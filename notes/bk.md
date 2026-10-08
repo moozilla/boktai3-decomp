@@ -47,3 +47,13 @@ Only run briefly on 08100BC8 (score 1355, not near 0) before the struct approach
 - sub_0814A854 (2): up-counting loop with `cmp r6,#2; ble` gets strength-reduced to downcount; 6 tries
 - sub_08238470 (2): ptr?ldrsh:-1 compare; r4 temp used for ldrsh offset instead of r3; 3 tries
 - fragments (not whole functions, tail-split): sub_0808A9EC sub_080C09F0 sub_0813436E sub_08219624 sub_0821962C sub_08249210 sub_08248970 sub_0808A210
+- sub_081C674C (2): r2 holds copy of old counter value, r4/r5 pushed; 4 tries
+- sub_0811EE68 (2): args shuffled (b->r0, n->r1) before cmp, like an inlined helper; 3 tries
+- sub_080F4A0C (2): byte stores with last address computed as 0xf8+0x97 (reg reuse); mine uses literal pool; 3 tries
+- sub_081B6810 (2): find-first-free-slot loop; out ptr in r4, stride r5, `bne next` layout; 3 tries
+- sub_081FB82C (2): CpuSet(&zero) with stack zero stored after `adds r1,#0xc`; 3 tries
+- sub_0813DB60 (2): p/d swapped regs (r3/r2), return-d layout; 3 tries
+- sub_081A55D4 (3): loop with 5-arg stack call, copies r4/r5 allocation swapped; permuted decl order, 24 tries
+- sub_0818E1BC (3): flag-take with 0x119 bit0, 'ands r0,r1' operand order; 5 tries
+- sub_08210C5C (3): nested const-chain select; only r2/r3 swapped (p in r3, r in r2); 6 tries
+- sub_080F6118 (3) same flag-take-0x119-bit0 as sub_0818E1BC (-2 mask not narrowed to 0xfe)
