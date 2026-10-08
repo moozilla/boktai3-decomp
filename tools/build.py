@@ -59,8 +59,8 @@ def build_asm(src, obj, defsym=None):
 
 
 def build_c(src, obj):
-    deps = [src] + [os.path.join("include", f) for f in sorted(os.listdir(os.path.join(ROOT, "include")))
-                    if f.endswith(".h")]
+    deps = [src] + [os.path.join(d, f) for d in ("include", "include/gba")
+                    for f in sorted(os.listdir(os.path.join(ROOT, d))) if f.endswith(".h")]
     key = file_hash(*deps, "tools/build.py", extra=" ".join(CFLAGS))
     if stamp_ok(os.path.join(ROOT, obj), key):
         return
@@ -141,8 +141,20 @@ def main():
         base = open(os.path.join(ROOT, "baserom.gba"), "rb").read()
         new = open(os.path.join(ROOT, a.out), "rb").read()
         diff = next((i for i in range(min(len(base), len(new))) if base[i] != new[i]), None)
-        sys.exit(f"{a.out}: MISMATCH (sha1 {h}); first difference at "
-                 f"{0x08000000 + diff:#010x}" if diff is not None else f"{a.out}: MISMATCH (length)")
+        # Layout shifts make the first byte difference misleading: name the
+        # first function whose linked address differs from its original one.
+        moved = None
+        for ln in sh(["arm-none-eabi-nm", "-n", elf]).splitlines():
+            m = re.match(r"([0-9a-f]{8}) [Tt] sub_([0-9A-F]{8})$", ln)
+            if m and int(m.group(1), 16) & ~1 != int(m.group(2), 16):
+                moved = m.group(2)
+                break
+        msg = f"{a.out}: MISMATCH (sha1 {h}); first difference at " + (
+            f"{0x08000000 + diff:#010x}" if diff is not None else "(length)")
+        if moved:
+            msg += (f"\n  layout shifted: sub_{moved} is not at its original address -- the C unit "
+                    f"just before it compiles to a different size")
+        sys.exit(msg)
     print(f"{a.out}: OK")
 
 
