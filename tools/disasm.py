@@ -17,7 +17,7 @@ import re
 import subprocess
 import sys
 
-from romlib import ROOT, baserom_path, load_rom, u16
+from romlib import ROOT, baserom_path, load_rom, u16, u32
 
 CODE_END = 0x0824DAFA  # first byte after the last function (verified by rebuild)
 GBADISASM = os.environ.get("GBADISASM", os.path.join(ROOT, "build", "tools", "gbadisasm", "gbadisasm"))
@@ -54,6 +54,20 @@ def bl_targets(b):
             t = o + 4 + (off11 << 12) + ((h2 & 0x7FF) << 1)
             if 0 <= t < CODE_END - 0x08000000 and (u16(b, t) & 0xFF00) == 0xB500:
                 seeds.add(0x08000000 + t)
+    return seeds
+
+
+def data_table_seeds(b):
+    """Thumb entries referenced from aligned words anywhere in the ROM
+    (callback/state tables in the data region), which never show up as code
+    literals. Only entries that start with a push are taken."""
+    seeds = set()
+    for o in range(0, len(b) - 3, 4):
+        v = u32(b, o)
+        if v & 1 and 0x08000400 <= v < CODE_END:
+            a = v & ~1
+            if (u16(b, a - 0x08000000) & 0xFE00) == 0xB400 and not in_overlay(a):
+                seeds.add(a)
     return seeds
 
 
@@ -105,7 +119,7 @@ def main():
         sys.exit(f"gbadisasm not found at {GBADISASM}; run tools/setup.sh")
     b = load_rom()
     names = load_names()
-    seeds = bl_targets(b) | set(names)
+    seeds = bl_targets(b) | set(names) | data_table_seeds(b)
     outdir = os.path.join(ROOT, "gen")
     os.makedirs(outdir, exist_ok=True)
     cfg = os.path.join(outdir, "disasm.cfg")
