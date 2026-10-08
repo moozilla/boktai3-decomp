@@ -120,6 +120,7 @@ everything from the worktree root.
   produce different layouts. Try both. A single `return` with a result
   variable often matches better.
 * `cmp rX, #n; beq; cmp rX, #n; bgt ...` is a switch statement.
+* **Never write a raw ROM data address** (`0x08603300`) in C: it matches but breaks the shift test. Declare the gen/data.s label (`extern const u32 gUnk_08603300[];`). build.py rejects raw addresses >= 0x0824DAFC.
 * Struct field offsets: define a local struct with `u8 filler[N]` padding,
   or use `*(u16 *)(p + 0x20)` casts. Both compile the same.
 * Multiplications by constants appear as shift/add sequences, and

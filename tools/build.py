@@ -66,7 +66,7 @@ def lint_c(src):
     """A raw ROM-data address in C matches byte-for-byte but stays put when
     the data moves (shift test). Reference the gen/data.s label instead."""
     text = re.sub(r"/\*.*?\*/|//[^\n]*", "", open(os.path.join(ROOT, src)).read(), flags=re.S)
-    bad = [m.group(0) for m in RAW_ROM.finditer(text) if int(m.group(1), 16) >= DATA_START - 0x08000000]
+    bad = [m.group(0) for m in RAW_ROM.finditer(text) if int(m.group(0), 16) >= DATA_START]
     if bad:
         sys.exit(f"{src}: raw ROM data address {', '.join(sorted(set(bad)))}; "
                  f"declare `extern const u8 gUnk_XXXXXXXX[];` (the label in gen/data.s) and use that")
