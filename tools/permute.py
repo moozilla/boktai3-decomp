@@ -20,7 +20,18 @@ import sys
 import build
 from romlib import ROOT
 
-PERMUTER = os.environ.get("PERMUTER", os.path.join(os.path.dirname(ROOT), "decomp-permuter"))
+def _find_permuter():
+    if os.environ.get("PERMUTER"):
+        return os.environ["PERMUTER"]
+    # next to the repo, or next to the main checkout when run from ../wt/NAME
+    for base in (os.path.dirname(ROOT), os.path.dirname(os.path.dirname(os.path.dirname(ROOT)))):
+        p = os.path.join(base, "decomp-permuter")
+        if os.path.isdir(p):
+            return p
+    return os.path.join(os.path.dirname(ROOT), "decomp-permuter")
+
+
+PERMUTER = _find_permuter()
 
 
 def main():
