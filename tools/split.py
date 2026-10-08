@@ -133,11 +133,36 @@ def main():
         out_units.append(("asm", os.path.relpath(path, ROOT)))
         seg_no += 1
 
+    aliases = []
+    addr_name = re.compile(r"(?:^|_)([0-9A-F]{8})(?:__addr)?$")
     for first, last, rel in units:
         emit_seg(line, funcs[first][2])
         out_units.append(("c", rel))
-        line = funcs[last][3]
+        # The C object replaces only the last function's instructions (and its
+        # literal pools); trailing undisassembled data in that block stays asm.
+        end = funcs[last][3]
+        for k in range(funcs[last][2], funcs[last][3]):
+            if code[k].lstrip().startswith(".incbin"):
+                end = k
+                while end > funcs[last][2] and LABEL.match(code[end - 1]):
+                    end -= 1
+                break
+        # Labels that disappear with the asm are redefined relative to the
+        # unit's first function, so references from elsewhere still resolve.
+        base_name, base_addr = funcs[first][0], funcs[first][1]
+        c_names = {funcs[i][0] for i in range(first, last + 1)}
+        for k in range(funcs[first][2], end):
+            m = LABEL.match(code[k]) or SET_LABEL.match(code[k])
+            if not m or m.group(1) in c_names:
+                continue
+            am = addr_name.search(m.group(1))
+            if am:
+                aliases.append(f"{m.group(1)} = ({base_name} & ~1) + {int(am.group(1), 16) - base_addr:#x};")
+        for name in c_names:
+            aliases.append(f"PROVIDE({name}__addr = {name} & ~1);")
+        line = end
     emit_seg(line, len(code))
+    open(os.path.join(ROOT, "build", "c_labels.ld"), "w").write("\n".join(aliases) + "\n")
 
     with open(os.path.join(ROOT, "build", "units.txt"), "w") as f:
         for kind, p in out_units:
