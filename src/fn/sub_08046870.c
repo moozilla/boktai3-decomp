@@ -1,8 +1,9 @@
 #include "global.h"
 
-u32 sub_08046870(u8 *p) {
-    if (p == 0) {
+struct S { u8 f[0x2c]; u32 a; };
+u32 sub_08046870(struct S *p)
+{
+    if (!p)
         return 0;
-    }
-    return *(u32 *)(p + 0x2C);
+    return p->a;
 }
