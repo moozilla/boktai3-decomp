@@ -12,11 +12,11 @@ top of it, but the translation lives in its own repo.
 
 | | |
 |---|---|
-| Disassembly | 7,868 functions, reassembles **bit-identical** (`make compare`) |
+| Disassembly | 10,986 functions (incl. callbacks found via data-region pointer tables), reassembles **bit-identical** (`make compare`) |
 | Shiftable | every ROM pointer is a symbol; all 13.7 MB of data can move. Moving it by 64 KiB plays **pixel-identical** in every scripted test (`make shifttest`) |
 | Compiler | identified as **agbcc** (pret's GCC 2.95 GBA compiler), `-O2 -mthumb-interwork` |
-| C pipeline | `src/*.c` → agbcc → spliced into the ROM in place of the asm; `INCLUDE_ASM` for unfinished functions; 4 functions matched so far |
-| Libraries | 43 MP2K (`m4a`) functions match pret's pokeemerald `m4a.c` byte-for-byte (`tools/sigmatch.py`); `libagbsyscall` identified |
+| C pipeline | `src/*.c` → agbcc → spliced into the ROM in place of the asm; `INCLUDE_ASM` for unfinished functions; **1,430 functions matched** (see PROGRESS.md); `tools/check.py` per-function diff, `tools/permute.py` for decomp-permuter |
+| Libraries | 57 of 58 MP2K (`m4a`) functions in C (`src/lib/m4a.c`, from pret's pokeemerald plus older-SDK variants) (`tools/sigmatch.py`); `libagbsyscall` identified |
 | Text | script bank format decoded (9,976 strings round-trip byte-exact); the text itself is handled by the translation repo |
 | Sound | MP2K engine; 1,483 songs, 5,525 track streams, 81 voicegroups, 415 samples walked |
 | Symbols | `symbols/` — named functions (incl. raphaelr's), data map, confirmed pointers |

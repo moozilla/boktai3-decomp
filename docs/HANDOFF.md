@@ -9,10 +9,13 @@ can pick up without the chat history. Read `README.md`, `CLAUDE.md`,
 * **Build:** the ROM rebuilds bit-identical (`make`), and all data is
   relocatable (`make shifttest` moves it 64 KiB and the emulator screenshots
   stay identical).
-* **Decomp:** 664 / 7,890 functions in C (8.4% of functions, ~2.3% of code
-  bytes; see `PROGRESS.md`). Almost all are small, easiest-first functions in
-  `src/fn/` (one file per function). Plus `src/lib/m4a.c`: 55 of 58 MP2K
-  functions, lifted from pret's pokeemerald.
+* **Decomp:** 1,430 / 10,986 functions in C (13.0% of functions, ~2.8% of code
+  bytes; see `PROGRESS.md`). Mostly small functions in `src/fn/` (one file per
+  function), plus `src/lib/m4a.c` (57 of 58 MP2K functions; `CgbSound` left).
+  The function total grew from 7,890 to 10,986 when `tools/disasm.py` started
+  seeding from function-pointer tables in the data region (session 2); the old
+  byte percentages were inflated because undiscovered code was counted as part
+  of the preceding function.
 * **Names:** almost everything is still `sub_XXXXXXXX`. Proposed names sit in
   `symbols/proposed/*.csv` (mostly m4a) and have **not** been applied to
   `symbols/functions.csv` yet. Review them first.
@@ -58,9 +61,7 @@ Optional: the Ghidra export for `tools/ghidra_c.py` (`tools/ghidra/README.md`,
 * ~~Leaf functions starting `mov ip, r0`~~: solved, they come from struct array accesses (see WORKER.md).
 * Jump-table functions are mostly unattempted (`JUMPTABLE` in worklist).
 * ~~Per-unit check~~: `tools/check.py` (links one file at its address, diffs vs. ROM).
-* gbadisasm finds 7,890 functions and Ghidra 10,686. The difference is mostly
-  code reached only through pointer tables. Reconcile it, because missing
-  functions sit inside `.incbin` blocks today.
+* ~~gbadisasm vs. Ghidra function counts~~: reconciled; data-table seeds bring gbadisasm to 10,986 (Ghidra: 10,686). Some code may still hide in `.incbin` blocks (no pointer to it anywhere): search for `push {..., lr}` prologues after returns.
 * m4a: only `CgbSound` is left (`notes/cgb.md`, best attempt `notes/cgb_attempt.c`; register allocation only). `CgbModVol` and `m4aSoundVSync` are matched. Old note: `CgbModVol`, `CgbSound` (older SDK variant) and `m4aSoundVSync`
   (asm in the SDK) are still INCLUDE_ASM. `gMaxLines = 0` in
   `symbols/ram.ld` is an unverified placeholder.
