@@ -59,8 +59,8 @@ def build_asm(src, obj, defsym=None):
 
 
 def build_c(src, obj):
-    deps = [src] + [os.path.join("include", f) for f in sorted(os.listdir(os.path.join(ROOT, "include")))
-                    if f.endswith(".h")]
+    deps = [src] + [os.path.join(d, f) for d in ("include", "include/gba")
+                    for f in sorted(os.listdir(os.path.join(ROOT, d))) if f.endswith(".h")]
     key = file_hash(*deps, "tools/build.py", extra=" ".join(CFLAGS))
     if stamp_ok(os.path.join(ROOT, obj), key):
         return

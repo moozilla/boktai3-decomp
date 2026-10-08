@@ -45,6 +45,8 @@ def c_functions(path, with_asm=True):
         name = m.group(1)
         if name in ("if", "for", "while", "switch", "return", "sizeof"):
             continue
+        if "static" in src[src.rfind("\n", 0, m.start()) + 1:m.start()]:
+            continue  # static (inline) helper: not a ROM function of its own
         found.append((m.start(), name))
     if with_asm:
         for m in INCLUDE_ASM.finditer(src):
@@ -96,6 +98,12 @@ def main():
             continue
         idx = []
         for n in names:
+            if n not in index and re.fullmatch(r"sub_[0-9A-F]{8}", n):
+                # "hidden" function: code the disassembler did not split off
+                # (e.g. inside the previous function's trailing data). It is
+                # replaced along with the block it sits in; it only needs to
+                # lie between this unit's first and last known function.
+                continue
             if n not in index:
                 sys.exit(f"{rel}: function {n} is not a known function start")
             idx.append(index[n])
