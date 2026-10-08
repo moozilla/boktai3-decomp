@@ -58,7 +58,22 @@ def build_asm(src, obj, defsym=None):
     stamp(os.path.join(ROOT, obj), key)
 
 
+DATA_START = 0x0824DAFC
+RAW_ROM = re.compile(r"\b0[xX]0([89][0-9A-Fa-f]{6})\b")
+
+
+def lint_c(src):
+    """A raw ROM-data address in C matches byte-for-byte but stays put when
+    the data moves (shift test). Reference the gen/data.s label instead."""
+    text = re.sub(r"/\*.*?\*/|//[^\n]*", "", open(os.path.join(ROOT, src)).read(), flags=re.S)
+    bad = [m.group(0) for m in RAW_ROM.finditer(text) if int(m.group(1), 16) >= DATA_START - 0x08000000]
+    if bad:
+        sys.exit(f"{src}: raw ROM data address {', '.join(sorted(set(bad)))}; "
+                 f"declare `extern const u8 gUnk_XXXXXXXX[];` (the label in gen/data.s) and use that")
+
+
 def build_c(src, obj):
+    lint_c(src)
     deps = [src] + [os.path.join(d, f) for d in ("include", "include/gba")
                     for f in sorted(os.listdir(os.path.join(ROOT, d))) if f.endswith(".h")]
     key = file_hash(*deps, "tools/build.py", extra=" ".join(CFLAGS))
