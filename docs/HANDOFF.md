@@ -92,6 +92,10 @@ build.
 
 ## Cleanup backlog (later phase)
 
+* **Lua pseudo debug menu** (user idea): build our own debug menu into
+  `tools/mgba/centaur.lua`: jump to scenes/stages, set flags, warp, toggle
+  sun level, using RAM addresses as the decomp names them. Not matching work.
+
 * Group `src/fn/*.c` into real translation units: contiguous files, shared
   headers, struct definitions instead of `*(u16 *)(p + 0x156)`.
 * Apply reviewed names; add struct/RAM symbols (`symbols/ram.ld`).
