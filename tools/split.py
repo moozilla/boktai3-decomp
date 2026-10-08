@@ -152,7 +152,7 @@ def main():
         for k in range(funcs[last][2], funcs[last][3]):
             if code[k].lstrip().startswith(".incbin"):
                 end = k
-                while end > funcs[last][2] and LABEL.match(code[end - 1]):
+                while end > funcs[last][2] and re.match(r"^\w+:\s*$", code[end - 1]):
                     end -= 1
                 break
         # Labels that disappear with the asm are redefined relative to the
