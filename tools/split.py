@@ -36,6 +36,8 @@ def c_functions(path, with_asm=True):
     INCLUDE_ASM(dir, name) placeholders (unless with_asm=False)."""
     raw = open(path).read()
     src = raw
+    # "#define Name sub_XXXXXXXX" aliases a known name to its address label
+    alias = dict(re.findall(r"^#define\s+(\w+)\s+(sub_[0-9A-F]{8})\s*$", raw, re.M))
     src = re.sub(r"/\*.*?\*/", "", src, flags=re.S)
     src = re.sub(r"//[^\n]*", "", src)
     src = re.sub(r"^#.*$", "", src, flags=re.M)
@@ -51,7 +53,7 @@ def c_functions(path, with_asm=True):
     if with_asm:
         for m in INCLUDE_ASM.finditer(src):
             found.append((m.start(), m.group(1)))
-    return [n for _, n in sorted(found)]
+    return [alias.get(n, n) for _, n in sorted(found)]
 
 
 def write_nonmatching(code, funcs):
