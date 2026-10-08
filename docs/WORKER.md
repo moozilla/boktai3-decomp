@@ -87,6 +87,11 @@ everything from the worktree root.
 * **Redundant null check** (`bl f; cmp r0,#0; bne; movs r0,#0`): the function
   returns the address of the struct's first field:
   `if (!p) return NULL; return &p->unk0;` (src/fn/sub_08065C40.c).
+* **Materialised bools** (`movs r0,#1; b; movs r0,#0; cmp r0,#0`): put the
+  test in a `static inline u8` helper (`return TRUE/FALSE`) and call it in the
+  `if`. An `int` result gets jump-threaded away (src/fn/sub_080F9374.c). For a
+  `bne; movs 0; b; movs 1` return, `if (x & m) return TRUE; return FALSE;`
+  works where the ternary doesn't (src/fn/sub_080FF7AC.c).
 * **Clone families**: run `python3 tools/clones.py --port --range START END`
   on your range after a few matches; it copies matched C to identical
   siblings and keeps what `check.py` accepts.
