@@ -353,9 +353,81 @@ void SoundInit(struct SoundInfo *soundInfo)
     soundInfo->ident = ID_NUMBER;
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_08230380);
+void sub_08230380(u32 freq)
+{
+    struct SoundInfo *soundInfo;
 
-INCLUDE_ASM("asm/nonmatching", sub_082303EC);
+    m4aSoundVSyncOff();
+    soundInfo = SOUND_INFO_PTR;
+
+    freq = (freq & 0xF0000) >> 16;
+    soundInfo->freq = freq;
+    soundInfo->pcmSamplesPerVBlank = gPcmSamplesPerVBlankTable[freq - 1];
+    soundInfo->pcmDmaPeriod = PCM_DMA_BUF_SIZE / soundInfo->pcmSamplesPerVBlank;
+
+    // LCD refresh rate 59.7275Hz
+    soundInfo->pcmFreq = (597275 * soundInfo->pcmSamplesPerVBlank + 5000) / 10000;
+
+    // CPU frequency 16.78Mhz
+    soundInfo->divFreq = (16777216 / soundInfo->pcmFreq + 1) >> 1;
+
+    m4aSoundVSyncOn();
+}
+
+void sub_082303EC(u32 mode)
+{
+    struct SoundInfo *soundInfo = SOUND_INFO_PTR;
+    u32 temp;
+
+    if (soundInfo->ident != ID_NUMBER)
+        return;
+
+    soundInfo->ident++;
+
+    temp = mode & (SOUND_MODE_REVERB_SET | SOUND_MODE_REVERB_VAL);
+
+    if (temp)
+        soundInfo->reverb = temp & SOUND_MODE_REVERB_VAL;
+
+    temp = mode & SOUND_MODE_MAXCHN;
+
+    if (temp)
+    {
+        struct SoundChannel *chan;
+
+        soundInfo->maxChans = temp >> SOUND_MODE_MAXCHN_SHIFT;
+
+        temp = MAX_DIRECTSOUND_CHANNELS;
+        chan = &soundInfo->chans[0];
+
+        while (temp != 0)
+        {
+            chan->statusFlags = 0;
+            temp--;
+            chan++;
+        }
+    }
+
+    temp = mode & SOUND_MODE_MASVOL;
+
+    if (temp)
+        soundInfo->masterVolume = temp >> SOUND_MODE_MASVOL_SHIFT;
+
+    temp = mode & SOUND_MODE_DA_BIT;
+
+    if (temp)
+    {
+        temp = (temp & 0x300000) >> 14;
+        REG_SOUNDBIAS_H = (REG_SOUNDBIAS_H & 0x3F) | temp;
+    }
+
+    temp = mode & SOUND_MODE_FREQ;
+
+    if (temp)
+        SampleFreqSet(temp);
+
+    soundInfo->ident = ID_NUMBER;
+}
 
 void SoundClear(void)
 {
@@ -396,9 +468,54 @@ void SoundClear(void)
     soundInfo->ident = ID_NUMBER;
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_082304D4);
+void sub_082304D4(void)
+{
+    struct SoundInfo *soundInfo = SOUND_INFO_PTR;
 
-INCLUDE_ASM("asm/nonmatching", sub_08230554);
+    if (soundInfo->ident >= ID_NUMBER && soundInfo->ident <= ID_NUMBER + 1)
+    {
+        soundInfo->ident += 10;
+
+        REG_TM0CNT_H = 0;
+
+        if (REG_DMA1CNT & (DMA_REPEAT << 16))
+            REG_DMA1CNT = ((DMA_ENABLE | DMA_START_NOW | DMA_32BIT | DMA_SRC_INC | DMA_DEST_FIXED) << 16) | 4;
+
+        if (REG_DMA2CNT & (DMA_REPEAT << 16))
+            REG_DMA2CNT = ((DMA_ENABLE | DMA_START_NOW | DMA_32BIT | DMA_SRC_INC | DMA_DEST_FIXED) << 16) | 4;
+
+        REG_DMA1CNT_H = DMA_32BIT;
+        REG_DMA2CNT_H = DMA_32BIT;
+
+        CpuFill32(0, soundInfo->pcmBuffer, sizeof(soundInfo->pcmBuffer));
+    }
+}
+
+void sub_08230554(void)
+{
+    struct SoundInfo *soundInfo = SOUND_INFO_PTR;
+    u32 ident = soundInfo->ident;
+
+    if (ident == ID_NUMBER)
+        return;
+
+    REG_DMA1CNT_H = DMA_ENABLE | DMA_START_SPECIAL | DMA_32BIT | DMA_REPEAT;
+    REG_DMA2CNT_H = DMA_ENABLE | DMA_START_SPECIAL | DMA_32BIT | DMA_REPEAT;
+
+    soundInfo->pcmDmaCounter = 0;
+    soundInfo->ident = ident - 10;
+
+    while (*(vu8 *)REG_ADDR_VCOUNT == 159)
+        ;
+
+    while (*(vu8 *)REG_ADDR_VCOUNT != 159)
+        ;
+
+    // cycles per LCD fresh 280896
+    REG_TM0CNT_L = -(280896 / soundInfo->pcmSamplesPerVBlank);
+
+    REG_TM0CNT_H = TIMER_ENABLE | TIMER_1CLK;
+}
 
 INCLUDE_ASM("asm/nonmatching", sub_082305CC);
 
