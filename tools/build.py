@@ -117,6 +117,10 @@ def main():
     ld += [f"    {o}(.text)" for o in objs]
     ld += ["  }", "  /DISCARD/ : { *(.comment) *(.ARM.attributes) }", "}"]
     ld += [f"{name} = 0x{addr};" for name, addr in sorted(syms)]
+    ld += open(os.path.join(ROOT, "build", "c_labels.ld")).read().splitlines()
+    ram = os.path.join(ROOT, "symbols", "ram.ld")
+    if os.path.exists(ram):
+        ld += open(ram).read().splitlines()
     open(os.path.join(ROOT, "build", "link.ld"), "w").write("\n".join(ld) + "\n")
     elf = a.out[:-4] + ".elf"
     sh(["arm-none-eabi-ld", "-T", "build/link.ld", "-o", elf])
