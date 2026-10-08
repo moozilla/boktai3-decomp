@@ -913,12 +913,16 @@ void CgbOscOff(u8 chanNum)
     }
 }
 
-static inline int CgbPan(struct CgbChannel *chan)
+static inline bool32 CgbPanInline(struct CgbChannel *chan)
 {
-    u32 rightVolume = chan->rightVolume;
-    u32 leftVolume = chan->leftVolume;
+    u32 r, l, rightVolume, leftVolume;
 
-    if ((rightVolume = (u8)rightVolume) >= (leftVolume = (u8)leftVolume))
+    r = chan->rightVolume;
+    l = chan->leftVolume;
+    rightVolume = (u8)r;
+    leftVolume = (u8)l;
+
+    if (rightVolume >= leftVolume)
     {
         if (rightVolume / 2 >= leftVolume)
         {
@@ -938,7 +942,24 @@ static inline int CgbPan(struct CgbChannel *chan)
     return 0;
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_08230A60);
+// Older SDK: no soundInfo->mode check; CgbPan is inlined.
+void CgbModVol(struct CgbChannel *chan)
+{
+    if (!CgbPanInline(chan))
+    {
+        chan->pan = 0xFF;
+        chan->envelopeGoal = (u32)(chan->rightVolume + chan->leftVolume) / 16;
+    }
+    else
+    {
+        chan->envelopeGoal = (u32)(chan->rightVolume + chan->leftVolume) / 16;
+        if (chan->envelopeGoal > 15)
+            chan->envelopeGoal = 15;
+    }
+
+    chan->sustainGoal = (chan->envelopeGoal * chan->sustain + 15) >> 4;
+    chan->pan &= chan->panMask;
+}
 
 INCLUDE_ASM("asm/nonmatching", sub_08230AC8);
 
