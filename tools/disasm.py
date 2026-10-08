@@ -131,8 +131,10 @@ def main():
         gaps = [(0x08000000 + int(o, 16), int(n, 16)) for o, n in
                 re.findall(r'\.incbin "baserom\.gba", (0x[0-9a-f]+), (0x[0-9a-f]+)', asm)]
 
+        byte_labels = {int(x, 16) for x in re.findall(r"^_([0-9A-F]{8}):\n\t\.byte ", asm, re.M)}
+
         def in_gap(a):
-            return any(s <= a < s + n for s, n in gaps)
+            return a in byte_labels or any(s <= a < s + n for s, n in gaps)
         # a word-aligned target in undecoded bytes is accepted too: small leaf
         # callbacks often sit right after a literal pool or padding
         new = {a for a in new if not in_overlay(a) and
