@@ -40,3 +40,10 @@ Only run briefly on 08100BC8 (score 1355, not near 0) before the struct approach
 - sub_08249FA8 (4): epilogue is 'pop {r4,pc}' = compiled without -mthumb-interwork; build has no per-file flag (tooling gap). Rest matched except that
 - sub_08086A2C (4): arg regs swapped (p in r5, n in r4 in orig; mine reversed), 7 tries
 - sub_0813BA24 (4): ret value copied to r1 and 0x744 literal reused +4 for next addr; r/off regs differ, 9 tries
+- sub_0822B4E8 (2): `ldr r1,=gUnk; ldrh r0,[r1,#0x3c]` (ptr in r1, value r0); every form gives ptr in r0; 4 tries
+- sub_08019BB0 (2): arg copied to r2 (not r1) around ldr of global; 5 tries
+- sub_08164738/sub_08165870 (3): `ldr r2,=0xD040; adds r1,r2,#0; strh` counter/copy pattern with p++ between stores; 7 tries
+- sub_0816A25C (2): switch (a>>2) with case 2 body before case 1/3 but cmp-1 first; case order vs body order not reproducible, 5 tries
+- sub_0814A854 (2): up-counting loop with `cmp r6,#2; ble` gets strength-reduced to downcount; 6 tries
+- sub_08238470 (2): ptr?ldrsh:-1 compare; r4 temp used for ldrsh offset instead of r3; 3 tries
+- fragments (not whole functions, tail-split): sub_0808A9EC sub_080C09F0 sub_0813436E sub_08219624 sub_0821962C sub_08249210 sub_08248970 sub_0808A210
