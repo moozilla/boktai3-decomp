@@ -61,7 +61,7 @@ Optional: the Ghidra export for `tools/ghidra_c.py` (`tools/ghidra/README.md`,
 * gbadisasm finds 7,890 functions and Ghidra 10,686. The difference is mostly
   code reached only through pointer tables. Reconcile it, because missing
   functions sit inside `.incbin` blocks today.
-* m4a: `CgbModVol`, `CgbSound` (older SDK variant) and `m4aSoundVSync`
+* m4a: only `CgbSound` is left (`notes/cgb.md`, best attempt `notes/cgb_attempt.c`; register allocation only). `CgbModVol` and `m4aSoundVSync` are matched. Old note: `CgbModVol`, `CgbSound` (older SDK variant) and `m4aSoundVSync`
   (asm in the SDK) are still INCLUDE_ASM. `gMaxLines = 0` in
   `symbols/ram.ld` is an unverified placeholder.
 * No decomp.dev report or CI yet. `tools/progress.py --json` is a start, and
