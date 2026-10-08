@@ -122,8 +122,7 @@ build.
   2. Unoptimized bool merge blocks (`beq; movs 1; b; movs 0; cmp r0,#0`):
      agbcc threads them away. Bit-allocator loops need this.
   3. "Copy constant to a second register" in fill loops (`adds r2,r1,#0`).
-  4. `bl f; cmp r0,#0; bne; movs r0,#0` (redundant null check) folds to
-     `return f()`.
+  4. ~~Redundant null check~~: solved, it's `return &p->unk0` (WORKER.md).
   5. Pure register-allocation swaps (most skips): try `tools/permute.py`.
   These may hint at a slightly different compiler build or flags for some
   files; worth testing `old_agbcc` and `-O1` per class before brute force.

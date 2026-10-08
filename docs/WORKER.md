@@ -84,6 +84,12 @@ everything from the worktree root.
 * **Loops**: descending loops with no pre-check are `do {} while`; where the
   pointer increment sits (`e++` in the body vs. the `for`) moves `adds`.
 * C89: declarations at the top of a block only.
+* **Redundant null check** (`bl f; cmp r0,#0; bne; movs r0,#0`): the function
+  returns the address of the struct's first field:
+  `if (!p) return NULL; return &p->unk0;` (src/fn/sub_08065C40.c).
+* **Clone families**: run `python3 tools/clones.py --port --range START END`
+  on your range after a few matches; it copies matched C to identical
+  siblings and keeps what `check.py` accepts.
 * **Returns a value it never sets**: a non-void function that falls off the
   end (`u32 f(...) { ...; s->v = 0; }`) gives `pop {r1}; bx r1` with a stale r0.
 * **Work in progress** goes in an untracked `wip/` directory
