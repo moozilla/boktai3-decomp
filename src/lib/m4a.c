@@ -208,7 +208,40 @@ void m4aMPlayFadeIn(struct MusicPlayerInfo *mplayInfo, u16 speed)
     }
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_082300DC);
+void sub_082300DC(struct MusicPlayerInfo *mplayInfo)
+{
+    if (mplayInfo->ident == ID_NUMBER)
+    {
+        s32 trackCount;
+        struct MusicPlayerTrack *track;
+
+        mplayInfo->ident++;
+
+        trackCount = mplayInfo->trackCount;
+        track = mplayInfo->tracks;
+
+        while (trackCount > 0)
+        {
+            if (track->flags & MPT_FLG_EXIST)
+            {
+                if (track->flags & MPT_FLG_START)
+                {
+                    Clear64byte(track);
+                    track->flags = MPT_FLG_EXIST;
+                    track->bendRange = 2;
+                    track->volX = 64;
+                    track->lfoSpeed = 22;
+                    track->tone.type = 1;
+                }
+            }
+
+            trackCount--;
+            track++;
+        }
+
+        mplayInfo->ident = ID_NUMBER;
+    }
+}
 
 void MPlayExtender(struct CgbChannel *cgbChans)
 {
