@@ -7,3 +7,4 @@ __pycache__/
 tools/emu/harness
 !tests/saves/*.sav
 gen/
+wip/
