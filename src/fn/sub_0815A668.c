@@ -1,9 +1,9 @@
 #include "global.h"
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-s32 sub_0815CA08(void)
+void sub_08159164(s32);
+void sub_0815A668(void)
 {
     if (Script_SeekToKeyword(0x65))
-        return Script_GetValue();
-    return 0;
+        sub_08159164(Script_GetValue());
 }
