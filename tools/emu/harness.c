@@ -16,6 +16,8 @@
 //   save NAME / load NAME   savestate to/from OUTDIR/NAME.ss
 //   dump NAME ADDR:LEN  raw memory dump (hex address and length)
 //   watch ADDR:LEN      log stores into a RAM range (hex) to stderr
+//   poke ADDR[:SIZE] V  write V (hex) to memory once (SIZE 1/2/4, default 4)
+//   freeze ADDR[:SIZE] V  same, rewritten before every frame; "unfreeze" clears
 //   lux N               solar sensor reading (0-255, game treats lower as brighter)
 //   trace on|off        enable coverage recording (default on)
 //   (env BOKTAI3_SAV=file.sav loads a battery save first)
@@ -159,8 +161,19 @@ static void note_exec(void) {
 	}
 }
 
+// "freeze" entries: rewritten before every frame
+static struct { uint32_t addr, size, val; } freezes[32];
+static int nfreeze;
+
+static void poke(uint32_t addr, uint32_t size, uint32_t val) {
+	if (size == 1) core->busWrite8(core, addr, val);
+	else if (size == 2) core->busWrite16(core, addr, val);
+	else core->busWrite32(core, addr, val);
+}
+
 static void run_frames(int n) {
 	for (int f = 0; f < n; ++f) {
+		for (int i = 0; i < nfreeze; ++i) poke(freezes[i].addr, freezes[i].size, freezes[i].val);
 		if (!tracing) { core->runFrame(core); continue; }
 		uint32_t frame = core->frameCounter(core);
 		while (core->frameCounter(core) == frame) {
@@ -311,6 +324,19 @@ int main(int argc, char** argv) {
 			cpu->memory.store8 = h_store8;
 			cpu->memory.storeMultiple = h_storeMultiple;
 		}
+		else if (!strcmp(cmd, "poke") || !strcmp(cmd, "freeze")) {
+			// poke ADDR[:SIZE] VALUE   (hex; SIZE 1/2/4, default 4)
+			// freeze ADDR[:SIZE] VALUE  same, rewritten before every frame
+			unsigned addr = 0, size = 4, val = 0;
+			sscanf(a1, "%x:%x", &addr, &size);
+			sscanf(a2, "%x", &val);
+			poke(addr, size, val);
+			if (cmd[0] == 'f' && nfreeze < 32) {
+				freezes[nfreeze].addr = addr; freezes[nfreeze].size = size; freezes[nfreeze].val = val;
+				nfreeze++;
+			}
+		}
+		else if (!strcmp(cmd, "unfreeze")) nfreeze = 0;
 		else if (!strcmp(cmd, "lux")) lux = atoi(a1);
 		else if (!strcmp(cmd, "trace")) tracing = !strcmp(a1, "on");
 		else if (!strcmp(cmd, "mark")) {

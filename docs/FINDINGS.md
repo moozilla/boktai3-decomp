@@ -88,3 +88,17 @@ noted. "medium" means the name or role is inferred from coverage, not decoded.
 * **Debugging a bad pointer**: dump RAM every N frames on both builds;
   `tools/ramdiff.py` finds the first word that differs by something other
   than the shift, and the `watch` command finds the instruction that wrote it.
+
+## Debug leftovers (search, 2026-10-08)
+
+* No `DEBUG`/`TEST`/`MENU` ASCII strings, and no デバッグ in EUC-JP or Shift-JIS,
+  anywhere in the ROM. A retail debug menu, if any survives, has no text of its own.
+* Script text ids 1953–1973 (`08D8386B`…) are twelve `★デバッグメッセージ★`
+  ("debug message") banners, placeholder siblings of the 「〜を倒せ!!」 objective
+  banners just before them.
+* The event bytecode's EUC-JP developer labels (741 unique strings) describe demo
+  playback ("解説デモ" chapters for title/option/boot demos, `08DE987A`–`08DEA170`),
+  "◆◆デモモード◆◆" (`08DF59B0`), "◆◆現在ステージ" (`08DF566D`), sound delays
+  (`08DF99EA`), and timer/day-difference checks. They are printf-style log labels;
+  their script handlers are good targets for `poke`/`freeze` experiments in
+  `tools/emu/harness.c`.
