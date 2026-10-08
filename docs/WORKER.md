@@ -37,15 +37,27 @@ everything from the worktree root.
    * Keep the `sub_XXXXXXXX` name. If you're confident what a function does,
      add a line to `symbols/proposed/<your-worker-name>.csv`:
      `addr,name,confidence,evidence` (e.g. `08033568,Foo_SetFlag,medium,"sets flag 0x17D on gUnk_020000E0 object"`).
-4. `python3 tools/build.py`: `build/boktai3.gba: OK` means it matched. A
-   mismatch prints the first differing address. Compare
-   `arm-none-eabi-objdump -d build/src/fn/sub_XXXXXXXX.o` with the asm.
+4. Inner loop: `python3 tools/check.py sub_XXXXXXXX` compiles just your file,
+   links it at its real address and prints original vs. yours side by side,
+   with `!` on differing lines (~0.5 s; exit 0 = MATCH). Literal pools show up
+   as junk instructions; that's fine. When it says MATCH, run
+   `python3 tools/build.py` once (must print `build/boktai3.gba: OK`) before
+   committing: it also checks the whole-ROM layout.
 5. Matched: `git add src/fn/sub_XXXXXXXX.c symbols/proposed && git commit -m "match sub_XXXXXXXX"`.
-   Not matched after ~6 build attempts: delete the file, add a line to
+   Not matched after ~10 check attempts: delete the file, add a line to
    `notes/<your-worker-name>.md` with the address and what was off (register
    swap, branch order, ...), and move on. Never commit a non-matching file.
 
 ## agbcc matching tips
+
+* **Use real struct types, not `*(u16 *)(p + 0x20)` casts**, whenever the
+  asm indexes arrays inside an object. Leaf functions that start with
+  `mov ip, r0` (369 of them) come from struct/array-of-struct accesses like
+  `p->elems[i].flags &= ~1;`. With pointer casts agbcc pushes r4 instead. See
+  `src/fn/sub_0810C1E8.c`. Structs also fixed ordering problems elsewhere
+  (`sub_081FC61C`).
+* Function pointers work: declare the callee (`void sub_081F05D0(void);`) and
+  pass `sub_081F05D0`. The literal gets the Thumb bit (`src/fn/sub_081F065C.c`).
 
 * Compiler: `agbcc -O2 -mthumb-interwork`. Leaf functions may end in
   `bx lr` with no push. Functions that call others end in `pop {r0}; bx r0`
