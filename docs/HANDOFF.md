@@ -99,6 +99,36 @@ build.
 * Split `gen/data.s` into named assets (graphics, tilemaps, palettes), with
   extraction to PNG and rebuild, as eds/knidl do.
 
+## Session 2 (same day): what changed and what to do next
+
+* **Tools added:** `tools/check.py` (one file vs. ROM, side-by-side diff,
+  ~0.5 s), `tools/clones.py` (clone families: ports matched C to identical
+  siblings; `--stats`, `--port --range`), `tools/permute.py` (decomp-permuter
+  for agbcc), harness `poke`/`freeze`/`unfreeze`. `build.py` rejects raw ROM
+  data addresses in C (they broke the shift test once; see FINDINGS).
+* **Disassembly:** 10,986 functions (data-table seeds). Still missing: small
+  leaf callbacks that don't start with `push` and are referenced from code
+  literals only (e.g. `0806F54C`, `08070444`, `08070E44`). Extend
+  `disasm.py` seeding to accept non-push entries referenced by code literals
+  whose previous halfword is a return, then re-run `make disasm`.
+* **Workflow that worked:** Sonnet workers on disjoint ranges, 60–90 matches
+  per round at ~110–230k tokens each; merge, then run
+  `tools/clones.py --port` over idle ranges after each merge (it found 77
+  functions for free). Run `make shifttest` after big merges.
+* **Unsolved codegen classes** (logged across `notes/s*.md`; good targets for
+  Opus or the permuter):
+  1. A big constant built from another constant's register (`movs r2,#0x94;
+     lsls; ... subs r2,#4`) instead of separate literals.
+  2. Unoptimized bool merge blocks (`beq; movs 1; b; movs 0; cmp r0,#0`):
+     agbcc threads them away. Bit-allocator loops need this.
+  3. "Copy constant to a second register" in fill loops (`adds r2,r1,#0`).
+  4. `bl f; cmp r0,#0; bne; movs r0,#0` (redundant null check) folds to
+     `return f()`.
+  5. Pure register-allocation swaps (most skips): try `tools/permute.py`.
+  These may hint at a slightly different compiler build or flags for some
+  files; worth testing `old_agbcc` and `-O1` per class before brute force.
+* **CgbSound:** last m4a function; best attempt + permuter result in `notes/`.
+
 ## Translation (separate repo)
 
 The translation lives in [boktai3trans](https://github.com/moozilla/boktai3trans).
