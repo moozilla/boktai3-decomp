@@ -119,8 +119,7 @@ build.
   Opus or the permuter):
   1. A big constant built from another constant's register (`movs r2,#0x94;
      lsls; ... subs r2,#4`) instead of separate literals.
-  2. Unoptimized bool merge blocks (`beq; movs 1; b; movs 0; cmp r0,#0`):
-     agbcc threads them away. Bit-allocator loops need this.
+  2. ~~Unoptimized bool merge blocks~~: solved, `static inline u8` helpers (WORKER.md). Bit-allocator loops (0806F400 family) likely the same; untested.
   3. "Copy constant to a second register" in fill loops (`adds r2,r1,#0`).
   4. ~~Redundant null check~~: solved, it's `return &p->unk0` (WORKER.md).
   5. Pure register-allocation swaps (most skips): try `tools/permute.py`.
