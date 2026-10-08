@@ -118,7 +118,12 @@ build.
 * **Unsolved codegen classes** (logged across `notes/s*.md`; good targets for
   Opus or the permuter):
   1. A big constant built from another constant's register (`movs r2,#0x94;
-     lsls; ... subs r2,#4`) instead of separate literals.
+     lsls; ... subs r2,#4`) instead of separate literals. Partial (081A6108):
+     real struct fields get the first `movs/lsls` address right; the second
+     offset still comes from a literal. The original loads the stored value
+     *before* building the second address, so the source probably differs in
+     statement shape. Odd: with `u32 w; ... w = a->w38; c->w5a4 = w;` agbcc
+     dropped that store entirely (aliasing?), worth understanding.
   2. ~~Unoptimized bool merge blocks~~: solved, `static inline u8` helpers (WORKER.md). Bit-allocator loops (0806F400 family) likely the same; untested.
   3. "Copy constant to a second register" in fill loops (`adds r2,r1,#0`).
   4. ~~Redundant null check~~: solved, it's `return &p->unk0` (WORKER.md).
