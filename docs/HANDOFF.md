@@ -9,7 +9,7 @@ can pick up without the chat history. Read `README.md`, `CLAUDE.md`,
 * **Build:** the ROM rebuilds bit-identical (`make`), and all data is
   relocatable (`make shifttest` moves it 64 KiB and the emulator screenshots
   stay identical).
-* **Decomp:** 2,147 / 10,986 functions in C (19.5% of functions, ~4.2% of code
+* **Decomp:** 2,192 / 10,986 functions in C (20.0% of functions, ~4.4% of code
   bytes; see `PROGRESS.md`). Mostly small functions in `src/fn/` (one file per
   function), plus `src/lib/m4a.c` (57 of 58 MP2K functions; `CgbSound` left).
   The function total grew from 7,890 to 10,986 when `tools/disasm.py` started
@@ -131,6 +131,15 @@ build.
   These may hint at a slightly different compiler build or flags for some
   files; worth testing `old_agbcc` and `-O1` per class before brute force.
 * **CgbSound:** last m4a function; best attempt + permuter result in `notes/`.
+* **Backlog worker** (`notes/bk.md`) solved all 14 materialised-bool skips with
+  real structs + `static inline u8` helpers, and listed the next families
+  (stack-arg memclear allocs, per-slot callback loops, two-call free-all loops).
+  `clones.py` misses families that differ only in immediates; workers used
+  per-family generator scripts instead. Extending `clones.py` to map small
+  immediates too would automate that.
+* **Suggested next session:** Sonnet workers on the 41–80 instruction tier and
+  switches (all six ranges have plenty left), `clones.py --port` after each
+  merge, a backlog worker per few rounds, and `make shifttest` before ending.
 
 ## Translation (separate repo)
 
