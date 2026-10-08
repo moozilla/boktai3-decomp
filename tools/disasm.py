@@ -128,7 +128,15 @@ def main():
         asm = run(cfg)
         ptrs = {int(v, 16) for v in re.findall(r"\.4byte 0x(08[0-9A-F]{6})", asm)}
         new = {p & ~1 for p in ptrs if p & 1 and p < CODE_END} - seeds
-        new = {a for a in new if not in_overlay(a) and plausible_entry(b, a)}
+        gaps = [(0x08000000 + int(o, 16), int(n, 16)) for o, n in
+                re.findall(r'\.incbin "baserom\.gba", (0x[0-9a-f]+), (0x[0-9a-f]+)', asm)]
+
+        def in_gap(a):
+            return any(s <= a < s + n for s, n in gaps)
+        # a word-aligned target in undecoded bytes is accepted too: small leaf
+        # callbacks often sit right after a literal pool or padding
+        new = {a for a in new if not in_overlay(a) and
+               (plausible_entry(b, a) or (a % 4 == 0 and in_gap(a)))}
         nfunc = asm.count("func_start")
         print(f"pass {it}: {nfunc} functions, {len(new)} new pointer-derived seeds", file=sys.stderr)
         if not new:
