@@ -9,7 +9,7 @@ can pick up without the chat history. Read `README.md`, `CLAUDE.md`,
 * **Build:** the ROM rebuilds bit-identical (`make`), and all data is
   relocatable (`make shifttest` moves it 64 KiB and the emulator screenshots
   stay identical).
-* **Decomp:** 1,430 / 10,986 functions in C (13.0% of functions, ~2.8% of code
+* **Decomp:** 2,147 / 10,986 functions in C (19.5% of functions, ~4.2% of code
   bytes; see `PROGRESS.md`). Mostly small functions in `src/fn/` (one file per
   function), plus `src/lib/m4a.c` (57 of 58 MP2K functions; `CgbSound` left).
   The function total grew from 7,890 to 10,986 when `tools/disasm.py` started
