@@ -126,3 +126,12 @@ Stop when your assigned budget is reached or your range has no easy
 functions left. Make sure `python3 tools/build.py` prints OK on your final
 commit, then report: functions matched (count + list), functions skipped and
 why, and any naming insights.
+
+## Permuter (for "only registers differ" skips)
+
+`python3 tools/permute.py src/fn/sub_X.c --run 600` sets up
+build/permute/sub_X/ for [decomp-permuter](https://github.com/simonlindholm/decomp-permuter)
+(clone it next to the repo, or set PERMUTER=) and runs it for 10 minutes.
+Candidates with better scores land in build/permute/sub_X/output-*/. Use it on
+your best non-matching attempt when the structure is right and only register
+allocation or instruction order differs.
