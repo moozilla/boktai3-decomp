@@ -84,6 +84,7 @@ everything from the worktree root.
 * **Loops**: descending loops with no pre-check are `do {} while`; where the
   pointer increment sits (`e++` in the body vs. the `for`) moves `adds`.
 * C89: declarations at the top of a block only.
+* **Per-file compiler flags**: a line `// CFLAGS: -O2` (replaces the default `-O2 -mthumb-interwork`) — e.g. library code that ends in `pop {r4, pc}` was built without interworking.
 * **Redundant null check** (`bl f; cmp r0,#0; bne; movs r0,#0`): the function
   returns the address of the struct's first field:
   `if (!p) return NULL; return &p->unk0;` (src/fn/sub_08065C40.c).

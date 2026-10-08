@@ -76,11 +76,14 @@ def build_c(src, obj):
     lint_c(src)
     deps = [src] + [os.path.join(d, f) for d in ("include", "include/gba")
                     for f in sorted(os.listdir(os.path.join(ROOT, d))) if f.endswith(".h")]
-    key = file_hash(*deps, "tools/build.py", extra=" ".join(CFLAGS))
+    # per-file flags: a line "// CFLAGS: -O2 ..." replaces the default flags
+    m = re.search(r"^// CFLAGS: (.*)$", open(os.path.join(ROOT, src)).read(), re.M)
+    cflags = m.group(1).split() + ["-fhex-asm"] if m else CFLAGS
+    key = file_hash(*deps, "tools/build.py", extra=" ".join(cflags))
     if stamp_ok(os.path.join(ROOT, obj), key):
         return
     pre = sh(["cpp", "-P", "-nostdinc", "-undef", "-I", "include", "-iquote", ".", src])
-    asm = subprocess.run([AGBCC] + CFLAGS + ["-o", "-"], input=pre, cwd=ROOT,
+    asm = subprocess.run([AGBCC] + cflags + ["-o", "-"], input=pre, cwd=ROOT,
                          capture_output=True, text=True)
     if asm.returncode or "error" in asm.stderr:
         sys.stderr.write(asm.stderr)
