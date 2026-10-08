@@ -95,7 +95,7 @@ def main():
         rel = os.path.relpath(path, ROOT)
         names = c_functions(path)
         if not names:
-            continue
+            sys.exit(f"{rel}: no function definitions found (a file the build would silently ignore)")
         idx = []
         for n in names:
             if n not in index and re.fullmatch(r"sub_[0-9A-F]{8}", n):
