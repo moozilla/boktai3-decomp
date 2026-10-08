@@ -1,167 +1,152 @@
-# Handoff: state of the project and what to do next
+# Handoff: state of the project and how to continue
 
-Written at the end of the first working session (2026-10-08) so a new thread
-can pick up without the chat history. Read `README.md`, `CLAUDE.md`,
-`docs/WORKER.md`, `docs/ROM_MAP.md` and `docs/FINDINGS.md` too.
+Last updated at the end of session 3 (2026-10-09). This file is the single
+entry point for a new agent, a new thread after compaction, or a helper on
+another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
-## Where things stand
+## 1. Where things stand
 
-* **Build:** the ROM rebuilds bit-identical (`make`), and all data is
-  relocatable (`make shifttest` moves it 64 KiB and the emulator screenshots
-  stay identical).
-* **Decomp:** 3,618 / 11,025 functions in C (32.8% of functions, ~7.9% of code
-  bytes; see `PROGRESS.md`). Mostly small functions in `src/fn/` (one file per
-  function), plus `src/lib/m4a.c` (57 of 58 MP2K functions; `CgbSound` left).
-  The function total grew from 7,890 to 10,986 when `tools/disasm.py` started
-  seeding from function-pointer tables in the data region (session 2); the old
-  byte percentages were inflated because undiscovered code was counted as part
-  of the preceding function.
-* **Names:** almost everything is still `sub_XXXXXXXX`. Proposed names sit in
-  `symbols/proposed/*.csv` (mostly m4a) and have **not** been applied to
-  `symbols/functions.csv` yet. Review them first.
+| | |
+|---|---|
+| Matched C | **4,145 / 11,025 functions (37.6%)**, ~9.1% of code bytes (`PROGRESS.md`) |
+| Build | `make` / `python3 tools/build.py` rebuilds the ROM **bit-identical** (SHA-1 `2651c5e6875ac60abff734510d152166d211c87c`) |
+| Shiftable | all data relocatable; `make shifttest` (3 scenarios, 35 screenshots) passes |
+| Code layout | `src/fn/sub_XXXXXXXX.c`, one function per file; `src/lib/m4a.c` (MP2K sound, 57/58) |
+| Names | still mostly `sub_XXXXXXXX`; naming/context pass not started |
 
-## Rebuilding the environment in a new session
+Why bytes trail functions: workers go easiest-first. ~7,000 functions remain;
+most small ones (<=40 insns) are done in most ranges, so the frontier is the
+41-150 instruction tier, switches, and the logged skip classes below.
 
-The ROM is never in git, so a new cloud session needs it uploaded again.
-Then:
+History in one paragraph: session 1 built the disassembly (gbadisasm),
+shiftable data (46k symbolized pointers), the C pipeline and the first 664
+matches. Session 2 added `check.py`, `clones.py`, `permute.py`, found 3,096
+hidden functions (data-table seeds), and solved three "impossible" codegen
+patterns. Session 3 ran 5-6 Sonnet workers overnight (~1,950 matches).
+
+## 2. Setting up (new machine/session)
+
+The ROM is never in git. Upload it, then:
 
 ```
-ln -s /path/to/rom.gba baserom.gba        # SHA-1 2651c5e6875ac60abff734510d152166d211c87c
+ln -s /path/to/rom.gba baserom.gba        # SHA-1 above (Japanese, U33J)
 apt install build-essential cmake binutils-arm-none-eabi libmgba-dev python3-numpy python3-pil
-pip install capstone
+pip install capstone pycparser toml        # pycparser/toml only for the permuter
 make setup      # gbadisasm (patched), agbcc, armips, emulator harness
-make disasm     # ~18 min: gen/code.s, then gen/code_sym.s + gen/data.s
-make            # must print OK
+make disasm     # ~15-20 min: gen/code.s -> gen/code_sym.s + gen/data.s (11,025 functions)
+make            # must print build/boktai3.gba: OK
+git clone https://github.com/simonlindholm/decomp-permuter ../decomp-permuter   # optional
 ```
 
-Optional: the Ghidra export for `tools/ghidra_c.py` (`tools/ghidra/README.md`,
-~25 min). Workers found it useful as a first draft.
+`gen/` and `build/` are generated, gitignored, never committed (ROM-derived).
 
-## Parallel workers: what was learned
+## 3. How to match a function (the inner loop)
 
-* Setup: `tools/worktree.sh NAME` gives each worker its own git worktree
-  (`../wt/NAME`, branch `work/NAME`) that shares `gen/`, the ROM and the tools
-  by symlink. Workers get disjoint address ranges (`tools/worklist.py --chunks N`)
-  and follow `docs/WORKER.md`. The lead merges `work/*` branches into main.
-  Merges were always conflict-free because each function is its own file.
-* **Models:** Haiku 5.5 and Sonnet 5.5 both matched 8/8 on a pilot. Haiku used
-  ~160–230k tokens per round of ~40 easy functions. Sonnet used ~140–190k per
-  round of 40–55 and handled medium functions and the library lift.
-  Second-round yields dropped for Haiku in some ranges (w3: 10, w5: 28),
-  because the easy pool there is running out. Next rounds should use Sonnet
-  for 30–80-instruction functions, Opus or a permuter for the skip lists.
-* Each worker logs the functions it gave up on in `notes/wN.md`, with the
-  reason. That's the backlog for stronger models.
-* Lead-side cost was the expensive part (Opus, long context). Keep the lead
-  thread short: merge, fix tooling, and delegate.
+```
+python3 tools/worklist.py --range 08000000 080492B0 --max-insns 80   # unmatched, easiest first
+python3 tools/asmat.py 0800E08C 60      # the asm (runs past the end; stop at the next func_start)
+python3 tools/ghidra_c.py 0800E08C      # Ghidra draft, if gen/ghidra export exists (optional)
+mkdir -p wip && $EDITOR wip/sub_0800E08C.c
+python3 tools/check.py wip/sub_0800E08C.c   # ~0.5 s; side-by-side diff, '!' = differs; ends MATCH/MISMATCH
+cp wip/sub_0800E08C.c src/fn/ && python3 tools/build.py   # must print OK, then commit
+```
 
-## Open tooling issues
+Rules that matter (all in `docs/WORKER.md`, which also has ~40 agbcc tricks):
+* Only commit files that MATCH and a build that prints OK. Never hand-written asm.
+* Never write raw ROM data addresses (`0x086xxxxx`) in C: declare the
+  `gen/data.s` label (`extern const u8 gUnk_08603300[];`). build.py rejects them;
+  they break the shift test.
+* RAM: `extern T gUnk_02xxxxxx;` (the linker defines it from the name).
+* Callees: declare locally with their `sub_` name. Functions that have a real
+  name in gen (e.g. `Script_*`, m4a names) must be defined under that name.
+* Always read check.py's final MATCH line; a compile error prints no `!` lines.
 
-* ~~Thumb function pointers in C~~: solved, they just work now (081F065C, 081FC61C matched).
-* ~~Leaf functions starting `mov ip, r0`~~: solved, they come from struct array accesses (see WORKER.md).
-* Jump-table functions are mostly unattempted (`JUMPTABLE` in worklist).
-* ~~Per-unit check~~: `tools/check.py` (links one file at its address, diffs vs. ROM).
-* ~~gbadisasm vs. Ghidra function counts~~: reconciled; data-table seeds bring gbadisasm to 10,986 (Ghidra: 10,686). Some code may still hide in `.incbin` blocks (no pointer to it anywhere): search for `push {..., lr}` prologues after returns.
-* m4a: only `CgbSound` is left (`notes/cgb.md`, best attempt `notes/cgb_attempt.c`; register allocation only). `CgbModVol` and `m4aSoundVSync` are matched. Old note: `CgbModVol`, `CgbSound` (older SDK variant) and `m4aSoundVSync`
-  (asm in the SDK) are still INCLUDE_ASM. `gMaxLines = 0` in
-  `symbols/ram.ld` is an unverified placeholder.
-* No decomp.dev report or CI yet. `tools/progress.py --json` is a start, and
-  `report.json` can be generated without the ROM, as knidl's `gen_report.py`
-  does.
+## 4. Tools
 
-## Coverage / "centaur" plan (next big lever)
+| Tool | What |
+|---|---|
+| `tools/build.py` | split asm around src/*.c, compile (agbcc -O2 -mthumb-interwork; per-file `// CFLAGS:` override), link, SHA-1 check |
+| `tools/check.py FILE` | one file vs ROM at its address, side-by-side diff |
+| `tools/worklist.py` | unmatched functions with size/branch/jumptable signals; `--chunks N` to split ranges |
+| `tools/clones.py` | clone families: `--stats`, `--port [--loose] [--range A B]` copies matched C to identical siblings (loose = immediates may differ), keeps what check.py accepts. ~6 min for the full ROM. Run after every merge. |
+| `tools/permute.py FILE --run SECS` | decomp-permuter for register-allocation misses |
+| `tools/progress.py [--markdown PROGRESS.md]` | numbers |
+| `tools/disasm.py` / `symbolize.py` | regenerate gen/ (seeds: BL targets, code literals, data-region function tables, aligned gap targets) |
+| `tools/shift_test.sh`, `make shifttest` | move data 64 KiB, compare emulator screenshots |
+| `tools/emu/harness` | headless mGBA: scripted input, screenshots, coverage, `dump/watch/poke/freeze` |
+| `tools/mgba/centaur.lua` | desktop mGBA: input recorder + peek/poke console |
 
-1. **Record playthroughs**: `tools/mgba/centaur.lua` in desktop mGBA records
-   inputs as harness scripts (`rec_start("name")`). The RTC and solar
-   settings must match the harness defaults (see the script header). Replays
-   feed `tools/runtime_ptrs.py` (pointer evidence) and per-screen coverage
-   (`mark NAME` segments).
-2. **Find the gaps**: list functions never executed in any run, grouped by
-   caller and region, and map them to game features. Then play those parts
-   deliberately.
-3. **Force the rest**: add `poke ADDR VAL` and `call FUNC` commands to
-   `tools/emu/harness.c`. Use them, and the Lua console (`poke32`, `watch`),
-   to trigger unreached menus and scripts. The event bytecode keeps EUC-JP
-   debug labels, which are good hints for debug menus and scenes.
-4. **Name by context**: tag matched functions with the screens they run on
-   and the data they read, and name subsystems in batches.
+## 5. Running parallel workers (what worked)
 
-The current test runs cover only 1,709 functions (~6% of code). The
-shiftability proof only covers those paths, so more coverage also hardens the
-build.
+* `tools/worktree.sh NAME` -> `../wt/NAME` on branch `work/NAME`, sharing gen/,
+  the ROM and tools by symlink. Existing worktrees: `../wt/s0`..`s5`, `bk`, `disc`.
+* Ranges used in session 3 (each has ~1,000+ functions left):
+  s0 `08000000-080492B0`, s1 `080492B0-0810ECEC`, s2 `0810ECEC-08182F24`,
+  s3 `08182F24-081F612C`, s4 `081F612C-0824DAFA` (skip MP2K `0822F248-08231440`).
+* Give each worker `docs/WORKER_ROUND.md` with NAME/START/END. Sonnet-class
+  models did 80-135 matches per round at 130-340k tokens. Workers commit
+  after every batch, so a usage-limit cutoff loses little.
+* Lead merges: `git merge work/NAME`; on add/add conflicts (two workers or
+  clones.py matched the same function) keep either side (`git checkout --ours`),
+  check for `<<<<<<<`, build, push. Then `clones.py --port --loose`.
+* A "seeder" worker is high-leverage: list unseeded clone families
+  (see the snippet in the session-3 log: `clones.LOOSE=True; clones.families(...)`,
+  families with no matched member, largest first), match one representative
+  each, then port siblings. Top families gave 10-50 functions each.
+* Run `make shifttest` after big merges; once, a worker's raw addresses broke it.
+* Builds slow down to 30-120 s with 5-6 workers on 4 cores; workers batch.
 
-## Cleanup backlog (later phase)
+### Helping from another plan / another agent
 
-* **Lua pseudo debug menu** (user idea): build our own debug menu into
-  `tools/mgba/centaur.lua`: jump to scenes/stages, set flags, warp, toggle
-  sun level, using RAM addresses as the decomp names them. Not matching work.
+Pick a range nobody else is working on (coordinate via a GitHub issue or a
+branch name), branch from `main`, follow sections 2-3, commit one function per
+commit (`match sub_XXXXXXXX`), and open a PR. Every file must MATCH and
+`build.py` must print OK on the branch. Good first targets:
+`python3 tools/worklist.py --range START END --max-insns 40`, then 41-80.
+Skips are logged per range in `notes/s*.md` (with reasons) — a fresh model
+solving those is the most useful test of capability.
 
-* Group `src/fn/*.c` into real translation units: contiguous files, shared
-  headers, struct definitions instead of `*(u16 *)(p + 0x156)`.
-* Apply reviewed names; add struct/RAM symbols (`symbols/ram.ld`).
-* Classify the 1,483 song-table entries into BGM and SFX (`tools/m4a.py --list`).
-* Split `gen/data.s` into named assets (graphics, tilemaps, palettes), with
-  extraction to PNG and rebuild, as eds/knidl do.
+## 6. Known-hard classes (backlog for stronger models / permuter)
 
-## Session 2 (same day): what changed and what to do next
+Solved (see WORKER.md): `mov ip, r0` leaves (struct arrays); redundant null
+check (`return &p->unk0`); materialised bools (`static inline u8` helpers);
+function pointers; switches (case order = asm order); fall-off-the-end returns.
 
-* **Tools added:** `tools/check.py` (one file vs. ROM, side-by-side diff,
-  ~0.5 s), `tools/clones.py` (clone families: ports matched C to identical
-  siblings; `--stats`, `--port --range`), `tools/permute.py` (decomp-permuter
-  for agbcc), harness `poke`/`freeze`/`unfreeze`. `build.py` rejects raw ROM
-  data addresses in C (they broke the shift test once; see FINDINGS).
-* **Disassembly:** 10,986 functions (data-table seeds). Still missing: small
-  leaf callbacks that don't start with `push` and are referenced from code
-  literals only (e.g. `0806F54C`, `08070444`, `08070E44`). Extend
-  `disasm.py` seeding to accept non-push entries referenced by code literals
-  whose previous halfword is a return, then re-run `make disasm`.
-* **Workflow that worked:** Sonnet workers on disjoint ranges, 60–90 matches
-  per round at ~110–230k tokens each; merge, then run
-  `tools/clones.py --port` over idle ranges after each merge (it found 77
-  functions for free). Run `make shifttest` after big merges.
-* **Unsolved codegen classes** (logged across `notes/s*.md`; good targets for
-  Opus or the permuter):
-  1. A big constant built from another constant's register (`movs r2,#0x94;
-     lsls; ... subs r2,#4`) instead of separate literals. Partial (081A6108):
-     real struct fields get the first `movs/lsls` address right; the second
-     offset still comes from a literal. The original loads the stored value
-     *before* building the second address, so the source probably differs in
-     statement shape. Odd: with `u32 w; ... w = a->w38; c->w5a4 = w;` agbcc
-     dropped that store entirely (aliasing?), worth understanding.
-  2. ~~Unoptimized bool merge blocks~~: solved, `static inline u8` helpers (WORKER.md). Bit-allocator loops (0806F400 family) likely the same; untested.
-  3. "Copy constant to a second register" in fill loops (`adds r2,r1,#0`).
-  4. ~~Redundant null check~~: solved, it's `return &p->unk0` (WORKER.md).
-  5. Pure register-allocation swaps (most skips): try `tools/permute.py`.
-  These may hint at a slightly different compiler build or flags for some
-  files; worth testing `old_agbcc` and `-O1` per class before brute force.
-* **CgbSound:** last m4a function; best attempt + permuter result in `notes/`.
-* **Backlog worker** (`notes/bk.md`) solved all 14 materialised-bool skips with
-  real structs + `static inline u8` helpers, and listed the next families
-  (stack-arg memclear allocs, per-slot callback loops, two-call free-all loops).
-  `clones.py` misses families that differ only in immediates; workers used
-  per-family generator scripts instead. Extending `clones.py` to map small
-  immediates too would automate that.
-* **Overnight run (session 3):** ~1,400 functions in ~10 hours with 5-6 Sonnet
-  workers on fixed ranges + a seeder for clone families
-  (`clones.py --loose` maps differing immediates too). Workers follow
-  `docs/WORKER_ROUND.md`. Usage limits cut workers off every few hours; their
-  committed work is merged afterwards (`git merge work/sN`, keep main on add/add).
-  Disassembly now 11,025 functions (aligned gap targets of code-literal pointers).
-* **Suggested next session:** Sonnet workers on the 41–80 instruction tier and
-  switches (all six ranges have plenty left), `clones.py --port` after each
-  merge, a backlog worker per few rounds, and `make shifttest` before ending.
+Open:
+1. A big constant derived from another constant's register (`movs r2,#0x94;
+   lsls; ... subs r2,#4`) instead of separate literals (081A6108, 081A6EF8,
+   0813BA24, 0814DF0C). Real struct fields get partway.
+2. Alloc/init/free wrapper whose null path jumps straight to the pop with r0
+   untouched (~10 clones in 081F-0821: 081FB788, 081FBB38, ...).
+3. `movs r1,#3; ands r1,r0` (result in the constant's register): 081F612C family.
+4. Stack `s16[3]` vectors whose address lives in a callee-saved register
+   (081C43B0 family; 08201CAC's `u16 *q = (u16 *)&v` trick may help).
+5. Loops where agbcc hoists or strength-reduces what the original recomputes
+   (0811E8B0 family, 080150D0).
+6. Pure register-allocation swaps (most remaining skips): `tools/permute.py`.
+7. `CgbSound` (last m4a function): stack layout solved, registers left;
+   `notes/cgb.md`, best permuter candidate `notes/cgb_permuted_1480.c`.
+8. ROM-tail libgcc/libc pieces (0824xxxx) may need `// CFLAGS: -O2` (no
+   interworking) or are hand asm (`pop {r4, pc}` epilogues).
 
-## Translation (separate repo)
+## 7. Other open work
 
-The translation lives in [boktai3trans](https://github.com/moozilla/boktai3trans).
-Its branch `claude/kind-shannon-ugkern` has the first-session text tooling
-under `decomp/` (`tools/text_dump.py`, `tools/charmap.py`, `text/script.jsonl`
-with Japanese + 2007 English per string). Translation-side ideas:
+* decomp.dev report / CI (`tools/progress.py --json` is a start).
+* Naming/context pass: tag functions by the screens they run on (harness
+  coverage per `mark` segment), name subsystems, apply `symbols/proposed/*.csv`.
+* Cleanup: merge `src/fn/*.c` into real translation units with shared headers
+  and structs (contiguous runs); extract assets (graphics, tilemaps, songs:
+  classify the 1,483 song-table entries).
+* Coverage: record playthroughs with `tools/mgba/centaur.lua`; only ~6% of
+  code is exercised by the scripted tests.
+* Lua pseudo debug menu (user idea): extend `centaur.lua` with scene jumps,
+  flag toggles, warps, sun level, using RAM addresses as the decomp names them.
 
-* a text inserter with box-width checks that uses the 1.47 MB of free space
-* `{1F}{xx}` accents
-* a variable-width font via `Text_DrawGlyph` (`08218D1C`)
+## 8. Translation (separate repo)
 
-Lan Hikari's 0.9 PR on that repo is still open and untouched. The earlier
-recommendation was to merge it as-is for players and ask for the sources
-behind the binary patches.
+[boktai3trans](https://github.com/moozilla/boktai3trans), branch
+`claude/kind-shannon-ugkern`: text tooling (`decomp/tools/text_dump.py`,
+`charmap.py`, `text/script.jsonl` with Japanese + 2007 English per string).
+Ideas: inserter with box-width checks (1.47 MB free ROM space), `{1F}{xx}`
+accents, VWF via `Text_DrawGlyph` (`08218D1C`). Lan Hikari's 0.9 PR there is
+still open (recommendation: merge for players, ask for sources).
