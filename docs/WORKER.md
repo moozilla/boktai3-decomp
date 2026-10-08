@@ -1,0 +1,69 @@
+# Worker brief: phase 1 function matching
+
+You are one of several parallel workers. Each worker has its **own git
+worktree** and an **assigned address range**, so no two workers touch the same
+function or file. Phase 1 is about matched functions. Naming, headers and
+merging into real translation units are cleanup for later; don't spend effort
+on them.
+
+## Setup (already done for you)
+
+Your worktree is a full checkout with `baserom.gba`, `gen/` (generated
+asm, shared, **read-only**) and `build/tools` (agbcc) symlinked in. Run
+everything from the worktree root.
+
+## Loop
+
+1. Pick the next function in your range, easiest first:
+   `python3 tools/worklist.py --range START END --max-insns 40 | head`
+   Skip anything marked `JUMPTABLE` until the easy ones are done.
+2. Read it: `python3 tools/asmat.py ADDR 80` (asm) and
+   `python3 tools/ghidra_c.py ADDR` (Ghidra pseudo-C, often wrong in detail
+   but useful for structure).
+3. Write `src/fn/sub_XXXXXXXX.c`, one function per file:
+   ```c
+   #include "global.h"
+
+   extern u8 *gUnk_02000710;          // RAM: gUnk_<address>, the linker defines it
+   extern const u8 gUnk_0860B810[];   // ROM data: use the label that exists in gen/data.s
+   void sub_08120DAC(u8 *);           // callees: declare locally, keep sub_ names
+
+   s32 sub_08033568(void) { ... }
+   ```
+   * Declarations go **in your file**. Don't edit shared headers except to add
+     a type that's obviously missing from `include/global.h`, and avoid even that.
+   * **No data definitions** (no initialized globals, `static const` tables or
+     string literals). Reference existing ROM labels instead.
+   * Keep the `sub_XXXXXXXX` name. If you're confident what a function does,
+     add a line to `symbols/proposed/<your-worker-name>.csv`:
+     `addr,name,confidence,evidence` (e.g. `08033568,Foo_SetFlag,medium,"sets flag 0x17D on gUnk_020000E0 object"`).
+4. `python3 tools/build.py`: `build/boktai3.gba: OK` means it matched. A
+   mismatch prints the first differing address. Compare
+   `arm-none-eabi-objdump -d build/src/fn/sub_XXXXXXXX.o` with the asm.
+5. Matched: `git add src/fn/sub_XXXXXXXX.c symbols/proposed && git commit -m "match sub_XXXXXXXX"`.
+   Not matched after ~6 build attempts: delete the file, add a line to
+   `notes/<your-worker-name>.md` with the address and what was off (register
+   swap, branch order, ...), and move on. Never commit a non-matching file.
+
+## agbcc matching tips
+
+* Compiler: `agbcc -O2 -mthumb-interwork`. Every non-leaf and leaf function
+  pushes `lr`.
+* Register-allocation differences usually come from declaration order or a
+  missing or extra temporary. Try reordering locals, splitting or merging
+  expressions, and `u8`/`u16`/`s16` types for loads (`ldrb`/`ldrh`/`ldrsh`).
+* Branch order: `if (!x) return A; ...` and `if (x) {...} else return A;`
+  produce different layouts. Try both. A single `return` with a result
+  variable often matches better.
+* `cmp rX, #n; beq; cmp rX, #n; bgt ...` is a switch statement.
+* Struct field offsets: define a local struct with `u8 filler[N]` padding,
+  or use `*(u16 *)(p + 0x20)` casts. Both compile the same.
+* Multiplications by constants appear as shift/add sequences, and
+  divisions as `bl __divsi3` / `Div` (svc 6).
+
+## Finishing
+
+Stop when your assigned budget is reached or your range has no easy
+functions left. Make sure `python3 tools/build.py` prints OK on your final
+commit, then report: functions matched (count + list), functions skipped and
+why, and any naming insights.
