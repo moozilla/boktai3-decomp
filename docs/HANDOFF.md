@@ -9,7 +9,7 @@ can pick up without the chat history. Read `README.md`, `CLAUDE.md`,
 * **Build:** the ROM rebuilds bit-identical (`make`), and all data is
   relocatable (`make shifttest` moves it 64 KiB and the emulator screenshots
   stay identical).
-* **Decomp:** ~570 / 7,890 functions in C (~7% of functions, ~2% of code
+* **Decomp:** 664 / 7,890 functions in C (8.4% of functions, ~2.3% of code
   bytes; see `PROGRESS.md`). Almost all are small, easiest-first functions in
   `src/fn/` (one file per function). Plus `src/lib/m4a.c`: 55 of 58 MP2K
   functions, lifted from pret's pokeemerald.
