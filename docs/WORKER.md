@@ -84,6 +84,11 @@ everything from the worktree root.
 * **Loops**: descending loops with no pre-check are `do {} while`; where the
   pointer increment sits (`e++` in the body vs. the `for`) moves `adds`.
 * C89: declarations at the top of a block only.
+* **Returns a value it never sets**: a non-void function that falls off the
+  end (`u32 f(...) { ...; s->v = 0; }`) gives `pop {r1}; bx r1` with a stale r0.
+* **Work in progress** goes in an untracked `wip/` directory
+  (`check.py wip/sub_X.c` works); copy into `src/fn/` only on MATCH, so the
+  full build never sees a non-matching file.
 * Function pointers work: declare the callee (`void sub_081F05D0(void);`) and
   pass `sub_081F05D0`. The literal gets the Thumb bit (`src/fn/sub_081F065C.c`).
 
