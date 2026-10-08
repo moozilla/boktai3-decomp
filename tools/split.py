@@ -157,9 +157,8 @@ def main():
                 continue
             am = addr_name.search(m.group(1))
             if am:
-                aliases.append(f"{m.group(1)} = ({base_name} & ~1) + {int(am.group(1), 16) - base_addr:#x};")
-        for name in c_names:
-            aliases.append(f"PROVIDE({name}__addr = {name} & ~1);")
+                # based on the plain (non-Thumb) alias label build.py emits in the C object
+                aliases.append(f"{m.group(1)} = {base_name}__addr + {int(am.group(1), 16) - base_addr:#x};")
         line = end
     emit_seg(line, len(code))
     open(os.path.join(ROOT, "build", "c_labels.ld"), "w").write("\n".join(aliases) + "\n")

@@ -61,7 +61,7 @@ def build_asm(src, obj, defsym=None):
 def build_c(src, obj):
     deps = [src] + [os.path.join("include", f) for f in sorted(os.listdir(os.path.join(ROOT, "include")))
                     if f.endswith(".h")]
-    key = file_hash(*deps, extra=" ".join(CFLAGS))
+    key = file_hash(*deps, "tools/build.py", extra=" ".join(CFLAGS))
     if stamp_ok(os.path.join(ROOT, obj), key):
         return
     pre = sh(["cpp", "-P", "-nostdinc", "-undef", "-I", "include", "-iquote", ".", src])
@@ -71,7 +71,12 @@ def build_c(src, obj):
         sys.stderr.write(asm.stderr)
         sys.exit(f"agbcc failed on {src}")
     s_path = os.path.join(ROOT, obj[:-2] + ".s")
-    open(s_path, "w").write(asm.stdout + "\t.text\n\t.align\t2, 0\n")
+    # After each function label add a plain (non-Thumb) alias NAME__addr: data
+    # that points at the function's even address references it (an ABS32
+    # relocation against a Thumb function symbol would set bit 0).
+    text = re.sub(r"^(\w+):\n", lambda m: f"{m.group(1)}:\n\t.global {m.group(1)}__addr\n{m.group(1)}__addr:\n"
+                  if not m.group(1).startswith(".") else m.group(0), asm.stdout, flags=re.M)
+    open(s_path, "w").write(text + "\t.text\n\t.align\t2, 0\n")
     sh(AS + ["-o", obj, s_path])
     stamp(os.path.join(ROOT, obj), key)
 

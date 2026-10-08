@@ -47,8 +47,19 @@ everything from the worktree root.
 
 ## agbcc matching tips
 
-* Compiler: `agbcc -O2 -mthumb-interwork`. Every non-leaf and leaf function
-  pushes `lr`.
+* Compiler: `agbcc -O2 -mthumb-interwork`. Leaf functions may end in
+  `bx lr` with no push. Functions that call others end in `pop {r0}; bx r0`
+  (void) or `pop {r1}; bx r1` (returns a value), so the return type shows
+  in the epilogue.
+* `movs r0, #0; str r0, [rX]; pop {r1}` at the end: write
+  `return *(u32 *)(p + off) = 0;` with a `u32`/`s32` return type.
+* Parameter widths matter: `lsls r1, #0x10; lsrs r1, #0x10` at entry means a
+  `u16` parameter, and a missing truncation means `u32`/`s32` (a `u8` that
+  should have been `u32` won't match).
+* Trailing data after a function and labels other code points into are
+  handled by the build (since commit "split: keep trailing data..."). If
+  linking reports an undefined `_08XXXXXX` / `__addr` symbol, report it as a
+  tooling bug in your notes instead of working around it.
 * Register-allocation differences usually come from declaration order or a
   missing or extra temporary. Try reordering locals, splitting or merging
   expressions, and `u8`/`u16`/`s16` types for loads (`ldrb`/`ldrh`/`ldrsh`).
