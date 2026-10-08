@@ -35,6 +35,10 @@
 
 extern const u8 gCgb3Vol[];
 
+/* data defined elsewhere (see symbols/ram.ld) */
+extern u8 SoundMainRAM_Buffer[0x400];
+extern struct SoundInfo gSoundInfo;
+
 u32 MidiKeyToFreq(struct WaveData *wav, u8 key, u8 fineAdjust)
 {
     u32 val1;
@@ -82,7 +86,27 @@ void MPlayFadeOut(struct MusicPlayerInfo *mplayInfo, u16 speed)
     }
 }
 
-INCLUDE_ASM("asm/nonmatching", m4aSoundInit);
+void m4aSoundInit(void)
+{
+    s32 i;
+
+    CpuCopy32((void *)((s32)SoundMainRAM & ~1), SoundMainRAM_Buffer, 0x400);
+
+    SoundInit(&gSoundInfo);
+    MPlayExtender(gCgbChans);
+    m4aSoundMode(SOUND_MODE_DA_BIT_8
+               | SOUND_MODE_FREQ_21024
+               | (15 << SOUND_MODE_MASVOL_SHIFT)
+               | (12 << SOUND_MODE_MAXCHN_SHIFT));
+
+    for (i = 0; i < NUM_MUSIC_PLAYERS; i++)
+    {
+        struct MusicPlayerInfo *mplayInfo = gMPlayTable[i].info;
+        MPlayOpen(mplayInfo, gMPlayTable[i].track, gMPlayTable[i].numTracks);
+        mplayInfo->unk_B = gMPlayTable[i].unk_A;
+        mplayInfo->memAccArea = gMPlayMemAccArea;
+    }
+}
 
 void m4aSoundMain(void)
 {

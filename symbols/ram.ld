@@ -28,3 +28,10 @@ _call_via_r2 = sub_08249240;
 /* m4a_1.s routine whose label is only a data label in the generated asm */
 MPlayMain = gUnk_0822F820 + 1;
 gMaxLines = 0;
+
+/* m4aSoundInit */
+SoundMainRAM_Buffer = 0x030035F0;   /* 0x400 bytes: SoundMainRAM is copied here */
+gSoundInfo = 0x030054E0;
+gCgbChans = 0x03006520;
+gMPlayMemAccArea = 0x030069E0;
+SoundMainRAM = gUnk_0822F249;       /* ARM routine in ROM, copied to IWRAM (bit 0 cleared by the caller) */
