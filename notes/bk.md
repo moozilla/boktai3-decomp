@@ -35,7 +35,7 @@ Only run briefly on 08100BC8 (score 1355, not near 0) before the struct approach
   two-call free-all (080678B0 0812B27C 080695C8 081225A4), find loops without calls (08067148 08068480 ...),
   alloc loops 08121848 (copy of mask in r4) and its siblings. Generators used: build/fam/mk*.py (untracked scratch).
 ## Seeder skips
-- sub_08023720 (20 siblings): q pointer lands in r2 instead of r1 (bool via nz() helper gets structure right), 8 tries
 - sub_081E4560 (10 siblings): bitfield function, all but final 'f64 |= 1' ordering (movs r0,#1 before ldr) matches, 9 tries
 - sub_0811E8B0 (7): loop-invariant p+0x54 gets hoisted into a reg by agbcc, orig recomputes each iteration; 6 tries
 - sub_0803FAC8 (6): arg2 copied into r4 around const-6 stack arg; couldn't force it, 4 tries
+- sub_08249FA8 (4): epilogue is 'pop {r4,pc}' = compiled without -mthumb-interwork; build has no per-file flag (tooling gap). Rest matched except that
