@@ -60,6 +60,14 @@ everything from the worktree root.
   handled by the build (since commit "split: keep trailing data..."). If
   linking reports an undefined `_08XXXXXX` / `__addr` symbol, report it as a
   tooling bug in your notes instead of working around it.
+* agbcc derives one RAM address from another (`subs r0, #0x2c`) when a
+  function uses several nearby constants. Declaring each address as its own
+  `extern T gUnk_<addr>;` gives each one a separate literal, as the original
+  usually has. Assigning `p = (T *)CONST;` as a separate statement stops the
+  offset being folded into the literal.
+* Declaring a constant local first (`u32 m = 4;`) moves the constant load
+  before the memory operations. A struct copy `*(struct P *)a = *(struct P *)b`
+  produces paired `ldr`/`ldr [,#4]`.
 * Register-allocation differences usually come from declaration order or a
   missing or extra temporary. Try reordering locals, splitting or merging
   expressions, and `u8`/`u16`/`s16` types for loads (`ldrb`/`ldrh`/`ldrsh`).
