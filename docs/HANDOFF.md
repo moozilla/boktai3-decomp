@@ -9,7 +9,7 @@ can pick up without the chat history. Read `README.md`, `CLAUDE.md`,
 * **Build:** the ROM rebuilds bit-identical (`make`), and all data is
   relocatable (`make shifttest` moves it 64 KiB and the emulator screenshots
   stay identical).
-* **Decomp:** 2,192 / 10,986 functions in C (20.0% of functions, ~4.4% of code
+* **Decomp:** 3,618 / 11,025 functions in C (32.8% of functions, ~7.9% of code
   bytes; see `PROGRESS.md`). Mostly small functions in `src/fn/` (one file per
   function), plus `src/lib/m4a.c` (57 of 58 MP2K functions; `CgbSound` left).
   The function total grew from 7,890 to 10,986 when `tools/disasm.py` started
@@ -141,6 +141,12 @@ build.
   `clones.py` misses families that differ only in immediates; workers used
   per-family generator scripts instead. Extending `clones.py` to map small
   immediates too would automate that.
+* **Overnight run (session 3):** ~1,400 functions in ~10 hours with 5-6 Sonnet
+  workers on fixed ranges + a seeder for clone families
+  (`clones.py --loose` maps differing immediates too). Workers follow
+  `docs/WORKER_ROUND.md`. Usage limits cut workers off every few hours; their
+  committed work is merged afterwards (`git merge work/sN`, keep main on add/add).
+  Disassembly now 11,025 functions (aligned gap targets of code-literal pointers).
 * **Suggested next session:** Sonnet workers on the 41–80 instruction tier and
   switches (all six ranges have plenty left), `clones.py --port` after each
   merge, a backlog worker per few rounds, and `make shifttest` before ending.
