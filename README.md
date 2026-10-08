@@ -24,7 +24,8 @@ top of it, but the translation lives in its own repo.
 See [docs/ROM_MAP.md](docs/ROM_MAP.md) for what lives where,
 [docs/FINDINGS.md](docs/FINDINGS.md) for engine notes,
 [docs/screens/](docs/screens/) for per-screen graphics sources, and
-[CLAUDE.md](CLAUDE.md) for the decompilation workflow.
+[CLAUDE.md](CLAUDE.md) for the decompilation workflow, and
+**[docs/HANDOFF.md](docs/HANDOFF.md) for current state, open issues and next steps.**
 
 ## Setup
 
@@ -81,6 +82,7 @@ tools/        everything that generates or checks the above
   sigmatch.py     find library functions (compiled .o) in the ROM, relocation-masked
   progress.py     functions/bytes decompiled (+ objdiff-style JSON)
   ghidra/         headless Ghidra import/analysis/export scripts
+  mgba/centaur.lua  desktop mGBA script: record playthroughs as harness scripts, peek/poke/watch
   worklist.py     remaining functions with difficulty signals; --chunks for parallel ranges
   worktree.sh     isolated worktree for a parallel worker
   ghidra_c.py     Ghidra pseudo-C for a function (draft only)
