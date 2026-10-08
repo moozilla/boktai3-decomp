@@ -54,20 +54,10 @@ Optional: the Ghidra export for `tools/ghidra_c.py` (`tools/ghidra/README.md`,
 
 ## Open tooling issues
 
-* **Thumb function pointers in C** (e.g. `081F065C`, `081FC61C`): workers
-  reported they can't produce a literal pool entry with the Thumb bit. The
-  target is a proper `thumb_func` in asm, so `.word sub_X` *should* get bit 0
-  from the linker. Investigate how the workers declared it before assuming a
-  tooling limit.
-* **Leaf functions starting `mov ip, r0`:** no worker matched these; agbcc
-  emits an extra push. Possibly a different compiler or flags for some units
-  (try `old_agbcc`, `-O1`, or `-fprologue-bugfix`; knidl and eds use per-unit
-  flags).
+* ~~Thumb function pointers in C~~: solved, they just work now (081F065C, 081FC61C matched).
+* ~~Leaf functions starting `mov ip, r0`~~: solved, they come from struct array accesses (see WORKER.md).
 * Jump-table functions are mostly unattempted (`JUMPTABLE` in worklist).
-* One non-matching file anywhere makes the whole build report MISMATCH, so
-  workers test one candidate at a time. A per-unit check would speed them up:
-  assemble the original function alone and compare objects, like eds-decomp's
-  `check.py`.
+* ~~Per-unit check~~: `tools/check.py` (links one file at its address, diffs vs. ROM).
 * gbadisasm finds 7,890 functions and Ghidra 10,686. The difference is mostly
   code reached only through pointer tables. Reconcile it, because missing
   functions sit inside `.incbin` blocks today.
