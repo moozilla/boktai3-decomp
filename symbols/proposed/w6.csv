@@ -1,0 +1,2 @@
+addr,name,confidence,evidence
+081D5274,Flag_TestBit,medium,"returns bit idx of bitmap at gUnk_02000710+0x6F0 (word index = idx>>5)"
