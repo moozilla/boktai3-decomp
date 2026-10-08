@@ -58,6 +58,32 @@ everything from the worktree root.
   `p->elems[i].flags &= ~1;`. With pointer casts agbcc pushes r4 instead. See
   `src/fn/sub_0810C1E8.c`. Structs also fixed ordering problems elsewhere
   (`sub_081FC61C`).
+* **Switch / jump tables work**: a plain C `switch` reproduces the table.
+  Order the case bodies in the source by their order in the original asm,
+  not by value; use `r = N; break;` + one `return r`; list `case 0: case 7:
+  default:` explicitly when the table does. `switch` on `s32` gives
+  `cmp; beq; cmp; bgt`, on unsigned `blo`. (The worklist JUMPTABLE flag can
+  misfire on trailing data; a real one has `ldr; mov pc` and a `.4byte` table.)
+* **Branch layout**: the original often has the opposite layout from the
+  obvious C. Try testing the branch-taken condition first, `goto` for the
+  true cases, `if (a || b) r = 0; else r = 1; return r;`, nested ifs instead
+  of `&&`, and sequential early returns in the original's order.
+* **Constant load order**: declare the constant as a local first
+  (`u32 m = 4;`) to hoist its `movs`; declare it inside a block after a call
+  to sink it. To get "mask constant before the ldr", use a static inline
+  helper: `static inline u32 tst(u32 *a, u32 m) { return *a & m; }`.
+* **Commutative operand order** follows the source: try `(i << 2) + (u32)tbl`
+  vs `tbl[i]`, permute OR chains, `t = r; t += x;`.
+* **Shadow register + MMIO**: `gShadow = expr; REG = gShadow;` (not chained).
+  DMA: `struct Dma { vu32 src, dst, ctl; }` and read `d->ctl` afterwards.
+* **Hidden args**: an argument register kept alive across a call, or an
+  unused-looking parameter, usually means the callee takes more parameters.
+  Declare them. `pop {r1}; bx r1` means it returns the callee's value.
+* **Reloads**: if the original reloads a global pointer between stores,
+  declare it `u8 *` and use casts; a struct-typed global gets CSE'd.
+* **Loops**: descending loops with no pre-check are `do {} while`; where the
+  pointer increment sits (`e++` in the body vs. the `for`) moves `adds`.
+* C89: declarations at the top of a block only.
 * Function pointers work: declare the callee (`void sub_081F05D0(void);`) and
   pass `sub_081F05D0`. The literal gets the Thumb bit (`src/fn/sub_081F065C.c`).
 
