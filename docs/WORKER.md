@@ -48,6 +48,8 @@ everything from the worktree root.
    `notes/<your-worker-name>.md` with the address and what was off (register
    swap, branch order, ...), and move on. Never commit a non-matching file.
 
+**Scratch files:** never use fixed paths under `/tmp` (other workers share it). Put helper scripts in your worktree under `build/` (gitignored) or a directory named after your worker.
+
 ## agbcc matching tips
 
 * **Use real struct types, not `*(u16 *)(p + 0x20)` casts**, whenever the
