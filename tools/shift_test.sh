@@ -10,6 +10,7 @@ python3 tools/build.py --shift $SHIFT --out build/shifted.gba
 OUT=build/shift_test/$(date +%s); mkdir -p $OUT/orig $OUT/shift
 tools/emu/harness baserom.gba "$SCRIPT" $OUT/orig >/dev/null 2>&1
 tools/emu/harness build/shifted.gba "$SCRIPT" $OUT/shift >/dev/null 2>&1
+set +e
 python3 - "$OUT" <<'PY'
 import glob, sys
 from PIL import Image, ImageChops
@@ -21,3 +22,7 @@ for f in sorted(glob.glob(out + "/orig/*.ppm")):
     print(("same " if same else "DIFF ") + f.split("/")[-1])
 sys.exit(1 if bad else 0)
 PY
+STATUS=$?
+# coverage dumps are ~150 MB per run; keep only the screenshots
+find "$OUT" -type f ! -name '*.ppm' -delete
+exit $STATUS
