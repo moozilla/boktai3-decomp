@@ -21,3 +21,11 @@ Remaining diffs (all register allocation / CSE, ~130 differing lines):
 - Original copies REG_SOUNDBIAS_H into a second reg (`adds r1,r0,#0; cmp r1,#0x3f`); ours compares r0.
 Tried without effect: volatile prevC15, mask removal, chBitp init position, n4 constant forms,
 random decl-order search, REG_SOUNDBIAS_H variable types.
+
+## Permuter (session 2)
+
+`tools/permute.py` on the best attempt above: score 2945 -> 1480 after ~50 min
+on 2 cores (0 = match). The best candidate (preprocessed, CgbSound only) is
+`notes/cgb_permuted_1480.c`. Resume with
+`python3 tools/permute.py build/psrc/m4a_cgb.c CgbSound` after replacing the
+function body with that candidate, then run decomp-permuter longer.
