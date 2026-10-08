@@ -1,0 +1,6 @@
+#include "global.h"
+u32 sub_08074600(u32, u32);
+void sub_080AAFF4(u8 *p)
+{
+    *(u32 *)(p + 0x308) = sub_08074600(p[0x98], 0);
+}
