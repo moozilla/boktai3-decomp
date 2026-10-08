@@ -19,7 +19,11 @@ void sub_081F72A4(struct S *p)
 {
     if (TakeFlag(p))
     {
+<<<<<<< HEAD
         u32 v = 3;
+=======
+        u32 v = 0x3;
+>>>>>>> main
         p->st = v;
         sub_08020D68((u8 *)p + 0x118, 1);
     }
