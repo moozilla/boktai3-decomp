@@ -8,3 +8,4 @@ tools/emu/harness
 !tests/saves/*.sav
 gen/
 wip/
+gen
