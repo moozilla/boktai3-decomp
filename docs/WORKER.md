@@ -134,8 +134,11 @@ everything from the worktree root.
   variable often matches better.
 * `cmp rX, #n; beq; cmp rX, #n; bgt ...` is a switch statement.
 * **Never write a raw ROM data address** (`0x08603300`) in C: it matches but breaks the shift test. Declare the gen/data.s label (`extern const u32 gUnk_08603300[];`). build.py rejects raw addresses >= 0x0824DAFC.
-* Struct field offsets: define a local struct with `u8 filler[N]` padding,
-  or use `*(u16 *)(p + 0x20)` casts. Both compile the same.
+* Struct field offsets: define a local struct with observed padding and field
+  types. Raw casts can change alias information, pointer reloads and address
+  lifetimes; they are not always interchangeable with typed fields. The solo
+  family tranche matched 0818D754 and 080F57E8 on their first typed checks.
+  See `notes/solo-family_2026-10-09.md` for the layout and its limits.
 * Multiplications by constants appear as shift/add sequences, and
   divisions as `bl __divsi3` / `Div` (svc 6).
 
