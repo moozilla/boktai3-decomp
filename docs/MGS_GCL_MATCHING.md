@@ -367,8 +367,9 @@ register lifetime. These failures are not evidence of a different compiler.
 
 Round-2 bounded trap permuting improved the score from 1,840 to 1,110 in
 60 seconds with two workers; no zero-score candidate was found. The improved
-source remains untracked under `wip/`, alongside the independent base. This
-is a retained candidate, not a byte-exact match or evidence for a new compiler.
+source remains untracked under `wip/`, alongside the independent base. A later round-5 semantic audit rejected this generated candidate because it
+merged distinct record/vector pointers; see the explicit rejection below. It
+must not be promoted or treated as evidence for a new compiler.
 
 All eleven round-2 additions passed per-function checks, and the complete
 worker ROM printed `build/boktai3.gba: OK` before separate per-TU commits.
@@ -716,3 +717,99 @@ Round 4 validation: the complete build printed `build/boktai3.gba: OK` with
 all 14 new units before commits. No worker screenshots were requested; the
 orchestrator owns combined batch regression. No semantic symbol names were
 installed, and no unsupported compiler/whole-engine lineage claim is made.
+
+## Round 5: remaining inventory and rejected search candidates
+
+Round 5 starts at `3c025ef` on `codex/mgs-gcl-round5`, with a ten-active-minute
+bound. The assigned ranges have only three remaining unmatched function
+starts: `08219B24` (180 bytes), `0821B084` (88 bytes), and `08225624`
+(380 bytes). This round produced **zero new matches / zero native bytes**;
+only the evidence documentation is committed. Independent valid C drafts and
+ignored search output remain available separately. No source-level lineage,
+compiler identification or new installed semantic names follow from failures.
+
+### Input update: B3 evidence and MGS pad comparison
+
+The pinned additional source reviewed was
+[pad.c](https://github.com/FoxdieTeam/mgs_reversing/blob/f54dbb2a58adfc2755403296c9ebb653fbec277b/source/libgv/pad.c).
+Its `GV_UpdatePadSystem` calculates pressed bits from current AND NOT previous,
+and released bits from previous AND NOT current, then writes pad state. This
+supports a role comparison for B3's same bit formulas; MGS has four pad-state
+outputs, packed channel shifts, analog/configuration handling and six-frame
+quick-button history that are not present in the reviewed B3 routine.
+
+B3 `08219B24` always reads hardware `REG_KEYINPUT` and writes its raw halfword
+to `03005270`. With `03005250` zero, it XORs the raw value with `0x3FF`,
+truncates to 16 bits, and updates the record at `03005260`: held at offset 0,
+newly pressed at 2, newly released at 4, stride 8. It then clears held/pressed
+in the second record, storing that record's previous held value as released.
+With `03005250` nonzero, scheduler mask 1 suppresses both record updates;
+otherwise two halfword samples beginning at `03005274` supply the values.
+Sample `0xFFFF` means held zero; other samples are XORed with `0x3FF`.
+Both records get the same previous/current difference formulas. Replay/demo
+input is a candidate interpretation of the sampled path, not a verified
+exclusive owner of `03005250` or the sample buffer.
+
+Independent struct and integer-width drafts reproduce the control flow but
+retain initial hardware-result moves, missing/differently scheduled 16-bit
+normalization, and pointer/register choices. Signed raw, scoped assignment,
+register keyword, indexed records and a small independent inline update
+helper did not match. No externally reconstructed pad code was copied.
+A bounded 75-second search scored 1685 then 1640/1570/1475 without a match.
+The best generated candidate inserts `if (keys)` before `keys` is initialized.
+Even though the branches contain identical assignments, that uninitialized
+read is undefined behavior and the candidate is **rejected**. It is not a
+valid WIP improvement or a reason to make the original memory volatile.
+
+### Trap comparison and explicit semantic rejections
+
+This round rechecked `TrapCmd` and `NTrapCmd` in the pinned `game/script.c`.
+The optional `m`, `b`, `s`, `t`, `p`, and `e` processing in `NTrapCmd` gives
+more specific comparative context than MGS `TrapCmd`'s fixed positional
+arguments. The layouts still differ: MGS fills a persistent `HZD_BND` entry
+and installs a bind array, while the observed B3 path constructs a 44-byte
+stack record, gathers two arrays of up to four native halfwords and resolves
+through `0821E104` before passing record/top to `0821E190`. MGS `NTrapCmd`
+also handles `d/r/i/c` and different flag bits; neither record-field names nor
+numeric wildcard values can be transferred from that source merely because
+option letters overlap. B3's `b` flag is `0x10`, and its `p` flag is `0x20`.
+The B3 `e` branch has priority over `p`; no MGS diagnostics were observed here.
+
+Indexed zeroing, explicit local bounds, an early initialized loop variable,
+and moving the second array base initialization later did not match. These
+valid drafts emitted 384–396 bytes and changed saved high-register/loop-counter
+allocation. A bounded 90-second search on the valid independent base improved
+score 2050 through 1985/1860/1683/1570 to 1150; no exact candidate was found.
+
+A semantic audit found two pointer substitutions that are unacceptable:
+
+* The old round-2 score-1110 output substitutes the `out` variable for the
+  second-array base, then overwrites it with `&trap.fe`. Its following zeroing
+  and `s` reads therefore target the output halfword rather than `trap.s`.
+* The round-5 score-1150 output replaces saved `out` with traversal pointer
+  `p`, initializes it to `&trap.fe`, then immediately reuses it for vector
+  loops. The later `0821E104` call receives that traversal result instead of
+  the required pointer at record offset `0x0E`.
+
+Both are **rejected**, regardless of improved assembly scores. Neither is
+tracked C, a semantic match, or a candidate for integration. The independent
+base retains separate `w`, `s`, traversal `p`, and saved output-field pointers.
+Future work must audit every generated source diff for valid pointer lifetimes,
+initialized reads and observable behavior before considering its exact score.
+No rewrite of the actual data layout or unsafe pointer merge is authorized.
+
+### Timer setup: remaining two-byte operand-order issue
+
+`0821B084` retains round 4's five memory views and timer-derived offset evidence.
+Modulo, signed/halfword/integer casts, outer scope, scalar/array/field base,
+split arithmetic, final-local assignment, repeated global-base references and
+inline offset helper variants did not match. The simplest valid 88-byte draft
+still differs only at `0821B090`: it emits `adds r1, r0, r1` where the ROM has
+`adds r1, r1, r0`. A new bounded 60-second search remained score 10 without
+saving an improved candidate. The ordinary repeated-global version worsened
+other register choices. No asm, register binding, extra hardware read or fake
+volatile side effect was introduced to force the commutative instruction.
+
+Round 5 validation: the unchanged matching sources completed a full build with
+`build/boktai3.gba: OK` before the documentation commit. No new screenshots,
+shared-gen regeneration, push, PR or nonmatching tracked C were produced.
