@@ -46,7 +46,8 @@ everything from the worktree root.
 5. Matched: `git add src/fn/sub_XXXXXXXX.c symbols/proposed && git commit -m "match sub_XXXXXXXX"`.
    Not matched after ~10 check attempts: retain the candidate under `wip/`, add a line to
    `notes/<your-worker-name>.md` with the address and what was off (register
-   swap, branch order, ...), and move on. Never commit a non-matching file.
+   swap, branch order, ...), and move on. Never commit a nonmatching file to `main`. Dedicated WIP branches may
+   preserve candidates outside `src/`; they receive no exact progress credit.
 
 **Scratch files:** never use fixed paths under `/tmp` (other workers share it). Put helper scripts in your worktree under `build/` (gitignored) or a directory named after your worker.
 
