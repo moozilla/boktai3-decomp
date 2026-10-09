@@ -24,3 +24,9 @@ Full ROM builds were run before each batch of at most five per-function commits;
 ## Matches
 
 `sub_08170C08`, `sub_081713A4`, `sub_08171410`, `sub_081735C8`, `sub_081780FC`, `sub_08178140`, `sub_0817AA5C`, `sub_0817AFE8`, `sub_0817B4B4`, `sub_0817B504`, `sub_0817B554`, `sub_081A5394`, `sub_081A53E8`, `sub_081BB7B4`, `sub_081BC980`, `sub_081BDB28`, `sub_081BECA4`, `sub_081BEDFC`, `sub_081C08F4`, `sub_081C0958`, `sub_081D1D44`, `sub_081D1D80`, `sub_081D1DBC`, `sub_082172E0`, `sub_08217344`.
+
+## Compiler thunk follow-up
+
+The ROM functions at `08249238`, `0824923C`, `08249240`, `08249244`, `08249248`, and `0824924C` are respectively `bx r0` through `bx r5`, each followed by `nop`. The agbcc build's `libgcc/Makefile` compiles `lib1thumb.asm`, whose `call_via` macro defines `_call_via_<register>` as precisely `bx <register>; nop`; it instantiates `call_via r4` after r0–r3. Thus `_call_via_r4 = sub_08249248` is an evidence-backed compiler symbol alias. Only the alias needed by the retained candidate was added.
+
+Alias-only full ROM verification is logged in `build/round1/fullbuild-thunk-alias.txt`.
