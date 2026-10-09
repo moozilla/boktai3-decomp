@@ -44,7 +44,7 @@ $(ROM): build/rom.elf
 
 # Pure-asm build (no C), useful to check the generated asm alone
 compare: $(ROM)
-	@echo "$(SHA1)  $(ROM)" | sha1sum -c -
+	@$(PY) -c "import hashlib; p='$(ROM)'; ok=hashlib.sha1(open(p,'rb').read()).hexdigest()=='$(SHA1)'; print(p+(': OK' if ok else ': MISMATCH')); raise SystemExit(not ok)"
 
 clean:
 	rm -f build/rom.o build/rom.elf $(ROM)

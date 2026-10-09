@@ -1,0 +1,5 @@
+capstone==5.0.9
+numpy==2.5.3
+Pillow==12.3.0
+# Matching-search configuration; decomp-permuter bundles its own C parser.
+toml==0.10.2
