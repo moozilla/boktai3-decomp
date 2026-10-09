@@ -30,3 +30,5 @@ Full ROM builds were run before each batch of at most five per-function commits;
 The ROM functions at `08249238`, `0824923C`, `08249240`, `08249244`, `08249248`, and `0824924C` are respectively `bx r0` through `bx r5`, each followed by `nop`. The agbcc build's `libgcc/Makefile` compiles `lib1thumb.asm`, whose `call_via` macro defines `_call_via_<register>` as precisely `bx <register>; nop`; it instantiates `call_via r4` after r0–r3. Thus `_call_via_r4 = sub_08249248` is an evidence-backed compiler symbol alias. Only the alias needed by the retained candidate was added.
 
 Alias-only full ROM verification is logged in `build/round1/fullbuild-thunk-alias.txt`.
+
+With the alias available, `081C674C` differed only in the order of two zero loads. Replacing byte-pointer casts with a struct containing a `u8` field at offset 7, a `u16` field at offset `0xE`, a `u32` counter at `0x10`, and the callback at `0x2CC` reproduced the original ordering. The callback's third argument is the pre-increment counter (original keeps it in r2). This follow-up matched 52 bytes; its full ROM verification is logged in `build/round1/fullbuild-thunk-match.txt`.
