@@ -56,6 +56,18 @@ class PermuteTests(unittest.TestCase):
         self.assertEqual(split.c_replacement_end(lines, 0, len(lines)), 2)
         self.assertEqual(split.c_replacement_end(lines, 0, len(lines), {0x08004004}), 4)
 
+    def test_terminal_rom_alignment_is_not_duplicated_after_c(self):
+        lines = ["fn:", "\tpop {r4, pc}", "",
+                 '\t.incbin "baserom.gba", 0x24dafa, 0x2', ""]
+        self.assertEqual(split.c_replacement_end(lines, 0, len(lines)), len(lines))
+        # This exception must not swallow a data blob before further content,
+        # nor a different-sized terminal block.
+        more = lines + ['\t.byte 1']
+        self.assertEqual(split.c_replacement_end(more, 0, len(more)), 3)
+        different = lines.copy()
+        different[3] = '\t.incbin "baserom.gba", 0x24dafa, 0x4'
+        self.assertEqual(split.c_replacement_end(different, 0, len(different)), 3)
+
     @unittest.skipUnless(all(shutil.which("arm-none-eabi-" + t) for t in ("as", "ld", "objcopy")),
                          "ARM binutils required for synthetic linked-object fixture")
     def test_numeric_and_symbolic_literals_resolve_identically(self):
