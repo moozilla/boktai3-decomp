@@ -18,13 +18,17 @@ next start, with the last ending at `0824DAFA`, preserving the historical
 `progress.py` accounting (including intervening alignment and literal pools).
 This measures the code region, not the whole ROM or asset progress.
 
-Three reviewed SDK entries in `symbols/progress_extra_functions.csv` are also
-included. They already have verified C definitions in `src/lib/m4a.c`, but the
+Reviewed SDK entries in `symbols/progress_extra_functions.csv` are also
+included. The initial three had verified C definitions in `src/lib/m4a.c`, but the
 disassembler absorbs their bytes into preceding function spans. The corrected
 baseline is **4,145 / 11,028 functions**, versus the historical 4,145 / 11,025:
 the old numerator counted these three while its denominator did not. Code-byte
 progress is unchanged. Refreshing metadata unions these explicit boundaries
-with generated starts; it does not infer new boundaries from arbitrary C.
+with generated starts; it does not infer new boundaries from arbitrary C. Later
+libgcc, RTC, EEPROM and RFU audits add further explicit boundaries, including
+unmatched entries needed to avoid crediting retained assembly blobs. RFU ARM
+entries used by the splitter are separately reviewed in
+`symbols/build_extra_functions.csv`; see `docs/RFU.md`.
 
 The same `split.c_functions` scanner used by the build identifies non-static C
 definitions and address aliases. `INCLUDE_ASM` placeholders and static helpers
