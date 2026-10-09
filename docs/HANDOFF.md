@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after the bounded existing-draft rescue (2026-10-09 UTC). This file is the single
+Last updated after the solo family tranche (2026-10-09 UTC). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -14,25 +14,28 @@ published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
 | | |
 |---|---|
-| Matched C | **4,789 / 11,081 functions (43.22%)**, 323,090 / 2,415,354 code bytes (13.377%; `PROGRESS.md`) |
+| Matched C | **4,835 / 11,083 functions (43.63%)**, 330,514 / 2,415,354 code bytes (13.684%; `PROGRESS.md`) |
 | Build | `make` / `python3 tools/build.py` rebuilds the ROM **bit-identical** (SHA-1 `2651c5e6875ac60abff734510d152166d211c87c`) |
 | Shiftable | all data relocatable; `make shifttest` (3 scenarios, 35 screenshots) passes |
 | Code layout | `src/fn/sub_XXXXXXXX.c`, one function per file; `src/lib/m4a.c` (MP2K sound, 57/58) |
 | Names | still mostly `sub_XXXXXXXX`; first evidence-based pause-menu leads in `docs/MENU_CONTEXT.md` |
 
-The existing-draft rescue adds **48 functions / 3,724 exact bytes** on top of
-`b8c688f` (documentation closeout after source integration `8c2c818`, PR #12).
-Cumulative matching follow-up from `5ff44e3`: **164 functions / 26,432 progress
-bytes**. The 20% code target remains unmet by **159,981 bytes**. The RTC boundary
-at 08248F0C adds one inventory function without adding C credit; its 308 bytes
-remain assembly after the newly matched 156-byte time-write entry.
+The solo family tranche adds **46 functions / 7,424 exact bytes** on top of
+`7037e3a`, following the KNIDL process review. The 20% code target remains
+unmet by **152,557 bytes**. [The tranche notes](../notes/solo-family_2026-10-09.md)
+record accepted sources, reusable patterns and unresolved candidates.
+081DB1D8 contributes only its 116-byte body; two newly inventoried 108-byte
+wrappers at 081DB24C and 081DB2B8 remain assembly.
 
-**Current authorization: close existing drafts only, no new agents or work.**
-The user revised the floor to 15% remaining or one hour, whichever comes first;
-the bounded pass began at 07:02:40 UTC and has an 08:02:40 UTC deadline. The
-meter showed 19% remaining during integration. This supersedes the previous
-20% floor for this closeout only. Do not infer permission for a new matching
-tranche from this limited extension.
+**Latest authorization: work alone until 15% plan usage remains.** The user
+explicitly authorized new matching after the KNIDL review and prohibited
+subagents for this tranche. The meter was 16% remaining before closeout.
+The tranche is integrated and its sources/checkpoints are pushed; do not
+launch another tranche without checking the meter and the user's authorization.
+
+The preceding existing-draft rescue added 48 functions / 3,724 bytes and
+ended with 65 unresolved targets. Its one-hour/15% limit and the subsequent
+WIP preservation decision describe that earlier pass.
 
 The [draft inventory](DRAFT_INVENTORY_2026-10-09.md) covers 113 previously
 unmatched targets from 435 retained C files (many duplicates or already merged).
@@ -50,8 +53,8 @@ Nonmatching C and check/permuter outputs remain ignored in local checkouts:
 `../wt/push20-astra-motion/wip/`, and this checkout's `wip/`.
 The user subsequently authorized source retention on a separate branch.
 [**codex/wip-drafts-2026-10-09**](https://github.com/moozilla/boktai3-decomp/tree/codex/wip-drafts-2026-10-09/drafts)
-now preserves 519 candidate C files, including alternates and already-matched
-drafts. `drafts/targets.csv` maps all 65 unresolved selected candidates to
+preserves the original 519 candidate C files plus the solo-family drafts and
+alternate experiments, including already-matched drafts. `drafts/targets.csv` maps all 65 unresolved selected candidates to
 preserved files; `drafts/manifest.csv` records every source hash. A fresh clone
 can recover them by fetching that branch. The original local WIP and a
 source-only archive under `build/existing-draft-sources_2026-10-09.tar.gz`
@@ -72,9 +75,9 @@ isolated register-allocation retries; one-function commits are bookkeeping,
 not a requirement to solve functions independently.
 
 The [KNIDL process review](KNIDL_PROCESS_REVIEW_2026-10-09.md) compares its
-multiweek module/family campaigns with our recent run. The recommended next
-tranche uses seeded cohorts, compiler diagnostics and durable WIP checkpoints;
-it is a proposal, not an active matching assignment. No partial-credit metric
+multiweek module/family campaigns with our recent run. The solo tranche applied seeded cohorts, typed layouts, compiler diagnostics
+and durable WIP checkpoints. Its evidence and limits are recorded in the
+tranche notes; the 20% goal remains unmet. No partial-credit metric
 or compiler recipe change was implemented by the review.
 
 Historical run details follow; their meter limits and counts describe earlier
