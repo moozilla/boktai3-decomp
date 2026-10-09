@@ -121,7 +121,7 @@ def main():
 
     config = os.path.join(d, "compile.json")
     with open(config, "w") as f:
-        json.dump({"compiler": os.path.join(ROOT, build.AGBCC), "assembler": build.AS,
+        json.dump({"compiler": os.path.join(ROOT, build.compiler_for(src)), "assembler": build.AS,
                    "cflags": build.cflags_for(src), "symbols": symbols,
                    "address": address}, f)
 
