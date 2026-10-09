@@ -20,3 +20,9 @@ Useful patterns: branch-specific inline coordinate setters preserve repeated con
 Failures retained: fresh renderer `wip/round6/sub_08218508.c` (784 versus 788 bytes), bounded 90-second permutation score 2235 to 2020; `wip/round6/sub_08194858-best244.c` (244-byte target, remaining r4/r5 and temporary allocation differences), permuter aborted a duplicate-AST assertion; `wip/round6/sub_0819E1EC.c` (112-byte target) and best 60-second permutation score 465; timer and small-grid initializers preserved as well.
 
 Scorer caveat: the earlier packed-flag source scored zero in `build/permute/sub_0818E1BC/run-9btmgbde/base.c` although check.py found an unconditional branch skipping the common compare. Only direct MATCH sources were accepted; ordinary C early-return shaping repaired this branch. Parent was notified.
+
+## Short follow-up
+
+A separate `codex/endurance-r6-sol-followup` branch starts at the round6 notes tip. The allocator wrapper `sub_081B6180` matched its first check, adding 96 emitted code bytes. Its trailing 100-byte `.incbin` remains generated assembly data and is excluded from new-code accounting. No normalized clone siblings were found. The ordinary C preserves allocation, callback registration, global storage, initialization and cleanup on failure in the original order. No MGS reservation was edited. Follow-up timestamps and final manifest are in `build/round6/followup-results.json`.
+
+Follow-up full `tools/build.py` printed `build/boktai3.gba: OK` before the TU commit. One check, one MATCH, no failed candidates or permuter trials.
