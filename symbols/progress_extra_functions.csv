@@ -2,6 +2,24 @@ address,evidence
 0822FE18,Empty SDK function defined in src/lib/m4a.c; native full-ROM SHA-1 verified 2026-10-08; gbadisasm emits an incbin inside MidiKeyToFreq's span
 08230050,MPlayContinue loop over music players in src/lib/m4a.c; native full-ROM SHA-1 verified 2026-10-08; separate C entry within the preceding disassembly span
 0823025C,Existing SDK swi 0x2A stub in src/lib/m4a.c; native full-ROM SHA-1 verified 2026-10-08; separate C entry within the preceding disassembly span
+082440C4,STWI_set_MS_mode: separate C entry in exact RFU_V1024 unit; pinned source and resolved byte checks; docs/RFU.md
+082441E4,STWI_send_VersionStatusREQ: separate C entry in exact RFU_V1024 unit; pinned source and resolved byte checks; docs/RFU.md
+08244250,STWI_send_ConfigStatusREQ: separate C entry in exact RFU_V1024 unit; pinned source and resolved byte checks; docs/RFU.md
+08244534,STWI_send_DataReadyAndChangeREQ: separate C entry in exact RFU_V1024 unit; pinned source and resolved byte checks; docs/RFU.md
+08244584,STWI_send_DisconnectedAndChangeREQ: separate C entry in exact RFU_V1024 unit; pinned source and resolved byte checks; docs/RFU.md
+08244A38,IntrSIO32: exact compiled RFU_V1024 source; docs/RFU.md
+08244A9C,sio32intr_clock_master: exact compiled RFU_V1024 source; docs/RFU.md
+08244D2C,sio32intr_clock_slave: exact compiled RFU_V1024 source; docs/RFU.md
+08245138,handshake_wait: exact compiled RFU_V1024 source; docs/RFU.md
+082451A0,STWI_set_timer_in_RAM: exact compiled RFU_V1024 source; docs/RFU.md
+082452B0,STWI_stop_timer_in_RAM: exact compiled RFU_V1024 source; docs/RFU.md
+08245300,STWI_init_slave: exact compiled RFU_V1024 source; docs/RFU.md
+0824538C,Existing bx r2 callback trampoline; retained assembly; docs/RFU.md
+08245390,Existing bx r1 callback trampoline; retained assembly; docs/RFU.md
+08245394,Existing bx r0 callback trampoline; retained assembly; docs/RFU.md
+08245744,rfu_MBOOT_CHILD_inheritanceLinkStatus: separate C entry in exact RFU_V1024 unit; pinned source and resolved byte checks; docs/RFU.md
+0824826C,rfu_REQ_noise: separate C entry in exact RFU_V1024 unit; pinned source and resolved byte checks; docs/RFU.md
+08248930,EEPROM write-verify wrapper; 64-byte exact standalone match; contiguous C unit sub_082488D8.c; docs/EEPROM.md
 08248E70,RTC time-write entry verified by exact 156-byte standalone C check; retained assembly not counted as matched; docs/RTC.md
 08249F7C,__cmpdf2: separate function in exact linked libgcc_dp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
 0824A288,__make_dp: separate function in exact linked libgcc_dp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md

@@ -103,8 +103,53 @@ def c_replacement_end(code, start, end, covered_addresses=()):
     return end
 
 
+def apply_extra_boundaries(code, path):
+    """Split only reviewed incbin entries in memory; never rewrite shared gen/."""
+    if not os.path.exists(path):
+        return code
+    with open(path, newline="") as source:
+        rows = list(csv.DictReader(source))
+    entries = {}
+    for row in rows:
+        address = int(row["address"], 16)
+        isa = row["isa"]
+        if isa not in ("arm", "thumb") or address % (4 if isa == "arm" else 2):
+            raise ValueError("invalid reviewed function ISA/alignment")
+        if address in entries:
+            raise ValueError("duplicate reviewed function boundary")
+        entries[address] = isa
+    found = set()
+    result = []
+    for line in code:
+        blob = re.fullmatch(r'\s*\.incbin "baserom\.gba",\s*(0x[0-9a-fA-F]+),\s*(0x[0-9a-fA-F]+)', line)
+        if not blob:
+            result.append(line)
+            continue
+        start = 0x08000000 + int(blob.group(1), 16)
+        end = start + int(blob.group(2), 16)
+        cuts = sorted(address for address in entries if start <= address < end)
+        if not cuts:
+            result.append(line)
+            continue
+        cursor = start
+        for address, following in zip(cuts, cuts[1:] + [end]):
+            if cursor < address:
+                result.append(f'\t.incbin "baserom.gba", {cursor - 0x08000000:#x}, {address - cursor:#x}')
+            name = f"sub_{address:08X}"
+            result += [f"\t{entries[address]}_func_start {name}",
+                       f"{name}: @ 0x{address:08X}",
+                       f'\t.incbin "baserom.gba", {address - 0x08000000:#x}, {following - address:#x}']
+            found.add(address)
+            cursor = following
+    if found != set(entries):
+        raise ValueError("reviewed function boundary is not inside an incbin: " +
+                         ", ".join(f"{a:08X}" for a in sorted(set(entries) - found)))
+    return result
+
+
 def main():
     code = open(os.path.join(ROOT, "gen", "code_sym.s")).read().split("\n")
+    code = apply_extra_boundaries(code, os.path.join(ROOT, "symbols", "build_extra_functions.csv"))
     # function blocks: [start_line, end_line) per function, in order
     starts = [i for i, ln in enumerate(code) if FUNC_START.match(ln)]
     funcs = []

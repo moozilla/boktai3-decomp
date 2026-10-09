@@ -262,3 +262,30 @@ credit. The result is 4,456 / 11,047 functions and 268,626 / 2,415,354 bytes
 (11.122%). No speed or cost frontier can be inferred from these mixed workloads.
 The user extended the stopping threshold to below 40% weekly allowance remaining;
 finish in-flight work after crossing it and start no further rounds.
+
+## Production batch 5: source reuse and mixed instruction sets
+
+Base `4852e86`. Reviewed combined output is **135 new functions and 23,220
+progress-span bytes**, reaching 4,591 / 11,065 functions and 12.083% code bytes.
+
+| Work | New functions | Emitted bytes | Progress-span gain | Matching interval |
+|---|---:|---:|---:|---|
+| Sol round 5 | 15 | 2,124 | 2,124 | 18.41 min matching; 20.44 min including notes |
+| Sol family round 3 | 8 | 1,688 | 1,688 | 19m20s |
+| Sol family follow-up 4 | 2 | 348 | 348 | 3m47s |
+| Sol MGS round 4 | 14 | 1,980 | 1,980 | bounded targeted assignment |
+| Sol MGS round 5 | 0 | 0 | 0 | bounded 10-minute assignment |
+| Root EEPROM source comparison | 5 | 808 | 808 | interleaved with orchestration |
+| Root RFU_V1024 source reuse and ARM support | 91 | 18,056 total unit bytes, including 54 existing functions | 16,272 | interleaved with orchestration |
+
+Do not compare the RFU total unit size with incremental worker output. Fifty-four
+old C functions were consolidated, not newly solved. New reviewed boundaries
+also refine previous spans. Seven ARM ISR routines and the final three retained
+assembly stubs receive distinct inventory entries. Source/compiler version
+identification produced more bytes than repeated register-only searches here;
+this observation does not establish model-specific cost or Pareto efficiency.
+
+The user extended the allowance floor to below **35% weekly remaining**. Three
+Sol matching rounds were authorized at 41% remaining. Keep checking before new
+assignments and finish only the in-flight work once below that floor. Live
+browser verification of decomp.dev is no longer requested.
