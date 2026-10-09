@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated during production batch 4 (2026-10-08 Pacific /
+Last updated during production batch 5 (2026-10-08 Pacific /
 2026-10-09 UTC). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
@@ -9,7 +9,7 @@ another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
 | | |
 |---|---|
-| Matched C | **4,456 / 11,047 functions (40.34%)**, 268,626 / 2,415,354 code bytes (11.122%; `PROGRESS.md`) |
+| Matched C | **4,591 / 11,065 functions (41.49%)**, 291,846 / 2,415,354 code bytes (12.083%; `PROGRESS.md`) |
 | Build | `make` / `python3 tools/build.py` rebuilds the ROM **bit-identical** (SHA-1 `2651c5e6875ac60abff734510d152166d211c87c`) |
 | Shiftable | all data relocatable; `make shifttest` (3 scenarios, 35 screenshots) passes |
 | Code layout | `src/fn/sub_XXXXXXXX.c`, one function per file; `src/lib/m4a.c` (MP2K sound, 57/58) |
@@ -65,7 +65,7 @@ the family. The main thread matched both floating-point runtime units with
 See `docs/LIBGCC.md`, `notes/round2-*.md` and `docs/MODEL_BENCHMARK.md`.
 
 The user authorized continued work until 20% matched code bytes or weekly
-allowance below **40% remaining** (extended from 50% by explicit user confirmation),
+allowance below **35% remaining** (extended from 50%, then 40%, by explicit user requests),
 then draining all existing assignments. Check
 the account meter before each new round. Two Luna workers began round 3 while
 a single requested Astra worker reviewed external development-history claims
@@ -97,6 +97,20 @@ unintegrated RTC entry at `08248E70` is now an unmatched progress boundary,
 preventing 464 retained assembly bytes from receiving false C credit.
 Terminal code alignment is handled once by the splitter. All 35 combined
 shift screenshots and 32 tool/context tests pass.
+
+Production batch 5 adds **135 functions / 23,220 progress bytes**: Sol round 5
+(15), Sol family rounds 3–4 (10), MGS round 4 (14), and root EEPROM/RFU work
+(96). MGS round 5 adds no matches and documents three remaining candidates plus
+unsafe permutations that must not be reused. All findings are in
+`docs/MGS_GCL_MATCHING.md`. The exact RFU_V1024 source matches consolidate 54
+existing functions and add 91; seven ARM interrupt routines use `agbcc_arm`.
+Ten reviewed ARM boundaries exclude three retained assembly trampolines from
+C credit. See `docs/RFU.md`, `docs/EEPROM.md`, and the ROM-free inventories.
+The complete combined ROM is byte-identical; all 35 shift screenshots and
+36 local tool/context tests pass.
+The user extended the floor again to **35% weekly allowance remaining**. This
+supersedes older 40%/50% instructions; finish existing work after crossing it.
+Do not recheck the live decomp.dev page; local reports and Actions suffice.
 
 The new `docs/SCRIPT_TRACING.md` records 698 native calls and 90 actor callbacks
 from the intro, verified against command tables and the 722-entry actor registry.
@@ -248,3 +262,7 @@ Open:
 Ideas: inserter with box-width checks (1.47 MB free ROM space), `{1F}{xx}`
 accents, VWF via `Text_DrawGlyph` (`08218D1C`). Lan Hikari's 0.9 PR there is
 still open (recommendation: merge for players, ask for sources).
+
+User preference: after the confirmed live integrations, do not spend browser
+work rechecking decomp.dev for each batch. Local reports and Actions results
+are sufficient; the user explicitly requested this on 2026-10-09 UTC.

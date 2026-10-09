@@ -54,3 +54,6 @@ __eqdf2 = sub_08249FA8;
 __gtdf2 = sub_0824A040;
 __divdf3 = sub_08249CF4;
 __nedf2 = sub_08249FF4;
+
+/* agbcc indirect-call helper: original 08249244 is bx r3; nop. */
+_call_via_r3 = sub_08249244;

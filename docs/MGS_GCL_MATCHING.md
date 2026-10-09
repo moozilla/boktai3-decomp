@@ -367,8 +367,9 @@ register lifetime. These failures are not evidence of a different compiler.
 
 Round-2 bounded trap permuting improved the score from 1,840 to 1,110 in
 60 seconds with two workers; no zero-score candidate was found. The improved
-source remains untracked under `wip/`, alongside the independent base. This
-is a retained candidate, not a byte-exact match or evidence for a new compiler.
+source remains untracked under `wip/`, alongside the independent base. A later round-5 semantic audit rejected this generated candidate because it
+merged distinct record/vector pointers; see the explicit rejection below. It
+must not be promoted or treated as evidence for a new compiler.
 
 All eleven round-2 additions passed per-function checks, and the complete
 worker ROM printed `build/boktai3.gba: OK` before separate per-TU commits.
@@ -511,3 +512,304 @@ and constant ordering. Both independent and permuted candidates remain WIP.
 Round 3 validation: all four new translation units passed exact matching; the
 complete build printed `build/boktai3.gba: OK` before commits. Combined emulator
 regression remains the orchestrator's batch validation.
+
+## Round 4: engine update and adjacent structural families
+
+Round 4 starts at `11bee1d` on `codex/mgs-gcl-round4`. All functions in the
+following table were absent from tracked C at that base. The new total is
+**14 byte-exact functions, 1,980 native bytes**, including pools/alignment as
+measured by the exact checks. The engine state machine described in round 3
+is now matched; that previous section remains the behavioral evidence.
+
+| B3 start | Bytes | Established role / comparative evidence |
+|---|---:|---|
+| `08219AAC` | 120 | Initializes heap, scheduler, entry/cache state and list-0 update task |
+| `08219C40` | 116 | Forward traversal and front split of free heap block |
+| `08219CB4` | 132 | Reverse traversal and back split of free heap block |
+| `08219D38` | 124 | Marks an allocation free and coalesces adjacent free blocks |
+| `08219DD8` | 108 | Byte alignment, BIOS word fill, trailing-byte zeroing |
+| `0821A184` | 68 | Finds reusable resource entry or increments bounded entry count |
+| `0821A284` | 40 | Inserts 16-bit ID, data pointer, caller flags and active flag |
+| `0821A520` | 332 | Ten key remaps, paired-word resource lookup and optional inner lookup |
+| `0821AA1C` | 52 | Reads three script values into native 32-bit elements |
+| `0821AA50` | 56 | Reads three script values into native 16-bit elements; `GCL_StrToSV` role |
+| `0821B20C` | 164 | Descriptor-selected scalar/bit read; complements the previously matched stores |
+| `082250FC` | 552 | Engine task update, procedure dispatch, request/countdown and counter state |
+| `08225448` | 68 | Conditional counter reset and state-field setup following an 8-bit result |
+| `082258DC` | 48 | Finds an actor-like linked record by a zero-extended 16-bit ID |
+
+Additional pinned comparison files reviewed this round:
+[memory.c](https://github.com/FoxdieTeam/mgs_reversing/blob/f54dbb2a58adfc2755403296c9ebb653fbec277b/source/libgv/memory.c)
+and [cache.c](https://github.com/FoxdieTeam/mgs_reversing/blob/f54dbb2a58adfc2755403296c9ebb653fbec277b/source/libgv/cache.c).
+The provenance/license restriction at the start of this document still applies:
+these were inspected for comparison, with no upstream C copied or adapted.
+
+### Engine update: resolved widths and allocation differences
+
+The round-3 ordinary source removed the second saved procedure-ID decision.
+A width-preserving unsigned left-shift test and explicit zero/past labels keep
+both observed comparisons without observable extra effects. Shifting a
+zero-extended 16-bit value by 16 is zero exactly when that value is zero.
+Only the nonzero path can call `0821AD08`; the zero path calls `0821B004`.
+The final C reproduces the original repeated comparison after the first call.
+
+The value at current-memory offset `0x5A4` is loaded as signed 16-bit and
+passed with sign extension to `0821B03C`. A caller declaration permitting the
+full signed word is needed to reproduce `ldrsh`; declaring that argument as
+u16 emitted `ldrh` and removed two bytes. The already matched callee stores
+the low 16 bits at `030039F0`, so its minimal u16 source does not establish the
+original source-level prototype. This is ABI/call-site evidence, not proof
+that either independently reconstructed declaration is the historical type.
+
+Explicit mask and halfword-pointer locals reproduce loading the full
+`~0xE00` mask before the halfword read. The scheduler clear uses `~14` before
+the global read. Finally, ordinary repeated global input references preserve
+the original `ands` destination; GCC coalesces them to one observed load.
+A bounded 90-second search improved the final score 15 to 0 by removing the
+cached input local. Earlier switch, signed/unsigned, two shifted tests, and
+boolean-inline variants either removed the repeated decision or emitted
+extra boolean materialization. All were discarded, with no volatile fiction,
+ASM, fake call effects, or alternate compiler claim used to force matching.
+
+### Heap and resource-entry structure
+
+The B3 heap header contains previous/next pointers, a size/flag word, and a
+cleared word, totaling 16 bytes. Both allocation paths round the requested
+size upward to 16 bytes and add a header. Bit 31 means free; the low 20 bits
+supply block length. The front allocator follows next links and splits at
+`block + requested_extent`; the back allocator first reaches the last block,
+then follows previous links and splits at `block + block_length - extent`.
+A remainder greater than 16 creates a separate header; a remainder of 16 or
+less consumes the block. Allocation clears the final header word. Freeing
+null or an already free block returns; otherwise it marks free, clears that
+word and merges free previous and next neighbors while repairing links.
+No input-size validation or externally promised maximum allocation was
+established merely by the 20-bit stored length mask.
+
+This differs from reviewed MGS `M_Sys`/`M_Unit` routines: MGS searches a
+separate ordered allocation-unit array and derives lengths from adjacent
+addresses, with array movement during splitting. B3's linked in-heap headers
+are not a byte/layout-compatible counterpart. Similar allocation purpose is
+insufficient to install MGS names or claim a shared heap implementation.
+
+`08219DD8` handles leading unaligned bytes while signed length is positive,
+then uses a local zero word with BIOS `CpuSet` control `0x05000000` plus the
+low 21 bits of the aligned signed word count. It handles the final 0–3 bytes
+separately. There is no top-level negative-length rejection: reviewed callers
+use positive lengths, but malformed negative lengths are not made safe by the
+matching source. Zero-word initialization belongs after the leading-byte
+loop; tail decrement precedes pointer increment in the original instruction
+schedule. Typed field checks through the newly assigned next link avoid
+extra alias-driven reloads in the heap routines. One bounded 60-second search
+resolved the front allocator's register swap by an ordinary scope wrapper;
+the independently reconstructed back allocator/free routine matched after
+field-expression changes.
+
+The entry registry has 8-byte records: 16-bit ID, 8-bit flags, padding byte,
+and native pointer. `0821A184` scans the signed current count for a record
+without mask `0x80`. If none is reusable, it increments the count first and
+returns null when the new count exceeds 31; failure does not roll back the
+increment. The active-bit search does not verify ID uniqueness. `0821A284`
+stores the low 16-bit ID and pointer, and stores the low flag byte of caller
+flags OR signed `0x80`; its high bit therefore marks active. The previously
+matched `0821A218` gives meaning to caller masks 1 (retention) and 2 (free data).
+
+MGS `FindCache` instead uses 128 entries, ID modulo 128, 24-bit ID comparison,
+and a first-unused cache pointer. B3's linear registry with incremented-count threshold 31,
+separate flag byte and 16-bit ID differ materially. That threshold permits
+a returned fresh index only when the old count is at most 30; physical array
+capacity cannot be inferred from the comparison alone. Cache/resource roles are
+comparisons only. The B3 allocator's bounded 90-second search reached score 0
+from 20 with ordinary scope wrappers. The insertion search reached 0 from
+255 by storing the OR expression directly instead of modifying a saved local;
+that simpler independent source also passed the exact check.
+
+### Resource lookup and script value readers
+
+`0821A520` forms a 32-bit key from high 16-bit group and low 16-bit selector,
+then calls the existing lower-bound lookup `0821A4E8` with bounds 0 and 10
+against `08614D6C`. Ten inputs first replace that pair:
+
+| Input group | Replacement group | Replacement low word |
+|---|---|---|
+| `922E` | `9225` | `5130` |
+| `92B3` | `9305` | `D710` |
+| `9B1B` | `9A65` | `4679` |
+| `98F5` | `9B05` | `2117` |
+| `A635` | `A705` | `6D24` |
+| `AE6C` | `AF05` | `AC2C` |
+| `C091` | `C305` | `E53E` |
+| `CB05` | `C8E5` | `5F29` |
+| `CEEF` | `CEE5` | `4F2D` |
+| `CEAA` | `CF05` | `0A4D` |
+
+For a remapped input, it calls `0821A490` on the result with the original
+second input as the actual 16-bit lookup key. The other forwarded parameters
+are the replacement group and replacement low word; `0821A490` ignores the
+group, and `0821A454` ignores the forwarded context word. Thus those argument
+positions do not establish selector/context behavior beyond this observed
+path. There is no result-null guard before the inner header lookup. No
+resource-category strings, historic file names, or MGS-equivalent lookup were
+established for these constants. Signed switch promotion, mutating the native
+16-bit parameters, and an explicit widened third-argument local resolve
+branch/prologue/call scheduling. Two bounded searches only improved partial
+scores or found no improvement; subsequent independent rewrites matched.
+
+`0821AA1C` and `0821AA50` each decode exactly three successive operands,
+store their values and update `02000610` to the final decoder cursor. Neither
+checks returned type or early end in this routine. The first stores 32-bit
+values; the second truncates to native 16-bit elements. The second is a close
+role/control-flow correspondence to MGS `GCL_StrToSV` in `parse.c`, whose
+three-value loop also stores shorts and updates the next-string pointer.
+B3's already established operand encoding still differs from MGS. Indexed
+three-element loops match; pointer-increment loops and explicit stack-pointer
+locals introduced extra hoisting/register allocation. Array/struct stack
+variants also added a saved register. A 45-second allocation search on a prior
+vector candidate did not improve it; the later independent indexed form did.
+
+`0821B20C` selects type from descriptor bits 24–27. Type 9 reads a
+little-endian 32-bit value with stride 4; type 8 reads two little-endian bytes
+with the same stride 4. Types 1/6 load signed native halfwords with stride 2;
+types 2/3 load unsigned bytes. Type 4 adds descriptor bits 16–19 to the signed
+index, selects byte at arithmetic `index >> 3`, and returns normalized bit
+`1 << (index & 7)` as 0/1. Other types leave the output untouched. The function
+does not check memory bounds. `bits != 0` matches and avoids the unnecessary
+saved index in the older handwritten normalization. Reversing the equivalent
+OR/negation operands also matched, while returning separately from cases did
+not. MGS variable roles are useful comparison context, not encoding identity.
+
+### Initialization, actor lookup and remaining negatives
+
+`08219AAC` registers callback `08219A94` on list 0, clears scheduler/input
+mode globals, writes 123456 to `03005278`, and fills four halfword samples at
+`03005274` with `0x3FF`. The registered callback's existing matched source
+calls `08219B24` and `0821A308` alongside two other functions. The value
+123456 is observed initialization, not proof of a specific RNG algorithm.
+An explicit start pointer/value/advance sequence reproduces the descending
+sample-fill schedule; two pointer/index drafts did not.
+
+`08225448` checks the low-byte result of `0822BBA8`, returns it, and on zero
+clears 40 bytes if `030053F8` is nonnull, writes halfword 5 at current-memory
+`0x12`, then writes 230 at counter-structure offset 4 and zero bytes at 8/9/A.
+There is no second null guard before those subsequent stores. Counter and
+state-field roles are observed; no exclusive gameplay subsystem name follows.
+
+`082258DC` requires the context pointer at `030025F8`, takes its list at offset
+`0x18`, compares each record's 32-bit first word with a zero-extended 16-bit
+argument, and follows next at offset `0x44`. It returns the matching record or
+null. This strengthens the linked actor/context interpretation near the
+already documented callback registry, without proving exclusive ownership or
+an identical MGS function correspondence.
+
+`0821B084` remains WIP: it reads timer-3 count at hardware `0400010C`, takes
+its low seven bits times eight as an offset into `0203C400`, and establishes
+five views at base, base+`B00`, base+`1600`, base+`1A00`, base+`1E00` in
+`02000710/0C/08/04/00`. This concretely gives a maximum initial offset of
+1016 bytes; it is not a random-generator or encryption identification.
+The 88-byte independent draft differs only in the initial commutative-add
+operand order after splitting the timer/base expressions. Integer, halfword,
+array-struct and expression-order variants did not fix it, and a 60-second
+search produced no improvement. No matching C was tracked for this target.
+The previous trap draft remains untouched and unmatched. Every candidate and
+negative described above remains untracked WIP or ignored build evidence.
+
+Round 4 validation: the complete build printed `build/boktai3.gba: OK` with
+all 14 new units before commits. No worker screenshots were requested; the
+orchestrator owns combined batch regression. No semantic symbol names were
+installed, and no unsupported compiler/whole-engine lineage claim is made.
+
+## Round 5: remaining inventory and rejected search candidates
+
+Round 5 starts at `3c025ef` on `codex/mgs-gcl-round5`, with a ten-active-minute
+bound. The assigned ranges have only three remaining unmatched function
+starts: `08219B24` (180 bytes), `0821B084` (88 bytes), and `08225624`
+(380 bytes). This round produced **zero new matches / zero native bytes**;
+only the evidence documentation is committed. Independent valid C drafts and
+ignored search output remain available separately. No source-level lineage,
+compiler identification or new installed semantic names follow from failures.
+
+### Input update: B3 evidence and MGS pad comparison
+
+The pinned additional source reviewed was
+[pad.c](https://github.com/FoxdieTeam/mgs_reversing/blob/f54dbb2a58adfc2755403296c9ebb653fbec277b/source/libgv/pad.c).
+Its `GV_UpdatePadSystem` calculates pressed bits from current AND NOT previous,
+and released bits from previous AND NOT current, then writes pad state. This
+supports a role comparison for B3's same bit formulas; MGS has four pad-state
+outputs, packed channel shifts, analog/configuration handling and six-frame
+quick-button history that are not present in the reviewed B3 routine.
+
+B3 `08219B24` always reads hardware `REG_KEYINPUT` and writes its raw halfword
+to `03005270`. With `03005250` zero, it XORs the raw value with `0x3FF`,
+truncates to 16 bits, and updates the record at `03005260`: held at offset 0,
+newly pressed at 2, newly released at 4, stride 8. It then clears held/pressed
+in the second record, storing that record's previous held value as released.
+With `03005250` nonzero, scheduler mask 1 suppresses both record updates;
+otherwise two halfword samples beginning at `03005274` supply the values.
+Sample `0xFFFF` means held zero; other samples are XORed with `0x3FF`.
+Both records get the same previous/current difference formulas. Replay/demo
+input is a candidate interpretation of the sampled path, not a verified
+exclusive owner of `03005250` or the sample buffer.
+
+Independent struct and integer-width drafts reproduce the control flow but
+retain initial hardware-result moves, missing/differently scheduled 16-bit
+normalization, and pointer/register choices. Signed raw, scoped assignment,
+register keyword, indexed records and a small independent inline update
+helper did not match. No externally reconstructed pad code was copied.
+A bounded 75-second search scored 1685 then 1640/1570/1475 without a match.
+The best generated candidate inserts `if (keys)` before `keys` is initialized.
+Even though the branches contain identical assignments, that uninitialized
+read is undefined behavior and the candidate is **rejected**. It is not a
+valid WIP improvement or a reason to make the original memory volatile.
+
+### Trap comparison and explicit semantic rejections
+
+This round rechecked `TrapCmd` and `NTrapCmd` in the pinned `game/script.c`.
+The optional `m`, `b`, `s`, `t`, `p`, and `e` processing in `NTrapCmd` gives
+more specific comparative context than MGS `TrapCmd`'s fixed positional
+arguments. The layouts still differ: MGS fills a persistent `HZD_BND` entry
+and installs a bind array, while the observed B3 path constructs a 44-byte
+stack record, gathers two arrays of up to four native halfwords and resolves
+through `0821E104` before passing record/top to `0821E190`. MGS `NTrapCmd`
+also handles `d/r/i/c` and different flag bits; neither record-field names nor
+numeric wildcard values can be transferred from that source merely because
+option letters overlap. B3's `b` flag is `0x10`, and its `p` flag is `0x20`.
+The B3 `e` branch has priority over `p`; no MGS diagnostics were observed here.
+
+Indexed zeroing, explicit local bounds, an early initialized loop variable,
+and moving the second array base initialization later did not match. These
+valid drafts emitted 384–396 bytes and changed saved high-register/loop-counter
+allocation. A bounded 90-second search on the valid independent base improved
+score 2050 through 1985/1860/1683/1570 to 1150; no exact candidate was found.
+
+A semantic audit found two pointer substitutions that are unacceptable:
+
+* The old round-2 score-1110 output substitutes the `out` variable for the
+  second-array base, then overwrites it with `&trap.fe`. Its following zeroing
+  and `s` reads therefore target the output halfword rather than `trap.s`.
+* The round-5 score-1150 output replaces saved `out` with traversal pointer
+  `p`, initializes it to `&trap.fe`, then immediately reuses it for vector
+  loops. The later `0821E104` call receives that traversal result instead of
+  the required pointer at record offset `0x0E`.
+
+Both are **rejected**, regardless of improved assembly scores. Neither is
+tracked C, a semantic match, or a candidate for integration. The independent
+base retains separate `w`, `s`, traversal `p`, and saved output-field pointers.
+Future work must audit every generated source diff for valid pointer lifetimes,
+initialized reads and observable behavior before considering its exact score.
+No rewrite of the actual data layout or unsafe pointer merge is authorized.
+
+### Timer setup: remaining two-byte operand-order issue
+
+`0821B084` retains round 4's five memory views and timer-derived offset evidence.
+Modulo, signed/halfword/integer casts, outer scope, scalar/array/field base,
+split arithmetic, final-local assignment, repeated global-base references and
+inline offset helper variants did not match. The simplest valid 88-byte draft
+still differs only at `0821B090`: it emits `adds r1, r0, r1` where the ROM has
+`adds r1, r1, r0`. A new bounded 60-second search remained score 10 without
+saving an improved candidate. The ordinary repeated-global version worsened
+other register choices. No asm, register binding, extra hardware read or fake
+volatile side effect was introduced to force the commutative instruction.
+
+Round 5 validation: the unchanged matching sources completed a full build with
+`build/boktai3.gba: OK` before the documentation commit. No new screenshots,
+shared-gen regeneration, push, PR or nonmatching tracked C were produced.

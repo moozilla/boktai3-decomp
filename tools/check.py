@@ -40,16 +40,18 @@ def elf_symbols():
     return syms
 
 
-def disasm(code, addr):
+def disasm(code, addr, *, arm=False):
+    width = 4 if arm else 2
     if capstone is None:
-        return [(addr + i, code[i:i + 2].hex()) for i in range(0, len(code), 2)]
-    md = capstone.Cs(capstone.CS_ARCH_ARM, capstone.CS_MODE_THUMB)
+        return [(addr + i, code[i:i + width].hex()) for i in range(0, len(code), width)]
+    md = capstone.Cs(capstone.CS_ARCH_ARM, capstone.CS_MODE_ARM if arm else capstone.CS_MODE_THUMB)
     out, i = [], 0
     while i < len(code):
         ins = next(md.disasm(code[i:i + 4], addr + i), None)
         if ins is None:
-            out.append((addr + i, ".2byte 0x%04x" % int.from_bytes(code[i:i + 2], "little")))
-            i += 2
+            value = int.from_bytes(code[i:i + width], "little")
+            out.append((addr + i, f".{width}byte 0x{value:0{width * 2}x}"))
+            i += width
         else:
             out.append((addr + i, f"{ins.mnemonic} {ins.op_str}".strip()))
             i += ins.size
@@ -136,7 +138,8 @@ def main():
     orig = rom[off(addr):off(addr) + len(mine)]
     ok = mine == orig
     if not ok or not a.quiet:
-        la, lb = disasm(orig, addr), disasm(mine, addr)
+        arm = os.path.basename(build.compiler_for(src)) == "agbcc_arm"
+        la, lb = disasm(orig, addr, arm=arm), disasm(mine, addr, arm=arm)
         n = max(len(la), len(lb))
         print(f"{'address':8}  {'original':38} {'yours':38}")
         for i in range(n):

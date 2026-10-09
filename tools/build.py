@@ -85,7 +85,11 @@ def cflags_for(src):
     # per-file flags: a line "// CFLAGS: -O2 ..." replaces the default flags
     with open(os.path.join(ROOT, src)) as f:
         m = re.search(r"^// CFLAGS: (.*)$", f.read(), re.M)
-    return m.group(1).split() + ["-fhex-asm"] if m else CFLAGS
+    flags = m.group(1).split() + ["-fhex-asm"] if m else CFLAGS.copy()
+    # The bundled ARM compiler does not implement the Thumb fork's option.
+    if os.path.basename(compiler_for(src)) == "agbcc_arm":
+        flags = [flag for flag in flags if flag != "-fhex-asm"]
+    return flags
 
 
 def compiler_for(src):
@@ -94,9 +98,9 @@ def compiler_for(src):
         m = re.search(r"^// COMPILER: (\S+)\s*$", f.read(), re.M)
     if not m or m.group(1) == "agbcc":
         return AGBCC
-    if m.group(1) == "old_agbcc":
-        return os.path.join(os.path.dirname(AGBCC), "old_agbcc")
-    sys.exit(f"{src}: unknown compiler {m.group(1)!r}; use agbcc or old_agbcc")
+    if m.group(1) in ("old_agbcc", "agbcc_arm"):
+        return os.path.join(os.path.dirname(AGBCC), m.group(1))
+    sys.exit(f"{src}: unknown compiler {m.group(1)!r}; use agbcc, old_agbcc, or agbcc_arm")
 
 
 @functools.lru_cache(maxsize=None)
