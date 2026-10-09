@@ -318,3 +318,34 @@ the per-function exact checker. Compiler diagnostics and a return to plain
 source are promising alternatives to blind allocation retries. Its successful
 multiweek campaigns do not establish token efficiency or justify weakening
 our matching rules. Fuzzy/partial progress remains a separate research topic.
+
+
+## October 9: applying the family workflow alone
+
+This tranche adds **46 exact functions / 7,424 bytes** (13.377% to 13.684%).
+The account meter moved from 18% to 17% during matching and 16% before
+closeout. Rounded readings do not establish token cost or a per-model rate.
+The 20% target remains unmet, and the work stayed on one agent throughout.
+
+The clearest improvement was choosing a reusable layout rather than persisting
+on an allocation residue. A typed motion object made a 396-byte initializer
+exact on the first check, then a 380-byte sibling on its first check. Two
+432/392-byte updates needed only an operand-order correction. Related rotation,
+sine/linear interpolation, effect initialization and construction followed.
+The family work produces exact whole functions; individual commits need not
+mean independently solving every function.
+
+Struct typing is useful beyond array indexing. It changes the native compiler's
+alias information, pointer reloads and expression lifetimes. Raw offset casts
+had removed reloads and hoisted addresses in the motion/projection drafts.
+Typing 08160EA4, however, left its four register differences unchanged; color
+unions and typed resource fields also failed on the palette/large setup drafts.
+This is an evidence-backed recipe with limits, not a universal fix. WIP branches
+preserve the failed hypotheses without weakening main or progress criteria.
+
+Whole-ROM validation remains necessary, but it is batched. The combined shift
+regression reuses one shifted ROM for all three scenarios instead of rebuilding
+it for each scenario. No broad tooling suite ran. The emitted-size audit caught
+a separate accounting risk: a 116-byte exact body had inherited a 332-byte
+inventory span. Adding the two retained wrapper boundaries removes 216 bytes
+of potential false credit. The accepted ledger records reviewed body sizes.
