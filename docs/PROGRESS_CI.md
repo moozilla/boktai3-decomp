@@ -1,7 +1,9 @@
 # ROM-free progress reports
 
-`.github/workflows/progress.yml` runs on pushes, pull requests and manual
-requests. It needs Python only, no ROM, compiler, secret, or generated assembly.
+`.github/workflows/progress.yml` runs on pushes to `main` and manual requests.
+Worker branches and pull requests do not run it. Workers keep per-match commits;
+the orchestrator validates and merges a batch into `main`, producing one progress
+run for that batch. It needs Python only, no ROM, compiler, secret, or generated assembly.
 It tests progress accounting, renders a job summary and uploads exactly one
 file, `report.json`, in the artifact `jp_report`. Artifact retention is 30 days
 with maximum compression to keep storage small.
@@ -80,6 +82,29 @@ A name-only change in `symbols/functions.csv` needs no inventory refresh.
 Reports are pulled by decomp.dev from GitHub Actions; this workflow does not
 push to a decomp.dev API. Expired artifacts cannot be used to backfill history,
 so register after the first successful default-branch push.
+
+The project is registered at [decomp.dev/moozilla/boktai3-decomp](https://decomp.dev/moozilla/boktai3-decomp),
+using `progress.yml` and default version `jp`. Its first imported report is
+commit `cec7bd7c24d87de34e52a3e6c87583e34e4e0832`. No GitHub App installation
+is required for scheduled updates: the current server queues refreshes for
+projects without the App every 30 minutes, plus a full refresh every 12 hours.
+The management page's **Force refresh** fetches missing reports on demand.
+See the [server scheduler](https://github.com/encounter/decomp.dev/blob/e9c086adb74d2fe569541cd715cd9312d7641313/crates/web/src/cron.rs).
+
+The standard Ubuntu runner is free for this public repository. GitHub Free
+includes 500 MB of artifact storage shared with Packages; the compressed
+metadata-only reports and 30-day retention keep this job's storage small.
+See [GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions).
+
+### Reading the metrics
+
+Fuzzy matching can include partial similarity; exact matching counts completed
+matches, and linked/completed measures count source units incorporated into
+the rebuilt game. Our reporter gives unfinished candidates no partial credit
+and treats each known function as a unit. Every accepted exact C match is used
+in the final ROM, so fuzzy, exact and linked code percentages coincide here.
+These are byte-weighted measures of the tracked code region, not percentages
+of functions or of the whole ROM. Data/asset reconstruction is not measured.
 
 ## Integration references
 
