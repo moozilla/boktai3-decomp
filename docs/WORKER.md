@@ -156,3 +156,12 @@ Candidates with better scores land in the printed
 attempt when the structure is right and only register allocation or instruction
 order differs. A zero score still needs `tools/check.py` and a full build;
 see `docs/COMPILER_REFERENCES.md` for the scoring controls and limitations.
+
+## Local orchestration safeguards
+
+Before drafting, confirm the function is absent from `src/` (including library
+units); matching an existing function earns no new coverage. Worker checkouts
+share generated files read-only: invoke `build/venv/bin/python tools/build.py`
+and `tools/shift_test.sh` directly, since Make prerequisite regeneration could
+write shared `gen/`. Exact library evidence may justify `// COMPILER: old_agbcc`;
+ordinary register differences alone do not. See `docs/LIBGCC.md`.
