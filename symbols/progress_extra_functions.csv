@@ -55,3 +55,5 @@ address,evidence
 0824AB70,__fixsfsi: separate function in exact linked libgcc_fp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
 0824ABD8,__negsf2: separate function in exact linked libgcc_fp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
 0824AC14,__extendsfdf2: separate function in exact linked libgcc_fp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
+081DB24C,Independent 108-byte Thumb allocation wrapper in retained 081DB1D8 tail; own prologue and call sequence and pop-bx plus literals; ends at 081DB2B8; notes/solo-family_2026-10-09.md
+081DB2B8,Independent 108-byte Thumb allocation wrapper in retained 081DB1D8 tail; own prologue and call sequence and pop-bx plus literals; ends at 081DB324; notes/solo-family_2026-10-09.md
