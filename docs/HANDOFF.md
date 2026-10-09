@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after local Codex setup and model pilot (2026-10-08 Pacific /
+Last updated after production round 1 (2026-10-08 Pacific /
 2026-10-09 UTC). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
@@ -9,7 +9,7 @@ another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
 | | |
 |---|---|
-| Matched C | **4,151 / 11,028 functions (37.64%)**, 220,984 / 2,415,354 code bytes (9.149%; `PROGRESS.md`) |
+| Matched C | **4,203 / 11,028 functions (38.11%)**, 224,688 / 2,415,354 code bytes (9.302%; `PROGRESS.md`) |
 | Build | `make` / `python3 tools/build.py` rebuilds the ROM **bit-identical** (SHA-1 `2651c5e6875ac60abff734510d152166d211c87c`) |
 | Shiftable | all data relocatable; `make shifttest` (3 scenarios, 35 screenshots) passes |
 | Code layout | `src/fn/sub_XXXXXXXX.c`, one function per file; `src/lib/m4a.c` (MP2K sound, 57/58) |
@@ -41,6 +41,21 @@ allows three simultaneous workers alongside the orchestrator. Workers retain
 per-function commits; the orchestrator validates and merges batches into main.
 Progress Actions run only for main pushes or manual dispatch.
 
+Production round 1 then added **52 new matches**: Luna A 15, Luna B 11,
+Sol 26 including a compiler-thunk follow-up. One redundant rewrite was excluded.
+The verified `_call_via_r4` alias unblocks ordinary C indirect calls through r4.
+Per-worker patterns and failures are in `notes/round1-*.md`; detailed accounting
+and limitations are appended to `docs/MODEL_BENCHMARK.md`.
+
+The community-reference pass found real permuter wrapper bugs: symbolic versus
+numeric addresses incurred false penalties, retained data inflated scores, and
+regex source stripping could erase compact loops. `tools/permute.py --debug`
+now diagnoses the base without those errors. It preserves static inline helpers,
+requires one target ROM function and creates isolated run directories. See
+`docs/COMPILER_REFERENCES.md` for tested GCC patterns, upstream/fork evaluation
+and validation. A 60-second trial on `081A55D4` did not solve its remaining
+register allocation difference; keep that candidate for future escalation.
+
 The deeper task connects emulator coverage to function boundaries:
 `tools/function_context.py`, `docs/RUNTIME_CONTEXT.md`, and `docs/MENU_CONTEXT.md`.
 Screenshot review corrected a one-tab offset in the menu replay's labels and
@@ -57,7 +72,7 @@ Activate `source build/venv/bin/activate` before using Python tools. Homebrew
 provides `arm-none-eabi-binutils` and mGBA; `make setup` builds the pinned
 compiler, disassembler, assembler, permuter and harness. See README for macOS
 installation instructions. Full `make` and all 35 shift-test screenshots passed
-after the six pilot matches were integrated.
+after the 52 production-round matches were integrated.
 
 On a fresh Linux machine, supply the ROM, then:
 
@@ -163,7 +178,8 @@ Open:
 
 ## 7. Other open work
 
-* decomp.dev report / CI (`tools/progress.py --json` is a start).
+* Progress reporting is live on decomp.dev; maintain the ROM-free report and
+  batched main-only CI as the source layout evolves (`docs/PROGRESS_CI.md`).
 * Naming/context pass: tag functions by the screens they run on (harness
   coverage per `mark` segment), name subsystems, apply `symbols/proposed/*.csv`.
 * Cleanup: merge `src/fn/*.c` into real translation units with shared headers

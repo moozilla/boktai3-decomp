@@ -80,13 +80,18 @@ def lint_c(src):
                  f"declare `extern const u8 gUnk_XXXXXXXX[];` (the label in gen/data.s) and use that")
 
 
+def cflags_for(src):
+    # per-file flags: a line "// CFLAGS: -O2 ..." replaces the default flags
+    with open(os.path.join(ROOT, src)) as f:
+        m = re.search(r"^// CFLAGS: (.*)$", f.read(), re.M)
+    return m.group(1).split() + ["-fhex-asm"] if m else CFLAGS
+
+
 def build_c(src, obj):
     lint_c(src)
     deps = [src] + [os.path.join(d, f) for d in ("include", "include/gba")
                     for f in sorted(os.listdir(os.path.join(ROOT, d))) if f.endswith(".h")]
-    # per-file flags: a line "// CFLAGS: -O2 ..." replaces the default flags
-    m = re.search(r"^// CFLAGS: (.*)$", open(os.path.join(ROOT, src)).read(), re.M)
-    cflags = m.group(1).split() + ["-fhex-asm"] if m else CFLAGS
+    cflags = cflags_for(src)
     key = file_hash(*deps, "tools/build.py", extra=" ".join(CPP + cflags))
     if stamp_ok(os.path.join(ROOT, obj), key):
         return

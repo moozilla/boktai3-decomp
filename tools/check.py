@@ -56,21 +56,12 @@ def disasm(code, addr):
     return out
 
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("src")
-    ap.add_argument("--quiet", action="store_true")
-    a = ap.parse_args()
-    src = a.src
-    if not src.endswith(".c"):
-        src = os.path.join("src", "fn", src + ".c")
-    src = os.path.relpath(os.path.join(ROOT, src), ROOT)
-    work = os.path.join("build", "check")
-    os.makedirs(os.path.join(ROOT, work), exist_ok=True)
-    base = os.path.join(work, os.path.basename(src)[:-2])
-    obj = base + ".o"
-    build.build_c(src, obj)
+def link_object(obj, elf, *, syms=None, address=None):
+    """Resolve a standalone object as in the ROM; also used by the permuter.
 
+    A supplied symbol snapshot keeps a search reproducible if the full build
+    changes while it is running. Output and stubs are private to this object.
+    """
     defined = []
     undefined = []
     for ln in build.sh(["arm-none-eabi-nm", obj]).splitlines():
@@ -80,11 +71,14 @@ def main():
         elif len(p) == 3 and p[1] in "Tt" and not p[2].endswith("__addr") and not p[2].startswith("."):
             defined.append((int(p[0], 16), p[2]))
     if not defined:
-        sys.exit("no functions defined in " + src)
+        sys.exit("no functions defined in " + obj)
     defined.sort()
-    syms = elf_symbols()
+    if syms is None:
+        syms = elf_symbols()
     first = defined[0][1]
-    if first not in syms:
+    if address is not None:
+        addr = address
+    elif first not in syms:
         m = re.search(r"_([0-9A-F]{8})$", first)
         if not m:
             sys.exit(f"cannot find the address of {first} (not in build/boktai3.elf)")
@@ -112,10 +106,30 @@ def main():
                 missing.append(name)
     if missing:
         sys.exit("unresolved symbols: " + ", ".join(missing))
-    open(os.path.join(ROOT, base + "_stub.s"), "w").write("\n".join(stub) + "\n")
-    build.sh(build.AS + ["-o", base + "_stub.o", base + "_stub.s"])
-    build.sh(["arm-none-eabi-ld", f"-Ttext=0x{addr:08X}", "-e", "0", "-o", base + ".elf",
-              obj, base + "_stub.o"])
+    stub_base = elf + "_stub"
+    with open(os.path.join(ROOT, stub_base + ".s"), "w") as f:
+        f.write("\n".join(stub) + "\n")
+    build.sh(build.AS + ["-o", stub_base + ".o", stub_base + ".s"])
+    build.sh(["arm-none-eabi-ld", f"-Ttext=0x{addr:08X}", "-e", "0", "-o", elf,
+              obj, stub_base + ".o"])
+    return addr, [n for _, n in defined]
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("src")
+    ap.add_argument("--quiet", action="store_true")
+    a = ap.parse_args()
+    src = a.src
+    if not src.endswith(".c"):
+        src = os.path.join("src", "fn", src + ".c")
+    src = os.path.relpath(os.path.join(ROOT, src), ROOT)
+    work = os.path.join("build", "check")
+    os.makedirs(os.path.join(ROOT, work), exist_ok=True)
+    base = os.path.join(work, os.path.basename(src)[:-2])
+    obj = base + ".o"
+    build.build_c(src, obj)
+    addr, defined = link_object(obj, base + ".elf")
     build.sh(["arm-none-eabi-objcopy", "-O", "binary", "-j", ".text", base + ".elf", base + ".bin"])
     mine = open(os.path.join(ROOT, base + ".bin"), "rb").read()
     rom = load_rom(verify=False)
@@ -130,7 +144,7 @@ def main():
             y = lb[i] if i < len(lb) else (0, "")
             mark = " " if x[1] == y[1] and x[0] == y[0] else "!"
             print(f"{(x[0] or y[0]):08X}{mark} {x[1]:38.38} {y[1]:38.38}")
-    names = ", ".join(n for _, n in defined)
+    names = ", ".join(defined)
     print(f"{names}: {'MATCH' if ok else 'MISMATCH'} ({len(mine)} bytes at 0x{addr:08X})")
     sys.exit(0 if ok else 1)
 
