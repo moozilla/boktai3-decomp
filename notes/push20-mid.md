@@ -141,3 +141,20 @@ Cumulative accepted worker snapshot: 26 functions / 5,500 emitted bytes.
 
 The batched full build printed `build/boktai3.gba: OK` before all three
 separate translation-unit commits. No sources changed after validation.
+
+## Call-argument safety correction
+
+Review found unsequenced assignment/read of `zero` in C6498, C5C2C and
+E2E7C. All same-call reads of that variable were replaced with literal `0`.
+Each call now assigns `zero` in one argument and never reads it in another;
+subsequent calls read the initialized local after completion of the first call.
+`sixty` is also assigned only once, with no same-call read. Ordinary pre-call
+initialization moved instructions in C6498, so the safe literal form is retained.
+
+Exact checks: `build/check-c6498-safe2.txt` (216 B),
+`check-c5c2c-safe1.txt` (276 B), `check-e2e7c-safe1.txt` (200 B).
+All three report MATCH. Read-only inspection of the other accepted call-site
+assignments found no further same-call assignment/read pattern.
+
+The corrective batch passed `build/full-safe-calls.txt` with
+`build/boktai3.gba: OK` before three per-function repair commits.
