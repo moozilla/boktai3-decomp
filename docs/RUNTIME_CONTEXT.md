@@ -1,5 +1,13 @@
 # Runtime function context
 
+Regenerate coverage with the corrected harness introduced in the script-trace
+work before relying on function-entry observations. Earlier `.exec` files used
+the memory-hook PC adjustment between CPU steps, shifting instruction samples;
+pending IRQs could also produce phantom samples. See
+[SCRIPT_TRACING.md](SCRIPT_TRACING.md#execution-sampling-correction) for the
+control replay and correction. The attribution tool cannot detect the age of
+a raw coverage file. Memory-hook pointer evidence and screenshots are unchanged.
+
 `tools/function_context.py` attributes the emulator harness's per-mark `.exec`
 files to function starts in `gen/code_sym.s`. It is a navigation aid for
 reviewing code by scene or segment. Coverage records that an instruction
