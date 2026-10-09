@@ -170,3 +170,16 @@ ordinary register differences alone do not. See `docs/LIBGCC.md`.
   The r7 frame and repeated byte-local loads are useful clues, but require exact
   checks. Eight-bit `u32` bitfields reproduce its narrow status operations; see
   `docs/RTC.md`. Do not apply this setting broadly to ordinary register misses.
+
+* **EEPROM SDK code** `08248634–08248970` matches `agbcc -O1 -mthumb-interwork`;
+  source comparison and exact checks are in `docs/EEPROM.md`. Optimization levels
+  can vary between linked libraries. Do not assume one global build flag.
+
+* **RFU SDK code** uses `LIBRFU_VERSION 1024` and O2; its serial interrupt
+  routines are ARM, selected with `// COMPILER: agbcc_arm`. Reviewed blob
+  boundaries are applied without editing shared `gen/`; see `docs/RFU.md`.
+  A function before an assembly blob does not make that blob matched C.
+
+* **Audit permuter source changes**, including low-score outputs. Reject
+  uninitialized reads and changes to distinct pointer lifetimes even if the
+  assembly score improves. MGS round 5 found both; see `docs/MGS_GCL_MATCHING.md`.
