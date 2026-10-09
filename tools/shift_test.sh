@@ -5,11 +5,12 @@
 set -e
 cd "$(dirname "$0")/.."
 SCRIPT=$1; SHIFT=${2:-0x100}
+HARNESS=${BOKTAI3_HARNESS:-tools/emu/harness}
 # (build.py trims trailing zero padding back to 16 MiB so EEPROM stays at 0x0D000000)
 python3 tools/build.py --shift $SHIFT --out build/shifted.gba
 OUT=build/shift_test/$(date +%s); mkdir -p $OUT/orig $OUT/shift
-tools/emu/harness baserom.gba "$SCRIPT" $OUT/orig >/dev/null 2>&1
-tools/emu/harness build/shifted.gba "$SCRIPT" $OUT/shift >/dev/null 2>&1
+"$HARNESS" baserom.gba "$SCRIPT" $OUT/orig >/dev/null 2>&1
+"$HARNESS" build/shifted.gba "$SCRIPT" $OUT/shift >/dev/null 2>&1
 set +e
 python3 - "$OUT" <<'PY'
 import glob, sys

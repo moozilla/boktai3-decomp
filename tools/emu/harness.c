@@ -20,6 +20,8 @@
 //   freeze ADDR[:SIZE] V  same, rewritten before every frame; "unfreeze" clears
 //   lux N               solar sensor reading (0-255, game treats lower as brighter)
 //   trace on|off        enable coverage recording (default on)
+//   probe NAME ADDR     log registers before executing ADDR (hex) to probes.tsv
+//   unprobe             remove all probes; probes also work with trace off
 //   (env BOKTAI3_SAV=file.sav loads a battery save first)
 //   mark NAME           start a new coverage segment: subsequent coverage is
 //                       written to OUTDIR/cov-NAME.* in addition to the totals
@@ -38,6 +40,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <stdint.h>
+#include <ctype.h>
 
 #define ROM_SIZE 0x1000000
 
@@ -61,6 +64,58 @@ static uint8_t ewram_exec[0x40000 / 2];
 static uint32_t* seg_reader;
 static uint8_t* seg_exec;
 static char seg_name[256] = "";
+
+static struct { char name[64]; uint32_t pc; } probes[32];
+static unsigned nprobes;
+static uint32_t probe_lo = UINT32_MAX, probe_hi;
+static FILE* probe_file;
+static unsigned probe_count;
+
+static void add_probe(const char* name, const char* address) {
+	char* end;
+	unsigned long pc = strtoul(address, &end, 16);
+	if (!*name || strlen(name) >= sizeof(probes[0].name) || !*address || *end ||
+	    pc > UINT32_MAX || (pc & 1) || nprobes == 32) {
+		fprintf(stderr, "invalid probe (use a name and an even hex address; at most 32)\n");
+		exit(1);
+	}
+	for (const char* p = name; *p; ++p) {
+		if (!isalnum((unsigned char)*p) && *p != '_' && *p != '-' && *p != '.') {
+			fprintf(stderr, "probe names must use letters, digits, _, - or .\n");
+			exit(1);
+		}
+	}
+	if (!probe_file) {
+		char path[1024];
+		snprintf(path, sizeof(path), "%s/probes.tsv", outdir);
+		probe_file = fopen(path, "w");
+		if (!probe_file) { perror(path); exit(1); }
+		fprintf(probe_file, "sequence\tframe\tsegment\tprobe\tpc\tmode");
+		for (int i = 0; i < 16; ++i) fprintf(probe_file, "\tr%d", i);
+		fputc('\n', probe_file);
+	}
+	strcpy(probes[nprobes].name, name);
+	probes[nprobes++].pc = pc;
+	if (pc < probe_lo) probe_lo = pc;
+	if (pc > probe_hi) probe_hi = pc;
+}
+
+static void note_probes(uint32_t pc) {
+	if (pc < probe_lo || pc > probe_hi) return;
+	for (unsigned i = 0; i < nprobes; ++i) {
+		if (pc != probes[i].pc) continue;
+		// Fail explicitly instead of silently delivering a truncated trace.
+		if (probe_count == 100000) {
+			fprintf(stderr, "probe trace exceeded 100000 records; narrow the replay\n");
+			exit(1);
+		}
+		fprintf(probe_file, "%u\t%u\t%s\t%s\t%08X\t%s", ++probe_count,
+		        core->frameCounter(core), seg_name, probes[i].name, pc,
+		        cpu->executionMode == MODE_THUMB ? "thumb" : "arm");
+		for (int r = 0; r < 16; ++r) fprintf(probe_file, "\t%08X", (uint32_t)cpu->gprs[r]);
+		fputc('\n', probe_file);
+	}
+}
 
 static uint8_t lux = 0xE8;
 
@@ -147,8 +202,7 @@ static uint32_t h_storeMultiple(struct ARMCore* c, uint32_t base, int mask, enum
 	return orig.storeMultiple(c, base, mask, dir, cc);
 }
 
-static void note_exec(void) {
-	uint32_t pc = cur_pc();
+static void note_exec(uint32_t pc) {
 	uint8_t bit = cpu->executionMode == MODE_THUMB ? 1 : 2;
 	if (pc >= 0x08000000 && pc < 0x0A000000) {
 		uint32_t o = (pc - 0x08000000) & (ROM_SIZE - 1);
@@ -174,10 +228,18 @@ static void poke(uint32_t addr, uint32_t size, uint32_t val) {
 static void run_frames(int n) {
 	for (int f = 0; f < n; ++f) {
 		for (int i = 0; i < nfreeze; ++i) poke(freezes[i].addr, freezes[i].size, freezes[i].val);
-		if (!tracing) { core->runFrame(core); continue; }
+		if (!tracing && !nprobes) { core->runFrame(core); continue; }
 		uint32_t frame = core->frameCounter(core);
 		while (core->frameCounter(core) == frame) {
-			note_exec();
+			// ARMRun processes events before executing an instruction. Drain
+			// them before sampling: an IRQ can redirect PC, otherwise a probe
+			// can report an instruction that has not actually executed yet.
+			while (cpu->cycles >= cpu->nextEvent) cpu->irqh.processEvents(cpu);
+			// Between steps PC points one instruction beyond the next one;
+			// cur_pc() is instead for in-instruction memory hooks.
+			uint32_t pc = cpu->gprs[15] - (cpu->executionMode == MODE_THUMB ? 2 : 4);
+			if (tracing) note_exec(pc);
+			if (nprobes) note_probes(pc);
 			core->step(core);
 		}
 	}
@@ -339,6 +401,8 @@ int main(int argc, char** argv) {
 		else if (!strcmp(cmd, "unfreeze")) nfreeze = 0;
 		else if (!strcmp(cmd, "lux")) lux = atoi(a1);
 		else if (!strcmp(cmd, "trace")) tracing = !strcmp(a1, "on");
+		else if (!strcmp(cmd, "probe")) add_probe(a1, a2);
+		else if (!strcmp(cmd, "unprobe")) { nprobes = 0; probe_lo = UINT32_MAX; probe_hi = 0; }
 		else if (!strcmp(cmd, "mark")) {
 			end_segment();
 			if (!seg_reader) { seg_reader = calloc(ROM_SIZE, 4); seg_exec = calloc(ROM_SIZE / 2, 1); }
@@ -350,6 +414,7 @@ int main(int argc, char** argv) {
 		fprintf(stderr, "[frame %u] %s %s %s\n", core->frameCounter(core), cmd, a1, a2);
 	}
 	end_segment();
+	if (probe_file && fclose(probe_file)) { perror("probes.tsv"); return 1; }
 	write_cov("total", rom_reader, rom_exec);
 	char path[1024];
 	snprintf(path, sizeof(path), "%s/total.word32", outdir);
