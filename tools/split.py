@@ -48,7 +48,10 @@ def c_functions(path, with_asm=True):
         name = m.group(1)
         if name in ("if", "for", "while", "switch", "return", "sizeof"):
             continue
-        if "static" in src[src.rfind("\n", 0, m.start()) + 1:m.start()]:
+        # Storage class/return type may be on preceding lines. Stop at the
+        # previous declaration or body boundary, not merely the last newline.
+        decl_start = max(src.rfind(c, 0, m.start()) for c in ";{}") + 1
+        if re.search(r"\bstatic\b", src[decl_start:m.start()]):
             continue  # static (inline) helper: not a ROM function of its own
         found.append((m.start(), name))
     if with_asm:
@@ -74,6 +77,17 @@ def write_nonmatching(code, funcs):
         p = os.path.join(d, name + ".s")
         if not os.path.exists(p) or open(p).read() != text:
             open(p, "w").write(text)
+
+
+def c_replacement_end(code, start, end):
+    """First retained trailing-data line; C replaces instructions/literal pools."""
+    for k in range(start, end):
+        if code[k].lstrip().startswith(".incbin"):
+            end = k
+            while end > start and re.match(r"^\w+:\s*$", code[end - 1]):
+                end -= 1
+            break
+    return end
 
 
 def main():
@@ -151,13 +165,7 @@ def main():
         out_units.append(("c", rel))
         # The C object replaces only the last function's instructions (and its
         # literal pools); trailing undisassembled data in that block stays asm.
-        end = funcs[last][3]
-        for k in range(funcs[last][2], funcs[last][3]):
-            if code[k].lstrip().startswith(".incbin"):
-                end = k
-                while end > funcs[last][2] and re.match(r"^\w+:\s*$", code[end - 1]):
-                    end -= 1
-                break
+        end = c_replacement_end(code, funcs[last][2], funcs[last][3])
         # Labels that disappear with the asm are redefined relative to the
         # unit's first function, so references from elsewhere still resolve.
         base_name, base_addr = funcs[first][0], funcs[first][1]

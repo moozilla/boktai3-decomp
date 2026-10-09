@@ -44,7 +44,7 @@ everything from the worktree root.
    `python3 tools/build.py` once (must print `build/boktai3.gba: OK`) before
    committing: it also checks the whole-ROM layout.
 5. Matched: `git add src/fn/sub_XXXXXXXX.c symbols/proposed && git commit -m "match sub_XXXXXXXX"`.
-   Not matched after ~10 check attempts: delete the file, add a line to
+   Not matched after ~10 check attempts: retain the candidate under `wip/`, add a line to
    `notes/<your-worker-name>.md` with the address and what was off (register
    swap, branch order, ...), and move on. Never commit a non-matching file.
 
@@ -147,9 +147,12 @@ why, and any naming insights.
 
 ## Permuter (for "only registers differ" skips)
 
-`python3 tools/permute.py src/fn/sub_X.c --run 600` sets up
-build/permute/sub_X/ for [decomp-permuter](https://github.com/simonlindholm/decomp-permuter)
-(clone it next to the repo, or set PERMUTER=) and runs it for 10 minutes.
-Candidates with better scores land in build/permute/sub_X/output-*/. Use it on
-your best non-matching attempt when the structure is right and only register
-allocation or instruction order differs.
+`python3 tools/permute.py wip/sub_X.c --debug` checks the base score first.
+`python3 tools/permute.py wip/sub_X.c --run 60 -j 2` then runs a bounded search
+using the pinned [decomp-permuter](https://github.com/simonlindholm/decomp-permuter)
+installed by `make setup` (or set `PERMUTER` to another checkout).
+Candidates with better scores land in the printed
+`build/permute/sub_X/run-*/output-*/` directory. Use it on your best non-matching
+attempt when the structure is right and only register allocation or instruction
+order differs. A zero score still needs `tools/check.py` and a full build;
+see `docs/COMPILER_REFERENCES.md` for the scoring controls and limitations.
