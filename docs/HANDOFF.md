@@ -67,8 +67,11 @@ See `docs/LIBGCC.md`, `notes/round2-*.md` and `docs/MODEL_BENCHMARK.md`.
 The user authorized continued work until 20% matched code bytes or weekly
 allowance below 50% remaining, then draining all existing assignments. Check
 the account meter before each new round. Two Luna workers began round 3 while
-a single requested Astra worker reviews external development-history claims
-and SolDec. The main thread continues hard matching and reviewed batch integration.
+a single requested Astra worker reviewed external development-history claims
+and SolDec. Its completed `docs/PROCESS_REVIEW.md` identifies concrete GCL-family
+script correspondences, B3-specific decoding differences and a 722-target actor
+registry. `tools/soldec_audit.py` supplies bounded, read-only checks; no speculative
+engine/compiler claims were adopted. The main thread continues hard matching and reviewed batch integration.
 Do not conflate worker commit counts with new coverage.
 
 The deeper task connects emulator coverage to function boundaries:
