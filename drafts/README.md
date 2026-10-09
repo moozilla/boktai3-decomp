@@ -1,6 +1,6 @@
 # Retained candidate source
 
-This branch preserves 656 WIP C files from seven local checkouts, including
+This branch preserves 666 WIP C files from seven local checkouts, including
 alternate attempts and targets already matched. The audited target inventory
 contains 48 accepted matches and 65 unresolved targets; file count is not
 unfinished-function count. `targets.csv` maps the best selected unresolved
@@ -43,3 +43,14 @@ hash equals accepted production source; other alternates are unaccepted and
 receive no credit. See `notes/solo-family_2026-10-09.md` for the selected
 near-matches, successful recipes and failed hypotheses. Production state is
 synchronized with main; candidate C remains confined to this WIP branch.
+
+
+## Solo tail checkpoint (October 9)
+
+PR #17 adds six exact functions / 752 bytes and groups the identified libraries
+in the objdiff report. This checkpoint preserves ten tail C files: six copies
+identical to accepted main source and four unaccepted hypotheses. The latter
+are two inline finish-helper variants, a reused flag-pointer variant, and an
+inline zero-vector-test variant. `solo-tail_2026-10-09.csv` records every path,
+source hash, target and status. These drafts are outside the production source
+tree and add no partial matching credit. Production state includes PR #17.
