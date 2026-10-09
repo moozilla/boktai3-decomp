@@ -121,3 +121,40 @@ improve the 700-byte draft; retained safe best, no source promotion.
 
 Final complete build after focused WIP work: `build/full-final-focused.txt`
 printed `build/boktai3.gba: OK`; accepted sources unchanged.
+
+## Final fresh pass (2026-10-09)
+
+Three additional exact matches from six standalone checks, two drafts per
+candidate, no search or regression suite. All native spans end at the next
+complete prologue; sources were absent from every existing translation unit.
+
+| Function | Emitted bytes | Evidence / successful adjustment |
+| --- | ---: | --- |
+| 081C6498 | 216 | Two 32-byte resource copies, two object calls and six-element setup loop. A distinct loop-zero lifetime fixes preserved-register allocation. Span ends 081C6570. |
+| 081E27A8 | 240 | Four script keyword checks and resource/palette setup. Distinct resource locals remove unnecessary copies. Span ends 081E2898. |
+| 081E2DA0 | 220 | Resource setup, two flag masks, and three nested 16-halfword copy loops. Initialize mask before reading flags; separate next-index local preserves the outer loop's precomputed increment. Span ends 081E2E7C. |
+
+Final-pass diffs are `build/check-final-c6498-v2.txt`,
+`check-final-e27a8-v2.txt`, and `check-final-e2da0-v2.txt` (all MATCH).
+The one batched complete build is `build/full-final-pass.txt`.
+Cumulative accepted worker snapshot: 26 functions / 5,500 emitted bytes.
+
+The batched full build printed `build/boktai3.gba: OK` before all three
+separate translation-unit commits. No sources changed after validation.
+
+## Call-argument safety correction
+
+Review found unsequenced assignment/read of `zero` in C6498, C5C2C and
+E2E7C. All same-call reads of that variable were replaced with literal `0`.
+Each call now assigns `zero` in one argument and never reads it in another;
+subsequent calls read the initialized local after completion of the first call.
+`sixty` is also assigned only once, with no same-call read. Ordinary pre-call
+initialization moved instructions in C6498, so the safe literal form is retained.
+
+Exact checks: `build/check-c6498-safe2.txt` (216 B),
+`check-c5c2c-safe1.txt` (276 B), `check-e2e7c-safe1.txt` (200 B).
+All three report MATCH. Read-only inspection of the other accepted call-site
+assignments found no further same-call assignment/read pattern.
+
+The corrective batch passed `build/full-safe-calls.txt` with
+`build/boktai3.gba: OK` before three per-function repair commits.

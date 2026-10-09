@@ -8,6 +8,10 @@ address,evidence
 08227F4C,Independent 12-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md
 08227F58,Independent 4-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md
 08229424,Independent 28-byte Thumb body after predecessor return; exact standalone check; notes/push20-root.md
+0822C110,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md
+0822C154,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md
+0822C180,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md
+0822C18C,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md
 0822FE18,Empty SDK function defined in src/lib/m4a.c; native full-ROM SHA-1 verified 2026-10-08; gbadisasm emits an incbin inside MidiKeyToFreq's span
 08230050,MPlayContinue loop over music players in src/lib/m4a.c; native full-ROM SHA-1 verified 2026-10-08; separate C entry within the preceding disassembly span
 0823025C,Existing SDK swi 0x2A stub in src/lib/m4a.c; native full-ROM SHA-1 verified 2026-10-08; separate C entry within the preceding disassembly span
