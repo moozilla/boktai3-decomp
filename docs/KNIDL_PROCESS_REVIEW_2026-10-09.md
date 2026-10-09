@@ -140,6 +140,13 @@ hypothesis. Reserve permutation for source-shape searches with a meaningful
 scoring gradient. Do not copy their historical pins or sanctioned exceptions:
 our current matching standards prohibit those tactics.
 
+They also found standalone and combined-TU matches could differ because of
+compiler pool-label state (lesson 4.79). Our one-function files work for
+thousands of matches, but a valuable stubborn residue may warrant a controlled
+compilation-context probe. This is a hypothesis to investigate, not evidence
+for merging all our files or changing function counts.
+[Compilation-context lesson](https://github.com/overjt/knidl/blob/628f4d461227d7a9e53b02e9eac8f63f4db5cf8b/docs/lessons-learned.md).
+
 ### 5. Validate recipes, rather than importing compiler folklore
 
 They initially assigned some game files to old_agbcc, then showed that
