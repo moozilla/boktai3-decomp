@@ -2,47 +2,136 @@
 """Decompilation progress: functions/bytes in src/*.c vs all code.
 
   progress.py            human-readable summary
-  progress.py --json F   objdiff-style report (schema-ish v2) for decomp.dev
+  progress.py --json F   objdiff v2 report for decomp.dev
   progress.py --markdown F   PROGRESS.md tracker (per-region bars)
 """
+import argparse
+import csv
 import json
+from pathlib import Path
 import re
-import sys
 
 from romlib import ROOT
 from split import c_functions
-import glob
-import os
+
+CODE_END = 0x0824DAFA
+INVENTORY = Path(ROOT) / "symbols/progress_functions.csv"
+EXTRA_BOUNDARIES = Path(ROOT) / "symbols/progress_extra_functions.csv"
+
+
+def assembly_addresses(path):
+    """Read only function-start addresses, never instructions or ROM bytes."""
+    code = Path(path).read_text()
+    return [int(a, 16) for a in re.findall(
+        r"^\t(?:thumb|arm|non_word_aligned_thumb)_func_start \S+\n\w+: @ 0x([0-9A-F]{8})",
+        code, re.M)]
+
+
+def write_inventory(path, addresses):
+    validate_addresses(addresses)
+    with Path(path).open("w", newline="") as f:
+        writer = csv.writer(f, lineterminator="\n")
+        writer.writerow(["address"])
+        writer.writerows([f"{a:08X}"] for a in addresses)
+
+
+def inventory_addresses(assembly, extras=EXTRA_BOUNDARIES):
+    # A few SDK functions have verified C definitions but gbadisasm leaves
+    # their bytes inside the preceding function's span. Keep these reviewed
+    # exceptions explicit rather than accepting arbitrary source definitions.
+    with Path(extras).open(newline="") as f:
+        extra = [int(row["address"], 16) for row in csv.DictReader(f)]
+    if extra:
+        validate_addresses(extra)
+    return sorted(set(assembly_addresses(assembly)) | set(extra))
+
+
+def validate_addresses(addresses):
+    if not addresses or addresses != sorted(set(addresses)):
+        raise ValueError("function addresses must be nonempty, unique and sorted")
+    if addresses[0] < 0x08000000 or addresses[-1] >= CODE_END:
+        raise ValueError("function addresses outside code range")
+    if any(a & 1 for a in addresses):
+        raise ValueError("function addresses must be halfword aligned")
+
+
+def load_functions(inventory=INVENTORY, symbols=None):
+    with Path(inventory).open(newline="") as f:
+        addresses = [int(row["address"], 16) for row in csv.DictReader(f)]
+    validate_addresses(addresses)
+    symbols = symbols or Path(ROOT) / "symbols/functions.csv"
+    with Path(symbols).open(newline="") as f:
+        names = {int(row["addr"], 16): row["name"] for row in csv.DictReader(f)}
+    funcs = [(names.get(a, f"sub_{a:08X}"), a) for a in addresses]
+    if len({n for n, _ in funcs}) != len(funcs):
+        raise ValueError("duplicate function names in symbol map")
+    sizes = {n: b - a for (n, a), b in zip(funcs, addresses[1:] + [CODE_END])}
+    return funcs, sizes
+
+
+def collect_done(funcs, source_root):
+    # Resolve address aliases even if a named symbol is defined as sub_XXXXXXXX.
+    known = {n: n for n, _ in funcs}
+    known.update({f"sub_{a:08X}": n for n, a in funcs})
+    done = set()
+    for p in sorted(Path(source_root).rglob("*.c")):
+        for n in c_functions(p, with_asm=False):
+            if n not in known:
+                raise ValueError(f"{p}: {n} has no progress boundary; refresh inventory")
+            done.add(known[n])
+    return done
+
+
+def measures(total_b, done_b, count, done_count):
+    return {
+        "fuzzy_match_percent": 100 * done_b / total_b,
+        "total_code": str(total_b), "matched_code": str(done_b),
+        "matched_code_percent": 100 * done_b / total_b,
+        "total_functions": count, "matched_functions": done_count,
+        "total_units": count, "complete_units": done_count,
+        "matched_functions_percent": 100 * done_count / count,
+        "complete_code": str(done_b), "complete_code_percent": 100 * done_b / total_b,
+    }
+
+
+def make_report(funcs, sizes, done):
+    units = []
+    for n, a in funcs:
+        matched = n in done
+        units.append({"name": f"functions/{a:08X}",
+                      "measures": measures(sizes[n], sizes[n] if matched else 0, 1, int(matched)),
+                      "functions": [{"name": n, "size": str(sizes[n]),
+                                     "fuzzy_match_percent": 100 if matched else 0,
+                                     "metadata": {"virtual_address": str(a)}}],
+                      "metadata": {"complete": matched}})
+    return {"version": 2, "measures": measures(sum(sizes.values()),
+            sum(sizes[n] for n in done), len(funcs), len(done)), "units": units}
 
 
 def main():
-    code = open(os.path.join(ROOT, "gen", "code_sym.s")).read()
-    funcs = [(n, int(a, 16)) for n, a in re.findall(r"^(\w+): @ 0x([0-9A-F]{8})", code, re.M)]
-    funcs.sort(key=lambda x: x[1])
-    code_end = 0x0824DAFA
-    sizes = {}
-    for (n, a), nxt in zip(funcs, funcs[1:] + [(None, code_end)]):
-        sizes[n] = nxt[1] - a
-    done = set()
-    for p in glob.glob(os.path.join(ROOT, "src", "**", "*.c"), recursive=True):
-        done |= set(c_functions(p, with_asm=False))
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--json", metavar="FILE")
+    parser.add_argument("--markdown", metavar="FILE")
+    parser.add_argument("--inventory", type=Path, default=INVENTORY)
+    parser.add_argument("--refresh-inventory", metavar="ASSEMBLY", type=Path,
+                        help="locally export address-only metadata from gen/code_sym.s")
+    parser.add_argument("--check-inventory", metavar="ASSEMBLY", type=Path)
+    args = parser.parse_args()
+    if args.refresh_inventory:
+        write_inventory(args.inventory, inventory_addresses(args.refresh_inventory))
+    funcs, sizes = load_functions(args.inventory)
+    if args.check_inventory:
+        if [a for _, a in funcs] != inventory_addresses(args.check_inventory):
+            parser.error("progress inventory differs from generated function boundaries")
+    done = collect_done(funcs, Path(ROOT) / "src")
     total_b = sum(sizes.values())
-    done_b = sum(sizes.get(n, 0) for n in done)
+    done_b = sum(sizes[n] for n in done)
     print(f"functions: {len(done)}/{len(funcs)} ({100 * len(done) / len(funcs):.2f}%)")
     print(f"code bytes: {done_b}/{total_b} ({100 * done_b / total_b:.3f}%)")
-    if "--markdown" in sys.argv:
-        out = sys.argv[sys.argv.index("--markdown") + 1]
-        write_markdown(out, funcs, sizes, done, total_b, done_b)
-    if "--json" in sys.argv:
-        out = sys.argv[sys.argv.index("--json") + 1]
-        rep = {"measures": {
-            "total_code": str(total_b), "matched_code": str(done_b),
-            "matched_code_percent": 100 * done_b / total_b,
-            "total_functions": len(funcs), "matched_functions": len(done),
-            "matched_functions_percent": 100 * len(done) / len(funcs),
-            "complete_code": str(done_b), "complete_code_percent": 100 * done_b / total_b,
-        }, "units": []}
-        json.dump(rep, open(out, "w"), indent=1)
+    if args.markdown:
+        write_markdown(args.markdown, funcs, sizes, done, total_b, done_b)
+    if args.json:
+        Path(args.json).write_text(json.dumps(make_report(funcs, sizes, done), indent=2) + "\n")
 
 
 def bar(frac, width=30):
@@ -69,7 +158,7 @@ def write_markdown(out, funcs, sizes, done, total_b, done_b):
         if not fs:
             continue
         lines.append(f"| `{lo:08X}–{hi:08X}` | {len(fs)} | {nd} | {100 * db / max(tb, 1):.1f}% | `{bar(db / max(tb, 1), 20)}` |")
-    open(out, "w").write("\n".join(lines) + "\n")
+    Path(out).write_text("\n".join(lines) + "\n")
 
 
 if __name__ == "__main__":
