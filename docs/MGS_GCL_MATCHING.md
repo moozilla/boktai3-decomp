@@ -202,3 +202,174 @@ ROM build printed `build/boktai3.gba: OK`. The intro shift replay passed all
 16 screenshot comparisons with data moved by `0x10000`. These screenshots
 validate the existing scenario, not malformed scripts or all 722 callbacks.
 The parent orchestrator performs combined-batch saved-game validation.
+
+## Round 2: larger interpreter and message functions
+
+Round 2 starts from worker commit `8b00059` and retains the same independent
+B3 reconstruction policy. Additional comparison source inspected:
+[expr.c](https://github.com/FoxdieTeam/mgs_reversing/blob/f54dbb2a58adfc2755403296c9ebb653fbec277b/source/libgcl/expr.c),
+[variable.c](https://github.com/FoxdieTeam/mgs_reversing/blob/f54dbb2a58adfc2755403296c9ebb653fbec277b/source/libgcl/variable.c),
+and [message.c](https://github.com/FoxdieTeam/mgs_reversing/blob/f54dbb2a58adfc2755403296c9ebb653fbec277b/source/libgv/message.c).
+No source was copied from these files.
+
+| New B3 target | Bytes | Established behavior / comparison |
+|---|---:|---|
+| `0821AE04` | 204 | Script loader, corresponds structurally to `GCL_LoadScript` |
+| `0821B938` | 292 | Integer operator dispatcher, corresponds to MGS `calc` |
+| `082255BC` | 100 | Script message construction, corresponds to `MesgCmd` |
+| `0821A340` | 168 | Queue insertion and payload copying, related role to `GV_SendMessage` |
+| `0821A3E8` | 108 | Lookup of consecutive messages, related role to `GV_ReceiveMessage` |
+| `0821B34C` | 152 | Typed variable store, related role to `GCL_SetVar` |
+| `0821B3E4` | 148 | Descriptor decode and typed variable store |
+| `0821B4C8` | 120 | Store through previously decoded variable reference |
+| `0821B540` | 124 | Read through previously decoded variable reference |
+| `0821B5BC` | 128 | Copy current variable value to alternate memory base |
+| `0821B63C` | 116 | Read variable value from alternate memory base |
+
+These eleven functions add **1,660 byte-exact native bytes**. The correspondence
+names remain comparative descriptions; generated sub-address names are kept.
+The operator function starts within this worker's range but ends at `0821BA5C`;
+that following expression-executor function was not edited.
+
+### Operator encoding
+
+The matched `0821B938` operator dispatch has the following exact IDs:
+
+| IDs | Operation |
+|---|---|
+| 1 / 2 / 3 | Negate RHS / logical NOT RHS / bitwise complement RHS |
+| 4 / 5 / 6 | Add / subtract / multiply |
+| 7 / 8 | BIOS `Div` / BIOS `Mod` |
+| 9 / 10 | Left shift / **logical** right shift |
+| 11 / 12 | Equal / not equal |
+| 13 / 14 / 15 / 16 | Signed less / less-or-equal / greater / greater-or-equal |
+| 17 / 18 / 19 | Bitwise OR / AND / XOR |
+| 20 / 21 | Logical OR / AND |
+| 23 | Return RHS |
+| Other, including 0 and 22 | Return zero |
+
+MGS `calc` has no shift cases; its equality-through-logical-AND IDs are two
+lower, and its assignment ID 20 is handled by `GCL_Expr`, not `calc`. B3 ID 23
+returning RHS does not by itself prove assignment semantics. B3 uses BIOS
+Div/Mod instead of MGS's native C division/remainder. No division-by-zero or
+out-of-range shift behavior was newly exercised. Returning directly from cases
+was required for matching; an equivalent shared result variable emitted
+operand mutations in different registers.
+
+### Script loader layout
+
+`0821AE04` reads a little-endian initial word into `0200060C`, calls the
+already matched `Script_ReadProcTable` on input plus four, and installs the
+table and count at `02000438` / offset 4. The table reader counts native words
+until **-1**, returns one word beyond the sentinel, and does not byte-swap
+entries. This differs from MGS's proc table, which terminates on a zero word
+and rewrites two big-endian 16-bit fields in each record.
+
+At the returned base B, B3 stores B at `02000448`, and resolves little-endian
+relative offsets from B+4/B+8/B+12 into three further pointers. It advances by
+the little-endian word at B, stores that address plus four as the script body,
+and stores that address plus its own little-endian word plus eight as another
+pointer at context offset 12. Names for these extra sections are not established.
+No font setup call exists in this routine, unlike MGS `GCL_LoadScript`.
+The routine returns zero and has no file-size/bounds argument.
+
+### Message construction and queue layout
+
+`082255BC` consumes a script value truncated to 16 bits as a message ID, then
+collects further values truncated to 16 bits into a sixteen-element stack
+array. The loop counter wraps at sixteen bits; the final stored count is eight
+bits at message offset 3. The record contains ID at offset 0, an untouched byte
+at offset 2, the count byte at offset 3, and a pointer at offset 4. The ID update
+preserves the word's upper half; count update preserves the low 24 bits.
+The C representation uses bitfields to reproduce those writes, without claiming
+original type recovery. There is no sixteen-item bounds check in this routine.
+It posts through `0821A340` and returns zero regardless of the posting result.
+MGS `MesgCmd` similarly collects shorts but propagates a send failure as -1;
+its `GV_MSG` embeds its payload, whereas B3's record points to payload storage.
+
+The byte-exact `0821A340` establishes a 392-byte buffer stride and a payload
+start at offset 264. The independent C layout represents this as two 32-bit
+counters, thirty-two eight-byte message slots, and sixty-four 16-bit payload
+slots; nominal original array capacities/types are not separately recovered. The selected buffer is the pointer returned by `0821A2DC`
+plus `03001680` times 392. Insertion defaults to the end; scanning updates the
+insertion point to one slot past each matching ID, so the new record follows
+the last matching ID. Later entries shift one slot, preserving both words.
+The new record clears byte 2, copies ID/count, points into the buffer's payload
+area at the used counter, increases that counter, and copies count shorts.
+It does not check either array capacity locally. The matched layout and code
+alone do not establish that capacity is exceeded in real execution.
+
+MGS `GV_SendMessage` also groups matching addresses, but checks `MAX_MESSAGES`
+and copies its embedded fixed-size record instead of appending a separate
+payload pool. B3's exact return/capacity/storage behavior must be retained in
+future restructuring; this is not a drop-in library replacement.
+
+`0821A3E8` selects the opposite buffer, at base plus `(1 - 03001680)`
+times 392. It locates the first matching u16 ID, stores that record pointer
+through the supplied output pointer, and returns the number of consecutive
+matching records. Missing ID returns zero without writing the output pointer.
+After finding the first matching record, it uses the previous count for an
+initial bound test, then reloads the buffer count once before scanning the rest
+of the group. This reload and the initial test are byte-exact matching details;
+an equivalent single inner while loop removes the reload and does not match.
+The reviewed MGS receiver checks `GV_PauseLevel` and returns a stored group
+length; this B3 function has no pause guard and calculates the group size.
+
+### Variable stores and alternate bases
+
+`0821B34C` handles descriptor types 9 (native 32-bit store, stride 4), 8
+(three little-endian byte stores at offsets 0/1/2, stride 4), 1/6 (16-bit store,
+stride 2), 2/3 (byte store), and 4 (bit set/clear). For type 4, descriptor bits
+16–19 are added to the supplied index, the byte uses arithmetic index >> 3,
+and the mask uses index & 7. Zero clears the bit; nonzero sets it. Other types
+leave memory unchanged. Type 8's three-byte store is a concrete finding,
+not a claim that all uses represent a 24-bit integer. The load counterpart
+remains unmatched and its intended width is not inferred from this writer.
+
+`0821B3E4` uses the same big-endian descriptor and dynamic RAM bases as the
+round-1 read decoder, then passes the second auxiliary operand as the write
+index and its caller's value into `0821B34C`. `0821B4C8` / `0821B540` take a
+previously decoded eight-byte reference, add its u16 field at offset 6 to the
+caller's index for family 20, and dispatch to typed store/load respectively.
+The reference's field at offset 4 is unused by these wrappers.
+
+`0821B5BC` parses a reference, reads its current value, and writes that value
+through a different base: descriptor selector 8 chooses the pointer at
+`0200070C`; other selectors choose `02000704`. `0821B63C` reads from those same
+alternate bases. Both use the descriptor's low 16-bit byte offset and family-20
+u16 index field. These relationships establish two groups of base pointers,
+not the semantic names or lifetime of the associated storage. No direct
+counterpart to these alternate-base operations was identified in the reviewed
+MGS variable code. MGS's reviewed type cases and fixed buffers do not justify
+importing them into B3.
+
+### Retained trap candidate and negative results
+
+The hash/table `trap` candidate at `08225624` remains **unmatched**. Assembly
+inspection and untracked C establish a 44-byte stack record and these local
+operations: consume two u16 values; optional `m` value or default `0DD2`;
+optional `t` with zero default; remap `?` in two fields to `14C9`, and `*` in
+the `m` field to `1516`; collect up to four u16 values for each of `w` and `s`;
+`b` sets flag `0x10` and stores a value; `e` decodes a block value; otherwise `p`
+sets flag `0x20` and stores a value. It resolves the first consumed u16 through
+`0821E104`, supplying a pointer to record offset `0x0E`; non-null resolution is
+passed with the original command pointer to `0821E190` and returns 0, otherwise
+it returns -1. The meaning of the numeric remaps, record fields, arrays, and
+resolved pointer is **not** established. No candidate semantic names were
+installed. MGS's `TrapCmd` is only a comparison lead; no behavior equivalence
+or transferred field naming is claimed.
+
+Matching the trap's pointer-based zeroing loops keeps a pointer in an extra
+high register; integer countdown alternatives instead add counter instructions.
+The typed load helper `0821B20C` also remains unmatched: struct-array accesses
+fix address-add operand order, while boolean normalization still changes index
+register lifetime. These failures are not evidence of a different compiler.
+
+Round-2 bounded trap permuting improved the score from 1,840 to 1,110 in
+60 seconds with two workers; no zero-score candidate was found. The improved
+source remains untracked under `wip/`, alongside the independent base. This
+is a retained candidate, not a byte-exact match or evidence for a new compiler.
+
+All eleven round-2 additions passed per-function checks, and the complete
+worker ROM printed `build/boktai3.gba: OK` before separate per-TU commits.
+The parent orchestrator handles the combined 35 screenshot comparisons.
