@@ -11,6 +11,9 @@ committed, and neither is anything generated from it (`build/`, `extracted/`).
   to force a match. `INCLUDE_ASM` is the placeholder for unfinished functions.
 * One translation unit per change/PR. A unit is a `src/*.c` file covering a
   **contiguous** run of functions in ROM order.
+  The user-authorized orchestration exception is a reviewed batch integration
+  PR: preserve separate per-function commits, validate the combined ROM and
+  shift test, then merge once into `main` (see `AGENTS.md`).
 * Don't edit generated files (`build/asm/*`). Names go in
   `symbols/functions.csv` / `symbols/data.csv`; pointer facts go in
   `symbols/pointers.txt` / `symbols/nonpointer_*.txt`.

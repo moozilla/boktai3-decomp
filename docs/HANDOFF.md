@@ -1,6 +1,7 @@
 # Handoff: state of the project and how to continue
 
-Last updated at the end of session 3 (2026-10-09). This file is the single
+Last updated after local Codex setup and model pilot (2026-10-08 Pacific /
+2026-10-09 UTC). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -8,11 +9,11 @@ another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
 | | |
 |---|---|
-| Matched C | **4,145 / 11,025 functions (37.6%)**, ~9.1% of code bytes (`PROGRESS.md`) |
+| Matched C | **4,151 / 11,028 functions (37.64%)**, 220,984 / 2,415,354 code bytes (9.149%; `PROGRESS.md`) |
 | Build | `make` / `python3 tools/build.py` rebuilds the ROM **bit-identical** (SHA-1 `2651c5e6875ac60abff734510d152166d211c87c`) |
 | Shiftable | all data relocatable; `make shifttest` (3 scenarios, 35 screenshots) passes |
 | Code layout | `src/fn/sub_XXXXXXXX.c`, one function per file; `src/lib/m4a.c` (MP2K sound, 57/58) |
-| Names | still mostly `sub_XXXXXXXX`; naming/context pass not started |
+| Names | still mostly `sub_XXXXXXXX`; first evidence-based pause-menu leads in `docs/MENU_CONTEXT.md` |
 
 Why bytes trail functions: workers go easiest-first. ~7,000 functions remain;
 most small ones (<=40 insns) are done in most ranges, so the frontier is the
@@ -24,18 +25,49 @@ matches. Session 2 added `check.py`, `clones.py`, `permute.py`, found 3,096
 hidden functions (data-table seeds), and solved three "impossible" codegen
 patterns. Session 3 ran 5-6 Sonnet workers overnight (~1,950 matches).
 
+The local session built and verified the native macOS toolchain, added ROM-free
+progress Actions and registered [decomp.dev](https://decomp.dev/moozilla/boktai3-decomp).
+The reporting denominator now includes three already-matched SDK boundaries
+that the old numerator counted but the old denominator omitted (11,028 report
+functions versus 11,025 generated disassembly starts). This is an accounting
+correction, not three new matches.
+
+An isolated six-target pilot produced six new matches: Sol 5/6, Astra 6/6,
+Luna 4/6 after an explicit continuation. See `docs/MODEL_BENCHMARK.md` for
+attempts, elapsed times and limitations. Use Sol as the initial default matcher;
+escalate hard cases to Astra and give Luna bounded tasks with explicit retry
+rules. No per-model plan-usage/cost measurement was available. This runtime
+allows three simultaneous workers alongside the orchestrator. Workers retain
+per-function commits; the orchestrator validates and merges batches into main.
+Progress Actions run only for main pushes or manual dispatch.
+
+The deeper task connects emulator coverage to function boundaries:
+`tools/function_context.py`, `docs/RUNTIME_CONTEXT.md`, and `docs/MENU_CONTEXT.md`.
+Screenshot review corrected a one-tab offset in the menu replay's labels and
+separated transition marks from stable screens. Inputs and all 12 screenshots
+remain unchanged. Config/sleep/save confirmation handlers are promising naming
+leads; an A-button replay is the next evidence step before adopting the names.
+
 ## 2. Setting up (new machine/session)
 
-The ROM is never in git. Upload it, then:
+The ROM is never in git. On the current Mac, it is already at `baserom.gba`,
+extracted from the user's Downloads ZIP and SHA-1 verified. `build/venv`,
+`build/tools`, `gen/`, and a verified baseline `build/boktai3.elf` are ready.
+Activate `source build/venv/bin/activate` before using Python tools. Homebrew
+provides `arm-none-eabi-binutils` and mGBA; `make setup` builds the pinned
+compiler, disassembler, assembler, permuter and harness. See README for macOS
+installation instructions. Full `make` and all 35 shift-test screenshots passed
+after the six pilot matches were integrated.
+
+On a fresh Linux machine, supply the ROM, then:
 
 ```
 ln -s /path/to/rom.gba baserom.gba        # SHA-1 above (Japanese, U33J)
 apt install build-essential cmake binutils-arm-none-eabi libmgba-dev python3-numpy python3-pil
-pip install capstone pycparser toml        # pycparser/toml only for the permuter
-make setup      # gbadisasm (patched), agbcc, armips, emulator harness
+pip install -r requirements.txt
+make setup      # gbadisasm (patched), agbcc, armips, permuter, emulator harness
 make disasm     # ~15-20 min: gen/code.s -> gen/code_sym.s + gen/data.s (11,025 functions)
 make            # must print build/boktai3.gba: OK
-git clone https://github.com/simonlindholm/decomp-permuter ../decomp-permuter   # optional
 ```
 
 `gen/` and `build/` are generated, gitignored, never committed (ROM-derived).
@@ -78,7 +110,7 @@ Rules that matter (all in `docs/WORKER.md`, which also has ~40 agbcc tricks):
 
 ## 5. Running parallel workers (what worked)
 
-* `tools/worktree.sh NAME` -> `../wt/NAME` on branch `work/NAME`, sharing gen/,
+* `tools/worktree.sh NAME` -> `../wt/NAME` on branch `codex/NAME`, sharing gen/,
   the ROM and tools by symlink. Existing worktrees: `../wt/s0`..`s5`, `bk`, `disc`.
 * Ranges used in session 3 (each has ~1,000+ functions left):
   s0 `08000000-080492B0`, s1 `080492B0-0810ECEC`, s2 `0810ECEC-08182F24`,
