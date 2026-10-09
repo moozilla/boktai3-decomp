@@ -48,12 +48,14 @@ Nonmatching C and check/permuter outputs remain ignored in local checkouts:
 `../wt/push20-integrate/wip/`, `../wt/push20-high-last/wip/`,
 `../wt/push20-high/wip/`, `../wt/push20-mid/wip/`, `../wt/push20-low/wip/`,
 `../wt/push20-astra-motion/wip/`, and this checkout's `wip/`.
-They survive a new local session while those directories exist, but **a fresh
-GitHub clone cannot recover them**. Committed inventory paths and hashes are
-metadata, not a backup of candidate source. Do not delete/archive these WIP
-trees before deciding whether to preserve candidates elsewhere. A source-only
-local backup is in this checkout's ignored
-`build/existing-draft-sources_2026-10-09.tar.gz`; it is also absent from GitHub.
+The user subsequently authorized source retention on a separate branch.
+[**codex/wip-drafts-2026-10-09**](https://github.com/moozilla/boktai3-decomp/tree/codex/wip-drafts-2026-10-09/drafts)
+now preserves 519 candidate C files, including alternates and already-matched
+drafts. `drafts/targets.csv` maps all 65 unresolved selected candidates to
+preserved files; `drafts/manifest.csv` records every source hash. A fresh clone
+can recover them by fetching that branch. The original local WIP and a
+source-only archive under `build/existing-draft-sources_2026-10-09.tar.gz`
+are also retained. No ROM, assembly, dumps or binary build outputs were pushed.
 
 The best large near-match is 08160EA4: 1,060 emitted bytes, four differing
 instruction locations. FDB4 has a 300-byte body, not its 788-byte span; its
@@ -61,13 +63,19 @@ instruction locations. FDB4 has a 300-byte body, not its 788-byte span; its
 source hashes are listed in the inventory. 08235000 is now exact, so the older
 handoff's claim that it remains blocked is superseded.
 
-Partial candidate tracking is proposed, not implemented. Current rules forbid
-committing nonmatching C. A user-authorized exception could allow a separate
-candidate directory excluded from the production build, with compiler/flags,
-diff evidence, safety issues and next hypothesis. It must receive zero exact
+The current policy prohibits nonmatching C on `main` while allowing dedicated
+WIP branches outside production `src/`. Candidate source retention is now
+implemented by the branch above. Fuzzy/partial progress reporting remains
+unimplemented pending further research; preserved source receives zero exact
 progress credit. Family/library reuse should be prioritized over repeated
 isolated register-allocation retries; one-function commits are bookkeeping,
 not a requirement to solve functions independently.
+
+The [KNIDL process review](KNIDL_PROCESS_REVIEW_2026-10-09.md) compares its
+multiweek module/family campaigns with our recent run. The recommended next
+tranche uses seeded cohorts, compiler diagnostics and durable WIP checkpoints;
+it is a proposal, not an active matching assignment. No partial-credit metric
+or compiler recipe change was implemented by the review.
 
 Historical run details follow; their meter limits and counts describe earlier
 stages rather than the current state.
