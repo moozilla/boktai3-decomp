@@ -13,3 +13,9 @@ Before committing, a complete build must print `build/boktai3.gba: OK`.
 Never commit the ROM, generated assembly, emulator dumps or nonmatching C.
 Function and subsystem names require evidence; a coverage tag means observed
 execution in a segment, not proof of exclusive ownership or a semantic name.
+
+The user prefers batched integration: workers commit each match separately, and
+the orchestrator reviews and validates their combined work before merging a
+batch into `main`. Such integration PRs may contain multiple translation units;
+individual matching commits should still contain only one. Progress Actions run
+only on pushes to `main` (or explicit manual dispatch), never per worker commit.
