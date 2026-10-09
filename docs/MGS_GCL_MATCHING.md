@@ -813,3 +813,176 @@ volatile side effect was introduced to force the commutative instruction.
 Round 5 validation: the unchanged matching sources completed a full build with
 `build/boktai3.gba: OK` before the documentation commit. No new screenshots,
 shared-gen regeneration, push, PR or nonmatching tracked C were produced.
+
+
+## Round 6: adjacent expression, trap and resource relationships
+
+The reserved extension targets were `0821BA5C`, `0821E040`, `0821E190`,
+`0821E3C0`, `0821E52C`, `0821E5C4`, `0821E860`, `0821E8C8`,
+`0821F15C`, and `082210B8`. Inventory excluded functions already in C in
+both this checkout and the current main checkout. The parent confirmed these
+ten addresses were excluded from the other worker's ownership. Original
+round-5 input, timer and trap-command misses were not revisited.
+
+All source was independently reconstructed from B3 instructions. The pinned
+reconstructed MGS source supplies comparative evidence only; no external C
+was copied or adapted, and no new semantic symbol names were installed.
+
+### Verified byte-exact functions
+
+| B3 address | Native bytes | Observed role |
+| --- | ---: | --- |
+| `0821BA5C` | 160 | Expression stack evaluation |
+| `0821E040` | 144 | Pack fourteen trap callback arguments |
+| `0821E190` | 360 | Insert a trap record and its associated top pointer |
+| `0821E3C0` | 276 | Export rectangle limits and centers through nine references |
+| `0821E52C` | 104 | Test horizontal rectangle membership |
+| `0821E860` | 104 | Export three decoded vector components |
+| `082210B8` | 88 | Initialize the random-value table and two cursors |
+
+The total is **7 new matches / 1,236 native bytes**.
+
+### Expression correspondence and encoding differences
+
+The control flow and two-word value/reference slots of B3 `0821BA5C` strongly
+correspond to [MGS GCL_Expr in libgcl/expr.c](https://github.com/FoxdieTeam/mgs_reversing/blob/f54dbb2a58adfc2755403296c9ebb653fbec277b/source/libgcl/expr.c).
+Both save each operand's bytecode pointer, reduce two slots on binary
+operations, retain the assigned right-hand value, and clear the reference
+after a nonassignment operation. This supports the evaluator role; it does
+not establish identical grammar or whole-engine ancestry.
+
+B3 uses one-byte operators selected by `(byte & 0xE0) == 0xA0`, with the
+operation in the low five bits. Operation zero terminates, and `0x16` assigns.
+MGS uses a `GCL_OP` marker followed by a separate operation byte, with
+`OP_SET` equal to 20. B3 advances one byte after an operator; MGS advances
+two. B3's stack frame is 72 bytes: eight native eight-byte value/reference
+slots and two four-byte decoder outputs. MGS locates its stack in scratchpad
+RAM. Neither observed path checks expression-stack height. Malformed scripts
+can therefore exceed the B3 local storage; no invented guard was added.
+
+A B3 assignment whose saved reference has high nibble `0x90` writes a
+procedure argument through `0821A91C`, indexed by its low nibble. Other
+references use `0821B3E4`. Decoder type `0x80` additionally executes a block
+through `0821AF2C` and takes the shared return word at VM offset four. These
+branches are absent from the compared MGS expression loop. Internal slots
+are native 32-bit memory words; bytecode decoding remains delegated to the
+already documented B3 decoder, so native slot widths do not imply little-endian
+bytecode operands.
+
+The matching C uses integer address arithmetic for the initial cursor below
+the array and each eight-byte movement. The stored cursor representation is
+not dereferenced until a valid slot is reached. All slot offsets are computed
+as integers, avoiding undefined C pointer arithmetic before the first
+array element. The block result uses `gUnk_02000610[1]`, preserving the
+verified VM base plus four rather than inventing a separate global literal.
+Initial integer-cursor and pointer-cursor drafts changed register copies;
+separating reference byte, category and saved slot after masking matched the
+assignment path without extra reads or side effects.
+
+### Trap callbacks, insertion and rectangle evidence
+
+`0821E040` constructs fourteen native 32-bit arguments in this order:
+trigger ID, trap field at offset eight, event value, three signed position
+halfwords, four unsigned halfwords at trap offset `0x10`, and four unsigned
+halfwords at `0x18`. The event and IDs are truncated to unsigned 16 bits;
+position values are sign extended. Its eight-byte argument header has a
+16-bit count field and a value-array pointer; the upper 16 bits of the count word are
+preserved by the generated field update. Flag `0x20` selects `08224F20`;
+otherwise it calls `08224F08`. Those existing wrappers route to procedure
+execution `0821AD08` and block execution `0821AFB4`, respectively.
+A combined packet struct allowed a halfword store and different saved
+registers; separate local value and header declarations matched the original
+word-field update and register allocation.
+
+`0821E190` maintains a maximum of 64 records: it returns when the current
+unsigned halfword count exceeds 63. Each record is 44 bytes, beginning at
+context offset `0x224`; 64 associated top pointers begin at `0xD24`. A
+32-bit serial counter at `03005300` is repaired from zero to one, written
+into the incoming record, and postincremented. Searching backward by the
+record's unsigned ID at offset eight selects insertion immediately after
+the last matching ID; otherwise the record appends. It shifts both record
+and pointer arrays backward before inserting and increments the count.
+The serial wraps naturally as a native unsigned word, with a later insertion
+repairing zero. A do-loop draft emitted 336 bytes and missed the peeled
+comparison; a while loop plus ID-first equality reproduced all 360 bytes.
+The correspondence with MGS trap registration is a subsystem relationship,
+not evidence that MGS's HZD_BND layout or flag names apply to this record.
+
+Existing `0821E104` searches the context's offset-`0x0C` table. Its header
+contains a byte count and three padding bytes; each 12-byte record consists
+of four signed horizontal halfwords, two unsigned vertical bytes, and a
+16-bit ID. It returns the first matching record and counts all matching IDs.
+`0821E52C` then scans that many consecutive records, using lower-inclusive,
+upper-exclusive tests on position components zero and two. It ignores the
+vertical limits. Thus this caller assumes matching IDs are contiguous; the
+search helper alone does not prove that property. Reversing the for-loop
+update order to pointer increment before the 16-bit loop counter matched
+its original 104 bytes.
+
+`0821E3C0` requires a nonnull script operand cursor, decodes the ID, and
+returns -1 if no rectangle exists. It decodes nine references and stores:
+first horizontal limit, first vertical byte shifted left four, second
+horizontal limit, corresponding upper limits in the same order, and three
+centers. Horizontal centers average signed 16-bit limits with division
+truncated toward zero. The vertical center averages the unsigned bytes
+then shifts left four. Small independently written inline half/half-and-shift
+helpers preserved the original distinct result registers; a shared local
+conditional average left three instructions mismatched.
+
+`0821E860` decodes two script values and calls `0821E7EC` with a four-halfword
+local vector. Failure returns -1; success decodes three variable references
+and writes the first three signed vector halfwords, returning zero. Keeping
+a saved vector base for the last two outputs matched the original 104 bytes.
+The previously matched helper chain `E7EC -> E748/E76C/E780` supplies its
+table-entry and vector relationship; no stronger map/actor name is inferred.
+
+### Random-state initializer and unresolved resource helpers
+
+`082210B8` initializes 1,024 signed halfwords at `0203B400`. Each element
+uses two calls to existing `08219C00`: a returned 15-bit value shifted right
+by a second returned value masked with three. Two final calls masked with
+1023 initialize cursors `03005308` and `03005304`. This is 2,050 generator
+calls. Existing `08219C00` advances `03005278` as unsigned
+`state * 0x5D588B65 + 1` and returns `state & 0x7FFF`. Consequently the
+round-4 initializer's 123456 write to that state is now evidence for a PRNG
+seed, replacing the earlier deliberately inconclusive interpretation. This
+does not identify encryption or an external historical RNG implementation.
+A 60-second search found an ordinary do scope around the element store;
+its source diff changes no reads, calls, pointer lifetime or computation.
+The distilled scope independently checked exact before promotion.
+
+`0821E5C4` initializes a 12-byte state from the context's offset-`0x10` table:
+unsigned halfword table count, four-byte entries containing a byte count and
+a halfword offset, and eight-byte selected elements. Invalid entry index or
+zero element count returns zero. An oversized element index is clamped to
+zero. State bytes zero/one/two receive index, argument and element with
+byte truncation; byte three is cleared. The entry pointer goes at four, and
+`table + entry.offset + stored_element * 8` at eight. Independent typed and
+byte-pointer drafts emitted 80 bytes against the original 84, missing a
+saved entry copy. A bounded permuter attempt failed with its AST assertion
+`nodes should only appear once in AST`, saving no candidate.
+
+`0821E8C8` tests absolute signed-horizontal differences between position
+components zero/two and the first two signed halfwords of state data. Each
+absolute difference is compared unsigned against its supplied limit; either
+strictly greater returns one, otherwise zero. Original instructions preserve
+unused upper bits in two registers before sign-extending the low halfwords.
+Independent signed and unsigned 16-bit bitfield drafts read only assigned
+fields, but optimized one field into a direct load and emitted 72 bytes
+against the original 88. No uninitialized full-word read or fake volatile
+operation was introduced to recreate unused upper bits.
+
+`0821F15C` fetches resource key `0xF63B` for a decoded unsigned halfword
+argument through `0821A520`, stores the result at context offset `0x14`,
+and returns zero. A native pointer/word draft differs by an extra original
+result move; an ordinary do scope did not resolve it. A bounded 60-second
+search produced byte-exact candidates by duplicating the same store and
+return under `if (resource)` and its else branch. This condition is initialized
+and the branches are behaviorally equal, unlike the rejected round-5
+candidates, but the artificial duplicated control flow is not promoted.
+A compact source representation remains WIP. Resource key spelling and
+higher-level ownership remain unresolved.
+
+Round 6 validation: all seven new translation units completed a full native
+build with `build/boktai3.gba: OK` before one-TU commits. No worker screenshots,
+shared-gen regeneration, push, PR or nonmatching tracked C were produced.
