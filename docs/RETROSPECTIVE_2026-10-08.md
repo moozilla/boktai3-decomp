@@ -302,3 +302,19 @@ ROM builds print `build/boktai3.gba: OK`; all 35 shifted-data screenshots pass
 combined integration. The 65 unresolved candidates remain local and ignored.
 A source-only local archive preserves 519 candidate files, including duplicate
 and already-matched drafts; it is not available in a GitHub clone.
+
+
+## Subsequent decision: WIP branches are the retention mechanism
+
+The user resolved the draft-retention question: prohibit nonmatching C on
+main, allow dedicated WIP branches. The pushed `codex/wip-drafts-2026-10-09`
+branch preserves the retained sources and a selected-target mapping. Earlier
+statements that a fresh GitHub clone cannot recover candidate source describe
+the pre-preservation state; logs and binary scratch remain local.
+
+The [KNIDL review](KNIDL_PROCESS_REVIEW_2026-10-09.md) reinforces the diagnosis:
+family/module execution with seeded dependencies matters more than abolishing
+the per-function exact checker. Compiler diagnostics and a return to plain
+source are promising alternatives to blind allocation retries. Its successful
+multiweek campaigns do not establish token efficiency or justify weakening
+our matching rules. Fuzzy/partial progress remains a separate research topic.
