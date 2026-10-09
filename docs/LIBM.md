@@ -83,3 +83,19 @@ and linked comparisons in `build/check/`. The final full ROM and combined
 shift-test logs are recorded with the integration batch. All generated or
 ROM-derived artifacts stay untracked. The mathematical matches do not by
 themselves explain where gameplay uses these operations.
+
+## Adjacent libc memory primitives
+
+`0824DA48` is a 96-byte `memcpy`; `0824DAA8` is an 84-byte emitted `memset`
+(the native-code progress boundary counts 82 bytes before terminal alignment).
+Both match pinned pret/agbcc `libc/string` sources at commit
+`da598c1d918402c42c0c0d7128ba14567f3175e9` using `old_agbcc -O2 -fno-builtin`.
+Their Cygnus Solutions notices are preserved; they are separate from Sun fdlibm.
+This software was developed at Cygnus Solutions.
+
+Replacing the final function exposed duplicate terminal padding in the splitter:
+the compiler already emits the two alignment bytes at `0824DAFA`, so retaining
+the same final ROM `.incbin` shifted all data by two bytes. `c_replacement_end`
+now consumes only that exact terminal alignment blob, retaining other trailing
+data. Regression coverage checks both accepted padding and retained data. The
+complete build again matches the original ROM SHA-1.
