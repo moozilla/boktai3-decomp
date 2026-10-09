@@ -1,7 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after the four-batch matching follow-up and closeout (2026-10-08 Pacific /
-2026-10-09 UTC). This file is the single
+Last updated after the bounded existing-draft rescue (2026-10-09 UTC). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -15,40 +14,60 @@ published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
 | | |
 |---|---|
-| Matched C | **4,741 / 11,080 functions (42.79%)**, 319,366 / 2,415,354 code bytes (13.222%; `PROGRESS.md`) |
+| Matched C | **4,789 / 11,081 functions (43.22%)**, 323,090 / 2,415,354 code bytes (13.377%; `PROGRESS.md`) |
 | Build | `make` / `python3 tools/build.py` rebuilds the ROM **bit-identical** (SHA-1 `2651c5e6875ac60abff734510d152166d211c87c`) |
 | Shiftable | all data relocatable; `make shifttest` (3 scenarios, 35 screenshots) passes |
 | Code layout | `src/fn/sub_XXXXXXXX.c`, one function per file; `src/lib/m4a.c` (MP2K sound, 57/58) |
 | Names | still mostly `sub_XXXXXXXX`; first evidence-based pause-menu leads in `docs/MENU_CONTEXT.md` |
 
-The latest source integration is `8c2c818` (PR #12). The subsequent matching
-follow-up added **116 functions / 22,708 progress bytes** from `5ff44e3`, across
-PRs #9–#12. Every accepted source is integrated; there is no pending matching
-batch. The final original-ROM build printed `build/boktai3.gba: OK`, all 35
-shifted-data screenshots matched, and the main Progress Action succeeded.
-See [the matching report](PUSH20_2026-10-08.md) for individual batches.
+The existing-draft rescue adds **48 functions / 3,724 exact bytes** on top of
+`b8c688f` (documentation closeout after source integration `8c2c818`, PR #12).
+Cumulative matching follow-up from `5ff44e3`: **164 functions / 26,432 progress
+bytes**. The 20% code target remains unmet by **159,981 bytes**. The RTC boundary
+at 08248F0C adds one inventory function without adding C credit; its 308 bytes
+remain assembly after the newly matched 156-byte time-write entry.
 
-**Current limit: preserve at least 20% remaining plan usage.** This supersedes
-the historical 35%/40%/50% limits recorded below. The meter reached 20% and
-matching stopped; the 20% code target remains unmet, requiring **163,705 more
-matched bytes**. All workers have completed. The final Astra escalation stopped
-at its usage gate before any drafts, checks, builds or commits. The user then
-authorized documentation closeout and pushing, with no new agents. Do not
-restart matching without fresh allowance or an explicit change to the floor.
+**Current authorization: close existing drafts only, no new agents or work.**
+The user revised the floor to 15% remaining or one hour, whichever comes first;
+the bounded pass began at 07:02:40 UTC and has an 08:02:40 UTC deadline. The
+meter showed 19% remaining during integration. This supersedes the previous
+20% floor for this closeout only. Do not infer permission for a new matching
+tranche from this limited extension.
 
-Sol 6.1 at high reasoning was the follow-up workhorse; bounded Astra-low attempts
-were used only after Sol blockers. No per-model subscription-cost attribution
-is available for this follow-up. The retrospective documents the poor byte yield
-and why tiny repeated rounds should not be the next operating policy.
+The [draft inventory](DRAFT_INVENTORY_2026-10-09.md) covers 113 previously
+unmatched targets from 435 retained C files (many duplicates or already merged).
+48 are now exact; **65 remain nonmatching** after the bounded pass. All exact
+source is separately committed through `82d700d` in the reviewed combined
+integration; no unmatched draft is promoted. The complete original and restored
+ROM builds print `build/boktai3.gba: OK`; all 35 shifted-data screenshots and
+five focused boundary/compiler tests pass. Sol workers remain finished; the existing Astra-low worker was
+resumed for three capped tasks and produced no new match. No new agents were
+started. Source review rejected an invalid permuter candidate.
 
-Nonmatching drafts stay ignored in isolated local checkouts. The final Sol
-candidate is `../wt/push20-high-last/wip/large-last/sub_0811FDB4.c`: 300 emitted
-bytes with ordering/register differences after three drafts; the following
-488-byte raw tail is a separate body and must not be credited to it. Parent
-35000 and BD58 drafts remain under `../wt/push20-integrate/wip/batch4/`;
-both still differ. Earlier worker and Astra WIP remains preserved in the
-`push20-high`, `push20-mid`, `push20-low` and `push20-astra-motion` checkouts.
-These local drafts are evidence for future attempts, not accepted source.
+Nonmatching C and check/permuter outputs remain ignored in local checkouts:
+`../wt/push20-integrate/wip/`, `../wt/push20-high-last/wip/`,
+`../wt/push20-high/wip/`, `../wt/push20-mid/wip/`, `../wt/push20-low/wip/`,
+`../wt/push20-astra-motion/wip/`, and this checkout's `wip/`.
+They survive a new local session while those directories exist, but **a fresh
+GitHub clone cannot recover them**. Committed inventory paths and hashes are
+metadata, not a backup of candidate source. Do not delete/archive these WIP
+trees before deciding whether to preserve candidates elsewhere. A source-only
+local backup is in this checkout's ignored
+`build/existing-draft-sources_2026-10-09.tar.gz`; it is also absent from GitHub.
+
+The best large near-match is 08160EA4: 1,060 emitted bytes, four differing
+instruction locations. FDB4 has a 300-byte body, not its 788-byte span; its
+488-byte tail is a separate body. Other useful near-matches and their selected
+source hashes are listed in the inventory. 08235000 is now exact, so the older
+handoff's claim that it remains blocked is superseded.
+
+Partial candidate tracking is proposed, not implemented. Current rules forbid
+committing nonmatching C. A user-authorized exception could allow a separate
+candidate directory excluded from the production build, with compiler/flags,
+diff evidence, safety issues and next hypothesis. It must receive zero exact
+progress credit. Family/library reuse should be prioritized over repeated
+isolated register-allocation retries; one-function commits are bookkeeping,
+not a requirement to solve functions independently.
 
 Historical run details follow; their meter limits and counts describe earlier
 stages rather than the current state.
