@@ -1,4 +1,22 @@
 address,evidence
-0822FE18,"Empty SDK function defined in src/lib/m4a.c; native full-ROM SHA-1 verified 2026-10-08; gbadisasm emits an incbin inside MidiKeyToFreq's span"
-08230050,"MPlayContinue loop over music players in src/lib/m4a.c; native full-ROM SHA-1 verified 2026-10-08; separate C entry within the preceding disassembly span"
-0823025C,"Existing SDK swi 0x2A stub in src/lib/m4a.c; native full-ROM SHA-1 verified 2026-10-08; separate C entry within the preceding disassembly span"
+0822FE18,Empty SDK function defined in src/lib/m4a.c; native full-ROM SHA-1 verified 2026-10-08; gbadisasm emits an incbin inside MidiKeyToFreq's span
+08230050,MPlayContinue loop over music players in src/lib/m4a.c; native full-ROM SHA-1 verified 2026-10-08; separate C entry within the preceding disassembly span
+0823025C,Existing SDK swi 0x2A stub in src/lib/m4a.c; native full-ROM SHA-1 verified 2026-10-08; separate C entry within the preceding disassembly span
+08249F7C,__cmpdf2: separate function in exact linked libgcc_dp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
+0824A288,__make_dp: separate function in exact linked libgcc_dp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
+0824A2B0,__truncdfsf2: separate function in exact linked libgcc_dp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
+0824A5A4,__addsf3: separate function in exact linked libgcc_fp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
+0824A5D0,__subsf3: separate function in exact linked libgcc_fp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
+0824A604,__mulsf3: separate function in exact linked libgcc_fp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
+0824A768,__divsf3: separate function in exact linked libgcc_fp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
+0824A938,__cmpsf2: separate function in exact linked libgcc_fp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
+0824A960,__eqsf2: separate function in exact linked libgcc_fp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
+0824A9A8,__nesf2: separate function in exact linked libgcc_fp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
+0824A9F0,__gtsf2: separate function in exact linked libgcc_fp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
+0824AA38,__gesf2: separate function in exact linked libgcc_fp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
+0824AA80,__ltsf2: separate function in exact linked libgcc_fp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
+0824AAC8,__lesf2: separate function in exact linked libgcc_fp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
+0824AB10,__floatsisf: separate function in exact linked libgcc_fp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
+0824AB70,__fixsfsi: separate function in exact linked libgcc_fp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
+0824ABD8,__negsf2: separate function in exact linked libgcc_fp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
+0824AC14,__extendsfdf2: separate function in exact linked libgcc_fp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
