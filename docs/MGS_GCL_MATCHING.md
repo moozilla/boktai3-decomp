@@ -373,3 +373,141 @@ is a retained candidate, not a byte-exact match or evidence for a new compiler.
 All eleven round-2 additions passed per-function checks, and the complete
 worker ROM printed `build/boktai3.gba: OK` before separate per-TU commits.
 The parent orchestrator handles the combined 35 screenshot comparisons.
+
+## Round 3: engine initialization and lifecycle context
+
+This round starts at `ace10e4`. It extends B3-native lifecycle context around
+the verified script subsystem; no additional MGS ancestry or semantic names
+are inferred from adjacency or generic scheduler structures.
+
+| New byte-exact B3 target | Bytes | Static behavior |
+|---|---:|---|
+| `08225328` | 232 | Registry/commands/global initialization and callback registration |
+| `0821A054` | 108 | Traversal of fourteen masked callback lists |
+| `0821A218` | 108 | Conditional cleanup of eight-byte resource entries |
+| `0821A490` | 88 | Relative-offset header copying and indexed lookup |
+
+These four functions add **536 matched native bytes**. Candidate function names remain unchanged.
+
+### Engine initialization
+
+`08225328` first initializes the 722-entry registry count, calls `082250EC`
+(the already matched wrapper calling `082258A0` / `08225E20`), installs the
+eight engine commands, and installs the six basic commands. This establishes
+a direct initialization chain joining both command tables and the callback
+registry used by `chara`.
+
+It then clears fourteen word globals in the `030053D8–03005414` region,
+clears a word at dynamic memory-base `02000710` plus `0x868`, clears
+`030053E8` again after that pointer store, and clears `030054B0`. It invokes
+`08227DC4`, `0806EF04`, `082210B8`, and `08177D54`, whose semantics are not
+newly established here. It stores u16 value 2 at memory-base plus `0x12`.
+At `030025A0`, it installs `082250FC` and `08225324` at callback offsets
+8/12 using `0821A04C`, writes 1 at offsets `0x14` and `0x16`, clears offset
+`0x10`, inserts the record with `08219F74`, then clears its words at `0x18`
+and `0x1C`. The already matched insertion routine indexes the callback-list
+array by the byte at `0x14`, so this specifically registers in list 1.
+The destruction callback `08225324` is an existing empty function.
+
+### Callback traversal and resource cleanup
+
+`0821A054` visits fourteen eight-byte list records at `03005280`. Each has a
+head pointer and a mask. A list runs only when its mask AND the word at
+`0300523C` is zero; this word is loaded again for each list, so callbacks may
+affect later gates. For each node, the next pointer is saved before invoking
+anything. A u16 flags word at node offset `0x12` selects normal callback offset
+8 when bit 0 is clear. When bit 0 is set, it calls optional callback offset
+12, unlinks through the already matched `08219F94`, then calls `08219D38`.
+Both optional callbacks receive the current node pointer. `08219D38`'s
+assembly marks a preceding 16-byte linked block header and coalesces adjacent
+marked blocks, supporting a deallocation interpretation; no semantic symbol
+name was installed and that function remains unmatched in this round.
+
+`0821A218` visits eight-byte entries at `0203B000` using the signed count at
+`030052F0`. Only entries with flag byte bit `0x80` set are processed. If entry
+mask 1 is set and caller mask 1 is clear, it
+retains the entry and records that entry's index. Otherwise entry mask 2
+requests `08219D38(data)` before the u16 ID and flag byte are cleared. The
+final count is the last retained index plus one; with no retained entry, it
+becomes one. These conditions are exact observed code, not an inferred naming
+of resource ownership or data type. Its count is reloaded after calls and at
+loop tests. The already matched `082250DC` invokes it with zero during the
+engine-update countdown-completion path.
+
+### Relative-offset lookup
+
+`0821A490` copies a native four-word header onto the stack. The first word is
+used as a count; the next two words become base-relative pointers to a u16 key
+array and a native-word relative-offset array. It calls `0821A454` with the
+third input argument truncated to u16 as key, the key-array pointer, the fourth
+input truncated to u16 as an extra context argument, low index 0, and high
+index count minus one. The second input register is unused. The helper's
+already matched implementation ignores that context argument and performs a
+lower-bound search. Negative result or unsigned index >= count returns null;
+otherwise it returns base plus the selected native-word relative offset.
+The fourth header word is copied but unused. No file-size check or validation
+of key sorting exists locally, and no new table semantic name was established.
+
+### Unmatched engine update: all observed local behavior
+
+`082250FC` remains an **untracked candidate**, not a byte-exact addition.
+Its assembly establishes the following state machine on words at node offsets
+`0x18` (state) and `0x1C` (countdown). The role as this initialized record's
+update callback is verified by `08225328`; its broader game-system name is
+not established.
+
+* If `03005408` is zero and all low four bits of halfword `03005260` are set,
+  it calls `08224FA4` and returns zero immediately, skipping the rest of the
+  callback. A nonzero `03005408` is cleared before ordinary processing.
+* State 0 clears `030054B0`, `030053E8`, and the countdown, sets `03003A08`
+  to 1, calls `0822502C` and `0821B078`, then consumes the u16 procedure ID
+  at `030039F0`. Nonzero invokes `0821AD08(id, 0)`; zero invokes `0821B004`.
+  It clears `03003A08`, sets state 1, and clears `030053FC`. The original
+  compares the saved ID again after the nonzero call, without rereading RAM.
+* State 1 with countdown <= 0: nonzero `030053E8` and cleared mask 2 in
+  `0300523C` allow `08224F2C`. Its zero result clears `030053DC` and
+  `03005414`, sets `030053FC` to 1, clears masks 2/4/8 in `0300523C`, calls
+  `0821A0F8(1)`, sets countdown 3, clears `0xE00` in halfword `03004BD8`,
+  and writes `0x40` to `030051D8`. Otherwise, cleared mask 2 allows the word
+  at `0300540C` to increment. A set mask 2 skips these updates.
+* State 1 with positive countdown decrements it. Reaching zero calls
+  `082250D8` and `082250DC`. If `030053F4` has mask `0x200`, it clears that
+  mask and conditionally clears mask 8 in `0300523C`. Mask `0x10` in
+  `030053E8` invokes `0821B148`; otherwise mask `0x100` invokes `0821B180`
+  and stores the u16 from dynamic memory-base plus `0x5A4` via `0821B03C`.
+  State becomes zero.
+* For all ordinary state paths, nonzero `03005404` invokes `08228928` and is
+  cleared. The unsigned word pointed to by `030053F8` increments through
+  `0xFFFFFFFF` and then saturates. `030053E4` always increments. With nonzero
+  `030053D8`, the signed word at dynamic memory-base plus `0x614` increments
+  through `0x7FFFFFFF` and then saturates. The callback returns zero.
+
+The already matched `0821B148` copies `0x89C` bytes from the pointer at
+`02000710` to `0200070C`, and `0x400` bytes from `02000708` to `02000704`;
+`0821B180` copies those regions in the reverse direction. This adds concrete
+copy/restore context to round 2's alternate-base operations. Calling these
+regions snapshots is a candidate interpretation, not evidence of exclusive
+save-game ownership, scene semantics, or lifetime.
+
+The update draft's first compound flag test initially collapsed to one nibble
+comparison; separate goto checks reproduce the original three tests. Its
+saved procedure-ID branch still collapses under ordinary C. A u8 inline
+predicate keeps the repeated decision and saved registers but materializes an
+extra boolean; changes to local widths and comparisons did not solve that
+residual. No ASM, alternate compiler claim, raw ROM constants, or fake side
+effects were introduced to force a match. The retained trap candidate was not
+revisited because the assigned larger update/init targets took priority.
+
+The `0821A184` entry allocator searches for a clear flag mask `0x80`, otherwise
+increments the signed entry count and returns null when that incremented count
+is greater than 31. Its observed counter/pointer register allocation remains
+unmatched. A 60-second search improved score 40 to 20; the best candidate
+fixes the counter/pointer allocation but swaps the saved loop-limit/mask
+registers. A further explicit-limit draft worsened scheduling and was not
+counted as a match. `0821A284` inserts ID/data and sets the flag byte's high bit
+after allocation succeeds; it also remains unmatched due to saved-register
+and constant ordering. Both independent and permuted candidates remain WIP.
+
+Round 3 validation: all four new translation units passed exact matching; the
+complete build printed `build/boktai3.gba: OK` before commits. Combined emulator
+regression remains the orchestrator's batch validation.

@@ -86,8 +86,15 @@ def c_replacement_end(code, start, end, covered_addresses=()):
             # A verified C unit may also define functions that gbadisasm left
             # in binary blobs after the last recognized entry point. Consume
             # those explicitly covered blobs; retain unrelated trailing data.
-            blob = re.match(r'\s*\.incbin "baserom\.gba",\s*(0x[0-9a-fA-F]+),', code[k])
+            blob = re.match(r'\s*\.incbin "baserom\.gba",\s*(0x[0-9a-fA-F]+),\s*(0x[0-9a-fA-F]+)', code[k])
             if blob and 0x08000000 + int(blob.group(1), 16) in covered_addresses:
+                continue
+            # U33J's last instruction ends at 0824DAFA. The next two bytes
+            # are zero alignment before data at 0824DAFC, already emitted
+            # by build_c's final .align 2,0. Keeping the terminal padding
+            # blob as well shifts every data address by two bytes.
+            if (blob and (int(blob.group(1), 16), int(blob.group(2), 16)) == (0x24DAFA, 2)
+                    and not any(line.strip() for line in code[k + 1:end])):
                 continue
             end = k
             while end > start and re.match(r"^\w+:\s*$", code[end - 1]):
