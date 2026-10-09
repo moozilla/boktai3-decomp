@@ -15,7 +15,7 @@ top of it, but the translation lives in its own repo.
 | Disassembly | 11,025 functions (incl. callbacks found via data-region pointer tables), reassembles **bit-identical** (`make compare`) |
 | Shiftable | every ROM pointer is a symbol; all 13.7 MB of data can move. Moving it by 64 KiB plays **pixel-identical** in every scripted test (`make shifttest`) |
 | Compiler | identified as **agbcc** (pret's GCC 2.95 GBA compiler), `-O2 -mthumb-interwork`; float/double libgcc: `old_agbcc -O2`; RFU ISR: `agbcc_arm -O2` |
-| C pipeline | `src/*.c` → agbcc → spliced into the ROM in place of the asm; `INCLUDE_ASM` for unfinished functions; **4,625 functions matched** (see PROGRESS.md); `tools/check.py` per-function diff, `tools/permute.py` for decomp-permuter |
+| C pipeline | `src/*.c` → agbcc → spliced into the ROM in place of the asm; `INCLUDE_ASM` for unfinished functions; **4,657 functions matched** (see PROGRESS.md); `tools/check.py` per-function diff, `tools/permute.py` for decomp-permuter |
 | Libraries | 57 of 58 MP2K (`m4a`) functions in C (`src/lib/m4a.c`, from pret's pokeemerald plus older-SDK variants) (`tools/sigmatch.py`); 40 float/double libgcc and 22 fdlibm routines, two memory primitives, 14 RTC routines, five EEPROM routines and the 145-function RFU SDK in C; solar timer/IRQ code traced and matched ([sensor evidence](docs/SOLAR_SENSOR.md)); `libagbsyscall` identified |
 | Text | script bank format decoded (9,976 strings round-trip byte-exact); the text itself is handled by the translation repo |
 | Sound | MP2K engine; 1,483 songs, 5,525 track streams, 81 voicegroups, 415 samples walked |

@@ -1,0 +1,54 @@
+#include "global.h"
+struct Dma { vu32 src,dest,control; };
+struct Task { u8 p0[0x10]; u16 h10; u8 p12[2]; u8 b14,b15,b16; };
+extern u32 gUnk_0300426C,gUnk_03001110,gUnk_0300522C,gUnk_03003A08,gUnk_03003A50,gUnk_03004264;
+extern u16 gUnk_0300427C,gUnk_030042F0;
+extern struct Task gUnk_03001118,gUnk_03001130;
+void sub_082190BC(void); void sub_082156D8(u32);
+void sub_08216F78(u32,u32,u32,u32,u32);
+void sub_08216FDC(u32,u32,u32,u32);
+void sub_082142DC(void);void sub_08217120(void);void sub_082195D0(void);void sub_08219234(void);void sub_08218BE0(void);
+void sub_08217F4C(void);void sub_08214B44(void);void sub_08219624(void);
+void sub_0821447C(u32,void*,void*,void*);
+void sub_082141C0(void);void sub_0821425C(void);
+void sub_0821A04C(void*,void*,u32); void sub_08219F74(void*);
+void sub_08213DCC(void)
+{
+ u32 fill,zero=0;
+ u8 byteZero,byteOne;
+ struct Dma *dma;
+ u32 mask;
+ struct Task *a,*b;
+ fill=zero; dma=(struct Dma*)0x040000D4; dma->src=(u32)&fill; dma->dest=0x06000000;dma->control=0x85006000; (void)dma->control;
+ fill=0xa0; dma->src=(u32)&fill;dma->dest=0x07000000;dma->control=0x85000100;(void)dma->control;
+ fill=zero;dma->src=(u32)&fill;dma->dest=0x05000000;dma->control=0x85000100;(void)dma->control;
+ byteZero=0;
+ *(vu16*)0x04000208=zero;
+ (void)*(vu16*)0x04000200;
+ *(vu16*)0x04000200=zero;
+ gUnk_0300426C=1;gUnk_03001110=zero;
+ byteOne=1;gUnk_0300427C=1;
+ mask=0x2000;
+ *(vu16*)0x04000200=mask;
+ *(vu16*)0x04000200|=0x1000;
+ *(vu16*)0x04000200|=1;
+ *(vu16*)0x04000200|=2;
+ *(vu16*)0x04000004=8;
+ *(vu16*)0x04000004|=0x10;
+ *(vu16*)0x04000004|=0x20;
+ *(vu16*)0x04000004=(*(vu16*)0x04000004&0xff)|0x4000;
+ *(vu16*)0x04000208=1;
+ *(vu16*)0x04000132=zero;
+ gUnk_0300522C=zero;
+ sub_082190BC();sub_082156D8(0);
+ sub_08216F78(0,0,0,240,160);sub_08216F78(1,0,0,240,160);sub_08216FDC(0x3f,1,0,0);
+ gUnk_030042F0=zero;gUnk_03003A08=zero;
+ sub_082142DC();sub_08217120();sub_082195D0();sub_08219234();sub_08218BE0();
+ sub_0821447C(0,sub_08217F4C,sub_08214B44,sub_08219624);
+ gUnk_03003A50=zero;gUnk_03004264=zero;
+ a=&gUnk_03001118;sub_0821A04C(a,sub_082141C0,0);
+ b=&gUnk_03001130;sub_0821A04C(b,sub_0821425C,0);
+ a->b14=byteZero;a->b16=byteOne;a->h10=zero;
+ b->b14=13;b->b16=byteOne;b->h10=zero;
+ sub_08219F74(a);sub_08219F74(b);
+}
