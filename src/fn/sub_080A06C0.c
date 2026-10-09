@@ -1,12 +1,14 @@
 #include "global.h"
-
-void sub_080A06C0(u16 a, s32 *b, s32 *c) {
-    s32 t = ((a + 0x70) >> 5) & 7;
-    if (t > 4) {
-        *b = 8 - t;
-        *c = 1;
-    } else {
-        *b = t;
-        *c = 0;
-    }
+void sub_080A06C0(u16 x, s32 *a, s32 *b) {
+    s32 v = ((x + 0x70) >> 5) & 7;
+    s32 r;
+    if (v <= 4) goto small;
+    *a = 8 - v;
+    r = 1;
+    goto done;
+small:
+    *a = v;
+    r = 0;
+done:
+    *b = r;
 }
