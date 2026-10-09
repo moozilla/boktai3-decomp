@@ -10,7 +10,10 @@ Use `codex/` branches for Codex work and keep benchmark workers isolated so
 one model cannot see another model's candidate solutions.
 
 Before committing, a complete build must print `build/boktai3.gba: OK`.
-Never commit the ROM, generated assembly, emulator dumps or nonmatching C.
+Never commit the ROM, generated assembly or emulator dumps.
+Never commit nonmatching C on `main`. Dedicated WIP branches may preserve
+nonmatching drafts and alternate candidates; keep them outside production
+`src/`, and do not merge them into `main` or count them as exact progress.
 Function and subsystem names require evidence; a coverage tag means observed
 execution in a segment, not proof of exclusive ownership or a semantic name.
 
