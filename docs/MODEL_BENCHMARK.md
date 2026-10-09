@@ -189,3 +189,47 @@ observations do not establish per-model price or a measured cost frontier.
 Luna remains useful on bounded work, but pre-draft checks must exclude existing
 matches; Sol was more productive in this heterogeneous round. No Astra matcher
 was used. A separately requested Astra process/SolDec review began afterward.
+
+## Production batch 3 and resource-allocation change
+
+Base `6834838`. This batch combines the completed third production rounds,
+two MGS-focused Sol rounds, and main-thread library/tracing work.
+
+| Worker | New functions | Emitted bytes | Progress-span bytes | Matching interval |
+|---|---:|---:|---:|---|
+| Luna A round 3 | 6 | 788 | 788 | 19m27s |
+| Luna B round 3 | 4 | 264 | 264 | 20m09s |
+| Sol 6.1 round 3 | 40 | 6,736 | 6,736 | 24m49s |
+| Sol 6.1 MGS rounds 1–2 | 25 | 3,272 | 3,428 | separate targeted assignments |
+| Main-thread fdlibm source identification | 22 | 11,584 | 11,584 | interleaved with orchestration |
+| Total | **97** | **22,644** | **22,800** | |
+
+Sol round 3 made 71 checks: 42 successful checks, 29 mismatches, and no
+check-tool errors. Only 40 successes are new functions; a baseline recheck
+and duplicate successful check do not count. Sixteen manual seeds, sixteen
+manual family ports and eight automatic ports contributed the 40. One bounded
+permuter run found the pointer-base source pattern; a separate bitfield AST
+failure was worked around manually. Two state mappings contributed 968 bytes.
+See `notes/round3-sol.md` for all attempts and retained candidates.
+
+Luna B then attempted another round for 9m04s and produced **zero** new matches.
+The user requested a stronger emphasis on progress, so the parent stopped that
+round and reassigned the slot to Sol 6.1, preserving its near-matches and
+`notes/round4-luna-b.md`. Sol promptly solved the two retained family seeds;
+their eventual gains belong to the following batch and include Luna's draft
+work, so they are not independent model trials.
+
+Continuing both Luna workers had become a poor allocation for the user's
+immediate progress objective. All current matching slots now use Sol 6.1,
+including one permanently assigned to the MGS lead while the usage budget
+permits. This is a practical decision based on recent output, **not measured
+Pareto efficiency**. There is still no per-model usage attribution, the target
+sets differ, and inherited drafts/source matches change difficulty. The library
+gain also demonstrates that choosing reusable source can matter more than
+scaling individual assembly reconstruction.
+
+The main-thread tracing work adds no native-byte credit. It records validated
+script/actor call chains and corrects an execution-sampling error; see
+`docs/SCRIPT_TRACING.md`. MGS packet formats, callbacks and comparison limits
+are fully recorded in `docs/MGS_GCL_MATCHING.md`. The math units and their
+source/license evidence are in `docs/LIBM.md`.

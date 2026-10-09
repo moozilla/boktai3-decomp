@@ -19,3 +19,5 @@ addr,name,confidence,evidence
 0824D8A4,matherr,high,Exact fully linked newlib 1.8.2 source match using old_agbcc -O2 -fno-builtin; docs/LIBM.md
 0824D8B8,scalbn,high,Exact fully linked newlib 1.8.2 source match using old_agbcc -O2 -fno-builtin; docs/LIBM.md
 0824DA14,copysign,high,Exact fully linked newlib 1.8.2 source match using old_agbcc -O2 -fno-builtin; docs/LIBM.md
+0824B25C,acos,high,Exact fully linked newlib 1.8.2 source; ambiguous masked signature resolved through core calls and name string; docs/LIBM.md
+0824B314,asin,high,Exact fully linked newlib 1.8.2 source; ambiguous masked signature resolved through core calls and name string; docs/LIBM.md
