@@ -233,3 +233,32 @@ script/actor call chains and corrects an execution-sampling error; see
 `docs/SCRIPT_TRACING.md`. MGS packet formats, callbacks and comparison limits
 are fully recorded in `docs/MGS_GCL_MATCHING.md`. The math units and their
 source/license evidence are in `docs/LIBM.md`.
+
+## Production batch 4: targeted Sol rounds and SDK identification
+
+Base `cfd3731`. All matching workers in this batch were Sol 6.1. The two
+family rounds reuse earlier Luna drafts and therefore do not measure an
+independent model comparison.
+
+| Work | New functions | Emitted bytes | Matching interval |
+|---|---:|---:|---|
+| Sol family rounds 1–2 | 13 | 1,448 | about 19 + 7.5 minutes |
+| Sol round 4 | 8 | 1,912 | 20.10 minutes |
+| Sol MGS round 3 | 4 | 536 | bounded 15-minute assignment |
+| Root SIIRTC reconstruction | 14 | 1,784 | interleaved with orchestration |
+| Root libc memory-source matches | 2 | 180 | interleaved with orchestration |
+| Root clone ports from Sol seeds | 2 | 284 | interleaved with orchestration |
+| Total | **43** | **6,144** | |
+
+Sol round 4 recorded 47 checks: eight matches, 34 mismatches and five compile
+errors; four manual seeds, three manual ports, one automated port. Moving state
+counter increments into individual switch cases solved a pair of 520-byte
+functions. All attempt details remain in worker notes.
+
+Progress grows by 6,142 bytes because the final memset object's two alignment
+bytes fall beyond the reporting code boundary. A newly verified but unintegrated
+RTC boundary excludes 464 retained assembly bytes from its preceding function's
+credit. The result is 4,456 / 11,047 functions and 268,626 / 2,415,354 bytes
+(11.122%). No speed or cost frontier can be inferred from these mixed workloads.
+The user extended the stopping threshold to below 40% weekly allowance remaining;
+finish in-flight work after crossing it and start no further rounds.

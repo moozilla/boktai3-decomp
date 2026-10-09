@@ -165,3 +165,8 @@ share generated files read-only: invoke `build/venv/bin/python tools/build.py`
 and `tools/shift_test.sh` directly, since Make prerequisite regeneration could
 write shared `gen/`. Exact library evidence may justify `// COMPILER: old_agbcc`;
 ordinary register differences alone do not. See `docs/LIBGCC.md`.
+
+* **RTC SDK code** at `08248970–08249238` matches `agbcc -O0 -mthumb-interwork`.
+  The r7 frame and repeated byte-local loads are useful clues, but require exact
+  checks. Eight-bit `u32` bitfields reproduce its narrow status operations; see
+  `docs/RTC.md`. Do not apply this setting broadly to ordinary register misses.

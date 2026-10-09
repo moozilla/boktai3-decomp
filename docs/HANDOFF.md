@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated during production batch 3 (2026-10-08 Pacific /
+Last updated during production batch 4 (2026-10-08 Pacific /
 2026-10-09 UTC). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
@@ -9,7 +9,7 @@ another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
 | | |
 |---|---|
-| Matched C | **4,413 / 11,046 functions (39.95%)**, 262,484 / 2,415,354 code bytes (10.867%; `PROGRESS.md`) |
+| Matched C | **4,456 / 11,047 functions (40.34%)**, 268,626 / 2,415,354 code bytes (11.122%; `PROGRESS.md`) |
 | Build | `make` / `python3 tools/build.py` rebuilds the ROM **bit-identical** (SHA-1 `2651c5e6875ac60abff734510d152166d211c87c`) |
 | Shiftable | all data relocatable; `make shifttest` (3 scenarios, 35 screenshots) passes |
 | Code layout | `src/fn/sub_XXXXXXXX.c`, one function per file; `src/lib/m4a.c` (MP2K sound, 57/58) |
@@ -65,7 +65,8 @@ the family. The main thread matched both floating-point runtime units with
 See `docs/LIBGCC.md`, `notes/round2-*.md` and `docs/MODEL_BENCHMARK.md`.
 
 The user authorized continued work until 20% matched code bytes or weekly
-allowance below 50% remaining, then draining all existing assignments. Check
+allowance below **40% remaining** (extended from 50% by explicit user confirmation),
+then draining all existing assignments. Check
 the account meter before each new round. Two Luna workers began round 3 while
 a single requested Astra worker reviewed external development-history claims
 and SolDec. Its completed `docs/PROCESS_REVIEW.md` identifies concrete GCL-family
@@ -87,6 +88,15 @@ next 9-minute round added zero matches and was stopped; its slot now runs Sol
 Luna production workers running. No measured Pareto-efficiency claim is valid:
 account usage cannot be attributed to individual models, and these rounds have
 different targets. Prioritize useful native-byte output over further benchmarking.
+
+Production batch 4 adds 43 functions / 6,142 progress bytes (6,144 emitted):
+Sol family rounds 1–2 (13), Sol round 4 (8), MGS round 3 (4), and root's
+14 unoptimized SIIRTC routines, two memcpy/memset primitives and two clone
+ports. See `docs/RTC.md` for the compiler/bitfield evidence. A reviewed but
+unintegrated RTC entry at `08248E70` is now an unmatched progress boundary,
+preventing 464 retained assembly bytes from receiving false C credit.
+Terminal code alignment is handled once by the splitter. All 35 combined
+shift screenshots and 32 tool/context tests pass.
 
 The new `docs/SCRIPT_TRACING.md` records 698 native calls and 90 actor callbacks
 from the intro, verified against command tables and the 722-entry actor registry.
