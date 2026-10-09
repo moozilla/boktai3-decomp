@@ -1,0 +1,72 @@
+#include "global.h"
+struct Task { u8 pad[16]; u16 f10; u8 pad12[2]; u8 f14, f15, f16, f17; s32 state, counter; };
+extern u32 gUnk_030053F4;
+extern u32 gUnk_030053F0;
+extern u32 gUnk_030053EC;
+extern u32 gUnk_03005410;
+extern u32 gUnk_030053E8;
+extern u32 gUnk_030053DC;
+extern u32 gUnk_03005414;
+extern u32 gUnk_03005408;
+extern u32 gUnk_03005400;
+extern u32 gUnk_030053E0;
+extern u32 gUnk_0300540C;
+extern u32 gUnk_030053E4;
+extern u32 gUnk_030053FC;
+extern u32 gUnk_030053D8;
+extern u32 gUnk_030054B0;
+extern u8 *gUnk_02000710;
+extern struct Task gUnk_030025A0;
+void sub_0822580C(void);
+void sub_082250EC(void);
+void sub_082257E4(void);
+void sub_0821B90C(void);
+void sub_08227DC4(void);
+void sub_0806EF04(void);
+void sub_082210B8(void);
+void sub_08177D54(void);
+s32 sub_082250FC(struct Task *);
+void sub_08225324(void);
+void sub_0821A04C(struct Task *, s32 (*)(struct Task *), void (*)(void));
+void sub_08219F74(struct Task *);
+void sub_08225328(void)
+{
+    struct Task *task;
+    sub_0822580C();
+    sub_082250EC();
+    sub_082257E4();
+    sub_0821B90C();
+    gUnk_030053F4 = 0;
+    gUnk_030053F0 = 0;
+    gUnk_030053EC = 0;
+    gUnk_03005410 = 0;
+    gUnk_030053E8 = 0;
+    gUnk_030053DC = 0;
+    gUnk_03005414 = 0;
+    gUnk_03005408 = 0;
+    gUnk_03005400 = 0;
+    gUnk_030053E0 = 0;
+    gUnk_0300540C = 0;
+    gUnk_030053E4 = 0;
+    gUnk_030053FC = 0;
+    gUnk_030053D8 = 0;
+    *(u32 *)(gUnk_02000710 + 0x868) = 0;
+    gUnk_030053E8 = 0;
+    gUnk_030054B0 = 0;
+    sub_08227DC4();
+    sub_0806EF04();
+    sub_082210B8();
+    sub_08177D54();
+    {
+        u32 value = 2;
+        *(u16 *)(gUnk_02000710 + 0x12) = value;
+    }
+    task = &gUnk_030025A0;
+    sub_0821A04C(task, sub_082250FC, sub_08225324);
+    task->f14 = 1;
+    task->f16 = 1;
+    task->f10 = 0;
+    sub_08219F74(task);
+    task->state = 0;
+    task->counter = 0;
+}
