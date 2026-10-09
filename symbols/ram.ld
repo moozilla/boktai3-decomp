@@ -50,6 +50,12 @@ __muldf3 = sub_08249A4C;
 __adddf3 = sub_082499E4;
 __fixdfsi = sub_0824A1EC;
 __gedf2 = sub_0824A08C;
+/* Exact libgcc source unit identifies comparison helper; docs/LIBGCC.md. */
+__ltdf2 = sub_0824A0D8;
+__ledf2 = sub_0824A124;
+/* Exact old_agbcc libgcc2 source and lib1thumb division identify these helpers. */
+__fixunsdfsi = sub_0824930C;
+__udivsi3 = sub_08249420;
 __eqdf2 = sub_08249FA8;
 __gtdf2 = sub_0824A040;
 __divdf3 = sub_08249CF4;
