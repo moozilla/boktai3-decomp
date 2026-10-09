@@ -56,6 +56,19 @@ class ArmUnitTests(unittest.TestCase):
             with self.subTest(entries=entries), self.assertRaisesRegex(ValueError, message):
                 self.expand(entries, blob)
 
+    def test_reviewed_body_fragments_stop_at_exact_endpoint(self):
+        lines = ['sub_08004000:',
+                 '\t.incbin "baserom.gba", 0x4000, 0x8',
+                 '\t.4byte callback',
+                 '\t.incbin "baserom.gba", 0x400c, 0x4',
+                 '\t.incbin "baserom.gba", 0x4010, 0x8']
+        self.assertEqual(split.c_replacement_end(lines, 0, len(lines),
+                         {0x08004000}, [(0x08004000, 0x08004010)]), 4)
+        # A fragment extending past the reviewed endpoint stays assembly.
+        lines[3] = '\t.incbin "baserom.gba", 0x400c, 0x8'
+        self.assertEqual(split.c_replacement_end(lines, 0, len(lines),
+                         {0x08004000}, [(0x08004000, 0x08004010)]), 3)
+
 
 if __name__ == "__main__":
     unittest.main()
