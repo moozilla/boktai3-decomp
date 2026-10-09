@@ -8,7 +8,9 @@ check logs and build outputs are private to each worker.
 ## Protocol
 
 The first pilot compares `gpt-6-luna`, `gpt-6.1-sol` and `gpt-6-astra` with
-the same inherited reasoning setting and worker brief. Six unmatched targets
+the same worker brief. A retrospective audit of local session records found
+that Sol used **low** reasoning while Luna and Astra used **medium**; the
+original claim of a common reasoning setting was incorrect. Six unmatched targets
 span short functions, medium functions and two documented difficult cases.
 Every worker reads the repository matching playbook and may use existing
 matched source and notes. Workers may not inspect another worker's solutions,
@@ -38,10 +40,13 @@ progress, while crediting each model's independent success in the comparison.
 The check's emitted object size and the progress tracker's next-function span
 are different measures; label them explicitly.
 
-No per-worker billing or token meter is exposed by the orchestration tools.
+No per-worker billing or token meter was exposed by the orchestration tools.
 The account usage meter combines this chat, workers and any other active work,
 so it cannot supply a per-model price. Do not call wall time a monetary cost or
-claim a measured plan-usage Pareto frontier from these observations. The pilot
+claim a measured plan-usage Pareto frontier from these observations. A later
+[retrospective](RETROSPECTIVE_2026-10-08.md) recovered per-response token records
+from local session logs and computed a published-rate cost proxy. Exact
+per-model subscription allowance attribution remains unavailable. The pilot
 can identify promising candidates for longer, disjoint production rounds.
 
 Use the cheapest model that demonstrably handles a class, retain its best
