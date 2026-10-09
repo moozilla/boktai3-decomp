@@ -8,6 +8,7 @@ assemble segments + data -> link in ROM order -> objcopy -> SHA-1 check.
 Unchanged inputs are not rebuilt (content hash).
 """
 import argparse
+import functools
 import hashlib
 import os
 import re
@@ -87,20 +88,39 @@ def cflags_for(src):
     return m.group(1).split() + ["-fhex-asm"] if m else CFLAGS
 
 
+def compiler_for(src):
+    """Library objects can predate the game's compiler variant."""
+    with open(os.path.join(ROOT, src)) as f:
+        m = re.search(r"^// COMPILER: (\S+)\s*$", f.read(), re.M)
+    if not m or m.group(1) == "agbcc":
+        return AGBCC
+    if m.group(1) == "old_agbcc":
+        return os.path.join(os.path.dirname(AGBCC), "old_agbcc")
+    sys.exit(f"{src}: unknown compiler {m.group(1)!r}; use agbcc or old_agbcc")
+
+
+@functools.lru_cache(maxsize=None)
+def compiler_identity(path):
+    # Both the selected executable and its contents affect generated code.
+    # Hash once per invocation, rather than once for every translation unit.
+    return os.path.realpath(path) + ":" + hashlib.sha1(open(path, "rb").read()).hexdigest()
+
+
 def build_c(src, obj):
     lint_c(src)
     deps = [src] + [os.path.join(d, f) for d in ("include", "include/gba")
                     for f in sorted(os.listdir(os.path.join(ROOT, d))) if f.endswith(".h")]
     cflags = cflags_for(src)
-    key = file_hash(*deps, "tools/build.py", extra=" ".join(CPP + cflags))
+    compiler = compiler_for(src)
+    key = file_hash(*deps, "tools/build.py", extra=compiler_identity(compiler) + " ".join(CPP + cflags))
     if stamp_ok(os.path.join(ROOT, obj), key):
         return
     pre = preprocess(src)
-    asm = subprocess.run([AGBCC] + cflags + ["-o", "-"], input=pre, cwd=ROOT,
+    asm = subprocess.run([compiler] + cflags + ["-o", "-"], input=pre, cwd=ROOT,
                          capture_output=True, text=True)
     if asm.returncode or "error" in asm.stderr:
         sys.stderr.write(asm.stderr)
-        sys.exit(f"agbcc failed on {src}")
+        sys.exit(f"{os.path.basename(compiler)} failed on {src}")
     s_path = os.path.join(ROOT, obj[:-2] + ".s")
     # After each function label add a plain (non-Thumb) alias NAME__addr: data
     # that points at the function's even address references it (an ABS32

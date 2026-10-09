@@ -149,3 +149,43 @@ Compiler references led to concrete permuter fixes, described in
 `docs/COMPILER_REFERENCES.md`. The corrected tool preserved a difficult loop
 candidate and scored it appropriately, but a 60-second trial found no new
 match; none of this round's matching credit comes from permutation search.
+
+## Production round 2 (2026-10-08 Pacific)
+
+Baseline `e2546f6`. Workers continued disjoint production ranges, with bounded
+permutation search permitted. Review excluded three already-matched rewrites.
+
+| Worker | New functions | Emitted bytes | Progress-span bytes | Automatic ports | Matching interval |
+|---|---:|---:|---:|---:|---|
+| Luna A | 5 | 328 | 328 | 2 | 18m46s |
+| Luna B | 21 | 944 | 980 | 0 | 19m58s |
+| Sol 6.1 | 40 | 3,736 | 3,736 | 12 | 23m34s |
+| Main-thread counter family | 7 | 4,088 | 4,088 | 0 | interleaved with orchestration |
+| Main-thread libgcc identification | 40 | 5,864 | 5,864 | 0 | interleaved with orchestration |
+| Total | **113** | **14,960** | **14,996** | **14** | |
+
+Sol solved three targets in five 60-second permuter trials; manual family
+adaptation propagated one result to two siblings. One null-guard pattern solved
+the longstanding allocator-wrapper backlog. Root solved a seven-member 584-byte
+counter family using a static inline clamp with assignments and one return.
+The 40 library functions came from identifying and adapting known upstream C,
+not 40 independently reconstructed functions. See `docs/LIBGCC.md`.
+
+Root's remaining 1,060-byte motion-family seed differs in four register-choice
+instructions. A three-minute permutation trial found no improvement and logged
+an upstream AST assertion; the candidate stays uncommitted. Luna A's six-member
+family requiring explicit assembly register bindings was rejected and remains
+WIP. These failures earn no matched-byte credit.
+
+The library pass exposed 18 previously unlisted function boundaries. The
+reporting denominator grows from 11,028 to 11,046 functions; the code-byte
+denominator stays 2,415,354. This batch reaches **4,316 functions and 239,684
+code bytes (9.923%)**. Matched progress uses next-function spans; it includes
+36 bytes retained beyond Luna B's emitted objects.
+
+The intervals include build waiting and vary by target mix; root time includes
+integration/tooling. Account-wide usage includes all concurrent work. These
+observations do not establish per-model price or a measured cost frontier.
+Luna remains useful on bounded work, but pre-draft checks must exclude existing
+matches; Sol was more productive in this heterogeneous round. No Astra matcher
+was used. A separately requested Astra process/SolDec review began afterward.

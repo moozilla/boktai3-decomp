@@ -79,10 +79,16 @@ def write_nonmatching(code, funcs):
             open(p, "w").write(text)
 
 
-def c_replacement_end(code, start, end):
+def c_replacement_end(code, start, end, covered_addresses=()):
     """First retained trailing-data line; C replaces instructions/literal pools."""
     for k in range(start, end):
         if code[k].lstrip().startswith(".incbin"):
+            # A verified C unit may also define functions that gbadisasm left
+            # in binary blobs after the last recognized entry point. Consume
+            # those explicitly covered blobs; retain unrelated trailing data.
+            blob = re.match(r'\s*\.incbin "baserom\.gba",\s*(0x[0-9a-fA-F]+),', code[k])
+            if blob and 0x08000000 + int(blob.group(1), 16) in covered_addresses:
+                continue
             end = k
             while end > start and re.match(r"^\w+:\s*$", code[end - 1]):
                 end -= 1
@@ -165,7 +171,9 @@ def main():
         out_units.append(("c", rel))
         # The C object replaces only the last function's instructions (and its
         # literal pools); trailing undisassembled data in that block stays asm.
-        end = c_replacement_end(code, funcs[last][2], funcs[last][3])
+        covered = {int(n[4:], 16) for n in c_functions(os.path.join(ROOT, rel), with_asm=False)
+                   if re.fullmatch(r"sub_[0-9A-F]{8}", n)}
+        end = c_replacement_end(code, funcs[last][2], funcs[last][3], covered)
         # Labels that disappear with the asm are redefined relative to the
         # unit's first function, so references from elsewhere still resolve.
         base_name, base_addr = funcs[first][0], funcs[first][1]

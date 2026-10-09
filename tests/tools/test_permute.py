@@ -49,6 +49,13 @@ class PermuteTests(unittest.TestCase):
             src.write_text("// CFLAGS: -O1 -mthumb-interwork\nint f(void) { return 0; }\n")
             self.assertEqual(build.cflags_for(str(src)), ["-O1", "-mthumb-interwork", "-fhex-asm"])
 
+    def test_explicit_hidden_c_function_replaces_its_blob_only(self):
+        lines = ["fn:", "\tbx lr", "hidden:",
+                 '\t.incbin "baserom.gba", 0x4004, 0x20',
+                 "tail:", '\t.incbin "baserom.gba", 0x4024, 0x10']
+        self.assertEqual(split.c_replacement_end(lines, 0, len(lines)), 2)
+        self.assertEqual(split.c_replacement_end(lines, 0, len(lines), {0x08004004}), 4)
+
     @unittest.skipUnless(all(shutil.which("arm-none-eabi-" + t) for t in ("as", "ld", "objcopy")),
                          "ARM binutils required for synthetic linked-object fixture")
     def test_numeric_and_symbolic_literals_resolve_identically(self):

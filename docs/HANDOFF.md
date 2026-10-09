@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after production round 1 (2026-10-08 Pacific /
+Last updated after production round 2 (2026-10-08 Pacific /
 2026-10-09 UTC). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
@@ -9,7 +9,7 @@ another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
 | | |
 |---|---|
-| Matched C | **4,203 / 11,028 functions (38.11%)**, 224,688 / 2,415,354 code bytes (9.302%; `PROGRESS.md`) |
+| Matched C | **4,316 / 11,046 functions (39.07%)**, 239,684 / 2,415,354 code bytes (9.923%; `PROGRESS.md`) |
 | Build | `make` / `python3 tools/build.py` rebuilds the ROM **bit-identical** (SHA-1 `2651c5e6875ac60abff734510d152166d211c87c`) |
 | Shiftable | all data relocatable; `make shifttest` (3 scenarios, 35 screenshots) passes |
 | Code layout | `src/fn/sub_XXXXXXXX.c`, one function per file; `src/lib/m4a.c` (MP2K sound, 57/58) |
@@ -56,6 +56,24 @@ requires one target ROM function and creates isolated run directories. See
 and validation. A 60-second trial on `081A55D4` did not solve its remaining
 register allocation difference; keep that candidate for future escalation.
 
+Production round 2 added **113 new functions and 14,996 progress-span bytes**:
+Luna A five, Luna B 21, Sol 40, main-thread counter family seven and libgcc 40.
+Three redundant rewrites were excluded. Sol's bounded permuter trials solved
+three targets, and allocator-wrapper null fallthroughs are now matched across
+the family. The main thread matched both floating-point runtime units with
+`old_agbcc -O2`; 18 hidden library boundaries were added to the inventory.
+See `docs/LIBGCC.md`, `notes/round2-*.md` and `docs/MODEL_BENCHMARK.md`.
+
+The user authorized continued work until 20% matched code bytes or weekly
+allowance below 50% remaining, then draining all existing assignments. Check
+the account meter before each new round. Two Luna workers began round 3 while
+a single requested Astra worker reviewed external development-history claims
+and SolDec. Its completed `docs/PROCESS_REVIEW.md` identifies concrete GCL-family
+script correspondences, B3-specific decoding differences and a 722-target actor
+registry. `tools/soldec_audit.py` supplies bounded, read-only checks; no speculative
+engine/compiler claims were adopted. The main thread continues hard matching and reviewed batch integration.
+Do not conflate worker commit counts with new coverage.
+
 The deeper task connects emulator coverage to function boundaries:
 `tools/function_context.py`, `docs/RUNTIME_CONTEXT.md`, and `docs/MENU_CONTEXT.md`.
 Screenshot review corrected a one-tab offset in the menu replay's labels and
@@ -72,7 +90,7 @@ Activate `source build/venv/bin/activate` before using Python tools. Homebrew
 provides `arm-none-eabi-binutils` and mGBA; `make setup` builds the pinned
 compiler, disassembler, assembler, permuter and harness. See README for macOS
 installation instructions. Full `make` and all 35 shift-test screenshots passed
-after the 52 production-round matches were integrated.
+after the production batches were integrated.
 
 On a fresh Linux machine, supply the ROM, then:
 
@@ -163,8 +181,8 @@ Open:
 1. A big constant derived from another constant's register (`movs r2,#0x94;
    lsls; ... subs r2,#4`) instead of separate literals (081A6108, 081A6EF8,
    0813BA24, 0814DF0C). Real struct fields get partway.
-2. Alloc/init/free wrapper whose null path jumps straight to the pop with r0
-   untouched (~10 clones in 081F-0821: 081FB788, 081FBB38, ...).
+2. Alloc/init/free wrappers: solved in round 2 with guarded initialization and
+   non-void null fallthrough retaining allocator r0; see notes/round2-sol.md.
 3. `movs r1,#3; ands r1,r0` (result in the constant's register): 081F612C family.
 4. Stack `s16[3]` vectors whose address lives in a callee-saved register
    (081C43B0 family; 08201CAC's `u16 *q = (u16 *)&v` trick may help).
@@ -173,8 +191,9 @@ Open:
 6. Pure register-allocation swaps (most remaining skips): `tools/permute.py`.
 7. `CgbSound` (last m4a function): stack layout solved, registers left;
    `notes/cgb.md`, best permuter candidate `notes/cgb_permuted_1480.c`.
-8. ROM-tail libgcc/libc pieces (0824xxxx) may need `// CFLAGS: -O2` (no
-   interworking) or are hand asm (`pop {r4, pc}` epilogues).
+8. Float/double libgcc units are now matched with `// COMPILER: old_agbcc` and
+   `// CFLAGS: -O2`. Remaining libc and integer helpers are library candidates;
+   compiler choice requires exact-byte evidence (docs/LIBGCC.md).
 
 ## 7. Other open work
 

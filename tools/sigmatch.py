@@ -4,12 +4,15 @@
   sigmatch.py OBJ.o [--csv]
 
 For every global function in OBJ, its bytes (with relocated fields masked) are
-searched in the code region.  Unique hits are printed as `addr,name` -- these
-are both names and proof that the object's C source matches as-is.
+searched in the code region. Unique hits are candidate identities, printed as
+`addr,name,size`. Relocations are masked: verify the linked bytes with check.py
+and the full ROM build before accepting source or a name.
 """
 import re
 import subprocess
 import sys
+import tempfile
+from pathlib import Path
 
 from romlib import load_rom
 
@@ -20,8 +23,10 @@ def main():
     obj = sys.argv[1]
     rom = load_rom()
     code = rom[:CODE_END]
-    subprocess.run(["arm-none-eabi-objcopy", "-O", "binary", "-j", ".text", obj, "/tmp/claude-0/sig.bin"], check=True)
-    text = open("/tmp/claude-0/sig.bin", "rb").read()
+    with tempfile.TemporaryDirectory(prefix="boktai-sigmatch-") as work:
+        binary = Path(work) / "text.bin"
+        subprocess.run(["arm-none-eabi-objcopy", "-O", "binary", "-j", ".text", obj, str(binary)], check=True)
+        text = binary.read_bytes()
     syms = []
     for ln in subprocess.run(["arm-none-eabi-nm", "-S", "--defined-only", obj], capture_output=True, text=True).stdout.splitlines():
         p = ln.split()
