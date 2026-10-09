@@ -24,6 +24,8 @@ gMPlayTable = gUnk_082643EC;
 __divsi3 = sub_08249274;
 _call_via_r1 = sub_0824923C;
 _call_via_r2 = sub_08249240;
+/* agbcc libgcc/lib1thumb.asm call_via r4: bx r4; nop (ROM 08249248). */
+_call_via_r4 = sub_08249248;
 
 /* m4a_1.s routine whose label is only a data label in the generated asm */
 MPlayMain = gUnk_0822F820 + 1;
