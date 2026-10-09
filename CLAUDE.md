@@ -9,6 +9,8 @@ committed, and neither is anything generated from it (`build/`, `extracted/`).
   If C changes data layout or touches pointers, also run `make shifttest`.
 * Matching means byte-identical. No hand-written instructions inside `asm()`
   to force a match. `INCLUDE_ASM` is the placeholder for unfinished functions.
+  Nonmatching candidate C may be committed on dedicated WIP branches outside
+  `src/`; never merge it into `main` or count it as exact progress.
 * One translation unit per change/PR. A unit is a `src/*.c` file covering a
   **contiguous** run of functions in ROM order.
   The user-authorized orchestration exception is a reviewed batch integration
