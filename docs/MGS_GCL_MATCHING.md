@@ -986,3 +986,82 @@ higher-level ownership remain unresolved.
 Round 6 validation: all seven new translation units completed a full native
 build with `build/boktai3.gba: OK` before one-TU commits. No worker screenshots,
 shared-gen regeneration, push, PR or nonmatching tracked C were produced.
+
+
+## Round 7: bounded final adjacency evidence
+
+The final six-minute pass started at 2026-10-09 04:07:14 UTC on
+`codex/mgs-gcl-round7` from `0f8f5b6`. It produced **zero new matches /
+zero native bytes**. The parent reserved direct siblings `0821F1C4` and
+`0821F204` after checking they remained ASM in both main and this checkout.
+The account reached the 35-percent stop floor during the assignment; no new
+target, worker, round or permutation search was started afterward.
+
+The retained `0821E5C4` draft was tested with an unsigned-word saved entry
+address, converting back only for the offset read and state pointer store.
+It remained 80 bytes versus 84, lacking the native saved-entry register copy.
+`0821E8C8`'s assigned-field-only bitfield draft remains valid WIP; review
+confirmed unused preserved upper bits cannot justify an uninitialized full
+word read. The `0821F15C` ordinary scope remains mismatched by its resource
+result move. The prior artificial identical branches were not reintroduced,
+and no new permutation fishing was performed.
+
+### Symmetric halfword table helper
+
+`0821F1C4` returns zero for equal signed input indices. Otherwise, let
+`lo = min(first, second)`, `hi = max(first, second)`, and `n` be the unsigned
+16-bit width argument. It reads the native unsigned halfword at table index
+`n * lo + hi - ((lo + 1) * (lo + 2) >> 1)`. The formula indexes an upper
+triangle without the diagonal, symmetrically for swapped input indices.
+The native routine does not check index or width bounds; integer overflow
+and invalid negative indices are not given invented semantics by this finding.
+This establishes the indexing structure, not the table's gameplay meaning.
+
+Independent separate index/triangle locals, mutation of width and indices,
+a small inline triangular-product helper, a signed width with explicit
+16-bit normalization, sequential product assignments and integer address
+calculation emitted 56, 60 or 64 bytes. None matched the original 64 bytes.
+Differences include copying the first input to r0, preserving normalized
+width separately, multiplication operand selection and the final load base.
+No register binding, asm, volatile side effect or duplicated branch was used.
+
+### Resource rectangle-group membership
+
+`0821F204` reads the same context offset-`0x14` resource stored by `F15C` and
+`F180`. Its resource starts with an unsigned halfword group count and a
+four-byte-aligned array of native 32-bit relative offsets beginning at four.
+Each selected group has an unsigned halfword rectangle count and another
+native 32-bit relative offset at group offset eight. Rectangle records are
+16 bytes, as supported by already matched `F18C`; their first four bytes
+are lower and upper horizontal limits shifted left eight before comparison
+against signed halfword position components zero and two. Bounds are
+lower inclusive and upper exclusive. Native offset tables are memory layouts,
+not evidence of bytecode endianness or MGS format compatibility.
+
+Before scanning groups, F204 arithmetic-shifts signed position halfwords
+right eight to obtain horizontal coordinates. Negative or out-of-range
+coordinates select cell zero rather than returning immediately. Otherwise
+a row halfword at context offset `0x24` plus the first coordinate supplies
+the cell index. It calls existing `D64C(cell, 1)`; a returned dynamic node
+provides its four-byte cell record at offset four, or the fallback record
+is at `context.grid + 12 + cell * 4`. Cell flag two suppresses the group
+scan. The first containing rectangle terminates the scan: return one only
+if its group index equals the incoming object's unsigned halfword at offset
+four, otherwise zero. It does not continue searching later groups after a
+hit in a different group. The second incoming register argument is unused.
+No null-resource guard or different invalid-coordinate policy was added.
+
+For-loops, explicit success/failure labels, integer group-offset addressing
+and explicit loop labels yielded valid independent drafts of 216–232 bytes
+against the original 232. Ordinary loop forms introduced an induction pointer
+and a stack spill for the group index; label placement could eliminate that
+spill, but flag-register selection, loop allocation and branches remained
+different. This resource relationship extends the established B3 script
+subsystem evidence. A direct MGS function identity or HZD structure name
+is **not verified** and was not transferred from the comparative source.
+
+All five valid drafts remain ignored WIP; no nonmatching C was installed.
+The unchanged matching tree completed `tools/build.py` with
+`build/boktai3.gba: OK` before this documentation-only commit. Parent performs
+combined runtime regression; no screenshots, push, PR, shared-gen changes
+or new semantic symbols were produced.
