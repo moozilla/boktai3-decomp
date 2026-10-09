@@ -1,4 +1,6 @@
 address,isa,evidence
+08229424,thumb,Independent 28-byte Thumb body after predecessor return; exact standalone check; notes/push20-root.md
+08232F1C,thumb,Independent 76-byte Thumb allocation wrapper in retained tail; exact standalone check; notes/push20-root.md
 08244A38,arm,IntrSIO32: exact compiled RFU_V1024 source; docs/RFU.md
 08244A9C,arm,sio32intr_clock_master: exact compiled RFU_V1024 source; docs/RFU.md
 08244D2C,arm,sio32intr_clock_slave: exact compiled RFU_V1024 source; docs/RFU.md
