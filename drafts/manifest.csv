@@ -526,6 +526,16 @@ drafts/retained/wt/push20-integrate/wip/solo-family/typed_08235C30.c,wt/push20-i
 drafts/retained/wt/push20-integrate/wip/solo-family/typed_flags_08235C30.c,wt/push20-integrate/wip/solo-family/typed_flags_08235C30.c,07a273f7b516f08ecbe5722b157f30e3fda0056fb9356a6224f417d58714da12
 drafts/retained/wt/push20-integrate/wip/solo-family/update_base_080F59E0.c,wt/push20-integrate/wip/solo-family/update_base_080F59E0.c,bdf661be43e258752949c5294f5e016436f240084a02044ee732ca2ad38edfbb
 drafts/retained/wt/push20-integrate/wip/solo-family/update_base_0818D960.c,wt/push20-integrate/wip/solo-family/update_base_0818D960.c,e26a42e643e4de5edac620a1cc138ca7cdc1943cddcdcab78253a68394680bcf
+drafts/retained/wt/push20-integrate/wip/solo-tail/finish_080F5B68.c,wt/push20-integrate/wip/solo-tail/finish_080F5B68.c,0dd3b1fc5a510907bdd8195cd5c050909e7d797df8873e646074ddf79009f7a7
+drafts/retained/wt/push20-integrate/wip/solo-tail/finish_0818DB10.c,wt/push20-integrate/wip/solo-tail/finish_0818DB10.c,331a9a25ec754f9cb0061c9acc9d5453c5a50ab52e739da094a1043534905eee
+drafts/retained/wt/push20-integrate/wip/solo-tail/reuse_08235C30.c,wt/push20-integrate/wip/solo-tail/reuse_08235C30.c,b3231cd0d6bb90fab5f828d6bd2fbd497437096071b836061177982884dcf2ea
+drafts/retained/wt/push20-integrate/wip/solo-tail/sub_080B7280.c,wt/push20-integrate/wip/solo-tail/sub_080B7280.c,4846884fc94f7c0ca4efff64cb7a64236e2cf2397499e3852c18c16a49da89c4
+drafts/retained/wt/push20-integrate/wip/solo-tail/sub_0818CA04.c,wt/push20-integrate/wip/solo-tail/sub_0818CA04.c,75ff8b2b7330557d383e1a6e74b4ddff501b082d3d9efa095db41a5e836f93da
+drafts/retained/wt/push20-integrate/wip/solo-tail/sub_0818DE44.c,wt/push20-integrate/wip/solo-tail/sub_0818DE44.c,73f03fd0b2ee04ff0029dfb90ed433f787191b1d668e7db44847a5fb564d072b
+drafts/retained/wt/push20-integrate/wip/solo-tail/sub_0818DF90.c,wt/push20-integrate/wip/solo-tail/sub_0818DF90.c,55f07ba057b93c31c33fdefdc2faadb22b0efdd58dc03166e471dad266c10376
+drafts/retained/wt/push20-integrate/wip/solo-tail/sub_081DB030.c,wt/push20-integrate/wip/solo-tail/sub_081DB030.c,357488308839c6a2e8dd605250ddd7ab14f02976a995700d5474ff57decf9bd7
+drafts/retained/wt/push20-integrate/wip/solo-tail/sub_081DB24C.c,wt/push20-integrate/wip/solo-tail/sub_081DB24C.c,e1e1871a47d79e4f684927dd817d92a3401bfbb13af4ee4eccd98750fa61a78d
+drafts/retained/wt/push20-integrate/wip/solo-tail/sub_081DB2B8.c,wt/push20-integrate/wip/solo-tail/sub_081DB2B8.c,c1ad40c42fe62afed5ddaeeea91119e2822e3c258621c2c289e94083ed72416a
 drafts/retained/wt/push20-low/wip/clones/sub_080033FC.c,wt/push20-low/wip/clones/sub_080033FC.c,4915b4342c6fce3140ae3f44c7d8d0e5a0e010c9cf727781cb8980cdd2fbeed6
 drafts/retained/wt/push20-low/wip/clones/sub_08011AA4.c,wt/push20-low/wip/clones/sub_08011AA4.c,598a989e732442e0aa37220ce47c16be8c936a28bd134d9091c877c930b8d36c
 drafts/retained/wt/push20-low/wip/clones/sub_08011C00.c,wt/push20-low/wip/clones/sub_08011C00.c,d4ec09669e1a457f409d153ac7971a1c93bb5b63852cb0eaeb32951d5d3b875d
