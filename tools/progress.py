@@ -17,6 +17,47 @@ from split import c_functions
 CODE_END = 0x0824DAFA
 INVENTORY = Path(ROOT) / "symbols/progress_functions.csv"
 EXTRA_BOUNDARIES = Path(ROOT) / "symbols/progress_extra_functions.csv"
+LIBRARIES = Path(ROOT) / "symbols/progress_libraries.csv"
+
+
+def load_libraries(funcs, sizes, path=LIBRARIES):
+    """Reviewed contiguous report spans and evidence-backed display names.
+
+    These presentation groups do not change build symbols or C credit.
+    Bounds use the existing progress spans, including their alignment/tails.
+    """
+    boundaries = {a for _, a in funcs} | {CODE_END}
+    known = {a for _, a in funcs}
+    libraries = []
+    with Path(path).open(newline="") as f:
+        for row in csv.DictReader(f):
+            start, end = int(row["start"], 16), int(row["end"], 16)
+            if start not in boundaries or end not in boundaries or start >= end:
+                raise ValueError(f"{row['name']}: invalid library boundaries")
+            if libraries and start < libraries[-1]["end"]:
+                raise ValueError("library ranges must be sorted and nonoverlapping")
+            if any(lib["name"] == row["name"] for lib in libraries):
+                raise ValueError("library names must be unique")
+            members = [(n, a) for n, a in funcs if start <= a < end]
+            if sum(sizes[n] for n, _ in members) != end - start:
+                raise ValueError(f"{row['name']}: library span is not contiguous")
+            names = {}
+            for relative in filter(None, row["name_files"].split(";")):
+                with (Path(path).parent.parent / relative).open(newline="") as nf:
+                    for label in csv.DictReader(nf):
+                        a = int(label["addr"], 16)
+                        if not start <= a < end:
+                            continue  # Some reviewed SDK maps also contain RAM/data.
+                        if a not in known or not label["evidence"]:
+                            raise ValueError(f"{relative}: unreviewed library label {a:08X}")
+                        if a in names and names[a] != label["name"]:
+                            raise ValueError(f"conflicting library names at {a:08X}")
+                        names[a] = label["name"]
+            if not row["evidence"]:
+                raise ValueError(f"{row['name']}: missing library evidence")
+            libraries.append({"name": row["name"], "start": start, "end": end,
+                              "names": names})
+    return libraries
 
 
 def assembly_addresses(path):
@@ -82,30 +123,47 @@ def collect_done(funcs, source_root):
     return done
 
 
-def measures(total_b, done_b, count, done_count):
+def measures(total_b, done_b, count, done_count, *, units=None, complete_units=None):
     return {
         "fuzzy_match_percent": 100 * done_b / total_b,
         "total_code": str(total_b), "matched_code": str(done_b),
         "matched_code_percent": 100 * done_b / total_b,
         "total_functions": count, "matched_functions": done_count,
-        "total_units": count, "complete_units": done_count,
+        "total_units": count if units is None else units,
+        "complete_units": done_count if complete_units is None else complete_units,
         "matched_functions_percent": 100 * done_count / count,
         "complete_code": str(done_b), "complete_code_percent": 100 * done_b / total_b,
     }
 
 
-def make_report(funcs, sizes, done):
+def make_report(funcs, sizes, done, libraries=()):
     units = []
+    grouped = {}
     for n, a in funcs:
+        library = next((lib for lib in libraries if lib["start"] <= a < lib["end"]), None)
+        unit_name = f"libraries/{library['name']}" if library else f"functions/{a:08X}"
+        if unit_name not in grouped:
+            unit = {"name": unit_name, "functions": []}
+            units.append(unit)
+            grouped[unit_name] = unit
         matched = n in done
-        units.append({"name": f"functions/{a:08X}",
-                      "measures": measures(sizes[n], sizes[n] if matched else 0, 1, int(matched)),
-                      "functions": [{"name": n, "size": str(sizes[n]),
-                                     "fuzzy_match_percent": 100 if matched else 0,
-                                     "metadata": {"virtual_address": str(a)}}],
-                      "metadata": {"complete": matched}})
+        grouped[unit_name]["functions"].append({
+            "name": library["names"].get(a, n) if library else n,
+            "size": str(sizes[n]), "fuzzy_match_percent": 100 if matched else 0,
+            "address": str(a - (library["start"] if library else a)),
+            "metadata": {"virtual_address": str(a)}})
+    for unit in units:
+        items = unit["functions"]
+        total_b = sum(int(item["size"]) for item in items)
+        matched_items = [item for item in items if item["fuzzy_match_percent"] == 100]
+        done_b = sum(int(item["size"]) for item in matched_items)
+        complete = len(matched_items) == len(items)
+        unit["measures"] = measures(total_b, done_b, len(items), len(matched_items),
+                                   units=1, complete_units=int(complete))
+        unit["metadata"] = {"complete": complete}
     return {"version": 2, "measures": measures(sum(sizes.values()),
-            sum(sizes[n] for n in done), len(funcs), len(done)), "units": units}
+            sum(sizes[n] for n in done), len(funcs), len(done), units=len(units),
+            complete_units=sum(u["metadata"]["complete"] for u in units)), "units": units}
 
 
 def main():
@@ -131,7 +189,8 @@ def main():
     if args.markdown:
         write_markdown(args.markdown, funcs, sizes, done, total_b, done_b)
     if args.json:
-        Path(args.json).write_text(json.dumps(make_report(funcs, sizes, done), indent=2) + "\n")
+        libraries = load_libraries(funcs, sizes)
+        Path(args.json).write_text(json.dumps(make_report(funcs, sizes, done, libraries), indent=2) + "\n")
 
 
 def bar(frac, width=30):

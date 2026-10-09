@@ -1,0 +1,25 @@
+addr,name,evidence
+08248634,DMA3Transfer,docs/EEPROM.md exact EEPROM_V124 source
+082486B4,EEPROMRead,docs/EEPROM.md exact EEPROM_V124 source
+08248778,EEPROMWrite,docs/EEPROM.md exact EEPROM_V124 source
+082488D8,EEPROMCompare,docs/EEPROM.md exact EEPROM_V124 source
+08248930,EEPROMWrite1_check,docs/EEPROM.md exact EEPROM_V124 source
+08248E70,SiiRtcSetTime,docs/RTC.md exact 156-byte time-write routine
+08249238,_call_via_r0,Exact linked pinned agbcc _call_via_rX.o; docs/PROGRESS_CI.md
+0824923C,_call_via_r1,Exact linked pinned agbcc _call_via_rX.o; docs/PROGRESS_CI.md
+08249240,_call_via_r2,Exact linked pinned agbcc _call_via_rX.o; docs/PROGRESS_CI.md
+08249244,_call_via_r3,Exact linked pinned agbcc _call_via_rX.o; docs/PROGRESS_CI.md
+08249248,_call_via_r4,Exact linked pinned agbcc _call_via_rX.o; docs/PROGRESS_CI.md
+0824924C,_call_via_r5,Exact linked pinned agbcc _call_via_rX.o; remaining helpers stay within existing progress span
+08249274,__divsi3,Exact linked pinned agbcc _divsi3.o; docs/PROGRESS_CI.md
+08249308,__div0,Exact linked pinned agbcc _dvmd_tls.o; docs/PROGRESS_CI.md
+0824930C,__fixunsdfsi,Exact old_agbcc libgcc2 source; notes/push20-root.md
+08249350,__modsi3,Exact linked pinned agbcc _modsi3.o; docs/PROGRESS_CI.md
+08249420,__udivsi3,Exact linked pinned agbcc _udivsi3.o; docs/PROGRESS_CI.md
+08249498,__umodsi3,Exact linked pinned agbcc _umodsi3.o; docs/PROGRESS_CI.md
+0824AC40,__lshrdi3,Exact libgcc2 source; docs/LIBGCC.md and notes/push20-root.md
+0824AC74,__muldi3,Exact libgcc2 source; docs/LIBGCC.md and notes/push20-root.md
+0824ACE4,__negdi2,Exact libgcc2 source; docs/LIBGCC.md and notes/push20-root.md
+0824DA3C,__errno,docs/LIBM.md independent caller audit
+0824DA48,memcpy,docs/LIBM.md exact pinned agbcc libc source
+0824DAA8,memset,docs/LIBM.md exact pinned agbcc libc source
