@@ -1,6 +1,6 @@
 # Retained candidate source
 
-This branch preserves 519 WIP C files from seven local checkouts, including
+This branch preserves 656 WIP C files from seven local checkouts, including
 alternate attempts and targets already matched. The audited target inventory
 contains 48 accepted matches and 65 unresolved targets; file count is not
 unfinished-function count. `targets.csv` maps the best selected unresolved
@@ -31,3 +31,15 @@ The inherited ignore rule also matches archived `wip/` directories. When
 saving a new candidate here, stage its specific C path explicitly, for example
 `git add -f drafts/retained/wt/push20-integrate/wip/example.c`, and update the
 manifest. Preserve source rather than generated or binary scratch output.
+
+
+## Solo family tranche checkpoint (October 9)
+
+The 137 newly retained C files cover 68 targets, including variants of sources
+already exact on main. The solo tranche merged 46 functions / 7,424 bytes in
+PR #16. `solo-family_2026-10-09.csv` records every new candidate's preserved
+path, original path, hash, target and status. Exact-source status means its
+hash equals accepted production source; other alternates are unaccepted and
+receive no credit. See `notes/solo-family_2026-10-09.md` for the selected
+near-matches, successful recipes and failed hypotheses. Production state is
+synchronized with main; candidate C remains confined to this WIP branch.
