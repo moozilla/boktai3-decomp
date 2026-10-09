@@ -1,0 +1,3 @@
+function,exact_bytes,source,sha256
+sub_0818E3F4,200,src/fn/sub_0818E3F4.c,2e59568ad7222391b0b285e552e5b6c3b9b3b2bb235a7b509d2c96754fc1cc36
+sub_0818E574,112,src/fn/sub_0818E574.c,22dd56e5e4ab8e53cede8bc890cbe6a580ff81b836564ada8512bcf1cb01e51d
