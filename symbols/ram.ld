@@ -41,3 +41,16 @@ gSoundInfo = 0x030054E0;
 gCgbChans = 0x03006520;
 gMPlayMemAccArea = 0x030069E0;
 SoundMainRAM = gUnk_0822F249;       /* ARM routine in ROM, copied to IWRAM (bit 0 cleared by the caller) */
+
+/* Fully linked newlib math calls verify these libgcc helper aliases; docs/LIBM.md. */
+__subdf3 = sub_08249A14;
+__negdf2 = sub_0824A260;
+__floatsidf = sub_0824A170;
+__muldf3 = sub_08249A4C;
+__adddf3 = sub_082499E4;
+__fixdfsi = sub_0824A1EC;
+__gedf2 = sub_0824A08C;
+__eqdf2 = sub_08249FA8;
+__gtdf2 = sub_0824A040;
+__divdf3 = sub_08249CF4;
+__nedf2 = sub_08249FF4;
