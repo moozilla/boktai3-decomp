@@ -14,6 +14,7 @@ set PERMUTER=/path/to/decomp-permuter or clone it next to this repo.
 import argparse
 import os
 import re
+import signal
 import subprocess
 import sys
 
@@ -23,6 +24,9 @@ from romlib import ROOT
 def _find_permuter():
     if os.environ.get("PERMUTER"):
         return os.environ["PERMUTER"]
+    local = os.path.join(ROOT, "build", "tools", "decomp-permuter")
+    if os.path.isdir(local):
+        return local
     # next to the repo, or next to the main checkout when run from ../wt/NAME
     for base in (os.path.dirname(ROOT), os.path.dirname(os.path.dirname(os.path.dirname(ROOT)))):
         p = os.path.join(base, "decomp-permuter")
@@ -49,7 +53,7 @@ def main():
     os.makedirs(d, exist_ok=True)
 
     # base.c: preprocessed, without the top-level asm(".include") pycparser can't parse
-    pre = build.sh(["cpp", "-P", "-nostdinc", "-undef", "-I", "include", "-iquote", ".", src])
+    pre = build.preprocess(src)
     pre = re.sub(r'^\s*asm\s*\(".*?"\);\s*$', "", pre, flags=re.M)
     open(os.path.join(d, "base.c"), "w").write(pre)
     subprocess.run([sys.executable, os.path.join(PERMUTER, "strip_other_fns.py"),
@@ -79,8 +83,23 @@ rm -rf "$T"
     open(os.path.join(d, "settings.toml"), "w").write(f'func_name = "{func}"\ncompiler_type = "gcc"\n')
     print(d)
     if a.run:
-        subprocess.run(["timeout", str(a.run), sys.executable, os.path.join(PERMUTER, "permuter.py"),
-                        d, "-j", str(a.j), "--best-only", "--quiet"])
+        # GNU timeout is not supplied by macOS. Terminate the entire worker
+        # process group so the permuter's compiler children cannot outlive it.
+        proc = subprocess.Popen([sys.executable, os.path.join(PERMUTER, "permuter.py"),
+                                 d, "-j", str(a.j), "--best-only", "--quiet"],
+                                start_new_session=True)
+        try:
+            proc.wait(timeout=a.run)
+        except (subprocess.TimeoutExpired, KeyboardInterrupt):
+            try:
+                os.killpg(proc.pid, signal.SIGTERM)
+            except ProcessLookupError:
+                pass
+            try:
+                proc.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                os.killpg(proc.pid, signal.SIGKILL)
+                proc.wait()
         outs = sorted(x for x in os.listdir(d) if x.startswith("output-"))
         print("\n".join(outs[:5]) if outs else "no improvement found")
 

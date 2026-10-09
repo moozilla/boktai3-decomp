@@ -1,0 +1,38 @@
+name: decomp.dev progress
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test reporting and analysis tools
+        run: |
+          python3 -m unittest discover -s tests/tools -v
+          python3 -m unittest discover -s tests -p 'test_function_context.py' -v
+      - name: Generate ROM-free report
+        run: |
+          mkdir -p progress-report
+          python3 tools/progress.py --json progress-report/report.json --markdown progress-report/PROGRESS.md
+          cat progress-report/PROGRESS.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload Japanese-version report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jp_report
+          path: progress-report/report.json
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 9

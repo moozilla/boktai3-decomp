@@ -1,3 +1,5 @@
+# Transitions have separate marks so tab coverage excludes the next tab.
+# Tab labels verified against screenshots on 2026-10-08; the first tab is valuables.
 # With ShinBok2.sav: continue, every pause-menu tab, then walk/attack in the field
 wait 300
 tap START
@@ -25,18 +27,6 @@ tap R
 mark menu_open
 tap START
 wait 60
-mark menu_items
-wait 30
-tap RIGHT
-tap DOWN
-tap RIGHT
-tap DOWN
-tap LEFT
-tap UP
-wait 20
-shot 01_items
-tap R
-wait 20
 mark menu_valuables
 wait 30
 tap RIGHT
@@ -46,7 +36,8 @@ tap DOWN
 tap LEFT
 tap UP
 wait 20
-shot 02_valuables
+shot 01_valuables
+mark transition_to_gun
 tap R
 wait 20
 mark menu_gun
@@ -58,7 +49,8 @@ tap DOWN
 tap LEFT
 tap UP
 wait 20
-shot 03_gun
+shot 02_gun
+mark transition_to_sword
 tap R
 wait 20
 mark menu_sword
@@ -70,7 +62,8 @@ tap DOWN
 tap LEFT
 tap UP
 wait 20
-shot 04_sword
+shot 03_sword
+mark transition_to_accessory
 tap R
 wait 20
 mark menu_accessory
@@ -82,7 +75,8 @@ tap DOWN
 tap LEFT
 tap UP
 wait 20
-shot 05_accessory
+shot 04_accessory
+mark transition_to_status
 tap R
 wait 20
 mark menu_status
@@ -94,7 +88,8 @@ tap DOWN
 tap LEFT
 tap UP
 wait 20
-shot 06_status
+shot 05_status
+mark transition_to_config
 tap R
 wait 20
 mark menu_config
@@ -106,7 +101,8 @@ tap DOWN
 tap LEFT
 tap UP
 wait 20
-shot 07_config
+shot 06_config
+mark transition_to_sleep
 tap R
 wait 20
 mark menu_sleep
@@ -118,7 +114,8 @@ tap DOWN
 tap LEFT
 tap UP
 wait 20
-shot 08_sleep
+shot 07_sleep
+mark transition_to_save
 tap R
 wait 20
 mark menu_save
@@ -130,7 +127,8 @@ tap DOWN
 tap LEFT
 tap UP
 wait 20
-shot 09_save
+shot 08_save
+mark transition_to_map
 tap R
 wait 20
 mark menu_map
@@ -142,7 +140,21 @@ tap DOWN
 tap LEFT
 tap UP
 wait 20
-shot 10_map
+shot 09_map
+mark transition_to_items
+tap R
+wait 20
+mark menu_items
+wait 30
+tap RIGHT
+tap DOWN
+tap RIGHT
+tap DOWN
+tap LEFT
+tap UP
+wait 20
+shot 10_items
+mark transition_to_close
 tap R
 wait 20
 mark menu_close

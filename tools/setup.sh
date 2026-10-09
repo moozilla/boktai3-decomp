@@ -5,6 +5,7 @@
 #   pip install capstone
 set -e
 cd "$(dirname "$0")/.."
+ROOT=$(pwd)
 mkdir -p build/tools
 cd build/tools
 
@@ -16,8 +17,13 @@ fetch() { # name url commit
 
 # gbadisasm (pret lineage): recursive-descent disassembler emitting reassemblable GNU as
 fetch gbadisasm https://github.com/jiangzhengwenjz/gbadisasm.git 940def2c91d678ee671716b8b44a2223c0ff2c62
-git -C gbadisasm apply --check ../../tools/patches/gbadisasm-no-assert.patch 2>/dev/null && \
-    git -C gbadisasm apply ../../tools/patches/gbadisasm-no-assert.patch
+PATCH="$ROOT/tools/patches/gbadisasm-no-assert.patch"
+if git -C gbadisasm apply --check "$PATCH" 2>/dev/null; then
+    git -C gbadisasm apply "$PATCH"
+else
+    # An already-applied patch is fine; an incompatible source tree is not.
+    git -C gbadisasm apply --reverse --check "$PATCH"
+fi
 make -s -C gbadisasm
 
 # agbcc: the GCC 2.95-based compiler used by agbcc-era GBA games (matching decomp)
@@ -28,6 +34,9 @@ fetch agbcc https://github.com/pret/agbcc.git da598c1d918402c42c0c0d7128ba14567f
 fetch armips https://github.com/Kingcom/armips.git 62adab4ef30da765f5cf22a451eb08a59c54dc8b
 git -C armips submodule update -q --init --recursive
 [ -x armips/build/armips ] || (mkdir -p armips/build && cd armips/build && cmake -DCMAKE_BUILD_TYPE=Release .. >/dev/null && make -s)
+
+# Optional matching search; its parser is bundled, and Python needs toml.
+fetch decomp-permuter https://github.com/simonlindholm/decomp-permuter.git 8556c81d80d1c1af98a858c8f4dc951357f29139
 
 # mGBA harness
 make -s -C ../../tools/emu
