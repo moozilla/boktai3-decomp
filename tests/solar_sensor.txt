@@ -1,0 +1,64 @@
+# With ShinBok2.sav: observe the cartridge sensor under controlled light.
+# No RAM pokes; register probes and snapshots only. See docs/SOLAR_SENSOR.md.
+# The lux command supplies a raw sensor threshold, not physical lux.
+trace off
+# Transitions have separate marks so tab coverage excludes the next tab.
+# Tab labels verified against screenshots on 2026-10-08; the first tab is valuables.
+# With ShinBok2.sav: continue, every pause-menu tab, then walk/attack in the field
+wait 300
+tap START
+wait 60
+tap A
+wait 150
+tap START
+wait 120
+tap A
+wait 120
+tap START
+wait 300
+tap START
+wait 120
+tap START
+wait 120
+tap A
+wait 150
+tap A
+wait 300
+
+lux 20
+wait 120
+mark sensor_20
+dump sensor_20 03006A30:20
+dump state_20 030035B0:14
+probe solar_sample 08243DD4
+wait 24
+unprobe
+
+lux 80
+wait 120
+mark sensor_80
+dump sensor_80 03006A30:20
+dump state_80 030035B0:14
+probe solar_sample 08243DD4
+wait 24
+unprobe
+
+lux 180
+wait 120
+mark sensor_180
+dump sensor_180 03006A30:20
+dump state_180 030035B0:14
+probe solar_sample 08243DD4
+wait 24
+unprobe
+
+lux 232
+wait 120
+mark sensor_232
+dump sensor_232 03006A30:20
+dump state_232 030035B0:14
+probe solar_sample 08243DD4
+wait 24
+unprobe
+
+shot solar_field

@@ -289,3 +289,38 @@ The user extended the allowance floor to below **35% weekly remaining**. Three
 Sol matching rounds were authorized at 41% remaining. Keep checking before new
 assignments and finish only the in-flight work once below that floor. Live
 browser verification of decomp.dev is no longer requested.
+
+## Production batch 6 and allowance stop
+
+Base `ed9805e`. All workers are Sol 6.1; no further model-comparison experiment
+was started. This batch adds **34 functions / 4,812 code bytes**.
+
+| Work | New functions | Emitted / progress bytes | Matching interval |
+|---|---:|---:|---|
+| Sol round 6 | 9 | 932 | 14.10 min |
+| Sol short follow-up | 1 | 96 | 1.41 min |
+| Sol family round 5 | 9 | 1,608 | 13m02s |
+| Sol family final round 6 | 4 | 328 | 3m41s |
+| Sol MGS round 6 | 7 | 1,236 | about 12 min |
+| Sol MGS round 7 | 0 | 0 | 5m23s |
+| Root solar timer/IRQ plus teardown | 4 | 612 | interleaved with orchestration |
+
+Three reviewed unmatched Thumb boundaries remove 340 trailing assembly bytes
+from these functions' spans. This is an accounting correction, not new C.
+The result is **4,625 / 11,068 functions; 296,658 / 2,415,354 bytes (12.282%)**.
+The final short follow-ups were assigned at 37%/36% weekly allowance remaining.
+When the meter reached 35%, no new assignments or targets were started; existing
+work was drained and integrated. It read 34% during final integration. No Luna
+or Astra matching workers were resumed, and no reset credit was consumed.
+
+Across the sustained goal from `e2546f6`, 422 functions and 71,970 progress bytes
+were added (9.302% to 12.282%). Account allowance went from 73% to 34% during the
+run, including concurrent research, tooling, documentation and integration.
+There is still no defensible per-model usage attribution or Pareto frontier.
+The largest recent gains came from exact historical library/source reuse.
+All dedicated MGS rounds together yielded 50 matches / 7,024 emitted bytes.
+
+The solar experiment adds architectural evidence beyond matching: four light
+inputs, eight memory snapshots, result-store probes and a verified outdoor
+screenshot. The standard local harness now reproduces the corrected probe
+behavior. See `docs/SOLAR_SENSOR.md` and `notes/root-batch6.md`.

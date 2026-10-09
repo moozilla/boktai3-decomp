@@ -183,3 +183,8 @@ ordinary register differences alone do not. See `docs/LIBGCC.md`.
 * **Audit permuter source changes**, including low-score outputs. Reject
   uninitialized reads and changes to distinct pointer lifetimes even if the
   assembly score improves. MGS round 5 found both; see `docs/MGS_GCL_MATCHING.md`.
+
+* **A zero permuter score is not an exact match.** Sol round 6 found an
+  unconditional branch-target difference with score zero. Only `check.py`
+  resolved-byte equality and the complete ROM build establish acceptance;
+  see `notes/round6-sol.md`.
