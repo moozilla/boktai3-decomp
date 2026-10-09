@@ -17,7 +17,7 @@ void sub_081C6498(u8 *s)
     p=sub_0821A520(bank,0xE2AB);
     *(struct Blob *)(s+0x38)=*p;
     sub_082196C4(s+0x38,p);
-    sub_0821983C(s+0x58,first,0,0x10,1,zero=0,sixty=0x3C,zero);
+    sub_0821983C(s+0x58,first,0,0x10,1,zero=0,sixty=0x3C,0);
     sub_0821983C(s+0xB8,first,0,0x10,2,zero,sixty,zero);
     {
         u32 loopzero=0;
