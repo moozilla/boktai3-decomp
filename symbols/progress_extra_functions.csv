@@ -1,7 +1,12 @@
 address,evidence
+0802CED0,Independent 40-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md
+0802CEF8,Independent 24-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md
 081B61E0,Separate 100-byte Thumb body with own push/call/control flow/pop-bx after 081B6180 returns; retained unmatched code; notes/root-batch6.md
 0821E0D0,Separate 52-byte Thumb function with own prologue/conditional return after E040 returns; retained unmatched code; docs/MGS_GCL_MATCHING.md
 0821E2F8,Separate 188-byte Thumb function with own prologue/calls/copy loops/return after E190 returns; retained unmatched code; docs/MGS_GCL_MATCHING.md
+08227F3C,Independent 16-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md
+08227F4C,Independent 12-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md
+08227F58,Independent 4-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md
 08229424,Independent 28-byte Thumb body after predecessor return; exact standalone check; notes/push20-root.md
 0822FE18,Empty SDK function defined in src/lib/m4a.c; native full-ROM SHA-1 verified 2026-10-08; gbadisasm emits an incbin inside MidiKeyToFreq's span
 08230050,MPlayContinue loop over music players in src/lib/m4a.c; native full-ROM SHA-1 verified 2026-10-08; separate C entry within the preceding disassembly span
