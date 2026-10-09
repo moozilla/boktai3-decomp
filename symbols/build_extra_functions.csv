@@ -1,0 +1,11 @@
+address,isa,evidence
+08244A38,arm,IntrSIO32: exact compiled RFU_V1024 source; docs/RFU.md
+08244A9C,arm,sio32intr_clock_master: exact compiled RFU_V1024 source; docs/RFU.md
+08244D2C,arm,sio32intr_clock_slave: exact compiled RFU_V1024 source; docs/RFU.md
+08245138,arm,handshake_wait: exact compiled RFU_V1024 source; docs/RFU.md
+082451A0,arm,STWI_set_timer_in_RAM: exact compiled RFU_V1024 source; docs/RFU.md
+082452B0,arm,STWI_stop_timer_in_RAM: exact compiled RFU_V1024 source; docs/RFU.md
+08245300,arm,STWI_init_slave: exact compiled RFU_V1024 source; docs/RFU.md
+0824538C,arm,Existing bx r2 callback trampoline; retained assembly; docs/RFU.md
+08245390,arm,Existing bx r1 callback trampoline; retained assembly; docs/RFU.md
+08245394,arm,Existing bx r0 callback trampoline; retained assembly; docs/RFU.md
