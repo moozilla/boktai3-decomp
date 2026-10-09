@@ -6,7 +6,7 @@ struct State {
 };
 extern struct State gUnk_03005430;
 void sub_082286E0(s32 *, s32 *, s32 *, s32);
-void Time_CalculateSunriseSunsetCore(s32, s32, s32, double, double, s32);
+u32 Time_CalculateSunriseSunsetCore(s32, s32, s32, double, double, s32);
 
 u32 Time_CalculateSunriseSunset(s32 a, s32 b, s32 c)
 {
