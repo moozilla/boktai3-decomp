@@ -11,6 +11,7 @@ import argparse
 import hashlib
 import os
 import re
+import shlex
 import subprocess
 import sys
 
@@ -21,6 +22,7 @@ AGBCC = os.environ.get("AGBCC", os.path.join(TOOLS, "agbcc", "agbcc"))
 AGBCC_INC = os.path.join(os.path.dirname(AGBCC), "ginclude")
 AS = ["arm-none-eabi-as", "-mcpu=arm7tdmi", "-mthumb-interwork", "--no-warn"]
 CFLAGS = ["-O2", "-mthumb-interwork", "-fhex-asm"]
+CPP = shlex.split(os.environ.get("CPP", "cc -E" if sys.platform == "darwin" else "cpp"))
 
 
 def sh(cmd, **kw):
@@ -29,6 +31,12 @@ def sh(cmd, **kw):
         sys.stderr.write(r.stdout + r.stderr)
         sys.exit(f"failed: {' '.join(cmd) if isinstance(cmd, list) else cmd}")
     return r.stdout
+
+
+def preprocess(src):
+    # macOS /usr/bin/cpp is a legacy shell wrapper which mishandles separated
+    # include arguments. The compiler driver provides the same preprocessing.
+    return sh(CPP + ["-P", "-nostdinc", "-undef", "-I", "include", "-iquote", ".", src])
 
 
 def stamp_ok(obj, key):
@@ -79,10 +87,10 @@ def build_c(src, obj):
     # per-file flags: a line "// CFLAGS: -O2 ..." replaces the default flags
     m = re.search(r"^// CFLAGS: (.*)$", open(os.path.join(ROOT, src)).read(), re.M)
     cflags = m.group(1).split() + ["-fhex-asm"] if m else CFLAGS
-    key = file_hash(*deps, "tools/build.py", extra=" ".join(cflags))
+    key = file_hash(*deps, "tools/build.py", extra=" ".join(CPP + cflags))
     if stamp_ok(os.path.join(ROOT, obj), key):
         return
-    pre = sh(["cpp", "-P", "-nostdinc", "-undef", "-I", "include", "-iquote", ".", src])
+    pre = preprocess(src)
     asm = subprocess.run([AGBCC] + cflags + ["-o", "-"], input=pre, cwd=ROOT,
                          capture_output=True, text=True)
     if asm.returncode or "error" in asm.stderr:

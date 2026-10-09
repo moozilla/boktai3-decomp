@@ -1,0 +1,4 @@
+address,evidence
+0822FE18,"Empty SDK function defined in src/lib/m4a.c; native full-ROM SHA-1 verified 2026-10-08; gbadisasm emits an incbin inside MidiKeyToFreq's span"
+08230050,"MPlayContinue loop over music players in src/lib/m4a.c; native full-ROM SHA-1 verified 2026-10-08; separate C entry within the preceding disassembly span"
+0823025C,"Existing SDK swi 0x2A stub in src/lib/m4a.c; native full-ROM SHA-1 verified 2026-10-08; separate C entry within the preceding disassembly span"

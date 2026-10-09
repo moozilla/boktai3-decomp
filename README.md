@@ -35,7 +35,9 @@ You need your own copy of the ROM:
 baserom.gba   SHA-1 2651c5e6875ac60abff734510d152166d211c87c
 ```
 
-Put it (or a symlink) at `decomp/baserom.gba`, or set `BOKTAI3_ROM`.
+Put it (or a symlink) at `baserom.gba` in this repository's root.
+`BOKTAI3_ROM` also selects the input for the ROM-reading Python tools, but the
+assembler and regression scripts expect the root-level file or symlink.
 Nothing derived from the ROM is committed: generated assembly lives in `gen/`
 and build output in `build/`, and both are gitignored. See
 [THIRD_PARTY.md](THIRD_PARTY.md) for what comes from elsewhere. Our own code is
@@ -46,8 +48,28 @@ System packages (Debian/Ubuntu):
 ```
 apt install build-essential cmake binutils-arm-none-eabi libmgba-dev python3-numpy python3-pil
 pip install capstone
-make setup          # fetches + builds pinned gbadisasm, agbcc, armips, and the mGBA harness
+make setup          # pinned gbadisasm, agbcc, armips, permuter, and mGBA harness
 ```
+
+On macOS with Homebrew and the Xcode Command Line Tools installed:
+
+```sh
+brew install cmake arm-none-eabi-binutils mgba python
+python3 -m venv build/venv
+source build/venv/bin/activate
+python -m pip install -r requirements.txt
+make setup
+make disasm
+make
+```
+
+Activate `build/venv` in each new shell before using the Python tools. The
+harness Makefile detects Homebrew's mGBA headers and library on macOS; set
+`MGBA_PREFIX` if it lives elsewhere. All third-party source and build products
+stay under the ignored `build/` directory.
+
+For ROM-free GitHub Actions reporting and decomp.dev registration, see
+[docs/PROGRESS_CI.md](docs/PROGRESS_CI.md).
 
 ## Building
 

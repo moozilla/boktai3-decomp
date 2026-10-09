@@ -34,7 +34,8 @@ INCLUDE_ASM = re.compile(r'INCLUDE_ASM\(\s*"[^"]*"\s*,\s*(\w+)\s*\)')
 def c_functions(path, with_asm=True):
     """Functions a C unit covers, in file order: C definitions plus
     INCLUDE_ASM(dir, name) placeholders (unless with_asm=False)."""
-    raw = open(path).read()
+    with open(path) as source:
+        raw = source.read()
     src = raw
     # "#define Name sub_XXXXXXXX" aliases a known name to its address label
     alias = dict(re.findall(r"^#define\s+(\w+)\s+(sub_[0-9A-F]{8})\s*$", raw, re.M))
