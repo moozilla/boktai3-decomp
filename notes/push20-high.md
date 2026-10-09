@@ -2,7 +2,7 @@
 
 Worktree: `/Users/benjaminharris/git/wt/push20-high`, branch `codex/push20-high`, base `5ff44e3`.
 
-33 byte-identical functions, 5640 emitted bytes. Every source passed `tools/check.py`; accepted batches passed full `tools/build.py` before separate one-TU commits. No naming or data changes. Parent owns integration and shift regression. Final build log: `build/high-final-build.txt`.
+41 byte-identical functions, 6604 emitted bytes. Every source passed `tools/check.py`; accepted batches passed full `tools/build.py` before separate one-TU commits. No naming or data changes. Parent owns integration and shift regression. Final build log: `build/high-last-pass-build.txt`.
 
 | Function | Emitted bytes |
 | --- | ---: |
@@ -29,6 +29,14 @@ Worktree: `/Users/benjaminharris/git/wt/push20-high`, branch `codex/push20-high`
 | 08227ECC | 112 |
 | 08228508 | 64 |
 | 0822867C | 100 |
+| 0822B1D8 | 88 |
+| 0822B298 | 96 |
+| 0822BC6C | 120 |
+| 0822C0CC | 68 |
+| 0822C3B8 | 76 |
+| 0822C404 | 212 |
+| 0822C824 | 180 |
+| 0822ED7C | 124 |
 | 082286E0 | 108 |
 | 0822874C | 204 |
 | 08228848 | 224 |
@@ -71,3 +79,23 @@ Boundary coordination:
 - Parent owns29440–2B13C,4930C,00A10, and>=49558. No overlap.
 
 Tooling: a standalone check can race the final ELF rewrite of a full build and report a readelf magic-number failure. Such checks were rerun after build completion; they were never treated as match evidence. All build outputs were private; shared generation/environment/tools were read-only.
+
+
+## Authorized eight-minute follow-up wave
+
+Two additional exact audio wrappers:0822B1D8 (88B),0822B298 (96B),184 emitted bytes total. Worker total is35 functions/5824 emitted bytes. Both use the existing MP2K song/music-player structures and labels. Explicitly loading the active song into a local before the conditional fixed the otherwise exact register assignments. B180 was already tracked and matched; the redundant draft was restored and contributes no new bytes.
+
+Wave started05:46:22 UTC. Meter at05:50:18 UTC remained23%; no resets were used. Final wave build log is `build/high-wave-final-build.txt`. No new searches or permuter runs.
+
+Fresh retained WIP: B6C8 slot initializer192B versus152B, incoming-register/stack-lifetime misses after three drafts; B7E4 finder176B versus168B with incoming-register/stack-lifetime misses after two drafts; B5FC64B versus68B branch/literal-island layout after one draft. No repeat of prior near-matches. Hidden B760 appears to be a40-byte wrapper before B788; sent parent for optional later boundary review, no metadata edited here.
+
+
+## Bounded final pass
+
+Six fresh exact functions, 780 emitted bytes: BC6C120, C0CC68, C3B876, C404212, C824180, ED7C124. Worker cumulative total41 functions/6604 emitted bytes. Started05:59:05 UTC; accepted queue closed before the ten-minute limit. One batched complete build, no permuter, no broad regression tests.
+
+C3B8 timestamp stores, BC6C read wrapper, C0CC object factory, and ED7C snapshot wrapper matched first draft. C404 matched after using one common success exit, preserving branch and literal-pool placement. C824 matched with ordinary byte-pointer field addressing, which retains the global pointer reload after writing the halfword. BC6C uses the existing ED64 integer size result, rather than interpreting it as a buffer pointer.
+
+Fresh loose clone passes returned0 ports. Retained WIP: BBD8 reached148B with only two narrowed shifts using r0 instead of r4 (three checks); D080 reached72B with global/address scratch-register differences (three checks); B968120B conditional join/register differences (two checks); EDF8 differs only epilogue register but its final callee is declared void, so no return-value semantics were invented (two checks); EE68216B EEPROM write/compare/checksum wrapper differs in high-register allocation and accumulation order (one check). No known misses were retried.
+
+C0CC emits only68B, ending0822C110 before the existing raw tail; no boundary files were edited. Final build log `build/high-last-pass-build.txt`.

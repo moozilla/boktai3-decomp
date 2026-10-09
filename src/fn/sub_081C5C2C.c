@@ -25,7 +25,7 @@ void sub_081C5C2C(u8 *s)
     *(struct Blob *)(s+0x18)=*p;
     last=(struct Blob *)(s+0x18);
     sub_082196C4(last,p);
-    sub_0821983C(s+0x258,last,0x8A,0x10,zero=0,zero,sixty=0x3C,zero);
+    sub_0821983C(s+0x258,last,0x8A,0x10,zero=0,0,sixty=0x3C,0);
     dst=(u16 *)(s+0x27A);
     bits=0xFFE8;
     *dst=bits;
