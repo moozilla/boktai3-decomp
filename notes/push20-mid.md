@@ -121,3 +121,23 @@ improve the 700-byte draft; retained safe best, no source promotion.
 
 Final complete build after focused WIP work: `build/full-final-focused.txt`
 printed `build/boktai3.gba: OK`; accepted sources unchanged.
+
+## Final fresh pass (2026-10-09)
+
+Three additional exact matches from six standalone checks, two drafts per
+candidate, no search or regression suite. All native spans end at the next
+complete prologue; sources were absent from every existing translation unit.
+
+| Function | Emitted bytes | Evidence / successful adjustment |
+| --- | ---: | --- |
+| 081C6498 | 216 | Two 32-byte resource copies, two object calls and six-element setup loop. A distinct loop-zero lifetime fixes preserved-register allocation. Span ends 081C6570. |
+| 081E27A8 | 240 | Four script keyword checks and resource/palette setup. Distinct resource locals remove unnecessary copies. Span ends 081E2898. |
+| 081E2DA0 | 220 | Resource setup, two flag masks, and three nested 16-halfword copy loops. Initialize mask before reading flags; separate next-index local preserves the outer loop's precomputed increment. Span ends 081E2E7C. |
+
+Final-pass diffs are `build/check-final-c6498-v2.txt`,
+`check-final-e27a8-v2.txt`, and `check-final-e2da0-v2.txt` (all MATCH).
+The one batched complete build is `build/full-final-pass.txt`.
+Cumulative accepted worker snapshot: 26 functions / 5,500 emitted bytes.
+
+The batched full build printed `build/boktai3.gba: OK` before all three
+separate translation-unit commits. No sources changed after validation.
