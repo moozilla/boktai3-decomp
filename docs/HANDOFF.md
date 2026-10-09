@@ -1,19 +1,57 @@
 # Handoff: state of the project and how to continue
 
-Last updated after production batch 6 (2026-10-08 Pacific /
+Last updated after the four-batch matching follow-up and closeout (2026-10-08 Pacific /
 2026-10-09 UTC). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
+
+The [October 8 devlog](DEVLOG_2026-10-08.md) summarizes the session's technical
+results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
+allowance and local per-response token records. It corrects the pilot's
+reasoning-setting claim and identifies the Astra main thread as the dominant
+published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
 ## 1. Where things stand
 
 | | |
 |---|---|
-| Matched C | **4,625 / 11,068 functions (41.79%)**, 296,658 / 2,415,354 code bytes (12.282%; `PROGRESS.md`) |
+| Matched C | **4,741 / 11,080 functions (42.79%)**, 319,366 / 2,415,354 code bytes (13.222%; `PROGRESS.md`) |
 | Build | `make` / `python3 tools/build.py` rebuilds the ROM **bit-identical** (SHA-1 `2651c5e6875ac60abff734510d152166d211c87c`) |
 | Shiftable | all data relocatable; `make shifttest` (3 scenarios, 35 screenshots) passes |
 | Code layout | `src/fn/sub_XXXXXXXX.c`, one function per file; `src/lib/m4a.c` (MP2K sound, 57/58) |
 | Names | still mostly `sub_XXXXXXXX`; first evidence-based pause-menu leads in `docs/MENU_CONTEXT.md` |
+
+The latest source integration is `8c2c818` (PR #12). The subsequent matching
+follow-up added **116 functions / 22,708 progress bytes** from `5ff44e3`, across
+PRs #9–#12. Every accepted source is integrated; there is no pending matching
+batch. The final original-ROM build printed `build/boktai3.gba: OK`, all 35
+shifted-data screenshots matched, and the main Progress Action succeeded.
+See [the matching report](PUSH20_2026-10-08.md) for individual batches.
+
+**Current limit: preserve at least 20% remaining plan usage.** This supersedes
+the historical 35%/40%/50% limits recorded below. The meter reached 20% and
+matching stopped; the 20% code target remains unmet, requiring **163,705 more
+matched bytes**. All workers have completed. The final Astra escalation stopped
+at its usage gate before any drafts, checks, builds or commits. The user then
+authorized documentation closeout and pushing, with no new agents. Do not
+restart matching without fresh allowance or an explicit change to the floor.
+
+Sol 6.1 at high reasoning was the follow-up workhorse; bounded Astra-low attempts
+were used only after Sol blockers. No per-model subscription-cost attribution
+is available for this follow-up. The retrospective documents the poor byte yield
+and why tiny repeated rounds should not be the next operating policy.
+
+Nonmatching drafts stay ignored in isolated local checkouts. The final Sol
+candidate is `../wt/push20-high-last/wip/large-last/sub_0811FDB4.c`: 300 emitted
+bytes with ordering/register differences after three drafts; the following
+488-byte raw tail is a separate body and must not be credited to it. Parent
+35000 and BD58 drafts remain under `../wt/push20-integrate/wip/batch4/`;
+both still differ. Earlier worker and Astra WIP remains preserved in the
+`push20-high`, `push20-mid`, `push20-low` and `push20-astra-motion` checkouts.
+These local drafts are evidence for future attempts, not accepted source.
+
+Historical run details follow; their meter limits and counts describe earlier
+stages rather than the current state.
 
 Why bytes trail functions: workers go easiest-first. ~7,000 functions remain;
 most small ones (<=40 insns) are done in most ranges, so the frontier is the
@@ -122,7 +160,7 @@ four emulator threshold inputs give measured results within one count, with
 identical snapshots/probes in the original and rebuilt ROMs. The standard
 `tools/emu/harness` has now been rebuilt with the corrected probe source.
 
-**Matching is stopped at the user's allowance limit.** The meter reached 35%
+**The earlier run stopped at its allowance limit.** The meter reached 35%
 remaining, no further assignments began, and all in-flight work was finished;
 it showed 34% while integrating the final batch. The final combined ROM
 SHA-1, all 35 shifted-data screenshots and all 36 tool/context tests pass. All three Sol workers are
