@@ -1,6 +1,6 @@
 # Math-library source matches
 
-Twenty additional native functions, **11,216 compiled bytes**, match the
+Twenty-two additional native functions, **11,584 compiled bytes**, match the
 Sun fdlibm implementation distributed in
 [newlib 1.8.2](https://sourceware.org/pub/newlib/newlib-1.8.2.tar.gz) with
 `old_agbcc -O2 -fno-builtin`. Each adapted translation unit was linked at its
@@ -21,6 +21,8 @@ These files retain that license rather than becoming project-authored MIT code.
 | `0824B120` | `fabs` | 24 |
 | `0824B138` | `sin` | 180 |
 | `0824B1EC` | `tan` | 112 |
+| `0824B25C` | `acos` wrapper | 184 |
+| `0824B314` | `asin` wrapper | 184 |
 | `0824B3CC` | `fmod` wrapper | 208 |
 | `0824B49C` | `__ieee754_acos` | 1,384 |
 | `0824BA04` | `__ieee754_asin` | 1,240 |
@@ -49,6 +51,8 @@ found five signatures: scalbn, copysign, isnan, memcpy and memset. The bundled
 libc contains only a subset of the math library. A broader scan of the older
 fdlibm sources found the larger kernels above. Relocation-masked signatures
 served only as candidates; fully linked equality was required afterward.
+The acos/asin wrappers each had two masked hits. Resolving their distinct
+core calls and name strings disambiguated them; both complete objects match.
 
 The initial broader source was the Chromium newlib mirror at
 `5feee65e182c08a7e89fbffc3223c57e4335420f`. Its `e_asin.c` did not match.
