@@ -1,0 +1,50 @@
+#include "global.h"
+extern u8 gUnk_03004FC0[];
+void sub_082156B8(u32);
+void sub_0821656C(u32,u32,u32,u32,u32);
+void *sub_0821A520(u32,u32);
+void sub_082161B4(u32,u32,void *,u32,u32,u32,u32 *);
+void sub_082196C4(u8 *,void *);
+void sub_0821983C(u8 *,u8 *,u32,u32,u32,u32,u32,u32);
+u32 sub_081DC1B4(u32);
+void sub_081E0818(u8 *);
+u32 sub_081EC204(u8 *s)
+{
+    u32 zero;
+    u32 value;
+    u32 bank;
+    u32 size;
+    void *a;
+    void *p;
+    void *q;
+    u32 old;
+    u8 *obj;
+    u8 *obj2;
+    u8 *obj3;
+    u32 *ptr;
+    u32 *save;
+    u8 *dest;
+    sub_082156B8(0);
+    zero=0;
+    sub_0821656C(0,0,0,0,zero);
+    sub_082156B8(2);
+    sub_0821656C(2,0,0,0,zero);
+    sub_082156B8(3);
+    a=sub_0821A520(0xC091,0x3536);
+    value=11;
+    sub_082161B4(2,0,a,0,zero,1,&value);
+    sub_0821656C(3,0,0,0,zero);
+    p=(u8 *)sub_0821A520(0x92B3,0x204)+0x14;
+    CpuSet(p,gUnk_03004FC0,size=0x100);
+    bank=0xCB05;
+    q=sub_0821A520(bank,0xE2AB);
+    obj=s+0x78;
+    sub_082196C4(obj,q);
+    sub_0821983C(s+0x18,obj,0x3C,0x10,zero,zero,zero,zero);
+    q=sub_0821A520(bank,0x530D);
+    obj2=s+size;
+    sub_082196C4(obj2,q);
+    sub_0821983C(s+0xA0,obj2,0x80,0x10,zero,zero,zero,zero);
+    *(u32 *)(s+0x134)=3;
+    return sub_081DC1B4(3);
+}
