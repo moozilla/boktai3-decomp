@@ -113,3 +113,39 @@ Local audit evidence lives in each managed `match-{luna,sol,astra}-pilot`
 worktree under `build/benchmark/`: `results.json`, `timing.json`, `checks.jsonl`
 and per-check transcripts. Candidate source and assembly transcripts remain
 local; they are not progress artifacts uploaded by CI.
+
+## Production round 1 (2026-10-08)
+
+Workers started from `540daab` on disjoint ranges. Existing matched source,
+template adaptation and clone porting were allowed. These results test the
+orchestration workflow; they are not another paired model benchmark.
+
+| Worker | Address range | New matches | Emitted bytes | Automatic ports |
+|---|---|---:|---:|---:|
+| Luna A | `08002000–080A0000` | 15 | 960 | 0 |
+| Luna B, including continuation | `080A0000–08170000` | 11 | 640 | 1 |
+| Sol 6.1, including thunk follow-up | `08170000–0822F248` | 26 | 2,032 | 10 |
+| Total | | **52** | **3,632** | **11** |
+
+The progress-span increase is **3,704 bytes**, including retained intervening
+bytes, bringing the repository to **4,203 / 11,028 functions** and
+**224,688 / 2,415,354 code bytes (9.302%)**. One Luna B rewrite of an already
+matched function was rejected during integration and earns no credit.
+
+Luna A logged 42 candidate checks over 22 targets and finished in 11m41s,
+including builds. Sol's initial 25-function round logged 251 checks over 54
+targets, including automated template trials, and finished in 11m39s. Its thunk
+follow-up added another match. Luna B's first-pass elapsed estimate was not
+reliable; its separately timestamped five-function continuation took 3m09s.
+Do not compare these heterogeneous times as model speed or plan efficiency.
+
+The Luna results justify continuing bounded production batches. Require an
+unmatched-target check before drafting, explicit retry/stop rules, and retained
+near-matches. Family templates were effective for all workers. Sol remains a
+useful default for harder functions and diagnosing toolchain blockers; no Astra
+worker was needed in this round. Per-model usage cost remains unmeasured.
+
+Compiler references led to concrete permuter fixes, described in
+`docs/COMPILER_REFERENCES.md`. The corrected tool preserved a difficult loop
+candidate and scored it appropriately, but a 60-second trial found no new
+match; none of this round's matching credit comes from permutation search.
