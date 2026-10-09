@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated during production batch 5 (2026-10-08 Pacific /
+Last updated after production batch 6 (2026-10-08 Pacific /
 2026-10-09 UTC). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
@@ -9,7 +9,7 @@ another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
 | | |
 |---|---|
-| Matched C | **4,591 / 11,065 functions (41.49%)**, 291,846 / 2,415,354 code bytes (12.083%; `PROGRESS.md`) |
+| Matched C | **4,625 / 11,068 functions (41.79%)**, 296,658 / 2,415,354 code bytes (12.282%; `PROGRESS.md`) |
 | Build | `make` / `python3 tools/build.py` rebuilds the ROM **bit-identical** (SHA-1 `2651c5e6875ac60abff734510d152166d211c87c`) |
 | Shiftable | all data relocatable; `make shifttest` (3 scenarios, 35 screenshots) passes |
 | Code layout | `src/fn/sub_XXXXXXXX.c`, one function per file; `src/lib/m4a.c` (MP2K sound, 57/58) |
@@ -111,6 +111,26 @@ The complete combined ROM is byte-identical; all 35 shift screenshots and
 The user extended the floor again to **35% weekly allowance remaining**. This
 supersedes older 40%/50% instructions; finish existing work after crossing it.
 Do not recheck the live decomp.dev page; local reports and Actions suffice.
+
+Production batch 6 adds **34 functions / 4,812 code bytes**: Sol round 6 and
+short follow-up (10), Sol family rounds 5–6 (13), MGS round 6 (7), and root's
+solar timer/IRQ routines plus teardown helper (4). MGS round 7 adds evidence
+without new matches. Three independently reviewed retained Thumb entries
+(081B61E0, 0821E0D0, 0821E2F8) exclude 340 assembly bytes from the new matches'
+progress spans. `docs/SOLAR_SENSOR.md` maps the low-level sensor API and RAM:
+four emulator threshold inputs give measured results within one count, with
+identical snapshots/probes in the original and rebuilt ROMs. The standard
+`tools/emu/harness` has now been rebuilt with the corrected probe source.
+
+**Matching is stopped at the user's allowance limit.** The meter reached 35%
+remaining, no further assignments began, and all in-flight work was finished;
+it showed 34% while integrating the final batch. The final combined ROM
+SHA-1, all 35 shifted-data screenshots and all 36 tool/context tests pass. All three Sol workers are
+idle with committed work integrated and ignored WIP preserved in their isolated
+checkouts. The sustained run from `e2546f6` added **422 functions / 71,970 code
+bytes**, advancing 9.302% to 12.282%; it stopped on allowance, before 20% code.
+Across all dedicated MGS rounds, 50 functions / 7,024 emitted bytes matched,
+with complete evidence and remaining targets in `docs/MGS_GCL_MATCHING.md`.
 
 The new `docs/SCRIPT_TRACING.md` records 698 native calls and 90 actor callbacks
 from the intro, verified against command tables and the 722-entry actor registry.

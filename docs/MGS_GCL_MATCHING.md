@@ -1065,3 +1065,15 @@ The unchanged matching tree completed `tools/build.py` with
 `build/boktai3.gba: OK` before this documentation-only commit. Parent performs
 combined runtime regression; no screenshots, push, PR, shared-gen changes
 or new semantic symbols were produced.
+
+## Final integration boundary audit
+
+The orchestrator compared emitted symbol sizes with progress spans. Two
+independent Thumb bodies remain inside the generated assembly tails:
+`0821E0D0–0821E104` (52 bytes) and `0821E2F8–0821E3B4` (188 bytes).
+Both begin after the matched predecessor's return, have their own saved-register
+prologue, conditional body and return; the larger body also has calls and
+record-copy loops. They remain unmatched assembly, with explicit reviewed
+progress boundaries. Thus E040 receives 144 bytes and E190 receives 360,
+not the additional 240 retained bytes. No shared disassembly was rewritten
+and no semantic names or matching credit were assigned to these new entries.
