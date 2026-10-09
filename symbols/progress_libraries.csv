@@ -1,0 +1,9 @@
+name,start,end,name_files,evidence
+MP2K (m4a),0822F1B4,08231448,symbols/proposed/m4a.csv,src/lib/m4a.c source aliases; docs/ROM_MAP.md mixer; includes existing final function span up to next inventory start
+RFU SDK 1024,08243EFC,08248590,symbols/proposed/rfu.csv,docs/RFU.md contiguous STWI/ARM interrupt/RFU/SIO32 units; includes three unmatched callback trampolines
+libagbsyscall,08248590,082485EC,,symbols/functions.csv BIOS syscall identifications; final VBlankIntrWait progress span ends at next inventory start
+EEPROM SDK V124,082485EC,08248970,symbols/progress_library_names.csv,docs/EEPROM.md; configuration and write-one wrappers in src/fn/sub_082485EC.c and sub_08248764.c
+SIIRTC,08248970,08249238,symbols/proposed/rtc.csv;symbols/progress_library_names.csv,docs/RTC.md; unmatched alarm retained with address label
+libgcc runtime,08249238,0824ACFC,symbols/proposed/libgcc.csv;symbols/progress_library_names.csv,docs/LIBGCC.md; docs/PROGRESS_CI.md exact linked lib1thumb helper identification
+libm (Sun fdlibm),0824ACFC,0824DA3C,symbols/proposed/libm.csv,docs/LIBM.md exact newlib 1.8.2 source matches
+libc (newlib),0824DA3C,0824DAFA,symbols/progress_library_names.csv,docs/LIBM.md errno caller audit and exact memcpy/memset source matches
