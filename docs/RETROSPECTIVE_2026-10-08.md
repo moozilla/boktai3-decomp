@@ -349,3 +349,45 @@ it for each scenario. No broad tooling suite ran. The emitted-size audit caught
 a separate accounting risk: a 116-byte exact body had inherited a 332-byte
 inventory span. Adding the two retained wrapper boundaries removes 216 bytes
 of potential false credit. The accepted ledger records reviewed body sizes.
+
+
+## October 9: final solo tail and library report grouping
+
+The six-function tail adds **752 exact bytes**, reaching **4,841 / 11,083
+functions**, **331,266 / 2,415,354 bytes (13.715%)**. Combined with PR #16,
+the solo work adds **52 functions / 8,176 bytes**; the 20% target remains
+short by 151,805 bytes. No agent was started or resumed. The tail ledger is
+`notes/solo-tail_2026-10-09.csv`.
+
+081DB24C/081DB2B8 are exact 108-byte constructor siblings. Their existing
+reviewed boundaries needed replacement endpoints to consume symbolized incbin
+fragments; the first full build caught duplication, and the corrected full
+build prints `build/boktai3.gba: OK`. Four typed-layout routines (080B7280,
+0818CA04,0818DE44,0818DF90) match their complete 208/104/120/104-byte bodies.
+One new constructor constant was corrected from 4096 to 262144 before acceptance.
+The emitted-size audit confirms all six progress spans equal their object bodies.
+
+At the user's request, the ROM-free objdiff report groups eight identified
+libraries into contiguous units, with individual functions nested and verified
+SDK/runtime names. Address-only manifests record ranges and label evidence;
+unknown entries retain address names. No build symbols, boundaries, byte totals
+or matching criteria change. Unit counts now describe displayed groups. Eight
+focused reporting tests cover grouping, retained assembly, exact accounting,
+contiguity and verified corpus labels. Six pinned libgcc assembly objects were
+resolved and compared exactly to support additional names; that identification
+adds no C credit. See `docs/PROGRESS_CI.md`.
+
+The final +64 KiB shifted ROM is compared against the already validated ROM's
+whole-file SHA-1 (`c208e82ae4996ba6e2066a724421190f5cf26a02`); equality reuses
+its 35 passing screenshots without rerunning three emulator scenarios. The
+original ROM is restored afterward. Ten tail drafts, including six accepted
+source copies and four unsuccessful alternates, are retained on the separate
+WIP branch with hashes and statuses; none of the four earns partial credit.
+
+The final bounded tail reinforces the same prioritization: reuse the proven
+layout/constructor seed, and stop on allocation residues. Inlining a finish
+helper or reusing a flag destination pointer did not improve the two motion
+finishers or the flag updater; an inline zero-vector test did not improve
+081DB030. These hypotheses are preserved rather than repeatedly rechecked.
+A requested reporting change is useful presentation, but adds zero matching
+bytes; it is recorded separately from the six-function gain above.
