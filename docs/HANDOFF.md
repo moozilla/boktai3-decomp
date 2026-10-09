@@ -14,28 +14,30 @@ published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
 | | |
 |---|---|
-| Matched C | **4,841 / 11,083 functions (43.68%)**, 331,266 / 2,415,354 code bytes (13.715%; `PROGRESS.md`) |
+| Matched C | **4,843 / 11,083 functions (43.70%)**, 331,578 / 2,415,354 code bytes (13.728%; `PROGRESS.md`) |
 | Build | `make` / `python3 tools/build.py` rebuilds the ROM **bit-identical** (SHA-1 `2651c5e6875ac60abff734510d152166d211c87c`) |
 | Shiftable | all data relocatable; `make shifttest` (3 scenarios, 35 screenshots) passes |
 | Code layout | `src/fn/sub_XXXXXXXX.c`, one function per file; `src/lib/m4a.c` (MP2K sound, 57/58) |
 | Names | still mostly `sub_XXXXXXXX`; first evidence-based pause-menu leads in `docs/MENU_CONTEXT.md` |
 
-The solo family tranche adds **52 functions / 8,176 exact bytes** on top of
+The solo family tranche adds **54 functions / 8,488 exact bytes** on top of
 `7037e3a`, following the KNIDL process review. The 20% code target remains
-unmet by **151,805 bytes**. [The tranche notes](../notes/solo-family_2026-10-09.md)
+unmet by **151,493 bytes**. [The tranche notes](../notes/solo-family_2026-10-09.md)
 record accepted sources, reusable patterns and unresolved candidates.
 081DB1D8 contributes only its 116-byte body; two newly inventoried 108-byte
 wrappers at 081DB24C and 081DB2B8 are now exact C. Their reviewed replacement
 endpoints consume the complete bodies across symbolized incbin fragments.
-[The tail ledger](../notes/solo-tail_2026-10-09.csv) records the six final
-matches (752 bytes). The objdiff report now groups eight identified libraries
+[The tail ledger](../notes/solo-tail_2026-10-09.csv) records the six tail
+matches (752 bytes). The [final ledger](../notes/solo-final_2026-10-09.csv)
+adds two more exact functions (312 bytes). The objdiff report now groups eight identified libraries
 into contiguous units with verified names; see [reporting policy](PROGRESS_CI.md).
 
 **Latest authorization: work alone until 15% plan usage remains.** The user
 explicitly authorized new matching after the KNIDL review and prohibited
-subagents for this tranche. The meter was 16% remaining before closeout.
+subagents for this tranche. The meter reached **15% remaining** in the final bounded pass; matching
+work stopped there, followed only by validation, documentation and preservation.
 The tranche is integrated and its sources/checkpoints are pushed; do not
-launch another tranche without checking the meter and the user's authorization.
+launch another tranche without renewed user authorization.
 
 The preceding existing-draft rescue added 48 functions / 3,724 bytes and
 ended with 65 unresolved targets. Its one-hour/15% limit and the subsequent
