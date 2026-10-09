@@ -1,6 +1,6 @@
 # Retained candidate source
 
-This branch preserves 666 WIP C files from seven local checkouts, including
+This branch preserves 682 WIP C files from seven local checkouts, including
 alternate attempts and targets already matched. The audited target inventory
 contains 48 accepted matches and 65 unresolved targets; file count is not
 unfinished-function count. `targets.csv` maps the best selected unresolved
@@ -54,3 +54,15 @@ are two inline finish-helper variants, a reused flag-pointer variant, and an
 inline zero-vector-test variant. `solo-tail_2026-10-09.csv` records every path,
 source hash, target and status. These drafts are outside the production source
 tree and add no partial matching credit. Production state includes PR #17.
+
+
+## Final allowance-floor checkpoint (October 9)
+
+The final solo pass stops at the 15% remaining meter. Two exact functions /312
+bytes reach 4,843 functions and 13.728% code coverage; the complete solo campaign
+adds 54 functions /8,488 bytes. This checkpoint preserves sixteen C drafts for
+six targets plus seven authored layout/body fragments. `solo-final_2026-10-09.csv`
+records paths, hashes and statuses. The inline 0818E3F4 source is identical to
+production; the exact 0818E574 alternative has an unused helper omitted from
+production. Other variants and the four remaining assembly targets receive no
+partial credit. Production state is synchronized with the final integration.

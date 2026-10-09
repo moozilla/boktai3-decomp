@@ -1,0 +1,22 @@
+extern const s16 gUnk_086149C4[];
+extern u32 gUnk_03005308;
+extern u16 gUnk_0203B400[];
+s32 Div(s32,s32);
+void sub_0818C9C4(struct Obj *);
+void sub_0818DFF8(struct Obj *p)
+{
+ if(activate(p)) {
+  struct Parent *owner=p->parent;
+  p->id10A=owner->id;
+  { s32 step=Div(256,owner->count); u8 *angle=&owner->angle; u8 index=*((u8 *)p+0x118); p->angle=step*index+*angle; }
+  p->x=owner->x+Div(gUnk_086149C4[(p->angle+64)&255]*200,4096);
+  p->y=owner->y+220;
+  p->z=owner->z+Div(gUnk_086149C4[p->angle]*200,4096);
+  p->flags&=~1; p->rotation=128; p->byte8=127; p->byte9=1;
+  gUnk_03005308=(gUnk_03005308+1)&1023;
+  { s32 one=1; u16 random=gUnk_0203B400[gUnk_03005308]; s32 spin=-1; if(random&one)spin=one; p->spin=spin; }
+  p->flagsA2&=~4; p->flags4E&=~4;
+  p->paramA6=16; p->param52=16;
+  p->callback=sub_0818C9C4;
+ }
+}

@@ -1,0 +1,9 @@
+void sub_0818DEBC(struct Obj *p)
+{
+ p->y+=p->velocity; p->velocity-=2; p->rotation+=20; p->timer++;
+ if(p->timer>30) {
+  struct Parent *owner=p->parent;
+  p->byte11E=0; p->state=5; p->flags119=1|p->flags119; owner->counter--;
+  p->callback=0; p->flags=(p->flags&~512)|1;
+ }
+}
