@@ -79,7 +79,7 @@ def write_nonmatching(code, funcs):
             open(p, "w").write(text)
 
 
-def c_replacement_end(code, start, end, covered_addresses=()):
+def c_replacement_end(code, start, end, covered_addresses=(), covered_ranges=()):
     """First retained trailing-data line; C replaces instructions/literal pools."""
     for k in range(start, end):
         if code[k].lstrip().startswith(".incbin"):
@@ -87,6 +87,11 @@ def c_replacement_end(code, start, end, covered_addresses=()):
             # in binary blobs after the last recognized entry point. Consume
             # those explicitly covered blobs; retain unrelated trailing data.
             blob = re.match(r'\s*\.incbin "baserom\.gba",\s*(0x[0-9a-fA-F]+),\s*(0x[0-9a-fA-F]+)', code[k])
+            if blob:
+                address = 0x08000000 + int(blob.group(1), 16)
+                following = address + int(blob.group(2), 16)
+                if any(lo <= address and following <= hi for lo, hi in covered_ranges):
+                    continue  # reviewed exact body split around symbolized literals
             if blob and 0x08000000 + int(blob.group(1), 16) in covered_addresses:
                 continue
             # U33J's last instruction ends at 0824DAFA. The next two bytes
@@ -149,7 +154,16 @@ def apply_extra_boundaries(code, path):
 
 def main():
     code = open(os.path.join(ROOT, "gen", "code_sym.s")).read().split("\n")
-    code = apply_extra_boundaries(code, os.path.join(ROOT, "symbols", "build_extra_functions.csv"))
+    boundary_path = os.path.join(ROOT, "symbols", "build_extra_functions.csv")
+    code = apply_extra_boundaries(code, boundary_path)
+    with open(boundary_path, newline="") as source:
+        replacement_ranges = {}
+        for row in csv.DictReader(source):
+            if row.get("replacement_end"):
+                lo, hi = int(row["address"], 16), int(row["replacement_end"], 16)
+                if hi <= lo or hi % 2:
+                    raise ValueError("invalid reviewed replacement endpoint")
+                replacement_ranges[lo] = hi
     # function blocks: [start_line, end_line) per function, in order
     starts = [i for i, ln in enumerate(code) if FUNC_START.match(ln)]
     funcs = []
@@ -225,7 +239,8 @@ def main():
         # literal pools); trailing undisassembled data in that block stays asm.
         covered = {int(n[4:], 16) for n in c_functions(os.path.join(ROOT, rel), with_asm=False)
                    if re.fullmatch(r"sub_[0-9A-F]{8}", n)}
-        end = c_replacement_end(code, funcs[last][2], funcs[last][3], covered)
+        ranges = [(a, replacement_ranges[a]) for a in covered if a in replacement_ranges]
+        end = c_replacement_end(code, funcs[last][2], funcs[last][3], covered, ranges)
         # Labels that disappear with the asm are redefined relative to the
         # unit's first function, so references from elsewhere still resolve.
         base_name, base_addr = funcs[first][0], funcs[first][1]

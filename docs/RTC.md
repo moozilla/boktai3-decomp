@@ -57,12 +57,12 @@ of portable modern-C behavior. Adding initializers/returns changes the ROM.
 
 Undecoded bytes after `08248DBC` contain apparent further entry points at
 `08248E70` and `08248F0C`, corresponding to time-write and alarm operations.
-The first has an exact 156-byte standalone C candidate and a reviewed progress
-boundary, so its following 464-byte block is **not credited** to the preceding
-matched function. It is still retained assembly in the ROM. The alarm candidate
-emits 304 rather than 308 bytes; local bitfield-address evaluation order differs.
-Neither candidate is counted as matched C. Investigate them in a coordinated
-boundary pass without rewriting shared `gen/` during active matching rounds.
+The time-write entry now has an integrated exact 156-byte C implementation
+(`-O0 -mthumb-interwork`). A separate reviewed build/progress boundary at
+08248F0C keeps the following 308-byte alarm routine in assembly with zero C
+credit. The alarm candidate emits 304 rather than 308 bytes; local bitfield
+address evaluation order differs. Both boundaries are applied in memory by
+the build without rewriting shared `gen/`.
 
 The first seven routines were reconstructed before consulting the comparison
 source; larger transaction routines were reconstructed from B3 instructions
