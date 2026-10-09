@@ -70,7 +70,7 @@ check and full build. No register bindings or assembly were used.
 | 08178FC8 | 460 bytes, seven final r0/r1 differences. Best retained `sub_08178FC8-best460.c` (and current main draft). Nine bounded checks; 90 s permuter reached score 40 but requires extra locals and did not match. |
 | 0816F6B4 | `sub_0816F6B4-best40.c`, 180 bytes, only six initial flag-update instructions differ. Ordinary do-block grouping from the 90 s permuter was retained. Enlarged struct array to 266 elements (u8 index + 10), rechecked: same six differences. |
 | 081DC470 | 424-byte manual body, nine initial x/y/half-pointer register differences; 90 s permuter no output. Current draft retains the u8 half-pointer version. |
-| 081E013C | Revisited using learned resource lifetimes: 736 to 700 bytes. Current retained 700-byte draft has the correct long-lived zero/resource registers; initial offset allocation, first saved pointer and two halfword constants remain. About six total manual checks; no permuter. |
+| 081E013C | Revisited using learned resource lifetimes: 736 to 700 bytes. Safe best retained in `sub_081E013C-focused700.c` and current draft. Correct long-lived zero/resource registers; initial offset registers, first saved pointer and E000 halfword setup remain. Final bounded pass used save-before-pointer and typed +0x70 member addressing; neither changed the 700-byte result. No permuter. |
 | 081BC820 | 352-byte body after splitting early/late zero. Remaining preserved-register rotation and some address choices; five checks, no permuter. |
 | 0812642C | 324 bytes; u32 parameters plus use-site narrowing fix premature stack argument loads. Remaining high-register rotation and first returned-pointer use. Four checks, no permuter. |
 | 081975C8 | Two checks; compiler merges the two intended long-lived zero values. Typed narrow locals did not separate them. |
@@ -111,3 +111,13 @@ both 19:32:32 PDT. Subsequent inspection used read-only asmat.py.
 
 Final complete build `build/full-final.txt` printed `build/boktai3.gba: OK`.
 Snapshot is 23 functions / 4,824 emitted bytes through 6d53060.
+
+Final focused boundary check: 081E013C has clean native span
+`[081E013C, 081E03F4)` (696 bytes), return at 03C2, literal pool
+03C4–03F0, and next complete prologue at 03F4. The compiler folds the first
+object pointer into `s + 0xE8` rather than keeping its original r5 lifetime.
+Two final checks (`build/check-e01-focus1.txt`, `check-e01-focus2.txt`) did not
+improve the 700-byte draft; retained safe best, no source promotion.
+
+Final complete build after focused WIP work: `build/full-final-focused.txt`
+printed `build/boktai3.gba: OK`; accepted sources unchanged.
