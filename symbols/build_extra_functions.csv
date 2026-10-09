@@ -5,6 +5,7 @@ address,isa,evidence
 08227F4C,thumb,Independent 12-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md
 08227F58,thumb,Independent 4-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md
 08229424,thumb,Independent 28-byte Thumb body after predecessor return; exact standalone check; notes/push20-root.md
+0822BD58,thumb,Independent 96-byte Thumb body after BD20 return at BD56; own push calls pop-bx at BDB0 and literals through BDB8; notes/push20-root.md
 0822C110,thumb,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md
 0822C154,thumb,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md
 0822C180,thumb,Independent Thumb return and literal pool in retained 0822C0CC tail; standalone exact C check; notes/push20-root.md
