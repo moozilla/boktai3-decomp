@@ -1,6 +1,8 @@
 #include "global.h"
-struct S { u8 pad; u8 a; u8 b; u8 g[9]; s8 arr[1]; };
-s8 sub_0816B3C0(struct S *p)
-{
-    return p->arr[p->a * 4 + p->b];
+s8 sub_0816B3C0(u8 *p) {
+    u32 i = (p[1] << 2) + p[2];
+    volatile u8 *q = p;
+    q += 0xC;
+    q += i;
+    return (s8)*q;
 }
