@@ -1,0 +1,10 @@
+# Prepend this file to a replay. Addresses are for verified Japanese U33J code.
+# These probes are read-only. See docs/SCRIPT_TRACING.md.
+probe native_enter 0821AC6C
+probe native_lookup 0821AC7C
+probe native_call 0821AC9E
+probe native_return 0821ACA2
+probe actor_key 0822556A
+probe actor_resolved 0822556E
+probe actor_call 0822557E
+probe actor_return 08225582

@@ -1,0 +1,23 @@
+addr,name,confidence,evidence
+0824ACFC,atan,high,Exact fully linked newlib 1.8.2 source match using old_agbcc -O2 -fno-builtin; docs/LIBM.md
+0824B070,cos,high,Exact fully linked newlib 1.8.2 source match using old_agbcc -O2 -fno-builtin; docs/LIBM.md
+0824B120,fabs,high,Exact fully linked newlib 1.8.2 source match using old_agbcc -O2 -fno-builtin; docs/LIBM.md
+0824B138,sin,high,Exact fully linked newlib 1.8.2 source match using old_agbcc -O2 -fno-builtin; docs/LIBM.md
+0824B1EC,tan,high,Exact fully linked newlib 1.8.2 source match using old_agbcc -O2 -fno-builtin; docs/LIBM.md
+0824B3CC,fmod,high,Exact fully linked newlib 1.8.2 source match using old_agbcc -O2 -fno-builtin; docs/LIBM.md
+0824B49C,__ieee754_acos,high,Exact fully linked newlib 1.8.2 source match using old_agbcc -O2 -fno-builtin; docs/LIBM.md
+0824BA04,__ieee754_asin,high,Exact fully linked newlib 1.8.2 source match using old_agbcc -O2 -fno-builtin; docs/LIBM.md
+0824BEDC,__ieee754_fmod,high,Exact fully linked newlib 1.8.2 source match using old_agbcc -O2 -fno-builtin; docs/LIBM.md
+0824C174,__ieee754_rem_pio2,high,Exact fully linked newlib 1.8.2 source match using old_agbcc -O2 -fno-builtin; docs/LIBM.md
+0824C5E0,__ieee754_sqrt,high,Exact fully linked newlib 1.8.2 source match using old_agbcc -O2 -fno-builtin; docs/LIBM.md
+0824C7E4,__kernel_cos,high,Exact fully linked newlib 1.8.2 source match using old_agbcc -O2 -fno-builtin; docs/LIBM.md
+0824C9E0,__kernel_rem_pio2,high,Exact fully linked newlib 1.8.2 source match using old_agbcc -O2 -fno-builtin; docs/LIBM.md
+0824D1B8,__kernel_sin,high,Exact fully linked newlib 1.8.2 source match using old_agbcc -O2 -fno-builtin; docs/LIBM.md
+0824D338,__kernel_tan,high,Exact fully linked newlib 1.8.2 source match using old_agbcc -O2 -fno-builtin; docs/LIBM.md
+0824D6F8,floor,high,Exact fully linked newlib 1.8.2 source match using old_agbcc -O2 -fno-builtin; docs/LIBM.md
+0824D884,isnan,high,Exact fully linked newlib 1.8.2 source match using old_agbcc -O2 -fno-builtin; docs/LIBM.md
+0824D8A4,matherr,high,Exact fully linked newlib 1.8.2 source match using old_agbcc -O2 -fno-builtin; docs/LIBM.md
+0824D8B8,scalbn,high,Exact fully linked newlib 1.8.2 source match using old_agbcc -O2 -fno-builtin; docs/LIBM.md
+0824DA14,copysign,high,Exact fully linked newlib 1.8.2 source match using old_agbcc -O2 -fno-builtin; docs/LIBM.md
+0824B25C,acos,high,Exact fully linked newlib 1.8.2 source; ambiguous masked signature resolved through core calls and name string; docs/LIBM.md
+0824B314,asin,high,Exact fully linked newlib 1.8.2 source; ambiguous masked signature resolved through core calls and name string; docs/LIBM.md
