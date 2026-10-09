@@ -1,0 +1,9 @@
+addr,name,confidence,evidence
+08243C10,Solar_InitTimer,high,"GPIO/Timer3 setup and handler installation; exact C; docs/SOLAR_SENSOR.md"
+08243CDC,Solar_ShutdownTimer,high,"Timer3/IE shutdown and GPIO read disable; exact C; docs/SOLAR_SENSOR.md"
+08243D28,Solar_TimerInterrupt,high,"GPIO reset/clock protocol; result stores observed for four harness light inputs; exact C; docs/SOLAR_SENSOR.md"
+08243E10,Solar_Enable,high,"Enabled flag and call to matched initialization; docs/SOLAR_SENSOR.md"
+08243E30,Solar_Disable,high,"Enabled flag and call to matched shutdown; docs/SOLAR_SENSOR.md"
+08243E4C,Solar_StartMeasurement,high,"Enables hardware and initializes active/phase/counter/result; docs/SOLAR_SENSOR.md"
+08243E8C,Solar_StopMeasurement,high,"Disables hardware and clears active/result; docs/SOLAR_SENSOR.md"
+08243EB8,Solar_GetMeasurement,high,"Returns runtime-confirmed result when measurement-active; docs/SOLAR_SENSOR.md"
