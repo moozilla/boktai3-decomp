@@ -1,0 +1,24 @@
+u8 sub_082212DC(struct Obj *,u8,u32,u32);
+void sub_08215284(u8 *,s32);
+void sub_0806A160(struct Vec *,u32,struct Vec *,u32,u32,u32,u32,u32);
+void sub_0822B3BC(u32);
+void sub_0818E288(struct Obj *p)
+{
+ struct Parent *owner=p->parent;
+ if(activate(p)) {
+  p->flags4E|=4; p->flagsA2|=4; p->counter12C=0; p->byte12D=20; p->callback=0;
+ }
+ if(sub_082212DC(p,p->counter12C++,10,30)) {
+  sub_08215284(p->ptrC,owner->value);
+  p->byte11E=0; p->state=5; p->flags119=1|p->flags119; owner->counter--;
+ }
+ { u32 flags=p->counter12C&7;
+  if(!flags) {
+   struct Vec pos=p->vec6C,color;
+   pos.x+=100; pos.y+=100; pos.z+=100;
+   color.x=80; color.y=60; color.z=40;
+   sub_0806A160(&pos,1,&color,0,flags,14,2,2);
+   sub_0822B3BC(366);
+  }
+ }
+}

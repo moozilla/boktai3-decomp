@@ -1,0 +1,13 @@
+extern const struct Vec gUnk_0824F150;
+void sub_08013930(u8 *,u8 *,u32,u32,u32,u32,u32,u32,u32,u32,u32);
+void sub_0818DE44(struct Obj *);
+void sub_0818E3F4(struct Obj *p)
+{
+ if(activate(p)) {
+  p->id10A=1; p->flags&=~513; p->rotation=128; p->byte8=64; p->byte9=64;
+  p->flagsA2|=4; p->flags4E&=~4; p->paramA6=16; p->param52=16;
+  p->vec64=gUnk_0824F150; p->vecB8=gUnk_0824F150;
+  sub_08013930((u8 *)p+0x160,(u8 *)p+0x1c,32,32,32,32,0,0,0,0,0);
+  p->callback=sub_0818DE44;
+ }
+}

@@ -1,0 +1,15 @@
+struct Global { u8 pad0[0x32]; s16 y; };
+extern struct Global *gUnk_02000710;
+void sub_0821FF24(u8 *,struct Vec *,u32);
+void sub_0821FE40(u8 *);
+void sub_0818E4BC(struct Obj *p)
+{
+ struct Vec out,delta;
+ delta.y=gUnk_02000710->y-(p->y-220);
+ delta.z=(delta.y*724)>>10;
+ delta.x=delta.z;
+ out.x=delta.x+p->x; out.y=p->y+delta.y; out.z=delta.z+p->z;
+ sub_0821FF24((u8 *)p+0x9c,&out,0);
+ sub_0821FF24((u8 *)p+0x48,&out,0);
+ if(!(p->flags4E&4)) sub_0821FE40((u8 *)p+0x48);
+}

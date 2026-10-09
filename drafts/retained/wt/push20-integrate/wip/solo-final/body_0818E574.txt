@@ -1,0 +1,13 @@
+extern void (*const gUnk_0824F158[])(struct Obj *);
+void sub_0818E4BC(struct Obj *);
+void sub_0818E574(struct Obj *p)
+{
+ s32 mask=16; u8 flags=p->flags119;
+ if(!(flags&mask)) {
+  if(p->countdown) p->countdown--;
+  gUnk_0824F158[p->state](p);
+  if(p->callback) p->callback(p);
+  sub_0818E4BC(p);
+  if(p->callback1CC) p->callback1CC(p);
+ }
+}
