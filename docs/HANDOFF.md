@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after production round 2 (2026-10-08 Pacific /
+Last updated during production batch 3 (2026-10-08 Pacific /
 2026-10-09 UTC). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
@@ -9,7 +9,7 @@ another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
 | | |
 |---|---|
-| Matched C | **4,316 / 11,046 functions (39.07%)**, 239,684 / 2,415,354 code bytes (9.923%; `PROGRESS.md`) |
+| Matched C | **4,413 / 11,046 functions (39.95%)**, 262,484 / 2,415,354 code bytes (10.867%; `PROGRESS.md`) |
 | Build | `make` / `python3 tools/build.py` rebuilds the ROM **bit-identical** (SHA-1 `2651c5e6875ac60abff734510d152166d211c87c`) |
 | Shiftable | all data relocatable; `make shifttest` (3 scenarios, 35 screenshots) passes |
 | Code layout | `src/fn/sub_XXXXXXXX.c`, one function per file; `src/lib/m4a.c` (MP2K sound, 57/58) |
@@ -73,6 +73,27 @@ script correspondences, B3-specific decoding differences and a 722-target actor
 registry. `tools/soldec_audit.py` supplies bounded, read-only checks; no speculative
 engine/compiler claims were adopted. The main thread continues hard matching and reviewed batch integration.
 Do not conflate worker commit counts with new coverage.
+
+Production batch 3 adds **97 functions and 22,800 progress-span bytes**:
+Luna A six, Luna B four, Sol 40, MGS-focused Sol 25 across two rounds, and the
+main thread 22 fdlibm functions. See `docs/LIBM.md` for exact historical source
+matches and `docs/MGS_GCL_MATCHING.md` for all MGS comparisons, B3 differences
+and remaining candidates. One Sol worker remains dedicated to MGS at the
+user's request. No speculative gameplay names were installed.
+
+The user challenged continuing Luna after its lower recent output. Luna B's
+next 9-minute round added zero matches and was stopped; its slot now runs Sol
+6.1 on retained family seeds. This supersedes the earlier decision to keep
+Luna production workers running. No measured Pareto-efficiency claim is valid:
+account usage cannot be attributed to individual models, and these rounds have
+different targets. Prioritize useful native-byte output over further benchmarking.
+
+The new `docs/SCRIPT_TRACING.md` records 698 native calls and 90 actor callbacks
+from the intro, verified against command tables and the 722-entry actor registry.
+The main thread fixed execution-sample PC adjustment and IRQ timing in the
+harness. **Regenerate older execution coverage before entry-level claims.**
+Existing memory-hook evidence is unaffected. `tests/script_probes.txt` and
+`tools/script_trace.py` provide a reproducible read-only runtime trace.
 
 The deeper task connects emulator coverage to function boundaries:
 `tools/function_context.py`, `docs/RUNTIME_CONTEXT.md`, and `docs/MENU_CONTEXT.md`.
