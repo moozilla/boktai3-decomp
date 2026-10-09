@@ -1,0 +1,54 @@
+#include "global.h"
+void sub_0816616C(u8 *);
+void sub_08163F14(u8 *,u32,u32,u32,u32);
+void sub_08165ACC(u8 *);
+void sub_08165B28(u8 *,u32,u32);
+void sub_08165B94(u8 *,u32,u32);
+void sub_0816618C(u8 *,u32,u32);
+void sub_0816446C(u8 *,u32,u32,u32);
+void sub_0816471C(u8 *,u32,u32,u32,u32,u32);
+void sub_0816568C(void);
+void sub_08166ED4(u8 *,u32,u32,u32,u32);
+void sub_08166F84(u8 *,u32,u32,u32,u32);
+void sub_08166CD0(u8 *);
+void sub_08166534(u8 *,u32,u32);
+void sub_081735C8(u8 *);
+void sub_08173650(u8 *);
+void sub_081672FC(u8 *);
+void sub_0817373C(u8 *,u32);
+void sub_08163EB8(u8 *,void (*)(void),u32);
+void sub_08173B24(void);
+void sub_08166094(u8 *,u32,s32);
+void sub_08166B7C(u8 *,u32);
+void sub_081663A0(u8 *,u32,u32,u32,u32);
+void sub_080335B4(void);
+void sub_081742F0(u8 *s)
+{
+    u8 *p;
+    u32 zero;
+    sub_0816616C(s);
+    sub_08163F14(s,*(u32 *)(s+0x18),0,6,*(u32 *)(s+0x2C));
+    sub_08165ACC(s);
+    sub_08165B28(s,0,0x55);
+    sub_08165B94(s,0x4D,1);
+    sub_08165B28(s,8,0x65);
+    sub_0816618C(s,8,0x20);
+    sub_0816446C(s,1,2,12);
+    p=*(u8 **)(s+0xA40);
+    sub_0816471C(s,1,2,14,*(u16 *)(p+0x428),*(u16 *)(p+0x42A));
+    sub_0816568C();
+    zero=0;
+    sub_08166ED4(s,8,3,0,zero);
+    sub_08166F84(s,8,4,0,zero);
+    sub_08166CD0(s);
+    sub_08166534(s,10,6);
+    sub_081735C8(s);
+    sub_08173650(s);
+    sub_081672FC(s);
+    sub_0817373C(s,0);
+    sub_08163EB8(s,sub_08173B24,0);
+    sub_08166094(s,0,0);
+    sub_08166B7C(s,2);
+    sub_081663A0(s,0,1,0,zero);
+    sub_080335B4();
+}
