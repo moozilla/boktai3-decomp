@@ -36,6 +36,7 @@ address,evidence
 0824826C,rfu_REQ_noise: separate C entry in exact RFU_V1024 unit; pinned source and resolved byte checks; docs/RFU.md
 08248930,EEPROM write-verify wrapper; 64-byte exact standalone match; contiguous C unit sub_082488D8.c; docs/EEPROM.md
 08248E70,RTC time-write entry verified by exact 156-byte standalone C check; retained assembly not counted as matched; docs/RTC.md
+08248F0C,Separate 308-byte RTC alarm body with own prologue/return after exact 156-byte time-write body; retained assembly; docs/RTC.md
 08249F7C,__cmpdf2: separate function in exact linked libgcc_dp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
 0824A288,__make_dp: separate function in exact linked libgcc_dp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
 0824A2B0,__truncdfsf2: separate function in exact linked libgcc_dp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md

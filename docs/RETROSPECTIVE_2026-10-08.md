@@ -1,8 +1,8 @@
 # Boktai 3 matching run retrospective
 
 This document first audits the earlier sustained run, then the later matching
-follow-up in the final section. The final source state is 13.222% code matched;
-matching stopped at the 20% remaining plan-usage floor.
+follow-up and bounded draft rescue in the final sections. The final source
+state is 13.377% code matched; the 20% target remains unmet.
 
 The sustained run delivered too little matched code for the allowance consumed.
 From `e2546f6` to `5ff44e3`, matched code rose from **9.302% to 12.282%** while
@@ -250,3 +250,55 @@ nonmatching drafts remain local and ignored, including the last Sol FDB4 draft.
 No unfinished source was promoted to make the closeout look successful. The
 [handoff](HANDOFF.md) gives current counts, limits and candidate locations;
 the [follow-up report](PUSH20_2026-10-08.md) preserves batch accounting.
+
+
+## Existing-draft rescue: missed work and family efficiency
+
+The first closeout was incomplete: accepted reviewed batches were merged,
+but ignored WIP had not been exhaustively inventoried. Two exact candidates
+were overlooked, and many clone drafts still contained stale constants or
+layout values that were inexpensive to repair. The bounded rescue checked
+113 previously unmatched targets plus 68 distinct alternates and finished
+**48 functions / 3,724 bytes**. It advances 13.222% to 13.377%, with the
+account meter at 19% remaining during integration after a 20% starting reading.
+Rounded account observations cannot establish per-model costs.
+
+The strong result within this rescue was broad family repair. Literal-pool
+values and compiler-encoded shifted constants had escaped earlier clone
+porting. Fixing the family parameters yielded more exacts than prolonged
+single-instruction/register tuning. The existing Astra-low worker's three
+bounded resumes produced no matches. Six capped permuter searches also
+produced no accepted exact source; a low-score candidate with an early return
+and unreachable logic was rejected. No new agents or function targets began.
+
+The audit also exposed why inventory spans need review before credit: the
+RTC time-write draft emits 156 bytes, while its previous span included a
+separate 308-byte unfinished routine. The final boundary preserves zero
+credit for that routine. Source review and the complete ROM check are still
+necessary even after a standalone exact check.
+
+Partial source retention has a useful role in preserving algorithms, layouts,
+and failed hypotheses across sessions. The present rule forbids committing
+nonmatching C, so this closeout commits metadata only. A separate candidate
+store, excluded from production and exact progress, is a concrete future
+option for the user to approve. Matching source chunks are not independently
+stable: completing the function can change register allocation and scheduling.
+A similarity percentage must not be described as semantic correctness.
+
+All 65 unresolved targets are explicitly inventoried rather than called
+finished. Local ignored WIP survives while the checkouts remain; a fresh clone
+does not recover it. This distinction belongs in every future closeout.
+
+The final integration needed a narrow splitter repair: exact hidden bodies
+spanned multiple incbin fragments around symbolized literals. Reviewed
+replacement endpoints for 08232F1C and 08248E70 consume only those bodies,
+leaving neighboring assembly intact. Five focused boundary/compiler tests
+pass, including a regression that preserves a fragment crossing the endpoint.
+This required tooling check is separate from the broad suite omitted above.
+
+Final accepted-source head: `82d700d`. Both the original and restored complete
+ROM builds print `build/boktai3.gba: OK`; all 35 shifted-data screenshots pass
+(intro 16 / save 7 / menus 12). All exacts are separately committed for one
+combined integration. The 65 unresolved candidates remain local and ignored.
+A source-only local archive preserves 519 candidate files, including duplicate
+and already-matched drafts; it is not available in a GitHub clone.
