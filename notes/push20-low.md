@@ -75,3 +75,9 @@ The useful change was to separate the early resource object and descriptor into 
 The accepted source is `src/fn/sub_08200A10.c`; whitespace cleanup was verified to leave its token string unchanged. Allsrc absence was checked before acceptance. The full emitted span ends at08200C40, with no trailing retained code to credit. Complete build printed `build/boktai3.gba: OK` before the one-TU matching commit (`build/push20/00a10-matched-full-build.txt`). Root supplied the mathematical/setup draft and owns boundary metadata; this continuation only changes its exclusive function.
 
 Net worker output is now **5 functions /2480 emitted bytes**, including the previously documented assisted A230 result and this inherited root draft. No active jobs remain after this continuation.
+
+## Final bounded AB294 allocation pass
+
+Parent authorized up to eight active minutes on the retained372B RNG/vector body, then requested drain as account remaining reached23%. Eight new manual checks, no new match and no search. Tested typed u16 table access/declaration, explicit table-address/index temporaries, RNG pointer aggregate, reordered inline parameters with a mask parameter, call-emission helper, u16 RNG return and individual scoped RNG results. All scalar variants retain the same372B mismatch: compiler preserves0x3ff in sl and reloads the table address, while original preserves the table in r7 and reloads0x3ff. Vector field operations remain exact. RNG aggregate grows to388B with stack traffic and was rejected. No fresh target after the drain directive and no revisit of root's RGB candidate.
+
+Safe retained base remains `wip/sub_080AB294.c` and `wip/sub_080AB294-retained.c`; scoped variant saved separately. Logs `build/push20/ab294-new1.diff` through`new8.diff`. Final private full build printed `build/boktai3.gba: OK` (`build/push20/ab294-drain-full-build.txt`). Source progress unchanged: **5 functions /2480B**. Only this note is committed; no active jobs remain.
