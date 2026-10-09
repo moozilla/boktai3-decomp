@@ -1,10 +1,10 @@
 #include "global.h"
 #include "libm_compat.h"
-double sub_08229468(s32, s32, s32, s32);
+double sub_08229468(s32, u32, s32, s32);
 double sub_08229618(double);
 double sub_08229E28(double);
 
-double sub_08229FFC(s32 a, s32 year, s32 month, s32 day)
+double sub_08229FFC(s32 a, u32 year, s32 month, s32 day)
 {
     double start, current, difference, age;
     double rate = 12.1818;
