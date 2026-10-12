@@ -1,0 +1,80 @@
+{
+  "worker": "pilot-sol-family-20261012",
+  "base": "3c975f2",
+  "start_utc": "2026-10-12T07:58:29Z",
+  "matching_end_utc": "2026-10-12T08:12:03Z",
+  "committed_utc": "2026-10-12T08:12:51Z",
+  "elapsed_seconds_at_commits": 862,
+  "audited_primary": {
+    "08118B8C": [
+      "08118B8C",
+      "08118E30",
+      676
+    ],
+    "08118E30": [
+      "08118E30",
+      "081190D4",
+      676
+    ],
+    "081190D4": [
+      "081190D4",
+      "08119378",
+      676
+    ]
+  },
+  "audited_fallback": {
+    "080AD270": [
+      "080AD270",
+      "080AD40C",
+      412
+    ],
+    "080C6010": [
+      "080C6010",
+      "080C61AC",
+      412
+    ],
+    "080D1EA0": [
+      "080D1EA0",
+      "080D203C",
+      412
+    ]
+  },
+  "audited_opportunity_bytes": 3264,
+  "exact_new_functions": 3,
+  "exact_new_bytes": 1236,
+  "commits": [
+    "8592594",
+    "3660c2c",
+    "a8adacc"
+  ],
+  "complete_rom_log": "build/final-clean-full-build.log",
+  "complete_rom_result": "build/boktai3.gba: OK",
+  "candidate_checkpoints": 20,
+  "candidate_status_counts": {
+    "mismatch": 13,
+    "error": 1,
+    "match": 6
+  },
+  "primary_best_authored": "wip/sub_08118B8C_ptrs.c",
+  "primary_best_authored_result": "672 bytes, 440 different bytes; retained field addresses reproduced three-high-register prologue but owner/core allocation and offset reuse differed",
+  "source_manifest": "wip/source-manifest.json",
+  "inherited_assistance": [
+    "Repository instructions and existing exact helper sources 081188C8, 0811BCBC, 0811CCB0",
+    "No exact family seed or other-worker candidates",
+    "Bounded 60-second permuter trial suggested inline accessor for fallback flag"
+  ],
+  "concrete_failures": [
+    "Ghidra export absent",
+    "Primary array layout, raw owner, nested pointer initialization and register keyword hypotheses did not solve allocation",
+    "Primary permuter low score reordered Div calls; not promoted or credited",
+    "Volatile fallback test introduced an extra byte load and did not solve address retention; final source has no volatile",
+    "Permuter emitted AST assertion warnings on anonymous typeof struct manipulation; accessor suggestion remained reviewable"
+  ],
+  "evidence": [
+    "Fallback family normalized assembly is equal except preparation helper targets 080B1E60, 080C4F9C, 080DA678",
+    "Owner flags +0 and embedded +0x20/+8 observed in exact stores; snapshot field copy/reset layout shared by all three exact consumers",
+    "08072188 ignores incoming r0 and reads globals: final declaration/call void(void)",
+    "No semantic renames, data definitions, ROM literal addresses, register pinning or handwritten asm"
+  ],
+  "tool_feedback": "Compact hunks reduced output and exposed retained flag pointer; reviewed sizes prevented false prefix acceptance. candidate.py then lacked hunks, requiring a second check to inspect each meaningful checkpoint. Alternatives with filename suffix need explicit target for permute.py. No tooling edits."
+}
