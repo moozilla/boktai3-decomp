@@ -2,8 +2,9 @@
 
 Recorded from the user's October 12, 2026 discussion. These are the full set
 of proposed directions, not a blanket authorization to implement all of them.
-The current authorized solo session starts with compact diffs, candidate
-tracking, worker guidance, then one promising subsystem. No delegated workers.
+The initial authorized solo pass covered compact diffs, candidate tracking,
+worker guidance and one subsystem. The user subsequently authorized the
+two-worker pilot described at the end of this backlog.
 
 ## Compiler provenance and recipe audit
 
@@ -124,3 +125,85 @@ Initial leads (not validated recommendations):
 Use bounded questions: type recovery, compiler diagnostics, reusable corpus
 retrieval, candidate retention, automation and actual costs. Avoid an open-ended
 survey replacing practical experiments.
+
+## October 12 external-research triage and execution order
+
+The user supplied a comparative research memo covering Mizuchi, Snowboard Kids 2,
+Klonoa, KNIDL, an FPS reconstruction, and several tools. Its statistics are
+reported research, not independently reproduced Boktai benchmarks. The useful
+methods below are adopted as bounded experiments; none changes acceptance.
+
+1. **Now: measured matching campaign.** Two isolated Sol 6.1/high workers,
+   twenty minutes each, explicitly authorized after the earlier solo trial.
+   Use a small production family and one diagnostic family. Record audited
+   bodies separately from inventory spans, seed effort, sibling opportunity,
+   exact new bytes, duplicate rewrites, failed checks, wall time and coordinator
+   effort. Stop on a plateau with no new hypothesis; ten attempts is a budget
+   rule, not proof of impossibility. See `campaigns/2026-10-12.json`.
+2. **Small ranked campaign manifests before a new scheduler.** Verified:
+   worklist.py filters/emits assembly order; it does not sort by difficulty,
+   and --chunks divides counts rather than effort/bytes. Rank a short queue
+   by audited byte opportunity, exact sibling/source evidence, shared layouts,
+   seed cost and prior failures. Large spans and high similarity alone do not
+   imply good return. FDB4's 488-byte tail is not part of its 300-byte draft.
+3. **Next only if needed: asmlift draft pilot.** Compare assembly-only, current
+   Ghidra and asmlift drafts on about twelve fixed targets (ordinary logic,
+   arrays/structs, a switch, hard family). Hide exact source from control arms,
+   exclude controls from progress, and hold recipe, context, model and budgets
+   fixed. Measure valid compiles, direct exacts, tokens to first exact and final
+   accepted bytes including failures/integration. Stop adapter work if setup
+   exceeds demonstrated savings. Keep the existing checker as the oracle.
+4. **Bounded compiler diagnostics.** Reproduce the retained candidate and
+   symbol baseline; inspect the first differing operation. At most three
+   distinct hypotheses about width, aliasing, lifetime, temporary placement,
+   branch structure or TU context, then a short search only with a useful
+   gradient. A diagnostic compiler may add traces, never alter production
+   codegen; compare with the untouched compiler on controls and the target.
+5. **Later: guided-search comparison.** On two structurally valid candidates,
+   compare equal CPU-time decomp-permuter versus explicit alternatives or
+   Transmuter. Retain variants and review validity; zero normalized score is
+   not acceptance. Stop random walks without a useful gradient. Do not replace
+   the current permuter merely because a new tool exists.
+6. **Compact task/result contracts.** Assign address/endpoints, accepted base,
+   compiler identity/flags, baseline ELF, exact sibling, relevant types, best
+   candidate hash, failed hypotheses, allowed files, goal and stop condition.
+   Return source hash, disposition, emitted/reviewed sizes, first difference,
+   category, full-build evidence, new bytes, inherited help and one next test.
+   Fingerprints must prevent a previous check from authorizing edited source.
+7. **Integration receipts and focused negative controls.** ROM-free progress
+   CI is source-membership accounting, not a ROM rebuild. A receipt should bind
+   source commit/tree, compiler identity, private reference hash and full-build
+   result. Extend existing tests only for gaps: stale symbol snapshots, missing
+   Thumb bits, wrong ARM/Thumb recipe, changed source after checking, body/tail
+   credit and wrong branch targets. Truncated-body and error-classification
+   controls now exist. No ROM in public CI and no reviewer fleet per function.
+8. **Cheap coordination and honest economics.** Automate target claiming,
+   unchanged-result handling and ledger updates only where repeated friction
+   is measured. Include failures, source reuse and coordinator usage. Keep API
+   dollars, price proxies and rounded subscription-meter readings separate.
+   Distinguish cost, elapsed-time and concurrency objectives. A new model
+   comparison needs equal packets/settings/budgets; the old six-target pilot
+   was confounded. Identical prompts alone do not prove cache savings.
+9. **Runtime work must answer a matching question during matching tranches.**
+   Use existing replay/watchpoints to resolve a particular callback, field or
+   table. Broad playthrough/naming/editor work remains worthwhile with its own
+   budget, not silently charged to exact-byte production.
+
+Research references retained for the experiments (not installations):
+- Mizuchi methodology: https://gambiconf.substack.com/p/can-llms-really-do-matching-decompilation
+- Snowboard Kids long tail: https://blog.chrislewis.au/the-long-tail-of-llm-assisted-decompilation/
+- Completion/source-policy comparison: https://blog.chrislewis.au/snowboard-kids-2-is-100-decompiled/
+- Small queue/control mechanisms: https://github.com/cdlewis/nigel
+- Klonoa production lessons: https://gambiconf.substack.com/p/starting-a-decompilation-project
+- Draft transcription: https://github.com/macabeus/asmlift
+- Guided search: https://github.com/macabeus/transmuter
+- Diagnostic compiler reference: https://github.com/Dream-Atelier/agbcc
+- Source fingerprints/plateau classification: https://github.com/Muhtasham/decomp-goal-harness
+- Oracle/relocation lessons: https://momo5502.com/posts/2026-10-09-game-decompilation/
+
+Do not import inline-assembly/register-pin exceptions, verifier exclusions,
+compiler forks that manufacture matches, or partial-credit commit policies.
+Do not extrapolate Mizuchi's reported per-function costs to this depleted easy
+frontier. Similarity leaderboards and Linux x86 re-executability results are
+not agbcc exact-success benchmarks. A playable game, a source-present function,
+and clean portable source are different deliverables from exact matching.

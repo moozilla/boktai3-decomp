@@ -4,6 +4,31 @@ October 12, 2026, solo investigation. This is a static, address-qualified
 subsystem slice, not identification of a particular character, attack or effect.
 No new emulator observation or semantic function rename is claimed.
 
+## What this means in plain language
+
+This code moves an object through a spinning, two-stage movement sequence.
+It first calculates a destination relative to another object's position,
+builds up spin, moves along a timed segment, then follows a second segment
+adjusted for movement of its owner. On completion it sets status flags.
+We have not connected this to a visible character, weapon or effect in-game.
+
+Useful descriptive names for the roles are below. These are documentation
+labels, not recovered original symbols or names applied to the build:
+
+| Readable role | Existing symbol | Acceptance |
+|---|---|---|
+| Build approach segment | sub_0818D754 | Existing exact C |
+| Ramp spin before movement | sub_0818D8E0 | Existing exact C |
+| Advance approach segment | sub_0818D960 | Existing exact C |
+| Follow moving owner and finish | sub_0818DB10 | Still nonmatching |
+
+The previous pass recovered a shared type and improved an unfinished draft;
+it completed **zero new functions and zero new code bytes**. The 155-to-32
+byte-difference improvement is diagnostic, not 123 bytes of new decompilation.
+The trial stopped with status-write codegen unresolved. Its matching yield
+was poor; further work should be a capped experiment, not more free-form
+source rearrangement. Actual game-context names require a targeted trace.
+
 ## Entry and callback chain
 
 The already exact dispatcher `0818E574` checks bit 4 at object +119, decrements

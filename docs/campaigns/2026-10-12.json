@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "status": "running",
+  "baseline_commit": "3c975f2",
+  "baseline_exact_functions": 4843,
+  "baseline_exact_bytes": 331578,
+  "account_weekly_used_percent_before_dispatch": 3,
+  "account_observed_utc": "2026-10-12 07:56:56 UTC",
+  "budget": {
+    "workers": 2,
+    "minutes_per_worker": 20,
+    "model": "gpt-6.1-sol",
+    "reasoning": "high",
+    "coordinator_role": "selection, review, integration only"
+  },
+  "comparison_limit": "Production pilot, not controlled model A/B; families and inherited assistance differ.",
+  "workers": [
+    {
+      "name": "sol_family_pilot",
+      "branch": "codex/pilot-sol-family-20261012",
+      "kind": "production",
+      "targets": [
+        {
+          "address": "08118B8C",
+          "inventory_span": 676,
+          "reviewed_body_bytes": null
+        },
+        {
+          "address": "08118E30",
+          "inventory_span": 676,
+          "reviewed_body_bytes": null
+        },
+        {
+          "address": "081190D4",
+          "inventory_span": 676,
+          "reviewed_body_bytes": null
+        }
+      ],
+      "evidence": "Unseeded normalized loose-clone family; worker must audit body/pools before credit.",
+      "fallback": [
+        "080AD270",
+        "080C6010",
+        "080D1EA0"
+      ],
+      "stop": "Switch after ~8 minutes without improving hypothesis; end matching within 20 minutes."
+    },
+    {
+      "name": "sol_diagnostic_pilot",
+      "branch": "codex/pilot-sol-diagnostic-20261012",
+      "kind": "diagnostic",
+      "targets": [
+        {
+          "address": "08160EA4",
+          "inventory_span": 1060,
+          "reviewed_body_bytes": null
+        },
+        {
+          "address": "081616D0",
+          "inventory_span": 1060,
+          "reviewed_body_bytes": null
+        },
+        {
+          "address": "08161AF4",
+          "inventory_span": 1060,
+          "reviewed_body_bytes": null
+        },
+        {
+          "address": "08161F18",
+          "inventory_span": 1060,
+          "reviewed_body_bytes": null
+        }
+      ],
+      "evidence": "Retained 1060-byte seed with four instruction differences; prior typed/prologue probes failed.",
+      "stop": "At most three new diagnostic hypotheses; stop by 8-10 minutes if none useful; no unrelated fallback."
+    }
+  ]
+}
