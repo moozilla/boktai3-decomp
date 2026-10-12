@@ -12,6 +12,7 @@ Items and containers (tentative),08006F00,08008A70,symbols/proposed/subsystems.c
 Pooled interactables (tentative),08008A70,08009500,symbols/proposed/subsystems.csv,Complete pooled object lifecycle state handlers route placement activation effects and script commands
 Directional interaction controllers (tentative),08009500,08009E30,symbols/proposed/subsystems.csv,Complete actor proximity facing and input gates; controller scripts and lifecycle
 Collision controllers (tentative),08009E30,0800A800,symbols/proposed/subsystems.csv,Complete collision-triggered sprite animation effects pause transitions and creation scripts
+Homing and orbiting effects (tentative),0800A800,0800C49C,symbols/proposed/subsystems.csv,Six particle states and manager lifecycle; creation functions remain unmatched
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
 Sound-test menu,081E1AF4,081E270C,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md and allocator 081E26CC callback chain
 Timed presentation,081E270C,081E2898,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md timed update cleanup and initialization
