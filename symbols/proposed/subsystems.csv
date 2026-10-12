@@ -96,3 +96,31 @@ addr,name,confidence,evidence
 08006478,ChoiceMenu_FindNonemptyRow,medium,Tentative role from contiguous matched controller implementation
 080066C0,ChoiceMenu_Update,medium,Tentative role from contiguous matched controller implementation
 08006710,ChoiceMenu_Destroy,medium,Tentative role from contiguous matched controller implementation
+08006F00,Trigger_RunScript,medium,src/fn/sub_08006F00.c; provisional descriptive interpretation
+08007060,Trigger_UpdateShake,medium,src/fn/sub_08007060.c; provisional descriptive interpretation
+08007304,Trigger_TryOpenNearby,medium,src/fn/sub_08007304.c; provisional descriptive interpretation
+08007444,Trigger_UpdateFalling,medium,src/fn/sub_08007444.c; provisional descriptive interpretation
+0800751C,Trigger_UpdateLanding,medium,src/fn/sub_0800751C.c; provisional descriptive interpretation
+080075F8,Trigger_UpdateBobbingAnimation,medium,src/fn/sub_080075F8.c; provisional descriptive interpretation
+08007728,Trigger_UpdateGrounded,medium,src/fn/sub_08007728.c; provisional descriptive interpretation
+080077FC,Trigger_UpdateIdleAnimation,medium,src/fn/sub_080077FC.c; provisional descriptive interpretation
+08007908,Trigger_UpdateOpeningAnimation,medium,src/fn/sub_08007908.c; provisional descriptive interpretation
+08007AE0,Trigger_UpdateActivation,medium,src/fn/sub_08007AE0.c; provisional descriptive interpretation
+08007C48,Trigger_UpdateLockedPause,medium,src/fn/sub_08007C48.c; provisional descriptive interpretation
+08007D84,Trigger_UpdateLockedRecovery,medium,src/fn/sub_08007D84.c; provisional descriptive interpretation
+08007ECC,TriggerManager_Update,medium,src/fn/sub_08007ECC.c; provisional descriptive interpretation
+08008174,TriggerManager_Initialize,medium,src/fn/sub_08008174.c; provisional descriptive interpretation
+0800828C,Trigger_CreateDrop,medium,src/fn/sub_0800828C.c; provisional descriptive interpretation
+080083F0,Trigger_CreateDropFromScript,medium,src/fn/sub_080083F0.c; provisional descriptive interpretation
+080084F4,Trigger_CreateContainer,medium,src/fn/sub_080084F4.c; provisional descriptive interpretation
+08008820,Trigger_CreateContainerFromScript,medium,src/fn/sub_08008820.c; provisional descriptive interpretation
+0800899C,Trigger_MoveDropsByItem,medium,src/fn/sub_0800899C.c; provisional descriptive interpretation
+08008AF4,Breakable_InitSlot,medium,src/fn/sub_08008AF4.c; provisional descriptive interpretation
+08008C84,Breakable_Idle,medium,src/fn/sub_08008C84.c; provisional descriptive interpretation
+08008CF0,Breakable_React,medium,src/fn/sub_08008CF0.c; provisional descriptive interpretation
+08008D64,Breakable_Activate,medium,src/fn/sub_08008D64.c; provisional descriptive interpretation
+08008F8C,Breakable_UpdateAll,medium,src/fn/sub_08008F8C.c; provisional descriptive interpretation
+08009088,Breakable_DestroyManager,medium,src/fn/sub_08009088.c; provisional descriptive interpretation
+080090D4,Breakable_InitManager,medium,src/fn/sub_080090D4.c; provisional descriptive interpretation
+080091C8,Breakable_ScriptCreate,medium,src/fn/sub_080091C8.c; provisional descriptive interpretation
+08009454,Breakable_ScriptSetTimeout,medium,src/fn/sub_08009454.c; provisional descriptive interpretation

@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after the terrain-modifier and choice-menu completion batch (2026-10-12). This file is the single
+Last updated after the items and pooled-interactables batch (2026-10-12). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,27 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 12 items and pooled interactables
+
+Coverage is **16.274%**, up **0.331 percentage points** from 15.944%:
+**28 new exact functions / 7,984 bytes**, 5,047 total / 11,091.
+Pooled interactables (08008A70–08009500; tentative name) are **100% matched**.
+This includes resource loading, pooled allocation, route/target/explicit
+placement, state callbacks, activation effects, visibility, and cleanup.
+Items and containers (08006F00–08008A70) are **91.97% matched**; only the
+pickup-proximity/response callback at 080070D0 remains. Its best close draft
+is `build/interaction159.c` (not exact; do not count or promote it).
+The adjacent controller from 08009500 is underway in ignored `wip/`.
+
+Whole-session gain from 15.315%: **0.959 percentage points**. The 20% target
+remains open. No tooling changes or broad regression tests. Combined ROM
+validation printed `build/boktai3.gba: OK` in
+`build/items-interactables-combined.log`. Branch: `codex/actor-trigger-controller`.
+Two named report groups and provisional function aliases accompany the matches.
+The item/container field called `sound` at offset 0x16 is probably a region ID;
+`sub_0822C034` takes a position and determines its map region. Interpret older
+field names provisionally until the next focused naming cleanup.
 
 ## October 12 terrain modifiers and choice menu
 
