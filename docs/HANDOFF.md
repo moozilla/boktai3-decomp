@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after the scanline and status-screen matching batch (2026-10-12). This file is the single
+Last updated after reaching 20% matching (2026-10-12). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,36 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 12: 20% matching reached
+
+Coverage is **20.001%**, up **0.345 percentage points** from 19.656%:
+**50 additional exact functions**, 5,559 / 11,109. Reported code spans are
+483,106 / 2,415,354 bytes (8,344 additional bytes; spans include alignment
+and existing unnamed assembly tails). Without register pinning: **15.935%**;
+register-pinned: **4.066%**, included in the total.
+
+The contiguous scene-actor action run **08030164–08030710** is complete.
+The named scene-actor manager functions **08030710–08030864** are complete.
+The surrounding batch also matches directional animation dispatch, terrain
+height and flash updates, nine status-effect cases, script overrides and the
+large behavior initializer. The adjacent dialogue/window controller now has
+matching animation timing, script/choice parsing, palette and rectangle
+controls, fast text processing and cleanup. Provisional descriptive names and
+three new contiguous objdiff groups accompany the source.
+
+Combined ROM validation printed **`build/boktai3.gba: OK`**;
+log: `build/scene-actor-twenty-combined.log`. Matching work stopped because the
+20% target was reached, with **17% weekly allowance remaining** at the last
+check. The user's allowance floor is now **15% remaining**. Work remains solo;
+no tooling was changed in this batch.
+
+For a future continuation, prioritize remaining functions within the same
+scene/dialogue groups: 0802DD6C, 0802E04C, 0802E188, 0802EA90, 0802EC90,
+0802EEA8, 0802F110 and 080311F0/080313E4. The retained 0802D44C initializer
+still has only five register differences. Useful WIP sources are preserved on
+`codex/wip-scene-actor-twenty`, outside production `src/`; see
+`notes/scene-actor-twenty_2026-10-12.md`. These drafts earn no exact credit.
 
 ## October 12 pooled callbacks and adjacent scene actor batch
 
