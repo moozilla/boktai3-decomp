@@ -16,6 +16,9 @@ Homing and orbiting effects (tentative),0800A800,0800C49C,symbols/proposed/subsy
 Effect emitter (tentative),0800C49C,0800C7F4,symbols/proposed/subsystems.csv,Contiguous matched allocation initialization update and cleanup callbacks in src/fn
 Damage controller,0800C7F4,0800CBA0,symbols/proposed/subsystems.csv,Contiguous matched allocation initialization update and cleanup callbacks in src/fn
 Falling objects (tentative),0800CBA0,0800D874,symbols/proposed/subsystems.csv,Contiguous matched allocation initialization update and cleanup callbacks in src/fn
+Scanline presentation (tentative),0800D874,0800E0CC,symbols/proposed/subsystems.csv,Contiguous scanline animation lifecycle and six display layers
+Palette sets,0800E0CC,0800E3E0,symbols/proposed/subsystems.csv,Palette set allocation initialization blending and upload
+Status screen (tentative),0800E3E0,0800F4EC,symbols/proposed/subsystems.csv,Numeric display palette fades and scanline transition callback chain
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
 Sound-test menu,081E1AF4,081E270C,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md and allocator 081E26CC callback chain
 Timed presentation,081E270C,081E2898,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md timed update cleanup and initialization
