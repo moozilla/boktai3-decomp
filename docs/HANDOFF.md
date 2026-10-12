@@ -10,6 +10,21 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 selection menu and presentation
+
+Coverage is **18.044%**, up **0.157 percentage points** from 17.888%:
+**25 new exact functions / 3,784 bytes**, 5,251 total / 11,104.
+Actor/item graphics, availability, population, cursor placement, statistics,
+selection/back/confirmation states, close/hide and script initialization match.
+The selection-menu group is NOT complete: 1A218, 1A3C0, 1A418, 1A6D0 and
+1ACB8 remain. Ignored draft 1A218 is 88 bytes away (build/a218-88.c); 1A3C0
+has a body-exact four-byte prologue mismatch in wip; 1A418 sibling is similar.
+Grid navigation is in build/acb8-natural.c. Avoid repeating blind pinning.
+Combined validation: build/selection-presentation-combined.log.
+Continue at 0801B49C, whose layer configuration is a sibling of exact 1A10C.
+Previous PR #40 merged; reporting Action 38298881150 succeeded.
+Usage: 64% weekly remaining at last check; stop below 50%.
+
 ## October 12 tile animation and sprite pool
 
 Coverage is **17.888%**, up **0.067 percentage points** from 17.821%:
