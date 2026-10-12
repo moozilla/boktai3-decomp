@@ -1,21 +1,6 @@
 addr,name,confidence,evidence
 08000000,RomHeaderAndResetVector,high,gen/code_sym.s branch to crt0 plus embedded GBA header
 080001F0,InterruptDispatcherAndIwramHelpers,high,docs/ROM_MAP.md; existing report span includes following ARM helper blob
-08219A94,Runtime_FlipMessages,medium,Calls message buffer swap from scheduler housekeeping callback
-08219AAC,Runtime_Initialize,high,Initializes heap scheduler registry message queues and input state
-08219B24,Input_PollButtons,high,Reads KEYINPUT and updates held pressed released states
-08219BD8,String_Hash16,high,Rotates 16-bit accumulator five bits then adds each string byte
-08219C20,Heap_Initialize,high,Initializes free block at 02000714
-08219F04,Memory_CopyDmaChunks,high,512-byte DMA3 blocks followed by remaining word count
-08219F50,TaskSystem_InitializeLists,high,Copies fourteen list descriptors into 03005280
-08219F74,Task_Register,medium,Links task into its priority list
-08219F94,Task_Unlink,medium,Removes task from doubly linked priority list
-0821A004,Task_Create,high,Allocates and clears task; assigns nonzero ID and registers it
-0821A04C,Task_SetCallbacks,high,Stores update and destructor callbacks
-0821A054,TaskSystem_RunFrame,high,Traverses fourteen lists calling updates or destruction and freeing
-0821A0C0,Task_RequestDestroy,medium,Marks task for deferred destruction
-0821A0F8,TaskSystem_DestroyBelowLevel,medium,Traverses all lists destroying tasks whose byte at offset 16 is below threshold
-0821A130,Task_FindById,high,Traverses task lists comparing 16-bit task IDs
 080015AC,Background_ApplyQueuedCommands,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 08001768,Background_Update,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 08001AD0,Background_Destroy,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
@@ -36,10 +21,6 @@ addr,name,confidence,evidence
 08002894,ScrollingBackground_CreateFromScript,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 08002A04,ScrollingBackground_QueueCommand,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 08002A58,ScrollingBackground_SubmitScriptCommand,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
-0818D754,Motion_BuildApproachSegment,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
-0818D8E0,Motion_RampSpin,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
-0818D960,Motion_AdvanceApproach,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
-0818DB10,Motion_FollowOwnerAndFinish,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 08002AE0,Palette_BlendRange,high,Exact C palette controller family in src/fn/sub_08002AE0.c
 08002BA0,Palette_ScaleRange,high,Exact C palette controller family in src/fn/sub_08002BA0.c
 08002E80,Palette_UpdateOscillation,high,Exact C palette controller family in src/fn/sub_08002E80.c
@@ -55,16 +36,16 @@ addr,name,confidence,evidence
 08003C20,TerrainOverlay_Update,medium,Tentative role from matching source in src/fn/sub_08003C20.c
 08004018,TerrainOverlay_DestroyDrawables,medium,Tentative role from matching source in src/fn/sub_08004018.c
 08004048,TerrainOverlay_Initialize,medium,Tentative role from matching source in src/fn/sub_08004048.c
+080041CC,Scene_SpawnEdgeParticles,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_080041CC.c
 080042AC,Scene_CanEnterNeighborCell,medium,Tentative role from matching source in src/fn/sub_080042AC.c
 08004380,Scene_CheckNeighborHeight,medium,Tentative role from matching source in src/fn/sub_08004380.c
 08004450,Scene_PlayMovementEffect,medium,Tentative role from matching source in src/fn/sub_08004450.c
 080044CC,Scene_PlayNeighborMovementEffect,medium,Tentative role from matching source in src/fn/sub_080044CC.c
 080045E8,Scene_ApplyTerrainInteraction,medium,Tentative role from matching source in src/fn/sub_080045E8.c
+080046F0,Scene_DropObjectsAbove,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_080046F0.c
 08004828,Scene_ActivateTypeOneObjects,medium,Tentative role from matching source in src/fn/sub_08004828.c
 08004888,Scene_StopSelectedObject,medium,Tentative role from matching source in src/fn/sub_08004888.c
 08004940,Scene_PlayObjectBreakEffect,medium,Tentative role from matching source in src/fn/sub_08004940.c
-080041CC,Scene_SpawnEdgeParticles,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_080041CC.c
-080046F0,Scene_DropObjectsAbove,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_080046F0.c
 08004B64,Scene_SpawnDirectionalDust,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_08004B64.c
 08004CE4,Scene_TryStepDown,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_08004CE4.c
 08004E8C,SceneObjects_TryPushNeighbor,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_08004E8C.c
@@ -77,25 +58,25 @@ addr,name,confidence,evidence
 08005B8C,SceneObjects_CreateFromScript,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_08005B8C.c
 08005D30,SceneObjects_SwitchPaletteFromScript,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_08005D30.c
 08005E10,TerrainModifiers_ClearGlobal,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_08005E10.c
+08005E1C,TerrainModifiers_Link,medium,Tentative role from contiguous matched controller implementation
+08005E40,TerrainModifiers_Unlink,medium,Tentative role from contiguous matched controller implementation
 08005E64,TerrainModifiers_Create,medium,Tentative role from exact C in src/fn/sub_08005E64.c
+08005F40,TerrainModifiers_Destroy,medium,Tentative role from contiguous matched controller implementation
 08006088,TerrainModifiers_Change,medium,Tentative role from exact C in src/fn/sub_08006088.c
+08006144,TerrainModifiers_CreateManager,medium,Tentative role from contiguous matched controller implementation
 080061CC,TerrainModifiers_ChangeFromScript,medium,Tentative role from exact C in src/fn/sub_080061CC.c
+080062C4,TerrainModifiers_CreateFromScript,medium,Tentative role from contiguous matched controller implementation
 08006374,ChoiceMenu_DispatchSelection,medium,Tentative role from exact C in src/fn/sub_08006374.c
 080063D0,ChoiceMenu_Select,medium,Tentative role from exact C in src/fn/sub_080063D0.c
+08006478,ChoiceMenu_FindNonemptyRow,medium,Tentative role from contiguous matched controller implementation
 080064C4,ChoiceMenu_HandleInput,medium,Tentative role from exact C in src/fn/sub_080064C4.c
+080066C0,ChoiceMenu_Update,medium,Tentative role from contiguous matched controller implementation
+08006710,ChoiceMenu_Destroy,medium,Tentative role from contiguous matched controller implementation
 08006770,ChoiceMenu_ParseTag,medium,Tentative role from exact C in src/fn/sub_08006770.c
 08006A04,ChoiceMenu_LayoutText,medium,Tentative role from exact C in src/fn/sub_08006A04.c
 08006B60,ChoiceMenu_Initialize,medium,Tentative role from exact C in src/fn/sub_08006B60.c
 08006CD0,ChoiceMenu_Create,medium,Tentative role from exact C in src/fn/sub_08006CD0.c
 08006D44,ChoiceMenu_CreateFromScript,medium,Tentative role from exact C in src/fn/sub_08006D44.c
-08005E1C,TerrainModifiers_Link,medium,Tentative role from contiguous matched controller implementation
-08005E40,TerrainModifiers_Unlink,medium,Tentative role from contiguous matched controller implementation
-08005F40,TerrainModifiers_Destroy,medium,Tentative role from contiguous matched controller implementation
-08006144,TerrainModifiers_CreateManager,medium,Tentative role from contiguous matched controller implementation
-080062C4,TerrainModifiers_CreateFromScript,medium,Tentative role from contiguous matched controller implementation
-08006478,ChoiceMenu_FindNonemptyRow,medium,Tentative role from contiguous matched controller implementation
-080066C0,ChoiceMenu_Update,medium,Tentative role from contiguous matched controller implementation
-08006710,ChoiceMenu_Destroy,medium,Tentative role from contiguous matched controller implementation
 08006F00,Trigger_RunScript,medium,src/fn/sub_08006F00.c; provisional descriptive interpretation
 08007060,Trigger_UpdateShake,medium,src/fn/sub_08007060.c; provisional descriptive interpretation
 08007304,Trigger_TryOpenNearby,medium,src/fn/sub_08007304.c; provisional descriptive interpretation
@@ -145,8 +126,8 @@ addr,name,confidence,evidence
 0800A670,CollisionController_ScriptCreate,medium,src/fn/sub_0800A670.c; provisional descriptive interpretation
 0800A800,EffectManager_ClearGlobal,medium,src/fn/sub_0800A800.c; provisional descriptive interpretation
 0800A878,EffectManager_UpdateParticles,medium,src/fn/sub_0800A878.c; provisional descriptive interpretation
-0800AB60,EffectManager_Init,medium,src/fn/sub_0800AB60.c; provisional descriptive interpretation
 0800A8E4,EffectManager_UpdateAll,medium,Tentative effect state interpretation; exact source in src/fn/sub_0800A8E4.c
+0800AB60,EffectManager_Init,medium,src/fn/sub_0800AB60.c; provisional descriptive interpretation
 0800B3E0,EffectParticle_UpdateDriftAroundActor,medium,Tentative effect state interpretation; exact source in src/fn/sub_0800B3E0.c
 0800B788,EffectParticle_UpdateDriftBeforeHoming,medium,Tentative effect state interpretation; exact source in src/fn/sub_0800B788.c
 0800BB34,EffectParticle_UpdateHomingWide,medium,Tentative effect state interpretation; exact source in src/fn/sub_0800BB34.c
@@ -182,13 +163,13 @@ addr,name,confidence,evidence
 0800EA94,StatusScreen_WaitForClose,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
 0800EAF0,StatusScreen_Reveal,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
 0800EBB0,StatusScreen_WaitForReveal,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
+0800EC0C,StatusScreen_FadeAndExit,medium,Tentative descriptive name from exact C in src/fn/sub_0800EC0C.c
+0800ECD0,StatusScreen_WaitForStart,medium,Tentative descriptive name from exact C in src/fn/sub_0800ECD0.c
 0800ED30,StatusScreen_FadeInPalette,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
 0800EE5C,StatusScreen_FadeOutPalette,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
 0800F0F0,StatusScreen_ClearScanlineNoise,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
 0800F154,StatusScreen_Update,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
 0800F1BC,StatusScreen_Destroy,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
-0800EC0C,StatusScreen_FadeAndExit,medium,Tentative descriptive name from exact C in src/fn/sub_0800EC0C.c
-0800ECD0,StatusScreen_WaitForStart,medium,Tentative descriptive name from exact C in src/fn/sub_0800ECD0.c
 0800F220,StatusScreen_Initialize,medium,Tentative descriptive name from exact C in src/fn/sub_0800F220.c
 0800F850,ResultPrompt_Update,medium,Tentative descriptive name from exact C in src/fn/sub_0800F850.c
 0800F9C4,BoardPiece_Initialize,medium,Tentative descriptive name from exact C in src/fn/sub_0800F9C4.c
@@ -331,3 +312,39 @@ addr,name,confidence,evidence
 0801B1E8,SelectionMenu_Hide,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
 0801B274,SelectionMenu_Confirm,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
 0801B324,SelectionMenu_Initialize,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801B49C,ResultMenu_ConfigureLayers,tentative,Exact C; transformation/result controller state and call flow
+0801B568,ResultMenu_InitializeLayer,tentative,Exact C; transformation/result controller state and call flow
+0801B960,Transformation_ReportResult,tentative,Exact C; transformation/result controller state and call flow
+0801BA0C,Transformation_Charge,tentative,Exact C; transformation/result controller state and call flow
+0801BAA8,Transformation_Reveal,tentative,Exact C; transformation/result controller state and call flow
+0801BC54,Transformation_Finish,tentative,Exact C; transformation/result controller state and call flow
+0801C064,ResultMenu_EnqueueMarker,tentative,Exact C; transformation/result controller state and call flow
+0801C0C8,ResultMenu_UpdateMarkers,tentative,Exact C; transformation/result controller state and call flow
+0801C1E8,ResultMenu_SendCommand,tentative,Exact C; transformation/result controller state and call flow
+0801C5AC,ResultMenu_DestroyGraphics,tentative,Exact C; transformation/result controller state and call flow
+0801C650,ResultMenu_Countdown,tentative,Exact C; transformation/result controller state and call flow
+0801C760,ResultGame_ScoreAlignment,tentative,Exact C; transformation/result controller state and call flow
+0801CAF0,ResultGame_ScorePress,tentative,Exact C; transformation/result controller state and call flow
+0801CBCC,ResultGame_HandlePress,tentative,Exact C; transformation/result controller state and call flow
+0801CE2C,ResultGame_Update,tentative,Exact C; transformation/result controller state and call flow
+0801CEF0,ResultGame_Finish,tentative,Exact C; transformation/result controller state and call flow
+0801CF30,ResultMenu_Update,tentative,Exact C; transformation/result controller state and call flow
+0818D754,Motion_BuildApproachSegment,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+0818D8E0,Motion_RampSpin,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+0818D960,Motion_AdvanceApproach,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+0818DB10,Motion_FollowOwnerAndFinish,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+08219A94,Runtime_FlipMessages,medium,Calls message buffer swap from scheduler housekeeping callback
+08219AAC,Runtime_Initialize,high,Initializes heap scheduler registry message queues and input state
+08219B24,Input_PollButtons,high,Reads KEYINPUT and updates held pressed released states
+08219BD8,String_Hash16,high,Rotates 16-bit accumulator five bits then adds each string byte
+08219C20,Heap_Initialize,high,Initializes free block at 02000714
+08219F04,Memory_CopyDmaChunks,high,512-byte DMA3 blocks followed by remaining word count
+08219F50,TaskSystem_InitializeLists,high,Copies fourteen list descriptors into 03005280
+08219F74,Task_Register,medium,Links task into its priority list
+08219F94,Task_Unlink,medium,Removes task from doubly linked priority list
+0821A004,Task_Create,high,Allocates and clears task; assigns nonzero ID and registers it
+0821A04C,Task_SetCallbacks,high,Stores update and destructor callbacks
+0821A054,TaskSystem_RunFrame,high,Traverses fourteen lists calling updates or destruction and freeing
+0821A0C0,Task_RequestDestroy,medium,Marks task for deferred destruction
+0821A0F8,TaskSystem_DestroyBelowLevel,medium,Traverses all lists destroying tasks whose byte at offset 16 is below threshold
+0821A130,Task_FindById,high,Traverses task lists comparing 16-bit task IDs
