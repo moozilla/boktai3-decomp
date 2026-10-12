@@ -62,6 +62,28 @@ class ProgressTests(unittest.TestCase):
         self.assertTrue({'__adddf3', '__kernel_sin', 'STWI_init_all',
                          'SiiRtcSetTime', 'EEPROMRead', 'm4aSoundMode', 'memcpy'} <= sdk_names)
 
+    def test_subsystem_groups_preserve_credit_and_pinning(self):
+        funcs, sizes = progress.load_functions()
+        done = progress.collect_done(funcs, Path(progress.ROOT) / "src")
+        pinned = progress.collect_pinned(funcs, Path(progress.ROOT) / "src") & done
+        libraries = progress.load_libraries(funcs, sizes)
+        groups = progress.load_groups(funcs, sizes, progress.SUBSYSTEMS, "game")
+        before = progress.make_report(funcs, sizes, done, libraries, pinned)
+        after = progress.make_report(funcs, sizes, done, libraries, pinned, groups)
+        for key in ("total_code", "matched_code", "matched_functions"):
+            self.assertEqual(before["measures"][key], after["measures"][key])
+        original = {f["metadata"]["virtual_address"]: f["fuzzy_match_percent"]
+                    for u in before["units"] for f in u["functions"]}
+        grouped = [f for u in after["units"] for f in u["functions"]]
+        self.assertEqual(len(grouped), len(original))
+        self.assertEqual(original, {f["metadata"]["virtual_address"]:
+                                   f["fuzzy_match_percent"] for f in grouped})
+        self.assertTrue(any(u["name"] == "game/Task scheduler" for u in after["units"]))
+        for a, b in zip(before["categories"], after["categories"]):
+            self.assertEqual(a["measures"]["matched_code"], b["measures"]["matched_code"])
+        with self.assertRaisesRegex(ValueError, "overlap"):
+            progress.make_report(funcs, sizes, done, libraries, pinned, groups + groups)
+
     def test_inventory_and_named_address_alias(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
