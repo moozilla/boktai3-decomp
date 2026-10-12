@@ -1,9 +1,11 @@
 #include "global.h"
+#define Presentation_ConfigureFrameRange sub_081E3354
+// Provisional name: Presentation_ConfigureFrameRange
 struct Sequence {u8 pad[0x218];u32 resource;u16 option;u8 gap[6];u16 first,last,timer,duration;};
 s32 Script_SeekToKeyword(s32);s32 Script_GetValue(void);u32 sub_08227E90(void);
 void sub_080311B0(s32);void sub_08030C84(u32);void sub_08030F20(s32,s32,s32,s32);void sub_08030B78(s32);void sub_08030DBC(s32);
 // Configure the scripted frame range and its duration.
-void sub_081E3354(struct Sequence *p){
+void Presentation_ConfigureFrameRange(struct Sequence *p){
  if(Script_SeekToKeyword('r')){
  p->resource=sub_08227E90();
  if(Script_SeekToKeyword('m')){

@@ -1,4 +1,7 @@
 #include "global.h"
+#define ActorPalette_BeginFade sub_081E34D0
+#define Actor_MoveAlongCurveToRest sub_081E692C
+// Provisional name: Actor_MoveAlongCurveToRest
 // MATCHING_CONCESSION: register-pinning
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
@@ -10,7 +13,7 @@ void sub_081E4188(void *);void sub_08013440(void *);void sub_081E41EC(void *);
 static inline u8 take(struct S *p) {s32 m=1;register s32 v asm("r1")=p->flags;if(v&m) {p->flags=~m&v;p->done=0;return 1;}return 0;}
 static inline u32 mode_bits(u8 *p,u32 mask){register u32 v asm("r1")=*p;register u32 result asm("r0")=mask&v;return result;}
 static inline u32 frame_factor(u16 v) {register u32 value asm("r1")=v;u32 mask=15;return mask&value;}
-struct Child {void (*fn)(void*,void*);u8 pad;u8 flags;u8 rest[0xdc-6];};void sub_081E5608(void*,void*);void sub_08056CC0(void);void sub_081E4174(void*);void sub_08215284(void*,s32);void sub_0822B2F8(s32);void sub_0821AD08(void*,s32);void sub_08013424(void*);void sub_081E34D0(void*);
+struct Child {void (*fn)(void*,void*);u8 pad;u8 flags;u8 rest[0xdc-6];};void sub_081E5608(void*,void*);void sub_08056CC0(void);void sub_081E4174(void*);void sub_08215284(void*,s32);void sub_0822B2F8(s32);void sub_0821AD08(void*,s32);void sub_08013424(void*);void ActorPalette_BeginFade(void*);
 extern u8 gUnk_03005430[];extern const s16 gUnk_086149C4[];u8 sub_082215E4(s32,s32);void sub_081E41B0(void*);
 static inline void set_direction(s16 angle,u8 *directionOut,u8 *flipOut){register s32 direction asm("r2");
  while(angle<0)angle+=256;
@@ -22,7 +25,7 @@ static inline void set_direction(s16 angle,u8 *directionOut,u8 *flipOut){registe
  else if(choice<4){*directionOut=4-direction;*flipOut=1;}
  else{register s32 result asm("r0")=direction-4;*directionOut=result;*flipOut=0;}}
 }
-void sub_081E692C(struct S*p){
+void Actor_MoveAlongCurveToRest(struct S*p){
  struct Obj *o;struct Anim *a;const u16 *entry;register u16 n asm("r0");u8 done;
  if(take(p)){
  p->timer=0;p->startX=p->obj.x;p->startY=p->obj.y;p->startZ=p->obj.z;p->state=0;

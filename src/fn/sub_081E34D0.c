@@ -1,4 +1,8 @@
 #include "global.h"
+#define ActorPalette_BeginFade sub_081E34D0
+#define ActorPalette_UpdateFade sub_081E3550
+#define ActorPalette_UpdateFadeAndNotify sub_081E36FC
+// Provisional name: ActorPalette_BeginFade
 struct PaletteController {
     u8 beforeEffect[0xe08];
     u8 effect[12]; const u16 *palette;
@@ -12,16 +16,16 @@ struct PaletteController {
     void (*callback)(void *);
 };
 void sub_08215284(void *, s32);
-void sub_081E3550(void *); void sub_081E36FC(void *);
+void ActorPalette_UpdateFade(void *); void ActorPalette_UpdateFadeAndNotify(void *);
 // Begin an actor palette transition; mode 2 also completes a waiting request.
-void sub_081E34D0(struct PaletteController *p) {
+void ActorPalette_BeginFade(struct PaletteController *p) {
     p->step=0;
     p->duration=50;
     sub_08215284(p->effect,344);
     p->savedPalette=p->palette;
     p->palette=p->output;
     if ((*(u8 *)&p->mode & 15)==2)
-        p->callback=sub_081E36FC;
+        p->callback=ActorPalette_UpdateFadeAndNotify;
     else
-        p->callback=sub_081E3550;
+        p->callback=ActorPalette_UpdateFade;
 }

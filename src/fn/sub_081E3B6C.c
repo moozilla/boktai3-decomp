@@ -1,4 +1,6 @@
 #include "global.h"
+#define Actor_ProjectAndClampToScreen sub_081E3B6C
+// Provisional name: Actor_ProjectAndClampToScreen
 // MATCHING_CONCESSION: register-pinning
 struct Vec {s16 x,y,z;};
 struct Actor {u8 pad[0xddc];u32 flags;u8 gap[0xdf8-0xde0];struct Vec pos;};
@@ -15,7 +17,7 @@ static inline void screen(struct Vec *dst,struct Vec *src){
  dst->z=z-gUnk_03005418[2];
 }
 // Project the actor into screen space and clamp it to the visible display.
-void sub_081E3B6C(struct Actor *p){struct Vec pos;
+void Actor_ProjectAndClampToScreen(struct Actor *p){struct Vec pos;
  p->flags|=0x30;
  screen(&pos,&p->pos);
  if(pos.x>240)pos.x=240;else if(pos.x<0)pos.x=0;

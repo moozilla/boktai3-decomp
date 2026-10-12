@@ -1,4 +1,6 @@
 #include "global.h"
+#define SoundTest_CountEntries sub_081E1AF4
+// Provisional name: SoundTest_CountEntries
 // MATCHING_CONCESSION: register-pinning
 struct Sprite {u8 head[8];u32 flags;u8 gap[0x20-12];s16 x,y;u8 tail[0x60-0x24];};
 struct Resource {u32 words[8];};
@@ -7,4 +9,4 @@ void sub_0821980C(void*,void*,u16,s32);s32 Mod(s32,s32);s32 Div(s32,s32);
 extern const s16 gUnk_086136F0[],gUnk_086137AE[],gUnk_08613BC4[];
 static inline s32 count(const s16*list){register s32 n asm("r2")=0;while(*list!=-1){list++;n++;}return n;}
 // Count entries in each of the three sound-test categories.
-void sub_081E1AF4(struct Viewer*p){p->countA=count(gUnk_086136F0);p->countB=count(gUnk_086137AE);p->countC=count(gUnk_08613BC4);}
+void SoundTest_CountEntries(struct Viewer*p){p->countA=count(gUnk_086136F0);p->countB=count(gUnk_086137AE);p->countC=count(gUnk_08613BC4);}

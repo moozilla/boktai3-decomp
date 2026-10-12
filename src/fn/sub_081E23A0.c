@@ -1,4 +1,12 @@
 #include "global.h"
+#define SoundTest_CountEntries sub_081E1AF4
+#define SoundTest_ShowCategory sub_081E1B80
+#define SoundTest_MoveCategoryCursor sub_081E1BC8
+#define SoundTest_DrawTrackName sub_081E1C10
+#define SoundTest_DrawSecondCategoryIndex sub_081E1C64
+#define SoundTest_DrawThirdCategoryIndex sub_081E1CDC
+#define SoundTest_Initialize sub_081E23A0
+// Provisional name: SoundTest_Initialize
 struct Sprite {u8 head[8];u32 flags;u8 gap[0x20-12];s16 x,y;u8 tail[0x60-0x24];};
 struct Resource {u32 words[8];};
 struct Viewer {u8 p0[0x20];struct Sprite background;struct Resource backgroundResource;u8 p1[8];struct Sprite panel;struct Resource panelResource;u8 p2[8];struct Sprite cursor;struct Resource cursorResource;u8 p3[8];struct Sprite label;struct Resource labelResource;u8 p4[8];struct Resource digitsResource;struct Sprite digitsA[3],digitsB[3],labels[3];s32 state,exitFlag,exitTimer,fadeShift,selection,countA,countB,countC,textIndex,valueA,valueB,previousA,previousB,previousC,repeatTimer;const u16 *savedPalette;u16 palette[16];};
@@ -8,11 +16,11 @@ u32 sub_0822B590(s32);void sub_0822B358(s32);void sub_0822B2F8(s32);void sub_082
 extern u16 gUnk_03004FC0[];
 void sub_082156B8(s32);void sub_0821656C(s32,s32,s32,s32,s32);void *sub_0821A520(s32,s32);
 void sub_082161B4(s32,s32,void*,s32,s32,s32,void*);void sub_082196C4(void*,void*);void sub_0821983C(void*,void*,s32,s32,s32,s32,s32,void*);
-void sub_081DC1B4(s32);void sub_081E1AF4(void*);void sub_081E1B80(void*);void sub_081E1BC8(void*);void sub_081E1C10(void*);void sub_081E1C64(void*);void sub_081E1CDC(void*);
+void sub_081DC1B4(s32);void SoundTest_CountEntries(void*);void SoundTest_ShowCategory(void*);void SoundTest_MoveCategoryCursor(void*);void SoundTest_DrawTrackName(void*);void SoundTest_DrawSecondCategoryIndex(void*);void SoundTest_DrawThirdCategoryIndex(void*);
 struct Vec {s16 x,y,z,w;};
 static inline void clear(u32 *value,void *dest){*value=0;CpuSet(value,dest,0x05000002);}
 // Load sound-test assets and initialize its category labels, counters and palette.
-s32 sub_081E23A0(struct Viewer*p){struct Vec pos;u32 zero;void *asset;s32 option,i;
+s32 SoundTest_Initialize(struct Viewer*p){struct Vec pos;u32 zero;void *asset;s32 option,i;
  clear(&zero,&pos);
  sub_082156B8(0);sub_0821656C(0,0,0,0,0);
  sub_082156B8(2);sub_0821656C(2,0,0,0,0);
@@ -34,6 +42,6 @@ s32 sub_081E23A0(struct Viewer*p){struct Vec pos;u32 zero;void *asset;s32 option
  sub_082196C4(&p->cursorResource,asset);sub_0821983C(&p->cursor,&p->cursorResource,71,16,0,0,0,0);
  p->savedPalette=*(u16**)((u8*)p+0x178);CpuSet(p->savedPalette,p->palette,16);*(u16**)((u8*)p+0x178)=p->palette;
  p->selection=0;p->fadeShift=3;sub_081DC1B4(3);
- sub_081E1AF4(p);sub_081E1B80(p);sub_081E1BC8(p);sub_081E1C10(p);sub_081E1C64(p);sub_081E1CDC(p);
+ SoundTest_CountEntries(p);SoundTest_ShowCategory(p);SoundTest_MoveCategoryCursor(p);SoundTest_DrawTrackName(p);SoundTest_DrawSecondCategoryIndex(p);SoundTest_DrawThirdCategoryIndex(p);
  return 0;
 }

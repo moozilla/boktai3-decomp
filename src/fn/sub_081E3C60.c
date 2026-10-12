@@ -1,4 +1,6 @@
 #include "global.h"
+#define Actor_TryInteraction sub_081E3C60
+// Provisional name: Actor_TryInteraction
 // MATCHING_CONCESSION: register-pinning
 struct Obj {u32 flags;u8 pad[3];u8 priority;s8 scaleX,scaleY;u8 padScale[6];u16 frame;u8 pad2[10];s16 x,y,z;};
 struct Anim {const u16 *data;u8 flags,count,factor,rate;u16 frame,unused,scale,timer;};
@@ -10,7 +12,7 @@ u8 sub_082215E4(s32,s32);void sub_0821AD08(void*,s32);
 void sub_081E574C(void*,void*);void sub_081E5648(void*,void*);void sub_081E4174(void*);void sub_081E44D4(void*);
 static inline u32 mode_bits(u8 *p,u32 mask){register u32 v asm("r1")=*p;register u32 result asm("r0")=mask&v;return result;}
 // Tentative: accept a nearby interaction when facing, height and input permit it.
-void sub_081E3C60(struct G*p,struct Partner*q){
+void Actor_TryInteraction(struct G*p,struct Partner*q){
  s32 dx,dz,xOffset,height,length; register s32 zOffset asm("r4");u32 radius; register u32 a asm("r8");u32 b,c;register u32 sector asm("r2");u8 *owner;
  if(q->group!=p->group)return;
  if(q->orientation==0){xOffset=0;zOffset=128;}else{xOffset=128;zOffset=0;}

@@ -1,4 +1,6 @@
 #include "global.h"
+#define Actor_ConfigureFromScript sub_081EA1C0
+// Provisional name: Actor_ConfigureFromScript
 extern u8 *gUnk_020003C8;
 u8 *sub_081EA730(s32, s32);
 struct Obj {u32 flags;u8 pad[3];u8 priority;s8 scaleX,scaleY;u8 padScale[6];u16 frame;u8 pad2[10];s16 x,y,z;};
@@ -19,7 +21,7 @@ static inline void state(struct G*g,u32 mode,u32 phase){
     }
     { u8 one = 1; g->flags |= one; }
 }
-void sub_081EA1C0(void){struct G*g=(struct G*)gUnk_020003C8;struct Obj*obj;
+void Actor_ConfigureFromScript(void){struct G*g=(struct G*)gUnk_020003C8;struct Obj*obj;
  if(!g)g=(struct G*)sub_081EA730(0xbb34,0);
  obj=(struct Obj*)((u8*)g+0xddc);sub_08215284((u8*)g+0xe08,343);g->obj.priority=0;g->last=0;
  g->resource=Script_GetValue();g->next=sub_0821ABA8(0x72,0);g->gap6a=sub_0821ABA8(0x41,0);
