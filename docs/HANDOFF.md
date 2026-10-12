@@ -10,6 +10,22 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 solo workflow update
+
+The user authorized compact diffs, candidate tracking, updated worker guidance,
+and a bounded subsystem investigation, explicitly solo. The older allowance
+floor below describes the previous tranche, not this authorization.
+
+- [Backlog](BACKLOG.md) preserves the user's complete research/tooling/editor
+  ideas; it is not blanket authorization to implement all of them.
+- [Candidate workflow](CANDIDATES.md): compact aligned diffs, explicit reviewed
+  target extents, retained full output and reproducible per-attempt checkpoints.
+- [Motion family](MOTION_0818.md): shared layout and callback chain, three
+  existing exact functions using one header, improved unfinished DB10/sibling
+  drafts. No new exact byte credit. WIP is separate from production.
+- Work selection now favors evidence-backed families and allows useful types,
+  naming and architecture work during matching rather than only at cleanup.
+
 ## 1. Where things stand
 
 | | |

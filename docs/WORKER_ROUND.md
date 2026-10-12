@@ -1,20 +1,24 @@
-# Standard round brief (for range workers)
+# Standard round brief (only when workers are authorized)
+
+Current October 12 session is solo. Use docs/WORKER.md and docs/CANDIDATES.md.
+Historical model-specific quotas below are examples, not current assignments.
 
 1. Work only in the assigned isolated checkout. The orchestrator supplies its
    branch and baseline; do not merge or reset another worker's work. Activate
    `build/venv`, record a start timestamp in `build/roundN/`, inspect leftover
    WIP and confirm the baseline build. Preserve older benchmark logs.
 2. Read docs/WORKER.md (consolidated tricks) and your notes/NAME.md.
-3. Worklist: `python3 tools/worklist.py --range START END --max-insns 80` (when thin,
+3. Worklist: `build/venv/bin/python tools/worklist.py --range START END --max-insns 80` (when thin,
    `--max-insns 150`). Order: shape/clone families, switches, 41-80 insns, small
    leftovers, then 81-150. Confirm every target is still unmatched before drafting;
    rewriting an existing match is not progress. Skip already-logged skips unless
    you have a new idea. Read `docs/COMPILER_REFERENCES.md` for checked community tips.
-4. Inner loop: `python3 tools/check.py wip/sub_X.c`; always confirm the final MATCH line.
-   Copy into src/fn/ only on MATCH. Full `python3 tools/build.py` OK before each commit
-   (batch ~5 matches per build). Never commit non-matching files, never raw ROM data
+4. Prefer a seeded family with reviewed body sizes and shared layout evidence.
+   Inner loop: `build/venv/bin/python tools/check.py wip/sub_X.c`; always confirm the final MATCH line.
+   Copy into src/fn/ only on MATCH. Full `build/venv/bin/python tools/build.py` OK before each commit
+   (batch ~5 matches per build). Keep nonmatching candidates on dedicated WIP branches outside src/; never raw ROM data
    addresses. Named functions keep their gen name.
-5. After batches: `python3 tools/clones.py --port --loose --range START END`.
+5. After batches: `build/venv/bin/python tools/clones.py --port --loose --range START END`.
 6. After every verified build batch, commit each new function separately. The
    orchestrator reviews and merges all worker work as one integration batch;
    only that main push triggers progress Actions. Do not push without assignment.
