@@ -50,6 +50,8 @@ Selection menu (tentative),08019E58,0801B49C,symbols/proposed/subsystems.csv,Act
 Transformation and result game (tentative),0801B49C,0801D104,symbols/proposed/subsystems.csv,"Contiguous shared state, result scoring, graphics and transformation sequence"
 Result game tutorial (tentative),0801D104,0801E000,symbols/proposed/subsystems.csv,"Complete contiguous tutorial: prompts, movement, tracking and press demonstrations, display blink, setup and teardown"
 Scene object controller (tentative),0801E000,08020964,symbols/proposed/subsystems.csv,Shared 140-byte object slots; script handlers and callbacks; task constructor 0802091C registers update 0801F93C and destructor 080203D4
+Scene message controller,08020964,08020F6C,symbols/proposed/subsystems.csv,Complete receiver registration double-buffered dispatch script lookup and scene-script lifecycle; src/fn/sub_08020DF0.c
+Scene presentation commands,08020F6C,080213EC,symbols/proposed/subsystems.csv,Effect palette fade and blend command handlers; 08021044 and 0802123C remain unmatched
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
 Sound-test menu,081E1AF4,081E270C,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md and allocator 081E26CC callback chain
 Timed presentation,081E270C,081E2898,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md timed update cleanup and initialization

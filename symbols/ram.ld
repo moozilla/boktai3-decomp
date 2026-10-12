@@ -63,3 +63,5 @@ __nedf2 = sub_08249FF4;
 
 /* agbcc indirect-call helper: original 08249244 is bx r3; nop. */
 _call_via_r3 = sub_08249244;
+/* agbcc indirect-call trampoline: bx r5; nop. */
+_call_via_r5 = sub_0824924C;
