@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after the scene-object completion batch (2026-10-12). This file is the single
+Last updated after the terrain-modifier and choice-menu completion batch (2026-10-12). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,23 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 12 terrain modifiers and choice menu
+
+Coverage is **15.944%**, up **0.133 percentage points** from 15.810%:
+**11 new exact functions / 3,216 bytes**, 5,019 total / 11,091.
+Terrain modifiers (08005E10–08006374; tentative role) and the choice menu
+(08006374–08006F00) are now **100% matched**, with named report groups.
+The menu supports row/column navigation, confirm/cancel dispatch, script
+arguments, text layout and ALTER/EXTEND/VAR markup. The modifier manager
+registers and changes terrain cells through script commands.
+
+The menu constructor at 08006CD0 has its own verified boundary; the code-byte
+denominator is unchanged. Whole-session gain from 15.315% is **0.629 percentage
+points**. Continue into actor triggers at 08006F00; the 20% target remains open.
+No tooling or broad regression tests. Combined build printed
+`build/boktai3.gba: OK` in `build/terrain-menu-combined.log`.
+Branch: `codex/terrain-modifiers-and-choice-menu`.
 
 ## October 12 scene-object completion batch
 
