@@ -491,6 +491,36 @@ addr,name,confidence,evidence
 080280CC,SceneActor_RepeatDirectedProjectiles,low,Tentative descriptive role from exact C control flow; src/fn/sub_080280CC.c
 080282BC,SceneActor_TimedAnchoredReaction,low,Tentative descriptive role from exact C control flow; src/fn/sub_080282BC.c
 08028414,SceneActor_EmitDestructionParticles,low,Tentative descriptive role from exact C control flow; src/fn/sub_08028414.c
+08028E18,SceneActor_DispatchCompanionCommand,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_08028E18.c
+08028E6C,SceneActor_QueueCompanionCommand,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_08028E6C.c
+08028EC0,SceneActor_QueueDefaultCompanionCommand,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_08028EC0.c
+08028F48,SceneActor_DestroyController,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_08028F48.c
+08029798,SceneActor_CreateController,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_08029798.c
+080297FC,GridActor_SetAnimation,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_080297FC.c
+08029908,GridActor_InitializeBodyCollider,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_08029908.c
+080299B4,GridActor_InitializeAttackCollider,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_080299B4.c
+08029A4C,GridActor_GridCellPosition,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_08029A4C.c
+08029A78,GridActor_SpawnGridCellEffect,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_08029A78.c
+08029AA8,GridActor_SpawnGridAttackPattern,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_08029AA8.c
+08029CC0,GridActor_DispatchDamageReaction,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_08029CC0.c
+08029E2C,GridActor_SelectUnusedAttack,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_08029E2C.c
+08029EB4,GridActor_EmitDestructionParticles,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_08029EB4.c
+08029F64,GridActor_SendEnableCommand,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_08029F64.c
+08029FB0,GridActor_SendDisableCommand,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_08029FB0.c
+08029FF8,GridActor_IdleState,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_08029FF8.c
+0802A0B8,GridActor_RepeatedGridAttack,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_0802A0B8.c
+0802A188,GridActor_StagedGridAttack,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_0802A188.c
+0802A400,GridActor_TargetedProjectileAttack,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_0802A400.c
+0802A4F4,GridActor_HoldHitAnimation,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_0802A4F4.c
+0802A53C,GridActor_TimedHitReaction,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_0802A53C.c
+0802A5A0,GridActor_RecoverHitReaction,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_0802A5A0.c
+0802A63C,GridActor_DeathState,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_0802A63C.c
+0802A714,GridActor_HiddenState,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_0802A714.c
+0802A7A8,GridActor_AnchoredReaction,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_0802A7A8.c
+0802A8CC,GridActor_RepeatAnimation,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_0802A8CC.c
+0802A958,GridActor_WaitAttackAnimation,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_0802A958.c
+0802A9C0,GridActor_WaitAlternateAttackAnimation,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_0802A9C0.c
+0802AA28,GridActor_TimedAnchoredReaction,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_0802AA28.c
 0818D754,Motion_BuildApproachSegment,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D8E0,Motion_RampSpin,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D960,Motion_AdvanceApproach,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
