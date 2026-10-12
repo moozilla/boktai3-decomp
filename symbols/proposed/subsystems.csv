@@ -49,3 +49,17 @@ addr,name,confidence,evidence
 080031EC,Palette_InitializeFromScript,high,Exact C palette controller family in src/fn/sub_080031EC.c
 080034A8,Palette_ReplaceResource,high,Exact C palette controller family in src/fn/sub_080034A8.c
 080035F0,Palette_SetBrightnessFromScript,high,Exact C palette controller family in src/fn/sub_080035F0.c
+080038B4,ColorFade_ApplyCommand,medium,Tentative role from matching source in src/fn/sub_080038B4.c
+08003960,ColorFade_ApplyCommands,medium,Tentative role from matching source in src/fn/sub_08003960.c
+08003BB8,TerrainOverlay_QueueCommand,medium,Tentative role from matching source in src/fn/sub_08003BB8.c
+08003C20,TerrainOverlay_Update,medium,Tentative role from matching source in src/fn/sub_08003C20.c
+08004018,TerrainOverlay_DestroyDrawables,medium,Tentative role from matching source in src/fn/sub_08004018.c
+08004048,TerrainOverlay_Initialize,medium,Tentative role from matching source in src/fn/sub_08004048.c
+080042AC,Scene_CanEnterNeighborCell,medium,Tentative role from matching source in src/fn/sub_080042AC.c
+08004380,Scene_CheckNeighborHeight,medium,Tentative role from matching source in src/fn/sub_08004380.c
+08004450,Scene_PlayMovementEffect,medium,Tentative role from matching source in src/fn/sub_08004450.c
+080044CC,Scene_PlayNeighborMovementEffect,medium,Tentative role from matching source in src/fn/sub_080044CC.c
+080045E8,Scene_ApplyTerrainInteraction,medium,Tentative role from matching source in src/fn/sub_080045E8.c
+08004828,Scene_ActivateTypeOneObjects,medium,Tentative role from matching source in src/fn/sub_08004828.c
+08004888,Scene_StopSelectedObject,medium,Tentative role from matching source in src/fn/sub_08004888.c
+08004940,Scene_PlayObjectBreakEffect,medium,Tentative role from matching source in src/fn/sub_08004940.c
