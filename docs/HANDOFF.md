@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after the directional and collision controller completion batch (2026-10-12). This file is the single
+Last updated after the effect-update matching batch (2026-10-12). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,24 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 12 effect updates
+
+Coverage is **16.653%**, up **0.201 percentage points** from 16.452%:
+**seven new exact functions / 4,848 bytes**, 5,076 total / 11,093.
+The effect manager frame update and all six movement/animation callbacks now
+match: orbiting, target contact, two homing variants, dissipating, and finished
+animation release. A named report group covers 0800A800–0800C49C.
+Names are provisional. Constructors 0800AC44 and 0800AFE8 remain unmatched;
+do not mistake the completed update states for complete construction support.
+Whole-session gain from 15.315% is **1.338 percentage points**; 20% remains open.
+
+Current branch: codex/effect-manager-continuation.
+Combined validation log: build/effect-updates-combined.log.
+Continue actual matching without tooling changes. The adjacent effect-emitter
+hit callback 0800C49C has an exact draft in wip/ (not yet production).
+Its manager at 0800C520 and initialization at 0800C654 are next.
+The item pickup callback 080070D0 also remains unfinished.
 
 ## October 12 directional and collision controller completion
 

@@ -146,3 +146,10 @@ addr,name,confidence,evidence
 0800A800,EffectManager_ClearGlobal,medium,src/fn/sub_0800A800.c; provisional descriptive interpretation
 0800A878,EffectManager_UpdateParticles,medium,src/fn/sub_0800A878.c; provisional descriptive interpretation
 0800AB60,EffectManager_Init,medium,src/fn/sub_0800AB60.c; provisional descriptive interpretation
+0800A8E4,EffectManager_UpdateAll,medium,Tentative effect state interpretation; exact source in src/fn/sub_0800A8E4.c
+0800B3E0,EffectParticle_UpdateDriftAroundActor,medium,Tentative effect state interpretation; exact source in src/fn/sub_0800B3E0.c
+0800B788,EffectParticle_UpdateDriftBeforeHoming,medium,Tentative effect state interpretation; exact source in src/fn/sub_0800B788.c
+0800BB34,EffectParticle_UpdateHomingWide,medium,Tentative effect state interpretation; exact source in src/fn/sub_0800BB34.c
+0800BE24,EffectParticle_UpdateHoming,medium,Tentative effect state interpretation; exact source in src/fn/sub_0800BE24.c
+0800C0B4,EffectParticle_UpdateFinish,medium,Tentative effect state interpretation; exact source in src/fn/sub_0800C0B4.c
+0800C210,EffectParticle_UpdateDissipating,medium,Tentative effect state interpretation; exact source in src/fn/sub_0800C210.c
