@@ -4,6 +4,10 @@ address,isa,evidence,replacement_end
 0802CEF8,thumb,Independent 24-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md,
 081DB24C,thumb,Independent 108-byte Thumb allocation wrapper in retained 081DB1D8 tail; own prologue and call sequence and pop-bx plus literals; ends at 081DB2B8; notes/solo-family_2026-10-09.md,081DB2B8
 081DB2B8,thumb,Independent 108-byte Thumb allocation wrapper in retained 081DB1D8 tail; own prologue and call sequence and pop-bx plus literals; ends at 081DB324; notes/solo-family_2026-10-09.md,081DB324
+081E4B0C,thumb,Independent animation command body with own push and pop-bx plus literal pool in retained 081E4A60 tail,081E4BD4
+081E4BD4,thumb,Independent animation command body with own push and pop-bx plus literal pool in retained 081E4A60 tail,081E4C74
+081E4C74,thumb,Independent animation command body with own push and pop-bx plus literal pool in retained 081E4A60 tail,081E4D14
+081E4D14,thumb,Independent animation command body with own push and pop-bx plus literal pool in retained 081E4A60 tail,081E4DB4
 08227F3C,thumb,Independent 16-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md,
 08227F4C,thumb,Independent 12-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md,
 08227F58,thumb,Independent 4-byte Thumb body after 08227ECC return and literal pool; standalone exact C check; notes/push20-root.md,
