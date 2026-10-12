@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after the solo animation matching batch (2026-10-12). This file is the single
+Last updated after the background and palette completion batch (2026-10-12). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,23 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 12 background and palette completion batch
+
+Coverage is **15.490%**, up **0.176 percentage points** from 15.315%:
+**16 new exact functions / 4,240 bytes**, 4,980 total / 11,089.
+Both **Background controllers (080015AC–08002AA8)** and **Palette controllers
+(08002AA8–080036F8)** are now **100% matched**. The new inventory boundary at
+080020BC separates an independently matched map-loading wrapper; the code
+byte denominator remains 2,415,354. The 20% target remains unfinished by
+**4.510 percentage points**. Continue into the adjacent color/fade controller
+starting at 080036F8; its command application and queue functions remain.
+
+Work is solo, matching only. No new tooling or regression tests. Empty asm
+constraints used with marked local register hints emit no instructions; they
+prevent old agbcc from discarding the hint. Full build log for this batch:
+`build/background-palette-combined.log` printed `build/boktai3.gba: OK`. Branch: `codex/background-completion`.
+The earlier background WIP checkpoint is superseded by exact production C.
 
 ## October 12 subsystem reporting and background setup batch
 
