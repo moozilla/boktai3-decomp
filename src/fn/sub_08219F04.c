@@ -1,5 +1,5 @@
 #include "global.h"
-#define Memory_CopyDmaChunks BgGfx_LoadTiles
+#define Memory_CopyDmaChunks sub_08219F04
 struct DmaTransfer { volatile u32 source, destination, control; };
 void Memory_CopyDmaChunks(u8 *source, u8 *destination, u32 bytes)
 {
