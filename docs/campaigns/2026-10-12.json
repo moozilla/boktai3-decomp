@@ -231,5 +231,21 @@
     ],
     "limits": "Recorded per-response usage; reasoning is included in output. Not subscription allocation or dollars. Snapshot excludes later responses and final closeout."
   },
-  "next": "Prefer a fresh related family with bounded seed work; park diagnostic residue. Do not expand concurrency based on this small heterogeneous pilot."
+  "next": "Prefer a fresh related family with bounded seed work; park diagnostic residue. Do not expand concurrency based on this small heterogeneous pilot.",
+  "integration": {
+    "pull_request": "https://github.com/moozilla/boktai3-decomp/pull/19",
+    "validated_source_commit": "090c62b",
+    "exact_checks": {
+      "080AD270": 412,
+      "080C6010": 412,
+      "080D1EA0": 412
+    },
+    "original_sha1": "2651c5e6875ac60abff734510d152166d211c87c",
+    "combined_full_build": "build/boktai3.gba: OK",
+    "shift_bytes": 65536,
+    "shifted_sha1": "c208e82ae4996ba6e2066a724421190f5cf26a02",
+    "shift_evidence": "Identical to previously tested shifted ROM; reuse 35 screenshots, no new emulator run.",
+    "wip_branch": "codex/wip-motion-2026-10-12",
+    "wip_commit": "30d59fb"
+  }
 }
