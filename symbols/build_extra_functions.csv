@@ -3,6 +3,8 @@ address,isa,evidence,replacement_end
 080020BC,thumb,Independent 96-byte map-loading wrapper with own push and pop-bx following script loader return,0800211C
 08005E10,thumb,Independent 12-byte global-pointer clearing function after palette-switch script return and literal pool,08005E1C
 08006CD0,thumb,Independent 116-byte menu constructor after initializer return and literal pool; exact standalone C,08006D44
+08009E30,thumb,Independent 12-byte global-pointer clear after directional script return and literal pool,08009E3C
+0800A800,thumb,Independent 12-byte effect manager global-pointer clear following collision controller teardown,0800A80C
 0802CED0,thumb,Independent 40-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md,
 0802CEF8,thumb,Independent 24-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md,
 081DB24C,thumb,Independent 108-byte Thumb allocation wrapper in retained 081DB1D8 tail; own prologue and call sequence and pop-bx plus literals; ends at 081DB2B8; notes/solo-family_2026-10-09.md,081DB2B8
