@@ -412,13 +412,48 @@ addr,name,confidence,evidence
 0802113C,SceneCommands_BlendPalette,low,Tentative descriptive role from exact C in src/fn/sub_0802113C.c
 0802141C,SceneActors_FindAvailable,low,Tentative descriptive role from exact C in src/fn/sub_0802141C.c
 08021450,SceneActors_ApplyDamage,low,Tentative descriptive role from exact C in src/fn/sub_08021450.c
+080214D4,SceneActors_Initialize,low,Tentative role from matched actor layout and control flow in src/fn/sub_080214D4.c
 08021578,SceneActors_Destroy,low,Tentative descriptive role from exact C in src/fn/sub_08021578.c
 080215AC,SceneActors_SetHealthLimits,low,Tentative descriptive role from exact C in src/fn/sub_080215AC.c
 08021630,SceneActors_SetHealth,low,Tentative descriptive role from exact C in src/fn/sub_08021630.c
 080216A4,SceneActors_SetDamageCallback,low,Tentative descriptive role from exact C in src/fn/sub_080216A4.c
 080216D8,SceneActors_SetMotionOffsets,low,Tentative descriptive role from exact C in src/fn/sub_080216D8.c
+080216E8,SceneActors_StartAnimation,low,Tentative role from matched actor layout and control flow in src/fn/sub_080216E8.c
 0802175C,SceneActors_StartDirectionalAnimation,low,Tentative descriptive role from exact C in src/fn/sub_0802175C.c
+080217F4,SceneActors_StartEightDirectionAnimation,low,Tentative role from matched actor layout and control flow in src/fn/sub_080217F4.c
+08021890,SceneActors_StartUnmirroredAnimation,low,Tentative role from matched actor layout and control flow in src/fn/sub_08021890.c
 080218FC,SceneActors_UpdateAnimation,low,Tentative descriptive role from exact C in src/fn/sub_080218FC.c
+08021930,SceneActors_UpdateTargetMetrics,low,Tentative role from matched actor layout and control flow in src/fn/sub_08021930.c
+080219D0,SceneActors_UpdateEffects,low,Tentative role from matched actor layout and control flow in src/fn/sub_080219D0.c
+08021AA8,SceneActors_RunStateCallback,low,Tentative role from matched actor layout and control flow in src/fn/sub_08021AA8.c
+08021AE8,SceneActors_RunFirstEventScript,low,Tentative role from matched actor layout and control flow in src/fn/sub_08021AE8.c
+08021B54,SceneActors_RunSecondEventScript,low,Tentative role from matched actor layout and control flow in src/fn/sub_08021B54.c
+08021BC0,SceneActors_CopyAvailablePosition,low,Tentative role from matched actor layout and control flow in src/fn/sub_08021BC0.c
+08021BF8,SceneActors_ConfigureEffect,low,Tentative role from matched actor layout and control flow in src/fn/sub_08021BF8.c
+08021D8C,SceneActors_SpawnAmbientParticle,low,Tentative role from matched actor layout and control flow in src/fn/sub_08021D8C.c
+08021E38,SceneActors_ScriptSetEffects,low,Tentative role from matched actor layout and control flow in src/fn/sub_08021E38.c
+08021EC0,SceneActorGraphics_SelectResource,low,Tentative role from matched actor layout and control flow in src/fn/sub_08021EC0.c
+080221DC,SceneActorGraphics_InitializeBody,low,Tentative role from matched actor layout and control flow in src/fn/sub_080221DC.c
+0802229C,SceneActorGraphics_InitializeOverlay,low,Tentative role from matched actor layout and control flow in src/fn/sub_0802229C.c
+08022330,SceneActorGraphics_UpdateVariant,low,Tentative role from matched actor layout and control flow in src/fn/sub_08022330.c
+080225B4,SceneActors_AddHealthCost,low,Tentative role from matched actor layout and control flow in src/fn/sub_080225B4.c
+08022600,SceneActors_AddResourceCost,low,Tentative role from matched actor layout and control flow in src/fn/sub_08022600.c
+080236C0,SceneActorState_Acknowledge,low,Tentative role from matched actor layout and control flow in src/fn/sub_080236C0.c
+080237C0,SceneActorState_Resume,low,Tentative role from matched actor layout and control flow in src/fn/sub_080237C0.c
+08023948,SceneActorState_ClearParticles,low,Tentative role from matched actor layout and control flow in src/fn/sub_08023948.c
+080239F8,SceneActorState_Animation21,low,Tentative role from matched actor layout and control flow in src/fn/sub_080239F8.c
+08023A48,SceneActorState_Hold,low,Tentative role from matched actor layout and control flow in src/fn/sub_08023A48.c
+08023B38,SceneActorState_TransitionTo17,low,Tentative role from matched actor layout and control flow in src/fn/sub_08023B38.c
+08023BE4,SceneActorState_ResumeAfterAction,low,Tentative role from matched actor layout and control flow in src/fn/sub_08023BE4.c
+08023E24,SceneActorState_WaitForTarget,low,Tentative role from matched actor layout and control flow in src/fn/sub_08023E24.c
+08023EC0,SceneActorState_TargetReady,low,Tentative role from matched actor layout and control flow in src/fn/sub_08023EC0.c
+08023F34,SceneActorState_TransitionTo3,low,Tentative role from matched actor layout and control flow in src/fn/sub_08023F34.c
+08023F98,SceneActorState_ActivateTarget,low,Tentative role from matched actor layout and control flow in src/fn/sub_08023F98.c
+080247AC,SceneActorState_ResetAfterAnimation16,low,Tentative role from matched actor layout and control flow in src/fn/sub_080247AC.c
+08024AD4,SceneActorState_ResetAfterAnimation23,low,Tentative role from matched actor layout and control flow in src/fn/sub_08024AD4.c
+08024B60,SceneActorState_WaitForFlagClear,low,Tentative role from matched actor layout and control flow in src/fn/sub_08024B60.c
+08024CE0,SceneActorAnimation_StartDirectional,low,Tentative role from matched actor layout and control flow in src/fn/sub_08024CE0.c
+08024E18,SceneActorAnimation_StartEightDirection,low,Tentative role from matched actor layout and control flow in src/fn/sub_08024E18.c
 0818D754,Motion_BuildApproachSegment,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D8E0,Motion_RampSpin,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D960,Motion_AdvanceApproach,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
