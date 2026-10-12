@@ -253,3 +253,16 @@ addr,name,confidence,evidence
 08015C90,AnimatedParticles_EmitAngledBurst,medium,Tentative descriptive name from exact C in src/fn/sub_08015C90.c
 08015CF0,AnimatedParticles_EmitOffset,medium,Tentative descriptive name from exact C in src/fn/sub_08015CF0.c
 08015DE0,AnimatedParticles_CreateFromScript,medium,Tentative descriptive name from exact C in src/fn/sub_08015DE0.c
+08016118,FadingParticleGroup_Update,low,Tentative effect/palette interpretation from matched state updates and manager layout
+080163C8,FadingParticleManager_Initialize,low,Tentative effect/palette interpretation from matched state updates and manager layout
+080164B8,PaletteLevels_Increase,low,Tentative effect/palette interpretation from matched state updates and manager layout
+0801655C,PaletteLevels_Decrease,low,Tentative effect/palette interpretation from matched state updates and manager layout
+08016600,PaletteLevels_Update,low,Tentative effect/palette interpretation from matched state updates and manager layout
+080166C4,PaletteLevels_Configure,low,Tentative effect/palette interpretation from matched state updates and manager layout
+0801683C,PaletteLevels_Reset,low,Tentative effect/palette interpretation from matched state updates and manager layout
+080168B8,FloatingEffect_Project,low,Tentative effect/palette interpretation from matched state updates and manager layout
+08016944,FloatingEffect_Bob,low,Tentative effect/palette interpretation from matched state updates and manager layout
+08016990,FloatingEffect_Wait,low,Tentative effect/palette interpretation from matched state updates and manager layout
+08016A0C,FloatingEffect_ShrinkAway,low,Tentative effect/palette interpretation from matched state updates and manager layout
+08016B78,FloatingEffect_RiseAndShrink,low,Tentative effect/palette interpretation from matched state updates and manager layout
+08016EA8,FloatingEffectManager_Update,low,Tentative effect/palette interpretation from matched state updates and manager layout

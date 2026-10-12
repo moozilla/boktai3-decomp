@@ -33,6 +33,9 @@ Shadow registry,08013C14,08013F98,symbols/proposed/subsystems.csv,Tentative desc
 Particle groups,08013F98,08014F64,symbols/proposed/subsystems.csv,Contiguous manager lifecycle and particle creation/update/emission wrappers; provisional names
 Fragment groups,08014F64,08015160,symbols/proposed/subsystems.csv,Contiguous manager lifecycle and particle creation/update/emission wrappers; provisional names
 Animated particles,08015160,08015F60,symbols/proposed/subsystems.csv,Contiguous manager lifecycle and particle creation/update/emission wrappers; provisional names
+Fading particle groups,08015F60,080164B8,symbols/proposed/subsystems.csv,Group lifetime animation and manager initialization; constructor remains unmatched
+Palette level transitions,080164B8,0801689C,symbols/proposed/subsystems.csv,Channel level increase decrease configuration and reset
+Floating item effects (tentative),0801689C,08017270,symbols/proposed/subsystems.csv,Projection bobbing and departure states with item-dependent collection animation
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
 Sound-test menu,081E1AF4,081E270C,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md and allocator 081E26CC callback chain
 Timed presentation,081E270C,081E2898,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md timed update cleanup and initialization
