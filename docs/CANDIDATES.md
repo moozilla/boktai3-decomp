@@ -35,7 +35,9 @@ This wraps checking and retains every attempt under ignored build/candidates/:
 a source snapshot, preprocessed input, source/preprocessing hashes, compiler
 identity/hash and flags, Git base, reviewed extent, structured comparison,
 stdout/stderr, elapsed compiler-wrapper time, and user-supplied hypotheses and
-validity status. `index.jsonl` lists records. Category and validity are supplied
+validity status. `index.jsonl` lists searchable target addresses, function names, source hashes,
+size/difference summaries, categories and hypotheses; e.g.
+`rg 0818DB10 build/candidates/index.jsonl`. Category and validity are supplied
 judgments, not inferred facts. Match status still grants zero progress credit
 until source review and complete-ROM integration. Errors are distinct from
 mismatches and return exit code 2; mismatches return 1; matches return 0.

@@ -87,3 +87,18 @@ preserved separately on codex/wip-motion-2026-10-12.
 The useful result of this slice is shared layout, explicit callback/phase
 relationships and better retained candidates. Existing exact byte coverage is
 unchanged. Tooling and understanding are reported separately from matching.
+
+## Validation
+
+Nine focused checker/candidate/benchmark tests pass. Live controls verify an
+exact 40-byte function, rejection when its reviewed extent is instead 44 bytes,
+and error classification for invalid C. The existing benchmark wrapper still
+recognizes the unchanged final MATCH line. The three shared-header consumers
+pass standalone reviewed-extent comparisons and the combined full ROM build.
+
+The +64 KiB shifted ROM SHA-1 is
+`c208e82ae4996ba6e2066a724421190f5cf26a02`, identical to the previously validated
+shifted ROM from the October 9 session. This reuses that ROM's 35 passing
+screenshots; no new emulator replay is claimed. The original ROM build is
+restored afterward. Progress remains 4,843/11,083 functions and
+331,578/2,415,354 exact code bytes (13.728%).
