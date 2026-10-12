@@ -137,3 +137,6 @@ The tests so far cover boot/setup, title, new game + intro cutscene, a
 late-game save, every pause-menu tab and some field play — about 6% of the
 code. Areas no test reaches may still hide a bad pointer guess; extending
 `tests/` with more of the game is the way to find them.
+
+Research and tooling directions: [backlog](docs/BACKLOG.md).
+Compact checking and WIP records: [candidate workflow](docs/CANDIDATES.md).
