@@ -10,6 +10,21 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 status, group objects, and message-menu continuation
+
+Coverage is **17.103%**, up **0.132 percentage points** from main's 16.971%:
+**17 new exact functions / 3,188 bytes**, 5,126 total / 11,094.
+The result prompt and message menu (111EC–1150C) are complete. The group-object
+manager initialization/update/cleanup and several animation/command callbacks
+are matched; its movement states remain partial. Status-screen initialization,
+start-button wait, and fade/exit are now exact. Register-pinned coverage is 2.143%.
+
+Next contiguous area begins at 0801150C. Prefer this text/menu code over another
+long allocation search. Near candidates remain ignored under wip/ and build/:
+E974 (8-byte clean candidate build/e9748.c), 10298 (8/11-byte variants), and larger
+FC28/10514 movement drafts. Permuter score zero on E974 was NOT byte-exact: it
+masked a branch-target difference. Always verify with the fast checker.
+
 ## October 12 scanline and status-screen batch
 
 Coverage is **16.971%**, up **0.132 percentage points** from 16.839%:
