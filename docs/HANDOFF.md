@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after the effect-update matching batch (2026-10-12). This file is the single
+Last updated after the emitter and falling-object matching batch (2026-10-12). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,20 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 12 emitter and falling-object completion
+
+Coverage is **16.839%**, up **0.186 percentage points** from 16.653%:
+**17 new exact functions / 4,484 bytes**, 5,093 total / 11,094.
+Effect emitters (0800C49C–0800C7F4), damage controllers (0800C7F4–0800CBA0),
+and falling objects (0800CBA0–0800D874) are complete, with descriptive aliases
+and separate report groups. The reset at CBA0 is a recovered function boundary;
+it was already covered by the preceding allocator span, so adds no code bytes.
+Combined validation: build/emitter-falling-combined.log printed ROM OK.
+Whole-session gain from 15.315% is **1.524 percentage points**.
+Continue directly with adjacent scanline/presentation controller 0800D874 onward.
+Do not stop at each batch or add tooling; 20% remains the requested target.
+Earlier gaps: item pickup 080070D0 and effect constructors 0800AC44/0800AFE8.
 
 ## October 12 effect updates
 

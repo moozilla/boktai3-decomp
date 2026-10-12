@@ -153,3 +153,20 @@ addr,name,confidence,evidence
 0800BE24,EffectParticle_UpdateHoming,medium,Tentative effect state interpretation; exact source in src/fn/sub_0800BE24.c
 0800C0B4,EffectParticle_UpdateFinish,medium,Tentative effect state interpretation; exact source in src/fn/sub_0800C0B4.c
 0800C210,EffectParticle_UpdateDissipating,medium,Tentative effect state interpretation; exact source in src/fn/sub_0800C210.c
+0800C49C,EffectEmitter_ReceiveHit,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
+0800C520,EffectEmitter_Update,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
+0800C654,EffectEmitter_Initialize,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
+0800C7F4,DamageController_AccumulateHit,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
+0800C878,DamageController_Update,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
+0800C964,DamageController_Initialize,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
+0800CBA0,FallingObjectManager_ClearGlobal,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
+0800CC98,FallingObject_Create,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
+0800D00C,FallingObject_CreateFromScript,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
+0800D0EC,FallingObject_UpdateFalling,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
+0800D1D0,FallingObject_UpdateLanding,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
+0800D30C,FallingObject_UpdateShatter,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
+0800D418,FallingObject_UpdateBounceAway,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
+0800D540,FallingObject_UpdateWaiting,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
+0800D5C0,FallingObject_SpawnFinishParticles,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
+0800D60C,FallingObject_UpdateFinish,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
+0800D668,FallingObjectManager_Update,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
