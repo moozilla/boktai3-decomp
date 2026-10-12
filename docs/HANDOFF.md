@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after the background and palette completion batch (2026-10-12). This file is the single
+Last updated after the color and terrain-overlay completion batch (2026-10-12). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,27 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 12 color, terrain-overlay and scene-object batch
+
+Coverage is **15.613%**, up **0.123 percentage points** from 15.490%:
+**14 new exact functions / 2,968 bytes**, 4,994 total / 11,089.
+Color/fade controllers (080036F8–08003B44) and terrain overlays
+(08003B44–080041CC; tentative name) are now **100% matched** and have named
+report groups. The terrain-overlay update tracks actors, examines neighboring
+map cells and reuses drawables for exposed terrain edges. Its complete frame
+routine matches without register pinning.
+
+The next contiguous scene-object area is underway: neighbor-cell eligibility,
+movement effects, terrain interaction costs, activation/stop handlers and the
+break-effect burst now match. These roles remain provisional. Remaining local
+drafts include 080041CC (edge particles), 080046F0 (falling objects), 08004B64
+(directional dust) and 08004CE4 (step down). Continue into their adjacent
+movement callbacks; do not count these drafts as progress. The whole-session
+gain from 15.315% is **0.298 percentage points**. The 20% goal remains open.
+
+Branch: `codex/color-and-scene-controllers`. Combined validation log:
+`build/color-terrain-scene-combined.log`. No tooling changes or regression tests.
 
 ## October 12 background and palette completion batch
 

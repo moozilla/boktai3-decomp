@@ -3,6 +3,8 @@ Boot and ARM helpers,08000000,0800145C,symbols/proposed/subsystems.csv,docs/ROM_
 Game entry point,0800145C,080015AC,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md AgbMain and reserved-word reset helper
 Background controllers,080015AC,08002AA8,symbols/proposed/subsystems.csv,Background controller command queues and task lifecycle; docs/BACKGROUND_CONTROLLERS.md
 Palette controllers,08002AA8,080036F8,symbols/proposed/subsystems.csv,Contiguous palette blending brightness transition task and script handlers; include/palette_controller.h
+Color and fade controller,080036F8,08003B44,symbols/proposed/subsystems.csv,Contiguous interpolation and command queue task; src/fn/sub_080038B4.c and sub_08003960.c
+Terrain overlays (tentative),08003B44,080041CC,symbols/proposed/subsystems.csv,Tracked actors and terrain-edge drawable management; src/fn/sub_08003C20.c
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
 Sound-test menu,081E1AF4,081E270C,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md and allocator 081E26CC callback chain
 Timed presentation,081E270C,081E2898,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md timed update cleanup and initialization
