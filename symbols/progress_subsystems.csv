@@ -22,6 +22,9 @@ Status screen (tentative),0800E3E0,0800F4EC,symbols/proposed/subsystems.csv,Nume
 Result prompt,0800F850,0800F9C4,symbols/proposed/subsystems.csv,Complete input prompt callbacks and lifecycle
 Group objects (tentative),0800F9C4,080111EC,symbols/proposed/subsystems.csv,Sixteen-object animation and movement manager; several movement callbacks remain unmatched
 Message menu,080111EC,0801150C,symbols/proposed/subsystems.csv,Complete background text windows transition update cleanup and initialization
+Password decoding,0801150C,08011884,symbols/proposed/subsystems.csv,Text filtering and decoding validation; character validation and decode wrapper remain unmatched
+Scene indicators (tentative),08011884,08012040,symbols/proposed/subsystems.csv,Complete lifecycle timing visibility terrain placement and pause/resume scripts
+Animated hazards (tentative),08012040,08012A88,symbols/proposed/subsystems.csv,Sprite/collision lifecycle and warning attack hold retraction states; constructors remain unmatched
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
 Sound-test menu,081E1AF4,081E270C,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md and allocator 081E26CC callback chain
 Timed presentation,081E270C,081E2898,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md timed update cleanup and initialization
