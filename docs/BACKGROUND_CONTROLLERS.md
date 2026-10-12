@@ -3,8 +3,10 @@
 The first game code after `AgbMain` controls backgrounds rather than startup.
 The contiguous `080015AC–08002AA8` range contains two related task families:
 normal backgrounds and a scrolling variant. These are provisional names.
-This group rose from **5.957% to 56.888% matching (+50.931 percentage points)**;
-whole-game coverage rose from **15.199% to 15.315% (+0.116 percentage points)**.
+This group is now **100% matched**. The completion session raised whole-game
+coverage from **15.315% to 15.490% (+0.176 percentage points)** by finishing
+this group and the following palette controllers (08002AA8–080036F8), also
+now **100% matched**.
 No affine-transform role is claimed merely from fixed-point arithmetic.
 
 Both families have allocation, initialization, update, cleanup, script creation,
@@ -20,10 +22,12 @@ submission/queue. The existing allocators and cleanup helpers already match.
 observed layouts, retaining explicitly unknown fields. Local register hints in
 the normal initializer and map-ID lookup are temporary matching concessions.
 
-The two frame-update routines and several map-loading/command helpers remain
-unfinished. Their source drafts live outside production and receive no credit.
-Names in `symbols/proposed/subsystems.csv` label both exact and unfinished
-functions in the report, so a descriptive name does not imply an exact match.
+Both frame updates, all map-loading helpers, and both command queues are now
+exact C. A separate map-loading wrapper at 080020BC is now counted independently.
+The palette family handles color-table blending, brightness scaling, oscillation,
+script-driven transitions, resource replacement and hardware palette uploads;
+`include/palette_controller.h` records its shared layout. Some register hints use
+empty compiler constraints; these emit no handwritten instructions.
 
 ## Scheduler findings
 
