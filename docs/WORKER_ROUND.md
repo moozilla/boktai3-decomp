@@ -1,6 +1,8 @@
 # Standard round brief (only when workers are authorized)
 
-Current October 12 session is solo. Use docs/WORKER.md and docs/CANDIDATES.md.
+The initial October 12 pass was solo; the user subsequently authorized the
+two-worker pilot in docs/campaigns/2026-10-12.json. Use docs/WORKER.md and
+docs/CANDIDATES.md.
 Historical model-specific quotas below are examples, not current assignments.
 
 1. Work only in the assigned isolated checkout. The orchestrator supplies its
