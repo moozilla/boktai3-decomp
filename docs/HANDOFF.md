@@ -10,6 +10,23 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 password, scene-indicator, and animated-hazard batch
+
+Coverage is **17.250%**, up **0.147 percentage points** from 17.103%:
+**16 new exact functions / 3,560 bytes**, 5,142 total / 11,094.
+The full scene-indicator span 11884–12040 now matches, including its large
+creation script and terrain placement. Password filtering, checksum/version
+validation, and decoded-data application are matched. Animated-hazard setup
+and warning/attack/hold/retraction states now match; constructors 12748 and
+12858 remain. Names are provisional. Register-pinned coverage is 2.246%.
+
+Next: finish hazard constructors, then proceed contiguously beyond 12A88.
+Ignored drafts: wip/sub_08012748.c; password wrapper build/11794-four.c is four
+register bytes away. Password character validator 115DC remains a draft.
+FAB8's animation C adapted directly to 12224/12380/124BC and matched; reuse it.
+Usage guard requested by user: check periodically and stop below 50% remaining.
+Latest observation was 91% weekly remaining; do not consume reset credits.
+
 ## October 12 status, group objects, and message-menu continuation
 
 Coverage is **17.103%**, up **0.132 percentage points** from main's 16.971%:
