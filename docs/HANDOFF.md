@@ -10,6 +10,21 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 transformation and result game
+
+Coverage is **18.147%**, up **0.102 percentage points** from 18.044%:
+**18 new exact functions / 2,468 bytes**, 5,269 total / 11,104.
+Charge/reveal/finish animation, result reporting, marker animation, countdown,
+command packets, both scoring paths, button handling and dispatch now match.
+The new contiguous report group spans 0801B49C–0801D104 and is NOT complete.
+Remaining: preview B600, apply B700, graphics BCA8/BD44/C24C, player motion
+C6CC, state machines C874/CC24, and initialization CF6C/D020.
+C6CC has a 19-byte register-only draft in build/c6cc-19.c; BCA8 is 30 bytes
+away in wip. Other readable drafts are retained in ignored wip.
+Combined validation: build/transformation-result-combined.log.
+Previous PR #41 merged; reporting Action 38300138637 succeeded.
+Usage: 59% weekly remaining at last check; stop below 50%.
+
 ## October 12 selection menu and presentation
 
 Coverage is **18.044%**, up **0.157 percentage points** from 17.888%:
