@@ -1,0 +1,4 @@
+#include "global.h"
+#define SceneObjects_ScriptReadPosition sub_0801EB08
+u8 *sub_0821A2C4(int);int Script_SeekToKeyword(int);int Script_GetValue(void);void sub_0821AAD8(void*);void sub_0821B4C8(void*,int,int);
+void SceneObjects_ScriptReadPosition(void){u8*p=sub_0821A2C4(0x85e6);int id,i,count,index;u32 output[2];if(!p)return;if(!Script_SeekToKeyword(0x6e))return;id=Script_GetValue();i=0;count=0;index=0;for(;i<*(u16*)(p+0x1a);i++){u8*s=*(u8**)(p+0x42c)+i*140;if(*(u16*)(s+0x34)==id){count++;index=i;}}if(!count)return;if(count>1)return;if(!Script_SeekToKeyword(0x70))return;sub_0821AAD8(output);sub_0821B4C8(output,0,*(s16*)(*(u8**)(p+0x42c)+index*140+0x1c));sub_0821AAD8(output);sub_0821B4C8(output,0,*(s16*)(*(u8**)(p+0x42c)+index*140+0x1e));sub_0821AAD8(output);sub_0821B4C8(output,0,*(s16*)(*(u8**)(p+0x42c)+index*140+0x20));}
