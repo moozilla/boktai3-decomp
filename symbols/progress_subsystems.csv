@@ -43,6 +43,9 @@ Orbiting particles,080187BC,08018D94,symbols/proposed/subsystems.csv,Complete or
 Hardware blend transitions,08018D94,08018F38,symbols/proposed/subsystems.csv,Hardware blend coefficient update; script initializer remains unmatched
 Circular scanline window,08018F38,080192D0,symbols/proposed/subsystems.csv,Complete circular scanline generation expansion contraction projection initialization and lifecycle
 Clock events,080192D0,08019518,symbols/proposed/subsystems.csv,Complete clock-based script event edge detection initialization and lifecycle
+Palette frame cycling,08019518,080195DC,symbols/proposed/subsystems.csv,Complete seven-frame palette cycling and lifecycle
+Tile animation,080195DC,08019A14,symbols/proposed/subsystems.csv,Complete eight-channel tile animation initialization frame timing DMA upload and script controls
+Sprite pool,08019A14,08019E58,symbols/proposed/subsystems.csv,Complete sixteen-slot allocation activation animation playback resource controls and removal including recovered byte-tail functions
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
 Sound-test menu,081E1AF4,081E270C,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md and allocator 081E26CC callback chain
 Timed presentation,081E270C,081E2898,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md timed update cleanup and initialization

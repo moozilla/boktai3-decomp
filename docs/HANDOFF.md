@@ -10,6 +10,18 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 tile animation and sprite pool
+
+Coverage is **17.888%**, up **0.067 percentage points** from 17.821%:
+**15 new exact functions / 1,612 bytes**, 5,226 total / 11,102.
+Palette frame cycling, eight-channel tile animation and the sixteen-slot sprite
+pool are complete contiguous units, including two recovered byte-tail functions.
+Animation playback 19C9C uses marked register constraints; the state logic is C.
+Combined validation: build/tile-sprite-combined.log. Continue at 08019E58 into
+presentation commands; most wrappers already match, so check inventory first.
+Previous PR #39 is merged; main reporting Action 38298126393 succeeded.
+Latest usage: 67% weekly remaining; stop below 50%.
+
 ## October 12 orbiting particles, circular windows and clock events
 
 Coverage is **17.821%**, up **0.112 percentage points** from 17.709%:
