@@ -6,7 +6,7 @@ struct Anim{const u16*data;u8 flags,count,factor,rate;u16 frame,unused,scale,tim
 struct Motion{struct Vec velocity;struct Sprite sprite;struct Anim anim;};
 struct Particle{u8 active,lifetime;s16 speed;struct Motion motion;};
 struct Group{u8 active,count,pad[2];struct Particle particles[8];};
-struct Manager{u8 pad[28];u8*resource;u32 frame;void*animations;};extern struct Manager*gUnk_0200006C;
+struct Manager{u8 pad[28];u8*resource;void*animations;};extern struct Manager*gUnk_0200006C;
 void sub_08220D44(void*,int);void sub_08217EAC(void*);
 static inline int scale(int a,int b){int v=a*b;if(v>=0)return v>>12;return -((-v)>>12);}
 static inline u32 frame_factor(u16 v){register u32 value asm("r1")=v;u32 mask=15;return mask&value;}
