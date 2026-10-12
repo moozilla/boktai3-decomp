@@ -24,7 +24,12 @@ Group objects (tentative),0800F9C4,080111EC,symbols/proposed/subsystems.csv,Sixt
 Message menu,080111EC,0801150C,symbols/proposed/subsystems.csv,Complete background text windows transition update cleanup and initialization
 Password decoding,0801150C,08011884,symbols/proposed/subsystems.csv,Text filtering and decoding validation; character validation and decode wrapper remain unmatched
 Scene indicators (tentative),08011884,08012040,symbols/proposed/subsystems.csv,Complete lifecycle timing visibility terrain placement and pause/resume scripts
-Animated hazards (tentative),08012040,08012A88,symbols/proposed/subsystems.csv,Sprite/collision lifecycle and warning attack hold retraction states; constructors remain unmatched
+Animated hazards (tentative),08012040,08012AD0,symbols/proposed/subsystems.csv,Sprite/collision lifecycle and warning attack hold retraction states; constructors now matched
+Debris particles,08012AD0,08012D08,symbols/proposed/subsystems.csv,Tentative descriptive grouping from contiguous manager callbacks and exact C; unmatched reset tails remain counted
+Breakable barriers,08012D08,080133CC,symbols/proposed/subsystems.csv,Tentative descriptive grouping from contiguous manager callbacks and exact C; unmatched reset tails remain counted
+Terrain shadows,080133CC,080136B4,symbols/proposed/subsystems.csv,Tentative descriptive grouping from contiguous manager callbacks and exact C; unmatched reset tails remain counted
+Scaled shadows,080136B4,08013C14,symbols/proposed/subsystems.csv,Tentative descriptive grouping from contiguous manager callbacks and exact C; unmatched reset tails remain counted
+Shadow registry,08013C14,08013F98,symbols/proposed/subsystems.csv,Tentative descriptive grouping from contiguous manager callbacks and exact C; unmatched reset tails remain counted
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
 Sound-test menu,081E1AF4,081E270C,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md and allocator 081E26CC callback chain
 Timed presentation,081E270C,081E2898,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md timed update cleanup and initialization
