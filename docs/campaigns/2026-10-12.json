@@ -23,17 +23,17 @@
         {
           "address": "08118B8C",
           "inventory_span": 676,
-          "reviewed_body_bytes": null
+          "reviewed_body_bytes": 676
         },
         {
           "address": "08118E30",
           "inventory_span": 676,
-          "reviewed_body_bytes": null
+          "reviewed_body_bytes": 676
         },
         {
           "address": "081190D4",
           "inventory_span": 676,
-          "reviewed_body_bytes": null
+          "reviewed_body_bytes": 676
         }
       ],
       "evidence": "Unseeded normalized loose-clone family; worker must audit body/pools before credit.",
@@ -52,26 +52,51 @@
         {
           "address": "08160EA4",
           "inventory_span": 1060,
-          "reviewed_body_bytes": null
+          "reviewed_body_bytes": 1060
         },
         {
           "address": "081616D0",
           "inventory_span": 1060,
-          "reviewed_body_bytes": null
+          "reviewed_body_bytes": 1060
         },
         {
           "address": "08161AF4",
           "inventory_span": 1060,
-          "reviewed_body_bytes": null
+          "reviewed_body_bytes": 1060
         },
         {
           "address": "08161F18",
           "inventory_span": 1060,
-          "reviewed_body_bytes": null
+          "reviewed_body_bytes": 1060
         }
       ],
       "evidence": "Retained 1060-byte seed with four instruction differences; prior typed/prologue probes failed.",
-      "stop": "At most three new diagnostic hypotheses; stop by 8-10 minutes if none useful; no unrelated fallback."
+      "stop": "At most three new diagnostic hypotheses; stop by 8-10 minutes if none useful; no unrelated fallback.",
+      "status": "complete",
+      "result": {
+        "new_exact_bytes": 0,
+        "new_exact_functions": 0,
+        "matching_seconds": 318,
+        "checks": 16,
+        "diagnostic_compilations": 6,
+        "hypotheses": 3,
+        "source_probes": 7,
+        "commits": [],
+        "baseline_build": "OK",
+        "best_source_sha256": "cf35be38b1bb1ee6a4f7ab1f8ee13a38f83afb950c4e49361d83fd5b1b354822",
+        "remaining_different_bytes": 5,
+        "remaining_instruction_sites": 4,
+        "disposition": "Park: three hypotheses disproven; no further allocation retries without new evidence."
+      }
     }
-  ]
+  ],
+  "compact_output_measurement": {
+    "target": "0818DB10",
+    "legacy_rows": 159,
+    "compact_rows": 47,
+    "legacy_characters": 13991,
+    "compact_characters": 3190,
+    "character_reduction_percent": 77.2,
+    "limits": "One real nonmatching candidate; character count is not tokens, model cost, or matching yield."
+  }
 }
