@@ -10,6 +10,23 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 actor projectile and reaction controllers
+
+Coverage is **19.269%**, up **0.213 percentage points** from 19.055%:
+**19 additional exact functions / 5,152 bytes**, 5,431 total / 11,109.
+The entire **080277B8–080284FC** reaction-handler run is matched, including
+four/eight-direction turns, anchored shakes, frame holds, repeated projectiles,
+and destruction particles. Earlier projectile handlers and 08025DEC also match.
+Combined validation log: build/actor-projectiles-combined.log.
+
+Continue toward **20% matching**, solo, no tooling changes. Weekly allowance
+stop floor is **20% remaining**; last check **29% remaining**. Next contiguous
+area begins at **080284FC** (damage processing), then 080287DC (visual update).
+Remaining earlier gaps include 0802592C, 08025FFC, 08026FF0 and 08027214.
+The exact particle randomization from 08012F50 also matched 08028414 directly.
+For vectors use signed-short struct members: array casts caused load-order
+mismatches. 080280CC's add helper returns zero initialized after the x sum.
+
 ## October 12 actor animation and action controllers
 
 Continue toward **20% matching**, with a **20% weekly allowance remaining** stop

@@ -465,6 +465,7 @@ addr,name,confidence,evidence
 080257D0,SceneActorAnimation_RecoverMovement,medium,Tentative descriptive role from exact C control flow; src/fn/sub_080257D0.c
 08025CD4,SceneActorAnimation_WaitForCompletion,medium,Tentative descriptive role from exact C control flow; src/fn/sub_08025CD4.c
 08025D60,SceneActorAnimation_WaitForAlternateCompletion,medium,Tentative descriptive role from exact C control flow; src/fn/sub_08025D60.c
+08025DEC,SceneActor_FireRandomizedProjectile,low,Tentative descriptive role from exact C control flow; src/fn/sub_08025DEC.c
 08026248,SceneActorAnimation_TimedEffectReset,medium,Tentative descriptive role from exact C control flow; src/fn/sub_08026248.c
 0802634C,SceneActorAnimation_LockedReset,medium,Tentative descriptive role from exact C control flow; src/fn/sub_0802634C.c
 08026398,SceneActorAnimation_AlternateEffectReset,medium,Tentative descriptive role from exact C control flow; src/fn/sub_08026398.c
@@ -472,6 +473,24 @@ addr,name,confidence,evidence
 0802667C,SceneActorAnimation_HoldFrame,medium,Tentative descriptive role from exact C control flow; src/fn/sub_0802667C.c
 08026780,SceneActorAnimation_ReleaseHeldFrame,medium,Tentative descriptive role from exact C control flow; src/fn/sub_08026780.c
 08026908,SceneActorAnimation_ReleaseSavedAction,medium,Tentative descriptive role from exact C control flow; src/fn/sub_08026908.c
+08026AA4,SceneActor_PeriodicProjectileBurst,low,Tentative descriptive role from exact C control flow; src/fn/sub_08026AA4.c
+08026C38,SceneActor_FireDirectedProjectile,low,Tentative descriptive role from exact C control flow; src/fn/sub_08026C38.c
+08026DE0,SceneActor_DecayScale,low,Tentative descriptive role from exact C control flow; src/fn/sub_08026DE0.c
+08026EB4,SceneActor_DecayScaleAndMove,low,Tentative descriptive role from exact C control flow; src/fn/sub_08026EB4.c
+080277B8,SceneActor_ResetWhenBlocked,low,Tentative descriptive role from exact C control flow; src/fn/sub_080277B8.c
+08027824,SceneActor_TurnFourDirections,low,Tentative descriptive role from exact C control flow; src/fn/sub_08027824.c
+0802797C,SceneActor_TurnEightDirections,low,Tentative descriptive role from exact C control flow; src/fn/sub_0802797C.c
+08027AD4,SceneActor_ContractAnchoredShake,low,Tentative descriptive role from exact C control flow; src/fn/sub_08027AD4.c
+08027BF0,SceneActor_ExpandAnchoredShake,low,Tentative descriptive role from exact C control flow; src/fn/sub_08027BF0.c
+08027CF8,SceneActor_TimedCommandAnimation,low,Tentative descriptive role from exact C control flow; src/fn/sub_08027CF8.c
+08027DAC,SceneActor_HoldSavedFacing,low,Tentative descriptive role from exact C control flow; src/fn/sub_08027DAC.c
+08027E44,SceneActor_CompleteTriggeredAnimation,low,Tentative descriptive role from exact C control flow; src/fn/sub_08027E44.c
+08027F08,SceneActor_HoldAlternateSavedFacing,low,Tentative descriptive role from exact C control flow; src/fn/sub_08027F08.c
+08027FA0,SceneActor_AnchorAnimation,low,Tentative descriptive role from exact C control flow; src/fn/sub_08027FA0.c
+08028040,SceneActor_HoldUnmirroredAnimation,low,Tentative descriptive role from exact C control flow; src/fn/sub_08028040.c
+080280CC,SceneActor_RepeatDirectedProjectiles,low,Tentative descriptive role from exact C control flow; src/fn/sub_080280CC.c
+080282BC,SceneActor_TimedAnchoredReaction,low,Tentative descriptive role from exact C control flow; src/fn/sub_080282BC.c
+08028414,SceneActor_EmitDestructionParticles,low,Tentative descriptive role from exact C control flow; src/fn/sub_08028414.c
 0818D754,Motion_BuildApproachSegment,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D8E0,Motion_RampSpin,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D960,Motion_AdvanceApproach,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
