@@ -73,3 +73,4 @@ address,evidence
 0824AB70,__fixsfsi: separate function in exact linked libgcc_fp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
 0824ABD8,__negsf2: separate function in exact linked libgcc_fp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
 0824AC14,__extendsfdf2: separate function in exact linked libgcc_fp.c unit; pinned old_agbcc -O2; docs/LIBGCC.md
+08017428,Recovered manager presence callback after scanline wave allocator
