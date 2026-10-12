@@ -1,0 +1,12 @@
+name,start,end,name_files,evidence
+Boot and ARM helpers,08000000,0800145C,symbols/proposed/subsystems.csv,docs/ROM_MAP.md reset/header and IWRAM copy/blit code; original report spans retained
+Game entry point,0800145C,080015AC,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md AgbMain and reserved-word reset helper
+Sound-test menu,081E1AF4,081E270C,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md and allocator 081E26CC callback chain
+Timed presentation,081E270C,081E2898,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md timed update cleanup and initialization
+Scripted presentation,081E2898,081E34D0,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md allocation through global callback cleanup
+Actor animation controller (tentative),081E34D0,081EAB64,symbols/proposed/entry-animation.csv,docs/ANIMATION_081E.md and docs/ENTRY_AND_MENUS.md shared actor layout and command/callback chain
+Runtime input and utilities,08219A94,08219C20,symbols/proposed/subsystems.csv,Initializer 08219AAC; button polling 08219B24 and string hash 08219BD8
+Heap and memory operations,08219C20,08219F50,symbols/proposed/subsystems.csv,Allocator/free and memory clearing/copying implementations in src/fn/sub_08219*.c
+Task scheduler,08219F50,0821A184,symbols/proposed/subsystems.csv,Fourteen priority lists; allocation registration update destruction and ID lookup in src/fn/sub_08219F*.c and sub_0821A*.c
+Resource registry,0821A184,0821A2DC,,Registration and lookup implementations in src/fn/sub_0821A184.c through sub_0821A2C4.c
+Message queue,0821A2DC,0821A454,,docs/MGS_GCL_MATCHING.md double-buffered message posting and receiving

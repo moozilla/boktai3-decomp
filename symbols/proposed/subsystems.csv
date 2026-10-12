@@ -1,0 +1,18 @@
+addr,name,confidence,evidence
+08000000,RomHeaderAndResetVector,high,gen/code_sym.s branch to crt0 plus embedded GBA header
+080001F0,InterruptDispatcherAndIwramHelpers,high,docs/ROM_MAP.md; existing report span includes following ARM helper blob
+08219A94,Runtime_FlipMessages,medium,Calls message buffer swap from scheduler housekeeping callback
+08219AAC,Runtime_Initialize,high,Initializes heap scheduler registry message queues and input state
+08219B24,Input_PollButtons,high,Reads KEYINPUT and updates held pressed released states
+08219BD8,String_Hash16,high,Rotates 16-bit accumulator five bits then adds each string byte
+08219C20,Heap_Initialize,high,Initializes free block at 02000714
+08219F04,Memory_CopyDmaChunks,high,512-byte DMA3 blocks followed by remaining word count
+08219F50,TaskSystem_InitializeLists,high,Copies fourteen list descriptors into 03005280
+08219F74,Task_Register,medium,Links task into its priority list
+08219F94,Task_Unlink,medium,Removes task from doubly linked priority list
+0821A004,Task_Create,high,Allocates and clears task; assigns nonzero ID and registers it
+0821A04C,Task_SetCallbacks,high,Stores update and destructor callbacks
+0821A054,TaskSystem_RunFrame,high,Traverses fourteen lists calling updates or destruction and freeing
+0821A0C0,Task_RequestDestroy,medium,Marks task for deferred destruction
+0821A0F8,TaskSystem_DestroyPriority,medium,Requests destruction for matching priority
+0821A130,Task_FindById,high,Traverses task lists comparing 16-bit task IDs
