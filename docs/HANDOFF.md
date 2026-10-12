@@ -10,6 +10,31 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 subsystem reporting and background setup batch
+
+Coverage is **15.315%**, up **0.116 percentage points** from 15.199%:
+**10 new exact functions / 2,812 bytes**, 4,964 total. The 20% target remains
+unfinished by **4.685 percentage points**. Continue with contiguous subsystems.
+
+The report now has fifteen named contiguous game groups alongside the existing
+libraries, including the already fully matched scheduler, script VM, registry,
+message queue and solar sensor. Names and grouping do not change byte credit.
+Boot/header/ARM code is distinguished from the already matched `AgbMain`.
+See [reporting policy](PROGRESS_CI.md) and
+[background controller notes](BACKGROUND_CONTROLLERS.md).
+
+Matching additions cover background setup and script/queued commands in the
+early-ROM controller pair, plus the neighboring scheduler's DMA copy utility.
+The early background group is still only partly matched: both frame-update
+routines and map-loading helpers remain unfinished. Source drafts are retained
+separately; do not confuse descriptive report labels with exact C acceptance.
+A two-minute input-polling permuter search did not produce an exact match.
+Unfinished sources are preserved on `codex/wip-subsystems-2026-10-12` under
+`wip/subsystems-checkpoint/`; never merge that branch into main.
+Within the early background-controller group, matching rose from **5.957% to
+56.888% (+50.931 percentage points)**. This is a subsystem measure, not the
+whole-game percentage.
+
 ## October 12 entry point and contiguous subsystem batch
 
 Current matching coverage is **15.199%**, up **0.635 percentage points** from
@@ -104,7 +129,7 @@ floor below describes the previous tranche, not this authorization.
 
 | | |
 |---|---|
-| Matched C | **4,954 / 11,088 functions (44.68%)**, 367,098 / 2,415,354 code bytes (15.199%; `PROGRESS.md`) |
+| Matched C | **4,964 / 11,088 functions (44.77%)**, 369,910 / 2,415,354 code bytes (15.315%; `PROGRESS.md`) |
 | Build | `make` / `python3 tools/build.py` rebuilds the ROM **bit-identical** (SHA-1 `2651c5e6875ac60abff734510d152166d211c87c`) |
 | Shiftable | all data relocatable; `make shifttest` (3 scenarios, 35 screenshots) passes |
 | Code layout | `src/fn/sub_XXXXXXXX.c`, one function per file; `src/lib/m4a.c` (MP2K sound, 57/58) |

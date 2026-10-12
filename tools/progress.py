@@ -18,9 +18,14 @@ CODE_END = 0x0824DAFA
 INVENTORY = Path(ROOT) / "symbols/progress_functions.csv"
 EXTRA_BOUNDARIES = Path(ROOT) / "symbols/progress_extra_functions.csv"
 LIBRARIES = Path(ROOT) / "symbols/progress_libraries.csv"
+SUBSYSTEMS = Path(ROOT) / "symbols/progress_subsystems.csv"
 
 
 def load_libraries(funcs, sizes, path=LIBRARIES):
+    return load_groups(funcs, sizes, path, "libraries")
+
+
+def load_groups(funcs, sizes, path, prefix):
     """Reviewed contiguous report spans and evidence-backed display names.
 
     These presentation groups do not change build symbols or C credit.
@@ -33,14 +38,14 @@ def load_libraries(funcs, sizes, path=LIBRARIES):
         for row in csv.DictReader(f):
             start, end = int(row["start"], 16), int(row["end"], 16)
             if start not in boundaries or end not in boundaries or start >= end:
-                raise ValueError(f"{row['name']}: invalid library boundaries")
+                raise ValueError(f"{row['name']}: invalid group boundaries")
             if libraries and start < libraries[-1]["end"]:
-                raise ValueError("library ranges must be sorted and nonoverlapping")
+                raise ValueError("group ranges must be sorted and nonoverlapping")
             if any(lib["name"] == row["name"] for lib in libraries):
-                raise ValueError("library names must be unique")
+                raise ValueError("group names must be unique")
             members = [(n, a) for n, a in funcs if start <= a < end]
             if sum(sizes[n] for n, _ in members) != end - start:
-                raise ValueError(f"{row['name']}: library span is not contiguous")
+                raise ValueError(f"{row['name']}: group span is not contiguous")
             names = {}
             for relative in filter(None, row["name_files"].split(";")):
                 with (Path(path).parent.parent / relative).open(newline="") as nf:
@@ -49,14 +54,14 @@ def load_libraries(funcs, sizes, path=LIBRARIES):
                         if not start <= a < end:
                             continue  # Some reviewed SDK maps also contain RAM/data.
                         if a not in known or not label["evidence"]:
-                            raise ValueError(f"{relative}: unreviewed library label {a:08X}")
+                            raise ValueError(f"{relative}: unreviewed group label {a:08X}")
                         if a in names and names[a] != label["name"]:
-                            raise ValueError(f"conflicting library names at {a:08X}")
+                            raise ValueError(f"conflicting display names at {a:08X}")
                         names[a] = label["name"]
             if not row["evidence"]:
-                raise ValueError(f"{row['name']}: missing library evidence")
+                raise ValueError(f"{row['name']}: missing group evidence")
             libraries.append({"name": row["name"], "start": start, "end": end,
-                              "names": names})
+                              "names": names, "prefix": prefix})
     return libraries
 
 
@@ -145,12 +150,16 @@ def measures(total_b, done_b, count, done_count, *, units=None, complete_units=N
     }
 
 
-def make_report(funcs, sizes, done, libraries=(), pinned=frozenset()):
+def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems=()):
+    libraries = sorted([*libraries, *subsystems], key=lambda group: group["start"])
+    for left, right in zip(libraries, libraries[1:]):
+        if left["end"] > right["start"]:
+            raise ValueError("report groups overlap")
     units = []
     grouped = {}
     for n, a in funcs:
         library = next((lib for lib in libraries if lib["start"] <= a < lib["end"]), None)
-        unit_name = f"libraries/{library['name']}" if library else f"functions/{a:08X}"
+        unit_name = f"{library.get('prefix', 'libraries')}/{library['name']}" if library else f"functions/{a:08X}"
         category = "register_pinned" if n in pinned else "no_register_pinning"
         if library and n in pinned:
             unit_name += "/register-pinned"
@@ -216,7 +225,8 @@ def main():
         write_markdown(args.markdown, funcs, sizes, done, total_b, done_b, pinned_b)
     if args.json:
         libraries = load_libraries(funcs, sizes)
-        Path(args.json).write_text(json.dumps(make_report(funcs, sizes, done, libraries, pinned), indent=2) + "\n")
+        subsystems = load_groups(funcs, sizes, SUBSYSTEMS, "game")
+        Path(args.json).write_text(json.dumps(make_report(funcs, sizes, done, libraries, pinned, subsystems), indent=2) + "\n")
 
 
 def bar(frac, width=30):

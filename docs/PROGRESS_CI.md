@@ -141,7 +141,8 @@ denominator; the Markdown summary also shows each matched share of total code.
 Fuzzy matching can include partial similarity; exact matching counts completed
 matches, and linked/completed measures count source units incorporated into
 the rebuilt game. Our reporter gives unfinished candidates no partial credit
-and groups identified libraries while leaving game functions as individual units.
+and groups identified libraries and contiguous game subsystems. Unknown areas
+remain individual function units.
 Every accepted exact C match is used
 in the final ROM, so fuzzy, exact and linked code percentages coincide here.
 These are byte-weighted measures of the tracked code region, not percentages
@@ -158,3 +159,22 @@ The primary source links were inspected on 2026-10-08. The server recognizes
 `<version>_report`/`<version>-report` artifacts and report/progress file stems,
 parses the objdiff report and requires version 2. This project uses the simplest
 contract: `jp_report` containing `report.json`.
+
+## Contiguous game groups
+
+`symbols/progress_subsystems.csv` defines the named `game/` report units, using
+half-open inventory ranges and source/document evidence. This changes report
+presentation only: function identities, byte denominators and matching credit
+are preserved. Register-pinned members appear in a nested unit so the native
+category remains accurate. Provisional labels are explicitly marked tentative.
+
+The task scheduler (`08219F50–0821A184`) already has matching C throughout.
+Neighboring groups expose its heap, input, resource registry and message queue.
+The entry-point group contains the matching `AgbMain` and reset-word helper.
+
+The beginning of the address-ordered report is **not AgbMain**. Its first span
+includes the GBA header/reset vector; the `IntrMain` span also includes the ARM
+helpers copied to IWRAM. These remain assembly. We retain the old denominator
+and do not turn header data or handwritten startup assembly into C credit.
+Treemap positions can change as groups and layout change; use unit labels and
+virtual addresses to identify a tile rather than its screen corner.
