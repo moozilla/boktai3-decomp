@@ -36,6 +36,8 @@ Animated particles,08015160,08015F60,symbols/proposed/subsystems.csv,Contiguous 
 Fading particle groups,08015F60,080164B8,symbols/proposed/subsystems.csv,Group lifetime animation and manager initialization; constructor remains unmatched
 Palette level transitions,080164B8,0801689C,symbols/proposed/subsystems.csv,Channel level increase decrease configuration and reset
 Floating item effects (tentative),0801689C,08017270,symbols/proposed/subsystems.csv,Projection bobbing and departure states with item-dependent collection animation
+Scanline wave distortion,08017270,08017428,symbols/proposed/subsystems.csv,Complete wave update initialization creation and cleanup
+Weather and storm controller (tentative),08017428,08018438,symbols/proposed/subsystems.csv,Storm wait onset active shutdown dispatch commands and weather particles; some constructors remain unmatched
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
 Sound-test menu,081E1AF4,081E270C,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md and allocator 081E26CC callback chain
 Timed presentation,081E270C,081E2898,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md timed update cleanup and initialization
