@@ -25,3 +25,4 @@ address,isa,evidence,replacement_end
 08248F0C,thumb,Separate RTC alarm body with own push/sub-sp and pop/bx after 08248E70 return; retained unmatched; docs/RTC.md,
 081DB24C,thumb,Independent 108-byte Thumb allocation wrapper in retained 081DB1D8 tail; own prologue and call sequence and pop-bx plus literals; ends at 081DB2B8; notes/solo-family_2026-10-09.md,081DB2B8
 081DB2B8,thumb,Independent 108-byte Thumb allocation wrapper in retained 081DB1D8 tail; own prologue and call sequence and pop-bx plus literals; ends at 081DB324; notes/solo-family_2026-10-09.md,081DB324
+08001590,thumb,Independent boot-word clearing loop with own push and pop-bx plus literal after AgbMain; exact 28-byte C body,080015AC
