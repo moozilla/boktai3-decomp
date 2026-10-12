@@ -10,6 +10,30 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 grid attack actor state batch
+
+Coverage is **19.459%**, up **0.191 percentage points** from 19.269%:
+**30 additional exact functions / 4,608 bytes**, 5,461 total / 11,109.
+All states from **08029FF8–0802AB4C** now match, including the ten-stage grid
+attack, repeated attacks, recovery, death and anchored reactions. Collider
+setup, random attack selection, grid effects and damage reaction dispatch
+also match. Provisional names and objdiff groups describe these areas.
+Combined validation log: build/grid-actor-combined.log.
+
+Continue toward **20% matching**, solo, no tooling. Weekly remaining allowance
+floor: **20%**, last check **25% remaining**. Next functions: 0802AB4C damage
+processing, then the next actor family from 0802AD0C. Ignored WIP candidates:
+08029870 is only two differing bytes (first coordinate-load offset r1 vs r3),
+08029BF4 has stack/register differences, 080284FC has allocation differences,
+080287DC has math and allocation differences. Do not count those as exact.
+
+Useful matching pattern: explicit zero/one locals initialized before field
+stores can fix allocation across an entire function. That matched 08029CC0
+and 0802A188. Initialize RNG table/index/mask locals after vector setup to get
+correct loop-invariant order; 08029EB4 matches using this pattern. For fixed
+register table pointers reused across calls, declare them in the caller's
+scope (08029AA8), otherwise inlined helpers reload them unnecessarily.
+
 ## October 12 actor projectile and reaction controllers
 
 Coverage is **19.269%**, up **0.213 percentage points** from 19.055%:
