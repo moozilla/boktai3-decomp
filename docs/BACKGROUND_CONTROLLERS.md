@@ -3,6 +3,8 @@
 The first game code after `AgbMain` controls backgrounds rather than startup.
 The contiguous `080015AC–08002AA8` range contains two related task families:
 normal backgrounds and a scrolling variant. These are provisional names.
+This group rose from **5.957% to 56.888% matching (+50.931 percentage points)**;
+whole-game coverage rose from **15.199% to 15.315% (+0.116 percentage points)**.
 No affine-transform role is claimed merely from fixed-point arithmetic.
 
 Both families have allocation, initialization, update, cleanup, script creation,

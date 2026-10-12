@@ -29,6 +29,11 @@ The early background group is still only partly matched: both frame-update
 routines and map-loading helpers remain unfinished. Source drafts are retained
 separately; do not confuse descriptive report labels with exact C acceptance.
 A two-minute input-polling permuter search did not produce an exact match.
+Unfinished sources are preserved on `codex/wip-subsystems-2026-10-12` under
+`wip/subsystems-checkpoint/`; never merge that branch into main.
+Within the early background-controller group, matching rose from **5.957% to
+56.888% (+50.931 percentage points)**. This is a subsystem measure, not the
+whole-game percentage.
 
 ## October 12 entry point and contiguous subsystem batch
 
