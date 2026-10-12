@@ -396,6 +396,29 @@ addr,name,confidence,evidence
 080203D4,SceneObjects_Destroy,low,Tentative lifecycle or scene-message role; exact C in src/fn/sub_080203D4.c
 080209D0,SceneMessages_Enqueue,low,Tentative lifecycle or scene-message role; exact C in src/fn/sub_080209D0.c
 08020A14,SceneMessages_SwapBuffers,low,Tentative lifecycle or scene-message role; exact C in src/fn/sub_08020A14.c
+08020A60,SceneMessages_RunScript,low,Tentative descriptive role from exact C in src/fn/sub_08020A60.c
+08020AF0,SceneMessages_Dispatch,low,Tentative descriptive role from exact C in src/fn/sub_08020AF0.c
+08020B8C,SceneMessages_Update,low,Tentative descriptive role from exact C in src/fn/sub_08020B8C.c
+08020C40,SceneMessages_Initialize,low,Tentative descriptive role from exact C in src/fn/sub_08020C40.c
+08020C84,SceneMessages_Create,low,Tentative descriptive role from exact C in src/fn/sub_08020C84.c
+08020CD4,SceneMessages_RegisterReceiver,low,Tentative descriptive role from exact C in src/fn/sub_08020CD4.c
+08020D88,SceneMessages_FindScript,low,Tentative descriptive role from exact C in src/fn/sub_08020D88.c
+08020DF0,SceneMessages_ScriptStart,low,Tentative descriptive role from exact C in src/fn/sub_08020DF0.c
+08020ED8,SceneMessages_Stop,low,Tentative descriptive role from exact C in src/fn/sub_08020ED8.c
+08020F1C,SceneMessages_ConsumeSignal,low,Tentative descriptive role from exact C in src/fn/sub_08020F1C.c
+08020F48,SceneMessages_IsActive,low,Tentative descriptive role from exact C in src/fn/sub_08020F48.c
+08020F84,SceneCommands_CreateEffect,low,Tentative descriptive role from exact C in src/fn/sub_08020F84.c
+080210B0,SceneCommands_FadePalette,low,Tentative descriptive role from exact C in src/fn/sub_080210B0.c
+0802113C,SceneCommands_BlendPalette,low,Tentative descriptive role from exact C in src/fn/sub_0802113C.c
+0802141C,SceneActors_FindAvailable,low,Tentative descriptive role from exact C in src/fn/sub_0802141C.c
+08021450,SceneActors_ApplyDamage,low,Tentative descriptive role from exact C in src/fn/sub_08021450.c
+08021578,SceneActors_Destroy,low,Tentative descriptive role from exact C in src/fn/sub_08021578.c
+080215AC,SceneActors_SetHealthLimits,low,Tentative descriptive role from exact C in src/fn/sub_080215AC.c
+08021630,SceneActors_SetHealth,low,Tentative descriptive role from exact C in src/fn/sub_08021630.c
+080216A4,SceneActors_SetDamageCallback,low,Tentative descriptive role from exact C in src/fn/sub_080216A4.c
+080216D8,SceneActors_SetMotionOffsets,low,Tentative descriptive role from exact C in src/fn/sub_080216D8.c
+0802175C,SceneActors_StartDirectionalAnimation,low,Tentative descriptive role from exact C in src/fn/sub_0802175C.c
+080218FC,SceneActors_UpdateAnimation,low,Tentative descriptive role from exact C in src/fn/sub_080218FC.c
 0818D754,Motion_BuildApproachSegment,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D8E0,Motion_RampSpin,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D960,Motion_AdvanceApproach,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
