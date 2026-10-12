@@ -40,3 +40,12 @@ addr,name,confidence,evidence
 0818D8E0,Motion_RampSpin,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D960,Motion_AdvanceApproach,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818DB10,Motion_FollowOwnerAndFinish,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+08002AE0,Palette_BlendRange,high,Exact C palette controller family in src/fn/sub_08002AE0.c
+08002BA0,Palette_ScaleRange,high,Exact C palette controller family in src/fn/sub_08002BA0.c
+08002E80,Palette_UpdateOscillation,high,Exact C palette controller family in src/fn/sub_08002E80.c
+08002F40,Palette_BlendVariants,high,Exact C palette controller family in src/fn/sub_08002F40.c
+0800306C,Palette_ApplyFrame,high,Exact C palette controller family in src/fn/sub_0800306C.c
+080031AC,Palette_Update,high,Exact C palette controller family in src/fn/sub_080031AC.c
+080031EC,Palette_InitializeFromScript,high,Exact C palette controller family in src/fn/sub_080031EC.c
+080034A8,Palette_ReplaceResource,high,Exact C palette controller family in src/fn/sub_080034A8.c
+080035F0,Palette_SetBrightnessFromScript,high,Exact C palette controller family in src/fn/sub_080035F0.c
