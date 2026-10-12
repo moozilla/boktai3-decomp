@@ -20,6 +20,7 @@ address,evidence
 0801EBE4,Independent scene-object selection helper with separate prologue return and literal pool; exact standalone C
 08020F48,Independent 36-byte scene-message activity query after signal-consumption return; exact C
 080216D8,Independent motion-offset setter after callback registration return and literal; exact 16-byte C body
+08021BC0,Independent available-position query after event-script return and literals; exact 36-byte C body
 0802CED0,Independent 40-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md
 0802CEF8,Independent 24-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md
 081B61E0,Separate 100-byte Thumb body with own push/call/control flow/pop-bx after 081B6180 returns; retained unmatched code; notes/root-batch6.md
