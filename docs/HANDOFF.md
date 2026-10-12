@@ -10,6 +10,25 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 grid controller completion and pooled actor batch
+
+Coverage is **19.584%**, up **0.125 percentage points** from 19.459%:
+**26 additional exact functions**, 5,487 total / 11,109. The report credits
+3,020 additional bytes (473,034 / 2,415,354); function spans include alignment
+and existing assembly tails. The pool manager **0802C678–0802C8A0 is complete**.
+Grid actor damage processing, action priority and contiguous command/reaction
+callbacks now match, followed by pool registration, update, destruction,
+allocation, facing, hit capture, target selection, refresh and turning.
+Combined validation: `build/actor-grid-completion-combined.log`.
+
+Continue solo toward **20% matching**, no tooling; stop below **20% weekly
+allowance remaining** (latest check: 21%). The next contiguous area begins
+0802CF10. Existing near matches remain under ignored `wip/`: 0802ADBC command
+dispatch has loop/register differences; 08029870 has two differing bytes.
+Use explicit signed-angle conversion plus an opaque register output to retain
+truncation before byte subtraction (0802CAAC/0802CB94). The following turning
+helper uses an opaque delta pointer to preserve its reload (0802CC94).
+
 ## October 12 grid attack actor state batch
 
 Coverage is **19.459%**, up **0.191 percentage points** from 19.269%:
