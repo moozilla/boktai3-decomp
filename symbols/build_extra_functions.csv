@@ -14,6 +14,7 @@ address,isa,evidence,replacement_end
 0801A614,thumb,Independent eight-marker hide loop in byte tail; exact C body,0801A634
 0801EBBC,thumb,Independent scene-object selection helper with separate prologue return and literal pool; exact standalone C,0801EBE4
 0801EBE4,thumb,Independent scene-object selection helper with separate prologue return and literal pool; exact standalone C,0801EC00
+08020F48,thumb,Independent 36-byte scene-message activity query after signal-consumption return; exact C,08020F6C
 0802CED0,thumb,Independent 40-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md,
 0802CEF8,thumb,Independent 24-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md,
 081DB24C,thumb,Independent 108-byte Thumb allocation wrapper in retained 081DB1D8 tail; own prologue and call sequence and pop-bx plus literals; ends at 081DB2B8; notes/solo-family_2026-10-09.md,081DB2B8
