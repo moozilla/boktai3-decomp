@@ -1,4 +1,6 @@
 #include "global.h"
+#define ActorPalette_UpdateFadeAndNotify sub_081E36FC
+// Provisional name: ActorPalette_UpdateFadeAndNotify
 struct PaletteController {
     u8 beforeEffect[0xe08];
     u8 effect[12]; const u16 *palette;
@@ -16,7 +18,7 @@ void sub_08215284(void *, s32);
 s32 Div(s32,s32);
 void sub_0821AD08(void *, s32);
 // Interpolate the actor palette over fifty updates, then restore its asset palette.
-void sub_081E36FC(struct PaletteController *p) {
+void ActorPalette_UpdateFadeAndNotify(struct PaletteController *p) {
     s32 i;
     struct RGB {s32 r:8,g:8,b:8;} a,b,c;
     for(i=0;i<16;i++) {

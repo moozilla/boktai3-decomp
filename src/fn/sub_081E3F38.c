@@ -1,4 +1,6 @@
 #include "global.h"
+#define Actor_SelectNearestInteraction sub_081E3F38
+// Provisional name: Actor_SelectNearestInteraction
 // MATCHING_CONCESSION: register-pinning
 struct Obj {u32 flags;u8 pad[3];u8 priority;s8 scaleX,scaleY;u8 padScale[6];u16 frame;u8 pad2[10];s16 x,y,z;};
 struct Anim {const u16 *data;u8 flags,count,factor,rate;u16 frame,unused,scale,timer;};
@@ -10,7 +12,7 @@ u8 sub_082215E4(s32,s32);void sub_0821AD08(void*,s32);
 void sub_081E574C(void*,void*);void sub_081E5648(void*,void*);void sub_081E4174(void*);void sub_081E44D4(void*);
 void sub_08215284(void*,s32);
 // Select the closest eligible interaction target and animate its selection marker.
-void sub_081E3F38(struct G*p){
+void Actor_SelectNearestInteraction(struct G*p){
  s32 i;struct Partner*q;s32 dx,dz,xOffset,zOffset,length;register s32 height asm("r0");u32 radius;
  u32 a,b,c;register u32 sector asm("r2");u8 *owner;
  p->group=-1;

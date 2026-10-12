@@ -1,4 +1,9 @@
 #include "global.h"
+#define ActorPalette_UpdateFade sub_081E3550
+#define ActorPalette_UpdateFadeAndNotify sub_081E36FC
+#define ActorPalette_BeginReverseFade sub_081E38C4
+#define ActorPalette_UpdateReverseFade sub_081E394C
+// Provisional name: ActorPalette_BeginReverseFade
 struct PaletteController {
     u8 beforeEffect[0xe08];
     u8 effect[12]; const u16 *palette;
@@ -12,10 +17,10 @@ struct PaletteController {
     void (*callback)(void *);
 };
 void sub_08215284(void *, s32);
-void sub_081E3550(void *); void sub_081E36FC(void *);
-void sub_081E394C(void *);
+void ActorPalette_UpdateFade(void *); void ActorPalette_UpdateFadeAndNotify(void *);
+void ActorPalette_UpdateReverseFade(void *);
 // Begin the reverse palette transition and retain the normal asset palette.
-void sub_081E38C4(struct PaletteController *p) {
+void ActorPalette_BeginReverseFade(struct PaletteController *p) {
     const u16 *src; u16 *dst; s32 i; void *effect;
     p->step=50; p->duration=50;
     effect=p->effect;
@@ -25,5 +30,5 @@ void sub_081E38C4(struct PaletteController *p) {
     src=p->palette; dst=p->output;
     for(i=15;i>=0;i--) {*dst++=*src++;}
     p->palette=p->output;
-    p->callback=sub_081E394C;
+    p->callback=ActorPalette_UpdateReverseFade;
 }

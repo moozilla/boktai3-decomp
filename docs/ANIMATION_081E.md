@@ -1,5 +1,10 @@
 # Animation controller matching batch
 
+The subsequent entry-point/subsystem batch is described in
+[ENTRY_AND_MENUS.md](ENTRY_AND_MENUS.md). It completes curved movement at
+`081E692C` and `081E6E0C`, script configuration, and the adjacent palette and
+interaction block `081E34D0–081E4174`. The figures below describe the earlier batch.
+
 The October 12 batch advances code coverage from **13.779% to 14.564%**:
 **+0.785 percentage points**, 55 exact functions / 18,952 tracked code bytes.
 Of those, 37 functions / 14,680 tracked bytes belong to this controller; the

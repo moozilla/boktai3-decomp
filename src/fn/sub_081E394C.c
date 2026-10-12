@@ -1,4 +1,6 @@
 #include "global.h"
+#define ActorPalette_UpdateReverseFade sub_081E394C
+// Provisional name: ActorPalette_UpdateReverseFade
 // MATCHING_CONCESSION: register-pinning
 struct PaletteController {
     u8 beforeEffect[0xe08];
@@ -17,7 +19,7 @@ void sub_08215284(void *, s32);
 s32 Div(s32,s32);
 static inline u32 mode_bits(u8 *p,u32 mask){register u32 v asm("r1")=*p;register u32 result asm("r0")=mask&v;return result;}
 // Interpolate the actor palette over fifty updates, then restore its asset palette.
-void sub_081E394C(struct PaletteController *p) {
+void ActorPalette_UpdateReverseFade(struct PaletteController *p) {
     s32 i;
     struct RGB {s32 r:8,g:8,b:8;} a,b,c;
     for(i=0;i<16;i++) {
