@@ -187,3 +187,20 @@ addr,name,confidence,evidence
 0800F0F0,StatusScreen_ClearScanlineNoise,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
 0800F154,StatusScreen_Update,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
 0800F1BC,StatusScreen_Destroy,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
+0800EC0C,StatusScreen_FadeAndExit,medium,Tentative descriptive name from exact C in src/fn/sub_0800EC0C.c
+0800ECD0,StatusScreen_WaitForStart,medium,Tentative descriptive name from exact C in src/fn/sub_0800ECD0.c
+0800F220,StatusScreen_Initialize,medium,Tentative descriptive name from exact C in src/fn/sub_0800F220.c
+0800F850,ResultPrompt_Update,medium,Tentative descriptive name from exact C in src/fn/sub_0800F850.c
+0800F9C4,BoardPiece_Initialize,medium,Tentative descriptive name from exact C in src/fn/sub_0800F9C4.c
+0800FAB8,BoardPiece_UpdateAnimation,medium,Tentative descriptive name from exact C in src/fn/sub_0800FAB8.c
+0801037C,BoardPieces_DispatchCommands,medium,Tentative descriptive name from exact C in src/fn/sub_0801037C.c
+08010454,BoardPiece_Launch,medium,Tentative descriptive name from exact C in src/fn/sub_08010454.c
+08010FD4,GroupObjects_Update,medium,Tentative descriptive name from exact C in src/fn/sub_08010FD4.c
+080110E8,GroupObjects_Destroy,medium,Tentative descriptive name from exact C in src/fn/sub_080110E8.c
+08011118,GroupObjects_Initialize,medium,Tentative descriptive name from exact C in src/fn/sub_08011118.c
+080111EC,MessageMenu_LoadBackground,medium,Tentative descriptive name from exact C in src/fn/sub_080111EC.c
+08011264,MessageMenu_CreateTextWindows,medium,Tentative descriptive name from exact C in src/fn/sub_08011264.c
+08011350,MessageMenu_InitializeTransition,medium,Tentative descriptive name from exact C in src/fn/sub_08011350.c
+0801138C,MessageMenu_Update,medium,Tentative descriptive name from exact C in src/fn/sub_0801138C.c
+080113E0,MessageMenu_Destroy,medium,Tentative descriptive name from exact C in src/fn/sub_080113E0.c
+0801140C,MessageMenu_Initialize,medium,Tentative descriptive name from exact C in src/fn/sub_0801140C.c

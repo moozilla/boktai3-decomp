@@ -31,3 +31,6 @@ Resource registry,0821A184,0821A2DC,,Registration and lookup implementations in 
 Message queue,0821A2DC,0821A454,,docs/MGS_GCL_MATCHING.md double-buffered message posting and receiving
 Script virtual machine,0821A454,0821BAFC,,docs/MGS_GCL_MATCHING.md resource lookup and bytecode decoding through expression evaluator; following allocator starts map/collision resource
 Cartridge solar sensor,08243C10,08243EFC,symbols/proposed/solar.csv,docs/SOLAR_SENSOR.md complete eight-function GPIO and timer block
+Result prompt,0800F850,0800F9C4,symbols/proposed/subsystems.csv,Complete input prompt callbacks and lifecycle
+Group objects (tentative),0800F9C4,080111EC,symbols/proposed/subsystems.csv,Sixteen-object animation and movement manager; several movement callbacks remain unmatched
+Message menu,080111EC,0801150C,symbols/proposed/subsystems.csv,Complete background text windows transition update cleanup and initialization
