@@ -10,6 +10,37 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 common actor controller completed
+
+Current user instruction: continue toward **20% matching**; the weekly allowance
+stopping floor is now **20% remaining**, explicitly replacing the previous 50%.
+Latest usage check: **39% weekly remaining**. Continue after integrating this batch.
+
+Coverage is **18.837%**, up **0.202 percentage points** from 18.636%:
+**35 additional exact functions / 4,868 bytes**, 5,394 total / 11,109.
+The common scene actor controller at 080213EC–08021EA8 is now completely matched,
+including initialization, all animation setup variants, target metrics, event
+scripts, damage/effect updates, and the effect-selection dispatcher.
+Adjacent graphics setup and animation states also gained exact implementations.
+Objdiff groups distinguish the complete common controller from the following
+partially matched graphics/basic-state span. The hidden position-copy query at
+08021BC0 now has explicit bounds. Combined log: build/actor-controller-combined.log.
+Previous PR #47 reporting Action 38308245189 succeeded.
+
+Matching lesson: **use actual struct fields before pinning raw offset drafts**.
+The stubborn 080216E8 and 08021890 wrappers matched directly once their byte and
+halfword fields were represented by a struct. Existing 08023720/0802383C and
+08024440 state helpers supplied useful seeds. Keeping the zero parameter in the
+state-entry helper only where the original hoists it matters for allocation.
+The facing helper recovered in 08024CE0/08024E18 also completed 080214D4.
+
+Next contiguous work: the larger actor state handlers from 08024F2C onward,
+then return to graphics/targeting gaps. Ignored drafts include 08023D78
+(seven register-allocation differences in its best form), 080243CC, 08022624,
+08022404, and the earlier presentation commands. 08023FE8 disassembly is saved
+in build/23FE8-asm.txt; it combines facing vectors, target bounds and terrain.
+No Ghidra C export exists locally; do not retry tools/ghidra_c.py without one.
+
 ## October 12 scene messages and actor health/animation batch
 
 Coverage is **18.636%**, up **0.090 percentage points** from 18.546%:
