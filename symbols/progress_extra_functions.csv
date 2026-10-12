@@ -2,6 +2,7 @@ address,evidence
 08001590,Independent boot-word clearing loop with own push and pop-bx plus literal after AgbMain; exact 28-byte C body
 080020BC,Independent 96-byte map-loading wrapper with own prologue and return after 08002024
 08005E10,Independent 12-byte global-pointer clearing function after palette-switch script return and literal pool
+08006CD0,Independent 116-byte menu constructor after initializer return and literal pool; exact standalone C
 0802CED0,Independent 40-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md
 0802CEF8,Independent 24-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md
 081B61E0,Separate 100-byte Thumb body with own push/call/control flow/pop-bx after 081B6180 returns; retained unmatched code; notes/root-batch6.md

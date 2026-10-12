@@ -76,4 +76,23 @@ addr,name,confidence,evidence
 08005830,SceneObjects_CreateObject,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_08005830.c
 08005B8C,SceneObjects_CreateFromScript,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_08005B8C.c
 08005D30,SceneObjects_SwitchPaletteFromScript,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_08005D30.c
-08005E10,SceneController_ClearGlobal,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_08005E10.c
+08005E10,TerrainModifiers_ClearGlobal,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_08005E10.c
+08005E64,TerrainModifiers_Create,medium,Tentative role from exact C in src/fn/sub_08005E64.c
+08006088,TerrainModifiers_Change,medium,Tentative role from exact C in src/fn/sub_08006088.c
+080061CC,TerrainModifiers_ChangeFromScript,medium,Tentative role from exact C in src/fn/sub_080061CC.c
+08006374,ChoiceMenu_DispatchSelection,medium,Tentative role from exact C in src/fn/sub_08006374.c
+080063D0,ChoiceMenu_Select,medium,Tentative role from exact C in src/fn/sub_080063D0.c
+080064C4,ChoiceMenu_HandleInput,medium,Tentative role from exact C in src/fn/sub_080064C4.c
+08006770,ChoiceMenu_ParseTag,medium,Tentative role from exact C in src/fn/sub_08006770.c
+08006A04,ChoiceMenu_LayoutText,medium,Tentative role from exact C in src/fn/sub_08006A04.c
+08006B60,ChoiceMenu_Initialize,medium,Tentative role from exact C in src/fn/sub_08006B60.c
+08006CD0,ChoiceMenu_Create,medium,Tentative role from exact C in src/fn/sub_08006CD0.c
+08006D44,ChoiceMenu_CreateFromScript,medium,Tentative role from exact C in src/fn/sub_08006D44.c
+08005E1C,TerrainModifiers_Link,medium,Tentative role from contiguous matched controller implementation
+08005E40,TerrainModifiers_Unlink,medium,Tentative role from contiguous matched controller implementation
+08005F40,TerrainModifiers_Destroy,medium,Tentative role from contiguous matched controller implementation
+08006144,TerrainModifiers_CreateManager,medium,Tentative role from contiguous matched controller implementation
+080062C4,TerrainModifiers_CreateFromScript,medium,Tentative role from contiguous matched controller implementation
+08006478,ChoiceMenu_FindNonemptyRow,medium,Tentative role from contiguous matched controller implementation
+080066C0,ChoiceMenu_Update,medium,Tentative role from contiguous matched controller implementation
+08006710,ChoiceMenu_Destroy,medium,Tentative role from contiguous matched controller implementation
