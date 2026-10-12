@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after the color and terrain-overlay completion batch (2026-10-12). This file is the single
+Last updated after the scene-object completion batch (2026-10-12). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,21 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 12 scene-object completion batch
+
+Coverage is **15.810%**, up **0.197 percentage points** from 15.613%:
+**14 new exact functions / 4,760 bytes**, 5,008 total / 11,090.
+The scene-object subsystem (080041CC–08005E10; tentative name) is now
+**100% matched** and has a named report group. This completes the manager,
+creation and palette scripts, pushing and step-down checks, movement/fall/
+disappearance/flash callbacks, and directional dust/edge particles.
+The independent cleanup at 08005E10 starts the next controller and now has
+its own boundary. The byte denominator is unchanged. Continue from 08005E1C.
+
+Whole-session gain from 15.315%: **0.495 percentage points**. The 20% goal
+remains open. No tooling changes or broad regression tests. Branch:
+`codex/scene-object-movement`; combined log: `build/scene-object-combined.log`.
 
 ## October 12 color, terrain-overlay and scene-object batch
 
