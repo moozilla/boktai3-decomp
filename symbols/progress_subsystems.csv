@@ -30,6 +30,9 @@ Breakable barriers,08012D08,080133CC,symbols/proposed/subsystems.csv,Tentative d
 Terrain shadows,080133CC,080136B4,symbols/proposed/subsystems.csv,Tentative descriptive grouping from contiguous manager callbacks and exact C; unmatched reset tails remain counted
 Scaled shadows,080136B4,08013C14,symbols/proposed/subsystems.csv,Tentative descriptive grouping from contiguous manager callbacks and exact C; unmatched reset tails remain counted
 Shadow registry,08013C14,08013F98,symbols/proposed/subsystems.csv,Tentative descriptive grouping from contiguous manager callbacks and exact C; unmatched reset tails remain counted
+Particle groups,08013F98,08014F64,symbols/proposed/subsystems.csv,Contiguous manager lifecycle and particle creation/update/emission wrappers; provisional names
+Fragment groups,08014F64,08015160,symbols/proposed/subsystems.csv,Contiguous manager lifecycle and particle creation/update/emission wrappers; provisional names
+Animated particles,08015160,08015F60,symbols/proposed/subsystems.csv,Contiguous manager lifecycle and particle creation/update/emission wrappers; provisional names
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
 Sound-test menu,081E1AF4,081E270C,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md and allocator 081E26CC callback chain
 Timed presentation,081E270C,081E2898,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md timed update cleanup and initialization
