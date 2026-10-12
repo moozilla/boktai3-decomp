@@ -1,0 +1,408 @@
+[
+  {
+    "source": "/Users/benjaminharris/git/boktai3-decomp/wip/motion-session/sub_0818DB10.c",
+    "source_sha256": "cf2f20069efe5a8bdd9498b16857c1f0689f9d04c04c1a8e2596140507df6a2d",
+    "created_utc": "2026-10-12T07:37:44.472090+00:00",
+    "hypothesis": "Recheck retained motion final-stage baseline; boundary DC50",
+    "next_hypothesis": "Compare vector representation and derived field addresses",
+    "category": "registers",
+    "validity": "unreviewed",
+    "status": "mismatch",
+    "compiler": "/Users/benjaminharris/git/boktai3-decomp/build/tools/agbcc/agbcc:64e2fc71113aaa52c072cac9215e322999453602",
+    "flags": [
+      "-O2",
+      "-mthumb-interwork",
+      "-fhex-asm"
+    ],
+    "preprocessed_sha256": "edfc0c845a8d2b2b43d652c457f4154fe664e1b2605fbbee24861ee6e729f1e5",
+    "comparison": {
+      "functions": [
+        "sub_0818DB10"
+      ],
+      "address": 135846672,
+      "candidate_bytes": 324,
+      "target_bytes": 320,
+      "size_delta": 4,
+      "different_byte_count": 155,
+      "original_sha256": null,
+      "candidate_sha256": null
+    }
+  },
+  {
+    "source": "/Users/benjaminharris/git/boktai3-decomp/wip/motion-session/typed_vector.c",
+    "source_sha256": "7b74eb769048066abc255a9b5999d5dbf02bc2660c8b67327e22b2523292c4dd",
+    "created_utc": "2026-10-12T07:38:02.564360+00:00",
+    "hypothesis": "Mixed signed bitfields express observed zero/sign extension without pointer alias casts",
+    "next_hypothesis": "Inspect finishing flag writes",
+    "category": "types",
+    "validity": "unreviewed",
+    "status": "mismatch",
+    "compiler": "/Users/benjaminharris/git/boktai3-decomp/build/tools/agbcc/agbcc:64e2fc71113aaa52c072cac9215e322999453602",
+    "flags": [
+      "-O2",
+      "-mthumb-interwork",
+      "-fhex-asm"
+    ],
+    "preprocessed_sha256": "649fa6c3f46580a6053e2410ab9e376444758f05f82c2232bcf1d4d8c6bdc33b",
+    "comparison": {
+      "functions": [
+        "sub_0818DB10"
+      ],
+      "address": 135846672,
+      "candidate_bytes": 324,
+      "target_bytes": 320,
+      "size_delta": 4,
+      "different_byte_count": 32,
+      "original_sha256": null,
+      "candidate_sha256": null
+    }
+  },
+  {
+    "source": "/Users/benjaminharris/git/boktai3-decomp/wip/motion-session/flag_local.c",
+    "source_sha256": "17abb57c81315693dcf0e3b4d2887efd5d9edc81278d0d603bf466d5e7c84f2d",
+    "created_utc": "2026-10-12T07:38:21.736464+00:00",
+    "hypothesis": "flag_local",
+    "next_hypothesis": "",
+    "category": "types",
+    "validity": "unreviewed",
+    "status": "mismatch",
+    "compiler": "/Users/benjaminharris/git/boktai3-decomp/build/tools/agbcc/agbcc:64e2fc71113aaa52c072cac9215e322999453602",
+    "flags": [
+      "-O2",
+      "-mthumb-interwork",
+      "-fhex-asm"
+    ],
+    "preprocessed_sha256": "7fa35e83155c050f2f507aabcb2b4b174a00794def8ccc9b1cefd8fc65c387f4",
+    "comparison": {
+      "functions": [
+        "sub_0818DB10"
+      ],
+      "address": 135846672,
+      "candidate_bytes": 324,
+      "target_bytes": 320,
+      "size_delta": 4,
+      "different_byte_count": 35,
+      "original_sha256": null,
+      "candidate_sha256": null
+    }
+  },
+  {
+    "source": "/Users/benjaminharris/git/boktai3-decomp/wip/motion-session/flag_commute.c",
+    "source_sha256": "b7a1f3ead032917870e43a60dd86e49d0bb01cb946b42d44be5d251120bd55aa",
+    "created_utc": "2026-10-12T07:38:22.486730+00:00",
+    "hypothesis": "flag_commute",
+    "next_hypothesis": "",
+    "category": "types",
+    "validity": "unreviewed",
+    "status": "mismatch",
+    "compiler": "/Users/benjaminharris/git/boktai3-decomp/build/tools/agbcc/agbcc:64e2fc71113aaa52c072cac9215e322999453602",
+    "flags": [
+      "-O2",
+      "-mthumb-interwork",
+      "-fhex-asm"
+    ],
+    "preprocessed_sha256": "6c4a9e09149e364edd0cfe54eef8427f7131b2477d730acb5cdaf4c3733634e8",
+    "comparison": {
+      "functions": [
+        "sub_0818DB10"
+      ],
+      "address": 135846672,
+      "candidate_bytes": 324,
+      "target_bytes": 320,
+      "size_delta": 4,
+      "different_byte_count": 32,
+      "original_sha256": null,
+      "candidate_sha256": null
+    }
+  },
+  {
+    "source": "/Users/benjaminharris/git/boktai3-decomp/wip/motion-session/flag_inline.c",
+    "source_sha256": "12038e5032c04b344e8b36f290d59a7d1cf7312efd55dc677dcbc5ca59aacc30",
+    "created_utc": "2026-10-12T07:38:23.023945+00:00",
+    "hypothesis": "flag_inline",
+    "next_hypothesis": "",
+    "category": "types",
+    "validity": "unreviewed",
+    "status": "mismatch",
+    "compiler": "/Users/benjaminharris/git/boktai3-decomp/build/tools/agbcc/agbcc:64e2fc71113aaa52c072cac9215e322999453602",
+    "flags": [
+      "-O2",
+      "-mthumb-interwork",
+      "-fhex-asm"
+    ],
+    "preprocessed_sha256": "d4218a720671d111fe6e1b164d52cf9db0d52307e9de4bfcd70db492f17e5bdb",
+    "comparison": {
+      "functions": [
+        "sub_0818DB10"
+      ],
+      "address": 135846672,
+      "candidate_bytes": 324,
+      "target_bytes": 320,
+      "size_delta": 4,
+      "different_byte_count": 32,
+      "original_sha256": null,
+      "candidate_sha256": null
+    }
+  },
+  {
+    "source": "/Users/benjaminharris/git/boktai3-decomp/wip/motion-session/flag_bits.c",
+    "source_sha256": "bb93190ed4cb3888bd7a0a54f02b0b7d6d692895be7288eeae0b9179a15da178",
+    "created_utc": "2026-10-12T07:38:23.562522+00:00",
+    "hypothesis": "flag_bits",
+    "next_hypothesis": "",
+    "category": "types",
+    "validity": "unreviewed",
+    "status": "mismatch",
+    "compiler": "/Users/benjaminharris/git/boktai3-decomp/build/tools/agbcc/agbcc:64e2fc71113aaa52c072cac9215e322999453602",
+    "flags": [
+      "-O2",
+      "-mthumb-interwork",
+      "-fhex-asm"
+    ],
+    "preprocessed_sha256": "7ce8acd8e393d9a9e8ed004bba593df1280b774100a4d7a4e7862f1efe3a886c",
+    "comparison": {
+      "functions": [
+        "sub_0818DB10"
+      ],
+      "address": 135846672,
+      "candidate_bytes": 324,
+      "target_bytes": 320,
+      "size_delta": 4,
+      "different_byte_count": 32,
+      "original_sha256": null,
+      "candidate_sha256": null
+    }
+  },
+  {
+    "source": "/Users/benjaminharris/git/boktai3-decomp/wip/motion-session/signed_mask.c",
+    "source_sha256": "d306b5be5efbc93d92892efa5c5dd34a797c1102d2c31b69661b1465e2676caf",
+    "created_utc": "2026-10-12T07:38:44.675262+00:00",
+    "hypothesis": "signed_mask",
+    "next_hypothesis": "",
+    "category": "types",
+    "validity": "unreviewed",
+    "status": "mismatch",
+    "compiler": "/Users/benjaminharris/git/boktai3-decomp/build/tools/agbcc/agbcc:64e2fc71113aaa52c072cac9215e322999453602",
+    "flags": [
+      "-O2",
+      "-mthumb-interwork",
+      "-fhex-asm"
+    ],
+    "preprocessed_sha256": "f9be5d0e1b933652e6de6343a9a72a1a84f1bd42aa987537efd48cd645f2bc98",
+    "comparison": {
+      "functions": [
+        "sub_0818DB10"
+      ],
+      "address": 135846672,
+      "candidate_bytes": 324,
+      "target_bytes": 320,
+      "size_delta": 4,
+      "different_byte_count": 35,
+      "original_sha256": null,
+      "candidate_sha256": null
+    }
+  },
+  {
+    "source": "/Users/benjaminharris/git/boktai3-decomp/wip/motion-session/loaded_flag.c",
+    "source_sha256": "3e8cb54fe2ebeab6cb67f8659a7eb98d224a3a1808315ac56ca90e3501777b17",
+    "created_utc": "2026-10-12T07:38:45.242649+00:00",
+    "hypothesis": "loaded_flag",
+    "next_hypothesis": "",
+    "category": "types",
+    "validity": "unreviewed",
+    "status": "mismatch",
+    "compiler": "/Users/benjaminharris/git/boktai3-decomp/build/tools/agbcc/agbcc:64e2fc71113aaa52c072cac9215e322999453602",
+    "flags": [
+      "-O2",
+      "-mthumb-interwork",
+      "-fhex-asm"
+    ],
+    "preprocessed_sha256": "cfe6e09afecb83c857a573422624248c38490b3f76fd7bc123b8340866ee15ab",
+    "comparison": {
+      "functions": [
+        "sub_0818DB10"
+      ],
+      "address": 135846672,
+      "candidate_bytes": 324,
+      "target_bytes": 320,
+      "size_delta": 4,
+      "different_byte_count": 32,
+      "original_sha256": null,
+      "candidate_sha256": null
+    }
+  },
+  {
+    "source": "/Users/benjaminharris/git/boktai3-decomp/wip/motion-session/activation.c",
+    "source_sha256": "a26d2bd8e1bfe184354e525e391937cbe98ac1eea574b5461d7e5a752a84f385",
+    "created_utc": "2026-10-12T07:38:45.775601+00:00",
+    "hypothesis": "activation",
+    "next_hypothesis": "",
+    "category": "types",
+    "validity": "unreviewed",
+    "status": "mismatch",
+    "compiler": "/Users/benjaminharris/git/boktai3-decomp/build/tools/agbcc/agbcc:64e2fc71113aaa52c072cac9215e322999453602",
+    "flags": [
+      "-O2",
+      "-mthumb-interwork",
+      "-fhex-asm"
+    ],
+    "preprocessed_sha256": "9e34b9eacc7296ff349135a97b815a01d1eac780b2b360589a22445152f16c2e",
+    "comparison": {
+      "functions": [
+        "sub_0818DB10"
+      ],
+      "address": 135846672,
+      "candidate_bytes": 324,
+      "target_bytes": 320,
+      "size_delta": 4,
+      "different_byte_count": 32,
+      "original_sha256": null,
+      "candidate_sha256": null
+    }
+  },
+  {
+    "source": "/Users/benjaminharris/git/boktai3-decomp/wip/motion-session/sibling_vector.c",
+    "source_sha256": "214dfac75b98331019d1aeb7ee88f190f9fd224ec46ff76ffe869cfe99c34eea",
+    "created_utc": "2026-10-12T07:39:14.243359+00:00",
+    "hypothesis": "Transfer mixed signed vector fields to sibling with word timer",
+    "next_hypothesis": "",
+    "category": "types",
+    "validity": "unreviewed",
+    "status": "mismatch",
+    "compiler": "/Users/benjaminharris/git/boktai3-decomp/build/tools/agbcc/agbcc:64e2fc71113aaa52c072cac9215e322999453602",
+    "flags": [
+      "-O2",
+      "-mthumb-interwork",
+      "-fhex-asm"
+    ],
+    "preprocessed_sha256": "099d29a661fdce24ddc20abbe944b105dfed81f3a082703f9d2f78e4d9392a87",
+    "comparison": {
+      "functions": [
+        "sub_080F5B68"
+      ],
+      "address": 135224168,
+      "candidate_bytes": 304,
+      "target_bytes": 308,
+      "size_delta": -4,
+      "different_byte_count": 59,
+      "original_sha256": null,
+      "candidate_sha256": null
+    }
+  },
+  {
+    "source": "/Users/benjaminharris/git/boktai3-decomp/wip/motion-session/signed_flags.c",
+    "source_sha256": "21b5e59f82cb9f5d83667cb04d72f8eb573bad8057f03519093f6d155693861c",
+    "created_utc": "2026-10-12T07:39:40.088921+00:00",
+    "hypothesis": "Signed flag byte may permit sharing narrowed constant with status writes",
+    "next_hypothesis": "",
+    "category": "types",
+    "validity": "unreviewed",
+    "status": "mismatch",
+    "compiler": "/Users/benjaminharris/git/boktai3-decomp/build/tools/agbcc/agbcc:64e2fc71113aaa52c072cac9215e322999453602",
+    "flags": [
+      "-O2",
+      "-mthumb-interwork",
+      "-fhex-asm"
+    ],
+    "preprocessed_sha256": "cfcda17836f86b33ba6d50903b1f12e9c194c9a793206f98221ae52a1c5cf209",
+    "comparison": {
+      "functions": [
+        "sub_0818DB10"
+      ],
+      "address": 135846672,
+      "candidate_bytes": 324,
+      "target_bytes": 320,
+      "size_delta": 4,
+      "different_byte_count": 32,
+      "original_sha256": null,
+      "candidate_sha256": null
+    }
+  },
+  {
+    "source": "/Users/benjaminharris/git/boktai3-decomp/wip/motion-session/sibling_signed_flags.c",
+    "source_sha256": "ffc14dc263884a9d2e328b520d327ad178c0e8aed138e2ace8398de5b0acd2d5",
+    "created_utc": "2026-10-12T07:39:40.880628+00:00",
+    "hypothesis": "Correct callback224 padding (old field actually at 0x228); signed flags",
+    "next_hypothesis": "",
+    "category": "layout",
+    "validity": "unreviewed",
+    "status": "mismatch",
+    "compiler": "/Users/benjaminharris/git/boktai3-decomp/build/tools/agbcc/agbcc:64e2fc71113aaa52c072cac9215e322999453602",
+    "flags": [
+      "-O2",
+      "-mthumb-interwork",
+      "-fhex-asm"
+    ],
+    "preprocessed_sha256": "98c0e7640c2642ae121091b1e2e4b2a612cc9a0793c44bbcbb9b8bae5bb08f35",
+    "comparison": {
+      "functions": [
+        "sub_080F5B68"
+      ],
+      "address": 135224168,
+      "candidate_bytes": 304,
+      "target_bytes": 308,
+      "size_delta": -4,
+      "different_byte_count": 59,
+      "original_sha256": null,
+      "candidate_sha256": null
+    }
+  },
+  {
+    "source": "/Users/benjaminharris/git/boktai3-decomp/wip/motion-session/typed_vector.c",
+    "source_sha256": "7b74eb769048066abc255a9b5999d5dbf02bc2660c8b67327e22b2523292c4dd",
+    "created_utc": "2026-10-12T07:43:57.474743+00:00",
+    "hypothesis": "Explicit unsigned X/Z and signed Y vector fields match the calculation prefix",
+    "next_hypothesis": "Use RTL to diagnose duplicated flag constant; flag helper/local/commutation trials failed",
+    "category": "types",
+    "validity": "unreviewed",
+    "status": "mismatch",
+    "compiler": "/Users/benjaminharris/git/boktai3-decomp/build/tools/agbcc/agbcc:64e2fc71113aaa52c072cac9215e322999453602",
+    "flags": [
+      "-O2",
+      "-mthumb-interwork",
+      "-fhex-asm"
+    ],
+    "preprocessed_sha256": "649fa6c3f46580a6053e2410ab9e376444758f05f82c2232bcf1d4d8c6bdc33b",
+    "comparison": {
+      "functions": [
+        "sub_0818DB10"
+      ],
+      "address": 135846672,
+      "candidate_bytes": 324,
+      "target_bytes": 320,
+      "size_delta": 4,
+      "different_byte_count": 32,
+      "original_sha256": "000142b507c4c643a1ed9955e043927d2187a8696cd8372fcab0bec08d170d39",
+      "candidate_sha256": "3aef0bd2ff96c1fce590e1c08dedc182ffdb360c5df8839237d056af980372ad"
+    }
+  },
+  {
+    "source": "/Users/benjaminharris/git/boktai3-decomp/wip/motion-session/sibling_vector.c",
+    "source_sha256": "214dfac75b98331019d1aeb7ee88f190f9fd224ec46ff76ffe869cfe99c34eea",
+    "created_utc": "2026-10-12T07:43:58.090264+00:00",
+    "hypothesis": "Transfer vector representation to separate-layout word-timer sibling",
+    "next_hypothesis": "Investigate finishing-write source idiom; keep correct callback offset 0x224",
+    "category": "types",
+    "validity": "unreviewed",
+    "status": "mismatch",
+    "compiler": "/Users/benjaminharris/git/boktai3-decomp/build/tools/agbcc/agbcc:64e2fc71113aaa52c072cac9215e322999453602",
+    "flags": [
+      "-O2",
+      "-mthumb-interwork",
+      "-fhex-asm"
+    ],
+    "preprocessed_sha256": "099d29a661fdce24ddc20abbe944b105dfed81f3a082703f9d2f78e4d9392a87",
+    "comparison": {
+      "functions": [
+        "sub_080F5B68"
+      ],
+      "address": 135224168,
+      "candidate_bytes": 304,
+      "target_bytes": 308,
+      "size_delta": -4,
+      "different_byte_count": 59,
+      "original_sha256": "e0d109fed65ff72fcb45bdadf9ecb078835a22ca941d0642dc4057ed18ea0fc2",
+      "candidate_sha256": "31644b64d73f886424cf22a150fde68514f6328c7a646d917a7ef627a0a11c60"
+    }
+  }
+]
