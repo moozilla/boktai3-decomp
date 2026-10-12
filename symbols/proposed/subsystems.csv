@@ -362,6 +362,23 @@ addr,name,confidence,evidence
 0801DD40,ResultTutorial_UpdateSequence,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
 0801DEBC,ResultTutorial_ReadScript,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
 0801DEF4,ResultTutorial_Initialize,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801E000,SceneObject_UpdatePoseA,low,Tentative scene-object controller role; exact C in src/fn/sub_0801E000.c
+0801E090,SceneObject_UpdatePoseB,low,Tentative scene-object controller role; exact C in src/fn/sub_0801E090.c
+0801E0F4,SceneObject_UpdatePoseC,low,Tentative scene-object controller role; exact C in src/fn/sub_0801E0F4.c
+0801E184,SceneObjects_Append,low,Tentative scene-object controller role; exact C in src/fn/sub_0801E184.c
+0801E344,SceneObjects_HasPrimaryId,low,Tentative scene-object controller role; exact C in src/fn/sub_0801E344.c
+0801E374,SceneObjects_HasSecondaryId,low,Tentative scene-object controller role; exact C in src/fn/sub_0801E374.c
+0801E3E4,SceneObjects_ScriptAppend,low,Tentative scene-object controller role; exact C in src/fn/sub_0801E3E4.c
+0801E530,SceneObjects_BeginActivation,low,Tentative scene-object controller role; exact C in src/fn/sub_0801E530.c
+0801E5B8,SceneObjects_BeginDeactivation,low,Tentative scene-object controller role; exact C in src/fn/sub_0801E5B8.c
+0801E630,SceneObjects_SetActive,low,Tentative scene-object controller role; exact C in src/fn/sub_0801E630.c
+0801E698,SceneObjects_SetInactive,low,Tentative scene-object controller role; exact C in src/fn/sub_0801E698.c
+0801E740,SceneObjects_Unlock,low,Tentative scene-object controller role; exact C in src/fn/sub_0801E740.c
+0801E784,SceneObjects_ScriptActivate,low,Tentative scene-object controller role; exact C in src/fn/sub_0801E784.c
+0801E820,SceneObjects_ScriptDeactivate,low,Tentative scene-object controller role; exact C in src/fn/sub_0801E820.c
+0801EB08,SceneObjects_ScriptReadPosition,low,Tentative scene-object controller role; exact C in src/fn/sub_0801EB08.c
+0801EBBC,SceneObjects_ScriptSetSelection,low,Tentative scene-object controller role; exact C in src/fn/sub_0801EBBC.c
+0801EBE4,SceneObjects_ClearSelection,low,Tentative scene-object controller role; exact C in src/fn/sub_0801EBE4.c
 0818D754,Motion_BuildApproachSegment,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D8E0,Motion_RampSpin,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D960,Motion_AdvanceApproach,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md

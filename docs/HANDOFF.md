@@ -10,6 +10,22 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 scene-object controller commands
+
+Coverage is **18.465%**, up **0.097 percentage points** from 18.367%:
+**17 new exact functions / 2,352 bytes**, 5,319 total / 11,106.
+Object pose selection, slot construction, ID-list queries, script construction,
+activation/deactivation commands, active/inactive state changes, unlock,
+position readback and selection helpers now match. The contiguous controller
+0801E000–08020964 has its own report group. It is NOT complete: pose eligibility,
+lock, raise/lower/promote scripts, object callbacks and the main update remain.
+The two independent selection helpers at EBBC/EBE4 are split out of EB08's
+assembly tail. Nonmatching drafts remain ignored in wip; E700 previously had
+only a prologue mismatch (fixed R7 omitted from save set).
+Combined validation: build/scene-object-combined.log.
+Previous PR #43 merged; reporting Action 38302938887 succeeded.
+Usage: 53% weekly remaining; stop below 50%. Continue within this controller.
+
 ## October 12 result-game states and complete tutorial
 
 Coverage is **18.367%**, up **0.221 percentage points** from 18.147%:
