@@ -1,4 +1,21 @@
 #include "global.h"
-int sub_08011578(void*,int,int);
-#define GlyphTable_EncodeName sub_080115A4
-int GlyphTable_EncodeName(u8*m){u8*p=m+24;int step=2,i;for(i=0;i<24;i++,p+=step){int first=p[0],second=p[1];unsigned value=sub_08011578(*(void**)(m+0x7c),first,second);if(value>63)return -1;m[i]=value;}return 0;}
+#define Password_EncodeSymbols sub_080115A4
+
+struct S { u8 out[0x18]; u8 in[0x30]; u8 g[0x7c-0x48]; u32 p; };
+u32 sub_08011578(u32, u32, u32);
+
+s32 Password_EncodeSymbols(struct S *s)
+{
+    u8 *in = s->in;
+    s32 k = 2;
+    s32 i;
+    for (i = 0; i <= 0x17; i++, in += k) {
+        u32 a = in[0];
+        u32 b = in[1];
+        u32 r = sub_08011578(s->p, a, b);
+        if (r > 0x3f)
+            return -1;
+        s->out[i] = r;
+    }
+    return 0;
+}
