@@ -10,6 +10,29 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 actor animation and action controllers
+
+Continue toward **20% matching**, with a **20% weekly allowance remaining** stop
+floor. Latest usage check: **36% remaining**. Work solo; no tooling changes.
+
+Coverage is **19.055%**, up **0.218 percentage points** from 18.837%:
+**18 additional exact functions / 5,268 bytes**, 5,412 total / 11,109.
+This batch matches variant transitions, path motion, recoil, deceleration,
+target approach, frame holds, release and timed-effect controllers. It also
+closes the earlier scale oscillator and repositioning helper gaps. A new
+objdiff group and provisional descriptive names identify the contiguous span.
+Combined validation log: build/actor-transitions-combined.log.
+
+Continue at **08026AA4** through neighboring actor action handlers. Ignored
+partials 0802592C (analysis only), 08025DEC (532-byte candidate vs 528 target),
+and 08025FFC remain inside this span. Older gaps are recorded below.
+Use actual struct fields and short scoped register hints. The movement vector
+pattern in 0802533C/08025714/080257D0 is reusable. Inlined effect parameter order
+changes allocation: mode-before-id matched 08026398 and 08026780; id-before-mode
+matched 08026248 and the first half of 08026488. Keep drawable/resource pointers
+as locals when reused by successive calls. An opaque zero in sb matched
+08026908 while allowing the separate literal-zero argument to rematerialize.
+
 ## October 12 common actor controller completed
 
 Current user instruction: continue toward **20% matching**; the weekly allowance

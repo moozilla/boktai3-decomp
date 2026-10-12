@@ -432,10 +432,13 @@ addr,name,confidence,evidence
 08021BF8,SceneActors_ConfigureEffect,low,Tentative role from matched actor layout and control flow in src/fn/sub_08021BF8.c
 08021D8C,SceneActors_SpawnAmbientParticle,low,Tentative role from matched actor layout and control flow in src/fn/sub_08021D8C.c
 08021E38,SceneActors_ScriptSetEffects,low,Tentative role from matched actor layout and control flow in src/fn/sub_08021E38.c
+08021EA8,SceneActorGraphics_SelectResource,medium,Tentative descriptive role from exact C control flow; src/fn/sub_08021EA8.c
 08021EC0,SceneActorGraphics_SelectResource,low,Tentative role from matched actor layout and control flow in src/fn/sub_08021EC0.c
 080221DC,SceneActorGraphics_InitializeBody,low,Tentative role from matched actor layout and control flow in src/fn/sub_080221DC.c
 0802229C,SceneActorGraphics_InitializeOverlay,low,Tentative role from matched actor layout and control flow in src/fn/sub_0802229C.c
 08022330,SceneActorGraphics_UpdateVariant,low,Tentative role from matched actor layout and control flow in src/fn/sub_08022330.c
+08022404,SceneActorGraphics_OscillateScale,medium,Tentative descriptive role from exact C control flow; src/fn/sub_08022404.c
+080224E4,SceneActor_RepositionAndResetAnimation,medium,Tentative descriptive role from exact C control flow; src/fn/sub_080224E4.c
 080225B4,SceneActors_AddHealthCost,low,Tentative role from matched actor layout and control flow in src/fn/sub_080225B4.c
 08022600,SceneActors_AddResourceCost,low,Tentative role from matched actor layout and control flow in src/fn/sub_08022600.c
 080236C0,SceneActorState_Acknowledge,low,Tentative role from matched actor layout and control flow in src/fn/sub_080236C0.c
@@ -454,6 +457,21 @@ addr,name,confidence,evidence
 08024B60,SceneActorState_WaitForFlagClear,low,Tentative role from matched actor layout and control flow in src/fn/sub_08024B60.c
 08024CE0,SceneActorAnimation_StartDirectional,low,Tentative role from matched actor layout and control flow in src/fn/sub_08024CE0.c
 08024E18,SceneActorAnimation_StartEightDirection,low,Tentative role from matched actor layout and control flow in src/fn/sub_08024E18.c
+08024F2C,SceneActorAnimation_TransitionVariant,medium,Tentative descriptive role from exact C control flow; src/fn/sub_08024F2C.c
+080251C4,SceneActorAnimation_FollowMotionPath,medium,Tentative descriptive role from exact C control flow; src/fn/sub_080251C4.c
+0802533C,SceneActorAnimation_Recoil,medium,Tentative descriptive role from exact C control flow; src/fn/sub_0802533C.c
+08025550,SceneActorAnimation_ApproachTarget,medium,Tentative descriptive role from exact C control flow; src/fn/sub_08025550.c
+08025714,SceneActorAnimation_Decelerate,medium,Tentative descriptive role from exact C control flow; src/fn/sub_08025714.c
+080257D0,SceneActorAnimation_RecoverMovement,medium,Tentative descriptive role from exact C control flow; src/fn/sub_080257D0.c
+08025CD4,SceneActorAnimation_WaitForCompletion,medium,Tentative descriptive role from exact C control flow; src/fn/sub_08025CD4.c
+08025D60,SceneActorAnimation_WaitForAlternateCompletion,medium,Tentative descriptive role from exact C control flow; src/fn/sub_08025D60.c
+08026248,SceneActorAnimation_TimedEffectReset,medium,Tentative descriptive role from exact C control flow; src/fn/sub_08026248.c
+0802634C,SceneActorAnimation_LockedReset,medium,Tentative descriptive role from exact C control flow; src/fn/sub_0802634C.c
+08026398,SceneActorAnimation_AlternateEffectReset,medium,Tentative descriptive role from exact C control flow; src/fn/sub_08026398.c
+08026488,SceneActorAnimation_TimedAction,medium,Tentative descriptive role from exact C control flow; src/fn/sub_08026488.c
+0802667C,SceneActorAnimation_HoldFrame,medium,Tentative descriptive role from exact C control flow; src/fn/sub_0802667C.c
+08026780,SceneActorAnimation_ReleaseHeldFrame,medium,Tentative descriptive role from exact C control flow; src/fn/sub_08026780.c
+08026908,SceneActorAnimation_ReleaseSavedAction,medium,Tentative descriptive role from exact C control flow; src/fn/sub_08026908.c
 0818D754,Motion_BuildApproachSegment,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D8E0,Motion_RampSpin,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D960,Motion_AdvanceApproach,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md

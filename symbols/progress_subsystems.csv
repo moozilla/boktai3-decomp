@@ -54,6 +54,7 @@ Scene message controller,08020964,08020F6C,symbols/proposed/subsystems.csv,Compl
 Scene presentation commands,08020F6C,080213EC,symbols/proposed/subsystems.csv,Effect palette fade and blend command handlers; 08021044 and 0802123C remain unmatched
 Common scene actor controller,080213EC,08021EA8,symbols/proposed/subsystems.csv,Complete actor registration health damage animation setup event scripts and effect dispatch; src/fn/sub_080214D4.c
 Actor graphics and basic states (tentative),08021EA8,08024F2C,symbols/proposed/subsystems.csv,Adjacent drawable setup targeting resource costs and animation state handlers; larger actor controller continues after this range
+Actor animation and action controllers (tentative),08024F2C,08026AA4,symbols/proposed/subsystems.csv,Contiguous variant transitions motion recoil frame holds and timed effects; most handlers exact with projectile and target-transfer gaps remaining
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
 Sound-test menu,081E1AF4,081E270C,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md and allocator 081E26CC callback chain
 Timed presentation,081E270C,081E2898,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md timed update cleanup and initialization
