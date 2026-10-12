@@ -8,7 +8,7 @@ struct Particle {u8 state,speed,angle; s8 drift;u16 timer,lifetime;struct Vec ve
 struct Effect {u8 active,count,type,kind,soundDelay,pad;u16 timer;struct Particle particles[4];};
 struct Graphics {u32 pad;u16 base;};
 struct Manager {u8 pad[32];struct Graphics *graphics;};
-void sub_0800A80C(struct Manager *);
+void sub_0800A80C(struct Manager *,struct Effect *);
 #define EffectParticle_UpdateFinish sub_0800C0B4
 void EffectParticle_UpdateFinish(struct Manager *manager,struct Effect *effect,s32 index){
 struct Particle *p=&effect->particles[index];struct Sprite *sprite=&p->sprite,*o;struct Anim *a;const u16 *entry;register u16 n asm("r0");u8 done;
@@ -30,5 +30,5 @@ struct Particle *p=&effect->particles[index];struct Sprite *sprite=&p->sprite,*o
  }
  entry=a->data+a->frame;a->rate=((*entry&15)*a->scale)>>6;
  }else done=0;
- if(done){p->state=0;sprite->flags|=1;effect->count--;if(!effect->count)sub_0800A80C(manager);}
+ if(done){p->state=0;sprite->flags|=1;effect->count--;if(!effect->count)sub_0800A80C(manager,effect);}
 }
