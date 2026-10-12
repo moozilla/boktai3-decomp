@@ -10,6 +10,24 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 result-game states and complete tutorial
+
+Coverage is **18.367%**, up **0.221 percentage points** from 18.147%:
+**33 new exact functions / 5,332 bytes**, 5,302 total / 11,104.
+The complete contiguous tutorial 0801D104–0801E000 now matches. Its report group
+names the prompt fades, marker motion, tracking and early/late/accurate press
+examples, display blinks, script setup and table-driven sequence controller.
+The preceding result game now has exact player motion, tracking and timed-press
+state machines, graphics creation, resource initialization and script parsing.
+Remaining result-game gaps: B600/B700 transformation calculation, BD44 graphics
+layout and C24C graphics update. Readable drafts are retained in ignored wip.
+C24C first draft build/c24c-first.c; later register experiments did not improve
+it. A3C0 still has its four-byte prologue mismatch; do not repeat clobber tests.
+Combined validation: build/result-game-states-combined.log.
+Previous PR #42 merged; reporting Action 38301541113 succeeded.
+Usage: 56% weekly remaining at last check; stop below 50%.
+Continue contiguously at 0801E000; no new tooling or agents.
+
 ## October 12 transformation and result game
 
 Coverage is **18.147%**, up **0.102 percentage points** from 18.044%:
