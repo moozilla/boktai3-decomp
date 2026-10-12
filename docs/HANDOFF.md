@@ -10,6 +10,20 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 fading particles, palette levels and floating effects
+
+Coverage is **17.631%**, up **0.083 percentage points** from 17.548%:
+**13 new exact functions / 2,004 bytes**, 5,186 total / 11,099.
+Fading-particle group movement/lifetimes and manager initialization, palette
+level transitions/configuration/reset, and floating-item projection, bobbing,
+waiting, departures and manager dispatch now match. Three report groups name
+these adjacent families. They remain incomplete: constructors 15F60/17044,
+palette script 16764, collection animation 16C04 and initializer 16F24 are drafts.
+16C04 is 42 bytes away in build/16c04-42.c; 17044 has a 544-byte draft in wip/.
+Do not count these as matches. Continue past 17270 if allocation work stalls.
+Combined validation log: build/fading-particles-combined.log.
+Latest usage observation: 75% weekly remains; stop below 50% as requested.
+
 ## October 12 particle-family continuation
 
 Coverage is **17.548%**, up **0.150 percentage points** from 17.398%:
