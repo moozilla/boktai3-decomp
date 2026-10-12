@@ -1,0 +1,2 @@
+#include "global.h"
+void*sub_0802140C(int);void*sub_08219FBC(int,int);void sub_0821A04C(void*,void*,void*);int sub_08028F24(void*);int sub_08028F48(void*);int sub_08028F78(void*,void*);void sub_0821A0C0(void*);void*sub_08029798(void*arg){void*p=sub_0802140C(0);if(p)return p;p=sub_08219FBC(8,0xa10);if(p){sub_0821A04C(p,sub_08028F24,sub_08028F48);if(sub_08028F78(p,arg)<0){sub_0821A0C0(p);return 0;}}return p;}

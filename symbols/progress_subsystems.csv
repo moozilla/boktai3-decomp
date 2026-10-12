@@ -56,6 +56,8 @@ Common scene actor controller,080213EC,08021EA8,symbols/proposed/subsystems.csv,
 Actor graphics and basic states (tentative),08021EA8,08024F2C,symbols/proposed/subsystems.csv,Adjacent drawable setup targeting resource costs and animation state handlers; larger actor controller continues after this range
 Actor animation and action controllers (tentative),08024F2C,08026AA4,symbols/proposed/subsystems.csv,Contiguous variant transitions motion recoil frame holds and timed effects; most handlers exact with projectile and target-transfer gaps remaining
 Actor projectile and reaction controllers (tentative),08026AA4,080284FC,symbols/proposed/subsystems.csv,Contiguous actor projectile turning anchored reactions and destruction effects; death controller gaps remain
+Actor damage and lifecycle (tentative),080284FC,080297E8,symbols/proposed/subsystems.csv,Actor damage visual updates and lifecycle callbacks; large update and initialization routines remain
+Grid attack actor (tentative),080297E8,0802AD0C,symbols/proposed/subsystems.csv,Grid attacks animation states collider setup reaction dispatch and effects; contiguous state run completely matched
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
 Sound-test menu,081E1AF4,081E270C,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md and allocator 081E26CC callback chain
 Timed presentation,081E270C,081E2898,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md timed update cleanup and initialization
