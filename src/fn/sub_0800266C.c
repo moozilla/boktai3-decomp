@@ -1,12 +1,12 @@
 #include "global.h"
-#include "affine_background.h"
-#define AffineBackground_Initialize sub_0800266C
+#include "scrolling_background.h"
+#define ScrollingBackground_Initialize sub_0800266C
 struct Config {u8 flags,layer;u16 resource;s32 x,y,offsetX,offsetY,speedX,speedY,scale,width,height,mode,priority,fade,blendX,blendY;};
 struct Layer {u16 flags;u8 pad[46];};
 struct Camera {s16 x,y,a,b,offsetX,offsetY;};
 struct Dimensions {s16 pad[4],x,y;};
 struct ResourceRef {u32 a;struct Dimensions *data;};
-extern struct AffineBackground *gUnk_02000010[];
+extern struct ScrollingBackground *gUnk_02000010[];
 extern struct Layer gUnk_03004C30[];
 extern struct Camera gUnk_030042A0;
 extern s16 gUnk_03005418[2];
@@ -17,7 +17,7 @@ void sub_08215A74(u32,s32);
 void sub_082160B8(u32,u32,void *,s32,s32,s32,s32,void *);
 void sub_0821656C(u32,s32,s32,s32,s32);
 void sub_08219574(u32,s32,s32);
-s32 AffineBackground_Initialize(struct AffineBackground *p,u16 id,struct Config *c)
+s32 ScrollingBackground_Initialize(struct ScrollingBackground *p,u16 id,struct Config *c)
 {
     struct Layer *layer;
     u8 *resource;

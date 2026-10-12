@@ -1,5 +1,5 @@
 #include "global.h"
-#define AffineBackground_CreateFromScript sub_08002894
+#define ScrollingBackground_CreateFromScript sub_08002894
 struct Config {u8 flags,layer;u16 resource;s32 x,y,offsetX,offsetY,speedX,speedY,scale,width,height,mode,priority,fade,blendX,blendY;};
 s32 sub_0821ABA8(s32,s32);
 s32 Script_SeekToKeyword(s32);
@@ -9,7 +9,7 @@ void *sub_08002840(u16,struct Config *);
 static inline s32 nextZero(void){s32 v=(s32)Script_GetPc();if(v)v=sub_0821AA00((u8 *)v);return v;}
 static inline s32 nextOffset(void){s32 v=(s32)Script_GetPc();if(v)v=sub_0821AA00((u8 *)v)<<4;return v;}
 static inline s32 next(s32 fallback){u8 *p=Script_GetPc();if(p)return sub_0821AA00(p);return fallback;}
-void *AffineBackground_CreateFromScript(u32 id)
+void *ScrollingBackground_CreateFromScript(u32 id)
 {
     struct Config c;
     c.flags=sub_0821ABA8('f',0);c.layer=sub_0821ABA8('i',0);c.resource=sub_0821ABA8('d',0);
