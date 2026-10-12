@@ -26,7 +26,7 @@ looks identical. No fuzzy percentage is presented as correctness.
 
 ```
 build/venv/bin/python tools/candidate.py wip/sub_XXXXXXXX.c \
-  --target-size 364 --category types --validity unreviewed \
+  --target-size 364 --diff --category types --validity unreviewed \
   --hypothesis 'Use the observed owner layout' \
   --next 'Investigate status-store ordering against the exact sibling'
 ```
@@ -48,3 +48,7 @@ WIP branch outside src/, following the existing branch policy. Never copy whole
 build/candidates directories into Git: they include preprocessed third-party
 material, assembly comparisons and ROM-derived outputs. Keep useful alternates
 and failed hypotheses; do not choose solely by a scalar similarity score.
+
+Use `--diff` to print compact hunks from the same checkpointed compilation.
+The October 12 diagnostic pilot compiled eight candidates twice to obtain both
+a record and a visible diff; this option removes that redundant second check.

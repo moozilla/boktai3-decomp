@@ -16,6 +16,7 @@ import tempfile
 import time
 
 import build
+import check
 
 ROOT = Path(build.ROOT)
 
@@ -42,6 +43,8 @@ def main():
     p.add_argument('--category', default='unclassified', choices=[
         'unclassified', 'registers', 'control-flow', 'types', 'layout', 'constants'])
     p.add_argument('--validity', default='unreviewed', choices=['unreviewed', 'reviewed', 'known-problem'])
+    p.add_argument('--diff', action='store_true',
+                   help='show the recorded compact diff without a second compilation')
     a = p.parse_args()
     if a.target_size <= 0:
         p.error('target size must be positive')
@@ -105,6 +108,8 @@ def main():
                                next_hypothesis=a.next_hypothesis)) + '\n')
     print(f"{record['status'].upper()}: {c.get('different_byte_count', '?')} differing bytes; "
           f"size delta {c.get('size_delta', '?')}; {dest.relative_to(ROOT)}/record.json")
+    if a.diff and record['status'] == 'mismatch':
+        print(check.render_diff(c))
     if record['status'] == 'error':
         print(record.get('error', 'See retained stderr.txt for compiler/linker failure.'))
     sys.exit(status)
