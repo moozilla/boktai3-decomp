@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after the items and pooled-interactables batch (2026-10-12). This file is the single
+Last updated after the directional and collision controller completion batch (2026-10-12). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,29 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 12 directional and collision controller completion
+
+Coverage is **16.452%**, up **0.178 percentage points** from 16.274%:
+**22 new exact functions / 4,300 bytes**, 5,069 total / 11,093.
+Directional interaction controllers (08009500–08009E30) and collision
+controllers (08009E30–0800A800) are **100% matched**, with named report groups.
+The former handles actor proximity/facing, button input, enter/exit scripts,
+placement, and lifecycle. The latter handles hit/idle animations, timed effects,
+scene pause transitions, creation, and cleanup. Names remain provisional.
+
+The adjacent effect manager at 0800A800 is underway: its global cleanup,
+particle callback dispatch, and initializer now match. The frame update has a
+close draft in `build/effect222.c` / `wip/sub_0800A8E4.c`; the large constructor
+at 0800AC44 is next. The item pickup callback 080070D0 also remains unfinished.
+Neither draft is counted or stored in production source.
+
+Whole-session gain from 15.315%: **1.137 percentage points**. Continue toward
+20%; no tooling work or broad tests. Combined ROM validation printed
+`build/boktai3.gba: OK` in `build/directional-collision-combined.log`.
+Branch: `codex/directional-interaction-controllers`. Two independent global
+cleanup boundaries (08009E30 and 0800A800) were separated without changing
+the byte denominator. PR27 is merged; its main CI run 38266641331 succeeded.
 
 ## October 12 items and pooled interactables
 
