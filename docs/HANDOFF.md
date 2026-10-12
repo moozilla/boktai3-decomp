@@ -24,7 +24,7 @@ starting at 080036F8; its command application and queue functions remain.
 Work is solo, matching only. No new tooling or regression tests. Empty asm
 constraints used with marked local register hints emit no instructions; they
 prevent old agbcc from discarding the hint. Full build log for this batch:
-`build/background-palette-combined.log`. Branch: `codex/background-completion`.
+`build/background-palette-combined.log` printed `build/boktai3.gba: OK`. Branch: `codex/background-completion`.
 The earlier background WIP checkpoint is superseded by exact production C.
 
 ## October 12 subsystem reporting and background setup batch
