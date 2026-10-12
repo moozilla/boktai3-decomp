@@ -1,0 +1,37 @@
+addr,name,confidence,evidence
+08001590,Boot_ClearReservedWords,medium,Clear four reserved EWRAM words.
+081E1AF4,SoundTest_CountEntries,medium,Count the three sound-ID tables.
+081E1B80,SoundTest_ShowCategory,medium,Show the category label and cursor.
+081E1BC8,SoundTest_MoveCategoryCursor,medium,Position the category cursor and refresh its label.
+081E1C10,SoundTest_DrawTrackName,medium,Look up and display the selected first-category track name.
+081E1C64,SoundTest_DrawSecondCategoryIndex,medium,Draw the second category index as three digits.
+081E1CDC,SoundTest_DrawThirdCategoryIndex,medium,Draw the third category index as three digits.
+081E1D50,SoundTest_PlaySelection,medium,"Stop the previous category sound, play the selected sound and animate its marker."
+081E1E50,SoundTest_StopSelection,medium,Stop the selected preview or report that every category is silent.
+081E1F5C,SoundTest_SelectPrevious,medium,Decrement and wrap the selected sound index.
+081E1FF8,SoundTest_SelectNext,medium,Increment and wrap the selected sound index.
+081E2094,SoundTest_UpdatePlaybackIndicators,medium,Unmatched: animate or retire each category playback indicator.
+081E2154,SoundTest_Update,medium,"Handle buttons, category changes, accelerating key repeat and exit fade."
+081E2300,SoundTest_Destroy,medium,Release the menu sprites.
+081E23A0,SoundTest_Initialize,medium,"Load assets, create sprites, copy the palette and populate labels and indices."
+081E270C,TimedPresentation_Update,medium,"Handle duration, skipping and completion after an exit fade."
+081E2910,Presentation_UpdateDropShakeBlink,medium,"Drop, shake and blink presentation layers."
+081E2B50,Presentation_Update,medium,"Advance the scripted frame range, handle skipping and notify completion."
+081E2D40,Presentation_Destroy,medium,Release all five presentation layers.
+081E2D74,Presentation_ClearTilemap,medium,Fill the 32 by 32 tilemap with its blank tile.
+081E2F44,Presentation_ConfigureLayout,medium,Configure layer resources and callbacks for each layout option.
+081E3354,Presentation_ConfigureFrameRange,medium,Read scripted frame bounds and duration.
+081E3400,Presentation_Initialize,medium,Parse options and initialize the presentation components.
+081E34D0,ActorPalette_BeginFade,medium,Begin the forward palette transition.
+081E3550,ActorPalette_UpdateFade,medium,Interpolate 16 RGB colors and restore the asset palette when complete.
+081E36FC,ActorPalette_UpdateFadeAndNotify,medium,Complete the forward fade and release its waiting request.
+081E38C4,ActorPalette_BeginReverseFade,medium,Initialize the reverse palette transition.
+081E394C,ActorPalette_UpdateReverseFade,medium,Interpolate backward and enter the next controller phase.
+081E3B6C,Actor_ProjectAndClampToScreen,medium,Project world coordinates and clamp to the display.
+081E3C60,Actor_TryInteraction,medium,"Tentative: accept an interaction gated by facing, distance, height and input."
+081E3F38,Actor_SelectNearestInteraction,medium,Select the closest eligible partner and update selection markers.
+081E692C,Actor_MoveAlongCurveToRest,medium,Move to a rest point with a curved vertical component and advance animation.
+081E6E0C,Actor_MoveAlongScriptedCurve,medium,Move toward the configured target with curved interpolation and animation.
+081EA1C0,Actor_ConfigureFromScript,medium,"Read script options, position and initial animation mode."
+08213D10,InterruptsAndVideo_Initialize,medium,"Install IRQ handlers and clear video, sprite and palette memory."
+0821B084,GameState_SelectRamBase,medium,Select timer-jittered game-state storage and assign its region pointers.
