@@ -14,6 +14,8 @@ address,evidence
 08017428,Recovered manager presence callback after scanline wave allocator
 08019C64,SpritePool_SetAnimationFrame: recovered function in assembly byte tail; exact 56-byte C body
 08019E2C,SpritePool_Remove: recovered function in assembly byte tail; exact 44-byte C body
+0801A0D0,Selection sounds: independent 60-byte function in byte tail
+0801A614,Hide selection markers: independent 32-byte function in byte tail
 0802CED0,Independent 40-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md
 0802CEF8,Independent 24-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md
 081B61E0,Separate 100-byte Thumb body with own push/call/control flow/pop-bx after 081B6180 returns; retained unmatched code; notes/root-batch6.md

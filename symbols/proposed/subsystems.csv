@@ -306,3 +306,28 @@ addr,name,confidence,evidence
 08019C9C,SpritePool_AdvanceAnimation,medium,Exact palette/tile animation or sprite pool implementation and callback chain
 08019DC0,SpritePool_Activate,medium,Exact palette/tile animation or sprite pool implementation and callback chain
 08019E2C,SpritePool_Remove,medium,Exact palette/tile animation or sprite pool implementation and callback chain
+08019ECC,Presentation_SetItemGraphic,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+08019F44,Presentation_UpdateActorGraphic,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801A01C,Presentation_UpdateItemGraphic,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801A0D0,Presentation_PlaySelectionSound,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801A10C,SelectionMenu_ConfigureLayers,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801A1A4,SelectionMenu_HandleHorizontalInput,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801A4B4,SelectionMenu_PositionCursors,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801A53C,SelectionMenu_PositionInventoryMarkers,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801A5A8,SelectionMenu_PositionEquipmentMarkers,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801A614,SelectionMenu_HideMarkers,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801A75C,SelectionMenu_PopulateActors,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801A814,SelectionMenu_PopulateItems,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801A920,SelectionMenu_Back,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801A9B4,SelectionMenu_AdvanceChoice,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801AA18,SelectionMenu_DrawStatistics,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801AB1C,SelectionMenu_ActorAvailability,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801ABA0,SelectionMenu_ItemAvailability,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801ABEC,SelectionMenu_OpenActorPage,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801ADC0,SelectionMenu_Choose,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801AF54,SelectionMenu_AnimateChoice,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801B004,SelectionMenu_ReviewChoice,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801B188,SelectionMenu_Close,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801B1E8,SelectionMenu_Hide,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801B274,SelectionMenu_Confirm,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
+0801B324,SelectionMenu_Initialize,low,Tentative selection-menu naming from exact actor/item grid input availability confirmation and presentation code
