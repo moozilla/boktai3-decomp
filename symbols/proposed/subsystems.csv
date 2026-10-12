@@ -521,6 +521,32 @@ addr,name,confidence,evidence
 0802A958,GridActor_WaitAttackAnimation,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_0802A958.c
 0802A9C0,GridActor_WaitAlternateAttackAnimation,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_0802A9C0.c
 0802AA28,GridActor_TimedAnchoredReaction,low,Tentative actor/grid-effect role from exact C control flow; src/fn/sub_0802AA28.c
+0802AB4C,GridActor_ApplyAccumulatedDamage,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802AB4C.c
+0802AD0C,GridActor_SelectPriorityAction,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802AD0C.c
+0802B070,GridActor_FinishCommandActionA,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802B070.c
+0802B180,GridActor_FinishCommandActionB,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802B180.c
+0802B240,GridActor_FinishCommandActionC,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802B240.c
+0802B338,GridActor_DispatchHealthReaction,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802B338.c
+0802B3E4,GridActor_UpdateIdleTimer,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802B3E4.c
+0802B440,GridActor_FinishTimedAttackA,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802B440.c
+0802B4B8,GridActor_FinishTimedAttackB,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802B4B8.c
+0802B530,GridActor_WaitForCounterThreshold,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802B530.c
+0802B5F8,GridActor_UpdateTimedRecovery,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802B5F8.c
+0802B660,GridActor_FinishFlaggedReaction,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802B660.c
+0802C684,ActorPool_Insert,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802C684.c
+0802C6C8,ActorPool_Remove,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802C6C8.c
+0802C710,ActorPool_CachePartyTargets,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802C710.c
+0802C738,ActorPool_Update,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802C738.c
+0802C7A4,ActorPool_DestroyAll,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802C7A4.c
+0802C7E8,ActorPool_Init,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802C7E8.c
+0802C860,ActorPool_Allocate,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802C860.c
+0802C8CC,PooledActor_SetFacing,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802C8CC.c
+0802C934,PooledActor_ClampHealth,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802C934.c
+0802C96C,PooledActor_CaptureFirstHit,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802C96C.c
+0802CAAC,PooledActor_FindTarget,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802CAAC.c
+0802CB94,PooledActor_RefreshTarget,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802CB94.c
+0802CC4C,PooledActor_UpdateTargetOnSlot,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802CC4C.c
+0802CC94,PooledActor_TurnTowardTarget,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802CC94.c
 0818D754,Motion_BuildApproachSegment,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D8E0,Motion_RampSpin,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D960,Motion_AdvanceApproach,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
