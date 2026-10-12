@@ -278,3 +278,16 @@ addr,name,confidence,evidence
 08018348,Weather_Start,low,Tentative scanline/weather naming from phase samples storm state transitions and particle callbacks
 08018374,Weather_Stop,low,Tentative scanline/weather naming from phase samples storm state transitions and particle callbacks
 080183A8,Weather_ConfigureCooldown,low,Tentative scanline/weather naming from phase samples storm state transitions and particle callbacks
+08018840,OrbitingParticles_Advance,low,Tentative descriptive name from exact particle/window/clock callback and field behavior
+08018898,OrbitingParticles_Update,low,Tentative descriptive name from exact particle/window/clock callback and field behavior
+080189C8,OrbitingParticles_Initialize,low,Tentative descriptive name from exact particle/window/clock callback and field behavior
+08018C48,OrbitingParticles_Create,low,Tentative descriptive name from exact particle/window/clock callback and field behavior
+08018CA8,OrbitingParticles_CreateFromScript,low,Tentative descriptive name from exact particle/window/clock callback and field behavior
+08018D94,BlendTransition_Update,low,Tentative descriptive name from exact particle/window/clock callback and field behavior
+08018F38,CircleWindow_GenerateScanlines,low,Tentative descriptive name from exact particle/window/clock callback and field behavior
+08019044,CircleWindow_Update,low,Tentative descriptive name from exact particle/window/clock callback and field behavior
+08019104,CircleWindow_Destroy,low,Tentative descriptive name from exact particle/window/clock callback and field behavior
+08019130,CircleWindow_Initialize,low,Tentative descriptive name from exact particle/window/clock callback and field behavior
+080192D0,ClockEvents_RunScript,low,Tentative descriptive name from exact particle/window/clock callback and field behavior
+080192FC,ClockEvents_Update,low,Tentative descriptive name from exact particle/window/clock callback and field behavior
+08019474,ClockEvents_Initialize,low,Tentative descriptive name from exact particle/window/clock callback and field behavior

@@ -38,6 +38,11 @@ Palette level transitions,080164B8,0801689C,symbols/proposed/subsystems.csv,Chan
 Floating item effects (tentative),0801689C,08017270,symbols/proposed/subsystems.csv,Projection bobbing and departure states with item-dependent collection animation
 Scanline wave distortion,08017270,08017428,symbols/proposed/subsystems.csv,Complete wave update initialization creation and cleanup
 Weather and storm controller (tentative),08017428,08018438,symbols/proposed/subsystems.csv,Storm wait onset active shutdown dispatch commands and weather particles; some constructors remain unmatched
+Palette cycling,08018438,080187BC,symbols/proposed/subsystems.csv,Palette interpolation cycle callbacks; script initialization and cycle update remain unmatched
+Orbiting particles,080187BC,08018D94,symbols/proposed/subsystems.csv,Complete orbit movement terrain placement initialization and creation scripts
+Hardware blend transitions,08018D94,08018F38,symbols/proposed/subsystems.csv,Hardware blend coefficient update; script initializer remains unmatched
+Circular scanline window,08018F38,080192D0,symbols/proposed/subsystems.csv,Complete circular scanline generation expansion contraction projection initialization and lifecycle
+Clock events,080192D0,08019518,symbols/proposed/subsystems.csv,Complete clock-based script event edge detection initialization and lifecycle
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
 Sound-test menu,081E1AF4,081E270C,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md and allocator 081E26CC callback chain
 Timed presentation,081E270C,081E2898,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md timed update cleanup and initialization
