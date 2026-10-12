@@ -318,17 +318,50 @@ addr,name,confidence,evidence
 0801BA0C,Transformation_Charge,tentative,Exact C; transformation/result controller state and call flow
 0801BAA8,Transformation_Reveal,tentative,Exact C; transformation/result controller state and call flow
 0801BC54,Transformation_Finish,tentative,Exact C; transformation/result controller state and call flow
+0801BCA8,ResultMenu_CreateGraphics,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
 0801C064,ResultMenu_EnqueueMarker,tentative,Exact C; transformation/result controller state and call flow
 0801C0C8,ResultMenu_UpdateMarkers,tentative,Exact C; transformation/result controller state and call flow
 0801C1E8,ResultMenu_SendCommand,tentative,Exact C; transformation/result controller state and call flow
 0801C5AC,ResultMenu_DestroyGraphics,tentative,Exact C; transformation/result controller state and call flow
 0801C650,ResultMenu_Countdown,tentative,Exact C; transformation/result controller state and call flow
+0801C6CC,ResultGame_UpdatePlayerMarker,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
 0801C760,ResultGame_ScoreAlignment,tentative,Exact C; transformation/result controller state and call flow
+0801C874,ResultGame_TrackTarget,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
 0801CAF0,ResultGame_ScorePress,tentative,Exact C; transformation/result controller state and call flow
 0801CBCC,ResultGame_HandlePress,tentative,Exact C; transformation/result controller state and call flow
+0801CC24,ResultGame_TimedPress,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
 0801CE2C,ResultGame_Update,tentative,Exact C; transformation/result controller state and call flow
 0801CEF0,ResultGame_Finish,tentative,Exact C; transformation/result controller state and call flow
 0801CF30,ResultMenu_Update,tentative,Exact C; transformation/result controller state and call flow
+0801CF6C,ResultMenu_ReadScript,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801D020,ResultMenu_Initialize,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801D104,ResultTutorial_FadeIn,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801D13C,ResultTutorial_FadeOut,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801D174,ResultTutorial_ShowPrompt,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801D1C8,ResultTutorial_HidePrompt,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801D208,ResultTutorial_SlideMarkerIn,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801D264,ResultTutorial_BlinkPlayer,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801D2E4,ResultTutorial_BlinkTarget,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801D354,ResultTutorial_MovePlayer,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801D48C,ResultTutorial_RaiseMarker,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801D4E8,ResultTutorial_LowerMarker,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801D52C,ResultTutorial_DemonstrateTracking,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801D668,ResultTutorial_SlideMarkerOut,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801D6AC,ResultTutorial_InitializePressDemo,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801D718,ResultTutorial_BlinkPressMarker,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801D798,ResultTutorial_Press,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801D7D4,ResultTutorial_DemonstrateEarlyPress,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801D890,ResultTutorial_DemonstrateLatePress,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801D950,ResultTutorial_DemonstrateAccuratePress,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801D9F4,ResultTutorial_BlinkScore,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801DA74,ResultTutorial_BlinkTimer,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801DAE8,ResultTutorial_BlinkLevel,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801DB5C,ResultTutorial_AnimateLevel,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801DBD8,ResultTutorial_Close,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801DC7C,ResultTutorial_Open,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801DD40,ResultTutorial_UpdateSequence,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801DEBC,ResultTutorial_ReadScript,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
+0801DEF4,ResultTutorial_Initialize,tentative,Exact C; result-game and tutorial state transitions and demonstration sequence
 0818D754,Motion_BuildApproachSegment,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D8E0,Motion_RampSpin,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D960,Motion_AdvanceApproach,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
