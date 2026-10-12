@@ -30,7 +30,7 @@ checks. The single combined build printed `build/boktai3.gba: OK`, recorded in
 `build/entry-animation-combined-build.log`.
 Keep continuation work in contiguous units and use percentages first.
 
-Best failed sources will be preserved on
+Best failed sources are preserved on
 `codex/wip-entry-animation-2026-10-12` under `wip/entry-animation/`. Never merge
 that branch into main. In particular, do not repeat the many failed tiny-register
 experiments on the sound-test playback indicators or the old spawn-family
