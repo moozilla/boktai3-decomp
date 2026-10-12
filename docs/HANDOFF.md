@@ -10,6 +10,20 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 orbiting particles, circular windows and clock events
+
+Coverage is **17.821%**, up **0.112 percentage points** from 17.709%:
+**13 new exact functions / 2,712 bytes**, 5,211 total / 11,100.
+Orbiting particles, circular scanline windows and clock events are now complete
+contiguous units. Hardware blend update also matches. Five report groups name
+these adjacent areas; palette cycling and blend initialization remain incomplete.
+Ignored drafts: wip/sub_08018454.c, sub_08018664.c and sub_08018E00.c.
+Continue contiguously at 08019518. Projection helper reuse matched 19130 on the
+first check; keeping the RNG table register live solved orbital initialization.
+Combined validation log: build/orbit-window-clock-combined.log.
+Usage: 68% weekly remaining; stop below 50%. Previous PR #38 is merged and its
+main progress Action succeeded (38296521524).
+
 ## October 12 scanline wave and weather states
 
 Coverage is **17.709%**, up **0.078 percentage points** from 17.631%:
