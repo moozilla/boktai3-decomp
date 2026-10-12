@@ -10,6 +10,21 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 particle-family continuation
+
+Coverage is **17.548%**, up **0.150 percentage points** from 17.398%:
+**15 new exact functions / 3,624 bytes**, 5,173 total / 11,098.
+Particle-manager dispatch and initialization, fragment ballistic updates and
+initialization, and animated-particle movement/playback, initialization,
+configuration-based creation and script/wrapper emission are now exact.
+Three named report groups cover these adjacent families. Recovered byte-tail
+boundaries prevent crediting unmatched hidden functions. Volume emission 15A0C
+remains six operand bytes away (ignored wip/sub_08015A0C.c); paused particle
+rendering 14330 remains 20 bytes away (build/14330-20.c). Larger drafts 1404C,
+14634 and earlier barrier destruction 1310C remain excluded.
+Combined validation: build/particle-family-combined.log. Continue contiguously
+at 08015F60. Latest usage observation: 81% weekly remaining; stop below 50%.
+
 ## October 12 hazards, barriers, and shadows continuation
 
 Coverage is **17.398%**, up **0.148 percentage points** from 17.250%:
