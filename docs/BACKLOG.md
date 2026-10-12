@@ -207,3 +207,14 @@ Do not extrapolate Mizuchi's reported per-function costs to this depleted easy
 frontier. Similarity leaderboards and Linux x86 re-executability results are
 not agbcc exact-success benchmarks. A playable game, a source-present function,
 and clean portable source are different deliverables from exact matching.
+
+### Pilot outcome and next selection
+
+The completed October 12 pilot added three exact functions / 1,236 bytes from
+a fresh snapshot/reset family; the retained register-residue diagnostic added
+zero. Both stopped within budget. Prefer another small fresh-family campaign
+before the asmlift experiment, a scheduler, or increased concurrency.
+`candidate.py --diff` now removes the duplicate check workers encountered.
+The account meter rose three percentage points including coordination; this
+is not proof of economical scale. See the campaign receipt for source-level
+results and separate model usage records.
