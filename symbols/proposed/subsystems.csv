@@ -63,3 +63,17 @@ addr,name,confidence,evidence
 08004828,Scene_ActivateTypeOneObjects,medium,Tentative role from matching source in src/fn/sub_08004828.c
 08004888,Scene_StopSelectedObject,medium,Tentative role from matching source in src/fn/sub_08004888.c
 08004940,Scene_PlayObjectBreakEffect,medium,Tentative role from matching source in src/fn/sub_08004940.c
+080041CC,Scene_SpawnEdgeParticles,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_080041CC.c
+080046F0,Scene_DropObjectsAbove,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_080046F0.c
+08004B64,Scene_SpawnDirectionalDust,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_08004B64.c
+08004CE4,Scene_TryStepDown,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_08004CE4.c
+08004E8C,SceneObjects_TryPushNeighbor,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_08004E8C.c
+080050F4,Scene_UpdateObjectStep,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_080050F4.c
+08005264,Scene_UpdateFallingObject,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_08005264.c
+08005338,Scene_UpdateObjectDisappearance,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_08005338.c
+0800542C,Scene_UpdateObjectFlash,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_0800542C.c
+08005498,SceneObjects_Update,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_08005498.c
+08005830,SceneObjects_CreateObject,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_08005830.c
+08005B8C,SceneObjects_CreateFromScript,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_08005B8C.c
+08005D30,SceneObjects_SwitchPaletteFromScript,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_08005D30.c
+08005E10,SceneController_ClearGlobal,medium,Tentative role from exact C and contiguous scene object callback/script chain; src/fn/sub_08005E10.c
