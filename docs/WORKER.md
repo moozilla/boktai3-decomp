@@ -1,10 +1,19 @@
-# Worker brief: phase 1 function matching
+# Worker brief: family-oriented matching
 
-You are one of several parallel workers. Each worker has its **own git
-worktree** and an **assigned address range**, so no two workers touch the same
-function or file. Phase 1 is about matched functions. Naming, headers and
-merging into real translation units are cleanup for later; don't spend effort
-on them.
+Work solo unless the current user explicitly authorizes delegation. When
+workers are authorized, each has its own build outputs and a non-overlapping
+assignment. Prefer a related subsystem/family with a known seed, observed
+layouts, actual remaining body bytes and a concrete hypothesis over arbitrary
+easy-first address sweeps. One-function commits do not require independent
+one-function reasoning.
+
+Recover shared types, API contracts and evidence-backed names while matching
+when they improve the cohort or future use. Keep unknown fields explicit;
+record static consumers/callers or runtime evidence. Coverage alone does not
+prove semantic ownership. Physical TU consolidation is optional and must not
+be confused with architectural understanding. Read docs/CANDIDATES.md for the
+compact checker and candidate checkpoint workflow, and docs/BACKLOG.md for
+longer-term directions.
 
 ## Setup (already done for you)
 
@@ -14,13 +23,14 @@ everything from the worktree root.
 
 ## Loop
 
-1. Pick the next function in your range, easiest first:
-   `python3 tools/worklist.py --range START END --max-insns 40 | head`
-   Skip anything marked `JUMPTABLE` until the easy ones are done.
-2. Read it: `python3 tools/asmat.py ADDR 80` (asm) and
-   `python3 tools/ghidra_c.py ADDR` (Ghidra pseudo-C, often wrong in detail
+1. Confirm the target is not already matched; select a related cohort first.
+   For an exploratory inventory:
+   `build/venv/bin/python tools/worklist.py --range START END --max-insns 40 | head`
+   Review jump-table boundaries; the flag alone is not a reason to skip a useful family.
+2. Read it: `build/venv/bin/python tools/asmat.py ADDR 80` (asm) and
+   `build/venv/bin/python tools/ghidra_c.py ADDR` (Ghidra pseudo-C, often wrong in detail
    but useful for structure).
-3. Write `src/fn/sub_XXXXXXXX.c`, one function per file:
+3. Draft `wip/sub_XXXXXXXX.c`, one function per file; promote only after review and exact checks:
    ```c
    #include "global.h"
 
@@ -30,18 +40,19 @@ everything from the worktree root.
 
    s32 sub_08033568(void) { ... }
    ```
-   * Declarations go **in your file**. Don't edit shared headers except to add
-     a type that's obviously missing from `include/global.h`, and avoid even that.
+   * Keep tentative declarations local. Promote a shared family header when
+     multiple consumers establish its layout; check every changed consumer
+     exactly. Do not invent a universal object type from matching offsets alone.
    * **No data definitions** (no initialized globals, `static const` tables or
      string literals). Reference existing ROM labels instead.
    * Keep the `sub_XXXXXXXX` name. If you're confident what a function does,
      add a line to `symbols/proposed/<your-worker-name>.csv`:
      `addr,name,confidence,evidence` (e.g. `08033568,Foo_SetFlag,medium,"sets flag 0x17D on gUnk_020000E0 object"`).
-4. Inner loop: `python3 tools/check.py sub_XXXXXXXX` compiles just your file,
-   links it at its real address and prints original vs. yours side by side,
-   with `!` on differing lines (~0.5 s; exit 0 = MATCH). Literal pools show up
+4. Inner loop: `build/venv/bin/python tools/check.py sub_XXXXXXXX` compiles just your file,
+   links it at its real address and prints original vs. yours as compact aligned mismatch hunks,
+   with `!` on differing lines (`--full` expands the listing) (~0.5 s; exit 0 = MATCH). Literal pools show up
    as junk instructions; that's fine. When it says MATCH, run
-   `python3 tools/build.py` once (must print `build/boktai3.gba: OK`) before
+   `build/venv/bin/python tools/build.py` once (must print `build/boktai3.gba: OK`) before
    committing: it also checks the whole-ROM layout.
 5. Matched: `git add src/fn/sub_XXXXXXXX.c symbols/proposed && git commit -m "match sub_XXXXXXXX"`.
    Not matched after ~10 check attempts: retain the candidate under `wip/`, add a line to
@@ -94,7 +105,7 @@ everything from the worktree root.
   `if`. An `int` result gets jump-threaded away (src/fn/sub_080F9374.c). For a
   `bne; movs 0; b; movs 1` return, `if (x & m) return TRUE; return FALSE;`
   works where the ternary doesn't (src/fn/sub_080FF7AC.c).
-* **Clone families**: run `python3 tools/clones.py --port --range START END`
+* **Clone families**: run `build/venv/bin/python tools/clones.py --port --range START END`
   on your range after a few matches; it copies matched C to identical
   siblings and keeps what `check.py` accepts.
 * **Returns a value it never sets**: a non-void function that falls off the
@@ -126,7 +137,7 @@ everything from the worktree root.
 * Declaring a constant local first (`u32 m = 4;`) moves the constant load
   before the memory operations. A struct copy `*(struct P *)a = *(struct P *)b`
   produces paired `ldr`/`ldr [,#4]`.
-* Register-allocation differences usually come from declaration order or a
+* Register-allocation differences can come from declaration order or a
   missing or extra temporary. Try reordering locals, splitting or merging
   expressions, and `u8`/`u16`/`s16` types for loads (`ldrb`/`ldrh`/`ldrsh`).
 * Branch order: `if (!x) return A; ...` and `if (x) {...} else return A;`
@@ -145,14 +156,14 @@ everything from the worktree root.
 ## Finishing
 
 Stop when your assigned budget is reached or your range has no easy
-functions left. Make sure `python3 tools/build.py` prints OK on your final
+functions left. Make sure `build/venv/bin/python tools/build.py` prints OK on your final
 commit, then report: functions matched (count + list), functions skipped and
 why, and any naming insights.
 
 ## Permuter (for "only registers differ" skips)
 
-`python3 tools/permute.py wip/sub_X.c --debug` checks the base score first.
-`python3 tools/permute.py wip/sub_X.c --run 60 -j 2` then runs a bounded search
+`build/venv/bin/python tools/permute.py wip/sub_X.c --debug` checks the base score first.
+`build/venv/bin/python tools/permute.py wip/sub_X.c --run 60 -j 2` then runs a bounded search
 using the pinned [decomp-permuter](https://github.com/simonlindholm/decomp-permuter)
 installed by `make setup` (or set `PERMUTER` to another checkout).
 Candidates with better scores land in the printed
@@ -192,3 +203,19 @@ ordinary register differences alone do not. See `docs/LIBGCC.md`.
   unconditional branch-target difference with score zero. Only `check.py`
   resolved-byte equality and the complete ROM build establish acceptance;
   see `notes/round6-sol.md`.
+
+## Current family workflow
+
+Start with the best retained candidate and exact siblings. Review body/pool
+extents, types, widths, aliases and callback signatures before allocation
+experiments. Use compiler diagnostics for a concrete hypothesis; cap blind
+permutation and preserve unsuccessful hypotheses. The prior solo pass already
+tested prologue-bugfix without improving its selected residue.
+
+Use tools/candidate.py with a reviewed --target-size to checkpoint meaningful
+attempts, including errors and alternatives. Candidate-length equality, fuzzy
+similarity, and zero permuter scores are not full-function acceptance. Review
+source validity, check exact bytes and run the complete build before committing.
+Keep unmatched source outside production src/ and preserve it on a dedicated
+WIP branch at session closeout. Report exact bytes separately from recovered
+layouts, semantic evidence, candidate improvements and tool work.
