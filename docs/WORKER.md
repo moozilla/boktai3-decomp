@@ -51,11 +51,10 @@ everything from the worktree root.
 4. Inner loop: `build/venv/bin/python tools/check.py sub_XXXXXXXX` compiles just your file,
    links it at its real address and prints original vs. yours as compact aligned mismatch hunks,
    with `!` on differing lines (`--full` expands the listing) (~0.5 s; exit 0 = MATCH). Literal pools show up
-   as junk instructions; that's fine. When it says MATCH, run
-   `build/venv/bin/python tools/build.py` once (must print `build/boktai3.gba: OK`) before
-   committing: it also checks the whole-ROM layout.
+   as junk instructions; that's fine. When it says MATCH, commit the function on the working branch. The integrator
+   runs one combined full-ROM build before merging the batch.
 5. Matched: `git add src/fn/sub_XXXXXXXX.c symbols/proposed && git commit -m "match sub_XXXXXXXX"`.
-   Not matched after ~10 check attempts: retain the candidate under `wip/`, add a line to
+   If attempts stop yielding useful hypotheses, retain the candidate under `wip/`, add a line to
    `notes/<your-worker-name>.md` with the address and what was off (register
    swap, branch order, ...), and move on. Never commit a nonmatching file to `main`. Dedicated WIP branches may
    preserve candidates outside `src/`; they receive no exact progress credit.
@@ -156,8 +155,8 @@ everything from the worktree root.
 ## Finishing
 
 Stop when your assigned budget is reached or your range has no easy
-functions left. Make sure `build/venv/bin/python tools/build.py` prints OK on your final
-commit, then report: functions matched (count + list), functions skipped and
+functions left. Do not run a redundant worker build when the integrator will validate the batch.
+Report: functions matched (count + list), functions skipped and
 why, and any naming insights.
 
 ## Permuter (for "only registers differ" skips)
@@ -215,7 +214,22 @@ tested prologue-bugfix without improving its selected residue.
 Use tools/candidate.py with a reviewed --target-size to checkpoint meaningful
 attempts, including errors and alternatives. Candidate-length equality, fuzzy
 similarity, and zero permuter scores are not full-function acceptance. Review
-source validity, check exact bytes and run the complete build before committing.
+source validity, check exact bytes; defer the complete build to batch integration.
 Keep unmatched source outside production src/ and preserve it on a dedicated
 WIP branch at session closeout. Report exact bytes separately from recovered
 layouts, semantic evidence, candidate improvements and tool work.
+
+## October 12 lean workflow (latest user preference)
+
+Prioritize percentage gain over exhaustive justification. Fast checks authorize
+working-branch commits; one combined full build gates the integration PR. No
+repeated baseline/worker/per-commit rebuilds or regression suite for doc edits.
+Use provisional descriptive names and comments; mark uncertainty, correct later.
+Retain failed drafts cheaply. Report code percentage and percentage-point gain
+first. Add diagnostics or tests only to answer an actual failure/question.
+
+Local register pinning is user-authorized as a temporary matching concession.
+Mark affected translation units `// MATCHING_CONCESSION: register-pinning`;
+count exact bytes normally and report them in the Register-pinned category.
+Retain readable C, fast exact checks, and batch validation; defer removing the
+hints. This does not authorize handwritten instruction bodies.

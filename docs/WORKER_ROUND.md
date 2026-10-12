@@ -8,7 +8,7 @@ Historical model-specific quotas below are examples, not current assignments.
 1. Work only in the assigned isolated checkout. The orchestrator supplies its
    branch and baseline; do not merge or reset another worker's work. Activate
    `build/venv`, record a start timestamp in `build/roundN/`, inspect leftover
-   WIP and confirm the baseline build. Preserve older benchmark logs.
+   WIP; reuse the integrator's accepted baseline. Preserve older benchmark logs.
 2. Read docs/WORKER.md (consolidated tricks) and your notes/NAME.md.
 3. Worklist: `build/venv/bin/python tools/worklist.py --range START END --max-insns 80` (when thin,
    `--max-insns 150`). Order: shape/clone families, switches, 41-80 insns, small
@@ -17,11 +17,11 @@ Historical model-specific quotas below are examples, not current assignments.
    you have a new idea. Read `docs/COMPILER_REFERENCES.md` for checked community tips.
 4. Prefer a seeded family with reviewed body sizes and shared layout evidence.
    Inner loop: `build/venv/bin/python tools/check.py wip/sub_X.c`; always confirm the final MATCH line.
-   Copy into src/fn/ only on MATCH. Full `build/venv/bin/python tools/build.py` OK before each commit
-   (batch ~5 matches per build). Keep nonmatching candidates on dedicated WIP branches outside src/; never raw ROM data
+   Copy into src/fn/ only on MATCH. Fast checks suffice for working-branch commits; the integrator performs one
+   combined full build before merging. Keep nonmatching candidates on dedicated WIP branches outside src/; never raw ROM data
    addresses. Named functions keep their gen name.
 5. After batches: `build/venv/bin/python tools/clones.py --port --loose --range START END`.
-6. After every verified build batch, commit each new function separately. The
+6. After fast checks, commit each new function separately. The
    orchestrator reviews and merges all worker work as one integration batch;
    only that main push triggers progress Actions. Do not push without assignment.
 7. Use the assigned match/time cap (initial production rounds: 15 matches for
