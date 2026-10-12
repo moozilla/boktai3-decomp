@@ -14,5 +14,29 @@ addr,name,confidence,evidence
 0821A04C,Task_SetCallbacks,high,Stores update and destructor callbacks
 0821A054,TaskSystem_RunFrame,high,Traverses fourteen lists calling updates or destruction and freeing
 0821A0C0,Task_RequestDestroy,medium,Marks task for deferred destruction
-0821A0F8,TaskSystem_DestroyPriority,medium,Requests destruction for matching priority
+0821A0F8,TaskSystem_DestroyBelowLevel,medium,Traverses all lists destroying tasks whose byte at offset 16 is below threshold
 0821A130,Task_FindById,high,Traverses task lists comparing 16-bit task IDs
+080015AC,Background_ApplyQueuedCommands,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+08001768,Background_Update,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+08001AD0,Background_Destroy,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+08001AE4,Background_Initialize,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+08001CB0,Background_Create,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+08001D08,Background_CreateFromScript,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+08001EB4,Background_FindMapId,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+08001EE0,Background_LoadMapsFromScript,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+08002024,Background_LoadMapFromScript,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+0800211C,Background_LoadTilesFromScript,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+080021DC,Background_QueueCommand,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+08002234,Background_SubmitScriptCommand,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+080022A0,ScrollingBackground_ApplyCommands,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+08002408,ScrollingBackground_Update,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+08002658,ScrollingBackground_Destroy,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+0800266C,ScrollingBackground_Initialize,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+08002840,ScrollingBackground_Create,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+08002894,ScrollingBackground_CreateFromScript,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+08002A04,ScrollingBackground_QueueCommand,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+08002A58,ScrollingBackground_SubmitScriptCommand,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+0818D754,Motion_BuildApproachSegment,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+0818D8E0,Motion_RampSpin,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+0818D960,Motion_AdvanceApproach,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
+0818DB10,Motion_FollowOwnerAndFinish,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md

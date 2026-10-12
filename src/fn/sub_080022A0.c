@@ -1,6 +1,6 @@
 #include "global.h"
-#define AffineBackground_ApplyCommands sub_080022A0
-struct AffineBackground {
+#define ScrollingBackground_ApplyCommands sub_080022A0
+struct ScrollingBackground {
     u8 task[0x1A];u8 flags,layer;
     s16 v1C,x,y,rotation,zoom,dx,dy;
     u8 pad2A[14];s16 targetX,targetY;
@@ -10,7 +10,7 @@ struct AffineBackground {
 };
 void sub_08219574(u32,s32,s32);
 static inline s32 fixed4(s32 v) { return v << 4; }
-s32 AffineBackground_ApplyCommands(struct AffineBackground *p)
+s32 ScrollingBackground_ApplyCommands(struct ScrollingBackground *p)
 {
     u32 i;
     for(i=0;i<p->count;i++) {
