@@ -1,13 +1,8 @@
-#include "global.h"
-struct Obj {
-    u8 pad0[6]; u8 rotation; u8 pad7[0x15]; s16 x,y,z; u8 pad22[0xf8]; u8 angle; u8 pad11B[0x19];
-    u16 endX,endY,endZ,pad13A,startX,startY,startZ,pad142; s16 dx,dy,dz; u16 pad14A;
-    u16 fx,fy,fz,pad152,a,b,c,pad15A; u8 *parent; u8 pad160[0x70];
-    void (*callback)(struct Obj *); u16 pad1D4; s16 timer; u8 pad1D8[5]; u8 byte1DD;
-};
+#include "motion_0818.h"
+
 s32 Div(s32,s32);
-void sub_0818DB10(struct Obj *);
-void sub_0818D960(struct Obj *p)
+void sub_0818DB10(struct Motion0818Object *);
+void sub_0818D960(struct Motion0818Object *p)
 {
     u8 *owner=p->parent;
     p->rotation+=p->byte1DD;
