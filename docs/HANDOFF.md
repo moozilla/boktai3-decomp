@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after the emitter and falling-object matching batch (2026-10-12). This file is the single
+Last updated after the scanline and status-screen matching batch (2026-10-12). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,26 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 12 scanline and status-screen batch
+
+Coverage is **16.971%**, up **0.132 percentage points** from 16.839%:
+**16 new exact functions / 3,200 bytes**, 5,109 total / 11,094.
+Palette-set functions are complete. Their report span (0800E0CC–0800E3E0)
+also retains the following unmatched reset tail at E3D4. Scanline presentation and
+status-screen callbacks now have separate report groups and provisional names.
+The latter covers numeric drawing, reveal/close transitions, palette blending,
+callback dispatch, and cleanup. Register-pinned exact coverage is 2.069%.
+EAF0 and E8E0 use a per-file optimization override; this is a matching
+concession, not evidence of historical compiler flags.
+
+Whole-session gain from 15.315%: **1.656 percentage points**. Continue toward
+20% with adjacent callbacks. Remaining gaps include D874/DC90 scanline noise
+and initialization, E5B8 numeric drawing, E974/EC0C/ECD0/EF90 transitions,
+and F220 initialization. Drafts stay in ignored wip/ and are not counted.
+F0F0 was an existing match rewritten with a descriptive name, not new progress.
+Combined batch validation log: build/scanline-status-combined.log.
+User requests periodic usage checks and stopping below 50% remaining.
 
 ## October 12 emitter and falling-object completion
 

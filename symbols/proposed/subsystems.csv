@@ -170,3 +170,20 @@ addr,name,confidence,evidence
 0800D5C0,FallingObject_SpawnFinishParticles,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
 0800D60C,FallingObject_UpdateFinish,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
 0800D668,FallingObjectManager_Update,medium,Matched contiguous controller callbacks; descriptive interpretation tentative
+0800DA5C,ScanlinePresentation_Update,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
+0800DC38,ScanlinePresentation_Destroy,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
+0800E130,PaletteSet_Update,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
+0800E22C,PaletteSet_Initialize,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
+0800E408,NumericDisplay_DrawPair,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
+0800E4DC,NumericDisplay_DrawStatusValues,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
+0800E7D8,StatusScreen_CheckConfirm,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
+0800E838,StatusScreen_Close,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
+0800E8E0,StatusScreen_BeginClose,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
+0800EA94,StatusScreen_WaitForClose,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
+0800EAF0,StatusScreen_Reveal,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
+0800EBB0,StatusScreen_WaitForReveal,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
+0800ED30,StatusScreen_FadeInPalette,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
+0800EE5C,StatusScreen_FadeOutPalette,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
+0800F0F0,StatusScreen_ClearScanlineNoise,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
+0800F154,StatusScreen_Update,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
+0800F1BC,StatusScreen_Destroy,medium,Tentative behavior name from exact C implementation; scanline and status-screen callback family
