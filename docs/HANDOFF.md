@@ -10,6 +10,22 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 final lifecycle and adjacent message batch
+
+Coverage is **18.546%**, up **0.014 percentage points** from 18.532%:
+**3 exact functions / 328 bytes**, 5,336 total / 11,106.
+Controller destruction and the adjacent scene-message enqueue/buffer swap match.
+Previous PR #45 merged; reporting Action 38305054196 succeeded.
+Combined validation: build/scene-lifecycle-combined.log.
+Weekly allowance reached 50% remaining: preserve the user's 50% floor and
+resume toward 20% when more allowance is authorized/available.
+The controller resource initializer draft is in wip/sub_0802048C.c, restored
+to its best initial form (432 differing bytes, 1176 vs 1168 target bytes).
+Its first allocation block is almost exact; resource-loop register assignment
+and increment order remain. Broad pinning worsened it; do not repeat blindly.
+The adjacent dispatch helper 20A60 is also drafted but not exact. Keep drafts
+out of production. Main object update F93C and three object initializers remain.
+
 ## October 12 scene-object commands and motion completed
 
 Coverage is **18.532%**, up **0.068 percentage points** from 18.465%:
