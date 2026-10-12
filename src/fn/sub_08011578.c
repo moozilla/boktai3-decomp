@@ -1,13 +1,3 @@
 #include "global.h"
-
-s32 sub_08011578(u8 *p, u32 a, u32 b) {
-    s32 i = 0;
-    while (i <= 0x3F) {
-        if (p[0] == a && p[1] == b) {
-            return i;
-        }
-        i++;
-        p += 2;
-    }
-    return -1;
-}
+#define GlyphTable_FindPair sub_08011578
+int GlyphTable_FindPair(u8 *table,int first,int second){int i;for(i=0;i<64;i++,table+=2)if(table[0]==first && table[1]==second)return i;return -1;}
