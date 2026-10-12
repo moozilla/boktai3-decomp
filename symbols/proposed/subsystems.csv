@@ -393,6 +393,9 @@ addr,name,confidence,evidence
 0801F4C4,SceneObject_UpdateLowering,low,Tentative scene-object controller role; exact C in src/fn/sub_0801F4C4.c
 0801F580,SceneObject_UpdateRaised,low,Tentative scene-object controller role; exact C in src/fn/sub_0801F580.c
 0801F5B8,SceneObject_UpdateLowered,low,Tentative scene-object controller role; exact C in src/fn/sub_0801F5B8.c
+080203D4,SceneObjects_Destroy,low,Tentative lifecycle or scene-message role; exact C in src/fn/sub_080203D4.c
+080209D0,SceneMessages_Enqueue,low,Tentative lifecycle or scene-message role; exact C in src/fn/sub_080209D0.c
+08020A14,SceneMessages_SwapBuffers,low,Tentative lifecycle or scene-message role; exact C in src/fn/sub_08020A14.c
 0818D754,Motion_BuildApproachSegment,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D8E0,Motion_RampSpin,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D960,Motion_AdvanceApproach,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
