@@ -6,6 +6,7 @@ address,isa,evidence,replacement_end
 08009E30,thumb,Independent 12-byte global-pointer clear after directional script return and literal pool,08009E3C
 0800A800,thumb,Independent 12-byte effect manager global-pointer clear following collision controller teardown,0800A80C
 0800CBA0,thumb,Independent global manager reset after allocator return and pool; exact 12-byte C body,0800CBAC
+08015B1C,thumb,Independent exact 104-byte fan emission wrapper inside retained byte tail,08015B84
 08015C90,thumb,Independent exact 96-byte angled burst wrapper inside retained byte tail,08015CF0
 0802CED0,thumb,Independent 40-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md,
 0802CEF8,thumb,Independent 24-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md,
