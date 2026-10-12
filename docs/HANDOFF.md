@@ -10,6 +10,33 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 entry point and contiguous subsystem batch
+
+Current matching coverage is **15.199%**, up **0.635 percentage points** from
+main's previous 14.564%: **53 new exact functions**, 4,954 total / 11,088.
+The additional five inventory entries split verified hidden function bodies;
+total tracked code remains 2,415,354 bytes. See
+[entry point and menu notes](ENTRY_AND_MENUS.md) for readable subsystem roles.
+
+This batch adds `AgbMain` and missing startup helpers, two curved movement
+controllers, script commands, all eight adjacent palette/projection/interaction
+functions, most of the sound-test menu, and the remaining scripted-presentation
+lifecycle. Readable source aliases and `symbols/proposed/entry-animation.csv`
+record provisional names. The **20% target is not achieved**; 4.801 percentage
+points remain. No new tooling or regression tests were added.
+
+Working branch: `codex/entry-animation-to20`. Individual commits passed fast
+checks. The single combined build printed `build/boktai3.gba: OK`, recorded in
+`build/entry-animation-combined-build.log`.
+Keep continuation work in contiguous units and use percentages first.
+
+Best failed sources are preserved on
+`codex/wip-entry-animation-2026-10-12` under `wip/entry-animation/`. Never merge
+that branch into main. In particular, do not repeat the many failed tiny-register
+experiments on the sound-test playback indicators or the old spawn-family
+candidate without a fresh hypothesis. A two-minute existing-permuter run was
+used for the indicator while integration notes were prepared.
+
 ## October 12 animation batch
 
 Code coverage is **14.564%**, up **0.785 percentage points** from the previous
@@ -77,7 +104,7 @@ floor below describes the previous tranche, not this authorization.
 
 | | |
 |---|---|
-| Matched C | **4,901 / 11,083 functions (44.22%)**, 351,766 / 2,415,354 code bytes (14.564%; `PROGRESS.md`) |
+| Matched C | **4,954 / 11,088 functions (44.68%)**, 367,098 / 2,415,354 code bytes (15.199%; `PROGRESS.md`) |
 | Build | `make` / `python3 tools/build.py` rebuilds the ROM **bit-identical** (SHA-1 `2651c5e6875ac60abff734510d152166d211c87c`) |
 | Shiftable | all data relocatable; `make shifttest` (3 scenarios, 35 screenshots) passes |
 | Code layout | `src/fn/sub_XXXXXXXX.c`, one function per file; `src/lib/m4a.c` (MP2K sound, 57/58) |
