@@ -10,6 +10,22 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 scanline wave and weather states
+
+Coverage is **17.709%**, up **0.078 percentage points** from 17.631%:
+**12 new exact functions / 1,876 bytes**, 5,198 total / 11,100.
+The scanline-wave unit is complete. Weather particle presentation, storm wait,
+onset, active state, shutdown, dispatch and start/stop/cooldown commands match.
+The weather family is NOT complete: scroll update 17510, particle initializer
+17684, emission 177AC, trigger wait 17A6C and script initializer 18028 remain.
+Best ignored drafts: build/17510-48.c (48 operand bytes); build/17684-five.c
+(body exact, five prologue bytes differ; prologue-bugfix did not help);
+build/18028-111.c (111 bytes). 17A6C has a readable wip draft.
+Continue at the adjacent palette controller 18454; avoid prolonged allocation
+searches. Combined validation: build/wave-weather-combined.log.
+Usage check: 74% weekly remaining; stop below 50%. Prior batch merged PR #37
+and its main-only reporting Action succeeded (38295175067).
+
 ## October 12 fading particles, palette levels and floating effects
 
 Coverage is **17.631%**, up **0.083 percentage points** from 17.548%:
