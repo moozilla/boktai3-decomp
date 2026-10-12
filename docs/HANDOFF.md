@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after the solo family/tail tranche and library report update (2026-10-09 UTC). This file is the single
+Last updated after the bounded two-worker pilot (2026-10-12 UTC). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,32 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 12 measured pilot: completed
+
+The user replaced the solo-only restriction with two isolated Sol 6.1/high
+workers, each capped at twenty minutes. Both stopped; no ongoing matching.
+[Campaign receipt](campaigns/2026-10-12.json) records results and usage limits.
+
+- Production: **three new exact functions / 1,236 bytes**, completed and
+  committed within 14m22s. The snapshot/reset callback family at 080AD270,
+  080C6010 and 080D1EA0 shares flag consumption, owner-flag clearing, a saved
+  field copy and state reset; only its preparation helper differs. This is an
+  observed code role, not an identified character or gameplay action.
+- Diagnostic: **zero exact bytes**, stopped after 5m18s and three failed
+  hypotheses. Park 08160EA4's register residue until new evidence appears.
+- Compact diffs were used in actual matching. Worker feedback exposed duplicate
+  compilation for checkpoints; `candidate.py --diff` now prints the same run's
+  compact hunks. Smaller output is measured; cost savings are not established.
+- Account weekly usage rose from 3% to 6% at the post-worker observation,
+  including coordination. Rounded shared usage is not per-worker billing.
+- Integration is PR #19; failed sources and reports are separately retained on
+  `codex/wip-motion-2026-10-12`, outside production. Research priorities and all
+  original user ideas are in [BACKLOG.md](BACKLOG.md).
+
+Next: a small fresh-family campaign, using the saved failed hypotheses to avoid
+repeated work. Do not broaden concurrency or build a scheduler on this evidence.
+The older solo authorization and allowance floor below are historical.
 
 ## October 12 solo workflow update
 
@@ -30,7 +56,7 @@ floor below describes the previous tranche, not this authorization.
 
 | | |
 |---|---|
-| Matched C | **4,843 / 11,083 functions (43.70%)**, 331,578 / 2,415,354 code bytes (13.728%; `PROGRESS.md`) |
+| Matched C | **4,846 / 11,083 functions (43.72%)**, 332,814 / 2,415,354 code bytes (13.779%; `PROGRESS.md`) |
 | Build | `make` / `python3 tools/build.py` rebuilds the ROM **bit-identical** (SHA-1 `2651c5e6875ac60abff734510d152166d211c87c`) |
 | Shiftable | all data relocatable; `make shifttest` (3 scenarios, 35 screenshots) passes |
 | Code layout | `src/fn/sub_XXXXXXXX.c`, one function per file; `src/lib/m4a.c` (MP2K sound, 57/58) |
@@ -38,7 +64,7 @@ floor below describes the previous tranche, not this authorization.
 
 The solo family tranche adds **54 functions / 8,488 exact bytes** on top of
 `7037e3a`, following the KNIDL process review. The 20% code target remains
-unmet by **151,493 bytes**. [The tranche notes](../notes/solo-family_2026-10-09.md)
+unmet by **150,257 bytes** after the October 12 pilot. [The tranche notes](../notes/solo-family_2026-10-09.md)
 record accepted sources, reusable patterns and unresolved candidates.
 081DB1D8 contributes only its 116-byte body; two newly inventoried 108-byte
 wrappers at 081DB24C and 081DB2B8 are now exact C. Their reviewed replacement
@@ -48,7 +74,7 @@ matches (752 bytes). The [final ledger](../notes/solo-final_2026-10-09.csv)
 adds two more exact functions (312 bytes). The objdiff report now groups eight identified libraries
 into contiguous units with verified names; see [reporting policy](PROGRESS_CI.md).
 
-**Latest authorization: work alone until 15% plan usage remains.** The user
+**Historical October 9 authorization: work alone until 15% plan usage remains.** The user
 explicitly authorized new matching after the KNIDL review and prohibited
 subagents for this tranche. The meter reached **15% remaining** in the final bounded pass; matching
 work stopped there, followed only by validation, documentation and preservation.
@@ -286,7 +312,7 @@ Rules that matter (all in `docs/WORKER.md`, which also has ~40 agbcc tricks):
 | Tool | What |
 |---|---|
 | `tools/build.py` | split asm around src/*.c, compile (agbcc -O2 -mthumb-interwork; per-file `// CFLAGS:` override), link, SHA-1 check |
-| `tools/check.py FILE` | one file vs ROM at its address, side-by-side diff |
+| `tools/check.py FILE` | one file vs ROM at its address, compact aligned diff |
 | `tools/worklist.py` | unmatched functions with size/branch/jumptable signals; `--chunks N` to split ranges |
 | `tools/clones.py` | clone families: `--stats`, `--port [--loose] [--range A B]` copies matched C to identical siblings (loose = immediates may differ), keeps what check.py accepts. ~6 min for the full ROM. Run after every merge. |
 | `tools/permute.py FILE --run SECS` | decomp-permuter for register-allocation misses |

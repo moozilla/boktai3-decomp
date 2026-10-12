@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "running",
+  "status": "complete",
   "baseline_commit": "3c975f2",
   "baseline_exact_functions": 4843,
   "baseline_exact_bytes": 331578,
@@ -42,7 +42,88 @@
         "080C6010",
         "080D1EA0"
       ],
-      "stop": "Switch after ~8 minutes without improving hypothesis; end matching within 20 minutes."
+      "stop": "Switch after ~8 minutes without improving hypothesis; end matching within 20 minutes.",
+      "status": "complete",
+      "result": {
+        "worker": "pilot-sol-family-20261012",
+        "base": "3c975f2",
+        "start_utc": "2026-10-12T07:58:29Z",
+        "matching_end_utc": "2026-10-12T08:12:03Z",
+        "committed_utc": "2026-10-12T08:12:51Z",
+        "elapsed_seconds_at_commits": 862,
+        "audited_primary": {
+          "08118B8C": [
+            "08118B8C",
+            "08118E30",
+            676
+          ],
+          "08118E30": [
+            "08118E30",
+            "081190D4",
+            676
+          ],
+          "081190D4": [
+            "081190D4",
+            "08119378",
+            676
+          ]
+        },
+        "audited_fallback": {
+          "080AD270": [
+            "080AD270",
+            "080AD40C",
+            412
+          ],
+          "080C6010": [
+            "080C6010",
+            "080C61AC",
+            412
+          ],
+          "080D1EA0": [
+            "080D1EA0",
+            "080D203C",
+            412
+          ]
+        },
+        "audited_opportunity_bytes": 3264,
+        "exact_new_functions": 3,
+        "exact_new_bytes": 1236,
+        "commits": [
+          "8592594",
+          "3660c2c",
+          "a8adacc"
+        ],
+        "complete_rom_log": "build/final-clean-full-build.log",
+        "complete_rom_result": "build/boktai3.gba: OK",
+        "candidate_checkpoints": 20,
+        "candidate_status_counts": {
+          "mismatch": 13,
+          "error": 1,
+          "match": 6
+        },
+        "primary_best_authored": "wip/sub_08118B8C_ptrs.c",
+        "primary_best_authored_result": "672 bytes, 440 different bytes; retained field addresses reproduced three-high-register prologue but owner/core allocation and offset reuse differed",
+        "source_manifest": "wip/source-manifest.json",
+        "inherited_assistance": [
+          "Repository instructions and existing exact helper sources 081188C8, 0811BCBC, 0811CCB0",
+          "No exact family seed or other-worker candidates",
+          "Bounded 60-second permuter trial suggested inline accessor for fallback flag"
+        ],
+        "concrete_failures": [
+          "Ghidra export absent",
+          "Primary array layout, raw owner, nested pointer initialization and register keyword hypotheses did not solve allocation",
+          "Primary permuter low score reordered Div calls; not promoted or credited",
+          "Volatile fallback test introduced an extra byte load and did not solve address retention; final source has no volatile",
+          "Permuter emitted AST assertion warnings on anonymous typeof struct manipulation; accessor suggestion remained reviewable"
+        ],
+        "evidence": [
+          "Fallback family normalized assembly is equal except preparation helper targets 080B1E60, 080C4F9C, 080DA678",
+          "Owner flags +0 and embedded +0x20/+8 observed in exact stores; snapshot field copy/reset layout shared by all three exact consumers",
+          "08072188 ignores incoming r0 and reads globals: final declaration/call void(void)",
+          "No semantic renames, data definitions, ROM literal addresses, register pinning or handwritten asm"
+        ],
+        "tool_feedback": "Compact hunks reduced output and exposed retained flag pointer; reviewed sizes prevented false prefix acceptance. candidate.py then lacked hunks, requiring a second check to inspect each meaningful checkpoint. Alternatives with filename suffix need explicit target for permute.py. No tooling edits."
+      }
     },
     {
       "name": "sol_diagnostic_pilot",
@@ -98,5 +179,57 @@
     "compact_characters": 3190,
     "character_reduction_percent": 77.2,
     "limits": "One real nonmatching candidate; character count is not tokens, model cost, or matching yield."
-  }
+  },
+  "account_weekly_used_percent_after_workers": 6,
+  "account_meter_limits": "Rounded account-wide readings, including coordinator; not worker-specific billing. Closeout may add usage.",
+  "new_exact_functions": 3,
+  "new_exact_bytes": 1236,
+  "final_exact_functions": 4846,
+  "final_exact_bytes": 332814,
+  "usage_snapshot": {
+    "root_turn": "01a12f1c-65ca-7c61-8897-918ec39c127a",
+    "rows": [
+      {
+        "thread": "01a12f1e-a0f5-7ad3-b9b8-1dfbd97cf24f",
+        "model": "gpt-6.1-sol",
+        "reasoning": "high",
+        "responses": 50,
+        "input_tokens": 5836878,
+        "cached_input_tokens": 5622272,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 23136,
+        "reasoning_output_tokens": 6927,
+        "total_tokens": 5860014,
+        "uncached_input_tokens": 214606
+      },
+      {
+        "thread": "01a12eff-ac1c-7203-a534-8f7febd9a4f0",
+        "model": "gpt-6-astra",
+        "reasoning": "low",
+        "responses": 39,
+        "input_tokens": 6446584,
+        "cached_input_tokens": 6356480,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 20436,
+        "reasoning_output_tokens": 7034,
+        "total_tokens": 6467020,
+        "uncached_input_tokens": 90104
+      },
+      {
+        "thread": "01a12f1f-078a-74d2-bd59-c06be0f5eb31",
+        "model": "gpt-6.1-sol",
+        "reasoning": "high",
+        "responses": 18,
+        "input_tokens": 1429302,
+        "cached_input_tokens": 1273216,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 10198,
+        "reasoning_output_tokens": 3291,
+        "total_tokens": 1439500,
+        "uncached_input_tokens": 156086
+      }
+    ],
+    "limits": "Recorded per-response usage; reasoning is included in output. Not subscription allocation or dollars. Snapshot excludes later responses and final closeout."
+  },
+  "next": "Prefer a fresh related family with bounded seed work; park diagnostic residue. Do not expand concurrency based on this small heterogeneous pilot."
 }
