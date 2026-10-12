@@ -1,0 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
+#include "global.h"
+#define SceneObject_UpdateLowering sub_0801F4C4
+void sub_0822B2F8(int);void sub_0822B358(int);void sub_0801F5B8(void);void sub_08068124(void*,int,void*,int,int,int);
+void SceneObject_UpdateLowering(u8*s){struct {s16 x,y,z;} v;register int clear asm("r5");register int one asm("r2");{int next=*(u16*)(s+0x80)-15;clear=0;asm("" : "+r"(clear) : "r"(next));*(u16*)(s+0x80)=next;}if(*(s16*)(s+0x80)<0){*(u16*)(s+0x80)=clear;sub_0822B358(0x152);sub_0822B2F8(0x153);*(u16*)(s+0x82)=30;{one=1;asm("" : "+r"(one));s[0x37]=one;}{register int pose asm("r0")=s[0x84];asm("" : "+r"(pose));s[0x39]=pose;}s[0x3a]=0;*(void**)(s+0x30)=sub_0801F5B8;{struct {s16 x,y,z;} zero={0,0,0};v.z=zero.z;*(u32*)&v=clear;}one&=s[0x38];asm("" : "+r"(one));if(one){*(u32*)&v=128;sub_08068124(s+0x70,0,&v,5,2,clear);}else{v.z=128;sub_08068124(s+0x70,0,&v,5,2,one);}}{register u16 *offset asm("r0")=(u16*)(s+0x80);register int base asm("r1");asm("" : "+r"(offset));base=*(u16*)(s+0x7a);asm("" : "+r"(base));base+=*offset;asm("" : "+r"(base));*(u16*)(s+0x72)=base;}}
