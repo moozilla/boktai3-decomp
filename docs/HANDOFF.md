@@ -10,6 +10,25 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 scene-object commands and motion completed
+
+Coverage is **18.532%**, up **0.068 percentage points** from 18.465%:
+**14 new exact functions / 1,632 bytes**, 5,333 total / 11,106.
+The command/query span 0801E000–0801EC4C is now completely matched. This includes
+raise/lower/promote scripts, lock and both compatibility/resource predicates.
+Both pose animations EF60/EFDC and the full raising/lowering callback chain
+F3A0–F5EC now match, including impact effects and delayed script execution.
+The controller remains incomplete: EC4C/F058/F5EC object initializers,
+F93C main update, 203D4 destruction and 2048C resource setup remain assembly.
+Combined validation: build/scene-motion-combined.log.
+Previous PR #44 merged; reporting Action 38304277922 succeeded.
+Usage: 51% weekly remaining; stop below 50%.
+Matching notes: E700's R7 save issue is solved with an input-only pinned
+constant and a literal OR in the body; allowing the compiler to see the
+constant lets its body allocate/save R7. Return-result variables solved the
+compatibility predicate's block order; explicit success-label placement solved
+EC00's early return block. No Ghidra export exists locally.
+
 ## October 12 scene-object controller commands
 
 Coverage is **18.465%**, up **0.097 percentage points** from 18.367%:
