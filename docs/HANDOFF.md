@@ -10,6 +10,21 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 hazards, barriers, and shadows continuation
+
+Coverage is **17.398%**, up **0.148 percentage points** from 17.250%:
+**16 new exact functions / 3,568 bytes**, 5,158 total / 11,094.
+Animated-hazard constructors now match. Barrier initialization, updates and
+placement, terrain/scaled shadows, the shadow registry and the first particle
+update are matched and provisionally named. Barrier destruction 1310C remains
+four operand bytes away in ignored build/1310c-four.c. Debris creation 12B34,
+bouncing particles 1404C and paused particles 14330 remain ignored drafts.
+The closest paused-particle candidate is build/14330-close.c (31 differing bytes).
+Continue contiguously through the particle manager; do not stall on allocation
+puzzles. This batch adds report groups for debris, barriers and shadow families.
+Combined validation: build/hazard-shadow-combined.log. Usage: 82% weekly remains;
+check periodically and stop below 50%, as requested. No reset credits consumed.
+
 ## October 12 password, scene-indicator, and animated-hazard batch
 
 Coverage is **17.250%**, up **0.147 percentage points** from 17.103%:
