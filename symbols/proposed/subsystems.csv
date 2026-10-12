@@ -266,3 +266,15 @@ addr,name,confidence,evidence
 08016A0C,FloatingEffect_ShrinkAway,low,Tentative effect/palette interpretation from matched state updates and manager layout
 08016B78,FloatingEffect_RiseAndShrink,low,Tentative effect/palette interpretation from matched state updates and manager layout
 08016EA8,FloatingEffectManager_Update,low,Tentative effect/palette interpretation from matched state updates and manager layout
+08017270,ScanlineWave_Update,low,Tentative scanline/weather naming from phase samples storm state transitions and particle callbacks
+080172EC,ScanlineWave_Initialize,low,Tentative scanline/weather naming from phase samples storm state transitions and particle callbacks
+080173C0,ScanlineWave_Create,low,Tentative scanline/weather naming from phase samples storm state transitions and particle callbacks
+08017730,WeatherParticles_Update,low,Tentative scanline/weather naming from phase samples storm state transitions and particle callbacks
+08017BB8,Weather_WaitForStorm,low,Tentative scanline/weather naming from phase samples storm state transitions and particle callbacks
+08017BEC,Weather_StormOnset,low,Tentative scanline/weather naming from phase samples storm state transitions and particle callbacks
+08017C8C,Weather_ActiveStorm,low,Tentative scanline/weather naming from phase samples storm state transitions and particle callbacks
+08017E7C,Weather_StormEnd,low,Tentative scanline/weather naming from phase samples storm state transitions and particle callbacks
+08017F74,Weather_Update,low,Tentative scanline/weather naming from phase samples storm state transitions and particle callbacks
+08018348,Weather_Start,low,Tentative scanline/weather naming from phase samples storm state transitions and particle callbacks
+08018374,Weather_Stop,low,Tentative scanline/weather naming from phase samples storm state transitions and particle callbacks
+080183A8,Weather_ConfigureCooldown,low,Tentative scanline/weather naming from phase samples storm state transitions and particle callbacks
