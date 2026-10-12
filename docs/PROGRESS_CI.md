@@ -63,8 +63,8 @@ runtime span. The call-via object's extra entries remain inside the existing
 `_call_via_r5` progress span; the report does not invent additional functions.
 These assembly identifications provide names, not C matching credit.
 
-CI reports C coverage under the project's rule that source is committed only
-after a byte-identical local build. CI itself does **not** verify matching: a
+CI reports C coverage under the project's rule that source is integrated into main only
+after a byte-identical combined local build. CI itself does **not** verify matching: a
 source edit that violates that rule can produce an overstated report. Reviewers
 must retain the local `make`/`tools/check.py` verification requirement. The report
 uses objdiff v2 JSON, decimal strings for uint64 byte counts and addresses, and
@@ -128,6 +128,15 @@ metadata-only reports and 30-day retention keep this job's storage small.
 See [GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions).
 
 ### Reading the metrics
+
+Register hints are tracked using objdiff's native report categories, which
+decomp.dev exposes as category selections: **Register-pinned**
+(`register_pinned`) and **No register pinning** (`no_register_pinning`).
+Translation units marked `// MATCHING_CONCESSION: register-pinning` belong to
+the first category. These remain exact matches; the category records deferred
+source cleanup without lowering their byte-match score. Nonmatching drafts
+still receive no exact credit. Category percentages use their own category's
+denominator; the Markdown summary also shows each matched share of total code.
 
 Fuzzy matching can include partial similarity; exact matching counts completed
 matches, and linked/completed measures count source units incorporated into
