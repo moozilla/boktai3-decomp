@@ -5,8 +5,9 @@ committed, and neither is anything generated from it (`build/`, `extracted/`).
 
 ## Ground rules
 
-* `make` must print `build/boktai3.gba: OK` before anything is committed.
-  If C changes data layout or touches pointers, also run `make shifttest`.
+* Fast exact checks suffice for working-branch commits. Run one combined ROM
+  build before batch integration into main (`build/boktai3.gba: OK`). Rebuild or
+  run relocation/emulator tests again only when changes or failures justify it.
 * Matching means byte-identical. No hand-written instructions inside `asm()`
   to force a match. `INCLUDE_ASM` is the placeholder for unfinished functions.
   Nonmatching candidate C may be committed on dedicated WIP branches outside
@@ -14,14 +15,13 @@ committed, and neither is anything generated from it (`build/`, `extracted/`).
 * One translation unit per change/PR. A unit is a `src/*.c` file covering a
   **contiguous** run of functions in ROM order.
   The user-authorized orchestration exception is a reviewed batch integration
-  PR: preserve separate per-function commits, validate the combined ROM and
-  shift test, then merge once into `main` (see `AGENTS.md`).
+  PR: preserve separate per-function commits, validate the combined ROM,
+  then merge once into `main` (see `AGENTS.md`).
 * Don't edit generated files (`build/asm/*`). Names go in
   `symbols/functions.csv` / `symbols/data.csv`; pointer facts go in
   `symbols/pointers.txt` / `symbols/nonpointer_*.txt`.
-* Names need evidence. Put it in the csv `source`/`notes` columns: a caller,
-  a data reference, an emulator observation, or a matching library. Use
-  `confidence=low` for guesses.
+* Use useful provisional names without a separate proof exercise. Mark guesses
+  `confidence=low` and record the current interpretation; revise later.
 
 ## Decompiling a function
 
@@ -62,3 +62,9 @@ committed, and neither is anything generated from it (`build/`, `extracted/`).
    (add a `nonpointer_ranges.txt` range or an emulator run that reads it), or
    a pointer the scan can't see (unaligned or in a structure; add it to
    `pointers.txt` or teach a walker like `tools/m4a.py`).
+
+Local register pinning is user-authorized as a temporary matching concession.
+Mark affected translation units `// MATCHING_CONCESSION: register-pinning`;
+count exact bytes normally and report them in the Register-pinned category.
+Retain readable C, fast exact checks, and batch validation; defer removing the
+hints. This does not authorize handwritten instruction bodies.

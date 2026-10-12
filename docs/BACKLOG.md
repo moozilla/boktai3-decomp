@@ -201,7 +201,7 @@ Research references retained for the experiments (not installations):
 - Source fingerprints/plateau classification: https://github.com/Muhtasham/decomp-goal-harness
 - Oracle/relocation lessons: https://momo5502.com/posts/2026-10-09-game-decompilation/
 
-Do not import inline-assembly/register-pin exceptions, verifier exclusions,
+Do not import inline-assembly exceptions, verifier exclusions,
 compiler forks that manufacture matches, or partial-credit commit policies.
 Do not extrapolate Mizuchi's reported per-function costs to this depleted easy
 frontier. Similarity leaderboards and Linux x86 re-executability results are
@@ -218,3 +218,7 @@ before the asmlift experiment, a scheduler, or increased concurrency.
 The account meter rose three percentage points including coordination; this
 is not proof of economical scale. See the campaign receipt for source-level
 results and separate model usage records.
+
+Register pinning is now explicitly authorized (October 12): use marked local
+register declarations for exact matching, with cleanup deferred. Track their
+source completeness separately through decomp.dev progress categories.

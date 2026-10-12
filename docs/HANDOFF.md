@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after the bounded two-worker pilot (2026-10-12 UTC). This file is the single
+Last updated after the solo animation matching batch (2026-10-12). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,27 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 12 animation batch
+
+Code coverage is **14.564%**, up **0.785 percentage points** from the previous
+main baseline (13.779%). The batch adds **55 exact functions**, with 4,901 total.
+The animation work and readable callback roles are in [ANIMATION_081E.md](ANIMATION_081E.md).
+Two contiguous ranges are now fully represented by matching C: the state/reset
+and child callbacks (`081E5608–081E692C`), and animation/rotation/scale/particle
+callbacks (`081E78F4–081E9BA4`). Other movement/dispatch paths remain unfinished.
+
+User-authorized local register pinning unlocked the larger callbacks. Marked
+sources are reported using decomp.dev's native Register-pinned category; they
+retain exact byte credit. Fast checks gated individual commits; the combined
+build printed `build/boktai3.gba: OK`. No repeated emulator/shift runs were needed
+for this batch: data and pointer definitions are unchanged.
+
+Prioritize further production matching, not more tooling. Work solo unless newly
+authorized otherwise. Use percentages first, defer register-hint cleanup, and
+build once at batch integration. Sources for remaining experiments are preserved
+on `codex/wip-animation-2026-10-12` under `wip/lean-family/`; never merge that WIP
+branch into main. The older pilot and solo budget limits below are historical.
 
 ## October 12 measured pilot: completed
 
@@ -56,7 +77,7 @@ floor below describes the previous tranche, not this authorization.
 
 | | |
 |---|---|
-| Matched C | **4,846 / 11,083 functions (43.72%)**, 332,814 / 2,415,354 code bytes (13.779%; `PROGRESS.md`) |
+| Matched C | **4,901 / 11,083 functions (44.22%)**, 351,766 / 2,415,354 code bytes (14.564%; `PROGRESS.md`) |
 | Build | `make` / `python3 tools/build.py` rebuilds the ROM **bit-identical** (SHA-1 `2651c5e6875ac60abff734510d152166d211c87c`) |
 | Shiftable | all data relocatable; `make shifttest` (3 scenarios, 35 screenshots) passes |
 | Code layout | `src/fn/sub_XXXXXXXX.c`, one function per file; `src/lib/m4a.c` (MP2K sound, 57/58) |
