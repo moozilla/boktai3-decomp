@@ -547,6 +547,28 @@ addr,name,confidence,evidence
 0802CB94,PooledActor_RefreshTarget,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802CB94.c
 0802CC4C,PooledActor_UpdateTargetOnSlot,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802CC4C.c
 0802CC94,PooledActor_TurnTowardTarget,medium,Tentative role from exact C and adjacent callbacks; src/fn/sub_0802CC94.c
+0802CF10,PooledActor_UpdateDrawable,medium,Tentative role from exact C and adjacent lifecycle calls; src/fn/sub_0802CF10.c
+0802CF44,PooledActor_DispatchAction,medium,Tentative role from exact C and adjacent lifecycle calls; src/fn/sub_0802CF44.c
+0802CF74,PooledActor_UpdateCollisionAndEffectTimers,medium,Tentative role from exact C and adjacent lifecycle calls; src/fn/sub_0802CF74.c
+0802D080,PooledActor_SelectDirectionalAnimation,medium,Tentative role from exact C and adjacent lifecycle calls; src/fn/sub_0802D080.c
+0802D1B0,PooledActor_ForwardHit,medium,Tentative role from exact C and adjacent lifecycle calls; src/fn/sub_0802D1B0.c
+0802D1E4,PooledActor_DispatchState,medium,Tentative role from exact C and adjacent lifecycle calls; src/fn/sub_0802D1E4.c
+0802D380,PooledActor_ApplyDamageAndEffects,medium,Tentative role from exact C and adjacent lifecycle calls; src/fn/sub_0802D380.c
+0802D570,PooledActor_CreateBasic,medium,Tentative role from exact C and adjacent lifecycle calls; src/fn/sub_0802D570.c
+0802D5B4,SceneActor_FindResource,medium,Tentative role from exact C and adjacent lifecycle calls; src/fn/sub_0802D5B4.c
+0802D5E0,SceneActor_FindResourceEntry,medium,Tentative role from exact C and adjacent lifecycle calls; src/fn/sub_0802D5E0.c
+0802D614,SceneActor_LoadResourcePair,medium,Tentative role from exact C and adjacent lifecycle calls; src/fn/sub_0802D614.c
+0802D654,SceneActorList_Insert,medium,Tentative role from exact C and adjacent lifecycle calls; src/fn/sub_0802D654.c
+0802D688,SceneActorList_Remove,medium,Tentative role from exact C and adjacent lifecycle calls; src/fn/sub_0802D688.c
+0802D6D0,SceneActorList_FindById,medium,Tentative role from exact C and adjacent lifecycle calls; src/fn/sub_0802D6D0.c
+0802D6F4,SceneActor_Allocate,medium,Tentative role from exact C and adjacent lifecycle calls; src/fn/sub_0802D6F4.c
+0802D728,SceneActor_InitMotion,medium,Tentative role from exact C and adjacent lifecycle calls; src/fn/sub_0802D728.c
+0802D760,SceneActor_LoadDrawable,medium,Tentative role from exact C and adjacent lifecycle calls; src/fn/sub_0802D760.c
+0802D7E0,SceneActor_InitEffect,medium,Tentative role from exact C and adjacent lifecycle calls; src/fn/sub_0802D7E0.c
+0802D8EC,SceneActor_RegisterMotion,medium,Tentative role from exact C and adjacent lifecycle calls; src/fn/sub_0802D8EC.c
+0802D914,SceneActor_UnregisterMotion,medium,Tentative role from exact C and adjacent lifecycle calls; src/fn/sub_0802D914.c
+0802D96C,SceneActor_Destroy,medium,Tentative role from exact C and adjacent lifecycle calls; src/fn/sub_0802D96C.c
+0802D9C0,SceneActor_RunCallbacks,medium,Tentative role from exact C and adjacent lifecycle calls; src/fn/sub_0802D9C0.c
 0818D754,Motion_BuildApproachSegment,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D8E0,Motion_RampSpin,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D960,Motion_AdvanceApproach,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
