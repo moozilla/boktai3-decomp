@@ -8,6 +8,8 @@ Terrain overlays (tentative),08003B44,080041CC,symbols/proposed/subsystems.csv,T
 Scene objects (tentative),080041CC,08005E10,symbols/proposed/subsystems.csv,Complete object manager creation scripts movement falling disappearance and particle effects; src/fn/sub_08005498.c
 Terrain modifiers (tentative),08005E10,08006374,symbols/proposed/subsystems.csv,Complete terrain modifier registration updates removal and script commands
 Choice menu,08006374,08006F00,symbols/proposed/subsystems.csv,Complete input navigation text markup layout resource initialization and script/callback selection dispatch
+Items and containers (tentative),08006F00,08008A70,symbols/proposed/subsystems.csv,Dropped item movement pickup and container opening script callbacks; one pickup routine remains unmatched
+Pooled interactables (tentative),08008A70,08009500,symbols/proposed/subsystems.csv,Complete pooled object lifecycle state handlers route placement activation effects and script commands
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
 Sound-test menu,081E1AF4,081E270C,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md and allocator 081E26CC callback chain
 Timed presentation,081E270C,081E2898,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md timed update cleanup and initialization
