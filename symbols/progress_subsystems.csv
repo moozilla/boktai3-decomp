@@ -60,6 +60,8 @@ Actor damage and lifecycle (tentative),080284FC,080297E8,symbols/proposed/subsys
 Grid attack actor (tentative),080297E8,0802C678,symbols/proposed/subsystems.csv,Grid attack animation states damage reactions command dispatch and lifecycle; command dispatch and initialization gaps remain
 Pooled actor manager,0802C678,0802C8A0,symbols/proposed/subsystems.csv,Complete intrusive actor list management update dispatch party target cache and allocation
 Pooled actor shared helpers (tentative),0802C8A0,0802CD04,symbols/proposed/subsystems.csv,Adjacent facing health hit capture target selection refresh and turning helpers
+Pooled actor controllers (tentative),0802CD04,0802D5B4,symbols/proposed/subsystems.csv,Script initialization drawable collision timers state and action dispatch damage and creation
+Scene actor resources and lifecycle (tentative),0802D5B4,0802D9F8,symbols/proposed/subsystems.csv,Contiguous resource lookup registry allocation drawable setup motion registration destruction and callback dispatch; family continues beyond this reviewed range
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
 Sound-test menu,081E1AF4,081E270C,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md and allocator 081E26CC callback chain
 Timed presentation,081E270C,081E2898,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md timed update cleanup and initialization

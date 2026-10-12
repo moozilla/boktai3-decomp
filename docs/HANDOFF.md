@@ -10,6 +10,29 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 pooled callbacks and adjacent scene actor batch
+
+Coverage is **19.656%**, up **0.072 percentage points** from 19.584%:
+**22 additional exact functions**, 5,509 / 11,109. Reported code spans:
+474,762 / 2,415,354 bytes. The batch completes pooled actor drawable/timer,
+state dispatch, damage and creation helpers, then adjacent scene actor resource
+lookup, list management, allocation, motion/graphics/effect setup, registration,
+destruction and callback dispatch. Provisional names and contiguous report
+groups are in the subsystem CSVs. Combined validation log:
+`build/pooled-callbacks-combined.log`.
+
+**Stopped matching at 19% weekly allowance remaining**, below the user's 20%
+floor. The 20% matching target is unfinished (0.344 percentage points remain).
+Resume after allowance is replenished or the user changes the floor. Main
+already contains PR52; this last batch must also be merged and pushed.
+
+Next contiguous function: **0802D9F8** scene actor movement/terrain-height and
+flash timer update; assembly reviewed, no candidate yet. Follow with 0802DB1C.
+Near matches retained outside production: `wip/sub_0802D44C.c` has five
+register-only differences (292-byte initializer; exact-size artifact
+build/check/run-l4re3ibr). `wip/sub_0802D334.c` is a less-close action setter.
+Do not count either as matched. Earlier WIP candidates remain as below.
+
 ## October 12 grid controller completion and pooled actor batch
 
 Coverage is **19.584%**, up **0.125 percentage points** from 19.459%:
