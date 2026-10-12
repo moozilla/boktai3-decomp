@@ -1,0 +1,251 @@
+{
+  "schema_version": 1,
+  "status": "complete",
+  "baseline_commit": "3c975f2",
+  "baseline_exact_functions": 4843,
+  "baseline_exact_bytes": 331578,
+  "account_weekly_used_percent_before_dispatch": 3,
+  "account_observed_utc": "2026-10-12 07:56:56 UTC",
+  "budget": {
+    "workers": 2,
+    "minutes_per_worker": 20,
+    "model": "gpt-6.1-sol",
+    "reasoning": "high",
+    "coordinator_role": "selection, review, integration only"
+  },
+  "comparison_limit": "Production pilot, not controlled model A/B; families and inherited assistance differ.",
+  "workers": [
+    {
+      "name": "sol_family_pilot",
+      "branch": "codex/pilot-sol-family-20261012",
+      "kind": "production",
+      "targets": [
+        {
+          "address": "08118B8C",
+          "inventory_span": 676,
+          "reviewed_body_bytes": 676
+        },
+        {
+          "address": "08118E30",
+          "inventory_span": 676,
+          "reviewed_body_bytes": 676
+        },
+        {
+          "address": "081190D4",
+          "inventory_span": 676,
+          "reviewed_body_bytes": 676
+        }
+      ],
+      "evidence": "Unseeded normalized loose-clone family; worker must audit body/pools before credit.",
+      "fallback": [
+        "080AD270",
+        "080C6010",
+        "080D1EA0"
+      ],
+      "stop": "Switch after ~8 minutes without improving hypothesis; end matching within 20 minutes.",
+      "status": "complete",
+      "result": {
+        "worker": "pilot-sol-family-20261012",
+        "base": "3c975f2",
+        "start_utc": "2026-10-12T07:58:29Z",
+        "matching_end_utc": "2026-10-12T08:12:03Z",
+        "committed_utc": "2026-10-12T08:12:51Z",
+        "elapsed_seconds_at_commits": 862,
+        "audited_primary": {
+          "08118B8C": [
+            "08118B8C",
+            "08118E30",
+            676
+          ],
+          "08118E30": [
+            "08118E30",
+            "081190D4",
+            676
+          ],
+          "081190D4": [
+            "081190D4",
+            "08119378",
+            676
+          ]
+        },
+        "audited_fallback": {
+          "080AD270": [
+            "080AD270",
+            "080AD40C",
+            412
+          ],
+          "080C6010": [
+            "080C6010",
+            "080C61AC",
+            412
+          ],
+          "080D1EA0": [
+            "080D1EA0",
+            "080D203C",
+            412
+          ]
+        },
+        "audited_opportunity_bytes": 3264,
+        "exact_new_functions": 3,
+        "exact_new_bytes": 1236,
+        "commits": [
+          "8592594",
+          "3660c2c",
+          "a8adacc"
+        ],
+        "complete_rom_log": "build/final-clean-full-build.log",
+        "complete_rom_result": "build/boktai3.gba: OK",
+        "candidate_checkpoints": 20,
+        "candidate_status_counts": {
+          "mismatch": 13,
+          "error": 1,
+          "match": 6
+        },
+        "primary_best_authored": "wip/sub_08118B8C_ptrs.c",
+        "primary_best_authored_result": "672 bytes, 440 different bytes; retained field addresses reproduced three-high-register prologue but owner/core allocation and offset reuse differed",
+        "source_manifest": "wip/source-manifest.json",
+        "inherited_assistance": [
+          "Repository instructions and existing exact helper sources 081188C8, 0811BCBC, 0811CCB0",
+          "No exact family seed or other-worker candidates",
+          "Bounded 60-second permuter trial suggested inline accessor for fallback flag"
+        ],
+        "concrete_failures": [
+          "Ghidra export absent",
+          "Primary array layout, raw owner, nested pointer initialization and register keyword hypotheses did not solve allocation",
+          "Primary permuter low score reordered Div calls; not promoted or credited",
+          "Volatile fallback test introduced an extra byte load and did not solve address retention; final source has no volatile",
+          "Permuter emitted AST assertion warnings on anonymous typeof struct manipulation; accessor suggestion remained reviewable"
+        ],
+        "evidence": [
+          "Fallback family normalized assembly is equal except preparation helper targets 080B1E60, 080C4F9C, 080DA678",
+          "Owner flags +0 and embedded +0x20/+8 observed in exact stores; snapshot field copy/reset layout shared by all three exact consumers",
+          "08072188 ignores incoming r0 and reads globals: final declaration/call void(void)",
+          "No semantic renames, data definitions, ROM literal addresses, register pinning or handwritten asm"
+        ],
+        "tool_feedback": "Compact hunks reduced output and exposed retained flag pointer; reviewed sizes prevented false prefix acceptance. candidate.py then lacked hunks, requiring a second check to inspect each meaningful checkpoint. Alternatives with filename suffix need explicit target for permute.py. No tooling edits."
+      }
+    },
+    {
+      "name": "sol_diagnostic_pilot",
+      "branch": "codex/pilot-sol-diagnostic-20261012",
+      "kind": "diagnostic",
+      "targets": [
+        {
+          "address": "08160EA4",
+          "inventory_span": 1060,
+          "reviewed_body_bytes": 1060
+        },
+        {
+          "address": "081616D0",
+          "inventory_span": 1060,
+          "reviewed_body_bytes": 1060
+        },
+        {
+          "address": "08161AF4",
+          "inventory_span": 1060,
+          "reviewed_body_bytes": 1060
+        },
+        {
+          "address": "08161F18",
+          "inventory_span": 1060,
+          "reviewed_body_bytes": 1060
+        }
+      ],
+      "evidence": "Retained 1060-byte seed with four instruction differences; prior typed/prologue probes failed.",
+      "stop": "At most three new diagnostic hypotheses; stop by 8-10 minutes if none useful; no unrelated fallback.",
+      "status": "complete",
+      "result": {
+        "new_exact_bytes": 0,
+        "new_exact_functions": 0,
+        "matching_seconds": 318,
+        "checks": 16,
+        "diagnostic_compilations": 6,
+        "hypotheses": 3,
+        "source_probes": 7,
+        "commits": [],
+        "baseline_build": "OK",
+        "best_source_sha256": "cf35be38b1bb1ee6a4f7ab1f8ee13a38f83afb950c4e49361d83fd5b1b354822",
+        "remaining_different_bytes": 5,
+        "remaining_instruction_sites": 4,
+        "disposition": "Park: three hypotheses disproven; no further allocation retries without new evidence."
+      }
+    }
+  ],
+  "compact_output_measurement": {
+    "target": "0818DB10",
+    "legacy_rows": 159,
+    "compact_rows": 47,
+    "legacy_characters": 13991,
+    "compact_characters": 3190,
+    "character_reduction_percent": 77.2,
+    "limits": "One real nonmatching candidate; character count is not tokens, model cost, or matching yield."
+  },
+  "account_weekly_used_percent_after_workers": 6,
+  "account_meter_limits": "Rounded account-wide readings, including coordinator; not worker-specific billing. Closeout may add usage.",
+  "new_exact_functions": 3,
+  "new_exact_bytes": 1236,
+  "final_exact_functions": 4846,
+  "final_exact_bytes": 332814,
+  "usage_snapshot": {
+    "root_turn": "01a12f1c-65ca-7c61-8897-918ec39c127a",
+    "rows": [
+      {
+        "thread": "01a12f1e-a0f5-7ad3-b9b8-1dfbd97cf24f",
+        "model": "gpt-6.1-sol",
+        "reasoning": "high",
+        "responses": 50,
+        "input_tokens": 5836878,
+        "cached_input_tokens": 5622272,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 23136,
+        "reasoning_output_tokens": 6927,
+        "total_tokens": 5860014,
+        "uncached_input_tokens": 214606
+      },
+      {
+        "thread": "01a12eff-ac1c-7203-a534-8f7febd9a4f0",
+        "model": "gpt-6-astra",
+        "reasoning": "low",
+        "responses": 39,
+        "input_tokens": 6446584,
+        "cached_input_tokens": 6356480,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 20436,
+        "reasoning_output_tokens": 7034,
+        "total_tokens": 6467020,
+        "uncached_input_tokens": 90104
+      },
+      {
+        "thread": "01a12f1f-078a-74d2-bd59-c06be0f5eb31",
+        "model": "gpt-6.1-sol",
+        "reasoning": "high",
+        "responses": 18,
+        "input_tokens": 1429302,
+        "cached_input_tokens": 1273216,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 10198,
+        "reasoning_output_tokens": 3291,
+        "total_tokens": 1439500,
+        "uncached_input_tokens": 156086
+      }
+    ],
+    "limits": "Recorded per-response usage; reasoning is included in output. Not subscription allocation or dollars. Snapshot excludes later responses and final closeout."
+  },
+  "next": "Prefer a fresh related family with bounded seed work; park diagnostic residue. Do not expand concurrency based on this small heterogeneous pilot.",
+  "integration": {
+    "pull_request": "https://github.com/moozilla/boktai3-decomp/pull/19",
+    "validated_source_commit": "090c62b",
+    "exact_checks": {
+      "080AD270": 412,
+      "080C6010": 412,
+      "080D1EA0": 412
+    },
+    "original_sha1": "2651c5e6875ac60abff734510d152166d211c87c",
+    "combined_full_build": "build/boktai3.gba: OK",
+    "shift_bytes": 65536,
+    "shifted_sha1": "c208e82ae4996ba6e2066a724421190f5cf26a02",
+    "shift_evidence": "Identical to previously tested shifted ROM; reuse 35 screenshots, no new emulator run.",
+    "wip_branch": "codex/wip-motion-2026-10-12",
+    "wip_commit": "30d59fb"
+  }
+}

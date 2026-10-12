@@ -7,15 +7,18 @@
 Compiles the file exactly as build.py does, links it alone at the address of
 its first function (every other symbol resolved from the last full build's
 build/boktai3.elf), and compares the bytes with baserom.gba. Prints a
-side-by-side disassembly with mismatching lines marked '!'. Exit status 0 on
+compact aligned disassembly hunks (or --full), with differences marked '!'. Exit status 0 on
 a match. A full `tools/build.py` run is still needed before committing (it
 checks the layout of the whole ROM); this is the fast inner loop.
 """
 import argparse
+import difflib
+import hashlib
+import json
 import os
 import re
-import subprocess
 import sys
+import tempfile
 
 import build
 from romlib import ROOT, load_rom, off
@@ -117,17 +120,67 @@ def link_object(obj, elf, *, syms=None, address=None):
     return addr, [n for _, n in defined]
 
 
+def comparison(orig, mine, addr, *, arm=False, target_size=None):
+    """Byte acceptance is independent of the human-readable alignment."""
+    different = [addr + i for i in range(max(len(orig), len(mine)))
+                 if orig[i:i + 1] != mine[i:i + 1]]
+    return {
+        "status": "match" if orig == mine else "mismatch",
+        "address": addr, "candidate_bytes": len(mine),
+        "target_bytes": target_size,
+        "extent_basis": "reviewed" if target_size is not None else "candidate-length",
+        "size_delta": len(mine) - target_size if target_size is not None else None,
+        "different_byte_count": len(different), "different_addresses": different,
+        "original_sha256": hashlib.sha256(orig).hexdigest(),
+        "candidate_sha256": hashlib.sha256(mine).hexdigest(),
+        "original": disasm(orig, addr, arm=arm),
+        "candidate": disasm(mine, addr, arm=arm),
+    }
+
+
+def render_diff(result, context=3, full=False):
+    """Align decoded instructions; retain both addresses and literal differences.
+
+    Pools are not classified as instructions: this remains a decoded-byte view,
+    and the independent byte summary is authoritative.
+    """
+    left, right = result["original"], result["candidate"]
+    matcher = difflib.SequenceMatcher(None, [x[1] for x in left],
+                                    [x[1] for x in right], autojunk=False)
+    groups = [matcher.get_opcodes()] if full else matcher.get_grouped_opcodes(context)
+    lines = []
+    for group in groups:
+        lines.append("@@ original / candidate @@")
+        for tag, a, b, c, d in group:
+            for i in range(max(b - a, d - c)):
+                x = left[a + i] if a + i < b else None
+                y = right[c + i] if c + i < d else None
+                fmt = lambda v: f"{v[0]:08X} {v[1]}" if v else ""
+                lines.append(f"{' ' if tag == 'equal' else '!'} {fmt(x):48} | {fmt(y)}")
+    if not lines and result["different_byte_count"]:
+        lines.append("Decoded text is identical; resolved bytes differ (see byte addresses in JSON).")
+    return "\n".join(lines)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("src")
     ap.add_argument("--quiet", action="store_true")
+    ap.add_argument("--full", action="store_true", help="show all decoded rows")
+    ap.add_argument("--context", type=int, default=3)
+    ap.add_argument("--json", action="store_true", help="machine-readable comparison")
+    ap.add_argument("--target-size", type=lambda v: int(v, 0),
+                    help="reviewed body plus pool/padding extent, in bytes")
     a = ap.parse_args()
+    if a.context < 0 or (a.target_size is not None and a.target_size <= 0):
+        ap.error("context must be nonnegative and target size must be positive")
     src = a.src
     if not src.endswith(".c"):
         src = os.path.join("src", "fn", src + ".c")
     src = os.path.relpath(os.path.join(ROOT, src), ROOT)
-    work = os.path.join("build", "check")
-    os.makedirs(os.path.join(ROOT, work), exist_ok=True)
+    parent = os.path.join(ROOT, "build", "check")
+    os.makedirs(parent, exist_ok=True)
+    work = os.path.relpath(tempfile.mkdtemp(prefix="run-", dir=parent), ROOT)
     base = os.path.join(work, os.path.basename(src)[:-2])
     obj = base + ".o"
     build.build_c(src, obj)
@@ -135,18 +188,24 @@ def main():
     build.sh(["arm-none-eabi-objcopy", "-O", "binary", "-j", ".text", base + ".elf", base + ".bin"])
     mine = open(os.path.join(ROOT, base + ".bin"), "rb").read()
     rom = load_rom(verify=False)
-    orig = rom[off(addr):off(addr) + len(mine)]
-    ok = mine == orig
-    if not ok or not a.quiet:
-        arm = os.path.basename(build.compiler_for(src)) == "agbcc_arm"
-        la, lb = disasm(orig, addr, arm=arm), disasm(mine, addr, arm=arm)
-        n = max(len(la), len(lb))
-        print(f"{'address':8}  {'original':38} {'yours':38}")
-        for i in range(n):
-            x = la[i] if i < len(la) else (0, "")
-            y = lb[i] if i < len(lb) else (0, "")
-            mark = " " if x[1] == y[1] and x[0] == y[0] else "!"
-            print(f"{(x[0] or y[0]):08X}{mark} {x[1]:38.38} {y[1]:38.38}")
+    extent = a.target_size if a.target_size is not None else len(mine)
+    if off(addr) < 0 or off(addr) + extent > len(rom):
+        sys.exit("target extent outside ROM")
+    orig = rom[off(addr):off(addr) + extent]
+    arm = os.path.basename(build.compiler_for(src)) == "agbcc_arm"
+    result = comparison(orig, mine, addr, arm=arm, target_size=a.target_size)
+    result.update(functions=defined, artifacts=work)
+    ok = result["status"] == "match"
+    with open(os.path.join(ROOT, work, "comparison.json"), "w") as f:
+        json.dump(result, f, indent=2)
+    with open(os.path.join(ROOT, work, "full.diff"), "w") as f:
+        f.write(render_diff(result, full=True) + "\n")
+    if a.json:
+        print(json.dumps(result))
+        sys.exit(0 if ok else 1)
+    if not a.quiet and (not ok or a.full):
+        print(render_diff(result, context=a.context, full=a.full))
+    print(f"{result['different_byte_count']} differing bytes; extent={result['extent_basis']}; artifacts: {work}")
     names = ", ".join(defined)
     print(f"{names}: {'MATCH' if ok else 'MISMATCH'} ({len(mine)} bytes at 0x{addr:08X})")
     sys.exit(0 if ok else 1)
