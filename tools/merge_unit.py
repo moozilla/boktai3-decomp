@@ -25,13 +25,22 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 def items(text):
     """Top-level items: preprocessor lines, comments and declarations/definitions."""
     out, cur, depth = [], [], 0
-    for line in text.split("\n"):
+    lines = text.split("\n")
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        i += 1
+        while line.rstrip().endswith("\\") and i < len(lines):  # one logical line
+            line += "\n" + lines[i]
+            i += 1
         if not cur and not line.strip():
             continue
         if not cur and line.startswith("#"):
             out.append(line)
             continue
         cur.append(line)
+        if line.lstrip().startswith("#"):
+            continue  # a directive inside a definition doesn't change nesting
         code = re.sub(r"//.*|\"(\\.|[^\"])*\"|'(\\.|[^'])*'", "", line)
         depth += code.count("{") + code.count("(") - code.count("}") - code.count(")")
         s = code.strip()
