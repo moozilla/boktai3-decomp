@@ -6,8 +6,8 @@ struct Manager {u8 task[24];void *animation;};extern struct Manager *gUnk_020004
 void sub_08220C8C(void *,void *,u32,u32,u32);void sub_0822B2F8(u32);void sub_0821FF24(void *,void *,u32);void sub_0821FE40(void *);
 static inline void setFrame(struct Sprite *sprite,u16 frame){sprite->frame=frame;}
 void sub_0800CC34(void *);void sub_08015F60(u32,void *,u32,u32,u32,u32,u32,u32,u32,u32);extern u32 gUnk_03005308;extern u16 gUnk_0203B400[];
-static inline u32 randomValue(void){register u32 offset asm("r0");gUnk_03005308=(gUnk_03005308+1)&1023;offset=gUnk_03005308*2;asm("" : : "r"(offset));return *(u16 *)(offset+(u32)gUnk_0203B400);}
-static inline void setState(struct Object *object,u32 state){register u32 value asm("r0")=state;register u32 zero asm("r1")=0;asm("" : : "r"(value),"r"(zero));object->state=value;object->timer=zero;object->entered=1;}
+static inline u32 randomValue(void){u32 offset;gUnk_03005308=(gUnk_03005308+1)&1023;offset=gUnk_03005308*2;return *(u16 *)(offset+(u32)gUnk_0203B400);}
+static inline void setState(struct Object *object,u32 state){u32 value=state;u32 zero=0;object->state=value;object->timer=zero;object->entered=1;}
 struct PackedVec {s32 x:16,y:16,z:16,pad:16;};
 s32 sub_08015C30(void *,u32,u32,u32,u32,u32,u32,u32);
 #define FallingObject_SpawnFinishParticles sub_0800D5C0

@@ -52,50 +52,43 @@ void sub_082216F8(void*,void*,void*,int,int);
 void sub_08039998(void*,int,int);
 extern struct Owner *gUnk_02000100;
 int sub_0803A618(int indexArg,int amountArg,int pendingArg) {
-  register int index asm("r12")=indexArg;
-  register int amount asm("r8")=amountArg;
-  register int pendingFlag asm("r9")=pendingArg;
-  register struct Owner *owner asm("r3")=gUnk_02000100;
+  int index=indexArg;
+  int amount=amountArg;
+  int pendingFlag=pendingArg;
+  struct Owner *owner=gUnk_02000100;
   struct Item *target;
   if(!owner)return -1;
   if(amount<=0) {
-    register int result asm("r0")=0;
-    asm("" : "+r"(result));
+    int result=0;
     return result;
   }
    {
-    register int size asm("r0")=0xb0;
-    register int scaled asm("r1");
+    int size=0xb0;
+    int scaled;
     register int extra asm("r2");
-    register int offset asm("r0");
-    asm("" : "+r"(size));
+    int offset;
     scaled=index*size;
     extra=0x89c;
-    asm("" : "+r"(scaled),"+r"(extra));
     offset=scaled+extra;
     target=(struct Item*)((u8*)owner+offset);
     if(target->count) {
       struct Item *current;
       register u8 *first asm("r1");
-      register u8 *second asm("r6");
+      u8 *second;
       register u8 *dest asm("r5");
       register int total asm("r2");
       extra=0x5dc;
-      asm("" : "+r"(extra));
       offset=scaled+extra;
       current=(struct Item*)((u8*)owner+offset);
       if(target->unused) {
         first=owner->pending;
          {
           register int slot asm("r0")=index;
-          asm("" : "+r"(slot));
           dest=first+slot;
         }
         total=*dest;
-        asm("" : "+r"(total));
         total+=target->count;
         second=first;
-        asm("" : "+r"(second));
         if(total>255)total=255;
         *dest=total;
         first=owner->current;
@@ -104,23 +97,21 @@ int sub_0803A618(int indexArg,int amountArg,int pendingArg) {
         first=owner->current;
          {
           register int slot asm("r2")=index;
-          asm("" : "+r"(slot));
           dest=first+slot;
         }
         total=*dest;
-        asm("" : "+r"(total));
         total+=target->count;
         if(total>255)total=255;
         *dest=total;
         second=owner->pending;
       }
        {
-        register int slot asm("r2")=index;
+        int slot=index;
         register u8*address asm("r0");
-        register int a asm("r3");
-        register int b asm("r2");
+        int a;
+        int b;
         register int one asm("r0");
-        register int zero asm("r1");
+        int zero;
         asm("" : "+r"(slot));
         address=first+slot;
         a=*address;
@@ -135,13 +126,11 @@ int sub_0803A618(int indexArg,int amountArg,int pendingArg) {
          {
           register int value asm("r0")=a+b;
           int clear;
-          asm("" : "+r"(value));
           if(value>10)value=10;
           clear=0;
           asm("" : "+r"(clear));
           current->count=value;
           value=0;
-          asm("" : "+r"(value));
           current->unused=value;
           target->count=clear;
         }
@@ -150,15 +139,12 @@ int sub_0803A618(int indexArg,int amountArg,int pendingArg) {
   }
    {
     register int value asm("r1")=amount;
-    register int zero asm("r0");
-    asm("" : "+r"(value));
+    int zero;
     if(value>10)value=10;
     else if(value<0)value=0;
     zero=0;
-    asm("" : "+r"(zero));
     target->count=value;
     value=pendingFlag;
-    asm("" : "+r"(value));
     target->unused=value;
     target->state=5;
     target->entered=1;

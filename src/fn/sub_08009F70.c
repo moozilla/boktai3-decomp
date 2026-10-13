@@ -7,19 +7,19 @@ struct Graphics {u32 pad;u16 base;};
 struct Manager {u8 pad[28];void *graphics;struct Graphics *animationGraphics;u32 pad24;void *animationResource;};
 extern u32 gUnk_03005308;extern u16 gUnk_0203B400[];
 void sub_08217EC4(void *,s32,s32);void sub_08217EEC(void *,void *,u32);void sub_08220C8C(void *,void *,u32,u32,u32);
-static inline u32 randomDelay(u32 restart){gUnk_03005308=(gUnk_03005308+1)&1023;{register u32 offset asm("r0")=gUnk_03005308*2;register u32 value asm("r0");asm("" : : "r"(offset));if(restart){register u16 *table asm("r2")=gUnk_0203B400;asm("" : : "r"(table));value=*(u16 *)(offset+(u32)table);}else value=*(u16 *)((u8 *)gUnk_0203B400+offset);asm("" : : "r"(value));value&=127;value+=120;asm("" : : "r"(value));return value;}}
+static inline u32 randomDelay(u32 restart){gUnk_03005308=(gUnk_03005308+1)&1023;{u32 offset=gUnk_03005308*2;u32 value;if(restart){register u16 *table asm("r2")=gUnk_0203B400;value=*(u16 *)(offset+(u32)table);}else value=*(u16 *)((u8 *)gUnk_0203B400+offset);value&=127;value+=120;return value;}}
 #define CollisionController_UpdateIdleAnimation sub_08009F70
 void CollisionController_UpdateIdleAnimation(struct Manager *manager,struct Slot *p){
  struct Sprite *o;struct Anim *a;const u16 *entry;register u16 n asm("r0");u8 done;
  if(p->entered){p->entered=0;sub_08217EC4(&p->sprite,-4,-4);sub_08217EEC(&p->sprite,manager->animationGraphics,0);sub_08220C8C(&p->anim,manager->animationResource,8,0,0);p->sprite.flags&=~1;p->delay=randomDelay(0);}
- {register u32 flags asm("r0")=p->sprite.flags;register u32 low asm("r2")=1;register u32 firstMask asm("ip");asm("" : : "r"(flags),"r"(low));firstMask=low;
+ {u32 flags=p->sprite.flags;register u32 low asm("r2")=1;register u32 firstMask asm("ip");firstMask=low;
  if(flags&low){
   if(p->timer++>p->delay){p->timer=0;p->delay=randomDelay(1);sub_08217EC4(&p->sprite,-4,-4);sub_08217EEC(&p->sprite,manager->animationGraphics,0);sub_08220C8C(&p->anim,manager->animationResource,8,0,0);p->sprite.flags&=~1;}
  }else{
- o=&p->sprite;{register struct Graphics *graphics asm("r3")=manager->animationGraphics;asm("" : : "r"(graphics));a=&p->anim;entry=a->data+a->frame;
- {register u32 factor asm("r2")=*entry>>6;asm("" : : "r"(factor));o->tile=(o->width>>3)*(o->height>>3)*factor+graphics->base;}}
- {register u32 input asm("r0")=a->flags;register u32 left asm("r1")=firstMask;left&=input;asm("" : "+r"(firstMask)); if(left!=(((*entry&0x30)>>4)&firstMask))o->flags|=4;else o->flags&=~4;}
- {register u32 input asm("r0")=a->flags;register u32 mask asm("r3")=2; register u32 left asm("r1")=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
+ o=&p->sprite;{struct Graphics *graphics=manager->animationGraphics;a=&p->anim;entry=a->data+a->frame;
+ {u32 factor=*entry>>6;o->tile=(o->width>>3)*(o->height>>3)*factor+graphics->base;}}
+ {u32 input=a->flags;register u32 left asm("r1")=firstMask;left&=input;if(left!=(((*entry&0x30)>>4)&firstMask))o->flags|=4;else o->flags&=~4;}
+ {register u32 input asm("r0")=a->flags;u32 mask=2; u32 left=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
  n=++a->timer;
  if(n>=a->rate) {
  a->timer=0;

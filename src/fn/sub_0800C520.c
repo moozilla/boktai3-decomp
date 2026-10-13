@@ -5,7 +5,7 @@ struct Sprite {u32 flags;u8 pad4[12];u16 frame;u8 pad12[10];struct Vec position;
 struct Object {u8 task[32];void *scene;s16 health;u16 maximum,cooldown,phase,timer,flash;u8 rising,pad31;s16 baseY,offset;u16 count,kind,pad3A;u8 resource[28];struct Sprite sprite;u8 shadow[64];u16 collision[4];};
 struct World {u8 pad[0x5a0];void *scene;};extern struct World *gUnk_02000710;extern u16 gUnk_08604AB4[];
 void sub_08013440(void *);void sub_08013424(void *);void sub_08215284(void *,u32);
-static inline s32 isVisible(void *scene){register void *saved asm("r1")=scene;register s32 result asm("r0");asm("" : : "r"(saved));if(gUnk_02000710->scene==saved){result=1;asm("" : : "r"(result));}else {result=0;asm("" : : "r"(result));}return result;}
+static inline s32 isVisible(void *scene){void *saved=scene;s32 result;if(gUnk_02000710->scene==saved){result=1;asm("" : : "r"(result));}else {result=0;}return result;}
 static inline void setFrame(struct Sprite *sprite,u16 frame){sprite->frame=frame;}
 #define EffectEmitter_Update sub_0800C520
 s32 EffectEmitter_Update(struct Object *object){

@@ -10,14 +10,14 @@ void sub_0800EC0C(Screen*);void sub_0800EE5C(Screen*);void sub_0800EF90(Screen*)
 void sub_082156B8(int);
 #define StatusScreen_FadeAndExit sub_0800EC0C
 void StatusScreen_FadeAndExit(Screen *p){
- int factor=32-p->timer,bank,i;register int blueMask asm("r10");register u16 *buffer asm("r9");
- bank=0;buffer=p->buffer;blueMask=31744;asm("" : "+r"(blueMask) : "r"(buffer));
+ int factor=32-p->timer,bank,i;int blueMask;register u16 *buffer asm("r9");
+ bank=0;buffer=p->buffer;blueMask=31744;
  for(;bank<2;bank++)for(i=0;i<16;i++){
- {register int index asm("r6")=i;asm("" : "=r"(index) : "0"(index));i=index;}{
+ {register int index asm("r6")=i;i=index;}{
   register u16 *out asm("r4")=&buffer[bank*16+i];register int color asm("r1")=*out;
   int r=((color&31)*factor)&0x7C0;
   int g=((color&992)*factor)&0xF800;
-  register int blue asm("r0")=color&blueMask;asm("" : "+r"(blue));{int b=(blue*factor)&0x1F0000;
+  int blue=color&blueMask;{int b=(blue*factor)&0x1F0000;
   *out=(r|g|b)>>6;}}
  }
  if(++p->timer>31){sub_082156B8(0);sub_0821AD08(p->script,p->args);sub_0821A0C0(p);}else p->dirty|=15;

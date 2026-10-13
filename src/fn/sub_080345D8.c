@@ -129,7 +129,7 @@ reset5:
   reset(p, 5, 0);
   goto done;
 mode: {
-  register int mode asm("r1") = gUnk_03006A80->mode;
+  int mode = gUnk_03006A80->mode;
   if (!mode)
     reset(p, 5, mode);
   else
@@ -137,36 +137,32 @@ mode: {
 }
   goto done;
 selectedAdd: {
-  register u8 *slot asm("r2") = &p->selected;
+  u8 *slot = &p->selected;
   register int incoming asm("r1");
   incoming = gUnk_03005390.bits;
   *slot = *slot | incoming;
 }
   goto done;
 selectedRemove: {
-  register u8 *slot asm("r2") = &p->selected;
-  register int incoming asm("r1");
+  u8 *slot = &p->selected;
+  int incoming;
   incoming = gUnk_03005390.bits;
   *slot = *slot & ~incoming;
 }
   goto done;
 release: {
   register struct Message *message asm("r2") = &gUnk_03005390;
-  register u8 *selected asm("r3");
+  u8 *selected;
   int incoming;
-  asm("" : "+r"(message));
   incoming = message->bits;
   p->bits &= ~incoming;
   selected = &p->selected;
-  asm("" : "+r"(selected));
   incoming = message->bits;
   *selected &= ~incoming;
   {
-    register int zero asm("r1") = p->bits;
-    asm("" : "+r"(zero));
+    int zero = p->bits;
     if (!zero) {
-      register int op asm("r0") = 11;
-      asm("" : "+r"(op));
+      int op = 11;
       p->flag = zero;
       p->operation = op;
       p->ticks = zero;
@@ -177,21 +173,17 @@ release: {
   goto done;
 releaseOther: {
   register struct Message *message asm("r2") = &gUnk_03005390;
-  register u8 *selected asm("r3");
+  u8 *selected;
   int incoming;
-  asm("" : "+r"(message));
   incoming = message->bits;
   p->bits &= ~incoming;
   selected = &p->selected;
-  asm("" : "+r"(selected));
   incoming = message->bits;
   *selected &= ~incoming;
   {
-    register int zero asm("r1") = p->bits;
-    asm("" : "+r"(zero));
+    int zero = p->bits;
     if (!zero) {
-      register int op asm("r0") = 11;
-      asm("" : "+r"(op));
+      int op = 11;
       p->flag = zero;
       p->operation = op;
       p->ticks = zero;

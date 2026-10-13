@@ -23,7 +23,6 @@ const u8 *sub_08032254(struct Tag *p, const u8 *s) {
     int c = *s;
     if (c == '=') {
       register int one asm("r0") = 1;
-      asm("" : "+r"(one));
       p->hasValue = one;
     } else if (p->hasValue) {
       length = p->length;

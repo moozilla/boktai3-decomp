@@ -34,10 +34,10 @@ void sub_08038838(struct P *p)
     u32 data;
     if (p->entered) {
         struct Entry *e;
-        register u32 packed asm("r10");
-        register int total asm("r9");
+        u32 packed;
+        int total;
         register int i asm("r12");
-        register int shift asm("r8");
+        int shift;
         register u8 *q asm("r5");
         p->entered = 0;
         data = 0;
@@ -53,12 +53,10 @@ void sub_08038838(struct P *p)
             if (flag) {
                 value = *q;
             } else {
-                register int old asm("r0") = *q;
+                int old = *q;
                 register u8 *score asm("r1");
                 register int n asm("r2");
-                asm("" : "+r"(old));
                 score = p->scores;
-                asm("" : "+r"(score));
                 score += i;
                 n = *score;
                 value = old + n;
@@ -87,8 +85,7 @@ void sub_08038838(struct P *p)
         u32 zero;
         sub_08037F5C(p);
         {
-            register u32 mask asm("r1") = ~12;
-            asm("" : "+r"(mask));
+            u32 mask = ~12;
             p->flags &= mask;
         }
         five = 5;

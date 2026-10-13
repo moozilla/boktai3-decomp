@@ -31,7 +31,7 @@ void sub_081E8EA8(struct S *p) {
  o=&p->obj;a=&p->anim;entry=a->data+a->frame;
  o->frame=*entry>>6;
  {u32 input=a->flags;register u32 mask asm("r3")=1; register u32 left asm("r1")=(u8)(input&mask); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=4;else o->flags&=~4;}
- {register u32 input asm("r0")=a->flags;register u32 mask asm("r3")=2; register u32 left asm("r1")=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
+ {register u32 input asm("r0")=a->flags;u32 mask=2; u32 left=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
  n=++a->timer;
  if(n>=a->rate) {
  a->timer=0;

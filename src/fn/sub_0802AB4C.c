@@ -57,12 +57,12 @@ int sub_0802AB4C(struct Actor *p) {
   struct Packed size;
   {
     register int offset asm("r1") = 0x178;
-    register int *damagePtr asm("r2") = (int *)((u8 *)p + offset);
+    int *damagePtr = (int *)((u8 *)p + offset);
     asm("" ::"r"(damagePtr), "r"(offset));
     damage = *damagePtr;
     {
       register int off asm("r3") = 0x17c;
-      register u8 *specialPtr asm("r1") = (u8 *)p + off;
+      u8 *specialPtr = (u8 *)p + off;
       register int value asm("r0");
       asm("" ::"r"(specialPtr), "r"(off));
       value = *specialPtr;
@@ -74,22 +74,20 @@ int sub_0802AB4C(struct Actor *p) {
   }
   if (damage > 0) {
     register int react asm("r8") = 0;
-    asm("" : "+r"(react));
     p->common.health -= damage;
     {
       register int offset asm("r1") = 0x198;
-      register int *accum asm("r2") = (int *)((u8 *)p + offset);
+      int *accum = (int *)((u8 *)p + offset);
       asm("" ::"r"(accum), "r"(offset));
       {
         register int value asm("r0") = *accum + damage;
         *accum = value;
         {
           register int off asm("r3") = 0x19c;
-          register int *threshold asm("r1") = (int *)((u8 *)p + off);
+          int *threshold = (int *)((u8 *)p + off);
           asm("" ::"r"(threshold), "r"(off));
           if (value >= *threshold) {
             value = react;
-            asm("" : "+r"(value));
             *accum = value;
             {
               register int one asm("r1") = 1;
@@ -134,9 +132,8 @@ int sub_0802AB4C(struct Actor *p) {
     p->shake = 3;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     {
-      register u32 index asm("r0") = gUnk_03005308 * 2;
+      u32 index = gUnk_03005308 * 2;
       u32 value;
-      asm("" : "+r"(index));
       value = *(u16 *)((u8 *)gUnk_0203B400 + index);
       p->angle = value;
     }

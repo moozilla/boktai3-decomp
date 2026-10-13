@@ -19,9 +19,9 @@ void sub_081E53C4(void)
         if (g == 0) return;
     }
 if(Script_SeekToKeyword(0x70)){H(0xdf8)=Script_GetValue();H(0xdfa)=Script_GetValue();H(0xdfc)=Script_GetValue();}
- else{{register u32 value asm("r1")=OWNER(0x30);H(0xdf8)=value;}{register u32 value asm("r0")=OWNER(0x32)+160;H(0xdfa)=value;}{register u32 value asm("r1")=OWNER(0x34);H(0xdfc)=value;}}
+ else{{u32 value=OWNER(0x30);H(0xdf8)=value;}{u32 value=OWNER(0x32)+160;H(0xdfa)=value;}{u32 value=OWNER(0x34);H(0xdfc)=value;}}
     g->b = g->xa;
-    {register u32 mode asm("r2")=2;g->xa=mode;}
+    {u32 mode=2;g->xa=mode;}
     {register u32 raw asm("r1")=*(u16*)((u8*)g+0xf5a);register u32 mask asm("r2")=15;
     *(u16*)((u8*)g+0xf5a)=(mask&raw)|0xe0;
     if(g->b==3){register u32 bits asm("r0")=mode_bits((u8*)g+0xf5a,mask);if(bits==3){g->d=g->e2c;g->e=g->e32;}}}

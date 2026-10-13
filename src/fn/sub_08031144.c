@@ -89,7 +89,6 @@ int sub_08031144(int mode, int step, int flags) {
   {
     u8 *dst = &p->scrollMode;
     int zero;
-    asm("" : "+r"(dst));
     zero = 0;
     *dst = mode;
     p->scrollStep = step;

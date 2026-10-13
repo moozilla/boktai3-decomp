@@ -20,10 +20,10 @@ void CollisionController_UpdateHitAnimation(struct Manager *manager,struct Slot 
   sub_0800AC44(p->kind,p->type|16,p->attack,&p->sprite.position,&effect,p->range,p->script);
   if(p->type==2)sub_0822B3BC(696);else sub_0822B3BC(285);
  }
- o=&p->sprite;{register struct Graphics *graphics asm("r3")=manager->graphics;asm("" : : "r"(graphics));a=&p->anim;entry=a->data+a->frame;
- {register u32 factor asm("r2")=*entry>>6;asm("" : : "r"(factor));o->tile=(o->width>>3)*(o->height>>3)*factor+graphics->base;}}
+ o=&p->sprite;{struct Graphics *graphics=manager->graphics;a=&p->anim;entry=a->data+a->frame;
+ {u32 factor=*entry>>6;o->tile=(o->width>>3)*(o->height>>3)*factor+graphics->base;}}
  {u32 input=a->flags;register u32 mask asm("r3")=1; register u32 left asm("r1")=(u8)(input&mask); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=4;else o->flags&=~4;}
- {register u32 input asm("r0")=a->flags;register u32 mask asm("r3")=2; register u32 left asm("r1")=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
+ {register u32 input asm("r0")=a->flags;u32 mask=2; u32 left=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
  n=++a->timer;
  if(n>=a->rate) {
  a->timer=0;

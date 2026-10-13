@@ -18,7 +18,7 @@ void sub_081E4A60(void)
     B(0xf76)=sub_0821ABA8(0x70,0);
     if(W(0xddc)&1)return;
     g->b = g->xa;
-    {register u32 mode asm("r2")=3;g->xa=mode;}
+    {u32 mode=3;g->xa=mode;}
     {register u32 raw asm("r1")=*(u16*)((u8*)g+0xf5a);register u32 mask asm("r2")=15;
     *(u16*)((u8*)g+0xf5a)=(mask&raw)|0x90;
     if(g->b==3){register u32 bits asm("r0")=mode_bits((u8*)g+0xf5a,mask);if(bits==3){g->d=g->e2c;g->e=g->e32;}}}

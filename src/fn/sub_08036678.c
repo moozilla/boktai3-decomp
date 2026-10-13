@@ -63,20 +63,18 @@ static inline void publishInputs(struct Engine *p) {
   int enabled = p->flag31;
   if (enabled) {
     register int i asm("r5");
-    register int valid asm("r12");
+    int valid;
     int mask;
-    register u16 *output asm("r3");
-    register int invalid asm("r6");
+    u16 *output;
+    int invalid;
     register u16 *history asm("r4");
     gUnk_03005250 = 1;
     i = 0;
     {
-      register int initial asm("r1") = 0x2000;
-      asm("" : "+r"(initial));
+      int initial = 0x2000;
       valid = initial;
     }
     mask = 4095;
-    asm("" : "+r"(mask));
     output = gUnk_03005274;
     {
       register int initial asm("r1") = 65535;
@@ -88,14 +86,11 @@ static inline void publishInputs(struct Engine *p) {
       register int value asm("r2") = *history;
       register int test asm("r1") = valid;
       register int result asm("r1");
-      asm("" : "+r"(test));
       if (value & test) {
         result = mask;
-        asm("" : "+r"(result));
         result &= value;
       } else
         result = *output | invalid;
-      asm("" : "+r"(result));
       *output = result;
       output++;
       history++;

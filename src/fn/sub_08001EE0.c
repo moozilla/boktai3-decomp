@@ -22,7 +22,7 @@ s32 Background_LoadMapsFromScript(void)
     resource.tiles+=(u32)base;
     resource.extra+=(u32)base;
     target=sub_0821ABA8('t',1);
-    if(Script_SeekToKeyword('o')) {u8 *cursor; x=({register s32 value asm("r0")=nextShift();asm("" : "+r"(value));value;}); cursor=Script_GetPc(); if(cursor)y=sub_0821AA00(cursor)<<7;else y=0;} else {register s32 zero asm("r2")=0; asm("" : "+r"(zero));x=zero;y=0;}
+    if(Script_SeekToKeyword('o')) {u8 *cursor; x=({s32 value=nextShift();asm("" : "+r"(value));value;}); cursor=Script_GetPc(); if(cursor)y=sub_0821AA00(cursor)<<7;else y=0;} else {register s32 zero asm("r2")=0; asm("" : "+r"(zero));x=zero;y=0;}
     n=sub_0821ABA8('n',1);
     explicitIndices=0;
     if(Script_SeekToKeyword('i')) {

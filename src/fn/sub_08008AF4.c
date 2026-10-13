@@ -13,7 +13,7 @@ s32 Breakable_InitSlot(struct Manager *manager,struct Slot *slot){
  u32 fill;struct Vec dimensions,scale,offset;void *resource;void *drawable;void *collider;register struct Vec *d asm("r5");
  slot->resource=manager->resource;resource=slot->resource;
  asm("" : "=m"(fill));
- {d=&dimensions;asm("" : : "r"(d));fill=0;{register u32 *source asm("r0")=&fill;register struct Vec *dest asm("r1")=d;asm("" : : "r"(source),"r"(dest));CpuSet(source,dest,0x05000002);}}
+ {d=&dimensions;fill=0;{u32 *source=&fill;struct Vec *dest=d;asm("" : : "r"(source),"r"(dest));CpuSet(source,dest,0x05000002);}}
  drawable=slot->drawable;
  sub_08219918(drawable,resource,0,1,2,0,60,d);
  sub_08220D78(drawable,slot->resource,0,1,0);

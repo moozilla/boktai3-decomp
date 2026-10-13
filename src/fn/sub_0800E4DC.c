@@ -8,7 +8,7 @@ void NumericDisplay_DrawStatusValues(void){
  int digits[2];s16 *dst;int row,col;register int *values asm("r12");int left=sub_08228D88(),right=sub_08228D94();
  digits[0]=Div(left,10);digits[1]=left-digits[0]*10;
  dst=sub_0800E3E0(0,16,11);
- row=0;values=digits;asm("" : "+r"(values));
+ row=0;values=digits;
  for(;row<2;row++){
   int shift=row<<4;int *digit=values;s16 *out=dst;
   for(col=0;col<2;col++){int tile=*digit++ +32;*out++=shift+tile | -12288;}
@@ -17,7 +17,7 @@ void NumericDisplay_DrawStatusValues(void){
 
  digits[0]=Div(right,10);digits[1]=right-digits[0]*10;
  dst=sub_0800E3E0(0,20,11);
- row=0;values=digits;asm("" : "+r"(values));
+ row=0;values=digits;
  for(;row<2;){
   int next=row+1;row<<=4;
   {

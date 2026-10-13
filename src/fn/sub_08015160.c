@@ -10,13 +10,13 @@ static inline int scale8(int a,int b){int x=a*b;if(x>=0)return x>>8;return -((-x
 static inline int scale12(int a,int b){int x=a*b;if(x>=0)return x>>12;return -((-x)>>12);}
 static inline u32 frame_factor(u16 v){register u32 value asm("r1")=v;u32 mask=15;return mask&value;}
 #define AnimatedParticleManager_Update sub_08015160
-int AnimatedParticleManager_Update(struct Manager*m){struct Obj*sprites=&m->pieces[0].sprite;struct Piece*cursor=m->pieces,*base=cursor;int i;asm("" : "+r"(base));for(i=31;i>=0;sprites=(void*)((u8*)sprites+120),base++,cursor++,i--){if(cursor->active){struct Piece*p=base;struct Obj*o=sprites;struct Anim*a;const u16*entry;register u16 n asm("r0");int done;asm("" : "+r"(o));
+int AnimatedParticleManager_Update(struct Manager*m){struct Obj*sprites=&m->pieces[0].sprite;struct Piece*cursor=m->pieces,*base=cursor;int i;for(i=31;i>=0;sprites=(void*)((u8*)sprites+120),base++,cursor++,i--){if(cursor->active){struct Piece*p=base;struct Obj*o=sprites;struct Anim*a;const u16*entry;register u16 n asm("r0");int done;
 if(cursor->timer>=cursor->horizontalStart){p->horizontalScale=scale8(cursor->horizontalScale,cursor->horizontalDecay);p->velocity.x=scale12(p->direction.x,p->horizontalScale);p->velocity.z=scale12(p->direction.z,p->horizontalScale);}
 if(p->timer>=p->verticalStart){p->verticalScale=scale8(p->verticalScale,p->verticalDecay);p->velocity.y=scale12(p->direction.y,p->verticalScale);}
 o->position.x+=p->velocity.x;o->position.y+=p->velocity.y;if(!(o->flags&16))o->position.z+=p->velocity.z;
 a=&p->anim;entry=a->data+a->frame;o->frame=*entry>>6;
- {register u32 input asm("r0")=a->flags;register u32 left asm("r2")=1;u32 mask=1;asm("" : : "r"(input));left&=input;asm("" : "+r"(left)); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=4;else o->flags&=~4;}
- {register u32 input asm("r0")=a->flags;register u32 mask asm("r3")=2; register u32 left asm("r1")=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
+ {u32 input=a->flags;register u32 left asm("r2")=1;u32 mask=1;left&=input;if(left!=(((*entry&0x30)>>4)&mask))o->flags|=4;else o->flags&=~4;}
+ {register u32 input asm("r0")=a->flags;u32 mask=2; register u32 left asm("r1")=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
  n=++a->timer;
  if(n>=a->rate) {
  a->timer=0;

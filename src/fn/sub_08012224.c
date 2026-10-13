@@ -10,7 +10,7 @@ static inline u32 frame_factor(u16 v){register u32 value asm("r1")=v;u32 mask=15
 void AnimatedHazard_AnimateAttack(u8*m,struct Piece*p){struct Obj*o;struct Anim*a;const u16*entry;register u16 n asm("r0");int done;if(sub_08012058(m,p)){p->sprite.flags&=~1;sub_08220C8C(&p->anim,*(void**)(m+0x34),0,0,0);sub_0822B3BC(0x34D);}
  o=&p->sprite;a=&p->anim;entry=a->data+a->frame;o->frame=*entry>>6;
  {u32 input=a->flags;register u32 mask asm("r3")=1; register u32 left asm("r1")=(u8)(input&mask); if(left!=(((*entry&0x30)>>4)&mask))p->sprite.flags|=4;else p->sprite.flags&=~4;}
- {register u32 input asm("r0")=a->flags;register u32 mask asm("r3")=2; register u32 left asm("r1")=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
+ {register u32 input asm("r0")=a->flags;u32 mask=2; u32 left=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
  n=++a->timer;
  if(n>=a->rate) {
  a->timer=0;

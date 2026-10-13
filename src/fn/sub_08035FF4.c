@@ -55,9 +55,9 @@ void sub_08035FF4(struct Engine *p) {
       if (callback)
         sub_0824923C((u8 *)p + 0xB8, callback);
       {
-        register struct NIComm *send asm("r2") = &slots[*slot]->send;
-        register u8 *original asm("r0") = &send->bmSlotOrg;
-        register int old asm("r3") = *original;
+        struct NIComm *send = &slots[*slot]->send;
+        u8 *original = &send->bmSlotOrg;
+        int old = *original;
         {
           register int current asm("r0") = send->bmSlot;
           asm("" : "+r"(current));
@@ -72,9 +72,9 @@ void sub_08035FF4(struct Engine *p) {
       if (callback)
         sub_08249238(callback);
       {
-        register struct NIComm *send asm("r2") = &slots[*slot]->send;
-        register u8 *original asm("r0") = &send->bmSlotOrg;
-        register int old asm("r3") = *original;
+        struct NIComm *send = &slots[*slot]->send;
+        u8 *original = &send->bmSlotOrg;
+        int old = *original;
         {
           register int current asm("r0") = send->bmSlot;
           asm("" : "+r"(current));
@@ -87,7 +87,6 @@ void sub_08035FF4(struct Engine *p) {
     }
     if (lost) {
       lost |= p->flag35;
-      asm("" : "+r"(lost));
       p->flag35 = lost;
     }
   }

@@ -25,7 +25,7 @@ static inline s32 groundHeight(struct Vec *position){
 
 #define Breakable_ScriptCreate sub_080091C8
 s32 Breakable_ScriptCreate(void){
- struct Vec position;register struct Manager *manager asm("r8")=gUnk_02000034;struct Slot *slot;s32 placed;void *drawable;
+ struct Vec position;struct Manager *manager=gUnk_02000034;struct Slot *slot;s32 placed;void *drawable;
  if(!manager)goto fail;asm("" : : "r"(manager));
  slot=sub_08008A70(manager);if(!slot)goto fail;
  slot->motion=0;placed=0;
@@ -48,18 +48,18 @@ s32 Breakable_ScriptCreate(void){
  slot->id=sub_0821ABA8('n',0);slot->kind=sub_0821ABA8('D',0);
  slot->resource=&manager->resources[slot->kind];
  slot->script=sub_0821ABA8('p',0);slot->arg=sub_0821ABA8('a',0);
- {u32 motion=slot->motion;register struct Resource **resource asm("r7")=&slot->resource;asm("" : : "r"(resource));
+ {u32 motion=slot->motion;register struct Resource **resource asm("r7")=&slot->resource;
  if(motion!=2)position.y=groundHeight(&position);
  if(sub_0821ABA8('M',0))slot->region=sub_0822C034(&position);else slot->region=-1;
  slot->drawable.position=position;slot->drawable.flags&=~1;
  if(slot->state==1){
   drawable=&slot->drawable;
-  {register struct Resource *res asm("r1")=*resource;asm("" : : "r"(res));sub_08220D78(drawable,res,gUnk_086049CE[slot->kind][0],1,0);}
+  {struct Resource *res=*resource;sub_08220D78(drawable,res,gUnk_086049CE[slot->kind][0],1,0);}
   if(slot->kind!=2)sub_08219A80(drawable,gUnk_086049DA[slot->kind]+1);
   else sub_08219A80(drawable,gUnk_086049DA[2]);
  }else{
   drawable=&slot->drawable;
-  {register struct Resource *res asm("r1")=*resource;asm("" : : "r"(res));sub_08220D78(drawable,res,gUnk_086049CE[slot->kind][1],1,0);}
+  {struct Resource *res=*resource;sub_08220D78(drawable,res,gUnk_086049CE[slot->kind][1],1,0);}
   sub_08219A80(drawable,gUnk_086049DA[slot->kind]);
  }
  sub_08214424(drawable,0);slot->active=1;return 0;}

@@ -65,16 +65,13 @@ run:
   result = sub_08218E5C(p->x, p->y, p->width, p->height);
   {
     register void *fn asm("r2") = sub_080317CC;
-    register void **dst asm("r1");
-    asm("" : "+r"(fn));
+    void **dst;
     dst = &p->callback;
-    asm("" : "+r"(dst));
     *dst = fn;
   }
   p->flags |= 1;
   {
     register struct State *state asm("r2") = &p->state;
-    asm("" : "+r"(state));
     state->current = -1;
   }
   p->render.flags |= 1;

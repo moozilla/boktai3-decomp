@@ -11,7 +11,7 @@ struct S {u8 p0[0xddc];struct Obj obj;u8 p1a[0xe08 - 0xe00];u8 effect[0xe24 - 0x
 void sub_08220C8C(void *,u32,u32,u32,u32);
 void sub_081E4188(void *);void sub_08013440(void *);void sub_081E41EC(void *);
 static inline u8 take(struct S *p) {s32 m=1;register s32 v asm("r1")=p->flags;if(v&m) {p->flags=~m&v;p->done=0;return 1;}return 0;}
-static inline u32 mode_bits(u8 *p,u32 mask){register u32 v asm("r1")=*p;register u32 result asm("r0")=mask&v;return result;}
+static inline u32 mode_bits(u8 *p,u32 mask){register u32 v asm("r1")=*p;u32 result=mask&v;return result;}
 static inline u32 frame_factor(u16 v) {register u32 value asm("r1")=v;u32 mask=15;return mask&value;}
 struct Child {void (*fn)(void*,void*);u8 pad;u8 flags;u8 rest[0xdc-6];};void sub_081E5608(void*,void*);void sub_08056CC0(void);void sub_081E4174(void*);void sub_08215284(void*,s32);void sub_0822B2F8(s32);void sub_0821AD08(void*,s32);void sub_08013424(void*);void ActorPalette_BeginFade(void*);
 extern u8 gUnk_03005430[];extern const s16 gUnk_086149C4[];u8 sub_082215E4(s32,s32);void sub_081E41B0(void*);
@@ -19,7 +19,7 @@ static inline void set_direction(s16 angle,u8 *directionOut,u8 *flipOut){registe
  while(angle<0)angle+=256;
  while(angle>255)angle-=256;
  {register s32 shifted asm("r0")=angle-16;direction=(shifted>>5)&7;}
- {register s32 choice asm("r0")=direction;
+ {s32 choice=direction;
  if(choice==4)*directionOut=0;
  else if(choice==0)*directionOut=4;
  else if(choice<4){*directionOut=4-direction;*flipOut=1;}
@@ -40,7 +40,7 @@ void Actor_MoveAlongCurveToRest(struct S*p){
  o=&p->obj;a=&p->anim;entry=a->data+a->frame;
  o->frame=*entry>>6;
  {u32 input=a->flags;register u32 mask asm("r3")=1; register u32 left asm("r1")=(u8)(input&mask); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=4;else o->flags&=~4;}
- {register u32 input asm("r0")=a->flags;register u32 mask asm("r3")=2; register u32 left asm("r1")=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
+ {register u32 input asm("r0")=a->flags;u32 mask=2; u32 left=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
  n=++a->timer;
  if(n>=a->rate) {
  a->timer=0;
@@ -59,7 +59,7 @@ void Actor_MoveAlongCurveToRest(struct S*p){
  p->done=done;
  if(p->timer++>31){
  p->obj.x=p->targetX;p->obj.y=p->targetY;
- p->oldMode=p->mode;{register u32 mode asm("r2")=3;p->mode=mode;}
+ p->oldMode=p->mode;{u32 mode=3;p->mode=mode;}
  {register u32 raw asm("r1")=*(u16*)((u8*)p+0xf5a);register u32 mask asm("r2")=15;*(u16*)((u8*)p+0xf5a)=(mask&raw)|16;
  if(p->oldMode==3){register u32 bits asm("r0")=mode_bits((u8*)p+0xf5a,mask);if(bits==3){p->savedFrame=p->anim.frame;p->savedTimer=p->anim.timer;}}}
  {register s32 mask asm("r0")=1;register s32 v asm("r1")=p->flags;p->flags=mask|v;}

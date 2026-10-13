@@ -23,7 +23,7 @@ s32 Trigger_TryOpenNearby(struct Actor *actor){
  for(p=manager->head;p;){
   struct State *state;
   if((p->flags&1)||*(u16 *)&p->actor!=511)goto next;
-  {register struct Vec *point asm("r3")=&actor->position;asm("" : : "r"(point));if(!nearby(p->position,point,actor))goto next;}
+  {struct Vec *point=&actor->position;if(!nearby(p->position,point,actor))goto next;}
   state=gUnk_02000580[index];
   if(state&&state->mode==6&&p->condition==1){
    if(!manager->soundDelay){sub_0822B2F8(402);manager->soundDelay=15;
@@ -32,7 +32,7 @@ next: p=p->next;
   }else{
   p->actor=index;sub_0822B3BC(271);p->update=sub_08007908;p->timer=0;p->started=0;
   sub_08220C8C(p->animation,manager->resource,5,0,0);
-  {register s32 event asm("r2");
+  {s32 event;
    if(gUnk_030053F4&2048)event=1;
    else event=sub_0822D490(p->id,p->kind)==1;
    sub_08006F00(p,p->script,event);}

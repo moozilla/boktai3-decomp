@@ -38,7 +38,7 @@ int sub_0803092C(struct Actor *p) {
     p->render.flags |= 1;
   } else {
     struct Frames *f;
-    register struct Frames *initial asm("r4");
+    struct Frames *initial;
     struct Render *r;
     u16 *word;
     p->render.flags &= ~1;
@@ -90,14 +90,13 @@ int sub_0803092C(struct Actor *p) {
     sub_08220C8C(initial, p->resource, (u16)state->current, 0, 0);
     r = &p->render;
     f = initial;
-    asm("" : "+r"(f));
     word = f->data + f->index;
     r->tile = *word >> 6;
     {
-      register int settings asm("r1") = f->flags;
-      register int mask asm("r4") = 1;
+      int settings = f->flags;
+      int mask = 1;
       register int mine asm("r2");
-      register int bits asm("r1");
+      int bits;
       asm("" : "+r"(mask));
       mine = mask & settings;
       bits = (*word & 48) >> 4;
@@ -108,10 +107,10 @@ int sub_0803092C(struct Actor *p) {
         r->flags &= ~4;
     }
     {
-      register int settings asm("r1") = f->flags;
-      register int mask asm("r4") = 2;
+      int settings = f->flags;
+      int mask = 2;
       register int mine asm("r2");
-      register int bits asm("r1");
+      int bits;
       asm("" : "+r"(mask));
       mine = mask & settings;
       asm("" : "+r"(mine));
@@ -125,7 +124,7 @@ int sub_0803092C(struct Actor *p) {
     }
     {
       register u32 mask asm("r6");
-      register int duration asm("r3");
+      int duration;
       register int savedDuration asm("r4");
       u32 timer = f->timer + 1;
       f->timer = timer;
@@ -137,10 +136,9 @@ int sub_0803092C(struct Actor *p) {
       duration = f->duration;
       timer = (u16)timer;
       savedDuration = duration;
-      asm("" : "+r"(savedDuration));
       if (timer >= (u32)duration) {
         register u32 flags asm("r2");
-        register int index asm("r1");
+        int index;
         f->timer = 0;
         flags = f->flags;
         if (flags & 4) {
@@ -159,11 +157,9 @@ int sub_0803092C(struct Actor *p) {
           index = f->index + 1;
           f->index = index;
           count = f->count;
-          asm("" : "+r"(count), "+r"(index));
           if ((index & mask) < count)
             goto update;
           index = flags & 8;
-          asm("" : "+r"(index));
           index = (u8)index;
           if (index) {
             f->timer = duration;
@@ -176,8 +172,7 @@ int sub_0803092C(struct Actor *p) {
         word = f->data + f->index;
         {
           register u32 value asm("r2") = *word;
-          register u32 low asm("r1") = 15;
-          asm("" : "+r"(value));
+          u32 low = 15;
           low &= value;
           f->multiplier = low;
         }

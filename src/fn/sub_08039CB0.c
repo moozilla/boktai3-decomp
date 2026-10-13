@@ -49,28 +49,25 @@ void sub_08039920(void*,int,int);
 void sub_082216F8(void*,void*,void*,int,int);
 void sub_08039998(void*,int,int);
 void sub_08039CB0(struct Owner *owner,struct Item *p,int indexArg)  {
-  register int index asm("r6")=indexArg;
+  int index=indexArg;
   struct Sprite *sprite=&p->sprite;
   struct Drawing *drawing=&p->drawing;
   if(p->entered)  {
-    register int choice asm("r0");
-    register int y asm("r3");
+    int choice;
+    int y;
     register void*draw asm("r3");
-    register void*resource asm("r4");
+    void*resource;
     p->entered=0;
     sprite->value=p->count;
     sprite->flags&=~1;
     draw=drawing;
     resource=owner->resource;
-    asm("" : "+r"(draw),"+r"(resource));
     if(index>7)choice=(index&3)+4;
     else choice=index&3;
-    asm("" : "+r"(choice));
     sub_0821980C(draw,resource,gUnk_0824DE7C[choice],0);
     *(u32*)((u8*)p+0x58)&=~1;
     {
-      register struct Vec*end asm("r2")=&p->end;
-      asm("" : "+r"(end));
+      struct Vec*end=&p->end;
       y=128;
       if(index>7)y=144;
       p->end.x=gUnk_0824DE8C[index&3]+80;
@@ -84,23 +81,20 @@ void sub_08039CB0(struct Owner *owner,struct Item *p,int indexArg)  {
   *(struct Pair*)&sprite->x=*(struct Pair*)&drawing->x;
   if(p->timer>31)  {
     register int offset asm("r0")=(index&~4)*0xb0+0x5c;
-    register struct Item*target asm("r2");
-    register int count asm("r3");
-    asm("" : "+r"(offset));
+    struct Item*target;
+    int count;
     target=(struct Item*)((u8*)owner+offset);
     count=p->count;
     if(target->state==1)count+=target->count;
     {
-      register int one asm("r0")=1;
-      register int zero asm("r1")=0;
-      asm("" : "+r"(one),"+r"(zero));
+      int one=1;
+      int zero=0;
       target->state=one;
       target->entered=one;
       target->timer=zero;
     }
     {
       register int value asm("r0")=count;
-      asm("" : "+r"(value));
       if(value>10)value=10;
       else if(value<0)value=0;
       {
@@ -108,7 +102,6 @@ void sub_08039CB0(struct Owner *owner,struct Item *p,int indexArg)  {
         asm("" : "+r"(zero));
         target->count=value;
         value=0;
-        asm("" : "+r"(value));
         target->unused=value;
         target->type=8;
         p->state=zero;

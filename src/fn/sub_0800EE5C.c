@@ -15,7 +15,7 @@ void StatusScreen_FadeOutPalette(Screen *p){
   for(i=p->start;i<p->end;i++){
    u16 *source=&p->source[base+i],*dest=&p->buffer[base+i];
    register int color asm("r1")=*source;
-   int r;int g;int b;asm("" : "+r"(color));
+   int r;int g;int b;
    r=(factor*red+(color&31)*other)&0x1F00;
    g=(factor*green+(color&992)*other)&0x3E000;
    b=(factor*blue+(color&31744)*other)&0x7C0000;

@@ -7,7 +7,7 @@ struct S {u8 p0[0xddc];struct Obj obj;u8 p1a[0xe08 - 0xdfc];u8 effect[0xe24 - 0x
 void sub_08220C8C(void *,u32,u32,u32,u32);
 void sub_081E4188(void *);void sub_08013440(void *);void sub_081E41EC(void *);
 static inline u8 take(struct S *p) {s32 m=1;register s32 v asm("r1")=p->flags;if(v&m) {p->flags=~m&v;p->done=0;return 1;}return 0;}
-static inline u32 mode_bits(u8 *p,u32 mask){register u32 v asm("r1")=*p;register u32 result asm("r0")=mask&v;return result;}
+static inline u32 mode_bits(u8 *p,u32 mask){register u32 v asm("r1")=*p;u32 result=mask&v;return result;}
 static inline u32 frame_factor(u16 v) {register u32 value asm("r1")=v;u32 mask=15;return mask&value;}
 struct Child {void (*fn)(void*,void*);u8 pad;u8 flags;u8 rest[0xdc-6];};void sub_081E5608(void*,void*);void sub_08056CC0(void);void sub_081E4174(void*);void sub_08215284(void*,s32);void sub_0822B2F8(s32);void sub_0821AD08(void*,s32);void sub_08013424(void*);void sub_081E34D0(void*);
 s32 Mod(s32,s32);void sub_08015C30(void*,s32,s32,s32,s32,s32,s32,s32);void sub_080148CC(s32,s32,void*,s32,s32,s32,s32,s32,s32,s32,s32);
@@ -19,7 +19,7 @@ void sub_081E7F80(struct S *p) {
  o=&p->obj;a=&p->anim;entry=a->data+a->frame;
  o->frame=*entry>>6;
  {u32 input=a->flags;register u32 mask asm("r3")=1; register u32 left asm("r1")=(u8)(input&mask); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=4;else o->flags&=~4;}
- {register u32 input asm("r0")=a->flags;register u32 mask asm("r3")=2; register u32 left asm("r1")=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
+ {register u32 input asm("r0")=a->flags;u32 mask=2; u32 left=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
  n=++a->timer;
  if(n>=a->rate) {
  a->timer=0;
@@ -40,7 +40,7 @@ void sub_081E7F80(struct S *p) {
  if(Mod(++*(u16*)((u8*)p+0xf80),*(s16*)((u8*)p+0xf82))==0){
  *(u16*)((u8*)p+0xf80)=0;
  if(p->obj.flags&1)p->obj.flags&=~1;else p->obj.flags|=1;
- if(--*(u16*)((u8*)p+0xf82)==0){register s32 duration asm("r5")=10;
+ if(--*(u16*)((u8*)p+0xf82)==0){s32 duration=10;
 sub_08015C30((u8*)p+0xdf8,1,512,48,8,8,8,4);
 sub_08015C30((u8*)p+0xdf8,1,512,48,8,8,8,4);
 sub_08015C30((u8*)p+0xdf8,1,512,48,8,8,8,4);
@@ -55,10 +55,10 @@ sub_080148CC(1,3,(u8*)p+0xdf8,224,60,duration,3,duration,5,60,duration);
 sub_080148CC(1,3,(u8*)p+0xdf8,256,60,duration,3,duration,5,60,duration);
 sub_08013440(p->p2);
 p->obj.flags|=1;
- p->oldMode=p->mode;{register u32 mode asm("r2")=1;p->mode=mode;}{register u32 raw asm("r1")=*(u16*)((u8*)p+0xf5a);register u32 mask asm("r2")=15;*(u16*)((u8*)p+0xf5a)=(mask&raw)|32;
+ p->oldMode=p->mode;{u32 mode=1;p->mode=mode;}{register u32 raw asm("r1")=*(u16*)((u8*)p+0xf5a);register u32 mask asm("r2")=15;*(u16*)((u8*)p+0xf5a)=(mask&raw)|32;
  if(p->oldMode==3){register u32 bits asm("r0")=mode_bits((u8*)p+0xf5a,mask);if(bits==3){p->savedFrame=p->anim.frame;p->savedTimer=p->anim.timer;}}}
  {register s32 mask asm("r0")=1;register s32 v asm("r1")=p->flags;p->flags=mask|v;}
- {register u32 active asm("r6")=4;register void (*fn)(void*,void*) asm("r4")=sub_081E5608;register u32 reset asm("r5")=1;register struct Child *child asm("r1")=(struct Child*)((u8*)p+0xc8);/* MATCHING_CONCESSION: retain the original unused zero-register initialization. */register s32 reserved asm("r7")=0;s32 i;for(i=15;i>=0;i--){register u32 v asm("r2")=child->flags;if(active&v){register u32 flags asm("r0");child->fn=fn;flags=reset|v;child->flags=flags;}child++;}}
+ {u32 active=4;register void (*fn)(void*,void*) asm("r4")=sub_081E5608;u32 reset=1;struct Child *child=(struct Child*)((u8*)p+0xc8);/* MATCHING_CONCESSION: retain the original unused zero-register initialization. */register s32 reserved asm("r7")=0;s32 i;for(i=15;i>=0;i--){register u32 v asm("r2")=child->flags;if(active&v){u32 flags;child->fn=fn;flags=reset|v;child->flags=flags;}child++;}}
  }
 }
 }

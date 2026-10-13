@@ -6,7 +6,7 @@ s32 sub_0821ABA8(s32,s32);
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 s32 sub_08005830(u32,s32,u32,struct Vec *,u32,s32,s32,s32,s32,u32);
-#define RESOURCE(value) ({register s32 result asm("r1")=(value);asm("" : "+r"(result));result;})
+#define RESOURCE(value) ({s32 result=(value);asm("" : "+r"(result));result;})
 s32 SceneObjects_CreateFromScript(void)
 {
     struct Vec position;

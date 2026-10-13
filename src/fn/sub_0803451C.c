@@ -40,16 +40,14 @@ void sub_0803451C(struct Engine *p) {
   int changed = 0;
   if (p->mask & 2) {
     struct RfuSlotStatusNI **slots = gUnk_03006A70;
-    register int slot asm("r3") = p->mode;
-    register struct NIComm *s asm("r2") = &slots[slot]->send;
+    int slot = p->mode;
+    struct NIComm *s = &slots[slot]->send;
     {
       int state;
-      asm("" : "+r"(s));
       state = s->state;
       if (state == 0x26) {
         register int original asm("r1") = s->bmSlotOrg;
         register int current asm("r0") = s->bmSlot;
-        asm("" : "+r"(current));
         changed = current ^ original;
         sub_08246AAC(4, slot);
         p->mask &= ~2;
@@ -60,7 +58,6 @@ void sub_0803451C(struct Engine *p) {
       } else if (state == 0x27) {
         register int original asm("r1") = s->bmSlotOrg;
         register int current asm("r0") = s->bmSlot;
-        asm("" : "+r"(current));
         changed = current ^ original;
         sub_08246AAC(4, slot);
         {

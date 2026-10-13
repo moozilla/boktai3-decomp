@@ -13,32 +13,32 @@ u8 *Text_FindChar(u8 *,s32);
     s32 found=0,length=0,value; \
     while(*cursor!='>'){ \
         if(!*cursor){cursor++;break;} \
-        if(*cursor=='=')found=({register s32 one asm("r4")=1;asm("" : : "r"(one));one;}); \
-        else if(({register s32 f asm("r0")=found;asm("" : : "r"(f));f;}))p->scratch[length++]=*cursor; \
+        if(*cursor=='=')found=({register s32 one asm("r4")=1;one;}); \
+        else if(({register s32 f asm("r0")=found;f;}))p->scratch[length++]=*cursor; \
         cursor++; \
     } \
     p->scratch[length]=0; \
-    if(({register s32 f asm("r1")=found;asm("" : : "r"(f));f;})&&length)value=sub_080321A0(p->scratch,length);else value=0; \
+    if(({register s32 f asm("r1")=found;f;})&&length)value=sub_080321A0(p->scratch,length);else value=0; \
     value; \
 })
 #define READ_WIDTH() ({ \
     s32 found=0,length=0; \
     while(*cursor!='>'){ \
         if(!*cursor){cursor++;break;} \
-        if(*cursor=='=')found=({register s32 one asm("r4")=1;asm("" : : "r"(one));one;}); \
-        else if(({register s32 f asm("r0")=found;asm("" : : "r"(f));f;}))p->scratch[length++]=*cursor; \
+        if(*cursor=='=')found=({register s32 one asm("r4")=1;one;}); \
+        else if(({register s32 f asm("r0")=found;f;}))p->scratch[length++]=*cursor; \
         cursor++; \
     } \
     p->scratch[length]=0; \
-    if(({register s32 f asm("r1")=found;asm("" : : "r"(f));f;})&&length){ \
+    if(({s32 f=found;f;})&&length){ \
         s32 value=sub_080321A0(p->scratch,length); \
         register u8 *out asm("r2")=&p->explicitWidth; \
         asm("" : : "r"(out));*out=value; \
     }else{ \
-        register s32 zero asm("r0")=0; \
+        s32 zero=0; \
         register u8 *out asm("r3"); \
-        asm("" : : "r"(zero));out=&p->explicitWidth; \
-        asm("" : : "r"(out));*out=zero; \
+out=&p->explicitWidth; \
+*out=zero; \
     } \
 })
 u8 *ChoiceMenu_ParseTag(struct Menu *p,u8 *text)
