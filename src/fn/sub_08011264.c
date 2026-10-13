@@ -1,19 +1,5 @@
-#include "global.h"
-struct Menu {
-    u8 pad[0x3c];
-    u8 lines[4][256];
-    u32 pad43c;
-    void *text;
-    int mainText, footerText, choiceText;
-};
-int sub_08033690(int, int, int, int);
-void sub_08033A38(int, int, void *);
-void TextWindow_SetScript(int, void *);
-void TextWindow_Refresh(int, int);
-void sub_080337FC(int);
-void *ScriptProc_Start(int, int);
-extern u16 gUnk_030051A0[];
-int MessageMenu_CreateTextWindows(struct Menu *m)
+#include "message_menu.h"
+int MessageMenu_CreateTextWindows(struct MessageMenu *m)
 {
     int *handle = &m->mainText;
     int i;

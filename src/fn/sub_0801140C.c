@@ -1,36 +1,7 @@
-#include "global.h"
-struct Resource {
-    u32 words[8];
-};
-struct Menu {
-    u8 task[24];
-    u32 timer;
-    u8 pad[6];
-    u16 script;
-    u8 formatter[24];
-    u8 lines[1024];
-    void *source, *text;
-    int handles[3];
-    void *map, *palette;
-    struct Resource resource;
-    u8 transition[96];
-};
-void *ScriptProc_Start(int, int);
-void ResourceHeader_Relocate(void *, void *);
-int Script_SeekToKeyword(int);
-int Script_GetPc(void);
-int Script_ParseStringRef(int);
-void *Text_LookupString(int);
-void *sub_08227E90(void);
-int Script_GetKeywordValue(int, int);
-void sub_08044E6C(void *);
-void sub_08044DD0(void *, void *, void *, int);
-void MessageMenu_LoadBackground(void *, int);
-int MessageMenu_CreateTextWindows(void *);
-void MessageMenu_InitializeTransition(void *);
-int MessageMenu_Initialize(struct Menu *m)
+#include "message_menu.h"
+int MessageMenu_Initialize(struct MessageMenu *m)
 {
-    struct Resource *r = ScriptProc_Start(0xCB05, 0xE2AB);
+    struct MenuResource *r = ScriptProc_Start(0xCB05, 0xE2AB);
     if (!r)
         return -1;
     m->resource = *r;

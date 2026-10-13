@@ -1,13 +1,11 @@
-#include "global.h"
-void sub_08033778(int);
-void Anim_Remove(void *);
-int MessageMenu_Destroy(u8 *m)
+#include "message_menu.h"
+int MessageMenu_Destroy(struct MessageMenu *m)
 {
-    int *handles = (int *)(m + 0x444);
+    int *handles = &m->mainText;
     int i = 2;
     do {
         sub_08033778(*handles++);
     } while (--i >= 0);
-    Anim_Remove(m + 0x478);
+    Anim_Remove(m->transition);
     return 0;
 }
