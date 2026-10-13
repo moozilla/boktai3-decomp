@@ -10,6 +10,27 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 continuation: dialogue interpreter and scrolling text
+
+Coverage is **20.230%**, up **0.229 percentage points** from 20.001%:
+**36 additional exact functions**, 5,595 / 11,109. Reported code spans are
+488,626 / 2,415,354 bytes (+5,520). Without register pinning: **16.016%**;
+register-pinned: **4.214%**, included above.
+
+Combined ROM validation printed **`build/boktai3.gba: OK`**.
+
+All named functions at **08031D40-080335D4** now match. This completes the
+text interpreter and scrolling dialogue controller; unnamed assembly tails
+remain assembly. The large tag parser, width counters, glyph dispatch and
+scroll/reveal loop are exact C. Descriptive names and contiguous objdiff groups
+cover task setup, text interpretation and scrolling control. See
+[batch notes](../notes/dialogue-vm_2026-10-12.md) for field meanings.
+
+Continue toward **25%**, under the latest user allowance. Work solo, no new
+tooling. Largest nearby gaps: dialogue initializer 0803198C, choice initializer
+080311F0 and input/window control 080313E4. Next contiguous area is the
+multi-window manager starting 080335F4. Do not count retained drafts as exact.
+
 ## October 12: 20% matching reached
 
 Coverage is **20.001%**, up **0.345 percentage points** from 19.656%:
