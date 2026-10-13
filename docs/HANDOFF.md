@@ -10,6 +10,33 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 renewed allowance: wireless menus and result panels
+
+Matching is **21.351%**, up **0.647 percentage points** from
+main at 20.704%. This batch adds **103 exact functions**: **5,781 / 11,109**,
+**515,710 / 2,415,354 reported span bytes** (+15,636). Without pinning:
+**16.294%**; Register-pinned: **5.057%**, included above. Names and nine
+contiguous objdiff groups describe the menu stretch; unmatched spans remain
+counted. See [menu notes](../notes/link-menus_2026-10-12.md).
+
+The charset utility, link status menu and peer panel now match all named
+functions. Packet exchange callbacks, trade handshake/countdown/outcome,
+selection-menu initialization, item movement and result-panel initialization
+are newly exact. The trade input handler also matches; several larger item
+callbacks remain. Following scene-object matching has begun.
+
+Combined ROM validation printed **`build/boktai3.gba: OK`**.
+The initial split detected overlapping standalone callbacks; redundant copies
+were removed before the successful combined build. Progress was deduplicated
+throughout.
+
+Latest user instruction replaces the former solo-only instruction and 5%
+stopping floor: use Sol 6.1 workers, escalate difficult drafts to Astra with
+medium reasoning, merge the combined batch around **1–2% remaining usage**,
+then continue until allowance is exhausted. **Do not redeem reset credits.**
+No new tooling. Per-unit fast checks and one combined build gate integration.
+Workers use separate build outputs and non-overlapping contiguous ranges.
+
 ## October 12 continuation: complete wireless controller
 
 Coverage is **20.704%**, up **0.298 percentage points** from 20.406%.
