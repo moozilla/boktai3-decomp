@@ -1,54 +1,5 @@
-#include "global.h"
 // MATCHING_CONCESSION: register-pinning
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct Sprite {
-    u32 flags;
-    u8 pad[12];
-    u16 frame;
-    u8 pad12[10];
-    struct Vec position;
-    u8 tail[8];
-};
-struct Indicator {
-    u8 pad0[8];
-    u32 timer;
-    int id;
-    u8 active;
-    s8 frame;
-    u8 animation, index, count, visible, mode, disabled;
-    int delay, period, value;
-    u16 times[8];
-    u8 effect[84];
-    struct Sprite sprite;
-};
-void Sound_PlaySongChecked(int);
-void Collider_Refresh(void *);
-static inline void setFrame(struct Sprite *s, int frame)
-{
-    s->frame = frame;
-}
-void *sub_08011884(void);
-struct Indicator *sub_08011C6C(void *, int);
-int Script_GetKeywordValue(int, int);
-struct Map {
-    u32 pad;
-    u8 *cells;
-    u8 pad8[28];
-    u16 rows[1];
-};
-extern struct Map *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC;
-void *sub_08011C4C(void *);
-int Script_SeekToKeyword(int);
-int Script_GetValue(void);
-int Script_GetPc(void);
-u8 *sub_0821D64C(int, int);
-int sub_0821DA14(void *);
-void sub_08214588(void *, void *);
-void Collider_SetPosition(void *, void *, int);
-void sub_0821FF50(void *, int, int);
+#include "scene_indicator.h"
 static inline int cellIndex(struct Vec *p)
 {
     int x = p->x >> 8, z = p->z >> 8;
@@ -65,10 +16,10 @@ static inline u8 *cell(int i)
 }
 int SceneIndicator_CreateFromScript(void)
 {
-    u8 *m = sub_08011884();
-    struct Indicator *p;
+    struct SceneIndicators *m = sub_08011884();
+    struct SceneIndicator *p;
     struct Vec *position;
-    struct Sprite *sprite;
+    struct IndicatorSprite *sprite;
     void *effect;
     if (!m)
         return -1;
@@ -168,7 +119,7 @@ int SceneIndicator_CreateFromScript(void)
         p->visible = Script_GetValue();
     }
     p->animation = Script_GetKeywordValue('E', 0);
-    sub_08214588(sprite, m + 28 + p->animation * 28);
+    sub_08214588(sprite, &m->animations[p->animation]);
     sprite->frame = p->frame + p->visible;
     Collider_SetPosition(effect, position, 0);
     if (Script_GetKeywordValue('v', 1))

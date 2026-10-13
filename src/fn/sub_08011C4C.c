@@ -1,15 +1,15 @@
-#include "global.h"
+#include "scene_indicator.h"
 
-u8 *sub_08011C4C(u8 *p)
+struct SceneIndicator *sub_08011C4C(struct SceneIndicators *p)
 {
-    u8 *q = p + 0x8C;
+    struct SceneIndicator *q = p->indicators;
     s32 i = 0;
     while (i <= 15) {
-        if (q[0x10] == 0) {
+        if (q->active == 0) {
             return q;
         }
         i++;
-        q += 0xB4;
+        q++;
     }
     return 0;
 }
