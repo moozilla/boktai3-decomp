@@ -156,8 +156,125 @@ void BoardPiece_UpdateAnimation(struct GroupPiece *p)
     p->angle += 4;
 }
 
+static inline void addPositionAt(struct GroupVec *d, struct GroupVec *dst, struct GroupVec *src)
+{
+    d->x += src->x;
+    dst->y += src->y;
+    dst->z += src->z;
+}
+
+#ifdef NONMATCHING
+// fuzzy: 81.6% (loop counter lives in a register, random table not hoisted into one)
+int sub_0800FC28(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
+{
+    struct GroupVec origin;
+    int i;
+    int radius0, radius1, radius2, direction, spread;
+    struct GroupPiece *p;
+    struct GroupPiece *r;
+    origin.x = cmd->originX;
+    origin.y = cmd->originY;
+    origin.z = cmd->originZ;
+    radius0 = cmd->radius0;
+    radius1 = cmd->radius1;
+    radius2 = cmd->radius2;
+    direction = cmd->direction;
+    spread = cmd->spread;
+    m->origin = origin;
+    m->timer = 0;
+    m->paletteActive = 1;
+    m->paletteMask = 63;
+    {
+        void *first = gUnk_030042E4 + 0x5A60;
+        void *second = gUnk_030042E4 + 0x5AA0;
+        sub_08221110(m->palette, first, second, 63, 6);
+    }
+    p = m->pieces;
+    r = p;
+    for (i = 0; i < 16; i++, p++, r++) {
+        p->state = 5;
+        p->active = 1;
+        p->timer = 0;
+        p->direction = direction;
+        if (spread != 0)
+            p->direction += Mod(randomValue(), spread);
+        p->duration = radius0;
+        polar(&r->position, p->direction, radius1);
+        addPositionAt(&p->position, &r->position, &origin);
+        polar(&r->target, p->direction, radius2);
+        addPositionAt(&p->target, &r->target, &origin);
+        p->angle = randomValue();
+        p->targetY = i * 16 + p->position.y;
+        p->speed = (randomValue() & 7) + 7;
+        p->sprite.position = p->position;
+        p->sprite.flags &= ~1;
+        sub_0800FA5C(m, r, 0);
+        AnimData_SelectTiles(&r->resource, 0x2D3);
+        p->resource.palette = m->palette;
+        ActorShadow_Enable(r->transform);
+    }
+    m->active = 1;
+    return 0;
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_0800FC28);
+#endif
+#ifdef NONMATCHING
+// fuzzy: 83.3% (same as sub_0800FC28, state 0)
+int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
+{
+    struct GroupVec origin;
+    int i;
+    int radius0, radius1, radius2, direction, spread;
+    struct GroupPiece *p;
+    struct GroupPiece *r;
+    origin.x = cmd->originX;
+    origin.y = cmd->originY;
+    origin.z = cmd->originZ;
+    radius0 = cmd->radius0;
+    radius1 = cmd->radius1;
+    radius2 = cmd->radius2;
+    direction = cmd->direction;
+    spread = cmd->spread;
+    m->origin = origin;
+    m->timer = 0;
+    m->paletteActive = 1;
+    m->paletteMask = 63;
+    {
+        void *first = gUnk_030042E4 + 0x5A60;
+        void *second = gUnk_030042E4 + 0x5AA0;
+        sub_08221110(m->palette, first, second, 63, 6);
+    }
+    p = m->pieces;
+    r = p;
+    for (i = 0; i < 16; i++, p++, r++) {
+        p->state = 0;
+        p->active = 1;
+        p->timer = 0;
+        p->direction = direction;
+        if (spread != 0)
+            p->direction += Mod(randomValue(), spread);
+        p->duration = radius0;
+        polar(&r->position, p->direction, radius1);
+        addPositionAt(&p->position, &r->position, &origin);
+        polar(&r->target, p->direction, radius2);
+        addPositionAt(&p->target, &r->target, &origin);
+        p->angle = randomValue();
+        p->targetY = i * 16 + p->position.y;
+        p->speed = (randomValue() & 7) + 7;
+        p->sprite.position = p->position;
+        p->sprite.flags &= ~1;
+        sub_0800FA5C(m, r, 0);
+        AnimData_SelectTiles(&r->resource, 0x2D3);
+        p->resource.palette = m->palette;
+        ActorShadow_Enable(r->transform);
+    }
+    m->active = 1;
+    return 0;
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_0800FE98);
+#endif
 INCLUDE_ASM("asm/nonmatching", sub_0801010C);
 INCLUDE_ASM("asm/nonmatching", sub_08010298);
 
@@ -215,17 +332,14 @@ static inline void addPosition(struct GroupVec *d, struct GroupVec *s)
     dst->z += src->z;
 }
 
-static inline void addVec(struct GroupVec *d, struct GroupVec *s)
+static inline struct GroupVec *addPositionN(struct GroupVec *d, struct GroupVec *s)
 {
-    struct GroupVec *dst = d;
     struct GroupVec *src = s;
-    {
-        u32 value = (u16)s->x;
-        value = value + (u16)d->x;
-        d->x = value;
-    }
+    struct GroupVec *dst = d;
+    d->x += s->x;
     dst->y += src->y;
     dst->z += src->z;
+    return dst;
 }
 
 // MATCHING_CONCESSION: register-pinning
@@ -246,9 +360,136 @@ void BoardPiece_Launch(struct GroupObjects *m, struct GroupPiece *p, int delay)
     p->timer++;
 }
 
+#ifdef NONMATCHING
+// fuzzy: 93.0% (register choice for random table/address/mask in the heading roll)
+void sub_08010514(struct GroupObjects *m, struct GroupPiece *p, int index)
+{
+    struct GroupVec delta;
+    struct GroupVec *moved;
+    struct GroupVec *origin;
+    const u16 *table;
+    if (p->active) {
+        p->active = 0;
+        p->heading = p->direction =
+            Math_Atan2(p->target.x - p->position.x, p->target.z - p->position.z);
+        table = gUnk_0203B400;
+        if (randomByte(table) <= 0x7F)
+            p->heading = p->heading + (0x40 - (randomWith(table) & 0x3F));
+        else
+            p->heading = p->heading + (0x40 + (randomWith(table) & 0x3F));
+        p->speed = (randomValue() & 3) + 4;
+    }
+    if (p->speed != 0) {
+        polar(&delta, p->heading, p->duration);
+        moved = addPositionN(&p->position, &delta);
+        origin = &m->origin;
+        p->direction = Math_Atan2(origin->x - p->position.x, origin->z - moved->z);
+        p->speed--;
+    }
+    sub_0800FA5C(m, p, 0);
+    if (p->timer > 0x5F) {
+        u32 t = 1;
+        p->state = t;
+        p->active = 1;
+        p->timer = 0;
+    }
+    p->timer++;
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_08010514);
-INCLUDE_ASM("asm/nonmatching", sub_0801068C);
-INCLUDE_ASM("asm/nonmatching", sub_08010860);
+#endif
+void sub_0801068C(struct GroupObjects *m, struct GroupPiece *p, int index)
+{
+    struct GroupVec delta;
+    struct GroupVec *position;
+    struct GroupVec *moved;
+    int dx, dz;
+    if (p->active) {
+        const u16 *table;
+        struct GroupVec *current;
+        struct GroupVec *origin;
+        p->active = 0;
+        current = &p->position;
+        origin = &m->origin;
+        p->direction = Math_Atan2(origin->x - p->position.x, origin->z - current->z);
+        p->heading = Math_Atan2(p->target.x - p->position.x, p->target.z - current->z);
+        table = gUnk_0203B400;
+        p->heading += (randomWith(table) & 31) - 16;
+        p->speed = (randomWith(table) & 15) + 16;
+    }
+    position = &p->position;
+    dx = p->target.x - p->position.x;
+    dz = p->target.z - position->z;
+    if (dx * dx + dz * dz <= 0x9C3F) {
+        u32 t = 2;
+        p->state = t;
+        p->active = 1;
+        p->timer = 0;
+    } else {
+        if (p->speed == 0) {
+            const u16 *table;
+            p->heading = Math_Atan2(dx, dz);
+            table = gUnk_0203B400;
+            p->heading += (randomWith(table) & 31) - 16;
+            p->speed = (randomWith(table) & 31) + 32;
+        } else
+            p->speed--;
+        polar(&delta, p->heading, p->duration);
+        moved = addPositionN(&p->position, &delta);
+        {
+            struct GroupVec *origin = &m->origin;
+            p->direction = Math_Atan2(origin->x - p->position.x, origin->z - moved->z);
+        }
+        sub_0800FA5C(m, p, 0);
+        p->timer++;
+    }
+}
+void sub_08010860(struct GroupObjects *m, struct GroupPiece *p, int index)
+{
+    struct GroupVec delta;
+    struct GroupVec *position;
+    struct GroupVec *moved;
+    int dx, dz;
+    if (p->active) {
+        const u16 *table;
+        struct GroupVec *current;
+        struct GroupVec *origin;
+        p->active = 0;
+        current = &p->position;
+        origin = &m->origin;
+        p->direction = Math_Atan2(origin->x - p->position.x, origin->z - current->z);
+        p->heading = Math_Atan2(p->target.x - p->position.x, p->target.z - current->z);
+        table = gUnk_0203B400;
+        p->heading += (randomWith(table) & 31) - 16;
+        p->speed = (randomWith(table) & 15) + 16;
+    }
+    position = &p->position;
+    dx = p->target.x - p->position.x;
+    dz = p->target.z - position->z;
+    if (dx * dx + dz * dz <= 0x9C3F) {
+        u32 t = 8;
+        p->state = t;
+        p->active = 1;
+        p->timer = 0;
+    } else {
+        if (p->speed == 0) {
+            const u16 *table;
+            p->heading = Math_Atan2(dx, dz);
+            table = gUnk_0203B400;
+            p->heading += (randomWith(table) & 31) - 16;
+            p->speed = (randomWith(table) & 31) + 32;
+        } else
+            p->speed--;
+        polar(&delta, p->heading, p->duration);
+        moved = addPositionN(&p->position, &delta);
+        {
+            struct GroupVec *origin = &m->origin;
+            p->direction = Math_Atan2(origin->x - p->position.x, origin->z - moved->z);
+        }
+        sub_0800FA5C(m, p, 0);
+        p->timer++;
+    }
+}
 
 void sub_08010A34(struct GroupObjects *m, struct GroupPiece *p)
 {
@@ -259,8 +500,6 @@ void sub_08010A34(struct GroupObjects *m, struct GroupPiece *p)
     }
 }
 
-#ifdef NONMATCHING
-// fuzzy: 92.6% (delta add uses r6-relative x and r3 temps; zero/4 store order)
 void sub_08010A58(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
@@ -292,22 +531,25 @@ void sub_08010A58(struct GroupObjects *m, struct GroupPiece *p, int index)
     dx = p->target.x - p->position.x;
     dz = target->z - position->z;
     if (dx * dx + dz * dz <= 0xFFF) {
-        p->state = 4;
+        u32 t = 4;
+        p->state = t;
         p->active = 1;
         p->timer = 0;
     } else {
         polar(&delta, p->direction, p->duration);
-        addVec(position, &delta);
+        {
+            struct GroupVec *src = &delta;
+            p->position.x += delta.x;
+            position->y += src->y;
+            position->z += src->z;
+        }
         sub_0800FA5C(m, p, 0);
         p->timer++;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08010A58);
-#endif
 
 #ifdef NONMATCHING
-// fuzzy: 92.3% (register allocation of delta pointer/temps in vector add)
+// fuzzy: 98.4% (index register of the first Atan2 argument)
 void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
@@ -335,7 +577,12 @@ void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
     } else
         p->speed--;
     polar(&delta, p->direction, p->duration);
-    addVec(&p->offset, &delta);
+    {
+        struct GroupVec *src = &delta;
+        p->offset.x += delta.x;
+        offset->y += src->y;
+        offset->z += src->z;
+    }
     p->position.x = p->anchor.x + p->offset.x;
     p->position.z = p->anchor.z + p->offset.z;
     sub_0800FA5C(m, p, 0);
@@ -359,8 +606,6 @@ void sub_08010D84(struct GroupObjects *m, struct GroupPiece *p, int delay)
     }
     p->timer++;
 }
-#ifdef NONMATCHING
-// fuzzy: 88.8% (register allocation in delta add and distance setup)
 void sub_08010E44(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
@@ -373,13 +618,14 @@ void sub_08010E44(struct GroupObjects *m, struct GroupPiece *p, int index)
         p->direction = Math_Atan2(p->target.x - p->position.x, p->target.z - p->position.z);
         table = gUnk_0203B400;
         p->direction += (randomWith(table) & 31) - 16;
-        p->speed = (randomWith(table) & 31) + 16;
+        p->speed = (randomWith(table) & 15) + 16;
     }
     position = &p->position;
     dx = p->target.x - p->position.x;
     dz = p->target.z - position->z;
     if (dx * dx + dz * dz <= 0x9C3F) {
-        p->state = 2;
+        u32 t = 2;
+        p->state = t;
         p->active = 1;
         p->timer = 0;
     } else {
@@ -392,14 +638,11 @@ void sub_08010E44(struct GroupObjects *m, struct GroupPiece *p, int index)
         } else
             p->speed--;
         polar(&delta, p->direction, p->duration);
-        addPosition(&p->position, &delta);
+        addPositionN(&p->position, &delta);
         sub_0800FA5C(m, p, 0);
         p->timer++;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08010E44);
-#endif
 
 int GroupObjects_Update(struct GroupObjects *m)
 {
