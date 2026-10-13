@@ -17,7 +17,7 @@ struct Group080A9688 {
     u8 pad874[0x8da - 0x874];
     s16 count;
 };
-u8 sub_082215E4(s32, s32);
+u8 Math_Atan2(s32, s32);
 
 static inline u8 TestMask(u8 *flags, u32 mask)
 {
@@ -42,7 +42,7 @@ void sub_080A9688(u8 *p)
     for (i = 0; i < g->count; i++) {
         if (!TestMask(&g->entries[i].flags, 1)) {
             VecSub(&d, &prev, &g->entries[i].pos);
-            g->entries[i].heading = sub_082215E4(d.x, d.z);
+            g->entries[i].heading = Math_Atan2(d.x, d.z);
             prev = g->entries[i].pos;
         }
     }
