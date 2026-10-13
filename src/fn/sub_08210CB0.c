@@ -7,10 +7,6 @@ void sub_08033468(void);
 void sub_0803343C(void *);
 u32 Script_ParseStringRef(void *);
 void *Text_LookupString(u32);
-static inline u32 plus(s32 offset, u32 base)
-{
-    return base + offset;
-}
 u32 sub_08210CB0(u8 *p)
 {
     s16 *idx = (s16 *)(p + 0xb88);
