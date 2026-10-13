@@ -1,17 +1,11 @@
-#include "global.h"
+#include "palette_controller.h"
 
-struct S {
-    u8 f0;
-    u8 a;
-    u8 b;
-    u8 c;
-};
-void sub_08002D3C(struct S *p)
+void sub_08002D3C(struct PaletteTransition *t)
 {
-    if (p->a > 1) {
-        p->a -= 2;
+    if (t->brightness > 1) {
+        t->brightness -= 2;
     } else {
-        p->a = 0;
-        p->c = 0;
+        t->brightness = 0;
+        t->mode = 0;
     }
 }

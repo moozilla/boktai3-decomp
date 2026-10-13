@@ -1,11 +1,11 @@
-#include "global.h"
+#include "palette_controller.h"
 
-void sub_08002D58(void *, u8 *);
+void sub_08002D58(struct PaletteController *, struct PaletteTransition *);
 
-void sub_08002E28(void *a, u8 *p)
+void sub_08002E28(struct PaletteController *p, struct PaletteTransition *t)
 {
-    sub_08002D58(a, p);
-    (*p)++;
-    if (*p > 0x3f)
-        *p = 0x40;
+    sub_08002D58(p, t);
+    t->level++;
+    if (t->level > 0x3f)
+        t->level = 0x40;
 }

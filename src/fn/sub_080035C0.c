@@ -1,4 +1,4 @@
-#include "global.h"
+#include "palette_controller.h"
 
 s32 sub_0821ABA8(u32, u32);
 void sub_08003588(s32, s32, s32);

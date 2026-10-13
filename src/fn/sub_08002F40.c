@@ -9,8 +9,8 @@ void Palette_BlendVariants(struct PaletteController *p)
         i = 0;
         out = p->palettes[0];
         do {
-            if (p->source[i])
-                CpuSet(p->source[i], out, 0x04000080);
+            if (p->colorSets[PALETTE_SET_SOURCE][i])
+                CpuSet(p->colorSets[PALETTE_SET_SOURCE][i], out, 0x04000080);
             out += 256;
             i++;
         } while (i <= 3);
@@ -18,8 +18,8 @@ void Palette_BlendVariants(struct PaletteController *p)
         i = 0;
         out = p->palettes[0];
         do {
-            if (p->destination[i])
-                CpuSet(p->destination[i], out, 0x04000080);
+            if (p->colorSets[PALETTE_SET_DESTINATION][i])
+                CpuSet(p->colorSets[PALETTE_SET_DESTINATION][i], out, 0x04000080);
             out += 256;
             i++;
         } while (i <= 3);
@@ -27,8 +27,9 @@ void Palette_BlendVariants(struct PaletteController *p)
         i = 0;
         out = p->palettes[0];
         do {
-            if (p->source[i] && p->destination[i])
-                Palette_BlendRange(out, p->source[i], p->destination[i], p->blend, 0, 208);
+            if (p->colorSets[PALETTE_SET_SOURCE][i] && p->colorSets[PALETTE_SET_DESTINATION][i])
+                Palette_BlendRange(out, p->colorSets[PALETTE_SET_SOURCE][i],
+                                   p->colorSets[PALETTE_SET_DESTINATION][i], p->blend, 0, 208);
             out += 256;
             i++;
         } while (i <= 3);

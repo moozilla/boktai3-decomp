@@ -1,14 +1,13 @@
-#include "global.h"
-extern u8 *gUnk_02000468;
-u8 *sub_08219FBC(u32, u32);
-void sub_0821A04C(u8 *, void (*)(void), void (*)(void));
-s32 Palette_InitializeFromScript(u8 *);
-void sub_0821A0C0(u8 *);
-void Palette_Update(void);
-void sub_080031E0(void);
-u8 *sub_080033FC(void)
+#include "palette_controller.h"
+struct PaletteController *sub_08219FBC(u32, u32);
+void sub_0821A04C(struct PaletteController *, s32 (*)(struct PaletteController *), u32 (*)(void));
+s32 Palette_InitializeFromScript(struct PaletteController *);
+void sub_0821A0C0(struct PaletteController *);
+s32 Palette_Update(struct PaletteController *);
+u32 sub_080031E0(void);
+struct PaletteController *sub_080033FC(void)
 {
-    u8 *r;
+    struct PaletteController *r;
     if (gUnk_02000468 != 0)
         return gUnk_02000468;
     r = sub_08219FBC(11, 0xe94);

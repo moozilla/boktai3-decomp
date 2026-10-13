@@ -1,14 +1,12 @@
-#include "global.h"
-
-extern u8 *gUnk_02000468;
+#include "palette_controller.h"
 
 u32 sub_080036DC(void)
 {
-    u8 *q = gUnk_02000468;
+    struct PaletteController *q = gUnk_02000468;
     u32 r;
     if (q) {
-        q += 0x4C;
-        r = q[1];
+        struct PaletteTransition *t = &q->transition;
+        r = t->brightness;
     } else {
         r = 0;
     }

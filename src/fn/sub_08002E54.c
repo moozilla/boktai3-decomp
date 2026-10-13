@@ -1,18 +1,14 @@
-#include "global.h"
+#include "palette_controller.h"
 
-void sub_08002C38(void *, u8 *);
-void sub_08002E00(void *, u8 *);
-void sub_08002D58(void *, u8 *);
-struct S {
-    u8 f[0x4c];
-    u8 v;
-};
+void sub_08002C38(struct PaletteController *, struct PaletteTransition *);
+void sub_08002E00(struct PaletteController *, struct PaletteTransition *);
+void sub_08002D58(struct PaletteController *, struct PaletteTransition *);
 
-void sub_08002E54(struct S *p)
+void sub_08002E54(struct PaletteController *p)
 {
-    u8 *q = &p->v;
-    sub_08002C38(p, q);
-    *q = 0x40;
-    sub_08002E00(p, q);
-    sub_08002D58(p, q);
+    struct PaletteTransition *t = &p->transition;
+    sub_08002C38(p, t);
+    t->level = 0x40;
+    sub_08002E00(p, t);
+    sub_08002D58(p, t);
 }

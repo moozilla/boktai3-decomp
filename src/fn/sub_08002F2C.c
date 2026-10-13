@@ -1,11 +1,11 @@
-#include "global.h"
+#include "palette_controller.h"
 
-void sub_08002F2C(u8 *p)
+void sub_08002F2C(struct PaletteController *p)
 {
-    u32 *q = (u32 *)(p + 0x38);
-    q[1] = 0x40;
-    q[2] = 0x40;
-    *(u32 *)(p + 0x38) = 0x40;
-    q[3] = 0;
-    q[4] = 0;
+    struct PaletteSlide *s = &p->slide;
+    s->start = 0x40;
+    s->target = 0x40;
+    s->value = 0x40;
+    s->time = 0;
+    s->duration = 0;
 }

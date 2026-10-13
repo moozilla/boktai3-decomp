@@ -1,6 +1,5 @@
-#include "global.h"
+#include "palette_controller.h"
 
-extern u32 gUnk_02000468;
 s32 sub_0821ABA8(u32, u32);
 void Palette_ReplaceResource(s32, s32, s32, s32);
 void sub_08003540(void)

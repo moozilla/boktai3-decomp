@@ -1,13 +1,14 @@
-#include "global.h"
+#include "palette_controller.h"
+
 s32 sub_08002C70(void);
-void sub_08002CB0(u8 *p)
+void sub_08002CB0(struct PaletteTransition *t)
 {
     s32 current;
-    current = p[1];
+    current = t->brightness;
     if (current < sub_08002C70()) {
-        p[1] += 4;
+        t->brightness += 4;
         return;
     }
-    p[1] = sub_08002C70();
-    p[3] = 2;
+    t->brightness = sub_08002C70();
+    t->mode = 2;
 }
