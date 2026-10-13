@@ -6,10 +6,6 @@ struct Args {
     u32 *values;
 };
 
-void sub_0821AD08(u32, struct Args *);
-
-void sub_0824923C(s32, void *);
-
 static inline u32 selectionScript(struct ChoiceMenu *p)
 {
     return p->script;
@@ -34,8 +30,6 @@ void ChoiceMenu_DispatchSelection(struct ChoiceMenu *p, s32 selection)
     } else
         sub_0824923C(selection, p->callback);
 }
-
-void sub_0822B2F8(s32);
 
 void ChoiceMenu_Select(struct ChoiceMenu *p, s32 selection)
 {
@@ -81,8 +75,6 @@ s32 sub_08006478(struct ChoiceMenu *p, s32 a, s32 d)
 }
 
 void sub_08030BF8(void);
-
-void sub_0821A0C0(void *);
 
 // MATCHING_CONCESSION: register-pinning
 s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p)
@@ -247,8 +239,6 @@ u32 sub_080066C0(struct ChoiceMenu *p)
     return 0;
 }
 
-void sub_082195E0(void *);
-
 u32 sub_08006710(struct ChoiceMenu *p)
 {
     sub_082195E0(&p->leftCursor);
@@ -337,10 +327,6 @@ returnText:
     return text;
 }
 
-u32 Script_ParseStringRef(void *);
-
-u8 *Text_LookupString(u32);
-
 u16 sub_08032070(u8 *);
 
 // MATCHING_CONCESSION: register-pinning
@@ -423,13 +409,7 @@ struct Dimensions {
     u32 z : 16;
 };
 
-struct ChoiceResource *sub_0821A520(s32, s32);
-
-void sub_082196C4(struct ChoiceResource *, struct ChoiceResource *);
-
 void sub_0821983C(void *, struct ChoiceResource *, s32, s32, s32, s32, s32, struct Dimensions *);
-
-void sub_08219EBC(void *, void *, s32);
 
 s32 sub_08031E1C(void);
 
@@ -487,8 +467,6 @@ s32 ChoiceMenu_Initialize(struct ChoiceMenu *p, void *window, s32 stringBase, s3
 
 #define ChoiceMenu_Create sub_08006CD0
 
-void *sub_08219FBC(s32, s32);
-
 struct ChoiceMenu *ChoiceMenu_Create(void *window, s32 stringBase, void *callback, s32 *options)
 {
     struct ChoiceMenu *p;
@@ -506,14 +484,6 @@ struct ChoiceMenu *ChoiceMenu_Create(void *window, s32 stringBase, void *callbac
     }
     return p;
 }
-
-s32 Script_SeekToKeyword(s32);
-
-s32 Script_GetValue(void);
-
-s32 Script_GetPc(void);
-
-s32 sub_0821ABA8(s32, s32);
 
 void *sub_08227E90(void);
 

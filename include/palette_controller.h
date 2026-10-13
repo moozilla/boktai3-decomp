@@ -1,6 +1,6 @@
 #ifndef PALETTE_CONTROLLER_H
 #define PALETTE_CONTROLLER_H
-#include "global.h"
+#include "engine.h"
 struct PaletteWave {
     u16 timer, period;
     s16 value, step;

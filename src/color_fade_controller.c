@@ -239,12 +239,6 @@ s32 sub_080039F0(struct ColorFadeController *s)
     return gUnk_030051C8 = 0;
 }
 
-void *sub_08219FBC(u32, u32);
-
-void sub_0821A04C(void *, u32 (*)(struct ColorFadeController *), void (*)(void));
-
-void sub_0821A0C0(void *);
-
 void *sub_08003A68(void)
 {
     void *p = sub_08219FBC(0xb, 0x15c);
@@ -270,14 +264,6 @@ s32 sub_08003AA8(u32 id, s32 cnt, u32 *src)
     s->count++;
     return 0;
 }
-
-s32 Script_SeekToKeyword(s32);
-
-s32 Script_GetValue(void);
-
-u8 *Script_GetPc(void);
-
-u32 sub_0821ABA8(u32, u32);
 
 s32 sub_08003AA8(u32, s32, u32 *);
 
