@@ -1,18 +1,18 @@
 #include "global.h"
-void *sub_08219FBC(u32, u32);
-void sub_0821A04C(void *, void (*)(void), void (*)(void));
+void *Task_Create(u32, u32);
+void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
 s32 AnimatedParticleManager_Initialize(void *, void *);
-void sub_0821A0C0(void *);
+void Task_Kill(void *);
 void AnimatedParticleManager_Update(void);
 void sub_0801537C(void);
 
 void *sub_0801548C(void *a)
 {
-    void *p = sub_08219FBC(9, 0xf24);
+    void *p = Task_Create(9, 0xf24);
     if (p != 0) {
-        sub_0821A04C(p, AnimatedParticleManager_Update, sub_0801537C);
+        Task_SetCallbacks(p, AnimatedParticleManager_Update, sub_0801537C);
         if (AnimatedParticleManager_Initialize(p, a) < 0) {
-            sub_0821A0C0(p);
+            Task_Kill(p);
             return 0;
         }
     }

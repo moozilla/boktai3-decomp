@@ -10,7 +10,7 @@ struct S {
     u32 a14;
     u8 h[0x168 - 0x18];
 };
-void sub_08020D68(void *, u32);
+void Trigger_ConsumePending(void *, u32);
 void sub_081C66AC(u32 a, struct S *p)
 {
     if (p->b8 != 0) {
@@ -24,6 +24,6 @@ void sub_081C66AC(u32 a, struct S *p)
         p->b4 = o;
         p->a14 = z;
         p->b8 = o;
-        sub_08020D68((u8 *)p + 0x168, 1);
+        Trigger_ConsumePending((u8 *)p + 0x168, 1);
     }
 }

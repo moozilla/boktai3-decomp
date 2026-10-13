@@ -51,10 +51,10 @@ int sub_0803092C(struct Actor *);
 void sub_080316A4(void);
 void sub_080317D8(void);
 void sub_080317CC(void);
-int sub_08218E5C(int, int, int, int);
+int TextWindow_BlankRect(int, int, int, int);
 void *sub_080313C8(struct Actor *, int);
-void sub_08032C34(struct State *);
-int sub_08032C54(struct State *, int, int, int, int);
+void TextState_Reset(struct State *);
+int TextState_SetBounds(struct State *, int, int, int, int);
 int Script_GetValue(void);
 static inline void setCallback(void *fn, struct Actor *p)
 {
@@ -82,7 +82,7 @@ extern struct Sun *gUnk_02000710;
 int Script_SeekToKeyword(int);
 void *sub_08227E90(void);
 void *Script_GetPc(void);
-int sub_0821ABA8(int, int);
+int Script_GetKeywordValue(int, int);
 int sub_080308D0(struct Actor *, int);
 void sub_08030908(struct Actor *);
 int sub_08030C84(void *);
@@ -109,12 +109,12 @@ int sub_080311F0(void)
         int h = Script_GetValue();
         sub_08030F20(x, y, w, h);
     }
-    if (sub_080308D0(p, sub_0821ABA8(0x63, p->palette)) < 0)
+    if (sub_080308D0(p, Script_GetKeywordValue(0x63, p->palette)) < 0)
         goto fail;
     sub_08030908(p);
-    p->scriptIndex = sub_0821ABA8(0x69, p->scriptIndex);
-    vm->spacing = sub_0821ABA8(0x6d, vm->spacing);
-    vm->mode = sub_0821ABA8(0x77, gUnk_02000710->level);
+    p->scriptIndex = Script_GetKeywordValue(0x69, p->scriptIndex);
+    vm->spacing = Script_GetKeywordValue(0x6d, vm->spacing);
+    vm->mode = Script_GetKeywordValue(0x77, gUnk_02000710->level);
     {
         int found = Script_SeekToKeyword(0x64);
         if (found) {

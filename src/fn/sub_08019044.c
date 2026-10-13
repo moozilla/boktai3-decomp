@@ -11,7 +11,7 @@ struct Circle {
 extern void *gUnk_03004278, *gUnk_03003A00;
 extern u16 gUnk_03004270, gUnk_03004274;
 void CircleWindow_GenerateScanlines(void *, int);
-void sub_0821A0C0(void *);
+void Task_Kill(void *);
 int CircleWindow_Update(struct Circle *p)
 {
     p->x = 120;
@@ -26,14 +26,14 @@ int CircleWindow_Update(struct Circle *p)
         if (p->radius >= 4000) {
             p->radius = 4000;
             if (p->dispose)
-                sub_0821A0C0(p);
+                Task_Kill(p);
         }
     } else {
         p->radius -= p->step;
         if (p->radius <= 512) {
             p->radius = 512;
             if (p->dispose)
-                sub_0821A0C0(p);
+                Task_Kill(p);
         }
     }
     p->bank = 1 - p->bank;

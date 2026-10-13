@@ -12,15 +12,15 @@ struct S {
     u32 f358;
 };
 s32 sub_081C5EA8(u32);
-void sub_0821980C(u8 *, u8 *, u16, u32);
+void Anim_LoadKeyframe(u8 *, u8 *, u16, u32);
 
 void sub_081C6448(struct S *p)
 {
     s32 r = sub_081C5EA8(p->f358);
     if (r >= 0) {
-        sub_0821980C(p->a58, p->a18, r, 0);
+        Anim_LoadKeyframe(p->a58, p->a18, r, 0);
         p->f78 = 0x6f;
         p->f7a = -26;
-        sub_0821980C(p->ab8, p->a18, 0x5d, 0);
+        Anim_LoadKeyframe(p->ab8, p->a18, 0x5d, 0);
     }
 }

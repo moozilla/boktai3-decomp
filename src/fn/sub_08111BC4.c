@@ -8,15 +8,15 @@ struct S {
     u32 w;
 };
 extern struct S *gUnk_020001D8;
-s32 sub_0821ABA8(s32, s32);
+s32 Script_GetKeywordValue(s32, s32);
 s32 Div(s32, s32);
 void sub_08111BC4(void)
 {
     struct S *g = gUnk_020001D8;
     if (g != 0) {
         struct S *s = g;
-        s->h = sub_0821ABA8(0x66, 0);
-        s->h2 = sub_0821ABA8(0x70, 0) << 7;
+        s->h = Script_GetKeywordValue(0x66, 0);
+        s->h2 = Script_GetKeywordValue(0x70, 0) << 7;
         if (s->h == 0)
             s->w = s->h2;
         else

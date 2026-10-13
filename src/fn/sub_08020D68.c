@@ -5,7 +5,7 @@ struct S {
     u8 a;
 };
 void sub_08020D28(void);
-u32 sub_08020D68(struct S *p, u32 v)
+u32 Trigger_ConsumePending(struct S *p, u32 v)
 {
     u32 r;
     if (p->a != v)

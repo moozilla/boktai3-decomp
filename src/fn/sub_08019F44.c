@@ -8,7 +8,7 @@ void sub_08030C84(u32);
 void sub_08174480(void *, void *);
 void sub_081744AC(u8 *, u32);
 u32 sub_08174594(u8 *);
-void sub_0821980C(u8 *, u8 *, u32, u32);
+void Anim_LoadKeyframe(u8 *, u8 *, u32, u32);
 void sub_08030BF8(void);
 void sub_08033468(void);
 void sub_0803343C(u32);
@@ -24,7 +24,7 @@ void Presentation_UpdateActorGraphic(u8 *p, u32 fallback)
         {
             u32 resource = sub_08174594(actor);
             ((Graphic *)(p + 0x5b4))->flags &= ~1;
-            sub_0821980C(p + 0x5b4, p + 0x6c, (u16)resource, 0);
+            Anim_LoadKeyframe(p + 0x5b4, p + 0x6c, (u16)resource, 0);
         }
     } else {
         sub_08030BF8();

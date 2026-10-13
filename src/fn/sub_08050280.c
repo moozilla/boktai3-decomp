@@ -5,7 +5,7 @@ s32 sub_08050128(u8 *);
 s32 sub_080501E8(u8 *);
 void sub_0821D6D0(u8 *);
 void sub_08158CD8(u32);
-void sub_0821AD08(u32, u32);
+void Script_Call(u32, u32);
 void sub_0821D698(u8 *, u32, u32, u32, u32, u32);
 void sub_08050280(u8 *p)
 {
@@ -17,7 +17,7 @@ void sub_08050280(u8 *p)
                 p[0x1d] = r;
                 sub_08158CD8(gUnk_02000580);
                 if (*(u32 *)(p + 0x34) != 0)
-                    sub_0821AD08(*(u32 *)(p + 0x34), 0);
+                    Script_Call(*(u32 *)(p + 0x34), 0);
             }
         } else if (p[0x1d] == 0) {
             sub_0821D698(p + 0x24, *(u16 *)(p + 0x1e), 0, *(u16 *)(p + 0x20), 0xff, 0x82a);

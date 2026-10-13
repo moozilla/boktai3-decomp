@@ -1,7 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 void sub_0821983C(void *, void *, int, int, int, int, int, void *);
-void *sub_08215184(int);
+void *AnimData_FindEntry(int);
 void sub_08217DE0(void *, void *, int);
 int ResultMenu_CreateGraphics(u8 *arg)
 {
@@ -34,7 +34,7 @@ int ResultMenu_CreateGraphics(u8 *arg)
         i--;
     } while (i >= 0);
     {
-        void *resource = sub_08215184(0x1c1a);
+        void *resource = AnimData_FindEntry(0x1c1a);
         register u8 *a asm("r8") = p + 0xb8;
         register u8 *b asm("sb") = p + 0xb9;
         out = p + 0x6e4;

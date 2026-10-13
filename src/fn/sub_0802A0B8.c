@@ -46,7 +46,7 @@ void sub_080297FC(void *, int, int, int);
 void sub_08029E1C(void *);
 int sub_08029E2C(void *);
 void sub_08029AA8(void *);
-void sub_0822B3BC(int);
+void Sound_PlaySongChecked(int);
 void sub_0802A0B8(ActorAnimation *p, int tick)
 {
     if (p->changed) {
@@ -54,7 +54,7 @@ void sub_0802A0B8(ActorAnimation *p, int tick)
         setFacing(p, p->requestedAngle);
         sub_08029E1C(p);
         sub_080297FC(p, sub_08029E2C(p), 1, 8);
-        sub_0822B3BC(1355);
+        Sound_PlaySongChecked(1355);
     }
     if (p->tryUpdate(p))
         return;

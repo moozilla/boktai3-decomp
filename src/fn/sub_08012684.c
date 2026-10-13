@@ -10,8 +10,8 @@ struct S {
     struct E e[8];
 };
 extern struct S *gUnk_02000050;
-u32 sub_0821A520(u32, u32);
-s32 sub_082151E4(void *, u32);
+u32 ScriptProc_Start(u32, u32);
+s32 AnimData_Load(void *, u32);
 void AnimatedHazard_Initialize(void *, void *);
 
 s32 sub_08012684(struct S *s)
@@ -19,8 +19,8 @@ s32 sub_08012684(struct S *s)
     struct E *e;
     s32 i;
     gUnk_02000050 = s;
-    *(u32 *)((u8 *)s + 0x34) = sub_0821A520(0x922E, 0xE92A);
-    if (sub_082151E4(s->a - 0, 0xCD6C) == 0)
+    *(u32 *)((u8 *)s + 0x34) = ScriptProc_Start(0x922E, 0xE92A);
+    if (AnimData_Load(s->a - 0, 0xCD6C) == 0)
         return -1;
     e = s->e;
     for (i = 7; i >= 0; i--, e++) {

@@ -239,19 +239,13 @@ s32 sub_080039F0(struct ColorFadeController *s)
     return gUnk_030051C8 = 0;
 }
 
-void *sub_08219FBC(u32, u32);
-
-void sub_0821A04C(void *, u32 (*)(struct ColorFadeController *), void (*)(void));
-
-void sub_0821A0C0(void *);
-
 void *sub_08003A68(void)
 {
-    void *p = sub_08219FBC(0xb, 0x15c);
+    void *p = Task_Create(0xb, 0x15c);
     if (p != 0) {
-        sub_0821A04C(p, sub_080039BC, sub_080039E4);
+        Task_SetCallbacks(p, sub_080039BC, sub_080039E4);
         if (sub_080039F0(p) < 0) {
-            sub_0821A0C0(p);
+            Task_Kill(p);
             return 0;
         }
     }
@@ -271,20 +265,12 @@ s32 sub_08003AA8(u32 id, s32 cnt, u32 *src)
     return 0;
 }
 
-s32 Script_SeekToKeyword(s32);
-
-s32 Script_GetValue(void);
-
-u8 *Script_GetPc(void);
-
-u32 sub_0821ABA8(u32, u32);
-
 s32 sub_08003AA8(u32, s32, u32 *);
 
 u32 sub_08003B00(void)
 {
     u32 buf[8];
-    u32 a = sub_0821ABA8(0x72, 0);
+    u32 a = Script_GetKeywordValue(0x72, 0);
     s32 n = 0;
     if (Script_SeekToKeyword(0x70)) {
         u32 *q = buf;

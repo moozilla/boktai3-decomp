@@ -7,7 +7,7 @@ struct Panel {
     u8 values[7];
 };
 struct Panel *sub_08037DC0(void);
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 int sub_08039774(void)
 {
     struct Panel *p = sub_08037DC0();
@@ -15,7 +15,7 @@ int sub_08039774(void)
     if (p && p->enabled) {
         u8 *v = p->values;
         v[6] = 1 - v[6];
-        sub_0822B2F8(267);
+        Sound_PlaySong(267);
         return v[6];
     }
     return 0;

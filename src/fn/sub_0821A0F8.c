@@ -11,7 +11,7 @@ struct List {
     u32 pad;
 };
 extern struct List gUnk_03005280[];
-s32 sub_0821A0C0(struct Task *);
+s32 Task_Kill(struct Task *);
 
 void sub_0821A0F8(s32 prio)
 {
@@ -23,7 +23,7 @@ void sub_0821A0F8(s32 prio)
         struct List *nl = l + 1;
         for (; t != 0; t = t->next) {
             if (t->f16 < prio)
-                sub_0821A0C0(t);
+                Task_Kill(t);
         }
         i = ni;
         l = nl;

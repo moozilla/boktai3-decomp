@@ -9,7 +9,7 @@ struct S {
     u8 h[0x108 - 0x18];
     u8 d;
 };
-void sub_08032C34(struct S *p)
+void TextState_Reset(struct S *p)
 {
     u32 z = 0;
     p->a = z;

@@ -11,7 +11,7 @@ struct State33A {
     u32 handle;
     struct Entry33A entries[8];
 };
-u32 sub_08215184(u32);
+u32 AnimData_FindEntry(u32);
 void sub_08217DE0(struct Entry33A *, u32, s32);
 void sub_08217EC4(struct Entry33A *, s32, s32);
 void sub_08217EEC(struct Entry33A *, u32, s32);
@@ -19,7 +19,7 @@ void sub_08217ECC(struct Entry33A *, s32);
 void sub_08233A1C(struct State33A *p)
 {
     s32 i;
-    p->handle = sub_08215184(0x1c1e);
+    p->handle = AnimData_FindEntry(0x1c1e);
     for (i = 0; i < 8; i++) {
         struct Entry33A *e = &p->entries[i];
         sub_08217DE0(e, p->handle, 1);

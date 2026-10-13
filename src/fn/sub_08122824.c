@@ -6,15 +6,15 @@ struct S {
     u16 c;
 };
 u8 sub_0812266C(void);
-void sub_0821FF24(void *, void *, u32);
-void sub_0821FE40(void *);
+void Collider_SetPosition(void *, void *, u32);
+void Collider_Refresh(void *);
 void sub_08122824(u8 *s)
 {
     if (sub_0812266C() == 0) {
         if (*(s16 *)(s + 0x130) == 1) {
             u8 *p = s + 0xdc;
-            sub_0821FF24(p, s + 0xd4, 0);
-            sub_0821FE40(p);
+            Collider_SetPosition(p, s + 0xd4, 0);
+            Collider_Refresh(p);
         }
         (*(u16 *)(s + 0x13c))++;
     }

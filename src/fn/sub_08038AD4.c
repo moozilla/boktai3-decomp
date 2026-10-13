@@ -39,7 +39,7 @@ struct Target *sub_0802140C(int);
 void sub_080397D4(int, int);
 int sub_08037FB4(struct P *, int, const u32 *, int);
 void sub_08178404(void);
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 static inline u32 test(u32 *flags, u32 mask)
 {
     return *flags & mask;
@@ -183,7 +183,7 @@ void sub_08038AD4(struct P *input)
             u32 two;
             u8 *state;
             sub_08178404();
-            sub_0822B2F8(0x372);
+            Sound_PlaySong(0x372);
             two = 2;
             state = &p->state;
             *state = two;

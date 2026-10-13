@@ -25,7 +25,7 @@ struct G {
 s32 Script_SeekToKeyword(s32);
 void Actor_ProjectAndClampToScreen(void *);
 s32 Script_GetValue(void);
-s32 sub_0821ABA8(s32, s32);
+s32 Script_GetKeywordValue(s32, s32);
 static inline u32 mode_bits(u8 *p, u32 mask)
 {
     register u32 v asm("r1") = *p;
@@ -62,8 +62,8 @@ void sub_081E4DB4(void)
             H(0xed4) = value;
         }
     }
-    B(0xf67) = sub_0821ABA8(0x64, -1);
-    W(0xf50) = sub_0821ABA8(0x70, 0);
+    B(0xf67) = Script_GetKeywordValue(0x64, -1);
+    W(0xf50) = Script_GetKeywordValue(0x70, 0);
     g->b = g->xa;
     {
         u32 mode = 2;

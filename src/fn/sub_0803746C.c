@@ -28,27 +28,27 @@ struct PeerStyle {
     u8 tile, animation, priority, x, y, pad9[3];
 };
 extern const struct PeerStyle gUnk_0824DE64[];
-void *sub_0821A520(int, int);
-void sub_082151E4(void *, int);
-void sub_08215284(void *, int);
-void sub_082144A4(void *, void *, int);
+void *ScriptProc_Start(int, int);
+void AnimData_Load(void *, int);
+void AnimData_SelectTiles(void *, int);
+void Sprite_Init(void *, void *, int);
 void sub_08220D20(void *, void *, int, int, int);
 void sub_0821983C(void *, void *, int, int, int, int, int, int);
-void sub_08214514(void *);
-void sub_082195E0(void *);
-void sub_08219EBC(void *, const void *, int);
+void Sprite_Remove(void *);
+void Anim_Remove(void *);
+void Memory_Copy(void *, const void *, int);
 void sub_08036CF0(const u8 *, u8 *, int);
 void *sub_08037DCC(int);
-void sub_08033924(int, int);
+void TextWindow_Refresh(int, int);
 void sub_0803746C(void *owner, struct PeerPanel *p)
 {
     u8 *drawing;
     int i;
-    sub_08214514(&p->sprite);
+    Sprite_Remove(&p->sprite);
     drawing = p->drawings[0];
     i = 4;
     do {
-        sub_082195E0(drawing);
+        Anim_Remove(drawing);
         drawing += 0x60;
     } while (--i >= 0);
 }

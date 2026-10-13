@@ -1,6 +1,6 @@
 #include "global.h"
 void sub_081DF1D8(void *);
-void sub_0822B2F8(s32);
+void Sound_PlaySong(s32);
 void sub_081DF694(u8 *p)
 {
     switch (*(u32 *)(p + 0x34c)) {
@@ -57,5 +57,5 @@ void sub_081DF694(u8 *p)
             break;
     }
     sub_081DF1D8(p);
-    sub_0822B2F8(0xdc);
+    Sound_PlaySong(0xdc);
 }

@@ -3,7 +3,7 @@
 extern u16 gUnknown_03005260[];
 extern int gUnk_0824DB38[];
 extern u8 gUnk_0824DB64[], gUnk_0824DB6F[];
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 void ResultGame_UpdatePlayerMarker(u8 *p)
 {
     int *velocity;
@@ -19,7 +19,7 @@ void ResultGame_UpdatePlayerMarker(u8 *p)
     if (key) {
         velocity = (int *)(p + 0x90);
         *velocity = gUnk_0824DB38[*(u32 *)(p + 0x50)];
-        sub_0822B2F8(0x3ec);
+        Sound_PlaySong(0x3ec);
     } else {
         int v;
         int *initial = (int *)(p + 0x90);

@@ -18,7 +18,7 @@ void sub_0801B700(void *);
 void sub_0815AF14(void *, int);
 void sub_082216F8(void *, void *, void *, u32, int);
 void OrbitingParticles_Create(void *, int, int, int, int);
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 void sub_08017044(int, int, int, int, void *, void *, int, void *);
 void sub_0815B1D0(void *, int, int);
 void sub_082279A8(int, int, int, int, int, int, int);
@@ -43,7 +43,7 @@ void Transformation_Reveal(u8 *p)
     if (*(u32 *)(p + 0x3c) == 30) {
         orbit = actor->position;
         OrbitingParticles_Create(&orbit, 64, 60, 8, 0);
-        sub_0822B2F8(0x29c);
+        Sound_PlaySong(0x29c);
     }
     if (*(u32 *)(p + 0x3c) == 90) {
         {
@@ -56,7 +56,7 @@ void Transformation_Reveal(u8 *p)
             sub_08017044(1, p[0x7c], 0, 0, out, origin, 60, p);
         }
         sub_0815B1D0(actor, 0, 0);
-        sub_0822B2F8(0x110);
+        Sound_PlaySong(0x110);
     }
     if (*(u32 *)(p + 0x3c) == 96 && actor) {
         burst.x = actor->position.x;

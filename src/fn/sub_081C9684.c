@@ -9,7 +9,7 @@ struct S {
     u8 g[4];
     u16 h0e;
 };
-void sub_0802DCD8(void *, u32, u32, u32, u32);
+void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
 s32 sub_080424FC(void *);
 void sub_081C9684(u32 a, struct S *p)
 {
@@ -52,7 +52,7 @@ void sub_081C9684(u32 a, struct S *p)
                 r = 0;
                 break;
         }
-        sub_0802DCD8(p, r, 1, 0, 4);
+        Actor_PlayAnimationEntry(p, r, 1, 0, 4);
     }
     {
         u32 m = 0x1000;

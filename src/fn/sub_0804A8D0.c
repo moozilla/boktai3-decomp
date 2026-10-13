@@ -6,11 +6,11 @@ struct H {
 struct Z {
     struct H a, b;
 };
-void sub_0821FEB4(u8 *, u32, u32, u32, u32, struct Z *, struct Z *);
+void Collider_Init(u8 *, u32, u32, u32, u32, struct Z *, struct Z *);
 void sub_0821FF7C(u8 *, u32, u32, u32);
-void sub_0821FF84(u8 *, void (*)(void), u8 *);
-void sub_0821FF24(u8 *, u8 *, u32);
-void sub_0821FE40(u8 *);
+void Collider_SetCallback(u8 *, void (*)(void), u8 *);
+void Collider_SetPosition(u8 *, u8 *, u32);
+void Collider_Refresh(u8 *);
 void sub_0804ACA8(void);
 void sub_0804A8D0(u8 *p)
 {
@@ -31,9 +31,9 @@ void sub_0804A8D0(u8 *p)
         t = 0x10;
     else
         t = 2;
-    sub_0821FEB4(q, *(u16 *)(p + 0x18), 0x4081, 0, t, &s1, &s2);
+    Collider_Init(q, *(u16 *)(p + 0x18), 0x4081, 0, t, &s1, &s2);
     sub_0821FF7C(q, 0, 0, 0);
-    sub_0821FF84(q, sub_0804ACA8, p);
-    sub_0821FF24(q, p + 0x50, 0);
-    sub_0821FE40(q);
+    Collider_SetCallback(q, sub_0804ACA8, p);
+    Collider_SetPosition(q, p + 0x50, 0);
+    Collider_Refresh(q);
 }

@@ -25,7 +25,7 @@ struct G {
 s32 Script_SeekToKeyword(s32);
 void Actor_ProjectAndClampToScreen(void *);
 s32 Script_GetValue(void);
-s32 sub_0821ABA8(s32, s32);
+s32 Script_GetKeywordValue(s32, s32);
 void sub_081E4EDC(void)
 {
     struct G *g = (struct G *)gUnk_020003C8;
@@ -36,8 +36,8 @@ void sub_081E4EDC(void)
             return;
     }
     H(0xf8a) = Script_GetValue();
-    B(0xf77) = sub_0821ABA8(0x75, 0);
-    W(0xf50) = sub_0821ABA8(0x70, 0);
+    B(0xf77) = Script_GetKeywordValue(0x75, 0);
+    W(0xf50) = Script_GetKeywordValue(0x70, 0);
     Actor_ProjectAndClampToScreen(g);
     g->b = g->xa;
     g->xa = three;

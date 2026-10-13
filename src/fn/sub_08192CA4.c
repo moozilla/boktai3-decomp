@@ -12,8 +12,8 @@ struct P {
     u8 st[0x34];
     u8 st2[0x40];
 };
-void sub_08220D78(void *, void *, s32, s32, s32);
-s32 sub_08220F70(void *, void *);
+void Anim_SetKeyframes(void *, void *, s32, s32, s32);
+s32 Anim_Step(void *, void *);
 void sub_08192CA4(struct P *p, s32 i)
 {
     u8 *s;
@@ -23,11 +23,11 @@ void sub_08192CA4(struct P *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].fl &= ~1;
-        sub_08220D78(&p->rows[i], p->hdr, 0x1f, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], p->hdr, 0x1f, 2, 4);
         (*s)++;
         p->st2[i] = z;
     }
-    if (sub_08220F70(&p->rows[i], p->hdr) != 0) {
+    if (Anim_Step(&p->rows[i], p->hdr) != 0) {
         *s = 0xff;
         p->st2[i] = 1;
     }

@@ -10,7 +10,7 @@ struct G {
 };
 void sub_08003C10(void *);
 void sub_08225938(void *);
-void sub_08219DD8(void *, u32);
+void Memory_Clear(void *, u32);
 void sub_08125898(struct G *g, struct E *e)
 {
     u8 *p;
@@ -21,6 +21,6 @@ void sub_08125898(struct G *g, struct E *e)
     g->m &= ~(1 << k);
     sub_08003C10(e);
     sub_08225938(e);
-    sub_08219DD8(e, 0xe4);
+    Memory_Clear(e, 0xe4);
     *p = 0xff;
 }

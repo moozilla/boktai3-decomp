@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08219DD8(u32, u32);
+void Memory_Clear(u32, u32);
 void sub_08045934(u32, u32, u32, u32, u32);
 void sub_08045950(u32, u32, u32, u32, u32, u32);
 void sub_08045968(u32, u32, u32, u32);
@@ -9,7 +9,7 @@ void sub_08045980(u32, void (*)(void));
 void sub_080459F8(void);
 void sub_080458C8(u32 p)
 {
-    sub_08219DD8(p, 0x44);
+    Memory_Clear(p, 0x44);
     sub_08045934(p, 0, 0x3c, 0, 0);
     sub_08045950(p, 0, 0, 10, 0x14, 0x14);
     sub_08045968(p, 8, 0x20, 8);

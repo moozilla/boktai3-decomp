@@ -14,7 +14,7 @@ extern u32 gUnk_030053F4;
 extern u32 gUnk_030053D8;
 void sub_081630E0(struct P *);
 void sub_08224F70(s32);
-void sub_0821A0C0(struct P *);
+void Task_Kill(struct P *);
 static inline void andm(u32 *a, u32 m)
 {
     *a &= m;
@@ -26,6 +26,6 @@ void sub_08163654(struct P *p)
         andm(&gUnk_030053F4, ~0x400);
         gUnk_030053D8 = 0;
         sub_08224F70(p->f);
-        sub_0821A0C0(p);
+        Task_Kill(p);
     }
 }

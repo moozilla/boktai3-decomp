@@ -1,5 +1,5 @@
 #include "global.h"
-extern void sub_08013440(void *);
+extern void ActorShadow_Disable(void *);
 extern void sub_08076034(void *, s32);
 extern void sub_080AD270(void);
 static inline u8 take6030(u8 *s)
@@ -33,7 +33,7 @@ void sub_080AD1C0(u8 *s, s32 arg, u32 unused)
             u32 value = part->flags;
             part->flags = value | mask;
         }
-        sub_08013440(s + 0x320);
+        ActorShadow_Disable(s + 0x320);
     } else if (arg > 0x1A) {
         void (*fn)(void);
         u32 code;

@@ -12,8 +12,8 @@ struct S {
     u32 h;
 };
 extern struct G *gUnk_020004B4;
-void sub_0803386C(u32, u32);
-void sub_08033924(u32, u32);
+void TextWindow_SetScript(u32, u32);
+void TextWindow_Refresh(u32, u32);
 void sub_08033A38(u32, u32, void *);
 void sub_080337FC(u32);
 static inline u8 ok(s32 v)
@@ -34,8 +34,8 @@ void sub_0810F990(struct S *s)
     if (g != 0 && g->b == 1 && ok(i)) {
         u8 *q = (u8 *)g + ((i << 6) + 0x120);
         if (q != 0) {
-            sub_0803386C(s->h, s->e);
-            sub_08033924(s->h, 0);
+            TextWindow_SetScript(s->h, s->e);
+            TextWindow_Refresh(s->h, 0);
             sub_08033A38(s->h, 1, q + 0x10);
             sub_080337FC(s->h);
         }

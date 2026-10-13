@@ -5,8 +5,8 @@ void sub_0801C16C(void *);
 void sub_0801C17C(void *);
 void sub_0801C1A0(void *);
 void sub_0801C190(void *);
-void sub_0822B2F8(int);
-void sub_0822B358(int);
+void Sound_PlaySong(int);
+void Sound_StopSong(int);
 void ResultGame_UpdatePlayerMarker(void *);
 void ResultGame_ScoreAlignment(void *);
 void sub_0801C69C(void *, void *);
@@ -39,7 +39,7 @@ void ResultGame_TrackTarget(u8 *p)
             sub_0801C16C(p);
             sub_0801C17C(p);
             sub_0801C1A0(p);
-            sub_0822B2F8(0x4b1);
+            Sound_PlaySong(0x4b1);
             break;
         }
         case 1:
@@ -105,8 +105,8 @@ void ResultGame_TrackTarget(u8 *p)
     if (++H(0xa8) > 1200)
         H(0xa8) = 1200;
     if (p[0xaf] != 6 && (p[0xc4] == 1 || H(0xa8) > 1199)) {
-        sub_0822B358(0x3ed);
-        sub_0822B358(0x3ee);
+        Sound_StopSong(0x3ed);
+        Sound_StopSong(0x3ee);
         p[0xaf] = 6;
         p[0xb3] = 0;
         sub_0801C190(p);

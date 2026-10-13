@@ -27,29 +27,29 @@ void sub_08215114(void);
 void sub_0821969C(void);
 void sub_0821447C(int, void *, void *, void *);
 void sub_08177DEC(int);
-void sub_082156B8(int);
-void *sub_0821A520(int, int);
+void Bg_ClearTilemap(int);
+void *ScriptProc_Start(int, int);
 void sub_082161B4(int, int, void *, int, int, int, void *);
-void sub_0821656C(int, int, int, int, int);
+void BgGfx_LoadTilemapSimple(int, int, int, int, int);
 void sub_08036C0C(void);
 void sub_0822B058(int);
 void sub_08036E14(void);
 void sub_08036EC8(struct LinkMenu *, int);
 int sub_08033690(int, int, int, int);
-void sub_0803386C(int, void *);
-void sub_08033924(int, int);
+void TextWindow_SetScript(int, void *);
+void TextWindow_Refresh(int, int);
 void sub_080337FC(int);
 void sub_08033778(int);
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 int sub_08036BEC(void);
 int sub_0824923C(void *, void *);
 extern void *gUnk_08605770[];
-void sub_082195E0(void *);
+void Anim_Remove(void *);
 int Script_SeekToKeyword(int);
 void *sub_08227E90(void);
-void sub_082196C4(void *, void *);
+void ResourceHeader_Relocate(void *, void *);
 void sub_0821983C(void *, void *, int, int, int, int, int, int);
-void *sub_0821ABA8(int, int);
+void *Script_GetKeywordValue(int, int);
 int sub_08037140(struct LinkMenu *p)
 {
     struct Blob *resource;
@@ -62,12 +62,12 @@ int sub_08037140(struct LinkMenu *p)
     p->script = sub_08227E90();
     if (!p->script)
         goto failed;
-    resource = sub_0821A520(0xCB05, 0x7C8B);
+    resource = ScriptProc_Start(0xCB05, 0x7C8B);
     if (!resource)
         goto failed;
     p->blob = *resource;
     blob = &p->blob;
-    sub_082196C4(blob, resource);
+    ResourceHeader_Relocate(blob, resource);
     {
         void *drawable = p->draw50;
         int flags;
@@ -75,7 +75,7 @@ int sub_08037140(struct LinkMenu *p)
         zero = 0;
         sub_0821983C(drawable, blob, 3, flags, zero, zero, 60, zero);
     }
-    p->resource = sub_0821ABA8(114, 0);
+    p->resource = Script_GetKeywordValue(114, 0);
     p->window = -1;
     p->state = zero;
     p->entered = 1;

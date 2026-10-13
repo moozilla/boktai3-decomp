@@ -1,7 +1,7 @@
 #include "global.h"
 extern u8 gUnk_0824DB2D[];
-void sub_0822B358(int);
-void sub_0822B2F8(int);
+void Sound_StopSong(int);
+void Sound_PlaySong(int);
 void ResultMenu_EnqueueMarker(void *);
 void ResultGame_ScoreAlignment(u8 *p)
 {
@@ -24,8 +24,8 @@ void ResultGame_ScoreAlignment(u8 *p)
         *(u16 *)(p + 0xa0) = value;
         ++*(int *)(p + 0xd8);
         if (p[0xbf]) {
-            sub_0822B358(0x3ee);
-            sub_0822B2F8(0x3ed);
+            Sound_StopSong(0x3ee);
+            Sound_PlaySong(0x3ed);
         }
         p[0xbf] = 0;
     } else if (delta <= width) {
@@ -35,9 +35,9 @@ void ResultGame_ScoreAlignment(u8 *p)
         *(u16 *)(p + 0xa0) = value;
         ++*(int *)(p + 0xdc);
         if (delta > 320)
-            sub_0822B358(0x3ed);
+            Sound_StopSong(0x3ed);
         if (p[0xbf] != 1)
-            sub_0822B358(0x3ee);
+            Sound_StopSong(0x3ee);
         p[0xbf] = 1;
     } else {
         if (value > 65535)
@@ -45,8 +45,8 @@ void ResultGame_ScoreAlignment(u8 *p)
         *(u16 *)(p + 0xa0) = value;
         ++*(int *)(p + 0xe0);
         if (p[0xbf] != 2) {
-            sub_0822B358(0x3ed);
-            sub_0822B2F8(0x3ee);
+            Sound_StopSong(0x3ed);
+            Sound_PlaySong(0x3ee);
         }
         p[0xbf] = 2;
     }

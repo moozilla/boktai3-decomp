@@ -1,7 +1,7 @@
 #include "global.h"
 
-void sub_08214514(u8 *);
-void sub_082195E0(u8 *);
+void Sprite_Remove(u8 *);
+void Anim_Remove(u8 *);
 void sub_0805E468(u8 *);
 void sub_0805E2F0(u8 *);
 void sub_08030BF8(void);
@@ -11,11 +11,11 @@ s32 sub_080632EC(u8 *p)
 {
     u8 *q;
     s32 i;
-    sub_08214514(p + 0x60);
+    Sprite_Remove(p + 0x60);
     q = p + 0xa8;
     i = 0x44;
     do {
-        sub_082195E0(q);
+        Anim_Remove(q);
         q += 0x60;
         i--;
     } while (i >= 0);

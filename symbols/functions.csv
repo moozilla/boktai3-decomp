@@ -193,6 +193,8 @@ addr,name,mode,confidence,source,notes
 08012F28,BreakableBarrier_Hide,thumb,low,src-alias,
 08012F50,BreakableBarrier_Update,thumb,low,src-alias,
 08013294,BreakableBarriers_Initialize,thumb,low,src-alias,
+08013424,ActorShadow_Enable,thumb,low,src-alias,
+08013440,ActorShadow_Disable,thumb,low,src-alias,
 08013458,Shadow_UpdateTerrain,thumb,low,src-alias,
 080135E8,Shadow_Initialize,thumb,low,src-alias,
 08013740,ScaledShadow_Update,thumb,low,src-alias,
@@ -376,6 +378,7 @@ addr,name,mode,confidence,source,notes
 08020C40,SceneMessages_Initialize,thumb,low,src-alias,
 08020C84,SceneMessages_Create,thumb,low,src-alias,
 08020CD4,SceneMessages_RegisterReceiver,thumb,low,src-alias,
+08020D68,Trigger_ConsumePending,thumb,low,src-alias,
 08020D88,SceneMessages_FindScript,thumb,low,src-alias,
 08020DF0,SceneMessages_ScriptStart,thumb,low,src-alias,
 08020ED8,SceneMessages_Stop,thumb,low,src-alias,
@@ -416,7 +419,13 @@ addr,name,mode,confidence,source,notes
 08023A48,SceneActorState_Hold,thumb,low,src-alias,
 08023BE4,SceneActorState_ResumeAfterAction,thumb,low,src-alias,
 08024F2C,SceneActorAnimation_TransitionVariant,thumb,low,src-alias,
+0802DCD8,Actor_PlayAnimationEntry,thumb,low,src-alias,
 0803223C,Text_FindChar,thumb,medium,raphaelr,strchr variant used by script parsing
+08032C34,TextState_Reset,thumb,low,src-alias,
+08032C54,TextState_SetBounds,thumb,low,src-alias,
+08033634,TextWindow_Find,thumb,low,src-alias,
+0803386C,TextWindow_SetScript,thumb,low,src-alias,
+08033924,TextWindow_Refresh,thumb,low,src-alias,
 081DC02C,Menu_EraseRect,thumb,high,raphaelr,"(x, y, w, h) clear UI text area; must be called before overdrawing text"
 081DC054,Menu_DrawText,thumb,high,raphaelr,"(x, y, char *text) draw text in the UI"
 081DC6D0,Time_ShowRegionMenu,thumb,medium,raphaelr,region select screen; page number at menu+0x1C
@@ -459,13 +468,33 @@ addr,name,mode,confidence,source,notes
 081E6E0C,Actor_MoveAlongScriptedCurve,thumb,low,src-alias,
 081EA1C0,Actor_ConfigureFromScript,thumb,low,src-alias,
 08213D10,InterruptsAndVideo_Initialize,thumb,low,src-alias,
+082144A4,Sprite_Init,thumb,low,src-alias,
+08214514,Sprite_Remove,thumb,low,src-alias,
+08215184,AnimData_FindEntry,thumb,low,src-alias,
+082151E4,AnimData_Load,thumb,low,src-alias,
+08215284,AnimData_SelectTiles,thumb,low,src-alias,
 08215400,ObjGfx_LoadTiles,thumb,medium,coverage,"reads sprite tile graphics 0x08BF0000-0x08CDxxxx (menu titles, button labels, portraits)"
 08215698,Video_GetBackgroundMap,thumb,high,raphaelr,(int bg) -> EWRAM buffer holding that BG's tilemap
+082156B8,Bg_ClearTilemap,thumb,low,src-alias,
+0821656C,BgGfx_LoadTilemapSimple,thumb,low,src-alias,
 08216584,BgGfx_LoadTilemap,thumb,medium,coverage,reads 0x200-byte BG tilemaps (menu screens at 0x0870C238+)
+08217EAC,Effect_Remove,thumb,low,src-alias,
 08218D1C,Text_DrawGlyph,thumb,medium,coverage,copies 8x16 / 16x16 glyph tiles from the fonts at 0x089F8F00 / 0x089FAF00
+08218E5C,TextWindow_BlankRect,thumb,low,src-alias,
+082195E0,Anim_Remove,thumb,low,src-alias,
+082196C4,ResourceHeader_Relocate,thumb,low,src-alias,
+0821980C,Anim_LoadKeyframe,thumb,low,src-alias,
 08219AAC,TaskSystem_Initialize,thumb,low,src-alias,
+08219C40,Heap_Alloc,thumb,low,src-alias,
+08219D38,Heap_Free,thumb,low,src-alias,
+08219DD8,Memory_Clear,thumb,low,src-alias,
+08219EBC,Memory_Copy,thumb,low,src-alias,
 08219F04,BgGfx_LoadTiles,thumb,medium,coverage,"reads BG tile graphics (0x0865xxxx-0x0875xxxx, menu BG 0x0870A230)"
+08219FBC,Task_Create,thumb,low,src-alias,
+0821A04C,Task_SetCallbacks,thumb,low,src-alias,
 0821A054,TaskSystem_RunFrame,thumb,low,src-alias,
+0821A0C0,Task_Kill,thumb,low,src-alias,
+0821A520,ScriptProc_Start,thumb,low,src-alias,
 0821A6F0,Script_DecodeOperand,thumb,medium,disasm,event VM operand decoder (u8/u16/string-ref/text operands; calls Text_LookupString)
 0821A940,Script_PushCtrlNextKeyword,thumb,medium,raphaelr,
 0821A950,Script_PopCtrlNextKeyword,thumb,medium,raphaelr,
@@ -475,13 +504,27 @@ addr,name,mode,confidence,source,notes
 0821AB18,Script_GetPc,thumb,high,raphaelr,
 0821AB40,Script_GetValue,thumb,high,raphaelr,evaluate integer operand at PC
 0821AB88,Script_GetValueSafe,thumb,medium,raphaelr,Script_GetValue with null-PC checks
+0821ABA8,Script_GetKeywordValue,thumb,low,src-alias,
 0821ACB4,Script_ReadProcTable,thumb,low,coverage,heaviest reader of 0x08D5xxxx-0x08D6Bxxx (table preceding the script text bank)
+0821AD08,Script_Call,thumb,low,src-alias,
 0821ADD4,Text_LookupString,thumb,high,notes.txt+raphaelr,"(int id) -> char*; table 0x08D6B1F8, base 0x08D74DDC, mask 0x7FFFFFFF"
 0821B084,GameState_SelectRamBase,thumb,low,src-alias,
+0821FE40,Collider_Refresh,thumb,low,src-alias,
+0821FE6C,Collider_Remove,thumb,low,src-alias,
+0821FEB4,Collider_Init,thumb,low,src-alias,
+0821FF24,Collider_SetPosition,thumb,low,src-alias,
+0821FF84,Collider_SetCallback,thumb,low,src-alias,
+08220C8C,Anim_SetSequence,thumb,low,src-alias,
+08220D78,Anim_SetKeyframes,thumb,low,src-alias,
+08220F70,Anim_Step,thumb,low,src-alias,
+082215E4,Math_Atan2,thumb,low,src-alias,
 082284F4,Clock_ClearState,thumb,low,src-alias,
 082290F4,Clock_CheckRtcDate,thumb,low,src-alias,
 0822A7A8,Time_CalculateSunriseSunsetCore,thumb,medium,raphaelr,
 0822AE00,Time_CalculateSunriseSunset,thumb,high,raphaelr,"(lat, lon, tz_offset) compute+store sunrise/sunset"
+0822B2F8,Sound_PlaySong,thumb,low,src-alias,
+0822B358,Sound_StopSong,thumb,low,src-alias,
+0822B3BC,Sound_PlaySongChecked,thumb,low,src-alias,
 0822F1B4,umul3232H32,thumb,low,src-alias,
 0822F1C4,SoundMain,thumb,low,src-alias,
 0822F65C,MPlayJumpTableCopy,thumb,low,src-alias,

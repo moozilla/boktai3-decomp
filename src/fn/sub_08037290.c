@@ -40,10 +40,10 @@ struct Owner {
 };
 
 extern const struct PeerStyle gUnk_0824DE64[];
-void *sub_0821A520(int, int);
-void sub_082151E4(void *, int);
-void sub_08215284(void *, int);
-void sub_082144A4(void *, void *, int);
+void *ScriptProc_Start(int, int);
+void AnimData_Load(void *, int);
+void AnimData_SelectTiles(void *, int);
+void Sprite_Init(void *, void *, int);
 void sub_08220D20(void *, void *, int, int, int);
 void sub_0821983C(void *, void *, int, int, int, int, int, void *);
 
@@ -61,7 +61,7 @@ int sub_08037290(struct Owner *owner, struct PeerPanel *panel, int kind)
     struct Animation *a;
     int flags;
 
-    resource = sub_0821A520(0x922E, 0x4BBF);
+    resource = ScriptProc_Start(0x922E, 0x4BBF);
     glyph = p->glyph;
     {
         const struct PeerStyle *table = gUnk_0824DE64;
@@ -75,14 +75,14 @@ int sub_08037290(struct Owner *owner, struct PeerPanel *panel, int kind)
             }
         }
     }
-    sub_082151E4(glyph, style->resource);
+    AnimData_Load(glyph, style->resource);
     {
         int tile = style->tile;
         register int base asm("r2") = 503;
-        sub_08215284(glyph, tile + base);
+        AnimData_SelectTiles(glyph, tile + base);
     }
     initialSprite = &p->sprite;
-    sub_082144A4(initialSprite, glyph, style->priority | 48);
+    Sprite_Init(initialSprite, glyph, style->priority | 48);
     sub_08220D20(&animation, resource, style->animation, 0, 0);
     sprite = initialSprite;
     a = &animation;

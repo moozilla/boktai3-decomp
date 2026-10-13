@@ -8,7 +8,7 @@ struct Obj {
 };
 void sub_08214450(struct Obj *, u32);
 
-void sub_082195E0(struct Obj *o)
+void Anim_Remove(struct Obj *o)
 {
     if (o->f4 != 0)
         sub_08214450(o, o->f1C);

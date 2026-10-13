@@ -6,7 +6,7 @@ struct P {
     u16 f382;
 };
 void sub_08052418(struct P *);
-void sub_0822B2F8(u32);
+void Sound_PlaySong(u32);
 void sub_08052628(struct P *, void (*)(void));
 void sub_08052D34(void);
 void sub_08052CE4(struct P *p)
@@ -20,7 +20,7 @@ void sub_08052CE4(struct P *p)
         u32 v = *d + 1;
         *d = v;
         if ((u16)v > 0x1f) {
-            sub_0822B2F8(0x15f);
+            Sound_PlaySong(0x15f);
             sub_08052628(p, sub_08052D34);
         }
     }

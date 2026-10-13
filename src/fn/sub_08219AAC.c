@@ -13,7 +13,7 @@ void sub_08219F50(void);
 void sub_0821A20C(void);
 void sub_0821A2E4(void);
 s32 sub_08219A94(void);
-void sub_0821A04C(struct Task *, s32 (*)(void), void (*)(void));
+void Task_SetCallbacks(struct Task *, s32 (*)(void), void (*)(void));
 void sub_08219F74(struct Task *);
 void TaskSystem_Initialize(void)
 {
@@ -24,7 +24,7 @@ void TaskSystem_Initialize(void)
     sub_0821A2E4();
     gUnk_03005278 = 123456;
     task = &gUnk_03001668;
-    sub_0821A04C(task, sub_08219A94, 0);
+    Task_SetCallbacks(task, sub_08219A94, 0);
     task->f14 = 0;
     task->f16 = 1;
     task->f10 = 0;

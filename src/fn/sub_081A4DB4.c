@@ -12,7 +12,7 @@ struct A {
     struct E e[16];
 };
 extern void *gUnk_02000244;
-void sub_082195E0(void *);
+void Anim_Remove(void *);
 void sub_08013B74(void *);
 
 void sub_081A4DB4(struct A *p)
@@ -21,7 +21,7 @@ void sub_081A4DB4(struct A *p)
     struct E *e = p->e;
     for (i = 15; i >= 0; i--) {
         if (e->a != 0)
-            sub_082195E0(e);
+            Anim_Remove(e);
         if (e->b != 0)
             sub_08013B74(&e->b);
         e++;

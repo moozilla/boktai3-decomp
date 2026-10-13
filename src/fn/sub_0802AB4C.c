@@ -49,7 +49,7 @@ struct Actor {
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
 void sub_0802A5A0(void *);
-void sub_0822B3BC(int);
+void Sound_PlaySongChecked(int);
 int sub_0802AB4C(struct Actor *p)
 {
     struct Common *base = (void *)p;
@@ -139,7 +139,7 @@ int sub_0802AB4C(struct Actor *p)
             value = *(u16 *)((u8 *)gUnk_0203B400 + index);
             p->angle = value;
         }
-        sub_0822B3BC(318);
+        Sound_PlaySongChecked(318);
     }
     return 0;
 }

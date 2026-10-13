@@ -26,7 +26,7 @@ struct Engine {
 };
 extern struct Engine *gUnk_02000484;
 extern u8 gUnk_020000EC;
-void sub_08219DD8(void *, int);
+void Memory_Clear(void *, int);
 struct Message {
     u8 pad0[0x14];
     u8 bits;
@@ -48,5 +48,5 @@ void sub_08034178(struct Engine *p)
     p->flag3d = zero;
     p->flag3e = zero;
     p->flag3f = zero;
-    sub_08219DD8(p->scratch, 64);
+    Memory_Clear(p->scratch, 64);
 }

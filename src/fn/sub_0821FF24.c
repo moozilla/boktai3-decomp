@@ -7,7 +7,7 @@ struct O {
     u16 fe;
     u16 f10;
 };
-void sub_0821FF24(struct O *o, u16 *s, u16 v)
+void Collider_SetPosition(struct O *o, u16 *s, u16 v)
 {
     o->fc = s[0];
     o->fe = s[1];

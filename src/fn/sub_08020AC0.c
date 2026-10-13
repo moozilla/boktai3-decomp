@@ -8,11 +8,11 @@ struct T {
     u8 f[8];
     s16 a;
 };
-void sub_08020D68(u32, u32);
+void Trigger_ConsumePending(u32, u32);
 void sub_08020AC0(struct S *p, u32 x, struct T *t)
 {
     s32 v = t->a;
     p->a = v;
     if (v == 0)
-        sub_08020D68(x, 1);
+        Trigger_ConsumePending(x, 1);
 }

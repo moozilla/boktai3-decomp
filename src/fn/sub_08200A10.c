@@ -19,17 +19,17 @@ struct Vec00A {
 };
 
 void sub_08201274(u8 *);
-void *sub_0821A520(u32, u32);
-void sub_082196C4(u8 *, void *);
+void *ScriptProc_Start(u32, u32);
+void ResourceHeader_Relocate(u8 *, void *);
 void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
 u32 sub_081605DC(u8 *, u8 *, u8 *);
 void sub_0816065C(u32, u32, u32);
 void sub_080139F4(u8 *, u8 *);
 void sub_08013728(u8 *);
-void sub_0821FEB4(u8 *, u32, u32, u32, u32, struct Vec00A *, struct Vec00A *);
-void sub_0821FF84(u8 *, void *, u8 *);
+void Collider_Init(u8 *, u32, u32, u32, u32, struct Vec00A *, struct Vec00A *);
+void Collider_SetCallback(u8 *, void *, u8 *);
 void sub_0821FF7C(u8 *, s32, u32, u32);
-void sub_0821FE40(u8 *);
+void Collider_Refresh(u8 *);
 void sub_0821FF58(u8 *, s32, s32, u32, u32, s32);
 void sub_08200324(void);
 void sub_082003B8(void);
@@ -52,10 +52,10 @@ void sub_08200A10(u32 unused, u8 *s, u32 arg)
         source = &fill;
         fill00A(source, dest, 0x05000002);
     }
-    res = sub_0821A520(0xcb05, 0xde23);
+    res = ScriptProc_Start(0xcb05, 0xde23);
     {
         u8 *obj = s + 0x278;
-        sub_082196C4(obj, res);
+        ResourceHeader_Relocate(obj, res);
         {
             u8 *p = s + 0x1b8;
             sub_0821983C(p, obj, 0, 0, 2, 1, zero, zero);
@@ -78,10 +78,10 @@ void sub_08200A10(u32 unused, u8 *s, u32 arg)
     w.x = zero;
     w.y = 128;
     w.z = zero;
-    sub_0821FEB4(p, zero, 0x4001, zero, 16, &v, &w);
-    sub_0821FF84(p, sub_08200324, s);
+    Collider_Init(p, zero, 0x4001, zero, 16, &v, &w);
+    Collider_SetCallback(p, sub_08200324, s);
     sub_0821FF7C(p, *(s16 *)(context + 0x16), 0x402, 1);
-    sub_0821FE40(p);
+    Collider_Refresh(p);
     *(u16 *)(p + 6) = flag00A(*(u16 *)(p + 6));
     p -= 0x54;
     v.x = 64;
@@ -90,8 +90,8 @@ void sub_08200A10(u32 unused, u8 *s, u32 arg)
     w.x = zero;
     w.y = 128;
     w.z = zero;
-    sub_0821FEB4(p, zero, 0x2001, zero, 16, &v, &w);
-    sub_0821FF84(p, sub_082003B8, s);
+    Collider_Init(p, zero, 0x2001, zero, 16, &v, &w);
+    Collider_SetCallback(p, sub_082003B8, s);
     sub_0821FF58(p, *(s16 *)(context + 0x10), *(s16 *)(context + 0x12), 0, zero,
                  *(s16 *)(context + 0x14));
     p += 0xa8;
@@ -101,8 +101,8 @@ void sub_08200A10(u32 unused, u8 *s, u32 arg)
     w.x = zero;
     w.y = 128;
     w.z = zero;
-    sub_0821FEB4(p, zero, 0x2001, zero, 16, &v, &w);
-    sub_0821FF84(p, sub_082003B8, s);
+    Collider_Init(p, zero, 0x2001, zero, 16, &v, &w);
+    Collider_SetCallback(p, sub_082003B8, s);
     sub_0821FF58(p, *(s16 *)(context + 0x18), *(s16 *)(context + 0x1a), 0, zero,
                  *(s16 *)(context + 0x1c));
     p = s + 0x128;
@@ -112,6 +112,6 @@ void sub_08200A10(u32 unused, u8 *s, u32 arg)
     w.x = zero;
     w.y = 128;
     w.z = zero;
-    sub_0821FEB4(p, zero, 0x2001, zero, 16, &v, &w);
-    sub_0821FF84(p, sub_082003B8, s);
+    Collider_Init(p, zero, 0x2001, zero, 16, &v, &w);
+    Collider_SetCallback(p, sub_082003B8, s);
 }

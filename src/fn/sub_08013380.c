@@ -1,18 +1,18 @@
 #include "global.h"
-void *sub_08219FBC(s32, s32);
-void sub_0821A04C(void *, void *, void *);
+void *Task_Create(s32, s32);
+void Task_SetCallbacks(void *, void *, void *);
 s32 BreakableBarriers_Initialize(void *);
-void sub_0821A0C0(void *);
+void Task_Kill(void *);
 void sub_0801324C(void);
 void sub_08013270(void);
 void *sub_08013380(void)
 {
     void *obj;
-    obj = sub_08219FBC(8, 0x2FC);
+    obj = Task_Create(8, 0x2FC);
     if (obj != 0) {
-        sub_0821A04C(obj, sub_0801324C, sub_08013270);
+        Task_SetCallbacks(obj, sub_0801324C, sub_08013270);
         if (BreakableBarriers_Initialize(obj) < 0) {
-            sub_0821A0C0(obj);
+            Task_Kill(obj);
             return 0;
         }
     }

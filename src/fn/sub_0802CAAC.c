@@ -18,7 +18,7 @@ struct Object {
 };
 void *sub_0802C678(void);
 struct Object *sub_0802CA8C(int);
-int sub_082215E4(int, int);
+int Math_Atan2(int, int);
 int sub_0802CAAC(struct Object *p)
 {
     int i;
@@ -29,7 +29,7 @@ int sub_0802CAAC(struct Object *p)
         if (t) {
             struct Vec *src = &p->pos;
             struct Vec *dst = &t->pos;
-            int angle = sub_082215E4(dst->x - src->x, dst->z - src->z);
+            int angle = Math_Atan2(dst->x - src->x, dst->z - src->z);
             int facing = p->angle;
             int signedAngle = (s8)angle;
             u8 diff;

@@ -46,7 +46,7 @@ void sub_080297FC(void *, int, int, int);
 void sub_08029E1C(void *);
 int sub_08029E2C(void *);
 void sub_08029AA8(void *);
-void sub_0822B3BC(int);
+void Sound_PlaySongChecked(int);
 struct Common {
     u8 pad0[0x90];
     u32 timer;
@@ -82,7 +82,7 @@ void sub_0802A5A0(ActorAnimation *p)
         p->changed = 0;
         sub_080297FC(p, 8, 1, 8);
         sub_08046834(*(void **)((u8 *)p + 0x904));
-        sub_0822B3BC(1359);
+        Sound_PlaySongChecked(1359);
     }
     {
         u8 *dst = (u8 *)p + 0x197;

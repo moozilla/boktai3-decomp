@@ -14,7 +14,7 @@ struct G {
     s16 fa;
 };
 extern struct G gUnk_030042A0;
-s32 sub_0821ABA8(u32, u32);
+s32 Script_GetKeywordValue(u32, u32);
 struct Q *sub_0821A2C4(u32);
 void sub_0821447C(u32, void (*)(void), void (*)(void), void (*)(void));
 void sub_08217F4C(void);
@@ -25,7 +25,7 @@ void sub_08214D20(void);
 void sub_0821964C(void);
 void sub_08225DA0(void)
 {
-    s32 r = sub_0821ABA8(0x76, 0);
+    s32 r = Script_GetKeywordValue(0x76, 0);
     struct Q *p;
     if (r == 0) {
         p = sub_0821A2C4(0x56C2);

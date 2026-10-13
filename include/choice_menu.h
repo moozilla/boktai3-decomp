@@ -1,7 +1,7 @@
 #ifndef GUARD_CHOICE_MENU_H
 #define GUARD_CHOICE_MENU_H
 
-#include "global.h"
+#include "engine.h"
 
 /* One selectable entry; x/y are pixel positions, width in characters. */
 struct Choice {
@@ -51,9 +51,6 @@ struct ChoiceKeys {
 
 extern struct ChoiceMenu *gUnk_0200002C;
 extern struct ChoiceKeys gUnk_03005260;
-
-s32 sub_0821ABA8(s32, s32);
-void sub_0821A04C(void *, u32 (*)(struct ChoiceMenu *), u32 (*)(struct ChoiceMenu *));
 
 void ChoiceMenu_DispatchSelection(struct ChoiceMenu *p, s32 selection);
 void ChoiceMenu_Select(struct ChoiceMenu *p, s32 selection);

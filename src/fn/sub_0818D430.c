@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0822B3BC(u32);
+void Sound_PlaySongChecked(u32);
 void sub_0818D460(void);
 
 void sub_0818D430(u8 *p)
@@ -9,6 +9,6 @@ void sub_0818D430(u8 *p)
     *(u16 *)(p + 0x1D6) = c;
     if ((c << 16) == 0) {
         *(u32 *)(p + 0x1D0) = (u32)sub_0818D460;
-        sub_0822B3BC(0x16A);
+        Sound_PlaySongChecked(0x16A);
     }
 }

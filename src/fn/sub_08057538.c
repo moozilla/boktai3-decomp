@@ -6,7 +6,7 @@ struct S {
 };
 extern struct S *gUnk_0200049C;
 void sub_08178404(void);
-void sub_0821A0C0(struct S *);
+void Task_Kill(struct S *);
 
 void sub_08057538(void)
 {
@@ -15,6 +15,6 @@ void sub_08057538(void)
         sub_08178404();
         p = gUnk_0200049C;
         p->v = 0;
-        sub_0821A0C0(p);
+        Task_Kill(p);
     }
 }

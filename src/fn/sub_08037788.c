@@ -23,12 +23,12 @@ struct PeerMenu {
 extern u16 gUnk_03005260[];
 int sub_08036AC4(void);
 int sub_08036A88(void);
-void sub_08033924(int, int);
-void sub_08219DD8(void *, int);
+void TextWindow_Refresh(int, int);
+void Memory_Clear(void *, int);
 void sub_08036CF0(const void *, void *, int);
 void sub_082213B8(void *, void *, int, int, int, int, int, int, int);
 void sub_08033A38(int, int, void *);
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 void sub_08036B14(void);
 void sub_08036AFC(void);
 void sub_08037788(struct PeerMenu *p)
@@ -38,7 +38,7 @@ void sub_08037788(struct PeerMenu *p)
     int i;
     if (p->entered) {
         p->entered = 0;
-        sub_08033924(p->window, 7);
+        TextWindow_Refresh(p->window, 7);
         p->previous = 255;
     }
     if (connected != p->previous) {
@@ -65,7 +65,7 @@ void sub_08037788(struct PeerMenu *p)
                     } while (!((*(struct RfuLinkStatus *volatile *)links)->connSlotFlag >> i & 1));
                 }
                 r = p->rows;
-                sub_08219DD8(name, 24);
+                Memory_Clear(name, 24);
                 sub_08036CF0(gUnk_03006A80->partner[i].gname, name, 11);
                 {
                     u8 *packet = gUnk_03006A80->partner[i].gname;
@@ -82,11 +82,11 @@ void sub_08037788(struct PeerMenu *p)
                     } while (--i >= 0);
                 }
                 sub_08033A38(p->window, 2, (u8 *)r + 0x244);
-                sub_0822B2F8(495);
+                Sound_PlaySong(495);
             }
-            sub_08033924(p->window, 8);
+            TextWindow_Refresh(p->window, 8);
         } else {
-            sub_08033924(p->window, 7);
+            TextWindow_Refresh(p->window, 7);
             {
                 u32 mask = 1;
                 struct Row *cursor = r;

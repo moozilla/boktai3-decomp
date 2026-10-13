@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-void sub_08220D78(void *, int, u16, u16, u16);
+void Anim_SetKeyframes(void *, int, u16, u16, u16);
 void SceneActors_StartEightDirectionAnimation(u8 *p, u8 *animation, int resource, int sequence,
                                               int speed, int offset, int flags)
 {
@@ -25,7 +25,7 @@ void SceneActors_StartEightDirectionAnimation(u8 *p, u8 *animation, int resource
         int selected = p[0xb6] + sequence;
         *(u16 *)(p + 0xb8) = selected;
     }
-    sub_08220D78(animation, resource, *(u16 *)(p + 0xb8), speed, flags);
+    Anim_SetKeyframes(animation, resource, *(u16 *)(p + 0xb8), speed, flags);
     flags &= 1;
     if (!flags) {
         asm("" : "+r"(flags));

@@ -8,7 +8,7 @@ struct Weather {
 };
 extern u8 *gUnk_02000710;
 extern u16 gUnk_03004BD8;
-void sub_0821AD08(void *, int);
+void Script_Call(void *, int);
 void sub_080174B8(void *, int);
 int sub_080177AC(void *, int, int, int);
 static inline void setFlag(void)
@@ -23,7 +23,7 @@ int Weather_StormOnset(struct Weather *p)
         p->entered = 0;
         setFlag();
         if (p->script)
-            sub_0821AD08(p->script, 0);
+            Script_Call(p->script, 0);
     }
     mask = 512;
     gUnk_03004BD8 = mask | gUnk_03004BD8;

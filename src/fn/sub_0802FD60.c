@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08020D68(void *, u32);
+void Trigger_ConsumePending(void *, u32);
 struct S {
     u8 f0[5];
     u8 b5;
@@ -15,7 +15,7 @@ void sub_0802FD60(u32 a, struct S *p)
         p->b8 = 0;
         p->b7 = 0;
         p->b5 = 1;
-        sub_08020D68((u8 *)p + 0x168, 1);
+        Trigger_ConsumePending((u8 *)p + 0x168, 1);
     }
     p->c14++;
 }

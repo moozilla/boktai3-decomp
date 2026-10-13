@@ -1,6 +1,6 @@
 #ifndef TERRAIN_OVERLAY_H
 #define TERRAIN_OVERLAY_H
-#include "global.h"
+#include "engine.h"
 
 // Tentative: terrain-edge overlays drawn around tracked actors.
 struct TerrainOverlayDrawable {
@@ -49,13 +49,6 @@ struct TerrainOverlay {
 struct TerrainOverlayCell {
     u8 height, tile;
     u16 flags;
-};
-
-struct TerrainOverlayMap {
-    u32 unknown;
-    u8 *cells;
-    u8 pad8[28];
-    u16 rows[1];
 };
 
 #endif

@@ -5,7 +5,7 @@ struct E {
 extern struct E gUnk_08614D6C[];
 u8 *sub_0821A490(u8 *, u32, u16, u16);
 u32 sub_0821A4E8(u32, struct E *, s32, s32);
-u8 *sub_0821A520(u16 key, u16 context)
+u8 *ScriptProc_Start(u16 key, u16 context)
 {
     u32 special = 0;
     u16 saved_context = context;

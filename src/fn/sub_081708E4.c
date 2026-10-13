@@ -7,7 +7,7 @@ void sub_0816471C(void *, s32, s32, s32, u32, u32);
 void sub_0816568C(void);
 void sub_08165ACC(void *);
 void sub_08165B94(void *, s32, s32);
-void sub_0821980C(void *, void *, u16, s32);
+void Anim_LoadKeyframe(void *, void *, u16, s32);
 void sub_0816618C(void *, s32, s32);
 void sub_08165B28(void *, s32, s32);
 void sub_08166CD0(void *);
@@ -40,7 +40,7 @@ void sub_081708E4(u8 *p)
     sub_08165B94(p, 0, 0x201);
     {
         u8 *a = p + 0x1420;
-        sub_0821980C(a, p + 0x64, 0x52, 0);
+        Anim_LoadKeyframe(a, p + 0x64, 0x52, 0);
     }
     sub_0816618C(p, 8, 32);
     sub_08165B94(p, 0x4d, 1);

@@ -46,13 +46,13 @@ extern struct Map *gUnk_030052F4;
 extern u32 gUnk_030052F8, gUnk_030052FC;
 u8 *sub_0821D64C(int, int);
 extern const s16 gUnk_086149C4[];
-int sub_0802DCD8(struct Actor *, int, int, int, int);
+int Actor_PlayAnimationEntry(struct Actor *, int, int, int, int);
 void sub_0802DD6C(struct Actor *, int);
 void sub_080426D4(void *, int);
 void sub_080426F8(void *, int);
 void sub_0804275C(void *, int, int, int);
-void sub_0822B2F8(int);
-int sub_082215E4(int, int);
+void Sound_PlaySong(int);
+int Math_Atan2(int, int);
 static inline int scale(int v)
 {
     if (v >= 0)
@@ -81,7 +81,7 @@ void sub_0802EA90(void *unused, struct Actor *p)
         int zero = 0;
         p->entered = zero;
         p->done = zero;
-        sub_0802DCD8(p, 1, 1, zero, 4);
+        Actor_PlayAnimationEntry(p, 1, 1, zero, 4);
     }
     if ((u8)p->callback(p) != 1) {
         struct Vec *pos = &p->pos;
@@ -99,14 +99,14 @@ void sub_0802EA90(void *unused, struct Actor *p)
             vel->x = scale(gUnk_086149C4[(angle + 64) & 255] * speed);
             vel->y = 0;
             vel->z = scale(gUnk_086149C4[angle] * speed);
-            p->targetAngle = sub_082215E4(target->x - pos->x, target->z - pos->z);
+            p->targetAngle = Math_Atan2(target->x - pos->x, target->z - pos->z);
             {
                 u32 value = p->targetAngle;
                 p->angle = value;
                 p->facing8 = ((value + 112) >> 5) & 7;
                 p->facing4 = ((value + 96) >> 6) & 3;
             }
-            sub_0802DCD8(p, 1, 1, 0, 1);
+            Actor_PlayAnimationEntry(p, 1, 1, 0, 1);
         }
         sub_0802DD6C(p, 1);
     }

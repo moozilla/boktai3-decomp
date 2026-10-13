@@ -4,7 +4,7 @@ struct P {
     u32 x;
 };
 extern u8 *gUnk_02000710;
-void sub_08215284(u8 *, s32);
+void AnimData_SelectTiles(u8 *, s32);
 void sub_0804F0B4(struct P *p)
 {
     u32 *q = &p->x;
@@ -22,7 +22,7 @@ void sub_0804F0B4(struct P *p)
             }
         }
     } else {
-        sub_08215284((u8 *)p + 0x44, 0x1ae);
+        AnimData_SelectTiles((u8 *)p + 0x44, 0x1ae);
         *((u8 *)p + 0x262) = 0;
     }
     *((u8 *)p + 0x264) = 1;

@@ -5,7 +5,7 @@ struct Args {
     s32 *values;
 };
 u8 *Script_DecodeOperand(u8 *, s32 *, s32 *);
-s32 sub_0821AD08(s32, struct Args *);
+s32 Script_Call(s32, struct Args *);
 s32 sub_0821AD2C(u8 *p)
 {
     s32 values[16], type, value;
@@ -23,5 +23,5 @@ s32 sub_0821AD2C(u8 *p)
     }
     args.count = count;
     args.values = values;
-    return sub_0821AD08(id, &args);
+    return Script_Call(id, &args);
 }

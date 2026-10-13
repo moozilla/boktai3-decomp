@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0821AD08(s32, s32);
+void Script_Call(s32, s32);
 
 void sub_0814F838(u8 *p)
 {
@@ -9,6 +9,6 @@ void sub_0814F838(u8 *p)
 
     if (v != 0) {
         *(s32 *)slot = 0;
-        sub_0821AD08(v, 0);
+        Script_Call(v, 0);
     }
 }

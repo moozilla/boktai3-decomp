@@ -27,17 +27,17 @@ struct Manager {
     u32 direction[4];
     struct Vec positions[4];
 };
-int sub_082151E4(void *, int);
-void sub_082144A4(void *, void *, int);
+int AnimData_Load(void *, int);
+void Sprite_Init(void *, void *, int);
 void BreakableBarrier_SetPosition(void *, void *, int);
-void sub_0821FEB4(void *, int, int, int, int, void *, void *);
-void sub_0821FF24(void *, void *, int);
-void sub_0821FF84(void *, void *, void *);
+void Collider_Init(void *, int, int, int, int, void *, void *);
+void Collider_SetPosition(void *, void *, int);
+void Collider_SetCallback(void *, void *, void *);
 void sub_0821FF7C(void *, int, int, int);
-void sub_0821FE40(void *);
+void Collider_Refresh(void *);
 void sub_08012D78(void *, void *, void *);
 void sub_08012D08(void *, int);
-int sub_0821ABA8(int, int);
+int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetPc(void);
 int Script_GetValue(void);
@@ -49,7 +49,7 @@ int BreakableBarriers_Initialize(struct Manager *m)
     struct Barrier *p;
     m->count = 0;
     m->remaining = 0;
-    m->health = sub_0821ABA8('l', 5);
+    m->health = Script_GetKeywordValue('l', 5);
     if (Script_SeekToKeyword('p')) {
         for (i = 0; i < 4 && Script_GetPc(); i++) {
             m->positions[i].x = Script_GetValue();
@@ -74,7 +74,7 @@ int BreakableBarriers_Initialize(struct Manager *m)
     for (i = 0; i < 4; i++, p++)
         if (BreakableBarrier_Initialize(m, p, i) < 0)
             return -1;
-    m->script = sub_0821ABA8('c', 0);
+    m->script = Script_GetKeywordValue('c', 0);
     gUnk_03005214 = 0x1084;
     gUnk_030051C4 = 0x1FFF;
     {

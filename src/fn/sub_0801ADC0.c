@@ -5,7 +5,7 @@ int sub_08019F2C(void *);
 void sub_0801AC50(void *);
 void sub_0801AC84(void *);
 int sub_0801ACB8(void *);
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 void Presentation_UpdateActorGraphic(void *, int);
 void Presentation_UpdateItemGraphic(void *, int);
 u8 *sub_0822D6C8(int);
@@ -24,7 +24,7 @@ void SelectionMenu_Choose(u8 *p)
                 if (gUnk_03005260[1] & 1) {
                     if (++p[0x24] > 2)
                         p[0x24] = 0;
-                    sub_0822B2F8(0xdc);
+                    Sound_PlaySong(0xdc);
                 }
             } else {
                 index = sub_0801ACB8(p);
@@ -43,14 +43,14 @@ void SelectionMenu_Choose(u8 *p)
                         }
                     }
                     p[0x1d] = index;
-                    sub_0822B2F8(0xdc);
+                    Sound_PlaySong(0xdc);
                     Presentation_UpdateActorGraphic(p, 0);
                 }
                 if (gUnk_03005260[1] & 1) {
                     if (*sub_0822D6C8(p[0x1d]) != 255 && ((1 << p[0x1d]) & *(u32 *)(p + 0x34)))
                         sub_0801A8FC(p);
                     else
-                        sub_0822B2F8(0x192);
+                        Sound_PlaySong(0x192);
                     return;
                 } else if (gUnk_03005260[1] & 2) {
                     SelectionMenu_Back(p);
@@ -66,7 +66,7 @@ void SelectionMenu_Choose(u8 *p)
                 if (gUnk_03005260[1] & 1) {
                     if (++p[0x24] > 2)
                         p[0x24] = 0;
-                    sub_0822B2F8(0xdc);
+                    Sound_PlaySong(0xdc);
                 }
             } else {
                 index = sub_0801ACB8(p);
@@ -88,7 +88,7 @@ void SelectionMenu_Choose(u8 *p)
                             }
                         }
                         p[0x1d] = index;
-                        sub_0822B2F8(0xdc);
+                        Sound_PlaySong(0xdc);
                         Presentation_UpdateItemGraphic(p, 0);
                     }
                 }
@@ -98,9 +98,9 @@ void SelectionMenu_Choose(u8 *p)
                         if ((1 << selected) & *(u32 *)(p + 0x34))
                             sub_0801A8FC(p);
                         else
-                            sub_0822B2F8(0x192);
+                            Sound_PlaySong(0x192);
                     } else
-                        sub_0822B2F8(0x192);
+                        Sound_PlaySong(0x192);
                     return;
                 } else if (gUnk_03005260[1] & 2) {
                     SelectionMenu_Back(p);

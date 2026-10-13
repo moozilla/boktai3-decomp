@@ -1,5 +1,5 @@
 #include "global.h"
-s32 sub_0821ABA8(s32, s32);
+s32 Script_GetKeywordValue(s32, s32);
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void sub_0802C8AC(u8 *, s32, s32, void *);
@@ -19,7 +19,7 @@ struct Vec2CD {
 void sub_0802CD04(u8 *p)
 {
     struct Vec2CD v;
-    s32 id = sub_0821ABA8(0x6e, 0);
+    s32 id = Script_GetKeywordValue(0x6e, 0);
     s32 n;
     if (Script_SeekToKeyword(0x70)) {
         v.x = Script_GetValue();
@@ -30,22 +30,22 @@ void sub_0802CD04(u8 *p)
         v.y = 0;
         v.z = 0;
     }
-    sub_0802C8AC(p, id, sub_0821ABA8(0x64, 0), &v);
+    sub_0802C8AC(p, id, Script_GetKeywordValue(0x64, 0), &v);
     *(u32 *)(p + 0x50) = 0;
     *(u32 *)(p + 0x54) = 0;
     *(u32 *)(p + 0x58) = 0;
     *(u32 *)(p + 0x5c) = 0;
     *(u32 *)(p + 0x60) = 0;
-    *(u32 *)(p + 0x138) = sub_0821ABA8(0x65, 0x10000);
+    *(u32 *)(p + 0x138) = Script_GetKeywordValue(0x65, 0x10000);
     {
         struct Fields2CD *q = (struct Fields2CD *)p;
-        q->v13c = sub_0821ABA8(0x45, 0x80);
+        q->v13c = Script_GetKeywordValue(0x45, 0x80);
         q->v140 = -1;
         q->v144 = 0x7f;
         q->v145 = 0xff;
     }
-    p[0x146] = sub_0821ABA8(0x73, 1);
-    n = sub_0821ABA8(0x6c, 0x64);
+    p[0x146] = Script_GetKeywordValue(0x73, 1);
+    n = Script_GetKeywordValue(0x6c, 0x64);
     sub_0802C91C(p, n, n);
     if (Script_SeekToKeyword(0x53)) {
         *(u32 *)(p + 0x14c) = Script_GetValue();
@@ -66,7 +66,7 @@ void sub_0802CD04(u8 *p)
         *(u32 *)(p + 0x164) = 0;
         *(u32 *)(p + 0x168) = 0;
     }
-    *(u32 *)(p + 0x16c) = sub_0821ABA8(0x44, 0);
+    *(u32 *)(p + 0x16c) = Script_GetKeywordValue(0x44, 0);
     if (Script_SeekToKeyword(0x61)) {
         u32 *q = (u32 *)(p + 0x170);
         s32 i = 3;

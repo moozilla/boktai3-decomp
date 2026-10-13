@@ -1,6 +1,6 @@
 #ifndef SCENE_OBJECT_H
 #define SCENE_OBJECT_H
-#include "global.h"
+#include "engine.h"
 
 /*
  * Scene objects: pushable/breakable blocks and similar props (types 0-6) that live in a fixed
@@ -27,14 +27,6 @@ struct SceneCell {
     u8 height; /* low nibble: height level (0-15); high nibble: kind (0 = solid floor, else open) */
     u8 tile;
     u16 flags; /* bit 0 occupied by an object, bit 3 blocks entry, 0x20 (guess) */
-};
-
-/* Terrain map header; the cell array and row table live behind it. */
-struct SceneMap {
-    u32 unused0;
-    u8 *cells; /* +0 u16 width? (`((s16 *)cells)[2]` is the row stride), cells start at +12 */
-    u8 pad8[28];
-    u16 rows[1]; /* first cell index of each row */
 };
 
 /* Position and velocity block, shared with the generic entity code (sub_08225AB4 etc.). */
@@ -135,16 +127,8 @@ struct SceneObjectManager {
 };
 
 extern struct SceneObjectManager *gUnk_02000024;
-extern struct SceneMap *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC;
-extern u32 gUnk_03005308;
-extern const u16 gUnk_0203B400[];
 
 /* Engine helpers shared by the functions below. */
-s32 sub_0822B2F8(s32 sound);
-s32 sub_0821ABA8(s32 key, s32 defaultValue); /* script parameter lookup */
-s32 sub_08215284(struct SceneAnimation *, u16 animation);
-void sub_0821FF24(struct SceneCollider *, struct SceneVec *, s32);
 void sub_08068108(struct SceneVec *, s32, struct SceneExtent *, s32, s32, s32);
 void AnimatedParticles_EmitDirectional(s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, void *);
 

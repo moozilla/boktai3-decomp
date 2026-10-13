@@ -4,8 +4,8 @@ struct P {
     u8 e;
 };
 extern u32 gUnk_02000210;
-void sub_08214514(u8 *);
-void sub_082195E0(u8 *);
+void Sprite_Remove(u8 *);
+void Anim_Remove(u8 *);
 u32 sub_081636C0(u8 *p)
 {
     u8 *q;
@@ -13,10 +13,10 @@ u32 sub_081636C0(u8 *p)
     if (((struct P *)p)->e != 0) {
         q = p + 0x18;
         for (i = 7; i >= 0; i--) {
-            sub_08214514(q);
+            Sprite_Remove(q);
             q += 0x50;
         }
-        sub_082195E0(p + 0x2b8);
+        Anim_Remove(p + 0x2b8);
     }
     return gUnk_02000210 = 0;
 }

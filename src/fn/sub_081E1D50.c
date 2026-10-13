@@ -30,36 +30,36 @@ struct Viewer {
     s32 state, selection, countA, countB, countC, textIndex, valueA, valueB, previousA, previousB,
         previousC;
 };
-void sub_0821980C(void *, void *, u16, s32);
+void Anim_LoadKeyframe(void *, void *, u16, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 extern const s16 gUnk_086136F0[], gUnk_086137AE[], gUnk_08613BC4[];
 u32 sub_0822B590(s32);
-void sub_0822B358(s32);
-void sub_0822B2F8(s32);
-void sub_08220D78(void *, void *, u16, s32, s32);
+void Sound_StopSong(s32);
+void Sound_PlaySong(s32);
+void Anim_SetKeyframes(void *, void *, u16, s32, s32);
 // Play the selected sound, stopping the previous sound in that category.
 void SoundTest_PlaySelection(struct Viewer *p)
 {
     switch (p->selection) {
         case 0:
             if (sub_0822B590(gUnk_086136F0[p->previousA]))
-                sub_0822B358(gUnk_086136F0[p->previousA]);
-            sub_0822B2F8(gUnk_086136F0[p->textIndex]);
+                Sound_StopSong(gUnk_086136F0[p->previousA]);
+            Sound_PlaySong(gUnk_086136F0[p->textIndex]);
             p->previousA = p->textIndex;
             break;
         case 1:
             if (sub_0822B590(gUnk_086137AE[p->previousB]))
-                sub_0822B358(gUnk_086137AE[p->previousB]);
-            sub_0822B2F8(gUnk_086137AE[p->valueA]);
+                Sound_StopSong(gUnk_086137AE[p->previousB]);
+            Sound_PlaySong(gUnk_086137AE[p->valueA]);
             p->previousB = p->valueA;
             break;
         case 2:
             if (sub_0822B590(gUnk_08613BC4[p->previousC]))
-                sub_0822B358(gUnk_08613BC4[p->previousC]);
-            sub_0822B2F8(gUnk_08613BC4[p->valueB]);
+                Sound_StopSong(gUnk_08613BC4[p->previousC]);
+            Sound_PlaySong(gUnk_08613BC4[p->valueB]);
             p->previousC = p->valueB;
             break;
     }
-    sub_08220D78(&p->labels[p->selection], &p->digitsResource, 0, 1, 0);
+    Anim_SetKeyframes(&p->labels[p->selection], &p->digitsResource, 0, 1, 0);
 }

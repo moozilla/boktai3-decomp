@@ -1,6 +1,6 @@
 #include "global.h"
 void sub_08089340(void);
-void sub_08020D68(u8 *, u32);
+void Trigger_ConsumePending(u8 *, u32);
 struct S {
     u8 pad[0x9C];
     s16 z;
@@ -81,7 +81,7 @@ void sub_0808CE50(struct S *s)
         u8 zero8;
         u32 *flags;
         u32 two;
-        sub_08020D68(((u8 *)s) + 0xC, 1);
+        Trigger_ConsumePending(((u8 *)s) + 0xC, 1);
         off = 0x22C;
         fn = *(void (**)(void))((u8 *)s + off);
         zero = 0;

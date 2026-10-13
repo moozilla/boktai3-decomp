@@ -84,13 +84,13 @@ struct Partner {
 extern u8 *gUnk_02000710;
 extern u16 gUnk_03005260[];
 extern u32 gUnk_0300523C;
-u8 sub_082215E4(s32, s32);
-void sub_0821AD08(void *, s32);
+u8 Math_Atan2(s32, s32);
+void Script_Call(void *, s32);
 void sub_081E574C(void *, void *);
 void sub_081E5648(void *, void *);
 void sub_081E4174(void *);
 void sub_081E44D4(void *);
-void sub_08215284(void *, s32);
+void AnimData_SelectTiles(void *, s32);
 // Select the closest eligible interaction target and animate its selection marker.
 void Actor_SelectNearestInteraction(struct G *p)
 {
@@ -132,7 +132,7 @@ void Actor_SelectNearestInteraction(struct G *p)
             c = 2;
         }
         {
-            u32 angle = (u8)(sub_082215E4(dx, dz) - 16);
+            u32 angle = (u8)(Math_Atan2(dx, dz) - 16);
             register s32 first asm("r1") = (s8)a;
             sector = angle >> 5;
             if (first != sector && (s8)b != sector && (s8)c != sector) {
@@ -169,17 +169,17 @@ void Actor_SelectNearestInteraction(struct G *p)
         q = (struct Partner *)((u8 *)p + 0x1c + i * 0xdc);
         if (i == p->group) {
             if (++q->timer > 10) {
-                sub_08215284((u8 *)q + 0x2c, q->resource);
+                AnimData_SelectTiles((u8 *)q + 0x2c, q->resource);
                 q->timer = 10;
             } else
-                sub_08215284((u8 *)q + 0x2c, q->resource + 1);
+                AnimData_SelectTiles((u8 *)q + 0x2c, q->resource + 1);
         } else {
             u8 old = q->timer--;
             if (old == 0) {
                 q->timer = 0;
-                sub_08215284((u8 *)q + 0x2c, q->resource + 2);
+                AnimData_SelectTiles((u8 *)q + 0x2c, q->resource + 2);
             } else
-                sub_08215284((u8 *)q + 0x2c, q->resource + 1);
+                AnimData_SelectTiles((u8 *)q + 0x2c, q->resource + 1);
         }
     }
 }

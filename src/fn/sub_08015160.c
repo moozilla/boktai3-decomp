@@ -31,7 +31,7 @@ struct Manager {
     u32 timer;
     struct Piece pieces[32];
 };
-void sub_08214514(void *);
+void Sprite_Remove(void *);
 static inline int scale8(int a, int b)
 {
     int x = a * b;
@@ -136,7 +136,7 @@ int AnimatedParticleManager_Update(struct Manager *m)
                 done = 0;
             if (done) {
                 p->active = 0;
-                sub_08214514(o);
+                Sprite_Remove(o);
             }
             p->timer++;
         }

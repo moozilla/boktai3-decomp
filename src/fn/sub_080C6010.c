@@ -72,7 +72,7 @@ typedef struct Obj {
     u8 unk320[0xac];
     u8 unk3CC;
 } Obj;
-void sub_08013424(void *);
+void ActorShadow_Enable(void *);
 void sub_080C4F9C(Obj *);
 void sub_08072188(void);
 static inline u8 take_flag(Obj *s)
@@ -94,7 +94,7 @@ void sub_080C6010(Obj *s)
 {
     s32 n;
     if (take_flag(s)) {
-        sub_08013424(s->unk320);
+        ActorShadow_Enable(s->unk320);
         if (!s->unk8) {
             u32 *q = &s->unk4->unk0;
             u32 mask = ~1;

@@ -8,20 +8,20 @@ typedef struct {
 } Presentation;
 void sub_082194D4(void *);
 void sub_0821910C(void);
-void sub_082195E0(Layer *);
+void Anim_Remove(Layer *);
 int ScanlinePresentation_Destroy(Presentation *p)
 {
     int i;
     Layer *layer;
     sub_082194D4(p);
     sub_0821910C();
-    sub_082195E0(&p->first);
-    sub_082195E0(&p->second);
-    sub_082195E0(&p->third);
-    sub_082195E0(&p->fourth);
+    Anim_Remove(&p->first);
+    Anim_Remove(&p->second);
+    Anim_Remove(&p->third);
+    Anim_Remove(&p->fourth);
     layer = p->tail;
     for (i = 1; i >= 0; i--) {
-        sub_082195E0(layer);
+        Anim_Remove(layer);
         layer++;
     }
     return 0;

@@ -71,7 +71,7 @@ struct Actor {
 };
 extern void *gUnk_02000480;
 struct Actor *sub_0802D6D0(void *, int);
-int sub_0821ABA8(int, int);
+int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
 int sub_0802FD14(struct Actor *);
@@ -80,13 +80,13 @@ void sub_0821E780(void *, void *, int);
 void sub_0802D8EC(struct Actor *);
 int sub_0802E698(void *unused, struct Actor *p)
 {
-    if (sub_0821ABA8(0x43, 1))
+    if (Script_GetKeywordValue(0x43, 1))
         sub_0802D8EC(p);
     {
         u8 angle = p->angle;
         p->savedAngle = angle;
     }
-    p->registered = sub_0821ABA8(0x43, 1);
+    p->registered = Script_GetKeywordValue(0x43, 1);
     if (Script_SeekToKeyword(0x72)) {
         p->pathId = Script_GetValue();
         p->pathParamA = Script_GetValue();
@@ -154,7 +154,7 @@ int sub_0802E698(void *unused, struct Actor *p)
         p->turnRate = 4;
         p->turnState = 255;
     }
-    p->turnRate = sub_0821ABA8(0x42, 4);
+    p->turnRate = Script_GetKeywordValue(0x42, 4);
     if (Script_SeekToKeyword(0x74))
         p->script = Script_GetValue();
     if (Script_SeekToKeyword(0x73)) {
@@ -175,9 +175,9 @@ int sub_0802E698(void *unused, struct Actor *p)
         p->radiusASquared = 6400;
         p->radiusBSquared = 9216;
     }
-    p->distance = sub_0821ABA8(0x4d, 10);
+    p->distance = Script_GetKeywordValue(0x4d, 10);
     p->distanceSquared = p->distance * p->distance;
-    p->enabled = sub_0821ABA8(0x75, 1);
-    p->soundEnabled = sub_0821ABA8(0x46, 1);
+    p->enabled = Script_GetKeywordValue(0x75, 1);
+    p->soundEnabled = Script_GetKeywordValue(0x46, 1);
     return 0;
 }

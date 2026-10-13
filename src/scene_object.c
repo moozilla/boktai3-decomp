@@ -115,9 +115,9 @@ success:
 void sub_0800435C(u32 type)
 {
     if (type == 5) {
-        sub_0822B2F8(0x151);
+        Sound_PlaySong(0x151);
     } else {
-        sub_0822B2F8(0x151);
+        Sound_PlaySong(0x151);
     }
 }
 
@@ -178,20 +178,20 @@ void Scene_PlayMovementEffect(struct SceneObject *object)
 {
     switch (object->type) {
         case 0:
-            sub_0822B2F8(0x143);
+            Sound_PlaySong(0x143);
             break;
         case 1:
-            sub_0822B2F8(0x143);
+            Sound_PlaySong(0x143);
             break;
         case 2:
         case 3:
         case 4:
         case 5:
         case 6:
-            sub_0822B2F8(0x143);
+            Sound_PlaySong(0x143);
             break;
         default:
-            sub_0822B2F8(0x143);
+            Sound_PlaySong(0x143);
             break;
     }
     if (sub_0800441C(object))
@@ -240,13 +240,13 @@ void sub_080045B0(s32 type)
         case 3:
         case 4:
         case 5:
-            sub_0822B2F8(0x142);
+            Sound_PlaySong(0x142);
             break;
         case 1:
-            sub_0822B2F8(0x137);
+            Sound_PlaySong(0x137);
             break;
         default:
-            sub_0822B2F8(0x142);
+            Sound_PlaySong(0x142);
             break;
     }
 }
@@ -275,7 +275,7 @@ void Scene_ApplyTerrainInteraction(struct SceneCollider *contact, void *unused,
             actor->health -= 24;
             actor->damageTimer = 10;
             actor->animationTimer = 2;
-            sub_08215284(&actor->animationData, actor->animation);
+            AnimData_SelectTiles(&actor->animationData, actor->animation);
             applied = 1;
         }
     } else if (actor->type == 1) {
@@ -290,10 +290,10 @@ void Scene_ApplyTerrainInteraction(struct SceneCollider *contact, void *unused,
             actor->health -= 24;
             actor->damageTimer = 10;
             actor->animationTimer = 2;
-            sub_08215284(&actor->animationData, actor->animation);
+            AnimData_SelectTiles(&actor->animationData, actor->animation);
             if (!actor->cooldown) {
                 actor->cooldown = 10;
-                sub_0822B2F8(0x15C);
+                Sound_PlaySong(0x15C);
                 AnimatedParticles_EmitBurst(&actor->body.position, 0, 0, 0x40, 12, 12, 4, 4);
             }
             applied = 1;
@@ -306,7 +306,7 @@ void Scene_ApplyTerrainInteraction(struct SceneCollider *contact, void *unused,
             actor->health -= 24;
             actor->damageTimer = 10;
             actor->animationTimer = 2;
-            sub_08215284(&actor->animationData, actor->animation);
+            AnimData_SelectTiles(&actor->animationData, actor->animation);
             applied = 1;
         }
     }
@@ -321,7 +321,7 @@ void Scene_ApplyTerrainInteraction(struct SceneCollider *contact, void *unused,
             actor->health = 0;
         else {
         sound:
-            sub_0822B2F8(0x13E);
+            Sound_PlaySong(0x13E);
         }
     }
 }
@@ -374,11 +374,7 @@ void Scene_DropObjectsAbove(struct SceneObject *object)
     }
 }
 
-void sub_08214514(void *);
-
 void sub_0821D6D0(void *);
-
-void sub_0821FE6C(void *);
 
 void sub_08003C10(void *);
 
@@ -388,9 +384,9 @@ void sub_08225938(void *);
 
 u32 sub_080047AC(struct SceneObject *object)
 {
-    sub_08214514(&object->draw);
+    Sprite_Remove(&object->draw);
     sub_0821D6D0(&object->cellRef);
-    sub_0821FE6C(&object->collider);
+    Collider_Remove(&object->collider);
     if ((object->flags & 2) == 0)
         sub_08003C10(&object->body);
     sub_08225938(&object->body);
@@ -449,7 +445,7 @@ s32 Scene_StopSelectedObject(void)
     struct SceneObject *p;
     register s32 i asm("r5");
     register s32 count asm("r4");
-    if (!manager || !(id = sub_0821ABA8(0x6E, 0)))
+    if (!manager || !(id = Script_GetKeywordValue(0x6E, 0)))
         return -1;
     p = manager->objects;
     i = 0;
@@ -481,7 +477,7 @@ s32 sub_080048F4(void)
     s32 i;
     if (manager == 0)
         return -1;
-    id = sub_0821ABA8(0x6e, 0);
+    id = Script_GetKeywordValue(0x6e, 0);
     object = manager->objects;
     for (i = 0; i < manager->count; object++, i++) {
         if (object->active != 0 && object->body.id == id)
@@ -502,7 +498,7 @@ void Scene_PlayObjectBreakEffect(struct SceneObject *p)
     struct SceneExtent c;
     u32 d;
     struct SceneVec *q;
-    sub_0822B2F8(0x15B);
+    Sound_PlaySong(0x15B);
     q = &p->body.position;
     d = 0x1e;
     sub_08014CA4(3, 2, q, 0x3c, d, 0x10, 8, 8, 0, 0x100, 0x18, 0x10);
@@ -526,7 +522,7 @@ void sub_08004A34(struct SceneObject *p)
     struct SceneExtent c;
     u32 d;
     struct SceneVec *q;
-    sub_0822B2F8(0x135);
+    Sound_PlaySong(0x135);
     q = &p->body.position;
     d = 0x1e;
     sub_08014CA4(4, 0, q, 0x3c, d, 0x14, 8, 8, 0, 0x100, 0x18, 0x10);
@@ -545,7 +541,7 @@ void sub_08004A34(struct SceneObject *p)
 void sub_08004AE8(struct SceneObject *object)
 {
     struct SceneVec *p;
-    sub_0822B2F8(0x150);
+    Sound_PlaySong(0x150);
     p = &object->body.position;
     sub_08014CA4(3, 1, p, 0x3c, 0x1e, 0x10, 8, 8, 0, 0x100, 0x18, 0x10);
     sub_08014CA4(8, 5, p, 0x3c, 0x1e, 0x16, 8, 8, 0, 0x100, 0x18, 0x10);
@@ -960,8 +956,6 @@ void sub_080050AC(struct SceneObject *p)
     }
 }
 
-void sub_0821FE40(struct SceneCollider *);
-
 void Scene_UpdateObjectStep(struct SceneObject *p)
 {
     struct SceneBody *body = &p->body;
@@ -976,8 +970,8 @@ void Scene_UpdateObjectStep(struct SceneObject *p)
     if (p->kind == 2)
         body->position.y -= 256;
     p->center.y = body->position.y;
-    sub_0821FF24(&p->stepCollider, &p->body.position, 0);
-    sub_0821FE40(&p->stepCollider);
+    Collider_SetPosition(&p->stepCollider, &p->body.position, 0);
+    Collider_Refresh(&p->stepCollider);
     if (p->type != 1 && !(p->timer & 3))
         Scene_SpawnDirectionalDust(p);
     if (++p->timer >= p->duration) {
@@ -1093,8 +1087,6 @@ struct Args {
     s32 *values;
 };
 
-void sub_0821AD08(u32, struct Args *);
-
 s32 Mod(s32, s32);
 
 static inline void setMode(struct SceneDraw *draw, s16 mode)
@@ -1110,7 +1102,7 @@ void Scene_UpdateObjectDisappearance(struct SceneObject *p)
         p->entered = 0;
         p->phase = 0;
         setMode(&p->draw, 0);
-        sub_0822B2F8(0x136);
+        Sound_PlaySong(0x136);
         p->cellRef.cell.flags |= 0x21;
         if (p->script) {
             values[0] = p->body.id;
@@ -1120,7 +1112,7 @@ void Scene_UpdateObjectDisappearance(struct SceneObject *p)
             values[4] = p->body.position.z;
             args.count = 5;
             args.values = values;
-            sub_0821AD08(p->script, &args);
+            Script_Call(p->script, &args);
             p->script = 0;
         }
     }
@@ -1152,7 +1144,7 @@ void Scene_UpdateObjectFlash(struct SceneObject *p)
         p->entered = 0;
         p->phase = 3;
         setMode(&p->draw, 3);
-        sub_0822B2F8(0x136);
+        Sound_PlaySong(0x136);
     }
     if (p->phase) {
         if (p->timer++ > 5) {
@@ -1170,8 +1162,6 @@ void Scene_UpdateObjectFlash(struct SceneObject *p)
 }
 
 extern void (*const gUnk_086049B4[])(struct SceneObject *);
-
-extern u8 *gUnk_02000710;
 
 void sub_08225B74(void *);
 
@@ -1216,7 +1206,7 @@ s32 SceneObjects_Update(struct SceneObjectManager *manager)
                 values[4] = p->body.position.z;
                 args.count = 5;
                 args.values = values;
-                sub_0821AD08(p->script, &args);
+                Script_Call(p->script, &args);
                 p->script = 0;
             }
             Scene_DropObjectsAbove(p);
@@ -1246,13 +1236,13 @@ s32 SceneObjects_Update(struct SceneObjectManager *manager)
         }
         if (!p->owner || ownerIsCurrent(p->owner)) {
             p->collider.state &= ~4;
-            sub_0821FF24(&p->collider, &p->body.position, 0);
+            Collider_SetPosition(&p->collider, &p->body.position, 0);
         } else {
         disable:
             disableCollision(&p->collider.state);
         }
         if (p->animationTimer && !--p->animationTimer)
-            sub_08215284(&p->animationData, p->initialAnimation);
+            AnimData_SelectTiles(&p->animationData, p->initialAnimation);
     }
     if (manager->fading) {
         sub_08221110(manager->paletteA, manager->fromA, manager->toA, manager->fade, 5);
@@ -1273,22 +1263,14 @@ s32 SceneObjects_Update(struct SceneObjectManager *manager)
     return 0;
 }
 
-void sub_08219D38(u32);
-
 /* Task teardown: free all objects, release the pool and clear the global manager. */
 
 u32 sub_080056D0(struct SceneObjectManager *manager)
 {
     sub_080047EC();
-    sub_08219D38((u32)manager->objects);
+    Heap_Free((u32)manager->objects);
     return (u32)(gUnk_02000024 = 0);
 }
-
-extern u8 *gUnk_030042E4;
-
-void *sub_08219C40(u32);
-
-void sub_08219DD8(void *, u32);
 
 /* Allocate the object pool (default 8 objects) and initialize the palette-fade state. */
 
@@ -1299,11 +1281,11 @@ s32 sub_080056F0(struct SceneObjectManager *p, void *unused)
     gUnk_02000024 = p;
     if (p->count == 0)
         p->count = 8;
-    m = sub_08219C40(p->count * sizeof(struct SceneObject));
+    m = Heap_Alloc(p->count * sizeof(struct SceneObject));
     p->objects = m;
     if (m == 0)
         return -1;
-    sub_08219DD8(m, p->count * sizeof(struct SceneObject));
+    Memory_Clear(m, p->count * sizeof(struct SceneObject));
     p->frame = 0;
     p->fading = 0;
     p->descending = 0;
@@ -1318,12 +1300,6 @@ s32 sub_080056F0(struct SceneObjectManager *p, void *unused)
     return 0;
 }
 
-void *sub_08219FBC(u32, u32);
-
-void sub_0821A04C(void *, void (*)(void), void (*)(void));
-
-void sub_0821A0C0(void *);
-
 /* Create the scene-object task (or return the existing one). */
 
 struct SceneObjectManager *sub_08005778(void *a)
@@ -1331,12 +1307,12 @@ struct SceneObjectManager *sub_08005778(void *a)
     struct SceneObjectManager *p;
     if (gUnk_02000024 != 0)
         return gUnk_02000024;
-    p = sub_08219FBC(8, 0x74);
+    p = Task_Create(8, 0x74);
     if (p != 0) {
-        sub_0821A04C(p, (void (*)(void))SceneObjects_Update, (void (*)(void))sub_080056D0);
-        p->count = sub_0821ABA8(0x6d, 8);
+        Task_SetCallbacks(p, (void (*)(void))SceneObjects_Update, (void (*)(void))sub_080056D0);
+        p->count = Script_GetKeywordValue(0x6d, 8);
         if (sub_080056F0(p, a) < 0) {
-            sub_0821A0C0(p);
+            Task_Kill(p);
             return 0;
         }
     }
@@ -1369,10 +1345,6 @@ struct SceneObject *sub_080057FC(struct SceneObjectManager *manager, u32 id)
     return 0;
 }
 
-void sub_082151E4(struct SceneAnimation *, u32);
-
-void sub_082144A4(struct SceneDraw *, struct SceneAnimation *, s32);
-
 void sub_08225AB4(struct SceneBody *, u32, struct SceneVec *, s32, s32, struct SceneObject *);
 
 void sub_08225B28(struct SceneBody *, struct SceneDraw *);
@@ -1380,11 +1352,6 @@ void sub_08225B28(struct SceneBody *, struct SceneDraw *);
 u32 sub_0822C034(struct SceneVec *);
 
 u32 sub_0821D698(void *, u32, u32, u32, u32, u32);
-
-void sub_0821FEB4(struct SceneCollider *, u16, u32, s32, s32, struct SceneExtent *,
-                  struct SceneExtent *);
-
-void sub_0821FF84(struct SceneCollider *, void *, struct SceneObject *);
 
 void sub_0821FF50(struct SceneCollider *, s32, s32);
 
@@ -1425,7 +1392,7 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     struct SceneCell *cell;
     if (!manager || !(p = sub_080057D0(manager)))
         return -1;
-    sub_08219DD8(p, 0x1A8);
+    Memory_Clear(p, 0x1A8);
     p->active = 1;
     p->type = type;
     if (p->type == 6)
@@ -1433,10 +1400,10 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     p->flags = flags;
     p->timer = 0;
     p->kind = 0;
-    sub_082151E4(&p->animationData, animationResource);
+    AnimData_Load(&p->animationData, animationResource);
     draw = &p->draw;
     asm("" : "+r"(draw));
-    sub_082144A4(draw, &p->animationData, 0);
+    Sprite_Init(draw, &p->animationData, 0);
     draw->mode = drawMode;
     p->center.x = (position->x & ~255) + 128;
     p->center.y = position->y & ~255;
@@ -1506,16 +1473,16 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     offset.x = 0;
     offset.y = 128;
     offset.z = 0;
-    sub_0821FEB4(&p->collider, p->body.id, 0x4041, 0, 16, &size, &offset);
-    sub_0821FF24(&p->collider, pos, 0);
-    sub_0821FF84(&p->collider, Scene_ApplyTerrainInteraction, p);
-    sub_0821FE40(&p->collider);
+    Collider_Init(&p->collider, p->body.id, 0x4041, 0, 16, &size, &offset);
+    Collider_SetPosition(&p->collider, pos, 0);
+    Collider_SetCallback(&p->collider, Scene_ApplyTerrainInteraction, p);
+    Collider_Refresh(&p->collider);
     ((u16 *)&size)[0] = 128;
     ((u16 *)&size)[1] = 128;
     ((u16 *)&size)[2] = 128;
-    sub_0821FEB4(&p->stepCollider, p->body.id, 0x2801, 0, 1, &size, &offset);
-    sub_0821FF24(&p->stepCollider, pos, 0);
-    sub_0821FF84(&p->stepCollider, sub_080046EC, p);
+    Collider_Init(&p->stepCollider, p->body.id, 0x2801, 0, 1, &size, &offset);
+    Collider_SetPosition(&p->stepCollider, pos, 0);
+    Collider_SetCallback(&p->stepCollider, sub_080046EC, p);
     sub_0821FF50(&p->stepCollider, 1500, 50);
     setStepFlags(&p->stepCollider);
     p->health = health;
@@ -1543,7 +1510,7 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
         else
             p->initialAnimation = p->animationData.initial;
     }
-    sub_08215284(&p->animationData, p->initialAnimation);
+    AnimData_SelectTiles(&p->animationData, p->initialAnimation);
     p->animation = animation;
     p->link.id = p->body.id;
     p->link.position = pos;
@@ -1560,10 +1527,6 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     return 0;
 }
 
-s32 Script_SeekToKeyword(s32);
-
-s32 Script_GetValue(void);
-
 #define RESOURCE(value)                                                                            \
     ({                                                                                             \
         s32 result = (value);                                                                      \
@@ -1576,9 +1539,9 @@ s32 SceneObjects_CreateFromScript(void)
     s32 id, type;
     s32 initial, animation, script, defaultResource;
     register s32 flags asm("r9"), resource asm("r6"), drawMode asm("r8"), health asm("r10");
-    id = sub_0821ABA8('n', 0);
-    type = sub_0821ABA8('t', 0);
-    flags = sub_0821ABA8('f', 0);
+    id = Script_GetKeywordValue('n', 0);
+    type = Script_GetKeywordValue('t', 0);
+    flags = Script_GetKeywordValue('f', 0);
     if (Script_SeekToKeyword('M') && Script_GetValue())
         flags |= 16;
     if (Script_SeekToKeyword('p')) {
@@ -1608,9 +1571,9 @@ s32 SceneObjects_CreateFromScript(void)
     fallback:
         defaultResource = RESOURCE(0x9D41);
     }
-    resource = sub_0821ABA8('a', defaultResource);
-    drawMode = sub_0821ABA8('i', 0);
-    health = sub_0821ABA8('l', 128);
+    resource = Script_GetKeywordValue('a', defaultResource);
+    drawMode = Script_GetKeywordValue('i', 0);
+    health = Script_GetKeywordValue('l', 128);
     if (type == 0)
         initial = 0x2B8;
     else if (type == 1)
@@ -1629,9 +1592,9 @@ s32 SceneObjects_CreateFromScript(void)
         else
             initial = 5;
     } else
-        initial = sub_0821ABA8('d', -1);
+        initial = Script_GetKeywordValue('d', -1);
     animation = 0x192;
-    script = sub_0821ABA8('b', 0);
+    script = Script_GetKeywordValue('b', 0);
     SceneObjects_CreateObject(id, type, flags, (struct SceneVec *)&position, resource, drawMode,
                               health, initial, animation, script);
     return 0;
@@ -1645,32 +1608,32 @@ s32 SceneObjects_SwitchPaletteFromScript(void)
     struct SceneObject *p;
     struct SceneDraw *draw;
     s32 id, mode, sound;
-    if (!manager || !(id = sub_0821ABA8('n', 0)) || !(p = sub_080057FC(manager, id)) ||
+    if (!manager || !(id = Script_GetKeywordValue('n', 0)) || !(p = sub_080057FC(manager, id)) ||
         p->type != 6)
         return -1;
     draw = &p->draw;
-    mode = sub_0821ABA8('s', 0);
-    sound = sub_0821ABA8('S', 1);
+    mode = Script_GetKeywordValue('s', 0);
+    sound = Script_GetKeywordValue('S', 1);
     if (!mode) {
         if (draw->mode == 0 || draw->mode == 2) {
             p->initialAnimation = 4;
-            sub_08215284(&p->animationData, 4);
+            AnimData_SelectTiles(&p->animationData, 4);
         } else {
             p->initialAnimation = 5;
-            sub_08215284(&p->animationData, 5);
+            AnimData_SelectTiles(&p->animationData, 5);
         }
     } else {
         if (draw->mode == 0 || draw->mode == 2) {
             p->initialAnimation = 6;
-            sub_08215284(&p->animationData, 6);
+            AnimData_SelectTiles(&p->animationData, 6);
             p->animationData.palette = manager->paletteA;
         } else {
             p->initialAnimation = 7;
-            sub_08215284(&p->animationData, 7);
+            AnimData_SelectTiles(&p->animationData, 7);
             p->animationData.palette = manager->paletteB;
         }
         manager->stopFade = 1;
         if (sound)
-            sub_0822B2F8(0x149);
+            Sound_PlaySong(0x149);
     }
 }

@@ -19,9 +19,9 @@ void sub_08030BF8(void);
 void sub_08030B78(int);
 void sub_08030C84(void *);
 void sub_080311B0(int);
-void sub_0821AD08(int, int);
-void sub_0821A0C0(void *);
-void sub_082156B8(int);
+void Script_Call(int, int);
+void Task_Kill(void *);
+void Bg_ClearTilemap(int);
 int Div(int, int);
 u8 sub_08033C9C(struct Transition *);
 void sub_08033C90(struct Transition *, int);
@@ -35,9 +35,9 @@ void sub_08033D4C(struct Transition *p)
             sub_08030BF8();
             sub_08033C90(p, 4);
             if (p->startProcedure)
-                sub_0821AD08(p->startProcedure, 0);
+                Script_Call(p->startProcedure, 0);
             if (p->flags & 2)
-                sub_0821A0C0(p);
+                Task_Kill(p);
         } else {
             p->index++;
             sub_08033C90(p, 0);

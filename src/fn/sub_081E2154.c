@@ -29,14 +29,14 @@ struct Viewer {
     s32 state, exitFlag, exitTimer, fadeShift, selection, countA, countB, countC, textIndex, valueA,
         valueB, previousA, previousB, previousC, repeatTimer;
 };
-void sub_0821980C(void *, void *, u16, s32);
+void Anim_LoadKeyframe(void *, void *, u16, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 extern const s16 gUnk_086136F0[], gUnk_086137AE[], gUnk_08613BC4[];
 u32 sub_0822B590(s32);
-void sub_0822B358(s32);
-void sub_0822B2F8(s32);
-void sub_08220D78(void *, void *, u16, s32, s32);
+void Sound_StopSong(s32);
+void Sound_PlaySong(s32);
+void Anim_SetKeyframes(void *, void *, u16, s32, s32);
 extern u16 gUnk_03005260[];
 extern void *gUnk_020003C0[];
 void sub_081DC1DC(s32);
@@ -47,8 +47,8 @@ void SoundTest_MoveCategoryCursor(void *);
 void SoundTest_SelectPrevious(void *);
 void SoundTest_SelectNext(void *);
 void sub_0816381C(void *, void *);
-void sub_0821AD08(void *, void *);
-void sub_0821A0C0(void *);
+void Script_Call(void *, void *);
+void Task_Kill(void *);
 // Handle sound-test controls, accelerating held left/right, and the exit fade.
 void SoundTest_Update(struct Viewer *p)
 {
@@ -59,7 +59,7 @@ void SoundTest_Update(struct Viewer *p)
                 sub_081DC1DC(p->fadeShift);
                 p->state = 1;
                 p->exitFlag = 0;
-                sub_0822B2F8(222);
+                Sound_PlaySong(222);
                 break;
             }
             SoundTest_UpdatePlaybackIndicators(p);
@@ -69,12 +69,12 @@ void SoundTest_Update(struct Viewer *p)
                 if (--p->selection < 0)
                     p->selection = 2;
                 SoundTest_MoveCategoryCursor(p);
-                sub_0822B2F8(0x37c);
+                Sound_PlaySong(0x37c);
             } else if (gUnk_03005260[1] & 128) {
                 if (++p->selection > 2)
                     p->selection = 0;
                 SoundTest_MoveCategoryCursor(p);
-                sub_0822B2F8(0x37c);
+                Sound_PlaySong(0x37c);
             }
             direction = 0;
             interval = 5;
@@ -104,8 +104,8 @@ void SoundTest_Update(struct Viewer *p)
         case 1:
             if (p->exitTimer > (1 << p->fadeShift)) {
                 if (!p->exitFlag)
-                    sub_0821AD08(gUnk_020003C0[1], 0);
-                sub_0821A0C0(p);
+                    Script_Call(gUnk_020003C0[1], 0);
+                Task_Kill(p);
             }
             p->exitTimer++;
             break;

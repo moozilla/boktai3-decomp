@@ -55,20 +55,20 @@ extern struct Map *gUnk_030052F4;
 extern u32 gUnk_030052F8, gUnk_030052FC;
 extern u16 gUnk_08604ABC[];
 void *sub_0800D828(u32, u32);
-void *sub_08219C40(u32);
-void sub_08219DD8(void *, u32);
+void *Heap_Alloc(u32);
+void Memory_Clear(void *, u32);
 u8 *sub_0821D64C(s32, s32);
-void sub_0821FEB4(void *, u32, u32, u32, u32, void *, void *);
-void sub_0821FF84(void *, void *, void *);
-void sub_0821FE40(void *);
-void sub_0821FF24(void *, void *, u32);
+void Collider_Init(void *, u32, u32, u32, u32, void *, void *);
+void Collider_SetCallback(void *, void *, void *);
+void Collider_Refresh(void *);
+void Collider_SetPosition(void *, void *, u32);
 void sub_0821FF58(void *, u32, u32, u32, u32, u32);
 void sub_0800CBAC(void);
 void sub_0800CBDC(void);
-s32 sub_082151E4(void *, u32);
-void sub_082144A4(void *, void *, u32);
-void sub_08215284(void *, u32);
-void sub_08220C8C(void *, void *, u32, u32, u32);
+s32 AnimData_Load(void *, u32);
+void Sprite_Init(void *, void *, u32);
+void AnimData_SelectTiles(void *, u32);
+void Anim_SetSequence(void *, void *, u32, u32, u32);
 void ScaledShadow_Initialize(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32);
 s32 sub_0800CBE0(void *, void *);
 static inline s32 cellIndex(struct Vec *pos)
@@ -95,10 +95,10 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
     void *resource;
     if (!gUnk_0200046C && !sub_0800D828(0xc0db, 0))
         return -1;
-    p = sub_08219C40(sizeof(*p));
+    p = Heap_Alloc(sizeof(*p));
     if (!p)
         return -1;
-    sub_08219DD8(p, sizeof(*p));
+    Memory_Clear(p, sizeof(*p));
     p->id = id;
     variant = 0;
     if (type > 1) {
@@ -146,10 +146,10 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
     }
     p->health = health;
     if (p->flags & 1) {
-        p->collider = sub_08219C40(84);
+        p->collider = Heap_Alloc(84);
         if (!p->collider)
             return -1;
-        sub_08219DD8(p->collider, 84);
+        Memory_Clear(p->collider, 84);
         if (p->flags & 4) {
             size.x = 180;
             size.y = 256;
@@ -165,19 +165,19 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
             offset.y = 128;
             offset.z = 0;
         }
-        sub_0821FEB4(p->collider, p->id, 0x4001, 0, 16, &size, &offset);
-        sub_0821FF84(p->collider, sub_0800CBAC, p);
-        sub_0821FE40(p->collider);
-        sub_0821FF24(p->collider, pos, 0);
+        Collider_Init(p->collider, p->id, 0x4001, 0, 16, &size, &offset);
+        Collider_SetCallback(p->collider, sub_0800CBAC, p);
+        Collider_Refresh(p->collider);
+        Collider_SetPosition(p->collider, pos, 0);
     } else
         p->collider = 0;
     if ((u8)(p->flags & 2)) {
         u32 attackFlags;
         u32 big;
-        p->attack = sub_08219C40(84);
+        p->attack = Heap_Alloc(84);
         if (!p->attack)
             return -1;
-        sub_08219DD8(p->attack, 84);
+        Memory_Clear(p->attack, 84);
         big = (u8)(p->flags & 4);
         if (big) {
             big = 0;
@@ -198,20 +198,20 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
         attackFlags = 0;
         if (!p->type)
             attackFlags = 0x200004;
-        sub_0821FEB4(p->attack, p->id, 0x2001, 0, 32, &size, &offset);
+        Collider_Init(p->attack, p->id, 0x2001, 0, 32, &size, &offset);
         sub_0821FF58(p->attack, power, force, 65536, attackFlags, 60);
-        sub_0821FF84(p->attack, sub_0800CBDC, p);
-        sub_0821FF24(p->attack, pos, 0);
+        Collider_SetCallback(p->attack, sub_0800CBDC, p);
+        Collider_SetPosition(p->attack, pos, 0);
     } else
         p->attack = 0;
     resource = p->resource;
-    if (!sub_082151E4(resource, gUnk_08604ABC[p->type]))
+    if (!AnimData_Load(resource, gUnk_08604ABC[p->type]))
         return -1;
-    sub_082144A4(&p->sprite, resource, 0);
+    Sprite_Init(&p->sprite, resource, 0);
     p->sprite.priority = 2;
     p->sprite.position = p->position;
     if (type > 1)
-        sub_08215284(resource, 739 + variant);
+        AnimData_SelectTiles(resource, 739 + variant);
     if (p->flags & 4) {
         p->sprite.flags |= 2;
         p->sprite.scaleY = 120;
@@ -222,7 +222,7 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
         p->sprite.scaleX = 64;
     }
     if (p->animated)
-        sub_08220C8C(&p->anim, gUnk_0200046C->animation, 3, 0, 0);
+        Anim_SetSequence(&p->anim, gUnk_0200046C->animation, 3, 0, 0);
     ScaledShadow_Initialize(p->effect, pos, 80, 7, 107, 107, 3200, 1, 5, 1, 0);
     p->effectActive = 1;
     p->remove = 0;

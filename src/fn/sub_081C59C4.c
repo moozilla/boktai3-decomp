@@ -6,20 +6,20 @@ struct S {
     u8 f[0x78];
     struct E e[4];
 };
-void sub_082195E0(void *);
-void sub_082156B8(u32);
+void Anim_Remove(void *);
+void Bg_ClearTilemap(u32);
 void sub_081C59C4(struct S *p)
 {
     s32 i;
     struct E *e = p->e;
     for (i = 3; i >= 0; i--) {
-        sub_082195E0(e);
+        Anim_Remove(e);
         e++;
     }
-    sub_082195E0((u8 *)p + 0x1f8);
-    sub_082195E0((u8 *)p + 0x258);
-    sub_082156B8(0);
-    sub_082156B8(1);
-    sub_082156B8(2);
-    sub_082156B8(3);
+    Anim_Remove((u8 *)p + 0x1f8);
+    Anim_Remove((u8 *)p + 0x258);
+    Bg_ClearTilemap(0);
+    Bg_ClearTilemap(1);
+    Bg_ClearTilemap(2);
+    Bg_ClearTilemap(3);
 }

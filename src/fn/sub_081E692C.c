@@ -58,9 +58,9 @@ struct S {
     s32 timer;
     u32 variant;
 };
-void sub_08220C8C(void *, u32, u32, u32, u32);
+void Anim_SetSequence(void *, u32, u32, u32, u32);
 void sub_081E4188(void *);
-void sub_08013440(void *);
+void ActorShadow_Disable(void *);
 void sub_081E41EC(void *);
 static inline u8 take(struct S *p)
 {
@@ -94,14 +94,14 @@ struct Child {
 void sub_081E5608(void *, void *);
 void sub_08056CC0(void);
 void sub_081E4174(void *);
-void sub_08215284(void *, s32);
-void sub_0822B2F8(s32);
-void sub_0821AD08(void *, s32);
-void sub_08013424(void *);
+void AnimData_SelectTiles(void *, s32);
+void Sound_PlaySong(s32);
+void Script_Call(void *, s32);
+void ActorShadow_Enable(void *);
 void ActorPalette_BeginFade(void *);
 extern u8 gUnk_03005430[];
 extern const s16 gUnk_086149C4[];
-u8 sub_082215E4(s32, s32);
+u8 Math_Atan2(s32, s32);
 void sub_081E41B0(void *);
 static inline void set_direction(s16 angle, u8 *directionOut, u8 *flipOut)
 {
@@ -144,7 +144,7 @@ void Actor_MoveAlongCurveToRest(struct S *p)
         p->startZ = p->obj.z;
         p->state = 0;
         p->bend = (p->variant & 1) ? 1 : -1;
-        sub_08013440(p->p2);
+        ActorShadow_Disable(p->p2);
         if (*((u8 *)p + 0xf6f) && p->obj.scaleX != 127 && (p->obj.flags & 16))
             p->scaleFn = sub_081E41B0;
         if (!*((u8 *)p + 0xf77)) {
@@ -161,7 +161,7 @@ void Actor_MoveAlongCurveToRest(struct S *p)
             p->targetZ = 0;
         }
     }
-    p->heading = sub_082215E4(p->targetX - p->obj.x, p->targetY - p->obj.y);
+    p->heading = Math_Atan2(p->targetX - p->obj.x, p->targetY - p->obj.y);
     o = &p->obj;
     a = &p->anim;
     entry = a->data + a->frame;
@@ -248,11 +248,11 @@ void Actor_MoveAlongCurveToRest(struct S *p)
         if (p->handle) {
             void *handle = p->handle;
             p->handle = 0;
-            sub_0821AD08(handle, 0);
+            Script_Call(handle, 0);
         }
     } else {
         set_direction(p->heading - 16, &p->direction, &p->flip);
-        sub_08220C8C(&p->anim, p->arg, p->state, p->direction, p->flip);
+        Anim_SetSequence(&p->anim, p->arg, p->state, p->direction, p->flip);
         {
             s32 delta = p->targetX - p->startX;
             p->obj.x = p->startX + Div(delta * p->timer, 32);

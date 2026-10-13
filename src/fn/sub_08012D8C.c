@@ -28,14 +28,14 @@ struct Manager {
     u32 direction[4];
     struct Vec positions[4];
 };
-int sub_082151E4(void *, int);
-void sub_082144A4(void *, void *, int);
+int AnimData_Load(void *, int);
+void Sprite_Init(void *, void *, int);
 void BreakableBarrier_SetPosition(void *, void *, int);
-void sub_0821FEB4(void *, int, int, int, int, void *, void *);
-void sub_0821FF24(void *, void *, int);
-void sub_0821FF84(void *, void *, void *);
+void Collider_Init(void *, int, int, int, int, void *, void *);
+void Collider_SetPosition(void *, void *, int);
+void Collider_SetCallback(void *, void *, void *);
 void sub_0821FF7C(void *, int, int, int);
-void sub_0821FE40(void *);
+void Collider_Refresh(void *);
 void sub_08012D78(void *, void *, void *);
 void sub_08012D08(void *, int);
 int BreakableBarrier_Initialize(struct Manager *m, struct Barrier *p, unsigned i)
@@ -47,9 +47,9 @@ int BreakableBarrier_Initialize(struct Manager *m, struct Barrier *p, unsigned i
     if (i < m->count)
         active = 1;
     resource = p->resource;
-    if (!sub_082151E4(resource, 0x9929))
+    if (!AnimData_Load(resource, 0x9929))
         return -1;
-    sub_082144A4(p, resource, 0);
+    Sprite_Init(p, resource, 0);
     if (!active)
         p->flags |= 1;
     if (m->direction[i])
@@ -72,13 +72,13 @@ int BreakableBarrier_Initialize(struct Manager *m, struct Barrier *p, unsigned i
         offset.y = 128;
         offset.z = 32;
     }
-    sub_0821FEB4(c, 0, 0x4001, 0, 16, &size, &offset);
+    Collider_Init(c, 0, 0x4001, 0, 16, &size, &offset);
     if (!active)
         c->flags |= 4;
-    sub_0821FF24(c, &p->position, 0);
-    sub_0821FF84(c, sub_08012D78, p);
+    Collider_SetPosition(c, &p->position, 0);
+    Collider_SetCallback(c, sub_08012D78, p);
     sub_0821FF7C(c, 0, 0, 0);
-    sub_0821FE40(c);
+    Collider_Refresh(c);
     if (active)
         sub_08012D08(p, 1);
     else

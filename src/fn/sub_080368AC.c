@@ -18,7 +18,7 @@ struct P {
 extern u32 gUnk_020000F0;
 s32 sub_08224D3C(void);
 void sub_080340AC(struct P *);
-u32 sub_0821ABA8(u32, u32);
+u32 Script_GetKeywordValue(u32, u32);
 s32 Script_SeekToKeyword(s32);
 u32 sub_08227E90(void);
 s32 sub_080368AC(struct P *p)
@@ -39,7 +39,7 @@ s32 sub_080368AC(struct P *p)
         p->w44 = z;
         p->b32 = 1;
     }
-    p->w4c = sub_0821ABA8(0x70, 0);
+    p->w4c = Script_GetKeywordValue(0x70, 0);
     if (!Script_SeekToKeyword(0x61))
         goto fail;
     {

@@ -28,23 +28,23 @@ struct Manager {
     u32 direction[4];
     struct Vec positions[4];
 };
-int sub_082151E4(void *, int);
-void sub_082144A4(void *, void *, int);
+int AnimData_Load(void *, int);
+void Sprite_Init(void *, void *, int);
 void BreakableBarrier_SetPosition(void *, void *, int);
-void sub_0821FEB4(void *, int, int, int, int, void *, void *);
-void sub_0821FF24(void *, void *, int);
-void sub_0821FF84(void *, void *, void *);
+void Collider_Init(void *, int, int, int, int, void *, void *);
+void Collider_SetPosition(void *, void *, int);
+void Collider_SetCallback(void *, void *, void *);
 void sub_0821FF7C(void *, int, int, int);
-void sub_0821FE40(void *);
+void Collider_Refresh(void *);
 void sub_08012D78(void *, void *, void *);
 void sub_08012D08(void *, int);
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
 int sub_08012D20(void *);
-void sub_08215284(void *, int);
+void AnimData_SelectTiles(void *, int);
 void sub_0806A160(void *, int, void *, int, int, int, int, int);
 void sub_08012B34(void *, void *);
-void sub_0822B3BC(int);
+void Sound_PlaySongChecked(int);
 static inline int randomValue(void)
 {
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
@@ -64,7 +64,7 @@ void BreakableBarrier_Update(struct Manager *m, struct Barrier *p)
     struct Packed size;
     if (sub_08012D20(p)) {
         p->flags &= ~1;
-        sub_08215284(p->resource, 136);
+        AnimData_SelectTiles(p->resource, 136);
     }
     p->frame++;
     if (p->frame == 7)
@@ -120,14 +120,14 @@ void BreakableBarrier_Update(struct Manager *m, struct Barrier *p)
             sub_08012B34(m, p);
             sub_08012B34(m, p);
             sub_08012B34(m, p);
-            sub_0822B3BC(232);
-            sub_08215284(p->resource, 402);
+            Sound_PlaySongChecked(232);
+            AnimData_SelectTiles(p->resource, 402);
         }
     }
     if (p->flash) {
         p->flash--;
         if (!p->flash) {
-            sub_08215284(p->resource, 136);
+            AnimData_SelectTiles(p->resource, 136);
             enable(&p->collider);
         } else
             disable(&p->collider);

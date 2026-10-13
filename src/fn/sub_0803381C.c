@@ -30,28 +30,28 @@ struct WindowManager {
     struct TextWindow *head;
 };
 extern struct WindowManager *gUnk_020000E4;
-void *sub_08219C40(int);
-void sub_08219DD8(void *, int);
-void sub_08219D38(void *);
-void sub_08218E5C(int, int, int, int);
+void *Heap_Alloc(int);
+void Memory_Clear(void *, int);
+void Heap_Free(void *);
+void TextWindow_BlankRect(int, int, int, int);
 void sub_08032C80(struct TextState *, int, int, int, int);
-void sub_08032C54(struct TextState *, int, int, int, int);
-void sub_08032C34(struct TextState *);
+void TextState_SetBounds(struct TextState *, int, int, int, int);
+void TextState_Reset(struct TextState *);
 int Script_ParseStringRef(const void *);
 const u8 *Text_LookupString(int);
 void sub_08033AF0(void);
 void sub_08033AF8(void);
 struct TextWindow *sub_0803360C(struct WindowManager *, int);
-struct TextWindow *sub_08033634(int);
+struct TextWindow *TextWindow_Find(int);
 int sub_08033654(struct WindowManager *);
 const u8 *sub_080335F4(struct TextWindow *, int);
 int sub_0803381C(int id)
 {
-    struct TextWindow *w = sub_08033634(id);
+    struct TextWindow *w = TextWindow_Find(id);
     int result;
     if (!w)
         goto fail;
-    sub_08218E5C(w->x, w->y, w->width, w->height);
+    TextWindow_BlankRect(w->x, w->y, w->width, w->height);
     w->callback = sub_08033AF0;
     result = 0;
     goto done;

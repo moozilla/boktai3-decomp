@@ -5,7 +5,7 @@ struct S {
 };
 void sub_0821FE04(struct S *);
 void sub_0821FDC8(struct S *);
-void sub_0821FE40(struct S *p)
+void Collider_Refresh(struct S *p)
 {
     if (p->h6 & 0x2000) {
         if ((p->h6 & 4) == 0)

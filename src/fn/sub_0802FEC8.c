@@ -73,7 +73,7 @@ struct Actor {
 };
 extern void *gUnk_02000480;
 struct Actor *sub_0802D6D0(void *, int);
-int sub_0821ABA8(int, int);
+int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
 int sub_0802FD14(struct Actor *);
@@ -128,7 +128,7 @@ static inline int targetNear(struct Context *m, struct Actor *p)
 done:
     return result;
 }
-void sub_08020D68(void *, int);
+void Trigger_ConsumePending(void *, int);
 void sub_0802FEC8(struct Context *m, struct Actor *p)
 {
     int close;
@@ -137,7 +137,7 @@ void sub_0802FEC8(struct Context *m, struct Actor *p)
         p->entered = zero;
         p->done = zero;
         p->action = 2;
-        sub_08020D68((u8 *)p + 0x168, 1);
+        Trigger_ConsumePending((u8 *)p + 0x168, 1);
     }
     close = targetNear(m, p);
     if (close) {

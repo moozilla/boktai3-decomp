@@ -43,9 +43,9 @@ struct S {
     void (*previous)(void *);
     void (*fn)(void *);
 };
-void sub_08220C8C(void *, u32, u32, u32, u32);
+void Anim_SetSequence(void *, u32, u32, u32, u32);
 void sub_081E4188(void *);
-void sub_08013440(void *);
+void ActorShadow_Disable(void *);
 void sub_081E41EC(void *);
 static inline u8 take(struct S *p)
 {
@@ -65,10 +65,10 @@ static inline u32 frame_factor(u16 v)
     return mask & value;
 }
 void sub_081E4174(void *);
-void sub_08215284(void *, s32);
-void sub_0822B2F8(s32);
-void sub_0821AD08(void *, s32);
-void sub_08013424(void *);
+void AnimData_SelectTiles(void *, s32);
+void Sound_PlaySong(s32);
+void Script_Call(void *, s32);
+void ActorShadow_Enable(void *);
 void ActorPalette_BeginFade(void *);
 void sub_081E59CC(struct S *p)
 {
@@ -80,7 +80,7 @@ void sub_081E59CC(struct S *p)
     u8 done;
     if (take(p)) {
         p->state = 1;
-        sub_08220C8C(&p->anim, p->arg, 1, 0, p->next);
+        Anim_SetSequence(&p->anim, p->arg, 1, 0, p->next);
         p->obj.flags &= ~1;
         p->obj.flags &= ~16;
         p->obj.flags &= ~32;
@@ -88,9 +88,9 @@ void sub_081E59CC(struct S *p)
         p->obj.scaleX = 64;
         p->obj.angle += 160;
         *(u16 *)((u8 *)p + 0xee2) = p->obj.angle;
-        sub_0822B2F8(286);
+        Sound_PlaySong(286);
         sub_081E4174(p);
-        sub_08215284(p->effect, 343);
+        AnimData_SelectTiles(p->effect, 343);
     }
     o = &p->obj;
     a = &p->anim;
@@ -152,7 +152,7 @@ void sub_081E59CC(struct S *p)
     p->done = done;
     if (done) {
         s32 zero;
-        sub_08013424(p->p2);
+        ActorShadow_Enable(p->p2);
         p->phase = 0;
         if (p->oldMode == 3 && p->mode == 3) {
             p->savedFrame = p->anim.frame;
@@ -164,11 +164,11 @@ void sub_081E59CC(struct S *p)
             zero = 0;
             p->flags = mask | v;
         }
-        sub_08220C8C(&p->anim, p->arg, 0, 4, zero);
+        Anim_SetSequence(&p->anim, p->arg, 0, 4, zero);
         if (p->handle) {
             void *h = p->handle;
             p->handle = (void *)zero;
-            sub_0821AD08(h, 0);
+            Script_Call(h, 0);
         }
     }
 }

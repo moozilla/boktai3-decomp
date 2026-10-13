@@ -24,7 +24,7 @@ typedef struct State {
     u16 y;
 } State;
 extern const s16 gUnk_086149C4[];
-s32 sub_082215E4(s32, s32);
+s32 Math_Atan2(s32, s32);
 void sub_08217EEC(Effect *, void *, s32);
 static inline s32 magnitude(s32 v)
 {
@@ -52,7 +52,7 @@ void sub_0813C2EC(State *s)
                 draw->flags |= 1;
                 e->active = 0;
             } else {
-                s32 angle = sub_082215E4(e->dx, e->dy);
+                s32 angle = Math_Atan2(e->dx, e->dy);
                 e->dx -= scale(e->speed * gUnk_086149C4[(angle + 64) & 255]);
                 e->dy -= scale(e->speed * gUnk_086149C4[angle & 255]);
                 draw->x = s->x + (u16)e->dx;

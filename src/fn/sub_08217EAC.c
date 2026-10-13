@@ -8,7 +8,7 @@ struct Obj {
 };
 void sub_082143F8(struct Obj *, u32);
 
-void sub_08217EAC(struct Obj *o)
+void Effect_Remove(struct Obj *o)
 {
     if (o->f4 != 0)
         sub_082143F8(o, o->f11);

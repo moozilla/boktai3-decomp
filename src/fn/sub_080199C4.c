@@ -13,19 +13,19 @@ typedef struct {
 
 Manager *sub_080195DC(void);
 Channel *sub_08019818(Manager *, int);
-int sub_0821ABA8(int, int);
+int Script_GetKeywordValue(int, int);
 void TileAnimation_Stop(void)
 {
     Manager *p = sub_080195DC();
     Channel *q;
     int id, frame;
     if (p) {
-        id = sub_0821ABA8('c', 0);
+        id = Script_GetKeywordValue('c', 0);
         if (id) {
             q = sub_08019818(p, id);
             if (q) {
                 q->remove = 1;
-                frame = sub_0821ABA8('i', -1);
+                frame = Script_GetKeywordValue('i', -1);
                 if (frame >= 0) {
                     q->frame = frame;
                     if (q->frame >= q->frames)

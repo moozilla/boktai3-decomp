@@ -11,7 +11,7 @@ struct Globals {
 };
 extern struct Globals *gUnk_0200047C;
 void sub_08020D54(void *, void *);
-void sub_08020D68(void *, int);
+void Trigger_ConsumePending(void *, int);
 int sub_0800FC28(void *, void *, void *);
 int sub_0800FE98(void *, void *, void *);
 int sub_08010298(void *, void *, void *);
@@ -33,19 +33,19 @@ int BoardPieces_DispatchCommands(u8 *manager)
             switch (cmd->type) {
                 case 0:
                     sub_0800FC28(manager, queue, cmd);
-                    sub_08020D68(manager + 0xCD4, 1);
+                    Trigger_ConsumePending(manager + 0xCD4, 1);
                     break;
                 case 1:
                     sub_0800FE98(manager, queue, cmd);
-                    sub_08020D68(manager + 0xCD4, 1);
+                    Trigger_ConsumePending(manager + 0xCD4, 1);
                     break;
                 case 2:
                     sub_08010298(manager, queue, cmd);
-                    sub_08020D68(manager + 0xCD4, 1);
+                    Trigger_ConsumePending(manager + 0xCD4, 1);
                     break;
                 case 11:
                     sub_0801010C(manager, queue, cmd);
-                    sub_08020D68(manager + 0xCD4, 1);
+                    Trigger_ConsumePending(manager + 0xCD4, 1);
                     break;
             }
         }

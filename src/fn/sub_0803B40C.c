@@ -34,15 +34,15 @@ struct ResultMenu {
 extern struct ResultMenu *gUnk_02000104;
 int Script_SeekToKeyword(int);
 void *sub_08227E90(void);
-void *sub_0821A520(int, int);
-void sub_082196C4(void *, void *);
+void *ScriptProc_Start(int, int);
+void ResourceHeader_Relocate(void *, void *);
 void sub_0821983C(void *, void *, int, int, int, int, int, void *);
-void sub_082151E4(void *, int);
-void sub_08215284(void *, int);
-void sub_082144A4(void *, void *, int);
+void AnimData_Load(void *, int);
+void AnimData_SelectTiles(void *, int);
+void Sprite_Init(void *, void *, int);
 void sub_08220D20(void *, void *, int, int, int);
 void *sub_08037DCC(int);
-void sub_08219EBC(void *, void *, int);
+void Memory_Copy(void *, void *, int);
 int sub_0803B40C(struct ResultMenu *arg)
 {
     struct ResultMenu *p = arg;
@@ -75,21 +75,21 @@ failed:
     return -1;
 initialize:
     pack = 0xCB05;
-    res = sub_0821A520(pack, 0x530D);
+    res = ScriptProc_Start(pack, 0x530D);
     if (!res)
         goto failed;
     asm("" : "+r"(res));
     p->primary = *res;
     first = &p->primary;
-    sub_082196C4(first, res);
-    res = sub_0821A520(pack, 0x7C8B);
+    ResourceHeader_Relocate(first, res);
+    res = ScriptProc_Start(pack, 0x7C8B);
     primary = first;
     if (!res)
         goto failed;
     asm("" : "+r"(res));
     p->secondary = *res;
     secondary = &p->secondary;
-    sub_082196C4(secondary, res);
+    ResourceHeader_Relocate(secondary, res);
     {
         struct Drawing *draw = p->draws;
         u32 drawFlags = 0x2011;
@@ -113,10 +113,10 @@ initialize:
             } while (count >= 0);
         }
     }
-    resource = sub_0821A520(0x922E, 0x4BBF);
-    sub_082151E4(glyph, 0x593A);
-    sub_08215284(glyph, 503);
-    sub_082144A4(savedSprite, glyph, 0x2011);
+    resource = ScriptProc_Start(0x922E, 0x4BBF);
+    AnimData_Load(glyph, 0x593A);
+    AnimData_SelectTiles(glyph, 503);
+    Sprite_Init(savedSprite, glyph, 0x2011);
     sub_08220D20(&saved.animation, resource, 0, 0, 0);
     sprite = savedSprite;
     a = &saved.animation;
@@ -251,8 +251,8 @@ initialize:
             u8 *visible = saved.visible;
             *visible = zero;
         }
-        sub_08219EBC(p->left, sub_08037DCC(0), 16);
-        sub_08219EBC(p->right, sub_08037DCC(1), 16);
+        Memory_Copy(p->left, sub_08037DCC(0), 16);
+        Memory_Copy(p->right, sub_08037DCC(1), 16);
         {
             register struct ResultMenu *write asm("r1") = p;
             int one;

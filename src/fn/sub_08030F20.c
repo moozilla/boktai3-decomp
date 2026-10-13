@@ -46,10 +46,10 @@ int sub_0803092C(struct Actor *);
 void sub_080316A4(void);
 void sub_080317D8(void);
 void sub_080317CC(void);
-int sub_08218E5C(int, int, int, int);
+int TextWindow_BlankRect(int, int, int, int);
 void *sub_080313C8(struct Actor *, int);
-void sub_08032C34(struct State *);
-int sub_08032C54(struct State *, int, int, int, int);
+void TextState_Reset(struct State *);
+int TextState_SetBounds(struct State *, int, int, int, int);
 int Script_GetValue(void);
 static inline void setCallback(void *fn, struct Actor *p)
 {
@@ -68,12 +68,12 @@ int sub_08030F20(int x, int y, int width, int height)
     result = 0;
     goto done;
 run: {
-    sub_08218E5C(p->x, p->y, p->width, p->height);
+    TextWindow_BlankRect(p->x, p->y, p->width, p->height);
     p->x = x;
     p->y = y;
     p->width = width;
     p->height = height;
-    result = sub_08032C54(&p->state, p->x, p->y, p->width, p->height);
+    result = TextState_SetBounds(&p->state, p->x, p->y, p->width, p->height);
 }
 done:
     return result;

@@ -30,7 +30,7 @@ struct Engine {
 };
 extern struct Engine *gUnk_02000484;
 extern u8 gUnk_020000EC;
-void sub_08219DD8(void *, int);
+void Memory_Clear(void *, int);
 #define gRfuLinkStatus   gUnk_03006A80
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
@@ -42,13 +42,13 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->pending = 1;
 }
 void sub_0822C1C8(void);
-void *sub_08219C40(int);
-void sub_08219DD8(void *, int);
+void *Heap_Alloc(int);
+void Memory_Clear(void *, int);
 int sub_08228DA0(void);
 int sub_080368AC(struct Engine *);
-void sub_0821A04C(void *, int, int);
+void Task_SetCallbacks(void *, int, int);
 void sub_08219F74(void *);
-void sub_08219D38(void *);
+void Heap_Free(void *);
 extern u32 gUnk_03005308, gUnk_0300546C;
 extern const u16 gUnk_0203B400[];
 extern u8 gUnk_03003A50;
@@ -63,11 +63,11 @@ struct Engine *sub_08036910(void)
         return existing;
     sub_0822C1C8();
     size = 0x38C;
-    p = sub_08219C40(size);
+    p = Heap_Alloc(size);
     if (!p)
         goto failed;
     asm("" : "+r"(p));
-    sub_08219DD8(p, size);
+    Memory_Clear(p, size);
     random = sub_08228DA0();
     {
         u32 *position = &gUnk_03005308;
@@ -96,7 +96,7 @@ struct Engine *sub_08036910(void)
     }
     if (sub_080368AC(p) >= 0) {
         int one;
-        sub_0821A04C(p, 0, 0);
+        Task_SetCallbacks(p, 0, 0);
         one = 1;
         ((u8 *)p)[0x14] = one;
         ((u8 *)p)[0x16] = one;
@@ -106,7 +106,7 @@ struct Engine *sub_08036910(void)
         *singleton = p;
         return p;
     }
-    sub_08219D38(p);
+    Heap_Free(p);
 failed:
     return 0;
 }

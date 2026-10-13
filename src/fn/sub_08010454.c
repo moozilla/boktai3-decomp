@@ -38,8 +38,8 @@ extern s16 gUnk_086149C4[];
 void sub_08221110(void *, void *, void *, int, int);
 int Mod(int, int);
 void sub_0800FA5C(void *, void *, int);
-void sub_08215284(void *, int);
-void sub_08013424(void *);
+void AnimData_SelectTiles(void *, int);
+void ActorShadow_Enable(void *);
 static inline int randomValue(void)
 {
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;

@@ -12,7 +12,7 @@ struct Hdr {
 };
 extern struct Hdr *gUnk_030042EC;
 
-struct Ent *sub_08215184(u16 id)
+struct Ent *AnimData_FindEntry(u16 id)
 {
     struct Hdr *h = gUnk_030042EC;
     if (h == 0)

@@ -1,11 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-void sub_0822B3BC(int);
+void Sound_PlaySongChecked(int);
 void sub_0801EF5C(void);
 void SceneObject_AnimateActive(u8 *s)
 {
     if ((*(u32 *)(s + 0x38) & 0xffff00) == 0) {
-        sub_0822B3BC(0xce);
+        Sound_PlaySongChecked(0xce);
         *(u16 *)(*(u8 **)(s + 0x2c) + 6) &= ~3;
         asm("" ::: "memory");
         {

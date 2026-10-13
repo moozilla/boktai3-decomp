@@ -29,7 +29,7 @@ struct Engine {
 };
 extern struct Engine *gUnk_02000484;
 extern u8 gUnk_020000EC;
-void sub_08219DD8(void *, int);
+void Memory_Clear(void *, int);
 #define gRfuLinkStatus   gUnk_03006A80
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
@@ -40,7 +40,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 void sub_08213F98(int);
 int sub_08035EB8(struct Engine *);
 int sub_082238F0(int);
@@ -49,7 +49,7 @@ int sub_08034F44(struct Engine *p)
 {
     if (p->pending) {
         p->pending = 0;
-        sub_0822B2F8(222);
+        Sound_PlaySong(222);
     }
     if (p->ticks > 89) {
         sub_08034178(p);

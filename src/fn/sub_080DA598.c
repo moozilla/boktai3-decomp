@@ -1,7 +1,7 @@
 #include "global.h"
 
 void sub_0807E7B0(void *, s32);
-void sub_08219DD8(void *, s32);
+void Memory_Clear(void *, s32);
 
 struct S {
     u8 filler[0x5b8];
@@ -19,7 +19,7 @@ struct S2 {
 void sub_080DA598(struct S2 *s)
 {
     sub_0807E7B0(s, 4);
-    sub_08219DD8((u8 *)s + 0x5b8, 8);
+    Memory_Clear((u8 *)s + 0x5b8, 8);
     s->h5c2 = 0;
     s->h5c0 = 0;
 }

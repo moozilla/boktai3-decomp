@@ -1,18 +1,18 @@
 #include "global.h"
-void sub_082156B8(s32);
+void Bg_ClearTilemap(s32);
 void sub_08112118(void *);
 u32 sub_0811BB1C(void);
-void sub_0821AD08(u32, void *);
+void Script_Call(u32, void *);
 void sub_081123F0(u8 *s)
 {
     u32 loc[3];
     u32 *p;
     u32 *q;
     u32 m;
-    sub_082156B8(0);
-    sub_082156B8(1);
-    sub_082156B8(2);
-    sub_082156B8(3);
+    Bg_ClearTilemap(0);
+    Bg_ClearTilemap(1);
+    Bg_ClearTilemap(2);
+    Bg_ClearTilemap(3);
     sub_08112118(s);
     p = (u32 *)(s + 0x1210);
     if (*p != 0) {
@@ -21,6 +21,6 @@ void sub_081123F0(u8 *s)
         loc[1] = (loc[1] & m) | 1;
         q = &loc[1];
         q[1] = (u32)loc;
-        sub_0821AD08(*p, q);
+        Script_Call(*p, q);
     }
 }

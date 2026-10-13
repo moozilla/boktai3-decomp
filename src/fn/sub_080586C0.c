@@ -7,7 +7,7 @@ struct P {
     u16 f1378;
 };
 extern struct P *gUnk_020004A4;
-void sub_0822B2F8(u32);
+void Sound_PlaySong(u32);
 void sub_080586C0(void)
 {
     struct P *p = gUnk_020004A4;
@@ -17,6 +17,6 @@ void sub_080586C0(void)
         *a = 0x40;
         p->f132a = z;
         p->f1378 = 1;
-        sub_0822B2F8(0x129);
+        Sound_PlaySong(0x129);
     }
 }

@@ -38,7 +38,7 @@ struct Owner {
     struct Item items[16];
 };
 extern const u16 gUnk_0824DE7C[], gUnk_0824DE8C[];
-void sub_0821980C(void *, void *, int, int);
+void Anim_LoadKeyframe(void *, void *, int, int);
 void sub_08039920(void *, int, int);
 void sub_082216F8(void *, void *, void *, int, int);
 void sub_08039998(void *, int, int);
@@ -94,7 +94,7 @@ void sub_08039DE4(struct Owner *owner, struct Item *p, int index)
             choice = (index & 3) + 4;
         else
             choice = index & 3;
-        sub_0821980C(draw, resource, gUnk_0824DE7C[choice], 0);
+        Anim_LoadKeyframe(draw, resource, gUnk_0824DE7C[choice], 0);
     }
     p->drawing.flags &= ~1;
     {

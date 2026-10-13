@@ -10,9 +10,9 @@ struct PeerPanel {
 };
 
 void *sub_08037DCC(int peer);
-void sub_08219EBC(void *destination, const void *source, int size);
+void Memory_Copy(void *destination, const void *source, int size);
 void sub_08036CF0(const u8 *source, u8 *destination, int count);
-void sub_08033924(int window, int style);
+void TextWindow_Refresh(int window, int style);
 
 int sub_080374A8(void *ownerArg, struct PeerPanel *panel, int peerArg, int playerArg,
                  const u8 *packetArg)
@@ -33,10 +33,10 @@ int sub_080374A8(void *ownerArg, struct PeerPanel *panel, int peerArg, int playe
     scratch = owner + 0x4F4;
     CpuSet(&zero, scratch, 0x05000001);
     packet += 4 + player * 10;
-    sub_08219EBC(scratch, packet, 16);
+    Memory_Copy(scratch, packet, 16);
     destination = p->name;
     sub_08036CF0(scratch, destination, 8);
-    sub_08219EBC(name, destination, 16);
+    Memory_Copy(name, destination, 16);
     {
         int index = peer << 2;
         int offset = 0x4E4;
@@ -48,6 +48,6 @@ int sub_080374A8(void *ownerArg, struct PeerPanel *panel, int peerArg, int playe
             window = *(int *)address;
         }
         peer += 3;
-        sub_08033924(window, peer);
+        TextWindow_Refresh(window, peer);
     }
 }

@@ -7,7 +7,7 @@ struct P {
     u8 pad;
     u8 b;
 };
-void sub_08220D78(void *, void *, s32, s32, s32);
+void Anim_SetKeyframes(void *, void *, s32, s32, s32);
 void sub_08013728(void *);
 void sub_0824923C(void *, u32);
 void sub_081980FC(struct P *p)
@@ -15,7 +15,7 @@ void sub_081980FC(struct P *p)
     u8 *q = &p->a;
     u32 v = *q;
     if (v == 0) {
-        sub_08220D78((u8 *)p + 0x28, (u8 *)p + 8, 6, 2, v);
+        Anim_SetKeyframes((u8 *)p + 0x28, (u8 *)p + 8, 6, 2, v);
         sub_08013728((u8 *)p + 0x88);
         (*q)++;
     } else if (p->b != 0) {

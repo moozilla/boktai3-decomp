@@ -12,13 +12,13 @@ struct Unk081FC61C {
     u32 unk18;
 };
 
-void sub_08219DD8(void *, u32);
+void Memory_Clear(void *, u32);
 void sub_081FC618(void *, void (*)(void));
 void sub_081FBE2C(void);
 
 void sub_081FC61C(struct Unk081FC61C *p)
 {
-    sub_08219DD8(p, 0x1C);
+    Memory_Clear(p, 0x1C);
     sub_081FC618(p, sub_081FBE2C);
     p->unk0 = 0;
     p->unk2 = 20;
