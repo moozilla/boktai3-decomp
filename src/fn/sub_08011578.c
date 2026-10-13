@@ -1,4 +1,4 @@
-#include "global.h"
+#include "password.h"
 
 s32 GlyphTable_FindPair(u8 *p, u32 a, u32 b)
 {

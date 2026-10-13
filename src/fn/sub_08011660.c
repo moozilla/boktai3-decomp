@@ -1,14 +1,5 @@
-#include "global.h"
-struct Entry {
-    u8 codes[24], text[48], decoded[44], name[5], pad[3];
-    void *table;
-    int script, version, checksum, key;
-};
-int sub_08044CF4(void *, int *, int, int);
-int sub_08221594(void *, int, int);
-void sub_080453DC(void *, void *, int);
-int sub_080115DC(void *);
-int NameEntry_DecodeAndValidate(struct Entry *m)
+#include "password.h"
+int NameEntry_DecodeAndValidate(struct PasswordEntry *m)
 {
     u8 *decoded = m->decoded;
     int pos = 0;

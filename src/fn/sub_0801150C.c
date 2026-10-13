@@ -1,4 +1,4 @@
-#include "global.h"
+#include "password.h"
 // MATCHING_CONCESSION: register-pinning
 int Text_CopyWithoutTags(u8 *dst, u8 *src, int limit)
 {
