@@ -1,7 +1,13 @@
 #include "global.h"
 
-struct A { u8 f[0x38]; u32 fl; };
-struct B { u8 f[2]; u8 t; };
+struct A {
+    u8 f[0x38];
+    u32 fl;
+};
+struct B {
+    u8 f[2];
+    u8 t;
+};
 void sub_08008A98(struct B *, u32);
 
 void sub_08008ABC(struct A *a, u32 unused, struct B *b)

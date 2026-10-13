@@ -1,6 +1,9 @@
 #include "global.h"
 
-struct P0813FBE4 { u8 f0[0x34C]; u16 a[10]; };
+struct P0813FBE4 {
+    u8 f0[0x34C];
+    u16 a[10];
+};
 
 void sub_0813FBE4(struct P0813FBE4 *p)
 {

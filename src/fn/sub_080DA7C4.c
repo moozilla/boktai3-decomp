@@ -1,6 +1,9 @@
 #include "global.h"
 
-struct S { u8 filler[0x2d0]; u32 flags; };
+struct S {
+    u8 filler[0x2d0];
+    u32 flags;
+};
 
 void sub_080DA7C4(struct S *s)
 {

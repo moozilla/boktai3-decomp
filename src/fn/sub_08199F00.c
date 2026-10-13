@@ -3,7 +3,8 @@
 void sub_082333A8(u8 *, u32, u32, u32, u32);
 void sub_0824923C(u8 *, u32);
 
-void sub_08199F00(u8 *p, u32 unused, u8 *q) {
+void sub_08199F00(u8 *p, u32 unused, u8 *q)
+{
     u8 *c = p + 0xC;
     u16 a2 = *(u16 *)(p + 0x3C);
     u16 a3 = *(u16 *)(p + 0x40);

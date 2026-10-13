@@ -11,14 +11,16 @@ void sub_08040170(s32 a, s32 b, s32 count, s32 y, s32 width)
     color = 0x3b;
     if (diff <= 0) {
         color = 0x1b;
-        if (diff < 0) color = 0x2b;
+        if (diff < 0)
+            color = 0x2b;
     }
     i = 0;
     if (i < count) {
         do {
             s32 c;
             c = color;
-            if (i >= a) goto no_increment;
+            if (i >= a)
+                goto no_increment;
             c++;
         no_increment:
             sub_08215DF0(2, y + i, width, c, 0, 0);

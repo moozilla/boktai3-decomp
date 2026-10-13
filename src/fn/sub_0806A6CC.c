@@ -1,1 +1,3 @@
-void sub_0806A6CC(void) {}
+void sub_0806A6CC(void)
+{
+}

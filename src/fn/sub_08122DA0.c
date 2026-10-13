@@ -13,7 +13,8 @@ void sub_08122DA0(void)
         p = sub_08219FBC(10, 0x550);
         if (p != 0) {
             sub_0821A04C(p, sub_081228F0, sub_0812286C);
-            if (sub_08122D58(p) < 0) sub_0821A0C0(p);
+            if (sub_08122D58(p) < 0)
+                sub_0821A0C0(p);
         }
     }
 }

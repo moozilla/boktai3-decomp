@@ -1,6 +1,14 @@
 #include "global.h"
-struct A { u8 p0[0x18]; u32 w18; };
-struct B { u8 p[0x9c]; u32 w9c; u8 p1[0x122 - 0xa0]; u16 h122; };
+struct A {
+    u8 p0[0x18];
+    u32 w18;
+};
+struct B {
+    u8 p[0x9c];
+    u32 w9c;
+    u8 p1[0x122 - 0xa0];
+    u16 h122;
+};
 void sub_08214514(void *);
 void sub_081FCA0C(struct A *a, struct B *b, u32 n)
 {

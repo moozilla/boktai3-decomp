@@ -1,2 +1,4 @@
 #include "global.h"
-void sub_0823ACCC(void) {}
+void sub_0823ACCC(void)
+{
+}

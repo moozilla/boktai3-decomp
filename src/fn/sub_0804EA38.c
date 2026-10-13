@@ -1,6 +1,9 @@
 #include "global.h"
 
-struct S { u8 filler[0x1c]; u16 v; };
+struct S {
+    u8 filler[0x1c];
+    u16 v;
+};
 s32 sub_08228DB8(void);
 
 s32 sub_0804EA38(struct S *p)

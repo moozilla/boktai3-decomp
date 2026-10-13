@@ -1,6 +1,14 @@
 #include "global.h"
-struct Message { u16 id; u8 unk2, count; s16 *values; };
-struct Buffer { s32 count, used; struct Message entries[32]; s16 values[64]; };
+struct Message {
+    u16 id;
+    u8 unk2, count;
+    s16 *values;
+};
+struct Buffer {
+    s32 count, used;
+    struct Message entries[32];
+    s16 values[64];
+};
 extern s32 gUnk_03001680;
 struct Buffer *sub_0821A2DC(void);
 void sub_0821A340(struct Message *message)
@@ -15,7 +23,7 @@ void sub_0821A340(struct Message *message)
             insert = i + 1;
     }
     for (i = buffer->count; i > insert; i--)
-        buffer->entries[i] = buffer->entries[i-1];
+        buffer->entries[i] = buffer->entries[i - 1];
     buffer->count++;
     p = &buffer->entries[insert];
     p->id = message->id;

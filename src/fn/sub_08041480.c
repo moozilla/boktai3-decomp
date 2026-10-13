@@ -2,7 +2,8 @@
 
 void sub_0803384C(s32);
 
-void sub_08041480(u8 *p) {
+void sub_08041480(u8 *p)
+{
     s32 *e = (s32 *)(p + 0xf8);
     s32 i = 5;
     do {

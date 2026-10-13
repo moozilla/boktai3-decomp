@@ -1,5 +1,8 @@
 #include "global.h"
-struct S { u8 pad[0x3a4]; s32 w3a4; };
+struct S {
+    u8 pad[0x3a4];
+    s32 w3a4;
+};
 extern u8 *gUnk_02000580;
 u32 sub_081FDAAC(struct S *p)
 {

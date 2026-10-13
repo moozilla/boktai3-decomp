@@ -1,6 +1,7 @@
 #include "global.h"
 
-s32 sub_080133CC(u8 *head, u8 *n) {
+s32 sub_080133CC(u8 *head, u8 *n)
+{
     u32 z = n[0];
     u8 *t;
     s32 r;

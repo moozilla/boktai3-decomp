@@ -8,8 +8,10 @@ void sub_08049E64(u32 a)
     u8 *p = gUnk_02000488;
     if (p) {
         u8 *q;
-        if (a) sub_08049168(p, 7);
-        else sub_08049168(p, 6);
+        if (a)
+            sub_08049168(p, 7);
+        else
+            sub_08049168(p, 6);
         q = p + 0x254;
         if (*q) {
             sub_08072C40(p + 0x244);

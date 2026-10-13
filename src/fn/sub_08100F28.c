@@ -1,8 +1,18 @@
 #include "global.h"
 
-struct P { u16 x; u16 y; };
-struct A { u8 filler[8]; struct P *p; };
-struct B { s16 x; s16 pad; s16 y; };
+struct P {
+    u16 x;
+    u16 y;
+};
+struct A {
+    u8 filler[8];
+    struct P *p;
+};
+struct B {
+    s16 x;
+    s16 pad;
+    s16 y;
+};
 
 u32 sub_08100F28(struct A *a, struct B *b, u32 c, u32 d)
 {

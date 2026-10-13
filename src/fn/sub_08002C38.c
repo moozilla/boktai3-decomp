@@ -1,8 +1,15 @@
 #include "global.h"
 
 void sub_08227950(u16 *, u16 *);
-struct S { u8 f[0x27c]; u32 t[1]; };
-struct D { u32 a; u32 b; u32 c; };
+struct S {
+    u8 f[0x27c];
+    u32 t[1];
+};
+struct D {
+    u32 a;
+    u32 b;
+    u32 c;
+};
 
 void sub_08002C38(struct S *p, struct D *d)
 {

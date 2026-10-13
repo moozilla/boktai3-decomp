@@ -1,6 +1,8 @@
 #include "global.h"
 
-struct Blk { u32 w[7]; };
+struct Blk {
+    u32 w[7];
+};
 
 struct Obj {
     u32 f0;

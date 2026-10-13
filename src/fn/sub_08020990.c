@@ -1,7 +1,14 @@
 #include "global.h"
 
-struct N { u8 f[0x2c]; struct N *prev; struct N *next; };
-struct S { u8 f[0x74]; struct N *head; };
+struct N {
+    u8 f[0x2c];
+    struct N *prev;
+    struct N *next;
+};
+struct S {
+    u8 f[0x74];
+    struct N *head;
+};
 u32 sub_08020990(struct S *p, struct N *n)
 {
     if (p->head)

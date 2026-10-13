@@ -5,8 +5,17 @@ extern u8 gUnk_0203B400[];
 s32 Mod(s32, s32);
 u8 *sub_0821E76C(u8 *);
 
-struct E { u8 pad0[2]; u8 a; u8 b; u8 *p; u8 *q; };
-struct S080FA7D0 { u8 filler[0x448]; struct E e; };
+struct E {
+    u8 pad0[2];
+    u8 a;
+    u8 b;
+    u8 *p;
+    u8 *q;
+};
+struct S080FA7D0 {
+    u8 filler[0x448];
+    struct E e;
+};
 
 void sub_080FA7D0(struct S080FA7D0 *s)
 {

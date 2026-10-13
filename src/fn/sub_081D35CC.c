@@ -11,7 +11,8 @@ void sub_081D3374(void);
 u32 sub_081D35CC(u32 a, u32 b)
 {
     u32 r;
-    if (gUnk_02000298 != 0) return gUnk_02000298;
+    if (gUnk_02000298 != 0)
+        return gUnk_02000298;
     {
         r = sub_08219FBC(0xa, 0xb74);
         if (r != 0) {

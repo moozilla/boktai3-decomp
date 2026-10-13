@@ -2,7 +2,8 @@
 
 extern u8 *gUnk_020001AC;
 
-u8 *sub_08101A3C(u32 key) {
+u8 *sub_08101A3C(u32 key)
+{
     u8 *base = gUnk_020001AC;
     s32 i = 0;
     u8 *a = base + 0x1c;

@@ -1,6 +1,9 @@
 #include "global.h"
 
-struct Pal { u8 pad[6]; u16 f6; };
+struct Pal {
+    u8 pad[6];
+    u16 f6;
+};
 struct Obj {
     u32 f0;
     u8 f4;

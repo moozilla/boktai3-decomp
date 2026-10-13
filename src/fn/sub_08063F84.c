@@ -1,5 +1,7 @@
 #include "global.h"
-struct Z { u32 x, y; };
+struct Z {
+    u32 x, y;
+};
 void sub_080472A4(u8 *, s32, u32, u8 *, struct Z *, u32);
 void sub_08063F48(u8 *, u32);
 s32 sub_08063F84(u8 *p, u32 b, s32 c)

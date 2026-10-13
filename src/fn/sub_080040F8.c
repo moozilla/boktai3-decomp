@@ -1,5 +1,11 @@
 #include "global.h"
-struct S { u8 f[0x20]; u32 a; u32 b; u8 g[0x88-0x28]; u8 *p[2]; };
+struct S {
+    u8 f[0x20];
+    u32 a;
+    u32 b;
+    u8 g[0x88 - 0x28];
+    u8 *p[2];
+};
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void *sub_08219FBC(u32, u32);

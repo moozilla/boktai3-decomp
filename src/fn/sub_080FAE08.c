@@ -1,12 +1,22 @@
 #include "global.h"
 
-struct Q { u8 filler[0xe4c]; u32 f; };
-struct B { u8 pad[0xf]; u8 b; };
+struct Q {
+    u8 filler[0xe4c];
+    u32 f;
+};
+struct B {
+    u8 pad[0xf];
+    u8 b;
+};
 struct S080FAE08 {
-    u8 filler0[0xdc]; struct B bb;
-    u8 filler1[0x2d4 - 0xec]; u16 h;
-    u8 filler2[0x3d0 - 0x2d6]; struct Q *q;
-    u8 filler3[0x418 - 0x3d4]; u16 z;
+    u8 filler0[0xdc];
+    struct B bb;
+    u8 filler1[0x2d4 - 0xec];
+    u16 h;
+    u8 filler2[0x3d0 - 0x2d6];
+    struct Q *q;
+    u8 filler3[0x418 - 0x3d4];
+    u16 z;
 };
 
 void sub_080FAE08(struct S080FAE08 *s)

@@ -2,6 +2,7 @@
 
 void sub_08214514(u32 p);
 
-void sub_08011A18(u32 unused, u8 *p) {
+void sub_08011A18(u32 unused, u8 *p)
+{
     sub_08214514((u32)(p + 0x88));
 }

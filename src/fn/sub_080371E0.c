@@ -1,19 +1,19 @@
 #include "global.h"
 struct Blob {
-  u32 words[8];
+    u32 words[8];
 };
 struct LinkMenu {
-  u8 task[0x18];
-  u8 state, entered, pad1a[2];
-  u32 timer;
-  int window;
-  void *background;
-  void *script;
-  void *resource;
-  struct Blob blob;
-  u8 draw50[8];
-  u32 flags;
-  u8 pad5c[0x54];
+    u8 task[0x18];
+    u8 state, entered, pad1a[2];
+    u32 timer;
+    int window;
+    void *background;
+    void *script;
+    void *resource;
+    struct Blob blob;
+    u8 draw50[8];
+    u32 flags;
+    u8 pad5c[0x54];
 };
 extern struct LinkMenu *gUnk_020000F8;
 extern u16 gUnk_03004BD8, gUnk_03005260[];
@@ -53,31 +53,32 @@ struct LinkMenu *sub_08219FBC(int, int);
 void sub_0821A04C(void *, void *, void *);
 int sub_08037140(struct LinkMenu *);
 void sub_0821A0C0(void *);
-struct LinkMenu *sub_080371E0(void) {
-  struct LinkMenu *p = sub_08036E08();
-  struct LinkMenu *result;
-  if (p) {
-    result = p;
+struct LinkMenu *sub_080371E0(void)
+{
+    struct LinkMenu *p = sub_08036E08();
+    struct LinkMenu *result;
+    if (p) {
+        result = p;
+        goto done;
+    }
+    {
+        struct LinkMenu *allocated = sub_08219FBC(12, 0xB0);
+        void *update;
+        void *destroy;
+        p = allocated;
+        if (!p)
+            goto returnPointer;
+        update = sub_080370D0;
+        destroy = sub_08037110;
+        sub_0821A04C(allocated, update, destroy);
+    }
+    if (sub_08037140(p) >= 0)
+        goto returnPointer;
+    sub_0821A0C0(p);
+    result = 0;
     goto done;
-  }
-  {
-    struct LinkMenu *allocated = sub_08219FBC(12, 0xB0);
-    void *update;
-    void *destroy;
-    p = allocated;
-    if (!p)
-      goto returnPointer;
-    update = sub_080370D0;
-    destroy = sub_08037110;
-    sub_0821A04C(allocated, update, destroy);
-  }
-  if (sub_08037140(p) >= 0)
-    goto returnPointer;
-  sub_0821A0C0(p);
-  result = 0;
-  goto done;
 returnPointer:
-  result = p;
+    result = p;
 done:
-  return result;
+    return result;
 }

@@ -129,14 +129,14 @@ void sub_08038448(struct P *p)
         if (n < limit) {
             register int item asm("r1") = n;
             register u32 bit asm("r2");
-            asm volatile("" : "+r"(n), "+r"(limit), "+r"(offset) :: "r10", "r12");
+            asm volatile("" : "+r"(n), "+r"(limit), "+r"(offset)::"r10", "r12");
             if (item > 11)
                 item -= 12;
             bit = 1 << item;
             if (({
-                u32 t = mask;
-                t & bit;
-            }) != 0) {
+                    u32 t = mask;
+                    t & bit;
+                }) != 0) {
                 {
                     struct Save **slot = &gUnk_02000710;
                     struct Save *save;
@@ -153,16 +153,15 @@ void sub_08038448(struct P *p)
             }
             goto next;
         }
-    selected:
-        {
-            register u32 *read asm("r1") = random;
-            register u32 *write asm("r3");
-            asm("" : "+r"(read));
-            index = (*read + 1) & 1023;
-            write = random;
-            asm("" : "+r"(write));
-            *write = index;
-        }
+    selected: {
+        register u32 *read asm("r1") = random;
+        register u32 *write asm("r3");
+        asm("" : "+r"(read));
+        index = (*read + 1) & 1023;
+        write = random;
+        asm("" : "+r"(write));
+        *write = index;
+    }
         start += Mod(gUnk_0203B400[index], 12);
         if (start > 11)
             start -= 12;

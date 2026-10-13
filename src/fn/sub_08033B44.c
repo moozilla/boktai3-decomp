@@ -1,35 +1,35 @@
 #include "global.h"
 struct TextState {
-  u8 x, y, left, top, width, height, palette, style;
-  u8 entered, mode, skip, busy, padC, choiceCount, padE, fresh, pad10, voice,
-      toggle, lastWidth, pad14;
-  s8 current;
-  u8 instant, wrap;
-  u32 frame;
-  const u8 *pc, *streams[4];
-  u8 pad30[0xD8];
-  u8 depth, styles[7];
+    u8 x, y, left, top, width, height, palette, style;
+    u8 entered, mode, skip, busy, padC, choiceCount, padE, fresh, pad10, voice, toggle, lastWidth,
+        pad14;
+    s8 current;
+    u8 instant, wrap;
+    u32 frame;
+    const u8 *pc, *streams[4];
+    u8 pad30[0xD8];
+    u8 depth, styles[7];
 };
 struct TextWindow {
-  s32 id;
-  u8 x, y, width, height;
-  u32 enabled;
-  u16 clock, index;
-  s16 symbol;
-  u16 pad12;
-  const u8 *script;
-  u16 sequenceIndex, sequenceCount;
-  u16 sequence[32];
-  void *callback;
-  struct TextState text;
-  u8 pad170[0x54];
-  struct TextWindow *next, *previous;
+    s32 id;
+    u8 x, y, width, height;
+    u32 enabled;
+    u16 clock, index;
+    s16 symbol;
+    u16 pad12;
+    const u8 *script;
+    u16 sequenceIndex, sequenceCount;
+    u16 sequence[32];
+    void *callback;
+    struct TextState text;
+    u8 pad170[0x54];
+    struct TextWindow *next, *previous;
 };
 struct WindowManager {
-  u8 pad0[0x14];
-  void *script;
-  s32 nextId;
-  struct TextWindow *head;
+    u8 pad0[0x14];
+    void *script;
+    s32 nextId;
+    struct TextWindow *head;
 };
 extern struct WindowManager *gUnk_020000E4;
 void *sub_08219C40(int);
@@ -51,20 +51,21 @@ void sub_08032E8C(struct TextState *);
 void sub_08032E98(struct TextState *);
 int sub_08033924(int, int);
 void sub_08249240(struct WindowManager *, struct TextWindow *, void *);
-int sub_08033B44(struct WindowManager *p) {
-  struct TextWindow *w = p->head;
-  if (w) {
-    do {
-      struct TextWindow *previous = w->previous;
-      struct TextState *t = &w->text;
-      sub_08032E8C(t);
-      if (w->symbol >= 0)
-        sub_08033924(w->id, w->symbol);
-      if (w->callback)
-        sub_08249240(p, w, w->callback);
-      sub_08032E98(t);
-      w = previous;
-    } while (w);
-  }
-  return 0;
+int sub_08033B44(struct WindowManager *p)
+{
+    struct TextWindow *w = p->head;
+    if (w) {
+        do {
+            struct TextWindow *previous = w->previous;
+            struct TextState *t = &w->text;
+            sub_08032E8C(t);
+            if (w->symbol >= 0)
+                sub_08033924(w->id, w->symbol);
+            if (w->callback)
+                sub_08249240(p, w, w->callback);
+            sub_08032E98(t);
+            w = previous;
+        } while (w);
+    }
+    return 0;
 }

@@ -2,7 +2,12 @@
 
 extern u32 gUnk_03005308;
 extern u8 gUnk_0203B400[];
-struct P { u8 f[0x170]; void (*cb)(void); u8 g[0x184 - 0x174]; u32 a; };
+struct P {
+    u8 f[0x170];
+    void (*cb)(void);
+    u8 g[0x184 - 0x174];
+    u32 a;
+};
 void sub_080F4B94(void);
 
 void sub_080F4B54(struct P *p)

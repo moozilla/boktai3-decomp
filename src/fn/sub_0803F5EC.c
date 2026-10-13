@@ -1,6 +1,7 @@
 #include "global.h"
 
-s32 sub_0803F5EC(u8 *head, u8 *n) {
+s32 sub_0803F5EC(u8 *head, u8 *n)
+{
     u8 *prev = *(u8 **)(n + 0x38);
     u8 *next = *(u8 **)(n + 0x3C);
     s32 r;

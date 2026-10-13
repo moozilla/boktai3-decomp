@@ -12,27 +12,28 @@ struct P {
 };
 struct Slot *sub_0803BAA0(struct P *p)
 {
-    struct Slot *slot=p->slots;
-    u32 i=0;
-    u32 total=p->count;
-    if(i<total) {
-        u32 offset=0x854;
-        s32 empty=-1;
-        u32 stride=0x8b0;
+    struct Slot *slot = p->slots;
+    u32 i = 0;
+    u32 total = p->count;
+    if (i < total) {
+        u32 offset = 0x854;
+        s32 empty = -1;
+        u32 stride = 0x8b0;
         u32 count;
-        count=total;
+        count = total;
         do {
-            if(*(s32*)((u8*)slot+offset)==empty)return slot;
+            if (*(s32 *)((u8 *)slot + offset) == empty)
+                return slot;
             i++;
-            slot=(struct Slot*)((u8*)slot+stride);
-        } while(i<count);
+            slot = (struct Slot *)((u8 *)slot + stride);
+        } while (i < count);
     }
     return 0;
 }
-void sub_0811BD30(void*,void*);
+void sub_0811BD30(void *, void *);
 void sub_0803BAE4(u8 *p)
 {
-    sub_0811BD30(p,p+0x600);
+    sub_0811BD30(p, p + 0x600);
 }
 struct TailData {
     u8 pad[12];
@@ -45,7 +46,7 @@ struct Tail {
 };
 void sub_0803BAF4(struct Tail *p)
 {
-    struct TailData *data=&p->data;
-    data->flag=0;
-    data->timer=0;
+    struct TailData *data = &p->data;
+    data->flag = 0;
+    data->timer = 0;
 }

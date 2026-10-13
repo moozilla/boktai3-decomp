@@ -28,37 +28,57 @@ Boston, MA 02111-1307, USA.  */
    This exception does not however invalidate any other reasons why
    the executable file might be covered by the GNU General Public License.  */
 
-
 /* Specialized from pinned pret/agbcc libgcc/libgcc2.c. */
 typedef long int ptrdiff_t;
 typedef unsigned long int size_t;
 typedef int wchar_t;
-typedef unsigned int UQItype __attribute__ ((mode (QI)));
-typedef int SItype __attribute__ ((mode (SI)));
-typedef unsigned int USItype __attribute__ ((mode (SI)));
-typedef int DItype __attribute__ ((mode (DI)));
-typedef unsigned int UDItype __attribute__ ((mode (DI)));
-typedef float SFtype __attribute__ ((mode (SF)));
-typedef float DFtype __attribute__ ((mode (DF)));
-typedef int word_type __attribute__ ((mode (__word__)));
-struct DIstruct {SItype low, high;};
-typedef union
-{
-  struct DIstruct s;
-  DItype ll;
+typedef unsigned int UQItype __attribute__((mode(QI)));
+typedef int SItype __attribute__((mode(SI)));
+typedef unsigned int USItype __attribute__((mode(SI)));
+typedef int DItype __attribute__((mode(DI)));
+typedef unsigned int UDItype __attribute__((mode(DI)));
+typedef float SFtype __attribute__((mode(SF)));
+typedef float DFtype __attribute__((mode(DF)));
+typedef int word_type __attribute__((mode(__word__)));
+struct DIstruct {
+    SItype low, high;
+};
+typedef union {
+    struct DIstruct s;
+    DItype ll;
 } DIunion;
 extern const UQItype __clz_tab[];
-extern DItype __fixunssfdi (SFtype a);
-extern DItype __fixunsdfdi (DFtype a);
-DItype
-sub_0824AC74 (DItype u, DItype v)
+extern DItype __fixunssfdi(SFtype a);
+extern DItype __fixunsdfdi(DFtype a);
+DItype sub_0824AC74(DItype u, DItype v)
 {
-  DIunion w;
-  DIunion uu, vv;
-  uu.ll = u,
-  vv.ll = v;
-  w.ll = ({DIunion __w; do { USItype __x0, __x1, __x2, __x3; USItype __ul, __vl, __uh, __vh; __ul = ((USItype) (uu.s.low) % (1L << ((sizeof (SItype) * 8) / 2))); __uh = ((USItype) (uu.s.low) / (1L << ((sizeof (SItype) * 8) / 2))); __vl = ((USItype) (vv.s.low) % (1L << ((sizeof (SItype) * 8) / 2))); __vh = ((USItype) (vv.s.low) / (1L << ((sizeof (SItype) * 8) / 2))); __x0 = (USItype) __ul * __vl; __x1 = (USItype) __ul * __vh; __x2 = (USItype) __uh * __vl; __x3 = (USItype) __uh * __vh; __x1 += ((USItype) (__x0) / (1L << ((sizeof (SItype) * 8) / 2))); __x1 += __x2; if (__x1 < __x2) __x3 += (1L << ((sizeof (SItype) * 8) / 2)); (__w.s.high) = __x3 + ((USItype) (__x1) / (1L << ((sizeof (SItype) * 8) / 2))); (__w.s.low) = ((USItype) (__x1) % (1L << ((sizeof (SItype) * 8) / 2))) * (1L << ((sizeof (SItype) * 8) / 2)) + ((USItype) (__x0) % (1L << ((sizeof (SItype) * 8) / 2))); } while (0); __w.ll; });
-  w.s.high += ((USItype) uu.s.low * (USItype) vv.s.high
-        + (USItype) uu.s.high * (USItype) vv.s.low);
-  return w.ll;
+    DIunion w;
+    DIunion uu, vv;
+    uu.ll = u, vv.ll = v;
+    w.ll = ({
+        DIunion __w;
+        do {
+            USItype __x0, __x1, __x2, __x3;
+            USItype __ul, __vl, __uh, __vh;
+            __ul = ((USItype)(uu.s.low) % (1L << ((sizeof(SItype) * 8) / 2)));
+            __uh = ((USItype)(uu.s.low) / (1L << ((sizeof(SItype) * 8) / 2)));
+            __vl = ((USItype)(vv.s.low) % (1L << ((sizeof(SItype) * 8) / 2)));
+            __vh = ((USItype)(vv.s.low) / (1L << ((sizeof(SItype) * 8) / 2)));
+            __x0 = (USItype)__ul * __vl;
+            __x1 = (USItype)__ul * __vh;
+            __x2 = (USItype)__uh * __vl;
+            __x3 = (USItype)__uh * __vh;
+            __x1 += ((USItype)(__x0) / (1L << ((sizeof(SItype) * 8) / 2)));
+            __x1 += __x2;
+            if (__x1 < __x2)
+                __x3 += (1L << ((sizeof(SItype) * 8) / 2));
+            (__w.s.high) = __x3 + ((USItype)(__x1) / (1L << ((sizeof(SItype) * 8) / 2)));
+            (__w.s.low) = ((USItype)(__x1) % (1L << ((sizeof(SItype) * 8) / 2))) *
+                              (1L << ((sizeof(SItype) * 8) / 2)) +
+                          ((USItype)(__x0) % (1L << ((sizeof(SItype) * 8) / 2)));
+        } while (0);
+        __w.ll;
+    });
+    w.s.high += ((USItype)uu.s.low * (USItype)vv.s.high + (USItype)uu.s.high * (USItype)vv.s.low);
+    return w.ll;
 }

@@ -29,7 +29,7 @@ struct Obj {
     s16 dy;
     s16 dz;
     u8 pad14A[0x12];
-    u8 * parent;
+    u8 *parent;
     u8 pad160[0x70];
     void (*callback)(struct Obj *);
     u8 pad1D4[0x2];
@@ -42,9 +42,22 @@ struct Obj {
 void sub_0818CA6C(struct Obj *);
 void sub_0818CA04(struct Obj *p)
 {
-    s32 a=p->byte8,b=p->byte9;
-    if(a>64) { a+=p->delta8; if(a<64) a=64; }
-    if(b<127) { b+=p->delta9; if(b>127) b=127; }
-    p->byte8=a; p->byte9=b;
-    if(b==127) { p->byte8=64; p->delta9=-16; p->callback=sub_0818CA6C; }
+    s32 a = p->byte8, b = p->byte9;
+    if (a > 64) {
+        a += p->delta8;
+        if (a < 64)
+            a = 64;
+    }
+    if (b < 127) {
+        b += p->delta9;
+        if (b > 127)
+            b = 127;
+    }
+    p->byte8 = a;
+    p->byte9 = b;
+    if (b == 127) {
+        p->byte8 = 64;
+        p->delta9 = -16;
+        p->callback = sub_0818CA6C;
+    }
 }

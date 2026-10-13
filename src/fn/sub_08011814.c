@@ -9,14 +9,19 @@ void sub_08011814(void)
 {
     u32 a, b, c;
     s32 i;
-    if (!Script_SeekToKeyword(0x63)) return;
+    if (!Script_SeekToKeyword(0x63))
+        return;
     a = Script_GetPc();
-    if (!Script_SeekToKeyword(0x6e)) return;
+    if (!Script_SeekToKeyword(0x6e))
+        return;
     b = Script_GetPc();
-    if (b == 0) return;
-    if (!Script_SeekToKeyword(0x64)) return;
+    if (b == 0)
+        return;
+    if (!Script_SeekToKeyword(0x64))
+        return;
     c = Script_GetPc();
-    if (c == 0) return;
+    if (c == 0)
+        return;
     i = 0;
     do {
         u32 r = Text_LookupString(Script_ParseStringRef(c) + i);

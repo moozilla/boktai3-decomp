@@ -8,7 +8,10 @@ void sub_081685B4(u8 *);
 void sub_0822B524(void);
 void sub_08163EA0(u8 *, void *);
 void sub_08167C84(void);
-static inline void andm(u32 *a, u32 m) { *a &= m; }
+static inline void andm(u32 *a, u32 m)
+{
+    *a &= m;
+}
 void sub_08168DE4(u8 *p)
 {
     sub_081681B8(p);

@@ -1,7 +1,13 @@
 #include "global.h"
 
-struct Q { u8 filler[0xec8]; s8 v[3]; };
-struct S080FB248 { u8 filler[0x3d0]; struct Q *q; };
+struct Q {
+    u8 filler[0xec8];
+    s8 v[3];
+};
+struct S080FB248 {
+    u8 filler[0x3d0];
+    struct Q *q;
+};
 
 u32 sub_080FB248(struct S080FB248 *s, s32 x)
 {

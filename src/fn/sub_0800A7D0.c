@@ -1,7 +1,8 @@
 #include "global.h"
 extern u8 *gUnk_0200003C;
 void sub_08009F34(void *, void *);
-void sub_0800A7D0(void) {
+void sub_0800A7D0(void)
+{
     u8 *base = gUnk_0200003C;
     s32 i;
     u8 *item;

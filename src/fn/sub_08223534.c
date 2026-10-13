@@ -1,5 +1,16 @@
 #include "global.h"
-struct S { u8 f0; u8 f1; u8 pad[2]; u8 f4; u8 f5; u8 f6; u8 f7; u8 f8; u8 pad2[4]; u8 fd; };
+struct S {
+    u8 f0;
+    u8 f1;
+    u8 pad[2];
+    u8 f4;
+    u8 f5;
+    u8 f6;
+    u8 f7;
+    u8 f8;
+    u8 pad2[4];
+    u8 fd;
+};
 extern struct S gUnk_03005390;
 u32 sub_08245890(void);
 void sub_08224C84(void);

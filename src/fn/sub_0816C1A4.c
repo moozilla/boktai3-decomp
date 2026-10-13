@@ -1,6 +1,7 @@
 #include "global.h"
 u16 *sub_08163F70(s32, s32, s32);
-void sub_0816C1A4(void) {
+void sub_0816C1A4(void)
+{
     s32 y;
     s32 x;
     for (y = 0; y <= 0x1f; y++) {

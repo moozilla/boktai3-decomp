@@ -1,7 +1,19 @@
 #include "global.h"
 
 extern u32 gUnk_0861218C[];
-struct S { u8 pad[5]; u8 b5; u8 b6; u8 pad7[2]; u8 b9; u8 pad2[6]; u32 f10; u8 pad3[4]; u8 b18; u8 pad4[0x2cc-0x19]; u32 f2cc; };
+struct S {
+    u8 pad[5];
+    u8 b5;
+    u8 b6;
+    u8 pad7[2];
+    u8 b9;
+    u8 pad2[6];
+    u32 f10;
+    u8 pad3[4];
+    u8 b18;
+    u8 pad4[0x2cc - 0x19];
+    u32 f2cc;
+};
 
 s32 sub_081C6710(struct S *p)
 {

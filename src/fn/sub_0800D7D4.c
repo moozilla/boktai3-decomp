@@ -1,7 +1,13 @@
 #include "global.h"
 
-struct N { u8 f[0xf0]; struct N *next; };
-struct S { u8 f[0x1c]; struct N *head; };
+struct N {
+    u8 f[0xf0];
+    struct N *next;
+};
+struct S {
+    u8 f[0x1c];
+    struct N *head;
+};
 extern u32 gUnk_0200046C;
 void sub_0800CC50(struct N *);
 

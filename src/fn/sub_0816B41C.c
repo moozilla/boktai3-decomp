@@ -1,8 +1,16 @@
 #include "global.h"
 u8 sub_0816B3C0(void *);
 void sub_0822B2F8(u32);
-struct S { u8 f0; u8 b1; u8 b2; u8 b3; u8 f4[8]; s8 t[1]; };
-u32 sub_0816B41C(struct S *p) {
+struct S {
+    u8 f0;
+    u8 b1;
+    u8 b2;
+    u8 b3;
+    u8 f4[8];
+    s8 t[1];
+};
+u32 sub_0816B41C(struct S *p)
+{
     s32 base = p->t[p->b2 + p->b1 * 4];
     u32 i = (p->b2 + 3) & 3;
     while (i != p->b2) {

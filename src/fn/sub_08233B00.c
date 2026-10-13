@@ -1,5 +1,7 @@
 #include "global.h"
-struct Pair3B { u32 a, b; };
+struct Pair3B {
+    u32 a, b;
+};
 u8 *sub_08219FBC(u32, u32);
 void sub_0821A04C(u8 *, void (*)(u8 *), void (*)(u8 *));
 void sub_0821A0C0(u8 *);

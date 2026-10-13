@@ -1,6 +1,7 @@
 #include "global.h"
 
-u32 sub_0800CBE0(u8 *head, u8 *n) {
+u32 sub_0800CBE0(u8 *head, u8 *n)
+{
     u32 *slot;
     u8 *t;
     *(u32 *)(n + 0xEC) = 0;

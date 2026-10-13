@@ -11,7 +11,8 @@ void *sub_08019264(u32 a)
 {
     void *p;
     u32 r = sub_0821ABA8(0x61, 0);
-    if (gUnk_0200009C != 0) return (void *)gUnk_0200009C;
+    if (gUnk_0200009C != 0)
+        return (void *)gUnk_0200009C;
     if (r != 0) {
         p = sub_08219FBC(0xb, 0x2b0);
     } else {

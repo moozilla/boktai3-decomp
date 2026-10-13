@@ -1,5 +1,9 @@
 #include "global.h"
-struct CommandSet { void *next; u32 count; const void *entries; };
+struct CommandSet {
+    void *next;
+    u32 count;
+    const void *entries;
+};
 extern struct CommandSet gUnk_030025E8;
 extern const u8 gUnk_08E8791C[];
 void sub_082257E0(void);

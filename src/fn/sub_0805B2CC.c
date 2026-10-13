@@ -8,7 +8,8 @@ s32 sub_0805B2CC(u8 *p)
     if (q) {
         u8 *r = gUnk_02000580;
         if (*(s32 *)(r + 0x1c) == 1 && r[0x457] == 6) {
-            if (sub_0805B28C(q + 0x50, p + 0x510, 0x46)) return 1;
+            if (sub_0805B28C(q + 0x50, p + 0x510, 0x46))
+                return 1;
         }
     }
     return 0;

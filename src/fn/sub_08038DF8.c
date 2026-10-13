@@ -11,7 +11,8 @@ void sub_08038138(struct P *);
 void sub_0821AD08(u32, int);
 void sub_08038DF8(struct P *p)
 {
-    if (p->entered) p->entered = 0;
+    if (p->entered)
+        p->entered = 0;
     if (p->timer > 119) {
         u32 eleven;
         u8 *state;
@@ -24,6 +25,8 @@ void sub_08038DF8(struct P *p)
         p->entered = 1;
         p->timer = zero;
         sub_08038138(p);
-        if (p->title) sub_0821AD08(p->title, 0);
-    } else p->timer++;
+        if (p->title)
+            sub_0821AD08(p->title, 0);
+    } else
+        p->timer++;
 }

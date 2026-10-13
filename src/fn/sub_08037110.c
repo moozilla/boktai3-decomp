@@ -1,20 +1,20 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Blob {
-  u32 words[8];
+    u32 words[8];
 };
 struct LinkMenu {
-  u8 task[0x18];
-  u8 state, entered, pad1a[2];
-  u32 timer;
-  int window;
-  void *background;
-  void *script;
-  void *resource;
-  struct Blob blob;
-  u8 draw50[8];
-  u32 flags;
-  u8 pad5c[0x54];
+    u8 task[0x18];
+    u8 state, entered, pad1a[2];
+    u32 timer;
+    int window;
+    void *background;
+    void *script;
+    void *resource;
+    struct Blob blob;
+    u8 draw50[8];
+    u32 flags;
+    u8 pad5c[0x54];
 };
 extern struct LinkMenu *gUnk_020000F8;
 extern u16 gUnk_03004BD8, gUnk_03005260[];
@@ -47,15 +47,16 @@ int sub_08036BEC(void);
 int sub_0824923C(void *, void *);
 extern void *gUnk_08605770[];
 void sub_082195E0(void *);
-int sub_08037110(struct LinkMenu *p) {
-  sub_08033778(p->window);
-  sub_082156B8(0);
-  sub_082156B8(2);
-  sub_082195E0(p->draw50);
-  {
-    struct LinkMenu **singleton = &gUnk_020000F8;
-    register u32 zero asm("r0");
-    zero = 0;
-    *singleton = (void *)zero;
-  }
+int sub_08037110(struct LinkMenu *p)
+{
+    sub_08033778(p->window);
+    sub_082156B8(0);
+    sub_082156B8(2);
+    sub_082195E0(p->draw50);
+    {
+        struct LinkMenu **singleton = &gUnk_020000F8;
+        register u32 zero asm("r0");
+        zero = 0;
+        *singleton = (void *)zero;
+    }
 }

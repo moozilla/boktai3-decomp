@@ -2,7 +2,8 @@
 
 extern u8 *gUnk_02000030;
 
-u32 sub_08006FAC(u8 *p) {
+u32 sub_08006FAC(u8 *p)
+{
     u32 *slot;
     u8 *t;
     *(u32 *)(p + 0xB4) = 0;

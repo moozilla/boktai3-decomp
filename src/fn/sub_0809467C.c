@@ -5,7 +5,8 @@ void sub_0824923C(u8 *, u32);
 void sub_0807FC5C(u8 *);
 void sub_080937F4(u8 *);
 
-u32 sub_0809467C(u8 *p) {
+u32 sub_0809467C(u8 *p)
+{
     u32 i;
     u32 *t;
     sub_080937E8(p);

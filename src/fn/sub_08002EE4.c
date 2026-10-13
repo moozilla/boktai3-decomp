@@ -1,7 +1,22 @@
 #include "global.h"
 s32 Div(s32, s32);
-struct S { u8 f[0x1a]; u8 o; u8 p[0x1d]; s32 v; s32 a; s32 b; s32 c; s32 d; };
-struct T { s32 x; s32 a; s32 b; s32 c; s32 d; };
+struct S {
+    u8 f[0x1a];
+    u8 o;
+    u8 p[0x1d];
+    s32 v;
+    s32 a;
+    s32 b;
+    s32 c;
+    s32 d;
+};
+struct T {
+    s32 x;
+    s32 a;
+    s32 b;
+    s32 c;
+    s32 d;
+};
 void sub_08002EE4(struct S *s)
 {
     struct T *t = (struct T *)&s->v;

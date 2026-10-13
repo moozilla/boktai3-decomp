@@ -1,6 +1,11 @@
 #include "global.h"
 
-struct T0813BA88 { u8 a; u8 b; u8 c; u8 d; };
+struct T0813BA88 {
+    u8 a;
+    u8 b;
+    u8 c;
+    u8 d;
+};
 extern const struct T0813BA88 gUnk_086108F8[];
 void sub_08217EEC(u32 *, u32, u32);
 

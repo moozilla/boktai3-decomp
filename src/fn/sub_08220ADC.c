@@ -7,7 +7,8 @@ void sub_08220A58(void);
 void sub_08220AA0(void);
 void sub_08220AAC(void);
 
-u8 *sub_08220ADC(void) {
+u8 *sub_08220ADC(void)
+{
     u8 *p;
     if (gUnk_03001688 != 0)
         return gUnk_03001688;

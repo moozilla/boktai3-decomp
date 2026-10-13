@@ -193,27 +193,25 @@ int sub_08037290(struct Owner *owner, struct PeerPanel *panel, int kind)
             }
             a->frame = next;
         }
-    recalculate:
-        {
-            int index = a->frame << 1;
-            const u16 *table;
-            register int word asm("r1");
-            register int value asm("r0");
-            table = a->frames;
-            frame = (const u16 *)((u32)table + index);
-            word = *frame;
-            value = word & 15;
-            a->duration = value;
-            value = a->duration * a->speed;
-            asm("" : "+r"(value));
-            value >>= 6;
-            a->period = value;
-            value = (u32)value << 24;
-            if (!value)
-                a->period = 1;
-        }
-    animationDone:
-        ;
+    recalculate: {
+        int index = a->frame << 1;
+        const u16 *table;
+        register int word asm("r1");
+        register int value asm("r0");
+        table = a->frames;
+        frame = (const u16 *)((u32)table + index);
+        word = *frame;
+        value = word & 15;
+        a->duration = value;
+        value = a->duration * a->speed;
+        asm("" : "+r"(value));
+        value >>= 6;
+        a->period = value;
+        value = (u32)value << 24;
+        if (!value)
+            a->period = 1;
+    }
+    animationDone:;
     }
     {
         int one = 1;

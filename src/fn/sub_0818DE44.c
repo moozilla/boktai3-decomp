@@ -29,7 +29,7 @@ struct Obj {
     s16 dy;
     s16 dz;
     u8 pad14A[0x12];
-    u8 * parent;
+    u8 *parent;
     u8 pad160[0x70];
     void (*callback)(struct Obj *);
     u8 pad1D4[0x2];
@@ -44,12 +44,16 @@ void sub_08013B74(u8 *);
 void sub_0822B3BC(u32);
 void sub_0818DE44(struct Obj *p)
 {
-    p->y-=60;
-    if(p->y<p->endY) {
-        p->y=p->endY; p->velocity=30;
-        p->flagsA2|=4; p->flags4E|=4; p->flags|=512;
-        p->timer=0; p->callback=sub_0818DEBC;
-        sub_08013B74((u8 *)p+0x160);
+    p->y -= 60;
+    if (p->y < p->endY) {
+        p->y = p->endY;
+        p->velocity = 30;
+        p->flagsA2 |= 4;
+        p->flags4E |= 4;
+        p->flags |= 512;
+        p->timer = 0;
+        p->callback = sub_0818DEBC;
+        sub_08013B74((u8 *)p + 0x160);
         sub_0822B3BC(484);
     }
 }

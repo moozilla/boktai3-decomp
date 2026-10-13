@@ -1,6 +1,7 @@
 #include "global.h"
 
-void sub_08225F5C(s32 a) {
+void sub_08225F5C(s32 a)
+{
     u8 *s = *(u8 **)0x03005420;
     if (s != 0) {
         if (a <= 1) {

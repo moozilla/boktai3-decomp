@@ -1,7 +1,16 @@
 #include "global.h"
 
-struct P0814D8D8 { u8 f0[0xAAE]; u16 fAAE; u8 fAB0[0xBF0 - 0xAB0]; u32 fBF0; };
-struct B0814D8D8 { u8 f0[0x15]; u8 f15; u8 f16[10]; };
+struct P0814D8D8 {
+    u8 f0[0xAAE];
+    u16 fAAE;
+    u8 fAB0[0xBF0 - 0xAB0];
+    u32 fBF0;
+};
+struct B0814D8D8 {
+    u8 f0[0x15];
+    u8 f15;
+    u8 f16[10];
+};
 extern u8 gUnk_08E5FA6C[];
 void sub_0822D764(u32, void *);
 

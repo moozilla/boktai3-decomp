@@ -23,10 +23,8 @@ u8 *sub_080FF820(u32 x)
     one = 1;
     p = b + 0xD0;
     e = b + 0x1C;
-    for (; i < 12; i++)
-    {
-        if (Tst(m, one, i))
-        {
+    for (; i < 12; i++) {
+        if (Tst(m, one, i)) {
             if (*(u32 *)p == x)
                 return e;
         }

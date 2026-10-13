@@ -18,17 +18,19 @@ void sub_08171154(u32 a, u16 *t)
                 v = e[4];
             }
             switch (k) {
-            case 1:
-                t[1] += v;
-                break;
-            case 2:
-                t[2] += v;
-                break;
-            case 3:
-                t[2] += v;
-            case 4: case 5: case 6:
-                t[0] += v;
-                break;
+                case 1:
+                    t[1] += v;
+                    break;
+                case 2:
+                    t[2] += v;
+                    break;
+                case 3:
+                    t[2] += v;
+                case 4:
+                case 5:
+                case 6:
+                    t[0] += v;
+                    break;
             }
             i++;
         } while (i <= 1);

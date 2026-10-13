@@ -1,7 +1,9 @@
 #include "global.h"
 
 extern u32 gUnk_02000298;
-struct E { u8 pad[0x48]; };
+struct E {
+    u8 pad[0x48];
+};
 void sub_08030BF8(u8 *);
 void sub_08217EAC(u8 *);
 

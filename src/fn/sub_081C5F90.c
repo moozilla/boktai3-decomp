@@ -1,7 +1,13 @@
 #include "global.h"
 
-struct E { u32 flags; u8 pad[0x5c]; };
-struct S { u8 pad[0x120]; struct E e[6]; };
+struct E {
+    u32 flags;
+    u8 pad[0x5c];
+};
+struct S {
+    u8 pad[0x120];
+    struct E e[6];
+};
 void sub_081C5EF0(struct S *, void (*)(void));
 void sub_081C6094(void);
 

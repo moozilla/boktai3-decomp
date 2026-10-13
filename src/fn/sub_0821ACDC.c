@@ -1,5 +1,9 @@
 #include "global.h"
-struct T { u32 *tbl; u32 f4; u8 *base; };
+struct T {
+    u32 *tbl;
+    u32 f4;
+    u8 *base;
+};
 extern struct T gUnk_02000438;
 u8 *sub_0821ACDC(u32 id, u32 *out)
 {

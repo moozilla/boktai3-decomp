@@ -1,5 +1,8 @@
 #include "global.h"
-struct M { u32 a; u16 *b; };
+struct M {
+    u32 a;
+    u16 *b;
+};
 s32 sub_0821A3E8(u32, struct M **);
 void sub_0804F384(u8 *p)
 {
@@ -14,8 +17,12 @@ void sub_0804F384(u8 *p)
         u32 zero = 0;
         do {
             switch (*e->b) {
-            case 0: *t = one; break;
-            case 1: *t = zero; break;
+                case 0:
+                    *t = one;
+                    break;
+                case 1:
+                    *t = zero;
+                    break;
             }
             e++;
         } while (i-- > 0);

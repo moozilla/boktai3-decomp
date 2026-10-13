@@ -1,5 +1,10 @@
 #include "global.h"
-struct P { u8 f[0x10]; u16 f10; u8 f12[0xe4]; u16 ff6; };
+struct P {
+    u8 f[0x10];
+    u16 f10;
+    u8 f12[0xe4];
+    u16 ff6;
+};
 void sub_0804F7D0(struct P *, u32, void (*)(void));
 void sub_0804FB48(void);
 void sub_0804FB0C(struct P *p)

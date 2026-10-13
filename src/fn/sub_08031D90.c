@@ -1,24 +1,25 @@
 #include "global.h"
 struct Actor {
-  u8 pad[0x1A];
-  u8 rect[4];
+    u8 pad[0x1A];
+    u8 rect[4];
 };
 extern struct Actor *gUnk_020000DC;
-int sub_08031D90(int *out) {
-  struct Actor *p = gUnk_020000DC;
-  int result;
-  if (!p)
-    goto fail;
-  {
-    out[0] = p->rect[0];
-    out[1] = p->rect[1];
-    out[2] = p->rect[2];
-    out[3] = p->rect[3];
-    result = 0;
-    goto done;
-  }
+int sub_08031D90(int *out)
+{
+    struct Actor *p = gUnk_020000DC;
+    int result;
+    if (!p)
+        goto fail;
+    {
+        out[0] = p->rect[0];
+        out[1] = p->rect[1];
+        out[2] = p->rect[2];
+        out[3] = p->rect[3];
+        result = 0;
+        goto done;
+    }
 fail:
-  result = -1;
+    result = -1;
 done:
-  return result;
+    return result;
 }

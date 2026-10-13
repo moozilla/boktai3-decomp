@@ -29,7 +29,7 @@ struct Obj {
     s16 dy;
     s16 dz;
     u8 pad14A[0x12];
-    u8 * parent;
+    u8 *parent;
     u8 pad160[0x70];
     void (*callback)(struct Obj *);
     u8 pad1D4[0x2];
@@ -41,8 +41,10 @@ struct Obj {
 };
 void sub_0818DF90(struct Obj *p)
 {
-    p->endX=p->x; p->endY=p->y; p->endZ=p->z;
-    p->dx=p->endX-p->startX;
-    p->dy=p->endY-p->startY;
-    p->dz=p->endZ-p->startZ;
+    p->endX = p->x;
+    p->endY = p->y;
+    p->endZ = p->z;
+    p->dx = p->endX - p->startX;
+    p->dy = p->endY - p->startY;
+    p->dz = p->endZ - p->startZ;
 }

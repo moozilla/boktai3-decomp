@@ -1,8 +1,15 @@
 #include "global.h"
-struct Q { u8 f[0x10]; u16 v; u8 g[0x1C - 0x12]; };
+struct Q {
+    u8 f[0x10];
+    u16 v;
+    u8 g[0x1C - 0x12];
+};
 void sub_081DAD0C(void *, void (*)(void));
 void sub_081D92F0(void);
-static inline void clr(u32 *a, u32 m) { *a = m & *a; }
+static inline void clr(u32 *a, u32 m)
+{
+    *a = m & *a;
+}
 s32 sub_081D92B8(struct Q *p)
 {
     sub_081DAD0C((u8 *)p + 0x18, sub_081D92F0);

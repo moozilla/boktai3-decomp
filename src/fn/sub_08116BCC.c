@@ -1,6 +1,9 @@
 #include "global.h"
 extern u8 *gUnk_02000710;
-struct S { u8 f[0x74]; u32 a; };
+struct S {
+    u8 f[0x74];
+    u32 a;
+};
 extern struct S *gUnk_020004F0;
 void sub_08116BCC(void)
 {

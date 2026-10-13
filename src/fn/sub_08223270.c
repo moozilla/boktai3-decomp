@@ -2,7 +2,8 @@
 
 void sub_08222D18(void);
 
-u32 sub_08223270(void) {
+u32 sub_08223270(void)
+{
     if (*(s32 *)0x0300531C == 0)
         sub_08222D18();
     else

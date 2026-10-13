@@ -1,5 +1,8 @@
 #include "global.h"
-struct Task { u8 pad[24]; s32 state, counter; };
+struct Task {
+    u8 pad[24];
+    s32 state, counter;
+};
 extern u32 gUnk_03005408, gUnk_030054B0, gUnk_03003A08, gUnk_030053E8, gUnk_030053FC;
 extern u32 gUnk_0300523C, gUnk_030053DC, gUnk_03005414, gUnk_030051D8, gUnk_0300540C;
 extern u32 gUnk_030053F4, gUnk_03005404, gUnk_030053E4, gUnk_030053D8;
@@ -32,10 +35,9 @@ s32 sub_082250FC(struct Task *task)
         return 0;
     } else
         gUnk_03005408 = 0;
-update:
-    {
-        u32 state = task->state;
-        switch (state) {
+update: {
+    u32 state = task->state;
+    switch (state) {
         case 0: {
             u16 procedure;
             u32 *active;
@@ -54,16 +56,15 @@ update:
             sub_0821AD08(procedure, 0);
             if ((u32)procedure << 16)
                 goto ran_procedure;
-no_procedure:
+        no_procedure:
             sub_0821B004();
-ran_procedure:
-            ;
+        ran_procedure:;
             *active = state;
             task->state = next;
             gUnk_030053FC = state;
             break;
         }
-    case 1:
+        case 1:
             if (task->counter <= 0) {
                 if (gUnk_030053E8) {
                     if (gUnk_0300523C & 2)
@@ -109,8 +110,8 @@ ran_procedure:
             }
             task->state = 0;
             break;
-        }
     }
+}
     if (gUnk_03005404) {
         sub_08228928();
         gUnk_03005404 = 0;

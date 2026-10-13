@@ -1,6 +1,13 @@
 #include "global.h"
-struct V { u32 a, b; };
-struct O { void (*f0)(void); void (*f1)(void); u8 g[0x38]; struct V v; };
+struct V {
+    u32 a, b;
+};
+struct O {
+    void (*f0)(void);
+    void (*f1)(void);
+    u8 g[0x38];
+    struct V v;
+};
 struct O *sub_0818F218(void *);
 void sub_082151E4(void *, s32);
 void sub_08215284(void *, s32);

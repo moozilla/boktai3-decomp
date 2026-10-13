@@ -1,6 +1,17 @@
 #include "global.h"
-struct V { u16 a; u16 b; u32 c; };
-struct S { u8 p0[0x18]; s32 w18; u8 p1[0x40 - 0x1c]; struct V v; u8 p2[0x1a8 - 0x48]; s16 h1a8; };
+struct V {
+    u16 a;
+    u16 b;
+    u32 c;
+};
+struct S {
+    u8 p0[0x18];
+    s32 w18;
+    u8 p1[0x40 - 0x1c];
+    struct V v;
+    u8 p2[0x1a8 - 0x48];
+    s16 h1a8;
+};
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
 void sub_081263E0(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);

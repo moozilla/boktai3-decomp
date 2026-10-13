@@ -1,6 +1,16 @@
 #include "global.h"
-struct Entry33A { u8 pad[15]; u8 a, b; u8 gap[23]; u8 c, d; u8 tail[2]; };
-struct State33A { u8 pad[0xa0]; u32 handle; struct Entry33A entries[8]; };
+struct Entry33A {
+    u8 pad[15];
+    u8 a, b;
+    u8 gap[23];
+    u8 c, d;
+    u8 tail[2];
+};
+struct State33A {
+    u8 pad[0xa0];
+    u32 handle;
+    struct Entry33A entries[8];
+};
 u32 sub_08215184(u32);
 void sub_08217DE0(struct Entry33A *, u32, s32);
 void sub_08217EC4(struct Entry33A *, s32, s32);

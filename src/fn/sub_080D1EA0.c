@@ -13,7 +13,7 @@ typedef struct Owner {
 } Owner;
 typedef struct Obj {
     u8 pad0[0x4];
-    Owner * unk4;
+    Owner *unk4;
     u8 unk8;
     u8 pad9[0x50];
     u8 unk59;
@@ -77,12 +77,18 @@ void sub_080DA678(Obj *);
 void sub_08072188(void);
 static inline u8 take_flag(Obj *s)
 {
-    if (s->unk2B2) { s->unk2B2 = 0; return 1; }
+    if (s->unk2B2) {
+        s->unk2B2 = 0;
+        return 1;
+    }
     return 0;
 }
 
 /* Keep this byte predicate local; its address is not retained by the body. */
-static inline u8 peek_flag(Obj *s) { return s->unk2B3; }
+static inline u8 peek_flag(Obj *s)
+{
+    return s->unk2B3;
+}
 
 void sub_080D1EA0(Obj *s)
 {
@@ -104,7 +110,8 @@ void sub_080D1EA0(Obj *s)
         }
         s->unk178 = 60;
     }
-    if (!peek_flag(s)) return;
+    if (!peek_flag(s))
+        return;
     {
         sub_080DA678(s);
         s->unk2CC = s->unk118;
@@ -118,7 +125,8 @@ void sub_080D1EA0(Obj *s)
         s->unk2C0 = s->unk12E;
         s->unk2EA = s->unk12C;
         n = s->unkB0;
-        if (n <= 0) n = 0;
+        if (n <= 0)
+            n = 0;
         s->unk9C = n;
         s->unk2D6 = 0;
         s->unk2D4 = 0;

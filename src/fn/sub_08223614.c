@@ -1,6 +1,7 @@
 #include "global.h"
 
-void sub_08223614(void) {
+void sub_08223614(void)
+{
     u16 z;
     u8 *p;
     u16 *q = &z;

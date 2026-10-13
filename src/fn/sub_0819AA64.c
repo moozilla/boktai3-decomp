@@ -3,7 +3,8 @@
 u32 sub_081FCFA8(u8 *);
 u32 sub_081FE6E0(u32);
 
-s32 sub_0819AA64(u8 *p) {
+s32 sub_0819AA64(u8 *p)
+{
     u32 r = sub_081FCFA8(p);
     *(u32 *)(p + 0x18) = r;
     if (r != 0) {
