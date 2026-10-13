@@ -216,6 +216,19 @@ static inline void addPosition(struct GroupVec *d, struct GroupVec *s)
     dst->z += src->z;
 }
 
+static inline void addVec(struct GroupVec *d, struct GroupVec *s)
+{
+    struct GroupVec *dst = d;
+    struct GroupVec *src = s;
+    {
+        u32 value = (u16)s->x;
+        value = value + (u16)d->x;
+        d->x = value;
+    }
+    dst->y += src->y;
+    dst->z += src->z;
+}
+
 // MATCHING_CONCESSION: register-pinning
 
 void BoardPiece_Launch(struct GroupObjects *m, struct GroupPiece *p, int delay)
@@ -247,19 +260,51 @@ void sub_08010A34(struct GroupObjects *m, struct GroupPiece *p)
     }
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_08010A58);
-static inline void addVec(struct GroupVec *d, struct GroupVec *s)
+#ifdef NONMATCHING
+void sub_08010A58(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
-    struct GroupVec *dst = d;
-    struct GroupVec *src = s;
-    {
-        u32 value = (u16)s->x;
-        value = value + (u16)d->x;
-        d->x = value;
+    struct GroupVec delta;
+    struct GroupVec *position;
+    struct GroupVec *target;
+    int dx, dz;
+    int active;
+    if (m->actor)
+        p->target = m->actor->position;
+    active = p->active;
+    position = &p->position;
+    target = &p->target;
+    if (active) {
+        const u16 *table;
+        p->active = 0;
+        p->direction = sub_082215E4(target->x - position->x, target->z - position->z);
+        table = gUnk_0203B400;
+        p->direction += (randomWith(table) & 31) - 16;
+        p->speed = (randomWith(table) & 15) + 16;
     }
-    dst->y += src->y;
-    dst->z += src->z;
+    if (p->speed == 0) {
+        const u16 *table;
+        p->direction = sub_082215E4(target->x - position->x, target->z - position->z);
+        table = gUnk_0203B400;
+        p->direction += (randomWith(table) & 15) - 8;
+        p->speed = (randomWith(table) & 15) + 16;
+    } else
+        p->speed--;
+    dx = p->target.x - p->position.x;
+    dz = target->z - position->z;
+    if (dx * dx + dz * dz <= 0xFFF) {
+        p->state = 4;
+        p->active = 1;
+        p->timer = 0;
+    } else {
+        polar(&delta, p->direction, p->duration);
+        addVec(position, &delta);
+        sub_0800FA5C(m, p, 0);
+        p->timer++;
+    }
 }
+#else
+INCLUDE_ASM("asm/nonmatching", sub_08010A58);
+#endif
 
 #ifdef NONMATCHING
 void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
