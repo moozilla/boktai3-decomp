@@ -111,7 +111,6 @@ int GroupObjects_Initialize(struct GroupObjects *, int);
 void *sub_080111A8(void *);
 
 void sub_082216F8(void *, void *, void *, int, int);
-int sub_082215E4(int, int);
 void sub_0800FA5C(struct GroupObjects *, struct GroupPiece *, int);
 int sub_0800FC28(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
 int sub_0800FE98(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);

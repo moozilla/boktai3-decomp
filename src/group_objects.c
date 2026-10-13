@@ -53,7 +53,6 @@ static inline u32 frame_factor(u16 v)
     return mask & value;
 }
 
-void sub_08220C8C(void *, void *, int, u8, u8);
 void sub_0800FA5C(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     u8 left;
@@ -69,7 +68,7 @@ void sub_0800FA5C(struct GroupObjects *m, struct GroupPiece *p, int index)
         *r = 1;
     else
         *r = 0;
-    sub_08220C8C(&p->anim, m->animation, (u16)index, left, right);
+    Anim_SetSequence(&p->anim, m->animation, (u16)index, left, right);
 }
 
 // MATCHING_CONCESSION: register-pinning
@@ -277,14 +276,14 @@ void sub_08010A58(struct GroupObjects *m, struct GroupPiece *p, int index)
     if (active) {
         const u16 *table;
         p->active = 0;
-        p->direction = sub_082215E4(target->x - position->x, target->z - position->z);
+        p->direction = Math_Atan2(target->x - position->x, target->z - position->z);
         table = gUnk_0203B400;
         p->direction += (randomWith(table) & 31) - 16;
         p->speed = (randomWith(table) & 15) + 16;
     }
     if (p->speed == 0) {
         const u16 *table;
-        p->direction = sub_082215E4(target->x - position->x, target->z - position->z);
+        p->direction = Math_Atan2(target->x - position->x, target->z - position->z);
         table = gUnk_0203B400;
         p->direction += (randomWith(table) & 15) - 8;
         p->speed = (randomWith(table) & 15) + 16;
@@ -329,7 +328,7 @@ void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
     sub_082216F8(&p->anchor, &p->anchor, &p->target, index + 8, 5);
     if (p->speed == 0) {
         const u16 *table;
-        p->direction = sub_082215E4(-p->offset.x, -p->offset.z);
+        p->direction = Math_Atan2(-p->offset.x, -p->offset.z);
         table = gUnk_0203B400;
         p->direction += (randomWith(table) & 15) - 7;
         p->speed = (randomWith(table) & 7) + 8;
@@ -371,7 +370,7 @@ void sub_08010E44(struct GroupObjects *m, struct GroupPiece *p, int index)
     if (active) {
         const u16 *table;
         p->active = 0;
-        p->direction = sub_082215E4(p->target.x - p->position.x, p->target.z - p->position.z);
+        p->direction = Math_Atan2(p->target.x - p->position.x, p->target.z - p->position.z);
         table = gUnk_0203B400;
         p->direction += (randomWith(table) & 31) - 16;
         p->speed = (randomWith(table) & 31) + 16;
@@ -386,7 +385,7 @@ void sub_08010E44(struct GroupObjects *m, struct GroupPiece *p, int index)
     } else {
         if (p->speed == 0) {
             const u16 *table;
-            p->direction = sub_082215E4(dx, dz);
+            p->direction = Math_Atan2(dx, dz);
             table = gUnk_0203B400;
             p->direction += (randomWith(table) & 31) - 16;
             p->speed = (randomWith(table) & 31) + 32;
