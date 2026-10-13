@@ -686,6 +686,58 @@ addr,name,confidence,evidence
 0803441C,WirelessController_SendPeerPacket,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
 0803451C,WirelessController_CheckPeerSend,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
 080345D8,WirelessController_HandleEvent,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+08034A2C,Wireless_InitializeAdapter,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08034A80,Wireless_ConfigureGameIdentity,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08034BCC,Wireless_WaitForConfiguration,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08034C28,Wireless_StartChildSearch,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08034CA0,Wireless_StartParentSearch,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08034CFC,Wireless_WaitForPeerExchange,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08034E18,Wireless_SelectParentFromInput,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08034ED8,Wireless_BeginParentExchange,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08034F0C,Wireless_DisconnectBeforeExchange,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08034F44,Wireless_WaitForDisconnect,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08034F90,Wireless_ClearDisconnectedSlots,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08034FC8,Wireless_WaitBeforeParentSearch,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08034FF8,Wireless_ExchangeChildHandshake,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+0803521C,Wireless_WaitForReset,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+0803524C,Wireless_ResetAfterError,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08035288,Wireless_ResetAfterSendError,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+080352E8,Wireless_RequestDisconnect,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08035320,Wireless_TrackReceivedSlotMask,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+0803536C,Wireless_ReceiveChildUniPacket,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+0803545C,Wireless_ResetInputHistory,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+0803548C,Wireless_ReceiveParentUniPackets,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+0803559C,Wireless_BuildParentUniPacket,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+080356AC,Wireless_RemoveConnectedSlots,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+080356FC,Wireless_HandleParentSessionEvent,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08035864,Wireless_HandleChildSessionEvent,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08035958,Wireless_PollAcknowledgedSlots,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08035CE8,Wireless_PublishLocalInput,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08035D20,Wireless_PublishLocalInputAlternate,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08035D58,Wireless_HandleParentTransferEvent,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08035EB8,Wireless_BeginParentTransfer,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08035F5C,Wireless_SendParentNiPacket,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08035FF4,Wireless_PollParentNiSend,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+080360A0,Wireless_EnterParentTransferWait,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+080360C8,Wireless_PollParentNiReceive,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+0803614C,Wireless_HandleChildTransferEvent,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08036230,Wireless_BeginChildTransfer,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+080362E0,Wireless_ExchangeChildNiPacket,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+080363D0,Wireless_PollChildNiSend,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08036468,Wireless_EnterChildTransferWait,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+080364C0,Wireless_UpdateConnectionSession,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08036538,Wireless_UpdateInactiveConnectionSession,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08036568,Wireless_UpdateParentUniSession,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08036678,Wireless_UpdateChildUniSession,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+0803670C,Wireless_UpdateParentNiSession,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08036778,Wireless_UpdateChildNiSession,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+080367B4,Wireless_UpdateControllerTask,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08036910,Wireless_CreateController,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08036A10,Wireless_GetConnectedParentSlot,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08036A3C,Wireless_IsSessionConnected,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08036B2C,Wireless_SetTransferCallbacks,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08036B64,Wireless_QueueNiPacket,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08036C0C,Wireless_RequestDisconnectMode,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
 0818D754,Motion_BuildApproachSegment,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D8E0,Motion_RampSpin,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D960,Motion_AdvanceApproach,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
