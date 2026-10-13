@@ -1,8 +1,19 @@
 #include "global.h"
 
-static inline void orm(u32 *a, u32 m) { *a |= m; }
-struct N { u32 v; u32 flags; u32 w8; struct N *next; };
-struct L { u8 f00[0x18]; struct N *head; };
+static inline void orm(u32 *a, u32 m)
+{
+    *a |= m;
+}
+struct N {
+    u32 v;
+    u32 flags;
+    u32 w8;
+    struct N *next;
+};
+struct L {
+    u8 f00[0x18];
+    struct N *head;
+};
 extern struct L *volatile gUnk_02000598;
 
 s32 sub_0815F6F0(struct N *n, u32 v, u32 w)

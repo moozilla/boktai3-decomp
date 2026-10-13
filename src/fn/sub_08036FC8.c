@@ -1,19 +1,19 @@
 #include "global.h"
 struct Blob {
-  u32 words[8];
+    u32 words[8];
 };
 struct LinkMenu {
-  u8 task[0x18];
-  u8 state, entered, pad1a[2];
-  u32 timer;
-  int window;
-  void *background;
-  void *script;
-  void *resource;
-  struct Blob blob;
-  u8 draw50[8];
-  u32 flags;
-  u8 pad5c[0x54];
+    u8 task[0x18];
+    u8 state, entered, pad1a[2];
+    u32 timer;
+    int window;
+    void *background;
+    void *script;
+    void *resource;
+    struct Blob blob;
+    u8 draw50[8];
+    u32 flags;
+    u8 pad5c[0x54];
 };
 extern struct LinkMenu *gUnk_020000F8;
 extern u16 gUnk_03004BD8, gUnk_03005260[];
@@ -46,36 +46,37 @@ int sub_08036BEC(void);
 int sub_0824923C(void *, void *);
 extern void *gUnk_08605770[];
 void sub_082195E0(void *);
-void sub_08036FC8(struct LinkMenu *p) {
-  {
-    int bits = 4;
-    u32 *flags;
-    flags = &gUnk_0300523C;
-    *flags |= bits;
-  }
-  if (p->entered) {
-    p->entered = 0;
-    sub_0822B058(1);
-    sub_08036E14(p);
-    sub_08036C0C();
-    sub_08036EC8(p, 2);
-    p->flags &= ~1;
-    p->window = sub_08033690(1, 14, 28, 6);
-    if (p->window >= 0) {
-      sub_0803386C(p->window, p->script);
-      sub_08033924(p->window, 1);
-      sub_080337FC(p->window);
-    }
-    sub_0822B2F8(402);
-  }
-  if (p->timer > 59 && (gUnk_03005260[1] & 11)) {
+void sub_08036FC8(struct LinkMenu *p)
+{
     {
-      int state = 3;
-      int zero = 0;
-      p->state = state;
-      p->entered = 1;
-      p->timer = zero;
+        int bits = 4;
+        u32 *flags;
+        flags = &gUnk_0300523C;
+        *flags |= bits;
     }
-  } else
-    p->timer++;
+    if (p->entered) {
+        p->entered = 0;
+        sub_0822B058(1);
+        sub_08036E14(p);
+        sub_08036C0C();
+        sub_08036EC8(p, 2);
+        p->flags &= ~1;
+        p->window = sub_08033690(1, 14, 28, 6);
+        if (p->window >= 0) {
+            sub_0803386C(p->window, p->script);
+            sub_08033924(p->window, 1);
+            sub_080337FC(p->window);
+        }
+        sub_0822B2F8(402);
+    }
+    if (p->timer > 59 && (gUnk_03005260[1] & 11)) {
+        {
+            int state = 3;
+            int zero = 0;
+            p->state = state;
+            p->entered = 1;
+            p->timer = zero;
+        }
+    } else
+        p->timer++;
 }

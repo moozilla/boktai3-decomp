@@ -28,34 +28,33 @@ Boston, MA 02111-1307, USA.  */
    This exception does not however invalidate any other reasons why
    the executable file might be covered by the GNU General Public License.  */
 
-
 /* Specialized from pinned pret/agbcc libgcc/libgcc2.c. */
 typedef long int ptrdiff_t;
 typedef unsigned long int size_t;
 typedef int wchar_t;
-typedef unsigned int UQItype __attribute__ ((mode (QI)));
-typedef int SItype __attribute__ ((mode (SI)));
-typedef unsigned int USItype __attribute__ ((mode (SI)));
-typedef int DItype __attribute__ ((mode (DI)));
-typedef unsigned int UDItype __attribute__ ((mode (DI)));
-typedef float SFtype __attribute__ ((mode (SF)));
-typedef float DFtype __attribute__ ((mode (DF)));
-typedef int word_type __attribute__ ((mode (__word__)));
-struct DIstruct {SItype low, high;};
-typedef union
-{
-  struct DIstruct s;
-  DItype ll;
+typedef unsigned int UQItype __attribute__((mode(QI)));
+typedef int SItype __attribute__((mode(SI)));
+typedef unsigned int USItype __attribute__((mode(SI)));
+typedef int DItype __attribute__((mode(DI)));
+typedef unsigned int UDItype __attribute__((mode(DI)));
+typedef float SFtype __attribute__((mode(SF)));
+typedef float DFtype __attribute__((mode(DF)));
+typedef int word_type __attribute__((mode(__word__)));
+struct DIstruct {
+    SItype low, high;
+};
+typedef union {
+    struct DIstruct s;
+    DItype ll;
 } DIunion;
-extern DItype __fixunssfdi (SFtype a);
-extern DItype __fixunsdfdi (DFtype a);
-DItype
-sub_0824ACE4 (DItype u)
+extern DItype __fixunssfdi(SFtype a);
+extern DItype __fixunsdfdi(DFtype a);
+DItype sub_0824ACE4(DItype u)
 {
-  DIunion w;
-  DIunion uu;
-  uu.ll = u;
-  w.s.low = -uu.s.low;
-  w.s.high = -uu.s.high - ((USItype) w.s.low > 0);
-  return w.ll;
+    DIunion w;
+    DIunion uu;
+    uu.ll = u;
+    w.s.low = -uu.s.low;
+    w.s.high = -uu.s.high - ((USItype)w.s.low > 0);
+    return w.ll;
 }

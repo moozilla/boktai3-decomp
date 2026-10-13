@@ -1,6 +1,14 @@
 #include "global.h"
-struct N { u8 pad[0x40]; struct N *prev; struct N *next; };
-struct H { u8 pad[0x18]; struct N *first; struct N *last; };
+struct N {
+    u8 pad[0x40];
+    struct N *prev;
+    struct N *next;
+};
+struct H {
+    u8 pad[0x18];
+    struct N *first;
+    struct N *last;
+};
 extern struct H *gUnk_030025F8;
 s32 sub_0822590C(struct N *);
 s32 sub_08225938(struct N *n)

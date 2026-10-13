@@ -4,7 +4,8 @@ void sub_081816B0(u8 *);
 void sub_08182278(u32);
 void sub_08182290(u8 *);
 
-void sub_08182348(u8 *p) {
+void sub_08182348(u8 *p)
+{
     u8 *r4 = p + 0x650;
     u32 off;
     u32 f1;

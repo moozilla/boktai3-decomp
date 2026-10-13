@@ -5,8 +5,7 @@ u32 sub_08076034(void *, u32);
 
 static inline u8 TakeFlag(u8 *flag)
 {
-    if (*flag)
-    {
+    if (*flag) {
         *flag = 0;
         return TRUE;
     }

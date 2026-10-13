@@ -2,7 +2,8 @@
 
 extern u8 *gUnk_02000030;
 
-u32 sub_08006FD8(u8 *p) {
+u32 sub_08006FD8(u8 *p)
+{
     u8 *a = *(u8 **)(p + 0xB4);
     u8 *b = *(u8 **)(p + 0xB8);
     if (a) {

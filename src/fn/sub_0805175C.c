@@ -1,5 +1,7 @@
 #include "global.h"
-struct W { u32 a, b; };
+struct W {
+    u32 a, b;
+};
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void sub_082151E4(u8 *, s32);
@@ -15,7 +17,8 @@ void sub_0805175C(u8 *p, struct W *w)
         sub_082151E4(r, 0x9D41);
     sub_082144A4(q, r, 0);
     v = Script_SeekToKeyword(0x69);
-    if (v) v = Script_GetValue();
+    if (v)
+        v = Script_GetValue();
     *(u16 *)(q + 0x10) = v;
     *(struct W *)(q + 0x1c) = *w;
     if (Script_SeekToKeyword(0x72) && Script_GetValue())

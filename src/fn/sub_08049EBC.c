@@ -1,6 +1,11 @@
 #include "global.h"
-struct W { u32 a, b; };
-struct Q { u8 f[0x380]; u16 v; };
+struct W {
+    u32 a, b;
+};
+struct Q {
+    u8 f[0x380];
+    u16 v;
+};
 extern u8 *gUnk_02000488;
 void sub_08049168(u8 *, s32);
 void sub_080488B8(u8 *);

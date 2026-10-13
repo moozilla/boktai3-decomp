@@ -31,6 +31,7 @@ double sub_08229618(double arg)
     result = (result + (cos((((t * 31932.0) + 107.0) * 0.017453292519943278)) * 0.0052));
     result = (result + (cos((((t * 481266.0) + 205.0) * 0.017453292519943278)) * 0.005));
     result = fmod(result, 360.0);
-    if (result < 0.0) result += 360.0;
+    if (result < 0.0)
+        result += 360.0;
     return result;
 }

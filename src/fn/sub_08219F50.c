@@ -1,5 +1,7 @@
 #include "global.h"
-struct Dma { vu32 src, dst, ctl; };
+struct Dma {
+    vu32 src, dst, ctl;
+};
 extern const u32 gUnk_08614114[];
 extern u32 gUnk_03005280;
 u32 sub_08219F50(void)

@@ -3,7 +3,10 @@ s32 sub_08109464(void *);
 void sub_080335B4(void);
 void sub_0821A0C0(void *);
 void sub_0824923C(void *, u32);
-struct S { u8 filler[0xFE4]; u32 f; };
+struct S {
+    u8 filler[0xFE4];
+    u32 f;
+};
 s32 sub_08110834(struct S *s)
 {
     if (sub_08109464(s) == 0) {

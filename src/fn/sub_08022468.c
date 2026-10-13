@@ -2,7 +2,8 @@
 extern u16 gUnk_02000590;
 extern u8 *gUnk_02000710;
 s32 sub_0804DF4C(void *);
-s32 sub_08022468(u8 *p) {
+s32 sub_08022468(u8 *p)
+{
     s32 r;
     if (gUnk_02000590 != 0) {
         r = 4;

@@ -1,4 +1,5 @@
 #include "global.h"
 
-void sub_080046EC(void) {
+void sub_080046EC(void)
+{
 }

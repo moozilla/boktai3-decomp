@@ -1,6 +1,15 @@
 #include "global.h"
-struct N { u16 f0; u16 f2; u8 f4; u8 p5[7]; struct N *fc; };
-struct A { u8 p[0x18]; struct N *f18; };
+struct N {
+    u16 f0;
+    u16 f2;
+    u8 f4;
+    u8 p5[7];
+    struct N *fc;
+};
+struct A {
+    u8 p[0x18];
+    struct N *f18;
+};
 extern struct A *gUnk_030052F4;
 struct N *sub_0821D64C(u32 k, u32 m)
 {

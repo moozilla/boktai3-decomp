@@ -1,6 +1,13 @@
 #include "global.h"
 
-struct Q { u8 f[0x52c]; s32 sel; u8 g[4]; u32 arr[8]; u8 g2[0xc]; s32 cnt; };
+struct Q {
+    u8 f[0x52c];
+    s32 sel;
+    u8 g[4];
+    u32 arr[8];
+    u8 g2[0xc];
+    s32 cnt;
+};
 void sub_0821AD08(u32, s32);
 
 void sub_081BA244(struct Q *p)

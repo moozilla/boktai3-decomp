@@ -1,7 +1,16 @@
 #include "global.h"
 
-struct P0823CFDC { u8 f0[0x20]; u32 f20; u8 f24[0x428 - 0x24]; u16 f428; u16 f42A; };
-static inline u32 tst(u32 *a, u32 m) { return *a & m; }
+struct P0823CFDC {
+    u8 f0[0x20];
+    u32 f20;
+    u8 f24[0x428 - 0x24];
+    u16 f428;
+    u16 f42A;
+};
+static inline u32 tst(u32 *a, u32 m)
+{
+    return *a & m;
+}
 
 s32 sub_0823CFDC(struct P0823CFDC *p)
 {

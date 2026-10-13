@@ -1,5 +1,10 @@
 #include "global.h"
-struct E { u8 f0[0xB3D]; u8 a; u8 f1[7]; u8 b; };
+struct E {
+    u8 f0[0xB3D];
+    u8 a;
+    u8 f1[7];
+    u8 b;
+};
 s32 sub_0818505C(struct E *, s32);
 void sub_081856D8(struct E *p)
 {

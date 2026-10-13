@@ -1,6 +1,9 @@
 #include "global.h"
 
-struct P { u8 f[0x2c]; u32 flags; };
+struct P {
+    u8 f[0x2c];
+    u32 flags;
+};
 extern struct P *gUnk_020004A8;
 u32 sub_0821ABA8(s32, s32);
 

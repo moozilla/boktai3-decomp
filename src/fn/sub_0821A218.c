@@ -1,5 +1,9 @@
 #include "global.h"
-struct Entry { u16 id; u8 flags, pad; void *data; };
+struct Entry {
+    u16 id;
+    u8 flags, pad;
+    void *data;
+};
 extern struct Entry gUnk_0203B000[];
 extern s32 gUnk_030052F0;
 void sub_08219D38(void *);

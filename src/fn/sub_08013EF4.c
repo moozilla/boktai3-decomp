@@ -1,5 +1,7 @@
 #include "global.h"
-struct P { u32 a, b; };
+struct P {
+    u32 a, b;
+};
 void *sub_08013C14(void);
 u8 *sub_08013C2C(void *, u32);
 s32 sub_08013EF4(u32 a, struct P *b)

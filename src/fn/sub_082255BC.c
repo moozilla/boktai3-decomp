@@ -1,5 +1,10 @@
 #include "global.h"
-struct Message { u32 id:16; u32 reserved:8; u32 count:8; s16 *values; };
+struct Message {
+    u32 id : 16;
+    u32 reserved : 8;
+    u32 count : 8;
+    s16 *values;
+};
 u32 Script_GetValue(void);
 u8 *Script_GetPc(void);
 void sub_0821A340(struct Message *);

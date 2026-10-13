@@ -1,5 +1,10 @@
 #include "global.h"
-struct T { u32 lo:16; u32 hi:16; u32 lo2:16; u32 hi2:16; };
+struct T {
+    u32 lo : 16;
+    u32 hi : 16;
+    u32 lo2 : 16;
+    u32 hi2 : 16;
+};
 void sub_0811D384(void *);
 void sub_0811C9F8(void *, void *, u32);
 void sub_0811CB68(void *, void *, void *, s32);

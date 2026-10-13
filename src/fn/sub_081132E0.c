@@ -1,5 +1,8 @@
 #include "global.h"
-struct E { u8 f[0x19]; u8 b; };
+struct E {
+    u8 f[0x19];
+    u8 b;
+};
 void sub_0824923C(void *, u32);
 s32 sub_081132E0(u8 *s)
 {

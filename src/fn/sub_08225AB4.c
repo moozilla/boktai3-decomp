@@ -1,9 +1,13 @@
 #include "global.h"
 
-struct P { u32 a; u32 b; };
+struct P {
+    u32 a;
+    u32 b;
+};
 void sub_082258AC(u8 *);
 
-u32 sub_08225AB4(u8 *p, u32 a, u32 *q, u8 b, u8 c, u32 d) {
+u32 sub_08225AB4(u8 *p, u32 a, u32 *q, u8 b, u8 c, u32 d)
+{
     u32 z;
     *(u32 *)p = a;
     z = 0;

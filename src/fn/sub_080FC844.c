@@ -1,6 +1,9 @@
 #include "global.h"
 
-struct S080FC844 { u8 filler[0x3d0]; u8 *q; };
+struct S080FC844 {
+    u8 filler[0x3d0];
+    u8 *q;
+};
 void sub_0821FE6C(u8 *);
 void sub_08013684(u8 *);
 void sub_08214514(u8 *);

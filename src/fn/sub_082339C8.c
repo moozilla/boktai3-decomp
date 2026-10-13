@@ -1,5 +1,7 @@
 #include "global.h"
-struct Pair339 { u32 a, b; };
+struct Pair339 {
+    u32 a, b;
+};
 u32 sub_08215184(u32);
 void sub_08217DE0(u8 *, u32, s32);
 void sub_08217EC4(u8 *, s32, s32);

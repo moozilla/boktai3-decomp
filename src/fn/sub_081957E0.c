@@ -2,7 +2,8 @@
 
 void sub_08195774(u8 *);
 
-u8 sub_081957E0(u8 *p) {
+u8 sub_081957E0(u8 *p)
+{
     u8 *q = p + 0x725E;
     u8 *t;
     u8 v;

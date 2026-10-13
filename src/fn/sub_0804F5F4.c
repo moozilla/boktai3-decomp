@@ -10,7 +10,8 @@ s32 sub_0804F5F4(u8 *p, u32 v)
     u32 z;
     u16 *h;
     *(u32 *)(p + 0x25c) = g;
-    if (g == 0) return -1;
+    if (g == 0)
+        return -1;
     h = (u16 *)(p + 0x260);
     z = 0;
     *h = v;

@@ -1,7 +1,16 @@
 #include "global.h"
 
-struct D { u32 a, b; };
-struct S { u8 f[0xD88]; struct D d1; u8 g[0xDE8-0xD90]; struct D d2; u8 h[0x1AA4-0xDF0]; u8 a; };
+struct D {
+    u32 a, b;
+};
+struct S {
+    u8 f[0xD88];
+    struct D d1;
+    u8 g[0xDE8 - 0xD90];
+    struct D d2;
+    u8 h[0x1AA4 - 0xDF0];
+    u8 a;
+};
 
 void sub_0805EA00(u8 *);
 void sub_0805E7C4(u8 *, s32);

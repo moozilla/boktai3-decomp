@@ -1,6 +1,20 @@
 #include "global.h"
-struct H { u8 filler[0x14E4]; u32 a; u8 pad[8]; u32 c; u32 d; };
-struct G2 { u8 f[0x53]; u8 b; u8 p[0xcc]; u8 a[0x10]; u8 c[0x30]; u8 e[0x10]; u8 g[1]; };
+struct H {
+    u8 filler[0x14E4];
+    u32 a;
+    u8 pad[8];
+    u32 c;
+    u32 d;
+};
+struct G2 {
+    u8 f[0x53];
+    u8 b;
+    u8 p[0xcc];
+    u8 a[0x10];
+    u8 c[0x30];
+    u8 e[0x10];
+    u8 g[1];
+};
 extern struct G2 *gUnk_020004B4;
 void sub_0803386C(u32, u32);
 void sub_08033924(u32, u32);

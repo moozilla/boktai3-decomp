@@ -1,50 +1,50 @@
 #include "global.h"
 struct State {
-  u8 pad0[7];
-  u8 pending, entered, mode, skip;
-  u8 padb[4];
-  u8 fresh;
-  u8 pad10[5];
-  s8 current;
-  u8 instant;
-  u8 pad17[5];
-  void *pc;
+    u8 pad0[7];
+    u8 pending, entered, mode, skip;
+    u8 padb[4];
+    u8 fresh;
+    u8 pad10[5];
+    s8 current;
+    u8 instant;
+    u8 pad17[5];
+    void *pc;
 };
 struct Render {
-  u32 flags;
-  u8 pad[12];
-  u16 tile;
+    u32 flags;
+    u8 pad[12];
+    u16 tile;
 };
 struct Frames {
-  u16 *data;
-  u8 flags, count, multiplier, duration;
-  u16 index, pada, rate, timer;
+    u16 *data;
+    u8 flags, count, multiplier, duration;
+    u16 index, pada, rate, timer;
 };
 struct Actor {
-  u8 pad0[0x18];
-  struct State state;
-  u8 pad38[0x144];
-  u8 x, y, width, height;
-  u16 scriptIndex;
-  u8 mode, pad183, previousMode, pad185, scrollMode, defaultMode;
-  u16 scrollStep, scrollCounter;
-  void *custom;
-  u32 customCount;
-  u16 palette, wait;
-  u32 scrollFlags;
-  u32 counter;
-  u8 pad1a0[4];
-  void *script;
-  u16 scriptFrame, scriptCount;
-  u8 pad1ac[0x6c];
-  u32 flags;
-  u8 pad21c[0x54];
-  u8 sprite[0x1c];
-  struct Render render;
-  u8 pad2a0[0x18];
-  struct Frames frames;
-  void *resource;
-  void *callback;
+    u8 pad0[0x18];
+    struct State state;
+    u8 pad38[0x144];
+    u8 x, y, width, height;
+    u16 scriptIndex;
+    u8 mode, pad183, previousMode, pad185, scrollMode, defaultMode;
+    u16 scrollStep, scrollCounter;
+    void *custom;
+    u32 customCount;
+    u16 palette, wait;
+    u32 scrollFlags;
+    u32 counter;
+    u8 pad1a0[4];
+    void *script;
+    u16 scriptFrame, scriptCount;
+    u8 pad1ac[0x6c];
+    u32 flags;
+    u8 pad21c[0x54];
+    u8 sprite[0x1c];
+    struct Render render;
+    u8 pad2a0[0x18];
+    struct Frames frames;
+    void *resource;
+    void *callback;
 };
 extern struct Actor *gUnk_020000DC;
 int sub_0803092C(struct Actor *);
@@ -56,21 +56,27 @@ void *sub_080313C8(struct Actor *, int);
 void sub_08032C34(struct State *);
 int sub_08032C54(struct State *, int, int, int, int);
 int Script_GetValue(void);
-static inline void setCallback(void *fn, struct Actor *p) { p->callback = fn; }
-static inline void setCallbackB(struct Actor *p, void *fn) { p->callback = fn; }
+static inline void setCallback(void *fn, struct Actor *p)
+{
+    p->callback = fn;
+}
+static inline void setCallbackB(struct Actor *p, void *fn)
+{
+    p->callback = fn;
+}
 struct Vm {
-  u8 pad0[9];
-  u8 mode;
-  u8 pada[3];
-  u8 choiceCount;
-  u8 pade[3];
-  u8 spacing;
-  u8 pad12[0xb6];
-  u32 choices[16];
+    u8 pad0[9];
+    u8 mode;
+    u8 pada[3];
+    u8 choiceCount;
+    u8 pade[3];
+    u8 spacing;
+    u8 pad12[0xb6];
+    u32 choices[16];
 };
 struct Sun {
-  u8 pad[0x12];
-  s16 level;
+    u8 pad[0x12];
+    s16 level;
 };
 extern struct Sun *gUnk_02000710;
 int Script_SeekToKeyword(int);
@@ -87,8 +93,9 @@ void sub_080313E4(void);
 extern u16 gUnk_03005260[];
 void sub_082195E0(void *);
 void sub_08214514(void *);
-int sub_08031964(struct Actor *p) {
-  sub_082195E0((u8 *)p + 0x210);
-  sub_08214514(&p->render);
-  return (gUnk_020000DC = 0);
+int sub_08031964(struct Actor *p)
+{
+    sub_082195E0((u8 *)p + 0x210);
+    sub_08214514(&p->render);
+    return (gUnk_020000DC = 0);
 }

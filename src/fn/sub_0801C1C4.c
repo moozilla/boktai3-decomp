@@ -1,5 +1,6 @@
 #include "global.h"
-void sub_0801C1C4(u8 *p) {
+void sub_0801C1C4(u8 *p)
+{
     u32 *field;
     field = (u32 *)(p + 0x324);
     field[2] |= 1;

@@ -1,6 +1,9 @@
 #include "global.h"
 
-struct S080FBF20 { u8 filler[0x3d0]; u8 *q; };
+struct S080FBF20 {
+    u8 filler[0x3d0];
+    u8 *q;
+};
 void sub_08214514(u8 *);
 
 void sub_080FBF20(struct S080FBF20 *s)

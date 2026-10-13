@@ -1,8 +1,16 @@
 #include "global.h"
-struct T { u16 a, b; };
+struct T {
+    u16 a, b;
+};
 extern const struct T gUnk_086049CE[];
 extern const u16 gUnk_086049DA[];
-struct S { u8 f[0x18]; s32 idx; u8 i[0x1c]; u8 q[0xb0]; u32 e8; };
+struct S {
+    u8 f[0x18];
+    s32 idx;
+    u8 i[0x1c];
+    u8 q[0xb0];
+    u32 e8;
+};
 s32 sub_08008AA4(void *);
 void sub_08220D78(void *, u32, u32, u32, u32);
 void sub_08219A80(void *, u32);

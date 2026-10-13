@@ -1,5 +1,8 @@
 #include "global.h"
-struct T { u8 p[0xc]; u8 *f0c; };
+struct T {
+    u8 p[0xc];
+    u8 *f0c;
+};
 extern struct T gUnk_02000438;
 extern const u8 gUnk_08614184[];
 u8 *sub_0821A66C(u8 *, u32 *);

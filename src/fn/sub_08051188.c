@@ -5,8 +5,10 @@ void sub_08051158(s32, s32, s32, s32, s32);
 void sub_08051188(void)
 {
     s32 a, b, c, d, e;
-    if (Script_SeekToKeyword(0x64)) a = Script_GetValue();
-    else a = 0;
+    if (Script_SeekToKeyword(0x64))
+        a = Script_GetValue();
+    else
+        a = 0;
     if (Script_SeekToKeyword(0x70)) {
         b = Script_GetValue();
         c = Script_GetValue();

@@ -1,6 +1,7 @@
 #include "global.h"
 
-void sub_08003760(u8 *p) {
+void sub_08003760(u8 *p)
+{
     *(u32 *)p = 0;
     *(u32 *)(p + 4) = 0x1084;
     *(u32 *)(p + 8) = 0;

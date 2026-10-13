@@ -9,7 +9,8 @@ void sub_0804D4B0(void);
 u8 *sub_0804D5CC(u32 a, u32 b)
 {
     u8 *r;
-    if (gUnk_02000488 != 0) return gUnk_02000488;
+    if (gUnk_02000488 != 0)
+        return gUnk_02000488;
     r = sub_08219FBC(9, 0x484);
     if (r) {
         sub_0821A04C(r, sub_0804D378, sub_0804D4B0);

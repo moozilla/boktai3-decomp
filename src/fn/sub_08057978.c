@@ -1,6 +1,11 @@
 #include "global.h"
-struct A { u32 a; };
-struct B { u32 flags; struct A *args; };
+struct A {
+    u32 a;
+};
+struct B {
+    u32 flags;
+    struct A *args;
+};
 void sub_0821AD08(u32, struct B *);
 void sub_08057978(u8 *p, u32 x)
 {

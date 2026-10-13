@@ -1,5 +1,7 @@
 #include "global.h"
-struct Vec339 { u32 x:16, y:16, z:16; };
+struct Vec339 {
+    u32 x : 16, y : 16, z : 16;
+};
 void sub_0821FEB4(u8 *, s32, s32, s32, s32, struct Vec339 *, struct Vec339 *);
 void sub_0821FF58(u8 *, s32, s32, s32, s32, s32);
 void sub_0821FF84(u8 *, void *, u8 *);

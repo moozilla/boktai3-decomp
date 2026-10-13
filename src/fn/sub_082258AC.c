@@ -1,6 +1,7 @@
 #include "global.h"
 
-void sub_082258AC(u8 *n) {
+void sub_082258AC(u8 *n)
+{
     u8 *s = *(u8 **)0x030025F8;
     if (s != 0) {
         u32 v = *(u32 *)(s + 0x18);

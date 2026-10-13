@@ -1,5 +1,19 @@
 #include "global.h"
-struct P { u8 pad[0x14]; u32 w14; u8 pad1[0x1c]; u32 w34; u8 pad2[0xc]; u32 w44; u8 pad3[0x10]; s32 w58; u8 pad4[8]; u8 b64; u8 pad5[3]; u32 w68; u8 b6c[1]; };
+struct P {
+    u8 pad[0x14];
+    u32 w14;
+    u8 pad1[0x1c];
+    u32 w34;
+    u8 pad2[0xc];
+    u32 w44;
+    u8 pad3[0x10];
+    s32 w58;
+    u8 pad4[8];
+    u8 b64;
+    u8 pad5[3];
+    u32 w68;
+    u8 b6c[1];
+};
 void sub_08219DD8(u8 *, u32);
 u32 sub_0803D9D8(struct P *p)
 {

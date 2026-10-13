@@ -1,7 +1,18 @@
 #include "global.h"
-struct In { u8 pad[8]; s16 f8; s16 fa; };
-struct Q { u32 f0; struct In *f4; };
-struct G { u8 pad[8]; s16 f8; s16 fa; };
+struct In {
+    u8 pad[8];
+    s16 f8;
+    s16 fa;
+};
+struct Q {
+    u32 f0;
+    struct In *f4;
+};
+struct G {
+    u8 pad[8];
+    s16 f8;
+    s16 fa;
+};
 extern struct G gUnk_030042A0;
 s32 sub_0821ABA8(u32, u32);
 struct Q *sub_0821A2C4(u32);

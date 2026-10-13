@@ -1,126 +1,124 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Pair {
-  u32 x,y;
-}
-;
-struct Vec  {
-  s16 x,y,z;
-}
-;
-struct Sprite  {
-  u32 flags;
-  u8 pad4[12];
-  u16 value;
-  u8 pad12[10];
-  u32 x,y;
-  u8 pad24[8];
-}
-;
-struct Drawing  {
-  u8 pad0[8];
-  u32 flags;
-  u8 padc[0x14];
-  u32 x,y;
-  u8 pad28[0x38];
-}
-;
-struct Item  {
-  u8 state,entered,unused,count,type,pad5;
-  s16 velocity;
-  u16 timer;
-  u8 pada[2];
-  struct Vec start;
-  struct Vec end;
-  u8 pad1c[8];
-  struct Sprite sprite;
-  struct Drawing drawing;
-}
-;
-struct Owner  {
-  u8 pad0[0x3c];
-  u8 resource[32];
-  struct Item items[16];
-}
-;
-extern const u16 gUnk_0824DE7C[],gUnk_0824DE8C[];
-void sub_0821980C(void*,void*,int,int);
-void sub_08039920(void*,int,int);
-void sub_082216F8(void*,void*,void*,int,int);
-void sub_08039998(void*,int,int);
-void sub_08039968(void*,int,int);
-void sub_08039DE4(struct Owner *owner,struct Item *p,int index)  {
-  struct Sprite *sprite=&p->sprite;
-  struct Drawing *drawing;
-  int choice;
-  {
-    register int offset asm("r2")=0x50;
-    struct Drawing*initial;
-    asm("" : "+r"(offset));
-    initial=(struct Drawing*)(offset+(u32)p);
-    drawing=initial;
-  }
-  if(p->entered)  {
-    int zero=0;
-    struct Vec*vector;
-    register int y asm("r6");
-    const u16*table;
-    const u16*entry;
-    p->entered=zero;
-    vector=&p->start;
-    y=128;
-    if(index>7)y=144;
-    table=gUnk_0824DE8C;
-    entry=(const u16*)((index&3)*2+(u32)table);
-    p->start.x=*entry+80;
-    vector->y=y;
-    vector->z=zero;
-    vector=&p->end;
-    y=272;
-    asm("" : "+r"(vector),"+r"(y));
+    u32 x, y;
+};
+struct Vec {
+    s16 x, y, z;
+};
+struct Sprite {
+    u32 flags;
+    u8 pad4[12];
+    u16 value;
+    u8 pad12[10];
+    u32 x, y;
+    u8 pad24[8];
+};
+struct Drawing {
+    u8 pad0[8];
+    u32 flags;
+    u8 padc[0x14];
+    u32 x, y;
+    u8 pad28[0x38];
+};
+struct Item {
+    u8 state, entered, unused, count, type, pad5;
+    s16 velocity;
+    u16 timer;
+    u8 pada[2];
+    struct Vec start;
+    struct Vec end;
+    u8 pad1c[8];
+    struct Sprite sprite;
+    struct Drawing drawing;
+};
+struct Owner {
+    u8 pad0[0x3c];
+    u8 resource[32];
+    struct Item items[16];
+};
+extern const u16 gUnk_0824DE7C[], gUnk_0824DE8C[];
+void sub_0821980C(void *, void *, int, int);
+void sub_08039920(void *, int, int);
+void sub_082216F8(void *, void *, void *, int, int);
+void sub_08039998(void *, int, int);
+void sub_08039968(void *, int, int);
+void sub_08039DE4(struct Owner *owner, struct Item *p, int index)
+{
+    struct Sprite *sprite = &p->sprite;
+    struct Drawing *drawing;
+    int choice;
     {
-      register int x asm("r0")=y;
-      int value;
-      asm("" : "+r"(x));
-      value=*entry;
-      p->end.x=x+value;
+        register int offset asm("r2") = 0x50;
+        struct Drawing *initial;
+        asm("" : "+r"(offset));
+        initial = (struct Drawing *)(offset + (u32)p);
+        drawing = initial;
     }
-    vector->y=32;
-    vector->z=zero;
-    sub_08039968(p,32,15);
-  }
-  p->sprite.value=p->count;
-  p->sprite.flags&=~1;
-  {
-    void*draw=&p->drawing;
-    register void*resource asm("r6")=owner->resource;
-    if(index>7)choice=(index&3)+4;
-    else choice=index&3;
-    sub_0821980C(draw,resource,gUnk_0824DE7C[choice],0);
-  }
-  p->drawing.flags&=~1;
-  {
-    void*position=&drawing->x;
-    sub_082216F8(position,&p->start,&p->end,p->timer,5);
-    sub_08039998(position,p->timer,p->velocity);
-  }
-  {
-    register struct Drawing*source asm("r2")=drawing;
-    register u32 x asm("r0")=source->x;
-    u32 y=source->y;
-    register struct Sprite*dest asm("r6")=sprite;
-    dest->x=x;
-    dest->y=y;
-  }
-  if(p->timer>31)  {
-    register int one asm("r1")=1;
-    int zero=0;
-    asm("" : "+r"(one),"+r"(zero));
-    p->state=one;
-    p->entered=one;
-    p->timer=zero;
-    p->count=zero;
-    p->unused=zero;
-  }
-  p->timer++;
+    if (p->entered) {
+        int zero = 0;
+        struct Vec *vector;
+        register int y asm("r6");
+        const u16 *table;
+        const u16 *entry;
+        p->entered = zero;
+        vector = &p->start;
+        y = 128;
+        if (index > 7)
+            y = 144;
+        table = gUnk_0824DE8C;
+        entry = (const u16 *)((index & 3) * 2 + (u32)table);
+        p->start.x = *entry + 80;
+        vector->y = y;
+        vector->z = zero;
+        vector = &p->end;
+        y = 272;
+        asm("" : "+r"(vector), "+r"(y));
+        {
+            register int x asm("r0") = y;
+            int value;
+            asm("" : "+r"(x));
+            value = *entry;
+            p->end.x = x + value;
+        }
+        vector->y = 32;
+        vector->z = zero;
+        sub_08039968(p, 32, 15);
+    }
+    p->sprite.value = p->count;
+    p->sprite.flags &= ~1;
+    {
+        void *draw = &p->drawing;
+        register void *resource asm("r6") = owner->resource;
+        if (index > 7)
+            choice = (index & 3) + 4;
+        else
+            choice = index & 3;
+        sub_0821980C(draw, resource, gUnk_0824DE7C[choice], 0);
+    }
+    p->drawing.flags &= ~1;
+    {
+        void *position = &drawing->x;
+        sub_082216F8(position, &p->start, &p->end, p->timer, 5);
+        sub_08039998(position, p->timer, p->velocity);
+    }
+    {
+        register struct Drawing *source asm("r2") = drawing;
+        register u32 x asm("r0") = source->x;
+        u32 y = source->y;
+        register struct Sprite *dest asm("r6") = sprite;
+        dest->x = x;
+        dest->y = y;
+    }
+    if (p->timer > 31) {
+        register int one asm("r1") = 1;
+        int zero = 0;
+        asm("" : "+r"(one), "+r"(zero));
+        p->state = one;
+        p->entered = one;
+        p->timer = zero;
+        p->count = zero;
+        p->unused = zero;
+    }
+    p->timer++;
 }

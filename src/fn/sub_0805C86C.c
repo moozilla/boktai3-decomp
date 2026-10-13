@@ -1,8 +1,23 @@
 #include "global.h"
-struct H { u32 lo:16; u32 hi:16; };
-struct Z { struct H a, b; };
-struct G { u8 f[0x30]; s16 x; u16 y; s16 z; };
-struct R { u8 f0[0x500]; s16 a; u8 f1[0x504 - 0x502]; s16 b; };
+struct H {
+    u32 lo : 16;
+    u32 hi : 16;
+};
+struct Z {
+    struct H a, b;
+};
+struct G {
+    u8 f[0x30];
+    s16 x;
+    u16 y;
+    s16 z;
+};
+struct R {
+    u8 f0[0x500];
+    s16 a;
+    u8 f1[0x504 - 0x502];
+    s16 b;
+};
 extern struct G *gUnk_02000580;
 void sub_08225F88(struct Z *);
 void sub_0805C86C(u8 *p)

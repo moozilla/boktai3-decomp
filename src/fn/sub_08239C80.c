@@ -1,6 +1,13 @@
 #include "global.h"
-struct Entry { u16 a, b; };
-struct State { u8 pad[0x18]; u32 value; u8 gap[0xa94]; struct Entry entries[4]; };
+struct Entry {
+    u16 a, b;
+};
+struct State {
+    u8 pad[0x18];
+    u32 value;
+    u8 gap[0xa94];
+    struct Entry entries[4];
+};
 void sub_08239C80(struct State *p)
 {
     u32 v = p->value + 47;

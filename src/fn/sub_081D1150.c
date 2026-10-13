@@ -1,6 +1,11 @@
 #include "global.h"
-struct Z { u8 f[0x20]; };
-struct Y { u8 f[0xc]; u8 c; };
+struct Z {
+    u8 f[0x20];
+};
+struct Y {
+    u8 f[0xc];
+    u8 c;
+};
 extern u8 *gUnk_02000274;
 void sub_081D1150(void)
 {

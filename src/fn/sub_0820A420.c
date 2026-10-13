@@ -6,7 +6,8 @@ void sub_0821A0C0(void *);
 void sub_0820A2C8(void);
 void sub_0820A364(void);
 
-void *sub_0820A420(void) {
+void *sub_0820A420(void)
+{
     void *p = sub_08219FBC(8, 0xc1c);
     if (p) {
         sub_0821A04C(p, sub_0820A2C8, sub_0820A364);

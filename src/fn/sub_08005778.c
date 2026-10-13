@@ -8,7 +8,10 @@ void sub_0821A0C0(void *);
 s32 sub_0821ABA8(u32, u32);
 void sub_08005498(void);
 void sub_080056D0(void);
-struct S { u8 f[0x18]; u16 a; };
+struct S {
+    u8 f[0x18];
+    u16 a;
+};
 
 void *sub_08005778(void *a)
 {

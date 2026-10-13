@@ -1,5 +1,9 @@
 #include "global.h"
-struct S { u8 p[0x3a4]; s32 pos; s32 vel; };
+struct S {
+    u8 p[0x3a4];
+    s32 pos;
+    s32 vel;
+};
 void sub_081FE0EC(struct S *p)
 {
     p->pos += p->vel;

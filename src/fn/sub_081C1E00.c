@@ -1,5 +1,10 @@
 #include "global.h"
-struct T { u8 f[0x30]; u16 a30; u16 a32; u16 a34; };
+struct T {
+    u8 f[0x30];
+    u16 a30;
+    u16 a32;
+    u16 a34;
+};
 extern u32 gUnk_02000260;
 extern struct T *volatile gUnk_02000580;
 void sub_08055F3C(u32, u32, void (*)(void *), u32);

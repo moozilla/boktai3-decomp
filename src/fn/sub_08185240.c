@@ -1,6 +1,7 @@
 #include "global.h"
 
-u32 sub_08185240(u8 *p, u32 v) {
+u32 sub_08185240(u8 *p, u32 v)
+{
     u8 *a = p + 0xB3C;
     if (*a != v) {
         u8 *b = p + 0xB3D;

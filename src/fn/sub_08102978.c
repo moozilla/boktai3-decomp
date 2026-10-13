@@ -1,6 +1,11 @@
 #include "global.h"
 
-struct S { u8 filler[0xb6]; u16 h; u8 filler2[0xdc - 0xb8]; u32 k; };
+struct S {
+    u8 filler[0xb6];
+    u16 h;
+    u8 filler2[0xdc - 0xb8];
+    u32 k;
+};
 extern u8 *gUnk_02000580;
 void sub_08159404(u8 *, u32, u32);
 void sub_08159424(u8 *, u32);

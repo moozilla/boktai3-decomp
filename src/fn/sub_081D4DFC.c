@@ -1,6 +1,9 @@
 #include "global.h"
 
-struct S { u8 pad[0x25]; u8 b25; };
+struct S {
+    u8 pad[0x25];
+    u8 b25;
+};
 
 void sub_081D4DFC(struct S *p)
 {

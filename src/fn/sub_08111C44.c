@@ -1,5 +1,10 @@
 #include "global.h"
-struct S { u8 f[0x18]; u32 a; u32 b; u32 c; };
+struct S {
+    u8 f[0x18];
+    u32 a;
+    u32 b;
+    u32 c;
+};
 u32 sub_0821A520(u32, u32);
 void sub_082161B4(u32, u32, u32, u32, u32, u32, void *);
 void CpuSet(const void *, void *, u32);

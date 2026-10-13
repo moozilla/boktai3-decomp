@@ -1,6 +1,10 @@
 #include "global.h"
-struct T { u16 a, b, c, d; };
-struct V { u16 a, b, c; };
+struct T {
+    u16 a, b, c, d;
+};
+struct V {
+    u16 a, b, c;
+};
 extern const struct T gUnk_0824F1DC[];
 void sub_08121D64(struct V *, s32, s32, s32, s32);
 void sub_0822B3BC(s32);

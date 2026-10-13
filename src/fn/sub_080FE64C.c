@@ -1,6 +1,9 @@
 #include "global.h"
 
-struct S080FE64C { u8 filler[0xdc]; u8 *p; };
+struct S080FE64C {
+    u8 filler[0xdc];
+    u8 *p;
+};
 extern u8 *gUnk_02000580;
 void sub_0812F270(struct S080FE64C *);
 

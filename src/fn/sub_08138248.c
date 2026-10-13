@@ -15,6 +15,7 @@ u32 sub_08138248(u8 *p, s32 n)
             cnt++;
         i++;
     } while (i <= 3);
-    if (cnt == n) return 1;
+    if (cnt == n)
+        return 1;
     return 0;
 }

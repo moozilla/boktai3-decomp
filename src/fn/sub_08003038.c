@@ -2,7 +2,8 @@
 
 void sub_08002C38(u8 *a, u8 *b);
 
-void sub_08003038(u8 *p) {
+void sub_08003038(u8 *p)
+{
     s32 i = 3;
     u32 v = (u32)p + 0x88C;
     u32 *t = (u32 *)(p + 0x288);

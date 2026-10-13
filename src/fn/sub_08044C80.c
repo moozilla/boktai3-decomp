@@ -9,8 +9,10 @@ void sub_08044C80(u8 *base, s32 bits, const u8 **source, s32 count, s32 index)
     s32 shift;
     s32 value;
     u8 *address;
-    if (count == 0) return;
-    if ((u32)bits > (u32)((1 << count) - 1)) bits = (1 << count) - 1;
+    if (count == 0)
+        return;
+    if ((u32)bits > (u32)((1 << count) - 1))
+        bits = (1 << count) - 1;
     i = 0;
     if (i < count) {
         do {

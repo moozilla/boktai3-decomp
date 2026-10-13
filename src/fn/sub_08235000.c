@@ -1,11 +1,20 @@
 #include "global.h"
-struct Vec50 { s32 x:16, y:16, z:16; };
+struct Vec50 {
+    s32 x : 16, y : 16, z : 16;
+};
 extern u16 gUnk_03005418[];
 extern u32 gUnk_030053F4;
 void sub_08234F18(u8 *);
 void sub_08234F88(u8 *);
 void sub_08234DC8(u8 *);
-static inline s32 scale50(s32 v) { if (v >= 0) v = v >> 5; else v = -((-v) >> 5); return v; }
+static inline s32 scale50(s32 v)
+{
+    if (v >= 0)
+        v = v >> 5;
+    else
+        v = -((-v) >> 5);
+    return v;
+}
 s32 sub_08235000(u8 *p, u8 *owner)
 {
     struct Vec50 v;
@@ -18,10 +27,11 @@ s32 sub_08235000(u8 *p, u8 *owner)
     v.y += 150;
     dest = (u16 *)(p + 0x84);
     coords = (s16 *)&v;
-    x = coords[0]; z = coords[2];
-    dest[0] = scale50((x-z)*3);
-    sum = scale50((x+z)*3);
-    vertical = scale50(coords[1]*3);
+    x = coords[0];
+    z = coords[2];
+    dest[0] = scale50((x - z) * 3);
+    sum = scale50((x + z) * 3);
+    vertical = scale50(coords[1] * 3);
     y = sum - vertical;
     zero = 0;
     depth = sum + vertical;

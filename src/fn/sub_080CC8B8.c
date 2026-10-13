@@ -5,8 +5,17 @@ void sub_080C4E8C(void *);
 void sub_080C52BC(void *);
 void sub_080C53A8(void *);
 
-struct T { u8 filler[0x6ac]; u16 h6ac; u16 h6ae; };
-struct S { u8 filler[0x2d4]; u16 flags; u8 f2[0x3d0 - 0x2d6]; struct T *t; };
+struct T {
+    u8 filler[0x6ac];
+    u16 h6ac;
+    u16 h6ae;
+};
+struct S {
+    u8 filler[0x2d4];
+    u16 flags;
+    u8 f2[0x3d0 - 0x2d6];
+    struct T *t;
+};
 
 s32 sub_080CC8B8(struct S *s)
 {

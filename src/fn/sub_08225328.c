@@ -1,5 +1,11 @@
 #include "global.h"
-struct Task { u8 pad[16]; u16 f10; u8 pad12[2]; u8 f14, f15, f16, f17; s32 state, counter; };
+struct Task {
+    u8 pad[16];
+    u16 f10;
+    u8 pad12[2];
+    u8 f14, f15, f16, f17;
+    s32 state, counter;
+};
 extern u32 gUnk_030053F4;
 extern u32 gUnk_030053F0;
 extern u32 gUnk_030053EC;

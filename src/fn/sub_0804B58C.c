@@ -10,8 +10,10 @@ void sub_0804B58C(u8 *p)
             if (*(u16 *)(p + 0x41C) == 0) {
                 if (p[0x3E4] == 0) {
                     u16 *q = (u16 *)(p + 0x40C);
-                    if (*q != 0) *q = *q - 1;
-                    else sub_080492F0(p);
+                    if (*q != 0)
+                        *q = *q - 1;
+                    else
+                        sub_080492F0(p);
                 }
             }
         }

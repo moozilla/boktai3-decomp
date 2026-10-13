@@ -1,6 +1,9 @@
 #include "global.h"
 
-struct S { u8 filler[0x876]; s16 v; };
+struct S {
+    u8 filler[0x876];
+    s16 v;
+};
 extern struct S *gUnk_02000710;
 s32 Div(s32, s32);
 

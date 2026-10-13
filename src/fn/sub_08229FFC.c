@@ -10,24 +10,30 @@ double sub_08229FFC(s32 a, u32 year, s32 month, s32 day)
     double rate = 12.1818;
     double period = 360.0 / 12.1818;
     s32 i;
-    current = sub_08229468(a,year,month,day) + 0.5;
+    current = sub_08229468(a, year, month, day) + 0.5;
     start = current;
-    for (i=1; i<=6; i++) {
+    for (i = 1; i <= 6; i++) {
         difference = sub_08229618(current) - sub_08229E28(current);
-        if (difference >= 0.0 && difference <= 0.1) break;
-        if (difference < 0.0 && difference >= -0.1) break;
+        if (difference >= 0.0 && difference <= 0.1)
+            break;
+        if (difference < 0.0 && difference >= -0.1)
+            break;
         current -= difference / rate;
     }
     age = start - current;
     if (age < 0.0 || age > period) {
         if (age < 0.0) {
             current -= period;
-            if (age < -period) current -= period;
-        } else current += period;
-        for (i=1; i<=4; i++) {
+            if (age < -period)
+                current -= period;
+        } else
+            current += period;
+        for (i = 1; i <= 4; i++) {
             difference = sub_08229618(current) - sub_08229E28(current);
-            if (difference >= 0.0 && difference <= 0.1) break;
-            if (difference < 0.0 && difference >= -0.1) break;
+            if (difference >= 0.0 && difference <= 0.1)
+                break;
+            if (difference < 0.0 && difference >= -0.1)
+                break;
             current -= difference / rate;
         }
     }

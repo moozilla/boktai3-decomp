@@ -1,7 +1,15 @@
 #include "global.h"
 
-struct P0813FADC { u8 f0[0x418]; u8 f418; };
-struct G0813FADC { u8 f0[0x52]; s16 idx; u8 f54[0xC]; s16 f60; };
+struct P0813FADC {
+    u8 f0[0x418];
+    u8 f418;
+};
+struct G0813FADC {
+    u8 f0[0x52];
+    s16 idx;
+    u8 f54[0xC];
+    s16 f60;
+};
 extern struct G0813FADC *gUnk_02000710;
 extern s16 gUnk_02000554;
 

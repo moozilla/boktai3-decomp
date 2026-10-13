@@ -1,5 +1,8 @@
 #include "global.h"
-struct Entry {u8 bytes[4], a, b, flag, kind;u16 timer, pad;};
+struct Entry {
+    u8 bytes[4], a, b, flag, kind;
+    u16 timer, pad;
+};
 struct P {
     u8 pad[0x20];
     u32 flags, timer;
@@ -15,7 +18,10 @@ int sub_08037FB4(struct P *, int, const u32 *, int);
 void sub_08038128(struct P *, int);
 void sub_0822B058(int);
 void sub_0815AF14(void *, int);
-static inline u32 test(u32 *flags, u32 mask) { return *flags & mask; }
+static inline u32 test(u32 *flags, u32 mask)
+{
+    return *flags & mask;
+}
 void sub_08038CDC(struct P *p)
 {
     u32 data;
@@ -23,13 +29,17 @@ void sub_08038CDC(struct P *p)
         p->entered = 0;
         sub_0801683C();
         sub_08038094(p);
-        {struct Entry *e = &p->entry;
-        data = e->timer | ((e->kind & 3) << 16);}
+        {
+            struct Entry *e = &p->entry;
+            data = e->timer | ((e->kind & 3) << 16);
+        }
         sub_08037FB4(p, 4, &data, 1);
         sub_08038128(p, 5);
         sub_0822B058(4);
-        {u32 mask = 4;
-        if (!(gUnk_02000560 & mask)) sub_0815AF14(gUnk_02000580, -1);
+        {
+            u32 mask = 4;
+            if (!(gUnk_02000560 & mask))
+                sub_0815AF14(gUnk_02000580, -1);
         }
     }
     if (p->timer > 29 && test(&p->flags, 0xc0) == 0xc0) {
@@ -43,5 +53,6 @@ void sub_08038CDC(struct P *p)
         *state = nine;
         p->entered = 1;
         p->timer = zero;
-    } else p->timer++;
+    } else
+        p->timer++;
 }

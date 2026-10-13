@@ -1,6 +1,11 @@
 #include "global.h"
 
-struct P { u8 f[0x1c]; u8 a; u8 g[7]; u8 b; };
+struct P {
+    u8 f[0x1c];
+    u8 a;
+    u8 g[7];
+    u8 b;
+};
 extern struct P *gUnk_020004B4;
 void sub_0822B058(s32);
 

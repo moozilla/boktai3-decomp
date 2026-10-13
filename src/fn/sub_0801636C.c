@@ -22,6 +22,9 @@ u32 sub_0801636C(u8 *p)
         }
         i = next;
     } while (i <= 5);
-    { u32 z = 0; gUnk_0200006C = z; }
+    {
+        u32 z = 0;
+        gUnk_0200006C = z;
+    }
     return 0;
 }

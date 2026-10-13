@@ -1,6 +1,17 @@
 #include "global.h"
 void sub_081ED8A0(void);
-struct S { u8 f0[0x90]; u32 a90; u8 f1[0xAE - 0x94]; u8 aae; u8 af; u8 b0; u8 f2[0xC4-0xB1]; u32 c4; u8 f3[0x100-0xC8]; void (*fn)(void); };
+struct S {
+    u8 f0[0x90];
+    u32 a90;
+    u8 f1[0xAE - 0x94];
+    u8 aae;
+    u8 af;
+    u8 b0;
+    u8 f2[0xC4 - 0xB1];
+    u32 c4;
+    u8 f3[0x100 - 0xC8];
+    void (*fn)(void);
+};
 static inline u8 chk(struct S *p)
 {
     u8 *q = &p->b0;
@@ -11,7 +22,10 @@ static inline u8 chk(struct S *p)
     }
     return FALSE;
 }
-static inline void st(void (*v)(void), void (**a)(void)) { *a = v; }
+static inline void st(void (*v)(void), void (**a)(void))
+{
+    *a = v;
+}
 void sub_081EF2F0(struct S *p)
 {
     u8 *q;

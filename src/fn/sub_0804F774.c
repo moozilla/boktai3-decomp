@@ -12,8 +12,10 @@ s32 sub_0804F774(void)
     u8 *o;
     u8 *a;
     u8 *b;
-    if (*g == 0) goto fail;
-    if (Script_SeekToKeyword(0x6e) != 0) goto go;
+    if (*g == 0)
+        goto fail;
+    if (Script_SeekToKeyword(0x6e) != 0)
+        goto go;
     goto fail;
 found:
     return *(u8 *)(b + 0x100);
@@ -22,12 +24,14 @@ go:
     i = 0;
     o = *g;
     n = *(u16 *)(o + 0x18);
-    if (i >= n) goto fail;
+    if (i >= n)
+        goto fail;
     m = n;
     a = o + 0x104;
     b = o;
     do {
-        if (*(u16 *)a == v) goto found;
+        if (*(u16 *)a == v)
+            goto found;
         a += 0xfc;
         b += 0xfc;
         i++;

@@ -1,5 +1,9 @@
 #include "global.h"
-struct Q { u32 a; u32 b; u32 fl; };
+struct Q {
+    u32 a;
+    u32 b;
+    u32 fl;
+};
 void sub_08165ACC(u8 *p)
 {
     u32 one = 1;

@@ -9,7 +9,8 @@ void sub_0821A0C0(void *);
 void *sub_081FB788(void *arg)
 {
     void *p = sub_0802140C(4);
-    if (p) return p;
+    if (p)
+        return p;
     p = sub_08219FBC(8, 0xf30);
     if (p) {
         sub_0821A04C(p, sub_081FAD14, sub_081FAD74);

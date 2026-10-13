@@ -1,6 +1,11 @@
 #include "global.h"
 
-struct Task { u8 pad[0x10]; u16 f10; u8 pad12[2]; u8 f14; };
+struct Task {
+    u8 pad[0x10];
+    u16 f10;
+    u8 pad12[2];
+    u8 f14;
+};
 extern u16 gUnk_03005240;
 struct Task *sub_08219C40(u32);
 void sub_08219DD8(struct Task *, u32);

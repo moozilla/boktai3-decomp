@@ -1,7 +1,14 @@
 #include "global.h"
 
-struct Task { struct Task *prev, *next; u8 pad[0xC]; u8 f14; };
-struct List { struct Task *head; u32 pad; };
+struct Task {
+    struct Task *prev, *next;
+    u8 pad[0xC];
+    u8 f14;
+};
+struct List {
+    struct Task *head;
+    u32 pad;
+};
 extern struct List gUnk_03005280[];
 
 void sub_08219F74(struct Task *t)

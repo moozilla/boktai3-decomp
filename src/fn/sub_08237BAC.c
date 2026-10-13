@@ -1,6 +1,7 @@
 #include "global.h"
 
-void sub_08237BAC(u8 *p) {
+void sub_08237BAC(u8 *p)
+{
     u8 z = 0;
     u32 one = 1;
     u8 *a = p + 0xA4;

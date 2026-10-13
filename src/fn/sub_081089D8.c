@@ -14,10 +14,8 @@ u32 sub_081089D8(u8 *p)
 {
     s32 i = 0;
     u32 *m = (u32 *)(p + 0x154);
-    for (; i < 3; i++)
-    {
-        if (Tst(m, i))
-        {
+    for (; i < 3; i++) {
+        if (Tst(m, i)) {
             u32 o = i * 0x68 + 0x1C;
             u8 *e = p + o;
             sub_08214514(e);

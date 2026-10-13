@@ -1,6 +1,8 @@
 #include "global.h"
 
-struct Blk { u32 w[8]; };
+struct Blk {
+    u32 w[8];
+};
 
 s32 sub_082196C4(struct Blk *dst, struct Blk *src)
 {
