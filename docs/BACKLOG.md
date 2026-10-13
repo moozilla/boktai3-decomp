@@ -55,6 +55,18 @@ records as formats become understood. Start with a complete inspect/edit/rebuild
 slice rather than waiting for all data to be mapped; verify changes in-game.
 This is a separate product goal, not part of the current matching target.
 
+## Engine documentation as HTML with explainer graphics
+
+Render `docs/ENGINE.md` and `docs/GAME_LAYOUT.md` as a browsable HTML site with
+explainer graphics: the task-list and frame loop, the script call path, the memory
+map, and the grand layout from ROM regions to subsystems. Build any artwork from
+locally extracted assets (tiles, palettes, maps) under the ignored `build/` tree,
+so no ROM-derived image is committed. Keep the Markdown as the source of truth
+and generate the site from it. Build it alongside the planned data viewer and
+editor, reusing its extraction pipeline and asset loaders. Every figure should
+link to the function or unit it depicts, and every *(guess)* in the text should
+stay marked in the figure. Start after the layout and engine documents settle.
+
 ## Programmatic pattern knowledge and broad draft generation
 
 The user wants systematic recognition of disassembly building blocks, repeated
