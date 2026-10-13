@@ -1,6 +1,7 @@
 #include "global.h"
 
-void sub_081959C0(u8 *p) {
+void sub_081959C0(u8 *p)
+{
     s32 i = 0;
     u8 *a = p + 0x726A;
     u32 z = 0;

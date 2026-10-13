@@ -1,6 +1,7 @@
 #include "global.h"
 void sub_08020D68(void *, s32);
-void sub_0802FE50(void *unused, u8 *p) {
+void sub_0802FE50(void *unused, u8 *p)
+{
     u32 one;
     u32 zero;
     if (p[8] != 0) {

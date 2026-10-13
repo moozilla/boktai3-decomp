@@ -1,5 +1,8 @@
 #include "global.h"
-struct Reference { u8 bytes[4]; u16 first, index; };
+struct Reference {
+    u8 bytes[4];
+    u16 first, index;
+};
 extern u8 *gUnk_0200070C, *gUnk_02000704;
 u8 *sub_0821B478(u8 *, struct Reference *);
 void sub_0821B20C(u8 *, u32, s32, s32 *);

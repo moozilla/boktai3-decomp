@@ -4,7 +4,11 @@ void sub_081FF354(void *, u32, u32, u32, u32);
 void sub_081FF368(void *, u32, u32, s32);
 void sub_081FF370(void *, void (*)(void));
 void sub_081FED9C(void);
-struct S { u8 p[0x2c]; u32 w2c; u16 h30; };
+struct S {
+    u8 p[0x2c];
+    u32 w2c;
+    u16 h30;
+};
 void sub_081FF30C(struct S *p)
 {
     u32 z;

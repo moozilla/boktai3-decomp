@@ -8,12 +8,22 @@ void sub_0811CC24(u8 *s, u8 *t)
         u32 v;
         u8 *a, *b;
         switch (i) {
-        case 0: v = s[0x48]; break;
-        case 3:
-        case 4: v = s[0x4a]; break;
-        case 1: v = s[0x49]; break;
-        case 2: v = s[0x4c]; break;
-        default: v = 0; break;
+            case 0:
+                v = s[0x48];
+                break;
+            case 3:
+            case 4:
+                v = s[0x4a];
+                break;
+            case 1:
+                v = s[0x49];
+                break;
+            case 2:
+                v = s[0x4c];
+                break;
+            default:
+                v = 0;
+                break;
         }
         a = t + i * 0x60;
         b = t + 0x1e0;

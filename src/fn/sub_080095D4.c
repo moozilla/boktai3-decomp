@@ -1,7 +1,17 @@
 #include "global.h"
-struct V { u16 x, y, z; };
-struct S { u8 f[2]; u8 t; u8 g[0x19]; struct V v; };
-struct Q { u8 f[0x1c]; struct V v; };
+struct V {
+    u16 x, y, z;
+};
+struct S {
+    u8 f[2];
+    u8 t;
+    u8 g[0x19];
+    struct V v;
+};
+struct Q {
+    u8 f[0x1c];
+    struct V v;
+};
 
 u32 sub_080095D4(u32 unused, u8 *p, struct V *in)
 {

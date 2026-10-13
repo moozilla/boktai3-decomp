@@ -10,17 +10,23 @@ static inline u8 Tst(u32 *m, s32 i)
     return FALSE;
 }
 
-struct E { u8 a[4]; u8 on; u8 b[0xA0 - 5]; };
-struct S { u8 pad[0x38]; u32 mask; struct E e[20]; };
+struct E {
+    u8 a[4];
+    u8 on;
+    u8 b[0xA0 - 5];
+};
+struct S {
+    u8 pad[0x38];
+    u32 mask;
+    struct E e[20];
+};
 
 u32 sub_0812975C(struct S *b)
 {
     s32 i = 0;
     struct E *e = b->e;
-    for (; i < 20; e++, i++)
-    {
-        if (Tst(&b->mask, i))
-        {
+    for (; i < 20; e++, i++) {
+        if (Tst(&b->mask, i)) {
             if (e->on)
                 sub_08214514(e);
         }

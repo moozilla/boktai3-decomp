@@ -1,7 +1,15 @@
 #include "global.h"
 
-struct P0813F7B4 { u8 f0[0x33c]; s8 f33C; u8 f33D[0x448 - 0x33D]; u32 f448; };
-static inline u32 tst(u32 *a, u32 m) { return *a & m; }
+struct P0813F7B4 {
+    u8 f0[0x33c];
+    s8 f33C;
+    u8 f33D[0x448 - 0x33D];
+    u32 f448;
+};
+static inline u32 tst(u32 *a, u32 m)
+{
+    return *a & m;
+}
 s32 Div(s32, s32);
 s32 sub_0813F784(s32);
 

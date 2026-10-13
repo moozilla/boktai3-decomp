@@ -1,6 +1,9 @@
 #include "global.h"
 s32 sub_081C909C(u8 *, u32, u32);
-static inline void orr(u16 *a, u32 m) { *a = m | *a; }
+static inline void orr(u16 *a, u32 m)
+{
+    *a = m | *a;
+}
 void sub_081CC590(u8 *a, u8 *b, u32 c)
 {
     if (b[9]) {

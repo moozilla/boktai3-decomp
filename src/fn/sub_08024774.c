@@ -1,11 +1,18 @@
 #include "global.h"
 
-struct S { u8 pad[0xAA]; u8 st; u8 pad2[4]; u8 f1; u8 f2; u8 pad3[0xC4 - 0xB1]; u32 cnt; };
+struct S {
+    u8 pad[0xAA];
+    u8 st;
+    u8 pad2[4];
+    u8 f1;
+    u8 f2;
+    u8 pad3[0xC4 - 0xB1];
+    u32 cnt;
+};
 
 static inline u8 TakeFlag(struct S *p)
 {
-    if (p->f2)
-    {
+    if (p->f2) {
         p->f2 = 0;
         p->f1 = 0;
         return TRUE;
@@ -15,8 +22,7 @@ static inline u8 TakeFlag(struct S *p)
 
 void sub_08024774(struct S *p)
 {
-    if (TakeFlag(p))
-    {
+    if (TakeFlag(p)) {
         u32 v = 0xF;
         p->st = v;
     }

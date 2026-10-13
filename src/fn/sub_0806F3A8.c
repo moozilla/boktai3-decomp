@@ -21,10 +21,8 @@ u8 *sub_0806F3A8(u32 x)
     m = *(u32 *)(b + 0x198);
     p = b;
     one = 1;
-    for (; i < 12; i++)
-    {
-        if (Tst(m, one, i))
-        {
+    for (; i < 12; i++) {
+        if (Tst(m, one, i)) {
             u32 o = i * 0x20;
             if (*(u16 *)(p + 0x2C) == x)
                 return b + (o + 0x18);

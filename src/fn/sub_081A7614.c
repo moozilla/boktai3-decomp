@@ -1,5 +1,13 @@
 #include "global.h"
-struct S { u8 f0[0xAA]; u8 st; u8 g[4]; u8 af; u8 b0; u8 f2[0x118 - 0xB1]; u8 d[1]; };
+struct S {
+    u8 f0[0xAA];
+    u8 st;
+    u8 g[4];
+    u8 af;
+    u8 b0;
+    u8 f2[0x118 - 0xB1];
+    u8 d[1];
+};
 void sub_081A68CC(void *);
 void sub_08020D68(void *, s32);
 static inline u8 chk(struct S *p)

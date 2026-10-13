@@ -1,5 +1,7 @@
 #include "global.h"
-struct E { u8 p[0x74]; };
+struct E {
+    u8 p[0x74];
+};
 extern u8 *gUnk_020005E0;
 void sub_081FB82C(u8 *, struct E *, s32);
 void sub_082151E4(u8 *, u32);

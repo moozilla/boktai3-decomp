@@ -1,6 +1,9 @@
 #include "global.h"
 
-struct G { u8 filler[0x868]; u32 f; };
+struct G {
+    u8 filler[0x868];
+    u32 f;
+};
 extern struct G *gUnk_02000710;
 void sub_0804EDCC(void *);
 void sub_0804EDD0(void *);

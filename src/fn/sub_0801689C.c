@@ -1,6 +1,7 @@
 #include "global.h"
 
-void sub_0801689C(u8 *p) {
+void sub_0801689C(u8 *p)
+{
     u32 z = 0;
     u32 one;
     *(u32 *)p = z;

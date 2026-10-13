@@ -1,5 +1,12 @@
 #include "global.h"
-struct P { u8 pad[0x18]; s32 w18; u32 w1c; u32 w20; s32 w24; u32 w28; };
+struct P {
+    u8 pad[0x18];
+    s32 w18;
+    u32 w1c;
+    u32 w20;
+    s32 w24;
+    u32 w28;
+};
 void sub_08177DEC(u32);
 u32 sub_0821ABA8(u32, u32);
 s32 Script_SeekToKeyword(s32);

@@ -8,7 +8,8 @@ extern void *gUnk_02000580;
 void sub_0815C99C(void *);
 void sub_08038688(struct TradeMenu *p)
 {
-    if (p->entered) p->entered = 0;
+    if (p->entered)
+        p->entered = 0;
     if (p->timer > 1) {
         u32 two = 2;
         u8 *state = &p->state;

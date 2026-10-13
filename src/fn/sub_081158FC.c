@@ -1,7 +1,8 @@
 #include "global.h"
 void sub_08214514(void *);
 extern u32 gUnk_020001E4;
-u32 sub_081158FC(u8 *p) {
+u32 sub_081158FC(u8 *p)
+{
     u8 *e = p + 0x34;
     s32 i = 0x2f;
     do {

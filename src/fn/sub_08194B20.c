@@ -10,7 +10,10 @@ void sub_08194B20(u8 *p)
     t = gUnk_086141BC[gUnk_03005304];
     c = p + 0x7253;
     *c = (t & 3) + (1 + *c);
-    if (*c > 5) *c = 0;
-    if (p[0x724B] != 0) sub_08190C98(p, 0x16, *c + 0x3f);
-    else sub_08190C98(p, 0x16, *c + 0x16);
+    if (*c > 5)
+        *c = 0;
+    if (p[0x724B] != 0)
+        sub_08190C98(p, 0x16, *c + 0x3f);
+    else
+        sub_08190C98(p, 0x16, *c + 0x16);
 }

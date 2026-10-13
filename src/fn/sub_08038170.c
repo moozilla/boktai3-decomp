@@ -12,13 +12,14 @@ struct Save {
     s16 leftRows[16];
 };
 struct ItemInfo {
-    u8 enabled;u8 pad[31];
+    u8 enabled;
+    u8 pad[31];
 };
 extern struct Save *gUnk_02000710;
 extern u32 gUnk_03003A50, gUnk_03005308;
 extern u16 gUnk_0203B400[];
 int Mod(int, int);
-void sub_0822D808(int, struct ItemInfo*);
+void sub_0822D808(int, struct ItemInfo *);
 int sub_0822E618(int);
 void sub_0822EA8C(int, int);
 void sub_0822EACC(int);
@@ -35,13 +36,14 @@ void sub_08038170(struct P *input)
     int count = p->count;
     int other;
     register u32 *seed asm("r5");
-    if (!count||!p->rightCount)return;
+    if (!count || !p->rightCount)
+        return;
     i = 0;
     start = count;
     do {
-        *(s16*)((u8*)gUnk_02000710+i*2+0x68) = -1;
+        *(s16 *)((u8 *)gUnk_02000710 + i * 2 + 0x68) = -1;
         i++;
-    } while (i<=7);
+    } while (i <= 7);
     start = Mod(gUnk_03003A50, start);
     missing = 0;
     usable = 0;
@@ -66,76 +68,76 @@ void sub_08038170(struct P *input)
             struct Save **t = &gUnk_02000710;
             slot = t;
         }
-        limit = start+16;
-        if (start<limit) {
+        limit = start + 16;
+        if (start < limit) {
             register int item asm("r1") = start;
             int mod = moduloMask;
             register u32 bit asm("r3");
             asm("" : "+r"(item), "+r"(mod));
             item &= mod;
-            bit = 1<<item;
+            bit = 1 << item;
             if (({
-                u32 available = mask;
-                available&bit;
-            })) {
+                    u32 available = mask;
+                    available & bit;
+                })) {
                 {
                     register struct Save **t asm("r2") = slot;
-                    *(s16*)((u8*)*t+offset+0x68) = item;
+                    *(s16 *)((u8 *)*t + offset + 0x68) = item;
                 }
-                mask&=~bit;
+                mask &= ~bit;
                 goto selected16;
             }
             while (1) {
                 n++;
-                if (n>=limit)break;
+                if (n >= limit)
+                    break;
                 item = n;
                 mod = moduloMask;
                 asm("" : "+r"(item), "+r"(mod));
                 item &= mod;
-                bit = 1<<item;
+                bit = 1 << item;
                 if (({
-                    u32 available = mask;
-                    available&bit;
-                })) {
+                        u32 available = mask;
+                        available & bit;
+                    })) {
                     {
                         register struct Save **t asm("r4") = slot;
-                        *(s16*)((u8*)*t+offset+0x68) = item;
+                        *(s16 *)((u8 *)*t + offset + 0x68) = item;
                     }
-                    mask&=~bit;
+                    mask &= ~bit;
                     start = n;
                     break;
                 }
             }
         }
-selected16:
-        if (*(s16*)((u8*)gUnk_02000710+offset+0x68)<0) {
+    selected16:
+        if (*(s16 *)((u8 *)gUnk_02000710 + offset + 0x68) < 0) {
             int t = 1;
             missing = t;
-        }
-        else {
+        } else {
             sub_0822D808(i, &info);
-            if (!info.enabled){
+            if (!info.enabled) {
                 int t = 1;
                 usable = t;
             }
         }
-        index = (gUnk_03005308+1)&1023;
+        index = (gUnk_03005308 + 1) & 1023;
         gUnk_03005308 = index;
         {
-            int off = index*2;
+            int off = index * 2;
             register int m asm("r2");
-            off = *(u16*)((u8*)gUnk_0203B400+off);
+            off = *(u16 *)((u8 *)gUnk_0203B400 + off);
             m = moduloMask;
             asm("" : "+r"(m));
-            start+=off&m;
+            start += off & m;
         }
         {
             int two = 2;
             asm("" : "+r"(two));
-            offset+=two;
+            offset += two;
         }
         i++;
-    } while (i<=1);
+    } while (i <= 1);
     {
         register struct P *t asm("r1") = p;
         other = t->rightCount;
@@ -149,33 +151,36 @@ selected16:
         }
         seed = &gUnk_03003A50;
         if (({
-            register int t asm("r0") = missing;
-            asm("" : "+r"(t));
-            t;
-        })&& !({
-            int t = usable;
-            t;
-        })) {
+                register int t asm("r0") = missing;
+                asm("" : "+r"(t));
+                t;
+            }) &&
+            !({
+                int t = usable;
+                t;
+            })) {
             i = 0;
             {
                 register struct Save **t asm("r2") = fallback;
                 register struct Save *save asm("r0");
                 s16 *row;
                 save = *t;
-                row = (s16*)((u8*)save+0x68);
-                if (*row<0) *row = i;
+                row = (s16 *)((u8 *)save + 0x68);
+                if (*row < 0)
+                    *row = i;
                 else {
                     while (1) {
                         s16 *row;
                         i++;
-                        if (i>1) break;
+                        if (i > 1)
+                            break;
                         {
                             register struct Save **t asm("r1") = fallback;
                             struct Save *save;
                             save = *t;
-                            row = (s16*)(i*2+(u32)save+0x68);
+                            row = (s16 *)(i * 2 + (u32)save + 0x68);
                         }
-                        if (*row<0) {
+                        if (*row < 0) {
                             {
                                 u16 zero = 0;
                                 asm("" : "+r"(zero));
@@ -190,9 +195,9 @@ selected16:
     }
     i = 0;
     do {
-        *(s16*)((u8*)gUnk_02000710+i*2+0x78) = -1;
+        *(s16 *)((u8 *)gUnk_02000710 + i * 2 + 0x78) = -1;
         i++;
-    } while (i<=7);
+    } while (i <= 7);
     start = Mod(*seed, other);
     missing = 0;
     usable = 0;
@@ -217,77 +222,78 @@ selected16:
             struct Save **t = &gUnk_02000710;
             slot = t;
         }
-        limit = start+8;
+        limit = start + 8;
         asm("" : "+r"(limit), "+r"(i));
-        if (start<limit) {
+        if (start < limit) {
             register int item asm("r1") = start;
             int mod = moduloMask;
             register u32 bit asm("r3");
             asm("" : "+r"(item), "+r"(mod));
             item &= mod;
-            bit = 1<<item;
+            bit = 1 << item;
             if (({
-                u32 available = mask;
-                available&bit;
-            })) {
+                    u32 available = mask;
+                    available & bit;
+                })) {
                 {
                     register struct Save **t asm("r2") = slot;
-                    *(s16*)((u8*)*t+offset+0x78) = item;
+                    *(s16 *)((u8 *)*t + offset + 0x78) = item;
                 }
-                mask&=~bit;
+                mask &= ~bit;
                 goto selected8;
             }
             while (1) {
                 n++;
-                if (n>=limit)break;
+                if (n >= limit)
+                    break;
                 item = n;
                 mod = moduloMask;
                 asm("" : "+r"(item), "+r"(mod));
                 item &= mod;
-                bit = 1<<item;
+                bit = 1 << item;
                 if (({
-                    u32 available = mask;
-                    asm("" : "+r"(available) :: "r10");
-                    available&bit;
-                })) {
+                        u32 available = mask;
+                        asm("" : "+r"(available)::"r10");
+                        available & bit;
+                    })) {
                     {
                         register struct Save **t asm("r4") = slot;
-                        *(s16*)((u8*)*t+offset+0x78) = item;
+                        *(s16 *)((u8 *)*t + offset + 0x78) = item;
                     }
-                    mask&=~bit;
+                    mask &= ~bit;
                     start = n;
                     break;
                 }
             }
         }
-selected8:
-        {
-            register struct Save **t asm("r0") = &gUnk_02000710;
-            s16 *row;
-            row = (s16*)((u8*)*t+offset+0x78);
-            if (*row<0)missing = 1;
-            else if (sub_0822E618(*row)==1){
-                register int t asm("r0") = 1;
-                usable = t;
-            }
+    selected8: {
+        register struct Save **t asm("r0") = &gUnk_02000710;
+        s16 *row;
+        row = (s16 *)((u8 *)*t + offset + 0x78);
+        if (*row < 0)
+            missing = 1;
+        else if (sub_0822E618(*row) == 1) {
+            register int t asm("r0") = 1;
+            usable = t;
         }
-        index = (gUnk_03005308+1)&1023;
+    }
+        index = (gUnk_03005308 + 1) & 1023;
         gUnk_03005308 = index;
         {
-            int off = index*2;
+            int off = index * 2;
             register int m asm("r2");
-            off = *(u16*)((u8*)gUnk_0203B400+off);
+            off = *(u16 *)((u8 *)gUnk_0203B400 + off);
             m = moduloMask;
             asm("" : "+r"(m));
-            start+=off&m;
+            start += off & m;
         }
         {
             int two = 2;
             asm("" : "+r"(two));
-            offset+=two;
+            offset += two;
         }
         i++;
-    } while (i<=1);
+    } while (i <= 1);
     {
         register struct Save **fallback asm("r12");
         {
@@ -295,33 +301,36 @@ selected8:
             fallback = t;
         }
         if (({
-            int t = missing;
-            t;
-        })&& !({
-            register int t asm("r4") = usable;
-            asm("" : "+r"(t));
-            t;
-        })) {
+                int t = missing;
+                t;
+            }) &&
+            !({
+                register int t asm("r4") = usable;
+                asm("" : "+r"(t));
+                t;
+            })) {
             i = 0;
             {
                 register struct Save **t asm("r1") = fallback;
                 register struct Save *save asm("r0");
                 s16 *row;
                 save = *t;
-                row = (s16*)((u8*)save+0x78);
-                if (*row<0) *row = i;
+                row = (s16 *)((u8 *)save + 0x78);
+                if (*row < 0)
+                    *row = i;
                 else {
                     while (1) {
                         s16 *row;
                         i++;
-                        if (i>1) break;
+                        if (i > 1)
+                            break;
                         {
                             register struct Save **t asm("r4") = fallback;
                             struct Save *save;
                             save = *t;
-                            row = (s16*)(i*2+(u32)save+0x78);
+                            row = (s16 *)(i * 2 + (u32)save + 0x78);
                         }
-                        if (*row<0) {
+                        if (*row < 0) {
                             {
                                 u16 zero = 0;
                                 asm("" : "+r"(zero));
@@ -335,7 +344,7 @@ selected8:
         }
         {
             register struct Save **t asm("r4") = fallback;
-(*t)->leftSelected = 0;
+            (*t)->leftSelected = 0;
         }
     }
     asm("" ::: "r1");
@@ -344,6 +353,6 @@ selected8:
     do {
         sub_0822EACC(i);
         i++;
-    } while (i<=7);
+    } while (i <= 7);
     gUnk_02000710->extraSelected = 0;
 }

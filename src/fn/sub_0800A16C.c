@@ -1,6 +1,13 @@
 #include "global.h"
 
-struct S { u8 f[2]; u8 c; u8 g[4]; u8 a; u8 h[2]; u16 n; };
+struct S {
+    u8 f[2];
+    u8 c;
+    u8 g[4];
+    u8 a;
+    u8 h[2];
+    u16 n;
+};
 void sub_0800A16C(u32 x, struct S *p)
 {
     u16 n;

@@ -17,8 +17,7 @@ static inline u8 Tst(u16 *m, u32 b)
 u32 sub_08090E1C(u8 *p)
 {
     u32 m = 0x100;
-    if (Tst((u16 *)(p + 0x2D6), m))
-    {
+    if (Tst((u16 *)(p + 0x2D6), m)) {
         sub_0808FE64(p);
         Clr((u16 *)(p + 0x2D6), ~0x100);
     }

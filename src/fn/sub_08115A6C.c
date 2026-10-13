@@ -1,7 +1,8 @@
 #include "global.h"
 void sub_08115A20(u8 *, u32);
 void sub_081153B4(void);
-void sub_08115A6C(u8 *s, u32 arg) {
+void sub_08115A6C(u8 *s, u32 arg)
+{
     u32 *p = (u32 *)(s + 0x9c);
     u32 mask = 1;
     *p |= mask;

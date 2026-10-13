@@ -1,6 +1,7 @@
 #include "global.h"
 
-u32 sub_08225B38(u8 *p, u32 *q) {
+u32 sub_08225B38(u8 *p, u32 *q)
+{
     u32 y;
     u32 x;
     u32 f = 4;

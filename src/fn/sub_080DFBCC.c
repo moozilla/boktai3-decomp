@@ -1,6 +1,9 @@
 #include "global.h"
 
-struct P { u8 f[6]; u16 flags; };
+struct P {
+    u8 f[6];
+    u16 flags;
+};
 void sub_0807E9D0(struct P *, s32, s32);
 
 static inline u32 tst(u16 *a, u32 m)

@@ -1,5 +1,10 @@
 #include "global.h"
-struct N { u8 f[0x18]; struct N *next; u8 g[0x34]; struct N *n50; };
+struct N {
+    u8 f[0x18];
+    struct N *next;
+    u8 g[0x34];
+    struct N *n50;
+};
 extern u32 gUnk_02000470;
 void sub_08013684(u8 *);
 void sub_08013C74(void *, void *);

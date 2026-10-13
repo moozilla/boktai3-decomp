@@ -1,6 +1,9 @@
 #include "global.h"
 
-struct P { u8 f[0x1a]; u16 v; };
+struct P {
+    u8 f[0x1a];
+    u16 v;
+};
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 

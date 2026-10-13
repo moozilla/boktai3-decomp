@@ -1,6 +1,9 @@
 #include "global.h"
 
-struct P { u8 f[0x22]; s16 v; };
+struct P {
+    u8 f[0x22];
+    s16 v;
+};
 
 s32 sub_0805F758(struct P *p, s32 a, s32 b)
 {

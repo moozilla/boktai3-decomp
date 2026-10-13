@@ -1,6 +1,9 @@
 #include "global.h"
 
-struct O0815A35C { u8 f0[0xD4]; u32 fD4; };
+struct O0815A35C {
+    u8 f0[0xD4];
+    u32 fD4;
+};
 extern struct O0815A35C *gUnk_02000580;
 extern u8 *gUnk_030042E4;
 

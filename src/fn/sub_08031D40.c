@@ -6,17 +6,18 @@ void sub_0821A0C0(void *);
 void sub_08031840(void);
 void sub_08031964(void);
 int sub_0803198C(void *, void *);
-void *sub_08031D40(void *config) {
-  void *p = gUnk_020000DC;
-  if (!p) {
-    p = sub_08219FBC(12, 720);
-    if (p) {
-      sub_0821A04C(p, sub_08031840, sub_08031964);
-      if (sub_0803198C(p, config) < 0) {
-        sub_0821A0C0(p);
-        return 0;
-      }
+void *sub_08031D40(void *config)
+{
+    void *p = gUnk_020000DC;
+    if (!p) {
+        p = sub_08219FBC(12, 720);
+        if (p) {
+            sub_0821A04C(p, sub_08031840, sub_08031964);
+            if (sub_0803198C(p, config) < 0) {
+                sub_0821A0C0(p);
+                return 0;
+            }
+        }
     }
-  }
-  return p;
+    return p;
 }

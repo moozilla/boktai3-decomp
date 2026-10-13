@@ -1,6 +1,12 @@
 #include "global.h"
 
-struct S { u8 f[0x36]; u8 a, b, c, d; u8 g[0x22]; u32 x; u32 y; };
+struct S {
+    u8 f[0x36];
+    u8 a, b, c, d;
+    u8 g[0x22];
+    u32 x;
+    u32 y;
+};
 void sub_08030F20(u32, u32, u32, u32);
 void sub_08030B78(u32);
 void sub_08030C84(u32);

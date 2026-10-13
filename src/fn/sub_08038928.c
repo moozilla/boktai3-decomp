@@ -9,7 +9,10 @@ struct P {
     u8 resend;
 };
 int sub_08037FB4(struct P *, int, const u32 *, int);
-static inline u32 test(u32 *flags, u32 mask) { return *flags & mask; }
+static inline u32 test(u32 *flags, u32 mask)
+{
+    return *flags & mask;
+}
 void sub_08038928(struct P *p)
 {
     u32 data;
@@ -37,5 +40,6 @@ void sub_08038928(struct P *p)
         *state = six;
         p->entered = 1;
         p->timer = zero;
-    } else p->timer++;
+    } else
+        p->timer++;
 }

@@ -1,6 +1,7 @@
 #include "global.h"
 
-s32 sub_082217CC(s32 a, s32 b) {
+s32 sub_082217CC(s32 a, s32 b)
+{
     s32 d = b - a;
     s32 t;
     if (d != 0) {

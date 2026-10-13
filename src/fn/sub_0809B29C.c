@@ -6,8 +6,7 @@ void sub_08076818(void *, u32);
 // the second test; an int result gets jump-threaded away.
 static inline u8 TakeFlag(u8 *flag)
 {
-    if (*flag)
-    {
+    if (*flag) {
         *flag = 0;
         return TRUE;
     }

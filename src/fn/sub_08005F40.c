@@ -1,6 +1,12 @@
 #include "global.h"
 
-struct N { u16 id; u8 f2; u8 pad; u32 a[2]; u8 sub[1]; };
+struct N {
+    u16 id;
+    u8 f2;
+    u8 pad;
+    u32 a[2];
+    u8 sub[1];
+};
 extern u32 gUnk_02000028;
 void sub_0821D6D0(void *);
 void sub_08005E40(void *);

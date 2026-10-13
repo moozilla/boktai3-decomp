@@ -1,5 +1,8 @@
 #include "global.h"
-struct Z { u32 x; u32 y; };
+struct Z {
+    u32 x;
+    u32 y;
+};
 void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, struct Z *);
 void sub_0801A470(u8 *p)
 {

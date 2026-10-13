@@ -1,7 +1,12 @@
 #include "global.h"
 
-struct R { u32 a, b; };
-struct Q { u8 f00[0x20]; struct R r; };
+struct R {
+    u32 a, b;
+};
+struct Q {
+    u8 f00[0x20];
+    struct R r;
+};
 
 void sub_082151E4(void *, s32);
 void sub_082144A4(void *, void *, s32);

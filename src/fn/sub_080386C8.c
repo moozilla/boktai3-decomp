@@ -13,7 +13,10 @@ void sub_08038128(struct P *, int);
 void sub_08038138(struct P *);
 void sub_0803A6F8(void);
 void sub_08178404(void);
-static inline void set(u32 mask) { gUnk_0300523C |= mask; }
+static inline void set(u32 mask)
+{
+    gUnk_0300523C |= mask;
+}
 void sub_080386C8(struct P *p)
 {
     u32 data;
@@ -47,7 +50,8 @@ void sub_080386C8(struct P *p)
     } else {
         u32 three = 3;
         three &= flags;
-        if (three != 3) goto tick;
+        if (three != 3)
+            goto tick;
         p->flags = flags & ~3;
         p->state = three;
         p->entered = 1;

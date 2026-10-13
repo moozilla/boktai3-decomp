@@ -1,6 +1,7 @@
 #include "global.h"
 
-void sub_0822619C(u32 *q) {
+void sub_0822619C(u32 *q)
+{
     u8 *p = *(u8 **)0x03005420;
     if (p != 0) {
         u32 a = q[0];

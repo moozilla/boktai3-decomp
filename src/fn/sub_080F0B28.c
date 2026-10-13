@@ -1,7 +1,13 @@
 #include "global.h"
 
-struct R { u8 f[8]; u16 v; };
-struct P { u8 f[4]; u8 *q; };
+struct R {
+    u8 f[8];
+    u16 v;
+};
+struct P {
+    u8 f[4];
+    u8 *q;
+};
 
 u16 sub_080F0B28(struct P *p)
 {

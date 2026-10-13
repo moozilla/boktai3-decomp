@@ -1,6 +1,25 @@
 #include "global.h"
-struct S { u32 f0[7]; u32 g; u8 f[0xFE4-0x20]; void *fp; u32 a; u32 b[2]; u32 c; u32 d[2]; u8 st; u8 pad[7]; u32 h; u8 q[0x18]; u8 c24; u8 pad2; u16 t; };
-struct G { u8 f[0x1c]; u8 b; };
+struct S {
+    u32 f0[7];
+    u32 g;
+    u8 f[0xFE4 - 0x20];
+    void *fp;
+    u32 a;
+    u32 b[2];
+    u32 c;
+    u32 d[2];
+    u8 st;
+    u8 pad[7];
+    u32 h;
+    u8 q[0x18];
+    u8 c24;
+    u8 pad2;
+    u16 t;
+};
+struct G {
+    u8 f[0x1c];
+    u8 b;
+};
 extern struct G *gUnk_020004B4;
 void sub_0810FD90(struct S *);
 void sub_082156B8(s32);
@@ -13,7 +32,12 @@ void sub_08033924(u32, u32);
 void sub_080337FC(u32);
 void sub_08109358(void);
 void sub_0811024C(void);
-static inline void set(struct S *s, void *fp, u8 st) { s->fp = fp; s->c24 = 1; s->st = st; }
+static inline void set(struct S *s, void *fp, u8 st)
+{
+    s->fp = fp;
+    s->c24 = 1;
+    s->st = st;
+}
 void sub_08110188(struct S *s)
 {
     struct G *g;

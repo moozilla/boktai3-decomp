@@ -45,7 +45,8 @@ void sub_0822CE18(int);
 void sub_0822CE34(int);
 void sub_08038074(struct Menu *, int);
 void *sub_08227E90(void);
-int sub_080390C4(struct Menu *arg) {
+int sub_080390C4(struct Menu *arg)
+{
     register struct Menu *p asm("r6") = arg;
     u16 *leftBase;
     u16 *rightBase;
@@ -65,7 +66,7 @@ int sub_080390C4(struct Menu *arg) {
         {
             register u32 offset asm("r1") = 0xBC;
             asm("" : "+r"(offset));
-            rightBase = (u16 *)(offset+(u32)p);
+            rightBase = (u16 *)(offset + (u32)p);
         }
         {
             register u8 *a asm("r3") = &p->v2b;
@@ -94,19 +95,20 @@ int sub_080390C4(struct Menu *arg) {
             if (Script_GetPc()) {
                 *cursor = Script_GetValue();
                 p->count++;
-            } else *cursor = 0;
+            } else
+                *cursor = 0;
             cursor++;
             asm("" : "+r"(leftBase));
-        } while ((s32)cursor <= (s32)(leftBase+15));
+        } while ((s32)cursor <= (s32)(leftBase + 15));
     } else {
         {
             register u32 offset asm("r3") = 0x7C;
             asm("" : "+r"(offset));
-            leftBase = (u16 *)(offset+(u32)p);
+            leftBase = (u16 *)(offset + (u32)p);
         }
         {
             u32 offset = 0xBC;
-            rightBase = (u16 *)(offset+(u32)p);
+            rightBase = (u16 *)(offset + (u32)p);
         }
         {
             u8 *a = &p->v2b;
@@ -133,7 +135,7 @@ int sub_080390C4(struct Menu *arg) {
                 register u16 *end asm("r1") = leftBase;
                 int zero = 0;
                 register u16 *cursor asm("r0");
-                cursor = (u16 *)(c+0x62);
+                cursor = (u16 *)(c + 0x62);
                 do {
                     *cursor = zero;
                     cursor--;
@@ -148,59 +150,62 @@ int sub_080390C4(struct Menu *arg) {
             register int j asm("r5");
             r = gUnk_03003A50;
             j = 0;
-            if ((u32)j<count) do {
-                int index;
-                register u32 mask asm("r1");
-                item = sub_08227F5C(leftBase[j]);
-                if (!*item) {
-                    index = 0;
-                    mask = p->leftMask;
-                } else {
-                    index = 15;
-                    index &= r;
-                    if (!index)index = 1;
-                    {
-                        u32 bit = 1 << index;
+            if ((u32)j < count)
+                do {
+                    int index;
+                    register u32 mask asm("r1");
+                    item = sub_08227F5C(leftBase[j]);
+                    if (!*item) {
+                        index = 0;
                         mask = p->leftMask;
-                        if (bit&mask) {
-                            register int small asm("r8");
-                            register int one asm("r12");
-                            u32 used;
-                            {
-                                register int x asm("r3") = 15;
-                                asm("" : "+r"(x));
-                                small = x;
+                    } else {
+                        index = 15;
+                        index &= r;
+                        if (!index)
+                            index = 1;
+                        {
+                            u32 bit = 1 << index;
+                            mask = p->leftMask;
+                            if (bit & mask) {
+                                register int small asm("r8");
+                                register int one asm("r12");
+                                u32 used;
+                                {
+                                    register int x asm("r3") = 15;
+                                    asm("" : "+r"(x));
+                                    small = x;
+                                }
+                                {
+                                    int x = 1;
+                                    one = x;
+                                }
+                                used = mask;
+                                do {
+                                    index = r;
+                                    index &= small;
+                                    if (!index)
+                                        index = 1;
+                                    r++;
+                                } while ((one << index) & used);
                             }
-                            {
-                                int x = 1;
-                                one = x;
-                            }
-                            used = mask;
-                            do {
-                                index = r;
-                                index &= small;
-                                if (!index)index = 1;
-                                r++;
-                            } while ((one << index)&used);
                         }
                     }
-                }
-                p->leftMask = (1 << index)|mask;
-                sub_0822D83C(index, item);
-                {
-                    register u32 *read asm("r1") = &gUnk_03005308;
-                    register u32 *write asm("r3");
-                    u32 x;
-                    u8 *table;
-                    x = (*read+1)&1023;
-                    write = &gUnk_03005308;
-                    *write = x;
-                    x <<= 1;
-                    table = gUnk_0203B400;
-                    r += *(u8 *)(x+(u32)table);
-                }
-                j++;
-            } while ((u32)j<p->count);
+                    p->leftMask = (1 << index) | mask;
+                    sub_0822D83C(index, item);
+                    {
+                        register u32 *read asm("r1") = &gUnk_03005308;
+                        register u32 *write asm("r3");
+                        u32 x;
+                        u8 *table;
+                        x = (*read + 1) & 1023;
+                        write = &gUnk_03005308;
+                        *write = x;
+                        x <<= 1;
+                        table = gUnk_0203B400;
+                        r += *(u8 *)(x + (u32)table);
+                    }
+                    j++;
+                } while ((u32)j < p->count);
         }
     }
     item = sub_08227F5C(0);
@@ -213,15 +218,16 @@ int sub_080390C4(struct Menu *arg) {
             if (Script_GetPc()) {
                 *cursor = Script_GetValue();
                 p->rightCount++;
-            } else *cursor = 0;
+            } else
+                *cursor = 0;
             cursor++;
             asm("" : "+r"(rightBase));
-        } while ((s32)cursor <= (s32)(rightBase+7));
+        } while ((s32)cursor <= (s32)(rightBase + 7));
     } else {
         register u16 *end asm("r1") = rightBase;
         int zero = 0;
         u16 *cursor;
-        cursor = rightBase+7;
+        cursor = rightBase + 7;
         do {
             *cursor = zero;
             cursor--;
@@ -236,7 +242,7 @@ int sub_080390C4(struct Menu *arg) {
             u32 *random;
             r = gUnk_03003A50;
             j = 0;
-            if ((u32)j<count) {
+            if ((u32)j < count) {
                 q = rightBase;
                 {
                     register u32 *x asm("r3") = &gUnk_03005308;
@@ -252,11 +258,12 @@ int sub_080390C4(struct Menu *arg) {
                     } else {
                         index = 7;
                         index &= r;
-                        if (!index)index = 1;
+                        if (!index)
+                            index = 1;
                         {
                             u32 bit = 1 << index;
                             mask = p->extraMask;
-                            if (bit&mask) {
+                            if (bit & mask) {
                                 register int small asm("r12");
                                 register int one asm("r8");
                                 u32 used;
@@ -274,13 +281,14 @@ int sub_080390C4(struct Menu *arg) {
                                     index = r;
                                     asm("" : "+r"(index));
                                     index &= small;
-                                    if (!index)index = 1;
+                                    if (!index)
+                                        index = 1;
                                     r++;
-                                } while ((one << index)&used);
+                                } while ((one << index) & used);
                             }
                         }
                     }
-                    p->extraMask = (1 << index)|mask;
+                    p->extraMask = (1 << index) | mask;
                     asm("" : "+r"(q));
                     sub_0822E650(index, *q);
                     {
@@ -289,23 +297,24 @@ int sub_080390C4(struct Menu *arg) {
                         u32 x;
                         u8 *table;
                         asm("" : "+r"(read));
-                        x = (*read+1)&1023;
+                        x = (*read + 1) & 1023;
                         write = random;
                         asm("" : "+r"(write));
                         *write = x;
                         x <<= 1;
                         table = gUnk_0203B400;
-                        r += *(u8 *)(x+(u32)table);
+                        r += *(u8 *)(x + (u32)table);
                     }
                     q++;
                     j++;
-                } while ((u32)j<p->rightCount);
+                } while ((u32)j < p->rightCount);
             }
         }
     }
     sub_0822E650(0, 1);
     sub_0822E9FC(0, 0);
-    for (i = 1;i <= 7;i++)sub_0822E9FC(i, -1);
+    for (i = 1; i <= 7; i++)
+        sub_0822E9FC(i, -1);
     {
         struct Save **slot;
         register int minus asm("r0");
@@ -319,13 +328,16 @@ int sub_080390C4(struct Menu *arg) {
             register struct Save *save asm("r1") = *slot;
             int offset = i << 1;
             asm("" : "+r"(offset));
-            *(s16 *)(offset+(u32)save+0x58) = value;
+            *(s16 *)(offset + (u32)save + 0x58) = value;
             i++;
         } while (i <= 3);
     }
-    for (i = 0;i <= 15;i++)sub_0822E0DC(i, -1);
-    for (i = 0;i <= 15;i++)sub_0822CE18(i);
-    for (i = 0;i <= 15;i++)sub_0822CE34(i);
+    for (i = 0; i <= 15; i++)
+        sub_0822E0DC(i, -1);
+    for (i = 0; i <= 15; i++)
+        sub_0822CE18(i);
+    for (i = 0; i <= 15; i++)
+        sub_0822CE34(i);
     p->rightMask = 0xFCF;
     {
         register int zero asm("r2") = 0;
@@ -387,19 +399,19 @@ int sub_080390C4(struct Menu *arg) {
         struct Tail *tail = (struct Tail *)&p->slots[0].a;
         u8 *bytes = p->slots[0].counts;
         do {
-            register u8 *destination asm("r2") = bytes+j;
+            register u8 *destination asm("r2") = bytes + j;
             register int k asm("r0") = 3;
             // The original repeats this same per-slot byte store four times.
             do {
                 *destination = zero;
             } while (--k >= 0);
             *((u8 *)tail) = hundred;
-            *((u8 *)tail+1) = hundred;
-            *((u8 *)tail+2) = zero;
-            *((u8 *)tail+3) = zero;
+            *((u8 *)tail + 1) = hundred;
+            *((u8 *)tail + 2) = zero;
+            *((u8 *)tail + 3) = zero;
             tail->timer = zero;
             asm("" : "+r"(tail), "+r"(bytes));
-            tail = (struct Tail *)((u8 *)tail+12);
+            tail = (struct Tail *)((u8 *)tail + 12);
             bytes += 12;
             j++;
         } while (j <= 1);
@@ -408,7 +420,7 @@ int sub_080390C4(struct Menu *arg) {
         u8 *base = local.counts;
         int zero = 0;
         u8 *c;
-        c = base+3;
+        c = base + 3;
         do {
             *c = zero;
             c--;
@@ -424,8 +436,8 @@ int sub_080390C4(struct Menu *arg) {
             p->delta = 0;
             p->weights[0] = (int)sub_0821ABA8(77, 11);
             if (Script_SeekToKeyword(112)) {
-                cursor = p->weights+1;
-                for (i = 3;i >= 0;i--) {
+                cursor = p->weights + 1;
+                for (i = 3; i >= 0; i--) {
                     *cursor = Script_GetValue();
                     cursor++;
                 }

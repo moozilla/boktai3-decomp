@@ -1,6 +1,9 @@
 #include "global.h"
 
-struct Buf { u32 a, b; u8 pad[0x180]; };
+struct Buf {
+    u32 a, b;
+    u8 pad[0x180];
+};
 extern u32 gUnk_03001680;
 struct Buf *sub_0821A2DC(void);
 

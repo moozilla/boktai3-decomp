@@ -1,5 +1,11 @@
 #include "global.h"
-struct E { u16 a; u16 b; u8 f[5]; u8 c; u8 g[0x5c - 10]; };
+struct E {
+    u16 a;
+    u16 b;
+    u8 f[5];
+    u8 c;
+    u8 g[0x5c - 10];
+};
 extern const u32 gUnk_08611F40[];
 void sub_0824923C(void *, u32);
 void sub_081A46B0(u8 *p)

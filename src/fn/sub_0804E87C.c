@@ -1,6 +1,16 @@
 #include "global.h"
-struct O { u8 f[0x18]; u32 *q; u8 g[0xa]; u8 n; u8 h; u8 s; };
-static inline u32 tst(u32 *a, u32 m) { return *a & m; }
+struct O {
+    u8 f[0x18];
+    u32 *q;
+    u8 g[0xa];
+    u8 n;
+    u8 h;
+    u8 s;
+};
+static inline u32 tst(u32 *a, u32 m)
+{
+    return *a & m;
+}
 void sub_0804E618(struct O *, u32);
 void sub_0804E87C(struct O *o)
 {
@@ -14,7 +24,8 @@ void sub_0804E87C(struct O *o)
             u8 *e = (u8 *)o;
             u8 *np = &o->n;
             do {
-                if (*fp != 0) *(u32 *)(e + 0x34) |= m;
+                if (*fp != 0)
+                    *(u32 *)(e + 0x34) |= m;
                 fp += 0xa8;
                 e += 0xa8;
                 i++;

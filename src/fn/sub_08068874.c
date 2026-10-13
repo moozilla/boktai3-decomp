@@ -9,7 +9,8 @@ void sub_080687EC(void);
 u8 *sub_08068874(void)
 {
     u8 *r;
-    if (gUnk_02000134 != 0) return gUnk_02000134;
+    if (gUnk_02000134 != 0)
+        return gUnk_02000134;
     r = sub_08219FBC(10, 0x2C4);
     gUnk_02000134 = r;
     if (r) {

@@ -1,7 +1,11 @@
 #include "global.h"
 
 extern s32 gUnk_0300523C;
-struct A { u8 f[0x2c]; u8 g[0x86]; s16 h; };
+struct A {
+    u8 f[0x2c];
+    u8 g[0x86];
+    s16 h;
+};
 void sub_08233140(void *, void *, s32, s32, s32, s32);
 
 void sub_081AF9E8(struct A *p)

@@ -1,5 +1,8 @@
 #include "global.h"
-struct Block { struct Block *prev, *next; u32 size, unused; };
+struct Block {
+    struct Block *prev, *next;
+    u32 size, unused;
+};
 extern struct Block gUnk_02000714;
 void *sub_08219C40(s32 bytes)
 {
@@ -17,11 +20,13 @@ void *sub_08219C40(s32 bytes)
                 do {
                     next->prev = block;
                     next->next = block->next;
-                    if (next->next) next->next->prev = next;
+                    if (next->next)
+                        next->next->prev = next;
                     block->size = bytes;
                     block->next = next;
                 } while (0);
-            } else block->size = flags & 0x7FFFFFFF;
+            } else
+                block->size = flags & 0x7FFFFFFF;
             block->unused = 0;
             return (u8 *)block + 16;
         }

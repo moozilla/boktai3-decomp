@@ -1,5 +1,14 @@
 #include "global.h"
-struct S { u8 filler[0x14E0]; u32 g; u8 pad[9]; u8 c; u8 pad2[2]; u32 d; u32 e; u32 f; };
+struct S {
+    u8 filler[0x14E0];
+    u32 g;
+    u8 pad[9];
+    u8 c;
+    u8 pad2[2];
+    u32 d;
+    u32 e;
+    u32 f;
+};
 u32 sub_08033690(s32, s32, s32, s32);
 void sub_0803386C(u32, u32);
 void sub_08033924(u32, u32);

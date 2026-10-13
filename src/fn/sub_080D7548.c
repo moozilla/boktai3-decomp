@@ -2,7 +2,10 @@
 
 void sub_080D6FDC(void *);
 
-struct S { u8 filler[0x2d4]; u16 f; };
+struct S {
+    u8 filler[0x2d4];
+    u16 f;
+};
 
 void sub_080D7548(struct S *s)
 {

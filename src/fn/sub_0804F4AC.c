@@ -1,6 +1,10 @@
 #include "global.h"
-struct Z { u32 x, y; };
-struct C { u32 w[8]; };
+struct Z {
+    u32 x, y;
+};
+struct C {
+    u32 w[8];
+};
 struct C *sub_0821A520(u32, u32);
 void sub_082196C4(u8 *, struct C *);
 void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, struct Z *);

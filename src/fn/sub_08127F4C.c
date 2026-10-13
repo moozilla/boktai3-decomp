@@ -1,6 +1,8 @@
 #include "global.h"
 
-struct Unk08127EFC { u32 unk0; };
+struct Unk08127EFC {
+    u32 unk0;
+};
 
 struct Unk08127EFC *sub_08127EFC(void);
 

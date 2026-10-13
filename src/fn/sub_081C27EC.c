@@ -9,7 +9,8 @@ void sub_081C22BC(void *);
 void *sub_081C27EC(void)
 {
     void *p;
-    if (gUnk_02000260 != 0) return (void *)gUnk_02000260;
+    if (gUnk_02000260 != 0)
+        return (void *)gUnk_02000260;
     p = sub_08219FBC(8, 0x5bc);
     if (p != 0) {
         sub_0821A04C(p, (void (*)(void *))sub_081C2294, sub_081C22BC);

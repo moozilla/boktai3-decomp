@@ -1,6 +1,8 @@
 #include "global.h"
 // Generic 512-byte-chunk DMA copy; retains the existing linker name.
-struct DmaTransfer { volatile u32 source, destination, control; };
+struct DmaTransfer {
+    volatile u32 source, destination, control;
+};
 void BgGfx_LoadTiles(u8 *source, u8 *destination, u32 bytes)
 {
     while (bytes > 512) {

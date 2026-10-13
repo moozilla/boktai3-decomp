@@ -5,7 +5,10 @@ extern u32 gUnk_03006A40, gUnk_03006A30, gUnk_03006A44, gUnk_03006A34;
 extern s32 gUnk_03006A48;
 extern void (*gUnk_03003A10[])(void);
 void sub_08243D28(void);
-static inline u16 maskIE(u32 ie, u32 mask) { return ie | mask; }
+static inline u16 maskIE(u32 ie, u32 mask)
+{
+    return ie | mask;
+}
 void sub_08243C10(void)
 {
     u16 ie;

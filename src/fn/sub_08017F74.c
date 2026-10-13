@@ -1,4 +1,34 @@
 #include "global.h"
-struct Weather{u8 pad[29];u8 state;u8 pad1e[62];u32 frame;};extern int(*const gUnk_08604C80[])(struct Weather*);extern u8*gUnk_02000710;extern int gUnk_02000088,gUnk_02000478;void sub_08017510(void*);void sub_08017730(void*);
+struct Weather {
+    u8 pad[29];
+    u8 state;
+    u8 pad1e[62];
+    u32 frame;
+};
+extern int (*const gUnk_08604C80[])(struct Weather *);
+extern u8 *gUnk_02000710;
+extern int gUnk_02000088, gUnk_02000478;
+void sub_08017510(void *);
+void sub_08017730(void *);
 #define Weather_Update sub_08017F74
-int Weather_Update(struct Weather*p){int(*f)(struct Weather*)=gUnk_08604C80[p->state];if(f)f(p);if(p->state>1)sub_08017510(p);if(p->state==3){*(s16*)(gUnk_02000710+0x87a)=32767;gUnk_02000088=1;}else{if(*(s16*)(gUnk_02000710+0x87a)>0)(*(s16*)(gUnk_02000710+0x87a))--;gUnk_02000088=0;}if(gUnk_02000478>0)gUnk_02000478--;sub_08017730(p);p->frame++;return 0;}
+int Weather_Update(struct Weather *p)
+{
+    int (*f)(struct Weather *) = gUnk_08604C80[p->state];
+    if (f)
+        f(p);
+    if (p->state > 1)
+        sub_08017510(p);
+    if (p->state == 3) {
+        *(s16 *)(gUnk_02000710 + 0x87a) = 32767;
+        gUnk_02000088 = 1;
+    } else {
+        if (*(s16 *)(gUnk_02000710 + 0x87a) > 0)
+            (*(s16 *)(gUnk_02000710 + 0x87a))--;
+        gUnk_02000088 = 0;
+    }
+    if (gUnk_02000478 > 0)
+        gUnk_02000478--;
+    sub_08017730(p);
+    p->frame++;
+    return 0;
+}

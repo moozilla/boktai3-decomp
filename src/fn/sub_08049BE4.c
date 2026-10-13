@@ -21,7 +21,8 @@ void sub_08049BE4(void)
             *(u32 *)(p + 0x418) = Script_GetValue();
         if (p[0x255] == 3) {
             a = p + 0x50;
-            if (sub_0821FCDC(a) == 0xFF || (b = p + 0x1D8, sub_0821FD3C(b, a), sub_0821F2EC(b, a, p + 0x410) == 0))
+            if (sub_0821FCDC(a) == 0xFF ||
+                (b = p + 0x1D8, sub_0821FD3C(b, a), sub_0821F2EC(b, a, p + 0x410) == 0))
                 sub_08049168(p, 0);
             else
                 sub_08049168(p, 3);

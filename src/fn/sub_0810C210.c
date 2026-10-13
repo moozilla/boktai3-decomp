@@ -1,6 +1,9 @@
 #include "global.h"
 
-struct Unk0810C1E8_Elem { u32 flags; u8 filler4[0x5C]; };
+struct Unk0810C1E8_Elem {
+    u32 flags;
+    u8 filler4[0x5C];
+};
 struct Unk0810C1E8 {
     u8 filler0[0x28];
     struct Unk0810C1E8_Elem elems[7];

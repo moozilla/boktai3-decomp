@@ -1,5 +1,8 @@
 #include "global.h"
-struct A { u8 p[4]; void *f4; };
+struct A {
+    u8 p[4];
+    void *f4;
+};
 extern struct A *gUnk_030052F4;
 void *sub_0821A520(u32, u16);
 void sub_0821BB98(void);

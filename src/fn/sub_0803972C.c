@@ -1,6 +1,9 @@
 #include "global.h"
 u8 *sub_08037DC0(void);
-static inline u8 g(u8 *q) { return q[4]; }
+static inline u8 g(u8 *q)
+{
+    return q[4];
+}
 u32 sub_0803972C(void)
 {
     u8 *p = sub_08037DC0();

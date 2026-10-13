@@ -7,7 +7,8 @@ s32 sub_0805B318(u8 *p)
         s32 m = n;
         u8 **q = (u8 **)(p + 0xbe8);
         do {
-            if ((*q)[0xd3] != 2) return 0;
+            if ((*q)[0xd3] != 2)
+                return 0;
             q++;
             i++;
         } while (i < m);

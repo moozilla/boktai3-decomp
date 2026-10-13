@@ -9,7 +9,8 @@ struct S2B94 {
     u8 f2[0xD53 - 0xCF4];
     s8 b;
 };
-void sub_080F2B94(struct S2B94 *s) {
+void sub_080F2B94(struct S2B94 *s)
+{
     u32 v = s->v;
     if (v != 0) {
         if ((u8)sub_0824923C(s, v) != 0)

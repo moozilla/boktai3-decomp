@@ -1,7 +1,16 @@
 #include "global.h"
-struct H { u32 lo:16; u32 hi:16; };
-struct Tail { u32 lo:16; u32 :16; };
-struct Z { struct H a; struct Tail b; };
+struct H {
+    u32 lo : 16;
+    u32 hi : 16;
+};
+struct Tail {
+    u32 lo : 16;
+    u32 : 16;
+};
+struct Z {
+    struct H a;
+    struct Tail b;
+};
 void sub_08074BF4(u8 *, struct Z *, struct Z *, void (*)(void), u8 *);
 void sub_08074D34(u8 *, struct Z *, struct Z *, void (*)(void), u32, u8 *);
 void sub_080C58DC(void);

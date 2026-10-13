@@ -1,6 +1,9 @@
 #include "global.h"
 
-struct S { u8 pad[0x1f]; u8 b1f; };
+struct S {
+    u8 pad[0x1f];
+    u8 b1f;
+};
 extern struct S *gUnk_02000298;
 
 s32 sub_081D372C(void)

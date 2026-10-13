@@ -1,7 +1,18 @@
 #include "global.h"
 
-struct P { u32 a; u32 b; };
-struct Q { u8 f[0x38]; struct P p38; u8 g[0x58]; struct P p98; s16 ha0; u8 g2[0x102]; u32 w1a4; };
+struct P {
+    u32 a;
+    u32 b;
+};
+struct Q {
+    u8 f[0x38];
+    struct P p38;
+    u8 g[0x58];
+    struct P p98;
+    s16 ha0;
+    u8 g2[0x102];
+    u32 w1a4;
+};
 s16 sub_081BAD98(void *);
 s32 sub_081BADFC(void *);
 

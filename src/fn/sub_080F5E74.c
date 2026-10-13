@@ -1,10 +1,14 @@
 #include "global.h"
 
 struct S080F5E74 {
-    u8 filler0[0xc]; u8 *q;
-    u8 filler1[0x128 - 0x10]; s16 h;
-    u8 filler2[0x160 - 0x12a]; u8 *p;
-    u8 filler3[0x168 - 0x164]; u32 z;
+    u8 filler0[0xc];
+    u8 *q;
+    u8 filler1[0x128 - 0x10];
+    s16 h;
+    u8 filler2[0x160 - 0x12a];
+    u8 *p;
+    u8 filler3[0x168 - 0x164];
+    u32 z;
 };
 void sub_08215284(u8 *, u32);
 

@@ -1,7 +1,13 @@
 #include "global.h"
 
-struct E { u8 act; u8 f[0x9f]; };
-struct S { u8 f[0x38]; struct E e[8]; };
+struct E {
+    u8 act;
+    u8 f[0x9f];
+};
+struct S {
+    u8 f[0x38];
+    struct E e[8];
+};
 void sub_080125FC(void *, void *);
 
 s32 sub_08012630(struct S *s)

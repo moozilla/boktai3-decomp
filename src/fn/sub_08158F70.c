@@ -1,6 +1,10 @@
 #include "global.h"
 
-struct O08158F70 { u32 f0; u32 f4; u32 f8; };
+struct O08158F70 {
+    u32 f0;
+    u32 f4;
+    u32 f8;
+};
 extern struct O08158F70 *gUnk_0200054C;
 void sub_08249244(u32, u32, u32, u32);
 

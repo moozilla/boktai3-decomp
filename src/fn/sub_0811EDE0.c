@@ -1,5 +1,12 @@
 #include "global.h"
-struct O { u8 pad[0x58]; s16 h; u8 pad2[0xb0-0x5a]; u32 cb; u8 pad3[0xbf-0xb4]; u8 b; };
+struct O {
+    u8 pad[0x58];
+    s16 h;
+    u8 pad2[0xb0 - 0x5a];
+    u32 cb;
+    u8 pad3[0xbf - 0xb4];
+    u8 b;
+};
 void sub_0811ED0C(void);
 void sub_0811EDE0(struct O *o)
 {

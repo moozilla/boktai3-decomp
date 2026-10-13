@@ -1,6 +1,19 @@
 #include "global.h"
 
-struct S { u8 t; u8 f1; u16 a; u16 b; u8 g[0xb]; u8 c; u8 h[4]; s16 hp; u8 i[1]; u8 d; u8 j[0x18a]; void *fn; };
+struct S {
+    u8 t;
+    u8 f1;
+    u16 a;
+    u16 b;
+    u8 g[0xb];
+    u8 c;
+    u8 h[4];
+    s16 hp;
+    u8 i[1];
+    u8 d;
+    u8 j[0x18a];
+    void *fn;
+};
 void sub_08005338(void);
 void sub_080050AC(struct S *p)
 {

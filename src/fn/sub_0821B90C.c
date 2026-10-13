@@ -1,5 +1,9 @@
 #include "global.h"
-struct S { u32 f0; u32 f4; const u8 *f8; };
+struct S {
+    u32 f0;
+    u32 f4;
+    const u8 *f8;
+};
 extern struct S gUnk_02000428;
 extern const u8 gUnk_0861418C[];
 s32 Div(s32, s32);

@@ -1,6 +1,7 @@
 #include "global.h"
 
-void sub_0819AE64(u8 *p) {
+void sub_0819AE64(u8 *p)
+{
     u32 z;
     u8 v = *p + 1;
     z = 0;

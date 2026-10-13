@@ -1,6 +1,11 @@
 #include "global.h"
 
-struct Obj { u8 pad[2]; u16 f2; u8 pad4[0x17]; u8 f1B; };
+struct Obj {
+    u8 pad[2];
+    u16 f2;
+    u8 pad4[0x17];
+    u8 f1B;
+};
 extern u16 gUnk_03005238;
 s32 sub_08219728(struct Obj *, u32, u32);
 

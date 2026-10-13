@@ -5,7 +5,8 @@ s32 sub_0800F6F8(void *, u16);
 void sub_0821A0C0(void *);
 void sub_0800F6E0(void);
 void sub_0800F6EC(void);
-void *sub_0800F80C(u32 arg) {
+void *sub_0800F80C(u32 arg)
+{
     void *obj;
     obj = sub_08219FBC(9, 0x2C);
     if (obj != 0) {

@@ -1,6 +1,12 @@
 #include "global.h"
 
-struct P { u8 f[0x34]; u8 g[0x1c]; u32 a; u32 b; u32 c; };
+struct P {
+    u8 f[0x34];
+    u8 g[0x1c];
+    u32 a;
+    u32 b;
+    u32 c;
+};
 void sub_082151E4(u8 *, s32);
 u32 sub_08215184(s32);
 u32 sub_0821A520(s32, s32);

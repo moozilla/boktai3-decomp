@@ -1,6 +1,7 @@
 #include "global.h"
 
-u32 sub_080427E0(u8 *p) {
+u32 sub_080427E0(u8 *p)
+{
     u8 *q;
     u32 mode = *(u32 *)p;
     if (mode == 0) {

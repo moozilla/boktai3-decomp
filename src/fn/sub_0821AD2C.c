@@ -1,5 +1,9 @@
 #include "global.h"
-struct Args { u32 count:16; u32 reserved:16; s32 *values; };
+struct Args {
+    u32 count : 16;
+    u32 reserved : 16;
+    s32 *values;
+};
 u8 *Script_DecodeOperand(u8 *, s32 *, s32 *);
 s32 sub_0821AD08(s32, struct Args *);
 s32 sub_0821AD2C(u8 *p)

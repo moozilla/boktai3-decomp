@@ -1,9 +1,14 @@
 #include "global.h"
 
-struct T { u32 a; void (*b)(void); void (*c)(void); };
+struct T {
+    u32 a;
+    void (*b)(void);
+    void (*c)(void);
+};
 void sub_082141BC(void);
 
-void sub_08222784(void) {
+void sub_08222784(void)
+{
     u16 ie;
     struct T *t;
     *(vu16 *)0x04000208 = 0;

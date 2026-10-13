@@ -21,7 +21,10 @@ void sub_08169E94(void);
 void sub_08038128(struct P *, int);
 void sub_08038138(struct P *);
 void sub_0822B2F8(int);
-static inline u32 test(u16 *flags, u32 mask) { return *flags & mask; }
+static inline u32 test(u16 *flags, u32 mask)
+{
+    return *flags & mask;
+}
 void sub_08038764(struct P *p)
 {
     if (p->entered) {
@@ -54,7 +57,8 @@ void sub_08038764(struct P *p)
             p->timer = countdown;
             sub_08169E94();
             sub_08038138(p);
-            if (p->cancel && p->retries) p->retries--;
+            if (p->cancel && p->retries)
+                p->retries--;
             return;
         }
         p->countdown = value - 1;

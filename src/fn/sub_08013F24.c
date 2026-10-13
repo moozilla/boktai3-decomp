@@ -1,5 +1,9 @@
 #include "global.h"
-struct BF { u32 a : 16; u32 b : 16; u32 c : 16; };
+struct BF {
+    u32 a : 16;
+    u32 b : 16;
+    u32 c : 16;
+};
 u32 sub_0821ABA8(u32, u32);
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);

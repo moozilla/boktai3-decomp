@@ -8,5 +8,6 @@ void sub_0811A004(void)
     u32 p;
     u32 i = sub_0821ABA8(0x69, 0);
     p = gUnk_020004F0[i];
-    if (p != 0) sub_08055F3C(0, 0, sub_08119F9C, p);
+    if (p != 0)
+        sub_08055F3C(0, 0, sub_08119F9C, p);
 }

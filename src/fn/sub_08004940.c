@@ -3,7 +3,11 @@
 s32 sub_0822B2F8(u32);
 void sub_08014CA4(u32, u32, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32);
 
-struct W { u32 x : 16; u32 y : 16; u32 z : 16; };
+struct W {
+    u32 x : 16;
+    u32 y : 16;
+    u32 z : 16;
+};
 void sub_08014634(u32, u32, struct W *, struct W *, struct W *, u32, u32);
 
 void Scene_PlayObjectBreakEffect(u8 *p)

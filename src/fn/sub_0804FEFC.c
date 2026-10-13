@@ -1,7 +1,14 @@
 #include "global.h"
 
-struct E { u8 f[0xfc]; };
-struct P { u8 f0[0x18]; u16 n; u8 f1a[2]; struct E e[1]; };
+struct E {
+    u8 f[0xfc];
+};
+struct P {
+    u8 f0[0x18];
+    u16 n;
+    u8 f1a[2];
+    struct E e[1];
+};
 void sub_0804FD70(struct E *, s32, s32, s32, s32, s32);
 void sub_0804FDB4(struct E *, s32, s32);
 void sub_0804FE20(struct E *);
