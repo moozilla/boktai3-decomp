@@ -147,21 +147,58 @@ def fuzzy_percent(result):
     return 100.0 if result["status"] == "match" else min(99.9, 100 * matcher.ratio())
 
 
-def record_fuzzy(src, pct):
-    """Write `// fuzzy: NN.N%` as the first line of each NONMATCHING draft."""
+def record_fuzzy(src, scores):
+    """Write `// fuzzy: NN.N%` as the first line of each NONMATCHING draft,
+    using the score of the function its #else branch INCLUDE_ASMs."""
     path = os.path.join(ROOT, src)
     text = open(path).read()
-    text = re.sub(r"^(#\s*ifdef\s+NONMATCHING[^\n]*\n)(//\s*fuzzy:[^\n]*\n)?",
-                  lambda m: f"{m.group(1)}// fuzzy: {pct:.1f}%\n", text, flags=re.M)
-    open(path, "w").write(text)
+    block = re.compile(r"(#\s*ifdef\s+NONMATCHING[^\n]*\n)(//\s*fuzzy:[^\n]*\n)?(.*?#\s*else.*?#\s*endif)", re.S)
+
+    def fix(m):
+        names = re.findall(r'INCLUDE_ASM\(\s*"[^"]*"\s*,\s*(\w+)\s*\)', m.group(3))
+        pct = next((scores[n] for n in names if n in scores), None)
+        return m.group(0) if pct is None else f"{m.group(1)}// fuzzy: {pct:.1f}%\n{m.group(3)}"
+    open(path, "w").write(block.sub(fix, text))
+
+
+def inventory():
+    import progress
+    funcs, sizes = progress.load_functions()
+    by_label = {f"sub_{a:08X}": n for n, a in funcs}
+    addr = {n: a for n, a in funcs}
+    return by_label, addr, sizes
 
 
 def draft_extent(src, defined):
     """Bytes of the ROM functions a NONMATCHING build of src defines."""
-    import progress
-    funcs, sizes = progress.load_functions()
-    by_label = {f"sub_{a:08X}": n for n, a in funcs}
-    return sum(sizes[by_label.get(n, n)] for n in defined)
+    by_label, _, sizes = inventory()
+    return sum(sizes.get(by_label.get(n, n), 0) for n in defined)
+
+
+def draft_scores(src, obj, mine, rom, arm):
+    """Per-draft fuzzy scores: each draft's emitted bytes against its own ROM
+    function, so drafts inside a multi-function unit are scored separately."""
+    from split import nonmatching_functions
+    by_label, addr, sizes = inventory()
+    syms = []
+    for ln in build.sh(["arm-none-eabi-nm", obj]).splitlines():
+        p = ln.split()
+        if len(p) == 3 and p[1] in "Tt" and not p[2].endswith("__addr") and not p[2].startswith("."):
+            syms.append((int(p[0], 16), p[2]))
+    syms.sort()
+    base = syms[0][0] if syms else 0
+    scores = {}
+    for name, _ in nonmatching_functions(os.path.join(ROOT, src)):
+        here = [o for o, n in syms if n == name]
+        key = by_label.get(name, name)
+        if not here or key not in addr:
+            continue
+        start = here[0] - base
+        end = next((o - base for o, _ in syms if o - base > start), len(mine))
+        a = addr[key]
+        part = comparison(rom[off(a):off(a) + sizes[key]], mine[start:end], a, arm=arm)
+        scores[name] = fuzzy_percent(part)
+    return scores
 
 
 def render_diff(result, context=3, full=False):
@@ -229,8 +266,12 @@ def main():
     arm = os.path.basename(build.compiler_for(src)) == "agbcc_arm"
     result = comparison(orig, mine, addr, arm=arm, target_size=a.target_size)
     result.update(functions=defined, artifacts=work, fuzzy_match_percent=fuzzy_percent(result))
-    if a.record:
-        record_fuzzy(src, result["fuzzy_match_percent"])
+    if a.nonmatching:
+        result["draft_fuzzy"] = draft_scores(src, obj, mine, rom, arm)
+        for name, pct in result["draft_fuzzy"].items():
+            print(f"draft {name}: fuzzy {pct:.1f}%")
+        if a.record:
+            record_fuzzy(src, result["draft_fuzzy"])
     ok = result["status"] == "match"
     with open(os.path.join(ROOT, work, "comparison.json"), "w") as f:
         json.dump(result, f, indent=2)
