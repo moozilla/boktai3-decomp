@@ -129,6 +129,22 @@ def collect_done(funcs, source_root):
 
 
 MARK = "// MATCHING_CONCESSION: register-pinning"
+HINT = re.compile(r'\bregister\b[^;]*\basm\s*\(\s*"\w+"\s*\)|\basm\s*(?:volatile\s*)?\(\s*""')
+
+
+def hinted_functions(text, names):
+    """Functions of a unit that use register pins or asm barriers, directly or
+    through a static helper that does (a unit-wide marker is attributed so)."""
+    from merge_unit import items
+    bodies = {}
+    for item in items(text):
+        m = re.match(r"(static\s+)?[A-Za-z_][\w \*]*?\b(\w+)\s*\([^;{]*\)\s*\{", item.lstrip(), re.S)
+        if m:
+            bodies[m.group(2)] = (bool(m.group(1)), item)
+    helpers = {n for n, (static, body) in bodies.items() if static and HINT.search(body)}
+    uses = re.compile(r"\b(" + "|".join(map(re.escape, helpers)) + r")\s*\(") if helpers else None
+    return [n for n in names if n in bodies and (HINT.search(bodies[n][1]) or
+                                               (uses and uses.search(bodies[n][1])))]
 
 
 def collect_pinned(funcs, source_root):
@@ -141,10 +157,13 @@ def collect_pinned(funcs, source_root):
         # A marker directly above a definition pins that function; any other
         # marker (e.g. at the top of a one-function file) pins the whole unit.
         scoped = re.findall(re.escape(MARK) + r"\n(?!static\b)[A-Za-z_][\w \*]*?\b(\w+)\s*\(", text)
-        if text.count(MARK) == len(scoped) and len(c_functions(path, with_asm=False)) > 1:
+        names = c_functions(path, with_asm=False)
+        if text.count(MARK) == len(scoped) and len(names) > 1:
             pinned.update(aliases.get(n, n) for n in scoped)
+        elif len(names) > 1:
+            pinned.update(aliases.get(n, n) for n in hinted_functions(text, names))
         else:
-            pinned.update(aliases.get(n, n) for n in c_functions(path, with_asm=False))
+            pinned.update(aliases.get(n, n) for n in names)
     return pinned
 
 
