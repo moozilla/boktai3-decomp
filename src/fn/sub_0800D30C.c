@@ -1,47 +1,9 @@
-#include "global.h"
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct Sprite {
-    u32 flags;
-    u8 pad4[12];
-    u16 frame;
-    u8 pad12[10];
-    struct Vec position;
-    u8 tail[8];
-};
-struct Object {
-    u16 id;
-    u8 type, entered, state, flags;
-    u16 timer, parameter;
-    u8 padA, effectActive, animated, remove, frameTimer, frame;
-    s16 health;
-    u16 speed, ground, pad16;
-    struct Vec position;
-    void *collider, *attack;
-    u8 resource[28];
-    struct Sprite sprite;
-    u8 anim[16];
-};
-struct Manager {
-    u8 task[24];
-    void *animation;
-};
-extern struct Manager *gUnk_0200046C;
-void Anim_SetSequence(void *, void *, u32, u32, u32);
-void Sound_PlaySong(u32);
-void Collider_SetPosition(void *, void *, u32);
-void Collider_Refresh(void *);
-struct PackedVec {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
-extern u32 gUnk_030053F4;
-void sub_0800CC34(void *);
+#include "falling_objects.h"
 void sub_08014634(u32, u32, void *, void *, void *, u32, u32);
 void sub_082260A4(u32);
-void FallingObject_UpdateShatter(struct Object *object)
+void FallingObject_UpdateShatter(struct FallingObject *object)
 {
-    struct PackedVec low, high;
+    struct FallingPackedVec low, high;
     if (object->entered) {
         object->entered = 0;
         sub_0800CC34(object);

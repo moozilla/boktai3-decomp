@@ -1,77 +1,17 @@
-#include "global.h"
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct Sprite {
-    u32 flags;
-    u8 pad4[3], priority;
-    u8 scaleX, scaleY;
-    u8 padA[6];
-    u16 frame;
-    u8 pad12[10];
-    struct Vec position;
-    u8 tail[8];
-};
-struct Anim {
-    const u16 *data;
-    u8 flags, count, factor, rate;
-    u16 frame, unused, scale, timer;
-};
-struct Object {
-    u16 id;
-    u8 type, entered, state, flags;
-    u16 timer, parameter;
-    u8 animationDone, effectActive, animated, remove, frameTimer, frame;
-    s16 health;
-    u16 speed, ground, pad16;
-    struct Vec position;
-    void *collider, *attack;
-    u8 resource[28];
-    struct Sprite sprite;
-    struct Anim anim;
-    u8 effect[108];
-    struct Object *previous, *next;
-};
-struct Manager {
-    u8 task[24];
-    void *animation;
-    struct Object *head;
-};
-extern struct Manager *gUnk_0200046C;
-struct PackedVec {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
+#include "falling_objects.h"
 struct Cell {
     u8 height, tile;
     u16 flags;
 };
-struct Map {
-    u32 pad;
-    u8 *cells;
-    u8 pad8[28];
-    u16 rows[1];
-};
-extern struct Map *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC;
 extern u16 gUnk_08604ABC[];
 void *sub_0800D828(u32, u32);
-void *Heap_Alloc(u32);
-void Memory_Clear(void *, u32);
 u8 *sub_0821D64C(s32, s32);
-void Collider_Init(void *, u32, u32, u32, u32, void *, void *);
-void Collider_SetCallback(void *, void *, void *);
-void Collider_Refresh(void *);
-void Collider_SetPosition(void *, void *, u32);
 void sub_0821FF58(void *, u32, u32, u32, u32, u32);
 void sub_0800CBAC(void);
 void sub_0800CBDC(void);
-s32 AnimData_Load(void *, u32);
-void Sprite_Init(void *, void *, u32);
-void AnimData_SelectTiles(void *, u32);
-void Anim_SetSequence(void *, void *, u32, u32, u32);
 void ScaledShadow_Initialize(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32);
 s32 sub_0800CBE0(void *, void *);
-static inline s32 cellIndex(struct Vec *pos)
+static inline s32 cellIndex(struct FallingVec *pos)
 {
     s32 x = pos->x >> 8, z = pos->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
@@ -86,12 +26,12 @@ static inline struct Cell *getCell(s32 index)
     return (struct Cell *)(gUnk_030052F4->cells + 12 + index * 4);
 }
 s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, u32 health,
-                         u32 power, u32 force, struct Vec *position)
+                         u32 power, u32 force, struct FallingVec *position)
 {
-    struct PackedVec size, offset;
-    struct Object *p;
+    struct FallingPackedVec size, offset;
+    struct FallingObject *p;
     s32 variant;
-    struct Vec *pos;
+    struct FallingVec *pos;
     void *resource;
     if (!gUnk_0200046C && !sub_0800D828(0xc0db, 0))
         return -1;
@@ -121,7 +61,7 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
     }
     p->speed = speed;
     {
-        struct Vec *groundPos = &p->position;
+        struct FallingVec *groundPos = &p->position;
         s32 x = p->position.x >> 8, z = groundPos->z >> 8, index;
         struct Cell *cell;
         u32 slope;
@@ -181,19 +121,19 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
         big = (u8)(p->flags & 4);
         if (big) {
             big = 0;
-            ((struct Vec *)&size)->x = 120;
-            ((struct Vec *)&size)->y = 160;
-            ((struct Vec *)&size)->z = 120;
-            ((struct Vec *)&offset)->x = big;
-            ((struct Vec *)&offset)->y = 80;
-            ((struct Vec *)&offset)->z = big;
+            ((struct FallingVec *)&size)->x = 120;
+            ((struct FallingVec *)&size)->y = 160;
+            ((struct FallingVec *)&size)->z = 120;
+            ((struct FallingVec *)&offset)->x = big;
+            ((struct FallingVec *)&offset)->y = 80;
+            ((struct FallingVec *)&offset)->z = big;
         } else {
-            ((struct Vec *)&size)->x = 60;
-            ((struct Vec *)&size)->y = 80;
-            ((struct Vec *)&size)->z = 60;
-            ((struct Vec *)&offset)->x = big;
-            ((struct Vec *)&offset)->y = 40;
-            ((struct Vec *)&offset)->z = big;
+            ((struct FallingVec *)&size)->x = 60;
+            ((struct FallingVec *)&size)->y = 80;
+            ((struct FallingVec *)&size)->z = 60;
+            ((struct FallingVec *)&offset)->x = big;
+            ((struct FallingVec *)&offset)->y = 40;
+            ((struct FallingVec *)&offset)->z = big;
         }
         attackFlags = 0;
         if (!p->type)
