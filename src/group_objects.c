@@ -343,7 +343,21 @@ void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
 #else
 INCLUDE_ASM("asm/nonmatching", sub_08010C10);
 #endif
-INCLUDE_ASM("asm/nonmatching", sub_08010D84);
+void sub_08010D84(struct GroupObjects *m, struct GroupPiece *p, int delay)
+{
+    struct GroupVec delta;
+    if (p->active)
+        p->active = 0;
+    polar(&delta, p->direction, p->duration * 2);
+    addPosition(&p->position, &delta);
+    sub_0800FA5C(m, p, 0);
+    if (p->timer >= delay + 2) {
+        p->state = 6;
+        p->active = 1;
+        p->timer = 0;
+    }
+    p->timer++;
+}
 INCLUDE_ASM("asm/nonmatching", sub_08010E44);
 
 int GroupObjects_Update(struct GroupObjects *m)
