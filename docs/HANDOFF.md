@@ -10,6 +10,29 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 continuation: complete wireless controller
+
+Coverage is **20.704%**, up **0.298 percentage points** from 20.406%.
+**52 additional exact functions** bring the total to **5,678 / 11,109**;
+reported spans are **500,074 / 2,415,354 bytes** (+7,188). No pinning:
+**16.137%**; Register-pinned: **4.567%**, included above. Across this
+continuation the gain is **0.703 points**, 119 new functions.
+
+All named inventory functions in **08034084–08036CA4** now match. This is
+one cohesive wireless controller: creation/configuration, parent selection,
+peer handshake, UNI/NI packet handling, event callbacks, per-frame session
+updates, input publication and public API. Unnamed assembly tails remain
+preserved. The existing wireless objdiff group and 52 descriptive names cover
+this batch. See [wireless notes](../notes/wireless-controller_2026-10-12.md).
+
+Combined ROM validation printed **`build/boktai3.gba: OK`**.
+
+Continue solo toward **25% matching**, with **5% weekly allowance remaining**
+as the latest explicit stopping floor. No new tooling. The following charset
+utility run is already mostly matched; select the next contiguous game unit
+beyond it. A source-level range switch preserves strict comparisons in the
+wireless dispatchers; ordinary C comparisons folded the boundary by one.
+
 ## October 12 continuation: windows, transitions and wireless
 
 Coverage is **20.406%**, up **0.176 percentage points** from 20.230%.
