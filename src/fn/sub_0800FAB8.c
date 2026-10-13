@@ -1,43 +1,15 @@
-#include "global.h"
+#include "group_objects.h"
 // MATCHING_CONCESSION: register-pinning
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct Obj {
-    u32 flags;
-    u8 pad[12];
-    u16 frame;
-    u8 pad12[10];
-    struct Vec position;
-};
-struct Anim {
-    const u16 *data;
-    u8 flags, count, factor, rate;
-    u16 frame, unused, scale, timer;
-};
-struct Piece {
-    u8 active, state, done, angle;
-    u16 timer;
-    s8 direction;
-    u8 pad7[3];
-    u16 targetY;
-    u8 padc[4];
-    struct Vec position;
-    u8 pad18[24];
-    struct Anim anim;
-    struct Obj sprite;
-};
-extern s16 gUnk_086149C4[];
 static inline u32 frame_factor(u16 v)
 {
     register u32 value asm("r1") = v;
     u32 mask = 15;
     return mask & value;
 }
-void BoardPiece_UpdateAnimation(struct Piece *p)
+void BoardPiece_UpdateAnimation(struct GroupPiece *p)
 {
-    struct Obj *o = &p->sprite;
-    struct Anim *a;
+    struct GroupSprite *o = &p->sprite;
+    struct GroupAnim *a;
     const u16 *entry;
     register u16 n asm("r0");
     int done;

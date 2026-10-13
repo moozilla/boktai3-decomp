@@ -1,10 +1,7 @@
-#include "global.h"
+#include "group_objects.h"
 
-void sub_08013684(void *);
-void Sprite_Remove(void *);
-
-u32 sub_0800FA40(u32 a, u8 *b)
+u32 sub_0800FA40(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
-    sub_08013684(b + 0x88);
-    Sprite_Remove(b + 0x40);
+    sub_08013684(p->transform);
+    Sprite_Remove(&p->sprite);
 }
