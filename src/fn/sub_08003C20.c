@@ -1,79 +1,34 @@
 #include "global.h"
+#include "terrain_overlay.h"
 /* Tentative: draws terrain-edge overlays around tracked actors. */
-struct Drawable {
-    u32 flags;
-    u8 active;
-    u8 pad5[11];
-    u16 tile;
-    u8 pad12[6];
-    u32 drawFlags;
-    s16 x, y, z;
-    u8 tail[10];
-};
-struct ActorFlags {
-    u32 unused[2], flags;
-};
-struct Actor {
-    u32 unused, flags;
-    u8 pad8[4];
-    s16 x, y, z;
-    u8 pad12[26];
-    u32 *state;
-    struct ActorFlags *parent;
-};
-struct Entry {
-    u16 used, id;
-    struct Actor *actor;
-};
-struct Manager {
-    u8 task[0x18];
-    u16 id, resource;
-    s32 initialized, actorCount, drawableCount;
-    u32 count;
-    u16 commands[16][2];
-    u8 model[28];
-    struct Drawable *drawables;
-    u32 *keys;
-    struct Entry entries[1];
-};
-struct Cell {
-    u8 height, tile;
-    u16 flags;
-};
-struct Map {
-    u32 unknown;
-    u8 *cells;
-    u8 pad8[28];
-    u16 rows[1];
-};
-extern struct Map *gUnk_030052F4;
+extern struct TerrainOverlayMap *gUnk_030052F4;
 u8 *sub_0821D64C(s32, s32);
-void sub_08214374(struct Drawable *, s32);
-void sub_08003B44(struct Manager *, u16);
-void sub_08003B84(struct Manager *, u16);
-static inline struct Cell *baseCell(s32 index)
+void sub_08214374(struct TerrainOverlayDrawable *, s32);
+void sub_08003B44(struct TerrainOverlay *, u16);
+void sub_08003B84(struct TerrainOverlay *, u16);
+static inline struct TerrainOverlayCell *baseCell(s32 index)
 {
-    struct Cell *cell;
+    struct TerrainOverlayCell *cell;
     if (!gUnk_030052F4->cells)
         return 0;
-    cell = (struct Cell *)(gUnk_030052F4->cells + 12 + index * 4);
+    cell = (struct TerrainOverlayCell *)(gUnk_030052F4->cells + 12 + index * 4);
     return cell;
 }
 static inline u16 rowOffset(s32 row)
 {
     return gUnk_030052F4->rows[row];
 }
-s32 TerrainOverlay_Update(struct Manager *p)
+s32 TerrainOverlay_Update(struct TerrainOverlay *p)
 {
     s32 heights[4], tiles[4], xs[3], zs[3], indices[3];
     s32 i, j, used;
-    struct Drawable *out;
-    struct Entry *entry;
+    struct TerrainOverlayDrawable *out;
+    struct TerrainOverlayEntry *entry;
     if (!p->initialized) {
         p->initialized = 1;
         for (i = 0; i < p->drawableCount; i++) {
-            struct Drawable *base = p->drawables;
-            struct Drawable *d = (struct Drawable *)(sizeof(*base) * i + (u32)base);
+            struct TerrainOverlayDrawable *base = p->drawables;
+            struct TerrainOverlayDrawable *d = (struct TerrainOverlayDrawable *)(sizeof(*base) * i + (u32)base);
             if (!d->active)
                 sub_08214374(d, 0);
         }
@@ -93,7 +48,7 @@ s32 TerrainOverlay_Update(struct Manager *p)
     out = p->drawables;
     entry = p->entries;
     for (j = 0; j < p->actorCount; j++, entry++) {
-        struct Actor *actor = entry->actor;
+        struct TerrainOverlayActor *actor = entry->actor;
         s32 quadrant, yFixed, y, x, z;
         if (!entry->used)
             continue;
@@ -150,15 +105,15 @@ s32 TerrainOverlay_Update(struct Manager *p)
             }
         }
         for (i = 0; i < 3; i++) {
-            struct Cell *cell;
+            struct TerrainOverlayCell *cell;
             u8 *dynamic;
             s32 index = rowOffset(zs[i]) + xs[i];
             indices[i] = index;
             dynamic = sub_0821D64C(index, 1);
             if (dynamic)
-                cell = (struct Cell *)(dynamic + 4);
+                cell = (struct TerrainOverlayCell *)(dynamic + 4);
             else
-                cell = (struct Cell *)(gUnk_030052F4->cells + 12 + index * 4);
+                cell = (struct TerrainOverlayCell *)(gUnk_030052F4->cells + 12 + index * 4);
             if (!cell || (cell->flags & 16)) {
                 heights[i + 1] = 0;
                 tiles[i + 1] = 255;
@@ -170,7 +125,7 @@ s32 TerrainOverlay_Update(struct Manager *p)
                 if (delta < 0)
                     delta = -delta;
                 if (delta > 1) {
-                    struct Cell *base = baseCell(indices[i]);
+                    struct TerrainOverlayCell *base = baseCell(indices[i]);
                     if (!base || (base->flags & 16))
                         tiles[i + 1] = 255;
                     else if ((base->height & 15) <= heights[0])

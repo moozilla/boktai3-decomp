@@ -1,23 +1,17 @@
 #include "global.h"
-struct S {
-    u8 f[0x20];
-    u32 a;
-    u32 b;
-    u8 g[0x88 - 0x28];
-    u8 *p[2];
-};
+#include "terrain_overlay.h"
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void *sub_08219FBC(u32, u32);
 void sub_0821A04C(void *, void (*)(void), void (*)(void));
-s32 TerrainOverlay_Initialize(void *, u32, u32);
+s32 TerrainOverlay_Initialize(struct TerrainOverlay *, u32, u32);
 void sub_0821A0C0(void *);
 void TerrainOverlay_Update(void);
 void TerrainOverlay_DestroyDrawables(void);
 
 void *sub_080040F8(u16 x, u16 y)
 {
-    struct S *s;
+    struct TerrainOverlay *s;
     s32 n;
     s32 a;
     s32 b;
@@ -30,10 +24,10 @@ void *sub_080040F8(u16 x, u16 y)
     s = sub_08219FBC(9, a + b + n * 12);
     if (s != 0) {
         sub_0821A04C(s, TerrainOverlay_Update, TerrainOverlay_DestroyDrawables);
-        s->p[0] = (u8 *)s + b;
-        s->p[1] = s->p[0] + a;
-        s->a = n;
-        s->b = n * 3;
+        s->drawables = (struct TerrainOverlayDrawable *)((u8 *)s + b);
+        s->keys = (u32 *)((u8 *)s->drawables + a);
+        s->actorCount = n;
+        s->drawableCount = n * 3;
         if (TerrainOverlay_Initialize(s, x, y) < 0) {
             sub_0821A0C0(s);
             return 0;

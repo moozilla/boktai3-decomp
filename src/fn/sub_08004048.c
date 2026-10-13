@@ -1,30 +1,16 @@
 #include "global.h"
+#include "terrain_overlay.h"
 // MATCHING_CONCESSION: register-pinning
-struct Drawable {
-    u32 flags;
-    u8 active;
-    u8 pad[0x13];
-    u32 drawFlags;
-    u8 tail[0x10];
-};
-struct Manager {
-    u8 task[0x18];
-    u16 id, resource;
-    s32 initialized, actorCount, drawableCount;
-    u32 count;
-    u8 commands[64], model[28];
-    struct Drawable *drawables;
-};
 extern const u8 gUnk_0824DAFC[];
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 s32 sub_08219BD8(const u8 *);
 s32 sub_082151E4(void *, s32);
-void sub_082144E4(struct Drawable *, void *, s32);
+void sub_082144E4(struct TerrainOverlayDrawable *, void *, s32);
 void sub_08217060(s32, s32, s32);
 void sub_08217074(s32, s32);
 void sub_0821A284(u16, void *, s32);
-s32 TerrainOverlay_Initialize(struct Manager *p, u32 id, u32 resource)
+s32 TerrainOverlay_Initialize(struct TerrainOverlay *p, u32 id, u32 resource)
 {
     u8 *model;
     u8 *loadedModel;
@@ -52,11 +38,11 @@ s32 TerrainOverlay_Initialize(struct Manager *p, u32 id, u32 resource)
     }
     i = 0;
     if (i < p->drawableCount) {
-        register struct Drawable **drawables asm("r8") = &p->drawables;
+        register struct TerrainOverlayDrawable **drawables asm("r8") = &p->drawables;
         do {
-            register u32 offset asm("r0") = sizeof(struct Drawable) * i;
-            struct Drawable *d;
-            d = (struct Drawable *)((u32)*drawables + offset);
+            register u32 offset asm("r0") = sizeof(struct TerrainOverlayDrawable) * i;
+            struct TerrainOverlayDrawable *d;
+            d = (struct TerrainOverlayDrawable *)((u32)*drawables + offset);
             sub_082144E4(d, loadedModel, 1);
             d->drawFlags |= 0x400;
             i++;
