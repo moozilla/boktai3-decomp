@@ -233,5 +233,7 @@ Mark affected translation units `// MATCHING_CONCESSION: register-pinning`;
 count exact bytes normally and report them in the Register-pinned category.
 Retain readable C, fast exact checks, and batch validation; defer removing the
 hints. This does not authorize handwritten instruction bodies.
+Format C with `make format` (clang-format, pinned in requirements.txt) before
+committing; formatting never changes agbcc output.
 Before committing a hinted file, run `tools/depin.py FILE --write`: it
 removes every pin/barrier the match does not actually need.
