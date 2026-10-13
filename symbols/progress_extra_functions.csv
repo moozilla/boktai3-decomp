@@ -7,6 +7,7 @@ address,evidence
 08003494,Independent 18-byte script-value wrapper calling 0800347C; exact C in src/palette_controller.c
 08005E10,Independent 12-byte global-pointer clearing function after palette-switch script return and literal pool
 08006CD0,Independent 116-byte menu constructor after initializer return and literal pool; exact standalone C
+08008C18,Empty 4-byte bx lr function between 08008BD0 and 08008C1C (gbadisasm left it as data); exact C in src/pooled_interactable.c
 08009E30,Independent 12-byte global-pointer clear after directional script return and literal pool
 0800A800,Independent 12-byte effect manager global-pointer clear following collision controller teardown
 0800CBA0,Independent 12-byte global manager reset after allocator return and pool
