@@ -1,6 +1,5 @@
 #include "palette_controller.h"
 // MATCHING_CONCESSION: register-pinning
-extern struct PaletteController *gUnk_02000468;
 s32 sub_0821ABA8(s32, s32);
 s32 Script_SeekToKeyword(s32);
 s32 sub_08002C70(void);
@@ -19,7 +18,7 @@ void Palette_SetBrightnessFromScript(void)
         u32 immediate = ((0u - query) | query) >> 31;
         s32 callback = sub_0821ABA8('p', 0);
         u32 mode;
-        *(s32 *)((u8 *)p + 0x258) = 0;
+        p->transition.callback = 0;
         if (!(p->flags & 16)) {
             p->flags |= 16;
             if (t->mode == 0) {
@@ -61,6 +60,6 @@ void Palette_SetBrightnessFromScript(void)
     setMode:
         t->mode = mode;
     waiting:
-        *(s32 *)((u8 *)t + 0x20C) = callback;
+        t->callback = callback;
     }
 }

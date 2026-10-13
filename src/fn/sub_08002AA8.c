@@ -1,6 +1,6 @@
-#include "global.h"
+#include "palette_controller.h"
 
-void sub_08002AA8(u8 *p, u32 x)
+void sub_08002AA8(struct PaletteController *p, u32 x)
 {
-    p[0x1d] |= x;
+    p->pending |= x;
 }

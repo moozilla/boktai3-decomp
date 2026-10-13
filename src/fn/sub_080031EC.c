@@ -1,6 +1,5 @@
 #include "palette_controller.h"
 // MATCHING_CONCESSION: register-pinning
-extern struct PaletteController *gUnk_02000468;
 extern u16 gUnk_03004FC0[];
 extern s32 gUnk_03004DA0, gUnk_03004DA8;
 extern u16 gUnk_03005214, gUnk_030051C4;
@@ -25,7 +24,7 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
     struct PaletteWave *w = &p->wave;
     gUnk_02000468 = p;
     p->pending = 0;
-    *(u32 *)((u8 *)p + 0x258) = 0;
+    t->callback = 0;
     p->hardware = gUnk_03004FC0;
     gUnk_03004DA0 = 64;
     gUnk_03004DA8 = 64;
@@ -34,7 +33,7 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
     p->flags = sub_0821ABA8('f', 0);
     if (Script_SeekToKeyword('p')) {
         register s32 i asm("r6") = 0;
-        u16 **out = p->source;
+        u16 **out = p->colorSets[PALETTE_SET_SOURCE];
         while (Script_GetPc() && i <= 3) {
             s32 value = Script_GetValue();
             if (value != 0x30)
@@ -47,7 +46,7 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
     }
     if (Script_SeekToKeyword('d')) {
         s32 i = 0;
-        u16 **out = p->destination;
+        u16 **out = p->colorSets[PALETTE_SET_DESTINATION];
         while (Script_GetPc() && i <= 3) {
             s32 value = Script_GetValue();
             if (value != 0x30)
@@ -64,7 +63,7 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
         sub_0800301C(p);
     p->blend = 0;
     p->selected = sub_0821ABA8('c', 0);
-    p->current = p->source[p->selected];
+    p->current = p->colorSets[PALETTE_SET_SOURCE][p->selected];
     sub_08002F2C(p);
     if (p->flags & 2) {
         p->flags |= 8;

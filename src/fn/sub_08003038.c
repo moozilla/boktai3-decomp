@@ -1,18 +1,17 @@
-#include "global.h"
+#include "palette_controller.h"
 
-void sub_08002C38(u8 *a, u8 *b);
+void sub_08002C38(struct PaletteController *, struct PaletteTransition *);
 
-void sub_08003038(u8 *p)
+void sub_08003038(struct PaletteController *p)
 {
     s32 i = 3;
-    u32 v = (u32)p + 0x88C;
-    u32 *t = (u32 *)(p + 0x288);
-    u32 step = -0x200;
+    u16 *v = p->palettes[3];
+    u16 **t = &p->colorSets[PALETTE_SET_VARIANT][3];
     do {
         *t = v;
-        v += step;
+        v -= 256;
         t--;
         i--;
     } while (i >= 0);
-    sub_08002C38(p, p + 0x4C);
+    sub_08002C38(p, &p->transition);
 }

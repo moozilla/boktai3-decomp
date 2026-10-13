@@ -1,8 +1,6 @@
-#include "global.h"
+#include "palette_controller.h"
 
-u32 sub_08002AC0(u8 *p, u32 a, u32 b)
+u16 *sub_08002AC0(struct PaletteController *p, u32 set, u32 slot)
 {
-    u32 off = (b << 2) + (a << 4);
-    u8 *q = p + 0x25C;
-    return *(u32 *)(q + off);
+    return p->colorSets[set][slot];
 }
