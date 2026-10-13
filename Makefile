@@ -2,6 +2,7 @@
 #   make setup     fetch/build pinned tools (gbadisasm, agbcc, armips, mGBA harness)
 #   make disasm    regenerate gen/code.s from baserom.gba + symbols/
 #   make           assemble build/boktai3.gba and verify it matches the base ROM
+#   make format    clang-format our C (make format-check: fail if unformatted)
 AS      := arm-none-eabi-as
 LD      := arm-none-eabi-ld
 OBJCOPY := arm-none-eabi-objcopy
@@ -11,7 +12,7 @@ PY      := python3
 ROM     := build/boktai3.gba
 SHA1    := 2651c5e6875ac60abff734510d152166d211c87c
 
-.PHONY: all compare setup disasm clean shifttest
+.PHONY: all compare setup disasm clean shifttest format format-check
 # Default: split asm around src/*.c, compile with agbcc, link, verify SHA-1
 all: gen/code_sym.s gen/data.s
 	$(PY) tools/build.py
@@ -55,3 +56,11 @@ shifttest: gen/code_sym.s gen/data.s
 	tools/shift_test.sh tests/newgame_intro.txt $(or $(SHIFT),0x10000)
 	BOKTAI3_SAV=$(SAVE) tools/shift_test.sh tests/save_boot.txt $(or $(SHIFT),0x10000)
 	BOKTAI3_SAV=$(SAVE) tools/shift_test.sh tests/save_menus_field.txt $(or $(SHIFT),0x10000)
+
+# Our C sources (pret/SDK-derived src/lib, include/gba, rfu_compat.h keep upstream layout).
+CLANG_FORMAT := $(or $(wildcard build/venv/bin/clang-format),clang-format)
+FORMAT_SRCS = $(filter-out src/lib/% include/gba/% include/rfu_compat.h,$(wildcard src/*.c src/*/*.c include/*.h include/*/*.h))
+format:
+	@$(CLANG_FORMAT) -i $(FORMAT_SRCS)
+format-check:
+	@$(CLANG_FORMAT) --dry-run --Werror $(FORMAT_SRCS)

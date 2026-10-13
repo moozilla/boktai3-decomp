@@ -29,7 +29,7 @@ committed, and neither is anything generated from it (`build/`, `extracted/`).
    you have the export (`tools/ghidra/README.md`), is a starting draft only.
 2. Write C in the unit's file. Unfinished neighbours stay as
    `INCLUDE_ASM("asm/nonmatching", sub_XXXXXXXX);` so the unit stays contiguous.
-3. `make`. On a mismatch it prints the first differing address. Compare with
+3. `make format`, then `make`. On a mismatch it prints the first differing address. Compare with
    `arm-none-eabi-objdump -d build/src/<unit>.o` against `tools/asmat.py`.
 4. Compiler facts: `agbcc -O2 -mthumb-interwork` (pret's agbcc). Leaf
    functions push `lr`, which agbcc does and old_agbcc doesn't. Typical agbcc
