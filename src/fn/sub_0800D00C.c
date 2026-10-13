@@ -1,16 +1,9 @@
-#include "global.h"
-struct Vec {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
-s32 Script_GetKeywordValue(u32, s32);
-s32 Script_SeekToKeyword(u32);
-s32 Script_GetValue(void);
-s32 FallingObject_Create(u32, s32, s32, s32, s32, s32, s32, s32, struct Vec *);
+#include "falling_objects.h"
 s32 FallingObject_CreateFromScript(void)
 {
-    struct Vec position;
-    u32 id;
-    s32 type, flags, parameter, speed, health, power, force;
+    struct FallingPackedVec position;
+    u16 id;
+    s32 type; u32 flags, parameter, speed, health, power, force;
     id = (u16)Script_GetKeywordValue(110, 0);
     type = Script_GetKeywordValue(116, 0);
     flags = Script_GetKeywordValue(102, 0);
@@ -28,5 +21,5 @@ s32 FallingObject_CreateFromScript(void)
         position.y = 0;
         position.z = 0;
     }
-    return FallingObject_Create(id, type, flags, parameter, speed, health, power, force, &position);
+    return FallingObject_Create(id, type, flags, parameter, speed, health, power, force, (struct FallingVec *)&position);
 }

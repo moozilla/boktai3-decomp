@@ -1,30 +1,17 @@
-#include "global.h"
+#include "falling_objects.h"
 
-struct A {
-    u8 f[0x38];
-    u32 fl;
-    u8 g[2];
-    u16 d;
-};
-struct B {
-    u8 f[2];
-    u8 t;
-    u8 g[0xd];
-    s16 v;
-};
-
-void sub_0800CBAC(struct A *a, u32 unused, struct B *b)
+void sub_0800CBAC(struct FallingHit *a, u32 unused, struct FallingObject *b)
 {
-    struct B *c = b;
-    if (c->t == 0) {
-        u32 fl = a->fl;
+    struct FallingObject *c = b;
+    if (c->type == 0) {
+        u32 fl = a->flags;
         u32 d;
-        d = a->d;
+        d = a->damage;
         if (fl & 8) {
             d <<= 1;
-            b->v -= d;
+            b->health -= d;
         }
-        if (c->v < 0)
-            c->v = 0;
+        if (c->health < 0)
+            c->health = 0;
     }
 }

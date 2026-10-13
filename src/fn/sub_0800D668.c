@@ -1,54 +1,10 @@
-#include "global.h"
+#include "falling_objects.h"
 // MATCHING_CONCESSION: register-pinning
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct Sprite {
-    u32 flags;
-    u8 pad4[12];
-    u16 frame;
-    u8 pad12[10];
-    struct Vec position;
-    u8 tail[8];
-};
-struct Anim {
-    const u16 *data;
-    u8 flags, count, factor, rate;
-    u16 frame, unused, scale, timer;
-};
-struct Object {
-    u16 id;
-    u8 type, entered, state, flags;
-    u16 timer, parameter;
-    u8 animationDone, effectActive, animated, remove, frameTimer, frame;
-    s16 health;
-    u16 speed, ground, pad16;
-    struct Vec position;
-    void *collider, *attack;
-    u8 resource[28];
-    struct Sprite sprite;
-    struct Anim anim;
-    u8 effect[108];
-    struct Object *previous, *next;
-};
-struct Manager {
-    u8 task[24];
-    void *animation;
-    struct Object *head;
-};
-extern struct Manager *gUnk_0200046C;
-void Anim_SetSequence(void *, void *, u32, u32, u32);
-void Sound_PlaySong(u32);
-void Collider_SetPosition(void *, void *, u32);
-void Collider_Refresh(void *);
-void sub_0800CC50(void *);
-typedef void (*Callback)(struct Object *);
-extern Callback gUnk_08604ACC[][4];
-s32 FallingObjectManager_Update(struct Manager *manager)
+s32 FallingObjectManager_Update(struct FallingObjectManager *manager)
 {
-    struct Object *p = manager->head, *next;
-    struct Sprite *o;
-    struct Anim *a;
+    struct FallingObject *p = manager->head, *next;
+    struct FallingSprite *o;
+    struct FallingAnim *a;
     const u16 *entry;
     register u16 n asm("r0");
     u8 done;
