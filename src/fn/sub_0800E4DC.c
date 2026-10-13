@@ -6,7 +6,6 @@ extern struct Background {
 } gUnk_03004C30;
 s16 *sub_0800E3E0(int, int, int);
 int Div(int, int);
-#define NumericDisplay_DrawStatusValues sub_0800E4DC
 int sub_08228D88(void);
 int sub_08228D94(void);
 void NumericDisplay_DrawStatusValues(void)

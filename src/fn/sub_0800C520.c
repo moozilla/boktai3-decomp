@@ -49,7 +49,6 @@ static inline void setFrame(struct Sprite *sprite, u16 frame)
 {
     sprite->frame = frame;
 }
-#define EffectEmitter_Update sub_0800C520
 s32 EffectEmitter_Update(struct Object *object)
 {
     s32 visible = isVisible(object->scene);

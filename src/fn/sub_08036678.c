@@ -30,10 +30,8 @@ struct Engine {
 extern struct Engine *gUnk_02000484;
 extern u8 gUnk_020000EC;
 void sub_08219DD8(void *, int);
-#define gRfuLinkStatus     gUnk_03006A80
-#define gRfuSlotStatusNI   gUnk_03006A70
-#define rfu_NI_setSendData sub_08246CC8
-#define rfu_clearSlot      sub_08246AAC
+#define gRfuLinkStatus   gUnk_03006A80
+#define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
@@ -43,9 +41,6 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->pending = 1;
 }
 void sub_08223BC0(int);
-void sub_08246644(void);
-void sub_082456E0(void);
-void sub_0824722C(int);
 void sub_0803441C(struct Engine *);
 void sub_0803451C(struct Engine *);
 int sub_0824923C(void *, void *);
@@ -54,9 +49,6 @@ void sub_080341B8(struct Engine *);
 void sub_080341E0(struct Engine *);
 void sub_0803559C(struct Engine *);
 void sub_08223580(int);
-void sub_0824555C(void);
-void sub_0824714C(int, void *, int);
-void sub_08246968(void);
 extern u32 gUnk_03005250;
 extern u16 gUnk_03005274[];
 // MATCHING_CONCESSION: register-pinning
@@ -108,7 +100,7 @@ int sub_08036678(struct Engine *p)
         *ready = zero;
         sub_08223BC0(zero);
     }
-    sub_08246968();
+    rfu_getMasterSlave();
     sub_080341B8(p);
     sub_080341E0(p);
     {

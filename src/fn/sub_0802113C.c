@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneCommands_BlendPalette sub_0802113C
 extern int gUnk_030051C8;
 void sub_08003AA8(int, int, void *);
 void SceneCommands_BlendPalette(void *p, void *unused, u8 *message)

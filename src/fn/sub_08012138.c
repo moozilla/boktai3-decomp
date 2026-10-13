@@ -20,7 +20,6 @@ struct Hazard {
 extern u8 *gUnk_02000710;
 struct Vec *sub_0815F53C(int);
 void sub_0801204C(void *, void *, int);
-#define AnimatedHazard_WaitForPlayer sub_08012138
 void AnimatedHazard_WaitForPlayer(void *m, struct Hazard *p)
 {
     if (*(s16 *)(gUnk_02000710 + 0x876) > 0)

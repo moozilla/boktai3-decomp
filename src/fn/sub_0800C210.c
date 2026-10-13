@@ -73,7 +73,6 @@ static inline u32 randomValue(s32 reverse)
     }
     return *(u16 *)(offset + (u32)gUnk_0203B400);
 }
-#define EffectParticle_UpdateDissipating sub_0800C210
 void EffectParticle_UpdateDissipating(struct Manager *manager, struct Effect *effect, s32 index,
                                       s32 phase)
 {

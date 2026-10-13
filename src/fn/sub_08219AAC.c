@@ -15,7 +15,7 @@ void sub_0821A2E4(void);
 s32 sub_08219A94(void);
 void sub_0821A04C(struct Task *, s32 (*)(void), void (*)(void));
 void sub_08219F74(struct Task *);
-void sub_08219AAC(void)
+void TaskSystem_Initialize(void)
 {
     struct Task *task;
     sub_08219C20();

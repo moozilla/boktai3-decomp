@@ -1,5 +1,4 @@
 #include "global.h"
-#define GameState_SelectRamBase sub_0821B084
 // Provisional name: GameState_SelectRamBase
 // MATCHING_CONCESSION: register-pinning
 /* Select timer-jittered storage for the game-state regions. */

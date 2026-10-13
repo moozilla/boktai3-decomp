@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneObject_UpdateRaised sub_0801F580
 void sub_082260A4(int);
 void sub_0821AD08(int, int);
 void SceneObject_UpdateRaised(u8 *s)

@@ -1,12 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneMessages_Update sub_08020B8C
 void *sub_08224EBC(int, int, int);
-void sub_080209D0(void *, void *);
+void SceneMessages_Enqueue(void *, void *);
 void sub_0821AD08(int, int);
 void sub_08020D68(void *, int);
-void sub_08020A14(void *);
-void sub_08020AF0(void *);
+void SceneMessages_SwapBuffers(void *);
+void SceneMessages_Dispatch(void *);
 int SceneMessages_Update(u8 *p)
 {
     int dispatch = 0;
@@ -28,7 +27,7 @@ int SceneMessages_Update(u8 *p)
             *(u16 *)(p + 0x1c) = 0;
             while ((message =
                         sub_08224EBC(*(s16 *)(p + 0x18), *(s16 *)(p + 0x1a), *(u16 *)(p + 0x1c)))) {
-                sub_080209D0(p, message);
+                SceneMessages_Enqueue(p, message);
                 (*(u16 *)(p + 0x1c))++;
             }
             if (!*(u16 *)(p + 0x1c)) {
@@ -44,8 +43,8 @@ int SceneMessages_Update(u8 *p)
                 sub_08020D68(p + 0x78, 1);
         }
     }
-    sub_08020A14(p);
+    SceneMessages_SwapBuffers(p);
     if (dispatch)
-        sub_08020AF0(p);
+        SceneMessages_Dispatch(p);
     return 0;
 }

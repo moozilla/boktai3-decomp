@@ -1,5 +1,4 @@
 #include "global.h"
-#define SelectionMenu_AnimateChoice sub_0801AF54
 typedef struct {
     u32 pad[2], flags;
     u8 gap[20];
@@ -14,7 +13,7 @@ int sub_08019F2C(void *);
 void sub_082199C8(void *, void *, int);
 void *sub_08019E58(int);
 void sub_082216F8(void *, void *, void *, u32, int);
-void sub_0801A9B4(void *);
+void SelectionMenu_AdvanceChoice(void *);
 void SelectionMenu_AnimateChoice(u8 *p)
 {
     Graphic *source = (Graphic *)(p + 0x674 + p[0x1d] * 0x60);
@@ -38,7 +37,7 @@ void SelectionMenu_AnimateChoice(u8 *p)
     }
     sub_082216F8(dest->position, source->position, p + 0x38, *(u32 *)(p + 0x28), 3);
     if (*(u32 *)(p + 0x28) > 7)
-        sub_0801A9B4(p);
+        SelectionMenu_AdvanceChoice(p);
     else
         (*(u32 *)(p + 0x28))++;
 }

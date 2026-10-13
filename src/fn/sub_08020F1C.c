@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneMessages_ConsumeSignal sub_08020F1C
 extern u8 *gUnk_0200047C;
 void sub_08020D28(void);
 int SceneMessages_ConsumeSignal(void)

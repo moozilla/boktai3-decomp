@@ -1,5 +1,4 @@
 #include "global.h"
-#define SpritePool_Activate sub_08019DC0
 extern u8 *gUnk_020000B0;
 void sub_08214374(u8 *, int);
 u32 SpritePool_Activate(u8 *p, u32 callback, u32 context)

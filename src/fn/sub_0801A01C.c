@@ -2,7 +2,6 @@
 typedef struct {
     u32 pad[2], flags;
 } Graphic;
-#define Presentation_UpdateItemGraphic sub_0801A01C
 extern u8 gUnk_08E60F80[][16];
 int sub_0822E104(u32);
 void sub_08019FD8(void *, u32);

@@ -1,5 +1,4 @@
 #include "global.h"
-#define ResultTutorial_BlinkTarget sub_0801D2E4
 void sub_0822B2F8(int);
 void sub_0801C17C(void *);
 void sub_0801C190(void *);

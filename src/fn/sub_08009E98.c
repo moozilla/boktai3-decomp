@@ -20,7 +20,6 @@ void sub_08009E5C(void);
 void sub_08217DE0(void *, void *, u32);
 void sub_08217EEC(void *, void *, u32);
 void sub_08217EC4(void *, s32, s32);
-#define CollisionController_InitSlot sub_08009E98
 s32 CollisionController_InitSlot(struct Manager *manager, struct Slot *slot)
 {
     struct Vec scale, offset;

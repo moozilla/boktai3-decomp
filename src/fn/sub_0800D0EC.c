@@ -36,7 +36,6 @@ static inline void setFrame(struct Sprite *sprite, u16 frame)
 {
     sprite->frame = frame;
 }
-#define FallingObject_UpdateFalling sub_0800D0EC
 void FallingObject_UpdateFalling(struct Object *object)
 {
     if (object->entered) {

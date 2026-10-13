@@ -9,7 +9,6 @@ struct Actor {
     u8 pad1A[10];
     struct Object *object;
 };
-#define Actor_CanInteractWithController sub_080096A0
 s32 Actor_CanInteractWithController(struct Actor *actor)
 {
     struct Object *object = actor->object;

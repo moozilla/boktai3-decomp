@@ -1,5 +1,4 @@
 #include "global.h"
-#define SelectionMenu_Hide sub_0801B1E8
 typedef struct {
     u32 pad[2], flags;
     u8 tail[84];

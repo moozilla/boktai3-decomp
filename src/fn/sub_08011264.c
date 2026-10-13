@@ -13,7 +13,6 @@ void sub_08033924(int, int);
 void sub_080337FC(int);
 void *sub_0821A520(int, int);
 extern u16 gUnk_030051A0[];
-#define MessageMenu_CreateTextWindows sub_08011264
 int MessageMenu_CreateTextWindows(struct Menu *m)
 {
     int *handle = &m->mainText;

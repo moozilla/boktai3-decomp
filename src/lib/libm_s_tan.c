@@ -6,7 +6,6 @@
 /* Adapted from newlib 1.8.2 s_tan.c; see docs/LIBM.md. */
 // COMPILER: old_agbcc
 // CFLAGS: -O2 -fno-builtin
-#define tan sub_0824B1EC
 #include "libm_compat.h"
 
  double tan(double x)

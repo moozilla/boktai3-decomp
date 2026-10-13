@@ -53,7 +53,6 @@ static inline u32 randomDelay(u32 restart)
         return value;
     }
 }
-#define CollisionController_UpdateIdleAnimation sub_08009F70
 void CollisionController_UpdateIdleAnimation(struct Manager *manager, struct Slot *p)
 {
     struct Sprite *o;

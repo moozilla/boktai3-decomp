@@ -1,8 +1,7 @@
 #include "global.h"
-#define ResultTutorial_DemonstrateEarlyPress sub_0801D7D4
 extern int gUnk_0824DB94[];
 extern u8 gUnk_0824DB2D[];
-void sub_0801D798(void *, int);
+void ResultTutorial_Press(void *, int);
 #define I(o) (*(int *)(p + (o)))
 int ResultTutorial_DemonstrateEarlyPress(u8 *p)
 {
@@ -27,7 +26,7 @@ int ResultTutorial_DemonstrateEarlyPress(u8 *p)
             I(0x8c) -= gUnk_0824DB94[4];
             width = gUnk_0824DB2D[p[0xae]] << 5;
             if (I(0x8c) - I(0x9c) < width + 512)
-                sub_0801D798(p, 1);
+                ResultTutorial_Press(p, 1);
             if (I(0x8c) <= 0) {
                 I(0x8c) = 0;
                 return 1;

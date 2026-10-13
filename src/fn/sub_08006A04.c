@@ -26,10 +26,9 @@ struct Menu {
     u8 pad170[20];
     s16 rightX, rightY;
 };
-#define ChoiceMenu_LayoutText sub_08006A04
 u32 Script_ParseStringRef(void *);
 u8 *Text_LookupString(u32);
-u8 *sub_08006770(struct Menu *, u8 *);
+u8 *ChoiceMenu_ParseTag(struct Menu *, u8 *);
 u16 sub_08032070(u8 *);
 void ChoiceMenu_LayoutText(struct Menu *p, void *window)
 {
@@ -59,7 +58,7 @@ void ChoiceMenu_LayoutText(struct Menu *p, void *window)
             text++;
             if (!*text)
                 break;
-            text = sub_08006770(p, text);
+            text = ChoiceMenu_ParseTag(p, text);
             if (!*text)
                 break;
         } else if (*text == '\n') {

@@ -43,7 +43,6 @@ static inline int noShadow(struct Cell *c)
     value &= 32;
     return value;
 }
-#define Shadow_UpdateTerrain sub_08013458
 void Shadow_UpdateTerrain(struct Shadow *p)
 {
     u32 *flags = &p->spriteFlags;

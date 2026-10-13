@@ -105,7 +105,6 @@ static inline void project(struct Vec *out, struct Vec *in)
     out->y = h - y;
     out->z = h + y;
 }
-#define EffectParticle_UpdateDriftBeforeHoming sub_0800B788
 void EffectParticle_UpdateDriftBeforeHoming(struct Manager *manager, struct Effect *effect,
                                             s32 index, s32 phase, u32 phaseMask,
                                             struct Context *ctx)

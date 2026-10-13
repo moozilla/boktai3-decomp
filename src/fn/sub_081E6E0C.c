@@ -1,6 +1,4 @@
 #include "global.h"
-#define ActorPalette_BeginFade       sub_081E34D0
-#define Actor_MoveAlongScriptedCurve sub_081E6E0C
 // Provisional name: Actor_MoveAlongScriptedCurve
 // MATCHING_CONCESSION: register-pinning
 /* Tentative role: initialize and advance an animation with a previous-state callback.

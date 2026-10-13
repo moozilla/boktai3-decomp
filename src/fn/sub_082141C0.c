@@ -12,7 +12,7 @@ void sub_082173A8(void);
 void sub_0821537C(void);
 void sub_08218B34(void);
 void sub_08215964(void);
-void sub_08019788(void);
+void TileAnimation_Upload(void);
 void sub_08219134(void);
 u32 sub_082141C0(void)
 {
@@ -34,7 +34,7 @@ u32 sub_082141C0(void)
     sub_0821537C();
     sub_08218B34();
     sub_08215964();
-    sub_08019788();
+    TileAnimation_Upload();
     disp = (vu16 *)0x04000000;
     *disp &= 0xe0ff;
     if (!gUnk_03003A08) {

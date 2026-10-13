@@ -21,7 +21,7 @@ struct Trigger {
 extern struct Map *gUnk_030052F4;
 extern u32 gUnk_030052F8, gUnk_030052FC;
 void *sub_0821D64C(s32, s32);
-void sub_08007060(struct Trigger *);
+void Trigger_UpdateShake(struct Trigger *);
 void sub_080070D0(void *, struct Trigger *);
 void sub_080077C4(void *, struct Trigger *);
 static inline s32 cellIndex(struct Vec *pos)
@@ -31,7 +31,6 @@ static inline s32 cellIndex(struct Vec *pos)
         return 0;
     return gUnk_030052F4->rows[z] + x;
 }
-#define Trigger_UpdateGrounded sub_08007728
 void Trigger_UpdateGrounded(void *manager, struct Trigger *p)
 {
     if (!p->persistent && p->timer > 899) {
@@ -42,7 +41,7 @@ void Trigger_UpdateGrounded(void *manager, struct Trigger *p)
             if (sub_0821D64C(cellIndex(p->position), 1))
                 p->timer = 900;
         }
-        sub_08007060(p);
+        Trigger_UpdateShake(p);
         sub_080070D0(manager, p);
         p->timer++;
     }

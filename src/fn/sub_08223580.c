@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0824722C(u32);
+void rfu_REQ_sendData(u32);
 
 struct S {
     u8 a, b, c, d;
@@ -18,5 +18,5 @@ void sub_08223580(u8 a)
         ((volatile u8 *)p)[3];
         p[3] = 0;
     }
-    sub_0824722C(a);
+    rfu_REQ_sendData(a);
 }

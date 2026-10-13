@@ -1,5 +1,4 @@
 #include "global.h"
-#define ScrollingBackground_ApplyCommands sub_080022A0
 struct ScrollingBackground {
     u8 task[0x1A];
     u8 flags, layer;

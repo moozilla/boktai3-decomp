@@ -1,5 +1,4 @@
 #include "global.h"
-#define ResultTutorial_FadeOut sub_0801D13C
 void sub_08219574(int, int, int);
 int ResultTutorial_FadeOut(u8 *p)
 {

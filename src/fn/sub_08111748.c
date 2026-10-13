@@ -4,7 +4,6 @@ struct S {
     u32 a[2];
 };
 u32 sub_0821A520(u32, u16);
-void CpuSet(const void *, void *, u32);
 void sub_08111748(struct S *s, u32 a, u32 b)
 {
     s32 i;

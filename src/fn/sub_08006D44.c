@@ -30,7 +30,6 @@ struct Menu {
     u8 pad170[20];
     s16 rightX, rightY;
 };
-#define ChoiceMenu_CreateFromScript sub_08006D44
 extern struct Menu *gUnk_0200002C;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
@@ -43,7 +42,7 @@ void sub_0821A04C(void *, void (*)(void), void (*)(void));
 void sub_080066C0(void);
 void sub_08006710(void);
 void sub_0821A0C0(void *);
-s32 sub_08006B60(struct Menu *, void *, s32, s32 *);
+s32 ChoiceMenu_Initialize(struct Menu *, void *, s32, s32 *);
 struct Menu *ChoiceMenu_CreateFromScript(void)
 {
     s32 options[7], arguments[4], defaults[4];
@@ -121,7 +120,7 @@ struct Menu *ChoiceMenu_CreateFromScript(void)
             for (i = 3; i >= 0; i--)
                 *destination++ = *source++;
         }
-        if (sub_08006B60(p, window, stringBase, options) < 0) {
+        if (ChoiceMenu_Initialize(p, window, stringBase, options) < 0) {
             sub_0821A0C0(p);
             return 0;
         }

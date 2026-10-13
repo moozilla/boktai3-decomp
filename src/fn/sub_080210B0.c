@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneCommands_FadePalette sub_080210B0
 void sub_08003AA8(int, int, void *);
 void SceneCommands_FadePalette(void *p, void *unused, u8 *message)
 {

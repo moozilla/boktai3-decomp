@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneObject_CheckActorCompatibility sub_0801E3A4
 extern u8 *gUnk_02000580;
 extern int gUnk_08604D54[][3];
 int SceneObject_CheckActorCompatibility(void *unused, u8 *p)

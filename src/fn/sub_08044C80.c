@@ -1,5 +1,5 @@
 #include "global.h"
-s32 sub_08249274(s32, s32);
+s32 __divsi3(s32, s32);
 s32 sub_08249350(s32, s32);
 void sub_08044C80(u8 *base, s32 bits, const u8 **source, s32 count, s32 index)
 {
@@ -17,7 +17,7 @@ void sub_08044C80(u8 *base, s32 bits, const u8 **source, s32 count, s32 index)
     if (i < count) {
         do {
             p = *source;
-            offset = sub_08249274((s32)p, index);
+            offset = __divsi3((s32)p, index);
             shift = sub_08249350((s32)p, index);
             value = bits >> i;
             value &= 1;

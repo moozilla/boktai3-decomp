@@ -29,7 +29,7 @@ struct Context {
 };
 extern u32 gUnk_030053F4, gUnk_030053F0;
 extern u32 gUnk_08604A6C[];
-void sub_0800A878(struct Manager *, struct Effect *, struct Context *);
+void EffectManager_UpdateParticles(struct Manager *, struct Effect *, struct Context *);
 void sub_0822B3BC(u32);
 static inline s32 scale(s32 input)
 {
@@ -81,7 +81,6 @@ static inline s32 continuing(s32 i)
     asm("" : : "r"(v));
     return v >= 0;
 }
-#define EffectManager_UpdateAll sub_0800A8E4
 s32 EffectManager_UpdateAll(struct Manager *manager)
 {
     struct Context context;
@@ -134,7 +133,7 @@ s32 EffectManager_UpdateAll(struct Manager *manager)
             ctx->actorLower.y -= 20;
             ctx->actorUpper.x += 8;
             ctx->actorUpper.y += 20;
-            sub_0800A878(manager, p, &context);
+            EffectManager_UpdateParticles(manager, p, &context);
             if (view->soundDelay) {
                 view->soundDelay--;
                 if (!view->soundDelay) {

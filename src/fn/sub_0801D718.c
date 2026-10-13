@@ -1,5 +1,4 @@
 #include "global.h"
-#define ResultTutorial_BlinkPressMarker sub_0801D718
 void sub_0822B2F8(int);
 typedef struct {
     u32 pad[2], flags;

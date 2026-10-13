@@ -1,5 +1,4 @@
 #include "global.h"
-#define Presentation_ClearTilemap sub_081E2D74
 // Provisional name: Presentation_ClearTilemap
 struct Tilemap {
     u8 pad[0x2c];

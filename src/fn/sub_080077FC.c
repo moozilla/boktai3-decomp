@@ -32,7 +32,6 @@ static inline u32 frame_factor(u16 v)
     u32 mask = 15;
     return mask & value;
 }
-#define Trigger_UpdateIdleAnimation sub_080077FC
 void Trigger_UpdateIdleAnimation(void *manager, struct Trigger *p)
 {
     struct Obj *o;

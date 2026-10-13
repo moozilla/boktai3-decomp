@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneActors_AddResourceCost sub_08022600
 u8 *sub_0802140C(int);
 void SceneActors_AddResourceCost(int amount)
 {

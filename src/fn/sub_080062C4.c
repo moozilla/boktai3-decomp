@@ -7,7 +7,7 @@ struct BF {
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 u32 sub_0821ABA8(u32, u32);
-void sub_08005E64(u32, struct BF *, u32, u32, u32);
+void TerrainModifiers_Create(u32, struct BF *, u32, u32, u32);
 
 u32 sub_080062C4(void)
 {
@@ -25,6 +25,6 @@ u32 sub_080062C4(void)
         bf.b = 0;
         bf.c = 0;
     }
-    sub_08005E64(a, &bf, c, b, d);
+    TerrainModifiers_Create(a, &bf, c, b, d);
     return 0;
 }

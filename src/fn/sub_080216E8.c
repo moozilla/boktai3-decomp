@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneActors_StartAnimation sub_080216E8
 typedef struct {
     u8 pad[0xa3];
     u8 completed;

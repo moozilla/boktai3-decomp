@@ -36,7 +36,6 @@ static inline s32 scaleHeight(s32 input)
         return value >> 5;
     return -((-value) >> 5);
 }
-#define TriggerManager_Initialize sub_08008174
 s32 TriggerManager_Initialize(struct Manager *p)
 {
     s32 i;

@@ -13,7 +13,6 @@ extern u16 gUnk_0203B400[];
 extern void *gUnk_03004278, *gUnk_03003A00;
 extern u16 gUnk_03004270, gUnk_03004274;
 
-#define StatusScreen_Destroy sub_0800F1BC
 extern void *gUnk_02000044;
 // This callback preserves the BIOS wrapper's r0 result on return.
 extern int CpuSetResult(const void *, void *, u32) asm("CpuSet");

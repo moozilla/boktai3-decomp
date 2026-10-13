@@ -39,7 +39,7 @@ static inline void setFacing(ActorAnimation *p, int angle)
     value = 7 & shifted;
     p->facing8 = value;
 }
-void sub_0802175C(void *, void *, void *, int, int, int, int);
+void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 void sub_0822B3BC(int);
 int sub_082215E4(int, int);
 extern s16 gUnk_086149C4[];
@@ -56,8 +56,8 @@ static inline int trunc12(int x)
 {
     return x >= 0 ? x >> 12 : -(-x >> 12);
 }
-void sub_080216E8(void *, void *, void *, int, int, int);
-void sub_08021890(void *, void *, void *, int, int, int);
+void SceneActors_StartAnimation(void *, void *, void *, int, int, int);
+void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void sub_08028040(ActorAnimation *p)
 {
     ActorAnimation *p2 = p;
@@ -67,7 +67,8 @@ void sub_08028040(ActorAnimation *p)
         sequence = choose(p->mode, 70, 32);
         {
             int offset = 0x240;
-            sub_08021890(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence, 1, 4);
+            SceneActors_StartUnmirroredAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence, 1,
+                                                 4);
         }
     }
     *(u32 *)((u8 *)p + 0x33c) = 0;

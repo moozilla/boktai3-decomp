@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define Scene_StopSelectedObject sub_08004888
 struct Object {
     u8 type, flags;
     u16 state, kind;

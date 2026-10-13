@@ -1,7 +1,4 @@
 #include "global.h"
-#define Presentation_ConfigureLayout     sub_081E2F44
-#define Presentation_ConfigureFrameRange sub_081E3354
-#define Presentation_Initialize          sub_081E3400
 // Provisional name: Presentation_Initialize
 struct Sequence {
     u8 pad[0x21c];

@@ -30,10 +30,8 @@ struct Engine {
 extern struct Engine *gUnk_02000484;
 extern u8 gUnk_020000EC;
 void sub_08219DD8(void *, int);
-#define gRfuLinkStatus     gUnk_03006A80
-#define gRfuSlotStatusNI   gUnk_03006A70
-#define rfu_NI_setSendData sub_08246CC8
-#define rfu_clearSlot      sub_08246AAC
+#define gRfuLinkStatus   gUnk_03006A80
+#define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
@@ -47,15 +45,12 @@ void sub_08213F98(int);
 int sub_08035EB8(struct Engine *);
 int sub_082238F0(int);
 void sub_08034178(struct Engine *);
-int sub_08246968(void);
-void sub_08246644(int);
-void sub_082456E0(void);
 int sub_08034F90(struct Engine *p)
 {
     if (p->pending)
         p->pending = 0;
-    if ((u8)sub_08246968() == 1) {
-        sub_08246644(gUnk_03006A80->connSlotFlag | gUnk_03006A80->linkLossSlotFlag);
-        sub_082456E0();
+    if ((u8)rfu_getMasterSlave() == 1) {
+        rfu_REQ_disconnect(gUnk_03006A80->connSlotFlag | gUnk_03006A80->linkLossSlotFlag);
+        rfu_waitREQComplete();
     }
 }

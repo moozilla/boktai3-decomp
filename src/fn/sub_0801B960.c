@@ -1,5 +1,4 @@
 #include "global.h"
-#define Transformation_ReportResult sub_0801B960
 typedef struct {
     u8 id, pad;
     u16 level;

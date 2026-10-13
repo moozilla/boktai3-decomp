@@ -22,7 +22,6 @@ static inline void clearFlag(void)
     u32 mask = ~4096;
     *flags &= mask;
 }
-#define Weather_StormEnd sub_08017E7C
 int Weather_StormEnd(struct Weather *p)
 {
     int mask;

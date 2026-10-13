@@ -14,7 +14,6 @@ struct Effect {
 };
 typedef s32 (*Callback)(struct Manager *, struct Effect *, s32, u32, u32, u32);
 extern Callback gUnk_08604A78[][5];
-#define EffectManager_UpdateParticles sub_0800A878
 s32 EffectManager_UpdateParticles(struct Manager *manager, struct Effect *effect, u32 mode)
 {
     u32 one = manager->flags & 1, mask = manager->flags & 3;

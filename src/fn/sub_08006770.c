@@ -26,7 +26,6 @@ struct Menu {
     u8 pad170[20];
     s16 rightX, rightY;
 };
-#define ChoiceMenu_ParseTag sub_08006770
 extern const u8 gUnk_0824DB0C[], gUnk_0824DB14[], gUnk_0824DB1C[], gUnk_0824DB20[];
 s32 sub_08032168(const u8 *, const u8 *, s32);
 s32 sub_080321A0(const u8 *, s32);

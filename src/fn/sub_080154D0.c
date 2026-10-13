@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define AnimatedParticle_PriorityFromFlags sub_080154D0
 int AnimatedParticle_PriorityFromFlags(int flags)
 {
     register int p asm("r0") = flags & 0xf000;

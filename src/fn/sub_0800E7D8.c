@@ -19,17 +19,16 @@ void sub_082279A8(int, int, int, int, int, int, int);
 void sub_0821AD08(u32, void *);
 void sub_0821A0C0(void *);
 void sub_0822B2F8(int);
-void sub_0800EC0C(Screen *);
-void sub_0800EE5C(Screen *);
+void StatusScreen_FadeAndExit(Screen *);
+void StatusScreen_FadeOutPalette(Screen *);
 void sub_0800EF90(Screen *);
-void sub_0800E838(Screen *);
-#define StatusScreen_CheckConfirm sub_0800E7D8
+void StatusScreen_Close(Screen *);
 int StatusScreen_CheckConfirm(Screen *p)
 {
     if ((gUnk_03005260[1] & 8) || (gUnk_03005260[1] & 1)) {
         sub_082279A8(3, 4, 4, 4, 4, 65535, 0);
         {
-            register void (*state)(Screen *) asm("r1") = sub_0800EC0C;
+            register void (*state)(Screen *) asm("r1") = StatusScreen_FadeAndExit;
             p->state = state;
         }
         p->timer = 0;

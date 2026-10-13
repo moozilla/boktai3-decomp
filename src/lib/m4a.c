@@ -8,27 +8,8 @@
  * and are given their m4a.c names through the #defines below; the mapping is
  * recorded in symbols/proposed/m4a.csv.
  */
-#define m4aMPlayAllStop sub_08230018
-#define m4aMPlayImmInit sub_082300DC
-#define SampleFreqSet sub_08230380
-#define m4aSoundMode sub_082303EC
-#define m4aSoundVSyncOff sub_082304D4
-#define m4aSoundVSyncOn sub_08230554
-#define m4aSoundVSync sub_082305CC
-#define MPlayStart sub_082306C4
-#define FadeOutBody sub_082307E8
-#define CgbModVol sub_08230A60
-#define CgbSound sub_08230AC8
 /* m4a_1.s routines elsewhere in the ROM */
-#define umul3232H32 sub_0822F1B4
-#define SoundMain sub_0822F1C4
-#define TrackStop sub_0822FA9C
-#define ply_endtie sub_0822FD18
-#define ply_lfos sub_0822FD8C
-#define ply_mod sub_0822FDA0
 #define ply_note m4a_Unk_0822FB18
-#define DummyFunc sub_08231434
-#define MPlayJumpTableCopy sub_0822F65C
 
 #include "global.h"
 #include "gba/m4a_internal.h"
@@ -181,7 +162,7 @@ void m4aSongNumContinue(u16 n)
         MPlayContinue(mplay->info);
 }
 
-void sub_08230018(void)
+void m4aMPlayAllStop(void)
 {
     s32 i;
 
@@ -232,7 +213,7 @@ void m4aMPlayFadeIn(struct MusicPlayerInfo *mplayInfo, u16 speed)
     }
 }
 
-void sub_082300DC(struct MusicPlayerInfo *mplayInfo)
+void m4aMPlayImmInit(struct MusicPlayerInfo *mplayInfo)
 {
     if (mplayInfo->ident == ID_NUMBER)
     {
@@ -410,7 +391,7 @@ void SoundInit(struct SoundInfo *soundInfo)
     soundInfo->ident = ID_NUMBER;
 }
 
-void sub_08230380(u32 freq)
+void SampleFreqSet(u32 freq)
 {
     struct SoundInfo *soundInfo;
 
@@ -431,7 +412,7 @@ void sub_08230380(u32 freq)
     m4aSoundVSyncOn();
 }
 
-void sub_082303EC(u32 mode)
+void m4aSoundMode(u32 mode)
 {
     struct SoundInfo *soundInfo = SOUND_INFO_PTR;
     u32 temp;
@@ -525,7 +506,7 @@ void SoundClear(void)
     soundInfo->ident = ID_NUMBER;
 }
 
-void sub_082304D4(void)
+void m4aSoundVSyncOff(void)
 {
     struct SoundInfo *soundInfo = SOUND_INFO_PTR;
 
@@ -548,7 +529,7 @@ void sub_082304D4(void)
     }
 }
 
-void sub_08230554(void)
+void m4aSoundVSyncOn(void)
 {
     struct SoundInfo *soundInfo = SOUND_INFO_PTR;
     u32 ident = soundInfo->ident;
@@ -645,7 +626,7 @@ void MPlayOpen(struct MusicPlayerInfo *mplayInfo, struct MusicPlayerTrack *track
     mplayInfo->ident = ID_NUMBER;
 }
 
-void sub_082306C4(struct MusicPlayerInfo *mplayInfo, struct SongHeader *songHeader)
+void MPlayStart(struct MusicPlayerInfo *mplayInfo, struct SongHeader *songHeader)
 {
     s32 i;
     u8 unk_B;
@@ -727,7 +708,7 @@ void m4aMPlayStop(struct MusicPlayerInfo *mplayInfo)
     mplayInfo->ident = ID_NUMBER;
 }
 
-void sub_082307E8(struct MusicPlayerInfo *mplayInfo)
+void FadeOutBody(struct MusicPlayerInfo *mplayInfo)
 {
     s32 i;
     struct MusicPlayerTrack *track;
@@ -961,7 +942,7 @@ void CgbModVol(struct CgbChannel *chan)
     chan->pan &= chan->panMask;
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_08230AC8);
+INCLUDE_ASM("asm/nonmatching", CgbSound);
 
 void m4aMPlayTempoControl(struct MusicPlayerInfo *mplayInfo, u16 tempo)
 {

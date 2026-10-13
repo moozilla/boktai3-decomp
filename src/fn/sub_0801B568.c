@@ -1,5 +1,4 @@
 #include "global.h"
-#define ResultMenu_InitializeLayer sub_0801B568
 void *sub_0821A520(int, int);
 void sub_082161B4(int, int, void *, int, int, int, void *);
 void sub_0821656C(int, int, int, int, int);

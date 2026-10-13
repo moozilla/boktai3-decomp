@@ -14,13 +14,13 @@ struct S {
     u8 j[0x18a];
     void *fn;
 };
-void sub_08005338(void);
+void Scene_UpdateObjectDisappearance(void);
 void sub_080050AC(struct S *p)
 {
     u8 t = p->t;
     if (t == 1) {
         if (p->hp <= 0) {
-            void *f = sub_08005338;
+            void *f = Scene_UpdateObjectDisappearance;
             p->fn = f;
             p->a = 0;
             p->c = t;

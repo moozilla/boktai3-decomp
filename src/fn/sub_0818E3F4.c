@@ -97,7 +97,7 @@ static inline void setVector(struct Geometry *g)
 {
     g->vec = gUnk_0824F150;
 }
-void sub_08013930(u8 *, u8 *, u32, u32, u32, u32, u32, u32, u32, u32, u32);
+void ScaledShadow_Initialize(u8 *, u8 *, u32, u32, u32, u32, u32, u32, u32, u32, u32);
 void sub_0818DE44(struct Obj *);
 void sub_0818E3F4(struct Obj *p)
 {
@@ -113,7 +113,7 @@ void sub_0818E3F4(struct Obj *p)
         p->param52 = 16;
         p->vec64 = gUnk_0824F150;
         setVector(&p->geometry);
-        sub_08013930((u8 *)p + 0x160, (u8 *)p + 0x1c, 32, 32, 32, 32, 0, 0, 0, 0, 0);
+        ScaledShadow_Initialize((u8 *)p + 0x160, (u8 *)p + 0x1c, 32, 32, 32, 32, 0, 0, 0, 0, 0);
         p->callback = sub_0818DE44;
     }
 }

@@ -7,7 +7,7 @@ struct P {
     u8 pad3[3];
     u8 st;
 };
-void sub_0801D354(struct P *, s32);
+void ResultTutorial_MovePlayer(struct P *, s32);
 u32 sub_0801D3CC(struct P *p)
 {
     switch (p->st) {
@@ -20,9 +20,9 @@ u32 sub_0801D3CC(struct P *p)
         case 5:
             p->t++;
             if ((p->t & 3) == 0) {
-                sub_0801D354(p, 1);
+                ResultTutorial_MovePlayer(p, 1);
             } else {
-                sub_0801D354(p, 0);
+                ResultTutorial_MovePlayer(p, 0);
             }
             if (p->v > 0x1000) {
                 p->st++;
@@ -31,7 +31,7 @@ u32 sub_0801D3CC(struct P *p)
         case 2:
         case 4:
         case 6:
-            sub_0801D354(p, 0);
+            ResultTutorial_MovePlayer(p, 0);
             if (p->v <= 0xBFF) {
                 p->st++;
                 if (p->st > 5)

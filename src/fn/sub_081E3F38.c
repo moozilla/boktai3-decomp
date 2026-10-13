@@ -1,5 +1,4 @@
 #include "global.h"
-#define Actor_SelectNearestInteraction sub_081E3F38
 // Provisional name: Actor_SelectNearestInteraction
 // MATCHING_CONCESSION: register-pinning
 struct Obj {

@@ -15,7 +15,6 @@ struct Trigger {
 };
 extern u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
-#define Trigger_UpdateShake sub_08007060
 void Trigger_UpdateShake(struct Trigger *p)
 {
     if (p->shake) {

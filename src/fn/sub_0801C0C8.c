@@ -1,5 +1,4 @@
 #include "global.h"
-#define ResultMenu_UpdateMarkers sub_0801C0C8
 typedef struct {
     u32 pad[2], flags;
     u8 pad2[20];

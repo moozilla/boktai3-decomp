@@ -9,7 +9,7 @@ struct A {
     u16 x;
     u16 y;
 };
-void sub_08021890(void *, void *, void *, s32, s32, s32);
+void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
 
 void sub_081ACA78(struct A *p)
 {
@@ -19,6 +19,6 @@ void sub_081ACA78(struct A *p)
         p->b1 = 0;
         p->x = 0;
         p->y = 0;
-        sub_08021890(p, (u8 *)p + 0x18c, (u8 *)p + 0x1ec, 0xf, 0, 4);
+        SceneActors_StartUnmirroredAnimation(p, (u8 *)p + 0x18c, (u8 *)p + 0x1ec, 0xf, 0, 4);
     }
 }

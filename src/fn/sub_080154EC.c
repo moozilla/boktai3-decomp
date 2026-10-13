@@ -52,7 +52,7 @@ struct Config {
 struct Manager *sub_0801548C(int, int);
 int Mod(int, int);
 void sub_08215284(void *, int);
-int sub_080154D0(int);
+int AnimatedParticle_PriorityFromFlags(int);
 void sub_08220D44(void *, int);
 void sub_08214374(void *, int);
 static inline int rnd(void)
@@ -77,7 +77,6 @@ static inline u32 frame_factor(u16 v)
     u32 mask = 15;
     return mask & value;
 }
-#define AnimatedParticles_Create sub_080154EC
 int AnimatedParticles_Create(int count, struct Vec *pos, struct Config *c)
 {
     int i, emitted;
@@ -237,7 +236,7 @@ start:
             } else
                 done = 0;
             o->position = *pos;
-            *((u8 *)o + 7) = sub_080154D0(c->flags);
+            *((u8 *)o + 7) = AnimatedParticle_PriorityFromFlags(c->flags);
             sub_08220D44(saved, c->speed);
             sub_08214374(o, 0);
             if (emitted++ >= count)

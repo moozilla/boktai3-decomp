@@ -7,7 +7,7 @@ struct P {
     u8 flag;
 };
 extern u32 gUnk_0300523C;
-void sub_0801683C(void);
+void PaletteLevels_Reset(void);
 int sub_08037FB4(struct P *, int, const u32 *, int);
 void sub_08038128(struct P *, int);
 void sub_08038138(struct P *);
@@ -25,7 +25,7 @@ void sub_080386C8(struct P *p)
     if (p->entered) {
         u32 zero = 0;
         p->entered = zero;
-        sub_0801683C();
+        PaletteLevels_Reset();
         data = zero;
         sub_08037FB4(p, 1, &data, 1);
         set(4);

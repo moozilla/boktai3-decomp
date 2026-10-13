@@ -25,7 +25,6 @@ struct Menu {
     u8 pad170[20];
     s16 rightX, rightY;
 };
-#define ChoiceMenu_DispatchSelection sub_08006374
 struct Args {
     u32 count : 16;
     u32 unused : 16;

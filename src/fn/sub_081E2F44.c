@@ -1,6 +1,4 @@
 #include "global.h"
-#define Presentation_ClearTilemap    sub_081E2D74
-#define Presentation_ConfigureLayout sub_081E2F44
 // Provisional name: Presentation_ConfigureLayout
 struct Sequence {
     u8 p0[0x18];

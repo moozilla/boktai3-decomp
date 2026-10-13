@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneActors_UpdateAnimation sub_080218FC
 int sub_08220F70(void *, int);
 int SceneActors_UpdateAnimation(u8 *p, void *animation, int delta)
 {

@@ -1,11 +1,4 @@
 #include "global.h"
-#define SoundTest_CountEntries            sub_081E1AF4
-#define SoundTest_ShowCategory            sub_081E1B80
-#define SoundTest_MoveCategoryCursor      sub_081E1BC8
-#define SoundTest_DrawTrackName           sub_081E1C10
-#define SoundTest_DrawSecondCategoryIndex sub_081E1C64
-#define SoundTest_DrawThirdCategoryIndex  sub_081E1CDC
-#define SoundTest_Initialize              sub_081E23A0
 // Provisional name: SoundTest_Initialize
 struct Sprite {
     u8 head[8];

@@ -1,5 +1,4 @@
 #include "global.h"
-#define TerrainOverlay_DestroyDrawables sub_08004018
 struct Drawable {
     u32 flags;
     u8 active;

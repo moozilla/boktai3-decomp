@@ -57,12 +57,12 @@ struct Manager *sub_08008270(void);
 void *sub_08219C40(u32);
 void sub_08219DD8(void *, u32);
 void sub_08219D38(void *);
-void sub_08007444(void *, struct Trigger *);
+void Trigger_UpdateFalling(void *, struct Trigger *);
 void sub_08217DE0(struct Sprite *, struct Graphics *, u32);
 void sub_08217EC4(struct Sprite *, s32, s32);
 s32 sub_0821D6F4(struct Vec *, s32);
 s32 sub_0822C034(struct Vec *);
-void sub_08013930(void *, struct Vec *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+void ScaledShadow_Initialize(void *, struct Vec *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void sub_08006FAC(struct Trigger *);
 struct Map {
     u32 pad0;
@@ -142,8 +142,8 @@ static inline s32 actorMode(void)
     }
     return 0;
 }
-void sub_080075F8(void *, struct Trigger *);
-void sub_080077FC(void *, struct Trigger *);
+void Trigger_UpdateBobbingAnimation(void *, struct Trigger *);
+void Trigger_UpdateIdleAnimation(void *, struct Trigger *);
 void sub_0822B2F8(s32);
 s32 sub_082151E4(void *, u16);
 void sub_082144A4(struct Object *, void *, s32);
@@ -186,7 +186,6 @@ static inline u8 sameRegion(struct Trigger *p)
         return 1;
     return 0;
 }
-#define TriggerManager_Update sub_08007ECC
 s32 TriggerManager_Update(struct Manager *input)
 {
     struct Manager *p = input;

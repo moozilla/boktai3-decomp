@@ -55,7 +55,7 @@ static inline u32 frame_factor(u16 v)
     return mask & value;
 }
 void sub_08013424(void *);
-void sub_081E38C4(void *);
+void ActorPalette_BeginReverseFade(void *);
 void sub_081E7AA0(struct S *p)
 {
     struct Obj *o;
@@ -68,7 +68,7 @@ void sub_081E7AA0(struct S *p)
         p->state = 19;
         sub_08220C8C(&p->anim, p->arg, 19, 0, 0);
         sub_08013424(p->p2);
-        p->previous = sub_081E38C4;
+        p->previous = ActorPalette_BeginReverseFade;
     }
     if (p->previous)
         p->previous(p);

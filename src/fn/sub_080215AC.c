@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneActors_SetHealthLimits sub_080215AC
 extern u8 *gUnk_02000710;
 int Div(int, int);
 int SceneActors_SetHealthLimits(u8 *p, int current, int maximum, int extra)

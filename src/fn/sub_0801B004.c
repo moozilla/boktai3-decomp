@@ -3,7 +3,6 @@
 typedef struct {
     u8 pad[2], level, tail[29];
 } Actor;
-#define SelectionMenu_ReviewChoice sub_0801B004
 typedef struct {
     u32 pad[2], flags;
     u8 gap[20];
@@ -22,10 +21,10 @@ void sub_08030C84(u32);
 int sub_0822D044(int);
 void sub_08030DBC(int);
 void sub_0822B2F8(int);
-void sub_0801A1A4(void *);
-void sub_0801A920(void *);
+void SelectionMenu_HandleHorizontalInput(void *);
+void SelectionMenu_Back(void *);
 void sub_08019F18(void *, void (*)(void));
-void sub_0801B274(void);
+void SelectionMenu_Confirm(void);
 void SelectionMenu_ReviewChoice(u8 *p)
 {
     Graphic *g;
@@ -62,7 +61,7 @@ void SelectionMenu_ReviewChoice(u8 *p)
             sub_0822B2F8(0xdc);
         }
     } else {
-        sub_0801A1A4(p);
+        SelectionMenu_HandleHorizontalInput(p);
         {
             int keys = gUnk_03005260[1], mask;
             mask = 1;
@@ -70,7 +69,7 @@ void SelectionMenu_ReviewChoice(u8 *p)
             if (mask & keys) {
                 if (!p[0x20]) {
                     sub_0822B2F8(0xdd);
-                    sub_08019F18(p, sub_0801B274);
+                    sub_08019F18(p, SelectionMenu_Confirm);
                     return;
                 }
                 goto back;
@@ -78,7 +77,7 @@ void SelectionMenu_ReviewChoice(u8 *p)
             back:
                 ((Graphic *)(p + 0xd34))->flags |= mask;
                 *(u32 *)(p + 0x25c) |= mask;
-                sub_0801A920(p);
+                SelectionMenu_Back(p);
                 return;
             }
             asm("" ::"r"(keys));

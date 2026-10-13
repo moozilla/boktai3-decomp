@@ -7,7 +7,6 @@ void sub_0821FEB4(void *, int, int, int, int, void *, void *);
 void sub_0821FF84(void *, void *, void *);
 void sub_0821FF58(void *, int, int, int, int, int);
 void sub_08220C8C(void *, void *, int, int, int);
-#define AnimatedHazard_Initialize sub_08012070
 void AnimatedHazard_Initialize(u8 *m, u8 *p)
 {
     struct Vec size, offset;

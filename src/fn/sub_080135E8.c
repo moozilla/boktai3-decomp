@@ -5,12 +5,11 @@ struct Manager {
 };
 extern struct Manager *gUnk_02000054;
 void *sub_080135A8(int, int);
-void sub_08013458(void *);
+void Shadow_UpdateTerrain(void *);
 void sub_08013454(void *);
 void sub_08217DE0(void *, void *, int);
 void sub_08217EC4(void *, int, int);
 void sub_080133CC(void *, void *);
-#define Shadow_Initialize sub_080135E8
 int Shadow_Initialize(u8 *p, void *source, int mode)
 {
     u8 *sprite;
@@ -24,7 +23,7 @@ int Shadow_Initialize(u8 *p, void *source, int mode)
     *(u16 *)(p + 2) = zero;
     *(u16 *)(p + 4) = zero;
     if (!mode)
-        *(void (**)(void *))(p + 0x34) = sub_08013458;
+        *(void (**)(void *))(p + 0x34) = Shadow_UpdateTerrain;
     else
         *(void (**)(void *))(p + 0x34) = sub_08013454;
     sprite = p + 12;

@@ -52,7 +52,6 @@ static inline u32 frame_factor(u16 v)
     u32 mask = 15;
     return mask & value;
 }
-#define AnimatedParticleManager_Update sub_08015160
 int AnimatedParticleManager_Update(struct Manager *m)
 {
     struct Obj *sprites = &m->pieces[0].sprite;

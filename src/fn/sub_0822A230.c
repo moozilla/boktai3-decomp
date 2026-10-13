@@ -3,13 +3,11 @@
 double sub_08229E28(double);
 double sub_08229FEC(double);
 double sub_08229560(double);
-double sub_0824B314(double);
-double sub_0824B25C(double);
-s32 sub_0824A0D8(double, double);
-double sub_08249A4C(double, double);
-double sub_082499E4(double, double);
-double sub_08249A14(double, double);
-double sub_08249CF4(double, double);
+s32 __ltdf2(double, double);
+double __muldf3(double, double);
+double __adddf3(double, double);
+double __subdf3(double, double);
+double __divdf3(double, double);
 struct SA230 {
     double d[12];
     s32 n[4];
@@ -24,13 +22,11 @@ void sub_0822A230(struct SA230 *s, s32 mode, double arg, s32 day, double longitu
     b = b / 57.29577951308238;
     l = l / 57.29577951308238;
     e = e / 57.29577951308238;
-    decl = sub_0824B314(sub_082499E4(sub_08249A4C(sub_08249A4C(cos(b), sin(l)), sin(e)),
-                                     sub_08249A4C(sin(b), cos(e))));
+    decl = asin(__adddf3(__muldf3(__muldf3(cos(b), sin(l)), sin(e)), __muldf3(sin(b), cos(e))));
     {
         double x, y;
         x = cos(b) * cos(l);
-        y = sub_08249A14(sub_08249A4C(sub_08249A4C(cos(b), sin(l)), cos(e)),
-                         sub_08249A4C(sin(b), sin(e)));
+        y = __subdf3(__muldf3(__muldf3(cos(b), sin(l)), cos(e)), __muldf3(sin(b), sin(e)));
         alpha = atan(y / x);
         if (x < 0.0)
             alpha += 3.14159265358979;
@@ -38,9 +34,8 @@ void sub_0822A230(struct SA230 *s, s32 mode, double arg, s32 day, double longitu
             alpha += 6.28318530717958;
         {
             double lat = latitude * 0.017453292519943278;
-            hour = sub_0824B25C(
-                sub_082499E4(-tan(lat) * tan(decl),
-                             sub_08249CF4(cos(1.5856316254368468), cos(lat) * cos(decl))));
+            hour = acos(__adddf3(-tan(lat) * tan(decl),
+                                 __divdf3(cos(1.5856316254368468), cos(lat) * cos(decl))));
             {
                 double rise, date;
                 rise = (alpha - hour) / 6.28318530717958;

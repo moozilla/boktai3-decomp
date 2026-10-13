@@ -13,7 +13,6 @@ extern u16 gUnk_0203B400[];
 extern void *gUnk_03004278, *gUnk_03003A00;
 extern u16 gUnk_03004270, gUnk_03004274;
 
-#define StatusScreen_ClearScanlineNoise sub_0800F0F0
 void StatusScreen_ClearScanlineNoise(Screen *p)
 {
     u32 zero = 0;

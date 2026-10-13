@@ -9,8 +9,7 @@ extern int (*const gUnk_08604C80[])(struct Weather *);
 extern u8 *gUnk_02000710;
 extern int gUnk_02000088, gUnk_02000478;
 void sub_08017510(void *);
-void sub_08017730(void *);
-#define Weather_Update sub_08017F74
+void WeatherParticles_Update(void *);
 int Weather_Update(struct Weather *p)
 {
     int (*f)(struct Weather *) = gUnk_08604C80[p->state];
@@ -28,7 +27,7 @@ int Weather_Update(struct Weather *p)
     }
     if (gUnk_02000478 > 0)
         gUnk_02000478--;
-    sub_08017730(p);
+    WeatherParticles_Update(p);
     p->frame++;
     return 0;
 }

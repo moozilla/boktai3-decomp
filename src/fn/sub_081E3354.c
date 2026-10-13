@@ -1,5 +1,4 @@
 #include "global.h"
-#define Presentation_ConfigureFrameRange sub_081E3354
 // Provisional name: Presentation_ConfigureFrameRange
 struct Sequence {
     u8 pad[0x218];

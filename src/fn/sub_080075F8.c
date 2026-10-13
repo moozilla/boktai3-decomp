@@ -32,8 +32,7 @@ static inline u32 frame_factor(u16 v)
     u32 mask = 15;
     return mask & value;
 }
-#define Trigger_UpdateBobbingAnimation sub_080075F8
-void sub_080077FC(void *, struct Trigger *);
+void Trigger_UpdateIdleAnimation(void *, struct Trigger *);
 void Trigger_UpdateBobbingAnimation(void *manager, struct Trigger *p)
 {
     struct Obj *o;
@@ -98,7 +97,7 @@ void Trigger_UpdateBobbingAnimation(void *manager, struct Trigger *p)
     else if (p->timer <= 7)
         p->position->y -= 8;
     else {
-        p->update = sub_080077FC;
+        p->update = Trigger_UpdateIdleAnimation;
         p->timer = 0;
         return;
     }

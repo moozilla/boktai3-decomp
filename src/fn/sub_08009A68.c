@@ -31,7 +31,6 @@ struct Manager {
 extern struct Manager *gUnk_02000038;
 void sub_08214514(void *);
 void sub_08219D38(void *);
-#define DirectionalController_DestroyManager sub_08009A68
 s32 DirectionalController_DestroyManager(struct Manager *manager)
 {
     struct Controller *p = manager->slots;

@@ -1,6 +1,4 @@
 #include "global.h"
-#define ActorPalette_BeginFade     sub_081E34D0
-#define Actor_MoveAlongCurveToRest sub_081E692C
 // Provisional name: Actor_MoveAlongCurveToRest
 // MATCHING_CONCESSION: register-pinning
 /* Tentative role: initialize and advance an animation with a previous-state callback.

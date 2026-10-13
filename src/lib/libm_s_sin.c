@@ -6,7 +6,6 @@
 /* Adapted from newlib 1.8.2 s_sin.c; see docs/LIBM.md. */
 // COMPILER: old_agbcc
 // CFLAGS: -O2 -fno-builtin
-#define sin sub_0824B138
 #include "libm_compat.h"
 
  double sin(double x)

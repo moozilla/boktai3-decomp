@@ -1,5 +1,4 @@
 #include "global.h"
-#define ResultTutorial_BlinkPlayer sub_0801D264
 void sub_0822B2F8(int);
 typedef struct {
     u32 pad[2], flags;

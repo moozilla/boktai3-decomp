@@ -1,9 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneActors_SpawnAmbientParticle sub_08021D8C
 extern u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
-void sub_08015C30(void *, int, int, int, int, int, int, int);
+void AnimatedParticles_EmitBurst(void *, int, int, int, int, int, int, int);
 void SceneActors_SpawnAmbientParticle(u8 *p)
 {
     struct {
@@ -37,5 +36,5 @@ void SceneActors_SpawnAmbientParticle(u8 *p)
         r -= 0x7f;
         position.z = *z - r;
     }
-    sub_08015C30(&position, 1, 0, 0x40, 12, 12, 4, 4);
+    AnimatedParticles_EmitBurst(&position, 1, 0, 0x40, 12, 12, 4, 4);
 }

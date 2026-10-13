@@ -51,12 +51,12 @@ struct Manager *sub_08008270(void);
 void *sub_08219C40(u32);
 void sub_08219DD8(void *, u32);
 void sub_08219D38(void *);
-void sub_08007444(void *, struct Trigger *);
+void Trigger_UpdateFalling(void *, struct Trigger *);
 void sub_08217DE0(struct Sprite *, struct Graphics *, u32);
 void sub_08217EC4(struct Sprite *, s32, s32);
 s32 sub_0821D6F4(struct Vec *, s32);
 s32 sub_0822C034(struct Vec *);
-void sub_08013930(void *, struct Vec *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+void ScaledShadow_Initialize(void *, struct Vec *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void sub_08006FAC(struct Trigger *);
 struct Map {
     u32 pad0;
@@ -134,15 +134,14 @@ static inline s32 actorMode(void)
     }
     return 0;
 }
-void sub_080075F8(void *, struct Trigger *);
-void sub_080077FC(void *, struct Trigger *);
+void Trigger_UpdateBobbingAnimation(void *, struct Trigger *);
+void Trigger_UpdateIdleAnimation(void *, struct Trigger *);
 void sub_0822B2F8(s32);
 s32 sub_082151E4(void *, u16);
 void sub_082144A4(struct Object *, void *, s32);
 void sub_08215284(void *, s32);
 void sub_08220C8C(void *, void *, s32, s32, s32);
 void sub_08013728(void *);
-#define Trigger_CreateContainer sub_080084F4
 s32 Trigger_CreateContainer(struct Vec *position, s32 id, s32 kind, s32 flip, s32 bob,
                             u32 startScript, u32 script, u32 *arguments, s32 sound, s32 hidden,
                             s32 condition)
@@ -169,11 +168,11 @@ s32 Trigger_CreateContainer(struct Vec *position, s32 id, s32 kind, s32 flip, s3
     p->other = 0;
     p->animation = 0;
     if (bob) {
-        p->update = sub_080075F8;
+        p->update = Trigger_UpdateBobbingAnimation;
         if (!(gUnk_030053F4 & 2048))
             sub_0822B2F8(623);
     } else
-        p->update = sub_080077FC;
+        p->update = Trigger_UpdateIdleAnimation;
     p->startScript = startScript;
     p->script = script;
     in = arguments;
@@ -280,10 +279,10 @@ s32 Trigger_CreateContainer(struct Vec *position, s32 id, s32 kind, s32 flip, s3
             value = *(u16 *)&sound;
         p->sound = value;
     }
-    sub_08013930(p->effect, &p->object->position, 64, 24, 40, 32, 512, 1, 5, 1, ({
-                     register s32 zero asm("r0") = 0;
-                     zero;
-                 }));
+    ScaledShadow_Initialize(p->effect, &p->object->position, 64, 24, 40, 32, 512, 1, 5, 1, ({
+                                register s32 zero asm("r0") = 0;
+                                zero;
+                            }));
     sub_08013728(p->effect);
     sub_08006FAC(p);
     return 0;

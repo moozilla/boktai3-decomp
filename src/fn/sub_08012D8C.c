@@ -30,7 +30,7 @@ struct Manager {
 };
 int sub_082151E4(void *, int);
 void sub_082144A4(void *, void *, int);
-void sub_08012D3C(void *, void *, int);
+void BreakableBarrier_SetPosition(void *, void *, int);
 void sub_0821FEB4(void *, int, int, int, int, void *, void *);
 void sub_0821FF24(void *, void *, int);
 void sub_0821FF84(void *, void *, void *);
@@ -38,7 +38,6 @@ void sub_0821FF7C(void *, int, int, int);
 void sub_0821FE40(void *);
 void sub_08012D78(void *, void *, void *);
 void sub_08012D08(void *, int);
-#define BreakableBarrier_Initialize sub_08012D8C
 int BreakableBarrier_Initialize(struct Manager *m, struct Barrier *p, unsigned i)
 {
     struct Packed size, offset;
@@ -56,7 +55,7 @@ int BreakableBarrier_Initialize(struct Manager *m, struct Barrier *p, unsigned i
     if (m->direction[i])
         p->flags |= 4;
     p->priority = 2;
-    sub_08012D3C(p, &m->positions[i], m->direction[i]);
+    BreakableBarrier_SetPosition(p, &m->positions[i], m->direction[i]);
     c = &p->collider;
     if (m->direction[i]) {
         size.x = 128;

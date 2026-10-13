@@ -1,6 +1,5 @@
 #include "global.h"
 /* Tentative: draws terrain-edge overlays around tracked actors. */
-#define TerrainOverlay_Update sub_08003C20
 struct Drawable {
     u32 flags;
     u8 active;

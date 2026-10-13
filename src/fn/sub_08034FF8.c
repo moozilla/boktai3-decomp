@@ -31,13 +31,15 @@ struct Engine {
 extern struct Engine *gUnk_02000484;
 extern u8 gUnk_020000EC;
 void sub_08219DD8(void *, int);
-#define gRfuLinkStatus     gUnk_03006A80
-#define gRfuSlotStatusNI   gUnk_03006A70
-#define rfu_NI_setSendData sub_08246CC8
+#define gRfuLinkStatus   gUnk_03006A80
+#define gRfuSlotStatusNI gUnk_03006A70
 
+// The original caller saw an int-width prototype for rfu_clearSlot (u8, u8 in
+// the SDK header): its argument order only matches with int parameters.
+#define rfu_clearSlot rfu_clearSlot_sdk
 #include "rfu_compat.h"
-u16 sub_08246AAC(int, int);
-#define rfu_clearSlot sub_08246AAC
+#undef rfu_clearSlot
+u16 rfu_clearSlot(int connTypeFlag, int slotStatusIndex);
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
     p->flag = zero;

@@ -29,7 +29,6 @@ extern struct Manager *gUnk_02000034;
 void sub_0821FE6C(void *);
 void sub_082195E0(void *);
 void sub_08219D38(void *);
-#define Breakable_DestroyManager sub_08009088
 s32 Breakable_DestroyManager(struct Manager *manager)
 {
     struct Slot *slot = manager->slots;

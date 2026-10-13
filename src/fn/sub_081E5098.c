@@ -24,7 +24,7 @@ struct G {
 };
 void sub_08220C8C(void *, u32, u32, u32, u32);
 s32 Script_SeekToKeyword(s32);
-void sub_081E3B6C(void *);
+void Actor_ProjectAndClampToScreen(void *);
 s32 Script_GetValue(void);
 s32 sub_0821ABA8(s32, s32);
 static inline u32 mode_bits(u8 *p, u32 mask)

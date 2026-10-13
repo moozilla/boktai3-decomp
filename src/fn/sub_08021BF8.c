@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneActors_ConfigureEffect sub_08021BF8
 void *sub_08066DB8(void *, void *, int, int, void *, int, int, int);
 void sub_0822B2F8(int);
 void SceneActors_ConfigureEffect(u8 *p, unsigned mode, int first, int second)

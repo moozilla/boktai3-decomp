@@ -12,7 +12,7 @@ struct S {
 };
 
 u8 *sub_08002AC0(struct S *p, u32 a, u32 b);
-void sub_08002AE0(void *, u8 *, u8 *, u32, u32, u32);
+void Palette_BlendRange(void *, u8 *, u8 *, u32, u32, u32);
 
 void sub_08002D90(struct S *s, u8 *q)
 {
@@ -26,7 +26,7 @@ void sub_08002D90(struct S *s, u8 *q)
         r = sub_08002AC0(s, 0, s->n);
     }
     d = (u8 *)s + 0xC8C;
-    sub_08002AE0(d, r, q + 0xC, q[1], 0, 0xD0);
+    Palette_BlendRange(d, r, q + 0xC, q[1], 0, 0xD0);
     *(u8 **)((u8 *)s + 0xE90) = d;
     s->f1c = 1;
 }

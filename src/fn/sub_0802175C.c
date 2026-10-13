@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneActors_StartDirectionalAnimation sub_0802175C
 void sub_08220D78(void *, int, u16, u16, u16);
 void SceneActors_StartDirectionalAnimation(u8 *p, u8 *animation, int resource, int sequence,
                                            int speed, int offset, int flags)

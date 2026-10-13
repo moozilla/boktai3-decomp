@@ -57,20 +57,19 @@ static inline void polar(struct Vec *v, int angle, int radius)
     v->z = scale(gUnk_086149C4[angle & 255] * radius);
 }
 void *sub_0821A520(int, int);
-void sub_0800F9C4(void *, void *, int);
+void BoardPiece_Initialize(void *, void *, int);
 void sub_0800FA40(void *, void *, int);
-void sub_08020CD4(void *, int, int);
+void SceneMessages_RegisterReceiver(void *, int, int);
 void sub_08020D08(void *);
 void *sub_08225984(int);
-void sub_0801037C(void *);
-void sub_0800FAB8(void *);
+void BoardPieces_DispatchCommands(void *);
+void BoardPiece_UpdateAnimation(void *);
 extern void (*gUnk_08604B48[])(void *, void *, int);
-#define GroupObjects_Update sub_08010FD4
 int GroupObjects_Update(struct Manager *m)
 {
     int i;
     struct Piece *p;
-    sub_0801037C(m);
+    BoardPieces_DispatchCommands(m);
     if (m->active) {
         if (m->actorId)
             m->actor = sub_08225984(m->actorId);
@@ -98,7 +97,7 @@ int GroupObjects_Update(struct Manager *m)
         p = m->pieces;
         for (i = 0; i < 16; i++, p++) {
             gUnk_08604B48[p->state](m, p, i);
-            sub_0800FAB8(p);
+            BoardPiece_UpdateAnimation(p);
         }
         m->timer++;
     }

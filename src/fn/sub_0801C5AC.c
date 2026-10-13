@@ -1,5 +1,4 @@
 #include "global.h"
-#define ResultMenu_DestroyGraphics sub_0801C5AC
 void sub_082195E0(void *);
 void sub_08217EAC(void *);
 int ResultMenu_DestroyGraphics(u8 *p)

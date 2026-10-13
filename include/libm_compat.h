@@ -7,40 +7,7 @@
  * Address aliases are verified from fully linked B3 objects; docs/LIBM.md. */
 #ifndef BOKTAI3_LIBM_COMPAT_H
 #define BOKTAI3_LIBM_COMPAT_H
-#define sin                sub_0824B138
-#define __kernel_sin       sub_0824D1B8
-#define __subdf3           sub_08249A14
-#define __ieee754_rem_pio2 sub_0824C174
-#define __kernel_cos       sub_0824C7E4
-#define __negdf2           sub_0824A260
-#define cos                sub_0824B070
-#define fabs               sub_0824B120
-#define __kernel_rem_pio2  sub_0824C9E0
-#define __divsi3           sub_08249274
-#define __floatsidf        sub_0824A170
-#define __muldf3           sub_08249A4C
-#define __adddf3           sub_082499E4
-#define __fixdfsi          sub_0824A1EC
-#define scalbn             sub_0824D8B8
-#define floor              sub_0824D6F8
-#define __gedf2            sub_0824A08C
-#define __eqdf2            sub_08249FA8
-#define atan               sub_0824ACFC
-#define __gtdf2            sub_0824A040
-#define __divdf3           sub_08249CF4
-#define isnan              sub_0824D884
-#define tan                sub_0824B1EC
-#define __kernel_tan       sub_0824D338
-#define __ieee754_fmod     sub_0824BEDC
-#define __ieee754_acos     sub_0824B49C
-#define __ieee754_sqrt     sub_0824C5E0
-#define __ieee754_asin     sub_0824BA04
-#define fmod               sub_0824B3CC
-#define __fdlib_version    gUnk_086032A8
-#define matherr            sub_0824D8A4
-#define __errno            sub_0824DA3C
-#define copysign           sub_0824DA14
-#define __nedf2            sub_08249FF4
+#define __fdlib_version gUnk_086032A8
 typedef int __int32_t;
 typedef unsigned int __uint32_t;
 typedef union {

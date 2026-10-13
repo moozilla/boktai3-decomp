@@ -6,7 +6,6 @@ extern struct Background {
 } gUnk_03004C30;
 s16 *sub_0800E3E0(int, int, int);
 int Div(int, int);
-#define NumericDisplay_DrawPair sub_0800E408
 void NumericDisplay_DrawPair(void *unused, int left, int right)
 {
     int digits[2];

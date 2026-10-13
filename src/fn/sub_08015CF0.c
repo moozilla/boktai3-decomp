@@ -9,7 +9,7 @@ struct Vec {
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
 extern s16 gUnk_086149C4[];
-void sub_080154EC(int, void *, struct Config *);
+void AnimatedParticles_Create(int, void *, struct Config *);
 static inline int scale(int a, int b)
 {
     int v = a * 40;
@@ -18,7 +18,6 @@ static inline int scale(int a, int b)
         return v >> 12;
     return -((-v) >> 12);
 }
-#define AnimatedParticles_EmitOffset sub_08015CF0
 void AnimatedParticles_EmitOffset(struct Vec *pos, int unused, int type, int flags, int speed,
                                   int horizontal, int start, int decay)
 {
@@ -55,5 +54,5 @@ void AnimatedParticles_EmitOffset(struct Vec *pos, int unused, int type, int fla
     out.x = pos->x + scale(gUnk_086149C4[(s.v[10] + 192) & 255], horizontal);
     out.y = pos->y;
     out.z = pos->z + scale(gUnk_086149C4[(s.v[10] + 128) & 255], horizontal);
-    sub_080154EC(1, &out, &s);
+    AnimatedParticles_Create(1, &out, &s);
 }

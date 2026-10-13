@@ -12,7 +12,6 @@ typedef struct {
     Slot slots[16];
 } Manager;
 
-#define SpritePool_Update sub_08019A14
 int sub_08249248(Manager *, Slot *);
 void sub_08214514(void *);
 int SpritePool_Update(Manager *p)

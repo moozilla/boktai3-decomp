@@ -1,15 +1,14 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define ResultTutorial_Initialize sub_0801DEF4
 typedef struct {
     u32 words[8];
 } Resource;
 Resource *sub_0821A520(int, int);
 void sub_082196C4(void *, void *);
-int sub_0801DEBC(void *);
-void sub_0801BCA8(void *);
+int ResultTutorial_ReadScript(void *);
+void ResultMenu_CreateGraphics(void *);
 void sub_0801B534(void *, void *);
-void sub_0801DC7C(void *);
+void ResultTutorial_Open(void *);
 extern u32 gUnk_0300523C;
 void sub_0822AE7C(int);
 int ResultTutorial_Initialize(u8 *p, void *owner)
@@ -27,7 +26,7 @@ int ResultTutorial_Initialize(u8 *p, void *owner)
         return -1;
     *(Resource *)(p + 0x124) = *r;
     sub_082196C4(p + 0x124, r);
-    if (sub_0801DEBC(p) < 0)
+    if (ResultTutorial_ReadScript(p) < 0)
         return -1;
     {
         u8 *out = p + 0xae;
@@ -39,8 +38,8 @@ int ResultTutorial_Initialize(u8 *p, void *owner)
     p[0xb4] = zero;
     p[0xb6] = zero;
     *(int *)(p + 0x50) = 3;
-    sub_0801BCA8(p);
-    sub_0801B534(p, sub_0801DC7C);
+    ResultMenu_CreateGraphics(p);
+    sub_0801B534(p, ResultTutorial_Open);
     sub_0822AE7C(0xaa);
     gUnk_0300523C |= four;
     return 0;

@@ -18,7 +18,6 @@ struct Object {
 };
 void sub_08215284(void *, u32);
 s32 sub_0800AFE8(s32, u32, s32, struct Vec *, void *, s32, s32);
-#define EffectEmitter_ReceiveHit sub_0800C49C
 void EffectEmitter_ReceiveHit(struct Attack *attack, void *unused, struct Object *object)
 {
     s32 damage = attack->damage;

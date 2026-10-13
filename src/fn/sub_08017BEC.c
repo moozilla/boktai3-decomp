@@ -16,7 +16,6 @@ static inline void setFlag(void)
     u32 mask = 4096;
     *(u32 *)(gUnk_02000710 + 0x868) |= mask;
 }
-#define Weather_StormOnset sub_08017BEC
 int Weather_StormOnset(struct Weather *p)
 {
     int mask;

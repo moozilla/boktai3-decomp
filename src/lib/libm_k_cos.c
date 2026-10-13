@@ -6,7 +6,6 @@
 /* Adapted from newlib 1.8.2 k_cos.c; see docs/LIBM.md. */
 // COMPILER: old_agbcc
 // CFLAGS: -O2 -fno-builtin
-#define __kernel_cos sub_0824C7E4
 #include "libm_compat.h"
 
 #define one (1.00000000000000000000e+00)

@@ -2,7 +2,6 @@
 extern u8 *gUnk_02000710;
 int Script_ParseStringRef(int);
 u8 *Text_LookupString(int);
-#define Password_ApplyDecoded sub_08011714
 void Password_ApplyDecoded(u8 *m, u8 *output)
 {
     u32 *decoded = (u32 *)(m + 0x48);

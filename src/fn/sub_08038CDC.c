@@ -12,7 +12,7 @@ struct P {
 };
 extern u32 gUnk_02000560;
 extern void *gUnk_02000580;
-void sub_0801683C(void);
+void PaletteLevels_Reset(void);
 void sub_08038094(struct P *);
 int sub_08037FB4(struct P *, int, const u32 *, int);
 void sub_08038128(struct P *, int);
@@ -27,7 +27,7 @@ void sub_08038CDC(struct P *p)
     u32 data;
     if (p->entered) {
         p->entered = 0;
-        sub_0801683C();
+        PaletteLevels_Reset();
         sub_08038094(p);
         {
             struct Entry *e = &p->entry;

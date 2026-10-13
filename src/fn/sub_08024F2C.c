@@ -26,8 +26,8 @@ typedef struct ActorAnimation {
     u32 mode;
 } ActorAnimation;
 
-void sub_0802175C(void *, void *, void *, int, int, int, int);
-void sub_080217F4(void *, void *, void *, int, int, int, int);
+void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
+void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
 static inline int choose(u32 mode, int normal, int alternate)
 {
     int test = mode & 1;
@@ -46,7 +46,6 @@ static inline int chooseMasked(u32 mode, u32 mask, int normal, int alternate)
         result = alternate;
     return result;
 }
-#define SceneActorAnimation_TransitionVariant sub_08024F2C
 void SceneActorAnimation_TransitionVariant(ActorAnimation *p, int tick)
 {
     ActorAnimation *p2 = p;
@@ -61,7 +60,8 @@ void SceneActorAnimation_TransitionVariant(ActorAnimation *p, int tick)
             sequence = choose(p->mode, 45, 7);
             {
                 register int offset asm("r2") = 0x240;
-                sub_0802175C(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence, 2, 1, 4);
+                SceneActors_StartDirectionalAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220,
+                                                      sequence, 2, 1, 4);
             }
         } else {
             register int sequence asm("r6");
@@ -70,7 +70,8 @@ void SceneActorAnimation_TransitionVariant(ActorAnimation *p, int tick)
             sequence = choose(p->mode, 47, 9);
             {
                 register int offset asm("r2") = 0x240;
-                sub_0802175C(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence, 2, 1, 4);
+                SceneActors_StartDirectionalAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220,
+                                                      sequence, 2, 1, 4);
             }
         }
     }
@@ -105,7 +106,8 @@ void SceneActorAnimation_TransitionVariant(ActorAnimation *p, int tick)
                 else
                     sequence = chooseMasked(p2->mode, variant, 45, 7);
             }
-            sub_0802175C(p, (u8 *)p2 + 0x240, (u8 *)p2 + 0x220, sequence, 2, 1, 1);
+            SceneActors_StartDirectionalAnimation(p, (u8 *)p2 + 0x240, (u8 *)p2 + 0x220, sequence,
+                                                  2, 1, 1);
         }
     } else if (p2->scale > 319) {
         register int sequence asm("r6");
@@ -115,7 +117,8 @@ void SceneActorAnimation_TransitionVariant(ActorAnimation *p, int tick)
         sequence = chooseMasked(eightMode, variant, 38, 0);
         {
             register int offset asm("r2") = 0x240;
-            sub_080217F4(p, (u8 *)p2 + offset, (u8 *)p2 + 0x220, sequence, 2, variant, 4);
+            SceneActors_StartEightDirectionAnimation(p, (u8 *)p2 + offset, (u8 *)p2 + 0x220,
+                                                     sequence, 2, variant, 4);
         }
     } else {
         int sequence;
@@ -123,7 +126,8 @@ void SceneActorAnimation_TransitionVariant(ActorAnimation *p, int tick)
             sequence = choose(p2->mode, 47, 9);
         else
             sequence = choose(p2->mode, 45, 7);
-        sub_0802175C(p, (u8 *)p2 + 0x240, (u8 *)p2 + 0x220, sequence, 2, 1, 1);
+        SceneActors_StartDirectionalAnimation(p, (u8 *)p2 + 0x240, (u8 *)p2 + 0x220, sequence, 2, 1,
+                                              1);
     }
     if (tick > 47) {
         if (!p2->variant) {

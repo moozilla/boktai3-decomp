@@ -1,5 +1,4 @@
 #include "global.h"
-#define ResultMenu_EnqueueMarker sub_0801C064
 typedef struct {
     u32 pad[2], flags;
     u8 tail[84];

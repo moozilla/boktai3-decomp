@@ -1,5 +1,4 @@
 #include "global.h"
-#define GlyphTable_FindPair sub_08011578
 
 s32 GlyphTable_FindPair(u8 *p, u32 a, u32 b)
 {

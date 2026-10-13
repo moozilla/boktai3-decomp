@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneActorState_Acknowledge sub_080236C0
 void sub_08020D68(void *, u32);
 struct S {
     u8 f0[0xaa];

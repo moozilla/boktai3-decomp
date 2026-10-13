@@ -16,12 +16,12 @@ extern u32 gUnk_0300523C;
 void sub_08013B74(void *);
 void sub_0821FE6C(void *);
 void sub_082195E0(void *);
-void sub_08021578(void *);
+void SceneActors_Destroy(void *);
 int sub_08028F48(u8 *p)
 {
     sub_08013B74(p + 0x2a0);
     sub_0821FE6C(p + 0x1cc);
     sub_082195E0(p + 0x240);
-    sub_08021578(p);
+    SceneActors_Destroy(p);
     return 0;
 }

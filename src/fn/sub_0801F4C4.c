@@ -1,9 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneObject_UpdateLowering sub_0801F4C4
 void sub_0822B2F8(int);
 void sub_0822B358(int);
-void sub_0801F5B8(void);
+void SceneObject_UpdateLowered(void);
 void sub_08068124(void *, int, void *, int, int, int);
 void SceneObject_UpdateLowering(u8 *s)
 {
@@ -32,7 +31,7 @@ void SceneObject_UpdateLowering(u8 *s)
             s[0x39] = pose;
         }
         s[0x3a] = 0;
-        *(void **)(s + 0x30) = sub_0801F5B8;
+        *(void **)(s + 0x30) = SceneObject_UpdateLowered;
         {
             struct {
                 s16 x, y, z;

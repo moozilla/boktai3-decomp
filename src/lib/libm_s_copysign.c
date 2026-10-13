@@ -6,7 +6,6 @@
 /* Adapted from newlib 1.8.2 s_copysign.c; see docs/LIBM.md. */
 // COMPILER: old_agbcc
 // CFLAGS: -O2 -fno-builtin
-#define copysign sub_0824DA14
 #include "libm_compat.h"
 
  double copysign(double x, double y)

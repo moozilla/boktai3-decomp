@@ -6,7 +6,6 @@ typedef struct {
     u8 tail[60];
 } Graphic;
 
-#define SelectionMenu_PositionCursors sub_0801A4B4
 void sub_0821980C(void *, void *, int, int);
 void SelectionMenu_PositionCursors(u8 *p)
 {

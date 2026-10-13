@@ -19,11 +19,10 @@ void sub_082279A8(int, int, int, int, int, int, int);
 void sub_0821AD08(u32, void *);
 void sub_0821A0C0(void *);
 void sub_0822B2F8(int);
-void sub_0800EC0C(Screen *);
-void sub_0800EE5C(Screen *);
+void StatusScreen_FadeAndExit(Screen *);
+void StatusScreen_FadeOutPalette(Screen *);
 void sub_0800EF90(Screen *);
-void sub_0800E838(Screen *);
-#define StatusScreen_Close sub_0800E838
+void StatusScreen_Close(Screen *);
 void StatusScreen_Close(Screen *p)
 {
     if (!p->timer) {
@@ -32,7 +31,7 @@ void StatusScreen_Close(Screen *p)
         p->blend = 0x1084;
         p->fade = 0;
         p->fadeStep = 2;
-        p->effect = sub_0800EE5C;
+        p->effect = StatusScreen_FadeOutPalette;
     }
     if (p->timer == p->closeDelay) {
         sub_0821AD08(p->script, p->args);
