@@ -107,7 +107,8 @@ void sub_0800A7D0(void);
 /* Engine helpers. */
 void sub_0821FEB4(struct SceneCollider *, u32, u32, u32, u32, struct SceneExtent *,
                   struct SceneExtent *);
-void sub_0821FF84(struct SceneCollider *, void (*)(struct SceneCollider *, struct CollisionOther *, struct CollisionSlot *),
+void sub_0821FF84(struct SceneCollider *,
+                  void (*)(struct SceneCollider *, struct CollisionOther *, struct CollisionSlot *),
                   struct CollisionSlot *);
 void sub_0821FE40(struct SceneCollider *);
 void sub_0821FE6C(struct SceneCollider *);
