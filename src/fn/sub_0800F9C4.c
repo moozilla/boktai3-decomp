@@ -16,9 +16,8 @@ typedef struct {
 void sub_082151E4(void *, int);
 void sub_08215284(void *, int);
 void sub_082144A4(void *, void *, int);
-void sub_080135E8(void *, void *, int);
+void Shadow_Initialize(void *, void *, int);
 int sub_08013440(void *);
-#define BoardPiece_Initialize sub_0800F9C4
 int BoardPiece_Initialize(u8 *owner, Piece *p)
 {
     struct Resource {
@@ -60,7 +59,7 @@ int BoardPiece_Initialize(u8 *owner, Piece *p)
                 CpuSet(src, dst, 0x05000002);
             }
         }
-        sub_080135E8(p->transform, position, 0);
+        Shadow_Initialize(p->transform, position, 0);
     }
     return sub_08013440(p->transform);
 }

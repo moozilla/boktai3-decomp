@@ -1,6 +1,5 @@
 #include "global.h"
 /* Tentative: trigger the type-six object's palette-switch animation. */
-#define SceneObjects_SwitchPaletteFromScript sub_08005D30
 struct Animation {
     u8 pad[12];
     void *palette;

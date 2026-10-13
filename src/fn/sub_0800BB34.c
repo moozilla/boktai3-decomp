@@ -81,7 +81,6 @@ static inline u32 pausedMode(void)
     u32 mask = 4;
     return gUnk_02000560 & mask;
 }
-#define EffectParticle_UpdateHomingWide sub_0800BB34
 void EffectParticle_UpdateHomingWide(struct Manager *manager, struct Effect *effect, s32 index,
                                      s32 phase, u32 phaseMask, struct Context *context)
 {

@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define SelectionMenu_ItemAvailability sub_0801ABA0
 typedef struct {
     u8 pad[10], available, tail[5];
 } Item;

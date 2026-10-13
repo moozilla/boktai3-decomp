@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define SpritePool_AdvanceAnimation sub_08019C9C
 typedef struct {
     u16 *data;
     u8 flags, frames, weight, duration;

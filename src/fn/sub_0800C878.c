@@ -22,7 +22,6 @@ struct Controller {
 };
 void sub_0821AD08(u32, void *);
 void sub_0821A0C0(void *);
-#define DamageController_Update sub_0800C878
 s32 DamageController_Update(struct Controller *controller)
 {
     /* The original stores these coordinates but passes separate, uninitialized

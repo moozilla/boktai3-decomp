@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define TerrainOverlay_Initialize sub_08004048
 struct Drawable {
     u32 flags;
     u8 active;

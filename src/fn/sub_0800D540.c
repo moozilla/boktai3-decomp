@@ -55,7 +55,6 @@ static inline void setState(struct Object *object, u32 state)
     object->timer = zero;
     object->entered = 1;
 }
-#define FallingObject_UpdateWaiting sub_0800D540
 void FallingObject_UpdateWaiting(struct Object *object)
 {
     if (object->entered) {

@@ -3,7 +3,6 @@ typedef struct {
     u8 pad[0x344];
     s16 scale, min, max, step;
 } Actor;
-#define SceneActorGraphics_OscillateScale sub_08022404
 void SceneActorGraphics_OscillateScale(Actor *p)
 {
     p->scale += p->step;

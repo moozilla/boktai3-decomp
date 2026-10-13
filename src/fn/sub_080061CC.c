@@ -34,7 +34,6 @@ static inline s32 cellIndex(struct Vec *pos)
         return 0;
     return gUnk_030052F4->rows[z] + x;
 }
-#define TerrainModifiers_ChangeFromScript sub_080061CC
 struct ScriptVec {
     u32 x : 16;
     u32 y : 16;
@@ -43,7 +42,7 @@ struct ScriptVec {
 s32 sub_0821ABA8(s32, s32);
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-s32 sub_08006088(s32, s32, s32, s32, s32, s32);
+s32 TerrainModifiers_Change(s32, s32, s32, s32, s32, s32);
 s32 TerrainModifiers_ChangeFromScript(void)
 {
     s32 id = sub_0821ABA8('n', -1), tile = sub_0821ABA8('t', -1), kind = sub_0821ABA8('f', -1),
@@ -64,5 +63,5 @@ s32 TerrainModifiers_ChangeFromScript(void)
         height = -1;
         cell = height;
     }
-    return sub_08006088(id, tile, kind, flags, cell, height);
+    return TerrainModifiers_Change(id, tile, kind, flags, cell, height);
 }

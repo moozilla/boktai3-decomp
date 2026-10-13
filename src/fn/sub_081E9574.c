@@ -83,7 +83,7 @@ void sub_08215284(void *, s32);
 void sub_0822B2F8(s32);
 void sub_0821AD08(void *, s32);
 void sub_08013424(void *);
-void sub_081E34D0(void *);
+void ActorPalette_BeginFade(void *);
 void sub_081E9574(struct S *p)
 {
     struct Obj *o;

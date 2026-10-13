@@ -7,9 +7,9 @@ struct P {
     u8 sub[1];
 };
 
-void sub_08020CD4(u8 *, u32, s32);
+void SceneMessages_RegisterReceiver(u8 *, u32, s32);
 
 void sub_0815D688(struct P *p)
 {
-    sub_08020CD4(p->sub, p->w24, 2);
+    SceneMessages_RegisterReceiver(p->sub, p->w24, 2);
 }

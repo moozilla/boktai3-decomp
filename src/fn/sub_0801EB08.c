@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneObjects_ScriptReadPosition sub_0801EB08
 u8 *sub_0821A2C4(int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);

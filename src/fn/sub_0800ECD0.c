@@ -20,20 +20,19 @@ void sub_082279A8(int, int, int, int, int, int, int);
 void sub_0821AD08(u32, void *);
 void sub_0821A0C0(void *);
 void sub_0822B2F8(int);
-void sub_0800EC0C(Screen *);
-void sub_0800EE5C(Screen *);
+void StatusScreen_FadeAndExit(Screen *);
+void StatusScreen_FadeOutPalette(Screen *);
 void sub_0800EF90(Screen *);
-void sub_0800E838(Screen *);
+void StatusScreen_Close(Screen *);
 
-int sub_0800E7D8(Screen *);
-void sub_0800EAF0(Screen *);
+int StatusScreen_CheckConfirm(Screen *);
+void StatusScreen_Reveal(Screen *);
 extern Screen *gUnk_02000044;
-#define StatusScreen_WaitForStart sub_0800ECD0
 void StatusScreen_WaitForStart(Screen *p)
 {
     u32 mask = 256;
     gUnk_03004BD8 &= ~mask;
-    if (!sub_0800E7D8(p)) {
+    if (!StatusScreen_CheckConfirm(p)) {
         u32 old = p->delay;
         p->delay = old + 65535;
         asm("" : "+r"(old));
@@ -48,7 +47,7 @@ void StatusScreen_WaitForStart(Screen *p)
             {
                 Screen *target = gUnk_02000044;
                 {
-                    register void (*state)(Screen *) asm("r1") = sub_0800EAF0;
+                    register void (*state)(Screen *) asm("r1") = StatusScreen_Reveal;
                     target->state = state;
                     target->timer = 0;
                 }

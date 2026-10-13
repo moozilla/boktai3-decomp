@@ -6,7 +6,6 @@
 /* Adapted from newlib 1.8.2 s_cos.c; see docs/LIBM.md. */
 // COMPILER: old_agbcc
 // CFLAGS: -O2 -fno-builtin
-#define cos sub_0824B070
 #include "libm_compat.h"
 
  double cos(double x)

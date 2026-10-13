@@ -6,7 +6,6 @@ void sub_082144A4(void *, void *, int);
 void sub_0821FEB4(void *, int, int, int, int, void *, void *);
 void sub_0821FF84(void *, void *, void *);
 void sub_0821FF58(void *, int, int, int, int, int);
-#define SceneIndicator_Initialize sub_08011890
 void SceneIndicator_Initialize(u8 *m, u8 *p)
 {
     struct Vec size, offset;

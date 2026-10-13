@@ -1,5 +1,4 @@
 #include "global.h"
-#define Scene_UpdateObjectFlash sub_0800542C
 struct Draw {
     u8 pad[16];
     u16 mode;

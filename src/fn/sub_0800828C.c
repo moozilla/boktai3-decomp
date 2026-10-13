@@ -45,14 +45,13 @@ struct Manager *sub_08008270(void);
 void *sub_08219C40(u32);
 void sub_08219DD8(void *, u32);
 void sub_08219D38(void *);
-void sub_08007444(void *, struct Trigger *);
+void Trigger_UpdateFalling(void *, struct Trigger *);
 void sub_08217DE0(struct Sprite *, struct Graphics *, u32);
 void sub_08217EC4(struct Sprite *, s32, s32);
 s32 sub_0821D6F4(struct Vec *, s32);
 s32 sub_0822C034(struct Vec *, s32);
-void sub_08013930(void *, struct Vec *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+void ScaledShadow_Initialize(void *, struct Vec *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void sub_08006FAC(struct Trigger *);
-#define Trigger_CreateDrop sub_0800828C
 s32 Trigger_CreateDrop(struct Vec *position, s32 id, s32 kind, u32 script, u32 *arguments,
                        s32 sound, s32 persistent, s32 option)
 {
@@ -77,7 +76,7 @@ s32 Trigger_CreateDrop(struct Vec *position, s32 id, s32 kind, u32 script, u32 *
     p->object = 0;
     p->other = 0;
     p->animation = 0;
-    p->update = sub_08007444;
+    p->update = Trigger_UpdateFalling;
     p->tick = 0;
     p->option = option;
     p->script = script;
@@ -118,7 +117,7 @@ s32 Trigger_CreateDrop(struct Vec *position, s32 id, s32 kind, u32 script, u32 *
     else
         p->sound = sound;
     p->persistent = persistent;
-    sub_08013930(p->effect, &p->sprite->position, 64, 24, 40, 32, 512, 1, 5, 1, 0);
+    ScaledShadow_Initialize(p->effect, &p->sprite->position, 64, 24, 40, 32, 512, 1, 5, 1, 0);
     sub_08006FAC(p);
     return 0;
 }

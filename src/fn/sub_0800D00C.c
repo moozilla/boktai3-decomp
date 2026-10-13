@@ -5,8 +5,7 @@ struct Vec {
 s32 sub_0821ABA8(u32, s32);
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
-s32 sub_0800CC98(u32, s32, s32, s32, s32, s32, s32, s32, struct Vec *);
-#define FallingObject_CreateFromScript sub_0800D00C
+s32 FallingObject_Create(u32, s32, s32, s32, s32, s32, s32, s32, struct Vec *);
 s32 FallingObject_CreateFromScript(void)
 {
     struct Vec position;
@@ -29,5 +28,5 @@ s32 FallingObject_CreateFromScript(void)
         position.y = 0;
         position.z = 0;
     }
-    return sub_0800CC98(id, type, flags, parameter, speed, health, power, force, &position);
+    return FallingObject_Create(id, type, flags, parameter, speed, health, power, force, &position);
 }

@@ -15,7 +15,7 @@ extern struct Circle *gUnk_0200009C;
 extern u8 *gUnk_02000580[];
 extern struct Vec gUnk_03005418;
 int sub_0821ABA8(int, int);
-void sub_08018F38(void *, int);
+void CircleWindow_GenerateScanlines(void *, int);
 static inline int project(int input)
 {
     int v = input * 3;
@@ -25,7 +25,6 @@ static inline int project(int input)
         v = -((-v) >> 5);
     return v;
 }
-#define CircleWindow_Initialize sub_08019130
 int CircleWindow_Initialize(struct Circle *p)
 {
     int i;
@@ -65,5 +64,5 @@ int CircleWindow_Initialize(struct Circle *p)
         p->center.y = 80;
     }
     for (i = 0; i <= 1; i++)
-        sub_08018F38(p, i);
+        CircleWindow_GenerateScanlines(p, i);
 }

@@ -41,10 +41,9 @@ static inline void setFacing(ActorAnimation *p, int angle)
     p->facing8 = value;
 }
 
-#define SceneActors_Initialize sub_080214D4
 void sub_08225AB4(void *, int, int, int, int, void *);
 void sub_08225B38(void *, void *);
-void sub_08020CD4(void *, int, int);
+void SceneMessages_RegisterReceiver(void *, int, int);
 int SceneActors_Initialize(u8 *p, int id, int type, int arg, int facingArg)
 {
     register int firstId asm("r1") = id;
@@ -66,6 +65,6 @@ int SceneActors_Initialize(u8 *p, int id, int type, int arg, int facingArg)
     *(int *)(p + 0x16c) = zero;
     *(int *)(p + 0x158) = zero;
     *(int *)(p + 0x170) = zero;
-    sub_08020CD4(p + 0x118, id, 4);
+    SceneMessages_RegisterReceiver(p + 0x118, id, 4);
     return 0;
 }

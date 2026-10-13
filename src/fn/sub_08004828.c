@@ -1,5 +1,4 @@
 #include "global.h"
-#define Scene_ActivateTypeOneObjects sub_08004828
 struct Object {
     u8 type, flags;
     u16 state, kind;
@@ -19,7 +18,7 @@ struct Manager {
     struct Object *objects;
 };
 extern struct Manager *gUnk_02000024;
-void sub_08005338(void);
+void Scene_UpdateObjectDisappearance(void);
 s32 Scene_ActivateTypeOneObjects(void)
 {
     struct Manager *manager = gUnk_02000024;
@@ -35,7 +34,7 @@ s32 Scene_ActivateTypeOneObjects(void)
             continue;
         p->resource = 0;
         if (!p->kind) {
-            p->update = sub_08005338;
+            p->update = Scene_UpdateObjectDisappearance;
             p->state = 0;
             p->moving = 1;
             p->kind = 3;

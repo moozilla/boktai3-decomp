@@ -19,13 +19,12 @@ void sub_082279A8(int, int, int, int, int, int, int);
 void sub_0821AD08(u32, void *);
 void sub_0821A0C0(void *);
 void sub_0822B2F8(int);
-void sub_0800EC0C(Screen *);
-void sub_0800EE5C(Screen *);
+void StatusScreen_FadeAndExit(Screen *);
+void StatusScreen_FadeOutPalette(Screen *);
 void sub_0800EF90(Screen *);
-void sub_0800E838(Screen *);
+void StatusScreen_Close(Screen *);
 void sub_0800E77C(Screen *);
 int sub_0821656C(int, int, int, int, int);
-#define StatusScreen_Update sub_0800F154
 int StatusScreen_Update(Screen *p)
 {
     int zero;

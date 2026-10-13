@@ -1,6 +1,5 @@
 #include "palette_controller.h"
 // MATCHING_CONCESSION: register-pinning
-#define Palette_InitializeFromScript sub_080031EC
 extern struct PaletteController *gUnk_02000468;
 extern u16 gUnk_03004FC0[];
 extern s32 gUnk_03004DA0, gUnk_03004DA8;
@@ -14,7 +13,7 @@ void sub_08003038(struct PaletteController *);
 void sub_0800301C(struct PaletteController *);
 void sub_08002F2C(struct PaletteController *);
 void sub_08002E54(struct PaletteController *);
-void sub_08002F40(struct PaletteController *);
+void Palette_BlendVariants(struct PaletteController *);
 void sub_08002D58(struct PaletteController *, struct PaletteTransition *);
 static inline u16 blendEnabled(struct PaletteController *p)
 {
@@ -91,7 +90,7 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
     if (p->flags & 1)
         sub_08002E54(p);
     if (blendEnabled(p) && (p->flags & 2))
-        sub_08002F40(p);
+        Palette_BlendVariants(p);
     if (p->flags & 1)
         sub_08002D58(p, t);
     if (p->current)

@@ -29,7 +29,6 @@ struct Menu {
     u8 pad170[20];
     s16 rightX, rightY;
 };
-#define ChoiceMenu_Initialize sub_08006B60
 struct Dimensions {
     u32 x : 16;
     u32 y : 16;
@@ -41,8 +40,8 @@ struct Resource *sub_0821A520(s32, s32);
 void sub_082196C4(struct Resource *, struct Resource *);
 void sub_0821983C(void *, struct Resource *, s32, s32, s32, s32, s32, struct Dimensions *);
 void sub_08219EBC(void *, void *, s32);
-void sub_08006A04(struct Menu *, void *);
-void sub_080063D0(struct Menu *, s32);
+void ChoiceMenu_LayoutText(struct Menu *, void *);
+void ChoiceMenu_Select(struct Menu *, s32);
 void sub_08006738(struct Menu *);
 s32 sub_08031E1C(void);
 void sub_0822B2F8(s32);
@@ -89,8 +88,8 @@ s32 ChoiceMenu_Initialize(struct Menu *p, void *window, s32 stringBase, s32 *opt
     *(u16 **)((u8 *)p + 0x14C) = palette;
     *(u16 **)((u8 *)p + 0x1AC) = palette;
     if (p->window) {
-        sub_08006A04(p, p->window);
-        sub_080063D0(p, p->selected);
+        ChoiceMenu_LayoutText(p, p->window);
+        ChoiceMenu_Select(p, p->selected);
         sub_08006738(p);
     }
     if (!sub_08031E1C())

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define ResultTutorial_MovePlayer sub_0801D354
 extern int gUnk_0824DB38[];
 extern u8 gUnk_0824DB64[], gUnk_0824DB6F[];
 int ResultTutorial_MovePlayer(u8 *p, int input)

@@ -1,5 +1,4 @@
 #include "global.h"
-#define ResultTutorial_InitializePressDemo sub_0801D6AC
 void sub_0801C17C(void *);
 void sub_0801C1C4(void *);
 int ResultTutorial_InitializePressDemo(u8 *p)

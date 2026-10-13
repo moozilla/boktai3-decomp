@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneObjects_Lock sub_0801E700
 void SceneObjects_Lock(u8 *p, u16 id)
 {
     int i = 0;

@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define Text_CopyWithoutTags sub_0801150C
 int Text_CopyWithoutTags(u8 *dst, u8 *src, int limit)
 {
     int tag = 0, count = 0;

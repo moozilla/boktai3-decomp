@@ -20,7 +20,6 @@ void sub_08220D78(void *, void *, u32, u32, u32);
 void sub_08219A80(void *, u32);
 void sub_0822B2F8(u32);
 void sub_08008BD0(struct Slot *);
-#define Breakable_React sub_08008CF0
 void Breakable_React(void *manager, struct Slot *slot)
 {
     if (sub_08008AA4(slot)) {

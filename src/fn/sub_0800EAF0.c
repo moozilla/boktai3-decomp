@@ -21,17 +21,16 @@ void sub_082279A8(int, int, int, int, int, int, int);
 void sub_0821AD08(u32, void *);
 void sub_0821A0C0(void *);
 void sub_0822B2F8(int);
-void sub_0800EC0C(Screen *);
-void sub_0800EE5C(Screen *);
+void StatusScreen_FadeAndExit(Screen *);
+void StatusScreen_FadeOutPalette(Screen *);
 void sub_0800EF90(Screen *);
-void sub_0800E838(Screen *);
-int sub_0800E7D8(Screen *);
-void sub_0800ED30(Screen *);
-void sub_0800EBB0(Screen *);
-#define StatusScreen_Reveal sub_0800EAF0
+void StatusScreen_Close(Screen *);
+int StatusScreen_CheckConfirm(Screen *);
+void StatusScreen_FadeInPalette(Screen *);
+void StatusScreen_WaitForReveal(Screen *);
 void StatusScreen_Reveal(Screen *p)
 {
-    if (!sub_0800E7D8(p)) {
+    if (!StatusScreen_CheckConfirm(p)) {
         if (!p->timer) {
             sub_0822B2F8(225);
             p->top = 0;
@@ -42,11 +41,11 @@ void StatusScreen_Reveal(Screen *p)
             p->blend = 0x1084;
             p->fade = 0;
             p->fadeStep = 4;
-            p->effect = sub_0800ED30;
+            p->effect = StatusScreen_FadeInPalette;
         }
         if (p->timer++ >= *(u16 *)((u8 *)p + 0x2B8)) {
             {
-                register void (*state)(Screen *) asm("r0") = sub_0800EBB0;
+                register void (*state)(Screen *) asm("r0") = StatusScreen_WaitForReveal;
                 asm("" : "+r"(p) : "r"(state));
                 p->state = state;
             }

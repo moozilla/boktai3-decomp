@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneObjects_SetInactive sub_0801E698
 void sub_0801EF58(void);
 void SceneObjects_SetInactive(u8 *p, u16 id)
 {

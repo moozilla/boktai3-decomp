@@ -26,7 +26,6 @@ void *Script_GetPc(void);
 int sub_08227938(u32);
 void sub_08221208(void *, void *, int, int, int);
 extern u8 *gUnk_030042E4;
-#define PaletteSet_Initialize sub_0800E22C
 int PaletteSet_Initialize(Manager *p, u16 id)
 {
     u16 offsets[6];

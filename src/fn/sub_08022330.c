@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneActorGraphics_UpdateVariant sub_08022330
 void sub_0821FF58(void *, int, int, int, int, int);
 void SceneActorGraphics_UpdateVariant(u8 *p)
 {

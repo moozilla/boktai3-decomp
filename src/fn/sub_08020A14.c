@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneMessages_SwapBuffers sub_08020A14
 typedef struct {
     u16 id;
     u8 unk[4];

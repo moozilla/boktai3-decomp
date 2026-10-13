@@ -6,7 +6,6 @@
 /* Adapted from newlib 1.8.2 s_scalbn.c; see docs/LIBM.md. */
 // COMPILER: old_agbcc
 // CFLAGS: -O2 -fno-builtin
-#define scalbn sub_0824D8B8
 #include "libm_compat.h"
 
 #define two54 (1.80143985094819840000e+16)

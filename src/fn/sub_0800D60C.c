@@ -55,8 +55,7 @@ static inline void setState(struct Object *object, u32 state)
     object->timer = zero;
     object->entered = 1;
 }
-void sub_0800D5C0(void *);
-#define FallingObject_UpdateFinish sub_0800D60C
+void FallingObject_SpawnFinishParticles(void *);
 void FallingObject_UpdateFinish(struct Object *object)
 {
     if (object->entered) {
@@ -73,7 +72,7 @@ void FallingObject_UpdateFinish(struct Object *object)
     }
     if (object->animationDone) {
         if (!object->remove)
-            sub_0800D5C0(object);
+            FallingObject_SpawnFinishParticles(object);
         object->remove = 1;
     }
 }

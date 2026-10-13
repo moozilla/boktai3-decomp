@@ -1,8 +1,4 @@
 #include "global.h"
-#define SoundTest_DrawTrackName           sub_081E1C10
-#define SoundTest_DrawSecondCategoryIndex sub_081E1C64
-#define SoundTest_DrawThirdCategoryIndex  sub_081E1CDC
-#define SoundTest_SelectNext              sub_081E1FF8
 // Provisional name: SoundTest_SelectNext
 struct Sprite {
     u8 head[8];

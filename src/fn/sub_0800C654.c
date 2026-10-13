@@ -37,9 +37,8 @@ void sub_0821FE40(void *);
 void sub_082151E4(void *, u32);
 void sub_082144A4(void *, void *, u32);
 void sub_08215284(void *, u32);
-void sub_080135E8(void *, void *, u32);
-void sub_0800C49C(void);
-#define EffectEmitter_Initialize sub_0800C654
+void Shadow_Initialize(void *, void *, u32);
+void EffectEmitter_ReceiveHit(void);
 s32 EffectEmitter_Initialize(struct Object *object, u32 id)
 {
     struct PackedVec position, size, offset;
@@ -77,7 +76,7 @@ s32 EffectEmitter_Initialize(struct Object *object, u32 id)
     offset.z = 0;
     collision = object->collision;
     sub_0821FEB4(collision, 0, 0x4001, 0, 16, &size, &offset);
-    sub_0821FF84(collision, sub_0800C49C, object);
+    sub_0821FF84(collision, EffectEmitter_ReceiveHit, object);
     sub_0821FF24(collision, &position, 0);
     sub_0821FE40(collision);
     resource = object->resource;
@@ -87,6 +86,6 @@ s32 EffectEmitter_Initialize(struct Object *object, u32 id)
     sprite->frame = 0;
     sub_08215284(resource, 486);
     object->sprite.position = *(struct Vec *)&position;
-    sub_080135E8(object->shadow, &object->sprite.position, 0);
+    Shadow_Initialize(object->shadow, &object->sprite.position, 0);
     return 0;
 }

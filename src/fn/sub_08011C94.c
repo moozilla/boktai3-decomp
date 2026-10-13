@@ -63,7 +63,6 @@ static inline u8 *cell(int i)
         return p + 4;
     return gUnk_030052F4->cells + 12 + i * 4;
 }
-#define SceneIndicator_CreateFromScript sub_08011C94
 int SceneIndicator_CreateFromScript(void)
 {
     u8 *m = sub_08011884();

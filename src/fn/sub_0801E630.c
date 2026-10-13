@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneObjects_SetActive sub_0801E630
 void sub_0801EF5C(void);
 void SceneObjects_SetActive(u8 *p, u16 id)
 {

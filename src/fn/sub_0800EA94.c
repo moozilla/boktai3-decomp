@@ -20,17 +20,16 @@ void sub_082279A8(int, int, int, int, int, int, int);
 void sub_0821AD08(u32, void *);
 void sub_0821A0C0(void *);
 void sub_0822B2F8(int);
-void sub_0800EC0C(Screen *);
-void sub_0800EE5C(Screen *);
+void StatusScreen_FadeAndExit(Screen *);
+void StatusScreen_FadeOutPalette(Screen *);
 void sub_0800EF90(Screen *);
-void sub_0800E838(Screen *);
-int sub_0800E7D8(Screen *);
+void StatusScreen_Close(Screen *);
+int StatusScreen_CheckConfirm(Screen *);
 void sub_0800E974(Screen *);
-void sub_0800F0F0(Screen *);
-#define StatusScreen_WaitForClose sub_0800EA94
+void StatusScreen_ClearScanlineNoise(Screen *);
 void StatusScreen_WaitForClose(Screen *p)
 {
-    if (!sub_0800E7D8(p)) {
+    if (!StatusScreen_CheckConfirm(p)) {
         if (p->timer++ >= *(u16 *)((u8 *)p + 0x2BA)) {
             {
                 register void (*state)(Screen *) asm("r1") = sub_0800E974;
@@ -38,7 +37,7 @@ void StatusScreen_WaitForClose(Screen *p)
                 p->state = state;
                 p->timer = 0;
             }
-            p->pad2d4 = (u32)sub_0800F0F0;
+            p->pad2d4 = (u32)StatusScreen_ClearScanlineNoise;
         }
         p->dirty |= 15;
     }

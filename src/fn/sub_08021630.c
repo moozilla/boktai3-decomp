@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneActors_SetHealth sub_08021630
 int Div(int, int);
 int SceneActors_SetHealth(u8 *p, int health)
 {

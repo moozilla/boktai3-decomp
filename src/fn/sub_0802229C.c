@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneActorGraphics_InitializeOverlay sub_0802229C
 typedef struct {
     s16 x, y, z;
 } Vec;

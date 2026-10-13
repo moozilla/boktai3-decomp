@@ -1,5 +1,4 @@
 #include "global.h"
-#define Scene_PlayObjectBreakEffect sub_08004940
 s32 sub_0822B2F8(u32);
 void sub_08014CA4(u32, u32, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32);
 

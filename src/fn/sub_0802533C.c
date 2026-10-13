@@ -42,7 +42,7 @@ static inline void setFacing(ActorAnimation *p, int angle)
     value = 7 & shifted;
     p->facing8 = value;
 }
-void sub_0802175C(void *, void *, void *, int, int, int, int);
+void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 void sub_0822B3BC(int);
 int sub_082215E4(int, int);
 extern s16 gUnk_086149C4[];
@@ -89,10 +89,12 @@ void sub_0802533C(ActorAnimation *p, int tick)
                 sub_0822B3BC(888);
         }
         sequence = choose(p2->mode, 51, 13);
-        sub_0802175C(p, (u8 *)p2 + 0x240, (u8 *)p2 + 0x220, sequence, 2, 3, 4);
+        SceneActors_StartDirectionalAnimation(p, (u8 *)p2 + 0x240, (u8 *)p2 + 0x220, sequence, 2, 3,
+                                              4);
     } else {
         int sequence = choose(p->mode, 51, 13);
-        sub_0802175C(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 2, 3, 1);
+        SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 2, 3,
+                                              1);
     }
     decay(&p2->minScale);
     decay(&p2->maxScale);

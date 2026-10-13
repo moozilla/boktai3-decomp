@@ -21,7 +21,6 @@ static inline int count(struct Queue *q)
     u8 *bank = &gUnk_0200047C->bank;
     return q->count[*bank];
 }
-#define BoardPieces_DispatchCommands sub_0801037C
 int BoardPieces_DispatchCommands(u8 *manager)
 {
     struct Queue *queue = (void *)(manager + 0xCD4);

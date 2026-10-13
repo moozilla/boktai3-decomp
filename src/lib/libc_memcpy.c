@@ -18,7 +18,6 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  * This software was developed at Cygnus Solutions. */
 // COMPILER: old_agbcc
 // CFLAGS: -O2 -fno-builtin
-#define memcpy sub_0824DA48
 typedef unsigned long size_t;
 void *
 memcpy(void * dst0 , const void * src0 , size_t len0)

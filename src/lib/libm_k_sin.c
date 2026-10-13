@@ -6,7 +6,6 @@
 /* Adapted from newlib 1.8.2 k_sin.c; see docs/LIBM.md. */
 // COMPILER: old_agbcc
 // CFLAGS: -O2 -fno-builtin
-#define __kernel_sin sub_0824D1B8
 #include "libm_compat.h"
 
 #define half (5.00000000000000000000e-01)

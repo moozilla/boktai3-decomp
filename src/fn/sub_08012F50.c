@@ -30,7 +30,7 @@ struct Manager {
 };
 int sub_082151E4(void *, int);
 void sub_082144A4(void *, void *, int);
-void sub_08012D3C(void *, void *, int);
+void BreakableBarrier_SetPosition(void *, void *, int);
 void sub_0821FEB4(void *, int, int, int, int, void *, void *);
 void sub_0821FF24(void *, void *, int);
 void sub_0821FF84(void *, void *, void *);
@@ -59,7 +59,6 @@ static inline void disable(struct Collider *c)
 {
     c->flags |= 4;
 }
-#define BreakableBarrier_Update sub_08012F50
 void BreakableBarrier_Update(struct Manager *m, struct Barrier *p)
 {
     struct Packed size;

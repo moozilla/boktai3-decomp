@@ -52,7 +52,6 @@ static inline u32 frame_factor(u16 v)
     u32 mask = 15;
     return mask & value;
 }
-#define FadingParticleGroup_Update sub_08016118
 int FadingParticleGroup_Update(struct Group *g)
 {
     int alive = 0, i = 0;

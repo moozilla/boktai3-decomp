@@ -39,7 +39,6 @@ extern u32 gUnk_030053F4;
 void sub_0800CC34(void *);
 void sub_08014634(u32, u32, void *, void *, void *, u32, u32);
 void sub_082260A4(u32);
-#define FallingObject_UpdateBounceAway sub_0800D418
 void FallingObject_UpdateBounceAway(struct Object *object)
 {
     struct PackedVec low, high;

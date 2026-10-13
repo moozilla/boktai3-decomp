@@ -6,7 +6,6 @@
 /* Adapted from newlib 1.8.2 s_isnan.c; see docs/LIBM.md. */
 // COMPILER: old_agbcc
 // CFLAGS: -O2 -fno-builtin
-#define isnan sub_0824D884
 #include "libm_compat.h"
 
  int isnan(double x)

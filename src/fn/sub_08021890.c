@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneActors_StartUnmirroredAnimation sub_08021890
 typedef struct {
     u8 pad[0xa3];
     u8 completed;

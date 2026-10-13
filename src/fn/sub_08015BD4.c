@@ -2,8 +2,7 @@
 struct Config {
     u16 v[20];
 };
-void sub_080154EC(int, void *, struct Config *);
-#define AnimatedParticles_EmitDirectional sub_08015BD4
+void AnimatedParticles_Create(int, void *, struct Config *);
 void AnimatedParticles_EmitDirectional(int count, int type, int flags, int speed, int yaw,
                                        int yawRange, int horizontal, int horizontalRange,
                                        int vertical, int verticalRange, void *pos)
@@ -28,5 +27,5 @@ void AnimatedParticles_EmitDirectional(int count, int type, int flags, int speed
     s.v[17] = 0;
     s.v[18] = 255;
     s.v[19] = 0;
-    sub_080154EC(count, pos, &s);
+    AnimatedParticles_Create(count, pos, &s);
 }

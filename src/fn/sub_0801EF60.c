@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneObject_AnimateInactive sub_0801EF60
 void sub_0822B3BC(int);
 void sub_0801EF58(void);
 void SceneObject_AnimateInactive(u8 *s)

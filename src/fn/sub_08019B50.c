@@ -1,5 +1,4 @@
 #include "global.h"
-#define SpritePool_Find sub_08019B50
 typedef struct {
     u32 id;
     u8 active, pad[171];

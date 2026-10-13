@@ -24,16 +24,15 @@ int Script_GetPc(void);
 int Script_GetValue(void);
 int sub_082151E4(void *, int);
 void sub_08215284(void *, int);
-void sub_08011890(void *, void *);
-void sub_08011928(void *, void *);
-#define SceneIndicators_Update sub_08011A28
+void SceneIndicator_Initialize(void *, void *);
+void SceneIndicator_Update(void *, void *);
 int SceneIndicators_Update(struct Controller *m)
 {
     int i;
     u8 *p = m->indicators[0];
     for (i = 15; i >= 0; i--, p += 180)
         if (p[16])
-            sub_08011928(m, p);
+            SceneIndicator_Update(m, p);
     {
         int x = *(s16 *)(gUnk_02000580 + 0x30) >> 8, y = *(s16 *)(gUnk_02000580 + 0x34) >> 8, tile;
         if (x < 0 || y < 0 || x >= gUnk_030052F8 || y >= gUnk_030052FC)

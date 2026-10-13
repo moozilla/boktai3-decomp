@@ -82,9 +82,9 @@ void sub_08215284(void *, s32);
 void sub_0822B2F8(s32);
 void sub_0821AD08(void *, s32);
 void sub_08013424(void *);
-void sub_081E34D0(void *);
+void ActorPalette_BeginFade(void *);
 s32 Mod(s32, s32);
-void sub_08015C30(void *, s32, s32, s32, s32, s32, s32, s32);
+void AnimatedParticles_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
 void sub_080148CC(s32, s32, void *, s32, s32, s32, s32, s32, s32, s32, s32);
 void sub_081E7F80(struct S *p)
 {
@@ -166,10 +166,10 @@ void sub_081E7F80(struct S *p)
             p->obj.flags |= 1;
         if (--*(u16 *)((u8 *)p + 0xf82) == 0) {
             s32 duration = 10;
-            sub_08015C30((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
-            sub_08015C30((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
-            sub_08015C30((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
-            sub_08015C30((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
+            AnimatedParticles_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
+            AnimatedParticles_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
+            AnimatedParticles_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
+            AnimatedParticles_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
             sub_080148CC(1, 3, (u8 *)p + 0xdf8, 32, 60, duration, 3, duration, 5, 60, duration);
             sub_080148CC(1, 3, (u8 *)p + 0xdf8, 64, 60, duration, 3, duration, 5, 60, duration);
             sub_080148CC(1, 3, (u8 *)p + 0xdf8, 96, 60, duration, 3, duration, 5, 60, duration);

@@ -1,10 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneObjects_ScriptRaise sub_0801E8B8
 u8 *sub_0821A2C4(int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
-void sub_0801F580(void);
+void SceneObject_UpdateRaised(void);
 int SceneObjects_ScriptRaise(void)
 {
     register u8 *p asm("r5") = sub_0821A2C4(0x85e6);
@@ -28,7 +27,7 @@ int SceneObjects_ScriptRaise(void)
         zero = 0;
         asm("" : "+r"(zero));
         mask = 0xfffc;
-        fn = sub_0801F580;
+        fn = SceneObject_UpdateRaised;
         do {
             u8 *s;
             s = *base + i * 140;

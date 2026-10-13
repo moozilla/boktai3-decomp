@@ -1,6 +1,5 @@
 #include "global.h"
-#define ResultTutorial_HidePrompt sub_0801D1C8
-int sub_0801D13C(void *);
+int ResultTutorial_FadeOut(void *);
 typedef struct {
     u32 pad[2], flags;
 } Graphic;
@@ -15,7 +14,7 @@ int ResultTutorial_HidePrompt(u8 *p)
             ((Graphic *)(p + 0x684))->flags |= one;
         }
         case 1:
-            if (sub_0801D13C(p))
+            if (ResultTutorial_FadeOut(p))
                 return 1;
             break;
     }

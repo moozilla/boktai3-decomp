@@ -6,7 +6,6 @@
 /* Adapted from newlib 1.8.2 k_rem_pio2.c; see docs/LIBM.md. */
 // COMPILER: old_agbcc
 // CFLAGS: -O2 -fno-builtin
-#define __kernel_rem_pio2 sub_0824C9E0
 #include "libm_compat.h"
 
 extern const int gUnk_08603178[];

@@ -4,7 +4,7 @@ s32 sub_08229440(void);
 s32 sub_08229380(void);
 void sub_082284CC(s32);
 void sub_08228C40(s32, s32, s32, s32, s32, s32, s32);
-void sub_082290F4(void)
+void Clock_CheckRtcDate(void)
 {
     s32 status = 0, i = 0, error = -1;
     while (i <= 4) {

@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define TerrainOverlay_QueueCommand sub_08003BB8
 struct Command {
     u16 type, id;
 };

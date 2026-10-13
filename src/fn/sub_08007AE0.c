@@ -38,9 +38,8 @@ static inline u32 frame_factor(u16 v)
 extern u32 gUnk_030053F4;
 void sub_0822B3BC(s32);
 s32 sub_0822D490(s32, s32);
-s32 sub_08006F00(struct Trigger *, u16, s32);
+s32 Trigger_RunScript(struct Trigger *, u16, s32);
 u8 sub_082212DC(struct Obj *, u32, s32, s32);
-#define Trigger_UpdateActivation sub_08007AE0
 void Trigger_UpdateActivation(void *manager, struct Trigger *p)
 {
     struct Obj *o;
@@ -105,7 +104,7 @@ void Trigger_UpdateActivation(void *manager, struct Trigger *p)
         if (!(gUnk_030053F4 & 2048))
             sub_0822B3BC(272);
         script = p->script;
-        sub_08006F00(p, script, sub_0822D490(p->id, p->kind) == 1);
+        Trigger_RunScript(p, script, sub_0822D490(p->id, p->kind) == 1);
     } else if (p->timer > 8) {
         if (sub_082212DC(p->obj, p->timer, 30, 90))
             p->flags |= 1;

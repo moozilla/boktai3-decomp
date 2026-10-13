@@ -34,7 +34,6 @@ s32 sub_0821ABA8(u32, s32);
 void *sub_08219C40(u32);
 void sub_08219DD8(void *, u32);
 s32 sub_08009524(struct Manager *, struct Controller *, s32);
-#define DirectionalController_InitManager sub_08009AA0
 s32 DirectionalController_InitManager(struct Manager *manager)
 {
     struct Controller *p;

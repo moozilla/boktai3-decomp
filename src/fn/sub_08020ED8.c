@@ -20,7 +20,6 @@ typedef struct {
     Receiver *receivers;
     Receiver self;
 } Controller;
-#define SceneMessages_Stop sub_08020ED8
 extern Controller *gUnk_0200047C;
 int SceneMessages_Stop(void)
 {

@@ -21,7 +21,7 @@ struct Trigger {
 extern struct Map *gUnk_030052F4;
 extern u32 gUnk_030052F8, gUnk_030052FC;
 u8 *sub_0821D64C(s32, s32);
-void sub_08007060(struct Trigger *);
+void Trigger_UpdateShake(struct Trigger *);
 void sub_080070D0(void *, struct Trigger *);
 void sub_080077C4(void *, struct Trigger *);
 static inline s32 cellIndex(struct Vec *pos)
@@ -52,9 +52,8 @@ static inline s32 groundHeight(struct Vec *position)
     }
     return height;
 }
-void sub_08007728(void *, struct Trigger *);
+void Trigger_UpdateGrounded(void *, struct Trigger *);
 void sub_08013728(void *);
-#define Trigger_UpdateLanding sub_0800751C
 void Trigger_UpdateLanding(void *manager, struct Trigger *p)
 {
     s32 height = groundHeight(p->position);
@@ -63,13 +62,13 @@ void Trigger_UpdateLanding(void *manager, struct Trigger *p)
     else if (p->timer <= 5)
         p->position->y -= 8;
     else {
-        p->update = sub_08007728;
+        p->update = Trigger_UpdateGrounded;
         p->timer = 0;
         p->position->y = height + 1;
         sub_08013728(p + 1);
         return;
     }
-    sub_08007060(p);
+    Trigger_UpdateShake(p);
     sub_080070D0(manager, p);
     p->timer++;
 }

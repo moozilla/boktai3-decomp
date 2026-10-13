@@ -3,10 +3,10 @@
 typedef struct {
     int a, b;
 } Position;
-u8 *sub_0802141C(void);
+u8 *SceneActors_FindAvailable(void);
 int SceneActors_CopyAvailablePosition(int *out)
 {
-    u8 *p = sub_0802141C();
+    u8 *p = SceneActors_FindAvailable();
     int result;
     if (p) {
         *(Position *)out = *(Position *)(p + 0x54);

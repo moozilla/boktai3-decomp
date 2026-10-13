@@ -2,7 +2,6 @@
 
 u8 *sub_0821A520(u32, u32);
 s32 sub_08058544(void *);
-void CpuSet(const void *, void *, u32);
 
 void sub_080585AC(void *p)
 {

@@ -1,11 +1,4 @@
 #include "global.h"
-#define SoundTest_MoveCategoryCursor       sub_081E1BC8
-#define SoundTest_PlaySelection            sub_081E1D50
-#define SoundTest_StopSelection            sub_081E1E50
-#define SoundTest_SelectPrevious           sub_081E1F5C
-#define SoundTest_SelectNext               sub_081E1FF8
-#define SoundTest_UpdatePlaybackIndicators sub_081E2094
-#define SoundTest_Update                   sub_081E2154
 // Provisional name: SoundTest_Update
 struct Sprite {
     u8 head[8];

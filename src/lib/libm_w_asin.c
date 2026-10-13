@@ -6,7 +6,6 @@
 /* Adapted from newlib 1.8.2 w_asin.c; see docs/LIBM.md. */
 // COMPILER: old_agbcc
 // CFLAGS: -O2 -fno-builtin
-#define asin sub_0824B314
 #include "libm_compat.h"
 extern const char gUnk_08602E48[];
 

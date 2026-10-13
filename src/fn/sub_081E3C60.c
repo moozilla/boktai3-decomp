@@ -1,5 +1,4 @@
 #include "global.h"
-#define Actor_TryInteraction sub_081E3C60
 // Provisional name: Actor_TryInteraction
 // MATCHING_CONCESSION: register-pinning
 struct Obj {

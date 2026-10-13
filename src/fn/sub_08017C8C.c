@@ -53,7 +53,6 @@ static inline int interrupted(void)
     int mask = 1024;
     return (gUnk_030053F4 | gUnk_030053F0) & mask;
 }
-#define Weather_ActiveStorm sub_08017C8C
 int Weather_ActiveStorm(struct Weather *p)
 {
     if (p->entered) {

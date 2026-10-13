@@ -26,7 +26,6 @@ void *sub_08215184(u32);
 void *sub_0821A520(u32, u32);
 void sub_08217E60(void *, void *, u32);
 void sub_08217ECC(void *, u32);
-#define EffectManager_Init sub_0800AB60
 s32 EffectManager_Init(struct Manager *manager)
 {
     s32 i, j;

@@ -1,5 +1,4 @@
 #include "global.h"
-#define Palette_UpdateOscillation sub_08002E80
 #include "palette_controller.h"
 void Palette_UpdateOscillation(struct PaletteController *p)
 {

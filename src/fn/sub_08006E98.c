@@ -12,8 +12,8 @@ s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 u32 sub_08227E90(void);
 u32 sub_0821ABA8(u32, u32);
-void sub_08006A04(void *, u32);
-void sub_080063D0(void *, s32);
+void ChoiceMenu_LayoutText(void *, u32);
+void ChoiceMenu_Select(void *, s32);
 void sub_08006738(void *);
 void sub_08006E98(void)
 {
@@ -24,8 +24,8 @@ void sub_08006E98(void)
         if (Script_SeekToKeyword(0x77))
             p->a = Script_GetValue();
         if (p->b != 0) {
-            sub_08006A04(p, p->b);
-            sub_080063D0(p, p->a);
+            ChoiceMenu_LayoutText(p, p->b);
+            ChoiceMenu_Select(p, p->a);
             sub_08006738(p);
         }
     }

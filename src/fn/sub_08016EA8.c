@@ -11,7 +11,6 @@ struct Manager {
     struct Effect effects[8];
 };
 extern void (*gUnk_08604C64[])(struct Manager *, struct Effect *, int);
-#define FloatingEffectManager_Update sub_08016EA8
 int FloatingEffectManager_Update(struct Manager *m)
 {
     int i = 0;

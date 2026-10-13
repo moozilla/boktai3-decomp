@@ -7,7 +7,6 @@ void *sub_0821A520(int, int);
 void sub_082161B4(int, int, void *, int, int, int, void *);
 void sub_0821656C(int, int, int, int, int);
 extern u16 gUnk_03004FC0[];
-#define MessageMenu_LoadBackground sub_080111EC
 void MessageMenu_LoadBackground(struct Menu *m, int id)
 {
     void *map = sub_0821A520(0xC091, 0x3536);

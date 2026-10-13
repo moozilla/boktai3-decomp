@@ -23,7 +23,6 @@ void sub_0821FF84(void *, void *, void *);
 void sub_08008ABC(void);
 void sub_0821FF24(void *, void *, u32);
 void sub_0821FE40(void *);
-#define Breakable_InitSlot sub_08008AF4
 s32 Breakable_InitSlot(struct Manager *manager, struct Slot *slot)
 {
     u32 fill;

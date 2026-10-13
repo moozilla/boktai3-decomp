@@ -6,7 +6,6 @@ struct Weather {
 };
 void sub_08003448(int);
 void sub_080174B8(void *, int);
-#define Weather_WaitForStorm sub_08017BB8
 int Weather_WaitForStorm(struct Weather *p)
 {
     if (p->entered) {

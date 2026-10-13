@@ -1,5 +1,4 @@
 #include "global.h"
-#define SelectionMenu_Back sub_0801A920
 typedef struct {
     u32 pad[2], flags;
     u8 gap[20];
@@ -7,12 +6,12 @@ typedef struct {
     u8 tail[60];
 } Graphic;
 void sub_08019F18(void *, void (*)(void));
-void sub_0801ADC0(void);
-void sub_0801B188(void);
+void SelectionMenu_Choose(void);
+void SelectionMenu_Close(void);
 void sub_0822B2F8(int);
 void sub_0821980C(void *, void *, int, int);
 void sub_08030F20(int, int, int, int);
-void sub_08019F44(void *, int);
+void Presentation_UpdateActorGraphic(void *, int);
 void SelectionMenu_Back(u8 *p)
 {
     Graphic *g = (Graphic *)(p + 0x1f4);
@@ -27,10 +26,10 @@ void SelectionMenu_Back(u8 *p)
             g->x = 64;
         g->y = 40;
         sub_08030F20(2, 16, 30, 2);
-        sub_08019F44(p, 0);
-        sub_08019F18(p, sub_0801ADC0);
+        Presentation_UpdateActorGraphic(p, 0);
+        sub_08019F18(p, SelectionMenu_Choose);
     } else {
         sub_0822B2F8(0xde);
-        sub_08019F18(p, sub_0801B188);
+        sub_08019F18(p, SelectionMenu_Close);
     }
 }

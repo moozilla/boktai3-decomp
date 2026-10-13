@@ -19,7 +19,6 @@ struct Weather {
 };
 void sub_08217EEC(void *, void *, int);
 void sub_08217EAC(void *);
-#define WeatherParticles_Update sub_08017730
 int WeatherParticles_Update(struct Weather *p)
 {
     struct Drop *d = p->drops;

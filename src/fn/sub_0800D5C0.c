@@ -58,13 +58,12 @@ static inline void setState(struct Object *object, u32 state)
 struct PackedVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
-s32 sub_08015C30(void *, u32, u32, u32, u32, u32, u32, u32);
-#define FallingObject_SpawnFinishParticles sub_0800D5C0
+s32 AnimatedParticles_EmitBurst(void *, u32, u32, u32, u32, u32, u32, u32);
 s32 FallingObject_SpawnFinishParticles(struct Object *object)
 {
     struct PackedVec position;
     position.x = object->sprite.position.x;
     position.y = object->sprite.position.y;
     position.z = object->sprite.position.z;
-    return sub_08015C30(&position, 2, 0, 64, 8, 4, 0, 0);
+    return AnimatedParticles_EmitBurst(&position, 2, 0, 64, 8, 4, 0, 0);
 }

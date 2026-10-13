@@ -1,5 +1,4 @@
 #include "global.h"
-#define Password_EncodeSymbols sub_080115A4
 
 struct S {
     u8 out[0x18];
@@ -7,7 +6,7 @@ struct S {
     u8 g[0x7c - 0x48];
     u32 p;
 };
-u32 sub_08011578(u32, u32, u32);
+u32 GlyphTable_FindPair(u32, u32, u32);
 
 s32 Password_EncodeSymbols(struct S *s)
 {
@@ -17,7 +16,7 @@ s32 Password_EncodeSymbols(struct S *s)
     for (i = 0; i <= 0x17; i++, in += k) {
         u32 a = in[0];
         u32 b = in[1];
-        u32 r = sub_08011578(s->p, a, b);
+        u32 r = GlyphTable_FindPair(s->p, a, b);
         if (r > 0x3f)
             return -1;
         s->out[i] = r;

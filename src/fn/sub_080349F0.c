@@ -1,7 +1,7 @@
 #include "global.h"
 
-void sub_0824780C(void);
+void rfu_REQ_recvData(void);
 void sub_080349F0(void)
 {
-    sub_0824780C();
+    rfu_REQ_recvData();
 }

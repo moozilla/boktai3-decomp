@@ -1,8 +1,8 @@
 #include "global.h"
 
-void sub_08248970(void);
+void Rtc_Initialize(void);
 
 void sub_082284DC(void)
 {
-    sub_08248970();
+    Rtc_Initialize();
 }

@@ -1,5 +1,4 @@
 #include "global.h"
-#define SoundTest_MoveCategoryCursor sub_081E1BC8
 // Provisional name: SoundTest_MoveCategoryCursor
 struct Sprite {
     u8 head[8];

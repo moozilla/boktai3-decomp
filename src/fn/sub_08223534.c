@@ -12,11 +12,11 @@ struct S {
     u8 fd;
 };
 extern struct S gUnk_03005390;
-u32 sub_08245890(void);
+u32 rfu_REQBN_softReset_and_checkID(void);
 void sub_08224C84(void);
 u32 sub_08223534(void)
 {
-    u32 r = sub_08245890();
+    u32 r = rfu_REQBN_softReset_and_checkID();
     struct S *s;
     u32 c;
     if (r == 0x8001)

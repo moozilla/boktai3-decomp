@@ -1,6 +1,5 @@
 #include "global.h"
 extern u8 *gUnk_030042E4;
-void CpuSet(const void *, void *, u32);
 void sub_0811C818(u8 *a, s32 b)
 {
     u8 **gp;

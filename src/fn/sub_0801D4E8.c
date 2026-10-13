@@ -1,6 +1,5 @@
 #include "global.h"
-#define ResultTutorial_LowerMarker sub_0801D4E8
-void sub_0801D354(void *, int);
+void ResultTutorial_MovePlayer(void *, int);
 int ResultTutorial_LowerMarker(u8 *p)
 {
     switch (p[0xaf]) {
@@ -9,7 +8,7 @@ int ResultTutorial_LowerMarker(u8 *p)
             *(u16 *)(p + 0xaa) = 0;
             break;
         case 1:
-            sub_0801D354(p, 0);
+            ResultTutorial_MovePlayer(p, 0);
             if (*(int *)(p + 0x8c) <= 3071)
                 return 1;
             break;

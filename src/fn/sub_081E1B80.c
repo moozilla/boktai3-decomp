@@ -1,5 +1,4 @@
 #include "global.h"
-#define SoundTest_ShowCategory sub_081E1B80
 // Provisional name: SoundTest_ShowCategory
 struct Sprite {
     u8 head[8];

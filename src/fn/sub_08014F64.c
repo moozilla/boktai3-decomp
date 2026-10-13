@@ -24,7 +24,6 @@ static inline int scale(int a, int b)
     else
         return -((-v) >> 12);
 }
-#define FragmentGroup_Update sub_08014F64
 void FragmentGroup_Update(void *m, struct Group *g)
 {
     int i;

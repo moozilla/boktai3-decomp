@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneActors_Destroy sub_08021578
 void sub_0815F738(void *);
 void sub_08020D08(void *);
 void sub_08225938(void *);

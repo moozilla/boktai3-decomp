@@ -1,9 +1,8 @@
 #include "global.h"
-#define SceneObjects_ScriptActivate sub_0801E784
 u8 *sub_0821A2C4(int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
-void sub_0801F3A0(void);
+void SceneObject_BeginRaising(void);
 int SceneObjects_ScriptActivate(void)
 {
     u8 *p = sub_0821A2C4(0x85e6);
@@ -21,7 +20,7 @@ int SceneObjects_ScriptActivate(void)
                 *(int *)(s + 0x60) = Script_GetValue();
             if (s[0x37] == 1 || s[0x37] == 3) {
                 s[0x37] = 2;
-                *(void **)(s + 0x30) = sub_0801F3A0;
+                *(void **)(s + 0x30) = SceneObject_BeginRaising;
             }
             found = 1;
         }

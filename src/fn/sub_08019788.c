@@ -11,7 +11,6 @@ typedef struct {
     void *tiles;
 } Manager;
 
-#define TileAnimation_Upload sub_08019788
 Manager *sub_080195DC(void);
 void TileAnimation_Upload(void)
 {

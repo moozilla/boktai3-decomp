@@ -20,7 +20,7 @@ extern u16 gUnk_03004BD8, gUnk_03005260[];
 extern u32 gUnk_0300523C;
 extern u16 gUnk_03004FC0[];
 void sub_08033C1C(void);
-void sub_0801683C(void);
+void PaletteLevels_Reset(void);
 void sub_08215490(int);
 void sub_08218B30(void);
 void sub_08215114(void);
@@ -31,7 +31,6 @@ void sub_082156B8(int);
 void *sub_0821A520(int, int);
 void sub_082161B4(int, int, void *, int, int, int, void *);
 void sub_0821656C(int, int, int, int, int);
-void CpuSet(const void *, void *, u32);
 void sub_08036C0C(void);
 void sub_0822B058(int);
 void sub_08036E14(void);
@@ -57,7 +56,7 @@ int sub_08037140(struct LinkMenu *p)
     struct Blob *blob;
     int zero;
     gUnk_020000F8 = p;
-    sub_0801683C();
+    PaletteLevels_Reset();
     if (!Script_SeekToKeyword(115))
         goto failed;
     p->script = sub_08227E90();

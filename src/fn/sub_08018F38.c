@@ -10,7 +10,6 @@ struct Circle {
     s16 x, y;
 };
 u16 Sqrt(u32);
-#define CircleWindow_GenerateScanlines sub_08018F38
 void CircleWindow_GenerateScanlines(struct Circle *p, int bank)
 {
     int radius = p->radius >> 4;

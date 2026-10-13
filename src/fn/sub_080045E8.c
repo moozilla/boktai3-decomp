@@ -1,7 +1,6 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 /* Tentative: apply a terrain-triggered resource cost and feedback. */
-#define Scene_ApplyTerrainInteraction sub_080045E8
 struct Actor {
     u8 type, pad1[3];
     u16 kind;
@@ -18,7 +17,7 @@ struct Contact {
 };
 void sub_08215284(void *, u16);
 void sub_0822B2F8(s32);
-void sub_08015C30(void *, s32, s32, s32, s32, s32, s32, s32);
+void AnimatedParticles_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
 void Scene_ApplyTerrainInteraction(struct Contact *contact, void *unused, struct Actor *actor)
 {
     register struct Actor *incoming asm("r0") = actor;
@@ -56,7 +55,7 @@ void Scene_ApplyTerrainInteraction(struct Contact *contact, void *unused, struct
             if (!actor->cooldown) {
                 actor->cooldown = 10;
                 sub_0822B2F8(0x15C);
-                sub_08015C30((u8 *)actor + 0x38, 0, 0, 0x40, 12, 12, 4, 4);
+                AnimatedParticles_EmitBurst((u8 *)actor + 0x38, 0, 0, 0x40, 12, 12, 4, 4);
             }
             applied = 1;
         }

@@ -7,7 +7,6 @@ struct Controller {
 };
 extern struct Controller *gUnk_02000070;
 void sub_0821910C(void);
-#define PaletteLevels_Reset sub_0801683C
 void PaletteLevels_Reset(void)
 {
     struct Controller *p = gUnk_02000070;

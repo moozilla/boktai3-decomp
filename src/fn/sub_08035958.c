@@ -31,10 +31,8 @@ struct Engine {
 extern struct Engine *gUnk_02000484;
 extern u8 gUnk_020000EC;
 void sub_08219DD8(void *, int);
-#define gRfuLinkStatus     gUnk_03006A80
-#define gRfuSlotStatusNI   gUnk_03006A70
-#define rfu_NI_setSendData sub_08246CC8
-#define rfu_clearSlot      sub_08246AAC
+#define gRfuLinkStatus   gUnk_03006A80
+#define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
@@ -43,15 +41,13 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-u16 sub_08245570(u8 *);
-void sub_0824780C(void);
 void sub_08035958(void)
 {
     struct Engine *p = gUnk_02000484;
     u8 slots;
     if (p) {
         u8 *scratch = p->scratch;
-        int status = sub_08245570(&slots);
+        int status = rfu_UNI_PARENT_getDRAC_ACK(&slots);
         if (!status) {
             register u8 *seen asm("r2") = (u8 *)p + 0xE7;
             int bits = (slots << 1) | *seen;
@@ -68,6 +64,6 @@ void sub_08035958(void)
                 (*(u32 *)((u8 *)p + 0xE0))++;
             }
         }
-        sub_0824780C();
+        rfu_REQ_recvData();
     }
 }

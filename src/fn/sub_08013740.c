@@ -47,7 +47,6 @@ static inline int noShadow(struct Cell *c)
     value &= 32;
     return value;
 }
-#define ScaledShadow_Update sub_08013740
 void ScaledShadow_Update(struct Shadow *p)
 {
     u16 index = cellIndex(p->source);
