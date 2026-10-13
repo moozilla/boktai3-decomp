@@ -19,7 +19,7 @@ register-pinned: **4.214%**, included above.
 
 Combined ROM validation printed **`build/boktai3.gba: OK`**.
 
-All named functions at **08031D40-080335D4** now match. This completes the
+All named functions at **08031D40-080335F4** now match. This completes the
 text interpreter and scrolling dialogue controller; unnamed assembly tails
 remain assembly. The large tag parser, width counters, glyph dispatch and
 scroll/reveal loop are exact C. Descriptive names and contiguous objdiff groups
