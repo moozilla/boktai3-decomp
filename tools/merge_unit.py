@@ -81,7 +81,8 @@ def merge(paths):
                 if item not in includes:
                     includes.append(item)
                 continue
-            if item.strip() == MARK:
+            item = "\n".join(l for l in item.split("\n") if l.strip() != MARK).strip("\n")
+            if not item:
                 continue
             if pinned and is_function(item):
                 item = MARK + "\n" + item
