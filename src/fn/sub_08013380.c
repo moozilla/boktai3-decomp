@@ -1,10 +1,9 @@
-#include "global.h"
-void *Task_Create(s32, s32);
-void Task_SetCallbacks(void *, void *, void *);
+#include "breakable_barrier.h"
+
 s32 BreakableBarriers_Initialize(void *);
-void Task_Kill(void *);
-void sub_0801324C(void);
-void sub_08013270(void);
+u32 sub_0801324C(struct BreakableBarrierManager *);
+u32 sub_08013270(struct BreakableBarrierManager *);
+
 void *sub_08013380(void)
 {
     void *obj;

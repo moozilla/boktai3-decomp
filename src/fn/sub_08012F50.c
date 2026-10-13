@@ -1,76 +1,29 @@
-#include "global.h"
+#include "breakable_barrier.h"
 // MATCHING_CONCESSION: register-pinning
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct Packed {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
-struct Collider {
-    u8 pad[6];
-    u16 flags;
-    u8 rest[76];
-};
-struct Barrier {
-    u32 flags;
-    u8 pad4[3], priority;
-    u8 pad8[20];
-    struct Vec position;
-    u8 spriteTail[8], resource[28];
-    struct Collider collider;
-    u16 health;
-    u8 state, entered, flash, hit, frame, pada3;
-    u32 timer;
-};
-struct Manager {
-    u8 task[24];
-    u32 count, health, remaining, blend, script;
-    u32 direction[4];
-    struct Vec positions[4];
-};
-int AnimData_Load(void *, int);
-void Sprite_Init(void *, void *, int);
-void BreakableBarrier_SetPosition(void *, void *, int);
-void Collider_Init(void *, int, int, int, int, void *, void *);
-void Collider_SetPosition(void *, void *, int);
-void Collider_SetCallback(void *, void *, void *);
-void sub_0821FF7C(void *, int, int, int);
-void Collider_Refresh(void *);
-void sub_08012D78(void *, void *, void *);
-void sub_08012D08(void *, int);
-extern u32 gUnk_03005308;
-extern u16 gUnk_0203B400[];
-int sub_08012D20(void *);
-void AnimData_SelectTiles(void *, int);
-void sub_0806A160(void *, int, void *, int, int, int, int, int);
-void sub_08012B34(void *, void *);
-void Sound_PlaySongChecked(int);
-static inline int randomValue(void)
-{
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return gUnk_0203B400[gUnk_03005308];
-}
-static inline void enable(struct Collider *c)
+
+int sub_08012D20(struct BreakableBarrier *);
+void sub_08012D08(struct BreakableBarrier *, u8);
+static inline void enable(struct SceneCollider *c)
 {
     u32 mask = ~4;
-    c->flags = mask & c->flags;
+    c->state = mask & c->state;
 }
-static inline void disable(struct Collider *c)
+static inline void disable(struct SceneCollider *c)
 {
-    c->flags |= 4;
+    c->state |= 4;
 }
-void BreakableBarrier_Update(struct Manager *m, struct Barrier *p)
+void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
 {
-    struct Packed size;
+    struct BarrierExtent size;
     if (sub_08012D20(p)) {
-        p->flags &= ~1;
+        p->sprite.flags &= ~1;
         AnimData_SelectTiles(p->resource, 136);
     }
     p->frame++;
     if (p->frame == 7)
-        *(u16 *)(p->pad8 + 8) = 1;
+        p->sprite.frame = 1;
     else if (p->frame == 14) {
-        *(u16 *)(p->pad8 + 8) = 0;
+        p->sprite.frame = 0;
         p->frame = 0;
     }
     if (p->hit) {
@@ -102,7 +55,7 @@ void BreakableBarrier_Update(struct Manager *m, struct Barrier *p)
             index = (index + 1) & mask;
             *indexPtr = index;
             speed = (table[index] & smallMask) + 20;
-            sub_0806A160(&p->position, 3, &size, angle, count, speed, 2, 2);
+            sub_0806A160(&p->sprite.position, 3, &size, angle, count, speed, 2, 2);
             {
                 u32 *ptr = indexPtr;
                 index = (*ptr + 1) & mask;
@@ -113,7 +66,7 @@ void BreakableBarrier_Update(struct Manager *m, struct Barrier *p)
             index = (index + 1) & mask;
             *indexPtr = index;
             speed = (table[index] & smallMask) + 20;
-            sub_0806A160(&p->position, 3, &size, angle, count, speed, 2, 2);
+            sub_0806A160(&p->sprite.position, 3, &size, angle, count, speed, 2, 2);
             sub_08012D08(p, 2);
             return;
         } else {

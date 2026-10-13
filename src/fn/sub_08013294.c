@@ -1,52 +1,11 @@
-#include "global.h"
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct Packed {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
-struct Collider {
-    u8 pad[6];
-    u16 flags;
-    u8 rest[76];
-};
-struct Barrier {
-    u32 flags;
-    u8 pad4[3], priority;
-    u8 pad8[20];
-    struct Vec position;
-    u8 spriteTail[8], resource[28];
-    struct Collider collider;
-    u16 health;
-    u8 state, entered, flash, hit, frame, pada3;
-    u32 timer;
-};
-struct Manager {
-    u8 task[24];
-    u32 count, health, remaining, blend, script;
-    u32 direction[4];
-    struct Vec positions[4];
-};
-int AnimData_Load(void *, int);
-void Sprite_Init(void *, void *, int);
-void BreakableBarrier_SetPosition(void *, void *, int);
-void Collider_Init(void *, int, int, int, int, void *, void *);
-void Collider_SetPosition(void *, void *, int);
-void Collider_SetCallback(void *, void *, void *);
-void sub_0821FF7C(void *, int, int, int);
-void Collider_Refresh(void *);
-void sub_08012D78(void *, void *, void *);
-void sub_08012D08(void *, int);
-int Script_GetKeywordValue(int, int);
-int Script_SeekToKeyword(int);
-int Script_GetPc(void);
-int Script_GetValue(void);
-int BreakableBarrier_Initialize(void *, void *, int);
-extern u16 gUnk_03005214, gUnk_030051C4;
-int BreakableBarriers_Initialize(struct Manager *m)
+#include "breakable_barrier.h"
+
+int BreakableBarrier_Initialize(struct BreakableBarrierManager *, struct BreakableBarrier *, unsigned);
+
+int BreakableBarriers_Initialize(struct BreakableBarrierManager *m)
 {
     int i;
-    struct Barrier *p;
+    struct BreakableBarrier *p;
     m->count = 0;
     m->remaining = 0;
     m->health = Script_GetKeywordValue('l', 5);
@@ -70,7 +29,7 @@ int BreakableBarriers_Initialize(struct Manager *m)
             } while (i < m->count);
         }
     }
-    p = (struct Barrier *)(m + 1);
+    p = m->barriers;
     for (i = 0; i < 4; i++, p++)
         if (BreakableBarrier_Initialize(m, p, i) < 0)
             return -1;

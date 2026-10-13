@@ -1,17 +1,14 @@
-#include "global.h"
-struct Collider {
-    u8 pad[6];
-    u16 flags;
-};
-static inline void disable(struct Collider *c)
+#include "breakable_barrier.h"
+
+static inline void disable(struct SceneCollider *c)
 {
-    c->flags |= 4;
+    c->state |= 4;
 }
-int sub_08012D20(void *);
-void BreakableBarrier_Hide(void *m, u8 *p)
+int sub_08012D20(struct BreakableBarrier *);
+void BreakableBarrier_Hide(void *m, struct BreakableBarrier *p)
 {
     if (sub_08012D20(p)) {
-        *(u32 *)p |= 1;
-        disable((void *)(p + 0x48));
+        p->sprite.flags |= 1;
+        disable(&p->collider);
     }
 }
