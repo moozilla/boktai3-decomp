@@ -28,6 +28,25 @@ have no C at all (gaps).
    different bodies: unify those first.
 4. Every function still matches.
 
+## Unmatched functions in your range
+
+Once the types are in place, try to match each unmatched function in your range:
+you now hold the subsystem's context, which is the point of working in ROM order.
+Use `tools/asmat.py ADDR 80`, write C in the unit at its ROM position, and check
+the unit. Budget roughly 8-10 check iterations per function, more for large ones
+that are close. If it matches, great (one commit per match). If not:
+* close (`tools/check.py --nonmatching` fuzzy above ~80%): keep it as a
+  `#ifdef NONMATCHING` draft with `--record` and a one-line note on what differs;
+* otherwise leave `INCLUDE_ASM` and note what blocked it in your report.
+Do not add register pins to force a match.
+
+## Engine API
+
+`include/engine.h` declares the shared engine functions and globals (tasks, heap,
+script reader, sound, sprites/animation, colliders, text windows). Include it via
+your header and don't redeclare those functions locally. If its prototype is wrong
+for your callers, say so in your report rather than working around it silently.
+
 ## Loop
 
 * `tools/check.py src/fn/sub_X.c` per function before merging, then
@@ -66,5 +85,5 @@ have no C at all (gaps).
 
 ## Report
 
-Short: build result, header structs in brief, local adaptations and why, gap
+Short: build result, functions newly matched (and drafts with fuzzy %), header structs in brief, local adaptations and why, gap
 functions added, surprises, rough number of check iterations.
