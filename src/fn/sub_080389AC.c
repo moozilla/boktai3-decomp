@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct P {
     u8 pad[0x1e];
     u16 rounds;
@@ -37,14 +36,14 @@ void sub_080389AC(struct P *p)
         u32 zero=0;
         u32 one;
         u8 *entered;
-        register u8 *mode asm("r2");
+        u8 *mode;
         *state=seven;
         entered=&p->entered;
         one=1;
         *entered=one;
         p->timer=zero;
-        {register u32 *global asm("r2")=&gUnk_0300523C;
-        register u32 mask asm("r1")=~4;
+        {u32 *global=&gUnk_0300523C;
+        u32 mask=~4;
         *global &= mask;}
         sub_08038138(p);
         mode=&p->mode;

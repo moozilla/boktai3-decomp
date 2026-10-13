@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #define Scene_UpdateObjectFlash sub_0800542C
 struct Draw {u8 pad[16];u16 mode;};
 struct Object {u8 type,flags;u16 timer,kind;u8 pad6[11];u8 entered;u8 pad12[14];u8 flash;u8 pad21[111];struct Draw draw;u8 padA2[256];void (*update)(void);};
@@ -14,5 +13,5 @@ void Scene_UpdateObjectFlash(struct Object *p)
     }
     if(p->flash){
         if(p->timer++>5){p->timer=0;p->flash--;setMode(&p->draw,p->flash);}
-    }else{register void (*callback)(void) asm("r0")=sub_080050AC;asm("" : "+r"(callback));p->update=callback;p->timer=0;p->entered=1;p->kind=0;}
+    }else{register void (*callback)(void) asm("r0")=sub_080050AC;p->update=callback;p->timer=0;p->entered=1;p->kind=0;}
 }

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Transition {
   u8 pad0[0x18];
@@ -38,8 +37,7 @@ int sub_08033FEC(struct Transition *p) {
     p->savedRegister = previous;
     {
       int value = previous & ~0xE00;
-      register int bits asm("r1") = 0x100;
-      asm("" : "+r"(bits));
+      int bits = 0x100;
       value |= bits;
       gUnk_03004BD8 = value;
     }

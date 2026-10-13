@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 // Tentative result points animation; input skips to the completed display.
@@ -17,7 +16,7 @@ void sub_082213B8(void *, void *, int, int, int, int, int, int, int);
 void sub_0803B124(struct P *p)
 {
     int value;
-    register u8 *drawing asm("r3");
+    u8 *drawing;
     if (p->entered)
         p->entered = 0;
     if (gUnk_03005260[1] & 0x30F)
@@ -33,7 +32,7 @@ void sub_0803B124(struct P *p)
     }
     drawing = (u8 *)p + 0x5F8;
     {
-        register int number asm("r2") = value;
+        int number = value;
         if (number > 9999)
             number = 9999;
         else if (number < 0)

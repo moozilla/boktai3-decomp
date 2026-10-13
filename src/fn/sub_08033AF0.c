@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct TextState {
   u8 x, y, left, top, width, height, palette, style;
@@ -50,6 +49,5 @@ int sub_08033654(struct WindowManager *);
 const u8 *sub_080335F4(struct TextWindow *, int);
 void sub_08033AF0(struct WindowManager *p, struct TextWindow *w) {
   struct TextState *t = &w->text;
-  asm("" : "+r"(t));
   t->fresh = 0;
 }

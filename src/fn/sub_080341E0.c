@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Engine {
   u8 pad0[0x18];
@@ -38,8 +37,8 @@ void sub_08219DD8(void *, int);
 #include "rfu_compat.h"
 int sub_08224E54(void *, void *);
 int sub_080341E0(struct Engine *p) {
-  register u8 *changed asm("ip");
-  register int result asm("r1");
+  u8 *changed;
+  int result;
   void *key = &p->key;
   void *message = p->message;
   if (sub_08224E54(message, key)) {
@@ -48,7 +47,6 @@ int sub_080341E0(struct Engine *p) {
     u16 *history;
     int i;
     changed = &p->changed;
-    asm("" : "+r"(changed));
     src = p->input;
     diff = p->diff;
     history = p->history;
@@ -66,10 +64,8 @@ int sub_080341E0(struct Engine *p) {
     result = -2;
     changed = &p->changed;
   }
-  asm("" : "+r"(changed), "+r"(result));
   {
-    register int one asm("r0") = 1;
-    asm("" : "+r"(one));
+    int one = 1;
     *changed = one;
   }
   return result;

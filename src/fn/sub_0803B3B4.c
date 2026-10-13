@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // Tentative result-menu offsets from the contiguous callback family.
 struct Drawing {
@@ -41,13 +40,10 @@ int sub_0803B3B4(struct ResultMenu *p) {
     sub_08033778(*w++);
   } while (--i >= 0);
   {
-    register u16 *shadow asm("r2") = &gUnk_03004BD8;
-    register u32 mask asm("r0");
-    asm("" : "+r"(shadow));
+    u16 *shadow = &gUnk_03004BD8;
+    u32 mask;
     mask = ~0xC00;
-    asm("" : "+r"(mask));
     mask &= *shadow;
-    asm("" : "+r"(mask));
     *shadow = mask;
   }
   gUnk_02000104 = 0;

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 // Tentative result-panel layout: six displayed values settle in three stages.
@@ -30,8 +29,7 @@ void sub_0803ADB8(struct P *p)
     if (gUnk_03005260[1] & 0x30F)
         p->timer = 100;
     if (p->timer <= 29) {
-        register u16 *table asm("r6") = gUnk_0203B400;
-        asm("" : "+r"(table));
+        u16 *table = gUnk_0203B400;
         a = randomValue(table, 99);
         d = randomValue(table, 99);
     } else {
@@ -39,8 +37,7 @@ void sub_0803ADB8(struct P *p)
         d = p->d;
     }
     if (p->timer <= 59) {
-        register u16 *table asm("r6") = gUnk_0203B400;
-        asm("" : "+r"(table));
+        u16 *table = gUnk_0203B400;
         b = randomValue(table, 60);
         e = randomValue(table, 60);
     } else {
@@ -48,8 +45,7 @@ void sub_0803ADB8(struct P *p)
         e = p->e;
     }
     if (p->timer <= 89) {
-        register u16 *table asm("r6") = gUnk_0203B400;
-        asm("" : "+r"(table));
+        u16 *table = gUnk_0203B400;
         c = randomValue(table, 99);
         f = randomValue(table, 99);
     } else {
@@ -71,8 +67,7 @@ void sub_0803ADB8(struct P *p)
     if (f > 99)
         f = 99;
     {
-        register u8 *drawing asm("r0") = (u8 *)p + 0x178;
-        asm("" : "+r"(drawing));
+        u8 *drawing = (u8 *)p + 0x178;
         base = (u8 *)p + 0x30;
         sub_082213B8(drawing, base, a, 2, 51, 168, 32, 8, 0);
     }

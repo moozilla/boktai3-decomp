@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 typedef struct {u16 id,time;u8 active,count,frame,frames,unpaused,dirty,remove,pad;u16 source[8],dest[8],duration[8];} Channel;
 typedef struct {u8 pad[24];u16 count,unused;Channel channels[8];void *tiles;} Manager;
 
@@ -33,7 +32,7 @@ void TileAnimation_Configure(void) {
   
   i=0; if(i<q->frames) { out=q->source; do {
    v=Script_GetPc();if(v)v=Script_GetValue(v);
-   *out=v;out++;i++;asm("" : "+r"(out));
+   *out=v;out++;i++;
   }while(i<q->frames); }
  } else {
   
@@ -44,7 +43,7 @@ void TileAnimation_Configure(void) {
   
   i=0; if(i<q->frames) { out=q->dest; do {
    v=Script_GetPc();if(v)v=Script_GetValue(v);
-   *out=v;out++;i++;asm("" : "+r"(out));
+   *out=v;out++;i++;
   }while(i<q->frames); }
  } else {
   
@@ -55,7 +54,7 @@ void TileAnimation_Configure(void) {
   
   i=0; if(i<q->frames) { out=q->duration; do {
    v=Script_GetPc();if(v)v=Script_GetValue(v);
-   *out=v;out++;i++;asm("" : "+r"(out));
+   *out=v;out++;i++;
   }while(i<q->frames); }
  } else {
   

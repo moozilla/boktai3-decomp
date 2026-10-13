@@ -53,7 +53,6 @@ struct LinkMenu *sub_08219FBC(int, int);
 void sub_0821A04C(void *, void *, void *);
 int sub_08037140(struct LinkMenu *);
 void sub_0821A0C0(void *);
-// MATCHING_CONCESSION: register-pinning
 struct LinkMenu *sub_080371E0(void) {
   struct LinkMenu *p = sub_08036E08();
   struct LinkMenu *result;
@@ -62,14 +61,13 @@ struct LinkMenu *sub_080371E0(void) {
     goto done;
   }
   {
-    register struct LinkMenu *allocated asm("r0") = sub_08219FBC(12, 0xB0);
-    register void *update asm("r1");
-    register void *destroy asm("r2");
+    struct LinkMenu *allocated = sub_08219FBC(12, 0xB0);
+    void *update;
+    void *destroy;
     p = allocated;
     if (!p)
       goto returnPointer;
     update = sub_080370D0;
-    asm("" : "+r"(update));
     destroy = sub_08037110;
     sub_0821A04C(allocated, update, destroy);
   }

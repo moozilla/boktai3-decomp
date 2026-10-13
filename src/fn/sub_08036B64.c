@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Engine {
   u8 pad0[0x18];
@@ -50,8 +49,7 @@ int sub_08036B64(u8 *packet) {
   if (p->mask & 2)
     goto busy;
   {
-    register u8 *destination asm("r1") = (u8 *)p + 0xB8;
-    asm("" : "+r"(destination));
+    u8 *destination = (u8 *)p + 0xB8;
     (*packet)++;
     CpuSet(packet, destination, 0x04000003);
   }

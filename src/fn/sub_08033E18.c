@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Transition {
   u8 pad0[0x18];
@@ -36,8 +35,7 @@ int sub_08033E18(struct Transition *p) {
     sub_0824923C(p, callback);
   {
     u16 *reg = &gUnk_03004FC0;
-    register int value asm("r0") = 0x1084;
-    asm("" : "+r"(value));
+    int value = 0x1084;
     *reg = value;
   }
   if ((gUnk_03005260[1] & 9) && p->endProcedure && p->state <= 2)

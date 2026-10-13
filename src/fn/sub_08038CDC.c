@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Entry {u8 bytes[4], a, b, flag, kind;u16 timer, pad;};
 struct P {
     u8 pad[0x20];
@@ -24,12 +23,12 @@ void sub_08038CDC(struct P *p)
         p->entered = 0;
         sub_0801683C();
         sub_08038094(p);
-        {register struct Entry *e asm("r0") = &p->entry;
+        {struct Entry *e = &p->entry;
         data = e->timer | ((e->kind & 3) << 16);}
         sub_08037FB4(p, 4, &data, 1);
         sub_08038128(p, 5);
         sub_0822B058(4);
-        {register u32 mask asm("r1") = 4;
+        {u32 mask = 4;
         if (!(gUnk_02000560 & mask)) sub_0815AF14(gUnk_02000580, -1);
         }
     }

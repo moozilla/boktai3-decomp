@@ -1,8 +1,7 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Vec{s16 x,y,z,pad;};struct Shadow{u8 active,flags,pad[6];struct Vec*source;u32 spriteFlags;u8 pad10[4],scaleX,scaleY,pad16[18];struct Vec position;u8 pad30[36];s8 scale;u8 minScale,maxScale,pad57;s16 maxHeight,minHeight;u16 shift,nearShift;};struct Cell{u8 height,tile;u16 flags;};struct Map{u32 pad;u8*cells;u8 pad8[28];u16 rows[1];};extern struct Map*gUnk_030052F4;extern u32 gUnk_030052F8,gUnk_030052FC;u8*sub_0821D64C(int,int);
 static inline int cellIndex(struct Vec*p){int x=p->x>>8,z=p->z>>8;if(x<0||z<0||(u32)x>=gUnk_030052F8||(u32)z>=gUnk_030052FC)return 0;return gUnk_030052F4->rows[z]+x;}
 static inline struct Cell*cell(int i){u8*p=sub_0821D64C(i,1);if(p)return (void*)(p+4);return (void*)(gUnk_030052F4->cells+12+i*4);}
-static inline int noShadow(struct Cell*c){register u32 value asm("r0")=c->flags;asm("" : : "r"(value));value&=32;asm("" : "+r"(value));return value;}
+static inline int noShadow(struct Cell*c){u32 value=c->flags;value&=32;return value;}
 #define ScaledShadow_Update sub_08013740
 void ScaledShadow_Update(struct Shadow*p){u16 index=cellIndex(p->source);int height;p->position.x=p->source->x;if(p->flags&1)p->position.y=p->source->y;else{struct Vec*source=p->source;struct Cell*c=cell(index);int slope=c->height>>4,y=(c->height&15)<<8;switch(slope){case 1:y-=(u8)source->z;break;case 2:y-=(u8)source->x;break;}p->position.y=y;}p->position.z=p->source->z;height=p->source->y-p->position.y;if(height<=0)p->scale=p->maxScale;else if(height<p->minHeight)p->scale=p->maxScale-(height>>p->nearShift);else if(height>p->maxHeight)p->scale=p->minScale;else p->scale=p->maxScale-(height>>p->shift);if(p->scale<=0)p->scale=1;p->scaleX=p->scale;p->scaleY=p->scale;if(p->source->y<p->position.y||p->position.y==0||noShadow(cell(index)))p->spriteFlags|=1;else p->spriteFlags&=~1;}

@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 // Tentative: Select the first party target within angular and distance limits.
 struct Vec {
   s16 x, y, z, pad;
@@ -31,10 +30,9 @@ int sub_0802CAAC(struct Object *p) {
       struct Vec *dst = &t->pos;
       int angle = sub_082215E4(dst->x - src->x, dst->z - src->z);
       int facing = p->angle;
-      register int signedAngle asm("r0") = (s8)angle;
+      int signedAngle = (s8)angle;
       u8 diff;
       int magnitude;
-      asm("" : "+r"(signedAngle) : "r"(facing));
       diff = facing - signedAngle;
       magnitude = (s8)diff;
       if (magnitude < 0)

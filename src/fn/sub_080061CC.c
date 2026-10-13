@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct TerrainModifier {u16 id;u8 active,kind,tile,height;u16 flags,cell;u8 padA[2];u8 registration[16];struct TerrainModifier *previous,*next;};
 struct Manager {u8 pad[24];struct TerrainModifier *head;};
 struct Vec {s16 x,y,z,pad;};
@@ -20,11 +19,11 @@ s32 TerrainModifiers_ChangeFromScript(void)
     s32 id=sub_0821ABA8('n',-1),tile=sub_0821ABA8('t',-1),kind=sub_0821ABA8('f',-1),flags=sub_0821ABA8('e',-1);
     struct ScriptVec position;
     s32 cell;
-    register s32 height asm("r1");
+    s32 height;
     if(Script_SeekToKeyword('p')){
         position.x=Script_GetValue();position.y=Script_GetValue();position.z=Script_GetValue();
         cell=cellIndex((struct Vec *)&position);
-        height=({register s32 value asm("r0")=heightLevel(((struct Vec *)&position)->y);asm("" : "+r"(value));value;});asm("" : : "r"(height));
-    }else{height=-1;asm("" : "+r"(height));cell=height;}
+        height=({s32 value=heightLevel(((struct Vec *)&position)->y);value;});
+    }else{height=-1;cell=height;}
     return sub_08006088(id,tile,kind,flags,cell,height);
 }
