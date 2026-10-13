@@ -76,11 +76,11 @@ void sub_08009F54(u32 x, struct CollisionSlot *slot)
 
 static inline s32 stateMode(void)
 {
-    struct CollisionActor *a = gUnk_02000580;
+    struct Player *a = gUnk_02000580[0];
     if (a) {
         u32 active = a->active;
         s32 yes = 0;
-        if (active && a->mode == 4)
+        if (active && a->sceneMode == 4)
             yes = 1;
         return yes;
     }
@@ -351,12 +351,12 @@ s32 CollisionController_UpdateAll(struct CollisionManager *input)
     if (gUnk_030053F4 & 2048)
         available = stateMode();
     else {
-        struct CollisionActor *actor;
+        struct Player *actor;
         if (gUnk_02000478 > 0)
             goto pause;
-        actor = gUnk_02000580;
+        actor = gUnk_02000580[0];
         if (actor) {
-            u32 *address = &actor->flags;
+            u32 *address = &actor->actionFlags;
             u32 mask = 16;
             if (*address & mask)
                 goto pause;
@@ -418,12 +418,12 @@ s32 CollisionController_InitManager(struct CollisionManager *manager, void *owne
     if (gUnk_030053F4 & 2048)
         available = stateMode();
     else {
-        struct CollisionActor *actor;
+        struct Player *actor;
         if (gUnk_02000478 > 0)
             goto pause;
-        actor = gUnk_02000580;
+        actor = gUnk_02000580[0];
         if (actor) {
-            u32 *address = &actor->flags;
+            u32 *address = &actor->actionFlags;
             u32 mask = 16;
             if (*address & mask)
                 goto pause;

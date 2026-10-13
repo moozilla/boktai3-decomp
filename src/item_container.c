@@ -3,14 +3,8 @@
 // MATCHING_CONCESSION: register-pinning
 
 extern u32 gUnk_02000560[];
-extern struct TriggerActor *gUnk_02000580[4];
 extern s32 gUnk_02000478;
 extern u16 gUnk_02000534, gUnk_02000500;
-
-struct World {
-    u8 pad[0x5A0];
-    u32 region;
-};
 
 void sub_08013B74(void *);
 s32 sub_0822D490(s32, s32);
@@ -78,11 +72,11 @@ static inline s32 groundHeight(struct SceneVec *position)
 }
 static inline s32 stateMode(void)
 {
-    struct TriggerActor *state = gUnk_02000580[0];
+    struct Player *state = gUnk_02000580[0];
     if (state) {
         u32 active = state->active;
         s32 yes = 0;
-        if (active && state->mode == 4)
+        if (active && state->sceneMode == 4)
             yes = 1;
         return yes;
     }
@@ -115,7 +109,7 @@ static inline s32 scaleHeight(s32 input)
 static inline u8 sameRegion(struct Trigger *p)
 {
     u32 current = ({
-        struct World *world = gUnk_02000710;
+        struct GameState *world = gUnk_02000710;
         register u32 offset asm("r2") = 0x5A0;
         asm("" : : "r"(offset));
         *(u32 *)((u8 *)world + offset);
@@ -295,7 +289,7 @@ s32 Trigger_TryOpenNearby(struct TriggerOpener *actor)
         return 0;
     index = actor->index;
     for (p = manager->head; p;) {
-        struct TriggerActor *state;
+        struct Player *state;
         if ((p->flags & 1) || *(u16 *)&p->actor != 511)
             goto next;
         {
@@ -835,14 +829,14 @@ s32 TriggerManager_Update(struct TriggerManager *input)
     struct Trigger *trigger, *next;
     u8 *delay;
     {
-        struct TriggerActor **table;
+        struct Player **table;
         i = 0;
         table = gUnk_02000580;
         for (; i < 4; i++) {
-            struct TriggerActor *actor;
+            struct Player *actor;
             asm("" : "+r"(i));
             actor = ({
-                struct TriggerActor *a = table[i];
+                struct Player *a = table[i];
                 a;
             });
             p->actors[i] = actor;
@@ -912,7 +906,7 @@ s32 TriggerManager_Update(struct TriggerManager *input)
                             if (gUnk_030053F4 & 2048)
                                 available = stateMode();
                             else if (gUnk_02000580[0] && ({
-                                         u32 *flags = &gUnk_02000580[0]->flags;
+                                         u32 *flags = &gUnk_02000580[0]->actionFlags;
                                          u32 mask = 16;
                                          *flags &mask;
                                      }))
@@ -1012,9 +1006,9 @@ s32 TriggerManager_Initialize(struct TriggerManager *p, void *unused)
     p->resource = ScriptProc_Start(37422, 39666);
     p->head = 0;
     for (i = 0; i < 4; i++) {
-        struct TriggerActor *actor;
+        struct Player *actor;
         actor = ({
-            struct TriggerActor *a = gUnk_02000580[i];
+            struct Player *a = gUnk_02000580[i];
             a;
         });
         p->actors[i] = actor;
@@ -1279,7 +1273,7 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
                 if (gUnk_02000478 > 0)
                     goto reveal;
                 if (gUnk_02000580[0] && (({
-                        u32 *flags = &gUnk_02000580[0]->flags;
+                        u32 *flags = &gUnk_02000580[0]->actionFlags;
                         u32 mask = 16;
                         *flags &mask;
                     })))
