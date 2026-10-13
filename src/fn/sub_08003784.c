@@ -1,11 +1,12 @@
 #include "global.h"
+#include "color_fade_controller.h"
 
-void sub_08003734(u32 *);
-void sub_080036F8(u32 *);
+void sub_08003734(struct ColorFadeChannel *);
+void sub_080036F8(struct ColorFadeChannel *);
 
-void sub_08003784(u32 *p)
+void sub_08003784(struct ColorFadeChannel *p)
 {
-    switch (*p) {
+    switch (p->mode) {
         case 1:
         case 3:
             sub_08003734(p);

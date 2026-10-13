@@ -1,18 +1,9 @@
 #include "global.h"
-struct Channel {
-    u32 mode, color, start, level, target;
-    u16 time, shift;
-};
-struct Controller {
-    u8 task[0x18];
-    struct Channel channels[2];
-    u32 count;
-    u16 types[8];
-    s32 args[8][8];
-};
-void ColorFade_ApplyCommand(struct Controller *, s32, s32 *);
-void sub_0800377C(struct Channel *);
-void ColorFade_ApplyCommands(struct Controller *p)
+#include "color_fade_controller.h"
+
+void ColorFade_ApplyCommand(struct ColorFadeController *, s32, s32 *);
+void sub_0800377C(struct ColorFadeChannel *);
+void ColorFade_ApplyCommands(struct ColorFadeController *p)
 {
     u32 i = 0;
     for (; i < p->count; i++) {
