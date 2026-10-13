@@ -4,7 +4,7 @@ extern u32 gUnk_030053F4, gUnk_030053F0;
 extern u32 gUnk_02000560;
 void sub_08197324(void *);
 void sub_08197260(void *);
-void sub_0821FE40(void *);
+void Collider_Refresh(void *);
 void sub_082260A4(u32);
 void sub_08194D70(void *);
 void sub_0819465C(void *);
@@ -32,7 +32,7 @@ s32 sub_0819736C(u8 *t)
     if (Tst2(0x400, &gUnk_030053F4, &gUnk_030053F0) || Tst32(4, &gUnk_02000560))
         t[0x724c] = 0;
     if (t[0x724c]) {
-        sub_0821FE40(t + 0x5dfc);
+        Collider_Refresh(t + 0x5dfc);
         sub_082260A4(0x80);
         t[0x724c]--;
     }
