@@ -17,7 +17,7 @@ struct Vec {
     } zp;
 };
 void sub_08068108(struct Vec *, s32, struct SceneExtent *, s32, s32, s32);
-static inline u32 scatter(const u8 *random, const u16 *coordinate)
+static inline u32 dustScatter(const u8 *random, const u16 *coordinate)
 {
     s32 value = *coordinate - 128;
     return value + *random;
@@ -79,7 +79,7 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
             case 0:
                 random = FIRST();
                 {
-                    u32 value = scatter((u8 *)random, &particle->xy.half.x);
+                    u32 value = dustScatter((u8 *)random, &particle->xy.half.x);
                     u32 low = (u16)value;
                     point.xy.word = (point.xy.word & 0xFFFF0000) | low;
                 }
@@ -102,7 +102,7 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                 {
                     const u16 *second = LAST();
                     {
-                        u32 value = scatter((u8 *)second, &point.zp.half.z);
+                        u32 value = dustScatter((u8 *)second, &point.zp.half.z);
                         u32 low = (u16)value;
                         point.zp.word = (point.zp.word & 0xFFFF0000) | low;
                     }
@@ -111,7 +111,7 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
             case 2:
                 random = FIRST();
                 {
-                    register u32 value asm("r1") = scatter((u8 *)random, &particle->xy.half.x);
+                    register u32 value asm("r1") = dustScatter((u8 *)random, &particle->xy.half.x);
                     u32 low = (u16)value;
                     point.xy.word = (point.xy.word & 0xFFFF0000) | low;
                 }
@@ -134,7 +134,7 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                 {
                     const u16 *second = LAST();
                     {
-                        register u32 value asm("r1") = scatter((u8 *)second, &point.zp.half.z);
+                        register u32 value asm("r1") = dustScatter((u8 *)second, &point.zp.half.z);
                         u32 low = (u16)value;
                         point.zp.word = (point.zp.word & 0xFFFF0000) | low;
                     }
