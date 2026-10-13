@@ -12,6 +12,7 @@ address,evidence
 0800A800,Independent 12-byte effect manager global-pointer clear following collision controller teardown
 0800CBA0,Independent 12-byte global manager reset after allocator return and pool
 0800F4B8,Independent 12-byte store of zero to gUnk_02000048 between sub_0800F474 and sub_0800F4C4 (twin of sub_0800F6EC)
+08012134,Independent 2-byte bx lr stub between sub_08012114 and AnimatedHazard_WaitForPlayer (left as data by gbadisasm); exact C in src/animated_hazard.c
 08015A0C,Independent Thumb function prologue after 136-byte ring emission wrapper; retained unmatched byte tail
 08015B1C,Independent 104-byte fan emission wrapper after volume emitter and its literal pool
 08015C90,Independent Thumb function prologue after 96-byte burst emission wrapper; retained unmatched byte tail
