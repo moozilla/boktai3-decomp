@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#define KeyTrigger_Update sub_08197EC4
 
 struct Msg08197EC4 {
     u32 a;
