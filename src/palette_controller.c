@@ -128,8 +128,6 @@ s32 sub_08002C70(void)
     return 0x40;
 }
 
-void sub_0821AD08(s32, s32);
-
 void sub_08002C90(struct PaletteTransition *t)
 {
     u32 z = 0;
@@ -379,8 +377,6 @@ void sub_08003038(struct PaletteController *p)
 
 s32 sub_08017444(void);
 
-void sub_0824923C(struct PaletteTransition *, void *);
-
 extern void *gUnk_0860499C[];
 
 void Palette_ApplyFrame(struct PaletteController *p)
@@ -445,16 +441,6 @@ extern u16 gUnk_03004FC0[];
 extern s32 gUnk_03004DA0, gUnk_03004DA8;
 
 extern u16 gUnk_03005214, gUnk_030051C4;
-
-s32 sub_0821ABA8(s32, s32);
-
-s32 Script_SeekToKeyword(s32);
-
-u8 *Script_GetPc(void);
-
-s32 Script_GetValue(void);
-
-u8 *sub_0821A520(u16, u16);
 
 static inline u16 blendEnabled(struct PaletteController *p)
 {
@@ -542,12 +528,6 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
     t->mode = 0;
     return 0;
 }
-
-struct PaletteController *sub_08219FBC(u32, u32);
-
-void sub_0821A04C(struct PaletteController *, s32 (*)(struct PaletteController *), u32 (*)(void));
-
-void sub_0821A0C0(struct PaletteController *);
 
 struct PaletteController *sub_080033FC(void)
 {

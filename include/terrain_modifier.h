@@ -1,7 +1,7 @@
 #ifndef GUARD_TERRAIN_MODIFIER_H
 #define GUARD_TERRAIN_MODIFIER_H
 
-#include "global.h"
+#include "engine.h"
 
 /* Tentative: a modifier applied to a map cell (tile/height override). */
 struct TerrainModifier {
@@ -27,11 +27,6 @@ struct TerrainVec {
     s16 x, y, z, pad;
 };
 
-struct TerrainMap {
-    u8 pad[36];
-    u16 rows[1];
-};
-
 /* Script-read position (three 16-bit values, 6 bytes). */
 struct TerrainScriptVec {
     u32 x : 16;
@@ -40,12 +35,8 @@ struct TerrainScriptVec {
 };
 
 extern struct TerrainModifierManager *gUnk_02000028;
-extern struct TerrainMap *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC;
 
 void sub_0821D698(void *, s32, s32, s32, s32, s32);
-s32 sub_0821ABA8(s32, s32);
-void sub_0821A04C(void *, u32 (*)(void), u32 (*)(void));
 
 u32 sub_08005E1C(struct TerrainModifier *);
 u32 sub_08005E40(struct TerrainModifier *);
