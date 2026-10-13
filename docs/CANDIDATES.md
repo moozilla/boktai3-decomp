@@ -44,7 +44,7 @@ mismatches and return exit code 2; mismatches return 1; matches return 0.
 
 These local checkpoints are not durable Git retention. Before leaving a session,
 preserve selected authored candidate sources and concise metadata on a dedicated
-WIP branch outside src/, following the existing branch policy. Never copy whole
+NONMATCHING draft in src/ (see docs/WORKER.md); older drafts remain on WIP branches. Never copy whole
 build/candidates directories into Git: they include preprocessed third-party
 material, assembly comparisons and ROM-derived outputs. Keep useful alternates
 and failed hypotheses; do not choose solely by a scalar similarity score.

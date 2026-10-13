@@ -12,7 +12,7 @@ from pathlib import Path
 import re
 
 from romlib import ROOT
-from split import c_functions
+from split import c_functions, nonmatching_functions
 
 CODE_END = 0x0824DAFA
 INVENTORY = Path(ROOT) / "symbols/progress_functions.csv"
@@ -137,9 +137,9 @@ def collect_pinned(funcs, source_root):
     return pinned
 
 
-def measures(total_b, done_b, count, done_count, *, units=None, complete_units=None):
+def measures(total_b, done_b, count, done_count, *, units=None, complete_units=None, fuzzy_b=None):
     return {
-        "fuzzy_match_percent": 100 * done_b / total_b,
+        "fuzzy_match_percent": 100 * (done_b if fuzzy_b is None else fuzzy_b) / total_b,
         "total_code": str(total_b), "matched_code": str(done_b),
         "matched_code_percent": 100 * done_b / total_b,
         "total_functions": count, "matched_functions": done_count,
@@ -150,7 +150,22 @@ def measures(total_b, done_b, count, done_count, *, units=None, complete_units=N
     }
 
 
-def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems=()):
+def collect_fuzzy(funcs, source_root):
+    """{name: fuzzy percent} for NONMATCHING drafts (recorded by check.py
+    --nonmatching --record; unrecorded drafts count as 0)."""
+    known = {n: n for n, _ in funcs}
+    known.update({f"sub_{a:08X}": n for n, a in funcs})
+    fuzzy = {}
+    for p in sorted(Path(source_root).rglob("*.c")):
+        for n, pct in nonmatching_functions(p):
+            if n in known:
+                fuzzy[known[n]] = min(pct or 0.0, 99.9)
+    return fuzzy
+
+
+def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems=(), fuzzy=None):
+    fuzzy = fuzzy or {}
+    score = lambda n: 100 if n in done else fuzzy.get(n, 0)
     libraries = sorted([*libraries, *subsystems], key=lambda group: group["start"])
     for left, right in zip(libraries, libraries[1:]):
         if left["end"] > right["start"]:
@@ -170,7 +185,7 @@ def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems
         matched = n in done
         grouped[unit_name]["functions"].append({
             "name": library["names"].get(a, n) if library else n,
-            "size": str(sizes[n]), "fuzzy_match_percent": 100 if matched else 0,
+            "size": str(sizes[n]), "fuzzy_match_percent": score(n),
             "address": str(a - (library["start"] if library else a)),
             "metadata": {"virtual_address": str(a)}})
     for unit in units:
@@ -179,8 +194,9 @@ def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems
         matched_items = [item for item in items if item["fuzzy_match_percent"] == 100]
         done_b = sum(int(item["size"]) for item in matched_items)
         complete = len(matched_items) == len(items)
+        fuzzy_b = sum(int(item["size"]) * item["fuzzy_match_percent"] / 100 for item in items)
         unit["measures"] = measures(total_b, done_b, len(items), len(matched_items),
-                                   units=1, complete_units=int(complete))
+                                   units=1, complete_units=int(complete), fuzzy_b=fuzzy_b)
         unit["metadata"]["complete"] = complete
     categories = []
     for cid, label in [("no_register_pinning", "No register pinning"), ("register_pinned", "Register-pinned")]:
@@ -192,10 +208,12 @@ def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems
         categories.append({"id": cid, "name": label, "measures": measures(
             sum(sizes[n] for n in members), sum(sizes[n] for n in matched),
             len(members), len(matched), units=len(selected),
-            complete_units=sum(u["metadata"]["complete"] for u in selected))})
+            complete_units=sum(u["metadata"]["complete"] for u in selected),
+            fuzzy_b=sum(sizes[n] * score(n) / 100 for n in members))})
     return {"version": 2, "categories": categories, "measures": measures(sum(sizes.values()),
             sum(sizes[n] for n in done), len(funcs), len(done), units=len(units),
-            complete_units=sum(u["metadata"]["complete"] for u in units)), "units": units}
+            complete_units=sum(u["metadata"]["complete"] for u in units),
+            fuzzy_b=sum(sizes[n] * score(n) / 100 for n, _ in funcs)), "units": units}
 
 
 def main():
@@ -221,12 +239,15 @@ def main():
     print(f"code bytes: {done_b}/{total_b} ({100 * done_b / total_b:.3f}%)")
     pinned_b = sum(sizes[n] for n in pinned)
     print(f"register-pinned: {100 * pinned_b / total_b:.3f}% of total code; no register pinning: {100 * (done_b - pinned_b) / total_b:.3f}%")
+    fuzzy = {n: p for n, p in collect_fuzzy(funcs, Path(ROOT) / "src").items() if n not in done}
+    draft_b = sum(sizes[n] for n in fuzzy)
+    print(f"nonmatching drafts: {len(fuzzy)} functions, {draft_b} bytes ({100 * draft_b / total_b:.3f}% of code)")
     if args.markdown:
-        write_markdown(args.markdown, funcs, sizes, done, total_b, done_b, pinned_b)
+        write_markdown(args.markdown, funcs, sizes, done, total_b, done_b, pinned_b, fuzzy)
     if args.json:
         libraries = load_libraries(funcs, sizes)
         subsystems = load_groups(funcs, sizes, SUBSYSTEMS, "game")
-        Path(args.json).write_text(json.dumps(make_report(funcs, sizes, done, libraries, pinned, subsystems), indent=2) + "\n")
+        Path(args.json).write_text(json.dumps(make_report(funcs, sizes, done, libraries, pinned, subsystems, fuzzy), indent=2) + "\n")
 
 
 def bar(frac, width=30):
@@ -234,7 +255,10 @@ def bar(frac, width=30):
     return "█" * n + "░" * (width - n)
 
 
-def write_markdown(out, funcs, sizes, done, total_b, done_b, pinned_b=0):
+def write_markdown(out, funcs, sizes, done, total_b, done_b, pinned_b=0, fuzzy=None):
+    fuzzy = fuzzy or {}
+    draft_b = sum(sizes[n] for n in fuzzy)
+    mean = sum(sizes[n] * p for n, p in fuzzy.items()) / draft_b if draft_b else 0
     regions = [(0x08000000, 0x08040000), (0x08040000, 0x08080000), (0x08080000, 0x080C0000),
                (0x080C0000, 0x08100000), (0x08100000, 0x08140000), (0x08140000, 0x08180000),
                (0x08180000, 0x081C0000), (0x081C0000, 0x08200000), (0x08200000, 0x08240000),
@@ -245,6 +269,8 @@ def write_markdown(out, funcs, sizes, done, total_b, done_b, pinned_b=0):
              f"({done_b:,} / {total_b:,} bytes) — **{len(done)} / {len(funcs)} functions**", "",
              f"Without register pinning: **{100 * (done_b - pinned_b) / total_b:.3f}%**. "
              f"Register-pinned: **{100 * pinned_b / total_b:.3f}%** of total code (included above).", "",
+             f"Nonmatching drafts (`#ifdef NONMATCHING`, not counted above): **{len(fuzzy)} functions**, "
+             f"{100 * draft_b / total_b:.3f}% of code, mean fuzzy match {mean:.1f}%.", "",
              "```", f"{bar(done_b / total_b, 50)} {100 * done_b / total_b:.2f}%", "```", "",
              "| Region | Functions | Matched | Bytes matched | |", "|---|---:|---:|---:|---|"]
     for lo, hi in regions:
