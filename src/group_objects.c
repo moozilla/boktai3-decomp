@@ -53,7 +53,24 @@ static inline u32 frame_factor(u16 v)
     return mask & value;
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_0800FA5C);
+void sub_08220C8C(void *, void *, int, u8, u8);
+void sub_0800FA5C(struct GroupObjects *m, struct GroupPiece *p, int index)
+{
+    u8 left;
+    u8 right;
+    u32 dir = (((u16)p->direction + 0x60) >> 6) & 3;
+    u8 *l = &left;
+    u8 *r = &right;
+    if ((u8)(dir - 1) <= 1)
+        *l = 1;
+    else
+        *l = 0;
+    if (dir > 1)
+        *r = 1;
+    else
+        *r = 0;
+    sub_08220C8C(&p->anim, m->animation, (u16)index, left, right);
+}
 
 // MATCHING_CONCESSION: register-pinning
 void BoardPiece_UpdateAnimation(struct GroupPiece *p)
