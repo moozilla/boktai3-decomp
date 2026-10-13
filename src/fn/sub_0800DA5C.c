@@ -1,49 +1,20 @@
-#include "global.h"
-typedef struct {
-    u32 pad[2];
-    u32 flags;
-    u8 rest[84];
-} Layer;
-typedef struct Controller Controller;
-struct Controller {
-    u8 pad[0x38];
-    u16 state, timer;
-    u32 ticks, script;
-    s16 cancellable, mode, phase, delay, hold, duration;
-    u8 pad50[4];
-    u16 rows[2][160];
-    u16 active;
-    s16 amplitude, delta;
-    u16 start, end;
-    u8 pad2de[6];
-    void (*fade)(Controller *);
-    void (*noise)(Controller *);
-    Layer first, second, third, fourth, tail[2];
-};
-extern u32 gUnk_030051D4, gUnk_03004DA0;
-extern u16 gUnk_03005260[];
-void Script_Call(u32, void *);
-void Task_Kill(void *);
+#include "scanline_presentation.h"
 void sub_08219254(int, int, void *);
-void Sound_PlaySong(int);
-void sub_0800D9A0(Controller *);
-void sub_0800D9FC(Controller *);
-void sub_0800D874(Controller *);
-static inline void hide(Layer *p)
+static inline void hide(struct ScanlineLayer *p)
 {
     p->flags |= 1;
 }
-int ScanlinePresentation_Update(Controller *p)
+int ScanlinePresentation_Update(struct ScanlinePresentation *p)
 {
     if (p->mode == 0)
         gUnk_030051D4 = gUnk_03004DA0;
     if (p->cancellable && (gUnk_03005260[1] & 3)) {
-        hide(&p->first);
-        hide(&p->second);
-        hide(&p->third);
-        hide(&p->fourth);
-        hide(&p->tail[0]);
-        hide(&p->tail[1]);
+        hide(&p->layers[0]);
+        hide(&p->layers[1]);
+        hide(&p->layers[2]);
+        hide(&p->layers[3]);
+        hide(&p->layers[4]);
+        hide(&p->layers[5]);
         if (p->mode == 0)
             gUnk_030051D4 = gUnk_03004DA0 = 0;
         if (p->script)

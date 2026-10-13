@@ -1,31 +1,17 @@
-#include "global.h"
-extern s32 gUnk_03004DA0;
+#include "scanline_presentation.h"
 s32 Div(s32, s32);
-void Script_Call(void *, u32);
-void Task_Kill(void *);
-struct S {
-    u8 f[0x40];
-    void *t;
-    u8 g[2];
-    s16 a;
-    s16 b;
-    u8 gg[4];
-    s16 c;
-    u8 h[0x2e4 - 0x50];
-    u32 z;
-};
-void sub_0800D9FC(struct S *s)
+void sub_0800D9FC(struct ScanlinePresentation *s)
 {
     u32 k;
-    if (s->a == 0)
-        gUnk_03004DA0 = Div(s->b << 6, s->c);
-    s->b--;
+    if (s->mode == 0)
+        gUnk_03004DA0 = Div(s->phase << 6, s->duration);
+    s->phase--;
     k = 0;
-    if (s->b < 0) {
-        s->b = k;
-        s->z = k;
-        if (s->t != 0)
-            Script_Call(s->t, 0);
+    if (s->phase < 0) {
+        s->phase = k;
+        s->fade = (void *)k;
+        if (s->script != 0)
+            Script_Call(s->script, 0);
         Task_Kill(s);
     }
 }
