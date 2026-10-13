@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#define KeyTrigger_Init sub_08197F68
 
 struct Args08197F68 {
     u16 count;

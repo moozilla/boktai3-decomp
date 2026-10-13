@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#define KeyTrigger_Create sub_08198008
 
 void sub_08197EC4(void *);
 void sub_08197F64(void *);
