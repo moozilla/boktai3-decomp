@@ -10,6 +10,24 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 (Claude): register-hint audit
+
+Matched code is unchanged at **21.351%**, but less of it relies on the
+pinning concession: **Register-pinned falls from 5.057% to 3.822%** of total
+code (no pinning: **17.529%**, up from 16.294%). About half of the files added
+on October 12 were pinned, and most of their hints were not needed:
+
+* 175 pinned units still match with every register pin and empty `asm("")`
+  barrier deleted. Their concession markers are removed.
+* `tools/depin.py FILE... --write` deletes each remaining hint in turn and keeps
+  the deletion when `check.py` still matches. Over the other 297 hinted files:
+  3,749 hints became 1,511. Of 290 files that still have hints, 113 have only one or two.
+
+Combined ROM validation printed **`build/boktai3.gba: OK`**. **Workers: run
+`tools/depin.py` on any file before committing it with pins or barriers.**
+Files with one or two hints left are good cleanup targets. Often a correct
+field type or declaration order removes the last hint.
+
 ## October 12 renewed allowance: wireless menus and result panels
 
 Matching is **21.351%**, up **0.647 percentage points** from
