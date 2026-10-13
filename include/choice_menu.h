@@ -1,37 +1,75 @@
+#ifndef GUARD_CHOICE_MENU_H
+#define GUARD_CHOICE_MENU_H
+
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
+
+/* One selectable entry; x/y are pixel positions, width in characters. */
 struct Choice {
     u8 x, y, width, row;
 };
-struct Menu {
+
+/* 8-byte-header sprite object used for the left/right cursor arrows (0x60 bytes). */
+struct ChoiceCursor {
+    u8 head[8];
+    u32 flags; // bit 0 hide, bit 9 hidden/idle
+    u8 pad0C[20];
+    s16 x, y;
+    u8 pad24[36];
+    u16 *palette;
+    u8 pad4C[20];
+};
+
+struct ChoiceResource {
+    u32 words[8];
+};
+
+struct ChoiceMenu {
     u8 task[24];
     s8 selected, initial;
     u8 delay, count;
     u8 rowStart[8], rowEnd[8], rowCount[8];
     u8 rows, useScript, left, top;
-    u8 pad38[2];
+    u8 maxWidth, maxRows;
     u8 width, textX, allowCancel, wakeDelay, repeatDelay, explicitWidth;
     u32 held;
     u32 arguments[4];
     u32 script;
     void *callback, *window;
-    u32 unknown60;
+    u32 stringBase;
     struct Choice choices[16];
-    u8 scratch[104];
-    u32 leftFlags;
-    u8 pad110[20];
-    s16 leftX, leftY;
-    u8 pad128[68];
-    u32 rightFlags;
-    u8 pad170[20];
-    s16 rightX, rightY;
+    u8 scratch[64];
+    struct ChoiceResource resource;
+    struct ChoiceCursor leftCursor;
+    struct ChoiceCursor rightCursor;
+    u32 colorIndex;
+    u16 palette[16];
 };
-extern const u8 gUnk_0824DB0C[], gUnk_0824DB14[], gUnk_0824DB1C[], gUnk_0824DB20[];
-s32 sub_08032168(const u8 *, const u8 *, s32);
-s32 sub_080321A0(const u8 *, s32);
-s32 sub_08031DDC(s32);
-s32 sub_08031DBC(s32);
-u8 *Text_FindChar(u8 *, s32);
+
+struct ChoiceKeys {
+    u16 held, pressed;
+};
+
+extern struct ChoiceMenu *gUnk_0200002C;
+extern struct ChoiceKeys gUnk_03005260;
+
+s32 sub_0821ABA8(s32, s32);
+void sub_0821A04C(void *, u32 (*)(struct ChoiceMenu *), u32 (*)(struct ChoiceMenu *));
+
+void ChoiceMenu_DispatchSelection(struct ChoiceMenu *p, s32 selection);
+void ChoiceMenu_Select(struct ChoiceMenu *p, s32 selection);
+s32 sub_08006478(struct ChoiceMenu *p, s32 a, s32 d);
+s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p);
+u32 sub_080066C0(struct ChoiceMenu *p);
+u32 sub_08006710(struct ChoiceMenu *p);
+void sub_08006738(struct ChoiceMenu *p);
+u8 *ChoiceMenu_ParseTag(struct ChoiceMenu *p, u8 *text);
+void ChoiceMenu_LayoutText(struct ChoiceMenu *p, void *window);
+s32 ChoiceMenu_Initialize(struct ChoiceMenu *p, void *window, s32 stringBase, s32 *options);
+struct ChoiceMenu *sub_08006CD0(void *window, s32 stringBase, void *callback, s32 *options);
+struct ChoiceMenu *ChoiceMenu_CreateFromScript(void);
+void sub_08006E98(void);
+
+/* Tag-parsing helpers; expand inside ChoiceMenu_ParseTag (use its p and cursor). */
 #define READ_NUMBER()                                                                              \
     ({                                                                                             \
         s32 found = 0, length = 0, value;                                                          \
@@ -100,54 +138,5 @@ u8 *Text_FindChar(u8 *, s32);
             *out = zero;                                                                           \
         }                                                                                          \
     })
-u8 *ChoiceMenu_ParseTag(struct Menu *p, u8 *text)
-{
-    u8 *cursor = text;
-    if (*text != '/') {
-        if (!sub_08032168(text, gUnk_0824DB0C, 5)) {
-            READ_WIDTH();
-            cursor = Text_FindChar(cursor, '>');
-            p->choices[p->count].x = (p->left + ({
-                                          register u8 *x asm("r4") = &p->textX;
-                                          asm("" : : "r"(x));
-                                          *x;
-                                      }))
-                                     << 3;
-            p->choices[p->count].y = (p->top << 3) + (p->rows << 4);
-            p->choices[p->count].row = p->rows;
-            p->width = 0;
-        } else if (!sub_08032168(text, gUnk_0824DB14, 6)) {
-            register s32 width asm("r1") = sub_08031DDC(READ_NUMBER());
-            p->width += width;
-            p->textX += width;
-            cursor = Text_FindChar(cursor, '>');
-        } else if (!sub_08032168(text, gUnk_0824DB1C, 3)) {
-            register s32 width asm("r1") = sub_08031DBC(READ_NUMBER());
-            p->width += width;
-            p->textX += width;
-            cursor = Text_FindChar(cursor, '>');
-        } else
-            goto unknown;
-    } else if (!sub_08032168(text, gUnk_0824DB20, 6)) {
-        cursor = Text_FindChar(text, '>');
-        if (p->explicitWidth)
-            p->choices[p->count].width = p->explicitWidth;
-        else
-            p->choices[p->count].width = p->width;
-        p->count++;
-        p->width = 0;
-        p->rowCount[p->rows]++;
-    } else
-        goto unknown;
-    goto matchedTag;
-unknown: {
-    u8 *result = Text_FindChar(text, '>');
-    register u8 *saved asm("r4") = result;
-    asm("" : : "r"(saved));
-    return result;
-}
-matchedTag:
-    text = cursor + 1;
-returnText:
-    return text;
-}
+
+#endif
