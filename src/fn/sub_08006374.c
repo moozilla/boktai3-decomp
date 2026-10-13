@@ -1,30 +1,4 @@
-#include "global.h"
-struct Choice {
-    u8 x, y, width, row;
-};
-struct Menu {
-    u8 task[24];
-    s8 selected, initial;
-    u8 delay, count;
-    u8 rowStart[8], rowEnd[8], rowCount[8];
-    u8 rows, useScript, left, top;
-    u8 pad38[2];
-    u8 width, textX, allowCancel, wakeDelay, repeatDelay, explicitWidth;
-    u32 held;
-    u32 arguments[4];
-    u32 script;
-    void *callback, *window;
-    u32 unknown60;
-    struct Choice choices[16];
-    u8 scratch[104];
-    u32 leftFlags;
-    u8 pad110[20];
-    s16 leftX, leftY;
-    u8 pad128[68];
-    u32 rightFlags;
-    u8 pad170[20];
-    s16 rightX, rightY;
-};
+#include "choice_menu.h"
 struct Args {
     u32 count : 16;
     u32 unused : 16;
@@ -32,11 +6,11 @@ struct Args {
 };
 void sub_0821AD08(u32, struct Args *);
 void sub_0824923C(s32, void *);
-static inline u32 selectionScript(struct Menu *p)
+static inline u32 selectionScript(struct ChoiceMenu *p)
 {
     return p->script;
 }
-void ChoiceMenu_DispatchSelection(struct Menu *p, s32 selection)
+void ChoiceMenu_DispatchSelection(struct ChoiceMenu *p, s32 selection)
 {
     u32 values[5];
     struct Args args;

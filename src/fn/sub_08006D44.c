@@ -1,36 +1,5 @@
-#include "global.h"
+#include "choice_menu.h"
 // MATCHING_CONCESSION: register-pinning
-struct Choice {
-    u8 x, y, width, row;
-};
-struct Menu {
-    u8 task[24];
-    s8 selected, initial;
-    u8 delay, count;
-    u8 rowStart[8], rowEnd[8], rowCount[8];
-    u8 rows, useScript, left, top;
-    u8 pad38[2];
-    u8 width, textX, allowCancel, wakeDelay, repeatDelay, explicitWidth;
-    u32 held;
-    u32 arguments[4];
-    u32 script;
-    void *callback, *window;
-    u32 unknown60;
-    struct Choice choices[16];
-    u8 scratch[64];
-    struct Resource {
-        u32 words[8];
-    } resource;
-    u8 leftPrefix[8];
-    u32 leftFlags;
-    u8 pad110[20];
-    s16 leftX, leftY;
-    u8 pad128[68];
-    u32 rightFlags;
-    u8 pad170[20];
-    s16 rightX, rightY;
-};
-extern struct Menu *gUnk_0200002C;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 s32 Script_GetPc(void);
@@ -38,17 +7,13 @@ s32 sub_0821ABA8(s32, s32);
 void *sub_08227E90(void);
 s32 sub_08031D90(s32 *);
 void *sub_08219FBC(s32, s32);
-void sub_0821A04C(void *, void (*)(void), void (*)(void));
-void sub_080066C0(void);
-void sub_08006710(void);
 void sub_0821A0C0(void *);
-s32 ChoiceMenu_Initialize(struct Menu *, void *, s32, s32 *);
-struct Menu *ChoiceMenu_CreateFromScript(void)
+struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
 {
     s32 options[7], arguments[4], defaults[4];
     void *window;
     s32 stringBase, script;
-    struct Menu *p;
+    struct ChoiceMenu *p;
     s32 i;
     s32 *argumentBase;
     if (gUnk_0200002C)
