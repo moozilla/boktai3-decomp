@@ -77,12 +77,10 @@ void Memory_Clear(void *dst, s32 bytes); /* zero fill (bytes, then CpuSet words)
 #define Memory_Copy sub_08219EBC
 void Memory_Copy(void *dst, const void *src, s32 bytes);
 
-#define Callback_Invoke sub_0824923C
-s32 Callback_Invoke(void *arg, void *function); /* function(arg) through a `bx r1` thunk */
-
-#define Callback_Invoke2 sub_08249240
-s32 Callback_Invoke2(void *arg0, void *arg1,
-                     void *function); /* function(arg0, arg1) via `bx r2` (guess) */
+/* libgcc _call_via_r1 / _call_via_r2 (bx r1 / bx r2), aliased in symbols/ram.ld.
+ * Explicit calls are a matching workaround; prefer calling the function pointer. */
+s32 sub_0824923C(void *arg, void *function);
+s32 sub_08249240(void *arg0, void *arg1, void *function);
 
 /* ---- Sound -------------------------------------------------------------- */
 
