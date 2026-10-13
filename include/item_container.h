@@ -2,6 +2,7 @@
 #define ITEM_CONTAINER_H
 #include "global.h"
 #include "scene_object.h"
+#include "player.h"
 
 /*
  * "Triggers": dropped items (type 0) and treasure containers (type 1) that live in a linked list
@@ -49,18 +50,6 @@ struct TriggerObject {
     u8 pad12[10];
     struct SceneVec position;
     u8 pad24[8];
-};
-
-/* Player actor state (gUnk_02000580[i]). */
-struct TriggerActor {
-    u8 pad0[48];
-    struct SceneVec position;
-    u8 pad38[0x3E0];
-    u8 actionMode; /* 6 while locked containers refuse to open (guess) */
-    u8 pad419[0x2F];
-    u32 flags; /* bit 4: items always visible (guess) */
-    u8 pad44C[0xE8];
-    u16 mode, pad536, active;
 };
 
 /* The actor that tries to open a container (position at +0xC, slot index at +8). */
@@ -114,7 +103,7 @@ struct TriggerManager {
     u8 soundDelay;
     u8 pad25[3];
     struct Trigger *head;
-    struct TriggerActor *actors[4];
+    struct Player *actors[4];
     struct SceneVec projected[4]; /* isometric positions of the actors */
 };
 

@@ -1,6 +1,8 @@
 #ifndef DIRECTIONAL_INTERACTION_H
 #define DIRECTIONAL_INTERACTION_H
 #include "global.h"
+#include "game_state.h"
+#include "player.h"
 
 /*
  * Directional interaction controllers (tentative): invisible trigger zones kept in a small pool
@@ -10,20 +12,6 @@
  * controller and runs its start/end scripts. The "level" counts a short fade of its marker.
  */
 
-struct DirectionalVec {
-    s16 x, y, z, pad;
-};
-
-/* The player actor, as far as the controllers care. */
-struct DirectionalActor {
-    u8 pad0[0x20];
-    u32 flags; /* 0x186c: busy bits, 0x100000: cannot interact */
-    u8 pad24[12];
-    struct DirectionalVec position;
-    u8 pad38[0x3a4 - 0x38];
-    u8 facing;
-};
-
 /* Marker draw record (embedded in a controller at +0x24). */
 struct DirectionalDrawable {
     u32 flags; /* bit 0: hidden, bit 2: oriented along z */
@@ -32,7 +20,7 @@ struct DirectionalDrawable {
     u8 pad8[8];
     u16 scale;
     u8 pad12[0x1c - 0x12];
-    struct DirectionalVec position; /* marker position, derived from the controller's */
+    struct SceneVec position; /* marker position, derived from the controller's */
     u8 pad24[0x2c - 0x24];
 };
 
@@ -48,7 +36,7 @@ struct DirectionalController {
     u16 startScript, endScript;
     u32 distance; /* squared trigger distance */
     s16 arguments[4];
-    struct DirectionalVec position;
+    struct SceneVec position;
     struct DirectionalDrawable drawable;
     u8 animation[28];
 };
@@ -61,8 +49,8 @@ struct DirectionalManager {
     u32 unused : 8;
     u32 enabled; /* bit mask of slots in use */
     struct DirectionalController *slots;
-    struct DirectionalActor *actor;
-    struct DirectionalVec position; /* copy of the actor's position */
+    struct Player *actor;
+    struct SceneVec position; /* copy of the actor's position */
 };
 
 struct DirectionalPackedVec {
@@ -74,14 +62,7 @@ struct DirectionalScriptArgs {
     s32 *values;
 };
 
-struct DirectionalWorld {
-    u8 pad[0x5a0];
-    s32 region;
-};
-
 extern struct DirectionalManager *gUnk_02000038;
-extern struct DirectionalActor *gUnk_02000580;
-extern struct DirectionalWorld *gUnk_02000710;
 extern u32 gUnk_02000560;
 extern u16 gUnk_03005260[];
 extern void *gUnk_086049F4[];
@@ -91,7 +72,7 @@ s32 Script_GetKeywordValue(u32, s32);
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetPc(void);
 s32 Script_GetValue(void);
-s32 sub_0822C034(struct DirectionalVec *);
+s32 sub_0822C034(struct SceneVec *);
 s32 Math_Atan2(s32, s32);
 s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);

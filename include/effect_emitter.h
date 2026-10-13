@@ -43,11 +43,6 @@ struct EffectEmitter {
     struct SceneCollider collider;
 };
 
-struct EmitterWorld {
-    u8 pad[0x5a0];
-    void *scene;
-};
-
 extern u16 gUnk_08604AB4[];
 
 void EffectEmitter_ReceiveHit(struct EmitterAttack *, void *, struct EffectEmitter *);
