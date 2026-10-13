@@ -1,11 +1,10 @@
-#include "global.h"
+#include "breakable_barrier.h"
 
 extern const u32 gUnk_08604B84[];
-void sub_08249240(u32 a, u8 *p, u32 f);
 
-u32 sub_08013220(u32 a, u8 *p)
+u32 sub_08013220(void *a, struct BreakableBarrier *p)
 {
-    sub_08249240(a, p, gUnk_08604B84[p[0x9E]]);
-    *(u32 *)(p + 0xA4) += 1;
+    sub_08249240(a, p, (void *)gUnk_08604B84[p->state]);
+    p->timer += 1;
     return 0;
 }
