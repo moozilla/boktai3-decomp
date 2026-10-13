@@ -201,6 +201,38 @@ void *Video_GetBackgroundMap(u32);
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
 
+/* Fixed-point helpers used by the update functions (truncating shifts). */
+#define truncate7(v)                                                                               \
+    ({                                                                                             \
+        s32 value = (v);                                                                           \
+        s32 result;                                                                                \
+        if (value >= 0)                                                                            \
+            result = value >> 7;                                                                   \
+        else                                                                                       \
+            result = -((-value) >> 7);                                                             \
+        result;                                                                                    \
+    })
+#define truncate3(v)                                                                               \
+    ({                                                                                             \
+        s32 value = (v);                                                                           \
+        s32 result;                                                                                \
+        if (value >= 0)                                                                            \
+            result = value >> 3;                                                                   \
+        else                                                                                       \
+            result = -((-value) >> 3);                                                             \
+        result;                                                                                    \
+    })
+#define fixedToInt(v)                                                                              \
+    ({                                                                                             \
+        s32 value = (v);                                                                           \
+        s32 result;                                                                                \
+        if (value >= 0)                                                                            \
+            result = value >> 18;                                                                  \
+        else                                                                                       \
+            result = -((-value) >> 18);                                                            \
+        result;                                                                                    \
+    })
+
 /* Functions of this unit (ROM order). */
 s32 Background_ApplyQueuedCommands(struct Background *p);
 s32 Background_Update(struct Background *p);
