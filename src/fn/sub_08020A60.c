@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneMessages_RunScript sub_08020A60
-int sub_08020D88(int);
+int SceneMessages_FindScript(int);
 void sub_0821AD08(int, void *);
 void sub_08020D68(void *, int);
 void SceneMessages_RunScript(void *p, void *entry, u8 *message)
@@ -12,7 +11,7 @@ void SceneMessages_RunScript(void *p, void *entry, u8 *message)
         u32 unused : 16;
         void *args;
     } call;
-    int id = (u16)sub_08020D88(*(u16 *)(message + 8));
+    int id = (u16)SceneMessages_FindScript(*(u16 *)(message + 8));
     if (id) {
         register int count asm("r0") = message[7];
         {

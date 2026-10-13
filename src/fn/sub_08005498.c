@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define SceneObjects_Update sub_08005498
 struct ObjectTail {
     u8 damageTimer, mode;
     u16 animation;
@@ -37,7 +36,7 @@ struct Args {
 extern void (*const gUnk_086049B4[])(struct Object *);
 extern u8 *gUnk_02000710;
 void sub_0821AD08(u32, struct Args *);
-void sub_080046F0(struct Object *);
+void Scene_DropObjectsAbove(struct Object *);
 void sub_080047AC(struct Object *);
 void sub_08225B74(void *);
 void sub_0821DE30(void *);
@@ -81,7 +80,7 @@ s32 SceneObjects_Update(struct Manager *manager)
                 sub_0821AD08(p->tail.script, &args);
                 p->tail.script = 0;
             }
-            sub_080046F0(p);
+            Scene_DropObjectsAbove(p);
             sub_080047AC(p);
             continue;
         }

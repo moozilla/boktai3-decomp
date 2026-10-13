@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define SelectionMenu_DrawStatistics sub_0801AA18
 extern u8 *gUnk_02000710;
 void sub_0805DE3C(int);
 void sub_0805DF08(int);

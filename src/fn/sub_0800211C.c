@@ -1,5 +1,4 @@
 #include "global.h"
-#define Background_LoadTilesFromScript sub_0800211C
 struct Resource {
     u32 words[2];
     u16 unused, size;

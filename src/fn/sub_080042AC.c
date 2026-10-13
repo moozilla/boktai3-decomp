@@ -1,6 +1,5 @@
 #include "global.h"
 /* Tentative: test whether a neighboring terrain cell accepts an actor. */
-#define Scene_CanEnterNeighborCell sub_080042AC
 struct Cell {
     u8 height, tile;
     u16 flags;

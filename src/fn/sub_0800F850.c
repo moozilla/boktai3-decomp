@@ -14,7 +14,6 @@ void sub_0822B2F8(int);
 void sub_08177DEC(int);
 void sub_0821AD08(u32, void *);
 void sub_0821A0C0(void *);
-#define ResultPrompt_Update sub_0800F850
 int ResultPrompt_Update(ResultPrompt *p)
 {
     if (p->result < 120)

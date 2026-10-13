@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scrolling_background.h"
-#define ScrollingBackground_Update sub_08002408
 struct Layer {
     u8 pad[32];
     s16 x, y;
@@ -14,7 +13,7 @@ extern struct Camera gUnk_030042A0;
 extern s16 gUnk_03005418[2];
 extern u16 gUnk_02000550, gUnk_0200053C;
 extern const s16 gUnk_086149C4[];
-s32 sub_080022A0(struct ScrollingBackground *);
+s32 ScrollingBackground_ApplyCommands(struct ScrollingBackground *);
 void sub_08219574(u32, s32, s32);
 #define fixedToInt(v)                                                                              \
     ({                                                                                             \
@@ -37,7 +36,7 @@ s32 ScrollingBackground_Update(struct ScrollingBackground *p)
     struct Layer *layer = &gUnk_03004C30[p->layer];
     s32 width, height;
     s32 cx, cy;
-    sub_080022A0(p);
+    ScrollingBackground_ApplyCommands(p);
     if (!p->enabled)
         return 0;
     width = p->width << 4;

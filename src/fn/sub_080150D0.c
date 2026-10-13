@@ -1,6 +1,5 @@
 #include "global.h"
 extern void *gUnk_02000064;
-#define FragmentManager_Initialize sub_080150D0
 int FragmentManager_Initialize(u8 *m)
 {
     int i = 0;

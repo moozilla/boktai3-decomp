@@ -19,7 +19,6 @@ void sub_08037490(void *, void *);
 void sub_0803749C(void *, void *);
 void *sub_08037594(int);
 void *sub_08037DCC(int);
-void CpuSet(const void *, void *, u32);
 void sub_08219EBC(void *, const void *, int);
 void sub_08033924(int, int);
 void sub_080374A8(void *, void *, int, void *, int);

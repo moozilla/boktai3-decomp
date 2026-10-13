@@ -69,7 +69,7 @@ void sub_08215284(void *, s32);
 void sub_0822B2F8(s32);
 void sub_0821AD08(void *, s32);
 void sub_08013424(void *);
-void sub_081E34D0(void *);
+void ActorPalette_BeginFade(void *);
 extern s32 gUnk_03005260;
 extern u8 gUnk_03005430[];
 void sub_081E43E8(void *);
@@ -95,7 +95,7 @@ static inline u8 child_take(struct Child *c)
     }
     return 0;
 }
-void sub_081E3C60(void *, void *);
+void Actor_TryInteraction(void *, void *);
 void sub_081E5608(void *, void *);
 void sub_081E5648(struct S *input, struct Child *child)
 {

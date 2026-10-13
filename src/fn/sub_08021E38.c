@@ -1,11 +1,10 @@
 #include "global.h"
-#define SceneActors_ScriptSetEffects sub_08021E38
-u8 *sub_0802141C(void);
+u8 *SceneActors_FindAvailable(void);
 int Script_SeekToKeyword(int);
 void sub_0822B2F8(int);
 void SceneActors_ScriptSetEffects(void)
 {
-    u8 *p = sub_0802141C();
+    u8 *p = SceneActors_FindAvailable();
     if (p) {
         if (Script_SeekToKeyword('s')) {
             p[0x154] = 1;

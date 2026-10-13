@@ -40,9 +40,8 @@ struct Manager {
     void *resource;
 };
 extern struct Manager *gUnk_02000030;
-void sub_080077FC(void *, struct Trigger *);
+void Trigger_UpdateIdleAnimation(void *, struct Trigger *);
 void sub_08220C8C(struct Anim *, void *, u32, u32, u32);
-#define Trigger_UpdateLockedRecovery sub_08007D84
 void Trigger_UpdateLockedRecovery(struct Manager *manager, struct Trigger *p)
 {
     struct Obj *o;
@@ -110,7 +109,7 @@ void Trigger_UpdateLockedRecovery(struct Manager *manager, struct Trigger *p)
     if (p->flip)
         p->obj->flags |= 4;
     if (done) {
-        p->update = sub_080077FC;
+        p->update = Trigger_UpdateIdleAnimation;
         p->timer = 0;
         p->actor = -1;
         sub_08220C8C(p->anim, manager->resource, 0, 0, 0);

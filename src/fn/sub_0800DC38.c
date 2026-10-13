@@ -9,7 +9,6 @@ typedef struct {
 void sub_082194D4(void *);
 void sub_0821910C(void);
 void sub_082195E0(Layer *);
-#define ScanlinePresentation_Destroy sub_0800DC38
 int ScanlinePresentation_Destroy(Presentation *p)
 {
     int i;

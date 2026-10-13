@@ -29,7 +29,7 @@ struct Manager {
 };
 int sub_082151E4(void *, int);
 void sub_082144A4(void *, void *, int);
-void sub_08012D3C(void *, void *, int);
+void BreakableBarrier_SetPosition(void *, void *, int);
 void sub_0821FEB4(void *, int, int, int, int, void *, void *);
 void sub_0821FF24(void *, void *, int);
 void sub_0821FF84(void *, void *, void *);
@@ -41,9 +41,8 @@ int sub_0821ABA8(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetPc(void);
 int Script_GetValue(void);
-int sub_08012D8C(void *, void *, int);
+int BreakableBarrier_Initialize(void *, void *, int);
 extern u16 gUnk_03005214, gUnk_030051C4;
-#define BreakableBarriers_Initialize sub_08013294
 int BreakableBarriers_Initialize(struct Manager *m)
 {
     int i;
@@ -73,7 +72,7 @@ int BreakableBarriers_Initialize(struct Manager *m)
     }
     p = (struct Barrier *)(m + 1);
     for (i = 0; i < 4; i++, p++)
-        if (sub_08012D8C(m, p, i) < 0)
+        if (BreakableBarrier_Initialize(m, p, i) < 0)
             return -1;
     m->script = sub_0821ABA8('c', 0);
     gUnk_03005214 = 0x1084;

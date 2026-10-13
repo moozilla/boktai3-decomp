@@ -7,7 +7,6 @@ struct Controller {
 };
 extern struct Controller *gUnk_02000070;
 struct Controller *sub_08016674(int, int);
-#define PaletteLevels_Configure sub_080166C4
 int PaletteLevels_Configure(int mode, int first, int count, u8 *initial, u8 *target, u16 *periods)
 {
     struct Controller *initialManager = gUnk_02000070;

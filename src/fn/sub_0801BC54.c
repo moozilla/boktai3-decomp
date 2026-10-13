@@ -1,7 +1,6 @@
 #include "global.h"
-#define Transformation_Finish sub_0801BC54
 void sub_082279A8(int, int, int, int, int, int, int);
-void sub_0801B960(void *);
+void Transformation_ReportResult(void *);
 void sub_0821A0C0(void *);
 void Transformation_Finish(u8 *p)
 {
@@ -9,7 +8,7 @@ void Transformation_Finish(u8 *p)
         sub_082279A8(1, 5, 4, 4, 4, 0xffff, 0);
     if (*(u32 *)(p + 0x3c) > 91) {
         if (*(u16 *)(p + 0x7a0))
-            sub_0801B960(p);
+            Transformation_ReportResult(p);
         sub_0821A0C0(p);
     } else
         (*(u32 *)(p + 0x3c))++;

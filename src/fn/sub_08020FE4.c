@@ -19,7 +19,7 @@ struct S {
     s16 d;
 };
 struct R *sub_08225984(s32);
-void sub_08018C48(struct BF *, s32, s32, s32, s32);
+void OrbitingParticles_Create(struct BF *, s32, s32, s32, s32);
 void sub_08020FE4(u32 x, u32 y, struct S *s)
 {
     struct BF bf;
@@ -28,6 +28,6 @@ void sub_08020FE4(u32 x, u32 y, struct S *s)
         bf.a = r->a;
         bf.b = r->b;
         bf.c = r->c;
-        sub_08018C48(&bf, s->a, s->b, s->c, s->d);
+        OrbitingParticles_Create(&bf, s->a, s->b, s->c, s->d);
     }
 }

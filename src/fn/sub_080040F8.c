@@ -10,10 +10,10 @@ s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void *sub_08219FBC(u32, u32);
 void sub_0821A04C(void *, void (*)(void), void (*)(void));
-s32 sub_08004048(void *, u32, u32);
+s32 TerrainOverlay_Initialize(void *, u32, u32);
 void sub_0821A0C0(void *);
-void sub_08003C20(void);
-void sub_08004018(void);
+void TerrainOverlay_Update(void);
+void TerrainOverlay_DestroyDrawables(void);
 
 void *sub_080040F8(u16 x, u16 y)
 {
@@ -29,12 +29,12 @@ void *sub_080040F8(u16 x, u16 y)
     b = n * 8 + 0x90;
     s = sub_08219FBC(9, a + b + n * 12);
     if (s != 0) {
-        sub_0821A04C(s, sub_08003C20, sub_08004018);
+        sub_0821A04C(s, TerrainOverlay_Update, TerrainOverlay_DestroyDrawables);
         s->p[0] = (u8 *)s + b;
         s->p[1] = s->p[0] + a;
         s->a = n;
         s->b = n * 3;
-        if (sub_08004048(s, x, y) < 0) {
+        if (TerrainOverlay_Initialize(s, x, y) < 0) {
             sub_0821A0C0(s);
             return 0;
         }

@@ -35,7 +35,6 @@ static inline u32 frame_factor(u16 v)
     u32 mask = 15;
     return mask & value;
 }
-#define AnimatedHazard_AnimateHold sub_08012380
 void AnimatedHazard_AnimateHold(u8 *m, struct Piece *p)
 {
     struct Obj *o;

@@ -1,11 +1,4 @@
 #include "global.h"
-#define Rtc_Initialize                sub_08248970
-#define Clock_ClearState              sub_082284F4
-#define Clock_CheckRtcDate            sub_082290F4
-#define InterruptsAndVideo_Initialize sub_08213D10
-#define GameState_SelectRamBase       sub_0821B084
-#define TaskSystem_Initialize         sub_08219AAC
-#define TaskSystem_RunFrame           sub_0821A054
 /* Hardware startup, subsystem initialization, then the task scheduler loop. */
 struct Dma {
     vu32 source, dest, control;

@@ -24,7 +24,7 @@ struct Manager {
 };
 extern const s16 gUnk_086149C4[];
 void sub_080187E4(void *, void *);
-void sub_08018840(void *, void *);
+void OrbitingParticles_Advance(void *, void *);
 int sub_080187BC(void *);
 void sub_0821A0C0(void *);
 static inline int scale(int v)
@@ -33,7 +33,6 @@ static inline int scale(int v)
         return v >> 12;
     return -((-v) >> 12);
 }
-#define OrbitingParticles_Update sub_08018898
 int OrbitingParticles_Update(struct Manager *m)
 {
     int i;
@@ -51,7 +50,7 @@ int OrbitingParticles_Update(struct Manager *m)
             if (!p->state)
                 sub_080187E4(m, arg);
             else
-                sub_08018840(m, arg);
+                OrbitingParticles_Advance(m, arg);
             out = position;
             angle = p->angle;
             radius = p->radius;

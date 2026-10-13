@@ -1,6 +1,5 @@
 #include "global.h"
-#define SceneObjects_BeginDeactivation sub_0801E5B8
-void sub_0801EF60(void);
+void SceneObject_AnimateInactive(void);
 void SceneObjects_BeginDeactivation(u8 *p, u16 id)
 {
     int i = 0;
@@ -16,7 +15,7 @@ void SceneObjects_BeginDeactivation(u8 *p, u16 id)
             u8 *s = *base + 140 * i;
             if (*(u16 *)(s + 0x34) == id && (u8)(s[0x37] - 1) <= 1) {
                 s[0x37] = three;
-                *(void **)(s + 0x30) = sub_0801EF60;
+                *(void **)(s + 0x30) = SceneObject_AnimateInactive;
                 s[0x39] = two;
                 s[0x3a] = zero;
             }

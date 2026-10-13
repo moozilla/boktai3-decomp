@@ -6,7 +6,6 @@
 /* Adapted from newlib 1.8.2 s_matherr.c; see docs/LIBM.md. */
 // COMPILER: old_agbcc
 // CFLAGS: -O2 -fno-builtin
-#define matherr sub_0824D8A4
 #include "libm_compat.h"
 
  int matherr(struct exception *x)

@@ -1,5 +1,4 @@
 #include "global.h"
-#define Presentation_Destroy sub_081E2D40
 // Provisional name: Presentation_Destroy
 extern u16 gUnk_03004BD8;
 void sub_082195E0(void *);

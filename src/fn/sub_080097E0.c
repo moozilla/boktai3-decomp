@@ -31,10 +31,9 @@ static inline s32 facingAllowed(u32 facing, s32 a, s32 b, s32 c)
     return 0;
 }
 extern u16 gUnk_03005260[];
-s32 sub_080096A0(struct Manager *, struct Controller *);
+s32 Actor_CanInteractWithController(struct Manager *, struct Controller *);
 void sub_080095B4(struct Controller *, u32);
 void sub_0800971C(struct Manager *, s32);
-#define DirectionalController_CheckInput sub_080097E0
 s32 DirectionalController_CheckInput(struct Manager *manager, struct Controller *p, s32 index)
 {
     sub_0800950C(p);
@@ -65,7 +64,7 @@ s32 DirectionalController_CheckInput(struct Manager *manager, struct Controller 
                 if (a == direction || b == direction || c == direction) {
                     u32 facing = manager->actor->facing;
                     if (facingAllowed(facing, a, b, c)) {
-                        if ((gUnk_03005260[1] & 1) && sub_080096A0(manager, p)) {
+                        if ((gUnk_03005260[1] & 1) && Actor_CanInteractWithController(manager, p)) {
                             p->level = 5;
                             sub_080095B4(p, 0);
                             sub_08009500(p, 2);

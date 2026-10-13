@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneActors_StartEightDirectionAnimation sub_080217F4
 void sub_08220D78(void *, int, u16, u16, u16);
 void SceneActors_StartEightDirectionAnimation(u8 *p, u8 *animation, int resource, int sequence,
                                               int speed, int offset, int flags)

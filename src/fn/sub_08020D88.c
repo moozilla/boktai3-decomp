@@ -21,7 +21,6 @@ typedef struct {
     Receiver self;
 } Controller;
 
-#define SceneMessages_FindScript sub_08020D88
 extern Controller *gUnk_0200047C;
 int SceneMessages_FindScript(int id)
 {

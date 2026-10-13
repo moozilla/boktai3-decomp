@@ -38,7 +38,6 @@ void *sub_0821A520(int, int);
 int sub_082151E4(void *, int);
 void sub_082144E4(void *, void *, int);
 void sub_08220C8C(void *, void *, int, int, int);
-#define AnimatedParticleManager_Initialize sub_080153B0
 int AnimatedParticleManager_Initialize(struct Manager *m)
 {
     int i;

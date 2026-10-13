@@ -1,16 +1,15 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneActorGraphics_SelectResource sub_08021EC0
 extern u8 *gUnk_030042E4;
-int sub_08021EA8(void *);
+int SceneActorGraphics_GetResourceId(void *);
 void SceneActorGraphics_SelectResource(u8 *p)
 {
     if (p[0x38e]) {
         int resource;
         p[0x38c] = 0;
         p[0x38e] = 0;
-        *(int *)(p + 0x390) = sub_08021EA8(p);
-        resource = sub_08021EA8(p);
+        *(int *)(p + 0x390) = SceneActorGraphics_GetResourceId(p);
+        resource = SceneActorGraphics_GetResourceId(p);
         {
             int test = resource;
             asm("" : "+r"(test));

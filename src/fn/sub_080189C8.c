@@ -24,7 +24,7 @@ struct Manager {
 };
 extern const s16 gUnk_086149C4[];
 void sub_080187E4(void *, void *);
-void sub_08018840(void *, void *);
+void OrbitingParticles_Advance(void *, void *);
 int sub_080187BC(void *);
 void sub_0821A0C0(void *);
 static inline int scale(int v)
@@ -66,7 +66,6 @@ static inline int randomAngle(void)
     value = *(u16 *)(offset + (u32)table);
     return (value & 127) - 32;
 }
-#define OrbitingParticles_Initialize sub_080189C8
 int OrbitingParticles_Initialize(struct Manager *m, struct Vec *source, int radius, int duration,
                                  int count, int type)
 {

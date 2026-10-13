@@ -1,5 +1,4 @@
 #include "global.h"
-#define SelectionMenu_PopulateActors sub_0801A75C
 typedef struct {
     signed x : 16;
     signed y : 16;

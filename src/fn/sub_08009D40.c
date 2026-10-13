@@ -31,7 +31,6 @@ struct Manager {
 extern struct Manager *gUnk_02000038;
 void sub_08009728(struct Manager *, s32);
 void sub_08009500(struct Controller *, u32);
-#define DirectionalController_ScriptRelease sub_08009D40
 s32 DirectionalController_ScriptRelease(void)
 {
     struct Manager *manager = gUnk_02000038;

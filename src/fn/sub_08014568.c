@@ -3,7 +3,6 @@ extern void *gUnk_02000060;
 void *sub_08215184(int);
 void sub_08217E60(void *, void *, int);
 void sub_08217EC4(void *, int, int);
-#define ParticleManager_Initialize sub_08014568
 int ParticleManager_Initialize(u8 *m)
 {
     int i;

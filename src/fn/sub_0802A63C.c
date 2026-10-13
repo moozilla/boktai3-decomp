@@ -47,10 +47,10 @@ void sub_08029E1C(void *);
 int sub_08029E2C(void *);
 void sub_08029AA8(void *);
 void sub_0822B3BC(int);
-void sub_08021AE8(void *, void *);
+void SceneActors_RunFirstEventScript(void *, void *);
 void sub_08046834(void *);
 void sub_081D5204(int);
-void sub_08021B54(void *, void *);
+void SceneActors_RunSecondEventScript(void *, void *);
 static inline void effect(ActorAnimation *p, int mode, int id, int duration)
 {
     *(u32 *)((u8 *)p + 0x1c0) = id;
@@ -68,7 +68,7 @@ void sub_0802A63C(ActorAnimation *p)
     if (p->changed) {
         p->changed = 0;
         sub_080297FC(p, 10, 1, 8);
-        sub_08021AE8(p, (u8 *)p + 0x8a4);
+        SceneActors_RunFirstEventScript(p, (u8 *)p + 0x8a4);
         sub_08046834(*(void **)((u8 *)p + 0x904));
         effect(p, 2, 349, 1);
         base->stage = 0;
@@ -77,7 +77,7 @@ void sub_0802A63C(ActorAnimation *p)
     }
     if (p->padB2 && !base->stage) {
         sub_081D5204(80);
-        sub_08021B54(p, (u8 *)base + 0x8a4);
+        SceneActors_RunSecondEventScript(p, (u8 *)base + 0x8a4);
         base->stage++;
     }
     {

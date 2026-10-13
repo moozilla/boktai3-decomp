@@ -11,7 +11,6 @@ typedef struct {
     void *tiles;
 } Manager;
 
-#define TileAnimation_Configure sub_08019840
 Manager *sub_080195DC(void);
 Channel *sub_080197F8(Manager *);
 Channel *sub_08019818(Manager *, int);

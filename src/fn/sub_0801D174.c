@@ -1,7 +1,6 @@
 #include "global.h"
-#define ResultTutorial_ShowPrompt sub_0801D174
 void sub_08030DBC(int);
-int sub_0801D104(void *);
+int ResultTutorial_FadeIn(void *);
 typedef struct {
     u32 pad[2], flags;
 } Graphic;
@@ -13,7 +12,7 @@ int ResultTutorial_ShowPrompt(u8 *p)
             ++p[0xaf];
             *(u16 *)(p + 0xaa) = 0;
         case 1:
-            if (sub_0801D104(p)) {
+            if (ResultTutorial_FadeIn(p)) {
                 ((Graphic *)(p + 0x684))->flags &= ~1;
                 return 1;
             }

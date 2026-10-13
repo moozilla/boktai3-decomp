@@ -13,7 +13,6 @@ extern const s16 gUnk_086149C4[];
 int sub_0821ABA8(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
-#define ScanlineWave_Initialize sub_080172EC
 int ScanlineWave_Initialize(struct Wave *p, int id)
 {
     int amplitude;

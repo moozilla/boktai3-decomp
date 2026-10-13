@@ -1,5 +1,4 @@
 #include "global.h"
-#define Background_CreateFromScript sub_08001D08
 struct Config {
     u8 flags, layer;
     u16 resource;

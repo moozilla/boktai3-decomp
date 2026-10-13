@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define Scene_TryStepDown sub_08004CE4
 struct Cell {
     u8 height, tile;
     u16 flags;
@@ -25,7 +24,7 @@ struct Map {
 extern struct Map *gUnk_030052F4;
 extern u16 gUnk_02000534, gUnk_02000500;
 u8 *sub_0821D64C(s32, s32);
-void sub_080050F4(void);
+void Scene_UpdateObjectStep(void);
 s32 Scene_TryStepDown(struct Object *input, s32 idx, s32 dir)
 {
     struct Object *actor = input;
@@ -108,7 +107,7 @@ s32 Scene_TryStepDown(struct Object *input, s32 idx, s32 dir)
                         d;
                     });
                     {
-                        register void (*callback)(void) asm("r1") = sub_080050F4;
+                        register void (*callback)(void) asm("r1") = Scene_UpdateObjectStep;
                         actor->update = callback;
                     }
                     actor->state = 0;
@@ -146,7 +145,7 @@ s32 Scene_TryStepDown(struct Object *input, s32 idx, s32 dir)
                         d;
                     });
                     {
-                        register void (*callback)(void) asm("r1") = sub_080050F4;
+                        register void (*callback)(void) asm("r1") = Scene_UpdateObjectStep;
                         actor->update = callback;
                     }
                     actor->state = 0;

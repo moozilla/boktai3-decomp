@@ -55,7 +55,6 @@ static inline void setState(struct Object *object, u32 state)
     object->timer = zero;
     object->entered = 1;
 }
-#define FallingObject_UpdateLanding sub_0800D1D0
 void FallingObject_UpdateLanding(struct Object *object)
 {
     if (object->entered) {

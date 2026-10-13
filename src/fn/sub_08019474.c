@@ -10,7 +10,6 @@ int sub_08228D88(void);
 int sub_08228D94(void);
 int sub_08228DA0(void);
 int sub_0821ABA8(int, int);
-#define ClockEvents_Initialize sub_08019474
 int ClockEvents_Initialize(struct Clock *p)
 {
     int i;

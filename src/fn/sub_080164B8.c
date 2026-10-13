@@ -6,7 +6,6 @@ struct Controller {
     s8 current[4], target[4];
 };
 void sub_082190E0(int, int, int);
-#define PaletteLevels_Increase sub_080164B8
 void PaletteLevels_Increase(struct Controller *p)
 {
     u16 levels = 0;

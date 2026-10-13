@@ -21,16 +21,15 @@ struct Effect {
     u8 pad20[4];
     struct Sprite sprite;
 };
-void sub_080168B8(struct Effect *);
+void FloatingEffect_Project(struct Effect *);
 extern void *gUnk_02000580[];
-#define FloatingEffect_Wait sub_08016990
 void FloatingEffect_Wait(void *m, struct Effect *p)
 {
     if (p->entered) {
         p->entered = 0;
         p->sprite.flags &= ~1;
     }
-    sub_080168B8(p);
+    FloatingEffect_Project(p);
     if (p->timer >= p->duration) {
         u32 mode = p->mode;
         if (mode == 0) {

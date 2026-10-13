@@ -20,7 +20,6 @@ static inline void setFrame(struct Sprite *s, int frame)
 {
     s->frame = frame;
 }
-#define SceneIndicator_Update sub_08011928
 void SceneIndicator_Update(u8 *owner, struct Indicator *p)
 {
     u8 old;

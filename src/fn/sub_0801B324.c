@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define SelectionMenu_Initialize sub_0801B324
 typedef struct {
     u32 words[8];
 } Resource;
@@ -15,9 +14,9 @@ void sub_0801A6D0(void *);
 void sub_0801A3C0(void *);
 void sub_0801A470(void *);
 void sub_08030F20(int, int, int, int);
-void sub_0801ABEC(void *);
+void SelectionMenu_OpenActorPage(void *);
 void sub_08019F18(void *, void (*)(void));
-void sub_0801ADC0(void);
+void SelectionMenu_Choose(void);
 void sub_08033568(void);
 extern u32 gUnk_0300523C;
 int SelectionMenu_Initialize(u8 *p)
@@ -57,8 +56,8 @@ configure:
     sub_0801A3C0(p);
     sub_0801A470(p);
     sub_08030F20(0, 16, 30, 2);
-    sub_0801ABEC(p);
-    sub_08019F18(p, sub_0801ADC0);
+    SelectionMenu_OpenActorPage(p);
+    sub_08019F18(p, SelectionMenu_Choose);
     sub_08033568();
     {
         int mask = 4;

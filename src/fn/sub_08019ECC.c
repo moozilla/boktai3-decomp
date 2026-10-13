@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define Presentation_SetItemGraphic sub_08019ECC
 extern u8 gUnk_08E60F80[][16];
 int sub_0822E104(u32);
 void sub_0821980C(u8 *, u8 *, u32, u32);

@@ -64,7 +64,6 @@ static inline s32 actorMode(void)
 extern struct Manager *gUnk_0200003C;
 void *sub_08215184(u32);
 void *sub_0821A520(u32, u32);
-#define CollisionController_InitManager sub_0800A534
 s32 CollisionController_InitManager(struct Manager *manager)
 {
     u32 mode;

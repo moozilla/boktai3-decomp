@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_08002AE0(void *, u32, u32, u32, u32, u32);
+void Palette_BlendRange(void *, u32, u32, u32, u32, u32);
 struct S {
     u8 f[0x1c];
     u8 v;
@@ -21,7 +21,7 @@ void sub_08002D58(struct S *p, struct A *a)
     void *buf = p->buf;
     u32 b = a->b;
     u32 c = a->c;
-    sub_08002AE0(buf, b, c, a->a, 0, 0xd0);
+    Palette_BlendRange(buf, b, c, a->a, 0, 0xd0);
     p->ptr = buf;
     p->v = 1;
 }

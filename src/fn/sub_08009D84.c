@@ -38,7 +38,6 @@ s32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
 void sub_080095D4(struct Manager *, struct Controller *, struct PackedVec *);
 s32 sub_0822C034(struct Vec *);
-#define DirectionalController_ScriptMove sub_08009D84
 s32 DirectionalController_ScriptMove(void)
 {
     struct PackedVec position;

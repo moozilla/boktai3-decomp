@@ -28,7 +28,6 @@ static inline s32 cellIndex(struct Vec *pos)
         return 0;
     return gUnk_030052F4->rows[z] + x;
 }
-#define TerrainModifiers_Change sub_08006088
 void sub_0821D630(void *, s32, s32, s32, s32, s32);
 s32 TerrainModifiers_Change(s32 id, s32 tile, s32 kind, s32 flags, s32 cell, s32 height)
 {

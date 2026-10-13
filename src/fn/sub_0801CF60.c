@@ -1,9 +1,9 @@
 #include "global.h"
 
-void sub_0801C5AC(void *);
+void ResultMenu_DestroyGraphics(void *);
 
 s32 sub_0801CF60(void *p)
 {
-    sub_0801C5AC(p);
+    ResultMenu_DestroyGraphics(p);
     return 0;
 }

@@ -35,15 +35,14 @@ struct World {
 extern struct World *gUnk_02000710;
 extern void *gUnk_086049F4[];
 void sub_08249244(struct Manager *, struct Controller *, s32, void *);
-void sub_0800962C(struct Manager *, struct Controller *);
-void sub_080096D4(struct Manager *, struct Controller *, u32);
+void LevelController_Update(struct Manager *, struct Controller *);
+void LevelController_RunScript(struct Manager *, struct Controller *, u32);
 static inline u8 sameRegion(s32 region)
 {
     if (gUnk_02000710->region == region)
         return 1;
     return 0;
 }
-#define DirectionalController_UpdateAll sub_0800997C
 s32 DirectionalController_UpdateAll(struct Manager *manager)
 {
     struct Controller *p;
@@ -60,7 +59,7 @@ s32 DirectionalController_UpdateAll(struct Manager *manager)
                 if (p->disabled != 1)
                     p->drawableFlags &= ~1;
                 sub_08249244(manager, p, i, gUnk_086049F4[p->state]);
-                sub_0800962C(manager, p);
+                LevelController_Update(manager, p);
             }
         }
     }
@@ -68,11 +67,11 @@ s32 DirectionalController_UpdateAll(struct Manager *manager)
         p = &manager->slots[manager->selected];
         if (manager->pending == 0) {
             manager->pending = -1;
-            sub_080096D4(manager, p, p->startScript);
+            LevelController_RunScript(manager, p, p->startScript);
         } else if (manager->pending == 1) {
             manager->pending = -1;
             manager->selected = -1;
-            sub_080096D4(manager, p, p->endScript);
+            LevelController_RunScript(manager, p, p->endScript);
         }
     }
     return 0;

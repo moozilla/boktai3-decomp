@@ -4,7 +4,7 @@ s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 u8 *Script_GetPc(void);
 u32 sub_0821ABA8(u32, u32);
-void sub_08002A04(u32, u32, s32, s32 *);
+void ScrollingBackground_QueueCommand(u32, u32, s32, s32 *);
 void sub_08002A58(void)
 {
     s32 buf[8];
@@ -18,5 +18,5 @@ void sub_08002A58(void)
             n++;
         }
     }
-    sub_08002A04(a, b, n, buf);
+    ScrollingBackground_QueueCommand(a, b, n, buf);
 }

@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define Scene_SpawnDirectionalDust sub_08004B64
 struct Vec {
     union {
         u32 word;

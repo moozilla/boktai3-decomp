@@ -21,9 +21,8 @@ struct Effect {
     u8 pad20[4];
     struct Sprite sprite;
 };
-void sub_080168B8(struct Effect *);
+void FloatingEffect_Project(struct Effect *);
 void sub_0801689C(struct Effect *);
-#define FloatingEffect_RiseAndShrink sub_08016B78
 void FloatingEffect_RiseAndShrink(u8 *m, struct Effect *p, int index)
 {
     struct Sprite *s = &p->sprite;
@@ -40,7 +39,7 @@ void FloatingEffect_RiseAndShrink(u8 *m, struct Effect *p, int index)
     if (*scale > 16)
         *scale -= 16;
     p->position.y += 64;
-    sub_080168B8(p);
+    FloatingEffect_Project(p);
     s->position.x += (64 - *scale) >> 3;
     if (p->timer > 3) {
         sub_0801689C(p);

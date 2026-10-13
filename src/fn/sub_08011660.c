@@ -8,7 +8,6 @@ int sub_08044CF4(void *, int *, int, int);
 int sub_08221594(void *, int, int);
 void sub_080453DC(void *, void *, int);
 int sub_080115DC(void *);
-#define NameEntry_DecodeAndValidate sub_08011660
 int NameEntry_DecodeAndValidate(struct Entry *m)
 {
     u8 *decoded = m->decoded;

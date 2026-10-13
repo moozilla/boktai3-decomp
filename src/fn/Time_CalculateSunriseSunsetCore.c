@@ -10,7 +10,7 @@ void sub_0822A230(struct SunContext *, s32, double, s32, double, double);
 void sub_08228A10(s32, s32);
 void sub_08228B10(s32, s32);
 void sub_08229078(s32, s32);
-s32 sub_0824A040(double, double);
+s32 __gtdf2(double, double);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 static inline double transform(double date, double offset)
@@ -53,7 +53,7 @@ u32 Time_CalculateSunriseSunsetCore(u32 year, s32 month, s32 day, double latitud
             else
                 difference = result - current;
             {
-                s32 comparison = sub_0824A040(difference, 0.7);
+                s32 comparison = __gtdf2(difference, 0.7);
                 rise = result;
                 if (comparison > 0)
                     rise = -1.0;
@@ -74,7 +74,7 @@ u32 Time_CalculateSunriseSunsetCore(u32 year, s32 month, s32 day, double latitud
             else
                 difference = result - old;
             {
-                s32 comparison = sub_0824A040(difference, 0.7);
+                s32 comparison = __gtdf2(difference, 0.7);
                 set = result;
                 if (comparison > 0)
                     set = -1.0;

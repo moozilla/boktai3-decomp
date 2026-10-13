@@ -43,14 +43,13 @@ struct Manager {
     void *resource;
 };
 extern struct Manager *gUnk_02000030;
-void sub_080077FC(void *, struct Trigger *);
+void Trigger_UpdateIdleAnimation(void *, struct Trigger *);
 void sub_08220C8C(struct Anim *, void *, u32, u32, u32);
 extern u32 gUnk_030053F4;
 s32 sub_0822D490(s32, s32);
-void sub_08007C48(void *, struct Trigger *);
-void sub_08007AE0(void *, struct Trigger *);
+void Trigger_UpdateLockedPause(void *, struct Trigger *);
+void Trigger_UpdateActivation(void *, struct Trigger *);
 void sub_08017044(s32, s32, s32, s32, struct Position *, struct Position *, s32, struct Trigger *);
-#define Trigger_UpdateOpeningAnimation sub_08007908
 void Trigger_UpdateOpeningAnimation(struct Manager *manager, struct Trigger *p)
 {
     struct Obj *o;
@@ -124,11 +123,11 @@ void Trigger_UpdateOpeningAnimation(struct Manager *manager, struct Trigger *p)
         if (!(gUnk_030053F4 & 2048) && sub_0822D490(p->id, p->kind) == 0) {
             if (p->id <= 5)
                 sub_08017044(p->id, p->kind, 1, p->actor, &raised, &raised, 24, p);
-            p->update = sub_08007C48;
+            p->update = Trigger_UpdateLockedPause;
         } else {
             if (p->id <= 5)
                 sub_08017044(p->id, p->kind, 0, p->actor, &raised, &raised, 24, p);
-            p->update = sub_08007AE0;
+            p->update = Trigger_UpdateActivation;
         }
         p->timer = 0;
         sub_08220C8C(p->anim, gUnk_02000030->resource, 6, 0, 0);

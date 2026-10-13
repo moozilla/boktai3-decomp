@@ -3,7 +3,6 @@ struct Position {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
 void sub_0821983C(void *, void *, int, int, int, int, int, void *);
-#define MessageMenu_InitializeTransition sub_08011350
 void MessageMenu_InitializeTransition(u8 *m)
 {
     struct Position zero;

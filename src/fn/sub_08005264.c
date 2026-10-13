@@ -1,5 +1,4 @@
 #include "global.h"
-#define Scene_UpdateFallingObject sub_08005264
 struct Body {
     u8 pad[14];
     s16 y;
@@ -27,7 +26,7 @@ struct Object {
     void (*update)(void);
 };
 void sub_080050AC(void);
-void sub_08004450(struct Object *);
+void Scene_PlayMovementEffect(struct Object *);
 void Scene_UpdateFallingObject(struct Object *p)
 {
     struct Body *body = &p->body;
@@ -60,7 +59,7 @@ void Scene_UpdateFallingObject(struct Object *p)
             p->resource = 0;
         } else {
             p->terrain.flags &= ~0x21;
-            sub_08004450(p);
+            Scene_PlayMovementEffect(p);
         }
         {
             register void (*callback)(void) asm("r1") = sub_080050AC;

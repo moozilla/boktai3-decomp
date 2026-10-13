@@ -6,7 +6,6 @@
 /* Adapted from newlib 1.8.2 s_fabs.c; see docs/LIBM.md. */
 // COMPILER: old_agbcc
 // CFLAGS: -O2 -fno-builtin
-#define fabs sub_0824B120
 #include "libm_compat.h"
 
  double fabs(double x)

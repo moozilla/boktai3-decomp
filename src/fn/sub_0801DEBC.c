@@ -1,5 +1,4 @@
 #include "global.h"
-#define ResultTutorial_ReadScript sub_0801DEBC
 int sub_0821ABA8(int, int);
 int Script_SeekToKeyword(int);
 void *sub_08227E90(void);

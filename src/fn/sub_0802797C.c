@@ -44,7 +44,7 @@ static inline void setFacing(ActorAnimation *p, int angle)
     asm("" : "+r"(value));
     p->facing8 = value;
 }
-void sub_080217F4(void *, void *, void *, int, int, int, int);
+void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
 void sub_0822B3BC(int);
 int sub_082215E4(int, int);
 extern s16 gUnk_086149C4[];
@@ -82,13 +82,15 @@ void sub_0802797C(ActorAnimation *p)
         sequence = choose(p->mode, 38, 0);
         {
             register int offset asm("r2") = 0x240;
-            sub_080217F4(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence, 1, 1, 4);
+            SceneActors_StartEightDirectionAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence,
+                                                     1, 1, 4);
         }
     } else {
         register int sequence asm("r6") = choose(p->mode, 38, 0);
         {
             register int offset asm("r2") = 0x240;
-            sub_080217F4(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence, 1, 1, 1);
+            SceneActors_StartEightDirectionAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence,
+                                                     1, 1, 1);
         }
     }
     *(u32 *)((u8 *)p + 0x33c) = 0;

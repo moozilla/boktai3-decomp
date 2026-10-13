@@ -6,7 +6,6 @@
 /* Adapted from newlib 1.8.2 e_sqrt.c; see docs/LIBM.md. */
 // COMPILER: old_agbcc
 // CFLAGS: -O2 -fno-builtin
-#define __ieee754_sqrt sub_0824C5E0
 #include "libm_compat.h"
 
 #define one (1.0)

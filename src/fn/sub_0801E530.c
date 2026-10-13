@@ -1,6 +1,5 @@
 #include "global.h"
-#define SceneObjects_BeginActivation sub_0801E530
-void sub_0801EFDC(void);
+void SceneObject_AnimateActive(void);
 void SceneObjects_BeginActivation(u8 *p, u16 id)
 {
     int i = 0;
@@ -13,7 +12,7 @@ void SceneObjects_BeginActivation(u8 *p, u16 id)
             if (*(u16 *)(s + 0x34) == id && (s[0x37] == 0 || s[0x37] == 3) && !(s[0x36] & 1)) {
                 s[0x41] = 1;
                 s[0x37] = two;
-                *(void **)(s + 0x30) = sub_0801EFDC;
+                *(void **)(s + 0x30) = SceneObject_AnimateActive;
                 s[0x39] = 0;
                 s[0x3a] = 0;
             }

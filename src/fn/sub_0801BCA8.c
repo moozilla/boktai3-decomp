@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define ResultMenu_CreateGraphics sub_0801BCA8
 void sub_0821983C(void *, void *, int, int, int, int, int, void *);
 void *sub_08215184(int);
 void sub_08217DE0(void *, void *, int);

@@ -44,10 +44,10 @@ extern struct State *gUnk_02000580[];
 extern u32 gUnk_030053F4;
 void sub_0822B2F8(s32);
 void sub_0822B3BC(s32);
-void sub_08007908(void *, struct Trigger *);
+void Trigger_UpdateOpeningAnimation(void *, struct Trigger *);
 void sub_08220C8C(void *, void *, s32, s32, s32);
 s32 sub_0822D490(s32, s32);
-s32 sub_08006F00(struct Trigger *, u16, s32);
+s32 Trigger_RunScript(struct Trigger *, u16, s32);
 static inline s32 absolute(s32 value)
 {
     if (value < 0)
@@ -65,7 +65,6 @@ static inline u8 nearby(struct Vec *p, struct Vec *a, struct Actor *actor)
     }
     return 0;
 }
-#define Trigger_TryOpenNearby sub_08007304
 s32 Trigger_TryOpenNearby(struct Actor *actor)
 {
     struct Manager *manager = gUnk_02000030;
@@ -96,7 +95,7 @@ s32 Trigger_TryOpenNearby(struct Actor *actor)
         } else {
             p->actor = index;
             sub_0822B3BC(271);
-            p->update = sub_08007908;
+            p->update = Trigger_UpdateOpeningAnimation;
             p->timer = 0;
             p->started = 0;
             sub_08220C8C(p->animation, manager->resource, 5, 0, 0);
@@ -106,7 +105,7 @@ s32 Trigger_TryOpenNearby(struct Actor *actor)
                     event = 1;
                 else
                     event = sub_0822D490(p->id, p->kind) == 1;
-                sub_08006F00(p, p->script, event);
+                Trigger_RunScript(p, p->script, event);
             }
             return 1;
         }

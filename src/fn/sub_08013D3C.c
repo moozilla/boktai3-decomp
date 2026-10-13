@@ -12,10 +12,9 @@ void *sub_08013C14(void);
 void *sub_08013C2C(void *, int);
 void *sub_08219C40(int);
 void sub_08219DD8(void *, int);
-int sub_080135E8(void *, void *, int);
+int Shadow_Initialize(void *, void *, int);
 int sub_08013C4C(void *, void *);
 void sub_08219D38(void *);
-#define ShadowRegistry_Create sub_08013D3C
 int ShadowRegistry_Create(int id, int mode, struct Vec *position)
 {
     void *m = sub_08013C14();
@@ -32,7 +31,7 @@ int ShadowRegistry_Create(int id, int mode, struct Vec *position)
     p->id = id;
     dest = &p->position;
     p->position = *position;
-    if (sub_080135E8(p->shadow, dest, mode == 2) < 0)
+    if (Shadow_Initialize(p->shadow, dest, mode == 2) < 0)
         goto fail;
     if (sub_08013C4C(m, p) < 0)
         goto fail;

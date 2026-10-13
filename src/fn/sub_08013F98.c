@@ -24,7 +24,6 @@ struct Manager {
 };
 extern u32 gUnk_08604B90[];
 void sub_08217EAC(void *);
-#define ParticleGroup_Update sub_08013F98
 void ParticleGroup_Update(struct Manager *m, struct Group *g)
 {
     int alive = 0, i = 0;

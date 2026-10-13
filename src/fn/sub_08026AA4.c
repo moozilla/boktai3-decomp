@@ -42,7 +42,7 @@ static inline void setFacing(ActorAnimation *p, int angle)
     value = 7 & shifted;
     p->facing8 = value;
 }
-void sub_0802175C(void *, void *, void *, int, int, int, int);
+void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 void sub_0822B3BC(int);
 int sub_082215E4(int, int);
 extern s16 gUnk_086149C4[];
@@ -59,7 +59,7 @@ static inline int trunc12(int x)
 {
     return x >= 0 ? x >> 12 : -(-x >> 12);
 }
-void sub_080216E8(void *, void *, void *, int, int, int);
+void SceneActors_StartAnimation(void *, void *, void *, int, int, int);
 void sub_0806DFC8(void *, void *, int, int, int, int, int, int, int, int, int, int);
 typedef struct {
     s16 x, y, z;
@@ -81,7 +81,7 @@ void sub_08026AA4(ActorAnimation *p, int tick)
         sequence = choose(p->mode, 64, 26);
         {
             register int offset asm("r2") = 0x240;
-            sub_080216E8(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence, 2, 4);
+            SceneActors_StartAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence, 2, 4);
         }
         sub_0822B3BC(890);
     }

@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define Scene_SpawnEdgeParticles sub_080041CC
 /* Eight-byte position; the helpers below access its halfword coordinates. */
 struct Vec {
     u16 x, y;

@@ -26,13 +26,12 @@ struct Menu {
     u8 pad170[20];
     s16 rightX, rightY;
 };
-#define ChoiceMenu_HandleInput sub_080064C4
 struct Keys {
     u16 held, pressed;
 };
 extern struct Keys gUnk_03005260;
-void sub_080063D0(struct Menu *, s32);
-void sub_08006374(struct Menu *, s32);
+void ChoiceMenu_Select(struct Menu *, s32);
+void ChoiceMenu_DispatchSelection(struct Menu *, s32);
 s32 sub_08006478(struct Menu *, s32, s32);
 void sub_0822B2F8(s32);
 void sub_08030BF8(void);
@@ -43,7 +42,7 @@ s32 ChoiceMenu_HandleInput(struct Menu *p)
     p->rightFlags &= ~1;
     if (p->selected < 0) {
         if ((gUnk_03005260.pressed & 240) || (!p->wakeDelay && (gUnk_03005260.pressed & 3))) {
-            sub_080063D0(p, p->initial);
+            ChoiceMenu_Select(p, p->initial);
             sub_0822B2F8(263);
         } else if (p->wakeDelay)
             p->wakeDelay--;
@@ -84,7 +83,7 @@ s32 ChoiceMenu_HandleInput(struct Menu *p)
             if (p->allowCancel) {
                 sub_0822B2F8(222);
                 sub_08030BF8();
-                sub_08006374(p, -1);
+                ChoiceMenu_DispatchSelection(p, -1);
                 p->leftFlags |= 1;
                 p->rightFlags |= 1;
                 sub_0821A0C0(p);
@@ -100,7 +99,7 @@ s32 ChoiceMenu_HandleInput(struct Menu *p)
                 })) {
                 sub_0822B2F8(221);
                 sub_08030BF8();
-                sub_08006374(p, p->selected);
+                ChoiceMenu_DispatchSelection(p, p->selected);
                 p->leftFlags |= one;
                 p->rightFlags |= one;
                 sub_0821A0C0(p);
@@ -170,7 +169,7 @@ s32 ChoiceMenu_HandleInput(struct Menu *p)
         clampSelection:
             selection = limit;
         applySelection:
-            sub_080063D0(p, selection);
+            ChoiceMenu_Select(p, selection);
             {
                 u32 delay = 30;
                 *repeat = delay;

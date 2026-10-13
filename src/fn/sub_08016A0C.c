@@ -21,9 +21,8 @@ struct Effect {
     u8 pad20[4];
     struct Sprite sprite;
 };
-void sub_080168B8(struct Effect *);
+void FloatingEffect_Project(struct Effect *);
 void sub_0801689C(struct Effect *);
-#define FloatingEffect_ShrinkAway sub_08016A0C
 void FloatingEffect_ShrinkAway(u8 *m, struct Effect *p, int index)
 {
     struct Sprite *s = &p->sprite;
@@ -42,7 +41,7 @@ void FloatingEffect_ShrinkAway(u8 *m, struct Effect *p, int index)
     s->angle += 16;
     p->position.x += 8;
     p->position.z += 8;
-    sub_080168B8(p);
+    FloatingEffect_Project(p);
     s->position.x += (64 - *scale) >> 3;
     if (p->timer > 7) {
         sub_0801689C(p);

@@ -25,10 +25,9 @@ void *sub_08227E90(void);
 int sub_0821ABA8(int, int);
 void sub_08044E6C(void *);
 void sub_08044DD0(void *, void *, void *, int);
-void sub_080111EC(void *, int);
-int sub_08011264(void *);
-void sub_08011350(void *);
-#define MessageMenu_Initialize sub_0801140C
+void MessageMenu_LoadBackground(void *, int);
+int MessageMenu_CreateTextWindows(void *);
+void MessageMenu_InitializeTransition(void *);
 int MessageMenu_Initialize(struct Menu *m)
 {
     struct Resource *r = sub_0821A520(0xCB05, 0xE2AB);
@@ -48,9 +47,9 @@ int MessageMenu_Initialize(struct Menu *m)
     m->script = sub_0821ABA8('e', 0);
     sub_08044E6C(m->formatter);
     sub_08044DD0(m->lines, m->formatter, m->source, 6);
-    sub_080111EC(m, 12);
-    if (sub_08011264(m) != 0)
+    MessageMenu_LoadBackground(m, 12);
+    if (MessageMenu_CreateTextWindows(m) != 0)
         return -1;
-    sub_08011350(m);
+    MessageMenu_InitializeTransition(m);
     return 0;
 }

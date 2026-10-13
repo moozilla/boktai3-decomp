@@ -36,7 +36,6 @@ static inline u32 frame_factor(u16 v)
     return mask & value;
 }
 void sub_08012114(void *, void *);
-#define AnimatedHazard_AnimateRetraction sub_080124BC
 void AnimatedHazard_AnimateRetraction(u8 *m, struct Piece *p)
 {
     struct Obj *o;

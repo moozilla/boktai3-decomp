@@ -1,5 +1,4 @@
 #include "global.h"
-#define SoundTest_DrawTrackName sub_081E1C10
 // Provisional name: SoundTest_DrawTrackName
 struct Sprite {
     u8 head[8];

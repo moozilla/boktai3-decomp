@@ -25,7 +25,6 @@ struct Menu {
     u8 pad170[20];
     s16 rightX, rightY;
 };
-#define ChoiceMenu_Select sub_080063D0
 void sub_0822B2F8(s32);
 void ChoiceMenu_Select(struct Menu *p, s32 selection)
 {

@@ -16,6 +16,10 @@ Never commit the ROM, generated assembly or emulator dumps.
 Never commit nonmatching C on `main`. Dedicated WIP branches may preserve
 nonmatching drafts and alternate candidates; keep them outside production
 `src/`, and do not merge them into `main` or count them as exact progress.
+Name functions `Subsystem_VerbNoun` (e.g. `SceneIndicator_CreateFromScript`).
+Workers add a file-local `#define Name sub_XXXXXXXX` alias; the integrator runs
+`tools/promote_names.py` before merging a batch, which moves aliases into
+`symbols/functions.csv` and rewrites all references (then `make format`, `make`).
 Provisional descriptive names are welcome: mark uncertain interpretations as
 tentative and correct them as understanding improves. Do not block matching on
 a naming investigation. Coverage tags describe observed execution.

@@ -1,5 +1,4 @@
 #include "global.h"
-#define Transformation_Reveal sub_0801BAA8
 typedef struct {
     s16 x, y, z, pad;
 } Vec;
@@ -18,14 +17,14 @@ int sub_0801B54C(void *);
 void sub_0801B700(void *);
 void sub_0815AF14(void *, int);
 void sub_082216F8(void *, void *, void *, u32, int);
-void sub_08018C48(void *, int, int, int, int);
+void OrbitingParticles_Create(void *, int, int, int, int);
 void sub_0822B2F8(int);
 void sub_08017044(int, int, int, int, void *, void *, int, void *);
 void sub_0815B1D0(void *, int, int);
 void sub_082279A8(int, int, int, int, int, int, int);
 void sub_080148CC(int, int, void *, int, int, int, int, int, int, int, int);
 void sub_0801B534(void *, void (*)(void));
-void sub_0801BC54(void);
+void Transformation_Finish(void);
 void Transformation_Reveal(u8 *p)
 {
     Actor *actor = gUnk_02000580;
@@ -43,7 +42,7 @@ void Transformation_Reveal(u8 *p)
         sub_082216F8(p + 0x18, p + 0x28, p + 0x30, *(u32 *)(p + 0x3c), 5);
     if (*(u32 *)(p + 0x3c) == 30) {
         orbit = actor->position;
-        sub_08018C48(&orbit, 64, 60, 8, 0);
+        OrbitingParticles_Create(&orbit, 64, 60, 8, 0);
         sub_0822B2F8(0x29c);
     }
     if (*(u32 *)(p + 0x3c) == 90) {
@@ -78,7 +77,7 @@ void Transformation_Reveal(u8 *p)
         }
     }
     if (*(u32 *)(p + 0x3c) > 163) {
-        sub_0801B534(p, sub_0801BC54);
+        sub_0801B534(p, Transformation_Finish);
         sub_0815AF14(actor, p[0xc1]);
     } else
         (*(u32 *)(p + 0x3c))++;

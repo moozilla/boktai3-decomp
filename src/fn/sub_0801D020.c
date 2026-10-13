@@ -1,12 +1,11 @@
 #include "global.h"
-#define ResultMenu_Initialize sub_0801D020
 typedef struct {
     u32 words[8];
 } Resource;
 Resource *sub_0821A520(int, int);
 void sub_082196C4(void *, void *);
-int sub_0801CF6C(void *);
-void sub_0801BCA8(void *);
+int ResultMenu_ReadScript(void *);
+void ResultMenu_CreateGraphics(void *);
 void sub_0801B534(void *, void *);
 void sub_0801C5E4(void *);
 int ResultMenu_Initialize(u8 *p, void *owner)
@@ -23,9 +22,9 @@ int ResultMenu_Initialize(u8 *p, void *owner)
         return -1;
     *(Resource *)(p + 0x124) = *r;
     sub_082196C4(p + 0x124, r);
-    if (sub_0801CF6C(p) < 0)
+    if (ResultMenu_ReadScript(p) < 0)
         return -1;
-    sub_0801BCA8(p);
+    ResultMenu_CreateGraphics(p);
     sub_0801B534(p, sub_0801C5E4);
     return 0;
 }

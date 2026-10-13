@@ -1,5 +1,4 @@
 #include "global.h"
-#define ResultTutorial_BlinkTimer sub_0801DA74
 void sub_0822B2F8(int);
 typedef struct {
     u32 pad[2], flags;

@@ -1,12 +1,11 @@
 #include "global.h"
 extern void *gUnk_02000058;
 void *sub_080138F0(int, int);
-void sub_08013740(void *);
+void ScaledShadow_Update(void *);
 void sub_0801373C(void *);
 void sub_082151E4(void *, int);
 void sub_082144A4(void *, void *, int);
 void sub_080136B4(void *, void *);
-#define ScaledShadow_Initialize sub_08013930
 int ScaledShadow_Initialize(u8 *p, void *source, int scale, int min, int max, int extra,
                             int maxHeight, int minHeight, int shift, int nearShift, int mode)
 {
@@ -33,7 +32,7 @@ int ScaledShadow_Initialize(u8 *p, void *source, int scale, int min, int max, in
     *(u16 *)(p + 0x5c) = shift;
     *(u16 *)(p + 0x5e) = nearShift;
     if (!mode)
-        *(void (**)(void *))(p + 0x60) = sub_08013740;
+        *(void (**)(void *))(p + 0x60) = ScaledShadow_Update;
     else
         *(void (**)(void *))(p + 0x60) = sub_0801373C;
     resource = p + 0x38;

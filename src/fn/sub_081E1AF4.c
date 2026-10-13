@@ -1,5 +1,4 @@
 #include "global.h"
-#define SoundTest_CountEntries sub_081E1AF4
 // Provisional name: SoundTest_CountEntries
 // MATCHING_CONCESSION: register-pinning
 struct Sprite {

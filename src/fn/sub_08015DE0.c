@@ -8,8 +8,7 @@ struct Vec {
 int sub_0821ABA8(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
-void sub_080154EC(int, void *, struct Config *);
-#define AnimatedParticles_CreateFromScript sub_08015DE0
+void AnimatedParticles_Create(int, void *, struct Config *);
 void AnimatedParticles_CreateFromScript(void)
 {
     struct Config s;
@@ -68,5 +67,5 @@ void AnimatedParticles_CreateFromScript(void)
         s.v[18] = 255;
         s.v[19] = 0;
     }
-    sub_080154EC(count, &pos, &s);
+    AnimatedParticles_Create(count, &pos, &s);
 }

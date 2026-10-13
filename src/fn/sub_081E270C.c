@@ -1,5 +1,4 @@
 #include "global.h"
-#define TimedPresentation_Update sub_081E270C
 // Provisional name: TimedPresentation_Update
 struct TimedSequence {
     u8 pad[0x18];

@@ -6,7 +6,6 @@
 /* Adapted from newlib 1.8.2 k_tan.c; see docs/LIBM.md. */
 // COMPILER: old_agbcc
 // CFLAGS: -O2 -fno-builtin
-#define __kernel_tan sub_0824D338
 #include "libm_compat.h"
 
 #define one (1.00000000000000000000e+00)

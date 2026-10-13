@@ -31,11 +31,14 @@ struct Engine {
 extern struct Engine *gUnk_02000484;
 extern u8 gUnk_020000EC;
 void sub_08219DD8(void *, int);
-#define gRfuLinkStatus     gUnk_03006A80
-#define gRfuSlotStatusNI   gUnk_03006A70
-#define rfu_NI_setSendData sub_08246CC8
+#define gRfuLinkStatus   gUnk_03006A80
+#define gRfuSlotStatusNI gUnk_03006A70
+// The original caller saw an int-width prototype for rfu_clearSlot (u8, u8 in
+// the SDK header): its argument order only matches with int parameters.
+#define rfu_clearSlot rfu_clearSlot_sdk
 #include "rfu_compat.h"
-u16 sub_08246AAC(int, int);
+#undef rfu_clearSlot
+u16 rfu_clearSlot(int connTypeFlag, int slotStatusIndex);
 void sub_0803451C(struct Engine *p)
 {
     int changed = 0;
@@ -50,7 +53,7 @@ void sub_0803451C(struct Engine *p)
                 register int original asm("r1") = s->bmSlotOrg;
                 register int current asm("r0") = s->bmSlot;
                 changed = current ^ original;
-                sub_08246AAC(4, slot);
+                rfu_clearSlot(4, slot);
                 p->mask &= ~2;
                 if (p->mask & 16)
                     p->mask |= 128;
@@ -60,7 +63,7 @@ void sub_0803451C(struct Engine *p)
                 register int original asm("r1") = s->bmSlotOrg;
                 register int current asm("r0") = s->bmSlot;
                 changed = current ^ original;
-                sub_08246AAC(4, slot);
+                rfu_clearSlot(4, slot);
                 {
                     int zero = 0;
                     p->mask = zero;

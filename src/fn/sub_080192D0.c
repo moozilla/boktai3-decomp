@@ -4,7 +4,6 @@ struct Args {
     void *values;
 };
 void sub_0821AD08(void *, struct Args *);
-#define ClockEvents_RunScript sub_080192D0
 void ClockEvents_RunScript(u8 *p, int event)
 {
     struct Args args;

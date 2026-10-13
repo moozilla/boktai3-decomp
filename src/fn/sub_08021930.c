@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneActors_UpdateTargetMetrics sub_08021930
 typedef struct {
     u8 unknown[12];
     s16 x, y, z;

@@ -2,7 +2,6 @@
 typedef struct {
     u32 pad[2], flags;
 } Graphic;
-#define Presentation_UpdateActorGraphic sub_08019F44
 u8 *sub_0822D6C8(u32);
 void sub_0822D764(u8 *, void *);
 void sub_08030C84(u32);

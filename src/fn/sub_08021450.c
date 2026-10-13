@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneActors_ApplyDamage sub_08021450
 void sub_08249248(void *, int, int);
 int sub_0824924C(void *, int, int);
 int SceneActors_ApplyDamage(u8 *p, int kind, int amount)

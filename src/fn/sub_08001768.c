@@ -2,7 +2,6 @@
 // MATCHING_CONCESSION: register-pinning
 /* Empty constraints retain register choices without handwritten instructions. */
 #include "background_controller.h"
-#define Background_Update sub_08001768
 struct Camera {
     s16 x, y, unknown4, unknown6, offsetX, offsetY;
     u8 pad[6];
@@ -11,7 +10,7 @@ struct Camera {
 extern struct Camera gUnk_030042A0;
 extern s16 gUnk_03005418[2];
 extern u16 gUnk_03004BD8;
-s32 sub_080015AC(struct Background *);
+s32 Background_ApplyQueuedCommands(struct Background *);
 void sub_0821656C(u32, s32, s32, s32, s32);
 void sub_08219574(u32, s32, s32);
 #define truncate7(v)                                                                               \
@@ -38,7 +37,7 @@ s32 Background_Update(struct Background *p)
 {
     s32 x, y asm("r6");
     s32 tileX, tileY;
-    sub_080015AC(p);
+    Background_ApplyQueuedCommands(p);
     tileY = 0;
     if (p->flags & 2) {
         s32 cx, cy;

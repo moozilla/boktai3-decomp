@@ -9,8 +9,7 @@ s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 s32 Script_GetPc(void);
 s32 sub_0821ABA8(s32, s32);
-s32 sub_0800828C(struct Vec *, s32, s32, s32, s32 *, s32, s32, s32);
-#define Trigger_CreateDropFromScript sub_080083F0
+s32 Trigger_CreateDrop(struct Vec *, s32, s32, s32, s32 *, s32, s32, s32);
 s32 Trigger_CreateDropFromScript(void)
 {
     s32 arguments[3];
@@ -52,5 +51,5 @@ s32 Trigger_CreateDropFromScript(void)
             count++;
         }
     }
-    return sub_0800828C(&position, id, kind, script, arguments, mode, persistent, option);
+    return Trigger_CreateDrop(&position, id, kind, script, arguments, mode, persistent, option);
 }

@@ -1,6 +1,4 @@
 #include "global.h"
-#define Presentation_UpdateDropShakeBlink sub_081E2910
-#define Presentation_ClearTilemap         sub_081E2D74
 // Provisional name: Presentation_UpdateDropShakeBlink
 // MATCHING_CONCESSION: register-pinning
 struct Sequence {

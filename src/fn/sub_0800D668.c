@@ -44,7 +44,6 @@ void sub_0821FE40(void *);
 void sub_0800CC50(void *);
 typedef void (*Callback)(struct Object *);
 extern Callback gUnk_08604ACC[][4];
-#define FallingObjectManager_Update sub_0800D668
 s32 FallingObjectManager_Update(struct Manager *manager)
 {
     struct Object *p = manager->head, *next;

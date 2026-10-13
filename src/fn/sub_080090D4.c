@@ -18,8 +18,7 @@ void sub_082196C4(void *, void *);
 u32 sub_0821ABA8(u32, u32);
 void *sub_08219C40(u32);
 void sub_08219DD8(void *, u32);
-s32 sub_08008AF4(struct Manager *, struct Slot *);
-#define Breakable_InitManager sub_080090D4
+s32 Breakable_InitSlot(struct Manager *, struct Slot *);
 s32 Breakable_InitManager(struct Manager *manager)
 {
     s32 i;
@@ -39,5 +38,5 @@ s32 Breakable_InitManager(struct Manager *manager)
     sub_08219DD8(manager->slots, bytes);
     slot = manager->slots;
     for (i = 0; (u32)i < manager->count; i++, slot++)
-        sub_08008AF4(manager, slot);
+        Breakable_InitSlot(manager, slot);
 }

@@ -1,9 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneActors_UpdateEffects sub_080219D0
 extern u8 *gUnk_02000710;
 void sub_082260A4(int);
-void sub_08021D8C(void *);
+void SceneActors_SpawnAmbientParticle(void *);
 typedef struct {
     int unknown;
     u32 flags;
@@ -20,7 +19,7 @@ void SceneActors_UpdateEffects(u8 *p)
         p[0xb4]--;
     }
     if (p[0x154] && (*(int *)(p + 0xe4) & 3) == 0)
-        sub_08021D8C(p);
+        SceneActors_SpawnAmbientParticle(p);
     if (p[0x155] && (*(u32 *)(p + 0xe4) & 3) <= 1) {
         u32 m = 0x10;
         asm("" : : "r"(m));

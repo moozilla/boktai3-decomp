@@ -1,5 +1,4 @@
 #include "global.h"
-#define ResultTutorial_Close sub_0801DBD8
 typedef struct {
     unsigned count : 16;
     unsigned reserved : 16;

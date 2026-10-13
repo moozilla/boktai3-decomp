@@ -16,7 +16,6 @@ struct Wave {
     s16 samples[1][288];
 };
 void sub_08219254(int, int, void *);
-#define ScanlineWave_Update sub_08017270
 int ScanlineWave_Update(struct Wave *p)
 {
     if (p->enabled) {

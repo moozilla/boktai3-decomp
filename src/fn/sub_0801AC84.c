@@ -1,15 +1,15 @@
 #include "global.h"
-void sub_0801ABA0(u8 *);
-void sub_0801A5A8(u8 *);
-void sub_0801A814(u8 *);
+void SelectionMenu_ItemAvailability(u8 *);
+void SelectionMenu_PositionEquipmentMarkers(u8 *);
+void SelectionMenu_PopulateItems(u8 *);
 s32 Script_ParseStringRef(s32);
 s32 Text_LookupString(void);
-void sub_0801A01C(u8 *, s32);
+void Presentation_UpdateItemGraphic(u8 *, s32);
 void sub_0801AC84(u8 *p)
 {
-    sub_0801ABA0(p);
-    sub_0801A5A8(p);
-    sub_0801A814(p);
+    SelectionMenu_ItemAvailability(p);
+    SelectionMenu_PositionEquipmentMarkers(p);
+    SelectionMenu_PopulateItems(p);
     Script_ParseStringRef(*(s32 *)(p + 0xDB0));
-    sub_0801A01C(p, Text_LookupString());
+    Presentation_UpdateItemGraphic(p, Text_LookupString());
 }

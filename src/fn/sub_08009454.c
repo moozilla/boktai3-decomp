@@ -14,7 +14,6 @@ struct Manager {
 };
 extern struct Manager *gUnk_02000034;
 s32 sub_0821ABA8(u32, s32);
-#define Breakable_ScriptSetTimeout sub_08009454
 void Breakable_ScriptSetTimeout(void)
 {
     struct Manager *manager = gUnk_02000034;

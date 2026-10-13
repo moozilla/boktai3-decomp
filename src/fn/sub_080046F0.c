@@ -1,6 +1,5 @@
 #include "global.h"
 /* Tentative: start falling for objects above another object in the same cell. */
-#define Scene_DropObjectsAbove sub_080046F0
 struct Object {
     u8 type, flags;
     u16 state, kind;
@@ -26,10 +25,10 @@ struct Manager {
 };
 extern struct Manager *gUnk_02000024;
 typedef void (*UpdateFn)(void);
-void sub_08005264(void);
+void Scene_UpdateFallingObject(void);
 static inline UpdateFn fallCallback(void)
 {
-    return sub_08005264;
+    return Scene_UpdateFallingObject;
 }
 void Scene_DropObjectsAbove(struct Object *object)
 {

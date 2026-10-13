@@ -19,7 +19,6 @@ void sub_08227950(u16 *, u16 *);
 void sub_0800E0CC(Manager *, Palette *);
 void sub_0800E10C(Manager *, Palette *);
 void sub_08217344(u32, void *);
-#define PaletteSet_Update sub_0800E130
 int PaletteSet_Update(Manager *p)
 {
     int amount = sub_080036C0(), changed = 0, i;

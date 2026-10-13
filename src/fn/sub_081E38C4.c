@@ -1,8 +1,4 @@
 #include "global.h"
-#define ActorPalette_UpdateFade          sub_081E3550
-#define ActorPalette_UpdateFadeAndNotify sub_081E36FC
-#define ActorPalette_BeginReverseFade    sub_081E38C4
-#define ActorPalette_UpdateReverseFade   sub_081E394C
 // Provisional name: ActorPalette_BeginReverseFade
 struct PaletteController {
     u8 beforeEffect[0xe08];

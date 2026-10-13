@@ -47,7 +47,6 @@ static inline u8 *cell(int i)
         return p + 4;
     return gUnk_030052F4->cells + 12 + i * 4;
 }
-#define AnimatedHazard_Create sub_08012748
 int AnimatedHazard_Create(struct Vec *source, int damage, int hold)
 {
     void *m = sub_08012040();

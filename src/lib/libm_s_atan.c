@@ -6,7 +6,6 @@
 /* Adapted from newlib 1.8.2 s_atan.c; see docs/LIBM.md. */
 // COMPILER: old_agbcc
 // CFLAGS: -O2 -fno-builtin
-#define atan sub_0824ACFC
 #include "libm_compat.h"
 
 extern const double gUnk_08602D98[];

@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneActorGraphics_InitializeBody sub_080221DC
 typedef struct {
     s16 x, y, z;
 } Vec;

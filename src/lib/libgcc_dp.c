@@ -1,24 +1,7 @@
 /* Derived from pret/agbcc da598c1d918402c42c0c0d7128ba14567f3175e9,
  * libgcc/fp-bit-base.c (dp configuration). See docs/LIBGCC.md.
  * Original FSF license and linking exceptions are retained below. */
-#define __pack_d sub_08249558
-#define __unpack_d sub_082496A0
-#define __fpadd_parts_dp sub_08249778
-#define __adddf3 sub_082499E4
-#define __subdf3 sub_08249A14
-#define __muldf3 sub_08249A4C
-#define __divdf3 sub_08249CF4
-#define __fpcmp_parts_d sub_08249E7C
 #define __cmpdf2 sub_08249F7C
-#define __eqdf2 sub_08249FA8
-#define __nedf2 sub_08249FF4
-#define __gtdf2 sub_0824A040
-#define __gedf2 sub_0824A08C
-#define __ltdf2 sub_0824A0D8
-#define __ledf2 sub_0824A124
-#define __floatsidf sub_0824A170
-#define __fixdfsi sub_0824A1EC
-#define __negdf2 sub_0824A260
 #define __make_dp sub_0824A288
 #define __truncdfsf2 sub_0824A2B0
 // COMPILER: old_agbcc
@@ -804,7 +787,7 @@ __negdf2 (FLO_type arg_a)
   flip_sign (&a);
   return __pack_d (&a);
 }
-extern SFtype sub_0824ABFC (fp_class_type, unsigned int, int, USItype);
+extern SFtype __make_fp (fp_class_type, unsigned int, int, USItype);
 DFtype
 __make_dp (fp_class_type class, unsigned int sign, int exp, UDItype frac)
 {
@@ -824,5 +807,5 @@ __truncdfsf2 (DFtype arg_a)
   sffrac = in.fraction.ll >> (52+8-(23+7));
   if ((in.fraction.ll & (((USItype) 1 << (52+8-(23+7))) - 1)) != 0)
     sffrac |= 1;
-  return sub_0824ABFC (in.class, in.sign, in.normal_exp, sffrac);
+  return __make_fp (in.class, in.sign, in.normal_exp, sffrac);
 }

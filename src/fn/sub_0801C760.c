@@ -1,9 +1,8 @@
 #include "global.h"
-#define ResultGame_ScoreAlignment sub_0801C760
 extern u8 gUnk_0824DB2D[];
 void sub_0822B358(int);
 void sub_0822B2F8(int);
-void sub_0801C064(void *);
+void ResultMenu_EnqueueMarker(void *);
 void ResultGame_ScoreAlignment(u8 *p)
 {
     int delta = *(int *)(p + 0x8c) - *(int *)(p + 0x9c);
@@ -51,6 +50,6 @@ void ResultGame_ScoreAlignment(u8 *p)
         }
         p[0xbf] = 2;
     }
-    sub_0801C064(p);
+    ResultMenu_EnqueueMarker(p);
     ++*(u16 *)(p + 0xa2);
 }

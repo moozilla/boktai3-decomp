@@ -1,5 +1,4 @@
 #include "global.h"
-#define ActorPalette_UpdateFadeAndNotify sub_081E36FC
 // Provisional name: ActorPalette_UpdateFadeAndNotify
 struct PaletteController {
     u8 beforeEffect[0xe08];

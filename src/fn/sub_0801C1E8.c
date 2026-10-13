@@ -1,5 +1,4 @@
 #include "global.h"
-#define ResultMenu_SendCommand sub_0801C1E8
 typedef struct {
     u16 id;
     u8 kind, zero;

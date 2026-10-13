@@ -1,7 +1,6 @@
 #include "palette_controller.h"
 // MATCHING_CONCESSION: register-pinning
-#define Palette_BlendVariants sub_08002F40
-void sub_08002AE0(u16 *, const u16 *, const u16 *, u32, s32, s32);
+void Palette_BlendRange(u16 *, const u16 *, const u16 *, u32, s32, s32);
 void Palette_BlendVariants(struct PaletteController *p)
 {
     s32 i;
@@ -29,7 +28,7 @@ void Palette_BlendVariants(struct PaletteController *p)
         out = p->palettes[0];
         do {
             if (p->source[i] && p->destination[i])
-                sub_08002AE0(out, p->source[i], p->destination[i], p->blend, 0, 208);
+                Palette_BlendRange(out, p->source[i], p->destination[i], p->blend, 0, 208);
             out += 256;
             i++;
         } while (i <= 3);

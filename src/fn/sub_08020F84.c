@@ -1,7 +1,6 @@
 #include "global.h"
-#define SceneCommands_CreateEffect sub_08020F84
 void sub_08018D84(void *);
-void *sub_08018C48(void *, int, int, int, int);
+void *OrbitingParticles_Create(void *, int, int, int, int);
 void SceneCommands_CreateEffect(u8 *p, void *unused, s16 *message)
 {
     struct {
@@ -19,5 +18,5 @@ void SceneCommands_CreateEffect(u8 *p, void *unused, s16 *message)
         sub_08018D84(*(void **)(p + 0x58));
         *(void **)(p + 0x58) = 0;
     }
-    *(void **)(p + 0x58) = sub_08018C48(&v, a, b, c, d);
+    *(void **)(p + 0x58) = OrbitingParticles_Create(&v, a, b, c, d);
 }

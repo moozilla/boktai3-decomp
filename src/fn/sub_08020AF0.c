@@ -1,8 +1,7 @@
 #include "global.h"
-#define SceneMessages_Dispatch sub_08020AF0
 extern u8 *gUnk_0200047C;
 void sub_08020D54(void *, void *);
-void sub_08020A60(void *, void *, void *);
+void SceneMessages_RunScript(void *, void *, void *);
 void sub_08020AC0(void *, void *, void *);
 void sub_08020ADC(void *, void *, void *);
 typedef struct {
@@ -26,7 +25,7 @@ int SceneMessages_Dispatch(u8 *p)
             sub_08020D54(entry, message);
             switch (message[6]) {
                 case 0:
-                    sub_08020A60(p, entry, message);
+                    SceneMessages_RunScript(p, entry, message);
                     break;
                 case 1:
                     sub_08020AC0(p, entry, message);

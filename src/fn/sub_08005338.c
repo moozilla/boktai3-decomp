@@ -1,5 +1,4 @@
 #include "global.h"
-#define Scene_UpdateObjectDisappearance sub_08005338
 struct Draw {
     u8 pad[16];
     s16 mode;

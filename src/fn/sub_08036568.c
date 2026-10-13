@@ -30,10 +30,8 @@ struct Engine {
 extern struct Engine *gUnk_02000484;
 extern u8 gUnk_020000EC;
 void sub_08219DD8(void *, int);
-#define gRfuLinkStatus     gUnk_03006A80
-#define gRfuSlotStatusNI   gUnk_03006A70
-#define rfu_NI_setSendData sub_08246CC8
-#define rfu_clearSlot      sub_08246AAC
+#define gRfuLinkStatus   gUnk_03006A80
+#define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
@@ -43,9 +41,6 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->pending = 1;
 }
 void sub_08223BC0(int);
-void sub_08246644(void);
-void sub_082456E0(void);
-void sub_0824722C(int);
 void sub_0803441C(struct Engine *);
 void sub_0803451C(struct Engine *);
 int sub_0824923C(void *, void *);
@@ -54,9 +49,6 @@ void sub_080341B8(struct Engine *);
 void sub_080341E0(struct Engine *);
 void sub_0803559C(struct Engine *);
 void sub_08223580(int);
-void sub_0824555C(void);
-void sub_0824714C(int, void *, int);
-void sub_08246968(void);
 extern u32 gUnk_03005250;
 extern u16 gUnk_03005274[];
 // MATCHING_CONCESSION: register-pinning
@@ -123,10 +115,10 @@ int sub_08036568(struct Engine *p)
     if (!gUnk_03006A80->linkLossSlotFlag && p->flag36) {
         gUnk_020000EC = 1;
         if (!((u8 *)p)[0xE8]) {
-            sub_0824714C(p->mode, (u8 *)p + 0x70, 16);
+            rfu_UNI_changeAndReadySendData(p->mode, (u8 *)p + 0x70, 16);
             sub_08223580(1);
         } else
-            sub_0824555C();
+            rfu_REQ_PARENT_resumeRetransmitAndChange();
     }
     sub_080341E0(p);
     sub_0824923C(p, gUnk_086056EC[p->operation]);

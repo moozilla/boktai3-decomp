@@ -6,7 +6,6 @@
 /* Adapted from newlib 1.8.2 s_floor.c; see docs/LIBM.md. */
 // COMPILER: old_agbcc
 // CFLAGS: -O2 -fno-builtin
-#define floor sub_0824D6F8
 #include "libm_compat.h"
 
 #define huge (1.0e300)

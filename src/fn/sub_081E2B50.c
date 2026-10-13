@@ -1,7 +1,4 @@
 #include "global.h"
-#define Presentation_UpdateDropShakeBlink sub_081E2910
-#define Presentation_Update               sub_081E2B50
-#define Presentation_ClearTilemap         sub_081E2D74
 // Provisional name: Presentation_Update
 struct Sequence {
     u8 p0[0x18];
