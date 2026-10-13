@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 99.3%
-// 2 differing instruction runs; first diff at +0xFC (add r0, sp, #0xc vs ldr r2, [pc, #0x40])
 void Bg_ClearTilemap(u32);
 void *ScriptProc_Start(u32, u32);
 void sub_082161B4(u32, u32, void *, u32, u32, u32, u32 *);
@@ -17,6 +14,8 @@ void sub_081F0E24(u8 *s)
     void *p, *q, *r;
     u8 *dst;
     u32 *fill;
+    int ctl;
+    ctl = 0x05000002;
     if (kind) {
         Bg_ClearTilemap(1);
         *(void **)(s + 0x3A4) = (p = ScriptProc_Start(0xC091, 0x42FF));
@@ -42,11 +41,8 @@ void sub_081F0E24(u8 *s)
     dst = s + 0x278;
     scratch.fill = zero;
     fill = &scratch.fill;
-    CpuSet(fill, dst, 0x05000002);
+    CpuSet(fill, dst, ctl);
     *(u32 *)(s + 0x284) = zero;
     *(u32 *)(s + 0x280) = 0x5000;
     *(u32 *)(s + 0x288) = zero;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081F0E24);
-#endif
