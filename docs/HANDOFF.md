@@ -10,6 +10,34 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 13 (Claude): where to pick up (read this first)
+
+State: **21.424%** matched (5,797 functions); subsystem units with shared headers
+cover 0x080015AC-0x080133CC; `include/engine.h`, `game_state.h`, `player.h` hold the
+shared engine API and globals. See [ENGINE.md](ENGINE.md) and
+[GAME_LAYOUT.md](GAME_LAYOUT.md) for the architecture and the whole-ROM map.
+
+How work runs now (all on main, no WIP branches):
+* Orchestrator (one session) creates worktrees with
+  `BRANCH_PREFIX=claude tools/worktree.sh NAME main`, gives each Sonnet worker a
+  five-line brief pointing at `docs/UNIT_WORKER.md`, then merges the branches,
+  refreshes the inventory (`progress.py --refresh-inventory gen/code_sym.s`), runs
+  `promote_names.py`, `make format`, one `make`, and merges a PR.
+* Cost observations (Pro plan): a Sonnet unit worker uses ~100-200k tokens; five
+  workers exhausted a 5-hour window. Three workers is the sustainable width. Keep
+  the orchestrator session short: its context is re-read on every step.
+* Yield: unit/type waves buy readability, few matches. Finishing 95-99% drafts
+  (with `tools/permute.py` for register-only diffs) matched 6/16 in one pass.
+
+Next, in order of value:
+1. **Map 0x0803CDF0-0x0818D754** (1.38 MB, >half the code, ~2,070 unnamed
+   one-function files, no subsystem rows). Probably actors/enemies/bosses. Split it
+   into subsystems (call graph, task-callback pairs, script keywords) before unit work.
+2. Remaining drafts (`grep -rl "^// fuzzy:" src`), especially those at 97%+.
+3. Continue units in ROM order from 0x080133CC ("Terrain shadows").
+4. Doc open questions (ENGINE.md end): frame sync/VBlank path, task priority lists,
+   save payload, script VM proc-table keys.
+
 ## October 13 (Claude): subsystem units, NONMATCHING drafts, asmlift trial
 
 * **Subsystem translation units.** `tools/merge_unit.py` merges contiguous
