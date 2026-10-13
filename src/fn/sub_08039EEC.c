@@ -51,45 +51,39 @@ void sub_08039968(void*,int,int);
 void sub_082216F8(void*,void*,void*,int,int);
 void sub_08039998(void*,int,int);
 void sub_08039EEC(struct Owner *owner,struct Item *p,int indexArg) {
-  register int index asm("r6")=indexArg;
-  register struct Sprite *sprite asm("r9");
+  int index=indexArg;
+  struct Sprite *sprite;
   struct Drawing *drawing=&p->drawing;
-  asm("" : "+r"(drawing));
   sprite=&p->sprite;
   if(p->entered) {
-    register int choice asm("r0");
-    register int y asm("r3");
+    int choice;
+    int y;
     register void*draw asm("r3");
-    register void*resource asm("r4");
+    void*resource;
     p->entered=0;
      {
-      register int value asm("r0")=p->count;
-      register struct Sprite*dest asm("r1");
-      asm("" : "+r"(value));
+      int value=p->count;
+      struct Sprite*dest;
       dest=sprite;
       dest->value=value;
     }
     p->sprite.flags&=~1;
     draw=drawing;
     resource=owner->resource;
-    asm("" : "+r"(draw),"+r"(resource));
     if(index>7)choice=(index&3)+4;
     else choice=index&3;
-    asm("" : "+r"(choice));
     sub_0821980C(draw,resource,gUnk_0824DE7C[choice],0);
     *(u32*)((u8*)p+0x58)&=~1;
      {
-      register struct Vec*start asm("r2")=&p->start;
-      register const u16*entry asm("r3");
-      register int x asm("r0");
-      register int zero asm("r4");
-      register struct Vec*end asm("r1");
-      register int y asm("r2");
-      asm("" : "+r"(start));
+      struct Vec*start=&p->start;
+      const u16*entry;
+      int x;
+      int zero;
+      struct Vec*end;
+      int y;
        {
-        register const u16*table asm("r1")=gUnk_0824DE8C;
-        register int offset asm("r0");
-        asm("" : "+r"(table));
+        const u16*table=gUnk_0824DE8C;
+        int offset;
         offset=(index&3)*2;
         entry=(const u16*)(offset+(u32)table);
       }
@@ -101,17 +95,14 @@ void sub_08039EEC(struct Owner *owner,struct Item *p,int indexArg) {
       asm("" : "+r"(x),"+r"(entry));
        {
         register int value asm("r1")=*entry;
-        asm("" : "+r"(value));
         x+=value;
       }
       zero=0;
-      asm("" : "+r"(zero));
       p->start.x=x;
       start->y=32;
       start->z=zero;
       end=&p->end;
       y=128;
-      asm("" : "+r"(end),"+r"(y));
       if(index>7)y=144;
       p->end.x=*entry+80;
       end->y=y;
@@ -122,70 +113,61 @@ void sub_08039EEC(struct Owner *owner,struct Item *p,int indexArg) {
   sub_082216F8(&drawing->x,&p->start,&p->end,p->timer,5);
   sub_08039998(&drawing->x,p->timer,p->velocity);
    {
-    register u32 x asm("r0")=drawing->x;
-    register u32 y asm("r1")=drawing->y;
+    u32 x=drawing->x;
+    u32 y=drawing->y;
     register struct Sprite*dest asm("r2");
-    asm("" : "+r"(x),"+r"(y));
     dest=sprite;
     dest->x=x;
     dest->y=y;
   }
   if(p->timer>31) {
     int slot=index&3;
-    register u8 *current asm("r2");
+    u8 *current;
     register u8 *pending asm("r12");
-    register struct Item *target asm("r4");
+    struct Item *target;
     int count;
     if(p->unused) {
-      register u8*array asm("r2")=owner->pending;
-      register u8*dest asm("r3")=array+slot;
+      u8*array=owner->pending;
+      u8*dest=array+slot;
       register int total asm("r1")=*dest;
-      asm("" : "+r"(total));
       total+=p->count;
-      asm("" : "+r"(total),"+r"(array));
       pending=array;
       if(total>255)total=255;
       *dest=total;
       current=owner->current;
     }
     else {
-      register u8*dest asm("r3");
-      register int total asm("r1");
+      u8*dest;
+      int total;
       current=owner->current;
       dest=current+slot;
       total=*dest;
-      asm("" : "+r"(total));
       total+=p->count;
-      asm("" : "+r"(total));
       if(total>255)total=255;
       *dest=total;
        {
-        register int offset asm("r0")=0x1c;
-        register u8*array asm("r0");
+        int offset=0x1c;
+        u8*array;
         asm("" : "+r"(offset));
         array=(u8*)(offset+(u32)owner);
-        asm("" : "+r"(array));
         pending=array;
       }
     }
      {
-      register int offset asm("r0")=(index&~4)*0xb0+0x5c;
-      register int first asm("r3");
-      register int second asm("r2");
+      int offset=(index&~4)*0xb0+0x5c;
+      int first;
+      int second;
       register int one asm("r0");
-      register int zero asm("r1");
-      asm("" : "+r"(offset));
+      int zero;
       target=(struct Item*)((u8*)owner+offset);
        {
-        register u8*address asm("r0")=current+slot;
-        asm("" : "+r"(address));
+        u8*address=current+slot;
         first=*address;
         current=pending;
         asm("" : "+r"(current));
         address=current+slot;
         second=*address;
       }
-      asm("" : "+r"(first),"+r"(second));
       one=1;
       zero=0;
       asm("" : "+r"(one),"+r"(zero));
@@ -195,13 +177,11 @@ void sub_08039EEC(struct Owner *owner,struct Item *p,int indexArg) {
        {
         register int value asm("r0")=first+second;
         int clear;
-        asm("" : "+r"(value));
         if(value>10)value=10;
         clear=0;
         asm("" : "+r"(clear));
         target->count=value;
         value=0;
-        asm("" : "+r"(value));
         target->unused=value;
         target->type=8;
         p->count=clear;

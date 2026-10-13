@@ -44,29 +44,28 @@ void sub_08220D20(void *, void *, int, int, int);
 void *sub_08037DCC(int);
 void sub_08219EBC(void *, void *, int);
 int sub_0803B40C(struct ResultMenu *arg) {
-  register struct ResultMenu *p asm("r9") = arg;
+  struct ResultMenu *p = arg;
   register struct Blob *res asm("r2");
-  register struct Blob *first asm("r4");
-  register int pack asm("r5");
-  register struct Blob *primary asm("r10");
-  register struct Blob *secondary asm("r5");
+  struct Blob *first;
+  int pack;
+  struct Blob *primary;
+  struct Blob *secondary;
   int i;
-  register void *resource asm("r4");
-  register void *glyph asm("r6");
+  void *resource;
+  void *glyph;
   struct Saved {
     struct Animation animation;
     u8 *visible;
   } saved;
-  register struct Animation *a asm("r5");
-  register const u16 *frame asm("r6");
+  struct Animation *a;
+  const u16 *frame;
   struct Sprite *sprite;
-  register struct Sprite *savedSprite asm("r8");
+  struct Sprite *savedSprite;
   int flags;
   gUnk_02000104 = p;
   if (Script_SeekToKeyword(115)) {
     void *value = sub_08227E90();
-    register void **slot asm("r1") = &p->resource;
-    asm("" : "+r"(slot));
+    void **slot = &p->resource;
     *slot = value;
     if (value)
       goto initialize;
@@ -75,7 +74,6 @@ failed:
   return -1;
 initialize:
   pack = 0xCB05;
-  asm("" : "+r"(pack));
   res = sub_0821A520(pack, 0x530D);
   if (!res)
     goto failed;
@@ -93,7 +91,7 @@ initialize:
   sub_082196C4(secondary, res);
   {
     struct Drawing *draw = p->draws;
-    register u32 drawFlags asm("r8") = 0x2011;
+    u32 drawFlags = 0x2011;
     sub_0821983C(draw, secondary, 30, drawFlags, 0, 0, 60, 0);
     draw = p->draws + 1;
     sub_0821983C(draw, secondary, 2, drawFlags, 0, 0, 60, 0);
@@ -102,13 +100,11 @@ initialize:
     savedSprite = &p->sprite;
     {
       register u8 *visible asm("r1") = &p->sprite.visible;
-      asm("" : "+r"(visible));
       saved.visible = visible;
     }
     {
       register int zero asm("r5") = 0;
-      register int count asm("r4") = 19;
-      asm("" : "+r"(zero));
+      int count = 19;
       do {
         sub_0821983C(draw, primary, 51, 0x2011, zero, zero, 60, (void *)zero);
         count--;
@@ -122,12 +118,10 @@ initialize:
   sub_082144A4(savedSprite, glyph, 0x2011);
   sub_08220D20(&saved.animation, resource, 0, 0, 0);
   sprite = savedSprite;
-  asm("" : "+r"(sprite));
   a = &saved.animation;
   {
-    register int offset asm("r0") = a->frame << 1;
-    register const u16 *table asm("r1");
-    asm("" : "+r"(offset));
+    int offset = a->frame << 1;
+    const u16 *table;
     table = saved.animation.frames;
     frame = (const u16 *)((u32)table + offset);
   }
@@ -135,48 +129,42 @@ initialize:
 
   // Combine the animation and frame orientation flags for the sprite.
   {
-    register int observed asm("r0") = a->flags;
+    int observed = a->flags;
     register int one asm("r3");
     register int side asm("r1");
     register int word asm("r2");
-    register u32 encoded asm("r0");
-    asm("" : "+r"(observed));
+    u32 encoded;
     one = 1;
     side = one;
-    asm("" : "+r"(side));
     side &= observed;
     word = *frame;
     encoded = word & 48;
-    asm("" : "+r"(encoded));
     encoded >>= 4;
     encoded &= one;
     if (side != encoded) {
       register struct ResultMenu *write asm("r3") = p;
-      register int value asm("r0") = write->sprite.flags;
+      int value = write->sprite.flags;
       value |= 4;
       write->sprite.flags = value;
     } else {
       register struct ResultMenu *write asm("r4") = p;
-      register int value asm("r0") = write->sprite.flags;
-      register int mask asm("r1") = -5;
+      int value = write->sprite.flags;
+      int mask = -5;
       value &= mask;
       write->sprite.flags = value;
     }
   }
   {
-    register int observed asm("r4") = a->flags;
+    int observed = a->flags;
     register int two asm("r3") = 2;
     register int side asm("r1");
     register int word asm("r2");
-    register u32 encoded asm("r0");
+    u32 encoded;
     side = two;
-    asm("" : "+r"(side));
     side &= observed;
-    asm("" : "+r"(side));
     side = (u8)side;
     word = *frame;
     encoded = word & 48;
-    asm("" : "+r"(encoded));
     encoded >>= 4;
     encoded &= two;
     if (side != encoded)
@@ -186,9 +174,9 @@ initialize:
     flags = observed;
   }
   {
-    register u32 elapsed asm("r0") = a->timer + 1;
-    register u32 limit asm("r3");
-    register u32 initialPeriod asm("r1");
+    u32 elapsed = a->timer + 1;
+    u32 limit;
+    u32 initialPeriod;
     register int savedPeriod asm("r6");
     register int bits asm("r2");
     a->timer = elapsed;
@@ -204,9 +192,8 @@ initialize:
       goto animationDone;
     a->timer = 0;
     bits = flags;
-    asm("" : "+r"(bits));
     if (bits & 4) {
-      register int previous asm("r0");
+      int previous;
       previous = a->frame;
       if (previous)
         goto decrementFrame;
@@ -220,8 +207,8 @@ initialize:
       a->frame = previous;
       goto recalculate;
     } else {
-      register u32 next asm("r0") = a->frame + 1;
-      register int length asm("r2");
+      u32 next = a->frame + 1;
+      int length;
       a->frame = next;
       length = a->length;
       next &= limit;
@@ -237,23 +224,20 @@ initialize:
       a->frame = next;
     }
   recalculate: {
-    register int index asm("r0") = a->frame << 1;
-    register const u16 *table asm("r1");
+    int index = a->frame << 1;
+    const u16 *table;
     register int word asm("r1");
     register int value asm("r0");
-    asm("" : "+r"(index));
     table = a->frames;
     frame = (const u16 *)((u32)table + index);
     word = *frame;
     value = word & 15;
     a->duration = value;
-    asm("" : : : "memory");
     value = a->duration * a->speed;
     asm("" : "+r"(value));
     value >>= 6;
     a->period = value;
     value = (u32)value << 24;
-    asm("" : "+r"(value));
     if (!value)
       a->period = 1;
   }
@@ -261,28 +245,23 @@ initialize:
   }
 
   {
-    register int zero asm("r5") = 0;
-    asm("" : "+r"(zero));
+    int zero = 0;
     {
-      register u8 *visible asm("r0") = saved.visible;
-      asm("" : "+r"(visible));
+      u8 *visible = saved.visible;
       *visible = zero;
     }
     sub_08219EBC(p->left, sub_08037DCC(0), 16);
     sub_08219EBC(p->right, sub_08037DCC(1), 16);
     {
       register struct ResultMenu *write asm("r1") = p;
-      register int one asm("r0");
-      asm("" : "+r"(write));
+      int one;
       write->state = zero;
       one = 1;
-      asm("" : "+r"(one));
       write->entered = one;
       write->timer = zero;
     }
     {
-      register void **callback asm("r0") = &p->onClose;
-      asm("" : "+r"(callback));
+      void **callback = &p->onClose;
       *callback = (void *)zero;
     }
   }

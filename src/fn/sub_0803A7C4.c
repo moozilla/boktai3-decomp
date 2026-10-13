@@ -27,12 +27,10 @@ void sub_0803A7C4(struct Display*p) {
     u32 phase=p->timer&127;
     if(phase==63) {
       register struct Drawing*q asm("r4")=p->drawings;
-      asm("" : "+r"(q));
       sub_0821980C(q,p->resource,24,0);
     }
     else if(phase==127) {
       register struct Drawing*q asm("r4")=p->drawings;
-      asm("" : "+r"(q));
       sub_0821980C(q,p->resource,25,0);
     }
   }

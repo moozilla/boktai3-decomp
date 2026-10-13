@@ -26,16 +26,15 @@ void sub_0821980C(void *, void *, int, int);
 void sub_0803B01C(struct P *p)
 {
     if (p->entered) {
-        register int icon asm("r5");
-        register int count asm("r1");
+        int icon;
+        int count;
         register struct Drawing *drawing asm("r6");
-        register u8 *result asm("r3");
-        register u8 **save asm("r4");
+        u8 *result;
+        u8 **save;
         p->entered = 0;
         {
-            register u8 *address asm("r0") = &p->result;
-            register int resultValue asm("r1") = *address;
-            asm("" : "+r"(resultValue));
+            u8 *address = &p->result;
+            int resultValue = *address;
             icon = 30;
             result = address;
             if (resultValue != 0) {
@@ -45,8 +44,8 @@ void sub_0803B01C(struct P *p)
             }
         }
         {
-            register u8 **address asm("r0") = &gUnk_030053F8;
-            register int maximum asm("r2");
+            u8 **address = &gUnk_030053F8;
+            int maximum;
             asm("" : "+r"(address));
             count = *(u16 *)(*address + 0x14) + 1;
             maximum = 9999;
@@ -62,19 +61,16 @@ void sub_0803B01C(struct P *p)
             if (resultValue == 0) {
                 sub_0822AE7C(0xB0);
                 {
-                    register int old asm("r0") = *(u16 *)(*save + 0x16);
-                    asm("" : "+r"(old));
+                    int old = *(u16 *)(*save + 0x16);
                     count = old + 1;
                 }
                 {
-                    register int maximum asm("r0") = 9999;
-                    asm("" : "+r"(maximum));
+                    int maximum = 9999;
                     if (count > maximum)
                         count = maximum;
                 }
                 {
-                    register u8 **address asm("r0") = &gUnk_030053F8;
-                    asm("" : "+r"(address));
+                    u8 **address = &gUnk_030053F8;
                     *(u16 *)(*address + 0x16) = count;
                 }
             } else if (resultValue == 1) {
@@ -86,8 +82,8 @@ void sub_0803B01C(struct P *p)
         drawing = &p->drawing;
         drawing->flags &= ~1;
         {
-            register u8 *descriptor asm("r1") = (u8 *)p + 0x50;
-            register int resource asm("r2") = icon;
+            u8 *descriptor = (u8 *)p + 0x50;
+            int resource = icon;
             asm("" : "+r"(descriptor), "+r"(resource));
             sub_0821980C(drawing, descriptor, resource, 0);
         }
@@ -95,18 +91,16 @@ void sub_0803B01C(struct P *p)
         drawing->y = 0;
     }
     if (p->timer <= 7) {
-        register struct Drawing *drawing asm("r6") = &p->drawing;
-        register u16 *table asm("r5") = gUnk_0203B400;
+        struct Drawing *drawing = &p->drawing;
+        u16 *table = gUnk_0203B400;
         register u32 *indexPointer asm("r2");
         register u32 index asm("r0");
         register u32 mask asm("r4");
-        register int value asm("r1");
+        int value;
         register int smallMask asm("r3");
-        asm("" : "+r"(drawing), "+r"(table));
         indexPointer = &gUnk_03005308;
         index = *indexPointer + 1;
         mask = 1023;
-        asm("" : "+r"(mask));
         index &= mask;
         *indexPointer = index;
         value = table[index];
@@ -123,14 +117,12 @@ void sub_0803B01C(struct P *p)
         drawing->y = index;
     } else if (p->timer == 8) {
         register struct Drawing *drawing asm("r6") = &p->drawing;
-        asm("" : "+r"(drawing));
         drawing->x = 0;
         drawing->y = 0;
     }
     if (p->timer > 29) {
-        register int state asm("r0") = 3;
-        register int zero asm("r1") = 0;
-        asm("" : "+r"(state), "+r"(zero));
+        int state = 3;
+        int zero = 0;
         p->state = state;
         p->entered = 1;
         p->timer = zero;

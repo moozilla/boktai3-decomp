@@ -47,8 +47,8 @@ s32 Background_Initialize(struct Background *p,u16 id,struct Config *c)
     p->blendStepX=p->blendX;p->blendStepY=p->blendY;
     mode=modeFlag(p)!=0;
     if(resource[0]=='M' && resource[1]=='P') {layer->flags=mode;sub_08215A74(p->layer,c->mode);}
-    else {register void *map asm("r0")=Video_GetBackgroundMap(p->layer);
-        register u32 layerId asm("r3")=p->layer;
+    else {void *map=Video_GetBackgroundMap(p->layer);
+        u32 layerId=p->layer;
         register u32 drawMode asm("r1")=mode;
         sub_082160B8(layerId,drawMode,resource,0,offsetX,offsetY,c->mode,map);
     }

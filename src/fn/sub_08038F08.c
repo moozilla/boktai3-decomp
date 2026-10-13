@@ -24,19 +24,16 @@ void sub_0822B2F8(int);
 void sub_08038F08(struct Menu*p) {
   int*window=&p->window;
   if(p->entered) {
-    register struct Save**save asm("r2");
-    register int score asm("r1");
-    register int delta asm("r0");
+    struct Save**save;
+    int score;
+    int delta;
     p->entered=0;
     save=&gUnk_030053F8;
     score=(*save)->score;
-    asm("" : "+r"(score),"+r"(save));
     delta=p->delta;
-    asm("" : "+r"(delta));
     score+=delta;
     {
       register int maximum asm("r3")=9999;
-      asm("" : "+r"(maximum));
       if(score>maximum)score=maximum;
       else if(score<0)score=0;
       (*save)->score=score;
@@ -56,10 +53,9 @@ void sub_08038F08(struct Menu*p) {
   if(p->timer==240) {
     if(p->result==1||++p->retries>2) {
       {
-        register int state asm("r1")=14;
+        int state=14;
         register u8*dest asm("r0")=&p->state;
-        register int zero asm("r2")=0;
-        asm("" : "+r"(state),"+r"(dest),"+r"(zero));
+        int zero=0;
         *dest=state;
         p->entered=1;
         p->timer=zero;
@@ -68,9 +64,8 @@ void sub_08038F08(struct Menu*p) {
     else {
       sub_08033924(*window,11);
       {
-        register int state asm("r1")=13;
-        register u8*dest asm("r0")=&p->state;
-        asm("" : "+r"(state),"+r"(dest));
+        int state=13;
+        u8*dest=&p->state;
         *dest=state;
         p->entered=1;
         p->timer=0;

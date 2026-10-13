@@ -12,7 +12,6 @@ int sub_080321CC(struct Vm *p) {
   goto test;
 loop:
   c <<= 24;
-  asm("" : "+r"(c));
   if ((s32)c < 0)
     goto wide;
   c >>= 24;
@@ -24,21 +23,17 @@ loop:
     goto next;
   }
   if (c == 0x1F) {
-    register u32 code asm("r2") = (u16)sub_08032070(s);
-    asm("" : "+r"(code));
+    u32 code = (u16)sub_08032070(s);
     if (code != 0xFFFF) {
       {
-        register u32 mask asm("r0") = 0xFF;
+        u32 mask = 0xFF;
         register u32 bits asm("r1");
         asm("" : "+r"(mask));
         mask <<= 8;
         asm("" : "+r"(mask));
         bits = mask;
-        asm("" : "+r"(bits));
         mask = code;
-        asm("" : "+r"(mask));
         mask &= bits;
-        asm("" : "+r"(mask));
         if (mask)
           goto wide;
       }

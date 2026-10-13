@@ -25,14 +25,12 @@ void sub_0802CC94(struct Object *p) {
   if (p->target >= 0) {
     register s8 *deltaPtr asm("r3") = (s8 *)&p->delta;
     int delta, angle;
-    asm("" : "+r"(deltaPtr));
     delta = *deltaPtr;
     if (delta > 3)
       angle = p->angle + 4;
     else if (delta <= -4)
       angle = p->angle - 4;
     else {
-      asm("" : "+r"(deltaPtr) : : "memory");
       angle = *deltaPtr + p->angle;
     }
     sub_0802C8CC(p, angle);

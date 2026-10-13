@@ -89,8 +89,7 @@ int sub_0821E7A0(struct Node *, int);
 int sub_0802FCA8(struct Actor *, struct Node *);
 int sub_0802FCA8(struct Actor *p, struct Node *node) {
   register u32 value asm("r0") = node->flags;
-  register int kind asm("r4");
-  asm("" : "+r"(value));
+  int kind;
   kind = value >> 4;
   p->nodeId = sub_0821E7AC(node, 0);
   switch (kind) {
@@ -98,7 +97,6 @@ int sub_0802FCA8(struct Actor *p, struct Node *node) {
     int angle = (u16)sub_0821E7A0(node, 0);
     int facing = (angle + 112) >> 5;
     int mask;
-    asm("" : "+r"(facing));
     mask = 7;
     p->nodeFacing = facing & mask;
     if ((((p->angle + 112) >> 5) & mask) != p->nodeFacing)

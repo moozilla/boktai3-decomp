@@ -65,13 +65,10 @@ void sub_08035EB8(struct Engine *p) {
   sub_08224BA0(sub_08035EAC);
   i = 0;
   do {
-    register int mask asm("r0");
+    int mask;
     int active = scratch[2];
-    asm("" : "+r"(active));
     bit = 2;
-    asm("" : "+r"(bit));
     mask = bit << i;
-    asm("" : "+r"(mask));
     if (active & mask)
       sub_08246C68(32, i, (u8 *)p + 0xC4, 12);
   } while (++i <= 3);

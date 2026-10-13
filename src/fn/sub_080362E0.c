@@ -46,7 +46,7 @@ void sub_08036BD4(int);
 void sub_0824923C(void *, void *);
 void sub_08249238(void *);
 int sub_080362E0(struct Engine *argument) {
-  register struct Engine *p asm("r4") = argument;
+  struct Engine *p = argument;
   int flags = p->mask;
   struct RfuLinkStatus **links;
   register int one asm("r6");
@@ -54,18 +54,16 @@ int sub_080362E0(struct Engine *argument) {
   int index;
   {
     register int test asm("r0") = 2 & flags;
-    asm("" : "+r"(test));
     if (test)
       goto failed;
   }
   if (gUnk_03006A80->linkLossSlotFlag)
     goto failed;
   {
-    register struct RfuSlotStatusNI **slots asm("r1") = gUnk_03006A70;
+    struct RfuSlotStatusNI **slots = gUnk_03006A70;
     register u8 *initial asm("r2");
-    register int state asm("r0");
+    int state;
     register int index asm("r0");
-    asm("" : "+r"(slots));
     initial = &p->index;
     index = *initial;
     asm("" : "+r"(index));
@@ -84,9 +82,8 @@ int sub_080362E0(struct Engine *argument) {
   }
   flags = p->mask;
   one = 1;
-  asm("" : "+r"(one));
   {
-    register int check asm("r0") = one;
+    int check = one;
     asm("" : "+r"(check));
     check &= flags;
     asm("" : "+r"(check));

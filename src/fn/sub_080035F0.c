@@ -10,7 +10,7 @@ void Palette_SetBrightnessFromScript(void)
 {
     struct PaletteController *p=gUnk_02000468;
     if(p) {
-        struct PaletteTransition *t=({register struct PaletteTransition *hint asm("r4")=&p->transition;asm("" : "+r"(hint));hint;});
+        struct PaletteTransition *t=({struct PaletteTransition *hint=&p->transition;asm("" : "+r"(hint));hint;});
         s32 enabled=sub_0821ABA8('n',0);
         u32 query=Script_SeekToKeyword('q');
         u32 immediate=((0u-query)|query)>>31;

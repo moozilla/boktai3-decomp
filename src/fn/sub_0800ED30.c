@@ -8,19 +8,19 @@ void sub_0800EC0C(Screen*);void sub_0800EE5C(Screen*);void sub_0800EF90(Screen*)
 
 #define StatusScreen_FadeInPalette sub_0800ED30
 void StatusScreen_FadeInPalette(Screen *p){
- int factor=p->fade,red,green,blue,base,bank,i;register int other asm("r12");
+ int factor=p->fade,red,green,blue,base,bank,i;int other;
  if(factor>256)factor=256;
- other=256-factor;asm("" : "+r"(other));red=p->blend&31;green=p->blend&992;blue=p->blend&31744;
+ other=256-factor;red=p->blend&31;green=p->blend&992;blue=p->blend&31744;
  for(base=0,bank=0;bank<2;){
   i=p->start;
   {u16 *end=&p->end;int nextBase=base+16;int nextBank=bank+1;
   for(;i<*end;i++){
    u16 *source=&p->source[base+i],*dest=&p->buffer[base+i];
    register int color asm("r1")=*source;
-   int r;int g;register int b asm("r0");asm("" : "+r"(color));
+   int r;int g;int b;
    r=((color&31)*factor+other*red)&0x1F00;
    g=((color&992)*factor+other*green)&0x3E000;
-   b=color&31744;asm("" : "+r"(b));b=(b*factor+other*blue)&0x7C0000;
+   b=color&31744;b=(b*factor+other*blue)&0x7C0000;
    *dest=(r|g|b)>>8;
   }
   base=nextBase;bank=nextBank;}

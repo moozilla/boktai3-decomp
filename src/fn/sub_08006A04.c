@@ -34,7 +34,7 @@ void ChoiceMenu_LayoutText(struct Menu *p,void *window)
             if(*text==31){
                 u16 value=sub_08032070(text);
                 if(value!=65535){
-                    if(({register u32 mask asm("r0")=255;asm("" : "+r"(mask));mask<<=8;mask&=value;asm("" : : "r"(mask));mask;}))goto doubleCharacter;
+                    if(({u32 mask=255;asm("" : "+r"(mask));mask<<=8;mask&=value;mask;}))goto doubleCharacter;
                     p->width++;p->textX++;
                     text+=2;
                     continue;

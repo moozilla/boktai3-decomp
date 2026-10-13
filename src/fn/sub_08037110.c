@@ -53,11 +53,9 @@ int sub_08037110(struct LinkMenu *p) {
   sub_082156B8(2);
   sub_082195E0(p->draw50);
   {
-    register struct LinkMenu **singleton asm("r1") = &gUnk_020000F8;
+    struct LinkMenu **singleton = &gUnk_020000F8;
     register u32 zero asm("r0");
-    asm("" : "+r"(singleton));
     zero = 0;
-    asm("" : "+r"(zero));
     *singleton = (void *)zero;
   }
 }

@@ -57,7 +57,7 @@ s32 Trigger_CreateContainer(struct Vec *position,s32 id,s32 kind,s32 flip,s32 bo
  if(gUnk_030053F4&2048){available=stateMode();}
  else{
   if(gUnk_02000478>0)goto reveal;
-  if(gUnk_02000580&&(({u32 *flags=&gUnk_02000580->flags;register u32 mask asm("r1")=16;asm("" : : "r"(mask),"r"(flags));*flags&mask;})))goto reveal;
+  if(gUnk_02000580&&(({u32 *flags=&gUnk_02000580->flags;u32 mask=16;*flags&mask;})))goto reveal;
   available=globalMode();
  }
  asm("" : : "r"(available));
@@ -67,8 +67,8 @@ conceal:hidden=1;
  }
 visibilityDone:p->visible=hidden;
 }
- {register void *animation asm("r0")=p->animation;void *resource=({register struct Manager *m asm("r2")=manager;asm("" : : "r"(m));m->resource;});register s32 zero asm("r2")=0;asm("" : : "r"(zero),"r"(animation),"r"(resource));sub_08220C8C(animation,resource,zero,0,zero);}
- {register s32 value asm("r0");if(({register s32 input asm("r3")=sound;asm("" : : "r"(input));input;}))value=sub_0822C034(&p->object->position);else value=*(u16 *)&sound;p->sound=value;}
- sub_08013930(p->effect,&p->object->position,64,24,40,32,512,1,5,1,({register s32 zero asm("r0")=0;asm("" : : "r"(zero));zero;}));
+ {void *animation=p->animation;void *resource=({struct Manager *m=manager;m->resource;});register s32 zero asm("r2")=0;sub_08220C8C(animation,resource,zero,0,zero);}
+ {s32 value;if(({register s32 input asm("r3")=sound;input;}))value=sub_0822C034(&p->object->position);else value=*(u16 *)&sound;p->sound=value;}
+ sub_08013930(p->effect,&p->object->position,64,24,40,32,512,1,5,1,({register s32 zero asm("r0")=0;zero;}));
  sub_08013728(p->effect);sub_08006FAC(p);return 0;
 }

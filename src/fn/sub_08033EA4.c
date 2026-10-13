@@ -58,7 +58,6 @@ parameters:
     Script_SetPc(p->entries);
     i = 0;
     sentinel = -1;
-    asm("" : "+r"(sentinel));
     delay = p->delays;
     fadeIn = p->fadeIn;
     do {

@@ -51,22 +51,20 @@ int sub_08034E18(struct Engine *p) {
     p->pending = 0;
   sub_08034270(p);
   {
-    register u8 *initial asm("r1") = &p->count;
+    u8 *initial = &p->count;
     register int available asm("r2") = *initial;
     {
-      register u8 *savedCount asm("r7") = initial;
-      asm("" : "+r"(savedCount), "+r"(available));
+      u8 *savedCount = initial;
       count = savedCount;
     }
     if (available) {
       s8 *scroll = &p->scroll;
-      register int old asm("r6") = *scroll;
+      int old = *scroll;
       register u16 *buttons asm("r2") = gUnk_03005260;
       register int pressed asm("r5");
       int current;
       int index;
       int n;
-      asm("" : "+r"(buttons));
       pressed = buttons[1];
       if (pressed & 64)
         (*scroll)--;
@@ -82,10 +80,9 @@ int sub_08034E18(struct Engine *p) {
       index = (s8)(u8)*scroll;
       n = *count;
       if ((buttons[1] & 1) && index < n) {
-        register int parentIndex asm("r1") = p->ids[index];
+        int parentIndex = p->ids[index];
         struct RfuLinkStatus *link;
         int status;
-        asm("" : "+r"(parentIndex));
         link = gUnk_03006A80;
         status = (u8)sub_082237A0(link->partner[parentIndex].id, 0);
         if (!status) {

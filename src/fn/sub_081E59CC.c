@@ -21,7 +21,7 @@ void sub_081E59CC(struct S *p) {
  o=&p->obj;a=&p->anim;entry=a->data+a->frame;
  o->frame=*entry>>6;
  {u32 input=a->flags;register u32 mask asm("r3")=1; register u32 left asm("r1")=(u8)(input&mask); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=4;else o->flags&=~4;}
- {register u32 input asm("r0")=a->flags;register u32 mask asm("r3")=2; register u32 left asm("r1")=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
+ {register u32 input asm("r0")=a->flags;u32 mask=2; u32 left=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
  n=++a->timer;
  if(n>=a->rate) {
  a->timer=0;
@@ -38,7 +38,7 @@ void sub_081E59CC(struct S *p) {
  a->rate=(a->factor*a->scale)>>6;if(!a->rate)a->rate=1;
  }else done=0;
  p->done=done; if(done) {
- register s32 zero asm("r4");sub_08013424(p->p2);p->phase=0;
+ s32 zero;sub_08013424(p->p2);p->phase=0;
  if(p->oldMode==3 && p->mode==3){p->savedFrame=p->anim.frame;p->savedTimer=p->anim.timer;}
  {register s32 mask asm("r0")=1;register s32 v asm("r1")=p->flags;zero=0;p->flags=mask|v;}sub_08220C8C(&p->anim,p->arg,0,4,zero);
  if(p->handle){void *h=p->handle;p->handle=(void*)zero;sub_0821AD08(h,0);}

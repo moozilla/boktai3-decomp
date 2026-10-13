@@ -74,9 +74,8 @@ void sub_08037788(struct PeerMenu*p) {
           sub_082213B8(draw,p->draw,value,5,0,136,70,8,0);
         }
         {
-          register u32 mask asm("r2")=~1;
-          register struct Row*cursor asm("r1")=r;
-          asm("" : "+r"(mask),"+r"(cursor));
+          u32 mask=~1;
+          struct Row*cursor=r;
           i=4;
           do {
             cursor->flags&=mask;
@@ -92,9 +91,8 @@ void sub_08037788(struct PeerMenu*p) {
     else {
       sub_08033924(p->window,7);
       {
-        register u32 mask asm("r1")=1;
-        register struct Row*cursor asm("r2")=r;
-        asm("" : "+r"(mask),"+r"(cursor));
+        u32 mask=1;
+        struct Row*cursor=r;
         i=4;
         do {
           cursor->flags|=mask;

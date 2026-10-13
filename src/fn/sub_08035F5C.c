@@ -55,10 +55,8 @@ int sub_08035F5C(struct Engine *p) {
   if ((*links)->linkLossSlotFlag)
     goto failed;
   one = 1;
-  asm("" : "+r"(one));
   {
-    register int check asm("r0") = one;
-    asm("" : "+r"(check));
+    int check = one;
     check &= flags;
     asm("" : "+r"(check));
     if (!check)

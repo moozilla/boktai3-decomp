@@ -52,45 +52,40 @@ void sub_0803559C(struct Engine *argument) {
     u8 *sent;
   } stack;
   register struct Engine *p asm("r5") = argument;
-  register u8 *scratch asm("r8") = p->scratch;
+  u8 *scratch = p->scratch;
   u8 *packet = (u8 *)p + 0x70;
-  register u8 *sent asm("r9");
-  register int got asm("r0");
+  u8 *sent;
+  int got;
   int expected;
-  register u8 *read asm("r2");
+  u8 *read;
   {
-    register int offset asm("r1") = 0xE7;
+    int offset = 0xE7;
     register u8 *initial asm("r1");
     asm("" : "+r"(offset));
     initial = (u8 *)(offset + (u32)p);
-    asm("" : "+r"(initial));
     sent = initial;
     got = *initial;
     read = scratch;
-    asm("" : "+r"(read));
     expected = read[2];
   }
   got &= expected;
-  asm("" : "+r"(got));
   if (got == expected) {
-    register int zero asm("r6") = p->flag3e;
+    int zero = p->flag3e;
     if (zero) {
       if (read[3] > 1) {
         register u8 *waiting asm("r1") = &p->flag36;
-        asm("" : "+r"(waiting));
         *waiting = 1;
       }
     } else {
       u8 *waiting;
-      register int i asm("r2");
-      register u16 *backup asm("r6");
-      register u16 *flags asm("r12");
-      register u8 *seen asm("r10");
+      int i;
+      u16 *backup;
+      u16 *flags;
+      u8 *seen;
       register int bit asm("r9");
       register u16 *input asm("r3");
       u16 *output;
       stack.sequence = *packet;
-      asm("" : : "m"(stack.sequence));
       sub_08224E0C(p->message, packet);
       waiting = &p->flag36;
       *waiting = zero;
@@ -99,32 +94,26 @@ void sub_0803559C(struct Engine *argument) {
       i = 0;
       stack.sent = sent;
       stack.waiting = waiting;
-      asm("" : "+m"(stack.sent), "+m"(stack.waiting), "+m"(stack.sequence));
       backup = (u16 *)((u8 *)p + 0xEA);
       {
         register int offset asm("r1") = 0xEC;
-        asm("" : "+r"(offset));
         flags = (u16 *)(offset + (u32)p);
       }
       {
-        register int offset asm("r0") = 0xE6;
-        asm("" : "+r"(offset));
+        int offset = 0xE6;
         seen = (u8 *)(offset + (u32)p);
       }
       {
-        register int initial asm("r1") = 2;
-        asm("" : "+r"(initial));
+        int initial = 2;
         bit = initial;
       }
       input = (u16 *)((u8 *)p + 0x82);
       output = (u16 *)(waiting + 0x40);
       do {
-        register int mask asm("r1") = bit;
+        int mask = bit;
         register u8 *read asm("r5");
-        asm("" : "+r"(mask));
         mask <<= i;
         read = scratch;
-        asm("" : "+r"(read));
         if (read[2] & mask)
           *output = *input;
         input += 2;
@@ -132,18 +121,15 @@ void sub_0803559C(struct Engine *argument) {
       } while (++i <= 3);
       *(u16 *)(packet + 4) = *backup;
       {
-        register u16 *read asm("r1") = flags;
+        u16 *read = flags;
         register int value asm("r0");
-        asm("" : "+r"(read));
         value = *read;
         *backup = value;
         value = 65535;
-        asm("" : "+r"(value));
         *read = value;
       }
       {
         register u8 *read asm("r2") = scratch;
-        asm("" : "+r"(read));
         packet[2] = read[2];
       }
       packet[1] = 1;
@@ -151,12 +137,10 @@ void sub_0803559C(struct Engine *argument) {
       {
         register int sequence asm("r3") = stack.sequence + 1;
         register int bit asm("r5") = 2;
-        asm("" : "+r"(sequence), "+r"(bit));
         do {
           register u8 *read asm("r0") = scratch;
           int active;
-          register int mask asm("r0");
-          asm("" : "+r"(read));
+          int mask;
           active = read[2];
           mask = bit << i;
           asm("" : "+r"(mask));
@@ -168,7 +152,6 @@ void sub_0803559C(struct Engine *argument) {
       {
         int one = 1;
         register u8 *write asm("r2") = stack.sent;
-        asm("" : "+r"(write));
         *write = one;
         {
           register u8 *write asm("r5") = seen;
@@ -177,10 +160,8 @@ void sub_0803559C(struct Engine *argument) {
         }
         {
           register u8 *read asm("r2") = scratch;
-          asm("" : "+r"(read));
           if (read[3] > 1) {
             register u8 *write asm("r5") = stack.waiting;
-            asm("" : "+r"(write));
             *write = one;
           }
         }

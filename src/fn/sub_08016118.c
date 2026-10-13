@@ -13,9 +13,9 @@ static inline u32 frame_factor(u16 v){register u32 value asm("r1")=v;u32 mask=15
 #define FadingParticleGroup_Update sub_08016118
 int FadingParticleGroup_Update(struct Group*g){int alive=0,i=0;if(i<g->count){u8*life=&g->particles[0].lifetime;struct Anim*anim=&g->particles[0].motion.anim;s16*speed=&g->particles[0].speed;struct Motion*p=&g->particles[0].motion;do{if(*life){struct Anim*a;const u16*entry;register u16 n asm("r0");u8*resource;u32 frame;
 alive++;p->sprite.position.x+=scale(p->velocity.x,*speed);p->sprite.position.y+=p->velocity.y;p->sprite.position.z+=scale(p->velocity.z,*speed);asm("" : : : "memory");p->velocity.y-=2;
-sub_08220D44(anim,16);resource=gUnk_0200006C->resource;a=anim;entry=p->anim.data+p->anim.frame;frame=*entry>>6;asm("" : "+r"(frame));p->sprite.tile=*(u16*)(resource+4)+(p->sprite.width>>3)*(p->sprite.height>>3)*frame;
- {register u32 input asm("r0")=a->flags;register u32 left asm("r2")=1;u32 mask=1;asm("" : : "r"(input));left&=input;asm("" : "+r"(left)); if(left!=(((*entry&0x30)>>4)&mask))p->sprite.flags|=4;else p->sprite.flags&=~4;}
- {register u32 input asm("r0")=a->flags;register u32 mask asm("r3")=2; register u32 left asm("r1")=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))p->sprite.flags|=8;else p->sprite.flags&=~8;}
+sub_08220D44(anim,16);resource=gUnk_0200006C->resource;a=anim;entry=p->anim.data+p->anim.frame;frame=*entry>>6;p->sprite.tile=*(u16*)(resource+4)+(p->sprite.width>>3)*(p->sprite.height>>3)*frame;
+ {u32 input=a->flags;register u32 left asm("r2")=1;u32 mask=1;left&=input;if(left!=(((*entry&0x30)>>4)&mask))p->sprite.flags|=4;else p->sprite.flags&=~4;}
+ {register u32 input asm("r0")=a->flags;u32 mask=2; u32 left=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))p->sprite.flags|=8;else p->sprite.flags&=~8;}
  n=++a->timer;
  if(n>=a->rate) {
  a->timer=0;
@@ -30,6 +30,6 @@ sub_08220D44(anim,16);resource=gUnk_0200006C->resource;a=anim;entry=p->anim.data
  }
  entry=a->data+a->frame;a->rate=((int)frame_factor(*entry)*a->scale)>>6;
  }
-{register u32 raw asm("r0")=*life;register u32 compare asm("r1");register u32 time asm("r2");asm("" : : "r"(raw));compare=raw;asm("" : "+r"(compare));time=raw;asm("" : : "r"(time));if(compare>8){if(p->anim.frame==5)p->anim.frame=0;}else if(compare==8)p->anim.frame=0;raw=time-1;asm("" : "+r"(raw));*life=raw;if((u8)raw==255)p->sprite.flags|=1;}
+{register u32 raw asm("r0")=*life;u32 compare;u32 time;compare=raw;time=raw;if(compare>8){if(p->anim.frame==5)p->anim.frame=0;}else if(compare==8)p->anim.frame=0;raw=time-1;*life=raw;if((u8)raw==255)p->sprite.flags|=1;}
 }else p->sprite.flags|=1;life+=68;anim=(void*)((u8*)anim+68);speed=(void*)((u8*)speed+68);p=(void*)((u8*)p+68);i++;}while(i<g->count);}
 if(!alive){g->active=0;for(i=0;i<g->count;i++)sub_08217EAC(&g->particles[i].motion.sprite);g->count=0;}return 0;}

@@ -20,10 +20,10 @@ void sub_081E5098(void)
         if (g == 0) return;
     }
 H(0xf8a)=Script_GetValue();
-    {register u32 shifted asm("r0")=sub_0821ABA8(0x64,0)<<24;u32 flip=0;register u32 mask asm("r1")=0x07000000;u8 direction=(mask&shifted)>>24;B(0xf68)=direction;if(direction>4){direction=8-direction;flip=1;}B(0xf66)=direction;B(0xf6b)=flip;}
+    {register u32 shifted asm("r0")=sub_0821ABA8(0x64,0)<<24;u32 flip=0;u32 mask=0x07000000;u8 direction=(mask&shifted)>>24;B(0xf68)=direction;if(direction>4){direction=8-direction;flip=1;}B(0xf66)=direction;B(0xf6b)=flip;}
     sub_08220C8C((u8*)g+0xe24,W(0xe74),0,B(0xf66),B(0xf6b));
     g->b = g->xa;
-    {register u32 mode asm("r2")=2;g->xa=mode;}
+    {u32 mode=2;g->xa=mode;}
     {register u32 raw asm("r1")=*(u16*)((u8*)g+0xf5a);register u32 mask asm("r2")=15;
     *(u16*)((u8*)g+0xf5a)=(mask&raw)|0;
     if(g->b==3){register u32 bits asm("r0")=mode_bits((u8*)g+0xf5a,mask);if(bits==3){g->d=g->e2c;g->e=g->e32;}}}
