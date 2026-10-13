@@ -1,14 +1,5 @@
-#include "global.h"
-extern u16 gUnk_03005260[];
-void Sound_PlaySong(int);
-void Script_Call(int, int);
-struct Menu {
-    u8 task[24];
-    u32 timer;
-    u8 pad[6];
-    u16 script;
-};
-int MessageMenu_Update(struct Menu *m)
+#include "message_menu.h"
+int MessageMenu_Update(struct MessageMenu *m)
 {
     if (m->timer <= 40 && !(m->timer & 1))
         Sound_PlaySong(628);

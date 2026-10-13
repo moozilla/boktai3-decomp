@@ -1,13 +1,5 @@
-#include "global.h"
-struct Menu {
-    u8 pad[0x450];
-    void *map, *palette;
-};
-void *ScriptProc_Start(int, int);
-void sub_082161B4(int, int, void *, int, int, int, void *);
-void BgGfx_LoadTilemapSimple(int, int, int, int, int);
-extern u16 gUnk_03004FC0[];
-void MessageMenu_LoadBackground(struct Menu *m, int id)
+#include "message_menu.h"
+void MessageMenu_LoadBackground(struct MessageMenu *m, int id)
 {
     void *map = ScriptProc_Start(0xC091, 0x3536);
     m->map = map;

@@ -1,10 +1,6 @@
-#include "global.h"
-void *Task_Create(s32, s32);
-void Task_SetCallbacks(void *, void *, void *);
-s32 MessageMenu_Initialize(void *);
-void Task_Kill(void *);
-void MessageMenu_Update(void);
-void MessageMenu_Destroy(void);
+#include "message_menu.h"
+void MessageMenu_UpdateTask(void);
+void MessageMenu_DestroyTask(void);
 void *sub_080114CC(void)
 {
     void *obj;
