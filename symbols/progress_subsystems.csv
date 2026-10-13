@@ -65,6 +65,9 @@ Scene actor resources and lifecycle (tentative),0802D5B4,0802D9F8,symbols/propos
 Scene actor animation and scripted actions (tentative),0802D9F8,08030710,symbols/proposed/subsystems.csv,Terrain height path-node selection status effects script settings directional animation and proximity/phase actions; 08030164-08030710 is fully matched
 Scene actor manager,08030710,080308BC,symbols/proposed/subsystems.csv,Complete named update destruction initialization and task creation functions; final report span includes an existing unnamed assembly tail
 Dialogue controls and animation (tentative),080308BC,0803198C,symbols/proposed/subsystems.csv,Text lookup script and choice parsing window rectangles palette selection scroll settings animation timing fast text processing and graphics cleanup
+Dialogue task setup (tentative),0803198C,08031E54,symbols/proposed/subsystems.csv,Dialogue allocator callbacks singleton and rectangle/VM accessors; initializer remains unmatched
+Dialogue text interpreter,08031E54,08032EDC,symbols/proposed/subsystems.csv,All named functions exact; inline angle-bracket commands speaker labels glyph escapes number formatting nested styles and selected procedures
+Scrolling dialogue controller,08032EDC,080335D4,symbols/proposed/subsystems.csv,All named functions exact; text reveal timing wide glyphs cyclic row clearing show hide reset and scheduler callbacks
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
 Sound-test menu,081E1AF4,081E270C,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md and allocator 081E26CC callback chain
 Timed presentation,081E270C,081E2898,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md timed update cleanup and initialization
