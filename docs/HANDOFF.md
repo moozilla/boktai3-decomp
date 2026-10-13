@@ -10,6 +10,28 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 13 (Claude): subsystem units, NONMATCHING drafts, asmlift trial
+
+* **Subsystem translation units.** `tools/merge_unit.py` merges contiguous
+  one-function files once their types are unified in a shared header. Pilots:
+  `src/palette_controller.c` (Sonnet, 42 functions, ~125k tokens, 14 min) and
+  `src/background_controller.c` (Haiku, 22 functions, ~238k tokens, 25 min). Both
+  removed every per-function partial struct and matched 4 small gap functions
+  the disassembly had missed. Register new boundaries in
+  `symbols/progress_extra_functions.csv`, then `progress.py --refresh-inventory gen/code_sym.s`.
+  Pinning markers are per function in merged units.
+* **NONMATCHING drafts** replace WIP branches (see `docs/WORKER.md`). 62 drafts
+  are on main (Haiku migration), 14,116 bytes, several at 97-99% fuzzy
+  (`sub_081F0E24`, `sub_08160EA4`, `sub_08097BC0`, `sub_0820267C`, `sub_08201160`).
+  Not migrated: `sub_0811FDB4`, `sub_0822B6C8`, `sub_0802DD6C` (their INCLUDE_ASM
+  stub redefines a label the neighbouring segment also defines) and `sub_0822BD58`
+  (body is an .incbin blob; needs a build_extra_functions.csv boundary).
+* **asmlift** (v0.9, needs Node 24; installed only under `build/asmlift/`): on
+  120 random unmatched Thumb functions <=400 bytes it found 0 exact matches,
+  median 42% of instructions off, 7 within 10%. Adding 3,316 prototypes
+  harvested from `src/` as `--context` cut declines from 32 to 21 but still found
+  no exact match. Useful at most as a draft seed for agents, not as a bulk matcher.
+
 ## October 12 (Claude): register-hint audit
 
 Matched code is unchanged at **21.351%**, but less of it relies on the

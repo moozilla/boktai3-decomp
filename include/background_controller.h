@@ -29,33 +29,33 @@ struct BackgroundCommandQueue {
 
 /* Normal background task (object size 0x140). */
 struct Background {
-    u8 task[0x18];          /* scheduler task header */
+    u8 task[0x18]; /* scheduler task header */
     u16 id;
     u8 flags;
     u8 layer;
-    u32 resource;           /* resource id, stored as a word */
-    s32 x, y;               /* position, 1/128 px */
-    s32 baseX, baseY;       /* position at creation (1/128 px) */
-    s32 scrollSpeedX, scrollSpeedY;     /* scroll velocity, px/frame */
-    s32 scrollDistX, scrollDistY;       /* accumulated scroll, px (guess) */
-    s32 moveTargetX, moveTargetY;       /* move target, 1/128 px */
-    s32 moveOriginX, moveOriginY;       /* move start, 1/128 px */
-    s32 cameraOffsetX, cameraOffsetY;   /* subtracted from camera, px */
-    s32 driftX, driftY;                 /* added to camera with flag 128 (guess) */
-    s32 limitX, limitY;     /* layer halfWidth/halfHeight are limit / 2 */
-    s32 centerX, centerY;   /* pivot for rate scaling */
+    u32 resource;                     /* resource id, stored as a word */
+    s32 x, y;                         /* position, 1/128 px */
+    s32 baseX, baseY;                 /* position at creation (1/128 px) */
+    s32 scrollSpeedX, scrollSpeedY;   /* scroll velocity, px/frame */
+    s32 scrollDistX, scrollDistY;     /* accumulated scroll, px (guess) */
+    s32 moveTargetX, moveTargetY;     /* move target, 1/128 px */
+    s32 moveOriginX, moveOriginY;     /* move start, 1/128 px */
+    s32 cameraOffsetX, cameraOffsetY; /* subtracted from camera, px */
+    s32 driftX, driftY;               /* added to camera with flag 128 (guess) */
+    s32 limitX, limitY;               /* layer halfWidth/halfHeight are limit / 2 */
+    s32 centerX, centerY;             /* pivot for rate scaling */
     u16 moveActive, moveTime, moveDuration;
-    s16 rateX, rateY;       /* parallax rate, 128 = 1:1 */
+    s16 rateX, rateY; /* parallax rate, 128 = 1:1 */
     u16 scrollTime, scrollDuration;
-    u16 unk7E;              /* never touched by these functions */
-    s32 scrollStartX, scrollStartY, scrollTargetX, scrollTargetY;   /* eased speed ends, 1/128 */
-    u16 fadeActive;         /* 1 while fading */
-    u16 fadeDuration;       /* frames remaining */
-    u16 blendX, blendY;     /* current level, 8.8 fixed point */
+    u16 unk7E; /* never touched by these functions */
+    s32 scrollStartX, scrollStartY, scrollTargetX, scrollTargetY; /* eased speed ends, 1/128 */
+    u16 fadeActive;                                               /* 1 while fading */
+    u16 fadeDuration;                                             /* frames remaining */
+    u16 blendX, blendY; /* current level, 8.8 fixed point */
     u16 blendStartX, blendStartY;
     u16 blendTargetX, blendTargetY;
-    u16 blendStepX, blendStepY;     /* added to blendX/blendY each frame */
-    u32 unkA4;              /* never touched by these functions */
+    u16 blendStepX, blendStepY; /* added to blendX/blendY each frame */
+    u32 unkA4;                  /* never touched by these functions */
     struct BackgroundCommandQueue queue;
     u32 frame;
 };
@@ -67,25 +67,25 @@ struct ScrollingBackground {
     u8 flags;
     u8 layer;
     u16 resource;
-    s16 x, y;               /* position, 1/16 px */
-    s16 baseX, baseY;       /* position at creation, 1/16 px */
-    s16 moveDx, moveDy;     /* per-frame step of the move command */
-    s16 speedX, speedY;     /* scroll speed, 1/16 px/frame */
-    u16 unk2E;              /* never touched by these functions */
-    s32 accumulatedX, accumulatedY;     /* scroll accumulator, wrapped by width/height */
-    s16 moveTargetX, moveTargetY;       /* 1/16 px */
-    s16 offsetX, offsetY;   /* config offsets given to the map loader */
-    s16 width, height;      /* wrap period, 1/16 px */
+    s16 x, y;                       /* position, 1/16 px */
+    s16 baseX, baseY;               /* position at creation, 1/16 px */
+    s16 moveDx, moveDy;             /* per-frame step of the move command */
+    s16 speedX, speedY;             /* scroll speed, 1/16 px/frame */
+    u16 unk2E;                      /* never touched by these functions */
+    s32 accumulatedX, accumulatedY; /* scroll accumulator, wrapped by width/height */
+    s16 moveTargetX, moveTargetY;   /* 1/16 px */
+    s16 offsetX, offsetY;           /* config offsets given to the map loader */
+    s16 width, height;              /* wrap period, 1/16 px */
     u16 moveActive, moveTime, moveDuration;
-    u16 speedScale;         /* multiplies the sine-orbit speed */
+    u16 speedScale; /* multiplies the sine-orbit speed */
     u8 enabled;
     u8 unk4D;
-    u16 fadeActive;         /* 1 while fading */
-    u16 fadeDuration;       /* frames remaining */
-    u16 blendX, blendY;     /* current level, 8.8 fixed point */
+    u16 fadeActive;     /* 1 while fading */
+    u16 fadeDuration;   /* frames remaining */
+    u16 blendX, blendY; /* current level, 8.8 fixed point */
     u16 blendStartX, blendStartY;
     u16 blendTargetX, blendTargetY;
-    u16 blendStepX, blendStepY;     /* added to blendX/blendY each frame */
+    u16 blendStepX, blendStepY; /* added to blendX/blendY each frame */
     u16 unk62;
     struct BackgroundCommandQueue queue;
 };
@@ -101,7 +101,7 @@ struct BackgroundConfig {
     s32 centerX, centerY;
     s32 offsetX, offsetY;
     s32 mode;
-    s32 priority;           /* selects the task list: 0 or nonzero */
+    s32 priority; /* selects the task list: 0 or nonzero */
     s32 blendX, blendY;
 };
 
@@ -115,8 +115,8 @@ struct ScrollingBackgroundConfig {
     s32 scale;
     s32 width, height;
     s32 mode;
-    s32 priority;           /* selects the task list: 0 or nonzero */
-    s32 fade;               /* nonzero: start a fade at creation */
+    s32 priority; /* selects the task list: 0 or nonzero */
+    s32 fade;     /* nonzero: start a fade at creation */
     s32 blendX, blendY;
 };
 
@@ -151,11 +151,11 @@ struct ResourceRef {
 
 /* Map or tile resource header; maps/tiles/extra are relocated by adding the base. */
 struct BackgroundResource {
-    u8 signature[2];        /* "MP" for map data */
+    u8 signature[2]; /* "MP" for map data */
     u16 unk02;
-    u16 count;              /* number of map entries */
+    u16 count; /* number of map entries */
     u16 unk06, unk08;
-    u16 size;               /* tile data size used by the tile loader */
+    u16 size; /* tile data size used by the tile loader */
     u32 maps;
     u32 tiles;
     u32 extra;

@@ -147,10 +147,10 @@ s32 Background_Update(struct Background *p)
         } else if (p->moveActive == 1) {
             if (p->moveDuration) {
                 register s32 remaining asm("r5") = p->moveDuration - p->moveTime;
-                p->x = Div(p->moveOriginX * remaining + p->moveTargetX * p->moveTime,
-                           p->moveDuration);
-                p->y = Div(p->moveOriginY * remaining + p->moveTargetY * p->moveTime,
-                           p->moveDuration);
+                p->x =
+                    Div(p->moveOriginX * remaining + p->moveTargetX * p->moveTime, p->moveDuration);
+                p->y =
+                    Div(p->moveOriginY * remaining + p->moveTargetY * p->moveTime, p->moveDuration);
             }
             if (++p->moveTime >= p->moveDuration) {
                 p->moveActive = 0;
