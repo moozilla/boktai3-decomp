@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 96.7%
-// 2 differing instruction runs; first diff at +0x16E (ldr r0, [pc, #0x54] vs ldr r1, [pc, #0x54])
 void sub_08215A74(u32, u32);
 extern u16 gUnk_020005A4;
 extern u32 gUnk_02000580;
@@ -22,7 +19,9 @@ void sub_0816778C(u8 *);
 extern u8 *gUnk_02000214;
 u32 sub_08178FC8(u8 *s)
 {
-    u32 zero, value, offset;
+    u32 zero, value;
+    u16 one;
+    u32 offset;
     s32 negative;
     void (*callback)(void);
     s[0x4CD8] = (zero = 0);
@@ -33,6 +32,7 @@ u32 sub_08178FC8(u8 *s)
     s[0x1414] = value;
     value = gUnk_02000580;
     *(u32 *)(s + 0xA40) = value;
+    one = 1;
     sub_0822D740(gUnk_08E60F0C, s + 0x4884);
     if (Script_SeekToKeyword(0x4E))
         s[0xA5E] = Script_GetValue();
@@ -63,12 +63,9 @@ u32 sub_08178FC8(u8 *s)
     s[0xB01] = 2;
     offset = 0xB02;
     s[offset] = 0xFF;
-    *(s8 *)(s + 0xB03) = (negative = -1);
+    *(s8 *)(s + 0xB03) = (negative = -one);
     offset -= 0xA3;
     *(s8 *)(s + offset) = negative;
     gUnk_02000214 = s;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08178FC8);
-#endif
