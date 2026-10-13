@@ -71,6 +71,15 @@ Scrolling dialogue controller,08032EDC,080335F4,symbols/proposed/subsystems.csv,
 Text window manager,080335F4,08033C58,symbols/proposed/subsystems.csv,Independent windows each embed the text interpreter at +0x60; singleton list manager at gUnk_020000E4; allocation remains unmatched
 Scripted dialogue transitions,08033C58,08034084,symbols/proposed/subsystems.csv,All named functions exact; rectangular dialogue placement timed fading script arrays advance skip and display-register restoration
 Wireless connection controller,08034084,08036CA4,symbols/proposed/subsystems.csv,RFU SDK link status and NI slot globals plus peer packet builder NI send acknowledgement event dispatch and singleton controller accessors
+Wireless text encoding,08036CA4,08036E08,symbols/proposed/subsystems.csv,Contiguous menu callbacks shared offsets and wireless API consumers; notes/link-menus_2026-10-12.md; unmatched spans remain counted
+Wireless status menu,08036E08,08037228,symbols/proposed/subsystems.csv,Contiguous menu callbacks shared offsets and wireless API consumers; notes/link-menus_2026-10-12.md; unmatched spans remain counted
+Wireless peer panel,08037228,08037B20,symbols/proposed/subsystems.csv,Contiguous menu callbacks shared offsets and wireless API consumers; notes/link-menus_2026-10-12.md; unmatched spans remain counted
+Wireless packet exchange,08037B20,080380C4,symbols/proposed/subsystems.csv,Contiguous menu callbacks shared offsets and wireless API consumers; notes/link-menus_2026-10-12.md; unmatched spans remain counted
+Wireless trade and selection menu (tentative),080380C4,080394D4,symbols/proposed/subsystems.csv,Contiguous menu callbacks shared offsets and wireless API consumers; notes/link-menus_2026-10-12.md; unmatched spans remain counted
+Wireless exit task,080394D4,080395D4,symbols/proposed/subsystems.csv,Contiguous menu callbacks shared offsets and wireless API consumers; notes/link-menus_2026-10-12.md; unmatched spans remain counted
+Wireless game items and display (tentative),080395D4,0803AC9C,symbols/proposed/subsystems.csv,Contiguous menu callbacks shared offsets and wireless API consumers; notes/link-menus_2026-10-12.md; unmatched spans remain counted
+Wireless result panel (tentative),0803AC9C,0803BAA0,symbols/proposed/subsystems.csv,Contiguous menu callbacks shared offsets and wireless API consumers; notes/link-menus_2026-10-12.md; unmatched spans remain counted
+Wireless scene objects (tentative),0803BAA0,0803CDF0,symbols/proposed/subsystems.csv,Four scene slots actor resource lifetime position and proximity callbacks; notes/link-menus_2026-10-12.md
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
 Sound-test menu,081E1AF4,081E270C,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md and allocator 081E26CC callback chain
 Timed presentation,081E270C,081E2898,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md timed update cleanup and initialization
