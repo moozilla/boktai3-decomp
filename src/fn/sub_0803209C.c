@@ -1,21 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 int sub_08031FEC(int *, int);
-static inline int units(int *value) {
-  int n = 0;
-  int v = *value;
-  u8 *dummy;
-  if (v > 0) {
-    int next;
-    do {
-      n++;
-      next = v - 1;
-      v = next;
-    } while (next > 0);
-    *value = next;
-  }
-  return n;
-}
 void sub_0803209C(u8 *buffer, volatile int value) {
   int started = 0;
   u8 *out = buffer;
