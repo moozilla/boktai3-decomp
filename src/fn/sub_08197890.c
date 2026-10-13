@@ -11,13 +11,6 @@ s32 sub_081976E4(void *, u16, u16);
 void SceneMessages_RegisterReceiver(void *, u32, u32);
 void sub_08195A4C(void *, u32);
 
-static inline void Set3(u16 *src, struct Vec08197890 *v)
-{
-    v->x = src[0];
-    v->x = src[1];
-    v->x = src[2];
-}
-
 void *sub_08197890(u16 id, u16 arg)
 {
     u8 *t = Task_Create(8, 0x72fc);
@@ -29,7 +22,13 @@ void *sub_08197890(u16 id, u16 arg)
             Task_Kill(t);
             return NULL;
         }
-        Set3((u16 *)(t + 0x72a0), (struct Vec08197890 *)(t + 0x7290));
+        {
+            u16 tmp = *(u16 *)(t + 0x72a0);
+            ((struct Vec08197890 *)(t + 0x7290))->x = tmp;
+        }
+        /* the original writes x three times (y and z never set) */
+        ((struct Vec08197890 *)(t + 0x7290))->x = *(u16 *)(t + 0x72a2);
+        ((struct Vec08197890 *)(t + 0x7290))->x = *(u16 *)(t + 0x72a4);
         *(struct Vec08197890 *)(t + 0x7298) = *(struct Vec08197890 *)(t + 0x7290);
         SceneMessages_RegisterReceiver(t + 0x18, *(u32 *)(t + 0x4c), 4);
         sub_08195A4C(t, 0xd);
