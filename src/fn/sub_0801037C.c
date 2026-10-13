@@ -1,51 +1,34 @@
-#include "global.h"
-struct Command {
-    u8 pad[6], type;
-};
-struct Queue {
-    u8 pad[6], count[2];
-    struct Command *commands[2][4];
-};
-struct Globals {
-    u8 pad[36], bank;
-};
-extern struct Globals *gUnk_0200047C;
-void sub_08020D54(void *, void *);
-void Trigger_ConsumePending(void *, int);
-int sub_0800FC28(void *, void *, void *);
-int sub_0800FE98(void *, void *, void *);
-int sub_08010298(void *, void *, void *);
-int sub_0801010C(void *, void *, void *);
-static inline int count(struct Queue *q)
+#include "group_objects.h"
+static inline int count(struct GroupQueue *q)
 {
     u8 *bank = &gUnk_0200047C->bank;
     return q->count[*bank];
 }
-int BoardPieces_DispatchCommands(u8 *manager)
+int BoardPieces_DispatchCommands(struct GroupObjects *manager)
 {
-    struct Queue *queue = (void *)(manager + 0xCD4);
+    struct GroupQueue *queue = &manager->queue;
     int i;
     for (i = 0; i < count(queue); i++) {
-        struct Globals *g = gUnk_0200047C;
+        struct GroupGlobals *g = gUnk_0200047C;
         {
-            struct Command *cmd = queue->commands[g->bank][i];
+            struct GroupCommand *cmd = queue->commands[g->bank][i];
             sub_08020D54(queue, cmd);
             switch (cmd->type) {
                 case 0:
                     sub_0800FC28(manager, queue, cmd);
-                    Trigger_ConsumePending(manager + 0xCD4, 1);
+                    Trigger_ConsumePending(&manager->queue, 1);
                     break;
                 case 1:
                     sub_0800FE98(manager, queue, cmd);
-                    Trigger_ConsumePending(manager + 0xCD4, 1);
+                    Trigger_ConsumePending(&manager->queue, 1);
                     break;
                 case 2:
                     sub_08010298(manager, queue, cmd);
-                    Trigger_ConsumePending(manager + 0xCD4, 1);
+                    Trigger_ConsumePending(&manager->queue, 1);
                     break;
                 case 11:
                     sub_0801010C(manager, queue, cmd);
-                    Trigger_ConsumePending(manager + 0xCD4, 1);
+                    Trigger_ConsumePending(&manager->queue, 1);
                     break;
             }
         }

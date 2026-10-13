@@ -1,18 +1,10 @@
-#include "global.h"
+#include "group_objects.h"
 
-struct S {
-    u8 a;
-    u8 f[0x3f];
-    u32 b;
-    u8 g[0x44];
-    u8 c;
-};
-void ActorShadow_Disable(u8 *);
-void sub_08010A34(u32 x, struct S *p)
+void sub_08010A34(struct GroupObjects *m, struct GroupPiece *p)
 {
-    if (p->a != 0) {
-        p->a = 0;
-        p->b |= 1;
-        ActorShadow_Disable((u8 *)p + 0x88);
+    if (p->active != 0) {
+        p->active = 0;
+        p->sprite.flags |= 1;
+        ActorShadow_Disable(p->transform);
     }
 }
