@@ -1,27 +1,5 @@
-#include "global.h"
-struct TerrainModifier {
-    u16 id;
-    u8 active, kind, tile, height;
-    u16 flags, cell;
-    u8 padA[2];
-    u8 registration[16];
-    struct TerrainModifier *previous, *next;
-};
-struct Manager {
-    u8 pad[24];
-    struct TerrainModifier *head;
-};
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct Map {
-    u8 pad[36];
-    u16 rows[1];
-};
-extern struct Manager *gUnk_02000028;
-extern struct Map *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC;
-static inline s32 cellIndex(struct Vec *pos)
+#include "terrain_modifier.h"
+static inline s32 cellIndex(struct TerrainVec *pos)
 {
     s32 x = pos->x >> 8, z = pos->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)

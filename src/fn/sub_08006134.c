@@ -1,10 +1,8 @@
-#include "global.h"
+#include "terrain_modifier.h"
 
-extern u8 *gUnk_02000028;
-
-u32 sub_08006134(u8 *p)
+s32 sub_08006134(struct TerrainModifierManager *p)
 {
     gUnk_02000028 = p;
-    *(u32 *)(p + 0x18) = 0;
+    p->head = 0;
     return 0;
 }

@@ -1,18 +1,16 @@
-#include "global.h"
+#include "terrain_modifier.h"
 
-extern u8 *gUnk_02000028;
-
-u32 sub_08005E40(u8 *p)
+u32 sub_08005E40(struct TerrainModifier *p)
 {
-    u8 *prev = *(u8 **)(p + 0x1C);
-    u8 *next = *(u8 **)(p + 0x20);
+    struct TerrainModifier *prev = p->previous;
+    struct TerrainModifier *next = p->next;
     if (prev) {
-        *(u8 **)(prev + 0x20) = next;
+        prev->next = next;
     } else {
-        *(u8 **)(gUnk_02000028 + 0x18) = next;
+        gUnk_02000028->head = next;
     }
     if (next) {
-        *(u8 **)(next + 0x1C) = prev;
+        next->previous = prev;
     }
     return 0;
 }
