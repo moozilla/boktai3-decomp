@@ -1,0 +1,38 @@
+#include "global.h"
+#include "engine.h"
+
+struct Vec08197890 {
+    u16 x, y, z, w;
+};
+void sub_08197470(void *);
+void sub_081975B0(void *);
+void sub_081975C8(void *);
+s32 sub_081976E4(void *, u16, u16);
+void SceneMessages_RegisterReceiver(void *, u32, u32);
+void sub_08195A4C(void *, u32);
+
+static inline void Set3(u16 *src, struct Vec08197890 *v)
+{
+    v->x = src[0];
+    v->x = src[1];
+    v->x = src[2];
+}
+
+void *sub_08197890(u16 id, u16 arg)
+{
+    u8 *t = Task_Create(8, 0x72fc);
+    if (t) {
+        *(u32 *)(t + 0x4c) = id;
+        Task_SetCallbacks(t, sub_08197470, sub_081975B0);
+        sub_081975C8(t);
+        if (sub_081976E4(t, id, arg) < 0) {
+            Task_Kill(t);
+            return NULL;
+        }
+        Set3((u16 *)(t + 0x72a0), (struct Vec08197890 *)(t + 0x7290));
+        *(struct Vec08197890 *)(t + 0x7298) = *(struct Vec08197890 *)(t + 0x7290);
+        SceneMessages_RegisterReceiver(t + 0x18, *(u32 *)(t + 0x4c), 4);
+        sub_08195A4C(t, 0xd);
+    }
+    return t;
+}
