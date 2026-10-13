@@ -248,7 +248,56 @@ void sub_08010A34(struct GroupObjects *m, struct GroupPiece *p)
 }
 
 INCLUDE_ASM("asm/nonmatching", sub_08010A58);
+static inline void addVec(struct GroupVec *d, struct GroupVec *s)
+{
+    struct GroupVec *dst = d;
+    struct GroupVec *src = s;
+    {
+        u32 value = (u16)s->x;
+        value = value + (u16)d->x;
+        d->x = value;
+    }
+    dst->y += src->y;
+    dst->z += src->z;
+}
+
+#ifdef NONMATCHING
+void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
+{
+    struct GroupVec delta;
+    struct GroupVec *offset;
+    int active;
+    if (m->actor)
+        p->target = m->actor->position;
+    active = p->active;
+    offset = &p->offset;
+    if (active) {
+        u32 zero;
+        p->active = 0;
+        p->anchor = p->position;
+        p->direction = randomValue();
+        zero = 0;
+        CpuSet(&zero, offset, 0x05000002);
+    }
+    sub_082216F8(&p->anchor, &p->anchor, &p->target, index + 8, 5);
+    if (p->speed == 0) {
+        const u16 *table;
+        p->direction = sub_082215E4(-p->offset.x, -p->offset.z);
+        table = gUnk_0203B400;
+        p->direction += (randomWith(table) & 15) - 7;
+        p->speed = (randomWith(table) & 7) + 8;
+    } else
+        p->speed--;
+    polar(&delta, p->direction, p->duration);
+    addVec(&p->offset, &delta);
+    p->position.x = p->anchor.x + p->offset.x;
+    p->position.z = p->anchor.z + p->offset.z;
+    sub_0800FA5C(m, p, 0);
+    p->timer++;
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_08010C10);
+#endif
 INCLUDE_ASM("asm/nonmatching", sub_08010D84);
 INCLUDE_ASM("asm/nonmatching", sub_08010E44);
 

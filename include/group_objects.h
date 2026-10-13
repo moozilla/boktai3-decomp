@@ -40,7 +40,7 @@ struct GroupPiece {
     u8 pad7, speed, pad9;
     u16 targetY, duration, pade;
     struct GroupVec position, target;
-    u8 pad20[16];
+    struct GroupVec anchor, offset; // 0x20, 0x28
     struct GroupAnim anim;
     struct GroupSprite sprite; // 0x40
     u8 pad64[8];
@@ -66,6 +66,11 @@ struct GroupQueue {
     u8 tail[12];
 };
 
+struct GroupActor {
+    u8 pad0[12];
+    struct GroupVec position;
+};
+
 struct GroupObjects {
     u8 task[24];
     u32 active, timer;
@@ -74,7 +79,7 @@ struct GroupObjects {
     s8 paletteActive, paletteMask;
     u16 actorId;
     u8 palette[32];
-    void *actor;
+    struct GroupActor *actor;
     struct GroupVec origin;
     struct GroupQueue queue; // 0xCD4
 };
@@ -91,7 +96,7 @@ void Shadow_Initialize(void *, void *, int);
 void SceneMessages_RegisterReceiver(void *, int, int);
 void sub_08020D08(void *);
 void sub_08020D54(void *, void *);
-void *sub_08225984(int);
+struct GroupActor *sub_08225984(int);
 int Mod(int, int);
 
 int BoardPiece_Initialize(struct GroupObjects *, struct GroupPiece *, int);
@@ -105,6 +110,8 @@ int GroupObjects_Destroy(struct GroupObjects *);
 int GroupObjects_Initialize(struct GroupObjects *, int);
 void *sub_080111A8(void *);
 
+void sub_082216F8(void *, void *, void *, int, int);
+int sub_082215E4(int, int);
 void sub_0800FA5C(struct GroupObjects *, struct GroupPiece *, int);
 int sub_0800FC28(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
 int sub_0800FE98(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
@@ -113,8 +120,18 @@ int sub_08010298(struct GroupObjects *, struct GroupQueue *, struct GroupCommand
 
 static inline int randomValue(void)
 {
+    u32 offset;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return gUnk_0203B400[gUnk_03005308];
+    offset = gUnk_03005308 * 2;
+    return *(const u16 *)(offset + (u32)gUnk_0203B400);
+}
+
+static inline int randomWith(const u16 *table)
+{
+    u32 offset;
+    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    offset = gUnk_03005308 * 2;
+    return *(const u16 *)(offset + (u32)table);
 }
 
 static inline int scale(int n)
