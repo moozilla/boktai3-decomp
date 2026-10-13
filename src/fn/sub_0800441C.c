@@ -1,17 +1,13 @@
 #include "global.h"
+#include "scene_object.h"
 
-struct S {
-    u8 f[0xbe];
-    u16 v;
-};
-u8 Scene_CanEnterNeighborCell(struct S *, u16, s32);
-
-s32 sub_0800441C(struct S *s)
+/* Count how many of the four neighbors accept the object; more than two means it is boxed in. */
+u8 sub_0800441C(struct SceneObject *object)
 {
     s32 c = 0;
     s32 i = 0;
     do {
-        if (Scene_CanEnterNeighborCell(s, s->v, i))
+        if (Scene_CanEnterNeighborCell(object, object->cellRef.index, i))
             c++;
         i++;
     } while (i <= 3);

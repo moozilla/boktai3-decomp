@@ -1,19 +1,7 @@
 #include "global.h"
+#include "scene_object.h"
 // MATCHING_CONCESSION: register-pinning
-/* Eight-byte position; the helpers below access its halfword coordinates. */
-struct Vec {
-    u16 x, y;
-    u32 z;
-};
-struct Size {
-    u32 x : 16;
-    u32 y : 16;
-    u32 z : 16;
-    u32 unused : 16;
-};
-extern u32 gUnk_03005308;
-extern const u16 gUnk_0203B400[];
-void sub_08068108(struct Vec *, s32, struct Size *, s32, s32, s32);
+void sub_08068108(struct SceneVec *, s32, struct SceneExtent *, s32, s32, s32);
 static inline void scatter(u16 *coordinate, const u8 *random)
 {
     s32 value = *coordinate - 128;
@@ -37,10 +25,10 @@ static inline const u16 *scatterAddress(u32 index, const u16 *table)
     asm("" : "+r"(address));
     return (const u16 *)address;
 }
-void Scene_SpawnEdgeParticles(struct Vec *position, s32 offset)
+void Scene_SpawnEdgeParticles(struct SceneVec *position, s32 offset)
 {
-    struct Size size;
-    struct Vec point;
+    struct SceneExtent size;
+    struct SceneVec point;
     u16 *p;
     s32 i;
     size.x = 32;

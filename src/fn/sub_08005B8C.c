@@ -1,12 +1,9 @@
 #include "global.h"
+#include "scene_object.h"
 // MATCHING_CONCESSION: register-pinning
-struct Vec {
-    u32 x : 16, y : 16, z : 16;
-};
 s32 sub_0821ABA8(s32, s32);
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-s32 SceneObjects_CreateObject(u32, s32, u32, struct Vec *, u32, s32, s32, s32, s32, u32);
 #define RESOURCE(value)                                                                            \
     ({                                                                                             \
         s32 result = (value);                                                                      \
@@ -15,7 +12,7 @@ s32 SceneObjects_CreateObject(u32, s32, u32, struct Vec *, u32, s32, s32, s32, s
     })
 s32 SceneObjects_CreateFromScript(void)
 {
-    struct Vec position;
+    struct SceneExtent position;
     s32 id, type;
     s32 initial, animation, script, defaultResource;
     register s32 flags asm("r9"), resource asm("r6"), drawMode asm("r8"), health asm("r10");
@@ -75,7 +72,7 @@ s32 SceneObjects_CreateFromScript(void)
         initial = sub_0821ABA8('d', -1);
     animation = 0x192;
     script = sub_0821ABA8('b', 0);
-    SceneObjects_CreateObject(id, type, flags, &position, resource, drawMode, health, initial,
+    SceneObjects_CreateObject(id, type, flags, (struct SceneVec *)&position, resource, drawMode, health, initial,
                               animation, script);
     return 0;
 }

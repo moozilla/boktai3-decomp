@@ -1,36 +1,9 @@
 #include "global.h"
-struct Body {
-    u8 pad[14];
-    s16 y;
-    u8 pad10[6];
-    s16 vy;
-};
-struct Cell {
-    u8 height, tile;
-    u16 flags;
-};
-struct Object {
-    u8 type, flags;
-    u16 state, kind;
-    u8 pad6[6];
-    u16 dx, dz;
-    u8 direction, entered;
-    u16 targetY;
-    u8 pad14[2];
-    u16 resource;
-    u8 pad18[20];
-    struct Body body;
-    u8 pad44[124];
-    struct Cell terrain;
-    u8 padC4[224];
-    void (*update)(void);
-};
-void sub_080050AC(void);
-void Scene_PlayMovementEffect(struct Object *);
-void Scene_UpdateFallingObject(struct Object *p)
+#include "scene_object.h"
+void Scene_UpdateFallingObject(struct SceneObject *p)
 {
-    struct Body *body = &p->body;
-    struct Cell *terrain = &p->terrain;
+    struct SceneBody *body = &p->body;
+    struct SceneCell *terrain = &p->cellRef.cell;
     if (p->entered) {
         s32 height;
         p->entered = 0;
@@ -43,9 +16,9 @@ void Scene_UpdateFallingObject(struct Object *p)
                 u32 mask = 8;
                 mask & p->flags;
             }))
-            p->terrain.flags |= 0x21;
+            p->cellRef.cell.flags |= 0x21;
     }
-    body->vy = p->targetY - body->y;
+    body->vy = p->targetY - body->position.y;
     if (body->vy < -16)
         body->vy = -16;
     else if (body->vy > 0)
@@ -55,17 +28,17 @@ void Scene_UpdateFallingObject(struct Object *p)
                 u32 mask = 8;
                 mask & p->flags;
             })) {
-            p->terrain.flags |= 0x21;
-            p->resource = 0;
+            p->cellRef.cell.flags |= 0x21;
+            p->health = 0;
         } else {
-            p->terrain.flags &= ~0x21;
+            p->cellRef.cell.flags &= ~0x21;
             Scene_PlayMovementEffect(p);
         }
         {
             register void (*callback)(void) asm("r1") = sub_080050AC;
             p->update = callback;
         }
-        p->state = 0;
+        p->timer = 0;
         p->entered = 1;
         p->dx = 0;
         p->dz = 0;

@@ -1,43 +1,13 @@
 #include "global.h"
+#include "scene_object.h"
 // MATCHING_CONCESSION: register-pinning
-struct ObjectTail {
-    u8 damageTimer, mode;
-    u16 animation;
-    u8 pad4[2], active, animationTimer, pad8, cooldown, padA[6];
-    u32 script, id, bodyFlags;
-    u8 pad1C[4];
-    s16 x, y, z;
-    u8 pad26[82];
-    u32 drawFlags;
-    u8 tail[276];
-};
-struct Object {
-    u8 type, flags;
-    u16 state, kind, pad6;
-    u32 owner;
-    u8 padC[10];
-    s16 resource;
-    struct ObjectTail tail;
-};
-struct Manager {
-    u8 task[24];
-    u16 count;
-    u8 frame, descending;
-    s16 fade;
-    u8 fading, stopFade;
-    u32 fromA, fromB, toA, toB;
-    u8 paletteA[32], paletteB[32];
-    struct Object *objects;
-};
 struct Args {
     u32 count : 16;
     s32 *values;
 };
-extern void (*const gUnk_086049B4[])(struct Object *);
+extern void (*const gUnk_086049B4[])(struct SceneObject *);
 extern u8 *gUnk_02000710;
 void sub_0821AD08(u32, struct Args *);
-void Scene_DropObjectsAbove(struct Object *);
-void sub_080047AC(struct Object *);
 void sub_08225B74(void *);
 void sub_0821DE30(void *);
 void sub_0821FF24(void *, void *, s32);
@@ -57,63 +27,63 @@ static inline void disableCollision(u16 *flags)
         *flags = result;
     }
 }
-s32 SceneObjects_Update(struct Manager *manager)
+s32 SceneObjects_Update(struct SceneObjectManager *manager)
 {
-    struct Object *p = manager->objects;
+    struct SceneObject *p = manager->objects;
     s32 i;
     s32 values[5];
     struct Args args;
     for (i = 0; i < manager->count; i++, p++) {
-        if (!p->tail.active)
+        if (!p->active)
             continue;
-        if (p->tail.mode) {
-            if (p->tail.mode == 3 && gUnk_086049B4[p->type])
+        if (p->mode) {
+            if (p->mode == 3 && gUnk_086049B4[p->type])
                 gUnk_086049B4[p->type](p);
-            if (p->tail.script) {
-                values[0] = p->tail.id;
+            if (p->script) {
+                values[0] = p->body.id;
                 values[1] = p->type;
-                values[2] = p->tail.x;
-                values[3] = p->tail.y;
-                values[4] = p->tail.z;
+                values[2] = p->body.position.x;
+                values[3] = p->body.position.y;
+                values[4] = p->body.position.z;
                 args.count = 5;
                 args.values = values;
-                sub_0821AD08(p->tail.script, &args);
-                p->tail.script = 0;
+                sub_0821AD08(p->script, &args);
+                p->script = 0;
             }
             Scene_DropObjectsAbove(p);
             sub_080047AC(p);
             continue;
         }
-        sub_08225B74((u8 *)p + 0x2C);
-        if (*(void (**)(struct Object *))((u8 *)p + 0x1A4))
-            (*(void (**)(struct Object *))((u8 *)p + 0x1A4))(p);
+        sub_08225B74(&p->body);
+        if (p->update)
+            p->update(p);
         if (p->flags & 0x20) {
             if (!p->kind) {
-                p->tail.bodyFlags &= ~2;
-                sub_0821DE30((u8 *)p + 0x174);
+                p->body.flags &= ~2;
+                sub_0821DE30(&p->link);
             } else
-                p->tail.bodyFlags |= 2;
+                p->body.flags |= 2;
         } else
-            sub_0821DE30((u8 *)p + 0x174);
-        if (p->tail.cooldown)
-            p->tail.cooldown--;
+            sub_0821DE30(&p->link);
+        if (p->cooldown)
+            p->cooldown--;
         if (!p->owner || ownerIsCurrent(p->owner))
-            p->tail.drawFlags &= ~1;
+            p->draw.flags &= ~1;
         else
-            p->tail.drawFlags |= 1;
-        if (p->tail.damageTimer || p->resource <= 0) {
-            p->tail.damageTimer--;
+            p->draw.flags |= 1;
+        if (p->damageTimer || p->health <= 0) {
+            p->damageTimer--;
             goto disable;
         }
         if (!p->owner || ownerIsCurrent(p->owner)) {
-            *(u16 *)((u8 *)p + 0xD2) &= ~4;
-            sub_0821FF24((u8 *)p + 0xCC, (u8 *)p + 0x38, 0);
+            p->collider.state &= ~4;
+            sub_0821FF24(&p->collider, &p->body.position, 0);
         } else {
         disable:
-            disableCollision((u16 *)((u8 *)p + 0xD2));
+            disableCollision(&p->collider.state);
         }
-        if (p->tail.animationTimer && !--p->tail.animationTimer)
-            sub_08215284((u8 *)p + 0x74, p->tail.animation);
+        if (p->animationTimer && !--p->animationTimer)
+            sub_08215284((u8 *)p + 0x74, p->initialAnimation);
     }
     if (manager->fading) {
         sub_08221110(manager->paletteA, manager->fromA, manager->toA, manager->fade, 5);
