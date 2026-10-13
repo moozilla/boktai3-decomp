@@ -5,7 +5,9 @@ struct G {
     s16 padx;
     s16 y;
 };
-struct V { s16 x, y, z; };
+struct V {
+    s16 x, y, z;
+};
 struct O {
     u8 pad[0x98];
     s16 x;

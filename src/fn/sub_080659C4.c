@@ -1,6 +1,8 @@
 #include "global.h"
 
-struct V { u32 a, b; };
+struct V {
+    u32 a, b;
+};
 struct Q {
     u32 flags;
     u8 pad4[0xc];
@@ -8,7 +10,9 @@ struct Q {
     u8 pad12[0xa];
     union {
         struct V v;
-        struct { u16 x, y, z; } h;
+        struct {
+            u16 x, y, z;
+        } h;
     } pos;
 };
 struct O {

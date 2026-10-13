@@ -4,7 +4,7 @@
 // fuzzy: 97.3%
 
 extern u8 *gUnk_02000710;
-void sub_0822B2F8(u32);
+void Sound_PlaySong(u32);
 void sub_08077848(u8 *, u32);
 
 static inline u8 same(u16 *q)
@@ -31,20 +31,20 @@ void sub_080645D4(u8 *p)
     if (e[0x2b5] == 0x15)
         return;
     switch (e[0x98]) {
-    case 4:
-        sub_0822B2F8(0xee);
-        goto done;
-    case 1:
-        if (p[0x3f] == 3)
+        case 4:
+            Sound_PlaySong(0xee);
+            goto done;
+        case 1:
+            if (p[0x3f] == 3)
+                return;
+            Sound_PlaySong(0xff);
+            goto done;
+        case 3:
+            sub_08077848(e, 3);
+        done:
+            break;
+        default:
             return;
-        sub_0822B2F8(0xff);
-        goto done;
-    case 3:
-        sub_08077848(e, 3);
-    done:
-        break;
-    default:
-        return;
     }
     t = *f;
     t |= one;

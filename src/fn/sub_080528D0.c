@@ -35,7 +35,7 @@ struct O {
 void sub_08052628(struct O *, void (*)(struct O *));
 void sub_08052418(struct O *);
 void sub_08052A40(struct O *);
-void sub_08020D68(void *, u32);
+void Trigger_ConsumePending(void *, u32);
 void sub_080528D0(struct O *o)
 {
     o->flags50 &= ~1;
@@ -47,6 +47,6 @@ void sub_080528D0(struct O *o)
     } else {
         o->wa0 &= ~1;
         sub_08052628(o, sub_08052A40);
-        sub_08020D68(&o->b18, 1);
+        Trigger_ConsumePending(&o->b18, 1);
     }
 }
