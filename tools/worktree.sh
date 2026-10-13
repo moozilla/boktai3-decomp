@@ -1,13 +1,13 @@
 #!/bin/sh
 # Create an isolated worktree for one parallel worker:
-#   tools/worktree.sh NAME [BASE]   -> ../wt/NAME on branch codex/NAME
+#   tools/worktree.sh NAME [BASE]   -> ../wt/NAME on branch ${BRANCH_PREFIX:-codex}/NAME
 # Shares the (gitignored) generated asm in gen/, the ROM and the built tools with
 # the main checkout via symlinks; build/ outputs stay per-worktree.
 set -e
 MAIN=$(cd "$(dirname "$0")/.." && pwd)
-NAME=$1; BASE=${2:-HEAD}
+NAME=$1; BASE=${2:-HEAD}; PREFIX=${BRANCH_PREFIX:-codex}
 DIR=$(dirname "$MAIN")/wt/$NAME
-git -C "$MAIN" worktree add -q -b "codex/$NAME" "$DIR" "$BASE"
+git -C "$MAIN" worktree add -q -b "$PREFIX/$NAME" "$DIR" "$BASE"
 ln -s "$MAIN/baserom.gba" "$DIR/baserom.gba"
 ln -s "$MAIN/gen" "$DIR/gen"
 mkdir -p "$DIR/build"
