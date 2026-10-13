@@ -738,6 +738,125 @@ addr,name,confidence,evidence
 08036B2C,Wireless_SetTransferCallbacks,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
 08036B64,Wireless_QueueNiPacket,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
 08036C0C,Wireless_RequestDisconnectMode,medium,Tentative role from exact RFU controller C; notes/wireless-controller_2026-10-12.md
+08036CA4,LinkText_GetAlphabet,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08036CAC,LinkText_EncodeCharacter,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08036CC4,LinkText_DecodeCharacter,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08036CF0,LinkText_DecodeString,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08036D2C,LinkText_EncodeString,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08036D80,LinkText_DecodePacketName,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08036E08,LinkStatusMenu_GetInstance,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08036E14,LinkStatusMenu_ResetGraphics,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08036EC8,LinkStatusMenu_SetBackground,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08036F48,LinkStatusMenu_InitializeDisplay,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08036FC8,LinkStatusMenu_ShowConnectionPrompt,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+080370D0,LinkStatusMenu_WaitForDisconnect,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08037110,LinkStatusMenu_UpdateTask,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08037140,LinkStatusMenu_InitializeTask,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+080371E0,LinkStatusMenu_Create,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08037228,PeerPanel_SetBackground,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08037290,PeerPanel_InitializeDrawables,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+0803746C,PeerPanel_DestroyDrawables,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+080374A8,PeerPanel_ApplyPacketName,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08037540,PeerPanel_ClearName,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08037594,PeerPanel_FindConnectedSlot,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+080375BC,PeerPanel_UpdateInput,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+080376C4,PeerPanel_UpdateTask,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08037730,PeerPanel_DestroyTask,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08037788,PeerPanel_InitializeTask,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08037934,PeerPanel_Create,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08037960,PeerPanel_ResetSelection,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08037B20,LinkExchange_OnSendComplete,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08037B6C,LinkExchange_OnReceiveComplete,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08037BB8,LinkExchange_InitializeTask,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08037DC0,LinkExchange_GetInstance,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08037DCC,LinkExchange_Destroy,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08037DEC,LinkExchange_CopyReceivedPacket,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08037ECC,LinkExchange_ReceivePacket,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08037F30,LinkExchange_OnTransferError,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08037F50,LinkExchange_MarkReady,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08037F5C,LinkExchange_PackInputFlags,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08037FB4,LinkExchange_QueuePacket,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08038004,LinkExchange_SendPendingPacket,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08038074,LinkExchange_ClearSlot,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08038094,LinkExchange_ClearFlags,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+080380C4,TradeMenu_SetBackground,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08038170,TradeMenu_ProcessInput,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08038448,TradeMenu_PopulateSelections,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+080385E0,TradeMenu_RemoveLeftSelection,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08038634,TradeMenu_RemoveRightSelection,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08038674,TradeMenu_ClearStateEntry,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08038688,TradeMenu_WaitBeforeHandshake,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+080386C8,TradeMenu_WaitForInitialHandshake,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08038764,TradeMenu_ConfirmSelectionCountdown,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08038838,TradeMenu_PackScores,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08038928,TradeMenu_RetryReadyPacket,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+080389AC,TradeMenu_UpdateRoundAndEquipment,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08038AD4,TradeMenu_ResolveRound,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08038CDC,TradeMenu_PublishOutcome,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08038D80,TradeMenu_AcknowledgeResult,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08038DF8,TradeMenu_WaitForDisconnect,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08038E48,TradeMenu_ShowResultSummary,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08038F08,TradeMenu_ApplyScoreAndRetry,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08039058,TradeMenu_UpdateTask,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+080390A0,TradeMenu_DestroyTask,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+080390C4,TradeMenu_InitializeTask,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08039490,TradeMenu_Create,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+080394D4,LinkExit_UpdateTask,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08039568,LinkExit_InitializeTask,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+080395D4,LinkGame_AddSelection,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+0803962C,LinkGame_RemoveSelection,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08039774,LinkGame_ToggleOption,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+080397D4,LinkGame_AddWeightedScore,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08039834,LinkGame_InitializeCallbacks,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08039870,LinkGame_Start,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08039898,LinkGame_ResetState,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08039920,LinkItem_SetRandomMotion,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08039968,LinkItem_SetNegativeRandomMotion,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08039998,LinkItem_UpdateSinusoidalMotion,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+080399D4,LinkItem_Hide,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+08039C24,LinkItem_BeginMotion,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+08039CB0,LinkItem_AdvanceMotion,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+08039DE4,LinkItem_PublishArrival,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+08039EEC,LinkItem_MergeArrivalCounters,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+0803A238,LinkItem_WaitForExit,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+0803A2A8,LinkItem_InitializeTask,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+0803A3C8,LinkItem_UpdateTask,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+0803A408,LinkItem_DestroyTask,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+0803A434,LinkItem_Create,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+0803A618,LinkItem_PublishPendingQueue,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+0803A6F8,LinkDisplay_SetState,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+0803A744,LinkDisplay_Hide,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+0803A778,LinkDisplay_Begin,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+0803A7C4,LinkDisplay_UpdateText,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+0803A9CC,LinkDisplay_ShakeResult,low,Tentative result-icon shake from exact C; notes/link-menus_2026-10-12.md
+0803AA74,LinkDisplay_PlayStateSound,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+0803AAC8,LinkDisplay_UpdateTask,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+0803AAF0,LinkDisplay_DestroyTask,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+0803AC5C,LinkDisplay_Create,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+0803AC9C,LinkResultPanel_SetState,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+0803ACC8,LinkResultPanel_RequestAdvance,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+0803ACD0,LinkResultPanel_UpdateThresholdIcons,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+0803AD30,LinkResultPanel_GetInstance,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+0803AD3C,LinkResultPanel_SetBackground,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+0803ADB8,LinkResultPanel_AnimateRollingValues,low,Tentative role from contiguous wireless menu exact C and callers; notes/link-menus_2026-10-12.md
+0803B01C,LinkResultPanel_UpdateGameCounters,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+0803B124,LinkResultPanel_RevealScores,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+0803B314,LinkResultPanel_WaitForDismissal,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+0803B370,LinkResultPanel_UpdateTask,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+0803B3B4,LinkResultPanel_DestroyTask,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+0803B40C,LinkResultPanel_InitializeTask,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+0803B6B8,LinkResultPanel_Create,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+0803BAA0,LinkScene_FindFreeSlot,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+0803BAE4,LinkScene_ResetSlot,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+0803BAF4,LinkScene_ClearSlots,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+0803BBE4,LinkScene_ApplySlotStyle,low,Tentative style and drawable resource setup; notes/link-menus_2026-10-12.md
+0803C008,LinkScene_RemoveSlot,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+0803C070,LinkScene_WaitForAnimation,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+0803C0A4,LinkScene_CopyPosition,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+0803C0D4,LinkScene_IsNearCamera,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+0803C880,LinkScene_UpdateSlots,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+0803C90C,LinkScene_UpdateTask,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
+0803C914,LinkScene_AttachResourceList,low,Tentative role from contiguous wireless menu exact C; notes/link-menus_2026-10-12.md
 0818D754,Motion_BuildApproachSegment,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D8E0,Motion_RampSpin,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D960,Motion_AdvanceApproach,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
