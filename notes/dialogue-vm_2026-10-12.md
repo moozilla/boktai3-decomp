@@ -4,7 +4,7 @@ Exact progress: 20.001% -> 20.230%, +0.229 percentage points;
 36 additional functions and 5,520 reported code-span bytes.
 Without register pinning: 16.016%; register-pinned: 4.214%, included above.
 
-All named functions in 08031D40-080335D4 now match. Existing unnamed
+All named functions in 08031D40-080335F4 now match. Existing unnamed
 assembly tails remain assembly; this does not claim those tails are recovered.
 The 948-byte dialogue initializer at 0803198C remains an actual gap.
 
