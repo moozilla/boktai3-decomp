@@ -1,6 +1,5 @@
 #include "palette_controller.h"
-#define Palette_ApplyFrame sub_0800306C
-void sub_08002E80(struct PaletteController *);
+void Palette_UpdateOscillation(struct PaletteController *);
 void sub_08002EE4(struct PaletteController *);
 void sub_08002AA8(struct PaletteController *, u32);
 void sub_08002AB0(struct PaletteController *, u32);
@@ -9,7 +8,7 @@ void sub_08002C38(struct PaletteController *, struct PaletteTransition *);
 s32 sub_08017444(void);
 void sub_0824923C(struct PaletteTransition *, void *);
 extern void *gUnk_0860499C[];
-void sub_08002F40(struct PaletteController *);
+void Palette_BlendVariants(struct PaletteController *);
 void sub_08002E28(struct PaletteController *, struct PaletteTransition *);
 void sub_08002E48(struct PaletteController *, struct PaletteTransition *);
 void Palette_ApplyFrame(struct PaletteController *p)
@@ -17,7 +16,7 @@ void Palette_ApplyFrame(struct PaletteController *p)
     struct PaletteTransition *t = &p->transition;
     if (p->flags & 8) {
         if (p->flags & 2)
-            sub_08002E80(p);
+            Palette_UpdateOscillation(p);
         else
             sub_08002EE4(p);
         if (p->blend != p->previousBlend)
@@ -39,7 +38,7 @@ void Palette_ApplyFrame(struct PaletteController *p)
     } else
         sub_08002AB0(p, 4);
     if (sub_08002AB8(p, 1))
-        sub_08002F40(p);
+        Palette_BlendVariants(p);
     if (sub_08002AB8(p, 2))
         sub_08002E28(p, t);
     if (sub_08002AB8(p, 4))

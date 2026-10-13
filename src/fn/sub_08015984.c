@@ -3,8 +3,7 @@ struct Config {
     u16 v[20];
 };
 int Div(int, int);
-void sub_080154EC(int, void *, struct Config *);
-#define AnimatedParticles_EmitRing sub_08015984
+void AnimatedParticles_Create(int, void *, struct Config *);
 void AnimatedParticles_EmitRing(void *pos, int count, int type, int flags, int speed,
                                 int horizontal, int start, int decay)
 {
@@ -31,7 +30,7 @@ void AnimatedParticles_EmitRing(void *pos, int count, int type, int flags, int s
     s.v[11] = 10;
     s.v[10] = 0;
     for (i = 0; i < count; i++) {
-        sub_080154EC(1, pos, &s);
+        AnimatedParticles_Create(1, pos, &s);
         s.v[10] += step;
     }
 }

@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneObjects_HasPrimaryId sub_0801E344
 int SceneObjects_HasPrimaryId(u8 *p, u16 id)
 {
     int i = 0;

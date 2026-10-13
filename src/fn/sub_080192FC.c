@@ -11,7 +11,7 @@ extern u8 gUnk_03005430[];
 int sub_08228D88(void);
 int sub_08228D94(void);
 int sub_08228DA0(void);
-void sub_080192D0(void *, int);
+void ClockEvents_RunScript(void *, int);
 static inline int distance(int a, int b)
 {
     int d = a - b;
@@ -31,7 +31,6 @@ static inline int scheduled(int index)
     int h = gUnk_03005430[index] * 3600;
     return h + gUnk_03005430[index + 1] * 60;
 }
-#define ClockEvents_Update sub_080192FC
 int ClockEvents_Update(struct Clock *p)
 {
     int zero;
@@ -49,7 +48,7 @@ int ClockEvents_Update(struct Clock *p)
         if (distance(p->seconds, 43230) <= 30) {
             if (p->armed[0]) {
                 p->armed[0] = zero;
-                sub_080192D0(p, 0);
+                ClockEvents_RunScript(p, 0);
             }
         } else
             p->armed[0] = 1;
@@ -58,7 +57,7 @@ int ClockEvents_Update(struct Clock *p)
             if (distance(p->seconds, when) <= limit) {
                 if (p->armed[1]) {
                     p->armed[1] = 0;
-                    sub_080192D0(p, 1);
+                    ClockEvents_RunScript(p, 1);
                 }
             } else
                 p->armed[1] = 1;
@@ -68,7 +67,7 @@ int ClockEvents_Update(struct Clock *p)
             if (distance(p->seconds, when) <= limit) {
                 if (p->armed[2]) {
                     p->armed[2] = 0;
-                    sub_080192D0(p, 2);
+                    ClockEvents_RunScript(p, 2);
                 }
             } else
                 p->armed[2] = 1;

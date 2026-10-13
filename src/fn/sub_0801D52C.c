@@ -1,8 +1,7 @@
 #include "global.h"
-#define ResultTutorial_DemonstrateTracking sub_0801D52C
 extern u8 gUnk_0824DB8A[];
-void sub_0801D354(void *, int);
-void sub_0801C760(void *);
+void ResultTutorial_MovePlayer(void *, int);
+void ResultGame_ScoreAlignment(void *);
 #define I(o) (*(int *)(p + (o)))
 #define H(o) (*(s16 *)(p + (o)))
 int ResultTutorial_DemonstrateTracking(u8 *p)
@@ -58,11 +57,11 @@ int ResultTutorial_DemonstrateTracking(u8 *p)
             break;
     }
     if (I(0x8c) < I(0x9c) - 96)
-        sub_0801D354(p, 1);
+        ResultTutorial_MovePlayer(p, 1);
     else
-        sub_0801D354(p, 0);
+        ResultTutorial_MovePlayer(p, 0);
     if ((H(0xa8) & 15) == 0)
-        sub_0801C760(p);
+        ResultGame_ScoreAlignment(p);
     ++H(0xa8);
     return 0;
 }

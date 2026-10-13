@@ -41,7 +41,6 @@ s32 Script_GetValue(void);
 void sub_080095D4(struct Manager *, struct Controller *, struct PackedVec *);
 s32 sub_0822C034(struct Vec *);
 void sub_080095B4(struct Controller *, u32);
-#define DirectionalController_ScriptCreate sub_08009B7C
 s32 DirectionalController_ScriptCreate(void)
 {
     struct PackedVec position;

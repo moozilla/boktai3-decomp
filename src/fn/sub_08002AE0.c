@@ -4,7 +4,6 @@ static inline void copy32(const void *source, void *dest, s32 size)
 {
     CpuSet(source, dest, (size / 4 & 0x1fffff) | 0x04000000);
 }
-#define Palette_BlendRange sub_08002AE0
 void Palette_BlendRange(u16 *dest, const u16 *source, const u16 *target, u32 amount, s32 first,
                         s32 end)
 {

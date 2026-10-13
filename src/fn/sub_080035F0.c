@@ -1,6 +1,5 @@
 #include "palette_controller.h"
 // MATCHING_CONCESSION: register-pinning
-#define Palette_SetBrightnessFromScript sub_080035F0
 extern struct PaletteController *gUnk_02000468;
 s32 sub_0821ABA8(s32, s32);
 s32 Script_SeekToKeyword(s32);

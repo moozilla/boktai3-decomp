@@ -8,7 +8,6 @@ struct S {
     u8 h[0x10];
     u16 cnt;
 };
-void CpuSet(const void *, void *, u32);
 extern u16 gUnk_03004FE0[];
 void sub_0811D16C(u16 *p)
 {

@@ -46,11 +46,10 @@ struct Manager *sub_0800A62C(u32, u32);
 struct Slot *sub_08009E3C(struct Manager *);
 void sub_08219DD8(void *, u32);
 s32 sub_0821ABA8(u32, s32);
-s32 sub_08009E98(struct Manager *, struct Slot *);
+s32 CollisionController_InitSlot(struct Manager *, struct Slot *);
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
 void sub_0821FF24(void *, struct PackedVec *, u32);
-#define CollisionController_ScriptCreate sub_0800A670
 s32 CollisionController_ScriptCreate(void)
 {
     struct PackedVec position;
@@ -76,7 +75,7 @@ s32 CollisionController_ScriptCreate(void)
     p->entered = 1;
     p->delay = 0;
     p->state = 0;
-    sub_08009E98(manager, p);
+    CollisionController_InitSlot(manager, p);
     if (Script_SeekToKeyword('p')) {
         position.x = Script_GetValue();
         position.y = Script_GetValue();

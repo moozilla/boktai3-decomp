@@ -19,7 +19,6 @@ struct Args {
 };
 extern u32 gUnk_02000560[];
 s32 sub_0821AD08(u32, struct Args *);
-#define Trigger_RunScript sub_08006F00
 s32 Trigger_RunScript(struct Trigger *input, u32 scriptInput, s32 eventInput)
 {
     struct Trigger *p = ({

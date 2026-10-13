@@ -63,7 +63,6 @@ static inline u32 frame_factor(u16 v)
     u32 mask = 15;
     return mask & value;
 }
-#define AnimatedHazard_CreateProximity sub_08012858
 int AnimatedHazard_CreateProximity(struct Vec *source, int damage, int delay, int hold)
 {
     u8 *m = sub_08012040();

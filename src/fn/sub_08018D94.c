@@ -12,7 +12,6 @@ void sub_08217060(int, int, int);
 void sub_08217074(int, int);
 void sub_08217084(int);
 void sub_0821A0C0(void *);
-#define BlendTransition_Update sub_08018D94
 int BlendTransition_Update(struct Blend *p)
 {
     int first;

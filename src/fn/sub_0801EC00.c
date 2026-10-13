@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneObjects_HasTypeTwoResource sub_0801EC00
 u8 *sub_0821A2C4(int);
 int SceneObjects_HasTypeTwoResource(int id)
 {

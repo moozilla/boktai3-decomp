@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scrolling_background.h"
-#define ScrollingBackground_Initialize sub_0800266C
 struct Config {
     u8 flags, layer;
     u16 resource;

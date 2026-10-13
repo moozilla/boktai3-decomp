@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define Background_FindMapId sub_08001EB4
 struct MapEntry {
     u32 a;
     u16 id;

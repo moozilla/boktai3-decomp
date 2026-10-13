@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneObjects_Append sub_0801E184
 typedef struct {
     u32 words[2];
 } Vec;

@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneActors_RunStateCallback sub_08021AA8
 void SceneActors_RunStateCallback(u8 *p)
 {
     int tick;

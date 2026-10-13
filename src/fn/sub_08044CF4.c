@@ -1,5 +1,5 @@
 #include "global.h"
-s32 sub_08249274(s32, s32);
+s32 __divsi3(s32, s32);
 s32 sub_08249350(s32, s32);
 u32 sub_08044CF4(const u8 *base, const u8 **source, s32 count, s32 index)
 {
@@ -14,7 +14,7 @@ u32 sub_08044CF4(const u8 *base, const u8 **source, s32 count, s32 index)
         do {
             s32 offset;
             s32 shift;
-            offset = sub_08249274((s32)p, index);
+            offset = __divsi3((s32)p, index);
             shift = sub_08249350((s32)p, index);
             value = base[offset];
             value >>= shift;

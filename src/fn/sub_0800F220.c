@@ -29,8 +29,7 @@ u8 *sub_0821A520(int, int);
 void sub_08215A74(int, int);
 void *Video_GetBackgroundMap(int);
 void sub_082160B8(int, int, void *, int, int, int, int, void *);
-void sub_0800ECD0(Screen *);
-#define StatusScreen_Initialize sub_0800F220
+void StatusScreen_WaitForStart(Screen *);
 int StatusScreen_Initialize(Screen *p, u16 id)
 {
     int i;
@@ -90,7 +89,7 @@ int StatusScreen_Initialize(Screen *p, u16 id)
     *(volatile u16 *)0x04000008 |= 0x40;
     p->delay = sub_0821ABA8('w', 0);
     {
-        register void (*state)(Screen *) asm("r1") = sub_0800ECD0;
+        register void (*state)(Screen *) asm("r1") = StatusScreen_WaitForStart;
         p->state = state;
     }
     p->timer = 0;

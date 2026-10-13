@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneActors_RunSecondEventScript sub_08021B54
 extern u32 gUnk_02000560;
 void sub_0821AD08(int, void *);
 void SceneActors_RunSecondEventScript(u8 *p, s16 *position)

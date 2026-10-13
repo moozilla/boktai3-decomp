@@ -31,10 +31,8 @@ struct Engine {
 extern struct Engine *gUnk_02000484;
 extern u8 gUnk_020000EC;
 void sub_08219DD8(void *, int);
-#define gRfuLinkStatus     gUnk_03006A80
-#define gRfuSlotStatusNI   gUnk_03006A70
-#define rfu_NI_setSendData sub_08246CC8
-#define rfu_clearSlot      sub_08246AAC
+#define gRfuLinkStatus   gUnk_03006A80
+#define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 void sub_08221380(const void *, void *, int);
 int sub_08034310(struct Engine *p)

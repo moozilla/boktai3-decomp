@@ -20,21 +20,20 @@ void sub_082279A8(int, int, int, int, int, int, int);
 void sub_0821AD08(u32, void *);
 void sub_0821A0C0(void *);
 void sub_0822B2F8(int);
-void sub_0800EC0C(Screen *);
-void sub_0800EE5C(Screen *);
+void StatusScreen_FadeAndExit(Screen *);
+void StatusScreen_FadeOutPalette(Screen *);
 void sub_0800EF90(Screen *);
-void sub_0800E838(Screen *);
-int sub_0800E7D8(Screen *);
-void sub_0800EA94(Screen *);
-void sub_0800F0F0(Screen *);
-#define StatusScreen_WaitForReveal sub_0800EBB0
+void StatusScreen_Close(Screen *);
+int StatusScreen_CheckConfirm(Screen *);
+void StatusScreen_WaitForClose(Screen *);
+void StatusScreen_ClearScanlineNoise(Screen *);
 void StatusScreen_WaitForReveal(Screen *p)
 {
-    if (!sub_0800E7D8(p)) {
+    if (!StatusScreen_CheckConfirm(p)) {
         if (p->timer++ >= *(u16 *)((u8 *)p + 0x2B6)) {
-            p->pad2d4 = (u32)sub_0800F0F0;
+            p->pad2d4 = (u32)StatusScreen_ClearScanlineNoise;
             {
-                register void (*state)(Screen *) asm("r1") = sub_0800EA94;
+                register void (*state)(Screen *) asm("r1") = StatusScreen_WaitForClose;
                 asm("" : "+r"(p) : "r"(state));
                 p->state = state;
                 p->timer = 0;

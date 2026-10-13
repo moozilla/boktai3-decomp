@@ -1,16 +1,16 @@
 #include "global.h"
 
 extern u32 gUnk_02000484;
-void sub_0824693C(void);
-void sub_082456E0(void);
-void sub_0824780C(void);
+void rfu_REQ_changeMasterSlave(void);
+void rfu_waitREQComplete(void);
+void rfu_REQ_recvData(void);
 void sub_080359BC(u16 v)
 {
     if (gUnk_02000484 != 0) {
         if (v == 0x27) {
-            sub_0824693C();
-            sub_082456E0();
+            rfu_REQ_changeMasterSlave();
+            rfu_waitREQComplete();
         } else
-            sub_0824780C();
+            rfu_REQ_recvData();
     }
 }

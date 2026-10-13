@@ -1,5 +1,4 @@
 #include "global.h"
-#define Actor_ConfigureFromScript sub_081EA1C0
 // Provisional name: Actor_ConfigureFromScript
 extern u8 *gUnk_020003C8;
 u8 *sub_081EA730(s32, s32);

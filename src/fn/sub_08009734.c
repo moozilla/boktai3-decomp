@@ -28,7 +28,6 @@ static inline s32 facingAllowed(u32 facing, s32 a, s32 b, s32 c)
         return yes;
     return 0;
 }
-#define DirectionalController_CheckApproach sub_08009734
 s32 DirectionalController_CheckApproach(struct Manager *manager, struct Controller *p)
 {
     sub_0800950C(p);

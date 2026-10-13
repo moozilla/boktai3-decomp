@@ -1,6 +1,5 @@
 #include "global.h"
 #include "background_controller.h"
-#define Background_ApplyQueuedCommands sub_080015AC
 void sub_08219574(u32, s32, s32);
 s32 Background_ApplyQueuedCommands(struct Background *p)
 {

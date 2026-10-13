@@ -75,7 +75,6 @@ static inline void resetIdle(struct Manager *manager)
         p += 160;
     } while (--i >= 0);
 }
-#define CollisionController_UpdateAll sub_0800A3A8
 s32 CollisionController_UpdateAll(struct Manager *input)
 {
     struct Manager *manager = input;

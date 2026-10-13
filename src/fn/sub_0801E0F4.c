@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneObject_UpdatePoseC sub_0801E0F4
 typedef struct {
     u32 words[2];
 } Vec;

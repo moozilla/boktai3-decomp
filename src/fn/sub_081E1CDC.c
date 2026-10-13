@@ -1,5 +1,4 @@
 #include "global.h"
-#define SoundTest_DrawThirdCategoryIndex sub_081E1CDC
 // Provisional name: SoundTest_DrawThirdCategoryIndex
 struct Sprite {
     u8 head[8];

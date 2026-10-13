@@ -16,7 +16,6 @@ struct Controller {
     u8 pad7c[12];
     struct Vec hitPosition;
 };
-#define DamageController_AccumulateHit sub_0800C7F4
 void DamageController_AccumulateHit(struct Collider *attack, struct Collider *target,
                                     struct Controller *controller)
 {

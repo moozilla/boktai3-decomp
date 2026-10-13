@@ -5,7 +5,6 @@ extern u16 gUnk_0203B400[];
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
 int Mod(int, int);
-#define Weather_ConfigureCooldown sub_080183A8
 int Weather_ConfigureCooldown(void)
 {
     int base, spread, result;

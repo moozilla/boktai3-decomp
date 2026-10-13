@@ -21,9 +21,8 @@ typedef struct {
     Receiver self;
 } Controller;
 
-#define SceneMessages_Initialize sub_08020C40
 extern Controller *gUnk_0200047C;
-int sub_08020CD4(void *, int, int);
+int SceneMessages_RegisterReceiver(void *, int, int);
 int SceneMessages_Initialize(Controller *p, int id)
 {
     gUnk_0200047C = p;
@@ -37,6 +36,6 @@ int SceneMessages_Initialize(Controller *p, int id)
     p->scriptCount = 0;
     p->unknown6c = 0;
     p->receivers = 0;
-    sub_08020CD4(&p->self, id, 1);
+    SceneMessages_RegisterReceiver(&p->self, id, 1);
     return 0;
 }

@@ -1,18 +1,17 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define SelectionMenu_Choose sub_0801ADC0
 extern u16 gUnk_03005260[];
 int sub_08019F2C(void *);
 void sub_0801AC50(void *);
 void sub_0801AC84(void *);
 int sub_0801ACB8(void *);
 void sub_0822B2F8(int);
-void sub_08019F44(void *, int);
-void sub_0801A01C(void *, int);
+void Presentation_UpdateActorGraphic(void *, int);
+void Presentation_UpdateItemGraphic(void *, int);
 u8 *sub_0822D6C8(int);
 int sub_0822E104(int);
 void sub_0801A8FC(void *);
-void sub_0801A920(void *);
+void SelectionMenu_Back(void *);
 void SelectionMenu_Choose(u8 *p)
 {
     int index;
@@ -45,7 +44,7 @@ void SelectionMenu_Choose(u8 *p)
                     }
                     p[0x1d] = index;
                     sub_0822B2F8(0xdc);
-                    sub_08019F44(p, 0);
+                    Presentation_UpdateActorGraphic(p, 0);
                 }
                 if (gUnk_03005260[1] & 1) {
                     if (*sub_0822D6C8(p[0x1d]) != 255 && ((1 << p[0x1d]) & *(u32 *)(p + 0x34)))
@@ -54,7 +53,7 @@ void SelectionMenu_Choose(u8 *p)
                         sub_0822B2F8(0x192);
                     return;
                 } else if (gUnk_03005260[1] & 2) {
-                    sub_0801A920(p);
+                    SelectionMenu_Back(p);
                     return;
                 }
             }
@@ -90,7 +89,7 @@ void SelectionMenu_Choose(u8 *p)
                         }
                         p[0x1d] = index;
                         sub_0822B2F8(0xdc);
-                        sub_0801A01C(p, 0);
+                        Presentation_UpdateItemGraphic(p, 0);
                     }
                 }
                 if (gUnk_03005260[1] & 1) {
@@ -104,7 +103,7 @@ void SelectionMenu_Choose(u8 *p)
                         sub_0822B2F8(0x192);
                     return;
                 } else if (gUnk_03005260[1] & 2) {
-                    sub_0801A920(p);
+                    SelectionMenu_Back(p);
                     return;
                 }
             }

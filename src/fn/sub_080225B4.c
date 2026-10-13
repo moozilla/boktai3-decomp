@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneActors_AddHealthCost sub_080225B4
 u8 *sub_0802140C(int);
 void sub_08022590(void);
 void SceneActors_AddHealthCost(int amount)

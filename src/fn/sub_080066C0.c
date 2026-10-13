@@ -11,13 +11,13 @@ struct S {
     u16 v;
 };
 s32 sub_08031E34(void *);
-s32 sub_080064C4(void *);
+s32 ChoiceMenu_HandleInput(void *);
 u32 sub_082282A4(u32);
 u32 sub_080066C0(struct S *p)
 {
     if (p->b != 0 && sub_08031E34(p->b) != 0) {
         if (p->a == 0) {
-            if (sub_080064C4(p) == 1)
+            if (ChoiceMenu_HandleInput(p) == 1)
                 return 0;
         } else {
             p->a--;

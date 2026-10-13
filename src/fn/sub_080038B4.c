@@ -1,5 +1,4 @@
 #include "global.h"
-#define ColorFade_ApplyCommand sub_080038B4
 struct Channel {
     u32 mode, color, start, level, target;
     u16 time, shift;

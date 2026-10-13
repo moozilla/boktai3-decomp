@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define ResultTutorial_AnimateLevel sub_0801DB5C
 int ResultTutorial_AnimateLevel(u8 *p)
 {
     switch (p[0xaf]) {

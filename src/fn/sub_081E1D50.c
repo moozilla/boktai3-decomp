@@ -1,5 +1,4 @@
 #include "global.h"
-#define SoundTest_PlaySelection sub_081E1D50
 // Provisional name: SoundTest_PlaySelection
 struct Sprite {
     u8 head[8];

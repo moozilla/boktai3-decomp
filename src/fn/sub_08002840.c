@@ -6,9 +6,9 @@ struct B {
 };
 void *sub_08219FBC(u32, u32);
 void sub_0821A04C(void *, void (*)(void), void (*)(void));
-s32 sub_0800266C(void *, u16, void *);
+s32 ScrollingBackground_Initialize(void *, u16, void *);
 void sub_0821A0C0(void *);
-void sub_08002408(void);
+void ScrollingBackground_Update(void);
 void sub_08002658(void);
 
 void *sub_08002840(u16 a, struct B *b)
@@ -19,8 +19,8 @@ void *sub_08002840(u16 a, struct B *b)
     else
         p = sub_08219FBC(0xb, 0xf8);
     if (p != 0) {
-        sub_0821A04C(p, sub_08002408, sub_08002658);
-        if (sub_0800266C(p, a, b) < 0) {
+        sub_0821A04C(p, ScrollingBackground_Update, sub_08002658);
+        if (ScrollingBackground_Initialize(p, a, b) < 0) {
             sub_0821A0C0(p);
             return 0;
         }

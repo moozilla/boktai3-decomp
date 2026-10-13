@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define Background_QueueCommand sub_080021DC
 #include "background_controller.h"
 extern struct Background *gUnk_02000000[];
 void Background_QueueCommand(u32 layer, u32 type, s32 length, s32 *args)

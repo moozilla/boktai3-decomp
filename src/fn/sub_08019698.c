@@ -1,5 +1,4 @@
 #include "global.h"
-#define TileAnimation_Initialize sub_08019698
 typedef struct {
     u16 id, time;
     u8 active, count, frame, frames, unpaused, dirty, remove, pad;

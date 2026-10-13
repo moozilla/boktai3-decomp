@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneObjects_Unlock sub_0801E740
 void sub_0801EF58(void);
 void SceneObjects_Unlock(u8 *p, u16 id)
 {

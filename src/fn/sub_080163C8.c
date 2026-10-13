@@ -4,7 +4,6 @@ void *sub_08215184(int);
 void *sub_0821A520(int, int);
 void sub_08217E60(void *, void *, int);
 void sub_08220C8C(void *, void *, int, int, int);
-#define FadingParticleManager_Initialize sub_080163C8
 int FadingParticleManager_Initialize(u8 *m)
 {
     int i;

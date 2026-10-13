@@ -1,5 +1,4 @@
 #include "global.h"
-#define ResultMenu_ReadScript sub_0801CF6C
 typedef struct {
     s16 x, y, z, pad;
 } Vec;

@@ -1,5 +1,4 @@
 #include "global.h"
-#define Actor_ProjectAndClampToScreen sub_081E3B6C
 // Provisional name: Actor_ProjectAndClampToScreen
 struct Vec {
     s16 x, y, z;

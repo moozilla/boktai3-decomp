@@ -12,7 +12,7 @@ struct S {
 extern struct S *gUnk_02000050;
 u32 sub_0821A520(u32, u32);
 s32 sub_082151E4(void *, u32);
-void sub_08012070(void *, void *);
+void AnimatedHazard_Initialize(void *, void *);
 
 s32 sub_08012684(struct S *s)
 {
@@ -24,7 +24,7 @@ s32 sub_08012684(struct S *s)
         return -1;
     e = s->e;
     for (i = 7; i >= 0; i--, e++) {
-        sub_08012070(s, e);
+        AnimatedHazard_Initialize(s, e);
     }
     return 0;
 }

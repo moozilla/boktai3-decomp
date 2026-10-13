@@ -11,7 +11,6 @@ struct Manager {
     void *resource;
 };
 void sub_08217EEC(void *, void *, int);
-#define OrbitingParticles_Advance sub_08018840
 void OrbitingParticles_Advance(struct Manager *m, struct Orb *p)
 {
     p->rise += m->speed;

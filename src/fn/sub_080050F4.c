@@ -1,5 +1,4 @@
 #include "global.h"
-#define Scene_UpdateObjectStep sub_080050F4
 struct Vec {
     s16 x, y, z;
 };
@@ -30,10 +29,10 @@ struct Object {
 };
 void sub_0821FF24(void *, void *, s32);
 void sub_0821FE40(void *);
-void sub_08004B64(struct Object *);
-s32 sub_08004CE4(struct Object *, s32, s32);
-void sub_080044CC(struct Object *);
-void sub_08005264(void);
+void Scene_SpawnDirectionalDust(struct Object *);
+s32 Scene_TryStepDown(struct Object *, s32, s32);
+void Scene_PlayNeighborMovementEffect(struct Object *);
+void Scene_UpdateFallingObject(void);
 void sub_080050AC(void);
 void Scene_UpdateObjectStep(struct Object *p)
 {
@@ -52,7 +51,7 @@ void Scene_UpdateObjectStep(struct Object *p)
     sub_0821FF24((u8 *)p + 0x120, (u8 *)p + 0x38, 0);
     sub_0821FE40((u8 *)p + 0x120);
     if (p->type != 1 && !(p->timer & 3))
-        sub_08004B64(p);
+        Scene_SpawnDirectionalDust(p);
     if (++p->timer >= p->duration) {
         s32 height = terrain->height & 15;
         if (height < 15)
@@ -62,7 +61,7 @@ void Scene_UpdateObjectStep(struct Object *p)
         if (p->type == 1) {
             if (p->kind == 2) {
                 {
-                    register void (*callback)(void) asm("r1") = sub_08005264;
+                    register void (*callback)(void) asm("r1") = Scene_UpdateFallingObject;
                     p->update = callback;
                 }
                 p->timer = 0;
@@ -71,8 +70,8 @@ void Scene_UpdateObjectStep(struct Object *p)
                 p->dx = 0;
                 p->dz = 0;
                 p->direction = 0;
-            } else if (!sub_08004CE4(p, p->cell, p->direction)) {
-                sub_080044CC(p);
+            } else if (!Scene_TryStepDown(p, p->cell, p->direction)) {
+                Scene_PlayNeighborMovementEffect(p);
                 {
                     register void (*callback)(void) asm("r1") = sub_080050AC;
                     p->update = callback;
@@ -88,14 +87,14 @@ void Scene_UpdateObjectStep(struct Object *p)
         } else {
             if (p->kind == 2) {
                 {
-                    register void (*callback)(void) asm("r0") = sub_08005264;
+                    register void (*callback)(void) asm("r0") = Scene_UpdateFallingObject;
                     p->update = callback;
                 }
                 p->timer = 0;
                 p->entered = 1;
                 p->kind = 2;
             } else {
-                sub_080044CC(p);
+                Scene_PlayNeighborMovementEffect(p);
                 {
                     register void (*callback)(void) asm("r1") = sub_080050AC;
                     p->update = callback;

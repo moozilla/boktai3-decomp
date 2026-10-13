@@ -1,5 +1,4 @@
 #include "global.h"
-#define SelectionMenu_Close sub_0801B188
 int sub_08019F2C(void *);
 void sub_082279A8(int, int, int, int, int, int, int);
 void sub_0821AD08(int, void *);

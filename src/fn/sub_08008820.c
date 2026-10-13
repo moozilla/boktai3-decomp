@@ -9,8 +9,7 @@ s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 s32 Script_GetPc(void);
 s32 sub_0821ABA8(s32, s32);
-s32 sub_080084F4(struct Vec *, s32, s32, s32, s32, s32, s32, s32 *, s32, s32, s32);
-#define Trigger_CreateContainerFromScript sub_08008820
+s32 Trigger_CreateContainer(struct Vec *, s32, s32, s32, s32, s32, s32, s32 *, s32, s32, s32);
 s32 Trigger_CreateContainerFromScript(void)
 {
     s32 arguments[3];
@@ -55,6 +54,6 @@ s32 Trigger_CreateContainerFromScript(void)
             count++;
         }
     }
-    return sub_080084F4(&position, id, kind, flip, bob, startScript, script, arguments, sound,
-                        hidden, condition);
+    return Trigger_CreateContainer(&position, id, kind, flip, bob, startScript, script, arguments,
+                                   sound, hidden, condition);
 }

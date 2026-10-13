@@ -1,5 +1,4 @@
 #include "global.h"
-#define ResultTutorial_SlideMarkerOut sub_0801D668
 void sub_0801C190(void *);
 int ResultTutorial_SlideMarkerOut(u8 *p)
 {

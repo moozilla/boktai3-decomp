@@ -39,7 +39,7 @@ static inline void setFacing(ActorAnimation *p, int angle)
     value = 7 & shifted;
     p->facing8 = value;
 }
-void sub_0802175C(void *, void *, void *, int, int, int, int);
+void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 void sub_0822B3BC(int);
 int sub_082215E4(int, int);
 extern s16 gUnk_086149C4[];
@@ -75,7 +75,8 @@ void sub_08026398(ActorAnimation *p)
         u32 zero = 0;
         p->changed = zero;
         sequence = choose(p->mode, 62, 24);
-        sub_0802175C(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1, 1, 6);
+        SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1, 1,
+                                              6);
         p->minScale = zero;
         p->maxScale = zero;
         p->variant = 0;

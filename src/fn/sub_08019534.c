@@ -1,5 +1,4 @@
 #include "global.h"
-#define PaletteFrames_Update sub_08019534
 typedef struct {
     u8 pad[24];
     int time, frame;

@@ -33,7 +33,6 @@ static inline void hide(Layer *p)
 {
     p->flags |= 1;
 }
-#define ScanlinePresentation_Update sub_0800DA5C
 int ScanlinePresentation_Update(Controller *p)
 {
     if (p->mode == 0)

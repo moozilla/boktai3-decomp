@@ -1,9 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneObject_UpdateRaising sub_0801F430
 void sub_0822B2F8(int);
 void sub_0822B358(int);
-void sub_0801F580(void);
+void SceneObject_UpdateRaised(void);
 void SceneObject_UpdateRaising(u8 *s)
 {
     *(u16 *)(s + 0x80) += 15;
@@ -19,7 +18,7 @@ void SceneObject_UpdateRaising(u8 *s)
         asm("" ::: "memory");
         (*(u8 **)(s + 0x2c))[4] = ((*(u8 **)(s + 0x2c))[4] & 0xf0) | s[0x3b];
         *(u16 *)(*(u8 **)(s + 0x2c)) |= 1;
-        *(void **)(s + 0x30) = sub_0801F580;
+        *(void **)(s + 0x30) = SceneObject_UpdateRaised;
     }
     {
         int base = *(u16 *)(s + 0x7a);

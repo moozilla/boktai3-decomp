@@ -2,7 +2,7 @@
 struct Config {
     u16 v[20];
 };
-void sub_080154EC(int, void *, struct Config *);
+void AnimatedParticles_Create(int, void *, struct Config *);
 #define AnimatedParticles_EmitFan sub_08015B1C
 void AnimatedParticles_EmitFan(void *pos, int yaw, int yawRange, int count, int type, int flags,
                                int speed, int horizontal, int start, int decay)
@@ -27,5 +27,5 @@ void AnimatedParticles_EmitFan(void *pos, int yaw, int yawRange, int count, int 
     s.v[17] = 0;
     s.v[18] = decay;
     s.v[19] = 0;
-    sub_080154EC(count, pos, &s);
+    AnimatedParticles_Create(count, pos, &s);
 }

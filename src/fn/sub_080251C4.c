@@ -42,12 +42,12 @@ static inline void setFacing(ActorAnimation *p, int angle)
     value = 7 & shifted;
     p->facing8 = value;
 }
-void sub_080217F4(void *, void *, void *, int, int, int, int);
+void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
 void sub_08222330(void *, void *);
 void sub_082222BC(void *, void *, int);
 int sub_08222358(void *, void *);
 void sub_0822B3BC(int);
-int sub_08021EA8(void *);
+int SceneActorGraphics_GetResourceId(void *);
 void sub_08047D24(void *, int, int, int, void *);
 extern u8 *gUnk_030042E4;
 void sub_080251C4(ActorAnimation *p, int tick)
@@ -66,7 +66,8 @@ void sub_080251C4(ActorAnimation *p, int tick)
         }
         {
             register int offset asm("r2") = 0x240;
-            sub_080217F4(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence, 1, 1, 4);
+            SceneActors_StartEightDirectionAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence,
+                                                     1, 1, 4);
         }
         sub_08222330((u8 *)p + 0x30c, (u8 *)p + 0x54);
         sub_082222BC((u8 *)p + 0x30c, (u8 *)p + 0x9c4, *(u16 *)((u8 *)p + 0x354));
@@ -84,7 +85,8 @@ void sub_080251C4(ActorAnimation *p, int tick)
         }
         {
             register int offset asm("r2") = 0x240;
-            sub_080217F4(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence, 1, 1, 1);
+            SceneActors_StartEightDirectionAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence,
+                                                     1, 1, 1);
         }
     }
     if (!p->tryUpdate(p)) {
@@ -92,7 +94,7 @@ void sub_080251C4(ActorAnimation *p, int tick)
         p->flags |= mask;
         if (!p->reset(p)) {
             if (!(tick & 3)) {
-                int id = sub_08021EA8(p2);
+                int id = SceneActorGraphics_GetResourceId(p2);
                 {
                     u8 *data = gUnk_030042E4 + id * 32;
                     sub_08047D24((u8 *)p2 + 0x240, 8, 0x200, 0x9000, data);

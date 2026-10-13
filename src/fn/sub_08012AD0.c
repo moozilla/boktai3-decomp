@@ -10,18 +10,17 @@ struct Particle {
     u8 pad30[60];
     struct Vec velocity;
 };
-void sub_08019C9C(void *);
+void SpritePool_AdvanceAnimation(void *);
 static inline void add(struct Vec *d, struct Vec *v)
 {
     d->x += v->x;
     d->y += v->y;
     d->z += v->z;
 }
-#define Debris_Update sub_08012AD0
 int Debris_Update(void *unused, struct Particle *p)
 {
     struct Vec *v = &p->velocity;
-    sub_08019C9C(p);
+    SpritePool_AdvanceAnimation(p);
     v->y -= 3;
     add(&p->position, v);
     if (p->timer > 14) {

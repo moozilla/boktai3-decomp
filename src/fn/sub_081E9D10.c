@@ -60,7 +60,7 @@ void sub_08215284(void *, s32);
 void sub_0822B2F8(s32);
 void sub_0821AD08(void *, s32);
 void sub_08013424(void *);
-void sub_081E34D0(void *);
+void ActorPalette_BeginFade(void *);
 extern s32 gUnk_03005260;
 extern u8 gUnk_03005430[];
 void sub_081E43E8(void *);
@@ -75,12 +75,12 @@ struct Child {
     u16 effect;
     u8 rest[10];
 };
-void sub_081E3C60(void *, void *);
+void Actor_TryInteraction(void *, void *);
 void sub_081E5608(void *, void *);
-void sub_081E3F38(void *);
+void Actor_SelectNearestInteraction(void *);
 extern void (*const gUnk_08613D70[])(void *);
 void sub_081E9D10(struct S *p)
 {
-    sub_081E3F38(p);
+    Actor_SelectNearestInteraction(p);
     gUnk_08613D70[p->mode](p);
 }

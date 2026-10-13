@@ -40,7 +40,7 @@ static inline void setFacing(ActorAnimation *p, int angle)
     value = 7 & shifted;
     p->facing8 = value;
 }
-void sub_080217F4(void *, void *, void *, int, int, int, int);
+void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
 void sub_08024E18(ActorAnimation *p)
 {
     if (!p->locked)
@@ -56,7 +56,8 @@ void sub_08024E18(ActorAnimation *p)
             if (test)
                 sequence = 0;
         }
-        sub_080217F4(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1, 1, 4);
+        SceneActors_StartEightDirectionAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1,
+                                                 1, 4);
     } else {
         int sequence;
         {
@@ -65,7 +66,8 @@ void sub_08024E18(ActorAnimation *p)
             if (test)
                 sequence = 0;
         }
-        sub_080217F4(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1, 1, 1);
+        SceneActors_StartEightDirectionAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1,
+                                                 1, 1);
     }
     if (!p->tryUpdate(p)) {
         u32 mask = 0x40;

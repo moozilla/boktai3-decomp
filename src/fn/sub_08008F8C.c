@@ -42,7 +42,6 @@ static inline u8 sameRegion(s32 region)
         return 1;
     return 0;
 }
-#define Breakable_UpdateAll sub_08008F8C
 s32 Breakable_UpdateAll(struct Manager *manager)
 {
     struct Slot *slot = manager->slots;

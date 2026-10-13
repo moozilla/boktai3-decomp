@@ -69,7 +69,7 @@ s32 sub_082151E4(void *, u32);
 void sub_082144A4(void *, void *, u32);
 void sub_08215284(void *, u32);
 void sub_08220C8C(void *, void *, u32, u32, u32);
-void sub_08013930(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32);
+void ScaledShadow_Initialize(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32);
 s32 sub_0800CBE0(void *, void *);
 static inline s32 cellIndex(struct Vec *pos)
 {
@@ -85,7 +85,6 @@ static inline struct Cell *getCell(s32 index)
         return (struct Cell *)(dynamic + 4);
     return (struct Cell *)(gUnk_030052F4->cells + 12 + index * 4);
 }
-#define FallingObject_Create sub_0800CC98
 s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, u32 health,
                          u32 power, u32 force, struct Vec *position)
 {
@@ -224,7 +223,7 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
     }
     if (p->animated)
         sub_08220C8C(&p->anim, gUnk_0200046C->animation, 3, 0, 0);
-    sub_08013930(p->effect, pos, 80, 7, 107, 107, 3200, 1, 5, 1, 0);
+    ScaledShadow_Initialize(p->effect, pos, 80, 7, 107, 107, 3200, 1, 5, 1, 0);
     p->effectActive = 1;
     p->remove = 0;
     p->previous = 0;

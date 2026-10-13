@@ -5,7 +5,7 @@ struct A {
     u8 f[0xaf];
     u8 a;
 };
-void sub_08021AA8(void *);
+void SceneActors_RunStateCallback(void *);
 
 void sub_0817F41C(struct A *p)
 {
@@ -13,5 +13,5 @@ void sub_0817F41C(struct A *p)
     p->a = 0;
     m = 4;
     if ((m & gUnk_02000560) == 0)
-        sub_08021AA8(p);
+        SceneActors_RunStateCallback(p);
 }

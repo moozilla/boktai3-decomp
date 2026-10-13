@@ -59,7 +59,6 @@ extern void (*gUnk_08604A54[])(void *, u32);
 s32 sub_082215E4(s32, s32);
 void sub_08220C8C(void *, void *, u32, u32, u32);
 void sub_0822B3BC(u32);
-#define EffectParticle_UpdateHoming sub_0800BE24
 void EffectParticle_UpdateHoming(struct Manager *manager, struct Effect *effect, s32 index,
                                  s32 phase, u32 phaseMask, struct Context *context)
 {

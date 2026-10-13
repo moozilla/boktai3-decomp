@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneObjects_TryPushNeighbor sub_08004E8C
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -35,7 +34,7 @@ extern struct Manager *gUnk_02000024;
 extern struct Map *gUnk_030052F4;
 extern u32 gUnk_030052F8, gUnk_030052FC;
 u8 *sub_0821D64C(s32, s32);
-s32 sub_08004CE4(struct Object *, s32, s32);
+s32 Scene_TryStepDown(struct Object *, s32, s32);
 void sub_080045B0(u8);
 static inline s32 cellIndex(struct Vec *pos)
 {
@@ -98,7 +97,7 @@ s32 SceneObjects_TryPushNeighbor(struct Vec *position, s32 direction)
             continue;
         if (p->limited && !p->remaining)
             break;
-        result = sub_08004CE4(p, p->cell, direction);
+        result = Scene_TryStepDown(p, p->cell, direction);
         if (result > 0) {
             sub_080045B0(p->type);
             if (p->type == 1)

@@ -31,7 +31,6 @@ static inline int project(int input)
         v = -((-v) >> 5);
     return v;
 }
-#define FloatingEffect_Project sub_080168B8
 void FloatingEffect_Project(struct Effect *p)
 {
     struct Sprite *s = &p->sprite;

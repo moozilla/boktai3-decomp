@@ -1,5 +1,4 @@
 #include "global.h"
-#define ResultMenu_Update sub_0801CF30
 int sub_0822C220(void);
 void sub_0824923C(void *, void *);
 void sub_0801C24C(void *);

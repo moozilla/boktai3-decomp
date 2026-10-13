@@ -1,5 +1,4 @@
 #include "global.h"
-#define ActorPalette_UpdateReverseFade sub_081E394C
 // Provisional name: ActorPalette_UpdateReverseFade
 // MATCHING_CONCESSION: register-pinning
 struct PaletteController {

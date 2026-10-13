@@ -1,5 +1,4 @@
 #include "global.h"
-#define SelectionMenu_PopulateItems sub_0801A814
 typedef struct {
     signed x : 16;
     signed y : 16;
@@ -16,7 +15,7 @@ typedef struct {
     void *colors;
     u8 tail[20];
 } Graphic;
-void sub_08019ECC(u8 *, Graphic *, int);
+void Presentation_SetItemGraphic(u8 *, Graphic *, int);
 void *sub_08019E58(int);
 void sub_0821980C(void *, void *, int, int);
 void SelectionMenu_PopulateItems(u8 *p)
@@ -27,7 +26,7 @@ void SelectionMenu_PopulateItems(u8 *p)
     for (i = 0; i < 16; i++, g++) {
         v.x = (i & 3) * 24 + 144;
         v.y = (i >> 2) * 24 + 32;
-        sub_08019ECC(p, g, i);
+        Presentation_SetItemGraphic(p, g, i);
         g->position = v;
         if ((1 << i) & *(u32 *)(p + 0x34)) {
             g->palette = 0x373;

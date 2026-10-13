@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define ResultGame_TrackTarget sub_0801C874
 extern u8 gUnk_0824DB8A[], gUnk_0824DB7A[];
 void sub_0801C16C(void *);
 void sub_0801C17C(void *);
@@ -8,10 +7,10 @@ void sub_0801C1A0(void *);
 void sub_0801C190(void *);
 void sub_0822B2F8(int);
 void sub_0822B358(int);
-void sub_0801C6CC(void *);
-void sub_0801C760(void *);
+void ResultGame_UpdatePlayerMarker(void *);
+void ResultGame_ScoreAlignment(void *);
 void sub_0801C69C(void *, void *);
-void sub_0801CC24(void *);
+void ResultGame_TimedPress(void *);
 #define I(o) (*(int *)(p + (o)))
 #define H(o) (*(s16 *)(p + (o)))
 void ResultGame_TrackTarget(u8 *p)
@@ -56,35 +55,35 @@ void ResultGame_TrackTarget(u8 *p)
             break;
         case 2:
             I(0x9c) += speed;
-            sub_0801C6CC(p);
+            ResultGame_UpdatePlayerMarker(p);
             if ((H(0xa8) & 15) == 0)
-                sub_0801C760(p);
+                ResultGame_ScoreAlignment(p);
             if (I(0x9c) >= I(0x98)) {
                 ++p[0xaf];
                 H(0xaa) = 30;
             }
             break;
         case 3:
-            sub_0801C6CC(p);
+            ResultGame_UpdatePlayerMarker(p);
             if ((H(0xa8) & 15) == 0)
-                sub_0801C760(p);
+                ResultGame_ScoreAlignment(p);
             if (H(0xaa) <= 0)
                 ++p[0xaf];
             break;
         case 4:
             I(0x9c) -= speed;
-            sub_0801C6CC(p);
+            ResultGame_UpdatePlayerMarker(p);
             if ((H(0xa8) & 15) == 0)
-                sub_0801C760(p);
+                ResultGame_ScoreAlignment(p);
             if (I(0x9c) <= I(0x94)) {
                 ++p[0xaf];
                 H(0xaa) = 10;
             }
             break;
         case 5:
-            sub_0801C6CC(p);
+            ResultGame_UpdatePlayerMarker(p);
             if ((H(0xa8) & 15) == 0)
-                sub_0801C760(p);
+                ResultGame_ScoreAlignment(p);
             if (H(0xaa) <= 0)
                 p[0xaf] = 2;
             break;
@@ -92,7 +91,7 @@ void ResultGame_TrackTarget(u8 *p)
             I(0x8c) -= 176;
             if (I(0x8c) <= 0) {
                 I(0x8c) = 0;
-                sub_0801C69C(p, sub_0801CC24);
+                sub_0801C69C(p, ResultGame_TimedPress);
                 if (p[0xc4] == 1)
                     p[0xc4] = 2;
             }

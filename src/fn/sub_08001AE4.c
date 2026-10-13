@@ -1,7 +1,6 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #include "background_controller.h"
-#define Background_Initialize sub_08001AE4
 struct Config {
     u8 flags, layer;
     u16 resource;

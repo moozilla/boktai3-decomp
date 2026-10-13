@@ -1,14 +1,10 @@
 /* Derived from pret/agbcc da598c1d918402c42c0c0d7128ba14567f3175e9,
  * libgcc/fp-bit-base.c (fp configuration). See docs/LIBGCC.md.
  * Original FSF license and linking exceptions are retained below. */
-#define __pack_f sub_0824A2F4
-#define __unpack_f sub_0824A3AC
-#define __fpadd_parts_fp sub_0824A428
 #define __addsf3 sub_0824A5A4
 #define __subsf3 sub_0824A5D0
 #define __mulsf3 sub_0824A604
 #define __divsf3 sub_0824A768
-#define __fpcmp_parts_f sub_0824A854
 #define __cmpsf2 sub_0824A938
 #define __eqsf2 sub_0824A960
 #define __nesf2 sub_0824A9A8
@@ -19,7 +15,6 @@
 #define __floatsisf sub_0824AB10
 #define __fixsfsi sub_0824AB70
 #define __negsf2 sub_0824ABD8
-#define __make_fp sub_0824ABFC
 #define __extendsfdf2 sub_0824AC14
 // COMPILER: old_agbcc
 // CFLAGS: -O2

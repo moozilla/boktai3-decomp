@@ -7,7 +7,7 @@ struct BF {
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 u32 sub_0821ABA8(u32, u32);
-u32 sub_0800899C(struct BF *, u32, u32);
+u32 Trigger_MoveDropsByItem(struct BF *, u32, u32);
 
 u32 sub_08008A00(void)
 {
@@ -19,5 +19,5 @@ u32 sub_08008A00(void)
         bf.b = Script_GetValue();
         bf.c = Script_GetValue();
     }
-    return sub_0800899C(&bf, x, y);
+    return Trigger_MoveDropsByItem(&bf, x, y);
 }

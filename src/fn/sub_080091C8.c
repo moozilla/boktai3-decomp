@@ -91,7 +91,6 @@ static inline s32 groundHeight(struct Vec *position)
     return height;
 }
 
-#define Breakable_ScriptCreate sub_080091C8
 s32 Breakable_ScriptCreate(void)
 {
     struct Vec position;

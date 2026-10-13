@@ -42,7 +42,7 @@ static inline void setFacing(ActorAnimation *p, int angle)
     value = 7 & shifted;
     p->facing8 = value;
 }
-void sub_0802175C(void *, void *, void *, int, int, int, int);
+void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 void sub_0822B3BC(int);
 int sub_082215E4(int, int);
 extern s16 gUnk_086149C4[];
@@ -59,7 +59,7 @@ static inline int trunc12(int x)
 {
     return x >= 0 ? x >> 12 : -(-x >> 12);
 }
-int sub_08021EA8(void *);
+int SceneActorGraphics_GetResourceId(void *);
 void sub_08047D24(void *, int, int, int, void *);
 extern u8 *gUnk_030042E4;
 typedef struct {
@@ -74,7 +74,8 @@ void sub_08025550(ActorAnimation *p, int tick)
         int sequence;
         p->changed = 0;
         sequence = choose(p->mode, 52, 14);
-        sub_0802175C(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 2, 3, 4);
+        SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 2, 3,
+                                              4);
         sub_0822B3BC(842);
     }
     {
@@ -99,7 +100,7 @@ void sub_08025550(ActorAnimation *p, int tick)
         return;
     if (!(tick & 3)) {
         if (!p2->type) {
-            int id = sub_08021EA8(p2);
+            int id = SceneActorGraphics_GetResourceId(p2);
             u8 *data = gUnk_030042E4 + id * 32;
             {
                 register int offset asm("r4") = 0x240;

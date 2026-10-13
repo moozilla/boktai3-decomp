@@ -3,7 +3,6 @@ static inline void copy32(const void *source, void *dest, s32 size)
 {
     CpuSet(source, dest, (size / 4 & 0x1fffff) | 0x04000000);
 }
-#define Palette_ScaleRange sub_08002BA0
 void Palette_ScaleRange(u16 *dest, const u16 *source, u32 brightness, s32 first, s32 end)
 {
     s32 count;

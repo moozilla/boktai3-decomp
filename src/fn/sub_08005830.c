@@ -1,6 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#define SceneObjects_CreateObject sub_08005830
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -82,7 +81,7 @@ void sub_082144A4(struct Draw *, struct Animation *, s32);
 void sub_08225AB4(struct Body *, u32, struct Vec *, s32, s32, struct Object *);
 void sub_08225B28(struct Body *, struct Draw *);
 u32 sub_0822C034(struct Vec *);
-void sub_0800542C(void), sub_080050AC(void);
+void Scene_UpdateObjectFlash(void), sub_080050AC(void);
 u8 *sub_0821D64C(s32, s32);
 u32 sub_0821D698(void *, u32, u32, u32, u32, u32);
 void sub_0821FEB4(struct Collider *, u16, u32, s32, s32, struct Size *, struct Size *);
@@ -90,7 +89,7 @@ void sub_0821FF24(struct Collider *, struct Vec *, s32);
 void sub_0821FF84(struct Collider *, void (*)(void), struct Object *);
 void sub_0821FE40(struct Collider *);
 void sub_0821FF50(struct Collider *, s32, s32);
-void sub_080045E8(void), sub_080046EC(void);
+void Scene_ApplyTerrainInteraction(void), sub_080046EC(void);
 s32 Mod(s32, s32);
 void sub_08215284(struct Animation *, u16);
 s32 sub_08003C00(struct Body *);
@@ -156,7 +155,7 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct Vec *position,
     p->direction = 0;
     if (flags16(p, 4)) {
         {
-            register void (*callback)(void) asm("r0") = sub_0800542C;
+            register void (*callback)(void) asm("r0") = Scene_UpdateObjectFlash;
             asm("" : "+r"(callback));
             p->update = callback;
         }
@@ -208,7 +207,7 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct Vec *position,
     offset.z = 0;
     sub_0821FEB4(&p->collider, p->body.id, 0x4041, 0, 16, &size, &offset);
     sub_0821FF24(&p->collider, pos, 0);
-    sub_0821FF84(&p->collider, sub_080045E8, p);
+    sub_0821FF84(&p->collider, Scene_ApplyTerrainInteraction, p);
     sub_0821FE40(&p->collider);
     ((u16 *)&size)[0] = 128;
     ((u16 *)&size)[1] = 128;

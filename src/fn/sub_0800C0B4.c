@@ -42,7 +42,6 @@ struct Manager {
     struct Graphics *graphics;
 };
 void sub_0800A80C(struct Manager *, struct Effect *);
-#define EffectParticle_UpdateFinish sub_0800C0B4
 void EffectParticle_UpdateFinish(struct Manager *manager, struct Effect *effect, s32 index)
 {
     struct Particle *p = &effect->particles[index];

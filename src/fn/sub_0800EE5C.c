@@ -21,12 +21,11 @@ void sub_082279A8(int, int, int, int, int, int, int);
 void sub_0821AD08(u32, void *);
 void sub_0821A0C0(void *);
 void sub_0822B2F8(int);
-void sub_0800EC0C(Screen *);
-void sub_0800EE5C(Screen *);
+void StatusScreen_FadeAndExit(Screen *);
+void StatusScreen_FadeOutPalette(Screen *);
 void sub_0800EF90(Screen *);
-void sub_0800E838(Screen *);
+void StatusScreen_Close(Screen *);
 
-#define StatusScreen_FadeOutPalette sub_0800EE5C
 void StatusScreen_FadeOutPalette(Screen *p)
 {
     int other, red, green, blue, base, bank, i;

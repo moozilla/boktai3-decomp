@@ -25,8 +25,7 @@ int Script_GetPc(void);
 int Script_GetValue(void);
 int sub_082151E4(void *, int);
 void sub_08215284(void *, int);
-void sub_08011890(void *, void *);
-#define SceneIndicators_Initialize sub_08011AD0
+void SceneIndicator_Initialize(void *, void *);
 int SceneIndicators_Initialize(struct Controller *m)
 {
     int i;
@@ -70,7 +69,7 @@ int SceneIndicators_Initialize(struct Controller *m)
     {
         u8 *p = first;
         for (i = 15; i >= 0; i--, p += 180)
-            sub_08011890(m, p);
+            SceneIndicator_Initialize(m, p);
     }
     if (gUnk_02000580) {
         int x = *(s16 *)(gUnk_02000580 + 0x30) >> 8, y = *(s16 *)(gUnk_02000580 + 0x34) >> 8, tile;

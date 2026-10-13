@@ -1,5 +1,4 @@
 #include "global.h"
-#define Background_LoadMapFromScript sub_08002024
 struct Resource {
     u32 header[3], maps, tiles, extra;
 };
@@ -8,7 +7,7 @@ s32 Script_SeekToKeyword(s32);
 u8 *Script_GetPc(void);
 s32 sub_0821AA00(u8 *);
 u8 *sub_08216E54(u16);
-s32 sub_08001EB4(struct Resource *, u16);
+s32 Background_FindMapId(struct Resource *, u16);
 void sub_082164AC(u16, void *, u16);
 s32 Background_LoadMapFromScript(void)
 {
@@ -33,7 +32,7 @@ s32 Background_LoadMapFromScript(void)
         Script_SeekToKeyword('c')) {
         u8 *p = Script_GetPc();
         if (p)
-            index = (u16)sub_08001EB4(&resource, sub_0821AA00(p));
+            index = (u16)Background_FindMapId(&resource, sub_0821AA00(p));
     }
     sub_082164AC(layer, base, index);
     return index;

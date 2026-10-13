@@ -12,8 +12,7 @@ struct Manager {
 extern u32 gUnk_0300523C;
 void sub_08014330(struct Manager *, struct Group *);
 void sub_0801404C(struct Manager *, struct Group *);
-void sub_08013F98(struct Manager *, struct Group *);
-#define ParticleManager_Update sub_08014498
+void ParticleGroup_Update(struct Manager *, struct Group *);
 int ParticleManager_Update(struct Manager *m)
 {
     struct Group *g;
@@ -31,7 +30,7 @@ int ParticleManager_Update(struct Manager *m)
                 if (g->type <= 8)
                     sub_0801404C(m, g);
                 else
-                    sub_08013F98(m, g);
+                    ParticleGroup_Update(m, g);
             }
         }
     }

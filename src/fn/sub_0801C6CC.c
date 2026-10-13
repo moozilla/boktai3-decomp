@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define ResultGame_UpdatePlayerMarker sub_0801C6CC
 extern u16 gUnknown_03005260[];
 extern int gUnk_0824DB38[];
 extern u8 gUnk_0824DB64[], gUnk_0824DB6F[];

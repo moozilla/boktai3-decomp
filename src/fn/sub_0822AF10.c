@@ -4,7 +4,7 @@ extern u16 gUnk_03005470[];
 void m4aSongNumStartOrContinue(u16);
 void m4aSongNumStart(u16);
 void m4aSongNumStop(u16);
-void sub_082300DC(struct MusicPlayerInfo *);
+void m4aMPlayImmInit(struct MusicPlayerInfo *);
 void m4aMPlayFadeIn(struct MusicPlayerInfo *, u16);
 void m4aMPlayFadeOut(struct MusicPlayerInfo *, u16);
 void m4aMPlayFadeOutTemporarily(struct MusicPlayerInfo *, u16);

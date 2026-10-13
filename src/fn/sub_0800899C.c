@@ -47,15 +47,14 @@ struct Manager *sub_08008270(void);
 void *sub_08219C40(u32);
 void sub_08219DD8(void *, u32);
 void sub_08219D38(void *);
-void sub_08007444(void *, struct Trigger *);
+void Trigger_UpdateFalling(void *, struct Trigger *);
 void sub_08217DE0(struct Sprite *, struct Graphics *, u32);
 void sub_08217EC4(struct Sprite *, s32, s32);
 s32 sub_0821D6F4(struct Vec *, s32);
 s32 sub_0822C034(struct Vec *, s32);
-void sub_08013930(void *, struct Vec *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+void ScaledShadow_Initialize(void *, struct Vec *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void sub_08006FAC(struct Trigger *);
 void sub_080077C4(void *, struct Trigger *);
-#define Trigger_MoveDropsByItem sub_0800899C
 s32 Trigger_MoveDropsByItem(struct Vec *position, s32 id, s32 kind)
 {
     struct Manager *manager = sub_08008270();

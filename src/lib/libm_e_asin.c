@@ -6,7 +6,6 @@
 /* Adapted from newlib 1.8.2 e_asin.c; see docs/LIBM.md. */
 // COMPILER: old_agbcc
 // CFLAGS: -O2 -fno-builtin
-#define __ieee754_asin sub_0824BA04
 #include "libm_compat.h"
 
 #define one (1.00000000000000000000e+00)

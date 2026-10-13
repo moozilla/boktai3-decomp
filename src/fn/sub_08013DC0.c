@@ -5,8 +5,7 @@ struct Packed {
 int sub_0821ABA8(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
-int sub_08013D3C(int, int, void *);
-#define ShadowRegistry_CreateFromScript sub_08013DC0
+int ShadowRegistry_Create(int, int, void *);
 int ShadowRegistry_CreateFromScript(void)
 {
     struct Packed pos;
@@ -19,7 +18,7 @@ int ShadowRegistry_CreateFromScript(void)
         pos.x = Script_GetValue();
         pos.y = Script_GetValue();
         pos.z = Script_GetValue();
-        result = sub_08013D3C(id, mode, &pos);
+        result = ShadowRegistry_Create(id, mode, &pos);
     }
     return result;
 }

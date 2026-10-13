@@ -21,7 +21,6 @@ typedef struct {
     Receiver self;
 } Controller;
 
-#define SceneMessages_ScriptStart sub_08020DF0
 extern Controller *gUnk_0200047C;
 int sub_0821ABA8(int, int);
 int Script_SeekToKeyword(int);

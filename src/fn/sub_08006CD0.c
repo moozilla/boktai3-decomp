@@ -32,7 +32,7 @@ void sub_0821A04C(void *, void (*)(void), void (*)(void));
 void sub_080066C0(void);
 void sub_08006710(void);
 void sub_0821A0C0(void *);
-s32 sub_08006B60(struct Menu *, void *, s32, s32 *);
+s32 ChoiceMenu_Initialize(struct Menu *, void *, s32, s32 *);
 struct Menu *ChoiceMenu_Create(void *window, s32 stringBase, void *callback, s32 *options)
 {
     struct Menu *p;
@@ -43,7 +43,7 @@ struct Menu *ChoiceMenu_Create(void *window, s32 stringBase, void *callback, s32
         sub_0821A04C(p, sub_080066C0, sub_08006710);
         p->useScript = 0;
         p->callback = callback;
-        if (sub_08006B60(p, window, stringBase, options) < 0) {
+        if (ChoiceMenu_Initialize(p, window, stringBase, options) < 0) {
             sub_0821A0C0(p);
             return 0;
         }

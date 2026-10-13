@@ -7,7 +7,6 @@ struct Sprite {
     u8 pad[28];
     struct Vec position;
 };
-#define BreakableBarrier_SetPosition sub_08012D3C
 struct Sprite *BreakableBarrier_SetPosition(struct Sprite *input, struct Vec *position,
                                             int orientation)
 {

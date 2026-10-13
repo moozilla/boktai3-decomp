@@ -1,9 +1,8 @@
 #include "global.h"
-#define SceneObjects_ScriptPromote sub_0801EA70
 u8 *sub_0821A2C4(int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
-void sub_0801EFDC(void);
+void SceneObject_AnimateActive(void);
 void SceneObjects_ScriptPromote(void)
 {
     u8 *p = sub_0821A2C4(0x85e6);
@@ -35,7 +34,7 @@ void SceneObjects_ScriptPromote(void)
                 }
                 p[0x1c]++;
                 s[0x37] = two;
-                *(void **)(s + 0x30) = sub_0801EFDC;
+                *(void **)(s + 0x30) = SceneObject_AnimateActive;
                 s[0x39] = zero;
                 s[0x3a] = zero;
             }

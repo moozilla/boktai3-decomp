@@ -1,5 +1,4 @@
 #include "global.h"
-#define SelectionMenu_HandleHorizontalInput sub_0801A1A4
 extern u16 gUnk_03005260[];
 void sub_0821980C(u8 *, u8 *, int, int);
 void sub_0822B2F8(int);

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneObjects_ScriptAppend sub_0801E3E4
 typedef struct {
     s16 x, y, z, pad;
 } Vec;
@@ -9,7 +8,7 @@ int sub_0821ABA8(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
 void sub_0821E4D4(u16, void *);
-int sub_0801E184(void *, u16, void *, int, u8, u8, u8, int, int, int, int, void *, u8, int);
+int SceneObjects_Append(void *, u16, void *, int, u8, u8, u8, int, int, int, int, void *, u8, int);
 int SceneObjects_ScriptAppend(void)
 {
     int data[4];
@@ -62,6 +61,6 @@ int SceneObjects_ScriptAppend(void)
             position.z = found;
         }
     }
-    return sub_0801E184(p, id, &position, value, kind, variant, orientation, type, field88, flags,
-                        field41, data, field44, field45);
+    return SceneObjects_Append(p, id, &position, value, kind, variant, orientation, type, field88,
+                               flags, field41, data, field44, field45);
 }

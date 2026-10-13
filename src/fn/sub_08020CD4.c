@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneMessages_RegisterReceiver sub_08020CD4
 extern void *gUnk_0200047C;
 int sub_08020990(void *, void *);
 int SceneMessages_RegisterReceiver(u8 *p, int id, int kind)

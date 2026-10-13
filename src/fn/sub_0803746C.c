@@ -40,7 +40,6 @@ void sub_08219EBC(void *, const void *, int);
 void sub_08036CF0(const u8 *, u8 *, int);
 void *sub_08037DCC(int);
 void sub_08033924(int, int);
-void CpuSet(const void *, void *, u32);
 void sub_0803746C(void *owner, struct PeerPanel *p)
 {
     u8 *drawing;

@@ -21,7 +21,6 @@ gXcmdTable = gUnk_08250284;
 gMPlayTable = gUnk_082643EC;
 
 /* libgcc/AGB SDK helpers emitted by the compiler */
-__divsi3 = sub_08249274;
 _call_via_r1 = sub_0824923C;
 _call_via_r2 = sub_08249240;
 /* agbcc libgcc/lib1thumb.asm call_via r4: bx r4; nop (ROM 08249248). */
@@ -43,23 +42,10 @@ gMPlayMemAccArea = 0x030069E0;
 SoundMainRAM = gUnk_0822F249;       /* ARM routine in ROM, copied to IWRAM (bit 0 cleared by the caller) */
 
 /* Fully linked newlib math calls verify these libgcc helper aliases; docs/LIBM.md. */
-__subdf3 = sub_08249A14;
-__negdf2 = sub_0824A260;
-__floatsidf = sub_0824A170;
-__muldf3 = sub_08249A4C;
-__adddf3 = sub_082499E4;
-__fixdfsi = sub_0824A1EC;
-__gedf2 = sub_0824A08C;
 /* Exact libgcc source unit identifies comparison helper; docs/LIBGCC.md. */
-__ltdf2 = sub_0824A0D8;
-__ledf2 = sub_0824A124;
 /* Exact old_agbcc libgcc2 source and lib1thumb division identify these helpers. */
 __fixunsdfsi = sub_0824930C;
 __udivsi3 = sub_08249420;
-__eqdf2 = sub_08249FA8;
-__gtdf2 = sub_0824A040;
-__divdf3 = sub_08249CF4;
-__nedf2 = sub_08249FF4;
 
 /* agbcc indirect-call helper: original 08249244 is bx r3; nop. */
 _call_via_r3 = sub_08249244;

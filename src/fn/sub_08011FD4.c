@@ -23,7 +23,6 @@ static inline void setFrame(struct Sprite *s, int frame)
 void *sub_08011884(void);
 struct Indicator *sub_08011C6C(void *, int);
 int sub_0821ABA8(int, int);
-#define SceneIndicator_Resume sub_08011FD4
 int SceneIndicator_Resume(void)
 {
     void *m = sub_08011884();

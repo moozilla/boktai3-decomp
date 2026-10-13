@@ -1,5 +1,4 @@
 #include "global.h"
-#define TileAnimation_Update sub_08019628
 typedef struct {
     u16 id, time;
     u8 active, count, frame, frames, unpaused, dirty, remove, pad;
@@ -11,7 +10,7 @@ typedef struct {
     void *tiles;
 } Manager;
 extern int gUnk_0300523C;
-void sub_080195E8(Manager *, Channel *);
+void TileAnimation_Advance(Manager *, Channel *);
 int TileAnimation_Update(Manager *p)
 {
     Channel *q = p->channels;
@@ -22,7 +21,7 @@ int TileAnimation_Update(Manager *p)
                 q->active = 0;
                 q->remove = 0;
             } else if (q->unpaused || !gUnk_0300523C)
-                sub_080195E8(p, q);
+                TileAnimation_Advance(p, q);
         }
         i--;
         q++;

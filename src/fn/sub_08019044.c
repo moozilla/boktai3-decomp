@@ -10,14 +10,13 @@ struct Circle {
 };
 extern void *gUnk_03004278, *gUnk_03003A00;
 extern u16 gUnk_03004270, gUnk_03004274;
-void sub_08018F38(void *, int);
+void CircleWindow_GenerateScanlines(void *, int);
 void sub_0821A0C0(void *);
-#define CircleWindow_Update sub_08019044
 int CircleWindow_Update(struct Circle *p)
 {
     p->x = 120;
     p->y = 80;
-    sub_08018F38(p, 1 - p->bank);
+    CircleWindow_GenerateScanlines(p, 1 - p->bank);
     gUnk_03004278 = p->rows[p->bank];
     gUnk_03003A00 = (void *)0x04000040;
     gUnk_03004270 = 1;

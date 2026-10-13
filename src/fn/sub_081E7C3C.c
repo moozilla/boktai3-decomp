@@ -57,7 +57,7 @@ static inline u32 frame_factor(u16 v)
 }
 void sub_0821AD08(void *, s32);
 void sub_08013424(void *);
-void sub_081E34D0(void *);
+void ActorPalette_BeginFade(void *);
 void sub_081E7C3C(struct S *p)
 {
     struct Obj *o;

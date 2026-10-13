@@ -6,7 +6,6 @@ typedef struct {
     u8 tail[60];
 } Graphic;
 
-#define SelectionMenu_PositionEquipmentMarkers sub_0801A5A8
 extern u8 *gUnk_02000710;
 void SelectionMenu_PositionEquipmentMarkers(u8 *p)
 {

@@ -39,7 +39,7 @@ static inline void setFacing(ActorAnimation *p, int angle)
     value = 7 & shifted;
     p->facing8 = value;
 }
-void sub_0802175C(void *, void *, void *, int, int, int, int);
+void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 void sub_0822B3BC(int);
 int sub_082215E4(int, int);
 extern s16 gUnk_086149C4[];
@@ -78,7 +78,8 @@ void sub_08027BF0(ActorAnimation *p, int time)
         }
         {
             int offset = 0x240;
-            sub_0802175C(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence, one, one, 4);
+            SceneActors_StartDirectionalAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence,
+                                                  one, one, 4);
         }
         *(Point *)((u8 *)p + 0xd0) = *(Point *)(position + 12);
     }

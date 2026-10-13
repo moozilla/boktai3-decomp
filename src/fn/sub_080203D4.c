@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneObjects_Destroy sub_080203D4
 void sub_0821D6D0(void *);
 void sub_08219D38(void *);
 void sub_08214514(void *);

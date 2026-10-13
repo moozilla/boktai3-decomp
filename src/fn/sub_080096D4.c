@@ -9,7 +9,6 @@ struct Args {
     s32 *values;
 };
 void sub_0821AD08(u32, struct Args *);
-#define LevelController_RunScript sub_080096D4
 void LevelController_RunScript(void *unused, struct Controller *p, u32 script)
 {
     s32 values[5];

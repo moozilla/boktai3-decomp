@@ -21,8 +21,7 @@ struct Effect {
     u8 pad20[4];
     struct Sprite sprite;
 };
-void sub_080168B8(struct Effect *);
-#define FloatingEffect_Bob sub_08016944
+void FloatingEffect_Project(struct Effect *);
 void FloatingEffect_Bob(void *m, struct Effect *p)
 {
     if (p->entered) {
@@ -33,7 +32,7 @@ void FloatingEffect_Bob(void *m, struct Effect *p)
         p->position.y += 16;
     else
         p->position.y -= 16;
-    sub_080168B8(p);
+    FloatingEffect_Project(p);
     if (p->timer > 3) {
         int state = 1;
         p->state = state;

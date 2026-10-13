@@ -8,7 +8,6 @@ struct Menu {
     u8 pad[6];
     u16 script;
 };
-#define MessageMenu_Update sub_0801138C
 int MessageMenu_Update(struct Menu *m)
 {
     if (m->timer <= 40 && !(m->timer & 1))

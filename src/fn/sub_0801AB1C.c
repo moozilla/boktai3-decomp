@@ -1,5 +1,4 @@
 #include "global.h"
-#define SelectionMenu_ActorAvailability sub_0801AB1C
 extern u8 *gUnk_02000710;
 extern u8 gUnk_08E6092C[][32];
 u8 *sub_0822D6C8(int);

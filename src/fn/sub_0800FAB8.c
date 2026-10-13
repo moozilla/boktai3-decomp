@@ -34,7 +34,6 @@ static inline u32 frame_factor(u16 v)
     u32 mask = 15;
     return mask & value;
 }
-#define BoardPiece_UpdateAnimation sub_0800FAB8
 void BoardPiece_UpdateAnimation(struct Piece *p)
 {
     struct Obj *o = &p->sprite;

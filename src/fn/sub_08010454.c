@@ -70,7 +70,6 @@ static inline void addPosition(struct Vec *d, struct Vec *s)
     dst->y += src->y;
     dst->z += src->z;
 }
-#define BoardPiece_Launch sub_08010454
 void BoardPiece_Launch(struct Manager *m, struct Piece *p, int delay)
 {
     struct Vec delta;

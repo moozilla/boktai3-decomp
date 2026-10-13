@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define SceneActors_FindAvailable sub_0802141C
 extern u8 *gUnk_020000B8[8];
 u8 *SceneActors_FindAvailable(void)
 {

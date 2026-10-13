@@ -1,5 +1,4 @@
 #include "global.h"
-#define SoundTest_Destroy sub_081E2300
 // Provisional name: SoundTest_Destroy
 struct Sprite {
     u8 head[8];

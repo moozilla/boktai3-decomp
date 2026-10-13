@@ -12,7 +12,7 @@ extern struct List gUnk_03005280[14];
 extern u32 gUnk_0300523C;
 void sub_08219F94(struct Task *);
 void sub_08219D38(struct Task *);
-void sub_0821A054(void)
+void TaskSystem_RunFrame(void)
 {
     struct List *list = gUnk_03005280;
     s32 i;

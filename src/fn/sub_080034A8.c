@@ -1,5 +1,4 @@
 #include "palette_controller.h"
-#define Palette_ReplaceResource sub_080034A8
 extern struct PaletteController *gUnk_02000468;
 u8 *sub_0821A520(u16, u16);
 void sub_08227950(u16 *, u16 *);

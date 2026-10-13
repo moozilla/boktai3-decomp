@@ -31,8 +31,7 @@ void sub_0821FF24(void *, void *, u32);
 void sub_0821FF84(void *, void *, void *);
 void sub_0821FF7C(void *, u32, u32, u32);
 void sub_0821FE40(void *);
-void sub_0800C7F4(void);
-#define DamageController_Initialize sub_0800C964
+void DamageController_AccumulateHit(void);
 s32 DamageController_Initialize(struct Controller *controller, u32 id)
 {
     struct PackedVec position, size, offset;
@@ -71,7 +70,7 @@ s32 DamageController_Initialize(struct Controller *controller, u32 id)
     collider = &controller->collider;
     sub_0821FEB4(collider, (u16)id, 0x4001, 0, (u16) * (u32 *)controller->pad7c, &size, &offset);
     sub_0821FF24(collider, &position, 0);
-    sub_0821FF84(collider, sub_0800C7F4, controller);
+    sub_0821FF84(collider, DamageController_AccumulateHit, controller);
     sub_0821FF7C(collider, 0, 0, 0);
     sub_0821FE40(collider);
     controller->flags = sub_0821ABA8(102, 0);

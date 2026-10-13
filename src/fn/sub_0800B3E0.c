@@ -114,7 +114,6 @@ static inline u32 actorMode(struct Actor *actor)
     u32 mask = 128;
     return actor->flags & mask;
 }
-#define EffectParticle_UpdateDriftAroundActor sub_0800B3E0
 void EffectParticle_UpdateDriftAroundActor(struct Manager *manager, struct Effect *effect,
                                            s32 index, s32 phase, u32 phaseMask, struct Context *ctx)
 {

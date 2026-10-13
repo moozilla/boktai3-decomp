@@ -64,13 +64,13 @@ static inline u32 frame_factor(u16 v)
     u32 mask = 15;
     return mask & value;
 }
-void sub_081E3B6C(void *);
+void Actor_ProjectAndClampToScreen(void *);
 void sub_081E4174(void *);
 void sub_08215284(void *, s32);
 void sub_0822B2F8(s32);
 void sub_0821AD08(void *, s32);
 void sub_08013424(void *);
-void sub_081E34D0(void *);
+void ActorPalette_BeginFade(void *);
 void sub_081E5ED4(struct S *p)
 {
     struct Obj *o;
@@ -94,7 +94,7 @@ void sub_081E5ED4(struct S *p)
         p->obj.flags &= ~1;
         p->obj.scaleY = 64;
         p->obj.scaleX = 64;
-        sub_081E3B6C(p);
+        Actor_ProjectAndClampToScreen(p);
         p->obj.angle += 8;
         *(u16 *)((u8 *)p + 0xee2) = p->obj.angle;
         sub_08013440(p->p2);

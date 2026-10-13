@@ -45,7 +45,6 @@ void sub_08217EEC(void *, void *, u32);
 void sub_08220C8C(void *, void *, u32, u32, u32);
 void sub_0822B3BC(u32);
 void sub_0800AC44(u32, u32, u32, struct Vec *, struct PackedVec *, u32, u32);
-#define CollisionController_UpdateHitAnimation sub_0800A198
 void CollisionController_UpdateHitAnimation(struct Manager *manager, struct Slot *p)
 {
     struct Sprite *o;

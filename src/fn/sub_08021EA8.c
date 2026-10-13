@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneActorGraphics_GetResourceId sub_08021EA8
 int SceneActorGraphics_GetResourceId(u8 *p)
 {
     switch (p[0xb3]) {

@@ -1,5 +1,4 @@
 #include "global.h"
-#define InterruptsAndVideo_Initialize sub_08213D10
 // Provisional name: InterruptsAndVideo_Initialize
 /* Install interrupt handlers and clear video, sprite and palette memory. */
 struct Dma {

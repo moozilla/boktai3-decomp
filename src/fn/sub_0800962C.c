@@ -4,7 +4,6 @@ struct Controller {
     u8 disabled, state, entered, level;
 };
 void sub_080095B4(struct Controller *, u32);
-#define LevelController_Update sub_0800962C
 void LevelController_Update(void *manager, struct Controller *p)
 {
     if (p->disabled != 1) {
