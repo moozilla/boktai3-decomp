@@ -56,8 +56,24 @@ everything from the worktree root.
 5. Matched: `git add src/fn/sub_XXXXXXXX.c symbols/proposed && git commit -m "match sub_XXXXXXXX"`.
    If attempts stop yielding useful hypotheses, retain the candidate under `wip/`, add a line to
    `notes/<your-worker-name>.md` with the address and what was off (register
-   swap, branch order, ...), and move on. Never commit a nonmatching file to `main`. Dedicated WIP branches may
-   preserve candidates outside `src/`; they receive no exact progress credit.
+   swap, branch order, ...), and move on. To keep a useful close candidate, commit it
+   as a NONMATCHING draft (below); it gets a fuzzy score, never exact credit.
+
+**NONMATCHING drafts.** Wrap the candidate so the default build uses the asm:
+
+```c
+#ifdef NONMATCHING
+// fuzzy: 96.5%
+int Foo(struct Object *p) { ... }
+#else
+INCLUDE_ASM("asm/nonmatching", sub_XXXXXXXX);
+#endif
+```
+
+`tools/check.py FILE --nonmatching` compiles the draft and compares it with the
+function's full size; `--record` writes the `// fuzzy:` line that `progress.py`
+reports (ROM-free) to decomp.dev. Put a short comment in the draft saying what
+still differs. Only commit drafts that compile and are worth resuming.
 
 **Scratch files:** never use fixed paths under `/tmp` (other workers share it). Put helper scripts in your worktree under `build/` (gitignored) or a directory named after your worker.
 
