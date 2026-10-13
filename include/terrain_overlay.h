@@ -38,7 +38,8 @@ struct TerrainOverlay {
     u16 id, resource;
     s32 initialized, actorCount, drawableCount;
     u32 count; // queued commands
-    u16 commands[16][2]; // {type, id}; type 0 = track actor, 1 = untrack (a struct pair changes codegen)
+    u16 commands
+        [16][2]; // {type, id}; type 0 = track actor, 1 = untrack (a struct pair changes codegen)
     u8 model[28];
     struct TerrainOverlayDrawable *drawables;
     u32 *keys; // dedupe keys, one per drawable
