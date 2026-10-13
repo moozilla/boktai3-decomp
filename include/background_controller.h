@@ -5,7 +5,7 @@
 
 /*
  * Background controllers (ROM 080015AC-08002AA8). Two task families share
- * one command queue layout and one blend layout. Names are provisional;
+ * the command queue and blend field layouts. Names are provisional;
  * "guess" marks fields whose meaning is inferred from a single use.
  *
  * Background flags (p->flags): 1 use dimension offset, 2 follow camera,
@@ -42,7 +42,7 @@ struct Background {
     s32 moveOriginX, moveOriginY;       /* move start, 1/128 px */
     s32 cameraOffsetX, cameraOffsetY;   /* subtracted from camera, px */
     s32 driftX, driftY;                 /* added to camera with flag 128 (guess) */
-    s32 limitX, limitY;     /* halfWidth/halfHeight source, times 2 */
+    s32 limitX, limitY;     /* layer halfWidth/halfHeight are limit / 2 */
     s32 centerX, centerY;   /* pivot for rate scaling */
     u16 moveActive, moveTime, moveDuration;
     s16 rateX, rateY;       /* parallax rate, 128 = 1:1 */
