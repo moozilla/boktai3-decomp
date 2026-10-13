@@ -5,12 +5,12 @@ struct Manager {u8 pad[36];struct Actor *actor;s16 x,y,z;};
 struct Controller {u16 id;u8 orientation;u8 pad3[13];u32 distance;u8 pad14[8];s16 x,y,z;};
 extern u32 gUnk_02000560;
 u32 sub_0800950C(struct Controller *);s32 sub_082215E4(s32,s32);void sub_08009500(struct Controller *,u32);
-static inline s32 facingAllowed(u32 facing,s32 a,s32 b,s32 c){register u32 yes asm("r1")=1;asm("" : : "r"(yes));if(a==facing||b==facing||c==facing)return yes;return 0;}
+static inline s32 facingAllowed(u32 facing,s32 a,s32 b,s32 c){register u32 yes asm("r1")=1;if(a==facing||b==facing||c==facing)return yes;return 0;}
 #define DirectionalController_CheckApproach sub_08009734
 s32 DirectionalController_CheckApproach(struct Manager *manager,struct Controller *p){
  sub_0800950C(p);
  if(manager->actor){
-  register u32 mask asm("r0")=6;register u32 flags asm("r1");asm("" : : "r"(mask));flags=gUnk_02000560;if(flags&mask)goto done;asm("" : "+r"(flags));flags&=1;asm("" : : "r"(flags));if(!flags)goto done;
+  u32 mask=6;register u32 flags asm("r1");flags=gUnk_02000560;if(flags&mask)goto done;flags&=1;if(!flags)goto done;
   {
   s32 dx=p->x-manager->x,dz=p->z-manager->z;
   u32 distance=dx*dx+dz*dz;

@@ -61,7 +61,7 @@ int sub_08030DBC(int index) {
   struct Actor *p = gUnk_020000DC;
   if (p) {
     void *script = p->script;
-    register struct State *state asm("r9") = &p->state;
+    struct State *state = &p->state;
     asm("" : "+r"(state) : "r"(script) : "r1");
     if (script) {
       sub_08218E5C(p->x, p->y, p->width, p->height);
@@ -70,7 +70,6 @@ int sub_08030DBC(int index) {
       {
         void *pc = sub_080313C8(p, p->scriptIndex);
         register struct State *dst asm("r3") = state;
-        asm("" : "+r"(dst));
         dst->pc = pc;
       }
       {
@@ -78,7 +77,6 @@ int sub_08030DBC(int index) {
         {
           register u32 offset asm("r1") = 0x182;
           register u8 *ptr asm("r0");
-          asm("" : "+r"(offset));
           ptr = (u8 *)p + offset;
           mode = *ptr;
         }
@@ -87,29 +85,22 @@ int sub_08030DBC(int index) {
             register void *fn asm("r0") = sub_080316A4;
             register void **dst asm("r1");
             register u32 offset asm("r2") = 0x2cc;
-            asm("" : "+r"(fn));
-            asm("" : "+r"(offset));
             dst = (void **)((u8 *)p + offset);
-            asm("" : "+r"(dst));
             *dst = fn;
           }
           {
             register u32 offset asm("r3") = 0x187;
             register u8 *mode asm("r1");
-            asm("" : "+r"(offset));
             mode = (u8 *)p + offset;
-            asm("" : "+r"(mode));
             *mode = 3;
           }
         } else {
           {
             register u32 offset asm("r0") = 0x19c;
-            register u32 *counter asm("r1");
-            asm("" : "+r"(offset));
+            u32 *counter;
             counter = (u32 *)((u8 *)p + offset);
             {
               register u32 zero asm("r0") = 0;
-              asm("" : "+r"(zero));
               *counter = zero;
             }
           }
@@ -117,9 +108,7 @@ int sub_08030DBC(int index) {
             register void *fn asm("r1") = sub_080317D8;
             register u32 offset asm("r2");
             register void **dst asm("r0");
-            asm("" : "+r"(fn));
             offset = 0x2cc;
-            asm("" : "+r"(offset));
             dst = (void **)((u8 *)p + offset);
             *dst = fn;
           }
@@ -129,24 +118,19 @@ int sub_08030DBC(int index) {
       {
         register u32 offset asm("r3") = 0x196;
         register u16 *wait asm("r1");
-        asm("" : "+r"(offset));
         wait = (u16 *)((u8 *)p + offset);
-        asm("" : "+r"(wait));
         {
-          register u32 value asm("r0") = 65535;
-          asm("" : "+r"(value));
+          u32 value = 65535;
           *wait = value;
         }
       }
       {
         register u32 offset asm("r0") = 0x218;
-        register u32 *flags asm("r2");
-        asm("" : "+r"(offset));
+        u32 *flags;
         flags = (u32 *)((u8 *)p + offset);
         {
           register u32 value asm("r0") = *flags;
-          register u32 mask asm("r1") = 1;
-          asm("" : "+r"(value));
+          u32 mask = 1;
           value |= mask;
           *flags = value;
         }

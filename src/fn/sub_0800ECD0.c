@@ -9,9 +9,9 @@ void sub_0800EC0C(Screen*);void sub_0800EE5C(Screen*);void sub_0800EF90(Screen*)
 int sub_0800E7D8(Screen*);void sub_0800EAF0(Screen*);extern Screen *gUnk_02000044;
 #define StatusScreen_WaitForStart sub_0800ECD0
 void StatusScreen_WaitForStart(Screen *p){
- register u32 mask asm("r6")=256;asm("" : "+r"(mask));gUnk_03004BD8&=~mask;
+ u32 mask=256;gUnk_03004BD8&=~mask;
  if(!sub_0800E7D8(p)){
-  u32 old=p->delay;p->delay=old+65535;asm("" : "+r"(old));if((u16)old==0){{register int flags asm("r1")=gUnk_03004BD8;asm("" : "+r"(flags));{register int result asm("r0")=mask;asm("" : "+r"(result));gUnk_03004BD8=result|flags;}}{Screen *target=gUnk_02000044;asm("" : "+r"(target));{register void(*state)(Screen*) asm("r1")=sub_0800EAF0;asm("" : : "r"(state),"r"(target));target->state=state;target->timer=0;}}}
+  u32 old=p->delay;p->delay=old+65535;asm("" : "+r"(old));if((u16)old==0){{register int flags asm("r1")=gUnk_03004BD8;{int result=mask;gUnk_03004BD8=result|flags;}}{Screen *target=gUnk_02000044;{register void(*state)(Screen*) asm("r1")=sub_0800EAF0;target->state=state;target->timer=0;}}}
  }
 }
 

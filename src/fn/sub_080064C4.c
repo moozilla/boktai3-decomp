@@ -21,18 +21,17 @@ s32 ChoiceMenu_HandleInput(struct Menu *p)
     }else if(p->wakeDelay)p->wakeDelay--;
     else{
         register struct Keys *initialKeys asm("r1")=&gUnk_03005260;
-        register struct Keys *keys asm("r3");
-        register u8 *repeat asm("r8");
+        struct Keys *keys;
+        u8 *repeat;
         u32 pressed;
         u32 sameDirection;
-        asm("" : : "r"(initialKeys));
-        sameDirection=({u32 held=initialKeys->held;register u32 mask asm("r2")=p->held;mask&=held;asm("" : : "r"(mask));mask;});
+        sameDirection=({u32 held=initialKeys->held;u32 mask=p->held;mask&=held;mask;});
         keys=initialKeys;
         if(sameDirection){
             u8 *ptr=&p->repeatDelay;
-            register u32 delay asm("r1")=*ptr;asm("" : : "r"(delay));
+            register u32 delay asm("r1")=*ptr;
             repeat=ptr;
-            if(delay){register u32 value asm("r0")=delay-1;asm("" : : "r"(value));
+            if(delay){u32 value=delay-1;
                 {register u8 *destination asm("r1")=repeat;asm("" : "+r"(destination));*destination=value;}}
         }else {p->repeatDelay=sameDirection;repeat=&p->repeatDelay;}
         p->held=keys->held&240;
@@ -44,12 +43,12 @@ s32 ChoiceMenu_HandleInput(struct Menu *p)
                 sub_0821A0C0(p);return 1;
             }
         }else {register u32 one asm("r4")=1;
-        if(({register u32 bits asm("r0")=one;asm("" : "+r"(bits));bits&=pressed;asm("" : : "r"(bits));bits;})){
+        if(({u32 bits=one;bits&=pressed;asm("" : : "r"(bits));bits;})){
             sub_0822B2F8(221);sub_08030BF8();sub_08006374(p,p->selected);
             p->leftFlags|=one;p->rightFlags|=one;
             sub_0821A0C0(p);return 1;
         }}
-        if(!({register u8 *ptr asm("r1")=repeat;asm("" : : "r"(ptr));*ptr;})){
+        if(!({u8 *ptr=repeat;*ptr;})){
             register s32 currentSelection asm("r2")=p->selected;
             struct Choice *choice=&p->choices[currentSelection];
             s32 selection,limit;
@@ -61,13 +60,13 @@ s32 ChoiceMenu_HandleInput(struct Menu *p)
                 selection=currentSelection+1;
                 limit=p->rowEnd[choice->row];if(selection>limit)goto clampSelection;
             }else if(held&64){
-                register s32 column asm("r6")=currentSelection-({register u32 value asm("r0")=p->rowStart[choice->row];asm("" : : "r"(value));value;});
+                s32 column=currentSelection-({u32 value=p->rowStart[choice->row];value;});
                 s32 row=sub_08006478(p,choice->row,-1);
                 if(choice->row==row)selection=p->selected;else selection=p->rowStart[row]+column;
                 limit=p->rowStart[row];if(selection<limit)goto clampSelection;
                 limit=p->rowEnd[row];if(selection>limit)goto clampSelection;
-            }else if(({register u32 bits asm("r0")=128;bits&=held;asm("" : : "r"(bits));bits;})){
-                register s32 column asm("r6")=currentSelection-({register u32 value asm("r0")=p->rowStart[choice->row];asm("" : : "r"(value));value;});
+            }else if(({u32 bits=128;bits&=held;bits;})){
+                register s32 column asm("r6")=currentSelection-({register u32 value asm("r0")=p->rowStart[choice->row];value;});
                 s32 row=sub_08006478(p,choice->row,1);
                 if(choice->row==row)selection=p->selected;else selection=p->rowStart[row]+column;
                 limit=p->rowStart[row];if(selection<limit)goto clampSelection;
@@ -77,7 +76,7 @@ s32 ChoiceMenu_HandleInput(struct Menu *p)
         clampSelection:selection=limit;
         applySelection:
             sub_080063D0(p,selection);
-            {register u32 delay asm("r0")=30;asm("" : : "r"(delay));*repeat=delay;}
+            {u32 delay=30;*repeat=delay;}
         }
     }
     return 0;

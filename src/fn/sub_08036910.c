@@ -58,7 +58,7 @@ struct Engine *sub_08036910(void) {
   struct Engine *existing = *singleton;
   struct Engine *p;
   int size;
-  register int random asm("r0");
+  int random;
   if (existing)
     return existing;
   sub_0822C1C8();
@@ -70,25 +70,22 @@ struct Engine *sub_08036910(void) {
   sub_08219DD8(p, size);
   random = sub_08228DA0();
   {
-    register u32 *position asm("r3") = &gUnk_03005308;
-    register u32 index asm("r1") = *position + 1;
-    register u32 mask asm("r2") = 1023;
-    register const u16 *table asm("r2");
-    register int term asm("r3");
-    register const u8 *saltAddress asm("r1");
-    register int byteMask asm("r2");
-    register int salt asm("r1");
-    register u16 *destination asm("r0");
-    asm("" : "+r"(mask));
+    u32 *position = &gUnk_03005308;
+    u32 index = *position + 1;
+    u32 mask = 1023;
+    const u16 *table;
+    int term;
+    const u8 *saltAddress;
+    int byteMask;
+    int salt;
+    u16 *destination;
     index &= mask;
     *position = index;
     index <<= 1;
     table = gUnk_0203B400;
-    asm("" : "+r"(table));
     term = *(const u16 *)(index + (u32)table);
     saltAddress = &gUnk_03003A50;
     byteMask = 255;
-    asm("" : "+r"(saltAddress), "+r"(byteMask));
     salt = *saltAddress;
     random += term;
     random &= byteMask;

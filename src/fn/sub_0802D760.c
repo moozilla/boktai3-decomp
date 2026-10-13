@@ -36,7 +36,6 @@ int sub_0802D760(struct Object *p, int kind, int a, int b, int c) {
     status = sub_08042610(d, a, c, p->pos);
     {
       register struct Model *m asm("r1") = (struct Model *)p->pad100;
-      asm("" : "+r"(m));
       p->frames = m->frames;
     }
     sub_08225B30(p->motion);
@@ -44,7 +43,6 @@ int sub_0802D760(struct Object *p, int kind, int a, int b, int c) {
     status = sub_08042588(d, a, b, c, p->pos);
     {
       struct Part *part = &p->part;
-      asm("" : "+r"(part));
       p->frames = part->frames;
     }
     sub_08225B28(p->motion, p->transform);

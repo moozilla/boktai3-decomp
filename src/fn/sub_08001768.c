@@ -14,7 +14,7 @@ void sub_08219574(u32,s32,s32);
 #define truncate3(v) ({s32 value=(v);s32 result;if(value>=0)result=value>>3;else result=-((-value)>>3);result;})
 s32 Background_Update(struct Background *p)
 {
-    register s32 x asm("r7"),y asm("r6");
+    s32 x,y asm("r6");
     s32 tileX,tileY;
     sub_080015AC(p);
     tileY=0;
@@ -24,18 +24,18 @@ s32 Background_Update(struct Background *p)
         else {cx=gUnk_030042A0.x>>3;cy=gUnk_030042A0.y>>3;}
         if(!(p->flags&1)){cx-=p->offsetX;cy-=p->offsetY;}
         if(p->flags&128){cx+=p->speedX;cy+=p->speedY;}
-        {register s32 cyHint asm("r5")=cy;asm("" : "+r"(cyHint));cy=cyHint;}
+        {s32 cyHint=cy;cy=cyHint;}
         if(p->rateX==128)x=cx;else x=({s32 delta=cx-p->centerX; register s32 result asm("r0")=truncate7(delta*p->rateX)+p->centerX;asm("" : "+r"(result));result;});
         x-=120;
         if(p->rateY==128)y=cy;else y=({s32 delta=cy-p->centerY; register s32 result asm("r0")=truncate7(delta*p->rateY)+p->centerY;asm("" : "+r"(result));result;});
         y-=80;
         bottom=y+80;
         tileX=truncate3(x-8);
-        {s32 value=truncate3(bottom-128);register s32 mask asm("r8")=-2;asm("" : "+r"(mask));tileY=mask&value;asm volatile("" :: "r"(tileY));}
+        {s32 value=truncate3(bottom-128);register s32 mask asm("r8")=-2;tileY=mask&value;}
     } else {
         if(p->flags&4) {
             if(p->scrollDuration) {
-                register s32 remaining asm("r5")=p->scrollDuration-p->scrollTime;
+                s32 remaining=p->scrollDuration-p->scrollTime;
                 asm("" : "+r"(remaining));
                 p->scrollX=Div(p->scrollStartX*remaining+p->scrollTargetX*p->scrollTime,p->scrollDuration)/128;
                 p->scrollY=Div(p->scrollStartY*remaining+p->scrollTargetY*p->scrollTime,p->scrollDuration)/128;
@@ -49,7 +49,6 @@ s32 Background_Update(struct Background *p)
         } else if(p->moveActive==1) {
             if(p->moveDuration) {
                 register s32 remaining asm("r5")=p->moveDuration-p->moveTime;
-                asm("" : "+r"(remaining));
                 p->x=Div(p->originX*remaining+p->targetX*p->moveTime,p->moveDuration);
                 p->y=Div(p->originY*remaining+p->targetY*p->moveTime,p->moveDuration);
             }
@@ -57,9 +56,9 @@ s32 Background_Update(struct Background *p)
                 p->moveActive=0;p->moveTime=0;p->x=p->targetX;p->y=p->targetY;
             }
         }
-        x=({register s32 value asm("r3")=truncate7(p->x);asm("" : "+r"(value));value;});y=({register s32 value asm("r0")=truncate7(p->y);asm("" : "+r"(value));value;});
+        x=({register s32 value asm("r3")=truncate7(p->x);asm("" : "+r"(value));value;});y=({s32 value=truncate7(p->y);value;});
         if(p->flags&32) {x+=gUnk_03005418[0]+gUnk_030042A0.offsetX;y+=gUnk_03005418[1]+gUnk_030042A0.offsetY;}
-        {register s32 rowY asm("r5")=y;asm("" : "+r"(rowY));
+        {register s32 rowY asm("r5")=y;
         if(x<0)tileX=~((-x)>>3);else tileX=x>>3;
         if(rowY<0){register s32 negative asm("r0")=~((-rowY)>>3);asm("" : "+r"(negative));tileY=negative;}else tileY=rowY>>3;
         tileY&=~1;
@@ -72,8 +71,8 @@ s32 Background_Update(struct Background *p)
         if(--p->fadeDuration==0)p->fadeActive=0;
     }
     if(p->flags&64) {
-        if(p->frame&1){register u32 mask asm("r0")=(0x01000000u<<p->layer)>>16;asm("" : "+r"(mask));gUnk_03004BD8=mask|gUnk_03004BD8;}
-        else {register u32 mask asm("r0")=(0x01000000u<<p->layer)>>16;asm("" : "+r"(mask));gUnk_03004BD8&=~mask;}
+        if(p->frame&1){u32 mask=(0x01000000u<<p->layer)>>16;gUnk_03004BD8=mask|gUnk_03004BD8;}
+        else {u32 mask=(0x01000000u<<p->layer)>>16;gUnk_03004BD8&=~mask;}
     }
     p->frame++;
     return 0;

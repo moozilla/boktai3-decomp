@@ -13,7 +13,7 @@ void sub_081E3B6C(void*);void sub_081E4174(void*);void sub_08215284(void*,s32);v
 void sub_081E6150(struct S *p) {
  struct Obj *o;struct Anim *a;const u16 *entry;u32 flag;register u16 n asm("r0");u8 done;
  if(take(p)) {
- u16 *first=(u16*)((u8*)p+0xed0);register s32 savedZero asm("r4");register s32 zero asm("r2");savedZero=0;zero=0;*first=25;*(u16*)((u8*)p+0xed2)=102;*(u16*)((u8*)p+0xed4)=zero;
+ u16 *first=(u16*)((u8*)p+0xed0);s32 savedZero;register s32 zero asm("r2");savedZero=0;zero=0;*first=25;*(u16*)((u8*)p+0xed2)=102;*(u16*)((u8*)p+0xed4)=zero;
  p->state=1;sub_08220C8C(&p->anim,p->arg,1,0,p->next);
  *((u8*)p+0xf77)=savedZero;p->obj.flags&=~1;
  p->obj.scaleY=64;p->obj.scaleX=64;sub_081E3B6C(p);p->obj.angle+=8;*(u16*)((u8*)p+0xee2)=p->obj.angle;
@@ -22,7 +22,7 @@ void sub_081E6150(struct S *p) {
  o=&p->obj;a=&p->anim;entry=a->data+a->frame;
  o->frame=*entry>>6;
  {u32 input=a->flags;register u32 mask asm("r3")=1; register u32 left asm("r1")=(u8)(input&mask); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=4;else o->flags&=~4;}
- {register u32 input asm("r0")=a->flags;register u32 mask asm("r3")=2; register u32 left asm("r1")=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
+ {register u32 input asm("r0")=a->flags;u32 mask=2; u32 left=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
  n=++a->timer;
  if(n>=a->rate) {
  a->timer=0;

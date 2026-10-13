@@ -96,22 +96,20 @@ extern const u8 gUnk_0824DE58[]; /* /ALTER */
 // MATCHING_CONCESSION: register-pinning
 const u8 *sub_0803232C(struct TextVm *p, const u8 *s) {
   const u8 *end = s;
-  register int value asm("r0");
+  int value;
   int cmp;
-  register int paletteValue asm("r0");
-  register const u8 *findPtr asm("r0");
+  int paletteValue;
+  const u8 *findPtr;
   register struct TextVm *pushP asm("r0");
-  register int pushStyle asm("r1");
+  int pushStyle;
   if (*s == '/')
     goto close;
   if (!sub_08032168(s, gUnk_0824DC80, 6)) {
     paletteValue = 1;
-    asm("" : "+r"(paletteValue));
     goto palette;
   }
   if (!sub_08032168(s, gUnk_0824DC88, 6)) {
     paletteValue = 2;
-    asm("" : "+r"(paletteValue));
     goto palette;
   }
   if (!sub_08032168(s, gUnk_0824DC90, 6)) {
@@ -125,7 +123,6 @@ const u8 *sub_0803232C(struct TextVm *p, const u8 *s) {
       p->mode = sub_080321A0(p->text, p->length);
     else {
       int level = gUnk_02000710->level;
-      asm("" : "+r"(level));
       p->mode = level;
     }
     goto done;
@@ -145,7 +142,6 @@ const u8 *sub_0803232C(struct TextVm *p, const u8 *s) {
     p->streams[0] = sub_08227878();
     sub_08031E54(p, 1);
     findPtr = s;
-    asm("" : "+r"(findPtr));
     goto findAdvanceCall;
   }
   if (!sub_08032168(s, gUnk_0824DCB0, 4)) {
@@ -276,7 +272,6 @@ const u8 *sub_0803232C(struct TextVm *p, const u8 *s) {
     }
     {
       register const u8 *alias asm("r6") = name;
-      asm("" : "+r"(alias));
       if (!sub_08032168(alias, gUnk_0824DDB8, 11)) {
         value = 30;
         goto selected;
@@ -296,15 +291,13 @@ const u8 *sub_0803232C(struct TextVm *p, const u8 *s) {
     p->selection = value;
     {
       register int zero asm("r0") = 0;
-      register int one asm("r1") = 1;
-      asm("" : "+r"(zero), "+r"(one));
+      int one = 1;
       p->busy = one;
       one = p->mode;
       p->previousMode = one;
       p->mode = zero;
     }
     findPtr = end;
-    asm("" : "+r"(findPtr));
     goto findEndCall;
   }
   if (!sub_08032168(s, gUnk_0824DDD4, 7)) {
@@ -327,17 +320,14 @@ const u8 *sub_0803232C(struct TextVm *p, const u8 *s) {
     else
       value = 0;
     {
-      register u32 index asm("r1") = value << 2;
+      u32 index = value << 2;
       register const u8 **slot asm("r0");
-      asm("" : "+r"(index));
       slot = p->strings;
-      asm("" : "+r"(slot));
       slot = (const u8 **)((u8 *)slot + index);
       p->streams[2] = *slot;
     }
     pushP = p;
     pushStyle = 3;
-    asm("" : "+r"(pushP), "+r"(pushStyle));
     goto push;
   }
   if (!sub_08032168(s, gUnk_0824DDEC, 5)) {
@@ -359,23 +349,19 @@ const u8 *sub_0803232C(struct TextVm *p, const u8 *s) {
       number = 0;
     buffer = p->numberText;
     {
-      register u32 index asm("r1") = number << 2;
+      u32 index = number << 2;
       s32 *slot;
-      asm("" : "+r"(index));
       slot = p->numbers;
-      asm("" : "+r"(slot), "+r"(index));
       slot = (s32 *)((u8 *)slot + index);
       sub_0803209C(buffer, *slot);
     }
     p->streams[1] = buffer;
     pushP = p;
     pushStyle = 2;
-    asm("" : "+r"(pushP), "+r"(pushStyle));
   push:
     sub_08031E54(pushP, pushStyle);
   findAdvance:
     findPtr = end;
-    asm("" : "+r"(findPtr));
   findAdvanceCall:
     end = Text_FindChar(findPtr, '>');
     p->advance = 1;
@@ -414,7 +400,6 @@ const u8 *sub_0803232C(struct TextVm *p, const u8 *s) {
   if (!sub_08032168(s, gUnk_0824DE28, 5)) {
     p->palette = 1;
     findPtr = end;
-    asm("" : "+r"(findPtr));
     goto findEndCall;
   }
   goto done;
@@ -450,7 +435,6 @@ palette:
   p->palette = paletteValue;
 findS:
   findPtr = s;
-  asm("" : "+r"(findPtr));
   goto findEndCall;
 findEndCall:
   end = Text_FindChar(findPtr, '>');

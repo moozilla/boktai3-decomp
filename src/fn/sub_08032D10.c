@@ -1,18 +1,15 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Vm {
   u8 pad[0x88];
   s32 numbers[16];
 };
 int sub_08032D10(struct Vm *p, int index) {
-  register int value asm("r1") = p->numbers[index];
-  register u32 n asm("r2") = (u32)value >> 31;
-  register int abs asm("r0") = value;
-  asm("" : "+r"(n), "+r"(abs), "+r"(value));
+  int value = p->numbers[index];
+  u32 n = (u32)value >> 31;
+  int abs = value;
   if (value < 0)
     abs = -value;
   value = abs;
-  asm("" : "+r"(value));
   if (value > 9999999)
     n += 8;
   else if (value > 999999)

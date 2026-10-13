@@ -14,7 +14,7 @@ void sub_08215284(void*,s32);
 // Select the closest eligible interaction target and animate its selection marker.
 void Actor_SelectNearestInteraction(struct G*p){
  s32 i;struct Partner*q;s32 dx,dz,xOffset,zOffset,length;register s32 height asm("r0");u32 radius;
- u32 a,b,c;register u32 sector asm("r2");u8 *owner;
+ u32 a,b,c;u32 sector;u8 *owner;
  p->group=-1;
  for(i=0;i<16;i++){
  q=(struct Partner*)((u8*)p+0x1c+i*0xdc);
@@ -28,15 +28,15 @@ void Actor_SelectNearestInteraction(struct G*p){
  radius=p->speed;
  if(length>=(s32)(radius*radius))continue;
  if(q->orientation==0){a=0;b=6;c=7;}else{a=0;b=1;c=2;}
- {register u32 angle asm("r0")=(u8)(sub_082215E4(dx,dz)-16);register s32 first asm("r1")=(s8)a;sector=angle>>5;
+ {u32 angle=(u8)(sub_082215E4(dx,dz)-16);register s32 first asm("r1")=(s8)a;sector=angle>>5;
  if(first!=sector&&(s8)b!=sector&&(s8)c!=sector){c=255;b=255;a=255;}}
  if((s8)a!=*(s16*)(gUnk_02000710+0x85e)&&(s8)b!=*(s16*)(gUnk_02000710+0x85e)&&(s8)c!=*(s16*)(gUnk_02000710+0x85e))continue;
- height=q->worldY;{register u8 *parent asm("r1")=*(u8**)((u8*)p+0x18);height-=*(s16*)(parent+0x32);}if(height<0)height=-height;
+ height=q->worldY;{u8 *parent=*(u8**)((u8*)p+0x18);height-=*(s16*)(parent+0x32);}if(height<0)height=-height;
  if(height>119)continue;
 
  q->eligible=1;q->distance=dx*dx+dz*dz;
  if(p->group==-1)p->group=i;
- else {register s32 offset asm("r1")=p->group*0xdc; register u8 *base asm("r0")=(u8*)p+0xf0; if(q->distance<*(s32*)(base+offset))p->group=i;}
+ else {s32 offset=p->group*0xdc; u8 *base=(u8*)p+0xf0; if(q->distance<*(s32*)(base+offset))p->group=i;}
  }
  for(i=0;i<16;i++){
  q=(struct Partner*)((u8*)p+0x1c+i*0xdc);

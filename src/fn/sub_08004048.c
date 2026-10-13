@@ -14,7 +14,7 @@ void sub_08217074(s32,s32);
 void sub_0821A284(u16,void *,s32);
 s32 TerrainOverlay_Initialize(struct Manager *p,u32 id,u32 resource)
 {
-    register u8 *model asm("r4");
+    u8 *model;
     u8 *loadedModel;
     s32 key,i;
     p->id=id;p->resource=resource;p->initialized=0;p->count=0;
@@ -23,11 +23,9 @@ s32 TerrainOverlay_Initialize(struct Manager *p,u32 id,u32 resource)
     i=0;
     if(i<p->drawableCount) {
     register struct Drawable **drawables asm("r8")=&p->drawables;
-    asm("" : "+r"(drawables));
     do {
         register u32 offset asm("r0")=sizeof(struct Drawable)*i;
         struct Drawable *d;
-        asm("" : "+r"(offset));
         d=(struct Drawable *)((u32)*drawables+offset);
         sub_082144E4(d,loadedModel,1);
         d->drawFlags|=0x400;

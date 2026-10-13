@@ -10,7 +10,7 @@ extern u8 gUnk_0203B400[];
 extern u32 gUnk_03005308;
 extern u8 *gUnk_02000710;
 void sub_08217EEC(Effect*,void*,s32);
-static inline s32 random_value(void) {register u8 *table asm("r2"); register u32 offset asm("r0"); gUnk_03005308=(gUnk_03005308+1)&1023; offset=gUnk_03005308<<1; table=gUnk_0203B400; offset+=(u32)table; return *(u16 *)offset;}
+static inline s32 random_value(void) {register u8 *table asm("r2"); u32 offset; gUnk_03005308=(gUnk_03005308+1)&1023; offset=gUnk_03005308<<1; table=gUnk_0203B400; offset+=(u32)table; return *(u16 *)offset;}
 static inline s32 random_first(void) { u8 *table=gUnk_0203B400; gUnk_03005308=(gUnk_03005308+1)&1023; return *(u16 *)(table+(gUnk_03005308<<1)); }
 static inline s32 scale(s32 v) { if(v>=0) return v>>12; return -((-v)>>12); }
 void sub_0813C42C(State *s,Point *pos) {

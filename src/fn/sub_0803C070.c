@@ -10,7 +10,7 @@ int sub_0803C070(struct P *p)
 {
     struct Animation *animation=&p->animation;
     if(p->countdown>0) {
-        register u32 zero asm("r1");
+        u32 zero;
         p->countdown--;
         zero=0;
         asm("" : "+r"(zero));

@@ -15,7 +15,7 @@ static inline u8 chk(struct S *p) {
 void sub_08024B60(struct S *p) {
     struct S *p2 = p;
     if (chk(p)) { u32 k = 0x18; p->aa = k; }
-    {register u32 mask asm("r1")=1;asm("" : : "r"(mask));}if (!(*(u32*)((u8*)p+0x9c)&1)) {
+    {u32 mask=1;asm("" : : "r"(mask));}if (!(*(u32*)((u8*)p+0x9c)&1)) {
         u32 z2 = 0;
         p2->ac = z2;
         p2->ad = z2;

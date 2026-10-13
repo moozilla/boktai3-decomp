@@ -13,7 +13,7 @@ void SelectionMenu_DrawStatistics(u8 *p) {
  sub_0805DE3C(p[0x24]);sub_0805DF08(p[0x24]);
  value=*(s16 *)(gUnk_02000710+0x40);
  if(value>99)value=99;else if(value<0)value=0;
- {register int x asm("r1")=10;asm("" : "+r"(x));sub_08215F38(0,x,9,value,33,2,15);}
+ {int x=10;asm("" : "+r"(x));sub_08215F38(0,x,9,value,33,2,15);}
  a=0;b=0;sub_0805F3A4(&a,&b,0,0);
  if(b>0)sub_08215F38(0,9,10,b,33,3,15);else sub_0805DD68(9,10,3);
  if(a>0)sub_08215F38(0,9,11,a,33,3,15);else sub_0805DD68(9,11,3);

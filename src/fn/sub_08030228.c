@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Vec {
   s16 x, y, z, pad;
 };
@@ -88,11 +87,10 @@ struct Context {
   struct Vec *target;
 };
 static inline int near(struct Actor *p, struct Vec *b) {
-  register struct Vec *a asm("r3") = &p->pos;
-  register int limit asm("r5");
+  struct Vec *a = &p->pos;
+  int limit;
   int x;
-  register int result asm("r2");
-  asm("" : "+r"(a));
+  int result;
   limit = p->rateA;
   x = b->x - a->x;
   if (x < 0)
@@ -120,7 +118,7 @@ done:
   return result;
 }
 static inline int targetNear(struct Context *m, struct Actor *p) {
-  register int result asm("r1");
+  int result;
   if (m->target) {
     int close = near(p, m->target);
     result = 1;
@@ -134,8 +132,8 @@ done:
 struct Vec *sub_08049B6C(void);
 void sub_08030228(struct Context *m, struct Actor *p) {
   int close;
-  register int nextState asm("r0");
-  register int zero asm("r1");
+  int nextState;
+  int zero;
   if (p->entered) {
     int zero = 0;
     p->entered = zero;
@@ -143,12 +141,12 @@ void sub_08030228(struct Context *m, struct Actor *p) {
     p->action = 8;
   }
   if (!(p->ticks & 15)) {
-    register s8 *firstMode asm("r0") = (s8 *)&p->hasDestination;
+    s8 *firstMode = (s8 *)&p->hasDestination;
     int flag = *firstMode;
     s8 *mode = firstMode;
     if (flag) {
       struct Vec *q = sub_08049B6C();
-      register int nearby asm("r6") = 0;
+      int nearby = 0;
       if (q) {
         struct Vec *pos = &p->pos;
         int dx = pos->x - q->x;
@@ -167,7 +165,6 @@ void sub_08030228(struct Context *m, struct Actor *p) {
         }
         nextState = 12;
         zero = 0;
-        asm volatile("" : "+r"(zero) : "r"(nextState));
         goto changeState;
       }
     }
@@ -184,7 +181,6 @@ void sub_08030228(struct Context *m, struct Actor *p) {
     state13:
       nextState = 13;
       zero = 0;
-      asm volatile("" : "+r"(zero));
       goto changeState;
     }
   }
@@ -194,7 +190,6 @@ afterPhase:
     int state = p->state;
     u8 *dst = &p->savedState;
     int zero;
-    asm("" : "+r"(dst));
     zero = 0;
     *dst = state;
     p->state = 10;

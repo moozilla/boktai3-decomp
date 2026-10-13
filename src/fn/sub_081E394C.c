@@ -17,7 +17,7 @@ struct PaletteController {
 void sub_08215284(void *, s32);
 
 s32 Div(s32,s32);
-static inline u32 mode_bits(u8 *p,u32 mask){register u32 v asm("r1")=*p;register u32 result asm("r0")=mask&v;return result;}
+static inline u32 mode_bits(u8 *p,u32 mask){register u32 v asm("r1")=*p;u32 result=mask&v;return result;}
 // Interpolate the actor palette over fifty updates, then restore its asset palette.
 void ActorPalette_UpdateReverseFade(struct PaletteController *p) {
     s32 i;
@@ -35,7 +35,7 @@ void ActorPalette_UpdateReverseFade(struct PaletteController *p) {
         sub_08215284(p->effect,343);
         p->palette=p->savedPalette;
         p->oldMode=p->mode;
-        {register u32 mode asm("r2")=2;p->mode=mode;}
+        {u32 mode=2;p->mode=mode;}
         {register u32 raw asm("r1")=*(u16 *)((u8*)p+0xf5a); register u32 mask asm("r2")=15;
         *(u16 *)((u8*)p+0xf5a)=(mask&raw)|0xd0;
         if(p->oldMode==3){register u32 bits asm("r0")=mode_bits((u8*)p+0xf5a,mask);if(bits==3){p->savedFrame=p->frame;p->savedTimer=p->timer;}}}

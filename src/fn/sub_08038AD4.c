@@ -50,13 +50,12 @@ void sub_08038AD4(struct P *input)
 {
     register struct P *p asm("r8")=input;
     u32 data;
-    register u8 *entered asm("r1")=&p->entered;
+    u8 *entered=&p->entered;
     if(*entered)  {
         *entered=0;
         {
-            register u32 value asm("r0")=720;
+            u32 value=720;
             register struct P *view asm("r1");
-            asm("" : "+r"(value));
             view=p;
             view->remaining=value;
         }
@@ -68,23 +67,21 @@ void sub_08038AD4(struct P *input)
     sub_08038148(p);
     if(( {
         register struct P *view asm("r2")=p;
-        asm("" : "+r"(view));
         view->timer;
     })==30)sub_08038138(p);
     if(Mod(( {
         register struct P *view asm("r3")=p;
-        asm("" : "+r"(view));
         view->timer;
     }),60)==0)  {
         struct Actor *actor=gUnk_02000580;
         struct Target *target=sub_0802140C(0);
         int a,b;
-        register struct Entry *e asm("r6");
-        register u32 packed asm("r10");
-        register int total asm("r9");
+        struct Entry *e;
+        u32 packed;
+        int total;
         int i;
-        register int shift asm("r12");
-        register u8 *q asm("r5");
+        int shift;
+        u8 *q;
         if(actor&&actor->maximum)a=Div(100*actor->current,actor->maximum);
         else a=0;
         if(a==0&&actor->current)a=1;
@@ -96,7 +93,6 @@ void sub_08038AD4(struct P *input)
         asm("" : "+r"(e));
         {
             register u32 zero asm("r3")=0;
-            asm("" : "+r"(zero));
             packed=zero;
             total=zero;
         }
@@ -109,15 +105,13 @@ void sub_08038AD4(struct P *input)
         q=e->bytes;
         do  {
             int value;
-            register u32 flag asm("r4")=e->flag;
+            u32 flag=e->flag;
             if(flag)value=*q;
             else  {
-                register int old asm("r0")=*q;
+                int old=*q;
                 register u8 *score asm("r1");
                 register int n asm("r2");
-                asm("" : "+r"(old));
                 score=p->scores;
-                asm("" : "+r"(score));
                 score+=i;
                 n=*score;
                 value=old+n;
@@ -142,22 +136,18 @@ void sub_08038AD4(struct P *input)
         } while(i<=3);
         if(( {
             register int v asm("r0")=total;
-            asm("" : "+r"(v));
             v;
         })>0)sub_080397D4(3,1);
         {
             register u32 v asm("r2")=packed;
             register u32 shifted asm("r1");
-            asm("" : "+r"(v));
             shifted=v<<16;
-            asm("" : "+r"(shifted));
             data|=shifted;
         }
         sub_08037FB4(p,0,&data,1);
     }
     {
         register struct P *view asm("r3")=p;
-        asm("" : "+r"(view));
         if((view->status&0xffff00)||test(&view->flags,128))  {
             u32 eight;
             u8 *state;
@@ -173,9 +163,8 @@ void sub_08038AD4(struct P *input)
         }
     }
     {
-        register struct P *view asm("r1")=p;
+        struct P *view=p;
         u32 remaining;
-        asm("" : "+r"(view));
         remaining=--view->remaining;
         if(!remaining)  {
             u32 two;
@@ -188,14 +177,12 @@ void sub_08038AD4(struct P *input)
             p->entered=1;
             {
                 register struct P *view asm("r2")=p;
-                asm("" : "+r"(view));
                 view->timer=remaining;
             }
             set(4);
             p->active=0;
         } else  {
             register struct P *view asm("r3")=p;
-            asm("" : "+r"(view));
             view->timer++;
         }
     }

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct State {
   u8 pad0[7];
@@ -87,9 +86,9 @@ void sub_080313E4(void);
 extern u16 gUnk_03005260[];
 void sub_080317D8(struct Actor *p) {
   struct State *state = &p->state;
-  register int i asm("r6");
-  register void *close asm("r8");
-  register void **callback asm("r5");
+  int i;
+  void *close;
+  void **callback;
   u32 *counter;
   state->skip = 1;
   i = 0;
@@ -108,7 +107,6 @@ void sub_080317D8(struct Actor *p) {
         break;
       }
     }
-    asm("" : "+r"(i));
     i++;
   } while (i <= 3);
 }

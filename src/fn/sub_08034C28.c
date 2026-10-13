@@ -46,7 +46,7 @@ u16 sub_08246C68(u8, u8, void *, u32);
 int sub_082236C8(int, int, int, const u8 *);
 extern const u8 gUnk_0824DE60[];
 int sub_08034C28(struct Engine *p) {
-  register int raw asm("r0");
+  int raw;
   int status;
   int result;
   if (p->pending) {
@@ -74,15 +74,12 @@ int sub_08034C28(struct Engine *p) {
 success: {
   register int operation asm("r1") = 7;
   register int one asm("r1");
-  asm("" : "+r"(operation));
   p->flag = status;
   p->operation = operation;
   p->ticks = status;
   {
     register u8 *pending asm("r2") = &p->pending;
-    asm("" : "+r"(pending));
     one = 1;
-    asm("" : "+r"(one));
     *pending = one;
   }
 }

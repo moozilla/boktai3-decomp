@@ -11,4 +11,4 @@ extern s32 gUnk_03005260;extern u8 gUnk_03005430[];void sub_081E43E8(void*);
 struct Child {u32 flags;u8 p0[0x2c-4];u8 sprite[0xac-0x2c];void (*fn)(void*,void*);u8 index,control;u8 p1[0xce - 0xb2];u8 variant,p2;u16 effect;u8 rest[10];};
 static inline u8 child_take(struct Child *c){s32 mask=1;register s32 v asm("r1")=c->control;if(v&mask){c->control=v&~mask;return 1;}return 0;}
 void sub_081E3C60(void*,void*);
-void sub_081E5608(struct S*input,struct Child*child){register struct Child*c asm("r2")=child;struct S*p=input;if(child_take(c))c->flags&=~1;sub_081E3C60(p,c);}
+void sub_081E5608(struct S*input,struct Child*child){struct Child*c=child;struct S*p=input;if(child_take(c))c->flags&=~1;sub_081E3C60(p,c);}

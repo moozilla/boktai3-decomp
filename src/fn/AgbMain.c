@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #define Rtc_Initialize sub_08248970
 #define Clock_ClearState sub_082284F4
 #define Clock_CheckRtcDate sub_082290F4
@@ -17,7 +16,7 @@ extern u8 _08000350[],AgbMain__addr[],gUnk_03000000[];
 void AgbMain(void){
  u32 saved0,saved1,zero;u32 *cookie0,*cookie1;
  *(vu16*)0x04000204=0x4014;
- {register u32 anchor asm("r4")=0x0401fb14;register u32 offset asm("r0")=anchor+0xfdfe0c00;cookie0=(u32*)(anchor-offset);saved0=*cookie0;anchor+=4;cookie1=(u32*)(anchor-offset);saved1=*cookie1;}
+ {u32 anchor=0x0401fb14;u32 offset=anchor+0xfdfe0c00;cookie0=(u32*)(anchor-offset);saved0=*cookie0;anchor+=4;cookie1=(u32*)(anchor-offset);saved1=*cookie1;}
  RegisterRamReset(1);
  *cookie0=saved0;*cookie1=saved1;
  {struct Dma *dma;zero=0;dma=(struct Dma*)0x040000d4;dma->source=(u32)&zero;dma->dest=0x03000000;dma->control=0x85001f40;dma->control;while(dma->control&0x80000000);}

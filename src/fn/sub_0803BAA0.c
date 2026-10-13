@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Slot {
     u8 pad[0x854];
     s32 id;
@@ -15,13 +14,12 @@ struct Slot *sub_0803BAA0(struct P *p)
 {
     struct Slot *slot=p->slots;
     u32 i=0;
-    register u32 total asm("r0")=p->count;
+    u32 total=p->count;
     if(i<total) {
-        register u32 offset asm("r6")=0x854;
-        register s32 empty asm("r5")=-1;
-        register u32 stride asm("r4")=0x8b0;
+        u32 offset=0x854;
+        s32 empty=-1;
+        u32 stride=0x8b0;
         u32 count;
-        asm("" : "+r"(total) : "r"(offset), "r"(empty), "r"(stride));
         count=total;
         do {
             if(*(s32*)((u8*)slot+offset)==empty)return slot;

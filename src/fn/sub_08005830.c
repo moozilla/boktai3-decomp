@@ -35,7 +35,7 @@ void sub_080045E8(void),sub_080046EC(void);
 s32 Mod(s32,s32);
 void sub_08215284(struct Animation *,u16);
 s32 sub_08003C00(struct Body *);
-static inline void initializeCell(void *cell,s32 index,s32 height){sub_0821D698(cell,index,0,height,255,({register s32 zero asm("r2")=0;asm("" : : "r"(zero));zero;}));}
+static inline void initializeCell(void *cell,s32 index,s32 height){sub_0821D698(cell,index,0,height,255,({register s32 zero asm("r2")=0;zero;}));}
 static inline void setStepFlags(struct Collider *c){c->flags=0x800;c->flags2=0;}
 static inline u16 flags16(struct Object *p,u32 mask){return mask&p->flags;}
 s32 SceneObjects_CreateObject(u32 id,s32 type,u32 flags,struct Vec *position,u32 animationResource,s32 drawMode,s32 resource,s32 initialAnimation,s32 animation,u32 script)
@@ -88,7 +88,7 @@ s32 SceneObjects_CreateObject(u32 id,s32 type,u32 flags,struct Vec *position,u32
     sub_0821FF50(&p->stepCollider,1500,50);
     setStepFlags(&p->stepCollider);
     p->resource=resource;p->damageTimer=clear;p->mode=clear;p->animationTimer=clear;p->phase=clear;p->cooldown=clear;p->unk23=4;
-    gUnk_03005308=(gUnk_03005308+1)&1023;p->randomPhase=Mod(({register u32 offset asm("r0")=gUnk_03005308*2;register u16 *table asm("r2");asm("" : "+r"(offset));table=gUnk_0203B400;asm("" : "+r"(table));*(u16 *)(offset+(u32)table);}),16);
+    gUnk_03005308=(gUnk_03005308+1)&1023;p->randomPhase=Mod(({u32 offset=gUnk_03005308*2;register u16 *table asm("r2");asm("" : "+r"(offset));table=gUnk_0203B400;asm("" : "+r"(table));*(u16 *)(offset+(u32)table);}),16);
     {register s32 initial asm("r3")=initialAnimation;asm("" : "+r"(initial));
     if(initial>=0)p->initialAnimation=initial;else p->initialAnimation=p->animationData.initial;}
     sub_08215284(&p->animationData,p->initialAnimation);

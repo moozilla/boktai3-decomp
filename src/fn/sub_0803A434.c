@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Resource  {
   u32 words[8];
@@ -25,7 +24,7 @@ int sub_0803A434(struct Owner *p)  {
   struct Resource *resource;
   struct Item *item;
   u8*current;
-  register u8*pending asm("r8");
+  u8*pending;
   int i;
   gUnk_02000100 = p;
   resource = sub_0821A520(0xcb05,0x5d04);
@@ -36,7 +35,6 @@ int sub_0803A434(struct Owner *p)  {
   item = p->items;
   i = 0;
   current = p->current;
-  asm("" : "+r"(current));
   pending = p->pending;
   do  {
     sub_0803A2A8(p,item,i);
@@ -46,10 +44,9 @@ int sub_0803A434(struct Owner *p)  {
   while (i <= 15);
   i = 0;
   {
-    register u8*first asm("r3")=current;
-    register int zero asm("r1")=0;
-    register u8*second asm("r2")=pending;
-    asm("" : "+r"(first),"+r"(zero),"+r"(second));
+    u8*first=current;
+    int zero=0;
+    u8*second=pending;
     do  {
       first[i]=zero;
       second[i]=zero;

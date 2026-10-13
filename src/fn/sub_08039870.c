@@ -11,10 +11,9 @@ void sub_08039834(void*);
 void sub_08039870(void) {
   struct Panel*p=sub_08037DC0();
   if(p) {
-    register int one asm("r0")=1;
+    int one=1;
     register u8*state asm("r1")=&p->state;
-    register int zero asm("r2")=0;
-    asm("" : "+r"(one),"+r"(state),"+r"(zero));
+    int zero=0;
     *state=one;
     state++;
     asm("" : "+r"(state));

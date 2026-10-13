@@ -16,12 +16,11 @@ void Palette_BlendRange(u16 *dest,const u16 *source,const u16 *target,u32 amount
             u16 *out;
             s32 i;
             dest+=first;out=dest;
-            if(count>0) {register u32 greenMask asm("r10")=0x03E0;asm("" : "+r"(greenMask));i=count;do {
+            if(count>0) {register u32 greenMask asm("r10")=0x03E0;i=count;do {
                 register u32 from asm("r0")=*a;
                 register u32 fromRB asm("r3");u32 fromG;
                 u32 to;
-                asm("" : "+r"(from));
-                fromRB=0x7C1F&from;asm("" : "+r"(fromRB));fromG=greenMask&from;
+                fromRB=0x7C1F&from;fromG=greenMask&from;
                 to=*b;
                 {u32 rb=(((to&0x7C1F)*amount)+(inverse*fromRB))&0xF83E0;
                 u32 g=(((to&greenMask)*amount)+(inverse*fromG))&0x7C00;

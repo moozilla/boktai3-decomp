@@ -28,7 +28,7 @@ int sub_08036B64(struct Packet*);
 void sub_0803A618(int,int,int);
 void sub_08037DEC(struct Packet*p) {
     register struct P*s asm("r6")=sub_08037DC0();
-    register struct Entry*e asm("r3");
+    struct Entry*e;
     int i;
     register int shift asm("r5");
     int value;
@@ -111,12 +111,12 @@ void sub_08037F50(void) {
 }
 void sub_08037F5C(struct P*s) {
     struct Entry*a=&s->entries[0];
-    register u8*q asm("r5")=s->entries[1].bytes;
-    register int i asm("r6");
+    u8*q=s->entries[1].bytes;
+    int i;
     u32 z;
     if(a->flag) {
-        register u8*d asm("r5");
-        register u8*t asm("r4");
+        u8*d;
+        u8*t;
         i=0;
         z=0;
         t=q;

@@ -50,32 +50,28 @@ void sub_082216F8(void*,void*,void*,int,int);
 void sub_08039998(void*,int,int);
 void sub_08039968(void*,int,int);
 void sub_08039DE4(struct Owner *owner,struct Item *p,int index)  {
-  register struct Sprite *sprite asm("r9")=&p->sprite;
-  register struct Drawing *drawing asm("r8");
-  register int choice asm("r0");
+  struct Sprite *sprite=&p->sprite;
+  struct Drawing *drawing;
+  int choice;
   {
     register int offset asm("r2")=0x50;
-    register struct Drawing*initial asm("r2");
+    struct Drawing*initial;
     asm("" : "+r"(offset));
     initial=(struct Drawing*)(offset+(u32)p);
     drawing=initial;
   }
   if(p->entered)  {
-    register int zero asm("r3")=0;
-    register struct Vec*vector asm("r2");
+    int zero=0;
+    struct Vec*vector;
     register int y asm("r6");
-    register const u16*table asm("r0");
-    register const u16*entry asm("r1");
-    asm("" : "+r"(zero));
+    const u16*table;
+    const u16*entry;
     p->entered=zero;
     vector=&p->start;
     y=128;
-    asm("" : "+r"(vector),"+r"(y));
     if(index>7)y=144;
     table=gUnk_0824DE8C;
-    asm("" : "+r"(table));
     entry=(const u16*)((index&3)*2+(u32)table);
-    asm("" : "+r"(entry));
     p->start.x=*entry+80;
     vector->y=y;
     vector->z=zero;
@@ -84,10 +80,9 @@ void sub_08039DE4(struct Owner *owner,struct Item *p,int index)  {
     asm("" : "+r"(vector),"+r"(y));
     {
       register int x asm("r0")=y;
-      register int value asm("r1");
+      int value;
       asm("" : "+r"(x));
       value=*entry;
-      asm("" : "+r"(value));
       p->end.x=x+value;
     }
     vector->y=32;
@@ -97,27 +92,23 @@ void sub_08039DE4(struct Owner *owner,struct Item *p,int index)  {
   p->sprite.value=p->count;
   p->sprite.flags&=~1;
   {
-    register void*draw asm("r3")=&p->drawing;
+    void*draw=&p->drawing;
     register void*resource asm("r6")=owner->resource;
-    asm("" : "+r"(draw),"+r"(resource));
     if(index>7)choice=(index&3)+4;
     else choice=index&3;
-    asm("" : "+r"(choice));
     sub_0821980C(draw,resource,gUnk_0824DE7C[choice],0);
   }
   p->drawing.flags&=~1;
   {
-    register void*position asm("r4")=&drawing->x;
-    asm("" : "+r"(position));
+    void*position=&drawing->x;
     sub_082216F8(position,&p->start,&p->end,p->timer,5);
     sub_08039998(position,p->timer,p->velocity);
   }
   {
     register struct Drawing*source asm("r2")=drawing;
     register u32 x asm("r0")=source->x;
-    register u32 y asm("r1")=source->y;
+    u32 y=source->y;
     register struct Sprite*dest asm("r6")=sprite;
-    asm("" : "+r"(x),"+r"(y));
     dest->x=x;
     dest->y=y;
   }

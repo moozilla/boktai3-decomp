@@ -10,11 +10,11 @@ u8 *sub_0821D64C(s32,s32);
 void sub_080050F4(void);
 s32 Scene_TryStepDown(struct Object *input,s32 idx,s32 dir)
 {
-    register struct Object *actor asm("r5")=input;
+    struct Object *actor=input;
     register s32 index asm("r4")=idx;
     register s32 direction asm("r8")=dir;
     register struct Cell *reference asm("r10")=&actor->terrain;
-    register s32 savedIndex asm("r9");
+    s32 savedIndex;
     s32 delta=0,dx=0,dz=0,speed,step;
     struct Cell *cell;
     u8 *dynamic;
@@ -28,46 +28,45 @@ s32 Scene_TryStepDown(struct Object *input,s32 idx,s32 dir)
     }
     index+=delta;
     dynamic=sub_0821D64C(index,1);
-    savedIndex=index;asm("" : "+r"(savedIndex));
+    savedIndex=index;
     if(dynamic)cell=(struct Cell *)(dynamic+4);
     else cell=(struct Cell *)(gUnk_030052F4->cells+12+savedIndex*4);
     if(cell){
         register u32 heightByte asm("r1")=cell->height;
-        register u32 mask asm("r4")=0xF0;
+        u32 mask=0xF0;
         s32 type=heightByte>>4;
         asm("" : : "r"(heightByte));
         asm("" : "+r"(mask));
         switch(type){
         case 0:{
             register u32 lowMask asm("r12")=15;
-            register u32 referenceHeight asm("r0");
+            u32 referenceHeight;
             register s32 next asm("r3");
             s32 current;
-            asm("" : : "r"(lowMask));
-            referenceHeight=({register struct Cell *p asm("r2")=reference;asm("" : "+r"(p));p->height;});
+            referenceHeight=({register struct Cell *p asm("r2")=reference;p->height;});
             asm("" : : "r"(referenceHeight));
-            next=heightByte&lowMask;asm("" : : "r"(next));current=referenceHeight&lowMask;
+            next=heightByte&lowMask;current=referenceHeight&lowMask;
             if((u32)next>=(u32)current)break;
             if(cell->flags&8)break;
             if(current-next>1){
-                actor->targetY=({register u32 y asm("r0")=next<<8;asm("" : "+r"(y));y;});actor->direction=({register u32 d asm("r0")=direction;asm("" : "+r"(d));d;});{register void (*callback)(void) asm("r1")=sub_080050F4;asm("" : "+r"(callback));actor->update=callback;}
+                actor->targetY=({register u32 y asm("r0")=next<<8;y;});actor->direction=({u32 d=direction;asm("" : "+r"(d));d;});{register void (*callback)(void) asm("r1")=sub_080050F4;actor->update=callback;}
                 actor->state=0;actor->moving=1;actor->dx=dx;actor->dz=dz;actor->kind=2;actor->cell=savedIndex;actor->speed=speed;
                 return 3;
             }else{
                 u32 referenceHeight;
-                actor->targetY=({register u32 y asm("r0")=next<<8;asm("" : "+r"(y));y;});
-                referenceHeight=({register struct Cell *p asm("r2")=reference;asm("" : "+r"(p));p->height;});
-                {register s32 remaining asm("r0")=referenceHeight&lowMask;asm("" : "+r"(remaining));if(remaining>0)remaining--;
+                actor->targetY=({register u32 y asm("r0")=next<<8;y;});
+                referenceHeight=({register struct Cell *p asm("r2")=reference;p->height;});
+                {register s32 remaining asm("r0")=referenceHeight&lowMask;if(remaining>0)remaining--;
                 mask&=referenceHeight;mask|=remaining;reference->height=mask;}
-                {register u32 tile asm("r0")=cell->tile;asm("" : "+r"(tile));reference->tile=tile;}
-                actor->direction=({register u32 d asm("r2")=direction;asm("" : "+r"(d));d;});{register void (*callback)(void) asm("r1")=sub_080050F4;asm("" : "+r"(callback));actor->update=callback;}
+                {register u32 tile asm("r0")=cell->tile;reference->tile=tile;}
+                actor->direction=({register u32 d asm("r2")=direction;d;});{register void (*callback)(void) asm("r1")=sub_080050F4;actor->update=callback;}
                 actor->state=0;actor->moving=1;actor->dx=dx;actor->dz=dz;actor->kind=1;actor->cell=savedIndex;actor->speed=speed;
                 return 1;
             }
         }
         default:{
             /* Preserve the original range normalization for non-flat terrain. */
-            register s32 normalized asm("r0")=type-1;asm("" : : "r"(normalized));break;
+            s32 normalized=type-1;asm("" : : "r"(normalized));break;
         }
         }
     }

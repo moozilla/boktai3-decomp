@@ -41,7 +41,6 @@ void sub_08036BD4(int);
 int sub_0803441C(struct Engine *p) {
   int result = 0;
   register int bits asm("r2") = p->mask;
-  asm("" : "+r"(bits));
   if (bits & 2)
     goto fail;
   if (gUnk_03006A80->linkLossSlotFlag)
@@ -56,17 +55,15 @@ run:
     p->mask = 0x205 | bits;
   {
     register int value asm("r0") = p->bits;
-    register int previous asm("r1") = p->pad1a;
-    register int current asm("r3");
+    int previous = p->pad1a;
+    int current;
     asm("" : "+r"(value), "+r"(previous));
     current = value;
-    asm("" : "+r"(current));
     if (previous != current) {
       {
-        register int flags asm("r1") = p->mask;
-        register int mask asm("r0") = 4;
+        int flags = p->mask;
+        int mask = 4;
         register int unusedZero asm("r2") = 0;
-        asm("" : "+r"(flags), "+r"(mask) : "r"(unusedZero));
         p->mask = flags | mask;
       }
       if (gUnk_03006A80->connSlotFlag)
@@ -81,11 +78,10 @@ run:
   }
   {
     register int flags asm("r1") = p->mask;
-    register int one asm("r5") = 1;
-    asm("" : "+r"(one), "+r"(flags));
+    int one = 1;
     if (one & flags) {
       if (!rfu_NI_setSendData(p->bits, 67, p->scratch, 64)) {
-        register int slot asm("r2") = 0;
+        int slot = 0;
         if (!(gUnk_03006A80->connSlotFlag & one)) {
           do {
             slot++;

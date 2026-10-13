@@ -55,7 +55,7 @@ int sub_082238F0(int);
 // MATCHING_CONCESSION: register-pinning
 void sub_08035D58(u8 command) {
   register int key asm("r3") = command;
-  register int saved asm("r1") = key;
+  int saved = key;
   struct Engine *p = gUnk_02000484;
   if (!p)
     goto done;
@@ -71,8 +71,7 @@ void sub_08035D58(u8 command) {
 lowMore:
   if (key == 0x32)
     goto removed;
-  asm(""
-      : "+r"(key)); /* Range switch retains the original strict comparison
+/* Range switch retains the original strict comparison
                        boundary. */
   switch (key) {
   case 0x32 ... 0x7FFFFFFF:
@@ -92,7 +91,6 @@ high:
     goto last;
   if (key == 0x43)
     goto done;
-  asm("" : "+r"(key));
   switch (key) {
   case 0x43 ... 0x7FFFFFFF:
     break;
@@ -118,24 +116,24 @@ lastMore:
   goto done;
 
 added: {
-  register u8 *slots asm("r2") = &p->selected;
+  u8 *slots = &p->selected;
   register int incoming asm("r1") = (u8)gUnk_03005390.code;
   *slots |= incoming;
 }
   goto done;
 removed: {
-  register u8 *slots asm("r2") = &p->selected;
-  register int incoming asm("r1") = (u8)gUnk_03005390.code;
+  u8 *slots = &p->selected;
+  int incoming = (u8)gUnk_03005390.code;
   *slots &= ~incoming;
 }
   goto done;
 disconnected: {
-  register u8 *slots asm("r3") = &p->selected;
-  register struct Event *event asm("r2") = &gUnk_03005390;
+  u8 *slots = &p->selected;
+  struct Event *event = &gUnk_03005390;
   int zero;
   int remaining;
-  register int incoming asm("r1") = (u8)event->code;
-  register int selected asm("r0") = *slots & ~incoming;
+  int incoming = (u8)event->code;
+  int selected = *slots & ~incoming;
   zero = 0;
   *slots = selected;
   ((u8 *)p)[0xE9] = 1;
@@ -145,8 +143,7 @@ disconnected: {
     goto done;
   sub_082238F0(1);
   {
-    register int op asm("r0") = 29;
-    asm("" : "+r"(op));
+    int op = 29;
     p->flag = zero;
     p->operation = op;
     p->ticks = zero;

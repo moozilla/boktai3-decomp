@@ -61,7 +61,6 @@ int sub_08030C84(void *script) {
     p->script = script;
     {
       u16 *index = &p->scriptIndex;
-      asm("" : "+r"(index));
       zero = 0;
       *index = zero;
     }
@@ -70,7 +69,6 @@ int sub_08030C84(void *script) {
     {
       u16 *count = &p->scriptCount;
       int one;
-      asm("" : "+r"(count));
       one = 1;
       *count = one;
     }

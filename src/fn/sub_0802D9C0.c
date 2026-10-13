@@ -13,7 +13,6 @@ int sub_0802D9C0(void *context, struct Object *p) {
   i = 0;
   fn = p->callbacks;
   do {
-    asm("" : "+r"(i));
     if (*fn)
       (*fn)(context, p);
     fn++;

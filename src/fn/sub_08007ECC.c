@@ -26,43 +26,43 @@ static inline s32 stateMode(void){struct State *state=gUnk_02000580[0];if(state)
 static inline s32 globalMode(void){u32 active=gUnk_02000534;s32 yes=0;if(active&&gUnk_02000500==4)yes=1;return yes;}
 static inline s32 actorMode(void){struct State *state=gUnk_02000580[0];if(state){u32 mask=16;return state->flags&mask;}return 0;}
 void sub_080075F8(void *,struct Trigger *);void sub_080077FC(void *,struct Trigger *);void sub_0822B2F8(s32);s32 sub_082151E4(void *,u16);void sub_082144A4(struct Object *,void *,s32);void sub_08215284(void *,s32);void sub_08220C8C(void *,void *,s32,s32,s32);void sub_08013728(void *);
-static inline s32 scale(s32 input){register s32 value asm("r0")=input*3;asm("" : : "r"(value));if(value>=0)value>>=5;else value=-((-value)>>5);asm("" : : "r"(value));return value;}
-static inline s32 scaleHeight(s32 input){register s32 value asm("r0")=input*3;asm("" : : "r"(value));if(value>=0)return value>>5;return -((-value)>>5);}
+static inline s32 scale(s32 input){s32 value=input*3;if(value>=0)value>>=5;else value=-((-value)>>5);return value;}
+static inline s32 scaleHeight(s32 input){s32 value=input*3;if(value>=0)return value>>5;return -((-value)>>5);}
 struct World {u8 pad[0x5A0];u32 region;};extern struct World *gUnk_02000710;
 void sub_0800700C(struct Trigger *);void sub_08249240(struct Manager *,struct Trigger *,void (*)(void *,struct Trigger *));
-static inline u8 sameRegion(struct Trigger *p){u32 current=({struct World *world=gUnk_02000710;register u32 offset asm("r2")=0x5A0;asm("" : : "r"(offset));*(u32 *)((u8 *)world+offset);});register u32 region asm("r7")=p->sound;asm("" : : "r"(region));if(current==region)return 1;return 0;}
+static inline u8 sameRegion(struct Trigger *p){u32 current=({struct World *world=gUnk_02000710;register u32 offset asm("r2")=0x5A0;asm("" : : "r"(offset));*(u32 *)((u8 *)world+offset);});register u32 region asm("r7")=p->sound;if(current==region)return 1;return 0;}
 #define TriggerManager_Update sub_08007ECC
-s32 TriggerManager_Update(struct Manager *input){register struct Manager *p asm("r10")=input;s32 i;struct Trigger *trigger,*next;register u8 *delay asm("r9");
- {register struct State **table asm("r8");i=0;table=gUnk_02000580;
+s32 TriggerManager_Update(struct Manager *input){struct Manager *p=input;s32 i;struct Trigger *trigger,*next;register u8 *delay asm("r9");
+ {struct State **table;i=0;table=gUnk_02000580;
  for(;i<4;i++){
-  struct State *actor;asm("" : "+r"(i));actor=({register struct State *a asm("r2")=table[i];asm("" : : "r"(a));a;});p->actors[i]=actor;
-  if(actor){register u32 offset asm("r0")=i*8;register struct Vec *out asm("r3");register struct Vec *in asm("r5");s32 x,z,horizontal,height;asm("" : : "r"(offset));out=(struct Vec *)(offset+(u32)({register struct Manager *manager asm("r7")=p;asm("" : : "r"(manager));manager;}));asm("" : : "r"(out));out=(struct Vec *)((u8 *)out+60);in=&actor->position;x=({register s32 value asm("r4")=actor->position.x;asm("" : : "r"(value));value;});z=in->z;
+  struct State *actor;asm("" : "+r"(i));actor=({struct State *a=table[i];a;});p->actors[i]=actor;
+  if(actor){register u32 offset asm("r0")=i*8;struct Vec *out;struct Vec *in;s32 x,z,horizontal,height;out=(struct Vec *)(offset+(u32)({register struct Manager *manager asm("r7")=p;manager;}));out=(struct Vec *)((u8 *)out+60);in=&actor->position;x=({register s32 value asm("r4")=actor->position.x;asm("" : : "r"(value));value;});z=in->z;
    out->x=scale(x-z);horizontal=scale(({register s32 sum asm("r1")=x+z;asm("" : : "r"(sum));sum;}));height=scaleHeight(in->y);out->y=horizontal-height;out->z=horizontal+height;
   }
  }
  }
- trigger=({register struct Manager *m asm("r0")=p;asm("" : : "r"(m));m->head;});
- delay=({register u8 *value asm("r1")=(u8 *)36;asm("" : "+r"(value));value=(u8 *)((u32)value+(u32)p);value;});
+ trigger=({register struct Manager *m asm("r0")=p;m->head;});
+ delay=({register u8 *value asm("r1")=(u8 *)36;value=(u8 *)((u32)value+(u32)p);value;});
  for(;trigger;trigger=next){
   next=trigger->next;
   if(trigger->flags&1)sub_0800700C(trigger);
   else{
    if(!trigger->sound||sameRegion(trigger)){
     if(trigger->sprite)trigger->sprite->flags&=~1;
-    {register struct Object *object asm("r4");struct Object *candidate=({register struct Object *value asm("r1")=trigger->object;asm("" : : "r"(value));value;});object=candidate;
+    {struct Object *object;struct Object *candidate=({struct Object *value=trigger->object;value;});object=candidate;
     if(candidate){
      if(!trigger->started)goto showObject;
      else if(gUnk_02000478>0){candidate->flags&=~1;trigger->flash=0;trigger->tick=0;trigger->visible=1;}
      else{
       s32 available;
       if(gUnk_030053F4&2048)available=stateMode();
-      else if(gUnk_02000580[0]&&({u32 *flags=&gUnk_02000580[0]->flags;register u32 mask asm("r1")=16;asm("" : : "r"(mask),"r"(flags));*flags&mask;}))goto available;
+      else if(gUnk_02000580[0]&&({u32 *flags=&gUnk_02000580[0]->flags;u32 mask=16;*flags&mask;}))goto available;
       else available=globalMode();
       asm("" : : "r"(available));
       if(available){
 available:
        if(trigger->visible)trigger->flash=31;
-       {register u32 ticks asm("r1")=trigger->flash;register u32 saved asm("r2")=ticks;if(saved){ticks--;trigger->flash=ticks;ticks&=15;asm("" : : "r"(ticks));if(ticks>7)object->flags&=~1;else object->flags|=1;}
+       {u32 ticks=trigger->flash;register u32 saved asm("r2")=ticks;if(saved){ticks--;trigger->flash=ticks;ticks&=15;if(ticks>7)object->flags&=~1;else object->flags|=1;}
        else{if(trigger->tick<=47)object->flags&=~1;else if(trigger->tick<=71)object->flags|=1;else trigger->tick=saved;trigger->tick++;}}
        trigger->visible=0;
       }else{

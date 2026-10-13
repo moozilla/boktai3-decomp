@@ -7,7 +7,7 @@ void sub_08036D2C(const u8 *source, u8 *destination, int count) {
   int i = 0;
   while (i < count) {
     u32 first = *source;
-    register u32 code asm("r1");
+    u32 code;
     if (!first)
       break;
     first <<= 24;
@@ -18,10 +18,8 @@ void sub_08036D2C(const u8 *source, u8 *destination, int count) {
       {
         int high;
         code = source[0];
-        asm("" : "+r"(code));
         high = source[1] << 8;
         code |= high;
-        asm("" : "+r"(code));
       }
       source += 2;
     }

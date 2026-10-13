@@ -18,24 +18,23 @@ extern struct Owner *gUnk_02000100;
 void sub_0803A6F8(void)  {
   register struct Owner *p asm("r5") = gUnk_02000100;
   if (p)  {
-    register int i asm("r4")=0;
+    int i=0;
     int state=4;
     register int zero asm("r6")=0;
-    register u8*count asm("r2")=p->counts;
+    u8*count=p->counts;
     asm("" : "+r"(i),"+r"(state),"+r"(zero),"+r"(count));
     do  {
       if (*count)  {
         int value;
         register int offset asm("r0")=i*0xb0+0x5c;
-        register struct Item*q asm("r1");
-        asm("" : "+r"(offset));
+        struct Item*q;
         q=(struct Item*)((u8*)p+offset);
         q->state = state;
         q->entered = 1;
         q->timer = zero;
         value = *count;
         {
-          register int clear asm("r3")=0;
+          int clear=0;
           asm("" : "+r"(clear));
           if (value > 10) value = 10;
           q->count = value;

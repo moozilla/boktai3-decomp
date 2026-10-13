@@ -19,11 +19,11 @@ void sub_081E4DB4(void)
         if (g == 0) return;
     }
 H(0xf8a)=Script_GetValue();
- if(Script_SeekToKeyword(0x74)){H(0xed0)=Script_GetValue();{register u32 value asm("r0")=Script_GetValue()+160;H(0xed2)=value;}H(0xed4)=Script_GetValue();}
- else{{register u32 value asm("r1")=OWNER(0x30);H(0xed0)=value;}{register u32 value asm("r0")=OWNER(0x32)+160;H(0xed2)=value;}{register u32 value asm("r1")=OWNER(0x34);H(0xed4)=value;}}
+ if(Script_SeekToKeyword(0x74)){H(0xed0)=Script_GetValue();{u32 value=Script_GetValue()+160;H(0xed2)=value;}H(0xed4)=Script_GetValue();}
+ else{{u32 value=OWNER(0x30);H(0xed0)=value;}{u32 value=OWNER(0x32)+160;H(0xed2)=value;}{u32 value=OWNER(0x34);H(0xed4)=value;}}
  B(0xf67)=sub_0821ABA8(0x64,-1);W(0xf50)=sub_0821ABA8(0x70,0);
     g->b = g->xa;
-    {register u32 mode asm("r2")=2;g->xa=mode;}
+    {u32 mode=2;g->xa=mode;}
     {register u32 raw asm("r1")=*(u16*)((u8*)g+0xf5a);register u32 mask asm("r2")=15;
     *(u16*)((u8*)g+0xf5a)=(mask&raw)|0xa0;
     if(g->b==3){register u32 bits asm("r0")=mode_bits((u8*)g+0xf5a,mask);if(bits==3){g->d=g->e2c;g->e=g->e32;}}}

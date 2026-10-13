@@ -12,7 +12,7 @@ void BoardPiece_UpdateAnimation(struct Piece *p){
  p->sprite.position=p->position;
  a=&p->anim;entry=a->data+a->frame;o->frame=*entry>>6;
  {u32 input=a->flags;register u32 mask asm("r3")=1; register u32 left asm("r1")=(u8)(input&mask); if(left!=(((*entry&0x30)>>4)&mask))p->sprite.flags|=4;else p->sprite.flags&=~4;}
- {register u32 input asm("r0")=a->flags;register u32 mask asm("r3")=2; register u32 left asm("r1")=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
+ {register u32 input asm("r0")=a->flags;u32 mask=2; u32 left=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
  n=++a->timer;
  if(n>=a->rate) {
  a->timer=0;
@@ -30,6 +30,6 @@ void BoardPiece_UpdateAnimation(struct Piece *p){
  }else done=0;
  p->done=done;
  if(p->position.y>p->targetY)p->position.y--;else if(p->position.y<p->targetY)p->position.y++;
- {int value=gUnk_086149C4[p->angle]*32;{register int delta asm("r1");if(value>=0)delta=value>>12;else{register int magnitude asm("r0")=-value;asm("" : "+r"(magnitude));delta=-(magnitude>>12);}asm("" : "+r"(delta));o->position.y=o->position.y+delta;}}
+ {int value=gUnk_086149C4[p->angle]*32;{int delta;if(value>=0)delta=value>>12;else{int magnitude=-value;delta=-(magnitude>>12);}o->position.y=o->position.y+delta;}}
  p->angle+=4;
 }

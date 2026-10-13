@@ -35,18 +35,15 @@ void sub_08032E8C(struct TextState *);
 void sub_08032E98(struct TextState *);
 void sub_08032F78(struct Window *);
 int sub_08033468(void);
-// MATCHING_CONCESSION: register-pinning
 void sub_08032F78(struct Window *p) {
   struct TextState *t = &p->text;
-  register int advance asm("r8");
+  int advance;
   const u8 *s;
   {
-    register struct TextState *initial asm("r7") = t;
-    asm("" : "+r"(initial));
+    struct TextState *initial = t;
     t = initial;
   }
   advance = 0;
-  asm("" : "+r"(advance));
   if (p->scrolling) {
     if (!p->delay) {
       if (gUnk_03005260[0] & 4)
@@ -69,7 +66,6 @@ void sub_08032F78(struct Window *p) {
       const u8 *q = sub_08032BEC(t);
       if (q) {
         int c = (s8)*q;
-        asm("" : "+r"(c));
         if (c < 0) {
           p->ticks -= 8;
           p->scrolling = 1;
@@ -80,7 +76,6 @@ void sub_08032F78(struct Window *p) {
   }
   if (p->blocked)
     goto done;
-  asm("" : "+r"(advance));
   if (!advance)
     goto done;
   sub_08218E5C(p->row, 18, 1, 2);

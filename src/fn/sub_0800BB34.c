@@ -13,31 +13,31 @@ struct Context {struct Vec world,lower,upper,actorLower,actorUpper;};
 extern s16 gUnk_086149C4[];extern u32 gUnk_02000560;struct AnimId{u16 id,pad;};extern struct AnimId gUnk_08604A30[][3];extern u32 gUnk_08604A60[];extern void (*gUnk_08604A54[])(void *,u32);
 s32 sub_082215E4(s32,s32);void sub_08220C8C(void *,void *,u32,u32,u32);void sub_0822B3BC(u32);
 extern u32 gUnk_03005308;extern u16 gUnk_0203B400[];
-static inline u32 randomValue(void){register u16 *table asm("r4")=gUnk_0203B400;asm("" : : "r"(table));gUnk_03005308=(gUnk_03005308+1)&1023;return table[gUnk_03005308];}
-static inline u32 actorMode(struct Actor *actor){register u32 mask asm("r1")=128;asm("" : : "r"(actor),"r"(mask));return actor->flags&mask;}
-static inline u32 pausedMode(void){register u32 mask asm("r1")=4;asm("" : : "r"(mask));return gUnk_02000560&mask;}
+static inline u32 randomValue(void){register u16 *table asm("r4")=gUnk_0203B400;gUnk_03005308=(gUnk_03005308+1)&1023;return table[gUnk_03005308];}
+static inline u32 actorMode(struct Actor *actor){u32 mask=128;return actor->flags&mask;}
+static inline u32 pausedMode(void){u32 mask=4;return gUnk_02000560&mask;}
 #define EffectParticle_UpdateHomingWide sub_0800BB34
 void EffectParticle_UpdateHomingWide(struct Manager *manager,struct Effect *effect,s32 index,s32 phase,u32 phaseMask,struct Context *context){
 register struct Context *ctx asm("r10")=context;
-struct Particle *p=&effect->particles[index];struct Sprite *sprite=&p->sprite,*o;struct Anim *a;const u16 *entry;register u16 n asm("r0");s32 dx,dy,dz;asm("" : : "r"(ctx));
+struct Particle *p=&effect->particles[index];struct Sprite *sprite=&p->sprite,*o;struct Anim *a;const u16 *entry;register u16 n asm("r0");s32 dx,dy,dz;
 if((index&1)==phase){
- {register struct Context *c asm("r2")=ctx;asm("" : : "r"(c));dx=c->world.x-sprite->position.x;}{register struct Context *c asm("r3")=ctx;asm("" : : "r"(c));dy=c->world.y-sprite->position.y+164;dz=c->world.z-sprite->position.z;}
+ {register struct Context *c asm("r2")=ctx;dx=c->world.x-sprite->position.x;}{register struct Context *c asm("r3")=ctx;dy=c->world.y-sprite->position.y+164;dz=c->world.z-sprite->position.z;}
  p->angle=sub_082215E4(dx,dz);
  p->velocity.x=(gUnk_086149C4[(p->angle+64)&255]*p->speed)>>12;
  p->velocity.z=(gUnk_086149C4[p->angle]*p->speed)>>12;
- {register u32 mask asm("r9");register u32 m asm("r3")=4;asm("" : : "r"(m));mask=m;if(!(gUnk_02000560&m)&&!effect->timer&&(dy<0?-dy:dy)<=179&&dx*dx+dz*dz<400){
+ {u32 mask;register u32 m asm("r3")=4;mask=m;if(!(gUnk_02000560&m)&&!effect->timer&&(dy<0?-dy:dy)<=179&&dx*dx+dz*dz<400){
  p->state=mask;sub_08220C8C(&p->anim,manager->animation,gUnk_08604A30[manager->mode][effect->type].id,0,0);
  if(!(gUnk_02000560&mask)){sub_0822B3BC(gUnk_08604A60[effect->type]);gUnk_08604A54[effect->type](manager->actor,effect->kind);}return;
  }
 }}
 sprite->position.x=sprite->position.x+p->velocity.x;
-{s32 height;register struct Context *c asm("r2")=ctx;asm("" : : "r"(c));height=c->world.y-sprite->position.y;
-if(height>16)sprite->position.y+=16;else if(height< -16)sprite->position.y-=16;else {register struct Context *c asm("r3")=ctx;asm("" : : "r"(c));sprite->position.y=c->world.y;}}
-{register u16 velocity asm("r0")=p->velocity.z;register u16 position asm("r1")=sprite->position.z;asm("" : : "r"(velocity),"r"(position));sprite->position.z=velocity+position;}
- o=&p->sprite;{register struct Manager *m asm("r2")=manager;register struct Graphics *graphics asm("r3");asm("" : : "r"(m));graphics=m->graphics;asm("" : : "r"(graphics));a=&p->anim;entry=a->data+a->frame;
- {register u32 factor asm("r2")=*entry>>6;asm("" : : "r"(factor));o->tile=(o->width>>3)*(o->height>>3)*factor+graphics->base;}}
+{s32 height;register struct Context *c asm("r2")=ctx;height=c->world.y-sprite->position.y;
+if(height>16)sprite->position.y+=16;else if(height< -16)sprite->position.y-=16;else {register struct Context *c asm("r3")=ctx;sprite->position.y=c->world.y;}}
+{u16 velocity=p->velocity.z;u16 position=sprite->position.z;sprite->position.z=velocity+position;}
+ o=&p->sprite;{register struct Manager *m asm("r2")=manager;struct Graphics *graphics;asm("" : : "r"(m));graphics=m->graphics;a=&p->anim;entry=a->data+a->frame;
+ {u32 factor=*entry>>6;o->tile=(o->width>>3)*(o->height>>3)*factor+graphics->base;}}
  {u32 input=a->flags;register u32 mask asm("r3")=1; register u32 left asm("r1")=(u8)(input&mask); if(left!=(((*entry&0x30)>>4)&mask))p->sprite.flags|=4;else p->sprite.flags&=~4;}
- {register u32 input asm("r0")=a->flags;register u32 mask asm("r3")=2; register u32 left asm("r1")=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
+ {register u32 input asm("r0")=a->flags;u32 mask=2; u32 left=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
  n=++a->timer;
  if(n>=a->rate) {
  a->timer=0;

@@ -26,19 +26,17 @@ void sub_08038448(struct P *p)
     register u32 mask asm("r8") = 0;
     register int start asm("r4");
     register int i asm("r5");
-    register u32 *random asm("r9");
+    u32 *random;
     gUnk_02000710->selection = mask;
     sub_0822E498(0);
     {
-        register u32 t asm("r3") = 1;
-        asm volatile("" : "+r"(t));
+        u32 t = 1;
         mask = t;
     }
     if ((p->rightMask & 2) && p->round > 3) {
         sub_0822E498(1);
         {
-            register u32 t asm("r0") = 3;
-            asm volatile("" : "+r"(t));
+            u32 t = 3;
             mask = t;
         }
     }
@@ -46,7 +44,6 @@ void sub_08038448(struct P *p)
         sub_0822E498(2);
         {
             register u32 t asm("r1") = mask;
-            asm volatile("" : "+r"(t));
             t |= 4;
             mask = t;
         }
@@ -55,7 +52,6 @@ void sub_08038448(struct P *p)
         sub_0822E498(6);
         {
             register u32 t asm("r3") = mask;
-            asm volatile("" : "+r"(t));
             t |= 64;
             mask = t;
         }
@@ -63,8 +59,7 @@ void sub_08038448(struct P *p)
     if (p->rightMask & 128) {
         sub_0822E498(7);
         {
-            register u32 t asm("r0") = mask;
-            asm volatile("" : "+r"(t));
+            u32 t = mask;
             t |= 128;
             mask = t;
         }
@@ -73,7 +68,6 @@ void sub_08038448(struct P *p)
         sub_0822E498(8);
         {
             register u32 t asm("r1") = mask;
-            asm volatile("" : "+r"(t));
             t |= 256;
             mask = t;
         }
@@ -82,7 +76,6 @@ void sub_08038448(struct P *p)
         sub_0822E498(9);
         {
             register u32 t asm("r3") = mask;
-            asm volatile("" : "+r"(t));
             t |= 512;
             mask = t;
         }
@@ -90,8 +83,7 @@ void sub_08038448(struct P *p)
     if (p->rightMask & 1024) {
         sub_0822E498(10);
         {
-            register u32 t asm("r0") = mask;
-            asm volatile("" : "+r"(t));
+            u32 t = mask;
             t |= 1024;
             mask = t;
         }
@@ -100,7 +92,6 @@ void sub_08038448(struct P *p)
         sub_0822E498(11);
         {
             register u32 t asm("r1") = mask;
-            asm volatile("" : "+r"(t));
             t |= 2048;
             mask = t;
         }
@@ -113,27 +104,24 @@ void sub_08038448(struct P *p)
         random = t;
     }
     do {
-        register int n asm("r3");
-        register int limit asm("r6");
+        int n;
+        int limit;
         int offset;
         int index;
         register int byteOffset asm("r2");
         {
-            register struct Save **slot asm("r0") = &gUnk_02000710;
+            struct Save **slot = &gUnk_02000710;
             register struct Save *save asm("r1");
-            register s16 *row asm("r1");
-            asm volatile("" : "+r"(slot));
+            s16 *row;
             save = *slot;
             byteOffset = i * 2;
             row = (s16 *)(byteOffset + (u32)save + 0x88);
-            asm volatile("" : "+r"(row), "+r"(byteOffset));
             *row = -1;
         }
         n = start;
         offset = byteOffset;
         limit = start + 12;
         i++;
-        asm volatile("" : "+r"(n), "+r"(limit), "+r"(offset));
         goto condition;
     next:
         n++;
@@ -145,22 +133,18 @@ void sub_08038448(struct P *p)
             if (item > 11)
                 item -= 12;
             bit = 1 << item;
-            asm volatile("" : "+r"(bit));
             if (({
-                register u32 t asm("r0") = mask;
-                asm volatile("" : "+r"(t));
+                u32 t = mask;
                 t & bit;
             }) != 0) {
                 {
-                    register struct Save **slot asm("r0") = &gUnk_02000710;
-                    register struct Save *save asm("r0");
-                    asm volatile("" : "+r"(slot), "+r"(offset), "+r"(limit), "+r"(n), "+r"(bit) :: "memory");
+                    struct Save **slot = &gUnk_02000710;
+                    struct Save *save;
                     save = *slot;
                     *(s16 *)(offset + (u32)save + 0x88) = item;
                 }
                 {
-                    register u32 t asm("r0") = mask;
-                    asm volatile("" : "+r"(t));
+                    u32 t = mask;
                     t &= ~bit;
                     mask = t;
                 }

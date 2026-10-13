@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Engine {
   u8 pad0[0x18];
@@ -45,8 +44,8 @@ static inline void setOperation(struct Engine *p, int op, int zero) {
 }
 void sub_080356AC(struct Engine *p, u8 slots) {
   u8 *scratch = p->scratch;
-  register int mask asm("r3") = (u8)(slots << 1);
-  register int i asm("r1") = 0;
+  int mask = (u8)(slots << 1);
+  int i = 0;
   int active = scratch[2];
   do {
     if (((2 << i) & active) & mask) {
@@ -55,8 +54,7 @@ void sub_080356AC(struct Engine *p, u8 slots) {
     }
   } while (++i <= 4);
   {
-    register int active asm("r1") = scratch[2] & ~mask;
-    asm("" : "+r"(active));
+    int active = scratch[2] & ~mask;
     scratch[2] = active;
     if ((((u8 *)p)[0xE7] & active) == active)
       ((u8 *)p)[0xE8] = 0;

@@ -11,7 +11,6 @@ void Scene_ApplyTerrainInteraction(struct Contact *contact,void *unused,struct A
 {
     register struct Actor *incoming asm("r0")=actor;
     s32 applied;
-    asm("" : "+r"(incoming));
     applied=0;
     actor=incoming;
     if(actor->type==0){

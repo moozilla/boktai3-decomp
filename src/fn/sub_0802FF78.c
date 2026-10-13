@@ -89,10 +89,9 @@ struct Context {
 };
 static inline int near(struct Actor *p, struct Vec *b) {
   register struct Vec *a asm("r3") = &p->pos;
-  register int limit asm("r5");
+  int limit;
   int x;
-  register int result asm("r1");
-  asm("" : "+r"(a));
+  int result;
   limit = p->rateA;
   x = b->x - a->x;
   if (x < 0)
@@ -120,7 +119,7 @@ done:
   return result;
 }
 static inline int targetNear(struct Context *m, struct Actor *p) {
-  register int result asm("r0");
+  int result;
   if (m->target) {
     int close = near(p, m->target);
     result = 1;
@@ -135,10 +134,9 @@ struct Vec *sub_08049B6C(void);
 void sub_0821E618(void *);
 void sub_0802FF78(struct Context *m, struct Actor *p) {
   int close;
-  register void *path asm("r8") = p->path;
-  register int nextState asm("r0");
+  void *path = p->path;
+  int nextState;
   register int zero asm("r1");
-  asm("" : "+r"(path));
   if (p->entered) {
     int zero = 0;
     p->entered = zero;
@@ -146,12 +144,12 @@ void sub_0802FF78(struct Context *m, struct Actor *p) {
     p->action = 2;
   }
   if (!(p->ticks & 15)) {
-    register s8 *firstMode asm("r0") = (s8 *)&p->hasDestination;
+    s8 *firstMode = (s8 *)&p->hasDestination;
     int flag = *firstMode;
     s8 *mode = firstMode;
     if (flag) {
       struct Vec *q = sub_08049B6C();
-      register int nearby asm("r6") = 0;
+      int nearby = 0;
       if (q) {
         struct Vec *pos = &p->pos;
         int dx = pos->x - q->x;
@@ -200,7 +198,6 @@ afterPhase:
     int state = p->state;
     u8 *dst = &p->savedState;
     int zero;
-    asm("" : "+r"(dst));
     zero = 0;
     *dst = state;
     p->state = 10;

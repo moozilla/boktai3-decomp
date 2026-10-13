@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #define Scene_UpdateObjectStep sub_080050F4
 struct Vec {s16 x,y,z;};
 struct Body {u8 pad[12];s16 x,y,z,unused,vx,vy,vz;};
@@ -30,17 +29,17 @@ void Scene_UpdateObjectStep(struct Object *p)
         terrain->height=(terrain->height&0xF0)|height;terrain->tile=255;
         if(p->type==1){
             if(p->kind==2){
-                {register void (*callback)(void) asm("r1")=sub_08005264;asm("" : "+r"(callback));p->update=callback;}p->timer=0;p->entered=1;p->kind=2;p->dx=0;p->dz=0;p->direction=0;
+                {register void (*callback)(void) asm("r1")=sub_08005264;p->update=callback;}p->timer=0;p->entered=1;p->kind=2;p->dx=0;p->dz=0;p->direction=0;
             }else if(!sub_08004CE4(p,p->cell,p->direction)){
                 sub_080044CC(p);
-                {register void (*callback)(void) asm("r1")=sub_080050AC;asm("" : "+r"(callback));p->update=callback;}p->timer=0;p->entered=1;p->kind=0;p->dx=0;p->dz=0;p->direction=0;
+                {register void (*callback)(void) asm("r1")=sub_080050AC;p->update=callback;}p->timer=0;p->entered=1;p->kind=0;p->dx=0;p->dz=0;p->direction=0;
                 terrain->flags&=~1;
             }
         }else{
-            if(p->kind==2){{register void (*callback)(void) asm("r0")=sub_08005264;asm("" : "+r"(callback));p->update=callback;}p->timer=0;p->entered=1;p->kind=2;}
+            if(p->kind==2){{register void (*callback)(void) asm("r0")=sub_08005264;p->update=callback;}p->timer=0;p->entered=1;p->kind=2;}
             else{
                 sub_080044CC(p);
-                {register void (*callback)(void) asm("r1")=sub_080050AC;asm("" : "+r"(callback));p->update=callback;}p->timer=0;p->entered=1;p->kind=0;terrain->flags&=~1;
+                {register void (*callback)(void) asm("r1")=sub_080050AC;p->update=callback;}p->timer=0;p->entered=1;p->kind=0;terrain->flags&=~1;
             }
             p->dx=0;p->dz=0;p->direction=0;
         }

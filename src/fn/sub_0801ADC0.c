@@ -21,8 +21,8 @@ void SelectionMenu_Choose(u8 *p) {
   }else {
    index=sub_0801ACB8(p);
    if(index!=p[0x1d]) {
-    {register int x asm("r0")=(index&3)*24+144;register int offset asm("r3");asm("" : "+r"(x));offset=0x1b4;asm("" : "+r"(offset));*(u16 *)(p+offset)=x;
-    x=(index>>2)*24+32;asm("" : "+r"(x));offset+=2;{register u16 *out asm("r1")=(u16 *)(p+offset);asm("" : "+r"(out));*out=x;}}
+    {register int x asm("r0")=(index&3)*24+144;register int offset asm("r3");offset=0x1b4;asm("" : "+r"(offset));*(u16 *)(p+offset)=x;
+    x=(index>>2)*24+32;offset+=2;{register u16 *out asm("r1")=(u16 *)(p+offset);*out=x;}}
     p[0x1d]=index;sub_0822B2F8(0xdc);sub_08019F44(p,0);
    }
    if(gUnk_03005260[1]&1) {
@@ -43,12 +43,12 @@ void SelectionMenu_Choose(u8 *p) {
   }else {
    index=sub_0801ACB8(p);
    {register int old asm("r3")=p[0x1d];asm("" : "+r"(old));if(index!=old) {
-    {register int x asm("r0")=(index&3)*24+144;register int offset asm("r3");asm("" : "+r"(x));offset=0x1b4;asm("" : "+r"(offset));*(u16 *)(p+offset)=x;
-    x=(index>>2)*24+32;asm("" : "+r"(x));offset+=2;{register u16 *out asm("r1")=(u16 *)(p+offset);asm("" : "+r"(out));*out=x;}}
+    {register int x asm("r0")=(index&3)*24+144;register int offset asm("r3");offset=0x1b4;asm("" : "+r"(offset));*(u16 *)(p+offset)=x;
+    x=(index>>2)*24+32;offset+=2;{register u16 *out asm("r1")=(u16 *)(p+offset);*out=x;}}
     p[0x1d]=index;sub_0822B2F8(0xdc);sub_0801A01C(p,0);
    }}
    if(gUnk_03005260[1]&1) {
-    if(sub_0822E104(p[0x1d])>=0) {register int selected asm("r0")=p[0x1d];asm("" : "+r"(selected));if((1<<selected)&*(u32 *)(p+0x34))sub_0801A8FC(p);else sub_0822B2F8(0x192);}
+    if(sub_0822E104(p[0x1d])>=0) {int selected=p[0x1d];if((1<<selected)&*(u32 *)(p+0x34))sub_0801A8FC(p);else sub_0822B2F8(0x192);}
     else sub_0822B2F8(0x192);
     return;
    }else if(gUnk_03005260[1]&2) {sub_0801A920(p);return;}

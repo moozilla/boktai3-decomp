@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Vec {s16 x,y,z,pad;};
 struct Sprite {u32 flags;u8 pad4[3],priority;u8 scaleX,scaleY;u8 padA[6];u16 frame;u8 pad12[10];struct Vec position;u8 tail[8];};
 struct Anim {const u16 *data;u8 flags,count,factor,rate;u16 frame,unused,scale,timer;};
@@ -19,8 +18,8 @@ struct PackedVec size,offset;struct Object *p;s32 variant;struct Vec *pos;void *
 if(!gUnk_0200046C&&!sub_0800D828(0xc0db,0))return -1;
 p=sub_08219C40(sizeof(*p));if(!p)return -1;sub_08219DD8(p,sizeof(*p));
 p->id=id;variant=0;if(type>1){p->type=2;variant=type-2;}else p->type=type;
-p->state=0;p->timer=0;{register u32 one asm("r2")=1;asm("" : : "r"(one));p->entered=one;p->flags=flags;p->parameter=parameter;p->position=*position;
-if(p->type==0)p->animated=one;else p->animated=0;}p->speed=speed;{struct Vec *groundPos=&p->position;s32 x=p->position.x>>8,z=groundPos->z>>8,index;struct Cell *cell;u32 slope;s32 height;pos=groundPos;asm("" : "+r"(pos));if(x<0||z<0||(u32)x>=gUnk_030052F8||(u32)z>=gUnk_030052FC)index=0;else index=gUnk_030052F4->rows[z]+x;cell=getCell(index);slope=cell->height>>4;height=(cell->height&15)<<8;switch(slope){case 1:height-=(u8)groundPos->z;break;case 2:height-=(u8)groundPos->x;break;}p->ground=height;}p->health=health;
+p->state=0;p->timer=0;{u32 one=1;p->entered=one;p->flags=flags;p->parameter=parameter;p->position=*position;
+if(p->type==0)p->animated=one;else p->animated=0;}p->speed=speed;{struct Vec *groundPos=&p->position;s32 x=p->position.x>>8,z=groundPos->z>>8,index;struct Cell *cell;u32 slope;s32 height;pos=groundPos;if(x<0||z<0||(u32)x>=gUnk_030052F8||(u32)z>=gUnk_030052FC)index=0;else index=gUnk_030052F4->rows[z]+x;cell=getCell(index);slope=cell->height>>4;height=(cell->height&15)<<8;switch(slope){case 1:height-=(u8)groundPos->z;break;case 2:height-=(u8)groundPos->x;break;}p->ground=height;}p->health=health;
 if(p->flags&1){
 p->collider=sub_08219C40(84);if(!p->collider)return -1;sub_08219DD8(p->collider,84);
 if(p->flags&4){size.x=180;size.y=256;size.z=180;offset.x=0;offset.y=256;offset.z=0;}else{size.x=90;size.y=128;size.z=90;offset.x=0;offset.y=128;offset.z=0;}

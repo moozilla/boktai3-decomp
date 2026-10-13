@@ -14,7 +14,7 @@ s32 Scene_StopSelectedObject(void)
     register s32 count asm("r4");
     if(!manager || !(id=sub_0821ABA8(0x6E,0)))return -1;
     p=manager->objects;
-    i=0;count=manager->count;asm("" : "+r"(count));
+    i=0;count=manager->count;
     for(;i<count;p++,i++){
         if(!p->active)continue;
         if(p->type==1)continue;

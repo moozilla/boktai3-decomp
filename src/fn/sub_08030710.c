@@ -46,21 +46,19 @@ int sub_08030710(struct Manager *m) {
   m->phase = sub_08228D88();
   {
     int frame = sub_08228D94();
-    register u8 *current asm("r2") = &m->frame;
+    u8 *current = &m->frame;
     register u8 *previous asm("r1");
     register int old asm("r3");
-    register u8 *keep asm("r4");
+    u8 *keep;
     *current = frame;
     previous = &m->previous;
     old = *previous;
     frame = (u8)frame;
     keep = previous;
-    asm("" : "+r"(keep));
     if (old != frame)
       *(previous - 1) = 1;
     else
       m->changed = 0;
-    asm("" : : : "memory");
     {
       int value = *current;
       zero = 0;

@@ -93,14 +93,12 @@ int sub_0802E468(void) {
     angle = (u16)value;
     {
       register int shifted asm("r2") = (angle + 112) >> 5;
-      register int facing asm("r1") = 7 & shifted;
-      asm("" : "+r"(facing));
+      int facing = 7 & shifted;
       p->facing8 = facing;
     }
     angle = (angle + 96) >> 6;
     {
-      register int facing asm("r1") = 3 & angle;
-      asm("" : "+r"(facing));
+      int facing = 3 & angle;
       p->facing4 = facing;
     }
   }
@@ -139,13 +137,12 @@ int sub_0802E468(void) {
     p->state = state;
     p->ticks = zero;
     {
-      register int one asm("r0") = 1;
+      int one = 1;
       asm("" : "+r"(one));
       p->entered = one;
     }
     {
       register u8 *controlled asm("r1") = &p->controlled;
-      asm("" : "+r"(controlled));
       *controlled = 1;
     }
   }

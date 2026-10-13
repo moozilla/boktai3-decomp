@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct PeerMenu  {
   u8 pad0[0x19];
@@ -17,9 +16,8 @@ void sub_080376C4(struct PeerMenu*p) {
       if(gUnk_03005260[1]&2) {
         sub_08036B14();
         {
-          register u32 state asm("r0")=7;
-          register u32 zero asm("r1")=0;
-          asm("" : "+r"(state),"+r"(zero));
+          u32 state=7;
+          u32 zero=0;
           p->state=state;
           p->entered=1;
           p->timer=zero;

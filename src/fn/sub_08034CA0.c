@@ -45,7 +45,7 @@ static inline void setOperation(struct Engine *p, int op, int zero) {
 int sub_082236C8(int, int, int, const u8 *);
 extern const u8 gUnk_0824DE60[];
 int sub_08034CA0(struct Engine *p) {
-  register int raw asm("r0");
+  int raw;
   int status;
   int result;
   if (p->pending) {
@@ -66,12 +66,10 @@ int sub_08034CA0(struct Engine *p) {
 success: {
   register int operation asm("r1") = 8;
   register int one asm("r1");
-  asm("" : "+r"(operation));
   p->flag = status;
   p->operation = operation;
   p->ticks = status;
   one = 1;
-  asm("" : "+r"(one));
   p->pending = one;
 }
   result = raw;

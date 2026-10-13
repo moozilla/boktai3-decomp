@@ -11,10 +11,10 @@ s32 EffectManager_Init(struct Manager *manager){
  s32 i,j;u8 *p;
  gUnk_02000040=manager;manager->graphics=sub_08215184(0x1c1a);manager->animation=sub_0821A520(0x922e,0xd1b8);
  for(i=0;i<6;i++){
-  struct Effect *effect=&manager->effects[i];effect->active=0;{register s32 next asm("r7")=i+1;asm("" : : "r"(next));}p=effect->particles[0].sprite;
+  struct Effect *effect=&manager->effects[i];effect->active=0;{register s32 next asm("r7")=i+1;}p=effect->particles[0].sprite;
   for(j=3;j>=0;p+=80,j--){sub_08217E60(p,manager->graphics,1);sub_08217ECC(p,1);}
  }
- manager->counter=0;{struct Actor *actor=({register struct Actor *a asm("r1")=gUnk_02000580;asm("" : : "r"(a));a;});manager->actor=actor;
+ manager->counter=0;{struct Actor *actor=({struct Actor *a=gUnk_02000580;a;});manager->actor=actor;
  if(!actor)return -1;
  if(actor->mode==6)manager->mode=1;else manager->mode=0;
  return 0;}

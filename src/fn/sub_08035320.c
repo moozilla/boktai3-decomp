@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Engine {
   u8 pad0[0x18];
@@ -47,14 +46,12 @@ void sub_08035320(struct Engine *p) {
   u8 *seen = (u8 *)p + 0xE7;
   int bits = (gUnk_03005390[3] << 1) | *seen;
   int zero = 0;
-  register int offset asm("r3");
+  int offset;
   int expected;
   *seen = bits;
   offset = 0x136;
-  asm("" : "+r"(offset));
   {
-    register u8 *required asm("r1") = (u8 *)p + offset;
-    asm("" : "+r"(required));
+    u8 *required = (u8 *)p + offset;
     expected = *required;
   }
   if ((bits & expected) == expected) {

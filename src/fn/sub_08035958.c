@@ -49,7 +49,7 @@ void sub_08035958(void) {
   u8 slots;
   if (p) {
     u8 *scratch = p->scratch;
-    register int status asm("r3") = sub_08245570(&slots);
+    int status = sub_08245570(&slots);
     if (!status) {
       register u8 *seen asm("r2") = (u8 *)p + 0xE7;
       int bits = (slots << 1) | *seen;

@@ -30,5 +30,5 @@ int SelectionMenu_Initialize(u8 *p) {
  if(!(*(u32 *)(p+0xdb0)=sub_08227E90()))goto fail;
  sub_0801A218(p);sub_0801A418(p);sub_0801A6D0(p);sub_0801A3C0(p);sub_0801A470(p);
  sub_08030F20(0,16,30,2);sub_0801ABEC(p);sub_08019F18(p,sub_0801ADC0);sub_08033568();
- {int mask=4;asm("" : "+r"(mask));gUnk_0300523C|=mask;}return 0;
+ {int mask=4;gUnk_0300523C|=mask;}return 0;
 }
