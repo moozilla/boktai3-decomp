@@ -1,0 +1,46 @@
+#ifndef GUARD_MESSAGE_MENU_H
+#define GUARD_MESSAGE_MENU_H
+
+#include "engine.h"
+
+struct MenuResource {
+    u32 words[8];
+};
+
+/* Full-screen message menu task (0x4D8 bytes, priority list 11). */
+struct MessageMenu {
+    u8 task[24];
+    u32 timer; /* frames since creation */
+    u8 pad1C[6];
+    u16 script;                           /* script run once when the menu is dismissed */
+    u8 formatter[24];                     /* text formatter state for sub_08044DD0 */
+    u8 lines[4][256];                     /* formatted text lines */
+    void *source;                         /* source string table (guess) */
+    u8 *text;                             /* script text for the three windows */
+    int mainText, footerText, choiceText; /* text window handles */
+    void *map, *palette;
+    struct MenuResource resource;
+    u8 transition[96]; /* animation object used for the opening effect */
+};
+
+int sub_08033690(int, int, int, int);
+void sub_08033A38(int, int, void *);
+void sub_080337FC(int);
+void sub_08033778(int);
+void sub_082161B4(int, int, void *, int, int, int, void *);
+void sub_0821983C(void *, void *, int, int, int, int, int, void *);
+void sub_08044E6C(void *);
+void sub_08044DD0(void *, void *, void *, int);
+void *sub_08227E90(void);
+extern u16 gUnk_03004FC0[];
+extern u16 gUnk_030051A0[];
+extern u16 gUnk_03005260[];
+
+void MessageMenu_LoadBackground(struct MessageMenu *m, int id);
+int MessageMenu_CreateTextWindows(struct MessageMenu *m);
+void MessageMenu_InitializeTransition(struct MessageMenu *m);
+int MessageMenu_Update(struct MessageMenu *m);
+int MessageMenu_Destroy(struct MessageMenu *m);
+int MessageMenu_Initialize(struct MessageMenu *m);
+
+#endif

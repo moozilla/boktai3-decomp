@@ -18,7 +18,8 @@ Damage controller,0800C7F4,0800CBA0,symbols/proposed/subsystems.csv,Contiguous m
 Falling objects (tentative),0800CBA0,0800D874,symbols/proposed/subsystems.csv,Contiguous matched allocation initialization update and cleanup callbacks in src/fn
 Scanline presentation (tentative),0800D874,0800E0CC,symbols/proposed/subsystems.csv,Contiguous scanline animation lifecycle and six display layers
 Palette sets,0800E0CC,0800E3E0,symbols/proposed/subsystems.csv,Palette set allocation initialization blending and upload
-Status screen (tentative),0800E3E0,0800F4EC,symbols/proposed/subsystems.csv,Numeric display palette fades and scanline transition callback chain
+Status screen (tentative),0800E3E0,0800F4C4,symbols/proposed/subsystems.csv,Numeric display palette fades and scanline transition callback chain; include/status_screen.h
+Numeric overlay (tentative),0800F4C4,0800F850,symbols/proposed/subsystems.csv,Sibling of the status screen: same background/palette load and counter display without fades; include/numeric_overlay.h
 Result prompt,0800F850,0800F9C4,symbols/proposed/subsystems.csv,Complete input prompt callbacks and lifecycle
 Group objects (tentative),0800F9C4,080111EC,symbols/proposed/subsystems.csv,Sixteen-object animation and movement manager; several movement callbacks remain unmatched
 Message menu,080111EC,0801150C,symbols/proposed/subsystems.csv,Complete background text windows transition update cleanup and initialization

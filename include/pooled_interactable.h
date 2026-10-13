@@ -64,14 +64,9 @@ extern u16 gUnk_086049CE[][2];
 extern u16 gUnk_086049DA[];
 extern void (*gUnk_086049E0[])(struct PooledInteractableManager *, struct PooledInteractable *);
 
-struct PooledWorld {
-    u8 pad[0x5a0];
-    s32 region;
-};
-
 static inline u8 sameRegion(s32 region)
 {
-    if (((struct PooledWorld *)gUnk_02000710)->region == region)
+    if (gUnk_02000710->region == region)
         return 1;
     return 0;
 }

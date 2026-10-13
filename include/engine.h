@@ -10,6 +10,7 @@
  */
 
 #include "global.h"
+#include "game_state.h"
 
 /* ---- Globals ---------------------------------------------------------- */
 
@@ -45,7 +46,7 @@ extern u32 gUnk_0300523C; /* engine pause/suspend flags (bits 1-2: sound off; li
 extern u16 gUnk_03005240; /* next Task id */
 extern struct TaskList gUnk_03005280[14]; /* task lists by priority */
 extern struct HeapBlock gUnk_02000714;    /* head of the general heap (Heap_Alloc/Heap_Free) */
-extern u8 *gUnk_02000710;                 /* main game-state block (guess: save/world state) */
+extern struct GameState *gUnk_02000710;   /* main game-state block, see game_state.h */
 extern struct EngineMap *gUnk_030052F4;   /* current terrain map */
 extern u32 gUnk_030052F8, gUnk_030052FC;  /* terrain map width, height (cells) */
 extern u32 gUnk_03005308;                 /* index (0..1023) into the random table */
