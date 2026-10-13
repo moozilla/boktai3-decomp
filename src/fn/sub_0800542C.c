@@ -1,9 +1,9 @@
 #include "global.h"
 #include "scene_object.h"
 void sub_0822B2F8(s32);
-static inline void setMode(struct SceneDraw *d, u16 mode)
+static inline void setMode(struct SceneDraw *draw, s16 mode)
 {
-    d->mode = mode;
+    draw->mode = mode;
 }
 void Scene_UpdateObjectFlash(struct SceneObject *p)
 {
