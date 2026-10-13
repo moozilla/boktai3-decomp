@@ -374,11 +374,7 @@ void Scene_DropObjectsAbove(struct SceneObject *object)
     }
 }
 
-void sub_08214514(void *);
-
 void sub_0821D6D0(void *);
-
-void sub_0821FE6C(void *);
 
 void sub_08003C10(void *);
 
@@ -960,8 +956,6 @@ void sub_080050AC(struct SceneObject *p)
     }
 }
 
-void sub_0821FE40(struct SceneCollider *);
-
 void Scene_UpdateObjectStep(struct SceneObject *p)
 {
     struct SceneBody *body = &p->body;
@@ -1093,8 +1087,6 @@ struct Args {
     s32 *values;
 };
 
-void sub_0821AD08(u32, struct Args *);
-
 s32 Mod(s32, s32);
 
 static inline void setMode(struct SceneDraw *draw, s16 mode)
@@ -1170,8 +1162,6 @@ void Scene_UpdateObjectFlash(struct SceneObject *p)
 }
 
 extern void (*const gUnk_086049B4[])(struct SceneObject *);
-
-extern u8 *gUnk_02000710;
 
 void sub_08225B74(void *);
 
@@ -1273,8 +1263,6 @@ s32 SceneObjects_Update(struct SceneObjectManager *manager)
     return 0;
 }
 
-void sub_08219D38(u32);
-
 /* Task teardown: free all objects, release the pool and clear the global manager. */
 
 u32 sub_080056D0(struct SceneObjectManager *manager)
@@ -1283,12 +1271,6 @@ u32 sub_080056D0(struct SceneObjectManager *manager)
     sub_08219D38((u32)manager->objects);
     return (u32)(gUnk_02000024 = 0);
 }
-
-extern u8 *gUnk_030042E4;
-
-void *sub_08219C40(u32);
-
-void sub_08219DD8(void *, u32);
 
 /* Allocate the object pool (default 8 objects) and initialize the palette-fade state. */
 
@@ -1317,12 +1299,6 @@ s32 sub_080056F0(struct SceneObjectManager *p, void *unused)
     CpuSet((void *)p->paletteA[1], p->paletteB, 0x04000008);
     return 0;
 }
-
-void *sub_08219FBC(u32, u32);
-
-void sub_0821A04C(void *, void (*)(void), void (*)(void));
-
-void sub_0821A0C0(void *);
 
 /* Create the scene-object task (or return the existing one). */
 
@@ -1369,10 +1345,6 @@ struct SceneObject *sub_080057FC(struct SceneObjectManager *manager, u32 id)
     return 0;
 }
 
-void sub_082151E4(struct SceneAnimation *, u32);
-
-void sub_082144A4(struct SceneDraw *, struct SceneAnimation *, s32);
-
 void sub_08225AB4(struct SceneBody *, u32, struct SceneVec *, s32, s32, struct SceneObject *);
 
 void sub_08225B28(struct SceneBody *, struct SceneDraw *);
@@ -1380,11 +1352,6 @@ void sub_08225B28(struct SceneBody *, struct SceneDraw *);
 u32 sub_0822C034(struct SceneVec *);
 
 u32 sub_0821D698(void *, u32, u32, u32, u32, u32);
-
-void sub_0821FEB4(struct SceneCollider *, u16, u32, s32, s32, struct SceneExtent *,
-                  struct SceneExtent *);
-
-void sub_0821FF84(struct SceneCollider *, void *, struct SceneObject *);
 
 void sub_0821FF50(struct SceneCollider *, s32, s32);
 
@@ -1559,10 +1526,6 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     }
     return 0;
 }
-
-s32 Script_SeekToKeyword(s32);
-
-s32 Script_GetValue(void);
 
 #define RESOURCE(value)                                                                            \
     ({                                                                                             \

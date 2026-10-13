@@ -67,8 +67,6 @@ u32 sub_08003C10(u32 *p)
 
 /* Tentative: draws terrain-edge overlays around tracked actors. */
 
-extern struct TerrainOverlayMap *gUnk_030052F4;
-
 u8 *sub_0821D64C(s32, s32);
 
 void sub_08214374(struct TerrainOverlayDrawable *, s32);
@@ -241,8 +239,6 @@ s32 TerrainOverlay_Update(struct TerrainOverlay *p)
     return 0;
 }
 
-void sub_08214514(struct TerrainOverlayDrawable *);
-
 s32 TerrainOverlay_DestroyDrawables(struct TerrainOverlay *p)
 {
     s32 i;
@@ -264,13 +260,7 @@ test:
 
 extern const u8 gUnk_0824DAFC[];
 
-s32 Script_SeekToKeyword(s32);
-
-s32 Script_GetValue(void);
-
 s32 sub_08219BD8(const u8 *);
-
-s32 sub_082151E4(void *, s32);
 
 void sub_082144E4(struct TerrainOverlayDrawable *, void *, s32);
 
@@ -325,12 +315,6 @@ s32 TerrainOverlay_Initialize(struct TerrainOverlay *p, u32 id, u32 resource)
     return 0;
 }
 
-void *sub_08219FBC(u32, u32);
-
-void sub_0821A04C(void *, s32 (*)(struct TerrainOverlay *), s32 (*)(struct TerrainOverlay *));
-
-void sub_0821A0C0(void *);
-
 void *sub_080040F8(u16 x, u16 y)
 {
     struct TerrainOverlay *s;
@@ -357,8 +341,6 @@ void *sub_080040F8(u16 x, u16 y)
     }
     return s;
 }
-
-s32 sub_0821ABA8(u32, u32);
 
 s32 sub_08004194(void)
 {

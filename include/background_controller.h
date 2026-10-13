@@ -1,7 +1,7 @@
 #ifndef GUARD_BACKGROUND_CONTROLLER_H
 #define GUARD_BACKGROUND_CONTROLLER_H
 
-#include "global.h"
+#include "engine.h"
 
 /*
  * Background controllers (ROM 080015AC-08002AA8). Two task families share
@@ -176,22 +176,12 @@ extern struct Camera gUnk_030042A0;
 extern s16 gUnk_03005418[2];
 extern u16 gUnk_03004BD8;
 extern u16 gUnk_02000550, gUnk_0200053C;
-extern const s16 gUnk_086149C4[];
 
 /* Engine functions used by this unit. */
-s32 sub_0821ABA8(s32, s32);
-s32 Script_SeekToKeyword(s32);
-s32 Script_GetValue(void);
-u8 *Script_GetPc(void);
 s32 sub_0821AA00(u8 *);
 u8 *sub_08216E54(u16);
 struct ResourceRef *sub_0821A2C4(u16);
-void *sub_0821A520(u16, u16);
-void *sub_08219FBC(u32, u32);
-void sub_0821A04C(void *, void *, void *);
-void sub_0821A0C0(void *);
 void sub_08219574(u32, s32, s32);
-void sub_0821656C(u32, s32, s32, s32, s32);
 void sub_08215A74(u32, s32);
 void sub_082160B8(u32, u32, void *, s32, s32, s32, s32, void *);
 void sub_082161B4(s32, s32, void *, s16, s16, s32, s32 *);
