@@ -1,12 +1,12 @@
-#include "global.h"
+#include "animated_hazard.h"
 
-u32 sub_08012058(u32 unused, u8 *p)
+s32 sub_08012058(void *unused, struct AnimatedHazard *p)
 {
-    u32 r;
-    if (p[2] == 0) {
+    s32 r;
+    if (p->entered == 0) {
         r = 0;
     } else {
-        p[2] = 0;
+        p->entered = 0;
         r = 1;
     }
     return r;

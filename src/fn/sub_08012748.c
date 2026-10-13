@@ -1,45 +1,9 @@
-#include "global.h"
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct Sprite {
-    u32 flags;
-    u8 pad[12];
-    u16 frame;
-    u8 pad12[10];
-    struct Vec position;
-    u8 tail[8];
-};
-struct Hazard {
-    u8 active, state, entered, pad3;
-    u16 duration, pad6;
-    u32 timer;
-    u32 hold;
-    u8 pad10[84];
-    struct Sprite sprite;
-};
-struct Map {
-    u32 pad;
-    u8 *cells;
-    u8 pad8[28];
-    u16 rows[1];
-};
-extern struct Map *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC;
-u8 *sub_0821D64C(int, int);
-void *sub_08012040(void);
+#include "animated_hazard.h"
+
+struct AnimatedHazardManager *sub_08012040(void);
 void *sub_080126DC(void);
-struct Hazard *sub_08012728(void *);
-void Collider_SetPosition(void *, void *, int);
-void sub_0821FF50(void *, int, int);
-void sub_0801204C(void *, void *, int);
-static inline int cellIndex(struct Vec *p)
-{
-    int x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
-        return 0;
-    return gUnk_030052F4->rows[z] + x;
-}
+struct AnimatedHazard *sub_08012728(struct AnimatedHazardManager *);
+void sub_0801204C(void *, struct AnimatedHazard *, u32);
 static inline u8 *cell(int i)
 {
     u8 *p = sub_0821D64C(i, 1);
@@ -47,11 +11,11 @@ static inline u8 *cell(int i)
         return p + 4;
     return gUnk_030052F4->cells + 12 + i * 4;
 }
-int AnimatedHazard_Create(struct Vec *source, int damage, int hold)
+int AnimatedHazard_Create(struct SceneVec *source, int damage, int hold)
 {
-    void *m = sub_08012040();
-    struct Hazard *p;
-    struct Vec *pos;
+    struct AnimatedHazardManager *m = sub_08012040();
+    struct AnimatedHazard *p;
+    struct SceneVec *pos;
     void *effect;
     u8 *c;
     int height, slope;
@@ -66,7 +30,7 @@ int AnimatedHazard_Create(struct Vec *source, int damage, int hold)
         return -1;
     p->sprite.position = *source;
     {
-        struct Vec *ground = &p->sprite.position;
+        struct SceneVec *ground = &p->sprite.position;
         int x = ground->x >> 8, z = ground->z >> 8, index;
         pos = ground;
         if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
@@ -90,7 +54,7 @@ int AnimatedHazard_Create(struct Vec *source, int damage, int hold)
         zero = 0;
         *h = height;
     }
-    effect = (u8 *)p + 16;
+    effect = p->collider;
     Collider_SetPosition(effect, pos, 0);
     sub_0821FF50(effect, (u16)damage, 50);
     sub_0801204C(m, p, 2);

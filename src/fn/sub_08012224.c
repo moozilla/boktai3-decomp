@@ -1,50 +1,23 @@
-#include "global.h"
+#include "animated_hazard.h"
 // MATCHING_CONCESSION: register-pinning
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct Obj {
-    u32 flags;
-    u8 pad[12];
-    u16 frame;
-    u8 pad12[10];
-    struct Vec position;
-};
-struct Anim {
-    const u16 *data;
-    u8 flags, count, factor, rate;
-    u16 frame, unused, scale, timer;
-};
-struct Piece {
-    u8 active, state, entered, pad3;
-    u16 duration, pad6;
-    u32 timer;
-    u8 padc[88];
-    struct Obj sprite;
-    u8 tail[8];
-    struct Anim anim;
-};
-void Anim_SetSequence(void *, void *, int, int, int);
-int sub_08012058(void *, void *);
-void sub_0801204C(void *, void *, int);
-void Sound_PlaySongChecked(int);
-void Collider_Refresh(void *);
+s32 sub_08012058(void *, struct AnimatedHazard *);
+void sub_0801204C(void *, struct AnimatedHazard *, u32);
 static inline u32 frame_factor(u16 v)
 {
     register u32 value asm("r1") = v;
     u32 mask = 15;
     return mask & value;
 }
-void AnimatedHazard_AnimateAttack(u8 *m, struct Piece *p)
+void AnimatedHazard_AnimateAttack(struct AnimatedHazardManager *m, struct AnimatedHazard *p)
 {
-    struct Obj *o;
-    struct Anim *a;
+    struct HazardSprite *o;
+    struct HazardAnim *a;
     const u16 *entry;
     register u16 n asm("r0");
     int done;
     if (sub_08012058(m, p)) {
         p->sprite.flags &= ~1;
-        Anim_SetSequence(&p->anim, *(void **)(m + 0x34), 0, 0, 0);
+        Anim_SetSequence(&p->anim, m->script, 0, 0, 0);
         Sound_PlaySongChecked(0x34D);
     }
     o = &p->sprite;
@@ -105,5 +78,5 @@ void AnimatedHazard_AnimateAttack(u8 *m, struct Piece *p)
         done = 0;
     if (done)
         sub_0801204C(m, p, 4);
-    Collider_Refresh((u8 *)p + 0x10);
+    Collider_Refresh(p->collider);
 }

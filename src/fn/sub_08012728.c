@@ -1,15 +1,15 @@
-#include "global.h"
+#include "animated_hazard.h"
 
-u8 *sub_08012728(u8 *p)
+struct AnimatedHazard *sub_08012728(struct AnimatedHazardManager *p)
 {
-    u8 *q = p + 0x38;
+    struct AnimatedHazard *q = p->hazards;
     s32 i = 0;
     while (i <= 7) {
-        if (q[0] == 0) {
+        if (q->active == 0) {
             return q;
         }
         i++;
-        q += 0xA0;
+        q++;
     }
     return 0;
 }
