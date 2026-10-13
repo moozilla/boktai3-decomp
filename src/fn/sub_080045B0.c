@@ -1,10 +1,12 @@
 #include "global.h"
+#include "scene_object.h"
 
 void sub_0822B2F8(u32);
 
-void sub_080045B0(s32 x)
+/* Play the sound for pushing an object of this type. */
+void sub_080045B0(s32 type)
 {
-    switch (x) {
+    switch (type) {
         case 0:
         case 2:
         case 3:

@@ -1,98 +1,22 @@
 #include "global.h"
+#include "scene_object.h"
 // MATCHING_CONCESSION: register-pinning
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct Size {
-    u32 x : 16, y : 16, z : 16;
-};
-struct Body {
-    u32 id, unknown, flags;
-    struct Vec position;
-    u8 tail[52];
-};
-struct Animation {
-    u8 pad[6];
-    u16 initial;
-    u8 tail[20];
-};
-struct Draw {
-    u8 pad[16];
-    u16 mode;
-    u8 tail[10];
-};
-struct Collider {
-    u8 pad[52];
-    u32 flags, flags2;
-    u8 tail[24];
-};
-struct Link {
-    u16 id;
-    u8 pad2[2];
-    struct Vec *position;
-    u8 tail[40];
-};
-struct Cell {
-    u8 height, tile;
-    u16 flags;
-};
-struct Object {
-    u8 type, flags;
-    u16 timer, kind, unknown6;
-    u32 owner;
-    u16 dx, dz;
-    u8 direction, entered;
-    u16 targetY, duration;
-    s16 resource;
-    u8 damageTimer, mode;
-    u16 initialAnimation, animation;
-    u8 active, animationTimer, phase, cooldown, randomPhase, unk23, typeFiveA, typeFiveB, pad26[2];
-    u32 script;
-    struct Body body;
-    struct Animation animationData;
-    struct Draw draw;
-    struct Vec center;
-    u8 padB4[8];
-    u16 cellId, cellIndex;
-    struct Cell cell;
-    u8 padC4[8];
-    struct Collider collider, stepCollider;
-    struct Link link;
-    void (*update)(void);
-};
-struct Manager {
-    u8 pad[30];
-    u8 fading;
-};
-struct Map {
-    u32 unused;
-    u8 *cells;
-    u8 pad8[28];
-    u16 rows[1];
-};
-extern struct Manager *gUnk_02000024;
-extern struct Map *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC, gUnk_03005308;
-extern u16 gUnk_0203B400[];
-struct Object *sub_080057D0(struct Manager *);
 void sub_08219DD8(void *, u32);
-void sub_082151E4(struct Animation *, u32);
-void sub_082144A4(struct Draw *, struct Animation *, s32);
-void sub_08225AB4(struct Body *, u32, struct Vec *, s32, s32, struct Object *);
-void sub_08225B28(struct Body *, struct Draw *);
-u32 sub_0822C034(struct Vec *);
-void Scene_UpdateObjectFlash(void), sub_080050AC(void);
+void sub_082151E4(struct SceneAnimation *, u32);
+void sub_082144A4(struct SceneDraw *, struct SceneAnimation *, s32);
+void sub_08225AB4(struct SceneBody *, u32, struct SceneVec *, s32, s32, struct SceneObject *);
+void sub_08225B28(struct SceneBody *, struct SceneDraw *);
+u32 sub_0822C034(struct SceneVec *);
 u8 *sub_0821D64C(s32, s32);
 u32 sub_0821D698(void *, u32, u32, u32, u32, u32);
-void sub_0821FEB4(struct Collider *, u16, u32, s32, s32, struct Size *, struct Size *);
-void sub_0821FF24(struct Collider *, struct Vec *, s32);
-void sub_0821FF84(struct Collider *, void (*)(void), struct Object *);
-void sub_0821FE40(struct Collider *);
-void sub_0821FF50(struct Collider *, s32, s32);
-void Scene_ApplyTerrainInteraction(void), sub_080046EC(void);
+void sub_0821FEB4(struct SceneCollider *, u16, u32, s32, s32, struct SceneExtent *, struct SceneExtent *);
+void sub_0821FF24(struct SceneCollider *, struct SceneVec *, s32);
+void sub_0821FF84(struct SceneCollider *, void *, struct SceneObject *);
+void sub_0821FE40(struct SceneCollider *);
+void sub_0821FF50(struct SceneCollider *, s32, s32);
 s32 Mod(s32, s32);
-void sub_08215284(struct Animation *, u16);
-s32 sub_08003C00(struct Body *);
+void sub_08215284(struct SceneAnimation *, u16);
+s32 sub_08003C00(struct SceneBody *);
 static inline void initializeCell(void *cell, s32 index, s32 height)
 {
     sub_0821D698(cell, index, 0, height, 255, ({
@@ -100,28 +24,28 @@ static inline void initializeCell(void *cell, s32 index, s32 height)
                      zero;
                  }));
 }
-static inline void setStepFlags(struct Collider *c)
+static inline void setStepFlags(struct SceneCollider *c)
 {
-    c->flags = 0x800;
-    c->flags2 = 0;
+    c->contactFlags = 0x800;
+    c->contactFlags2 = 0;
 }
-static inline u16 flags16(struct Object *p, u32 mask)
+static inline u16 flags16(struct SceneObject *p, u32 mask)
 {
     return mask & p->flags;
 }
-s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct Vec *position,
-                              u32 animationResource, s32 drawMode, s32 resource,
+s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *position,
+                              u32 animationResource, s32 drawMode, s32 health,
                               s32 initialAnimation, s32 animation, u32 script)
 {
-    struct Size size, offset;
-    struct Manager *manager = gUnk_02000024;
-    struct Object *p;
-    register struct Draw *draw asm("r5");
-    register struct Vec *pos asm("r9");
+    struct SceneExtent size, offset;
+    struct SceneObjectManager *manager = gUnk_02000024;
+    struct SceneObject *p;
+    register struct SceneDraw *draw asm("r5");
+    register struct SceneVec *pos asm("r9");
     s32 x, z, index, height;
     u32 clear;
     u8 *dynamic;
-    struct Cell *cell;
+    struct SceneCell *cell;
     if (!manager || !(p = sub_080057D0(manager)))
         return -1;
     sub_08219DD8(p, 0x1A8);
@@ -155,14 +79,14 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct Vec *position,
     p->direction = 0;
     if (flags16(p, 4)) {
         {
-            register void (*callback)(void) asm("r0") = Scene_UpdateObjectFlash;
+            register void (*callback)(struct SceneObject *) asm("r0") = Scene_UpdateObjectFlash;
             asm("" : "+r"(callback));
             p->update = callback;
         }
         p->timer = 0;
     } else {
         {
-            register void (*callback)(void) asm("r0") = sub_080050AC;
+            register void (*callback)(struct SceneObject *) asm("r0") = sub_080050AC;
             asm("" : "+r"(callback));
             p->update = callback;
         }
@@ -171,7 +95,7 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct Vec *position,
     p->entered = 1;
     x = p->body.position.x >> 8;
     z = ({
-            register struct Vec *coords asm("r1") = pos;
+            register struct SceneVec *coords asm("r1") = pos;
             asm("" : "+r"(coords));
             coords->z;
         }) >>
@@ -182,13 +106,13 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct Vec *position,
         index = gUnk_030052F4->rows[z] + x;
     dynamic = sub_0821D64C(index, 1);
     if (dynamic)
-        cell = (struct Cell *)(dynamic + 4);
+        cell = (struct SceneCell *)(dynamic + 4);
     else
-        cell = (struct Cell *)(gUnk_030052F4->cells + 12 + index * 4);
+        cell = (struct SceneCell *)(gUnk_030052F4->cells + 12 + index * 4);
     height = cell->height & 15;
     if (height < 15)
         height++;
-    initializeCell(&p->cellId, index, height);
+    initializeCell(&p->cellRef, index, height);
     {
         register u32 y asm("r0") = height << 8;
         asm("" : "+r"(y));
@@ -217,7 +141,7 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct Vec *position,
     sub_0821FF84(&p->stepCollider, sub_080046EC, p);
     sub_0821FF50(&p->stepCollider, 1500, 50);
     setStepFlags(&p->stepCollider);
-    p->resource = resource;
+    p->health = health;
     p->damageTimer = clear;
     p->mode = clear;
     p->animationTimer = clear;
@@ -250,11 +174,11 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct Vec *position,
     if (!(p->flags & 2) && sub_08003C00(&p->body) < 0)
         p->flags |= 2;
     if (p->type == 5) {
-        p->typeFiveA = 1;
-        p->typeFiveB = 1;
+        p->pushLimited = 1;
+        p->pushesLeft = 1;
     } else {
-        p->typeFiveA = 0;
-        p->typeFiveB = 0;
+        p->pushLimited = 0;
+        p->pushesLeft = 0;
     }
     return 0;
 }

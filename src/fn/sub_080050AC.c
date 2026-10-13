@@ -1,35 +1,22 @@
 #include "global.h"
+#include "scene_object.h"
 
-struct S {
-    u8 t;
-    u8 f1;
-    u16 a;
-    u16 b;
-    u8 g[0xb];
-    u8 c;
-    u8 h[4];
-    s16 hp;
-    u8 i[1];
-    u8 d;
-    u8 j[0x18a];
-    void *fn;
-};
-void Scene_UpdateObjectDisappearance(void);
-void sub_080050AC(struct S *p)
+/* Idle state: wait until health runs out, then disappear (type 1) or get removed. */
+void sub_080050AC(struct SceneObject *p)
 {
-    u8 t = p->t;
+    u8 t = p->type;
     if (t == 1) {
-        if (p->hp <= 0) {
+        if (p->health <= 0) {
             void *f = Scene_UpdateObjectDisappearance;
-            p->fn = f;
-            p->a = 0;
-            p->c = t;
-            p->b = 3;
+            p->update = f;
+            p->timer = 0;
+            p->entered = t;
+            p->kind = 3;
         }
     } else {
-        if (p->hp <= 0) {
-            p->d = 3;
-            p->fn = 0;
+        if (p->health <= 0) {
+            p->mode = 3;
+            p->update = 0;
         }
     }
 }

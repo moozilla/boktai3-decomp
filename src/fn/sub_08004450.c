@@ -1,11 +1,10 @@
 #include "global.h"
-void sub_0822B2F8(s32);
-u8 sub_0800441C(u8 *);
+#include "scene_object.h"
+s32 sub_0822B2F8(s32);
 void AnimatedParticles_EmitDirectional(s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, void *);
-void Scene_SpawnEdgeParticles(void *, s32);
-void Scene_PlayMovementEffect(u8 *actor)
+void Scene_PlayMovementEffect(struct SceneObject *object)
 {
-    switch (*actor) {
+    switch (object->type) {
         case 0:
             sub_0822B2F8(0x143);
             break;
@@ -23,8 +22,8 @@ void Scene_PlayMovementEffect(u8 *actor)
             sub_0822B2F8(0x143);
             break;
     }
-    if (sub_0800441C(actor))
-        AnimatedParticles_EmitDirectional(4, 1, 1, 0x40, 0, 255, 2, 4, 6, 6, actor + 0xAC);
+    if (sub_0800441C(object))
+        AnimatedParticles_EmitDirectional(4, 1, 1, 0x40, 0, 255, 2, 4, 6, 6, &object->center);
     else
-        Scene_SpawnEdgeParticles(actor + 0x38, 0x90);
+        Scene_SpawnEdgeParticles(&object->body.position, 0x90);
 }

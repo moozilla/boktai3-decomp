@@ -1,39 +1,17 @@
 #include "global.h"
+#include "scene_object.h"
 // MATCHING_CONCESSION: register-pinning
-struct Cell {
-    u8 height, tile;
-    u16 flags;
-};
-struct Object {
-    u8 type, flags;
-    u16 state, kind;
-    u8 pad6[6];
-    s16 dx, dz;
-    u8 direction, moving;
-    u16 targetY, speed;
-    u8 pad16[168];
-    u16 cell;
-    struct Cell terrain;
-    u8 padC4[224];
-    void (*update)(void);
-};
-struct Map {
-    u32 unknown;
-    u8 *cells;
-};
-extern struct Map *gUnk_030052F4;
 extern u16 gUnk_02000534, gUnk_02000500;
 u8 *sub_0821D64C(s32, s32);
-void Scene_UpdateObjectStep(void);
-s32 Scene_TryStepDown(struct Object *input, s32 idx, s32 dir)
+s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
 {
-    struct Object *actor = input;
+    struct SceneObject *actor = input;
     register s32 index asm("r4") = idx;
     register s32 direction asm("r8") = dir;
-    register struct Cell *reference asm("r10") = &actor->terrain;
+    register struct SceneCell *reference asm("r10") = &actor->cellRef.cell;
     s32 savedIndex;
     s32 delta = 0, dx = 0, dz = 0, speed, step;
-    struct Cell *cell;
+    struct SceneCell *cell;
     u8 *dynamic;
     if (({
             u8 active = 0;
@@ -70,9 +48,9 @@ s32 Scene_TryStepDown(struct Object *input, s32 idx, s32 dir)
     dynamic = sub_0821D64C(index, 1);
     savedIndex = index;
     if (dynamic)
-        cell = (struct Cell *)(dynamic + 4);
+        cell = (struct SceneCell *)(dynamic + 4);
     else
-        cell = (struct Cell *)(gUnk_030052F4->cells + 12 + savedIndex * 4);
+        cell = (struct SceneCell *)(gUnk_030052F4->cells + 12 + savedIndex * 4);
     if (cell) {
         register u32 heightByte asm("r1") = cell->height;
         u32 mask = 0xF0;
@@ -86,7 +64,7 @@ s32 Scene_TryStepDown(struct Object *input, s32 idx, s32 dir)
                 register s32 next asm("r3");
                 s32 current;
                 referenceHeight = ({
-                    register struct Cell *p asm("r2") = reference;
+                    register struct SceneCell *p asm("r2") = reference;
                     p->height;
                 });
                 asm("" : : "r"(referenceHeight));
@@ -110,13 +88,13 @@ s32 Scene_TryStepDown(struct Object *input, s32 idx, s32 dir)
                         register void (*callback)(void) asm("r1") = Scene_UpdateObjectStep;
                         actor->update = callback;
                     }
-                    actor->state = 0;
-                    actor->moving = 1;
+                    actor->timer = 0;
+                    actor->entered = 1;
                     actor->dx = dx;
                     actor->dz = dz;
                     actor->kind = 2;
-                    actor->cell = savedIndex;
-                    actor->speed = speed;
+                    actor->cellRef.index = savedIndex;
+                    actor->duration = speed;
                     return 3;
                 } else {
                     u32 referenceHeight;
@@ -125,7 +103,7 @@ s32 Scene_TryStepDown(struct Object *input, s32 idx, s32 dir)
                         y;
                     });
                     referenceHeight = ({
-                        register struct Cell *p asm("r2") = reference;
+                        register struct SceneCell *p asm("r2") = reference;
                         p->height;
                     });
                     {
@@ -148,13 +126,13 @@ s32 Scene_TryStepDown(struct Object *input, s32 idx, s32 dir)
                         register void (*callback)(void) asm("r1") = Scene_UpdateObjectStep;
                         actor->update = callback;
                     }
-                    actor->state = 0;
-                    actor->moving = 1;
+                    actor->timer = 0;
+                    actor->entered = 1;
                     actor->dx = dx;
                     actor->dz = dz;
                     actor->kind = 1;
-                    actor->cell = savedIndex;
-                    actor->speed = speed;
+                    actor->cellRef.index = savedIndex;
+                    actor->duration = speed;
                     return 1;
                 }
             }

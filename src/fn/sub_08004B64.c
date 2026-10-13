@@ -1,5 +1,7 @@
 #include "global.h"
+#include "scene_object.h"
 // MATCHING_CONCESSION: register-pinning
+/* Local view of a SceneVec as 32-bit words; needed to match the halfword read-modify-write. */
 struct Vec {
     union {
         u32 word;
@@ -14,20 +16,7 @@ struct Vec {
         } half;
     } zp;
 };
-struct Size {
-    u32 x : 16;
-    u32 y : 16;
-    u32 z : 16;
-};
-struct Actor {
-    u8 pad[16];
-    u8 direction;
-    u8 pad11[39];
-    struct Vec position;
-};
-extern u32 gUnk_03005308;
-extern const u16 gUnk_0203B400[];
-void sub_08068108(struct Vec *, s32, struct Size *, s32, s32, s32);
+void sub_08068108(struct Vec *, s32, struct SceneExtent *, s32, s32, s32);
 static inline u32 scatter(const u8 *random, const u16 *coordinate)
 {
     s32 value = *coordinate - 128;
@@ -57,10 +46,10 @@ static inline u32 backEdge(u32 random, u32 coordinate)
          p;                                                                                        \
      }) = index,                                                                                   \
      index *= 2, index += (u32)table, (const u16 *)index)
-void Scene_SpawnDirectionalDust(struct Actor *input)
+void Scene_SpawnDirectionalDust(struct SceneObject *input)
 {
-    register struct Actor *actor asm("r10") = input;
-    struct Size size;
+    register struct SceneObject *actor asm("r10") = input;
+    struct SceneExtent size;
     struct Vec point;
     struct Vec *particle;
     s32 i;
@@ -81,11 +70,11 @@ void Scene_SpawnDirectionalDust(struct Actor *input)
     mask = 1023;
     do {
         register u32 index asm("r2");
-        struct Actor *local = actor;
+        struct SceneObject *local = actor;
 
         const u16 *random;
 
-        point = local->position;
+        point = *(struct Vec *)&local->body.position;
         switch (local->direction) {
             case 0:
                 random = FIRST();
