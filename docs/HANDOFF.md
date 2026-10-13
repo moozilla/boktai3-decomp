@@ -38,6 +38,17 @@ published-rate cost proxy; exact subscription-cost attribution remains unknown.
   such as `PooledWorld`, `EmitterWorld`) and `gUnk_02000580` (player object, seen
   as `EffectActor`, `CollisionActor`, `TriggerActor`). Sprite/anim structs are still
   duplicated across collision and homing headers.
+* **Wave 4** (resumed after a session limit): units through 0x08012040 (falling
+  objects, scanline presentation, palette sets, status screen x3, numeric overlay
+  (new subsystem), result prompt, group objects, message menu, password, scene
+  indicators); `include/game_state.h` (`struct GameState`, `gUnk_02000710`) and
+  `include/player.h` (`gUnk_02000580` is `struct Player *[4]`; old views read slot 0).
+  +3 matches, +5 drafts. Lessons: retyping a global turns `ptr + N` byte offsets
+  into element offsets (password.c had to cast back); status screen is split in
+  three files because two functions need `-fno-expensive-optimizations` and their
+  neighbour must not have it. Follow-ups: `engine.h` declares
+  `BgGfx_LoadTilemapSimple` void but status screen needs its r0 (uses an `asm("name")`
+  alias); group objects has 7 unattempted functions (0800FC28, 0800FE98 are twins).
 * **NONMATCHING drafts** replace WIP branches (see `docs/WORKER.md`). 62 drafts
   are on main (Haiku migration), 14,116 bytes, several at 97-99% fuzzy
   (`sub_081F0E24`, `sub_08160EA4`, `sub_08097BC0`, `sub_0820267C`, `sub_08201160`).

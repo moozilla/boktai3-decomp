@@ -149,10 +149,11 @@ void Password_ApplyDecoded(struct PasswordEntry *m, u8 *output)
         name++;
     }
     *out = 0;
-    *(u16 *)(gUnk_02000710 + 8) = 1;
-    *(u16 *)(gUnk_02000710 + 10) = decoded[0];
-    *(u16 *)(gUnk_02000710 + 12) = decoded[1];
-    *(u16 *)(gUnk_02000710 + 14) = decoded[10];
+    /* GameState values08[0..3]: field access compiles 8 bytes shorter, so offsets stay */
+    *(u16 *)((u8 *)gUnk_02000710 + 8) = 1;
+    *(u16 *)((u8 *)gUnk_02000710 + 10) = decoded[0];
+    *(u16 *)((u8 *)gUnk_02000710 + 12) = decoded[1];
+    *(u16 *)((u8 *)gUnk_02000710 + 14) = decoded[10];
 }
 
 s32 sub_08011794(u8 *src, s32 tableRef, s32 script, u8 *output)
@@ -201,7 +202,7 @@ void sub_08011814(void)
     i = 0;
     do {
         u8 *r = Text_LookupString(Script_ParseStringRef(c) + i);
-        sub_08011794(r, (s32)a, (s32)b, gUnk_02000710 + 0x780);
+        sub_08011794(r, (s32)a, (s32)b, gUnk_02000710->playerName);
         i++;
     } while (i <= 0x1e49);
 }
