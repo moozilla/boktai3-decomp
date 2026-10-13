@@ -43,6 +43,10 @@ extern struct TerrainModifierManager *gUnk_02000028;
 extern struct TerrainMap *gUnk_030052F4;
 extern u32 gUnk_030052F8, gUnk_030052FC;
 
+void sub_0821D698(void *, s32, s32, s32, s32, s32);
+s32 sub_0821ABA8(s32, s32);
+void sub_0821A04C(void *, u32 (*)(void), u32 (*)(void));
+
 u32 sub_08005E1C(struct TerrainModifier *);
 u32 sub_08005E40(struct TerrainModifier *);
 s32 TerrainModifiers_Create(s32 id, struct TerrainVec *position, s32 kind, s32 tile, s32 flags);
@@ -54,7 +58,7 @@ s32 sub_0800602C(u32 id);
 s32 TerrainModifiers_Change(s32 id, s32 tile, s32 kind, s32 flags, s32 cell, s32 height);
 u32 sub_0800611C(void);
 u32 sub_08006120(void);
-s32 sub_08006134();
-void *sub_08006144();
+s32 sub_08006134(struct TerrainModifierManager *manager, s32 unused);
+void *sub_08006144(s32 a, s32 unused);
 
 #endif
