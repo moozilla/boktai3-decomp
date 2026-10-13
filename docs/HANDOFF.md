@@ -20,6 +20,14 @@ published-rate cost proxy; exact subscription-cost attribution remains unknown.
   the disassembly had missed. Register new boundaries in
   `symbols/progress_extra_functions.csv`, then `progress.py --refresh-inventory gen/code_sym.s`.
   Pinning markers are per function in merged units.
+* **Wave 2** (three Sonnet workers, `docs/UNIT_WORKER.md`, ~80-150k tokens each):
+  `color_fade_controller`, `terrain_overlay`, `scene_object`, `terrain_modifier`,
+  `choice_menu` (85 functions). Units now cover 0x080015AC-0x08006F00 except
+  `sub_080036F8`'s range boundary. Next in ROM order: "Items and containers"
+  0x08006F00 (one unmatched function, 080070D0). **Needed soon:** a common engine
+  header (task/script API such as `sub_0821A04C`, `sub_0821ABA8`, map globals
+  `gUnk_030052F4..FC`); units currently declare these locally, sometimes with
+  different callback types.
 * **NONMATCHING drafts** replace WIP branches (see `docs/WORKER.md`). 62 drafts
   are on main (Haiku migration), 14,116 bytes, several at 97-99% fuzzy
   (`sub_081F0E24`, `sub_08160EA4`, `sub_08097BC0`, `sub_0820267C`, `sub_08201160`).
