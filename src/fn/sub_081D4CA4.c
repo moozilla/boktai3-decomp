@@ -9,7 +9,7 @@ struct S {
     struct E e[6];
 };
 void sub_08042558(struct E *);
-void sub_08214514(u8 *);
+void Sprite_Remove(u8 *);
 
 s32 sub_081D4CA4(struct S *p)
 {
@@ -18,6 +18,6 @@ s32 sub_081D4CA4(struct S *p)
         if (p->e[i].a != 0)
             sub_08042558(&p->e[i]);
     }
-    sub_08214514((u8 *)p + 0x9a4);
+    Sprite_Remove((u8 *)p + 0x9a4);
     return 0;
 }

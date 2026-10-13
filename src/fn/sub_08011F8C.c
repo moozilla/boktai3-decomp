@@ -14,15 +14,15 @@ struct Indicator {
     u8 effect[84];
     struct Sprite sprite;
 };
-void sub_0822B3BC(int);
-void sub_0821FE40(void *);
+void Sound_PlaySongChecked(int);
+void Collider_Refresh(void *);
 static inline void setFrame(struct Sprite *s, int frame)
 {
     s->frame = frame;
 }
 void *sub_08011884(void);
 struct Indicator *sub_08011C6C(void *, int);
-int sub_0821ABA8(int, int);
+int Script_GetKeywordValue(int, int);
 int SceneIndicator_Pause(void)
 {
     void *m = sub_08011884();
@@ -30,7 +30,7 @@ int SceneIndicator_Pause(void)
     struct Indicator *p;
     if (!m)
         return -1;
-    id = sub_0821ABA8('n', 0);
+    id = Script_GetKeywordValue('n', 0);
     if (!id)
         return -1;
     p = sub_08011C6C(m, id);

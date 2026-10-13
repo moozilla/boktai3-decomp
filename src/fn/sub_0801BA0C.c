@@ -10,7 +10,7 @@ extern Actor *gUnk_02000580;
 int sub_0801B54C(void *);
 void ResultMenu_SendCommand(void *, int, int, void *);
 void sub_0815BE5C(void *, int);
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 void sub_08015B84(int, int, int, int, void *);
 void sub_0801B534(void *, void (*)(void));
 void Transformation_Reveal(void);
@@ -24,7 +24,7 @@ void Transformation_Charge(u8 *p)
         param = 2;
         ResultMenu_SendCommand(p, 1, 1, &param);
         sub_0815BE5C(actor, 3);
-        sub_0822B2F8(0x2e1);
+        Sound_PlaySong(0x2e1);
     }
     if (*(u32 *)(p + 0x3c) - 30 <= 69 && !(*(u32 *)(p + 0x3c) & 3)) {
         {
@@ -33,7 +33,7 @@ void Transformation_Charge(u8 *p)
             out->x += 200;
             sub_08015B84(2, 0, 0x2000, 64, out);
         }
-        sub_0822B2F8(0x1c5);
+        Sound_PlaySong(0x1c5);
     }
     if (*(u32 *)(p + 0x3c) > 99)
         sub_0801B534(p, Transformation_Reveal);

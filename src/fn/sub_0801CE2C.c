@@ -3,7 +3,7 @@ int sub_0801B54C(void *);
 void sub_0801C69C(void *, void *);
 void ResultGame_TrackTarget(void *);
 void sub_0824923C(void *, void *);
-void sub_0822B358(int);
+void Sound_StopSong(int);
 void sub_0801B534(void *, void *);
 void ResultGame_Finish(void *);
 void ResultGame_Update(u8 *p)
@@ -31,8 +31,8 @@ void ResultGame_Update(u8 *p)
     p[0xbe] = 0;
     sub_0824923C(p, *(void **)(p + 0x7a8));
     if (p[0xc4] == 2) {
-        sub_0822B358(0x3ed);
-        sub_0822B358(0x3ee);
+        Sound_StopSong(0x3ed);
+        Sound_StopSong(0x3ee);
         sub_0801B534(p, ResultGame_Finish);
     } else {
         if (*(u16 *)(p + 0xac) == 0)

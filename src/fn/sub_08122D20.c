@@ -7,11 +7,11 @@ struct S {
     struct P p;
     struct P *q;
 };
-struct P *sub_0821A520(u32, u32);
-void sub_082196C4(void *, void *);
+struct P *ScriptProc_Start(u32, u32);
+void ResourceHeader_Relocate(void *, void *);
 void sub_08122D20(struct S *s)
 {
-    s->q = sub_0821A520(0xcb05, 0x1bc7);
+    s->q = ScriptProc_Start(0xcb05, 0x1bc7);
     s->p = *s->q;
-    sub_082196C4(&s->p, s->q);
+    ResourceHeader_Relocate(&s->p, s->q);
 }

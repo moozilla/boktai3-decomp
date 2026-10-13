@@ -14,8 +14,8 @@ struct S {
     u8 pad2;
     u16 t;
 };
-void sub_0803386C(u32, u32);
-void sub_08033924(u32, u32);
+void TextWindow_SetScript(u32, u32);
+void TextWindow_Refresh(u32, u32);
 void sub_080337FC(u32);
 s32 sub_0822BE78(void);
 void sub_08109374(void);
@@ -30,8 +30,8 @@ static inline void set(struct S *s, void *fp, u8 st)
 void sub_0811024C(struct S *s)
 {
     if (s->c24 != 0) {
-        sub_0803386C(s->h, s->c);
-        sub_08033924(s->h, 4);
+        TextWindow_SetScript(s->h, s->c);
+        TextWindow_Refresh(s->h, 4);
         sub_080337FC(s->h);
         s->t = 0;
         s->c24 = 0;

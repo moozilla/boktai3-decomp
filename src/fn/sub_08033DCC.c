@@ -19,9 +19,9 @@ void sub_08030BF8(void);
 void sub_08030B78(int);
 void sub_08030C84(void *);
 void sub_080311B0(int);
-void sub_0821AD08(int, int);
-void sub_0821A0C0(void *);
-void sub_082156B8(int);
+void Script_Call(int, int);
+void Task_Kill(void *);
+void Bg_ClearTilemap(int);
 int Div(int, int);
 u8 sub_08033C9C(struct Transition *);
 void sub_08033C90(struct Transition *, int);
@@ -34,9 +34,9 @@ void sub_08033DCC(struct Transition *p)
             u32 *brightness = &gUnk_03004DA0;
             int zero = 0;
             *brightness = zero;
-            sub_0821AD08(p->endProcedure, 0);
+            Script_Call(p->endProcedure, 0);
             p->endProcedure = zero;
-            sub_0821A0C0(p);
+            Task_Kill(p);
         } else
             gUnk_03004DA0 = 64 - Div(p->ticks << 6, 16);
     }

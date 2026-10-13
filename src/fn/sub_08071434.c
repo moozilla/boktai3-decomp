@@ -2,7 +2,7 @@
 
 extern u32 *gUnk_020004AC;
 void sub_0824923C(u32, u32);
-void sub_08219D38(u32);
+void Heap_Free(u32);
 
 void sub_08071434(void)
 {
@@ -15,7 +15,7 @@ void sub_08071434(void)
             a = *(u32 *)(e + 0x3d0);
             b = *(u32 *)(e + 0x25c);
             sub_0824923C(a, b);
-            sub_08219D38(a);
+            Heap_Free(a);
         }
     }
 }

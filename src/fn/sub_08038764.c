@@ -20,7 +20,7 @@ void sub_08169DCC(void);
 void sub_08169E94(void);
 void sub_08038128(struct P *, int);
 void sub_08038138(struct P *);
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 static inline u32 test(u16 *flags, u32 mask)
 {
     return *flags & mask;
@@ -49,7 +49,7 @@ void sub_08038764(struct P *p)
         if (countdown == 0) {
             u32 four;
             u8 *state;
-            sub_0822B2F8(0xdd);
+            Sound_PlaySong(0xdd);
             four = 4;
             state = &p->state;
             *state = four;

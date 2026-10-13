@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_082195E0(u8 *);
+void Anim_Remove(u8 *);
 
 void sub_0810F238(u8 *p)
 {
@@ -8,7 +8,7 @@ void sub_0810F238(u8 *p)
     s32 i;
 
     for (i = 8; i >= 0; i--) {
-        sub_082195E0(q);
+        Anim_Remove(q);
         q += 0x60;
     }
 }

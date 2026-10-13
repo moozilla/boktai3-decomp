@@ -47,10 +47,10 @@ int sub_0803092C(struct Actor *);
 void sub_080316A4(void);
 void sub_080317D8(void);
 void sub_080317CC(void);
-int sub_08218E5C(int, int, int, int);
+int TextWindow_BlankRect(int, int, int, int);
 void *sub_080313C8(struct Actor *, int);
-void sub_08032C34(struct State *);
-int sub_08032C54(struct State *, int, int, int, int);
+void TextState_Reset(struct State *);
+int TextState_SetBounds(struct State *, int, int, int, int);
 int Script_GetValue(void);
 static inline void setCallback(void *fn, struct Actor *p)
 {
@@ -72,8 +72,8 @@ int sub_08030DBC(int index)
         struct State *state = &p->state;
         asm("" : "+r"(state) : "r"(script) : "r1");
         if (script) {
-            sub_08218E5C(p->x, p->y, p->width, p->height);
-            sub_08032C54(state, p->x, p->y, p->width, p->height);
+            TextWindow_BlankRect(p->x, p->y, p->width, p->height);
+            TextState_SetBounds(state, p->x, p->y, p->width, p->height);
             p->scriptIndex = index;
             {
                 void *pc = sub_080313C8(p, p->scriptIndex);
@@ -122,7 +122,7 @@ int sub_08030DBC(int index)
                     }
                 }
             }
-            sub_08032C34(state);
+            TextState_Reset(state);
             {
                 register u32 offset asm("r3") = 0x196;
                 register u16 *wait asm("r1");

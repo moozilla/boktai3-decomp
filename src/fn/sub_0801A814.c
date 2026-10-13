@@ -17,7 +17,7 @@ typedef struct {
 } Graphic;
 void Presentation_SetItemGraphic(u8 *, Graphic *, int);
 void *sub_08019E58(int);
-void sub_0821980C(void *, void *, int, int);
+void Anim_LoadKeyframe(void *, void *, int, int);
 void SelectionMenu_PopulateItems(u8 *p)
 {
     Graphic *g = (Graphic *)(p + 0x674);
@@ -37,6 +37,6 @@ void SelectionMenu_PopulateItems(u8 *p)
         }
     }
     g = (Graphic *)(p + 0x614);
-    sub_0821980C(g, p + 0x4c, 0x66, 0);
+    Anim_LoadKeyframe(g, p + 0x4c, 0x66, 0);
     g->flags &= ~1;
 }

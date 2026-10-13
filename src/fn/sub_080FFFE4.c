@@ -1,7 +1,7 @@
 #include "global.h"
 extern u32 gUnk_020001A4;
-void sub_08214514(void *);
-void sub_0821FE6C(void *);
+void Sprite_Remove(void *);
+void Collider_Remove(void *);
 
 static inline u8 Tst(u32 *m, s32 i)
 {
@@ -19,9 +19,9 @@ u32 sub_080FFFE4(u8 *p)
             u32 o = i * 0xD8 + 0x1C;
             u8 *e;
             e = p + o;
-            sub_08214514(e);
+            Sprite_Remove(e);
             e += 0x60;
-            sub_0821FE6C(e);
+            Collider_Remove(e);
         }
     }
     return gUnk_020001A4 = 0;

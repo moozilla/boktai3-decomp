@@ -1,7 +1,7 @@
 #include "global.h"
 
 extern u32 gUnk_020001BC;
-void sub_08214514(void *);
+void Sprite_Remove(void *);
 
 static inline u8 Tst(u32 *m, s32 i)
 {
@@ -18,7 +18,7 @@ u32 sub_081089D8(u8 *p)
         if (Tst(m, i)) {
             u32 o = i * 0x68 + 0x1C;
             u8 *e = p + o;
-            sub_08214514(e);
+            Sprite_Remove(e);
         }
     }
     return gUnk_020001BC = 0;

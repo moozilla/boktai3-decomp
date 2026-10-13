@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_08219EBC(u8 *dst, u8 *src, s32 n)
+void Memory_Copy(u8 *dst, u8 *src, s32 n)
 {
     while (n > 7) {
         dst[0] = src[0];

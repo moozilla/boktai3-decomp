@@ -3,7 +3,7 @@ struct S {
     u8 f[0x20];
     u32 a[2];
 };
-u32 sub_0821A520(u32, u16);
+u32 ScriptProc_Start(u32, u16);
 void sub_08111748(struct S *s, u32 a, u32 b)
 {
     s32 i;
@@ -11,10 +11,10 @@ void sub_08111748(struct S *s, u32 a, u32 b)
         u32 r = 0;
         switch (i) {
             case 0:
-                r = sub_0821A520(0x92B3, a);
+                r = ScriptProc_Start(0x92B3, a);
                 break;
             case 1:
-                r = sub_0821A520(0x92B3, b);
+                r = ScriptProc_Start(0x92B3, b);
                 break;
         }
         s->a[i] = r + 0x14;

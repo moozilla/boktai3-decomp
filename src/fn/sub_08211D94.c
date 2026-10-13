@@ -9,11 +9,11 @@ struct O {
     s16 b64;
     s16 b66;
 };
-void sub_0821980C(void *, void *, u32, u32);
+void Anim_LoadKeyframe(void *, void *, u32, u32);
 s32 sub_08211D94(struct O *o)
 {
     o->fe4 = o->b64 * 24 + 0x58;
     o->fe6 = o->b66 * 24 + 0x18;
-    sub_0821980C(o->fc4, o->f44, 0x4d, 0);
+    Anim_LoadKeyframe(o->fc4, o->f44, 0x4d, 0);
     return 0;
 }

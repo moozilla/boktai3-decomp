@@ -54,9 +54,9 @@ struct S {
     s32 idleTimer;
     u32 ticks;
 };
-void sub_08220C8C(void *, u32, u32, u32, u32);
+void Anim_SetSequence(void *, u32, u32, u32, u32);
 void sub_081E4188(void *);
-void sub_08013440(void *);
+void ActorShadow_Disable(void *);
 void sub_081E41EC(void *);
 static inline u32 mode_bits(u8 *p, u32 mask)
 {
@@ -65,10 +65,10 @@ static inline u32 mode_bits(u8 *p, u32 mask)
     return result;
 }
 void sub_081E4174(void *);
-void sub_08215284(void *, s32);
-void sub_0822B2F8(s32);
-void sub_0821AD08(void *, s32);
-void sub_08013424(void *);
+void AnimData_SelectTiles(void *, s32);
+void Sound_PlaySong(s32);
+void Script_Call(void *, s32);
+void ActorShadow_Enable(void *);
 void ActorPalette_BeginFade(void *);
 extern s32 gUnk_03005260;
 extern u8 gUnk_03005430[];

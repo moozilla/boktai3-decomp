@@ -1,12 +1,12 @@
 #include "global.h"
-void *sub_0821A520(int, int);
+void *ScriptProc_Start(int, int);
 void sub_082161B4(int, int, void *, int, int, int, void *);
-void sub_0821656C(int, int, int, int, int);
+void BgGfx_LoadTilemapSimple(int, int, int, int, int);
 int ResultMenu_InitializeLayer(void)
 {
-    void *resource = sub_0821A520(0xc091, 0xa597);
+    void *resource = ScriptProc_Start(0xc091, 0xa597);
     int value = 2;
     sub_082161B4(0, 0, resource, 0, 0, 1, &value);
-    sub_0821656C(0, 0, -4, 0, -24);
+    BgGfx_LoadTilemapSimple(0, 0, -4, 0, -24);
     return 0;
 }

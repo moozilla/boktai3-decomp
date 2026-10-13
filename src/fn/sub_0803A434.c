@@ -13,9 +13,9 @@ struct Owner {
     struct Item items[16];
 };
 extern struct Owner *gUnk_02000100;
-struct Resource *sub_0821A520(int, int);
-void sub_082196C4(void *, void *);
-int sub_082151E4(void *, int);
+struct Resource *ScriptProc_Start(int, int);
+void ResourceHeader_Relocate(void *, void *);
+int AnimData_Load(void *, int);
 void sub_0803A2A8(void *, void *, int);
 int sub_0803A434(struct Owner *p)
 {
@@ -25,12 +25,12 @@ int sub_0803A434(struct Owner *p)
     u8 *pending;
     int i;
     gUnk_02000100 = p;
-    resource = sub_0821A520(0xcb05, 0x5d04);
+    resource = ScriptProc_Start(0xcb05, 0x5d04);
     if (!resource)
         return -1;
     p->resource = *resource;
-    sub_082196C4(&p->resource, resource);
-    if (!sub_082151E4(p->sprite, 0x18a9))
+    ResourceHeader_Relocate(&p->resource, resource);
+    if (!AnimData_Load(p->sprite, 0x18a9))
         return -1;
     item = p->items;
     i = 0;

@@ -24,11 +24,11 @@ struct Piece {
     u8 tail[8];
     struct Anim anim;
 };
-void sub_08220C8C(void *, void *, int, int, int);
+void Anim_SetSequence(void *, void *, int, int, int);
 int sub_08012058(void *, void *);
 void sub_0801204C(void *, void *, int);
-void sub_0822B3BC(int);
-void sub_0821FE40(void *);
+void Sound_PlaySongChecked(int);
+void Collider_Refresh(void *);
 static inline u32 frame_factor(u16 v)
 {
     register u32 value asm("r1") = v;
@@ -43,7 +43,7 @@ void AnimatedHazard_AnimateHold(u8 *m, struct Piece *p)
     register u16 n asm("r0");
     int done;
     if (sub_08012058(m, p)) {
-        sub_08220C8C(&p->anim, *(void **)(m + 0x34), 1, 0, 0);
+        Anim_SetSequence(&p->anim, *(void **)(m + 0x34), 1, 0, 0);
     }
     o = &p->sprite;
     a = &p->anim;
@@ -103,5 +103,5 @@ void AnimatedHazard_AnimateHold(u8 *m, struct Piece *p)
         done = 0;
     if (p->timer >= *(u32 *)((u8 *)p + 12))
         sub_0801204C(m, p, 5);
-    sub_0821FE40((u8 *)p + 0x10);
+    Collider_Refresh((u8 *)p + 0x10);
 }

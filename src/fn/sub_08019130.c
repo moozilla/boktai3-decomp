@@ -14,7 +14,7 @@ struct Circle {
 extern struct Circle *gUnk_0200009C;
 extern u8 *gUnk_02000580[];
 extern struct Vec gUnk_03005418;
-int sub_0821ABA8(int, int);
+int Script_GetKeywordValue(int, int);
 void CircleWindow_GenerateScanlines(void *, int);
 static inline int project(int input)
 {
@@ -31,12 +31,12 @@ int CircleWindow_Initialize(struct Circle *p)
     gUnk_0200009C = p;
     p->time = 0;
     p->bank = 0;
-    p->direction = sub_0821ABA8('m', 0);
-    p->radius = sub_0821ABA8('r', 250) * 16;
+    p->direction = Script_GetKeywordValue('m', 0);
+    p->radius = Script_GetKeywordValue('r', 250) * 16;
     if (p->radius >= 4000)
         p->radius = 4000;
-    p->step = sub_0821ABA8('s', 8) * 16;
-    p->dispose = sub_0821ABA8('d', 0);
+    p->step = Script_GetKeywordValue('s', 8) * 16;
+    p->dispose = Script_GetKeywordValue('d', 0);
     if (gUnk_02000580[0]) {
         struct Vec *out = &p->center;
         struct Vec *in = (void *)(gUnk_02000580[0] + 48);

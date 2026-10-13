@@ -5,14 +5,14 @@ struct P {
     u16 f1a;
 };
 extern struct P *gUnk_0200049C;
-s32 sub_0821ABA8(u32, u32);
+s32 Script_GetKeywordValue(u32, u32);
 void sub_08057648(void)
 {
     struct P *p = gUnk_0200049C;
     if (p != 0) {
         if (p->f1a == 0) {
             if (p->f18 != 0)
-                p->f18 += sub_0821ABA8(0x74, 0);
+                p->f18 += Script_GetKeywordValue(0x74, 0);
         }
     }
 }

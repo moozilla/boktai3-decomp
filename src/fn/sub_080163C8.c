@@ -1,16 +1,16 @@
 #include "global.h"
 extern void *gUnk_0200006C;
-void *sub_08215184(int);
-void *sub_0821A520(int, int);
+void *AnimData_FindEntry(int);
+void *ScriptProc_Start(int, int);
 void sub_08217E60(void *, void *, int);
-void sub_08220C8C(void *, void *, int, int, int);
+void Anim_SetSequence(void *, void *, int, int, int);
 int FadingParticleManager_Initialize(u8 *m)
 {
     int i;
     int clear;
     gUnk_0200006C = m;
-    *(void **)(m + 28) = sub_08215184(0x1c1a);
-    *(void **)(m + 32) = sub_0821A520(0x922e, 0xd1b8);
+    *(void **)(m + 28) = AnimData_FindEntry(0x1c1a);
+    *(void **)(m + 32) = ScriptProc_Start(0x922e, 0xd1b8);
     i = 0;
     clear = 0;
     do {
@@ -23,7 +23,7 @@ int FadingParticleManager_Initialize(u8 *m)
         s = g + 16;
         for (j = 7; j >= 0; a += 68, s += 68, j--) {
             sub_08217E60(s, *(void **)(m + 28), 0);
-            sub_08220C8C(a, *(void **)(m + 32), 3, 0, clear);
+            Anim_SetSequence(a, *(void **)(m + 32), 3, 0, clear);
         }
         i = next;
     } while (i <= 5);

@@ -1,6 +1,6 @@
 #include "global.h"
 void SelectionMenu_ActorAvailability(void *);
-void sub_082156B8(int);
+void Bg_ClearTilemap(int);
 void SelectionMenu_ConfigureLayers(int, int);
 void SelectionMenu_PositionCursors(void *);
 void SelectionMenu_PositionInventoryMarkers(void *);
@@ -14,7 +14,7 @@ void SelectionMenu_OpenActorPage(u8 *p)
     SelectionMenu_ActorAvailability(p);
     p[0x1e] = 0;
     p[0x24] = 0;
-    sub_082156B8(0);
+    Bg_ClearTilemap(0);
     SelectionMenu_ConfigureLayers(13, 0);
     SelectionMenu_PositionCursors(p);
     SelectionMenu_PositionInventoryMarkers(p);

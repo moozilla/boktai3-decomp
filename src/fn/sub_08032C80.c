@@ -10,14 +10,14 @@ struct TextState {
     u8 pad30[0xD8];
     u8 depth, styles[7];
 };
-void sub_08032C54(struct TextState *, int, int, int, int);
-void sub_08032C34(struct TextState *);
+void TextState_SetBounds(struct TextState *, int, int, int, int);
+void TextState_Reset(struct TextState *);
 void sub_08032C6C(struct TextState *);
 void sub_08032C80(struct TextState *p, int x, int y, int w, int h)
 {
     int zero;
-    sub_08032C54(p, x, y, w, h);
-    sub_08032C34(p);
+    TextState_SetBounds(p, x, y, w, h);
+    TextState_Reset(p);
     sub_08032C6C(p);
     zero = 0;
     p->skip = zero;

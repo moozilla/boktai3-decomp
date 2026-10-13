@@ -19,8 +19,8 @@ void sub_08037490(void *, void *);
 void sub_0803749C(void *, void *);
 void *sub_08037594(int);
 void *sub_08037DCC(int);
-void sub_08219EBC(void *, const void *, int);
-void sub_08033924(int, int);
+void Memory_Copy(void *, const void *, int);
+void TextWindow_Refresh(int, int);
 void sub_080374A8(void *, void *, int, void *, int);
 void sub_08037540(void *, void *, int);
 extern u8 *gUnk_02000710;
@@ -45,9 +45,9 @@ void sub_080375BC(struct PeerMenu *p, struct PeerPanel *panel, int index)
                 void *name = sub_08037DCC(0);
                 u32 zero = 0;
                 CpuSet(&zero, &p->clear, 0x05000001);
-                sub_08219EBC(name, gUnk_02000710 + 0x780, 16);
-                sub_08219EBC(panel->name, gUnk_02000710 + 0x780, 16);
-                sub_08033924(p->window, 3);
+                Memory_Copy(name, gUnk_02000710 + 0x780, 16);
+                Memory_Copy(panel->name, gUnk_02000710 + 0x780, 16);
+                TextWindow_Refresh(p->window, 3);
                 panel->active = 1;
             }
         } else if (peer) {

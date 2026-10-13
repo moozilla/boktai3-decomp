@@ -6,7 +6,7 @@ struct Panel {
 struct Panel *sub_08037DC0(void);
 void sub_0803A514(void *, int, int);
 void sub_080397D4(int, int);
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 void sub_080395D4(void *p, int index)
 {
     struct Panel *q = sub_08037DC0();
@@ -21,7 +21,7 @@ void sub_080395D4(void *p, int index)
                 sub_0803A514(p, index, 1);
                 counts[index]++;
                 sub_080397D4(2, 1);
-                sub_0822B2F8(885);
+                Sound_PlaySong(885);
             }
         }
     }

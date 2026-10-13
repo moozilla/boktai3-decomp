@@ -7,9 +7,9 @@ typedef struct {
 extern volatile u32 gUnk_0300523C;
 void sub_082279A8(int, int, int, int, int, int, int);
 void sub_0822AFE8(int);
-void sub_0821AD08(int, Args *);
+void Script_Call(int, Args *);
 void sub_08033590(void);
-void sub_0821A0C0(void *);
+void Task_Kill(void *);
 int ResultTutorial_Close(u8 *p)
 {
     int value;
@@ -26,7 +26,7 @@ int ResultTutorial_Close(u8 *p)
                 args.count = 0;
                 args.values = &value;
                 if (*(u16 *)(p + 0x7a0))
-                    sub_0821AD08(*(u16 *)(p + 0x7a0), &args);
+                    Script_Call(*(u16 *)(p + 0x7a0), &args);
                 {
                     volatile u32 *flags = &gUnk_0300523C;
                     u32 mask;
@@ -34,7 +34,7 @@ int ResultTutorial_Close(u8 *p)
                     *flags &= mask;
                 }
                 sub_08033590();
-                sub_0821A0C0(p);
+                Task_Kill(p);
                 return 1;
             }
             break;

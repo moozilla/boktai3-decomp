@@ -9,8 +9,8 @@ extern u16 gUnk_03005260[];
 int ResultTutorial_ShowPrompt(void *);
 int ResultTutorial_HidePrompt(void *);
 int sub_08249240(void *, void *, void *);
-void sub_0822B2F8(int);
-void sub_0822B358(int);
+void Sound_PlaySong(int);
+void Sound_StopSong(int);
 void sub_0801C24C(void *);
 void ResultTutorial_UpdateSequence(u8 *p)
 {
@@ -31,7 +31,7 @@ void ResultTutorial_UpdateSequence(u8 *p)
             if (gUnk_0824DBC0[index].wait) {
                 if (gUnk_03005260[1] & 1) {
                     ++p[0xb4];
-                    sub_0822B2F8(0x107);
+                    Sound_PlaySong(0x107);
                 }
                 break;
             }
@@ -58,8 +58,8 @@ void ResultTutorial_UpdateSequence(u8 *p)
                     zero = 0;
                     p[0xb4] = next;
                     p[0xaf] = zero;
-                    sub_0822B358(0x3ed);
-                    sub_0822B358(0x3ee);
+                    Sound_StopSong(0x3ed);
+                    Sound_StopSong(0x3ee);
                 }
                 --*(u16 *)(p + 0xac);
             } else {

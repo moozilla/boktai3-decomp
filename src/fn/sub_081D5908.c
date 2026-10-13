@@ -8,13 +8,13 @@ struct A {
 struct V {
     s16 x, y, z, w;
 };
-struct A *sub_0821A520(u32, u32);
-void sub_082196C4(struct A *, struct A *);
+struct A *ScriptProc_Start(u32, u32);
+void ResourceHeader_Relocate(struct A *, struct A *);
 void sub_0821983C(u8 *, struct A *, u32, u32, u32, u32, u32, struct V *);
 u32 sub_081D5908(u8 *s)
 {
     struct V v;
-    struct A *a = sub_0821A520(0xCB05, 0xE2AB);
+    struct A *a = ScriptProc_Start(0xCB05, 0xE2AB);
     struct A *b = (struct A *)(s + 0x4C);
     u8 *dst;
     u8 *other;
@@ -22,7 +22,7 @@ u32 sub_081D5908(u8 *s)
     s32 stride;
     u32 zero;
     *b = *a;
-    sub_082196C4(b, a);
+    ResourceHeader_Relocate(b, a);
     v.x = 0;
     v.y = 0;
     v.z = 0;

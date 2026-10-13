@@ -1,7 +1,7 @@
 #include "global.h"
 int sub_08019F2C(void *);
 void sub_082279A8(int, int, int, int, int, int, int);
-void sub_0821AD08(int, void *);
+void Script_Call(int, void *);
 extern u32 gUnk_0300523C;
 void SelectionMenu_Close(u8 *p)
 {
@@ -15,7 +15,7 @@ void SelectionMenu_Close(u8 *p)
             *state &= mask;
         }
         if (*(u16 *)(p + 0x40))
-            sub_0821AD08(*(u16 *)(p + 0x40), 0);
+            Script_Call(*(u16 *)(p + 0x40), 0);
     } else
         (*(u32 *)(p + 0x28))++;
 }

@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0822B2F8(s32);
+void Sound_PlaySong(s32);
 void sub_08165C08(void *, void *, s32);
 void sub_08166714(void *, s32);
 void sub_0822E138(s32, s32);
@@ -8,7 +8,7 @@ void sub_08171C44(u8 *p)
 {
     u16 *timer = (u16 *)(p + 0xa4e);
     if (!*timer)
-        sub_0822B2F8(0x38a);
+        Sound_PlaySong(0x38a);
     (*timer)++;
     if (*timer <= 11) {
         s32 n = 12 - *timer;

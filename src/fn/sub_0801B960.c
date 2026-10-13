@@ -9,7 +9,7 @@ typedef struct {
     int *values;
 } Args;
 Entry *sub_0822D6C8(int);
-void sub_0821AD08(int, Args *);
+void Script_Call(int, Args *);
 static inline int clamp(int x)
 {
     if (x > 999)
@@ -32,5 +32,5 @@ void Transformation_ReportResult(u8 *p)
     values[6] = entry->level;
     args.count = 7;
     args.values = values;
-    sub_0821AD08(*(u16 *)(p + 0x7a0), &args);
+    Script_Call(*(u16 *)(p + 0x7a0), &args);
 }

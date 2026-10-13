@@ -22,7 +22,7 @@ typedef struct {
 } Controller;
 
 extern Controller *gUnk_0200047C;
-int sub_0821ABA8(int, int);
+int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
 int Script_GetPc(void);
@@ -38,12 +38,12 @@ int SceneMessages_ScriptStart(void)
     if (!p || p->active == 1)
         return -1;
     p->active = 1;
-    p->scene = sub_0821ABA8(0x64, -1);
-    p->step = sub_0821ABA8(0x63, -1) - 1;
+    p->scene = Script_GetKeywordValue(0x64, -1);
+    p->step = Script_GetKeywordValue(0x63, -1) - 1;
     p->queued = 0;
     p->advance = 1;
     p->changed = 0;
-    p->onFinish = sub_0821ABA8(0x65, 0);
+    p->onFinish = Script_GetKeywordValue(0x65, 0);
     p->scriptCount = 0;
     countA = 0;
     countB = 0;

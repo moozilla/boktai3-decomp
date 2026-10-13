@@ -9,11 +9,11 @@ typedef struct {
 extern int gUnk_03005408;
 extern u16 gUnk_03005260[];
 u8 sub_0822BE20(void);
-void sub_08033924(int, int);
-void sub_0822B2F8(int);
+void TextWindow_Refresh(int, int);
+void Sound_PlaySong(int);
 void sub_08177DEC(int);
-void sub_0821AD08(u32, void *);
-void sub_0821A0C0(void *);
+void Script_Call(u32, void *);
+void Task_Kill(void *);
 int ResultPrompt_Update(ResultPrompt *p)
 {
     if (p->result < 120)
@@ -22,11 +22,11 @@ int ResultPrompt_Update(ResultPrompt *p)
         if (p->timer == 60) {
             p->result = sub_0822BE20();
             if (p->result == 1) {
-                sub_08033924(p->text, 14);
-                sub_0822B2F8(686);
+                TextWindow_Refresh(p->text, 14);
+                Sound_PlaySong(686);
             } else {
-                sub_08033924(p->text, 15);
-                sub_0822B2F8(402);
+                TextWindow_Refresh(p->text, 15);
+                Sound_PlaySong(402);
             }
         }
     }
@@ -41,10 +41,10 @@ int ResultPrompt_Update(ResultPrompt *p)
             } args;
             args.count = 1;
             args.values = &value;
-            sub_0821AD08(p->script, &args);
+            Script_Call(p->script, &args);
             p->script = 0;
         }
-        sub_0821A0C0(p);
+        Task_Kill(p);
     }
     p->timer++;
     return 0;

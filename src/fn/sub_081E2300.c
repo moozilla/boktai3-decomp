@@ -29,16 +29,16 @@ struct Viewer {
     s32 state, exitFlag, exitTimer, fadeShift, selection, countA, countB, countC, textIndex, valueA,
         valueB, previousA, previousB, previousC, repeatTimer;
 };
-void sub_0821980C(void *, void *, u16, s32);
+void Anim_LoadKeyframe(void *, void *, u16, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 extern const s16 gUnk_086136F0[], gUnk_086137AE[], gUnk_08613BC4[];
 u32 sub_0822B590(s32);
-void sub_0822B358(s32);
-void sub_0822B2F8(s32);
-void sub_08220D78(void *, void *, u16, s32, s32);
+void Sound_StopSong(s32);
+void Sound_PlaySong(s32);
+void Anim_SetKeyframes(void *, void *, u16, s32, s32);
 extern u16 gUnk_03004BD8;
-void sub_082195E0(void *);
+void Anim_Remove(void *);
 // Release every sprite used by the sound-test menu.
 void SoundTest_Destroy(struct Viewer *p)
 {
@@ -55,15 +55,15 @@ void SoundTest_Destroy(struct Viewer *p)
     b = p->digitsA;
     a = p->labels;
     for (i = 2; i >= 0; i--) {
-        sub_082195E0(a);
-        sub_082195E0(b);
-        sub_082195E0(c);
+        Anim_Remove(a);
+        Anim_Remove(b);
+        Anim_Remove(c);
         c++;
         b++;
         a++;
     }
-    sub_082195E0(&p->cursor);
-    sub_082195E0(&p->panel);
-    sub_082195E0(&p->label);
-    sub_082195E0(&p->background);
+    Anim_Remove(&p->cursor);
+    Anim_Remove(&p->panel);
+    Anim_Remove(&p->label);
+    Anim_Remove(&p->background);
 }

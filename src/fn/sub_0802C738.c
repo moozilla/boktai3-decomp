@@ -19,7 +19,7 @@ struct Manager {
 extern struct Manager *gUnk_020000D8;
 extern u8 *gUnk_02000580[4];
 int sub_0802C6C8(struct Manager *, struct Object *);
-void sub_08219D38(void *);
+void Heap_Free(void *);
 void sub_0802C710(struct Manager *);
 int sub_0802C738(struct Manager *m)
 {
@@ -32,7 +32,7 @@ int sub_0802C738(struct Manager *m)
                 if (p->destroy)
                     p->destroy(p);
                 sub_0802C6C8(m, p);
-                sub_08219D38(p);
+                Heap_Free(p);
             } else if (p->update)
                 p->update(p);
             p = next;

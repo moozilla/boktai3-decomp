@@ -29,7 +29,7 @@ struct Engine {
 };
 extern struct Engine *gUnk_02000484;
 extern u8 gUnk_020000EC;
-void sub_08219DD8(void *, int);
+void Memory_Clear(void *, int);
 #define gRfuLinkStatus   gUnk_03006A80
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
@@ -40,14 +40,14 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-void sub_082156B8(void);
+void Bg_ClearTilemap(void);
 int sub_080341B0(struct Engine *, int);
 extern u16 gUnk_03005270;
 int sub_08035D20(struct Engine *p)
 {
     if (p->pending) {
         p->pending = 0;
-        sub_082156B8();
+        Bg_ClearTilemap();
     }
     {
         int input = gUnk_03005270;

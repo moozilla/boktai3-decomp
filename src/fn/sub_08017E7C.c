@@ -12,7 +12,7 @@ extern int gUnk_02000080, gUnk_02000084;
 extern u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
 void sub_08003448(int);
-void sub_0821AD08(void *, int);
+void Script_Call(void *, int);
 void sub_080174B8(void *, int);
 int sub_080177AC(void *, int, int, int);
 int Mod(int, int);
@@ -30,7 +30,7 @@ int Weather_StormEnd(struct Weather *p)
         sub_08003448(3);
         clearFlag();
         if (p->script)
-            sub_0821AD08(p->script, 0);
+            Script_Call(p->script, 0);
     }
     mask = 512;
     gUnk_03004BD8 = mask | gUnk_03004BD8;

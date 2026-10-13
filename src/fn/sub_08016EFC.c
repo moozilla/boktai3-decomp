@@ -1,12 +1,12 @@
 #include "global.h"
 extern u32 gUnk_02000078;
-void sub_082195E0(u8 *);
+void Anim_Remove(u8 *);
 u32 sub_08016EFC(u8 *p)
 {
     s32 i;
     u8 *q = p + 0x60;
     for (i = 7; i >= 0; i--) {
-        sub_082195E0(q);
+        Anim_Remove(q);
         q += 0x84;
     }
     {

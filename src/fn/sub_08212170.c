@@ -1,8 +1,8 @@
 #include "global.h"
 s32 sub_082118A0(u32);
 s32 sub_082118D8(u32);
-void sub_0803386C(void *, void *);
-void sub_08033924(void *, u32);
+void TextWindow_SetScript(void *, void *);
+void TextWindow_Refresh(void *, u32);
 void sub_08033A38(void *, u32, void *);
 void sub_080337FC(void *);
 void sub_08033468(void);
@@ -22,10 +22,10 @@ u32 sub_08212170(u8 *p)
             void **obj = (void **)(p + 0xb74);
             void *objvalue = *obj;
             void **arg = (void **)(p + 0xb78);
-            sub_0803386C(objvalue, *arg);
+            TextWindow_SetScript(objvalue, *arg);
             flag = p + 0xbec;
             *flag = 0;
-            sub_08033924(*obj, tbl[*idx]);
+            TextWindow_Refresh(*obj, tbl[*idx]);
             sub_08033A38(*obj, 0, flag);
             sub_080337FC(*obj);
             sub_08033468();
@@ -33,10 +33,10 @@ u32 sub_08212170(u8 *p)
         } else {
             u8 *flag;
             void **obj = (void **)(p + 0xb74);
-            sub_0803386C(*obj, *(void **)(p + 0xb78));
+            TextWindow_SetScript(*obj, *(void **)(p + 0xb78));
             flag = p + 0xbec;
             *flag = v;
-            sub_08033924(*obj, 0x62);
+            TextWindow_Refresh(*obj, 0x62);
             sub_08033A38(*obj, 0, flag);
             sub_080337FC(*obj);
             sub_08033468();
@@ -51,10 +51,10 @@ u32 sub_08212170(u8 *p)
             void **obj = (void **)(p + 0xb74);
             void *objvalue = *obj;
             void **arg = (void **)(p + 0xb80);
-            sub_0803386C(objvalue, *arg);
+            TextWindow_SetScript(objvalue, *arg);
             flag = p + 0xbec;
             *flag = 0;
-            sub_08033924(*obj, tbl[*idx]);
+            TextWindow_Refresh(*obj, tbl[*idx]);
             sub_08033A38(*obj, 0, flag);
             sub_080337FC(*obj);
             sub_08033468();
@@ -62,10 +62,10 @@ u32 sub_08212170(u8 *p)
         } else {
             u8 *flag;
             void **obj = (void **)(p + 0xb74);
-            sub_0803386C(*obj, *(void **)(p + 0xb78));
+            TextWindow_SetScript(*obj, *(void **)(p + 0xb78));
             flag = p + 0xbec;
             *flag = v;
-            sub_08033924(*obj, 0x62);
+            TextWindow_Refresh(*obj, 0x62);
             sub_08033A38(*obj, 0, flag);
             sub_080337FC(*obj);
             sub_08033468();

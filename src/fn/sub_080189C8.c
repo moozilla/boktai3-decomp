@@ -26,7 +26,7 @@ extern const s16 gUnk_086149C4[];
 void sub_080187E4(void *, void *);
 void OrbitingParticles_Advance(void *, void *);
 int sub_080187BC(void *);
-void sub_0821A0C0(void *);
+void Task_Kill(void *);
 static inline int scale(int v)
 {
     if (v >= 0)
@@ -42,7 +42,7 @@ struct Map {
 extern struct Map *gUnk_030052F4;
 extern u32 gUnk_030052F8, gUnk_030052FC;
 u8 *sub_0821D64C(int, int);
-void *sub_08215184(int);
+void *AnimData_FindEntry(int);
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
 void sub_08217DE0(void *, void *, int);
@@ -75,37 +75,37 @@ int OrbitingParticles_Initialize(struct Manager *m, struct Vec *source, int radi
     struct Orb *p;
     switch (type) {
         case 1:
-            m->resource = sub_08215184(0x1c1e);
+            m->resource = AnimData_FindEntry(0x1c1e);
             m->frame = 0;
             break;
         case 3:
-            m->resource = sub_08215184(0x1c1e);
+            m->resource = AnimData_FindEntry(0x1c1e);
             m->frame = 4;
             break;
         case 4:
-            m->resource = sub_08215184(0x1c1e);
+            m->resource = AnimData_FindEntry(0x1c1e);
             m->frame = 6;
             break;
         case 5:
-            m->resource = sub_08215184(0x1c1e);
+            m->resource = AnimData_FindEntry(0x1c1e);
             m->frame = 8;
             break;
         case 6:
-            m->resource = sub_08215184(0x1c1e);
+            m->resource = AnimData_FindEntry(0x1c1e);
             m->frame = 10;
             break;
         case 7:
-            m->resource = sub_08215184(0x1c1e);
+            m->resource = AnimData_FindEntry(0x1c1e);
             m->frame = 12;
             break;
         case 8:
-            m->resource = sub_08215184(0x1c1e);
+            m->resource = AnimData_FindEntry(0x1c1e);
             m->frame = 14;
             break;
         case 0:
         case 2:
         default:
-            m->resource = sub_08215184(0x1c1e);
+            m->resource = AnimData_FindEntry(0x1c1e);
             m->frame = 2;
             break;
     }

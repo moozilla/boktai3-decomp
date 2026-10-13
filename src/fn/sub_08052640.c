@@ -7,10 +7,10 @@ struct S {
     u8 sub[0x148];
     u16 v;
 };
-void sub_08215284(u8 *, u16);
+void AnimData_SelectTiles(u8 *, u16);
 
 void sub_08052640(struct S *p)
 {
     p->flags |= 1;
-    sub_08215284(p->sub, p->v);
+    AnimData_SelectTiles(p->sub, p->v);
 }

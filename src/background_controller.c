@@ -187,7 +187,7 @@ s32 Background_Update(struct Background *p)
             tileY &= ~1;
         }
     }
-    sub_0821656C(p->layer, tileX, tileY, x, y);
+    BgGfx_LoadTilemapSimple(p->layer, tileX, tileY, x, y);
     if (p->fadeActive == 1) {
         p->blendX += p->blendStepX;
         p->blendY += p->blendStepY;
@@ -304,13 +304,13 @@ void *sub_08001CB0(u16 id, struct BackgroundConfig *c)
 {
     struct Background *p;
     if (c->priority == 0)
-        p = sub_08219FBC(9, 0x140);
+        p = Task_Create(9, 0x140);
     else
-        p = sub_08219FBC(0xb, 0x140);
+        p = Task_Create(0xb, 0x140);
     if (p != 0) {
-        sub_0821A04C(p, Background_Update, sub_08001AD0);
+        Task_SetCallbacks(p, Background_Update, sub_08001AD0);
         if (Background_Initialize(p, id, c) < 0) {
-            sub_0821A0C0(p);
+            Task_Kill(p);
             return 0;
         }
     }
@@ -336,9 +336,9 @@ static inline s32 nextZero(void)
 void *Background_CreateFromScript(u32 id)
 {
     struct BackgroundConfig c;
-    c.flags = sub_0821ABA8('f', 0);
-    c.layer = sub_0821ABA8('i', 0);
-    c.resource = sub_0821ABA8('d', 0);
+    c.flags = Script_GetKeywordValue('f', 0);
+    c.layer = Script_GetKeywordValue('i', 0);
+    c.resource = Script_GetKeywordValue('d', 0);
     if (Script_SeekToKeyword('r')) {
         c.rateX = Script_GetValue();
         c.rateY = Script_GetValue();
@@ -348,17 +348,17 @@ void *Background_CreateFromScript(u32 id)
     }
     switch (c.layer) {
         case 0:
-            c.mode = sub_0821ABA8('p', 0);
+            c.mode = Script_GetKeywordValue('p', 0);
             break;
         case 2:
-            c.mode = sub_0821ABA8('p', 3);
+            c.mode = Script_GetKeywordValue('p', 3);
             break;
         case 1:
         case 3:
-            c.mode = sub_0821ABA8('p', 1);
+            c.mode = Script_GetKeywordValue('p', 1);
             break;
     }
-    c.priority = sub_0821ABA8('a', 0);
+    c.priority = Script_GetKeywordValue('a', 0);
     if (Script_SeekToKeyword('s')) {
         c.x = nextZero();
         c.y = nextZero();
@@ -428,13 +428,13 @@ s32 Background_LoadMapsFromScript(void)
 {
     s32 indices[4];
     struct BackgroundResource resource;
-    u8 *base = sub_08216E54(sub_0821ABA8('d', 0));
+    u8 *base = sub_08216E54(Script_GetKeywordValue('d', 0));
     s32 target, x, y, n, explicitIndices, i;
     resource = *(struct BackgroundResource *)base;
     resource.maps += (u32)base;
     resource.tiles += (u32)base;
     resource.extra += (u32)base;
-    target = sub_0821ABA8('t', 1);
+    target = Script_GetKeywordValue('t', 1);
     if (Script_SeekToKeyword('o')) {
         u8 *cursor;
         x = ({
@@ -453,7 +453,7 @@ s32 Background_LoadMapsFromScript(void)
         x = zero;
         y = 0;
     }
-    n = sub_0821ABA8('n', 1);
+    n = Script_GetKeywordValue('n', 1);
     explicitIndices = 0;
     if (Script_SeekToKeyword('i')) {
         u8 *p = Script_GetPc();
@@ -495,9 +495,9 @@ s32 Background_LoadMapsFromScript(void)
 s32 Background_LoadMapFromScript(void)
 {
     struct BackgroundResource resource;
-    u16 layer = sub_0821ABA8('p', 0);
+    u16 layer = Script_GetKeywordValue('p', 0);
     u16 index;
-    u8 *base = sub_08216E54(sub_0821ABA8('d', 0));
+    u8 *base = sub_08216E54(Script_GetKeywordValue('d', 0));
     resource = *(struct BackgroundResource *)base;
     resource.maps += (u32)base;
     resource.tiles += (u32)base;
@@ -539,10 +539,10 @@ s32 Background_LoadTilesFromScript(void)
 {
     u16 entries[64];
     struct BackgroundResource resource;
-    u16 layer = sub_0821ABA8('t', 0);
-    u16 data = sub_0821ABA8('d', 0);
-    u16 size = sub_0821ABA8('s', 0);
-    void *base = sub_0821A520(0xCEEF, data);
+    u16 layer = Script_GetKeywordValue('t', 0);
+    u16 data = Script_GetKeywordValue('d', 0);
+    u16 size = Script_GetKeywordValue('s', 0);
+    void *base = ScriptProc_Start(0xCEEF, data);
     s32 count = 0;
     if (Script_SeekToKeyword('c')) {
         s32 i;
@@ -608,8 +608,8 @@ void Background_QueueCommand(u32 layer, u32 type, s32 length, s32 *args)
 void sub_08002234(void)
 {
     s32 buf[8];
-    u32 a = sub_0821ABA8(0x74, 1);
-    u32 b = sub_0821ABA8(0x72, 0);
+    u32 a = Script_GetKeywordValue(0x74, 1);
+    u32 b = Script_GetKeywordValue(0x72, 0);
     s32 n = 0;
     if (Script_SeekToKeyword(0x70)) {
         s32 *q = buf;
@@ -831,7 +831,7 @@ s32 ScrollingBackground_Initialize(struct ScrollingBackground *p, u16 id,
         s32 drawX = p->x >> 4, drawY = p->y >> 4;
         tx = Div(drawX - 128, 8);
         ty = Div(drawY - 128, 8) & ~1;
-        sub_0821656C(p->layer, tx, ty, drawX, drawY);
+        BgGfx_LoadTilemapSimple(p->layer, tx, ty, drawX, drawY);
     }
     p->fadeActive = 0;
     {
@@ -855,13 +855,13 @@ void *sub_08002840(u16 id, struct ScrollingBackgroundConfig *c)
 {
     struct ScrollingBackground *p;
     if (c->priority == 0)
-        p = sub_08219FBC(9, 0xf8);
+        p = Task_Create(9, 0xf8);
     else
-        p = sub_08219FBC(0xb, 0xf8);
+        p = Task_Create(0xb, 0xf8);
     if (p != 0) {
-        sub_0821A04C(p, ScrollingBackground_Update, sub_08002658);
+        Task_SetCallbacks(p, ScrollingBackground_Update, sub_08002658);
         if (ScrollingBackground_Initialize(p, id, c) < 0) {
-            sub_0821A0C0(p);
+            Task_Kill(p);
             return 0;
         }
     }
@@ -879,11 +879,11 @@ static inline s32 nextOffset(void)
 void *ScrollingBackground_CreateFromScript(u32 id)
 {
     struct ScrollingBackgroundConfig c;
-    c.flags = sub_0821ABA8('f', 0);
-    c.layer = sub_0821ABA8('i', 0);
-    c.resource = sub_0821ABA8('d', 0);
-    c.scale = sub_0821ABA8('r', 128);
-    c.priority = sub_0821ABA8('a', 0);
+    c.flags = Script_GetKeywordValue('f', 0);
+    c.layer = Script_GetKeywordValue('i', 0);
+    c.resource = Script_GetKeywordValue('d', 0);
+    c.scale = Script_GetKeywordValue('r', 128);
+    c.priority = Script_GetKeywordValue('a', 0);
     if (Script_SeekToKeyword('s')) {
         c.x = nextZero();
         c.y = nextZero();
@@ -924,14 +924,14 @@ void *ScrollingBackground_CreateFromScript(u32 id)
     }
     switch (c.layer) {
         case 0:
-            c.mode = sub_0821ABA8('p', 0);
+            c.mode = Script_GetKeywordValue('p', 0);
             break;
         case 2:
-            c.mode = sub_0821ABA8('p', 3);
+            c.mode = Script_GetKeywordValue('p', 3);
             break;
         case 1:
         case 3:
-            c.mode = sub_0821ABA8('p', 1);
+            c.mode = Script_GetKeywordValue('p', 1);
             break;
     }
     return sub_08002840(id, &c);
@@ -952,8 +952,8 @@ void ScrollingBackground_QueueCommand(u32 layer, u32 type, s32 length, s32 *args
 void sub_08002A58(void)
 {
     s32 buf[8];
-    u32 a = sub_0821ABA8(0x74, 1);
-    u32 b = sub_0821ABA8(0x72, 0);
+    u32 a = Script_GetKeywordValue(0x74, 1);
+    u32 b = Script_GetKeywordValue(0x72, 0);
     s32 n = 0;
     if (Script_SeekToKeyword(0x70)) {
         s32 *q = buf;

@@ -8,8 +8,8 @@ struct S {
     s32 f68;
 };
 void sub_081C439C(struct S *);
-void sub_0821AD08(u32, u32);
-void sub_0821A0C0(u32);
+void Script_Call(u32, u32);
+void Task_Kill(u32);
 void sub_081C44E0(struct S *);
 
 void sub_081C4668(struct S *p)
@@ -18,9 +18,9 @@ void sub_081C4668(struct S *p)
     p->f68++;
     if (p->f68 > 0x3f) {
         if (p->f5c) {
-            sub_0821AD08(p->f5c, 0);
-            sub_0821A0C0(p->f60);
-            sub_0821A0C0((u32)p);
+            Script_Call(p->f5c, 0);
+            Task_Kill(p->f60);
+            Task_Kill((u32)p);
         } else {
             sub_081C44E0(p);
         }

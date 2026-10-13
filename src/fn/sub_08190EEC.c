@@ -21,9 +21,9 @@ struct Sprite {
     u32 pad;
     u32 flags;
 };
-void sub_08220D78(void *, void *, s32, s32, s32);
-s32 sub_08220F70(void *, void *);
-void sub_0822B3BC(s32);
+void Anim_SetKeyframes(void *, void *, s32, s32, s32);
+s32 Anim_Step(void *, void *);
+void Sound_PlaySongChecked(s32);
 struct Pair {
     u32 a, b;
 };
@@ -41,13 +41,13 @@ void sub_08190EEC(u8 *p, int i)
         u8 *a;
         ((struct Entries *)p)->items[i].flags &= ~1;
         a = p + (off + 0x543c);
-        sub_08220D78(a, p + 0x541c, 5, 2, 4);
+        Anim_SetKeyframes(a, p + 0x541c, 5, 2, 4);
         (*q)++;
         ((struct Flags *)p)->done[i] = old;
         v = gUnk_0824F34C;
         sub_0818FD9C(p + 0x54, a + 0x20, &v, p);
     }
-    if (sub_08220F70(p + (i * 0x60 + 0x543c), p + 0x541c)) {
+    if (Anim_Step(p + (i * 0x60 + 0x543c), p + 0x541c)) {
         *q = 0xff;
         ((struct Flags *)p)->done[i] = 1;
     }

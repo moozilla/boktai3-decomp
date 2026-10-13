@@ -1,10 +1,10 @@
 #include "global.h"
 
 extern void *gUnk_0200046C;
-void *sub_08219FBC(u32, u32);
-void sub_0821A04C(void *, void (*)(void), void (*)(void));
+void *Task_Create(u32, u32);
+void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
 s32 sub_0800D800(void *, void *);
-void sub_0821A0C0(void *);
+void Task_Kill(void *);
 void FallingObjectManager_Update(void);
 void sub_0800D7D4(void);
 
@@ -13,11 +13,11 @@ void *sub_0800D828(void *a)
     void *p;
     if (gUnk_0200046C != 0)
         return gUnk_0200046C;
-    p = sub_08219FBC(8, 0x20);
+    p = Task_Create(8, 0x20);
     if (p != 0) {
-        sub_0821A04C(p, FallingObjectManager_Update, sub_0800D7D4);
+        Task_SetCallbacks(p, FallingObjectManager_Update, sub_0800D7D4);
         if (sub_0800D800(p, a) < 0) {
-            sub_0821A0C0(p);
+            Task_Kill(p);
             return 0;
         }
     }

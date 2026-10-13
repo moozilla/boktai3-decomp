@@ -28,14 +28,14 @@ struct Sequence {
     void *handle;
     void (*callback)(void *);
 };
-void sub_0821980C(void *, void *, s32, s32);
-void sub_08220D78(void *, void *, s32, s32, s32);
+void Anim_LoadKeyframe(void *, void *, s32, s32);
+void Anim_SetKeyframes(void *, void *, s32, s32, s32);
 void sub_081E28D4(void *);
 void Presentation_ClearTilemap(void);
 extern u16 gUnk_03005260[];
 extern u16 gUnk_03004FC0;
-void sub_0821A0C0(void *);
-void sub_0821AD08(void *, void *);
+void Task_Kill(void *);
+void Script_Call(void *, void *);
 void Presentation_UpdateDropShakeBlink(void *);
 s32 sub_082279A8(s32, s32, s32, s32, s32, s32, s32);
 void sub_08030B78(s32);
@@ -58,9 +58,9 @@ s32 Presentation_Update(struct Sequence *p)
                 message.count = 1;
                 message.values = &value;
                 value = p->result;
-                sub_0821AD08(p->handle, &message);
+                Script_Call(p->handle, &message);
             }
-            sub_0821A0C0(p);
+            Task_Kill(p);
         }
     } else {
         if (p->frame == p->last && p->frameTimer == p->duration - 16) {
@@ -74,8 +74,8 @@ s32 Presentation_Update(struct Sequence *p)
         } else if (p->frameTimer >= p->duration && p->option) {
             p->frame++;
             if (p->option == 1) {
-                sub_08220D78(p->layer2, p->resource, 4, 1, 0);
-                sub_0821980C(p->layer3, p->resource, 1, 1);
+                Anim_SetKeyframes(p->layer2, p->resource, 4, 1, 0);
+                Anim_LoadKeyframe(p->layer3, p->resource, 1, 1);
                 p->flags4 |= 1;
             } else if (p->option == 3) {
                 p->callback = Presentation_UpdateDropShakeBlink;

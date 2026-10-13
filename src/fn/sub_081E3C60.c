@@ -77,8 +77,8 @@ struct Partner {
 extern u8 *gUnk_02000710;
 extern u16 gUnk_03005260[];
 extern u32 gUnk_0300523C;
-u8 sub_082215E4(s32, s32);
-void sub_0821AD08(void *, s32);
+u8 Math_Atan2(s32, s32);
+void Script_Call(void *, s32);
 void sub_081E574C(void *, void *);
 void sub_081E5648(void *, void *);
 void sub_081E4174(void *);
@@ -125,7 +125,7 @@ void Actor_TryInteraction(struct G *p, struct Partner *q)
         c = 2;
     }
     {
-        u32 angle = (u8)(sub_082215E4(dx, dz) - 16);
+        u32 angle = (u8)(Math_Atan2(dx, dz) - 16);
         s32 first = (s8)a;
         sector = angle >> 5;
         if (first != sector && (s8)b != sector && (s8)c != sector) {
@@ -151,7 +151,7 @@ void Actor_TryInteraction(struct G *p, struct Partner *q)
     if (*(u32 *)(owner + 0x1c) == 4)
         return;
     if (q->request)
-        sub_0821AD08(q->request, 0);
+        Script_Call(q->request, 0);
     p->obj.x = q->x;
     p->obj.y = q->y;
     p->obj.z = q->z;

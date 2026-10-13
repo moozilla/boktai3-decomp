@@ -10,7 +10,7 @@ struct A {
 };
 extern u32 gUnk_020005EC;
 void sub_081FE244(struct A *, struct E *, s32);
-void sub_0822B358(u32);
+void Sound_StopSong(u32);
 u32 sub_081FE644(struct A *a)
 {
     struct E *e = a->e;
@@ -21,6 +21,6 @@ u32 sub_081FE644(struct A *a)
         i++;
         e++;
     } while (i <= 3);
-    sub_0822B358(0x564);
+    Sound_StopSong(0x564);
     return gUnk_020005EC = 0;
 }

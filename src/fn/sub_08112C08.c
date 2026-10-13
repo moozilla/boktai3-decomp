@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_020004BC;
-void sub_08214514(void *);
+void Sprite_Remove(void *);
 void sub_08112C08(u32 i)
 {
     u8 *g = gUnk_020004BC;
@@ -11,7 +11,7 @@ void sub_08112C08(u32 i)
             u8 *r = g + (off + 0x18);
             u8 *t;
             u32 z;
-            sub_08214514(r + 0x1c);
+            Sprite_Remove(r + 0x1c);
             t = g + 0x74;
             t = t + off;
             z = 0;

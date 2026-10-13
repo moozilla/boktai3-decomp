@@ -11,14 +11,14 @@ struct Display {
     u8 resource[32];
     struct Drawing drawings[4];
 };
-void sub_0821980C(void *, void *, int, int);
+void Anim_LoadKeyframe(void *, void *, int, int);
 void sub_0803A778(struct Display *p)
 {
     if (p->entered) {
         struct Drawing *q;
         p->entered = 0;
         q = p->drawings;
-        sub_0821980C(q, p->resource, 26, 0);
+        Anim_LoadKeyframe(q, p->resource, 26, 0);
         q->flags &= ~1;
     }
     if (p->finished) {

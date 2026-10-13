@@ -14,8 +14,8 @@ struct P {
 extern u32 gUnk_0300523C;
 extern u32 gUnk_030053F4;
 
-void sub_0821FE40(void *);
-void sub_0821A0C0(void *);
+void Collider_Refresh(void *);
+void Task_Kill(void *);
 
 void sub_0815FF40(struct P *p)
 {
@@ -28,7 +28,7 @@ void sub_0815FF40(struct P *p)
     }
     (*c)++;
     if (*c <= 5)
-        sub_0821FE40(p->s9c);
+        Collider_Refresh(p->s9c);
     else
-        sub_0821A0C0(p);
+        Task_Kill(p);
 }

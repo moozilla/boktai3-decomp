@@ -16,24 +16,24 @@ extern struct ResultMenu *gUnk_02000104;
 extern void *gUnk_08605814[];
 extern u16 gUnk_03005260[], gUnk_03004BD8;
 void sub_0822AFE8(int);
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 void sub_08249238(void *);
-void sub_0821A0C0(void *);
+void Task_Kill(void *);
 int sub_08036BEC(void);
 void sub_08033778(int);
 void sub_0824923C(void *, void *);
-void sub_082195E0(void *);
-void sub_08214514(void *);
+void Anim_Remove(void *);
+void Sprite_Remove(void *);
 void sub_0803B314(struct ResultMenu *p)
 {
     if (p->entered)
         p->entered = 0;
     if (p->timer > 29 && (gUnk_03005260[1] & 0x30F)) {
         sub_0822AFE8(4);
-        sub_0822B2F8(221);
+        Sound_PlaySong(221);
         if (p->onClose)
             sub_08249238(p->onClose);
-        sub_0821A0C0(p);
+        Task_Kill(p);
     } else
         p->timer++;
 }

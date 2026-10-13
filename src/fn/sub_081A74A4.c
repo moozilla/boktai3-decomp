@@ -9,7 +9,7 @@ struct S {
     u8 d[1];
 };
 void sub_081A68CC(void *);
-void sub_08020D68(void *, s32);
+void Trigger_ConsumePending(void *, s32);
 static inline u8 chk(struct S *p)
 {
     u8 *q = &p->b0;
@@ -29,5 +29,5 @@ void sub_081A74A4(struct S *p)
         p->st = v;
     }
     if (p->af != 0)
-        sub_08020D68((u8 *)p + 0x118, 1);
+        Trigger_ConsumePending((u8 *)p + 0x118, 1);
 }

@@ -28,10 +28,10 @@ struct Manager {
     void *animation;
 };
 extern struct Manager *gUnk_0200046C;
-void sub_08220C8C(void *, void *, u32, u32, u32);
-void sub_0822B2F8(u32);
-void sub_0821FF24(void *, void *, u32);
-void sub_0821FE40(void *);
+void Anim_SetSequence(void *, void *, u32, u32, u32);
+void Sound_PlaySong(u32);
+void Collider_SetPosition(void *, void *, u32);
+void Collider_Refresh(void *);
 static inline void setFrame(struct Sprite *sprite, u16 frame)
 {
     sprite->frame = frame;
@@ -41,18 +41,18 @@ void FallingObject_UpdateFalling(struct Object *object)
     if (object->entered) {
         object->entered = 0;
         if (object->animated)
-            sub_08220C8C(object->anim, gUnk_0200046C->animation, 3, 0, 0);
+            Anim_SetSequence(object->anim, gUnk_0200046C->animation, 3, 0, 0);
     }
     object->position.y -= object->speed;
     if (object->position.y <= object->ground) {
         object->position.y = object->ground;
         if (object->type == 2) {
             if (object->flags & 4)
-                sub_0822B2F8(669);
+                Sound_PlaySong(669);
             else
-                sub_0822B2F8(511);
+                Sound_PlaySong(511);
         } else
-            sub_0822B2F8(326);
+            Sound_PlaySong(326);
         {
             u32 one = 1;
             u32 zero = 0;
@@ -76,9 +76,9 @@ void FallingObject_UpdateFalling(struct Object *object)
         setFrame(&object->sprite, object->frame);
     }
     if (object->collider)
-        sub_0821FF24(object->collider, &object->position, 0);
+        Collider_SetPosition(object->collider, &object->position, 0);
     if (object->attack) {
-        sub_0821FF24(object->attack, &object->position, 0);
-        sub_0821FE40(object->attack);
+        Collider_SetPosition(object->attack, &object->position, 0);
+        Collider_Refresh(object->attack);
     }
 }

@@ -7,29 +7,29 @@ struct Actor {
     s16 timer, duration;
 };
 void *sub_08066DB8(void *, void *, int, int, void *, int, int, int);
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 void sub_0802DE3C(struct Actor *p, unsigned kind, int timer, int duration)
 {
     switch (kind) {
         case 0:
             p->effectKind = 0;
             p->effect = sub_08066DB8(p->effect, p->motion, 0, 1, 0, 0, 0, 100);
-            sub_0822B2F8(0x1b1);
+            Sound_PlaySong(0x1b1);
             break;
         case 2:
             p->effectKind = 0;
             p->effect = sub_08066DB8(p->effect, p->motion, 0, 0, 0, 0, 0, 100);
-            sub_0822B2F8(0x1ec);
+            Sound_PlaySong(0x1ec);
             break;
         case 1:
             p->effectKind = 0;
             p->effect = sub_08066DB8(p->effect, p->motion, 0, 3, 0, 0, 0, 100);
-            sub_0822B2F8(0x1ec);
+            Sound_PlaySong(0x1ec);
             break;
         case 3:
             p->effectKind = 0;
             p->effect = sub_08066DB8(p->effect, p->motion, 0, 2, 0, 0, 0, 100);
-            sub_0822B2F8(0x1ed);
+            Sound_PlaySong(0x1ed);
             break;
         case 4:
             p->effectKind = 1;

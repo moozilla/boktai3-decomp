@@ -7,14 +7,14 @@ struct S {
     void (*callback)(void *);
 };
 extern u8 gUnk_03005430[];
-void sub_0822B2F8(u32);
+void Sound_PlaySong(u32);
 void sub_08228D88(void);
 void sub_081E4518(struct S *p)
 {
     if (--p->timer == 0) {
         p->callback = 0;
         if ((u8)(gUnk_03005430[14] - 1) <= 2)
-            sub_0822B2F8(0x120);
+            Sound_PlaySong(0x120);
         else
             sub_08228D88();
     }

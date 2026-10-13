@@ -29,8 +29,8 @@ void sub_08038158(void);
 void sub_0803B700(int, int, void *, void *, u32, u32, void *);
 void sub_080380C4(struct P *, int);
 int sub_08033690(int, int, int, int);
-void sub_0803386C(int, void *);
-void sub_08033924(int, int);
+void TextWindow_SetScript(int, void *);
+void TextWindow_Refresh(int, int);
 void sub_080337FC(int);
 void sub_08038E48(struct P *p)
 {
@@ -63,8 +63,8 @@ void sub_08038E48(struct P *p)
         w = sub_08033690(1, 6, 28, 6);
         *window = w;
         if (w >= 0) {
-            sub_0803386C(w, p->script);
-            sub_08033924(*window, 11);
+            TextWindow_SetScript(w, p->script);
+            TextWindow_Refresh(*window, 11);
             sub_080337FC(*window);
         }
     }

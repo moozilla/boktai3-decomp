@@ -19,19 +19,19 @@ void sub_08030BF8(void);
 void sub_08030B78(int);
 void sub_08030C84(void *);
 void sub_080311B0(int);
-void sub_0821AD08(int, int);
-void sub_0821A0C0(void *);
-void sub_082156B8(int);
+void Script_Call(int, int);
+void Task_Kill(void *);
+void Bg_ClearTilemap(int);
 int Div(int, int);
 u8 sub_08033C9C(struct Transition *);
 void sub_08033C90(struct Transition *, int);
 void sub_08033C58(struct Transition *);
-int sub_0821ABA8(int, int);
+int Script_GetKeywordValue(int, int);
 int sub_08033EA4(struct Transition *);
 int sub_08033FEC(struct Transition *p)
 {
     gUnk_020000E8 = p;
-    p->flags = sub_0821ABA8(102, 0);
+    p->flags = Script_GetKeywordValue(102, 0);
     if (p->flags & 1) {
         int previous = gUnk_03004BD8;
         p->savedRegister = previous;

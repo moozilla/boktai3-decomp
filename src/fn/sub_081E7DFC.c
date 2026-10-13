@@ -33,9 +33,9 @@ struct S {
     void (*previous)(void *);
     void (*fn)(void *);
 };
-void sub_08220C8C(void *, u32, u32, u32, u32);
+void Anim_SetSequence(void *, u32, u32, u32, u32);
 void sub_081E4188(void *);
-void sub_08013440(void *);
+void ActorShadow_Disable(void *);
 void sub_081E41EC(void *);
 static inline u8 take(struct S *p)
 {
@@ -54,8 +54,8 @@ static inline u32 frame_factor(u16 v)
     u32 mask = 15;
     return mask & value;
 }
-void sub_08215284(void *, s32);
-void sub_08013424(void *);
+void AnimData_SelectTiles(void *, s32);
+void ActorShadow_Enable(void *);
 void ActorPalette_BeginReverseFade(void *);
 void sub_081E7DFC(struct S *p)
 {
@@ -67,8 +67,8 @@ void sub_081E7DFC(struct S *p)
     u8 done;
     if (take(p)) {
         p->state = 12;
-        sub_08220C8C(&p->anim, p->arg, 12, 0, 0);
-        sub_08215284((u8 *)p + 0xe08, 346);
+        Anim_SetSequence(&p->anim, p->arg, 12, 0, 0);
+        AnimData_SelectTiles((u8 *)p + 0xe08, 346);
         o = &p->obj;
         a = &p->anim;
         entry = a->data + a->frame;

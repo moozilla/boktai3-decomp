@@ -26,7 +26,7 @@ extern const s16 gUnk_086149C4[];
 void sub_080187E4(void *, void *);
 void OrbitingParticles_Advance(void *, void *);
 int sub_080187BC(void *);
-void sub_0821A0C0(void *);
+void Task_Kill(void *);
 static inline int scale(int v)
 {
     if (v >= 0)
@@ -84,6 +84,6 @@ int OrbitingParticles_Update(struct Manager *m)
     }
     m->time++;
     if (m->duration > 0 && m->time >= m->duration && !sub_080187BC(m))
-        sub_0821A0C0(m);
+        Task_Kill(m);
     return 0;
 }

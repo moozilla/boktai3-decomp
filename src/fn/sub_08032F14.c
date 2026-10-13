@@ -23,11 +23,11 @@ extern struct Window *gUnk_020000E0;
 extern u32 gUnk_03003A48, gUnk_03004280;
 extern u16 gUnk_03005260[];
 extern const u8 gUnk_086056D0[];
-void sub_08218E5C(int, int, int, int);
+void TextWindow_BlankRect(int, int, int, int);
 void sub_08218ED8(int, int, int, int);
-void sub_08032C54(struct TextState *, int, int, int, int);
+void TextState_SetBounds(struct TextState *, int, int, int, int);
 void sub_08032C80(struct TextState *, int, int, int, int);
-void sub_08032C34(struct TextState *);
+void TextState_Reset(struct TextState *);
 const u8 *sub_08032BEC(struct TextState *);
 int sub_08032B24(struct TextState *);
 int sub_08031F58(struct TextState *, int);
@@ -55,5 +55,5 @@ int sub_08032F14(struct Window *p, int clear)
     t->pc = p->script;
     t->style = zero;
     t->wrap = 2;
-    sub_08032C34(t);
+    TextState_Reset(t);
 }

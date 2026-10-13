@@ -2,14 +2,14 @@
 struct Pair339 {
     u32 a, b;
 };
-u32 sub_08215184(u32);
+u32 AnimData_FindEntry(u32);
 void sub_08217DE0(u8 *, u32, s32);
 void sub_08217EC4(u8 *, s32, s32);
 void sub_08217EEC(u8 *, u32, s32);
 void sub_082339C8(u8 *p)
 {
     u8 *e = p + 0x74;
-    u32 resource = sub_08215184(0x1c1a);
+    u32 resource = AnimData_FindEntry(0x1c1a);
     *(u32 *)(p + 0x9c) = resource;
     sub_08217DE0(e, resource, 1);
     sub_08217EC4(e, -8, -8);

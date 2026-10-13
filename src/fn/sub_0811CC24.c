@@ -1,6 +1,6 @@
 #include "global.h"
-void sub_08220D78(void *, void *, u32, u32, u32);
-void sub_08220F70(void *, void *);
+void Anim_SetKeyframes(void *, void *, u32, u32, u32);
+void Anim_Step(void *, void *);
 void sub_0811CC24(u8 *s, u8 *t)
 {
     s32 i = 0;
@@ -27,8 +27,8 @@ void sub_0811CC24(u8 *s, u8 *t)
         }
         a = t + i * 0x60;
         b = t + 0x1e0;
-        sub_08220D78(a, b, v, 1, 0);
-        sub_08220F70(a, b);
+        Anim_SetKeyframes(a, b, v, 1, 0);
+        Anim_Step(a, b);
         i++;
     } while (i <= 4);
 }

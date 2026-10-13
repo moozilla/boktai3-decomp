@@ -1,7 +1,7 @@
 #include "global.h"
 extern u8 *gUnk_020003C8;
 u8 *sub_081EA730(u32, u32);
-u8 sub_0821ABA8(u32, u32);
+u8 Script_GetKeywordValue(u32, u32);
 void sub_081E5594(void)
 {
     u8 *p = gUnk_020003C8;
@@ -10,5 +10,5 @@ void sub_081E5594(void)
         if (p == 0)
             return;
     }
-    p[0xDE3] = sub_0821ABA8(0x70, 0);
+    p[0xDE3] = Script_GetKeywordValue(0x70, 0);
 }

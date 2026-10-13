@@ -22,11 +22,11 @@ struct G {
     u8 d;
     u8 e;
 };
-void sub_08220C8C(void *, u32, u32, u32, u32);
+void Anim_SetSequence(void *, u32, u32, u32, u32);
 s32 Script_SeekToKeyword(s32);
 void Actor_ProjectAndClampToScreen(void *);
 s32 Script_GetValue(void);
-s32 sub_0821ABA8(s32, s32);
+s32 Script_GetKeywordValue(s32, s32);
 static inline u32 mode_bits(u8 *p, u32 mask)
 {
     register u32 v asm("r1") = *p;
@@ -43,7 +43,7 @@ void sub_081E5098(void)
     }
     H(0xf8a) = Script_GetValue();
     {
-        register u32 shifted asm("r0") = sub_0821ABA8(0x64, 0) << 24;
+        register u32 shifted asm("r0") = Script_GetKeywordValue(0x64, 0) << 24;
         u32 flip = 0;
         u32 mask = 0x07000000;
         u8 direction = (mask & shifted) >> 24;
@@ -55,7 +55,7 @@ void sub_081E5098(void)
         B(0xf66) = direction;
         B(0xf6b) = flip;
     }
-    sub_08220C8C((u8 *)g + 0xe24, W(0xe74), 0, B(0xf66), B(0xf6b));
+    Anim_SetSequence((u8 *)g + 0xe24, W(0xe74), 0, B(0xf66), B(0xf6b));
     g->b = g->xa;
     {
         u32 mode = 2;

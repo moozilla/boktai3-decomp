@@ -1,6 +1,6 @@
 #ifndef COLOR_FADE_CONTROLLER_H
 #define COLOR_FADE_CONTROLLER_H
-#include "global.h"
+#include "engine.h"
 
 // One fade channel (guess: blend of a colour into the screen, 0x40 = no fade)
 struct ColorFadeChannel {

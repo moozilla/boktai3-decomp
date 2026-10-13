@@ -21,7 +21,7 @@ extern u8 *gUnk_030053F8;
 extern u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
 void sub_0822AE7C(int);
-void sub_0821980C(void *, void *, int, int);
+void Anim_LoadKeyframe(void *, void *, int, int);
 
 void sub_0803B01C(struct P *p)
 {
@@ -85,7 +85,7 @@ void sub_0803B01C(struct P *p)
             u8 *descriptor = (u8 *)p + 0x50;
             int resource = icon;
             asm("" : "+r"(descriptor), "+r"(resource));
-            sub_0821980C(drawing, descriptor, resource, 0);
+            Anim_LoadKeyframe(drawing, descriptor, resource, 0);
         }
         drawing->x = 0;
         drawing->y = 0;

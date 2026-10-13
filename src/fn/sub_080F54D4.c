@@ -7,12 +7,12 @@ struct S080F54D4 {
     s32 cnt;
 };
 void sub_080F5504(void);
-void sub_0822B2F8(u32);
+void Sound_PlaySong(u32);
 
 void sub_080F54D4(struct S080F54D4 *s)
 {
     if (--s->cnt == 0) {
         s->fn = sub_080F5504;
-        sub_0822B2F8(0x16a);
+        Sound_PlaySong(0x16a);
     }
 }

@@ -15,7 +15,7 @@ struct PaletteController {
     u8 beforeCallback[0xf8c - 0xf5c];
     void (*callback)(void *);
 };
-void sub_08215284(void *, s32);
+void AnimData_SelectTiles(void *, s32);
 void ActorPalette_UpdateFade(void *);
 void ActorPalette_UpdateFadeAndNotify(void *);
 void ActorPalette_UpdateReverseFade(void *);
@@ -29,9 +29,9 @@ void ActorPalette_BeginReverseFade(struct PaletteController *p)
     p->step = 50;
     p->duration = 50;
     effect = p->effect;
-    sub_08215284(effect, 343);
+    AnimData_SelectTiles(effect, 343);
     p->savedPalette = p->palette;
-    sub_08215284(effect, 344);
+    AnimData_SelectTiles(effect, 344);
     src = p->palette;
     dst = p->output;
     for (i = 15; i >= 0; i--) {

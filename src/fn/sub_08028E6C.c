@@ -8,7 +8,7 @@ struct Actor {
     void *handle;
 };
 struct Actor *sub_0802140C(int);
-int sub_0821ABA8(int, int);
+int Script_GetKeywordValue(int, int);
 void sub_08022AF4(void *);
 void sub_08047B68(void *);
 void sub_08047B58(void *);

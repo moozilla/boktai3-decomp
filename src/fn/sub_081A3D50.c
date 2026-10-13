@@ -5,9 +5,9 @@ struct E {
     u8 g[0x178 - 5];
 };
 extern s32 gUnk_0200023C;
-void sub_08214514(void *);
+void Sprite_Remove(void *);
 void sub_08013B74(void *);
-void sub_0821FE6C(void *);
+void Collider_Remove(void *);
 void sub_081A3D50(struct E *e)
 {
     s32 i;
@@ -15,9 +15,9 @@ void sub_081A3D50(struct E *e)
     i = 2;
     do {
         if (e->a != 0) {
-            sub_08214514(e);
+            Sprite_Remove(e);
             sub_08013B74((u8 *)e + 0xec);
-            sub_0821FE6C((u8 *)e + 0x3c);
+            Collider_Remove((u8 *)e + 0x3c);
         }
         e++;
         i--;

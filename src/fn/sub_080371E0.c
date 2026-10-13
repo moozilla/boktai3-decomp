@@ -27,31 +27,31 @@ void sub_08215114(void);
 void sub_0821969C(void);
 void sub_0821447C(int, void *, void *, void *);
 void sub_08177DEC(int);
-void sub_082156B8(int);
-void *sub_0821A520(int, int);
+void Bg_ClearTilemap(int);
+void *ScriptProc_Start(int, int);
 void sub_082161B4(int, int, void *, int, int, int, void *);
-void sub_0821656C(int, int, int, int, int);
+void BgGfx_LoadTilemapSimple(int, int, int, int, int);
 void sub_08036C0C(void);
 void sub_0822B058(int);
 void sub_08036E14(void);
 void sub_08036EC8(struct LinkMenu *, int);
 int sub_08033690(int, int, int, int);
-void sub_0803386C(int, void *);
-void sub_08033924(int, int);
+void TextWindow_SetScript(int, void *);
+void TextWindow_Refresh(int, int);
 void sub_080337FC(int);
 void sub_08033778(int);
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 int sub_08036BEC(void);
 int sub_0824923C(void *, void *);
 extern void *gUnk_08605770[];
-void sub_082195E0(void *);
+void Anim_Remove(void *);
 int sub_080370D0(struct LinkMenu *);
 int sub_08037110(struct LinkMenu *);
 struct LinkMenu *sub_08036E08(void);
-struct LinkMenu *sub_08219FBC(int, int);
-void sub_0821A04C(void *, void *, void *);
+struct LinkMenu *Task_Create(int, int);
+void Task_SetCallbacks(void *, void *, void *);
 int sub_08037140(struct LinkMenu *);
-void sub_0821A0C0(void *);
+void Task_Kill(void *);
 struct LinkMenu *sub_080371E0(void)
 {
     struct LinkMenu *p = sub_08036E08();
@@ -61,7 +61,7 @@ struct LinkMenu *sub_080371E0(void)
         goto done;
     }
     {
-        struct LinkMenu *allocated = sub_08219FBC(12, 0xB0);
+        struct LinkMenu *allocated = Task_Create(12, 0xB0);
         void *update;
         void *destroy;
         p = allocated;
@@ -69,11 +69,11 @@ struct LinkMenu *sub_080371E0(void)
             goto returnPointer;
         update = sub_080370D0;
         destroy = sub_08037110;
-        sub_0821A04C(allocated, update, destroy);
+        Task_SetCallbacks(allocated, update, destroy);
     }
     if (sub_08037140(p) >= 0)
         goto returnPointer;
-    sub_0821A0C0(p);
+    Task_Kill(p);
     result = 0;
     goto done;
 returnPointer:

@@ -17,14 +17,14 @@ struct Obj {
 };
 extern u8 *gUnk_02000710;
 extern const s16 gUnk_086149C4[];
-u32 sub_082215E4(s32, s32);
+u32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
 void sub_080F5964(struct Obj *);
 void sub_080F57E8(struct Obj *p)
 {
     u8 *owner = p->parent;
-    p->angle = sub_082215E4(*(s16 *)(*(u8 **)(owner + 0x60) + 0x30) - p->x,
-                            *(s16 *)(*(u8 **)(owner + 0x60) + 0x34) - p->z);
+    p->angle = Math_Atan2(*(s16 *)(*(u8 **)(owner + 0x60) + 0x30) - p->x,
+                          *(s16 *)(*(u8 **)(owner + 0x60) + 0x34) - p->z);
     p->byte1DD = 0;
     p->callback = sub_080F5964;
     p->a = 0;

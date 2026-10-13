@@ -1,19 +1,19 @@
 #include "global.h"
 
-void *sub_08219FBC(s32, s32);
-void sub_0821A04C(void *, void *, void *);
+void *Task_Create(s32, s32);
+void Task_SetCallbacks(void *, void *, void *);
 s32 sub_081E27A8(void *);
-void sub_0821A0C0(void *);
+void Task_Kill(void *);
 void TimedPresentation_Update(void);
 void sub_081E2794(void);
 
 void *sub_081E2898(void)
 {
-    void *r = sub_08219FBC(0xb, 0x38);
+    void *r = Task_Create(0xb, 0x38);
     if (r != 0) {
-        sub_0821A04C(r, TimedPresentation_Update, sub_081E2794);
+        Task_SetCallbacks(r, TimedPresentation_Update, sub_081E2794);
         if (sub_081E27A8(r) < 0) {
-            sub_0821A0C0(r);
+            Task_Kill(r);
             return 0;
         }
     }

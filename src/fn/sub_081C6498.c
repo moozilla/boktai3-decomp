@@ -1,6 +1,6 @@
 #include "global.h"
-void *sub_0821A520(u32, u32);
-void sub_082196C4(void *, void *);
+void *ScriptProc_Start(u32, u32);
+void ResourceHeader_Relocate(void *, void *);
 void sub_0821983C(u8 *, void *, u32, u32, u32, u32, u32, u32);
 void sub_081C6448(u8 *);
 void sub_081C62B4(u8 *);
@@ -10,15 +10,15 @@ void sub_081C6498(u8 *s)
         u32 words[8];
     };
     u32 bank = 0xCB05, zero, sixty;
-    struct Blob *p = sub_0821A520(bank, 0x1289), *first;
+    struct Blob *p = ScriptProc_Start(bank, 0x1289), *first;
     u8 *obj;
     s32 i;
     *(struct Blob *)(s + 0x18) = *p;
     first = (struct Blob *)(s + 0x18);
-    sub_082196C4(first, p);
-    p = sub_0821A520(bank, 0xE2AB);
+    ResourceHeader_Relocate(first, p);
+    p = ScriptProc_Start(bank, 0xE2AB);
     *(struct Blob *)(s + 0x38) = *p;
-    sub_082196C4(s + 0x38, p);
+    ResourceHeader_Relocate(s + 0x38, p);
     sub_0821983C(s + 0x58, first, 0, 0x10, 1, zero = 0, sixty = 0x3C, 0);
     sub_0821983C(s + 0xB8, first, 0, 0x10, 2, zero, sixty, zero);
     {

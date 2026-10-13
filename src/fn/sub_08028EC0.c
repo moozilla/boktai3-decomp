@@ -8,7 +8,7 @@ struct Actor {
     void *handle;
 };
 struct Actor *sub_0802140C(int);
-int sub_0821ABA8(int, int);
+int Script_GetKeywordValue(int, int);
 void sub_08022AF4(void *);
 void sub_08047B68(void *);
 void sub_08047B58(void *);
@@ -17,8 +17,8 @@ void sub_08028EC0(void)
 {
     struct Actor *p = sub_0802140C(0);
     if (p && p->handle) {
-        int a = sub_0821ABA8(115, 0);
-        int b = sub_0821ABA8(104, 0);
+        int a = Script_GetKeywordValue(115, 0);
+        int b = Script_GetKeywordValue(104, 0);
         if (!p->command) {
             if (a)
                 p->command = 3;

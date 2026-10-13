@@ -9,7 +9,7 @@ void sub_0816D920(void *, u32);
 s32 sub_0816CEB4(u32, u32);
 s32 sub_0822D604(s32);
 void sub_08165E78(u8 *, u32, s32, u32, void *, void *, u32, u32);
-void sub_0822B2F8(u32);
+void Sound_PlaySong(u32);
 void sub_08163EB8(u8 *, void (*)(void), u32);
 void sub_0816F768(void);
 struct E {
@@ -48,7 +48,7 @@ void sub_0816F6B4(u8 *s)
     result = sub_0822D604(sub_0816CEB4(s[0x4860], *kind));
     later = (*kind) + 10;
     sub_08165E78(s, 0, result, ((struct S *)s)->elems[later].v, v, w, 0x18, 0x10);
-    sub_0822B2F8(0x38A);
+    Sound_PlaySong(0x38A);
     sub_08163EB8(s, sub_0816F768, 1);
 }
 #else

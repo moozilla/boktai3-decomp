@@ -30,7 +30,7 @@ struct G {
     s16 y;
 };
 extern struct G *gUnk_02000710;
-s32 sub_082215E4(s32, s32);
+s32 Math_Atan2(s32, s32);
 void sub_081850F4(struct S *, s32);
 s32 sub_0818505C(struct S *, s32);
 void sub_081854DC(struct S *p)
@@ -40,7 +40,7 @@ void sub_081854DC(struct S *p)
     switch (*q) {
         case 0: {
             struct G *g = gUnk_02000710;
-            s32 a = sub_082215E4(g->x - p->a48, g->y - p->a4c);
+            s32 a = Math_Atan2(g->x - p->a48, g->y - p->a4c);
             a = (a + 0x20) & 0xc0;
             if (p->b39 != a)
                 sub_081850F4(p, a);

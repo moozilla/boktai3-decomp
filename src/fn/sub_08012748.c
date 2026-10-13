@@ -30,7 +30,7 @@ u8 *sub_0821D64C(int, int);
 void *sub_08012040(void);
 void *sub_080126DC(void);
 struct Hazard *sub_08012728(void *);
-void sub_0821FF24(void *, void *, int);
+void Collider_SetPosition(void *, void *, int);
 void sub_0821FF50(void *, int, int);
 void sub_0801204C(void *, void *, int);
 static inline int cellIndex(struct Vec *p)
@@ -91,7 +91,7 @@ int AnimatedHazard_Create(struct Vec *source, int damage, int hold)
         *h = height;
     }
     effect = (u8 *)p + 16;
-    sub_0821FF24(effect, pos, 0);
+    Collider_SetPosition(effect, pos, 0);
     sub_0821FF50(effect, (u16)damage, 50);
     sub_0801204C(m, p, 2);
     p->timer = zero;

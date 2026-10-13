@@ -5,19 +5,19 @@ struct Z {
 struct C {
     u32 w[8];
 };
-struct C *sub_0821A520(u32, u32);
-void sub_082196C4(u8 *, struct C *);
+struct C *ScriptProc_Start(u32, u32);
+void ResourceHeader_Relocate(u8 *, struct C *);
 void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, struct Z *);
 void sub_0804F4AC(u8 *p)
 {
     struct Z z;
-    struct C *r = sub_0821A520(0xCB05, 0x530D);
+    struct C *r = ScriptProc_Start(0xCB05, 0x530D);
     if (r != 0) {
         u8 *a, *b;
         s32 j;
         *(struct C *)(p + 0x60) = *r;
         a = p + 0x60;
-        sub_082196C4(a, r);
+        ResourceHeader_Relocate(a, r);
         {
             u32 m = 0xFFFF0000;
             z.x = 0;

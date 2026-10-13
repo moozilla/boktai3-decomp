@@ -23,15 +23,15 @@ struct Indicator {
     u8 effect[84];
     struct Sprite sprite;
 };
-void sub_0822B3BC(int);
-void sub_0821FE40(void *);
+void Sound_PlaySongChecked(int);
+void Collider_Refresh(void *);
 static inline void setFrame(struct Sprite *s, int frame)
 {
     s->frame = frame;
 }
 void *sub_08011884(void);
 struct Indicator *sub_08011C6C(void *, int);
-int sub_0821ABA8(int, int);
+int Script_GetKeywordValue(int, int);
 struct Map {
     u32 pad;
     u8 *cells;
@@ -47,7 +47,7 @@ int Script_GetPc(void);
 u8 *sub_0821D64C(int, int);
 int sub_0821DA14(void *);
 void sub_08214588(void *, void *);
-void sub_0821FF24(void *, void *, int);
+void Collider_SetPosition(void *, void *, int);
 void sub_0821FF50(void *, int, int);
 static inline int cellIndex(struct Vec *p)
 {
@@ -75,13 +75,13 @@ int SceneIndicator_CreateFromScript(void)
     p = sub_08011C4C(m);
     if (!p)
         return -1;
-    p->id = sub_0821ABA8('n', 0);
+    p->id = Script_GetKeywordValue('n', 0);
     if (Script_SeekToKeyword('p')) {
         p->sprite.position.x = Script_GetValue();
         p->sprite.position.y = Script_GetValue();
         p->sprite.position.z = Script_GetValue();
     }
-    if (sub_0821ABA8('f', 1)) {
+    if (Script_GetKeywordValue('f', 1)) {
         u8 *c;
         int height, slope;
         p->sprite.position.x = (p->sprite.position.x & ~255) + 128;
@@ -100,7 +100,7 @@ int SceneIndicator_CreateFromScript(void)
         }
         p->sprite.position.y = height;
     }
-    p->frame = sub_0821ABA8('P', -1);
+    p->frame = Script_GetKeywordValue('P', -1);
     if (p->frame < 0) {
         switch (sub_0821DA14(&p->sprite.position) & 14) {
             case 2:
@@ -160,22 +160,22 @@ int SceneIndicator_CreateFromScript(void)
             p->times[i] |= mask;
     }
     p->delay = 0;
-    p->period = sub_0821ABA8('T', -1);
+    p->period = Script_GetKeywordValue('T', -1);
     if (p->period >= 0)
         p->mode = 1;
     if (Script_SeekToKeyword('s')) {
         p->mode = 2;
         p->visible = Script_GetValue();
     }
-    p->animation = sub_0821ABA8('E', 0);
+    p->animation = Script_GetKeywordValue('E', 0);
     sub_08214588(sprite, m + 28 + p->animation * 28);
     sprite->frame = p->frame + p->visible;
-    sub_0821FF24(effect, position, 0);
-    if (sub_0821ABA8('v', 1))
+    Collider_SetPosition(effect, position, 0);
+    if (Script_GetKeywordValue('v', 1))
         sprite->flags &= ~1;
     else
         sprite->flags |= 1;
-    sub_0821FF50(effect, (u16)sub_0821ABA8('d', 10), 1);
+    sub_0821FF50(effect, (u16)Script_GetKeywordValue('d', 10), 1);
     {
         register u32 raw asm("r0") = (u16)position->x;
         register int x asm("r2");

@@ -8,7 +8,7 @@ struct S {
     u8 g[0x168 - 9];
     u8 d[1];
 };
-void sub_08020D68(void *, s32);
+void Trigger_ConsumePending(void *, s32);
 void sub_081D182C(u32 a, struct S *p)
 {
     if (p->b8 != 0) {
@@ -17,5 +17,5 @@ void sub_081D182C(u32 a, struct S *p)
         p->b5 = 0x14;
     }
     if (p->b7 != 0)
-        sub_08020D68(&p->d, 1);
+        Trigger_ConsumePending(&p->d, 1);
 }

@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_08020D68(void *, u32);
+void Trigger_ConsumePending(void *, u32);
 
 struct S {
     u8 pad[0xAA];
@@ -29,5 +29,5 @@ void sub_081F78B0(struct S *p)
         p->st = v;
     }
     if (p->f1)
-        sub_08020D68((u8 *)p + 0x118, 1);
+        Trigger_ConsumePending((u8 *)p + 0x118, 1);
 }

@@ -10,13 +10,13 @@ struct E {
     u8 pad[4];
     u32 c;
 };
-void sub_08217EAC(void *);
-void sub_08219DD8(void *, u32);
+void Effect_Remove(void *);
+void Memory_Clear(void *, u32);
 void sub_08114E04(u8 *g, struct E *e)
 {
-    sub_08217EAC(g + 0x20 + e->idx * 40);
+    Effect_Remove(g + 0x20 + e->idx * 40);
     e->b = 0;
     e->c = 0;
-    sub_08219DD8(e, 0x1c);
+    Memory_Clear(e, 0x1c);
     e->idx = 0xff;
 }

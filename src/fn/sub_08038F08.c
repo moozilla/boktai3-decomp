@@ -17,8 +17,8 @@ struct Save {
 };
 extern struct Save *gUnk_030053F8;
 int sub_0822BB7C(void);
-void sub_08033924(int, int);
-void sub_0822B2F8(int);
+void TextWindow_Refresh(int, int);
+void Sound_PlaySong(int);
 void sub_08038F08(struct Menu *p)
 {
     int *window = &p->window;
@@ -43,11 +43,11 @@ void sub_08038F08(struct Menu *p)
     if (p->timer == 60) {
         p->result = sub_0822BB7C();
         if (p->result == 1) {
-            sub_08033924(*window, 14);
-            sub_0822B2F8(686);
+            TextWindow_Refresh(*window, 14);
+            Sound_PlaySong(686);
         } else {
-            sub_08033924(*window, 15);
-            sub_0822B2F8(402);
+            TextWindow_Refresh(*window, 15);
+            Sound_PlaySong(402);
         }
     }
     if (p->timer == 240) {
@@ -61,7 +61,7 @@ void sub_08038F08(struct Menu *p)
                 p->timer = zero;
             }
         } else {
-            sub_08033924(*window, 11);
+            TextWindow_Refresh(*window, 11);
             {
                 int state = 13;
                 u8 *dest = &p->state;

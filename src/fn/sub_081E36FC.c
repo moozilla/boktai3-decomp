@@ -15,10 +15,10 @@ struct PaletteController {
     u8 beforeCallback[0xf8c - 0xf5c];
     void (*callback)(void *);
 };
-void sub_08215284(void *, s32);
+void AnimData_SelectTiles(void *, s32);
 
 s32 Div(s32, s32);
-void sub_0821AD08(void *, s32);
+void Script_Call(void *, s32);
 // Interpolate the actor palette over fifty updates, then restore its asset palette.
 void ActorPalette_UpdateFadeAndNotify(struct PaletteController *p)
 {
@@ -40,12 +40,12 @@ void ActorPalette_UpdateFadeAndNotify(struct PaletteController *p)
     }
     if (++p->step > p->duration) {
         p->callback = 0;
-        sub_08215284(p->effect, 344);
+        AnimData_SelectTiles(p->effect, 344);
         p->palette = p->savedPalette;
         if (p->completionHandle) {
             void *handle = p->completionHandle;
             p->completionHandle = 0;
-            sub_0821AD08(handle, 0);
+            Script_Call(handle, 0);
         }
     }
 }

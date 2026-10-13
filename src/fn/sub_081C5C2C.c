@@ -1,6 +1,6 @@
 #include "global.h"
-void *sub_0821A520(u32, u32);
-void sub_082196C4(void *, void *);
+void *ScriptProc_Start(u32, u32);
+void ResourceHeader_Relocate(void *, void *);
 void sub_0821983C(u8 *, void *, u32, u32, u32, u32, u32, u32);
 void sub_081C5AF0(u8 *);
 void sub_081C5B6C(u8 *);
@@ -10,7 +10,7 @@ void sub_081C5C2C(u8 *s)
         u32 words[8];
     };
     u32 key = 0xCB05;
-    struct Blob *p = sub_0821A520(key, 0xA2DB);
+    struct Blob *p = ScriptProc_Start(key, 0xA2DB);
     struct Blob *first, *last;
     u32 zero, sixty, loopzero;
     u16 bits;
@@ -19,14 +19,14 @@ void sub_081C5C2C(u8 *s)
     u8 *entry;
     *(struct Blob *)(s + 0x58) = *p;
     first = (struct Blob *)(s + 0x58);
-    sub_082196C4(first, p);
-    p = sub_0821A520(key, 0x1289);
+    ResourceHeader_Relocate(first, p);
+    p = ScriptProc_Start(key, 0x1289);
     *(struct Blob *)(s + 0x38) = *p;
-    sub_082196C4(s + 0x38, p);
-    p = sub_0821A520(key, 0x530D);
+    ResourceHeader_Relocate(s + 0x38, p);
+    p = ScriptProc_Start(key, 0x530D);
     *(struct Blob *)(s + 0x18) = *p;
     last = (struct Blob *)(s + 0x18);
-    sub_082196C4(last, p);
+    ResourceHeader_Relocate(last, p);
     sub_0821983C(s + 0x258, last, 0x8A, 0x10, zero = 0, 0, sixty = 0x3C, 0);
     dst = (u16 *)(s + 0x27A);
     bits = 0xFFE8;

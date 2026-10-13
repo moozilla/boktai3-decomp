@@ -2,12 +2,12 @@
 struct Packed {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
-void sub_0821FEB4(void *, int, int, int, int, void *, void *);
-void sub_0821FF24(void *, void *, int);
-void sub_0821FF84(void *, void *, void *);
+void Collider_Init(void *, int, int, int, int, void *, void *);
+void Collider_SetPosition(void *, void *, int);
+void Collider_SetCallback(void *, void *, void *);
 void sub_0821FF58(void *, int, int, int, int, int);
 void sub_0821FF7C(void *, int, int, int);
-void sub_0821FE40(void *);
+void Collider_Refresh(void *);
 void sub_08029904(void);
 void sub_08029870(void *, void *, void *);
 void sub_080299B4(u8 *p, int mode)
@@ -20,9 +20,9 @@ void sub_080299B4(u8 *p, int mode)
     offset.x = 0;
     offset.y = 128;
     offset.z = 0;
-    sub_0821FEB4(collider, 0, 0x5101, 0, 16, &size, &offset);
-    sub_0821FF24(collider, p + 0x8a4, 0);
-    sub_0821FF84(collider, sub_08029870, p);
+    Collider_Init(collider, 0, 0x5101, 0, 16, &size, &offset);
+    Collider_SetPosition(collider, p + 0x8a4, 0);
+    Collider_SetCallback(collider, sub_08029870, p);
     sub_0821FF7C(collider, mode, 0x808, 4);
-    sub_0821FE40(collider);
+    Collider_Refresh(collider);
 }

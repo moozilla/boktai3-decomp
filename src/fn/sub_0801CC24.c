@@ -6,7 +6,7 @@ void sub_0801C17C(void *);
 void sub_0801C1C4(void *);
 void sub_0815BE5C(void *, int);
 void ResultMenu_SendCommand(void *, int, int, void *);
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 void ResultGame_HandlePress(void *);
 void ResultGame_ScorePress(void *);
 void sub_0801C16C(void *);
@@ -38,7 +38,7 @@ void ResultGame_TimedPress(u8 *p)
             }
             sub_0815BE5C(gUnknown_02000580, 1);
             ResultMenu_SendCommand(p, 0x35, 0, 0);
-            sub_0822B2F8(0x4b2);
+            Sound_PlaySong(0x4b2);
             break;
         case 1: {
             int zero;

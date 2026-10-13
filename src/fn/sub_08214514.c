@@ -9,7 +9,7 @@ struct Obj {
 
 void sub_082143A0(struct Obj *, u32);
 
-void sub_08214514(struct Obj *o)
+void Sprite_Remove(struct Obj *o)
 {
     if (o->f4 != 0)
         sub_082143A0(o, o->fA);

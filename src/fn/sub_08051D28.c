@@ -1,6 +1,6 @@
 #include "global.h"
 void sub_08051CB4(void);
-void sub_0822B2F8(s32);
+void Sound_PlaySong(s32);
 struct Obj {
     u8 pad0[0x18];
     u32 f18;
@@ -25,7 +25,7 @@ void sub_08051D28(struct Obj *p)
         p->f69 = 0x40;
         p->timer = 0;
         *(void (**)(void))((u8 *)p + 0xb4) = sub_08051CB4;
-        sub_0822B2F8(0x32f);
+        Sound_PlaySong(0x32f);
     } else {
         p->f60 |= 2;
         p->f68 = p->timer;

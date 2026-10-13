@@ -11,7 +11,7 @@ struct P {
     u32 w9c;
 };
 s32 Mod(s32, s32);
-void sub_0822B3BC(u32);
+void Sound_PlaySongChecked(u32);
 void sub_080468A8(struct P *p)
 {
     if (p->b1c != 0) {
@@ -21,7 +21,7 @@ void sub_080468A8(struct P *p)
     p->b1a += 6;
     p->h18 += 7;
     if (Mod(p->w20, 0x14) == 8)
-        sub_0822B3BC(0x3bc);
+        Sound_PlaySongChecked(0x3bc);
     if (p->w20 > 0x3b) {
         p->b1b = 2;
         p->b1c = 1;

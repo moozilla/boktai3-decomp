@@ -8,8 +8,8 @@ struct TimedSequence {
 extern u16 gUnk_03005260[];
 void sub_081DC1DC(s32);
 s32 sub_08228008(void);
-void sub_0821AD08(void *, void *);
-void sub_0821A0C0(void *);
+void Script_Call(void *, void *);
+void Task_Kill(void *);
 // Wait for the sequence duration or an eligible skip, then finish its exit fade.
 void TimedPresentation_Update(struct TimedSequence *p)
 {
@@ -25,8 +25,8 @@ void TimedPresentation_Update(struct TimedSequence *p)
             break;
         case 1:
             if (p->exitTimer > (1 << p->fadeShift)) {
-                sub_0821AD08(p->handle, 0);
-                sub_0821A0C0(p);
+                Script_Call(p->handle, 0);
+                Task_Kill(p);
             }
             p->exitTimer++;
             break;

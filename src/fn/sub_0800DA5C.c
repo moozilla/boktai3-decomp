@@ -22,10 +22,10 @@ struct Controller {
 };
 extern u32 gUnk_030051D4, gUnk_03004DA0;
 extern u16 gUnk_03005260[];
-void sub_0821AD08(u32, void *);
-void sub_0821A0C0(void *);
+void Script_Call(u32, void *);
+void Task_Kill(void *);
 void sub_08219254(int, int, void *);
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 void sub_0800D9A0(Controller *);
 void sub_0800D9FC(Controller *);
 void sub_0800D874(Controller *);
@@ -47,8 +47,8 @@ int ScanlinePresentation_Update(Controller *p)
         if (p->mode == 0)
             gUnk_030051D4 = gUnk_03004DA0 = 0;
         if (p->script)
-            sub_0821AD08(p->script, 0);
-        sub_0821A0C0(p);
+            Script_Call(p->script, 0);
+        Task_Kill(p);
     } else {
         if (p->fade)
             p->fade(p);
@@ -65,7 +65,7 @@ int ScanlinePresentation_Update(Controller *p)
                     p->timer = 0;
                     p->fade = sub_0800D9A0;
                     if (p->start != p->end)
-                        sub_0822B2F8(225);
+                        Sound_PlaySong(225);
                     p->amplitude = 128;
                     p->delta = -2;
                     p->noise = sub_0800D874;
@@ -82,7 +82,7 @@ int ScanlinePresentation_Update(Controller *p)
                     p->timer = 0;
                     p->fade = sub_0800D9FC;
                     if (p->start != p->end)
-                        sub_0822B2F8(227);
+                        Sound_PlaySong(227);
                     p->amplitude = 0;
                     p->delta = 4;
                     p->noise = sub_0800D874;

@@ -22,13 +22,13 @@ struct G {
 };
 extern struct G *gUnk_020004B4;
 void sub_0810FD90(struct S *);
-void sub_082156B8(s32);
+void Bg_ClearTilemap(s32);
 void sub_082164AC(s32, u32, s32);
-void sub_0821656C(s32, s32, s32, s32, s32);
+void BgGfx_LoadTilemapSimple(s32, s32, s32, s32, s32);
 void sub_0803381C(u32);
 void sub_080339B8(u32, s32, s32, s32, s32);
-void sub_0803386C(u32, u32);
-void sub_08033924(u32, u32);
+void TextWindow_SetScript(u32, u32);
+void TextWindow_Refresh(u32, u32);
 void sub_080337FC(u32);
 void sub_08109358(void);
 void sub_0811024C(void);
@@ -45,14 +45,14 @@ void sub_08110188(struct S *s)
     if (s->c24 != 0) {
         u8 z;
         sub_0810FD90(s);
-        sub_082156B8(0);
-        sub_082156B8(3);
+        Bg_ClearTilemap(0);
+        Bg_ClearTilemap(3);
         sub_082164AC(0, s->g, 3);
-        sub_0821656C(0, 0, 0, 0, 0);
+        BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
         sub_0803381C(s->h);
         sub_080339B8(s->h, 1, 6, 0x1c, 6);
-        sub_0803386C(s->h, s->a);
-        sub_08033924(s->h, 8);
+        TextWindow_SetScript(s->h, s->a);
+        TextWindow_Refresh(s->h, 8);
         sub_080337FC(s->h);
         sub_08109358();
         s->c24 = 0;

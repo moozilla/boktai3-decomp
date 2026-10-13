@@ -20,7 +20,7 @@ struct S {
     s16 z;
 };
 void sub_081850F4(struct S *, s32);
-void sub_08020D68(void *, s32);
+void Trigger_ConsumePending(void *, s32);
 void sub_08186AE4(struct S *p)
 {
     switch (p->b3d) {
@@ -31,7 +31,7 @@ void sub_08186AE4(struct S *p)
         case 1:
             if (p->b40 == 0xff) {
                 p->b3d = 0xff;
-                sub_08020D68((u8 *)p + 0xB40 - 0x64, 1);
+                Trigger_ConsumePending((u8 *)p + 0xB40 - 0x64, 1);
             }
             break;
     }

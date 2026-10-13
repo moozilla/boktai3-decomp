@@ -16,9 +16,9 @@ struct Screen {
 };
 extern u16 gUnk_03005260[], gUnk_03004BD8;
 void sub_082279A8(int, int, int, int, int, int, int);
-void sub_0821AD08(u32, void *);
-void sub_0821A0C0(void *);
-void sub_0822B2F8(int);
+void Script_Call(u32, void *);
+void Task_Kill(void *);
+void Sound_PlaySong(int);
 void StatusScreen_FadeAndExit(Screen *);
 void StatusScreen_FadeOutPalette(Screen *);
 void sub_0800EF90(Screen *);
@@ -34,8 +34,8 @@ void StatusScreen_Close(Screen *p)
         p->effect = StatusScreen_FadeOutPalette;
     }
     if (p->timer == p->closeDelay) {
-        sub_0821AD08(p->script, p->args);
-        sub_0821A0C0(p);
+        Script_Call(p->script, p->args);
+        Task_Kill(p);
         {
             u16 *flags = &gUnk_03004BD8;
             s32 mask;

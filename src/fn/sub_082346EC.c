@@ -2,10 +2,10 @@
 struct Vec346 {
     u32 x : 16, y : 16, z : 16;
 };
-void sub_0821FEB4(u8 *, s32, s32, s32, s32, struct Vec346 *, struct Vec346 *);
+void Collider_Init(u8 *, s32, s32, s32, s32, struct Vec346 *, struct Vec346 *);
 void sub_0821FF58(u8 *, s32, s32, s32, s32, s32);
-void sub_0821FF84(u8 *, void *, u8 *);
-void sub_0821FF24(u8 *, u8 *, s32);
+void Collider_SetCallback(u8 *, void *, u8 *);
+void Collider_SetPosition(u8 *, u8 *, s32);
 void sub_082346EC(u8 *p)
 {
     struct Vec346 scale;
@@ -17,8 +17,8 @@ void sub_082346EC(u8 *p)
     position.x = 0;
     position.y = 0;
     position.z = 0;
-    sub_0821FEB4(q, 0, 0x2000, 0, 1, &scale, &position);
+    Collider_Init(q, 0, 0x2000, 0, 1, &scale, &position);
     sub_0821FF58(q, 0, 0, 0x40000, 0, 0);
-    sub_0821FF84(q, 0, p);
-    sub_0821FF24(q, p + 0x1c, 0);
+    Collider_SetCallback(q, 0, p);
+    Collider_SetPosition(q, p + 0x1c, 0);
 }

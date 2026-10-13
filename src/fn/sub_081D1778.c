@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08020D68(u8 *, u32);
+void Trigger_ConsumePending(u8 *, u32);
 void sub_081D1778(u8 *a, u8 *p)
 {
     if (p[8] != 0) {
@@ -9,6 +9,6 @@ void sub_081D1778(u8 *a, u8 *p)
     }
     if (p[7] != 0) {
         p[5] = 0x12;
-        sub_08020D68(p + 0x168, 1);
+        Trigger_ConsumePending(p + 0x168, 1);
     }
 }
