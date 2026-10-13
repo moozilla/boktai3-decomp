@@ -1,13 +1,7 @@
-#include "global.h"
-extern u8 *gUnk_02000710;
-s32 Script_SeekToKeyword(s32);
-u32 Script_GetPc(void);
-u32 Script_ParseStringRef(u32);
-u32 Text_LookupString(u32);
-void sub_08011794(u32, u32, u32, u32);
+#include "password.h"
 void sub_08011814(void)
 {
-    u32 a, b, c;
+    u8 *a, *b, *c;
     s32 i;
     if (!Script_SeekToKeyword(0x63))
         return;
@@ -24,8 +18,8 @@ void sub_08011814(void)
         return;
     i = 0;
     do {
-        u32 r = Text_LookupString(Script_ParseStringRef(c) + i);
-        sub_08011794(r, a, b, (u32)(gUnk_02000710 + 0x780));
+        u8 *r = Text_LookupString(Script_ParseStringRef(c) + i);
+        sub_08011794(r, (s32)a, (s32)b, gUnk_02000710 + 0x780);
         i++;
     } while (i <= 0x1e49);
 }
