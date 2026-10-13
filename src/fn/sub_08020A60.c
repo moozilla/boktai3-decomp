@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 int SceneMessages_FindScript(int);
-void sub_0821AD08(int, void *);
-void sub_08020D68(void *, int);
+void Script_Call(int, void *);
+void Trigger_ConsumePending(void *, int);
 void SceneMessages_RunScript(void *p, void *entry, u8 *message)
 {
     int args[8];
@@ -36,7 +36,7 @@ void SceneMessages_RunScript(void *p, void *entry, u8 *message)
             *(u32 *)&call = header;
         }
         call.args = args;
-        sub_0821AD08(id, &call);
+        Script_Call(id, &call);
     }
-    sub_08020D68(entry, 1);
+    Trigger_ConsumePending(entry, 1);
 }

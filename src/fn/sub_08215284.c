@@ -9,7 +9,7 @@ struct Obj {
 extern u16 gUnk_030042E0;
 extern u8 *gUnk_030042E4;
 
-void sub_08215284(struct Obj *o, s32 i)
+void AnimData_SelectTiles(struct Obj *o, s32 i)
 {
     if (i < gUnk_030042E0) {
         o->f6 = i;

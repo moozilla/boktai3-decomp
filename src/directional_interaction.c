@@ -25,9 +25,9 @@ s32 sub_08009524(struct DirectionalManager *manager, struct DirectionalControlle
 {
     void *animation = p->animation;
     s32 r;
-    if (sub_082151E4(animation, 0xA850) != 0) {
+    if (AnimData_Load(animation, 0xA850) != 0) {
         struct DirectionalDrawable *q = &p->drawable;
-        sub_082144A4(q, animation, 1);
+        Sprite_Init(q, animation, 1);
         q->scale = 1;
         p->drawable.mode = 2;
         r = 0;
@@ -59,7 +59,7 @@ u32 sub_080095B4(struct DirectionalController *p, u32 level)
 {
     void *animation = p->animation;
     if (p->disabled == 0)
-        sub_08215284(animation, level + 0x6b);
+        AnimData_SelectTiles(animation, level + 0x6b);
 }
 
 /* Places the controller and its marker around the given point. */
@@ -140,7 +140,7 @@ void LevelController_RunScript(struct DirectionalManager *unused, struct Directi
             values[i + 1] = p->arguments[i];
         args.count = 5;
         args.values = values;
-        sub_0821AD08(script, &args);
+        Script_Call(script, &args);
     }
 }
 
@@ -188,7 +188,7 @@ s32 DirectionalController_CheckApproach(struct DirectionalManager *manager,
         {
             s32 dx = p->position.x - manager->position.x, dz = p->position.z - manager->position.z;
             u32 distance = dx * dx + dz * dz;
-            u32 direction = (((u16)sub_082215E4(dx, dz) + 112) >> 5) & 7;
+            u32 direction = (((u16)Math_Atan2(dx, dz) + 112) >> 5) & 7;
             if (distance < p->distance) {
                 s32 a, b, c;
                 if (p->orientation) {
@@ -228,7 +228,7 @@ s32 DirectionalController_CheckInput(struct DirectionalManager *manager,
         {
             s32 dx = p->position.x - manager->position.x, dz = p->position.z - manager->position.z;
             u32 distance = dx * dx + dz * dz;
-            u32 direction = (((u16)sub_082215E4(dx, dz) + 112) >> 5) & 7;
+            u32 direction = (((u16)Math_Atan2(dx, dz) + 112) >> 5) & 7;
             if (distance < p->distance) {
                 s32 a, b, c;
                 if (p->orientation) {
@@ -277,7 +277,7 @@ s32 DirectionalController_CheckRemaining(struct DirectionalManager *manager,
         {
             s32 dx = p->position.x - manager->position.x, dz = p->position.z - manager->position.z;
             u32 distance = dx * dx + dz * dz;
-            register s32 angle asm("r0") = sub_082215E4(dx, dz);
+            register s32 angle asm("r0") = Math_Atan2(dx, dz);
             u32 direction = ((({
                                   s32 copy = angle;
                                   asm("" : : "r"(copy));
@@ -356,9 +356,9 @@ s32 DirectionalController_DestroyManager(struct DirectionalManager *manager)
     struct DirectionalController *p = manager->slots;
     s32 i;
     for (i = 0; i < manager->count; i++, p++)
-        sub_08214514(&p->drawable);
+        Sprite_Remove(&p->drawable);
     if (manager->slots)
-        sub_08219D38(manager->slots);
+        Heap_Free(manager->slots);
     gUnk_02000038 = 0;
     return 0;
 }
@@ -368,16 +368,16 @@ s32 DirectionalController_InitManager(struct DirectionalManager *manager, void *
     struct DirectionalController *p;
     s32 i;
     gUnk_02000038 = manager;
-    manager->count = sub_0821ABA8('n', 1);
+    manager->count = Script_GetKeywordValue('n', 1);
     manager->selected = -1;
     manager->pending = -1;
     manager->enabled = 0;
-    manager->slots = sub_08219C40(manager->count * sizeof(struct DirectionalController));
+    manager->slots = Heap_Alloc(manager->count * sizeof(struct DirectionalController));
     if (!manager->slots) {
     fail:
         return -1;
     }
-    sub_08219DD8(manager->slots, manager->count * sizeof(struct DirectionalController));
+    Memory_Clear(manager->slots, manager->count * sizeof(struct DirectionalController));
     p = manager->slots;
     for (i = 0; i < manager->count; i++, p++)
         if (sub_08009524(manager, p, i) < 0)
@@ -398,12 +398,12 @@ void *sub_08009B30(void *a)
     struct DirectionalManager *p;
     if (gUnk_02000038 != 0)
         return gUnk_02000038;
-    p = sub_08219FBC(8, 0x30);
+    p = Task_Create(8, 0x30);
     if (p != 0) {
-        sub_0821A04C(p, (void (*)(void))DirectionalController_UpdateAll,
-                     (void (*)(void))DirectionalController_DestroyManager);
+        Task_SetCallbacks(p, (void (*)(void))DirectionalController_UpdateAll,
+                          (void (*)(void))DirectionalController_DestroyManager);
         if (DirectionalController_InitManager(p, a) < 0) {
-            sub_0821A0C0(p);
+            Task_Kill(p);
             return 0;
         }
     }
@@ -419,20 +419,20 @@ s32 DirectionalController_ScriptCreate(void)
     s32 i, id;
     if (!manager)
         goto fail;
-    id = sub_0821ABA8('n', 0);
+    id = Script_GetKeywordValue('n', 0);
     p = manager->slots;
     for (i = 0; i < manager->count; i++, p++) {
         if (!(manager->enabled & (1 << i))) {
             u32 *drawable = &p->drawable.flags;
             p->id = id;
-            p->orientation = sub_0821ABA8('d', 0);
+            p->orientation = Script_GetKeywordValue('d', 0);
             p->flags = 0;
-            p->disabled = sub_0821ABA8('t', 0);
-            findRegion = sub_0821ABA8('m', 0);
-            p->startScript = sub_0821ABA8('b', 0);
-            p->endScript = sub_0821ABA8('e', 0);
+            p->disabled = Script_GetKeywordValue('t', 0);
+            findRegion = Script_GetKeywordValue('m', 0);
+            p->startScript = Script_GetKeywordValue('b', 0);
+            p->endScript = Script_GetKeywordValue('e', 0);
             {
-                s32 distance = sub_0821ABA8('D', 230);
+                s32 distance = Script_GetKeywordValue('D', 230);
                 p->distance = distance * distance;
             }
             if (Script_SeekToKeyword('a')) {
@@ -502,7 +502,7 @@ s32 DirectionalController_ScriptMove(void)
     struct DirectionalController *p;
     if (!manager)
         goto fail;
-    p = sub_08009568(manager, sub_0821ABA8('n', 0), 0);
+    p = sub_08009568(manager, Script_GetKeywordValue('n', 0), 0);
     if (!p) {
     fail:
         return -1;

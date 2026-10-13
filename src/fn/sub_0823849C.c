@@ -4,7 +4,7 @@ struct S {
     s16 id;
 };
 extern struct S *gUnk_020004B4;
-void sub_0822B358(u32);
+void Sound_StopSong(u32);
 static inline s32 gid(void)
 {
     if (gUnk_020004B4 == 0)
@@ -14,5 +14,5 @@ static inline s32 gid(void)
 void sub_0823849C(s32 a, u32 b)
 {
     if (a == gid())
-        sub_0822B358(b);
+        Sound_StopSong(b);
 }

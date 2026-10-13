@@ -8,7 +8,7 @@ struct P {
 };
 void sub_08036C38(void);
 void sub_08038138(struct P *);
-void sub_0821AD08(u32, int);
+void Script_Call(u32, int);
 void sub_08038DF8(struct P *p)
 {
     if (p->entered)
@@ -26,7 +26,7 @@ void sub_08038DF8(struct P *p)
         p->timer = zero;
         sub_08038138(p);
         if (p->title)
-            sub_0821AD08(p->title, 0);
+            Script_Call(p->title, 0);
     } else
         p->timer++;
 }

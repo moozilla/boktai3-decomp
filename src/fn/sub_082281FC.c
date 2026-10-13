@@ -4,10 +4,10 @@ struct G {
     s32 w;
 };
 extern struct G *gUnk_030053F8;
-s32 sub_0821ABA8(u32, s32);
+s32 Script_GetKeywordValue(u32, s32);
 s32 sub_082281FC(void)
 {
-    s32 v = sub_0821ABA8(0x70, gUnk_030053F8->w);
+    s32 v = Script_GetKeywordValue(0x70, gUnk_030053F8->w);
     if (v < 0)
         v = 0;
     else if (v > 9999)

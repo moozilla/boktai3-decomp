@@ -1,12 +1,12 @@
 #include "global.h"
-void sub_08214514(void *);
-void sub_082195E0(void *);
-void sub_08219D38(void *);
+void Sprite_Remove(void *);
+void Anim_Remove(void *);
+void Heap_Free(void *);
 void sub_08020D08(void *);
 void sub_08013684(void *);
 void sub_08003C10(void *);
 void sub_08225938(void *);
-void sub_0821FE6C(void *);
+void Collider_Remove(void *);
 void sub_0806FBC8(void *);
 
 static inline u8 tst(u16 *a, u32 m)
@@ -29,10 +29,10 @@ u32 sub_080A13AC(struct S *s)
     u32 m;
     u32 v;
     if (s->b8 == 0)
-        sub_08214514(p);
+        Sprite_Remove(p);
     else
-        sub_082195E0(p + 0x20);
-    sub_08219D38(p);
+        Anim_Remove(p + 0x20);
+    Heap_Free(p);
     m = 0x100;
     if (tst((u16 *)((u8 *)s + 0x2c0), m))
         sub_08020D08((u8 *)s + 0xc);
@@ -48,7 +48,7 @@ u32 sub_080A13AC(struct S *s)
         sub_08003C10(q);
 
     sub_08225938(q);
-    sub_0821FE6C((u8 *)s + 0x134);
+    Collider_Remove((u8 *)s + 0x134);
     sub_0806FBC8(s);
     return 0;
 }

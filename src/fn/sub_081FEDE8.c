@@ -3,7 +3,7 @@ struct A {
     u8 p0[0x18];
     u32 w18;
 };
-void sub_08214514(void *);
+void Sprite_Remove(void *);
 void sub_081FEDE8(struct A *a, u32 *b, u32 n)
 {
     u32 m, t;
@@ -11,6 +11,6 @@ void sub_081FEDE8(struct A *a, u32 *b, u32 n)
     t = *q;
     m = 1;
     *q = t | m;
-    sub_08214514(q);
+    Sprite_Remove(q);
     a->w18 &= ~(m << n);
 }

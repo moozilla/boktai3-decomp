@@ -12,7 +12,7 @@ u32 sub_0800A80C(struct EffectManager *manager, struct Effect *effect)
     struct EffectSprite *sprite = &effect->particles[0].sprite;
     s32 i;
     for (i = 3; i >= 0; i--) {
-        sub_08217EAC(sprite);
+        Effect_Remove(sprite);
         sprite = (struct EffectSprite *)((u8 *)sprite + sizeof(struct EffectParticle));
     }
     effect->active = 0;
@@ -158,7 +158,7 @@ s32 EffectManager_UpdateAll(struct EffectManager *manager)
                 view->soundDelay--;
                 if (!view->soundDelay) {
                     u32 type = view->type;
-                    sub_0822B3BC(gUnk_08604A6C[type]);
+                    Sound_PlaySongChecked(gUnk_08604A6C[type]);
                 }
             }
             if (view->timer)
@@ -191,7 +191,7 @@ s32 sub_0800AB18(struct EffectManager *manager)
             struct EffectSprite *sprite = &effect->particles[0].sprite;
             s32 j;
             for (j = 3; j >= 0; j--) {
-                sub_08217EAC(sprite);
+                Effect_Remove(sprite);
                 sprite = (struct EffectSprite *)((u8 *)sprite + sizeof(struct EffectParticle));
             }
         }
@@ -208,8 +208,8 @@ s32 EffectManager_Init(struct EffectManager *manager, void *unused)
     s32 i, j;
     struct EffectSprite *sprite;
     gUnk_02000040 = manager;
-    manager->graphics = sub_08215184(0x1c1a);
-    manager->animation = sub_0821A520(0x922e, 0xd1b8);
+    manager->graphics = AnimData_FindEntry(0x1c1a);
+    manager->animation = ScriptProc_Start(0x922e, 0xd1b8);
     for (i = 0; i < 6; i++) {
         struct Effect *effect = &manager->effects[i];
         effect->active = 0;
@@ -242,11 +242,11 @@ s32 EffectManager_Init(struct EffectManager *manager, void *unused)
 
 void *sub_0800AC00(void *a)
 {
-    void *p = sub_08219FBC(8, 0x7DC);
+    void *p = Task_Create(8, 0x7DC);
     if (p != 0) {
-        sub_0821A04C(p, EffectManager_UpdateAll, sub_0800AB18);
+        Task_SetCallbacks(p, EffectManager_UpdateAll, sub_0800AB18);
         if (EffectManager_Init(p, a) < 0) {
-            sub_0821A0C0(p);
+            Task_Kill(p);
             return 0;
         }
     }
@@ -319,7 +319,7 @@ void EffectParticle_UpdateDriftAroundActor(struct EffectManager *manager, struct
     s32 difference;
     if ((index & 1) == phase) {
         difference =
-            sub_082215E4(origin->x - sprite->position.x, origin->z - sprite->position.z) - p->angle;
+            Math_Atan2(origin->x - sprite->position.x, origin->z - sprite->position.z) - p->angle;
         if (p->drift < 0) {
             if ((difference < 0 ? -difference : difference) <= 4)
                 *angle = p->angle + difference;
@@ -350,10 +350,10 @@ void EffectParticle_UpdateDriftAroundActor(struct EffectManager *manager, struct
             if (!paused && ctx->actorLower.x <= projected.x && ctx->actorUpper.x >= projected.x &&
                 ctx->actorLower.y <= projected.y && ctx->actorUpper.y >= projected.y) {
                 p->state = mask;
-                sub_08220C8C(&p->anim, manager->animation,
-                             gUnk_08604A30[manager->mode][effect->type].id, 0, 0);
+                Anim_SetSequence(&p->anim, manager->animation,
+                                 gUnk_08604A30[manager->mode][effect->type].id, 0, 0);
                 if (!(gUnk_02000560 & mask)) {
-                    sub_0822B3BC(gUnk_08604A60[effect->type]);
+                    Sound_PlaySongChecked(gUnk_08604A60[effect->type]);
                     gUnk_08604A54[effect->type](manager->actor, effect->kind);
                 }
                 return;
@@ -451,7 +451,7 @@ void EffectParticle_UpdateDriftBeforeHoming(struct EffectManager *manager, struc
     s32 difference;
     if ((index & 1) == phase) {
         difference =
-            sub_082215E4(origin->x - sprite->position.x, origin->z - sprite->position.z) - p->angle;
+            Math_Atan2(origin->x - sprite->position.x, origin->z - sprite->position.z) - p->angle;
         if (p->drift < 0) {
             if ((difference < 0 ? -difference : difference) <= 4)
                 *angle = p->angle + difference;
@@ -482,10 +482,10 @@ void EffectParticle_UpdateDriftBeforeHoming(struct EffectManager *manager, struc
             if (!paused && ctx->lower.x <= projected.x && ctx->upper.x >= projected.x &&
                 ctx->lower.y <= projected.y && ctx->upper.y >= projected.y) {
                 p->state = mask;
-                sub_08220C8C(&p->anim, manager->animation,
-                             gUnk_08604A30[manager->mode][effect->type].id, 0, 0);
+                Anim_SetSequence(&p->anim, manager->animation,
+                                 gUnk_08604A30[manager->mode][effect->type].id, 0, 0);
                 if (!(gUnk_02000560 & mask)) {
-                    sub_0822B3BC(gUnk_08604A60[effect->type]);
+                    Sound_PlaySongChecked(gUnk_08604A60[effect->type]);
                     gUnk_08604A54[effect->type](manager->actor, effect->kind);
                 }
                 return;
@@ -598,7 +598,7 @@ void EffectParticle_UpdateHomingWide(struct EffectManager *manager, struct Effec
             dy = c->world.y - sprite->position.y + 164;
             dz = c->world.z - sprite->position.z;
         }
-        p->angle = sub_082215E4(dx, dz);
+        p->angle = Math_Atan2(dx, dz);
         p->velocity.x = (gUnk_086149C4[(p->angle + 64) & 255] * p->speed) >> 12;
         p->velocity.z = (gUnk_086149C4[p->angle] * p->speed) >> 12;
         {
@@ -608,10 +608,10 @@ void EffectParticle_UpdateHomingWide(struct EffectManager *manager, struct Effec
             if (!(gUnk_02000560 & m) && !effect->timer && (dy < 0 ? -dy : dy) <= 179 &&
                 dx * dx + dz * dz < 400) {
                 p->state = mask;
-                sub_08220C8C(&p->anim, manager->animation,
-                             gUnk_08604A30[manager->mode][effect->type].id, 0, 0);
+                Anim_SetSequence(&p->anim, manager->animation,
+                                 gUnk_08604A30[manager->mode][effect->type].id, 0, 0);
                 if (!(gUnk_02000560 & mask)) {
-                    sub_0822B3BC(gUnk_08604A60[effect->type]);
+                    Sound_PlaySongChecked(gUnk_08604A60[effect->type]);
                     gUnk_08604A54[effect->type](manager->actor, effect->kind);
                 }
                 return;
@@ -726,7 +726,7 @@ void EffectParticle_UpdateHoming(struct EffectManager *manager, struct Effect *e
             dy = c->world.y - sprite->position.y + 128;
             dz = c->world.z - sprite->position.z;
         }
-        p->angle = sub_082215E4(dx, dz);
+        p->angle = Math_Atan2(dx, dz);
         p->velocity.x = (gUnk_086149C4[(p->angle + 64) & 255] * p->speed) >> 12;
         p->velocity.z = (gUnk_086149C4[p->angle] * p->speed) >> 12;
         {
@@ -737,10 +737,10 @@ void EffectParticle_UpdateHoming(struct EffectManager *manager, struct Effect *e
             if (!(gUnk_02000560 & m) && !effect->timer && (dy < 0 ? -dy : dy) <= 129 &&
                 dx * dx + dz * dz < 400) {
                 p->state = mask;
-                sub_08220C8C(&p->anim, manager->animation,
-                             gUnk_08604A30[manager->mode][effect->type].id, 0, 0);
+                Anim_SetSequence(&p->anim, manager->animation,
+                                 gUnk_08604A30[manager->mode][effect->type].id, 0, 0);
                 if (!(gUnk_02000560 & mask)) {
-                    sub_0822B3BC(gUnk_08604A60[effect->type]);
+                    Sound_PlaySongChecked(gUnk_08604A60[effect->type]);
                     gUnk_08604A54[effect->type](manager->actor, effect->kind);
                 }
                 return;
@@ -923,7 +923,7 @@ void EffectParticle_UpdateDissipating(struct EffectManager *manager, struct Effe
     s32 difference;
     if ((index & 1) == phase) {
         difference =
-            sub_082215E4(origin->x - sprite->position.x, origin->z - sprite->position.z) - p->angle;
+            Math_Atan2(origin->x - sprite->position.x, origin->z - sprite->position.z) - p->angle;
         if (p->drift < 0) {
             if ((difference < 0 ? -difference : difference) <= 4)
                 *angle = p->angle + difference;

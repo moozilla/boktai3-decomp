@@ -9,7 +9,7 @@ struct Actor {
     void *resource;
 };
 void sub_08220D20(void *, void *, int, int, int);
-void sub_08220C8C(void *, void *, int, int, int);
+void Anim_SetSequence(void *, void *, int, int, int);
 void sub_080297FC(struct Actor *p, int sequence, int start, int speed)
 {
     p->mode = 0;
@@ -18,5 +18,5 @@ void sub_080297FC(struct Actor *p, int sequence, int start, int speed)
         sub_08220D20(p->animation, p->resource, (u16)sequence, p->mode, p->speed);
         p->active = 0;
     } else
-        sub_08220C8C(p->animation, p->resource, (u16)sequence, p->mode, p->speed);
+        Anim_SetSequence(p->animation, p->resource, (u16)sequence, p->mode, p->speed);
 }

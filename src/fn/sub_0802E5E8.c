@@ -72,7 +72,7 @@ struct Actor {
 };
 extern void *gUnk_02000480;
 struct Actor *sub_0802D6D0(void *, int);
-int sub_0821ABA8(int, int);
+int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
 int sub_0802FD14(struct Actor *);
@@ -85,7 +85,7 @@ int sub_0802E5E8(void)
     register int mode asm("r0");
     if (!m)
         return -1;
-    p = sub_0802D6D0(m, sub_0821ABA8(0x6e, 0));
+    p = sub_0802D6D0(m, Script_GetKeywordValue(0x6e, 0));
     if (!p)
         return -1;
     {
@@ -93,7 +93,7 @@ int sub_0802E5E8(void)
         int zero;
         zero = 0;
         *controlled = zero;
-        mode = sub_0821ABA8(0x69, 0);
+        mode = Script_GetKeywordValue(0x69, 0);
         {
             u32 command = mode;
             switch (command) {

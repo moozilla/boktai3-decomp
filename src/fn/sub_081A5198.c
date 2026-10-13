@@ -1,8 +1,8 @@
 #include "global.h"
 
-void sub_08214514(void *);
+void Sprite_Remove(void *);
 void sub_08013B74(void *);
-void sub_0821FE6C(void *);
+void Collider_Remove(void *);
 struct A {
     u8 f0[0x18];
     u8 f18[0x48];
@@ -12,7 +12,7 @@ struct A {
 
 void sub_081A5198(struct A *p)
 {
-    sub_08214514(p->f18);
+    Sprite_Remove(p->f18);
     sub_08013B74(p->fcc);
-    sub_0821FE6C(p->f60);
+    Collider_Remove(p->f60);
 }

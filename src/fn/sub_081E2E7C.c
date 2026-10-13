@@ -1,6 +1,6 @@
 #include "global.h"
-void *sub_0821A520(u32, u32);
-void sub_082196C4(void *, void *);
+void *ScriptProc_Start(u32, u32);
+void ResourceHeader_Relocate(void *, void *);
 void sub_0821983C(u8 *, void *, u32, u32, u32, u32, u32, void *);
 void sub_081E2E7C(u8 *s)
 {
@@ -10,12 +10,12 @@ void sub_081E2E7C(u8 *s)
     struct Coords {
         u16 a, b, c, d;
     } coords;
-    struct Blob *p = sub_0821A520(0xCB05, 0xDF11);
+    struct Blob *p = ScriptProc_Start(0xCB05, 0xDF11);
     struct Blob *obj;
     u32 zero, sixty;
     *(struct Blob *)(s + 0x18) = *p;
     obj = (struct Blob *)(s + 0x18);
-    sub_082196C4(obj, p);
+    ResourceHeader_Relocate(obj, p);
     coords.a = 0;
     coords.b = 0;
     coords.c = 0;

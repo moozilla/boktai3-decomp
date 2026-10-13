@@ -22,7 +22,7 @@ struct Manager {
     u32 slot;
 };
 struct Manager *sub_0802C678(void);
-void sub_0821FE40(void *);
+void Collider_Refresh(void *);
 void sub_08042798(void *, u32);
 void sub_0802C994(struct Object *);
 static inline void enable(struct Object *p)
@@ -51,7 +51,7 @@ void sub_0802CF74(struct Object *p)
     if (selected) {
         u32 mask = 4;
         if (p->flags & mask)
-            sub_0821FE40(p->sensor);
+            Collider_Refresh(p->sensor);
     }
     if (!p->collisionTimer) {
         u32 mask = 8;

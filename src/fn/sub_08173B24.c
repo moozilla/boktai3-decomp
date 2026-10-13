@@ -1,7 +1,7 @@
 #include "global.h"
 extern u16 gUnk_03005260[];
 void sub_0816618C(void *, s32, s32);
-void sub_0822B2F8(s32);
+void Sound_PlaySong(s32);
 void sub_0816B634(void *);
 void sub_0816D920(void *, s32);
 void sub_081738D0(void *);
@@ -19,7 +19,7 @@ void sub_08173B24(u8 *p)
     p[0xa58] = 0;
     if (1 & gUnk_03005260[1]) {
         u8 *q;
-        sub_0822B2F8(0xdd);
+        Sound_PlaySong(0xdd);
         sub_0816B634(p + 0x4384);
         {
             u8 *a = p + 0x15c0;

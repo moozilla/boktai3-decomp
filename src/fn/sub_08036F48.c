@@ -27,24 +27,24 @@ void sub_08215114(void);
 void sub_0821969C(void);
 void sub_0821447C(int, void *, void *, void *);
 void sub_08177DEC(int);
-void sub_082156B8(int);
-void *sub_0821A520(int, int);
+void Bg_ClearTilemap(int);
+void *ScriptProc_Start(int, int);
 void sub_082161B4(int, int, void *, int, int, int, void *);
-void sub_0821656C(int, int, int, int, int);
+void BgGfx_LoadTilemapSimple(int, int, int, int, int);
 void sub_08036C0C(void);
 void sub_0822B058(int);
 void sub_08036E14(struct LinkMenu *);
 void sub_08036EC8(struct LinkMenu *, int);
 int sub_08033690(int, int, int, int);
-void sub_0803386C(int, void *);
-void sub_08033924(int, int);
+void TextWindow_SetScript(int, void *);
+void TextWindow_Refresh(int, int);
 void sub_080337FC(int);
 void sub_08033778(int);
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 int sub_08036BEC(void);
 int sub_0824923C(void *, void *);
 extern void *gUnk_08605770[];
-void sub_082195E0(void *);
+void Anim_Remove(void *);
 void sub_08036F48(struct LinkMenu *p)
 {
     {
@@ -64,11 +64,11 @@ void sub_08036F48(struct LinkMenu *p)
         p->flags &= ~1;
         p->window = sub_08033690(1, 14, 28, 6);
         if (p->window >= 0) {
-            sub_0803386C(p->window, p->script);
-            sub_08033924(p->window, 0);
+            TextWindow_SetScript(p->window, p->script);
+            TextWindow_Refresh(p->window, 0);
             sub_080337FC(p->window);
         }
-        sub_0822B2F8(402);
+        Sound_PlaySong(402);
     }
     p->timer++;
 }

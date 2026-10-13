@@ -38,7 +38,7 @@ struct Manager {
 };
 extern struct Manager *gUnk_0200006C;
 void sub_08220D44(void *, int);
-void sub_08217EAC(void *);
+void Effect_Remove(void *);
 static inline int scale(int a, int b)
 {
     int v = a * b;
@@ -153,7 +153,7 @@ int FadingParticleGroup_Update(struct Group *g)
     if (!alive) {
         g->active = 0;
         for (i = 0; i < g->count; i++)
-            sub_08217EAC(&g->particles[i].motion.sprite);
+            Effect_Remove(&g->particles[i].motion.sprite);
         g->count = 0;
     }
     return 0;

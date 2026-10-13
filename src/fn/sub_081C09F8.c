@@ -7,14 +7,14 @@ struct S {
     u8 h[0x14];
     s32 n;
 };
-void sub_0821AD08(void *, u32);
-void sub_0821A0C0(void *);
+void Script_Call(void *, u32);
+void Task_Kill(void *);
 void sub_081C09F8(struct S *p)
 {
     p->n = p->n + 1;
     if (p->n > 0x3f && p->b != 0) {
-        sub_0821AD08(p->b, 0);
-        sub_0821A0C0(p->a);
-        sub_0821A0C0(p);
+        Script_Call(p->b, 0);
+        Task_Kill(p->a);
+        Task_Kill(p);
     }
 }

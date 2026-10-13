@@ -3,19 +3,19 @@ struct Task {
     u8 pad0[0x16];
     u8 active;
 };
-void *sub_08219FBC(int, int);
-void sub_0821A04C(void *, void *, void *);
+void *Task_Create(int, int);
+void Task_SetCallbacks(void *, void *, void *);
 int sub_08039058(void *);
 int sub_080390A0(void *);
 int sub_080390C4(void *);
-void sub_0821A0C0(void *);
+void Task_Kill(void *);
 struct Task *sub_08039490(void)
 {
-    struct Task *p = sub_08219FBC(2, 276);
+    struct Task *p = Task_Create(2, 276);
     if (p) {
-        sub_0821A04C(p, sub_08039058, sub_080390A0);
+        Task_SetCallbacks(p, sub_08039058, sub_080390A0);
         if (sub_080390C4(p) < 0) {
-            sub_0821A0C0(p);
+            Task_Kill(p);
             return 0;
         }
         p->active = 1;

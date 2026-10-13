@@ -5,7 +5,7 @@ struct Config {
 struct Vec {
     s16 x, y, z, pad;
 };
-int sub_0821ABA8(int, int);
+int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
 void AnimatedParticles_Create(int, void *, struct Config *);
@@ -13,7 +13,7 @@ void AnimatedParticles_CreateFromScript(void)
 {
     struct Config s;
     struct Vec pos;
-    int count = sub_0821ABA8('n', 1);
+    int count = Script_GetKeywordValue('n', 1);
     if (Script_SeekToKeyword('p')) {
         pos.x = Script_GetValue();
         pos.y = Script_GetValue();
@@ -23,9 +23,9 @@ void AnimatedParticles_CreateFromScript(void)
         pos.y = 0;
         pos.z = 0;
     }
-    s.v[0] = sub_0821ABA8('t', 0);
-    s.v[1] = sub_0821ABA8('f', 0);
-    s.v[3] = sub_0821ABA8('a', 64);
+    s.v[0] = Script_GetKeywordValue('t', 0);
+    s.v[1] = Script_GetKeywordValue('f', 0);
+    s.v[3] = Script_GetKeywordValue('a', 64);
     if (Script_SeekToKeyword('s')) {
         s.v[4] = Script_GetValue();
         s.v[5] = Script_GetValue();

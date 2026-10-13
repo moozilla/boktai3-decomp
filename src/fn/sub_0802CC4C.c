@@ -18,7 +18,7 @@ struct Object {
 };
 void *sub_0802C678(void);
 struct Object *sub_0802CA8C(int);
-int sub_082215E4(int, int);
+int Math_Atan2(int, int);
 struct Manager {
     u8 pad[0x30];
     u32 slot;

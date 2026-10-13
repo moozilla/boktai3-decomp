@@ -3,7 +3,7 @@ void sub_08210D60(void *);
 void sub_08210F04(void *);
 s32 Script_SeekToKeyword(s32);
 void *sub_08227E90(void);
-void *sub_0821ABA8(s32, s32);
+void *Script_GetKeywordValue(s32, s32);
 void sub_08210AD4(void *);
 void sub_08210B50(void *);
 void sub_08210BEC(void *);
@@ -12,7 +12,7 @@ void sub_08033568(void);
 void sub_08033468(void);
 u32 sub_08210CB0(void *);
 void sub_082279A8(s32, s32, s32, s32, s32, s32, s32);
-void sub_0822B2F8(u32);
+void Sound_PlaySong(u32);
 s32 sub_0821159C(u8 *s)
 {
     u32 zero = 0, four;
@@ -43,7 +43,7 @@ s32 sub_0821159C(u8 *s)
 fail:
     return -1;
 success:
-    *(void **)(s + 0xba4) = sub_0821ABA8(0x65, 0);
+    *(void **)(s + 0xba4) = Script_GetKeywordValue(0x65, 0);
     sub_08210AD4(s);
     sub_08210B50(s);
     sub_08210BEC(s);
@@ -52,6 +52,6 @@ success:
     sub_08033468();
     sub_08210CB0(s);
     sub_082279A8(0, *p, 4, 4, four, 0xffff, zero);
-    sub_0822B2F8(0x118);
+    Sound_PlaySong(0x118);
     return 0;
 }

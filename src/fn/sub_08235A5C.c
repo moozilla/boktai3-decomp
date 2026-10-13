@@ -12,16 +12,16 @@ struct Owner {
     struct Elem elems[2];
     u8 resource[1];
 };
-void sub_082151E4(void *, u32);
-void sub_082144A4(void *, void *, u32);
-void sub_08215284(void *, u32);
+void AnimData_Load(void *, u32);
+void Sprite_Init(void *, void *, u32);
+void AnimData_SelectTiles(void *, u32);
 void sub_08235A5C(struct Owner *p)
 {
     s32 i;
-    sub_082151E4(p->resource, 0x24ba);
+    AnimData_Load(p->resource, 0x24ba);
     for (i = 0; i < 2; i++) {
-        sub_082144A4(&p->elems[i], p->resource, 1);
-        sub_08215284(p->resource, 0x2e5);
+        Sprite_Init(&p->elems[i], p->resource, 1);
+        AnimData_SelectTiles(p->resource, 0x2e5);
         p->elems[i].coords = *(struct Pair *)(*(u8 **)((u8 *)p + 0x18) + 0x30);
     }
 }

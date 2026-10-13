@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08020D68(void *, int);
+void Trigger_ConsumePending(void *, int);
 static inline u8 test(u8 *p)
 {
     if (p[0xb0]) {
@@ -16,6 +16,6 @@ void sub_0817B4B4(u8 *p)
         p[0xaa] = x;
     }
     if (p[0xaf])
-        sub_08020D68(p + 0x118, 1);
+        Trigger_ConsumePending(p + 0x118, 1);
     (*(u32 *)(p + 0xc4))++;
 }

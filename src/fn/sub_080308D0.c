@@ -48,10 +48,10 @@ int sub_0803092C(struct Actor *);
 void sub_080316A4(void);
 void sub_080317D8(void);
 void sub_080317CC(void);
-int sub_08218E5C(int, int, int, int);
+int TextWindow_BlankRect(int, int, int, int);
 void *sub_080313C8(struct Actor *, int);
-void sub_08032C34(struct State *);
-int sub_08032C54(struct State *, int, int, int, int);
+void TextState_Reset(struct State *);
+int TextState_SetBounds(struct State *, int, int, int, int);
 int Script_GetValue(void);
 static inline void setCallback(void *fn, struct Actor *p)
 {
@@ -61,10 +61,10 @@ static inline void setCallbackB(struct Actor *p, void *fn)
 {
     p->callback = fn;
 }
-void *sub_0821A520(int, u16);
+void *ScriptProc_Start(int, u16);
 int sub_080308D0(struct Actor *p, int palette)
 {
-    void *data = sub_0821A520(0x92b3, (u16)palette);
+    void *data = ScriptProc_Start(0x92b3, (u16)palette);
     int result;
     if (data) {
         p->palette = palette;

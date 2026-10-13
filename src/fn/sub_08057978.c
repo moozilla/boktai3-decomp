@@ -6,7 +6,7 @@ struct B {
     u32 flags;
     struct A *args;
 };
-void sub_0821AD08(u32, struct B *);
+void Script_Call(u32, struct B *);
 void sub_08057978(u8 *p, u32 x)
 {
     u32 r = *(u32 *)(p + 0x17ac);
@@ -16,6 +16,6 @@ void sub_08057978(u8 *p, u32 x)
         b.flags = (b.flags & 0xFFFF0000) | 1;
         a.a = x;
         b.args = &a;
-        sub_0821AD08(r, &b);
+        Script_Call(r, &b);
     }
 }

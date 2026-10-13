@@ -43,9 +43,9 @@ struct S {
     void (*previous)(void *);
     void (*fn)(void *);
 };
-void sub_08220C8C(void *, u32, u32, u32, u32);
+void Anim_SetSequence(void *, u32, u32, u32, u32);
 void sub_081E4188(void *);
-void sub_08013440(void *);
+void ActorShadow_Disable(void *);
 void sub_081E41EC(void *);
 static inline u8 take(struct S *p)
 {
@@ -79,10 +79,10 @@ struct Child {
 void sub_081E5608(void *, void *);
 void sub_08056CC0(void);
 void sub_081E4174(void *);
-void sub_08215284(void *, s32);
-void sub_0822B2F8(s32);
-void sub_0821AD08(void *, s32);
-void sub_08013424(void *);
+void AnimData_SelectTiles(void *, s32);
+void Sound_PlaySong(s32);
+void Script_Call(void *, s32);
+void ActorShadow_Enable(void *);
 void ActorPalette_BeginFade(void *);
 void sub_081E9574(struct S *p)
 {
@@ -94,9 +94,9 @@ void sub_081E9574(struct S *p)
     u8 done;
     if (take(p)) {
         p->state = 10;
-        sub_08220C8C(&p->anim, p->arg, 10, 0, p->last);
-        sub_08013440(p->p2);
-        sub_0822B2F8(287);
+        Anim_SetSequence(&p->anim, p->arg, 10, 0, p->last);
+        ActorShadow_Disable(p->p2);
+        Sound_PlaySong(287);
     }
     o = &p->obj;
     a = &p->anim;

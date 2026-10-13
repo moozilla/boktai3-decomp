@@ -133,7 +133,7 @@ void sub_08002C90(struct PaletteTransition *t)
     u32 z = 0;
     t->brightness = z;
     if (t->callback != 0) {
-        sub_0821AD08(t->callback, 0);
+        Script_Call(t->callback, 0);
         t->callback = z;
     }
 }
@@ -181,7 +181,7 @@ void sub_08002CD8(struct PaletteTransition *t)
     t->brightness = v;
     q = &t->callback;
     if (*q != 0) {
-        sub_0821AD08(*q, 0);
+        Script_Call(*q, 0);
         *q = 0;
     }
 }
@@ -460,14 +460,14 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
     gUnk_03004DA8 = 64;
     gUnk_03005214 = 0x1084;
     gUnk_030051C4 = 0;
-    p->flags = sub_0821ABA8('f', 0);
+    p->flags = Script_GetKeywordValue('f', 0);
     if (Script_SeekToKeyword('p')) {
         register s32 i asm("r6") = 0;
         u16 **out = p->colorSets[PALETTE_SET_SOURCE];
         while (Script_GetPc() && i <= 3) {
             s32 value = Script_GetValue();
             if (value != 0x30)
-                *out = (u16 *)(sub_0821A520(0x92B3, value) + 20);
+                *out = (u16 *)(ScriptProc_Start(0x92B3, value) + 20);
             else
                 *out = 0;
             out++;
@@ -480,7 +480,7 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
         while (Script_GetPc() && i <= 3) {
             s32 value = Script_GetValue();
             if (value != 0x30)
-                *out = (u16 *)(sub_0821A520(0x92B3, value) + 20);
+                *out = (u16 *)(ScriptProc_Start(0x92B3, value) + 20);
             else
                 *out = 0;
             out++;
@@ -492,7 +492,7 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
     else
         sub_0800301C(p);
     p->blend = 0;
-    p->selected = sub_0821ABA8('c', 0);
+    p->selected = Script_GetKeywordValue('c', 0);
     p->current = p->colorSets[PALETTE_SET_SOURCE][p->selected];
     sub_08002F2C(p);
     if (p->flags & 2) {
@@ -534,11 +534,11 @@ struct PaletteController *sub_080033FC(void)
     struct PaletteController *r;
     if (gUnk_02000468 != 0)
         return gUnk_02000468;
-    r = sub_08219FBC(11, 0xe94);
+    r = Task_Create(11, 0xe94);
     if (r) {
-        sub_0821A04C(r, Palette_Update, sub_080031E0);
+        Task_SetCallbacks(r, Palette_Update, sub_080031E0);
         if (Palette_InitializeFromScript(r) < 0) {
-            sub_0821A0C0(r);
+            Task_Kill(r);
             return 0;
         }
     }
@@ -569,7 +569,7 @@ void sub_0800347C(u32 v)
 
 void sub_08003494(void)
 {
-    sub_0800347C(sub_0821ABA8('r', 0));
+    sub_0800347C(Script_GetKeywordValue('r', 0));
 }
 
 void Palette_ReplaceResource(u32 bank, u32 index, u32 resource, u32 flags)
@@ -578,7 +578,7 @@ void Palette_ReplaceResource(u32 bank, u32 index, u32 resource, u32 flags)
     if (p) {
         u8 *colors;
         u16 id = resource;
-        colors = sub_0821A520(0x92B3, id) + 20;
+        colors = ScriptProc_Start(0x92B3, id) + 20;
         p->colorSets[bank][index] = (u16 *)colors;
         if (flags & 1) {
             if (p->flags & 1) {
@@ -601,10 +601,10 @@ void Palette_ReplaceResource(u32 bank, u32 index, u32 resource, u32 flags)
 void sub_08003540(void)
 {
     if (gUnk_02000468 != 0) {
-        s32 a = sub_0821ABA8(0x73, 0);
-        s32 b = sub_0821ABA8(0x69, 0);
-        s32 c = sub_0821ABA8(0x6e, 0);
-        s32 d = sub_0821ABA8(0x66, 0);
+        s32 a = Script_GetKeywordValue(0x73, 0);
+        s32 b = Script_GetKeywordValue(0x69, 0);
+        s32 c = Script_GetKeywordValue(0x6e, 0);
+        s32 d = Script_GetKeywordValue(0x66, 0);
         Palette_ReplaceResource(a, b, c, d);
     }
 }
@@ -626,9 +626,9 @@ void sub_08003588(u32 a, u32 b, u32 c)
 
 void sub_080035C0(void)
 {
-    s32 a = sub_0821ABA8(0x73, 0);
-    s32 b = sub_0821ABA8(0x61, 0);
-    s32 c = sub_0821ABA8(0x74, 0);
+    s32 a = Script_GetKeywordValue(0x73, 0);
+    s32 b = Script_GetKeywordValue(0x61, 0);
+    s32 c = Script_GetKeywordValue(0x74, 0);
     sub_08003588(a, b, c);
 }
 
@@ -642,10 +642,10 @@ void Palette_SetBrightnessFromScript(void)
             asm("" : "+r"(hint));
             hint;
         });
-        s32 enabled = sub_0821ABA8('n', 0);
+        s32 enabled = Script_GetKeywordValue('n', 0);
         u32 query = Script_SeekToKeyword('q');
         u32 immediate = ((0u - query) | query) >> 31;
-        s32 callback = sub_0821ABA8('p', 0);
+        s32 callback = Script_GetKeywordValue('p', 0);
         u32 mode;
         p->transition.callback = 0;
         if (!(p->flags & 16)) {
@@ -682,7 +682,7 @@ void Palette_SetBrightnessFromScript(void)
         }
     complete:
         if (callback)
-            sub_0821AD08(callback, 0);
+            Script_Call(callback, 0);
         return;
     fadeOut:
         mode = 3;

@@ -19,12 +19,12 @@ struct Manager {
 extern struct Manager *gUnk_020000D8;
 extern u8 *gUnk_02000580[4];
 int sub_0802C6C8(struct Manager *, struct Object *);
-void sub_08219D38(void *);
+void Heap_Free(void *);
 void sub_0802C710(struct Manager *);
 struct Manager *sub_0802C678(void);
 struct Manager *sub_0802C818(void);
-void *sub_08219C40(int);
-void sub_08219DD8(void *, int);
+void *Heap_Alloc(int);
+void Memory_Clear(void *, int);
 int sub_0802C684(struct Manager *, struct Object *);
 void *sub_0802C860(int size)
 {
@@ -35,10 +35,10 @@ void *sub_0802C860(int size)
         if (!m)
             return 0;
     }
-    p = sub_08219C40(size);
+    p = Heap_Alloc(size);
     if (!p)
         return 0;
-    sub_08219DD8(p, size);
+    Memory_Clear(p, size);
     sub_0802C684(m, p);
     return p;
 }

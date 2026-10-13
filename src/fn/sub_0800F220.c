@@ -21,11 +21,11 @@ struct Screen {
 extern Screen *gUnk_02000044;
 extern u16 gUnk_03004BD8, gUnk_03005160[];
 extern const u16 gUnk_08604B3C[];
-int sub_0821ABA8(int, int);
+int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
 int Script_GetPc(void);
-u8 *sub_0821A520(int, int);
+u8 *ScriptProc_Start(int, int);
 void sub_08215A74(int, int);
 void *Video_GetBackgroundMap(int);
 void sub_082160B8(int, int, void *, int, int, int, int, void *);
@@ -44,11 +44,11 @@ int StatusScreen_Initialize(Screen *p, u16 id)
         }
     }
     p->id = id;
-    p->flags = sub_0821ABA8('f', 0);
+    p->flags = Script_GetKeywordValue('f', 0);
     p->mapId = 0x5AF3;
-    p->paletteId = sub_0821ABA8('p', 0);
+    p->paletteId = Script_GetKeywordValue('p', 0);
     p->buffer = gUnk_03005160;
-    p->script = sub_0821ABA8('e', 0);
+    p->script = Script_GetKeywordValue('e', 0);
     if (Script_SeekToKeyword('a')) {
         p->argv = p->values;
         for (i = 0; i < 8 && Script_GetPc(); i++)
@@ -69,10 +69,10 @@ int StatusScreen_Initialize(Screen *p, u16 id)
         for (i = 0; i < 6; i++)
             p->times[i] = gUnk_08604B3C[i];
     p->bg = 0;
-    map = sub_0821A520(0xC091, p->mapId);
+    map = ScriptProc_Start(0xC091, p->mapId);
     if (!map)
         return -1;
-    palette = sub_0821A520(0x92B3, p->paletteId);
+    palette = ScriptProc_Start(0x92B3, p->paletteId);
     if (!palette)
         return -1;
     if (map[0] == 'M' && map[1] == 'P')
@@ -87,7 +87,7 @@ int StatusScreen_Initialize(Screen *p, u16 id)
         CpuSet(&zero, p->buffer, 0x05000018);
     }
     *(volatile u16 *)0x04000008 |= 0x40;
-    p->delay = sub_0821ABA8('w', 0);
+    p->delay = Script_GetKeywordValue('w', 0);
     {
         register void (*state)(Screen *) asm("r1") = StatusScreen_WaitForStart;
         p->state = state;

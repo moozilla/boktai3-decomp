@@ -49,7 +49,7 @@ void sub_080297FC(void *, int, int, int);
 void sub_08029E1C(void *);
 int sub_08029E2C(void *);
 void sub_08029AA8(void *);
-void sub_0822B3BC(int);
+void Sound_PlaySongChecked(int);
 extern u32 gUnk_03005304;
 extern u16 gUnk_086141BC[];
 void sub_08029BF4(void *, void *, int);
@@ -65,7 +65,7 @@ void sub_0802A400(ActorAnimation *p, int tick)
         {
             int random = gUnk_086141BC[gUnk_03005304];
             if (random <= 32767)
-                sub_0822B3BC(1356);
+                Sound_PlaySongChecked(1356);
         }
     }
     if (p->tryUpdate(p))

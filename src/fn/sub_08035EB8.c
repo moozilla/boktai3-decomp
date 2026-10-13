@@ -30,7 +30,7 @@ struct Engine {
 };
 extern struct Engine *gUnk_02000484;
 extern u8 gUnk_020000EC;
-void sub_08219DD8(void *, int);
+void Memory_Clear(void *, int);
 #define gRfuLinkStatus   gUnk_03006A80
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
@@ -41,13 +41,13 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-void sub_082156B8(int);
+void Bg_ClearTilemap(int);
 void sub_08224DE8(void *);
 void sub_08035D58(u8);
 void sub_08035EAC(void);
 void sub_08224BB8(void (*)(u8));
 void sub_08224BA0(void (*)(void));
-void sub_0821AD08(void *, int);
+void Script_Call(void *, int);
 void sub_0822B058(int);
 void sub_08035EB8(struct Engine *p)
 {
@@ -55,10 +55,10 @@ void sub_08035EB8(struct Engine *p)
     int i;
     register int bit asm("r6");
     void *listener;
-    sub_082156B8(0);
+    Bg_ClearTilemap(0);
     sub_08224DE8(p->message);
-    sub_08219DD8((u8 *)p + 0xB8, 12);
-    sub_08219DD8((u8 *)p + 0xC4, 12);
+    Memory_Clear((u8 *)p + 0xB8, 12);
+    Memory_Clear((u8 *)p + 0xC4, 12);
     rfu_clearSlot(8, p->mode);
     sub_08224BB8(sub_08035D58);
     sub_08224BA0(sub_08035EAC);
@@ -75,6 +75,6 @@ void sub_08035EB8(struct Engine *p)
     setOperation(p, 23, 0);
     listener = *(void **)((u8 *)p + 0x4C);
     if (listener)
-        sub_0821AD08(listener, 0);
+        Script_Call(listener, 0);
     sub_0822B058(4);
 }

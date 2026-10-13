@@ -72,7 +72,7 @@ s32 Breakable_InitSlot(struct PooledInteractableManager *manager, struct PooledI
     }
     drawable = &slot->drawable;
     sub_08219918(drawable, resource, 0, 1, 2, 0, 60, d);
-    sub_08220D78(drawable, slot->resource, 0, 1, 0);
+    Anim_SetKeyframes(drawable, slot->resource, 0, 1, 0);
     collider = &slot->collider;
     scale.x = 128;
     scale.y = 128;
@@ -80,10 +80,10 @@ s32 Breakable_InitSlot(struct PooledInteractableManager *manager, struct PooledI
     offset.x = 0;
     offset.y = 128;
     offset.z = 0;
-    sub_0821FEB4(collider, slot->id, 0x4001, 0, 0, &scale, &offset);
-    sub_0821FF84(collider, sub_08008ABC, slot);
-    sub_0821FF24(collider, &slot->drawable.position, 0);
-    sub_0821FE40(collider);
+    Collider_Init(collider, slot->id, 0x4001, 0, 0, &scale, &offset);
+    Collider_SetCallback(collider, sub_08008ABC, slot);
+    Collider_SetPosition(collider, &slot->drawable.position, 0);
+    Collider_Refresh(collider);
     return 0;
 }
 
@@ -101,7 +101,7 @@ void sub_08008BD0(struct PooledInteractable *slot)
         a[2] = slot->arg;
         b.flags = 3;
         b.args = a;
-        sub_0821AD08(slot->script, &b);
+        Script_Call(slot->script, &b);
     }
 }
 
@@ -114,7 +114,7 @@ void sub_08008C1C(struct PooledInteractableManager *manager, struct PooledIntera
 {
     if (sub_08008AA4(slot)) {
         void *q = &slot->drawable;
-        sub_08220D78(q, slot->resource, gUnk_086049CE[slot->kind][0], 1, 0);
+        Anim_SetKeyframes(q, slot->resource, gUnk_086049CE[slot->kind][0], 1, 0);
         if (slot->kind != 2)
             sub_08219A80(q, gUnk_086049DA[slot->kind] + 1);
         else
@@ -126,7 +126,7 @@ void Breakable_Idle(struct PooledInteractableManager *manager, struct PooledInte
 {
     if (sub_08008AA4(slot)) {
         void *drawable = &slot->drawable;
-        sub_08220D78(drawable, slot->resource, gUnk_086049CE[slot->kind][1], 1, 0);
+        Anim_SetKeyframes(drawable, slot->resource, gUnk_086049CE[slot->kind][1], 1, 0);
         sub_08219A80(drawable, gUnk_086049DA[slot->kind]);
     }
     if (slot->timeout >= 0 && slot->counter >= slot->timeout)
@@ -137,10 +137,10 @@ void Breakable_React(struct PooledInteractableManager *manager, struct PooledInt
 {
     if (sub_08008AA4(slot)) {
         void *drawable = &slot->drawable;
-        sub_08220D78(drawable, slot->resource, gUnk_086049CE[slot->kind][1], 1, 0);
+        Anim_SetKeyframes(drawable, slot->resource, gUnk_086049CE[slot->kind][1], 1, 0);
         sub_08219A80(drawable, gUnk_086049DA[slot->kind]);
         slot->flash = 10;
-        sub_0822B2F8(331);
+        Sound_PlaySong(331);
         sub_08008BD0(slot);
     }
     if (slot->counter > 10)
@@ -155,7 +155,7 @@ void Breakable_Activate(struct PooledInteractableManager *manager, struct Pooled
     struct SceneExtent effect;
     if (sub_08008AA4(slot)) {
         void *drawable = &slot->drawable;
-        sub_08220D78(drawable, slot->resource, gUnk_086049CE[slot->kind][0], 1, 0);
+        Anim_SetKeyframes(drawable, slot->resource, gUnk_086049CE[slot->kind][0], 1, 0);
         slot->flash = 10;
         sub_08008BD0(slot);
         if (slot->kind != 2) {
@@ -238,8 +238,8 @@ s32 Breakable_UpdateAll(struct PooledInteractableManager *manager)
                     sub_08008F00(slot);
                 else if (slot->motion == 2)
                     sub_08008F64(slot);
-                sub_08220F70(&slot->drawable, slot->resource);
-                sub_0821FF24(&slot->collider, &slot->drawable.position, 0);
+                Anim_Step(&slot->drawable, slot->resource);
+                Collider_SetPosition(&slot->collider, &slot->drawable.position, 0);
                 if (slot->flash) {
                     slot->flash--;
                     if (!slot->flash)
@@ -259,11 +259,11 @@ s32 Breakable_DestroyManager(struct PooledInteractableManager *manager)
     u32 i;
     for (i = 0; i < manager->count; i++, slot++)
         if (slot->active) {
-            sub_0821FE6C(&slot->collider);
-            sub_082195E0(&slot->drawable);
+            Collider_Remove(&slot->collider);
+            Anim_Remove(&slot->drawable);
         }
     if (manager->slots) {
-        sub_08219D38(manager->slots);
+        Heap_Free(manager->slots);
         manager->slots = 0;
     }
     gUnk_02000034 = 0;
@@ -276,16 +276,16 @@ s32 Breakable_InitManager(struct PooledInteractableManager *manager)
     struct PooledInteractable *slot;
     gUnk_02000034 = manager;
     for (i = 0; i < 3; i++) {
-        struct PooledResource *resource = sub_0821A520(0xcb05, gUnk_086049C8[i]);
+        struct PooledResource *resource = ScriptProc_Start(0xcb05, gUnk_086049C8[i]);
         if (!resource)
             return -1;
         manager->resources[i] = *resource;
-        sub_082196C4(&manager->resources[i], resource);
+        ResourceHeader_Relocate(&manager->resources[i], resource);
     }
-    manager->count = sub_0821ABA8(110, 8);
+    manager->count = Script_GetKeywordValue(110, 8);
     bytes = manager->count * sizeof(struct PooledInteractable);
-    manager->slots = sub_08219C40(bytes);
-    sub_08219DD8(manager->slots, bytes);
+    manager->slots = Heap_Alloc(bytes);
+    Memory_Clear(manager->slots, bytes);
     slot = manager->slots;
     for (i = 0; (u32)i < manager->count; i++, slot++)
         Breakable_InitSlot(manager, slot);
@@ -296,12 +296,12 @@ void *sub_08009180(void)
     void *p;
     if (gUnk_02000034 != 0)
         return (void *)gUnk_02000034;
-    p = sub_08219FBC(10, 0x80);
+    p = Task_Create(10, 0x80);
     if (p != 0) {
-        sub_0821A04C(p, (void (*)(void))Breakable_UpdateAll,
-                     (void (*)(void))Breakable_DestroyManager);
+        Task_SetCallbacks(p, (void (*)(void))Breakable_UpdateAll,
+                          (void (*)(void))Breakable_DestroyManager);
         if (Breakable_InitManager(p) < 0) {
-            sub_0821A0C0(p);
+            Task_Kill(p);
             return 0;
         }
     }
@@ -383,20 +383,20 @@ s32 Breakable_ScriptCreate(void)
     fail:
         return -1;
     }
-    sub_08008A98(slot, sub_0821ABA8('m', 1));
-    slot->flags = sub_0821ABA8('f', 0);
-    slot->timeout = sub_0821ABA8('d', 120);
-    slot->id = sub_0821ABA8('n', 0);
-    slot->kind = sub_0821ABA8('D', 0);
+    sub_08008A98(slot, Script_GetKeywordValue('m', 1));
+    slot->flags = Script_GetKeywordValue('f', 0);
+    slot->timeout = Script_GetKeywordValue('d', 120);
+    slot->id = Script_GetKeywordValue('n', 0);
+    slot->kind = Script_GetKeywordValue('D', 0);
     slot->resource = &manager->resources[slot->kind];
-    slot->script = sub_0821ABA8('p', 0);
-    slot->arg = sub_0821ABA8('a', 0);
+    slot->script = Script_GetKeywordValue('p', 0);
+    slot->arg = Script_GetKeywordValue('a', 0);
     {
         u32 motion = slot->motion;
         register struct PooledResource **resource asm("r7") = &slot->resource;
         if (motion != 2)
             position.y = groundHeight(&position);
-        if (sub_0821ABA8('M', 0))
+        if (Script_GetKeywordValue('M', 0))
             slot->region = sub_0822C034(&position);
         else
             slot->region = -1;
@@ -406,7 +406,7 @@ s32 Breakable_ScriptCreate(void)
             drawable = &slot->drawable;
             {
                 struct PooledResource *res = *resource;
-                sub_08220D78(drawable, res, gUnk_086049CE[slot->kind][0], 1, 0);
+                Anim_SetKeyframes(drawable, res, gUnk_086049CE[slot->kind][0], 1, 0);
             }
             if (slot->kind != 2)
                 sub_08219A80(drawable, gUnk_086049DA[slot->kind] + 1);
@@ -416,7 +416,7 @@ s32 Breakable_ScriptCreate(void)
             drawable = &slot->drawable;
             {
                 struct PooledResource *res = *resource;
-                sub_08220D78(drawable, res, gUnk_086049CE[slot->kind][1], 1, 0);
+                Anim_SetKeyframes(drawable, res, gUnk_086049CE[slot->kind][1], 1, 0);
             }
             sub_08219A80(drawable, gUnk_086049DA[slot->kind]);
         }
@@ -430,7 +430,7 @@ void Breakable_ScriptSetTimeout(void)
 {
     struct PooledInteractableManager *manager = gUnk_02000034;
     if (manager) {
-        s32 id = sub_0821ABA8('n', 0), timeout = sub_0821ABA8('d', -1);
+        s32 id = Script_GetKeywordValue('n', 0), timeout = Script_GetKeywordValue('d', -1);
         struct PooledInteractable *slot = manager->slots;
         u32 i;
         for (i = 0; i < manager->count; i++, slot++)
@@ -443,9 +443,9 @@ void sub_080094A0(void)
 {
     struct PooledInteractableManager *g = gUnk_02000034;
     if (g != 0) {
-        u32 id = sub_0821ABA8(0x6e, 0);
+        u32 id = Script_GetKeywordValue(0x6e, 0);
         s32 m1 = -1;
-        s32 v = sub_0821ABA8(0x6d, m1);
+        s32 v = Script_GetKeywordValue(0x6d, m1);
         if (v != m1 && v <= 4) {
             struct PooledInteractable *e = g->slots;
             u32 i = 0;

@@ -33,10 +33,10 @@ void sub_0802D9C0(void *, struct Actor *);
 void sub_0802E188(struct Manager *);
 void sub_0802E04C(void *);
 int sub_0802D96C(struct Actor *);
-void *sub_08219FBC(int, int);
-void sub_0821A04C(void *, void *, void *);
+void *Task_Create(int, int);
+void Task_SetCallbacks(void *, void *, void *);
 int sub_08030818(struct Manager *);
-void sub_0821A0C0(void *);
+void Task_Kill(void *);
 void sub_08030710(void);
 void sub_080307D8(void);
 struct Manager *sub_08030864(void)
@@ -44,11 +44,11 @@ struct Manager *sub_08030864(void)
     struct Manager *p;
     if (gUnk_02000480)
         return gUnk_02000480;
-    p = sub_08219FBC(9, 0x43c);
+    p = Task_Create(9, 0x43c);
     if (p) {
-        sub_0821A04C(p, sub_08030710, sub_080307D8);
+        Task_SetCallbacks(p, sub_08030710, sub_080307D8);
         if (sub_08030818(p) < 0) {
-            sub_0821A0C0(p);
+            Task_Kill(p);
             return 0;
         }
     }

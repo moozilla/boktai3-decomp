@@ -11,7 +11,7 @@ struct P {
 };
 void sub_0803746C(struct P *, struct Panel *, int);
 void sub_08033778(u32);
-void sub_082195E0(void *);
+void Anim_Remove(void *);
 int sub_08037B6C(struct P *p)
 {
     struct Panel *q = p->panels;
@@ -28,6 +28,6 @@ int sub_08037B6C(struct P *p)
         sub_08033778(*w++);
         i--;
     } while (i >= 0);
-    sub_082195E0(p->draw);
+    Anim_Remove(p->draw);
     return 0;
 }

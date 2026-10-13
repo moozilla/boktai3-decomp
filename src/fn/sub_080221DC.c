@@ -2,11 +2,11 @@
 typedef struct {
     s16 x, y, z;
 } Vec;
-void sub_0821FEB4(void *, int, int, int, int, void *, void *);
-void sub_0821FF24(void *, void *, int);
-void sub_0821FF84(void *, void *, void *);
+void Collider_Init(void *, int, int, int, int, void *, void *);
+void Collider_SetPosition(void *, void *, int);
+void Collider_SetCallback(void *, void *, void *);
 void sub_0821FF7C(void *, int, int, int);
-void sub_0821FE40(void *);
+void Collider_Refresh(void *);
 void sub_080221D8(void);
 extern u32 gUnk_030053F4;
 void sub_0821FF58(void *, int, int, int, int, int);
@@ -20,9 +20,9 @@ void SceneActorGraphics_InitializeBody(u8 *p)
     rotation.x = 0;
     rotation.y = 0x80;
     rotation.z = 0;
-    sub_0821FEB4(drawable, 0, 0x2001, 0, 16, &scale, &rotation);
-    sub_0821FF24(drawable, p + 0x260, 0);
-    sub_0821FF84(drawable, sub_080221D8, p);
+    Collider_Init(drawable, 0, 0x2001, 0, 16, &scale, &rotation);
+    Collider_SetPosition(drawable, p + 0x260, 0);
+    Collider_SetCallback(drawable, sub_080221D8, p);
     {
         int test = gUnk_030053F4 & 0x1000;
         int flags;

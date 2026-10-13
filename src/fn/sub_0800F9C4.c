@@ -13,11 +13,11 @@ typedef struct {
     u8 pad7c[12];
     u8 transform[1];
 } Piece;
-void sub_082151E4(void *, int);
-void sub_08215284(void *, int);
-void sub_082144A4(void *, void *, int);
+void AnimData_Load(void *, int);
+void AnimData_SelectTiles(void *, int);
+void Sprite_Init(void *, void *, int);
 void Shadow_Initialize(void *, void *, int);
-int sub_08013440(void *);
+int ActorShadow_Disable(void *);
 int BoardPiece_Initialize(u8 *owner, Piece *p)
 {
     struct Resource {
@@ -38,15 +38,15 @@ int BoardPiece_Initialize(u8 *owner, Piece *p)
         p->direction = zero;
     }
     resource = (void *)p->resource;
-    sub_082151E4(resource, 0xDA6D);
+    AnimData_Load(resource, 0xDA6D);
     {
         void *r = resource;
         asm("" : "+r"(r));
-        sub_08215284(r, 0x2D3);
+        AnimData_SelectTiles(r, 0x2D3);
     }
     resource->palette = owner + 0xCA8;
     sprite = (void *)p->sprite;
-    sub_082144A4(sprite, resource, 1);
+    Sprite_Init(sprite, resource, 1);
     sprite->mode = 2;
     {
         register u32 *position asm("r5") = p->position;
@@ -61,5 +61,5 @@ int BoardPiece_Initialize(u8 *owner, Piece *p)
         }
         Shadow_Initialize(p->transform, position, 0);
     }
-    return sub_08013440(p->transform);
+    return ActorShadow_Disable(p->transform);
 }

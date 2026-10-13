@@ -24,7 +24,7 @@ void sub_08031E54(struct TextVm *, int);
 void sub_08031EFC(struct TextVm *, int);
 int sub_08031F58(struct TextVm *, int);
 void sub_0803209C(u8 *, int);
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 const u8 *Text_FindChar(const u8 *, u8);
 const u8 *sub_08227878(void);
 const u8 *sub_0811D1B0(void);
@@ -336,7 +336,7 @@ const u8 *sub_0803232C(struct TextVm *p, const u8 *s)
             value = sub_080321A0(p->text, p->length);
         else
             value = 221;
-        sub_0822B2F8(value);
+        Sound_PlaySong(value);
         goto done;
     }
     if (!sub_08032168(s, gUnk_0824DDF4, 3)) {

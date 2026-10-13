@@ -3,7 +3,7 @@ typedef struct {
     u8 unknown[12];
     s16 x, y, z;
 } Body;
-int sub_082215E4(int, int);
+int Math_Atan2(int, int);
 int Div(int, int);
 void SceneActors_UpdateTargetMetrics(u8 *p)
 {
@@ -14,7 +14,7 @@ void SceneActors_UpdateTargetMetrics(u8 *p)
     body = (Body *)(p + 0x48);
     x = *(s16 *)(p + 0xd0) - body->x;
     z = *(s16 *)(p + 0xd4) - body->z;
-    *(int *)(p + 0xdc) = (u8)sub_082215E4(x, z);
+    *(int *)(p + 0xdc) = (u8)Math_Atan2(x, z);
     *(int *)(p + 0xd8) = x * x + z * z;
     p[0xe0] = 1;
     if (*(s16 *)(p + 0x96))

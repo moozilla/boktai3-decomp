@@ -28,10 +28,10 @@ struct Manager {
     void *animation;
 };
 extern struct Manager *gUnk_0200046C;
-void sub_08220C8C(void *, void *, u32, u32, u32);
-void sub_0822B2F8(u32);
-void sub_0821FF24(void *, void *, u32);
-void sub_0821FE40(void *);
+void Anim_SetSequence(void *, void *, u32, u32, u32);
+void Sound_PlaySong(u32);
+void Collider_SetPosition(void *, void *, u32);
+void Collider_Refresh(void *);
 static inline void setFrame(struct Sprite *sprite, u16 frame)
 {
     sprite->frame = frame;

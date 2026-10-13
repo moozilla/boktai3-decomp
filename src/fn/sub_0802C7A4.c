@@ -19,7 +19,7 @@ struct Manager {
 extern struct Manager *gUnk_020000D8;
 extern u8 *gUnk_02000580[4];
 int sub_0802C6C8(struct Manager *, struct Object *);
-void sub_08219D38(void *);
+void Heap_Free(void *);
 void sub_0802C710(struct Manager *);
 int sub_0802C7A4(struct Manager *m)
 {
@@ -28,7 +28,7 @@ int sub_0802C7A4(struct Manager *m)
         struct Object *next = p->prev;
         p->destroy(p);
         sub_0802C6C8(m, p);
-        sub_08219D38(p);
+        Heap_Free(p);
         p = next;
     }
     gUnk_020000D8 = 0;

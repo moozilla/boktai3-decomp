@@ -13,7 +13,7 @@ typedef struct {
 } Manager;
 
 int sub_08249248(Manager *, Slot *);
-void sub_08214514(void *);
+void Sprite_Remove(void *);
 int SpritePool_Update(Manager *p)
 {
     Slot *q = p->slots;
@@ -22,13 +22,13 @@ int SpritePool_Update(Manager *p)
         if (q->active) {
             if (q->callback) {
                 if (sub_08249248(p, q)) {
-                    sub_08214514(q->sprite);
+                    Sprite_Remove(q->sprite);
                     q->active = 0;
                     q->id = 0;
                 }
                 q->time++;
             } else {
-                sub_08214514(q->sprite);
+                Sprite_Remove(q->sprite);
                 q->active = 0;
                 q->id = 0;
             }

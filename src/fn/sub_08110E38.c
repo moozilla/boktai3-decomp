@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08219D38(u32);
+void Heap_Free(u32);
 extern u32 gUnk_020004B8;
 struct S {
     u8 f[0x24];
@@ -9,7 +9,7 @@ struct S {
 };
 u32 sub_08110E38(struct S *p)
 {
-    sub_08219D38(p->a);
-    sub_08219D38(p->b);
+    Heap_Free(p->a);
+    Heap_Free(p->b);
     return gUnk_020004B8 = 0;
 }

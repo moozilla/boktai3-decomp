@@ -29,7 +29,7 @@ struct Engine {
 };
 extern struct Engine *gUnk_02000484;
 extern u8 gUnk_020000EC;
-void sub_08219DD8(void *, int);
+void Memory_Clear(void *, int);
 struct Message {
     u8 pad0[0x14];
     u8 bits;
@@ -98,7 +98,7 @@ void sub_080340AC(struct Engine *p)
     p->phase = secondByteZero;
     p->head = 0;
     p->tail = 0;
-    sub_08219DD8(p->scratch, 64);
-    sub_08219DD8(&p->number, 4);
-    sub_08219DD8(p->work, 16);
+    Memory_Clear(p->scratch, 64);
+    Memory_Clear(&p->number, 4);
+    Memory_Clear(p->work, 16);
 }

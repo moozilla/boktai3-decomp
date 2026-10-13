@@ -9,7 +9,7 @@ struct Clock {
 int sub_08228D88(void);
 int sub_08228D94(void);
 int sub_08228DA0(void);
-int sub_0821ABA8(int, int);
+int Script_GetKeywordValue(int, int);
 int ClockEvents_Initialize(struct Clock *p)
 {
     int i;
@@ -18,8 +18,8 @@ int ClockEvents_Initialize(struct Clock *p)
     p->minute = sub_08228D94();
     p->second = sub_08228DA0();
     p->seconds = p->hour * 3600 + p->minute * 60 + p->second;
-    p->window = sub_0821ABA8('d', 60);
-    p->script = (void *)sub_0821ABA8('p', 0);
+    p->window = Script_GetKeywordValue('d', 60);
+    p->script = (void *)Script_GetKeywordValue('p', 0);
     {
         int one = 1;
         int count = 3;

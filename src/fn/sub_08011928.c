@@ -14,8 +14,8 @@ struct Indicator {
     u8 effect[84];
     struct Sprite sprite;
 };
-void sub_0822B3BC(int);
-void sub_0821FE40(void *);
+void Sound_PlaySongChecked(int);
+void Collider_Refresh(void *);
 static inline void setFrame(struct Sprite *s, int frame)
 {
     s->frame = frame;
@@ -39,7 +39,7 @@ void SceneIndicator_Update(u8 *owner, struct Indicator *p)
                     p->index = 0;
                 p->visible = 1 - (p->index & 1);
                 if (p->visible)
-                    sub_0822B3BC(0x5AA);
+                    Sound_PlaySongChecked(0x5AA);
                 p->timer = 0;
             }
             break;
@@ -53,7 +53,7 @@ void SceneIndicator_Update(u8 *owner, struct Indicator *p)
                     if (p->delay >= p->period) {
                         p->visible = 1;
                         p->delay = 60;
-                        sub_0822B3BC(0x5AA);
+                        Sound_PlaySongChecked(0x5AA);
                     }
                 }
             } else {
@@ -72,6 +72,6 @@ void SceneIndicator_Update(u8 *owner, struct Indicator *p)
             setFrame(&p->sprite, p->frame + visible);
     }
     if (p->visible == 1)
-        sub_0821FE40(p->effect);
+        Collider_Refresh(p->effect);
     p->timer++;
 }

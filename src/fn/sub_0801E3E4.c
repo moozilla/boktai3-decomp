@@ -4,7 +4,7 @@ typedef struct {
     s16 x, y, z, pad;
 } Vec;
 void *sub_0821A2C4(int);
-int sub_0821ABA8(int, int);
+int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
 void sub_0821E4D4(u16, void *);
@@ -24,15 +24,15 @@ int SceneObjects_ScriptAppend(void)
     p = sub_0821A2C4(0x85e6);
     if (!p)
         return -1;
-    id = sub_0821ABA8(0x6e, 0);
-    value = sub_0821ABA8(0x64, 0);
-    kind = sub_0821ABA8(0x66, 0);
-    variant = sub_0821ABA8(0x73, 0);
-    orientation = sub_0821ABA8(0x72, 0);
-    type = sub_0821ABA8(0x76, 0);
-    field45 = sub_0821ABA8(0x63, 0);
-    field88 = sub_0821ABA8(0x68, 400);
-    field44 = sub_0821ABA8(0x6d, 0);
+    id = Script_GetKeywordValue(0x6e, 0);
+    value = Script_GetKeywordValue(0x64, 0);
+    kind = Script_GetKeywordValue(0x66, 0);
+    variant = Script_GetKeywordValue(0x73, 0);
+    orientation = Script_GetKeywordValue(0x72, 0);
+    type = Script_GetKeywordValue(0x76, 0);
+    field45 = Script_GetKeywordValue(0x63, 0);
+    field88 = Script_GetKeywordValue(0x68, 400);
+    field44 = Script_GetKeywordValue(0x6d, 0);
     if (Script_SeekToKeyword(0x6b)) {
         flags = Script_GetValue();
         field41 = Script_GetValue();

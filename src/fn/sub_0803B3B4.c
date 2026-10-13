@@ -16,25 +16,25 @@ extern struct ResultMenu *gUnk_02000104;
 extern void *gUnk_08605814[];
 extern u16 gUnk_03005260[], gUnk_03004BD8;
 void sub_0822AFE8(int);
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 void sub_08249238(void *);
-void sub_0821A0C0(void *);
+void Task_Kill(void *);
 int sub_08036BEC(void);
 void sub_08033778(int);
 void sub_0824923C(void *, void *);
-void sub_082195E0(void *);
-void sub_08214514(void *);
+void Anim_Remove(void *);
+void Sprite_Remove(void *);
 int sub_0803B3B4(struct ResultMenu *p)
 {
     struct Drawing *d = p->draws;
     int i = 21;
     int *w;
     do {
-        sub_082195E0(d);
+        Anim_Remove(d);
         i--;
         d++;
     } while (i >= 0);
-    sub_08214514((u8 *)p + 0x70);
+    Sprite_Remove((u8 *)p + 0x70);
     w = p->windows;
     i = 3;
     do {

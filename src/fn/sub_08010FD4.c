@@ -39,8 +39,8 @@ extern s16 gUnk_086149C4[];
 void sub_08221110(void *, void *, void *, int, int);
 int Mod(int, int);
 void sub_0800FA5C(void *, void *, int);
-void sub_08215284(void *, int);
-void sub_08013424(void *);
+void AnimData_SelectTiles(void *, int);
+void ActorShadow_Enable(void *);
 static inline int randomValue(void)
 {
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
@@ -56,7 +56,7 @@ static inline void polar(struct Vec *v, int angle, int radius)
     v->y = 0;
     v->z = scale(gUnk_086149C4[angle & 255] * radius);
 }
-void *sub_0821A520(int, int);
+void *ScriptProc_Start(int, int);
 void BoardPiece_Initialize(void *, void *, int);
 void sub_0800FA40(void *, void *, int);
 void SceneMessages_RegisterReceiver(void *, int, int);

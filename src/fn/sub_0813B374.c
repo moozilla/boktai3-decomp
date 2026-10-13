@@ -12,7 +12,7 @@ struct D {
     u32 a;
     struct C c;
 };
-void sub_0821AD08(void *, void *);
+void Script_Call(void *, void *);
 
 void sub_0813B374(struct S0813B374 *p, u32 a)
 {
@@ -26,6 +26,6 @@ void sub_0813B374(struct S0813B374 *p, u32 a)
         d.a = a;
         q = &d.c;
         q->c = &d;
-        sub_0821AD08(r, q);
+        Script_Call(r, q);
     }
 }

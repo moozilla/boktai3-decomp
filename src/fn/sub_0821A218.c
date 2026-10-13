@@ -6,7 +6,7 @@ struct Entry {
 };
 extern struct Entry gUnk_0203B000[];
 extern s32 gUnk_030052F0;
-void sub_08219D38(void *);
+void Heap_Free(void *);
 void sub_0821A218(u32 keep)
 {
     s32 retained = 0;
@@ -18,7 +18,7 @@ void sub_0821A218(u32 keep)
                 retained = i;
             else {
                 if (entry->flags & 2)
-                    sub_08219D38(entry->data);
+                    Heap_Free(entry->data);
                 entry->id = 0;
                 entry->flags = 0;
             }

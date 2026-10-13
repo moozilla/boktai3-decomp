@@ -1,8 +1,8 @@
 #include "global.h"
 
-u32 sub_08214514(u8 *);
+u32 Sprite_Remove(u8 *);
 
 void sub_08236FE8(u8 *p)
 {
-    sub_08214514(p + 0x2C);
+    Sprite_Remove(p + 0x2C);
 }

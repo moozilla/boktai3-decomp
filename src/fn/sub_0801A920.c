@@ -8,16 +8,16 @@ typedef struct {
 void sub_08019F18(void *, void (*)(void));
 void SelectionMenu_Choose(void);
 void SelectionMenu_Close(void);
-void sub_0822B2F8(int);
-void sub_0821980C(void *, void *, int, int);
+void Sound_PlaySong(int);
+void Anim_LoadKeyframe(void *, void *, int, int);
 void sub_08030F20(int, int, int, int);
 void Presentation_UpdateActorGraphic(void *, int);
 void SelectionMenu_Back(u8 *p)
 {
     Graphic *g = (Graphic *)(p + 0x1f4);
     if (p[0x1e]) {
-        sub_0822B2F8(0xde);
-        sub_0821980C(g, p + 0x4c, 0x4d, 0);
+        Sound_PlaySong(0xde);
+        Anim_LoadKeyframe(g, p + 0x4c, 0x4d, 0);
         p[0x1e]--;
         ((Graphic *)(p + 0xc74 + p[0x1e] * 0x60))->flags |= 1;
         if (!p[0x1e])
@@ -29,7 +29,7 @@ void SelectionMenu_Back(u8 *p)
         Presentation_UpdateActorGraphic(p, 0);
         sub_08019F18(p, SelectionMenu_Choose);
     } else {
-        sub_0822B2F8(0xde);
+        Sound_PlaySong(0xde);
         sub_08019F18(p, SelectionMenu_Close);
     }
 }

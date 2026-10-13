@@ -7,9 +7,9 @@ struct Tile {
 };
 extern struct Tile gUnk_03004CC0;
 extern u16 gUnk_03004FC0[];
-void sub_082156B8(u32);
-void sub_0821656C(u32, u32, u32, u32, u32);
-u8 *sub_0821A520(u32, u32);
+void Bg_ClearTilemap(u32);
+void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
+u8 *ScriptProc_Start(u32, u32);
 void sub_082161B4(u32, u32, void *, u32, u32, u32, u32 *);
 s32 sub_08212F24(s32);
 void sub_08215EB4(s32, s32, s32, s32, s32, s32, s32, s32);
@@ -18,20 +18,20 @@ void sub_082133BC(u8 *p)
     u32 size = 16;
     s32 max, count, row;
     struct Tile *tile;
-    sub_082156B8(0);
-    sub_0821656C(0, 0, 0, 0, 0);
-    sub_082156B8(2);
-    sub_0821656C(2, 0, 0, 0, 0);
-    sub_082156B8(3);
-    sub_0821656C(3, 0, 0, 0, 0);
+    Bg_ClearTilemap(0);
+    BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
+    Bg_ClearTilemap(2);
+    BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
+    Bg_ClearTilemap(3);
+    BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
     {
-        u8 *res = sub_0821A520(0xc091, 0x3536);
+        u8 *res = ScriptProc_Start(0xc091, 0x3536);
         *(u8 **)(p + 0x18) = res;
         size = 16;
         sub_082161B4(2, 0, res, 0, 0, 1, &size);
     }
-    sub_0821656C(3, 0, 0, 0, 0);
-    CpuSet(sub_0821A520(0x92b3, 0x204) + 0x14, gUnk_03004FC0, 0x100);
+    BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
+    CpuSet(ScriptProc_Start(0x92b3, 0x204) + 0x14, gUnk_03004FC0, 0x100);
     count = 0;
     max = sub_08212F24(*(s16 *)(p + 0x6f4));
     row = 0;

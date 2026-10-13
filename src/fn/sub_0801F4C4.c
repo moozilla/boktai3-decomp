@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-void sub_0822B2F8(int);
-void sub_0822B358(int);
+void Sound_PlaySong(int);
+void Sound_StopSong(int);
 void SceneObject_UpdateLowered(void);
 void sub_08068124(void *, int, void *, int, int, int);
 void SceneObject_UpdateLowering(u8 *s)
@@ -19,8 +19,8 @@ void SceneObject_UpdateLowering(u8 *s)
     }
     if (*(s16 *)(s + 0x80) < 0) {
         *(u16 *)(s + 0x80) = clear;
-        sub_0822B358(0x152);
-        sub_0822B2F8(0x153);
+        Sound_StopSong(0x152);
+        Sound_PlaySong(0x153);
         *(u16 *)(s + 0x82) = 30;
         {
             one = 1;

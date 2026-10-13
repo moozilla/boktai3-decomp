@@ -32,7 +32,7 @@ extern struct Menu *gUnk_020000FC;
 extern struct Save *gUnk_02000710;
 extern u8 gUnk_03003A50, gUnk_0203B400[];
 extern u32 gUnk_03005308;
-void *sub_0821ABA8(int, int);
+void *Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 void *Script_GetPc(void);
 int Script_GetValue(void);
@@ -57,8 +57,8 @@ int sub_080390C4(struct Menu *arg)
     u8 *item;
     u16 *cursor;
     gUnk_020000FC = p;
-    p->listener = sub_0821ABA8(101, 0);
-    p->secondListener = sub_0821ABA8(114, 0);
+    p->listener = Script_GetKeywordValue(101, 0);
+    p->secondListener = Script_GetKeywordValue(114, 0);
     p->count = 0;
     p->leftMask = 0;
     if (Script_SeekToKeyword(119)) {
@@ -434,7 +434,7 @@ int sub_080390C4(struct Menu *arg)
         if (resource) {
             asm("" : "+r"(p));
             p->delta = 0;
-            p->weights[0] = (int)sub_0821ABA8(77, 11);
+            p->weights[0] = (int)Script_GetKeywordValue(77, 11);
             if (Script_SeekToKeyword(112)) {
                 cursor = p->weights + 1;
                 for (i = 3; i >= 0; i--) {

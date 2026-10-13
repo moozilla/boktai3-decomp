@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_08217EAC(u8 *);
+void Effect_Remove(u8 *);
 
 void sub_0813C720(u8 *p)
 {
@@ -8,7 +8,7 @@ void sub_0813C720(u8 *p)
     s32 i;
 
     for (i = 3; i >= 0; i--) {
-        sub_08217EAC(q);
+        Effect_Remove(q);
         q += 0x34;
     }
 }

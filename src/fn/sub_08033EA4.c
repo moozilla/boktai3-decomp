@@ -20,9 +20,9 @@ void sub_08030BF8(void);
 void sub_08030B78(int);
 void sub_08030C84(void *);
 void sub_080311B0(int);
-void sub_0821AD08(int, int);
-void sub_0821A0C0(void *);
-void sub_082156B8(int);
+void Script_Call(int, int);
+void Task_Kill(void *);
+void Bg_ClearTilemap(int);
 int Div(int, int);
 u8 sub_08033C9C(struct Transition *);
 void sub_08033C90(struct Transition *, int);
@@ -32,14 +32,14 @@ void *sub_08227E90(void);
 void *sub_08227E9C(void);
 void Script_SetPc(void *);
 int Script_GetValue(void);
-int sub_0821ABA8(int, int);
+int Script_GetKeywordValue(int, int);
 int sub_08033EA4(struct Transition *p)
 {
     int zero = 0;
     p->state = zero;
     p->entered = zero;
     p->ticks = zero;
-    p->index = sub_0821ABA8(112, 0);
+    p->index = Script_GetKeywordValue(112, 0);
     p->parameter = zero;
     if (!Script_SeekToKeyword(115))
         goto fail;
@@ -81,11 +81,11 @@ parameters:
         } while (i <= 63);
     }
 ready: {
-    int procedure = sub_0821ABA8(101, 0);
+    int procedure = Script_GetKeywordValue(101, 0);
     zero = 0;
     p->startProcedure = procedure;
 }
-    p->endProcedure = sub_0821ABA8(99, 0);
+    p->endProcedure = Script_GetKeywordValue(99, 0);
     sub_08030C84(p->script);
     sub_08030B78(1);
     sub_080311B0(0x539C);

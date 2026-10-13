@@ -1,6 +1,6 @@
 #include "global.h"
 int sub_08165A30(void *);
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 void sub_0816D98C(void *);
 void sub_0816FF4C(void);
 void sub_08163EB8(void *, void (*)(void), int);
@@ -19,7 +19,7 @@ void sub_081700A8(u8 *p)
     int r = sub_08165A30(p);
     u8 *q, *a;
     if (r == 0) {
-        sub_0822B2F8(0xde);
+        Sound_PlaySong(0xde);
         sub_0816D98C(p);
         sub_08163EB8(p, sub_0816FF4C, 1);
         q = p + 0x4384;

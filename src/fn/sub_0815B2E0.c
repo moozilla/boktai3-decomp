@@ -25,7 +25,7 @@ void sub_0813AFEC(struct P *, s32, s32);
 void sub_0815AF14(struct P *, s32);
 void sub_081502AC(void);
 void sub_081507F4(void);
-void sub_0822B2F8(s32);
+void Sound_PlaySong(s32);
 
 void sub_0815B2E0(struct P *p, s32 v, u32 w)
 {

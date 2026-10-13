@@ -10,8 +10,8 @@ struct PeerPanel {
 };
 
 void *sub_08037DCC(int peer);
-void sub_08219EBC(void *destination, const void *source, int size);
-void sub_08033924(int window, int style);
+void Memory_Copy(void *destination, const void *source, int size);
+void TextWindow_Refresh(int window, int style);
 
 int sub_08037540(void *owner, struct PeerPanel *p, int peer)
 {
@@ -29,7 +29,7 @@ int sub_08037540(void *owner, struct PeerPanel *p, int peer)
     do {
         *destination-- = zero;
     } while (--i >= 0);
-    sub_08219EBC(name, p->name, 16);
+    Memory_Copy(name, p->name, 16);
     {
         int index = peer << 2;
         int offset = 0x4E4;
@@ -38,7 +38,7 @@ int sub_08037540(void *owner, struct PeerPanel *p, int peer)
         window += index;
         {
             int id = *(int *)window;
-            sub_08033924(id, peer + 3);
+            TextWindow_Refresh(id, peer + 3);
         }
     }
 }

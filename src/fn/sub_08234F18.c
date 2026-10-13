@@ -2,18 +2,18 @@
 struct Data {
     u32 words[8];
 };
-struct Data *sub_0821A520(u32, u32);
-void sub_082196C4(struct Data *, struct Data *);
+struct Data *ScriptProc_Start(u32, u32);
+void ResourceHeader_Relocate(struct Data *, struct Data *);
 u16 sub_0822D604(u32);
 void sub_0821983C(u8 *, struct Data *, u32, u32, u32, u32, u32, void *);
 void sub_08234F18(u8 *p)
 {
     struct Data data;
-    struct Data *source = sub_0821A520(0xcb05, 0x5d04);
+    struct Data *source = ScriptProc_Start(0xcb05, 0x5d04);
     u16 *coords;
     u32 zero;
     data = *source;
-    sub_082196C4(&data, source);
+    ResourceHeader_Relocate(&data, source);
     coords = (u16 *)(p + 0x7c);
     zero = 0;
     coords[0] = 8;

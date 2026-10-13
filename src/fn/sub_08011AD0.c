@@ -23,8 +23,8 @@ extern u32 gUnk_030052F8, gUnk_030052FC;
 int Script_SeekToKeyword(int);
 int Script_GetPc(void);
 int Script_GetValue(void);
-int sub_082151E4(void *, int);
-void sub_08215284(void *, int);
+int AnimData_Load(void *, int);
+void AnimData_SelectTiles(void *, int);
 void SceneIndicator_Initialize(void *, void *);
 int SceneIndicators_Initialize(struct Controller *m)
 {
@@ -41,12 +41,12 @@ int SceneIndicators_Initialize(struct Controller *m)
                 m->count++;
             } else
                 value = 0x4211;
-            if (!sub_082151E4(a, value))
+            if (!AnimData_Load(a, value))
                 return -1;
         }
     } else {
         for (i = 0, a = m->animations; i < 4; a++, i++)
-            if (!sub_082151E4(a, 0x4211))
+            if (!AnimData_Load(a, 0x4211))
                 return -1;
         m->count = 4;
     }
@@ -62,7 +62,7 @@ int SceneIndicators_Initialize(struct Controller *m)
                     m->count++;
                 } else
                     value = 0;
-                sub_08215284(a, a->frame + value);
+                AnimData_SelectTiles(a, a->frame + value);
             }
         }
     }

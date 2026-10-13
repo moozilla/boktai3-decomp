@@ -48,7 +48,6 @@ struct EmitterWorld {
     void *scene;
 };
 
-extern struct EmitterWorld *gUnk_02000710;
 extern u16 gUnk_08604AB4[];
 
 void EffectEmitter_ReceiveHit(struct EmitterAttack *, void *, struct EffectEmitter *);
@@ -59,25 +58,8 @@ void *sub_0800C7AC(u32, u32);
 
 /* Engine helpers. */
 s32 sub_0800AFE8(s32, u32, s32, struct EmitterVec *, void *, s32, s32);
-s32 Script_SeekToKeyword(u32);
-s32 Script_GetValue(void);
 void *sub_0822C034(void *);
-void sub_0821FEB4(struct SceneCollider *, u32, u32, u32, u32, struct SceneExtent *,
-                  struct SceneExtent *);
-void sub_0821FF84(struct SceneCollider *,
-                  void (*)(struct EmitterAttack *, void *, struct EffectEmitter *),
-                  struct EffectEmitter *);
-void sub_0821FE40(struct SceneCollider *);
-void sub_0821FE6C(struct SceneCollider *);
-void sub_082151E4(void *, u32);
-void sub_082144A4(void *, void *, u32);
-void sub_08214514(void *);
-void sub_08013440(void *);
-void sub_08013424(void *);
 void sub_08013684(void *);
 void Shadow_Initialize(void *, void *, u32);
-void *sub_08219FBC(u32, u32);
-void sub_0821A04C(void *, void *, void *);
-void sub_0821A0C0(void *);
 
 #endif

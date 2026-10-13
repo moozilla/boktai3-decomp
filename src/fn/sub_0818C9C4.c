@@ -26,7 +26,7 @@ struct A {
     u8 b1de;
     u8 b1df;
 };
-void sub_0822B3BC(s32);
+void Sound_PlaySongChecked(s32);
 void sub_0818CA04(void);
 void sub_0818C9C4(struct A *p)
 {
@@ -36,5 +36,5 @@ void sub_0818C9C4(struct A *p)
     p->b1de = 0xf8;
     p->b1df = 0x10;
     p->fn = sub_0818CA04;
-    sub_0822B3BC(0x16d);
+    Sound_PlaySongChecked(0x16d);
 }

@@ -12,7 +12,7 @@ extern u32 *gUnk_030053F8;
 void sub_08224FA4(void);
 void sub_0822502C(void);
 void sub_0821B078(void);
-u32 sub_0821AD08(u32, u32);
+u32 Script_Call(u32, u32);
 void sub_0821B004(void);
 s32 sub_08224F2C(void);
 void sub_0821A0F8(u32);
@@ -53,7 +53,7 @@ update: {
             procedure = gUnk_030039F0;
             if (!procedure)
                 goto no_procedure;
-            sub_0821AD08(procedure, 0);
+            Script_Call(procedure, 0);
             if ((u32)procedure << 16)
                 goto ran_procedure;
         no_procedure:

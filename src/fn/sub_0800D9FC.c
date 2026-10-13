@@ -1,8 +1,8 @@
 #include "global.h"
 extern s32 gUnk_03004DA0;
 s32 Div(s32, s32);
-void sub_0821AD08(void *, u32);
-void sub_0821A0C0(void *);
+void Script_Call(void *, u32);
+void Task_Kill(void *);
 struct S {
     u8 f[0x40];
     void *t;
@@ -25,7 +25,7 @@ void sub_0800D9FC(struct S *s)
         s->b = k;
         s->z = k;
         if (s->t != 0)
-            sub_0821AD08(s->t, 0);
-        sub_0821A0C0(s);
+            Script_Call(s->t, 0);
+        Task_Kill(s);
     }
 }

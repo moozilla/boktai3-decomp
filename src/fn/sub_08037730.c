@@ -6,16 +6,16 @@ struct PeerMenu {
     u8 pad24[0x4c8];
     int window;
 };
-void sub_08033924(int, int);
-void sub_0822B2F8(int);
+void TextWindow_Refresh(int, int);
+void Sound_PlaySong(int);
 void sub_08036B14(void);
 extern u16 gUnk_03005260[];
 void sub_08037730(struct PeerMenu *p)
 {
     if (p->entered) {
         p->entered = 0;
-        sub_08033924(p->window, 2);
-        sub_0822B2F8(402);
+        TextWindow_Refresh(p->window, 2);
+        Sound_PlaySong(402);
     }
     if (p->timer > 35) {
         if (gUnk_03005260[1] & 3) {

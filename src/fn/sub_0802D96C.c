@@ -11,7 +11,7 @@ void sub_0802D914(struct Object *);
 void sub_08225938(void *);
 void sub_08042558(void *);
 void sub_0802D85C(struct Object *);
-void sub_08219D38(void *);
+void Heap_Free(void *);
 int sub_0802D96C(struct Object *p)
 {
     int result;
@@ -22,7 +22,7 @@ int sub_0802D96C(struct Object *p)
         sub_08042558(p->drawable);
         sub_0802D85C(p);
         p->active = 0;
-        sub_08219D38(p);
+        Heap_Free(p);
         result = 0;
     } else
         result = -1;

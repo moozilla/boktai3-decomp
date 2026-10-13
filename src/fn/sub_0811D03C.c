@@ -4,19 +4,19 @@ struct S {
     u16 b;
     u16 a;
 };
-void sub_0822B358(u32);
-void sub_0822B2F8(u32);
+void Sound_StopSong(u32);
+void Sound_PlaySong(u32);
 void sub_0811D03C(struct S *s)
 {
     u16 *a = &s->a;
     u16 *b = &s->b;
     if (*a != *b) {
-        sub_0822B358(0x87);
-        sub_0822B358(0x88);
-        sub_0822B358(0x89);
-        sub_0822B358(0x8a);
-        sub_0822B358(0x8b);
-        sub_0822B2F8(*b);
+        Sound_StopSong(0x87);
+        Sound_StopSong(0x88);
+        Sound_StopSong(0x89);
+        Sound_StopSong(0x8a);
+        Sound_StopSong(0x8b);
+        Sound_PlaySong(*b);
         *a = *b;
     }
 }

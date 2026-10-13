@@ -29,7 +29,7 @@ struct Engine {
 };
 extern struct Engine *gUnk_02000484;
 extern u8 gUnk_020000EC;
-void sub_08219DD8(void *, int);
+void Memory_Clear(void *, int);
 #define gRfuLinkStatus   gUnk_03006A80
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
@@ -44,7 +44,7 @@ extern u32 gUnk_020000F0, gUnk_0300546C, gUnk_03005408;
 void sub_0822C1C8(void);
 void sub_0822C1F0(void);
 void sub_08219F94(void *);
-void sub_08219D38(void *);
+void Heap_Free(void *);
 int sub_082238F0(int);
 void sub_080364C0(struct Engine *);
 void sub_08036538(struct Engine *);
@@ -86,7 +86,7 @@ int sub_080367B4(struct Engine *p)
         gUnk_0300546C = 0;
         gUnk_02000484 = 0;
         sub_08219F94(p);
-        sub_08219D38(p);
+        Heap_Free(p);
         sub_0822C1F0();
     } else {
         if ((u16)(p->operation - 9) <= 17)

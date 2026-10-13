@@ -1,6 +1,6 @@
 #include "global.h"
 extern u32 gUnk_02000064;
-void sub_08214514(u8 *);
+void Sprite_Remove(u8 *);
 u32 sub_08015074(u8 *p)
 {
     s32 i = 0;
@@ -13,7 +13,7 @@ u32 sub_08015074(u8 *p)
             u8 *a = e + 0x2c;
             do {
                 if (a[j] != 0)
-                    sub_08214514(e + 0x70 + j * 0x2c);
+                    Sprite_Remove(e + 0x70 + j * 0x2c);
                 j++;
             } while (j <= 5);
         }

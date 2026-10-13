@@ -1,17 +1,17 @@
 #include "global.h"
 
-void sub_082195E0(u8 *);
-void sub_08217EAC(u8 *);
+void Anim_Remove(u8 *);
+void Effect_Remove(u8 *);
 
 s32 sub_0815FFB8(u8 *p)
 {
     u8 *q;
     s32 i;
-    sub_082195E0(p + 0x3c);
+    Anim_Remove(p + 0x3c);
     q = p + 0xfc;
     i = 15;
     do {
-        sub_08217EAC(q);
+        Effect_Remove(q);
         q += 0x3c;
         i--;
     } while (i >= 0);

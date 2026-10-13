@@ -7,7 +7,7 @@ struct Object {
     u8 effect[1];
 };
 void Shadow_Initialize(void *, int, int, int);
-void sub_08013424(void *);
+void ActorShadow_Enable(void *);
 void ScaledShadow_Initialize(void *, int, int, int, int, int, int, int, int, int, int);
 void sub_08013B98(void *, int, int);
 void sub_0801370C(void *);
@@ -21,7 +21,7 @@ int sub_0802D7E0(struct Object *p, int resource, int kind, int param, int value)
     if (kind == 1) {
         void *e = p->effect;
         Shadow_Initialize(e, resource, 1, value);
-        sub_08013424(e);
+        ActorShadow_Enable(e);
     } else if (kind == 2) {
         void *e = p->effect;
         ScaledShadow_Initialize(e, resource, value, value, value, value, 2000, 400, 2, 4, 1);

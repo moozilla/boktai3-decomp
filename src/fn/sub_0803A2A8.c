@@ -22,7 +22,7 @@ struct Item {
 };
 extern const u16 gUnk_0824DE7C[];
 extern const u8 gUnk_0824DE94[];
-void sub_082144A4(void *, void *, int);
+void Sprite_Init(void *, void *, int);
 void sub_0821983C(void *, void *, int, int, int, int, int, const void *);
 void sub_0803A2A8(void *owner, struct Item *p, int index)
 {
@@ -38,7 +38,7 @@ void sub_0803A2A8(void *owner, struct Item *p, int index)
     p->count = zero;
     p->unused = zero;
     sprite = &p->sprite;
-    sub_082144A4(sprite, (u8 *)owner + 0x20, 0x10011);
+    Sprite_Init(sprite, (u8 *)owner + 0x20, 0x10011);
     {
         int clear = 0;
         u8 *visible;

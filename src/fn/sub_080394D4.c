@@ -7,9 +7,9 @@ struct Task {
 void sub_082279A8(int, int, int, int, int, int, int);
 void sub_08036C54(void);
 void *sub_08037DC0(void);
-void sub_0821A0C0(void *);
+void Task_Kill(void *);
 int sub_08034084(void);
-void sub_0821AD08(void *, int);
+void Script_Call(void *, int);
 int sub_080394D4(struct Task *p)
 {
     switch (p->state) {
@@ -19,7 +19,7 @@ int sub_080394D4(struct Task *p)
             {
                 void *q = sub_08037DC0();
                 if (q)
-                    sub_0821A0C0(q);
+                    Task_Kill(q);
             }
             p->state++;
             break;
@@ -29,8 +29,8 @@ int sub_080394D4(struct Task *p)
             break;
         case 2:
             if (p->listener)
-                sub_0821AD08(p->listener, 0);
-            sub_0821A0C0(p);
+                Script_Call(p->listener, 0);
+            Task_Kill(p);
             break;
     }
     return 0;

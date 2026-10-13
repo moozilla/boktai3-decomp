@@ -3,14 +3,14 @@
 // fuzzy: 60.6%
 // 31 differing instruction runs; first diff at +0x4 (adds r7, r0, #0 vs adds r6, r0, #0)
 void sub_082164AC(u32, u32, u32);
-void sub_0821656C(u32, u32, u32, u32, u32);
+void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void sub_081BC664(u8 *);
-void sub_08220D78(u8 *, u8 *, u32, u32, u32);
-void sub_0821980C(u8 *, u8 *, u32, u32);
+void Anim_SetKeyframes(u8 *, u8 *, u32, u32, u32);
+void Anim_LoadKeyframe(u8 *, u8 *, u32, u32);
 void sub_081BC3B4(u8 *);
 void sub_081BC5F0(u8 *);
 void sub_081BC468(u8 *);
-void sub_08215284(u8 *, u32);
+void AnimData_SelectTiles(u8 *, u32);
 void sub_08030DBC(u32);
 void sub_081BCCD4(void);
 void sub_081BC694(u8 *, void (*)(void));
@@ -25,14 +25,14 @@ void sub_081BC820(u8 *s)
     u32 *p, *q, *initial;
     s32 i, j;
     sub_082164AC(0, *(u32 *)(s + 0x8E0), 4);
-    sub_0821656C(0, 0, 0, 0, zero = 0);
+    BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero = 0);
     sub_081BC664(s);
     value = *(u32 *)(s + 0x60);
     value &= (mask = ~1);
     *(u32 *)(s + 0x60) = value;
-    sub_08220D78(s + 0x58, (resource = s + 0x18), 5, 1, zero);
+    Anim_SetKeyframes(s + 0x58, (resource = s + 0x18), 5, 1, zero);
     *(u32 *)(s + 0x240) &= mask;
-    sub_0821980C(s + 0x238, resource, 0x12, 1);
+    Anim_LoadKeyframe(s + 0x238, resource, 0x12, 1);
     *(u16 *)(s + 0x8EE) = zero;
     resource += 0x48;
     initial = (u32 *)(s + 0x2A0);
@@ -59,7 +59,7 @@ void sub_081BC820(u8 *s)
     *(u16 *)(s + 0x90A) = latezero;
     ((struct Word8 *)(s + 0x778))->flags &= (mask3 = ~1);
     *(u32 *)(s + 0x898) &= mask3;
-    sub_08215284(s + 0x8C4, 0x1B4);
+    AnimData_SelectTiles(s + 0x8C4, 0x1B4);
     ((struct Word8 *)(s + 0x7D8))->flags &= mask3;
     ((struct Word8 *)(s + 0x838))->flags &= mask3;
     sub_08030DBC(4);

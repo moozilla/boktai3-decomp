@@ -5,7 +5,7 @@
 extern u8 gUnk_0203B400[];
 extern s32 gUnk_03005308;
 void sub_0806A160(u8 *, u32, void *, u32, u32, u32, u32, u32);
-void sub_0822B2F8(u32);
+void Sound_PlaySong(u32);
 struct VAB {
     u32 x : 16;
     u32 y : 16;
@@ -31,7 +31,7 @@ void sub_080AB294(u8 *p)
     sub_0806A160(p, (rnd(tbl, idx) & 1) + 1, &v, 0x80, 4, 20, 2, 1);
     sub_0806A160(p, (rnd(tbl, idx) & 3) + 1, &v, 0xc4, 4, 20, 2, 1);
     sub_0806A160(p, (rnd(tbl, idx) & 1) + 1, &v, 0xf0, 4, 20, 2, 1);
-    sub_0822B2F8(0xe5);
+    Sound_PlaySong(0xe5);
 }
 #else
 INCLUDE_ASM("asm/nonmatching", sub_080AB294);

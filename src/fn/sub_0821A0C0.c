@@ -5,7 +5,7 @@ struct Task {
     u16 f12;
 };
 
-s32 sub_0821A0C0(struct Task *t)
+s32 Task_Kill(struct Task *t)
 {
     t->f12 |= 1;
     return 0;

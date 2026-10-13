@@ -28,10 +28,10 @@ struct Manager {
     void *animation;
 };
 extern struct Manager *gUnk_0200046C;
-void sub_08220C8C(void *, void *, u32, u32, u32);
-void sub_0822B2F8(u32);
-void sub_0821FF24(void *, void *, u32);
-void sub_0821FE40(void *);
+void Anim_SetSequence(void *, void *, u32, u32, u32);
+void Sound_PlaySong(u32);
+void Collider_SetPosition(void *, void *, u32);
+void Collider_Refresh(void *);
 struct PackedVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
@@ -68,10 +68,10 @@ void FallingObject_UpdateBounceAway(struct Object *object)
             object->position.y = object->ground;
     }
     if (object->collider)
-        sub_0821FF24(object->collider, &object->position, 0);
+        Collider_SetPosition(object->collider, &object->position, 0);
     if (object->attack) {
-        sub_0821FF24(object->attack, &object->position, 0);
-        sub_0821FE40(object->attack);
+        Collider_SetPosition(object->attack, &object->position, 0);
+        Collider_Refresh(object->attack);
     }
     if ((object->timer & 7) < 2)
         object->sprite.flags |= 1;

@@ -14,7 +14,7 @@ struct P {
     u32 w68;
     u8 b6c[1];
 };
-void sub_08219DD8(u8 *, u32);
+void Memory_Clear(u8 *, u32);
 u32 sub_0803D9D8(struct P *p)
 {
     if (p->w14 >= p->w34) {
@@ -22,12 +22,12 @@ u32 sub_0803D9D8(struct P *p)
             p->w68 = 8;
             p->w44 = 0;
             p->b64 = 1;
-            sub_08219DD8(p->b6c, 0x100);
+            Memory_Clear(p->b6c, 0x100);
         } else {
             p->w68 = 9;
             p->w44 = 0;
             p->b64 = 1;
-            sub_08219DD8(p->b6c, 0x100);
+            Memory_Clear(p->b6c, 0x100);
         }
         return 1;
     }

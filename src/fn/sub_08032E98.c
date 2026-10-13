@@ -6,10 +6,10 @@ struct Vm {
     u32 count;
     u8 selected[32];
 };
-void sub_0821AD08(u32, int);
+void Script_Call(u32, int);
 void sub_08032E98(struct Vm *p)
 {
     u32 i = 0;
     for (; i < p->count; i++)
-        sub_0821AD08(p->choices[p->selected[i]], 0);
+        Script_Call(p->choices[p->selected[i]], 0);
 }

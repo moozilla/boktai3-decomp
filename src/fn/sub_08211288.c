@@ -5,8 +5,8 @@ struct Object {
 struct Entry {
     u8 data[0x60];
 };
-void sub_08214514(void *);
-void sub_082195E0(void *);
+void Sprite_Remove(void *);
+void Anim_Remove(void *);
 void sub_08211288(u8 *s)
 {
     struct Object *obj = (struct Object *)(s + 0x65c);
@@ -14,7 +14,7 @@ void sub_08211288(u8 *s)
     void *a, *b;
     int i = 26;
     do {
-        sub_08214514(obj);
+        Sprite_Remove(obj);
         obj++;
         i--;
     } while (i >= 0);
@@ -23,12 +23,12 @@ void sub_08211288(u8 *s)
     p = (struct Entry *)(s + 0x1c4);
     i = 3;
     do {
-        sub_082195E0(p);
+        Anim_Remove(p);
         p++;
         i--;
     } while (i >= 0);
-    sub_082195E0(s + 0x164);
-    sub_082195E0(s + 0x104);
-    sub_082195E0(a);
-    sub_082195E0(b);
+    Anim_Remove(s + 0x164);
+    Anim_Remove(s + 0x104);
+    Anim_Remove(a);
+    Anim_Remove(b);
 }

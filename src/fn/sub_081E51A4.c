@@ -18,7 +18,7 @@ struct G {
     u8 e;
 };
 s32 Script_GetValue(void);
-s32 sub_0821ABA8(s32, s32);
+s32 Script_GetKeywordValue(s32, s32);
 void sub_081E51A4(void)
 {
     struct G *g = (struct G *)gUnk_020003C8;
@@ -40,5 +40,5 @@ void sub_081E51A4(void)
         u8 one = 1;
         g->c |= one;
     }
-    *(u32 *)((u8 *)g + 0xf54) = sub_0821ABA8(0x70, 0);
+    *(u32 *)((u8 *)g + 0xf54) = Script_GetKeywordValue(0x70, 0);
 }

@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0802DCD8(void *, s32, s32, s32, s32);
+void Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
 void sub_081CA900(void *unused, u8 *p, s32 n)
 {
     if (p[9]) {
@@ -89,7 +89,7 @@ void sub_081CA900(void *unused, u8 *p, s32 n)
                 r = 0;
                 break;
         }
-        sub_0802DCD8(p, r, 2, 0, 4);
+        Actor_PlayAnimationEntry(p, r, 2, 0, 4);
     }
     if (n > 15)
         p[7] = 1;

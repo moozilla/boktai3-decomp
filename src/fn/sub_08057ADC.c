@@ -7,14 +7,14 @@ struct S {
     u8 f[0x564];
     struct E e[32];
 };
-void sub_08217EAC(struct E *);
+void Effect_Remove(struct E *);
 
 void sub_08057ADC(struct S *p)
 {
     s32 i;
     struct E *e = p->e;
     for (i = 31; i >= 0; i--) {
-        sub_08217EAC(e);
+        Effect_Remove(e);
         e++;
     }
 }

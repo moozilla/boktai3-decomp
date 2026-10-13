@@ -33,7 +33,7 @@ static inline void setFacing(ActorAnimation *p, int angle)
     p->facing8 = value;
 }
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
-void sub_0822B3BC(int);
+void Sound_PlaySongChecked(int);
 ActorAnimation *sub_0802140C(int);
 void sub_080224E4(u32 *position)
 {
@@ -61,7 +61,7 @@ void sub_080224E4(u32 *position)
         }
         SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, one,
                                               one, 6);
-        sub_0822B3BC(839);
-        sub_0822B3BC(1335);
+        Sound_PlaySongChecked(839);
+        Sound_PlaySongChecked(1335);
     }
 }

@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0822B358(u32);
+void Sound_StopSong(u32);
 struct S {
     u8 p0[0x90];
     u32 w90;
@@ -28,5 +28,5 @@ void sub_081F7998(struct S *p)
     p->bae = v;
     p->wc4 = z;
     p->bb0 = 1;
-    sub_0822B358(0x570);
+    Sound_StopSong(0x570);
 }

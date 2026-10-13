@@ -46,7 +46,7 @@ void sub_080297FC(void *, int, int, int);
 void sub_08029E1C(void *);
 int sub_08029E2C(void *);
 void sub_08029AA8(void *);
-void sub_0822B3BC(int);
+void Sound_PlaySongChecked(int);
 void sub_0802A9C0(ActorAnimation *p)
 {
     if (p->changed) {

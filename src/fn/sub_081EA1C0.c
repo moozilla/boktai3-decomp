@@ -64,11 +64,11 @@ struct G {
     u32 variant;
 };
 extern u8 gUnk_03005430[];
-void sub_08215284(void *, s32);
-void sub_08013440(void *);
+void AnimData_SelectTiles(void *, s32);
+void ActorShadow_Disable(void *);
 s32 Script_GetValue(void);
 s32 Script_SeekToKeyword(s32);
-s32 sub_0821ABA8(s32, s32);
+s32 Script_GetKeywordValue(s32, s32);
 #define B(o) (*(u8 *)((u8 *)g + (o)))
 #define H(o) (*(u16 *)((u8 *)g + (o)))
 #define W(o) (*(u32 *)((u8 *)g + (o)))
@@ -93,12 +93,12 @@ void Actor_ConfigureFromScript(void)
     if (!g)
         g = (struct G *)sub_081EA730(0xbb34, 0);
     obj = (struct Obj *)((u8 *)g + 0xddc);
-    sub_08215284((u8 *)g + 0xe08, 343);
+    AnimData_SelectTiles((u8 *)g + 0xe08, 343);
     g->obj.priority = 0;
     g->last = 0;
     g->resource = Script_GetValue();
-    g->next = sub_0821ABA8(0x72, 0);
-    g->gap6a = sub_0821ABA8(0x41, 0);
+    g->next = Script_GetKeywordValue(0x72, 0);
+    g->gap6a = Script_GetKeywordValue(0x41, 0);
     if (Script_SeekToKeyword(0x70)) {
         {
             s32 v = Script_GetValue();
@@ -129,12 +129,12 @@ void Actor_ConfigureFromScript(void)
     }
     if (Script_SeekToKeyword(0x63))
         W(0xf50) = Script_GetValue();
-    g->gap65 = sub_0821ABA8(0x73, 0);
+    g->gap65 = Script_GetKeywordValue(0x73, 0);
     if (gUnk_03005430[14] != 5 && gUnk_03005430[14] != 0 && gUnk_03005430[14] != 4)
         g->p6a[1] = 1;
     else
         g->p6a[1] = 0;
-    sub_08013440((u8 *)g + 0xe34);
+    ActorShadow_Disable((u8 *)g + 0xe34);
     *(u32 *)((u8 *)g + 0xddc) |= 1;
     switch (g->gap65) {
         case 0:
