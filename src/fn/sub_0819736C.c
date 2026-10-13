@@ -15,6 +15,11 @@ void sub_0819728C(void *);
 void sub_08225F88(void *);
 void sub_082261B8(s32, s32);
 
+static inline u32 Tst2(u32 mask, u32 *a, u32 *b)
+{
+    return (*a | *b) & mask;
+}
+
 static inline u32 Tst32(u32 mask, u32 *p)
 {
     return *p & mask;
@@ -24,8 +29,7 @@ s32 sub_0819736C(u8 *t)
 {
     sub_08197324(t);
     sub_08197260(t);
-    u32 m = 0x400;
-    if (((gUnk_030053F4 | gUnk_030053F0) & m) || Tst32(4, &gUnk_02000560))
+    if (Tst2(0x400, &gUnk_030053F4, &gUnk_030053F0) || Tst32(4, &gUnk_02000560))
         t[0x724c] = 0;
     if (t[0x724c]) {
         sub_0821FE40(t + 0x5dfc);
