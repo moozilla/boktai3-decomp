@@ -1,0 +1,28 @@
+#ifndef NUMERIC_OVERLAY_H
+#define NUMERIC_OVERLAY_H
+#include "global.h"
+#include "engine.h"
+#include "status_screen.h"
+
+// Tentative: a lightweight sibling of the status screen: it loads the same background map and
+// palette, draws the same counter display (sub_0800F4EC mirrors sub_0800E5B8) but has no fades
+// or scanline transition. Its task object is 0x2C bytes.
+struct NumericOverlay {
+    u8 task[24];
+    u16 id;
+    u8 flags, bg;
+    u16 mapId, paletteId;
+    u16 *buffer; // working palette (gUnk_03005160)
+    u16 *source; // palette resource
+    u16 dirty;   // bit mask of displays to redraw (set to 15 by sub_0800F6B0)
+    u16 pad2A;
+};
+
+extern struct NumericOverlay *gUnk_02000048; // the live overlay, or NULL
+
+u16 *sub_0800F4C4(u32 bg, u32 x, s32 y); // same as sub_0800E3E0
+void sub_0800F4EC(struct NumericOverlay *);
+void sub_0800F6B0(struct NumericOverlay *);
+s32 sub_0800F6F8(struct NumericOverlay *, u16 id);
+
+#endif
