@@ -163,8 +163,8 @@ static inline void addPositionAt(struct GroupVec *d, struct GroupVec *dst, struc
     dst->z += src->z;
 }
 
-#ifdef NONMATCHING_X
-// fuzzy: 81.6%
+#ifdef NONMATCHING
+// fuzzy: 81.6% (loop counter lives in a register, random table not hoisted into one)
 int sub_0800FC28(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
 {
     struct GroupVec origin;
@@ -219,7 +219,8 @@ int sub_0800FC28(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0800FC28);
 #endif
-#ifdef NONMATCHING_X
+#ifdef NONMATCHING
+// fuzzy: 83.3% (same as sub_0800FC28, state 0)
 int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
 {
     struct GroupVec origin;
@@ -275,40 +276,7 @@ int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
 INCLUDE_ASM("asm/nonmatching", sub_0800FE98);
 #endif
 INCLUDE_ASM("asm/nonmatching", sub_0801010C);
-#ifdef NONMATCHING
-int sub_08010298(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
-{
-    struct GroupVec position;
-    int radius;
-    int i;
-    struct GroupPiece *p;
-    const u16 *table;
-    struct GroupActor *actor;
-    m->actorId = cmd->originX;
-    actor = sub_08225984(m->actorId);
-    if (actor == 0)
-        return -1;
-    position = actor->position;
-    radius = (s16)cmd->originY;
-    m->timer = 0;
-    p = m->pieces;
-    for (i = 15; i >= 0; i--, p++) {
-        table = gUnk_0203B400;
-        p->state = 3;
-        p->active = 1;
-        p->timer = 0;
-        p->target = position;
-        p->direction = Math_Atan2(p->target.x - p->position.x, p->target.z - p->position.z);
-        p->direction += (randomWith(table) & 31) - 16;
-        p->duration = radius;
-        p->speed = (randomWith(table) & 7) + 7;
-    }
-    m->active = 1;
-    return 0;
-}
-#else
 INCLUDE_ASM("asm/nonmatching", sub_08010298);
-#endif
 
 static inline int count(struct GroupQueue *q)
 {
@@ -374,19 +342,6 @@ static inline struct GroupVec *addPositionN(struct GroupVec *d, struct GroupVec 
     return dst;
 }
 
-static inline void addVec(struct GroupVec *d, struct GroupVec *s)
-{
-    struct GroupVec *dst = d;
-    struct GroupVec *src = s;
-    {
-        u32 value = (u16)s->x;
-        value = value + (u16)d->x;
-        d->x = value;
-    }
-    dst->y += src->y;
-    dst->z += src->z;
-}
-
 // MATCHING_CONCESSION: register-pinning
 
 void BoardPiece_Launch(struct GroupObjects *m, struct GroupPiece *p, int delay)
@@ -406,35 +361,29 @@ void BoardPiece_Launch(struct GroupObjects *m, struct GroupPiece *p, int delay)
 }
 
 #ifdef NONMATCHING
+// fuzzy: 93.0% (register choice for random table/address/mask in the heading roll)
 void sub_08010514(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
-    struct GroupVec *position;
+    struct GroupVec *moved;
+    struct GroupVec *origin;
     const u16 *table;
     if (p->active) {
         p->active = 0;
         p->heading = p->direction =
             Math_Atan2(p->target.x - p->position.x, p->target.z - p->position.z);
         table = gUnk_0203B400;
-        if (randomByte(table) <= 0x7F) {
-            int r = randomWith(table) & 0x3F;
-            p->heading = p->heading + 0x40 - r;
-        } else {
-            int r = randomWith(table) & 0x3F;
-            p->heading = p->heading + 0x40 + r;
-        }
+        if (randomByte(table) <= 0x7F)
+            p->heading = p->heading + (0x40 - (randomWith(table) & 0x3F));
+        else
+            p->heading = p->heading + (0x40 + (randomWith(table) & 0x3F));
         p->speed = (randomValue() & 3) + 4;
     }
     if (p->speed != 0) {
         polar(&delta, p->heading, p->duration);
-        position = &p->position;
-        {
-            struct GroupVec *src = &delta;
-            p->position.x += delta.x;
-            position->y += src->y;
-            position->z += src->z;
-        }
-        p->direction = Math_Atan2(m->origin.x - p->position.x, m->origin.z - position->z);
+        moved = addPositionN(&p->position, &delta);
+        origin = &m->origin;
+        p->direction = Math_Atan2(origin->x - p->position.x, origin->z - moved->z);
         p->speed--;
     }
     sub_0800FA5C(m, p, 0);
@@ -600,7 +549,7 @@ void sub_08010A58(struct GroupObjects *m, struct GroupPiece *p, int index)
 }
 
 #ifdef NONMATCHING
-// fuzzy: 92.3% (register allocation of delta pointer/temps in vector add)
+// fuzzy: 98.4% (index register of the first Atan2 argument)
 void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
