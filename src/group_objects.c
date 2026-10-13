@@ -275,7 +275,40 @@ int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
 INCLUDE_ASM("asm/nonmatching", sub_0800FE98);
 #endif
 INCLUDE_ASM("asm/nonmatching", sub_0801010C);
+#ifdef NONMATCHING
+int sub_08010298(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
+{
+    struct GroupVec position;
+    int radius;
+    int i;
+    struct GroupPiece *p;
+    const u16 *table;
+    struct GroupActor *actor;
+    m->actorId = cmd->originX;
+    actor = sub_08225984(m->actorId);
+    if (actor == 0)
+        return -1;
+    position = actor->position;
+    radius = (s16)cmd->originY;
+    m->timer = 0;
+    p = m->pieces;
+    for (i = 15; i >= 0; i--, p++) {
+        table = gUnk_0203B400;
+        p->state = 3;
+        p->active = 1;
+        p->timer = 0;
+        p->target = position;
+        p->direction = Math_Atan2(p->target.x - p->position.x, p->target.z - p->position.z);
+        p->direction += (randomWith(table) & 31) - 16;
+        p->duration = radius;
+        p->speed = (randomWith(table) & 7) + 7;
+    }
+    m->active = 1;
+    return 0;
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_08010298);
+#endif
 
 static inline int count(struct GroupQueue *q)
 {
@@ -371,9 +404,148 @@ void BoardPiece_Launch(struct GroupObjects *m, struct GroupPiece *p, int delay)
     p->timer++;
 }
 
+#ifdef NONMATCHING
+void sub_08010514(struct GroupObjects *m, struct GroupPiece *p, int index)
+{
+    struct GroupVec delta;
+    struct GroupVec *position;
+    const u16 *table;
+    if (p->active) {
+        p->active = 0;
+        p->heading = p->direction =
+            Math_Atan2(p->target.x - p->position.x, p->target.z - p->position.z);
+        table = gUnk_0203B400;
+        if (randomByte(table) <= 0x7F) {
+            int r = randomWith(table) & 0x3F;
+            p->heading = p->heading + 0x40 - r;
+        } else {
+            int r = randomWith(table) & 0x3F;
+            p->heading = p->heading + 0x40 + r;
+        }
+        p->speed = (randomValue() & 3) + 4;
+    }
+    if (p->speed != 0) {
+        polar(&delta, p->heading, p->duration);
+        position = &p->position;
+        {
+            struct GroupVec *src = &delta;
+            p->position.x += delta.x;
+            position->y += src->y;
+            position->z += src->z;
+        }
+        p->direction = Math_Atan2(m->origin.x - p->position.x, m->origin.z - position->z);
+        p->speed--;
+    }
+    sub_0800FA5C(m, p, 0);
+    if (p->timer > 0x5F) {
+        u32 t = 1;
+        p->state = t;
+        p->active = 1;
+        p->timer = 0;
+    }
+    p->timer++;
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_08010514);
+#endif
+#ifdef NONMATCHING
+void sub_0801068C(struct GroupObjects *m, struct GroupPiece *p, int index)
+{
+    struct GroupVec delta;
+    struct GroupVec *position;
+    int dx, dz;
+    if (p->active) {
+        const u16 *table;
+        struct GroupVec *current;
+        struct GroupVec *origin;
+        p->active = 0;
+        current = &p->position;
+        origin = &m->origin;
+        p->direction = Math_Atan2(origin->x - p->position.x, origin->z - current->z);
+        p->heading = Math_Atan2(p->target.x - p->position.x, p->target.z - current->z);
+        table = gUnk_0203B400;
+        p->heading += (randomWith(table) & 31) - 16;
+        p->speed = (randomWith(table) & 15) + 16;
+    }
+    position = &p->position;
+    dx = p->target.x - p->position.x;
+    dz = p->target.z - position->z;
+    if (dx * dx + dz * dz <= 0x9C3F) {
+        u32 t = 2;
+        p->state = t;
+        p->active = 1;
+        p->timer = 0;
+    } else {
+        if (p->speed == 0) {
+            const u16 *table;
+            p->heading = Math_Atan2(dx, dz);
+            table = gUnk_0203B400;
+            p->heading += (randomWith(table) & 31) - 16;
+            p->speed = (randomWith(table) & 31) + 32;
+        } else
+            p->speed--;
+        polar(&delta, p->heading, p->duration);
+        addPositionN(&p->position, &delta);
+        {
+            struct GroupVec *origin = &m->origin;
+            p->direction = Math_Atan2(origin->x - p->position.x, origin->z - p->position.z);
+        }
+        sub_0800FA5C(m, p, 0);
+        p->timer++;
+    }
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_0801068C);
+#endif
+#ifdef NONMATCHING
+void sub_08010860(struct GroupObjects *m, struct GroupPiece *p, int index)
+{
+    struct GroupVec delta;
+    struct GroupVec *position;
+    int dx, dz;
+    if (p->active) {
+        const u16 *table;
+        struct GroupVec *current;
+        struct GroupVec *origin;
+        p->active = 0;
+        current = &p->position;
+        origin = &m->origin;
+        p->direction = Math_Atan2(origin->x - p->position.x, origin->z - current->z);
+        p->heading = Math_Atan2(p->target.x - p->position.x, p->target.z - current->z);
+        table = gUnk_0203B400;
+        p->heading += (randomWith(table) & 31) - 16;
+        p->speed = (randomWith(table) & 15) + 16;
+    }
+    position = &p->position;
+    dx = p->target.x - p->position.x;
+    dz = p->target.z - position->z;
+    if (dx * dx + dz * dz <= 0x9C3F) {
+        u32 t = 8;
+        p->state = t;
+        p->active = 1;
+        p->timer = 0;
+    } else {
+        if (p->speed == 0) {
+            const u16 *table;
+            p->heading = Math_Atan2(dx, dz);
+            table = gUnk_0203B400;
+            p->heading += (randomWith(table) & 31) - 16;
+            p->speed = (randomWith(table) & 31) + 32;
+        } else
+            p->speed--;
+        polar(&delta, p->heading, p->duration);
+        addPositionN(&p->position, &delta);
+        {
+            struct GroupVec *origin = &m->origin;
+            p->direction = Math_Atan2(origin->x - p->position.x, origin->z - p->position.z);
+        }
+        sub_0800FA5C(m, p, 0);
+        p->timer++;
+    }
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_08010860);
+#endif
 
 void sub_08010A34(struct GroupObjects *m, struct GroupPiece *p)
 {
@@ -384,8 +556,6 @@ void sub_08010A34(struct GroupObjects *m, struct GroupPiece *p)
     }
 }
 
-#ifdef NONMATCHING
-// fuzzy: 92.6% (delta add uses r6-relative x and r3 temps; zero/4 store order)
 void sub_08010A58(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
@@ -417,9 +587,10 @@ void sub_08010A58(struct GroupObjects *m, struct GroupPiece *p, int index)
     dx = p->target.x - p->position.x;
     dz = target->z - position->z;
     if (dx * dx + dz * dz <= 0xFFF) {
-        p->timer = 0;
-        p->state = 4;
+        u32 t = 4;
+        p->state = t;
         p->active = 1;
+        p->timer = 0;
     } else {
         polar(&delta, p->direction, p->duration);
         {
@@ -432,9 +603,6 @@ void sub_08010A58(struct GroupObjects *m, struct GroupPiece *p, int index)
         p->timer++;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08010A58);
-#endif
 
 #ifdef NONMATCHING
 // fuzzy: 92.3% (register allocation of delta pointer/temps in vector add)
@@ -494,8 +662,6 @@ void sub_08010D84(struct GroupObjects *m, struct GroupPiece *p, int delay)
     }
     p->timer++;
 }
-#ifdef NONMATCHING
-// fuzzy: 88.8% (register allocation in delta add and distance setup)
 void sub_08010E44(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
@@ -514,9 +680,10 @@ void sub_08010E44(struct GroupObjects *m, struct GroupPiece *p, int index)
     dx = p->target.x - p->position.x;
     dz = p->target.z - position->z;
     if (dx * dx + dz * dz <= 0x9C3F) {
-        p->timer = 0;
-        p->state = 2;
+        u32 t = 2;
+        p->state = t;
         p->active = 1;
+        p->timer = 0;
     } else {
         if (p->speed == 0) {
             const u16 *table;
@@ -532,9 +699,6 @@ void sub_08010E44(struct GroupObjects *m, struct GroupPiece *p, int index)
         p->timer++;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08010E44);
-#endif
 
 int GroupObjects_Update(struct GroupObjects *m)
 {
