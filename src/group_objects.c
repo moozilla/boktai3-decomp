@@ -364,13 +364,14 @@ static inline void addPosition(struct GroupVec *d, struct GroupVec *s)
     dst->z += src->z;
 }
 
-static inline void addPositionN(struct GroupVec *d, struct GroupVec *s)
+static inline struct GroupVec *addPositionN(struct GroupVec *d, struct GroupVec *s)
 {
     struct GroupVec *src = s;
     struct GroupVec *dst = d;
     d->x += s->x;
     dst->y += src->y;
     dst->z += src->z;
+    return dst;
 }
 
 static inline void addVec(struct GroupVec *d, struct GroupVec *s)
@@ -448,11 +449,11 @@ void sub_08010514(struct GroupObjects *m, struct GroupPiece *p, int index)
 #else
 INCLUDE_ASM("asm/nonmatching", sub_08010514);
 #endif
-#ifdef NONMATCHING
 void sub_0801068C(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
     struct GroupVec *position;
+    struct GroupVec *moved;
     int dx, dz;
     if (p->active) {
         const u16 *table;
@@ -485,23 +486,20 @@ void sub_0801068C(struct GroupObjects *m, struct GroupPiece *p, int index)
         } else
             p->speed--;
         polar(&delta, p->heading, p->duration);
-        addPositionN(&p->position, &delta);
+        moved = addPositionN(&p->position, &delta);
         {
             struct GroupVec *origin = &m->origin;
-            p->direction = Math_Atan2(origin->x - p->position.x, origin->z - p->position.z);
+            p->direction = Math_Atan2(origin->x - p->position.x, origin->z - moved->z);
         }
         sub_0800FA5C(m, p, 0);
         p->timer++;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0801068C);
-#endif
-#ifdef NONMATCHING
 void sub_08010860(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
     struct GroupVec *position;
+    struct GroupVec *moved;
     int dx, dz;
     if (p->active) {
         const u16 *table;
@@ -534,18 +532,15 @@ void sub_08010860(struct GroupObjects *m, struct GroupPiece *p, int index)
         } else
             p->speed--;
         polar(&delta, p->heading, p->duration);
-        addPositionN(&p->position, &delta);
+        moved = addPositionN(&p->position, &delta);
         {
             struct GroupVec *origin = &m->origin;
-            p->direction = Math_Atan2(origin->x - p->position.x, origin->z - p->position.z);
+            p->direction = Math_Atan2(origin->x - p->position.x, origin->z - moved->z);
         }
         sub_0800FA5C(m, p, 0);
         p->timer++;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08010860);
-#endif
 
 void sub_08010A34(struct GroupObjects *m, struct GroupPiece *p)
 {
