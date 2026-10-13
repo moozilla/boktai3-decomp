@@ -1,9 +1,9 @@
-#include "global.h"
+#include "animated_hazard.h"
 
-void sub_0801204C(u32 unused, u8 *p, u32 v)
+void sub_0801204C(void *unused, struct AnimatedHazard *p, u32 v)
 {
     u32 z = 0;
-    p[1] = v;
-    *(u32 *)(p + 8) = z;
-    p[2] = 1;
+    p->state = v;
+    p->timer = z;
+    p->entered = 1;
 }

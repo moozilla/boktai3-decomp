@@ -1,19 +1,10 @@
-#include "global.h"
+#include "animated_hazard.h"
 
-struct E {
-    u8 act;
-    u8 f[0x9f];
-};
-struct S {
-    u8 f[0x38];
-    struct E e[8];
-};
-extern u32 gUnk_02000050;
-void sub_08012620(void *, void *);
+void sub_08012620(void *, struct AnimatedHazard *);
 
-u32 sub_08012658(struct S *s)
+u32 sub_08012658(struct AnimatedHazardManager *s)
 {
-    struct E *e = s->e;
+    struct AnimatedHazard *e = s->hazards;
     s32 i;
     for (i = 7; i >= 0; i--, e++) {
         sub_08012620(s, e);

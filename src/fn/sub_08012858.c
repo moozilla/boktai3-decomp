@@ -1,52 +1,10 @@
-#include "global.h"
+#include "animated_hazard.h"
 // MATCHING_CONCESSION: register-pinning
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct Sprite {
-    u32 flags;
-    u8 pad[12];
-    u16 frame;
-    u8 pad12[10];
-    struct Vec position;
-    u8 tail[8];
-};
-struct Anim {
-    const u16 *data;
-    u8 flags, count, factor, rate;
-    u16 frame, unused, scale, timer;
-};
-struct Hazard {
-    u8 active, state, entered, pad3;
-    u16 duration, pad6;
-    u32 timer;
-    u32 hold;
-    u8 pad10[84];
-    struct Sprite sprite;
-    struct Anim anim;
-};
-struct Map {
-    u32 pad;
-    u8 *cells;
-    u8 pad8[28];
-    u16 rows[1];
-};
-extern struct Map *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC;
-u8 *sub_0821D64C(int, int);
-void *sub_08012040(void);
+
+struct AnimatedHazardManager *sub_08012040(void);
 void *sub_080126DC(void);
-struct Hazard *sub_08012728(void *);
-void Collider_SetPosition(void *, void *, int);
-void sub_0821FF50(void *, int, int);
-void sub_0801204C(void *, void *, int);
-static inline int cellIndex(struct Vec *p)
-{
-    int x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
-        return 0;
-    return gUnk_030052F4->rows[z] + x;
-}
+struct AnimatedHazard *sub_08012728(struct AnimatedHazardManager *);
+void sub_0801204C(void *, struct AnimatedHazard *, u32);
 static inline u8 *cell(int i)
 {
     u8 *p = sub_0821D64C(i, 1);
@@ -54,20 +12,17 @@ static inline u8 *cell(int i)
         return p + 4;
     return gUnk_030052F4->cells + 12 + i * 4;
 }
-void sub_0821FF58(void *, int, int, int, int, int);
-void Anim_SetSequence(void *, void *, int, int, int);
-void AnimData_SelectTiles(void *, int);
 static inline u32 frame_factor(u16 v)
 {
     register u32 value asm("r1") = v;
     u32 mask = 15;
     return mask & value;
 }
-int AnimatedHazard_CreateProximity(struct Vec *source, int damage, int delay, int hold)
+int AnimatedHazard_CreateProximity(struct SceneVec *source, int damage, int delay, int hold)
 {
-    u8 *m = sub_08012040();
-    struct Hazard *p;
-    struct Vec *pos;
+    struct AnimatedHazardManager *m = sub_08012040();
+    struct AnimatedHazard *p;
+    struct SceneVec *pos;
     void *effect;
     u8 *c;
     int height, slope;
@@ -82,7 +37,7 @@ int AnimatedHazard_CreateProximity(struct Vec *source, int damage, int delay, in
         return -1;
     p->sprite.position = *source;
     {
-        struct Vec *ground = &p->sprite.position;
+        struct SceneVec *ground = &p->sprite.position;
         int x = ground->x >> 8, z = ground->z >> 8, index;
         pos = ground;
         if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
@@ -106,17 +61,17 @@ int AnimatedHazard_CreateProximity(struct Vec *source, int damage, int delay, in
         zero = 0;
         *h = height;
     }
-    effect = (u8 *)p + 16;
+    effect = p->collider;
     Collider_SetPosition(effect, pos, 0);
     {
         register int d asm("r9") = damage;
         sub_0821FF58(effect, d, 50, 0, 8, 30);
     }
     sub_0801204C(m, p, 1);
-    Anim_SetSequence(&p->anim, *(void **)(m + 0x34), 0, 0, zero);
+    Anim_SetSequence(&p->anim, m->script, 0, 0, zero);
     {
-        struct Sprite *o = &p->sprite;
-        struct Anim *a;
+        struct HazardSprite *o = &p->sprite;
+        struct HazardAnim *a;
         const u16 *entry;
         register u16 n asm("r0");
         int done;
@@ -176,7 +131,7 @@ int AnimatedHazard_CreateProximity(struct Vec *source, int damage, int delay, in
         } else
             done = 0;
     }
-    AnimData_SelectTiles(m + 24, 0x33F);
+    AnimData_SelectTiles(m->animData, 0x33F);
     p->timer = 0;
     p->hold = hold;
     asm("" : "+r"(delay));

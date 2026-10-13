@@ -1,16 +1,12 @@
-#include "global.h"
+#include "animated_hazard.h"
 
-extern void *gUnk_02000050;
-void *Task_Create(u32, u32);
-void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
-s32 sub_08012684(void *);
-void Task_Kill(void *);
-void sub_08012630(void);
-void sub_08012658(void);
+s32 sub_08012684(struct AnimatedHazardManager *);
+s32 sub_08012630(struct AnimatedHazardManager *);
+u32 sub_08012658(struct AnimatedHazardManager *);
 
 void *sub_080126DC(void)
 {
-    void *p;
+    struct AnimatedHazardManager *p;
     if (gUnk_02000050 != 0)
         return gUnk_02000050;
     p = Task_Create(8, 0x538);

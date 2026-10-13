@@ -1,10 +1,9 @@
-#include "global.h"
+#include "animated_hazard.h"
 
 extern const u32 gUnk_08604B6C[];
-void sub_08249240(u32 a, u8 *p, u32 f);
 
-void sub_080125FC(u32 a, u8 *p)
+void sub_080125FC(void *a, struct AnimatedHazard *p)
 {
-    sub_08249240(a, p, gUnk_08604B6C[p[1]]);
-    *(u32 *)(p + 8) += 1;
+    sub_08249240(a, p, (void *)gUnk_08604B6C[p->state]);
+    p->timer += 1;
 }
