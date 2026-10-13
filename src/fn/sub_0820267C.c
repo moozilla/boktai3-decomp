@@ -1,7 +1,4 @@
-#include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.5%
-// 2 differing instruction runs; first diff at +0x1A (add r0, sp, #0xc vs ldr r2, [pc, #0x68])
+#include "global.h"// fuzzy: 98.5%
 struct Data {
     u8 pad0[0x14];
     u32 w14, w18;
@@ -16,20 +13,18 @@ void Collider_Init(void *, u32, u32, u32, u32, void *, void *);
 void Collider_SetCallback(void *, void *, void *);
 void sub_0821FF58(void *, s32, s32, u32, u32, s32);
 void sub_0820264C(void);
+static inline void Fill32(void *dst, u32 size)
+{
+    u32 tmp = 0;
+    CpuSet(&tmp, dst, 0x05000000 | size / 4);
+}
 void sub_0820267C(void *unused, u8 *p)
 {
     struct Data *data = (struct Data *)(p + 0x28);
-    void *obj, *effect, *target;
-    u32 zero;
+    void *obj, *effect;
     sub_08202E4C(data);
     *(u32 *)p = 0;
-    target = p + 0x10;
-    zero = 0;
-    {
-        u32 *fill = &zero;
-        u32 flags = 0x05000002;
-        CpuSet(fill, target, flags);
-    }
+    Fill32(p + 0x10, 8);
     obj = p + 0x84;
     AnimData_Load(obj, data->w34);
     sub_082144E4(p + 0xa0, obj, 1);
@@ -38,6 +33,3 @@ void sub_0820267C(void *unused, u8 *p)
     Collider_SetCallback(effect, sub_0820264C, p);
     sub_0821FF58(effect, data->h1c, data->h1e, data->w14, data->w18, data->h22);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0820267C);
-#endif
