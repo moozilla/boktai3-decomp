@@ -3,27 +3,6 @@
 /* Empty constraints retain register choices without handwritten instructions. */
 #include "background_controller.h"
 
-#define truncate7(v)                                                                               \
-    ({                                                                                             \
-        s32 value = (v);                                                                           \
-        s32 result;                                                                                \
-        if (value >= 0)                                                                            \
-            result = value >> 7;                                                                   \
-        else                                                                                       \
-            result = -((-value) >> 7);                                                             \
-        result;                                                                                    \
-    })
-#define truncate3(v)                                                                               \
-    ({                                                                                             \
-        s32 value = (v);                                                                           \
-        s32 result;                                                                                \
-        if (value >= 0)                                                                            \
-            result = value >> 3;                                                                   \
-        else                                                                                       \
-            result = -((-value) >> 3);                                                             \
-        result;                                                                                    \
-    })
-
 s32 Background_Update(struct Background *p)
 {
     s32 x, y asm("r6");

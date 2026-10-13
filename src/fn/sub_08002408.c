@@ -1,16 +1,6 @@
 #include "global.h"
 #include "background_controller.h"
 
-#define fixedToInt(v)                                                                              \
-    ({                                                                                             \
-        s32 value = (v);                                                                           \
-        s32 result;                                                                                \
-        if (value >= 0)                                                                            \
-            result = value >> 18;                                                                  \
-        else                                                                                       \
-            result = -((-value) >> 18);                                                            \
-        result;                                                                                    \
-    })
 
 static inline s32 pixel(s16 v)
 {
