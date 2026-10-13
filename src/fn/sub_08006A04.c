@@ -1,38 +1,11 @@
-#include "global.h"
+#include "choice_menu.h"
 // MATCHING_CONCESSION: register-pinning
-struct Choice {
-    u8 x, y, width, row;
-};
-struct Menu {
-    u8 task[24];
-    s8 selected, initial;
-    u8 delay, count;
-    u8 rowStart[8], rowEnd[8], rowCount[8];
-    u8 rows, useScript, left, top;
-    u8 pad38[2];
-    u8 width, textX, allowCancel, wakeDelay, repeatDelay, explicitWidth;
-    u32 held;
-    u32 arguments[4];
-    u32 script;
-    void *callback, *window;
-    u32 unknown60;
-    struct Choice choices[16];
-    u8 scratch[104];
-    u32 leftFlags;
-    u8 pad110[20];
-    s16 leftX, leftY;
-    u8 pad128[68];
-    u32 rightFlags;
-    u8 pad170[20];
-    s16 rightX, rightY;
-};
 u32 Script_ParseStringRef(void *);
 u8 *Text_LookupString(u32);
-u8 *ChoiceMenu_ParseTag(struct Menu *, u8 *);
 u16 sub_08032070(u8 *);
-void ChoiceMenu_LayoutText(struct Menu *p, void *window)
+void ChoiceMenu_LayoutText(struct ChoiceMenu *p, void *window)
 {
-    u8 *text = Text_LookupString(Script_ParseStringRef(window) + p->unknown60);
+    u8 *text = Text_LookupString(Script_ParseStringRef(window) + p->stringBase);
     s32 i;
     u8 *row, *rowStart, *rowEnd;
     s32 zero;
@@ -64,10 +37,10 @@ void ChoiceMenu_LayoutText(struct Menu *p, void *window)
         } else if (*text == '\n') {
             p->textX = 0;
             p->width = 0;
-            if (p->rows < p->pad38[1]) {
+            if (p->rows < p->maxRows) {
                 rowEnd[p->rows] = p->count ? p->count - 1 : 0;
                 p->rows++;
-                if (p->rows < p->pad38[1])
+                if (p->rows < p->maxRows)
                     rowStart[p->rows] = p->count;
             }
             text++;
@@ -99,6 +72,6 @@ void ChoiceMenu_LayoutText(struct Menu *p, void *window)
         p->textX += 2;
         text += 2;
     }
-    if (p->rows < p->pad38[1])
+    if (p->rows < p->maxRows)
         rowEnd[p->rows] = p->count ? p->count - 1 : 0;
 }

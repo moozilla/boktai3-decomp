@@ -1,29 +1,18 @@
-#include "global.h"
+#include "choice_menu.h"
 
-struct S {
-    u8 f[0x1a];
-    u8 a;
-    u8 g[0x41];
-    void *b;
-    u8 h[0x164];
-    u32 idx;
-    u8 i[0x18];
-    u16 v;
-};
 s32 sub_08031E34(void *);
-s32 ChoiceMenu_HandleInput(void *);
 u32 sub_082282A4(u32);
-u32 sub_080066C0(struct S *p)
+u32 sub_080066C0(struct ChoiceMenu *p)
 {
-    if (p->b != 0 && sub_08031E34(p->b) != 0) {
-        if (p->a == 0) {
+    if (p->window != 0 && sub_08031E34(p->window) != 0) {
+        if (p->delay == 0) {
             if (ChoiceMenu_HandleInput(p) == 1)
                 return 0;
         } else {
-            p->a--;
+            p->delay--;
         }
-        p->v = sub_082282A4(p->idx);
-        p->idx = (p->idx + 1) & 0x3f;
+        p->palette[12] = sub_082282A4(p->colorIndex);
+        p->colorIndex = (p->colorIndex + 1) & 0x3f;
     }
     return 0;
 }

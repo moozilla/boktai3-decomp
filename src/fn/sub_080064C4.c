@@ -1,45 +1,12 @@
-#include "global.h"
+#include "choice_menu.h"
 // MATCHING_CONCESSION: register-pinning
-struct Choice {
-    u8 x, y, width, row;
-};
-struct Menu {
-    u8 task[24];
-    s8 selected, initial;
-    u8 delay, count;
-    u8 rowStart[8], rowEnd[8], rowCount[8];
-    u8 rows, useScript, left, top;
-    u8 pad38[2];
-    u8 width, textX, allowCancel, wakeDelay, repeatDelay, explicitWidth;
-    u32 held;
-    u32 arguments[4];
-    u32 script;
-    void *callback, *window;
-    u32 unknown60;
-    struct Choice choices[16];
-    u8 scratch[104];
-    u32 leftFlags;
-    u8 pad110[20];
-    s16 leftX, leftY;
-    u8 pad128[68];
-    u32 rightFlags;
-    u8 pad170[20];
-    s16 rightX, rightY;
-};
-struct Keys {
-    u16 held, pressed;
-};
-extern struct Keys gUnk_03005260;
-void ChoiceMenu_Select(struct Menu *, s32);
-void ChoiceMenu_DispatchSelection(struct Menu *, s32);
-s32 sub_08006478(struct Menu *, s32, s32);
 void sub_0822B2F8(s32);
 void sub_08030BF8(void);
 void sub_0821A0C0(void *);
-s32 ChoiceMenu_HandleInput(struct Menu *p)
+s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p)
 {
-    p->leftFlags &= ~1;
-    p->rightFlags &= ~1;
+    p->leftCursor.flags &= ~1;
+    p->rightCursor.flags &= ~1;
     if (p->selected < 0) {
         if ((gUnk_03005260.pressed & 240) || (!p->wakeDelay && (gUnk_03005260.pressed & 3))) {
             ChoiceMenu_Select(p, p->initial);
@@ -49,8 +16,8 @@ s32 ChoiceMenu_HandleInput(struct Menu *p)
     } else if (p->wakeDelay)
         p->wakeDelay--;
     else {
-        register struct Keys *initialKeys asm("r1") = &gUnk_03005260;
-        struct Keys *keys;
+        register struct ChoiceKeys *initialKeys asm("r1") = &gUnk_03005260;
+        struct ChoiceKeys *keys;
         u8 *repeat;
         u32 pressed;
         u32 sameDirection;
@@ -84,8 +51,8 @@ s32 ChoiceMenu_HandleInput(struct Menu *p)
                 sub_0822B2F8(222);
                 sub_08030BF8();
                 ChoiceMenu_DispatchSelection(p, -1);
-                p->leftFlags |= 1;
-                p->rightFlags |= 1;
+                p->leftCursor.flags |= 1;
+                p->rightCursor.flags |= 1;
                 sub_0821A0C0(p);
                 return 1;
             }
@@ -100,8 +67,8 @@ s32 ChoiceMenu_HandleInput(struct Menu *p)
                 sub_0822B2F8(221);
                 sub_08030BF8();
                 ChoiceMenu_DispatchSelection(p, p->selected);
-                p->leftFlags |= one;
-                p->rightFlags |= one;
+                p->leftCursor.flags |= one;
+                p->rightCursor.flags |= one;
                 sub_0821A0C0(p);
                 return 1;
             }

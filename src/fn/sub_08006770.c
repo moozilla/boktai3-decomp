@@ -1,106 +1,12 @@
-#include "global.h"
+#include "choice_menu.h"
 // MATCHING_CONCESSION: register-pinning
-struct Choice {
-    u8 x, y, width, row;
-};
-struct Menu {
-    u8 task[24];
-    s8 selected, initial;
-    u8 delay, count;
-    u8 rowStart[8], rowEnd[8], rowCount[8];
-    u8 rows, useScript, left, top;
-    u8 pad38[2];
-    u8 width, textX, allowCancel, wakeDelay, repeatDelay, explicitWidth;
-    u32 held;
-    u32 arguments[4];
-    u32 script;
-    void *callback, *window;
-    u32 unknown60;
-    struct Choice choices[16];
-    u8 scratch[104];
-    u32 leftFlags;
-    u8 pad110[20];
-    s16 leftX, leftY;
-    u8 pad128[68];
-    u32 rightFlags;
-    u8 pad170[20];
-    s16 rightX, rightY;
-};
 extern const u8 gUnk_0824DB0C[], gUnk_0824DB14[], gUnk_0824DB1C[], gUnk_0824DB20[];
 s32 sub_08032168(const u8 *, const u8 *, s32);
 s32 sub_080321A0(const u8 *, s32);
 s32 sub_08031DDC(s32);
 s32 sub_08031DBC(s32);
 u8 *Text_FindChar(u8 *, s32);
-#define READ_NUMBER()                                                                              \
-    ({                                                                                             \
-        s32 found = 0, length = 0, value;                                                          \
-        while (*cursor != '>') {                                                                   \
-            if (!*cursor) {                                                                        \
-                cursor++;                                                                          \
-                break;                                                                             \
-            }                                                                                      \
-            if (*cursor == '=')                                                                    \
-                found = ({                                                                         \
-                    register s32 one asm("r4") = 1;                                                \
-                    one;                                                                           \
-                });                                                                                \
-            else if (({                                                                            \
-                         register s32 f asm("r0") = found;                                         \
-                         f;                                                                        \
-                     }))                                                                           \
-                p->scratch[length++] = *cursor;                                                    \
-            cursor++;                                                                              \
-        }                                                                                          \
-        p->scratch[length] = 0;                                                                    \
-        if (({                                                                                     \
-                register s32 f asm("r1") = found;                                                  \
-                f;                                                                                 \
-            }) &&                                                                                  \
-            length)                                                                                \
-            value = sub_080321A0(p->scratch, length);                                              \
-        else                                                                                       \
-            value = 0;                                                                             \
-        value;                                                                                     \
-    })
-#define READ_WIDTH()                                                                               \
-    ({                                                                                             \
-        s32 found = 0, length = 0;                                                                 \
-        while (*cursor != '>') {                                                                   \
-            if (!*cursor) {                                                                        \
-                cursor++;                                                                          \
-                break;                                                                             \
-            }                                                                                      \
-            if (*cursor == '=')                                                                    \
-                found = ({                                                                         \
-                    register s32 one asm("r4") = 1;                                                \
-                    one;                                                                           \
-                });                                                                                \
-            else if (({                                                                            \
-                         register s32 f asm("r0") = found;                                         \
-                         f;                                                                        \
-                     }))                                                                           \
-                p->scratch[length++] = *cursor;                                                    \
-            cursor++;                                                                              \
-        }                                                                                          \
-        p->scratch[length] = 0;                                                                    \
-        if (({                                                                                     \
-                s32 f = found;                                                                     \
-                f;                                                                                 \
-            }) &&                                                                                  \
-            length) {                                                                              \
-            s32 value = sub_080321A0(p->scratch, length);                                          \
-            register u8 *out asm("r2") = &p->explicitWidth;                                        \
-            asm("" : : "r"(out));                                                                  \
-            *out = value;                                                                          \
-        } else {                                                                                   \
-            s32 zero = 0;                                                                          \
-            register u8 *out asm("r3");                                                            \
-            out = &p->explicitWidth;                                                               \
-            *out = zero;                                                                           \
-        }                                                                                          \
-    })
-u8 *ChoiceMenu_ParseTag(struct Menu *p, u8 *text)
+u8 *ChoiceMenu_ParseTag(struct ChoiceMenu *p, u8 *text)
 {
     u8 *cursor = text;
     if (*text != '/') {
