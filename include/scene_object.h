@@ -1,6 +1,7 @@
 #ifndef SCENE_OBJECT_H
 #define SCENE_OBJECT_H
 #include "engine.h"
+#include "scene_vec.h"
 
 /*
  * Scene objects: pushable/breakable blocks and similar props (types 0-6) that live in a fixed
@@ -9,11 +10,6 @@
  * reference. Objects move between cells of the terrain map one step at a time, fall when the
  * block under them is removed, flash when hit and disappear when their health is gone.
  */
-
-struct SceneVec {
-    s16 x, y, z;
-    s16 pad;
-};
 
 /* Three 16-bit extents/offsets passed by pointer to the particle and collider helpers. */
 struct SceneExtent {
