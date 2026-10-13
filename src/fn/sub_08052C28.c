@@ -37,7 +37,7 @@ extern u8 *gUnk_02000580;
 void sub_0815B858(u8 *, u32, u32);
 s32 sub_0805238C(struct O *);
 s32 sub_0804A06C(void);
-void sub_0821AD08(void *, u32);
+void Script_Call(void *, u32);
 void sub_08052CE4(struct O *);
 void sub_08052C28(struct O *o)
 {
@@ -64,7 +64,7 @@ void sub_08052C28(struct O *o)
             o->wa0 |= 1;
             sub_08052628(o, sub_08052CE4);
             if (o->p36c != 0)
-                sub_0821AD08(o->p36c, 0);
+                Script_Call(o->p36c, 0);
         }
     }
 }

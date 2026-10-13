@@ -22,8 +22,8 @@ struct O {
     u16 t382;
 };
 void sub_08052628(struct O *, void (*)(struct O *));
-void sub_08215284(void *, u32);
-void sub_0822B2F8(u32);
+void AnimData_SelectTiles(void *, u32);
+void Sound_PlaySong(u32);
 void sub_08052418(struct O *);
 void sub_0805228C(void *, void *);
 void sub_08052744(struct O *o)
@@ -32,5 +32,5 @@ void sub_08052744(struct O *o)
     o->h1c6 = 8;
     o->flags50 &= ~1;
     o->h6e = o->h9a + o->b368;
-    sub_08215284(&o->b7c, o->h1c4 + 2);
+    AnimData_SelectTiles(&o->b7c, o->h1c4 + 2);
 }

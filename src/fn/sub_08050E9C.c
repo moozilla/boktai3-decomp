@@ -22,13 +22,14 @@ void sub_08050E9C(u8 *p)
         *r = *r & m;
         p[0x37] = 1;
     } else {
-        if (p[0x1f] != 0)
-        {   u32 m = 0x200;
-            gUnk_03004BD8 |= m; }
-        else
-        { u16 *r = &gUnk_03004BD8;
-          u32 m = ~0x200;
-          *r = *r & m; }
+        if (p[0x1f] != 0) {
+            u32 m = 0x200;
+            gUnk_03004BD8 |= m;
+        } else {
+            u16 *r = &gUnk_03004BD8;
+            u32 m = ~0x200;
+            *r = *r & m;
+        }
         p[0x37] = 0;
     }
 }

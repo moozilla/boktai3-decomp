@@ -9,7 +9,7 @@ struct S {
     u8 pad2a[2];
     s16 vx, vy, vz;
 };
-u32 sub_08215184(u32);
+u32 AnimData_FindEntry(u32);
 void sub_08217EEC(void *, u32, u32);
 static inline s32 dec(s32 v)
 {
@@ -30,7 +30,7 @@ void sub_08052130(struct S *s)
         s->x += s->vx;
         s->y += s->vy;
         s->z += s->vz;
-        sub_08217EEC(s, sub_08215184(0x1C1E), ((*pc >> 2) & 1) + 2);
+        sub_08217EEC(s, AnimData_FindEntry(0x1C1E), ((*pc >> 2) & 1) + 2);
         s->vx = dec(s->vx);
         s->vy = dec(s->vy);
         s->vz = dec(s->vz);
