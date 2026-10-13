@@ -156,8 +156,124 @@ void BoardPiece_UpdateAnimation(struct GroupPiece *p)
     p->angle += 4;
 }
 
+static inline void addPositionAt(struct GroupVec *d, struct GroupVec *dst, struct GroupVec *src)
+{
+    d->x += src->x;
+    dst->y += src->y;
+    dst->z += src->z;
+}
+
+#ifdef NONMATCHING_X
+// fuzzy: 81.6%
+int sub_0800FC28(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
+{
+    struct GroupVec origin;
+    int i;
+    int radius0, radius1, radius2, direction, spread;
+    struct GroupPiece *p;
+    struct GroupPiece *r;
+    origin.x = cmd->originX;
+    origin.y = cmd->originY;
+    origin.z = cmd->originZ;
+    radius0 = cmd->radius0;
+    radius1 = cmd->radius1;
+    radius2 = cmd->radius2;
+    direction = cmd->direction;
+    spread = cmd->spread;
+    m->origin = origin;
+    m->timer = 0;
+    m->paletteActive = 1;
+    m->paletteMask = 63;
+    {
+        void *first = gUnk_030042E4 + 0x5A60;
+        void *second = gUnk_030042E4 + 0x5AA0;
+        sub_08221110(m->palette, first, second, 63, 6);
+    }
+    p = m->pieces;
+    r = p;
+    for (i = 0; i < 16; i++, p++, r++) {
+        p->state = 5;
+        p->active = 1;
+        p->timer = 0;
+        p->direction = direction;
+        if (spread != 0)
+            p->direction += Mod(randomValue(), spread);
+        p->duration = radius0;
+        polar(&r->position, p->direction, radius1);
+        addPositionAt(&p->position, &r->position, &origin);
+        polar(&r->target, p->direction, radius2);
+        addPositionAt(&p->target, &r->target, &origin);
+        p->angle = randomValue();
+        p->targetY = i * 16 + p->position.y;
+        p->speed = (randomValue() & 7) + 7;
+        p->sprite.position = p->position;
+        p->sprite.flags &= ~1;
+        sub_0800FA5C(m, r, 0);
+        AnimData_SelectTiles(&r->resource, 0x2D3);
+        p->resource.palette = m->palette;
+        ActorShadow_Enable(r->transform);
+    }
+    m->active = 1;
+    return 0;
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_0800FC28);
+#endif
+#ifdef NONMATCHING_X
+int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
+{
+    struct GroupVec origin;
+    int i;
+    int radius0, radius1, radius2, direction, spread;
+    struct GroupPiece *p;
+    struct GroupPiece *r;
+    origin.x = cmd->originX;
+    origin.y = cmd->originY;
+    origin.z = cmd->originZ;
+    radius0 = cmd->radius0;
+    radius1 = cmd->radius1;
+    radius2 = cmd->radius2;
+    direction = cmd->direction;
+    spread = cmd->spread;
+    m->origin = origin;
+    m->timer = 0;
+    m->paletteActive = 1;
+    m->paletteMask = 63;
+    {
+        void *first = gUnk_030042E4 + 0x5A60;
+        void *second = gUnk_030042E4 + 0x5AA0;
+        sub_08221110(m->palette, first, second, 63, 6);
+    }
+    p = m->pieces;
+    r = p;
+    for (i = 0; i < 16; i++, p++, r++) {
+        p->state = 0;
+        p->active = 1;
+        p->timer = 0;
+        p->direction = direction;
+        if (spread != 0)
+            p->direction += Mod(randomValue(), spread);
+        p->duration = radius0;
+        polar(&r->position, p->direction, radius1);
+        addPositionAt(&p->position, &r->position, &origin);
+        polar(&r->target, p->direction, radius2);
+        addPositionAt(&p->target, &r->target, &origin);
+        p->angle = randomValue();
+        p->targetY = i * 16 + p->position.y;
+        p->speed = (randomValue() & 7) + 7;
+        p->sprite.position = p->position;
+        p->sprite.flags &= ~1;
+        sub_0800FA5C(m, r, 0);
+        AnimData_SelectTiles(&r->resource, 0x2D3);
+        p->resource.palette = m->palette;
+        ActorShadow_Enable(r->transform);
+    }
+    m->active = 1;
+    return 0;
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_0800FE98);
+#endif
 INCLUDE_ASM("asm/nonmatching", sub_0801010C);
 INCLUDE_ASM("asm/nonmatching", sub_08010298);
 
@@ -211,6 +327,15 @@ static inline void addPosition(struct GroupVec *d, struct GroupVec *s)
         }
         d->x = value;
     }
+    dst->y += src->y;
+    dst->z += src->z;
+}
+
+static inline void addPositionN(struct GroupVec *d, struct GroupVec *s)
+{
+    struct GroupVec *src = s;
+    struct GroupVec *dst = d;
+    d->x += s->x;
     dst->y += src->y;
     dst->z += src->z;
 }
@@ -292,12 +417,17 @@ void sub_08010A58(struct GroupObjects *m, struct GroupPiece *p, int index)
     dx = p->target.x - p->position.x;
     dz = target->z - position->z;
     if (dx * dx + dz * dz <= 0xFFF) {
+        p->timer = 0;
         p->state = 4;
         p->active = 1;
-        p->timer = 0;
     } else {
         polar(&delta, p->direction, p->duration);
-        addVec(position, &delta);
+        {
+            struct GroupVec *src = &delta;
+            p->position.x += delta.x;
+            position->y += src->y;
+            position->z += src->z;
+        }
         sub_0800FA5C(m, p, 0);
         p->timer++;
     }
@@ -335,7 +465,12 @@ void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
     } else
         p->speed--;
     polar(&delta, p->direction, p->duration);
-    addVec(&p->offset, &delta);
+    {
+        struct GroupVec *src = &delta;
+        p->offset.x += delta.x;
+        offset->y += src->y;
+        offset->z += src->z;
+    }
     p->position.x = p->anchor.x + p->offset.x;
     p->position.z = p->anchor.z + p->offset.z;
     sub_0800FA5C(m, p, 0);
@@ -373,15 +508,15 @@ void sub_08010E44(struct GroupObjects *m, struct GroupPiece *p, int index)
         p->direction = Math_Atan2(p->target.x - p->position.x, p->target.z - p->position.z);
         table = gUnk_0203B400;
         p->direction += (randomWith(table) & 31) - 16;
-        p->speed = (randomWith(table) & 31) + 16;
+        p->speed = (randomWith(table) & 15) + 16;
     }
     position = &p->position;
     dx = p->target.x - p->position.x;
     dz = p->target.z - position->z;
     if (dx * dx + dz * dz <= 0x9C3F) {
+        p->timer = 0;
         p->state = 2;
         p->active = 1;
-        p->timer = 0;
     } else {
         if (p->speed == 0) {
             const u16 *table;
@@ -392,7 +527,7 @@ void sub_08010E44(struct GroupObjects *m, struct GroupPiece *p, int index)
         } else
             p->speed--;
         polar(&delta, p->direction, p->duration);
-        addPosition(&p->position, &delta);
+        addPositionN(&p->position, &delta);
         sub_0800FA5C(m, p, 0);
         p->timer++;
     }
