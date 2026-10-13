@@ -618,7 +618,43 @@ addr,name,confidence,evidence
 080311B0,Dialogue_SetPalette,medium,Tentative descriptive role from exact C and contiguous callers; src/fn/sub_080311B0.c
 08031370,Dialogue_SetCustomCallback,medium,Tentative descriptive role from exact C and contiguous callers; src/fn/sub_08031370.c
 080315B8,Dialogue_ProcessTextQuickly,medium,Tentative descriptive role from exact C and contiguous callers; src/fn/sub_080315B8.c
+080317D8,Dialogue_ProcessTextBurst,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
 08031964,Dialogue_DestroyGraphics,medium,Tentative descriptive role from exact C and contiguous callers; src/fn/sub_08031964.c
+08031D40,Dialogue_CreateTask,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08031D90,Dialogue_GetTextRectangle,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08031E54,TextVm_PushStyle,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08031E84,TextVm_PopStyle,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08031EAC,TextVm_Newline,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08031ED8,TextVm_AdvanceColumn,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08031EFC,TextVm_PlayCharacterSound,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08031F58,TextVm_DrawNarrowGlyph,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08031FA0,TextVm_DrawWideGlyph,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08032070,TextVm_LookupEscapeGlyph,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+0803209C,TextVm_FormatNumber,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08032168,TextVm_ComparePrefix,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+080321A0,TextVm_ParseDecimal,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+080321CC,TextVm_CountRemainingColumns,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08032254,TextVm_ReadTagValue,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+080322B4,TextVm_SelectConditionalSpeaker,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08032300,TextVm_SelectPlayerSpeaker,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+0803232C,TextVm_ProcessTag,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08032A44,TextVm_ProcessNextGlyph,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08032B24,TextVm_ProcessCurrentStream,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08032C80,TextVm_Init,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08032D10,TextVm_CountNumberColumns,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08032D8C,TextVm_CountStringColumns,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08032E98,TextVm_RunSelectedProcedures,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08032EDC,ScrollingText_ClearRows,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08032F14,ScrollingText_Reset,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08032F78,ScrollingText_Update,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08033248,ScrollingText_Show,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08033284,ScrollingText_Hide,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+080332B0,ScrollingText_TaskUpdate,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08033340,ScrollingText_TaskDestroy,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+0803336C,ScrollingText_Init,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+0803343C,ScrollingText_SetScript,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08033478,ScrollingText_SetNumber,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+08033590,ScrollingText_RequestHide,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
 0818D754,Motion_BuildApproachSegment,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D8E0,Motion_RampSpin,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D960,Motion_AdvanceApproach,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
