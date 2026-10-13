@@ -1,5 +1,66 @@
 #include "global.h"
-struct PeerPanel {u8 active,pad1[0x22f];u8 name[16];};
-struct PeerMenu {u8 pad0[0x4e4];int window;u8 pad4e8[12];u32 clear;u8 pad4f8[0xfc];u8 draw[8];};
-int sub_08036A88(void);int sub_08036C88(void);int sub_08036AC4(void);void sub_082213B8(void*,void*,int,int,int,int,int,int,int);void sub_08037490(void*,void*);void sub_0803749C(void*,void*);void*sub_08037594(int);void*sub_08037DCC(int);void CpuSet(const void*,void*,u32);void sub_08219EBC(void*,const void*,int);void sub_08033924(int,int);void sub_080374A8(void*,void*,int,void*,int);void sub_08037540(void*,void*,int);extern u8*gUnk_02000710;
-void sub_080375BC(struct PeerMenu*p,struct PeerPanel*panel,int index){int status=sub_08036A88();void*peer;if(!index){int value=sub_08036C88();sub_082213B8((u8*)panel+0x50,p->draw,value,5,0,24,70,8,0);goto available;}if(sub_08036AC4()) {available:sub_08037490(p,panel);}else sub_0803749C(p,panel);if(status){peer=sub_08037594(status);if(!index){if(!panel->active){void*name=sub_08037DCC(0);u32 zero=0;CpuSet(&zero,&p->clear,0x05000001);sub_08219EBC(name,gUnk_02000710+0x780,16);sub_08219EBC(panel->name,gUnk_02000710+0x780,16);sub_08033924(p->window,3);panel->active=1;}}else if(peer){if(!panel->active){sub_080374A8(p,panel,index,peer,status);panel->active=1;}}else if(panel->active){sub_08037540(p,panel,index);panel->active=0;}}}
+struct PeerPanel  {
+  u8 active,pad1[0x22f];
+  u8 name[16];
+}
+;
+struct PeerMenu  {
+  u8 pad0[0x4e4];
+  int window;
+  u8 pad4e8[12];
+  u32 clear;
+  u8 pad4f8[0xfc];
+  u8 draw[8];
+}
+;
+int sub_08036A88(void);
+int sub_08036C88(void);
+int sub_08036AC4(void);
+void sub_082213B8(void*,void*,int,int,int,int,int,int,int);
+void sub_08037490(void*,void*);
+void sub_0803749C(void*,void*);
+void*sub_08037594(int);
+void*sub_08037DCC(int);
+void CpuSet(const void*,void*,u32);
+void sub_08219EBC(void*,const void*,int);
+void sub_08033924(int,int);
+void sub_080374A8(void*,void*,int,void*,int);
+void sub_08037540(void*,void*,int);
+extern u8*gUnk_02000710;
+void sub_080375BC(struct PeerMenu*p,struct PeerPanel*panel,int index) {
+  int status=sub_08036A88();
+  void*peer;
+  if(!index) {
+    int value=sub_08036C88();
+    sub_082213B8((u8*)panel+0x50,p->draw,value,5,0,24,70,8,0);
+    goto available;
+  }
+  if(sub_08036AC4())  {
+    available:sub_08037490(p,panel);
+  }
+  else sub_0803749C(p,panel);
+  if(status) {
+    peer=sub_08037594(status);
+    if(!index) {
+      if(!panel->active) {
+        void*name=sub_08037DCC(0);
+        u32 zero=0;
+        CpuSet(&zero,&p->clear,0x05000001);
+        sub_08219EBC(name,gUnk_02000710+0x780,16);
+        sub_08219EBC(panel->name,gUnk_02000710+0x780,16);
+        sub_08033924(p->window,3);
+        panel->active=1;
+      }
+    }
+    else if(peer) {
+      if(!panel->active) {
+        sub_080374A8(p,panel,index,peer,status);
+        panel->active=1;
+      }
+    }
+    else if(panel->active) {
+      sub_08037540(p,panel,index);
+      panel->active=0;
+    }
+  }
+}
