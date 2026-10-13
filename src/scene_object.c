@@ -1,0 +1,1676 @@
+#include "global.h"
+#include "scene_object.h"
+
+static inline void scatter(u16 *coordinate, const u8 *random)
+{
+    s32 value = *coordinate - 128;
+    u32 noise = *random;
+    {
+        u32 result = value + noise;
+        *coordinate = result;
+    }
+}
+
+static inline u32 edgeJitter(const u16 *random)
+{
+    u32 value = *random;
+    value &= 15;
+    return value;
+}
+
+static inline const u16 *scatterAddress(u32 index, const u16 *table)
+{
+    register u32 address asm("r2") = index * 2;
+    address += (u32)table;
+    asm("" : "+r"(address));
+    return (const u16 *)address;
+}
+
+// MATCHING_CONCESSION: register-pinning
+void Scene_SpawnEdgeParticles(struct SceneVec *position, s32 offset)
+{
+    struct SceneExtent size;
+    struct SceneVec point;
+    u16 *p;
+    s32 i;
+    size.x = 32;
+    size.y = 0;
+    size.z = 32;
+    for (i = 0; i < 10; i++) {
+        u32 seed;
+        register const u16 *table asm("r3") = gUnk_0203B400;
+        p = (u16 *)&point;
+        /* The two jitter samples are consumed before the next external call. */
+        seed = (gUnk_03005308 + 1) & 1023;
+        gUnk_03005308 = seed;
+        point = *position;
+        if (!(i & 1)) {
+            u32 index = (seed + 1) & 1023;
+            const u16 *random = (const u16 *)(index * 2 + (u32)table);
+            p[0] += offset + edgeJitter(random);
+            index = (index + 1) & 1023;
+            gUnk_03005308 = index;
+            random = scatterAddress(index, table);
+            scatter(&p[2], (u8 *)random);
+        } else {
+            register u32 index asm("r1") = (seed + 1) & 1023;
+            const u16 *random;
+            random = scatterAddress(index, table);
+            scatter(&p[0], (u8 *)random);
+            index = (index + 1) & 1023;
+            gUnk_03005308 = index;
+            random = (const u16 *)(index * 2 + (u32)table);
+            p[2] += offset + edgeJitter(random);
+        }
+        sub_08068108(&point, 0, &size, 1, 3, 4);
+    }
+}
+
+/* Tentative: test whether a neighboring terrain cell accepts an object. */
+
+u8 *sub_0821D64C(s32, s32);
+
+u8 Scene_CanEnterNeighborCell(struct SceneObject *object, s32 index, s32 direction)
+{
+    u8 *reference = &object->cellRef.cell.height;
+    s32 delta = 0, neighbor;
+    struct SceneCell *cell;
+    u8 *dynamic;
+    switch (direction) {
+        case 0:
+            delta = -((s16 *)gUnk_030052F4->cells)[2];
+            break;
+        case 1:
+            delta = 1;
+            break;
+        case 2:
+            delta = ((s16 *)gUnk_030052F4->cells)[2];
+            break;
+        case 3:
+            delta = -1;
+            break;
+    }
+    neighbor = index + delta;
+    dynamic = sub_0821D64C(neighbor, 1);
+    if (dynamic)
+        cell = (struct SceneCell *)(dynamic + 4);
+    else
+        cell = (struct SceneCell *)(gUnk_030052F4->cells + 12 + neighbor * 4);
+    if (cell) {
+        if (!(cell->height >> 4)) {
+            if ((u32)(cell->height & 15) < (u32)(*reference & 15))
+                goto fail;
+            if (cell->flags & 8)
+                goto fail;
+            goto success;
+        } else if ((u32)(cell->height & 15) >= (u32)(*reference & 15))
+            goto success;
+    }
+fail:
+    return 0;
+success:
+    return 1;
+}
+
+void sub_0800435C(u32 type)
+{
+    if (type == 5) {
+        sub_0822B2F8(0x151);
+    } else {
+        sub_0822B2F8(0x151);
+    }
+}
+
+/* Tentative: test whether a neighboring terrain cell is at least as tall as the object. */
+
+u8 Scene_CheckNeighborHeight(struct SceneObject *object, s32 index, s32 direction)
+{
+    u8 *reference = &object->cellRef.cell.height;
+    s32 delta = 0, neighbor;
+    struct SceneCell *cell;
+    u8 *dynamic;
+    switch (direction) {
+        case 0:
+            delta = -((s16 *)gUnk_030052F4->cells)[2];
+            break;
+        case 1:
+            delta = 1;
+            break;
+        case 2:
+            delta = ((s16 *)gUnk_030052F4->cells)[2];
+            break;
+        case 3:
+            delta = -1;
+            break;
+    }
+    neighbor = index + delta;
+    dynamic = sub_0821D64C(neighbor, 1);
+    if (dynamic)
+        cell = (struct SceneCell *)(dynamic + 4);
+    else
+        cell = (struct SceneCell *)(gUnk_030052F4->cells + 12 + neighbor * 4);
+    if (cell) {
+        if ((u32)(cell->height & 15) >= (u32)(*reference & 15))
+            return 1;
+        if (object->type == 5)
+            sub_0800435C(object->type);
+    }
+    return 0;
+}
+
+/* Count how many of the four neighbors accept the object; more than two means it is boxed in. */
+
+u8 sub_0800441C(struct SceneObject *object)
+{
+    s32 c = 0;
+    s32 i = 0;
+    do {
+        if (Scene_CanEnterNeighborCell(object, object->cellRef.index, i))
+            c++;
+        i++;
+    } while (i <= 3);
+    if (c > 2)
+        return 1;
+    return 0;
+}
+
+void Scene_PlayMovementEffect(struct SceneObject *object)
+{
+    switch (object->type) {
+        case 0:
+            sub_0822B2F8(0x143);
+            break;
+        case 1:
+            sub_0822B2F8(0x143);
+            break;
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+            sub_0822B2F8(0x143);
+            break;
+        default:
+            sub_0822B2F8(0x143);
+            break;
+    }
+    if (sub_0800441C(object))
+        AnimatedParticles_EmitDirectional(4, 1, 1, 0x40, 0, 255, 2, 4, 6, 6, &object->center);
+    else
+        Scene_SpawnEdgeParticles(&object->body.position, 0x90);
+}
+
+void Scene_PlayNeighborMovementEffect(struct SceneObject *object)
+{
+    struct SceneVec position;
+    s32 angle;
+    if (Scene_CheckNeighborHeight(object, object->cellRef.index, object->direction)) {
+        position = object->center;
+        angle = 0;
+        switch (object->direction) {
+            case 0:
+                position.z -= 128;
+                angle = 0xB0;
+                break;
+            case 1:
+                position.x += 128;
+                angle = -16;
+                break;
+            case 2:
+                position.z += 128;
+                angle = 0x30;
+                break;
+            case 3:
+                position.x -= 128;
+                angle = 0x70;
+                break;
+        }
+        AnimatedParticles_EmitDirectional(2, 1, 1, 0x40, angle, 31, 2, 4, 6, 6, &position);
+        sub_0800435C(object->type);
+    }
+}
+
+/* Play the sound for pushing an object of this type. */
+
+void sub_080045B0(s32 type)
+{
+    switch (type) {
+        case 0:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+            sub_0822B2F8(0x142);
+            break;
+        case 1:
+            sub_0822B2F8(0x137);
+            break;
+        default:
+            sub_0822B2F8(0x142);
+            break;
+    }
+}
+
+/* Tentative: apply a terrain-triggered resource cost and feedback. */
+
+void AnimatedParticles_EmitBurst(struct SceneVec *, s32, s32, s32, s32, s32, s32, s32);
+
+// MATCHING_CONCESSION: register-pinning
+void Scene_ApplyTerrainInteraction(struct SceneCollider *contact, void *unused,
+                                   struct SceneObject *actor)
+{
+    register struct SceneObject *incoming asm("r0") = actor;
+    s32 applied;
+    applied = 0;
+    actor = incoming;
+    if (actor->type == 0) {
+        if (({
+                u32 mask = 0x17;
+                mask & contact->contactFlags;
+            }) &&
+            ({
+                u32 mask = 0x10;
+                mask & contact->contactFlags2;
+            })) {
+            actor->health -= 24;
+            actor->damageTimer = 10;
+            actor->animationTimer = 2;
+            sub_08215284(&actor->animationData, actor->animation);
+            applied = 1;
+        }
+    } else if (actor->type == 1) {
+        if (({
+                u32 mask = 4;
+                mask & contact->contactFlags2;
+            }) &&
+            ({
+                u32 mask = 0x80017;
+                mask & contact->contactFlags;
+            })) {
+            actor->health -= 24;
+            actor->damageTimer = 10;
+            actor->animationTimer = 2;
+            sub_08215284(&actor->animationData, actor->animation);
+            if (!actor->cooldown) {
+                actor->cooldown = 10;
+                sub_0822B2F8(0x15C);
+                AnimatedParticles_EmitBurst(&actor->body.position, 0, 0, 0x40, 12, 12, 4, 4);
+            }
+            applied = 1;
+        }
+    } else if (actor->type == 2) {
+        if (({
+                u32 mask = 1;
+                mask & contact->contactFlags;
+            })) {
+            actor->health -= 24;
+            actor->damageTimer = 10;
+            actor->animationTimer = 2;
+            sub_08215284(&actor->animationData, actor->animation);
+            applied = 1;
+        }
+    }
+    if (applied) {
+        if ((u16)(actor->kind - 1) <= 1) {
+            if (actor->health <= 0)
+                actor->health = 1;
+            else
+                goto sound;
+        }
+        if (actor->health < 0)
+            actor->health = 0;
+        else {
+        sound:
+            sub_0822B2F8(0x13E);
+        }
+    }
+}
+
+void sub_080046EC(void)
+{
+}
+
+/* Start falling for objects resting above another object in the same cell. */
+
+typedef void (*UpdateFn)(struct SceneObject *);
+
+static inline UpdateFn fallCallback(void)
+{
+    return Scene_UpdateFallingObject;
+}
+
+void Scene_DropObjectsAbove(struct SceneObject *object)
+{
+    struct SceneObjectManager *manager = gUnk_02000024;
+    struct SceneObject *p = manager->objects;
+    s32 i;
+    for (i = 0; i < manager->count; i++, p++) {
+        if (!p->active)
+            continue;
+        if (p == object)
+            continue;
+        {
+            u8 *height = &p->cellRef.cell.height;
+            u8 *reference = &object->cellRef.cell.height;
+            if (p->cellRef.index != object->cellRef.index)
+                continue;
+            if (p->kind != 0)
+                continue;
+            if ((u32)(*height & 15) <= (u32)(*reference & 15))
+                continue;
+            p->update = fallCallback();
+            p->timer = 0;
+            p->entered = 1;
+            p->kind = 2;
+            p->dx = 0;
+            p->dz = 0;
+            p->direction = 0;
+            p->targetY = p->body.position.y;
+            if (p->targetY > 255)
+                p->targetY = p->body.position.y - 256;
+            else
+                p->targetY = 0;
+        }
+    }
+}
+
+void sub_08214514(void *);
+
+void sub_0821D6D0(void *);
+
+void sub_0821FE6C(void *);
+
+void sub_08003C10(void *);
+
+void sub_08225938(void *);
+
+/* Release everything an object holds (draw, cell reference, collider, body) and free its slot. */
+
+u32 sub_080047AC(struct SceneObject *object)
+{
+    sub_08214514(&object->draw);
+    sub_0821D6D0(&object->cellRef);
+    sub_0821FE6C(&object->collider);
+    if ((object->flags & 2) == 0)
+        sub_08003C10(&object->body);
+    sub_08225938(&object->body);
+    return object->active = 0;
+}
+
+/* Free every active object. */
+
+s32 sub_080047EC(void)
+{
+    struct SceneObjectManager *manager = gUnk_02000024;
+    struct SceneObject *object;
+    s32 i;
+    if (manager == 0)
+        return -1;
+    object = manager->objects;
+    for (i = 0; i < manager->count; i++) {
+        if (object->active != 0)
+            sub_080047AC(object);
+        object = object + 1;
+    }
+    return 0;
+}
+
+/* Make every idle type-1 object start disappearing. */
+
+s32 Scene_ActivateTypeOneObjects(void)
+{
+    struct SceneObjectManager *manager = gUnk_02000024;
+    struct SceneObject *p;
+    s32 i;
+    if (!manager)
+        return -1;
+    p = manager->objects;
+    for (i = 0; i < manager->count; p++, i++) {
+        if (!p->active)
+            continue;
+        if (p->type != 1)
+            continue;
+        p->health = 0;
+        if (!p->kind) {
+            p->update = Scene_UpdateObjectDisappearance;
+            p->timer = 0;
+            p->entered = 1;
+            p->kind = 3;
+        }
+    }
+    return 0;
+}
+
+// MATCHING_CONCESSION: register-pinning
+s32 Scene_StopSelectedObject(void)
+{
+    struct SceneObjectManager *manager = gUnk_02000024;
+    register u32 id asm("r6");
+    struct SceneObject *p;
+    register s32 i asm("r5");
+    register s32 count asm("r4");
+    if (!manager || !(id = sub_0821ABA8(0x6E, 0)))
+        return -1;
+    p = manager->objects;
+    i = 0;
+    count = manager->count;
+    for (; i < count; p++, i++) {
+        if (!p->active)
+            continue;
+        if (p->type == 1)
+            continue;
+        if (p->kind)
+            continue;
+        if (p->body.id == id) {
+            p->health = 0;
+            p->mode = 3;
+            p->update = 0;
+            return 1;
+        }
+    }
+    return 0;
+}
+
+/* Free every active object whose script id matches the selected one. */
+
+s32 sub_080048F4(void)
+{
+    struct SceneObjectManager *manager = gUnk_02000024;
+    u32 id;
+    struct SceneObject *object;
+    s32 i;
+    if (manager == 0)
+        return -1;
+    id = sub_0821ABA8(0x6e, 0);
+    object = manager->objects;
+    for (i = 0; i < manager->count; object++, i++) {
+        if (object->active != 0 && object->body.id == id)
+            sub_080047AC(object);
+    }
+    return 0;
+}
+
+void sub_08014CA4(u32, u32, struct SceneVec *, u32, u32, u32, u32, u32, u32, u32, u32, u32);
+
+void sub_08014634(u32, u32, struct SceneExtent *, struct SceneExtent *, struct SceneExtent *, u32,
+                  u32);
+
+void Scene_PlayObjectBreakEffect(struct SceneObject *p)
+{
+    struct SceneExtent a;
+    struct SceneExtent b;
+    struct SceneExtent c;
+    u32 d;
+    struct SceneVec *q;
+    sub_0822B2F8(0x15B);
+    q = &p->body.position;
+    d = 0x1e;
+    sub_08014CA4(3, 2, q, 0x3c, d, 0x10, 8, 8, 0, 0x100, 0x18, 0x10);
+    sub_08014CA4(8, 6, q, 0x3c, d, 0x16, 8, 8, 0, 0x100, 0x18, 0x10);
+    a.x = p->body.position.x;
+    a.y = p->body.position.y + 0x80;
+    a.z = p->body.position.z;
+    b.x = 0xFFF1;
+    b.y = 8;
+    b.z = 0xFFF1;
+    c.x = d;
+    c.y = 0x16;
+    c.z = d;
+    sub_08014634(8, 3, &a, &b, &c, 0x3c, 0x3c);
+}
+
+void sub_08004A34(struct SceneObject *p)
+{
+    struct SceneExtent a;
+    struct SceneExtent b;
+    struct SceneExtent c;
+    u32 d;
+    struct SceneVec *q;
+    sub_0822B2F8(0x135);
+    q = &p->body.position;
+    d = 0x1e;
+    sub_08014CA4(4, 0, q, 0x3c, d, 0x14, 8, 8, 0, 0x100, 0x18, 0x10);
+    a.x = p->body.position.x;
+    a.y = p->body.position.y + 0x80;
+    a.z = p->body.position.z;
+    b.x = 0xFFF1;
+    b.y = 8;
+    b.z = 0xFFF1;
+    c.x = d;
+    c.y = 0x16;
+    c.z = d;
+    sub_08014634(8, 2, &a, &b, &c, 0x3c, 0x3c);
+}
+
+void sub_08004AE8(struct SceneObject *object)
+{
+    struct SceneVec *p;
+    sub_0822B2F8(0x150);
+    p = &object->body.position;
+    sub_08014CA4(3, 1, p, 0x3c, 0x1e, 0x10, 8, 8, 0, 0x100, 0x18, 0x10);
+    sub_08014CA4(8, 5, p, 0x3c, 0x1e, 0x16, 8, 8, 0, 0x100, 0x18, 0x10);
+}
+
+/* Local view of a SceneVec as 32-bit words; needed to match the halfword read-modify-write. */
+
+struct Vec {
+    union {
+        u32 word;
+        struct {
+            u16 x, y;
+        } half;
+    } xy;
+    union {
+        u32 word;
+        struct {
+            u16 z, pad;
+        } half;
+    } zp;
+};
+
+static inline u32 dustScatter(const u8 *random, const u16 *coordinate)
+{
+    s32 value = *coordinate - 128;
+    return value + *random;
+}
+
+static inline u32 frontEdge(u32 random, u32 coordinate)
+{
+    s32 value = coordinate + 120;
+    return value + (random & 15);
+}
+
+static inline u32 backEdge(u32 random, u32 coordinate)
+{
+    s32 value = coordinate - 120;
+    return value - (random & 15);
+}
+
+/* Consume two jitter samples per particle; publish the index before emission. */
+
+#define FIRST()                                                                                    \
+    (index = (*cursor + 1) & ({                                                                    \
+                 register u32 m asm("r1") = mask;                                                  \
+                 asm("" : "+r"(m));                                                                \
+                 m;                                                                                \
+             }),                                                                                   \
+     (const u16 *)(index * 2 + (u32)table))
+#define LAST()                                                                                     \
+    (index = (index + 1) & mask, *({                                                               \
+         register u32 *p asm("r1") = cursor;                                                       \
+         p;                                                                                        \
+     }) = index,                                                                                   \
+     index *= 2, index += (u32)table, (const u16 *)index)
+void Scene_SpawnDirectionalDust(struct SceneObject *input)
+{
+    register struct SceneObject *actor asm("r10") = input;
+    struct SceneExtent size;
+    struct Vec point;
+    struct Vec *particle;
+    s32 i;
+    register const u16 *table asm("r4");
+    register u32 *cursor asm("r9");
+    u32 mask;
+    size.x = 32;
+    size.y = 0;
+    size.z = 32;
+    particle = &point;
+    table = gUnk_0203B400;
+    cursor = &gUnk_03005308;
+    i = ({
+        register s32 count asm("r1");
+        asm("" : "=r"(count) : "0"(2));
+        count;
+    });
+    mask = 1023;
+    do {
+        register u32 index asm("r2");
+        struct SceneObject *local = actor;
+
+        const u16 *random;
+
+        point = *(struct Vec *)&local->body.position;
+        switch (local->direction) {
+            case 0:
+                random = FIRST();
+                {
+                    u32 value = dustScatter((u8 *)random, &particle->xy.half.x);
+                    u32 low = (u16)value;
+                    point.xy.word = (point.xy.word & 0xFFFF0000) | low;
+                }
+                {
+                    const u16 *second = LAST();
+                    {
+                        u32 value = frontEdge(*second, point.zp.half.z);
+                        u32 low = (u16)value;
+                        point.zp.word = (point.zp.word & 0xFFFF0000) | low;
+                    }
+                }
+                break;
+            case 1:
+                random = FIRST();
+                {
+                    u32 value = backEdge(*random, particle->xy.half.x);
+                    u32 low = (u16)value;
+                    point.xy.word = (point.xy.word & 0xFFFF0000) | low;
+                }
+                {
+                    const u16 *second = LAST();
+                    {
+                        u32 value = dustScatter((u8 *)second, &point.zp.half.z);
+                        u32 low = (u16)value;
+                        point.zp.word = (point.zp.word & 0xFFFF0000) | low;
+                    }
+                }
+                break;
+            case 2:
+                random = FIRST();
+                {
+                    register u32 value asm("r1") = dustScatter((u8 *)random, &particle->xy.half.x);
+                    u32 low = (u16)value;
+                    point.xy.word = (point.xy.word & 0xFFFF0000) | low;
+                }
+                {
+                    const u16 *second = LAST();
+                    {
+                        u32 value = backEdge(*second, point.zp.half.z);
+                        u32 low = (u16)value;
+                        point.zp.word = (point.zp.word & 0xFFFF0000) | low;
+                    }
+                }
+                break;
+            case 3:
+                random = FIRST();
+                {
+                    register u32 value asm("r1") = frontEdge(*random, particle->xy.half.x);
+                    u32 low = (u16)value;
+                    point.xy.word = (point.xy.word & 0xFFFF0000) | low;
+                }
+                {
+                    const u16 *second = LAST();
+                    {
+                        register u32 value asm("r1") = dustScatter((u8 *)second, &point.zp.half.z);
+                        u32 low = (u16)value;
+                        point.zp.word = (point.zp.word & 0xFFFF0000) | low;
+                    }
+                }
+                break;
+        }
+        sub_08068108((struct SceneVec *)particle, 0, &size, 1, 2, 4);
+        i = ({
+            register s32 count asm("r2") = i;
+            asm("" : : "r"(count));
+            count - 1;
+        });
+    } while (i >= 0);
+}
+
+extern u16 gUnk_02000534, gUnk_02000500;
+
+// MATCHING_CONCESSION: register-pinning
+s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
+{
+    struct SceneObject *actor = input;
+    register s32 index asm("r4") = idx;
+    register s32 direction asm("r8") = dir;
+    register struct SceneCell *reference asm("r10") = &actor->cellRef.cell;
+    s32 savedIndex;
+    s32 delta = 0, dx = 0, dz = 0, speed, step;
+    struct SceneCell *cell;
+    u8 *dynamic;
+    if (({
+            u8 active = 0;
+            if (gUnk_02000534 && gUnk_02000500 == 2)
+                active = 1;
+            active;
+        }) ||
+        actor->type == 1) {
+        step = 16;
+        speed = 16;
+    } else {
+        step = 4;
+        speed = 64;
+    }
+    switch (direction) {
+        case 0:
+            dz = -step;
+            delta = -((s16 *)gUnk_030052F4->cells)[2];
+            break;
+        case 1:
+            dx = step;
+            delta = 1;
+            break;
+        case 2:
+            dz = step;
+            delta = ((s16 *)gUnk_030052F4->cells)[2];
+            break;
+        case 3:
+            dx = -step;
+            delta = -1;
+            break;
+    }
+    index += delta;
+    dynamic = sub_0821D64C(index, 1);
+    savedIndex = index;
+    if (dynamic)
+        cell = (struct SceneCell *)(dynamic + 4);
+    else
+        cell = (struct SceneCell *)(gUnk_030052F4->cells + 12 + savedIndex * 4);
+    if (cell) {
+        register u32 heightByte asm("r1") = cell->height;
+        u32 mask = 0xF0;
+        s32 type = heightByte >> 4;
+        asm("" : : "r"(heightByte));
+        asm("" : "+r"(mask));
+        switch (type) {
+            case 0: {
+                u32 lowMask = 15;
+                u32 referenceHeight;
+                s32 next;
+                s32 current;
+                referenceHeight = ({
+                    register struct SceneCell *p asm("r2") = reference;
+                    p->height;
+                });
+                asm("" : : "r"(referenceHeight));
+                next = heightByte & lowMask;
+                current = referenceHeight & lowMask;
+                if ((u32)next >= (u32)current)
+                    break;
+                if (cell->flags & 8)
+                    break;
+                if (current - next > 1) {
+                    actor->targetY = ({
+                        u32 y = next << 8;
+                        y;
+                    });
+                    actor->direction = ({
+                        u32 d = direction;
+                        asm("" : "+r"(d));
+                        d;
+                    });
+                    {
+                        register void (*callback)(struct SceneObject *) asm("r1") =
+                            Scene_UpdateObjectStep;
+                        actor->update = callback;
+                    }
+                    actor->timer = 0;
+                    actor->entered = 1;
+                    actor->dx = dx;
+                    actor->dz = dz;
+                    actor->kind = 2;
+                    actor->cellRef.index = savedIndex;
+                    actor->duration = speed;
+                    return 3;
+                } else {
+                    u32 referenceHeight;
+                    actor->targetY = ({
+                        u32 y = next << 8;
+                        y;
+                    });
+                    referenceHeight = ({
+                        register struct SceneCell *p asm("r2") = reference;
+                        p->height;
+                    });
+                    {
+                        register s32 remaining asm("r0") = referenceHeight & lowMask;
+                        if (remaining > 0)
+                            remaining--;
+                        mask &= referenceHeight;
+                        mask |= remaining;
+                        reference->height = mask;
+                    }
+                    {
+                        register u32 tile asm("r0") = cell->tile;
+                        reference->tile = tile;
+                    }
+                    actor->direction = ({
+                        register u32 d asm("r2") = direction;
+                        d;
+                    });
+                    {
+                        register void (*callback)(struct SceneObject *) asm("r1") =
+                            Scene_UpdateObjectStep;
+                        actor->update = callback;
+                    }
+                    actor->timer = 0;
+                    actor->entered = 1;
+                    actor->dx = dx;
+                    actor->dz = dz;
+                    actor->kind = 1;
+                    actor->cellRef.index = savedIndex;
+                    actor->duration = speed;
+                    return 1;
+                }
+            }
+            default: {
+                /* Preserve the original range normalization for non-flat terrain. */
+                s32 normalized = type - 1;
+                asm("" : : "r"(normalized));
+                break;
+            }
+        }
+    }
+    return 0;
+}
+
+static inline s32 cellIndex(struct SceneVec *pos)
+{
+    s32 x = pos->x >> 8, z = pos->z >> 8;
+    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        return 0;
+    return gUnk_030052F4->rows[z] + x;
+}
+
+static inline struct SceneCell *getCell(s32 index)
+{
+    u8 *dynamic = sub_0821D64C(index, 1);
+    struct SceneCell *cell;
+    if (dynamic)
+        cell = (struct SceneCell *)(dynamic + 4);
+    else
+        cell = (struct SceneCell *)(gUnk_030052F4->cells + 12 + index * 4);
+    return cell;
+}
+
+s32 SceneObjects_TryPushNeighbor(struct SceneVec *position, s32 direction)
+{
+    s32 delta, index;
+    struct SceneCell *origin;
+    struct SceneObjectManager *manager = gUnk_02000024;
+    struct SceneObject *p;
+    s32 i;
+    if (!manager)
+        return -1;
+    origin = getCell(cellIndex(position));
+    index = cellIndex(position);
+    delta = 0;
+    switch (direction) {
+        case 0:
+            delta = -((s16 *)gUnk_030052F4->cells)[2];
+            break;
+        case 1:
+            delta = 1;
+            break;
+        case 2:
+            delta = ((s16 *)gUnk_030052F4->cells)[2];
+            break;
+        case 3:
+            delta = -1;
+            break;
+    }
+    p = manager->objects;
+    for (i = 0; i < manager->count; p++, i++) {
+        struct SceneCell *reference;
+        s32 neighbor, result;
+        u32 neighborHeight;
+        if (!p->active || p->kind)
+            continue;
+        reference = &p->cellRef.cell;
+        neighbor = index + delta;
+        if (neighbor != p->cellRef.index)
+            continue;
+        if ((origin->height & 15) + 1 != (reference->height & 15))
+            continue;
+        neighborHeight = getCell(neighbor)->height & 15;
+        if (neighborHeight != (reference->height & 15))
+            continue;
+        if (p->pushLimited && !p->pushesLeft)
+            break;
+        result = Scene_TryStepDown(p, p->cellRef.index, direction);
+        if (result > 0) {
+            sub_080045B0(p->type);
+            if (p->type == 1)
+                result = -1;
+            if (p->pushesLeft)
+                p->pushesLeft--;
+        }
+        return result;
+    }
+    return 0;
+}
+
+extern const u8 gUnk_086049AC[];
+
+/* Try pushing the neighbor in the direction named by table entry `index`. */
+
+s32 sub_08005098(struct SceneVec *position, u32 index)
+{
+    return SceneObjects_TryPushNeighbor(position, gUnk_086049AC[index]);
+}
+
+/* Idle state: wait until health runs out, then disappear (type 1) or get removed. */
+
+void sub_080050AC(struct SceneObject *p)
+{
+    u8 t = p->type;
+    if (t == 1) {
+        if (p->health <= 0) {
+            void *f = Scene_UpdateObjectDisappearance;
+            p->update = f;
+            p->timer = 0;
+            p->entered = t;
+            p->kind = 3;
+        }
+    } else {
+        if (p->health <= 0) {
+            p->mode = 3;
+            p->update = 0;
+        }
+    }
+}
+
+void sub_0821FE40(struct SceneCollider *);
+
+void Scene_UpdateObjectStep(struct SceneObject *p)
+{
+    struct SceneBody *body = &p->body;
+    struct SceneCell *terrain = &p->cellRef.cell;
+    if (p->entered) {
+        p->entered = 0;
+        terrain->flags |= 1;
+    }
+    body->vx = p->dx;
+    body->vz = p->dz;
+    body->position.y = (terrain->height & 15) << 8;
+    if (p->kind == 2)
+        body->position.y -= 256;
+    p->center.y = body->position.y;
+    sub_0821FF24(&p->stepCollider, &p->body.position, 0);
+    sub_0821FE40(&p->stepCollider);
+    if (p->type != 1 && !(p->timer & 3))
+        Scene_SpawnDirectionalDust(p);
+    if (++p->timer >= p->duration) {
+        s32 height = terrain->height & 15;
+        if (height < 15)
+            height++;
+        terrain->height = (terrain->height & 0xF0) | height;
+        terrain->tile = 255;
+        if (p->type == 1) {
+            if (p->kind == 2) {
+                {
+                    register void (*callback)(struct SceneObject *) asm("r1") =
+                        Scene_UpdateFallingObject;
+                    p->update = callback;
+                }
+                p->timer = 0;
+                p->entered = 1;
+                p->kind = 2;
+                p->dx = 0;
+                p->dz = 0;
+                p->direction = 0;
+            } else if (!Scene_TryStepDown(p, p->cellRef.index, p->direction)) {
+                Scene_PlayNeighborMovementEffect(p);
+                {
+                    register void (*callback)(struct SceneObject *) asm("r1") = sub_080050AC;
+                    p->update = callback;
+                }
+                p->timer = 0;
+                p->entered = 1;
+                p->kind = 0;
+                p->dx = 0;
+                p->dz = 0;
+                p->direction = 0;
+                terrain->flags &= ~1;
+            }
+        } else {
+            if (p->kind == 2) {
+                {
+                    register void (*callback)(struct SceneObject *) asm("r0") =
+                        Scene_UpdateFallingObject;
+                    p->update = callback;
+                }
+                p->timer = 0;
+                p->entered = 1;
+                p->kind = 2;
+            } else {
+                Scene_PlayNeighborMovementEffect(p);
+                {
+                    register void (*callback)(struct SceneObject *) asm("r1") = sub_080050AC;
+                    p->update = callback;
+                }
+                p->timer = 0;
+                p->entered = 1;
+                p->kind = 0;
+                terrain->flags &= ~1;
+            }
+            p->dx = 0;
+            p->dz = 0;
+            p->direction = 0;
+        }
+    }
+}
+
+void Scene_UpdateFallingObject(struct SceneObject *p)
+{
+    struct SceneBody *body = &p->body;
+    struct SceneCell *terrain = &p->cellRef.cell;
+    if (p->entered) {
+        s32 height;
+        p->entered = 0;
+        height = (p->targetY >> 8) + 1;
+        if (height > 15)
+            terrain->height = (terrain->height & 0xF0) | 15;
+        else
+            terrain->height = (terrain->height & 0xF0) | height;
+        if (({
+                u32 mask = 8;
+                mask & p->flags;
+            }))
+            p->cellRef.cell.flags |= 0x21;
+    }
+    body->vy = p->targetY - body->position.y;
+    if (body->vy < -16)
+        body->vy = -16;
+    else if (body->vy > 0)
+        body->vy = 0;
+    if (body->vy == 0) {
+        if (({
+                u32 mask = 8;
+                mask & p->flags;
+            })) {
+            p->cellRef.cell.flags |= 0x21;
+            p->health = 0;
+        } else {
+            p->cellRef.cell.flags &= ~0x21;
+            Scene_PlayMovementEffect(p);
+        }
+        {
+            register void (*callback)(struct SceneObject *) asm("r1") = sub_080050AC;
+            p->update = callback;
+        }
+        p->timer = 0;
+        p->entered = 1;
+        p->dx = 0;
+        p->dz = 0;
+        p->direction = 0;
+        p->kind = 0;
+    }
+}
+
+struct Args {
+    u32 count : 16;
+    s32 *values;
+};
+
+void sub_0821AD08(u32, struct Args *);
+
+s32 Mod(s32, s32);
+
+static inline void setMode(struct SceneDraw *draw, s16 mode)
+{
+    draw->mode = mode;
+}
+
+void Scene_UpdateObjectDisappearance(struct SceneObject *p)
+{
+    s32 values[5];
+    struct Args args;
+    if (p->entered) {
+        p->entered = 0;
+        p->phase = 0;
+        setMode(&p->draw, 0);
+        sub_0822B2F8(0x136);
+        p->cellRef.cell.flags |= 0x21;
+        if (p->script) {
+            values[0] = p->body.id;
+            values[1] = p->type;
+            values[2] = p->body.position.x;
+            values[3] = p->body.position.y;
+            values[4] = p->body.position.z;
+            args.count = 5;
+            args.values = values;
+            sub_0821AD08(p->script, &args);
+            p->script = 0;
+        }
+    }
+    if (!p->phase) {
+        if (!Mod(p->timer, 2)) {
+            if (!p->draw.mode)
+                setMode(&p->draw, 1);
+            else
+                setMode(&p->draw, 0);
+        }
+        if (p->timer++ > 29) {
+            p->timer = 0;
+            p->phase++;
+        }
+    } else {
+        if (p->timer++ > 5) {
+            p->timer = 0;
+            if (++p->phase > 3)
+                p->mode = 2;
+            else
+                setMode(&p->draw, p->phase);
+        }
+    }
+}
+
+void Scene_UpdateObjectFlash(struct SceneObject *p)
+{
+    if (p->entered) {
+        p->entered = 0;
+        p->phase = 3;
+        setMode(&p->draw, 3);
+        sub_0822B2F8(0x136);
+    }
+    if (p->phase) {
+        if (p->timer++ > 5) {
+            p->timer = 0;
+            p->phase--;
+            setMode(&p->draw, p->phase);
+        }
+    } else {
+        register void (*callback)(struct SceneObject *) asm("r0") = sub_080050AC;
+        p->update = callback;
+        p->timer = 0;
+        p->entered = 1;
+        p->kind = 0;
+    }
+}
+
+extern void (*const gUnk_086049B4[])(struct SceneObject *);
+
+extern u8 *gUnk_02000710;
+
+void sub_08225B74(void *);
+
+void sub_0821DE30(void *);
+
+void sub_08221110(void *, u32, u32, s32, s32);
+
+static inline u8 ownerIsCurrent(u32 owner)
+{
+    if (*(u32 *)(gUnk_02000710 + 0x5A0) == owner)
+        return 1;
+    return 0;
+}
+
+static inline void disableCollision(u16 *flags)
+{
+    register u32 value asm("r1") = *flags;
+    {
+        u32 result = value | 4;
+        *flags = result;
+    }
+}
+
+// MATCHING_CONCESSION: register-pinning
+s32 SceneObjects_Update(struct SceneObjectManager *manager)
+{
+    struct SceneObject *p = manager->objects;
+    s32 i;
+    s32 values[5];
+    struct Args args;
+    for (i = 0; i < manager->count; i++, p++) {
+        if (!p->active)
+            continue;
+        if (p->mode) {
+            if (p->mode == 3 && gUnk_086049B4[p->type])
+                gUnk_086049B4[p->type](p);
+            if (p->script) {
+                values[0] = p->body.id;
+                values[1] = p->type;
+                values[2] = p->body.position.x;
+                values[3] = p->body.position.y;
+                values[4] = p->body.position.z;
+                args.count = 5;
+                args.values = values;
+                sub_0821AD08(p->script, &args);
+                p->script = 0;
+            }
+            Scene_DropObjectsAbove(p);
+            sub_080047AC(p);
+            continue;
+        }
+        sub_08225B74(&p->body);
+        if (p->update)
+            p->update(p);
+        if (p->flags & 0x20) {
+            if (!p->kind) {
+                p->body.flags &= ~2;
+                sub_0821DE30(&p->link);
+            } else
+                p->body.flags |= 2;
+        } else
+            sub_0821DE30(&p->link);
+        if (p->cooldown)
+            p->cooldown--;
+        if (!p->owner || ownerIsCurrent(p->owner))
+            p->draw.flags &= ~1;
+        else
+            p->draw.flags |= 1;
+        if (p->damageTimer || p->health <= 0) {
+            p->damageTimer--;
+            goto disable;
+        }
+        if (!p->owner || ownerIsCurrent(p->owner)) {
+            p->collider.state &= ~4;
+            sub_0821FF24(&p->collider, &p->body.position, 0);
+        } else {
+        disable:
+            disableCollision(&p->collider.state);
+        }
+        if (p->animationTimer && !--p->animationTimer)
+            sub_08215284(&p->animationData, p->initialAnimation);
+    }
+    if (manager->fading) {
+        sub_08221110(manager->paletteA, manager->fromA, manager->toA, manager->fade, 5);
+        sub_08221110(manager->paletteB, manager->fromB, manager->toB, manager->fade, 5);
+        if (!manager->descending) {
+            if (++manager->fade > 31) {
+                manager->fade = 32;
+                manager->descending = 1;
+            }
+        } else if (--manager->fade <= 0) {
+            manager->fade = 0;
+            manager->descending = 0;
+            if (manager->stopFade)
+                manager->stopFade = 0;
+        }
+    }
+    manager->frame = 1 - manager->frame;
+    return 0;
+}
+
+void sub_08219D38(u32);
+
+/* Task teardown: free all objects, release the pool and clear the global manager. */
+
+u32 sub_080056D0(struct SceneObjectManager *manager)
+{
+    sub_080047EC();
+    sub_08219D38((u32)manager->objects);
+    return (u32)(gUnk_02000024 = 0);
+}
+
+extern u8 *gUnk_030042E4;
+
+void *sub_08219C40(u32);
+
+void sub_08219DD8(void *, u32);
+
+/* Allocate the object pool (default 8 objects) and initialize the palette-fade state. */
+
+s32 sub_080056F0(struct SceneObjectManager *p, void *unused)
+{
+    void *m;
+    u8 *b;
+    gUnk_02000024 = p;
+    if (p->count == 0)
+        p->count = 8;
+    m = sub_08219C40(p->count * sizeof(struct SceneObject));
+    p->objects = m;
+    if (m == 0)
+        return -1;
+    sub_08219DD8(m, p->count * sizeof(struct SceneObject));
+    p->frame = 0;
+    p->fading = 0;
+    p->descending = 0;
+    p->fade = 0;
+    b = gUnk_030042E4;
+    p->fromA = (u32)(b + 0x80);
+    p->fromB = (u32)(b + 0xa0);
+    p->toA = (u32)(b + 0xc0);
+    p->toB = (u32)(b + 0xe0);
+    CpuSet((void *)p->paletteA[0], &p->paletteA[0], 0x04000008);
+    CpuSet((void *)p->paletteA[1], p->paletteB, 0x04000008);
+    return 0;
+}
+
+void *sub_08219FBC(u32, u32);
+
+void sub_0821A04C(void *, void (*)(void), void (*)(void));
+
+void sub_0821A0C0(void *);
+
+/* Create the scene-object task (or return the existing one). */
+
+struct SceneObjectManager *sub_08005778(void *a)
+{
+    struct SceneObjectManager *p;
+    if (gUnk_02000024 != 0)
+        return gUnk_02000024;
+    p = sub_08219FBC(8, 0x74);
+    if (p != 0) {
+        sub_0821A04C(p, (void (*)(void))SceneObjects_Update, (void (*)(void))sub_080056D0);
+        p->count = sub_0821ABA8(0x6d, 8);
+        if (sub_080056F0(p, a) < 0) {
+            sub_0821A0C0(p);
+            return 0;
+        }
+    }
+    return p;
+}
+
+/* Find a free object slot, or NULL. */
+
+struct SceneObject *sub_080057D0(struct SceneObjectManager *manager)
+{
+    struct SceneObject *e = manager->objects;
+    s32 i;
+    for (i = 0; i < manager->count; e++, i++) {
+        if (e->active == 0)
+            return e;
+    }
+    return 0;
+}
+
+/* Find the active object with the given script id, or NULL. */
+
+struct SceneObject *sub_080057FC(struct SceneObjectManager *manager, u32 id)
+{
+    struct SceneObject *e = manager->objects;
+    s32 i;
+    for (i = 0; i < manager->count; e++, i++) {
+        if (e->active != 0 && e->body.id == id)
+            return e;
+    }
+    return 0;
+}
+
+void sub_082151E4(struct SceneAnimation *, u32);
+
+void sub_082144A4(struct SceneDraw *, struct SceneAnimation *, s32);
+
+void sub_08225AB4(struct SceneBody *, u32, struct SceneVec *, s32, s32, struct SceneObject *);
+
+void sub_08225B28(struct SceneBody *, struct SceneDraw *);
+
+u32 sub_0822C034(struct SceneVec *);
+
+u32 sub_0821D698(void *, u32, u32, u32, u32, u32);
+
+void sub_0821FEB4(struct SceneCollider *, u16, u32, s32, s32, struct SceneExtent *,
+                  struct SceneExtent *);
+
+void sub_0821FF84(struct SceneCollider *, void *, struct SceneObject *);
+
+void sub_0821FF50(struct SceneCollider *, s32, s32);
+
+s32 sub_08003C00(struct SceneBody *);
+
+static inline void initializeCell(void *cell, s32 index, s32 height)
+{
+    sub_0821D698(cell, index, 0, height, 255, ({
+                     register s32 zero asm("r2") = 0;
+                     zero;
+                 }));
+}
+
+static inline void setStepFlags(struct SceneCollider *c)
+{
+    c->contactFlags = 0x800;
+    c->contactFlags2 = 0;
+}
+
+static inline u16 flags16(struct SceneObject *p, u32 mask)
+{
+    return mask & p->flags;
+}
+
+// MATCHING_CONCESSION: register-pinning
+s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *position,
+                              u32 animationResource, s32 drawMode, s32 health, s32 initialAnimation,
+                              s32 animation, u32 script)
+{
+    struct SceneExtent size, offset;
+    struct SceneObjectManager *manager = gUnk_02000024;
+    struct SceneObject *p;
+    register struct SceneDraw *draw asm("r5");
+    register struct SceneVec *pos asm("r9");
+    s32 x, z, index, height;
+    u32 clear;
+    u8 *dynamic;
+    struct SceneCell *cell;
+    if (!manager || !(p = sub_080057D0(manager)))
+        return -1;
+    sub_08219DD8(p, 0x1A8);
+    p->active = 1;
+    p->type = type;
+    if (p->type == 6)
+        manager->fading = 1;
+    p->flags = flags;
+    p->timer = 0;
+    p->kind = 0;
+    sub_082151E4(&p->animationData, animationResource);
+    draw = &p->draw;
+    asm("" : "+r"(draw));
+    sub_082144A4(draw, &p->animationData, 0);
+    draw->mode = drawMode;
+    p->center.x = (position->x & ~255) + 128;
+    p->center.y = position->y & ~255;
+    p->center.z = (position->z & ~255) + 128;
+    sub_08225AB4(&p->body, id, position, 0, 7, p);
+    sub_08225B28(&p->body, draw);
+    p->body.position = p->center;
+    if (flags16(p, 16)) {
+        p->owner = sub_0822C034(&p->body.position);
+        pos = &p->body.position;
+    } else {
+        p->owner = 0;
+        pos = &p->body.position;
+    }
+    p->dx = 0;
+    p->dz = 0;
+    p->direction = 0;
+    if (flags16(p, 4)) {
+        {
+            register void (*callback)(struct SceneObject *) asm("r0") = Scene_UpdateObjectFlash;
+            asm("" : "+r"(callback));
+            p->update = callback;
+        }
+        p->timer = 0;
+    } else {
+        {
+            register void (*callback)(struct SceneObject *) asm("r0") = sub_080050AC;
+            asm("" : "+r"(callback));
+            p->update = callback;
+        }
+        p->timer = 0;
+    }
+    p->entered = 1;
+    x = p->body.position.x >> 8;
+    z = ({
+            register struct SceneVec *coords asm("r1") = pos;
+            asm("" : "+r"(coords));
+            coords->z;
+        }) >>
+        8;
+    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        index = 0;
+    else
+        index = gUnk_030052F4->rows[z] + x;
+    dynamic = sub_0821D64C(index, 1);
+    if (dynamic)
+        cell = (struct SceneCell *)(dynamic + 4);
+    else
+        cell = (struct SceneCell *)(gUnk_030052F4->cells + 12 + index * 4);
+    height = cell->height & 15;
+    if (height < 15)
+        height++;
+    initializeCell(&p->cellRef, index, height);
+    {
+        register u32 y asm("r0") = height << 8;
+        asm("" : "+r"(y));
+        clear = ({
+            register u32 zero asm("r3") = 0;
+            asm("" : "+r"(zero));
+            zero;
+        });
+        p->targetY = y;
+    }
+    size.x = 130;
+    size.y = 128;
+    size.z = 130;
+    offset.x = 0;
+    offset.y = 128;
+    offset.z = 0;
+    sub_0821FEB4(&p->collider, p->body.id, 0x4041, 0, 16, &size, &offset);
+    sub_0821FF24(&p->collider, pos, 0);
+    sub_0821FF84(&p->collider, Scene_ApplyTerrainInteraction, p);
+    sub_0821FE40(&p->collider);
+    ((u16 *)&size)[0] = 128;
+    ((u16 *)&size)[1] = 128;
+    ((u16 *)&size)[2] = 128;
+    sub_0821FEB4(&p->stepCollider, p->body.id, 0x2801, 0, 1, &size, &offset);
+    sub_0821FF24(&p->stepCollider, pos, 0);
+    sub_0821FF84(&p->stepCollider, sub_080046EC, p);
+    sub_0821FF50(&p->stepCollider, 1500, 50);
+    setStepFlags(&p->stepCollider);
+    p->health = health;
+    p->damageTimer = clear;
+    p->mode = clear;
+    p->animationTimer = clear;
+    p->phase = clear;
+    p->cooldown = clear;
+    p->unk23 = 4;
+    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    p->randomPhase = Mod(({
+                             u32 offset = gUnk_03005308 * 2;
+                             register u16 *table asm("r2");
+                             asm("" : "+r"(offset));
+                             table = gUnk_0203B400;
+                             asm("" : "+r"(table));
+                             *(u16 *)(offset + (u32)table);
+                         }),
+                         16);
+    {
+        register s32 initial asm("r3") = initialAnimation;
+        asm("" : "+r"(initial));
+        if (initial >= 0)
+            p->initialAnimation = initial;
+        else
+            p->initialAnimation = p->animationData.initial;
+    }
+    sub_08215284(&p->animationData, p->initialAnimation);
+    p->animation = animation;
+    p->link.id = p->body.id;
+    p->link.position = pos;
+    p->script = script;
+    if (!(p->flags & 2) && sub_08003C00(&p->body) < 0)
+        p->flags |= 2;
+    if (p->type == 5) {
+        p->pushLimited = 1;
+        p->pushesLeft = 1;
+    } else {
+        p->pushLimited = 0;
+        p->pushesLeft = 0;
+    }
+    return 0;
+}
+
+s32 Script_SeekToKeyword(s32);
+
+s32 Script_GetValue(void);
+
+#define RESOURCE(value)                                                                            \
+    ({                                                                                             \
+        s32 result = (value);                                                                      \
+        asm("" : "+r"(result));                                                                    \
+        result;                                                                                    \
+    })
+s32 SceneObjects_CreateFromScript(void)
+{
+    struct SceneExtent position;
+    s32 id, type;
+    s32 initial, animation, script, defaultResource;
+    register s32 flags asm("r9"), resource asm("r6"), drawMode asm("r8"), health asm("r10");
+    id = sub_0821ABA8('n', 0);
+    type = sub_0821ABA8('t', 0);
+    flags = sub_0821ABA8('f', 0);
+    if (Script_SeekToKeyword('M') && Script_GetValue())
+        flags |= 16;
+    if (Script_SeekToKeyword('p')) {
+        position.x = Script_GetValue();
+        position.y = Script_GetValue();
+        position.z = Script_GetValue();
+    } else {
+        position.x = 0;
+        position.y = 0;
+        position.z = 0;
+    }
+    if (type == 0)
+        goto fallback;
+    else if (type == 1)
+        defaultResource = RESOURCE(0x84EE);
+    else if (type == 2)
+        defaultResource = RESOURCE(0x9D40);
+    else if (type == 3)
+        defaultResource = RESOURCE(0x9D43);
+    else if (type == 4)
+        defaultResource = RESOURCE(0xE0C9);
+    else if (type == 5)
+        defaultResource = RESOURCE(0x5A2);
+    else if (type == 6)
+        defaultResource = RESOURCE(0xB306);
+    else {
+    fallback:
+        defaultResource = RESOURCE(0x9D41);
+    }
+    resource = sub_0821ABA8('a', defaultResource);
+    drawMode = sub_0821ABA8('i', 0);
+    health = sub_0821ABA8('l', 128);
+    if (type == 0)
+        initial = 0x2B8;
+    else if (type == 1)
+        initial = 0x2C2;
+    else if (type == 2)
+        initial = 0x279;
+    else if (type == 3)
+        initial = 0x6E;
+    else if (type == 4)
+        initial = 0x1D0;
+    else if (type == 5)
+        initial = 0xC4;
+    else if (type == 6) {
+        if (drawMode == 0 || drawMode == 2)
+            initial = 4;
+        else
+            initial = 5;
+    } else
+        initial = sub_0821ABA8('d', -1);
+    animation = 0x192;
+    script = sub_0821ABA8('b', 0);
+    SceneObjects_CreateObject(id, type, flags, (struct SceneVec *)&position, resource, drawMode,
+                              health, initial, animation, script);
+    return 0;
+}
+
+/* Tentative: trigger the type-six object's palette-switch animation. */
+
+s32 SceneObjects_SwitchPaletteFromScript(void)
+{
+    struct SceneObjectManager *manager = gUnk_02000024;
+    struct SceneObject *p;
+    struct SceneDraw *draw;
+    s32 id, mode, sound;
+    if (!manager || !(id = sub_0821ABA8('n', 0)) || !(p = sub_080057FC(manager, id)) ||
+        p->type != 6)
+        return -1;
+    draw = &p->draw;
+    mode = sub_0821ABA8('s', 0);
+    sound = sub_0821ABA8('S', 1);
+    if (!mode) {
+        if (draw->mode == 0 || draw->mode == 2) {
+            p->initialAnimation = 4;
+            sub_08215284(&p->animationData, 4);
+        } else {
+            p->initialAnimation = 5;
+            sub_08215284(&p->animationData, 5);
+        }
+    } else {
+        if (draw->mode == 0 || draw->mode == 2) {
+            p->initialAnimation = 6;
+            sub_08215284(&p->animationData, 6);
+            p->animationData.palette = manager->paletteA;
+        } else {
+            p->initialAnimation = 7;
+            sub_08215284(&p->animationData, 7);
+            p->animationData.palette = manager->paletteB;
+        }
+        manager->stopFade = 1;
+        if (sound)
+            sub_0822B2F8(0x149);
+    }
+}
