@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 97.5%
-// 2 differing instruction runs; first diff at +0x1A (lsls r1, r0, #1 vs ldr r1, [pc, #0x80])
 void sub_08030BF8(void);
 void sub_08033468(void);
 void sub_08033590(void);
@@ -39,8 +36,9 @@ void sub_0816F6B4(u8 *s)
         index = (*kind) + 10;
     } while (0);
     {
+        u32 off = index * sizeof(struct E);
         u8 *base = s + 0x1428;
-        flags = (u32 *)(base + index * sizeof(struct E));
+        flags = (u32 *)(base + off);
     }
     *flags |= 1;
     sub_0816D920(v, *kind);
@@ -51,6 +49,3 @@ void sub_0816F6B4(u8 *s)
     Sound_PlaySong(0x38A);
     sub_08163EB8(s, sub_0816F768, 1);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0816F6B4);
-#endif
