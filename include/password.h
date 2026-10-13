@@ -5,13 +5,13 @@
 
 /* Working state for decoding a typed password / name string (0x90 bytes, heap allocated). */
 struct PasswordEntry {
-    u8 codes[24];     /* 6 bit symbol indices (output of Password_EncodeSymbols) */
-    u8 text[48];      /* typed characters with tags removed (24 pairs) */
-    u8 decoded[44];   /* decoded payload words */
-    u8 name[5];       /* decoded name characters, 0xF0 = substituted glyph */
+    u8 codes[24];   /* 6 bit symbol indices (output of Password_EncodeSymbols) */
+    u8 text[48];    /* typed characters with tags removed (24 pairs) */
+    u8 decoded[44]; /* decoded payload words */
+    u8 name[5];     /* decoded name characters, 0xF0 = substituted glyph */
     u8 pad79[3];
-    u8 *table;        /* glyph pair table (0x40 pairs) */
-    int script;       /* string table id used to resolve 0xF0 */
+    u8 *table;  /* glyph pair table (0x40 pairs) */
+    int script; /* string table id used to resolve 0xF0 */
     int version;
     int checksum;
     int key;

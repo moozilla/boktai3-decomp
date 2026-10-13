@@ -20,14 +20,14 @@ struct IndicatorSprite {
 /* One blinking terrain marker (0xB4 bytes). */
 struct SceneIndicator {
     u8 pad0[8];
-    u32 timer;  /* frames in the current phase (mode 0) */
-    int id;     /* script id ('n') */
+    u32 timer; /* frames in the current phase (mode 0) */
+    int id;    /* script id ('n') */
     u8 active;
-    s8 frame;   /* base sprite frame */
+    s8 frame;                                            /* base sprite frame */
     u8 animation, index, count, visible, mode, disabled; /* mode: 0 timed, 1 triggered, 2 manual */
     int delay, period, value;
-    u16 times[8]; /* phase durations, alternating hidden/visible */
-    u8 effect[84];            /* collider */
+    u16 times[8];  /* phase durations, alternating hidden/visible */
+    u8 effect[84]; /* collider */
     struct IndicatorSprite sprite;
 };
 
