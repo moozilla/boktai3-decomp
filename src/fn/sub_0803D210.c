@@ -1,6 +1,6 @@
 #include "global.h"
 
-struct Q { u8 pad[0x30]; u32 f30; u8 pad2[8]; u8 f38; };
+struct Q { u8 pad[0x30]; u32 f30; u8 pad2[4]; u8 f38; };
 struct P { u8 pad[0x2314]; u32 a[2]; u32 b[2]; };
 
 u32 sub_0803D210(struct P *p, s32 i, struct Q *q)
