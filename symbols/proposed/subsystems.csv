@@ -655,6 +655,37 @@ addr,name,confidence,evidence
 0803343C,ScrollingText_SetScript,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
 08033478,ScrollingText_SetNumber,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
 08033590,ScrollingText_RequestHide,medium,Tentative descriptive role from exact C and contiguous text VM/controller state; notes/dialogue-vm_2026-10-12.md
+0803360C,TextWindow_Find,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+08033654,TextWindow_AllocateId,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+08033778,TextWindow_Destroy,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+0803381C,TextWindow_Clear,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+0803386C,TextWindow_SetScript,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+08033A38,TextWindow_SetString,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+08033A5C,TextWindow_SetRevealSpeed,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+08033AF0,TextWindow_ClearFreshFlag,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+08033AF8,TextWindow_RevealBurst,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+08033B44,TextWindowManager_Update,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+08033B94,TextWindowManager_Destroy,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+08033C1C,TextWindowManager_ClearAll,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+08033C58,DialogueTransition_SetRectangle,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+08033CB4,DialogueTransition_FadeIn,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+08033D10,DialogueTransition_Wait,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+08033D4C,DialogueTransition_FadeOut,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+08033DCC,DialogueTransition_Close,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+08033E18,DialogueTransition_Update,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+08033E74,DialogueTransition_Destroy,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+08033EA4,DialogueTransition_ReadScript,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+08033FEC,DialogueTransition_Init,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+08034030,DialogueTransition_CreateOrRestart,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+080340AC,WirelessController_Reset,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+08034178,WirelessController_ResetTransfer,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+080341B8,WirelessController_RestoreFlags,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+080341E0,WirelessController_PollInput,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+08034270,WirelessController_FilterParents,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+08034310,WirelessController_BuildPeerPacket,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+0803441C,WirelessController_SendPeerPacket,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+0803451C,WirelessController_CheckPeerSend,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
+080345D8,WirelessController_HandleEvent,medium,Provisional descriptive role from exact C; wireless types and APIs backed by include/rfu_compat.h and docs/RFU.md; notes/windows-wireless_2026-10-12.md
 0818D754,Motion_BuildApproachSegment,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D8E0,Motion_RampSpin,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
 0818D960,Motion_AdvanceApproach,medium,Tentative role from contiguous callback and script-command analysis; docs/BACKGROUND_CONTROLLERS.md or docs/MOTION_0818.md
