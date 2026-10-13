@@ -2,6 +2,7 @@
 #define COLLISION_CONTROLLER_H
 #include "global.h"
 #include "scene_object.h"
+#include "player.h"
 
 // Tentative: a pool of 16 small hit-detecting props (idle sprite, hit animation, then spawns an
 // effect burst) owned by a task, created from script. Each slot embeds a collider
@@ -72,16 +73,8 @@ struct CollisionScene {
     u8 mode;
 };
 
-struct CollisionActor {
-    u8 pad[0x448];
-    u32 flags;
-    u8 pad44C[0xe8];
-    u16 mode, pad536, active;
-};
-
 extern struct CollisionManager *gUnk_0200003C;
 extern struct CollisionScene gUnk_03005430;
-extern struct CollisionActor *gUnk_02000580;
 extern s32 gUnk_02000478;
 extern u16 gUnk_02000534, gUnk_02000500;
 extern void *gUnk_08604A00[2][3];

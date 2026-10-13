@@ -138,7 +138,8 @@ def hinted_functions(text, names):
     from merge_unit import items
     bodies = {}
     for item in items(text):
-        m = re.match(r"(static\s+)?[A-Za-z_][\w \*]*?\b(\w+)\s*\([^;{]*\)\s*\{", item.lstrip(), re.S)
+        code = re.sub(r"^(\s*(//[^\n]*|/\*.*?\*/)\s*)+", "", item, flags=re.S)  # leading comments
+        m = re.match(r"(static\s+)?[A-Za-z_][\w \*]*?\b(\w+)\s*\([^;{]*\)\s*\{", code, re.S)
         if m:
             bodies[m.group(2)] = (bool(m.group(1)), item)
     helpers = {n for n, (static, body) in bodies.items() if static and HINT.search(body)}
@@ -154,13 +155,10 @@ def collect_pinned(funcs, source_root):
         text = path.read_text()
         if MARK not in text:
             continue
-        # A marker directly above a definition pins that function; any other
-        # marker (e.g. at the top of a one-function file) pins the whole unit.
-        scoped = re.findall(re.escape(MARK) + r"\n(?!static\b)[A-Za-z_][\w \*]*?\b(\w+)\s*\(", text)
+        # A one-function file is pinned by its marker. In a multi-function unit
+        # the functions using pins or barriers (directly or via a static helper).
         names = c_functions(path, with_asm=False)
-        if text.count(MARK) == len(scoped) and len(names) > 1:
-            pinned.update(aliases.get(n, n) for n in scoped)
-        elif len(names) > 1:
+        if len(names) > 1:  # in a unit, the hints themselves say which functions
             pinned.update(aliases.get(n, n) for n in hinted_functions(text, names))
         else:
             pinned.update(aliases.get(n, n) for n in names)
