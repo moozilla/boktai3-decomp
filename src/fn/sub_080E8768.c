@@ -2,7 +2,10 @@
 
 extern const u8 gUnk_086062AC[];
 
-struct S { u8 filler[0x288]; const u8 *p; };
+struct S {
+    u8 filler[0x288];
+    const u8 *p;
+};
 
 void sub_080E8768(struct S *s)
 {

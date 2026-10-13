@@ -1,6 +1,9 @@
 #include "global.h"
 
-struct E { s32 cnt; u32 fl; };
+struct E {
+    s32 cnt;
+    u32 fl;
+};
 void sub_081B73F8(void *, void *);
 
 void sub_081B740C(void *p, struct E *e, u32 k)

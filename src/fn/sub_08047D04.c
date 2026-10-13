@@ -1,6 +1,7 @@
 #include "global.h"
 
-u8 *sub_08047D04(u8 *p) {
+u8 *sub_08047D04(u8 *p)
+{
     u8 *q = p + 0x38;
     s32 i = 0;
     while (i <= 15) {

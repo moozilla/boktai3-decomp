@@ -1,6 +1,10 @@
 #include "global.h"
 
-struct S { u8 f[0x20]; void *p20; void *p24; };
+struct S {
+    u8 f[0x20];
+    void *p20;
+    void *p24;
+};
 extern u32 gUnk_0200046C;
 void sub_08214514(void *);
 void sub_0800CC08(u32, void *);

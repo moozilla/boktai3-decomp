@@ -1,6 +1,13 @@
 #include "global.h"
-struct Task { struct Task *prev, *next; void (*update)(struct Task *), (*destroy)(struct Task *); u16 f10, flags; };
-struct List { struct Task *head; u32 mask; };
+struct Task {
+    struct Task *prev, *next;
+    void (*update)(struct Task *), (*destroy)(struct Task *);
+    u16 f10, flags;
+};
+struct List {
+    struct Task *head;
+    u32 mask;
+};
 extern struct List gUnk_03005280[14];
 extern u32 gUnk_0300523C;
 void sub_08219F94(struct Task *);

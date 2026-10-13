@@ -1,7 +1,18 @@
 #include "global.h"
 
-struct E0813C740 { u8 f0[0xF]; u8 fF; u8 f10[0x34 - 0x10]; };
-struct Q0813C740 { u32 f0; u8 f4; u8 f5; u8 f6; u8 f7; struct E0813C740 e[4]; };
+struct E0813C740 {
+    u8 f0[0xF];
+    u8 fF;
+    u8 f10[0x34 - 0x10];
+};
+struct Q0813C740 {
+    u32 f0;
+    u8 f4;
+    u8 f5;
+    u8 f6;
+    u8 f7;
+    struct E0813C740 e[4];
+};
 u32 sub_08215184(u32);
 void sub_08217DE0(void *, u32, u32);
 void sub_08217EC4(void *, s32, s32);

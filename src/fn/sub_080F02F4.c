@@ -4,8 +4,14 @@ extern const u8 gUnk_086063E4[];
 extern const u8 gUnk_086063D4[];
 extern const u8 gUnk_086063F4[];
 
-struct P { const u8 *a; u32 pad; };
-struct S { u8 filler[0x284]; struct P p[3]; };
+struct P {
+    const u8 *a;
+    u32 pad;
+};
+struct S {
+    u8 filler[0x284];
+    struct P p[3];
+};
 
 void sub_080F02F4(struct S *s)
 {

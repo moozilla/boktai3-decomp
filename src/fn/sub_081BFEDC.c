@@ -7,7 +7,8 @@ void sub_081BFEDC(u8 *p)
     u8 *q = p + 0x18;
     s32 i = 0x37;
     do {
-        if (q[4]) sub_082195E0(q);
+        if (q[4])
+            sub_082195E0(q);
         q += 0x60;
         i--;
     } while (i >= 0);

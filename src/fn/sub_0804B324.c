@@ -11,26 +11,28 @@ u32 sub_0804B324(u8 *p)
     if (sub_0804B1CC(p) != 0 && p[0x1a] != 9)
         sub_08049364(p);
     switch (p[0x255]) {
-    case 0:
-    case 3:
-    case 4:
-        if (gUnk_02000580[0x457] == 6) goto r1;
-        break;
-    case 1:
-        if (gUnk_02000580[0x457] == 6) {
-    r1:
-            return 1;
-        }
-        return 0;
-    case 0x10:
-        if (gUnk_02000580[0x457] == 6) goto r11;
-        break;
-    case 0x11:
-        if (gUnk_02000580[0x457] == 6) {
-    r11:
-            return 0x11;
-        }
-        return 0x10;
+        case 0:
+        case 3:
+        case 4:
+            if (gUnk_02000580[0x457] == 6)
+                goto r1;
+            break;
+        case 1:
+            if (gUnk_02000580[0x457] == 6) {
+            r1:
+                return 1;
+            }
+            return 0;
+        case 0x10:
+            if (gUnk_02000580[0x457] == 6)
+                goto r11;
+            break;
+        case 0x11:
+            if (gUnk_02000580[0x457] == 6) {
+            r11:
+                return 0x11;
+            }
+            return 0x10;
     }
     return p[0x255];
 }

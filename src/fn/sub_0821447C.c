@@ -1,6 +1,9 @@
 #include "global.h"
 
-struct S30042A0 { u8 pad[0x12]; u16 f12; };
+struct S30042A0 {
+    u8 pad[0x12];
+    u16 f12;
+};
 extern struct S30042A0 gUnk_030042A0;
 extern u32 gUnk_030042B4;
 extern u32 gUnk_03004294;

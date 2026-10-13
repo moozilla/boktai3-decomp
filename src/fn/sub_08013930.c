@@ -1,4 +1,47 @@
 #include "global.h"
-extern void*gUnk_02000058;void*sub_080138F0(int,int);void sub_08013740(void*);void sub_0801373C(void*);void sub_082151E4(void*,int);void sub_082144A4(void*,void*,int);void sub_080136B4(void*,void*);
+extern void *gUnk_02000058;
+void *sub_080138F0(int, int);
+void sub_08013740(void *);
+void sub_0801373C(void *);
+void sub_082151E4(void *, int);
+void sub_082144A4(void *, void *, int);
+void sub_080136B4(void *, void *);
 #define ScaledShadow_Initialize sub_08013930
-int ScaledShadow_Initialize(u8*p,void*source,int scale,int min,int max,int extra,int maxHeight,int minHeight,int shift,int nearShift,int mode){void*m=gUnk_02000058;u8*resource,*sprite;int zero;if(!m){m=sub_080138F0(0,0);if(!m)return -1;}zero=0;p[0]=zero;*(void**)(p+8)=source;p[1]=zero;*(u16*)(p+2)=zero;*(u16*)(p+4)=zero;p[0x54]=scale;p[0x55]=min;p[0x56]=max;p[0x57]=extra;*(u16*)(p+0x58)=maxHeight;*(u16*)(p+0x5a)=minHeight;*(u16*)(p+0x5c)=shift;*(u16*)(p+0x5e)=nearShift;if(!mode)*(void(**)(void*))(p+0x60)=sub_08013740;else *(void(**)(void*))(p+0x60)=sub_0801373C;resource=p+0x38;sub_082151E4(resource,0x1C1B);sprite=p+12;sub_082144A4(sprite,resource,514);*(u16*)(sprite+16)=5;p[0x13]=2;sub_080136B4(m,p);return 0;}
+int ScaledShadow_Initialize(u8 *p, void *source, int scale, int min, int max, int extra,
+                            int maxHeight, int minHeight, int shift, int nearShift, int mode)
+{
+    void *m = gUnk_02000058;
+    u8 *resource, *sprite;
+    int zero;
+    if (!m) {
+        m = sub_080138F0(0, 0);
+        if (!m)
+            return -1;
+    }
+    zero = 0;
+    p[0] = zero;
+    *(void **)(p + 8) = source;
+    p[1] = zero;
+    *(u16 *)(p + 2) = zero;
+    *(u16 *)(p + 4) = zero;
+    p[0x54] = scale;
+    p[0x55] = min;
+    p[0x56] = max;
+    p[0x57] = extra;
+    *(u16 *)(p + 0x58) = maxHeight;
+    *(u16 *)(p + 0x5a) = minHeight;
+    *(u16 *)(p + 0x5c) = shift;
+    *(u16 *)(p + 0x5e) = nearShift;
+    if (!mode)
+        *(void (**)(void *))(p + 0x60) = sub_08013740;
+    else
+        *(void (**)(void *))(p + 0x60) = sub_0801373C;
+    resource = p + 0x38;
+    sub_082151E4(resource, 0x1C1B);
+    sprite = p + 12;
+    sub_082144A4(sprite, resource, 514);
+    *(u16 *)(sprite + 16) = 5;
+    p[0x13] = 2;
+    sub_080136B4(m, p);
+    return 0;
+}

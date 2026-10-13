@@ -4,7 +4,8 @@ extern u32 *gUnk_020004AC;
 void sub_0824923C(u32, u32);
 void sub_08219D38(u32);
 
-void sub_08071434(void) {
+void sub_08071434(void)
+{
     u32 *n = gUnk_020004AC;
     u8 *e;
     if (n) {

@@ -1,19 +1,19 @@
 #include "global.h"
 struct Blob {
-  u32 words[8];
+    u32 words[8];
 };
 struct LinkMenu {
-  u8 task[0x18];
-  u8 state, entered, pad1a[2];
-  u32 timer;
-  int window;
-  void *background;
-  void *script;
-  void *resource;
-  struct Blob blob;
-  u8 draw50[8];
-  u32 flags;
-  u8 pad5c[0x54];
+    u8 task[0x18];
+    u8 state, entered, pad1a[2];
+    u32 timer;
+    int window;
+    void *background;
+    void *script;
+    void *resource;
+    struct Blob blob;
+    u8 draw50[8];
+    u32 flags;
+    u8 pad5c[0x54];
 };
 extern struct LinkMenu *gUnk_020000F8;
 extern u16 gUnk_03004BD8, gUnk_03005260[];
@@ -51,36 +51,37 @@ void *sub_08227E90(void);
 void sub_082196C4(void *, void *);
 void sub_0821983C(void *, void *, int, int, int, int, int, int);
 void *sub_0821ABA8(int, int);
-int sub_08037140(struct LinkMenu *p) {
-  struct Blob *resource;
-  struct Blob *blob;
-  int zero;
-  gUnk_020000F8 = p;
-  sub_0801683C();
-  if (!Script_SeekToKeyword(115))
-    goto failed;
-  p->script = sub_08227E90();
-  if (!p->script)
-    goto failed;
-  resource = sub_0821A520(0xCB05, 0x7C8B);
-  if (!resource)
-    goto failed;
-  p->blob = *resource;
-  blob = &p->blob;
-  sub_082196C4(blob, resource);
-  {
-    void *drawable = p->draw50;
-    int flags;
-    flags = 0x2011;
-    zero = 0;
-    sub_0821983C(drawable, blob, 3, flags, zero, zero, 60, zero);
-  }
-  p->resource = sub_0821ABA8(114, 0);
-  p->window = -1;
-  p->state = zero;
-  p->entered = 1;
-  p->timer = zero;
-  return 0;
+int sub_08037140(struct LinkMenu *p)
+{
+    struct Blob *resource;
+    struct Blob *blob;
+    int zero;
+    gUnk_020000F8 = p;
+    sub_0801683C();
+    if (!Script_SeekToKeyword(115))
+        goto failed;
+    p->script = sub_08227E90();
+    if (!p->script)
+        goto failed;
+    resource = sub_0821A520(0xCB05, 0x7C8B);
+    if (!resource)
+        goto failed;
+    p->blob = *resource;
+    blob = &p->blob;
+    sub_082196C4(blob, resource);
+    {
+        void *drawable = p->draw50;
+        int flags;
+        flags = 0x2011;
+        zero = 0;
+        sub_0821983C(drawable, blob, 3, flags, zero, zero, 60, zero);
+    }
+    p->resource = sub_0821ABA8(114, 0);
+    p->window = -1;
+    p->state = zero;
+    p->entered = 1;
+    p->timer = zero;
+    return 0;
 failed:
-  return -1;
+    return -1;
 }

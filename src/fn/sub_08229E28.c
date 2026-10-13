@@ -11,6 +11,7 @@ double sub_08229E28(double arg)
     result = (result + (sin((((base * 719.981) + 355.05) * 0.017453292519943278)) * 0.02));
     result = (result + (sin((((base * 19.341) + 234.95) * 0.017453292519943278)) * 0.0048));
     result = fmod(result, 360.0);
-    if (result < 0.0) result += 360.0;
+    if (result < 0.0)
+        result += 360.0;
     return result;
 }

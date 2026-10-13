@@ -1,19 +1,19 @@
 #include "global.h"
 struct Blob {
-  u32 words[8];
+    u32 words[8];
 };
 struct LinkMenu {
-  u8 task[0x18];
-  u8 state, entered, pad1a[2];
-  u32 timer;
-  int window;
-  void *background;
-  void *script;
-  void *resource;
-  struct Blob blob;
-  u8 draw50[8];
-  u32 flags;
-  u8 pad5c[0x54];
+    u8 task[0x18];
+    u8 state, entered, pad1a[2];
+    u32 timer;
+    int window;
+    void *background;
+    void *script;
+    void *resource;
+    struct Blob blob;
+    u8 draw50[8];
+    u32 flags;
+    u8 pad5c[0x54];
 };
 extern struct LinkMenu *gUnk_020000F8;
 extern u16 gUnk_03004BD8, gUnk_03005260[];
@@ -46,12 +46,13 @@ int sub_08036BEC(void);
 int sub_0824923C(void *, void *);
 extern void *gUnk_08605770[];
 void sub_082195E0(void *);
-void sub_08036EC8(struct LinkMenu *p, int layer) {
-  void *resource = sub_0821A520(0xC091, 0xCF15);
-  int zero;
-  p->background = resource;
-  zero = 0;
-  sub_082161B4(1, 0, resource, 0, zero, 1, &layer);
-  sub_0821656C(2, 0, 0, 0, zero);
-  CpuSet((u8 *)sub_0821A520(0x92B3, 0x26BB) + 0x14, gUnk_03004FC0, 256);
+void sub_08036EC8(struct LinkMenu *p, int layer)
+{
+    void *resource = sub_0821A520(0xC091, 0xCF15);
+    int zero;
+    p->background = resource;
+    zero = 0;
+    sub_082161B4(1, 0, resource, 0, zero, 1, &layer);
+    sub_0821656C(2, 0, 0, 0, zero);
+    CpuSet((u8 *)sub_0821A520(0x92B3, 0x26BB) + 0x14, gUnk_03004FC0, 256);
 }

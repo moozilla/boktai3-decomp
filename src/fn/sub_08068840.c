@@ -1,6 +1,10 @@
 #include "global.h"
 
-struct S { u8 f[0x18]; s32 a; s32 b; };
+struct S {
+    u8 f[0x18];
+    s32 a;
+    s32 b;
+};
 
 s32 sub_08215184(s32);
 s32 sub_0821A520(s32, s32);

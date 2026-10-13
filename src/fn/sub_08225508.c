@@ -1,5 +1,8 @@
 #include "global.h"
-struct G { u8 pad[0x5a4]; u32 f5a4; };
+struct G {
+    u8 pad[0x5a4];
+    u32 f5a4;
+};
 extern struct G *gUnk_02000710;
 extern u32 gUnk_030053E8;
 u32 Script_GetValue(void);

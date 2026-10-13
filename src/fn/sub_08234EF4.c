@@ -1,7 +1,12 @@
 #include "global.h"
 
-struct E { u8 pad[0x3C]; };
-struct S { u8 pad[0x8C]; struct E e[8]; };
+struct E {
+    u8 pad[0x3C];
+};
+struct S {
+    u8 pad[0x8C];
+    struct E e[8];
+};
 void sub_082195E0(u8 *);
 void sub_08217EAC(struct E *);
 

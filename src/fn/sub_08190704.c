@@ -6,7 +6,8 @@ void sub_0818EBF4(u8 *);
 u32 sub_081906E4(u8 *);
 u32 sub_081906F4(u8 *);
 
-u8 *sub_08190704(u32 a, u32 b) {
+u8 *sub_08190704(u32 a, u32 b)
+{
     u8 *r4 = sub_08219FBC(8, 0x53CC);
     if (r4 != 0) {
         sub_0821A04C(r4, (u32)sub_081906E4, (u32)sub_081906F4);

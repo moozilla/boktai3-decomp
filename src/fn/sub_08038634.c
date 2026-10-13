@@ -23,10 +23,12 @@ void sub_08038634(struct TradeMenu *p)
     if (item >= 0) {
         int flags = p->rightMask & ~(1 << item);
         p->rightMask = flags;
-        if ((u32)(item - 1) <= 1) p->rightMask = flags & ~6;
+        if ((u32)(item - 1) <= 1)
+            p->rightMask = flags & ~6;
     }
 }
 void sub_08038674(struct TradeMenu *p)
 {
-    if (p->entered) p->entered = 0;
+    if (p->entered)
+        p->entered = 0;
 }

@@ -1,6 +1,7 @@
 #include "global.h"
 
-s32 sub_0803F5C4(u8 *p, u8 *q) {
+s32 sub_0803F5C4(u8 *p, u8 *q)
+{
     u32 v = *q;
     if (v != 0) {
         return -1;

@@ -1,6 +1,9 @@
 #include "global.h"
 
-struct P { u8 f00[0x341]; u8 i; };
+struct P {
+    u8 f00[0x341];
+    u8 i;
+};
 extern const u32 gUnk_08610E44[];
 
 void sub_0824923C(struct P *, u32);

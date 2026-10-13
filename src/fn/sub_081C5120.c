@@ -1,5 +1,8 @@
 #include "global.h"
-static inline void st(void (*v)(u8 *), void (**a)(u8 *)) { *a = v; }
+static inline void st(void (*v)(u8 *), void (**a)(u8 *))
+{
+    *a = v;
+}
 void sub_081C5120(u8 *p)
 {
     *(u32 *)(p + 0x20) |= 1;

@@ -1,6 +1,8 @@
 #include "global.h"
 
-struct Heap { u32 a, b, c; };
+struct Heap {
+    u32 a, b, c;
+};
 extern struct Heap gUnk_02000714;
 
 void sub_08219C20(void)

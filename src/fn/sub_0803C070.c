@@ -1,6 +1,10 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-struct Animation {u8 pad[12];u16 timer;u8 flag;};
+struct Animation {
+    u8 pad[12];
+    u16 timer;
+    u8 flag;
+};
 struct P {
     u8 pad[0x85c];
     int countdown;
@@ -8,16 +12,17 @@ struct P {
 };
 int sub_0803C070(struct P *p)
 {
-    struct Animation *animation=&p->animation;
-    if(p->countdown>0) {
+    struct Animation *animation = &p->animation;
+    if (p->countdown > 0) {
         u32 zero;
         p->countdown--;
-        zero=0;
+        zero = 0;
         asm("" : "+r"(zero));
-        animation->timer=0;
-        animation->flag=zero;
+        animation->timer = 0;
+        animation->flag = zero;
         return 0;
     }
-    if(animation->timer)return 1;
+    if (animation->timer)
+        return 1;
     return 0;
 }

@@ -1,5 +1,13 @@
 #include "global.h"
-struct P { void (*fn)(void); u32 w4; u32 w[3]; u8 b14; u8 b15; u8 pad[2]; u8 obj[1]; };
+struct P {
+    void (*fn)(void);
+    u32 w4;
+    u32 w[3];
+    u8 b14;
+    u8 b15;
+    u8 pad[2];
+    u8 obj[1];
+};
 s32 sub_08228DB8(void);
 s32 sub_08197DD0(s32);
 void sub_08217DB4(void *, u32);

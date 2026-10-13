@@ -1,7 +1,14 @@
 #include "global.h"
 
-struct S { u8 f00[0x424]; u16 h24; u16 h26; };
-struct P { u8 f00[0xA40]; struct S *s; };
+struct S {
+    u8 f00[0x424];
+    u16 h24;
+    u16 h26;
+};
+struct P {
+    u8 f00[0xA40];
+    struct S *s;
+};
 
 void sub_081642CC(struct P *, u32, u32, u32, u32, u32, u32);
 

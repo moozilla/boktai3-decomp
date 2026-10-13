@@ -2,7 +2,8 @@
 
 s32 sub_081DAB00(u8 *);
 
-s32 sub_081DAC1C(u8 *p, s32 a, u32 n) {
+s32 sub_081DAC1C(u8 *p, s32 a, u32 n)
+{
     if (n > 3) {
         return -1;
     }

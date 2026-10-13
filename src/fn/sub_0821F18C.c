@@ -1,6 +1,13 @@
 #include "global.h"
-struct R { u8 x0, y0, x1, y1; u8 p[12]; };
-struct P { s16 x; s16 p; s16 y; };
+struct R {
+    u8 x0, y0, x1, y1;
+    u8 p[12];
+};
+struct P {
+    s16 x;
+    s16 p;
+    s16 y;
+};
 u32 sub_0821F18C(struct R *r, struct P *pt, u32 i)
 {
     struct R *e = r + i;

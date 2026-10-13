@@ -1,6 +1,8 @@
 #include "global.h"
 
-struct Dma { vu32 src, dst, ctl; };
+struct Dma {
+    vu32 src, dst, ctl;
+};
 extern u32 gUnk_030051E0;
 extern s16 gUnk_03004DB0;
 extern u16 gUnk_030051D0;

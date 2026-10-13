@@ -2,7 +2,8 @@
 
 void sub_0824923C(u8 *p, u32 f);
 
-u32 sub_080138B4(u8 *p) {
+u32 sub_080138B4(u8 *p)
+{
     u8 *n = *(u8 **)(p + 0x1C);
     if (n) {
         do {

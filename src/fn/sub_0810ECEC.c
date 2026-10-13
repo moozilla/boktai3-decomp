@@ -1,5 +1,9 @@
 #include "global.h"
-struct S { u8 filler[0x84]; s16 a; s16 b; };
+struct S {
+    u8 filler[0x84];
+    s16 a;
+    s16 b;
+};
 extern struct S *gUnk_020004B4;
 void sub_0811D270(s32, s32, s32, s32, s32);
 void sub_0810ECEC(void)

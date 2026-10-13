@@ -1,9 +1,12 @@
 #include "global.h"
 
 struct P0814A4B0 {
-    u8 f0[0x34C]; s16 f34C;
-    u8 f34E[0x3A4 - 0x34E]; u8 f3A4;
-    u8 f3A5[0x4B6 - 0x3A5]; s16 f4B6;
+    u8 f0[0x34C];
+    s16 f34C;
+    u8 f34E[0x3A4 - 0x34E];
+    u8 f3A4;
+    u8 f3A5[0x4B6 - 0x3A5];
+    s16 f4B6;
 };
 u8 sub_08141BAC(void *);
 void sub_0813ADD0(void *);

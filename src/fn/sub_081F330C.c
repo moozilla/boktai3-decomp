@@ -1,6 +1,7 @@
 #include "global.h"
 
-s32 sub_081F330C(u8 *p) {
+s32 sub_081F330C(u8 *p)
+{
     s32 idx = -1;
     u32 best = 0xFFFFFFFF;
     s32 i = 0;

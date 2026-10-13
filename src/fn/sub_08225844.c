@@ -1,5 +1,8 @@
 #include "global.h"
-struct Entry { u32 key; u32 callback; };
+struct Entry {
+    u32 key;
+    u32 callback;
+};
 s32 Div(s32, s32);
 u32 sub_08225844(u32 key, struct Entry *table, s32 start, s32 end)
 {

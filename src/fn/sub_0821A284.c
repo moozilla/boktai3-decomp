@@ -1,5 +1,9 @@
 #include "global.h"
-struct Entry { u16 id; u8 flags, pad; void *data; };
+struct Entry {
+    u16 id;
+    u8 flags, pad;
+    void *data;
+};
 struct Entry *sub_0821A184(void);
 void sub_0821A284(u32 id, void *data, u32 flags)
 {

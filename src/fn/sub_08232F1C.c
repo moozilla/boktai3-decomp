@@ -10,7 +10,8 @@ void sub_0821A0C0(u8 *);
 u8 *sub_08232F1C(void)
 {
     u8 *p;
-    if (gUnk_02000098 != NULL) return gUnk_02000098;
+    if (gUnk_02000098 != NULL)
+        return gUnk_02000098;
     p = sub_08219FBC(11, 0x104);
     if (p != NULL) {
         sub_0821A04C(p, sub_08232E6C, sub_08232EA8);

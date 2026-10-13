@@ -3,7 +3,8 @@
 void sub_0822B3BC(u32);
 void sub_0818D460(void);
 
-void sub_0818D430(u8 *p) {
+void sub_0818D430(u8 *p)
+{
     u32 c = *(u16 *)(p + 0x1D6) - 1;
     *(u16 *)(p + 0x1D6) = c;
     if ((c << 16) == 0) {

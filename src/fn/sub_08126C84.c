@@ -14,5 +14,7 @@ u32 sub_08126C84(u8 *p)
         r += 0x40;
         n--;
     } while (n >= 0);
-    z = 0; gUnk_0200015C = z; return z;
+    z = 0;
+    gUnk_0200015C = z;
+    return z;
 }

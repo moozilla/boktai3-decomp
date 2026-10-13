@@ -5,7 +5,8 @@ void sub_08223E28(void);
 void sub_082455DC(void *);
 void sub_082455E8(void *);
 
-u32 sub_082235C0(u32 a, u32 b) {
+u32 sub_082235C0(u32 a, u32 b)
+{
     u32 r;
     if (a != 0) {
         u16 z;

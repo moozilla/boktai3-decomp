@@ -5,7 +5,8 @@ s32 sub_0801B324(void *, void *, void *);
 void sub_0821A0C0(void *);
 void sub_0801B2D4(void);
 void sub_0801B2F8(void);
-void *sub_0801B454(void *a, void *b) {
+void *sub_0801B454(void *a, void *b)
+{
     void *obj;
     obj = sub_08219FBC(11, 0xDB4);
     if (obj != 0) {

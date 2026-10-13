@@ -14,11 +14,10 @@ u32 sub_080FFFE4(u8 *p)
 {
     s32 i = 0;
     u32 *m = (u32 *)(p + 0xA3C);
-    for (; i < 12; i++)
-    {
-        if (Tst(m, i))
-        {
-            u32 o = i * 0xD8 + 0x1C; u8 *e;
+    for (; i < 12; i++) {
+        if (Tst(m, i)) {
+            u32 o = i * 0xD8 + 0x1C;
+            u8 *e;
             e = p + o;
             sub_08214514(e);
             e += 0x60;

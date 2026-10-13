@@ -1,5 +1,8 @@
 #include "global.h"
-struct FlagAC { s8 a; u8 b, c, d; };
+struct FlagAC {
+    s8 a;
+    u8 b, c, d;
+};
 s32 sub_0823AAAC(s32);
 s32 sub_0823AB4C(u8 *, s32);
 void sub_0823AC34(u8 *p)

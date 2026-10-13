@@ -2,7 +2,8 @@
 
 extern u8 *gUnk_03001688;
 
-void sub_08220AAC(void) {
+void sub_08220AAC(void)
+{
     u8 *p = gUnk_03001688;
     if (p != 0) {
         *(u8 **)(p + 0x18) = p + 0x28;

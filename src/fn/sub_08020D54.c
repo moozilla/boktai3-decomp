@@ -1,6 +1,9 @@
 #include "global.h"
 
-struct S { u8 f[3]; u8 a; };
+struct S {
+    u8 f[3];
+    u8 a;
+};
 u32 sub_08020D54(struct S *p, struct S *q)
 {
     u8 v = q->a;

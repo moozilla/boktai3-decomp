@@ -1,6 +1,11 @@
 #include "global.h"
 
-struct P { u8 filler[0x94]; u32 f; u8 filler2[0x58C - 0x98]; void *fn; };
+struct P {
+    u8 filler[0x94];
+    u32 f;
+    u8 filler2[0x58C - 0x98];
+    void *fn;
+};
 
 void sub_0815AD78(struct P *);
 void sub_0813AFEC(struct P *, s32, s32);

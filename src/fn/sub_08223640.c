@@ -2,7 +2,8 @@
 
 void sub_08223674(void);
 
-void sub_08223640(u8 *q) {
+void sub_08223640(u8 *q)
+{
     u8 *p;
     sub_08223674();
     p = (u8 *)0x03005390;

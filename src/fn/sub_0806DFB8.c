@@ -1,6 +1,8 @@
 #include "global.h"
 
-struct Unk0806DF60 { u32 unk0; };
+struct Unk0806DF60 {
+    u32 unk0;
+};
 
 struct Unk0806DF60 *sub_0806DF60(void);
 

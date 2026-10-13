@@ -1,6 +1,11 @@
 #include "global.h"
-struct H { u32 lo:16; u32 hi:16; };
-struct Z { struct H a, b; };
+struct H {
+    u32 lo : 16;
+    u32 hi : 16;
+};
+struct Z {
+    struct H a, b;
+};
 void sub_0811D024(void *, u32, void *);
 void sub_0811B278(void *, void *, struct Z *, struct Z *, u32, u32, u32, u32, u32, u32, u32);
 void sub_081145DC(u8 *s, u32 y, u32 x, u32 d)

@@ -1,7 +1,13 @@
 #include "global.h"
 
-struct T { u8 filler[0x696]; u16 h; };
-struct S { u8 filler[0x3d0]; struct T *t; };
+struct T {
+    u8 filler[0x696];
+    u16 h;
+};
+struct S {
+    u8 filler[0x3d0];
+    struct T *t;
+};
 
 void sub_080DED54(struct S *s)
 {

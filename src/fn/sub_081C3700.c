@@ -1,6 +1,12 @@
 #include "global.h"
 
-struct S { u8 pad0[0xd8]; u32 d8; u8 pad1[0xf4-0xdc]; u32 f4; u32 f8; };
+struct S {
+    u8 pad0[0xd8];
+    u32 d8;
+    u8 pad1[0xf4 - 0xdc];
+    u32 f4;
+    u32 f8;
+};
 
 void sub_081C3700(struct S *p)
 {

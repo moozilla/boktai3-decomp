@@ -72,28 +72,46 @@ void sub_08200A10(u32 unused, u8 *s, u32 arg)
     }
     *(u32 *)(s + 0x328) = arg;
     p = s + 0x80;
-    v.x = 40; v.y = 128; v.z = 40;
-    w.x = zero; w.y = 128; w.z = zero;
+    v.x = 40;
+    v.y = 128;
+    v.z = 40;
+    w.x = zero;
+    w.y = 128;
+    w.z = zero;
     sub_0821FEB4(p, zero, 0x4001, zero, 16, &v, &w);
     sub_0821FF84(p, sub_08200324, s);
     sub_0821FF7C(p, *(s16 *)(context + 0x16), 0x402, 1);
     sub_0821FE40(p);
     *(u16 *)(p + 6) = flag00A(*(u16 *)(p + 6));
     p -= 0x54;
-    v.x = 64; v.y = 128; v.z = 64;
-    w.x = zero; w.y = 128; w.z = zero;
+    v.x = 64;
+    v.y = 128;
+    v.z = 64;
+    w.x = zero;
+    w.y = 128;
+    w.z = zero;
     sub_0821FEB4(p, zero, 0x2001, zero, 16, &v, &w);
     sub_0821FF84(p, sub_082003B8, s);
-    sub_0821FF58(p, *(s16 *)(context + 0x10), *(s16 *)(context + 0x12), 0, zero, *(s16 *)(context + 0x14));
+    sub_0821FF58(p, *(s16 *)(context + 0x10), *(s16 *)(context + 0x12), 0, zero,
+                 *(s16 *)(context + 0x14));
     p += 0xa8;
-    v.x = 200; v.y = 128; v.z = 200;
-    w.x = zero; w.y = 128; w.z = zero;
+    v.x = 200;
+    v.y = 128;
+    v.z = 200;
+    w.x = zero;
+    w.y = 128;
+    w.z = zero;
     sub_0821FEB4(p, zero, 0x2001, zero, 16, &v, &w);
     sub_0821FF84(p, sub_082003B8, s);
-    sub_0821FF58(p, *(s16 *)(context + 0x18), *(s16 *)(context + 0x1a), 0, zero, *(s16 *)(context + 0x1c));
+    sub_0821FF58(p, *(s16 *)(context + 0x18), *(s16 *)(context + 0x1a), 0, zero,
+                 *(s16 *)(context + 0x1c));
     p = s + 0x128;
-    v.x = 32; v.y = 32; v.z = 32;
-    w.x = zero; w.y = 128; w.z = zero;
+    v.x = 32;
+    v.y = 32;
+    v.z = 32;
+    w.x = zero;
+    w.y = 128;
+    w.z = zero;
     sub_0821FEB4(p, zero, 0x2001, zero, 16, &v, &w);
     sub_0821FF84(p, sub_082003B8, s);
 }

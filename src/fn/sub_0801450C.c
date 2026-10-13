@@ -13,7 +13,8 @@ u32 sub_0801450C(u8 *p)
             u8 *b = e + 4;
             s32 k = 7;
             do {
-                if (*b != 0) sub_08217EAC(a);
+                if (*b != 0)
+                    sub_08217EAC(a);
                 a += 0x38;
                 b += 0x38;
                 k--;
@@ -21,6 +22,9 @@ u32 sub_0801450C(u8 *p)
         }
         i = next;
     } while (i <= 5);
-    { u32 z = 0; gUnk_02000060 = z; }
+    {
+        u32 z = 0;
+        gUnk_02000060 = z;
+    }
     return 0;
 }

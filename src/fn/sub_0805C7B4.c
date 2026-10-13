@@ -6,7 +6,8 @@ s32 sub_0805C7B4(u8 *p)
     if (n < c) {
         u8 **q = (u8 **)(p + 0xbe8);
         do {
-            if ((*q)[0xd3] == 4) n++;
+            if ((*q)[0xd3] == 4)
+                n++;
             q++;
             c--;
         } while (c != 0);

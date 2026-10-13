@@ -1,4 +1,48 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-struct Packed{s32 x:16,y:16,z:16,pad:16;};extern u32 gUnk_03005308;extern u16 gUnk_0203B400[];void sub_0806A160(void*,int,void*,int,int,int,int,int);
-void sub_08028414(u8*p){struct Packed size;int angle,speed;register int count asm("r1");u16*table;u32*indexPtr;u32 mask;register u32 smallMask asm("r8");register u32 index asm("r0");size.x=164;size.y=16;size.z=164;table=gUnk_0203B400;indexPtr=&gUnk_03005308;index=*indexPtr;index++;mask=1023;index&=mask;angle=(u8)table[index];index=(index+1)&mask;count=table[index];smallMask=3;count=(count&smallMask)+2;index=(index+1)&mask;*indexPtr=index;speed=(table[index]&smallMask)+20;sub_0806A160(p+0x260,3,&size,angle,count,speed,2,2);{u32*ptr=indexPtr;index=(*ptr+1)&mask;}angle=(u8)table[index];index=(index+1)&mask;count=(table[index]&smallMask)+2;index=(index+1)&mask;*indexPtr=index;speed=(table[index]&smallMask)+20;sub_0806A160(p+0x260,3,&size,angle,count,speed,2,2);}
+struct Packed {
+    s32 x : 16, y : 16, z : 16, pad : 16;
+};
+extern u32 gUnk_03005308;
+extern u16 gUnk_0203B400[];
+void sub_0806A160(void *, int, void *, int, int, int, int, int);
+void sub_08028414(u8 *p)
+{
+    struct Packed size;
+    int angle, speed;
+    register int count asm("r1");
+    u16 *table;
+    u32 *indexPtr;
+    u32 mask;
+    register u32 smallMask asm("r8");
+    register u32 index asm("r0");
+    size.x = 164;
+    size.y = 16;
+    size.z = 164;
+    table = gUnk_0203B400;
+    indexPtr = &gUnk_03005308;
+    index = *indexPtr;
+    index++;
+    mask = 1023;
+    index &= mask;
+    angle = (u8)table[index];
+    index = (index + 1) & mask;
+    count = table[index];
+    smallMask = 3;
+    count = (count & smallMask) + 2;
+    index = (index + 1) & mask;
+    *indexPtr = index;
+    speed = (table[index] & smallMask) + 20;
+    sub_0806A160(p + 0x260, 3, &size, angle, count, speed, 2, 2);
+    {
+        u32 *ptr = indexPtr;
+        index = (*ptr + 1) & mask;
+    }
+    angle = (u8)table[index];
+    index = (index + 1) & mask;
+    count = (table[index] & smallMask) + 2;
+    index = (index + 1) & mask;
+    *indexPtr = index;
+    speed = (table[index] & smallMask) + 20;
+    sub_0806A160(p + 0x260, 3, &size, angle, count, speed, 2, 2);
+}

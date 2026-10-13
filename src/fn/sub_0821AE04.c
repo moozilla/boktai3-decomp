@@ -1,5 +1,10 @@
 #include "global.h"
-struct ScriptContext { u8 *table; u32 count; u8 *body; u8 *tail; };
+struct ScriptContext {
+    u8 *table;
+    u32 count;
+    u8 *body;
+    u8 *tail;
+};
 extern struct ScriptContext gUnk_02000438;
 extern u8 *gUnk_02000448[4];
 extern u32 gUnk_0200060C;

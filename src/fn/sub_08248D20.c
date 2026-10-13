@@ -8,7 +8,8 @@ u8 sub_08249184(void);
 u8 sub_08248D20(u8 *p)
 {
     u8 i;
-    if (gUnk_030035C6 == 1) return 0;
+    if (gUnk_030035C6 == 1)
+        return 0;
     gUnk_030035C6 = 1;
     *(vu16 *)0x080000C4 = 1;
     *(vu16 *)0x080000C4 = 5;

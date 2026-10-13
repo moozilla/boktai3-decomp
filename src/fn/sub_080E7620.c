@@ -3,12 +3,14 @@
 u32 sub_080E81CC(u32);
 void sub_080763D0(void *, u32, u32);
 
-struct W { u16 pad[3]; u16 f; };
+struct W {
+    u16 pad[3];
+    u16 f;
+};
 
 static inline u8 TakeFlag(u8 *flag)
 {
-    if (*flag)
-    {
+    if (*flag) {
         *flag = 0;
         return TRUE;
     }
@@ -17,8 +19,7 @@ static inline u8 TakeFlag(u8 *flag)
 
 void sub_080E7620(u8 *p)
 {
-    if (TakeFlag(p + 0x2B2))
-    {
+    if (TakeFlag(p + 0x2B2)) {
         u32 r = sub_080E81CC(*(u8 *)(p + 0x59));
         struct W *w;
         sub_080763D0(p, 0, r);

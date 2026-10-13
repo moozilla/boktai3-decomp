@@ -1,6 +1,13 @@
 #include "global.h"
-struct E { u8 p[0x1c0]; };
-struct A { u8 p0[0x18]; u32 w18; u8 p1[0x20 - 0x1c]; struct E e[10]; };
+struct E {
+    u8 p[0x1c0];
+};
+struct A {
+    u8 p0[0x18];
+    u32 w18;
+    u8 p1[0x20 - 0x1c];
+    struct E e[10];
+};
 extern struct A *gUnk_020005E8;
 void sub_081FC900(struct A *, struct E *, s32);
 u32 sub_081FCF74(struct A *a)

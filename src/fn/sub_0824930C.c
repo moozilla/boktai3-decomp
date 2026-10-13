@@ -31,27 +31,27 @@ Boston, MA 02111-1307, USA.  */
 typedef long int ptrdiff_t;
 typedef unsigned long int size_t;
 typedef int wchar_t;
-typedef unsigned int UQItype __attribute__ ((mode (QI)));
-typedef int SItype __attribute__ ((mode (SI)));
-typedef unsigned int USItype __attribute__ ((mode (SI)));
-typedef int DItype __attribute__ ((mode (DI)));
-typedef unsigned int UDItype __attribute__ ((mode (DI)));
-typedef float SFtype __attribute__ ((mode (SF)));
-typedef float DFtype __attribute__ ((mode (DF)));
-typedef int word_type __attribute__ ((mode (__word__)));
-struct DIstruct {SItype low, high;};
-typedef union
-{
-  struct DIstruct s;
-  DItype ll;
+typedef unsigned int UQItype __attribute__((mode(QI)));
+typedef int SItype __attribute__((mode(SI)));
+typedef unsigned int USItype __attribute__((mode(SI)));
+typedef int DItype __attribute__((mode(DI)));
+typedef unsigned int UDItype __attribute__((mode(DI)));
+typedef float SFtype __attribute__((mode(SF)));
+typedef float DFtype __attribute__((mode(DF)));
+typedef int word_type __attribute__((mode(__word__)));
+struct DIstruct {
+    SItype low, high;
+};
+typedef union {
+    struct DIstruct s;
+    DItype ll;
 } DIunion;
-extern DItype __fixunssfdi (SFtype a);
-extern DItype __fixunsdfdi (DFtype a);
+extern DItype __fixunssfdi(SFtype a);
+extern DItype __fixunsdfdi(DFtype a);
 
-USItype
-sub_0824930C (DFtype a)
+USItype sub_0824930C(DFtype a)
 {
-  if (a >= - (DFtype) (-2147483647L -1))
-    return (SItype) (a + (-2147483647L -1)) - (-2147483647L -1);
-  return (SItype) a;
+    if (a >= -(DFtype)(-2147483647L - 1))
+        return (SItype)(a + (-2147483647L - 1)) - (-2147483647L - 1);
+    return (SItype)a;
 }

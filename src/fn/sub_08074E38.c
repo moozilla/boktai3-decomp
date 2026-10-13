@@ -1,5 +1,13 @@
 #include "global.h"
-struct Obj { u8 pad0[0x50]; u32 value; u8 pad1[0x60]; u16 a[4]; u16 b[4]; u16 c[4]; u32 d[4]; };
+struct Obj {
+    u8 pad0[0x50];
+    u32 value;
+    u8 pad1[0x60];
+    u16 a[4];
+    u16 b[4];
+    u16 c[4];
+    u32 d[4];
+};
 void sub_0821FEB4(void *, u16, u32, u32, u32, u32, u32);
 void sub_0821FF58(void *, u32, u32, u32, u32, u32);
 void sub_0821FF24(void *, void *, u32);

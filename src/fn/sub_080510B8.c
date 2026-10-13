@@ -1,6 +1,14 @@
 #include "global.h"
 
-struct S { u8 f[0x1a]; u16 a; u8 g[0xa]; u16 x; u8 h[2]; u16 y; u16 z; };
+struct S {
+    u8 f[0x1a];
+    u16 a;
+    u8 g[0xa];
+    u16 x;
+    u8 h[2];
+    u16 y;
+    u16 z;
+};
 extern struct S *gUnk_02000114;
 
 void sub_080510B8(void)

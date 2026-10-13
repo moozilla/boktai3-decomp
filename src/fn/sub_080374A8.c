@@ -15,7 +15,8 @@ void sub_08036CF0(const u8 *source, u8 *destination, int count);
 void sub_08033924(int window, int style);
 void CpuSet(const void *source, void *destination, u32 control);
 
-int sub_080374A8(void *ownerArg, struct PeerPanel *panel, int peerArg, int playerArg, const u8 *packetArg)
+int sub_080374A8(void *ownerArg, struct PeerPanel *panel, int peerArg, int playerArg,
+                 const u8 *packetArg)
 {
     u8 *owner = ownerArg;
     struct PeerPanel *p = panel;

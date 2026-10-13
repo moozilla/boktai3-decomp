@@ -2,9 +2,14 @@
 
 void sub_082225FC(void);
 
-struct T { u32 a; u32 b; void (*f)(void); };
+struct T {
+    u32 a;
+    u32 b;
+    void (*f)(void);
+};
 
-void sub_08222554(void) {
+void sub_08222554(void)
+{
     u16 ie;
     struct T *t;
     *(vu16 *)0x04000208 = 0;

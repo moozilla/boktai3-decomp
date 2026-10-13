@@ -1,5 +1,20 @@
 #include "global.h"
-struct P { u8 pad[0x1c]; u8 b1c; u8 b1d; u8 pad1[0x14]; u8 b32; u8 b33; u8 pad2[4]; u16 h38; u8 pad3[10]; u32 w44; u32 w48; u32 w4c; u8 pad5[0x338]; u32 w388; };
+struct P {
+    u8 pad[0x1c];
+    u8 b1c;
+    u8 b1d;
+    u8 pad1[0x14];
+    u8 b32;
+    u8 b33;
+    u8 pad2[4];
+    u16 h38;
+    u8 pad3[10];
+    u32 w44;
+    u32 w48;
+    u32 w4c;
+    u8 pad5[0x338];
+    u32 w388;
+};
 extern u32 gUnk_020000F0;
 s32 sub_08224D3C(void);
 void sub_080340AC(struct P *);
@@ -13,7 +28,8 @@ s32 sub_080368AC(struct P *p)
     z = 0;
     *f = z;
     gUnk_020000F0 = z;
-    if (sub_08224D3C() < 0) goto fail;
+    if (sub_08224D3C() < 0)
+        goto fail;
     p->b1d = z;
     sub_080340AC(p);
     {
@@ -24,7 +40,8 @@ s32 sub_080368AC(struct P *p)
         p->b32 = 1;
     }
     p->w4c = sub_0821ABA8(0x70, 0);
-    if (!Script_SeekToKeyword(0x61)) goto fail;
+    if (!Script_SeekToKeyword(0x61))
+        goto fail;
     {
         u32 v = sub_08227E90();
         p->w388 = v;

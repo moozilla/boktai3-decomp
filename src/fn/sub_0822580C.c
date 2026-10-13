@@ -1,7 +1,8 @@
 #include "global.h"
 extern const u32 gUnk_08603300[];
 
-void sub_0822580C(void) {
+void sub_0822580C(void)
+{
     vu16 *c = (vu16 *)0x030025F4;
     u32 *p;
     *c = 0;

@@ -1,6 +1,7 @@
 #include "global.h"
 
-u8 *sub_08009E3C(u8 *p) {
+u8 *sub_08009E3C(u8 *p)
+{
     s32 i = 0;
     u8 *q = p + 0x2C;
     while (i <= 15) {

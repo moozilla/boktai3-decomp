@@ -1,5 +1,8 @@
 #include "global.h"
-struct Header { u32 count; u32 keys, records, reserved; };
+struct Header {
+    u32 count;
+    u32 keys, records, reserved;
+};
 s32 sub_0821A454(u32, u16 *, s32, s32, s32);
 u8 *sub_0821A490(u8 *base, u32 unused, u16 key, u16 context)
 {

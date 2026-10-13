@@ -1,7 +1,15 @@
 #include "global.h"
 
-struct N { u8 f[5]; u8 id; u8 g[0xb2]; struct N *next; };
-struct S { u8 f[0x28]; struct N *head; };
+struct N {
+    u8 f[5];
+    u8 id;
+    u8 g[0xb2];
+    struct N *next;
+};
+struct S {
+    u8 f[0x28];
+    struct N *head;
+};
 struct S *sub_08008270(void);
 void sub_0800700C(struct N *);
 

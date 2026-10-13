@@ -1,4 +1,5 @@
 #include "global.h"
 
-void sub_08043FAC(void) {
+void sub_08043FAC(void)
+{
 }

@@ -12,26 +12,26 @@ u32 sub_0821AF2C(u8 *p, u32 a, u32 b)
     saved = sub_0821A8A4(a, b);
     while (p) {
         switch (*p & 0xF0) {
-        case 0x60:
-            p = sub_0821A66C(p, &length);
-            if (sub_0821AC6C(p) == 1) {
-                p = (u8 *)1;
-                goto done;
-            }
-            p += length;
-            break;
-        case 0x70:
-            p = sub_0821A66C(p, &length);
-            gUnk_02000610[1] = sub_0821AD2C(p);
-            p += length;
-            break;
-        case 0x30:
-            p = sub_0821A66C(p, &length);
-            gUnk_02000610[1] = sub_0821BA5C(p);
-            p += length;
-            break;
-        case 0:
-            goto stop;
+            case 0x60:
+                p = sub_0821A66C(p, &length);
+                if (sub_0821AC6C(p) == 1) {
+                    p = (u8 *)1;
+                    goto done;
+                }
+                p += length;
+                break;
+            case 0x70:
+                p = sub_0821A66C(p, &length);
+                gUnk_02000610[1] = sub_0821AD2C(p);
+                p += length;
+                break;
+            case 0x30:
+                p = sub_0821A66C(p, &length);
+                gUnk_02000610[1] = sub_0821BA5C(p);
+                p += length;
+                break;
+            case 0:
+                goto stop;
         }
     }
 stop:

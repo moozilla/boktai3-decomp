@@ -1,6 +1,12 @@
 #include "global.h"
 
-struct S { u8 f[0x18]; s8 a; u8 g[0x43]; u32 b; u32 c; };
+struct S {
+    u8 f[0x18];
+    s8 a;
+    u8 g[0x43];
+    u32 b;
+    u32 c;
+};
 extern struct S *gUnk_0200002C;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);

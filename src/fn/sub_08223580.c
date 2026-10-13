@@ -2,9 +2,12 @@
 
 void sub_0824722C(u32);
 
-struct S { u8 a, b, c, d; };
+struct S {
+    u8 a, b, c, d;
+};
 
-void sub_08223580(u8 a) {
+void sub_08223580(u8 a)
+{
     if (**(u8 **)0x03006A80 == 0) {
         u8 t = ((struct S *)0x03005390)->c;
         a = 0;

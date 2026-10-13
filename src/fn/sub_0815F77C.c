@@ -1,5 +1,9 @@
 #include "global.h"
-struct S { u8 f[0x18]; u32 a; u32 b; };
+struct S {
+    u8 f[0x18];
+    u32 a;
+    u32 b;
+};
 extern struct S *gUnk_02000598;
 s32 sub_0815F77C(struct S *s)
 {

@@ -8,12 +8,15 @@ s32 sub_08050574(void)
     u32 w = gUnk_02000534;
     x = 0;
     if (w != 0) {
-        if (gUnk_02000500 == 5) x = 1;
+        if (gUnk_02000500 == 5)
+            x = 1;
     }
     if (x == 0) {
         u32 t = gUnk_02000580[0x418];
-        if (t == 3) goto yes;
-        if (t != 4) goto no;
+        if (t == 3)
+            goto yes;
+        if (t != 4)
+            goto no;
     }
 yes:
     return 1;

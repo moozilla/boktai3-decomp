@@ -13,10 +13,8 @@ u32 sub_08101E20(u32 x)
     u8 *b = (u8 *)gUnk_020001AC;
     s32 i = 0;
     s32 one = 1;
-    for (; i < 12; i++)
-    {
-        if (Tst((u16 *)(b + i * 0x19C + 0xD4), one))
-        {
+    for (; i < 12; i++) {
+        if (Tst((u16 *)(b + i * 0x19C + 0xD4), one)) {
             if (*(u16 *)(b + i * 0x19C + 0x166) == x)
                 return 1;
         }

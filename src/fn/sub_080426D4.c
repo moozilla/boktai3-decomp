@@ -1,6 +1,7 @@
 #include "global.h"
 
-s32 sub_080426D4(u8 *p, u32 mask) {
+s32 sub_080426D4(u8 *p, u32 mask)
+{
     u32 *q;
     if (*(u32 *)p == 0) {
         return -1;

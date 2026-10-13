@@ -1,6 +1,11 @@
 #include "global.h"
 
-struct Slot { u16 id; u8 flags; u8 pad; u32 val; };
+struct Slot {
+    u16 id;
+    u8 flags;
+    u8 pad;
+    u32 val;
+};
 extern struct Slot gUnk_0203B000[];
 extern s32 gUnk_030052F0;
 

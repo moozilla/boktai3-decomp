@@ -1,5 +1,8 @@
 #include "global.h"
-struct P { u32 a; u32 b; };
+struct P {
+    u32 a;
+    u32 b;
+};
 extern struct P gUnk_020003C0;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);

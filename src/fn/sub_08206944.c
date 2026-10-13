@@ -1,5 +1,12 @@
 #include "global.h"
-struct S { u8 p0[0x170]; u8 *pc; u8 p1[0x20]; s16 n; s16 pad; s16 d[8]; };
+struct S {
+    u8 p0[0x170];
+    u8 *pc;
+    u8 p1[0x20];
+    s16 n;
+    s16 pad;
+    s16 d[8];
+};
 void Script_SetPc(u8 *);
 u8 *Script_GetPc(void);
 s32 Script_GetValue(void);

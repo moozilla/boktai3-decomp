@@ -1,5 +1,9 @@
 #include "global.h"
-struct S { u8 p[0x14]; u16 h14; u8 q[10]; };
+struct S {
+    u8 p[0x14];
+    u16 h14;
+    u8 q[10];
+};
 void sub_081FE92C(struct S *);
 void sub_081FE970(struct S *, u32, u32, u32, u32);
 void sub_081FE98C(struct S *, u32);
