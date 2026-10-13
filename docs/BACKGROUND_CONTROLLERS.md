@@ -18,8 +18,8 @@ sine-table-driven movement mode.
 New matching C covers both initializers, both queued-command processors, both
 script creation commands, map-ID lookup, and the scrolling family's command
 submission/queue. The existing allocators and cleanup helpers already match.
-`include/background_controller.h` and `include/scrolling_background.h` record
-observed layouts, retaining explicitly unknown fields. Local register hints in
+`include/background_controller.h` records both families' observed layouts, with
+shared command-queue and layer types, retaining explicitly unknown fields. Local register hints in
 the normal initializer and map-ID lookup are temporary matching concessions.
 
 Both frame updates, all map-loading helpers, and both command queues are now

@@ -128,11 +128,22 @@ def collect_done(funcs, source_root):
     return done
 
 
+MARK = "// MATCHING_CONCESSION: register-pinning"
+
+
 def collect_pinned(funcs, source_root):
     aliases = {f"sub_{a:08X}": n for n, a in funcs}
     pinned = set()
     for path in Path(source_root).rglob("*.c"):
-        if "// MATCHING_CONCESSION: register-pinning" in path.read_text():
+        text = path.read_text()
+        if MARK not in text:
+            continue
+        # A marker directly above a definition pins that function; any other
+        # marker (e.g. at the top of a one-function file) pins the whole unit.
+        scoped = re.findall(re.escape(MARK) + r"\n(?!static\b)[A-Za-z_][\w \*]*?\b(\w+)\s*\(", text)
+        if text.count(MARK) == len(scoped) and len(c_functions(path, with_asm=False)) > 1:
+            pinned.update(aliases.get(n, n) for n in scoped)
+        else:
             pinned.update(aliases.get(n, n) for n in c_functions(path, with_asm=False))
     return pinned
 

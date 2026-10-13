@@ -1,6 +1,10 @@
 address,evidence
 08001590,Independent boot-word clearing loop with own push and pop-bx plus literal after AgbMain; exact 28-byte C body
 080020BC,Independent 96-byte map-loading wrapper with own prologue and return after 08002024
+08002284,Independent 28-byte clear of gUnk_02000010[0..3] between 08002234 and 080022A0 (gbadisasm left it as .byte); exact C in src/background_controller.c
+08002AD4,Independent 12-byte clear of the palette controller pointer between 08002AC0 and Palette_BlendRange; exact C in src/palette_controller.c
+08002E7C,Independent 4-byte empty bx lr function after 08002E54; exact C in src/palette_controller.c
+08003494,Independent 18-byte script-value wrapper calling 0800347C; exact C in src/palette_controller.c
 08005E10,Independent 12-byte global-pointer clearing function after palette-switch script return and literal pool
 08006CD0,Independent 116-byte menu constructor after initializer return and literal pool; exact standalone C
 08009E30,Independent 12-byte global-pointer clear after directional script return and literal pool
