@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Panel  {
   u8 pad0[0x3c];
@@ -19,8 +18,7 @@ int sub_0803962C(void *owner)  {
   {
     if (!++p->counter)
     {
-      register int mask asm("r0")=255;
-      asm("" : "+r"(mask));
+      int mask=255;
       p->counter |= mask;
     }
     if (p->counter != 1)  {
@@ -28,12 +26,10 @@ int sub_0803962C(void *owner)  {
     }
     {
       {
-        register u8*field asm("r0")=&p->choice;
-        register int value asm("r2");
-        asm("" : "+r"(field));
+        u8*field=&p->choice;
+        int value;
         value=*field;
         choice=field;
-        asm("" : "+r"(value));
         switch (value)  {
           case 8: index = 3;
           break;

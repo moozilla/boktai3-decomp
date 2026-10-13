@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Vec {
   s16 x, y, z, pad;
 };
@@ -85,11 +84,10 @@ struct Context {
   struct Vec *target;
 };
 static inline int near(struct Actor *p, struct Vec *b) {
-  register struct Vec *a asm("r4") = &p->pos;
-  register int limit asm("r5");
+  struct Vec *a = &p->pos;
+  int limit;
   int x;
-  register int result asm("r2");
-  asm("" : "+r"(a));
+  int result;
   limit = p->rateA;
   x = b->x - a->x;
   if (x < 0)
@@ -117,7 +115,7 @@ done:
   return result;
 }
 static inline int targetNear(struct Context *m, struct Actor *p) {
-  register int result asm("r1");
+  int result;
   if (m->target) {
     int close = near(p, m->target);
     result = 1;
@@ -140,10 +138,9 @@ void sub_08030164(struct Context *m, struct Actor *p) {
   close = targetNear(m, p);
   if (close) {
     int state = p->state;
-    register u32 offset asm("r6") = 0x227;
+    u32 offset = 0x227;
     u8 *dst = (u8 *)p + offset;
     int zero;
-    asm("" : "+r"(dst));
     zero = 0;
     *dst = state;
     p->state = 10;

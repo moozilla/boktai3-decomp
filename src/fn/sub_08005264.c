@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #define Scene_UpdateFallingObject sub_08005264
 struct Body {u8 pad[14];s16 y;u8 pad10[6];s16 vy;};
 struct Cell {u8 height,tile;u16 flags;};
@@ -24,6 +23,6 @@ void Scene_UpdateFallingObject(struct Object *p)
     if(body->vy==0){
         if(({u32 mask=8;mask&p->flags;})){p->terrain.flags|=0x21;p->resource=0;}
         else{p->terrain.flags&=~0x21;sub_08004450(p);}
-        {register void (*callback)(void) asm("r1")=sub_080050AC;asm("" : "+r"(callback));p->update=callback;}p->state=0;p->entered=1;p->dx=0;p->dz=0;p->direction=0;p->kind=0;
+        {register void (*callback)(void) asm("r1")=sub_080050AC;p->update=callback;}p->state=0;p->entered=1;p->dx=0;p->dz=0;p->direction=0;p->kind=0;
     }
 }

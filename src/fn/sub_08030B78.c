@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct State {
   u8 pad0[15];
   u8 fresh;
@@ -63,7 +62,6 @@ int sub_08030B78(int mode) {
     setCallback(sub_080316A4, p);
     {
       u8 *mode = &p->defaultMode;
-      asm("" : "+r"(mode));
       *mode = 3;
     }
   } else {
@@ -71,10 +69,9 @@ int sub_08030B78(int mode) {
     setCallbackB(p, sub_080317D8);
   }
   {
-    register u8 *fresh asm("r1") = &p->state.fresh;
+    u8 *fresh = &p->state.fresh;
     *fresh = 0;
     fresh -= 15;
-    asm("" : "+r"(fresh));
     ((struct State *)fresh)->current = -1;
   }
   return sub_0803092C(p);

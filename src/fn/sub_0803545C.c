@@ -45,27 +45,22 @@ int sub_08034258(struct Engine *);
 void sub_080340AC(struct Engine *);
 void sub_08036BD4(int);
 int sub_082238F0(int);
-// MATCHING_CONCESSION: register-pinning
 void sub_0803545C(struct Engine *p) {
   u16 *history = (u16 *)((u8 *)p + 0xEA);
-  register int bits asm("r3");
+  int bits;
   int i;
   {
-    register int initial asm("r0") = 65535;
-    asm("" : "+r"(initial));
+    int initial = 65535;
     *history++ = initial;
     initial = -1;
-    asm("" : "+r"(initial));
     *history = initial;
     bits = initial;
   }
-  asm("" : "+r"(bits));
   history += 2;
   i = 4;
   do {
-    register int value asm("r0") = *history;
+    int value = *history;
     value |= bits;
-    asm("" : "+r"(value));
     *history++ = value;
   } while (--i >= 0);
 }

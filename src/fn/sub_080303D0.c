@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Vec {
   s16 x, y, z, pad;
 };
@@ -90,8 +89,8 @@ struct Body {
   struct Vec pos;
 };
 static inline int near(struct Actor *p, struct Vec *b, struct Body *body) {
-  register struct Vec *a asm("r4") = &p->pos;
-  register int limit asm("r5") = p->rateB;
+  struct Vec *a = &p->pos;
+  int limit = p->rateB;
   int x = b->x - body->pos.x;
   int result;
   if (x < 0)
@@ -119,8 +118,7 @@ done:
   return result;
 }
 void sub_080303D0(struct Context *m, struct Actor *p) {
-  register struct Body *body asm("r6") = (struct Body *)&p->body;
-  asm("" : "+r"(body));
+  struct Body *body = (struct Body *)&p->body;
   if (p->entered) {
     int zero = 0;
     p->entered = zero;

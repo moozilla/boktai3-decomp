@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Vec {
   s16 x, y, z, pad;
 };
@@ -101,10 +100,9 @@ void sub_080305AC(struct Context *m, struct Actor *p) {
   if (m->event)
     goto tick;
   {
-    register u8 *phasePtr asm("r1") = &m->phase;
+    u8 *phasePtr = &m->phase;
     u8 *firstPtr = &p->paramA;
     unsigned phase, first;
-    asm("" : "+r"(firstPtr));
     phase = *phasePtr;
     first = *firstPtr;
     if (phase == first && m->frame >= p->paramB)

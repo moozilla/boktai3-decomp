@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Engine {
   u8 pad0[0x18];
@@ -48,9 +47,8 @@ void sub_08034270(struct Engine *p) {
   for (; i < gUnk_03006A80->count; i++) {
     if ((p->allowed >> i) & 1) {
       {
-        register struct Record *base asm("r0") = gUnk_03006A80;
-        register int offset asm("r1");
-        asm("" : "+r"(base));
+        struct Record *base = gUnk_03006A80;
+        int offset;
         offset = i << 5;
         base = (struct Record *)((u32)base + offset);
         if (base->status <= 3) {

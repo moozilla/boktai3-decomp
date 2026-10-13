@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Blob {
   u32 words[8];
@@ -51,13 +50,10 @@ void sub_08036E14(struct LinkMenu *p) {
   sub_08033C1C();
   sub_0801683C();
   {
-    register u16 *shadow asm("r2") = &gUnk_03004BD8;
-    register u32 mask asm("r0");
-    asm("" : "+r"(shadow));
+    u16 *shadow = &gUnk_03004BD8;
+    u32 mask;
     mask = ~0x600;
-    asm("" : "+r"(mask));
     mask &= *shadow;
-    asm("" : "+r"(mask));
     *shadow = mask;
   }
   sub_08215490(1);

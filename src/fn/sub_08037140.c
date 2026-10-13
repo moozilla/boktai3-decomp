@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Blob {
   u32 words[8];
@@ -70,11 +69,9 @@ int sub_08037140(struct LinkMenu *p) {
   blob = &p->blob;
   sub_082196C4(blob, resource);
   {
-    register void *drawable asm("r0") = p->draw50;
-    register int flags asm("r3");
-    asm("" : "+r"(drawable));
+    void *drawable = p->draw50;
+    int flags;
     flags = 0x2011;
-    asm("" : "+r"(flags));
     zero = 0;
     sub_0821983C(drawable, blob, 3, flags, zero, zero, 60, zero);
   }

@@ -1,6 +1,5 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Vec{s16 x,y,z,pad;};struct Sprite{u8 pad[8];u32 flags;u8 padc[20];struct Vec position;u8 pad28[12];u8 scaleX,scaleY;u16 angle;};struct Effect{u32 pad0;u8 state,entered,pad6,mode;u32 pad8,timer;u16 duration;u8 index,pad13[5];struct Vec position;u8 pad20[4];struct Sprite sprite;};extern struct Vec gUnk_03005418;
-static inline int project(int input){register int v asm("r0")=input*3;asm("" : "+r"(v));if(v>=0)v=v>>5;else v=-((-v)>>5);asm("" : "+r"(v));return v;}
+static inline int project(int input){int v=input*3;if(v>=0)v=v>>5;else v=-((-v)>>5);return v;}
 #define FloatingEffect_Project sub_080168B8
-void FloatingEffect_Project(struct Effect*p){struct Sprite*s=&p->sprite;struct Vec*out=&p->sprite.position;struct Vec*in=&p->position;register int xy asm("r4");int height,x=in->x,z=in->z;out->x=project(x-z);xy=project(x+z);asm("" : "+r"(xy));height=project(in->y);{int y=xy-height,z=xy+height;out->x=out->x-gUnk_03005418.x+120;out->y=y-gUnk_03005418.y+80;out->z=z-gUnk_03005418.z;}s->position.x-=8;s->position.y-=8;}
+void FloatingEffect_Project(struct Effect*p){struct Sprite*s=&p->sprite;struct Vec*out=&p->sprite.position;struct Vec*in=&p->position;int xy;int height,x=in->x,z=in->z;out->x=project(x-z);xy=project(x+z);height=project(in->y);{int y=xy-height,z=xy+height;out->x=out->x-gUnk_03005418.x+120;out->y=y-gUnk_03005418.y+80;out->z=z-gUnk_03005418.z;}s->position.x-=8;s->position.y-=8;}

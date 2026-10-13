@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Object {
   u8 pad0[0x50];
@@ -26,7 +25,6 @@ int sub_0802C738(struct Manager *m) {
   struct Object *p = m->head;
   if (p) {
     u32 mask = 1;
-    asm("" : "+r"(mask));
     do {
       struct Object *next = p->prev;
       if (p->flags & mask) {

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Engine {
   u8 pad0[0x18];
@@ -51,9 +50,8 @@ int sub_08035CE8(struct Engine *p) {
     sub_082156B8();
   }
   {
-    register int input asm("r1") = gUnk_03005270;
-    register int mask asm("r0") = 0x2000;
-    asm("" : "+r"(input), "+r"(mask));
+    int input = gUnk_03005270;
+    int mask = 0x2000;
     input |= mask;
     sub_080341B0(p, input);
   }

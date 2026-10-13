@@ -1,11 +1,10 @@
 #include "global.h"
 #define Actor_ProjectAndClampToScreen sub_081E3B6C
 // Provisional name: Actor_ProjectAndClampToScreen
-// MATCHING_CONCESSION: register-pinning
 struct Vec {s16 x,y,z;};
 struct Actor {u8 pad[0xddc];u32 flags;u8 gap[0xdf8-0xde0];struct Vec pos;};
 extern const u16 gUnk_03005418[];
-static inline s32 project(s32 input){register s32 v asm("r0")=input*3;return v>=0?v>>5:-((-v)>>5);}
+static inline s32 project(s32 input){s32 v=input*3;return v>=0?v>>5:-((-v)>>5);}
 static inline void screen(struct Vec *dst,struct Vec *src){
  s32 depth,height,y,z; s32 sx=src->x,sz=src->z;
  dst->x=project(sx-sz);

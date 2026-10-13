@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Vec {s32 x:16;s32 y:16;s32 z:16;s32 pad:16;};
 struct Graphics {u32 pad;u16 base;};
 struct Sprite {u32 flags;u8 pad4[4];u16 tile;u8 width,height;u8 padC[3];u8 mode,priority;u8 pad11[7];struct Vec position;u8 pad20[8];};
@@ -20,9 +19,9 @@ s32 Trigger_CreateDrop(struct Vec *position,s32 id,s32 kind,u32 script,u32 *argu
  p->sprite=sub_08219C40(40);if(!p->sprite){sub_08219D38(p);return -1;}
  sub_08219DD8(p->sprite,40);sub_08217DE0(p->sprite,manager->graphics,0);sub_08217EC4(p->sprite,-8,-10);
  if(sub_0821D6F4(position,128)){
- {struct Sprite *sprite=p->sprite;register struct Graphics *graphics asm("r3")=manager->graphics;asm("" : : "r"(graphics));sprite->tile=((sprite->width>>3)*(sprite->height>>3))*35+graphics->base;}p->sprite->mode=1;
+ {struct Sprite *sprite=p->sprite;struct Graphics *graphics=manager->graphics;sprite->tile=((sprite->width>>3)*(sprite->height>>3))*35+graphics->base;}p->sprite->mode=1;
  }else{
- {struct Sprite *sprite=p->sprite;register struct Graphics *graphics asm("r3")=manager->graphics;asm("" : : "r"(graphics));sprite->tile=((sprite->width>>3)*(sprite->height>>3))*32+graphics->base;}p->sprite->mode=2;
+ {struct Sprite *sprite=p->sprite;struct Graphics *graphics=manager->graphics;sprite->tile=((sprite->width>>3)*(sprite->height>>3))*32+graphics->base;}p->sprite->mode=2;
  }
  p->sprite->position=*position;p->sprite->priority=16;p->position=&p->sprite->position;
  if(sound)p->sound=sub_0822C034(p->position,sound);else p->sound=sound;

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Common {
   u8 pad0[0x90];
@@ -55,8 +54,7 @@ void sub_0802B530(struct Common *p) {
   }
   if (p->finished) {
     int duration, zero;
-    register int value asm("r0") = *((u8 *)p + 0xe1);
-    asm("" : "+r"(value));
+    int value = *((u8 *)p + 0xe1);
     if (value < 64)
       duration = *((u8 *)base + 0x1b7);
     else
