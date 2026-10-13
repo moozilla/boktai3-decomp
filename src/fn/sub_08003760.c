@@ -1,12 +1,13 @@
 #include "global.h"
+#include "color_fade_controller.h"
 
-void sub_08003760(u8 *p)
+void sub_08003760(struct ColorFadeChannel *p)
 {
-    *(u32 *)p = 0;
-    *(u32 *)(p + 4) = 0x1084;
-    *(u32 *)(p + 8) = 0;
-    *(u32 *)(p + 0xC) = 0x40;
-    *(u32 *)(p + 0x10) = 0;
-    *(u16 *)(p + 0x14) = 0;
-    *(u16 *)(p + 0x16) = 0;
+    p->mode = 0;
+    p->color = 0x1084;
+    p->start = 0;
+    p->level = 0x40;
+    p->target = 0;
+    p->time = 0;
+    p->shift = 0;
 }

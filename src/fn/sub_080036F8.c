@@ -1,24 +1,15 @@
 #include "global.h"
+#include "color_fade_controller.h"
 
-struct S {
-    u32 a;
-    u32 b;
-    u32 c;
-    s32 d;
-    u32 e;
-    u16 cnt;
-    u16 sh;
-};
-
-void sub_080036F8(struct S *p)
+void sub_080036F8(struct ColorFadeChannel *p)
 {
-    p->d = 0x40 - ((p->cnt << 6) >> p->sh);
-    if (p->cnt > (1 << p->sh)) {
-        p->d = 0;
-        if (p->a == 2)
-            p->a = 0;
+    p->level = 0x40 - ((p->time << 6) >> p->shift);
+    if (p->time > (1 << p->shift)) {
+        p->level = 0;
+        if (p->mode == 2)
+            p->mode = 0;
         else
-            p->a = 5;
+            p->mode = 5;
     }
-    p->cnt++;
+    p->time++;
 }

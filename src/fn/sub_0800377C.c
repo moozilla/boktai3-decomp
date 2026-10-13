@@ -1,6 +1,7 @@
 #include "global.h"
+#include "color_fade_controller.h"
 
-void sub_0800377C(u32 *p)
+void sub_0800377C(struct ColorFadeChannel *p)
 {
-    *p = 0;
+    p->mode = 0;
 }

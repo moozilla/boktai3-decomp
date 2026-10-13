@@ -1,7 +1,9 @@
 #include "global.h"
+#include "color_fade_controller.h"
 
-s32 sub_08003860(u32 *p, s32 x)
+s32 sub_08003860(struct ColorFadeChannel *c, s32 x)
 {
+    u32 *p = &c->mode;
     switch (x) {
         case 1:
             if (*p > 2)
