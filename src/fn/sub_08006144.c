@@ -1,11 +1,8 @@
-#include "global.h"
+#include "terrain_modifier.h"
 
 void *sub_08219FBC(u32, u32);
 void sub_0821A04C(void *, void (*)(void), void (*)(void));
-s32 sub_08006134(void *, void *);
 void sub_0821A0C0(void *);
-void sub_0800611C(void);
-void sub_08006120(void);
 
 void *sub_08006144(void *a)
 {

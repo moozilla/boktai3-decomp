@@ -1,7 +1,4 @@
-#include "global.h"
-
-extern u8 *gUnk_02000028;
-void sub_08005F78(void);
+#include "terrain_modifier.h"
 
 u32 sub_08006120(void)
 {
