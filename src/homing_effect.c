@@ -225,14 +225,14 @@ s32 EffectManager_Init(struct EffectManager *manager, void *unused)
     }
     manager->counter = 0;
     {
-        struct EffectActor *actor = ({
-            struct EffectActor *a = gUnk_02000580;
+        struct Player *actor = ({
+            struct Player *a = gUnk_02000580[0];
             a;
         });
         manager->actor = actor;
         if (!actor)
             return -1;
-        if (actor->mode == 6)
+        if (actor->actionMode == 6)
             manager->mode = 1;
         else
             manager->mode = 0;
@@ -299,10 +299,10 @@ static inline void project(struct EffectVec *out, struct EffectVec *in)
     out->y = h - y;
     out->z = h + y;
 }
-static inline u32 actorMode(struct EffectActor *actor)
+static inline u32 actorMode(struct Player *actor)
 {
     u32 mask = 128;
-    return actor->flags & mask;
+    return actor->statusFlags & mask;
 }
 void EffectParticle_UpdateDriftAroundActor(struct EffectManager *manager, struct Effect *effect,
                                            s32 index, s32 phase, u32 phaseMask,

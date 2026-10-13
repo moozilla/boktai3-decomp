@@ -1171,7 +1171,7 @@ void sub_08221110(void *, u32, u32, s32, s32);
 
 static inline u8 ownerIsCurrent(u32 owner)
 {
-    if (*(u32 *)(gUnk_02000710 + 0x5A0) == owner)
+    if (gUnk_02000710->region == (s32)owner)
         return 1;
     return 0;
 }
