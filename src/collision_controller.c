@@ -21,7 +21,8 @@ struct CollisionSlot *sub_08009E3C(struct CollisionManager *manager)
     return 0;
 }
 
-void sub_08009E5C(struct SceneCollider *collider, struct CollisionOther *other, struct CollisionSlot *slot)
+void sub_08009E5C(struct SceneCollider *collider, struct CollisionOther *other,
+                  struct CollisionSlot *slot)
 {
     u32 m = 0x4000;
     if ((collider->contactFlags2 & m) == 0) {
@@ -126,7 +127,8 @@ static inline u32 randomDelay(u32 restart)
         return value;
     }
 }
-void CollisionController_UpdateIdleAnimation(struct CollisionManager *manager, struct CollisionSlot *p)
+void CollisionController_UpdateIdleAnimation(struct CollisionManager *manager,
+                                             struct CollisionSlot *p)
 {
     struct CollisionSprite *o;
     struct CollisionAnim *a;
@@ -237,7 +239,8 @@ void sub_0800A16C(u32 x, struct CollisionSlot *slot)
     }
 }
 
-void CollisionController_UpdateHitAnimation(struct CollisionManager *manager, struct CollisionSlot *p)
+void CollisionController_UpdateHitAnimation(struct CollisionManager *manager,
+                                            struct CollisionSlot *p)
 {
     struct CollisionSprite *o;
     struct CollisionAnim *a;
