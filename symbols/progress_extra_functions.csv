@@ -53,6 +53,10 @@ address,evidence
 0819B2E4,Array approach helper (1/4) in the math helper block; exact standalone C
 0819B330,Array approach helper (1/8) in the math helper block; exact standalone C
 0819B37C,Array approach helper (1/16) in the math helper block; exact standalone C
+0819B3C8,Array helper in the math helper block (own push/pop-bx); exact standalone C; exact standalone C
+0819B410,Array helper in the math helper block (own push/pop-bx); retained assembly (not yet matched); exact standalone C
+0819B44C,Array helper in the math helper block (own push/pop-bx); exact standalone C; exact standalone C
+0819B488,Array helper in the math helper block (own push/pop-bx); retained assembly (not yet matched); exact standalone C
 081B61E0,Separate 100-byte Thumb body with own push/call/control flow/pop-bx after 081B6180 returns; retained unmatched code; notes/root-batch6.md
 081DB24C,Independent 108-byte Thumb allocation wrapper in retained 081DB1D8 tail; own prologue and call sequence and pop-bx plus literals; ends at 081DB2B8; notes/solo-family_2026-10-09.md
 081DB2B8,Independent 108-byte Thumb allocation wrapper in retained 081DB1D8 tail; own prologue and call sequence and pop-bx plus literals; ends at 081DB324; notes/solo-family_2026-10-09.md
