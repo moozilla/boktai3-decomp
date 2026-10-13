@@ -2,17 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 /* Empty constraints retain register choices without handwritten instructions. */
 #include "background_controller.h"
-struct Camera {
-    s16 x, y, unknown4, unknown6, offsetX, offsetY;
-    u8 pad[6];
-    s16 mode;
-};
-extern struct Camera gUnk_030042A0;
-extern s16 gUnk_03005418[2];
-extern u16 gUnk_03004BD8;
-s32 Background_ApplyQueuedCommands(struct Background *);
-void sub_0821656C(u32, s32, s32, s32, s32);
-void sub_08219574(u32, s32, s32);
+
 #define truncate7(v)                                                                               \
     ({                                                                                             \
         s32 value = (v);                                                                           \
@@ -33,10 +23,12 @@ void sub_08219574(u32, s32, s32);
             result = -((-value) >> 3);                                                             \
         result;                                                                                    \
     })
+
 s32 Background_Update(struct Background *p)
 {
     s32 x, y asm("r6");
     s32 tileX, tileY;
+
     Background_ApplyQueuedCommands(p);
     tileY = 0;
     if (p->flags & 2) {
@@ -50,12 +42,12 @@ s32 Background_Update(struct Background *p)
             cy = gUnk_030042A0.y >> 3;
         }
         if (!(p->flags & 1)) {
-            cx -= p->offsetX;
-            cy -= p->offsetY;
+            cx -= p->cameraOffsetX;
+            cy -= p->cameraOffsetY;
         }
         if (p->flags & 128) {
-            cx += p->speedX;
-            cy += p->speedY;
+            cx += p->driftX;
+            cy += p->driftY;
         }
         {
             s32 cyHint = cy;
@@ -93,34 +85,38 @@ s32 Background_Update(struct Background *p)
             if (p->scrollDuration) {
                 s32 remaining = p->scrollDuration - p->scrollTime;
                 asm("" : "+r"(remaining));
-                p->scrollX = Div(p->scrollStartX * remaining + p->scrollTargetX * p->scrollTime,
-                                 p->scrollDuration) /
-                             128;
-                p->scrollY = Div(p->scrollStartY * remaining + p->scrollTargetY * p->scrollTime,
-                                 p->scrollDuration) /
-                             128;
+                p->scrollSpeedX =
+                    Div(p->scrollStartX * remaining + p->scrollTargetX * p->scrollTime,
+                        p->scrollDuration) /
+                    128;
+                p->scrollSpeedY =
+                    Div(p->scrollStartY * remaining + p->scrollTargetY * p->scrollTime,
+                        p->scrollDuration) /
+                    128;
                 if (++p->scrollTime > p->scrollDuration) {
                     p->scrollDuration = 0;
                     p->scrollTime = 0;
-                    p->scrollX = p->scrollTargetX / 128;
-                    p->scrollY = p->scrollTargetY / 128;
+                    p->scrollSpeedX = p->scrollTargetX / 128;
+                    p->scrollSpeedY = p->scrollTargetY / 128;
                 }
             }
-            p->unknown38 += p->scrollX;
-            p->unknown3C += p->scrollY;
-            p->x = p->unknown38 + p->startX;
-            p->y = p->unknown3C + p->startY;
+            p->scrollDistX += p->scrollSpeedX;
+            p->scrollDistY += p->scrollSpeedY;
+            p->x = p->scrollDistX + p->baseX;
+            p->y = p->scrollDistY + p->baseY;
         } else if (p->moveActive == 1) {
             if (p->moveDuration) {
                 register s32 remaining asm("r5") = p->moveDuration - p->moveTime;
-                p->x = Div(p->originX * remaining + p->targetX * p->moveTime, p->moveDuration);
-                p->y = Div(p->originY * remaining + p->targetY * p->moveTime, p->moveDuration);
+                p->x = Div(p->moveOriginX * remaining + p->moveTargetX * p->moveTime,
+                           p->moveDuration);
+                p->y = Div(p->moveOriginY * remaining + p->moveTargetY * p->moveTime,
+                           p->moveDuration);
             }
             if (++p->moveTime >= p->moveDuration) {
                 p->moveActive = 0;
                 p->moveTime = 0;
-                p->x = p->targetX;
-                p->y = p->targetY;
+                p->x = p->moveTargetX;
+                p->y = p->moveTargetY;
             }
         }
         x = ({

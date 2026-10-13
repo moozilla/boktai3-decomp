@@ -1,10 +1,6 @@
 #include "global.h"
+#include "background_controller.h"
 
-s32 Script_SeekToKeyword(s32);
-s32 Script_GetValue(void);
-u8 *Script_GetPc(void);
-u32 sub_0821ABA8(u32, u32);
-void Background_QueueCommand(u32, u32, s32, s32 *);
 void sub_08002234(void)
 {
     s32 buf[8];

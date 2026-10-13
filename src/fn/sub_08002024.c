@@ -1,21 +1,13 @@
 #include "global.h"
-struct Resource {
-    u32 header[3], maps, tiles, extra;
-};
-s32 sub_0821ABA8(s32, s32);
-s32 Script_SeekToKeyword(s32);
-u8 *Script_GetPc(void);
-s32 sub_0821AA00(u8 *);
-u8 *sub_08216E54(u16);
-s32 Background_FindMapId(struct Resource *, u16);
-void sub_082164AC(u16, void *, u16);
+#include "background_controller.h"
+
 s32 Background_LoadMapFromScript(void)
 {
-    struct Resource resource;
+    struct BackgroundResource resource;
     u16 layer = sub_0821ABA8('p', 0);
     u16 index;
     u8 *base = sub_08216E54(sub_0821ABA8('d', 0));
-    resource = *(struct Resource *)base;
+    resource = *(struct BackgroundResource *)base;
     resource.maps += (u32)base;
     resource.tiles += (u32)base;
     resource.extra += (u32)base;

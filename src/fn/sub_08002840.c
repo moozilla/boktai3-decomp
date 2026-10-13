@@ -1,26 +1,16 @@
 #include "global.h"
+#include "background_controller.h"
 
-struct B {
-    u8 f[0x2c];
-    u32 x;
-};
-void *sub_08219FBC(u32, u32);
-void sub_0821A04C(void *, void (*)(void), void (*)(void));
-s32 ScrollingBackground_Initialize(void *, u16, void *);
-void sub_0821A0C0(void *);
-void ScrollingBackground_Update(void);
-void sub_08002658(void);
-
-void *sub_08002840(u16 a, struct B *b)
+void *sub_08002840(u16 id, struct ScrollingBackgroundConfig *c)
 {
-    void *p;
-    if (b->x == 0)
+    struct ScrollingBackground *p;
+    if (c->priority == 0)
         p = sub_08219FBC(9, 0xf8);
     else
         p = sub_08219FBC(0xb, 0xf8);
     if (p != 0) {
         sub_0821A04C(p, ScrollingBackground_Update, sub_08002658);
-        if (ScrollingBackground_Initialize(p, a, b) < 0) {
+        if (ScrollingBackground_Initialize(p, id, c) < 0) {
             sub_0821A0C0(p);
             return 0;
         }
