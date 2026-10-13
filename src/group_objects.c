@@ -261,6 +261,7 @@ void sub_08010A34(struct GroupObjects *m, struct GroupPiece *p)
 }
 
 #ifdef NONMATCHING
+// fuzzy: 92.6% (delta add uses r6-relative x and r3 temps; zero/4 store order)
 void sub_08010A58(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
@@ -307,6 +308,7 @@ INCLUDE_ASM("asm/nonmatching", sub_08010A58);
 #endif
 
 #ifdef NONMATCHING
+// fuzzy: 92.3% (register allocation of delta pointer/temps in vector add)
 void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
@@ -358,7 +360,47 @@ void sub_08010D84(struct GroupObjects *m, struct GroupPiece *p, int delay)
     }
     p->timer++;
 }
+#ifdef NONMATCHING
+// fuzzy: 88.8% (register allocation in delta add and distance setup)
+void sub_08010E44(struct GroupObjects *m, struct GroupPiece *p, int index)
+{
+    struct GroupVec delta;
+    struct GroupVec *position;
+    int dx, dz;
+    int active = p->active;
+    if (active) {
+        const u16 *table;
+        p->active = 0;
+        p->direction = sub_082215E4(p->target.x - p->position.x, p->target.z - p->position.z);
+        table = gUnk_0203B400;
+        p->direction += (randomWith(table) & 31) - 16;
+        p->speed = (randomWith(table) & 31) + 16;
+    }
+    position = &p->position;
+    dx = p->target.x - p->position.x;
+    dz = p->target.z - position->z;
+    if (dx * dx + dz * dz <= 0x9C3F) {
+        p->state = 2;
+        p->active = 1;
+        p->timer = 0;
+    } else {
+        if (p->speed == 0) {
+            const u16 *table;
+            p->direction = sub_082215E4(dx, dz);
+            table = gUnk_0203B400;
+            p->direction += (randomWith(table) & 31) - 16;
+            p->speed = (randomWith(table) & 31) + 32;
+        } else
+            p->speed--;
+        polar(&delta, p->direction, p->duration);
+        addPosition(&p->position, &delta);
+        sub_0800FA5C(m, p, 0);
+        p->timer++;
+    }
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_08010E44);
+#endif
 
 int GroupObjects_Update(struct GroupObjects *m)
 {
