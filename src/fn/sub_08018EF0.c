@@ -1,18 +1,18 @@
 #include "global.h"
-void *sub_08219FBC(s32, s32);
-void sub_0821A04C(void *, void *, void *);
+void *Task_Create(s32, s32);
+void Task_SetCallbacks(void *, void *, void *);
 s32 sub_08018E00(void *);
-void sub_0821A0C0(void *);
+void Task_Kill(void *);
 void BlendTransition_Update(void);
 void sub_08018DFC(void);
 void *sub_08018EF0(void)
 {
     void *obj;
-    obj = sub_08219FBC(11, 0x2C);
+    obj = Task_Create(11, 0x2C);
     if (obj != 0) {
-        sub_0821A04C(obj, BlendTransition_Update, sub_08018DFC);
+        Task_SetCallbacks(obj, BlendTransition_Update, sub_08018DFC);
         if (sub_08018E00(obj) < 0) {
-            sub_0821A0C0(obj);
+            Task_Kill(obj);
             return 0;
         }
     }

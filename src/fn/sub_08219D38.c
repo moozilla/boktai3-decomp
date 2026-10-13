@@ -3,7 +3,7 @@ struct Block {
     struct Block *prev, *next;
     u32 size, unused;
 };
-void sub_08219D38(void *data)
+void Heap_Free(void *data)
 {
     struct Block *block, *prev, *next;
     u32 flags;

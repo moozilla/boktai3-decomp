@@ -3,18 +3,18 @@
 // fuzzy: 95.7%
 // 2 differing instruction runs; first diff at +0xDC (ldr r1, [pc, #0xbc] vs ldr r0, [pc, #0xbc])
 extern u8 gUnk_03004FC0[];
-void sub_082156B8(u32);
-void sub_0821656C(u32, u32, u32, u32, u32);
-void *sub_0821A520(u32, u32);
+void Bg_ClearTilemap(u32);
+void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
+void *ScriptProc_Start(u32, u32);
 void sub_082161B4(u32, u32, void *, u32, u32, u32, u32 *);
-void sub_082196C4(u8 *, void *);
+void ResourceHeader_Relocate(u8 *, void *);
 void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
 void sub_081DC1B4(u32);
 void sub_081E0818(u8 *);
 extern u32 gUnk_020002F8[];
 u32 sub_08033690(u32, u32, u32, u32);
-void sub_0803386C(u32, u32);
-void sub_08033924(u32, u32);
+void TextWindow_SetScript(u32, u32);
+void TextWindow_Refresh(u32, u32);
 void sub_080337FC(u32);
 void sub_08217DCC(u32);
 u32 sub_081DC470(u8 *s)
@@ -29,28 +29,28 @@ u32 sub_081DC470(u8 *s)
     u32 old;
     u32 *sound;
     u32 result;
-    sub_082156B8(0);
+    Bg_ClearTilemap(0);
     zero = 0;
-    sub_0821656C(0, 0, 0, 0, zero);
-    sub_082156B8(2);
-    sub_0821656C(2, 0, 0, 0, zero);
-    sub_082156B8(3);
-    a = sub_0821A520(0xC091, 0xA597);
+    BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero);
+    Bg_ClearTilemap(2);
+    BgGfx_LoadTilemapSimple(2, 0, 0, 0, zero);
+    Bg_ClearTilemap(3);
+    a = ScriptProc_Start(0xC091, 0xA597);
     value = 3;
     sub_082161B4(2, 0, a, 0, zero, one = 1, &value);
-    sub_0821656C(3, 0, 0, 0, zero);
-    p = (u8 *)sub_0821A520(0x92B3, 0x81B) + 0x14;
+    BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
+    p = (u8 *)ScriptProc_Start(0x92B3, 0x81B) + 0x14;
     CpuSet(p, gUnk_03004FC0, 0x100);
     global = gUnk_020002F8;
     if (global[2] == 1) {
         u32 x, y;
         u8 *half;
-        resource = sub_0821A520(0xCB05, 0x530D);
+        resource = ScriptProc_Start(0xCB05, 0x530D);
         obj = s + 0x7C;
-        sub_082196C4(obj, resource);
+        ResourceHeader_Relocate(obj, resource);
         sub_0821983C(s + 0x1C, obj, 0x4B, 0x10, zero, zero, zero, zero);
         obj2 = s + 0x104;
-        sub_082196C4(obj2, resource);
+        ResourceHeader_Relocate(obj2, resource);
         sub_0821983C(s + 0xA4, obj2, 0x4C, 0x10, zero, zero, zero, zero);
         *(u16 *)(s + 0x3C) = x = 0xFFF8;
         *(u16 *)(s + 0x3E) = y = 0xFFC0;
@@ -71,8 +71,8 @@ u32 sub_081DC470(u8 *s)
     result = sub_08033690(1, 6, 28, 6);
     sound = (u32 *)(s + 0x140);
     *sound = result;
-    sub_0803386C(result, global[0]);
-    sub_08033924(*sound, global[1]);
+    TextWindow_SetScript(result, global[0]);
+    TextWindow_Refresh(*sound, global[1]);
     sub_080337FC(*sound);
     *(u32 *)(s + 0x138) = zero;
     sub_081DC1B4(0);

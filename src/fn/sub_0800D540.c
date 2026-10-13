@@ -28,10 +28,10 @@ struct Manager {
     void *animation;
 };
 extern struct Manager *gUnk_0200046C;
-void sub_08220C8C(void *, void *, u32, u32, u32);
-void sub_0822B2F8(u32);
-void sub_0821FF24(void *, void *, u32);
-void sub_0821FE40(void *);
+void Anim_SetSequence(void *, void *, u32, u32, u32);
+void Sound_PlaySong(u32);
+void Collider_SetPosition(void *, void *, u32);
+void Collider_Refresh(void *);
 static inline void setFrame(struct Sprite *sprite, u16 frame)
 {
     sprite->frame = frame;
@@ -59,16 +59,16 @@ void FallingObject_UpdateWaiting(struct Object *object)
 {
     if (object->entered) {
         object->entered = 0;
-        sub_08220C8C(object->anim, gUnk_0200046C->animation, 2, 0, 0);
+        Anim_SetSequence(object->anim, gUnk_0200046C->animation, 2, 0, 0);
     }
     if (object->health <= 0 || object->timer++ > object->parameter) {
         setState(object, 3);
         return;
     }
     if (object->collider)
-        sub_0821FF24(object->collider, &object->position, 0);
+        Collider_SetPosition(object->collider, &object->position, 0);
     if (object->attack) {
-        sub_0821FF24(object->attack, &object->position, 0);
-        sub_0821FE40(object->attack);
+        Collider_SetPosition(object->attack, &object->position, 0);
+        Collider_Refresh(object->attack);
     }
 }

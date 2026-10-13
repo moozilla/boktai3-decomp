@@ -8,7 +8,7 @@ struct P {
     u8 pad2[7];
     u32 v;
 };
-void sub_08219DD8(void *, u32);
+void Memory_Clear(void *, u32);
 s32 sub_0811E534(void *, s32);
 void sub_0811F4C4(void);
 void sub_0811F6CC(void);
@@ -28,7 +28,7 @@ void sub_0811F874(u8 *s, u32 v)
     p->fl = z;
     p->v = v;
     q = s + 0x318;
-    sub_08219DD8(q, 0xc);
+    Memory_Clear(q, 0xc);
     if (sub_0811E534(q, *(s8 *)(a + 0xe)) < 0) {
         p->cb = sub_0811F4C4;
         p->fl = z;

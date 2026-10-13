@@ -1,6 +1,6 @@
 #include "global.h"
 u8 sub_0805E5D0(void *);
-void sub_0822B2F8(u32);
+void Sound_PlaySong(u32);
 struct S {
     u8 f0;
     u8 b1;
@@ -18,7 +18,7 @@ u32 sub_0805E880(struct S *p)
         if (v >= 0 && v != base) {
             p->b2 = i;
             p->b3 = sub_0805E5D0(p);
-            sub_0822B2F8(0xdc);
+            Sound_PlaySong(0xdc);
             return 1;
         }
         i = (i + 1) & 3;

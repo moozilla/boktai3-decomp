@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 typedef struct {
     u32 pad[2], flags;
 } Graphic;
@@ -15,7 +15,7 @@ int ResultTutorial_BlinkLevel(u8 *p)
             int frame = *(u16 *)(p + 0xaa) & 31;
             int visible;
             if (frame == 0)
-                sub_0822B2F8(0x2b0);
+                Sound_PlaySong(0x2b0);
             visible = 1;
             if (frame <= 19)
                 goto show;

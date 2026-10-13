@@ -11,17 +11,17 @@ struct Display {
     u8 resource[32];
     struct Drawing drawings[4];
 };
-void sub_0821980C(void *, void *, int, int);
-void sub_0822B2F8(int);
+void Anim_LoadKeyframe(void *, void *, int, int);
+void Sound_PlaySong(int);
 void sub_0803AA74(struct Display *p)
 {
     if (p->entered) {
         struct Drawing *q;
         p->entered = 0;
         q = p->drawings;
-        sub_0821980C(q, p->resource, 10, 0);
+        Anim_LoadKeyframe(q, p->resource, 10, 0);
         q->flags &= ~1;
-        sub_0822B2F8(660);
+        Sound_PlaySong(660);
     }
     if (p->finished) {
         p->finished = 0;

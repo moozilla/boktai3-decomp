@@ -13,14 +13,14 @@ struct Owner {
     u8 pad[0x168];
     struct Elem elems[8];
 };
-u32 sub_08215184(u32);
+u32 AnimData_FindEntry(u32);
 void sub_08217DE0(struct Elem *, u32, s32);
 void sub_08217EC4(struct Elem *, s32, s32);
 void sub_08217EEC(struct Elem *, u32, s32);
 void sub_08217ECC(struct Elem *, s32);
 void sub_08235AB8(struct Owner *p)
 {
-    u32 resource = sub_08215184(0x1c1e);
+    u32 resource = AnimData_FindEntry(0x1c1e);
     u32 zero = 0;
     struct Elem *e = (struct Elem *)((u8 *)p + 0x168);
     s32 i;

@@ -12,7 +12,7 @@ struct TextState {
 };
 extern u16 gUnk_03005428;
 extern const s16 gUnk_086055E0[];
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 void sub_08031EFC(struct TextState *p, int c)
 {
     if (p->skip)
@@ -24,7 +24,7 @@ void sub_08031EFC(struct TextState *p, int c)
             goto clear;
     }
     if (c && c != gUnk_03005428)
-        sub_0822B2F8(gUnk_086055E0[p->voice]);
+        Sound_PlaySong(gUnk_086055E0[p->voice]);
     if (!p->toggle)
         goto set;
 clear:

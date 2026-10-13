@@ -15,7 +15,7 @@ void EffectEmitter_ReceiveHit(struct EmitterAttack *attack, void *unused,
     }
     if (!object->cooldown && damage > 0) {
         object->cooldown = 8;
-        sub_08215284(&object->resource, 487);
+        AnimData_SelectTiles(&object->resource, 487);
         object->flash = 8;
         object->health -= damage;
         if (object->health <= 0) {
@@ -31,7 +31,7 @@ static inline s32 isVisible(void *scene)
 {
     void *saved = scene;
     s32 result;
-    if (gUnk_02000710->scene == saved) {
+    if (((struct EmitterWorld *)gUnk_02000710)->scene == saved) {
         result = 1;
         asm("" : : "r"(result));
     } else {
@@ -49,17 +49,17 @@ s32 EffectEmitter_Update(struct EffectEmitter *object)
     if (!visible) {
         object->sprite.flags |= 1;
         object->collider.state |= 4;
-        sub_08013440(object->shadow);
+        ActorShadow_Disable(object->shadow);
     } else {
         object->sprite.flags &= ~1;
         object->collider.state &= ~4;
-        sub_08013424(object->shadow);
+        ActorShadow_Enable(object->shadow);
         if (object->cooldown)
             object->cooldown--;
         if (object->flash) {
             object->flash--;
             if (!object->flash)
-                sub_08215284(&object->resource, 486);
+                AnimData_SelectTiles(&object->resource, 486);
         }
         if (++object->timer >= gUnk_08604AB4[object->phase]) {
             object->timer = 0;
@@ -89,8 +89,8 @@ s32 EffectEmitter_Update(struct EffectEmitter *object)
 
 u32 sub_0800C630(struct EffectEmitter *object)
 {
-    sub_0821FE6C(&object->collider);
-    sub_08214514(&object->sprite);
+    Collider_Remove(&object->collider);
+    Sprite_Remove(&object->sprite);
     sub_08013684(object->shadow);
     return 0;
 }
@@ -103,11 +103,11 @@ s32 EffectEmitter_Initialize(struct EffectEmitter *object, u32 id, u32 unused)
     struct EmitterSprite *sprite;
     u32 zero = 0;
     object->id = id;
-    object->maximum = sub_0821ABA8(108, 200);
+    object->maximum = Script_GetKeywordValue(108, 200);
     object->health = 1;
     object->cooldown = zero;
-    object->count = sub_0821ABA8(110, 4);
-    object->kind = sub_0821ABA8(101, 50);
+    object->count = Script_GetKeywordValue(110, 4);
+    object->kind = Script_GetKeywordValue(101, 50);
     object->phase = zero;
     object->timer = zero;
     object->flash = zero;
@@ -131,16 +131,16 @@ s32 EffectEmitter_Initialize(struct EffectEmitter *object, u32 id, u32 unused)
     offset.y = 160;
     offset.z = 0;
     collision = &object->collider;
-    sub_0821FEB4(collision, 0, 0x4001, 0, 16, &size, &offset);
-    sub_0821FF84(collision, EffectEmitter_ReceiveHit, object);
-    sub_0821FF24(collision, (struct SceneVec *)&position, 0);
-    sub_0821FE40(collision);
+    Collider_Init(collision, 0, 0x4001, 0, 16, &size, &offset);
+    Collider_SetCallback(collision, EffectEmitter_ReceiveHit, object);
+    Collider_SetPosition(collision, (struct SceneVec *)&position, 0);
+    Collider_Refresh(collision);
     resource = &object->resource;
-    sub_082151E4(resource, 1642);
+    AnimData_Load(resource, 1642);
     sprite = &object->sprite;
-    sub_082144A4(sprite, resource, 0);
+    Sprite_Init(sprite, resource, 0);
     sprite->frame = 0;
-    sub_08215284(resource, 486);
+    AnimData_SelectTiles(resource, 486);
     object->sprite.position = *(struct EmitterVec *)&position;
     Shadow_Initialize(object->shadow, &object->sprite.position, 0);
     return 0;
@@ -148,11 +148,11 @@ s32 EffectEmitter_Initialize(struct EffectEmitter *object, u32 id, u32 unused)
 
 void *sub_0800C7AC(u32 a, u32 b)
 {
-    void *p = sub_08219FBC(8, 0x118);
+    void *p = Task_Create(8, 0x118);
     if (p) {
-        sub_0821A04C(p, EffectEmitter_Update, sub_0800C630);
+        Task_SetCallbacks(p, EffectEmitter_Update, sub_0800C630);
         if (EffectEmitter_Initialize(p, a, b) < 0) {
-            sub_0821A0C0(p);
+            Task_Kill(p);
             return 0;
         }
     }

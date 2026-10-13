@@ -46,7 +46,7 @@ void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, 
 void sub_08222330(void *, void *);
 void sub_082222BC(void *, void *, int);
 int sub_08222358(void *, void *);
-void sub_0822B3BC(int);
+void Sound_PlaySongChecked(int);
 int SceneActorGraphics_GetResourceId(void *);
 void sub_08047D24(void *, int, int, int, void *);
 extern u8 *gUnk_030042E4;
@@ -72,9 +72,9 @@ void sub_080251C4(ActorAnimation *p, int tick)
         sub_08222330((u8 *)p + 0x30c, (u8 *)p + 0x54);
         sub_082222BC((u8 *)p + 0x30c, (u8 *)p + 0x9c4, *(u16 *)((u8 *)p + 0x354));
         if (*(u16 *)((u8 *)p + 0x354) <= 64)
-            sub_0822B3BC(840);
+            Sound_PlaySongChecked(840);
         else
-            sub_0822B3BC(841);
+            Sound_PlaySongChecked(841);
     } else {
         int sequence;
         {

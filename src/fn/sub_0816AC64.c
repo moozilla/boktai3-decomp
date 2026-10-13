@@ -4,8 +4,8 @@
 // 5 differing instruction runs; first diff at +0x52 (movs r0, #0xf0 vs movs r2, #0xf0)
 void sub_08163F14(u8 *, u32, u32, u32, u32);
 void sub_08165ACC(u8 *);
-void sub_08220D78(void *, void *, u32, u32, u32);
-void sub_0821980C(void *, void *, u32, u32);
+void Anim_SetKeyframes(void *, void *, u32, u32, u32);
+void Anim_LoadKeyframe(void *, void *, u32, u32);
 void sub_08163EA0(u8 *, void *);
 void sub_0816AF5C(void);
 void sub_0816AC64(u8 *s)
@@ -28,10 +28,10 @@ void sub_0816AC64(u8 *s)
     *(u16 *)(s + 0x3C02) = 0x20;
     initial = s + 0x3BE0;
     b = s + 0xC4;
-    sub_08220D78(initial, b, 4, 2, zero);
+    Anim_SetKeyframes(initial, b, 4, 2, zero);
     a = s + 0x3D00;
-    sub_0821980C(a, b, 0x1D, 1);
-    sub_08220D78(a, b, 10, 1, zero);
+    Anim_LoadKeyframe(a, b, 0x1D, 1);
+    Anim_SetKeyframes(a, b, 10, 1, zero);
     sub_08030DBC(0);
     sub_08163EA0(s, sub_0816AF5C);
 }

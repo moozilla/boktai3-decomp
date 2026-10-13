@@ -45,18 +45,18 @@ s32 DamageController_Initialize(struct DamageController *, u32 id);
 void *sub_0800CB60(u32);
 
 /* Engine helpers. */
-void sub_0821AD08(u32, void *);
-void sub_0821A0C0(void *);
-s32 sub_0821ABA8(u32, s32);
+void Script_Call(u32, void *);
+void Task_Kill(void *);
+s32 Script_GetKeywordValue(u32, s32);
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
-void sub_0821FEB4(void *, u32, u32, u32, u32, void *, void *);
-void sub_0821FF24(void *, void *, u32);
-void sub_0821FF84(void *, void *, void *);
+void Collider_Init(void *, u32, u32, u32, u32, void *, void *);
+void Collider_SetPosition(void *, void *, u32);
+void Collider_SetCallback(void *, void *, void *);
 void sub_0821FF7C(void *, u32, u32, u32);
-void sub_0821FE40(void *);
-void sub_0821FE6C(void *);
-void *sub_08219FBC(s32, s32);
-void sub_0821A04C(void *, void *, void *);
+void Collider_Refresh(void *);
+void Collider_Remove(void *);
+void *Task_Create(s32, s32);
+void Task_SetCallbacks(void *, void *, void *);
 
 #endif

@@ -8,7 +8,7 @@ struct Pair77 {
 void sub_08234540(u8 *);
 void sub_082346EC(u8 *);
 s32 Div(s32, s32);
-void sub_0822B2F8(u32);
+void Sound_PlaySong(u32);
 void sub_082343B8(u8 *);
 void sub_082343A0(u8 *, void (*)(u8 *));
 s32 sub_08234770(u8 *p, u8 *owner, struct Pair77 *q)
@@ -20,7 +20,7 @@ s32 sub_08234770(u8 *p, u8 *owner, struct Pair77 *q)
     *(u16 *)(p + 0x1fe) = 180;
     *(u16 *)(p + 0x1fc) = Div(*(u16 *)(p + 0x1fe), 3);
     *(u16 *)(p + 0x200) = 900;
-    sub_0822B2F8(919);
+    Sound_PlaySong(919);
     sub_082343A0(p, sub_082343B8);
     return 0;
 }

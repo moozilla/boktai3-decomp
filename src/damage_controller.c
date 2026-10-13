@@ -45,17 +45,17 @@ s32 DamageController_Update(struct DamageController *controller)
                 values[0] = controller->hitPosition.x;
                 values[1] = controller->hitPosition.y;
                 values[2] = controller->hitPosition.z;
-                sub_0821AD08(controller->deathScript, deathArgs);
+                Script_Call(controller->deathScript, deathArgs);
             }
             if (controller->flags & 1)
-                sub_0821A0C0(controller);
+                Task_Kill(controller);
             else
                 controller->health = controller->maximum;
         } else if (controller->hitScript) {
             values[0] = controller->hitPosition.x;
             values[1] = controller->hitPosition.y;
             values[2] = controller->hitPosition.z;
-            sub_0821AD08(controller->hitScript, hitArgs);
+            Script_Call(controller->hitScript, hitArgs);
         }
         collider->damage = 0;
     }
@@ -64,7 +64,7 @@ s32 DamageController_Update(struct DamageController *controller)
 
 u32 sub_0800C954(struct DamageController *controller)
 {
-    sub_0821FE6C(&controller->collider);
+    Collider_Remove(&controller->collider);
     return 0;
 }
 
@@ -73,9 +73,9 @@ s32 DamageController_Initialize(struct DamageController *controller, u32 id)
     struct DamagePackedVec position, size, offset;
     struct DamageCollider *collider;
     controller->id = id;
-    controller->maximum = sub_0821ABA8(108, 100);
+    controller->maximum = Script_GetKeywordValue(108, 100);
     controller->health = controller->maximum;
-    controller->height = sub_0821ABA8(83, 16);
+    controller->height = Script_GetKeywordValue(83, 16);
     if (Script_SeekToKeyword(112)) {
         position.x = Script_GetValue();
         position.y = Script_GetValue();
@@ -104,12 +104,12 @@ s32 DamageController_Initialize(struct DamageController *controller, u32 id)
         offset.z = 0;
     }
     collider = &controller->collider;
-    sub_0821FEB4(collider, (u16)id, 0x4001, 0, (u16)controller->height, &size, &offset);
-    sub_0821FF24(collider, &position, 0);
-    sub_0821FF84(collider, DamageController_AccumulateHit, controller);
+    Collider_Init(collider, (u16)id, 0x4001, 0, (u16)controller->height, &size, &offset);
+    Collider_SetPosition(collider, &position, 0);
+    Collider_SetCallback(collider, DamageController_AccumulateHit, controller);
     sub_0821FF7C(collider, 0, 0, 0);
-    sub_0821FE40(collider);
-    controller->flags = sub_0821ABA8(102, 0);
+    Collider_Refresh(collider);
+    controller->flags = Script_GetKeywordValue(102, 0);
     if (Script_SeekToKeyword(119)) {
         controller->kindMask = Script_GetValue();
     } else {
@@ -122,21 +122,21 @@ s32 DamageController_Initialize(struct DamageController *controller, u32 id)
         controller->flagMask = 0;
         controller->flags |= 16;
     }
-    controller->hitScript = sub_0821ABA8(68, 0);
-    controller->deathScript = sub_0821ABA8(100, 0);
+    controller->hitScript = Script_GetKeywordValue(68, 0);
+    controller->deathScript = Script_GetKeywordValue(100, 0);
     controller->cooldown = 0;
-    controller->delay = sub_0821ABA8(105, 0);
+    controller->delay = Script_GetKeywordValue(105, 0);
     return 0;
 }
 
 void *sub_0800CB60(u32 arg)
 {
     void *obj;
-    obj = sub_08219FBC(8, 0x90);
+    obj = Task_Create(8, 0x90);
     if (obj != 0) {
-        sub_0821A04C(obj, DamageController_Update, sub_0800C954);
+        Task_SetCallbacks(obj, DamageController_Update, sub_0800C954);
         if (DamageController_Initialize(obj, arg) < 0) {
-            sub_0821A0C0(obj);
+            Task_Kill(obj);
             return 0;
         }
     }

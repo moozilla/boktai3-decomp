@@ -4,7 +4,7 @@ struct Blk {
     u32 w[8];
 };
 
-s32 sub_082196C4(struct Blk *dst, struct Blk *src)
+s32 ResourceHeader_Relocate(struct Blk *dst, struct Blk *src)
 {
     *dst = *src;
     dst->w[3] += (u32)src;

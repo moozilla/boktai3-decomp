@@ -40,7 +40,7 @@ struct Owner {
     struct Item items[16];
 };
 extern const u16 gUnk_0824DE7C[], gUnk_0824DE8C[];
-void sub_0821980C(void *, void *, int, int);
+void Anim_LoadKeyframe(void *, void *, int, int);
 void sub_08039968(void *, int, int);
 void sub_082216F8(void *, void *, void *, int, int);
 void sub_08039998(void *, int, int);

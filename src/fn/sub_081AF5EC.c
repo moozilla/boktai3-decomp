@@ -7,7 +7,7 @@ struct A {
     u8 g[0x38];
     u16 c;
 };
-void sub_0821A0C0(void *);
+void Task_Kill(void *);
 
 void sub_081AF5EC(struct A *p)
 {
@@ -17,7 +17,7 @@ void sub_081AF5EC(struct A *p)
         p->c++;
         if (p->c == 0x50) {
             p->c = t;
-            sub_0821A0C0(p);
+            Task_Kill(p);
         }
     }
 }

@@ -49,9 +49,9 @@ s32 CollisionController_InitSlot(struct CollisionManager *manager, struct Collis
     offset.y = 160;
     offset.z = 0;
     collider = &slot->collider;
-    sub_0821FEB4(collider, 0, 0x4020, 0, 16, &scale, &offset);
-    sub_0821FF84(collider, sub_08009E5C, slot);
-    sub_0821FE40(collider);
+    Collider_Init(collider, 0, 0x4020, 0, 16, &scale, &offset);
+    Collider_SetCallback(collider, sub_08009E5C, slot);
+    Collider_Refresh(collider);
     sprite = &slot->sprite;
     sub_08217DE0(sprite, manager->graphics, 1);
     sub_08217EEC(sprite, manager->graphics, 12);
@@ -61,8 +61,8 @@ s32 CollisionController_InitSlot(struct CollisionManager *manager, struct Collis
 
 u32 sub_08009F34(struct CollisionManager *manager, struct CollisionSlot *slot)
 {
-    sub_08217EAC(&slot->sprite);
-    sub_0821FE6C(&slot->collider);
+    Effect_Remove(&slot->sprite);
+    Collider_Remove(&slot->collider);
     return slot->active = 0;
 }
 
@@ -139,7 +139,7 @@ void CollisionController_UpdateIdleAnimation(struct CollisionManager *manager,
         p->entered = 0;
         sub_08217EC4(&p->sprite, -4, -4);
         sub_08217EEC(&p->sprite, manager->animationGraphics, 0);
-        sub_08220C8C(&p->anim, manager->idleResource, 8, 0, 0);
+        Anim_SetSequence(&p->anim, manager->idleResource, 8, 0, 0);
         p->sprite.flags &= ~1;
         p->delay = randomDelay(0);
     }
@@ -154,7 +154,7 @@ void CollisionController_UpdateIdleAnimation(struct CollisionManager *manager,
                 p->delay = randomDelay(1);
                 sub_08217EC4(&p->sprite, -4, -4);
                 sub_08217EEC(&p->sprite, manager->animationGraphics, 0);
-                sub_08220C8C(&p->anim, manager->idleResource, 8, 0, 0);
+                Anim_SetSequence(&p->anim, manager->idleResource, 8, 0, 0);
                 p->sprite.flags &= ~1;
             }
         } else {
@@ -253,8 +253,8 @@ void CollisionController_UpdateHitAnimation(struct CollisionManager *manager,
         p->sprite.flags &= ~1;
         sub_08217EC4(&p->sprite, -8, -8);
         sub_08217EEC(&p->sprite, manager->graphics, 0);
-        sub_08220C8C(&p->anim, manager->hitResource, 0, 0, 0);
-        sub_0822B3BC(290);
+        Anim_SetSequence(&p->anim, manager->hitResource, 0, 0, 0);
+        Sound_PlaySongChecked(290);
     }
     if (p->anim.frame == 1 && p->anim.timer == 0)
         p->sprite.position.y += 16;
@@ -267,9 +267,9 @@ void CollisionController_UpdateHitAnimation(struct CollisionManager *manager,
         sub_0800AC44(p->kind, p->type | 16, p->attack, &p->sprite.position, &effect, p->range,
                      p->script);
         if (p->type == 2)
-            sub_0822B3BC(696);
+            Sound_PlaySongChecked(696);
         else
-            sub_0822B3BC(285);
+            Sound_PlaySongChecked(285);
     }
     o = &p->sprite;
     {
@@ -436,20 +436,20 @@ s32 CollisionController_InitManager(struct CollisionManager *manager, void *owne
         available = 1;
     }
     manager->paused = available;
-    manager->graphics = sub_08215184(0x1c1a);
-    manager->animationGraphics = sub_08215184(0x1c1c);
-    manager->hitResource = sub_0821A520(0x922e, 0xd1b8);
-    manager->idleResource = sub_0821A520(0x922e, 0xd41f);
+    manager->graphics = AnimData_FindEntry(0x1c1a);
+    manager->animationGraphics = AnimData_FindEntry(0x1c1c);
+    manager->hitResource = ScriptProc_Start(0x922e, 0xd1b8);
+    manager->idleResource = ScriptProc_Start(0x922e, 0xd41f);
     return 0;
 }
 
 struct CollisionManager *sub_0800A62C(void *owner, u32 unused)
 {
-    struct CollisionManager *p = sub_08219FBC(10, 0xA2C);
+    struct CollisionManager *p = Task_Create(10, 0xA2C);
     if (p != 0) {
-        sub_0821A04C(p, CollisionController_UpdateAll, sub_0800A500);
+        Task_SetCallbacks(p, CollisionController_UpdateAll, sub_0800A500);
         if (CollisionController_InitManager(p, owner) < 0) {
-            sub_0821A0C0(p);
+            Task_Kill(p);
             return 0;
         }
     }
@@ -471,10 +471,10 @@ s32 CollisionController_ScriptCreate(void)
     fail:
         return -1;
     }
-    sub_08219DD8(p, 160);
-    p->id = sub_0821ABA8('n', 0);
-    p->type = sub_0821ABA8('t', 0);
-    p->kind = sub_0821ABA8('b', 0);
+    Memory_Clear(p, 160);
+    p->id = Script_GetKeywordValue('n', 0);
+    p->type = Script_GetKeywordValue('t', 0);
+    p->kind = Script_GetKeywordValue('b', 0);
     p->done = 0;
     p->mode = 0;
     p->timer = 0;
@@ -491,7 +491,7 @@ s32 CollisionController_ScriptCreate(void)
         position.y = 0;
         position.z = 0;
     }
-    sub_0821FF24(&p->collider, (struct SceneVec *)&position, 0);
+    Collider_SetPosition(&p->collider, (struct SceneVec *)&position, 0);
     p->sprite.position = *(struct CollisionVec *)&position;
     p->sprite.position.y += 230;
     if (Script_SeekToKeyword('s')) {

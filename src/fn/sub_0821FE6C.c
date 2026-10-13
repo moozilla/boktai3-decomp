@@ -15,7 +15,7 @@ struct M {
     u16 c2;
 };
 extern struct M *gUnk_03001688;
-void sub_0821FE6C(struct Nd *n)
+void Collider_Remove(struct Nd *n)
 {
     struct Nd *prev, *cur;
     if (gUnk_03001688 == 0)

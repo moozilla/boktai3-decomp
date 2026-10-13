@@ -6,7 +6,7 @@ extern u16 gUnk_03004BD8;
 extern u32 gUnk_03004BC0[];
 extern u16 gUnk_03004BE0[], gUnk_03004C08[];
 extern const u32 gUnk_086140CC[];
-void sub_082156B8(s32);
+void Bg_ClearTilemap(s32);
 struct Dma {
     vu32 src, dst, ctl;
 };
@@ -21,10 +21,10 @@ void sub_082157EC(void)
     u32 dst;
     s32 i;
     gUnk_03004BD8 = zero;
-    sub_082156B8(0);
-    sub_082156B8(1);
-    sub_082156B8(2);
-    sub_082156B8(3);
+    Bg_ClearTilemap(0);
+    Bg_ClearTilemap(1);
+    Bg_ClearTilemap(2);
+    Bg_ClearTilemap(3);
     bg = (vu16 *)0x04000008;
     bg[0] &= 0xffbf;
     bg[1] &= 0xffbf;

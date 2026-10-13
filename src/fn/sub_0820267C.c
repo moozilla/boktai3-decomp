@@ -10,10 +10,10 @@ struct Data {
     u32 w34;
 };
 void sub_08202E4C(void *);
-void sub_082151E4(void *, u32);
+void AnimData_Load(void *, u32);
 void sub_082144E4(void *, void *, u32);
-void sub_0821FEB4(void *, u32, u32, u32, u32, void *, void *);
-void sub_0821FF84(void *, void *, void *);
+void Collider_Init(void *, u32, u32, u32, u32, void *, void *);
+void Collider_SetCallback(void *, void *, void *);
 void sub_0821FF58(void *, s32, s32, u32, u32, s32);
 void sub_0820264C(void);
 void sub_0820267C(void *unused, u8 *p)
@@ -31,11 +31,11 @@ void sub_0820267C(void *unused, u8 *p)
         CpuSet(fill, target, flags);
     }
     obj = p + 0x84;
-    sub_082151E4(obj, data->w34);
+    AnimData_Load(obj, data->w34);
     sub_082144E4(p + 0xa0, obj, 1);
     effect = p + 0xcc;
-    sub_0821FEB4(effect, 0, 0x2001, 0, 16, p + 0x4c, p + 0x54);
-    sub_0821FF84(effect, sub_0820264C, p);
+    Collider_Init(effect, 0, 0x2001, 0, 16, p + 0x4c, p + 0x54);
+    Collider_SetCallback(effect, sub_0820264C, p);
     sub_0821FF58(effect, data->h1c, data->h1e, data->w14, data->w18, data->h22);
 }
 #else

@@ -8,7 +8,7 @@ struct Message {
     struct Args *args;
 };
 extern u8 *gUnk_02000710;
-void sub_0821AD08(u32, struct Message *);
+void Script_Call(u32, struct Message *);
 void sub_081D5204(s32);
 void sub_08159164(s32);
 #define H(p, n) (*(s16 *)((p) + (n)))
@@ -38,7 +38,7 @@ void sub_0820BD24(u8 *p)
         a.e = W(p, 0x1F8);
         m.type = 8;
         m.args = &a;
-        sub_0821AD08(q, &m);
+        Script_Call(q, &m);
     }
     sub_081D5204(33);
     if (W(p, 0x200) & 1) {

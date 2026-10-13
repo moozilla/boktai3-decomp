@@ -10,14 +10,14 @@ struct S080F6414 {
     u8 filler3[0xd56 - 0xcf0];
     u16 w;
 };
-void sub_08215284(u8 *, u32);
+void AnimData_SelectTiles(u8 *, u32);
 
 void sub_080F6414(struct S080F6414 *s)
 {
     s16 v = --s->h;
     if (v == 0) {
         u8 **q = &s->q;
-        sub_08215284(*q, s->w);
+        AnimData_SelectTiles(*q, s->w);
         *(u8 **)(*q + 0xc) = (u8 *)s + 0xd30;
         s->z = v;
     }

@@ -1,8 +1,8 @@
 #include "global.h"
 extern u8 gUnk_03004FC0[];
-void sub_082156B8(u32);
-void sub_0821656C(u32, u32, u32, u32, u32);
-void *sub_0821A520(u32, u32);
+void Bg_ClearTilemap(u32);
+void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
+void *ScriptProc_Start(u32, u32);
 void sub_082161B4(u32, u32, void *, u32, u32, u32, u32 *);
 void sub_081DC1B4(u32);
 s32 sub_081E27A8(u8 *s)
@@ -22,16 +22,16 @@ s32 sub_081E27A8(u8 *s)
         *(u32 *)(s + 0x30) = Script_GetValue();
     if (Script_SeekToKeyword(0x65))
         *(u32 *)(s + 0x34) = Script_GetValue();
-    sub_082156B8(0);
-    sub_0821656C(0, 0, 0, 0, zero = 0);
-    sub_082156B8(2);
-    sub_0821656C(2, 0, 0, 0, zero);
-    sub_082156B8(3);
-    p = sub_0821A520(0xC091, 0x52AE);
+    Bg_ClearTilemap(0);
+    BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero = 0);
+    Bg_ClearTilemap(2);
+    BgGfx_LoadTilemapSimple(2, 0, 0, 0, zero);
+    Bg_ClearTilemap(3);
+    p = ScriptProc_Start(0xC091, 0x52AE);
     value = *(u32 *)(s + 0x30);
     sub_082161B4(2, 0, p, 0, zero, 1, &value);
-    sub_0821656C(3, 0, 0, 0, zero);
-    q = (u8 *)sub_0821A520(0x92B3, 0xD985) + 0x14;
+    BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
+    q = (u8 *)ScriptProc_Start(0x92B3, 0xD985) + 0x14;
     CpuSet(q, gUnk_03004FC0, 0x100);
     sub_081DC1B4(*(u32 *)(s + 0x24));
     return 0;

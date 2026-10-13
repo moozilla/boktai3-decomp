@@ -32,13 +32,13 @@ struct Manager {
     u32 timer;
     struct Piece pieces[32];
 };
-void sub_08214514(void *);
+void Sprite_Remove(void *);
 extern struct Manager *gUnk_02000068;
 extern u16 gUnk_08604C54[];
-void *sub_0821A520(int, int);
-int sub_082151E4(void *, int);
+void *ScriptProc_Start(int, int);
+int AnimData_Load(void *, int);
 void sub_082144E4(void *, void *, int);
-void sub_08220C8C(void *, void *, int, int, int);
+void Anim_SetSequence(void *, void *, int, int, int);
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
 extern s16 gUnk_086149C4[];
@@ -51,7 +51,7 @@ struct Config {
 };
 struct Manager *sub_0801548C(int, int);
 int Mod(int, int);
-void sub_08215284(void *, int);
+void AnimData_SelectTiles(void *, int);
 int AnimatedParticle_PriorityFromFlags(int);
 void sub_08220D44(void *, int);
 void sub_08214374(void *, int);
@@ -152,30 +152,30 @@ start:
             p->velocity.y = scale12(p->direction.y, p->verticalScale);
             p->velocity.z = scale12(p->direction.z, p->horizontalScale);
             if (p->pad1 == 5) {
-                sub_082151E4(p->resource, 0x61f9);
-                sub_08215284(p->resource, 0x29f);
+                AnimData_Load(p->resource, 0x61f9);
+                AnimData_SelectTiles(p->resource, 0x29f);
                 setFrame(&p->sprite, 32);
                 a = &p->anim;
-                sub_08220C8C(a, gUnk_02000068->resources[1], 6, 0, 0);
+                Anim_SetSequence(a, gUnk_02000068->resources[1], 6, 0, 0);
             } else if (p->pad1 == 6) {
-                sub_082151E4(p->resource, 0x61f9);
-                sub_08215284(p->resource, 0x2a7);
+                AnimData_Load(p->resource, 0x61f9);
+                AnimData_SelectTiles(p->resource, 0x2a7);
                 setFrame(&p->sprite, 32);
                 a = &p->anim;
-                sub_08220C8C(a, gUnk_02000068->resources[1], 6, 0, 0);
+                Anim_SetSequence(a, gUnk_02000068->resources[1], 6, 0, 0);
                 asm("" : : "r"(a), "i"(6));
             } else if (p->pad1 == 7) {
-                sub_082151E4(p->resource, 0x61f9);
-                sub_08215284(p->resource, 0x2a6);
+                AnimData_Load(p->resource, 0x61f9);
+                AnimData_SelectTiles(p->resource, 0x2a6);
                 setFrame(&p->sprite, 45);
                 a = &p->anim;
-                sub_08220C8C(a, gUnk_02000068->resources[1], 8, 0, 0);
+                Anim_SetSequence(a, gUnk_02000068->resources[1], 8, 0, 0);
                 asm("" : : "r"(a), "i"(7));
             } else {
-                sub_082151E4(p->resource, 0x4384);
-                sub_08215284(p->resource, p->pad1 + 182);
+                AnimData_Load(p->resource, 0x4384);
+                AnimData_SelectTiles(p->resource, p->pad1 + 182);
                 a = &p->anim;
-                sub_08220C8C(a, gUnk_02000068->resources[0], 0, 0, 0);
+                Anim_SetSequence(a, gUnk_02000068->resources[0], 0, 0, 0);
             }
             saved = a;
             asm("" : "+r"(saved));

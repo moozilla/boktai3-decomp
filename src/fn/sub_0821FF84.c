@@ -4,7 +4,7 @@ struct O {
     u32 f4c;
     u32 f50;
 };
-void sub_0821FF84(struct O *o, u32 a, u32 b)
+void Collider_SetCallback(struct O *o, u32 a, u32 b)
 {
     o->f4c = a;
     o->f50 = b;

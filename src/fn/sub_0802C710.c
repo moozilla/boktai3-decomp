@@ -19,7 +19,7 @@ struct Manager {
 extern struct Manager *gUnk_020000D8;
 extern u8 *gUnk_02000580[4];
 int sub_0802C6C8(struct Manager *, struct Object *);
-void sub_08219D38(void *);
+void Heap_Free(void *);
 void sub_0802C710(struct Manager *);
 void sub_0802C710(struct Manager *m)
 {

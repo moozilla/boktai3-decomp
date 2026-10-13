@@ -1,9 +1,9 @@
 #include "global.h"
 extern u16 gUnk_03004BD8;
 extern u8 gUnk_03004FC0[];
-void sub_082156B8(u32);
-void sub_0821656C(u32, u32, u32, u32, u32);
-void *sub_0821A520(u32, u32);
+void Bg_ClearTilemap(u32);
+void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
+void *ScriptProc_Start(u32, u32);
 void sub_082161B4(u32, u32, void *, u32, u32, u32, u32 *);
 void sub_082164AC(u32, void *, u32);
 void sub_081E2DA0(void)
@@ -13,11 +13,11 @@ void sub_081E2DA0(void)
     void *p;
     u16 *src, *dest;
     s32 i, j;
-    sub_082156B8(0);
-    sub_082156B8(2);
-    sub_0821656C(2, 0, 0, 0, zero = 0);
-    sub_082156B8(3);
-    sub_0821656C(3, 0, 0, 0, zero);
+    Bg_ClearTilemap(0);
+    Bg_ClearTilemap(2);
+    BgGfx_LoadTilemapSimple(2, 0, 0, 0, zero = 0);
+    Bg_ClearTilemap(3);
+    BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
     one = 1;
     {
         u16 *g = &gUnk_03004BD8;
@@ -27,12 +27,12 @@ void sub_081E2DA0(void)
         a &= ~2;
         *g = a;
     }
-    p = sub_0821A520(0xC091, id);
+    p = ScriptProc_Start(0xC091, id);
     value = zero;
     sub_082161B4(0, 0, p, 0, zero, one, &value);
     sub_082164AC(0, p, 4);
-    sub_0821656C(0, 0, 0, 0, zero);
-    src = (u16 *)((u8 *)sub_0821A520(0x92B3, pal) + 0x1B4);
+    BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero);
+    src = (u16 *)((u8 *)ScriptProc_Start(0x92B3, pal) + 0x1B4);
     for (i = 13; i <= 15;) {
         u32 offset = i * 32;
         s32 next = i + 1;

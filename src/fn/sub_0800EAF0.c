@@ -18,9 +18,9 @@ struct Screen {
 };
 extern u16 gUnk_03005260[], gUnk_03004BD8;
 void sub_082279A8(int, int, int, int, int, int, int);
-void sub_0821AD08(u32, void *);
-void sub_0821A0C0(void *);
-void sub_0822B2F8(int);
+void Script_Call(u32, void *);
+void Task_Kill(void *);
+void Sound_PlaySong(int);
 void StatusScreen_FadeAndExit(Screen *);
 void StatusScreen_FadeOutPalette(Screen *);
 void sub_0800EF90(Screen *);
@@ -32,7 +32,7 @@ void StatusScreen_Reveal(Screen *p)
 {
     if (!StatusScreen_CheckConfirm(p)) {
         if (!p->timer) {
-            sub_0822B2F8(225);
+            Sound_PlaySong(225);
             p->top = 0;
             p->bottom = 160;
             p->reveal = 256;

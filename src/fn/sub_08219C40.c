@@ -4,7 +4,7 @@ struct Block {
     u32 size, unused;
 };
 extern struct Block gUnk_02000714;
-void *sub_08219C40(s32 bytes)
+void *Heap_Alloc(s32 bytes)
 {
     struct Block *block = &gUnk_02000714;
     bytes += 15;

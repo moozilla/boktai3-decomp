@@ -107,16 +107,16 @@ s32 EffectManager_Init(struct EffectManager *, void *);
 void *sub_0800AC00(void *);
 
 /* Engine helpers. */
-void sub_0822B3BC(u32);
-void sub_08220C8C(void *, void *, u32, u32, u32);
-s32 sub_082215E4(s32, s32);
-void sub_08217EAC(void *);
+void Sound_PlaySongChecked(u32);
+void Anim_SetSequence(void *, void *, u32, u32, u32);
+s32 Math_Atan2(s32, s32);
+void Effect_Remove(void *);
 void sub_08217E60(void *, void *, u32);
 void sub_08217ECC(void *, u32);
-void *sub_08215184(u32);
-void *sub_0821A520(u32, u32);
-void *sub_08219FBC(u32, u32);
-void sub_0821A04C(void *, void *, void *);
-void sub_0821A0C0(void *);
+void *AnimData_FindEntry(u32);
+void *ScriptProc_Start(u32, u32);
+void *Task_Create(u32, u32);
+void Task_SetCallbacks(void *, void *, void *);
+void Task_Kill(void *);
 
 #endif

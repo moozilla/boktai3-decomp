@@ -1,7 +1,7 @@
 #include "global.h"
 void sub_080515DC(u8 *);
-void sub_0821AD08(u32, u32);
-void sub_0821A0C0(u8 *);
+void Script_Call(u32, u32);
+void Task_Kill(u8 *);
 u32 sub_080516FC(u8 *p)
 {
     if (p[0xC8] != 0) {
@@ -13,9 +13,9 @@ u32 sub_080516FC(u8 *p)
         v = *q;
         if (v != 0) {
             *q = 0;
-            sub_0821AD08(v, 0);
+            Script_Call(v, 0);
         }
-        sub_0821A0C0(p);
+        Task_Kill(p);
     }
     return 0;
 }

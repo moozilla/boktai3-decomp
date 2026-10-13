@@ -9,9 +9,9 @@ struct O {
     struct V v;
 };
 struct O *sub_0818F218(void *);
-void sub_082151E4(void *, s32);
-void sub_08215284(void *, s32);
-void sub_082144A4(void *, void *, s32);
+void AnimData_Load(void *, s32);
+void AnimData_SelectTiles(void *, s32);
+void Sprite_Init(void *, void *, s32);
 void sub_08220D20(void *, s32, s32, s32, s32);
 void sub_0818EE38(void);
 void sub_0818EF58(void);
@@ -22,9 +22,9 @@ void sub_0818F24C(u8 *p, struct V *q)
         u8 *r = (u8 *)o + 8;
         void (*a)(void);
         void (*b)(void);
-        sub_082151E4(r, 0xC7ED);
-        sub_08215284(r, 0x1A6);
-        sub_082144A4((u8 *)o + 0x24, r, 0);
+        AnimData_Load(r, 0xC7ED);
+        AnimData_SelectTiles(r, 0x1A6);
+        Sprite_Init((u8 *)o + 0x24, r, 0);
         sub_08220D20((u8 *)o + 0x50, *(s32 *)(p + 0x53AC), 5, 0, 0);
         o->v = *q;
         a = sub_0818EE38;

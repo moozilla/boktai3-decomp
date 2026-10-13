@@ -1,7 +1,7 @@
 #include "global.h"
 extern u8 *gUnk_02000274, *gUnk_02000480;
 s32 Script_SeekToKeyword(s32);
-s32 sub_0821ABA8(s32, s32);
+s32 Script_GetKeywordValue(s32, s32);
 u8 *sub_0802D6D0(void *, s32);
 void sub_081CEFCC(void);
 void sub_081D10D8(void)
@@ -13,7 +13,7 @@ void sub_081D10D8(void)
         p = gUnk_02000480;
         if (!p)
             return;
-        p = sub_0802D6D0(p, sub_0821ABA8(0x6e, 0));
+        p = sub_0802D6D0(p, Script_GetKeywordValue(0x6e, 0));
         if (!p)
             return;
     } else

@@ -22,8 +22,8 @@ extern u32 gUnk_030052F8, gUnk_030052FC;
 int Script_SeekToKeyword(int);
 int Script_GetPc(void);
 int Script_GetValue(void);
-int sub_082151E4(void *, int);
-void sub_08215284(void *, int);
+int AnimData_Load(void *, int);
+void AnimData_SelectTiles(void *, int);
 void SceneIndicator_Initialize(void *, void *);
 void SceneIndicator_Update(void *, void *);
 int SceneIndicators_Update(struct Controller *m)

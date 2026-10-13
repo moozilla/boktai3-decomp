@@ -13,7 +13,7 @@ struct PeerMenu {
     u8 pad468[0x84];
     int window;
 };
-void sub_08033924(int, int);
+void TextWindow_Refresh(int, int);
 void sub_08037960(struct PeerMenu *p)
 {
     if (p->entered) {
@@ -22,7 +22,7 @@ void sub_08037960(struct PeerMenu *p)
         u32 mask;
         p->entered = 0;
         r = p->rows;
-        sub_08033924(p->window, 6);
+        TextWindow_Refresh(p->window, 6);
         mask = 1;
         i = 4;
         do {

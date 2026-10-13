@@ -18,7 +18,7 @@ struct P {
     u8 f2b;
 };
 extern u8 *gUnk_02000710;
-void sub_0821AD08(u32, struct B *);
+void Script_Call(u32, struct B *);
 void sub_0806F7B0(struct P *p)
 {
     s32 v = *(s16 *)(gUnk_02000710 + 0x876);
@@ -42,12 +42,12 @@ void sub_0806F7B0(struct P *p)
         b.args = &a;
         if (r != 0) {
             if (p->f18 != 0) {
-                sub_0821AD08(p->f18, &b);
+                Script_Call(p->f18, &b);
                 p->f28 = 1;
             }
         } else {
             if (p->f1a != 0) {
-                sub_0821AD08(p->f1a, &b);
+                Script_Call(p->f1a, &b);
                 p->f28 = r;
             }
         }

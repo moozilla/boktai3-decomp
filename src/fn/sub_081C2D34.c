@@ -8,7 +8,7 @@ struct S {
     u8 g[0x734 - 0x18 - 0x700];
 };
 extern u32 gUnk_02000264;
-void sub_08214514(void *);
+void Sprite_Remove(void *);
 void sub_08020D08(void *);
 void sub_081C2D34(struct S *p)
 {
@@ -16,7 +16,7 @@ void sub_081C2D34(struct S *p)
     struct E *e = p->e;
     u32 z;
     for (i = 31; i >= 0; i--) {
-        sub_08214514(e);
+        Sprite_Remove(e);
         e++;
     }
     z = 0;

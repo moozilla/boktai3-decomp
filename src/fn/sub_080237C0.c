@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08020D68(void *, u32);
+void Trigger_ConsumePending(void *, u32);
 struct S {
     u8 f0[0xaa];
     u8 aa;
@@ -28,7 +28,7 @@ void SceneActorState_Resume(struct S *p)
     if (chk(p)) {
         u32 k = 0x1d;
         p->aa = k;
-        sub_08020D68((u8 *)p + 0x118, 1);
+        Trigger_ConsumePending((u8 *)p + 0x118, 1);
     }
     if (p->af) {
         u32 two = 2;
@@ -39,7 +39,7 @@ void SceneActorState_Resume(struct S *p)
         p->ae = one;
         p->c4 = z;
         p->b0 = one;
-        sub_08020D68((u8 *)p + 0x118, 1);
+        Trigger_ConsumePending((u8 *)p + 0x118, 1);
     } else
         p->c4++;
 }

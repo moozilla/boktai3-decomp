@@ -7,14 +7,14 @@ struct A {
     u8 f[0x20];
     struct E e[8];
 };
-void sub_08214514(void *);
+void Sprite_Remove(void *);
 
 void sub_081B748C(struct A *p)
 {
     s32 i;
     struct E *e = p->e;
     for (i = 7; i >= 0; i--) {
-        sub_08214514(e);
+        Sprite_Remove(e);
         e++;
     }
 }

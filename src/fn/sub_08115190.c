@@ -6,14 +6,14 @@ struct E {
     u32 v;
 };
 extern u32 gUnk_020001DC;
-void sub_08217EAC(void *);
+void Effect_Remove(void *);
 s32 sub_08115190(u8 *g)
 {
     struct E *e = (struct E *)(g + 0x720);
     s32 i = 0x1f;
     do {
         if (e->v != 0)
-            sub_08217EAC(g + 0x20 + e->idx * 40);
+            Effect_Remove(g + 0x20 + e->idx * 40);
         e = (struct E *)((u8 *)e + 0x1c);
         i--;
     } while (i >= 0);

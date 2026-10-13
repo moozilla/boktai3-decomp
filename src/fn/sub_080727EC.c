@@ -5,11 +5,11 @@ struct P {
     u32 flags;
 };
 extern struct P *gUnk_020004A8;
-u32 sub_0821ABA8(s32, s32);
+u32 Script_GetKeywordValue(s32, s32);
 
 void sub_080727EC(void)
 {
     struct P *p = gUnk_020004A8;
     if (p != 0)
-        p->flags &= ~(u16)sub_0821ABA8(0x73, 0);
+        p->flags &= ~(u16)Script_GetKeywordValue(0x73, 0);
 }

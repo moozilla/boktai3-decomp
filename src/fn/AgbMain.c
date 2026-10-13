@@ -16,7 +16,7 @@ void TaskSystem_Initialize(void);
 void sub_08213DCC(void);
 void sub_0821BAFC(void);
 void sub_08215118(void);
-void *sub_0821A520(u32, u32);
+void *ScriptProc_Start(u32, u32);
 void sub_08215148(void *);
 void sub_082151C0(void *);
 void sub_082229E8(void);
@@ -67,8 +67,8 @@ void AgbMain(void)
     sub_08213DCC();
     sub_0821BAFC();
     sub_08215118();
-    sub_08215148(sub_0821A520(0xceaa, 0x3002));
-    sub_082151C0(sub_0821A520(0x98f5, 0xff54));
+    sub_08215148(ScriptProc_Start(0xceaa, 0x3002));
+    sub_082151C0(ScriptProc_Start(0x98f5, 0xff54));
     {
         vu16 *ime = (vu16 *)0x04000208;
         vu16 *ie;

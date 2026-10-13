@@ -1,7 +1,7 @@
 #include "global.h"
 
 extern u32 gUnk_02000174;
-void sub_08214514(void *);
+void Sprite_Remove(void *);
 
 static inline u8 Tst(u32 *m, s32 i)
 {
@@ -28,7 +28,7 @@ u32 sub_0812975C(struct S *b)
     for (; i < 20; e++, i++) {
         if (Tst(&b->mask, i)) {
             if (e->on)
-                sub_08214514(e);
+                Sprite_Remove(e);
         }
     }
     {

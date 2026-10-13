@@ -19,7 +19,7 @@ struct Object {
 };
 void *sub_0802C678(void);
 struct Object *sub_0802CA8C(int);
-int sub_082215E4(int, int);
+int Math_Atan2(int, int);
 void sub_0802C8CC(struct Object *, int);
 void sub_0802CC94(struct Object *p)
 {

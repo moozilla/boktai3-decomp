@@ -26,7 +26,7 @@ void ChoiceMenu_DispatchSelection(struct ChoiceMenu *p, s32 selection)
         args.values = values;
         script = selectionScript(p);
         if (script)
-            sub_0821AD08(script, &args);
+            Script_Call(script, &args);
     } else
         sub_0824923C(selection, p->callback);
 }
@@ -54,7 +54,7 @@ void ChoiceMenu_Select(struct ChoiceMenu *p, s32 selection)
         p->rightCursor.y = choice->y;
     }
     if (selection != p->selected)
-        sub_0822B2F8(220);
+        Sound_PlaySong(220);
     p->selected = selection;
 }
 
@@ -84,7 +84,7 @@ s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p)
     if (p->selected < 0) {
         if ((gUnk_03005260.pressed & 240) || (!p->wakeDelay && (gUnk_03005260.pressed & 3))) {
             ChoiceMenu_Select(p, p->initial);
-            sub_0822B2F8(263);
+            Sound_PlaySong(263);
         } else if (p->wakeDelay)
             p->wakeDelay--;
     } else if (p->wakeDelay)
@@ -122,12 +122,12 @@ s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p)
         pressed = keys->pressed;
         if (pressed & 2) {
             if (p->allowCancel) {
-                sub_0822B2F8(222);
+                Sound_PlaySong(222);
                 sub_08030BF8();
                 ChoiceMenu_DispatchSelection(p, -1);
                 p->leftCursor.flags |= 1;
                 p->rightCursor.flags |= 1;
-                sub_0821A0C0(p);
+                Task_Kill(p);
                 return 1;
             }
         } else {
@@ -138,12 +138,12 @@ s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p)
                     asm("" : : "r"(bits));
                     bits;
                 })) {
-                sub_0822B2F8(221);
+                Sound_PlaySong(221);
                 sub_08030BF8();
                 ChoiceMenu_DispatchSelection(p, p->selected);
                 p->leftCursor.flags |= one;
                 p->rightCursor.flags |= one;
-                sub_0821A0C0(p);
+                Task_Kill(p);
                 return 1;
             }
         }
@@ -241,8 +241,8 @@ u32 sub_080066C0(struct ChoiceMenu *p)
 
 u32 sub_08006710(struct ChoiceMenu *p)
 {
-    sub_082195E0(&p->leftCursor);
-    sub_082195E0(&p->rightCursor);
+    Anim_Remove(&p->leftCursor);
+    Anim_Remove(&p->rightCursor);
     return gUnk_0200002C = 0;
 }
 
@@ -420,11 +420,11 @@ s32 ChoiceMenu_Initialize(struct ChoiceMenu *p, void *window, s32 stringBase, s3
     s32 initial;
     u16 *palette;
     gUnk_0200002C = p;
-    resource = sub_0821A520(0xCB05, 0x530D);
+    resource = ScriptProc_Start(0xCB05, 0x530D);
     if (!resource)
         return -1;
     p->resource = *resource;
-    sub_082196C4(&p->resource, resource);
+    ResourceHeader_Relocate(&p->resource, resource);
     p->window = window;
     p->stringBase = stringBase;
     if (options[1]) {
@@ -452,7 +452,7 @@ s32 ChoiceMenu_Initialize(struct ChoiceMenu *p, void *window, s32 stringBase, s3
     sub_0821983C(&p->leftCursor, &p->resource, 73, 17, 0, 0, 60, &dimensions);
     sub_0821983C(&p->rightCursor, &p->resource, 74, 17, 0, 0, 60, &dimensions);
     palette = p->palette;
-    sub_08219EBC(palette, p->leftCursor.palette, 32);
+    Memory_Copy(palette, p->leftCursor.palette, 32);
     p->leftCursor.palette = palette;
     p->rightCursor.palette = palette;
     if (p->window) {
@@ -461,7 +461,7 @@ s32 ChoiceMenu_Initialize(struct ChoiceMenu *p, void *window, s32 stringBase, s3
         sub_08006738(p);
     }
     if (!sub_08031E1C())
-        sub_0822B2F8(263);
+        Sound_PlaySong(263);
     return 0;
 }
 
@@ -472,13 +472,13 @@ struct ChoiceMenu *ChoiceMenu_Create(void *window, s32 stringBase, void *callbac
     struct ChoiceMenu *p;
     if (gUnk_0200002C)
         return 0;
-    p = sub_08219FBC(11, 0x1E8);
+    p = Task_Create(11, 0x1E8);
     if (p) {
-        sub_0821A04C(p, sub_080066C0, sub_08006710);
+        Task_SetCallbacks(p, sub_080066C0, sub_08006710);
         p->useScript = 0;
         p->callback = callback;
         if (ChoiceMenu_Initialize(p, window, stringBase, options) < 0) {
-            sub_0821A0C0(p);
+            Task_Kill(p);
             return 0;
         }
     }
@@ -504,13 +504,13 @@ struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
         window = sub_08227E90();
     else
         window = 0;
-    stringBase = sub_0821ABA8('i', 0);
+    stringBase = Script_GetKeywordValue('i', 0);
     script = 0;
     if (Script_SeekToKeyword('p'))
         script = Script_GetValue();
-    options[1] = sub_0821ABA8('l', 0);
-    options[0] = sub_0821ABA8('w', 0);
-    options[2] = sub_0821ABA8('c', 0);
+    options[1] = Script_GetKeywordValue('l', 0);
+    options[0] = Script_GetKeywordValue('w', 0);
+    options[2] = Script_GetKeywordValue('c', 0);
     if (Script_SeekToKeyword('a')) {
         options[3] = Script_GetValue();
         options[4] = Script_GetValue();
@@ -556,9 +556,9 @@ struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
             arg--;
         } while ((s32)arg >= (s32)begin);
     }
-    p = sub_08219FBC(11, 0x1E8);
+    p = Task_Create(11, 0x1E8);
     if (p) {
-        sub_0821A04C(p, sub_080066C0, sub_08006710);
+        Task_SetCallbacks(p, sub_080066C0, sub_08006710);
         p->useScript = 1;
         p->script = script;
         {
@@ -568,7 +568,7 @@ struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
                 *destination++ = *source++;
         }
         if (ChoiceMenu_Initialize(p, window, stringBase, options) < 0) {
-            sub_0821A0C0(p);
+            Task_Kill(p);
             return 0;
         }
     }
@@ -580,7 +580,7 @@ void sub_08006E98(void)
     struct ChoiceMenu *p = gUnk_0200002C;
     if (p != 0 && Script_SeekToKeyword(0x72)) {
         p->window = sub_08227E90();
-        p->stringBase = sub_0821ABA8(0x69, 0);
+        p->stringBase = Script_GetKeywordValue(0x69, 0);
         if (Script_SeekToKeyword(0x77))
             p->selected = Script_GetValue();
         if (p->window != 0) {

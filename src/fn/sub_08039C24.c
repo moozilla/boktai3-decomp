@@ -11,7 +11,7 @@ struct Item {
     u32 flags2;
 };
 extern const u16 gUnk_0824DE7C[];
-void sub_0821980C(void *, void *, int, int);
+void Anim_LoadKeyframe(void *, void *, int, int);
 void sub_08039C24(void *p, struct Item *q, int index)
 {
     if (q->entered)
@@ -27,7 +27,7 @@ void sub_08039C24(void *p, struct Item *q, int index)
             choice = (index & 3) + 4;
         else
             choice = index & 3;
-        sub_0821980C(draw, p, gUnk_0824DE7C[choice], 0);
+        Anim_LoadKeyframe(draw, p, gUnk_0824DE7C[choice], 0);
         q->flags2 &= ~1;
     } else {
         q->flags |= 1;

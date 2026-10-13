@@ -8,8 +8,8 @@ struct B {
     struct A *args;
 };
 
-void sub_0821AD08(u32, struct B *);
-void sub_0821A0C0(u8 *);
+void Script_Call(u32, struct B *);
+void Task_Kill(u8 *);
 
 s32 sub_08063248(u8 *p)
 {
@@ -22,9 +22,9 @@ s32 sub_08063248(u8 *p)
             a.a = *(u8 *)(p + 0x1AAC);
             a.b = *(u8 *)(p + 0x1AAD);
             b.args = &a;
-            sub_0821AD08(v, &b);
+            Script_Call(v, &b);
         }
-        sub_0821A0C0(p);
+        Task_Kill(p);
     }
     return 0;
 }

@@ -7,16 +7,16 @@ struct Task {
     u8 f14;
 };
 extern u16 gUnk_03005240;
-struct Task *sub_08219C40(u32);
-void sub_08219DD8(struct Task *, u32);
+struct Task *Heap_Alloc(u32);
+void Memory_Clear(struct Task *, u32);
 void sub_08219F74(struct Task *);
 
-struct Task *sub_08219FBC(u32 a, u32 b)
+struct Task *Task_Create(u32 a, u32 b)
 {
-    struct Task *t = sub_08219C40(b);
+    struct Task *t = Heap_Alloc(b);
     if (t == 0)
         return 0;
-    sub_08219DD8(t, b);
+    Memory_Clear(t, b);
     t->f14 = a;
     if (gUnk_03005240 == 0)
         gUnk_03005240++;

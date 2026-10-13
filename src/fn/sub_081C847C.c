@@ -15,7 +15,7 @@ struct P {
 };
 void sub_081FE6E0(void);
 u32 sub_081FEC9C(void *);
-void sub_0822B2F8(u32);
+void Sound_PlaySong(u32);
 void sub_081C847C(u32 a, struct S *p)
 {
     u8 *e = (u8 *)p + 0x20;
@@ -30,7 +30,7 @@ void sub_081C847C(u32 a, struct S *p)
         h = (u16 *)((u8 *)p + 0x56);
         *h = (u16)(0x100 + *h);
         *(u32 *)(e + 4) = sub_081FEC9C(d);
-        sub_0822B2F8(0x571);
+        Sound_PlaySong(0x571);
     }
     p->b7 = 1;
 }

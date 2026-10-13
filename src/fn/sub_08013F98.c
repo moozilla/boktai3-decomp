@@ -23,7 +23,7 @@ struct Manager {
     u8 *small, *large;
 };
 extern u32 gUnk_08604B90[];
-void sub_08217EAC(void *);
+void Effect_Remove(void *);
 void ParticleGroup_Update(struct Manager *m, struct Group *g)
 {
     int alive = 0, i = 0;
@@ -48,7 +48,7 @@ void ParticleGroup_Update(struct Manager *m, struct Group *g)
                 p->priority = g->priority;
                 if (p->timer++ >= p->lifetime) {
                     p->active = 0;
-                    sub_08217EAC(sprite);
+                    Effect_Remove(sprite);
                 } else
                     alive++;
             }

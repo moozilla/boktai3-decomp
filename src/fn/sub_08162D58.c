@@ -12,8 +12,8 @@ struct G {
 };
 extern struct G *gUnk_02000710;
 
-void sub_08215284(void *, s32);
-void sub_0822B2F8(s32);
+void AnimData_SelectTiles(void *, s32);
+void Sound_PlaySong(s32);
 
 s32 sub_08162D58(struct P *p)
 {
@@ -24,7 +24,7 @@ s32 sub_08162D58(struct P *p)
         p->w14c = 0;
         p->st = 3;
     }
-    sub_08215284(q->sub, 0x65);
-    sub_0822B2F8(0x198);
+    AnimData_SelectTiles(q->sub, 0x65);
+    Sound_PlaySong(0x198);
     return 1;
 }

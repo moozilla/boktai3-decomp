@@ -18,7 +18,7 @@ struct Weather {
     struct Drop drops[32];
 };
 void sub_08217EEC(void *, void *, int);
-void sub_08217EAC(void *);
+void Effect_Remove(void *);
 int WeatherParticles_Update(struct Weather *p)
 {
     struct Drop *d = p->drops;
@@ -38,7 +38,7 @@ int WeatherParticles_Update(struct Weather *p)
                     break;
                 case 1:
                     if (d->timer > 2) {
-                        sub_08217EAC(s);
+                        Effect_Remove(s);
                         d->active = 0;
                     }
                     break;

@@ -4,7 +4,6 @@
 
 extern u32 gUnk_02000560[];
 extern struct TriggerActor *gUnk_02000580[4];
-extern u32 gUnk_030053F4;
 extern s32 gUnk_02000478;
 extern u16 gUnk_02000534, gUnk_02000500;
 
@@ -12,39 +11,19 @@ struct World {
     u8 pad[0x5A0];
     u32 region;
 };
-extern struct World *gUnk_02000710;
 
-s32 sub_0821AD08(u32, struct TriggerScriptArgs *);
 void sub_08013B74(void *);
-void sub_08219D38(void *);
-void sub_08217EAC(void *);
-void sub_08214514(void *);
-void sub_0822B3BC(s32);
-void sub_08220C8C(void *, void *, s32, s32, s32);
 s32 sub_0822D490(s32, s32);
 u8 *sub_0821D64C(s32, s32);
 void sub_08013728(void *);
 void sub_08017044(s32, s32, s32, s32, struct SceneVec *, struct SceneVec *, s32, struct Trigger *);
 u8 sub_082212DC(void *, u32, s32, s32);
-void *sub_08219FBC(u32, u32);
-void sub_0821A04C(void *, void *, void *);
-void sub_0821A0C0(void *);
-void *sub_08215184(s32);
-void *sub_0821A520(s32, s32);
-void *sub_08219C40(u32);
-void sub_08219DD8(void *, u32);
 void sub_08217DE0(struct TriggerSprite *, struct TriggerGraphics *, u32);
 void sub_08217EC4(struct TriggerSprite *, s32, s32);
 s32 sub_0821D6F4(struct SceneVec *, s32);
 s32 sub_0822C034();
-s32 sub_082151E4(void *, u16);
-void sub_082144A4(struct TriggerObject *, void *, s32);
 void ScaledShadow_Initialize(void *, struct SceneVec *, s32, s32, s32, s32, s32, s32, s32, s32,
                              s32);
-void sub_08249240(struct TriggerManager *, struct Trigger *, TriggerUpdate);
-s32 Script_SeekToKeyword(s32);
-s32 Script_GetValue(void);
-s32 Script_GetPc(void);
 
 static inline u32 frame_factor(u16 v)
 {
@@ -224,7 +203,7 @@ active:
     }
     args.values = values;
     argsPtr = &args;
-    return sub_0821AD08(script, argsPtr);
+    return Script_Call(script, argsPtr);
 }
 
 u32 sub_08006FAC(struct Trigger *p)
@@ -258,18 +237,18 @@ u32 sub_0800700C(struct Trigger *s)
     sub_08006FD8(s);
     sub_08013B74(s->effect);
     if (s->other != 0)
-        sub_08219D38(s->other);
+        Heap_Free(s->other);
     if (s->animation != 0)
-        sub_08219D38(s->animation);
+        Heap_Free(s->animation);
     if (s->sprite != 0) {
-        sub_08217EAC(s->sprite);
-        sub_08219D38(s->sprite);
+        Effect_Remove(s->sprite);
+        Heap_Free(s->sprite);
     }
     if (s->object != 0) {
-        sub_08214514(s->object);
-        sub_08219D38(s->object);
+        Sprite_Remove(s->object);
+        Heap_Free(s->object);
     }
-    sub_08219D38(s);
+    Heap_Free(s);
     return 0;
 }
 void Trigger_UpdateShake(struct Trigger *p)
@@ -327,7 +306,7 @@ s32 Trigger_TryOpenNearby(struct TriggerOpener *actor)
         state = gUnk_02000580[index];
         if (state && state->actionMode == 6 && p->condition == 1) {
             if (!manager->soundDelay) {
-                sub_0822B2F8(402);
+                Sound_PlaySong(402);
                 manager->soundDelay = 15;
             next:
                 p = p->next;
@@ -336,11 +315,11 @@ s32 Trigger_TryOpenNearby(struct TriggerOpener *actor)
             }
         } else {
             p->actor = index;
-            sub_0822B3BC(271);
+            Sound_PlaySongChecked(271);
             p->update = Trigger_UpdateOpeningAnimation;
             p->timer = 0;
             p->started = 0;
-            sub_08220C8C(p->animation, manager->resource, 5, 0, 0);
+            Anim_SetSequence(p->animation, manager->resource, 5, 0, 0);
             {
                 s32 event;
                 if (gUnk_030053F4 & 2048)
@@ -630,7 +609,7 @@ void Trigger_UpdateOpeningAnimation(struct TriggerManager *manager, struct Trigg
             p->update = Trigger_UpdateActivation;
         }
         p->timer = 0;
-        sub_08220C8C(p->animation, gUnk_02000030->resource, 6, 0, 0);
+        Anim_SetSequence(p->animation, gUnk_02000030->resource, 6, 0, 0);
     } else
         p->timer++;
 }
@@ -697,7 +676,7 @@ void Trigger_UpdateActivation(struct TriggerManager *manager, struct Trigger *p)
     if (p->timer == 8) {
         u16 script;
         if (!(gUnk_030053F4 & 2048))
-            sub_0822B3BC(272);
+            Sound_PlaySongChecked(272);
         script = *(u16 *)&p->script;
         Trigger_RunScript(p, script, sub_0822D490(p->id, p->kind) == 1);
     } else if (p->timer > 8) {
@@ -769,7 +748,7 @@ void Trigger_UpdateLockedPause(struct TriggerManager *manager, struct Trigger *p
     if (p->timer > 31) {
         p->update = Trigger_UpdateLockedRecovery;
         p->timer = 0;
-        sub_08220C8C(p->animation, gUnk_02000030->resource, 5, 0, 4);
+        Anim_SetSequence(p->animation, gUnk_02000030->resource, 5, 0, 4);
     }
     p->timer++;
 }
@@ -844,7 +823,7 @@ void Trigger_UpdateLockedRecovery(struct TriggerManager *manager, struct Trigger
         p->update = Trigger_UpdateIdleAnimation;
         p->timer = 0;
         p->actor = -1;
-        sub_08220C8C(p->animation, manager->resource, 0, 0, 0);
+        Anim_SetSequence(p->animation, manager->resource, 0, 0, 0);
     } else
         p->timer++;
 }
@@ -1028,9 +1007,9 @@ s32 TriggerManager_Initialize(struct TriggerManager *p, void *unused)
 {
     s32 i;
     gUnk_02000030 = p;
-    p->graphics = sub_08215184(7194);
+    p->graphics = AnimData_FindEntry(7194);
     p->kind = 14454;
-    p->resource = sub_0821A520(37422, 39666);
+    p->resource = ScriptProc_Start(37422, 39666);
     p->head = 0;
     for (i = 0; i < 4; i++) {
         struct TriggerActor *actor;
@@ -1069,11 +1048,11 @@ s32 TriggerManager_Initialize(struct TriggerManager *p, void *unused)
 
 void *sub_08008230(void *a, void *b)
 {
-    void *p = sub_08219FBC(9, 0x5c);
+    void *p = Task_Create(9, 0x5c);
     if (p != 0) {
-        sub_0821A04C(p, TriggerManager_Update, sub_08008148);
+        Task_SetCallbacks(p, TriggerManager_Update, sub_08008148);
         if (TriggerManager_Initialize(p, a) < 0) {
-            sub_0821A0C0(p);
+            Task_Kill(p);
             return 0;
         }
     }
@@ -1097,10 +1076,10 @@ s32 Trigger_CreateDrop(struct SceneVec *position, s32 id, s32 kind, u32 script, 
     u32 *in, *out;
     if (!manager)
         return -1;
-    p = sub_08219C40(188);
+    p = Heap_Alloc(188);
     if (!p)
         return -1;
-    sub_08219DD8(p, 188);
+    Memory_Clear(p, 188);
     p->id = id;
     p->kind = kind;
     p->actor = -1;
@@ -1122,12 +1101,12 @@ s32 Trigger_CreateDrop(struct SceneVec *position, s32 id, s32 kind, u32 script, 
     do {
         *out++ = *in++;
     } while (--i >= 0);
-    p->sprite = sub_08219C40(40);
+    p->sprite = Heap_Alloc(40);
     if (!p->sprite) {
-        sub_08219D38(p);
+        Heap_Free(p);
         return -1;
     }
-    sub_08219DD8(p->sprite, 40);
+    Memory_Clear(p->sprite, 40);
     sub_08217DE0(p->sprite, manager->graphics, 0);
     sub_08217EC4(p->sprite, -8, -10);
     if (sub_0821D6F4(position, 128)) {
@@ -1180,10 +1159,10 @@ s32 Trigger_CreateDropFromScript(void)
         id = 0;
         kind = 0;
     }
-    script = sub_0821ABA8('p', 0);
-    mode = sub_0821ABA8('M', 0);
-    persistent = sub_0821ABA8('i', 0);
-    option = sub_0821ABA8('O', 0);
+    script = Script_GetKeywordValue('p', 0);
+    mode = Script_GetKeywordValue('M', 0);
+    persistent = Script_GetKeywordValue('i', 0);
+    option = Script_GetKeywordValue('O', 0);
     {
         s32 zero = 0;
         s32 *clear = arguments + 2;
@@ -1212,10 +1191,10 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
     u32 *in, *out;
     if (!manager)
         return -1;
-    p = sub_08219C40(188);
+    p = Heap_Alloc(188);
     if (!p)
         return -1;
-    sub_08219DD8(p, 188);
+    Memory_Clear(p, 188);
     p->id = id;
     p->kind = kind;
     p->actor = -1;
@@ -1230,7 +1209,7 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
     if (bob) {
         p->update = Trigger_UpdateBobbingAnimation;
         if (!(gUnk_030053F4 & 2048))
-            sub_0822B2F8(623);
+            Sound_PlaySong(623);
     } else
         p->update = Trigger_UpdateIdleAnimation;
     p->startScript = startScript;
@@ -1241,41 +1220,41 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
     do {
         *out++ = *in++;
     } while (--i >= 0);
-    p->object = sub_08219C40(44);
+    p->object = Heap_Alloc(44);
     if (!p->object) {
-        sub_08219D38(p);
+        Heap_Free(p);
         return -1;
     }
-    sub_08219DD8(p->object, 44);
-    p->other = sub_08219C40(28);
+    Memory_Clear(p->object, 44);
+    p->other = Heap_Alloc(28);
     if (!p->other) {
         if (p->object)
-            sub_08219D38(p->object);
-        sub_08219D38(p);
+            Heap_Free(p->object);
+        Heap_Free(p);
         return -1;
     }
-    sub_08219DD8(p->other, 28);
-    p->animation = sub_08219C40(16);
+    Memory_Clear(p->other, 28);
+    p->animation = Heap_Alloc(16);
     if (!p->animation) {
         if (p->object)
-            sub_08219D38(p->object);
+            Heap_Free(p->object);
         if (p->other)
-            sub_08219D38(p->other);
-        sub_08219D38(p);
+            Heap_Free(p->other);
+        Heap_Free(p);
         return -1;
     }
-    sub_08219DD8(p->animation, 16);
-    if (!sub_082151E4(p->other, manager->kind)) {
+    Memory_Clear(p->animation, 16);
+    if (!AnimData_Load(p->other, manager->kind)) {
         if (p->object)
-            sub_08219D38(p->object);
+            Heap_Free(p->object);
         if (p->other)
-            sub_08219D38(p->other);
+            Heap_Free(p->other);
         if (p->animation)
-            sub_08219D38(p->animation);
-        sub_08219D38(p);
+            Heap_Free(p->animation);
+        Heap_Free(p);
         return -1;
     }
-    sub_082144A4(p->object, p->other, 0);
+    Sprite_Init(p->object, p->other, 0);
     p->object->position = *position;
     p->object->position.y = groundHeight((struct SceneVec *)&p->object->position);
     if (p->flip)
@@ -1284,11 +1263,11 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
     p->started = hidden;
     p->condition = condition;
     if ((u8)condition == 0)
-        sub_08215284(p->other, 772);
+        AnimData_SelectTiles(p->other, 772);
     else if ((u8)condition == 1)
-        sub_08215284(p->other, 775);
+        AnimData_SelectTiles(p->other, 775);
     else
-        sub_08215284(p->other, 776);
+        AnimData_SelectTiles(p->other, 776);
     {
         s32 hidden = p->started;
         if (hidden) {
@@ -1326,7 +1305,7 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
             m->resource;
         });
         register s32 zero asm("r2") = 0;
-        sub_08220C8C(animation, resource, zero, 0, zero);
+        Anim_SetSequence(animation, resource, zero, 0, zero);
     }
     {
         s32 value;
@@ -1370,13 +1349,13 @@ s32 Trigger_CreateContainerFromScript(void)
         id = 0;
         kind = 0;
     }
-    flip = sub_0821ABA8('d', 0);
-    startScript = sub_0821ABA8('g', 0);
-    script = sub_0821ABA8('p', 0);
-    bob = sub_0821ABA8('m', 0);
-    sound = sub_0821ABA8('M', 0);
-    hidden = sub_0821ABA8('S', 0);
-    condition = sub_0821ABA8('c', 0);
+    flip = Script_GetKeywordValue('d', 0);
+    startScript = Script_GetKeywordValue('g', 0);
+    script = Script_GetKeywordValue('p', 0);
+    bob = Script_GetKeywordValue('m', 0);
+    sound = Script_GetKeywordValue('M', 0);
+    hidden = Script_GetKeywordValue('S', 0);
+    condition = Script_GetKeywordValue('c', 0);
     {
         s32 zero = 0;
         s32 *clear = arguments + 2;
@@ -1412,7 +1391,7 @@ s32 sub_08008950(u32 type)
 }
 u32 sub_08008988(void)
 {
-    return sub_08008950(sub_0821ABA8('t', 0));
+    return sub_08008950(Script_GetKeywordValue('t', 0));
 }
 
 s32 Trigger_MoveDropsByItem(struct SceneVec *position, s32 id, s32 kind)
@@ -1436,8 +1415,8 @@ u32 sub_08008A00(void)
         u32 b : 16;
         u32 c : 16;
     } bf;
-    u32 x = sub_0821ABA8(0x6b, 0);
-    u32 y = sub_0821ABA8(0x69, 0);
+    u32 x = Script_GetKeywordValue(0x6b, 0);
+    u32 y = Script_GetKeywordValue(0x69, 0);
     if (Script_SeekToKeyword(0x70)) {
         bf.a = Script_GetValue();
         bf.b = Script_GetValue();

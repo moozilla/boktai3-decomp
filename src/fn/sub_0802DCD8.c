@@ -13,7 +13,7 @@ int sub_0802DB78(struct Actor *, int, int, int, int, int);
 int sub_0802DC7C(struct Actor *, int, int, int, int, int);
 int sub_0802DC18(struct Actor *, int, int, int, int, int);
 int sub_0802DCB8(struct Actor *, int, int, int, int, int);
-int sub_0802DCD8(struct Actor *p, int id, int a, int b, int c)
+int Actor_PlayAnimationEntry(struct Actor *p, int id, int a, int b, int c)
 {
     struct Entry *entry = &p->entries[id];
     int result;

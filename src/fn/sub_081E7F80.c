@@ -42,9 +42,9 @@ struct S {
     void (*previous)(void *);
     void (*fn)(void *);
 };
-void sub_08220C8C(void *, u32, u32, u32, u32);
+void Anim_SetSequence(void *, u32, u32, u32, u32);
 void sub_081E4188(void *);
-void sub_08013440(void *);
+void ActorShadow_Disable(void *);
 void sub_081E41EC(void *);
 static inline u8 take(struct S *p)
 {
@@ -78,10 +78,10 @@ struct Child {
 void sub_081E5608(void *, void *);
 void sub_08056CC0(void);
 void sub_081E4174(void *);
-void sub_08215284(void *, s32);
-void sub_0822B2F8(s32);
-void sub_0821AD08(void *, s32);
-void sub_08013424(void *);
+void AnimData_SelectTiles(void *, s32);
+void Sound_PlaySong(s32);
+void Script_Call(void *, s32);
+void ActorShadow_Enable(void *);
 void ActorPalette_BeginFade(void *);
 s32 Mod(s32, s32);
 void AnimatedParticles_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
@@ -96,8 +96,8 @@ void sub_081E7F80(struct S *p)
     u8 done;
     if (take(p)) {
         p->state = 13;
-        sub_08220C8C(&p->anim, p->arg, 13, 0, 0);
-        sub_08215284((u8 *)p + 0xe08, 346);
+        Anim_SetSequence(&p->anim, p->arg, 13, 0, 0);
+        AnimData_SelectTiles((u8 *)p + 0xe08, 346);
         o = &p->obj;
         a = &p->anim;
         entry = a->data + a->frame;
@@ -178,7 +178,7 @@ void sub_081E7F80(struct S *p)
             sub_080148CC(1, 3, (u8 *)p + 0xdf8, 192, 60, duration, 3, duration, 5, 60, duration);
             sub_080148CC(1, 3, (u8 *)p + 0xdf8, 224, 60, duration, 3, duration, 5, 60, duration);
             sub_080148CC(1, 3, (u8 *)p + 0xdf8, 256, 60, duration, 3, duration, 5, 60, duration);
-            sub_08013440(p->p2);
+            ActorShadow_Disable(p->p2);
             p->obj.flags |= 1;
             p->oldMode = p->mode;
             {

@@ -49,7 +49,7 @@ void sub_080297FC(void *, int, int, int);
 void sub_08029E1C(void *);
 int sub_08029E2C(void *);
 void sub_08029AA8(void *);
-void sub_0822B3BC(int);
+void Sound_PlaySongChecked(int);
 void sub_08045D04(void *, int);
 void sub_08046B14(void *);
 void sub_0802A188(ActorAnimation *p)
@@ -63,7 +63,7 @@ void sub_0802A188(ActorAnimation *p)
         p->stage = zero;
         p->counter = zero;
         sub_08029E1C(p);
-        sub_0822B3BC(955);
+        Sound_PlaySongChecked(955);
     }
     {
         u16 *dst = (u16 *)((u8 *)p + 0x1aa);
@@ -98,7 +98,7 @@ void sub_0802A188(ActorAnimation *p)
             break;
         case 2:
             if (p->counter == 10)
-                sub_0822B3BC(1358);
+                Sound_PlaySongChecked(1358);
             if (p->counter > 129) {
                 p->stage++;
                 p->counter = 0;
@@ -121,7 +121,7 @@ void sub_0802A188(ActorAnimation *p)
             if (p->counter > 9) {
                 p->stage++;
                 p->counter = 0;
-                sub_0822B3BC(955);
+                Sound_PlaySongChecked(955);
             }
             break;
         case 8:

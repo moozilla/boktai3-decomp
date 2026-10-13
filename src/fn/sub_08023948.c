@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08020D68(void *, u32);
+void Trigger_ConsumePending(void *, u32);
 struct S {
     u8 f0[0xaa];
     u8 aa;
@@ -35,7 +35,7 @@ void sub_08023948(struct S *arg)
         base->particle = zero;
     }
     if (p->af)
-        sub_08020D68((u8 *)p + 0x118, 1);
+        Trigger_ConsumePending((u8 *)p + 0x118, 1);
     else
         p->c4++;
 }

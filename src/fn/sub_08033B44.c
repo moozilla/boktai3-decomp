@@ -32,24 +32,24 @@ struct WindowManager {
     struct TextWindow *head;
 };
 extern struct WindowManager *gUnk_020000E4;
-void *sub_08219C40(int);
-void sub_08219DD8(void *, int);
-void sub_08219D38(void *);
-void sub_08218E5C(int, int, int, int);
+void *Heap_Alloc(int);
+void Memory_Clear(void *, int);
+void Heap_Free(void *);
+void TextWindow_BlankRect(int, int, int, int);
 void sub_08032C80(struct TextState *, int, int, int, int);
-void sub_08032C54(struct TextState *, int, int, int, int);
-void sub_08032C34(struct TextState *);
+void TextState_SetBounds(struct TextState *, int, int, int, int);
+void TextState_Reset(struct TextState *);
 int Script_ParseStringRef(const void *);
 const u8 *Text_LookupString(int);
 void sub_08033AF0(struct WindowManager *, struct TextWindow *);
 void sub_08033AF8(struct WindowManager *, struct TextWindow *);
 struct TextWindow *sub_0803360C(struct WindowManager *, int);
-struct TextWindow *sub_08033634(int);
+struct TextWindow *TextWindow_Find(int);
 int sub_08033654(struct WindowManager *);
 const u8 *sub_080335F4(struct TextWindow *, int);
 void sub_08032E8C(struct TextState *);
 void sub_08032E98(struct TextState *);
-int sub_08033924(int, int);
+int TextWindow_Refresh(int, int);
 void sub_08249240(struct WindowManager *, struct TextWindow *, void *);
 int sub_08033B44(struct WindowManager *p)
 {
@@ -60,7 +60,7 @@ int sub_08033B44(struct WindowManager *p)
             struct TextState *t = &w->text;
             sub_08032E8C(t);
             if (w->symbol >= 0)
-                sub_08033924(w->id, w->symbol);
+                TextWindow_Refresh(w->id, w->symbol);
             if (w->callback)
                 sub_08249240(p, w, w->callback);
             sub_08032E98(t);

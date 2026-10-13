@@ -32,9 +32,9 @@ struct S {
     u8 p6[0xf90 - 0xf6d];
     void (*fn)(void *);
 };
-void sub_08220C8C(void *, u32, u32, u32, u32);
+void Anim_SetSequence(void *, u32, u32, u32, u32);
 void sub_081E4188(void *);
-void sub_08013440(void *);
+void ActorShadow_Disable(void *);
 void sub_081E41EC(void *);
 static inline u8 take(struct S *p)
 {
@@ -95,9 +95,9 @@ void sub_081E8374(struct S *p)
     u8 done;
     if (take(p)) {
         p->state = 2;
-        sub_08220C8C(&p->anim, p->arg, 2, 0, p->last);
+        Anim_SetSequence(&p->anim, p->arg, 2, 0, p->last);
         sub_081E4188(p);
-        sub_08013440(p->p2);
+        ActorShadow_Disable(p->p2);
         sub_081E41EC(p);
     }
     if (p->fn)

@@ -1,12 +1,12 @@
 #include "global.h"
-void sub_08214514(u8 *);
+void Sprite_Remove(u8 *);
 void sub_08020D08(u8 *);
 u32 sub_0804DD10(u8 *p)
 {
     u8 *q = p + 0x74;
     s32 i = 4;
     do {
-        sub_08214514(q);
+        Sprite_Remove(q);
         q += 0x2C;
         i--;
     } while (i >= 0);

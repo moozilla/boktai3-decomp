@@ -15,13 +15,13 @@ struct S {
     u16 h1a;
     u16 h1c;
 };
-void sub_08219DD8(void *, u32);
+void Memory_Clear(void *, u32);
 void sub_082001BC(void *, void (*)(void));
 void sub_081FF454(void);
 void sub_082001C0(struct S *p)
 {
     u32 a;
-    sub_08219DD8(p, 0x20);
+    Memory_Clear(p, 0x20);
     sub_082001BC(p, sub_081FF454);
 
     p->h0 = 0;

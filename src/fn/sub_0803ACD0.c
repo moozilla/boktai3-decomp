@@ -2,7 +2,7 @@
 #include "global.h"
 int sub_0803972C(void);
 int sub_08039744(void);
-void sub_0821980C(void *, void *, int, int);
+void Anim_LoadKeyframe(void *, void *, int, int);
 void sub_0803ACD0(u8 *p)
 {
     int value = sub_0803972C();
@@ -19,7 +19,7 @@ void sub_0803ACD0(u8 *p)
         offset = 448;
         descriptor = p + offset;
         offset -= 43;
-        sub_0821980C(first, descriptor, category + offset, 0);
+        Anim_LoadKeyframe(first, descriptor, category + offset, 0);
     }
     {
         int category;
@@ -45,7 +45,7 @@ void sub_0803ACD0(u8 *p)
             value = base;
             asm("" : "+r"(value));
             category |= value;
-            sub_0821980C(first, descriptor, category, 0);
+            Anim_LoadKeyframe(first, descriptor, category, 0);
         }
     }
 }

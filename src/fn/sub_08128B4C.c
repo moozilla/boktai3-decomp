@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_08219DD8(void *, u32);
+void Memory_Clear(void *, u32);
 
 struct E {
     u8 a[0x93];
@@ -28,7 +28,7 @@ struct E *sub_08128B4C(struct S *b)
         if (!Tst(&b->mask, i)) {
             e = &b->e[i];
             b->mask |= 1 << i;
-            sub_08219DD8(e, 0xA0);
+            Memory_Clear(e, 0xA0);
             e->idx = i;
             return e;
         }

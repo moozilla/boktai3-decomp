@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08219DD8(void *data, s32 bytes)
+void Memory_Clear(void *data, s32 bytes)
 {
     u8 *ptr = data;
     s32 aligned;

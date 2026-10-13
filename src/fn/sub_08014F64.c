@@ -15,7 +15,7 @@ struct Group {
     struct Vec velocity[6];
     struct Sprite sprites[6];
 };
-void sub_08214514(struct Sprite *);
+void Sprite_Remove(struct Sprite *);
 static inline int scale(int a, int b)
 {
     int v = a * b;
@@ -37,7 +37,7 @@ void FragmentGroup_Update(void *m, struct Group *g)
             g->velocity[i].y -= 2;
             if (--g->lifetime[i] == 255) {
                 g->enabled[i] = 0;
-                sub_08214514(s);
+                Sprite_Remove(s);
             } else
                 g->count++;
         }

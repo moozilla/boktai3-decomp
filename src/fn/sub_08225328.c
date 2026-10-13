@@ -33,7 +33,7 @@ void sub_082210B8(void);
 void sub_08177D54(void);
 s32 sub_082250FC(struct Task *);
 void sub_08225324(void);
-void sub_0821A04C(struct Task *, s32 (*)(struct Task *), void (*)(void));
+void Task_SetCallbacks(struct Task *, s32 (*)(struct Task *), void (*)(void));
 void sub_08219F74(struct Task *);
 void sub_08225328(void)
 {
@@ -68,7 +68,7 @@ void sub_08225328(void)
         *(u16 *)(gUnk_02000710 + 0x12) = value;
     }
     task = &gUnk_030025A0;
-    sub_0821A04C(task, sub_082250FC, sub_08225324);
+    Task_SetCallbacks(task, sub_082250FC, sub_08225324);
     task->f14 = 1;
     task->f16 = 1;
     task->f10 = 0;

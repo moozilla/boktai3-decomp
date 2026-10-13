@@ -6,10 +6,10 @@ struct S {
     u32 c;
 };
 extern struct S *gUnk_02000150;
-u32 sub_08215184(u32);
+u32 AnimData_FindEntry(u32);
 s32 sub_081260BC(struct S *s)
 {
-    s->p = sub_08215184(0x1c1e);
+    s->p = AnimData_FindEntry(0x1c1e);
     s->c = 0;
     gUnk_02000150 = s;
     return 0;

@@ -4,7 +4,7 @@
 // 2 differing instruction runs; first diff at +0x7E (mov r0, sp vs ldr r2, [pc, #0x20])
 void sub_0809775C(u8 *, s16 *);
 void sub_08097798(u8 *);
-u32 sub_082215E4(s32, s32);
+u32 Math_Atan2(s32, s32);
 void CpuSet(const void *, void *, u32);
 void sub_08097BC0(u8 *s, s16 *v)
 {
@@ -31,7 +31,7 @@ void sub_08097BC0(u8 *s, s16 *v)
         b[0] = v[0] - a[0];
         b[1] = v[1] - a[1];
         b[2] = v[2] - a[2];
-        s[0x3cd] = sub_082215E4(b[0], b[2]);
+        s[0x3cd] = Math_Atan2(b[0], b[2]);
         p += 0x5fc;
         stack[0] = zero;
     }

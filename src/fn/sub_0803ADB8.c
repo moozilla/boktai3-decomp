@@ -11,7 +11,7 @@ extern u16 gUnk_03005260[];
 extern u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
 int Mod(int, int);
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 void sub_082213B8(void *, void *, int, int, int, int, int, int, int);
 
 static inline int randomValue(u16 *table, int limit)
@@ -53,7 +53,7 @@ void sub_0803ADB8(struct P *p)
         f = p->f;
     }
     if (p->timer <= 89 && Mod(p->timer, 2) == 0)
-        sub_0822B2F8(0x2A5);
+        Sound_PlaySong(0x2A5);
     if (a > 99)
         a = 99;
     if (d > 99)

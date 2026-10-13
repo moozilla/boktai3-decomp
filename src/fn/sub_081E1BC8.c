@@ -29,7 +29,7 @@ struct Viewer {
     u8 p5[0x5cc - 0x5c0];
     u32 state, selection, countA, countB, countC, textIndex, valueA, valueB;
 };
-void sub_0821980C(void *, void *, u16, s32);
+void Anim_LoadKeyframe(void *, void *, u16, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 static inline void move(struct Sprite *s, s32 selection)
@@ -40,6 +40,6 @@ static inline void move(struct Sprite *s, s32 selection)
 void SoundTest_MoveCategoryCursor(struct Viewer *p)
 {
     move(&p->cursor, p->selection);
-    sub_0821980C(&p->label, &p->digitsResource, p->selection + 47, 0);
+    Anim_LoadKeyframe(&p->label, &p->digitsResource, p->selection + 47, 0);
     p->label.flags &= ~1;
 }

@@ -43,13 +43,13 @@ extern struct Map *gUnk_030052F4;
 extern u32 gUnk_030052F8, gUnk_030052FC;
 u8 *sub_0821D64C(int, int);
 extern const s16 gUnk_086149C4[];
-int sub_0802DCD8(struct Actor *, int, int, int, int);
+int Actor_PlayAnimationEntry(struct Actor *, int, int, int, int);
 void sub_0802DD6C(struct Actor *, int);
 void sub_080426D4(void *, int);
 void sub_080426F8(void *, int);
 void sub_0804275C(void *, int, int, int);
-void sub_0822B2F8(int);
-int sub_082215E4(int, int);
+void Sound_PlaySong(int);
+int Math_Atan2(int, int);
 static inline int scale(int v)
 {
     if (v >= 0)
@@ -78,7 +78,7 @@ void sub_0802EA4C(void *unused, struct Actor *p)
         int zero = 0;
         p->entered = zero;
         p->done = zero;
-        sub_0802DCD8(p, 0, 1, zero, 4);
+        Actor_PlayAnimationEntry(p, 0, 1, zero, 4);
     }
     {
         u32 mask = 4096;

@@ -41,7 +41,7 @@ struct Obj {
 };
 void sub_0818DEBC(struct Obj *);
 void sub_08013B74(u8 *);
-void sub_0822B3BC(u32);
+void Sound_PlaySongChecked(u32);
 void sub_0818DE44(struct Obj *p)
 {
     p->y -= 60;
@@ -54,6 +54,6 @@ void sub_0818DE44(struct Obj *p)
         p->timer = 0;
         p->callback = sub_0818DEBC;
         sub_08013B74((u8 *)p + 0x160);
-        sub_0822B3BC(484);
+        Sound_PlaySongChecked(484);
     }
 }

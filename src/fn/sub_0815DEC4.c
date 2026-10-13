@@ -6,13 +6,13 @@ struct P {
     u8 f3a8[0x3A8 - 0x3A8];
 };
 
-void sub_0821FE40(void *);
+void Collider_Refresh(void *);
 
 void sub_0815DEC4(struct P *p)
 {
     u8 *q = &p->c;
     if (*q != 0) {
-        sub_0821FE40((u8 *)p + 0x3A8);
+        Collider_Refresh((u8 *)p + 0x3A8);
         *q = *q - 1;
     }
 }

@@ -1,6 +1,6 @@
 #include "global.h"
 extern u32 gUnk_02000060;
-void sub_08217EAC(u8 *);
+void Effect_Remove(u8 *);
 u32 sub_0801450C(u8 *p)
 {
     s32 i = 0;
@@ -14,7 +14,7 @@ u32 sub_0801450C(u8 *p)
             s32 k = 7;
             do {
                 if (*b != 0)
-                    sub_08217EAC(a);
+                    Effect_Remove(a);
                 a += 0x38;
                 b += 0x38;
                 k--;

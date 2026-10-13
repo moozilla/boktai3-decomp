@@ -9,12 +9,12 @@ struct P {
     u16 d;
 };
 void sub_0822B3E8(void);
-void sub_0822B2F8(s32);
+void Sound_PlaySong(s32);
 void sub_08162E00(struct P *p)
 {
     sub_0822B3E8();
-    sub_0822B2F8(2);
-    sub_0822B2F8(0x12c);
+    Sound_PlaySong(2);
+    Sound_PlaySong(0x12c);
     p->a = 10;
     p->b = 0x40;
     p->c = 1;

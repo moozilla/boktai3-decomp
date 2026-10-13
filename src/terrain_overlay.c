@@ -249,7 +249,7 @@ loop: {
     struct TerrainOverlayDrawable *d =
         (struct TerrainOverlayDrawable *)(sizeof(*base) * i + (u32)base);
     if (d->active)
-        sub_08214514(d);
+        Sprite_Remove(d);
 }
     i++;
 test:
@@ -292,7 +292,7 @@ s32 TerrainOverlay_Initialize(struct TerrainOverlay *p, u32 id, u32 resource)
         });
     }
     {
-        s32 result = sub_082151E4(model, key);
+        s32 result = AnimData_Load(model, key);
         loadedModel = model;
         if (!result)
             return -1;
@@ -327,15 +327,15 @@ void *sub_080040F8(u16 x, u16 y)
         n = 8;
     a = n * 0x84;
     b = n * 8 + 0x90;
-    s = sub_08219FBC(9, a + b + n * 12);
+    s = Task_Create(9, a + b + n * 12);
     if (s != 0) {
-        sub_0821A04C(s, TerrainOverlay_Update, TerrainOverlay_DestroyDrawables);
+        Task_SetCallbacks(s, TerrainOverlay_Update, TerrainOverlay_DestroyDrawables);
         s->drawables = (struct TerrainOverlayDrawable *)((u8 *)s + b);
         s->keys = (u32 *)((u8 *)s->drawables + a);
         s->actorCount = n;
         s->drawableCount = n * 3;
         if (TerrainOverlay_Initialize(s, x, y) < 0) {
-            sub_0821A0C0(s);
+            Task_Kill(s);
             return 0;
         }
     }
@@ -344,8 +344,8 @@ void *sub_080040F8(u16 x, u16 y)
 
 s32 sub_08004194(void)
 {
-    s32 a = sub_0821ABA8(0x6d, 0);
-    s32 b = sub_0821ABA8(0x6e, 0);
+    s32 a = Script_GetKeywordValue(0x6d, 0);
+    s32 b = Script_GetKeywordValue(0x6e, 0);
     if (b == 0)
         return -1;
     return TerrainOverlay_QueueCommand(a, b);

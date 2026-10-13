@@ -87,23 +87,23 @@ extern u16 gUnk_03005260[];
 extern void *gUnk_086049F4[];
 
 /* Engine helpers. */
-s32 sub_0821ABA8(u32, s32);
+s32 Script_GetKeywordValue(u32, s32);
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetPc(void);
 s32 Script_GetValue(void);
 s32 sub_0822C034(struct DirectionalVec *);
-s32 sub_082215E4(s32, s32);
-s32 sub_082151E4(void *, u32);
-void sub_082144A4(void *, void *, u32);
-void sub_08215284(void *, u32 animation);
-void sub_08214514(void *);
-void sub_08219D38(void *);
-void *sub_08219C40(u32);
-void sub_08219DD8(void *, u32);
-void *sub_08219FBC(u32, u32);
-void sub_0821A04C(void *, void (*)(void), void (*)(void));
-void sub_0821A0C0(void *);
-void sub_0821AD08(u32, struct DirectionalScriptArgs *);
+s32 Math_Atan2(s32, s32);
+s32 AnimData_Load(void *, u32);
+void Sprite_Init(void *, void *, u32);
+void AnimData_SelectTiles(void *, u32 animation);
+void Sprite_Remove(void *);
+void Heap_Free(void *);
+void *Heap_Alloc(u32);
+void Memory_Clear(void *, u32);
+void *Task_Create(u32, u32);
+void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
+void Task_Kill(void *);
+void Script_Call(u32, struct DirectionalScriptArgs *);
 void sub_08249244(struct DirectionalManager *, struct DirectionalController *, s32, void *);
 
 u32 sub_08009500(struct DirectionalController *, u32);

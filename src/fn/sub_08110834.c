@@ -1,7 +1,7 @@
 #include "global.h"
 s32 sub_08109464(void *);
 void sub_080335B4(void);
-void sub_0821A0C0(void *);
+void Task_Kill(void *);
 void sub_0824923C(void *, u32);
 struct S {
     u8 filler[0xFE4];
@@ -11,7 +11,7 @@ s32 sub_08110834(struct S *s)
 {
     if (sub_08109464(s) == 0) {
         sub_080335B4();
-        sub_0821A0C0(s);
+        Task_Kill(s);
         return -1;
     }
     if (s->f != 0)

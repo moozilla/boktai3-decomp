@@ -1,18 +1,18 @@
 #include "global.h"
-void *sub_08219FBC(u32, u32);
-void sub_0821A04C(void *, void (*)(void), void (*)(void));
+void *Task_Create(u32, u32);
+void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
 s32 sub_0819A470(void *);
-void sub_0821A0C0(void *);
+void Task_Kill(void *);
 void sub_0819A23C(void);
 void sub_0819A414(void);
 void *sub_0819A4D8(u16 a)
 {
-    u32 *p = sub_08219FBC(8, 0x1328);
+    u32 *p = Task_Create(8, 0x1328);
     if (p) {
         p[6] = a;
-        sub_0821A04C(p, sub_0819A23C, sub_0819A414);
+        Task_SetCallbacks(p, sub_0819A23C, sub_0819A414);
         if (sub_0819A470(p) < 0) {
-            sub_0821A0C0(p);
+            Task_Kill(p);
             return 0;
         }
     }

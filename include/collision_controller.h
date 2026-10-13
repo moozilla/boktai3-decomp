@@ -81,7 +81,6 @@ struct CollisionActor {
 
 extern struct CollisionManager *gUnk_0200003C;
 extern struct CollisionScene gUnk_03005430;
-extern u32 gUnk_030053F4;
 extern struct CollisionActor *gUnk_02000580;
 extern s32 gUnk_02000478;
 extern u16 gUnk_02000534, gUnk_02000500;
@@ -105,28 +104,9 @@ s32 sub_0800A78C(void);
 void sub_0800A7D0(void);
 
 /* Engine helpers. */
-void sub_0821FEB4(struct SceneCollider *, u32, u32, u32, u32, struct SceneExtent *,
-                  struct SceneExtent *);
-void sub_0821FF84(struct SceneCollider *,
-                  void (*)(struct SceneCollider *, struct CollisionOther *, struct CollisionSlot *),
-                  struct CollisionSlot *);
-void sub_0821FE40(struct SceneCollider *);
-void sub_0821FE6C(struct SceneCollider *);
 void sub_08217DE0(void *, void *, u32);
 void sub_08217EEC(void *, void *, u32);
 void sub_08217EC4(void *, s32, s32);
-void sub_08217EAC(void *);
-void sub_08220C8C(void *, void *, u32, u32, u32);
-void sub_0822B3BC(u32);
-void sub_08249240(struct CollisionManager *, struct CollisionSlot *, void *);
-void *sub_08215184(u32);
-void *sub_0821A520(u32, u32);
-void *sub_08219FBC(u32, u32);
-void sub_0821A04C(void *, void *, void *);
-void sub_0821A0C0(void *);
-void sub_08219DD8(void *, u32);
-s32 Script_SeekToKeyword(u32);
-s32 Script_GetValue(void);
 void sub_0821AAD8(void *);
 void sub_0821B4C8(void *, s32, s32);
 void sub_0800AC44(u32, u32, u32, struct CollisionVec *, struct SceneExtent *, u32, u32);

@@ -3,8 +3,8 @@ extern void *gUnk_02000058;
 void *sub_080138F0(int, int);
 void ScaledShadow_Update(void *);
 void sub_0801373C(void *);
-void sub_082151E4(void *, int);
-void sub_082144A4(void *, void *, int);
+void AnimData_Load(void *, int);
+void Sprite_Init(void *, void *, int);
 void sub_080136B4(void *, void *);
 int ScaledShadow_Initialize(u8 *p, void *source, int scale, int min, int max, int extra,
                             int maxHeight, int minHeight, int shift, int nearShift, int mode)
@@ -36,9 +36,9 @@ int ScaledShadow_Initialize(u8 *p, void *source, int scale, int min, int max, in
     else
         *(void (**)(void *))(p + 0x60) = sub_0801373C;
     resource = p + 0x38;
-    sub_082151E4(resource, 0x1C1B);
+    AnimData_Load(resource, 0x1C1B);
     sprite = p + 12;
-    sub_082144A4(sprite, resource, 514);
+    Sprite_Init(sprite, resource, 514);
     *(u16 *)(sprite + 16) = 5;
     p[0x13] = 2;
     sub_080136B4(m, p);

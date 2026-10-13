@@ -26,7 +26,7 @@ void sub_08219624(void);
 void sub_0821447C(u32, void *, void *, void *);
 void sub_082141C0(void);
 void sub_0821425C(void);
-void sub_0821A04C(void *, void *, u32);
+void Task_SetCallbacks(void *, void *, u32);
 void sub_08219F74(void *);
 void sub_08213DCC(void)
 {
@@ -87,9 +87,9 @@ void sub_08213DCC(void)
     gUnk_03003A50 = zero;
     gUnk_03004264 = zero;
     a = &gUnk_03001118;
-    sub_0821A04C(a, sub_082141C0, 0);
+    Task_SetCallbacks(a, sub_082141C0, 0);
     b = &gUnk_03001130;
-    sub_0821A04C(b, sub_0821425C, 0);
+    Task_SetCallbacks(b, sub_0821425C, 0);
     a->b14 = byteZero;
     a->b16 = byteOne;
     a->h10 = zero;

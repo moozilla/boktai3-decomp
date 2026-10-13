@@ -2,7 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 extern u8 gUnk_08E60F80[][16];
 int sub_0822E104(u32);
-void sub_0821980C(u8 *, u8 *, u32, u32);
+void Anim_LoadKeyframe(u8 *, u8 *, u32, u32);
 void Presentation_SetItemGraphic(u8 *p, u8 *q, u32 item)
 {
     int index = sub_0822E104(item);
@@ -22,7 +22,7 @@ void Presentation_SetItemGraphic(u8 *p, u8 *q, u32 item)
                 register int tile asm("r3") = entry[0];
                 resource += tile;
             }
-            sub_0821980C(q, context, resource, 0);
+            Anim_LoadKeyframe(q, context, resource, 0);
         }
         *(u32 *)(q + 8) &= ~1;
     } else

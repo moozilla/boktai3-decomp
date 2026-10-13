@@ -31,20 +31,20 @@ struct Viewer {
     const u16 *savedPalette;
     u16 palette[16];
 };
-void sub_0821980C(void *, void *, u16, s32);
+void Anim_LoadKeyframe(void *, void *, u16, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 extern const s16 gUnk_086136F0[], gUnk_086137AE[], gUnk_08613BC4[];
 u32 sub_0822B590(s32);
-void sub_0822B358(s32);
-void sub_0822B2F8(s32);
-void sub_08220D78(void *, void *, u16, s32, s32);
+void Sound_StopSong(s32);
+void Sound_PlaySong(s32);
+void Anim_SetKeyframes(void *, void *, u16, s32, s32);
 extern u16 gUnk_03004FC0[];
-void sub_082156B8(s32);
-void sub_0821656C(s32, s32, s32, s32, s32);
-void *sub_0821A520(s32, s32);
+void Bg_ClearTilemap(s32);
+void BgGfx_LoadTilemapSimple(s32, s32, s32, s32, s32);
+void *ScriptProc_Start(s32, s32);
 void sub_082161B4(s32, s32, void *, s32, s32, s32, void *);
-void sub_082196C4(void *, void *);
+void ResourceHeader_Relocate(void *, void *);
 void sub_0821983C(void *, void *, s32, s32, s32, s32, s32, void *);
 void sub_081DC1B4(s32);
 void SoundTest_CountEntries(void *);
@@ -69,23 +69,23 @@ s32 SoundTest_Initialize(struct Viewer *p)
     void *asset;
     s32 option, i;
     clear(&zero, &pos);
-    sub_082156B8(0);
-    sub_0821656C(0, 0, 0, 0, 0);
-    sub_082156B8(2);
-    sub_0821656C(2, 0, 0, 0, 0);
-    sub_082156B8(3);
+    Bg_ClearTilemap(0);
+    BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
+    Bg_ClearTilemap(2);
+    BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
+    Bg_ClearTilemap(3);
     {
-        void *background = sub_0821A520(0xc091, 0x3536);
+        void *background = ScriptProc_Start(0xc091, 0x3536);
         option = 10;
         sub_082161B4(2, 0, background, 0, 0, 1, &option);
     }
-    sub_0821656C(3, 0, 0, 0, 0);
-    CpuSet((u8 *)sub_0821A520(0x92b3, 0x204) + 20, gUnk_03004FC0, 256);
-    asset = sub_0821A520(0xcb05, 0xe2ab);
-    sub_082196C4(&p->backgroundResource, asset);
+    BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
+    CpuSet((u8 *)ScriptProc_Start(0x92b3, 0x204) + 20, gUnk_03004FC0, 256);
+    asset = ScriptProc_Start(0xcb05, 0xe2ab);
+    ResourceHeader_Relocate(&p->backgroundResource, asset);
     p->digitsResource = p->backgroundResource;
     sub_0821983C(&p->background, &p->backgroundResource, 59, 16, 0, 0, 0, 0);
-    sub_082196C4(&p->labelResource, asset);
+    ResourceHeader_Relocate(&p->labelResource, asset);
     sub_0821983C(&p->label, &p->labelResource, 47, 16, 0, 0, 0, 0);
     for (i = 0; i < 3; i++) {
         sub_0821983C(&p->labels[i], &p->digitsResource, 43, 48, 1, 0, 60, &pos);
@@ -106,10 +106,10 @@ s32 SoundTest_Initialize(struct Viewer *p)
         p->digitsB[i].flags |= 1;
         pos.x += 8;
     }
-    asset = sub_0821A520(0xcb05, 0x530d);
-    sub_082196C4(&p->panelResource, asset);
+    asset = ScriptProc_Start(0xcb05, 0x530d);
+    ResourceHeader_Relocate(&p->panelResource, asset);
     sub_0821983C(&p->panel, &p->panelResource, 139, 16, 0, 0, 0, 0);
-    sub_082196C4(&p->cursorResource, asset);
+    ResourceHeader_Relocate(&p->cursorResource, asset);
     sub_0821983C(&p->cursor, &p->cursorResource, 71, 16, 0, 0, 0, 0);
     p->savedPalette = *(u16 **)((u8 *)p + 0x178);
     CpuSet(p->savedPalette, p->palette, 16);

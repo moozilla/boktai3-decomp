@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 extern u32 gUnk_02000560;
-void sub_0821AD08(int, void *);
+void Script_Call(int, void *);
 void SceneActors_RunSecondEventScript(u8 *p, s16 *position)
 {
     int args[8];
@@ -39,7 +39,7 @@ void SceneActors_RunSecondEventScript(u8 *p, s16 *position)
                 *(u32 *)&call = header;
             }
             call.args = args;
-            sub_0821AD08(id, &call);
+            Script_Call(id, &call);
         }
     }
 }

@@ -2,8 +2,8 @@
 #include "global.h"
 void *sub_08224EBC(int, int, int);
 void SceneMessages_Enqueue(void *, void *);
-void sub_0821AD08(int, int);
-void sub_08020D68(void *, int);
+void Script_Call(int, int);
+void Trigger_ConsumePending(void *, int);
 void SceneMessages_SwapBuffers(void *);
 void SceneMessages_Dispatch(void *);
 int SceneMessages_Update(u8 *p)
@@ -32,7 +32,7 @@ int SceneMessages_Update(u8 *p)
             }
             if (!*(u16 *)(p + 0x1c)) {
                 if (*(u16 *)(p + 0x20))
-                    sub_0821AD08(*(u16 *)(p + 0x20), 0);
+                    Script_Call(*(u16 *)(p + 0x20), 0);
                 p[0x23] = 0;
                 return 0;
             }
@@ -40,7 +40,7 @@ int SceneMessages_Update(u8 *p)
         }
         if (*(int *)(p + 0x68)) {
             if (--*(int *)(p + 0x68) == 0)
-                sub_08020D68(p + 0x78, 1);
+                Trigger_ConsumePending(p + 0x78, 1);
         }
     }
     SceneMessages_SwapBuffers(p);

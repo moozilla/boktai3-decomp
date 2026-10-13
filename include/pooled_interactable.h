@@ -68,11 +68,10 @@ struct PooledWorld {
     u8 pad[0x5a0];
     s32 region;
 };
-extern struct PooledWorld *gUnk_02000710;
 
 static inline u8 sameRegion(s32 region)
 {
-    if (gUnk_02000710->region == region)
+    if (((struct PooledWorld *)gUnk_02000710)->region == region)
         return 1;
     return 0;
 }
@@ -84,25 +83,8 @@ struct PooledPackedArgs {
 
 /* Engine helpers. */
 void sub_08219918(void *, void *, s32, s32, s32, s32, s32, void *);
-void sub_08220D78(void *, void *, u32, u32, u32);
 void sub_08219A80(void *, u32);
 void sub_08214424(void *, u32);
-void sub_0821FEB4(void *, u32, u32, u32, u32, void *, void *);
-void sub_0821FF84(void *, void *, void *);
-void sub_0821FE40(void *);
-void sub_0821FE6C(void *);
-void sub_082195E0(void *);
-void sub_08219D38(void *);
-void *sub_08219C40(u32);
-void sub_08219DD8(void *, u32);
-void *sub_08219FBC(u32, u32);
-void sub_0821A04C(void *, void (*)(void), void (*)(void));
-void sub_0821A0C0(void *);
-struct PooledResource *sub_0821A520(u32, u32);
-void sub_082196C4(void *, void *);
-void sub_0821AD08(u32, void *);
-void sub_08249240(struct PooledInteractableManager *, struct PooledInteractable *, void *);
-void sub_08220F70(void *, void *);
 u32 sub_0821E67C(void *, void *, void *, void *, u32, u32, u32);
 void sub_0821E618(void *);
 u16 sub_0821E7E4(void *);
@@ -111,8 +93,6 @@ void sub_0821E780(struct SceneVec *, void *, u32);
 struct SceneVec *sub_08103EF4(s32);
 s32 sub_0822C034(struct SceneVec *);
 u8 *sub_0821D64C(s32, s32);
-s32 Script_SeekToKeyword(s32);
-s32 Script_GetValue(void);
 
 /* Slot helpers and state handlers. */
 struct PooledInteractable *sub_08008A70(struct PooledInteractableManager *);

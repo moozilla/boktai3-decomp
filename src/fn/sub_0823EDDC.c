@@ -6,7 +6,7 @@ struct PairED {
     u32 a, b;
 };
 u32 sub_0823D7D4(u8 *);
-void sub_08215284(u8 *, u32);
+void AnimData_SelectTiles(u8 *, u32);
 void sub_0821FF58(u8 *, u32, u32, u32, u32, u32);
 void sub_0823EDDC(u8 *p)
 {
@@ -24,7 +24,7 @@ void sub_0823EDDC(u8 *p)
         *angle = direction;
     }
     resource = sub_0823D7D4(p);
-    sub_08215284(p + 0xb70, 76);
+    AnimData_SelectTiles(p + 0xb70, 76);
     sub_0821FF58(p + 0xb8c, resource, *(u16 *)(p + 0xbfc), 0x2000, zero, *(u16 *)(p + 0xbfe));
     p[0xbce] = *angle;
     *(u16 *)(p + 0xc0a) = zero;

@@ -8,8 +8,8 @@ struct P {
     u32 fac;
 };
 void sub_0824923C(struct P *, u32);
-void sub_0821AD08(u32, u32);
-void sub_0821A0C0(struct P *);
+void Script_Call(u32, u32);
+void Task_Kill(struct P *);
 s32 sub_08056DBC(struct P *p)
 {
     u16 *c;
@@ -20,7 +20,7 @@ s32 sub_08056DBC(struct P *p)
     *c = v;
     if ((u16)v >= p->f9c) {
         if (p->fa8 != 0)
-            sub_0821AD08(p->fa8, 0);
-        sub_0821A0C0(p);
+            Script_Call(p->fa8, 0);
+        Task_Kill(p);
     }
 }

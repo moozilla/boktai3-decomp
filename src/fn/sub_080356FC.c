@@ -29,7 +29,7 @@ struct Engine {
 };
 extern struct Engine *gUnk_02000484;
 extern u8 gUnk_020000EC;
-void sub_08219DD8(void *, int);
+void Memory_Clear(void *, int);
 #define gRfuLinkStatus   gUnk_03006A80
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"

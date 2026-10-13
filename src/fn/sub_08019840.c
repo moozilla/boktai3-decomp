@@ -14,7 +14,7 @@ typedef struct {
 Manager *sub_080195DC(void);
 Channel *sub_080197F8(Manager *);
 Channel *sub_08019818(Manager *, int);
-int sub_0821ABA8(int, int);
+int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetPc(void);
 int Script_GetValue(int);
@@ -29,13 +29,13 @@ void TileAnimation_Configure(void)
     q = sub_080197F8(p);
     if (!q)
         return;
-    q->id = sub_0821ABA8('c', 0);
+    q->id = Script_GetKeywordValue('c', 0);
     if (q->id && sub_08019818(p, q->id))
         return;
-    q->count = sub_0821ABA8('s', 1);
-    q->frame = sub_0821ABA8('S', 0);
-    q->frames = sub_0821ABA8('a', 1);
-    q->unpaused = sub_0821ABA8('p', 0);
+    q->count = Script_GetKeywordValue('s', 1);
+    q->frame = Script_GetKeywordValue('S', 0);
+    q->frames = Script_GetKeywordValue('a', 1);
+    q->unpaused = Script_GetKeywordValue('p', 0);
     q->dirty = 1;
     q->time = 0;
     if (q->count > p->count)

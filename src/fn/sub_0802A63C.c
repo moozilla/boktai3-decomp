@@ -46,7 +46,7 @@ void sub_080297FC(void *, int, int, int);
 void sub_08029E1C(void *);
 int sub_08029E2C(void *);
 void sub_08029AA8(void *);
-void sub_0822B3BC(int);
+void Sound_PlaySongChecked(int);
 void SceneActors_RunFirstEventScript(void *, void *);
 void sub_08046834(void *);
 void sub_081D5204(int);
@@ -73,7 +73,7 @@ void sub_0802A63C(ActorAnimation *p)
         effect(p, 2, 349, 1);
         base->stage = 0;
         base->counter = 0;
-        sub_0822B3BC(958);
+        Sound_PlaySongChecked(958);
     }
     if (p->padB2 && !base->stage) {
         sub_081D5204(80);

@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_08032C54(u8 *p, u32 a, u32 b, u32 c, u32 d)
+void TextState_SetBounds(u8 *p, u32 a, u32 b, u32 c, u32 d)
 {
     p[2] = a;
     p[3] = b;

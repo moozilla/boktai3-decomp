@@ -73,7 +73,7 @@ struct Actor {
 };
 extern void *gUnk_02000480;
 struct Actor *sub_0802D6D0(void *, int);
-int sub_0821ABA8(int, int);
+int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
 int sub_0802FD14(struct Actor *);

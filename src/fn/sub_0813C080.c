@@ -22,7 +22,7 @@ typedef struct State {
 } State;
 extern const s16 gUnk_086149C4[];
 void sub_0813C000(u32, u32 *, u32 *);
-void sub_08220C8C(void *, void *, s32, u8, u8);
+void Anim_SetSequence(void *, void *, s32, u8, u8);
 void sub_0813C040(State *);
 static inline s32 scale(s32 v)
 {
@@ -43,6 +43,6 @@ void sub_0813C080(State *s, u32 mode, Point *pos)
     s->dx = scale(10 * gUnk_086149C4[(angle + 64) & 255]);
     s->dy = scale(10 * gUnk_086149C4[angle & 255]);
     sub_0813C000(mode, &a, &b);
-    sub_08220C8C(s->animation, s->resource, 0, a, b);
+    Anim_SetSequence(s->animation, s->resource, 0, a, b);
     sub_0813C040(s);
 }

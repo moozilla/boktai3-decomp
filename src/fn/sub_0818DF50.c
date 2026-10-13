@@ -9,13 +9,13 @@ struct P {
     u8 i[0x1cc - 0x160];
     u32 z;
 };
-void sub_08215284(void *, u32);
+void AnimData_SelectTiles(void *, u32);
 void sub_0818DF50(struct P *p)
 {
     s32 v = --p->w128;
     if (v == 0) {
         u8 *q = p->q;
-        sub_08215284(p->c, *(u16 *)(q + 0x5BC));
+        AnimData_SelectTiles(p->c, *(u16 *)(q + 0x5BC));
         p->z = v;
     }
 }

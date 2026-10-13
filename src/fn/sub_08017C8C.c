@@ -24,7 +24,7 @@ void sub_0801746C(void *);
 void sub_080174B8(void *, int);
 int sub_080177AC(void *, int, int, int);
 int Mod(int, int);
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 void sub_082279A8(int, int, int, int, int, int, int);
 static inline int randomValue(void)
 {
@@ -70,7 +70,7 @@ int Weather_ActiveStorm(struct Weather *p)
         if (!p->countdown) {
             if (!(gUnk_030053F4 & 1024) && gUnk_02000478 > 0) {
                 gUnk_030051E4 = 5;
-                sub_0822B2F8(103);
+                Sound_PlaySong(103);
             }
             sub_0801746C(p);
         } else {

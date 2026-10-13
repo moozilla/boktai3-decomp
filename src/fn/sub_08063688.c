@@ -6,10 +6,10 @@ struct C {
 };
 
 void sub_0822AF78(s32);
-void sub_08020D68(void *, s32);
+void Trigger_ConsumePending(void *, s32);
 
 void sub_08063688(void *a, void *b, struct C *c)
 {
     sub_0822AF78(c->v);
-    sub_08020D68(b, 1);
+    Trigger_ConsumePending(b, 1);
 }

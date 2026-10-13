@@ -30,8 +30,8 @@ struct Actor {
     void *callback;
 };
 extern struct Actor *gUnk_020000DC;
-void sub_08215284(void *, int);
-int sub_08220C8C(struct Frames *, void *, u16, int, int);
+void AnimData_SelectTiles(void *, int);
+int Anim_SetSequence(struct Frames *, void *, u16, int, int);
 int sub_0803092C(struct Actor *p)
 {
     struct State *state = &p->state;
@@ -48,19 +48,19 @@ int sub_0803092C(struct Actor *p)
             asm("" : "+r"(read));
             switch ((s8)((u8)read->current - 4)) {
                 case 26:
-                    sub_08215284(p->sprite, 506);
+                    AnimData_SelectTiles(p->sprite, 506);
                     break;
                 case 16:
                 case 21:
-                    sub_08215284(p->sprite, 504);
+                    AnimData_SelectTiles(p->sprite, 504);
                     break;
                 case 0:
                 case 1:
                 case 9:
-                    sub_08215284(p->sprite, 505);
+                    AnimData_SelectTiles(p->sprite, 505);
                     break;
                 case 15:
-                    sub_08215284(p->sprite, 507);
+                    AnimData_SelectTiles(p->sprite, 507);
                     break;
                 case 2:
                 case 3:
@@ -83,12 +83,12 @@ int sub_0803092C(struct Actor *p)
                 case 24:
                 case 25:
                 default:
-                    sub_08215284(p->sprite, 503);
+                    AnimData_SelectTiles(p->sprite, 503);
                     break;
             }
         }
         initial = &p->frames;
-        sub_08220C8C(initial, p->resource, (u16)state->current, 0, 0);
+        Anim_SetSequence(initial, p->resource, (u16)state->current, 0, 0);
         r = &p->render;
         f = initial;
         word = f->data + f->index;

@@ -7,7 +7,7 @@ struct V {
 };
 extern const struct T gUnk_0824F1A4[];
 void sub_08121D64(struct V *, s32, s32, s32, s32);
-void sub_0822B3BC(s32);
+void Sound_PlaySongChecked(s32);
 void sub_0818F38C(struct V *p)
 {
     s32 i = 0;

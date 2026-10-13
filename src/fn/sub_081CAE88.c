@@ -1,6 +1,6 @@
 #include "global.h"
 s32 sub_080424FC(void *);
-void sub_0802DCD8(void *, s32, s32, s32, s32);
+void Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
 void sub_081CAE88(void *unused, u8 *p)
 {
     if (p[9]) {
@@ -90,7 +90,7 @@ void sub_081CAE88(void *unused, u8 *p)
                 r = 0;
                 break;
         }
-        sub_0802DCD8(p, r, 2, 0, 4);
+        Actor_PlayAnimationEntry(p, r, 2, 0, 4);
         p[0x18] = 0;
     }
     if (sub_080424FC(p + 0xd4)) {
@@ -180,7 +180,7 @@ void sub_081CAE88(void *unused, u8 *p)
                         r = 0;
                         break;
                 }
-                sub_0802DCD8(p, r, 2, 0, 4);
+                Actor_PlayAnimationEntry(p, r, 2, 0, 4);
                 p[0x18]++;
                 break;
             }
@@ -269,7 +269,7 @@ void sub_081CAE88(void *unused, u8 *p)
                         r = 0;
                         break;
                 }
-                sub_0802DCD8(p, r, 2, 0, 4);
+                Actor_PlayAnimationEntry(p, r, 2, 0, 4);
                 p[0x18]++;
                 break;
             }

@@ -5,7 +5,7 @@ struct E {
     u8 pad[0xdb];
 };
 extern u32 gUnk_020004CC;
-void sub_08214514(void *);
+void Sprite_Remove(void *);
 s32 sub_081392DC(u8 *s)
 {
     s32 i;
@@ -14,7 +14,7 @@ s32 sub_081392DC(u8 *s)
     i = 0x3;
     do {
         if (p->b != 0)
-            sub_08214514(p);
+            Sprite_Remove(p);
         p++;
     } while (--i >= 0);
     z = 0;

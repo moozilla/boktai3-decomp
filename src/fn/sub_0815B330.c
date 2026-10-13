@@ -25,7 +25,7 @@ void sub_0813AFEC(struct P *, s32, s32);
 void sub_0815AF14(struct P *, s32);
 void sub_081502AC(void);
 void sub_081507F4(void);
-void sub_0822B2F8(s32);
+void Sound_PlaySong(s32);
 
 void sub_0815B330(struct P *p, s32 v)
 {
@@ -33,7 +33,7 @@ void sub_0815B330(struct P *p, s32 v)
     if (v >= 0)
         p->a4 = v;
     sub_0813ADD0(p);
-    sub_0822B2F8(0xC6);
+    Sound_PlaySong(0xC6);
     sub_0815AD78(p);
     sub_0813AFEC(p, 0x15, 2);
     p->fn = sub_081507F4;

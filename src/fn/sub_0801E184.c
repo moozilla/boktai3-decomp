@@ -3,8 +3,8 @@
 typedef struct {
     u32 words[2];
 } Vec;
-void *sub_08219C40(int);
-void sub_08219DD8(void *, int);
+void *Heap_Alloc(int);
+void Memory_Clear(void *, int);
 int sub_0822C034(void *);
 void sub_0801F058(void *, void *);
 void sub_0801F5EC(void *, void *);
@@ -38,10 +38,10 @@ int SceneObjects_Append(u8 *p, u16 id, Vec *position, int value, u8 kind, u8 var
     *(u16 *)(slot + 0x80) = zeroHalf;
     *(u16 *)(slot + 0x42) = sub_0822C034(position);
     slot[0x44] = field44;
-    *(void **)(slot + 0x2c) = sub_08219C40(16);
+    *(void **)(slot + 0x2c) = Heap_Alloc(16);
     if (!*(void **)(slot + 0x2c))
         return -1;
-    sub_08219DD8(*(void **)(slot + 0x2c), 16);
+    Memory_Clear(*(void **)(slot + 0x2c), 16);
     switch (slot[0x40]) {
         case 1:
             sub_0801F058(p, slot);

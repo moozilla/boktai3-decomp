@@ -17,7 +17,7 @@ struct G {
     u8 d;
     u8 e;
 };
-void sub_0822B2F8(u32);
+void Sound_PlaySong(u32);
 void sub_08056CC0(void);
 void sub_081E4B0C(u32 phase)
 {
@@ -29,7 +29,7 @@ void sub_081E4B0C(u32 phase)
             return;
     }
     if (phase == 12) {
-        sub_0822B2F8(288);
+        Sound_PlaySong(288);
         return;
     }
     if (phase == 14) {

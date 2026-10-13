@@ -28,6 +28,16 @@ published-rate cost proxy; exact subscription-cost attribution remains unknown.
   header (task/script API such as `sub_0821A04C`, `sub_0821ABA8`, map globals
   `gUnk_030052F4..FC`); units currently declare these locally, sometimes with
   different callback types.
+* **Wave 3**: `include/engine.h` names ~50 engine functions (Task_, Heap_, Memory_,
+  Script_, Sound_, Sprite_/Anim_, Collider_, TextWindow_...), all marked
+  provisional, promoted project-wide (1,924 files rewritten). Units: `item_container`,
+  `pooled_interactable`, `directional_interaction`, `collision_controller`,
+  `homing_effect`, `effect_emitter`, `damage_controller`. Units now reach 0x0800CBA0.
+  `progress.py` attributes a unit-wide pinning marker only to functions that use hints.
+  **Next shared types:** `gUnk_02000710` (game state; units cast it to local views
+  such as `PooledWorld`, `EmitterWorld`) and `gUnk_02000580` (player object, seen
+  as `EffectActor`, `CollisionActor`, `TriggerActor`). Sprite/anim structs are still
+  duplicated across collision and homing headers.
 * **NONMATCHING drafts** replace WIP branches (see `docs/WORKER.md`). 62 drafts
   are on main (Haiku migration), 14,116 bytes, several at 97-99% fuzzy
   (`sub_081F0E24`, `sub_08160EA4`, `sub_08097BC0`, `sub_0820267C`, `sub_08201160`).

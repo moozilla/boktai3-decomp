@@ -25,21 +25,21 @@ typedef struct State {
     u8 pad861[3];
     void (*callback)(void *);
 } State;
-void sub_082151E4(void *, s32);
-void sub_082144A4(Sprite *, void *, s32);
-void sub_08215284(void *, s32);
+void AnimData_Load(void *, s32);
+void Sprite_Init(Sprite *, void *, s32);
+void AnimData_SelectTiles(void *, s32);
 void sub_0813BFE0(void *);
 void sub_0813C26C(State *s)
 {
     Sprite *sprite = &s->sprite;
     void *animation = s->animation;
-    sub_082151E4(animation, 0x2110);
-    sub_082144A4(sprite, animation, 67);
+    AnimData_Load(animation, 0x2110);
+    Sprite_Init(sprite, animation, 67);
     sprite->frame = 4;
     if (s->mode == 6)
-        sub_08215284(animation, 81);
+        AnimData_SelectTiles(animation, 81);
     else
-        sub_08215284(animation, 75);
+        AnimData_SelectTiles(animation, 75);
     sprite->mode = 1;
     sprite->yscale = 127;
     sprite->xscale = 127;

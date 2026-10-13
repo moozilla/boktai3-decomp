@@ -26,7 +26,7 @@ struct PaletteController {
     u8 beforeCallback[4];
     void (*callback)(void *);
 };
-void sub_08215284(void *, s32);
+void AnimData_SelectTiles(void *, s32);
 
 s32 Div(s32, s32);
 static inline u32 mode_bits(u8 *p, u32 mask)
@@ -56,7 +56,7 @@ void ActorPalette_UpdateReverseFade(struct PaletteController *p)
     }
     if (--p->step < 0) {
         p->callback = 0;
-        sub_08215284(p->effect, 343);
+        AnimData_SelectTiles(p->effect, 343);
         p->palette = p->savedPalette;
         p->oldMode = p->mode;
         {

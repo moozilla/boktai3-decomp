@@ -1,19 +1,19 @@
 #include "global.h"
 
-void *sub_08219C40(u32);
-void sub_08219DD8(void *, u32);
-void sub_08219D38(void *);
+void *Heap_Alloc(u32);
+void Memory_Clear(void *, u32);
+void Heap_Free(void *);
 s32 sub_08094764(void *);
 void sub_080946D0(void *);
 
 void sub_08095540(void)
 {
-    void *m = sub_08219C40(0x490);
+    void *m = Heap_Alloc(0x490);
     if (m != 0) {
-        sub_08219DD8(m, 0x490);
+        Memory_Clear(m, 0x490);
         if (sub_08094764(m) < 0) {
             sub_080946D0(m);
-            sub_08219D38(m);
+            Heap_Free(m);
         }
     }
 }

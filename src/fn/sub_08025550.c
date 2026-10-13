@@ -43,8 +43,8 @@ static inline void setFacing(ActorAnimation *p, int angle)
     p->facing8 = value;
 }
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
-void sub_0822B3BC(int);
-int sub_082215E4(int, int);
+void Sound_PlaySongChecked(int);
+int Math_Atan2(int, int);
 extern s16 gUnk_086149C4[];
 static inline int choose(u32 mode, int normal, int alternate)
 {
@@ -76,7 +76,7 @@ void sub_08025550(ActorAnimation *p, int tick)
         sequence = choose(p->mode, 52, 14);
         SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 2, 3,
                                               4);
-        sub_0822B3BC(842);
+        Sound_PlaySongChecked(842);
     }
     {
         register u32 mask asm("r2");

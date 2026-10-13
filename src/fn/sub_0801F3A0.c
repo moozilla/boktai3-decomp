@@ -1,9 +1,9 @@
 #include "global.h"
-void sub_0822B2F8(int);
+void Sound_PlaySong(int);
 void SceneObject_UpdateRaising(void);
 void SceneObject_BeginRaising(u8 *s)
 {
-    sub_0822B2F8(0x152);
+    Sound_PlaySong(0x152);
     s[0x39] = 0;
     s[0x3a] = 0;
     {

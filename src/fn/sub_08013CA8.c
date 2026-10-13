@@ -8,7 +8,7 @@ struct N {
 extern u32 gUnk_02000470;
 void sub_08013684(u8 *);
 void sub_08013C74(void *, void *);
-void sub_08219D38(void *);
+void Heap_Free(void *);
 u32 sub_08013CA8(u8 *p)
 {
     struct N *e = *(struct N **)(p + 0x18);
@@ -17,7 +17,7 @@ u32 sub_08013CA8(u8 *p)
         nx = e->n50;
         sub_08013684((u8 *)e + 0xc);
         sub_08013C74(p, e);
-        sub_08219D38(e);
+        Heap_Free(e);
         e = nx;
     }
     {

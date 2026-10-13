@@ -9,11 +9,11 @@ struct B {
     u8 p[0x2c];
     u32 w2c;
 };
-void sub_08214514(void *);
+void Sprite_Remove(void *);
 void sub_081FB86C(struct A *a, struct B *b, u32 n)
 {
     a->cnt--;
     b->w2c |= 1;
-    sub_08214514(&b->w2c);
+    Sprite_Remove(&b->w2c);
     a->w18 &= ~(1 << n);
 }
