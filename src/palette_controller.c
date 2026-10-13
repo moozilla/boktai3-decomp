@@ -314,7 +314,6 @@ void sub_08002F2C(struct PaletteController *p)
     s->duration = 0;
 }
 
-
 // MATCHING_CONCESSION: register-pinning
 void Palette_BlendVariants(struct PaletteController *p)
 {
@@ -652,7 +651,6 @@ void sub_080035C0(void)
     s32 c = sub_0821ABA8(0x74, 0);
     sub_08003588(a, b, c);
 }
-
 
 // MATCHING_CONCESSION: register-pinning
 void Palette_SetBrightnessFromScript(void)
