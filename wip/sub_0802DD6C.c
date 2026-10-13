@@ -1,0 +1,4 @@
+// WIP: nonmatching candidate; never merge into production src or count as exact.
+#include "global.h"
+struct Entry{u16 id;u8 kind,sound;s8 steps[4];};struct Actor{u8 pad[0xd4];u32 drawable;u8 padd8[0x13e];u8 soundEnabled;u8 pad217[0xa5];struct Entry*entry;};struct Sound{u16 first,second;};extern const struct Sound gUnk_086055D4[];int sub_08042524(void*,int*);void sub_0822B2F8(int);
+void sub_0802DD6C(struct Actor*p,int kind){int frame;int index;if(!p->soundEnabled)return;if(kind==1)index=0;else if(kind==3)index=2;else return;if(sub_08042524(&p->drawable,&frame)){struct Entry*entry=p->entry;s8*steps=entry->steps;asm("" : "+r"(steps));steps+=index;if(*steps==frame)sub_0822B2F8(gUnk_086055D4[entry->sound].first);else if(steps[1]==frame){const u16*second=&gUnk_086055D4[0].second;asm("" : "+r"(second));sub_0822B2F8(second[entry->sound*2]);}}}
