@@ -77,7 +77,7 @@ s32 Background_Update(struct Background *p)
         tileX = truncate3(x - 8);
         {
             s32 value = truncate3(bottom - 128);
-            register s32 mask asm("r8") = -2;
+            s32 mask = -2;
             tileY = mask & value;
         }
     } else {
