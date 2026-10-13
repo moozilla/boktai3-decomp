@@ -10,6 +10,27 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 12 continuation: windows, transitions and wireless
+
+Coverage is **20.406%**, up **0.176 percentage points** from 20.230%.
+**31 additional exact functions** bring the total to **5,626 / 11,109**;
+reported spans are **492,886 / 2,415,354 bytes** (+4,260). No pinning:
+**16.083%**; Register-pinned: **4.324%**, included above. Across this
+continuation the gain is **0.405 points**, 67 new functions.
+
+Combined ROM validation printed **`build/boktai3.gba: OK`**.
+
+The text-window list manager now has matching lookup ID allocation reveal
+callbacks script replacement update and unlink/free routines. Window creation
+08033690 remains a draft. The contiguous scripted dialogue transition unit
+**08033C58-08034084** is complete for named functions. The following controller
+is wireless connection code: exact packet builder send/ack and event routines
+use the RFU SDK types already recovered in include/rfu_compat.h. All named
+functions **08034084-080345D8** match. Continue through its state handlers
+at **08034A2C onward**, up to the singleton accessors before **08036CA4**.
+See [batch notes](../notes/windows-wireless_2026-10-12.md). Descriptive names
+and three additional objdiff groups accompany these matches.
+
 ## October 12 continuation: dialogue interpreter and scrolling text
 
 Coverage is **20.230%**, up **0.229 percentage points** from 20.001%:

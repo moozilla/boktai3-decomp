@@ -68,6 +68,9 @@ Dialogue controls and animation (tentative),080308BC,0803198C,symbols/proposed/s
 Dialogue task setup (tentative),0803198C,08031E54,symbols/proposed/subsystems.csv,Dialogue allocator callbacks singleton and rectangle/VM accessors; initializer remains unmatched
 Dialogue text interpreter,08031E54,08032EDC,symbols/proposed/subsystems.csv,All named functions exact; inline angle-bracket commands speaker labels glyph escapes number formatting nested styles and selected procedures
 Scrolling dialogue controller,08032EDC,080335F4,symbols/proposed/subsystems.csv,All named functions exact; text reveal timing wide glyphs cyclic row clearing show hide reset and scheduler callbacks; final report span includes an existing unnamed assembly tail
+Text window manager,080335F4,08033C58,symbols/proposed/subsystems.csv,Independent windows each embed the text interpreter at +0x60; singleton list manager at gUnk_020000E4; allocation remains unmatched
+Scripted dialogue transitions,08033C58,08034084,symbols/proposed/subsystems.csv,All named functions exact; rectangular dialogue placement timed fading script arrays advance skip and display-register restoration
+Wireless connection controller,08034084,08036CA4,symbols/proposed/subsystems.csv,RFU SDK link status and NI slot globals plus peer packet builder NI send acknowledgement event dispatch and singleton controller accessors
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
 Sound-test menu,081E1AF4,081E270C,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md and allocator 081E26CC callback chain
 Timed presentation,081E270C,081E2898,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md timed update cleanup and initialization
