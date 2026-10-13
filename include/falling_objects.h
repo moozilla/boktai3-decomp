@@ -100,13 +100,14 @@ u32 sub_0800CC50(struct FallingObject *object);
 s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, u32 health,
                          u32 power, u32 force, struct FallingVec *position);
 s32 FallingObject_CreateFromScript(void);
+s32 FallingObject_SpawnFinishParticles(struct FallingObject *object);
 void sub_0800CBAC(struct FallingHit *hit, u32 unused, struct FallingObject *object);
 void sub_0800CBDC(void);
 u32 sub_0800CBE0(struct FallingObjectManager *manager, struct FallingObject *object);
 u32 sub_0800CC08(struct FallingObjectManager *manager, struct FallingObject *object);
 u32 sub_0800D7D4(struct FallingObjectManager *manager);
 s32 sub_0800D800(struct FallingObjectManager *manager, void *unused);
-void *sub_0800D828(void *);
+void *sub_0800D828(void *a, u32 unused);
 s32 FallingObjectManager_Update(struct FallingObjectManager *manager);
 
 #endif
