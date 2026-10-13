@@ -247,6 +247,7 @@ s32 sub_080020BC(s32 layer, u16 resourceId, s32 useIndex, u16 index);
 s32 Background_LoadTilesFromScript(void);
 void Background_QueueCommand(u32 layer, u32 type, s32 length, s32 *args);
 void sub_08002234(void);
+void sub_08002284(void);
 s32 ScrollingBackground_ApplyCommands(struct ScrollingBackground *p);
 s32 ScrollingBackground_Update(struct ScrollingBackground *p);
 u32 sub_08002658(struct ScrollingBackground *p);
