@@ -1,30 +1,21 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 /* Empty constraints preserve local register hints; they emit no instructions. */
-struct Resource {
-    u8 signature[2];
-    u16 unk2, count, unk6, unk8, unkA;
-    u32 maps, tiles, extra;
-};
-s32 sub_0821ABA8(s32, s32);
-s32 Script_SeekToKeyword(s32);
-u8 *Script_GetPc(void);
-s32 sub_0821AA00(u8 *);
-u8 *sub_08216E54(u16);
-s32 Background_FindMapId(struct Resource *, u16);
-void sub_082161B4(s32, s32, void *, s16, s16, s32, s32 *);
+#include "background_controller.h"
+
 static inline s32 nextShift(void)
 {
     u8 *p = Script_GetPc();
     return p ? sub_0821AA00(p) << 7 : 0;
 }
+
 s32 Background_LoadMapsFromScript(void)
 {
     s32 indices[4];
-    struct Resource resource;
+    struct BackgroundResource resource;
     u8 *base = sub_08216E54(sub_0821ABA8('d', 0));
     s32 target, x, y, n, explicitIndices, i;
-    resource = *(struct Resource *)base;
+    resource = *(struct BackgroundResource *)base;
     resource.maps += (u32)base;
     resource.tiles += (u32)base;
     resource.extra += (u32)base;

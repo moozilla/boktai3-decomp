@@ -1,17 +1,6 @@
 #include "global.h"
-struct Config {
-    u8 flags, layer;
-    u16 resource;
-    s32 x, y, scrollX, scrollY, rateX, rateY, limitX, limitY, centerX, centerY, offsetX, offsetY,
-        mode, priority, blendX, blendY;
-};
-s32 sub_0821ABA8(s32, s32);
-s32 Script_SeekToKeyword(s32);
-s32 Script_GetValue(void);
-u8 *Script_GetPc(void);
-s32 sub_0821AA00(u8 *);
-void sub_08219574(u32, s32, s32);
-void *sub_08001CB0(u16, struct Config *);
+#include "background_controller.h"
+
 static inline s32 next(s32 fallback)
 {
     u8 *p = Script_GetPc();
@@ -19,6 +8,7 @@ static inline s32 next(s32 fallback)
         return sub_0821AA00(p);
     return fallback;
 }
+
 static inline s32 nextZero(void)
 {
     s32 v = (s32)Script_GetPc();
@@ -26,9 +16,10 @@ static inline s32 nextZero(void)
         v = sub_0821AA00((u8 *)v);
     return v;
 }
+
 void *Background_CreateFromScript(u32 id)
 {
-    struct Config c;
+    struct BackgroundConfig c;
     c.flags = sub_0821ABA8('f', 0);
     c.layer = sub_0821ABA8('i', 0);
     c.resource = sub_0821ABA8('d', 0);

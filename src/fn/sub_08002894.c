@@ -1,15 +1,6 @@
 #include "global.h"
-struct Config {
-    u8 flags, layer;
-    u16 resource;
-    s32 x, y, offsetX, offsetY, speedX, speedY, scale, width, height, mode, priority, fade, blendX,
-        blendY;
-};
-s32 sub_0821ABA8(s32, s32);
-s32 Script_SeekToKeyword(s32);
-u8 *Script_GetPc(void);
-s32 sub_0821AA00(u8 *);
-void *sub_08002840(u16, struct Config *);
+#include "background_controller.h"
+
 static inline s32 nextZero(void)
 {
     s32 v = (s32)Script_GetPc();
@@ -17,6 +8,7 @@ static inline s32 nextZero(void)
         v = sub_0821AA00((u8 *)v);
     return v;
 }
+
 static inline s32 nextOffset(void)
 {
     s32 v = (s32)Script_GetPc();
@@ -24,6 +16,7 @@ static inline s32 nextOffset(void)
         v = sub_0821AA00((u8 *)v) << 4;
     return v;
 }
+
 static inline s32 next(s32 fallback)
 {
     u8 *p = Script_GetPc();
@@ -31,9 +24,10 @@ static inline s32 next(s32 fallback)
         return sub_0821AA00(p);
     return fallback;
 }
+
 void *ScrollingBackground_CreateFromScript(u32 id)
 {
-    struct Config c;
+    struct ScrollingBackgroundConfig c;
     c.flags = sub_0821ABA8('f', 0);
     c.layer = sub_0821ABA8('i', 0);
     c.resource = sub_0821ABA8('d', 0);

@@ -1,39 +1,10 @@
 #include "global.h"
-#include "scrolling_background.h"
-struct Config {
-    u8 flags, layer;
-    u16 resource;
-    s32 x, y, offsetX, offsetY, speedX, speedY, scale, width, height, mode, priority, fade, blendX,
-        blendY;
-};
-struct Layer {
-    u16 flags;
-    u8 pad[46];
-};
-struct Camera {
-    s16 x, y, a, b, offsetX, offsetY;
-};
-struct Dimensions {
-    s16 pad[4], x, y;
-};
-struct ResourceRef {
-    u32 a;
-    struct Dimensions *data;
-};
-extern struct ScrollingBackground *gUnk_02000010[];
-extern struct Layer gUnk_03004C30[];
-extern struct Camera gUnk_030042A0;
-extern s16 gUnk_03005418[2];
-u8 *sub_08216E54(u16);
-struct ResourceRef *sub_0821A2C4(u16);
-void *Video_GetBackgroundMap(u32);
-void sub_08215A74(u32, s32);
-void sub_082160B8(u32, u32, void *, s32, s32, s32, s32, void *);
-void sub_0821656C(u32, s32, s32, s32, s32);
-void sub_08219574(u32, s32, s32);
-s32 ScrollingBackground_Initialize(struct ScrollingBackground *p, u16 id, struct Config *c)
+#include "background_controller.h"
+
+s32 ScrollingBackground_Initialize(struct ScrollingBackground *p, u16 id,
+                                   struct ScrollingBackgroundConfig *c)
 {
-    struct Layer *layer;
+    struct BackgroundLayer *layer;
     u8 *resource;
     s32 x, y, scale, tx, ty;
     void *map;
@@ -42,10 +13,10 @@ s32 ScrollingBackground_Initialize(struct ScrollingBackground *p, u16 id, struct
     p->flags = c->flags;
     p->layer = c->layer;
     layer = &gUnk_03004C30[p->layer];
-    p->v1C = c->resource;
-    resource = sub_08216E54(p->v1C);
+    p->resource = c->resource;
+    resource = sub_08216E54(p->resource);
     if (p->flags & 1) {
-        struct Dimensions *dims = sub_0821A2C4(0x56C2)->data;
+        struct BackgroundDimensions *dims = sub_0821A2C4(0x56C2)->data;
         c->offsetX = dims->x;
         c->offsetY = dims->y;
     }
@@ -60,16 +31,16 @@ s32 ScrollingBackground_Initialize(struct ScrollingBackground *p, u16 id, struct
     }
     p->x = x << 4;
     p->y = y << 4;
-    p->centerX = p->x;
-    p->centerY = p->y;
-    p->targetX = p->x;
-    p->targetY = p->y;
+    p->baseX = p->x;
+    p->baseY = p->y;
+    p->moveTargetX = p->x;
+    p->moveTargetY = p->y;
     p->speedX = c->speedX;
     p->speedY = c->speedY;
     p->accumulatedX = 0;
     p->accumulatedY = 0;
-    *(s16 *)(p->pad3C) = c->offsetX;
-    *(s16 *)(p->pad3C + 2) = c->offsetY;
+    p->offsetX = c->offsetX;
+    p->offsetY = c->offsetY;
     p->width = c->width << 3;
     p->height = c->height << 3;
     p->moveActive = 0;
@@ -95,12 +66,12 @@ s32 ScrollingBackground_Initialize(struct ScrollingBackground *p, u16 id, struct
         p->blendX = blendX << 8;
         blendY = c->blendY;
         p->blendY = blendY << 8;
-        p->stepX = 0;
-        p->stepY = 0;
-        p->targetBlendX = p->blendX;
-        p->targetBlendY = p->blendY;
-        p->stepX = p->blendX;
-        p->stepY = p->blendY;
+        p->blendStepX = 0;
+        p->blendStepY = 0;
+        p->blendTargetX = p->blendX;
+        p->blendTargetY = p->blendY;
+        p->blendStepX = p->blendX;
+        p->blendStepY = p->blendY;
         if (c->fade)
             sub_08219574(p->layer, blendX, blendY);
     }

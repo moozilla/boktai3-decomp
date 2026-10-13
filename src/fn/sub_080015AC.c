@@ -1,12 +1,12 @@
 #include "global.h"
 #include "background_controller.h"
-void sub_08219574(u32, s32, s32);
+
 s32 Background_ApplyQueuedCommands(struct Background *p)
 {
     u32 i;
-    for (i = 0; i < p->count; i++) {
-        u32 type = p->types[i];
-        s16 *a = p->commands[i].args;
+    for (i = 0; i < p->queue.count; i++) {
+        u32 type = p->queue.types[i];
+        s16 *a = p->queue.commands[i].args;
         switch (type) {
             case 0:
                 p->moveActive = 0;
@@ -16,10 +16,10 @@ s32 Background_ApplyQueuedCommands(struct Background *p)
                 p->moveActive = 1;
                 p->moveDuration = a[0];
                 p->moveTime = 0;
-                p->targetX = a[1] << 7;
-                p->targetY = a[2] << 7;
-                p->originX = p->x;
-                p->originY = p->y;
+                p->moveTargetX = a[1] << 7;
+                p->moveTargetY = a[2] << 7;
+                p->moveOriginX = p->x;
+                p->moveOriginY = p->y;
                 break;
             case 2:
                 p->fadeActive = 0;
@@ -41,22 +41,22 @@ s32 Background_ApplyQueuedCommands(struct Background *p)
                 sub_08219574(p->layer, p->blendX >> 8, p->blendY >> 8);
                 break;
             case 6:
-                p->speedX = a[0];
-                p->speedY = a[1];
+                p->driftX = a[0];
+                p->driftY = a[1];
                 break;
             case 7:
                 p->scrollTime = 0;
                 p->scrollDuration = a[0];
-                p->scrollStartX = p->scrollX << 7;
-                p->scrollStartY = p->scrollY << 7;
+                p->scrollStartX = p->scrollSpeedX << 7;
+                p->scrollStartY = p->scrollSpeedY << 7;
                 p->scrollTargetX = a[1] << 7;
                 p->scrollTargetY = a[2] << 7;
                 if (!p->scrollDuration) {
-                    p->scrollX = a[1];
-                    p->scrollY = a[2];
+                    p->scrollSpeedX = a[1];
+                    p->scrollSpeedY = a[2];
                 }
                 break;
         }
     }
-    return p->count = 0;
+    return p->queue.count = 0;
 }

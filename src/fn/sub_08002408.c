@@ -1,20 +1,6 @@
 #include "global.h"
-#include "scrolling_background.h"
-struct Layer {
-    u8 pad[32];
-    s16 x, y;
-    u8 tail[12];
-};
-struct Camera {
-    s16 x, y, a, b, offsetX, offsetY;
-};
-extern struct Layer gUnk_03004C30[];
-extern struct Camera gUnk_030042A0;
-extern s16 gUnk_03005418[2];
-extern u16 gUnk_02000550, gUnk_0200053C;
-extern const s16 gUnk_086149C4[];
-s32 ScrollingBackground_ApplyCommands(struct ScrollingBackground *);
-void sub_08219574(u32, s32, s32);
+#include "background_controller.h"
+
 #define fixedToInt(v)                                                                              \
     ({                                                                                             \
         s32 value = (v);                                                                           \
@@ -25,15 +11,17 @@ void sub_08219574(u32, s32, s32);
             result = -((-value) >> 18);                                                            \
         result;                                                                                    \
     })
+
 static inline s32 pixel(s16 v)
 {
     if (v >= 0)
         return v >> 4;
     return -((-v) >> 4);
 }
+
 s32 ScrollingBackground_Update(struct ScrollingBackground *p)
 {
-    struct Layer *layer = &gUnk_03004C30[p->layer];
+    struct BackgroundLayer *layer = &gUnk_03004C30[p->layer];
     s32 width, height;
     s32 cx, cy;
     ScrollingBackground_ApplyCommands(p);
@@ -58,8 +46,8 @@ s32 ScrollingBackground_Update(struct ScrollingBackground *p)
             y -= height;
         else if (y < -height)
             y += height;
-        p->x = p->centerX + x;
-        p->y = p->centerY + y;
+        p->x = p->baseX + x;
+        p->y = p->baseY + y;
         layer->x = p->x;
         layer->y = p->y;
     } else {
@@ -73,8 +61,8 @@ s32 ScrollingBackground_Update(struct ScrollingBackground *p)
             p->accumulatedY -= height;
         else if (p->accumulatedY < -height)
             p->accumulatedY += height;
-        p->x = p->accumulatedX + p->centerX;
-        p->y = p->accumulatedY + p->centerY;
+        p->x = p->accumulatedX + p->baseX;
+        p->y = p->accumulatedY + p->baseY;
         layer->x = pixel(p->x);
         layer->y = pixel(p->y);
     }
@@ -93,8 +81,8 @@ s32 ScrollingBackground_Update(struct ScrollingBackground *p)
         layer->y = shifted + cy;
     }
     if (p->fadeActive == 1) {
-        p->blendX += p->stepX;
-        p->blendY += p->stepY;
+        p->blendX += p->blendStepX;
+        p->blendY += p->blendStepY;
         sub_08219574(p->layer, p->blendX >> 8, p->blendY >> 8);
         if (--p->fadeDuration == 0)
             p->fadeActive = 0;
