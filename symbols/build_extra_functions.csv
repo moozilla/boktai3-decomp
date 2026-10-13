@@ -30,6 +30,18 @@ address,isa,evidence,replacement_end
 0819AF7C,thumb,Independent 40-byte angle wrap helper with own literal pool; retained assembly (not yet matched),0819AFA4
 0819AFA4,thumb,Independent 20-byte clamp-around helper; exact standalone C,0819AFB8
 0819AFB8,thumb,Independent 56-byte angle clamp helper with own literal pool; retained assembly (not yet matched),0819AFF0
+0819B010,thumb,Independent 64-byte table-weighted lerp helper (push/pop-bx; literal pool gUnk_08611D24) at the start of a math helper block; exact standalone C,0819B050
+0819B050,thumb,Angle approach helper (halving) in the math helper block; retained assembly (not yet matched); exact standalone C,0819B094
+0819B094,thumb,Angle helper in the math helper block (own push/pop-bx and literal pool); retained assembly (not yet matched); exact standalone C,0819B0E8
+0819B0E8,thumb,Angle helper in the math helper block (own push/pop-bx and literal pool); retained assembly (not yet matched); exact standalone C,0819B13C
+0819B13C,thumb,Angle helper in the math helper block (own push/pop-bx and literal pool); retained assembly (not yet matched); exact standalone C,0819B190
+0819B190,thumb,Angle helper in the math helper block (own push/pop-bx and literal pool); retained assembly (not yet matched); exact standalone C,0819B200
+0819B200,thumb,Angle helper in the math helper block (own push/pop-bx and literal pool); retained assembly (not yet matched); exact standalone C,0819B244
+0819B244,thumb,Angle helper in the math helper block (own push/pop-bx and literal pool); retained assembly (not yet matched); exact standalone C,0819B2A4
+0819B2A4,thumb,Array approach helper (halving) in the math helper block; retained assembly (not yet matched),0819B2E4
+0819B2E4,thumb,Array approach helper (1/4) in the math helper block; exact standalone C,0819B330
+0819B330,thumb,Array approach helper (1/8) in the math helper block; exact standalone C,0819B37C
+0819B37C,thumb,Array approach helper (1/16) in the math helper block; exact standalone C,0819B3C8
 081DB24C,thumb,Independent 108-byte Thumb allocation wrapper in retained 081DB1D8 tail; own prologue and call sequence and pop-bx plus literals; ends at 081DB2B8; notes/solo-family_2026-10-09.md,081DB2B8
 081DB2B8,thumb,Independent 108-byte Thumb allocation wrapper in retained 081DB1D8 tail; own prologue and call sequence and pop-bx plus literals; ends at 081DB324; notes/solo-family_2026-10-09.md,081DB324
 081E4B0C,thumb,Independent animation command body with own push and pop-bx plus literal pool in retained 081E4A60 tail,081E4BD4
