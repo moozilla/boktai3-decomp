@@ -50,10 +50,6 @@ static inline s32 cellIndex(struct TerrainVec *pos)
     return gUnk_030052F4->rows[z] + x;
 }
 
-void *sub_08219C40(u32);
-
-void sub_08219DD8(void *, u32);
-
 s32 TerrainModifiers_Create(s32 id, struct TerrainVec *position, s32 kind, s32 tile, s32 flags)
 {
     struct TerrainModifier *p;
@@ -76,8 +72,6 @@ s32 TerrainModifiers_Create(s32 id, struct TerrainVec *position, s32 kind, s32 t
 }
 
 void sub_0821D6D0(void *);
-
-void sub_08219D38(void *);
 
 u32 sub_08005F40(struct TerrainModifier *n)
 {
@@ -203,10 +197,6 @@ s32 sub_08006134(struct TerrainModifierManager *p, s32 unused)
     return 0;
 }
 
-void *sub_08219FBC(u32, u32);
-
-void sub_0821A0C0(void *);
-
 void *sub_08006144(s32 a, s32 unused)
 {
     void *p = sub_08219FBC(8, 0x1c);
@@ -234,10 +224,6 @@ u32 sub_080061B4(void)
 {
     return sub_0800602C((u16)sub_0821ABA8(0x6e, 0));
 }
-
-s32 Script_SeekToKeyword(s32);
-
-s32 Script_GetValue(void);
 
 s32 TerrainModifiers_ChangeFromScript(void)
 {
