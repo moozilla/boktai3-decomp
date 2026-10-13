@@ -31,11 +31,66 @@ C_FUNC = re.compile(r"^(?!static\b)[A-Za-z_][\w \*]*?\b(\w+)\s*\([^;]*\)\s*$|^(?
 INCLUDE_ASM = re.compile(r'INCLUDE_ASM\(\s*"[^"]*"\s*,\s*(\w+)\s*\)')
 
 
+NONMATCHING_IF = re.compile(r"^#\s*ifdef\s+NONMATCHING\b")
+FUZZY = re.compile(r"^//\s*fuzzy:\s*([0-9.]+)%", re.M)
+
+
+def split_nonmatching(raw):
+    """Split source at `#ifdef NONMATCHING ... #else ... #endif` blocks.
+
+    Returns (default, drafts): the text the normal build compiles (the #else
+    branch kept) and a list of (draft_text, fallback_text) pairs. Draft C never
+    counts as matched code; its #else branch must INCLUDE_ASM the function.
+    """
+    out, drafts = [], []
+    lines = raw.split("\n")
+    i = 0
+    while i < len(lines):
+        if not NONMATCHING_IF.match(lines[i].strip()):
+            out.append(lines[i])
+            i += 1
+            continue
+        depth, branch, draft, fallback = 0, "draft", [], []
+        i += 1
+        while i < len(lines):
+            s = lines[i].strip()
+            if re.match(r"^#\s*if", s):
+                depth += 1
+            elif re.match(r"^#\s*endif", s):
+                if depth == 0:
+                    break
+                depth -= 1
+            elif depth == 0 and re.match(r"^#\s*else", s):
+                branch = "fallback"
+                i += 1
+                continue
+            (draft if branch == "draft" else fallback).append(lines[i])
+            i += 1
+        i += 1
+        drafts.append(("\n".join(draft), "\n".join(fallback)))
+        out.extend(fallback)
+    return "\n".join(out), drafts
+
+
+def nonmatching_functions(path):
+    """[(name, fuzzy percent or None)] for each NONMATCHING draft in a unit."""
+    with open(path) as source:
+        _, drafts = split_nonmatching(source.read())
+    found = []
+    for draft, fallback in drafts:
+        m = FUZZY.search(draft)
+        for name in INCLUDE_ASM.findall(fallback):
+            found.append((name, float(m.group(1)) if m else None))
+    return found
+
+
 def c_functions(path, with_asm=True):
     """Functions a C unit covers, in file order: C definitions plus
-    INCLUDE_ASM(dir, name) placeholders (unless with_asm=False)."""
+    INCLUDE_ASM(dir, name) placeholders (unless with_asm=False).
+    NONMATCHING drafts are skipped; their INCLUDE_ASM fallbacks count."""
     with open(path) as source:
         raw = source.read()
+    raw, _ = split_nonmatching(raw)
     src = raw
     # "#define Name sub_XXXXXXXX" aliases a known name to its address label
     alias = dict(re.findall(r"^#define\s+(\w+)\s+(sub_[0-9A-F]{8})\s*$", raw, re.M))
@@ -65,7 +120,10 @@ def write_nonmatching(code, funcs):
     d = os.path.join(ROOT, "build", "asm", "nonmatching")
     os.makedirs(d, exist_ok=True)
     for name, addr, i, j, nonword in funcs:
-        body = code[i:j]
+        # Same plain alias build.py adds after C function labels, so a unit
+        # whose first function is INCLUDE_ASM can still anchor relative labels.
+        body = [ln + f"\n\t.global {name}__addr\n{name}__addr:" if ln.startswith(f"{name}:") else ln
+                for ln in code[i:j]]
         globs = set()
         for ln in body:
             m = LABEL.match(ln) or SET_LABEL.match(ln)
