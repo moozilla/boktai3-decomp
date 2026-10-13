@@ -13,9 +13,10 @@ Fast per-function checks are sufficient for working-branch matching commits.
 Run one complete combined build before merging a batch into main; it must print
 `build/boktai3.gba: OK`. Do not rebuild for every function or documentation edit.
 Never commit the ROM, generated assembly or emulator dumps.
-Never commit nonmatching C on `main`. Dedicated WIP branches may preserve
-nonmatching drafts and alternate candidates; keep them outside production
-`src/`, and do not merge them into `main` or count them as exact progress.
+Nonmatching drafts are committed on `main` inside `#ifdef NONMATCHING ... #else
+INCLUDE_ASM(...) #endif`, with a fuzzy score recorded by
+`tools/check.py --nonmatching --record`. They never count as exact progress.
+Do not create new WIP branches for drafts.
 Name functions `Subsystem_VerbNoun` (e.g. `SceneIndicator_CreateFromScript`).
 Workers add a file-local `#define Name sub_XXXXXXXX` alias; the integrator runs
 `tools/promote_names.py` before merging a batch, which moves aliases into

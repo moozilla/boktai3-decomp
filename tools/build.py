@@ -24,6 +24,8 @@ AGBCC_INC = os.path.join(os.path.dirname(AGBCC), "ginclude")
 AS = ["arm-none-eabi-as", "-mcpu=arm7tdmi", "-mthumb-interwork", "--no-warn"]
 CFLAGS = ["-O2", "-mthumb-interwork", "-fhex-asm"]
 CPP = shlex.split(os.environ.get("CPP", "cc -E" if sys.platform == "darwin" else "cpp"))
+# Extra preprocessor defines; check.py --nonmatching adds -DNONMATCHING.
+DEFINES = []
 
 
 def sh(cmd, **kw):
@@ -37,7 +39,7 @@ def sh(cmd, **kw):
 def preprocess(src):
     # macOS /usr/bin/cpp is a legacy shell wrapper which mishandles separated
     # include arguments. The compiler driver provides the same preprocessing.
-    return sh(CPP + ["-P", "-nostdinc", "-undef", "-I", "include", "-iquote", ".", src])
+    return sh(CPP + ["-P", "-nostdinc", "-undef"] + DEFINES + ["-I", "include", "-iquote", ".", src])
 
 
 def stamp_ok(obj, key):
@@ -114,9 +116,13 @@ def build_c(src, obj):
     lint_c(src)
     deps = [src] + [os.path.join(d, f) for d in ("include", "include/gba")
                     for f in sorted(os.listdir(os.path.join(ROOT, d))) if f.endswith(".h")]
+    # INCLUDE_ASM pulls in split.py output, which changes with gen/ and symbols.
+    deps += [os.path.join("build", "asm", "nonmatching", n + ".s")
+             for n in re.findall(r'INCLUDE_ASM\(\s*"[^"]*"\s*,\s*(\w+)\s*\)', open(os.path.join(ROOT, src)).read())
+             if os.path.exists(os.path.join(ROOT, "build", "asm", "nonmatching", n + ".s"))]
     cflags = cflags_for(src)
     compiler = compiler_for(src)
-    key = file_hash(*deps, "tools/build.py", extra=compiler_identity(compiler) + " ".join(CPP + cflags))
+    key = file_hash(*deps, "tools/build.py", extra=compiler_identity(compiler) + " ".join(CPP + DEFINES + cflags))
     if stamp_ok(os.path.join(ROOT, obj), key):
         return
     pre = preprocess(src)

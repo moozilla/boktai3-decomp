@@ -138,6 +138,32 @@ def comparison(orig, mine, addr, *, arm=False, target_size=None):
     }
 
 
+def fuzzy_percent(result):
+    """Instruction-text similarity (0-100), with absolute addresses masked so a
+    size difference early in the function does not penalise every branch."""
+    norm = lambda rows: [re.sub(r"0x[0-9a-f]{7,8}", "ADDR", x[1]) for x in rows]
+    matcher = difflib.SequenceMatcher(None, norm(result["original"]), norm(result["candidate"]),
+                                      autojunk=False)
+    return 100.0 if result["status"] == "match" else min(99.9, 100 * matcher.ratio())
+
+
+def record_fuzzy(src, pct):
+    """Write `// fuzzy: NN.N%` as the first line of each NONMATCHING draft."""
+    path = os.path.join(ROOT, src)
+    text = open(path).read()
+    text = re.sub(r"^(#\s*ifdef\s+NONMATCHING[^\n]*\n)(//\s*fuzzy:[^\n]*\n)?",
+                  lambda m: f"{m.group(1)}// fuzzy: {pct:.1f}%\n", text, flags=re.M)
+    open(path, "w").write(text)
+
+
+def draft_extent(src, defined):
+    """Bytes of the ROM functions a NONMATCHING build of src defines."""
+    import progress
+    funcs, sizes = progress.load_functions()
+    by_label = {f"sub_{a:08X}": n for n, a in funcs}
+    return sum(sizes[by_label.get(n, n)] for n in defined)
+
+
 def render_diff(result, context=3, full=False):
     """Align decoded instructions; retain both addresses and literal differences.
 
@@ -171,7 +197,13 @@ def main():
     ap.add_argument("--json", action="store_true", help="machine-readable comparison")
     ap.add_argument("--target-size", type=lambda v: int(v, 0),
                     help="reviewed body plus pool/padding extent, in bytes")
+    ap.add_argument("--nonmatching", action="store_true",
+                    help="compile #ifdef NONMATCHING drafts; compare against the functions' full size")
+    ap.add_argument("--record", action="store_true",
+                    help="with --nonmatching: write the fuzzy score into the draft's source")
     a = ap.parse_args()
+    if a.nonmatching:
+        build.DEFINES.append("-DNONMATCHING")
     if a.context < 0 or (a.target_size is not None and a.target_size <= 0):
         ap.error("context must be nonnegative and target size must be positive")
     src = a.src
@@ -188,13 +220,17 @@ def main():
     build.sh(["arm-none-eabi-objcopy", "-O", "binary", "-j", ".text", base + ".elf", base + ".bin"])
     mine = open(os.path.join(ROOT, base + ".bin"), "rb").read()
     rom = load_rom(verify=False)
+    if a.nonmatching and a.target_size is None:
+        a.target_size = draft_extent(src, defined)
     extent = a.target_size if a.target_size is not None else len(mine)
     if off(addr) < 0 or off(addr) + extent > len(rom):
         sys.exit("target extent outside ROM")
     orig = rom[off(addr):off(addr) + extent]
     arm = os.path.basename(build.compiler_for(src)) == "agbcc_arm"
     result = comparison(orig, mine, addr, arm=arm, target_size=a.target_size)
-    result.update(functions=defined, artifacts=work)
+    result.update(functions=defined, artifacts=work, fuzzy_match_percent=fuzzy_percent(result))
+    if a.record:
+        record_fuzzy(src, result["fuzzy_match_percent"])
     ok = result["status"] == "match"
     with open(os.path.join(ROOT, work, "comparison.json"), "w") as f:
         json.dump(result, f, indent=2)
@@ -205,7 +241,8 @@ def main():
         sys.exit(0 if ok else 1)
     if not a.quiet and (not ok or a.full):
         print(render_diff(result, context=a.context, full=a.full))
-    print(f"{result['different_byte_count']} differing bytes; extent={result['extent_basis']}; artifacts: {work}")
+    print(f"{result['different_byte_count']} differing bytes; fuzzy {result['fuzzy_match_percent']:.1f}%; "
+          f"extent={result['extent_basis']}; artifacts: {work}")
     names = ", ".join(defined)
     print(f"{names}: {'MATCH' if ok else 'MISMATCH'} ({len(mine)} bytes at 0x{addr:08X})")
     sys.exit(0 if ok else 1)
