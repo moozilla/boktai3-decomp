@@ -1,20 +1,17 @@
-#include "global.h"
-struct Vec {
+#include "scene_indicator.h"
+struct PackedVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
-void Sprite_Init(void *, void *, int);
-void Collider_Init(void *, int, int, int, int, void *, void *);
-void Collider_SetCallback(void *, void *, void *);
-void sub_0821FF58(void *, int, int, int, int, int);
-void SceneIndicator_Initialize(u8 *m, u8 *p)
+void SceneIndicator_Initialize(struct SceneIndicators *m, struct SceneIndicator *p)
 {
-    struct Vec size, offset;
+    struct PackedVec size, offset;
     int zero;
-    u8 *sprite = p + 0x88, *effect;
-    Sprite_Init(sprite, m + 0x1c, 1);
+    u8 *sprite = (u8 *)&p->sprite;
+    u8 *effect;
+    Sprite_Init(sprite, m->animations, 1);
     zero = 0;
     sprite[7] = 3;
-    effect = p + 0x34;
+    effect = p->effect;
     size.x = 120;
     size.y = 32;
     size.z = 120;
@@ -24,5 +21,5 @@ void SceneIndicator_Initialize(u8 *m, u8 *p)
     Collider_Init(effect, 0, 0x2001, 0, 16, &size, &offset);
     Collider_SetCallback(effect, 0, p);
     sub_0821FF58(effect, 10, 1, 0x400000, 0x60000, 30);
-    p[16] = zero;
+    p->active = zero;
 }
