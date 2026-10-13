@@ -41,7 +41,7 @@ int sub_08034310(struct Engine *p) {
   u8 *packet = p->scratch;
   u16 fill;
   u16 *fillPtr = &fill;
-  register int zero asm("r4") = 0;
+  int zero = 0;
   int i;
   asm("" : "+r"(zero));
   *fillPtr = zero;
@@ -49,13 +49,11 @@ int sub_08034310(struct Engine *p) {
   if (p->mask & 0x100) {
     packet[0] = 1;
     {
-      register int bits asm("r0") = p->mask;
-      asm("" : "+r"(bits));
+      int bits = p->mask;
       bits |= 8;
       bits |= zero;
       {
-        register int mask asm("r1") = 0xFEFF;
-        asm("" : "+r"(mask));
+        int mask = 0xFEFF;
         p->mask = bits & mask;
       }
     }
@@ -67,8 +65,7 @@ int sub_08034310(struct Engine *p) {
       packet[1] = 1;
       {
         int flags = p->mask | 16;
-        register int mask asm("r1") = 0xFDFF;
-        asm("" : "+r"(mask));
+        int mask = 0xFDFF;
         p->mask = flags & mask;
       }
     } else

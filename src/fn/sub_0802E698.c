@@ -135,7 +135,6 @@ int sub_0802E698(void *unused, struct Actor *p) {
   } else {
     int *dst = &p->rateC;
     int rate;
-    asm("" : "+r"(dst));
     rate = 256;
     *dst = rate;
     p->rateA = rate;
@@ -149,7 +148,6 @@ int sub_0802E698(void *unused, struct Actor *p) {
   } else {
     u8 *dst = &p->turnA;
     int six;
-    asm("" : "+r"(dst));
     six = 6;
     *dst = six;
     p->turnB = six;

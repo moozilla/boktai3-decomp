@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 // Tentative: Refresh the selected target; discard targets outside the search
 // limits.
 struct Vec {
@@ -31,11 +30,10 @@ void sub_0802CB94(struct Object *p) {
     struct Vec *dst = &t->pos;
     int angle = sub_082215E4(dst->x - src->x, dst->z - src->z);
     int facing = p->angle;
-    register int signedAngle asm("r0") = (s8)angle;
+    int signedAngle = (s8)angle;
     u8 diff;
     int dx, dz, magnitude;
     u32 distance;
-    asm("" : "+r"(signedAngle) : "r"(facing));
     diff = facing - signedAngle;
     dx = dst->x - src->x;
     dz = dst->z - src->z;

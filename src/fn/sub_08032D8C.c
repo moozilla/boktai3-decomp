@@ -14,22 +14,21 @@ extern const u8 gUnk_0824DDF4[];
 // MATCHING_CONCESSION: register-pinning
 int sub_08032D8C(struct Vm *arg, int index) {
   register struct Vm *p asm("r8") = arg;
-  register const u8 *s asm("r5") = p->strings[index];
+  const u8 *s = p->strings[index];
   int n = 0;
   u32 c;
-  asm("" : "+r"(p), "+r"(s), "+r"(n));
   goto test;
 loop:
   asm("" ::: "memory");
   c = *s;
   if (c == '<') {
-    register const u8 *q asm("r4");
+    const u8 *q;
     s++;
     if (!*s)
       goto done;
     q = s;
     if (!sub_08032168(s, gUnk_0824DDF4, 3)) {
-      register int has asm("r6") = 0;
+      int has = 0;
       int length = 0;
       u8 *text;
       c = *s;
@@ -68,14 +67,12 @@ loop:
   }
   if (c == 31) {
     register u32 code asm("r1") = (u16)sub_08032070(s);
-    asm("" : "+r"(code));
     if (code == 0xFFFF)
       goto wide;
     {
-      register u32 mask asm("r0") = 0xFF;
+      u32 mask = 0xFF;
       asm("" : "+r"(mask));
       mask <<= 8;
-      asm("" : "+r"(mask));
       if (mask & code)
         goto wide;
     }
@@ -92,7 +89,6 @@ wideNext:
 test:
   c = *s;
   c <<= 24;
-  asm("" : "+r"(c));
   if ((s32)c < 0)
     goto wide;
   c >>= 24;

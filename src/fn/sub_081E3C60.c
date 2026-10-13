@@ -10,10 +10,10 @@ struct Partner {u8 pad[0x1c];s16 x,y,z;u8 gap[0x48-0x22];s16 worldX,worldY,world
 extern u8 *gUnk_02000710;extern u16 gUnk_03005260[];extern u32 gUnk_0300523C;
 u8 sub_082215E4(s32,s32);void sub_0821AD08(void*,s32);
 void sub_081E574C(void*,void*);void sub_081E5648(void*,void*);void sub_081E4174(void*);void sub_081E44D4(void*);
-static inline u32 mode_bits(u8 *p,u32 mask){register u32 v asm("r1")=*p;register u32 result asm("r0")=mask&v;return result;}
+static inline u32 mode_bits(u8 *p,u32 mask){register u32 v asm("r1")=*p;u32 result=mask&v;return result;}
 // Tentative: accept a nearby interaction when facing, height and input permit it.
 void Actor_TryInteraction(struct G*p,struct Partner*q){
- s32 dx,dz,xOffset,height,length; register s32 zOffset asm("r4");u32 radius; register u32 a asm("r8");u32 b,c;register u32 sector asm("r2");u8 *owner;
+ s32 dx,dz,xOffset,height,length; s32 zOffset;u32 radius; u32 a;u32 b,c;u32 sector;u8 *owner;
  if(q->group!=p->group)return;
  if(q->orientation==0){xOffset=0;zOffset=128;}else{xOffset=128;zOffset=0;}
  owner=*(u8**)((u8*)p+0x18);
@@ -23,7 +23,7 @@ void Actor_TryInteraction(struct G*p,struct Partner*q){
  radius=p->speed;
  if(length>=(s32)(radius*radius))return;
  if(q->orientation==0){a=0;b=6;c=7;}else{a=0;b=1;c=2;}
- {register u32 angle asm("r0")=(u8)(sub_082215E4(dx,dz)-16);register s32 first asm("r1")=(s8)a;sector=angle>>5;
+ {u32 angle=(u8)(sub_082215E4(dx,dz)-16);s32 first=(s8)a;sector=angle>>5;
  if(first!=sector&&(s8)b!=sector&&(s8)c!=sector){c=255;b=255;a=255;}}
  if((s8)a!=*(s16*)(gUnk_02000710+0x85e)&&(s8)b!=*(s16*)(gUnk_02000710+0x85e)&&(s8)c!=*(s16*)(gUnk_02000710+0x85e))return;
  height=q->worldY;owner=*(u8**)((u8*)p+0x18);
@@ -34,11 +34,11 @@ void Actor_TryInteraction(struct G*p,struct Partner*q){
  if(*(u32*)(owner+0x1c)==4)return;
  if(q->request)sub_0821AD08(q->request,0);
  p->obj.x=q->x;p->obj.y=q->y;p->obj.z=q->z;p->handle=q->handle;p->gap6a=q->option;
- if(q->flags&16){p->oldMode=p->mode;{register u32 mode asm("r2")=1;p->mode=mode;}
+ if(q->flags&16){p->oldMode=p->mode;{u32 mode=1;p->mode=mode;}
  {register u32 raw asm("r1")=*(u16*)((u8*)p+0xf5a);register u32 mask asm("r2")=15;*(u16*)((u8*)p+0xf5a)=(mask&raw)|0x30;
  if(p->oldMode==3){register u32 bits asm("r0")=mode_bits((u8*)p+0xf5a,mask);if(bits==3){p->savedFrame=p->anim.frame;p->savedTimer=p->anim.timer;}}}
  {register u32 one asm("r1")=1;register u32 flags asm("r2")=p->flags;p->flags=one|flags;{register void (*fn)(void*,void*) asm("r2")=sub_081E574C;q->fn=fn;}one|=q->flags;q->flags=one;}sub_081E4174(p);}
- else{p->oldMode=p->mode;{register u32 mode asm("r2")=1;p->mode=mode;}
+ else{p->oldMode=p->mode;{u32 mode=1;p->mode=mode;}
  {register u32 raw asm("r1")=*(u16*)((u8*)p+0xf5a);register u32 mask asm("r2")=15;*(u16*)((u8*)p+0xf5a)=(mask&raw)|0x20;
  if(p->oldMode==3){register u32 bits asm("r0")=mode_bits((u8*)p+0xf5a,mask);if(bits==3){p->savedFrame=p->anim.frame;p->savedTimer=p->anim.timer;}}}
  {register u32 one asm("r1")=1;register u32 flags asm("r2")=p->flags;p->flags=one|flags;{register void (*fn)(void*,void*) asm("r2")=sub_081E5648;q->fn=fn;}one|=q->flags;q->flags=one;}sub_081E44D4(p);}

@@ -8,7 +8,7 @@ void sub_08221110(void*,void*,void*,int,int);int Mod(int,int);void sub_0800FA5C(
 static inline int randomValue(void){gUnk_03005308=(gUnk_03005308+1)&1023;return gUnk_0203B400[gUnk_03005308];}
 static inline int scale(int n){return n>=0?n>>12:-((-n)>>12);}
 static inline void polar(struct Vec *v,int angle,int radius){v->x=scale(gUnk_086149C4[(angle+64)&255]*radius);v->y=0;v->z=scale(gUnk_086149C4[angle&255]*radius);}
-static inline void addPosition(struct Vec *d,struct Vec *s){register struct Vec *dst asm("r1")=d;register struct Vec *src asm("r2")=s;asm("" : : "r"(dst),"r"(src));{register u32 value asm("r0")=(u16)s->x;asm("" : : "r"(value));{register u32 other asm("r3")=(u16)d->x;asm("" : : "r"(other));value=value+other;}asm("" : "+r"(value));d->x=value;}dst->y+=src->y;dst->z+=src->z;}
+static inline void addPosition(struct Vec *d,struct Vec *s){struct Vec *dst=d;struct Vec *src=s;{u32 value=(u16)s->x;{register u32 other asm("r3")=(u16)d->x;value=value+other;}d->x=value;}dst->y+=src->y;dst->z+=src->z;}
 #define BoardPiece_Launch sub_08010454
 void BoardPiece_Launch(struct Manager *m,struct Piece *p,int delay){
  struct Vec delta;

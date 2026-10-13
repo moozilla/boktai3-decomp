@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 typedef struct Screen Screen;
 struct Screen {
  u8 task[24];u16 id;u8 flags,bg;u16 mapId,paletteId;u16 *buffer,*source;u16 dirty,delay;
@@ -17,7 +16,7 @@ void sub_082160B8(int,int,void*,int,int,int,int,void*);void sub_0800ECD0(Screen*
 #define StatusScreen_Initialize sub_0800F220
 int StatusScreen_Initialize(Screen *p,u16 id){
  int i;u8 *map,*palette;
- gUnk_02000044=p;{register u16 *flags asm("r3")=&gUnk_03004BD8;asm("" : "+r"(flags));{register int mask asm("r0")=~256;asm("" : "+r"(mask));mask&=*flags;asm("" : "+r"(mask));*flags=mask;}}p->id=id;
+ gUnk_02000044=p;{u16 *flags=&gUnk_03004BD8;{int mask=~256;mask&=*flags;*flags=mask;}}p->id=id;
  p->flags=sub_0821ABA8('f',0);p->mapId=0x5AF3;p->paletteId=sub_0821ABA8('p',0);
  p->buffer=gUnk_03005160;p->script=sub_0821ABA8('e',0);
  if(Script_SeekToKeyword('a')){p->argv=p->values;for(i=0;i<8&&Script_GetPc();i++)p->argv[i]=Script_GetValue();p->argc=i;}else p->argc=0;
@@ -32,7 +31,7 @@ int StatusScreen_Initialize(Screen *p,u16 id){
  p->source=(u16*)(palette+0x1B4);
  {u32 zero=0;CpuSet(&zero,p->buffer,0x05000018);}
  *(volatile u16*)0x04000008|=0x40;p->delay=sub_0821ABA8('w',0);
- {register void(*state)(Screen*) asm("r1")=sub_0800ECD0;asm("" : : "r"(state));p->state=state;}p->timer=0;p->start=0;p->end=16;p->blend=0x1084;p->fade=0;p->fadeStep=1;p->effect=0;
+ {register void(*state)(Screen*) asm("r1")=sub_0800ECD0;p->state=state;}p->timer=0;p->start=0;p->end=16;p->blend=0x1084;p->fade=0;p->fadeStep=1;p->effect=0;
  {u32 zero=0;CpuSet(&zero,p->rows,0x05000091);}
  p->active=0;p->amplitude=1024;p->delta=1;p->top=0;p->bottom=160;p->noise=0;p->dirty=15;return 0;
 }

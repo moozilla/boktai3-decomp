@@ -45,7 +45,7 @@ static inline void setOperation(struct Engine *p, int op, int zero) {
 void sub_0824923C(void *, void *);
 void sub_08249238(void *);
 void sub_080363D0(struct Engine *p) {
-  register int lost asm("r6") = 0;
+  int lost = 0;
   if (p->mask & 2) {
     struct RfuSlotStatusNI **slots = gUnk_03006A70;
     u8 *slot = &p->index;
@@ -61,8 +61,8 @@ void sub_080363D0(struct Engine *p) {
       if (callback)
         sub_08249238(callback);
       {
-        register struct NIComm *send asm("r2") = &slots[*slot]->send;
-        register u8 *original asm("r0") = &send->bmSlotOrg;
+        struct NIComm *send = &slots[*slot]->send;
+        u8 *original = &send->bmSlotOrg;
         register int old asm("r3") = *original;
         {
           register int current asm("r0") = send->bmSlot;

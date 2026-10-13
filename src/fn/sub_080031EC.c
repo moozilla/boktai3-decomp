@@ -37,7 +37,7 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
         }
     }
     if(Script_SeekToKeyword('d')) {
-        register s32 i asm("r6")=0;u16 **out=p->destination;
+        s32 i=0;u16 **out=p->destination;
         while(Script_GetPc() && i<=3) {
             s32 value=Script_GetValue();
             if(value!=0x30)*out=(u16 *)(sub_0821A520(0x92B3,value)+20);else *out=0;

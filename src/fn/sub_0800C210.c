@@ -12,10 +12,10 @@ struct Context {struct Vec world,lower,upper,actorLower,actorUpper;};
 extern s16 gUnk_086149C4[];extern u32 gUnk_02000560;struct AnimId{u16 id,pad;};extern struct AnimId gUnk_08604A30[][3];extern u32 gUnk_08604A60[];extern void (*gUnk_08604A54[])(void *,u32);
 s32 sub_082215E4(s32,s32);void sub_08220C8C(void *,void *,u32,u32,u32);void sub_0822B3BC(u32);
 extern u32 gUnk_03005308;extern u16 gUnk_0203B400[];void sub_0800A80C(struct Manager *,struct Effect *);
-static inline u32 randomValue(s32 reverse){register u32 offset asm("r0");gUnk_03005308=(gUnk_03005308+1)&1023;offset=gUnk_03005308*2;asm("" : : "r"(offset));if(reverse){register u16 *table asm("r2")=gUnk_0203B400;asm("" : : "r"(table));return *(u16 *)(offset+(u32)table);}return *(u16 *)(offset+(u32)gUnk_0203B400);}
+static inline u32 randomValue(s32 reverse){u32 offset;gUnk_03005308=(gUnk_03005308+1)&1023;offset=gUnk_03005308*2;if(reverse){register u16 *table asm("r2")=gUnk_0203B400;return *(u16 *)(offset+(u32)table);}return *(u16 *)(offset+(u32)gUnk_0203B400);}
 #define EffectParticle_UpdateDissipating sub_0800C210
 void EffectParticle_UpdateDissipating(struct Manager *manager,struct Effect *effect,s32 index,s32 phase){
-struct Particle *p=&effect->particles[index];struct Vec *origin=&p->origin;struct Sprite *sprite=&p->sprite,*o;register u8 *angle asm("r6")=&p->angle;struct Anim *a;const u16 *entry;register u16 n asm("r0");s32 difference;asm("" : "+r"(angle));
+struct Particle *p=&effect->particles[index];struct Vec *origin=&p->origin;struct Sprite *sprite=&p->sprite,*o;register u8 *angle asm("r6")=&p->angle;struct Anim *a;const u16 *entry;register u16 n asm("r0");s32 difference;
 if((index&1)==phase){
  difference=sub_082215E4(origin->x-sprite->position.x,origin->z-sprite->position.z)-p->angle;
  if(p->drift<0){if((difference<0?-difference:difference)<=4)*angle=p->angle+difference;else *angle=p->angle+4;
@@ -28,10 +28,10 @@ if((index&1)==phase){
 }
 sprite->position.x=sprite->position.x+p->velocity.x;
 sprite->position.z=sprite->position.z+p->velocity.z;
- o=&p->sprite;{register struct Manager *m asm("r4")=manager;register struct Graphics *graphics asm("r3");asm("" : : "r"(m));graphics=m->graphics;asm("" : : "r"(graphics));a=&p->anim;entry=a->data+a->frame;
- {register u32 factor asm("r2")=*entry>>6;asm("" : : "r"(factor));o->tile=(o->width>>3)*(o->height>>3)*factor+graphics->base;}}
+ o=&p->sprite;{register struct Manager *m asm("r4")=manager;struct Graphics *graphics;asm("" : : "r"(m));graphics=m->graphics;a=&p->anim;entry=a->data+a->frame;
+ {u32 factor=*entry>>6;o->tile=(o->width>>3)*(o->height>>3)*factor+graphics->base;}}
  {u32 input=a->flags;register u32 mask asm("r3")=1; register u32 left asm("r1")=(u8)(input&mask); if(left!=(((*entry&0x30)>>4)&mask))p->sprite.flags|=4;else p->sprite.flags&=~4;}
- {register u32 input asm("r0")=a->flags;register u32 mask asm("r3")=2; register u32 left asm("r1")=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
+ {register u32 input asm("r0")=a->flags;u32 mask=2; u32 left=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
  n=++a->timer;
  if(n>=a->rate) {
  a->timer=0;

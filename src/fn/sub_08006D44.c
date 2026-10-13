@@ -16,7 +16,7 @@ struct Menu *ChoiceMenu_CreateFromScript(void)
     s32 stringBase,script;
     struct Menu *p;
     s32 i;
-    register s32 *argumentBase asm("r5");
+    s32 *argumentBase;
     if(gUnk_0200002C)return 0;
     if(Script_SeekToKeyword('r'))window=sub_08227E90();else window=0;
     stringBase=sub_0821ABA8('i',0);
@@ -29,14 +29,14 @@ struct Menu *ChoiceMenu_CreateFromScript(void)
         options[3]=defaults[0];options[4]=defaults[1];options[5]=defaults[2];options[6]=defaults[3];
     }else{options[3]=0;options[4]=0;options[5]=24;options[6]=3;}
     if(Script_SeekToKeyword('A')){
-        register s32 *arg asm("r4");argumentBase=arguments;arg=argumentBase;
-        do {s32 value=Script_GetPc();if(value)value=Script_GetValue();*arg=value;asm("" : : "r"(arg));arg++;}while((s32)arg<=({register s32 limit asm("r0")=(s32)argumentBase;asm("" : "+r"(limit));limit+12;}));
-    }else {s32 *arg;register s32 zero asm("r2");register s32 *begin asm("r1");argumentBase=arguments;begin=argumentBase;asm("" : "+r"(begin));zero=0;asm("" : : "r"(zero));arg=arguments+3;do{*arg=zero;arg--;}while((s32)arg>=(s32)begin);}
+        s32 *arg;argumentBase=arguments;arg=argumentBase;
+        do {s32 value=Script_GetPc();if(value)value=Script_GetValue();*arg=value;asm("" : : "r"(arg));arg++;}while((s32)arg<=({register s32 limit asm("r0")=(s32)argumentBase;limit+12;}));
+    }else {s32 *arg;s32 zero;s32 *begin;argumentBase=arguments;begin=argumentBase;asm("" : "+r"(begin));zero=0;arg=arguments+3;do{*arg=zero;arg--;}while((s32)arg>=(s32)begin);}
     p=sub_08219FBC(11,0x1E8);
     if(p){
         sub_0821A04C(p,sub_080066C0,sub_08006710);
         p->useScript=1;p->script=script;
-        {register s32 *source asm("r3")=argumentBase;u32 *destination=p->arguments;for(i=3;i>=0;i--)*destination++=*source++;}
+        {s32 *source=argumentBase;u32 *destination=p->arguments;for(i=3;i>=0;i--)*destination++=*source++;}
         if(sub_08006B60(p,window,stringBase,options)<0){sub_0821A0C0(p);return 0;}
     }
     return p;

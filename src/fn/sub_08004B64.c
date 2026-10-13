@@ -18,35 +18,33 @@ void Scene_SpawnDirectionalDust(struct Actor *input)
     register struct Actor *actor asm("r10")=input;
     struct Size size;
     struct Vec point;
-    register struct Vec *particle asm("r6");
+    struct Vec *particle;
     s32 i;
     register const u16 *table asm("r4");
     register u32 *cursor asm("r9");
-    register u32 mask asm("r8");
-    asm("" : "+r"(actor));
+    u32 mask;
     size.x=32;size.y=0;size.z=32;
     particle=&point;
     table=gUnk_0203B400;cursor=&gUnk_03005308;
     i=({register s32 count asm("r1");asm("" : "=r"(count) : "0"(2));count;});mask=1023;
     do {
         register u32 index asm("r2");
-        register struct Actor *local asm("r2")=actor;
+        struct Actor *local=actor;
 
-        register const u16 *random asm("r0");
+        const u16 *random;
 
-        asm("" : "+r"(local));
         point=local->position;
         switch(local->direction){
         case 0:
             random=FIRST();
             {
-                register u32 value asm("r1")=scatter((u8 *)random,&particle->xy.half.x);
+                u32 value=scatter((u8 *)random,&particle->xy.half.x);
                 u32 low=(u16)value;
                 point.xy.word=(point.xy.word&0xFFFF0000)|low;
             }
-            {register const u16 *second asm("r2")=LAST();
+            {const u16 *second=LAST();
             {
-                register u32 value asm("r1")=frontEdge(*second,point.zp.half.z);
+                u32 value=frontEdge(*second,point.zp.half.z);
                 u32 low=(u16)value;
                 point.zp.word=(point.zp.word&0xFFFF0000)|low;
                 }
@@ -55,13 +53,13 @@ void Scene_SpawnDirectionalDust(struct Actor *input)
         case 1:
             random=FIRST();
             {
-                register u32 value asm("r1")=backEdge(*random,particle->xy.half.x);
+                u32 value=backEdge(*random,particle->xy.half.x);
                 u32 low=(u16)value;
                 point.xy.word=(point.xy.word&0xFFFF0000)|low;
             }
-            {register const u16 *second asm("r2")=LAST();
+            {const u16 *second=LAST();
             {
-                register u32 value asm("r1")=scatter((u8 *)second,&point.zp.half.z);
+                u32 value=scatter((u8 *)second,&point.zp.half.z);
                 u32 low=(u16)value;
                 point.zp.word=(point.zp.word&0xFFFF0000)|low;
                 }
@@ -74,9 +72,9 @@ void Scene_SpawnDirectionalDust(struct Actor *input)
                 u32 low=(u16)value;
                 point.xy.word=(point.xy.word&0xFFFF0000)|low;
             }
-            {register const u16 *second asm("r2")=LAST();
+            {const u16 *second=LAST();
             {
-                register u32 value asm("r1")=backEdge(*second,point.zp.half.z);
+                u32 value=backEdge(*second,point.zp.half.z);
                 u32 low=(u16)value;
                 point.zp.word=(point.zp.word&0xFFFF0000)|low;
                 }
@@ -89,7 +87,7 @@ void Scene_SpawnDirectionalDust(struct Actor *input)
                 u32 low=(u16)value;
                 point.xy.word=(point.xy.word&0xFFFF0000)|low;
             }
-            {register const u16 *second asm("r2")=LAST();
+            {const u16 *second=LAST();
             {
                 register u32 value asm("r1")=scatter((u8 *)second,&point.zp.half.z);
                 u32 low=(u16)value;

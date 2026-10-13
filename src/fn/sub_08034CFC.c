@@ -59,7 +59,6 @@ int sub_08034CFC(struct Engine *p) {
   bits = p->mask;
   if (!(bits & 64))
     goto receive;
-  asm("" : "+r"(bits));
   if (bits & 0x338)
     goto receive;
   {
@@ -67,15 +66,13 @@ int sub_08034CFC(struct Engine *p) {
     register int value asm("r1");
     asm("" : "+r"(literal));
     value = literal;
-    asm("" : "+r"(value));
     value |= bits;
     p->mask = value;
   }
 receive:;
   if (gUnk_03006A70[p->mode]->recv.state == 0x46) {
-    register u8 *base asm("r0") = (u8 *)p + p->mode * 4;
+    u8 *base = (u8 *)p + p->mode * 4;
     u8 *message;
-    asm("" : "+r"(base));
     message = base + 0xA8;
     if (*message) {
       *message = 0;
@@ -85,12 +82,10 @@ receive:;
   }
   bits = p->mask;
   if ((bits & 96) == 96) {
-    register int mask asm("r0") = 0xFFDF;
-    register int second asm("r1");
-    asm("" : "+r"(mask));
+    int mask = 0xFFDF;
+    int second;
     mask &= bits;
     second = 0xFFBF;
-    asm("" : "+r"(second));
     mask &= second;
     p->mask = mask;
     p->flag35 |= gUnk_03006A80->connSlotFlag | gUnk_03006A80->linkLossSlotFlag;

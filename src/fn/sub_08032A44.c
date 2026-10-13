@@ -37,14 +37,12 @@ plain:
     goto next;
   }
   if (c == 31) {
-    register u32 code asm("r1") = (u16)sub_08032070(s);
-    asm("" : "+r"(code));
+    u32 code = (u16)sub_08032070(s);
     if (code == 0xFFFF) {
       glyph = *s - 32;
       sub_08031F58(p, glyph);
     } else if (code & 0xFF00) {
-      register u32 mask asm("r0") = 0x7FFF;
-      asm("" : "+r"(mask));
+      u32 mask = 0x7FFF;
       code &= mask;
       sub_08031FA0(p, code);
     } else
@@ -62,8 +60,7 @@ wide: {
   asm("" ::: "memory");
   low = *s;
   {
-    register u32 mask asm("r0") = 0x7F;
-    asm("" : "+r"(mask));
+    u32 mask = 0x7F;
     c = mask & low;
   }
   s++;
@@ -81,7 +78,6 @@ next:
 test:
   c = *s;
   c <<= 24;
-  asm("" : "+r"(c));
   if ((s32)c < 0)
     goto wide;
   c >>= 24;

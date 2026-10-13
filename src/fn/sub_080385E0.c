@@ -19,17 +19,15 @@ extern struct TradeSave *gUnk_02000710;
 extern u32 gUnk_03003A50;
 extern u16 gUnk_03005260[];
 void sub_080385E0(struct TradeMenu *p) {
-  register struct TradeSave *save asm("r2") = gUnk_02000710;
+  struct TradeSave *save = gUnk_02000710;
   register s16 *selected asm("r1") = &save->leftSelected;
   int row, item;
-  asm("" : "+r"(selected), "+r"(save), "+r"(p));
   row = *selected;
   if (row > 7) {
     item = *(s16 *)((u8 *)save + row * 2 + 0x68);
     if (item >= 0)
       p->extraMask &= ~(1 << item);
   } else {
-    asm("" ::: "memory");
     item = *(s16 *)((u8 *)save + *selected * 2 + 0x68);
     p->leftMask &= ~(1 << item);
   }

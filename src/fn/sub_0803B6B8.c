@@ -8,7 +8,7 @@ int sub_0803B3B4(void *);
 int sub_0803B40C(void *);
 void sub_0821A0C0(void *);
 void *sub_0803B6B8(void) {
-  register void *result asm("r0") = sub_0803AD30();
+  void *result = sub_0803AD30();
   register void *p asm("r4") = result;
   asm("" : : "r"(p));
   if (!p) {
@@ -22,6 +22,5 @@ void *sub_0803B6B8(void) {
     }
     result = p;
   }
-  asm("" : "+r"(result));
   return result;
 }

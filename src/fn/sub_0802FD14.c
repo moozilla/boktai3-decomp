@@ -94,7 +94,6 @@ int sub_0802FD14(struct Actor *p) {
   struct Path *path = (struct Path *)p->path;
   struct Node *node;
   int dx, result;
-  asm("" : "+r"(path));
   node = path->node;
   dx = node->x - p->pos.x;
   if (dx < 0)

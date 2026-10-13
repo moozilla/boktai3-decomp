@@ -16,7 +16,7 @@ void sub_0821FF24(void *,void *,s32);
 void sub_08215284(void *,u16);
 void sub_08221110(void *,u32,u32,s32,s32);
 static inline u8 ownerIsCurrent(u32 owner){if(*(u32 *)(gUnk_02000710+0x5A0)==owner)return 1;return 0;}
-static inline void disableCollision(u16 *flags){register u32 value asm("r1")=*flags;asm("" : "+r"(value));{register u32 result asm("r0")=value|4;asm("" : "+r"(result));*flags=result;}}
+static inline void disableCollision(u16 *flags){register u32 value asm("r1")=*flags;{u32 result=value|4;*flags=result;}}
 s32 SceneObjects_Update(struct Manager *manager)
 {
     struct Object *p=manager->objects;

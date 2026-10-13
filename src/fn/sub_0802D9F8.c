@@ -75,8 +75,7 @@ int sub_0802D9F8(void *unused, struct Actor *p) {
         p->timer = p->duration;
       else {
         register s16 *timer asm("r0") = &p->timer;
-        register int zero asm("r4");
-        asm("" : "+r"(timer));
+        int zero;
         zero = 0;
         asm("" : "+r"(zero));
         *timer = 0;

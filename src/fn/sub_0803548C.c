@@ -45,23 +45,21 @@ static inline void setOperation(struct Engine *p, int op, int zero) {
 }
 void sub_0824720C(u8);
 void sub_0803548C(struct Engine *argument) {
-  register struct Engine *p asm("r5") = argument;
-  register u8 *scratch asm("r10") = p->scratch;
-  register int i asm("r4");
-  register u8 *packet asm("r6");
+  struct Engine *p = argument;
+  u8 *scratch = p->scratch;
+  int i;
+  u8 *packet;
   register u8 *seen asm("r8");
   p->flag3e = 0;
   i = 0;
   packet = (u8 *)p + 0x80;
   do {
-    register int offset asm("r2") = i << 2;
+    int offset = i << 2;
     register int bit asm("r1") = 2 << i;
-    register int test asm("r0");
-    register u8 *initialSeen asm("r3");
-    asm("" : "+r"(offset));
+    int test;
+    u8 *initialSeen;
     {
       register u8 *read asm("r3") = scratch;
-      asm("" : "+r"(read));
       test = read[2] & bit;
     }
     {
@@ -69,22 +67,19 @@ void sub_0803548C(struct Engine *argument) {
       asm("" : "+r"(offset));
       initialSeen = (u8 *)(offset + (u32)p);
     }
-    asm("" : "+r"(initialSeen), "+r"(test));
     seen = initialSeen;
     if (test) {
       {
-        register struct RfuSlotStatusUNI **entry asm("r0") =
+        struct RfuSlotStatusUNI **entry =
             (struct RfuSlotStatusUNI **)(offset + (u32)gUnk_03006A60);
-        asm("" : "+r"(entry));
         if ((*entry)->recv.newDataFlag) {
           u8 *previous;
-          register int old asm("r3");
-          register int incoming asm("r2");
-          register int next asm("r0");
+          int old;
+          int incoming;
+          int next;
           register int zero asm("r9");
           bit |= *initialSeen;
           zero = 0;
-          asm("" : "+r"(zero));
           *initialSeen = bit;
           sub_0824720C(i);
           {
@@ -96,40 +91,32 @@ void sub_0803548C(struct Engine *argument) {
           }
           if (next != incoming) {
             {
-              register int previousValue asm("r0") = old;
+              int previousValue = old;
               asm("" : "+r"(previousValue));
               if (previousValue == incoming) {
                 {
                   register u8 *counter asm("r1") = (u8 *)p + 0xD4;
-                  asm("" : "+r"(counter));
                   counter += i;
-                  asm("" : "+r"(counter));
                   (*counter)++;
                 }
                 {
                   register int value asm("r2") = zero;
-                  asm("" : "+r"(value));
                   *(u16 *)(packet + 2) = value;
                 }
               } else if ((u32)previousValue < (u32)incoming) {
                 {
                   register u8 *counter asm("r1") = (u8 *)p + 0xDC;
-                  asm("" : "+r"(counter));
                   counter += i;
-                  asm("" : "+r"(counter));
                   (*counter)++;
                 }
                 {
                   register int value asm("r3") = zero;
-                  asm("" : "+r"(value));
                   *(u16 *)(packet + 2) = value;
                 }
               } else {
                 {
                   register u8 *counter asm("r1") = (u8 *)p + 0xD8;
-                  asm("" : "+r"(counter));
                   counter += i;
-                  asm("" : "+r"(counter));
                   (*counter)++;
                 }
               }
@@ -142,27 +129,22 @@ void sub_0803548C(struct Engine *argument) {
     packet += 4;
   } while (++i <= 3);
   {
-    register int got asm("r1") = *seen;
-    register int expected asm("r0");
+    int got = *seen;
+    int expected;
     register int saved asm("r3");
     register int matched asm("r2");
     u8 *sent;
     {
       register u8 *read asm("r2") = scratch;
-      asm("" : "+r"(read));
       expected = read[2];
     }
     saved = expected;
-    asm("" : "+r"(saved));
     matched = saved;
-    asm("" : "+r"(matched));
     matched &= got;
     got = expected;
-    asm("" : "+r"(got), "+r"(matched));
     sent = (u8 *)p + 0xE7;
     if (matched == got) {
       saved &= *sent;
-      asm("" : "+r"(saved));
       if (saved == matched)
         goto checkSent;
       {
@@ -171,27 +153,23 @@ void sub_0803548C(struct Engine *argument) {
       }
     }
     {
-      register u8 *read asm("r3");
-      register int value asm("r0") = *sent;
-      asm("" : "+r"(value));
+      u8 *read;
+      int value = *sent;
       read = scratch;
-      asm("" : "+r"(read));
       got = read[2];
       value &= got;
-      asm("" : "+r"(value));
       if (value != got)
         return;
     }
   checkSent: {
     register u8 *read asm("r2") = seen;
-    register int value asm("r0");
+    int value;
     asm("" : "+r"(read));
     value = *read;
     value &= got;
     asm("" : "+r"(value));
     if (value != got) {
-      register u8 *counter asm("r1") = (u8 *)p + 0xE5;
-      asm("" : "+r"(counter));
+      u8 *counter = (u8 *)p + 0xE5;
       (*counter)++;
     }
   }

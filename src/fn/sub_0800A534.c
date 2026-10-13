@@ -19,7 +19,7 @@ s32 CollisionController_InitManager(struct Manager *manager){
  else{
   struct Actor *actor;
   if(gUnk_02000478>0)goto pause;
-  actor=gUnk_02000580;if(actor){u32 *address=&actor->flags;register u32 mask asm("r1")=16;asm("" : : "r"(address),"r"(mask));if(*address&mask)goto pause;}
+  actor=gUnk_02000580;if(actor){u32 *address=&actor->flags;u32 mask=16;if(*address&mask)goto pause;}
   available=globalMode();
  }
  asm("" : : "r"(available));

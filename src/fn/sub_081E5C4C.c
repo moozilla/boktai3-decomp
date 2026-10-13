@@ -8,13 +8,13 @@ struct S {u8 p0[0xddc];struct Obj obj;u8 p1a[0xe08 - 0xdfc];u8 effect[0xe24 - 0x
 void sub_08220C8C(void *,u32,u32,u32,u32);
 void sub_081E4188(void *);void sub_08013440(void *);void sub_081E41EC(void *);
 static inline u8 take(struct S *p) {s32 m=1;register s32 v asm("r1")=p->flags;if(v&m) {p->flags=~m&v;p->done=0;return 1;}return 0;}
-static inline u32 mode_bits(u8 *p,u32 mask){register u32 v asm("r1")=*p;register u32 result asm("r0")=mask&v;return result;}
+static inline u32 mode_bits(u8 *p,u32 mask){register u32 v asm("r1")=*p;u32 result=mask&v;return result;}
 static inline u32 frame_factor(u16 v) {register u32 value asm("r1")=v;u32 mask=15;return mask&value;}
 void sub_081E4174(void*);void sub_08215284(void*,s32);void sub_0822B2F8(s32);void sub_0821AD08(void*,s32);void sub_08013424(void*);void sub_081E34D0(void*);
 void sub_081E5C4C(struct S *p) {
  struct Obj *o;struct Anim *a;const u16 *entry;u32 flag;register u16 n asm("r0");u8 done;
  if(take(p)) {
- u16 *first=(u16*)((u8*)p+0xed0);register s32 zero asm("r2");zero=0;*first=25;*(u16*)((u8*)p+0xed2)=102;*(u16*)((u8*)p+0xed4)=zero;
+ u16 *first=(u16*)((u8*)p+0xed0);s32 zero;zero=0;*first=25;*(u16*)((u8*)p+0xed2)=102;*(u16*)((u8*)p+0xed4)=zero;
  p->state=1;sub_08220C8C(&p->anim,p->arg,1,0,p->next);
  p->obj.flags&=~1;p->obj.flags|=48;
  p->obj.scaleY=64;p->obj.scaleX=64;sub_08013440(p->p2);
@@ -23,7 +23,7 @@ void sub_081E5C4C(struct S *p) {
  o=&p->obj;a=&p->anim;entry=a->data+a->frame;
  o->frame=*entry>>6;
  {u32 input=a->flags;register u32 mask asm("r3")=1; register u32 left asm("r1")=(u8)(input&mask); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=4;else o->flags&=~4;}
- {register u32 input asm("r0")=a->flags;register u32 mask asm("r3")=2; register u32 left asm("r1")=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
+ {register u32 input asm("r0")=a->flags;u32 mask=2; u32 left=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
  n=++a->timer;
  if(n>=a->rate) {
  a->timer=0;
@@ -40,7 +40,7 @@ void sub_081E5C4C(struct S *p) {
  a->rate=(a->factor*a->scale)>>6;if(!a->rate)a->rate=1;
  }else done=0;
  p->done=done; if(done) {
- p->oldMode=p->mode;{register u32 mode asm("r2")=3;p->mode=mode;}{register u32 raw asm("r1")=*(u16*)((u8*)p+0xf5a);register u32 mask asm("r2")=15;*(u16*)((u8*)p+0xf5a)=(mask&raw)|16;
+ p->oldMode=p->mode;{u32 mode=3;p->mode=mode;}{register u32 raw asm("r1")=*(u16*)((u8*)p+0xf5a);register u32 mask asm("r2")=15;*(u16*)((u8*)p+0xf5a)=(mask&raw)|16;
  if(p->oldMode==3){register u32 bits asm("r0")=mode_bits((u8*)p+0xf5a,mask);if(bits==3){p->savedFrame=p->anim.frame;p->savedTimer=p->anim.timer;}}}
  {register s32 mask asm("r0")=1;register s32 v asm("r1")=p->flags;p->flags=mask|v;}
  {register void *h asm("r2")=p->handle;if(h){p->handle=0;sub_0821AD08(h,0);}}

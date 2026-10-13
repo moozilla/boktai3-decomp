@@ -46,31 +46,29 @@ static inline void setOperation(struct Engine *p, int op, int zero) {
 void sub_0824720C(u8);
 void sub_08224E0C(void *, u8 *);
 int sub_0803536C(struct Engine *p) {
-  register u8 *scratch asm("r9") = p->scratch;
+  u8 *scratch = p->scratch;
   int result = 0;
   int slot;
   {
-    register struct RfuSlotStatusUNI **slots asm("r1") = gUnk_03006A60;
-    asm("" : "+r"(slots));
+    struct RfuSlotStatusUNI **slots = gUnk_03006A60;
     slot = p->index;
     if (slots[slot]->recv.newDataFlag) {
       u8 *packet = (u8 *)p + 0x90;
-      register u8 *previous asm("r8");
+      u8 *previous;
       u8 *sequence;
       register int last asm("r6");
-      register int next asm("r1");
-      register int received asm("r3");
+      int next;
+      int received;
       int i;
-      register u16 *flags asm("r3");
+      u16 *flags;
       u8 *changed;
       sub_0824720C(slot);
       {
         register u8 *initial asm("r0") = (u8 *)p + 0xD0;
-        register u8 *incoming asm("r2");
+        u8 *incoming;
         last = *initial;
         next = last + 1;
         incoming = (u8 *)p + 0x94;
-        asm("" : "+r"(incoming));
         next = (u8)next;
         received = *incoming;
         previous = initial;
@@ -81,18 +79,15 @@ int sub_0803536C(struct Engine *p) {
       } else {
         register int old asm("r0") = (u8)last;
         register u8 *counter asm("r1");
-        asm("" : "+r"(old));
         if (old == received)
           counter = (u8 *)p + 0xD4;
         else
           counter = (u8 *)p + 0xD8;
-        asm("" : "+r"(counter));
         (*counter)++;
       }
       {
         register int value asm("r0") = *sequence;
-        register int zero asm("r1") = 0;
-        asm("" : "+r"(value));
+        int zero = 0;
         *previous = value;
         (*packet)++;
         packet[1] = zero;
@@ -102,17 +97,14 @@ int sub_0803536C(struct Engine *p) {
       }
       do {
         register u8 *read asm("r6") = scratch;
-        asm("" : "+r"(read));
         if ((read[2] >> i) & 1)
           packet[1]++;
       } while (++i <= 4);
       {
-        register int value asm("r0") = *flags;
+        int value = *flags;
         register int zero asm("r1") = 0;
-        asm("" : "+r"(value), "+r"(zero));
         *(u16 *)(packet + 2) = value;
         value = 65535;
-        asm("" : "+r"(value));
         *flags = value;
         *changed = zero;
       }

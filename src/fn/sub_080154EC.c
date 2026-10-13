@@ -19,7 +19,7 @@ static inline u32 frame_factor(u16 v){register u32 value asm("r1")=v;u32 mask=15
 int AnimatedParticles_Create(int count,struct Vec*pos,struct Config*c){int i,emitted;u16*table;u32*index;
 if(gUnk_02000068)goto start;if(sub_0801548C(0,0))goto start;goto failure;
 success:return 0;
-start:emitted=0;i=0;table=gUnk_0203B400;index=&gUnk_03005308;asm("" : "+r"(table),"+r"(index));for(;i<=31;i++){
+start:emitted=0;i=0;table=gUnk_0203B400;index=&gUnk_03005308;for(;i<=31;i++){
  struct Piece*p=&gUnk_02000068->pieces[i];struct Obj*o=&p->sprite;
  if(!p->active){int pitch,yaw;struct Anim*a;register struct Anim*saved asm("r8");const u16*entry;register u16 n asm("r0");int done;
  p->active=1;p->pad1=c->type;p->timer=0;
@@ -33,13 +33,13 @@ start:emitted=0;i=0;table=gUnk_0203B400;index=&gUnk_03005308;asm("" : "+r"(table
  if(c->flags&2)o->flags|=16;else o->flags&=~16;
  p->direction.x=gUnk_086149C4[(yaw+64)&255];p->direction.y=gUnk_086149C4[pitch&255];p->direction.z=gUnk_086149C4[yaw&255];
  p->velocity.x=scale12(p->direction.x,p->horizontalScale);p->velocity.y=scale12(p->direction.y,p->verticalScale);p->velocity.z=scale12(p->direction.z,p->horizontalScale);
- if(p->pad1==5){sub_082151E4(p->resource,0x61f9);sub_08215284(p->resource,0x29f);setFrame(&p->sprite,32);a=&p->anim;sub_08220C8C(a,gUnk_02000068->resources[1],6,0,0);asm("" : : "r"(a),"i"(5));}
+ if(p->pad1==5){sub_082151E4(p->resource,0x61f9);sub_08215284(p->resource,0x29f);setFrame(&p->sprite,32);a=&p->anim;sub_08220C8C(a,gUnk_02000068->resources[1],6,0,0);}
  else if(p->pad1==6){sub_082151E4(p->resource,0x61f9);sub_08215284(p->resource,0x2a7);setFrame(&p->sprite,32);a=&p->anim;sub_08220C8C(a,gUnk_02000068->resources[1],6,0,0);asm("" : : "r"(a),"i"(6));}
  else if(p->pad1==7){sub_082151E4(p->resource,0x61f9);sub_08215284(p->resource,0x2a6);setFrame(&p->sprite,45);a=&p->anim;sub_08220C8C(a,gUnk_02000068->resources[1],8,0,0);asm("" : : "r"(a),"i"(7));}
  else{sub_082151E4(p->resource,0x4384);sub_08215284(p->resource,p->pad1+182);a=&p->anim;sub_08220C8C(a,gUnk_02000068->resources[0],0,0,0);}
 saved=a;asm("" : "+r"(saved));a=saved;entry=p->anim.data+a->frame;o->frame=*entry>>6;
- {register u32 input asm("r0")=a->flags;register u32 left asm("r2")=1;u32 mask=1;asm("" : : "r"(input));left&=input;asm("" : "+r"(left)); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=4;else o->flags&=~4;}
- {register u32 input asm("r0")=a->flags;register u32 mask asm("r3")=2; register u32 left asm("r1")=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
+ {u32 input=a->flags;register u32 left asm("r2")=1;u32 mask=1;left&=input;if(left!=(((*entry&0x30)>>4)&mask))o->flags|=4;else o->flags&=~4;}
+ {register u32 input asm("r0")=a->flags;u32 mask=2; u32 left=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
  n=++a->timer;
  if(n>=a->rate) {
  a->timer=0;

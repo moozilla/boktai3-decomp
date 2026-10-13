@@ -26,12 +26,10 @@ void sub_0821FE40(void *);
 void sub_08042798(void *, u32);
 void sub_0802C994(struct Object *);
 static inline void enable(struct Object *p) {
-  register struct Collision *c asm("r2") = &p->collider;
-  asm("" : "+r"(c));
+  struct Collision *c = &p->collider;
   {
     register u32 old asm("r1") = c->flags;
     register u32 result asm("r0");
-    asm("" : "+r"(old));
     result = old | 4;
     asm("" : "+r"(result));
     c->flags = result;
@@ -40,7 +38,6 @@ static inline void enable(struct Object *p) {
 static inline void disable(struct Object *p) {
   struct Collision *c = &p->collider;
   int mask = ~4;
-  asm("" : "+r"(c), "+r"(mask));
   c->flags &= mask;
 }
 void sub_0802CF74(struct Object *p) {

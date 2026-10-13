@@ -51,9 +51,9 @@ const u8 *sub_080335F4(struct TextWindow *, int);
 int sub_08033778(int id) {
   struct WindowManager *p = gUnk_020000E4;
   struct TextWindow *w;
-  register struct TextWindow **nextSlot asm("r3");
-  register struct TextWindow **prevSlot asm("r1");
-  register struct TextWindow *next asm("r2");
+  struct TextWindow **nextSlot;
+  struct TextWindow **prevSlot;
+  struct TextWindow *next;
   int result;
   if (!p)
     goto fail;
@@ -67,16 +67,13 @@ found:
   sub_08218E5C(w->x, w->y, w->width, w->height);
   w->callback = sub_08033AF0;
   {
-    register struct TextWindow **initial asm("r0") = &w->next;
-    asm("" : "+r"(initial) : : "r1");
+    struct TextWindow **initial = &w->next;
     next = *initial;
     nextSlot = initial;
-    asm("" : "+r"(next), "+r"(nextSlot));
   }
   if (next) {
-    register u32 offset asm("r0") = 0x1C8;
+    u32 offset = 0x1C8;
     register struct TextWindow **link asm("r2");
-    asm("" : "+r"(offset));
     link = (struct TextWindow **)((u8 *)next + offset);
     prevSlot = (struct TextWindow **)((u8 *)w + offset);
     *link = *prevSlot;
@@ -85,8 +82,8 @@ found:
     p->head = *prevSlot;
   }
   {
-    register struct TextWindow **last asm("r2") = prevSlot;
-    register struct TextWindow *previous asm("r1");
+    struct TextWindow **last = prevSlot;
+    struct TextWindow *previous;
     asm("" : "+r"(last));
     previous = *last;
     if (previous)

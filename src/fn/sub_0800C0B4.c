@@ -12,10 +12,10 @@ void sub_0800A80C(struct Manager *,struct Effect *);
 #define EffectParticle_UpdateFinish sub_0800C0B4
 void EffectParticle_UpdateFinish(struct Manager *manager,struct Effect *effect,s32 index){
 struct Particle *p=&effect->particles[index];struct Sprite *sprite=&p->sprite,*o;struct Anim *a;const u16 *entry;register u16 n asm("r0");u8 done;
- o=sprite;{register struct Graphics *graphics asm("r3")=manager->graphics;asm("" : : "r"(graphics));a=&p->anim;entry=a->data+a->frame;
- {register u32 factor asm("r2")=*entry>>6;asm("" : : "r"(factor));o->tile=(o->width>>3)*(o->height>>3)*factor+graphics->base;}}
+ o=sprite;{struct Graphics *graphics=manager->graphics;a=&p->anim;entry=a->data+a->frame;
+ {u32 factor=*entry>>6;o->tile=(o->width>>3)*(o->height>>3)*factor+graphics->base;}}
  {u32 input=a->flags;register u32 mask asm("r3")=1; register u32 left asm("r1")=(u8)(input&mask); if(left!=(((*entry&0x30)>>4)&mask))p->sprite.flags|=4;else p->sprite.flags&=~4;}
- {register u32 input asm("r0")=a->flags;register u32 mask asm("r3")=2; register u32 left asm("r1")=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
+ {register u32 input asm("r0")=a->flags;u32 mask=2; u32 left=(u8)(mask&input); if(left!=(((*entry&0x30)>>4)&mask))o->flags|=8;else o->flags&=~8;}
  n=++a->timer;
  if(n>=a->rate) {
  a->timer=0;

@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct P {
     u8 pad[0x1e];
     u16 round;
@@ -37,7 +36,7 @@ void sub_08038E48(struct P *p)
         int side;
         u32 money;
         u8 *left;
-        register u8 *right asm("r4");
+        u8 *right;
         p->entered=0;
         p->done=0;
         offset=(p->round-1)*720;

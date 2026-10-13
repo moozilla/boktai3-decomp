@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Engine {
   u8 pad0[0x18];
@@ -51,7 +50,6 @@ int sub_080360C8(struct Engine *p) {
     p->pending = 0;
   {
     struct RfuSlotStatusNI **slots = gUnk_03006A70;
-    asm("" : "+r"(slots));
     slot = &p->mode;
     state = slots[*slot]->recv.state;
   }

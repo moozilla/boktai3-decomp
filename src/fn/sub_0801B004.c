@@ -14,13 +14,13 @@ void SelectionMenu_ReviewChoice(u8 *p) {
  if(sub_08019F2C(p)) {
   g=(Graphic *)(p+0xd34);
   sub_0821980C(p+0x194,p+0x4c,0x4d,0);sub_08033468();
-  {register u8 *result asm("r2")=p+0xd94;asm("" : "+r"(result));sub_08019E70(p,g,result);}
+  {register u8 *result asm("r2")=p+0xd94;sub_08019E70(p,g,result);}
   g->flags&=~1;g->x=104;g->y=40;p[0x20]=0;
   sub_0821980C(p+0x254,p+0x4c,0x4b,0);
   *(u32 *)(p+0x25c)&=~1;
   sub_08030F20(0,16,30,2);
   sub_08030C84(*(u32 *)(p+0xdb0));
-  {Actor *actor=&gUnk_08E6092C[p[0xd94]];asm("" : "+r"(actor));if(*(s16 *)(gUnk_02000710+0x40)>=actor->level || sub_0822D044(0x29))
+  {Actor *actor=&gUnk_08E6092C[p[0xd94]];if(*(s16 *)(gUnk_02000710+0x40)>=actor->level || sub_0822D044(0x29))
    sub_08030DBC(1);
   else sub_08030DBC(2);}
   ((Graphic *)(p+0x5b4))->flags|=1;sub_08033468();
@@ -29,7 +29,7 @@ void SelectionMenu_ReviewChoice(u8 *p) {
   if(gUnk_03005260[1]&1) {if(++p[0x24]>2)p[0x24]=0;sub_0822B2F8(0xdc);}
  } else {
   sub_0801A1A4(p);
-  {int keys=gUnk_03005260[1],mask;asm("" : "+r"(keys));mask=1;asm("" : "+r"(mask));if(mask&keys) {
+  {int keys=gUnk_03005260[1],mask;mask=1;asm("" : "+r"(mask));if(mask&keys) {
    if(!p[0x20]) {sub_0822B2F8(0xdd);sub_08019F18(p,sub_0801B274);return;}
    goto back;
   } else if(2&keys) {

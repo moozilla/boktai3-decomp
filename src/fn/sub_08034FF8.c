@@ -49,12 +49,11 @@ void sub_08036BD4(int);
 void sub_08224CA4(void);
 extern u16 gUnk_03005260[];
 static inline void requestUpdate(struct Engine *p) {
-  register int flags asm("r1") = p->mask;
+  int flags = p->mask;
   register int mask asm("r3") = 256;
   register int value asm("r2");
   asm("" : "+r"(flags), "+r"(mask));
   value = mask;
-  asm("" : "+r"(value));
   value |= flags;
   value |= 1;
   asm("" : "+r"(value));
@@ -65,7 +64,6 @@ static inline void requestUpdateB(struct Engine *p, int flags) {
   register int value asm("r1");
   asm("" : "+r"(mask));
   value = mask;
-  asm("" : "+r"(value));
   value |= flags;
   value |= 1;
   asm("" : "+r"(value));
@@ -87,7 +85,6 @@ int sub_08034FF8(struct Engine *p) {
     struct RfuSlotStatusNI **slots = gUnk_03006A70;
     register u8 *initial asm("r3") = &p->index;
     int state;
-    asm("" : "+r"(initial));
     state = slots[*initial]->recv.state;
     slot = initial;
     if (state == 0x46) {
@@ -111,7 +108,6 @@ int sub_08034FF8(struct Engine *p) {
   flags = p->mask;
   if (!(flags & 64))
     goto send;
-  asm("" : "+r"(flags));
   if (flags & 40)
     goto send;
   requestUpdateB(p, flags);
@@ -123,21 +119,19 @@ send:;
       int one = 1;
       asm("" : "+r"(one));
       {
-        register int test asm("r1") = one & flags;
-        asm("" : "+r"(test));
+        int test = one & flags;
         if (!test)
           goto maybeComplete;
         {
-          register int cancel asm("r0") = 256 & flags;
+          int cancel = 256 & flags;
           asm("" : "+r"(cancel));
           data = (u8 *)&p->number;
           if (cancel) {
             int bits;
-            register int mask asm("r0");
+            int mask;
             *data = 1;
             bits = p->mask;
             mask = 0xFEFF;
-            asm("" : "+r"(mask));
             mask &= bits;
             mask |= 8;
             p->mask = mask;
@@ -161,11 +155,9 @@ send:;
   }
   {
     struct RfuSlotStatusNI **slots = gUnk_03006A70;
-    register int index asm("r3");
-    register int state asm("r1");
-    asm("" : "+r"(slots));
+    int index;
+    int state;
     index = *slot;
-    asm("" : "+r"(index));
     state = slots[index]->send.state;
     if (state == 0x26) {
       rfu_clearSlot(4, index);
@@ -182,17 +174,15 @@ send:;
 complete:
   flags = p->mask;
   if ((flags & 96) == 96) {
-    register int value asm("r0") = 0xFFDF;
+    int value = 0xFFDF;
     register u8 zeroByte asm("r4");
-    register u32 zeroWord asm("r5");
+    u32 zeroWord;
     register int second asm("r1");
-    asm("" : "+r"(value));
     value &= flags;
     zeroByte = 0;
     zeroWord = 0;
     asm("" : "+r"(zeroByte), "+r"(zeroWord));
     second = 0xFFBF;
-    asm("" : "+r"(second));
     value &= second;
     p->mask = value;
     sub_08224CA4();

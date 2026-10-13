@@ -26,45 +26,37 @@ void sub_0803A9CC(struct Display*arg) {
   if(p->entered) {
     p->entered=0;
     q=p->drawings;
-    asm("" : "+r"(q));
     sub_0821980C(q,p->resource,9,0);
     q->flags&=~1;
     sub_0822B2F8(1452);
   }
   if(p->timer<=7) {
-    register u16*table asm("r5");
-    register u32*state asm("r2");
+    u16*table;
+    u32*state;
     register u32 limit asm("r4");
     register u32 index asm("r0");
-    register int value asm("r1");
+    int value;
     register int mask asm("r3");
     q=p->drawings;
-    asm("" : "+r"(q));
     table=gUnk_0203B400;
     state=&gUnk_03005308;
-    asm("" : "+r"(table),"+r"(state));
     index=*state+1;
     limit=1023;
     index&=limit;
-    asm("" : "+r"(index));
     *state=index;
     value=table[index];
     mask=3;
-    asm("" : "+r"(value),"+r"(mask));
     value&=mask;
     value-=2;
     q->x=value;
     index=(index+1)&limit;
     *state=index;
     index=table[index]&mask;
-    asm("" : "+r"(index));
     index-=2;
     q->y=index;
   }
-  asm("" ::: "memory");
   if(p->timer==8) {
     q=p->drawings;
-    asm("" : "+r"(q));
     q->x=0;
     q->y=0;
   }

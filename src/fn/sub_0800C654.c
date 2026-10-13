@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Vec {s16 x,y,z,pad;};
 struct PackedVec {s32 x:16,y:16,z:16,pad:16;};
 struct Sprite {u32 flags;u8 pad4[12];u16 frame;u8 pad12[10];struct Vec position;u8 tail[8];};
@@ -9,7 +8,7 @@ void sub_0821FEB4(void *,u32,u32,u32,u32,void *,void *);void sub_0821FF84(void *
 void sub_082151E4(void *,u32);void sub_082144A4(void *,void *,u32);void sub_08215284(void *,u32);void sub_080135E8(void *,void *,u32);void sub_0800C49C(void);
 #define EffectEmitter_Initialize sub_0800C654
 s32 EffectEmitter_Initialize(struct Object *object,u32 id){
-struct PackedVec position,size,offset;void *collision;void *resource;struct Sprite *sprite;register u32 zero asm("r4")=0;asm("" : : "r"(zero));
+struct PackedVec position,size,offset;void *collision;void *resource;struct Sprite *sprite;u32 zero=0;
 *(u16 *)&object->task[24]=id;
 object->maximum=sub_0821ABA8(108,200);object->health=1;object->cooldown=zero;
 object->count=sub_0821ABA8(110,4);object->kind=sub_0821ABA8(101,50);

@@ -3,7 +3,6 @@
 #define Presentation_Update sub_081E2B50
 #define Presentation_ClearTilemap sub_081E2D74
 // Provisional name: Presentation_Update
-// MATCHING_CONCESSION: register-pinning
 struct Sequence {u8 p0[0x18];u8 resource[0x20];u8 layer0[8];u32 flags0;u8 p1[0x98-0x44];u8 layer1[8];u32 flags1;u8 p2[0xb8-0xa4];s16 x1,y1;u8 p3[0xf8-0xbc];u8 layer2[8];u32 flags2;u8 p4[0x158-0x104];u8 layer3[8];u32 flags3;u8 p5[0x178-0x164];s16 x3,y3;u8 p6[0x1b8-0x17c];u8 layer4[8];u32 flags4;u8 p7[0x21c-0x1c4];u16 option,state,timer;u8 p9[2];u16 frame,last,frameTimer,duration,result,exitTimer;void*handle;void(*callback)(void*);};
 void sub_0821980C(void*,void*,s32,s32);void sub_08220D78(void*,void*,s32,s32,s32);void sub_081E28D4(void*);void Presentation_ClearTilemap(void);
 extern u16 gUnk_03005260[];extern u16 gUnk_03004FC0;
@@ -31,5 +30,5 @@ s32 Presentation_Update(struct Sequence*p){s32 value;struct Message message;
   }
   p->timer++;p->frameTimer++;
  }
- if(p->result==1){register u16 *dest asm("r2")=&gUnk_03004FC0;register u32 value asm("r1")=0x1084;*dest=value;}
+ if(p->result==1){u16 *dest=&gUnk_03004FC0;u32 value=0x1084;*dest=value;}
 }

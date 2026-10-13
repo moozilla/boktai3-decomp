@@ -7,9 +7,8 @@ void sub_0821980C(u8 *,u8 *,u32,u32);
 void Presentation_SetItemGraphic(u8 *p,u8 *q,u32 item) {
  int index=sub_0822E104(item);
  if(index>=0) {
-  register int offset asm("r3")=index*16;register u8 *entry asm("r3");asm("" : "+r"(offset));entry=(u8 *)((u32)gUnk_08E60F80+offset);
-  asm("" : "+r"(entry));
-  {register u8 *context asm("r1")=p+0x6c;register int base asm("r0");register int resource asm("r2");asm("" : "+r"(context));base=0x121;asm("" : "+r"(base));resource=base;asm("" : "+r"(resource));{register int tile asm("r3")=entry[0];asm("" : "+r"(tile));resource+=tile;}sub_0821980C(q,context,resource,0);}
+  int offset=index*16;u8 *entry;entry=(u8 *)((u32)gUnk_08E60F80+offset);
+  {u8 *context=p+0x6c;register int base asm("r0");int resource;base=0x121;asm("" : "+r"(base));resource=base;asm("" : "+r"(resource));{register int tile asm("r3")=entry[0];resource+=tile;}sub_0821980C(q,context,resource,0);}
   *(u32 *)(q+8)&=~1;
  } else *(u32 *)(q+8)|=1;
 }

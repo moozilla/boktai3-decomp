@@ -16,7 +16,6 @@ int sub_0802D7E0(struct Object *p, int resource, int kind, int param,
   p->kind = kind;
   {
     register unsigned shifted asm("r2") = (unsigned)kind << 24;
-    asm("" : "+r"(shifted));
     kind = shifted >> 24;
   }
   if (kind == 1) {

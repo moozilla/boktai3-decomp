@@ -47,14 +47,14 @@ void sub_08038074(struct Menu *, int);
 void *sub_08227E90(void);
 int sub_080390C4(struct Menu *arg) {
     register struct Menu *p asm("r6") = arg;
-    register u16 *leftBase asm("r9");
-    register u16 *rightBase asm("r10");
+    u16 *leftBase;
+    u16 *rightBase;
     struct Locals {
         u8 *vec, *state, *entered, *v2b, *v2c, *v2d, *enabled, *v33, *counts;
     } local;
     int i;
     u8 *item;
-    register u16 *cursor asm("r4");
+    u16 *cursor;
     gUnk_020000FC = p;
     p->listener = sub_0821ABA8(101, 0);
     p->secondListener = sub_0821ABA8(114, 0);
@@ -69,33 +69,24 @@ int sub_080390C4(struct Menu *arg) {
         }
         {
             register u8 *a asm("r3") = &p->v2b;
-            register u8 *b asm("r0");
+            u8 *b;
             register u8 *c asm("r1");
-            asm("" : "+r"(a));
             local.v2b = a;
             b = &p->v2c;
-            asm("" : "+r"(b));
             local.v2c = b;
             c = &p->v2d;
-            asm("" : "+r"(c));
             local.v2d = c;
             a += 8;
-            asm("" : "+r"(a));
             local.v33 = a;
             b += 0xc0;
-            asm("" : "+r"(b));
             local.vec = b;
             c += 5;
-            asm("" : "+r"(c));
             local.enabled = c;
             a -= 11;
-            asm("" : "+r"(a));
             local.state = a;
             b -= 0xc3;
-            asm("" : "+r"(b));
             local.entered = b;
             c += 6;
-            asm("" : "+r"(c));
             local.counts = c;
         }
         cursor = leftBase;
@@ -114,45 +105,34 @@ int sub_080390C4(struct Menu *arg) {
             leftBase = (u16 *)(offset+(u32)p);
         }
         {
-            register u32 offset asm("r0") = 0xBC;
-            asm("" : "+r"(offset));
+            u32 offset = 0xBC;
             rightBase = (u16 *)(offset+(u32)p);
         }
         {
-            register u8 *a asm("r1") = &p->v2b;
+            u8 *a = &p->v2b;
             register u8 *b asm("r3");
-            register u8 *c asm("r0");
-            asm("" : "+r"(a));
+            u8 *c;
             local.v2b = a;
             b = &p->v2c;
-            asm("" : "+r"(b));
             local.v2c = b;
             c = &p->v2d;
-            asm("" : "+r"(c));
             local.v2d = c;
             a += 8;
-            asm("" : "+r"(a));
             local.v33 = a;
             b += 0xc0;
-            asm("" : "+r"(b));
             local.vec = b;
             c += 5;
-            asm("" : "+r"(c));
             local.enabled = c;
             a -= 11;
-            asm("" : "+r"(a));
             local.state = a;
             b -= 0xc3;
-            asm("" : "+r"(b));
             local.entered = b;
             c += 6;
-            asm("" : "+r"(c));
             local.counts = c;
             {
                 register u16 *end asm("r1") = leftBase;
-                register int zero asm("r2") = 0;
+                int zero = 0;
                 register u16 *cursor asm("r0");
-                asm("" : "+r"(end), "+r"(zero));
                 cursor = (u16 *)(c+0x62);
                 do {
                     *cursor = zero;
@@ -161,16 +141,15 @@ int sub_080390C4(struct Menu *arg) {
             }
         }
     }
-    asm("" ::: "memory");
     {
         register u32 count asm("r1") = p->count;
         if (count) {
-            register int r asm("r4");
+            int r;
             register int j asm("r5");
             r = gUnk_03003A50;
             j = 0;
             if ((u32)j<count) do {
-                register int index asm("r2");
+                int index;
                 register u32 mask asm("r1");
                 item = sub_08227F5C(leftBase[j]);
                 if (!*item) {
@@ -178,31 +157,27 @@ int sub_080390C4(struct Menu *arg) {
                     mask = p->leftMask;
                 } else {
                     index = 15;
-                    asm("" : "+r"(index));
                     index &= r;
                     if (!index)index = 1;
                     {
-                        register u32 bit asm("r0") = 1 << index;
-                        asm("" : "+r"(bit));
+                        u32 bit = 1 << index;
                         mask = p->leftMask;
                         if (bit&mask) {
                             register int small asm("r8");
                             register int one asm("r12");
-                            register u32 used asm("r3");
+                            u32 used;
                             {
                                 register int x asm("r3") = 15;
                                 asm("" : "+r"(x));
                                 small = x;
                             }
                             {
-                                register int x asm("r0") = 1;
-                                asm("" : "+r"(x));
+                                int x = 1;
                                 one = x;
                             }
                             used = mask;
                             do {
                                 index = r;
-                                asm("" : "+r"(index));
                                 index &= small;
                                 if (!index)index = 1;
                                 r++;
@@ -215,15 +190,12 @@ int sub_080390C4(struct Menu *arg) {
                 {
                     register u32 *read asm("r1") = &gUnk_03005308;
                     register u32 *write asm("r3");
-                    register u32 x asm("r0");
-                    register u8 *table asm("r1");
-                    asm("" : "+r"(read));
+                    u32 x;
+                    u8 *table;
                     x = (*read+1)&1023;
                     write = &gUnk_03005308;
-                    asm("" : "+r"(write));
                     *write = x;
                     x <<= 1;
-                    asm("" : "+r"(x));
                     table = gUnk_0203B400;
                     r += *(u8 *)(x+(u32)table);
                 }
@@ -247,23 +219,21 @@ int sub_080390C4(struct Menu *arg) {
         } while ((s32)cursor <= (s32)(rightBase+7));
     } else {
         register u16 *end asm("r1") = rightBase;
-        register int zero asm("r2") = 0;
-        register u16 *cursor asm("r0");
-        asm("" : "+r"(end), "+r"(zero));
+        int zero = 0;
+        u16 *cursor;
         cursor = rightBase+7;
         do {
             *cursor = zero;
             cursor--;
         } while ((s32)cursor >= (s32)end);
     }
-    asm("" ::: "memory");
     {
         register u32 count asm("r1") = p->rightCount;
         if (count) {
             register int r asm("r4");
             register int j asm("r5");
             u16 *q;
-            register u32 *random asm("r9");
+            u32 *random;
             r = gUnk_03003A50;
             j = 0;
             if ((u32)j<count) {
@@ -274,27 +244,24 @@ int sub_080390C4(struct Menu *arg) {
                     random = x;
                 }
                 do {
-                    register int index asm("r2");
+                    int index;
                     register u32 mask asm("r1");
                     if (*q == 1) {
                         index = 0;
                         mask = p->extraMask;
                     } else {
                         index = 7;
-                        asm("" : "+r"(index));
                         index &= r;
                         if (!index)index = 1;
                         {
-                            register u32 bit asm("r0") = 1 << index;
-                            asm("" : "+r"(bit));
+                            u32 bit = 1 << index;
                             mask = p->extraMask;
                             if (bit&mask) {
                                 register int small asm("r12");
                                 register int one asm("r8");
-                                register u32 used asm("r3");
+                                u32 used;
                                 {
-                                    register int x asm("r0") = 7;
-                                    asm("" : "+r"(x));
+                                    int x = 7;
                                     small = x;
                                 }
                                 {
@@ -319,19 +286,17 @@ int sub_080390C4(struct Menu *arg) {
                     {
                         register u32 *read asm("r1") = random;
                         register u32 *write asm("r3");
-                        register u32 x asm("r0");
-                        register u8 *table asm("r1");
+                        u32 x;
+                        u8 *table;
                         asm("" : "+r"(read));
                         x = (*read+1)&1023;
                         write = random;
                         asm("" : "+r"(write));
                         *write = x;
                         x <<= 1;
-                        asm("" : "+r"(x));
                         table = gUnk_0203B400;
                         r += *(u8 *)(x+(u32)table);
                     }
-                    asm("" : "+r"(q));
                     q++;
                     j++;
                 } while ((u32)j<p->rightCount);
@@ -342,7 +307,7 @@ int sub_080390C4(struct Menu *arg) {
     sub_0822E9FC(0, 0);
     for (i = 1;i <= 7;i++)sub_0822E9FC(i, -1);
     {
-        register struct Save **slot asm("r3");
+        struct Save **slot;
         register int minus asm("r0");
         register int value asm("r2");
         i = 0;
@@ -352,7 +317,7 @@ int sub_080390C4(struct Menu *arg) {
         value = minus;
         do {
             register struct Save *save asm("r1") = *slot;
-            register int offset asm("r0") = i << 1;
+            int offset = i << 1;
             asm("" : "+r"(offset));
             *(s16 *)(offset+(u32)save+0x58) = value;
             i++;
@@ -364,11 +329,10 @@ int sub_080390C4(struct Menu *arg) {
     p->rightMask = 0xFCF;
     {
         register int zero asm("r2") = 0;
-        register int byteZero asm("r0");
-        register int one asm("r1");
+        int byteZero;
+        int one;
         p->v18 = zero;
         byteZero = 0;
-        asm("" : "+r"(byteZero));
         {
             register u16 half asm("r2") = 0;
             asm("" : "+r"(half));
@@ -378,44 +342,35 @@ int sub_080390C4(struct Menu *arg) {
         p->flags = zero;
         {
             register u8 *q asm("r1") = local.v2b;
-            asm("" : "+r"(q));
             *q = byteZero;
         }
         {
             register u8 *q asm("r3") = local.v2c;
-            asm("" : "+r"(q));
             *q = byteZero;
         }
         {
             register u8 *q asm("r1") = local.v2d;
-            asm("" : "+r"(q));
             *q = byteZero;
         }
         {
             register u8 *q asm("r3") = local.v33;
-            asm("" : "+r"(q));
             *q = byteZero;
         }
         {
             register u8 *q asm("r1") = local.vec;
-            asm("" : "+r"(q));
             *q = byteZero;
         }
         one = 1;
-        asm("" : "+r"(one));
         {
             register u8 *q asm("r3") = local.enabled;
-            asm("" : "+r"(q));
             *q = one;
         }
         {
             register u8 *q asm("r3") = local.state;
-            asm("" : "+r"(q));
             *q = byteZero;
         }
         {
-            register u8 *q asm("r0") = local.entered;
-            asm("" : "+r"(q));
+            u8 *q = local.entered;
             *q = one;
         }
         p->timer = zero;
@@ -427,11 +382,10 @@ int sub_080390C4(struct Menu *arg) {
             u32 timer;
         };
         register int j asm("r5") = 0;
-        register int zero asm("r4") = 0;
+        int zero = 0;
         int hundred = 100;
-        register struct Tail *tail asm("r1") = (struct Tail *)&p->slots[0].a;
-        register u8 *bytes asm("r3") = p->slots[0].counts;
-        asm("" : "+r"(j));
+        struct Tail *tail = (struct Tail *)&p->slots[0].a;
+        u8 *bytes = p->slots[0].counts;
         do {
             register u8 *destination asm("r2") = bytes+j;
             register int k asm("r0") = 3;
@@ -451,10 +405,9 @@ int sub_080390C4(struct Menu *arg) {
         } while (j <= 1);
     }
     {
-        register u8 *base asm("r1") = local.counts;
-        register int zero asm("r2") = 0;
-        register u8 *c asm("r0");
-        asm("" : "+r"(base), "+r"(zero));
+        u8 *base = local.counts;
+        int zero = 0;
+        u8 *c;
         c = base+3;
         do {
             *c = zero;

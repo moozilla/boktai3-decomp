@@ -90,7 +90,6 @@ int sub_0802E5E8(void) {
   {
     u8 *controlled = &p->controlled;
     int zero;
-    asm("" : "+r"(controlled));
     zero = 0;
     *controlled = zero;
     mode = sub_0821ABA8(0x69, 0);
@@ -100,7 +99,7 @@ int sub_0802E5E8(void) {
       default:
         break;
       case 0: {
-        register int one asm("r1") = 1;
+        int one = 1;
         p->stage = command;
         p->phase = command;
         p->state = one;

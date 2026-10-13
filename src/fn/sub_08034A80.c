@@ -63,14 +63,13 @@ struct Game {
 extern struct Game *gUnk_02000710;
 int sub_08034A80(struct Engine *p) {
   u8 *pending = &p->pending;
-  register u8 *timer asm("r4");
+  u8 *timer;
   register int read asm("r0");
   int zero;
   if (*pending)
     *pending = 0;
   timer = &p->flag3c;
   read = *timer;
-  asm("" : "+r"(read));
   zero = read;
   if (zero) {
     read--;
@@ -88,7 +87,7 @@ int sub_08034A80(struct Engine *p) {
     register int three asm("r8") = 3;
     int base;
     u32 position;
-    register u16 *table asm("r3");
+    u16 *table;
     register u32 mask asm("r4");
     u32 *randomIndex;
     int offset;
@@ -96,39 +95,32 @@ int sub_08034A80(struct Engine *p) {
     const u8 *name;
     u8 *userName;
     u8 *gameName;
-    asm("" : "+r"(three));
     p->flag = zero;
     p->operation = three;
     p->ticks = zero;
     *pending = 1;
     base = Script_ParseStringRef(p->script);
     table = gUnk_0203B400;
-    asm("" : "+r"(table));
     randomIndex = &gUnk_03005308;
     position = *randomIndex + 1;
     mask = 1023;
-    asm("" : "+r"(mask));
     position &= mask;
     *randomIndex = position;
     chance = ((u8 *)table)[position * 2];
-    asm("" : "+r"(chance));
     if (chance <= 63) {
       u32 form = sub_08228DB8();
       int stage = sub_08228D88();
       if (form - 1 <= 2) {
         offset = 1;
-        asm("" : "+r"(offset));
         if (stage <= 11)
           offset = 0;
       } else {
         offset = 3;
-        asm("" : "+r"(offset));
         if (stage <= 11)
           offset = 2;
       }
     } else {
-      register u32 next asm("r0") = (position + 1) & mask;
-      asm("" : "+r"(next));
+      u32 next = (position + 1) & mask;
       *randomIndex = next;
       offset = (table[next] & three) + 4;
     }
