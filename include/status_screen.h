@@ -1,0 +1,108 @@
+#ifndef STATUS_SCREEN_H
+#define STATUS_SCREEN_H
+#include "global.h"
+#include "engine.h"
+
+// Tentative: a full-screen status/info page. A background map and palette are loaded from script
+// resources, the page is revealed through a scanline-noise (horizontal offset) transition while
+// its palette fades in, shows numeric counters, waits for confirm (A or START), then fades out
+// and calls the script given by keyword 'e' with the arguments given by keyword 'a'.
+
+// Argument block handed to Script_Call.
+struct StatusScreenArgs {
+    u16 count, pad;
+    u32 *values;
+};
+
+struct StatusScreen;
+typedef void (*StatusScreenFn)(struct StatusScreen *);
+
+struct StatusScreen {
+    u8 task[24];
+    u16 id;
+    u8 flags, bg;
+    u16 mapId, paletteId;
+    u16 *buffer;      // working palette (gUnk_03005160), 2 banks of 16 colors
+    u16 *source;      // palette resource the fades blend towards
+    u16 dirty;        // bit 0/1/2: numeric displays to redraw; bit 3: palette upload
+    u16 delay;        // frames to wait before starting (keyword 'w')
+    u16 rows[2][160]; // per-scanline horizontal offsets, double buffered
+    u16 active;       // index of the rows buffer being displayed
+    s16 amplitude;    // noise amplitude, 0..256
+    u16 delta;        // amplitude change per frame (may wrap negative)
+    u16 top, bottom;  // scanline range the noise applies to
+    u16 times[6];     // phase durations (keyword 't'), see gUnk_08604B3C for defaults
+    u16 start, end;   // palette entries (per bank) the fade affects
+    u16 blend;        // color the fade blends with
+    u16 fade;         // fade progress, 0..256
+    u16 fadeStep;
+    StatusScreenFn state;  // current phase
+    StatusScreenFn effect; // palette fade in progress, or NULL
+    StatusScreenFn noise;  // scanline noise updater, or NULL
+    u16 timer, pad;
+    struct StatusScreenArgs args;
+    u32 values[8];
+    u32 script; // script called when the screen closes (keyword 'e')
+};
+
+// Game state counters shown by the numeric displays (only the fields used here).
+struct StatusGameState {
+    u8 pad0[14];
+    u8 mode; // 0, 4 or 5 select the "alternate" counter pair
+    u8 pad0F;
+    u8 counters[2];    // shown when mode is not 0, 4 or 5
+    u8 altCounters[2]; // shown when mode is 0, 4 or 5
+};
+extern struct StatusGameState gUnk_03005430;
+
+// Tilemap geometry of a background (element of gUnk_03004C30).
+struct BgMapInfo {
+    u8 pad0[0x18];
+    s16 width; // tiles per map row
+    u8 pad1A[0x12];
+    u16 *map;
+};
+
+u16 *sub_0800E3E0(u32 bg, u32 x, s32 y); // address of a tile in the background's tilemap
+void NumericDisplay_DrawPair(void *unused, int left, int right);
+void NumericDisplay_DrawStatusValues(struct StatusScreen *);
+void sub_0800E5B8(struct StatusScreen *);
+void sub_0800E77C(struct StatusScreen *);
+int StatusScreen_CheckConfirm(struct StatusScreen *);
+void StatusScreen_Close(struct StatusScreen *);
+void StatusScreen_BeginClose(struct StatusScreen *);
+void StatusScreen_WaitForClose(struct StatusScreen *);
+void StatusScreen_Reveal(struct StatusScreen *);
+void StatusScreen_WaitForReveal(struct StatusScreen *);
+void StatusScreen_FadeAndExit(struct StatusScreen *);
+void StatusScreen_WaitForStart(struct StatusScreen *);
+void StatusScreen_FadeInPalette(struct StatusScreen *);
+void StatusScreen_FadeOutPalette(struct StatusScreen *);
+void StatusScreen_ClearScanlineNoise(struct StatusScreen *);
+void sub_0800E974(struct StatusScreen *);
+void sub_0800EF90(struct StatusScreen *);
+
+s32 Div(s32, s32);
+s32 sub_08228D88(void); // counter values
+s32 sub_08228D94(void);
+u32 sub_08228D7C(void);
+void sub_082286E0(s32 *, s32 *, s32 *, u32);
+void sub_082279A8(s32, s32, s32, s32, s32, s32, s32); // (guess) start a screen transition
+
+int StatusScreen_Update(struct StatusScreen *);
+int StatusScreen_Destroy(struct StatusScreen *);
+int StatusScreen_Initialize(struct StatusScreen *, u16 id);
+
+extern void *gUnk_03004278, *gUnk_03003A00; // HBlank DMA source and destination register (guess)
+extern u16 gUnk_03004270, gUnk_03004274;
+extern u16 gUnk_03005160[];
+extern const u16 gUnk_08604B3C[]; // default phase durations
+void sub_08215A74(u32, s32);
+void sub_082160B8(u32, u32, void *, s32, s32, s32, s32, void *);
+void *Video_GetBackgroundMap(u32);
+extern struct StatusScreen *gUnk_02000044; // the live status screen, or NULL
+extern struct BgMapInfo gUnk_03004C30[];
+extern u16 gUnk_03005260[]; // input: [1] = newly pressed keys
+extern u16 gUnk_03004BD8;   // flags, bit 8 set while a status screen is active (guess)
+
+#endif
