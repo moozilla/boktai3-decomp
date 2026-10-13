@@ -80,8 +80,8 @@ struct SceneLink {
 /* Reference to the terrain cell the object occupies, filled in by sub_0821D698. */
 struct SceneCellRef {
     u16 unknown0;
-    u16 index;               /* index into the terrain cell array */
-    struct SceneCell cell;   /* working copy of the cell (height of the object's top) */
+    u16 index;             /* index into the terrain cell array */
+    struct SceneCell cell; /* working copy of the cell (height of the object's top) */
     u8 pad8[8];
 };
 
@@ -92,7 +92,7 @@ struct SceneObject {
     u16 kind; /* 0 idle, 1 stepping, 2 falling, 3 disappearing */
     u16 unknown6;
     u32 owner;
-    s16 dx, dz;  /* step velocity */
+    s16 dx, dz;   /* step velocity */
     u8 direction; /* 0 north, 1 east, 2 south, 3 west */
     u8 entered;   /* set to 1 when a new update state starts; the state clears it on first run */
     u16 targetY;
@@ -140,6 +140,14 @@ extern u32 gUnk_030052F8, gUnk_030052FC;
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 
+/* Engine helpers shared by the functions below. */
+s32 sub_0822B2F8(s32 sound);
+s32 sub_0821ABA8(s32 key, s32 defaultValue); /* script parameter lookup */
+s32 sub_08215284(struct SceneAnimation *, u16 animation);
+void sub_0821FF24(struct SceneCollider *, struct SceneVec *, s32);
+void sub_08068108(struct SceneVec *, s32, struct SceneExtent *, s32, s32, s32);
+void AnimatedParticles_EmitDirectional(s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, void *);
+
 /* Update states (stored in SceneObject.update). */
 void Scene_UpdateObjectStep(struct SceneObject *);
 void Scene_UpdateFallingObject(struct SceneObject *);
@@ -177,8 +185,8 @@ struct SceneObjectManager *sub_08005778(void *);
 struct SceneObject *sub_080057D0(struct SceneObjectManager *);
 struct SceneObject *sub_080057FC(struct SceneObjectManager *, u32 id);
 s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *position,
-                              u32 animationResource, s32 drawMode, s32 health,
-                              s32 initialAnimation, s32 animation, u32 script);
+                              u32 animationResource, s32 drawMode, s32 health, s32 initialAnimation,
+                              s32 animation, u32 script);
 s32 SceneObjects_CreateFromScript(void);
 s32 SceneObjects_SwitchPaletteFromScript(void);
 
