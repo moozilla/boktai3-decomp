@@ -111,7 +111,6 @@ int sub_0800FE98(struct GroupObjects *, struct GroupQueue *, struct GroupCommand
 int sub_0801010C(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
 int sub_08010298(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
 
-
 static inline int randomValue(void)
 {
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
