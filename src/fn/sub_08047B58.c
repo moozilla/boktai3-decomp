@@ -1,8 +1,9 @@
-#include "global.h"
-
-void sub_080476F4(void *, u32);
-void sub_08047B58(void *p)
+#include "background_flash.h"
+#define BackgroundFlash_BeginAppearance sub_08047B58
+#define BackgroundFlash_SetState        sub_080476F4
+void BackgroundFlash_SetState(struct BackgroundFlashController *, u32);
+void BackgroundFlash_BeginAppearance(struct BackgroundFlashController *controller)
 {
-    if (p)
-        sub_080476F4(p, 1);
+    if (controller)
+        BackgroundFlash_SetState(controller, 1);
 }

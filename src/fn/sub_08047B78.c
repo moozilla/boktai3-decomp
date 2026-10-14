@@ -1,12 +1,9 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x1c];
-    u8 a;
-};
-void sub_080476F4(struct S *, u32);
-void sub_08047B78(struct S *p)
+#include "background_flash.h"
+#define BackgroundFlash_BeginDisappearance sub_08047B78
+#define BackgroundFlash_SetState           sub_080476F4
+void BackgroundFlash_SetState(struct BackgroundFlashController *, u32);
+void BackgroundFlash_BeginDisappearance(struct BackgroundFlashController *controller)
 {
-    if (p != 0 && p->a != 0)
-        sub_080476F4(p, 4);
+    if (controller && controller->state)
+        BackgroundFlash_SetState(controller, 4);
 }
