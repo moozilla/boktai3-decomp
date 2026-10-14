@@ -1,8 +1,8 @@
-#include "global.h"
-
-void sub_08045978(u8 *p, u32 a, u32 b, u32 c)
+#define MotionPool_SetGraphics sub_08045978
+#include "pooled_motion.h"
+void MotionPool_SetGraphics(struct MotionPoolParams *params, u32 resource, u32 frame, s32 tile)
 {
-    *(u32 *)(p + 0x38) = a;
-    *(u32 *)(p + 0x3c) = b;
-    *(u32 *)(p + 0x40) = c;
+    params->graphicResource = resource;
+    params->frame = frame;
+    params->tile = tile;
 }

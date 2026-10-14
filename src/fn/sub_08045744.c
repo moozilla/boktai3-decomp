@@ -1,26 +1,19 @@
-#include "global.h"
-struct E {
-    u8 p[0x13c];
-};
-struct A {
-    u8 p0[0x18];
-    u32 w18;
-    struct E e[16];
-};
-struct E *sub_08045744(struct A *a, s32 *out)
+#define MotionPool_FindFreeSlot sub_08045744
+#include "pooled_motion.h"
+struct MotionPoolSlot *MotionPool_FindFreeSlot(struct MotionPool *pool, s32 *out)
 {
-    struct E *e = a->e;
-    s32 i = 0;
-    u32 m = 1;
-    u32 w = a->w18;
+    struct MotionPoolSlot *slot = pool->slots;
+    s32 index = 0;
+    u32 one = 1;
+    u32 active = pool->activeMask;
     do {
-        if ((m << i & w) != 0) {
-            i++;
-            e++;
+        if ((one << index & active) != 0) {
+            index++;
+            slot++;
             continue;
         }
-        *out = i;
-        return e;
-    } while (i <= 15);
+        *out = index;
+        return slot;
+    } while (index <= 15);
     return 0;
 }
