@@ -26,6 +26,7 @@ import re
 import sys
 
 from romlib import ROOT, load_rom, u32
+from datafmt import load_manifest
 
 ROM_BASE = 0x08000000
 THUMB_FUNCS = set()
@@ -300,7 +301,14 @@ def main():
     # so the data object can be linked with 4-byte section alignment.
     data_start = (CODE_END + 3) & ~3
     out.append(f'\t.incbin "baserom.gba", {CODE_END - ROM_BASE:#x}, {data_start - CODE_END:#x}')
-    data += emit_bytes(rom, data_start, len(rom) + ROM_BASE, accepted, sym, data_labels)
+    pos = data_start
+    for entry in load_manifest():
+        if not data_start <= entry.start < entry.end <= len(rom) + ROM_BASE:
+            raise SystemExit(f"data/manifest.csv: {entry.name} is outside the data region")
+        data += emit_bytes(rom, pos, entry.start, accepted, sym, data_labels)
+        data += emit_decoded(entry, accepted, sym, data_labels)
+        pos = entry.end
+    data += emit_bytes(rom, pos, len(rom) + ROM_BASE, accepted, sym, data_labels)
     open(os.path.join(ROOT, "gen", "data.s"), "w").write("\n".join(data) + "\n")
     final = []
     for ln in out:
@@ -340,6 +348,37 @@ def emit_bytes(rom, s, e, accepted, sym, labels):
 
 
 SKIP_FIRST = set()
+
+
+def emit_decoded(entry, accepted, sym, labels):
+    """Emit a decoded data/ range from its source file (tools/datafmt)."""
+    items = entry.encode()
+    out = [f"@ {entry.name}: generated from {os.path.relpath(entry.file, ROOT)} ({entry.format})"]
+    directive = {1: ".byte", 2: ".2byte", 4: ".4byte"}
+    pos = entry.start
+    starts = set()
+    for size, value, pointer in items:
+        starts.add(pos)
+        if pos in labels:
+            out.append(f"{labels[pos]}:")
+        if pointer:
+            out.append(f"\t.4byte {sym(value)}")
+        else:
+            out.append(f"\t{directive[size]} {value & ((1 << (8 * size)) - 1):#x}")
+        pos += size
+    inner = [a for a in labels if entry.start <= a < entry.end and a not in starts]
+    if inner:
+        raise SystemExit(f"{entry.name}: labels inside an item: " + ", ".join(labels[a] for a in inner))
+    pointers = {p for p in accepted if entry.start <= p < entry.end}
+    emitted, pos = set(), entry.start
+    for size, _, pointer in items:
+        if pointer:
+            emitted.add(pos)
+        pos += size
+    if pointers - emitted:
+        raise SystemExit(f"{entry.name}: pointer words not encoded as pointers: " +
+                         ", ".join(f"{p:08X}" for p in sorted(pointers - emitted)))
+    return out
 
 
 if __name__ == "__main__":

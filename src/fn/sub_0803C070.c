@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Animation {
     u8 pad[12];
     u16 timer;
@@ -12,17 +11,19 @@ struct P {
 };
 int sub_0803C070(struct P *p)
 {
+    int alias;
     struct Animation *animation = &p->animation;
-    if (p->countdown > 0) {
+    alias = 0;
+    if (p->countdown > alias) {
         u32 zero;
         p->countdown--;
-        zero = 0;
-        asm("" : "+r"(zero));
-        animation->timer = 0;
+        zero = alias;
+        animation->timer = alias;
         animation->flag = zero;
-        return 0;
+        return alias;
     }
-    if (animation->timer)
+    if (animation->timer) {
         return 1;
-    return 0;
+    }
+    return alias;
 }

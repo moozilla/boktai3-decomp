@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -38,30 +37,34 @@ int sub_08030710(struct Manager *m)
 {
     struct Player *player = gUnk_02000580[0];
     int zero;
+    u8 *alias;
     m->player = player;
-    if (player)
+    if (player) {
         m->target = &player->pos;
-    else
+    } else {
         m->target = 0;
+    }
     m->event = sub_08018420();
     m->phase = sub_08228D88();
     {
         int frame = sub_08228D94();
         u8 *current = &m->frame;
-        register u8 *previous asm("r1");
-        register int old asm("r3");
+        u8 *previous;
+        int old;
         u8 *keep;
         *current = frame;
         previous = &m->previous;
         old = *previous;
         frame = (u8)frame;
         keep = previous;
-        if (old != frame)
+        alias = current;
+        if (old != frame) {
             *(previous - 1) = 1;
-        else
+        } else {
             m->changed = 0;
+        }
         {
-            int value = *current;
+            int value = *alias;
             zero = 0;
             *keep = value;
         }
@@ -80,8 +83,9 @@ int sub_08030710(struct Manager *m)
         }
     }
     sub_0802E188(m);
-    if (m->player)
-        sub_0802E04C((u8 *)m->player + 0x24);
+    if (m->player) {
+        sub_0802E04C(((u8 *)m->player) + 0x24);
+    }
     m->ticks++;
     return 0;
 }
