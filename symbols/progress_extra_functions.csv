@@ -80,6 +80,7 @@ address,evidence
 08042318,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C
 0804231C,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C
 0804271C,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+080441CC,Idle state callback from Thumb table entry 08605920; independent bx lr plus alignment before 080441D0; exact four-byte C
 08044934,Independent 416-byte slot spawn wrapper: own high-register prologue; return at 08044AAA followed by ten literals; hidden inside 08044854 incbin
 08044AD4,Independent 428-byte slot spawn wrapper: own high-register prologue; return at 08044C54 followed by ten literals; hidden inside 08044854 incbin
 08045D20,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C
