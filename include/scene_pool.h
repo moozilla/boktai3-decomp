@@ -66,4 +66,13 @@ struct ScenePoolActor {
     u32 controlFlags;
     u8 unknown85c[0x54];
 };
+/* Position and flag consumers identify this separate player-pointer array.
+ * This is not the gUnk_02000580 Player array from player.h. */
+struct ScenePoolPlayer {
+    u8 unknown0[0x28];
+    s32 position[3];
+    u8 unknown34[0x8c0];
+    u16 flags;
+};
+extern struct ScenePoolPlayer *gUnk_020004F0[2];
 #endif

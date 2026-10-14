@@ -1,10 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
-struct PlayerFlags {
-    u8 unknown0[0x8f4];
-    u16 flags;
-};
-extern struct PlayerFlags *gUnk_020004F0;
+
 void sub_0803DA7C(struct ScenePoolEntry *, s32, s32, s32);
 s32 sub_0803D9D8(struct ScenePoolEntry *);
 s32 ScenePool_ResumeAfterIdle(struct ScenePoolActor *, struct ScenePoolEntry *);
@@ -18,7 +14,7 @@ static inline void Or(u32 mask, u32 *flags)
 }
 static inline u8 PlayerHasFlag(u32 mask)
 {
-    if (gUnk_020004F0 && (gUnk_020004F0->flags & mask))
+    if (gUnk_020004F0[0] && (gUnk_020004F0[0]->flags & mask))
         return 1;
     return 0;
 }
