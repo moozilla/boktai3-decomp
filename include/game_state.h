@@ -46,7 +46,10 @@ struct GameState {
     s32 hour; /* (guess) RTC time at the last check */
     s32 minute;
     s32 second;
-    u8 unk500[0x38];
+    u8 unk500[0x1C];
+    s32 unk51C, unk520; /* encoded record fixed-point fields; meanings tentative */
+    u8 unk524[0x12];
+    s16 unk536;
     u16 counter538; /* (guess) capped at 9999 */
     u8 unk53A[0x28];
     u16 counter562; /* (guess) capped at 9999 */
@@ -84,7 +87,9 @@ struct GameState {
     s32 unk61C;
     u8 unk620[0x8];
     s32 counters628[4]; /* (guess) indexed by idx */
-    u8 unk638[0xE8];
+    u8 unk638[0x28];
+    s16 unk660, unk662, unk664; /* encoded record fields; meanings tentative */
+    u8 unk666[0xBA];
     u32 flags720; /* (guess) event flag words: bits 0-31 */
     u32 flags724; /* (guess) bits 32-63 */
     u32 flags728;
@@ -94,13 +99,18 @@ struct GameState {
     u16 unk744;
     u8 unk746[0x12];
     s16 unk758;
-    u8 unk75A[0x22];
+    s16 unk75A;
+    u8 unk75C[2];
+    u8 unk75E, unk75F;
+    u8 unk760[0x1C];
     s32 unk77C;
     u8 playerName[32]; /* (guess) */
     u16 unk7A0[4];
     u8 modifierIdsBytes[8]; /* tentative: four packed s16 source IDs; 0803F95C/0803FDBC */
     s16 unk7B0;
-    u8 unk7B2[0x6];
+    u8 unk7B2[2];
+    s16 unk7B4;
+    u8 unk7B6[2];
     u32 unk7B8[4];
     s32 unk7C8[12];
     s16 unk7F8;
