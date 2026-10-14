@@ -1,11 +1,10 @@
-#include "global.h"
-
-void sub_08045B90(void *);
-void sub_08045ADC(void *);
-
-s32 sub_08045C20(void *p)
+#define ProjectedDisplay_Update               sub_08045C20
+#define ProjectedDisplay_UpdateScreenPosition sub_08045B90
+#define ProjectedDisplay_UpdateEntries        sub_08045ADC
+#include "projected_display.h"
+s32 ProjectedDisplay_Update(struct ProjectedDisplay *display)
 {
-    sub_08045B90(p);
-    sub_08045ADC(p);
+    ProjectedDisplay_UpdateScreenPosition(display);
+    ProjectedDisplay_UpdateEntries(display);
     return 0;
 }
