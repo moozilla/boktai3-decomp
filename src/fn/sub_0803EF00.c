@@ -1,11 +1,9 @@
-#include "global.h"
-
-void Sprite_Remove(u8 *);
-void sub_0803F7D8(u8 *);
-void sub_0811B394(u8 *);
-void sub_0803EF00(u32 a, u8 *p)
+#include "scene_arc.h"
+u32 GroundEffect_Destroy(struct SceneGroundEffect *);
+void sub_0811B394(void *);
+void SceneArc_DestroySlot(struct SceneArcManager *manager, struct SceneArcSlot *slot, s32 index)
 {
-    Sprite_Remove(p + 0xb4);
-    sub_0803F7D8(p + 0xf0);
-    sub_0811B394(p + 0x58);
+    Sprite_Remove(&slot->sprite);
+    GroundEffect_Destroy(&slot->ground);
+    sub_0811B394(slot->collider);
 }

@@ -1,7 +1,7 @@
-#include "global.h"
-
-void sub_0803F638(u8 *p)
+#include "scene_arc.h"
+void GroundEffect_IgnoreUpdate(struct SceneGroundEffect *);
+void GroundEffect_DisableProjection(struct SceneGroundEffect *effect)
 {
-    *(u32 *)(p + 0xc) |= 1;
-    *(u32 *)(p + 0x34) = 0x0803F64D;
+    effect->flags |= 1;
+    effect->update = GroundEffect_IgnoreUpdate;
 }

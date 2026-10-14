@@ -1,10 +1,8 @@
-#include "global.h"
-
-void sub_0824923C(u8 *);
-
-void sub_0803F61C(u8 *p)
+#include "scene_arc.h"
+void GroundEffect_UpdateProjection(struct SceneGroundEffect *);
+void GroundEffect_EnableProjection(struct SceneGroundEffect *effect)
 {
-    *(u32 *)(p + 0xc) &= ~1;
-    *(u32 *)(p + 0x34) = 0x0803F651;
-    sub_0824923C(p);
+    effect->flags &= ~1;
+    effect->update = GroundEffect_UpdateProjection;
+    effect->update(effect);
 }

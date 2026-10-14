@@ -8,7 +8,7 @@ extern const struct ScenePoolSpeedBounds gUnk_086058A0[];
 void sub_08116C4C(s32, struct ScenePoolVec32 *);
 s32 sub_08116C20(s32);
 s32 sub_0811AE68(struct ScenePoolVec32 *);
-s32 sub_0803F4CC(struct ScenePoolVec32 *, struct ScenePoolVec32 *, s32, s32, s32);
+s32 SceneArc_Create(struct ScenePoolVec32 *, struct ScenePoolVec32 *, s32, s32, s32);
 static inline u32 *Prepare(struct ScenePoolEntry *entry, u32 state)
 {
     entry->state = state;
@@ -97,7 +97,7 @@ afterCheck:
         to.x += entry->direction + speed * 48;
         to.y = sub_0811AE68(&to);
         to.z = path.z;
-        sub_0803F4CC(&from, &to, 0x20, 48, 0x20);
+        SceneArc_Create(&from, &to, 0x20, 48, 0x20);
     }
     if (entry->stateFrame > 59) {
         s32 random;

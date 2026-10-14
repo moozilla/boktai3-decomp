@@ -1,16 +1,9 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x18];
-    u32 a;
-    u32 b;
-};
-void sub_0821A284(u32, struct S *, u32);
-u32 AnimData_FindEntry(u32);
-u32 sub_0803F6C4(struct S *p)
+#include "scene_arc.h"
+void sub_0821A284(u32, void *, u32);
+u32 GroundEffect_InitializeManager(struct SceneGroundManager *manager)
 {
-    sub_0821A284(0xF0DE, p, 0);
-    p->b = 0;
-    p->a = AnimData_FindEntry(0x1C1A);
+    sub_0821A284(0xf0de, manager, 0);
+    manager->head = 0;
+    manager->resource = AnimData_FindEntry(0x1c1a);
     return 0;
 }

@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 22.502% matching (2026-10-13). This file is the single
+Last updated after reaching 22.529% matching (2026-10-13). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,30 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 13 (Codex): scene arc slots and ground projection
+
+Matching is **22.529%**, up **0.027 percentage points** in this batch and
+**0.220 points** from Claude's 22.309% baseline. Four new exact functions bring
+us to **6,283 / 11,465**, **544,150 / 2,415,354 bytes** (+644). Without register
+pinning: **18.466%**; Register-pinned: **4.063%**, included above. The large arc
+update is a **67.3% guarded draft**, not exact progress; total drafts are 64.
+
+The adjacent **0803EE58–0803F804** block now has shared types and names for
+the eight-slot arc pool and its projected ground-effect list. New exact C covers
+slot collision initialization, the arc factory, ground projection and effect
+initialization. Existing exact consumers use recovered slot/list types, and
+raw Thumb callback literals were replaced with symbolic functions. See
+[arc/effect notes](../notes/scene-arc-effects_2026-10-13.md) for lifecycle evidence
+and the unsuccessful large-update allocation experiments.
+
+All changed exact bodies passed full-extent checks. The combined build printed
+**`build/boktai3.gba: OK`** (`build/scene-arc-combined.log`). Continue toward
+**25% or 80% usage remaining**; latest account reading is **93% remaining**.
+Next contiguous subsection: **0803F804 onward**, including six-bit packed
+state readers and their consumers. Claude already registered/matched the former hidden
+**0803F8F4**; reuse its C without claiming new credit. The large arc-update draft can be resumed with
+a new lifetime/projection hypothesis. Claude's primary-checkout edit is intact.
 
 ## October 13 (Codex): scene pool states and effects
 

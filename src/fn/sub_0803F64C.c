@@ -1,5 +1,4 @@
-#include "global.h"
-
-void sub_0803F64C(void)
+#include "scene_arc.h"
+void GroundEffect_IgnoreUpdate(struct SceneGroundEffect *effect)
 {
 }
