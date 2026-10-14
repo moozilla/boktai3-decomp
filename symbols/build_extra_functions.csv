@@ -304,13 +304,17 @@ address,isa,evidence,replacement_end
 0821432C,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,08214344
 08214344,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,0821435C
 0821435C,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,08214374
+082145F4,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08214600
+0821607C,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,082160B8
 08216FFC,thumb,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C,08217020
 08217020,thumb,Independent 32-byte leaf left as incbin by gbadisasm; exact standalone C,08217040
 08217040,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,08217050
 08217050,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,08217060
 08217414,thumb,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C,08217430
 08218BC8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08218BD4
+08218C40,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08218C5C
 082195AC,thumb,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C,082195D0
+082195F8,thumb,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08219624
 0821AED0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0821AEDC
 0821AEDC,thumb,Independent state save/restore function following a reviewed gap leaf; exact standalone C,0821AF04
 0821AF04,thumb,Independent state save/restore function following a reviewed gap leaf; exact standalone C,0821AF2C
