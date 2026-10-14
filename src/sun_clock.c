@@ -1,6 +1,6 @@
 #include "global.h"
 
-/* Sun clock: time-of-day spans and the light phase (0x08228A10-0x08228C10). */
+/* Sun clock: time-of-day spans and the light phase (0x08228928-0x08228C10). */
 struct SunClock {
     u8 pad0[4];
     u8 baseHour, baseMinute; /* 0x04 */
@@ -16,6 +16,8 @@ extern struct SunClock gUnk_03005430;
 extern u8 *gUnk_030053F8;
 s32 Div(s32, s32);
 u8 sub_08228DB8(void);
+extern u32 gUnk_0300546C;
+void sub_08229380(void);
 static inline void SunClock_Update(void)
 {
     struct SunClock *c = &gUnk_03005430;
@@ -74,6 +76,14 @@ static inline void SunClock_Update(void)
             break;
     }
 }
+/* Recompute the spans and the phase, initializing the clock first if needed. */
+void sub_08228928(void)
+{
+    if (!gUnk_0300546C)
+        sub_08229380();
+    SunClock_Update();
+}
+
 /* Set time A (hour, minute), one hour later in daylight-saving mode. */
 void sub_08228A10(s32 hour, s32 minute)
 {
