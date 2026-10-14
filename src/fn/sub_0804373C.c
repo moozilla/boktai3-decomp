@@ -1,0 +1,126 @@
+#ifdef NONMATCHING
+// fuzzy: 51.7%
+// Reviewed full extent; register lifetimes and instruction scheduling still differ.
+#include "contact_actor.h"
+#define ContactActor_UpdateRetreat sub_0804373C
+void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
+u8 *sub_0821D64C(s32, s32);
+static inline s32 truncateShift12(s32 value)
+{
+    if (value >= 0)
+        return value >> 12;
+    return -((-value) >> 12);
+}
+static inline s32 cellIndex(struct ContactPosition *position)
+{
+    s32 x = position->x >> 8, z = position->z >> 8;
+    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        return 0;
+    return gUnk_030052F4->rows[z] + x;
+}
+static inline u8 *cell(s32 index)
+{
+    u8 *dynamic = sub_0821D64C(index, 1);
+    if (dynamic)
+        return dynamic + 4;
+    return gUnk_030052F4->cells + 12 + index * 4;
+}
+static inline u32 nextRandom(const u16 *table)
+{
+    u32 index = (gUnk_03005308 + 1) & 1023;
+    gUnk_03005308 = index;
+    return table[index];
+}
+void ContactActor_UpdateRetreat(struct ContactActorPool *pool, struct ContactActor *slot, s32 index)
+{
+    struct ContactPosition delta;
+    struct ContactPosition *position, *destination;
+    if (slot->enter) {
+        struct ContactPosition *center;
+        u32 type, packed;
+        s32 height;
+        const u16 *table;
+        u32 angle, radius;
+        struct ContactPosition *write;
+        slot->enter = 0;
+        {
+            struct ContactCollider *collider = &slot->healthCollider;
+            collider->flags |= 4;
+        }
+        center = &pool->retreatCenter;
+        packed = *cell(cellIndex(center));
+        type = packed >> 4;
+        height = (packed & 15) * 256;
+        if (type == 1)
+            height -= (u8)center->z;
+        else if (type == 2)
+            height -= (u8)center->x;
+        pool->retreatCenter.y = height;
+        table = (const u16 *)RANDOM_TABLE_ADDR;
+        angle = nextRandom(table) & 255;
+        radius = (nextRandom(table) & 127) + 16;
+        write = &delta;
+        write->x = truncateShift12(gUnk_086149C4[(angle + 64) & 255] * radius);
+        write->y = 0;
+        write->z = truncateShift12(gUnk_086149C4[angle] * radius);
+        destination = &slot->destination;
+        {
+            const struct ContactPosition *read = &delta;
+            const struct ContactPosition *first = &delta;
+            slot->destination.x = first->x + pool->retreatCenter.x;
+            destination->y = read->y + center->y;
+            destination->z = read->z + center->z;
+        }
+        slot->targetHeight = (nextRandom(table) & 511) + slot->desiredHeight;
+        slot->direction = Math_Atan2(slot->destination.x - slot->position.x,
+                                    destination->z - slot->position.z);
+        slot->direction += (nextRandom(table) & 15) - 8;
+        slot->steeringTimer = (nextRandom(table) & 7) + 8;
+        slot->speed = 16;
+    }
+    if (!slot->steeringTimer) {
+        const u16 *table;
+        position = &slot->position;
+        destination = &slot->destination;
+        slot->direction = Math_Atan2(slot->destination.x - slot->position.x,
+                                    destination->z - position->z);
+        table = (const u16 *)RANDOM_TABLE_ADDR;
+        slot->direction += (nextRandom(table) & 3) - 1;
+        slot->steeringTimer = (nextRandom(table) & 7) + 8;
+    } else {
+        slot->steeringTimer--;
+        destination = &slot->destination;
+        position = &slot->position;
+    }
+    {
+        struct ContactPosition *write = &delta;
+        u32 direction = slot->direction;
+        u32 speed = slot->speed;
+        write->x = truncateShift12(gUnk_086149C4[(direction + 64) & 255] * speed);
+        write->y = 0;
+        write->z = truncateShift12(gUnk_086149C4[direction] * speed);
+    }
+    {
+        const struct ContactPosition *read = &delta;
+        const struct ContactPosition *first = &delta;
+        slot->position.x += first->x;
+        position->y += read->y;
+        position->z += read->z;
+    }
+    ContactActor_SetDirectionalSequence(pool, slot, 0);
+    {
+        s32 dx = slot->destination.x - slot->position.x;
+        s32 dz = destination->z - position->z;
+        if (dx * dx + dz * dz <= 16383) {
+            slot->state = 7;
+            slot->enter = 1;
+            slot->stateFrame = 0;
+        } else
+            slot->stateFrame++;
+    }
+}
+
+#else
+#include "global.h"
+INCLUDE_ASM("asm/nonmatching", sub_0804373C);
+#endif
