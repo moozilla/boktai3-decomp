@@ -68,6 +68,7 @@ canvas { image-rendering: pixelated; display: block; }
     <a href="/">Text</a>
     <a href="#sprites" data-tab="sprites">Sprites</a>
     <a href="#big" data-tab="big">Large sprites</a>
+    <a href="#maps" data-tab="maps">Maps</a>
     <a href="#palettes" data-tab="palettes">Palettes</a>
     <a href="#font" data-tab="font">Font</a>
     <a href="#tiles" data-tab="tiles">Tiles</a>
@@ -335,6 +336,111 @@ views.big = {
       c.onclick = () => { location.hash = `big/${rr.hash}`; };
       grid.appendChild(c);
     });
+  },
+};
+
+// ---------- maps (C091 "MP" + ptn tilesets) ----------
+function lz77(b) { // GBA BIOS LZ77, type 0x10
+  const size = b[1] | b[2] << 8 | b[3] << 16, out = new Uint8Array(size);
+  let i = 4, o = 0;
+  while (o < size) {
+    const flags = b[i++];
+    for (let bit = 0; bit < 8 && o < size; bit++) {
+      if (flags & (0x80 >> bit)) {
+        const x = b[i] << 8 | b[i + 1]; i += 2;
+        const n = (x >> 12) + 3, disp = (x & 0xFFF) + 1;
+        for (let k = 0; k < n && o < size; k++, o++) out[o] = out[o - disp];
+      } else out[o++] = b[i++];
+    }
+  }
+  return out;
+}
+function parseMP(raw) {
+  let b = raw[0] === 0x10 ? lz77(raw) : raw;
+  if (b[0] !== 0x4D) b = b.subarray(4); // compressed maps carry a 4-byte prefix
+  const m = { b, count: le(b, 4), ntiles: le(b, 6), nmeta: le(b, 8), tab: u32(b, 0xC), tiles: u32(b, 0x10), defs: u32(b, 0x14), ents: [] };
+  for (let i = 0; i < m.count; i++) {
+    const o = m.tab + i * 12;
+    m.ents.push({ w: le(b, o), h: le(b, o + 2), hash: le(b, o + 4).toString(16).toUpperCase().padStart(4, '0'), off: u32(b, o + 8) });
+  }
+  return m;
+}
+let ptn = null, stageList = null;
+async function loadPtn() {
+  if (ptn) return ptn;
+  const h = index.ptn[0][0], p = await res('ptn', h);
+  const n = le(p, 0), T = u32(p, 0xC), I = u32(p, 0x10), D = u32(p, 0x14), sets = {};
+  for (let i = 0; i < n; i++) { const o = T + i * 8; sets[le(p, o).toString(16).toUpperCase().padStart(4, '0')] = { n: le(p, o + 2), off: u32(p, o + 4) }; }
+  ptn = { p, I, D, sets };
+  return ptn;
+}
+function tilesetOffsets(id) { // -> function(tile) -> [src, offset]
+  const s = ptn.sets[id];
+  if (!s) return null;
+  const ids = Array.from({ length: s.n }, (_, k) => le(ptn.p, ptn.I + s.off + k * 2));
+  return t => t < ids.length ? [ptn.p, ptn.D + ids[t] * 32] : null;
+}
+function renderMP(m, ent, tileAt, colors, grid) {
+  const W = ent.w, H = ent.h, B = (W % 16 === 0 && H % 16 === 0) ? 16 : 0;
+  const img = new ImageData(W * 16, H * 16), d = img.data;
+  const [R0, G0, B0] = colors[0];
+  for (let k = 0; k < d.length; k += 4) { d[k] = R0; d[k + 1] = G0; d[k + 2] = B0; d[k + 3] = 255; }
+  const cells = [];
+  for (let i = 0; i < W * H; i++) {
+    let x, y;
+    if (B) { const blk = Math.floor(i / 256), r = i % 256; x = (blk % (W / 16)) * 16 + r % 16; y = Math.floor(blk / (W / 16)) * 16 + Math.floor(r / 16); }
+    else { x = i % W; y = Math.floor(i / W); }
+    const mi = le(m.b, ent.off + i * 2);
+    cells[y * W + x] = mi;
+    if (mi >= m.nmeta) continue;
+    for (let k = 0; k < 4; k++) {
+      const e = le(m.b, m.defs + mi * 8 + k * 2), src = tileAt(e & 0x3FF);
+      if (src) tile(img, src[0], src[1], x * 16 + (k & 1) * 8, y * 16 + (k >> 1) * 8, colors, e >> 12, !!(e & 0x400), !!(e & 0x800));
+    }
+  }
+  if (grid) for (let y = 0; y < H * 16; y++) for (let x = 0; x < W * 16; x++) if (x % 16 === 0 || y % 16 === 0) { const o = (y * W * 16 + x) * 4; d[o] = d[o] * .6 + 60; d[o + 1] *= .6; d[o + 2] *= .6; }
+  return { img, cells };
+}
+views.maps = {
+  async init() {
+    await loadPtn();
+    if (!stageList) stageList = await fetch('/api/stages').then(r => r.json());
+    const staged = new Set(stageList.map(s => s.map));
+    items = [
+      ...stageList.map(s => ({ key: `${s.map}-${s.tileset}-${s.hp}`, note: `stage · tiles ${s.tileset} · hp ${s.hp}`, n: s.procs.length + '×', stage: s })),
+      ...(index.map || []).filter(([h]) => !staged.has(h)).map(([h, n]) => ({ key: h, note: 'map', n: (n / 1024).toFixed(0) + ' KB' })),
+    ];
+  },
+  async show(key) {
+    const [mh, ts] = key.split('-'), m = parseMP(await res('map', mh)), v = $('view');
+    const it = items.find(i => i.key === key), st = it?.stage;
+    const own = m.tiles !== 0;
+    const tsList = Object.keys(ptn.sets).sort();
+    const savedTs = localStore('mapts.' + mh);
+    v.innerHTML = `<h2>Map ${mh}${st ? ` · stage` : ''}</h2>
+      <div class="meta">${m.count} layer${m.count > 1 ? 's' : ''} · ${m.nmeta} metatiles · ${own ? m.ntiles + ' own tiles' : 'tiles from ptn tileset (' + m.ntiles + ' used)'}${st ? ` · loaded by script procs ${st.procs.join(', ')} with HP data ${st.hp}` : ''}</div>
+      <div class="controls">
+        ${m.count > 1 ? 'Layer <select id="lay">' + m.ents.map((e, i) => `<option value="${i}">${e.hash} (${e.w}×${e.h})</option>`).join('') + '</select>' : ''}
+        ${own ? '' : `Tileset <select id="tsel">${tsList.map(t => `<option ${t === (ts || savedTs) ? 'selected' : ''}>${t}</option>`).join('')}</select>`}
+        <label><input type="checkbox" id="grid"> metatile grid</label>
+        <span style="color:var(--muted)">Palette is chosen at runtime; ${mh === 'CF70' ? 'E39B matched the field capture.' : 'pick one above (BG palettes such as E39B).'} </span>
+      </div>
+      <div class="stage" id="ms" style="padding:0;overflow:auto;max-width:100%"></div><div class="meta" id="hover" style="margin-top:6px">&nbsp;</div>`;
+    const draw = () => {
+      const ent = m.ents[$('lay') ? +$('lay').value : 0];
+      if (!ent) { $('ms').textContent = 'No layers.'; return; }
+      let tileAt;
+      if (own) tileAt = t => t < m.ntiles ? [m.b, m.tiles + t * 32] : null;
+      else { const id = $('tsel').value; localStore('mapts.' + mh, id); tileAt = tilesetOffsets(id) || (() => null); }
+      const { img, cells } = renderMP(m, ent, tileAt, colorsNow(), $('grid').checked);
+      const cv = toCanvas(img); $('ms').replaceChildren(cv);
+      cv.onmousemove = ev => {
+        const r = cv.getBoundingClientRect(), x = Math.floor((ev.clientX - r.left) / zoom / 16), y = Math.floor((ev.clientY - r.top) / zoom / 16);
+        if (x >= 0 && y >= 0 && x < ent.w && y < ent.h) $('hover').textContent = `metatile (${x}, ${y}) = #${cells[y * ent.w + x]}`;
+      };
+    };
+    ['lay', 'tsel', 'grid'].forEach(id => $(id) && ($(id).onchange = draw));
+    draw();
   },
 };
 

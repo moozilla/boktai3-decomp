@@ -61,6 +61,23 @@ def resource_file(label, h):
     return None
 
 
+def stages():
+    """Stage loads in the scripts: proc_884(map, tileset, hp) -> the procedures using them."""
+    out = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "assets", "gcx.py"), "dis"],
+                         cwd=ROOT, capture_output=True, text=True).stdout
+    found, proc = {}, None
+    for ln in out.split("\n"):
+        if ln.startswith("proc "):
+            proc = int(ln.split()[1])
+            continue
+        f = ln.split()
+        if f and f[0] == "proc_884" and len(f) >= 4 and all(x.startswith("0x") for x in f[1:4]):
+            key = tuple(int(x, 16) for x in f[1:4])
+            found.setdefault(key, []).append(proc)
+    return [{"map": f"{m:04X}", "tileset": f"{t:04X}", "hp": f"{h:04X}", "procs": ps}
+            for (m, t, h), ps in sorted(found.items())]
+
+
 def ensure_bank():
     if not os.path.exists(BANK):
         for e in load_manifest():
@@ -144,6 +161,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, open(font_path(), "rb").read(), "application/octet-stream")
         elif self.path in ("/gfx", "/gfx.html"):
             self.send(200, open(os.path.join(HERE, "gfx.html"), "rb").read(), "text/html; charset=utf-8")
+        elif self.path == "/api/stages":
+            self.send(200, stages())
         elif self.path == "/api/res":
             self.send(200, resource_index())
         elif self.path.startswith("/api/res/"):
