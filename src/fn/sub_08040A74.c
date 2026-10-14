@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
-#define ModifierMenu_GetHeaderFrame sub_08040A74
 s32 ModifierMenu_GetHeaderFrame(struct ModifierMenu *menu)
 {
     struct ModifierMenu *base = menu;

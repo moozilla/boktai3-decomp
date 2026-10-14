@@ -1,0 +1,12 @@
+addr,name,confidence,evidence
+080408A4,ModifierMenu_InitializeGraphics,low,Tentative menu display/input role; include/modifier_list.h; notes/modifier-display_2026-10-14.md
+08040A74,ModifierMenu_GetHeaderFrame,low,Tentative menu display/input role; include/modifier_list.h; notes/modifier-display_2026-10-14.md
+08040AE4,ModifierMenu_UpdateHeaderObjects,low,Tentative menu display/input role; include/modifier_list.h; notes/modifier-display_2026-10-14.md
+08040BF8,ModifierMenu_DrawOverview,low,Tentative menu display/input role; include/modifier_list.h; notes/modifier-display_2026-10-14.md
+08040CF4,ModifierMenu_DrawPendingChoice,low,Tentative menu display/input role; include/modifier_list.h; notes/modifier-display_2026-10-14.md
+08041020,ModifierMenu_UpdateDescription,low,Tentative menu display/input role; include/modifier_list.h; notes/modifier-display_2026-10-14.md
+08041128,ModifierMenu_DrawSelectedLabels,low,Tentative menu display/input role; include/modifier_list.h; notes/modifier-display_2026-10-14.md
+08041280,ModifierMenu_DrawAvailableLabels,low,Tentative menu display/input role; include/modifier_list.h; notes/modifier-display_2026-10-14.md
+08041514,ModifierMenu_HandleOverviewInput,low,Tentative menu display/input role; include/modifier_list.h; notes/modifier-display_2026-10-14.md
+0804164C,ModifierMenu_HandleSelectionInput,low,Tentative menu display/input role; include/modifier_list.h; notes/modifier-display_2026-10-14.md
+080418AC,ModifierMenu_HandleChangedInput,low,Tentative menu display/input role; include/modifier_list.h; notes/modifier-display_2026-10-14.md

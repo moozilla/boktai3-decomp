@@ -3,7 +3,6 @@
 // Remaining differences are low-register allocation; reviewed full extent is 716 bytes.
 // MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
-#define ModifierMenu_DrawPendingChoice sub_08040CF4
 void ModifierMenu_DrawFirstSourceStats(struct ModifierMenu *);
 void ModifierMenu_DrawSecondSourceStats(struct ModifierMenu *);
 void ModifierMenu_DrawThirdSourceStats(struct ModifierMenu *);
@@ -138,5 +137,5 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
 
 #else
 #include "global.h"
-INCLUDE_ASM("asm/nonmatching", sub_08040CF4);
+INCLUDE_ASM("asm/nonmatching", ModifierMenu_DrawPendingChoice);
 #endif

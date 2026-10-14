@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 22.627% matching (2026-10-14). This file is the single
+Last updated after reaching 22.817% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,38 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex): modifier menu graphics and input
+
+Matching is **22.817%**, with **6,309 / 11,465 functions**, **551,106 /
+2,415,354 bytes**. This batch adds ten exact functions, **0.119 percentage
+points** (+2,876 bytes). Claude's newly merged PRs 76–78 add another three
+matches (+1,704 bytes) and unpin existing routines, including the arc factory.
+Without register pinning: **18.716%**; Register-pinned: **4.101%**, included
+above. There are 63 guarded drafts; the new pending-choice renderer is
+**84.2%**, full-size but not exact, and receives no exact credit.
+
+The contiguous **080408A4–08041908** subsection now covers header/resource
+initialization, overview display, description/label rendering and all three
+input states. Shared types describe the 18 display objects, named packed cursor
+word, repeat counters, input delay and graphics resources. Mode and game-item
+identity remain tentative. See [display/input notes](../notes/modifier-display_2026-10-14.md).
+
+Claude's register-allocation tools and RAM-literal checks are incorporated.
+The diagnostic on 08040CF4 shows matching instruction structure with reload
+and two global allocation differences. `isolate.py` fixes the old permuter
+multi-declaration assertion; the first bounded search yielded no accepted
+candidate. Existing guarded drafts must be checked with **--nonmatching**.
+
+All new exact functions passed reviewed full-extent checks and hint
+minimization. Existing cursor consumers and the corrected window wrapper were
+rechecked. The combined build printed **`build/boktai3.gba: OK`**
+(`build/modifier-display-combined.log`); formatting, inventory and RAM-literal
+validation passed. Continue
+until **25% matching or 80% usage remaining**; latest usage is **90% remaining**.
+Next contiguous subsection begins at **08041908**, with unmatched 0804194C and
+08041A44 covering 3D preview setup/lifecycle. Claude's primary checkout remains
+untouched.
 
 ## October 14 (Codex): modifier selection and stat previews
 

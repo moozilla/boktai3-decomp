@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
-#define ModifierMenu_DrawOverview sub_08040BF8
 void ModifierMenu_DrawFirstSourceStats(struct ModifierMenu *);
 void ModifierMenu_DrawSecondSourceStats(struct ModifierMenu *);
 void ModifierMenu_DrawThirdSourceStats(struct ModifierMenu *);
