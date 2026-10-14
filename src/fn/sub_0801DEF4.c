@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 typedef struct {
     u32 words[8];
@@ -14,30 +13,35 @@ void sub_0822AE7C(int);
 int ResultTutorial_Initialize(u8 *p, void *owner)
 {
     Resource *r;
-    int four, zero;
-    *(void **)(p + 0x78) = owner;
+    int four;
+    u8 *unused; /* unused: changes agbcc's register allocation */
+    int zero;
+    *((void **)(p + 0x78)) = owner;
     r = ScriptProc_Start(0xcb05, 0x530d);
-    if (!r)
+    if (!r) {
         return -1;
-    *(Resource *)(p + 0x104) = *r;
+    }
+    *((Resource *)(p + 0x104)) = *r;
     ResourceHeader_Relocate(p + 0x104, r);
     r = ScriptProc_Start(0xcb05, 0x5d04);
-    if (!r)
+    if (!r) {
         return -1;
-    *(Resource *)(p + 0x124) = *r;
+    }
+    *((Resource *)(p + 0x124)) = *r;
     ResourceHeader_Relocate(p + 0x124, r);
-    if (ResultTutorial_ReadScript(p) < 0)
+    if (ResultTutorial_ReadScript(p) < 0) {
         return -1;
+    }
+    unused = p + 0xae;
     {
-        u8 *out = p + 0xae;
-        asm("" : : "r"(out));
+        u8 *out = unused;
     }
     zero = 0;
     four = 4;
     p[0xae] = four;
     p[0xb4] = zero;
     p[0xb6] = zero;
-    *(int *)(p + 0x50) = 3;
+    *((int *)(p + 0x50)) = 3;
     ResultMenu_CreateGraphics(p);
     sub_0801B534(p, ResultTutorial_Open);
     sub_0822AE7C(0xaa);
