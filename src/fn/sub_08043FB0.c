@@ -5,7 +5,9 @@
 void Shadow_Initialize(void *, void *, s32);
 void ContactSwarm_ApplyHealthContact(struct ContactCollider *, struct ContactCollider *,
                                      struct ContactSwarmSlot *);
-void sub_08043FAC(void *, struct ContactCollider *, struct ContactSwarmSlot *);
+#define ContactSwarm_IgnoreResourceContact sub_08043FAC
+void ContactSwarm_IgnoreResourceContact(struct ContactCollider *, struct ContactCollider *,
+                                        struct ContactSwarmSlot *);
 void sub_0821FF7C(void *, u32, u32, u32);
 void sub_0821FF58(void *, u32, u32, u32, u32, u32);
 u32 ContactSwarm_InitializeSlot(struct ContactSwarm *pool, struct ContactSwarmSlot *slot)
@@ -69,6 +71,6 @@ u32 ContactSwarm_InitializeSlot(struct ContactSwarm *pool, struct ContactSwarmSl
     ((struct ContactPosition *)&offset)->z = 0;
     Collider_Init(collider, 0, 0x2001, 0, 16, &bounds, &offset);
     Collider_SetPosition(collider, (void *)position, 0);
-    Collider_SetCallback(collider, sub_08043FAC, slot);
+    Collider_SetCallback(collider, ContactSwarm_IgnoreResourceContact, slot);
     sub_0821FF58(collider, 10, 30, 0x8000, 0, 8);
 }
