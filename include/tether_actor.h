@@ -23,7 +23,10 @@ struct TetherActor {
     s16 shakeZ;
     u8 unknown384[4];
     u16 shakeFrame;
-    u8 unknown38A[0x11];
+    u16 glowMode, glowFrame;
+    u8 unknown38E[6];
+    u16 paletteBlend;
+    u8 unknown396[5];
     u8 auxiliaryActive;
     struct ContactSwarmSprite auxiliarySprite;
     struct ContactSwarmGraphics auxiliaryGraphics;
