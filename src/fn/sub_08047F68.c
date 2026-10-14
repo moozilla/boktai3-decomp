@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_burst.h"
-#define ContactBurst_OnContact sub_08047F68
 struct ContactBurstHit {
     u8 unknown0[6];
     u16 flags;
@@ -9,18 +8,19 @@ struct ContactBurstHit {
     u8 unknown2A[0x18];
     u8 direction;
 };
-void ContactBurst_OnContact(struct ContactBurstHit *self, struct ContactBurstHit *otherInput, struct ContactBurst *effectInput)
+void ContactBurst_OnContact(struct ContactBurstHit *self, struct ContactBurstHit *otherInput,
+                            struct ContactBurst *effectInput)
 {
     struct ContactBurstHit *other = otherInput;
     register struct ContactBurst *effect asm("r4") = effectInput;
     u32 direction;
     effect->contactTimer = 18;
     {
-    u32 mask = 256;
-    if (self->flags & mask)
-        direction = self->direction;
-    else
-        direction = Math_Atan2(other->x - self->x, other->z - self->z);
+        u32 mask = 256;
+        if (self->flags & mask)
+            direction = self->direction;
+        else
+            direction = Math_Atan2(other->x - self->x, other->z - self->z);
     }
     effect->contactDirection = direction;
 }

@@ -48,7 +48,7 @@ void sub_082222BC(void *, void *, int);
 int sub_08222358(void *, void *);
 void Sound_PlaySongChecked(int);
 int SceneActorGraphics_GetResourceId(void *);
-void sub_08047D24(void *, int, int, int, void *);
+void TemporaryAnimationPool_CreateEntry(void *, int, int, int, void *);
 extern u8 *gUnk_030042E4;
 void sub_080251C4(ActorAnimation *p, int tick)
 {
@@ -97,7 +97,7 @@ void sub_080251C4(ActorAnimation *p, int tick)
                 int id = SceneActorGraphics_GetResourceId(p2);
                 {
                     u8 *data = gUnk_030042E4 + id * 32;
-                    sub_08047D24((u8 *)p2 + 0x240, 8, 0x200, 0x9000, data);
+                    TemporaryAnimationPool_CreateEntry((u8 *)p2 + 0x240, 8, 0x200, 0x9000, data);
                 }
             }
             if (sub_08222358((u8 *)p2 + 0x30c, position + 12))

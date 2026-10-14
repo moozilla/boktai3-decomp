@@ -1,10 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "temporary_animation_pool.h"
-#define TemporaryAnimationPool_Initialize sub_08047C14
 s32 sub_08219918(void *, void *, u32, u32, u32, u32, u32, void *);
 static inline s32 initializeAnimation(struct ProjectedDisplayEntry *animation,
-                                    struct ProjectedDisplayResource *resource,
-                                    struct ContactPosition *position, u32 zero)
+                                      struct ProjectedDisplayResource *resource,
+                                      struct ContactPosition *position, u32 zero)
 {
     s32 value = sub_08219918(animation, resource, 0, 0, 2, zero, 60, position);
     s32 result = 0;
@@ -17,7 +16,10 @@ s32 TemporaryAnimationPool_Initialize(struct TemporaryAnimationPool *pool)
     const struct ProjectedDisplayResource *resource;
     register struct TemporaryAnimationSlot *slot asm("r5");
     struct ProjectedDisplayResource *relocated;
-    struct { u32 zero; struct ContactPosition position; } scratch;
+    struct {
+        u32 zero;
+        struct ContactPosition position;
+    } scratch;
     register s32 index asm("r6");
     s32 result;
     u32 fillZero;

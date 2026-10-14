@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "directional_particles.h"
-#define DirectionalParticle_Update sub_08047DBC
 s32 DirectionalParticle_Update(void *unused, struct DirectionalParticle *particle)
 {
     struct DirectionalParticleMotion *motion = &particle->motion;

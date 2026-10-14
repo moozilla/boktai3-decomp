@@ -1,5 +1,4 @@
 #include "temporary_animation_pool.h"
-#define TemporaryAnimationPool_Update sub_08047BB4
 s32 TemporaryAnimationPool_Update(struct TemporaryAnimationPool *pool)
 {
     struct TemporaryAnimationSlot *slot = pool->slots;

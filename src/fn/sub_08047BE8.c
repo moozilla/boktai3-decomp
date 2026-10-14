@@ -1,5 +1,4 @@
 #include "temporary_animation_pool.h"
-#define TemporaryAnimationPool_Destroy sub_08047BE8
 s32 TemporaryAnimationPool_Destroy(struct TemporaryAnimationPool *pool)
 {
     struct TemporaryAnimationSlot *slot = pool->slots;

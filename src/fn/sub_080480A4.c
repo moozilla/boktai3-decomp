@@ -3,12 +3,9 @@
 #include "projected_display.h"
 extern u16 gUnk_03005418[];
 #include "directional_particles.h"
-#define ContactBurst_Update sub_080480A4
-#define ContactBurst_UpdateContactAnimation sub_08047FA8
-#define ContactBurst_RandomParticleFrame sub_08048074
-#define DirectionalParticle_Spawn sub_08047DF4
 s32 DirectionalParticle_Spawn(struct DirectionalParticleSource *, u32, u32);
-static inline void projectPosition(struct ContactPosition *screen, const struct ContactPosition *world)
+static inline void projectPosition(struct ContactPosition *screen,
+                                   const struct ContactPosition *world)
 {
     s32 x = world->x;
     s32 z = world->z;
@@ -76,7 +73,8 @@ s32 ContactBurst_Update(struct ContactBurst *effect)
                 sample &= 15;
                 direction += sample;
                 frame = ContactBurst_RandomParticleFrame();
-                DirectionalParticle_Spawn((struct DirectionalParticleSource *)effect, direction, frame);
+                DirectionalParticle_Spawn((struct DirectionalParticleSource *)effect, direction,
+                                          frame);
                 ++index;
             } while (index <= 7);
             Sound_PlaySong(0x3B7);

@@ -1,6 +1,4 @@
 #include "contact_burst.h"
-#define ContactBurst_Initialize sub_08048248
-#define ContactBurst_OnContact sub_08047F68
 void ContactBurst_OnContact(void *, void *, struct ContactBurst *);
 void sub_0821FF7C(void *, u32, u32, u32);
 s32 ContactBurst_Initialize(struct ContactBurst *effect, const struct ContactPosition *world)
