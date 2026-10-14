@@ -1,9 +1,7 @@
-#include "global.h"
-
-u32 sub_08045CF4(u8 *p)
+#include "projected_display.h"
+u32 ProjectedDisplay_GetHeight(struct ProjectedDisplay *display)
 {
-    if (p == 0) {
+    if (!display)
         return 0;
-    }
-    return *(u32 *)(p + 0x18);
+    return display->height;
 }

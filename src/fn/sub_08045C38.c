@@ -1,9 +1,6 @@
-#include "global.h"
-
-void sub_08045B74(void *);
-
-s32 sub_08045C38(void *p)
+#include "projected_display.h"
+s32 ProjectedDisplay_Destroy(struct ProjectedDisplay *display)
 {
-    sub_08045B74(p);
+    ProjectedDisplay_RemoveEntries(display);
     return 0;
 }
