@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "damage_number_display.h"
-#define DamageNumberDisplay_UpdateLeaving sub_08047068
-#define DamageNumberDisplay_RemoveGroup   sub_08046F08
 void DamageNumberDisplay_RemoveGroup(struct DamageNumberDisplay *, s32);
 extern const u32 gUnk_086059C0[];
 extern const s16 gUnk_08614A84[];

@@ -1,5 +1,4 @@
 #include "damage_number_display.h"
-#define DamageNumberDisplay_RenderDigits sub_08046BC8
 void sub_08217EEC(void *, void *, u32);
 void sub_08217E40(void *, u32);
 extern const u32 gUnk_086059C0[];
@@ -86,5 +85,5 @@ u32 DamageNumberDisplay_RenderDigits(struct DamageNumberDisplay *display,
     /* The original leaves r0 unspecified; both callers discard the result. */
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08046BC8);
+INCLUDE_ASM("asm/nonmatching", DamageNumberDisplay_RenderDigits);
 #endif

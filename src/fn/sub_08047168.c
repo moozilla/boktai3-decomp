@@ -1,6 +1,4 @@
 #include "damage_number_display.h"
-#define DamageNumberDisplay_Update       sub_08047168
-#define DamageNumberDisplay_GetActiveBit sub_08046B4C
 u32 DamageNumberDisplay_GetActiveBit(struct DamageNumberDisplay *, u32);
 s32 sub_08249244(void *, void *, u32, void *);
 extern void (*const gUnk_086059D4[])(struct DamageNumberDisplay *, struct DamageNumberGroup *, u32);

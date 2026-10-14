@@ -1,5 +1,4 @@
 #include "orbit_contact_actor.h"
-#define OrbitContactActor_UpdateInactive sub_08046880
 void OrbitContactActor_UpdateInactive(struct OrbitContactActor *actor)
 {
     if (actor->stateFlag) {

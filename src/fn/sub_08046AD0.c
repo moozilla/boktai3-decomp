@@ -1,8 +1,4 @@
 #include "orbit_contact_actor.h"
-#define OrbitContactActor_Create     sub_08046AD0
-#define OrbitContactActor_Initialize sub_08046A10
-#define OrbitContactActor_Update     sub_0804694C
-#define OrbitContactActor_Destroy    sub_08046A00
 s32 OrbitContactActor_Initialize(struct OrbitContactActor *, const struct ContactPosition *, u32);
 s32 OrbitContactActor_Update(struct OrbitContactActor *);
 s32 OrbitContactActor_Destroy(struct OrbitContactActor *);

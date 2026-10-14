@@ -1,5 +1,4 @@
 #include "orbit_contact_actor.h"
-#define OrbitContactActor_Initialize sub_08046A10
 void sub_0821FF58(void *, u32, u32, u32, u32, u32);
 s32 OrbitContactActor_Initialize(struct OrbitContactActor *actor,
                                  const struct ContactPosition *center, u32 resourceValue)

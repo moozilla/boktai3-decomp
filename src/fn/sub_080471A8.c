@@ -1,6 +1,4 @@
 #include "damage_number_display.h"
-#define DamageNumberDisplay_Destroy     sub_080471A8
-#define DamageNumberDisplay_RemoveGroup sub_08046F08
 void DamageNumberDisplay_RemoveGroup(struct DamageNumberDisplay *, s32);
 u32 DamageNumberDisplay_Destroy(struct DamageNumberDisplay *display)
 {

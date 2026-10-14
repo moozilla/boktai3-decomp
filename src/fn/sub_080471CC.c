@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "damage_number_display.h"
-#define DamageNumberDisplay_Initialize sub_080471CC
 void sub_08217E60(void *, void *, u32);
 void sub_08217EC4(void *, s32, s32);
 void sub_08217EEC(void *, void *, u32);
