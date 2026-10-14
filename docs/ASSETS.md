@@ -22,7 +22,7 @@ Types whose extension is known (the type is the hash of the string):
 | `922E` | `anm` | `08614DCC` | 75 | animation scripts |
 | `92B3` | ? | `088223C4` | 195 | palettes: 20-byte header + 16 × 16 colours (532 B each) |
 | `9B1B` | ? | `08D530DC` | 1 | 30 KB blob |
-| `98F5` | ? | `08A2D944` | 1 | 1.7 MB blob (`count 0x17D` header; nested format not decoded) |
+| `98F5` | ? | `08A2D944` | 1 | 1.7 MB: 381 large sprites (enemies, props, boss parts; below) |
 | `A635` | `fnt` | `089F8ED8` | 1 | font |
 | `A8D9` | `gcx` | `08D5A85C` | — | compiled scripts, a single image (MGS's GCL file extension); not an archive (below) |
 | `AE6C` | ? | `087C4C98` | 528 | LZ77; decompressed header magic `HP` |
@@ -142,3 +142,19 @@ monster list (#9838-#9921: ポイズナー ... グール, ゾンビ, マミー, 
 labels, elements (#9927-#9935), monster classes (ビースト, アンデッド, シング,
 ファントム, イモータル) and dungeon descriptions. Linking these names to the
 actor code (which kind is which monster) is the next step.
+
+## Large sprites (type `98F5`)
+
+`tools/assets/bigsprites.py list | index | sheet HASH [--palfile F]`. The
+single 1.7 MB entry holds 381 sprites: enemies, props (doors, chests, trees,
+traps) and boss parts. Actor code requests them by name with
+`ScriptProc_Start(0xCB05, name)` even though they are not in the `CB05`
+archive (for example `9247`, a shambling humanoid, from `sub_0808D1D8`), so
+the `CB05` lookup must also search this resource; the exact path is not yet
+traced. Layout (inferred): `+0x04` count, `+0x0C` pixel data start, `+0x10`
+frame table, `+0x14` part table; at `+0x18`, records of 12 bytes
+`{u32 name hash, u8 w, u8 h, u8 centre x, u8 centre y, u32 frame offset}`;
+frames of 12 bytes `{u8 parts, u8 tiles, u16 flags, u32 pixel offset,
+u32 part offset}`; parts of 4 bytes `{u8 size << 2 | shape, u8 flags, s8 x,
+s8 y}`, whose tiles follow each other in the frame's 4bpp pixel block.
+Matching these sprites to the monster names and actor kinds is open.
