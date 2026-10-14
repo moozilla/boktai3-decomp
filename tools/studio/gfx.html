@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boktai 3 Studio</title>
+<style>
+:root {
+  --bg: #f6f3ec; --panel: #fffdf8; --ink: #2b2620; --muted: #7d7468; --line: #e3dccf;
+  --accent: #b5462f; --accent-ink: #fff; --sel: #f3e3d6; --stage: #3b3f55; --checker: #464a62;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1b1916; --panel: #24211d; --ink: #ece6dc; --muted: #9a9083; --line: #3a352e;
+    --accent: #e0745a; --accent-ink: #1b1916; --sel: #3a2c25;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Hiragino Sans", sans-serif; }
+header { display: flex; align-items: center; gap: 16px; padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--panel); flex-wrap: wrap; }
+header h1 { font-size: 16px; margin: 0; }
+nav { display: flex; gap: 4px; flex-wrap: wrap; }
+nav a { color: var(--muted); text-decoration: none; padding: 5px 10px; border-radius: 6px; }
+nav a.on { background: var(--sel); color: var(--ink); }
+nav a:hover { color: var(--ink); }
+.sp { flex: 1; }
+select, input, button { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
+button { cursor: pointer; }
+main { display: grid; grid-template-columns: 260px 1fr; height: calc(100vh - 53px); }
+#side { border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
+#side .tools { padding: 10px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
+#side .count { color: var(--muted); font-size: 12px; }
+#list { overflow-y: auto; flex: 1; }
+.row { padding: 5px 10px; border-bottom: 1px solid var(--line); cursor: pointer; display: flex; gap: 8px; align-items: baseline; }
+.row:hover { background: var(--sel); }
+.row.on { background: var(--sel); box-shadow: inset 3px 0 var(--accent); }
+.row code { font-size: 12px; }
+.row .n { color: var(--muted); font-size: 12px; margin-left: auto; }
+.row .note { color: var(--accent); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#view { overflow: auto; padding: 16px 20px; min-width: 0; }
+h2 { font-size: 15px; margin: 0 0 4px; }
+.meta { color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+.stage { background: var(--stage); background-image: conic-gradient(var(--checker) 25%, transparent 0 50%, var(--checker) 0 75%, transparent 0); background-size: 16px 16px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; padding: 12px; min-width: 160px; min-height: 120px; }
+canvas { image-rendering: pixelated; display: block; }
+.strip { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.cell { background: var(--stage); border-radius: 6px; padding: 4px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; border: 2px solid transparent; }
+.cell.on { border-color: var(--accent); }
+.cell span { font-size: 10px; color: #cfd2e6; font-variant-numeric: tabular-nums; }
+.controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 10px 0; font-size: 13px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 6px; }
+.grid .cell { height: 96px; justify-content: center; }
+.pal { display: grid; grid-template-columns: repeat(16, 14px); gap: 1px; }
+.pal i { width: 14px; height: 14px; display: block; }
+.palcard { border: 1px solid var(--line); border-radius: 8px; padding: 8px; cursor: pointer; background: var(--panel); }
+.palcard.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.palcard code { font-size: 12px; }
+.palgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+#tip { position: fixed; pointer-events: none; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; font-size: 13px; display: none; box-shadow: 0 4px 16px rgba(0,0,0,.2); }
+.legend { display: flex; gap: 12px; font-size: 12px; color: var(--muted); margin: 8px 0; flex-wrap: wrap; }
+.legend b { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+@media (max-width: 760px) { main { grid-template-columns: 1fr; height: auto; } #side { height: 40vh; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Boktai 3 Studio</h1>
+  <nav>
+    <a href="/">Text</a>
+    <a href="#sprites" data-tab="sprites">Sprites</a>
+    <a href="#big" data-tab="big">Large sprites</a>
+    <a href="#palettes" data-tab="palettes">Palettes</a>
+    <a href="#font" data-tab="font">Font</a>
+    <a href="#tiles" data-tab="tiles">Tiles</a>
+  </nav>
+  <span class="sp"></span>
+  <label style="font-size:13px;color:var(--muted)">Palette
+    <select id="palSel"></select>
+  </label>
+  <label style="font-size:13px;color:var(--muted)">Zoom
+    <select id="zoom"><option>1</option><option selected>2</option><option>3</option><option>4</option></select>
+  </label>
+</header>
+<main>
+  <section id="side">
+    <div class="tools"><input id="q" type="search" placeholder="Filter by hash or note" autocomplete="off"><div class="count" id="count"></div></div>
+    <div id="list"></div>
+  </section>
+  <section id="view"></section>
+</main>
+<div id="tip"></div>
+<script>
+// ---------- data + decoding ----------
+const $ = id => document.getElementById(id);
+const SIZES = { 0: [[8, 8], [16, 16], [32, 32], [64, 64]], 1: [[16, 8], [32, 8], [32, 16], [64, 32]], 2: [[8, 16], [8, 32], [16, 32], [32, 64]], 3: [[8, 8], [8, 8], [8, 8], [8, 8]] };
+// Tentative identifications from docs/ASSETS.md (visual guesses unless noted).
+const NOTES = {
+  B96C: 'slime (name hash confirmed)', 9506: 'bee (name hash confirmed)', DA6D: 'bat?', 9247: 'ghoul / zombie?', D637: 'hooded figure', D28E: 'ring (runs in field; effect?)',
+  '5A6E': 'crow / raven?', '528F': 'spider?', D636: 'octopus?', 5290: 'red round creature', '48DE': 'thin green figure', D635: 'dragon puppy?', 3876: 'arcade cabinet',
+  D291: 'flame worm (モエルルン?)', D638: 'pale worm (ヒエルルン?)', 5291: 'living sword', '3DB6': 'black winged creature', AE52: 'skeletons', '0658': 'sword-wielder', '158A': 'man in coat',
+  DE23: 'playable character', '761E': 'character (1253 frames)', F761: 'large beast', F771: 'large bird', F7D2: 'boss face', A2DB: 'eruption effect', '1BC7': 'flames',
+  DF11: 'light bulb', '731D': 'copyright line', '82F1': 'PURIFICATION COMPLETED!', E89F: 'Boktai 2 title',
+};
+const le = (b, o) => b[o] | b[o + 1] << 8;
+const s16 = (b, o) => (le(b, o) << 16) >> 16;
+const u32 = (b, o) => (b[o] | b[o + 1] << 8 | b[o + 2] << 16 | b[o + 3] << 24) >>> 0;
+const s8 = (b, o) => (b[o] << 24) >> 24;
+
+let index = {}, palettes = [], curPal = null, zoom = 2, big = null, font = null, charmap = {};
+const cache = new Map();
+async function res(label, hash) {
+  const k = label + '/' + hash;
+  if (!cache.has(k)) cache.set(k, fetch(`/api/res/${label}/${hash}`).then(r => r.arrayBuffer()).then(b => new Uint8Array(b)));
+  return cache.get(k);
+}
+
+function rgb(c) { return [(c & 31) * 255 / 31 | 0, (c >> 5 & 31) * 255 / 31 | 0, (c >> 10 & 31) * 255 / 31 | 0]; }
+function palColors(p) { // 256 RGB triples, or a grey ramp
+  if (!p) return Array.from({ length: 256 }, (_, i) => { const v = (i & 15) * 17; return [v, v, v]; });
+  return Array.from({ length: 256 }, (_, i) => rgb(le(p.data, 20 + i * 2)));
+}
+
+// Draw one 4bpp 8x8 tile into ImageData at (x, y), with flips inside a w x h part.
+function tile(img, src, off, x, y, colors, bank, hf, vf) {
+  const W = img.width, d = img.data;
+  for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+    const v = (src[off + r * 4 + (c >> 1)] >> (4 * (c & 1))) & 15;
+    if (!v) continue;
+    const px = x + (hf ? 7 - c : c), py = y + (vf ? 7 - r : r);
+    if (px < 0 || py < 0 || px >= W || py >= img.height) continue;
+    const [R, G, B] = colors[bank * 16 + v], o = (py * W + px) * 4;
+    d[o] = R; d[o + 1] = G; d[o + 2] = B; d[o + 3] = 255;
+  }
+}
+
+function toCanvas(img, z = zoom) {
+  const cv = document.createElement('canvas');
+  cv.width = img.width; cv.height = img.height;
+  cv.getContext('2d').putImageData(img, 0, 0);
+  cv.style.width = img.width * z + 'px'; cv.style.height = img.height * z + 'px';
+  return cv;
+}
+
+// Compose parts [{x,y,w,h,tiles:(tx,ty)->offset, bank, hf, vf}] into one image.
+function compose(parts, colors, box) {
+  if (!parts.length) return null;
+  let x0 = Math.min(...parts.map(p => p.x)), y0 = Math.min(...parts.map(p => p.y));
+  let x1 = Math.max(...parts.map(p => p.x + p.w)), y1 = Math.max(...parts.map(p => p.y + p.h));
+  if (box) { x0 = Math.min(x0, box[0]); y0 = Math.min(y0, box[1]); x1 = Math.max(x1, box[2]); y1 = Math.max(y1, box[3]); }
+  const img = new ImageData(Math.max(1, x1 - x0), Math.max(1, y1 - y0));
+  for (const p of [...parts].reverse()) {
+    const tw = p.w / 8, th = p.h / 8;
+    for (let ty = 0; ty < th; ty++) for (let tx = 0; tx < tw; tx++) {
+      const dx = p.hf ? (tw - 1 - tx) * 8 : tx * 8, dy = p.vf ? (th - 1 - ty) * 8 : ty * 8;
+      tile(img, p.src, p.tileOff(tx, ty), p.x - x0 + dx, p.y - y0 + dy, colors, p.bank, p.hf, p.vf);
+    }
+  }
+  return img;
+}
+
+// CB05 sprite package (tools/assets/sprites.py)
+function parsePackage(b) {
+  const nframes = le(b, 2), nanims = le(b, 4), offs = [0, 1, 2, 3, 4].map(i => u32(b, 0xC + i * 4));
+  const frames = [], anims = [];
+  for (let i = 0; i < nframes; i++) {
+    const o = offs[0] + i * 20;
+    frames.push({ id: le(b, o), n: le(b, o + 2), po: u32(b, o + 16) });
+  }
+  for (let i = 0; i < nanims; i++) {
+    const o = offs[1] + i * 8, n = le(b, o + 2), ko = u32(b, o + 4), keys = [];
+    for (let k = 0; k < n; k++) keys.push({ frame: le(b, offs[3] + ko + k * 4), dur: le(b, offs[3] + ko + k * 4 + 2) });
+    anims.push({ id: le(b, o), keys });
+  }
+  const parts = f => {
+    const out = [];
+    for (let k = 0; k < f.n; k++) {
+      const o = offs[2] + f.po + k * 8, attr = le(b, o), a2 = le(b, o + 6);
+      const [w, h] = SIZES[(attr >> 8) & 3][(attr >> 10) & 3], t = a2 & 0x3FF;
+      out.push({ x: s16(b, o + 2), y: s16(b, o + 4), w, h, bank: a2 >> 12, hf: !!(attr & 4), vf: !!(attr & 8), src: b, tileOff: (tx, ty) => offs[4] + (t + ty * 16 + tx) * 32 });
+    }
+    return out;
+  };
+  return { frames, anims, parts, ntiles: le(b, 10) };
+}
+
+// 98F5 large sprites (tools/assets/bigsprites.py)
+function parseBig(d) {
+  const count = u32(d, 4), pixels = u32(d, 0xC), framesAt = u32(d, 0x10), partsAt = u32(d, 0x14), recs = [];
+  for (let i = 0; i < count; i++) {
+    const o = 0x18 + i * 12;
+    recs.push({ hash: u32(d, o).toString(16).toUpperCase().padStart(4, '0'), w: d[o + 4], h: d[o + 5], cx: d[o + 6], cy: d[o + 7], foff: u32(d, o + 8) });
+  }
+  const frames = i => {
+    const a = recs[i].foff, e = i + 1 < count ? recs[i + 1].foff : partsAt - framesAt, out = [];
+    for (let o = a; o < e; o += 12) out.push({ n: d[framesAt + o], pix: u32(d, framesAt + o + 4), po: u32(d, framesAt + o + 8) });
+    return out;
+  };
+  const parts = f => {
+    const out = []; let t = 0;
+    for (let k = 0; k < f.n; k++) {
+      const o = partsAt + f.po + k * 4, attr = d[o], [w, h] = SIZES[attr & 3][(attr >> 2) & 3], t0 = t;
+      out.push({ x: s8(d, o + 2), y: s8(d, o + 3), w, h, bank: 0, hf: false, vf: false, src: d, tileOff: (tx, ty) => pixels + f.pix + (t0 + ty * (w / 8) + tx) * 32 });
+      t += (w / 8) * (h / 8);
+    }
+    return out;
+  };
+  return { recs, frames, parts };
+}
+
+// ---------- shell ----------
+let tab = 'sprites', items = [], sel = null, timer = null;
+const views = {};
+
+async function boot() {
+  index = await fetch('/api/res').then(r => r.json());
+  const ps = index.t92B3 || [];
+  palettes = await Promise.all(ps.map(async ([h]) => ({ hash: h, data: await res('t92B3', h) })));
+  $('palSel').innerHTML = '<option value="">Greyscale</option>' + palettes.map((p, i) => `<option value="${i}">${p.hash}</option>`).join('');
+  const saved = localStore('pal');
+  $('palSel').value = saved ?? String(palettes.findIndex(p => p.hash === '081B'));
+  curPal = palettes[+$('palSel').value] || null;
+  $('palSel').onchange = () => { curPal = palettes[+$('palSel').value] || null; localStore('pal', $('palSel').value); refresh(); };
+  $('zoom').onchange = () => { zoom = +$('zoom').value; refresh(); };
+  $('q').oninput = renderList;
+  window.onhashchange = route;
+  route();
+}
+function localStore(k, v) { try { if (v === undefined) return localStorage.getItem('studio.' + k); localStorage.setItem('studio.' + k, v); } catch (e) { return null; } }
+
+function route() {
+  const [t, s] = (location.hash.slice(1) || 'sprites').split('/');
+  tab = views[t] ? t : 'sprites';
+  document.querySelectorAll('nav a[data-tab]').forEach(a => a.classList.toggle('on', a.dataset.tab === tab));
+  views[tab].init().then(() => { renderList(); if (s) select(s); else if (!sel || !items.some(i => i.key === sel)) select(items[0]?.key); else refresh(); });
+}
+function renderList() {
+  const q = $('q').value.trim().toUpperCase();
+  const hits = items.filter(i => !q || i.key.includes(q) || (i.note || '').toUpperCase().includes(q));
+  $('count').textContent = `${hits.length} of ${items.length}`;
+  $('list').replaceChildren(...hits.map(i => {
+    const d = document.createElement('div');
+    d.className = 'row' + (i.key === sel ? ' on' : '');
+    d.innerHTML = `<code>${i.key}</code>${i.note ? `<span class="note"></span>` : ''}<span class="n">${i.n ?? ''}</span>`;
+    if (i.note) d.querySelector('.note').textContent = i.note;
+    d.onclick = () => { history.replaceState(null, '', `#${tab}/${i.key}`); select(i.key); };
+    return d;
+  }));
+}
+function select(key) {
+  sel = key;
+  document.querySelectorAll('.row').forEach(r => r.classList.toggle('on', r.querySelector('code').textContent === key));
+  refresh();
+}
+function refresh() { clearInterval(timer); timer = null; if (sel !== undefined) views[tab].show(sel); }
+const colorsNow = () => palColors(curPal);
+
+// Animation player over a list of images with durations (frames at 60 Hz).
+function player(target, seq) {
+  clearInterval(timer);
+  if (!seq.length) return;
+  let i = 0, left = seq[0].dur;
+  const draw = () => target.replaceChildren(seq[i].canvas);
+  draw();
+  if (seq.length > 1) timer = setInterval(() => { if (--left > 0) return; i = (i + 1) % seq.length; left = Math.max(1, seq[i].dur); draw(); }, 1000 / 60);
+}
+
+// ---------- sprites (CB05) ----------
+views.sprites = {
+  async init() { items = (index.tCB05 || []).map(([h, n]) => ({ key: h, note: NOTES[h], n: (n / 1024).toFixed(0) + ' KB' })); },
+  async show(h) {
+    const pkg = parsePackage(await res('tCB05', h)), colors = colorsNow();
+    const v = $('view');
+    v.innerHTML = `<h2>Sprite package ${h}</h2><div class="meta">${NOTES[h] ? NOTES[h] + ' · ' : ''}${pkg.frames.length} frames · ${pkg.anims.length} animations · ${pkg.ntiles} tiles</div>
+      <div class="controls">Animation <select id="anim"></select> <span id="ainfo" style="color:var(--muted)"></span></div>
+      <div class="stage" id="stage"></div><div class="strip" id="strip"></div>`;
+    // Shared box per package so animations do not jitter.
+    const imgs = pkg.frames.map(f => compose(pkg.parts(f), colors));
+    const strip = $('strip');
+    const max = 300;
+    imgs.slice(0, max).forEach((img, i) => {
+      const c = document.createElement('div'); c.className = 'cell';
+      if (img) c.appendChild(toCanvas(img, 1));
+      c.insertAdjacentHTML('beforeend', `<span>${i}</span>`);
+      c.onclick = () => { clearInterval(timer); $('stage').replaceChildren(img ? toCanvas(img) : ''); strip.querySelectorAll('.cell').forEach(x => x.classList.toggle('on', x === c)); };
+      strip.appendChild(c);
+    });
+    if (imgs.length > max) strip.insertAdjacentHTML('beforeend', `<div class="meta">…and ${imgs.length - max} more frames</div>`);
+    const sel = $('anim');
+    sel.innerHTML = pkg.anims.map((a, i) => `<option value="${i}">#${i} (id ${a.id}, ${a.keys.length} keys)</option>`).join('') || '<option>none</option>';
+    const play = () => {
+      const a = pkg.anims[+sel.value]; if (!a) { if (imgs[0]) $('stage').replaceChildren(toCanvas(imgs[0])); return; }
+      const fs = a.keys.map(k => pkg.frames[k.frame] ? pkg.parts(pkg.frames[k.frame]) : []);
+      const all = fs.flat();
+      const box = all.length ? [Math.min(...all.map(p => p.x)), Math.min(...all.map(p => p.y)), Math.max(...all.map(p => p.x + p.w)), Math.max(...all.map(p => p.y + p.h))] : null;
+      const seq = a.keys.map((k, i) => { const img = compose(fs[i], colors, box); return { canvas: img ? toCanvas(img) : document.createElement('span'), dur: k.dur || 8 }; });
+      $('ainfo').textContent = a.keys.map(k => `${k.frame}×${k.dur}`).slice(0, 12).join(' ') + (a.keys.length > 12 ? ' …' : '');
+      player($('stage'), seq);
+    };
+    sel.onchange = play; play();
+  },
+};
+
+// ---------- large sprites (98F5) ----------
+views.big = {
+  async init() {
+    if (!big) { const e = index.t98F5[0][0]; big = parseBig(await res('t98F5', e)); }
+    items = big.recs.map((r, i) => ({ key: r.hash, idx: i, note: NOTES[r.hash], n: big.frames(i).length + 'f' }));
+  },
+  async show(h) {
+    const i = big.recs.findIndex(r => r.hash === h), colors = colorsNow();
+    const v = $('view');
+    if (i < 0) { v.textContent = 'Not found'; return; }
+    const r = big.recs[i], frames = big.frames(i);
+    v.innerHTML = `<h2>Large sprite ${h}</h2><div class="meta">${NOTES[h] ? NOTES[h] + ' · ' : ''}${frames.length} frames · ${r.w}×${r.h}, centre (${r.cx}, ${r.cy}) · frame order shown, not the game's animation timing</div>
+      <div class="controls"><label>Speed <select id="spd"><option value="4">fast</option><option value="8" selected>normal</option><option value="16">slow</option></select></label></div>
+      <div class="stage" id="stage"></div><div class="strip" id="strip"></div>
+      <h2 style="margin-top:20px">All large sprites</h2><div class="meta">First frame of each; click to open.</div><div class="grid" id="all"></div>`;
+    const ps = frames.map(f => big.parts(f)), all = ps.flat();
+    const box = all.length ? [Math.min(...all.map(p => p.x)), Math.min(...all.map(p => p.y)), Math.max(...all.map(p => p.x + p.w)), Math.max(...all.map(p => p.y + p.h))] : null;
+    const imgs = ps.map(p => compose(p, colors, box));
+    const play = () => player($('stage'), imgs.filter(Boolean).map(img => ({ canvas: toCanvas(img), dur: +$('spd').value })));
+    $('spd').onchange = play; play();
+    imgs.forEach((img, k) => {
+      const c = document.createElement('div'); c.className = 'cell';
+      if (img) c.appendChild(toCanvas(img, 1));
+      c.insertAdjacentHTML('beforeend', `<span>${k}</span>`);
+      c.onclick = () => { clearInterval(timer); $('stage').replaceChildren(toCanvas(img)); };
+      $('strip').appendChild(c);
+    });
+    const grid = $('all');
+    big.recs.forEach((rr, k) => {
+      const c = document.createElement('div'); c.className = 'cell' + (k === i ? ' on' : ''); c.title = (NOTES[rr.hash] || '') + ' ' + rr.hash;
+      const f = big.frames(k)[0], img = f ? compose(big.parts(f), colors) : null;
+      if (img) { const cv = toCanvas(img, 1), s = Math.min(1, 72 / Math.max(img.width, img.height)); cv.style.width = img.width * s + 'px'; cv.style.height = img.height * s + 'px'; c.appendChild(cv); }
+      c.insertAdjacentHTML('beforeend', `<span>${rr.hash}</span>`);
+      c.onclick = () => { location.hash = `big/${rr.hash}`; };
+      grid.appendChild(c);
+    });
+  },
+};
+
+// ---------- palettes ----------
+views.palettes = {
+  async init() { items = palettes.map((p, i) => ({ key: p.hash, i })); },
+  async show(h) {
+    const v = $('view');
+    v.innerHTML = `<h2>Palettes</h2><div class="meta">${palettes.length} resources of 256 colours (16 banks). Sprites choose a bank per part; which palette the game loads for a sprite is set at runtime (scripts, stage data), so pick one here. Click a palette to use it everywhere.</div><div class="palgrid" id="pg"></div>`;
+    const pg = $('pg');
+    palettes.forEach((p, i) => {
+      const card = document.createElement('div'); card.className = 'palcard' + (curPal === p ? ' on' : '');
+      const cols = palColors(p);
+      card.innerHTML = `<code>${p.hash}</code><div class="pal">${cols.map(([r, g, b]) => `<i style="background:rgb(${r},${g},${b})"></i>`).join('')}</div>`;
+      card.onclick = () => { $('palSel').value = i; curPal = p; localStore('pal', i); pg.querySelectorAll('.palcard').forEach(x => x.classList.toggle('on', x === card)); };
+      if (p.hash === h) setTimeout(() => card.scrollIntoView({ block: 'center' }), 0);
+      pg.appendChild(card);
+    });
+  },
+};
+
+// ---------- font ----------
+views.font = {
+  async init() {
+    if (!font) {
+      font = await fetch('/api/font').then(r => r.arrayBuffer()).then(b => new Uint8Array(b));
+      charmap = await fetch('/api/charmap').then(r => r.json());
+    }
+    items = [{ key: 'ASCII', note: '128 half-width glyphs' }, ...[0, 1, 2, 3, 4, 5].map(p => ({ key: 'PAGE' + p, note: `glyphs ${p}00–${p}FF` + (p === 0 ? ' (kana, symbols)' : '') }))];
+  },
+  async show(k) {
+    const v = $('view'), z = Math.max(2, zoom);
+    const ink = [[0, 0, 0], [140, 58, 46], [194, 122, 98], [228, 185, 163]];
+    const colors = Array.from({ length: 256 }, (_, i) => ink[i & 15] || [255, 247, 223]);
+    let n, w, off, base = 0;
+    if (k === 'ASCII') { n = 128; w = 8; off = g => 0xC + g * 64; }
+    else { base = +k.slice(4) * 256; n = Math.min(256, 1537 - base); w = 16; off = g => 0x200C + (base + g) * 128; }
+    const cols = 16, cell = w + 4, img = new ImageData(cols * cell, Math.ceil(n / cols) * 20);
+    for (let g = 0; g < n; g++) {
+      const x = (g % cols) * cell + 2, y = Math.floor(g / cols) * 20 + 2, o = off(g);
+      if (w === 8) { tile(img, font, o, x, y, colors, 0); tile(img, font, o + 32, x, y + 8, colors, 0); }
+      else [[0, 0], [8, 0], [0, 8], [8, 8]].forEach(([dx, dy], t) => tile(img, font, o + t * 32, x + dx, y + dy, colors, 0));
+    }
+    v.innerHTML = `<h2>Font · ${k === 'ASCII' ? 'ASCII (0x20–0x9F)' : 'glyphs ' + base.toString(16).toUpperCase().padStart(3, '0') + '–' + (base + n - 1).toString(16).toUpperCase().padStart(3, '0')}</h2>
+      <div class="meta">Hover a glyph for its code and reading from data/charmap.tsv. Text uses code 0x8000 + glyph.</div>
+      <div class="legend"><span><b style="background:#2f7d4f"></b>mapped in charmap.tsv</span><span><b style="background:#888"></b>unmapped (blank glyph)</span></div>
+      <div class="stage" id="fs" style="background:#fff7df"></div>`;
+    const cv = toCanvas(img, z); $('fs').appendChild(cv);
+    // Confidence marks under each glyph.
+    const ctx = cv.getContext('2d');
+    if (k !== 'ASCII') for (let g = 0; g < n; g++) {
+      const e = charmap[(base + g).toString(16).toUpperCase().padStart(4, '0')];
+      ctx.fillStyle = !e ? '#888' : '#2f7d4f';
+      ctx.fillRect((g % cols) * cell + 2, Math.floor(g / cols) * 20 + 18, w, 1);
+    }
+    cv.onmousemove = ev => {
+      const r = cv.getBoundingClientRect(), x = (ev.clientX - r.left) / z, y = (ev.clientY - r.top) / z;
+      const g = Math.floor(y / 20) * cols + Math.floor(x / cell);
+      if (g < 0 || g >= n) return tipHide();
+      const code = k === 'ASCII' ? g + 0x20 : base + g;
+      const ch = k === 'ASCII' ? String.fromCharCode(code) : (charmap[code.toString(16).toUpperCase().padStart(4, '0')] ?? '—');
+      tipShow(ev, k === 'ASCII' ? `byte 0x${code.toString(16).toUpperCase()} · ${ch}` : `glyph ${code.toString(16).toUpperCase().padStart(3, '0')} · text code ${(0x8000 + code).toString(16).toUpperCase()} · <b style="font-size:18px">${ch}</b>`);
+    };
+    cv.onmouseleave = tipHide;
+  },
+};
+function tipShow(ev, html) { const t = $('tip'); t.innerHTML = html; t.style.display = 'block'; t.style.left = ev.clientX + 14 + 'px'; t.style.top = ev.clientY + 14 + 'px'; }
+function tipHide() { $('tip').style.display = 'none'; }
+
+// ---------- raw tiles ----------
+views.tiles = {
+  async init() {
+    items = Object.entries(index).flatMap(([lab, es]) => es.map(([h, n]) => ({ key: `${lab}:${h}`, n: n >= 1024 ? (n / 1024).toFixed(0) + ' KB' : n + ' B' })));
+  },
+  async show(key) {
+    const [lab, h] = key.split(':'), d = await res(lab, h), v = $('view');
+    const st = JSON.parse(localStore('tiles') || '{"w":16,"off":0,"bank":0}');
+    v.innerHTML = `<h2>Raw tiles · ${lab} ${h}</h2><div class="meta">${d.length.toLocaleString()} bytes shown as 4bpp 8×8 tiles, for exploring formats not decoded yet.</div>
+      <div class="controls">Width <input id="tw" type="number" min="1" max="64" value="${st.w}" style="width:4em"> tiles · Offset <input id="to" type="number" min="0" step="32" value="${st.off}" style="width:7em"> bytes · Bank <input id="tb" type="number" min="0" max="15" value="${st.bank}" style="width:3.5em"> · showing at most 1024 tiles</div>
+      <div class="stage" id="ts"></div>`;
+    const draw = () => {
+      const w = +$('tw').value || 16, off = Math.max(0, +$('to').value || 0), bank = +$('tb').value || 0;
+      localStore('tiles', JSON.stringify({ w, off, bank }));
+      const n = Math.min(1024, Math.floor((d.length - off) / 32)), rows = Math.ceil(n / w);
+      if (n <= 0) { $('ts').textContent = 'Offset past the end.'; return; }
+      const img = new ImageData(w * 8, rows * 8), colors = colorsNow();
+      for (let t = 0; t < n; t++) tile(img, d, off + t * 32, (t % w) * 8, Math.floor(t / w) * 8, colors, bank);
+      $('ts').replaceChildren(toCanvas(img));
+    };
+    ['tw', 'to', 'tb'].forEach(id => $(id).oninput = draw);
+    draw();
+  },
+};
+
+boot();
+</script>
+</body>
+</html>

@@ -20,7 +20,7 @@ Types whose extension is known (the type is the hash of the string):
 | Type | Extension | Archive | Entries | Contents |
 |---|---|---|---|---|
 | `922E` | `anm` | `08614DCC` | 75 | animation scripts |
-| `92B3` | ? | `088223C4` | 195 | palettes: 20-byte header + 16 × 16 colours (532 B each) |
+| `92B3` | palette | `088223C4` | 195 | palettes: 20-byte header + 16 × 16 colours (532 B each) |
 | `9B1B` | ? | `08D530DC` | 1 | 30 KB blob |
 | `98F5` | ? | `08A2D944` | 1 | 1.7 MB: 381 large sprites (enemies, props, boss parts; below) |
 | `A635` | `fnt` | `089F8ED8` | 1 | font |
@@ -125,6 +125,15 @@ of 8x16 and 1,537 two-byte glyphs of 16x16, 4bpp as four 8x8 tiles (TL, TR,
 BL, BR); colour 4 is background, 1 the stroke and 2-3 shading. Kana and
 symbols come first (`0x001`-`0x0FF`), then kanji grouped by radical, with
 "PG" logo glyphs at `0x100`, `0x200`, ... `0x600`.
+
+**Cross-checked against the fan translation** (`moozilla/boktai3trans`,
+`scriptEd/`): its `chartable.sjs.tbl` settled 25 glyphs in its favour (for
+example 聞 for 閣 in 聞く, 秘, 運, 障, 貨/貸 swapped, 讐, 誓, 必, 風), each
+confirmed by the strings' context; 冠 stays ours (妖精の冠(かんむり)).
+After the fixes, 7,098 of the 7,217 strings whose Japanese its `script.sjs`
+keeps as comments decode identically; the rest differ only in notation
+(`{note}` for ♪, `{＋}` for ✚, 〜 for ～) or stray English in a comment. Its
+`protected_zones.txt` lists the same 82 binary entries as `text_bank`.
 
 Glyph order is not Shift-JIS order. In the kanji section (`0x100` on), only
 526 of 1,073 neighbouring mapped pairs increase in SJIS code, about chance,

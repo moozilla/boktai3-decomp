@@ -1,5 +1,6 @@
 # Game font glyph index (two-byte text code - 0x8000) to character.
 # confidence: high = read by eye; match = font-matcher candidate confirmed by eye; low = uncertain.
+# context = from the boktai3trans chartable.sjs.tbl (DarthNemesis/Spikeman), confirmed by the strings; tbl = from that table only (glyph unused by the strings).
 # {PGnn} are logo glyphs. Indices not listed are blank glyphs.
 index	char	confidence
 0000	■	high
@@ -202,7 +203,7 @@ index	char	confidence
 00C9	Ⅰ	high
 00CA	Ⅱ	high
 00CB	Ⅲ	high
-00D0	凰	low
+00D0	風	context
 00D1	白	high
 00D2	黒	high
 00D3	赤	high
@@ -283,7 +284,7 @@ index	char	confidence
 0125	位	match
 0126	倍	match
 0127	信	match
-0128	佶	match
+0128	借	context
 0129	僧	match
 012A	住	match
 012B	供	match
@@ -334,7 +335,7 @@ index	char	confidence
 015A	抜	match
 015B	抵	match
 015C	拡	match
-015D	拾	match
+015D	捨	context
 015E	搭	match
 015F	持	match
 0160	推	match
@@ -342,14 +343,14 @@ index	char	confidence
 0162	換	match
 0163	携	high
 0164	指	match
-0165	擁	low
+0165	接	context
 0166	揮	match
 0167	採	match
 0168	探	match
 0169	操	high
 016A	掛	match
 016B	拗	low
-016C	挽	match
+016C	拠	context
 016D	物	match
 016E	特	match
 016F	犠	high
@@ -512,7 +513,7 @@ index	char	confidence
 0216	相	match
 0217	根	high
 0218	板	high
-0219	析	high
+0219	栃	context
 021A	標	high
 021B	植	high
 021C	枚	match
@@ -522,6 +523,7 @@ index	char	confidence
 0220	桶	high
 0221	横	high
 0222	様	high
+0223	欅	tbl
 0224	橋	high
 0225	権	high
 0226	柄	match
@@ -540,7 +542,7 @@ index	char	confidence
 0234	称	match
 0235	秤	match
 0236	移	match
-0237	秩	low
+0237	秘	context
 0238	種	high
 0239	穫	high
 023A	積	high
@@ -591,7 +593,7 @@ index	char	confidence
 0278	隆	match
 0279	降	match
 027A	険	match
-027B	陸	match
+027B	障	context
 027C	陣	match
 027D	陰	match
 027E	隠	match
@@ -790,7 +792,7 @@ index	char	confidence
 0374	関	high
 0375	開	high
 0376	闇	high
-0377	閣	high
+0377	聞	context
 0378	闘	high
 0381	込	match
 0382	近	match
@@ -808,7 +810,7 @@ index	char	confidence
 038E	進	match
 038F	送	match
 0390	遺	low
-0391	遅	match
+0391	運	context
 0392	過	high
 0393	逃	match
 0394	逆	match
@@ -1011,7 +1013,7 @@ index	char	confidence
 046B	芽	match
 046C	茶	match
 046D	墓	low
-046E	甚	low
+046E	暮	context
 046F	著	match
 0470	藤	high
 0471	菅	low
@@ -1038,7 +1040,7 @@ index	char	confidence
 0492	威	high
 0493	戒	match
 0494	哉	match
-0495	裁	high
+0495	載	context
 0497	並	match
 0498	首	high
 0499	普	match
@@ -1063,7 +1065,7 @@ index	char	confidence
 04AC	画	match
 04AD	面	match
 04AE	品	match
-04AF	畠	match
+04AF	晶	context
 04B0	器	match
 04B1	巨	match
 04B2	向	high
@@ -1166,16 +1168,16 @@ index	char	confidence
 0523	負	match
 0524	真	high
 0525	資	match
-0526	貸	high
-0527	貨	high
+0526	貨	context
+0527	貸	context
 0528	貴	low
 0529	貫	high
 052A	質	high
-052B	輿	match
-052C	賛	low
-052D	腎	match
+052B	興	context
+052C	贄	context
+052D	賢	context
 052E	費	high
-052F	貝	low
+052F	員	context
 0530	翼	high
 0531	木	match
 0532	本	match
@@ -1186,7 +1188,7 @@ index	char	confidence
 0537	束	match
 0538	集	match
 0539	業	match
-053A	乘	match
+053A	乗	context
 053B	条	match
 053C	楽	match
 053D	染	high
@@ -1197,7 +1199,7 @@ index	char	confidence
 0542	基	match
 0543	壁	match
 0544	塗	match
-0545	疑	high
+0545	髪	context
 0547	望	match
 0548	聖	high
 054A	整	match
@@ -1234,10 +1236,10 @@ index	char	confidence
 0581	響	match
 0582	爵	match
 0583	舞	match
-0585	誓	high
-0586	哲	high
+0585	讐	context
+0586	誓	context
 0587	警	match
-0589	筆	high
+0589	肇	context
 058B	撃	match
 058D	導	high
 058E	辱	high
@@ -1273,10 +1275,10 @@ index	char	confidence
 05BA	秀	match
 05BB	季	high
 05BE	島	match
-05BF	烏	match
+05BF	鳥	context
 05C0	馬	high
 05C1	心	high
-05C2	灸	low
+05C2	必	context
 05C3	犬	match
 05C4	出	match
 05C5	当	match
