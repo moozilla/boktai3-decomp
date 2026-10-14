@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Item {
     u8 state, entered, unused, count;
@@ -15,26 +14,30 @@ extern const u16 gUnk_0824DE7C[];
 void Anim_LoadKeyframe(void *, void *, int, int);
 void sub_0803A238(void *p, struct Item *q, int index)
 {
-    if (q->entered) {
-        int choice;
-        void *draw;
-        q->entered = 0;
-        q->value = q->count;
-        q->flags &= ~1;
-        draw = (u8 *)q + 0x50;
-        p = (u8 *)p + 0x3c;
-        asm("" : "+r"(draw), "+r"(p));
-        if (index > 7)
-            choice = (index & 3) + 4;
-        else
-            choice = index & 3;
-        Anim_LoadKeyframe(draw, p, gUnk_0824DE7C[choice], 0);
-        q->flags2 &= ~1;
-    }
-    if (q->timer > 31) {
-        q->state = 0;
-        q->entered = 1;
-        q->timer = 0;
-    }
-    q->timer++;
+    void *alias;
+    /* do-while(0) only keeps agbcc's block layout */
+    do {
+        if (q->entered) {
+            int choice;
+            void *draw;
+            q->entered = 0;
+            q->value = q->count;
+            q->flags &= ~1;
+            draw = ((u8 *)q) + 0x50;
+            p = ((u8 *)p) + 0x3c;
+            if (index > 7) {
+                choice = (index & 3) + 4;
+            } else {
+                choice = index & 3;
+            }
+            Anim_LoadKeyframe(alias = draw, p, gUnk_0824DE7C[choice], 0);
+            q->flags2 &= ~1;
+        }
+        if (q->timer > 31) {
+            q->state = 0;
+            q->entered = 1;
+            q->timer = 0;
+        }
+        q->timer++;
+    } while (0);
 }

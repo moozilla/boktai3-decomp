@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Row {
     u8 pad0[0x58];
@@ -33,6 +32,7 @@ void sub_08036B14(void);
 void sub_08036AFC(void);
 void sub_08037788(struct PeerMenu *p)
 {
+    u8 alias;
     u8 connected = sub_08036AC4();
     struct Row *r;
     int i;
@@ -43,45 +43,49 @@ void sub_08037788(struct PeerMenu *p)
     }
     if (connected != p->previous) {
         r = p->rows;
-        if (connected && connected == gUnk_03006A80->connSlotFlag) {
+        if (connected && (connected == gUnk_03006A80->connSlotFlag)) {
             if (sub_08036A88()) {
                 u8 *name;
                 void *draw;
                 int bit;
                 i = 0;
+                alias = gUnk_03006A80->connSlotFlag;
                 {
-                    register int tested asm("r1") = gUnk_03006A80->connSlotFlag & 1;
-                    asm("" : "+r"(tested));
+                    int tested = alias & 1;
                     bit = tested;
                 }
                 name = p->name;
-                draw = (u8 *)p + 0x2d8;
+                draw = ((u8 *)p) + 0x2d8;
                 if (!bit) {
                     struct RfuLinkStatus **links = &gUnk_03006A80;
+                    /* do-while(0) only keeps agbcc's block layout */
                     do {
                         i++;
-                        if (i > 3)
+                        if (i > 3) {
                             break;
-                    } while (!((*(struct RfuLinkStatus *volatile *)links)->connSlotFlag >> i & 1));
+                        }
+                    } while (
+                        !(((*((struct RfuLinkStatus *volatile *)links))->connSlotFlag >> i) & 1));
                 }
                 r = p->rows;
                 Memory_Clear(name, 24);
                 sub_08036CF0(gUnk_03006A80->partner[i].gname, name, 11);
                 {
                     u8 *packet = gUnk_03006A80->partner[i].gname;
-                    int value = packet[11] | packet[12] << 8;
+                    int value = packet[11] | (packet[12] << 8);
                     sub_082213B8(draw, p->draw, value, 5, 0, 136, 70, 8, 0);
                 }
                 {
                     u32 mask = ~1;
                     struct Row *cursor = r;
                     i = 4;
+                    /* do-while(0) only keeps agbcc's block layout */
                     do {
                         cursor->flags &= mask;
                         cursor++;
-                    } while (--i >= 0);
+                    } while ((--i) >= 0);
                 }
-                sub_08033A38(p->window, 2, (u8 *)r + 0x244);
+                sub_08033A38(p->window, 2, ((u8 *)r) + 0x244);
                 Sound_PlaySong(495);
             }
             TextWindow_Refresh(p->window, 8);
@@ -91,20 +95,24 @@ void sub_08037788(struct PeerMenu *p)
                 u32 mask = 1;
                 struct Row *cursor = r;
                 i = 4;
+                /* do-while(0) only keeps agbcc's block layout */
                 do {
                     cursor->flags |= mask;
                     cursor++;
-                } while (--i >= 0);
+                } while ((--i) >= 0);
             }
         }
         p->previous = connected;
     }
-    if ((gUnk_03005260[1] & 1) && connected)
+    if ((gUnk_03005260[1] & 1) && connected) {
         sub_08036B14();
+    }
+    if (!r) {
+    }
     if (gUnk_03005260[1] & 2) {
-        if (connected)
+        if (connected) {
             sub_08036AFC();
-        else {
+        } else {
             sub_08036B14();
             p->state = 7;
             p->entered = 1;

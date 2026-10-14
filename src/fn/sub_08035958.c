@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Engine {
     u8 pad0[0x18];
@@ -48,22 +47,25 @@ void sub_08035958(void)
     if (p) {
         u8 *scratch = p->scratch;
         int status = rfu_UNI_PARENT_getDRAC_ACK(&slots);
-        if (!status) {
-            register u8 *seen asm("r2") = (u8 *)p + 0xE7;
-            int bits = (slots << 1) | *seen;
-            int expected;
-            *seen = bits;
-            expected = scratch[2];
-            if ((bits & expected) == expected) {
-                u8 *waiting = (u8 *)p + 0xE8;
-                *waiting = status;
-                p->flag36 = status;
-            } else {
-                u8 *waiting = (u8 *)p + 0xE8;
-                *waiting = 1;
-                (*(u32 *)((u8 *)p + 0xE0))++;
+        /* do-while(0) only keeps agbcc's block layout */
+        do {
+            if (!status) {
+                u8 *seen = ((u8 *)p) + 0xE7;
+                int bits = (slots << 1) | (*seen);
+                int expected;
+                *seen = bits;
+                expected = scratch[2];
+                if ((bits & expected) == expected) {
+                    u8 *waiting = ((u8 *)p) + 0xE8;
+                    *waiting = status;
+                    p->flag36 = status;
+                } else {
+                    u8 *waiting = ((u8 *)p) + 0xE8;
+                    *waiting = 1;
+                    (*((u32 *)(((u8 *)p) + 0xE0)))++;
+                }
             }
-        }
-        rfu_REQ_recvData();
+            rfu_REQ_recvData();
+        } while (0);
     }
 }
