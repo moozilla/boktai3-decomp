@@ -1,10 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
-#define ModifierMenu_SelectPendingSource sub_0803FCC4
-void sub_0803FC10(struct ModifierSelection *);
-void sub_0803FC34(struct ModifierSelection *, struct ModifierSelection *);
-void sub_0803FC60(struct ModifierSelection *);
-void sub_0803FC8C(struct ModifierSelection *);
+void Modifier_LoadFirstSource(struct ModifierSelection *);
+void Modifier_LoadSecondSource(struct ModifierSelection *, const struct ModifierSelection *);
+void Modifier_LoadThirdSource(struct ModifierSelection *);
+void Modifier_LoadFourthSource(struct ModifierSelection *);
 void ModifierMenu_SelectPendingSource(struct ModifierMenu *menu)
 {
     struct ModifierSelection *pending = &menu->pending;
@@ -14,16 +13,16 @@ void ModifierMenu_SelectPendingSource(struct ModifierMenu *menu)
             s32 category = menu->category;
             if (category == 0) {
                 pending->sourceIds[0] = index;
-                sub_0803FC10(pending);
+                Modifier_LoadFirstSource(pending);
             } else if (category == 1) {
                 pending->sourceIds[1] = index;
                 goto secondSource;
             } else if (category == 2) {
                 pending->sourceIds[2] = index;
-                sub_0803FC60(pending);
+                Modifier_LoadThirdSource(pending);
             } else {
                 pending->sourceIds[3] = index;
-                sub_0803FC8C(pending);
+                Modifier_LoadFourthSource(pending);
             }
             break;
         }
@@ -33,7 +32,7 @@ void ModifierMenu_SelectPendingSource(struct ModifierMenu *menu)
             category = category * 3 * 2 + index;
             pending->selectedId = category;
         secondSource:
-            sub_0803FC34(pending, &menu->current);
+            Modifier_LoadSecondSource(pending, &menu->current);
             break;
         }
         case 2: {

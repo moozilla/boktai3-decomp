@@ -2,7 +2,7 @@
 
 void Bg_ClearTilemap(u32);
 
-void sub_08040830(void)
+void ModifierMenu_ClearBackground(void)
 {
     Bg_ClearTilemap(0);
 }

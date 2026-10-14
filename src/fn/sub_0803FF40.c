@@ -1,5 +1,4 @@
 #include "modifier_list.h"
-#define ModifierMenu_CloseScript sub_0803FF40
 extern u32 gUnk_030053F0;
 void sub_081093AC(u32);
 static inline u32 TestFlags(u32 mask)

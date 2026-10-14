@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
-#define ModifierMenu_CommitSelection sub_0803FEBC
 struct ModifierMenu *ModifierMenu_CommitSelection(struct ModifierMenu *menu)
 {
     register struct ModifierMenu *base asm("r2") = menu;

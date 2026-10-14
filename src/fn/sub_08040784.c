@@ -5,7 +5,7 @@ void sub_082161B4(u32, u32, u8 *, u32, u32, u32, u32 *);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void CpuSet(const void *, void *, u32);
 
-u32 sub_08040784(u8 *p, u32 x)
+u32 ModifierMenu_LoadBackground(u8 *p, u32 x)
 {
     u32 v;
     u32 z;

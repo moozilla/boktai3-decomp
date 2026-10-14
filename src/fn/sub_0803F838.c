@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_02000710;
-u32 sub_0803F838(u32 k, s32 n)
+u32 Modifier_ReadPackedValue(u32 k, s32 n)
 {
     u32 sh = n * 3 * 2;
     u32 m = 0x3f;

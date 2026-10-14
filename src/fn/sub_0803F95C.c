@@ -3,7 +3,6 @@
 // Selected-source lookup still has register allocation differences (reviewed 256-byte extent).
 // MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
-#define Modifier_CollectSources sub_0803F95C
 s32 Modifier_CollectSources(struct ModifierSelection *actorArg,
                             struct ModifierSelection *selectionArg,
                             struct ModifierRecord *outputArg, u32 includeSelected)
@@ -84,5 +83,5 @@ done:
 
 #else
 #include "global.h"
-INCLUDE_ASM("asm/nonmatching", sub_0803F95C);
+INCLUDE_ASM("asm/nonmatching", Modifier_CollectSources);
 #endif
