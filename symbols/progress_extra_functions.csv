@@ -89,6 +89,7 @@ address,evidence
 08045F44,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08046B28,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0804732C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
+080475F8,Independent 252-byte script spawn wrapper: own push; final call to 080474E4; pop-bx and alignment end at 080476F4
 08047B94,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08047BA4,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08048438,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
