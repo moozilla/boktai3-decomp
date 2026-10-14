@@ -223,7 +223,8 @@ address,evidence
 0815AAB8,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C
 0815AAD4,Independent small function following a reviewed gap leaf; retained assembly (not yet matched)
 0815AD24,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C
-0815AD3C,Code following a reviewed gap function; retained assembly
+0815AD3C,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C
+0815AD60,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C
 0815F578,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C
 0815F588,Code following a reviewed gap function; retained assembly
 0816CE8C,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C
@@ -316,12 +317,15 @@ address,evidence
 08214344,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C
 0821435C,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C
 08216FFC,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C
-08217020,Code following a reviewed gap function; retained assembly
+08217020,Independent 32-byte leaf left as incbin by gbadisasm; exact standalone C
+08217040,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C
+08217050,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C
 08217414,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C
 08218BC8,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 082195AC,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C
 0821AED0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
-0821AEDC,Code following a reviewed gap function; retained assembly
+0821AEDC,Independent state save/restore function following a reviewed gap leaf; exact standalone C
+0821AF04,Independent state save/restore function following a reviewed gap leaf; exact standalone C
 0821E0D0,Separate 52-byte Thumb function with own prologue/conditional return after E040 returns; retained unmatched code; docs/MGS_GCL_MATCHING.md
 0821E2F8,Separate 188-byte Thumb function with own prologue/calls/copy loops/return after E190 returns; retained unmatched code; docs/MGS_GCL_MATCHING.md
 0821E7B4,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C
