@@ -1,5 +1,4 @@
 #include "modifier_list.h"
-#define ModifierMenu_UpdateCapacityFlash sub_08041D10
 void ModifierMenu_DrawCapacity(s32, s32, s32, s32, s32);
 void sub_08215EB4(s32, s32, s32, s32, s32, s32, s32, s32);
 static inline void drawCapacity(struct ModifierSelection *current)

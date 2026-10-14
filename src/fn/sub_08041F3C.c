@@ -1,12 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
-#define ModifierMenu_UpdateTask              sub_08041F3C
-#define ModifierMenu_UpdateCapacityFlash     sub_08041D10
-#define ModifierMenu_UpdatePreviewAppearance sub_08041DA8
-struct ModifierMenuActor {
-    u8 unknown0[0x1C];
-    u8 active;
-};
 extern struct ModifierMenuActor *gUnk_020004B4;
 extern void (*const gUnk_086058EC[])(struct ModifierMenu *);
 void ModifierMenu_CloseScript(struct ModifierMenu *);
