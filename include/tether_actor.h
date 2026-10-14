@@ -64,7 +64,7 @@ struct TetherActor {
     struct TetherSegment segments[7];
     u16 paletteIndex;
     s16 shakeX;
-    u16 auxiliaryTimer;
+    u16 displayOffsetY;
     s16 shakeZ;
     u16 chargeReady, charge;
     u16 shakeFrame;
@@ -96,7 +96,9 @@ struct TetherActor {
     struct ContactPosition directedTarget;
     struct ContactPosition origin;
     struct ContactPosition auxiliaryOrigin;
-    u8 unknown43C[0x2E];
+    u8 unknown43C[0x28];
+    u16 terrainCheckReady;
+    u8 unknown466[4];
     u16 directedTimer, directedHeading;
     u16 blendHold;
     u16 directedStep;
