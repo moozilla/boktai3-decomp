@@ -1,6 +1,4 @@
 #include "global.h"
-// fuzzy: 98.7%
-// 2 differing instruction runs; first diff at +0x7E (mov r0, sp vs ldr r2, [pc, #0x20])
 void sub_0809775C(u8 *, s16 *);
 void sub_08097798(u8 *);
 u32 Math_Atan2(s32, s32);
