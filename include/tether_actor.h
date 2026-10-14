@@ -16,14 +16,16 @@ struct TetherPaletteView {
     const u16 *keyframePalette;
     u8 unknown78[0x1C];
 };
+/* Twelve-byte body prefix; initialization also writes the following position/probe fields. */
 struct TetherBodyConfig {
     u32 id, flags;
     u8 category, angle, unknownA[2];
 };
 struct TetherMovementProbe {
-    u8 unknown0[6];
-    u16 cell;
-    u8 unknown8[0xB0];
+    u8 unknown0[4];
+    u16 previousCell, cell;
+    u8 previousHeight, height, previousSlope, slope;
+    u16 previousAttributes, attributes;
 };
 struct TetherInteractionProbe {
     u8 unknown0[0x24];
@@ -46,6 +48,7 @@ struct TetherActor {
         struct TetherPaletteView colors;
     } display;
     struct TetherMovementProbe movementProbeStorage;
+    struct ContactCollider chargeCollider, secondaryCollider;
     struct TetherInteractionProbe interactionProbe;
     u8 actionRequested, actionVariant;
     u16 actionValue;
@@ -59,10 +62,10 @@ struct TetherActor {
     s16 shakeX;
     u16 auxiliaryTimer;
     s16 shakeZ;
-    u16 pendingEffect, pendingEffectValue;
+    u16 chargeReady, charge;
     u16 shakeFrame;
     u16 glowMode, glowFrame;
-    u16 appliedPalette, paletteOverrideTimer, unknown392;
+    u16 appliedPalette, paletteOverrideTimer, contactCooldown;
     u16 paletteBlend;
     u16 effectFrame, soundCooldown;
     u8 moving;
