@@ -14,8 +14,8 @@ struct Object {
     u32 drawable;
 };
 void sub_0802CB94(struct Object *);
-void sub_080426B0(void *, void *);
-void sub_080423C8(void *);
+void DisplayAnimation_SetPosition(void *, void *);
+void DisplayAnimation_UpdatePlayback(void *);
 void sub_0802CF44(struct Object *p)
 {
     int tick;

@@ -1,0 +1,5 @@
+addr,name,confidence,evidence
+08042198,ScriptSelector_MoveSelection,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
+080421E8,ScriptSelector_UpdateTask,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
+08042278,ScriptSelector_InitializeTask,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
+080422DC,ScriptSelector_CreateTask,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md

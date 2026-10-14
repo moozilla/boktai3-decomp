@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "display_animation.h"
-#define DisplayAnimation_SetPosition sub_080426B0
 s32 DisplayAnimation_SetPosition(struct DisplayAnimation *display,
                                  const struct DisplayPosition *position)
 {

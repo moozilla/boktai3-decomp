@@ -1,5 +1,4 @@
 #include "display_animation.h"
-#define DisplayAnimation_SetPriority sub_08042738
 s32 DisplayAnimation_SetPriority(struct DisplayAnimation *display, u32 priority)
 {
     if (!display->kind)

@@ -1,19 +1,16 @@
-#include "global.h"
+#include "display_animation.h"
 
-u32 Sprite_Remove(u8 *);
-u32 Anim_Remove(u8 *);
-
-s32 sub_08042558(u8 *p)
+s32 DisplayAnimation_Destroy(struct DisplayAnimation *p)
 {
-    u32 mode = *(u32 *)p;
+    u32 mode = p->kind;
     if (mode == 0) {
         return -1;
     }
     if (mode == 1) {
-        Sprite_Remove(p + 0x28);
+        Sprite_Remove((u8 *)p + 0x28);
     } else {
-        Anim_Remove(p + 0x2c);
+        Anim_Remove((u8 *)p + 0x2c);
     }
-    *(u32 *)p = 0;
+    p->kind = 0;
     return 0;
 }
