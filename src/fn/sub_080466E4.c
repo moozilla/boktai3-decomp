@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_sequence_actor.h"
-#define ContactSequencePool_SpawnActor        sub_080466E4
-#define ContactSequencePool_FindInactiveActor sub_080466C0
-#define ContactSequenceActor_SetState         sub_08045D30
 struct ContactSequenceActor *ContactSequencePool_FindInactiveActor(struct ContactSequenceOwner *);
 void ContactSequenceActor_SetState(struct ContactSequenceActor *, u32);
 void *sub_0821D64C(u32, u32);

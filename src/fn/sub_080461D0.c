@@ -1,9 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_sequence_actor.h"
-#define ContactSequenceActor_UpdateDying   sub_080461D0
-#define ContactSequenceActor_TakeEntryFlag sub_08045D3C
-#define ContactSequenceActor_SetFlags      sub_08045D18
-#define ContactSequenceActor_Deactivate    sub_08045F14
 u32 ContactSequenceActor_TakeEntryFlag(struct ContactSequenceActor *);
 void ContactSequenceActor_SetFlags(struct ContactSequenceActor *, u32);
 void ContactSequenceActor_Deactivate(struct ContactSequenceOwner *, struct ContactSequenceActor *);
@@ -157,5 +153,5 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
     ContactSequenceActor_Deactivate(parent, actor);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080461D0);
+INCLUDE_ASM("asm/nonmatching", ContactSequenceActor_UpdateDying);
 #endif

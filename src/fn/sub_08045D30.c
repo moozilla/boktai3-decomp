@@ -1,5 +1,4 @@
 #include "contact_sequence_actor.h"
-#define ContactSequenceActor_SetState sub_08045D30
 void ContactSequenceActor_SetState(struct ContactSequenceActor *actor, u32 state)
 {
     u32 zero = 0;

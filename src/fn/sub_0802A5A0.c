@@ -74,14 +74,14 @@ static inline void state(struct Common *p, void (*fn)(void *), int id)
     p->reset = zero;
     p->pending = zero;
 }
-void sub_08046834(void *);
+void ContactSequencePool_BeginAllDeaths(void *);
 void sub_08029FF8(void *);
 void sub_0802A5A0(ActorAnimation *p)
 {
     if (p->changed) {
         p->changed = 0;
         sub_080297FC(p, 8, 1, 8);
-        sub_08046834(*(void **)((u8 *)p + 0x904));
+        ContactSequencePool_BeginAllDeaths(*(void **)((u8 *)p + 0x904));
         Sound_PlaySongChecked(1359);
     }
     {

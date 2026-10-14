@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_sequence_actor.h"
-#define ContactSequenceActor_ApplyHealthContact sub_08045D54
-#define ContactSequenceActor_SetState           sub_08045D30
 void ContactSequenceActor_SetState(struct ContactSequenceActor *, u32);
 void sub_0821FF8C(void *, void *);
 void sub_08159860(void *, void *, u32);

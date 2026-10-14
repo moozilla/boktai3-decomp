@@ -1,5 +1,4 @@
 #include "contact_sequence_actor.h"
-#define ContactSequenceActor_TakeEntryFlag sub_08045D3C
 u32 ContactSequenceActor_TakeEntryFlag(struct ContactSequenceActor *actor)
 {
     u32 result;
