@@ -1,12 +1,8 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x18];
-    u8 a;
-};
-u32 sub_08048390(struct S *p)
+#include "contact_burst.h"
+#define ContactBurst_GetEnabled sub_08048390
+u32 ContactBurst_GetEnabled(struct ContactBurst *effect)
 {
-    if (!p)
+    if (!effect)
         return 0;
-    return p->a;
+    return effect->enabled;
 }
