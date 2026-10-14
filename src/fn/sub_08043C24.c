@@ -1,4 +1,5 @@
 #include "global.h"
+#define ContactActorPool_Destroy sub_08043C24
 
 void ContactActor_DestroySlot(u8 *, u8 *, s32);
 

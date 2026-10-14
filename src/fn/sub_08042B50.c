@@ -10,6 +10,6 @@ void ContactActorPool_HideSlots(struct ContactActorPool *pool)
         i++;
         slot++;
     } while (i <= 15);
-    sub_080224E4(pool->scriptState);
+    sub_080224E4(&pool->retreatCenter);
     pool->state = 0;
 }
