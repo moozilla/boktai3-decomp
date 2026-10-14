@@ -2,7 +2,7 @@
 
 void sub_0811E3F8(u16 *, s32);
 
-void sub_0803FC60(s16 *p)
+void Modifier_LoadThirdSource(s16 *p)
 {
     u16 buf[6];
     sub_0811E3F8(buf, p[0x10]);

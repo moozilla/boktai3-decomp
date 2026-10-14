@@ -1,7 +1,7 @@
 #include "global.h"
 void sub_08215EB4(s32, s32, s32, s32, s32, s32, s32, s32);
 void sub_08215DF0(s32, s32, s32, s32, s32, s32);
-void sub_08040170(s32 a, s32 b, s32 count, s32 y, s32 width)
+void ModifierMenu_DrawCapacity(s32 a, s32 b, s32 count, s32 y, s32 width)
 {
     s32 diff;
     s32 color;

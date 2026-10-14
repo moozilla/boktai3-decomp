@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 22.529% matching (2026-10-13). This file is the single
+Last updated after reaching 22.627% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,32 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex): modifier selection and stat previews
+
+Matching is **22.627%**, up **0.098 percentage points** in this batch and
+**0.318 points** from Claude's 22.309% baseline. Thirteen new exact functions
+bring us to **6,296 / 11,465**, **546,526 / 2,415,354 bytes** (+2,376).
+Without register pinning: **18.527%**; Register-pinned: **4.100%**, included
+above. There are 65 guarded drafts; the new collector is **88.1%**, full-size
+but not exact. It earns no exact credit.
+
+The adjacent **0803F804–080408A4** block is a selection/stat-preview menu.
+Shared types describe current/pending 0x28-byte snapshots, count/capacity,
+selection mask, source IDs and stat records. All functions in this reviewed
+block except 0803F95C now match. New C covers stat application, pending choice,
+capacity enforcement, reconciliation, application, four stat renderers and
+background visibility. Specific gameplay identity remains tentative. See
+[modifier-menu notes](../notes/modifier-menu_2026-10-14.md).
+
+Every exact addition passed full-extent checks and hint minimization. Existing
+mask helpers/wrappers and hidden-argument corrections were rechecked. The
+combined build printed **`build/boktai3.gba: OK`**
+(`build/modifier-menu-combined.log`). Continue the **25% / 80%-remaining** goal;
+latest usage is **92% remaining**. Next contiguous subsection begins at
+**080408A4**: graphics-resource initialization, menu input/update and lifecycle.
+The collector's remaining allocation experiments and permuter assertion are
+logged; do not repeat them blindly. Claude's primary-checkout edit is intact.
 
 ## October 13 (Codex): scene arc slots and ground projection
 

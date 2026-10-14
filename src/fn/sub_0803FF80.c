@@ -3,7 +3,7 @@
 extern const u8 gUnk_086058E8[];
 void sub_082279A8(u32, u32, u32, u32, u32, u32, u32);
 
-void sub_0803FF80(u8 *p)
+void ModifierMenu_OpenSelection(u8 *p)
 {
     *(u32 *)(p + 0x18) = 3;
     *(u32 *)(p + 0x30) = 0;
