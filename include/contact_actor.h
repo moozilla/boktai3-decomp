@@ -26,15 +26,14 @@ struct ContactActor {
     u8 enter, state;
     u8 finished, bobPhase;
     u16 stateFrame;
-    u8 direction, unknown7;
+    u8 direction, steeringTimer;
     s8 targetIndex;
     u8 retargetTimer;
     u8 unknownA[2];
-    s16 targetHeight;
-    u8 unknownE[2];
+    s16 targetHeight, desiredHeight;
     u16 speed, unknown12;
     struct ContactPosition position;
-    u8 unknown1C[0x10];
+    struct ContactPosition destination, origin;
     struct ContactCollider resourceCollider, healthCollider;
     struct DisplaySequenceState sequence;
     struct DisplaySequenceSprite sprite;
