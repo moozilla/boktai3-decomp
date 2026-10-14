@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Motion {
     u8 pad0[6];
@@ -13,22 +12,23 @@ void sub_08039920(struct Motion *arg, int baseArg, int mask)
     u16 *table = gUnk_0203B400;
     u32 *state = &gUnk_03005308;
     u32 limit;
-    register u32 index asm("r0");
+    u32 index;
     int random;
-    index = *state + 1;
+    index = (*state) + 1;
     limit = 1023;
     index &= limit;
     random = index * 2;
-    random = *(u16 *)(random + (u32)table);
+    random = *((u16 *)(random + ((u32)table)));
     random &= mask;
     base += random;
-    index = (index + 1) & limit;
+    index = index + 1;
+    index = index & limit;
     *state = index;
     {
-        int sign = *(u8 *)&table[index];
-        if (sign <= 127)
+        int sign = *((u8 *)(&table[index]));
+        if (sign <= 127) {
             p->velocity = base;
-        else {
+        } else {
             int negative = -base;
             p->velocity = negative;
         }
