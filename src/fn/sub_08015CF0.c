@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Config {
     u16 v[20];
 };
@@ -33,12 +32,8 @@ void AnimatedParticles_EmitOffset(struct Vec *pos, int unused, int type, int fla
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     {
         u32 offset = gUnk_03005308 * 2;
-        register u8 *table asm("r2");
-        table = (u8 *)gUnk_0203B400;
-        {
-            u8 *sample = (u8 *)(offset + (u32)table);
-            s.v[10] = *sample;
-        }
+        u8 *sample = (u8 *)(offset + 0x0203B400);
+        s.v[10] = *sample;
     }
     s.v[11] = 0;
     s.v[9] = 0;

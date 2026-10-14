@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -59,10 +58,10 @@ static inline u8 *cell(int i)
 static inline int randomAngle(void)
 {
     u32 offset, value;
-    register u16 *table asm("r3");
+    u16 *table;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     offset = gUnk_03005308 * 2;
-    table = gUnk_0203B400;
+    table = ((u16 *)0x0203B400);
     value = *(u16 *)(offset + (u32)table);
     return (value & 127) - 32;
 }
@@ -142,14 +141,11 @@ int OrbitingParticles_Initialize(struct Manager *m, struct Vec *source, int radi
     for (i = 0; i <= 7; p++) {
         struct Sprite *s = &p->sprite;
         int angle, r;
-        register u16 *keepTable asm("r3");
         p->state = 0;
         p->angle = randomAngle();
-        keepTable = gUnk_0203B400;
         p->rise = 0;
         p->radius = radius;
         p->timer = i * 4;
-        asm("" : : "r"(keepTable));
         sub_08217DE0(s, m->resource, 1);
         sub_08217EC4(s, -4, -4);
         sub_08217EEC(s, m->resource, m->frame);
