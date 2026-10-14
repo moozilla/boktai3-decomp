@@ -25,8 +25,8 @@ struct ScenePoolEntry {
     u32 unknown5c;
     s32 idleFrame;
     u8 stateEntered;
-    u8 steeringActive, steeringDelay;
-    s8 steeringPulse;
+    u8 speedControlActive, speedControlDelay;
+    s8 speedControlPulse;
     u32 state;
     u32 history[0x40]; /* per-state workspace; temporal history is not established */
     s32 settingA, delayA, settingB, delayB;
@@ -65,6 +65,10 @@ struct ScenePoolActor {
     u8 unknown600[0x258];
     u32 controlFlags;
     u8 unknown85c[0x54];
+};
+/* Five signed thresholds used by the adjacent steering-state callbacks. */
+struct ScenePoolSpeedBounds {
+    s32 emergencyHigh, high, low, activeHigh, activeLow;
 };
 /* Position and flag consumers identify this separate player-pointer array.
  * This is not the gUnk_02000580 Player array from player.h. */
