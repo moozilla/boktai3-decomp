@@ -1,13 +1,8 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x44];
-    u8 a;
-};
-extern u32 gUnk_020000F4;
-void Anim_Remove(void *);
-u32 sub_08048514(struct S *p)
+#include "wireless_link_indicator.h"
+#define WirelessLinkIndicator_Destroy sub_08048514
+s32 WirelessLinkIndicator_Destroy(struct WirelessLinkIndicator *indicator)
 {
-    Anim_Remove(&p->a);
-    return gUnk_020000F4 = 0;
+    Anim_Remove(&indicator->animation);
+    gUnk_020000F4 = NULL;
+    return 0;
 }
