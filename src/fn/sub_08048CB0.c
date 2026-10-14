@@ -1,12 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "tether_actor.h"
-#define TetherActor_EmitPointEffect sub_08048CB0
-void sub_080154EC(u32, void *, u32);
+s32 AnimatedParticles_Create(s32, void *, const void *);
 union TetherPointPacket {
     struct ContactPackedVector bits;
     u32 words[2];
 };
-void TetherActor_EmitPointEffect(const struct ContactPackedVector *source, u32 kind)
+void TetherActor_EmitPointEffect(const struct ContactPackedVector *source, const void *config)
 {
     union TetherPointPacket position;
     const u16 *table;
@@ -55,5 +54,5 @@ void TetherActor_EmitPointEffect(const struct ContactPackedVector *source, u32 k
     y -= sampleY;
     highY = (u32)y << 16;
     position.words[0] = (xy & 0xFFFF) | highY;
-    sub_080154EC(1, &position, kind);
+    AnimatedParticles_Create(1, &position, config);
 }

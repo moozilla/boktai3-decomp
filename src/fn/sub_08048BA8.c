@@ -1,5 +1,4 @@
 #include "tether_actor.h"
-#define TetherActor_EmitRingEffects sub_08048BA8
 void sub_08068124(void *, void *, void *, u32, u32, u32);
 static inline s32 scaleEmission(s32 value)
 {

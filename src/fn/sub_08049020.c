@@ -1,6 +1,4 @@
 #include "tether_actor.h"
-#define TetherActor_UpdateMovingEffects sub_08049020
-#define TetherActor_EmitDirectionalEffect sub_080489A0
 void TetherActor_EmitDirectionalEffect(struct TetherActor *);
 u8 *sub_0821D64C(s32, s32);
 void TetherActor_UpdateMovingEffects(struct TetherActor *actor)

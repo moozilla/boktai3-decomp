@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "tether_actor.h"
-#define TetherActor_SelectPalette sub_08048EEC
 s32 DisplayAnimation_SelectTiles(struct DisplayAnimation *, u32);
 s32 DisplayAnimation_SetTileSource(struct DisplayAnimation *, u32);
 void TetherActor_SelectPalette(struct TetherActor *input, u32 index)

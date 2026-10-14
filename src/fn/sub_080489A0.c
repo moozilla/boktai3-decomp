@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "tether_actor.h"
-#define TetherActor_EmitDirectionalEffect sub_080489A0
 void sub_08068124(void *, void *, void *, u32, u32, u32);
 static inline s32 scaleEmission(s32 value)
 {
