@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct P {
     u8 pad[0x24];
     u32 timer;
@@ -44,8 +43,8 @@ void sub_08038764(struct P *p)
         p->countdown = 8;
     }
     if (p->ready && p->timer > 16 && p->requested) {
-        register u32 value asm("r0") = p->countdown;
-        u32 countdown = value;
+        u32 value = p->countdown;
+        short countdown = value; /* s16 copy steers register allocation */
         if (countdown == 0) {
             u32 four;
             u8 *state;
