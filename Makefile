@@ -3,6 +3,7 @@
 #   make disasm    regenerate gen/code.s from baserom.gba + symbols/
 #   make           assemble build/boktai3.gba and verify it matches the base ROM
 #   make mod       build build/mod.gba from edited data (text: build/text/bank.tsv)
+#   make english   build build/english.gba from the fan translation (../boktai3trans)
 #   make format    clang-format our C (make format-check: fail if unformatted)
 AS      := arm-none-eabi-as
 LD      := arm-none-eabi-ld
@@ -13,7 +14,7 @@ PY      := python3
 ROM     := build/boktai3.gba
 SHA1    := 2651c5e6875ac60abff734510d152166d211c87c
 
-.PHONY: all compare setup disasm clean shifttest format format-check mod
+.PHONY: all compare setup disasm clean shifttest format format-check mod english
 # Default: split asm around src/*.c, compile with agbcc, link, verify SHA-1
 all: gen/code_sym.s gen/data.s
 	$(PY) tools/build.py
@@ -23,6 +24,11 @@ all: gen/code_sym.s gen/data.s
 mod: gen/code_sym.s gen/data.s
 	$(PY) tools/build.py --out build/mod.gba --no-compare
 	@echo build/mod.gba
+
+# English ROM from the fan translation (clone github.com/moozilla/boktai3trans
+# next to this repository, or set TRANS=path): build/english.gba
+english: gen/code_sym.s gen/data.s
+	$(PY) tools/trans/english.py $(if $(TRANS),--trans $(TRANS))
 
 setup:
 	tools/setup.sh
