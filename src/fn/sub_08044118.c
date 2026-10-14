@@ -1,11 +1,8 @@
-#include "global.h"
-
-void Collider_Remove(u8 *);
-void sub_08013684(u8 *);
-void Sprite_Remove(u8 *);
-void sub_08044118(u32 a, u8 *p)
+#include "contact_swarm.h"
+void sub_08013684(void *);
+void ContactSwarm_DestroySlot(struct ContactSwarm *pool, struct ContactSwarmSlot *slot, s32 index)
 {
-    Collider_Remove(p + 0x68);
-    sub_08013684(p + 0x114);
-    Sprite_Remove(p + 0xcc);
+    Collider_Remove(&slot->display.healthCollider);
+    sub_08013684(slot->shadow);
+    Sprite_Remove(&slot->display.animation.draw.sprite);
 }

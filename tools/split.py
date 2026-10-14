@@ -142,8 +142,12 @@ def write_nonmatching(code, funcs):
             open(p, "w").write(text)
 
 
-def c_replacement_end(code, start, end, covered_addresses=(), covered_ranges=()):
+def c_replacement_end(code, start, end, covered_addresses=(), covered_ranges=(), includes_asm=False):
     """First retained trailing-data line; C replaces instructions/literal pools."""
+    if includes_asm:
+        # write_nonmatching already includes the complete original block.
+        # Retaining its incbin tail separately would emit those bytes twice.
+        return end
     for k in range(start, end):
         if code[k].lstrip().startswith(".incbin"):
             # A verified C unit may also define functions that gbadisasm left
@@ -300,10 +304,12 @@ def main():
         out_units.append(("c", rel))
         # The C object replaces only the last function's instructions (and its
         # literal pools); trailing undisassembled data in that block stays asm.
-        covered = {int(n[4:], 16) for n in c_functions(os.path.join(ROOT, rel), with_asm=False)
+        exact_names = c_functions(os.path.join(ROOT, rel), with_asm=False)
+        covered = {int(n[4:], 16) for n in exact_names
                    if re.fullmatch(r"sub_[0-9A-F]{8}", n)}
         ranges = [(a, replacement_ranges[a]) for a in covered if a in replacement_ranges]
-        end = c_replacement_end(code, funcs[last][2], funcs[last][3], covered, ranges)
+        end = c_replacement_end(code, funcs[last][2], funcs[last][3], covered, ranges,
+                                includes_asm=funcs[last][0] not in exact_names)
         # Labels that disappear with the asm are redefined relative to the
         # unit's first function, so references from elsewhere still resolve.
         base_name, base_addr = funcs[first][0], funcs[first][1]
