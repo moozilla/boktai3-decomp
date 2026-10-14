@@ -14,7 +14,7 @@ static inline s32 truncateShift12(s32 value)
 void ContactSwarm_UpdateReaction(struct ContactSwarm *pool, struct ContactSwarmSlot *slot,
                                  s32 index)
 {
-    struct ContactSwarmSprite *sprite = &slot->animation.sprite;
+    struct ContactSwarmSprite *sprite = &slot->display.animation.draw.sprite;
     struct ContactPosition *velocity;
     register const struct ContactPosition *read asm("r12");
     s32 product;
@@ -24,9 +24,9 @@ void ContactSwarm_UpdateReaction(struct ContactSwarm *pool, struct ContactSwarmS
     if (slot->enter) {
         struct ContactCollider *collider;
         slot->enter = 0;
-        collider = &slot->healthCollider;
+        collider = &slot->display.healthCollider;
         collider->flags |= 4;
-        AnimData_SelectTiles(slot->graphics, 0x192);
+        AnimData_SelectTiles(&slot->display.animation.draw.graphics, 0x192);
         ContactSwarm_SetDirectionalSequence(pool, slot, 1);
         Sound_PlaySong(0xE8);
     }
@@ -61,11 +61,11 @@ void ContactSwarm_UpdateReaction(struct ContactSwarm *pool, struct ContactSwarmS
         ContactSwarm_HideSlot(pool, slot, index);
     else {
         if (slot->stateFrame == 6)
-            AnimData_SelectTiles(slot->graphics, 0x2D3);
+            AnimData_SelectTiles(&slot->display.animation.draw.graphics, 0x2D3);
         if ((slot->stateFrame >> 2) & 1)
-            slot->animation.sprite.flags &= ~1;
+            slot->display.animation.draw.sprite.flags &= ~1;
         else
-            slot->animation.sprite.flags |= 1;
+            slot->display.animation.draw.sprite.flags |= 1;
         slot->stateFrame++;
     }
 }

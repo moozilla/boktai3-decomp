@@ -25,14 +25,14 @@ u32 ContactSwarm_InitializeSlot(struct ContactSwarm *pool, struct ContactSwarmSl
     slot->state = 0;
     slot->enter = 1;
     slot->stateFrame = 0;
-    graphics = slot->graphics;
+    graphics = &slot->display.animation.draw.graphics;
     AnimData_Load(graphics, 0xDA6D);
     {
         void *argument = graphics;
         asm("" : "+r"(argument));
         AnimData_SelectTiles(argument, 0x2D3);
     }
-    sprite = &slot->animation.sprite;
+    sprite = &slot->display.animation.draw.sprite;
     Sprite_Init(sprite, graphics, 1);
     sprite->priority = 2;
     {
@@ -50,7 +50,7 @@ u32 ContactSwarm_InitializeSlot(struct ContactSwarm *pool, struct ContactSwarmSl
     shadow = slot->shadow;
     Shadow_Initialize(shadow, (void *)position, 0);
     ActorShadow_Disable(shadow);
-    collider = &slot->healthCollider;
+    collider = &slot->display.healthCollider;
     bounds.x = 32;
     bounds.y = 240;
     bounds.z = 32;

@@ -11,9 +11,22 @@ struct ContactSwarmSprite {
     struct ContactPosition position;
     u8 unknown24[8];
 };
+struct ContactSwarmGraphics {
+    u8 unknown0[0xC];
+    const void *paletteData;
+    u8 unknown10[0xC];
+};
+struct ContactSwarmDrawPacket {
+    struct ContactSwarmSprite sprite;
+    struct ContactSwarmGraphics graphics;
+};
 struct ContactSwarmAnimation {
     struct DisplaySequenceState sequence;
-    struct ContactSwarmSprite sprite;
+    struct ContactSwarmDrawPacket draw;
+};
+struct ContactSwarmColliderAnimation {
+    struct ContactCollider healthCollider;
+    struct ContactSwarmAnimation animation;
 };
 struct ContactSwarmSlot {
     u8 direction, speed;
@@ -22,9 +35,8 @@ struct ContactSwarmSlot {
     u32 stateFrame;
     u8 advanceFrames, advanceSpeed, trackingFrames, unknownB;
     struct ContactPosition velocity;
-    struct ContactCollider resourceCollider, healthCollider;
-    struct ContactSwarmAnimation animation;
-    u8 graphics[0x1C];
+    struct ContactCollider resourceCollider;
+    struct ContactSwarmColliderAnimation display;
     u8 shadow[0x40];
 };
 struct ContactSwarm {

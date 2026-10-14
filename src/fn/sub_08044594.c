@@ -18,14 +18,14 @@ static inline void updatePlayback(struct ContactSwarmAnimation *animation,
         table = animation->sequence.commands;
         command = (const volatile u16 *)((u32)table + offset);
     }
-    animation->sprite.frame = *command >> 6;
+    animation->draw.sprite.frame = *command >> 6;
     {
         u32 input = animation->sequence.flags;
         u32 first;
         first = 1;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & 1))
-            animation->sprite.flags |= 4;
+            animation->draw.sprite.flags |= 4;
         else
             sprite->flags &= ~4;
     }
@@ -168,7 +168,7 @@ u32 ContactSwarm_Update(struct ContactSwarm *poolInput)
             slot = initialSlot;
             initialIndex = 0;
             index = initialIndex;
-            sequence = &pool->slots[0].animation;
+            sequence = &pool->slots[0].display.animation;
             do {
                 u32 mask = 1;
                 register const struct ContactSwarm *current asm("r2");
@@ -185,7 +185,7 @@ u32 ContactSwarm_Update(struct ContactSwarm *poolInput)
                     currentSlot = slot;
                     asm("" : "+r"(currentSlot));
                     table[currentSlot->state](pool, slot, index);
-                    updatePlayback(sequence, &slot->animation.sprite);
+                    updatePlayback(sequence, &slot->display.animation.draw.sprite);
                 }
                 {
                     register u32 one asm("r1") = 1;
