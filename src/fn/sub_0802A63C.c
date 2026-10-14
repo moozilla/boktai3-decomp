@@ -48,7 +48,7 @@ int sub_08029E2C(void *);
 void sub_08029AA8(void *);
 void Sound_PlaySongChecked(int);
 void SceneActors_RunFirstEventScript(void *, void *);
-void sub_08046834(void *);
+void ContactSequencePool_BeginAllDeaths(void *);
 void sub_081D5204(int);
 void SceneActors_RunSecondEventScript(void *, void *);
 static inline void effect(ActorAnimation *p, int mode, int id, int duration)
@@ -69,7 +69,7 @@ void sub_0802A63C(ActorAnimation *p)
         p->changed = 0;
         sub_080297FC(p, 10, 1, 8);
         SceneActors_RunFirstEventScript(p, (u8 *)p + 0x8a4);
-        sub_08046834(*(void **)((u8 *)p + 0x904));
+        ContactSequencePool_BeginAllDeaths(*(void **)((u8 *)p + 0x904));
         effect(p, 2, 349, 1);
         base->stage = 0;
         base->counter = 0;
