@@ -18,7 +18,7 @@ u32 TetherActor_CanStartInteraction(void)
     asm("" ::: "r2");
     if (actor->interactionCooldown)
         goto no;
-    if (actor->state <= 1 || ((u8)(actor->state - 3) <= 1 && actor->pendingEffect))
+    if (actor->state <= 1 || ((u8)(actor->state - 3) <= 1 && actor->chargeReady))
         result = 1;
     else {
     no:

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "tether_actor.h"
-#define TetherActor_InitBodyFromScript sub_0804A700
 u8 *sub_0821D64C(s32, s32);
 u32 sub_08225AB4(void *, u32, const struct ContactPosition *, u32, u32, void *);
 u32 sub_08225B28(void *, void *);

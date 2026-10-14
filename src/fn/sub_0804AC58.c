@@ -3,7 +3,7 @@ extern u8 *gUnk_02000488;
 void TetherActor_SetState(u8 *, u32);
 extern u8 *gUnk_02000710;
 void sub_0821FF58(u8 *, u32, u32, u32, u32, u32);
-void sub_0804AC58(u8 *p)
+void TetherActor_UpdateSecondaryColliderValues(u8 *p)
 {
     u8 *q = p + 0x184;
     u8 *g = gUnk_02000710;

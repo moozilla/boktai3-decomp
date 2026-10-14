@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "tether_actor.h"
-#define TetherActor_InitDisplayFromScript sub_0804A600
-#define TetherActor_SetEntry              sub_08049234
 s32 TetherActor_SetEntry(struct TetherActor *, u32);
 s32 DisplayAnimation_InitializeKeyframes(struct DisplayAnimation *, u32, s32,
                                          const struct DisplayPosition *);

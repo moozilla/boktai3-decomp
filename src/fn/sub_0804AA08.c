@@ -5,7 +5,7 @@ struct Obj {
     u16 f43e;
     u8 pad442[0];
 };
-void sub_0804AA08(u8 *p)
+void TetherActor_InitStateParameters(u8 *p)
 {
     u16 zero;
     u16 two;

@@ -1,6 +1,4 @@
 #include "tether_actor.h"
-#define TetherActor_OnChargeContact  sub_0804ACA8
-#define TetherActor_AccumulateCharge sub_0804AAB4
 void TetherActor_AccumulateCharge(struct TetherActor *, u32);
 struct TetherChargeContactView {
     u8 unknown0[6];
