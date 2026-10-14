@@ -1,8 +1,7 @@
-#include "global.h"
-
-void sub_08045948(u8 *p, u16 a, u32 b, u8 c)
+#include "pooled_motion.h"
+void MotionPool_SetTracking(struct MotionPoolParams *params, u16 frames, u32 targetId, u8 turnSpeed)
 {
-    *(u16 *)(p + 4) = a;
-    *(u32 *)(p + 0xc) = b;
-    *(u8 *)(p + 7) = c;
+    params->trackingFrames = frames;
+    params->targetId = targetId;
+    params->turnSpeed = turnSpeed;
 }

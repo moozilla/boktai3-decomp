@@ -1,10 +1,10 @@
-#include "global.h"
-
-void sub_08045950(u8 *p, u32 a, u32 b, u32 c, u32 d, u32 e)
+#include "pooled_motion.h"
+void MotionPool_SetContact(struct MotionPoolParams *params, u32 mode, u32 flags, u32 id, u32 cost,
+                           u32 option)
 {
-    *(u32 *)(p + 0x14) = a;
-    *(u32 *)(p + 0x18) = b;
-    *(u32 *)(p + 0x1c) = c;
-    *(u32 *)(p + 0x20) = d;
-    *(u32 *)(p + 0x24) = e;
+    params->contactMode = mode;
+    params->contactFlags = flags;
+    params->resourceId = id;
+    params->cost = cost;
+    params->option = option;
 }

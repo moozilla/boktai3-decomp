@@ -1,10 +1,5 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x1a];
-    u16 a;
-};
-void sub_080454C0(u32 a, u32 b, struct S *p)
+#include "pooled_motion.h"
+void MotionPool_FinishOnResourceContact(void *a, void *b, struct MotionPoolSlot *slot)
 {
-    *(u32 *)p = p->a;
+    slot->frame = slot->params.endFrame;
 }
