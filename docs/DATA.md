@@ -67,6 +67,15 @@ make            # extracts build/text/bank.tsv on first run
 make mod        # build/mod.gba
 ```
 
+Or use the local studio, which lists and searches all strings, previews edits
+in the game font (with the game's wrap at the box edge and `<WEIGHT>` in red,
+both checked against the emulator), saves to `build/text/bank.tsv` and runs
+`make mod`:
+
+```
+python3 tools/studio/serve.py      # http://localhost:8642
+```
+
 Characters must exist in `data/charmap.tsv` (or use `{XXXX}` glyph codes);
 ASCII is printed with the font's 8×16 half-width glyphs. Escapes are `\\`,
 `\n`, `\t`, `\{` and `\xNN`. Markup such as `<PROC=0>` and `<WEIGHT>` is
