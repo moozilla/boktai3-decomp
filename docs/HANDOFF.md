@@ -47,6 +47,9 @@ The combined build printed **`build/boktai3.gba: OK`** in
 cover all exact users of the actor header plus external status cleanup.
 Format, inventory, RAM literals, registry, ten resource archives and text bank
 checks pass. No new emulator claims. Main's PR 124 CI passed at **16086cb4**.
+Claude's **PR 125** is incorporated: Centaur subtitles, Live studio link,
+bookmarks and capture analysis. These play tools and palette annotations do
+not change the default C/ROM pipeline; see [CENTAUR.md](CENTAUR.md).
 
 Continue at **0804A430** (kind/script initialization), then **4A4C8, 4A600,
 4A700** and the following state callbacks. The first initializer is already
