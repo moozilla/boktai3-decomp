@@ -12,25 +12,48 @@ struct TetherSegment {
 struct TetherPaletteView {
     u8 unknown0[0x18];
     const u16 *palette;
-    u8 unknown1C[0x78];
+    u8 unknown1C[0x58];
+    const u16 *keyframePalette;
+    u8 unknown78[0x1C];
+};
+/* Twelve-byte body prefix; initialization also writes the following position/probe fields. */
+struct TetherMotionDelta {
+    s16 x, y, z;
+    u16 unknown6; /* initialized to 16 by the body initializer */
+} __attribute__((aligned(4)));
+struct TetherBodyConfig {
+    u32 id, flags;
+    u8 category, angle, unknownA[2];
+};
+struct TetherMovementProbe {
+    u8 unknown0[4];
+    u16 previousCell, cell;
+    u8 previousHeight, height, previousSlope, slope;
+    u16 previousAttributes, attributes;
+};
+struct TetherInteractionProbe {
+    u8 unknown0[0x24];
+    u16 bodyId;
+    u8 unknown26[0x42];
 };
 struct TetherActor {
-    u8 unknown0[0x1A];
-    u8 kind, unknown1B[9];
+    u8 unknown0[0x18];
+    u16 entry;
+    u8 kind, unknown1B;
+    u16 kindValue, kindLimit, valueA, valueB;
     u16 palette[16];
-    u8 unknown44[12];
+    struct TetherBodyConfig bodyConfig;
     struct ContactPosition position;
-    struct ContactPosition movementPosition;
+    struct TetherMotionDelta movementDelta;
     void *movementProbe;
     u8 unknown64[0x28];
     union {
         struct DisplayAnimation animation;
         struct TetherPaletteView colors;
     } display;
-    u8 unknown120[6];
-    u16 movementCell;
-    u8 unknown128[0xB0];
-    u8 interactionProbe[0x68];
+    struct TetherMovementProbe movementProbeStorage;
+    struct ContactCollider chargeCollider, secondaryCollider;
+    struct TetherInteractionProbe interactionProbe;
     u8 actionRequested, actionVariant;
     u16 actionValue;
     u8 auxiliaryRegistration[0x10];
@@ -43,10 +66,10 @@ struct TetherActor {
     s16 shakeX;
     u16 auxiliaryTimer;
     s16 shakeZ;
-    u16 pendingEffect, pendingEffectValue;
+    u16 chargeReady, charge;
     u16 shakeFrame;
     u16 glowMode, glowFrame;
-    u16 appliedPalette, paletteOverrideTimer, unknown392;
+    u16 appliedPalette, paletteOverrideTimer, contactCooldown;
     u16 paletteBlend;
     u16 effectFrame, soundCooldown;
     u8 moving;
@@ -56,11 +79,14 @@ struct TetherActor {
     u8 statusFlags;
     u8 unknown3E5;
     u16 statusTag;
-    u8 requestStatus, requestMode, unknown3EA[6];
+    u8 requestStatus, requestMode, unknown3EA[2];
+    const void *onActionScript;
     struct ContactPosition targetPosition;
-    u8 unknown3F8[4];
+    u16 secondaryValue, secondaryMaximum;
     u16 interactionLock;
-    u8 unknown3FE[0xA];
+    u16 unknown3FE;
+    u16 secondaryMode, secondaryTimer;
+    u8 unknown404[4];
     s16 parameter;
     u16 interactionEnabled, currentValue, maximumValue;
     struct ContactPosition interactionTarget;
