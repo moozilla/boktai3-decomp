@@ -1,6 +1,7 @@
-#include "global.h"
-
-void sub_08045980(u8 *p, u32 a)
+#define MotionPool_SetCallback sub_08045980
+#include "pooled_motion.h"
+void MotionPool_SetCallback(struct MotionPoolParams *params,
+                            s32 (*callback)(struct MotionPoolSlot *, s32))
 {
-    *(u32 *)(p + 0x10) = a;
+    params->callback = callback;
 }

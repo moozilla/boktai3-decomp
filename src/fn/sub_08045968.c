@@ -1,8 +1,8 @@
-#include "global.h"
-
-void sub_08045968(u8 *p, u16 a, u16 b, u16 c)
+#define MotionPool_SetBounds sub_08045968
+#include "pooled_motion.h"
+void MotionPool_SetBounds(struct MotionPoolParams *params, u16 x, u16 y, u16 z)
 {
-    *(u16 *)(p + 0x28) = a;
-    *(u16 *)(p + 0x2a) = b;
-    *(u16 *)(p + 0x2c) = c;
+    params->bounds.x = x;
+    params->bounds.y = y;
+    params->bounds.z = z;
 }

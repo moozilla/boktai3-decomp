@@ -1,8 +1,8 @@
-#include "global.h"
-void Sprite_Remove(u8 *);
-void sub_08045550(u32 *a, u32 *b, u32 n)
+#define MotionPool_HideSlot sub_08045550
+#include "pooled_motion.h"
+void MotionPool_HideSlot(struct MotionPool *pool, struct MotionPoolSlot *slot, s32 index)
 {
-    b[0x78 / 4] |= 1;
-    Sprite_Remove((u8 *)b + 0x78);
-    a[6] &= ~(1 << n);
+    slot->sprite.flags |= 1;
+    Sprite_Remove(&slot->sprite);
+    pool->activeMask &= ~(1 << index);
 }

@@ -1,19 +1,19 @@
-#include "global.h"
-void Memory_Clear(u32, u32);
-void sub_08045934(u32, u32, u32, u32, u32);
-void sub_08045950(u32, u32, u32, u32, u32, u32);
-void sub_08045968(u32, u32, u32, u32);
-void sub_08045970(u32, u32, u32, u32);
-void sub_08045978(u32, u32, u32, s32);
-void sub_08045980(u32, void (*)(void));
-void sub_080459F8(void);
-void sub_080458C8(u32 p)
+#define MotionPool_InitializeParams       sub_080458C8
+#define MotionPool_SetLifetimeAndVelocity sub_08045934
+#define MotionPool_SetContact             sub_08045950
+#define MotionPool_SetBounds              sub_08045968
+#define MotionPool_SetOffset              sub_08045970
+#define MotionPool_SetGraphics            sub_08045978
+#define MotionPool_SetCallback            sub_08045980
+#define MotionPool_UpdateUntilDeadline    sub_080459F8
+#include "pooled_motion.h"
+void MotionPool_InitializeParams(struct MotionPoolParams *params)
 {
-    Memory_Clear(p, 0x44);
-    sub_08045934(p, 0, 0x3c, 0, 0);
-    sub_08045950(p, 0, 0, 10, 0x14, 0x14);
-    sub_08045968(p, 8, 0x20, 8);
-    sub_08045970(p, 0, 0, 0);
-    sub_08045978(p, 0x848F, 0, -1);
-    sub_08045980(p, sub_080459F8);
+    Memory_Clear(params, sizeof(*params));
+    MotionPool_SetLifetimeAndVelocity(params, 0, 60, 0, 0);
+    MotionPool_SetContact(params, 0, 0, 10, 20, 20);
+    MotionPool_SetBounds(params, 8, 32, 8);
+    MotionPool_SetOffset(params, 0, 0, 0);
+    MotionPool_SetGraphics(params, 0x848F, 0, -1);
+    MotionPool_SetCallback(params, MotionPool_UpdateUntilDeadline);
 }
