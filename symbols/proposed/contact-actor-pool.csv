@@ -1,0 +1,10 @@
+addr,name,confidence,evidence
+080427FC,ContactActor_ApplyHealthContact,low,Observed dual collider slots and sequence/movement helpers; include/contact_actor.h; notes/contact-actor-pool_2026-10-14.md
+0804293C,ContactActor_ApplyResourceContact,low,Observed dual collider slots and sequence/movement helpers; include/contact_actor.h; notes/contact-actor-pool_2026-10-14.md
+08042984,ContactActor_InitializeSlot,low,Observed dual collider slots and sequence/movement helpers; include/contact_actor.h; notes/contact-actor-pool_2026-10-14.md
+08042B04,ContactActor_DestroySlot,low,Observed dual collider slots and sequence/movement helpers; include/contact_actor.h; notes/contact-actor-pool_2026-10-14.md
+08042B28,ContactActor_HideSlot,low,Observed dual collider slots and sequence/movement helpers; include/contact_actor.h; notes/contact-actor-pool_2026-10-14.md
+08042B50,ContactActorPool_HideSlots,low,Observed dual collider slots and sequence/movement helpers; include/contact_actor.h; notes/contact-actor-pool_2026-10-14.md
+08042B84,ContactActor_SetDirectionalSequence,low,Observed dual collider slots and sequence/movement helpers; include/contact_actor.h; notes/contact-actor-pool_2026-10-14.md
+08042BDC,ContactActor_UpdateDisplay,low,Observed dual collider slots and sequence/movement helpers; include/contact_actor.h; notes/contact-actor-pool_2026-10-14.md
+08042D58,ContactActor_UpdateAdvance,low,Observed dual collider slots and sequence/movement helpers; include/contact_actor.h; notes/contact-actor-pool_2026-10-14.md
