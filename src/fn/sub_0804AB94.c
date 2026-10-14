@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "tether_actor.h"
-#define TetherActor_UpdateInteractionCooldown sub_0804AB94
 void TetherActor_UpdateInteractionCooldown(struct TetherActor *actor)
 {
     u16 *field = &actor->interactionCooldown;

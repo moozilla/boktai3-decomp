@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "tether_actor.h"
 #include "game_state.h"
-#define TetherActor_HandleFlaggedCell sub_0804ADE0
 u32 TetherActor_RequestKindNineAction(u32, u32);
 u8 *sub_0821D64C(s32, s32);
 s32 Mod(s32, s32);
@@ -98,7 +97,4 @@ void TetherActor_HandleFlaggedCell(struct TetherActor *actor)
         }
     }
 done:;
-
-    ;
-    ;
 }

@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "tether_actor.h"
-#define TetherActor_InitInteractionFromScript sub_0804A4C8
-#define TetherActor_SelectInteractionState    sub_080492F0
 extern const u8 gUnk_08605A04[];
 void TetherActor_SelectInteractionState(struct TetherActor *);
 void TetherActor_InitInteractionFromScript(struct TetherActor *actor)

@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "tether_actor.h"
-#define TetherActor_InitKindFromScript sub_0804A430
-#define TetherActor_SetState           sub_08049168
 struct TetherExternalStatus {
     u8 unknown0[0x5AA];
     s16 value;

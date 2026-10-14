@@ -17,6 +17,10 @@ struct TetherPaletteView {
     u8 unknown78[0x1C];
 };
 /* Twelve-byte body prefix; initialization also writes the following position/probe fields. */
+struct TetherMotionDelta {
+    s16 x, y, z;
+    u16 unknown6; /* initialized to 16 by the body initializer */
+} __attribute__((aligned(4)));
 struct TetherBodyConfig {
     u32 id, flags;
     u8 category, angle, unknownA[2];
@@ -40,7 +44,7 @@ struct TetherActor {
     u16 palette[16];
     struct TetherBodyConfig bodyConfig;
     struct ContactPosition position;
-    struct ContactPosition movementPosition;
+    struct TetherMotionDelta movementDelta;
     void *movementProbe;
     u8 unknown64[0x28];
     union {

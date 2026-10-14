@@ -1,7 +1,4 @@
 #include "tether_actor.h"
-#define TetherActor_UpdateChargeAndCooldown   sub_0804ABCC
-#define TetherActor_UpdateChargeDecay         sub_0804AB40
-#define TetherActor_UpdateInteractionCooldown sub_0804AB94
 void TetherActor_UpdateChargeDecay(struct TetherActor *);
 void TetherActor_UpdateInteractionCooldown(struct TetherActor *);
 void *sub_08066DB8(void *, void *, u32, u32, void *, u32, u32, u32);
