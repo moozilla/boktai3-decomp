@@ -1,5 +1,4 @@
 #include "wireless_link_indicator.h"
-#define WirelessLinkIndicator_Initialize sub_0804852C
 s32 sub_0821983C(void *, void *, u32, u32, u32, u32, u32, void *);
 s32 WirelessLinkIndicator_Initialize(struct WirelessLinkIndicator *indicator)
 {

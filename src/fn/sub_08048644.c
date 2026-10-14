@@ -1,5 +1,4 @@
 #include "tether_actor.h"
-#define TetherActor_UpdateSegments sub_08048644
 #ifdef NONMATCHING
 // fuzzy: 77.3%
 // Packed endpoint caching and register allocation differ; no exact credit.
@@ -61,28 +60,28 @@ void TetherActor_UpdateSegments(struct TetherActor *input)
     segment = actor->segments;
     index = 0;
     {
-    register s32 startX asm("r10") = start.x;
-    register s32 startY asm("r8") = start.y;
-    register s32 endX asm("r12") = end.x;
-    register s32 nextX asm("r6") = endX;
-    s32 endY = end.y;
-    register s32 nextY asm("r5") = endY;
-    do {
-        register s32 count asm("r3") = index + 1;
-        s32 remaining = 7 - index;
-        segment->position.x = (nextX + startX * remaining) >> 3;
-        segment->position.y = (nextY + startY * remaining) >> 3;
-        segment->position.z = (end.z * count + start.z * remaining) >> 3;
-        segment->priority = priority;
-        segment->flags &= ~1;
-        nextX += endX;
-        nextY += endY;
-        index = count;
-        ++segment;
-    } while (index <= 6);
+        register s32 startX asm("r10") = start.x;
+        register s32 startY asm("r8") = start.y;
+        register s32 endX asm("r12") = end.x;
+        register s32 nextX asm("r6") = endX;
+        s32 endY = end.y;
+        register s32 nextY asm("r5") = endY;
+        do {
+            register s32 count asm("r3") = index + 1;
+            s32 remaining = 7 - index;
+            segment->position.x = (nextX + startX * remaining) >> 3;
+            segment->position.y = (nextY + startY * remaining) >> 3;
+            segment->position.z = (end.z * count + start.z * remaining) >> 3;
+            segment->priority = priority;
+            segment->flags &= ~1;
+            nextX += endX;
+            nextY += endY;
+            index = count;
+            ++segment;
+        } while (index <= 6);
     }
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08048644);
+INCLUDE_ASM("asm/nonmatching", TetherActor_UpdateSegments);
 #endif

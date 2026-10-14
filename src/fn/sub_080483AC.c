@@ -1,5 +1,4 @@
 #include "wireless_link_indicator.h"
-#define WirelessLinkIndicator_SelectStrengthFrame sub_080483AC
 void WirelessLinkIndicator_SelectStrengthFrame(struct WirelessLinkIndicator *input, s32 strength)
 {
     struct WirelessLinkIndicator *indicator = input;

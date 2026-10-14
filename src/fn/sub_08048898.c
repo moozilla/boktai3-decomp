@@ -1,5 +1,4 @@
 #include "tether_actor.h"
-#define TetherActor_RemoveSegments sub_08048898
 void TetherActor_RemoveSegments(struct TetherActor *actor)
 {
     struct TetherSegment *segment = actor->segments;

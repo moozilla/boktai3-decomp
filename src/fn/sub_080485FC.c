@@ -1,5 +1,4 @@
 #include "tether_actor.h"
-#define TetherActor_InitializeSegments sub_080485FC
 void TetherActor_InitializeSegments(struct TetherActor *actor)
 {
     struct TetherSegment *segment = actor->segments;

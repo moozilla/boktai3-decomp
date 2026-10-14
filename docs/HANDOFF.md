@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 23.807% matching (2026-10-14). This file is the single
+Last updated after reaching 23.836% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,48 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex): wireless indicator and tether actor helpers
+
+Exact code is **23.836%**, up **0.0288 percentage points** (+696 bytes)
+from seven new functions. There are **6,470 / 11,471 functions** and
+**575,714 / 2,415,354 bytes**. Without register pinning: **19.464%**;
+Register-pinned: **4.371%**, included above. Seventy-four guarded drafts remain.
+
+The **080483A0–080485FC RFU wireless-link indicator** is fully exact: 0xA4
+list-11 singleton, relocated animation resource, signal-strength frame
+selection, link visibility and screen placement. The recovered SDK status
+layout proves that it reads the selected child slot or the weakest connected
+parent slot. The standalone hidden 52-byte child-only helper already had
+boundary metadata and remains a file-local descriptive alias.
+
+The **080485FC–080489A0** subsection starts a larger, tentatively named tether
+actor: seven effect segments, auxiliary sprite ownership and periodic shake.
+Four new helpers are exact without hints. The **08048644 interpolation** is a
+**77.3% guarded draft**, with recovered player/object endpoints, visibility,
+priorities and weighted interpolation but different register/packed-field
+allocation. Player bytes 0x3A2/0x3A3/0x457 are distinguished from previously
+named facing/action-mode fields. See
+[wireless/tether notes](../notes/wireless-tether_2026-10-14.md).
+
+Six new matches use no hints; only the RFU status update retains two minimized
+concessions. Seven existing helpers were typed. The combined build printed
+**`build/boktai3.gba: OK`** in `build/wireless-tether-combined.log`;
+**21 complete post-promotion extent checks** passed, including seven renamed
+callers. Format, inventory, RAM literals, actor registry, ten resource-archive
+round trips and the text bank pass. No new emulator claims.
+
+Main **f475e4bf** includes Claude's **PR 115**, resizable extracted resource
+archives, and **PR 116**, the local text studio with game-font preview and
+`make mod`. These are incorporated in validation. PR 114 merged at
+**b5e79d08**; its main CI (**38618538320**) passed.
+
+Continue contiguously at **080489A0**, the directional-effect request, followed
+by random emission at **08048ABC** and more actor effects/state methods.
+Readable scratch candidates are retained under `wip/`; inspect their latest
+candidate records rather than assuming exact status. Continue toward
+**25% exact or 60% usage remaining**; latest allowance is **77% remaining**.
+Claude's separate checkout owns main.
 
 ## October 14 (Codex): temporary animations and contact-burst controller
 
