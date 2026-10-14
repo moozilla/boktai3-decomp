@@ -9,22 +9,17 @@ struct ModifierRecord {
     u8 extra;
     u8 unknown5[3];
 };
-struct ModifierActor {
-    u8 unknown0[0x24];
-    s16 selectedId;
-};
 struct ModifierSelection {
-    u16 values0[5];
+    s16 values0[5];
     s16 count, capacity;
-    u16 valuesE[5];
+    s16 valuesE[5];
     u32 mask;
     s16 sourceIds[4];
     s16 selectedId, secondaryId;
 };
 struct ModifierMenu {
     u8 task[0x18];
-    u32 state;
-    s32 mode;
+    s32 state, mode;
     s8 category, index;
     u8 unknown22[0x46];
     struct ModifierSelection current, pending;
