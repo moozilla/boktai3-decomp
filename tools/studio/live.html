@@ -99,6 +99,11 @@ code { font-size: 12px; }
         <input id="recname" placeholder="recording name" style="width:9.5em">
         <button id="recbtn">Record</button>
       </div>
+      <div class="row">
+        <input id="procid" placeholder="procedure #" style="width:7.5em">
+        <input id="procargs" placeholder="args, e.g. 896 1920 1" style="width:12em">
+        <button id="procrun">Run script procedure</button>
+      </div>
     </div>
     <div class="card">
       <h2>Remote pad <span class="sp"></span><span style="font-weight:400;text-transform:none;letter-spacing:0">hold Shift for a long press</span></h2>
@@ -136,6 +141,11 @@ code { font-size: 12px; }
       <div id="capview"></div>
     </div>
     <div class="card">
+      <h2>Scenes · warp (experimental) <span class="sp"></span><input id="scq" placeholder="scene or map" style="width:8em"></h2>
+      <div class="howto" style="margin-bottom:6px">Loads the scene's stage; the player is not placed yet, so use bookmarks for play. Current scene: <b id="cursc">—</b></div>
+      <div class="log" id="scenes" style="max-height:300px"><div class="empty">Loading…</div></div>
+    </div>
+    <div class="card">
       <h2>Graphics with text <span class="sp"></span><span id="tagcount" style="font-weight:400"></span></h2>
       <div id="tags" class="empty">Tag sprites or maps that contain text (from a capture, or the Graphics page).</div>
     </div>
@@ -161,7 +171,7 @@ async function poll() {
   document.querySelectorAll('#mode button').forEach(b => b.classList.toggle('on', b.dataset.m === (st.mode || 'en')));
   $('god').textContent = st.god ? 'God mode: on' : 'God mode';
   $('recbtn').textContent = st.rec ? 'Stop recording' : 'Record';
-  ['capture', 'god', 'recbtn', 'bmsave'].forEach(id => $(id).disabled = !d.connected);
+  ['capture', 'god', 'recbtn', 'bmsave', 'procrun'].forEach(id => $(id).disabled = !d.connected);
   // current text: the most recent fetched string that has text
   const cur = d.texts.find(t => t.jp || t.en);
   $('en').textContent = cur ? (cur.en || '(no translation)') : '';
@@ -242,6 +252,11 @@ async function loadTags() {
 
 document.querySelectorAll('#mode button').forEach(b => b.onclick = () => cmd({ c: 'subs', mode: b.dataset.m }));
 document.querySelectorAll('.pad button').forEach(b => b.onclick = ev => cmd({ c: 'keys', keys: b.dataset.k, frames: ev.shiftKey ? 30 : 4 }));
+$('procrun').onclick = () => {
+  const id = parseInt($('procid').value); if (isNaN(id)) return;
+  const args = $('procargs').value.trim().split(/[\s,]+/).filter(Boolean).map(x => parseInt(x));
+  cmd({ c: 'callproc', id, args });
+};
 $('capture').onclick = () => cmd({ c: 'capture' }).then(() => setTimeout(poll, 800));
 $('god').onclick = () => cmd({ c: 'god', on: !(last?.state?.god) });
 $('recbtn').onclick = () => last?.state?.rec ? cmd({ c: 'rec_stop' }) : cmd({ c: 'rec_start', name: $('recname').value || 'playthrough' });
@@ -251,7 +266,25 @@ document.addEventListener('keydown', e => {
   const map = { ArrowUp: 'UP', ArrowDown: 'DOWN', ArrowLeft: 'LEFT', ArrowRight: 'RIGHT', z: 'B', x: 'A', a: 'L', s: 'R', Enter: 'START', Backspace: 'SELECT' };
   if (map[e.key] && last?.connected) { e.preventDefault(); cmd({ c: 'keys', keys: map[e.key], frames: e.shiftKey ? 30 : 4 }); }
 });
-poll(); setInterval(poll, 700); loadTags();
+let sceneList = [];
+async function loadScenes() {
+  sceneList = await fetch('/api/scenes').then(r => r.json()).catch(() => []);
+  renderScenes();
+}
+function renderScenes() {
+  const q = $('scq').value.trim().toUpperCase();
+  const hits = sceneList.filter(s => !q || String(s.scene).includes(q) || (s.map || '').includes(q) || (s.shown || '').includes(q)).slice(0, 200);
+  $('scenes').replaceChildren(...hits.map(s => {
+    const e = document.createElement('div'); e.className = 'e'; e.style.gridTemplateColumns = s.shot ? '4.2em 72px 1fr' : '4.2em 1fr';
+    e.innerHTML = `<span class="id">${s.scene}</span>${s.shot ? `<img src="/api/live/file/captures/scene_${String(s.scene).padStart(4, '0')}/screen.png" style="width:72px;image-rendering:pixelated;border-radius:3px" alt="">` : ''}
+      <span>${s.map ? `map <a href="/gfx#maps/${s.map}-${s.tileset}-${s.hp}" target="_blank" onclick="event.stopPropagation()">${s.map}</a>` : 'no stage'}${s.shown && s.shown !== s.map ? ` · shows ${s.shown}` : ''}${s.palette ? ` · pal ${s.palette}` : ''}${s.became && s.became !== s.scene ? ` · → ${s.became}` : ''}</span>`;
+    e.onclick = () => { if (last?.connected) cmd({ c: 'warp', scene: s.scene }); };
+    return e;
+  }));
+}
+$('scq').oninput = renderScenes;
+setInterval(() => { if (last?.state?.scene) $('cursc').textContent = last.state.scene; }, 1000);
+poll(); setInterval(poll, 700); loadTags(); loadScenes();
 </script>
 </body>
 </html>
