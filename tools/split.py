@@ -109,6 +109,11 @@ def c_functions(path, with_asm=True):
         if re.search(r"\bstatic\b", src[decl_start:m.start()]):
             continue  # static (inline) helper: not a ROM function of its own
         found.append((m.start(), name))
+    # a function-defining macro at top level, e.g. STATE_COMMAND_WAIT(sub_X, 0x1b)
+    # (no trailing semicolon; the macro expands to the definition)
+    for m in re.finditer(r"^([A-Z][A-Z0-9_]+)\(\s*(\w+)\s*[,)][^\n;]*\)[ \t]*$", src, re.M):
+        if src.count("{", 0, m.start()) == src.count("}", 0, m.start()):
+            found.append((m.start(), m.group(2)))
     if with_asm:
         for m in INCLUDE_ASM.finditer(src):
             found.append((m.start(), m.group(1)))
