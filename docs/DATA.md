@@ -73,8 +73,15 @@ both checked against the emulator), saves to `build/text/bank.tsv` and runs
 `make mod`:
 
 ```
-python3 tools/studio/serve.py      # http://localhost:8642
+python3 tools/studio/serve.py      # http://localhost:8642 (text), /gfx (graphics)
 ```
+
+The graphics page browses the extracted archives: sprite packages (`CB05`)
+with their animations, the 381 large sprites (`98F5`), the 195 palettes
+(`92B3`: a 20-byte header and 256 colours), the font with its `charmap.tsv`
+readings, and any resource as raw 4bpp tiles. The game picks a sprite's
+palette at runtime (scripts and stage data), so colours come from the palette
+chosen in the page.
 
 Characters must exist in `data/charmap.tsv` (or use `{XXXX}` glyph codes);
 ASCII is printed with the font's 8×16 half-width glyphs. Escapes are `\\`,
