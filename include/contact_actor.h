@@ -26,33 +26,34 @@ struct ContactActor {
     u8 enter, state;
     u8 finished, bobPhase;
     u16 stateFrame;
-    u8 direction, unknown7;
+    u8 direction, steeringTimer;
     s8 targetIndex;
     u8 retargetTimer;
     u8 unknownA[2];
-    s16 targetHeight;
-    u8 unknownE[2];
+    s16 targetHeight, desiredHeight;
     u16 speed, unknown12;
     struct ContactPosition position;
-    u8 unknown1C[0x10];
+    struct ContactPosition destination, origin;
     struct ContactCollider resourceCollider, healthCollider;
     struct DisplaySequenceState sequence;
     struct DisplaySequenceSprite sprite;
     u8 graphics[0x1C];
     u8 shadow[0x40];
 };
-/* Known prefix only; the complete task allocation and tile buffer length are unconfirmed. */
+/* Task allocation is 0x1720 bytes; the final 32 bytes hold the blend buffer. */
 struct ContactActorPool {
     u8 task[0x18];
     u32 state;
-    u16 unknown1C;
+    u8 unknown1C, hideRequested;
     u8 clearRequested, mode;
     u16 resourceColliderId, healthColliderId;
-    u8 unknown24[4];
+    u32 lifetime;
     const struct ContactPosition *targets[2];
-    u8 scriptState[0xC];
+    struct ContactPosition retreatCenter;
+    const void *sequenceResource;
     struct ContactActor slots[16];
-    u8 unknown16FC[4];
-    u8 tileData[1];
+    s8 fadeMode, fadeLevel;
+    u8 unknown16FE[2];
+    u8 tileData[0x20];
 };
 #endif
