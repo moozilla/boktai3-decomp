@@ -341,16 +341,24 @@ one operand and returns its type and value. The first byte selects the type:
   matched accessors are `sub_0821B34C`, `sub_0821B4C8`, `sub_0821B540` and
   `sub_0821B5BC`.
 
-### Procedure keys
+### Resource keys (`ScriptProc_Start` is a resource lookup)
 
-`ScriptProc_Start(key, context)` (`0821A520`, `src/fn/sub_0821A520.c`) starts a
-script procedure and returns a handle. `sub_08219BD8` is a 16-bit string hash
-(rotate-left-5, add the byte, to NUL; the same algorithm as MGS's `GV_StrCode`).
-*(guess: procedure keys are hashes of script names, but no key has yet been
-matched to a name in the code.)* A `switch` remaps ten special keys to
-other procedure keys and contexts, for example `0x922E` to `0x9225`. The
-engine's own startup starts procedures with keys such as `0xCEAA`, `0x98F5`
-and `0x9B1B` (`sub_08215118`).
+`ScriptProc_Start(type, name)` (`0821A520`) is misnamed: it finds a
+**resource**, not a script procedure. Both arguments are 16-bit string hashes
+(`sub_08219BD8`: rotate-left-5, add the byte, to NUL; MGS's `GV_StrCode`
+scheme). `type` is the hash of a file extension (`0x922E` = `anm`, `0xC091` =
+`map`, `0xA635` = `fnt`, `0xCEEF` = `ptn`, `0xA8D9` = `gcx`); a `switch` maps it
+to a key of the archive directory at `08614D6C`, and `name` is searched in that
+archive. The result is the resource's data (sprite packages are then rebased by
+`ResourceHeader_Relocate`). This is the role of MGS's `GV_GetCache`. Archives
+and formats are in [ASSETS.md](ASSETS.md). The engine's startup loads the
+single-entry resources `0xCEAA`, `0x98F5` and `0x9B1B` (`sub_08215118`).
+A rename (for example `Resource_Find`) is pending, to avoid churn in units that
+other sessions are editing.
+
+The `gcx` resource (`08D5A85C`) starts with `0x42A05217`, which read as a Unix
+time is 2005-06-03, a plausible build date (MGS GCX files also begin with a
+timestamp), followed by offsets that are not yet decoded.
 
 ### Messages
 
