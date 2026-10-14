@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Local studio: browse, search and edit the script text with a live preview in
-the game font, then build a modified ROM.
+the game font, then build a modified ROM; browse sprites, palettes, the font and
+raw tiles from the resource archives (/gfx).
 
   python3 tools/studio/serve.py [--port 8642]    then open http://localhost:8642
 
@@ -33,6 +34,31 @@ def font_path():
             name = [ln.split()[1] for ln in open(e.file) if ln[:1] not in "#h" and ln.strip()][0]
             return os.path.join(d, name)
     raise SystemExit("no res_fnt entry in data/manifest.csv")
+
+
+def archives():
+    """{label: (index path, [(hash, file)])} for the extracted resource archives."""
+    out = {}
+    for e in load_manifest():
+        if e.format != "resource_archive":
+            continue
+        if not os.path.exists(e.file):
+            e.extract()
+        d = os.path.dirname(e.file)
+        ents = [ln.split() for ln in open(e.file) if ln[:1] not in "#h" and ln.strip()]
+        out[e.name[4:]] = [(h, os.path.join(d, f)) for h, f in ents]
+    return out
+
+
+def resource_index():
+    return {label: [[h, os.path.getsize(f)] for h, f in ents] for label, ents in archives().items()}
+
+
+def resource_file(label, h):
+    for eh, f in archives().get(label, []):
+        if eh == h.upper():
+            return f
+    return None
 
 
 def ensure_bank():
@@ -116,6 +142,16 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, {f"{g:04X}": c for g, c in text_bank.charmap().items()})
         elif self.path == "/api/font":
             self.send(200, open(font_path(), "rb").read(), "application/octet-stream")
+        elif self.path in ("/gfx", "/gfx.html"):
+            self.send(200, open(os.path.join(HERE, "gfx.html"), "rb").read(), "text/html; charset=utf-8")
+        elif self.path == "/api/res":
+            self.send(200, resource_index())
+        elif self.path.startswith("/api/res/"):
+            f = resource_file(*self.path[len("/api/res/"):].split("/")[:2])
+            if f:
+                self.send(200, open(f, "rb").read(), "application/octet-stream")
+            else:
+                self.send(404, {"error": "no such resource"})
         else:
             self.send(404, {"error": "not found"})
 
