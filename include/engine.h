@@ -96,8 +96,8 @@ u8 *Text_LookupString(s32 id);
 s32 Script_GetKeywordValue(s32 keyword,
                            s32 defaultValue); /* value operand after keyword, or default */
 
-void *ScriptProc_Start(u16 key,
-                       u16 context); /* (guess) start a script procedure; returns a handle */
+void *ScriptProc_Start(u16 key, u16 context); /* misnamed: resource lookup; key = extension hash,
+                                        context = name hash; returns the data (docs/ASSETS.md) */
 
 s32 Script_Call(
     u32 key,
