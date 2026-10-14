@@ -86,11 +86,59 @@ def check(path, text):
         os.unlink(tmp)
 
 
+def per_function(files, write):
+    """Strip hints function by function, keeping each change that still matches."""
+    sys.path.insert(0, str(ROOT / "tools"))
+    from merge_unit import items
+    total = 0
+    for p in files:
+        text = p.read_text()
+        parts = items(text)
+        # rebuild the file from items, so an item can be swapped in place
+        sep_text = text
+        changed = []
+        drafts = [m.span() for m in re.finditer(r"#\s*ifdef\s+NONMATCHING.*?#\s*endif", text, re.S)]
+        for item in parts:
+            if not (PIN.search(item) or BARRIER_INLINE.search(item)):
+                continue
+            at = text.find(item)
+            if any(a <= at < b for a, b in drafts):  # a draft: its check would pass trivially
+                continue
+            m = re.search(r"\b(\w+)\s*\([^;{]*\)\s*\{", item)
+            name = m.group(1) if m else "?"
+            for vname, fn in (("strip", strip_code), ("strip+literal", lambda t: literalize_item(t, sep_text))):
+                cand_item = fn(item)
+                if cand_item == item:
+                    continue
+                cand = sep_text.replace(item, cand_item, 1)
+                ok, msg = check(p, cand)
+                if ok:
+                    sep_text = cand
+                    changed.append(f"{name} ({vname})")
+                    break
+        if changed:
+            if not (PIN.search(sep_text) or BARRIER_INLINE.search(sep_text)):
+                sep_text = re.sub(r"^" + re.escape(MARK) + r"[^\n]*\n", "", sep_text, flags=re.M)
+            if write:
+                p.write_text(sep_text)
+            total += len(changed)
+        print(f"{p.relative_to(ROOT)}: unpinned {', '.join(changed) or 'none'}", flush=True)
+    print(f"{total} functions unpinned")
+
+
+def literalize_item(item, whole):
+    for typ, sym, _ in RAM_ARRAY.findall(whole):
+        item = re.sub(r"\b" + sym + r"\b", f"(({typ} *)0x{sym[5:]})", item)
+    return strip_code(item)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("files", nargs="*")
     ap.add_argument("--write", action="store_true")
     ap.add_argument("-j", type=int, default=6)
+    ap.add_argument("--per-function", action="store_true",
+                    help="in multi-function units, strip one function's hints at a time")
     a = ap.parse_args()
     files = [Path(f).resolve() for f in a.files] or sorted(
         p for p in (ROOT / "src").rglob("*.c") if MARK in p.read_text())
@@ -112,6 +160,8 @@ def main():
                 return p, True, "; ".join(msgs)
         return p, False, "; ".join(msgs)
 
+    if a.per_function:
+        return per_function(files, a.write)
     n = 0
     with ThreadPoolExecutor(a.j) as ex:
         for p, ok, msg in ex.map(one, files):

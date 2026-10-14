@@ -110,11 +110,10 @@ static inline u8 sameRegion(struct Trigger *p)
 {
     u32 current = ({
         struct GameState *world = gUnk_02000710;
-        register u32 offset asm("r2") = 0x5A0;
-        asm("" : : "r"(offset));
+        u32 offset = 0x5A0;
         *(u32 *)((u8 *)world + offset);
     });
-    register u32 region asm("r7") = p->sound;
+    u32 region = p->sound;
     if (current == region)
         return 1;
     return 0;
