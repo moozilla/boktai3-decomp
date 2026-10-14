@@ -21,7 +21,7 @@ void ModifierMenu_DrawFirstSourceStats(struct ModifierMenu *menu)
             ModifierMenu_DrawStatComparison(second, second, 21, 5, 1);
             break;
         case 1:
-            if (sub_0811DD94(menu->category, menu->index)) {
+            if (sub_0811DD94(menu->choice.cursor.category, menu->choice.cursor.index)) {
                 ModifierMenu_DrawStatComparison(first, nextFirst, 8, 13, 0);
                 ModifierMenu_DrawStatComparison(second, nextSecond, 8, 14, 1);
             } else {

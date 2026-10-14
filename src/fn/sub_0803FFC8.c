@@ -12,21 +12,21 @@ s32 ModifierMenu_ApplyPendingSource(struct ModifierMenu *menu)
     s32 result = -1;
     switch (menu->mode) {
         case 0:
-            if (!sub_0811DD94(menu->category, menu->index))
+            if (!sub_0811DD94(menu->choice.cursor.category, menu->choice.cursor.index))
                 break;
-            if (menu->category == 0)
+            if (menu->choice.cursor.category == 0)
                 result = ModifierMenu_CommitFirstSource(menu);
-            else if (menu->category == 1) {
+            else if (menu->choice.cursor.category == 1) {
                 result = ModifierMenu_CommitSecondSource(menu);
                 ModifierMenu_ReconcileSelection(menu);
-            } else if (menu->category == 2)
+            } else if (menu->choice.cursor.category == 2)
                 result = ModifierMenu_CommitThirdSource(menu);
             else
                 result = ModifierMenu_CommitFourthSource(menu);
             break;
         case 1: {
-            s32 category = menu->category;
-            s32 index = menu->index;
+            s32 category = menu->choice.cursor.category;
+            s32 index = menu->choice.cursor.index;
             if (!sub_0811DD94(4, category * 3 * 2 + index))
                 break;
             result = ModifierMenu_ToggleSelection(menu);
@@ -34,8 +34,8 @@ s32 ModifierMenu_ApplyPendingSource(struct ModifierMenu *menu)
             break;
         }
         case 2: {
-            s32 category = menu->category;
-            s32 index = menu->index;
+            s32 category = menu->choice.cursor.category;
+            s32 index = menu->choice.cursor.index;
             if (sub_0811DD94(5, category * 3 * 2 + index))
                 result = ModifierMenu_CommitSecondarySource(menu);
             break;
