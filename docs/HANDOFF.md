@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 20% matching (2026-10-12). This file is the single
+Last updated after reaching 22.3% matching (2026-10-13). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -10,7 +10,38 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
-## October 13 (Claude): where to pick up (read this first)
+## October 13 (Claude, solo): gap mining (read this first)
+
+State: **22.309%** matched (538,850 / 2,415,354 bytes; 6,261 / 11,465 functions);
+18.429% without register pinning; 61 NONMATCHING drafts. Branch `claude/overnight`
+added ~460 matched functions, mostly *gap functions*: code the original split left as
+`label + .incbin` inside `gen/code_sym.s`.
+
+Gap pipeline (`tools/gap/`, run with `build/venv/bin/python` available):
+* `gaps.py list` lists remaining push-starting gaps (264 left); `gaps.py dis ADDR`
+  and `gv.py ADDR` disassemble one with pool words resolved.
+* Write `wip/g/sub_ADDR.c`, then `trygap.py wip/g/*.c` (push functions) or
+  `tryleaf.py` (push-less leaves; tries old_agbcc first). Matches are copied to
+  `src/fn/` and registered via `addgap.py` in both `symbols/*extra_functions.csv`
+  (no commas in descriptions). `autoleaf.py` generates trivial leaves automatically.
+* Afterwards: `fixleftover.py` (registers bytes left after a reviewed function, or
+  the next C unit shifts), `progress.py --refresh-inventory gen/code_sym.s`, `make`.
+* Use names from `symbols/functions.csv` (old `sub_` names give link errors) and
+  don't redeclare functions that `engine.h` declares.
+* Accounting note: registering gaps splits incbin spans that were over-credited,
+  so the percentage can drop slightly when a gap is registered unmatched.
+
+Idioms that unlocked matches are in the agent memory file `agbcc-idioms` and
+summarized here: mask-first OR helpers (`Or(u16 m, u16 *f){*f|=m;}`), typed zero
+locals, angle wrap `s16 d=(a-b)&0xff; if(d>128)...`, `Fill32` inline wrapper for
+CpuSet, value-first temporaries before stores, `goto` for cross-jumped returns.
+
+Unsolved/near misses (stashed in `wip/`, not committed): actor-list loops over
+`gUnk_020004AC` (loop rotation), 080A9xx group loops (strength reduction),
+0821AD98 binary search (86.7%, argument copy order), 0821DE0C, 08201160.
+Large leftover spans: 08136F48 (1,732 bytes), 08222A04 (632).
+
+## October 13 (Claude): where to pick up
 
 State: **21.424%** matched (5,797 functions); subsystem units with shared headers
 cover 0x080015AC-0x080133CC; `include/engine.h`, `game_state.h`, `player.h` hold the
