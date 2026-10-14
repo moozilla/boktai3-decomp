@@ -1,5 +1,4 @@
 #include "tether_actor.h"
-#define TetherActor_EmitRandomEffect sub_08048ABC
 void sub_08068124(void *, void *, void *, u32, u32, u32);
 static inline s32 scaleEmission(s32 value)
 {

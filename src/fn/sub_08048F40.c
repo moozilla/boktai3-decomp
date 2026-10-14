@@ -1,8 +1,4 @@
 #include "tether_actor.h"
-#define TetherActor_UpdatePalette sub_08048F40
-#define TetherActor_SelectPalette sub_08048EEC
-#define TetherActor_BlendPalette sub_08048E0C
-#define TetherActor_UpdateGlow sub_08048D70
 void TetherActor_SelectPalette(struct TetherActor *, u32);
 void TetherActor_BlendPalette(struct TetherActor *);
 void TetherActor_UpdateGlow(struct TetherActor *);

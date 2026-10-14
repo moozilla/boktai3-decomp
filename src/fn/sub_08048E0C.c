@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "tether_actor.h"
-#define TetherActor_BlendPalette sub_08048E0C
 void TetherActor_BlendPalette(struct TetherActor *s)
 {
     u16 *a = (u16 *)(gUnk_030042E4 + (s->paletteIndex + 0x283) * 32);
