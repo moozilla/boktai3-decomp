@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
-#define ScenePool_SelectRepeatedDirection sub_0803D78C
 s32 ScenePool_SelectRepeatedDirection(void *owner, struct ScenePoolEntry *entry)
 {
     u32 *history = entry->history;

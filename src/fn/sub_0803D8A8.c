@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
-#define ScenePool_ResumeAfterIdle sub_0803D8A8
 s32 ScenePool_ResumeAfterIdle(u8 *owner, struct ScenePoolEntry *entry)
 {
     if ((s8)owner[0x5ec] <= 0 && entry->idleFrame > 79) {

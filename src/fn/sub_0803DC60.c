@@ -1,5 +1,4 @@
 #include "scene_pool.h"
-#define ScenePool_UpdateSteeringPulse sub_0803DC60
 struct ScenePoolSteeringBounds {
     s32 emergencyHigh, high, low, activeHigh, activeLow;
 };
@@ -66,5 +65,5 @@ done:;
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0803DC60);
+INCLUDE_ASM("asm/nonmatching", ScenePool_UpdateSteeringPulse);
 #endif

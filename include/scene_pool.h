@@ -21,14 +21,14 @@ struct ScenePoolEntry {
     s32 motionPhase;
     u32 stateFrame;
     s32 step, acceleration, speed, turnStep;
-    s32 direction;
+    s32 direction; /* signed metric; exact geometric meaning is tentative */
     u32 unknown5c;
     s32 idleFrame;
     u8 stateEntered;
     u8 steeringActive, steeringDelay;
     s8 steeringPulse;
     u32 state;
-    u32 history[0x40];
+    u32 history[0x40]; /* per-state workspace; temporal history is not established */
     s32 settingA, delayA, settingB, delayB;
 };
 struct ScenePoolManager {

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
-#define ScenePool_ApplyMotionControls sub_0803D90C
 void sub_0811EDE0(struct ScenePoolActor *);
 static inline void ApplyMotionControls(struct ScenePoolEntry *entry, struct ScenePoolActor *actor)
 {
@@ -38,6 +37,7 @@ static inline void ApplyMotionControls(struct ScenePoolEntry *entry, struct Scen
 
 void ScenePool_ApplyMotionControls(struct ScenePoolActor *actor, struct ScenePoolEntry *entry)
 {
+    /* Initialized indirection retains the original register-copy order. */
     struct ScenePoolActor *owner = actor;
     struct ScenePoolActor **ownerRef = &owner;
     ApplyMotionControls(entry, *ownerRef);

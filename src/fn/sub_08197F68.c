@@ -1,6 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#define KeyTrigger_Init sub_08197F68
 
 struct Args08197F68 {
     u16 count;
@@ -17,7 +16,7 @@ struct Task08197F68 {
     struct Args08197F68 args;
 };
 
-s32 sub_08197F68(struct Task08197F68 *t)
+s32 KeyTrigger_Init(struct Task08197F68 *t)
 {
     s32 i;
     t->script1 = NULL;
