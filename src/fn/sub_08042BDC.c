@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_actor.h"
-#define ContactActor_UpdateDisplay sub_08042BDC
 void ContactActor_UpdateDisplay(struct ContactActor *slot)
 {
     register struct ContactActor *owner asm("r12") = slot;
@@ -147,7 +146,7 @@ void ContactActor_UpdateDisplay(struct ContactActor *slot)
         s32 offset;
         reader = owner;
         phase = reader->bobPhase;
-        wave = table[phase] << 5;
+        wave = table[phase] * 32;
         asm("" : : "r"(reader));
         if (wave >= 0)
             offset = wave >> 12;

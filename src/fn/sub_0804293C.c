@@ -1,5 +1,4 @@
 #include "contact_actor.h"
-#define ContactActor_ApplyResourceContact sub_0804293C
 void sub_080472A4(void *, u32, s32, void *, const struct ContactPackedVector *, u32);
 void SceneActors_AddResourceCost(u32);
 void ContactActor_ApplyResourceContact(void *source, struct ContactCollider *other,
@@ -9,6 +8,6 @@ void ContactActor_ApplyResourceContact(void *source, struct ContactCollider *oth
     size.x = 16;
     size.y = 0;
     size.z = 16;
-    sub_080472A4(source, other->cost, 1, owner->position, &size, 1);
+    sub_080472A4(source, other->cost, 1, &owner->position, &size, 1);
     SceneActors_AddResourceCost(other->cost);
 }
