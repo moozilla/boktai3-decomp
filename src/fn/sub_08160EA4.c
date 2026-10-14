@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 99.2%
-// 2 differing instruction runs; first diff at +0x2A (ldr r3, [pc, #0x6c] vs ldr r1, [pc, #0x6c])
 struct Vec {
     u32 x : 16;
     u32 y : 16;
@@ -9,7 +6,6 @@ struct Vec {
     u32 pad : 16;
 };
 extern u32 gUnk_03005308;
-extern u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
@@ -45,7 +41,9 @@ s32 sub_08160EA4(u8 *p)
         s32 angle, step;
         if (W(0x584) == 0) {
             gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-            I(0xC0) = Mod(*(u16 *)((gUnk_03005308 << 1) + (u32)gUnk_0203B400), 10) + 230;
+            // literal gUnk_0203B400: a constant address leaves the load to
+            // reload, whose spill rotation gives the original r3/r4 choices
+            I(0xC0) = Mod(*(u16 *)((gUnk_03005308 << 1) + 0x0203B400), 10) + 230;
         }
         angle = ((*P(0x58C) + 5) & 7) * 32;
         step = Div(768, D(0x10));
@@ -100,6 +98,3 @@ s32 sub_08160EA4(u8 *p)
 done:
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08160EA4);
-#endif
