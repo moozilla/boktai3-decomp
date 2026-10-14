@@ -61,8 +61,14 @@ Note: `check.py FILE` without `--nonmatching` compiles a draft's
 * **Reload rotation.** `sub_08160EA4` differed only in r3/r4. Writing the
   random table as the literal `0x0203B400` instead of
   `(u32)gUnk_0203B400` turned its load into a reload, which advanced the
-  rotation and fixed both registers. The same family (`gUnk_0203B400`
-  random-table reads) pins elsewhere for the same reason.
+  rotation and fixed both registers. Three other random-table users lost
+  their pins the same way (of 40 tried).
+  Write such literals through a named macro in `include/global.h`
+  (`#define RANDOM_TABLE_ADDR 0x0203B400 /* gUnk_0203B400 */`).
+  `make` runs `tools/check_ram_literals.py`, which fails if the address no
+  longer equals the symbol in the link map. These are RAM addresses, so the
+  ROM shift test can't move them; the check keeps them tied to the symbol if
+  RAM layout ever changes.
 * **Statement order.** regdiag's line numbers show where the original
   computes a value. `sub_081DC470` matched after moving `half = s + 0xC4`
   below the stores the original emits first, then storing to `s + 0xC4` and
