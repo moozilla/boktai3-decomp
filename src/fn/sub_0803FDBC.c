@@ -27,10 +27,10 @@ void ModifierMenu_ReconcileSelection(struct ModifierMenu *menu)
             menu->changed = 1;
     }
     for (index = 0; index <= 3; index++)
-        ((s16 *)gUnk_02000710->unk7A8)[index] = -1;
+        ((s16 *)gUnk_02000710->modifierIdsBytes)[index] = -1;
     for (count = 0, index = 0; index <= 31; index++) {
         if (sub_0803F82C(current, index)) {
-            ((s16 *)gUnk_02000710->unk7A8)[count] = index;
+            ((s16 *)gUnk_02000710->modifierIdsBytes)[count] = index;
             count++;
         }
     }
