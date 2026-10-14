@@ -18,7 +18,7 @@ noted. "medium" means the name or role is inferred from coverage, not decoded.
 
 ## Text
 
-* Script bank: 9,976 entries (`08D6B1F8` table → `08D74DDC` text). Bit 31
+* Script bank: 9,977 entries (`08D6B1F8` table → `08D74DDC` text). Bit 31
   of an entry marks text; entries without it are binary records (e.g. string
   9340 = region list used by the region-select screen).
 * Encoding: `0x0A` newline, ASCII `0x20–0x7E`, lead bytes `0x80–0x85` + 1 byte
