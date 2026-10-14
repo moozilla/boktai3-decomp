@@ -19,7 +19,7 @@ struct Object {
     u32 drawable;
 };
 void sub_0802CD04(struct Object *);
-void sub_08042588(void *, int, int, int, struct Vec *);
+void DisplayAnimation_InitializeSequence(void *, int, int, int, struct Vec *);
 int sub_0802D080(struct Object *, int, int, int, int, int);
 void sub_0802C9A0(struct Object *, struct Vec *, struct Vec *, void *);
 void sub_0802CA1C(struct Object *, struct Vec *, struct Vec *, void *);
@@ -66,7 +66,7 @@ int sub_0802D44C(struct Object *p)
     struct Vec size, offset, size2, offset2;
     int zero;
     sub_0802CD04(p);
-    sub_08042588(&p->drawable, 0xd495, 0xaf44, 0, &p->pos);
+    DisplayAnimation_InitializeSequence(&p->drawable, 0xd495, 0xaf44, 0, &p->pos);
     {
         register int initialZero asm("r2") = 0;
         asm("" : "+r"(initialZero));

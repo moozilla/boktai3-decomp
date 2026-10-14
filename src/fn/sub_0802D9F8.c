@@ -29,8 +29,8 @@ extern struct Map *gUnk_030052F4;
 extern u32 gUnk_030052F8, gUnk_030052FC, gUnk_030053F4;
 u8 *sub_0821D64C(int, int);
 void sub_08225B74(void *);
-int sub_080426B0(void *, void *);
-int sub_080423C8(void *);
+int DisplayAnimation_SetPosition(void *, void *);
+int DisplayAnimation_UpdatePlayback(void *);
 void sub_0802DE3C(struct Actor *, unsigned, int, int);
 static inline u8 *cell(int i)
 {
@@ -68,8 +68,8 @@ int sub_0802D9F8(void *unused, struct Actor *p)
             body->pos.y = height;
         }
     }
-    sub_080426B0(drawable, &body->pos);
-    sub_080423C8(drawable);
+    DisplayAnimation_SetPosition(drawable, &body->pos);
+    DisplayAnimation_UpdatePlayback(drawable);
     if (p->timer > 0) {
         p->timer--;
         if (p->timer <= 3) {

@@ -1,5 +1,5 @@
 #include "global.h"
-s32 sub_080424FC(void *);
+s32 DisplayAnimation_TestFinished(void *);
 void Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
 void sub_081CAB20(void *unused, u8 *p)
 {
@@ -93,7 +93,7 @@ void sub_081CAB20(void *unused, u8 *p)
         Actor_PlayAnimationEntry(p, r, 2, 0, 4);
         p[0x18] = 0;
     }
-    if (sub_080424FC(p + 0xd4)) {
+    if (DisplayAnimation_TestFinished(p + 0xd4)) {
         switch (p[0x18]) {
             case 0: {
                 s32 r;

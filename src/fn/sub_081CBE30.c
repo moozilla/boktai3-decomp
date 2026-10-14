@@ -6,7 +6,7 @@ struct Vec081CBE30 {
     s16 x, y, z, pad;
 };
 void Actor_PlayAnimationEntry(u8 *, u32, u32, u32, u32);
-s32 sub_080424FC(void *);
+s32 DisplayAnimation_TestFinished(void *);
 void sub_082381C8(struct Vec081CBE30 *, s32, s32, s32, s32, s32, s32, s32, s32);
 /* Three-phase attack: play the wind-up, spawn an effect above the actor on
  * frame 15, then the follow-through after 0x56 frames. */
@@ -73,7 +73,7 @@ void sub_081CBE30(u8 *a, u8 *b, s32 frame)
                 v[2] = z + 0x20;
                 sub_082381C8((struct Vec081CBE30 *)v, 0xa0, 0x20, 1, 1, 0, 0, 0, 0);
             }
-            if (sub_080424FC(b + 0xd4))
+            if (DisplayAnimation_TestFinished(b + 0xd4))
                 b[0x18] = 1;
             break;
         case 1:
@@ -120,7 +120,7 @@ void sub_081CBE30(u8 *a, u8 *b, s32 frame)
             }
             break;
         case 2:
-            if (sub_080424FC(b + 0xd4))
+            if (DisplayAnimation_TestFinished(b + 0xd4))
                 b[7] = 1;
             break;
     }
