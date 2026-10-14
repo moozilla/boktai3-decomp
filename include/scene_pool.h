@@ -18,7 +18,8 @@ struct ScenePoolEntry {
     u8 side, mode, repetitions;
     u8 unknown3b;
     u32 unknown3c;
-    s32 motionPhase, stateFrame;
+    s32 motionPhase;
+    u32 stateFrame;
     s32 step, acceleration, speed, turnStep;
     s32 direction;
     u32 unknown5c;
@@ -47,15 +48,21 @@ struct ScenePoolManager {
 };
 /* Partial actor view established by the frame/state callbacks in this range. */
 struct ScenePoolActor {
-    u8 unknown0[0x38];
+    u8 unknown0[0x10];
+    s32 position[4];
+    u8 unknown20[0x18];
     s32 restrictionMetric;
     u8 unknown3c[0x1c];
     u16 timerA, timerB;
-    u8 unknown5c[0x550];
+    u8 unknown5c[0x510];
+    u32 motionFlags;
+    u8 unknown570[0x3c];
     s32 forwardSpeed, verticalSpeed, lateralSpeed;
     u8 unknown5b8[0x34];
     s8 motionLock;
-    u8 unknown5ed[0x26b];
+    u8 unknown5ed[0xf];
+    u32 stateFlags;
+    u8 unknown600[0x258];
     u32 controlFlags;
     u8 unknown85c[0x54];
 };
