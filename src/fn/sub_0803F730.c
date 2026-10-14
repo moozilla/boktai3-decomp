@@ -1,13 +1,12 @@
 #include "scene_arc.h"
-#define GroundEffect_Initialize sub_0803F730
 struct SceneGroundManager *sub_0821A2C4(u32);
-struct SceneGroundManager *sub_0803F6F0(u32, u32);
+struct SceneGroundManager *GroundEffect_CreateManager(u32, u32);
 void sub_08217DE0(void *, const void *, u32);
 void sub_08217EC4(void *, s32, s32);
-void sub_0803F64C(struct SceneGroundEffect *);
-void sub_0803F650(struct SceneGroundEffect *);
-void sub_0803F638(struct SceneGroundEffect *);
-s32 sub_0803F5C4(struct SceneGroundManager *, struct SceneGroundEffect *);
+void GroundEffect_IgnoreUpdate(struct SceneGroundEffect *);
+void GroundEffect_UpdateProjection(struct SceneGroundEffect *);
+void GroundEffect_DisableProjection(struct SceneGroundEffect *);
+s32 GroundEffect_Link(struct SceneGroundManager *, struct SceneGroundEffect *);
 s32 GroundEffect_Initialize(struct SceneGroundEffect *effect, const struct ScenePoolVec32 *position,
                             u32 kind)
 {
@@ -15,7 +14,7 @@ s32 GroundEffect_Initialize(struct SceneGroundEffect *effect, const struct Scene
     u32 zero;
     void *drawable;
     if (!manager) {
-        manager = sub_0803F6F0(0, 0);
+        manager = GroundEffect_CreateManager(0, 0);
         if (!manager)
             return -1;
     }
@@ -36,11 +35,11 @@ s32 GroundEffect_Initialize(struct SceneGroundEffect *effect, const struct Scene
     effect->priority = 0xfc;
     effect->mode = 2;
     if (!effect->kind)
-        effect->update = sub_0803F650;
+        effect->update = GroundEffect_UpdateProjection;
     else {
-        effect->update = sub_0803F64C;
-        sub_0803F638(effect);
+        effect->update = GroundEffect_IgnoreUpdate;
+        GroundEffect_DisableProjection(effect);
     }
-    sub_0803F5C4(manager, effect);
+    GroundEffect_Link(manager, effect);
     return 0;
 }

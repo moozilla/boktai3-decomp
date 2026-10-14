@@ -1,14 +1,11 @@
-#include "global.h"
-
-u8 *sub_0821A2C4(u32);
-void Effect_Remove(u8 *);
-void sub_0803F5EC(u8 *, u8 *);
-
-u32 sub_0803F7D8(u8 *p)
+#include "scene_arc.h"
+struct SceneGroundManager *sub_0821A2C4(u32);
+s32 GroundEffect_Unlink(struct SceneGroundManager *, struct SceneGroundEffect *);
+u32 GroundEffect_Destroy(struct SceneGroundEffect *effect)
 {
-    u8 *q = sub_0821A2C4(0xF0DE);
-    Effect_Remove(p + 0xc);
-    if (q != 0)
-        sub_0803F5EC(q, p);
+    struct SceneGroundManager *manager = sub_0821A2C4(0xf0de);
+    Effect_Remove(&effect->flags);
+    if (manager)
+        GroundEffect_Unlink(manager, effect);
     return 0;
 }

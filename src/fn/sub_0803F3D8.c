@@ -1,17 +1,15 @@
-#include "global.h"
-
-void sub_0803EF00(u8 *, u8 *, s32);
+#include "scene_arc.h"
+void SceneArc_DestroySlot(struct SceneArcManager *, struct SceneArcSlot *, s32);
 void sub_0821A2AC(u32);
-
-u32 sub_0803F3D8(u8 *p)
+u32 SceneArc_DestroyManager(struct SceneArcManager *manager)
 {
-    u8 *e = p + 0x20;
-    s32 i = 0;
+    struct SceneArcSlot *slot = manager->slots;
+    s32 index = 0;
     do {
-        sub_0803EF00(p, e, i);
-        i++;
-        e += 0x130;
-    } while (i <= 7);
-    sub_0821A2AC(0xFE2C);
+        SceneArc_DestroySlot(manager, slot, index);
+        index++;
+        slot++;
+    } while (index <= 7);
+    sub_0821A2AC(0xfe2c);
     return 0;
 }

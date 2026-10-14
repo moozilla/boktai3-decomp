@@ -1,26 +1,17 @@
-#include "global.h"
-struct E {
-    u8 d[0x130];
-};
-struct S {
-    u8 f0[0x18];
-    u32 mask;
-    struct E e[8];
-};
-u8 *sub_0803F498(struct S *p, s32 *out)
+#include "scene_arc.h"
+struct SceneArcSlot *SceneArc_FindFreeSlot(struct SceneArcManager *manager, s32 *out)
 {
-    u8 *e = (u8 *)p + 0x20;
-    s32 i = 0;
-    u32 one = 1;
-    u32 m = p->mask;
+    struct SceneArcSlot *slot = manager->slots;
+    s32 index = 0;
+    u32 one = 1, mask = manager->activeMask;
     do {
-        if (((one << i) & m)) {
-            i++;
-            e += 0x130;
+        if ((one << index) & mask) {
+            index++;
+            slot++;
         } else {
-            *out = i;
-            return e;
+            *out = index;
+            return slot;
         }
-    } while (i <= 7);
+    } while (index <= 7);
     return 0;
 }
