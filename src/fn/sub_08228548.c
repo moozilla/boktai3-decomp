@@ -1,7 +1,7 @@
 #include "global.h"
 s32 Mod(s32, s32);
 /* Days in `month` (1-12) of `year`, with the Gregorian leap-year rule. */
-s32 sub_08228548(s32 year, s32 month)
+s32 Clock_DaysInMonth(s32 year, s32 month)
 {
     switch (month) {
         case 2:
