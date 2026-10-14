@@ -1,9 +1,10 @@
 #include "global.h"
+#define EncodedRecord_ReadBits sub_08044CF4
 s32 __divsi3(s32, s32);
 s32 sub_08249350(s32, s32);
-u32 sub_08044CF4(const u8 *base, const u8 **source, s32 count, s32 index)
+u32 EncodedRecord_ReadBits(const u8 *base, u32 *source, s32 count, s32 index)
 {
-    const u8 *p;
+    u32 p;
     s32 value;
     s32 i;
     u32 result;
