@@ -1,7 +1,3 @@
-#define MotionPool_Create     sub_08045704
-#define MotionPool_Update     sub_08045574
-#define MotionPool_Destroy    sub_08045688
-#define MotionPool_Initialize sub_080456C8
 #include "pooled_motion.h"
 struct MotionPool *MotionPool_Create(void)
 {

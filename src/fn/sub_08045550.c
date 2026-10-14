@@ -1,4 +1,3 @@
-#define MotionPool_HideSlot sub_08045550
 #include "pooled_motion.h"
 void MotionPool_HideSlot(struct MotionPool *pool, struct MotionPoolSlot *slot, s32 index)
 {

@@ -1,8 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "pooled_motion.h"
 extern const s16 gUnk_086149C4[];
-#define MotionPool_Update   sub_08045574
-#define MotionPool_HideSlot sub_08045550
 void MotionPool_HideSlot(struct MotionPool *, struct MotionPoolSlot *, s32);
 static inline s32 scaleMotion(s32 value)
 {

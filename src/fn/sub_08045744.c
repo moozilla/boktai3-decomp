@@ -1,4 +1,3 @@
-#define MotionPool_FindFreeSlot sub_08045744
 #include "pooled_motion.h"
 struct MotionPoolSlot *MotionPool_FindFreeSlot(struct MotionPool *pool, s32 *out)
 {

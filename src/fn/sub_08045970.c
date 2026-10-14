@@ -1,4 +1,3 @@
-#define MotionPool_SetOffset sub_08045970
 #include "pooled_motion.h"
 void MotionPool_SetOffset(struct MotionPoolParams *params, u16 x, u16 y, u16 z)
 {
