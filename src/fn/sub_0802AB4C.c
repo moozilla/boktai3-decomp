@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Common {
     u8 pad0[0x90];
@@ -58,42 +57,36 @@ int sub_0802AB4C(struct Actor *p)
     int damage, special;
     struct Packed size;
     {
-        register int offset asm("r1") = 0x178;
+        int offset = 0x178;
         int *damagePtr = (int *)((u8 *)p + offset);
-        asm("" ::"r"(damagePtr), "r"(offset));
         damage = *damagePtr;
         {
-            register int off asm("r3") = 0x17c;
+            int off = 0x17c;
             u8 *specialPtr = (u8 *)p + off;
-            register int value asm("r0");
-            asm("" ::"r"(specialPtr), "r"(off));
+            int value;
             value = *specialPtr;
-            asm("" : "+r"(value));
             special = value;
             *damagePtr = 0;
             *specialPtr = 0;
         }
     }
     if (damage > 0) {
-        register int react asm("r8") = 0;
+        int react = 0;
         p->common.health -= damage;
         {
-            register int offset asm("r1") = 0x198;
+            int offset = 0x198;
             int *accum = (int *)((u8 *)p + offset);
-            asm("" ::"r"(accum), "r"(offset));
             {
-                register int value asm("r0") = *accum + damage;
+                int value = *accum + damage;
                 *accum = value;
                 {
-                    register int off asm("r3") = 0x19c;
+                    int off = 0x19c;
                     int *threshold = (int *)((u8 *)p + off);
-                    asm("" ::"r"(threshold), "r"(off));
                     if (value >= *threshold) {
                         value = react;
                         *accum = value;
                         {
-                            register int one asm("r1") = 1;
-                            asm("" : "+r"(one));
+                            int one = 1;
                             react = one;
                         }
                     }
@@ -136,7 +129,7 @@ int sub_0802AB4C(struct Actor *p)
         {
             u32 index = gUnk_03005308 * 2;
             u32 value;
-            value = *(u16 *)((u8 *)gUnk_0203B400 + index);
+            value = *(u16 *)((u8 *)((u16 *)0x0203B400) + index);
             p->angle = value;
         }
         Sound_PlaySongChecked(318);

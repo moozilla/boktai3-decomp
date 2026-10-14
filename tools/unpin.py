@@ -1,0 +1,174 @@
+#!/usr/bin/env python3
+"""Try removing register-pinning concessions from C files.
+
+  unpin.py [FILE.c ...] [--write] [-j N]
+
+For each file carrying `// MATCHING_CONCESSION: register-pinning` (default: all
+of src/), strip every `register T x asm("rN")` pin (keeping a plain
+declaration) and every `asm("")` barrier, compile with tools/check.py, and
+report whether the file still matches. With --write, a file that still matches
+is rewritten without the hints and without the marker.
+"""
+import argparse
+import os
+import re
+import subprocess
+import sys
+import tempfile
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+MARK = "// MATCHING_CONCESSION: register-pinning"
+PIN = re.compile(r'\bregister\s+([^;=()]*?)\s*\basm\s*\(\s*"\w+"\s*\)')
+BARRIER = re.compile(r'^[ \t]*(?:__)?asm(?:__)?\s*(?:volatile\s*|__volatile__\s*)?\(\s*""\s*(?::[^;]*)?\)\s*;[ \t]*\n', re.M)
+BARRIER_INLINE = re.compile(r'(?:__)?asm(?:__)?\s*(?:volatile\s*|__volatile__\s*)?\(\s*""\s*(?::[^;]*)?\)\s*;')
+
+
+DRAFT = re.compile(r"#\s*ifdef\s+NONMATCHING\b.*?#\s*else\b", re.S)
+
+
+def strip_code(text):
+    text = PIN.sub(lambda m: m.group(1), text)
+    text = BARRIER.sub("", text)
+    return BARRIER_INLINE.sub("", text)
+
+
+def strip(text):
+    """Remove hints outside NONMATCHING drafts (a draft's hints are left alone:
+    the default build compiles its INCLUDE_ASM fallback, so a check would pass
+    trivially). The marker goes only if no hints remain."""
+    out, last = [], 0
+    for m in DRAFT.finditer(text):
+        out.append(strip_code(text[last:m.start()]))
+        out.append(m.group(0))
+        last = m.end()
+    out.append(strip_code(text[last:]))
+    text = "".join(out)
+    if not any(p.search(text) for p in (PIN, BARRIER_INLINE)):
+        text = re.sub(r"^" + re.escape(MARK) + r"[^\n]*\n", "", text, flags=re.M)
+    return text
+
+
+RAM_ARRAY = re.compile(r"^extern\s+(?:const\s+)?(\w+)\s+(gUnk_0([234])[0-9A-F]{6})\s*\[\s*\]\s*;", re.M)
+
+
+def literalize(text):
+    """Use literal addresses for RAM arrays (gUnk_02xxxxxx[] etc.): a constant
+    address is loaded by reload, which can move later reload registers."""
+    for typ, sym, _ in RAM_ARRAY.findall(text):
+        addr = sym[5:]
+        text = re.sub(r"(?<!extern )(?<![\w ]" + typ + r" )\b" + sym + r"\b(?!\s*\[\s*\]\s*;)",
+                      f"(({typ} *)0x{addr})", text)
+    return text
+
+
+VARIANTS = [("strip", strip), ("strip+literal", lambda t: literalize(strip(t)))]
+
+
+def check(path, text):
+    # keep the file in its own directory so relative includes keep working
+    fd, tmp = tempfile.mkstemp(suffix=".c", prefix=".unpin_", dir=path.parent)
+    with os.fdopen(fd, "w") as f:
+        f.write(text)
+    try:
+        r = subprocess.run([sys.executable, str(ROOT / "tools/check.py"), tmp, "--quiet"],
+                           cwd=ROOT, capture_output=True, text=True)
+        out = r.stdout + r.stderr
+        m = re.search(r"(\d+) differing bytes; fuzzy ([\d.]+)%", out)
+        if r.returncode == 0:
+            return True, "match"
+        if m:
+            return False, f"{m.group(1)} bytes differ ({m.group(2)}%)"
+        tail = [ln for ln in out.splitlines() if ln.strip()][-1:] or ["?"]
+        return False, "error: " + tail[0][:100]
+    finally:
+        os.unlink(tmp)
+
+
+def per_function(files, write):
+    """Strip hints function by function, keeping each change that still matches."""
+    sys.path.insert(0, str(ROOT / "tools"))
+    from merge_unit import items
+    total = 0
+    for p in files:
+        text = p.read_text()
+        parts = items(text)
+        # rebuild the file from items, so an item can be swapped in place
+        sep_text = text
+        changed = []
+        drafts = [m.span() for m in re.finditer(r"#\s*ifdef\s+NONMATCHING.*?#\s*endif", text, re.S)]
+        for item in parts:
+            if not (PIN.search(item) or BARRIER_INLINE.search(item)):
+                continue
+            at = text.find(item)
+            if any(a <= at < b for a, b in drafts):  # a draft: its check would pass trivially
+                continue
+            m = re.search(r"\b(\w+)\s*\([^;{]*\)\s*\{", item)
+            name = m.group(1) if m else "?"
+            for vname, fn in (("strip", strip_code), ("strip+literal", lambda t: literalize_item(t, sep_text))):
+                cand_item = fn(item)
+                if cand_item == item:
+                    continue
+                cand = sep_text.replace(item, cand_item, 1)
+                ok, msg = check(p, cand)
+                if ok:
+                    sep_text = cand
+                    changed.append(f"{name} ({vname})")
+                    break
+        if changed:
+            if not (PIN.search(sep_text) or BARRIER_INLINE.search(sep_text)):
+                sep_text = re.sub(r"^" + re.escape(MARK) + r"[^\n]*\n", "", sep_text, flags=re.M)
+            if write:
+                p.write_text(sep_text)
+            total += len(changed)
+        print(f"{p.relative_to(ROOT)}: unpinned {', '.join(changed) or 'none'}", flush=True)
+    print(f"{total} functions unpinned")
+
+
+def literalize_item(item, whole):
+    for typ, sym, _ in RAM_ARRAY.findall(whole):
+        item = re.sub(r"\b" + sym + r"\b", f"(({typ} *)0x{sym[5:]})", item)
+    return strip_code(item)
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("files", nargs="*")
+    ap.add_argument("--write", action="store_true")
+    ap.add_argument("-j", type=int, default=6)
+    ap.add_argument("--per-function", action="store_true",
+                    help="in multi-function units, strip one function's hints at a time")
+    a = ap.parse_args()
+    files = [Path(f).resolve() for f in a.files] or sorted(
+        p for p in (ROOT / "src").rglob("*.c") if MARK in p.read_text())
+
+    def one(p):
+        text = p.read_text()
+        if strip(text) == text:
+            return p, None, "no hints"
+        msgs = []
+        for name, fn in VARIANTS:
+            new = fn(text)
+            if name != "strip" and new == strip(text):
+                continue
+            ok, msg = check(p, new)
+            msgs.append(f"{name}: {msg}")
+            if ok:
+                if a.write:
+                    p.write_text(new)
+                return p, True, "; ".join(msgs)
+        return p, False, "; ".join(msgs)
+
+    if a.per_function:
+        return per_function(files, a.write)
+    n = 0
+    with ThreadPoolExecutor(a.j) as ex:
+        for p, ok, msg in ex.map(one, files):
+            n += bool(ok)
+            print(f"{'OK  ' if ok else '--  '}{p.relative_to(ROOT)}: {msg}", flush=True)
+    print(f"{n}/{len(files)} files match without hints")
+
+
+if __name__ == "__main__":
+    main()

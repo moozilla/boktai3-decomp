@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 typedef struct ActorAnimation {
     u8 pad0[0x51];
@@ -95,7 +94,7 @@ void sub_08026488(ActorAnimation *p, int tick)
         p->changed = 0;
         sequence = choose(p->mode, 64, 26);
         {
-            register int offset asm("r0") = 0x240;
+            int offset = 0x240;
             SceneActors_StartDirectionalAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence, 2,
                                                   1, 4);
         }
@@ -116,13 +115,12 @@ void sub_08026488(ActorAnimation *p, int tick)
         gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
         {
             u32 index = gUnk_03005308 * 2;
-            register u16 *table asm("r3");
+            u16 *table;
             u32 random;
-            table = gUnk_0203B400;
+            table = ((u16 *)0x0203B400);
             index += (u32)table;
             random = *(u16 *)index;
             U8(p2, 0x398) = random;
-            asm("" ::"r"(table));
         }
     }
     if (U16(p2, 0x254) == 5)

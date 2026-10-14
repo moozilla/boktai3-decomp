@@ -53,7 +53,7 @@ s32 EffectManager_UpdateParticles(struct EffectManager *manager, struct Effect *
 
 static inline s32 projectScale(s32 input)
 {
-    register s32 value asm("r0") = input * 3;
+    s32 value = input * 3;
     if (value >= 0)
         value >>= 5;
     else
@@ -70,7 +70,6 @@ static inline s32 projectScaleHeight(s32 input)
 static inline void projectToScreen(struct EffectVec *out, struct EffectVec *in)
 {
     s32 x, z, h, y;
-    asm("" : : "r"(out), "r"(in));
     x = in->x;
     z = in->z;
     out->x = projectScale(x - z);
@@ -81,14 +80,13 @@ static inline void projectToScreen(struct EffectVec *out, struct EffectVec *in)
 }
 static inline void projectActorToScreen(struct EffectVec *out, struct EffectVec *in)
 {
-    register s32 x asm("r3");
+    s32 x;
     s32 z, h, y;
     x = in->x;
     z = in->z;
     out->x = projectScale(x - z);
     {
-        register s32 sum asm("r1") = x + z;
-        asm("" : : "r"(sum));
+        s32 sum = x + z;
         h = projectScale(sum);
     }
     y = projectScaleHeight(in->y);
@@ -285,14 +283,13 @@ static inline s32 scaleHeight(s32 input)
 }
 static inline void project(struct EffectVec *out, struct EffectVec *in)
 {
-    register s32 x asm("r4");
+    s32 x;
     s32 z, h, y;
     x = in->x;
     z = in->z;
     out->x = scale(x - z);
     {
-        register s32 sum asm("r1") = x + z;
-        asm("" : : "r"(sum));
+        s32 sum = x + z;
         h = scale(sum);
     }
     y = scaleHeight(in->y);
@@ -568,7 +565,7 @@ void EffectParticle_UpdateDriftBeforeHoming(struct EffectManager *manager, struc
 
 static inline u32 randomValueDirect(void)
 {
-    register u16 *table asm("r4") = gUnk_0203B400;
+    u16 *table = gUnk_0203B400;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     return table[gUnk_03005308];
 }
