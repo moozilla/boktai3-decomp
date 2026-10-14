@@ -82,6 +82,8 @@ Wireless game items and display (tentative),080395D4,0803AC9C,symbols/proposed/s
 Wireless result panel (tentative),0803AC9C,0803BAA0,symbols/proposed/subsystems.csv,Contiguous menu callbacks shared offsets and wireless API consumers; notes/link-menus_2026-10-12.md; unmatched spans remain counted
 Wireless scene objects (tentative),0803BAA0,0803CDF0,symbols/proposed/subsystems.csv,Four scene slots actor resource lifetime position and proximity callbacks; notes/link-menus_2026-10-12.md
 Scene pooled motion and actor controls (tentative),0803CDF0,0803EE58,symbols/proposed/scene-pool.csv,Manager owns four actor slots and 0x17c pooled motion entries; script parameters cruise state transitions and steering; notes/scene-pool_2026-10-13.md; incomplete
+Scene arc slot effects (tentative),0803EE58,0803F5C4,symbols/proposed/scene-arc-effects.csv,Eight 0x130-byte slots; creation from ScenePool_StateLaunchArc; notes/scene-arc-effects_2026-10-13.md
+Projected ground effects (tentative),0803F5C4,0803F804,symbols/proposed/scene-arc-effects.csv,Registry F0DE linked list with world-position and terrain projection callbacks; notes/scene-arc-effects_2026-10-13.md
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
 Sound-test menu,081E1AF4,081E270C,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md and allocator 081E26CC callback chain
 Timed presentation,081E270C,081E2898,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md timed update cleanup and initialization

@@ -1,13 +1,10 @@
-#include "global.h"
-
-void sub_0824923C(u8 *, u32);
-
-u32 sub_0803F690(u8 *p)
+#include "scene_arc.h"
+u32 GroundEffect_UpdateManager(struct SceneGroundManager *manager)
 {
-    u8 *n = *(u8 **)(p + 0x1c);
-    while (n != 0) {
-        sub_0824923C(n, *(u32 *)(n + 0x34));
-        n = *(u8 **)(n + 0x3c);
+    struct SceneGroundEffect *effect = manager->head;
+    while (effect != 0) {
+        effect->update(effect);
+        effect = effect->next;
     }
     return 0;
 }

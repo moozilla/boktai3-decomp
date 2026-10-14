@@ -1,5 +1,4 @@
 #include "scene_arc.h"
-#define GroundEffect_UpdateProjection sub_0803F650
 s32 sub_0811AE68(struct ScenePoolVec32 *);
 void GroundEffect_UpdateProjection(struct SceneGroundEffect *effect)
 {

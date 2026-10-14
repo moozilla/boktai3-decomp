@@ -1,10 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_arc.h"
-#define SceneArc_Create sub_0803F4CC
 struct SceneArcManager *sub_0821A2C4(u32);
-struct SceneArcSlot *sub_0803F498(struct SceneArcManager *, s32 *);
-struct SceneArcManager *sub_0803F458(void);
-void sub_0803F61C(struct SceneGroundEffect *);
+struct SceneArcSlot *SceneArc_FindFreeSlot(struct SceneArcManager *, s32 *);
+struct SceneArcManager *SceneArc_CreateManager(void);
+void GroundEffect_EnableProjection(struct SceneGroundEffect *);
 s32 SceneArc_Create(const struct ScenePoolVec32 *from, const struct ScenePoolVec32 *to,
                     u32 flightDuration, u32 endFrame, s32 height)
 {
@@ -18,10 +17,10 @@ s32 SceneArc_Create(const struct ScenePoolVec32 *from, const struct ScenePoolVec
     register u32 zero asm("r12");
     struct SceneArcSprite *sprite;
     if (!manager) {
-        sub_0803F458();
+        SceneArc_CreateManager();
         return -1;
     }
-    slot = sub_0803F498(manager, &index);
+    slot = SceneArc_FindFreeSlot(manager, &index);
     if (!slot)
         return -1;
     sprite = &slot->sprite;
@@ -62,13 +61,13 @@ s32 SceneArc_Create(const struct ScenePoolVec32 *from, const struct ScenePoolVec
         }
     }
     {
-        void *animation = slot->animation;
+        void *animation = &slot->animation;
         void *resource = manager->animationResource;
         register u32 callZero asm("r4");
         callZero = zero;
         Anim_SetSequence(animation, resource, 2, 0, callZero);
     }
-    sub_0803F61C(&slot->ground);
+    GroundEffect_EnableProjection(&slot->ground);
     manager->activeMask |= 1 << index;
     return 0;
 }

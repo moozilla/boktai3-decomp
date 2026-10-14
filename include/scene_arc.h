@@ -29,6 +29,11 @@ struct SceneArcSprite {
     struct SceneVec screen;
     u8 unknown24[8];
 };
+struct SceneArcAnimation {
+    const u16 *data;
+    u8 flags, count, factor, rate;
+    u16 frame, unknownA, scale, timer;
+};
 struct SceneArcSlot {
     u32 frame, flightDuration, endFrame, releaseFrame;
     s32 height;
@@ -38,7 +43,7 @@ struct SceneArcSlot {
     u8 collider[0x40];
     u8 animationData[0x1c];
     struct SceneArcSprite sprite;
-    u8 animation[0x10];
+    struct SceneArcAnimation animation;
     struct SceneGroundEffect ground;
 };
 struct SceneArcManager {

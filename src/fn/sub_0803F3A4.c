@@ -1,16 +1,14 @@
-#include "global.h"
-
-void sub_0803EF4C(u8 *, u8 *, s32);
-
-u32 sub_0803F3A4(u8 *p)
+#include "scene_arc.h"
+void SceneArc_UpdateSlot(struct SceneArcManager *, struct SceneArcSlot *, u32);
+u32 SceneArc_UpdateManager(struct SceneArcManager *manager)
 {
-    u8 *e = p + 0x20;
-    s32 i = 0;
+    struct SceneArcSlot *slot = manager->slots;
+    s32 index = 0;
     do {
-        if (*(u32 *)(p + 0x18) & (1 << i))
-            sub_0803EF4C(p, e, i);
-        i++;
-        e += 0x130;
-    } while (i <= 7);
+        if (manager->activeMask & (1 << index))
+            SceneArc_UpdateSlot(manager, slot, index);
+        index++;
+        slot++;
+    } while (index <= 7);
     return 0;
 }
