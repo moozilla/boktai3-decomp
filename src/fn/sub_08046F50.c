@@ -1,12 +1,7 @@
-#include "global.h"
-
-struct S {
-    u8 f[5];
-    u8 a;
-    u8 b;
-};
-void sub_08046F50(struct S *p)
+#include "damage_number_display.h"
+#define DamageNumberGroup_AdvancePhase sub_08046F50
+void DamageNumberGroup_AdvancePhase(struct DamageNumberGroup *group)
 {
-    p->b++;
-    p->a = 0;
+    ++group->phase;
+    group->phaseFrame = 0;
 }
