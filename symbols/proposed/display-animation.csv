@@ -1,0 +1,17 @@
+addr,name,confidence,evidence
+08042320,DisplayAnimation_SetEntry,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
+080423C8,DisplayAnimation_UpdatePlayback,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
+080424FC,DisplayAnimation_TestFinished,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
+08042524,DisplayAnimation_GetFrameBoundary,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
+08042558,DisplayAnimation_Destroy,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
+08042588,DisplayAnimation_InitializeSequence,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
+08042610,DisplayAnimation_InitializeKeyframes,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
+080426B0,DisplayAnimation_SetPosition,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
+080426D4,DisplayAnimation_SetFlags,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
+080426F8,DisplayAnimation_ClearFlags,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
+0804271C,DisplayAnimation_TestFlags,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
+08042738,DisplayAnimation_SetPriority,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
+0804275C,DisplayAnimation_SetPalette,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
+08042798,DisplayAnimation_SelectTiles,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
+080427C0,DisplayAnimation_SetTileSource,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
+080427E0,DisplayAnimation_GetTileIndex,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md

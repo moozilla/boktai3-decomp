@@ -1,5 +1,4 @@
 #include "display_animation.h"
-#define DisplayAnimation_InitializeSequence sub_08042588
 s32 DisplayAnimation_InitializeSequence(struct DisplayAnimation *display, s32 resourceId,
                                         u32 sequenceId, s32 flags,
                                         const struct DisplayPosition *position)

@@ -14,8 +14,8 @@ struct Actor {
     u32 drawable;
 };
 void sub_0821DE30(void *);
-int sub_080426D4(void *, int);
-int sub_080426F8(void *, int);
+int DisplayAnimation_SetFlags(void *, int);
+int DisplayAnimation_ClearFlags(void *, int);
 int sub_0802D88C(struct Actor *);
 int sub_0802D8BC(struct Actor *);
 int sub_0802DB1C(void *unused, struct Actor *p)
@@ -27,10 +27,10 @@ int sub_0802DB1C(void *unused, struct Actor *p)
     {
         u32 mask = 0x100;
         if (p->flags & mask) {
-            sub_080426D4(&p->drawable, 1);
+            DisplayAnimation_SetFlags(&p->drawable, 1);
             result = sub_0802D88C(p);
         } else {
-            sub_080426F8(&p->drawable, 1);
+            DisplayAnimation_ClearFlags(&p->drawable, 1);
             {
                 u32 mask = 0x200;
                 if (p->flags & mask)

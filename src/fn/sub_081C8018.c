@@ -10,7 +10,7 @@ struct S {
     u8 d4[1];
 };
 void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
-s32 sub_080424FC(void *);
+s32 DisplayAnimation_TestFinished(void *);
 void sub_081C8018(u32 a, struct S *p, s32 n)
 {
     u32 r;

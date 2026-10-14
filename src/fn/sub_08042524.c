@@ -1,5 +1,4 @@
 #include "display_animation.h"
-#define DisplayAnimation_GetFrameBoundary sub_08042524
 s32 DisplayAnimation_GetFrameBoundary(struct DisplayAnimation *display, u32 *out)
 {
     if (display->kind == 2) {

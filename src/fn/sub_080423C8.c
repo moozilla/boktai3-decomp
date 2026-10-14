@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "display_animation.h"
-#define DisplayAnimation_UpdatePlayback sub_080423C8
 s32 DisplayAnimation_UpdatePlayback(struct DisplayAnimation *display)
 {
     u32 kind = display->kind;

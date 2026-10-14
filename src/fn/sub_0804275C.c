@@ -1,5 +1,4 @@
 #include "display_animation.h"
-#define DisplayAnimation_SetPalette sub_0804275C
 s32 DisplayAnimation_SetPalette(struct DisplayAnimation *display, u32 palette, u32 variant,
                                 u32 attribute)
 {

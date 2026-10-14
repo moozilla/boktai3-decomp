@@ -1,8 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "script_selector.h"
-#define ScriptSelector_UpdateTask sub_080421E8
 extern u16 gUnk_03005260[];
-void sub_08042198(struct ScriptSelector *, s32);
+void ScriptSelector_MoveSelection(struct ScriptSelector *, s32);
 u32 sub_08228008(void);
 s32 ScriptSelector_UpdateTask(struct ScriptSelector *selector)
 {
@@ -18,11 +17,11 @@ s32 ScriptSelector_UpdateTask(struct ScriptSelector *selector)
         if (selector->lastDirection == step) {
             selector->repeatDelay--;
             if (selector->repeatDelay < 0) {
-                sub_08042198(selector, step);
+                ScriptSelector_MoveSelection(selector, step);
                 selector->repeatDelay = 4;
             }
         } else {
-            sub_08042198(selector, step);
+            ScriptSelector_MoveSelection(selector, step);
             selector->repeatDelay = 20;
             selector->lastDirection = step;
         }
@@ -33,7 +32,7 @@ s32 ScriptSelector_UpdateTask(struct ScriptSelector *selector)
         s32 oldIndex;
         do {
             oldIndex = selector->index;
-            sub_08042198(selector, 1);
+            ScriptSelector_MoveSelection(selector, 1);
         } while (oldIndex != selector->index);
     }
     if (keys[2] & 1) {

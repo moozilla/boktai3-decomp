@@ -1,5 +1,4 @@
 #include "display_animation.h"
-#define DisplayAnimation_TestFinished sub_080424FC
 s32 DisplayAnimation_TestFinished(struct DisplayAnimation *display)
 {
     if (display->kind == 1)

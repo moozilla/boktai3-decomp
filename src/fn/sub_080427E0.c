@@ -1,15 +1,15 @@
-#include "global.h"
+#include "display_animation.h"
 
-u32 sub_080427E0(u8 *p)
+u32 DisplayAnimation_GetTileIndex(struct DisplayAnimation *p)
 {
     u8 *q;
-    u32 mode = *(u32 *)p;
+    u32 mode = p->kind;
     if (mode == 0) {
         return 0;
     }
     if (mode == 1) {
-        return *(u16 *)(p + 0x12);
+        return *(u16 *)((u8 *)p + 0x12);
     }
-    q = p + 0x2c;
+    q = (u8 *)p + 0x2c;
     return *(u16 *)(q + 0x3a);
 }

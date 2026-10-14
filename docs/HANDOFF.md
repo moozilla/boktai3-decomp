@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 22.902% matching (2026-10-14). This file is the single
+Last updated after reaching 23.001% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,36 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex): script selector and shared display animation
+
+Matching is **23.001%**. This batch adds **0.055 percentage points** (+1,336 bytes), with
+**6,352 / 11,465 functions** and **555,562 / 2,415,354 bytes**. Thirteen new
+exact functions complete two contiguous subsections: **08042198–08042320**,
+a script-entry selector, and **08042320–080427FC**, a shared sequence/keyframe
+display wrapper. Without register pinning: **18.917%**; Register-pinned:
+**4.084%**, included above. There are 68 guarded drafts; this batch adds none. Claude's PR #83 adds
+17 separate exact helpers (+1,064 bytes; +0.044 points) in game state,
+sensor/time, script/slot tables and remembered sound slots. They are included
+in these overall figures and in combined validation.
+
+Shared types cover the 0x30-byte selector task and 0x94-byte display wrapper,
+sequence timing state and partial sprite/keyframe views. Playback decodes frame,
+flip and duration bits, supports reverse traversal and endpoint hold/wrap, and
+uses fixed-point speed scaling. Constructors, position/flags/palette/tile helpers
+and queries now connect to the observed lifecycle. Existing cursor and display
+helpers were named and rechecked with no new credit. See
+[selector/display notes](../notes/script-selector-display_2026-10-14.md).
+
+Each new function passed reviewed full-extent exact checks and hint minimization.
+Playback reduced from 47 to 11 hints; constructors and most helpers need none.
+The combined build printed **`build/boktai3.gba: OK`**
+(`build/script-display-final-combined.log`); format, inventory and RAM-literal
+checks passed. Continue toward **25%
+or 80% usage remaining**; last reading is **89% remaining**. Next contiguous
+subsection begins at **080427FC**: collision callbacks and actor initialization.
+The modifier collector/validator/pending-display drafts remain available for new
+hypotheses. Primary checkout remains untouched.
 
 ## October 14 (Codex): modifier menu preview and lifecycle
 

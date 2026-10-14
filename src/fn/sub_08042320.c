@@ -1,5 +1,4 @@
 #include "display_animation.h"
-#define DisplayAnimation_SetEntry sub_08042320
 s32 DisplayAnimation_SetEntry(struct DisplayAnimation *display, u32 index, u32 variant, u32 flags,
                               u32 mode, u32 sequenceFlags, u32 keyframeFlags)
 {

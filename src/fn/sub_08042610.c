@@ -1,5 +1,4 @@
 #include "display_animation.h"
-#define DisplayAnimation_InitializeKeyframes sub_08042610
 struct DisplayResourceHeader {
     u32 words[8];
 };

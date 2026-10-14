@@ -1,5 +1,4 @@
 #include "display_animation.h"
-#define DisplayAnimation_SelectTiles sub_08042798
 void sub_08219A80(void *, u32);
 s32 DisplayAnimation_SelectTiles(struct DisplayAnimation *display, u32 index)
 {

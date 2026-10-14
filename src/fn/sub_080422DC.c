@@ -1,7 +1,4 @@
 #include "script_selector.h"
-#define ScriptSelector_CreateTask     sub_080422DC
-#define ScriptSelector_UpdateTask     sub_080421E8
-#define ScriptSelector_InitializeTask sub_08042278
 s32 ScriptSelector_UpdateTask(struct ScriptSelector *);
 s32 ScriptSelector_InitializeTask(struct ScriptSelector *);
 struct ScriptSelector *ScriptSelector_CreateTask(void)
