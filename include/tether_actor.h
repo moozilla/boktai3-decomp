@@ -107,7 +107,7 @@ struct TetherActor {
     void *pendingEffectHandle;
     u16 effectValue, unknown482;
 };
-/* Additional player view: these fields are distinct from player.h's facing/actionMode. */
+/* Additional player view: heading, side and tetherMode are distinct from facing/actionMode. */
 struct TetherPlayer {
     u8 unknown0[0x30];
     struct ContactPosition position;

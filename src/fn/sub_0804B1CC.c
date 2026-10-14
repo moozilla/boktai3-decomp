@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "tether_actor.h"
-#define TetherActor_TestTerrainTransition sub_0804B1CC
 u8 *sub_0821D64C(s32, s32);
 static inline u8 *propertiesAt(struct ContactPosition *position)
 {

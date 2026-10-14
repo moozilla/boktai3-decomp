@@ -1,13 +1,12 @@
 #include "tether_actor.h"
 // MATCHING_CONCESSION: register-pinning
-#define TetherActor_UpdateFollowingState sub_0804BB30
 void TetherActor_SetState(struct TetherActor *, u32);
 void TetherActor_SetEntry(struct TetherActor *, u32);
 void TetherActor_SetHeadingEntry(struct TetherActor *, u32);
 void TetherActor_UpdateShake(struct TetherActor *);
-void sub_0804B964(struct TetherActor *);
-void sub_0804B43C(struct TetherActor *);
-void sub_0804BAE4(struct TetherActor *);
+void TetherActor_LimitPlayerDistance(struct TetherActor *);
+void TetherActor_UpdateLockedShake(struct TetherActor *);
+void TetherActor_UpdateSecondaryLock(struct TetherActor *);
 static inline s32 absolute(s32 value)
 {
     if (value < 0)
@@ -28,7 +27,7 @@ void TetherActor_UpdateFollowingState(struct TetherActor *actor)
     }
     actor->glowMode = 0;
     if (actor->parameter >= 0)
-        sub_0804B964(actor);
+        TetherActor_LimitPlayerDistance(actor);
     else {
         register s16 *x asm("r2") = &actor->position.x;
         s16 *z;
@@ -49,7 +48,7 @@ void TetherActor_UpdateFollowingState(struct TetherActor *actor)
     if (!(gUnk_030053F4 & 512) && actor->kind != 9) {
         u16 *lock = &actor->interactionLock;
         if (*lock)
-            sub_0804B43C(actor);
+            TetherActor_UpdateLockedShake(actor);
         else {
             u32 ready = actor->chargeReady;
             if (ready)
@@ -59,7 +58,7 @@ void TetherActor_UpdateFollowingState(struct TetherActor *actor)
                 actor->currentValue = actor->maximumValue;
                 *lock = ready;
             } else
-                sub_0804BAE4(actor);
+                TetherActor_UpdateSecondaryLock(actor);
         }
     }
 }

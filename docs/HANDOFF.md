@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 24.059% matching (2026-10-14). This file is the single
+Last updated after reaching 24.184% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,50 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex): tether world position, player boundary and state helpers
+
+Exact code is **24.184%**, up **0.1240 percentage points** (+2,996 bytes)
+from eight new functions. There are **6,506 / 11,471 functions** and
+**584,118 / 2,415,354 bytes**. Without register pinning: **19.554%**;
+Register-pinned: **4.629%**, included above. Seventy-six guarded drafts remain.
+
+The contiguous **0804AF80–0804B964** subsection is fully exact: 2,532 bytes,
+including 1,972 newly exact and three existing typed callbacks. Four further
+exact helpers through **0804BEE4** add 1,024 bytes. See the
+[world-position and state notes](../notes/tether-world-states_2026-10-14.md).
+
+The world updater confirms current/previous movement-cache semantics and that
+**380 is `displayOffsetY`**, correcting its earlier timer name. It reloads the
+display pointer between offset stores, updates the collider, applies kind-9
+body movement or refreshes terrain properties, invokes flagged-cell handling,
+and copies position/heading into the target. **464 is `terrainCheckReady`**.
+
+New matches cover the lock shake/transition phase, terrain boundary blocking
+of the player, secondary-lock tick, following-state callback, candidate terrain
+check and orthogonal/diagonal step tests. The original following callback's
+second reset-distance check compares **actor X against target Z**; preserved.
+Seven new functions retain minimized concessions; the 196-byte step wrapper
+needs none. Four existing helpers now have descriptive names and exact checks.
+
+**4B964 distance limiting is a guarded 97.9% draft**, with no exact credit:
+70-unit facing offset, 150-unit radius, signed truncation and 3:1 smoothing,
+followed by the boundary clamp and player cache copy. Four scratch-register
+allocation differences (five bytes) remain. Its full 384-byte extent and
+semantics are reviewed, and unnecessary hints have been removed.
+
+The combined build printed **`build/boktai3.gba: OK`** in
+`build/tether-world-states-combined.log`. **80 complete post-promotion extent checks passed**, along with
+format/inventory/RAM checks and all twelve data round trips. No new
+emulator claims. Main remains based on Claude's PRs 127–129.
+
+Continue at **0804BF04**, the state-3 movement callback (typed 73.7% scratch draft),
+then **4C104/4C304** and the remaining adjacent state handlers through 4D5CC.
+BF04 reveals that **418 is a script pointer**; refine the older provisional
+`interactionValue` name with that consumer in the next batch. The distance
+limiter's allocation draft remains available for a later pass. Continue toward
+**25% exact or 60% usage remaining**; latest usage is **72% remaining**.
+Claude's separate checkout owns main.
 
 ## October 14 (Codex): complete tether initialization and charge subsection
 

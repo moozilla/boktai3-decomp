@@ -1,6 +1,5 @@
 #include "tether_actor.h"
 // MATCHING_CONCESSION: register-pinning
-#define TetherActor_BlockPlayerAcrossTerrain sub_0804B6A4
 u8 *sub_0821D64C(s32, s32);
 static inline s32 cellIndex(s32 x, s32 z)
 {
@@ -26,15 +25,19 @@ static inline s32 surfaceHeight(const struct ContactPosition *position)
     u32 surface = *properties >> 4;
     s32 height = (*properties & 15) << 8;
     switch (surface) {
-    case 1: height -= (u8)position->z; break;
-    case 2: height -= (u8)position->x; break;
+        case 1:
+            height -= (u8)position->z;
+            break;
+        case 2:
+            height -= (u8)position->x;
+            break;
     }
     return height;
 }
 void TetherActor_BlockPlayerAcrossTerrain(struct TetherActor *actor)
 {
-    u8 *properties = cellProperties(cellIndex(gUnk_02000580[0]->position.x >> 8,
-                                              gUnk_02000580[0]->position.z >> 8));
+    u8 *properties = cellProperties(
+        cellIndex(gUnk_02000580[0]->position.x >> 8, gUnk_02000580[0]->position.z >> 8));
     u32 attributes = *(u16 *)(properties + 2);
     struct ContactPosition *position;
     register s32 playerCell asm("r4");
@@ -56,8 +59,12 @@ void TetherActor_BlockPlayerAcrossTerrain(struct TetherActor *actor)
             surface = *properties >> 4;
             height = (*properties & 15) << 8;
             switch (surface) {
-            case 1: height -= (u8)heightPosition->z; break;
-            case 2: height -= (u8)heightPosition->x; break;
+                case 1:
+                    height -= (u8)heightPosition->z;
+                    break;
+                case 2:
+                    height -= (u8)heightPosition->x;
+                    break;
             }
         }
         difference = playerHeight - height;
