@@ -9,6 +9,13 @@
 #define INCLUDE_ASM(DIR, NAME) asm(".include \"build/asm/nonmatching/" #NAME ".s\"")
 asm(".include \"asm/macros.inc\"");
 
+/* Fixed RAM addresses as integer constants, for code that agbcc must see as a
+ * literal (a constant address is loaded by reload, which changes register
+ * choice; see docs/REGALLOC.md). Each names its symbol in a trailing comment;
+ * tools/check_ram_literals.py verifies the address against the link map on
+ * every build, so these cannot drift from the symbols. */
+#define RANDOM_TABLE_ADDR 0x0203B400 /* gUnk_0203B400 */
+
 /* libagbsyscall */
 void CpuSet(const void *src, void *dest, u32 control);
 void CpuFastSet(const void *src, void *dest, u32 control);

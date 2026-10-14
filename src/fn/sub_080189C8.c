@@ -61,7 +61,7 @@ static inline int randomAngle(void)
     u16 *table;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     offset = gUnk_03005308 * 2;
-    table = ((u16 *)0x0203B400);
+    table = ((u16 *)RANDOM_TABLE_ADDR);
     value = *(u16 *)(offset + (u32)table);
     return (value & 127) - 32;
 }
