@@ -1,6 +1,5 @@
-#include "global.h"
-
-u32 sub_08045D28(u8 *p, u32 m)
+#include "contact_sequence_actor.h"
+u32 ContactSequenceActor_GetFlags(struct ContactSequenceActor *actor, u32 mask)
 {
-    return *(u16 *)(p + 4) & m;
+    return actor->flags & mask;
 }

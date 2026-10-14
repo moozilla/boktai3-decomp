@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 23.496% matching (2026-10-14). This file is the single
+Last updated after reaching 23.595% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,36 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex): eight-slot sequence contact actor pool
+
+Exact code is **23.595%**, up **0.0992 percentage points** (+2,396 bytes)
+from thirteen new exact functions. There are **6,427 / 11,470 functions** and
+**569,910 / 2,415,354 bytes**. Code without register pinning is **19.339%**;
+Register-pinned code is **4.256%**, included above. Seventy-one guarded drafts
+remain, with no exact credit.
+
+The contiguous **08045D18–08046880** subsection recovers the 0x118 actor,
+eight-slot 0x918 task, health/resource colliders, terrain-aligned spawning,
+appearance and active sequence states, hit cooldown and signed jitter, palette
+oscillation, bulk death command and lifecycle. Owner +0x18 supplies initial
+health; +0x20 supplies a distinct resource-collider parameter. Naming remains
+tentative. See [sequence actor notes](../notes/contact-sequence-actor_2026-10-14.md).
+
+Seven new functions use no hints; six retain minimized register-pinning
+concessions. Eight existing helpers were typed with exact checks. The death
+handler at **080461D0** is retained as a **97.0%** NONMATCHING draft: six bytes
+differ at equal 416-byte extent, in signed-field scratch registers and a script
+argument mask reload. Preserve its fallback and check it with `--nonmatching`.
+
+The combined build printed **`build/boktai3.gba: OK`** in
+`build/contact-sequence-combined.log`. Twenty-five post-promotion full-extent
+checks passed, including four renamed scene-owner callers. Format, inventory,
+RAM literals and decoded registry checks pass. No new emulator claims.
+Continue toward **25% exact or 60% usage remaining**; latest allowance reading
+is **81% remaining**. PR 108 merged at a87f004c. The next contiguous subsection
+starts **08046880**: rotating resource-contact actor with expansion/contraction
+states. Claude's separate checkout owns main.
 
 ## October 14 (Codex): five-entry projected display
 

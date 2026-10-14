@@ -1,10 +1,5 @@
-#include "global.h"
-
-struct S {
-    u8 f[4];
-    u16 a;
-};
-void sub_08045D18(struct S *p, u32 v)
+#include "contact_sequence_actor.h"
+void ContactSequenceActor_SetFlags(struct ContactSequenceActor *actor, u32 flags)
 {
-    p->a |= v;
+    actor->flags |= flags;
 }

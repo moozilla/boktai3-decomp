@@ -28,8 +28,8 @@ static inline void state(struct Common *p, void (*fn)(void *), int id)
     p->pending = zero;
 }
 int sub_08048390(void *);
-int sub_08046870(void *);
-void sub_08046834(void *);
+int ContactSequencePool_GetActiveCount(void *);
+void ContactSequencePool_BeginAllDeaths(void *);
 static inline void setAction(struct Common *p, int id, int zero)
 {
     p->action = id;
@@ -50,8 +50,8 @@ int sub_0802AD0C(struct Common *p)
         if (active) {
             setAction(p, 3, 0);
         } else if (*(s16 *)((u8 *)p + 0x1a0) >= *(s16 *)((u8 *)p + 0x1a4)) {
-            if (sub_08046870(*(void **)((u8 *)p + 0x904)) > 0)
-                sub_08046834(*(void **)((u8 *)p + 0x904));
+            if (ContactSequencePool_GetActiveCount(*(void **)((u8 *)p + 0x904)) > 0)
+                ContactSequencePool_BeginAllDeaths(*(void **)((u8 *)p + 0x904));
             setAction(p, 1, 0);
         } else {
             setAction(base, 3, 0);
