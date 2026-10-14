@@ -161,13 +161,13 @@ address,evidence
 08108968,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0810CB7C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0810D548,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
-0810D554,Code following a reviewed gap leaf; retained assembly
+0810D554,Independent screen teardown function following a reviewed gap leaf; exact standalone C
 0810E91C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
-0810E928,Code following a reviewed gap leaf; retained assembly
+0810E928,Independent screen teardown function following a reviewed gap leaf; exact standalone C
 0810F820,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
-0810F82C,Code following a reviewed gap leaf; retained assembly
+0810F82C,Independent screen teardown function following a reviewed gap leaf; exact standalone C
 08110A8C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
-08110A98,Code following a reviewed gap leaf; retained assembly
+08110A98,Independent screen teardown function following a reviewed gap leaf; exact standalone C
 08113638,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08114CA0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08114CAC,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C
