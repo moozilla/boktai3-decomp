@@ -1,6 +1,4 @@
 #include "contact_swarm.h"
-#define ContactSwarm_Initialize     sub_080447D4
-#define ContactSwarm_InitializeSlot sub_08043FB0
 u32 ContactSwarm_InitializeSlot(struct ContactSwarm *, struct ContactSwarmSlot *, s32);
 s32 ContactSwarm_Initialize(struct ContactSwarm *pool)
 {

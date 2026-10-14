@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
-#define ContactSwarm_ApplyHealthContact sub_08043F64
 void ContactSwarm_ApplyHealthContact(struct ContactCollider *source, struct ContactCollider *other,
                                      struct ContactSwarmSlot *slot)
 {

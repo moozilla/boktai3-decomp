@@ -1,6 +1,4 @@
 #include "contact_swarm.h"
-#define ContactSwarm_UpdateAdvance          sub_080441D0
-#define ContactSwarm_SetDirectionalSequence sub_08044174
 void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
 static inline s32 truncateShift12(s32 value)
 {

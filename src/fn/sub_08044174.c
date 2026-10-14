@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
-#define ContactSwarm_SetDirectionalSequence sub_08044174
 void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *pool, struct ContactSwarmSlot *slot,
                                          u32 index)
 {

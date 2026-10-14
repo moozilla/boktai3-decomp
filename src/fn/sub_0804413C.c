@@ -1,5 +1,4 @@
 #include "contact_swarm.h"
-#define ContactSwarm_HideSlot sub_0804413C
 u32 ContactSwarm_HideSlot(struct ContactSwarm *pool, struct ContactSwarmSlot *slot, s32 index)
 {
     u32 one;
