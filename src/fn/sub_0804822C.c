@@ -1,10 +1,8 @@
-#include "global.h"
-
-void Collider_Remove(u8 *);
-void Sprite_Remove(u8 *);
-u32 sub_0804822C(u8 *p)
+#include "contact_burst.h"
+#define ContactBurst_Destroy sub_0804822C
+s32 ContactBurst_Destroy(struct ContactBurst *effect)
 {
-    Collider_Remove(p + 0x70);
-    Sprite_Remove(p + 0x44);
+    Collider_Remove(&effect->collider);
+    Sprite_Remove(&effect->sprite);
     return 0;
 }
