@@ -107,11 +107,11 @@ address,isa,evidence,replacement_end
 08070E44,thumb,Independent actor-list search function left as incbin by gbadisasm; retained assembly (not yet matched),08070EB0
 08072124,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08072188
 08072204,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched),08072264
-08078B48,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched),08078BB4
+08078B48,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08078BB4
 0807C468,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0807C4B4
 0807C53C,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0807C580
 08082BF0,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08082C68
-08082D20,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched),08082D80
+08082D20,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08082D80
 08084280,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08084284
 0808AED8,thumb,Independent random pattern selector (own push/pop-bx and literal pool) left as incbin by gbadisasm; exact standalone C,0808AF38
 0808F9E4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0808F9E8
@@ -120,7 +120,7 @@ address,isa,evidence,replacement_end
 080A2F28,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080A2F2C
 080A3804,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080A382C
 080A5FBC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080A5FC0
-080A5FC0,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,080A6030
+080A5FC0,thumb,Independent actor state handler following a reviewed gap leaf; exact standalone C,080A6030
 080A6294,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080A62DC
 080A7188,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080A71A0
 080A8CDC,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080A8D50
@@ -132,7 +132,7 @@ address,isa,evidence,replacement_end
 080E81FC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080E8200
 080E99F4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080E99F8
 080ED480,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080ED484
-080ED484,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,080ED4E0
+080ED484,thumb,Independent actor state handler following a reviewed gap leaf; exact standalone C,080ED4E0
 080F469C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080F46A0
 080F636C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080F6370
 080FFDD0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080FFDD4
