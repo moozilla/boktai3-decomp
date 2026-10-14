@@ -1,13 +1,13 @@
-#include "global.h"
-
-u32 sub_08047700(u8 *p)
+#include "background_flash.h"
+#define BackgroundFlash_TakeEntryFlag sub_08047700
+u32 BackgroundFlash_TakeEntryFlag(struct BackgroundFlashController *controller)
 {
-    u32 r;
-    if (p[29] == 0) {
-        r = 0;
+    u32 result;
+    if (!controller->enter) {
+        result = 0;
     } else {
-        p[29] = 0;
-        r = 1;
+        controller->enter = 0;
+        result = 1;
     }
-    return r;
+    return result;
 }

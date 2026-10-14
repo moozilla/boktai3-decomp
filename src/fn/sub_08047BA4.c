@@ -1,8 +1,8 @@
-#include "global.h"
-
-u8 sub_08047BA4(u8 *p)
+#include "background_flash.h"
+#define BackgroundFlash_GetState sub_08047BA4
+u8 BackgroundFlash_GetState(struct BackgroundFlashController *controller)
 {
-    if (p == NULL)
+    if (!controller)
         return 0;
-    return p[0x1c];
+    return controller->state;
 }
