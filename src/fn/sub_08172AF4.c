@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 96.7%
-// 3 differing instruction runs; first diff at +0x4C (ldrb r0, [r4] vs movs r1, #0)
 void sub_08172638(u8 *);
 void sub_0816B644(void *);
 void sub_08172850(void *, u32, u32);
@@ -32,7 +29,13 @@ void sub_08172AF4(u8 *s)
     q = s + 0x15C0;
     p = s + 0x4387;
     sub_081727AC(q, *p);
-    sub_08166B7C(s, *p <= 7 ? 0 : 1);
+    {
+        u8 v = *p;
+        u32 r = 1;
+        if (v <= 7)
+            r = 0;
+        sub_08166B7C(s, r);
+    }
     sub_08169818(s);
     sub_08169838(s);
     sub_08166094(s, 0, 0);
@@ -51,6 +54,3 @@ void sub_08172AF4(u8 *s)
     sub_08166E14(s, 3, 14, result, zero, 0x47);
     sub_081724D4(s);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08172AF4);
-#endif

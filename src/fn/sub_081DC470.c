@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 96.3%
-// 2 differing instruction runs; first diff at +0xDC (ldr r1, [pc, #0xbc] vs ldr r0, [pc, #0xbc])
 extern u8 gUnk_03004FC0[];
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
@@ -44,7 +41,6 @@ u32 sub_081DC470(u8 *s)
     global = gUnk_020002F8;
     if (global[2] == 1) {
         u32 x, y;
-        u8 *half;
         resource = ScriptProc_Start(0xCB05, 0x530D);
         obj = s + 0x7C;
         ResourceHeader_Relocate(obj, resource);
@@ -53,12 +49,10 @@ u32 sub_081DC470(u8 *s)
         ResourceHeader_Relocate(obj2, resource);
         sub_0821983C(s + 0xA4, obj2, 0x4C, 0x10, zero, zero, zero, zero);
         x = 0xFFF8;
-        half = s + 0xC4;
         *(u16 *)(s + 0x3C) = x;
         *(u16 *)(s + 0x3E) = y = 0xFFC0;
-        *(u16 *)half = x;
-        half += 2;
-        *(u16 *)half = y;
+        *(u16 *)(s + 0xC4) = x;
+        *(u16 *)(s + 0xC6) = y;
         *(u32 *)(s + 0x24) |= one;
         *(u32 *)(s + 0xAC) |= one;
         save = (u32 *)(s + 0x144);
@@ -81,6 +75,3 @@ u32 sub_081DC470(u8 *s)
     sub_08217DCC(0x73FF);
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081DC470);
-#endif
