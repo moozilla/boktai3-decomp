@@ -158,3 +158,32 @@ frames of 12 bytes `{u8 parts, u8 tiles, u16 flags, u32 pixel offset,
 u32 part offset}`; parts of 4 bytes `{u8 size << 2 | shape, u8 flags, s8 x,
 s8 y}`, whose tiles follow each other in the frame's 4bpp pixel block.
 Matching these sprites to the monster names and actor kinds is open.
+
+### Enemy families and their sprites (tentative)
+
+Each enemy family in `0x08084F44`-`0x080FE68C` loads one large sprite by
+name. The identifications below are visual guesses from renders with a
+borrowed palette, matched against the monster list in the text; treat them as
+leads for naming, not facts.
+
+| Loader | Sprite | Frames | Looks like | Candidate monster |
+|---|---|---|---|---|
+| `sub_08084F44` | `DA6D` | 16 | small black wings | バット / ヴァンパイアバット |
+| `sub_0808D1D8` | `9247` | 12 | hunched shambling humanoid | グール / ゾンビ |
+| `sub_08090FEC` | `B96C` | 16 | dome with an eye | スライム |
+| `sub_08094764` | `9506` | 29 | small winged insect | ビー |
+| `sub_08099B44` | `D637` | 29 | hooded cloaked figure | ? |
+| `sub_0809DD78` | `D28E` | 42 | small ring-like | ? |
+| `sub_080A1440` | `5A6E` | 23 | black bird | クロウ / レイブン |
+| `sub_080A4AFC` | `528F` | 16 | spider | スパイダー |
+| `sub_080ABDCC` | `D636` | 44 | round body with tentacles | オクトパス? |
+| `sub_080CFC14` | `5290` | 47 | round red/orange creature | ? |
+| `sub_080DCC98` | `48DE` | 25 | thin green figure | ? |
+| `sub_080E5744` | `D635` | 64 | small dragon | ドラゴンパピー? |
+| `sub_080E87C4` | `3876` | 8 | arcade cabinet | ? |
+| `sub_080EC3F8` | `D291` | 35 | flame worm | モエルルン? |
+| `sub_080F0C20` | `D638` | 37 | pale worm | ヒエルルン / クロロホルルン? |
+| `sub_080FE68C` | `5291` | 4 | living sword | ソード |
+
+Two families load small-sprite packages instead: `sub_080B43BC` (`3DB6`, a
+black winged creature) and `sub_080C3260` (`AE52`, skeletons).
