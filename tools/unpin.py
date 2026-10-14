@@ -25,11 +25,28 @@ BARRIER = re.compile(r'^[ \t]*(?:__)?asm(?:__)?\s*(?:volatile\s*|__volatile__\s*
 BARRIER_INLINE = re.compile(r'(?:__)?asm(?:__)?\s*(?:volatile\s*|__volatile__\s*)?\(\s*""\s*(?::[^;]*)?\)\s*;')
 
 
-def strip(text):
+DRAFT = re.compile(r"#\s*ifdef\s+NONMATCHING\b.*?#\s*else\b", re.S)
+
+
+def strip_code(text):
     text = PIN.sub(lambda m: m.group(1), text)
     text = BARRIER.sub("", text)
-    text = BARRIER_INLINE.sub("", text)
-    text = re.sub(r"^" + re.escape(MARK) + r"[^\n]*\n", "", text, flags=re.M)
+    return BARRIER_INLINE.sub("", text)
+
+
+def strip(text):
+    """Remove hints outside NONMATCHING drafts (a draft's hints are left alone:
+    the default build compiles its INCLUDE_ASM fallback, so a check would pass
+    trivially). The marker goes only if no hints remain."""
+    out, last = [], 0
+    for m in DRAFT.finditer(text):
+        out.append(strip_code(text[last:m.start()]))
+        out.append(m.group(0))
+        last = m.end()
+    out.append(strip_code(text[last:]))
+    text = "".join(out)
+    if not any(p.search(text) for p in (PIN, BARRIER_INLINE)):
+        text = re.sub(r"^" + re.escape(MARK) + r"[^\n]*\n", "", text, flags=re.M)
     return text
 
 

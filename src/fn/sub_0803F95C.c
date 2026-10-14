@@ -1,18 +1,22 @@
 #ifdef NONMATCHING
 // fuzzy: 88.1%
 // Selected-source lookup still has register allocation differences (reviewed 256-byte extent).
+// MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
 s32 Modifier_CollectSources(struct ModifierSelection *actorArg,
                             struct ModifierSelection *selectionArg,
                             struct ModifierRecord *outputArg, u32 includeSelected)
 {
-    struct ModifierSelection *actor = actorArg;
+    register struct ModifierSelection *actor asm("r10") = actorArg;
     struct ModifierSelection *selection = selectionArg;
-    struct ModifierRecord *output = outputArg;
+    register struct ModifierRecord *output asm("r9") = outputArg;
     struct ModifierRecord swap, scratch;
-    s32 count = 0;
-    s32 i;
+    register s32 count asm("r8") = 0;
+    register s32 i asm("r4");
     struct ModifierRecord *out;
+    asm("" : "+m"(includeSelected));
+    asm("" : "+r"(actor), "+r"(output));
+    asm("" : "+r"(count));
     i = 0;
     if (count < selection->count) {
         out = output;
@@ -43,20 +47,22 @@ s32 Modifier_CollectSources(struct ModifierSelection *actorArg,
         output[count] = scratch;
         count++;
         {
-            s32 pass = 0;
+            register s32 pass asm("r0") = 0;
             do {
-                s32 nextPass;
-                struct ModifierRecord *right;
-                struct ModifierRecord *left;
-                s32 remaining;
+                register s32 nextPass asm("r5");
+                register struct ModifierRecord *right asm("r3");
+                register struct ModifierRecord *left asm("r2");
+                register s32 remaining asm("r4");
                 nextPass = pass + 1;
+                asm("" : "+r"(output));
                 right = output + 1;
                 left = output;
                 remaining = 2;
+                asm("" : : "r"(left), "r"(right), "r"(remaining), "r"(nextPass));
                 do {
-                    s32 leftOrder = left->order;
+                    register s32 leftOrder asm("r1") = left->order;
                     if (leftOrder >= 0) {
-                        s32 rightOrder = right->order;
+                        register s32 rightOrder asm("r0") = right->order;
                         if (rightOrder >= 0 && leftOrder > rightOrder) {
                             swap = *left;
                             *left = *right;
@@ -67,6 +73,7 @@ s32 Modifier_CollectSources(struct ModifierSelection *actorArg,
                     left++;
                 } while (--remaining >= 0);
                 pass = nextPass;
+                asm("" : "+r"(pass));
             } while (pass <= 3);
         }
     }
