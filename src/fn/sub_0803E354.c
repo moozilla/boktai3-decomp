@@ -46,7 +46,7 @@ s32 ScenePool_StateScheduleMotion(void *manager, struct ScenePoolActor *actor,
             byteMask = 255;
             random = *randomAddress;
             if (random <= 31) {
-                s32 z = actor->position[2] >> 12;
+                s32 z = actor->position.z >> 12;
                 if (z <= 18)
                     sub_0803DA7C(entry, 1, 3, 6);
                 else if (z > 47)
