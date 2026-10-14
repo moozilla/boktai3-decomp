@@ -7,10 +7,14 @@ struct ContactPackedVector {
     s32 y : 16;
     s32 z : 16;
 };
+struct ContactPosition {
+    s16 x, y, z, pad;
+} __attribute__((aligned(4)));
 struct ContactCollider {
     u8 unknown0[6];
     u16 flags;
-    u8 unknown8[0x1C];
+    u8 unknown8[0xC];
+    struct ContactPosition offset, bounds;
     s16 x, y, z;
     u8 unknown2A[0xE];
     u32 reactionFlags;
@@ -19,9 +23,6 @@ struct ContactCollider {
     u8 direction;
     u8 unknown43[0x11];
 };
-struct ContactPosition {
-    s16 x, y, z, pad;
-} __attribute__((aligned(4)));
 struct ContactActor {
     u8 enter, state;
     u8 finished, bobPhase;

@@ -1,9 +1,9 @@
-#include "global.h"
-
-void sub_08045934(u8 *p, u16 a, u16 b, u8 c, u32 d)
+#include "pooled_motion.h"
+void MotionPool_SetLifetimeAndVelocity(struct MotionPoolParams *params, u16 firstFrame,
+                                       u16 endFrame, u8 direction, s32 speed)
 {
-    *(u16 *)p = a;
-    *(u16 *)(p + 2) = b;
-    *(u8 *)(p + 6) = c;
-    *(u32 *)(p + 8) = d;
+    params->firstFrame = firstFrame;
+    params->endFrame = endFrame;
+    params->direction = direction;
+    params->speed = speed;
 }

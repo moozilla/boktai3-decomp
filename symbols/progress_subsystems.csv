@@ -93,6 +93,7 @@ Contact actor pool setup and display (tentative),080427FC,08042E18,symbols/propo
 Contact actor pool states and lifecycle (tentative),08042E18,08043F64,symbols/proposed/contact-actor-states.csv,Nine state handlers and sixteen-slot task fade clear and target lifecycle; notes/contact-actor-states_2026-10-14.md
 Contact swarm states and spawning (tentative),08043F64,08044C80,,Five-state sixteen-slot pool; colliders sequence playback palette fade and spawn wrappers; notes/contact-swarm_2026-10-14.md
 Encoded records and password payloads,08044C80,080454C0,,Two six-bit record formats with seeded masking CRC fields names and glyph formatting; notes/encoded-records_2026-10-14.md
+Parameterized motion pool (tentative),080454C0,08045A20,,Sixteen configurable moving slots with lifetime tracking contacts and graphics; notes/parameterized-motion-pool_2026-10-14.md
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
 State actor kind 086121C4 (tentative),081C66F8,081CC690,symbols/proposed/state-actors.csv,96-state table gUnk_086121C4 (first 16 shared with 0x0802FD60-0x08030658); helpers 081C66F8-081C6B84 precede the handlers; include/state_actor.h
 Scripted message actor 08612344 (tentative),081CC690,081CD484,symbols/proposed/state-actors.csv,state table gUnk_08612344 and dispatcher 081CD43C; command states wait on scene messages; src/message_actor_08612344.c
