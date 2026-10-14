@@ -24,7 +24,7 @@ Types whose extension is known (the type is the hash of the string):
 | `9B1B` | ? | `08D530DC` | 1 | 30 KB blob |
 | `98F5` | ? | `08A2D944` | 1 | 1.7 MB blob (`count 0x17D` header; nested format not decoded) |
 | `A635` | `fnt` | `089F8ED8` | 1 | font |
-| `A8D9` | `gcx` | `08D5A85C` | — | compiled scripts, a single image (MGS's GCL file extension); not an archive |
+| `A8D9` | `gcx` | `08D5A85C` | — | compiled scripts, a single image (MGS's GCL file extension); not an archive (below) |
 | `AE6C` | ? | `087C4C98` | 528 | LZ77; decompressed header magic `HP` |
 | `C091` | `map` | `08617084` | 287 | LZ77; decompressed header magic `MP` |
 | `CB05` | ? | `08BDDE08` | 46 | sprite packages (below) |
@@ -83,3 +83,30 @@ Many `ScriptProc_Start(0xCB05, name)` calls in the actor code (for example
 `9247` in `sub_0808D1D8`, `D635`-`D638`, `5290`/`5291`) name packages that are
 in no archive. They may be resources of cut or Boktai 2 content whose code
 remained; script references (`gcx`) should settle which actors are used.
+
+## The script image (`gcx`)
+
+`tools/assets/gcx.py info | dis [PROC...] | chara` decodes it.
+`sub_0821AE04` loads the image: a u32 timestamp (`0x42A05217`, 2005-06-03),
+a procedure table of u32 words ending in `0xFFFFFFFF` (16,992 slots, 5,615
+used; low 24 bits = offset from the body, top byte = a flag 0-14), then four
+section offsets: the body (`08DD6BA0`, 0x884A4 bytes, prefixed by its size),
+the string offset table (`08D6B1F8`) and string data (`08D74DDC`) that
+`Text_LookupString` uses, and a fourth word before the body.
+
+Instructions: the high nibble of the first byte is the kind and the low nibble
+the payload length (13-15: a 1-3 byte little-endian length follows). Kind 6 is
+a native command: u16 command id (a name hash, see ENGINE.md), then an
+argument list with its own length (one byte below 0x80, else two big-endian
+bytes & 0x7FFF, `sub_0821A6C0`) holding operands. Kind 7 calls a procedure,
+kind 3 is an expression, kind 0 ends a block. Operands follow
+`Script_DecodeOperand`; nested `0x8X` blocks hold `if`/`switch` bodies.
+
+**`chara` usage.** The procedures contain 1,525 `chara` commands naming 151
+distinct registry keys, all present in `data/actor_registry.csv` (for example
+`0xB4B4` = `Background_CreateFromScript`). The remaining 571 registry entries
+are not named by any script constant. Only three code sites call the registry
+lookup, and map files show no registry keys above chance, so those entries are
+created another way (per-stage data not yet decoded) or are unused; the ROM
+also keeps Boktai 2 material (its title graphics in `E89F`). The procedure
+table covers the whole body, so no script code is unreachable from it.
