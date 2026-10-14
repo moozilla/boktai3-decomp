@@ -10,5 +10,5 @@ addr,name,size,kind,confidence,source,notes
 08C15880,gMenuTitleSprites,,gfx-4bpp,high,notes.txt,"menu title OBJ graphics (aitemu, suteetasu, ...)"
 08D6B1F8,gScriptTextPtrs,9DE0,table,high,notes.txt,"9976 u32 offsets; bit31 = text, else binary record; relative to gScriptText"
 08D74DDC,gScriptText,61D7B,text,high,notes.txt,"main script bank (encoding: docs/FINDINGS.md)"
-08DD6B95,gEventBytecode,,bytecode,medium,coverage,"event script bytecode (keyword VM, EUC-JP debug labels like ★★★ゲームスタート画面★★★)"
+08DD6B96,gEventBytecode,,bytecode,medium,coverage,"event script bytecode (keyword VM, EUC-JP debug labels like ★★★ゲームスタート画面★★★)"
 08E8755C,gEventBytecodePtrs,,table,medium,"coverage+scan","pointer table into event bytecode (>=240 entries)"

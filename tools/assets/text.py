@@ -18,7 +18,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from romlib import ROOT, load_rom  # noqa: E402
 
-TABLE, BASE, COUNT = 0x08D6B1F8, 0x08D74DDC, 9976
+TABLE, BASE, COUNT = 0x08D6B1F8, 0x08D74DDC, 9977
 
 
 def charmap():

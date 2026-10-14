@@ -2,6 +2,7 @@
 #   make setup     fetch/build pinned tools (gbadisasm, agbcc, armips, mGBA harness)
 #   make disasm    regenerate gen/code.s from baserom.gba + symbols/
 #   make           assemble build/boktai3.gba and verify it matches the base ROM
+#   make mod       build build/mod.gba from edited data (text: build/text/bank.tsv)
 #   make format    clang-format our C (make format-check: fail if unformatted)
 AS      := arm-none-eabi-as
 LD      := arm-none-eabi-ld
@@ -12,11 +13,16 @@ PY      := python3
 ROM     := build/boktai3.gba
 SHA1    := 2651c5e6875ac60abff734510d152166d211c87c
 
-.PHONY: all compare setup disasm clean shifttest format format-check
+.PHONY: all compare setup disasm clean shifttest format format-check mod
 # Default: split asm around src/*.c, compile with agbcc, link, verify SHA-1
 all: gen/code_sym.s gen/data.s
 	$(PY) tools/build.py
 	$(PY) tools/check_ram_literals.py
+
+# Modified ROM from edited sources (e.g. build/text/bank.tsv): no SHA-1 check
+mod: gen/code_sym.s gen/data.s
+	$(PY) tools/build.py --out build/mod.gba --no-compare
+	@echo build/mod.gba
 
 setup:
 	tools/setup.sh
@@ -24,7 +30,7 @@ setup:
 gen/code.s: tools/disasm.py
 	$(PY) tools/disasm.py
 
-gen/code_sym.s gen/data.s: gen/code.s tools/symbolize.py tools/m4a.py symbols/*.csv symbols/*.txt data/manifest.csv $(wildcard data/*.csv) $(wildcard tools/datafmt/*.py)
+gen/code_sym.s gen/data.s: gen/code.s tools/symbolize.py tools/m4a.py symbols/*.csv symbols/*.txt data/manifest.csv $(wildcard data/*.csv) $(wildcard build/text/*.tsv) $(wildcard tools/datafmt/*.py)
 	$(PY) tools/symbolize.py
 
 disasm: gen/code_sym.s

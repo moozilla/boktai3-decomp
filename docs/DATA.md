@@ -22,6 +22,21 @@ the policy for what is committed, and the formats decoded so far.
 To add a format: write the module, add the manifest row, run
 `check.py --extract NAME`, then `make` and `make shifttest`.
 
+**Extracted (ROM-derived) sources.** A manifest file under `build/` is
+extracted from the ROM automatically when it is missing, so creative assets
+are editable without being committed. **Resizable formats** (`RESIZABLE = True`)
+may encode to a different size; everything after them moves. Such a format
+declares `ANCHORS`, the only interior addresses that may be referenced. Data
+words pointing anywhere else inside the range are rejected as pointers (84
+graphics words resembled pointers into the text bank). `make mod` builds
+`build/mod.gba` from edited sources without the SHA-1 check, trimmed back to
+16 MiB so EEPROM stays at `0x0D000000`.
+
+The shift test moves all data together, so it cannot catch offsets that span a
+resized range. Check a resized build in the emulator: the first attempt to
+grow the text bank failed until the script image's section offsets, which span
+the bank, were encoded with it.
+
 ## Policy
 
 * **Committed:** structured tables whose content is code-like facts (keys,
@@ -40,6 +55,21 @@ To add a format: write the module, add the manifest row, run
 | Format | Range | File | Notes |
 |---|---|---|---|
 | `keyed_callbacks` | `08603300`–`08604998` | `data/actor_registry.csv` | 722 sorted `(key, callback)` records and a zero sentinel. The script `chara` command binary-searches it (`08225844`) and calls the callback. |
+| `text_bank` | `08D6B1E4`–`08DD6B96` | `build/text/bank.tsv` (extracted) | Script text, resizable. The gcx section words, 9,977 entry offsets, then strings (`T`, decoded with `data/charmap.tsv`) and binary blobs (`B`, 82 tables read by script code). Verified in-game: a lengthened config help line renders and the field still plays. |
+
+### Editing text
+
+```
+make            # extracts build/text/bank.tsv on first run
+# edit a line:  1287<TAB>T<TAB><WEIGHT>Ａボタン</WEIGHT>で設定を変更します。
+make mod        # build/mod.gba
+```
+
+Characters must exist in `data/charmap.tsv` (or use `{XXXX}` glyph codes);
+ASCII is printed with the font's 8×16 half-width glyphs. Escapes are `\\`,
+`\n`, `\t`, `\{` and `\xNN`. Markup such as `<PROC=0>` and `<WEIGHT>` is
+plain ASCII and passes through unchanged. Restore the original with
+`python3 tools/datafmt/check.py --extract text_bank`.
 
 ### Actor registry keys are string hashes
 
