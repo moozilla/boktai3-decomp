@@ -126,6 +126,15 @@ BL, BR); colour 4 is background, 1 the stroke and 2-3 shading. Kana and
 symbols come first (`0x001`-`0x0FF`), then kanji grouped by radical, with
 "PG" logo glyphs at `0x100`, `0x200`, ... `0x600`.
 
+**Cross-checked against the fan translation** (`moozilla/boktai3trans`,
+`scriptEd/`): its `chartable.sjs.tbl` settled 25 glyphs in its favour (for
+example 聞 for 閣 in 聞く, 秘, 運, 障, 貨/貸 swapped, 讐, 誓, 必, 風), each
+confirmed by the strings' context; 冠 stays ours (妖精の冠(かんむり)).
+After the fixes, 7,098 of the 7,217 strings whose Japanese its `script.sjs`
+keeps as comments decode identically; the rest differ only in notation
+(`{note}` for ♪, `{＋}` for ✚, 〜 for ～) or stray English in a comment. Its
+`protected_zones.txt` lists the same 82 binary entries as `text_bank`.
+
 Glyph order is not Shift-JIS order. In the kanji section (`0x100` on), only
 526 of 1,073 neighbouring mapped pairs increase in SJIS code, about chance,
 while the runs follow radicals (亻: 仲 何 付 代…, 彳: 行 役 彼 後…, 扌: 打 払 折…).
