@@ -1,13 +1,11 @@
-#include "global.h"
-
-extern u32 gUnk_02000074;
-void sub_08046F08(u32, s32);
-u32 sub_080471A8(u32 p)
+#include "damage_number_display.h"
+void DamageNumberDisplay_RemoveGroup(struct DamageNumberDisplay *, s32);
+u32 DamageNumberDisplay_Destroy(struct DamageNumberDisplay *display)
 {
-    s32 i = 0;
+    s32 index = 0;
     do {
-        sub_08046F08(p, i);
-        i++;
-    } while (i <= 3);
-    return gUnk_02000074 = 0;
+        DamageNumberDisplay_RemoveGroup(display, index);
+        ++index;
+    } while (index <= 3);
+    return (u32)(gUnk_02000074 = NULL);
 }

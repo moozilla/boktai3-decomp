@@ -51,7 +51,7 @@ int sub_08029E2C(void *);
 void sub_08029AA8(void *);
 void Sound_PlaySongChecked(int);
 void ProjectedDisplay_SetHeight(void *, int);
-void sub_08046B14(void *);
+void OrbitContactActor_BeginExpansion(void *);
 void sub_0802A188(ActorAnimation *p)
 {
     ActorAnimation *base = p;
@@ -86,7 +86,7 @@ void sub_0802A188(ActorAnimation *p)
             if (p->counter > 31) {
                 p->stage++;
                 p->counter = 0;
-                sub_08046B14(*(void **)((u8 *)p + 0x908));
+                OrbitContactActor_BeginExpansion(*(void **)((u8 *)p + 0x908));
             }
             break;
         case 1:

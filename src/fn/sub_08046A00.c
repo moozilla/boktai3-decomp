@@ -1,12 +1,6 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x9c];
-    u8 a;
-};
-u32 Sprite_Remove(void *);
-u32 sub_08046A00(struct S *p)
+#include "orbit_contact_actor.h"
+s32 OrbitContactActor_Destroy(struct OrbitContactActor *actor)
 {
-    Sprite_Remove(&p->a);
+    Sprite_Remove(&actor->sprite);
     return 0;
 }

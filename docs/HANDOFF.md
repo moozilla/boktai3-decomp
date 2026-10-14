@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 23.595% matching (2026-10-14). This file is the single
+Last updated after reaching 23.671% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,43 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex): rotating contact actor and floating numbers
+
+Exact code is **23.671%**, up **0.0754 percentage points** (+1,820 bytes)
+from thirteen new functions. There are **6,440 / 11,470 functions** and
+**571,730 / 2,415,354 bytes**. Without register pinning: **19.380%**;
+Register-pinned: **4.291%**, included above. Seventy-two guarded drafts remain.
+
+The **08046880–08046B28** rotating resource-contact actor is now fully exact:
+0xC8 list-8 task, center/collider/sprite layout, six-angle/seven-radius steps,
+sixty-frame expansion/contraction states and signed sine projection. Four new
+functions plus four typed existing functions establish the family.
+
+The **08046B34–0804732C** floating number display adds nine exact functions:
+four groups with four glyphs each, 0x2F0 list-9 singleton at gUnk_02000074,
+source keys, priority reuse, projected offsets, four selectable glyph bases,
+twenty-frame bounce and ten-frame removal phase. Six existing helpers/lifecycle
+functions now share the layout. See
+[orbit/number notes](../notes/orbit-number-display_2026-10-14.md).
+
+The decimal renderer **08046BC8** is retained as readable C behind NONMATCHING,
+with **63.1% fuzzy** score and no exact credit. The 548-byte original extent
+includes all body/pool bytes; the candidate is 552 bytes. Local alternatives
+confirm the decimal prefix but still have allocation and projection-loop
+residue. Explicit r7 pointer hints add halfword address copies; keep access
+bases naturally allocated. The original unobserved return is documented.
+
+Nine new functions have no hints; four retain minimized concessions. The full
+combined build printed **`build/boktai3.gba: OK`** in
+`build/orbit-damage-combined.log`; **33 post-promotion complete-extent checks**
+passed, including ten renamed callers. Format, inventory, RAM literals and
+decoded registry checks pass. The preceding pool batch merged as PR 109 at
+b583a587; main CI 38602485664 passed. No new emulator claims.
+
+Continue at **08047338**, the sixteen-slot transient sprite-effect pool called
+by earlier death handlers. Continue toward **25% exact or 60% usage remaining**;
+latest account reading is **80% remaining**. Claude's separate checkout owns main.
 
 ## October 14 (Codex): eight-slot sequence contact actor pool
 
