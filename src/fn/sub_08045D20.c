@@ -1,6 +1,6 @@
-#include "global.h"
-
-void sub_08045D20(u8 *p, u32 mask)
+#include "contact_sequence_actor.h"
+#define ContactSequenceActor_ClearFlags sub_08045D20
+void ContactSequenceActor_ClearFlags(struct ContactSequenceActor *actor, u32 mask)
 {
-    *(u16 *)(p + 4) &= ~mask;
+    actor->flags &= ~mask;
 }
