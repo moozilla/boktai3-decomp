@@ -8,13 +8,13 @@ s32 ModifierMenu_GetHeaderFrame(struct ModifierMenu *menu)
     asm("" : "+r"(base));
     switch (base->mode) {
         case 0:
-            frame = base->category + 19;
+            frame = base->choice.cursor.category + 19;
             break;
         case 1:
-            frame = base->category + 23;
+            frame = base->choice.cursor.category + 23;
             break;
         case 2:
-            frame = base->category + 27;
+            frame = base->choice.cursor.category + 27;
             break;
     }
     asm("" : : "r"(base));

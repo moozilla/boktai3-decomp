@@ -19,12 +19,12 @@ void ModifierMenu_UpdateDescription(struct ModifierMenu *menu)
             goto lookup;
         case 1:
             if (menu->mode == 0) {
-                s8 *category = &menu->category;
+                s8 *category = &menu->choice.cursor.category;
                 s8 *item;
                 s32 categoryArg = *category;
                 s32 tableIndex;
                 register const u8 **table asm("r1");
-                item = &menu->index;
+                item = &menu->choice.cursor.index;
                 if (!sub_0811DD94(categoryArg, *item))
                     goto unavailable;
                 tableIndex = *category + 7;
@@ -38,12 +38,12 @@ void ModifierMenu_UpdateDescription(struct ModifierMenu *menu)
                 goto lookup;
             }
             if (menu->mode == 1) {
-                s8 *category = &menu->category;
+                s8 *category = &menu->choice.cursor.category;
                 s8 *item;
                 s32 categoryArg = *category;
                 s32 itemArg;
                 asm("" : "+r"(categoryArg));
-                item = &menu->index;
+                item = &menu->choice.cursor.index;
                 itemArg = *item;
                 if (sub_0811DD94(4, categoryArg * 3 * 2 + itemArg)) {
                     categoryValue = *category;
@@ -55,12 +55,12 @@ void ModifierMenu_UpdateDescription(struct ModifierMenu *menu)
                 text = Text_LookupString(Script_ParseStringRef(menu->textSources[0]) + 6);
                 break;
             } else {
-                s8 *category = &menu->category;
+                s8 *category = &menu->choice.cursor.category;
                 s8 *item;
                 s32 categoryArg = *category;
                 s32 itemArg;
                 asm("" : "+r"(categoryArg));
-                item = &menu->index;
+                item = &menu->choice.cursor.index;
                 itemArg = *item;
                 if (sub_0811DD94(5, categoryArg * 3 * 2 + itemArg)) {
                     categoryValue = *category;
