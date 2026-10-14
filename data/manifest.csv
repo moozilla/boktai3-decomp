@@ -1,2 +1,3 @@
 name,start,end,format,file,description
 actor_registry,08603300,08604998,keyed_callbacks,data/actor_registry.csv,Script chara registry: string-hash key to actor/controller constructor (722 entries + sentinel)
+text_bank,08D6B1E4,08DD6B96,text_bank,build/text/bank.tsv,"Script text: gcx section words, entry table + strings and blobs (ROM-derived source, extracted on demand; strings may change length)"
