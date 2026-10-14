@@ -1,12 +1,8 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x18];
-    u32 a;
-};
-u32 sub_08045D04(struct S *p, u32 v)
+#include "projected_display.h"
+/* Observed callers ignore the result; non-null fallthrough retains r0. */
+u32 ProjectedDisplay_SetHeight(struct ProjectedDisplay *display, s32 height)
 {
-    if (p == 0)
+    if (!display)
         return 0;
-    p->a = v;
+    display->height = height;
 }

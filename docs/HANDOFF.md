@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 23.472% matching (2026-10-14). This file is the single
+Last updated after reaching 23.496% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,30 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex): five-entry projected display
+
+Working-tree matching is **23.496%**, up **0.0245 percentage points**
+(+592 bytes) from five new exact functions. There are **6,414 / 11,470 functions**,
+**567,514 / 2,415,354 bytes**. Without register pinning: **19.306%**;
+Register-pinned: **4.190%**, included above. Seventy guarded drafts remain.
+
+The **08045A20–08045D18** subsection establishes five animation entries,
+0x60 stride, a 0x238 list-10 task, CB05/7516 resource, signed 3/32 projection,
+height controls and per-entry depth biases. Entry 1 uses the unraised position;
+others follow the raised screen vector. PositionEntry preserves/returns r0's
+input pointer; the initializer ignores entry-creation failure after finding its
+resource. Both are documented and retained. See
+[projected-display notes](../notes/projected-display_2026-10-14.md).
+
+All eleven new/typed units passed reviewed full extents; four new functions have
+no hints and PositionEntry reduced 27 to seven. The complete combined build printed **`build/boktai3.gba: OK`** in
+`build/projected-display-combined.log`. Twelve post-name full-extent checks
+passed, including the existing owner caller; format, inventory, RAM literals
+and decoded actor-registry checks pass. Continue toward **25% exact or 60%
+usage remaining**; latest account reading is **83% remaining**. Main PR 107
+merged at 6252ca5a. Next contiguous work begins **08045D18**, then health/contact
+callbacks and state actors from **08045D54**. Claude's checkout owns main.
 
 ## October 14 (Codex): parameterized motion pool
 

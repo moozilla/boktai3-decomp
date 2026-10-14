@@ -50,7 +50,7 @@ void sub_08029E1C(void *);
 int sub_08029E2C(void *);
 void sub_08029AA8(void *);
 void Sound_PlaySongChecked(int);
-void sub_08045D04(void *, int);
+void ProjectedDisplay_SetHeight(void *, int);
 void sub_08046B14(void *);
 void sub_0802A188(ActorAnimation *p)
 {
@@ -82,7 +82,7 @@ void sub_0802A188(ActorAnimation *p)
     switch (p->stage) {
         case 0:
             p->counter++;
-            sub_08045D04(*(void **)((u8 *)p + 0x900), p->counter * 4);
+            ProjectedDisplay_SetHeight(*(void **)((u8 *)p + 0x900), p->counter * 4);
             if (p->counter > 31) {
                 p->stage++;
                 p->counter = 0;
@@ -126,7 +126,7 @@ void sub_0802A188(ActorAnimation *p)
             break;
         case 8:
             p->counter++;
-            sub_08045D04(*(void **)((u8 *)p + 0x900), (32 - p->counter) * 4);
+            ProjectedDisplay_SetHeight(*(void **)((u8 *)p + 0x900), (32 - p->counter) * 4);
             if (p->counter > 31) {
                 p->stage++;
                 p->counter = 0;
