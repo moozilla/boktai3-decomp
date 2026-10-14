@@ -31,7 +31,7 @@ void TextWindow_SetScript(int, void *);
 void sub_08033A38(int, int, void *);
 void TextWindow_Refresh(int, int);
 void sub_080337FC(int);
-void sub_080485E0(int, int);
+void WirelessLinkIndicator_SetPosition(int, int);
 void sub_082279A8(int, int, int, int, int, int, int);
 void sub_0821983C(void *, void *, int, int, int, int, int, int);
 int sub_08037BB8(struct P *p)
@@ -85,7 +85,7 @@ int sub_08037BB8(struct P *p)
     TextWindow_SetScript(*w, p->script);
     TextWindow_Refresh(*w, 7);
     sub_080337FC(*w);
-    sub_080485E0(0, 24);
+    WirelessLinkIndicator_SetPosition(0, 24);
     sub_082279A8(2, 4, 4, 4, 4, 65535, 0);
     b = ScriptProc_Start(0xcb05, 0x7c8b);
     if (!b)

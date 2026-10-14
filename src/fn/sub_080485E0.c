@@ -1,17 +1,10 @@
-#include "global.h"
-
-struct T {
-    u8 f[0x20];
-    u16 a;
-    u16 b;
-};
-struct T *sub_08048598(void);
-void sub_080485E0(u32 a, u32 b)
+#include "wireless_link_indicator.h"
+void WirelessLinkIndicator_SetPosition(u32 x, u32 y)
 {
-    u8 *p = (u8 *)sub_08048598();
-    if (p) {
-        struct T *t = (struct T *)(p + 0x44);
-        t->a = a;
-        t->b = b;
+    struct WirelessLinkIndicator *indicator = WirelessLinkIndicator_Create();
+    if (indicator) {
+        struct ProjectedDisplayEntry *animation = &indicator->animation;
+        animation->position.x = x;
+        animation->position.y = y;
     }
 }
