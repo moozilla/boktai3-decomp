@@ -1,69 +1,102 @@
+// MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
-struct ScenePoolSteeringBounds {
-    s32 emergencyHigh, high, low, activeHigh, activeLow;
-};
-static inline u8 AtLeast(s32 value, s32 lo)
-{
-    u8 result = 1;
-    if (value < lo)
-        result = 0;
-    return result;
-}
-#ifdef NONMATCHING
-// fuzzy: 83.6%
-// Remaining differences: pointer lifetimes, materialized bounds checks and narrow RNG loads.
 void ScenePool_UpdateSteeringPulse(struct ScenePoolActor *actor, struct ScenePoolEntry *entry,
-                                   const struct ScenePoolSteeringBounds *bounds)
+                                   const struct ScenePoolSpeedBounds *bounds)
 {
-    u8 active = entry->steeringActive;
+    u32 active = entry->speedControlActive;
     s32 metric;
+    u32 *pulseFlags;
+    register u32 pulseControl asm("r0");
+    register u32 pulseMask asm("r1");
     if (active) {
         metric = entry->direction;
-        if (metric > bounds->activeHigh || !AtLeast(metric, bounds->activeLow)) {
-            entry->steeringActive = 0;
-            entry->steeringDelay = 30;
-            entry->steeringPulse = 0;
-            goto done;
-        }
-        if (!entry->steeringDelay) {
-            if (metric > bounds->high)
-                entry->steeringPulse = 16;
-            else if (metric < bounds->low)
-                entry->steeringPulse = -16;
-            gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-            entry->steeringDelay = (gUnk_0203B400[gUnk_03005308] & 31) + 60;
-        } else
-            entry->steeringDelay--;
         {
-            u8 *pulseAddress = (u8 *)&entry->steeringPulse;
-            u8 pulseByte = *pulseAddress;
-            s32 pulse = entry->steeringPulse;
+            s32 hi = bounds->activeHigh;
+            s32 lo = bounds->activeLow;
+            s32 inside;
+            if (metric > hi)
+                goto deactivate;
+            inside = 1;
+            if (metric < lo)
+                inside = 0;
+            if (inside)
+                goto activeContinue;
+        }
+    deactivate: {
+        entry->speedControlActive = 0;
+        entry->speedControlDelay = 30;
+        entry->speedControlPulse = 0;
+        goto done;
+    }
+    activeContinue:
+        if (!entry->speedControlDelay) {
+            if (metric > bounds->high)
+                entry->speedControlPulse = 16;
+            else if (metric < bounds->low)
+                entry->speedControlPulse = -16;
+            gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
+            {
+                u32 random = *(const u16 *)((gUnk_03005308 << 1) + (u32)gUnk_0203B400);
+                entry->speedControlDelay = (random & 31) + 60;
+            }
+        } else
+            entry->speedControlDelay--;
+        {
+            u8 *pulseAddress = (u8 *)&entry->speedControlPulse;
+            u32 pulseByte = *pulseAddress;
+            s32 pulse = entry->speedControlPulse;
             if (pulse > 0) {
-                *pulseAddress = pulseByte - 1;
-                actor->controlFlags |= 0x10;
+                pulseByte--;
+                *pulseAddress = pulseByte;
+                {
+                    register u32 offset asm("r4") = 0x858;
+                    asm("" : : "r"(offset));
+                    pulseFlags = (u32 *)((u8 *)actor + offset);
+                    pulseControl = *pulseFlags;
+                    pulseMask = 0x10;
+                    goto applyPulse;
+                }
             } else if (pulse < 0) {
-                *pulseAddress = pulseByte + 1;
-                actor->controlFlags |= 0x20;
+                pulseByte++;
+                *pulseAddress = pulseByte;
+                {
+                    u32 offset = 0x858;
+                    asm("" : : "r"(offset));
+                    pulseFlags = (u32 *)((u8 *)actor + offset);
+                    pulseControl = *pulseFlags;
+                    pulseMask = 0x20;
+                }
+            applyPulse:
+                *pulseFlags = pulseControl | pulseMask;
             }
         }
     } else {
+        s32 hi = bounds->high;
+        register s32 lo asm("r4");
         metric = entry->direction;
-        if (metric <= bounds->high && AtLeast(metric, bounds->low)) {
-            entry->steeringActive = 1;
-            entry->steeringDelay = 30;
-            entry->steeringPulse = active;
+        lo = bounds->low;
+        if (metric > hi)
+            goto outside;
+        {
+            s32 inside = 1;
+            if (metric < lo)
+                inside = 0;
+            if (!inside)
+                goto outside;
+        }
+        {
+            entry->speedControlActive = 1;
+            entry->speedControlDelay = 30;
+            entry->speedControlPulse = active;
             goto done;
         }
+    outside:
         if (metric - 1 > bounds->emergencyHigh)
             actor->controlFlags |= 0x300;
-        else if (metric < bounds->low)
+        else if (metric < lo)
             actor->controlFlags |= 0x20;
         else
             actor->controlFlags |= 0x110;
     }
 done:;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", ScenePool_UpdateSteeringPulse);
-#endif
