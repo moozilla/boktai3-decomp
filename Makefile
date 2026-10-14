@@ -24,7 +24,7 @@ setup:
 gen/code.s: tools/disasm.py
 	$(PY) tools/disasm.py
 
-gen/code_sym.s gen/data.s: gen/code.s tools/symbolize.py tools/m4a.py symbols/*.csv symbols/*.txt
+gen/code_sym.s gen/data.s: gen/code.s tools/symbolize.py tools/m4a.py symbols/*.csv symbols/*.txt data/manifest.csv $(wildcard data/*.csv) $(wildcard tools/datafmt/*.py)
 	$(PY) tools/symbolize.py
 
 disasm: gen/code_sym.s
