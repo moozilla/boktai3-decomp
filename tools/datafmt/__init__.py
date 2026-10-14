@@ -17,7 +17,9 @@ the range stays shiftable. `rom` is the whole ROM image (index 0 = 0x08000000);
 
 tools/datafmt/check.py verifies that every manifest entry re-encodes to the
 original bytes. Only structured tables are committed under data/; graphics,
-text and audio extract to the ignored build/ tree (see docs/DATA.md).
+text and audio extract to the ignored build/ tree (see docs/DATA.md). A
+manifest file under build/ is extracted from the ROM when missing. A format
+module with RESIZABLE = True may encode to a different size; later data shifts.
 """
 import csv
 import importlib
@@ -40,13 +42,28 @@ class Entry:
     def module(self):
         return importlib.import_module("datafmt." + self.format)
 
+    def extracted(self):
+        """True for ROM-derived sources kept under build/ (never committed)."""
+        return os.path.relpath(self.file, ROOT).startswith("build" + os.sep)
+
     def encode(self):
+        if not os.path.exists(self.file) and self.extracted():
+            self.extract()
         with open(self.file, encoding="utf-8") as f:
             items = self.module().encode(f.read(), self.start, self.end)
         size = sum(s for s, _, _ in items)
-        if size != self.end - self.start:
+        if size != self.end - self.start and not getattr(self.module(), "RESIZABLE", False):
             raise ValueError(f"{self.name}: encodes to {size:#x} bytes, range is {self.end - self.start:#x}")
         return items
+
+
+    def extract(self):
+        import sys
+        sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from romlib import load_rom
+        os.makedirs(os.path.dirname(self.file), exist_ok=True)
+        with open(self.file, "w", encoding="utf-8") as f:
+            f.write(self.module().decode(load_rom(), self.start, self.end, {}))
 
 
 def load_manifest():

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
 s32 ScenePool_ResumeAfterIdle(u8 *owner, struct ScenePoolEntry *entry)
 {
@@ -6,8 +5,10 @@ s32 ScenePool_ResumeAfterIdle(u8 *owner, struct ScenePoolEntry *entry)
         s32 zero = 0;
         entry->idleFrame = zero;
         if (entry->direction > 0) {
-            register s32 one asm("r0") = 1;
-            entry->state = one;
+            s32 one = 1;
+            do { /* scope block steers register allocation */
+                entry->state = one;
+            } while (0);
             entry->stateFrame = zero;
             entry->stateEntered = one;
             Memory_Clear(entry->history, 0x100);

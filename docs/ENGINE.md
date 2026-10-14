@@ -256,7 +256,7 @@ comment on `struct SceneObject.entered` in `include/scene_object.h`.
 
 The event script system is a keyword-based bytecode VM. The matching C is
 mostly in `src/fn/sub_0821A4xx`–`sub_0821BAxx`, and the bytecode is in the ROM
-at `08DD6B95`–`08E8755B` ([ROM_MAP.md](ROM_MAP.md)). Its structure and command names come from
+at `08DD6B96`–`08E8755B` ([ROM_MAP.md](ROM_MAP.md)). Its structure and command names come from
 MGS's GCL (see Command names below), though the encoding differs. See [MGS_GCL_MATCHING.md](MGS_GCL_MATCHING.md) (the matched
 functions and the comparison) and [PROCESS_REVIEW.md](PROCESS_REVIEW.md) (what
 the comparison does and does not show).
@@ -629,7 +629,7 @@ Most logic is in the controllers listed in section 4.
 ## 11. Text and dialogue
 
 * **String table.** `Text_LookupString(id)` (`0821ADD4`, high confidence in
-  `symbols/functions.csv`) finds a script string: a table of 9,976 `u32`
+  `symbols/functions.csv`) finds a script string: a table of 9,977 `u32`
   offsets at `0x08D6B1F8`, bit 31 marks text, the base is `0x08D74DDC`, and the
   mask is `0x7FFFFFFF`. Some entries are binary records, not text.
 * **Markup.** Strings contain inline ASCII tags parsed at runtime: `<PROC=n>`,

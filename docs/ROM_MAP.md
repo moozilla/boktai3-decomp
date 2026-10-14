@@ -29,9 +29,9 @@ Confidence: **high** = verified by rebuild, emulator, or rendering;
 | `08A2xxxx–08B1xxxx` | | graphics (portraits e.g. `08B154B4`) | medium | VRAM→ROM map |
 | `08BE2F04–08CDxxxx` | | **sprite (OBJ) graphics**: button labels (`08BE2F04`), menu titles (`08C11880`, `08C15880`), bike/course menus | high (spots) | VRAM→ROM map, `ObjGfx_LoadTiles` |
 | `08D5xxxx–08D6B1F7` | | tables read by `Script_ReadProcTable` (`0821ACB4`) + palettes (`08D5943C` …) | medium | coverage |
-| `08D6B1F8–08D74DDB` | 39 KB | **script text pointer table**: 9,976 × u32, bit 31 = text, offset from `08D74DDC` | high | dump round-trips |
-| `08D74DDC–08DD6B94` | 400 KB | **script text bank** (ASCII + 2-byte codes `0x80xx–0x85xx`, inline `<TAG=…>` markup) | high | dump round-trips |
-| `08DD6B95–08E8755B` | 0.7 MB | **event bytecode** (keyword VM, `Script_*` functions; embeds EUC-JP debug labels like `★★★ゲームスタート画面★★★`), with interleaved pointer tables (`08E785CC`, `08E83890`) | high (region) | VM coverage; shift test |
+| `08D6B1F8–08D74DDB` | 39 KB | **script text pointer table**: 9,977 × u32, bit 31 = text, offset from `08D74DDC` | high | dump round-trips |
+| `08D74DDC–08DD6B95` | 400 KB | **script text bank** (ASCII + 2-byte codes `0x80xx–0x85xx`, inline `<TAG=…>` markup) | high | dump round-trips |
+| `08DD6B96–08E8755B` | 0.7 MB | **event bytecode** (keyword VM, `Script_*` functions; embeds EUC-JP debug labels like `★★★ゲームスタート画面★★★`), with interleaved pointer tables (`08E785CC`, `08E83890`) | high (region) | VM coverage; shift test |
 | `08E8755C–08E88144` | | pointer table into the bytecode (≥ 240 entries) | medium | scan, `0821AC44` |
 | `08E88145–08FFFFFF` | 1.47 MB | **free** (zero padding) | high | |
 

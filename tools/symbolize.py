@@ -230,6 +230,20 @@ def main():
                 if k != o and k in accepted and k not in forced and abs(k - o) < 4:
                     del accepted[k]
             accepted[o] = v
+    # A resizable decoded range (data/manifest.csv) can only be addressed at its
+    # start and the anchors its format declares; any other word pointing into
+    # it is data that resembles a pointer, and would be corrupted on resize.
+    for entry in load_manifest():
+        mod = entry.module()
+        if not getattr(mod, "RESIZABLE", False):
+            continue
+        ok = {entry.start} | set(getattr(mod, "ANCHORS", ()))
+        for o, v in list(accepted.items()):
+            if entry.start <= v < entry.end and v not in ok:
+                if o in forced:
+                    raise SystemExit(f"symbols/pointers.txt: {o:08X} points inside resizable {entry.name}")
+                del accepted[o]
+                rejected.add(o)
     for v in accepted.values():
         refs.add(v & ~1 if v < CODE_END and v & 1 else v)
 
@@ -357,15 +371,29 @@ def emit_decoded(entry, accepted, sym, labels):
     directive = {1: ".byte", 2: ".2byte", 4: ".4byte"}
     pos = entry.start
     starts = set()
+    mod = entry.module()
+    if getattr(mod, "RESIZABLE", False):
+        # item positions drift once the size changes: label only fixed points,
+        # which the format keeps at their original offsets
+        keep = {entry.start} | set(getattr(mod, "ANCHORS", ()))
+        labels = {a: n for a, n in labels.items() if a in keep or not entry.start <= a < entry.end + 1}
+    run = []  # consecutive plain bytes, emitted 32 per line
     for size, value, pointer in items:
         starts.add(pos)
-        if pos in labels:
+        if run and (pos in labels or size != 1 or len(run) == 32):
+            out.append("\t.byte " + ",".join(run))
+            run = []
+        if pos in labels and pos < entry.end:
             out.append(f"{labels[pos]}:")
         if pointer:
             out.append(f"\t.4byte {sym(value)}")
+        elif size == 1:
+            run.append(f"{value & 0xFF:#x}")
         else:
             out.append(f"\t{directive[size]} {value & ((1 << (8 * size)) - 1):#x}")
         pos += size
+    if run:
+        out.append("\t.byte " + ",".join(run))
     inner = [a for a in labels if entry.start <= a < entry.end and a not in starts]
     if inner:
         raise SystemExit(f"{entry.name}: labels inside an item: " + ", ".join(labels[a] for a in inner))
