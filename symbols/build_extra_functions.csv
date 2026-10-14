@@ -78,6 +78,7 @@ address,isa,evidence,replacement_end
 08045F44,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08045F48
 08046B28,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08046B34
 0804732C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08047338
+080475F8,thumb,Independent 252-byte script spawn wrapper: push at 080475F8; final call to 080474E4; pop-bx and alignment end at 080476F4,080476F4
 08047B94,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08047BA4
 08047BA4,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08047BB4
 08048438,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0804846C

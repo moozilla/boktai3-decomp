@@ -1,9 +1,10 @@
-#include "global.h"
-
-void sub_08047B94(u8 *p, u32 a, u32 b)
+#include "background_flash.h"
+#define BackgroundFlash_SetEffectSources sub_08047B94
+void BackgroundFlash_SetEffectSources(struct BackgroundFlashController *controller, void *sourceA,
+                                      void *sourceB)
 {
-    if (p) {
-        *(u32 *)(p + 0x20) = a;
-        *(u32 *)(p + 0x24) = b;
+    if (controller) {
+        controller->effectSourceA = sourceA;
+        controller->effectSourceB = sourceB;
     }
 }

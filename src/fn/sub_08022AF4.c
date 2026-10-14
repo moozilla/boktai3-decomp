@@ -6,9 +6,9 @@ struct S {
     u8 g[0x9dc - 0x3c4];
     u32 a;
 };
-void sub_08047B78(u32);
+void BackgroundFlash_BeginDisappearance(u32);
 void sub_08022AF4(struct S *p)
 {
-    sub_08047B78(p->a);
+    BackgroundFlash_BeginDisappearance(p->a);
     p->b = 0;
 }

@@ -1,12 +1,7 @@
-#include "global.h"
-
-extern u16 gUnk_03004BD8;
-u32 sub_08047700(void);
-void sub_08047884(void)
+#include "background_flash.h"
+u32 BackgroundFlash_TakeEntryFlag(struct BackgroundFlashController *);
+void BackgroundFlash_UpdateInactive(struct BackgroundFlashController *controller)
 {
-    if (sub_08047700()) {
-        u16 *g = &gUnk_03004BD8;
-        u32 m = 0xFFFFFDFF;
-        *g = *g & m;
-    }
+    if (BackgroundFlash_TakeEntryFlag(controller))
+        BackgroundFlash_HideLayer();
 }
