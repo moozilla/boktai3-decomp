@@ -1,8 +1,12 @@
 # Modifier menu preview and lifecycle (tentative)
 
 Contiguous subsection: `08041908–08042198`. Seven new exact functions add
-**0.059 percentage points** (1,428 bytes), bringing the branch to **22.876%**,
-6,316 / 11,465 functions and 552,534 / 2,415,354 bytes. The 492-byte validator
+**0.059 percentage points** (1,428 bytes), bringing the branch to **22.902%**,
+6,322 / 11,465 functions and 553,162 / 2,415,354 bytes. Claude's PR #80 adds
+six separate matches (+628 bytes), four drafts and the consolidated message
+actor unit; its contributions are included in these overall figures. PR #82
+unpins seven additional functions, bringing the categories to **18.838%**
+without register pinning and **4.064%** Register-pinned. The 492-byte validator
 is a guarded **71.0%** draft, with no exact credit.
 
 ## Observed lifecycle
@@ -90,7 +94,7 @@ boolean materialization and prevent factoring its two cancellation call sites.
 
 Shared actor/menu views, named color fields and text-source writes were rechecked
 at full extent after type cleanup. The complete combined build printed **`build/boktai3.gba: OK`**
-(`build/modifier-preview-combined.log`); format, inventory and RAM-literal
+(`build/modifier-preview-final-combined.log`); format, inventory and RAM-literal
 validation passed. The next contiguous subsection starts at
 **08042198**: a script/text cursor and its adjacent scrolling task, separate from
 the completed modifier menu lifecycle. The validator remains available for a new

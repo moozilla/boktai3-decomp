@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 22.876% matching (2026-10-14). This file is the single
+Last updated after reaching 22.902% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -12,13 +12,18 @@ published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
 ## October 14 (Codex): modifier menu preview and lifecycle
 
-Matching is **22.876%**, up **0.059 percentage points** (+1,428 bytes), with
-**6,316 / 11,465 functions** and **552,534 / 2,415,354 bytes**. Seven new exact
+Matching is **22.902%**. This batch adds **0.059 percentage points** (+1,428 bytes), with
+**6,322 / 11,465 functions** and **553,162 / 2,415,354 bytes**. Seven new exact
 functions complete preview construction, saved-selection loading, capacity
 flashing, appearance, script text banks, task update and initialization.
-Without register pinning: **18.746%**; Register-pinned: **4.130%**, included
-above. The new validator is a guarded **71.0%** draft; 64 drafts overall,
-with no exact credit.
+Without register pinning: **18.838%**; Register-pinned: **4.064%**, included
+above. The new validator is a guarded **71.0%** draft; 68 drafts overall,
+with no exact credit. Claude's PR #80 adds another six matches (+628 bytes)
+and four drafts, consolidates 88 message-actor files, and adds state-actor
+layouts/macros and macro-aware function discovery. Those changes are included
+in the overall figures and were read before combined validation. Claude's
+PR #82 removes hints from seven more functions without changing exact bytes;
+those rewrites are also incorporated.
 
 The contiguous **08041908–08042198** subsection connects script options and
 saved IDs to the model and per-frame rendering. The shared menu view extends
@@ -31,7 +36,7 @@ helpers and symbols changed without new coverage credit. See
 Every addition passed full-extent checks and hint minimization. Shared type
 consumers and the corrected 13-entry text-source helper were rechecked.
 The combined build printed **`build/boktai3.gba: OK`**
-(`build/modifier-preview-combined.log`); format, inventory and RAM-literal
+(`build/modifier-preview-final-combined.log`); format, inventory and RAM-literal
 checks passed. Continue the
 **25% / 80%-remaining** goal; latest usage is **90% remaining**. Next
 contiguous subsection begins at **08042198**, a script/text cursor and its
