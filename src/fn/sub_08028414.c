@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Packed {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
@@ -9,13 +8,15 @@ void sub_0806A160(void *, int, void *, int, int, int, int, int);
 void sub_08028414(u8 *p)
 {
     struct Packed size;
-    int angle, speed;
-    register int count asm("r1");
+    int angle;
+    int speed;
+    int count;
     u16 *table;
     u32 *indexPtr;
     u32 mask;
-    register u32 smallMask asm("r8");
-    register u32 index asm("r0");
+    u32 smallMask;
+    u32 *alias;
+    u32 index;
     size.x = 164;
     size.y = 16;
     size.z = 164;
@@ -32,17 +33,18 @@ void sub_08028414(u8 *p)
     count = (count & smallMask) + 2;
     index = (index + 1) & mask;
     *indexPtr = index;
-    speed = (table[index] & smallMask) + 20;
+    alias = &index;
+    speed = (table[*alias] & smallMask) + 20;
     sub_0806A160(p + 0x260, 3, &size, angle, count, speed, 2, 2);
     {
         u32 *ptr = indexPtr;
-        index = (*ptr + 1) & mask;
+        index = ((*ptr) + 1) & mask;
     }
-    angle = (u8)table[index];
+    angle = (u8)table[*alias];
     index = (index + 1) & mask;
     count = (table[index] & smallMask) + 2;
     index = (index + 1) & mask;
     *indexPtr = index;
-    speed = (table[index] & smallMask) + 20;
+    speed = (table[*alias] & smallMask) + 20;
     sub_0806A160(p + 0x260, 3, &size, angle, count, speed, 2, 2);
 }
