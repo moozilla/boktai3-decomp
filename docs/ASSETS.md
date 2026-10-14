@@ -114,7 +114,7 @@ table covers the whole body, so no script code is unreachable from it.
 ## Text and the font
 
 `tools/assets/text.py dump | find WORD` decodes the script string table
-(9,976 entries at `08D6B1F8`, base `08D74DDC`; bit 31 of an entry marks text).
+(9,977 entries at `08D6B1F8`, base `08D74DDC`; bit 31 of an entry marks text).
 Bytes below `0x80` are ASCII (markup such as `<PROC=0>`, `<LABEL>`, `<ALTER>`,
 newlines); a lead byte `0x80`-`0x85` and the next byte form a glyph index
 (code - `0x8000`).
@@ -184,6 +184,13 @@ leads for naming, not facts.
 | `sub_080EC3F8` | `D291` | 35 | flame worm | モエルルン? |
 | `sub_080F0C20` | `D638` | 37 | pale worm | ヒエルルン / クロロホルルン? |
 | `sub_080FE68C` | `5291` | 4 | living sword | ソード |
+
+Sprite names are string hashes (`sub_08219BD8`, see [DATA.md](DATA.md)) of
+plain English words in two cases: `slime` = `B96C` and `bee` = `9506`, matching
+the visual identifications above. Romanised Japanese and English guesses for
+the other families gave nothing above chance; with 1,500 resource hashes, a
+random word hits one about 2% of the time, so only a family-level guess
+confirmed by the render counts.
 
 Two families load small-sprite packages instead: `sub_080B43BC` (`3DB6`, a
 black winged creature) and `sub_080C3260` (`AE52`, skeletons).

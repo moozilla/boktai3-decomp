@@ -191,7 +191,9 @@ def main():
     elf = a.out[:-4] + ".elf"
     sh(["arm-none-eabi-ld", "-T", "build/link.ld", "-o", elf])
     sh(["arm-none-eabi-objcopy", "-O", "binary", "-j", ".text", elf, a.out])
-    if a.shift:
+    # Shifted or resized data grows the image into the trailing zero padding:
+    # trim back to 16 MiB so EEPROM stays at 0x0D000000.
+    if True:
         b = open(os.path.join(ROOT, a.out), "rb").read()
         if len(b) > 0x1000000 and not any(b[0x1000000:]):
             open(os.path.join(ROOT, a.out), "wb").write(b[:0x1000000])
