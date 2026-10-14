@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 23.272% matching (2026-10-14). This file is the single
+Last updated after reaching 23.330% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -12,10 +12,10 @@ published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
 ## October 14 (Codex): contact swarm and latest Claude integration
 
-Matching is **23.272%**, up **0.098 percentage points** from this batch
-(+2,368 bytes), plus **0.044 points** from Claude's eight new engine functions.
-There are **6,387 / 11,468 functions**, **562,102 / 2,415,354 bytes**.
-Without register pinning: **19.135%**; Register-pinned: **4.137%**, included above.
+Matching is **23.330%**, up **0.098 percentage points** from this batch
+(+2,368 bytes), plus **0.101 points** from Claude's fourteen new engine functions.
+There are **6,393 / 11,468 functions**, **563,494 / 2,415,354 bytes**.
+Without register pinning: **19.192%**; Register-pinned: **4.137%**, included above.
 Three hidden function boundaries were recovered, without changing byte totals.
 Two guarded paired-spawn drafts bring the draft count to 74; neither is exact credit.
 
@@ -24,9 +24,9 @@ five-state dispatch, 0x154 stride, 0x1590 allocation, parity-filtered resource
 contact, packed sequence playback, palette fade, and first-free charge spawning.
 See [contact-swarm notes](../notes/contact-swarm_2026-10-14.md).
 
-Claude's PRs 93–99 are included: font character mapping and text decoding,
+Claude's PRs 93–101 are included: font character mapping and text decoding,
 large sprites, tentative enemy-family identities, thirteen unpinned functions,
-and eight new engine matches. Read REGALLOC.md and the October 14 Claude
+and fourteen new engine matches, including sun-clock and delayed-script tasks. Read REGALLOC.md and the October 14 Claude
 handoff section for reload rotation, regdiag, and asset context.
 
 All sixteen new/affected exact units passed reviewed full-extent checks.
