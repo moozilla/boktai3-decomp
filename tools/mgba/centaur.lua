@@ -508,17 +508,24 @@ in game: SELECT+L cycles subtitles, SELECT+R saves a quick bookmark
 studio: python3 tools/studio/serve.py, then http://localhost:8642/live]])
 end
 
--- Experimental warp: request scene N the way the script `load` command does
--- (08225508): 0x030039F0 = N, GameState+0x5A4 = N, request flags 0x030053E8.
--- Scenes are script procedures; python3 tools/mgba/scenes.py lists them. The
--- stage loads, but the player is not spawned (doors also set an entrance).
+-- Warp to scene N the way "continue" does (sub_081E132C at 081E14E0):
+-- 0x0300546C = 0; Script_Call(*0x020003A8, 0); 0x0300523C = 0 (task mask: a
+-- full rebuild, player included); request word 0x030053E8 = 0x11; next scene
+-- 0x030039F0 = N (sub_0821B03C), with GameState+0x5A4 = N as the saved scene.
+-- Scenes are script procedures; python3 tools/mgba/scenes.py lists them.
 function warp(scene)
   local gs = emu:read32(ADDR.GameState)
-  emu:write16(0x030039F0, scene)
+  local cont = emu:read32(0x020003A8)
   if gs >= 0x02000000 and gs < 0x02040000 then emu:write32(gs + 0x5A4, scene) end
-  emu:write32(0x030053E8, 0x11)
+  emu:write32(0x0300546C, 0)
+  local function finish()
+    emu:write32(0x0300523C, 0)
+    emu:write32(0x030053E8, 0x11)
+    emu:write16(0x030039F0, scene)
+  end
+  if HAS_BP and cont > 0 and cont < 0x10000 then callproc(cont, {}, finish) else finish() end
   S.stage = {}; S.dirty = true
-  LOG("warp to scene " .. scene); toast("warp " .. scene)
+  LOG(string.format("warp to scene %d (continue proc %d)", scene, cont)); toast("warp " .. scene)
 end
 function scene()
   local gs = emu:read32(ADDR.GameState)
@@ -533,14 +540,15 @@ function centaur_state() return { map = S.stage.map, tileset = S.stage.tileset, 
 -- scratch area at the top of EWRAM (unused in captures).
 local CALL = { queue = {}, saved = nil }
 local SCRATCH = 0x0203FF00
-function callproc(pid, args)
-  CALL.queue[#CALL.queue + 1] = { pid = pid, args = args or {} }
+function callproc(pid, args, after)
+  CALL.queue[#CALL.queue + 1] = { pid = pid, args = args or {}, after = after }
   LOG(string.format("callproc %d (%d args) queued", pid, #(args or {})))
 end
 local function on_runframe()
   if CALL.saved then
     emu:writeRegister("lr", CALL.saved)
     CALL.saved = nil
+    if CALL.after then local f = CALL.after; CALL.after = nil; f() end
     return
   end
   local c = table.remove(CALL.queue, 1)
@@ -553,6 +561,7 @@ local function on_runframe()
     argp = SCRATCH
   end
   CALL.saved = emu:readRegister("lr")
+  CALL.after = c.after
   emu:writeRegister("r0", c.pid)
   emu:writeRegister("r1", argp)
   emu:writeRegister("lr", 0x0821A054 | 1)
