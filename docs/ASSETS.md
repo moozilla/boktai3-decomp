@@ -126,6 +126,12 @@ BL, BR); colour 4 is background, 1 the stroke and 2-3 shading. Kana and
 symbols come first (`0x001`-`0x0FF`), then kanji grouped by radical, with
 "PG" logo glyphs at `0x100`, `0x200`, ... `0x600`.
 
+Glyph order is not Shift-JIS order. In the kanji section (`0x100` on), only
+526 of 1,073 neighbouring mapped pairs increase in SJIS code, about chance,
+while the runs follow radicals (亻: 仲 何 付 代…, 彳: 行 役 彼 後…, 扌: 打 払 折…).
+Monotonicity therefore cannot validate the map; cross-checking against a
+translation project's table or translated strings can.
+
 `data/charmap.tsv` maps glyph indices to characters (1,326 entries). Kana and
 symbols were read by eye; kanji were ranked by template matching against
 Hiragino Kaku Gothic W7 at the glyph's ink box (IoU of blurred bitmaps, JIS
@@ -166,24 +172,37 @@ name. The identifications below are visual guesses from renders with a
 borrowed palette, matched against the monster list in the text; treat them as
 leads for naming, not facts.
 
-| Loader | Sprite | Frames | Looks like | Candidate monster |
-|---|---|---|---|---|
-| `sub_08084F44` | `DA6D` | 16 | small black wings | バット / ヴァンパイアバット |
-| `sub_0808D1D8` | `9247` | 12 | hunched shambling humanoid | グール / ゾンビ |
-| `sub_08090FEC` | `B96C` | 16 | dome with an eye | スライム |
-| `sub_08094764` | `9506` | 29 | small winged insect | ビー |
-| `sub_08099B44` | `D637` | 29 | hooded cloaked figure | ? |
-| `sub_0809DD78` | `D28E` | 42 | small ring-like | ? |
-| `sub_080A1440` | `5A6E` | 23 | black bird | クロウ / レイブン |
-| `sub_080A4AFC` | `528F` | 16 | spider | スパイダー |
-| `sub_080ABDCC` | `D636` | 44 | round body with tentacles | オクトパス? |
-| `sub_080CFC14` | `5290` | 47 | round red/orange creature | ? |
-| `sub_080DCC98` | `48DE` | 25 | thin green figure | ? |
-| `sub_080E5744` | `D635` | 64 | small dragon | ドラゴンパピー? |
-| `sub_080E87C4` | `3876` | 8 | arcade cabinet | ? |
-| `sub_080EC3F8` | `D291` | 35 | flame worm | モエルルン? |
-| `sub_080F0C20` | `D638` | 37 | pale worm | ヒエルルン / クロロホルルン? |
-| `sub_080FE68C` | `5291` | 4 | living sword | ソード |
+| Loader | Registry key (spawner) | Sprite | Frames | Looks like | Candidate monster |
+|---|---|---|---|---|---|
+| `sub_08084F44` | `F8BE` (`sub_08085D20`) | `DA6D` | 16 | small black wings | バット / ヴァンパイアバット |
+| `sub_0808D1D8` | `05A5` (`sub_0808E1D4`) | `9247` | 12 | hunched shambling humanoid | グール / ゾンビ |
+| `sub_08090FEC` | `C3BC` (`sub_08091E1C`) | `B96C` | 16 | dome with an eye | スライム |
+| `sub_08094764` | `E131` (`sub_08095540`) | `9506` | 29 | small winged insect | ビー |
+| `sub_08099B44` | `CCD3` (`sub_0809ADD4`) | `D637` | 29 | hooded cloaked figure | ? |
+| `sub_0809DD78` | `680E` (`sub_0809ECC8`) | `D28E` | 42 | small ring-like | ? |
+| `sub_080A1440` | `9E8D` (`sub_080A2010`) | `5A6E` | 23 | black bird | クロウ / レイブン |
+| `sub_080A4AFC` | `87E4` (`sub_080A5B54`) | `528F` | 16 | spider | スパイダー |
+| `sub_080ABDCC` | `0AC7` (`sub_080ACBA8`) | `D636` | 44 | round body with tentacles | オクトパス? |
+| `sub_080CFC14` | `98EC` (`sub_080D0BFC`) | `5290` | 47 | round red/orange creature | ? |
+| `sub_080DCC98` | `6913` (`sub_080DDCF4`) | `48DE` | 25 | thin green figure | ? |
+| `sub_080E5744` | `F836` (`sub_080E6814`) | `D635` | 64 | small dragon | ドラゴンパピー? |
+| `sub_080E87C4` | `BEF5` (`sub_080E986C`) | `3876` | 8 | arcade cabinet | ? |
+| `sub_080EC3F8` | `3F99` (`sub_080ED2F0`) | `D291` | 35 | flame worm | モエルルン? |
+| `sub_080F0C20` | `1744` (`sub_080F1BD4`) | `D638` | 37 | pale worm | ヒエルルン / クロロホルルン? |
+| `sub_080FE68C` | `2D30` (`sub_080FF754`) | `5291` | 4 | living sword | ソード |
+
+Each family is spawned through the script actor registry
+(`data/actor_registry.csv`): the key's callback calls the family loader. The
+small-sprite families are `DFDC` (`sub_080B54A8`, black wings) and `AD03`
+(`sub_080C44AC`, skeletons). Registry names are not the sprite names with a
+shared prefix or suffix (no affix of up to five characters maps both `slime`
+to `C3BC` and `bee` to `E131`), and about 300,000 English, romanised and
+decorated spellings tested against each family's own key hit only at the
+chance rate.
+
+In the late-game save's field scene (`tests/save_menus_field.txt`), the only
+family code that runs is `sub_0809DD78` (`D28E`, "ring"), alongside a red ring
+drawn around Django, so that family may be a field effect rather than an enemy.
 
 Sprite names are string hashes (`sub_08219BD8`, see [DATA.md](DATA.md)) of
 plain English words in two cases: `slime` = `B96C` and `bee` = `9506`, matching
