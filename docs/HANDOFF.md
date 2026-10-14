@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 23.746% matching (2026-10-14). This file is the single
+Last updated after reaching 23.807% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,47 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex): temporary animations and contact-burst controller
+
+Exact code is **23.807%**, up **0.0604 percentage points** (+1,460 bytes)
+from ten new functions. There are **6,463 / 11,471 functions** and
+**575,018 / 2,415,354 bytes**. Without register pinning: **19.441%**;
+Register-pinned: **4.365%**, included above. Seventy-three guarded drafts remain.
+
+**08047BB4–08047DBC** is now a fully exact sixteen-slot temporary animation
+singleton: 0x678 list-10 task, 0x64 slots, signed lifetimes, relocated resource
+and palette/list selection. The common 0x60 animation entry now exposes its
+flags, palette index and palette pointer. Destruction tests registration
+separately from the pool's active flag.
+
+**08047F68–080483A0** is a fully exact 0xC4 list-8 contact-burst controller,
+with tentative gameplay identity. It projects a caller-owned world position,
+fades in, runs an eighteen-update contact animation and emits eight
+sine-directed particles when disabled. Its particle update at **08047DBC**
+is exact; the **08047DF4 spawner** is a **53.3% guarded draft**, with recovered
+lifetime/speed/position behavior but different allocation and an unresolved
+unused literal in the original. See
+[animation/contact notes](../notes/animation-contact-burst_2026-10-14.md).
+
+Four new matches use no hints; six retain minimized concessions. Six existing
+helpers/lifecycle functions were typed. The combined build printed
+**`build/boktai3.gba: OK`** in `build/animation-contact-main-combined.log`;
+**31 complete post-promotion extent checks** passed, including eleven shared
+entry consumers and four renamed callers. Format, inventory, RAM literals,
+actor registry and text-bank round trips pass. No new emulator claims.
+
+Main **1174c388** incorporates Claude's **PR 112**, which makes the extracted
+script text bank resizable and adds `make mod`, and **PR 113**, which removes
+register hints from two existing exact functions. Those updates are included
+in the combined validation and category totals above. Main CI for PR 111
+(38612601507) passed.
+
+Next contiguous work is **080483A0–080485FC**, the RFU wireless-link indicator.
+Its strength-frame selector and initializer are already exact without hints
+in ignored scratch work; its link-status update is exact with two minimized
+hints. Continue toward **25% exact or 60% usage remaining**; latest allowance
+is **78% remaining**. Claude's separate checkout owns main.
 
 ## October 14 (Codex): transient sprites and BG1 flash/scroll controller
 

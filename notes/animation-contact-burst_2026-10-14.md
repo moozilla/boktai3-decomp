@@ -7,7 +7,7 @@ callback is exact and its spawner is a guarded draft.
 Exact code rises **23.746% → 23.807%**, **+0.0604 percentage points**
 (+1,460 bytes, ten new functions). There are **6,463 / 11,471 functions**
 and **575,018 / 2,415,354 exact bytes**. Code without register pinning is
-**19.432%**; Register-pinned is **4.375%**, included above. Seventy-three
+**19.441%**; Register-pinned is **4.365%**, included above. Seventy-three
 guarded drafts remain excluded from exact credit.
 
 | Family | New exact functions | New bytes | Existing functions typed |
@@ -102,3 +102,18 @@ Next contiguous work starts **080483A0–080485FC**, the singleton RFU link-stre
 indicator. Its consumers read `RfuLinkStatus.strength` and connected-slot masks,
 so the subsystem identity is supported by the recovered SDK layout. Continue
 toward **25% exact or 60% usage remaining**; the latest allowance is **78% remaining**.
+
+## Validation and integration
+
+The combined build against **1174c388** printed **`build/boktai3.gba: OK`**
+in `build/animation-contact-main-combined.log`. **31 complete extent checks**
+passed after name promotion: ten new matches, six typed existing helpers,
+eleven consumers of the refined shared animation entry, and four renamed
+owning callers. The particle spawner was checked separately with
+`--nonmatching --record` and remains **53.3%**. Format, inventory, RAM literals,
+actor registry and text-bank round trips pass.
+
+Claude's **PR 112** (resizable text bank) and **PR 113** (two register-hint
+removals) are incorporated. The latter lowers the Register-pinned category
+without changing total exact progress. The original combined build begun
+before those main updates was stopped; the final build uses current main.
