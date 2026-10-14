@@ -27,6 +27,7 @@
 --   bm("name") / go("name") / bms()   save / load / list bookmarks
 --   god(true|false)         keep life at maximum (GameState +0x28/+0x2A)
 --   warp(scene), scene()    experimental: load a scene (stage loads, player does not spawn)
+--   callproc(id, {args})    run a script procedure (Script_Call) at the next frame
 --   capture()               send a scene capture to the studio
 --   rec_start("name"), rec_stop()     record inputs as a harness script
 --   peek8/16/32(a), poke8/16/32(a,v), watch(a), unwatch(), where()
@@ -525,6 +526,40 @@ function scene()
 end
 function centaur_state() return { map = S.stage.map, tileset = S.stage.tileset, pal = S.stage.pal, scene = scene() } end
 
+-- Run a script procedure: callproc(id, {args...}). At the next entry of the
+-- per-frame TaskSystem_RunFrame (0821A054, no arguments) the CPU is diverted
+-- into Script_Call(id, args) (0821AD08), which returns to RunFrame's entry; the
+-- second hit restores the original return address. Arguments are built in a
+-- scratch area at the top of EWRAM (unused in captures).
+local CALL = { queue = {}, saved = nil }
+local SCRATCH = 0x0203FF00
+function callproc(pid, args)
+  CALL.queue[#CALL.queue + 1] = { pid = pid, args = args or {} }
+  LOG(string.format("callproc %d (%d args) queued", pid, #(args or {})))
+end
+local function on_runframe()
+  if CALL.saved then
+    emu:writeRegister("lr", CALL.saved)
+    CALL.saved = nil
+    return
+  end
+  local c = table.remove(CALL.queue, 1)
+  if not c then return end
+  local argp = 0
+  if #c.args > 0 then
+    for k, v in ipairs(c.args) do emu:write32(SCRATCH + 8 + (k - 1) * 4, v) end
+    emu:write32(SCRATCH, #c.args)
+    emu:write32(SCRATCH + 4, SCRATCH + 8)
+    argp = SCRATCH
+  end
+  CALL.saved = emu:readRegister("lr")
+  emu:writeRegister("r0", c.pid)
+  emu:writeRegister("r1", argp)
+  emu:writeRegister("lr", 0x0821A054 | 1)
+  emu:writeRegister("pc", 0x0821AD08)
+end
+if HAS_BP then emu:setBreakpoint(on_runframe, 0x0821A054) end
+
 -- save the overlay layers as PNGs (debugging the overlay without seeing the window)
 function ovdump()
   local o = overlay()
@@ -542,6 +577,7 @@ COMMANDS = {
   load = function(c) go(c.name) end,
   bookmarks = function() send({ t = "bookmarks", list = bm_index() }) end,
   warp = function(c) warp(c.scene) end,
+  callproc = function(c) callproc(c.id, c.args) end,
   subs = function(c) subs(c.mode); if c.pos then subpos(c.pos) end end,
   god = function(c) god(c.on) end,
   rec_start = function(c) rec_start(c.name) end,
