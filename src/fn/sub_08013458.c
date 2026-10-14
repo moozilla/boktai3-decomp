@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -49,12 +48,12 @@ void Shadow_UpdateTerrain(struct Shadow *p)
     struct Vec *ground = &p->position;
     struct Vec *source = p->source;
     int index = cellIndex(source);
-    asm("" : : "r"(flags));
     if (p->flags & 1)
         ground->y = source->y;
     else {
         struct Cell *c = cell(index);
-        int slope = c->height >> 4, height = (c->height & 15) << 8;
+        int slope = (c->height >> 2) >> 2; /* two shifts: matches agbcc allocation */
+        int height = (c->height & 15) << 8;
         switch (slope) {
             case 1:
                 height -= (u8)source->z;

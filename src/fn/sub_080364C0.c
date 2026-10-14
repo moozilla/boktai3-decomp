@@ -45,10 +45,9 @@ void sub_0803441C(struct Engine *);
 void sub_0803451C(struct Engine *);
 int sub_0824923C(void *, void *);
 extern void *gUnk_086056EC[];
-// MATCHING_CONCESSION: register-pinning
 int sub_080364C0(struct Engine *argument)
 {
-    register struct Engine *p asm("r5") = argument;
+    struct Engine *p = argument;
     if (p->pad18) {
         volatile u8 *busy = &gUnk_020000EC;
         int initial = *busy;
