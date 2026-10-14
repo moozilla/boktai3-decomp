@@ -1,5 +1,4 @@
 #include "global.h"
-#define EncodedRecord_ReadBits sub_08044CF4
 s32 __divsi3(s32, s32);
 s32 sub_08249350(s32, s32);
 u32 EncodedRecord_ReadBits(const u8 *base, u32 *source, s32 count, s32 index)

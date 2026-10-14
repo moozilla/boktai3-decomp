@@ -100,8 +100,8 @@ int MessageMenu_Initialize(struct MessageMenu *m)
     if (!m->text)
         return -1;
     m->script = Script_GetKeywordValue('e', 0);
-    sub_08044E6C(m->formatter);
-    sub_08044DD0(m->lines, m->formatter, m->source, 6);
+    EncodedRecord_EncodeFields(m->formatter);
+    EncodedRecord_FormatRows(m->lines, m->formatter, m->source, 6);
     MessageMenu_LoadBackground(m, 12);
     if (MessageMenu_CreateTextWindows(m) != 0)
         return -1;

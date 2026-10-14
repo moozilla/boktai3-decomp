@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define EncodedRecord_XorRange     sub_08044D6C
-#define EncodedRecord_NextMaskWord sub_08044D58
 u32 EncodedRecord_NextMaskWord(u32 *);
 void EncodedRecord_XorRange(u8 *buffer, s32 start, s32 end, u32 seed, volatile s32 skipInput,
                             u32 mask)
