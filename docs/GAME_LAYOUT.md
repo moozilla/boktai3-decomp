@@ -80,7 +80,7 @@ region.
 | `089FAF00`–`08A2AEFF` | 16×16 kana and kanji font | section 13 |
 | `08BE2F04`–`08CDxxxx` | OBJ (sprite) graphics: button labels, menu titles, bike and course menus | section 13 |
 | `08D5xxxx`–`08D6B1F7` | proc tables and palettes read by `Script_ReadProcTable` | section 4 |
-| `08D6B1F8`–`08D74DDB` | script text pointer table (9,976 entries) | [FINDINGS.md](FINDINGS.md) |
+| `08D6B1F8`–`08D74DDB` | script text pointer table (9,977 entries) | [FINDINGS.md](FINDINGS.md) |
 | `08D74DDC`–`08DD6B94` | script text bank | section 13 |
 | `08DD6B95`–`08E8755B` | event bytecode (keyword VM), with EUC-JP developer labels | [ENGINE.md](ENGINE.md), section 4 |
 | `08E8755C`–`08E88144` | pointer table into the bytecode | |
@@ -369,7 +369,7 @@ These are not code. Each area has a full description in the linked document.
 
 | Area | Where | What | Document |
 |---|---|---|---|
-| Script text | `08D6B1F8`–`08D74DDB` (table), `08D74DDC`–`08DD6B94` (bank) | 9,976 entries, bit 31 marks text, two-byte kana and kanji codes, inline `<TAG=…>` markup | [FINDINGS.md](FINDINGS.md), [ENGINE.md](ENGINE.md) section 11 |
+| Script text | `08D6B1F8`–`08D74DDB` (table), `08D74DDC`–`08DD6B95` (bank) | 9,977 entries, bit 31 marks text, two-byte kana and kanji codes, inline `<TAG=…>` markup | [FINDINGS.md](FINDINGS.md), [ENGINE.md](ENGINE.md) section 11 |
 | Event bytecode | `08DD6B95`–`08E8755B` | keyword VM bytecode, with developer labels in EUC-JP for demos and debug messages | [ENGINE.md](ENGINE.md) section 5; [FINDINGS.md](FINDINGS.md), *Debug leftovers* |
 | Sound | `0826456C`–`08602C8B` | song table, voicegroups, 415 PCM samples, track streams | [ROM_MAP.md](ROM_MAP.md); `tools/m4a.py` |
 | Background tiles and maps | `0865xxxx`–`0875xxxx` | 4bpp tiles, tilemaps, some LZ77 | [ROM_MAP.md](ROM_MAP.md) |
