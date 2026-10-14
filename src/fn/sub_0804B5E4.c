@@ -1,14 +1,14 @@
 #include "global.h"
 extern u32 gUnk_030053F4;
-void sub_08049168(u8 *, u32);
-void sub_08049234(u8 *);
+void TetherActor_SetState(u8 *, u32);
+void TetherActor_SetEntry(u8 *);
 void sub_0804B43C(u8 *);
 void TetherActor_UpdateShake(u8 *);
 void sub_0804B58C(u8 *);
 void sub_0804B5E4(u8 *p)
 {
     if (p[0x255] != 0)
-        sub_08049168(p, 0);
+        TetherActor_SetState(p, 0);
     {
         u16 *q = (u16 *)(p + 0x136);
         u32 v = *q;
@@ -19,7 +19,7 @@ void sub_0804B5E4(u8 *p)
         *q = m;
         *(u16 *)(p + 0x38A) = z;
     }
-    sub_08049234(p);
+    TetherActor_SetEntry(p);
     if (!(gUnk_030053F4 & 0x200)) {
         if (p[0x1A] != 9) {
             u16 *r3 = (u16 *)(p + 0x3FC);

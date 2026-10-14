@@ -1,9 +1,9 @@
-#include "global.h"
+#include "tether_actor.h"
 extern u8 *gUnk_02000488;
-u8 *sub_08049B6C(void)
+struct ContactPosition *TetherActor_GetPosition(void)
 {
-    u8 *p = gUnk_02000488;
+    struct TetherActor *p = (struct TetherActor *)gUnk_02000488;
     if (!p)
         return 0;
-    return p + 0x50;
+    return &p->position;
 }

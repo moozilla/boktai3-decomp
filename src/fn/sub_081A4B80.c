@@ -11,15 +11,15 @@ struct A {
     s16 pad;
     s16 y;
 };
-struct P *sub_08049B6C(void);
+struct P *TetherActor_GetPosition(void);
 s32 Math_Atan2(s32, s32);
-void sub_0804A0CC(s32, s32);
+void TetherActor_RequestKindNineAction(s32, s32);
 
 void sub_081A4B80(struct A *p)
 {
-    struct P *q = sub_08049B6C();
+    struct P *q = TetherActor_GetPosition();
     s32 dx = q->x - p->x;
     s32 dy = q->y - p->y;
     if (dx * dx + dy * dy <= 0xFFFF)
-        sub_0804A0CC(0x80, Math_Atan2(dx, dy));
+        TetherActor_RequestKindNineAction(0x80, Math_Atan2(dx, dy));
 }

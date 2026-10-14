@@ -1,8 +1,8 @@
-#include "global.h"
+#include "tether_actor.h"
 extern u8 *gUnk_02000488;
-void sub_08049E48(u32 a)
+void TetherActor_SetParameter(u32 a)
 {
-    u8 *p = gUnk_02000488;
+    struct TetherActor *p = (struct TetherActor *)gUnk_02000488;
     if (p)
-        *(s16 *)(p + 0x408) = a;
+        p->parameter = a;
 }

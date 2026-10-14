@@ -1,5 +1,5 @@
 #include "global.h"
-s32 sub_08049818(u32 a, u32 b, u32 c, u32 d)
+s32 TetherActor_TestMatchingStatus(u32 a, u32 b, u32 c, u32 d)
 {
     s32 r;
     if (b & 4) {

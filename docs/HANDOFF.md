@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 23.917% matching (2026-10-14). This file is the single
+Last updated after reaching 23.978% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,53 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex): tether entry, interaction and script controls
+
+Exact code is **23.978%**, up **0.0608 percentage points** (+1,468 bytes)
+from eleven new functions. There are **6,490 / 11,471 functions** and
+**579,146 / 2,415,354 bytes**. Without register pinning: **19.533%**;
+Register-pinned: **4.445%**, included above. Seventy-five guarded drafts remain.
+
+The **08049168–0804945C** entry/state subsection is completely exact:
+mirrored heading selection, cardinal-sector entry selection, kind dispatch,
+pending effect, interaction-state selection and auxiliary terrain setup, plus
+three typed existing helpers. Five further matches cover external status
+cleanup, interaction eligibility/effect cooldowns, directed-state heading and
+scripted transforms through **0804A3AC**. Twenty-seven existing public helpers
+have provisional descriptive names and complete extent checks. The shared
+actor view now includes state/frame, path target/cache, registration, status
+flags/tag, cooldowns, display/origin positions and directed-state fields.
+
+The **3E4 byte is a bitmask**, correcting the earlier `effectsSuppressed`
+field name to `statusFlags`. The path probe's script target at 410 is not XYZ
+hitbox bounds. The state selector intentionally updates global 02000488 while
+probing the passed actor. Script transform input replaces Y with map slope
+height. Several public methods deliberately retain exact byte/word views.
+See [interaction notes](../notes/tether-interaction_2026-10-14.md) for contracts,
+limits and the retained drafts.
+
+**4945C slope movement (77.4%, 904 bytes)** and **49840 nearby interaction
+(65.6%, 764 bytes)** are now guarded readable drafts, with **no exact credit**.
+The nearby test combines a 220-unit X/Z radius, state/status compatibility,
+adjacent-cell Y tolerance 255 and orthogonal slope-route tolerance 127.
+No explicit r7 bindings or handwritten instruction bodies. Eight new matches
+retain minimized concessions; three (424 bytes) need no hints.
+
+The combined build printed **`build/boktai3.gba: OK`** in
+`build/tether-interaction-combined.log`. **52 complete post-promotion extent checks**
+cover all exact users of the actor header plus external status cleanup.
+Format, inventory, RAM literals, registry, ten resource archives and text bank
+checks pass. No new emulator claims. Main's PR 124 CI passed at **16086cb4**.
+Claude's **PR 125** is incorporated: Centaur subtitles, Live studio link,
+bookmarks and capture analysis. These play tools and palette annotations do
+not change the default C/ROM pipeline; see [CENTAUR.md](CENTAUR.md).
+
+Continue at **0804A430** (kind/script initialization), then **4A4C8, 4A600,
+4A700** and the following state callbacks. The first initializer is already
+exact in ignored scratch work (152 bytes); the others have typed candidates.
+Continue toward **25% exact or 60% usage remaining**; latest allowance is
+**75% remaining**. Claude's separate checkout owns main.
 
 ## October 14 (Codex): complete tether emissions, palette and moving effects
 

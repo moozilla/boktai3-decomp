@@ -1,10 +1,10 @@
-#include "global.h"
+#include "tether_actor.h"
 extern u8 *gUnk_02000488;
-void sub_08049168(u8 *, u32);
+void TetherActor_SetState(u8 *, u32);
 struct P {
     u16 x, y, z, w;
 };
-void sub_08049FFC(struct P *a)
+void TetherActor_SetPosition(struct P *a)
 {
     u8 *p = gUnk_02000488;
     if (p) {

@@ -1,11 +1,11 @@
-#include "global.h"
+#include "tether_actor.h"
 extern u8 *gUnk_02000488;
-s32 sub_08049E24(void)
+s32 TetherActor_GetParameter(void)
 {
-    u8 *p = gUnk_02000488;
+    struct TetherActor *p = (struct TetherActor *)gUnk_02000488;
     s32 r;
     if (p)
-        r = *(s16 *)(p + 0x408);
+        r = p->parameter;
     else
         r = -1;
     return r;

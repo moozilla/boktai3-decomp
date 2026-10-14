@@ -1,8 +1,8 @@
-#include "global.h"
+#include "tether_actor.h"
 extern u8 *gUnk_02000488;
-void sub_08049CB8(u32 a)
+void TetherActor_RequestPaletteBlend(u32 a)
 {
-    u8 *p = gUnk_02000488;
+    struct TetherActor *p = (struct TetherActor *)gUnk_02000488;
     if (p)
-        p[0x472] = a;
+        p->blendRequested = a;
 }

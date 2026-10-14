@@ -131,7 +131,7 @@ static inline int targetNear(struct Context *m, struct Actor *p)
 done:
     return result;
 }
-struct Vec *sub_08049B6C(void);
+struct Vec *TetherActor_GetPosition(void);
 void sub_08030228(struct Context *m, struct Actor *p)
 {
     int close;
@@ -148,7 +148,7 @@ void sub_08030228(struct Context *m, struct Actor *p)
         int flag = *firstMode;
         s8 *mode = firstMode;
         if (flag) {
-            struct Vec *q = sub_08049B6C();
+            struct Vec *q = TetherActor_GetPosition();
             int nearby = 0;
             if (q) {
                 struct Vec *pos = &p->pos;
