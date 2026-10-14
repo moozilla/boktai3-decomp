@@ -933,3 +933,4 @@ addr,name,mode,confidence,source,notes
 0824DA3C,__errno,thumb,low,src-alias,
 0824DA48,memcpy,thumb,low,src-alias,
 0824DAA8,memset,thumb,low,src-alias,
+08228548,Clock_DaysInMonth,thumb,low,manual,"days in month; February uses the Gregorian leap-year rule"
