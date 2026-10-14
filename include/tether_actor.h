@@ -26,8 +26,9 @@ struct TetherActor {
         struct TetherPaletteView colors;
     } display;
     u8 unknown120[0xB8];
-    u8 interactionProbe[0x7C];
-    u8 unknown254, state;
+    u8 interactionProbe[0x6C];
+    u8 auxiliaryRegistration[0x10];
+    u8 auxiliaryRegistered, state;
     u16 stateFrame;
     u8 unknown258[8];
     u8 heading, unknown261[3];
@@ -52,10 +53,7 @@ struct TetherActor {
     struct ContactPosition interactionTarget;
     u8 unknown418[0x1C];
     struct ContactPosition auxiliaryOrigin;
-    u8 unknown43C[0xC];
-    u8 unknown448[0xC];
-    u8 auxiliaryRegistered;
-    u8 unknown455[0x19];
+    u8 unknown43C[0x32];
     u16 blendHold;
     u8 unknown470[2];
     u8 blendRequested, unknown473[9];
