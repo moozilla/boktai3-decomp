@@ -1,16 +1,27 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 typedef struct State {
     u8 pad0[0x90];
     u32 tick;
-    s16 hp, maxHp;
+    s16 hp;
+    s16 maxHp;
     u16 extra;
-    u8 vulnerable, kind;
+    u8 vulnerable;
+    u8 kind;
     u32 flags;
     u8 unknownA0[2];
-    u8 unknownA2, unknownA3;
+    u8 unknownA2;
+    u8 unknownA3;
     u32 unknownA4;
-    u8 facing, facing8, animation, state, mode, submode, phase, finished, enter, changed;
+    u8 facing;
+    u8 facing8;
+    u8 animation;
+    u8 state;
+    u8 mode;
+    u8 submode;
+    u8 phase;
+    u8 finished;
+    u8 enter;
+    u8 changed;
     u8 padB2[0x12];
     u32 elapsed;
     u8 padC8[0x38];
@@ -34,6 +45,7 @@ static inline u8 enter(State *p)
 }
 void sub_08023F98(State *p)
 {
+    int bit;
     {
         u32 next = 6;
         u32 zero;
@@ -46,13 +58,13 @@ void sub_08023F98(State *p)
         u32 k = 9;
         p->animation = k;
     }
-    (*(void (**)(void *))((u8 *)p + 0x108))(p);
+    (*((void (**)(void *))(((u8 *)p) + 0x108)))(p);
     p->animation = 0;
     {
         u32 *flags = &p->flags;
-        register u32 mask asm("r1") = ~0x40u;
-        asm("" : : "r"(flags), "r"(mask));
-        p->flags &= ~0x40;
+        u32 mask = ~0x40u;
+        bit = 0x40;
+        p->flags &= ~bit;
     }
     ((u8 *)p)[0x383] = 0;
 }
