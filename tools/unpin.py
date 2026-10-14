@@ -50,6 +50,22 @@ def strip(text):
     return text
 
 
+RAM_ARRAY = re.compile(r"^extern\s+(?:const\s+)?(\w+)\s+(gUnk_0([234])[0-9A-F]{6})\s*\[\s*\]\s*;", re.M)
+
+
+def literalize(text):
+    """Use literal addresses for RAM arrays (gUnk_02xxxxxx[] etc.): a constant
+    address is loaded by reload, which can move later reload registers."""
+    for typ, sym, _ in RAM_ARRAY.findall(text):
+        addr = sym[5:]
+        text = re.sub(r"(?<!extern )(?<![\w ]" + typ + r" )\b" + sym + r"\b(?!\s*\[\s*\]\s*;)",
+                      f"(({typ} *)0x{addr})", text)
+    return text
+
+
+VARIANTS = [("strip", strip), ("strip+literal", lambda t: literalize(strip(t)))]
+
+
 def check(path, text):
     # keep the file in its own directory so relative includes keep working
     fd, tmp = tempfile.mkstemp(suffix=".c", prefix=".unpin_", dir=path.parent)
@@ -81,13 +97,20 @@ def main():
 
     def one(p):
         text = p.read_text()
-        new = strip(text)
-        if new == text:
+        if strip(text) == text:
             return p, None, "no hints"
-        ok, msg = check(p, new)
-        if ok and a.write:
-            p.write_text(new)
-        return p, ok, msg
+        msgs = []
+        for name, fn in VARIANTS:
+            new = fn(text)
+            if name != "strip" and new == strip(text):
+                continue
+            ok, msg = check(p, new)
+            msgs.append(f"{name}: {msg}")
+            if ok:
+                if a.write:
+                    p.write_text(new)
+                return p, True, "; ".join(msgs)
+        return p, False, "; ".join(msgs)
 
     n = 0
     with ThreadPoolExecutor(a.j) as ex:
