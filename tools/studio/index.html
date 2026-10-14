@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boktai 3 Studio</title>
+<style>
+:root {
+  --bg: #f6f3ec; --panel: #fffdf8; --ink: #2b2620; --muted: #7d7468; --line: #e3dccf;
+  --accent: #b5462f; --accent-ink: #fff; --sel: #f3e3d6; --edited: #2f7d4f; --tag: #6b5fb5;
+  --screen: #fff7df; --glyph1: #8c3a2e; --glyph2: #c27a62; --glyph3: #e4b9a3;
+  --weight1: #e8202a; --weight2: #f07a70; --weight3: #f7b9b0;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1b1916; --panel: #24211d; --ink: #ece6dc; --muted: #9a9083; --line: #3a352e;
+    --accent: #e0745a; --accent-ink: #1b1916; --sel: #3a2c25; --edited: #6cc596; --tag: #a99ff0;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Hiragino Sans", sans-serif; }
+header { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--panel); }
+header h1 { font-size: 16px; margin: 0; letter-spacing: .02em; }
+header .sp { flex: 1; }
+button { font: inherit; border: 1px solid var(--line); background: var(--panel); color: var(--ink); padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+button:disabled { opacity: .5; cursor: default; }
+main { display: grid; grid-template-columns: minmax(280px, 380px) 1fr; height: calc(100vh - 53px); }
+#side { border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
+#filters { padding: 10px; display: flex; flex-direction: column; gap: 6px; border-bottom: 1px solid var(--line); }
+input[type=search] { width: 100%; padding: 7px 10px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; }
+#count { color: var(--muted); font-size: 12px; }
+#list { overflow-y: auto; flex: 1; }
+.row { padding: 6px 10px; border-bottom: 1px solid var(--line); cursor: pointer; display: flex; gap: 8px; }
+.row:hover { background: var(--sel); }
+.row.on { background: var(--sel); box-shadow: inset 3px 0 var(--accent); }
+.row .id { color: var(--muted); font-variant-numeric: tabular-nums; min-width: 3.4em; font-size: 12px; padding-top: 1px; }
+.row .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.row .e { color: var(--edited); font-size: 11px; }
+#edit { padding: 16px 20px; overflow-y: auto; min-width: 0; }
+#edit h2 { font-size: 15px; margin: 0 0 10px; display: flex; gap: 10px; align-items: baseline; }
+#edit h2 small { color: var(--muted); font-weight: normal; }
+label { display: block; font-size: 12px; color: var(--muted); margin: 14px 0 4px; }
+textarea { width: 100%; min-height: 90px; font: 15px/1.5 ui-monospace, "SF Mono", Menlo, monospace; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); resize: vertical; }
+.orig { font: 13px/1.5 ui-monospace, Menlo, monospace; color: var(--muted); white-space: pre-wrap; word-break: break-all; background: var(--panel); border: 1px dashed var(--line); padding: 8px 10px; border-radius: 6px; }
+#screen { background: var(--screen); border-radius: 6px; padding: 12px; display: inline-block; max-width: 100%; overflow-x: auto; border: 1px solid var(--line); }
+canvas { image-rendering: pixelated; display: block; }
+.actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
+#msg { font-size: 13px; }
+#msg.err { color: #c0392b; }
+#msg.ok { color: var(--edited); }
+.tags { margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap; }
+.tags span { font: 12px ui-monospace, Menlo, monospace; color: var(--tag); border: 1px solid var(--line); border-radius: 10px; padding: 1px 8px; }
+.widths { font-size: 12px; color: var(--muted); margin-top: 6px; }
+pre#log { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 8px; font-size: 12px; max-height: 220px; overflow: auto; white-space: pre-wrap; display: none; }
+.help { font-size: 12px; color: var(--muted); margin-top: 18px; }
+.help code { font-size: 12px; }
+@media (max-width: 760px) {
+  main { grid-template-columns: 1fr; height: auto; }
+  #side { height: 45vh; border-right: 0; border-bottom: 1px solid var(--line); }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Boktai 3 Studio · Text</h1>
+  <span class="sp"></span>
+  <span id="dirty" style="color:var(--muted);font-size:12px"></span>
+  <button id="build" class="primary" title="make mod → build/mod.gba">Build mod ROM</button>
+</header>
+<main>
+  <section id="side">
+    <div id="filters">
+      <input id="q" type="search" placeholder="Search text, or #id" autocomplete="off">
+      <label style="margin:0;display:flex;gap:6px;align-items:center;color:var(--ink);font-size:13px">
+        <input id="onlyEdited" type="checkbox"> Edited only
+      </label>
+      <div id="count"></div>
+    </div>
+    <div id="list"></div>
+  </section>
+  <section id="edit">
+    <h2><span id="title">Select a string</span><small id="sub"></small></h2>
+    <label>Original</label>
+    <div class="orig" id="orig"></div>
+    <label for="ed">Text <span style="font-weight:normal">(escapes: <code>\n</code> newline, <code>{XXXX}</code> glyph code)</span></label>
+    <textarea id="ed" spellcheck="false" disabled></textarea>
+    <label>Preview (game font; tags not drawn, &lt;WEIGHT&gt; in red; wraps at
+      <input id="boxw" type="number" min="64" max="480" step="8" value="240" style="width:4.5em;font:inherit;padding:1px 4px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--ink)"> px, as the game does)</label>
+    <div id="screen"><canvas id="cv" width="240" height="32"></canvas></div>
+    <div class="widths" id="widths"></div>
+    <div class="tags" id="tags"></div>
+    <div class="actions">
+      <button id="save" class="primary" disabled>Save</button>
+      <button id="revert" disabled>Revert to original</button>
+      <span id="msg"></span>
+    </div>
+    <pre id="log"></pre>
+    <p class="help">Saves go to <code>build/text/bank.tsv</code>; <b>Build mod ROM</b> runs <code>make mod</code> and writes <code>build/mod.gba</code>.
+      Strings may grow: later data moves automatically. Characters must exist in the game font (<code>data/charmap.tsv</code>); ASCII uses the half-width font.</p>
+  </section>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+let strings = [], byId = new Map(), original = {}, inverse = new Map(), font = null, cur = null;
+const SCALE = 2;
+
+async function load() {
+  const [s, o, cm, f] = await Promise.all([
+    fetch('/api/strings').then(r => r.json()),
+    fetch('/api/original').then(r => r.json()),
+    fetch('/api/charmap').then(r => r.json()),
+    fetch('/api/font').then(r => r.arrayBuffer()),
+  ]);
+  strings = s; original = o; font = new Uint8Array(f);
+  for (const st of strings) byId.set(st.id, st);
+  for (const [code, ch] of Object.entries(cm)) inverse.set(ch, parseInt(code, 16));
+  render();
+  const h = parseInt(location.hash.slice(1));
+  if (byId.has(h)) select(h);
+}
+
+function plain(t) { return t.replace(/<[^>]*>/g, '').replace(/\\n/g, ' ⏎ '); }
+
+function render() {
+  const q = $('q').value.trim(), only = $('onlyEdited').checked;
+  let hits = strings;
+  if (only) hits = hits.filter(s => s.edited);
+  if (q.startsWith('#')) {
+    const n = parseInt(q.slice(1));
+    hits = isNaN(n) ? hits : hits.filter(s => String(s.id).startsWith(String(n)));
+  } else if (q) {
+    hits = hits.filter(s => s.text.includes(q) || plain(s.text).includes(q));
+  }
+  const shown = hits.slice(0, 400);
+  $('count').textContent = `${hits.length.toLocaleString()} of ${strings.length.toLocaleString()} strings` + (hits.length > shown.length ? ' (first 400 shown)' : '');
+  const frag = document.createDocumentFragment();
+  for (const s of shown) {
+    const d = document.createElement('div');
+    d.className = 'row' + (cur === s.id ? ' on' : '');
+    d.dataset.id = s.id;
+    d.innerHTML = `<span class="id">#${s.id}</span><span class="t"></span>${s.edited ? '<span class="e">edited</span>' : ''}`;
+    d.querySelector('.t').textContent = plain(s.text) || '(empty)';
+    frag.appendChild(d);
+  }
+  $('list').replaceChildren(frag);
+  $('dirty').textContent = `${strings.filter(s => s.edited).length} edited`;
+}
+
+$('list').addEventListener('click', e => {
+  const r = e.target.closest('.row');
+  if (r) select(+r.dataset.id);
+});
+$('q').addEventListener('input', render);
+$('onlyEdited').addEventListener('change', render);
+
+function select(id) {
+  cur = id;
+  const s = byId.get(id);
+  $('title').textContent = `#${id}`;
+  $('sub').textContent = s.edited ? 'edited' : '';
+  $('orig').textContent = original[id] ?? '';
+  $('ed').value = s.text; $('ed').disabled = false;
+  $('save').disabled = true; $('revert').disabled = !s.edited;
+  $('msg').textContent = '';
+  history.replaceState(null, '', '#' + id);
+  for (const r of document.querySelectorAll('.row')) r.classList.toggle('on', +r.dataset.id === id);
+  preview();
+}
+
+// Same token rules as tools/datafmt/text_bank.py encode_string.
+function tokens(s) {
+  const out = [], re = /\\x([0-9a-fA-F]{2})|\\(.)|(\{[^}]*\})|(<[^>]*>)|([\s\S])/g;
+  let m;
+  while ((m = re.exec(s))) {
+    if (m[1]) out.push({ byte: parseInt(m[1], 16) });
+    else if (m[2]) out.push(m[2] === 'n' ? { nl: true } : { byte: (m[2] === 't' ? 9 : m[2].charCodeAt(0)) });
+    else if (m[3]) {
+      if (/^\{[0-9A-F]{4}\}$/.test(m[3])) out.push({ glyph: parseInt(m[3].slice(1, -1), 16) });
+      else if (inverse.has(m[3])) out.push({ glyph: inverse.get(m[3]) });
+      else out.push({ error: `unknown glyph name ${m[3]}` });
+    } else if (m[4]) out.push({ tag: m[4] });
+    else {
+      const c = m[5];
+      if (c.charCodeAt(0) < 0x80) out.push({ byte: c.charCodeAt(0) });
+      else if (inverse.has(c)) out.push({ glyph: inverse.get(c) });
+      else out.push({ error: `“${c}” is not in the game font` });
+    }
+  }
+  return out;
+}
+
+const PALETTE = weight => {
+  const cs = getComputedStyle(document.documentElement), p = weight ? '--weight' : '--glyph';
+  return [null, cs.getPropertyValue(p + '1'), cs.getPropertyValue(p + '2'), cs.getPropertyValue(p + '3')];
+};
+
+function drawTile(ctx, off, x, y, colors) {
+  for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+    const v = (font[off + r * 4 + (c >> 1)] >> (4 * (c & 1))) & 15;
+    if (v >= 1 && v <= 3) { ctx.fillStyle = colors[v]; ctx.fillRect(x + c, y + r, 1, 1); }
+  }
+}
+
+function preview() {
+  const toks = tokens($('ed').value);
+  const errs = toks.filter(t => t.error).map(t => t.error);
+  const box = Math.max(64, +$('boxw').value || 240);
+  const adv = t => t.glyph !== undefined ? 16 : t.byte !== undefined && t.byte >= 0x20 ? 8 : 0;
+  // Lay out: explicit \n breaks, and the game's wrap when a glyph would cross the box edge.
+  const lines = [[]], widths = [0];
+  let weight = false;
+  for (const t of toks) {
+    if (t.tag) { if (/^<\/?WEIGHT>$/.test(t.tag)) weight = !t.tag.startsWith('</'); continue; }
+    if (t.nl) { lines.push([]); widths.push(0); continue; }
+    const w = adv(t);
+    if (w && widths[widths.length - 1] + w > box) { lines.push([]); widths.push(0); }
+    lines[lines.length - 1].push({ ...t, weight });
+    widths[widths.length - 1] += w;
+  }
+  const W = box, H = lines.length * 16;
+  const cv = $('cv'), ctx = cv.getContext('2d');
+  cv.width = W; cv.height = H; cv.style.width = W * SCALE + 'px'; cv.style.height = H * SCALE + 'px';
+  ctx.clearRect(0, 0, W, H);
+  const pal = [PALETTE(false), PALETTE(true)];
+  lines.forEach((l, i) => {
+    let x = 0; const y = i * 16;
+    for (const t of l) {
+      const colors = pal[t.weight ? 1 : 0];
+      if (t.glyph !== undefined) {
+        const o = 0x200C + t.glyph * 128;
+        [[0, 0], [8, 0], [0, 8], [8, 8]].forEach(([dx, dy], k) => drawTile(ctx, o + k * 32, x + dx, y + dy, colors));
+        x += 16;
+      } else if (t.byte !== undefined && t.byte >= 0x20 && t.byte < 0xA0) {
+        const o = 0xC + (t.byte - 0x20) * 64;
+        drawTile(ctx, o, x, y, colors); drawTile(ctx, o + 32, x, y + 8, colors);
+        x += 8;
+      }
+    }
+  });
+  $('widths').textContent = `${lines.length} line${lines.length > 1 ? 's' : ''}: ` + widths.map(w => w + ' px').join(' · ');
+  $('tags').replaceChildren(...toks.filter(t => t.tag).map(t => Object.assign(document.createElement('span'), { textContent: t.tag })));
+  $('msg').className = errs.length ? 'err' : '';
+  $('msg').textContent = errs[0] || '';
+  const s = byId.get(cur);
+  $('save').disabled = !s || errs.length > 0 || $('ed').value === s.text;
+}
+
+$('boxw').addEventListener('input', () => cur !== null && preview());
+$('ed').addEventListener('input', preview);
+$('ed').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey && !e.metaKey && !e.ctrlKey) { e.preventDefault(); document.execCommand('insertText', false, '\\n'); }
+  if (e.key === 's' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); if (!$('save').disabled) save(); }
+});
+
+async function save(text) {
+  const s = byId.get(cur);
+  const value = text ?? $('ed').value;
+  const r = await fetch('/api/string', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: cur, text: value }) });
+  const j = await r.json();
+  if (!r.ok) { $('msg').className = 'err'; $('msg').textContent = j.error; return; }
+  s.text = value; s.edited = value !== original[cur];
+  render(); select(cur);
+  $('msg').className = 'ok'; $('msg').textContent = 'Saved';
+}
+$('save').onclick = () => save();
+$('revert').onclick = () => save(original[cur]);
+
+$('build').onclick = async () => {
+  const b = $('build'); b.disabled = true; b.textContent = 'Building…';
+  $('log').style.display = 'block'; $('log').textContent = 'make mod…';
+  try {
+    const j = await fetch('/api/build', { method: 'POST' }).then(r => r.json());
+    $('log').textContent = (j.ok ? '✓ build/mod.gba written\n\n' : '✗ build failed\n\n') + j.log;
+  } finally { b.disabled = false; b.textContent = 'Build mod ROM'; }
+};
+
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => cur !== null && preview());
+load();
+</script>
+</body>
+</html>
