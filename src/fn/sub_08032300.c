@@ -6,22 +6,27 @@ struct Game {
     u32 flags;
 };
 extern struct Game *gUnk_02000710;
-// MATCHING_CONCESSION: register-pinning
 int sub_08032300(void)
 {
     int v = gUnk_02000710->form;
     int result;
-    if (v == 1)
+    if (v == 1) {
         goto fallback;
-    if (v > 1)
+    }
+    if (v > 1) {
         goto fallback;
-    if (v != 0)
+    }
+    if (v != 0) {
         goto fallback;
+    }
     result = 31;
-    asm("" : "+r"(result));
+    v = 1;
+    if (v) {
+    }
     goto done;
 fallback:
     result = 32;
+
 done:
     return result;
 }

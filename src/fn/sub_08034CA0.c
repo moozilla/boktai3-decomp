@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Engine {
     u8 pad0[0x18];
@@ -54,25 +53,26 @@ int sub_08034CA0(struct Engine *p)
     }
     raw = sub_082236C8(0, 0, 600, gUnk_0824DE60);
     {
-        register int narrowed asm("r1") = raw;
-        asm("" : "+r"(narrowed));
+        int narrowed = raw;
         status = (u8)narrowed;
     }
-    if (!status)
+    if (!status) {
         goto success;
+    }
     setOperation(p, 27, 0);
     result = -1;
     goto done;
+    result = raw;
+done:
+    return result;
+
 success: {
-    register int operation asm("r1") = 8;
-    register int one asm("r1");
+    int operation = 8;
+    int one;
     p->flag = status;
     p->operation = operation;
     p->ticks = status;
     one = 1;
     p->pending = one;
 }
-    result = raw;
-done:
-    return result;
 }

@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -82,12 +81,15 @@ int sub_0802E5E8(void)
 {
     void *m = gUnk_02000480;
     struct Actor *p;
-    register int mode asm("r0");
-    if (!m)
+    int mode;
+    struct Actor **alias;
+    if (!m) {
         return -1;
+    }
     p = sub_0802D6D0(m, Script_GetKeywordValue(0x6e, 0));
-    if (!p)
+    if (!p) {
         return -1;
+    }
     {
         u8 *controlled = &p->controlled;
         int zero;
@@ -96,27 +98,34 @@ int sub_0802E5E8(void)
         mode = Script_GetKeywordValue(0x69, 0);
         {
             u32 command = mode;
+            alias = &p;
             switch (command) {
                 default:
                     break;
-                case 0: {
-                    int one = 1;
-                    p->stage = command;
-                    p->phase = command;
-                    p->state = one;
-                    p->ticks = command;
-                    p->entered = one;
-                    break;
-                }
+
+                case 0:
+                    /* if (1) only keeps agbcc's block layout */
+                    if (1) {
+                    }
+                    {
+                        int one = 1;
+                        (*alias)->stage = command;
+                        (*alias)->phase = command;
+                        p->state = one;
+                        p->ticks = command;
+                        p->entered = one;
+                        break;
+                    }
+
                 case 1:
-                    p->stage = zero;
-                    p->phase = zero;
-                    p->state = zero;
+                    (*alias)->stage = zero;
+                    (*alias)->phase = zero;
+                    (*alias)->state = zero;
                     p->ticks = zero;
-                    p->entered = command;
+                    (*alias)->entered = command;
                     break;
+                    return mode;
             }
         }
     }
-    return mode;
 }
