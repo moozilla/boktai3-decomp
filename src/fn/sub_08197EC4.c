@@ -25,15 +25,16 @@ void sub_08197EC4(struct Task08197EC4 *t)
     s32 n = sub_0821A3E8(t->channel, &m);
     for (; n > 0; n--, m++) {
         switch (*m->b) {
-        case 0:
-            t->flags &= ~1;
-            break;
-        case 1:
-            t->flags |= 1;
-            break;
+            case 0:
+                t->flags &= ~1;
+                break;
+            case 1:
+                t->flags |= 1;
+                break;
         }
     }
-    if (((t->flags & 2) || !(gUnk_0300523C & 7)) && (t->flags & 1) && (gUnk_03005260[1] & t->keys)) {
+    if (((t->flags & 2) || !(gUnk_0300523C & 7)) && (t->flags & 1) &&
+        (gUnk_03005260[1] & t->keys)) {
         if (t->script1)
             sub_0821AFB4(t->script1, t->args);
         if (t->script2)

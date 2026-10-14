@@ -20,36 +20,36 @@ void sub_08195A4C(void *, u32);
 void sub_0819627C(struct P0819627C *t)
 {
     switch (t->state) {
-    case 0:
-        sub_08193680(t, 0);
-        sub_08195014(t, 0x1e0, 0x500);
-        if (t->a < 0)
-            t->d = 0x800;
-        else if (t->a > 0)
-            t->d = 0x90;
-        else
-            t->d = 0;
-        t->state = 1;
-        Sound_PlaySongChecked(0x40b);
-    case 1:
-        t->a += t->d;
-        if (t->a > 0 && t->d > 0) {
-            t->a = 0;
-            t->d = 0;
-        } else if (t->a < 0 && t->d < 0) {
-            t->a = 0;
-            t->d = 0;
-        }
-        sub_08195078(t, 0x1e0, 0x500);
-        if (t->a == 0 && t->x == 0x1e0) {
-            t->x = 0x1e0;
-            t->b = 0;
-            t->e = 0;
-            if (t->x == 0x1e0 && t->y > 0x4fb && t->y <= 0x504) {
-                t->y = 0x500;
-                sub_08195A4C(t, 6);
+        case 0:
+            sub_08193680(t, 0);
+            sub_08195014(t, 0x1e0, 0x500);
+            if (t->a < 0)
+                t->d = 0x800;
+            else if (t->a > 0)
+                t->d = 0x90;
+            else
+                t->d = 0;
+            t->state = 1;
+            Sound_PlaySongChecked(0x40b);
+        case 1:
+            t->a += t->d;
+            if (t->a > 0 && t->d > 0) {
+                t->a = 0;
+                t->d = 0;
+            } else if (t->a < 0 && t->d < 0) {
+                t->a = 0;
+                t->d = 0;
             }
-        }
-        break;
+            sub_08195078(t, 0x1e0, 0x500);
+            if (t->a == 0 && t->x == 0x1e0) {
+                t->x = 0x1e0;
+                t->b = 0;
+                t->e = 0;
+                if (t->x == 0x1e0 && t->y > 0x4fb && t->y <= 0x504) {
+                    t->y = 0x500;
+                    sub_08195A4C(t, 6);
+                }
+            }
+            break;
     }
 }

@@ -6,6 +6,7 @@ address,isa,evidence,replacement_end
 08009E30,thumb,Independent 12-byte global-pointer clear after directional script return and literal pool,08009E3C
 0800A800,thumb,Independent 12-byte effect manager global-pointer clear following collision controller teardown,0800A80C
 0800CBA0,thumb,Independent global manager reset after allocator return and pool; exact 12-byte C body,0800CBAC
+08013BDC,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched),08013C14
 08015B1C,thumb,Independent exact 104-byte fan emission wrapper inside retained byte tail,08015B84
 08015C90,thumb,Independent exact 96-byte angled burst wrapper inside retained byte tail,08015CF0
 08019C64,thumb,Independent animation-frame wrapper in byte tail; exact C body,08019C9C
@@ -17,8 +18,12 @@ address,isa,evidence,replacement_end
 08020F48,thumb,Independent 36-byte scene-message activity query after signal-consumption return; exact C,08020F6C
 080216D8,thumb,Independent motion-offset setter after callback registration return and literal; exact 16-byte C body,080216E8
 08021BC0,thumb,Independent available-position query after event-script return and literals; exact 36-byte C body,08021BE4
+08028DFC,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08028E18
+0802CCE0,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0802CD04
 0802CED0,thumb,Independent 40-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md,
 0802CEF8,thumb,Independent 24-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md,
+0802D05C,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0802D080
+0802D960,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0802D96C
 08180898,thumb,Independent 28-byte callback-clear helper (push/pop-bx) after preceding return; exact standalone C,081808B4
 08197AE0,thumb,Independent 76-byte palette-hold task constructor (own push/pop-bx and literal pool) after sub_08197A50; exact standalone C,08197B2C
 08197C20,thumb,Independent 56-byte palette-cycle constructor for an anim (push/pop-bx; literal pool) after sub_08197B7C helpers; exact standalone C,08197C58

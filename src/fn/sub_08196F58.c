@@ -31,56 +31,56 @@ void Sound_PlaySongChecked(u32);
 void sub_08196F58(struct P08196F58 *t)
 {
     switch (t->state) {
-    case 0:
-        sub_08193680(t, 1);
-        t->pos.x = -0xd80;
-        t->pos.y = 0;
-        t->pos.z = 0x80;
-        t->pos.z = gUnk_02000710->positionZ + 0x80;
-        t->base = t->pos;
-        t->base.x = -0x680;
-        sub_08195014(t, t->base.x, t->base.z);
-        t->base.x += t->b >> 8;
-        t->base.z += t->c >> 8;
-        t->b = 0;
-        t->c = 0;
-        t->speed = 0;
-        t->state++;
-        Sound_PlaySongChecked(0x405);
-        break;
-    case 1: {
-        s32 x, z;
-        t->a += 0x3000;
-        x = t->a + t->b;
-        z = t->c;
-        sub_08195254(t);
-        t->pos.x = (x >> 8) + t->base.x;
-        t->pos.z = (z >> 8) + t->base.z;
-        if (t->a >= 0) {
+        case 0:
+            sub_08193680(t, 1);
+            t->pos.x = -0xd80;
+            t->pos.y = 0;
+            t->pos.z = 0x80;
+            t->pos.z = gUnk_02000710->positionZ + 0x80;
+            t->base = t->pos;
+            t->base.x = -0x680;
+            sub_08195014(t, t->base.x, t->base.z);
+            t->base.x += t->b >> 8;
+            t->base.z += t->c >> 8;
+            t->b = 0;
+            t->c = 0;
+            t->speed = 0;
             t->state++;
-            sub_08177DEC(7);
-            sub_082279A8(3, 4, 0x1f, 0x1f, 0x1f, 0xffff, 0);
+            Sound_PlaySongChecked(0x405);
+            break;
+        case 1: {
+            s32 x, z;
+            t->a += 0x3000;
+            x = t->a + t->b;
+            z = t->c;
+            sub_08195254(t);
+            t->pos.x = (x >> 8) + t->base.x;
+            t->pos.z = (z >> 8) + t->base.z;
+            if (t->a >= 0) {
+                t->state++;
+                sub_08177DEC(7);
+                sub_082279A8(3, 4, 0x1f, 0x1f, 0x1f, 0xffff, 0);
+            }
+            break;
         }
-        break;
-    }
-    case 2: {
-        s32 x, z;
-        t->a += 0x3000;
-        x = t->a + t->b;
-        z = t->c;
-        sub_08195254(t);
-        t->pos.x = (x >> 8) + t->base.x;
-        t->pos.z = (z >> 8) + t->base.z;
-        if (t->a > 0x2ffff)
-            t->state++;
-        break;
-    }
-    case 3:
-        sub_08159164(t->h7272);
-        sub_081D5204(0x41);
-        if (t->script)
-            Script_Call(t->script, 0);
-        Task_Kill(t);
-        break;
+        case 2: {
+            s32 x, z;
+            t->a += 0x3000;
+            x = t->a + t->b;
+            z = t->c;
+            sub_08195254(t);
+            t->pos.x = (x >> 8) + t->base.x;
+            t->pos.z = (z >> 8) + t->base.z;
+            if (t->a > 0x2ffff)
+                t->state++;
+            break;
+        }
+        case 3:
+            sub_08159164(t->h7272);
+            sub_081D5204(0x41);
+            if (t->script)
+                Script_Call(t->script, 0);
+            Task_Kill(t);
+            break;
     }
 }

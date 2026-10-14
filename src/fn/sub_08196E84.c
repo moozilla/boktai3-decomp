@@ -19,17 +19,16 @@ void Trigger_ConsumePending(void *, u32);
 void sub_08196E84(struct P08196E84 *t)
 {
     switch (t->state) {
-    case 0:
-        sub_08193680(t, 1);
-        t->x = -0x680;
-        t->pad = 0;
-        t->y = 0xb80;
-        sub_08195014(t, -0x680, 0xb80);
-        t->state++;
-        Sound_PlaySongChecked(0x40a);
-        break;
-    case 1:
-        {
+        case 0:
+            sub_08193680(t, 1);
+            t->x = -0x680;
+            t->pad = 0;
+            t->y = 0xb80;
+            sub_08195014(t, -0x680, 0xb80);
+            t->state++;
+            Sound_PlaySongChecked(0x40a);
+            break;
+        case 1: {
             s32 x, z;
             t->a -= 0x1000;
             x = t->a + t->b;
@@ -37,10 +36,10 @@ void sub_08196E84(struct P08196E84 *t)
             t->x = (x >> 8) - 0x680;
             t->y = (z >> 8) + 0xb80;
         }
-        if (t->a < -0x70000) {
-            t->state++;
-            Trigger_ConsumePending(t->queue, 1);
-        }
-        break;
+            if (t->a < -0x70000) {
+                t->state++;
+                Trigger_ConsumePending(t->queue, 1);
+            }
+            break;
     }
 }
