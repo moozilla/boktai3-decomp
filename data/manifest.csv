@@ -1,3 +1,13 @@
 name,start,end,format,file,description
 actor_registry,08603300,08604998,keyed_callbacks,data/actor_registry.csv,Script chara registry: string-hash key to actor/controller constructor (722 entries + sentinel)
 text_bank,08D6B1E4,08DD6B96,text_bank,build/text/bank.tsv,"Script text: gcx section words, entry table + strings and blobs (ROM-derived source, extracted on demand; strings may change length)"
+res_anm,08614DCC,08617084,resource_archive,build/res/anm/index.txt,"Resource archive anm (ROM-derived entries, extracted on demand; entries may change size)"
+res_map,08617084,087C4C98,resource_archive,build/res/map/index.txt,"Resource archive map (ROM-derived entries, extracted on demand; entries may change size)"
+res_tAE6C,087C4C98,088223C4,resource_archive,build/res/tAE6C/index.txt,"Resource archive tAE6C (ROM-derived entries, extracted on demand; entries may change size)"
+res_t92B3,088223C4,0883BDA8,resource_archive,build/res/t92B3/index.txt,"Resource archive t92B3 (ROM-derived entries, extracted on demand; entries may change size)"
+res_ptn,0883BDA8,089F8ED8,resource_archive,build/res/ptn/index.txt,"Resource archive ptn (ROM-derived entries, extracted on demand; entries may change size)"
+res_fnt,089F8ED8,08A2AF80,resource_archive,build/res/fnt/index.txt,"Resource archive fnt (ROM-derived entries, extracted on demand; entries may change size)"
+res_tCEAA,08A2AF80,08A2D944,resource_archive,build/res/tCEAA/index.txt,"Resource archive tCEAA (ROM-derived entries, extracted on demand; entries may change size)"
+res_t98F5,08A2D944,08BDDE08,resource_archive,build/res/t98F5/index.txt,"Resource archive t98F5 (ROM-derived entries, extracted on demand; entries may change size)"
+res_tCB05,08BDDE08,08D530DC,resource_archive,build/res/tCB05/index.txt,"Resource archive tCB05 (ROM-derived entries, extracted on demand; entries may change size)"
+res_t9B1B,08D530DC,08D5A85C,resource_archive,build/res/t9B1B/index.txt,"Resource archive t9B1B (ROM-derived entries, extracted on demand; entries may change size)"
