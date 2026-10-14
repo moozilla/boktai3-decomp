@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 23.671% matching (2026-10-14). This file is the single
+Last updated after reaching 23.746% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,41 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex): transient sprites and BG1 flash/scroll controller
+
+Exact code is **23.746%**, up **0.0757 percentage points** (+1,828 bytes)
+from thirteen new functions. There are **6,453 / 11,471 functions** and
+**573,558 / 2,415,354 bytes**. Without register pinning: **19.415%**;
+Register-pinned: **4.332%**, included above. Seventy-two guarded drafts remain.
+
+Both contiguous subsections are now fully exact. **08047338–080476F4** is a
+sixteen-slot transient sprite singleton: 0x58 slots, 0x598 list-10 task,
+velocity damping, twenty-five-update lifetime, rendering options and script
+spawning. The independent 252-byte wrapper at **080475F8** was hidden in the
+spawn routine's retained tail. Build/progress metadata now separates it; this
+adds one inventory function and no bytes to the denominator. Its defaults are
+**delay 24 / multiplier 256**.
+
+**080476F4–08047BB4** is a 0x48 list-9 BG1 flash/scroll controller with five
+visibility/page states, camera-relative offsets, randomized scroll speed and
+periodic forwarding of caller-supplied effect sources. Initialization and
+retargeting intentionally use different speed ranges. See
+[effects/BG notes](../notes/effects-background-flash_2026-10-14.md).
+
+Seven new functions use no hints; six retain minimized concessions. Twelve
+existing helpers/lifecycle functions now share the recovered layouts. The
+combined build printed **`build/boktai3.gba: OK`** in
+`build/effects-background-final-combined.log`; **34 post-promotion complete
+extent checks** passed, including nine renamed callers. Format, inventory,
+RAM literals and decoded actor registry pass. The existing death draft was
+rechecked separately and remains 97.0%, with no exact credit. No new emulator
+claims. PR 110 merged at cac70ac7; main CI 38607304813 passed.
+
+Next contiguous work starts **08047BB4**, a sixteen-entry temporary animation
+pool with a relocated resource and per-entry lifetime. Continue toward
+**25% exact or 60% usage remaining**; latest allowance reading is **79% remaining**.
+Claude's separate checkout owns main.
 
 ## October 14 (Codex): rotating contact actor and floating numbers
 

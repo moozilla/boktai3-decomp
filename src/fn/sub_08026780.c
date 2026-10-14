@@ -68,7 +68,7 @@ static inline void effect(u8 *p, int mode, int id, int duration)
         p[0x38c] = 0;
 }
 void SceneActors_UpdateAnimation(void *, void *, void *);
-void sub_08047B68(void *);
+void BackgroundFlash_BeginAlternating(void *);
 void sub_08026780(ActorAnimation *p, int tick)
 {
     ActorAnimation *p2 = p;
@@ -82,7 +82,7 @@ void sub_08026780(ActorAnimation *p, int tick)
         SceneActors_StartDirectionalAnimation(p, draw, resource, sequence, 2, 1, 0);
         *(u16 *)((u8 *)p + 0x254) = 2;
         SceneActors_UpdateAnimation(p, draw, resource);
-        sub_08047B68(*(void **)((u8 *)p + 0x9dc));
+        BackgroundFlash_BeginAlternating(*(void **)((u8 *)p + 0x9dc));
         if (*(u32 *)((u8 *)p + 0x358) == 1)
             Sound_PlaySongChecked(900);
         else

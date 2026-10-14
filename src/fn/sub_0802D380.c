@@ -13,7 +13,7 @@ struct Object {
 void sub_0802D020(struct Object *, int, int, struct Vec *);
 void sub_0802C954(struct Object *, int);
 void sub_0802D040(struct Object *);
-void sub_080474E4(int, int, struct Vec *, int, int, int);
+void TransientSpriteEffects_Spawn(int, int, struct Vec *, int, int, int);
 int sub_0802D380(struct Object *p)
 {
     int damage = p->damage;
@@ -25,7 +25,7 @@ int sub_0802D380(struct Object *p)
         sub_0802D020(p, damage, 0, &size);
         sub_0802C954(p, damage);
         if (p->health <= 0) {
-            sub_080474E4(0, 0, &p->pos, 0, 256, 256);
+            TransientSpriteEffects_Spawn(0, 0, &p->pos, 0, 256, 256);
             return 1;
         }
         sub_0802D040(p);

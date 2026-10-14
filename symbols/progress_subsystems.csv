@@ -98,6 +98,8 @@ Five-entry projected display (tentative),08045A20,08045D18,,Five animations with
 Sequence contact actor pool (tentative),08045D18,08046880,,Eight-slot state pool; health and resource colliders; terrain-aligned spawning hit jitter palette fade and death script; notes/contact-sequence-actor_2026-10-14.md
 Orbit contact actor (tentative),08046880,08046B28,,Rotating resource-contact sprite with expanding and contracting states; include/orbit_contact_actor.h; notes/orbit-number-display_2026-10-14.md
 Floating number display,08046B34,0804732C,,Four-group decimal glyph singleton keyed by collision source; priority reuse world projection bounce and removal; notes/orbit-number-display_2026-10-14.md
+Transient sprite effects,08047338,080476F4,,Sixteen 0x58 slots; velocity damping animation aging singleton spawning and hidden script wrapper; notes/effects-background-flash_2026-10-14.md
+BG1 flash and scrolling controller (tentative),080476F4,08047BB4,,Five visibility/page states; camera-relative dual-page scrolling randomized speed and periodic effect forwarding; notes/effects-background-flash_2026-10-14.md
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
 State actor kind 086121C4 (tentative),081C66F8,081CC690,symbols/proposed/state-actors.csv,96-state table gUnk_086121C4 (first 16 shared with 0x0802FD60-0x08030658); helpers 081C66F8-081C6B84 precede the handlers; include/state_actor.h
 Scripted message actor 08612344 (tentative),081CC690,081CD484,symbols/proposed/state-actors.csv,state table gUnk_08612344 and dispatcher 081CD43C; command states wait on scene messages; src/message_actor_08612344.c

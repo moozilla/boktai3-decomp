@@ -81,7 +81,7 @@ static inline void effect2(u8 *p, int mode, int id, int duration)
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
 void sub_08022AF4(void *);
-void sub_08047B58(void *);
+void BackgroundFlash_BeginAppearance(void *);
 #define U16(p, o) (*(u16 *)((u8 *)(p) + (o)))
 #define S16(p, o) (*(s16 *)((u8 *)(p) + (o)))
 #define U32(p, o) (*(u32 *)((u8 *)(p) + (o)))
@@ -133,7 +133,7 @@ void sub_08026488(ActorAnimation *p, int tick)
         p->flags |= mask;
         if (!p->reset(p)) {
             if (tick == 10)
-                sub_08047B58(*(void **)((u8 *)p2 + 0x9dc));
+                BackgroundFlash_BeginAppearance(*(void **)((u8 *)p2 + 0x9dc));
             if (U16(p2, 0x254) == 2 && !U16(p2, 0x24c))
                 Sound_PlaySongChecked(849);
             if (tick > S16(p2, 0x374))
