@@ -32,7 +32,7 @@ void AnimatedParticles_EmitOffset(struct Vec *pos, int unused, int type, int fla
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     {
         u32 offset = gUnk_03005308 * 2;
-        u8 *sample = (u8 *)(offset + 0x0203B400);
+        u8 *sample = (u8 *)(offset + RANDOM_TABLE_ADDR);
         s.v[10] = *sample;
     }
     s.v[11] = 0;
