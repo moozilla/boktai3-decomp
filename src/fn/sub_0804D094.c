@@ -2,7 +2,7 @@
 extern u32 gUnk_030053F4;
 void TetherActor_SetState(u8 *, s32);
 void TetherActor_SetEntry(u8 *, s32);
-void sub_0804B43C(u8 *);
+void TetherActor_UpdateLockedShake(u8 *);
 void TetherActor_UpdateShake(u8 *);
 void sub_0804CF5C(u8 *);
 void sub_0804D094(u8 *p)
@@ -17,7 +17,7 @@ void sub_0804D094(u8 *p)
     if ((gUnk_030053F4 & 0x200) == 0) {
         u32 v = *(u16 *)(p + 0x3fc);
         if (v != 0) {
-            sub_0804B43C(p);
+            TetherActor_UpdateLockedShake(p);
         } else if (*(u16 *)(p + 0x384) != 0) {
             *q = v;
             TetherActor_UpdateShake(p);

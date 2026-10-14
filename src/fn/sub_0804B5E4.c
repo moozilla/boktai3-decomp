@@ -1,43 +1,43 @@
-#include "global.h"
+#include "tether_actor.h"
 extern u32 gUnk_030053F4;
-void TetherActor_SetState(u8 *, u32);
-void TetherActor_SetEntry(u8 *);
-void sub_0804B43C(u8 *);
-void TetherActor_UpdateShake(u8 *);
-void sub_0804B58C(u8 *);
-void sub_0804B5E4(u8 *p)
+void TetherActor_SetState(struct TetherActor *, u32);
+void TetherActor_SetEntry(struct TetherActor *, u32);
+void TetherActor_UpdateLockedShake(struct TetherActor *);
+void TetherActor_UpdateShake(struct TetherActor *);
+void TetherActor_UpdateInteractionValue(struct TetherActor *);
+void TetherActor_UpdateIdleState(struct TetherActor *p)
 {
-    if (p[0x255] != 0)
+    if (p->state != 0)
         TetherActor_SetState(p, 0);
     {
-        u16 *q = (u16 *)(p + 0x136);
+        u16 *q = &p->chargeCollider.flags;
         u32 v = *q;
         u32 m = 0xFFFB;
         u32 z;
         m &= v;
         z = 0;
         *q = m;
-        *(u16 *)(p + 0x38A) = z;
+        p->glowMode = z;
     }
-    TetherActor_SetEntry(p);
+    TetherActor_SetEntry(p, 0);
     if (!(gUnk_030053F4 & 0x200)) {
-        if (p[0x1A] != 9) {
-            u16 *r3 = (u16 *)(p + 0x3FC);
+        if (p->kind != 9) {
+            u16 *r3 = &p->interactionLock;
             if (*r3 != 0) {
-                sub_0804B43C(p);
+                TetherActor_UpdateLockedShake(p);
             } else {
-                u32 v = *(u16 *)(p + 0x384);
+                u32 v = p->chargeReady;
                 if (v != 0) {
                     TetherActor_UpdateShake(p);
-                } else if (p[0x472] != 0) {
-                    u32 t = *(u16 *)(p + 0x3FA);
+                } else if (p->blendRequested != 0) {
+                    u32 t = p->secondaryMaximum;
                     u32 t2;
-                    *(u16 *)(p + 0x3F8) = t;
-                    t2 = *(u16 *)(p + 0x40E);
-                    *(u16 *)(p + 0x40C) = t2;
+                    p->secondaryValue = t;
+                    t2 = p->maximumValue;
+                    p->currentValue = t2;
                     *r3 = v;
                 } else {
-                    sub_0804B58C(p);
+                    TetherActor_UpdateInteractionValue(p);
                 }
             }
         }
