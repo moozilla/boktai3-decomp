@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 // Tentative: Turn toward the selected target by at most four angular units.
 struct Vec {
     s16 x, y, z, pad;
@@ -24,15 +23,16 @@ void sub_0802C8CC(struct Object *, int);
 void sub_0802CC94(struct Object *p)
 {
     if (p->target >= 0) {
-        register s8 *deltaPtr asm("r3") = (s8 *)&p->delta;
-        int delta, angle;
-        delta = *deltaPtr;
-        if (delta > 3)
+        s8 *deltaPtr = (s8 *)(&p->delta);
+        int delta;
+        int angle;
+        ;
+        if ((*deltaPtr) > 3) {
             angle = p->angle + 4;
-        else if (delta <= -4)
+        } else if ((*deltaPtr) <= (-4)) {
             angle = p->angle - 4;
-        else {
-            angle = *deltaPtr + p->angle;
+        } else {
+            angle = (*deltaPtr) + p->angle;
         }
         sub_0802C8CC(p, angle);
     }

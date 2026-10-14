@@ -22,7 +22,7 @@ Types whose extension is known (the type is the hash of the string):
 | `922E` | `anm` | `08614DCC` | 75 | animation scripts |
 | `92B3` | ? | `088223C4` | 195 | palettes: 20-byte header + 16 × 16 colours (532 B each) |
 | `9B1B` | ? | `08D530DC` | 1 | 30 KB blob |
-| `98F5` | ? | `08A2D944` | 1 | 1.7 MB blob (`count 0x17D` header; nested format not decoded) |
+| `98F5` | ? | `08A2D944` | 1 | 1.7 MB: 381 large sprites (enemies, props, boss parts; below) |
 | `A635` | `fnt` | `089F8ED8` | 1 | font |
 | `A8D9` | `gcx` | `08D5A85C` | — | compiled scripts, a single image (MGS's GCL file extension); not an archive (below) |
 | `AE6C` | ? | `087C4C98` | 528 | LZ77; decompressed header magic `HP` |
@@ -110,3 +110,80 @@ lookup, and map files show no registry keys above chance, so those entries are
 created another way (per-stage data not yet decoded) or are unused; the ROM
 also keeps Boktai 2 material (its title graphics in `E89F`). The procedure
 table covers the whole body, so no script code is unreachable from it.
+
+## Text and the font
+
+`tools/assets/text.py dump | find WORD` decodes the script string table
+(9,976 entries at `08D6B1F8`, base `08D74DDC`; bit 31 of an entry marks text).
+Bytes below `0x80` are ASCII (markup such as `<PROC=0>`, `<LABEL>`, `<ALTER>`,
+newlines); a lead byte `0x80`-`0x85` and the next byte form a glyph index
+(code - `0x8000`).
+
+The font (`fnt` resource) has a 12-byte header (`u16 0x80` ASCII glyphs, `u8 1`,
+`u8 6`, `u32 0xC` ASCII offset, `u32 0x200C` two-byte offset), 128 ASCII glyphs
+of 8x16 and 1,537 two-byte glyphs of 16x16, 4bpp as four 8x8 tiles (TL, TR,
+BL, BR); colour 4 is background, 1 the stroke and 2-3 shading. Kana and
+symbols come first (`0x001`-`0x0FF`), then kanji grouped by radical, with
+"PG" logo glyphs at `0x100`, `0x200`, ... `0x600`.
+
+`data/charmap.tsv` maps glyph indices to characters (1,326 entries). Kana and
+symbols were read by eye; kanji were ranked by template matching against
+Hiragino Kaku Gothic W7 at the glyph's ink box (IoU of blurred bitmaps, JIS
+level 1) and each confirmed or corrected by eye (`confidence` column: `high`,
+`match`, `low`). Every two-byte code used by the strings is mapped. Decoding
+exposed two misreads that context fixed (嗅 in 嗅覚, 冑 in 甲冑); expect a few
+more among the `low` entries.
+
+What the text shows: item, weapon, armour and bike-part names; the character
+list (#9818-#9833, including the cameos スネーク, リキッド, ソリダス); and the
+monster list (#9838-#9921: ポイズナー ... グール, ゾンビ, マミー, スケルトン,
+ゴーレム, ミミック, the elemental armours, スライム, 伯爵, and the bosses
+フレスベルグ, サバタ, ニーズホッグ, ラタトスク, ヴァナルガンド), followed by drop
+labels, elements (#9927-#9935), monster classes (ビースト, アンデッド, シング,
+ファントム, イモータル) and dungeon descriptions. Linking these names to the
+actor code (which kind is which monster) is the next step.
+
+## Large sprites (type `98F5`)
+
+`tools/assets/bigsprites.py list | index | sheet HASH [--palfile F]`. The
+single 1.7 MB entry holds 381 sprites: enemies, props (doors, chests, trees,
+traps) and boss parts. Actor code requests them by name with
+`ScriptProc_Start(0xCB05, name)` even though they are not in the `CB05`
+archive (for example `9247`, a shambling humanoid, from `sub_0808D1D8`), so
+the `CB05` lookup must also search this resource; the exact path is not yet
+traced. Layout (inferred): `+0x04` count, `+0x0C` pixel data start, `+0x10`
+frame table, `+0x14` part table; at `+0x18`, records of 12 bytes
+`{u32 name hash, u8 w, u8 h, u8 centre x, u8 centre y, u32 frame offset}`;
+frames of 12 bytes `{u8 parts, u8 tiles, u16 flags, u32 pixel offset,
+u32 part offset}`; parts of 4 bytes `{u8 size << 2 | shape, u8 flags, s8 x,
+s8 y}`, whose tiles follow each other in the frame's 4bpp pixel block.
+Matching these sprites to the monster names and actor kinds is open.
+
+### Enemy families and their sprites (tentative)
+
+Each enemy family in `0x08084F44`-`0x080FE68C` loads one large sprite by
+name. The identifications below are visual guesses from renders with a
+borrowed palette, matched against the monster list in the text; treat them as
+leads for naming, not facts.
+
+| Loader | Sprite | Frames | Looks like | Candidate monster |
+|---|---|---|---|---|
+| `sub_08084F44` | `DA6D` | 16 | small black wings | バット / ヴァンパイアバット |
+| `sub_0808D1D8` | `9247` | 12 | hunched shambling humanoid | グール / ゾンビ |
+| `sub_08090FEC` | `B96C` | 16 | dome with an eye | スライム |
+| `sub_08094764` | `9506` | 29 | small winged insect | ビー |
+| `sub_08099B44` | `D637` | 29 | hooded cloaked figure | ? |
+| `sub_0809DD78` | `D28E` | 42 | small ring-like | ? |
+| `sub_080A1440` | `5A6E` | 23 | black bird | クロウ / レイブン |
+| `sub_080A4AFC` | `528F` | 16 | spider | スパイダー |
+| `sub_080ABDCC` | `D636` | 44 | round body with tentacles | オクトパス? |
+| `sub_080CFC14` | `5290` | 47 | round red/orange creature | ? |
+| `sub_080DCC98` | `48DE` | 25 | thin green figure | ? |
+| `sub_080E5744` | `D635` | 64 | small dragon | ドラゴンパピー? |
+| `sub_080E87C4` | `3876` | 8 | arcade cabinet | ? |
+| `sub_080EC3F8` | `D291` | 35 | flame worm | モエルルン? |
+| `sub_080F0C20` | `D638` | 37 | pale worm | ヒエルルン / クロロホルルン? |
+| `sub_080FE68C` | `5291` | 4 | living sword | ソード |
+
+Two families load small-sprite packages instead: `sub_080B43BC` (`3DB6`, a
+black winged creature) and `sub_080C3260` (`AE52`, skeletons).
