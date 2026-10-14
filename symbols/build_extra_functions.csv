@@ -64,6 +64,8 @@ address,isa,evidence,replacement_end
 08078B48,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched),08078BB4
 0807C468,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0807C4B4
 0807C53C,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0807C580
+08082BF0,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08082C68
+08082D20,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched),08082D80
 0808AED8,thumb,Independent random pattern selector (own push/pop-bx and literal pool) left as incbin by gbadisasm; exact standalone C,0808AF38
 08180898,thumb,Independent 28-byte callback-clear helper (push/pop-bx) after preceding return; exact standalone C,081808B4
 08197AE0,thumb,Independent 76-byte palette-hold task constructor (own push/pop-bx and literal pool) after sub_08197A50; exact standalone C,08197B2C
