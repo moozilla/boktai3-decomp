@@ -16,6 +16,7 @@ SHA1    := 2651c5e6875ac60abff734510d152166d211c87c
 # Default: split asm around src/*.c, compile with agbcc, link, verify SHA-1
 all: gen/code_sym.s gen/data.s
 	$(PY) tools/build.py
+	$(PY) tools/check_ram_literals.py
 
 setup:
 	tools/setup.sh
