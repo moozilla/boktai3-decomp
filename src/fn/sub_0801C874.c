@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 extern u8 gUnk_0824DB8A[], gUnk_0824DB7A[];
 void sub_0801C16C(void *);
@@ -15,96 +14,113 @@ void ResultGame_TimedPress(void *);
 #define H(o) (*(s16 *)(p + (o)))
 void ResultGame_TrackTarget(u8 *p)
 {
+    int *startPtr;
     int speed = gUnk_0824DB8A[p[0xae]];
     switch (p[0xaf]) {
-        case 0: {
-            int zero;
-            int *start = (int *)(p + 0x8c);
-            asm("" : : "r"(start));
+        case 0:
+            startPtr = (int *)(p + 0x8c);
             {
-                int z = 0;
-                zero = z;
+                int zero;
+                int *start = startPtr;
+                {
+                    int z = 0;
+                    zero = z;
+                }
+                *((int *)(p + 0x8c)) = zero;
+                *((int *)(p + 0x90)) = zero;
+                p[0xb2] = zero;
+                *((int *)(p + 0x9c)) = zero;
+                *((int *)(p + 0x94)) = gUnk_0824DB7A[p[0xae] * 2] << 5;
+                *((int *)(p + 0x98)) = (gUnk_0824DB7A + 1)[p[0xae] * 2] << 5;
+                ++p[0xaf];
+                *((s16 *)(p + 0xaa)) = zero;
+                *((s16 *)(p + 0xa8)) = zero;
+                p[0xb3] = 32;
+                p[0xbf] = 255;
+                sub_0801C16C(p);
+                sub_0801C17C(p);
+                sub_0801C1A0(p);
+                Sound_PlaySong(0x4b1);
+                break;
             }
-            I(0x8c) = zero;
-            I(0x90) = zero;
-            p[0xb2] = zero;
-            I(0x9c) = zero;
-            I(0x94) = gUnk_0824DB7A[p[0xae] * 2] << 5;
-            I(0x98) = (gUnk_0824DB7A + 1)[p[0xae] * 2] << 5;
-            ++p[0xaf];
-            H(0xaa) = zero;
-            H(0xa8) = zero;
-            p[0xb3] = 32;
-            p[0xbf] = 255;
-            sub_0801C16C(p);
-            sub_0801C17C(p);
-            sub_0801C1A0(p);
-            Sound_PlaySong(0x4b1);
-            break;
-        }
+
         case 1:
-            I(0x8c) += 176;
-            I(0x9c) = I(0x8c);
-            if (I(0x9c) >= I(0x98)) {
+            *((int *)(p + 0x8c)) += 176;
+            *((int *)(p + 0x9c)) = *((int *)(p + 0x8c));
+            if ((*((int *)(p + 0x9c))) >= (*((int *)(p + 0x98)))) {
                 int zero;
                 u8 *state = p + 0xaf;
                 zero = 0;
                 *state = 4;
-                H(0xa8) = zero;
+                *((s16 *)(p + 0xa8)) = zero;
             }
             break;
+
         case 2:
-            I(0x9c) += speed;
+            *((int *)(p + 0x9c)) += speed;
             ResultGame_UpdatePlayerMarker(p);
-            if ((H(0xa8) & 15) == 0)
+            if (((*((s16 *)(p + 0xa8))) & 15) == 0) {
                 ResultGame_ScoreAlignment(p);
-            if (I(0x9c) >= I(0x98)) {
+            }
+            if ((*((int *)(p + 0x9c))) >= (*((int *)(p + 0x98)))) {
                 ++p[0xaf];
-                H(0xaa) = 30;
+                *((s16 *)(p + 0xaa)) = 30;
             }
             break;
+
         case 3:
             ResultGame_UpdatePlayerMarker(p);
-            if ((H(0xa8) & 15) == 0)
+            if (((*((s16 *)(p + 0xa8))) & 15) == 0) {
                 ResultGame_ScoreAlignment(p);
-            if (H(0xaa) <= 0)
+            }
+            if ((*((s16 *)(p + 0xaa))) <= 0) {
                 ++p[0xaf];
-            break;
-        case 4:
-            I(0x9c) -= speed;
-            ResultGame_UpdatePlayerMarker(p);
-            if ((H(0xa8) & 15) == 0)
-                ResultGame_ScoreAlignment(p);
-            if (I(0x9c) <= I(0x94)) {
-                ++p[0xaf];
-                H(0xaa) = 10;
             }
             break;
+
+        case 4:
+            *((int *)(p + 0x9c)) -= speed;
+            ResultGame_UpdatePlayerMarker(p);
+            if (((*((s16 *)(p + 0xa8))) & 15) == 0) {
+                ResultGame_ScoreAlignment(p);
+            }
+            if ((*((int *)(p + 0x9c))) <= (*((int *)(p + 0x94)))) {
+                ++p[0xaf];
+                *((s16 *)(p + 0xaa)) = 10;
+            }
+            break;
+
         case 5:
             ResultGame_UpdatePlayerMarker(p);
-            if ((H(0xa8) & 15) == 0)
+            if (((*((s16 *)(p + 0xa8))) & 15) == 0) {
                 ResultGame_ScoreAlignment(p);
-            if (H(0xaa) <= 0)
+            }
+            if ((*((s16 *)(p + 0xaa))) <= 0) {
                 p[0xaf] = 2;
+            }
             break;
+
         case 6:
-            I(0x8c) -= 176;
-            if (I(0x8c) <= 0) {
-                I(0x8c) = 0;
+            *((int *)(p + 0x8c)) -= 176;
+            if ((*((int *)(p + 0x8c))) <= 0) {
+                *((int *)(p + 0x8c)) = 0;
                 sub_0801C69C(p, ResultGame_TimedPress);
-                if (p[0xc4] == 1)
+                if (p[0xc4] == 1) {
                     p[0xc4] = 2;
+                }
             }
             break;
     }
+
     {
-        int fade = 32 - Div(H(0xa8) << 5, 1200);
+        int fade = 32 - Div((*((s16 *)(p + 0xa8))) << 5, 1200);
         p[0xb3] = fade;
     }
-    --H(0xaa);
-    if (++H(0xa8) > 1200)
-        H(0xa8) = 1200;
-    if (p[0xaf] != 6 && (p[0xc4] == 1 || H(0xa8) > 1199)) {
+    --(*((s16 *)(p + 0xaa)));
+    if ((++(*((s16 *)(p + 0xa8)))) > 1200) {
+        *((s16 *)(p + 0xa8)) = 1200;
+    }
+    if ((p[0xaf] != 6) && ((p[0xc4] == 1) || ((*((s16 *)(p + 0xa8))) > 1199))) {
         Sound_StopSong(0x3ed);
         Sound_StopSong(0x3ee);
         p[0xaf] = 6;
