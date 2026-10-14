@@ -86,6 +86,7 @@ Scene arc slot effects (tentative),0803EE58,0803F5C4,symbols/proposed/scene-arc-
 Projected ground effects (tentative),0803F5C4,0803F804,symbols/proposed/scene-arc-effects.csv,Registry F0DE linked list with world-position and terrain projection callbacks; notes/scene-arc-effects_2026-10-13.md
 Modifier selection and stat previews (tentative),0803F804,080408A4,symbols/proposed/modifier-menu.csv,Current/pending snapshots at +68/+90; selected-source mask and stat comparison rendering; notes/modifier-menu_2026-10-14.md
 Modifier menu graphics and input (tentative),080408A4,08041908,symbols/proposed/modifier-display.csv,Graphics/display slots and three-mode cursor; notes/modifier-display_2026-10-14.md
+Modifier menu preview and lifecycle (tentative),08041908,08042198,symbols/proposed/modifier-preview.csv,Saved selection validation; model setup and per-frame task; notes/modifier-preview_2026-10-14.md
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
 State actor kind 086121C4 (tentative),081C66F8,081CC690,symbols/proposed/state-actors.csv,96-state table gUnk_086121C4 (first 16 shared with 0x0802FD60-0x08030658); helpers 081C66F8-081C6B84 precede the handlers; include/state_actor.h
 Scripted message actor 08612344 (tentative),081CC690,081CD484,symbols/proposed/state-actors.csv,state table gUnk_08612344 and dispatcher 081CD43C; command states wait on scene messages; src/message_actor_08612344.c

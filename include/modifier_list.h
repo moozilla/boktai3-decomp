@@ -41,7 +41,8 @@ union ModifierCursorWord {
     struct ModifierCursor cursor;
     u32 word;
 };
-/* Known prefix only: later fields include the 3D preview and more menu state. */
+/* Observed layout through 0x1088, the size allocated by 08042158.
+ * Preview resource/model storage remains opaque within unknown83C. */
 struct ModifierMenu {
     u8 task[0x18];
     s32 state, mode;
@@ -62,13 +63,28 @@ struct ModifierMenu {
     u8 unknown112[2];
     u8 changed;
     u8 errorFlash;
-    u8 unknown116[2];
+    u8 unknown116, colorCycle;
     u16 palette[16]; /* copied as 16 halfwords by 08217DB4; interpretation tentative. */
     u8 modeRepeat, indexRepeat, categoryRepeat, unknown13B;
     struct ModifierGraphicsResource graphicsA, graphicsB;
     struct ModifierDisplayObject displays[18];
     u8 unknown83C[0x6c0];
     u32 previewFlags;
+    u8 unknownF00[0x186];
+    u8 previewActorId;
+    u8 unknown1087;
+};
+/* Prefix observed through the menu cancellation check; gameplay identity tentative. */
+struct ModifierMenuActor {
+    u8 unknown0[0x18];
+    s16 id;
+    u8 unknown1A[2];
+    u8 active;
+};
+struct ModifierPreviewOrigin {
+    s32 x : 16;
+    s32 y : 16;
+    s32 z : 16;
 };
 struct ModifierItemInfo {
     u8 id, kind;

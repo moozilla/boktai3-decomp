@@ -29,7 +29,7 @@ addr,name,confidence,evidence
 0803FED4,ModifierMenu_ToggleSelection,low,Tentative role from current/pending snapshots and contiguous stat previews; include/modifier_list.h; notes/modifier-menu_2026-10-14.md
 0803FF20,ModifierMenu_CommitSecondarySource,low,Tentative role from current/pending snapshots and contiguous stat previews; include/modifier_list.h; notes/modifier-menu_2026-10-14.md
 0803FF40,ModifierMenu_CloseScript,low,Tentative role from current/pending snapshots and contiguous stat previews; include/modifier_list.h; notes/modifier-menu_2026-10-14.md
-0803FF80,ModifierMenu_OpenSelection,low,Tentative role from current/pending snapshots and contiguous stat previews; include/modifier_list.h; notes/modifier-menu_2026-10-14.md
+0803FF80,ModifierMenu_BeginClose,low,Tentative role from current/pending snapshots and contiguous stat previews; include/modifier_list.h; notes/modifier-menu_2026-10-14.md
 0803FFC8,ModifierMenu_ApplyPendingSource,low,Tentative role from current/pending snapshots and contiguous stat previews; include/modifier_list.h; notes/modifier-menu_2026-10-14.md
 08040098,ModifierMenu_DrawStatComparison,low,Tentative role from current/pending snapshots and contiguous stat previews; include/modifier_list.h; notes/modifier-menu_2026-10-14.md
 08040144,ModifierMenu_DrawUnavailableStat,low,Tentative role from current/pending snapshots and contiguous stat previews; include/modifier_list.h; notes/modifier-menu_2026-10-14.md

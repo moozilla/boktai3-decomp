@@ -1,7 +1,7 @@
 #include "modifier_list.h"
 extern u16 gUnk_03005260[];
 extern const u8 gUnk_086058E8[];
-void ModifierMenu_OpenSelection(struct ModifierMenu *);
+void ModifierMenu_BeginClose(struct ModifierMenu *);
 void Sound_PlaySong(u32);
 s32 sub_08221338(u32, u8 *, u32, s32, s32);
 static inline s32 ModifierMenu_ReadRepeatPair(u8 *counterArg, u32 negative, u32 positive)
@@ -46,7 +46,7 @@ void ModifierMenu_HandleOverviewInput(struct ModifierMenu *menu)
         }
     }
     if (close) {
-        ModifierMenu_OpenSelection(menu);
+        ModifierMenu_BeginClose(menu);
         return;
     }
     if (gUnk_03005260[1] & 1) {
