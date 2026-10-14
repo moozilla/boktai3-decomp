@@ -250,6 +250,27 @@ In the late-game save's field scene (`tests/save_menus_field.txt`), the only
 family code that runs is `sub_0809DD78` (`D28E`, "ring"), alongside a red ring
 drawn around Django, so that family may be a field effect rather than an enemy.
 
+**With real colours (stage survey, 2026-10-14).** Warping through every scene
+(docs/CENTAUR.md) captured the in-game palettes of twelve families. Seen in
+colour, several earlier guesses change:
+
+| Sprite | In colour | Revised candidate |
+|---|---|---|
+| `DA6D` | small purple bat | バット |
+| `9247` | green-headed shambling humanoid | グール / ゾンビ |
+| `B96C` | red slime (name hash `slime`) | レッドスライム (colour variants share the sprite) |
+| `D637` | hooded figure, pink robe, cyan hands, one eye | レイス? |
+| `D28E` | small flame, not a ring | a flame or will-o'-wisp effect; runs in the save's field |
+| `48DE` | blue bandaged figure | マミー |
+| `5290` | brown rock/clay body with fists | クレイゴーレム / ゴーレム |
+| `D635` | pink four-legged dog | ハウンド (not a dragon puppy) |
+| `3876` | treasure chest that opens | ミミック (not an arcade cabinet) |
+| `D638` | green spotted worm in a burrow | クロロホルルン |
+
+The black wings `3DB6` and skeletons `AE52` (small-sprite packages) were also
+captured. Palettes per sprite are kept in `build/centaur/sprite_palettes.json`
+and used by the studio.
+
 Sprite names are string hashes (`sub_08219BD8`, see [DATA.md](DATA.md)) of
 plain English words in two cases: `slime` = `B96C` and `bee` = `9506`, matching
 the visual identifications above. Romanised Japanese and English guesses for

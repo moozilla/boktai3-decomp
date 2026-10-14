@@ -5,8 +5,9 @@
 #   tools/mgba/build_mgba.sh [DIR]     default DIR: ~/git/mgba
 #
 # macOS (Homebrew): brew install cmake qt@5 lua sdl2 ffmpeg libzip libepoxy pkgconf
-# The patch (tools/mgba/mgba-headless.patch) only touches the headless runner:
-# a debugger for scripts (MGBA_SCRIPT_DEBUGGER=1), a video buffer, the harness's
+# The patch (tools/mgba/mgba-headless.patch): sockets no longer raise SIGPIPE
+# (a stopped studio must not kill the emulator), and the headless runner gets a
+# debugger for scripts (MGBA_SCRIPT_DEBUGGER=1), a video buffer, the harness's
 # fixed clock (BOKTAI3_RTC) and solar reading, and battery-save autoloading.
 set -e
 REPO=$(cd "$(dirname "$0")/../.." && pwd)

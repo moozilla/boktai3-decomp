@@ -73,7 +73,7 @@ pre#log { background: var(--panel); border: 1px solid var(--line); border-radius
 <main>
   <section id="side">
     <div id="filters">
-      <input id="q" type="search" placeholder="Search text, or #id" autocomplete="off">
+      <input id="q" type="search" placeholder="Search Japanese or English, or #id" autocomplete="off">
       <label style="margin:0;display:flex;gap:6px;align-items:center;color:var(--ink);font-size:13px">
         <input id="onlyEdited" type="checkbox"> Edited only
       </label>
@@ -85,6 +85,8 @@ pre#log { background: var(--panel); border: 1px solid var(--line); border-radius
     <h2><span id="title">Select a string</span><small id="sub"></small></h2>
     <label>Original</label>
     <div class="orig" id="orig"></div>
+    <label>Fan translation (boktai3trans)</label>
+    <div class="orig" id="fan" style="font-family:system-ui,sans-serif"></div>
     <label for="ed">Text <span style="font-weight:normal">(escapes: <code>\n</code> newline, <code>{XXXX}</code> glyph code)</span></label>
     <textarea id="ed" spellcheck="false" disabled></textarea>
     <label>Preview (game font; tags not drawn, &lt;WEIGHT&gt; in red; wraps at
@@ -104,7 +106,7 @@ pre#log { background: var(--panel); border: 1px solid var(--line); border-radius
 </main>
 <script>
 const $ = id => document.getElementById(id);
-let strings = [], byId = new Map(), original = {}, inverse = new Map(), font = null, cur = null;
+let strings = [], byId = new Map(), original = {}, inverse = new Map(), font = null, cur = null, fan = {};
 const SCALE = 2;
 
 async function load() {
@@ -115,6 +117,7 @@ async function load() {
     fetch('/api/font').then(r => r.arrayBuffer()),
   ]);
   strings = s; original = o; font = new Uint8Array(f);
+  fan = await fetch('/api/english').then(r => r.json()).catch(() => ({}));
   for (const st of strings) byId.set(st.id, st);
   for (const [code, ch] of Object.entries(cm)) inverse.set(ch, parseInt(code, 16));
   render();
@@ -132,7 +135,8 @@ function render() {
     const n = parseInt(q.slice(1));
     hits = isNaN(n) ? hits : hits.filter(s => String(s.id).startsWith(String(n)));
   } else if (q) {
-    hits = hits.filter(s => s.text.includes(q) || plain(s.text).includes(q));
+    const ql = q.toLowerCase();
+    hits = hits.filter(s => s.text.includes(q) || plain(s.text).includes(q) || (fan[s.id] || '').toLowerCase().includes(ql));
   }
   const shown = hits.slice(0, 400);
   $('count').textContent = `${hits.length.toLocaleString()} of ${strings.length.toLocaleString()} strings` + (hits.length > shown.length ? ' (first 400 shown)' : '');
@@ -162,6 +166,7 @@ function select(id) {
   $('title').textContent = `#${id}`;
   $('sub').textContent = s.edited ? 'edited' : '';
   $('orig').textContent = original[id] ?? '';
+  $('fan').textContent = fan[id] ?? '(no translation)';
   $('ed').value = s.text; $('ed').disabled = false;
   $('save').disabled = true; $('revert').disabled = !s.edited;
   $('msg').textContent = '';
