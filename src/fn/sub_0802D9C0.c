@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Object {
     u8 active;
     u8 pad[0x2cf];
@@ -7,15 +6,24 @@ struct Object {
 };
 int sub_0802D9C0(void *context, struct Object *p)
 {
-    register int i asm("r6");
+    void (**alias)(void *, struct Object *);
+    int i;
     void (**fn)(void *, struct Object *);
-    if (!p->active)
+    if (!p->active) {
         return -1;
-    i = 0;
-    fn = p->callbacks;
+    }
+    if (context || fn) {
+        i = 0;
+        fn = (alias = p->callbacks);
+    } else {
+        i = 0;
+        fn = (alias = p->callbacks);
+    }
+    /* do-while(0) only keeps agbcc's block layout */
     do {
-        if (*fn)
+        if (*fn) {
             (*fn)(context, p);
+        }
         fn++;
         i++;
     } while (i < 4);
