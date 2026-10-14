@@ -6,9 +6,16 @@ struct ProjectedDisplayResource {
 };
 /* Observed 0x60-byte animation entry; ownership/other fields remain tentative. */
 struct ProjectedDisplayEntry {
-    u8 unknown0[0x20];
+    u32 unknown0;
+    u8 registered, unknown5[3];
+    u32 flags;
+    u8 unknownC[0x14];
     struct ContactPosition position;
-    u8 unknown28[0x38];
+    u8 unknown28[0x12];
+    u16 paletteIndex;
+    u8 unknown3C[0xC];
+    const void *paletteData;
+    u8 unknown4C[0x14];
 };
 struct ProjectedDisplay {
     u8 task[0x18];
