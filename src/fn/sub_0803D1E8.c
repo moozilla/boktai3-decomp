@@ -1,5 +1,4 @@
 #include "global.h"
-#define ScenePool_ReadActorBounds sub_0803D1E8
 s32 sub_0811AB78(s32, u32 *, u32 *);
 void ScenePool_ReadActorBounds(s32 i, u32 *a, u32 *b, u32 *regions)
 {

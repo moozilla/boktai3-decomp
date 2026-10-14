@@ -1,6 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#define KeyTrigger_Update sub_08197EC4
 
 struct Msg08197EC4 {
     u32 a;
@@ -19,7 +18,7 @@ extern u16 gUnk_03005260[];
 s32 sub_0821A3E8(u32, struct Msg08197EC4 **);
 void sub_0821AFB4(void *, void *);
 
-void sub_08197EC4(struct Task08197EC4 *t)
+void KeyTrigger_Update(struct Task08197EC4 *t)
 {
     struct Msg08197EC4 *m;
     s32 n = sub_0821A3E8(t->channel, &m);

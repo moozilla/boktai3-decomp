@@ -1,9 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
-#define ScenePool_CreateEntryFromScript sub_0803D61C
 struct ScenePoolManager *sub_0803BA84(void);
 struct ScenePoolEntry *sub_0803D5E8(struct ScenePoolManager *, u32 *);
-void sub_0803CDF0(struct ScenePoolEntry *);
+void ScenePool_ParseEntryParameters(struct ScenePoolEntry *);
 void sub_0803C914(struct ScenePoolManager *, struct ScenePoolEntry *);
 s32 ScenePool_CreateEntryFromScript(void)
 {
@@ -19,7 +18,7 @@ s32 ScenePool_CreateEntryFromScript(void)
 failure:
     return -1;
 create:
-    sub_0803CDF0(entry);
+    ScenePool_ParseEntryParameters(entry);
     sub_0803C914(manager, entry);
     entry->step = 0x200;
     entry->acceleration = 0x4000;

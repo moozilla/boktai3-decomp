@@ -1,5 +1,4 @@
 #include "scene_pool.h"
-#define ScenePool_ParseEntryParameters sub_0803CDF0
 
 struct Values {
     s32 x, y, z, unused;

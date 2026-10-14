@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
-#define ScenePool_StateCruise sub_0803DDA8
 struct PlayerFlags {
     u8 unknown0[0x8f4];
     u16 flags;
@@ -8,11 +7,11 @@ struct PlayerFlags {
 extern struct PlayerFlags *gUnk_020004F0;
 void sub_0803DA7C(struct ScenePoolEntry *, s32, s32, s32);
 s32 sub_0803D9D8(struct ScenePoolEntry *);
-s32 sub_0803D8A8(struct ScenePoolActor *, struct ScenePoolEntry *);
-s32 sub_0803D680(struct ScenePoolActor *, struct ScenePoolEntry *);
-s32 sub_0803D700(struct ScenePoolActor *, struct ScenePoolEntry *);
-s32 sub_0803D78C(struct ScenePoolActor *, struct ScenePoolEntry *);
-s32 sub_0803D80C(struct ScenePoolActor *, struct ScenePoolEntry *);
+s32 ScenePool_ResumeAfterIdle(struct ScenePoolActor *, struct ScenePoolEntry *);
+s32 ScenePool_SelectInitialDirection(struct ScenePoolActor *, struct ScenePoolEntry *);
+s32 ScenePool_SelectRepeatOrExit(struct ScenePoolActor *, struct ScenePoolEntry *);
+s32 ScenePool_SelectRepeatedDirection(struct ScenePoolActor *, struct ScenePoolEntry *);
+s32 ScenePool_SelectDirectionOrRepeat(struct ScenePoolActor *, struct ScenePoolEntry *);
 static inline void Or(u32 mask, u32 *flags)
 {
     *flags |= mask;
@@ -107,22 +106,22 @@ s32 ScenePool_StateCruise(void *manager, struct ScenePoolActor *actor, struct Sc
     }
     if (sub_0803D9D8(entry))
         goto done;
-    if (sub_0803D8A8(actor, entry))
+    if (ScenePool_ResumeAfterIdle(actor, entry))
         goto done;
     Or(0x10, &actor->stateFlags);
     if (!PlayerHasFlag(2)) {
         switch (entry->kind) {
             case 0:
-                sub_0803D680(actor, entry);
+                ScenePool_SelectInitialDirection(actor, entry);
                 break;
             case 1:
-                sub_0803D700(actor, entry);
+                ScenePool_SelectRepeatOrExit(actor, entry);
                 break;
             case 2:
-                sub_0803D78C(actor, entry);
+                ScenePool_SelectRepeatedDirection(actor, entry);
                 break;
             case 3:
-                sub_0803D80C(actor, entry);
+                ScenePool_SelectDirectionOrRepeat(actor, entry);
                 break;
         }
     }
