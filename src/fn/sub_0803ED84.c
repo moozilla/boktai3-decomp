@@ -1,5 +1,4 @@
 #include "scene_pool.h"
-#define ScenePool_StateDepartForward sub_0803ED84
 void sub_0811D4AC(struct ScenePoolActor *, s32, s32, s32, s32, s32, s32);
 static inline void Or(u32 mask, u32 *flags)
 {

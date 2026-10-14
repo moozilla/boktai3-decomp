@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
-#define ScenePool_ScheduleSpeedControl sub_0803DAC8
 
 void sub_0803DA30(struct ScenePoolEntry *, s32, s32, s32);
 static inline u8 PlayerHasFlag(u32 mask)

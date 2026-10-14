@@ -1,8 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
-#define ScenePool_StateLaunchArc sub_0803E5F4
-void ScenePool_UpdateSteeringPulse(struct ScenePoolActor *, struct ScenePoolEntry *,
-                                   const struct ScenePoolSpeedBounds *);
+void ScenePool_UpdateSpeedPulse(struct ScenePoolActor *, struct ScenePoolEntry *,
+                                const struct ScenePoolSpeedBounds *);
 extern const struct ScenePoolSpeedBounds gUnk_0860588C[];
 void sub_08116C4C(s32, struct ScenePoolVec32 *);
 s32 sub_08116C20(s32);
@@ -44,7 +43,7 @@ s32 ScenePool_StateLaunchArc(void *manager, struct ScenePoolActor *actor,
     u32 fire;
     if (entry->stateEntered)
         entry->stateEntered = 0;
-    ScenePool_UpdateSteeringPulse(actor, entry, gUnk_0860588C);
+    ScenePool_UpdateSpeedPulse(actor, entry, gUnk_0860588C);
     if (entry->stateFrame <= 29) {
         s32 lateral = entry->unknown5c;
         s32 magnitude = lateral;

@@ -24,11 +24,11 @@ struct ScenePoolEntry {
     u8 side, mode, repetitions;
     u8 unknown3b;
     u32 unknown3c;
-    s32 motionPhase;
+    s32 motionPhase; /* legacy name: target-player index, selected by 0803C114 */
     u32 stateFrame;
     s32 step, acceleration, speed, turnStep;
-    s32 direction; /* signed metric; exact geometric meaning is tentative */
-    s32 unknown5c;
+    s32 direction; /* legacy name: target-player x minus actor x (0803C114) */
+    s32 unknown5c; /* target-player z minus actor z (0803C114) */
     s32 idleFrame;
     u8 stateEntered;
     u8 speedControlActive, speedControlDelay;
@@ -85,7 +85,7 @@ struct ScenePoolManager {
     u32 firstId, lastId;
     u32 registry[3];
 };
-/* Five signed thresholds used by the adjacent steering-state callbacks. */
+/* Five signed thresholds used by the adjacent forward-speed callbacks. */
 struct ScenePoolSpeedBounds {
     s32 emergencyHigh, high, low, activeHigh, activeLow;
 };

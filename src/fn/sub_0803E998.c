@@ -1,13 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
-#define ScenePool_StateEmitBursts sub_0803E998
-void ScenePool_UpdateSteeringPulse(struct ScenePoolActor *, struct ScenePoolEntry *,
-                                   const struct ScenePoolSpeedBounds *);
+void ScenePool_UpdateSpeedPulse(struct ScenePoolActor *, struct ScenePoolEntry *,
+                                const struct ScenePoolSpeedBounds *);
 extern const struct ScenePoolSpeedBounds gUnk_086058B4[];
 s32 sub_08116C20(s32);
 void sub_08114928(struct ScenePoolVec32 *, s32, struct ScenePoolVec32 *, void *, s32, s32, s32,
                   s32);
-void sub_08220D78(void *, void *, s32, s32, s32);
 static inline void Or(u32 mask, u32 *flags)
 {
     *flags |= mask;
@@ -50,7 +48,7 @@ s32 ScenePool_StateEmitBursts(void *manager, struct ScenePoolActor *actor,
     u32 steer;
     if (entry->stateEntered)
         entry->stateEntered = 0;
-    ScenePool_UpdateSteeringPulse(actor, entry, gUnk_086058B4);
+    ScenePool_UpdateSpeedPulse(actor, entry, gUnk_086058B4);
     fire = 0;
     steer = 0;
     {
@@ -125,7 +123,7 @@ s32 ScenePool_StateEmitBursts(void *manager, struct ScenePoolActor *actor,
                 velocity.y = zero;
                 velocity.z = zero;
                 sub_08114928(position, level, &velocity, profile, 5, zero, 4, 1);
-                sub_08220D78((u8 *)actor + 0x660, (u8 *)actor + 0x7e0, 30, 2, zero);
+                Anim_SetKeyframes((u8 *)actor + 0x660, (u8 *)actor + 0x7e0, 30, 2, zero);
                 actor->unknown308 = 60;
                 break;
             }
