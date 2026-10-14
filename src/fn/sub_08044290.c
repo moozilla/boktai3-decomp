@@ -6,7 +6,7 @@ void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *, struct ContactSw
 void ContactSwarm_UpdateTracking(struct ContactSwarm *pool, struct ContactSwarmSlot *slot,
                                  s32 index)
 {
-    struct ContactSwarmSprite *sprite = &slot->sprite;
+    struct ContactSwarmSprite *sprite = &slot->animation.sprite;
     struct ContactPosition *position;
     if (slot->enter) {
         struct ContactCollider *collider;
@@ -22,7 +22,7 @@ void ContactSwarm_UpdateTracking(struct ContactSwarm *pool, struct ContactSwarmS
         u32 phase = slot->stateFrame & 15;
         index &= 15;
         asm("" : "+r"(phase), "+r"(index));
-        position = &slot->sprite.position;
+        position = &slot->animation.sprite.position;
         if (phase == index) {
             register struct ContactSwarmSprite *current asm("r5");
             const struct ContactPosition *target = &pool->target;
