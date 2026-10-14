@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "orbit_contact_actor.h"
-#define OrbitContactActor_Update sub_0804694C
 extern void (*const gUnk_086059B4[])(struct OrbitContactActor *);
 s32 OrbitContactActor_Update(struct OrbitContactActor *actor)
 {

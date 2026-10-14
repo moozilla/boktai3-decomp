@@ -1,9 +1,4 @@
 #include "damage_number_display.h"
-#define DamageNumberDisplay_Show               sub_080472A4
-#define DamageNumberDisplay_Create             sub_08047258
-#define DamageNumberDisplay_FindSource         sub_08046B58
-#define DamageNumberDisplay_FindAvailableGroup sub_08046B8C
-#define DamageNumberDisplay_SetGroup           sub_08046DEC
 struct DamageNumberDisplay *DamageNumberDisplay_Create(void);
 s32 DamageNumberDisplay_FindSource(struct DamageNumberDisplay *, u32);
 s32 DamageNumberDisplay_FindAvailableGroup(struct DamageNumberDisplay *, s32);

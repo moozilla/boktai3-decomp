@@ -1,7 +1,4 @@
 #include "damage_number_display.h"
-#define DamageNumberDisplay_SetGroup     sub_08046DEC
-#define DamageNumberDisplay_SetActiveBit sub_08046B34
-#define DamageNumberDisplay_RenderDigits sub_08046BC8
 struct DamageNumberDisplay *DamageNumberDisplay_SetActiveBit(struct DamageNumberDisplay *, u32);
 u32 DamageNumberDisplay_RenderDigits(struct DamageNumberDisplay *, struct DamageNumberGroup *, u32,
                                      u32, struct ContactPosition *);

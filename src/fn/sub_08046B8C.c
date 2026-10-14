@@ -1,6 +1,4 @@
 #include "damage_number_display.h"
-#define DamageNumberDisplay_FindAvailableGroup sub_08046B8C
-#define DamageNumberDisplay_GetActiveBit       sub_08046B4C
 u32 DamageNumberDisplay_GetActiveBit(struct DamageNumberDisplay *, u32);
 s32 DamageNumberDisplay_FindAvailableGroup(struct DamageNumberDisplay *display, s32 priority)
 {

@@ -1,6 +1,4 @@
 #include "damage_number_display.h"
-#define DamageNumberDisplay_RemoveGroup    sub_08046F08
-#define DamageNumberDisplay_ClearActiveBit sub_08046B40
 void DamageNumberDisplay_ClearActiveBit(struct DamageNumberDisplay *, u32);
 void DamageNumberDisplay_RemoveGroup(struct DamageNumberDisplay *display, s32 index)
 {

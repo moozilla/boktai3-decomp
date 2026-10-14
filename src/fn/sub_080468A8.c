@@ -1,5 +1,4 @@
 #include "orbit_contact_actor.h"
-#define OrbitContactActor_UpdateExpanding sub_080468A8
 void OrbitContactActor_UpdateExpanding(struct OrbitContactActor *actor)
 {
     if (actor->stateFlag)

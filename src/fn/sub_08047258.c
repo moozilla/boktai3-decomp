@@ -1,8 +1,4 @@
 #include "damage_number_display.h"
-#define DamageNumberDisplay_Create     sub_08047258
-#define DamageNumberDisplay_Initialize sub_080471CC
-#define DamageNumberDisplay_Update     sub_08047168
-#define DamageNumberDisplay_Destroy    sub_080471A8
 s32 DamageNumberDisplay_Initialize(struct DamageNumberDisplay *);
 s32 DamageNumberDisplay_Update(struct DamageNumberDisplay *);
 u32 DamageNumberDisplay_Destroy(struct DamageNumberDisplay *);

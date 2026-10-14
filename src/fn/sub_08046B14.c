@@ -1,5 +1,4 @@
 #include "orbit_contact_actor.h"
-#define OrbitContactActor_BeginExpansion sub_08046B14
 void OrbitContactActor_BeginExpansion(struct OrbitContactActor *actor)
 {
     u32 one = 1;

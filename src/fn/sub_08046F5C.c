@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "damage_number_display.h"
-#define DamageNumberDisplay_UpdateBouncing sub_08046F5C
-#define DamageNumberGroup_AdvancePhase     sub_08046F50
 void DamageNumberGroup_AdvancePhase(struct DamageNumberGroup *);
 extern const u32 gUnk_086059C0[];
 s32 DamageNumberDisplay_UpdateBouncing(struct DamageNumberDisplay *display,

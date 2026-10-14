@@ -1,5 +1,4 @@
 #include "orbit_contact_actor.h"
-#define OrbitContactActor_UpdateContracting sub_08046900
 void OrbitContactActor_UpdateContracting(struct OrbitContactActor *actor)
 {
     actor->angle += 6;

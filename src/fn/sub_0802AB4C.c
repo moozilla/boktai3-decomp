@@ -30,7 +30,7 @@ static inline void state(struct Common *p, void (*fn)(void *), int id)
 struct Packed {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
-void sub_080472A4(void *, int, int, void *, void *, int);
+void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
 void sub_0802A4F4(void *);
 void sub_0802A53C(void *);
 void sub_0802A63C(void *);
@@ -102,7 +102,7 @@ int sub_0802AB4C(struct Actor *p)
         size.x = 16;
         size.y = 0;
         size.z = 16;
-        sub_080472A4(collider, damage, 0, position + 12, &size, 1);
+        DamageNumberDisplay_Show(collider, damage, 0, position + 12, &size, 1);
         if (base->health <= 0) {
             base->health = 0;
             {
