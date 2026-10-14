@@ -21,7 +21,10 @@ struct ModifierMenu {
     u8 task[0x18];
     s32 state, mode;
     s8 category, index;
-    u8 unknown22[0x46];
+    u8 unknown22[0x12];
+    void *backgroundResource;
+    void *tilemap;
+    u8 unknown3C[0x2c];
     struct ModifierSelection current, pending;
     void *script;
     u8 unknownBC[0x58];
