@@ -21,10 +21,10 @@ struct M {
     u8 sub;
 };
 extern struct M *gUnk_02000488;
-extern struct V *sub_08049B6C(void);
+extern struct V *TetherActor_GetPosition(void);
 s32 sub_0805238C(struct O *o)
 {
-    struct V *v = sub_08049B6C();
+    struct V *v = TetherActor_GetPosition();
     if (v != 0 && gUnk_02000488->mode == 4 && gUnk_02000488->sub <= 4) {
         s32 d = v->y - o->y;
         if (d < 0)

@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_02000488;
-void sub_08049FA8(u32 m)
+void TetherActor_RemoveStatusFlags(u32 m)
 {
     u8 *g = gUnk_02000488;
     if (g != 0) {
