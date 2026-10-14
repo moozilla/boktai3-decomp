@@ -9,12 +9,23 @@ struct TetherSegment {
     u8 unknown20[8];
 };
 /* Tentative identity: world actor with seven visible player-tether segments. */
+struct TetherPaletteView {
+    u8 unknown0[0x18];
+    const u16 *palette;
+    u8 unknown1C[0x78];
+};
 struct TetherActor {
-    u8 unknown0[0x24];
+    u8 unknown0[0x1A];
+    u8 kind, unknown1B[9];
     u16 palette[16];
     u8 unknown44[12];
     struct ContactPosition position;
-    u8 unknown58[0x208];
+    u8 unknown58[0x34];
+    union {
+        struct DisplayAnimation animation;
+        struct TetherPaletteView colors;
+    } display;
+    u8 unknown120[0x140];
     u8 heading, unknown261[3];
     struct TetherSegment segments[7];
     u16 paletteIndex;
@@ -24,13 +35,18 @@ struct TetherActor {
     u8 unknown384[4];
     u16 shakeFrame;
     u16 glowMode, glowFrame;
-    u8 unknown38E[6];
+    u16 appliedPalette, paletteOverrideTimer, unknown392;
     u16 paletteBlend;
-    u8 unknown396[5];
+    u16 effectFrame, soundCooldown;
+    u8 moving;
     u8 auxiliaryActive;
     struct ContactSwarmSprite auxiliarySprite;
     struct ContactSwarmGraphics auxiliaryGraphics;
-    u8 unknown3E4[0xA0];
+    u8 effectsSuppressed;
+    u8 unknown3E5[0x89];
+    u16 blendHold;
+    u8 unknown470[2];
+    u8 blendRequested, unknown473[0x11];
 };
 /* Additional player view: these fields are distinct from player.h's facing/actionMode. */
 struct TetherPlayer {
