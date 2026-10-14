@@ -1,6 +1,4 @@
 #include "pooled_motion.h"
-#define MotionPool_Destroy  sub_08045688
-#define MotionPool_HideSlot sub_08045550
 void MotionPool_HideSlot(struct MotionPool *, struct MotionPoolSlot *, s32);
 void sub_0821A2AC(u32);
 s32 MotionPool_Destroy(struct MotionPool *pool)

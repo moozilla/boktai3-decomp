@@ -1,7 +1,4 @@
 #include "pooled_motion.h"
-#define MotionPool_Spawn        sub_08045778
-#define MotionPool_Create       sub_08045704
-#define MotionPool_FindFreeSlot sub_08045744
 struct MotionPool *MotionPool_Create(void);
 struct MotionPoolSlot *MotionPool_FindFreeSlot(struct MotionPool *, s32 *);
 void *sub_0821A2C4(u32);

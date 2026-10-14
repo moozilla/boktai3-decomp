@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 23.429% matching (2026-10-14). This file is the single
+Last updated after reaching 23.472% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,33 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex): parameterized motion pool
+
+Working-tree matching is **23.472%**, up **0.043 percentage points**
+(+1,028 bytes) from seven new exact functions. There are **6,409 / 11,470 functions**,
+**566,922 / 2,415,354 bytes**. Without register pinning: **19.290%**;
+Register-pinned: **4.182%**, included above. Seventy guarded drafts remain.
+
+The **080454C0–08045A20** subsection has a 0x13DC task, sixteen 0x13C slots,
+0x44 parameter packets, callback dispatch, velocity/contact update, lifetime,
+optional heading adjustment, and lazy pool creation on spawn. Its original
+asymmetric signed turn threshold and retained flags/target behavior are documented,
+not corrected. The 0802D218 owner shows a player-targeted moving effect.
+See [motion-pool notes](../notes/parameterized-motion-pool_2026-10-14.md).
+
+Nineteen new/typed motion units and 34 existing shared-layout consumers passed
+full-extent checks. Hint minimization leaves manager ten, slot initializer one,
+heading two and deadline one; destroy, initialize and spawn have none.
+Shared collider offset/bounds gain types at +14/+1C without shifting other fields.
+The complete combined build printed **`build/boktai3.gba: OK`** in
+`build/motion-pool-combined.log`. Twenty post-name full-extent checks pass,
+including the existing owner caller; format, inventory, RAM-literal and
+decoded actor-registry checks pass.
+Main PR 106 passed Actions 38581950962 at 6cbf9e9f. Continue toward
+**25% exact or 60% usage remaining**; latest account reading is **83% remaining**.
+Next contiguous work is **08045A20–08045D18**, five projected animations.
+Claude's primary checkout owns main; use the Codex managed worktree.
 
 ## October 14 (Codex): packed records and paired contact spawning
 

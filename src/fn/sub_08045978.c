@@ -1,4 +1,3 @@
-#define MotionPool_SetGraphics sub_08045978
 #include "pooled_motion.h"
 void MotionPool_SetGraphics(struct MotionPoolParams *params, u32 resource, u32 frame, s32 tile)
 {

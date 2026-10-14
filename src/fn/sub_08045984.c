@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "pooled_motion.h"
-#define MotionPool_AdjustHeading sub_08045984
 void MotionPool_AdjustHeading(struct MotionPoolSlot *slot)
 {
     struct MotionPoolParams *params = &slot->params;

@@ -1,6 +1,4 @@
 #include "pooled_motion.h"
-#define MotionPool_Initialize     sub_080456C8
-#define MotionPool_InitializeSlot sub_080454C8
 void MotionPool_InitializeSlot(struct MotionPool *, struct MotionPoolSlot *, s32);
 void sub_0821A284(u32, void *, u32);
 s32 MotionPool_Initialize(struct MotionPool *pool)
