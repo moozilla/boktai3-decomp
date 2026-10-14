@@ -113,7 +113,8 @@ struct TetherPlayer {
     struct ContactPosition position;
     u8 unknown38[0x36A];
     u8 heading, side;
-    u8 unknown3A4[0xB3];
+    u8 facing;
+    u8 unknown3A5[0xB2];
     u8 tetherMode;
 };
 extern struct TetherPlayer *gUnk_02000580[4];
