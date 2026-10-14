@@ -1,6 +1,5 @@
 #include "tether_actor.h"
 // MATCHING_CONCESSION: register-pinning
-#define TetherActor_UpdateLockedShake sub_0804B43C
 void TetherActor_SetState(struct TetherActor *, u32);
 s32 Mod(s32, s32);
 void TetherActor_UpdateLockedShake(struct TetherActor *actor)
@@ -22,10 +21,11 @@ void TetherActor_UpdateLockedShake(struct TetherActor *actor)
     actor->shakeZ = Mod(randomTable[gUnk_03005308], amplitude) - (amplitude >> 1);
     if ((++actor->lockSoundFrame & 7) == 0) {
         gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-        { u32 sample = randomTable[gUnk_03005308];
-        sample &= 1;
-        if (sample)
-            Sound_PlaySong(0x2B9);
+        {
+            u32 sample = randomTable[gUnk_03005308];
+            sample &= 1;
+            if (sample)
+                Sound_PlaySong(0x2B9);
         }
     }
     if (++actor->lockFrame > 127) {

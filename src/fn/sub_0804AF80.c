@@ -1,6 +1,5 @@
 #include "tether_actor.h"
 // MATCHING_CONCESSION: register-pinning
-#define TetherActor_UpdateWorldPosition sub_0804AF80
 void TetherActor_HandleFlaggedCell(struct TetherActor *);
 void TetherActor_UpdateSampledPosition(struct TetherActor *);
 u8 *sub_0821D64C(s32, s32);
@@ -42,8 +41,12 @@ void TetherActor_UpdateWorldPosition(struct TetherActor *actor)
         surface = *properties >> 4;
         height = (*properties & 15) << 8;
         switch (surface) {
-        case 1: height -= (u8)position->z; break;
-        case 2: height -= (u8)position->x; break;
+            case 1:
+                height -= (u8)position->z;
+                break;
+            case 2:
+                height -= (u8)position->x;
+                break;
         }
         actor->position.y = height;
     }

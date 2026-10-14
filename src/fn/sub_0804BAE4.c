@@ -1,6 +1,5 @@
 #include "tether_actor.h"
 // MATCHING_CONCESSION: register-pinning
-#define TetherActor_UpdateSecondaryLock sub_0804BAE4
 void TetherActor_UpdateSecondaryLock(struct TetherActor *input)
 {
     register struct TetherActor *actor asm("r2") = input;

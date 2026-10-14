@@ -1,7 +1,6 @@
 #include "tether_actor.h"
 // MATCHING_CONCESSION: register-pinning
 #include "game_state.h"
-#define TetherActor_TestStepPosition sub_0804BCD4
 u8 *sub_0821D64C(s32, s32);
 u32 sub_08100AD4(struct ContactPosition *);
 static inline u8 *propertiesAt(struct ContactPosition *input)
@@ -39,7 +38,8 @@ static inline u32 terrainFlagEnabled(void)
     }
     return result;
 }
-u32 TetherActor_TestStepPosition(struct ContactPosition *origin, struct ContactPosition *input, u32 inputMask)
+u32 TetherActor_TestStepPosition(struct ContactPosition *origin, struct ContactPosition *input,
+                                 u32 inputMask)
 {
     register struct ContactPosition *candidate asm("r6");
     u32 mask;
@@ -61,8 +61,12 @@ u32 TetherActor_TestStepPosition(struct ContactPosition *origin, struct ContactP
     surface = *properties >> 4;
     height = (*properties & 15) << 8;
     switch (surface) {
-    case 1: height -= (u8)candidate->z; break;
-    case 2: height -= (u8)candidate->x; break;
+        case 1:
+            height -= (u8)candidate->z;
+            break;
+        case 2:
+            height -= (u8)candidate->x;
+            break;
     }
     difference = origin->y - height;
     if (difference < 0)
