@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 22.3% matching (2026-10-13). This file is the single
+Last updated after reaching 22.381% matching (2026-10-13). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,37 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 13 (Codex): contiguous scene pool continuation
+
+Matching is **22.381%**, up **0.072 percentage points** from Claude's latest
+22.309% baseline: **10 new exact functions**, **6,271 / 11,465** overall;
+540,582 / 2,415,354 bytes (+1,732). Without register pinning: **18.441%**;
+Register-pinned: **3.940%**, included above. One 83.6% NONMATCHING steering
+helper is retained and earns no exact credit. Shared types and a new contiguous
+report group cover **0803CDF0–0803EE58**. The subsystem is incomplete.
+
+Reviewed Claude's reorganization, shared engine types, hint audit and gap work,
+and resumed the previous contiguous matching approach beyond the wireless
+scene objects. New exact C includes the script parser, bounds query, pool-entry
+creation, five adjacent state selectors, actor motion control and the cruise
+state's kind-specific dispatch. Names and gameplay interpretations are tentative;
+see [scene-pool notes](../notes/scene-pool_2026-10-13.md).
+
+Every addition passed an explicit full-extent exact check. Unnecessary hints
+were removed with depin.py. Name promotion also promoted four existing KeyTrigger
+aliases; those are naming changes only. The combined ROM build printed
+**`build/boktai3.gba: OK`** (`build/scene-pool-combined.log`). This checkout has
+private generated files and build outputs; Claude's uncommitted 08160EA4 edit
+in the primary checkout was left intact.
+
+**Current user instruction:** keep working contiguously until **25% matching**
+or **80% usage remaining**, whichever comes first. This replaces older allowance
+floors below. Latest observation: **96% remaining**; continue solo after this
+batch. Do not redeem reset credits. Next: finish **0803DAC8 / 0803DC60**, then
+continue through **0803DF90–0803ED84**. A fresh 0803DAC8 candidate is in ignored
+wip/ in the attached `codex/contiguous-to25` worktree. Avoid repeating the manager
+loop's allocation/rotation experiments without a new hypothesis.
 
 ## October 13 (Claude, solo): gap mining (read this first)
 

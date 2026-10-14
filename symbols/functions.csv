@@ -426,6 +426,21 @@ addr,name,mode,confidence,source,notes
 08033634,TextWindow_Find,thumb,low,src-alias,
 0803386C,TextWindow_SetScript,thumb,low,src-alias,
 08033924,TextWindow_Refresh,thumb,low,src-alias,
+0803CDF0,ScenePool_ParseEntryParameters,thumb,low,src-alias,
+0803D1E8,ScenePool_ReadActorBounds,thumb,low,src-alias,
+0803D61C,ScenePool_CreateEntryFromScript,thumb,low,src-alias,
+0803D680,ScenePool_SelectInitialDirection,thumb,low,src-alias,
+0803D700,ScenePool_SelectRepeatOrExit,thumb,low,src-alias,
+0803D78C,ScenePool_SelectRepeatedDirection,thumb,low,src-alias,
+0803D80C,ScenePool_SelectDirectionOrRepeat,thumb,low,src-alias,
+0803D8A8,ScenePool_ResumeAfterIdle,thumb,low,src-alias,
+0803D90C,ScenePool_ApplyMotionControls,thumb,low,src-alias,
+0803DC60,ScenePool_UpdateSteeringPulse,thumb,low,src-alias,
+0803DDA8,ScenePool_StateCruise,thumb,low,src-alias,
+08197EC4,KeyTrigger_Update,thumb,low,src-alias,
+08197F64,KeyTrigger_Destroy,thumb,low,src-alias,
+08197F68,KeyTrigger_Init,thumb,low,src-alias,
+08198008,KeyTrigger_Create,thumb,low,src-alias,
 081DC02C,Menu_EraseRect,thumb,high,raphaelr,"(x, y, w, h) clear UI text area; must be called before overdrawing text"
 081DC054,Menu_DrawText,thumb,high,raphaelr,"(x, y, char *text) draw text in the UI"
 081DC6D0,Time_ShowRegionMenu,thumb,medium,raphaelr,region select screen; page number at menu+0x1C

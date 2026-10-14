@@ -1,0 +1,12 @@
+addr,name,confidence,evidence
+0803CDF0,ScenePool_ParseEntryParameters,low,Tentative role from contiguous scene pool callbacks and include/scene_pool.h; notes/scene-pool_2026-10-13.md
+0803D1E8,ScenePool_ReadActorBounds,low,Tentative role from contiguous scene pool callbacks and include/scene_pool.h; notes/scene-pool_2026-10-13.md
+0803D61C,ScenePool_CreateEntryFromScript,low,Tentative role from contiguous scene pool callbacks and include/scene_pool.h; notes/scene-pool_2026-10-13.md
+0803D680,ScenePool_SelectInitialDirection,low,Tentative role from contiguous scene pool callbacks and include/scene_pool.h; notes/scene-pool_2026-10-13.md
+0803D700,ScenePool_SelectRepeatOrExit,low,Tentative role from contiguous scene pool callbacks and include/scene_pool.h; notes/scene-pool_2026-10-13.md
+0803D78C,ScenePool_SelectRepeatedDirection,low,Tentative role from contiguous scene pool callbacks and include/scene_pool.h; notes/scene-pool_2026-10-13.md
+0803D80C,ScenePool_SelectDirectionOrRepeat,low,Tentative role from contiguous scene pool callbacks and include/scene_pool.h; notes/scene-pool_2026-10-13.md
+0803D8A8,ScenePool_ResumeAfterIdle,low,Tentative role from contiguous scene pool callbacks and include/scene_pool.h; notes/scene-pool_2026-10-13.md
+0803D90C,ScenePool_ApplyMotionControls,low,Tentative role from contiguous scene pool callbacks and include/scene_pool.h; notes/scene-pool_2026-10-13.md
+0803DC60,ScenePool_UpdateSteeringPulse,low,Tentative role from contiguous scene pool callbacks and include/scene_pool.h; notes/scene-pool_2026-10-13.md
+0803DDA8,ScenePool_StateCruise,low,Tentative role from contiguous scene pool callbacks and include/scene_pool.h; notes/scene-pool_2026-10-13.md
