@@ -1,0 +1,57 @@
+diff --git a/src/platform/headless-main.c b/src/platform/headless-main.c
+index 61110b1..0d9b274 100644
+--- a/src/platform/headless-main.c
++++ b/src/platform/headless-main.c
+@@ -54,6 +54,12 @@ static bool _headlessCheckResiger(void);
+ 
+ static struct mCore* core;
+ 
++#include <mgba/internal/gba/gba.h>
++static uint8_t _luxValue = 0xE8;
++static void _sampleLux(struct GBALuminanceSource* s) { (void) s; }
++static uint8_t _readLux(struct GBALuminanceSource* s) { (void) s; return _luxValue; }
++static struct GBALuminanceSource _headlessLux = { _sampleLux, _readLux };
++
+ static bool _dispatchExiting = false;
+ static int _exitCode = 0;
+ static struct mStandardLogger _logger;
+@@ -164,6 +170,7 @@ int main(int argc, char * argv[]) {
+ 	if (!mCoreLoadFile(core, args.fname)) {
+ 		goto loadError;
+ 	}
++	mCoreAutoloadSave(core); /* Boktai 3 decomp: load ROM.sav like the GUI does */
+ 
+ #ifdef ENABLE_DEBUGGERS
+ 	struct mDebugger debugger;
+@@ -173,11 +180,31 @@ int main(int argc, char * argv[]) {
+ 	if (hasDebugger) {
+ 		mDebuggerAttach(&debugger, core);
+ 		mDebuggerEnter(&debugger, DEBUGGER_ENTER_MANUAL, NULL);
++#ifdef ENABLE_SCRIPTING
++	} else if (StringListSize(&headlessOpts.scripts) && getenv("MGBA_SCRIPT_DEBUGGER")) {
++		/* Boktai 3 decomp: give scripts a debugger so emu:setBreakpoint works headless. */
++		mDebuggerAttach(&debugger, core);
++		hasDebugger = true;
++#endif
+ 	} else {
+ 		mDebuggerDeinit(&debugger);
+ 	}
+ #endif
+ 
++	/* Boktai 3 decomp: a video buffer (for screenshots and scripts), and a
++	 * deterministic clock and solar sensor, as tools/emu/harness.c */
++	{
++		unsigned vw, vh;
++		core->baseVideoSize(core, &vw, &vh);
++		static mColor* videoBuffer;
++		videoBuffer = calloc(vw * vh, BYTES_PER_PIXEL);
++		core->setVideoBuffer(core, videoBuffer, vw);
++		const char* rtcEnv = getenv("BOKTAI3_RTC");
++		core->rtc.override = RTC_FIXED;
++		core->rtc.value = (int64_t) (rtcEnv ? strtoll(rtcEnv, NULL, 10) : 1128150000LL) * 1000;
++		core->setPeripheral(core, mPERIPH_GBA_LUMINANCE, &_headlessLux);
++	}
++
+ 	core->reset(core);
+ 
+ 	mArgumentsApplyFileLoads(&args, core);
