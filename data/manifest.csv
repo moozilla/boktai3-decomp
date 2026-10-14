@@ -1,0 +1,2 @@
+name,start,end,format,file,description
+actor_registry,08603300,08604998,keyed_callbacks,data/actor_registry.csv,Script chara registry: string-hash key to actor/controller constructor (722 entries + sentinel)
