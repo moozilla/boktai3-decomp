@@ -24,9 +24,12 @@ def main():
         if a.extract and e.name != a.extract:
             continue
         if a.extract:
-            text = e.module().decode(rom, e.start, e.end, load_func_names())
-            with open(e.file, "w", encoding="utf-8") as f:
-                f.write(text)
+            if hasattr(e.module(), "extract"):
+                e.extract()
+            else:
+                text = e.module().decode(rom, e.start, e.end, load_func_names())
+                with open(e.file, "w", encoding="utf-8") as f:
+                    f.write(text)
             print(f"wrote {os.path.relpath(e.file)}")
         got = to_bytes(e.encode())
         want = rom[e.start - ROM_BASE:e.end - ROM_BASE]
