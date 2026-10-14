@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_sequence_actor.h"
-#define ContactSequenceActor_UpdateActive  sub_080460C8
-#define ContactSequenceActor_TakeEntryFlag sub_08045D3C
-#define ContactSequenceActor_SetFlags      sub_08045D18
 u32 ContactSequenceActor_TakeEntryFlag(struct ContactSequenceActor *);
 void ContactSequenceActor_SetFlags(struct ContactSequenceActor *, u32);
 void ContactSequenceActor_UpdateActive(struct ContactSequenceOwner *parent,

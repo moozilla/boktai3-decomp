@@ -1,6 +1,4 @@
 #include "contact_sequence_actor.h"
-#define ContactSequenceActor_Initialize         sub_08045E08
-#define ContactSequenceActor_ApplyHealthContact sub_08045D54
 void ContactSequenceActor_ApplyHealthContact(void *, void *, struct ContactSequenceActor *);
 void sub_0821FF7C(void *, u32, u32, u32);
 void sub_0821FF58(void *, u32, u32, u32, u32, u32);

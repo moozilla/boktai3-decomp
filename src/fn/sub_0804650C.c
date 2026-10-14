@@ -1,6 +1,4 @@
 #include "contact_sequence_actor.h"
-#define ContactSequencePool_Update  sub_0804650C
-#define ContactSequenceActor_Update sub_08046370
 void ContactSequenceActor_Update(struct ContactSequenceOwner *, struct ContactSequenceActor *);
 void sub_08221110(void *, void *, void *, u32, u32);
 s32 ContactSequencePool_Update(struct ContactSequenceOwner *owner)

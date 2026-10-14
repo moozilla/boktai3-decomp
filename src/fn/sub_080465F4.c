@@ -1,6 +1,4 @@
 #include "contact_sequence_actor.h"
-#define ContactSequencePool_Initialize  sub_080465F4
-#define ContactSequenceActor_Initialize sub_08045E08
 void ContactSequenceActor_Initialize(struct ContactSequenceOwner *, struct ContactSequenceActor *);
 extern u8 *gUnk_030042E4;
 s32 ContactSequencePool_Initialize(struct ContactSequenceOwner *owner, s32 initialHealth,

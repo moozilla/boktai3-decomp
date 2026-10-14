@@ -1,8 +1,4 @@
 #include "contact_sequence_actor.h"
-#define ContactSequencePool_Create     sub_0804665C
-#define ContactSequencePool_Update     sub_0804650C
-#define ContactSequencePool_Destroy    sub_080465CC
-#define ContactSequencePool_Initialize sub_080465F4
 s32 ContactSequencePool_Update(struct ContactSequenceOwner *);
 s32 ContactSequencePool_Destroy(struct ContactSequenceOwner *);
 s32 ContactSequencePool_Initialize(struct ContactSequenceOwner *, s32, u32, s32, u32, u32);

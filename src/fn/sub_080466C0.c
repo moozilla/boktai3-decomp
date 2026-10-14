@@ -1,5 +1,4 @@
 #include "contact_sequence_actor.h"
-#define ContactSequencePool_FindInactiveActor sub_080466C0
 struct ContactSequenceActor *
 ContactSequencePool_FindInactiveActor(struct ContactSequenceOwner *owner)
 {

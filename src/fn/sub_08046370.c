@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_sequence_actor.h"
-#define ContactSequenceActor_Update   sub_08046370
-#define ContactSequenceActor_SetFlags sub_08045D18
-#define ContactSequenceActor_GetFlags sub_08045D28
 void ContactSequenceActor_SetFlags(struct ContactSequenceActor *, u32);
 u32 ContactSequenceActor_GetFlags(struct ContactSequenceActor *, u32);
 extern void (*const gUnk_086059A4[])(struct ContactSequenceOwner *, struct ContactSequenceActor *);

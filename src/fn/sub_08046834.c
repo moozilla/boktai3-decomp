@@ -1,6 +1,4 @@
 #include "contact_sequence_actor.h"
-#define ContactSequencePool_BeginAllDeaths sub_08046834
-#define ContactSequenceActor_SetState      sub_08045D30
 void ContactSequenceActor_SetState(struct ContactSequenceActor *, u32);
 s32 ContactSequencePool_BeginAllDeaths(struct ContactSequenceOwner *owner)
 {
