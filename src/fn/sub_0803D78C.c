@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
 #define ScenePool_SelectRepeatedDirection sub_0803D78C
-void sub_08219DD8(void *, s32);
 s32 ScenePool_SelectRepeatedDirection(void *owner, struct ScenePoolEntry *entry)
 {
     u32 *history = entry->history;
@@ -25,7 +24,7 @@ s32 ScenePool_SelectRepeatedDirection(void *owner, struct ScenePoolEntry *entry)
         entry->stateEntered = one;
         {
             register u32 *arg asm("r0") = history;
-            sub_08219DD8(arg, 0x100);
+            Memory_Clear(arg, 0x100);
         }
     }
     } else {
@@ -35,7 +34,7 @@ s32 ScenePool_SelectRepeatedDirection(void *owner, struct ScenePoolEntry *entry)
         entry->stateEntered = 1;
         {
             register u32 *arg asm("r0") = history;
-            sub_08219DD8(arg, 0x100);
+            Memory_Clear(arg, 0x100);
         }
     }
     return 1;
