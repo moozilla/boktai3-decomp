@@ -24,7 +24,8 @@ struct ScenePoolEntry {
     u32 unknown5c;
     s32 idleFrame;
     u8 stateEntered;
-    u8 unknown65[3];
+    u8 steeringActive, steeringDelay;
+    s8 steeringPulse;
     u32 state;
     u32 history[0x40];
     s32 settingA, delayA, settingB, delayB;
@@ -33,5 +34,19 @@ struct ScenePoolManager {
     u8 task[0x18];
     u32 capacity, activeCount;
     struct ScenePoolEntry *entries;
+};
+/* Partial actor view established by the frame/state callbacks in this range. */
+struct ScenePoolActor {
+    u8 unknown0[0x38];
+    s32 restrictionMetric;
+    u8 unknown3c[0x1c];
+    u16 timerA, timerB;
+    u8 unknown5c[0x550];
+    s32 forwardSpeed, verticalSpeed, lateralSpeed;
+    u8 unknown5b8[0x34];
+    s8 motionLock;
+    u8 unknown5ed[0x26b];
+    u32 controlFlags;
+    u8 unknown85c[0x54];
 };
 #endif
