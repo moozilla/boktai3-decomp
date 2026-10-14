@@ -34,6 +34,16 @@ struct ScenePoolManager {
     u8 task[0x18];
     u32 capacity, activeCount;
     struct ScenePoolEntry *entries;
+    u32 seenIds[8];
+    u8 actors[4][0x8b0];
+    u32 playerMask;
+    s32 playerCount;
+    u32 regions[2];
+    u32 leftBounds[2], rightBounds[2];
+    s32 playerPositions[2][4];
+    u32 configuration, currentConfiguration;
+    u32 firstId, lastId;
+    u32 registry[3];
 };
 /* Partial actor view established by the frame/state callbacks in this range. */
 struct ScenePoolActor {
