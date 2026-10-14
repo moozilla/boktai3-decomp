@@ -3,7 +3,7 @@ extern u8 gUnk_03005430[];
 extern u32 gUnk_03005404;
 void sub_082286E0(s32 *, s32 *, s32 *, u32);
 u32 sub_0822874C(s32, s32, s32);
-s32 sub_08228548(s32, s32);
+s32 Clock_DaysInMonth(s32, s32);
 s32 sub_0822867C(s32, s32, s32);
 void sub_08228848(void)
 {
@@ -20,7 +20,7 @@ void sub_08228848(void)
                     p[4] = 0;
                     sub_082286E0(&year, &month, &day, *(u32 *)p);
                     day++;
-                    if (day >= sub_08228548(year, month)) {
+                    if (day >= Clock_DaysInMonth(year, month)) {
                         day = 1;
                         month++;
                         if (month > 12) {
