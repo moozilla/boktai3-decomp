@@ -1,0 +1,40 @@
+#include "contact_burst.h"
+#define ContactBurst_Initialize sub_08048248
+#define ContactBurst_OnContact sub_08047F68
+void ContactBurst_OnContact(void *, void *, struct ContactBurst *);
+void sub_0821FF7C(void *, u32, u32, u32);
+s32 ContactBurst_Initialize(struct ContactBurst *effect, const struct ContactPosition *world)
+{
+    struct ContactSwarmGraphics *graphics;
+    struct TransientEffectSprite *sprite;
+    struct ContactCollider *collider;
+    struct ContactPackedVector bounds, offset;
+    s32 sample;
+    effect->enabled = 0;
+    effect->previousEnabled = 0;
+    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    sample = ((const u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308];
+    effect->contactFrame = Mod(sample >> 8, 3) * 2 + 32;
+    effect->fade = 1;
+    effect->world = world;
+    graphics = &effect->graphics;
+    if (!AnimData_Load(graphics, 0x4147))
+        return -1;
+    sprite = &effect->sprite;
+    Sprite_Init(sprite, graphics, 0x211);
+    AnimData_SelectTiles(graphics, 0x164);
+    sprite->frame = 27;
+    sprite->priority = 1;
+    bounds.x = 96;
+    bounds.y = 128;
+    bounds.z = 96;
+    offset.x = 0;
+    offset.y = 128;
+    offset.z = 0;
+    collider = &effect->collider;
+    Collider_Init(collider, 0, 0x4005, 0, 16, &bounds, &offset);
+    Collider_SetCallback(collider, (void *)ContactBurst_OnContact, effect);
+    sub_0821FF7C(collider, 0, 0, 0);
+    Collider_Refresh(collider);
+    /* Original success path leaves the final call's r0 unspecified; creator tests only its sign. */
+}
