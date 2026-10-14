@@ -279,6 +279,36 @@ continue through **0803DF90–0803ED84**. A fresh 0803DAC8 candidate is in ignor
 wip/ in the attached `codex/contiguous-to25` worktree. Avoid repeating the manager
 loop's allocation/rotation experiments without a new hypothesis.
 
+## October 14 (Claude): data, assets and register allocation (read this first)
+
+* **Register allocation.** `tools/regdiag.py` explains wrong registers from
+  agbcc's own dumps (local, global or reload; source lines);
+  `docs/REGALLOC.md` has the rules read from agbcc's source and the fixes.
+  `tools/unpin.py` (also `--per-function`, literal RAM addresses),
+  `tools/isolate.py`, `tools/promote_draft.py`, `tools/make_draft.py`. The
+  permuter queue (`build/unp/permq.sh` over `build/unp/queue.txt`) found 20+
+  pin-free rewrites; review each diff for faithful C before applying it to
+  the current source (`build/unp/apply_perm.py`).
+* **Decoded data pipeline.** `data/manifest.csv` + `tools/datafmt/` rebuild
+  data ranges from editable files, byte-exact and shiftable
+  (`docs/DATA.md`). First table: `data/actor_registry.csv` (the script
+  `chara` table). Next candidates: other pointer tables, then archives.
+* **Assets** (`docs/ASSETS.md`, `tools/assets/`). Resources are found by
+  extension-hash + name-hash (`ScriptProc_Start` is a resource lookup,
+  MGS `GV_GetCache`-like). Decoded: the archive directory, both sprite formats
+  (`sprites.py`, `bigsprites.py`), the script image (`gcx.py`, with the
+  GCL command names recovered from their hashes), the font and all text
+  (`data/charmap.tsv`, `text.py`). Extracted output stays in `build/`.
+* **Insight so far.** The text contains the full monster list (#9838-#9921);
+  the enemy families at `0x08084F44`-`0x080FE68C` each load one large sprite
+  (tentative identifications in ASSETS.md). Region B around `0x081CC690` is
+  state-table actors (`include/state_actor.h`, `src/message_actor_08612344.c`).
+* **Open threads.** Trace how `CB05` lookups reach the `98F5` sprites; find the
+  bestiary table that links monster ids to names and families; decode `map`
+  (`MP`) and `HP` resources; dump OBJ palettes per scene for true colours;
+  region A (`0x08190670`, a 68-state and a 19-state machine, possibly the
+  `radio` command) is still mostly large unmatched functions.
+
 ## October 13 (Claude, solo): gap mining (read this first)
 
 State: **22.309%** matched (538,850 / 2,415,354 bytes; 6,261 / 11,465 functions);
