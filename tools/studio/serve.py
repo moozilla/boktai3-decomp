@@ -101,6 +101,28 @@ def display_strings(trans):
     return jp, en
 
 
+def scene_list():
+    """Scene entries (tools/mgba/scenes.py) with survey results when present."""
+    path = os.path.join(ROOT, "build", "centaur", "scenes.json")
+    if not os.path.exists(path):
+        subprocess.run([sys.executable, os.path.join(ROOT, "tools", "mgba", "scenes.py")], cwd=ROOT)
+    sc = json.load(open(path))
+    pals = {r["map"]: r["palette"] for r in live.stage_palettes()}
+    for s in sc:
+        cap = os.path.join(live.OUT, "captures", f"scene_{s['scene']:04d}")
+        s["shot"] = os.path.exists(os.path.join(cap, "screen.png"))
+        a = os.path.join(cap, "analysis.json")
+        if os.path.exists(a):
+            try:
+                an = json.load(open(a))
+                s["shown"] = an.get("stage_map")
+                s["became"] = an.get("meta", {}).get("scene")
+            except ValueError:
+                pass
+        s["palette"] = pals.get(s.get("shown") or s.get("map") or "")
+    return sc
+
+
 def ensure_bank():
     if not os.path.exists(BANK):
         for e in load_manifest():
@@ -178,6 +200,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, [dict(s, edited=orig.get(s["id"]) != s["text"]) for s in read_strings()])
         elif self.path == "/api/original":
             self.send(200, self.server.original)
+        elif self.path == "/api/english":
+            self.send(200, self.server.display_en)
         elif self.path == "/api/charmap":
             self.send(200, {f"{g:04X}": c for g, c in text_bank.charmap().items()})
         elif self.path == "/api/font":
@@ -202,6 +226,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 self.send(200, live.analyse_capture(name))
             except FileNotFoundError:
                 self.send(404, {"error": "no such capture"})
+        elif self.path == "/api/scenes":
+            self.send(200, scene_list())
         elif self.path == "/api/learned":
             self.send(200, {"stages": live.stage_palettes(), "sprites": live.sprite_palettes()})
         elif self.path == "/api/tags":

@@ -96,9 +96,9 @@ const $ = id => document.getElementById(id);
 const SIZES = { 0: [[8, 8], [16, 16], [32, 32], [64, 64]], 1: [[16, 8], [32, 8], [32, 16], [64, 32]], 2: [[8, 16], [8, 32], [16, 32], [32, 64]], 3: [[8, 8], [8, 8], [8, 8], [8, 8]] };
 // Tentative identifications from docs/ASSETS.md (visual guesses unless noted).
 const NOTES = {
-  B96C: 'slime (name hash confirmed)', 9506: 'bee (name hash confirmed)', DA6D: 'bat?', 9247: 'ghoul / zombie?', D637: 'hooded figure', D28E: 'ring (runs in field; effect?)',
-  '5A6E': 'crow / raven?', '528F': 'spider?', D636: 'octopus?', 5290: 'red round creature', '48DE': 'thin green figure', D635: 'dragon puppy?', 3876: 'arcade cabinet',
-  D291: 'flame worm (モエルルン?)', D638: 'pale worm (ヒエルルン?)', 5291: 'living sword', '3DB6': 'black winged creature', AE52: 'skeletons', '0658': 'sword-wielder', '158A': 'man in coat',
+  B96C: 'slime (name hash confirmed; red in game)', 9506: 'bee (name hash confirmed)', DA6D: 'bat', 9247: 'ghoul / zombie', D637: 'hooded figure (wraith?)', D28E: 'flame / wisp (runs in field)',
+  '5A6E': 'crow / raven?', '528F': 'spider?', D636: 'octopus?', 5290: 'golem (clay/rock)', '48DE': 'mummy', D635: 'hound', 3876: 'mimic (treasure chest)',
+  D291: 'flame worm (モエルルン?)', D638: 'green worm (クロロホルルン?)', 5291: 'living sword', '3DB6': 'black winged creature', AE52: 'skeletons', '0658': 'sword-wielder', '158A': 'man in coat',
   DE23: 'playable character', '761E': 'character (1253 frames)', F761: 'large beast', F771: 'large bird', F7D2: 'boss face', A2DB: 'eruption effect', '1BC7': 'flames',
   DF11: 'light bulb', '731D': 'copyright line', '82F1': 'PURIFICATION COMPLETED!', E89F: 'Boktai 2 title',
 };
@@ -454,7 +454,7 @@ views.maps = {
         <span id="palhint" style="color:var(--muted)"></span> <span id="tagslot"></span>
       </div>
       <div class="stage" id="ms" style="padding:0;overflow:auto;max-width:100%"></div><div class="meta" id="hover" style="margin-top:6px">&nbsp;</div>`;
-    const known = learned.stages.find(x => x.map === mh && (!ts || x.tileset === ts)) || learned.stages.find(x => x.map === mh);
+    const known = learned.stages.find(x => x.map === mh);
     $('palhint').innerHTML = known ? `Captured palette for this stage: <a href="#" id="usepal">${known.palette}</a>` : 'Palette is chosen at runtime; capture this stage in Live to learn it.';
     if (known) $('usepal').onclick = ev => { ev.preventDefault(); const i = palettes.findIndex(p => p.hash === known.palette); $('palSel').value = i; curPal = palettes[i]; draw(); };
     $('tagslot').appendChild(tagButton('map', mh, $('lay') ? m.ents[0].hash : ''));

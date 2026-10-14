@@ -20,11 +20,13 @@
 --
 -- Console commands (type in the scripting console):
 --   help()                  this list
+--   (in game) SELECT+L cycles subtitles, SELECT+R saves a quick bookmark
 --   subs("en"|"both"|"jp"|"off")   subtitle mode (default "en")
 --   subpos("top"|"bottom"), subid(true) subtitle position; show string IDs
 --   hud(true|false)         status overlay
 --   bm("name") / go("name") / bms()   save / load / list bookmarks
 --   god(true|false)         keep life at maximum (GameState +0x28/+0x2A)
+--   warp(scene), scene()    experimental: load a scene (stage loads, player does not spawn)
 --   capture()               send a scene capture to the studio
 --   rec_start("name"), rec_stop()     record inputs as a harness script
 --   peek8/16/32(a), poke8/16/32(a,v), watch(a), unwatch(), where()
@@ -77,6 +79,7 @@ local S = {
 }
 
 local function hex4(v) return string.format("%04X", v & 0xFFFF) end
+local function toast(msg) S.toast = { text = msg, frame = emu:currentFrame() }; S.dirty = true end
 
 -- ---------------------------------------------------------------------------
 -- tiny JSON (enough for the studio protocol)
@@ -341,12 +344,17 @@ local function draw()
     end
     o.sub:update()
     clear(o.hudp, o.sw, o.hudl.image.height)
-    if S.hud then
+    if S.hud or S.toast then
       local parts = {}
       if rec then parts[#parts + 1] = string.format("REC %d:%02d", rec.frames // 3600, (rec.frames // 60) % 60) end
       if S.stage.map then parts[#parts + 1] = "map " .. S.stage.map .. (S.stage.tileset and (" tiles " .. S.stage.tileset) or "") end
       if S.god then parts[#parts + 1] = "GOD" end
       if link.sock then parts[#parts + 1] = "studio" end
+      if S.toast and emu:currentFrame() - S.toast.frame < 150 then
+        local tw = o.hudp:textRunMetrics(S.toast.text):width() + 8
+        o.hudp:setFillColor(0xC0204060); o.hudp:drawRectangle(o.sw - tw, 0, tw, o.hudl.image.height)
+        o.hudp:setFillColor(0xFFFFFFFF); o.hudp:drawText(S.toast.text, o.sw - 4, 1, 0x13)
+      end
       if #parts > 0 then
         local s = table.concat(parts, "  ")
         o.hudp:setFillColor(0x90000000); o.hudp:drawRectangle(0, 0, o.hudp:textRunMetrics(s):width() + 8, o.hudl.image.height)
@@ -423,7 +431,7 @@ function bm(name)
   f = io.open(BM .. "index.tsv", "w")
   for _, b in ipairs(out) do f:write(string.format("%s\t%d\t%s\t%s\n", b.name, b.frame, b.map, b.when)) end
   f:close()
-  console:log("bookmark saved: " .. name)
+  console:log("bookmark saved: " .. name); toast("bookmark " .. name)
   send({ t = "bookmarks", list = out })
 end
 function go(name)
@@ -432,7 +440,7 @@ function go(name)
   local data = f:read("a"); f:close()
   if rec then console:warn("loading a bookmark while recording: the replay will not stay in sync") end
   emu:loadStateBuffer(data)
-  console:log("loaded bookmark " .. name)
+  console:log("loaded bookmark " .. name); toast("loaded " .. name)
 end
 function bms()
   for _, b in ipairs(bm_index()) do console:log(string.format("  %-20s map %s  %s", b.name, b.map, b.when)) end
@@ -452,10 +460,10 @@ function capture(tag)
   end
   pcall(function() emu:screenshot(dir .. "/screen.png") end)
   local meta = io.open(dir .. "/meta.json", "w")
-  meta:write(json({ frame = emu:currentFrame(), map = S.stage.map, tileset = S.stage.tileset, pal = S.stage.pal,
+  meta:write(json({ frame = emu:currentFrame(), scene = scene(), map = S.stage.map, tileset = S.stage.tileset, pal = S.stage.pal,
                     text = S.text and S.text.id or nil, time = os.date("%Y-%m-%d %H:%M:%S") }))
   meta:close()
-  console:log("capture saved: " .. dir)
+  console:log("capture saved: " .. dir); toast("captured")
   send({ t = "capture", name = name, dir = dir })
 end
 
@@ -495,8 +503,27 @@ function help()
   bm("name")  go("name")  bms()      capture("tag")
   rec_start("name")  rec_stop()      where()
   peek8/16/32(a)  poke8/16/32(a,v)  watch(a)  unwatch()
+in game: SELECT+L cycles subtitles, SELECT+R saves a quick bookmark
 studio: python3 tools/studio/serve.py, then http://localhost:8642/live]])
 end
+
+-- Experimental warp: request scene N the way the script `load` command does
+-- (08225508): 0x030039F0 = N, GameState+0x5A4 = N, request flags 0x030053E8.
+-- Scenes are script procedures; python3 tools/mgba/scenes.py lists them. The
+-- stage loads, but the player is not spawned (doors also set an entrance).
+function warp(scene)
+  local gs = emu:read32(ADDR.GameState)
+  emu:write16(0x030039F0, scene)
+  if gs >= 0x02000000 and gs < 0x02040000 then emu:write32(gs + 0x5A4, scene) end
+  emu:write32(0x030053E8, 0x11)
+  S.stage = {}; S.dirty = true
+  LOG("warp to scene " .. scene); toast("warp " .. scene)
+end
+function scene()
+  local gs = emu:read32(ADDR.GameState)
+  return (gs >= 0x02000000 and gs < 0x02040000) and emu:read32(gs + 0x5A4) or nil
+end
+function centaur_state() return { map = S.stage.map, tileset = S.stage.tileset, pal = S.stage.pal, scene = scene() } end
 
 -- save the overlay layers as PNGs (debugging the overlay without seeing the window)
 function ovdump()
@@ -514,6 +541,7 @@ COMMANDS = {
   bookmark = function(c) bm(c.name) end,
   load = function(c) go(c.name) end,
   bookmarks = function() send({ t = "bookmarks", list = bm_index() }) end,
+  warp = function(c) warp(c.scene) end,
   subs = function(c) subs(c.mode); if c.pos then subpos(c.pos) end end,
   god = function(c) god(c.on) end,
   rec_start = function(c) rec_start(c.name) end,
@@ -563,6 +591,20 @@ callbacks:add("frame", function()
     local gs = emu:read32(ADDR.GameState)
     if gs >= 0x02000000 and gs < 0x02040000 then emu:write16(gs + 0x28, emu:read16(gs + 0x2A)) end
   end
+  -- hotkeys: SELECT+L cycles subtitles, SELECT+R saves a quick bookmark
+  local k = emu:getKeys()
+  local combo = (k & 0x204 == 0x204 and "L") or (k & 0x104 == 0x104 and "R") or nil
+  if combo and combo ~= S.lastcombo then
+    if combo == "L" then
+      local order = { en = "both", both = "jp", jp = "off", off = "en" }
+      subs(order[S.mode] or "en"); toast("subtitles: " .. S.mode)
+    else
+      bm(os.date("%m%d-%H%M%S"))
+    end
+  end
+  S.lastcombo = combo
+  -- toasts expire
+  if S.toast and f - S.toast.frame == 150 then S.dirty = true end
   -- remote keys from the studio
   local q = S.keyq[1]
   if q then
@@ -575,7 +617,7 @@ callbacks:add("frame", function()
   if f % 30 == 0 then
     local gs = emu:read32(ADDR.GameState)
     local life = (gs >= 0x02000000 and gs < 0x02040000) and emu:read16(gs + 0x28) or nil
-    send({ t = "state", frame = f, rec = rec ~= nil, pos = S.pos, map = S.stage.map, tileset = S.stage.tileset, pal = S.stage.pal, life = life, mode = S.mode, god = S.god })
+    send({ t = "state", frame = f, rec = rec ~= nil, pos = S.pos, scene = scene(), map = S.stage.map, tileset = S.stage.tileset, pal = S.stage.pal, life = life, mode = S.mode, god = S.god })
   end
   draw()
 end)
