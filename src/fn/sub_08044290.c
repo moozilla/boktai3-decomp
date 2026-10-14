@@ -1,0 +1,84 @@
+// MATCHING_CONCESSION: register-pinning
+#include "contact_swarm.h"
+#define ContactSwarm_UpdateTracking         sub_08044290
+#define ContactSwarm_SetDirectionalSequence sub_08044174
+void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
+void ContactSwarm_UpdateTracking(struct ContactSwarm *pool, struct ContactSwarmSlot *slot,
+                                 s32 index)
+{
+    struct ContactSwarmSprite *sprite = &slot->sprite;
+    struct ContactPosition *position;
+    if (slot->enter) {
+        struct ContactCollider *collider;
+        s32 mask;
+        slot->enter = 0;
+        collider = &slot->healthCollider;
+        mask = -5;
+        mask &= collider->flags;
+        collider->flags = mask;
+        ContactSwarm_SetDirectionalSequence(pool, slot, 0);
+    }
+    {
+        u32 phase = slot->stateFrame & 15;
+        index &= 15;
+        asm("" : "+r"(phase), "+r"(index));
+        position = &slot->sprite.position;
+        if (phase == index) {
+            register struct ContactSwarmSprite *current asm("r5");
+            const struct ContactPosition *target = &pool->target;
+            s32 dx = target->x;
+            s32 dz;
+            current = sprite;
+            dx -= current->position.x;
+            dz = target->z;
+            dz -= position->z;
+            slot->direction = Math_Atan2(dx, dz);
+            ContactSwarm_SetDirectionalSequence(pool, slot, 0);
+        }
+    }
+    Collider_SetPosition(&slot->healthCollider, position, 0);
+    {
+        u32 frame = slot->stateFrame;
+        register u32 limit asm("r5");
+        limit = slot->trackingFrames;
+        if (frame >= limit) {
+            register u32 offset asm("r0") = (u8 *)&pool->target - (u8 *)pool;
+            const struct ContactPosition *target;
+            struct ContactSwarmSprite *current;
+            s32 dx;
+            s32 dz;
+            const u16 *randomTable;
+            u32 randomOffset;
+            u32 direction;
+            u32 randomIndex;
+            u32 jitter;
+            register u32 mask asm("r2");
+            target = (void *)((u8 *)pool + offset);
+            dx = target->x;
+            asm("" : "+r"(dx), "+r"(limit));
+            current = sprite;
+            dx -= current->position.x;
+            dz = target->z;
+            dz -= position->z;
+            direction = Math_Atan2(dx, dz);
+            randomIndex = (gUnk_03005308 + 1) & 1023;
+            gUnk_03005308 = randomIndex;
+            randomOffset = randomIndex * 2;
+            randomTable = (const u16 *)RANDOM_TABLE_ADDR;
+            randomOffset += (u32)randomTable;
+            jitter = *(const u16 *)randomOffset;
+            mask = 15;
+            jitter &= mask;
+            {
+                register u32 zero asm("r1");
+                u32 newDirection = direction + jitter - 8;
+                zero = 0;
+                slot->direction = newDirection;
+                slot->state = 3;
+                slot->enter = 1;
+                slot->stateFrame = zero;
+            }
+        } else
+            slot->stateFrame = frame + 1;
+    }
+}
