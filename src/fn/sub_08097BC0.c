@@ -1,11 +1,14 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.7%
-// 2 differing instruction runs; first diff at +0x7E (mov r0, sp vs ldr r2, [pc, #0x20])
 void sub_0809775C(u8 *, s16 *);
 void sub_08097798(u8 *);
 u32 Math_Atan2(s32, s32);
 void CpuSet(const void *, void *, u32);
+static inline void Fill(void *dst, u32 *tmp, u32 v)
+{
+    *tmp = v;
+    CpuSet(tmp, dst, 0x05000002);
+}
+
 void sub_08097BC0(u8 *s, s16 *v)
 {
     u8 *p = *(u8 **)(s + 0x3d0);
@@ -32,11 +35,6 @@ void sub_08097BC0(u8 *s, s16 *v)
         b[1] = v[1] - a[1];
         b[2] = v[2] - a[2];
         s[0x3cd] = Math_Atan2(b[0], b[2]);
-        p += 0x5fc;
-        stack[0] = zero;
+        Fill(p + 0x5fc, stack, zero);
     }
-    CpuSet(stack, p, 0x05000002);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08097BC0);
-#endif
