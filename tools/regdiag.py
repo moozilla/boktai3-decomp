@@ -150,14 +150,25 @@ def asm_lines(s_path, func):
     return out
 
 
-def strip_pools(dis, limit):
-    """Drop literal-pool words (targets of pc-relative loads) and their padding."""
+def strip_pools(dis, limit, raw=None, base=0):
+    """Drop literal-pool words (targets of pc-relative loads), jump tables
+    (words at a loaded in-function address that point into the function) and
+    their padding."""
     data = set()
     for o, t in dis:  # pools follow their loads, so skip loads already known to be data
         m = re.match(r"ldr r\d+, \[pc, #(0x[0-9a-f]+|\d+)\]", t)
         if m and o not in data:
             target = ((o + 4) & ~3) + int(m.group(1), 0)
             data.update((target, target + 2))
+            if raw is not None and target + 4 <= len(raw):
+                value = int.from_bytes(raw[target:target + 4], "little") - base
+                w = value
+                while 0 <= w < len(raw) - 3 and w < limit:
+                    entry = int.from_bytes(raw[w:w + 4], "little") - base
+                    if not (0 <= entry < limit):
+                        break
+                    data.update((w, w + 2))
+                    w += 4
     out = []
     for o, t in dis:
         if o in data or o >= limit:
@@ -229,7 +240,7 @@ def main():
     od = [(x - addr, t) for x, t in check.disasm(orig, addr)]
     # only instructions (drop pool words the walker knows about)
     cd = [(o, t) for o, t in cd if o in by_off]
-    od = strip_pools(od, len(cand))
+    od = strip_pools(od, len(cand), orig, addr)
     sm = difflib.SequenceMatcher(None, [shape(t) for _, t in cd], [shape(t) for _, t in od], autojunk=False)
 
     l_insns, g_insns = insns_by_uid(lreg), insns_by_uid(greg)
