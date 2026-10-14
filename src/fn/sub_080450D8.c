@@ -1,6 +1,4 @@
 #define EncodedRecord_DecodeFields sub_080450D8
-#define EncodedRecord_ReadBits     sub_08044CF4
-#define EncodedRecord_XorRange     sub_08044D6C
 #include "encoded_record.h"
 void EncodedRecord_DecodeFields(struct EncodedRecordFields *fields, u8 *record, s32 skip)
 {

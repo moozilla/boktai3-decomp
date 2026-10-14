@@ -1,5 +1,4 @@
 #include "global.h"
-#define EncodedRecord_FormatRows sub_08044DD0
 extern const u8 gUnk_08605934[];
 extern const u8 gUnk_08605940[];
 void EncodedRecord_FormatRows(u8 *dst, const u8 *src, const u8 *map, u32 count)

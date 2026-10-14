@@ -1,5 +1,4 @@
 #include "global.h"
-#define EncodedRecord_WriteBits sub_08044C80
 s32 __divsi3(s32, s32);
 s32 sub_08249350(s32, s32);
 void EncodedRecord_WriteBits(u8 *base, s32 bits, u32 *source, s32 count, s32 index)

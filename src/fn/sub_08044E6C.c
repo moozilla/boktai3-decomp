@@ -1,5 +1,3 @@
-#define EncodedRecord_WriteBits sub_08044C80
-#define EncodedRecord_XorRange  sub_08044D6C
 #include "encoded_record.h"
 extern u32 gUnk_03005308;
 extern u8 *gUnk_030053F8;
@@ -9,7 +7,6 @@ struct EncodedRecordSession {
 };
 s32 Div(s32, s32);
 u32 sub_082215A4(const void *, u32, u32);
-#define EncodedRecord_EncodeFields sub_08044E6C
 void EncodedRecord_EncodeFields(u8 *record)
 {
     u32 bit;

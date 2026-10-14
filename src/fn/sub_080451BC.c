@@ -1,5 +1,3 @@
-#define EncodedRecord_WriteBits sub_08044C80
-#define EncodedRecord_XorRange  sub_08044D6C
 #include "encoded_record.h"
 extern u32 gUnk_03005308;
 extern u8 *gUnk_030053F8;

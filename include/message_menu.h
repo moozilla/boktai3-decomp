@@ -13,7 +13,7 @@ struct MessageMenu {
     u32 timer; /* frames since creation */
     u8 pad1C[6];
     u16 script;                           /* script run once when the menu is dismissed */
-    u8 formatter[24];                     /* text formatter state for sub_08044DD0 */
+    u8 formatter[24];                     /* text formatter state for EncodedRecord_FormatRows */
     u8 lines[4][256];                     /* formatted text lines */
     void *source;                         /* source string table (guess) */
     u8 *text;                             /* script text for the three windows */
@@ -29,8 +29,8 @@ void sub_080337FC(int);
 void sub_08033778(int);
 void sub_082161B4(int, int, void *, int, int, int, void *);
 void sub_0821983C(void *, void *, int, int, int, int, int, void *);
-void sub_08044E6C(void *);
-void sub_08044DD0(void *, void *, void *, int);
+void EncodedRecord_EncodeFields(void *);
+void EncodedRecord_FormatRows(void *, void *, void *, int);
 void *sub_08227E90(void);
 extern u16 gUnk_03004FC0[];
 extern u16 gUnk_030051A0[];
