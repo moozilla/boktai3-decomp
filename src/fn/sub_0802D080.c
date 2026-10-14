@@ -14,9 +14,9 @@ struct Object {
     u32 drawable;
 };
 void sub_0802CB94(struct Object *);
-void sub_080426B0(void *, void *);
-void sub_080423C8(void *);
-int sub_08042320(void *, int, int, int, int, int, int);
+void DisplayAnimation_SetPosition(void *, void *);
+void DisplayAnimation_UpdatePlayback(void *);
+int DisplayAnimation_SetEntry(void *, int, int, int, int, int, int);
 int sub_0802D080(struct Object *p, int a, int b, int stride, int c, int d)
 {
     int direction, flip;
@@ -38,5 +38,5 @@ int sub_0802D080(struct Object *p, int a, int b, int stride, int c, int d)
         }
         direction *= stride;
     }
-    return sub_08042320(&p->drawable, a, direction, flip, b, c, d);
+    return DisplayAnimation_SetEntry(&p->drawable, a, direction, flip, b, c, d);
 }

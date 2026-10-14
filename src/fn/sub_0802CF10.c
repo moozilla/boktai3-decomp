@@ -14,17 +14,17 @@ struct Object {
     u32 drawable;
 };
 void sub_0802CB94(struct Object *);
-void sub_080426B0(void *, void *);
-void sub_080423C8(void *);
+void DisplayAnimation_SetPosition(void *, void *);
+void DisplayAnimation_UpdatePlayback(void *);
 void sub_0802CF10(struct Object *p)
 {
     void *d;
     sub_0802CB94(p);
     d = &p->drawable;
-    sub_080426B0(d, p->pos);
+    DisplayAnimation_SetPosition(d, p->pos);
     {
         u32 mask = 2;
         if (p->flags & mask)
-            sub_080423C8(d);
+            DisplayAnimation_UpdatePlayback(d);
     }
 }

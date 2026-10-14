@@ -7,7 +7,7 @@ struct Actor {
     u8 pad1b[0xb9];
     u32 drawable;
 };
-int sub_08042320(void *, int, int, int, int, int, int);
+int DisplayAnimation_SetEntry(void *, int, int, int, int, int, int);
 int sub_0802DBD4(struct Actor *p, int a, int b, int c, int d, int e)
 {
     void *draw = &p->drawable;
@@ -25,5 +25,5 @@ int sub_0802DBD4(struct Actor *p, int a, int b, int c, int d, int e)
         if (facing > 1)
             flip = 1;
     }
-    return sub_08042320(draw, a, direction, flip, b, d, e);
+    return DisplayAnimation_SetEntry(draw, a, direction, flip, b, d, e);
 }

@@ -1,8 +1,9 @@
-#include "global.h"
+#include "display_animation.h"
+#define DisplayAnimation_TestFlags sub_0804271C
 
-u32 sub_0804271C(u32 *p, u32 mask)
+u32 DisplayAnimation_TestFlags(struct DisplayAnimation *p, u32 mask)
 {
-    if (*p == 0)
+    if (p->kind == 0)
         return 0;
-    return **(u32 **)((u8 *)p + 0x90) & mask;
+    return *p->displayFlags & mask;
 }

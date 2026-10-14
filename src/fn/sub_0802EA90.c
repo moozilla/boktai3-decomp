@@ -48,9 +48,9 @@ u8 *sub_0821D64C(int, int);
 extern const s16 gUnk_086149C4[];
 int Actor_PlayAnimationEntry(struct Actor *, int, int, int, int);
 void sub_0802DD6C(struct Actor *, int);
-void sub_080426D4(void *, int);
-void sub_080426F8(void *, int);
-void sub_0804275C(void *, int, int, int);
+void DisplayAnimation_SetFlags(void *, int);
+void DisplayAnimation_ClearFlags(void *, int);
+void DisplayAnimation_SetPalette(void *, int, int, int);
 void Sound_PlaySong(int);
 int Math_Atan2(int, int);
 static inline int scale(int v)

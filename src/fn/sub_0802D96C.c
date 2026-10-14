@@ -9,7 +9,7 @@ extern void *gUnk_02000480;
 void sub_0802D688(void *, struct Object *);
 void sub_0802D914(struct Object *);
 void sub_08225938(void *);
-void sub_08042558(void *);
+void DisplayAnimation_Destroy(void *);
 void sub_0802D85C(struct Object *);
 void Heap_Free(void *);
 int sub_0802D96C(struct Object *p)
@@ -19,7 +19,7 @@ int sub_0802D96C(struct Object *p)
         sub_0802D688(gUnk_02000480, p);
         sub_0802D914(p);
         sub_08225938(p->motion);
-        sub_08042558(p->drawable);
+        DisplayAnimation_Destroy(p->drawable);
         sub_0802D85C(p);
         p->active = 0;
         Heap_Free(p);

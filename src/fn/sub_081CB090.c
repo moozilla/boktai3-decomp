@@ -13,7 +13,7 @@ struct S {
     u8 d4[1];
 };
 void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
-s32 sub_080424FC(void *);
+s32 DisplayAnimation_TestFinished(void *);
 void sub_081CB090(u32 a, struct S *p)
 {
     u32 r;
@@ -60,7 +60,7 @@ void sub_081CB090(u32 a, struct S *p)
         Actor_PlayAnimationEntry(p, r, 2, 0, 4);
         B(0x18) = 0;
     }
-    if (sub_080424FC(p->d4) != 0) {
+    if (DisplayAnimation_TestFinished(p->d4) != 0) {
         switch (B(0x18)) {
             case 0:
                 Actor_PlayAnimationEntry(p, 0, 1, 0, 4);
