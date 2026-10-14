@@ -99,6 +99,11 @@ code { font-size: 12px; }
         <input id="recname" placeholder="recording name" style="width:9.5em">
         <button id="recbtn">Record</button>
       </div>
+      <div class="row">
+        <input id="procid" placeholder="procedure #" style="width:7.5em">
+        <input id="procargs" placeholder="args, e.g. 896 1920 1" style="width:12em">
+        <button id="procrun">Run script procedure</button>
+      </div>
     </div>
     <div class="card">
       <h2>Remote pad <span class="sp"></span><span style="font-weight:400;text-transform:none;letter-spacing:0">hold Shift for a long press</span></h2>
@@ -166,7 +171,7 @@ async function poll() {
   document.querySelectorAll('#mode button').forEach(b => b.classList.toggle('on', b.dataset.m === (st.mode || 'en')));
   $('god').textContent = st.god ? 'God mode: on' : 'God mode';
   $('recbtn').textContent = st.rec ? 'Stop recording' : 'Record';
-  ['capture', 'god', 'recbtn', 'bmsave'].forEach(id => $(id).disabled = !d.connected);
+  ['capture', 'god', 'recbtn', 'bmsave', 'procrun'].forEach(id => $(id).disabled = !d.connected);
   // current text: the most recent fetched string that has text
   const cur = d.texts.find(t => t.jp || t.en);
   $('en').textContent = cur ? (cur.en || '(no translation)') : '';
@@ -247,6 +252,11 @@ async function loadTags() {
 
 document.querySelectorAll('#mode button').forEach(b => b.onclick = () => cmd({ c: 'subs', mode: b.dataset.m }));
 document.querySelectorAll('.pad button').forEach(b => b.onclick = ev => cmd({ c: 'keys', keys: b.dataset.k, frames: ev.shiftKey ? 30 : 4 }));
+$('procrun').onclick = () => {
+  const id = parseInt($('procid').value); if (isNaN(id)) return;
+  const args = $('procargs').value.trim().split(/[\s,]+/).filter(Boolean).map(x => parseInt(x));
+  cmd({ c: 'callproc', id, args });
+};
 $('capture').onclick = () => cmd({ c: 'capture' }).then(() => setTimeout(poll, 800));
 $('god').onclick = () => cmd({ c: 'god', on: !(last?.state?.god) });
 $('recbtn').onclick = () => last?.state?.rec ? cmd({ c: 'rec_stop' }) : cmd({ c: 'rec_start', name: $('recname').value || 'playthrough' });
