@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 23.330% matching (2026-10-14). This file is the single
+Last updated after reaching 23.341% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -12,26 +12,27 @@ published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
 ## October 14 (Codex): contact swarm and latest Claude integration
 
-Matching is **23.330%**, up **0.098 percentage points** from this batch
-(+2,368 bytes), plus **0.101 points** from Claude's fourteen new engine functions.
-There are **6,393 / 11,468 functions**, **563,494 / 2,415,354 bytes**.
-Without register pinning: **19.192%**; Register-pinned: **4.137%**, included above.
+Matching is **23.341%**, up **0.098 percentage points** from this batch
+(+2,368 bytes), plus **0.112 points** from Claude's seventeen new engine functions.
+There are **6,396 / 11,468 functions**, **563,758 / 2,415,354 bytes**.
+Without register pinning: **19.203%**; Register-pinned: **4.137%**, included above.
 Three hidden function boundaries were recovered, without changing byte totals.
-Two guarded paired-spawn drafts bring the draft count to 74; neither is exact credit.
+Two guarded paired-spawn drafts bring the draft count to 71; neither is exact credit.
 
 The **08043F64–08044C80** subsection establishes a second sixteen-slot pool,
 five-state dispatch, 0x154 stride, 0x1590 allocation, parity-filtered resource
 contact, packed sequence playback, palette fade, and first-free charge spawning.
 See [contact-swarm notes](../notes/contact-swarm_2026-10-14.md).
 
-Claude's PRs 93–101 are included: font character mapping and text decoding,
+Claude's PRs 93–103 are included: font character mapping and text decoding,
 large sprites, tentative enemy-family identities, thirteen unpinned functions,
-and fourteen new engine matches, including sun-clock and delayed-script tasks. Read REGALLOC.md and the October 14 Claude
+and seventeen new engine matches, including sun-clock, delayed-script tasks
+and three formerly guarded music-fade helpers. Read REGALLOC.md and the October 14 Claude
 handoff section for reload rotation, regdiag, and asset context.
 
-All sixteen new/affected exact units passed reviewed full-extent checks.
+All eighteen new/affected exact units passed reviewed full-extent checks.
 The combined ROM build printed **`build/boktai3.gba: OK`** in
-`build/contact-swarm-combined.log`. Three splitter regression checks pass; the
+`build/contact-swarm-final-combined.log`. Three splitter regression checks pass; the
 fix prevents guarded hidden-function incbin tails from being emitted twice.
 Continue toward **25% exact or 60% usage remaining**; latest reading is
 **85% remaining**. Next contiguous work starts at **08044D6C**, after the
