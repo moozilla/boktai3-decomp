@@ -28,7 +28,7 @@ Types whose extension is known (the type is the hash of the string):
 | `AE6C` | ? | `087C4C98` | 528 | LZ77; decompressed header magic `HP` |
 | `C091` | `map` | `08617084` | 287 | LZ77; decompressed header magic `MP` |
 | `CB05` | ? | `08BDDE08` | 46 | sprite packages (below) |
-| `CEEF` | `ptn` | `0883BDA8` | 1 | 1.8 MB pattern (tile) blob |
+| `CEEF` | `ptn` | `0883BDA8` | 1 | tileset library (below) |
 | `CEAA` | ? | `08A2AF80` | 1 | 10 KB blob |
 
 `tools/assets/archive.py list | entries TYPE | extract [TYPE...]` lists and
@@ -83,6 +83,43 @@ Many `ScriptProc_Start(0xCB05, name)` calls in the actor code (for example
 `9247` in `sub_0808D1D8`, `D635`-`D638`, `5290`/`5291`) name packages that are
 in no archive. They may be resources of cut or Boktai 2 content whose code
 remained; script references (`gcx`) should settle which actors are used.
+
+## Maps (`map`, type `C091`), tilesets (`ptn`) and stages
+
+Found by following the field scene of the late-game save: BG2 is fed every
+frame by `BgGfx_LoadTilemap` (`08216584`) from a map decompressed into EWRAM,
+and its tiles were copied once by `sub_08215D40` from `ptn`.
+
+**`MP` maps.** 252 of the 287 `map` entries are LZ77-compressed (a 4-byte
+prefix, then the map); 35 are stored raw. A map starts `"MP\0\0"`, then
+`u16 layers, u16 tiles, u16 metatiles`, `u32 layer table, u32 tile data (0 =
+tiles come from a ptn tileset), u32 metatile table` (offsets from `MP`).
+A metatile is four BG tile entries (top-left, top-right, bottom-left,
+bottom-right; tile, h/v flip and palette bank as in GBA text BG maps). A
+layer-table record is `u16 width, u16 height` (in metatiles), `u32 name hash,
+u32 offset` of a grid of `u16` metatile indices, stored in blocks of 16 × 16
+metatiles when both sides are multiples of 16, blocks row-major. Menu and
+screen backgrounds are raw maps with their own tiles and several named layers.
+
+**`ptn`.** One entry: `u16 tilesets` (263), then `u32 table, u32 index lists,
+u32 tile pool` at `+0x0C`. A table record is `u16 id, u16 tile count, u32
+offset` into the index lists; each index selects a 4bpp tile in the pool of
+49,638 tiles. A stage's tiles are its tileset's tiles in order, copied to the
+start of the BG character block.
+
+**Stages.** The scripts load a stage with `proc_884(map, tileset, hp)`, which
+calls into the `map` command and creates the `Background_CreateFromScript`
+actor; 398 distinct triples appear. The third argument names an `AE6C` entry
+(LZ77, magic `HP`), probably collision or height data (not decoded). The
+field stage of the save is `proc_884 0xcf70 0xf8ea 0x7239` (procedures 1491,
+3241, 6388): map `CF70` (32 × 48 metatiles), tileset `F8EA` (351 tiles), BG
+palette `92B3:E39B` banks 0-6 (matched against palette RAM; the script does
+not name it, so the palette is chosen elsewhere, perhaps by area or time of
+day). The OBJ palette banks 0-5 of that scene match no palette resource, so
+sprite colours are assembled at runtime.
+
+The studio's Maps view renders every stage and map this way
+(`tools/studio/serve.py`, `/gfx#maps`).
 
 ## The script image (`gcx`)
 

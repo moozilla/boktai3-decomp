@@ -59,6 +59,21 @@ the bank, were encoded with it.
 | `resource_archive` | 10 ranges `08614DCC`–`08D5A85C` | `build/res/LABEL/index.txt` + `HASH.bin` (extracted) | The archives found by `ScriptProc_Start` (anm, map, ptn, fnt, sprites...). Header, sorted hash table and offsets are regenerated; entries are emitted as `.incbin` of their files and may change size. Their contents are position-independent: about 7,300 pointer-like words inside them (tile and map data) are no longer relocated. Verified in-game: growing the first `anm` entry by 37 bytes shifts every archive and leaves all menu and field screenshots identical. |
 | `text_bank` | `08D6B1E4`–`08DD6B96` | `build/text/bank.tsv` (extracted) | Script text, resizable. The gcx section words, 9,977 entry offsets, then strings (`T`, decoded with `data/charmap.tsv`) and binary blobs (`B`, 82 tables read by script code). Verified in-game: a lengthened config help line renders and the field still plays. |
 
+### English build
+
+`make english` builds `build/english.gba` from the 2007 fan translation
+([moozilla/boktai3trans](https://github.com/moozilla/boktai3trans), cloned
+next to this repository). `tools/trans/english.py` imports the 7,212
+translated strings of `scriptEd/script.sjs` into a copy of the text bank (the
+rest stay Japanese; four use characters missing from the font), builds through
+the normal pipeline, then applies the graphics, menu and code records of
+`ips/latest_translation.ips` but not its text. That works because code and the
+resource archives precede the text bank and do not move, and the patch's new
+code sits in the ROM's zero padding, which the script checks is still free.
+Checked in the emulator: the menu titles, config, sleep and save screens, map
+names and the intro are in English; untranslated graphics (status-screen
+labels, the `もどる` prompt) stay Japanese.
+
 ### Editing text
 
 ```
