@@ -4,9 +4,6 @@
 void ScenePool_UpdateSteeringPulse(struct ScenePoolActor *, struct ScenePoolEntry *,
                                    const struct ScenePoolSpeedBounds *);
 extern const struct ScenePoolSpeedBounds gUnk_0860588C[];
-struct ScenePoolVec32 {
-    s32 x, y, z, unknown;
-};
 void sub_08116C4C(s32, struct ScenePoolVec32 *);
 s32 sub_08116C20(s32);
 s32 sub_0811AE68(struct ScenePoolVec32 *);
@@ -76,9 +73,9 @@ s32 ScenePool_StateLaunchArc(void *manager, struct ScenePoolActor *actor,
         s32 speed;
     launch:
         sub_08116C4C(entry->motionPhase, &path);
-        from = *(const struct ScenePoolVec32 *)entry->position;
+        from = entry->position;
         from.y += actor->restrictionMetric;
-        to = *(const struct ScenePoolVec32 *)entry->position;
+        to = entry->position;
         speed = sub_08116C20(entry->motionPhase);
         if (speed <= 0xfff)
             speed = 0x1000;
