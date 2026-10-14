@@ -1,10 +1,5 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x24];
-    u32 a;
-};
-void sub_08043F5C(struct S *p)
+#include "contact_actor.h"
+void ContactActorPool_RequestClear(struct ContactActorPool *pool)
 {
-    p->a = 600;
+    pool->lifetime = 600;
 }

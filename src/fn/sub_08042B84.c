@@ -21,5 +21,5 @@ void ContactActor_SetDirectionalSequence(struct ContactActorPool *pool, struct C
         *second = 1;
     else
         *second = 0;
-    Anim_SetSequence(&actor->sequence, *(void **)((u8 *)base + 0x38), (u16)index, flip[0], *saved);
+    Anim_SetSequence(&actor->sequence, base->sequenceResource, (u16)index, flip[0], *saved);
 }

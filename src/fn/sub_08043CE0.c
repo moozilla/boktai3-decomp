@@ -1,21 +1,17 @@
-#include "global.h"
-
-void *Task_Create(s32, s32);
-void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
-s32 sub_08043C4C(void *, s32, s32, s32);
-void Task_Kill(void *);
-void sub_08043ACC(void);
-void sub_08043C24(void);
-
-void *sub_08043CE0(s32 a, s32 b, s32 c)
+#include "contact_actor.h"
+s32 ContactActorPool_Initialize(struct ContactActorPool *, u32, u32, u32);
+u32 ContactActorPool_Update(struct ContactActorPool *);
+u32 ContactActorPool_Destroy(u8 *);
+struct ContactActorPool *ContactActorPool_Create(u32 mode, u32 resourceId, u32 healthId)
 {
-    void *r = Task_Create(8, 0x1720);
-    if (r != 0) {
-        Task_SetCallbacks(r, sub_08043ACC, sub_08043C24);
-        if (sub_08043C4C(r, a, b, c) < 0) {
-            Task_Kill(r);
+    struct ContactActorPool *pool = Task_Create(8, 0x1720);
+    if (pool) {
+        Task_SetCallbacks(pool, (void (*)(void *))ContactActorPool_Update,
+                          (void (*)(void *))ContactActorPool_Destroy);
+        if (ContactActorPool_Initialize(pool, mode, resourceId, healthId) < 0) {
+            Task_Kill(pool);
             return 0;
         }
     }
-    return r;
+    return pool;
 }
