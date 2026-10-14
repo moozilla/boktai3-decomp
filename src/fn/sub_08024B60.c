@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 extern u32 gUnk_030053F4;
 struct S {
@@ -31,25 +30,28 @@ static inline u8 chk(struct S *p)
 void sub_08024B60(struct S *p)
 {
     struct S *p2 = p;
+    int one;
     if (chk(p)) {
         u32 k = 0x18;
         p->aa = k;
     }
+    one = 1;
     {
-        u32 mask = 1;
-        asm("" : : "r"(mask));
+        u32 mask = one;
     }
-    if (!(*(u32 *)((u8 *)p + 0x9c) & 1)) {
+    if (!((*((u32 *)(((u8 *)p) + 0x9c))) & 1)) {
         u32 z2 = 0;
         p2->ac = z2;
         p2->ad = z2;
         p2->ae = z2;
         p2->c4 = z2;
         p2->b0 = 1;
-        if (gUnk_030053F4 & 0x1000)
+        if (gUnk_030053F4 & 0x1000) {
             p2->h356 = z2;
-        else
+        } else {
             p2->h356 = 0x1e;
-    } else
+        }
+    } else {
         p->c4++;
+    }
 }

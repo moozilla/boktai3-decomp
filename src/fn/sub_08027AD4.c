@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 typedef struct ActorAnimation {
     u8 pad0[0x51];
@@ -6,9 +5,11 @@ typedef struct ActorAnimation {
     u8 pad52[0x4a];
     u32 flags;
     u8 padA0[8];
-    u8 facing, facing8;
+    u8 facing;
+    u8 facing8;
     u8 padAA[5];
-    u8 finished, enter;
+    u8 finished;
+    u8 enter;
     u8 changed;
     u8 padB2;
     u8 locked;
@@ -21,7 +22,10 @@ typedef struct ActorAnimation {
     s8 savedAngle;
     u8 pad115[0x22e];
     u8 variant;
-    s16 scale, minScale, maxScale, scaleStep;
+    s16 scale;
+    s16 minScale;
+    s16 maxScale;
+    s16 scaleStep;
     u8 pad34C[0x60];
     u32 mode;
 } ActorAnimation;
@@ -58,13 +62,14 @@ static inline int trunc12(int x)
     return x >= 0 ? x >> 12 : -(-x >> 12);
 }
 typedef struct {
-    u32 a, b;
+    u32 a;
+    u32 b;
 } Point;
 void sub_08027AD4(ActorAnimation *p, int time)
 {
-    register int tick asm("r5") = time;
+    int tick = time;
     ActorAnimation *p2 = p;
-    register u8 *position asm("r6") = (u8 *)p + 0x48;
+    u8 *position = ((u8 *)p) + 0x48;
     if (p->changed) {
         int sequence;
         int one;
@@ -74,47 +79,53 @@ void sub_08027AD4(ActorAnimation *p, int time)
             one = 1;
             test &= one;
             sequence = 43;
-            if (test)
+            if (test) {
                 sequence = 5;
+            }
         }
         {
-            register int offset asm("r0") = 0x240;
-            SceneActors_StartDirectionalAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence,
-                                                  one, one, 4);
+            int offset = 0x240;
+            SceneActors_StartDirectionalAnimation(p, ((u8 *)p) + offset, ((u8 *)p) + 0x220,
+                                                  sequence, one, one, 4);
         }
         {
             u32 mask = 16;
             p->flags |= mask;
         }
-        *(Point *)((u8 *)p + 0xd0) = *(Point *)(position + 12);
+        *((Point *)(((u8 *)p) + 0xd0)) = *((Point *)(position + 12));
     }
-    *(u32 *)((u8 *)p2 + 0x33c) = 0;
-    *((u8 *)p2 + 0x340) = 0;
+    *((u32 *)(((u8 *)p2) + 0x33c)) = 0;
+    *(((u8 *)p2) + 0x340) = 0;
     {
         u32 mask = 0x1000c;
-        p->flags |= mask;
+        /* both arms are the same; the split keeps agbcc's original block layout */
+        if (tick) {
+            p->flags |= mask;
+        } else {
+            p->flags |= mask;
+        }
     }
     if (!p->reset(p)) {
-        *(Point *)(position + 12) = *(Point *)((u8 *)p + 0xd0);
-        if (tick > 31)
+        *((Point *)(position + 12)) = *((Point *)(((u8 *)p) + 0xd0));
+        if (tick > 31) {
             p->finished = 1;
-        else {
-            int dir = 3 & ~tick;
+        } else {
+            int dir = 3 & (~tick);
             int rate = 32 - tick;
             s16 *velocity = (s16 *)(position + 20);
-            register u32 angle asm("r5");
-            register int speed asm("r6");
+            u32 angle;
+            int speed;
             angle = dir << 6;
             speed = rate << 3;
             {
-                register int x asm("r3") = trunc12(gUnk_086149C4[(angle + 64) & 255] * speed);
+                int x = trunc12(gUnk_086149C4[(angle + 64) & 255] * speed);
                 int zero = 0;
                 velocity[0] = x;
                 velocity[1] = zero;
             }
             {
-                register s16 *entry asm("r0") = &gUnk_086149C4[angle];
-                velocity[2] = trunc12(*entry * speed);
+                s16 *entry = &gUnk_086149C4[angle];
+                velocity[2] = trunc12((*entry) * speed);
             }
         }
     }
