@@ -1,12 +1,10 @@
-#include "global.h"
-
-void sub_0803F638(u8 *);
-
-void sub_0803EF24(u8 *a, u8 *b, u32 n)
+#include "scene_arc.h"
+void GroundEffect_DisableProjection(struct SceneGroundEffect *);
+void SceneArc_ReleaseSlot(struct SceneArcManager *manager, struct SceneArcSlot *slot, u32 index)
 {
-    u32 m;
-    *(u32 *)(b + 0xb4) |= 1;
-    sub_0803F638(b + 0xf0);
-    m = 1 << n;
-    *(u32 *)(a + 0x18) &= ~m;
+    u32 mask;
+    slot->sprite.flags |= 1;
+    GroundEffect_DisableProjection(&slot->ground);
+    mask = 1 << index;
+    manager->activeMask &= ~mask;
 }

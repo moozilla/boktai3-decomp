@@ -1,0 +1,24 @@
+addr,name,confidence,evidence
+0803EE58,SceneArc_HandleCollision,low,Tentative role from contiguous slot and projection lifecycle; include/scene_arc.h; notes/scene-arc-effects_2026-10-13.md
+0803EE5C,SceneArc_InitializeSlot,low,Tentative role from contiguous slot and projection lifecycle; include/scene_arc.h; notes/scene-arc-effects_2026-10-13.md
+0803EF00,SceneArc_DestroySlot,low,Tentative role from contiguous slot and projection lifecycle; include/scene_arc.h; notes/scene-arc-effects_2026-10-13.md
+0803EF24,SceneArc_ReleaseSlot,low,Tentative role from contiguous slot and projection lifecycle; include/scene_arc.h; notes/scene-arc-effects_2026-10-13.md
+0803EF4C,SceneArc_UpdateSlot,low,Tentative role from contiguous slot and projection lifecycle; include/scene_arc.h; notes/scene-arc-effects_2026-10-13.md
+0803F3A4,SceneArc_UpdateManager,low,Tentative role from contiguous slot and projection lifecycle; include/scene_arc.h; notes/scene-arc-effects_2026-10-13.md
+0803F3D8,SceneArc_DestroyManager,low,Tentative role from contiguous slot and projection lifecycle; include/scene_arc.h; notes/scene-arc-effects_2026-10-13.md
+0803F40C,SceneArc_InitializeManager,low,Tentative role from contiguous slot and projection lifecycle; include/scene_arc.h; notes/scene-arc-effects_2026-10-13.md
+0803F458,SceneArc_CreateManager,low,Tentative role from contiguous slot and projection lifecycle; include/scene_arc.h; notes/scene-arc-effects_2026-10-13.md
+0803F498,SceneArc_FindFreeSlot,low,Tentative role from contiguous slot and projection lifecycle; include/scene_arc.h; notes/scene-arc-effects_2026-10-13.md
+0803F4CC,SceneArc_Create,low,Tentative role from contiguous slot and projection lifecycle; include/scene_arc.h; notes/scene-arc-effects_2026-10-13.md
+0803F5C4,GroundEffect_Link,low,Tentative role from contiguous slot and projection lifecycle; include/scene_arc.h; notes/scene-arc-effects_2026-10-13.md
+0803F5EC,GroundEffect_Unlink,low,Tentative role from contiguous slot and projection lifecycle; include/scene_arc.h; notes/scene-arc-effects_2026-10-13.md
+0803F61C,GroundEffect_EnableProjection,low,Tentative role from contiguous slot and projection lifecycle; include/scene_arc.h; notes/scene-arc-effects_2026-10-13.md
+0803F638,GroundEffect_DisableProjection,low,Tentative role from contiguous slot and projection lifecycle; include/scene_arc.h; notes/scene-arc-effects_2026-10-13.md
+0803F64C,GroundEffect_IgnoreUpdate,low,Tentative role from contiguous slot and projection lifecycle; include/scene_arc.h; notes/scene-arc-effects_2026-10-13.md
+0803F650,GroundEffect_UpdateProjection,low,Tentative role from contiguous slot and projection lifecycle; include/scene_arc.h; notes/scene-arc-effects_2026-10-13.md
+0803F690,GroundEffect_UpdateManager,low,Tentative role from contiguous slot and projection lifecycle; include/scene_arc.h; notes/scene-arc-effects_2026-10-13.md
+0803F6B0,GroundEffect_DestroyManager,low,Tentative role from contiguous slot and projection lifecycle; include/scene_arc.h; notes/scene-arc-effects_2026-10-13.md
+0803F6C4,GroundEffect_InitializeManager,low,Tentative role from contiguous slot and projection lifecycle; include/scene_arc.h; notes/scene-arc-effects_2026-10-13.md
+0803F6F0,GroundEffect_CreateManager,low,Tentative role from contiguous slot and projection lifecycle; include/scene_arc.h; notes/scene-arc-effects_2026-10-13.md
+0803F730,GroundEffect_Initialize,low,Tentative role from contiguous slot and projection lifecycle; include/scene_arc.h; notes/scene-arc-effects_2026-10-13.md
+0803F7D8,GroundEffect_Destroy,low,Tentative role from contiguous slot and projection lifecycle; include/scene_arc.h; notes/scene-arc-effects_2026-10-13.md
