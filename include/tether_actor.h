@@ -32,7 +32,9 @@ struct TetherMovementProbe {
     u16 previousAttributes, attributes;
 };
 struct TetherInteractionProbe {
-    u8 unknown0[0x24];
+    u16 flags;
+    u8 unknown2[0x1A];
+    struct ContactPosition target;
     u16 bodyId;
     u8 unknown26[0x42];
 };
@@ -92,7 +94,7 @@ struct TetherActor {
     struct ContactPosition interactionTarget;
     u32 interactionValue;
     u16 interactionReset, interactionCooldown;
-    u8 unknown420[4];
+    u16 roamFrame, turnAfterBlock;
     struct ContactPosition directedTarget;
     struct ContactPosition origin;
     struct ContactPosition auxiliaryOrigin;
