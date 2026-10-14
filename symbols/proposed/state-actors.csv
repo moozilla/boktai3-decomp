@@ -1,0 +1,4 @@
+addr,name,confidence,evidence
+081CC610,StateActor86121C4_EnterState,low,Loads gUnk_086121C4[nextState] into the state callback for states 1-0x5F; include/state_actor.h
+081CD43C,MessageActor_Dispatch,low,Calls gUnk_08612344[state](ctx; actor) through _call_via_r2; src/message_actor_08612344.c
+081CD46C,MessageActor_RegisterReceiver,low,SceneMessages_RegisterReceiver on actor+0x168 (type 5); src/message_actor_08612344.c
