@@ -330,11 +330,15 @@ address,evidence
 082195F8,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08219DB4,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 0821A168,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+0821AB50,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+0821AB64,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+0821AB98,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 0821AED0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0821AEDC,Independent state save/restore function following a reviewed gap leaf; exact standalone C
 0821AF04,Independent state save/restore function following a reviewed gap leaf; exact standalone C
 0821E0D0,Separate 52-byte Thumb function with own prologue/conditional return after E040 returns; retained unmatched code; docs/MGS_GCL_MATCHING.md
 0821E2F8,Separate 188-byte Thumb function with own prologue/calls/copy loops/return after E190 returns; retained unmatched code; docs/MGS_GCL_MATCHING.md
+0821E500,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 0821E7B4,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C
 0821E7C4,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0821E7D0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
