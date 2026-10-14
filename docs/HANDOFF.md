@@ -36,7 +36,7 @@ Every new match passed reviewed full-extent checks and hint minimization; change
 existing consumers were rechecked. The complete combined build printed
 **`build/boktai3.gba: OK`** (`build/contact-actor-final-combined.log`), with
 format, inventory, RAM-literal and decoded-data checks passing. Continue toward **25% matching or 80% remaining**; last account
-reading is **89% remaining**. Next contiguous subsection begins at **08042E18**
+reading is **88% remaining**. Next contiguous subsection begins at **08042E18**
 (tracking), followed by 08042F44 and later handlers. Tracking currently has a
 77.7% checkpoint, 308 versus 300 bytes; it is not accepted or credited. The
 primary checkout now owns main, so do not force its local branch ref.
