@@ -30,7 +30,7 @@ u32 ContactSwarm_InitializeSlot(struct ContactSwarm *pool, struct ContactSwarmSl
         asm("" : "+r"(argument));
         AnimData_SelectTiles(argument, 0x2D3);
     }
-    sprite = &slot->sprite;
+    sprite = &slot->animation.sprite;
     Sprite_Init(sprite, graphics, 1);
     sprite->priority = 2;
     {

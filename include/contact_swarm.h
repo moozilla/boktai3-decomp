@@ -11,14 +11,19 @@ struct ContactSwarmSprite {
     struct ContactPosition position;
     u8 unknown24[8];
 };
+struct ContactSwarmAnimation {
+    struct DisplaySequenceState sequence;
+    struct ContactSwarmSprite sprite;
+};
 struct ContactSwarmSlot {
-    u8 direction, speed, state, enter;
+    u8 direction, speed;
+    s8 state;
+    u8 enter;
     u32 stateFrame;
     u8 advanceFrames, advanceSpeed, trackingFrames, unknownB;
     struct ContactPosition velocity;
     struct ContactCollider resourceCollider, healthCollider;
-    struct DisplaySequenceState sequence;
-    struct ContactSwarmSprite sprite;
+    struct ContactSwarmAnimation animation;
     u8 graphics[0x1C];
     u8 shadow[0x40];
 };

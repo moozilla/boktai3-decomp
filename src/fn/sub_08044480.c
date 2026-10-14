@@ -14,7 +14,7 @@ static inline s32 truncateShift12(s32 value)
 void ContactSwarm_UpdateReaction(struct ContactSwarm *pool, struct ContactSwarmSlot *slot,
                                  s32 index)
 {
-    struct ContactSwarmSprite *sprite = &slot->sprite;
+    struct ContactSwarmSprite *sprite = &slot->animation.sprite;
     struct ContactPosition *velocity;
     register const struct ContactPosition *read asm("r12");
     s32 product;
@@ -63,9 +63,9 @@ void ContactSwarm_UpdateReaction(struct ContactSwarm *pool, struct ContactSwarmS
         if (slot->stateFrame == 6)
             AnimData_SelectTiles(slot->graphics, 0x2D3);
         if ((slot->stateFrame >> 2) & 1)
-            slot->sprite.flags &= ~1;
+            slot->animation.sprite.flags &= ~1;
         else
-            slot->sprite.flags |= 1;
+            slot->animation.sprite.flags |= 1;
         slot->stateFrame++;
     }
 }

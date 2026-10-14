@@ -13,7 +13,7 @@ static inline s32 truncateShift12(s32 value)
 }
 void ContactSwarm_UpdateCharge(struct ContactSwarm *pool, struct ContactSwarmSlot *slot, s32 index)
 {
-    struct ContactSwarmSprite *sprite = &slot->sprite;
+    struct ContactSwarmSprite *sprite = &slot->animation.sprite;
     struct ContactPosition *position;
     if (slot->enter) {
         struct ContactCollider *collider;
