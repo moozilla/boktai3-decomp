@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 22.381% matching (2026-10-13). This file is the single
+Last updated after reaching 22.502% matching (2026-10-13). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,40 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 13 (Codex): scene pool states and effects
+
+Matching is **22.502%**, up **0.121 percentage points** in this batch and
+**0.193 points** from Claude's 22.309% baseline. **Eight new exact functions**
+bring the total to **6,279 / 11,465**, **543,506 / 2,415,354 bytes** (+2,924).
+Without register pinning: **18.450%**; Register-pinned: **4.052%**, included
+above. The speed-pulse draft is now exact. Adaptive tracking (99.2%) and short
+arc launch (99.1%) are guarded, scored drafts; total drafts are 63. They add
+no exact credit.
+
+Ten of the twelve callbacks in the **0860585C** state table now match. The
+0803C114 dispatcher establishes target-player selection and target-minus-actor
+x/z metrics. Shared types describe 16-byte padded vectors, player positions/
+flags, actor effect fields and four typed actor slots. The former steering
+pulse is correctly named **ScenePool_UpdateSpeedPulse**; it drives forward
+speed, not lateral motion. The current controller's gameplay identity and
+older LinkScene labels remain provisional. See [state-family notes](../notes/scene-pool-states_2026-10-13.md).
+
+Every new function passed a reviewed full-extent exact check; unnecessary hints
+were removed. The combined ROM build printed **`build/boktai3.gba: OK`**
+(`build/scene-pool-states-combined.log`). The build caught and repaired a local
+metadata-script write to an unrelated file before integration, and exposed one
+legacy callee reference now replaced with the shared **Anim_SetKeyframes** API.
+The original checkout's uncommitted Claude edit was left intact.
+
+**Continue under the current 25% / 80%-remaining goal.** Latest usage observation:
+**94% remaining**. Remaining controller code: 0803CEE8 actor setup, 0803D288
+registry/bounds scan, 0803D430 manager loop and the two near state drafts.
+The first range's 0803C114 dispatcher/update and 0803CC90 collider setup remain
+assembly too. The next contiguous subsection starts at **0803EE58–0803F650**:
+arc effects created by the just-matched states, especially 0803EF4C and
+0803F4CC. Reuse the vector and state-family evidence; do not repeat the logged
+failed r7 pointer-pin and branch-range trials without a new hypothesis.
 
 ## October 13 (Codex): contiguous scene pool continuation
 

@@ -191,7 +191,7 @@ descriptive, not confirmed roles.
 | `0802D5B4`–`0802D9F8` | Scene actor resources and lifecycle (tentative) | `src/fn/` (19 files) | Scene actor resources and lifecycle: resource lookup, registry, allocation, motion registration and destruction. |
 | `0802D9F8`–`08030710` | Scene actor animation and scripted actions (tentative) | `src/fn/` (35 files) | Scene actor animation and scripted actions: terrain height, path nodes, status effects, directional animation, proximity and phase actions. |
 | `08030710`–`080308BC` | Scene actor manager | `src/fn/` (4 files) | Scene actor manager: update, destruction, initialization and task creation. |
-| `0803CDF0`–`0803EE58` | Scene pooled motion and actor controls (tentative) | `src/fn/`, `include/scene_pool.h` | Four actor slots and configurable pooled state entries; script parameters, motion controls and cruise transitions. Incomplete; gameplay identity unconfirmed. |
+| `0803CDF0`–`0803EE58` | Scene pooled motion and actor controls (tentative) | `src/fn/`, `include/scene_pool.h` | Four actor slots and configurable pooled state entries; target x/z metrics, speed/lateral controls and a twelve-state callback table (ten callbacks exact). Incomplete; gameplay identity unconfirmed. |
 | `0818D754`–`0818DC50` | Spinning approach motion (tentative) | `src/fn/` (3 files) | Two-stage spinning approach movement (four callbacks); see MOTION_0818.md. Not tied to a visible object yet. |
 | `081E34D0`–`081EAB64` | Actor animation controller (tentative) | `src/fn/` (91 files) | Actor animation controller: shared actor layout, child effects, state transitions, palette fades and interaction selection (ANIMATION_081E.md). |
 
