@@ -27,7 +27,7 @@ static inline void state(struct Common *p, void (*fn)(void *), int id)
     p->reset = zero;
     p->pending = zero;
 }
-int sub_08048390(void *);
+int ContactBurst_GetEnabled(void *);
 int ContactSequencePool_GetActiveCount(void *);
 void ContactSequencePool_BeginAllDeaths(void *);
 static inline void setAction(struct Common *p, int id, int zero)
@@ -46,7 +46,7 @@ int sub_0802AD0C(struct Common *p)
         setAction(p, 2, zero);
         return 1;
     } else {
-        int active = sub_08048390(*(void **)((u8 *)p + 0x90c));
+        int active = ContactBurst_GetEnabled(*(void **)((u8 *)p + 0x90c));
         if (active) {
             setAction(p, 3, 0);
         } else if (*(s16 *)((u8 *)p + 0x1a0) >= *(s16 *)((u8 *)p + 0x1a4)) {
