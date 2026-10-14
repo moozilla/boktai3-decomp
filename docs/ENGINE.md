@@ -352,6 +352,18 @@ derives from GCL:
 | `08E8791C` engine | `22FF` mesg (`082255BC`), `9906` chara (`08225560`), `D4CB` trap (`08225624`), `C8BB` load (`08225508`), `C091` map (`08225620`), `E43C` restart (`082257A0`), `B745` and `0BB3` unknown |
 | `080F38C8` | three entries `0CF4`, `0CC8`, `0CD8` (names unknown) |
 
+**Scenes.** The `load` command (`08225508`) changes scene: it stores the scene
+number in `0x030039F0` (`sub_0821B03C`) and in `GameState+0x5A4` (the scene
+saved with the game), and sets the request word `0x030053E8` to 1, or `0x11`
+unless keyword `n` is given as 0. A scene number is a script procedure: the
+late-game test save stands in scene 3243, whose entry runs `proc_861 1;
+proc_864 0`, then the stage setup (`proc_884 0xcf70 0xf8ea 0x7239`) and the
+area's objects. `tools/mgba/scenes.py` lists 354 scene entries (321 with a
+stage). Writing the three words from Lua loads the scene's stage but does not
+spawn the player; ordinary doors pass an entrance as well (*guess*: the door
+objects' `proc_912`/`proc_916` arguments). Note that `tools/assets/gcx.py`
+prints procedure headers one lower than the numbers calls use.
+
 The 722-entry table at `08603300` (`data/actor_registry.csv`) has the same
 layout. It is the `chara` table: every object a script can create by name,
 including controllers as well as actors. Its names are not recoverable by

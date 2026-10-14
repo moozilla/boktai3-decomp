@@ -189,6 +189,42 @@ def tile_index():
     return idx
 
 
+_map_heads = None
+
+
+def map_heads():
+    """First 64 bytes of each map resource as it sits in RAM (decompressed) -> hash."""
+    global _map_heads
+    if _map_heads is not None:
+        return _map_heads
+    import lz77
+    out = {}
+    for h, f in _archive("map"):
+        d = open(f, "rb").read()
+        if d[0] == 0x10:
+            r = lz77.decompress(d, 0)
+            if not r:
+                continue
+            d = r[0][4:]
+        out[bytes(d[:64])] = h
+    _map_heads = out
+    return out
+
+
+def maps_in_ram(ewram):
+    """Map resources present (decompressed) in EWRAM: [(address, hash)]."""
+    heads = map_heads()
+    found, i = [], 0
+    while True:
+        i = ewram.find(b"MP\0\0", i)
+        if i < 0:
+            return found
+        h = heads.get(bytes(ewram[i:i + 64]))
+        if h:
+            found.append((0x02000000 + i, h))
+        i += 4
+
+
 def _palettes():
     out = {}
     for h, f in _archive("t92B3"):
@@ -204,6 +240,9 @@ def analyse_capture(name):
     io = open(os.path.join(d, "io.bin"), "rb").read()
     meta = json.load(open(os.path.join(d, "meta.json")))
     res = _palettes()
+    ram_maps = []
+    if os.path.exists(os.path.join(d, "ewram.bin")):
+        ram_maps = maps_in_ram(open(os.path.join(d, "ewram.bin"), "rb").read())
     # BG palette banks -> palette resources containing them at the same bank
     bg = []
     votes = collections.Counter()
@@ -257,9 +296,12 @@ def analyse_capture(name):
                 known = {}
         known.update(learned)
         json.dump(known, open(SPRITE_PALS, "w"), indent=0)
-    if bg_best and meta.get("map"):
-        remember_stage_palette(meta["map"], meta.get("tileset") or "", bg_best)
-    result = {"bg": bg, "bg_best": bg_best, "sprites": sprites, "meta": meta}
+    # the stage on screen: a stage map decompressed in RAM (menus use raw maps in ROM)
+    stage_map = ram_maps[0][1] if ram_maps else meta.get("map")
+    if bg_best and stage_map:
+        remember_stage_palette(stage_map, meta.get("tileset") or "", bg_best)
+    result = {"bg": bg, "bg_best": bg_best, "sprites": sprites, "meta": meta,
+              "ram_maps": [[f"{a:08X}", h] for a, h in ram_maps], "stage_map": stage_map}
     json.dump(result, open(os.path.join(d, "analysis.json"), "w"))
     return result
 
@@ -268,11 +310,11 @@ def remember_stage_palette(map_hash, tileset, pal):
     rows = {}
     if os.path.exists(STAGE_PALS):
         for r in csv.DictReader(open(STAGE_PALS)):
-            rows[(r["map"], r["tileset"])] = r
-    rows[(map_hash, tileset)] = {"map": map_hash, "tileset": tileset, "palette": pal,
-                                 "evidence": "palette RAM in a centaur capture"}
+            rows[r["map"]] = {"map": r["map"], "palette": r["palette"], "evidence": r.get("evidence", "")}
+    rows[map_hash] = {"map": map_hash, "palette": pal,
+                      "evidence": "BG palette RAM matched in a centaur capture"}
     with open(STAGE_PALS, "w", newline="") as f:
-        w = csv.DictWriter(f, ["map", "tileset", "palette", "evidence"])
+        w = csv.DictWriter(f, ["map", "palette", "evidence"])
         w.writeheader()
         for k in sorted(rows):
             w.writerow(rows[k])
@@ -317,3 +359,20 @@ def save_tag(t):
         for k in sorted(rows):
             w.writerow(rows[k])
     return tags()
+
+
+if __name__ == "__main__":
+    import sys
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    if len(sys.argv) > 1 and sys.argv[1] == "analyse-all":
+        caps = sorted(os.listdir(os.path.join(OUT, "captures")))
+        for k, name in enumerate(caps):
+            try:
+                analyse_capture(name)
+            except Exception as ex:
+                print(name, "failed:", ex)
+            if k % 50 == 0:
+                print(f"{k}/{len(caps)}")
+        print(f"analysed {len(caps)} captures; stage palettes in {os.path.relpath(STAGE_PALS, ROOT)}")
+    else:
+        print("usage: python3 tools/studio/live.py analyse-all")
