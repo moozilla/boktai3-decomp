@@ -325,8 +325,11 @@ address,evidence
 08217414,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C
 08218BC8,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08218C40,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+0821907C,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 082195AC,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C
 082195F8,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+08219DB4,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+0821A168,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 0821AED0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0821AEDC,Independent state save/restore function following a reviewed gap leaf; exact standalone C
 0821AF04,Independent state save/restore function following a reviewed gap leaf; exact standalone C
