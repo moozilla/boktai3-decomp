@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boktai 3 Live</title>
+<style>
+:root {
+  --bg: #f6f3ec; --panel: #fffdf8; --ink: #2b2620; --muted: #7d7468; --line: #e3dccf;
+  --accent: #b5462f; --accent-ink: #fff; --sel: #f3e3d6; --ok: #2f7d4f; --warn: #b7791f; --stage: #3b3f55;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1b1916; --panel: #24211d; --ink: #ece6dc; --muted: #9a9083; --line: #3a352e;
+    --accent: #e0745a; --accent-ink: #1b1916; --sel: #3a2c25; --ok: #6cc596; --warn: #e2b04a;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Hiragino Sans", sans-serif; }
+header { display: flex; align-items: center; gap: 16px; padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--panel); flex-wrap: wrap; }
+header h1 { font-size: 16px; margin: 0; }
+nav { display: flex; gap: 4px; }
+nav a { color: var(--muted); text-decoration: none; padding: 5px 10px; border-radius: 6px; }
+nav a.on { background: var(--sel); color: var(--ink); }
+.sp { flex: 1; }
+.pill { font-size: 12px; padding: 3px 10px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); }
+.pill.on { color: var(--ok); border-color: var(--ok); }
+.pill.rec { color: #e04848; border-color: #e04848; }
+main { display: grid; grid-template-columns: minmax(300px, 1.1fr) minmax(280px, 1fr) minmax(300px, 1.1fr); gap: 14px; padding: 14px; align-items: start; }
+@media (max-width: 1100px) { main { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 720px) { main { grid-template-columns: 1fr; } }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; }
+.card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.card h2 .sp { flex: 1; }
+.sub-en { font-size: 20px; line-height: 1.35; white-space: pre-wrap; min-height: 1.4em; }
+.sub-jp { font-size: 15px; color: var(--muted); white-space: pre-wrap; margin-top: 6px; }
+.sub-meta { font-size: 12px; color: var(--muted); margin-top: 8px; }
+a { color: var(--accent); }
+button, input, select { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 5px 10px; }
+button { cursor: pointer; }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+button:disabled { opacity: .45; cursor: default; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; padding: 4px 10px; }
+.seg button.on { background: var(--sel); font-weight: 600; }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 6px 0; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font-size: 13px; }
+.kv b { font-weight: 500; color: var(--muted); }
+.log { max-height: 340px; overflow: auto; font-size: 13px; }
+.log .e { padding: 5px 2px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 4.2em 1fr; gap: 6px; cursor: pointer; }
+.log .e:hover { background: var(--sel); }
+.log .id { color: var(--muted); font-variant-numeric: tabular-nums; }
+.log .jp { color: var(--muted); font-size: 12px; }
+.res .e { grid-template-columns: 3.6em 4.2em 1fr; }
+.pad { display: grid; grid-template-columns: repeat(3, 42px) 18px repeat(2, 48px); grid-template-rows: repeat(3, 34px); gap: 4px; align-items: center; justify-items: center; }
+.pad button { width: 100%; height: 100%; padding: 0; font-size: 13px; }
+.thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; }
+.thumb { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; cursor: pointer; background: var(--stage); }
+.thumb img { width: 100%; display: block; image-rendering: pixelated; aspect-ratio: 3/2; object-fit: cover; }
+.thumb div { font-size: 11px; padding: 3px 6px; background: var(--panel); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.thumb.on { outline: 2px solid var(--accent); }
+.shot { width: 100%; image-rendering: pixelated; border-radius: 6px; display: block; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+td, th { text-align: left; padding: 3px 4px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+th { color: var(--muted); font-weight: 500; }
+.sw { display: inline-flex; }
+.sw i { width: 9px; height: 12px; display: block; }
+.empty { color: var(--muted); font-size: 13px; }
+code { font-size: 12px; }
+.howto { font-size: 13px; color: var(--muted); }
+.howto code { background: var(--sel); padding: 1px 4px; border-radius: 4px; color: var(--ink); }
+.tagrow input { width: 100%; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Boktai 3 Studio</h1>
+  <nav><a href="/">Text</a><a href="/gfx">Graphics</a><a href="/live" class="on">Live</a></nav>
+  <span class="sp"></span>
+  <span class="pill" id="rec" hidden>● REC</span>
+  <span class="pill" id="conn">waiting for mGBA</span>
+</header>
+<main>
+  <section>
+    <div class="card">
+      <h2>Now on screen <span class="sp"></span>
+        <span class="seg" id="mode"><button data-m="en">EN</button><button data-m="both">Both</button><button data-m="jp">JP</button><button data-m="off">Off</button></span>
+      </h2>
+      <div class="sub-en" id="en"></div>
+      <div class="sub-jp" id="jp"></div>
+      <div class="sub-meta" id="submeta"></div>
+    </div>
+    <div class="card">
+      <h2>Game</h2>
+      <div class="kv" id="game"></div>
+      <div class="row" style="margin-top:10px">
+        <button id="capture" class="primary">Capture scene</button>
+        <button id="god">God mode</button>
+        <input id="recname" placeholder="recording name" style="width:9.5em">
+        <button id="recbtn">Record</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Remote pad <span class="sp"></span><span style="font-weight:400;text-transform:none;letter-spacing:0">hold Shift for a long press</span></h2>
+      <div class="pad">
+        <span></span><button data-k="UP">▲</button><span></span><span></span><button data-k="L">L</button><button data-k="R">R</button>
+        <button data-k="LEFT">◀</button><span></span><button data-k="RIGHT">▶</button><span></span><button data-k="B">B</button><button data-k="A">A</button>
+        <span></span><button data-k="DOWN">▼</button><span></span><span></span><button data-k="SELECT">Sel</button><button data-k="START">Start</button>
+      </div>
+    </div>
+    <div class="card howto" id="howto">
+      <h2>Connect mGBA</h2>
+      Start the studio (<code>python3 tools/studio/serve.py</code>), then run mGBA with Centaur:<br>
+      <code>tools/mgba/play.sh</code> (builds the subtitle data and starts the bundled mGBA 0.11 build),
+      or load <code>tools/mgba/centaur.lua</code> from Tools › Scripting. The game connects here by itself.
+    </div>
+  </section>
+  <section>
+    <div class="card">
+      <h2>Text the game fetched</h2>
+      <div class="log" id="texts"><div class="empty">Nothing yet.</div></div>
+    </div>
+    <div class="card">
+      <h2>Resources loaded</h2>
+      <div class="log res" id="res"><div class="empty">Nothing yet.</div></div>
+    </div>
+  </section>
+  <section>
+    <div class="card">
+      <h2>Bookmarks · warp <span class="sp"></span><input id="bmname" placeholder="name" style="width:8em"><button id="bmsave">Save here</button></h2>
+      <div class="thumbs" id="bms"><div class="empty">No bookmarks yet. Save one while playing; click it later to jump back.</div></div>
+    </div>
+    <div class="card">
+      <h2>Captures</h2>
+      <div class="thumbs" id="caps"><div class="empty">Capture a scene to see its real palettes and sprites.</div></div>
+      <div id="capview"></div>
+    </div>
+    <div class="card">
+      <h2>Graphics with text <span class="sp"></span><span id="tagcount" style="font-weight:400"></span></h2>
+      <div id="tags" class="empty">Tag sprites or maps that contain text (from a capture, or the Graphics page).</div>
+    </div>
+  </section>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+let last = null, selCap = null;
+const cmd = c => fetch('/api/live/cmd', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(c) }).then(r => r.json());
+const gfxLink = (label, name) => ({ spr: `/gfx#sprites/${name}`, bigspr: `/gfx#big/${name}`, map: `/gfx#maps/${name}`, pal: `/gfx#palettes/${name}` }[label]);
+
+async function poll() {
+  let d;
+  try { d = await fetch('/api/live').then(r => r.json()); } catch (e) { $('conn').textContent = 'studio offline'; $('conn').className = 'pill'; return; }
+  last = d;
+  const st = d.state || {};
+  $('conn').textContent = d.connected ? `mGBA connected · frame ${st.frame ?? '?'}` : 'waiting for mGBA';
+  $('conn').className = 'pill' + (d.connected ? ' on' : '');
+  $('howto').hidden = d.connected;
+  $('rec').hidden = !st.rec;
+  $('rec').className = 'pill rec';
+  document.querySelectorAll('#mode button').forEach(b => b.classList.toggle('on', b.dataset.m === (st.mode || 'en')));
+  $('god').textContent = st.god ? 'God mode: on' : 'God mode';
+  $('recbtn').textContent = st.rec ? 'Stop recording' : 'Record';
+  ['capture', 'god', 'recbtn', 'bmsave'].forEach(id => $(id).disabled = !d.connected);
+  // current text: the most recent fetched string that has text
+  const cur = d.texts.find(t => t.jp || t.en);
+  $('en').textContent = cur ? (cur.en || '(no translation)') : '';
+  $('jp').textContent = cur ? (cur.jp || '') : '';
+  $('submeta').innerHTML = cur ? `string <a href="/#${cur.id}">#${cur.id}</a> · frame ${cur.frame}` : (d.connected ? 'No text fetched yet.' : '');
+  $('game').innerHTML = [
+    ['Map', st.map ? `<a href="/gfx#maps">${esc(st.map)}</a>` : '—'],
+    ['Tileset', esc(st.tileset || '—')],
+    ['Palette', st.pal ? `<a href="/gfx#palettes/${esc(st.pal)}">${esc(st.pal)}</a>` : '—'],
+    ['Life', st.life ?? '—'],
+    ['mGBA', d.hello ? `${esc(d.hello.title)} · breakpoints ${d.hello.bp ? 'on' : 'off'} · overlay ${d.hello.canvas ? 'on' : 'off'}` : '—'],
+  ].map(([k, v]) => `<b>${k}</b><span>${v}</span>`).join('');
+  renderLog('texts', d.texts.filter(t => t.jp || t.en), t => `<span class="id">#${t.id}</span><span>${esc(t.en || t.jp)}${t.en && t.jp ? `<div class="jp">${esc(t.jp)}</div>` : ''}</span>`, t => location.href = `/#${t.id}`);
+  renderLog('res', d.res, r => r.t === 'tileset'
+    ? `<span class="id">${r.frame}</span><span>tiles</span><span><code>${esc(r.ids.join(', '))}</code></span>`
+    : `<span class="id">${r.frame}</span><span>${esc(r.label)}</span><span><code>${esc(r.name)}</code></span>`,
+    r => { const l = gfxLink(r.label, r.name); if (l) window.open(l, '_blank'); });
+  renderThumbs('bms', d.bookmarks, b => `/api/live/file/bookmarks/${encodeURIComponent(b.name)}.png`, b => `${b.name}${b.map ? ' · ' + b.map : ''}`, b => cmd({ c: 'load', name: b.name }));
+  renderThumbs('caps', d.captures, c => `/api/live/file/captures/${encodeURIComponent(c.name)}/screen.png`, c => `${c.name}${c.map ? ' · ' + c.map : ''}`, c => showCapture(c.name), c => c.name === selCap);
+}
+const sig = {};
+function renderLog(id, list, html, click) {
+  const key = JSON.stringify(list.slice(0, 30));
+  if (sig[id] === key) return; sig[id] = key;
+  if (!list.length) return;
+  $(id).replaceChildren(...list.slice(0, 60).map(x => { const e = document.createElement('div'); e.className = 'e'; e.innerHTML = html(x); e.onclick = () => click(x); return e; }));
+}
+function renderThumbs(id, list, src, label, click, on) {
+  const key = JSON.stringify(list) + selCap;
+  if (sig[id] === key) return; sig[id] = key;
+  if (!list || !list.length) return;
+  $(id).replaceChildren(...list.map(x => {
+    const e = document.createElement('div'); e.className = 'thumb' + (on && on(x) ? ' on' : '');
+    e.innerHTML = `<img alt="" src="${src(x)}?t=${x.mtime || x.when || ''}" onerror="this.style.visibility='hidden'"><div>${esc(label(x))}</div>`;
+    e.onclick = () => click(x); return e;
+  }));
+}
+
+async function showCapture(name) {
+  selCap = name; sig.caps = null;
+  const a = await fetch(`/api/live/analysis/${encodeURIComponent(name)}`).then(r => r.json());
+  const rgb = c => `rgb(${(c & 31) * 8},${(c >> 5 & 31) * 8},${(c >> 10 & 31) * 8})`;
+  const sprites = a.sprites.filter(s => s.match);
+  const groups = {};
+  for (const s of sprites) (groups[s.match.join(':')] ||= { ...s, n: 0 }).n++;
+  $('capview').innerHTML = `
+    <img class="shot" src="/api/live/file/captures/${encodeURIComponent(name)}/screen.png" alt="">
+    <div class="kv" style="margin:8px 0"><b>BG palette</b><span>${a.bg_best ? `<a href="/gfx#palettes/${a.bg_best}">${a.bg_best}</a> (banks ${a.bg.filter(b => b.resources.includes(a.bg_best)).map(b => b.bank).join(', ')})` : 'no match'}${a.meta.map ? ` · remembered for map ${a.meta.map}` : ''}</span>
+    <b>Sprites</b><span>${a.sprites.length} on screen, ${sprites.length} identified; their palettes are now used by the Graphics page</span></div>
+    <table><tr><th>Resource</th><th>Parts</th><th>Palette (OBJ bank)</th><th></th></tr>
+    ${Object.values(groups).map(s => `<tr><td><a href="${s.match[0] === 'big' ? '/gfx#big/' : '/gfx#sprites/'}${s.match[1]}" target="_blank">${s.match[0]} ${s.match[1]}</a></td><td>${s.n}</td>
+      <td><span class="sw">${s.colors.map(c => `<i style="background:${rgb(c)}"></i>`).join('')}</span> ${s.bank}</td>
+      <td><button data-tag="${s.match[0]}:${s.match[1]}">Has text</button></td></tr>`).join('')}</table>`;
+  $('capview').querySelectorAll('[data-tag]').forEach(b => b.onclick = () => tag(...b.dataset.tag.split(':')));
+}
+
+async function tag(kind, hash) {
+  const note = prompt(`What text does ${kind} ${hash} show? (Japanese or a description)`);
+  if (note === null) return;
+  await fetch('/api/tags', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ kind, hash, part: '', note }) });
+  loadTags();
+}
+async function loadTags() {
+  const t = await fetch('/api/tags').then(r => r.json());
+  $('tagcount').textContent = t.length ? `${t.length} tagged · ${t.filter(x => x.status === 'done').length} done` : '';
+  if (!t.length) return;
+  $('tags').className = '';
+  $('tags').innerHTML = `<table><tr><th>Graphic</th><th>Shows</th><th>English</th><th>Status</th></tr>${t.map((x, i) => `<tr class="tagrow">
+    <td><a href="${x.kind === 'big' ? '/gfx#big/' : x.kind === 'map' ? '/gfx#maps/' : '/gfx#sprites/'}${x.hash}" target="_blank">${esc(x.kind)} ${esc(x.hash)}${x.part ? ' · ' + esc(x.part) : ''}</a></td>
+    <td>${esc(x.note)}</td><td><input data-i="${i}" data-f="english" value="${esc(x.english)}"></td>
+    <td><select data-i="${i}" data-f="status">${['todo', 'translated', 'drawn', 'done'].map(s => `<option ${s === x.status ? 'selected' : ''}>${s}</option>`).join('')}</select></td></tr>`).join('')}</table>`;
+  $('tags').querySelectorAll('[data-i]').forEach(el => el.onchange = async () => {
+    const x = t[+el.dataset.i]; x[el.dataset.f] = el.value;
+    await fetch('/api/tags', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(x) });
+    loadTags();
+  });
+}
+
+document.querySelectorAll('#mode button').forEach(b => b.onclick = () => cmd({ c: 'subs', mode: b.dataset.m }));
+document.querySelectorAll('.pad button').forEach(b => b.onclick = ev => cmd({ c: 'keys', keys: b.dataset.k, frames: ev.shiftKey ? 30 : 4 }));
+$('capture').onclick = () => cmd({ c: 'capture' }).then(() => setTimeout(poll, 800));
+$('god').onclick = () => cmd({ c: 'god', on: !(last?.state?.god) });
+$('recbtn').onclick = () => last?.state?.rec ? cmd({ c: 'rec_stop' }) : cmd({ c: 'rec_start', name: $('recname').value || 'playthrough' });
+$('bmsave').onclick = () => { cmd({ c: 'bookmark', name: $('bmname').value || undefined }); $('bmname').value = ''; };
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  const map = { ArrowUp: 'UP', ArrowDown: 'DOWN', ArrowLeft: 'LEFT', ArrowRight: 'RIGHT', z: 'B', x: 'A', a: 'L', s: 'R', Enter: 'START', Backspace: 'SELECT' };
+  if (map[e.key] && last?.connected) { e.preventDefault(); cmd({ c: 'keys', keys: map[e.key], frames: e.shiftKey ? 30 : 4 }); }
+});
+poll(); setInterval(poll, 700); loadTags();
+</script>
+</body>
+</html>
