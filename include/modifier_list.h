@@ -44,7 +44,10 @@ struct ModifierMenu {
     u8 unknown3C[0x2c];
     struct ModifierSelection current, pending;
     void *script;
-    u8 unknownBC[0x55];
+    const u8 *textSources[13];
+    s32 mainWindow, detailWindow;
+    s32 listWindows[6];
+    u8 unknown110;
     u8 specialHeader;
     u8 unknown112[2];
     u8 changed;
