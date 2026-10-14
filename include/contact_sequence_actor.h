@@ -17,9 +17,9 @@ struct ContactSequenceActor {
 };
 struct ContactSequenceOwner {
     u8 task[0x18];
-    u32 configuration;
-    u32 contactValue;
     s32 initialHealth;
+    u32 contactValue;
+    s32 resourceValue;
     u32 reactionValue;
     u32 script;
     u32 activeCount;

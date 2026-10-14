@@ -1,12 +1,8 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x2c];
-    u32 a;
-};
-u32 sub_08046870(struct S *p)
+#include "contact_sequence_actor.h"
+#define ContactSequencePool_GetActiveCount sub_08046870
+u32 ContactSequencePool_GetActiveCount(struct ContactSequenceOwner *owner)
 {
-    if (!p)
+    if (!owner)
         return 0;
-    return p->a;
+    return owner->activeCount;
 }

@@ -3,15 +3,15 @@
 #define ContactSequenceActor_Initialize sub_08045E08
 void ContactSequenceActor_Initialize(struct ContactSequenceOwner *, struct ContactSequenceActor *);
 extern u8 *gUnk_030042E4;
-s32 ContactSequencePool_Initialize(struct ContactSequenceOwner *owner, u32 configuration,
-                                   u32 contactValue, s32 initialHealth, u32 script,
+s32 ContactSequencePool_Initialize(struct ContactSequenceOwner *owner, s32 initialHealth,
+                                   u32 contactValue, s32 resourceValue, u32 script,
                                    u32 reactionValue)
 {
     struct ContactSequenceActor *actor;
     s32 remaining;
-    owner->configuration = configuration;
-    owner->contactValue = contactValue;
     owner->initialHealth = initialHealth;
+    owner->contactValue = contactValue;
+    owner->resourceValue = resourceValue;
     owner->script = script;
     owner->reactionValue = reactionValue;
     owner->sequenceResource = ScriptProc_Start(0x922E, 0xC5E2);
