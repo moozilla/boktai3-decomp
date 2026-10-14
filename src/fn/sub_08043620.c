@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_actor.h"
-#define ContactActor_UpdateReaction sub_08043620
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 struct ContactReactionGraphics {
     u8 prefix[0xC];

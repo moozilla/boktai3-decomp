@@ -2,7 +2,6 @@
 // fuzzy: 51.7%
 // Reviewed full extent; register lifetimes and instruction scheduling still differ.
 #include "contact_actor.h"
-#define ContactActor_UpdateRetreat sub_0804373C
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 u8 *sub_0821D64C(s32, s32);
 static inline s32 truncateShift12(s32 value)
@@ -72,8 +71,8 @@ void ContactActor_UpdateRetreat(struct ContactActorPool *pool, struct ContactAct
             destination->z = read->z + center->z;
         }
         slot->targetHeight = (nextRandom(table) & 511) + slot->desiredHeight;
-        slot->direction = Math_Atan2(slot->destination.x - slot->position.x,
-                                    destination->z - slot->position.z);
+        slot->direction =
+            Math_Atan2(slot->destination.x - slot->position.x, destination->z - slot->position.z);
         slot->direction += (nextRandom(table) & 15) - 8;
         slot->steeringTimer = (nextRandom(table) & 7) + 8;
         slot->speed = 16;
@@ -82,8 +81,8 @@ void ContactActor_UpdateRetreat(struct ContactActorPool *pool, struct ContactAct
         const u16 *table;
         position = &slot->position;
         destination = &slot->destination;
-        slot->direction = Math_Atan2(slot->destination.x - slot->position.x,
-                                    destination->z - position->z);
+        slot->direction =
+            Math_Atan2(slot->destination.x - slot->position.x, destination->z - position->z);
         table = (const u16 *)RANDOM_TABLE_ADDR;
         slot->direction += (nextRandom(table) & 3) - 1;
         slot->steeringTimer = (nextRandom(table) & 7) + 8;
@@ -122,5 +121,5 @@ void ContactActor_UpdateRetreat(struct ContactActorPool *pool, struct ContactAct
 
 #else
 #include "global.h"
-INCLUDE_ASM("asm/nonmatching", sub_0804373C);
+INCLUDE_ASM("asm/nonmatching", ContactActor_UpdateRetreat);
 #endif

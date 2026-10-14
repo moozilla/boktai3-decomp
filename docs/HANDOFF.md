@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 23.049% matching (2026-10-14). This file is the single
+Last updated after reaching 23.130% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,33 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex): contact actor states and pool lifecycle
+
+Matching is **23.130%**, up **0.082 percentage points** (+1,972 bytes), with
+**6,367 / 11,465 functions**, **558,678 / 2,415,354 bytes**. Eight new exact
+functions cover tracking, random walk, burst, hit reaction, wait/inactive states,
+the manager update and initialization. Without register pinning: **19.020%**;
+Register-pinned: **4.110%**, included above. The existing factory, destructor and
+clear request are typed/named with no additional credit. Three new guarded drafts
+cover roaming (66.9%), retreat (51.7%) and starting the pool (72.7%); 72 drafts overall.
+
+The **08042E18–08043F64** subsection confirms the nine-entry dispatch table,
+0x1720 allocation, packed destination/origin fields, target split, fade controls
+and timed clear/hide lifecycle. Pool+30 is the retreat-center position and +38
+the sequence resource. The owner helper at 08022590 passes its +9D8 pool pointer
+to RequestClear; its old prototype omitted that implicit argument. See
+[contact-state notes](../notes/contact-actor-states_2026-10-14.md).
+
+Every exact addition passed reviewed full-extent checks and hint minimization.
+Random walk and the manager update became entirely unpinned. Format, inventory,
+RAM literals and decoded actor-registry data checks pass. The complete combined build printed **`build/boktai3.gba: OK`**
+(`build/contact-state-combined.log`); nineteen exact functions passed post-name
+full-extent checks, including the corrected owner caller and shared consumers.
+The user replaced the earlier stop threshold: continue toward **25% exact or
+60% usage remaining**; latest account reading is **87% remaining**. Next
+contiguous subsection starts at **08043F64**, another collision/animation actor.
+Do not force the local main ref: Claude's primary checkout owns it.
 
 ## October 14 (Codex): contact actor setup, reactions and display
 

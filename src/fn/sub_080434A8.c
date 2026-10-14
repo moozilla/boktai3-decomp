@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_actor.h"
-#define ContactActor_UpdateBurst sub_080434A8
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 static inline s32 truncateShift12(s32 value)
 {

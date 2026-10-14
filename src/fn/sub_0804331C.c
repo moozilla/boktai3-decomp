@@ -1,5 +1,4 @@
 #include "contact_actor.h"
-#define ContactActor_UpdateRandomWalk sub_0804331C
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 static inline s32 truncateShift12(s32 value)
 {
