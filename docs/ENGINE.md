@@ -256,9 +256,8 @@ comment on `struct SceneObject.entered` in `include/scene_object.h`.
 
 The event script system is a keyword-based bytecode VM. The matching C is
 mostly in `src/fn/sub_0821A4xx`–`sub_0821BAxx`, and the bytecode is in the ROM
-at `08DD6B95`–`08E8755B` ([ROM_MAP.md](ROM_MAP.md)). Its structure resembles
-MGS's GCL, but the encoding is different, and this document does not claim
-shared ancestry. See [MGS_GCL_MATCHING.md](MGS_GCL_MATCHING.md) (the matched
+at `08DD6B95`–`08E8755B` ([ROM_MAP.md](ROM_MAP.md)). Its structure and command names come from
+MGS's GCL (see Command names below), though the encoding differs. See [MGS_GCL_MATCHING.md](MGS_GCL_MATCHING.md) (the matched
 functions and the comparison) and [PROCESS_REVIEW.md](PROCESS_REVIEW.md) (what
 the comparison does and does not show).
 
@@ -340,6 +339,26 @@ one operand and returns its type and value. The first byte selects the type:
   the first byte's high nibble is `2`, an index operand follows. The
   matched accessors are `sub_0821B34C`, `sub_0821B4C8`, `sub_0821B540` and
   `sub_0821B5BC`.
+
+### Command names
+
+Native command ids are 16-bit hashes of the command names, as in MGS's GCL.
+The hashes match MGS's names exactly, which shows that the script system
+derives from GCL:
+
+| Table | Entries (hash = name) |
+|---|---|
+| `0861418C` basic | `0D86` if, `4A6F` switch, `64C0` eval, `121F` call, `CD3A` return, `B96E` print |
+| `08E8791C` engine | `22FF` mesg (`082255BC`), `9906` chara (`08225560`), `D4CB` trap (`08225624`), `C8BB` load (`08225508`), `C091` map (`08225620`), `E43C` restart (`082257A0`), `B745` and `0BB3` unknown |
+| `080F38C8` | three entries `0CF4`, `0CC8`, `0CD8` (names unknown) |
+
+The 722-entry table at `08603300` (`data/actor_registry.csv`) has the same
+layout. It is the `chara` table: every object a script can create by name,
+including controllers as well as actors. Its names are not recoverable by
+guessing: about 9,400 candidate spellings of character, enemy and object names
+matched 99 keys, which is the 1% chance rate. A few common words do match
+plausible entries (`delay` 082284B4, `varsave` 08225410, `end` 0822548C,
+`select` 080422DC, `radio` 08197890) but are unconfirmed.
 
 ### Resource keys (`ScriptProc_Start` is a resource lookup)
 
