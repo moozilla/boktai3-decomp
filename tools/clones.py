@@ -175,7 +175,9 @@ def main():
     os.makedirs(wip, exist_ok=True)
     ok = 0
     for f in fams:
-        tmpl = [n for n in f if n in srcs]
+        # only exact matches are templates: a NONMATCHING draft's INCLUDE_ASM
+        # fallback would pass check.py trivially
+        tmpl = [n for n in f if n in srcs and n in done]
         if not tmpl:
             continue
         for n in f:
