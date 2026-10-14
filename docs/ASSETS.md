@@ -110,3 +110,35 @@ lookup, and map files show no registry keys above chance, so those entries are
 created another way (per-stage data not yet decoded) or are unused; the ROM
 also keeps Boktai 2 material (its title graphics in `E89F`). The procedure
 table covers the whole body, so no script code is unreachable from it.
+
+## Text and the font
+
+`tools/assets/text.py dump | find WORD` decodes the script string table
+(9,976 entries at `08D6B1F8`, base `08D74DDC`; bit 31 of an entry marks text).
+Bytes below `0x80` are ASCII (markup such as `<PROC=0>`, `<LABEL>`, `<ALTER>`,
+newlines); a lead byte `0x80`-`0x85` and the next byte form a glyph index
+(code - `0x8000`).
+
+The font (`fnt` resource) has a 12-byte header (`u16 0x80` ASCII glyphs, `u8 1`,
+`u8 6`, `u32 0xC` ASCII offset, `u32 0x200C` two-byte offset), 128 ASCII glyphs
+of 8x16 and 1,537 two-byte glyphs of 16x16, 4bpp as four 8x8 tiles (TL, TR,
+BL, BR); colour 4 is background, 1 the stroke and 2-3 shading. Kana and
+symbols come first (`0x001`-`0x0FF`), then kanji grouped by radical, with
+"PG" logo glyphs at `0x100`, `0x200`, ... `0x600`.
+
+`data/charmap.tsv` maps glyph indices to characters (1,326 entries). Kana and
+symbols were read by eye; kanji were ranked by template matching against
+Hiragino Kaku Gothic W7 at the glyph's ink box (IoU of blurred bitmaps, JIS
+level 1) and each confirmed or corrected by eye (`confidence` column: `high`,
+`match`, `low`). Every two-byte code used by the strings is mapped. Decoding
+exposed two misreads that context fixed (嗅 in 嗅覚, 冑 in 甲冑); expect a few
+more among the `low` entries.
+
+What the text shows: item, weapon, armour and bike-part names; the character
+list (#9818-#9833, including the cameos スネーク, リキッド, ソリダス); and the
+monster list (#9838-#9921: ポイズナー ... グール, ゾンビ, マミー, スケルトン,
+ゴーレム, ミミック, the elemental armours, スライム, 伯爵, and the bosses
+フレスベルグ, サバタ, ニーズホッグ, ラタトスク, ヴァナルガンド), followed by drop
+labels, elements (#9927-#9935), monster classes (ビースト, アンデッド, シング,
+ファントム, イモータル) and dungeon descriptions. Linking these names to the
+actor code (which kind is which monster) is the next step.
