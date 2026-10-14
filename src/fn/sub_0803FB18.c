@@ -1,10 +1,10 @@
-#include "global.h"
+#include "modifier_list.h"
 
-s32 sub_0803FA5C(s32, s32, s32, s32, s32);
+s32 Modifier_ApplyToStat(struct ModifierSelection *, struct ModifierSelection *, s32, u32, u32);
 
-s32 sub_0803FB18(s32 a, s32 b, s32 c, s32 d)
+s32 Modifier_ApplyKindSeven(struct ModifierSelection *a, struct ModifierSelection *b, s32 c, u32 d)
 {
-    c = sub_0803FA5C(a, b, c, d, 7);
+    c = Modifier_ApplyToStat(a, b, c, d, 7);
     if (c > 999)
         c = 999;
     return c;

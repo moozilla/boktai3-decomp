@@ -2,7 +2,7 @@
 
 s32 Div(s32, s32);
 
-s32 sub_0803F934(s32 a, s32 b, s32 c)
+s32 Modifier_ApplyAmount(s32 a, s32 b, s32 c)
 {
     switch (b) {
         case 0:

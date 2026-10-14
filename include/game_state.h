@@ -98,7 +98,7 @@ struct GameState {
     s32 unk77C;
     u8 playerName[32]; /* (guess) */
     u16 unk7A0[4];
-    u8 unk7A8[0x8];
+    u8 modifierIdsBytes[8]; /* tentative: four packed s16 source IDs; 0803F95C/0803FDBC */
     s16 unk7B0;
     u8 unk7B2[0x6];
     u32 unk7B8[4];

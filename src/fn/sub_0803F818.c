@@ -1,7 +1,7 @@
-#include "global.h"
+#include "modifier_list.h"
 
-void sub_0803F818(u8 *p, u32 n)
+void Modifier_RemoveSelection(struct ModifierSelection *p, u32 n)
 {
-    *(u32 *)(p + 0x18) &= ~(1 << n);
-    *(u16 *)(p + 0xa) -= 1;
+    p->mask &= ~(1 << n);
+    p->count -= 1;
 }
