@@ -40,7 +40,7 @@ struct ContactActor {
     u8 graphics[0x1C];
     u8 shadow[0x40];
 };
-/* Known prefix only; the complete task allocation and tile buffer length are unconfirmed. */
+/* Task allocation is 0x1720 bytes; the final 32 bytes hold the blend buffer. */
 struct ContactActorPool {
     u8 task[0x18];
     u32 state;
@@ -49,10 +49,11 @@ struct ContactActorPool {
     u16 resourceColliderId, healthColliderId;
     u32 lifetime;
     const struct ContactPosition *targets[2];
-    u8 scriptState[0xC];
+    struct ContactPosition retreatCenter;
+    const void *sequenceResource;
     struct ContactActor slots[16];
     s8 fadeMode, fadeLevel;
     u8 unknown16FE[2];
-    u8 tileData[1];
+    u8 tileData[0x20];
 };
 #endif
