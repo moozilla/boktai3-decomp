@@ -1,9 +1,9 @@
 #include "global.h"
 s32 __divsi3(s32, s32);
 s32 sub_08249350(s32, s32);
-void sub_08044C80(u8 *base, s32 bits, const u8 **source, s32 count, s32 index)
+void EncodedRecord_WriteBits(u8 *base, s32 bits, u32 *source, s32 count, s32 index)
 {
-    const u8 *p;
+    u32 p;
     s32 i;
     s32 offset;
     s32 shift;

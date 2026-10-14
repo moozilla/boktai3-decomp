@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 23.341% matching (2026-10-14). This file is the single
+Last updated after reaching 23.429% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,36 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex): packed records and paired contact spawning
+
+Working-tree matching is **23.429%**, up **0.088 percentage points**
+(+2,136 bytes) from six new exact functions. There are **6,402 / 11,470 functions**,
+**565,894 / 2,415,354 bytes**. Without register pinning: **19.270%**;
+Register-pinned: **4.159%**, included above. Seventy guarded drafts remain.
+
+The **08044C80–080454C0** subsection now has exact six-bit packing, seeded XOR,
+two 24-byte record encoders/decoders and four-row glyph formatting. Existing
+message-menu/password callers confirm its use; header/version, name packing,
+CRC polynomials and differing field selections are documented in
+[record notes](../notes/encoded-records_2026-10-14.md). Two hidden boundaries
+were recovered without changing the code-byte denominator. GameState gains
+observed scalar types at the original offsets; other meanings stay provisional.
+
+The paired contact-swarm wrapper is now exact at 416 bytes after barrier removal
+fixed branch length and spill rotation. Its count-limited sibling is a 98.6%
+guarded draft with only three differing bytes, all in the speed reload register;
+no exact credit. Four record encoder/decoder functions are entirely unpinned.
+
+Every addition passed reviewed full-extent checks and applicable hint minimization.
+The combined build printed **`build/boktai3.gba: OK`** in
+`build/encoded-records-combined.log`. Twelve new/affected units passed post-name
+full-extent checks, including entire password/message-menu units. Format,
+inventory, RAM literals, decoded actor-registry and splitter regression checks pass.
+Main PR 104 passed Actions (38578069272) at 0231770a. Continue toward
+**25% exact or 60% usage remaining**; latest account reading is **85% remaining**.
+Next contiguous subsection is **080454C0–08045A20**, a parameterized motion pool.
+Claude's primary checkout owns main; use the managed Codex worktree.
 
 ## October 14 (Codex): contact swarm and latest Claude integration
 
