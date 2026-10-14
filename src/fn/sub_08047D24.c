@@ -1,13 +1,12 @@
 // MATCHING_CONCESSION: register-pinning
 #include "temporary_animation_pool.h"
-#define TemporaryAnimationPool_CreateEntry sub_08047D24
-#define TemporaryAnimationPool_Create sub_08047CB8
-#define TemporaryAnimationPool_FindInactive sub_08047D04
 struct TemporaryAnimationPool *TemporaryAnimationPool_Create(void);
 struct TemporaryAnimationSlot *TemporaryAnimationPool_FindInactive(struct TemporaryAnimationPool *);
 void sub_082199C8(void *, u32, u32);
 void sub_08214424(void *, u32);
-struct TemporaryAnimationSlot *TemporaryAnimationPool_CreateEntry(u32 sequence, u32 lifetime, u32 flags, s32 paletteIndex, const void *paletteData)
+struct TemporaryAnimationSlot *TemporaryAnimationPool_CreateEntry(u32 sequence, u32 lifetime,
+                                                                  u32 flags, s32 paletteIndex,
+                                                                  const void *paletteData)
 {
     struct TemporaryAnimationPool *pool = gUnk_020000A8;
     struct TemporaryAnimationSlot *slot;

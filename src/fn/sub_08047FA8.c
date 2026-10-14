@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_burst.h"
-#define ContactBurst_UpdateContactAnimation sub_08047FA8
 static inline s32 nextRandomHighByte(void)
 {
     s32 sample;

@@ -1,5 +1,4 @@
 #include "contact_burst.h"
-#define ContactBurst_RandomParticleFrame sub_08048074
 u32 ContactBurst_RandomParticleFrame(void)
 {
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;

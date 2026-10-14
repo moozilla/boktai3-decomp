@@ -60,7 +60,7 @@ static inline int trunc12(int x)
     return x >= 0 ? x >> 12 : -(-x >> 12);
 }
 int SceneActorGraphics_GetResourceId(void *);
-void sub_08047D24(void *, int, int, int, void *);
+void TemporaryAnimationPool_CreateEntry(void *, int, int, int, void *);
 extern u8 *gUnk_030042E4;
 typedef struct {
     u32 a, b;
@@ -105,7 +105,7 @@ void sub_08025550(ActorAnimation *p, int tick)
             {
                 register int offset asm("r4") = 0x240;
                 asm("" ::"r"(offset));
-                sub_08047D24((u8 *)p2 + offset, 8, 0x200, 0x9000, data);
+                TemporaryAnimationPool_CreateEntry((u8 *)p2 + offset, 8, 0x200, 0x9000, data);
             }
         } else {
             int offset;
@@ -117,7 +117,7 @@ void sub_08025550(ActorAnimation *p, int tick)
             {
                 register int drawOffset asm("r2") = 0x240;
                 asm("" ::"r"(drawOffset));
-                sub_08047D24((u8 *)p2 + drawOffset, 8, 0x200, 0x9000, data);
+                TemporaryAnimationPool_CreateEntry((u8 *)p2 + drawOffset, 8, 0x200, 0x9000, data);
             }
         }
     }

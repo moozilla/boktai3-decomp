@@ -1,6 +1,4 @@
 #include "directional_particles.h"
-#define DirectionalParticle_Spawn sub_08047DF4
-#define DirectionalParticle_Update sub_08047DBC
 extern u32 gUnk_03005308;
 s32 DirectionalParticle_Update(void *, struct DirectionalParticle *);
 #ifdef NONMATCHING
@@ -54,5 +52,5 @@ s32 DirectionalParticle_Spawn(struct DirectionalParticleSource *source, u32 dire
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08047DF4);
+INCLUDE_ASM("asm/nonmatching", DirectionalParticle_Spawn);
 #endif
