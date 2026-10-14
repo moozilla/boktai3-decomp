@@ -1,5 +1,4 @@
 #include "modifier_list.h"
-#define Modifier_LoadFourthSource sub_0803FC8C
 s32 sub_0811E534(struct ModifierItemInfo *, s32);
 void Modifier_LoadFourthSource(struct ModifierSelection *selection)
 {

@@ -1,8 +1,7 @@
 #include "modifier_list.h"
-#define ModifierMenu_ToggleSelection sub_0803FED4
-u32 sub_0803F82C(struct ModifierSelection *, s32);
-void sub_0803F818(struct ModifierSelection *, s32);
-void sub_0803F804(struct ModifierSelection *, s32);
+u32 Modifier_TestSelection(struct ModifierSelection *, s32);
+void Modifier_RemoveSelection(struct ModifierSelection *, s32);
+void Modifier_AddSelection(struct ModifierSelection *, s32);
 s32 ModifierMenu_ToggleSelection(struct ModifierMenu *menu)
 {
     struct ModifierSelection *pending = &menu->pending;
@@ -10,12 +9,12 @@ s32 ModifierMenu_ToggleSelection(struct ModifierMenu *menu)
     s32 id;
     current->selectedId = pending->selectedId;
     id = pending->selectedId;
-    if (sub_0803F82C(current, id))
-        sub_0803F818(current, id);
+    if (Modifier_TestSelection(current, id))
+        Modifier_RemoveSelection(current, id);
     else {
         if (current->count >= current->capacity)
             return -1;
-        sub_0803F804(current, id);
+        Modifier_AddSelection(current, id);
     }
     return 0;
 }

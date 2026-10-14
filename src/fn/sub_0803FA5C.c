@@ -1,9 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
-#define Modifier_ApplyToStat sub_0803FA5C
-s32 sub_0803F95C(struct ModifierSelection *, struct ModifierSelection *, struct ModifierRecord *,
-                 u32);
-s32 sub_0803F934(s32, u32, u32);
+s32 Modifier_CollectSources(struct ModifierSelection *, struct ModifierSelection *,
+                            struct ModifierRecord *, u32);
+s32 Modifier_ApplyAmount(s32, u32, u32);
 s32 Modifier_ApplyToStat(struct ModifierSelection *actorArg, struct ModifierSelection *selectionArg,
                          s32 valueArg, u32 includeSelected, u32 kindArg)
 {
@@ -32,12 +31,12 @@ s32 Modifier_ApplyToStat(struct ModifierSelection *actorArg, struct ModifierSele
         iterator->order = -1;
         iterator++;
     } while (--i >= 0);
-    result = sub_0803F95C(actor, selection, record, includeSelected);
+    result = Modifier_CollectSources(actor, selection, record, includeSelected);
     if (result > 0) {
         s32 count = result;
         do {
             if (record->kind == kind)
-                value = sub_0803F934(value, kind, record->amount);
+                value = Modifier_ApplyAmount(value, kind, record->amount);
             record++;
         } while (--count != 0);
     }

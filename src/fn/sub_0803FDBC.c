@@ -1,6 +1,5 @@
 #include "modifier_list.h"
-#define ModifierMenu_ReconcileSelection sub_0803FDBC
-u32 sub_0803F82C(struct ModifierSelection *, s32);
+u32 Modifier_TestSelection(struct ModifierSelection *, s32);
 void ModifierMenu_ReconcileSelection(struct ModifierMenu *menu)
 {
     struct ModifierSelection *current = &menu->current;
@@ -13,7 +12,7 @@ void ModifierMenu_ReconcileSelection(struct ModifierMenu *menu)
         for (;;) {
             if (index > 31)
                 break;
-            if (sub_0803F82C(current, index)) {
+            if (Modifier_TestSelection(current, index)) {
                 mask |= 1 << index;
                 count++;
                 if (count >= current->capacity)
@@ -29,7 +28,7 @@ void ModifierMenu_ReconcileSelection(struct ModifierMenu *menu)
     for (index = 0; index <= 3; index++)
         ((s16 *)gUnk_02000710->modifierIdsBytes)[index] = -1;
     for (count = 0, index = 0; index <= 31; index++) {
-        if (sub_0803F82C(current, index)) {
+        if (Modifier_TestSelection(current, index)) {
             ((s16 *)gUnk_02000710->modifierIdsBytes)[count] = index;
             count++;
         }
