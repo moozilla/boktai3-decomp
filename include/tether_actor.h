@@ -75,7 +75,8 @@ struct TetherActor {
     u8 statusFlags;
     u8 unknown3E5;
     u16 statusTag;
-    u8 requestStatus, requestMode, unknown3EA[6];
+    u8 requestStatus, requestMode, unknown3EA[2];
+    const void *onActionScript;
     struct ContactPosition targetPosition;
     u16 secondaryValue, secondaryMaximum;
     u16 interactionLock;
