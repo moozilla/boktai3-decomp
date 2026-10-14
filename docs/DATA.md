@@ -28,7 +28,8 @@ are editable without being committed. **Resizable formats** (`RESIZABLE = True`)
 may encode to a different size; everything after them moves. Such a format
 declares `ANCHORS`, the only interior addresses that may be referenced. Data
 words pointing anywhere else inside the range are rejected as pointers (84
-graphics words resembled pointers into the text bank). `make mod` builds
+graphics words resembled pointers into the text bank), and pointer-like words
+inside the range are not relocated (the format holds no ROM pointers). `make mod` builds
 `build/mod.gba` from edited sources without the SHA-1 check, trimmed back to
 16 MiB so EEPROM stays at `0x0D000000`.
 
@@ -55,6 +56,7 @@ the bank, were encoded with it.
 | Format | Range | File | Notes |
 |---|---|---|---|
 | `keyed_callbacks` | `08603300`–`08604998` | `data/actor_registry.csv` | 722 sorted `(key, callback)` records and a zero sentinel. The script `chara` command binary-searches it (`08225844`) and calls the callback. |
+| `resource_archive` | 10 ranges `08614DCC`–`08D5A85C` | `build/res/LABEL/index.txt` + `HASH.bin` (extracted) | The archives found by `ScriptProc_Start` (anm, map, ptn, fnt, sprites...). Header, sorted hash table and offsets are regenerated; entries are emitted as `.incbin` of their files and may change size. Their contents are position-independent: about 7,300 pointer-like words inside them (tile and map data) are no longer relocated. Verified in-game: growing the first `anm` entry by 37 bytes shifts every archive and leaves all menu and field screenshots identical. |
 | `text_bank` | `08D6B1E4`–`08DD6B96` | `build/text/bank.tsv` (extracted) | Script text, resizable. The gcx section words, 9,977 entry offsets, then strings (`T`, decoded with `data/charmap.tsv`) and binary blobs (`B`, 82 tables read by script code). Verified in-game: a lengthened config help line renders and the field still plays. |
 
 ### Editing text
@@ -63,6 +65,15 @@ the bank, were encoded with it.
 make            # extracts build/text/bank.tsv on first run
 # edit a line:  1287<TAB>T<TAB><WEIGHT>Ａボタン</WEIGHT>で設定を変更します。
 make mod        # build/mod.gba
+```
+
+Or use the local studio, which lists and searches all strings, previews edits
+in the game font (with the game's wrap at the box edge and `<WEIGHT>` in red,
+both checked against the emulator), saves to `build/text/bank.tsv` and runs
+`make mod`:
+
+```
+python3 tools/studio/serve.py      # http://localhost:8642
 ```
 
 Characters must exist in `data/charmap.tsv` (or use `{XXXX}` glyph codes);
