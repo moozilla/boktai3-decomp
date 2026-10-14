@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
-void ScenePool_UpdateSteeringPulse(struct ScenePoolActor *actor, struct ScenePoolEntry *entry,
-                                   const struct ScenePoolSpeedBounds *bounds)
+void ScenePool_UpdateSpeedPulse(struct ScenePoolActor *actor, struct ScenePoolEntry *entry,
+                                const struct ScenePoolSpeedBounds *bounds)
 {
     u32 active = entry->speedControlActive;
     s32 metric;

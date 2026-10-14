@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
-#define ScenePool_StateLateralWeave sub_0803E4D0
 static inline u32 *Prepare(struct ScenePoolEntry *entry, u32 state)
 {
     entry->state = state;

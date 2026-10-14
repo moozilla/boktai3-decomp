@@ -1,12 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
-#define ScenePool_StateTrackAdaptive sub_0803DF90
 #ifdef NONMATCHING
 // fuzzy: 99.2%
 s32 sub_0803D9D8(struct ScenePoolEntry *);
 s32 ScenePool_ResumeAfterIdle(void *, struct ScenePoolEntry *);
-void ScenePool_UpdateSteeringPulse(struct ScenePoolActor *, struct ScenePoolEntry *,
-                                   const struct ScenePoolSpeedBounds *);
+void ScenePool_UpdateSpeedPulse(struct ScenePoolActor *, struct ScenePoolEntry *,
+                                const struct ScenePoolSpeedBounds *);
 extern const struct ScenePoolSpeedBounds gUnk_0860588C[];
 static inline void Or(u32 mask, u32 *flags)
 {
@@ -43,7 +42,7 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
     if (ScenePool_ResumeAfterIdle(actor, entry))
         goto done;
     Or(0x10, &actor->stateFlags);
-    ScenePool_UpdateSteeringPulse(actor, entry, gUnk_0860588C);
+    ScenePool_UpdateSpeedPulse(actor, entry, gUnk_0860588C);
     if (entry->speedControlActive) {
         u32 *controls = &actor->controlFlags;
         u32 value = *controls;
@@ -166,5 +165,5 @@ done:
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0803DF90);
+INCLUDE_ASM("asm/nonmatching", ScenePool_StateTrackAdaptive);
 #endif

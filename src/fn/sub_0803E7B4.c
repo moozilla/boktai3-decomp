@@ -1,10 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
-#define ScenePool_StateLaunchShortArc sub_0803E7B4
 #ifdef NONMATCHING
 // fuzzy: 99.1%
-void ScenePool_UpdateSteeringPulse(struct ScenePoolActor *, struct ScenePoolEntry *,
-                                   const struct ScenePoolSpeedBounds *);
+void ScenePool_UpdateSpeedPulse(struct ScenePoolActor *, struct ScenePoolEntry *,
+                                const struct ScenePoolSpeedBounds *);
 extern const struct ScenePoolSpeedBounds gUnk_086058A0[];
 void sub_08116C4C(s32, struct ScenePoolVec32 *);
 s32 sub_08116C20(s32);
@@ -47,7 +46,7 @@ s32 ScenePool_StateLaunchShortArc(void *manager, struct ScenePoolActor *actor,
     u8 *kindAddress;
     if (entry->stateEntered)
         entry->stateEntered = 0;
-    ScenePool_UpdateSteeringPulse(actor, entry, gUnk_086058A0);
+    ScenePool_UpdateSpeedPulse(actor, entry, gUnk_086058A0);
     if (entry->stateFrame <= 19) {
         s32 lateral = entry->unknown5c;
         s32 magnitude = lateral;
@@ -159,5 +158,5 @@ done:
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0803E7B4);
+INCLUDE_ASM("asm/nonmatching", ScenePool_StateLaunchShortArc);
 #endif

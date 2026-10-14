@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
-#define ScenePool_StateScheduleMotion  sub_0803E354
-#define ScenePool_ScheduleSpeedControl sub_0803DAC8
 void sub_0803DA30(struct ScenePoolEntry *, s32, s32, s32);
 void sub_0803DA7C(struct ScenePoolEntry *, s32, s32, s32);
 s32 sub_0803D9D8(struct ScenePoolEntry *);
