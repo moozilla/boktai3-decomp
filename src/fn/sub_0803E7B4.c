@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
 #ifdef NONMATCHING
 // fuzzy: 99.1%
@@ -23,7 +22,6 @@ static inline u32 *PrepareZero(struct ScenePoolEntry *entry, u32 zero, u32 one)
     {
         u8 *entered = &entry->stateEntered;
         u32 setOne = one;
-        asm("" : : "r"(entered), "r"(setOne));
         *entered = setOne;
         return (u32 *)(entered + 8);
     }
@@ -31,7 +29,7 @@ static inline u32 *PrepareZero(struct ScenePoolEntry *entry, u32 zero, u32 one)
 static inline u32 *PrepareFirst(struct ScenePoolEntry *entry)
 {
     u32 one = 1;
-    register u8 *entered asm("r0");
+    u8 *entered;
     entry->state = one;
     entry->stateFrame = 0;
     entered = &entry->stateEntered;
@@ -42,7 +40,7 @@ s32 ScenePool_StateLaunchShortArc(void *manager, struct ScenePoolActor *actor,
                                   struct ScenePoolEntry *entry)
 {
     struct ScenePoolVec32 from, to, path;
-    register u32 fire asm("r2");
+    u32 fire;
     u8 *kindAddress;
     if (entry->stateEntered)
         entry->stateEntered = 0;
@@ -61,8 +59,8 @@ s32 ScenePool_StateLaunchShortArc(void *manager, struct ScenePoolActor *actor,
     }
     fire = 0;
     {
-        register u8 *source asm("r0") = &entry->kind;
-        register u32 initialKind asm("r1") = *source;
+        u8 *source = &entry->kind;
+        u32 initialKind = *source;
         kindAddress = source;
         if (initialKind == 3) {
             if (entry->stateFrame == 10)
@@ -101,14 +99,14 @@ afterCheck:
     }
     if (entry->stateFrame > 59) {
         s32 random;
-        register s32 kind asm("r1");
+        s32 kind;
         u32 *arg;
-        register u32 *index asm("r0") = &gUnk_03005308;
+        u32 *index = &gUnk_03005308;
         u32 next = (*index + 1) & 0x3ff;
         *index = next;
         {
             u32 offset = next << 1;
-            register const u8 *table asm("r3");
+            const u8 *table;
             table = (const u8 *)gUnk_0203B400;
             random = *(const u8 *)(offset + (u32)table);
         }
@@ -123,7 +121,6 @@ afterCheck:
                 goto clear;
             case 1:
                 arg = PrepareZero(entry, 0, kind);
-                asm("" : "+r"(arg));
                 goto clear;
             case 2:
                 if (random > 63)
@@ -132,7 +129,6 @@ afterCheck:
                 goto second;
             first:
                 arg = PrepareFirst(entry);
-                asm("" : "+r"(arg));
                 goto clear;
             case 3:
                 if (random > 63)
@@ -148,7 +144,6 @@ afterCheck:
             isolatedFirst:
                 arg = PrepareFirst(entry);
                 Memory_Clear(arg, 0x100);
-                asm volatile("");
                 goto done;
         }
     } else

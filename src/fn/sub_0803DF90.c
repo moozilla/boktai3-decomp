@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
 #ifdef NONMATCHING
 // fuzzy: 99.2%
@@ -30,7 +29,7 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
     u32 *history = entry->history;
     u32 flag;
     u8 *entered;
-    register u32 value asm("r0");
+    u32 value;
     if (entry->stateEntered) {
         entry->stateEntered = 0;
         history[0] = 0;
@@ -80,7 +79,7 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
         history[0] = 0;
     flag = PlayerHasFlag(2);
     if (!flag && history[0] > 9) {
-        register u32 state asm("r0");
+        u32 state;
         switch (entry->kind) {
             case 0:
             case 1:
@@ -90,7 +89,6 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
                 if (entry->mode != 0)
                     goto seven;
                 state = 5;
-                asm("" : "+r"(state));
                 goto choose;
             seven:
                 state = 7;
@@ -98,20 +96,17 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
                 entry->state = state;
                 entry->stateFrame = flag;
                 {
-                    register u8 *chosenEntered asm("r1") = &entry->stateEntered;
-                    register u32 one asm("r0") = 1;
-                    asm("" : : "r"(chosenEntered), "r"(one));
+                    u8 *chosenEntered = &entry->stateEntered;
+                    u32 one = 1;
                     *chosenEntered = one;
                     {
-                        register u32 *arg asm("r0") = entry->history;
+                        u32 *arg = entry->history;
                         Memory_Clear(arg, 0x100);
                     }
                 }
-                asm volatile("");
                 goto done;
             case 3:
                 Enter(entry, 7, flag);
-                asm volatile("");
                 goto done;
             default:
                 goto done;
@@ -124,7 +119,7 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
             gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
             {
                 u32 offset = gUnk_03005308 << 1;
-                register const u8 *table asm("r3");
+                const u8 *table;
                 table = (const u8 *)gUnk_0203B400;
                 random = *(const u8 *)(offset + (u32)table);
             }
@@ -139,7 +134,6 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
                 entry->stateFrame = 0;
                 entered = &entry->stateEntered;
                 value = 1;
-                asm("" : "+r"(entered), "+r"(value));
                 goto sharedEntry;
             }
         } else if (entry->direction > 0) {
@@ -156,7 +150,6 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
             goto done;
         } else {
             Enter(entry, 2, flag);
-            asm volatile("");
         }
     } else
         entry->stateFrame++;
