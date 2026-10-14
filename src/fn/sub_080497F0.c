@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define TetherActor_ClearExternalStatus sub_080497F0
 struct TetherStatusOwner {
     u8 unknown0[0x5AA];
     s16 status;

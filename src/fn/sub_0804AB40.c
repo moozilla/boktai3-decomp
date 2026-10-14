@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_02000488;
-void sub_08049168(u8 *, u32);
+void TetherActor_SetState(u8 *, u32);
 u32 sub_08066DB8(u32, u8 *, u32, u32, u32, u32, u32, u32);
 void sub_0804AB40(u8 *p)
 {

@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "tether_actor.h"
-#define TetherActor_StartInteractionEffect sub_08049D4C
-#define TetherActor_UpdatePendingEffect    sub_080492A4
-#define TetherActor_SelectInteractionState sub_080492F0
 extern struct TetherActor *gUnk_02000488;
 void TetherActor_UpdatePendingEffect(struct TetherActor *);
 void TetherActor_SelectInteractionState(struct TetherActor *);

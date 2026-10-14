@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "tether_actor.h"
-#define TetherActor_SetEntry sub_08049234
-#define TetherActor_SetHeadingEntry sub_08049180
-#define TetherActor_SetCardinalEntry sub_080491C4
 s32 TetherActor_SetHeadingEntry(struct TetherActor *, u32);
 s32 TetherActor_SetCardinalEntry(struct TetherActor *, u32);
 s32 TetherActor_SetEntry(struct TetherActor *input, u32 inputBase)
@@ -16,8 +13,7 @@ s32 TetherActor_SetEntry(struct TetherActor *input, u32 inputBase)
         asm("" : "+r"(entry));
         entry = base + entry;
         result = TetherActor_SetHeadingEntry(actor, entry);
-    }
-    else
+    } else
         result = TetherActor_SetCardinalEntry(actor, base);
     return result;
 }

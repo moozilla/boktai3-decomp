@@ -1,11 +1,11 @@
-#include "global.h"
+#include "tether_actor.h"
 extern u8 *gUnk_02000488;
-u32 sub_08049BB8(u32 a)
+u32 TetherActor_IsState(u32 a)
 {
-    u8 *p = gUnk_02000488;
+    struct TetherActor *p = (struct TetherActor *)gUnk_02000488;
     if (!p)
         return 0;
-    if (p[0x255] == a)
+    if (p->state == a)
         return 1;
     return 0;
 }

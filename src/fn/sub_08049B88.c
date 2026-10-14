@@ -1,9 +1,9 @@
-#include "global.h"
+#include "tether_actor.h"
 extern u8 *gUnk_02000488;
 struct P {
     u32 a, b;
 };
-u32 sub_08049B88(struct P *a)
+u32 TetherActor_CopySampledPosition(struct P *a)
 {
     u8 *p = gUnk_02000488;
     u32 r;

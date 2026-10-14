@@ -1,8 +1,8 @@
 #include "global.h"
 extern u8 *gUnk_02000488;
-void sub_08049168(u8 *, u32);
+void TetherActor_SetState(u8 *, u32);
 extern u32 gUnk_030053F4;
-void sub_080492F0(u8 *);
+void TetherActor_SelectInteractionState(u8 *);
 void sub_0804B58C(u8 *p)
 {
     if (!(gUnk_030053F4 & 0x200)) {
@@ -13,7 +13,7 @@ void sub_0804B58C(u8 *p)
                     if (*q != 0)
                         *q = *q - 1;
                     else
-                        sub_080492F0(p);
+                        TetherActor_SelectInteractionState(p);
                 }
             }
         }

@@ -1,8 +1,9 @@
-#include "global.h"
+#include "tether_actor.h"
+#define TetherActor_GetStatusTag sub_08049F54
 
 extern u8 *gUnk_02000488;
 
-u16 sub_08049F54(void)
+u16 TetherActor_GetStatusTag(void)
 {
     if (gUnk_02000488 == NULL)
         return 0;

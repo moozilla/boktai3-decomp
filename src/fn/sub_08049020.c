@@ -7,7 +7,7 @@ void TetherActor_UpdateMovingEffects(struct TetherActor *actor)
         --actor->soundCooldown;
     if (!actor->moving)
         goto stopped;
-    if (actor->effectsSuppressed)
+    if (actor->statusFlags)
         goto stopped;
     {
         if (actor->kind == 5) {

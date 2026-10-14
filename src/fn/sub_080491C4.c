@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "tether_actor.h"
-#define TetherActor_SetCardinalEntry sub_080491C4
 s32 DisplayAnimation_SetEntry(struct DisplayAnimation *, u32, u32, u32, u32, u32, u32);
 s32 DisplayAnimation_UpdatePlayback(struct DisplayAnimation *);
 s32 TetherActor_SetCardinalEntry(struct TetherActor *actor, u32 unusedEntry)

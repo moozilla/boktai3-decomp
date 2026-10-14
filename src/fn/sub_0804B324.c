@@ -1,7 +1,7 @@
 #include "global.h"
 extern u8 *gUnk_02000580;
 s32 sub_0804B1CC(u8 *);
-void sub_08049364(u8 *);
+void TetherActor_BeginAuxiliaryState(u8 *);
 u32 sub_0804B324(u8 *p)
 {
     if (p[0x1a] == 9 && p[0x240] != 0) {
@@ -9,7 +9,7 @@ u32 sub_0804B324(u8 *p)
         return 0xb;
     }
     if (sub_0804B1CC(p) != 0 && p[0x1a] != 9)
-        sub_08049364(p);
+        TetherActor_BeginAuxiliaryState(p);
     switch (p[0x255]) {
         case 0:
         case 3:

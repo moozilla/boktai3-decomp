@@ -30,7 +30,9 @@ struct TetherActor {
     u8 unknown120[6];
     u16 movementCell;
     u8 unknown128[0xB0];
-    u8 interactionProbe[0x6C];
+    u8 interactionProbe[0x68];
+    u8 actionRequested, actionVariant;
+    u16 actionValue;
     u8 auxiliaryRegistration[0x10];
     u8 auxiliaryRegistered, state;
     u16 stateFrame;
@@ -39,7 +41,7 @@ struct TetherActor {
     struct TetherSegment segments[7];
     u16 paletteIndex;
     s16 shakeX;
-    u8 unknown380[2];
+    u16 auxiliaryTimer;
     s16 shakeZ;
     u16 pendingEffect, pendingEffectValue;
     u16 shakeFrame;
@@ -51,10 +53,12 @@ struct TetherActor {
     u8 auxiliaryActive;
     struct ContactSwarmSprite auxiliarySprite;
     struct ContactSwarmGraphics auxiliaryGraphics;
-    u8 effectsSuppressed;
+    u8 statusFlags;
     u8 unknown3E5;
     u16 statusTag;
-    u8 unknown3E8[0x14];
+    u8 requestStatus, requestMode, unknown3EA[6];
+    struct ContactPosition targetPosition;
+    u8 unknown3F8[4];
     u16 interactionLock;
     u8 unknown3FE[0xA];
     s16 parameter;
@@ -70,7 +74,8 @@ struct TetherActor {
     u16 directedTimer, directedHeading;
     u16 blendHold;
     u16 directedStep;
-    u8 blendRequested, unknown473[9];
+    u8 blendRequested, sampleRequested;
+    struct ContactPosition sampledPosition;
     void *pendingEffectHandle;
     u16 effectValue, unknown482;
 };

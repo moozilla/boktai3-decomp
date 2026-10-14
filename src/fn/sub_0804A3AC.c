@@ -1,8 +1,8 @@
-#include "global.h"
+#include "tether_actor.h"
 extern u8 *gUnk_02000488;
-void sub_0804A3AC(void)
+void TetherActor_RequestPositionSample(void)
 {
-    u8 *p = gUnk_02000488;
+    struct TetherActor *p = (struct TetherActor *)gUnk_02000488;
     if (p)
-        p[0x473] = 1;
+        p->sampleRequested = 1;
 }
