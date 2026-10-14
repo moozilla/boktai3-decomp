@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 u16 *sub_08036CA4(void);
 u16 sub_08036CAC(u8);
@@ -11,29 +10,34 @@ void sub_08036D80(void)
 {
     void *script;
     u16 *table;
-    int n;
-    register int i asm("r4");
-    register int capacity asm("r8");
-    if (Script_SeekToKeyword(115))
+    int alias[2];
+    int capacity;
+    if (Script_SeekToKeyword(115)) {
         script = Script_GetPc();
-    else
+    } else {
         script = 0;
-    if (!script)
+    }
+    if (!script) {
         return;
+    }
     table = sub_08036CA4();
-    n = 0;
-    i = 0;
+    alias[1] = 0;
+    alias[0] = 0;
     capacity = 256;
+    /* do-while(0) only keeps agbcc's block layout */
     do {
-        const u8 *text = Text_LookupString(Script_ParseStringRef(script) + i);
+        const u8 *text = Text_LookupString(Script_ParseStringRef(script) + alias[0]);
         int first = *text;
         u16 *entry;
-        i++;
-        if (!first)
+        alias[0]++;
+        if (!first) {
             continue;
-        if (n == capacity)
+        }
+        if (alias[1] == capacity) {
             continue;
-        entry = (u16 *)((n << 1) + (u32)table);
+        }
+        entry = (u16 *)((alias[1] << 1) + ((u32)table));
+        /* do-while(0) only keeps agbcc's block layout */
         do {
             int sign = first << 24;
             if (sign >= 0) {
@@ -46,11 +50,12 @@ void sub_08036D80(void)
                 text += 2;
             }
             entry++;
-            n++;
+            alias[1]++;
             first = *text;
-            if (!first)
+            if (!first) {
                 break;
-        } while (n != capacity);
-    } while (i <= 4);
+            }
+        } while (alias[1] != capacity);
+    } while (alias[0] <= 4);
     table[0] = 0;
 }
