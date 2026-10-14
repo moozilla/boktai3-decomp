@@ -1,5 +1,4 @@
 #include "background_flash.h"
-#define BackgroundFlash_LoadPalette sub_08047744
 extern u8 gUnk_03005140[];
 void BackgroundFlash_LoadPalette(void)
 {

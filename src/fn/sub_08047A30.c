@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "background_flash.h"
-#define BackgroundFlash_Initialize  sub_08047A30
-#define BackgroundFlash_LoadPalette sub_08047744
-#define BackgroundFlash_SetState    sub_080476F4
 void BackgroundFlash_LoadPalette(void);
 void BackgroundFlash_SetState(struct BackgroundFlashController *, u32);
 s32 BackgroundFlash_Initialize(struct BackgroundFlashController *controller, void *sourceA,

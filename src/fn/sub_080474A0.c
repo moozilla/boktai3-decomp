@@ -1,8 +1,4 @@
 #include "transient_sprite_effects.h"
-#define TransientSpriteEffects_Create     sub_080474A0
-#define TransientSpriteEffects_Update     sub_08047338
-#define TransientSpriteEffects_Destroy    sub_080473F0
-#define TransientSpriteEffects_Initialize sub_08047424
 s32 TransientSpriteEffects_Update(struct TransientSpriteEffects *);
 s32 TransientSpriteEffects_Destroy(struct TransientSpriteEffects *);
 s32 TransientSpriteEffects_Initialize(struct TransientSpriteEffects *, void *);

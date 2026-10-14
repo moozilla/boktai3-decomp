@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "transient_sprite_effects.h"
-#define TransientSpriteEffects_Update sub_08047338
 static inline s32 effectScale(s32 value)
 {
     if (value >= 0)

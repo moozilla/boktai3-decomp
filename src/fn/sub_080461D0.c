@@ -3,7 +3,8 @@
 u32 ContactSequenceActor_TakeEntryFlag(struct ContactSequenceActor *);
 void ContactSequenceActor_SetFlags(struct ContactSequenceActor *, u32);
 void ContactSequenceActor_Deactivate(struct ContactSequenceOwner *, struct ContactSequenceActor *);
-void sub_080474E4(u32, u32, void *, u32, u32, u32);
+s32 TransientSpriteEffects_Spawn(u32, u32, const struct ContactPosition *,
+                                 const struct ContactPosition *, u32, u32);
 void sub_080148CC(u32, u32, void *, u32, u32, u32, u32, u32, u32, u32, u32);
 struct ContactSequenceScriptArgs {
     u32 count : 16;
@@ -90,7 +91,7 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
             sourceZ += dz;
             scatterPosition->z = sourceZ;
         }
-        sub_080474E4(0, 0x1004, scatterPosition, 0, 256, 256);
+        TransientSpriteEffects_Spawn(0, 0x1004, scatterPosition, 0, 256, 256);
         {
             register u32 randomIndex asm("r0");
             u32 sampleX;
@@ -134,7 +135,7 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
             sampleZ += sourceZ;
             scatterPosition->z = sampleZ;
         }
-        sub_080474E4(0, 0x1004, scatterPosition, 0, 256, 256);
+        TransientSpriteEffects_Spawn(0, 0x1004, scatterPosition, 0, 256, 256);
         sub_080148CC(4, 14, position, 64, 256, 12, 8, 8, 8, 30, 30);
         {
             s32 health = actor->health;

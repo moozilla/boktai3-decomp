@@ -1,7 +1,4 @@
 #include "background_flash.h"
-#define BackgroundFlash_UpdateFlickering sub_08047910
-#define BackgroundFlash_TakeEntryFlag    sub_08047700
-#define BackgroundFlash_EmitEffect       sub_08047718
 u32 BackgroundFlash_TakeEntryFlag(struct BackgroundFlashController *);
 void BackgroundFlash_EmitEffect(void *);
 void BackgroundFlash_UpdateFlickering(struct BackgroundFlashController *controller)

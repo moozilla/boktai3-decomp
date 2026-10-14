@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "background_flash.h"
-#define BackgroundFlash_UpdateScrolling sub_08047770
 void BackgroundFlash_UpdateScrolling(struct BackgroundFlashController *controller)
 {
     s32 cameraX = gUnk_03005418[0] + gUnk_030042A0.offsetX;

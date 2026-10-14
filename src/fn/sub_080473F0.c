@@ -1,5 +1,4 @@
 #include "transient_sprite_effects.h"
-#define TransientSpriteEffects_Destroy sub_080473F0
 s32 TransientSpriteEffects_Destroy(struct TransientSpriteEffects *pool)
 {
     s32 index = 0;

@@ -1,6 +1,4 @@
 #include "transient_sprite_effects.h"
-#define TransientSpriteEffects_Spawn  sub_080474E4
-#define TransientSpriteEffects_Create sub_080474A0
 struct TransientSpriteEffects *TransientSpriteEffects_Create(void *, u32);
 void sub_08214374(void *, u32);
 s32 TransientSpriteEffects_Spawn(u32 kind, u32 options, const struct ContactPosition *position,
