@@ -4,7 +4,7 @@ void ContactSequenceActor_SetState(struct ContactSequenceActor *, u32);
 void sub_0821FF8C(void *, void *);
 void sub_08159860(void *, void *, u32);
 void sub_080148CC(u32, u32, void *, u32, u32, u32, u32, u32, u32, u32, u32);
-void sub_080472A4(void *, u32, s32, void *, const struct ContactPackedVector *, u32);
+void DamageNumberDisplay_Show(void *, u32, s32, void *, const struct ContactPackedVector *, u32);
 void ContactSequenceActor_ApplyHealthContact(struct ContactCollider *source,
                                              struct ContactCollider *other,
                                              struct ContactSequenceActor *actor)
@@ -28,7 +28,7 @@ void ContactSequenceActor_ApplyHealthContact(struct ContactCollider *source,
         size.x = 16;
         size.y = 0;
         size.z = 16;
-        sub_080472A4(other, other->cost, 0, position, &size, 1);
+        DamageNumberDisplay_Show(other, other->cost, 0, position, &size, 1);
         Sound_PlaySongChecked(0x3B9);
     }
 }

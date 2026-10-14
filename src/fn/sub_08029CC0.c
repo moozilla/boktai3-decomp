@@ -30,7 +30,7 @@ static inline void state(struct Common *p, void (*fn)(void *), int id)
 struct Packed {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
-void sub_080472A4(void *, int, int, void *, void *, int);
+void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
 void sub_0802A4F4(void *);
 void sub_0802A53C(void *);
 void sub_0802A63C(void *);
@@ -53,7 +53,7 @@ int sub_08029CC0(struct Common *p, int kind, int damage)
                 size.x = 32;
                 size.y = 0;
                 size.z = 32;
-                sub_080472A4((u8 *)p + 0x818, damage, 0, (u8 *)p + 0x54, &size, 1);
+                DamageNumberDisplay_Show((u8 *)p + 0x818, damage, 0, (u8 *)p + 0x54, &size, 1);
             }
             action(p, 0, 0);
             state(p, sub_0802A4F4, 5);

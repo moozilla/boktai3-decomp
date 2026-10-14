@@ -8,7 +8,7 @@ struct ContactModeActor {
 void sub_0821FF8C(void *, void *);
 void sub_08159860(void *, void *, u32);
 struct ContactModeActor *sub_0802140C(s32);
-void sub_080472A4(void *, u32, s32, void *, const struct ContactPackedVector *, u32);
+void DamageNumberDisplay_Show(void *, u32, s32, void *, const struct ContactPackedVector *, u32);
 void SceneActors_AddHealthCost(u32);
 void sub_0806A160(void *, u32, const void *, u32, u32, u32, u32, u32);
 extern const u8 gUnk_0824DE9C[];
@@ -50,7 +50,7 @@ void ContactActor_ApplyHealthContact(struct ContactCollider *sourceInput,
     {
         u32 cost = other->cost;
         position = &owner->position;
-        sub_080472A4(other, cost, 0, position, &size, mode = 1);
+        DamageNumberDisplay_Show(other, cost, 0, position, &size, mode = 1);
     }
     SceneActors_AddHealthCost(other->cost);
     {

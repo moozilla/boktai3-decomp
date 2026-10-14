@@ -1,20 +1,18 @@
-#include "global.h"
-void *Task_Create(u32, u32);
-void Task_SetCallbacks(void *, void *, void *);
-s32 sub_08046A10(void *, u32, u32);
-void Task_Kill(void *);
-void sub_0804694C(void);
-void sub_08046A00(void);
-
-void *sub_08046AD0(u32 a, u32 b)
+#include "orbit_contact_actor.h"
+s32 OrbitContactActor_Initialize(struct OrbitContactActor *, const struct ContactPosition *, u32);
+s32 OrbitContactActor_Update(struct OrbitContactActor *);
+s32 OrbitContactActor_Destroy(struct OrbitContactActor *);
+struct OrbitContactActor *OrbitContactActor_Create(const struct ContactPosition *center,
+                                                   u32 resourceValue)
 {
-    void *p = Task_Create(8, 0xC8);
-    if (p) {
-        Task_SetCallbacks(p, sub_0804694C, sub_08046A00);
-        if (sub_08046A10(p, a, b) < 0) {
-            Task_Kill(p);
-            return 0;
+    struct OrbitContactActor *actor = Task_Create(8, sizeof(*actor));
+    if (actor) {
+        Task_SetCallbacks(actor, (void (*)(void *))OrbitContactActor_Update,
+                          (void (*)(void *))OrbitContactActor_Destroy);
+        if (OrbitContactActor_Initialize(actor, center, resourceValue) < 0) {
+            Task_Kill(actor);
+            return NULL;
         }
     }
-    return p;
+    return actor;
 }
