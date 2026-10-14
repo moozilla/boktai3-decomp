@@ -83,6 +83,8 @@ address,evidence
 080441CC,Idle state callback from Thumb table entry 08605920; independent bx lr plus alignment before 080441D0; exact four-byte C
 08044934,Independent 416-byte slot spawn wrapper: own high-register prologue; return at 08044AAA followed by ten literals; hidden inside 08044854 incbin
 08044AD4,Independent 428-byte slot spawn wrapper: own high-register prologue; return at 08044C54 followed by ten literals; hidden inside 08044854 incbin
+080450D8,Independent 228-byte record unpacker: prologue at 080450D8; return at 080451B6 and one-word pool before 080451BC
+080451BC,Independent 544-byte alternate record encoder: prologue at 080451BC; return at 080453D4 and final seed literal at 080453D8
 08045D20,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C
 08045F44,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08046B28,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
