@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 23.836% matching (2026-10-14). This file is the single
+Last updated after reaching 23.917% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,46 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex): complete tether emissions, palette and moving effects
+
+Exact code is **23.917%**, up **0.0813 percentage points** (+1,964 bytes)
+from nine newly exact functions. There are **6,479 / 11,471 functions** and
+**577,678 / 2,415,354 bytes**. Without register pinning: **19.515%**;
+Register-pinned: **4.402%**, included above. Seventy-three guarded drafts remain;
+the existing **08048E0C RGB blend draft** is now exact.
+
+The contiguous **080489A0–08049168** subsection is fully exact: directional,
+random, ring and point emissions; red-glow animation; RGB555 blending;
+palette source/controller; terrain-dependent moving effects; and the typed
+combined update. Actor identity remains tentative. The point helper creates
+one animated particle with the caller's **configuration pointer**, rather
+than an integer kind, and preserves packed xy and z padding during jitter.
+The legacy display "tile" APIs are used here for palette data; broader
+renaming remains separate. See
+[tether emission/palette notes](../notes/tether-emission-palette_2026-10-14.md).
+
+Four new matches need no hints; five retain minimized concessions (one each
+for directional emission, glow, blend and palette selection; ten for point
+jitter). No r7 binding or handwritten instruction bodies. The combined build
+printed **`build/boktai3.gba: OK`** in `build/tether-effect-combined.log`;
+**15 complete post-promotion extent checks** passed, including all exact users
+of the refined actor header. The earlier interpolation was checked separately
+and remains **77.3%**, with no exact credit. Format, inventory, RAM literals,
+actor registry, ten resource archives and text-bank round trips pass.
+
+Claude's **PRs 119–123** are incorporated: another hint removal, corrected
+charmap, graphics studio, `make english`, and map decoding/viewing. The worker's
+old extracted text bank was backed up and regenerated after charmap changes;
+this fixed the default encode/build failure without changing C. PR 118 merged
+at **e58a63af**. No new emulator claims.
+
+Continue contiguously at **08049168**, the existing actor state setter, then
+entry/orientation and interaction methods. The **68-byte 08049180 helper**
+is already exact without hints in ignored scratch work; **080491C4** and
+**08049234** have readable nonmatching candidates. Continue toward
+**25% exact or 60% usage remaining**; latest allowance is **76% remaining**.
+Claude's separate checkout owns main.
 
 ## October 14 (Codex): wireless indicator and tether actor helpers
 

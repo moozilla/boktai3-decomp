@@ -1,12 +1,10 @@
-#include "global.h"
-
-void sub_08048F40(void *);
-void sub_08049020(void *);
-void TetherActor_UpdateSegments(void *);
-
-void sub_0804914C(void *p)
+#include "tether_actor.h"
+void TetherActor_UpdatePalette(struct TetherActor *);
+void TetherActor_UpdateMovingEffects(struct TetherActor *);
+void TetherActor_UpdateSegments(struct TetherActor *);
+void TetherActor_UpdateEffects(struct TetherActor *actor)
 {
-    sub_08048F40(p);
-    sub_08049020(p);
-    TetherActor_UpdateSegments(p);
+    TetherActor_UpdatePalette(actor);
+    TetherActor_UpdateMovingEffects(actor);
+    TetherActor_UpdateSegments(actor);
 }
