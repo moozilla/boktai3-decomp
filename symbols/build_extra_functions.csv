@@ -150,13 +150,13 @@ address,isa,evidence,replacement_end
 08108968,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0810896C
 0810CB7C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810CB88
 0810D548,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810D554
-0810D554,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,0810D590
+0810D554,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,0810D590
 0810E91C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810E928
-0810E928,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,0810E964
+0810E928,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,0810E964
 0810F820,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0810F82C
-0810F82C,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,0810F868
+0810F82C,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,0810F868
 08110A8C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08110A98
-08110A98,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,08110AD4
+08110A98,thumb,Independent screen teardown function following a reviewed gap leaf; exact standalone C,08110AD4
 08113638,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08113644
 08114CA0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08114CAC
 08114CAC,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,08114CB0
