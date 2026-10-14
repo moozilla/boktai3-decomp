@@ -112,11 +112,14 @@ the game continued. Procedure numbers are the ones calls use (one more than
 
 ## Next
 
-* Real warps: find what spawns the player when a door is used. The scene's
-  `proc_909`/`proc_912`/`proc_916` calls define entrances (position, direction,
-  target scenes); calling one after a warp runs but does not spawn the player.
-  Tracing a real door transition with `watch` on `0x030039F0` and the player
-  pointer `0x02000580` should show the missing step. The save's scene field
-  (`GameState+0x5A4`) plus the in-game save is another route.
+* Real warps. `warp(N)` now replays what "continue" does (`sub_081E132C` at
+  `081E14E0`): `0x0300546C = 0`, `Script_Call(*0x020003A8)` (the continue
+  procedure, 1436 in the test save), `0x0300523C = 0`, request `0x11`, next
+  scene `N`. The stage loads; the player object (`0x02000580`) is still not
+  created, also with `GameState+0x30` (the saved position, s16 x/y/z) seeded
+  from one of the scene's entrances. Tried and ruled out: request word 1 vs
+  `0x11`, calling an entrance procedure (`916`) after the load. Next: trace a
+  real door (walk through one in a recording, `emu:setWatchpoint` on
+  `0x02000580`) and diff what it sets.
 * Event flags (`GameState +0x720`–`+0x730`) as a named, editable list.
 * Sprite palettes per enemy family from captures, to settle which enemy is which.
