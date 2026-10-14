@@ -1,12 +1,13 @@
 // MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
 #define Modifier_ApplyToStat sub_0803FA5C
-s32 sub_0803F95C(struct ModifierActor *, struct ModifierSelection *, struct ModifierRecord *, u32);
+s32 sub_0803F95C(struct ModifierSelection *, struct ModifierSelection *, struct ModifierRecord *,
+                 u32);
 s32 sub_0803F934(s32, u32, u32);
-s32 Modifier_ApplyToStat(struct ModifierActor *actorArg, struct ModifierSelection *selectionArg,
+s32 Modifier_ApplyToStat(struct ModifierSelection *actorArg, struct ModifierSelection *selectionArg,
                          s32 valueArg, u32 includeSelected, u32 kindArg)
 {
-    register struct ModifierActor *actor asm("r12") = actorArg;
+    register struct ModifierSelection *actor asm("r12") = actorArg;
     register struct ModifierSelection *selection asm("r8") = selectionArg;
     u32 kind;
     s32 value;
