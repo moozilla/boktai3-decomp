@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Engine {
     u8 pad0[0x18];
@@ -53,28 +52,37 @@ void sub_08035EB8(struct Engine *p)
 {
     u8 *scratch = p->scratch;
     int i;
-    register int bit asm("r6");
+    int bit;
     void *listener;
     Bg_ClearTilemap(0);
     sub_08224DE8(p->message);
-    Memory_Clear((u8 *)p + 0xB8, 12);
-    Memory_Clear((u8 *)p + 0xC4, 12);
-    rfu_clearSlot(8, p->mode);
+    Memory_Clear(((u8 *)p) + 0xB8, 12);
+    Memory_Clear(((u8 *)p) + 0xC4, 12);
+    bit = 8;
+    rfu_clearSlot(bit, p->mode);
     sub_08224BB8(sub_08035D58);
     sub_08224BA0(sub_08035EAC);
     i = 0;
+    /* do-while(0) only keeps agbcc's block layout */
     do {
         int mask;
         int active = scratch[2];
-        bit = 2;
-        mask = bit << i;
-        if (active & mask)
-            rfu_setRecvBuffer(32, i, (u8 *)p + 0xC4, 12);
-    } while (++i <= 3);
+        if (scratch) {
+            bit = 2;
+            mask = bit << i;
+        } else {
+            bit = 2;
+            mask = bit << i;
+        }
+        if (active & mask) {
+            rfu_setRecvBuffer(32, i, ((u8 *)p) + 0xC4, 12);
+        }
+    } while ((++i) <= 3);
     p->phase = bit;
     setOperation(p, 23, 0);
-    listener = *(void **)((u8 *)p + 0x4C);
-    if (listener)
+    listener = *((void **)(((u8 *)p) + 0x4C));
+    if (listener) {
         Script_Call(listener, 0);
+    }
     sub_0822B058(4);
 }
