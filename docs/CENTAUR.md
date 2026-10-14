@@ -42,6 +42,8 @@ for the matching build; the English ROM reads better but differs in timing.
 | `rec_start("name")`, `rec_stop()` | record inputs (from a reset) as a harness script in `build/centaur/` |
 | `replay("tests/x.txt")` | play a harness input script inside mGBA |
 | `where()` | frame, map, tileset, palette, life, last text |
+| `callproc(id, {args})` | run a script procedure (also on the Live page) |
+| `warp(scene)`, `scene()` | experimental scene load (see below); current scene |
 | `peek*/poke*`, `watch(a)` | memory helpers |
 
 ## The Live page (http://localhost:8642/live)
@@ -97,10 +99,24 @@ stage): probably time-of-day variants of one palette, so the recorded palette
 is the one seen at that moment. Run `python3 tools/studio/live.py analyse-all` if the studio was not
 running during a survey.
 
+## Running script procedures
+
+`callproc(id, {args})` diverts the CPU at the next entry of
+`TaskSystem_RunFrame` (`0821A054`, which takes no arguments) into
+`Script_Call(id, args)` (`0821AD08`; its first argument is the procedure
+number, looked up by `sub_0821ACDC`), which returns to RunFrame's entry, where
+the second breakpoint hit restores the real return address. Arguments are
+built at `0x0203FF00`. Verified headlessly: procedure 916 ran exactly once and
+the game continued. Procedure numbers are the ones calls use (one more than
+`gcx.py dis` headers).
+
 ## Next
 
-* Real warps: find how doors pass the entrance (the `proc_912`/`proc_916` door
-  objects) so a warp spawns the player; the save's scene field
+* Real warps: find what spawns the player when a door is used. The scene's
+  `proc_909`/`proc_912`/`proc_916` calls define entrances (position, direction,
+  target scenes); calling one after a warp runs but does not spawn the player.
+  Tracing a real door transition with `watch` on `0x030039F0` and the player
+  pointer `0x02000580` should show the missing step. The save's scene field
   (`GameState+0x5A4`) plus the in-game save is another route.
 * Event flags (`GameState +0x720`–`+0x730`) as a named, editable list.
 * Sprite palettes per enemy family from captures, to settle which enemy is which.
