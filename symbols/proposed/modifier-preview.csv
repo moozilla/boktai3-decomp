@@ -1,0 +1,10 @@
+addr,name,confidence,evidence
+0804194C,ModifierMenu_InitializePreview,low,Observed preview/task lifecycle and script initialization; include/modifier_list.h; notes/modifier-preview_2026-10-14.md
+08041A44,ModifierMenu_ValidateSavedSelection,low,Observed preview/task lifecycle and script initialization; include/modifier_list.h; notes/modifier-preview_2026-10-14.md
+08041C30,ModifierMenu_LoadSavedSelection,low,Observed preview/task lifecycle and script initialization; include/modifier_list.h; notes/modifier-preview_2026-10-14.md
+08041D10,ModifierMenu_UpdateCapacityFlash,low,Observed preview/task lifecycle and script initialization; include/modifier_list.h; notes/modifier-preview_2026-10-14.md
+08041DA8,ModifierMenu_UpdatePreviewAppearance,low,Observed preview/task lifecycle and script initialization; include/modifier_list.h; notes/modifier-preview_2026-10-14.md
+08041E04,ModifierMenu_ReadTextSource,low,Observed preview/task lifecycle and script initialization; include/modifier_list.h; notes/modifier-preview_2026-10-14.md
+08041E1C,ModifierMenu_LoadTextSources,low,Observed preview/task lifecycle and script initialization; include/modifier_list.h; notes/modifier-preview_2026-10-14.md
+08041F3C,ModifierMenu_UpdateTask,low,Observed preview/task lifecycle and script initialization; include/modifier_list.h; notes/modifier-preview_2026-10-14.md
+08042068,ModifierMenu_Initialize,low,Observed preview/task lifecycle and script initialization; include/modifier_list.h; notes/modifier-preview_2026-10-14.md
