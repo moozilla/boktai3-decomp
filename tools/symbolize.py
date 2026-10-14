@@ -239,6 +239,10 @@ def main():
             continue
         ok = {entry.start} | set(getattr(mod, "ANCHORS", ()))
         for o, v in list(accepted.items()):
+            if entry.start <= o < entry.end and o not in forced:
+                del accepted[o]  # resizable formats hold no ROM pointers
+                rejected.add(o)
+                continue
             if entry.start <= v < entry.end and v not in ok:
                 if o in forced:
                     raise SystemExit(f"symbols/pointers.txt: {o:08X} points inside resizable {entry.name}")
@@ -380,12 +384,14 @@ def emit_decoded(entry, accepted, sym, labels):
     run = []  # consecutive plain bytes, emitted 32 per line
     for size, value, pointer in items:
         starts.add(pos)
-        if run and (pos in labels or size != 1 or len(run) == 32):
+        if run and (pos in labels or size != 1 or pointer or len(run) == 32):
             out.append("\t.byte " + ",".join(run))
             run = []
         if pos in labels and pos < entry.end:
             out.append(f"{labels[pos]}:")
-        if pointer:
+        if pointer == "incbin":
+            out.append(f'\t.incbin "{os.path.relpath(value, ROOT)}"')
+        elif pointer:
             out.append(f"\t.4byte {sym(value)}")
         elif size == 1:
             run.append(f"{value & 0xFF:#x}")
@@ -400,7 +406,7 @@ def emit_decoded(entry, accepted, sym, labels):
     pointers = {p for p in accepted if entry.start <= p < entry.end}
     emitted, pos = set(), entry.start
     for size, _, pointer in items:
-        if pointer:
+        if pointer is True:
             emitted.add(pos)
         pos += size
     if pointers - emitted:

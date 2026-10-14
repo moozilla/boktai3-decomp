@@ -12,7 +12,10 @@ Each format module (tools/datafmt/<format>.py) provides
 
 An Item is (size, value, pointer): size 1, 2 or 4 bytes; with pointer=True the
 4-byte value is a ROM address that tools/symbolize.py writes as a symbol, so
-the range stays shiftable. `rom` is the whole ROM image (index 0 = 0x08000000);
+the range stays shiftable. With pointer="incbin", value is a file path and
+size its length (emitted as .incbin). A module may instead provide
+extract(rom, start, end, path) and encode_path(path, start, end) when its
+source is more than one file. `rom` is the whole ROM image (index 0 = 0x08000000);
 `names` maps function addresses to their current names (informational columns).
 
 tools/datafmt/check.py verifies that every manifest entry re-encodes to the
@@ -49,8 +52,12 @@ class Entry:
     def encode(self):
         if not os.path.exists(self.file) and self.extracted():
             self.extract()
-        with open(self.file, encoding="utf-8") as f:
-            items = self.module().encode(f.read(), self.start, self.end)
+        mod = self.module()
+        if hasattr(mod, "encode_path"):
+            items = mod.encode_path(self.file, self.start, self.end)
+        else:
+            with open(self.file, encoding="utf-8") as f:
+                items = mod.encode(f.read(), self.start, self.end)
         size = sum(s for s, _, _ in items)
         if size != self.end - self.start and not getattr(self.module(), "RESIZABLE", False):
             raise ValueError(f"{self.name}: encodes to {size:#x} bytes, range is {self.end - self.start:#x}")
@@ -62,8 +69,12 @@ class Entry:
         sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         from romlib import load_rom
         os.makedirs(os.path.dirname(self.file), exist_ok=True)
+        mod = self.module()
+        if hasattr(mod, "extract"):
+            mod.extract(load_rom(), self.start, self.end, self.file)
+            return
         with open(self.file, "w", encoding="utf-8") as f:
-            f.write(self.module().decode(load_rom(), self.start, self.end, {}))
+            f.write(mod.decode(load_rom(), self.start, self.end, {}))
 
 
 def load_manifest():
@@ -79,6 +90,10 @@ def load_manifest():
 
 def to_bytes(items):
     out = bytearray()
-    for size, value, _ in items:
+    for size, value, kind in items:
+        if kind == "incbin":
+            with open(value, "rb") as f:
+                out += f.read()
+            continue
         out += (value & ((1 << (8 * size)) - 1)).to_bytes(size, "little")
     return bytes(out)
