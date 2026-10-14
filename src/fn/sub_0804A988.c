@@ -9,7 +9,7 @@ struct Z {
 void Collider_Init(u8 *, u32, u32, u32, u32, struct Z *, struct Z *);
 void sub_0821FF58(u8 *, u32, u32, u32, u32, u32);
 void Collider_SetCallback(u8 *, u32, u8 *);
-void sub_0804A988(u8 *p)
+void TetherActor_InitSecondaryCollider(u8 *p)
 {
     struct Z s1, s2;
     u8 *q = p + 0x184;

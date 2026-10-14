@@ -27,7 +27,7 @@ void TetherActor_StartInteractionEffect(void)
         cooldown = &actor->interactionCooldown;
         delay = 300;
     } else {
-        if (savedState != 0 && savedState != 2 && ((u8)(state - 3) > 1 || !actor->pendingEffect))
+        if (savedState != 0 && savedState != 2 && ((u8)(state - 3) > 1 || !actor->chargeReady))
             goto done;
         TetherActor_UpdatePendingEffect(actor);
         TetherActor_SelectInteractionState(actor);
@@ -37,7 +37,7 @@ void TetherActor_StartInteractionEffect(void)
     }
     *cooldown = delay;
     actor->effectValue = zero;
-    actor->pendingEffectHandle = sub_08066DB8(actor->pendingEffectHandle, actor->unknown44, 1, zero,
-                                              &actor->effectValue, 200, 250, 330);
+    actor->pendingEffectHandle = sub_08066DB8(actor->pendingEffectHandle, &actor->bodyConfig, 1,
+                                              zero, &actor->effectValue, 200, 250, 330);
 done:;
 }

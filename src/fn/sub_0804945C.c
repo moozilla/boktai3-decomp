@@ -50,12 +50,12 @@ void TetherActor_AdjustSlopeMovement(struct TetherActor *actor)
         else if (octant == 7)
             neighbor = 1;
         {
-            u32 value = cellByte(actor->movementCell);
+            u32 value = cellByte(actor->movementProbeStorage.cell);
             height = 15;
             asm("" : "+r"(height));
             height &= value;
         }
-        if (height < (cellByte(actor->movementCell + neighbor) & 15))
+        if (height < (cellByte(actor->movementProbeStorage.cell + neighbor) & 15))
             return;
         {
             register s32 next asm("r0") = octant + 1;
@@ -73,7 +73,7 @@ void TetherActor_AdjustSlopeMovement(struct TetherActor *actor)
                 delta = v >> 12;
             else
                 delta = -((-v) >> 12);
-            actor->movementPosition.x -= delta;
+            actor->movementDelta.x -= delta;
             product = gUnk_02000550 * sine;
         }
         goto adjustZ;
@@ -88,12 +88,12 @@ void TetherActor_AdjustSlopeMovement(struct TetherActor *actor)
         else if (octant == 6)
             neighbor = 1 - ((s16 *)gUnk_030052F4->cells)[2];
         {
-            u32 value = cellByte(actor->movementCell);
+            u32 value = cellByte(actor->movementProbeStorage.cell);
             height = 15;
             asm("" : "+r"(height));
             height &= value;
         }
-        if (height < (cellByte(actor->movementCell + neighbor) & 15))
+        if (height < (cellByte(actor->movementProbeStorage.cell + neighbor) & 15))
             return;
         x = (u8)actor->position.x;
         z = (u8)actor->position.z;
@@ -123,12 +123,12 @@ void TetherActor_AdjustSlopeMovement(struct TetherActor *actor)
                 neighbor = -((s16 *)gUnk_030052F4->cells)[2];
         }
         {
-            u32 value = cellByte(actor->movementCell);
+            u32 value = cellByte(actor->movementProbeStorage.cell);
             height = 15;
             asm("" : "+r"(height));
             height &= value;
         }
-        if (height < (cellByte(actor->movementCell + neighbor) & 15))
+        if (height < (cellByte(actor->movementProbeStorage.cell + neighbor) & 15))
             return;
         {
             register s32 next asm("r0") = octant + 1;
@@ -146,7 +146,7 @@ void TetherActor_AdjustSlopeMovement(struct TetherActor *actor)
                 delta = v >> 12;
             else
                 delta = -((-v) >> 12);
-            actor->movementPosition.x -= delta;
+            actor->movementDelta.x -= delta;
             product = gUnk_02000550 * sine;
         }
     }
@@ -156,7 +156,7 @@ adjustZ: {
         delta = product >> 12;
     else
         delta = -((-product) >> 12);
-    actor->movementPosition.z -= delta;
+    actor->movementDelta.z -= delta;
 }
 }
 

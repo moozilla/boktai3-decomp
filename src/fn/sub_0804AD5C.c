@@ -3,7 +3,7 @@ extern const s16 gUnk_086149C4[];
 struct P {
     u32 a, b;
 };
-void sub_0804AD5C(u8 *p)
+void TetherActor_UpdateSampledPosition(u8 *p)
 {
     u32 i;
     s32 x;

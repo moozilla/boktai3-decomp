@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 23.978% matching (2026-10-14). This file is the single
+Last updated after reaching 24.059% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,45 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex): complete tether initialization and charge subsection
+
+Exact code is **24.059%**, up **0.0818 percentage points** (+1,976 bytes)
+from eight new functions. There are **6,498 / 11,471 functions** and
+**581,122 / 2,415,354 bytes**. Without register pinning: **19.546%**;
+Register-pinned: **4.513%**, included above. Seventy-five guarded drafts remain.
+
+The contiguous **0804A430–0804AF80** subsection is fully exact: four script,
+interaction, display and body initializers; charge/cooldown update; contact
+callback; flagged-terrain clamp; and seven existing named functions. This is
+**2,896 contiguous exact bytes**, with 1,976 newly exact. See
+[initialization and charge notes](../notes/tether-initialization_2026-10-14.md).
+
+The **120 movement cache is 16 bytes**, followed by two separate colliders
+at 130 and 184. The body ID goes to **1FC**, distinct from lock 3FC. **58 is
+movement delta**, added to position and cleared by the body update. The earlier
+pending halves 384/386 are now **chargeReady/charge**, capped at 1,200, with
+readiness triggered only by an addition exceeding the cap. The callback's
+private contact view uses response flags at 34 and has a three-argument ABI.
+
+The new flagged-cell handler checks terrain attribute 0x80 and GameState bit
+0x2000, clamps into the previous cell, requests `(100, direction)` from the
+kind-9 action API, and optionally calls the script at 3EC. Six new functions
+retain minimized concessions; two (320 bytes) require no hints. No r7 binding
+or handwritten instruction bodies. The combined build printed
+**`build/boktai3.gba: OK`** in `build/tether-initialization-combined.log`.
+**67 complete post-promotion extent checks** and format/inventory/RAM/data
+round trips pass. No new emulator claims.
+
+Claude's **PRs 127–129** are incorporated: stage surveys/palettes, experimental
+warps and `callproc`. The documented warp limitation (no player object) remains
+Claude's separate work; the default C/ROM build is unaffected.
+
+Continue at **0804AF80** (world position/display/cache update; typed 80.0%
+scratch candidate), then **4B1CC** and state callbacks. AF80 also shows that
+380 is a vertical display offset; correct its older `auxiliaryTimer` name with
+that consumer. Keep driving toward **25% exact or 60% usage remaining**;
+latest allowance is **74% remaining**. Claude's checkout owns main.
 
 ## October 14 (Codex): tether entry, interaction and script controls
 
