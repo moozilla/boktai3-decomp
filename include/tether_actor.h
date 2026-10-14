@@ -84,9 +84,9 @@ struct TetherActor {
     struct ContactPosition targetPosition;
     u16 secondaryValue, secondaryMaximum;
     u16 interactionLock;
-    u16 unknown3FE;
+    u16 lockFrame;
     u16 secondaryMode, secondaryTimer;
-    u8 unknown404[4];
+    u16 lockSoundFrame, transitionReason;
     s16 parameter;
     u16 interactionEnabled, currentValue, maximumValue;
     struct ContactPosition interactionTarget;
