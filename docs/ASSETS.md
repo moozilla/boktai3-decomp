@@ -20,7 +20,7 @@ Types whose extension is known (the type is the hash of the string):
 | Type | Extension | Archive | Entries | Contents |
 |---|---|---|---|---|
 | `922E` | `anm` | `08614DCC` | 75 | animation scripts |
-| `92B3` | ? | `088223C4` | 195 | palettes: 20-byte header + 16 × 16 colours (532 B each) |
+| `92B3` | palette | `088223C4` | 195 | palettes: 20-byte header + 16 × 16 colours (532 B each) |
 | `9B1B` | ? | `08D530DC` | 1 | 30 KB blob |
 | `98F5` | ? | `08A2D944` | 1 | 1.7 MB: 381 large sprites (enemies, props, boss parts; below) |
 | `A635` | `fnt` | `089F8ED8` | 1 | font |
