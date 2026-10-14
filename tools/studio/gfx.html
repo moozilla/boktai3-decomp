@@ -66,6 +66,7 @@ canvas { image-rendering: pixelated; display: block; }
   <h1>Boktai 3 Studio</h1>
   <nav>
     <a href="/">Text</a>
+    <a href="/live">Live</a>
     <a href="#sprites" data-tab="sprites">Sprites</a>
     <a href="#big" data-tab="big">Large sprites</a>
     <a href="#maps" data-tab="maps">Maps</a>
@@ -211,8 +212,11 @@ function parseBig(d) {
 let tab = 'sprites', items = [], sel = null, timer = null;
 const views = {};
 
+let learned = { stages: [], sprites: {} }, tagList = [];
 async function boot() {
   index = await fetch('/api/res').then(r => r.json());
+  learned = await fetch('/api/learned').then(r => r.json()).catch(() => learned);
+  tagList = await fetch('/api/tags').then(r => r.json()).catch(() => []);
   const ps = index.t92B3 || [];
   palettes = await Promise.all(ps.map(async ([h]) => ({ hash: h, data: await res('t92B3', h) })));
   $('palSel').innerHTML = '<option value="">Greyscale</option>' + palettes.map((p, i) => `<option value="${i}">${p.hash}</option>`).join('');
@@ -253,6 +257,28 @@ function select(key) {
 }
 function refresh() { clearInterval(timer); timer = null; if (sel !== undefined) views[tab].show(sel); }
 const colorsNow = () => palColors(curPal);
+// A sprite's palette as captured in-game (tools/mgba/centaur.lua capture), for every bank.
+function learnedColors(kind, hash) {
+  const c = learned.sprites[`${kind}:${hash}`];
+  if (!c) return null;
+  const one = c.map(rgb);
+  return Array.from({ length: 256 }, (_, i) => one[i & 15]);
+}
+function learnedNote(kind, hash) {
+  return learned.sprites[`${kind}:${hash}`] ? ' · <span style="color:var(--accent)">colours from an in-game capture</span>' : '';
+}
+function tagButton(kind, hash, part = '') {
+  const t = tagList.find(x => x.kind === kind && x.hash === hash && x.part === String(part));
+  const b = document.createElement('button');
+  b.textContent = t ? `Text: ${t.note || 'tagged'} (${t.status})` : 'Has text…';
+  b.onclick = async () => {
+    const note = prompt(`What text does ${kind} ${hash}${part !== '' ? ' ' + part : ''} show?`, t?.note || '');
+    if (note === null) return;
+    tagList = await fetch('/api/tags', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ kind, hash, part, note, english: t?.english || '', status: t?.status || 'todo' }) }).then(r => r.json());
+    b.textContent = `Text: ${note} (${t?.status || 'todo'})`;
+  };
+  return b;
+}
 
 // Animation player over a list of images with durations (frames at 60 Hz).
 function player(target, seq) {
@@ -268,10 +294,10 @@ function player(target, seq) {
 views.sprites = {
   async init() { items = (index.tCB05 || []).map(([h, n]) => ({ key: h, note: NOTES[h], n: (n / 1024).toFixed(0) + ' KB' })); },
   async show(h) {
-    const pkg = parsePackage(await res('tCB05', h)), colors = colorsNow();
+    const pkg = parsePackage(await res('tCB05', h)), colors = learnedColors('spr', h) || colorsNow();
     const v = $('view');
-    v.innerHTML = `<h2>Sprite package ${h}</h2><div class="meta">${NOTES[h] ? NOTES[h] + ' · ' : ''}${pkg.frames.length} frames · ${pkg.anims.length} animations · ${pkg.ntiles} tiles</div>
-      <div class="controls">Animation <select id="anim"></select> <span id="ainfo" style="color:var(--muted)"></span></div>
+    v.innerHTML = `<h2>Sprite package ${h}</h2><div class="meta">${NOTES[h] ? NOTES[h] + ' · ' : ''}${pkg.frames.length} frames · ${pkg.anims.length} animations · ${pkg.ntiles} tiles${learnedNote('spr', h)}</div>
+      <div class="controls">Animation <select id="anim"></select> <span id="ainfo" style="color:var(--muted)"></span> <span id="tagslot"></span></div>
       <div class="stage" id="stage"></div><div class="strip" id="strip"></div>`;
     // Shared box per package so animations do not jitter.
     const imgs = pkg.frames.map(f => compose(pkg.parts(f), colors));
@@ -297,6 +323,7 @@ views.sprites = {
       player($('stage'), seq);
     };
     sel.onchange = play; play();
+    $('tagslot').appendChild(tagButton('spr', h));
   },
 };
 
@@ -307,17 +334,18 @@ views.big = {
     items = big.recs.map((r, i) => ({ key: r.hash, idx: i, note: NOTES[r.hash], n: big.frames(i).length + 'f' }));
   },
   async show(h) {
-    const i = big.recs.findIndex(r => r.hash === h), colors = colorsNow();
+    const i = big.recs.findIndex(r => r.hash === h), colors = learnedColors('big', h) || colorsNow();
     const v = $('view');
     if (i < 0) { v.textContent = 'Not found'; return; }
     const r = big.recs[i], frames = big.frames(i);
-    v.innerHTML = `<h2>Large sprite ${h}</h2><div class="meta">${NOTES[h] ? NOTES[h] + ' · ' : ''}${frames.length} frames · ${r.w}×${r.h}, centre (${r.cx}, ${r.cy}) · frame order shown, not the game's animation timing</div>
-      <div class="controls"><label>Speed <select id="spd"><option value="4">fast</option><option value="8" selected>normal</option><option value="16">slow</option></select></label></div>
+    v.innerHTML = `<h2>Large sprite ${h}</h2><div class="meta">${NOTES[h] ? NOTES[h] + ' · ' : ''}${frames.length} frames · ${r.w}×${r.h}${learnedNote('big', h)}, centre (${r.cx}, ${r.cy}) · frame order shown, not the game's animation timing</div>
+      <div class="controls"><label>Speed <select id="spd"><option value="4">fast</option><option value="8" selected>normal</option><option value="16">slow</option></select></label> <span id="tagslot"></span></div>
       <div class="stage" id="stage"></div><div class="strip" id="strip"></div>
       <h2 style="margin-top:20px">All large sprites</h2><div class="meta">First frame of each; click to open.</div><div class="grid" id="all"></div>`;
     const ps = frames.map(f => big.parts(f)), all = ps.flat();
     const box = all.length ? [Math.min(...all.map(p => p.x)), Math.min(...all.map(p => p.y)), Math.max(...all.map(p => p.x + p.w)), Math.max(...all.map(p => p.y + p.h))] : null;
     const imgs = ps.map(p => compose(p, colors, box));
+    $('tagslot').appendChild(tagButton('big', h));
     const play = () => player($('stage'), imgs.filter(Boolean).map(img => ({ canvas: toCanvas(img), dur: +$('spd').value })));
     $('spd').onchange = play; play();
     imgs.forEach((img, k) => {
@@ -423,9 +451,13 @@ views.maps = {
         ${m.count > 1 ? 'Layer <select id="lay">' + m.ents.map((e, i) => `<option value="${i}">${e.hash} (${e.w}×${e.h})</option>`).join('') + '</select>' : ''}
         ${own ? '' : `Tileset <select id="tsel">${tsList.map(t => `<option ${t === (ts || savedTs) ? 'selected' : ''}>${t}</option>`).join('')}</select>`}
         <label><input type="checkbox" id="grid"> metatile grid</label>
-        <span style="color:var(--muted)">Palette is chosen at runtime; ${mh === 'CF70' ? 'E39B matched the field capture.' : 'pick one above (BG palettes such as E39B).'} </span>
+        <span id="palhint" style="color:var(--muted)"></span> <span id="tagslot"></span>
       </div>
       <div class="stage" id="ms" style="padding:0;overflow:auto;max-width:100%"></div><div class="meta" id="hover" style="margin-top:6px">&nbsp;</div>`;
+    const known = learned.stages.find(x => x.map === mh && (!ts || x.tileset === ts)) || learned.stages.find(x => x.map === mh);
+    $('palhint').innerHTML = known ? `Captured palette for this stage: <a href="#" id="usepal">${known.palette}</a>` : 'Palette is chosen at runtime; capture this stage in Live to learn it.';
+    if (known) $('usepal').onclick = ev => { ev.preventDefault(); const i = palettes.findIndex(p => p.hash === known.palette); $('palSel').value = i; curPal = palettes[i]; draw(); };
+    $('tagslot').appendChild(tagButton('map', mh, $('lay') ? m.ents[0].hash : ''));
     const draw = () => {
       const ent = m.ents[$('lay') ? +$('lay').value : 0];
       if (!ent) { $('ms').textContent = 'No layers.'; return; }

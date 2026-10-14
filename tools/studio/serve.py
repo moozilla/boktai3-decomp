@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Local studio: browse, search and edit the script text with a live preview in
 the game font, then build a modified ROM; browse sprites, palettes, the font and
-raw tiles from the resource archives (/gfx).
+raw tiles from the resource archives (/gfx); and a live view of the game
+running in mGBA with tools/mgba/centaur.lua (/live, link on port 8643).
 
   python3 tools/studio/serve.py [--port 8642]    then open http://localhost:8642
 
@@ -19,8 +20,10 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
+sys.path.insert(0, HERE)
 from datafmt import load_manifest  # noqa: E402
 from datafmt import text_bank  # noqa: E402
+import live  # noqa: E402
 
 BANK = os.path.join(ROOT, "build", "text", "bank.tsv")
 
@@ -76,6 +79,26 @@ def stages():
             found.setdefault(key, []).append(proc)
     return [{"map": f"{m:04X}", "tileset": f"{t:04X}", "hp": f"{h:04X}", "procs": ps}
             for (m, t, h), ps in sorted(found.items())]
+
+
+def display_strings(trans):
+    """Plain Japanese and English per string ID, for the live view."""
+    sys.path.insert(0, os.path.join(ROOT, "tools", "mgba"))
+    sys.path.insert(0, os.path.join(ROOT, "tools", "trans"))
+    import gen_centaur_data as g
+    import english
+    jp = {}
+    for ln in open(BANK, encoding="utf-8"):
+        p = ln.rstrip("\n").split("\t")
+        if len(p) > 2 and p[1] == "T":
+            jp[int(p[0])] = g.display(p[2])
+    en = {}
+    script = os.path.join(trans, "scriptEd", "script.sjs")
+    if os.path.exists(script):
+        for sid, (j, e) in english.fan_script(script).items():
+            if j and e and e != j:
+                en[sid] = g.display(e)
+    return jp, en
 
 
 def ensure_bank():
@@ -161,6 +184,28 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, open(font_path(), "rb").read(), "application/octet-stream")
         elif self.path in ("/gfx", "/gfx.html"):
             self.send(200, open(os.path.join(HERE, "gfx.html"), "rb").read(), "text/html; charset=utf-8")
+        elif self.path in ("/live", "/live.html"):
+            self.send(200, open(os.path.join(HERE, "live.html"), "rb").read(), "text/html; charset=utf-8")
+        elif self.path == "/api/live":
+            self.send(200, self.server.live.snapshot(self.server.display_jp, self.server.display_en))
+        elif self.path.startswith("/api/live/file/"):
+            # bookmarks/NAME.png or captures/NAME/FILE
+            rel = os.path.normpath(self.path[len("/api/live/file/"):])
+            f = os.path.join(live.OUT, rel)
+            if rel.startswith("..") or not os.path.isfile(f):
+                return self.send(404, {"error": "not found"})
+            ctype = "image/png" if f.endswith(".png") else "application/json" if f.endswith(".json") else "application/octet-stream"
+            self.send(200, open(f, "rb").read(), ctype)
+        elif self.path.startswith("/api/live/analysis/"):
+            name = os.path.basename(self.path)
+            try:
+                self.send(200, live.analyse_capture(name))
+            except FileNotFoundError:
+                self.send(404, {"error": "no such capture"})
+        elif self.path == "/api/learned":
+            self.send(200, {"stages": live.stage_palettes(), "sprites": live.sprite_palettes()})
+        elif self.path == "/api/tags":
+            self.send(200, live.tags())
         elif self.path == "/api/stages":
             self.send(200, stages())
         elif self.path == "/api/res":
@@ -186,6 +231,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
             except (ValueError, KeyError) as e:
                 return self.send(400, {"error": str(e)})
             self.send(200, {"ok": True})
+        elif self.path == "/api/live/cmd":
+            self.send(200, {"ok": self.server.live.command(req)})
+        elif self.path == "/api/tags":
+            self.send(200, live.save_tag(req))
         elif self.path == "/api/build":
             p = subprocess.run(["make", "mod"], cwd=ROOT, capture_output=True, text=True)
             self.send(200, {"ok": p.returncode == 0, "log": (p.stdout + p.stderr)[-4000:]})
@@ -196,10 +245,13 @@ class Handler(http.server.BaseHTTPRequestHandler):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=8642)
+    ap.add_argument("--trans", default=os.path.join(os.path.dirname(ROOT), "boktai3trans"))
     a = ap.parse_args()
     ensure_bank()
     srv = http.server.ThreadingHTTPServer(("127.0.0.1", a.port), Handler)
     srv.original = original_strings()
+    srv.live = live.Live()
+    srv.display_jp, srv.display_en = display_strings(a.trans)
     print(f"studio: http://localhost:{a.port}")
     srv.serve_forever()
 
