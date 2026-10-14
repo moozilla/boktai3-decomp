@@ -1,0 +1,102 @@
+#ifdef NONMATCHING
+// fuzzy: 72.7%
+// Reviewed full extent; register lifetimes and instruction scheduling still differ.
+#include "contact_actor.h"
+#define ContactActorPool_Start sub_08043D2C
+void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
+void sub_08221110(void *, void *, void *, s32, s32);
+struct ContactStartSprite {
+    u8 prefix[0x1C];
+    struct ContactPosition position;
+    u8 unknown24[0x14];
+    const void *tileData;
+};
+static inline s32 truncateShift12(s32 value)
+{
+    if (value >= 0)
+        return value >> 12;
+    return -((-value) >> 12);
+}
+static inline u32 nextRandom(const u16 *table)
+{
+    u32 index = (gUnk_03005308 + 1) & 1023;
+    gUnk_03005308 = index;
+    return table[index];
+}
+s32 ContactActorPool_Start(struct ContactActorPool *pool, const struct ContactPosition *position,
+                           const struct ContactPosition *center, u32 speed, u32 parameter)
+{
+    struct ContactActor *slot;
+    s32 index;
+    const u16 *table;
+    pool->hideRequested = 0;
+    pool->clearRequested = 0;
+    pool->lifetime = 0;
+    pool->fadeMode = 1;
+    pool->fadeLevel = 63;
+    {
+        u8 *bank = gUnk_030042E4;
+        void *first = bank + 0x5A60;
+        void *second = bank + 0x5AA0;
+        sub_08221110((u8 *)pool + 0x1700, first, second, 63, 6);
+    }
+    pool->retreatCenter = *center;
+    slot = &pool->slots[0];
+    index = 0;
+    table = (const u16 *)RANDOM_TABLE_ADDR;
+    do {
+        struct ContactStartSprite *sprite;
+        struct ContactPosition *actorPosition;
+        struct ContactCollider *health;
+        u32 radius;
+        u32 direction;
+        slot->state = 0;
+        slot->enter = 1;
+        slot->stateFrame = 0;
+        slot->direction = index * 32 + (nextRandom(table) & 31);
+        slot->speed = speed;
+        slot->unknown12 = parameter;
+        sprite = (void *)&slot->sprite;
+        if (pool->mode == 2) {
+            if (index > 7)
+                slot->targetIndex = 0;
+            else
+                slot->targetIndex = 1;
+        } else if (pool->mode == 1)
+            slot->targetIndex = 0;
+        else {
+            u32 target = 255;
+            asm("" : "+r"(target));
+            slot->targetIndex = target;
+        }
+        slot->retargetTimer = 0;
+        radius = (nextRandom(table) & 31) + 16;
+        slot->desiredHeight = position->y;
+        slot->targetHeight = position->y + (nextRandom(table) & 511);
+        direction = slot->direction;
+        slot->position.x = position->x + truncateShift12(gUnk_086149C4[(direction + 64) & 255] * radius);
+        slot->position.y = slot->targetHeight;
+        slot->position.z = position->z + truncateShift12(gUnk_086149C4[direction] * radius);
+        slot->steeringTimer = (nextRandom(table) & 7) + 7;
+        actorPosition = &slot->position;
+        sprite->position = slot->position;
+        slot->sprite.flags &= ~1;
+        ContactActor_SetDirectionalSequence(pool, slot, 0);
+        AnimData_SelectTiles(slot->graphics, 0x2D3);
+        sprite->tileData = (u8 *)pool + 0x1700;
+        ActorShadow_Enable(slot->shadow);
+        Collider_SetPosition(&slot->resourceCollider, actorPosition, 0);
+        health = &slot->healthCollider;
+        Collider_SetPosition(health, actorPosition, 0);
+        health->flags |= 4;
+        index++;
+        slot++;
+    } while (index <= 15);
+    pool->state = 1;
+    return 0;
+}
+
+#else
+#include "global.h"
+INCLUDE_ASM("asm/nonmatching", sub_08043D2C);
+#endif
