@@ -1,7 +1,4 @@
 #include "projected_display.h"
-#define ProjectedDisplay_Initialize           sub_08045C44
-#define ProjectedDisplay_UpdateScreenPosition sub_08045B90
-#define ProjectedDisplay_InitializeEntries    sub_08045B08
 void ProjectedDisplay_UpdateScreenPosition(struct ProjectedDisplay *);
 s32 ProjectedDisplay_InitializeEntries(struct ProjectedDisplay *);
 s32 ProjectedDisplay_Initialize(struct ProjectedDisplay *display,

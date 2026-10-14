@@ -1,6 +1,5 @@
 #include "projected_display.h"
 extern u16 gUnk_03005418[];
-#define ProjectedDisplay_UpdateScreenPosition sub_08045B90
 void ProjectedDisplay_UpdateScreenPosition(struct ProjectedDisplay *display)
 {
     struct ContactPosition *screen;
