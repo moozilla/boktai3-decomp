@@ -129,7 +129,7 @@ int sub_0802AB4C(struct Actor *p)
         {
             u32 index = gUnk_03005308 * 2;
             u32 value;
-            value = *(u16 *)((u8 *)((u16 *)0x0203B400) + index);
+            value = *(u16 *)((u8 *)((u16 *)RANDOM_TABLE_ADDR) + index);
             p->angle = value;
         }
         Sound_PlaySongChecked(318);

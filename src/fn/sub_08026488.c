@@ -117,7 +117,7 @@ void sub_08026488(ActorAnimation *p, int tick)
             u32 index = gUnk_03005308 * 2;
             u16 *table;
             u32 random;
-            table = ((u16 *)0x0203B400);
+            table = ((u16 *)RANDOM_TABLE_ADDR);
             index += (u32)table;
             random = *(u16 *)index;
             U8(p2, 0x398) = random;
