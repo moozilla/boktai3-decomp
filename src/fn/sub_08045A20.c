@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "projected_display.h"
 extern u16 gUnk_03005418[];
-#define ProjectedDisplay_PositionEntry sub_08045A20
 struct ProjectedDisplay *ProjectedDisplay_PositionEntry(struct ProjectedDisplay *display, s32 index)
 {
     register struct ProjectedDisplay *result asm("r0") = display;

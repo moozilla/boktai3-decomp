@@ -1,7 +1,3 @@
-#define ProjectedDisplay_Create     sub_08045CB0
-#define ProjectedDisplay_Update     sub_08045C20
-#define ProjectedDisplay_Destroy    sub_08045C38
-#define ProjectedDisplay_Initialize sub_08045C44
 #include "projected_display.h"
 struct ProjectedDisplay *ProjectedDisplay_Create(const struct ContactPosition *position)
 {

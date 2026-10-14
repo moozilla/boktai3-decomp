@@ -1,6 +1,4 @@
 #include "projected_display.h"
-#define ProjectedDisplay_InitializeEntries sub_08045B08
-#define ProjectedDisplay_PositionEntry     sub_08045A20
 struct ProjectedDisplay *ProjectedDisplay_PositionEntry(struct ProjectedDisplay *, s32);
 struct ProjectedDisplayFrame {
     u16 frame, unknown2;
