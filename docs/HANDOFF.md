@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 22.817% matching (2026-10-14). This file is the single
+Last updated after reaching 22.876% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,35 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex): modifier menu preview and lifecycle
+
+Matching is **22.876%**, up **0.059 percentage points** (+1,428 bytes), with
+**6,316 / 11,465 functions** and **552,534 / 2,415,354 bytes**. Seven new exact
+functions complete preview construction, saved-selection loading, capacity
+flashing, appearance, script text banks, task update and initialization.
+Without register pinning: **18.746%**; Register-pinned: **4.130%**, included
+above. The new validator is a guarded **71.0%** draft; 64 drafts overall,
+with no exact credit.
+
+The contiguous **08041908–08042198** subsection connects script options and
+saved IDs to the model and per-frame rendering. The shared menu view extends
+to the observed **0x1088-byte allocation**, with actor ID, color-cycle and
+preview fields. State 3 is confirmed as closing, correcting the earlier
+`ModifierMenu_OpenSelection` name to **ModifierMenu_BeginClose**. Existing
+helpers and symbols changed without new coverage credit. See
+[preview/lifecycle notes](../notes/modifier-preview_2026-10-14.md).
+
+Every addition passed full-extent checks and hint minimization. Shared type
+consumers and the corrected 13-entry text-source helper were rechecked.
+The combined build printed **`build/boktai3.gba: OK`**
+(`build/modifier-preview-combined.log`); format, inventory and RAM-literal
+checks passed. Continue the
+**25% / 80%-remaining** goal; latest usage is **90% remaining**. Next
+contiguous subsection begins at **08042198**, a script/text cursor and its
+scrolling task. The saved-selection validator retains readable full-size C;
+pointer-reuse and loop-allocation experiments are logged. Claude's primary
+checkout remains untouched.
 
 ## October 14 (Codex): modifier menu graphics and input
 

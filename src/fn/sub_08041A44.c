@@ -1,8 +1,7 @@
 #ifdef NONMATCHING
 // fuzzy: 71.0%
 // Reviewed original extent: 492 bytes; remaining pointer reuse and loop allocation differ.
-#include "engine.h"
-#define ModifierMenu_ValidateSavedSelection sub_08041A44
+#include "modifier_list.h"
 struct ModifierCapacityInfo {
     u8 id, kind, unknown2, capacity;
     u16 value;
@@ -12,7 +11,7 @@ s32 sub_0811DD94(s32, s32);
 s32 sub_0811DE3C(s32, s32);
 s32 sub_0811E5D0(struct ModifierCapacityInfo *, s32);
 extern const u8 gUnk_086058E8[];
-void ModifierMenu_ValidateSavedSelection(void)
+void ModifierMenu_ValidateSavedSelection(struct ModifierMenu *menu)
 {
     struct ModifierCapacityInfo info;
     u32 mask;
@@ -67,5 +66,5 @@ secondary:
 
 #else
 #include "global.h"
-INCLUDE_ASM("asm/nonmatching", sub_08041A44);
+INCLUDE_ASM("asm/nonmatching", ModifierMenu_ValidateSavedSelection);
 #endif

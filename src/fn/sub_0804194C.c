@@ -1,26 +1,16 @@
 // MATCHING_CONCESSION: register-pinning
-#include "engine.h"
-#define ModifierMenu_InitializePreview sub_0804194C
-struct PreviewOrigin {
-    s32 x : 16;
-    s32 y : 16;
-    s32 z : 16;
-};
-struct PreviewActor {
-    u8 unknown0[0x18];
-    s16 id;
-};
+#include "modifier_list.h"
 extern u32 gUnk_030053F0;
-extern struct PreviewActor *gUnk_020004B4;
+extern struct ModifierMenuActor *gUnk_020004B4;
 void sub_0811C9F8(u8 *, u8 *, u32);
-void sub_08041908(u8 *);
-void sub_0811CB68(u8 *, u8 *, struct PreviewOrigin *, u32);
+void sub_08041908(struct ModifierMenu *);
+void sub_0811CB68(u8 *, u8 *, struct ModifierPreviewOrigin *, u32);
 void sub_0811CD24(u8 *, s32);
 void sub_0811CD5C(u8 *, s32);
 void sub_0811C844(u8 *, s32);
-void ModifierMenu_InitializePreview(u8 *menu)
+void ModifierMenu_InitializePreview(struct ModifierMenu *menu)
 {
-    struct PreviewOrigin origin;
+    struct ModifierPreviewOrigin origin;
     u8 *resource;
     u8 *model;
     u32 flags;
@@ -32,18 +22,18 @@ void ModifierMenu_InitializePreview(u8 *menu)
     flags = (gUnk_030053F4 | gUnk_030053F0) & mask;
     if (flags) {
         s32 id;
-        struct PreviewActor *actor = gUnk_020004B4;
+        struct ModifierMenuActor *actor = gUnk_020004B4;
         if (!actor) {
             id = -1;
             asm("" : "+r"(id));
         } else
             id = actor->id;
-        menu[0x1086] = id;
+        menu->previewActorId = id;
     } else {
-        menu[0x1086] = flags;
+        menu->previewActorId = flags;
     }
-    resource = menu + 0x83C;
-    model = menu + 0xE34;
+    resource = (u8 *)menu + 0x83C;
+    model = (u8 *)menu + 0xE34;
     sub_0811C9F8(resource, model, 0x3D99);
     sub_08041908(menu);
     sub_0811CB68(resource, model, &origin, 0);

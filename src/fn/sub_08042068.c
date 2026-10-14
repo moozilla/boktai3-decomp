@@ -1,9 +1,4 @@
 #include "modifier_list.h"
-#define ModifierMenu_Initialize             sub_08042068
-#define ModifierMenu_ValidateSavedSelection sub_08041A44
-#define ModifierMenu_LoadSavedSelection     sub_08041C30
-#define ModifierMenu_LoadTextSources        sub_08041E1C
-#define ModifierMenu_InitializePreview      sub_0804194C
 extern u32 gUnk_030053F0;
 void ModifierMenu_ValidateSavedSelection(struct ModifierMenu *);
 void ModifierMenu_LoadSavedSelection(struct ModifierMenu *);
@@ -22,7 +17,7 @@ s32 ModifierMenu_Initialize(struct ModifierMenu *menu)
 {
     u32 mask;
     u32 flags;
-    menu->unknown116[0] = 0;
+    menu->unknown116 = 0;
     ModifierMenu_ValidateSavedSelection(menu);
     ModifierMenu_LoadSavedSelection(menu);
     mask = 0x800;

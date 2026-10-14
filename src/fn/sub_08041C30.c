@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
-#define ModifierMenu_LoadSavedSelection sub_08041C30
 void Modifier_LoadFirstSource(struct ModifierSelection *);
 void Modifier_LoadSecondSource(struct ModifierSelection *, const struct ModifierSelection *);
 void Modifier_LoadThirdSource(struct ModifierSelection *);
