@@ -1,10 +1,11 @@
-#include "global.h"
-
-void Effect_Remove(u8 *);
-void sub_08048898(u8 *p)
+#include "tether_actor.h"
+void TetherActor_RemoveSegments(struct TetherActor *actor)
 {
-    s32 i;
-    u8 *e = p + 0x264;
-    for (i = 6; i >= 0; i--, e += 0x28)
-        Effect_Remove(e);
+    struct TetherSegment *segment = actor->segments;
+    s32 remaining = 6;
+    do {
+        Effect_Remove(segment);
+        --remaining;
+        ++segment;
+    } while (remaining >= 0);
 }
