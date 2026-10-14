@@ -44,14 +44,15 @@ struct ContactActor {
 struct ContactActorPool {
     u8 task[0x18];
     u32 state;
-    u16 unknown1C;
+    u8 unknown1C, hideRequested;
     u8 clearRequested, mode;
     u16 resourceColliderId, healthColliderId;
-    u8 unknown24[4];
+    u32 lifetime;
     const struct ContactPosition *targets[2];
     u8 scriptState[0xC];
     struct ContactActor slots[16];
-    u8 unknown16FC[4];
+    s8 fadeMode, fadeLevel;
+    u8 unknown16FE[2];
     u8 tileData[1];
 };
 #endif
