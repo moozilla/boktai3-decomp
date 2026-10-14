@@ -1,20 +1,18 @@
-#include "global.h"
-void *Task_Create(u32, u32);
-void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
-s32 sub_080447D4(void *);
-void Task_Kill(void *);
-void sub_08044594(void);
-void sub_080447AC(void);
-void *sub_08044814(void)
+#include "contact_swarm.h"
+s32 ContactSwarm_Initialize(struct ContactSwarm *);
+u32 ContactSwarm_Update(struct ContactSwarm *);
+u32 ContactSwarm_Destroy(struct ContactSwarm *);
+struct ContactSwarm *ContactSwarm_Create(void)
 {
-    void *p = Task_Create(8, 0x1590);
-    if (p) {
-        Task_SetCallbacks(p, sub_08044594, sub_080447AC);
-        if (sub_080447D4(p) >= 0)
-            goto ok;
-        Task_Kill(p);
+    struct ContactSwarm *pool = Task_Create(8, 0x1590);
+    if (pool) {
+        Task_SetCallbacks(pool, (void (*)(void *))ContactSwarm_Update,
+                          (void (*)(void *))ContactSwarm_Destroy);
+        if (ContactSwarm_Initialize(pool) >= 0)
+            goto done;
+        Task_Kill(pool);
         return 0;
     }
-ok:
-    return p;
+done:
+    return pool;
 }
