@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "transient_sprite_effects.h"
-#define TransientSpriteEffects_Initialize sub_08047424
 void sub_082144E4(void *, void *, u32);
 union TransientPackedPosition {
     struct ContactPackedVector bits;

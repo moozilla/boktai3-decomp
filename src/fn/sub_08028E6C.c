@@ -10,8 +10,8 @@ struct Actor {
 struct Actor *sub_0802140C(int);
 int Script_GetKeywordValue(int, int);
 void sub_08022AF4(void *);
-void sub_08047B68(void *);
-void sub_08047B58(void *);
+void BackgroundFlash_BeginAlternating(void *);
+void BackgroundFlash_BeginAppearance(void *);
 extern u32 gUnk_0300523C;
 int sub_08028E6C(int value)
 {

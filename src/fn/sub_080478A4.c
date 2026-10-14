@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "background_flash.h"
-#define BackgroundFlash_UpdateAppearing sub_080478A4
-#define BackgroundFlash_TakeEntryFlag   sub_08047700
-#define BackgroundFlash_SetState        sub_080476F4
 u32 BackgroundFlash_TakeEntryFlag(struct BackgroundFlashController *);
 void BackgroundFlash_SetState(struct BackgroundFlashController *, u32);
 void BackgroundFlash_UpdateAppearing(struct BackgroundFlashController *controller)

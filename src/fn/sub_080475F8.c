@@ -1,6 +1,5 @@
 #include "transient_sprite_effects.h"
 #define TransientSpriteEffects_SpawnFromScript sub_080475F8
-#define TransientSpriteEffects_Spawn           sub_080474E4
 s32 TransientSpriteEffects_Spawn(u32, u32, const struct ContactPosition *,
                                  const struct ContactPosition *, u32, u32);
 s32 TransientSpriteEffects_SpawnFromScript(void)

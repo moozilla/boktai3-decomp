@@ -1,5 +1,4 @@
 #include "background_flash.h"
-#define BackgroundFlash_TakeEntryFlag sub_08047700
 u32 BackgroundFlash_TakeEntryFlag(struct BackgroundFlashController *controller)
 {
     u32 result;
