@@ -1,5 +1,4 @@
 #include "contact_actor.h"
-#define ContactActorPool_Update sub_08043ACC
 void ContactActorPool_HideSlots(struct ContactActorPool *);
 void ContactActor_UpdateDisplay(struct ContactActor *);
 void sub_08221110(void *, void *, void *, s32, s32);

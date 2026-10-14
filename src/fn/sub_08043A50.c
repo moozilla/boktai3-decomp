@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_actor.h"
-#define ContactActor_UpdateAwaitHide sub_08043A50
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 void ContactActor_UpdateAwaitHide(struct ContactActorPool *pool, struct ContactActor *slot,
                                   s32 index)

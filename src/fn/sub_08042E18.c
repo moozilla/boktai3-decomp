@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_actor.h"
-#define ContactActor_UpdateTracking sub_08042E18
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 void ContactActor_UpdateTracking(struct ContactActorPool *poolInput, struct ContactActor *slotInput,
                                  s32 indexInput)

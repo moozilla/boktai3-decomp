@@ -2,7 +2,6 @@
 // fuzzy: 72.7%
 // Reviewed full extent; register lifetimes and instruction scheduling still differ.
 #include "contact_actor.h"
-#define ContactActorPool_Start sub_08043D2C
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 void sub_08221110(void *, void *, void *, s32, s32);
 struct ContactStartSprite {
@@ -74,7 +73,8 @@ s32 ContactActorPool_Start(struct ContactActorPool *pool, const struct ContactPo
         slot->desiredHeight = position->y;
         slot->targetHeight = position->y + (nextRandom(table) & 511);
         direction = slot->direction;
-        slot->position.x = position->x + truncateShift12(gUnk_086149C4[(direction + 64) & 255] * radius);
+        slot->position.x =
+            position->x + truncateShift12(gUnk_086149C4[(direction + 64) & 255] * radius);
         slot->position.y = slot->targetHeight;
         slot->position.z = position->z + truncateShift12(gUnk_086149C4[direction] * radius);
         slot->steeringTimer = (nextRandom(table) & 7) + 7;
@@ -98,5 +98,5 @@ s32 ContactActorPool_Start(struct ContactActorPool *pool, const struct ContactPo
 
 #else
 #include "global.h"
-INCLUDE_ASM("asm/nonmatching", sub_08043D2C);
+INCLUDE_ASM("asm/nonmatching", ContactActorPool_Start);
 #endif

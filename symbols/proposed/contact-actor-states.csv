@@ -1,0 +1,15 @@
+addr,name,confidence,evidence
+08042E18,ContactActor_UpdateTracking,low,Observed dispatch table 086058FC and sixteen-slot lifecycle; include/contact_actor.h; notes/contact-actor-states_2026-10-14.md
+08042F44,ContactActor_UpdateRoaming,low,Observed dispatch table 086058FC and sixteen-slot lifecycle; include/contact_actor.h; notes/contact-actor-states_2026-10-14.md
+0804331C,ContactActor_UpdateRandomWalk,low,Observed dispatch table 086058FC and sixteen-slot lifecycle; include/contact_actor.h; notes/contact-actor-states_2026-10-14.md
+080434A8,ContactActor_UpdateBurst,low,Observed dispatch table 086058FC and sixteen-slot lifecycle; include/contact_actor.h; notes/contact-actor-states_2026-10-14.md
+08043620,ContactActor_UpdateReaction,low,Observed dispatch table 086058FC and sixteen-slot lifecycle; include/contact_actor.h; notes/contact-actor-states_2026-10-14.md
+0804373C,ContactActor_UpdateRetreat,low,Observed dispatch table 086058FC and sixteen-slot lifecycle; include/contact_actor.h; notes/contact-actor-states_2026-10-14.md
+08043A50,ContactActor_UpdateAwaitHide,low,Observed dispatch table 086058FC and sixteen-slot lifecycle; include/contact_actor.h; notes/contact-actor-states_2026-10-14.md
+08043A98,ContactActor_UpdateInactive,low,Observed dispatch table 086058FC and sixteen-slot lifecycle; include/contact_actor.h; notes/contact-actor-states_2026-10-14.md
+08043ACC,ContactActorPool_Update,low,Observed dispatch table 086058FC and sixteen-slot lifecycle; include/contact_actor.h; notes/contact-actor-states_2026-10-14.md
+08043C24,ContactActorPool_Destroy,low,Observed dispatch table 086058FC and sixteen-slot lifecycle; include/contact_actor.h; notes/contact-actor-states_2026-10-14.md
+08043C4C,ContactActorPool_Initialize,low,Observed dispatch table 086058FC and sixteen-slot lifecycle; include/contact_actor.h; notes/contact-actor-states_2026-10-14.md
+08043CE0,ContactActorPool_Create,low,Observed dispatch table 086058FC and sixteen-slot lifecycle; include/contact_actor.h; notes/contact-actor-states_2026-10-14.md
+08043D2C,ContactActorPool_Start,low,Observed dispatch table 086058FC and sixteen-slot lifecycle; include/contact_actor.h; notes/contact-actor-states_2026-10-14.md
+08043F5C,ContactActorPool_RequestClear,low,Observed dispatch table 086058FC and sixteen-slot lifecycle; include/contact_actor.h; notes/contact-actor-states_2026-10-14.md

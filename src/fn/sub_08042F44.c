@@ -2,7 +2,6 @@
 // fuzzy: 66.9%
 // Reviewed full extent; register lifetimes and instruction scheduling still differ.
 #include "contact_actor.h"
-#define ContactActor_UpdateRoaming sub_08042F44
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 static inline s32 truncateShift12(s32 value)
 {
@@ -39,8 +38,8 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
                 destination->z = read->z + target->z;
             }
         }
-        slot->direction = Math_Atan2(slot->destination.x - slot->position.x,
-                                    destination->z - slot->position.z);
+        slot->direction =
+            Math_Atan2(slot->destination.x - slot->position.x, destination->z - slot->position.z);
         slot->direction += (nextRandom() & 63) - 32;
         slot->steeringTimer = (nextRandom() & 15) + 16;
         slot->healthCollider.flags &= ~4;
@@ -71,8 +70,8 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
                 }
             }
             position = &slot->position;
-            slot->direction = Math_Atan2(slot->destination.x - slot->position.x,
-                                        destination->z - position->z);
+            slot->direction =
+                Math_Atan2(slot->destination.x - slot->position.x, destination->z - position->z);
             slot->direction += (nextRandom() & 63) - 32;
         } else {
             slot->direction = nextRandom();
@@ -129,5 +128,5 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
 
 #else
 #include "global.h"
-INCLUDE_ASM("asm/nonmatching", sub_08042F44);
+INCLUDE_ASM("asm/nonmatching", ContactActor_UpdateRoaming);
 #endif

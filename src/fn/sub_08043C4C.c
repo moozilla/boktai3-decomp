@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_actor.h"
 #include "player.h"
-#define ContactActorPool_Initialize sub_08043C4C
 void ContactActor_InitializeSlot(struct ContactActorPool *, struct ContactActor *, s32);
 void sub_08221110(void *, void *, void *, s32, s32);
 s32 ContactActorPool_Initialize(struct ContactActorPool *pool, u32 mode, u32 resourceId,
