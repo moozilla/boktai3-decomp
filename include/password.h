@@ -25,8 +25,8 @@ int NameEntry_DecodeAndValidate(struct PasswordEntry *e);
 void Password_ApplyDecoded(struct PasswordEntry *e, u8 *output);
 s32 sub_08011794(u8 *src, s32 tableRef, s32 script, u8 *output);
 
-int sub_08044CF4(void *, int *, int, int);
+int EncodedRecord_ReadBits(void *, int *, int, int);
 int sub_08221594(void *, int, int);
-void sub_080453DC(void *, void *, int);
+void EncodedRecord_DecodeAlternateFields(void *, void *, int);
 
 #endif
