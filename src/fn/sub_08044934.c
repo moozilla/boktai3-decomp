@@ -3,8 +3,7 @@
 // fuzzy: 93.1%
 // MATCHING_CONCESSION: register-pinning
 // Reviewed paired-spawn behavior; allocation and branch encoding still differ.
-#define ContactSwarm_SpawnPairedAdvance     sub_08044934
-#define ContactSwarm_SetDirectionalSequence sub_08044174
+#define ContactSwarm_SpawnPairedAdvance sub_08044934
 void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
 void sub_0821FF58(void *, u32, u32, u32, u32, u32);
 void sub_08221110(void *, void *, void *, s32, s32);

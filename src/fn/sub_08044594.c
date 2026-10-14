@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "player.h"
-#define ContactSwarm_Update sub_08044594
 void sub_08221110(void *, void *, void *, s32, s32);
 extern void (*const gUnk_08605920[])(struct ContactSwarm *, struct ContactSwarmSlot *, s32);
 static inline void updatePlayback(struct ContactSwarmAnimation *animation,

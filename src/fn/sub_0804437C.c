@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
-#define ContactSwarm_UpdateCharge           sub_0804437C
-#define ContactSwarm_SetDirectionalSequence sub_08044174
-#define ContactSwarm_HideSlot               sub_0804413C
 void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
 u32 ContactSwarm_HideSlot(struct ContactSwarm *, struct ContactSwarmSlot *, s32);
 static inline s32 truncateShift12(s32 value)

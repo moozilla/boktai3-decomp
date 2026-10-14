@@ -1,11 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
-#define ContactSwarm_InitializeSlot     sub_08043FB0
-#define ContactSwarm_ApplyHealthContact sub_08043F64
 void Shadow_Initialize(void *, void *, s32);
 void ContactSwarm_ApplyHealthContact(struct ContactCollider *, struct ContactCollider *,
                                      struct ContactSwarmSlot *);
-#define ContactSwarm_IgnoreResourceContact sub_08043FAC
 void ContactSwarm_IgnoreResourceContact(struct ContactCollider *, struct ContactCollider *,
                                         struct ContactSwarmSlot *);
 void sub_0821FF7C(void *, u32, u32, u32);

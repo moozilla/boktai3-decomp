@@ -59,7 +59,7 @@ static inline int trunc12(int x)
 }
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
-void sub_08044854(void *, void *, int, int, int, int, int);
+void ContactSwarm_SpawnCharge(void *, void *, int, int, int, int, int);
 static inline void vector(s16 *dst, int direction, int length)
 {
     s16 *velocity;
@@ -148,7 +148,7 @@ void sub_08025DEC(ActorAnimation *p, int tick)
             random &= 15;
             direction += random;
         }
-        sub_08044854(*(void **)((u8 *)p2 + 0x9d4), &spawn, direction, 20, power, 30, 8);
+        ContactSwarm_SpawnCharge(*(void **)((u8 *)p2 + 0x9d4), &spawn, direction, 20, power, 30, 8);
         Sound_PlaySongChecked(234);
     }
     if (*((u8 *)p2 + 0x25d) & 2) {
