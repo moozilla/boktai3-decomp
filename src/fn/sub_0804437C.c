@@ -13,7 +13,7 @@ static inline s32 truncateShift12(s32 value)
 }
 void ContactSwarm_UpdateCharge(struct ContactSwarm *pool, struct ContactSwarmSlot *slot, s32 index)
 {
-    struct ContactSwarmSprite *sprite = &slot->animation.sprite;
+    struct ContactSwarmSprite *sprite = &slot->display.animation.draw.sprite;
     struct ContactPosition *position;
     if (slot->enter) {
         struct ContactCollider *collider;
@@ -22,7 +22,7 @@ void ContactSwarm_UpdateCharge(struct ContactSwarm *pool, struct ContactSwarmSlo
         u32 speed;
         s32 mask;
         slot->enter = 0;
-        collider = &slot->healthCollider;
+        collider = &slot->display.healthCollider;
         mask = -5;
         mask &= collider->flags;
         collider->flags = mask;
@@ -48,7 +48,7 @@ void ContactSwarm_UpdateCharge(struct ContactSwarm *pool, struct ContactSwarmSlo
         position->y += velocity->y;
         position->z += velocity->z;
     }
-    Collider_SetPosition(&slot->healthCollider, position, 0);
+    Collider_SetPosition(&slot->display.healthCollider, position, 0);
     if ((index & 1) == pool->resourceParity) {
         struct ContactCollider *resource = &slot->resourceCollider;
         Collider_SetPosition(resource, position, 0);

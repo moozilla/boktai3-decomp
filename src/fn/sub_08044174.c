@@ -22,6 +22,6 @@ void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *pool, struct Conta
         *second = 1;
     else
         *second = 0;
-    Anim_SetSequence(&actor->animation.sequence, base->sequenceResource, (u16)index, flip[0],
-                     *saved);
+    Anim_SetSequence(&actor->display.animation.sequence, base->sequenceResource, (u16)index,
+                     flip[0], *saved);
 }

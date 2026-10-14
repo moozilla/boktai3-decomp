@@ -10,14 +10,14 @@ static inline s32 truncateShift12(s32 value)
 }
 void ContactSwarm_UpdateAdvance(struct ContactSwarm *pool, struct ContactSwarmSlot *slot, s32 index)
 {
-    struct ContactSwarmSprite *sprite = &slot->animation.sprite;
+    struct ContactSwarmSprite *sprite = &slot->display.animation.draw.sprite;
     if (slot->enter) {
         struct ContactCollider *collider;
         struct ContactPosition *velocity;
         u32 direction;
         u32 speed;
         slot->enter = 0;
-        collider = &slot->healthCollider;
+        collider = &slot->display.healthCollider;
         collider->flags |= 4;
         ContactSwarm_SetDirectionalSequence(pool, slot, 0);
         velocity = &slot->velocity;
