@@ -9,8 +9,8 @@ void ModifierMenu_SelectPendingSource(struct ModifierMenu *menu)
     struct ModifierSelection *pending = &menu->pending;
     switch (menu->mode) {
         case 0: {
-            s32 index = menu->index;
-            s32 category = menu->category;
+            s32 index = menu->choice.cursor.index;
+            s32 category = menu->choice.cursor.category;
             if (category == 0) {
                 pending->sourceIds[0] = index;
                 Modifier_LoadFirstSource(pending);
@@ -27,8 +27,8 @@ void ModifierMenu_SelectPendingSource(struct ModifierMenu *menu)
             break;
         }
         case 1: {
-            register s32 category asm("r1") = menu->category;
-            s32 index = menu->index;
+            register s32 category asm("r1") = menu->choice.cursor.category;
+            s32 index = menu->choice.cursor.index;
             category = category * 3 * 2 + index;
             pending->selectedId = category;
         secondSource:
@@ -36,8 +36,8 @@ void ModifierMenu_SelectPendingSource(struct ModifierMenu *menu)
             break;
         }
         case 2: {
-            register s32 category asm("r1") = menu->category;
-            s32 index = menu->index;
+            register s32 category asm("r1") = menu->choice.cursor.category;
+            s32 index = menu->choice.cursor.index;
             category = category * 3 * 2 + index;
             pending->secondaryId = category;
             break;

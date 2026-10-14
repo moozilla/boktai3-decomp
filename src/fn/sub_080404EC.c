@@ -22,7 +22,7 @@ void ModifierMenu_DrawThirdSourceStats(struct ModifierMenu *menu)
             ModifierMenu_DrawStatComparison(third, third, 21, 12, 8);
             break;
         case 1:
-            if (sub_0811DD94(menu->category, menu->index)) {
+            if (sub_0811DD94(menu->choice.cursor.category, menu->choice.cursor.index)) {
                 ModifierMenu_DrawStatComparison(first, nextFirst, 8, 13, 6);
                 ModifierMenu_DrawStatComparison(second, nextSecond, 8, 14, 7);
                 ModifierMenu_DrawStatComparison(third, nextThird, 8, 15, 8);

@@ -31,7 +31,7 @@ void ModifierMenu_DrawFourthSourceStats(struct ModifierMenu *menu)
         }
         case 1: {
             u32 zero, one;
-            if (sub_0811DD94(menu->category, menu->index)) {
+            if (sub_0811DD94(menu->choice.cursor.category, menu->choice.cursor.index)) {
                 ModifierMenu_DrawStatComparison(first, nextFirst, 8, 13, 9);
                 ModifierMenu_DrawStatComparison(second, nextSecond, 8, 14, 10);
             } else {
