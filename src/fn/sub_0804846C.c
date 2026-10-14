@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "wireless_link_indicator.h"
-#define WirelessLinkIndicator_UpdateLinkStatus sub_0804846C
-#define WirelessLinkIndicator_SelectStrengthFrame sub_080483AC
 void WirelessLinkIndicator_UpdateLinkStatus(struct WirelessLinkIndicator *input)
 {
     register struct WirelessLinkIndicator *indicator asm("r4") = input;

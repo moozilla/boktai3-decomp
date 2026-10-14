@@ -1,5 +1,4 @@
 #include "wireless_link_indicator.h"
-#define WirelessLinkIndicator_Destroy sub_08048514
 s32 WirelessLinkIndicator_Destroy(struct WirelessLinkIndicator *indicator)
 {
     Anim_Remove(&indicator->animation);

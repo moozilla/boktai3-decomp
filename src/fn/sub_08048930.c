@@ -1,5 +1,4 @@
 #include "tether_actor.h"
-#define TetherActor_UpdateShake sub_08048930
 void TetherActor_UpdateShake(struct TetherActor *actor)
 {
     u32 phase = actor->shakeFrame & 127;

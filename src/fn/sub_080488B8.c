@@ -1,5 +1,4 @@
 #include "tether_actor.h"
-#define TetherActor_CreateAuxiliarySprite sub_080488B8
 void TetherActor_CreateAuxiliarySprite(struct TetherActor *actor)
 {
     u8 *active = &actor->auxiliaryActive;

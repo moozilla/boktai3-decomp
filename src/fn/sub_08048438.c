@@ -1,4 +1,3 @@
-#define WirelessLinkIndicator_SelectStrengthFrame sub_080483AC
 #include "wireless_link_indicator.h"
 #define WirelessLinkIndicator_UpdateChildStatus sub_08048438
 void WirelessLinkIndicator_UpdateChildStatus(struct WirelessLinkIndicator *indicator)
