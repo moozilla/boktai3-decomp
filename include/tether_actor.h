@@ -64,7 +64,7 @@ struct TetherActor {
     struct TetherSegment segments[7];
     u16 paletteIndex;
     s16 shakeX;
-    u16 auxiliaryTimer;
+    u16 displayOffsetY;
     s16 shakeZ;
     u16 chargeReady, charge;
     u16 shakeFrame;
@@ -84,9 +84,9 @@ struct TetherActor {
     struct ContactPosition targetPosition;
     u16 secondaryValue, secondaryMaximum;
     u16 interactionLock;
-    u16 unknown3FE;
+    u16 lockFrame;
     u16 secondaryMode, secondaryTimer;
-    u8 unknown404[4];
+    u16 lockSoundFrame, transitionReason;
     s16 parameter;
     u16 interactionEnabled, currentValue, maximumValue;
     struct ContactPosition interactionTarget;
@@ -96,7 +96,9 @@ struct TetherActor {
     struct ContactPosition directedTarget;
     struct ContactPosition origin;
     struct ContactPosition auxiliaryOrigin;
-    u8 unknown43C[0x2E];
+    u8 unknown43C[0x28];
+    u16 terrainCheckReady;
+    u8 unknown466[4];
     u16 directedTimer, directedHeading;
     u16 blendHold;
     u16 directedStep;
@@ -105,13 +107,14 @@ struct TetherActor {
     void *pendingEffectHandle;
     u16 effectValue, unknown482;
 };
-/* Additional player view: these fields are distinct from player.h's facing/actionMode. */
+/* Additional player view: heading, side and tetherMode are distinct from facing/actionMode. */
 struct TetherPlayer {
     u8 unknown0[0x30];
     struct ContactPosition position;
     u8 unknown38[0x36A];
     u8 heading, side;
-    u8 unknown3A4[0xB3];
+    u8 facing;
+    u8 unknown3A5[0xB2];
     u8 tetherMode;
 };
 extern struct TetherPlayer *gUnk_02000580[4];

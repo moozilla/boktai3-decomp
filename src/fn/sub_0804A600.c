@@ -64,6 +64,6 @@ void TetherActor_InitDisplayFromScript(struct TetherActor *actor)
     else
         actor->heading = value;
     actor->shakeX = 0;
-    actor->auxiliaryTimer = 0;
+    actor->displayOffsetY = 0;
     actor->shakeZ = 0;
 }

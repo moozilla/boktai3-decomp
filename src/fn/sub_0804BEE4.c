@@ -1,5 +1,5 @@
 #include "global.h"
-u32 sub_0804BEE4(s32 a, s32 b)
+u32 TetherActor_TestNearDelta(s32 a, s32 b)
 {
     if (a < 0)
         a = -a;
