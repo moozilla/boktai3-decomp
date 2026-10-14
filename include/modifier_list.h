@@ -30,29 +30,41 @@ struct ModifierDisplayObject {
     u8 unknown26[0x14];
     u16 tile;
     u8 unknown3C[0xc];
-    void *tileData;
+    u16 *palette; /* 32-byte graphic entry; palette interpretation is tentative. */
     u8 unknown4C[0x14];
+};
+struct ModifierCursor {
+    s8 category, index;
+    u8 unknown2[2];
+};
+union ModifierCursorWord {
+    struct ModifierCursor cursor;
+    u32 word;
 };
 /* Known prefix only: later fields include the 3D preview and more menu state. */
 struct ModifierMenu {
     u8 task[0x18];
     s32 state, mode;
-    s8 category, index;
-    u8 unknown22[0x12];
+    union ModifierCursorWord choice;
+    u32 savedChoices[3];
+    u32 stateFrame;
     void *backgroundResource;
     void *tilemap;
-    u8 unknown3C[0x2c];
+    u8 unknown3C[0x28];
+    u32 dirtyFlags;
     struct ModifierSelection current, pending;
     void *script;
     const u8 *textSources[13];
     s32 mainWindow, detailWindow;
     s32 listWindows[6];
-    u8 unknown110;
+    u8 inputDelay;
     u8 specialHeader;
     u8 unknown112[2];
     u8 changed;
-    u8 unknown115[3];
-    u8 glyphData[0x24];
+    u8 errorFlash;
+    u8 unknown116[2];
+    u16 palette[16]; /* copied as 16 halfwords by 08217DB4; interpretation tentative. */
+    u8 modeRepeat, indexRepeat, categoryRepeat, unknown13B;
     struct ModifierGraphicsResource graphicsA, graphicsB;
     struct ModifierDisplayObject displays[18];
     u8 unknown83C[0x6c0];

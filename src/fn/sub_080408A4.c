@@ -62,14 +62,14 @@ s32 ModifierMenu_InitializeGraphics(struct ModifierMenu *menu)
         remaining--;
         object++;
     } while (remaining >= 0);
-    sub_08217DB4(menu->glyphData, gUnk_030042E4 + 0x64e0);
+    sub_08217DB4(menu->palette, gUnk_030042E4 + 0x64e0);
     object = &menu->displays[1];
     object->tile = 0x9010;
-    object->tileData = menu->glyphData;
+    object->palette = menu->palette;
     object->attribute1A = 0;
     object = &menu->displays[8];
     object->tile = 0x9010;
-    object->tileData = menu->glyphData;
+    object->palette = menu->palette;
     object->attribute1A = 0;
     return 0;
 }

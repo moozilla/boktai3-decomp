@@ -41,11 +41,12 @@ void ModifierMenu_DrawSecondSourceStats(struct ModifierMenu *menu)
             break;
         case 1:
             if (menu->mode == 0) {
-                if (sub_0811DD94(menu->category, menu->index))
+                if (sub_0811DD94(menu->choice.cursor.category, menu->choice.cursor.index))
                     goto validPreview;
                 goto invalidPreview;
             } else if (menu->mode == 1) {
-                if (!sub_0811DD94(4, menu->index + menu->category * 3 * 2))
+                if (!sub_0811DD94(4,
+                                  menu->choice.cursor.index + menu->choice.cursor.category * 3 * 2))
                     goto invalidPreview;
             validPreview:
                 ModifierMenu_DrawStatComparison(first, nextFirst, 8, 13, 2);
