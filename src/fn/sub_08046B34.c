@@ -1,6 +1,8 @@
-#include "global.h"
-
-void sub_08046B34(u8 *p, u32 n)
+#include "damage_number_display.h"
+#define DamageNumberDisplay_SetActiveBit sub_08046B34
+struct DamageNumberDisplay *DamageNumberDisplay_SetActiveBit(struct DamageNumberDisplay *display,
+                                                             u32 index)
 {
-    *(u32 *)(p + 0x18) |= 1 << n;
+    display->activeMask |= 1 << index;
+    return display;
 }
