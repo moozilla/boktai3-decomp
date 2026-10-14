@@ -1,5 +1,4 @@
 #include "modifier_list.h"
-#define ModifierMenu_HandleChangedInput sub_080418AC
 extern u16 gUnk_03005260[];
 extern const u8 gUnk_086058E8[];
 void sub_0803384C(s32);

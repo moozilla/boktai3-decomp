@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
-#define ModifierMenu_DrawAvailableLabels sub_08041280
 u32 Modifier_ReadPackedValue(u32, s32);
 void sub_080339B8(s32, s32, s32, s32, s32);
 s32 sub_080337FC(u32);

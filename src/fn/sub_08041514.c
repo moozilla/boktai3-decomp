@@ -1,5 +1,4 @@
 #include "modifier_list.h"
-#define ModifierMenu_HandleOverviewInput sub_08041514
 extern u16 gUnk_03005260[];
 extern const u8 gUnk_086058E8[];
 void ModifierMenu_OpenSelection(struct ModifierMenu *);

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
-#define ModifierMenu_HandleSelectionInput sub_0804164C
 extern u16 gUnk_03005260[];
 extern const u8 gUnk_086058E8[];
 void Sound_PlaySong(u32);

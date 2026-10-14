@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
-#define ModifierMenu_UpdateDescription sub_08041020
 u32 sub_0811DD94(s32, s32);
 void sub_0803343C(const u8 *);
 extern const u8 gUnk_086058C8[];

@@ -5,8 +5,8 @@ void TextWindow_SetScript(s32, u32);
 void sub_08033A38(s32, u32, u8 *);
 void TextWindow_Refresh(s32, u32);
 void sub_080337FC(s32);
-void sub_08041128(u8 *);
-void sub_08041280(u8 *);
+void ModifierMenu_DrawSelectedLabels(u8 *);
+void ModifierMenu_DrawAvailableLabels(u8 *);
 
 void sub_08041370(u8 *p)
 {
@@ -19,13 +19,13 @@ void sub_08041370(u8 *p)
     }
     switch (*(s32 *)(p + 0x18)) {
         case 0:
-            sub_08041128(p);
+            ModifierMenu_DrawSelectedLabels(p);
             break;
         case 1:
-            sub_08041280(p);
+            ModifierMenu_DrawAvailableLabels(p);
             break;
         case 2:
-            sub_08041128(p);
+            ModifierMenu_DrawSelectedLabels(p);
             break;
     }
 }

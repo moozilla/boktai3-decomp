@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
 #include "scene_vec.h"
-#define ModifierMenu_InitializeGraphics sub_080408A4
 void sub_0821983C(void *, void *, u32, u32, u32, u32, u32, void *);
 void sub_08217DB4(void *, void *);
 s32 ModifierMenu_InitializeGraphics(struct ModifierMenu *menu)
