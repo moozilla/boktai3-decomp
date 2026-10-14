@@ -36,7 +36,7 @@ void sub_08052628(struct O *, void (*)(struct O *));
 extern u8 *gUnk_02000580;
 void sub_0815B858(u8 *, u32, u32);
 s32 sub_0805238C(struct O *);
-s32 sub_0804A06C(void);
+s32 TetherActor_BeginKindFourStateNine(void);
 void Script_Call(void *, u32);
 void sub_08052CE4(struct O *);
 void sub_08052C28(struct O *o)
@@ -56,7 +56,7 @@ void sub_08052C28(struct O *o)
             pf = &o->b1c3;
             *pf = 0;
             if (sub_0805238C(o)) {
-                if (sub_0804A06C())
+                if (TetherActor_BeginKindFourStateNine())
                     *pf = 1;
             }
             o->flags50 &= ~0x200;

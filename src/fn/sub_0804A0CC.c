@@ -1,8 +1,8 @@
-#include "global.h"
+#include "tether_actor.h"
 extern u8 *gUnk_02000488;
-void sub_08049168(u8 *, u32);
+void TetherActor_SetState(u8 *, u32);
 u32 sub_0805C760(u8 *);
-u32 sub_0804A0CC(u32 a, u32 b)
+u32 TetherActor_RequestKindNineAction(u32 a, u32 b)
 {
     if (gUnk_02000488) {
         if (!sub_0805C760(gUnk_02000488)) {

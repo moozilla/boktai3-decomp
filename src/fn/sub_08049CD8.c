@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "tether_actor.h"
-#define TetherActor_CanStartInteraction sub_08049CD8
 extern struct TetherActor *gUnk_02000488;
 u32 TetherActor_CanStartInteraction(void)
 {
@@ -14,7 +13,7 @@ u32 TetherActor_CanStartInteraction(void)
     if (actor->blendRequested)
         goto no;
     asm("" ::: "r2");
-    if (actor->effectsSuppressed)
+    if (actor->statusFlags)
         goto no;
     asm("" ::: "r2");
     if (actor->interactionCooldown)

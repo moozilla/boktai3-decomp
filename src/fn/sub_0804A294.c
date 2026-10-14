@@ -1,5 +1,4 @@
 #include "tether_actor.h"
-#define TetherActor_SetTransformFromScript sub_0804A294
 extern struct TetherActor *gUnk_02000488;
 u8 *sub_0821D64C(s32, s32);
 void TetherActor_SetTransformFromScript(void)

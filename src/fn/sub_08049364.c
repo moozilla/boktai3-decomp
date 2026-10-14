@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "tether_actor.h"
-#define TetherActor_BeginAuxiliaryState sub_08049364
-#define TetherActor_SetState            sub_08049168
-#define TetherActor_UpdatePendingEffect sub_080492A4
 void TetherActor_CreateAuxiliarySprite(struct TetherActor *);
 void TetherActor_SetState(struct TetherActor *, u32);
 void TetherActor_UpdatePendingEffect(struct TetherActor *);

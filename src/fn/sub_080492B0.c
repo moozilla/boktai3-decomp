@@ -1,5 +1,4 @@
 #include "tether_actor.h"
-#define TetherActor_TestInteractionPath sub_080492B0
 u32 sub_0821FCDC(void *);
 void sub_0821FD3C(void *, void *);
 u32 sub_0821F2EC(void *, void *, void *);

@@ -1,9 +1,9 @@
-#include "global.h"
+#include "tether_actor.h"
 extern u8 *gUnk_02000488;
 struct P {
     u32 a, b;
 };
-void sub_08049B3C(struct P *a, u32 b)
+void TetherActor_SetInteractionTarget(struct P *a, u32 b)
 {
     u8 *p = gUnk_02000488;
     if (p) {

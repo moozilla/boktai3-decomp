@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "tether_actor.h"
-#define TetherActor_BeginDirectedState sub_0804A15C
-#define TetherActor_SetState           sub_08049168
 extern u8 *gUnk_02000488;
 void TetherActor_SetState(struct TetherActor *, u32);
 void TetherActor_BeginDirectedState(struct ContactPosition *position)

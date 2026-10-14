@@ -1,12 +1,12 @@
-#include "global.h"
+#include "tether_actor.h"
 extern u8 *gUnk_02000488;
-void sub_08049168(u8 *, u32);
-u8 sub_0804A138(void)
+void TetherActor_SetState(struct TetherActor *, u32);
+u8 TetherActor_GetRequestMode(void)
 {
-    u8 *p = gUnk_02000488;
+    struct TetherActor *p = (struct TetherActor *)gUnk_02000488;
     u8 r;
     if (p)
-        r = p[0x3E9];
+        r = p->requestMode;
     else
         r = 0;
     return r;
