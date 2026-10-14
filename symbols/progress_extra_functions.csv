@@ -13,6 +13,7 @@ address,evidence
 0800CBA0,Independent 12-byte global manager reset after allocator return and pool
 0800F4B8,Independent 12-byte store of zero to gUnk_02000048 between sub_0800F474 and sub_0800F4C4 (twin of sub_0800F6EC)
 08012134,Independent 2-byte bx lr stub between sub_08012114 and AnimatedHazard_WaitForPlayer (left as data by gbadisasm); exact C in src/animated_hazard.c
+08013BDC,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched)
 08015A0C,Independent Thumb function prologue after 136-byte ring emission wrapper; retained unmatched byte tail
 08015B1C,Independent 104-byte fan emission wrapper after volume emitter and its literal pool
 08015C90,Independent Thumb function prologue after 96-byte burst emission wrapper; retained unmatched byte tail
@@ -28,8 +29,12 @@ address,evidence
 08020F48,Independent 36-byte scene-message activity query after signal-consumption return; exact C
 080216D8,Independent motion-offset setter after callback registration return and literal; exact 16-byte C body
 08021BC0,Independent available-position query after event-script return and literals; exact 36-byte C body
+08028DFC,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+0802CCE0,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 0802CED0,Independent 40-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md
 0802CEF8,Independent 24-byte Thumb body with own prologue/calls/return in retained 0802CD04 tail; standalone exact check; notes/push20-root.md
+0802D05C,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+0802D960,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08180898,Independent 28-byte callback-clear helper (push/pop-bx) after preceding return; exact standalone C
 08197AE0,Independent 76-byte palette-hold task constructor (own push/pop-bx and literal pool) after sub_08197A50; exact standalone C
 08197C20,Independent 56-byte palette-cycle constructor for an anim (push/pop-bx; literal pool) after sub_08197B7C helpers; exact standalone C

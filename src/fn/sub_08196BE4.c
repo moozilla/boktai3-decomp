@@ -20,41 +20,41 @@ void Trigger_ConsumePending(void *, u32);
 void sub_08196BE4(struct P08196BE4 *t)
 {
     switch (t->state) {
-    case 0:
-        sub_08193680(t, 0);
-        t->x = 0;
-        t->pad = 0;
-        t->y = -0x680;
-        sub_08195014(t, 0x200, 0x980);
-        t->state++;
-        Sound_PlaySongChecked(0x400);
-        break;
-    case 1: {
-        s32 z;
-        sub_08195140(t);
-        z = t->c += 0x2000;
-        t->x = ((t->a + t->b) >> 8) + 0x200;
-        t->y = (z >> 8) + 0x980;
-        if (t->c >= 0) {
+        case 0:
+            sub_08193680(t, 0);
+            t->x = 0;
+            t->pad = 0;
+            t->y = -0x680;
+            sub_08195014(t, 0x200, 0x980);
             t->state++;
-            t->d = -0xc00;
-            t->e = 0x88;
-            t->f = 0x400;
+            Sound_PlaySongChecked(0x400);
+            break;
+        case 1: {
+            s32 z;
+            sub_08195140(t);
+            z = t->c += 0x2000;
+            t->x = ((t->a + t->b) >> 8) + 0x200;
+            t->y = (z >> 8) + 0x980;
+            if (t->c >= 0) {
+                t->state++;
+                t->d = -0xc00;
+                t->e = 0x88;
+                t->f = 0x400;
+            }
+            break;
         }
-        break;
-    }
-    case 2: {
-        s32 z;
-        sub_08195140(t);
-        t->a += t->d;
-        z = t->c += 0x2000;
-        t->x = ((t->a + t->b) >> 8) + 0x200;
-        t->y = (z >> 8) + 0x980;
-        if (t->a < -0x60000) {
-            t->state++;
-            Trigger_ConsumePending(t->queue, 1);
+        case 2: {
+            s32 z;
+            sub_08195140(t);
+            t->a += t->d;
+            z = t->c += 0x2000;
+            t->x = ((t->a + t->b) >> 8) + 0x200;
+            t->y = (z >> 8) + 0x980;
+            if (t->a < -0x60000) {
+                t->state++;
+                Trigger_ConsumePending(t->queue, 1);
+            }
+            break;
         }
-        break;
-    }
     }
 }

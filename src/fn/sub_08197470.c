@@ -29,21 +29,21 @@ s32 sub_08197470(u8 *t)
         struct Globals08197470 *g = gUnk_0200047C;
         struct Msg08197470 *cmd = queue->commands[g->bank][i];
         switch (cmd->type) {
-        case 0:
-            sub_08195A4C(t, 0xd);
-            break;
-        case 33:
-            sub_08195A4C(t, 0xe);
-            break;
-        case 34:
-            sub_08195A4C(t, 0xf);
-            break;
-        case 35:
-            sub_08195A4C(t, 0x10);
-            break;
-        case 36:
-            sub_08195A4C(t, 0x12);
-            break;
+            case 0:
+                sub_08195A4C(t, 0xd);
+                break;
+            case 33:
+                sub_08195A4C(t, 0xe);
+                break;
+            case 34:
+                sub_08195A4C(t, 0xf);
+                break;
+            case 35:
+                sub_08195A4C(t, 0x10);
+                break;
+            case 36:
+                sub_08195A4C(t, 0x12);
+                break;
         }
         sub_08020D54(queue, cmd);
     }

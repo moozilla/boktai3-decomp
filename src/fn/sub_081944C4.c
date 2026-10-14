@@ -30,7 +30,8 @@ void sub_081944C4(u8 *t)
     *(u16 *)(t + 0x71c0) = hz;
     h = *(u16 *)(t + 0x726e) >> 1;
     collider = t + 0x7168;
-    Collider_Init(collider, *(u32 *)(t + 0x4c), 0x2001, 0, 16, (void *)gUnk_0824F4EC, (void *)gUnk_0824F4F4);
+    Collider_Init(collider, *(u32 *)(t + 0x4c), 0x2001, 0, 16, (void *)gUnk_0824F4EC,
+                  (void *)gUnk_0824F4F4);
     sub_0821FF58(collider, h, 10, 0, 0x40000, 30);
     Collider_SetCallback(collider, NULL, NULL);
 }

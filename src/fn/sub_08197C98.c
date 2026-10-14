@@ -19,27 +19,27 @@ void sub_08197C98(void *task)
     u8 *dst = t->buf;
     s32 i;
     switch (t->state) {
-    case 0:
-        for (i = 0; i < t->count; i++) {
-            sub_08221208(dst, src, 0x7fff, t->phase, 3);
-            src += 0x20;
-            dst += 0x20;
+        case 0:
+            for (i = 0; i < t->count; i++) {
+                sub_08221208(dst, src, 0x7fff, t->phase, 3);
+                src += 0x20;
+                dst += 0x20;
+            }
+            if (++t->phase > 7) {
+                t->state = 1;
+                t->phase = 0;
+            }
+            break;
+        case 1: {
+            u32 level = 16 - t->phase;
+            for (i = 0; i < t->count; i++) {
+                sub_08221208(dst, src, 0x7fff, level, 4);
+                src += 0x20;
+                dst += 0x20;
+            }
+            if (++t->phase > 15)
+                Task_Kill(task);
+            break;
         }
-        if (++t->phase > 7) {
-            t->state = 1;
-            t->phase = 0;
-        }
-        break;
-    case 1: {
-        u32 level = 16 - t->phase;
-        for (i = 0; i < t->count; i++) {
-            sub_08221208(dst, src, 0x7fff, level, 4);
-            src += 0x20;
-            dst += 0x20;
-        }
-        if (++t->phase > 15)
-            Task_Kill(task);
-        break;
-    }
     }
 }
