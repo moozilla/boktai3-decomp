@@ -20,12 +20,16 @@ struct TetherActor {
     u16 palette[16];
     u8 unknown44[12];
     struct ContactPosition position;
-    u8 unknown58[0x34];
+    struct ContactPosition movementPosition;
+    void *movementProbe;
+    u8 unknown64[0x28];
     union {
         struct DisplayAnimation animation;
         struct TetherPaletteView colors;
     } display;
-    u8 unknown120[0xB8];
+    u8 unknown120[6];
+    u16 movementCell;
+    u8 unknown128[0xB0];
     u8 interactionProbe[0x6C];
     u8 auxiliaryRegistration[0x10];
     u8 auxiliaryRegistered, state;
@@ -48,17 +52,21 @@ struct TetherActor {
     struct ContactSwarmSprite auxiliarySprite;
     struct ContactSwarmGraphics auxiliaryGraphics;
     u8 effectsSuppressed;
-    u8 unknown3E5[0x25];
+    u8 unknown3E5[0x17];
+    u16 interactionLock;
+    u8 unknown3FE[0xC];
     u16 interactionEnabled, currentValue, maximumValue;
     struct ContactPosition interactionTarget;
-    u8 unknown418[0x1C];
+    u32 interactionValue;
+    u16 interactionReset, interactionCooldown;
+    u8 unknown420[0x14];
     struct ContactPosition auxiliaryOrigin;
     u8 unknown43C[0x32];
     u16 blendHold;
     u8 unknown470[2];
     u8 blendRequested, unknown473[9];
     void *pendingEffectHandle;
-    u8 unknown480[4];
+    u16 effectValue, unknown482;
 };
 /* Additional player view: these fields are distinct from player.h's facing/actionMode. */
 struct TetherPlayer {
