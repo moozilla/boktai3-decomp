@@ -1,6 +1,4 @@
 #include "contact_actor.h"
-#define ContactActorPool_HideSlots sub_08042B50
-#define ContactActor_HideSlot      sub_08042B28
 s32 ContactActor_HideSlot(struct ContactActorPool *, struct ContactActor *, s32);
 void sub_080224E4(void *);
 void ContactActorPool_HideSlots(struct ContactActorPool *pool)

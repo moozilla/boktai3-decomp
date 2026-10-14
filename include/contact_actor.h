@@ -1,7 +1,7 @@
 #ifndef GUARD_CONTACT_ACTOR_H
 #define GUARD_CONTACT_ACTOR_H
 /* Tentative sixteen-slot contact actor pool, beginning at 080427FC. */
-#include "engine.h"
+#include "display_animation.h"
 struct ContactPackedVector {
     s32 x : 16;
     s32 y : 16;
@@ -19,19 +19,25 @@ struct ContactCollider {
     u8 direction;
     u8 unknown43[0x11];
 };
+struct ContactPosition {
+    s16 x, y, z, pad;
+} __attribute__((aligned(4)));
 struct ContactActor {
-    u8 active, state;
-    u8 unknown2[2];
+    u8 enter, state;
+    u8 finished, bobPhase;
     u16 stateFrame;
     u8 direction, unknown7;
-    s8 reactionFlag;
-    u8 reactionTimer;
-    u8 unknownA[0xA];
-    s32 position[3];
-    u8 unknown20[0xC];
+    s8 targetIndex;
+    u8 retargetTimer;
+    u8 unknownA[2];
+    s16 targetHeight;
+    u8 unknownE[2];
+    u16 speed, unknown12;
+    struct ContactPosition position;
+    u8 unknown1C[0x10];
     struct ContactCollider resourceCollider, healthCollider;
-    u8 sequenceD4[0x10];
-    u8 sprite[0x2C];
+    struct DisplaySequenceState sequence;
+    struct DisplaySequenceSprite sprite;
     u8 graphics[0x1C];
     u8 shadow[0x40];
 };
@@ -39,9 +45,11 @@ struct ContactActor {
 struct ContactActorPool {
     u8 task[0x18];
     u32 state;
-    u8 unknown1C[4];
+    u16 unknown1C;
+    u8 clearRequested, mode;
     u16 resourceColliderId, healthColliderId;
-    u8 unknown24[0xC];
+    u8 unknown24[4];
+    const struct ContactPosition *targets[2];
     u8 scriptState[0xC];
     struct ContactActor slots[16];
     u8 unknown16FC[4];

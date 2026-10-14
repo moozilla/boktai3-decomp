@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_actor.h"
 #include "player.h"
-#define ContactActor_ApplyHealthContact sub_080427FC
 struct ContactModeActor {
     u8 unknown0[0x358];
     u32 mode;

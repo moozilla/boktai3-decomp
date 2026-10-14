@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 23.001% matching (2026-10-14). This file is the single
+Last updated after reaching 23.049% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,37 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex): contact actor setup, reactions and display
+
+Matching is **23.049%**, up **0.047 percentage points** (+1,144 bytes), with
+**6,359 / 11,465 functions**, **556,706 / 2,415,354 bytes**. Seven exact additions
+cover both contact callbacks, slot/pool hiding, directional sequence selection,
+playback/height/bobbing, and the advance state. Without register pinning:
+**18.990%**; Register-pinned: **4.059%**, included above. The dual-collider
+initializer is an **88.6% guarded draft**, with no exact credit; 69 drafts overall.
+
+The **080427FC–08042E18** subsection is a sixteen-slot, 0x16C-stride pool with
+resource/health colliders, sequence sprite and shadow. The shared view corrects
+positions to packed halfwords and byte 0 to an entry flag. The signed byte +8
+selects a target, and +9 delays retargeting. Gameplay identity stays tentative.
+See [contact-pool notes](../notes/contact-actor-pool_2026-10-14.md).
+
+Claude's PRs 85–90 are integrated: structured actor-registry data, asset/script
+decoders, engine/command documentation and thirteen unpinned functions. Read
+[ENGINE.md](ENGINE.md), [ASSETS.md](ASSETS.md) and [DATA.md](DATA.md) for the new
+context. ScriptProc_Start is a resource lookup, with its historical name retained.
+The decoded registry passes the byte-exact roundtrip check. These changes shift
+pin categories but add no exact C bytes.
+
+Every new match passed reviewed full-extent checks and hint minimization; changed
+existing consumers were rechecked. The complete combined build printed
+**`build/boktai3.gba: OK`** (`build/contact-actor-final-combined.log`), with
+format, inventory, RAM-literal and decoded-data checks passing. Continue toward **25% matching or 80% remaining**; last account
+reading is **89% remaining**. Next contiguous subsection begins at **08042E18**
+(tracking), followed by 08042F44 and later handlers. Tracking currently has a
+77.7% checkpoint, 308 versus 300 bytes; it is not accepted or credited. The
+primary checkout now owns main, so do not force its local branch ref.
 
 ## October 14 (Codex): script selector and shared display animation
 

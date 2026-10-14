@@ -2,10 +2,9 @@
 // fuzzy: 88.6%
 // Reviewed original extent: 384 bytes; candidate is 380 bytes. Initialization ordering/allocation differs.
 #include "contact_actor.h"
-#define ContactActor_InitializeSlot sub_08042984
 void Shadow_Initialize(void *, void *, s32);
-void sub_080427FC(struct ContactCollider *, struct ContactCollider *, struct ContactActor *);
-#define ContactActor_ApplyResourceContact sub_0804293C
+void ContactActor_ApplyHealthContact(struct ContactCollider *, struct ContactCollider *,
+                                     struct ContactActor *);
 void ContactActor_ApplyResourceContact(void *, struct ContactCollider *, struct ContactActor *);
 void sub_0821FF7C(void *, u32, u32, u32);
 void sub_0821FF58(void *, u32, u32, u32, u32, u32);
@@ -44,7 +43,7 @@ void ContactActor_InitializeSlot(struct ContactActorPool *pool, struct ContactAc
     Collider_Init(collider, 0, 0x4005, 0, 16, &bounds, &offset);
     position = &slot->position;
     Collider_SetPosition(collider, (void *)position, 0);
-    Collider_SetCallback(collider, sub_080427FC, slot);
+    Collider_SetCallback(collider, ContactActor_ApplyHealthContact, slot);
     sub_0821FF7C(collider, pool->healthColliderId, 0x82, 1);
     Collider_Refresh(collider);
     collider = &slot->resourceCollider;
@@ -62,5 +61,5 @@ void ContactActor_InitializeSlot(struct ContactActorPool *pool, struct ContactAc
 
 #else
 #include "global.h"
-INCLUDE_ASM("asm/nonmatching", sub_08042984);
+INCLUDE_ASM("asm/nonmatching", ContactActor_InitializeSlot);
 #endif
