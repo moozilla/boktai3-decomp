@@ -37,14 +37,14 @@ s32 ScenePool_ParseEntryParameters(struct ScenePoolEntry *entry)
         position.z = 0;
     }
     {
-        s32 *dst = entry->position;
-        entry->position[0] = position.x << 12;
+        s32 *dst = &entry->position.x;
+        entry->position.x = position.x << 12;
         dst[1] = position.y << 12;
         dst[2] = position.z << 12;
     }
     range = Script_GetKeywordValue('r', 20000);
-    entry->origin = entry->position[0];
-    entry->limit = entry->position[0] + (range << 12);
+    entry->origin = entry->position.x;
+    entry->limit = entry->position.x + (range << 12);
     entry->state = 0;
     entry->stateFrame = 0;
     entry->stateEntered = 1;
