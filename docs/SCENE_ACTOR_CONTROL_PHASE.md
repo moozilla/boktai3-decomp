@@ -73,3 +73,43 @@ terrain script when2CC lacks0400. Neither test clears its flags. It then clears
 AA, installs default response controlFC90/kind16, sets animation1/0/2 and
 disables the shadow. All nine new bodies total1704 bytes (+0.0705 percentage
 points):268 ordinary and1436 register-pinned.
+
+82D80 matches496 register-pinned bytes. Preparation sets2D4 bit20, animation3,
+and secondary-collider flag4. Every call sets2D0 bit100000, takes signed
+(310−318)/4 and (314−31C)/4 with truncation toward zero, clamps each to±200,
+then adds them to motion X/Z and the saved318/31C values. A zero pair means
+both truncated deltas are zero, not necessarily equality of the original values.
+It then sets2B0, clears2D4 bit20 and2CC bit80, and clears context phase3E2.
+Actor EB bit8 selects animation0/2/0 plus player-facing setup, or sets EB bit8
+and animation0/0/3; both paths set2D4 bit100 and call83E34. An intermediate
+hard-register trial incorrectly omitted one whole path and was rejected. The
+accepted whole496 bytes include both paths and use no explicit r7 binding.
+
+All entries in82648–83550 now have complete static semantic review. The two
+remaining assembly bodies have valid private C drafts.82648(888-byte target,
+880-byte draft/53.8% fuzzy) admits destination kind1 and performs two actor
+availability checks, conditionally records contact ID4 at actor304, clears2D0
+bit01000000 and calls the shared contact operation. Field1E6 values1 or12–15
+allow health recovery from contact3E, capped at default healthB0; colliderA3E
+and actor2E6 record the applied amount. Global4800 flags, actor2E0 and optional
+selection18 gate the status/number display. Its initialized eight-byte zero
+vector is supplied to DamageNumberDisplay_Show. Final control logic clears
+contextflag8 and, when flag4 is absent, installs FC90/kind16, selecting the
+EB-bit8-dependent animation path. Null actor is a caller-precondition violation
+if these later accesses are reached; the availability helper adds no fallback.
+Field1E6's broader meaning remains tentative despite its current shared name.
+
+83354(508-byte target and full508-byte/98.4% draft) restores default control228
+on state entry, clears eight context bytes42C, saves an RNG byte at context3EC,
+and initializes sine-based secondary motion X/Z divided toward zero by128.
+It recomputes those components while signed counter2AC≤5. A zero squared
+magnitude clears the full eight-byte motion vector, runs83E34/player-facing
+setup, and installs animation0/2/0; every call increments the counter. The C
+sum uses unsigned32-bit products/addition to preserve the assembly's wrapping
+arithmetic for extreme signed-halfword inputs. Six differing bytes are two
+LDRSH scratch-register pairs, in a fresh frozen four-hour/j1 permuter queue
+(run-g042m0h3). No draft or permuter score contributes exact credit.
+
+The ten new exact bodies in this section total2200 bytes (+0.0911 percentage
+points):268 ordinary and1932 register-pinned. The adjoining motion/ground/sway
+cohort at83550–83AEC is handled separately and includes its own context view.
