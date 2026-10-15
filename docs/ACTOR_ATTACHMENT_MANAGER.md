@@ -83,15 +83,20 @@ New ordinary-boundary exact bodies in this batch are `65C50` (204), `65D1C`
 bytes, +0.0517 percentage points**. Those bodies carry temporary register-pin
 concessions, reduced with `tools/depin.py`; none binds `r7` or embeds instruction
 bodies. Descriptor dispatch at `66DB8` adds a further **472 ordinary C bytes**,
-for **1,720 new bytes / +0.0712 percentage points** in total. Its five initial
+for **1,720 new bytes / +0.0712 percentage points** before the single-part
+creator. `66278` adds **508 register-pinned bytes**, bringing this cohort to
+**2,228 new bytes / +0.0922 percentage points** (472 ordinary, 1,756 pinned).
+Its 109 initial hints were reduced to 62. Integer address temporaries preserve
+two-step stack addressing while reconstructing pointers to the actual output
+locals; no pointer outside an object is formed. Its five initial
 register hints were all removed after correcting the forwarding wrapper count
 parameter to a full word. The wrapper itself does not truncate that argument;
 its caller explicitly sign-extends the halfword value before forwarding. `66CB8` adds explicit correctness evidence for previously credited bytes.
 Every changed C unit is checked across its full reviewed inventory extent.
 The orchestrator performs the combined ROM build before integration.
 
-Unmatched bodies remain `65FD0` (680), `66278` (508), `66474` (612), `666D8`
-(472), `668B0` (472). The first three form the value/part
+Unmatched bodies remain `65FD0` (680), `66474` (612), `666D8`
+(472), `668B0` (472). The first two form the value/part
 creation family. Two exact forwarding wrappers at `66A88`/`66AB4` expose its
 fixed-three-part and explicit-part-count call contracts. The common creator
 sets kind 3 itself, divides the total value range by three, and initializes each
