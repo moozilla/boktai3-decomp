@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "proximity_emitter.h"
-#define ProximityEmitter_TickRise sub_08051CB4
 void ProximityEmitter_TickRise(struct ProximityEmitter *input)
 {
     struct ProximityEmitter *emitter = input;
@@ -18,7 +17,7 @@ void ProximityEmitter_TickRise(struct ProximityEmitter *input)
                 asm("" : "+r"(zero));
                 *frameAddress = zero;
             }
-            emitter->update = sub_08051BD8;
+            emitter->update = ProximityEmitter_TickActive;
         } else {
             u16 *height = (u16 *)&emitter->position.y;
             u32 rise = frame * 2;
@@ -45,6 +44,6 @@ void ProximityEmitter_TickRise(struct ProximityEmitter *input)
         frame &= 1;
         asm("" : "+r"(frame));
         if (frame == 0)
-            sub_08051A8C(emitter, emitter->particleResource);
+            ProximityEmitter_EmitParticle(emitter, emitter->particleResource);
     }
 }

@@ -1,7 +1,6 @@
 #include "stacked_actor.h"
-#define StackedActor_Destroy sub_080531BC
 void Sprite_Remove(void *);
-void sub_08217EAC(struct StackedActorParticle *);
+void Effect_Remove(struct StackedActorParticle *);
 void sub_08020D08(void *);
 s32 StackedActor_Destroy(struct StackedActor *actor)
 {
@@ -22,7 +21,7 @@ s32 StackedActor_Destroy(struct StackedActor *actor)
     particle = actor->particles;
     i = 7;
     do {
-        sub_08217EAC(particle);
+        Effect_Remove(particle);
         particle++;
         i--;
     } while (i >= 0);

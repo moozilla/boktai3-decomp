@@ -1,5 +1,4 @@
 #include "interaction_marker.h"
-#define InteractionMarker_Destroy sub_08053AC4
 void sub_08225938(void *);
 u32 InteractionMarker_Destroy(struct InteractionMarker *marker)
 {

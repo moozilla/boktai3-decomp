@@ -1,5 +1,4 @@
 #include "stacked_actor.h"
-#define StackedActor_HoldLift sub_08052744
 void AnimData_SelectTiles(void *, u32);
 void Sound_PlaySong(u32);
 void StackedActor_HoldLift(struct StackedActor *o)

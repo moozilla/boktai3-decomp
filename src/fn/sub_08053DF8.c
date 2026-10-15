@@ -1,12 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "saved_position_marker.h"
-#define SavedPositionMarker_TickIdle sub_08053DF8
 void SavedPositionMarker_TickIdle(struct SavedPositionMarker *marker)
 {
     u32 nearby;
     if (!(gUnk_030053F4 & 0x200) && marker->inputCooldown <= 9)
         marker->inputCooldown++;
-    nearby = sub_08053D8C(marker);
+    nearby = SavedPositionMarker_IsStoredPositionNearby(marker);
     if (nearby) {
         if (marker->nearby != 1) {
             Sound_PlaySong(0x198);
@@ -33,7 +32,7 @@ void SavedPositionMarker_TickIdle(struct SavedPositionMarker *marker)
                         marker->activationFrame = 8;
                         sub_08056C6C(1);
                         sub_0815B0A8(gUnk_02000580[0], &marker->position, 0, 4);
-                        sub_08053DE8(marker, sub_08053F48);
+                        SavedPositionMarker_SetState(marker, SavedPositionMarker_TickInteraction);
                     }
                 }
             }

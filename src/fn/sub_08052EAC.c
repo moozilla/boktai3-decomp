@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "stacked_actor.h"
-#define StackedActor_EmitRisingParticles sub_08052EAC
 extern u8 *gUnk_02000580;
 void sub_0815B9CC(u8 *, u32, u32);
 void StackedActor_EmitRisingParticles(struct StackedActor *actor)
@@ -22,6 +21,6 @@ void StackedActor_EmitRisingParticles(struct StackedActor *actor)
         actor->frame = next;
         next = (u16)next;
         if (next > 32)
-            sub_08052628(actor, sub_08052F1C);
+            StackedActor_SetUpdate(actor, StackedActor_WaitForRetraction);
     }
 }

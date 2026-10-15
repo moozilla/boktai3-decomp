@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 24.840% matching (2026-10-14). This file is the single
+Last updated after reaching 25.179% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,54 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex/Sol): proximity emitters, stacked actor and interaction markers
+
+Exact code is **25.179%**, up **0.3390 percentage points** (+8,188 bytes)
+from thirty-one new functions. There are **6,601 / 11,472 functions** and
+**608,170 / 2,415,354 bytes**. Without register pinning: **19.847%**;
+Register-pinned: **5.332%**, included above. New exact bytes comprise2,528
+without hints and5,660 with minimized concessions. Seventy-seven drafts remain.
+
+Parent completed three contiguous cohorts with shared layouts and named contracts:
+**08051A3C–08052130** proximity emitter (1,780 bytes),
+**080537D0–08053D8C** interaction marker (1,468), and
+**08053D8C–08054294** saved-position marker (1,288). The first uses tether proximity
+and an eight-slot particle ring; the two markers distinguish live player position
+from GameState's stored position, with animation/input gates and script dispatch.
+The emitter's proximity helper preserves the original nonvoid fallthrough
+outside its squared radius after passing the bounding box; its callers observe
+nonzero there. See [emitter notes](../notes/proximity-emitter_2026-10-14.md),
+[live-position marker](../notes/interaction-marker_2026-10-14.md), and
+[stored-position marker](../notes/saved-position-marker_2026-10-14.md).
+
+Sol recovered the stacked display actor **08052130–080537D0**:17 new exact
+functions (4,344 bytes), plus16 existing helpers (1,272 bytes) typed/named without
+extra credit. Sole gap **521DC,176 bytes** remains assembly; do not call the whole
+cohort complete. Large script initialization (1,212 bytes) and height-band display
+(528) match with minimized concessions. Header has sprite/shadow/three segments,
+eight particles, receiver/state callbacks and integer script IDs. Hidden helper
+**52E04–52E80** is now separately recorded in both extra-boundary CSVs and the
+refreshed progress inventory; it is not padding of52D60. See
+[stacked actor contracts](STACKED_ACTOR.md).
+
+New display-track evidence at54EC0 confirms the legacy helper
+**AnimData_SelectTiles selects32-byte palette banks**: its consumer interpolates
+sixteen RGB15 colors between them. Correct semantic names in the following batch;
+current marker baseTile fields and shared helper retain legacy names. The cohort
+notes distinguish observed palette behavior from the old labels.
+
+Combined build printed **`build/boktai3.gba: OK`** in
+`build/proximity-markers-combined.log`; 62 complete extent checks are recorded in
+`build/proximity-markers-postchecks.json`. Format/inventory/RAM and all twelve
+data round trips pass. Prior PR135 main Actions passed atad99374f.
+
+Continue toward **30% exact or40% account usage remaining** (the old25% milestone
+is surpassed). Latest usage: **60% remaining**. Sol continues521DC and then
+**54294–54B80** hit-switch manager (02000490, entries118 at3C, capacity8).
+Parent owns **54B80–5560C**, display-track manager02000494, entriesB8 at1C.
+Keep checkouts/build outputs isolated and integrate coherent batches after one
+combined ROM validation. No new runtime coverage claims.
 
 ## October 14 (Codex/Sol): station, repeated effects, force and breakable props
 

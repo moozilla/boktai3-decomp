@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "interaction_marker.h"
-#define InteractionMarker_InitializeFromScript sub_08053AEC
 u8 *sub_0821D64C(s32, s32);
 void sub_08225AB4(void *, u32, void *, u32, u32, void *);
 void sub_08003C00(void *);
@@ -227,6 +226,6 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
         destination[0] = lo;
         destination[1] = hi;
     }
-    sub_08053854(marker, sub_0805386C);
+    InteractionMarker_SetState(marker, InteractionMarker_TickIdle);
     return 0;
 }

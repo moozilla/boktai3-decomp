@@ -1,5 +1,4 @@
 #include "stacked_actor.h"
-#define StackedActor_IsPlayerNearby sub_08052330
 s32 StackedActor_IsPlayerNearby(struct StackedActor *o)
 {
     struct GameState *g = gUnk_02000710;

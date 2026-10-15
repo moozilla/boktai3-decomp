@@ -1,5 +1,4 @@
 #include "stacked_actor.h"
-#define StackedActor_InitParticles sub_0805321C
 void *AnimData_FindEntry(u32);
 void sub_08217DE0(struct StackedActorParticle *, void *, u32);
 void sub_08217EC4(struct StackedActorParticle *, s32, s32);

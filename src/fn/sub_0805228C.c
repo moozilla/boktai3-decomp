@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "stacked_actor.h"
-#define StackedActor_InitFallingParticle sub_0805228C
 void StackedActor_InitFallingParticle(struct StackedActorParticle *particle,
                                       struct StackedActorPosition *position)
 {

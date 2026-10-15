@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "proximity_emitter.h"
-#define ProximityEmitter_EmitParticle sub_08051A8C
 void ProximityEmitter_EmitParticle(struct ProximityEmitter *emitter, void *resource)
 {
     register u8 *next asm("r10") = &emitter->nextParticle;

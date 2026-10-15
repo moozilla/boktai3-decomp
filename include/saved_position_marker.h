@@ -14,12 +14,13 @@ struct SavedPositionMarker {
     u16 stateFrame, unknownC6;
     void (*update)(struct SavedPositionMarker *);
 };
-u32 sub_08053D8C(struct SavedPositionMarker *);
-void sub_08053DE8(struct SavedPositionMarker *, void (*)(struct SavedPositionMarker *));
-void sub_08053DF8(struct SavedPositionMarker *);
-void sub_08053F48(struct SavedPositionMarker *);
-void sub_08053FF4(struct SavedPositionMarker *);
-u32 sub_08053FF8(struct SavedPositionMarker *);
-u32 sub_0805400C(struct SavedPositionMarker *);
-s32 sub_08054028(struct SavedPositionMarker *, u32, u32);
+u32 SavedPositionMarker_IsStoredPositionNearby(struct SavedPositionMarker *);
+void SavedPositionMarker_SetState(struct SavedPositionMarker *,
+                                  void (*)(struct SavedPositionMarker *));
+void SavedPositionMarker_TickIdle(struct SavedPositionMarker *);
+void SavedPositionMarker_TickInteraction(struct SavedPositionMarker *);
+void SavedPositionMarker_TickDormant(struct SavedPositionMarker *);
+u32 SavedPositionMarker_Tick(struct SavedPositionMarker *);
+u32 SavedPositionMarker_Destroy(struct SavedPositionMarker *);
+s32 SavedPositionMarker_InitializeFromScript(struct SavedPositionMarker *, u32, u32);
 #endif

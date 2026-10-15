@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "stacked_actor.h"
-#define StackedActor_EmitScriptParticles sub_08052D60
 struct ScriptParticleArgs {
     u32 count : 16;
     u32 pad : 16;
@@ -15,7 +14,7 @@ void StackedActor_EmitScriptParticles(struct StackedActor *actor)
         u32 mask = 3;
         mask &= frame;
         if (!mask)
-            sub_0805228C(&actor->particles[shifted >> 18], &actor->world);
+            StackedActor_InitFallingParticle(&actor->particles[shifted >> 18], &actor->world);
     }
     {
         register u32 next asm("r0") = actor->frame + 1;

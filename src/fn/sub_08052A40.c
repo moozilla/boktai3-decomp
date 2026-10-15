@@ -1,9 +1,8 @@
 #include "stacked_actor.h"
-#define StackedActor_TickIdle sub_08052A40
 extern u32 gUnk_030053F4, gUnk_02000560;
 extern u8 *gUnk_02000580;
 extern u16 gUnk_03005260[];
-s32 sub_08052330(struct StackedActor *);
+s32 StackedActor_IsPlayerNearby(struct StackedActor *);
 void Sound_PlaySong(u32);
 void AnimData_SelectTiles(void *, u32);
 void sub_0815B0A8(u8 *, struct StackedActorPosition *, u32, u32);
@@ -12,7 +11,7 @@ void StackedActor_TickIdle(struct StackedActor *actor)
     if (!(gUnk_030053F4 & 0x200) && actor->interactionDelay <= 9)
         actor->interactionDelay++;
     {
-        s32 nearby = sub_08052330(actor);
+        s32 nearby = StackedActor_IsPlayerNearby(actor);
         if (nearby) {
             if (!actor->interactionEnabled) {
                 u32 mask = 1;
@@ -40,7 +39,7 @@ void StackedActor_TickIdle(struct StackedActor *actor)
                             actor->interactionDelay > 9) {
                             actor->animationPhase = 8;
                             sub_0815B0A8(gUnk_02000580, &actor->world, 0, 4);
-                            sub_08052628(actor, sub_08052C28);
+                            StackedActor_SetUpdate(actor, StackedActor_BeginPlayerInteraction);
                         }
                     }
                 }

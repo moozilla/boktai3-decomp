@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "stacked_actor.h"
-#define StackedActor_UpdateSegments sub_08052418
 void StackedActor_UpdateSegments(struct StackedActor *actor)
 {
     u16 *height = &actor->height;

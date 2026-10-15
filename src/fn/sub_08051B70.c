@@ -1,5 +1,4 @@
 #include "proximity_emitter.h"
-#define ProximityEmitter_IsTetherNearby sub_08051B70
 u32 ProximityEmitter_IsTetherNearby(struct ProximityEmitter *emitter)
 {
     struct ContactPosition *tether = TetherActor_GetPosition();
