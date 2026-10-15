@@ -1,5 +1,4 @@
 #include "scene_panel_interaction.h"
-#define ScenePanel_WaitTransitionGate sub_0805B9C8
 void ScenePanel_WaitTransitionGate(struct ScenePanel *input)
 {
     struct ScenePanelInteractionView *panel = (void *)input;

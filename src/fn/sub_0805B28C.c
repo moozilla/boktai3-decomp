@@ -1,5 +1,4 @@
 #include "scene_panel_interaction.h"
-#define ScenePanel_IsWithinHorizontalRadius sub_0805B28C
 s32 ScenePanel_IsWithinHorizontalRadius(const struct ContactPosition *first,
                                         const struct ContactPosition *second, s32 radius)
 {

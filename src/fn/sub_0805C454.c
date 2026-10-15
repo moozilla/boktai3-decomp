@@ -1,5 +1,4 @@
 #include "scene_panel_orchestration.h"
-#define ScenePanel_ReadInitialMode sub_0805C454
 void ScenePanel_ReadInitialMode(struct ScenePanel *input)
 {
     struct ScenePanelInteractionView *panel = (void *)input;

@@ -66,11 +66,12 @@ struct ScenePanelInteractionView {
 
 extern struct TetherActor *gUnk_02000488;
 #define SCENE_PANEL_PLAYER ((struct ScenePanelInteractionPlayer *)gUnk_02000580[0])
-s32 sub_0805B28C(const struct ContactPosition *, const struct ContactPosition *, s32);
-s32 sub_0805B2CC(struct ScenePanel *);
-s32 sub_0805B318(struct ScenePanel *);
-s32 sub_0805B34C(struct ScenePanel *);
-s32 sub_0805B3A0(struct ScenePanel *);
+s32 ScenePanel_IsWithinHorizontalRadius(const struct ContactPosition *,
+                                        const struct ContactPosition *, s32);
+s32 ScenePanel_CanAcquireTether(struct ScenePanel *);
+s32 ScenePanel_AreSubjectsSettled(struct ScenePanel *);
+s32 ScenePanel_CanAcceptPlayer(struct ScenePanel *);
+s32 ScenePanel_IsTetherDistant(struct ScenePanel *);
 void ScenePanel_SetEffectState(struct ScenePanel *, u16);
 void ScenePanel_SetState(struct ScenePanel *, void (*)(struct ScenePanel *));
 void ScenePanel_BeginForwardSequence(struct ScenePanel *);

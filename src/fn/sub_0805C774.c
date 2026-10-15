@@ -1,7 +1,6 @@
 #include "scene_panel_commands.h"
 #include "game_state.h"
-#define ScenePanel_SelectMode sub_0805C774
-void sub_0805C774(struct ScenePanelInteractionView *panel)
+void ScenePanel_SelectMode(struct ScenePanelInteractionView *panel)
 {
     s32 mode;
     if (panel->skipMainSprite == 0)

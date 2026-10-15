@@ -1,7 +1,6 @@
 #include "scene_panel_interaction.h"
 // MATCHING_CONCESSION: register-pinning
 
-#define ScenePanel_AdvanceTetherAcquisition sub_0805B40C
 void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *input)
 {
     struct ScenePanelInteractionView *panel = (void *)input;

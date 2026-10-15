@@ -1,5 +1,4 @@
 #include "scene_panel_orchestration.h"
-#define ScenePanel_SuppressMainPresentation sub_0805C470
 void ScenePanel_SuppressMainPresentation(void)
 {
     if (gUnk_020004A4) {

@@ -1,5 +1,4 @@
 #include "scene_panel_orchestration.h"
-#define ScenePanel_BeginArrivalRamp sub_0805C614
 void ScenePanel_BeginArrivalRamp(void)
 {
     struct ScenePanelInteractionView *panel = SCENE_PANEL_GLOBAL;

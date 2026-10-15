@@ -1,13 +1,12 @@
 #include "scene_panel_interaction.h"
-#define ScenePanel_WaitTetherReturn sub_0805BB20
 void ScenePanel_WaitTetherReturn(struct ScenePanel *input)
 {
     struct ScenePanelInteractionView *panel = (void *)input;
-    if (sub_0805B2CC(input)) {
+    if (ScenePanel_CanAcquireTether(input)) {
         sub_0815B15C(SCENE_PANEL_PLAYER, 0, -1, 0, 0);
         panel->variant = 2;
         ScenePanel_SetEffectState(input, 1);
-    } else if (sub_0805B3A0(input)) {
+    } else if (ScenePanel_IsTetherDistant(input)) {
         struct TetherActor *tether = gUnk_02000488;
         s32 sourceX = tether->position.x;
         struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;

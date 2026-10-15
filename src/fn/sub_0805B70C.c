@@ -1,7 +1,6 @@
 #include "scene_panel_interaction.h"
 // MATCHING_CONCESSION: register-pinning
 
-#define ScenePanel_UpdateActiveSubjects sub_0805B70C
 void ScenePanel_UpdateActiveSubjects(struct ScenePanel *input)
 {
     struct ScenePanelInteractionView *panel = (void *)input;
@@ -29,7 +28,7 @@ void ScenePanel_UpdateActiveSubjects(struct ScenePanel *input)
     }
     if (!panel->presentationState)
         ScenePanel_SetState((void *)panel, ScenePanel_BeginPulseSequence);
-    if (sub_0805B34C((void *)panel)) {
+    if (ScenePanel_CanAcceptPlayer((void *)panel)) {
         sub_0815B0A8(SCENE_PANEL_PLAYER, &panel->approachPosition, 0, 4);
         ScenePanel_SetEffectState((void *)panel, 5);
     }
