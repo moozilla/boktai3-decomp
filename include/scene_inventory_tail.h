@@ -7,7 +7,7 @@ struct SceneInventoryTail {
     struct SceneInputPanel display;
     u8 unknown14E8[0x1AA4 - 0x14E8];
     u8 interactionFlags, unknown1AA5, mode, unknown1AA7, category;
-    u8 unknown1AA9, choiceState, unknown1AAB[4], choiceRepeat;
+    u8 unknown1AA9, choiceState, clockMode, purchased, sold, blinkFrame, choiceRepeat;
     u8 page, unknown1AB1[0x1BE4 - 0x1AB1];
     struct SceneInputGridView grid;
     u8 unknown1C14[0x1D00 - 0x1C14];
