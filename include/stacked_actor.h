@@ -34,12 +34,12 @@ struct StackedActor {
     struct StackedActorSprite segments[3];
     u8 segmentGraphics[3][0x1C];
     u16 height;
-    u8 unknown1C2, tetherAccepted;
+    u8 removeAfterUse, tetherAccepted;
     u16 tileBase, animationPhase;
     struct StackedActorParticle particles[8];
     u8 lift, interactionEnabled;
     u16 interactionDelay;
-    u32 pendingScriptId, unknown370, unknown374, unknown378, unknown37C;
+    u32 pendingScriptId, completedScriptId, particleScriptId, particleScriptValue, acceptedScriptId;
     u16 unknown380, frame;
     void (*update)(struct StackedActor *);
 };
