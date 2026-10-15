@@ -1,9 +1,7 @@
 // COMPILER: old_agbcc
-#include "global.h"
-
-extern u32 gUnk_020004A4;
-
-void sub_0805C754(void)
+#include "scene_panel_commands.h"
+#define ScenePanel_ClearGlobal sub_0805C754
+void ScenePanel_ClearGlobal(void)
 {
-    gUnk_020004A4 = 0;
+    gUnk_020004A4 = NULL;
 }
