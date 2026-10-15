@@ -1,37 +1,20 @@
-#include "global.h"
-struct G {
-    u8 pad[0x30];
-    s16 x;
-    s16 padx;
-    s16 y;
+#include "stacked_actor.h"
+#define StackedActor_IsTetherNearby sub_0805238C
+struct StackedActorTetherView {
+    u8 unknown0[0x1A], mode, unknown1B[0x23A], phase;
 };
-struct V {
-    s16 x, y, z;
-};
-struct O {
-    u8 pad[0x98];
-    s16 x;
-    s16 y;
-    s16 z;
-};
-struct M {
-    u8 pad[0x1a];
-    u8 mode;
-    u8 pad2[0x255 - 0x1b];
-    u8 sub;
-};
-extern struct M *gUnk_02000488;
-extern struct V *TetherActor_GetPosition(void);
-s32 sub_0805238C(struct O *o)
+extern struct StackedActorTetherView *gUnk_02000488;
+struct StackedActorPosition *TetherActor_GetPosition(void);
+s32 StackedActor_IsTetherNearby(struct StackedActor *o)
 {
-    struct V *v = TetherActor_GetPosition();
-    if (v != 0 && gUnk_02000488->mode == 4 && gUnk_02000488->sub <= 4) {
-        s32 d = v->y - o->y;
+    struct StackedActorPosition *v = TetherActor_GetPosition();
+    if (v != 0 && gUnk_02000488->mode == 4 && gUnk_02000488->phase <= 4) {
+        s32 d = v->y - o->world.y;
         if (d < 0)
             d = -d;
         if (d <= 0xff) {
-            s32 dx = v->x - o->x;
-            s32 dz = v->z - o->z;
+            s32 dx = v->x - o->world.x;
+            s32 dz = v->z - o->world.z;
             if (dx <= 0x17c && dz <= 0x17c) {
                 if (dx * dx + dz * dz <= 0x23410)
                     return 1;
