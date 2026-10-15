@@ -1,8 +1,8 @@
-#include "global.h"
-void Script_Call(u32, u32);
-void sub_0806CFE4(u8 *p)
+#include "route_sprite_actor.h"
+#define RouteSpriteActor_RunEventScript sub_0806CFE4
+void RouteSpriteActor_RunEventScript(struct RouteSpriteActor *actor)
 {
-    u32 v = *(u32 *)(p + 0x170);
-    if (v != 0)
-        Script_Call(v, 0);
+    u32 script = actor->script;
+    if (script)
+        Script_Call(script, 0);
 }
