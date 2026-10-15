@@ -12,7 +12,7 @@ void ScenePanel_AdvanceSubjectDeparture(struct ScenePanel *input)
         for (; i < panel->subjectCount; i++) {
             struct ScenePanelInteractionSubject *subject = panel->subjects[i];
             if (subject->state == 4)
-                sub_0805CB88((void *)subject, 5);
+                ScenePanelSubject_SetState((void *)subject, 5);
         }
         ScenePanel_SetState((void *)panel, ScenePanel_BeginLongSequence);
         sub_0822B058(4);
