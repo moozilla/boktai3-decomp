@@ -1,26 +1,20 @@
-#include "global.h"
-struct W {
-    u32 a, b;
-};
-s32 Script_SeekToKeyword(s32);
-s32 Script_GetValue(void);
-void AnimData_Load(u8 *, s32);
-void Sprite_Init(u8 *, u8 *, u32);
-void sub_0805175C(u8 *p, struct W *w)
+#include "breakable_prop.h"
+#define BreakableProp_InitializeSprite sub_0805175C
+void BreakableProp_InitializeSprite(struct BreakableProp *prop, void *packet)
 {
-    u8 *q = p + 0x18;
-    u8 *r = p + 0x44;
-    s32 v;
-    if (Script_SeekToKeyword(0x74))
-        AnimData_Load(r, Script_GetValue());
+    struct ContactSwarmSprite *sprite = &prop->sprite;
+    u8 *graphics = prop->graphics;
+    s32 frame;
+    if (Script_SeekToKeyword('t'))
+        AnimData_Load(graphics, Script_GetValue());
     else
-        AnimData_Load(r, 0x9D41);
-    Sprite_Init(q, r, 0);
-    v = Script_SeekToKeyword(0x69);
-    if (v)
-        v = Script_GetValue();
-    *(u16 *)(q + 0x10) = v;
-    *(struct W *)(q + 0x1c) = *w;
-    if (Script_SeekToKeyword(0x72) && Script_GetValue())
-        *(u32 *)q |= 4;
+        AnimData_Load(graphics, 0x9D41);
+    Sprite_Init(sprite, graphics, 0);
+    frame = Script_SeekToKeyword('i');
+    if (frame)
+        frame = Script_GetValue();
+    sprite->frame = frame;
+    sprite->position = *(struct ContactPosition *)packet;
+    if (Script_SeekToKeyword('r') && Script_GetValue())
+        sprite->flags |= 4;
 }
