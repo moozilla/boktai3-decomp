@@ -146,6 +146,7 @@ address,evidence
 08078B48,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 0807C468,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 0807C53C,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+0807FE80,Independent 200-byte restoration callback after 0807FDC0 actual192-byte extent; own prologue return and pool through0807FF48; no stored Thumb pointer or direct branch reference found
 080800A4,Complete high-register prologue and matching restore through08080494; replaces interior080800AC boundary; removes8 falsely credited prior bytes
 08082BF0,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08082D20,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C

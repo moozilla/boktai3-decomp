@@ -135,6 +135,7 @@ address,isa,evidence,replacement_end
 08078B48,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08078BB4
 0807C468,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0807C4B4
 0807C53C,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0807C580
+0807FE80,thumb,Independent 200-byte restoration callback with PUSH-r4-r5-r6-r7-LR and POP/BX after 0807FDC0 return and pool; no stored Thumb pointer or direct branch reference found,0807FF48
 080800A4,thumb,Independent 1008-byte body begins with complete high-register save prologue; 080800AC is its interior push; prior 0808005C ends at080800A4 after literal pool,
 08082BF0,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08082C68
 08082D20,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08082D80
