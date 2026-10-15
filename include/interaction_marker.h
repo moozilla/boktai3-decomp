@@ -35,4 +35,7 @@ void sub_080539F4(struct InteractionMarker *);
 void sub_08053AAC(struct InteractionMarker *);
 void sub_08056C6C(u32);
 void sub_0815B0A8(struct InteractionMarkerPlayer *, struct ContactPosition *, u32, u32);
+u32 sub_08053AB0(struct InteractionMarker *);
+u32 sub_08053AC4(struct InteractionMarker *);
+s32 sub_08053AEC(struct InteractionMarker *, u32, u32);
 #endif
