@@ -17,3 +17,11 @@ Actual boundaries are83AEC/83B90/83BFC/83C38/83E18/83E34/83E70/83E98/83F3C/83F5C
 Old83AEC contains two explicit uninitialized scalar RMWs in its zero-vector construction. A private defined repair uses three signed16 bitfields (ContactPackedVector) and assigns all named XYZ components, leaving only padding unspecified. This preserves all164 bytes exactly as ordinary C; parent will port it onto canonical typed collider calls. The original two-field H layout narrows zero assignment to STRH and is unsuitable for the repair.
 
 At the20%-remaining cutoff,84210 had a full112-byte exact proof and standard hint reduction19→2;83E98 had full164-byte proof and21→8. They were frozen without further trials after the cutoff. The83B90 integer-return QC changed only word/pointer types after ROM-table review; parent must rerun its108-byte proof during final combined validation. Remaining helper bodies stay assembly/private drafts.
+
+## Resumed helper closure
+
+The completed82184 focused permuter run saved no candidates; its baseline remained30. Broad-search outputs contained only the already incorporated valid zero-store simplification. The repeated anonymous-declaration mutation assertions produced no exact evidence.
+
+The resumed pass closes84180(144B),84044(188B),and hidden83F5C(232B), all full-extent exact after standard hint reduction to7,13,and9 hints respectively. This adds564B,about0.0233percentage points; the subsection now contains1040B of new exact C, all register-pinned, with83C38(480B) still assembly. The existing420B are excluded from new progress.
+
+84044 uses the canonical player.h pointer array and its position30 field. The terrain probe uses signed arithmetic for slope-adjusted height and compares against the zero-extended ground2BE value; negative heights therefore do not cause reflection. Its XYZ sums remain within32-bit arithmetic before halfword narrowing, and no C scalar reads the temporary vector padding.
