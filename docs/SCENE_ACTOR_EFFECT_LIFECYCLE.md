@@ -67,3 +67,15 @@ there is no added check preventing that initial step from entering an adjoining
 row. The selected cell center is passed through the same two collision queries
 and failure/velocity rules as E7DC. Private variants retain the observed control
 flow and compiler-lifetime experiments; none contributes progress.
+
+The adjoining 80008 callback is exact over84 bytes. It consumes prepared2B2,
+sets control414 bit1 when the unsigned wordF0 is at mostFFFFF (otherwise clears
+it), and selects directional animation entry1. The wordF0 interpretation remains
+unknown; the comparison is preserved without assigning it a gameplay meaning.
+Three minimized allocation hints remain.
+
+A separate restoration callback begins7FE80 inside the previous retained tail.
+FDC0 ends after192 bytes; FE80 has its own prologue, full200-byte body, return
+and pool ending7FF48. Whole-ROM Thumb-pointer and decoded direct-branch scans
+found no references to the new entry. This boundary review adds one function
+without changing the code-byte denominator or claiming unmatched C credit.
