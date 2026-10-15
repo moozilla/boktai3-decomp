@@ -90,6 +90,32 @@ screen in both.
 Links to maps, sprites and palettes anywhere in the studio open in a side
 panel (Esc closes it; ⌘-click opens a tab). Every page has the same menu.
 
+* **Map around the player**: the Maps view of the current stage (chosen by
+  the scene) with the player and the screen rectangle drawn over it, and the
+  stage's doors, entrances, items and enemies (see below); it follows the
+  player and switches stage when the scene changes. Centaur sends a `player`
+  message every 6 frames: `GameState+0x30/+0x32/+0x34` and the BG2 camera
+  (`0x03004CB0`/`CB2`, ASSETS.md "BG scroll in RAM"); the studio serves the
+  latest at `/api/live/player`.
+
+## Stage maps (http://localhost:8642/gfx#maps)
+
+A stage (map, tileset, HP) is drawn with its scene data from
+`tools/assets/stages.py` (`/api/stagemeta`, built on first use into
+`build/assets/stages.json`, rebuilt when those tools change) and its terrain from
+`tools/assets/hp.py` (`/api/hp/HASH`): doors (orange, labelled with the
+destination scene; click to open that stage with the arrival entrance
+circled), entrances (green, with their ids), items and chests (hover for the
+item and its flag), enemies with their patrol paths, and optionally the
+terrain cells (walls red, slopes yellow, floor green) and named boxes. Hover a
+marker for the conditions it depends on. When several scenes use a stage,
+pick one; its palette (`proc_888`) colors the map unless a capture or the
+palette menu is chosen. `#maps/MAP-TILESET-HP/SCENE.ENTRANCE` links to a scene
+and entrance.
+
+Testing beside a running studio: `serve.py --port 8652 --link-port 8653` and
+`CENTAUR_LINK_PORT=8653` for the mGBA it should talk to.
+
 ## The Captures page (http://localhost:8642/captures)
 
 A capture list (label, group, filter; the stage survey is hidden unless
@@ -193,8 +219,9 @@ the game continued. Procedure numbers are the ones calls use (one more than
   map (ED78, as the door does) but never place or create the player: what is
   still missing is upstream of the request (compare RAM from the door frame
   with a warp attempt, outside GameState, e.g. `030042A0` changes at the
-  request). Scene procedures run their setup inside
-  `if expr<857368030000c1aba0>`, worth decoding.
+  request). Scene procedures run their setup inside `if (proc_872() == 0)`;
+  the entrance comes from `r708[0x70]`, which the door's `proc_953` sets
+  (ASSETS.md, "Stage scripts"), so a warp should set it as well.
 * `first_level` was recorded from a reset with `go("start")` partway, before
   recordings could start from a bookmark; replay it as `loadstate
   bookmarks/start.ss` followed by its inputs after the first wait (it stays in

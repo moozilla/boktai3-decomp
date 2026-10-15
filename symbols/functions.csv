@@ -1402,6 +1402,7 @@ addr,name,mode,confidence,source,notes
 08215400,ObjGfx_LoadTiles,thumb,medium,coverage,"reads sprite tile graphics 0x08BF0000-0x08CDxxxx (menu titles, button labels, portraits)"
 08215698,Video_GetBackgroundMap,thumb,high,raphaelr,(int bg) -> EWRAM buffer holding that BG's tilemap
 082156B8,Bg_ClearTilemap,thumb,low,src-alias,
+082158B0,Bg_UpdateScrollShadow,thumb,low,src-alias,masks the BG scroll records gUnk_03004C30[bg].x/y to 8 bits into the HOFS/VOFS shadow gUnk_03004C20
 0821656C,BgGfx_LoadTilemapSimple,thumb,low,src-alias,
 08216584,BgGfx_LoadTilemap,thumb,medium,coverage,reads 0x200-byte BG tilemaps (menu screens at 0x0870C238+)
 08217EAC,Effect_Remove,thumb,low,src-alias,
@@ -1436,6 +1437,15 @@ addr,name,mode,confidence,source,notes
 0821AD08,Script_Call,thumb,low,src-alias,
 0821ADD4,Text_LookupString,thumb,high,notes.txt+raphaelr,"(int id) -> char*; table 0x08D6B1F8, base 0x08D74DDC, mask 0x7FFFFFFF"
 0821B084,GameState_SelectRamBase,thumb,low,src-alias,
+0821B938,Script_ApplyOperator,thumb,low,src-alias,"expression operator (op & 0x1F of an 0xA0|op byte): 1 neg .. 21 &&, 23 right; docs/ASSETS.md"
+0821BA5C,Script_EvalExpression,thumb,low,src-alias,"evaluates a postfix script expression; 0xA0|op applies an operator, 0x16 assigns, 0xA0 ends"
+0821BB98,Terrain_SetNeighborOffsets,thumb,low,src-alias,"EngineMap+0x1C..0x22 = -width, +1, +width, -1 (neighbour cell offsets)"
+0821BBF8,Terrain_UpdateSize,thumb,low,src-alias,copies the grid width/height to gUnk_030052F8/FC
+0821BC1C,Terrain_LoadGridResource,thumb,low,src-alias,loads a grid from a type-AE1B resource (no such archive found; unused?)
+0821BC4C,Terrain_SetGrid,thumb,low,src-alias,"HP grid -> EngineMap+4, then neighbour offsets and size"
+0821DDF4,Terrain_SetBoxes,thumb,low,src-alias,"HP named boxes (doors, camera area) -> EngineMap+0xC"
+0821E5B8,Terrain_SetPaths,thumb,low,src-alias,HP patrol paths -> EngineMap+0x10
+0821F180,Terrain_SetNavMeshes,thumb,low,src-alias,HP nav meshes -> EngineMap+0x14
 0821FE40,Collider_Refresh,thumb,low,src-alias,
 0821FE6C,Collider_Remove,thumb,low,src-alias,
 0821FEB4,Collider_Init,thumb,low,src-alias,
@@ -1445,6 +1455,7 @@ addr,name,mode,confidence,source,notes
 08220D78,Anim_SetKeyframes,thumb,low,src-alias,
 08220F70,Anim_Step,thumb,low,src-alias,
 082215E4,Math_Atan2,thumb,low,src-alias,
+08225C48,Terrain_LoadHP,thumb,low,disasm,"ScriptProc_Start(0xAE6C, hp): hands the HP header offsets to Terrain_SetGrid/SetBoxes/SetPaths/SetNavMeshes; docs/ASSETS.md"
 082284F4,Clock_ClearState,thumb,low,src-alias,
 08228548,Clock_DaysInMonth,thumb,low,manual,days in month; February uses the Gregorian leap-year rule
 08228D88,SunClock_GetBaseHour,thumb,low,src-alias,

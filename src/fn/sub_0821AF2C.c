@@ -5,7 +5,7 @@ void sub_0821A8C8(u32);
 u8 *sub_0821A66C(u8 *, u32 *);
 u32 sub_0821AC6C(u8 *);
 u32 sub_0821AD2C(u8 *);
-u32 sub_0821BA5C(u8 *);
+u32 Script_EvalExpression(u8 *);
 u32 sub_0821AF2C(u8 *p, u32 a, u32 b)
 {
     u32 length, saved;
@@ -27,7 +27,7 @@ u32 sub_0821AF2C(u8 *p, u32 a, u32 b)
                 break;
             case 0x30:
                 p = sub_0821A66C(p, &length);
-                gUnk_02000610[1] = sub_0821BA5C(p);
+                gUnk_02000610[1] = Script_EvalExpression(p);
                 p += length;
                 break;
             case 0:
