@@ -73,7 +73,7 @@ void ActorAttachment_ReleaseAll(void)
                     }
                     kind = slot->resourceKind;
                     if (kind <= 1 || kind == 4 || kind == 5 || kind == 6) {
-                        u8 *active = &slot->unknown48[0];
+                        u8 *active = &slot->active48;
                         u32 present = *active;
 
                         {
