@@ -1,13 +1,8 @@
-#include "global.h"
-s32 sub_08061120(u8 *);
-void Sound_PlaySong(u32);
-void sub_0806167C(u8 *);
-void sub_08061780(u8 *);
-void sub_08061628(u8 *);
-void sub_08061914(u8 *);
-void sub_08061F18(u8 *s)
+#include "scene_inventory_control.h"
+#define SceneInventory_ConfirmEquipmentAction sub_08061F18
+void SceneInventory_ConfirmEquipmentAction(struct SceneInventoryControlView *s)
 {
-    switch (s[0x1AA6]) {
+    switch (s->mode) {
         case 4:
         case 5:
             switch (sub_08061120(s)) {
