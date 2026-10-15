@@ -1,17 +1,17 @@
-#include "global.h"
-s32 sub_0805C2DC(u8 *p)
+#include "scene_panel_config.h"
+s32 ScenePanel_AreSubjectsIdle(struct ScenePanel *input)
 {
-    s32 i = 0;
-    s32 n = p[0x1e];
-    if (i < n) {
-        s32 m = n;
-        u8 **q = (u8 **)(p + 0xbe8);
+    struct ScenePanelConfigView *parent = (void *)input;
+    s32 i = 0, count = parent->subjectCount;
+    if (i < count) {
+        s32 limit = count;
+        struct SceneRigSubject **subject = parent->subjects;
         do {
-            if ((*q)[0xd3] != 0)
+            if ((*subject)->state != 0)
                 return 0;
-            q++;
+            subject++;
             i++;
-        } while (i < m);
+        } while (i < limit);
     }
     return 1;
 }

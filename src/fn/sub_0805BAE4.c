@@ -1,14 +1,11 @@
-#include "global.h"
-void Sound_PlaySong(u32);
-void TetherActor_BeginDirectedState(u8 *);
-void ScenePanel_SetEffectState(u8 *, u32);
-void ScenePanel_CallPendingScript(u8 *, u32);
-void sub_0805BAE4(u8 *p)
+#include "scene_panel_interaction.h"
+void ScenePanel_WaitRigIdle(struct ScenePanel *input)
 {
-    if (*(u16 *)(p + 0x12e8) == 0) {
-        Sound_PlaySong(0x1eb);
-        TetherActor_BeginDirectedState(p + 0x510);
-        ScenePanel_SetEffectState(p, 0xc);
-        ScenePanel_CallPendingScript(p, 5);
+    struct ScenePanelInteractionView *panel = (void *)input;
+    if (panel->rig.state == 0) {
+        Sound_PlaySong(491);
+        TetherActor_BeginDirectedState(&panel->center);
+        ScenePanel_SetEffectState(input, 12);
+        ScenePanel_CallPendingScript(input, 5);
     }
 }

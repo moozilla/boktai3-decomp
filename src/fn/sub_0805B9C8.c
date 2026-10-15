@@ -1,15 +1,13 @@
-#include "global.h"
-extern u8 *gUnk_02000488;
-void Sound_PlaySong(u32);
-void ScenePanel_SetEffectState(u8 *, u32);
-void sub_0805B9C8(u8 *p)
+#include "scene_panel_interaction.h"
+void ScenePanel_WaitTransitionGate(struct ScenePanel *input)
 {
-    u16 *c = (u16 *)(p + 0x4fe);
-    if (*c <= 0x1d) {
-        *c += 1;
-    } else if (p[0xc12] == 0) {
-        Sound_PlaySong(0x1ea);
-        gUnk_02000488[0x255] = 0xe;
-        ScenePanel_SetEffectState(p, 9);
+    struct ScenePanelInteractionView *panel = (void *)input;
+    u16 *frame = &panel->frame;
+    if (*frame <= 29)
+        *frame += 1;
+    else if (!panel->gateC12) {
+        Sound_PlaySong(490);
+        gUnk_02000488->state = 14;
+        ScenePanel_SetEffectState(input, 9);
     }
 }
