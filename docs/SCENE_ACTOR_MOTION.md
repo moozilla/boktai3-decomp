@@ -88,3 +88,19 @@ changes. The refreshed v74 search log is `build/actor-A8CC-v74-permute.log`, run
 `build/permute/sub_0807A8CC/run-da5fqpph` (one job, one-hour cap). It starts at
 permuter score30 and has passed the two prior parser assertions. Any improved
 output still requires source review, full-extent checking and hint minimization.
+
+The next randomizer type failures exposed its documented limitation that local
+names must be unique across scopes. The readable v75 source names the cache
+at file scope; private `build/alpha-A8CC-permute.py` then creates a preprocessed
+search copy with 187 local/formal names made unique. Scope-aware renaming skips
+struct member identifiers and preserves lexical bindings. A baseline audit
+resolves every StructRef with zero type failures. The renamed search source
+`wip/permute_0807A8CC_scoped.c` compiles to the same 1,736 bytes and seven
+byte differences. The current one-job run is `run-6waemnp6`, log
+`build/actor-A8CC-scoped-permute.log`; the readable v75 remains separately
+preserved. This is private search preparation, not a production source style.
+
+A private compile-time layout check (`wip/layout_0807A8CC.c`) confirms all
+named offsets from health `9C` through failure callback `5F8`, including the
+new subject/route/saved-control fields. It retains the baseline seven-byte
+mismatch. No shared header or source has been promoted for this cohort.
