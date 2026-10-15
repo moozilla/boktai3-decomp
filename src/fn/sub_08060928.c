@@ -7,7 +7,7 @@ struct SceneInventorySlotsView {
 };
 extern struct SceneInventorySlotsView *gUnk_02000710;
 
-s32 SceneInventory_FindEmptyConsumableSlot(void)
+s32 SceneInventory_FindEmptyConsumableSlot(const void *unusedOwner)
 {
     s32 i = 0;
     s16 *p = gUnk_02000710->slots;
