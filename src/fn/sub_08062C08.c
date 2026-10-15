@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_tail.h"
 #include "scene_inventory_panel.h"
-#define SceneInventory_InitPanel sub_08062C08
 struct SceneInventoryInitTransitions {
     u8 unknown0[0x1AF0];
     struct SceneInputPair transition;

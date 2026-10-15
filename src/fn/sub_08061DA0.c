@@ -1,5 +1,4 @@
 #include "scene_inventory_control.h"
-#define SceneInventory_TickModeMenu sub_08061DA0
 s32 SceneInventory_TickModeMenu(struct SceneInventoryControlView *panel)
 {
     SceneInputPanel_PositionModeCursor((void *)panel, panel->mode);
@@ -9,9 +8,9 @@ s32 SceneInventory_TickModeMenu(struct SceneInventoryControlView *panel)
         SceneInput_SetGlyphPair(&panel->prompt, 0, -1);
     SceneInputPanel_HighlightMode((void *)panel,
                                   ((struct SceneInventoryHighlightView *)panel)->colors);
-    if (sub_08061C3C(panel))
+    if (SceneInventory_HandleClockShortcut(panel))
         goto handled;
-    if (sub_08061CFC(panel))
+    if (SceneInventory_HandlePageKeys(panel))
         goto handled;
     if (gUnk_03005260[1] & 2)
         return 1;
@@ -19,19 +18,19 @@ s32 SceneInventory_TickModeMenu(struct SceneInventoryControlView *panel)
         switch (panel->mode) {
             case 4:
                 Sound_PlaySong(0x107);
-                sub_0806158C(panel);
+                SceneInventory_BeginMoveSelection(panel);
                 goto handled;
             case 1:
                 Sound_PlaySong(0x107);
-                sub_080615D8(panel);
+                SceneInventory_BeginItemSelection(panel);
                 goto handled;
             case 3:
                 Sound_PlaySong(0x107);
-                sub_0806186C(panel);
+                SceneInventory_BeginExitConfirmation(panel);
                 goto handled;
             case 2:
                 Sound_PlaySong(0x107);
-                sub_08061600(panel);
+                SceneInventory_BeginConsumableSelection(panel);
                 goto handled;
         }
     }

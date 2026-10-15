@@ -1,7 +1,6 @@
 #include "scene_inventory_lifecycle.h"
-#define SceneInventory_TickSaleFeedback sub_08062778
 s32 SceneInputPanel_AdjustSlidingY(struct SceneInputWidget *, s32, u16);
-void sub_08061B48(struct SceneInventoryTail *);
+void SceneInventory_BeginAlternateSelection(struct SceneInventoryTail *);
 s32 SceneInventory_TickSaleFeedback(struct SceneInventoryTail *p)
 {
     u16 *frame;
@@ -10,6 +9,6 @@ s32 SceneInventory_TickSaleFeedback(struct SceneInventoryTail *p)
     if (*frame == 0)
         Sound_PlaySong(630);
     if (SceneInputPanel_AdjustSlidingY(&p->display.buttons[0], 32, *frame))
-        sub_08061B48(p);
+        SceneInventory_BeginAlternateSelection(p);
     return 0;
 }

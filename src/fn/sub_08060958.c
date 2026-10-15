@@ -1,5 +1,4 @@
 #include "scene_inventory_actions.h"
-#define SceneInventory_FindEmptyItemSlot sub_08060958
 
 s32 SceneInventory_FindEmptyItemSlot(const void *unusedOwner)
 {

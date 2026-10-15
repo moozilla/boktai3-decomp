@@ -1,7 +1,6 @@
 #include "scene_inventory_tail.h"
-#define SceneInventory_TickPurchaseConfirmation sub_080623C0
-void sub_080619D4(struct SceneInventoryTail *);
-void sub_08061B48(struct SceneInventoryTail *);
+void SceneInventory_BeginCatalogTransition(struct SceneInventoryTail *);
+void SceneInventory_BeginAlternateSelection(struct SceneInventoryTail *);
 s32 SceneInventory_TickPurchaseConfirmation(struct SceneInventoryTail *p)
 {
     s32 result;
@@ -9,10 +8,10 @@ s32 SceneInventory_TickPurchaseConfirmation(struct SceneInventoryTail *p)
     result = SceneInput_TickChoice(&p->display.prompt, &p->display.widgetResource, &p->choiceState,
                                    &p->choiceRepeat);
     if (result == 1)
-        sub_080619D4(p);
+        SceneInventory_BeginCatalogTransition(p);
     else if (result == 0) {
         Sound_PlaySong(0xDE);
-        sub_08061B48(p);
+        SceneInventory_BeginAlternateSelection(p);
     }
     return 0;
 }

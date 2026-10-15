@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_control.h"
-#define SceneInventory_ClassifyConsumableAction sub_0806122C
 s32 SceneInventory_ClassifyConsumableAction(struct SceneInventoryControlView *panel)
 {
     register s32 result asm("r6");

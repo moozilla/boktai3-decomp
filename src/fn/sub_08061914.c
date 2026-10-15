@@ -1,5 +1,4 @@
 #include "scene_inventory_states.h"
-#define SceneInventory_BeginRemovalConfirmation sub_08061914
 void SceneInventory_BeginRemovalConfirmation(struct SceneInventoryControlView *panel)
 {
     SceneInput_SaveSelection(&panel->grid);
@@ -15,8 +14,9 @@ void SceneInventory_BeginRemovalConfirmation(struct SceneInventoryControlView *p
             SceneInputPanel_ShowDescription(panel, 2, panel->itemText, -1);
             break;
     }
-    sub_080613BC(panel, 2);
+    SceneInventory_UpdateModePrompt(panel, 2);
     SceneInput_BeginChoice(&panel->display.prompt, &panel->display.widgetResource,
                            &panel->choiceValue, 0, &panel->choiceBlink);
-    sub_0806130C(panel, (SceneInventoryCallback)sub_080627C4);
+    SceneInventory_SetControllerCallback(
+        panel, (SceneInventoryCallback)SceneInventory_TickDiscardConfirmation);
 }

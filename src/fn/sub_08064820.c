@@ -1,5 +1,4 @@
 #include "actor_attachment_state.h"
-#define ActorAttachment_TickNarrowShake sub_08064820
 void ActorAttachment_TickNarrowShake(void *unused, struct ActorAttachmentSlotView *slot)
 {
     struct ContactSwarmSprite *sprite = &slot->sprite;

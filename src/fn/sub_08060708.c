@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_actions.h"
-#define SceneInventory_BeginEquipmentRemoveMove sub_08060708
 void SceneInventory_BeginEquipmentRemoveMove(struct SceneInventoryActionView *panel)
 {
     struct SceneInputPosition starts[2], targets[2];

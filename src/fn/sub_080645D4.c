@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_slot.h"
-#define ActorAttachment_NotifySourceState sub_080645D4
 void sub_08077848(struct ActorAttachmentSource *, u32);
 static inline u8 SameOwner(u16 *key)
 {

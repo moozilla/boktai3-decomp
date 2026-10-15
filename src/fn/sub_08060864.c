@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_actions.h"
-#define SceneInventory_ClassifyEquipmentMove sub_08060864
 struct SceneInventoryRestoreView {
     u8 unknown0[0x1AEC];
     u16 fallbackSelection;

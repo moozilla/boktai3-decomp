@@ -1,19 +1,18 @@
 #include "scene_inventory_lifecycle.h"
-#define SceneInventory_InitializeController sub_08063334
-void sub_08062DEC(struct SceneInventoryLifecycleView *);
-void sub_080630FC(struct SceneInventoryLifecycleView *);
-void sub_08062F10(struct SceneInventoryLifecycleView *);
-void sub_0806300C(struct SceneInventoryLifecycleView *);
-void sub_08062BF4(struct SceneInventoryLifecycleView *, u32);
-void sub_08062C08(struct SceneInventoryLifecycleView *, u32);
-void sub_08062DA8(struct SceneInventoryLifecycleView *);
-void sub_08063194(struct SceneInventoryLifecycleView *);
+void SceneInventory_BuildUnlockedEquipmentCatalog(struct SceneInventoryLifecycleView *);
+void SceneInventory_BuildConsumableCatalog(struct SceneInventoryLifecycleView *);
+void SceneInventory_BuildUnlockedItemCatalog(struct SceneInventoryLifecycleView *);
+void SceneInventory_ReadScriptCatalog(struct SceneInventoryLifecycleView *);
+void SceneInventory_InitCatalogBackground(struct SceneInventoryLifecycleView *, u32);
+void SceneInventory_InitPanel(struct SceneInventoryLifecycleView *, u32);
+void SceneInventory_InitMessageBox(struct SceneInventoryLifecycleView *);
+void SceneInventory_ReadCompletionScript(struct SceneInventoryLifecycleView *);
 void sub_082279A8(u32, u32, u32, u32, u32, u32, u32);
-void sub_080628D4(struct SceneInventoryLifecycleView *);
+void SceneInventory_RefreshCatalogDisplay(struct SceneInventoryLifecycleView *);
 void Sound_PlaySong(u32);
 void SceneInputPanel_RequestAction(struct SceneInventoryLifecycleView *,
                                    void (*)(struct SceneInventoryLifecycleView *));
-void sub_080631C4(struct SceneInventoryLifecycleView *);
+void SceneInventory_WaitForController(struct SceneInventoryLifecycleView *);
 s32 SceneInventory_InitializeController(struct SceneInventoryLifecycleView *owner)
 {
     owner->messageText = 0;
@@ -31,30 +30,30 @@ s32 SceneInventory_InitializeController(struct SceneInventoryLifecycleView *owne
     owner->itemPageCount = 0;
     switch (owner->presentation) {
         case 0:
-            sub_08062DEC(owner);
+            SceneInventory_BuildUnlockedEquipmentCatalog(owner);
             owner->itemPageCount = owner->pageCount;
             break;
         case 2:
-            sub_080630FC(owner);
+            SceneInventory_BuildConsumableCatalog(owner);
             owner->itemPageCount = owner->pageCount;
             break;
         case 1:
         default:
-            sub_08062F10(owner);
+            SceneInventory_BuildUnlockedItemCatalog(owner);
             owner->itemPageCount = owner->pageCount;
             break;
         case 3:
         case 4:
-            sub_0806300C(owner);
+            SceneInventory_ReadScriptCatalog(owner);
             break;
     }
-    sub_08062BF4(owner, owner->presentation);
-    sub_08062C08(owner, owner->presentation);
-    sub_08062DA8(owner);
-    sub_08063194(owner);
+    SceneInventory_InitCatalogBackground(owner, owner->presentation);
+    SceneInventory_InitPanel(owner, owner->presentation);
+    SceneInventory_InitMessageBox(owner);
+    SceneInventory_ReadCompletionScript(owner);
     sub_082279A8(2, 5, 4, 4, 4, 0xffff, 0);
-    sub_080628D4(owner);
+    SceneInventory_RefreshCatalogDisplay(owner);
     Sound_PlaySong(0x118);
-    SceneInputPanel_RequestAction(owner, sub_080631C4);
+    SceneInputPanel_RequestAction(owner, SceneInventory_WaitForController);
     return 0;
 }

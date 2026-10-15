@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_catalog.h"
-#define SceneInventory_BuildUnlockedItemCatalog sub_08062F10
 extern const s8 gUnk_0824DF6C[];
 struct SceneInventoryUnlockView {
     u8 unknown0[0x750];

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "roaming_object.h"
-#define RoamingObject_SteerWander sub_08063970
 void RoamingObject_SteerWander(struct RoamingObject *owner)
 {
     if (owner->angle != owner->targetAngle) {

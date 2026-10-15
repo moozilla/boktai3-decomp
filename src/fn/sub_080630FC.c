@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_catalog.h"
-#define SceneInventory_BuildConsumableCatalog sub_080630FC
 extern const s8 gUnk_0824DF7C[];
 void SceneInventory_BuildConsumableCatalog(struct SceneInventoryScriptCatalog *input)
 {

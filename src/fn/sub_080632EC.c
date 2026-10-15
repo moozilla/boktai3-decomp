@@ -1,7 +1,6 @@
 #include "contact_swarm.h"
 #include "scene_input_panel.h"
 #include "scene_input_grid.h"
-#define SceneInventory_DestroyController sub_080632EC
 /* The cleanup span contains 54 panel widgets and 15 comparison widgets. */
 struct SceneInventoryCleanupView {
     u8 task[0x60];

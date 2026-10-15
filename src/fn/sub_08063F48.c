@@ -1,5 +1,4 @@
 #include "roaming_object.h"
-#define RoamingObjectB_SetState sub_08063F48
 struct RoamingStateTable {
     void (*entries[3])(struct RoamingObject *);
 };

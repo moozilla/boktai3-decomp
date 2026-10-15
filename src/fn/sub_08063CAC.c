@@ -1,5 +1,4 @@
 #include "roaming_object.h"
-#define RoamingObject_InitializePosition sub_08063CAC
 u8 *sub_0821D64C(s32, s32);
 void sub_08225AB4(void *, u16, struct ContactPackedVector *, u32, u32, struct RoamingObject *);
 void RoamingObject_InitializePosition(struct RoamingObject *owner)

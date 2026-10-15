@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_state.h"
-#define ActorAttachment_BeginPartJitter sub_08064D40
 void ActorAttachment_BeginPartJitter(struct ActorAttachmentSlotView *slot, s32 indexInput)
 {
     s32 index = indexInput;

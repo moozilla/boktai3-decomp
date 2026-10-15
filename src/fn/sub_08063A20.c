@@ -1,5 +1,4 @@
 #include "roaming_object.h"
-#define RoamingObject_FlashPalette sub_08063A20
 void RoamingObject_FlashPalette(struct RoamingObject *owner)
 {
     if (owner->flashCount <= 5)

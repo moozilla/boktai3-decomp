@@ -1,5 +1,4 @@
 #include "scene_inventory_lifecycle.h"
-#define SceneInventory_FinishAndCallScript sub_08063248
 s32 SceneInventory_FinishAndCallScript(struct SceneInventoryLifecycle *p)
 {
     if (p->frame > 31) {

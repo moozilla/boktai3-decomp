@@ -1,5 +1,4 @@
 #include "scene_inventory_tail.h"
-#define SceneInventory_TickResetConfirmation sub_08062298
 void sub_0822DA94(u32);
 void sub_0822D0F0(u32);
 void sub_0822E18C(u32);
@@ -22,10 +21,10 @@ s32 SceneInventory_TickResetConfirmation(struct SceneInventoryTail *p)
                 sub_0822E18C(0);
                 break;
         }
-        sub_08061540(p);
+        SceneInventory_BeginBrowse(p);
     } else if (result == 0) {
         Sound_PlaySong(0xDE);
-        sub_08061540(p);
+        SceneInventory_BeginBrowse(p);
     }
     return 0;
 }
