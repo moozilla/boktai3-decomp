@@ -16,6 +16,11 @@ struct SparkParticleSprite {
     struct ContactPosition position;
     u8 unknown20[8];
 };
+/* Narrow view of the velocity/active tail at entry offset38. */
+struct SparkParticleMotion {
+    struct ContactPosition velocity;
+    u8 active, unknown41[3];
+};
 struct SparkParticle {
     struct DisplaySequenceState sequence;
     struct SparkParticleSprite sprite;
@@ -34,6 +39,7 @@ s32 sub_08069FA4(struct SparkParticlePool *);
 s32 sub_0806A138(struct SparkParticlePool *);
 s32 sub_0806A160(const struct ContactPosition *, u8, const struct ContactPosition *, s32, s32, s32,
                  s32, u32);
+void sub_0806A420(void);
 s32 sub_0806A520(struct SparkParticlePool *);
 struct SparkParticlePool *sub_0806A5B4(void);
 void sub_0806A600(void);
