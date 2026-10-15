@@ -2,7 +2,6 @@
 
 // MATCHING_CONCESSION: register-pinning
 
-#define ScenePanel_UpdateBackgroundEffect sub_08058700
 void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 screenX,
                                        s32 screenY)
 {
@@ -165,7 +164,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
                     u32 life = table[gUnk_03005308];
                     life &= 7;
                     life += 8;
-                    sub_08057A44(panel, positionWords, &velocity, life, 1);
+                    ScenePanel_AddParticle(panel, positionWords, &velocity, life, 1);
                 }
             }
             {
@@ -196,7 +195,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
             }
             BgGfx_LoadTilemapSimple(1, tileX, tileY, screenX, screenY + panel->shakeOffset);
             if (--panel->mode == 0)
-                sub_08057978(gUnk_020004A4, 9);
+                ScenePanel_CallPendingScript(gUnk_020004A4, 9);
         }
     }
     return;
