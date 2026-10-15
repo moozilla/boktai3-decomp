@@ -28,6 +28,10 @@ struct SceneActorControlMotionDrawable {
     u8 unknown12[0x36];
     struct DisplaySequenceState sequence;
 };
+struct SceneActorControlPresetView {
+    u8 unknown0[0x284];
+    const void *preset284;
+};
 struct SceneActorControlGroundView {
     u8 unknown0[0x2BE];
     u16 ground;
@@ -37,4 +41,6 @@ SceneActorControl_GetMotionState(struct SceneActorRegistryResetView *actor)
 {
     return (void *)SceneActorControl_GetState(actor);
 }
+void SceneActorControl_SetDefaultPreset(struct SceneActorRegistryResetView *);
+void SceneActorControl_TickSway(struct SceneActorRegistryResetView *);
 #endif
