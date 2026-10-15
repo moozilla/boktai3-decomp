@@ -18,5 +18,5 @@ void SceneInventory_BeginRemovalConfirmation(struct SceneInventoryControlView *p
     sub_080613BC(panel, 2);
     SceneInput_BeginChoice(&panel->display.prompt, &panel->display.widgetResource,
                            &panel->choiceValue, 0, &panel->choiceBlink);
-    sub_0806130C(panel, (void (*)(struct SceneInventoryControlView *))sub_080627C4);
+    sub_0806130C(panel, (SceneInventoryCallback)sub_080627C4);
 }
