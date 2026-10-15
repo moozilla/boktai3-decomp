@@ -12,6 +12,12 @@ struct SceneActorReactionGroup {
     u8 unknown46[6];
     struct SceneActorRegistryControl control;
 };
+struct SceneActorReactionCommand {
+    u8 unknown0[8];
+    u8 first, second, kind, unknownB;
+    u32 duration;
+    void *payload;
+};
 struct SceneActorReactionTail {
     u8 unknown0[0x5D4];
     struct ContactPosition *destination;
