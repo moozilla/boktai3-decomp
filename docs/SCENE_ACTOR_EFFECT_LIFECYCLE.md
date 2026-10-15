@@ -79,3 +79,14 @@ FDC0 ends after192 bytes; FE80 has its own prologue, full200-byte body, return
 and pool ending7FF48. Whole-ROM Thumb-pointer and decoded direct-branch scans
 found no references to the new entry. This boundary review adds one function
 without changing the code-byte denominator or claiming unmatched C credit.
+
+FDC0/FE80/FF48 are now exact over192/200/192 bytes, with2/1/1 minimized
+register hints respectively. At signed frame >= embedded threshold46C, they
+restore active state/phase/behavior from468/469/46A, control21C from470, set
+prepared2B2 and changed2B1, clear2B0/2C8/104/counter2AC, install substate14,
+and clear flags114 bit1. FE80 also clears restart2B3 unconditionally at entry.
+They forward table0824E128 and indices74/8B/A0 to the embedded460 reset helper;
+the existing helper ignores those latter arguments and only clears its local
+state bytes8/9/A and wordsC/10. Its definition now records the observed
+three-word argument contract, still exact over16 bytes. No runtime coverage is
+claimed by these static observations.

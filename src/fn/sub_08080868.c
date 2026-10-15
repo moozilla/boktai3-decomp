@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
-#define SceneActorReaction_BeginFadedState sub_08080868
 void SceneActorReaction_BeginFadedState(struct SceneActorRegistryResetView *actor)
 {
     u32 state;
@@ -13,7 +12,7 @@ void SceneActorReaction_BeginFadedState(struct SceneActorRegistryResetView *acto
         control->counter = 0;
         *(u16 *)((u8 *)control + 0x14) = 0;
         control->timer = 0;
-        sub_080764C8(actor, 3, 1);
+        SceneActorAnimation_SelectDirectionFlagsVariant(actor, 3, 1);
         switch (actor->category) {
             case 4:
                 Sound_PlaySong(212);
@@ -22,7 +21,7 @@ void SceneActorReaction_BeginFadedState(struct SceneActorRegistryResetView *acto
                 Sound_PlaySong(253);
                 break;
             case 3:
-                sub_08077848(actor, 1);
+                SceneActorPlacement_PlayVariantEventSound(actor, 1);
                 break;
         }
         {
