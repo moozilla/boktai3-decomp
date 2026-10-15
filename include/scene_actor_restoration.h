@@ -12,5 +12,5 @@ struct SceneActorRestorationState {
 extern const u8 gUnk_0824E128[];
 /* The implementation ignores the forwarded table and index. */
 void sub_0812E084(void *, const void *, u32);
-void sub_0807FDC0(struct SceneActorRegistryActor *, s32);
+void SceneActorReaction_RestoreAfterDelay(struct SceneActorRegistryActor *, s32);
 #endif

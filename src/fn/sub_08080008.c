@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
-#define SceneActorReaction_UpdateAnimationGate sub_08080008
 void SceneActorReaction_UpdateAnimationGate(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorRegistryControlGroup *group = &actor->group;

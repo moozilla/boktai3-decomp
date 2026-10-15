@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_restoration.h"
-#define SceneActorReaction_RestoreAfterDelay sub_0807FDC0
 void SceneActorReaction_RestoreAfterDelay(struct SceneActorRegistryActor *actor, s32 frame)
 {
     struct SceneActorRegistryActor *owner = actor;
