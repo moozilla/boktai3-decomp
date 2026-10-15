@@ -1,6 +1,5 @@
 #include "tether_actor.h"
 // MATCHING_CONCESSION: register-pinning
-#define TetherActor_UpdateBounceReturn sub_0804CB4C
 void TetherActor_SetState(struct TetherActor *, u32);
 void TetherActor_RemoveAuxiliarySprite(struct TetherActor *);
 void TetherActor_EmitRingEffects(struct TetherActor *);
@@ -53,70 +52,71 @@ void TetherActor_UpdateBounceReturn(struct TetherActor *actor)
             actor->displayOffsetY = zero;
     }
     {
-    u16 *counter;
-    u32 offset = 0x256;
-    register u16 *counterAddress asm("r2");
-    asm("" : "+r"(offset));
-    counterAddress = (u16 *)(offset + (u32)actor);
-    counter = counterAddress;
-    if (*counterAddress <= 11) {
-        register const u16 *rawTable asm("r6") = (const u16 *)RANDOM_TABLE_ADDR;
-        register const u16 *table asm("r12");
-        u32 *randomIndex;
-        register u32 index asm("r1");
-        u32 mask;
-        register u32 amplitudeMask asm("r4");
-        register u32 shakeOffset asm("r6");
-        asm("" : "+r"(rawTable));
-        table = rawTable;
-        randomIndex = &gUnk_03005308;
-        index = *randomIndex + 1;
-        mask = 1023;
-        index &= mask;
-        {
-            u32 sample = table[index];
-            s16 *shake;
-            amplitudeMask = 31;
-            sample &= amplitudeMask;
-            sample -= 16;
-            shakeOffset = 0x37E;
-            shake = (s16 *)((u8 *)actor + shakeOffset);
-            *shake = sample;
-        }
-        index = (index + 1) & mask;
-        *randomIndex = index;
-        actor->shakeZ = (table[index] & amplitudeMask) - 16;
-        asm("" : : "r"(shakeOffset));
-    }
-    {
-        register u16 *frameAlias asm("r6") = counter;
-        asm("" : "+r"(frameAlias));
-        if (*frameAlias == 2)
-            TetherActor_EmitRingEffects(actor);
-    }
-    {
-    u16 *frameAlias = counter;
-    if (*frameAlias > 29) {
-        register u16 *charge asm("r2");
-        void **handle;
-        TetherActor_SetState(actor, 0);
-        {
-            register u32 readyOffset asm("r2") = 0x384;
-            register u16 *ready asm("r1");
-            ready = (u16 *)((u8 *)actor + readyOffset);
-            *ready = 1;
+        u16 *counter;
+        u32 offset = 0x256;
+        register u16 *counterAddress asm("r2");
+        asm("" : "+r"(offset));
+        counterAddress = (u16 *)(offset + (u32)actor);
+        counter = counterAddress;
+        if (*counterAddress <= 11) {
+            register const u16 *rawTable asm("r6") = (const u16 *)RANDOM_TABLE_ADDR;
+            register const u16 *table asm("r12");
+            u32 *randomIndex;
+            register u32 index asm("r1");
+            u32 mask;
+            register u32 amplitudeMask asm("r4");
+            register u32 shakeOffset asm("r6");
+            asm("" : "+r"(rawTable));
+            table = rawTable;
+            randomIndex = &gUnk_03005308;
+            index = *randomIndex + 1;
+            mask = 1023;
+            index &= mask;
+            {
+                u32 sample = table[index];
+                s16 *shake;
+                amplitudeMask = 31;
+                sample &= amplitudeMask;
+                sample -= 16;
+                shakeOffset = 0x37E;
+                shake = (s16 *)((u8 *)actor + shakeOffset);
+                *shake = sample;
+            }
+            index = (index + 1) & mask;
+            *randomIndex = index;
+            actor->shakeZ = (table[index] & amplitudeMask) - 16;
+            asm("" : : "r"(shakeOffset));
         }
         {
-        register u32 chargeOffset asm("r6") = 0x386;
-        u32 value;
-        asm("" : "+r"(chargeOffset));
-        charge = (u16 *)((u8 *)actor + chargeOffset);
-        value = 287;
-        *charge = value;
-        handle = &actor->pendingEffectHandle;
-        *handle = sub_08066DB8(*handle, &actor->bodyConfig, 1, 0, charge, value, 250, 290);
+            register u16 *frameAlias asm("r6") = counter;
+            asm("" : "+r"(frameAlias));
+            if (*frameAlias == 2)
+                TetherActor_EmitRingEffects(actor);
         }
-    }
-    }
+        {
+            u16 *frameAlias = counter;
+            if (*frameAlias > 29) {
+                register u16 *charge asm("r2");
+                void **handle;
+                TetherActor_SetState(actor, 0);
+                {
+                    register u32 readyOffset asm("r2") = 0x384;
+                    register u16 *ready asm("r1");
+                    ready = (u16 *)((u8 *)actor + readyOffset);
+                    *ready = 1;
+                }
+                {
+                    register u32 chargeOffset asm("r6") = 0x386;
+                    u32 value;
+                    asm("" : "+r"(chargeOffset));
+                    charge = (u16 *)((u8 *)actor + chargeOffset);
+                    value = 287;
+                    *charge = value;
+                    handle = &actor->pendingEffectHandle;
+                    *handle =
+                        sub_08066DB8(*handle, &actor->bodyConfig, 1, 0, charge, value, 250, 290);
+                }
+            }
+        }
     }
 }

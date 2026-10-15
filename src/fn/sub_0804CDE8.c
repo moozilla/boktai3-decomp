@@ -1,7 +1,6 @@
 #include "tether_actor.h"
 void TetherActor_SetState(struct TetherActor *, u32);
 void TetherActor_SetEntry(struct TetherActor *, u32);
-#define TetherActor_UpdatePassiveState sub_0804CDE8
 void TetherActor_UpdatePassiveState(struct TetherActor *actor)
 {
     if (actor->state != 12)

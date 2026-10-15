@@ -3,7 +3,6 @@
 // fuzzy: 93.5%
 /* Complete body; remaining differences are scratch-register allocation. */
 #include "tether_actor.h"
-#define TetherActor_UpdateRoamingState sub_0804BF04
 void TetherActor_SetState(struct TetherActor *, u32);
 s32 TetherActor_SetEntry(struct TetherActor *, u32);
 s32 TetherActor_SetHeadingEntry(struct TetherActor *, u32);
@@ -127,6 +126,5 @@ void TetherActor_UpdateRoamingState(struct TetherActor *actor)
 
 #else
 #include "global.h"
-#define TetherActor_UpdateRoamingState sub_0804BF04
 INCLUDE_ASM("asm/nonmatching", TetherActor_UpdateRoamingState);
 #endif

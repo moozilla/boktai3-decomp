@@ -2,7 +2,6 @@
 // MATCHING_CONCESSION: register-pinning
 void TetherActor_SetState(struct TetherActor *, u32);
 void TetherActor_SetEntry(struct TetherActor *, u32);
-#define TetherActor_UpdateDirectedMovement sub_0804CF5C
 static inline s32 scale(s32 value)
 {
     if (value >= 0)

@@ -4,9 +4,8 @@ s32 TetherActor_SetEntry(struct TetherActor *, u32);
 s32 TetherActor_SetHeadingEntry(struct TetherActor *, u32);
 void TetherActor_UpdateLockedShake(struct TetherActor *);
 void TetherActor_UpdateShake(struct TetherActor *);
-void sub_0804D120(struct TetherActor *);
+void TetherActor_UpdateReverseDirectedMovement(struct TetherActor *);
 void TetherActor_UpdateSecondaryLock(struct TetherActor *);
-#define TetherActor_UpdateReverseDirectedState sub_0804D270
 static inline s32 absolute(s32 value)
 {
     if (value < 0)
@@ -35,7 +34,7 @@ void TetherActor_UpdateReverseDirectedState(struct TetherActor *actor)
             actor->glowMode = value;
             TetherActor_UpdateShake(actor);
         } else {
-            sub_0804D120(actor);
+            TetherActor_UpdateReverseDirectedMovement(actor);
             TetherActor_UpdateSecondaryLock(actor);
         }
     }

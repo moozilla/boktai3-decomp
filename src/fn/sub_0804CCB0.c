@@ -1,6 +1,5 @@
 #include "tether_actor.h"
 // MATCHING_CONCESSION: register-pinning
-#define TetherActor_UpdateKindNineRecoil sub_0804CCB0
 void TetherActor_SetState(struct TetherActor *, u32);
 void sub_0821BC68(void *, void *);
 static inline s32 scale(s32 value)
