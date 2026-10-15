@@ -1,16 +1,9 @@
-#include "global.h"
-
-struct Unk0806DF60 {
-    u32 unk0;
-};
-
-struct Unk0806DF60 *sub_0806DF60(void);
-
-// &p->unk0 == p, but agbcc keeps the null test for the address expression
-u32 *sub_0806DFB8(void)
+#include "route_sprite_actor.h"
+#define RouteSpritePool_TryAllocateSlot sub_0806DFB8
+struct RouteSpriteActor *RouteSpritePool_TryAllocateSlot(struct RouteSpritePool *pool)
 {
-    struct Unk0806DF60 *p = sub_0806DF60();
-    if (!p)
+    struct RouteSpriteActor *slot = sub_0806DF60(pool);
+    if (!slot)
         return NULL;
-    return &p->unk0;
+    return (void *)&slot->sprite;
 }
