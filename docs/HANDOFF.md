@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 29.610% matching (2026-10-15). This file is the single
+Last updated after reaching 29.679% matching (2026-10-15). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,46 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 15 continuation: reaction restoration and route transitions
+
+Exact code is **29.679%**, up **0.0694 percentage points** (+1,676 net bytes)
+from PR162: **7,060 /11,490 functions**, **716,858 /2,415,354 bytes**.
+Without register pinning: **21.154%**; Register-pinned: **8.525%**, included
+above. Newly authored exact bodies total1,808 bytes. Extent review removes132
+false ordinary-C bytes from the old12E084 retained tail: its actual reset leaf
+is16 bytes, followed by an independent132-byte12E094 function, still assembly.
+A second newly recognized boundary at7FE80 separates a200-byte restoration
+callback from7FDC0's actual192-byte body. Two entries add two functions; the
+code-byte denominator stays unchanged. The78 guarded drafts remain uncredited.
+
+The batch closes78550's252-byte descriptor steering helper in ordinary C.
+FDC0/FE80/FF48 restore delayed actor state and control;80008 consumes the prepared
+flag and selects animation after a wordF0 threshold gate. The reaction section
+adds80868/80984/80AF0: faded-state preparation, category reaction sounds, and a
+turn-back route transition. Shared command/phase views and canonical animation
+and placement signatures are reconciled. Existing attachment sound-gate and
+position-query ABIs now preserve word-sized forwarding and return values; those
+reviews earn no new exact credit. See [reaction callbacks](SCENE_ACTOR_REACTION_STATES.md),
+[effect lifecycle](SCENE_ACTOR_EFFECT_LIFECYCLE.md), [behavior frontier](SCENE_ACTOR_BEHAVIOR_FRONTIER.md),
+and [attachment responses](SCENE_ACTOR_ATTACHMENT_RESPONSES.md).
+
+Validation: all12 changed/promoted single-function units pass their full reviewed
+extents against the final combined ELF. The combined build prints
+`build/boktai3.gba: OK`; the RAM-literal audit passes. Source audit:12 files,
+no warnings/errors. All9 progress/boundary tests and the inventory/diff checks
+pass. No handwritten instruction bodies or explicit r7 bindings were introduced.
+FDC0's diagnostic/manual closure reduced17 hints to2; FE80 and FF48 need1 each.
+The suitable residue remains in bounded frozen permuter queues; zero scores
+still require initialized-value review and resolved-byte acceptance.
+
+Target remains **30% exact or20% account usage remaining**; latest meter36%
+remaining, no reset consumed. Sol owns7A8CC–7C11C and has a full1736-byte98.1%
+private candidate; Lifecycle owns800A4–81290 with four full semantic gaps after
+its three new matches. Tail completed semantic review of7C11C–7E334 and now
+owns81290–82648. Root continuesE334–8005C: F710 is a separate268-byte exact
+private target-selection candidate queued for the next batch. Earlier route,
+query and attachment gaps remain private and receive no exact credit.
 
 ## October 15 continuation: actor feedback, reactions and attachment lifecycle
 

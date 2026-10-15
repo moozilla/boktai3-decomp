@@ -3,7 +3,7 @@
 #include "global.h"
 /* The category-specific pairs feed Y/Z offset arguments of attachment creators. */
 void SceneActorEffect_PlayCategorySound(u8 event, u8 category, u8 variant);
-void SceneActorEffect_PlayCategorySoundIfEnabled(u8 gate, u32 event, u32 category, u32 variant);
+void SceneActorEffect_PlayCategorySoundIfEnabled(u32 gate, u32 event, u32 category, u32 variant);
 void SceneActorAttachment_SelectCategory4Offsets(u8 kind, s32 *yOffset, s32 *zOffset);
 void SceneActorAttachment_SelectCategory1Offsets(u8 kind, s32 *yOffset, s32 *zOffset);
 void SceneActorAttachment_SelectCommonOffsets(u8 kind, s32 *yOffset, s32 *zOffset);

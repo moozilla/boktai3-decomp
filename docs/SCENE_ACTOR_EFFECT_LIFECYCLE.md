@@ -67,3 +67,32 @@ there is no added check preventing that initial step from entering an adjoining
 row. The selected cell center is passed through the same two collision queries
 and failure/velocity rules as E7DC. Private variants retain the observed control
 flow and compiler-lifetime experiments; none contributes progress.
+
+The adjoining 80008 callback is exact over84 bytes. It consumes prepared2B2,
+sets control414 bit1 when the unsigned wordF0 is at mostFFFFF (otherwise clears
+it), and selects directional animation entry1. The wordF0 interpretation remains
+unknown; the comparison is preserved without assigning it a gameplay meaning.
+Three minimized allocation hints remain.
+
+A separate restoration callback begins7FE80 inside the previous retained tail.
+FDC0 ends after192 bytes; FE80 has its own prologue, full200-byte body, return
+and pool ending7FF48. Whole-ROM Thumb-pointer and decoded direct-branch scans
+found no references to the new entry. This boundary review adds one function
+without changing the code-byte denominator or claiming unmatched C credit.
+
+FDC0/FE80/FF48 are now exact over192/200/192 bytes, with2/1/1 minimized
+register hints respectively. At signed frame >= embedded threshold46C, they
+restore active state/phase/behavior from468/469/46A, control21C from470, set
+prepared2B2 and changed2B1, clear2B0/2C8/104/counter2AC, install substate14,
+and clear flags114 bit1. FE80 also clears restart2B3 unconditionally at entry.
+They forward table0824E128 and indices74/8B/A0 to the embedded460 reset helper;
+the existing helper ignores those latter arguments and only clears its local
+state bytes8/9/A and wordsC/10. Its definition now records the observed
+three-word argument contract, still exact over16 bytes. No runtime coverage is
+claimed by these static observations.
+
+Reviewing the existing reset helper also exposed false retained-tail progress:
+12E084 is16 bytes, followed by an independent132-byte command-selection body
+at12E094 with its own high-register save/restore and literal pool through12E118.
+The boundary is now explicit and132 previously credited bytes are removed;
+12E094 stays assembly. The reset ABI review itself earns no new matching credit.
