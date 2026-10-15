@@ -1,4 +1,5 @@
 #include "global.h"
+#define AreaEffect_TickLink sub_0804EE94
 
 struct G {
     u8 filler[0x868];
@@ -9,7 +10,7 @@ void sub_0804EDCC(void *);
 void sub_0804EDD0(void *);
 void sub_0804ECD0(void *);
 
-s32 sub_0804EE94(void *p)
+s32 AreaEffect_TickLink(void *p)
 {
     if (gUnk_02000710->f & 2)
         sub_0804EDCC(p);
