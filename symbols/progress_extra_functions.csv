@@ -115,6 +115,9 @@ address,evidence
 08066CB8,Independent unused-looking attachment release-all after query return and literal; complete push-loop-pop-bx; no ROM Thumb pointer or direct branch encoding found; exact standalone C
 08066FD8,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08067014,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+08067990,Independent script constructor with own prologue calls pop-bx and embedded literals in retained 08067984 tail; full exact 536-byte C extent
+08067BA8,Independent request-all slot loop with own push and pop-bx in retained 08067984 tail; full exact 100-byte C body
+08067C0C,Independent bx-lr empty leaf after request-all return; full exact 4-byte extent
 080682CC,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 080688CC,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08069788,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched)
@@ -122,6 +125,8 @@ address,evidence
 0806A420,Independent256-byte guarded particle script wrapper; exact C; original0806A160 span split704+256; docs/SPARK_PARTICLE.md
 0806A784,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0806BE80,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
+0806CF18,Independent 52-byte state-four-to-five loop after singleton reset; own push/pop-bx and literal; docs/SPRITE_EFFECT_STEERING_ACTORS.md
+0806CF4C,"Independent 152-byte fixed-position constructor wrapper with own stack prologue, angle and creator calls, and return; retained assembly gap"
 0806CFFC,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0806E29C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0807006C,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
