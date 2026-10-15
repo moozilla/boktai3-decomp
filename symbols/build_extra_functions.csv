@@ -118,6 +118,8 @@ address,isa,evidence,replacement_end
 0806CF4C,thumb,"Independent 152-byte fixed-position constructor wrapper with own stack prologue, angle and creator calls, and return; retained assembly gap",0806CFE4
 0806CFFC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0806D000
 0806E29C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0806E2A8
+0806E308,thumb,Independent 68-byte four-slot capacity query with push and pop-bx after 0806E2A8 return; no stored Thumb pointer or direct B/Bcc/BL reference found,0806E34C
+0806E34C,thumb,Independent 388-byte terrain position sampler with push-save prologue after 0806E308 return and padding; reviewed end 0806E4D0,0806E4D0
 0807006C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08070070
 08070444,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched),080704A4
 08070E44,thumb,Independent actor-list search function left as incbin by gbadisasm; retained assembly (not yet matched),08070EB0
