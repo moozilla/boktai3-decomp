@@ -16,7 +16,7 @@ void Collider_SetCallback(u8 *,
                                    struct RepeatedEffect *),
                           struct RepeatedEffect *);
 void Collider_SetPosition(u8 *, u8 *, u32);
-void Collider_Refresh(u8 *);
+s32 Collider_Refresh(u8 *);
 void RepeatedEffect_HandleContact(struct RepeatedEffectCollider *, struct RepeatedEffectCollider *,
                                   struct RepeatedEffect *);
 void RepeatedEffect_InitCollider(struct RepeatedEffect *p)
