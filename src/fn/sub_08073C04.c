@@ -1,14 +1,12 @@
-#include "global.h"
-
-extern u8 *gUnk_020004A8;
-void Heap_Free(u32 *);
-
-void sub_08073C04(void)
+#include "scene_actor_profile.h"
+#define SceneActorProfiles_FreeAll sub_08073C04
+void SceneActorProfiles_FreeAll(void)
 {
-    u32 *n = *(u32 **)(gUnk_020004A8 + 0x280);
-    while (n) {
-        u32 *next = (u32 *)*n;
-        Heap_Free(n);
-        n = next;
+    struct SceneActorProfileList *list = (void *)gUnk_020004A8->subsystem;
+    struct SceneActorProfile *profile = list->head;
+    while (profile) {
+        struct SceneActorProfile *next = profile->next;
+        Heap_Free(profile);
+        profile = next;
     }
 }
