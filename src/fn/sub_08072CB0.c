@@ -1,0 +1,20 @@
+#include "scene_actor_contact_list.h"
+#define SceneActorContacts_ContainsActiveNode sub_08072CB0
+u8 SceneActorContacts_ContainsActiveNode(struct SceneActorContactNode *input)
+{
+    struct SceneActorContactManager *manager = gUnk_020001A0;
+    struct SceneActorContactNode *node;
+    if (!manager)
+        goto failure;
+    if (input)
+        goto search;
+    goto failure;
+found:
+    return 1;
+search:
+    for (node = manager->head; node; node = node->next)
+        if ((node->flags & 1) && node == input)
+            goto found;
+failure:
+    return 0;
+}
