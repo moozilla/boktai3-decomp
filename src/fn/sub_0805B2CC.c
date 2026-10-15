@@ -1,14 +1,13 @@
-#include "global.h"
-extern u8 *gUnk_02000488;
-extern u8 *gUnk_02000580;
-s32 sub_0805B28C(void *, void *, s32);
-s32 sub_0805B2CC(u8 *p)
+#include "scene_panel_interaction.h"
+#define ScenePanel_CanAcquireTether sub_0805B2CC
+s32 ScenePanel_CanAcquireTether(struct ScenePanel *input)
 {
-    u8 *q = gUnk_02000488;
-    if (q) {
-        u8 *r = gUnk_02000580;
-        if (*(s32 *)(r + 0x1c) == 1 && r[0x457] == 6) {
-            if (sub_0805B28C(q + 0x50, p + 0x510, 0x46))
+    struct ScenePanelInteractionView *panel = (void *)input;
+    struct TetherActor *tether = gUnk_02000488;
+    if (tether) {
+        struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
+        if (player->kindValue == 1 && player->tetherMode == 6) {
+            if (sub_0805B28C(&tether->position, &panel->center, 70))
                 return 1;
         }
     }
