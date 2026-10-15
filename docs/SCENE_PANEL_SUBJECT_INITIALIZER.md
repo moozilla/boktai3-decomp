@@ -20,3 +20,10 @@ The playback expressions preserve separate command reads for frame and flip bits
 Integration uses the consolidated ScenePanelSubjectView and the shared playback
 helper. Palette fields and the selector follow main's verified palette-bank
 names. The final initializer ABI uses const ContactPosition* and u32 values.
+
+The adjoining factory `0805DCAC–0805DD18` adds108 ordinary-C exact bytes
+(+0.0045 percentage points). It allocates a 0x240-byte task in list8, installs
+the subject update/destructor, and forwards the eight input arguments to the
+initializer. A negative result kills the task and returns null; allocation
+failure also returns null. Successful creation returns the subject pointer.
+The parent passes its per-slot initial state and delays6/9/3/0 through this ABI.
