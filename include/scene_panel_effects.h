@@ -30,7 +30,7 @@ struct ScenePanelMainSprite {
     u32 flags;
     u8 unknown4[0x28];
     struct ScenePanelGraphics graphics;
-    u8 unknown48[0x20];
+    u16 paletteColors[16];
     u16 active, paletteFrame, unknown6C, phaseCounter;
 };
 struct ScenePanelEffectsView {
@@ -77,6 +77,6 @@ void sub_08217EC4(struct ScenePanelParticle *, s32, s32);
 void sub_08217ECC(struct ScenePanelParticle *, u32);
 void sub_08215284(void *, u32);
 u8 *sub_0821A520(u16, u16);
-u8 sub_08228DB8(void);
+u32 sub_08228DB8(void);
 extern u16 gUnk_03004FC0[];
 #endif
