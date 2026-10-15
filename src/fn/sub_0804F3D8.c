@@ -1,10 +1,11 @@
 #include "global.h"
+#define ResourceStation_Tick sub_0804F3D8
 void sub_0804F384(u8 *);
 void sub_0804EFB4(u8 *);
 void sub_0804F0B4(u8 *);
 void sub_0804F140(u8 *);
 void sub_0804F1FC(u8 *);
-u32 sub_0804F3D8(u8 *p)
+u32 ResourceStation_Tick(u8 *p)
 {
     sub_0804F384(p);
     switch (p[0x262]) {
