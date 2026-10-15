@@ -1,6 +1,7 @@
 #ifndef GUARD_SCENE_INPUT_H
 #define GUARD_SCENE_INPUT_H
 #include "engine.h"
+#include "contact_actor.h"
 
 struct SceneInputResource {
     u32 words[8];
@@ -8,7 +9,11 @@ struct SceneInputResource {
 struct SceneInputWidget {
     u8 unknown0[8];
     u32 flags;
-    u8 unknownC[0x3C];
+    u8 unknownC[0x14];
+    struct ContactPosition position;
+    u8 unknown28[0x12];
+    u16 paletteBank;
+    u8 unknown3C[0xC];
     u16 *palette;
     u8 unknown4C[0x14];
 };
