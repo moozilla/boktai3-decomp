@@ -4,7 +4,7 @@ This contiguous phase extends the actor control context at actor offset 3D0. Nam
 
 The context extends the existing control-phase prefix through storedPosition434. New fields include signed swayStep3E3 and sway3E4, previousGround3EA, three eight-byte ContactPosition vectors at41C/424/42C, and storedPosition434. The shared prefix retains flags3D4, baseOffset3DE, phase3E2, and elapsed/startTick3E6/3E7. The phase dispatcher supplies a valid actor with an initialized control context; 838AC obtains its context before checking availability.
 
-83550 installs the constant preset at08605C28 (existing exact16 bytes, no new credit). 83560 restores the stored position, derives terrain cell and slope-adjusted height, preserves the old vertical difference, clears three vectors, selects animation0, and advances the captured drawable's packed sequence. Its complete private draft is644 bytes/71.25%; the full628-byte body remains assembly.
+83550 installs the constant preset at08605C28 (existing exact16 bytes, no new credit). 83560 restores the stored position, derives terrain cell and slope-adjusted height, preserves the old vertical difference, clears three vectors, selects animation0, and advances the captured drawable's packed sequence. Its complete nonmatching draft is628 bytes/92.23%; the full628-byte assembly fallback remains authoritative. The draft reuses one initialized CpuSet zero word for the three vector clears and preserves the original packed-command read order.
 
 837D4 consumes context flag2 only when the actor is available and a local player exists. It clears that flag, sets actorEB bit3 and flags2D4 bit8, and enters state0/phase0/behavior3 with cleared counter and animation reset. Its full216 bytes are exact with four initialized register/lifetime hints remaining after reduction from22.
 
@@ -12,4 +12,4 @@ The context extends the existing control-phase prefix through storedPosition434.
 
 83A8C clamps the prior signed sway outside ±320, reverses its signed step, then advances by12*step. The resulting one-tick overshoot to±332 is intentional. Its full96 bytes match ordinary C.
 
-Current new exact gain is792 bytes, approximately0.0328 percentage points:96 ordinary and696 register-pinned. The existing16-byte preset helper was reviewed and typed without additional credit. The remaining628-byte restoration draft is private and uncredited. No handwritten instruction bodies or explicit r7 bindings were introduced.
+Current new exact gain is792 bytes, approximately0.0328 percentage points:96 ordinary and696 register-pinned. The existing16-byte preset helper was reviewed and typed without additional credit. The remaining628-byte restoration draft is uncredited and retains its assembly fallback. No handwritten instruction bodies or explicit r7 bindings were introduced.
