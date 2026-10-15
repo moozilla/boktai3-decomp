@@ -1,7 +1,6 @@
-#include "global.h"
-extern u32 gUnk_0200049C;
-void sub_08057538(void);
-void sub_0805755C(void)
+#include "countdown_timer.h"
+#define CountdownTimer_StopFromScript sub_0805755C
+void CountdownTimer_StopFromScript(void)
 {
     if (gUnk_0200049C)
         sub_08057538();
