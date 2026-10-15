@@ -92,8 +92,11 @@ address,isa,evidence,replacement_end
 08052E04,thumb,Independent 124-byte retract-state helper with push/pop-bx and two callback literals between52D60 and52E80; complete exact C,08052E80
 08056D24,thumb,Independent 20-byte global bit800 setter after 08056D04 return; registry key15B3 points to 08056D25; exact C,08056D38
 08058168,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08058184
+08058168,thumb,Independent channel-state entry thunk with own prologue return and calls; exact C; previously credited in preceding helper extent,08058184
 08058184,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080581A0
+08058184,thumb,Independent channel-state entry thunk with own prologue return and calls; exact C; previously credited in preceding helper extent,080581A0
 0805822C,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0805824C
+0805822C,thumb,Independent channel-state entry thunk with own prologue return and calls; exact C; previously credited in preceding helper extent,0805824C
 08059AB4,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,08059AC4
 0805BCE8,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0805BCEC
 0805C754,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0805C760

@@ -1,10 +1,7 @@
-#include "global.h"
-
-void sub_08058130(void *, u32, u32);
-void sub_08058150(void *, void *);
-
-void sub_08058168(void *p)
+#include "scene_panel.h"
+#define ScenePanel_SetChannelTwo sub_08058168
+void ScenePanel_SetChannelTwo(struct ScenePanel *panel)
 {
-    sub_08058130(p, 2, 2);
-    sub_08058150(p, NULL);
+    sub_08058130(panel, 2, 2);
+    sub_08058150(panel, 0);
 }
