@@ -1,16 +1,15 @@
-#include "global.h"
-extern u8 *gUnk_02000580;
-u32 sub_080501AC(u8 *p, s32 b)
+#include "cell_gate.h"
+#define CellGate_TestPlayerEdge sub_080501AC
+s32 CellGate_TestPlayerEdge(struct CellGate *gate, s32 limit)
 {
-    u32 v;
-    u32 m;
-    if (p[0x1C] & 8)
-        v = *(u16 *)(gUnk_02000580 + 0x30);
+    u32 value, mask;
+    if (gate->flags & 8)
+        value = (u16)gUnk_02000580->position.x;
     else
-        v = *(u16 *)(gUnk_02000580 + 0x34);
-    m = 0xFF;
-    m &= v;
-    if ((s32)m <= b)
+        value = (u16)gUnk_02000580->position.z;
+    mask = 255;
+    mask &= value;
+    if ((s32)mask <= limit)
         return 1;
     return 0;
 }

@@ -1,19 +1,17 @@
-#include "global.h"
-u8 *Task_Create(u32, u32);
-void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
-s32 sub_080506CC(u8 *, u32, u32);
-void Task_Kill(u8 *);
-void sub_08050694(void);
-void sub_080506B8(void);
-u8 *sub_080507DC(u32 a, u32 b)
+#include "cell_gate.h"
+#define CellGate_CreateFromScript sub_080507DC
+s32 sub_080506CC(struct CellGate *, u32, u32);
+u32 sub_08050694(struct CellGate *);
+u32 sub_080506B8(struct CellGate *);
+struct CellGate *CellGate_CreateFromScript(u32 id, u32 argument)
 {
-    u8 *r = Task_Create(8, 0x3c);
-    if (r) {
-        Task_SetCallbacks(r, (void (*)(void))sub_08050694, (void (*)(void))sub_080506B8);
-        if (sub_080506CC(r, a, b) < 0) {
-            Task_Kill(r);
+    struct CellGate *gate = Task_Create(8, 0x3C);
+    if (gate) {
+        Task_SetCallbacks(gate, (void (*)(void *))sub_08050694, (void (*)(void *))sub_080506B8);
+        if (sub_080506CC(gate, id, argument) < 0) {
+            Task_Kill(gate);
             return 0;
         }
     }
-    return r;
+    return gate;
 }
