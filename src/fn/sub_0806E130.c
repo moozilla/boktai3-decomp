@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "route_sprite_actor.h"
-#define RouteSpritePool_Tick sub_0806E130
 extern u32 gUnk_030053F0, gUnk_02000560;
 static inline u8 Occupied(u32 *mask, s32 index)
 {

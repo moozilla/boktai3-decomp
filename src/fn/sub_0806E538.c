@@ -1,9 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_grid.h"
 #include "contact_actor.h"
-s32 Div(s32,s32);
-s32 Mod(s32,s32);
-u8 *sub_0821D64C(s32,s32);
+s32 Div(s32, s32);
+s32 Mod(s32, s32);
+u8 *sub_0821D64C(s32, s32);
 static inline void FillResolved(struct ContactPosition *position, s32 index)
 {
     s32 column, row;
@@ -12,7 +12,8 @@ static inline void FillResolved(struct ContactPosition *position, s32 index)
     row = Div(index, SceneGrid_Width());
     position->x = column * 256 + 128;
     properties = sub_0821D64C(index, 1);
-    if (properties) properties += 4;
+    if (properties)
+        properties += 4;
     else {
         struct EngineMap *map = gUnk_030052F4;
         u32 offset = index * 4 + 12;
@@ -23,12 +24,13 @@ static inline void FillResolved(struct ContactPosition *position, s32 index)
 }
 static inline void Fill(struct ContactPosition *position, s32 index)
 {
-    if (index < 0) index = -index;
-    FillResolved(position,index);
+    if (index < 0)
+        index = -index;
+    FillResolved(position, index);
 }
 
-#define SceneGrid_ResolveEndpoint sub_0806E538
-s32 SceneGrid_ResolveEndpoint(struct ContactPosition *first, struct ContactPosition *second, s32 firstIndex, s32 secondIndex)
+s32 SceneGrid_ResolveEndpoint(struct ContactPosition *first, struct ContactPosition *second,
+                              s32 firstIndex, s32 secondIndex)
 {
     if (secondIndex == -255) {
         if (firstIndex == secondIndex) {
@@ -39,7 +41,8 @@ s32 SceneGrid_ResolveEndpoint(struct ContactPosition *first, struct ContactPosit
             {
                 register s32 index asm("r5") = fallback;
                 register s32 incoming asm("r2") = fallback;
-                if (incoming < 0) index = -incoming;
+                if (incoming < 0)
+                    index = -incoming;
                 FillResolved(second, index);
             }
         } else {

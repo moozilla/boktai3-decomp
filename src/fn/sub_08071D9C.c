@@ -1,5 +1,4 @@
 #include "scene_actor_registry.h"
-#define SceneActorRegistry_CreateManager sub_08071D9C
 struct SceneActorRegistryManager *SceneActorRegistry_CreateManager(u32 resourceId, u32 context)
 {
     u32 resource = (u16)resourceId, secondary = (u16)context;
@@ -9,9 +8,9 @@ struct SceneActorRegistryManager *SceneActorRegistry_CreateManager(u32 resourceI
     {
         manager = Task_Create(8, sizeof(*manager));
         if (manager) {
-            Task_SetCallbacks(manager, (void (*)(void *))sub_08071CFC,
-                              (void (*)(void *))sub_08071D3C);
-            if (sub_08071D60(manager, resource, secondary) < 0) {
+            Task_SetCallbacks(manager, (void (*)(void *))SceneActorRegistry_TickManager,
+                              (void (*)(void *))SceneActorRegistry_DestroyManager);
+            if (SceneActorRegistry_InitializeManager(manager, resource, secondary) < 0) {
                 Task_Kill(manager);
                 return 0;
             }

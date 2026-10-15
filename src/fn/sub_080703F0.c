@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-#define SceneActorRegistry_CountLivingByCategory sub_080703F0
 struct SceneActorRegistryManager *sub_08072B44(void);
 s32 SceneActorRegistry_CountLivingByCategory(s32 state)
 {

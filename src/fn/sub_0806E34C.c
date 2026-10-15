@@ -1,14 +1,15 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_grid.h"
 #include "contact_actor.h"
-s32 Div(s32,s32);
-s32 Mod(s32,s32);
-u8 *sub_0821D64C(s32,s32);
+s32 Div(s32, s32);
+s32 Mod(s32, s32);
+u8 *sub_0821D64C(s32, s32);
 extern const s8 gUnk_08605BC8[];
 static inline u8 *Properties(s32 index)
 {
-    u8 *p = sub_0821D64C(index,1);
-    if (p) return p+4;
+    u8 *p = sub_0821D64C(index, 1);
+    if (p)
+        return p + 4;
     else {
         struct EngineMap *map = gUnk_030052F4;
         u32 offset = index * 4 + 12;
@@ -17,7 +18,8 @@ static inline u8 *Properties(s32 index)
 }
 #define SceneGrid_TryRandomNearbyPosition sub_0806E34C
 
-s32 SceneGrid_TryRandomNearbyPosition(struct ContactPosition *output,void *unused,const struct ContactPosition *origin,s32 radius)
+s32 SceneGrid_TryRandomNearbyPosition(struct ContactPosition *output, void *unused,
+                                      const struct ContactPosition *origin, s32 radius)
 {
     register s32 spread asm("r5") = radius;
     s32 x = origin->x >> 8;
@@ -40,8 +42,8 @@ s32 SceneGrid_TryRandomNearbyPosition(struct ContactPosition *output,void *unuse
         register u32 rowBase asm("r0") = gUnk_030052F4->rows[z];
         index = rowBase + x;
     }
-    column = Mod(index,SceneGrid_Width());
-    row = Div(index,SceneGrid_Width());
+    column = Mod(index, SceneGrid_Width());
+    row = Div(index, SceneGrid_Width());
     height = *Properties(index) & 15;
     baseColumn = column - spread;
     baseRow = row - spread;
@@ -52,48 +54,48 @@ s32 SceneGrid_TryRandomNearbyPosition(struct ContactPosition *output,void *unuse
     }
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     {
-        s32 choice = Mod(samples[gUnk_03005308],spread);
+        s32 choice = Mod(samples[gUnk_03005308], spread);
         s32 base = baseColumn;
         chosenColumn = choice + base;
     }
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     {
-        s32 choice = Mod(samples[gUnk_03005308],spread);
+        s32 choice = Mod(samples[gUnk_03005308], spread);
         s32 chosenRow;
         s32 base = baseRow;
         chosenRow = choice + base;
-    {
-        const s8 *table = gUnk_08605BC8;
-        register s32 offset asm("r0");
-        offset = chosenRow * 8 - 69;
         {
-            const u8 *address;
-            u32 raw;
-            offset = chosenColumn + offset;
-            address = (void *)(offset + (u32)table);
-            raw = *address;
-    raw = (s8)raw;
-    {
-        s32 expected = height;
-    if ((s32)raw == expected) {
-        register s32 candidate asm("r6");
-        s32 x,z;
-        {
-            s32 width = SceneGrid_Width();
-            register s32 product asm("r0") = chosenRow;
-            product *= width;
-            candidate = chosenColumn + product;
+            const s8 *table = gUnk_08605BC8;
+            register s32 offset asm("r0");
+            offset = chosenRow * 8 - 69;
+            {
+                const u8 *address;
+                u32 raw;
+                offset = chosenColumn + offset;
+                address = (void *)(offset + (u32)table);
+                raw = *address;
+                raw = (s8)raw;
+                {
+                    s32 expected = height;
+                    if ((s32)raw == expected) {
+                        register s32 candidate asm("r6");
+                        s32 x, z;
+                        {
+                            s32 width = SceneGrid_Width();
+                            register s32 product asm("r0") = chosenRow;
+                            product *= width;
+                            candidate = chosenColumn + product;
+                        }
+                        x = Mod(candidate, SceneGrid_Width());
+                        z = Div(candidate, SceneGrid_Width());
+                        output->x = x * 256 + 128;
+                        output->y = (*Properties(candidate) & 15) * 256;
+                        output->z = z * 256 + 128;
+                        return 1;
+                    }
+                }
+            }
         }
-        x = Mod(candidate,SceneGrid_Width());
-        z = Div(candidate,SceneGrid_Width());
-        output->x = x * 256 + 128;
-        output->y = (*Properties(candidate) & 15) * 256;
-        output->z = z * 256 + 128;
-        return 1;
-    }
-    }
-    }
-    }
     }
     return 0;
 }

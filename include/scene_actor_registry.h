@@ -108,15 +108,15 @@ struct SceneActorRegistryManager {
 extern struct SceneActorRegistryManager *gUnk_020004A8;
 extern struct SceneActorRegistryNode *gUnk_020004AC;
 void sub_08070FA8(struct SceneActorRegistryManager *);
-void sub_08071434(void);
-void sub_08071470(struct SceneActorRegistryManager *);
-void sub_080714E4(struct SceneActorRegistryActor *);
-void sub_0807171C(struct SceneActorRegistryActor *);
+void SceneActorRegistry_DestroyActors(void);
+void SceneActorRegistry_AdvanceInactiveActors(struct SceneActorRegistryManager *);
+void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *);
+void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *);
 void sub_080718D8(struct SceneActorRegistryActor *);
-void sub_08071CB0(struct SceneActorRegistryManager *);
-s32 sub_08071CFC(struct SceneActorRegistryManager *);
-s32 sub_08071D3C(struct SceneActorRegistryManager *);
-s32 sub_08071D60(struct SceneActorRegistryManager *, u32, u32);
-struct SceneActorRegistryManager *sub_08071D9C(u32, u32);
-void sub_08071DF4(void);
+void SceneActorRegistry_UpdateBackgroundFlag(struct SceneActorRegistryManager *);
+s32 SceneActorRegistry_TickManager(struct SceneActorRegistryManager *);
+s32 SceneActorRegistry_DestroyManager(struct SceneActorRegistryManager *);
+s32 SceneActorRegistry_InitializeManager(struct SceneActorRegistryManager *, u32, u32);
+struct SceneActorRegistryManager *SceneActorRegistry_CreateManager(u32, u32);
+void SceneActorRegistry_ResetManager(void);
 #endif

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-#define SceneActorRegistry_FindAvailableAfterId sub_08070E00
 struct SceneActorRegistryActor *SceneActorRegistry_FindAvailableAfterId(u32 id)
 {
     struct SceneActorRegistryNode *node = gUnk_020004AC;

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "route_sprite_actor.h"
-#define RouteSpriteActor_Create sub_0806DFC8
 u8 sub_0821E5C4(void *, s32, s32, s32);
 s32 ScaledShadow_Initialize(u8 *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void RouteSpriteActor_Create(struct ContactPosition *anchor, void *unused, s32 initialTimer,
@@ -17,11 +16,11 @@ void RouteSpriteActor_Create(struct ContactPosition *anchor, void *unused, s32 i
     u8 *graphics;
     pool = gUnk_02000198;
     if (!pool) {
-        pool = sub_0806E250();
+        pool = RouteSpritePool_Create();
         if (!pool)
             return;
     }
-    actor = sub_0806DFB8(pool);
+    actor = RouteSpritePool_TryAllocateSlot(pool);
     if (!actor)
         return;
     /* Offset temporaries preserve allocation lifetimes for the typed fields

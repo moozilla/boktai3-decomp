@@ -120,15 +120,15 @@ static inline void Step(struct SceneSteeringActor *slot, struct DisplaySequenceS
     return;
 }
 
-struct SceneSteeringActorPool *sub_0806CEC0(void);
-struct SceneSteeringActor *sub_0806BC8C(struct SceneSteeringActorPool *);
-void sub_0806BBD0(struct SceneSteeringActor *, s32, s32, s32, s32, s32, s32, s32);
+struct SceneSteeringActorPool *SceneSteeringActor_EnsurePool(void);
+struct SceneSteeringActor *SceneSteeringActor_Allocate(struct SceneSteeringActorPool *);
+void SceneSteeringActor_InitializeCollider(struct SceneSteeringActor *, s32, s32, s32, s32, s32,
+                                           s32, s32);
 u32 ScaledShadow_Initialize(void *, const struct ContactPosition *, s32, s32, s32, s32, s32, s32,
                             s32, s32, s32);
 void sub_08013B98(void *, s32, s32);
 void sub_08013BBC(void *, s32);
 void sub_08013728(void *);
-#define SceneSteeringActor_CreateTravelActor sub_0806C7B0
 void SceneSteeringActor_CreateTravelActor(const struct ContactPosition *position,
                                           const struct ContactPosition *target, s32 velocityY,
                                           s32 direction, s32 steeringTimer, s32 turnStep,
@@ -148,11 +148,11 @@ void SceneSteeringActor_CreateTravelActor(const struct ContactPosition *position
     u32 clear;
     pool = gUnk_02000188;
     if (!pool) {
-        pool = sub_0806CEC0();
+        pool = SceneSteeringActor_EnsurePool();
         if (!pool)
             return;
     }
-    slot = sub_0806BC8C(pool);
+    slot = SceneSteeringActor_Allocate(pool);
     if (!slot)
         return;
     {
@@ -248,7 +248,7 @@ void SceneSteeringActor_CreateTravelActor(const struct ContactPosition *position
         owner = sprite;
         owner->priority = priority;
         owner->flags &= ~1;
-        sub_0806BBD0(slot, a, b, c, d, tailZero, tailZero, tailZero);
+        SceneSteeringActor_InitializeCollider(slot, a, b, c, d, tailZero, tailZero, tailZero);
         shadow = slot->shadow;
         slot->shadowStatus = ScaledShadow_Initialize(shadow, &slot->position, 64, 64, 64, 100,
                                                      tailZero, tailZero, 5, 1, tailZero);

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-#define SceneActorRegistry_ResetCategoryControl sub_080706DC
 struct SceneActorRegistryManager *sub_08072B44(void);
 static inline u8 IsUnavailable(struct SceneActorRegistryActor *input, u32 disabled, u32 excluded)
 {

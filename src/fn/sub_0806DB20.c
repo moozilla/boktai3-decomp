@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "route_sprite_playback.h"
-#define RouteSpriteActor_TickPausing sub_0806DB20
 static inline s32 Truncate12(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);

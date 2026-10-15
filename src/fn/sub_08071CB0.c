@@ -1,5 +1,4 @@
 #include "scene_actor_registry.h"
-#define SceneActorRegistry_UpdateBackgroundFlag sub_08071CB0
 s32 OrbitBackground_IsEnabled(void);
 void SceneActorRegistry_UpdateBackgroundFlag(struct SceneActorRegistryManager *manager)
 {

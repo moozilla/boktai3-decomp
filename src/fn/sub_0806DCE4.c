@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "route_sprite_actor.h"
-#define RouteSpriteActor_TickEmitting sub_0806DCE4
-void sub_0806CFE4(struct RouteSpriteActor *);
+void RouteSpriteActor_RunEventScript(struct RouteSpriteActor *);
 void sub_081287D4(struct ContactPosition *, u32, u32, u32, u32, u32, void *);
 union EmissionPosition {
     struct ContactPosition position;
@@ -88,7 +87,7 @@ void RouteSpriteActor_TickEmitting(struct RouteSpritePool *pool, struct RouteSpr
             position.packed.y -= 60;
             sub_081287D4(&position.position, (u16)actor->amount, actor->kind, actor->parameter,
                          actor->option, 20, actor->context);
-            sub_0806CFE4(actor);
+            RouteSpriteActor_RunEventScript(actor);
         }
     }
     {

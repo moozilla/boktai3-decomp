@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-#define SceneActorRegistry_SetMovementModesFromScript sub_08070A90
 struct SceneActorRegistryManager *sub_08072B44(void);
 void sub_08070070(struct SceneActorRegistryActor *, s32);
 static inline u32 ReadExclusionFlags(struct SceneActorRegistryActor *actor)

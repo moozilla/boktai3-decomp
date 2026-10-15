@@ -11,7 +11,7 @@ u8 RouteSpritePool_IsFull(void)
     struct RouteSpritePool *pool = gUnk_02000198;
     s32 i;
     if (!pool) {
-        pool = sub_0806E250();
+        pool = RouteSpritePool_Create();
         if (!pool)
             return TRUE;
     }

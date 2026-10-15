@@ -1,10 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_grid.h"
-u8 *sub_0821D64C(s32,s32);
+u8 *sub_0821D64C(s32, s32);
 static inline u8 *Properties(s32 index)
 {
-    u8 *p = sub_0821D64C(index,1);
-    if (p) return p+4;
+    u8 *p = sub_0821D64C(index, 1);
+    if (p)
+        return p + 4;
     else {
         struct EngineMap *map = gUnk_030052F4;
         u32 offset = index * 4 + 12;
@@ -13,12 +14,10 @@ static inline u8 *Properties(s32 index)
 }
 static inline u32 Blocked(u8 *properties)
 {
-    u32 flags = *(u16 *)(properties+2);
+    u32 flags = *(u16 *)(properties + 2);
     flags &= 0x80;
     return flags;
 }
-
-#define SceneGrid_ScanTerrainDirection sub_0806E900
 
 /* Directional height scan; stopping relies on terrain flag 0x80. */
 s32 SceneGrid_ScanTerrainDirection(s32 start, s32 angle)
@@ -33,12 +32,13 @@ s32 SceneGrid_ScanTerrainDirection(s32 start, s32 angle)
     {
         u32 raw;
         register u32 mask asm("r1");
-        u8 *properties = sub_0821D64C(savedStart,1);
-        if (properties) properties += 4;
+        u8 *properties = sub_0821D64C(savedStart, 1);
+        if (properties)
+            properties += 4;
         else {
             struct EngineMap *map = gUnk_030052F4;
-            u32 offset = savedStart*4+12;
-            properties = map->cells+offset;
+            u32 offset = savedStart * 4 + 12;
+            properties = map->cells + offset;
         }
         raw = *properties;
         mask = 15;
@@ -55,120 +55,132 @@ s32 SceneGrid_ScanTerrainDirection(s32 start, s32 angle)
     cell = savedStart;
     best = 0;
     switch (direction) {
-    case 0: {
-        struct EngineMap **location = &gUnk_030052F4;
-        u32 offset;
-        {
-            u32 initial = savedStart*4;
-            offset = initial+16;
-        }
-        for (;;) {
-            s32 next = cell+1;
-            register s32 adjacentHeight asm("r5");
-            u8 *properties = sub_0821D64C(next,1);
-            if (properties) properties += 4;
-            else {
-                struct EngineMap **low = location;
-                properties = (*low)->cells+offset;
-            }
+        case 0: {
+            struct EngineMap **location = &gUnk_030052F4;
+            u32 offset;
             {
-                u32 raw = *properties;
-                adjacentHeight = 15;
-                adjacentHeight &= raw;
+                u32 initial = savedStart * 4;
+                offset = initial + 16;
             }
-            properties = sub_0821D64C(next,1);
-            if (properties) properties += 4;
-            else {
-                struct EngineMap **low = location;
-                properties = (*low)->cells+offset;
+            for (;;) {
+                s32 next = cell + 1;
+                register s32 adjacentHeight asm("r5");
+                u8 *properties = sub_0821D64C(next, 1);
+                if (properties)
+                    properties += 4;
+                else {
+                    struct EngineMap **low = location;
+                    properties = (*low)->cells + offset;
+                }
+                {
+                    u32 raw = *properties;
+                    adjacentHeight = 15;
+                    adjacentHeight &= raw;
+                }
+                properties = sub_0821D64C(next, 1);
+                if (properties)
+                    properties += 4;
+                else {
+                    struct EngineMap **low = location;
+                    properties = (*low)->cells + offset;
+                }
+                if (Blocked(properties)) {
+                    if (best)
+                        return best;
+                    return cell;
+                }
+                if (adjacentHeight != height) {
+                    if (best)
+                        return best;
+                    best = cell;
+                } else {
+                    best = next;
+                }
+                offset += 4;
+                cell = cell + 1;
             }
-            if (Blocked(properties)) {
-                if (best) return best;
-                return cell;
-            }
-            if (adjacentHeight != height) {
-                if (best) return best;
-                best = cell;
-            } else {
-                best = next;
-            }
-            offset += 4;
-            cell = cell+1;
         }
-    }
-    case 1:
-        for (;;) {
-            s32 next = cell+SceneGrid_Width();
-            s32 adjacentHeight = *Properties(next) & 15;
-            if (Blocked(Properties(next))) {
-                if (best) return best;
-                return cell;
+        case 1:
+            for (;;) {
+                s32 next = cell + SceneGrid_Width();
+                s32 adjacentHeight = *Properties(next) & 15;
+                if (Blocked(Properties(next))) {
+                    if (best)
+                        return best;
+                    return cell;
+                }
+                if (adjacentHeight != height) {
+                    if (best)
+                        return best;
+                    best = cell;
+                } else {
+                    best = next;
+                }
+                cell = cell + SceneGrid_Width();
             }
-            if (adjacentHeight != height) {
-                if (best) return best;
-                best = cell;
-            } else {
-                best = next;
-            }
-            cell = cell+SceneGrid_Width();
-        }
-    case 2: {
-        struct EngineMap **location = &gUnk_030052F4;
-        u32 offset;
-        {
-            u32 initial = cell*4;
-            offset = initial+8;
-        }
-        for (;;) {
-            s32 next = cell-1;
-            register s32 adjacentHeight asm("r5");
-            u8 *properties = sub_0821D64C(next,1);
-            if (properties) properties += 4;
-            else {
-                struct EngineMap **low = location;
-                properties = (*low)->cells+offset;
-            }
+        case 2: {
+            struct EngineMap **location = &gUnk_030052F4;
+            u32 offset;
             {
-                u32 raw = *properties;
-                adjacentHeight = 15;
-                adjacentHeight &= raw;
+                u32 initial = cell * 4;
+                offset = initial + 8;
             }
-            properties = sub_0821D64C(next,1);
-            if (properties) properties += 4;
-            else {
-                struct EngineMap **low = location;
-                properties = (*low)->cells+offset;
+            for (;;) {
+                s32 next = cell - 1;
+                register s32 adjacentHeight asm("r5");
+                u8 *properties = sub_0821D64C(next, 1);
+                if (properties)
+                    properties += 4;
+                else {
+                    struct EngineMap **low = location;
+                    properties = (*low)->cells + offset;
+                }
+                {
+                    u32 raw = *properties;
+                    adjacentHeight = 15;
+                    adjacentHeight &= raw;
+                }
+                properties = sub_0821D64C(next, 1);
+                if (properties)
+                    properties += 4;
+                else {
+                    struct EngineMap **low = location;
+                    properties = (*low)->cells + offset;
+                }
+                if (Blocked(properties)) {
+                    if (best)
+                        return best;
+                    return cell;
+                }
+                if (adjacentHeight != height) {
+                    if (best)
+                        return best;
+                    best = cell;
+                } else {
+                    best = next;
+                }
+                offset -= 4;
+                cell = cell - 1;
             }
-            if (Blocked(properties)) {
-                if (best) return best;
-                return cell;
-            }
-            if (adjacentHeight != height) {
-                if (best) return best;
-                best = cell;
-            } else {
-                best = next;
-            }
-            offset -= 4;
-            cell = cell-1;
         }
-    }
-    case 3:
-        for (;;) {
-            s32 next = cell-SceneGrid_Width();
-            s32 adjacentHeight = *Properties(next) & 15;
-            if (Blocked(Properties(next))) {
-                if (best) return best;
-                return cell;
+        case 3:
+            for (;;) {
+                s32 next = cell - SceneGrid_Width();
+                s32 adjacentHeight = *Properties(next) & 15;
+                if (Blocked(Properties(next))) {
+                    if (best)
+                        return best;
+                    return cell;
+                }
+                if (adjacentHeight != height) {
+                    if (best)
+                        return best;
+                    best = cell;
+                } else {
+                    best = next;
+                }
+                cell = cell - SceneGrid_Width();
             }
-            if (adjacentHeight != height) {
-                if (best) return best;
-                best = cell;
-            } else {
-                best = next;
-            }
-            cell = cell-SceneGrid_Width();
-        }
     }
     return savedStart;
 }

@@ -1,7 +1,6 @@
 #include "scene_grid.h"
-s32 Div(s32,s32);
-#define SceneGrid_ComputeCellDelta sub_0806E4D0
-void SceneGrid_ComputeCellDelta(s32 first,s32 second,s32 *columnDelta,s32 *rowDelta)
+s32 Div(s32, s32);
+void SceneGrid_ComputeCellDelta(s32 first, s32 second, s32 *columnDelta, s32 *rowDelta)
 {
     s32 a = first;
     s32 b = second;

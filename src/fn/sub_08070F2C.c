@@ -1,8 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-#define SceneActorRegistry_TestCategoryFlags sub_08070F2C
-struct SceneActorRegistryActor *sub_08070EB0(void);
-struct SceneActorRegistryActor *sub_08070E00(u32);
+struct SceneActorRegistryActor *SceneActorRegistry_GetFirstActor(void);
+struct SceneActorRegistryActor *SceneActorRegistry_FindAvailableAfterId(u32);
 static inline u32 IsUnavailable(struct SceneActorRegistryActor *actor, u32 disabled, u32 excluded)
 {
     {
@@ -32,7 +31,7 @@ u32 SceneActorRegistry_TestCategoryFlags(s32 inputCategory, u32 inputFlags)
 {
     register s32 category asm("r5") = inputCategory;
     register u32 flags asm("r4") = inputFlags;
-    register struct SceneActorRegistryActor *actor asm("r1") = sub_08070EB0();
+    register struct SceneActorRegistryActor *actor asm("r1") = SceneActorRegistry_GetFirstActor();
     if (actor)
         goto initialize;
     goto failure;
@@ -48,7 +47,7 @@ initialize: {
             if (!unavailable && (actor->flags2CC & flags))
                 goto success;
         }
-        actor = sub_08070E00(actor->id);
+        actor = SceneActorRegistry_FindAvailableAfterId(actor->id);
     } while (actor);
 }
 failure:
