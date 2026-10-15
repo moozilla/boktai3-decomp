@@ -1,11 +1,6 @@
-#include "global.h"
-
-struct S {
-    u8 f[7];
-    u8 v;
-};
-
-u32 sub_0805E7D0(struct S *p, u32 m)
+#include "scene_input_grid.h"
+#define SceneInput_TestGridFlags sub_0805E7D0
+u32 SceneInput_TestGridFlags(struct SceneInputGrid *grid, u32 mask)
 {
-    return p->v & m;
+    return grid->flags & mask;
 }
