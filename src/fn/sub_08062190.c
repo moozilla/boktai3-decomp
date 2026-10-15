@@ -3,7 +3,7 @@
 s32 SceneInventory_TickMoveSelection(struct SceneInventoryTail *p)
 {
     s32 result;
-    SceneInputPanel_HighlightCompare(p, &p->highlight);
+    SceneInputPanel_HighlightCompare(&p->display, p->highlight.colors);
     if (gUnk_03005260[1] & 2) {
         Sound_PlaySong(0xDE);
         switch (p->mode) {
