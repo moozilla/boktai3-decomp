@@ -31,7 +31,9 @@ struct SceneActorRegistryActor {
     const void *control;
     u8 unknown220[0xC];
     const void *defaultControl;
-    u8 unknown230[0x28];
+    u8 unknown230[0x1C];
+    void *messageCallback;
+    u8 unknown250[8];
     s32 (*update)(void *);
     s32 (*destroy)(void *);
     u8 unknown260[0x48];
@@ -94,7 +96,8 @@ struct SceneActorRegistryNode {
     struct SceneActorRegistryActor *actor;
 };
 struct SceneActorRegistryManager {
-    u8 task[0x24];
+    u8 task[0x1C];
+    struct SceneActorRegistryNode *sentinel, *cursor;
     u32 resourceId;
     u16 unknown28, frame;
     u32 flags;
