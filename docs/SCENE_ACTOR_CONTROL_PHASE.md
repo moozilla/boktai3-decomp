@@ -47,3 +47,10 @@ The observed clock offset is not assigned a broader gameplay meaning.
 heading from E9 only when that flag was set, then unconditionally sets animation
 state/phase/behavior0/2/0, clears the counter, marks state changed again, and
 increments the counter to1. The clear-then-increment sequence is retained.
+
+83188 matches156 register-pinned bytes. Consuming state-changed2B1 installs
+persistent callback82C68 with control kind34, resets the common control fields,
+and disables the shadow. Every call then invokes callback270 and increments
+counter2AC only when its low-byte result is zero. The callback's effect is not
+inferred from its result alone. The seven new bodies now recover976 bytes
+(+0.0404 percentage points):268 ordinary and708 register-pinned.
