@@ -115,6 +115,6 @@ struct SceneActorRegistryResetView {
 };
 u8 *sub_0821D64C(s32, s32);
 void sub_0821E5C4(struct SceneActorRegistryRoute *, u32, u32, u32);
-void sub_0821E7EC(struct ContactPosition *, u32, u32);
+s32 sub_0821E7EC(u16 *, u32, u32);
 void sub_0821FD3C(void *, struct ContactPosition *);
 #endif

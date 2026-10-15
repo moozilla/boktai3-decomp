@@ -19,7 +19,7 @@ void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *a
     category = actor->category;
     if (category - 18 > 1 && category != 9 && category != 22) {
         struct ContactPosition *earlyPosition = &actor->position;
-        sub_0821E7EC(earlyPosition, route->parameterA, route->parameterC);
+        sub_0821E7EC((u16 *)earlyPosition, route->parameterA, route->parameterC);
         sub_0821E5C4(route, route->parameterA, route->parameterB, route->parameterC);
         sub_0821FD3C(actor->routeObject, earlyPosition);
         actor->currentRoute = route;
