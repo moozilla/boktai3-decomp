@@ -14,5 +14,5 @@ void SceneInventory_BeginRemovalTransition(struct SceneInventoryControlView *pan
             sub_0806097C((void *)panel);
             break;
     }
-    sub_0806130C(panel, (void (*)(struct SceneInventoryControlView *))sub_08062818);
+    sub_0806130C(panel, (SceneInventoryCallback)sub_08062818);
 }
