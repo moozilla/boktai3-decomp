@@ -1,14 +1,7 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x40];
-    u16 a;
-    u8 g[0x56 - 0x42];
-    u16 b;
-};
-
-void sub_080670A0(s32 a, s32 b, struct S *p)
+#include "scene_actor_control.h"
+#define SceneActorControl_OnContact sub_080670A0
+void SceneActorControl_OnContact(void *unused0, void *unused1, struct SceneActorControlSlot *slot)
 {
-    p->a |= 2;
-    p->b |= 4;
+    slot->flags |= 2;
+    slot->collider.flags |= 4;
 }
