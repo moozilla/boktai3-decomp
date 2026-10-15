@@ -49,12 +49,19 @@ unproved caller contract. Controller6A60C has an observed first-slot flag check
 for every occupied slot; its per-entry cooldown and flags writes still advance.
 
 The user target remains **30% exact or20% account usage remaining**. Latest
-meter check was73% remaining after the reset; no reset was consumed here.
-Root owns6CA3C–6D000, Sol owns697C8–6B2C4, tail owns6B2C4–6CA3C, and lifecycle
-owns6D000–6E130 plus the preceding6CFE4/CFFC typed callbacks. Keep the four
+meter check was71% remaining after the reset; no reset was consumed here.
+Root owns6CA3C–6D000 and6E34C–70070, Sol owns697C8–6B2C4, tail owns
+6B2C4–6CA3C, and lifecycle owns6D000–6E34C plus preceding6CFE4/CFFC callbacks. Keep the four
 checkouts/build outputs isolated. Frozen permuter jobs continue for close
 register/order residues; audit candidates for deleted initialization before
 acceptance. Some lower-scoring outputs were rejected for precisely that reason.
+
+Validation: all 78 changed/promoted C units pass their complete reviewed extents
+against the final combined ELF. The complete build prints `build/boktai3.gba: OK`
+and the RAM-literal audit passes. The source audit reports no uninitialized or
+unsequenced accesses; the existing 66DB8 non-void out-of-domain return warning
+is unchanged. All 18 progress/permuter regression tests pass. No ROM, generated
+assembly, native bytecode packet dump or permuter output is committed.
 
 ## October 15 continuation: attachment ownership, scene control and particle pools
 
