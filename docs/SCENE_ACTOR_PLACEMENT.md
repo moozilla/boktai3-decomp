@@ -44,3 +44,23 @@ Halfword arithmetic wraps on the store, matching the original unsigned loads.
 The356-byte extent is exact. Minimization removed all nineteen allocation
 and coordinate hints, leaving only the same two lifetime barriers used by
 the callback consumer.
+
+`77C48` is a timed particle emitter, not an initializer. Halfword2BC is
+decremented while nonzero; emission runs when the new value is divisible
+by four. Byte2B6 selects an eight-way base angle,2BA supplies an angular
+offset,and signed byte2BB changes that offset by four times its value.
+Values above64 clamp to64 and reverse the signed step. Category2 selects
+particle kind9 or10 according to paletteOffset; category14 selects kind11
+and adds40 to world Y. Each selected path issues three particle-group calls
+with independently randomized counts,angles and durations. Its eleven-arg
+particle API at148CC is preserved; the first two random-index advances do
+not publish the index before the later third/fourth samples. Each subsequent
+particle call can change the shared RNG index,so the next group reloads it.
+
+The emitter reproduces1072 bytes. `depin.py --write` reduced152 exploratory
+hints to21; all are local,no explicit r7 binding is present. Coordinate
+copy and word masking are defined: the position union is assigned from the
+actor before the first word's initialized X/Y pair is read. The remaining
+padding halfword is passed through the aggregate; it is never used as a
+scalar in authored arithmetic. The preserved separate branches/scopes keep
+three stack positions and RNG lifetimes consistent with the reviewed code.
