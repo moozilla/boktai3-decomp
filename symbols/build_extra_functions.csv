@@ -104,6 +104,9 @@ address,isa,evidence,replacement_end
 08066CB8,thumb,Independent unused-looking attachment release-all after query return and literal; complete push-loop-pop-bx; no ROM Thumb pointer or direct branch encoding found; exact standalone C,08066DB8
 08066FD8,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08067014
 08067014,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08067018
+08067990,thumb,Independent script constructor with own prologue calls pop-bx and embedded literals in retained 08067984 tail; full exact 536-byte C extent,08067BA8
+08067BA8,thumb,Independent request-all slot loop with own push and pop-bx in retained 08067984 tail; full exact 100-byte C body,08067C0C
+08067C0C,thumb,Independent bx-lr empty leaf after request-all return; full exact 4-byte extent,08067C10
 080682CC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080682D0
 080688CC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080688D0
 08069788,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched),080697C8
@@ -111,6 +114,8 @@ address,isa,evidence,replacement_end
 0806A420,thumb,Independent256-byte script wrapper after704-byte particle creator return and literal pool; own prologue and return; docs/SPARK_PARTICLE.md,0806A520
 0806A784,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0806A788
 0806BE80,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0806BE84
+0806CF18,thumb,Independent 52-byte state-four-to-five loop after singleton reset; own push/pop-bx and literal; docs/SPRITE_EFFECT_STEERING_ACTORS.md,0806CF4C
+0806CF4C,thumb,"Independent 152-byte fixed-position constructor wrapper with own stack prologue, angle and creator calls, and return; retained assembly gap",0806CFE4
 0806CFFC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0806D000
 0806E29C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0806E2A8
 0807006C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08070070
@@ -407,6 +412,3 @@ address,isa,evidence,replacement_end
 08245394,arm,Existing bx r0 callback trampoline; retained assembly; docs/RFU.md,
 08248E70,thumb,Independent 156-byte RTC write body; exact standalone C check; docs/RTC.md,08248F0C
 08248F0C,thumb,Separate RTC alarm body with own push/sub-sp and pop/bx after 08248E70 return; retained unmatched; docs/RTC.md,
-08067BA8,thumb,Independent request-all slot loop with own push and pop-bx in retained 08067984 tail; full exact 100-byte C body,08067C0C
-08067C0C,thumb,Independent bx-lr empty leaf after request-all return; full exact 4-byte extent,08067C10
-08067990,thumb,Independent script constructor with own prologue calls pop-bx and embedded literals in retained 08067984 tail; full exact 536-byte C extent,08067BA8
