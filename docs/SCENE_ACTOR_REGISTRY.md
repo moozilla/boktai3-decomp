@@ -38,7 +38,12 @@ pointer with identical bytes. There is no authored fall-through return.
 The larger `70FA8` draft traverses callbacks, handles flagged removal,
 conditionally emits three packed-vector particles and manages two palette
 transition categories. It remains an ignored nonmatching draft, with no exact
-credit. The three actor reset routines are not yet implemented by this worker.
+credit. `7171C` now resets its embedded route, samples terrain height and slope, copies
+the grounded position into either drawable, clears both motion vectors and
+restores its base palette bank. A flagged reset also clears the embedded
+control timer/counter/mode. The extended reset-phase layout is in
+`scene_actor_reset.h`; it is kept separate while the adjacent control consumers
+consolidate the common actor view. Other reset routines remain in progress.
 
 Current exact new progress: `71470` 116 bytes, `71D60` 60 bytes and `71D9C`
 88 bytes, totaling 264 ordinary-C bytes (about 0.0109 percentage points).
@@ -46,3 +51,13 @@ Existing 248 bytes now have typed contracts without new credit. The retained
 one hint in the initial inactive-actor draft was removed by `depin.py --write`.
 All eight reviewed extents pass private checks; the parent owns combined ROM
 validation and shared-header consolidation with the adjoining worker.
+
+The adjoining control cohort establishes actor motion at `0x64`, fields
+`0xA8/0x104`, flags `0x114/0x2C0`, control pointer slots `0x21C/0x22C/0x5F4`,
+and the transition bytes/counter at `0x2A8` onward. These verified additions
+from the neighboring worker are included in the shared view. Callback pointers
+remain opaque until indirect dispatch establishes the complete ABI.
+
+`7171C` adds 444 exact bytes (about 0.0184 percentage points), all counted as
+register-pinned. `depin.py --write` reduced 46 hints to 14. All nine extents
+using the expanded shared header pass; proof is `build/registry-reset-final.json`.
