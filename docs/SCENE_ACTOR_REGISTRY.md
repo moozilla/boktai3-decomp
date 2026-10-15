@@ -100,3 +100,8 @@ order (velocity `sp+0xC`, bounds `sp+0x14`, position `sp+0x1C`). The ignored
 The unsigned bitfield view in the common header need not change; this private
 candidate uses a local signed packed-vector union. The older draft and each
 allocation experiment remain under ignored `build/` for later comparison.
+
+Neighbor review of the existing `0821E7EC` implementation establishes its actual
+ABI as `s32(u16 *, u32, u32)`: it fills XYZ and reports zero or -1. The reset
+variant ignores that result, and explicitly views its packed position as a
+halfword array at this generic helper boundary. Its 568-byte extent is unchanged.
