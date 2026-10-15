@@ -27,6 +27,6 @@ struct RoamingObject {
 extern const s16 gUnk_086149C4[];
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
-void sub_080638BC(struct RoamingObject *, u32);
-void sub_08063F48(struct RoamingObject *, u32);
+void sub_080638BC(struct RoamingObject *, u16);
+void sub_08063F48(struct RoamingObject *, u16);
 #endif
