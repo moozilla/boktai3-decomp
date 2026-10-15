@@ -42,8 +42,8 @@ void SceneActorControl_StartStoredCurve(struct SceneActorRegistryResetView *acto
         }
         {
             u32 offset = 0x2B1;
-            actor = (void *)((u8 *)actor + offset);
-            *(u8 *)actor = zero;
+            u8 *entry = (u8 *)actor + offset;
+            *entry = zero;
         }
     }
 }
