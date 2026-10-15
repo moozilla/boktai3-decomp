@@ -1,7 +1,7 @@
 #include "scene_actor_registry.h"
 #define SceneActorRegistry_InitializeManager sub_08071D60
 void sub_0806FAD4(struct SceneActorRegistryManager *);
-s32 sub_08073BFC(void *);
+u32 *sub_08073BFC(u32 *);
 s32 SceneActorRegistry_InitializeManager(struct SceneActorRegistryManager *manager, u32 resourceId,
                                          u32 unusedContext)
 {
@@ -12,5 +12,6 @@ s32 SceneActorRegistry_InitializeManager(struct SceneActorRegistryManager *manag
     manager->mode = 3;
     sub_0806FAD4(manager);
     gUnk_020004A8 = manager;
-    return sub_08073BFC(manager->subsystem);
+    /* The caller tests this retained subsystem address as a signed status. */
+    return (s32)sub_08073BFC(manager->subsystem);
 }
