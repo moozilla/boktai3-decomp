@@ -8,7 +8,9 @@
 --
 -- Features
 --   * English subtitles over the game: every string the game fetches
---     (Text_LookupString, 0821ADD4) is shown with the fan translation.
+--     (Text_LookupString, 0821ADD4) is shown with the fan translation, just
+--     under the place where the game draws it (the BG0 cells its glyphs go to,
+--     sub_08218FB4 / sub_08218F2C), for as long as those glyphs stay on screen.
 --     Run `python3 tools/mgba/gen_centaur_data.py` first (writes build/centaur/data.lua).
 --   * What is loading: resource lookups (ScriptProc_Start, 0821A520) and stage
 --     tilesets (sub_08215D40), logged and shown in the HUD.
@@ -29,7 +31,8 @@
 --   warp(scene), scene()    experimental: load a scene (stage loads, player does not spawn)
 --   callproc(id, {args})    run a script procedure (Script_Call) at the next frame
 --   capture()               send a scene capture to the studio
---   rec_start("name"), rec_stop()     record inputs as a harness script
+--   rec_start("name"), rec_stop()     record inputs from here (savestate + inputs);
+--                           rec_start("name", "reset") records from power-on for the harness
 --   peek8/16/32(a), poke8/16/32(a,v), watch(a), unwatch(), where()
 --
 -- For recordings to replay in the harness: fix the real-time clock at
@@ -67,12 +70,15 @@ local ADDR = {
   ScriptProc_Start = 0x0821A520,
   TilesetLoad = 0x08215D40,     -- sub_08215D40(mode, ptn, count, ids, dst)
   GameState = 0x02000710,       -- pointer; +0x28 life, +0x2A lifeMax
+  GlyphAt16 = 0x08218FB4,       -- (glyph, x, y, ...) 16x16 glyph into the BG0 map at tile x, y
+  GlyphAt8 = 0x08218F2C,        -- (glyph, x, y, ...) 8x16 glyph
 }
 
 local S = {
   mode = "en", hud = true, god = false, pos = "bottom", showid = false,
-  text = nil,            -- { id, frame }
+  text = nil,            -- { id, frame }: the last string fetched that has text
   texts = {},            -- recent { id, frame }
+  items = {},            -- strings on screen: { id, frame, cells = {[y*32+x] = true}, n, x0, y0, x1, y1, last }
   res = {},              -- recent { type, name, frame }
   stage = {},            -- map, tileset, pal
   keyq = {},             -- queued remote input { keys, frames }
@@ -215,11 +221,56 @@ local function on_text()
   local f = emu:currentFrame()
   local last = S.texts[#S.texts]
   if last and last.id == id and f - last.frame < 4 then return end
-  local e = { id = id, frame = f }
+  local e = { id = id, frame = f, scene = scene() }
   S.texts[#S.texts + 1] = e
   if #S.texts > 40 then table.remove(S.texts, 1) end
   if D.jp[id] or D.en[id] then S.text = e; S.dirty = true end
-  send({ t = "text", id = id, frame = f })
+  send({ t = "text", id = id, frame = f, scene = scene(), map = S.stage.map })
+end
+
+-- A glyph drawn at BG0 tile (x, y), w x 2 tiles: it belongs to the last string
+-- fetched. Cells it covers are taken from any older string there.
+local function on_glyph(w)
+  local e = S.text
+  if not e then return end
+  local x, y = emu:readRegister("r1") & 31, emu:readRegister("r2") & 31
+  local f = emu:currentFrame()
+  local it = S.items[#S.items]
+  if not it or it.key ~= e then
+    it = { key = e, id = e.id, frame = f, cells = {}, n = 0 }
+    S.items[#S.items + 1] = it
+  end
+  for dy = 0, 1 do
+    for dx = 0, w - 1 do
+      local c = ((y + dy) & 31) * 32 + ((x + dx) & 31)
+      for _, o in ipairs(S.items) do
+        if o ~= it and o.cells[c] then o.cells[c] = nil; o.n = o.n - 1 end
+      end
+      if not it.cells[c] then it.cells[c] = true; it.n = it.n + 1 end
+    end
+  end
+  it.last = f
+  it.x0 = math.min(it.x0 or x, x); it.x1 = math.max(it.x1 or 0, x + w - 1)
+  it.y0 = math.min(it.y0 or y, y); it.y1 = math.max(it.y1 or 0, y + 1)
+  S.dirty = true
+end
+
+-- Drop strings whose glyphs are gone from the BG0 map in VRAM (text glyph
+-- entries are palette 15, tiles 0x100-0x1FF: the glyph cache).
+local function check_items()
+  if #S.items == 0 then return end
+  local base = 0x06000000 + ((emu:read16(0x04000008) >> 8) & 31) * 0x800
+  local f, keep = emu:currentFrame(), {}
+  for _, it in ipairs(S.items) do
+    if f - it.last > 8 then
+      for c in pairs(it.cells) do
+        local v = emu:read16(base + c * 2)
+        if v >> 12 ~= 15 or (v & 0x3FF) < 0x100 or (v & 0x3FF) > 0x1FF then it.cells[c] = nil; it.n = it.n - 1 end
+      end
+    end
+    if it.n > 0 then keep[#keep + 1] = it else S.dirty = true end
+  end
+  S.items = keep
 end
 
 local function on_resource()
@@ -249,6 +300,8 @@ if HAS_BP then
   if ok and id and id >= 0 then
     emu:setBreakpoint(on_resource, ADDR.ScriptProc_Start)
     emu:setBreakpoint(on_tileset, ADDR.TilesetLoad)
+    emu:setBreakpoint(function() on_glyph(2) end, ADDR.GlyphAt16)
+    emu:setBreakpoint(function() on_glyph(1) end, ADDR.GlyphAt8)
   else
     HAS_BP = false  -- no debugger attached (headless: set MGBA_SCRIPT_DEBUGGER=1)
   end
@@ -279,17 +332,16 @@ local function overlay()
   local w, h = canvas:width(), canvas:height()
   if not w or w == 0 then return nil end
   local sw, sh = canvas:screenWidth(), canvas:screenHeight()
-  ov = { w = w, h = h, sw = sw, sh = sh, x0 = (w - sw) // 2, y0 = (h - sh) // 2 }
-  ov.band = math.max(48, sh * 2 // 5)
-  ov.sub = canvas:newLayer(sw, ov.band)
-  ov.sub:setPosition(ov.x0, ov.y0 + (S.pos == "top" and 0 or sh - ov.band))
+  ov = { w = w, h = h, sw = sw, sh = sh, x0 = (w - sw) // 2, y0 = (h - sh) // 2, k = sw / 240 }
+  ov.sub = canvas:newLayer(sw, sh)
+  ov.sub:setPosition(ov.x0, ov.y0)
   ov.subp = image.newPainter(ov.sub.image)
   ov.hudl = canvas:newLayer(sw, math.max(12, sh // 14))
   ov.hudl:setPosition(ov.x0, ov.y0)
   ov.hudp = image.newPainter(ov.hudl.image)
   local fp = font_path()
   if fp then ov.subp:loadFont(fp); ov.hudp:loadFont(fp) end
-  ov.fs = math.max(7, sh / 18)
+  ov.fs = math.max(6, 7.5 * ov.k)
   ov.subp:setFontSize(ov.fs)
   ov.hudp:setFontSize(math.max(6, sh / 26))
   return ov
@@ -313,13 +365,44 @@ local function wrap(p, text, width)
   return out
 end
 
-local function subtitle_text()
-  local e = S.text
+local function subtitle_text(e)
+  e = e or S.text
   if not e or S.mode == "off" then return nil end
   local en, jp = D.en[e.id], D.jp[e.id]
   if S.mode == "jp" then return jp end
   if S.mode == "both" then return (jp or "") .. (en and ("\n" .. en) or "") end
   return en or jp
+end
+
+-- The string fetched last, when its glyphs were never drawn (graphics text,
+-- sprites, other renderers): shown at the screen edge for a few seconds, and
+-- only when it is more than a substituted name or a control string.
+local function unplaced()
+  local e = S.text
+  if not e or emu:currentFrame() - e.frame > 300 or emu:currentFrame() - e.frame < 20 then return nil end
+  for _, it in ipairs(S.items) do if it.key == e then return nil end end
+  if e.scene ~= scene() then return nil end
+  local t = subtitle_text(e)
+  if not t or utf8.len(t) == nil or utf8.len(t) < 6 then return nil end
+  return t
+end
+
+-- Draw a box of wrapped text, w wide, at (x, y) (y = bottom edge when up).
+local function draw_box(p, txt, x, y, w, up, taken)
+  local lines = wrap(p, txt, w - 6)
+  local lh = math.ceil(p:textRunMetrics("Ägy"):height()) + 1
+  local n = math.min(#lines, 6)
+  local h = n * lh + 3
+  local top = up and (y - h) or y
+  for _, r in ipairs(taken) do  -- step past boxes already drawn there
+    if top < r[2] + r[3] and top + h > r[2] and x < r[1] + r[4] and x + w > r[1] then top = up and (r[2] - h) or (r[2] + r[3]) end
+  end
+  top = math.max(0, math.min(top, ov.sh - h))
+  p:setFillColor(0xC0000000); p:drawRectangle(x, top, w, h)
+  p:setFillColor(0xFFFFFFFF)
+  for k = 1, n do p:drawText(lines[k], x + 3, top + 1 + (k - 1) * lh) end
+  taken[#taken + 1] = { x, top, h, w }
+  return top, h
 end
 
 local function draw()
@@ -328,20 +411,32 @@ local function draw()
   local o = overlay()
   local txt = subtitle_text()
   if o then
-    clear(o.subp, o.sw, o.band)
-    if txt and txt ~= "" then
-      local lines = wrap(o.subp, txt, o.sw - 10)
-      local m = o.subp:textRunMetrics("Ägy")
-      local lh = math.ceil(m:height()) + 1
-      local n = math.min(#lines, (o.band - 4) // lh)
-      local boxh = n * lh + 4
-      local top = S.pos == "top" and 0 or (o.band - boxh)
-      o.subp:setFillColor(0xB8000000); o.subp:drawRectangle(0, top, o.sw, boxh)
-      o.subp:setFillColor(0xFFFFFFFF)
-      for k = 1, n do o.subp:drawText(lines[#lines - n + k], 5, top + 2 + (k - 1) * lh) end
-      if S.showid then
-        o.subp:setFillColor(0xC09FB4FF); o.subp:drawText("#" .. S.text.id, o.sw - 3, top + boxh - lh, 0x13)
+    clear(o.subp, o.sw, o.sh)
+    local bg0 = emu:read16(0x04000000) & 0x100 ~= 0
+    local taken = {}
+    if S.mode ~= "off" and bg0 then
+      local list = {}
+      for _, it in ipairs(S.items) do list[#list + 1] = it end
+      table.sort(list, function(a, b) return a.y0 < b.y0 or (a.y0 == b.y0 and a.x0 < b.x0) end)
+      for _, it in ipairs(list) do
+        local t = subtitle_text(it)
+        if t and t ~= "" then
+          if S.showid then t = "#" .. it.id .. " " .. t end
+          local k = o.k
+          local x = math.floor(it.x0 * 8 * k)
+          local w = math.max(math.floor((it.x1 - it.x0 + 1) * 8 * k), math.floor(96 * k))
+          if x + w > o.sw then x = math.max(0, o.sw - w) end
+          local below = math.floor((it.y1 + 1) * 8 * k)
+          local need = (math.ceil(o.subp:textRunMetrics("Ägy"):height()) + 1) * math.min(6, #wrap(o.subp, t, w - 6)) + 3
+          if below + need <= o.sh then draw_box(o.subp, t, x, below, w, false, taken)
+          else draw_box(o.subp, t, x, math.floor(it.y0 * 8 * k), w, true, taken) end
+        end
       end
+    end
+    local un = S.mode ~= "off" and unplaced()
+    if un then
+      if S.showid then un = "#" .. S.text.id .. " " .. un end
+      draw_box(o.subp, un, 0, S.pos == "top" and 0 or o.sh, o.sw, S.pos ~= "top", taken)
     end
     o.sub:update()
     clear(o.hudp, o.sw, o.hudl.image.height)
@@ -387,15 +482,26 @@ local function flush()
   else rec.file:write(string.format("hold %s %d\n", keyname(rec.keys), rec.count)) end
   rec.count = 0
 end
-function rec_start(name)
+-- From here (default): the current savestate is kept as NAME.ss next to the
+-- inputs, and the script starts with "loadstate NAME.ss" (replay() in mGBA
+-- understands it; the harness does not). from == "reset": power-on, so the
+-- harness can replay it too.
+function rec_start(name, from)
   if rec then rec_stop() end
-  local path = OUT .. "/" .. (name or "playthrough") .. ".txt"
+  name = (name or "playthrough"):gsub("[^%w_%-]", "_")
+  local path = OUT .. "/" .. name .. ".txt"
   local f = io.open(path, "w")
   if not f then console:error("cannot open " .. path); return end
-  f:write("# recorded with tools/mgba/centaur.lua on " .. os.date() .. "; replay: tools/emu/harness ROM " .. path .. " OUTDIR\n")
-  emu:reset()
-  rec = { file = f, keys = 0, count = 0, frames = 0, path = path }
-  console:log("recording to " .. path .. " (game reset)")
+  if from == "reset" then
+    f:write("# recorded with tools/mgba/centaur.lua on " .. os.date() .. " from power-on; replay: tools/emu/harness ROM " .. path .. " OUTDIR\n")
+    emu:reset()
+  else
+    local ss = io.open(OUT .. "/" .. name .. ".ss", "wb"); ss:write(emu:saveStateBuffer()); ss:close()
+    f:write("# recorded with tools/mgba/centaur.lua on " .. os.date() .. string.format(" from frame %d, map %s, scene %s; replay in mGBA: replay(\"build/centaur/%s.txt\")\n", emu:currentFrame(), S.stage.map or "?", tostring(scene()), name))
+    f:write("loadstate " .. name .. ".ss\n")
+  end
+  rec = { file = f, keys = 0, count = 0, frames = 0, path = path, name = name }
+  LOG("recording to " .. path .. (from == "reset" and " (game reset)" or " (from here)"))
   S.dirty = true
 end
 function rec_stop()
@@ -439,8 +545,9 @@ function go(name)
   local f = io.open(BM .. name .. ".ss", "rb")
   if not f then console:error("no bookmark " .. name); return end
   local data = f:read("a"); f:close()
-  if rec then console:warn("loading a bookmark while recording: the replay will not stay in sync") end
+  if rec then flush(); rec.file:write("loadstate bookmarks/" .. name .. ".ss\n") end
   emu:loadStateBuffer(data)
+  S.items = {}; S.text = nil; S.dirty = true
   console:log("loaded bookmark " .. name); toast("loaded " .. name)
 end
 function bms()
@@ -460,9 +567,11 @@ function capture(tag)
     local f = io.open(dir .. "/" .. k .. ".bin", "wb"); f:write(emu:readRange(r[1], r[2])); f:close()
   end
   pcall(function() emu:screenshot(dir .. "/screen.png") end)
+  local onscreen = {}
+  for _, it in ipairs(S.items) do onscreen[#onscreen + 1] = { id = it.id, x0 = it.x0, y0 = it.y0, x1 = it.x1, y1 = it.y1 } end
   local meta = io.open(dir .. "/meta.json", "w")
   meta:write(json({ frame = emu:currentFrame(), scene = scene(), map = S.stage.map, tileset = S.stage.tileset, pal = S.stage.pal,
-                    text = S.text and S.text.id or nil, time = os.date("%Y-%m-%d %H:%M:%S") }))
+                    text = S.text and S.text.id or nil, onscreen = onscreen, time = os.date("%Y-%m-%d %H:%M:%S") }))
   meta:close()
   console:log("capture saved: " .. dir); toast("captured")
   send({ t = "capture", name = name, dir = dir })
@@ -474,7 +583,6 @@ function god(on) S.god = on ~= false; S.dirty = true; console:log("god mode " ..
 function subs(mode) S.mode = mode or "en"; S.dirty = true end
 function subpos(where)
   S.pos = where == "top" and "top" or "bottom"
-  if ov then ov.sub:setPosition(ov.x0, ov.y0 + (S.pos == "top" and 0 or ov.sh - ov.band)) end
   S.dirty = true
 end
 function subid(on) S.showid = on ~= false; S.dirty = true end
@@ -531,7 +639,7 @@ function scene()
   local gs = emu:read32(ADDR.GameState)
   return (gs >= 0x02000000 and gs < 0x02040000) and emu:read32(gs + 0x5A4) or nil
 end
-function centaur_state() return { map = S.stage.map, tileset = S.stage.tileset, pal = S.stage.pal, scene = scene() } end
+function centaur_state() return { map = S.stage.map, tileset = S.stage.tileset, pal = S.stage.pal, scene = scene(), items = S.items, text = S.text } end
 
 -- Run a script procedure: callproc(id, {args...}). At the next entry of the
 -- per-frame TaskSystem_RunFrame (0821A054, no arguments) the CPU is diverted
@@ -589,7 +697,7 @@ COMMANDS = {
   callproc = function(c) callproc(c.id, c.args) end,
   subs = function(c) subs(c.mode); if c.pos then subpos(c.pos) end end,
   god = function(c) god(c.on) end,
-  rec_start = function(c) rec_start(c.name) end,
+  rec_start = function(c) rec_start(c.name, c.from) end,
   rec_stop = function() rec_stop() end,
   keys = function(c) S.keyq[#S.keyq + 1] = { keys = c.keys or "", frames = c.frames or 2 } end,
   poke = function(c) local w = ({ [1] = emu.write8, [2] = emu.write16, [4] = emu.write32 })[c.size or 4]; w(emu, c.addr, c.value) end,
@@ -657,17 +765,21 @@ callbacks:add("frame", function()
     q.frames = q.frames - 1
     if q.frames <= 0 then table.remove(S.keyq, 1); if not S.keyq[1] then held_remote = nil end end
   end
+  if f % 4 == 0 then check_items() end
+  if f % 15 == 0 and S.text then S.dirty = true end  -- unplaced subtitles expire
   if f % 2 == 0 then link_poll() end
   link_flush()
   if f % 30 == 0 then
     local gs = emu:read32(ADDR.GameState)
     local life = (gs >= 0x02000000 and gs < 0x02040000) and emu:read16(gs + 0x28) or nil
-    send({ t = "state", frame = f, rec = rec ~= nil, pos = S.pos, scene = scene(), map = S.stage.map, tileset = S.stage.tileset, pal = S.stage.pal, life = life, mode = S.mode, god = S.god })
+    local onscreen = {}
+    for _, it in ipairs(S.items) do onscreen[#onscreen + 1] = { id = it.id, x0 = it.x0, y0 = it.y0, x1 = it.x1, y1 = it.y1 } end
+    send({ t = "state", frame = f, rec = rec ~= nil, pos = S.pos, onscreen = onscreen, scene = scene(), map = S.stage.map, tileset = S.stage.tileset, pal = S.stage.pal, life = life, mode = S.mode, god = S.god })
   end
   draw()
 end)
 
-callbacks:add("reset", function() S.text = nil; S.stage = {}; S.dirty = true end)
+callbacks:add("reset", function() S.text = nil; S.items = {}; S.stage = {}; S.dirty = true end)
 
 LOG(string.format("centaur.lua loaded (breakpoints %s, overlay %s). help() for commands.",
   HAS_BP and "on" or "unavailable: use an mGBA 0.11 build", HAS_CANVAS and "on" or "unavailable"))

@@ -210,6 +210,15 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, open(os.path.join(HERE, "gfx.html"), "rb").read(), "text/html; charset=utf-8")
         elif self.path in ("/live", "/live.html"):
             self.send(200, open(os.path.join(HERE, "live.html"), "rb").read(), "text/html; charset=utf-8")
+        elif self.path in ("/captures", "/captures.html"):
+            self.send(200, open(os.path.join(HERE, "captures.html"), "rb").read(), "text/html; charset=utf-8")
+        elif self.path in ("/static/common.js", "/static/common.css"):
+            ctype = "text/javascript" if self.path.endswith(".js") else "text/css"
+            self.send(200, open(os.path.join(HERE, os.path.basename(self.path)), "rb").read(), ctype + "; charset=utf-8")
+        elif self.path == "/api/notes":
+            self.send(200, live.notes())
+        elif self.path == "/api/captures":
+            self.send(200, live.list_captures(limit=None))
         elif self.path == "/api/live":
             self.send(200, self.server.live.snapshot(self.server.display_jp, self.server.display_en))
         elif self.path.startswith("/api/live/file/"):
@@ -261,6 +270,13 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, {"ok": self.server.live.command(req)})
         elif self.path == "/api/tags":
             self.send(200, live.save_tag(req))
+        elif self.path == "/api/notes":
+            self.send(200, live.save_note(req))
+        elif self.path.startswith("/api/captures/"):
+            try:
+                self.send(200, live.set_capture_info(os.path.basename(self.path), req))
+            except FileNotFoundError:
+                self.send(404, {"error": "no such capture"})
         elif self.path == "/api/build":
             p = subprocess.run(["make", "mod"], cwd=ROOT, capture_output=True, text=True)
             self.send(200, {"ok": p.returncode == 0, "log": (p.stdout + p.stderr)[-4000:]})
