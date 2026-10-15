@@ -31,8 +31,8 @@
 --   warp(scene), scene()    experimental: load a scene (stage loads, player does not spawn)
 --   callproc(id, {args})    run a script procedure (Script_Call) at the next frame
 --   capture()               send a scene capture to the studio
---   rec_start("name"), rec_stop()     record inputs from here (savestate + inputs);
---                           rec_start("name", "reset") records from power-on for the harness
+--   rec_start("name"), rec_stop()     record inputs from here (savestate + inputs;
+--                           replayable in mGBA and the harness); rec_start("name", "reset"): from power-on
 --   peek8/16/32(a), poke8/16/32(a,v), watch(a), unwatch(), where()
 --
 -- For recordings to replay in the harness: fix the real-time clock at
@@ -483,9 +483,9 @@ local function flush()
   rec.count = 0
 end
 -- From here (default): the current savestate is kept as NAME.ss next to the
--- inputs, and the script starts with "loadstate NAME.ss" (replay() in mGBA
--- understands it; the harness does not). from == "reset": power-on, so the
--- harness can replay it too.
+-- inputs, and the script starts with "loadstate NAME.ss", which replay() in
+-- mGBA and tools/emu/harness (built against mGBA 0.11) both understand.
+-- from == "reset": record from power-on instead.
 function rec_start(name, from)
   if rec then rec_stop() end
   name = (name or "playthrough"):gsub("[^%w_%-]", "_")
@@ -497,7 +497,7 @@ function rec_start(name, from)
     emu:reset()
   else
     local ss = io.open(OUT .. "/" .. name .. ".ss", "wb"); ss:write(emu:saveStateBuffer()); ss:close()
-    f:write("# recorded with tools/mgba/centaur.lua on " .. os.date() .. string.format(" from frame %d, map %s, scene %s; replay in mGBA: replay(\"build/centaur/%s.txt\")\n", emu:currentFrame(), S.stage.map or "?", tostring(scene()), name))
+    f:write("# recorded with tools/mgba/centaur.lua on " .. os.date() .. string.format(" from frame %d, map %s, scene %s; replay: replay(\"build/centaur/%s.txt\") in mGBA, or tools/emu/harness ROM build/centaur/%s.txt OUTDIR\n", emu:currentFrame(), S.stage.map or "?", tostring(scene()), name, name))
     f:write("loadstate " .. name .. ".ss\n")
   end
   rec = { file = f, keys = 0, count = 0, frames = 0, path = path, name = name }
