@@ -12,7 +12,7 @@ void SceneActorReaction_BeginFadedState(struct SceneActorRegistryResetView *acto
         control->counter = 0;
         *(u16 *)((u8 *)control + 0x14) = 0;
         control->timer = 0;
-        SceneActorAnimation_SelectDirectionFlagsVariant(actor, 3, 1);
+        SceneActorAnimation_SelectDirectionFlagsVariant((void *)actor, 3, 1);
         switch (actor->category) {
             case 4:
                 Sound_PlaySong(212);
@@ -21,7 +21,7 @@ void SceneActorReaction_BeginFadedState(struct SceneActorRegistryResetView *acto
                 Sound_PlaySong(253);
                 break;
             case 3:
-                SceneActorPlacement_PlayVariantEventSound(actor, 1);
+                SceneActorPlacement_PlayVariantEventSound((void *)actor, 1);
                 break;
         }
         {

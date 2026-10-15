@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
-#define SceneActorReaction_TurnBackToRoute sub_08080AF0
 void sub_0808005C(void *);
 static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
 {
@@ -21,7 +20,7 @@ void SceneActorReaction_TurnBackToRoute(struct SceneActorRegistryResetView *acto
     u32 mask;
     if (TakePrepared(actor)) {
         actor->direction = (((actor->direction + 128) & 255) >> 6) << 6;
-        sub_08076034(actor, 0);
+        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     }
     mask = 0x10;
     offset = 0x2D0;
@@ -42,7 +41,7 @@ void SceneActorReaction_TurnBackToRoute(struct SceneActorRegistryResetView *acto
         command->first = zero;
         command->second = one;
         command->kind = one;
-        callback = (void *)sub_0807FDC0;
+        callback = (void *)SceneActorReaction_RestoreAfterDelay;
         kind = 14;
         /* Keep the related prepared2B2/substate2B0/kind2B5 offsets together. */
         offset -= 0x1E;

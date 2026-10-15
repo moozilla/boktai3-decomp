@@ -2,6 +2,8 @@
 #define GUARD_SCENE_ACTOR_REACTION_H
 #include "scene_actor_reset.h"
 #include "scene_actor_restoration.h"
+#include "scene_actor_animation.h"
+#include "scene_actor_placement.h"
 /* Tentative reaction callbacks. This overlays only fields directly used by the
  * 080800A4 cohort; the shared reset-phase view owns the common prefix. */
 struct SceneActorReactionGroup {
@@ -22,9 +24,6 @@ struct SceneActorReactionTail {
     u8 unknown0[0x5D4];
     struct ContactPosition *destination;
 };
-void SceneActorAnimation_SelectDirectionFlagsVariant(void *, u32, u32);
-void SceneActorAnimation_SelectDirectionalEntry(void *, u32);
-void SceneActorPlacement_PlayVariantEventSound(void *, u32);
 void sub_0807FC90(void);
 s32 sub_0821F204(void *, struct ContactPosition *, struct ContactPosition *);
 s32 sub_0821F7A8(void *, struct ContactPosition *, struct ContactPosition *);

@@ -15,11 +15,11 @@ void SceneActorReaction_BeginReactionSound(struct SceneActorRegistryResetView *a
         control->timer = 0;
         switch (actor->category) {
             case 4:
-                SceneActorAnimation_SelectDirectionalEntry(actor, 3);
+                SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
                 Sound_PlaySong(212);
                 break;
             case 1:
-                SceneActorAnimation_SelectDirectionalEntry(actor, 3);
+                SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
                 Sound_PlaySong(253);
                 break;
             case 3:
@@ -27,11 +27,11 @@ void SceneActorReaction_BeginReactionSound(struct SceneActorRegistryResetView *a
             case 6:
             case 7:
             case 21:
-                SceneActorAnimation_SelectDirectionalEntry(actor, 3);
+                SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
                 Sound_PlaySong(318);
                 break;
             case 25:
-                SceneActorAnimation_SelectDirectionalEntry(actor, 3);
+                SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
                 Sound_PlaySong(459);
                 break;
         }
