@@ -1,8 +1,6 @@
-#include "global.h"
-
-void sub_08050840(void);
-
-void sub_0805086C(void)
+#include "orbit_background.h"
+void OrbitBackground_ReleaseCamera(void);
+void OrbitBackground_ReleaseCameraFromScript(void)
 {
-    sub_08050840();
+    OrbitBackground_ReleaseCamera();
 }

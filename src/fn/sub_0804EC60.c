@@ -6,7 +6,7 @@ struct S {
 extern struct S *gUnk_02000710;
 extern u8 *gUnk_020004B4;
 extern u8 *gUnk_0200010C;
-s32 sub_0804E030(u8 *);
+s32 AreaEffect_FindContainingEntry(u8 *);
 static inline u32 mk(u32 *a, u32 m)
 {
     return *a & m;
@@ -39,7 +39,7 @@ s32 sub_0804EC60(u8 *a)
     }
     if (gUnk_0200010C == 0)
         goto no;
-    if (sub_0804E030(a + 0x30) >= 0)
+    if (AreaEffect_FindContainingEntry(a + 0x30) >= 0)
         goto yes;
 no:
     return 0;

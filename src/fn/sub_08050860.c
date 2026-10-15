@@ -1,8 +1,6 @@
-#include "global.h"
-
-void sub_08050820(void);
-
-void sub_08050860(void)
+#include "orbit_background.h"
+void OrbitBackground_HoldCamera(void);
+void OrbitBackground_HoldCameraFromScript(void)
 {
-    sub_08050820();
+    OrbitBackground_HoldCamera();
 }

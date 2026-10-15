@@ -11,8 +11,8 @@ static inline u32 tst(u32 *a, u32 m)
 {
     return *a & m;
 }
-void sub_0804E618(struct O *, u32);
-void sub_0804E87C(struct O *o)
+void AreaEffect_AccumulatePlayerResource(struct O *, u32);
+void AreaEffect_HideSprites(struct O *o)
 {
     if (o->s == 1) {
         s32 i;
@@ -32,5 +32,5 @@ void sub_0804E87C(struct O *o)
             } while (i < *np);
         }
     }
-    sub_0804E618(o, tst(&o->q[8], 0x20) ? 2 : 0);
+    AreaEffect_AccumulatePlayerResource(o, tst(&o->q[8], 0x20) ? 2 : 0);
 }

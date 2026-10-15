@@ -7,8 +7,8 @@ struct S {
 };
 extern struct S *gUnk_02000710;
 extern u8 *gUnk_0200010C;
-s32 sub_0804E030(u8 *);
-s32 sub_0804E008(s32);
+s32 AreaEffect_FindContainingEntry(u8 *);
+s32 AreaEffect_ScaleResourceGain(s32);
 static inline u32 mk(u32 *a, u32 m)
 {
     return *a & m;
@@ -19,7 +19,7 @@ static inline u8 tst(u32 v)
         return TRUE;
     return FALSE;
 }
-s32 sub_0804E0A8(u8 *a, s32 b)
+s32 AreaEffect_ScaleGainAtPosition(u8 *a, s32 b)
 {
     struct S *s = gUnk_02000710;
     if (s->v == 0)
@@ -29,12 +29,12 @@ s32 sub_0804E0A8(u8 *a, s32 b)
         if (tst(mk(&s->fl, m)) != 0)
             goto yes;
     }
-    if (sub_0804E030(a) >= 0)
+    if (AreaEffect_FindContainingEntry(a) >= 0)
         goto yes;
     if (gUnk_0200010C[0x29] != 0)
         goto yes;
 no:
     return 0;
 yes:
-    return sub_0804E008(b);
+    return AreaEffect_ScaleResourceGain(b);
 }
