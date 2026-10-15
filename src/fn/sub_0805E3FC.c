@@ -1,33 +1,27 @@
-#include "global.h"
-struct Z {
-    u32 x, y;
-};
-struct C {
-    u32 w[8];
-};
-struct C *ScriptProc_Start(u32, u32);
-void ResourceHeader_Relocate(u8 *, struct C *);
-void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, struct Z *);
-void sub_0805E3FC(u8 *p)
+#include "scene_input.h"
+#define SceneInput_InitMarkerPair sub_0805E3FC
+void SceneInput_InitMarkerPair(struct SceneInputPair *pair)
 {
-    struct Z z;
-    struct C *r = ScriptProc_Start(0xCB05, 0x5D04);
-    u8 *a;
-    s32 j;
+    struct {
+        u32 first, second;
+    } position;
+    struct SceneInputResource *resource = ScriptProc_Start(0xCB05, 0x5D04);
+    struct SceneInputWidget *widget;
+    s32 remaining;
     u32 zero;
-    *(struct C *)p = *r;
-    ResourceHeader_Relocate(p, r);
+    pair->resource = *resource;
+    ResourceHeader_Relocate(pair, resource);
     {
-        u32 m = 0xFFFF0000;
-        z.x = 0;
-        z.y &= m;
+        u32 mask = 0xFFFF0000;
+        position.first = 0;
+        position.second &= mask;
     }
     zero = 0;
-    a = p + 0x20;
-    j = 1;
+    widget = pair->widgets;
+    remaining = 1;
     do {
-        sub_0821983C(a, p, 0, 0x31, zero, zero, 0x3c, &z);
-        a += 0x60;
-        j--;
-    } while (j >= 0);
+        sub_0821983C(widget, pair, 0, 0x31, zero, zero, 60, &position);
+        widget++;
+        remaining--;
+    } while (remaining >= 0);
 }
