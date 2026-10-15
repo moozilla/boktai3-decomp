@@ -24,6 +24,7 @@
 --   help()                  this list
 --   (in game) SELECT+L cycles subtitles, SELECT+R saves a quick bookmark
 --   subs("en"|"both"|"jp"|"off")   subtitle mode (default "en")
+--   substyle("shadow"|"box"), subsize(1.0), suboffset(px)   look, size, shift down (GBA px)
 --   subpos("top"|"bottom"), subid(true) subtitle position; show string IDs
 --   hud(true|false)         status overlay
 --   bm("name") / go("name") / bms()   save / load / list bookmarks
@@ -76,6 +77,9 @@ local ADDR = {
 
 local S = {
   mode = "en", hud = true, god = false, pos = "bottom", showid = false,
+  style = "shadow",      -- subtitle look: "shadow" (outlined text) or "box" (dark box)
+  size = 1.0,            -- subtitle text size, 1 = 6 GBA pixels
+  offset = 0,            -- move subtitles down (+) or up (-), in GBA pixels
   text = nil,            -- { id, frame }: the last string fetched that has text
   texts = {},            -- recent { id, frame }
   items = {},            -- strings on screen: { id, frame, cells = {[y*32+x] = true}, n, x0, y0, x1, y1, last }
@@ -84,6 +88,19 @@ local S = {
   keyq = {},             -- queued remote input { keys, frames }
   dirty = true,
 }
+
+-- subtitle settings, kept between sessions in build/centaur/settings.json
+local SETTINGS = { "mode", "style", "size", "offset", "pos", "showid", "hud" }
+local function save_settings()
+  local f = io.open(OUT .. "/settings.json", "w")
+  if not f then return end
+  local parts = {}
+  for _, k in ipairs(SETTINGS) do
+    local v = S[k]
+    parts[#parts + 1] = string.format('"%s":%s', k, type(v) == "string" and ('"' .. v .. '"') or tostring(v))
+  end
+  f:write("{" .. table.concat(parts, ",") .. "}\n"); f:close()
+end
 
 local function hex4(v) return string.format("%04X", v & 0xFFFF) end
 local function toast(msg) S.toast = { text = msg, frame = emu:currentFrame() }; S.dirty = true end
@@ -160,6 +177,14 @@ local function unjson(s)
   end
   local ok, r = pcall(val)
   return ok and r or nil
+end
+
+do
+  local f = io.open(OUT .. "/settings.json", "r")
+  if f then
+    local t = unjson(f:read("a")); f:close()
+    if type(t) == "table" then for _, k in ipairs(SETTINGS) do if t[k] ~= nil then S[k] = t[k] end end end
+  end
 end
 
 -- ---------------------------------------------------------------------------
@@ -341,8 +366,7 @@ local function overlay()
   ov.hudp = image.newPainter(ov.hudl.image)
   local fp = font_path()
   if fp then ov.subp:loadFont(fp); ov.hudp:loadFont(fp) end
-  ov.fs = math.max(6, 7.5 * ov.k)
-  ov.subp:setFontSize(ov.fs)
+  ov.fs = 0
   ov.hudp:setFontSize(math.max(6, sh / 26))
   return ov
 end
@@ -387,7 +411,8 @@ local function unplaced()
   return t
 end
 
--- Draw a box of wrapped text, w wide, at (x, y) (y = bottom edge when up).
+-- Draw wrapped text, w wide, at (x, y) (y = bottom edge when up): white on a
+-- dark box, or outlined white text with no box (S.style).
 local function draw_box(p, txt, x, y, w, up, taken)
   local lines = wrap(p, txt, w - 6)
   local lh = math.ceil(p:textRunMetrics("Ägy"):height()) + 1
@@ -398,7 +423,15 @@ local function draw_box(p, txt, x, y, w, up, taken)
     if top < r[2] + r[3] and top + h > r[2] and x < r[1] + r[4] and x + w > r[1] then top = up and (r[2] - h) or (r[2] + r[3]) end
   end
   top = math.max(0, math.min(top, ov.sh - h))
-  p:setFillColor(0xC0000000); p:drawRectangle(x, top, w, h)
+  if S.style == "box" then
+    p:setFillColor(0xC0000000); p:drawRectangle(x, top, w, h)
+  else
+    local d = math.max(1, math.floor(ov.k / 2 + 0.5))
+    p:setFillColor(0xE0000000)
+    for k = 1, n do
+      for _, o in ipairs({ { -d, 0 }, { d, 0 }, { 0, -d }, { 0, d }, { d, d } }) do p:drawText(lines[k], x + 3 + o[1], top + 1 + (k - 1) * lh + o[2]) end
+    end
+  end
   p:setFillColor(0xFFFFFFFF)
   for k = 1, n do p:drawText(lines[k], x + 3, top + 1 + (k - 1) * lh) end
   taken[#taken + 1] = { x, top, h, w }
@@ -412,6 +445,9 @@ local function draw()
   local txt = subtitle_text()
   if o then
     clear(o.subp, o.sw, o.sh)
+    local fs = math.max(5, 6 * o.k * (tonumber(S.size) or 1))
+    if fs ~= o.fs then o.fs = fs; o.subp:setFontSize(fs) end
+    local dy = math.floor((tonumber(S.offset) or 0) * o.k)
     local bg0 = emu:read16(0x04000000) & 0x100 ~= 0
     local taken = {}
     if S.mode ~= "off" and bg0 then
@@ -426,10 +462,10 @@ local function draw()
           local x = math.floor(it.x0 * 8 * k)
           local w = math.max(math.floor((it.x1 - it.x0 + 1) * 8 * k), math.floor(96 * k))
           if x + w > o.sw then x = math.max(0, o.sw - w) end
-          local below = math.floor((it.y1 + 1) * 8 * k)
+          local below = math.floor((it.y1 + 1) * 8 * k) + dy
           local need = (math.ceil(o.subp:textRunMetrics("Ägy"):height()) + 1) * math.min(6, #wrap(o.subp, t, w - 6)) + 3
           if below + need <= o.sh then draw_box(o.subp, t, x, below, w, false, taken)
-          else draw_box(o.subp, t, x, math.floor(it.y0 * 8 * k), w, true, taken) end
+          else draw_box(o.subp, t, x, math.floor(it.y0 * 8 * k) - dy, w, true, taken) end
         end
       end
     end
@@ -580,10 +616,13 @@ end
 -- ---------------------------------------------------------------------------
 -- debug helpers
 function god(on) S.god = on ~= false; S.dirty = true; console:log("god mode " .. (S.god and "on" or "off")) end
-function subs(mode) S.mode = mode or "en"; S.dirty = true end
+function subs(mode) S.mode = mode or "en"; S.dirty = true; save_settings() end
+function substyle(st) S.style = st == "box" and "box" or "shadow"; S.dirty = true; save_settings() end
+function subsize(n) S.size = math.max(0.5, math.min(3, tonumber(n) or 1)); S.dirty = true; save_settings() end
+function suboffset(n) S.offset = math.floor(tonumber(n) or 0); S.dirty = true; save_settings() end
 function subpos(where)
   S.pos = where == "top" and "top" or "bottom"
-  S.dirty = true
+  S.dirty = true; save_settings()
 end
 function subid(on) S.showid = on ~= false; S.dirty = true end
 function hud(on) S.hud = on ~= false; S.dirty = true end
@@ -608,6 +647,7 @@ end
 function help()
   console:log([[centaur commands:
   subs("en"|"both"|"jp"|"off")  subpos("top"|"bottom")  subid(true)
+  substyle("shadow"|"box")  subsize(1.0)  suboffset(0)   (saved in build/centaur/settings.json)
   hud(true|false)  god(true|false)
   bm("name")  go("name")  bms()      capture("tag")
   rec_start("name")  rec_stop()      where()
@@ -695,7 +735,13 @@ COMMANDS = {
   bookmarks = function() send({ t = "bookmarks", list = bm_index() }) end,
   warp = function(c) warp(c.scene) end,
   callproc = function(c) callproc(c.id, c.args) end,
-  subs = function(c) subs(c.mode); if c.pos then subpos(c.pos) end end,
+  subs = function(c)
+    if c.mode then subs(c.mode) end
+    if c.pos then subpos(c.pos) end
+    if c.style then substyle(c.style) end
+    if c.size then subsize(c.size) end
+    if c.offset then suboffset(c.offset) end
+  end,
   god = function(c) god(c.on) end,
   rec_start = function(c) rec_start(c.name, c.from) end,
   rec_stop = function() rec_stop() end,
@@ -774,7 +820,7 @@ callbacks:add("frame", function()
     local life = (gs >= 0x02000000 and gs < 0x02040000) and emu:read16(gs + 0x28) or nil
     local onscreen = {}
     for _, it in ipairs(S.items) do onscreen[#onscreen + 1] = { id = it.id, x0 = it.x0, y0 = it.y0, x1 = it.x1, y1 = it.y1 } end
-    send({ t = "state", frame = f, rec = rec ~= nil, pos = S.pos, onscreen = onscreen, scene = scene(), map = S.stage.map, tileset = S.stage.tileset, pal = S.stage.pal, life = life, mode = S.mode, god = S.god })
+    send({ t = "state", frame = f, rec = rec ~= nil, pos = S.pos, onscreen = onscreen, scene = scene(), map = S.stage.map, tileset = S.stage.tileset, pal = S.stage.pal, life = life, mode = S.mode, style = S.style, size = S.size, offset = S.offset, god = S.god })
   end
   draw()
 end)

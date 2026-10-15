@@ -77,6 +77,14 @@ with other entries (`1289` buttons with entry 939, not 807). Large sprites
 (`98F5`) carry no palette; captures record which entry their bank held
 (`build/centaur/sprite_palettes.json`, `pool`).
 
+The bank table is rebuilt every frame as sprites are drawn: `sub_08217298`
+clears it, `sub_082172E0` finds or adds a pool entry (in r4) and returns its
+bank, reached from the draw path `08214A45` ← `08219E27` ← `08215501` ←
+actor code; an IWRAM routine around `0x03000078` does the same for other
+callers (r0 = pool entry). So a large sprite's entry is passed in by the
+actor that draws it; which actor field holds it is the next step (watch a
+run with the enemy on screen, e.g. the ghoul `9247`, pool entry 403).
+
 **Stage palettes** are named by the scripts: a stage load `proc_884(map,
 tileset, hp)` is followed by `proc_888(palette, 0, 0)` (194 stages); 104 of the
 166 palettes learned from captures equal that argument.
