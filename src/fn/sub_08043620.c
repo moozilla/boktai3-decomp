@@ -25,7 +25,7 @@ void ContactActor_UpdateReaction(struct ContactActorPool *pool, struct ContactAc
             register struct ContactCollider *collider asm("r2") = &slot->healthCollider;
             collider->flags |= 4;
         }
-        AnimData_SelectTiles(slot->graphics, 0x192);
+        AnimData_SelectPaletteBank(slot->graphics, 0x192);
     }
     rawSpeed = 20 - slot->stateFrame;
     write = &delta;
@@ -57,7 +57,7 @@ void ContactActor_UpdateReaction(struct ContactActorPool *pool, struct ContactAc
             {
                 void *argument = graphics;
                 asm("" : "+r"(argument));
-                AnimData_SelectTiles(argument, 0x2D3);
+                AnimData_SelectPaletteBank(argument, 0x2D3);
             }
             graphics->tileData = (u8 *)pool + 0x1700;
         }

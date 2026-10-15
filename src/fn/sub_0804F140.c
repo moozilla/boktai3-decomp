@@ -6,14 +6,14 @@ void ResourceStation_UpdateAnimation(struct ResourceStation *station)
     if (player->flags & mask) {
         switch ((s32)((station->animationFrame >> 1) & 3)) {
             case 1:
-                AnimData_SelectTiles(station->graphics, 0x1B0);
+                AnimData_SelectPaletteBank(station->graphics, 0x1B0);
                 break;
             case 0:
             case 2:
-                AnimData_SelectTiles(station->graphics, 0x1AF);
+                AnimData_SelectPaletteBank(station->graphics, 0x1AF);
                 break;
             case 3:
-                AnimData_SelectTiles(station->graphics, 0x1AE);
+                AnimData_SelectPaletteBank(station->graphics, 0x1AE);
                 break;
         }
         station->animationFrame++;
@@ -24,10 +24,10 @@ void ResourceStation_UpdateAnimation(struct ResourceStation *station)
         {
             u32 value = *frame;
             if (value) {
-                AnimData_SelectTiles(station->graphics, 0x1AF);
+                AnimData_SelectPaletteBank(station->graphics, 0x1AF);
                 (*frame)--;
             } else {
-                AnimData_SelectTiles(station->graphics, 0x1AE);
+                AnimData_SelectPaletteBank(station->graphics, 0x1AE);
                 *frame = value;
             }
         }

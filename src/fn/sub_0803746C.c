@@ -30,7 +30,7 @@ struct PeerStyle {
 extern const struct PeerStyle gUnk_0824DE64[];
 void *ScriptProc_Start(int, int);
 void AnimData_Load(void *, int);
-void AnimData_SelectTiles(void *, int);
+void AnimData_SelectPaletteBank(void *, int);
 void Sprite_Init(void *, void *, int);
 void sub_08220D20(void *, void *, int, int, int);
 void sub_0821983C(void *, void *, int, int, int, int, int, int);

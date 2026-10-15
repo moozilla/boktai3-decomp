@@ -19,9 +19,9 @@ struct ScriptKeyframeManager {
     struct ScriptKeyframeEntry entries[1];
 };
 extern struct ScriptKeyframeManager *gUnk_02000498;
-struct ScriptKeyframeEntry *sub_08055678(void);
-void sub_08055828(struct ScriptKeyframeEntry *);
-u32 sub_08055A9C(struct ScriptKeyframeManager *);
-s32 sub_08055AC4(struct ScriptKeyframeManager *);
-s32 sub_08055AF4(struct ScriptKeyframeManager *, u32, u32, u32);
+struct ScriptKeyframeEntry *ScriptKeyframe_FindFromScript(void);
+void ScriptKeyframe_UpdateEntry(struct ScriptKeyframeEntry *);
+u32 ScriptKeyframe_TickManager(struct ScriptKeyframeManager *);
+s32 ScriptKeyframe_DestroyManager(struct ScriptKeyframeManager *);
+s32 ScriptKeyframe_InitManager(struct ScriptKeyframeManager *, u32, u32, u32);
 #endif

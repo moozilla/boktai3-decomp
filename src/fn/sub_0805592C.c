@@ -1,5 +1,4 @@
 #include "script_keyframe_pool.h"
-#define ScriptKeyframe_AddFromScript sub_0805592C
 void sub_0821983C(void *, void *, u32, u32, u32, u32, s32, const void *);
 void ScriptKeyframe_AddFromScript(void)
 {

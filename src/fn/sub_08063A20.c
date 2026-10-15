@@ -7,14 +7,14 @@ struct S {
     u16 pad2[2];
     u16 d;
 };
-void AnimData_SelectTiles(void *, u32);
+void AnimData_SelectPaletteBank(void *, u32);
 
 void sub_08063A20(struct S *s)
 {
     if (s->d <= 5)
-        AnimData_SelectTiles(s->a, 0x192);
+        AnimData_SelectPaletteBank(s->a, 0x192);
     else
-        AnimData_SelectTiles(s->a, 0x193);
+        AnimData_SelectPaletteBank(s->a, 0x193);
     s->st = 2;
     s->d++;
 }

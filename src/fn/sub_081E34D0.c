@@ -15,7 +15,7 @@ struct PaletteController {
     u8 beforeCallback[0xf8c - 0xf5c];
     void (*callback)(void *);
 };
-void AnimData_SelectTiles(void *, s32);
+void AnimData_SelectPaletteBank(void *, s32);
 void ActorPalette_UpdateFade(void *);
 void ActorPalette_UpdateFadeAndNotify(void *);
 // Begin an actor palette transition; mode 2 also completes a waiting request.
@@ -23,7 +23,7 @@ void ActorPalette_BeginFade(struct PaletteController *p)
 {
     p->step = 0;
     p->duration = 50;
-    AnimData_SelectTiles(p->effect, 344);
+    AnimData_SelectPaletteBank(p->effect, 344);
     p->savedPalette = p->palette;
     p->palette = p->output;
     if ((*(u8 *)&p->mode & 15) == 2)

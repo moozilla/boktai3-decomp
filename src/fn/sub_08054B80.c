@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "display_track.h"
-#define DisplayTrack_FindFromScript sub_08054B80
 struct DisplayTrackTagView {
     u8 prefix[0x1C];
     u16 tag;

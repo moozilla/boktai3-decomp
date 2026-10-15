@@ -14,7 +14,7 @@ void StackedActor_EmitRisingParticles(struct StackedActor *actor)
         u32 mask = 3;
         mask &= frame;
         if (!mask)
-            sub_080521DC(&actor->particles[shifted >> 18], &actor->world);
+            StackedActor_InitRisingParticle(&actor->particles[shifted >> 18], &actor->world);
     }
     {
         register u32 next asm("r0") = actor->frame + 1;

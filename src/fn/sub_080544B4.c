@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "hit_switch.h"
-#define HitSwitch_AnimateBobbingCompletion sub_080544B4
 void HitSwitch_AnimateBobbingCompletion(struct HitSwitchEntry *entry)
 {
     register u16 *frame asm("r4") = &entry->frame;
@@ -14,7 +13,7 @@ void HitSwitch_AnimateBobbingCompletion(struct HitSwitchEntry *entry)
             entry->sprite.frame = 1;
         } else {
             entry->sprite.frame = 2;
-            sub_08054294(entry, sub_08054538);
+            HitSwitch_SetUpdate(entry, HitSwitch_UpdateCompletedBobbing);
             if (entry->completedScriptId) {
                 s32 value;
                 struct HitSwitchScriptArgs args;

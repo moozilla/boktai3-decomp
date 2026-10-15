@@ -1,5 +1,4 @@
 #include "hit_switch.h"
-#define HitSwitch_UpdateCompletedBobbing sub_08054538
 extern u8 *gUnk_02000580;
 void HitSwitch_UpdateCompletedBobbing(struct HitSwitchEntry *entry)
 {

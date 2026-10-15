@@ -1,5 +1,4 @@
 #include "hit_switch.h"
-#define HitSwitch_RegisterCompletedCell sub_080542A4
 void sub_0821D698(struct SceneCellRef *, u32, u32, s32, u32, u32);
 void HitSwitch_RegisterCompletedCell(struct HitSwitchEntry *entry)
 {

@@ -11,7 +11,7 @@ void AnimData_Load(u8 *, u32);
 void *ScriptProc_Start(u32, u32);
 void Sprite_Init(u8 *, u8 *, u32);
 void Anim_SetSequence(u8 *, void *, u32, u32, u32);
-void AnimData_SelectTiles(u8 *, u32);
+void AnimData_SelectPaletteBank(u8 *, u32);
 s32 Mod(s32, s32);
 void sub_0812642C(u32 *a, s32 b, s32 c, s32 d, s32 e, u32 f, s32 g, s32 h, u32 i, u32 j, u32 k,
                   u32 l, u32 m, u32 n, u32 o, u32 p, u32 q, u32 r)
@@ -45,7 +45,7 @@ void sub_0812642C(u32 *a, s32 b, s32 c, s32 d, s32 e, u32 f, s32 g, s32 h, u32 i
     *(void **)(context + 0x18) = ScriptProc_Start(0x922E, (u16)o);
     Sprite_Init(s, resource, 0);
     Anim_SetSequence(s + 0x48, *(void **)(context + 0x18), (u16)p, (u8)q, zero);
-    AnimData_SelectTiles(resource, r);
+    AnimData_SelectPaletteBank(resource, r);
     table = gUnk_0203B400;
     rng = &gUnk_03005308;
     mask = 0x3FF;

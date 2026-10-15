@@ -49,7 +49,7 @@ s32 MotionPool_Spawn(const struct MotionPoolParams *params, const struct Contact
     sprite = &slot->sprite;
     sprite->frame = params->frame;
     if (params->tile >= 0)
-        AnimData_SelectTiles(graphics, params->tile);
+        AnimData_SelectPaletteBank(graphics, params->tile);
     sprite->flags &= ~1;
     sub_08214374(sprite, 0);
     if (params->trackingFrames) {

@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 25.179% matching (2026-10-14). This file is the single
+Last updated after reaching 25.399% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,64 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex/Sol): complete stacked actor, hit switches and display pools
+
+Exact code is **25.399%**, up **0.2198 percentage points** (+5,308 bytes)
+from twenty-three new functions: **6,624 / 11,472 functions** and
+**613,478 / 2,415,354 bytes**. Without register pinning: **19.925%**;
+Register-pinned: **5.474%**, included above. New bytes comprise1,912 without
+hints and3,396 with minimized concessions. The existing28-byte hit-switch
+script wrapper moved into the concession category to preserve incidental ABI.
+Seventy-seven guarded drafts remain, outside exact progress.
+
+Sol closed **521DC,176 bytes**, completing the stacked actor. Reusing an ordinary
+scratch across multiple lifetimes let agbcc's global allocator select r7 naturally;
+local allocation excludes eliminable frame registers. The pinned compiler source
+confirms this distinction. See [register allocation](REGALLOC.md) and
+[stacked actor](STACKED_ACTOR.md). No explicit r7 binding was introduced.
+
+Three adjacent complete cohorts now have shared typed layouts and named contracts:
+**54294–54B80** hit-switch pool (17 functions /2,284 bytes; ten new /1,928),
+**54B80–55678** display tracks (15 /2,808; eight new /2,532), and
+**55678–55B74** script keyframe pool (13 /1,276; four new /672). The keyframe
+updater55828 was already C and receives no new credit. The broader span
+**4E008–55B74** now contains **229 consecutive exact C functions /31,596 bytes**,
+with no remaining assembly gaps. See [hit-switch contracts](HIT_SWITCH.md),
+[display tracks](../notes/display-track_2026-10-14.md) and
+[keyframe pool](../notes/script-keyframe-pool_2026-10-14.md).
+
+The hit-switch pool counts collider contactFlags2+38 bit20, runs a shared palette
+flash, registers completed terrain cells and dispatches an integer script ID with
+its signed tag. Its initializer is void; registry dispatch consumes the wrapper's
+incidental r0, preserved by an empty output constraint rather than a fabricated
+count return. Display tracks independently interpolate movement, palette and
+scale and step sequences; initialization itself consumes a sequence tick.
+The keyframe pool uses the same resource/animation views but has its own manager,
+movement state and visibility gate on the still-unknown GameState.unk14.
+
+The sixteen RGB15 colors interpolated by both palette consumers prove the old
+tile interpretation wrong. Shared names are now **AnimData_SelectPaletteBank**,
+**Anim_SelectPaletteBank**, and **DisplayAnimation_SelectPaletteBank**. Marker and
+stacked-actor fields use paletteBase; SceneAnimation uses paletteIndex and scene
+props retain basePalette. Engine/layout notes and prior cohort notes were corrected.
+These semantic changes add no exact bytes.
+
+Combined validation passed: `build/boktai3.gba: OK` in
+`build/display-hit-combined.log`. All142 reviewed-extent checks passed after
+promotion; format, inventory, data and RAM-literal checks also passed.
+PR136 main Actions passed at814bec5e (run38668288494).
+
+Continue toward **30% exact or40% account usage remaining**. Latest usage:
+**58% remaining**. Parent has all sixteen functions of **55B74–5606C** stage-icon
+display exact in scratch after minimization (seven new /896 bytes); promote only
+in the following batch after this combined build. Sol owns the next FD22 marker/
+terrain-edge cohort **5606C–56A60**; its large selector is now exact and undergoing
+concession minimization. Parent also has script utilities56A60–56D70 and shake
+icons56D70–56F20 in scratch. A hidden20-byte leaf at56D24 must split the old
+query extent in both boundary inventories; it adds no net exact-byte credit.
+Keep outputs isolated, retain contiguous cohort reasoning and merge only after
+combined validation. No new emulator coverage claims.
 
 ## October 14 (Codex/Sol): proximity emitters, stacked actor and interaction markers
 

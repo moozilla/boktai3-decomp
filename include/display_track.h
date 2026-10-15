@@ -32,5 +32,11 @@ struct DisplayTrackManager {
     struct DisplayTrack entries[1];
 };
 extern struct DisplayTrackManager *gUnk_02000494;
-struct DisplayTrack *sub_08054B80(void);
+struct DisplayTrack *DisplayTrack_FindFromScript(void);
+void DisplayTrack_Update(struct DisplayTrack *);
+void DisplayTrack_AddFromScript(void);
+u32 DisplayTrack_TickManager(struct DisplayTrackManager *);
+s32 DisplayTrack_DestroyManager(struct DisplayTrackManager *);
+s32 DisplayTrack_InitManager(struct DisplayTrackManager *, u32, u32, u32);
+struct DisplayTrackManager *DisplayTrack_CreateManagerFromScript(u32, u32);
 #endif

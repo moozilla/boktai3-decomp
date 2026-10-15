@@ -593,7 +593,7 @@ int AnimatedHazard_CreateProximity(struct SceneVec *source, int damage, int dela
         } else
             done = 0;
     }
-    AnimData_SelectTiles(m->animData, 0x33F);
+    AnimData_SelectPaletteBank(m->animData, 0x33F);
     p->timer = 0;
     p->hold = hold;
     asm("" : "+r"(delay));

@@ -14,7 +14,7 @@ s32 OrbitContactActor_Initialize(struct OrbitContactActor *actor,
         sprite = &actor->sprite;
         Sprite_Init(sprite, graphics, 1);
         sprite->priority = 2;
-        AnimData_SelectTiles(graphics, 0x15F);
+        AnimData_SelectPaletteBank(graphics, 0x15F);
         bounds.x = 128;
         bounds.y = 128;
         bounds.z = 128;

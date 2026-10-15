@@ -23,7 +23,7 @@ struct Manager {
 };
 struct Manager *sub_0802C678(void);
 void Collider_Refresh(void *);
-void DisplayAnimation_SelectTiles(void *, u32);
+void DisplayAnimation_SelectPaletteBank(void *, u32);
 void sub_0802C994(struct Object *);
 static inline void enable(struct Object *p)
 {
@@ -66,7 +66,7 @@ void sub_0802CF74(struct Object *p)
     if (p->effectTimer) {
         p->effectTimer--;
         if (!p->effectTimer)
-            DisplayAnimation_SelectTiles(&p->drawable, p->effect);
+            DisplayAnimation_SelectPaletteBank(&p->drawable, p->effect);
     }
     sub_0802C994(p);
 }

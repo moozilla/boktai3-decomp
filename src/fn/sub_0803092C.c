@@ -30,7 +30,7 @@ struct Actor {
     void *callback;
 };
 extern struct Actor *gUnk_020000DC;
-void AnimData_SelectTiles(void *, int);
+void AnimData_SelectPaletteBank(void *, int);
 int Anim_SetSequence(struct Frames *, void *, u16, int, int);
 int sub_0803092C(struct Actor *p)
 {
@@ -48,19 +48,19 @@ int sub_0803092C(struct Actor *p)
             asm("" : "+r"(read));
             switch ((s8)((u8)read->current - 4)) {
                 case 26:
-                    AnimData_SelectTiles(p->sprite, 506);
+                    AnimData_SelectPaletteBank(p->sprite, 506);
                     break;
                 case 16:
                 case 21:
-                    AnimData_SelectTiles(p->sprite, 504);
+                    AnimData_SelectPaletteBank(p->sprite, 504);
                     break;
                 case 0:
                 case 1:
                 case 9:
-                    AnimData_SelectTiles(p->sprite, 505);
+                    AnimData_SelectPaletteBank(p->sprite, 505);
                     break;
                 case 15:
-                    AnimData_SelectTiles(p->sprite, 507);
+                    AnimData_SelectPaletteBank(p->sprite, 507);
                     break;
                 case 2:
                 case 3:
@@ -83,7 +83,7 @@ int sub_0803092C(struct Actor *p)
                 case 24:
                 case 25:
                 default:
-                    AnimData_SelectTiles(p->sprite, 503);
+                    AnimData_SelectPaletteBank(p->sprite, 503);
                     break;
             }
         }

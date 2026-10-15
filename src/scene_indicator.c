@@ -157,7 +157,7 @@ int SceneIndicators_Initialize(struct SceneIndicators *m)
                     m->count++;
                 } else
                     value = 0;
-                AnimData_SelectTiles(a, a->frame + value);
+                AnimData_SelectPaletteBank(a, a->frame + value);
             }
         }
     }

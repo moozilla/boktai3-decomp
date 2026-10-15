@@ -1,8 +1,7 @@
 #include "script_keyframe_pool.h"
-#define ScriptKeyframe_SetFrameFromScript sub_080556D0
 void ScriptKeyframe_SetFrameFromScript(void)
 {
-    struct ScriptKeyframeEntry *entry = sub_08055678();
+    struct ScriptKeyframeEntry *entry = ScriptKeyframe_FindFromScript();
     if (entry && Script_SeekToKeyword('p')) {
         union ScriptKeyframeAnimation *animation = &entry->animation;
         struct ProjectedDisplayResource *resource = &entry->resource;

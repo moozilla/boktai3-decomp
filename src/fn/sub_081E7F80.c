@@ -78,7 +78,7 @@ struct Child {
 void sub_081E5608(void *, void *);
 void sub_08056CC0(void);
 void sub_081E4174(void *);
-void AnimData_SelectTiles(void *, s32);
+void AnimData_SelectPaletteBank(void *, s32);
 void Sound_PlaySong(s32);
 void Script_Call(void *, s32);
 void ActorShadow_Enable(void *);
@@ -97,7 +97,7 @@ void sub_081E7F80(struct S *p)
     if (take(p)) {
         p->state = 13;
         Anim_SetSequence(&p->anim, p->arg, 13, 0, 0);
-        AnimData_SelectTiles((u8 *)p + 0xe08, 346);
+        AnimData_SelectPaletteBank((u8 *)p + 0xe08, 346);
         o = &p->obj;
         a = &p->anim;
         entry = a->data + a->frame;

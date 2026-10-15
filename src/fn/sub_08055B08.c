@@ -1,8 +1,7 @@
 #include "script_keyframe_pool.h"
-#define ScriptKeyframe_CreateManagerFromScript sub_08055B08
-u32 sub_08055A9C(struct ScriptKeyframeManager *);
-s32 sub_08055AC4(struct ScriptKeyframeManager *);
-s32 sub_08055AF4(struct ScriptKeyframeManager *, u32, u32, u32);
+u32 ScriptKeyframe_TickManager(struct ScriptKeyframeManager *);
+s32 ScriptKeyframe_DestroyManager(struct ScriptKeyframeManager *);
+s32 ScriptKeyframe_InitManager(struct ScriptKeyframeManager *, u32, u32, u32);
 struct ScriptKeyframeManager *ScriptKeyframe_CreateManagerFromScript(u32 arg1, u32 arg2)
 {
     if (gUnk_02000498)
@@ -16,9 +15,9 @@ struct ScriptKeyframeManager *ScriptKeyframe_CreateManagerFromScript(u32 arg1, u
             capacity = 1;
         manager = Task_Create(8, capacity * sizeof(struct ScriptKeyframeEntry) + 0x1C);
         if (manager) {
-            Task_SetCallbacks(manager, (void (*)(void *))sub_08055A9C,
-                              (void (*)(void *))sub_08055AC4);
-            if (sub_08055AF4(manager, arg1, arg2, capacity) < 0) {
+            Task_SetCallbacks(manager, (void (*)(void *))ScriptKeyframe_TickManager,
+                              (void (*)(void *))ScriptKeyframe_DestroyManager);
+            if (ScriptKeyframe_InitManager(manager, arg1, arg2, capacity) < 0) {
                 Task_Kill(manager);
                 return 0;
             }

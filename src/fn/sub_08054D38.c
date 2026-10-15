@@ -1,8 +1,7 @@
 #include "display_track.h"
-#define DisplayTrack_SetScaleTrackFromScript sub_08054D38
 void DisplayTrack_SetScaleTrackFromScript(void)
 {
-    struct DisplayTrack *track = sub_08054B80();
+    struct DisplayTrack *track = DisplayTrack_FindFromScript();
     if (track && Script_SeekToKeyword('s')) {
         track->scaleStart = Script_GetValue();
         if (Script_SeekToKeyword('e')) {

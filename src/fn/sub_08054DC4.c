@@ -1,11 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "display_track.h"
-#define DisplayTrack_SetSequenceFromScript sub_08054DC4
 void sub_08220D20(void *, const void *, u32, u32, u32);
 void sub_08220D44(void *, u32);
 void DisplayTrack_SetSequenceFromScript(void)
 {
-    struct DisplayTrack *track = sub_08054B80();
+    struct DisplayTrack *track = DisplayTrack_FindFromScript();
     if (track && Script_SeekToKeyword('m')) {
         track->sequenceId = Script_GetValue();
         if (Script_SeekToKeyword('d')) {

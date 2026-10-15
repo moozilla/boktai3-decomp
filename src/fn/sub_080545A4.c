@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "hit_switch.h"
-#define HitSwitch_UpdateSharedFlash sub_080545A4
 void HitSwitch_UpdateSharedFlash(struct HitSwitchManager *manager)
 {
     if (manager->hitPending) {

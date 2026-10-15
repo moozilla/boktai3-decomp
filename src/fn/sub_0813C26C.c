@@ -27,7 +27,7 @@ typedef struct State {
 } State;
 void AnimData_Load(void *, s32);
 void Sprite_Init(Sprite *, void *, s32);
-void AnimData_SelectTiles(void *, s32);
+void AnimData_SelectPaletteBank(void *, s32);
 void sub_0813BFE0(void *);
 void sub_0813C26C(State *s)
 {
@@ -37,9 +37,9 @@ void sub_0813C26C(State *s)
     Sprite_Init(sprite, animation, 67);
     sprite->frame = 4;
     if (s->mode == 6)
-        AnimData_SelectTiles(animation, 81);
+        AnimData_SelectPaletteBank(animation, 81);
     else
-        AnimData_SelectTiles(animation, 75);
+        AnimData_SelectPaletteBank(animation, 75);
     sprite->mode = 1;
     sprite->yscale = 127;
     sprite->xscale = 127;

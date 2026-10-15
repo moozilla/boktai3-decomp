@@ -64,7 +64,7 @@ struct G {
     u32 variant;
 };
 extern u8 gUnk_03005430[];
-void AnimData_SelectTiles(void *, s32);
+void AnimData_SelectPaletteBank(void *, s32);
 void ActorShadow_Disable(void *);
 s32 Script_GetValue(void);
 s32 Script_SeekToKeyword(s32);
@@ -93,7 +93,7 @@ void Actor_ConfigureFromScript(void)
     if (!g)
         g = (struct G *)sub_081EA730(0xbb34, 0);
     obj = (struct Obj *)((u8 *)g + 0xddc);
-    AnimData_SelectTiles((u8 *)g + 0xe08, 343);
+    AnimData_SelectPaletteBank((u8 *)g + 0xe08, 343);
     g->obj.priority = 0;
     g->last = 0;
     g->resource = Script_GetValue();

@@ -4,7 +4,7 @@ struct P {
     u32 x;
 };
 extern u8 *gUnk_02000710;
-void AnimData_SelectTiles(u8 *, s32);
+void AnimData_SelectPaletteBank(u8 *, s32);
 void ResourceStation_TransferStoredResource(struct P *p)
 {
     u32 *q = &p->x;
@@ -22,7 +22,7 @@ void ResourceStation_TransferStoredResource(struct P *p)
             }
         }
     } else {
-        AnimData_SelectTiles((u8 *)p + 0x44, 0x1ae);
+        AnimData_SelectPaletteBank((u8 *)p + 0x44, 0x1ae);
         *((u8 *)p + 0x262) = 0;
     }
     *((u8 *)p + 0x264) = 1;
