@@ -1,26 +1,26 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_helpers.h"
 #define SceneActorControl_GetTravelProfile sub_08083B90
-extern const u8 *gUnk_08605C3C[8];
+extern const u32 gUnk_08605C3C[8];
 static inline s32 Divide128(s32 value)
 {
     if (value >= 0)
         return value >> 7;
     return -((-value) >> 7);
 }
-static inline const u8 *ReadProfile(u32 index)
+static inline u32 ReadProfile(u32 index)
 {
-    register const u8 **table asm("r0") = gUnk_08605C3C;
+    register const u32 *table asm("r0") = gUnk_08605C3C;
     return table[index];
 }
-const u8 *SceneActorControl_GetTravelProfile(struct SceneActorRegistryResetView *actor)
+u32 SceneActorControl_GetTravelProfile(struct SceneActorRegistryResetView *actor)
 {
     register struct SceneActorControlMotionState *state asm("r3") =
         SceneActorControl_GetMotionState(actor);
     register u32 offset asm("r4") = 0x3E0;
     s32 sample;
     s32 index;
-    const u8 *result;
+    u32 result;
     asm("" : "+r"(offset));
     {
         register u16 *field asm("r0") = (void *)((u8 *)state + offset);
