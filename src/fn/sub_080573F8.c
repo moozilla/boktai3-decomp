@@ -1,13 +1,11 @@
-#include "global.h"
-void AnimData_Load(u8 *, u32);
-void Sprite_Init(u8 *, u8 *, u32);
-void AnimData_SelectPaletteBank(u8 *, u32);
-void sub_080573F8(u8 *p)
+#include "level_advance_display.h"
+#define LevelAdvanceDisplay_InitSprite sub_080573F8
+void LevelAdvanceDisplay_InitSprite(struct LevelAdvanceManager *manager)
 {
-    u8 *q = p + 0x44;
-    AnimData_Load(q, 0x1C1D);
-    Sprite_Init(p + 0x18, q, 0);
-    AnimData_SelectPaletteBank(q, 1);
-    *(u32 *)(p + 0x18) |= 1;
-    p[0x1f] = 1;
+    u8 *graphics = manager->graphics;
+    sub_082151E4(graphics, 0x1C1D);
+    sub_082144A4(&manager->sprite, graphics, 0);
+    sub_08215284(graphics, 1);
+    manager->sprite.flags |= 1;
+    manager->sprite.priority = 1;
 }
