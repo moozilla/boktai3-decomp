@@ -1,8 +1,10 @@
-#include "global.h"
-
-u32 sub_08073C70(u32, u32);
-
-u32 sub_08073CB0(u32 a, u32 b, s32 c)
+#include "scene_actor_profile.h"
+#define SceneActorProfiles_GetEntryAddress sub_08073CB0
+/* Integer address arithmetic preserves the lookup miss result without forming a null-derived pointer. */
+u32 SceneActorProfiles_GetEntryAddress(u32 id, u32 mode, s32 index)
 {
-    return (u32) & ((u32 *)sub_08073C70(a, b))[c + 2];
+    u32 profile = (u32)sub_08073C70(id, mode);
+    u32 offset = (u32)index << 2;
+    offset += 8;
+    return profile + offset;
 }
