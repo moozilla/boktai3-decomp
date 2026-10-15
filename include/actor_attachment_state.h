@@ -16,9 +16,9 @@ struct ActorAttachmentSlotView {
     struct ContactPosition jitter[3];
     struct ContactPosition offset;
     void *update;
-    struct ContactPosition position;
+    struct ContactPosition position; /* pad at 2E is the observed projected Y. */
     u8 frame, flags31, flags, action;
-    u16 unknown34;
+    u16 unknown34; /* Signed vertical accumulator in full-sprite updates. */
     u8 status[3], phase[3];
     u8 partMask;
     s8 slotId;
