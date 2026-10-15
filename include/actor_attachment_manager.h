@@ -30,7 +30,7 @@ ActorAttachment_CreateSpriteSlot(u32, struct ContactPosition *, void *, s32, s32
 struct ActorAttachmentSlotView *sub_08065FD0(u8, struct ContactPosition *, void *, s32, s32, u32,
                                              s16 *, s16, u32, void *,
                                              struct ActorAttachmentFollowView *);
-struct ActorAttachmentSlotView *sub_08066278(u8, struct ContactPosition *, void *, s32, u32,
+struct ActorAttachmentSlotView *sub_08066278(u32, struct ContactPosition *, void *, s32, u32,
                                              struct ActorAttachmentFollowView *);
 struct ActorAttachmentSlotView *
 ActorAttachment_CreateThreePartSlot(u8, struct ContactPosition *, void *, s32, u32, s16 *, s32,
