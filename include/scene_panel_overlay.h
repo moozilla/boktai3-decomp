@@ -26,6 +26,6 @@ struct SceneOverlayResource {
     struct SceneOverlayMapEntry *maps;
     u32 tiles, extra;
 };
-void sub_08058B88(struct ScenePanel *);
+void ScenePanel_CycleOverlayPalette(struct ScenePanel *);
 
 #endif

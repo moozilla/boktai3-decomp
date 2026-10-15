@@ -1,7 +1,6 @@
 #include "scene_panel_overlay.h"
 
 // MATCHING_CONCESSION: register-pinning
-#define ScenePanel_DrawOverlay sub_08058BD8
 
 static inline s32 scaleSceneOverlay(s32 value)
 {
@@ -27,7 +26,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
     s32 next;
     register u16 *output asm("r9");
     s32 slot;
-    sub_08058B88(panel);
+    ScenePanel_CycleOverlayPalette(panel);
     {
         struct SceneOverlayLayer *layer;
         register u16 tx asm("r2");
