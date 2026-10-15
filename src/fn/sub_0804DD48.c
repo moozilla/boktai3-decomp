@@ -67,10 +67,10 @@ s32 StagedEffect_Initialize(struct StagedEffect *effect, u32 script)
         savedPaletteIndex = paletteIndex;
         savedTravel = travel;
         if (found) {
-            effect->pendingScript = (void *)Script_GetValue();
+            effect->pendingScriptId = Script_GetValue();
             effect->scriptReleaseFrame = Script_GetValue();
         } else {
-            effect->pendingScript = 0;
+            effect->pendingScriptId = 0;
             effect->scriptReleaseFrame = 0;
         }
     }
