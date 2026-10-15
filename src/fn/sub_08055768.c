@@ -1,11 +1,11 @@
-#include "global.h"
-u8 *sub_08055678(void);
-void sub_08055768(void)
+#include "script_keyframe_pool.h"
+#define ScriptKeyframe_ShowFromScript sub_08055768
+void ScriptKeyframe_ShowFromScript(void)
 {
-    u8 *p = sub_08055678();
-    if (p) {
-        *(u32 *)(p + 0x40) &= -2;
-        if (*(u16 *)(p + 0x9C) != 0)
-            *(u16 *)(p + 0x9E) = 0;
+    struct ScriptKeyframeEntry *entry = sub_08055678();
+    if (entry) {
+        entry->animation.display.flags &= ~1;
+        if (entry->conditionalVisibility)
+            entry->hidden = 0;
     }
 }
