@@ -179,3 +179,66 @@ address formation before pointer conversion, preserving target wrapping without
 an intermediate huge/out-of-bounds C pointer addition for negative indices.
 These drafts remain private and uncredited; their matching and caller/storage
 preconditions still require completion before promotion.
+
+## Assembly-only mode and contact-release responses
+
+D2E0 has five incoming operands: actor, signed mode, position pointer, Y adjustment,
+and a signed terminal/nonterminal selector. Only modes0/1 use the supplied position;
+mode2 applies a health/fall response. These interpretations remain tentative.
+
+Before dispatch it clears actor2B8. If flags2D4 mask0x2000 is set, it emits three
+08231500 effects using actor47C configuration and origin484, with origin Y+128,
+random jitter X/Z in[-7,8], Y in[-16,15], packed vector(5,10,5), and two trailing
+40 arguments. This advances the shared random-table cursor nine times. It then
+clears actorAA/2B8 and flags2D4 mask0x2000. Invalid modes return after this prefix.
+
+Modes0/1 select response21/callback5FC unless substate2B5 is already21, set flags2D0
+masks0x20000 and0x4, reset several contact/timer flags, and copy the supplied
+position to actor5C with the requested Y adjustment. The copy is mirrored to the
+appropriate sequence/tile drawable at1C/40, then flags2D6 mask0x2000 is set.
+
+Mode2 disables shadow320 and hides the drawable. A positive fifth operand applies
+the terminal path: old health goes to collider134.cost(+3E) and actor2E4, health
+becomes zero, owned attachments0/1/3 are released through frame127 calls, E7B0 is
+called with4, and response17/callback234 is selected. Several existing multiplayer
+membership and scene gates control reporting through1781B4 and damage-number
+display. In nonmultiplayer mode, flags2D0 mask0x800 suppresses the6FA74 removal
+record. Categories1/4 emit six 6A160 bursts with packed vector(80,60,60), random
+mode1..4, and headings32/64/94/128/196/240; a subsequent live category check gates
+song229. The nonpositive fifth-operand path instead computes health/2 toward zero,
+stores that as collider cost/actor2E4, subtracts it with halfword truncation and a
+zero floor, and performs the gated reporting/display path without the terminal
+state transition. No C body for D2E0 is promoted yet.
+
+DB34 is a contact-release/route-resolution response, rather than a generic death
+routine. It first releases node45C if flags2D4 mask0x1000 was set, clears that bit
+and pointer, sets2C2=64, selects animation0, and chooses response14/FDC0 with actor
+state3/phase1/behavior0. Its subsequent branch is controlled by flags2D4 mask0x80.
+
+In that branch it refreshes destination5D4 from route450 and terrain height. The
+source cell comes from the targetSourceDC object's X/Z in single-player mode; in
+multiplayer mode, its byte8 identifies a player slot0..3, and the cell comes from
+that player's object40 halfword6. Missing/invalid multiplayer source indices take
+the fallback callback path. The source cell is compared to actor2F4, with a player
+status0x20000 exception. A differing cell attempts F204/F7A8 at that cell's center;
+accepted results install response behavior12/timer60/callback41C. Query failure
+clears flags2D4 mask0x200 and calls actor5F8 through the r1 trampoline.
+
+The same-cell route may select substate26/callback41C and actor behavior12, or the
+ordinary route callback228/behavior5, preserving the observed reread of mask0x80
+across calls. Unless flags2D4 mask0x400 or flags414 mask0x4 blocks it, the routine
+pushes a temporary direction response: saved callback21C goes to460, state/phase/
+behavior go to464/465/466, substate2B5 to467, and facing59 to5D9. It chooses a random
+cardinal direction(0/64/128/192), retrying equality with the old direction at most
+four times, and writes it to5D8. It selects callback5F0/substate27 with actor3/1/0,
+sets5DA=6, then calls E334 and sets2C2=32. These offsets directly connect this
+subsection to the following worker's E334 controller.
+
+With the initial mask0x80 clear, DB34 marks destination5D4's fourth halfword1 and
+queries it directly. Failure calls actor5F8; success starts response behavior7,
+timer60, callback228. The usual result2 exception preserves velocity. Both response
+paths retain the actor420/flags reset details in assembly; no exact C credit is
+claimed for DB34. The fourth vector halfword is sometimes explicitly written as
+phase metadata here, so its role should not be generalized as meaningless across
+all vector views; the reviewed F204/F7A8 chain uses its coordinate components and
+whole aggregate copies, without a scalar read of that fourth halfword.
