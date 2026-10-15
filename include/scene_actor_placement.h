@@ -18,7 +18,7 @@ struct SceneActorPlacementView {
     u8 unknown118[0x60];
     u16 field178;
     u8 unknown17A[0x6C];
-    u16 paletteVariant;
+    u16 paletteOffset;
     u8 unknown1E8[0x34];
     const void *control, *resetControl220;
     u8 unknown224[0x18];

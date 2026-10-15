@@ -3,7 +3,7 @@
 #define SceneActorPlacement_PlayVariantEventSound sub_08077848
 void SceneActorPlacement_PlayVariantEventSound(struct SceneActorPlacementView *actor, u32 event)
 {
-    s32 variant = actor->paletteVariant;
+    s32 variant = actor->paletteOffset;
     switch (event) {
         case 2:
             switch (variant) {
@@ -32,7 +32,7 @@ void SceneActorPlacement_PlayVariantEventSound(struct SceneActorPlacementView *a
                 u32 soundFlags = actor->flags2E6;
                 register u32 soundMask asm("r0") = 4;
                 if (!SceneActorPlacement_TestMask(soundMask, soundFlags)) {
-                    switch ((s32)actor->paletteVariant) {
+                    switch ((s32)actor->paletteOffset) {
                         case 0:
                         case 1:
                         case 3:

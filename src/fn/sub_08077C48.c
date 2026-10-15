@@ -34,7 +34,7 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
     switch (category) {
         case 2:
             offset.y = 0;
-            if (!actor->paletteVariant) {
+            if (!actor->paletteOffset) {
                 union {
                     struct ContactPosition position;
                     u32 words[2];
