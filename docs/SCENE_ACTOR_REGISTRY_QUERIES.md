@@ -48,6 +48,22 @@ any bit from the caller's `flags2CC` mask. Its availability predicate rejects
 retains the observed NULL-pointer case and normalized zero/one result before the
 caller checks its flag mask.
 
+## Scripted control changes
+
+`707EC` reads keyword `n` (actor ID), requires a non-NULL field5DC pointer, copies
+signed fieldA8 to fieldAA, and sets `flags2D6 & 2`. The roles of the copied
+fields and pointer remain unconfirmed. `70A40` reads `n` and `d`, requires the
+actor's `flags2C0 & 100`, then calls movement-mode setup `70070(actor,d)`.
+`70A90` applies the same setup to registry actors that pass the availability
+predicate and have `flags2D4 & 4000`; it reads only keyword `d`.
+
+`706DC` resets eligible categories `{4,1,3}` after the same health/status test.
+It copies control5F4 to control21C, writes field2B2=1, field2B0=0, substate2B5=5,
+clears field2C8 and field104, and clears bit one of flags114. It then resets
+state2A8/phase2A9/counter2AC, chooses behavior2AA=3, sets field2B1=1, and sets
+`flags2D0 & 1000`. These numeric states are deliberately retained: the reviewed
+stores do not establish a game-level departure/reset animation identity.
+
 ## Boundaries and validation
 
 The section spans 3,896 bytes and has 22 function entries, including known
@@ -56,8 +72,8 @@ independent entries `70444` and `70E44` that gbadisasm leaves as data. Thus
 has size 68, followed by the separate 108-byte `70E44`. These entries already
 exist in the repository's build/progress extra-function metadata.
 
-The current frozen query cohort contains seven new exact functions, **+0.0258
-percentage points** (624 bytes), all register-pinned. Four prior exact functions
+The current frozen query/control cohort contains eleven new exact functions,
+**+0.0492 percentage points** (1,188 bytes), all register-pinned. Four prior exact functions
 (124 bytes) were reviewed and typed without additional credit. Each function
 passed a full-size fast check after formatting. The parent performs name
 promotion and one combined complete ROM build before integration.
@@ -68,6 +84,10 @@ promotion and one combined complete ROM build before integration.
 | 080703F0 | 84 | Count living actors in a category | New, pinned |
 | 08070444 | 96 | Count with category and field1E6 filter | New, pinned |
 | 080704A4 | 72 | Find first living actor | New, pinned |
+| 080706DC | 272 | Reset control/state for selected categories | New, pinned |
+| 080707EC | 72 | Restore scripted actor fieldAA | New, pinned |
+| 08070A40 | 80 | Set scripted actor movement mode | New, pinned |
+| 08070A90 | 140 | Set movement mode across eligible registry actors | New, pinned |
 | 08070E00 | 68 | Continue after ID, excluding flag bit one | New, pinned |
 | 08070E44 | 108 | Continue with category whitelist | New, pinned |
 | 08070EB0 | 12 | Get first actor | Prior exact, ordinary |
@@ -79,6 +99,18 @@ promotion and one combined complete ROM build before integration.
 Register-hint minimization reduced the first four new leaves 5→3, 3→3, 11→7,
 and 3→2 respectively. The continuation helpers retain 3 and 3 hints (the latter
 reduced from 8), and the flags query reduced 17→8. No handwritten instruction bodies or explicit r7 bindings are used.
+The control reset reduced 42→17 hints, the field-restoration script 7→3, the
+individual movement-mode request 9→3, and the registry-wide mode request 21→10.
+
+The control reset also demonstrated the compiler branch-length estimate issue:
+its near-exact body measured 276 bytes, with a long entry branch and consequent
+pool padding. Removing one barrier at a time only when the score improved found
+no solution. A greedy pass accepting an unchanged fuzzy score removed ten empty
+barriers; trial twelve shortened the compiler-selected branch and yielded all
+272 bytes. The barriers emitted no physical instructions, but affected the
+compiler's estimated branch distance. Normal exact-only depin followed this
+preliminary minimization.
+
 The remaining section includes movement/response setup, script-driven actor
 mutation, and additional selection/query helpers; those bodies retain assembly
 until their complete reviewed spans match.
