@@ -1,0 +1,23 @@
+#include "route_sprite_actor.h"
+#define RouteSpritePool_IsFull sub_0806E308
+static inline u8 Occupied(u32 *mask, s32 index)
+{
+    if (*mask & (1 << index))
+        return TRUE;
+    return FALSE;
+}
+u8 RouteSpritePool_IsFull(void)
+{
+    struct RouteSpritePool *pool = gUnk_02000198;
+    s32 i;
+    if (!pool) {
+        pool = sub_0806E250();
+        if (!pool)
+            return TRUE;
+    }
+    for (i = 0; i < 4; i++) {
+        if (!Occupied(&pool->occupiedMask, i))
+            return FALSE;
+    }
+    return TRUE;
+}
