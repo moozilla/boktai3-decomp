@@ -5,7 +5,7 @@ s32 LevelAdvanceDisplay_DestroyManager(struct LevelAdvanceManager *manager)
 {
     struct LevelAdvanceParticle *particle;
     s32 i;
-    sub_08214514(&manager->sprite);
+    Sprite_Remove(&manager->sprite);
     particle = manager->particles;
     for (i = 7; i >= 0; i--) {
         Effect_Remove(particle);

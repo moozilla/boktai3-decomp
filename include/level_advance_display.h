@@ -68,9 +68,5 @@ void sub_08217DE0(struct LevelAdvanceParticle *, void *, u32);
 void sub_08217EEC(struct LevelAdvanceParticle *, void *, u32);
 void sub_08217EC4(struct LevelAdvanceParticle *, s32, s32);
 void sub_08217ECC(struct LevelAdvanceParticle *, u32);
-void sub_082151E4(void *, u32);
-void sub_082144A4(struct LevelAdvanceSprite *, void *, u32);
-void sub_08215284(void *, u32);
-void sub_08214514(struct LevelAdvanceSprite *);
 s32 Script_GetValueSafe(void);
 #endif
