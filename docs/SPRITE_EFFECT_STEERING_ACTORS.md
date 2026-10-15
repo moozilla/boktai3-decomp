@@ -128,19 +128,21 @@ collider-associated parameters each defaulting from zero to one, removes the
 shadow when its status byte is zero, removes the sprite, clears the used bit,
 and writes index `-1`, state zero, and entry zero.
 
-Travel state `6C3A0` and constructor `6C7B0` remain assembly-backed gaps. The latter
-creates state one with lifetime 120, animation sequence seven, a shadow and
-collider, and copies target/direction/steering parameters. Its adjacent state-two
-constructor begins at the next worker boundary `6CA3C`.
+Travel state `6C3A0` remains the assembly-backed gap. The exact constructor
+`6C7B0` creates state one with lifetime 120, animation sequence seven, a shadow
+and collider, and copies target/direction/steering parameters. It initializes
+velocity to zero before replacing Y with its signed argument. The palette call
+passes the observed value `127`, reusing the steering-delay field offset; its
+meaning remains unconfirmed. Its adjacent state-two constructor begins at the
+next worker boundary `6CA3C`.
 
 ## Validation and accounting
 
-The frozen cohort contains 20 exact functions covering 4,484 reviewed bytes.
-Eleven newly recovered bodies contribute **+0.1678 percentage points** (4,052 bytes):
-**+0.0238 points ordinary C** (576 bytes) and **+0.1439 points register-pinned**
-(3,476 bytes). Nine pre-existing exact bodies were reviewed and typed (432 bytes)
-without new matching credit. The two outstanding body spans are `6C3A0` (872)
-and `6C7B0` (652). Global progress is authoritative only after the
+The frozen cohort contains 21 exact functions covering 5,136 reviewed bytes.
+Twelve newly recovered bodies contribute **+0.1948 percentage points** (4,704 bytes):
+**+0.0238 points ordinary C** (576 bytes) and **+0.1709 points register-pinned**
+(4,128 bytes). Nine pre-existing exact bodies were reviewed and typed (432 bytes)
+without new matching credit. The outstanding body span is `6C3A0` (872). Global progress is authoritative only after the
 parent's combined import, name promotion, and complete ROM build.
 
 | Address | Reviewed bytes | Contract | Category |
@@ -165,6 +167,7 @@ parent's combined import, name promotion, and complete ROM build.
 | 0806C044 | 448 | Appear before bobbing | New, pinned |
 | 0806C204 | 412 | Bob in place | New, pinned |
 | 0806C708 | 168 | Destroy actor slot | New, pinned |
+| 0806C7B0 | 652 | Construct actor before travel | New, pinned |
 
 Full reviewed sizes passed the fast checker after the final formatting and
 semantic audit (`build/visual-steering-final.json`, private verification output).
@@ -179,3 +182,6 @@ The constructor passed a separate full-size 776-byte check after minimization
 volatile argument homes; removing either or both changes 15–18 bytes. Velocity
 squared accumulation and bias negation use unsigned arithmetic to preserve the
 observed machine wrap without signed-overflow assumptions.
+
+The travel constructor passed a separate 652-byte check after 80→30 register
+hints, formatting, and a scalar-definition audit (`build/6C7B0-final.json`).
