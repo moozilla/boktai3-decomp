@@ -199,7 +199,7 @@ void SceneInventory_PopulateConsumableGrid(struct SceneInventoryPanel *input)
                     register u32 offset asm("r0") = (u32) & ((struct GameState *)0)->unk7B0;
                     s16 *currency;
                     const struct SceneValueConsumableDefinition *record;
-                    s32 money, value asm("r0");
+                    s32 money, value;
                     currency = (void *)((u32)state + offset);
                     {
                         u32 base = (u32)gUnk_08E60F80;

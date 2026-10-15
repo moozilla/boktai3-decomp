@@ -5,7 +5,7 @@ struct S080FC7F4 {
     u8 *q;
 };
 void Collider_SetPosition(u8 *, u8 *, u32);
-void Collider_Refresh(u8 *);
+s32 Collider_Refresh(u8 *);
 
 void sub_080FC7F4(struct S080FC7F4 *s)
 {

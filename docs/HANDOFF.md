@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 29.984% matching (2026-10-15). This file is the single
+Last updated after corrected 30.003% matching and subsystem cleanup (2026-10-15). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,50 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 15 cleanup: corrected 30% and subsystem reports
+
+Exact code is **30.0028070%**, a net **+0.0183824 percentage points** from
+PR167: **7,113 /11,523 functions**,
+**724,674 /2,415,354 bytes**. Without register pinning: **21.080%**
+(509,146 bytes); Register-pinned: **8.923%**
+(215,528 bytes), included above. The strict 30% threshold is 724,607 bytes.
+
+The batch adds 32 full exact bodies / 3,628 bytes: 25 scalar/angle helpers and 7
+adjoining actor-control/visibility helpers. Correcting earlier credit removes
+2,484 bytes of retained assembly falsely absorbed by the 52-byte `08221800` helper,
+and 700 bytes at five consumed-return ABI boundaries (55EB8/54B64/51B70/821FE40/
+66DB8). These five now have valid scored guarded drafts and original ASM
+fallbacks; 88 drafts total remain uncredited. Both stage-icon initializers,
+the contact-burst initializer and directional-force initializer retain exact C
+with defined results. The net gain is 444 bytes after all corrections.
+The 31 reviewed hidden boundaries increase the function denominator, not the
+ROM-byte denominator. See [scalar helpers](SCALAR_APPROACH.md),
+[ABI audit](ASM_OUTPUT_QC.md) and [visibility callbacks](SCENE_ACTOR_VISIBILITY.md).
+
+All previous bounded permuter runs have finished without an additional accepted
+exact result. No new search or worker remains active. Their bases/logs/private
+candidates are preserved; see [completed-run handoff](PERMUTER_HANDOFF_2026-10-15.md).
+The new matches came from manual source and allocation work, with concessions
+minimized before integration.
+
+The treemap/report cleanup adds 80 documented subsystem ranges (117→197),
+covering recent `08047BB4–08084F44` work and seven middle-ROM families. On identical
+current function data, report units decrease 8,907→7,574. Per-function sizes,
+exact/fuzzy scores, totals and register categories are unchanged by grouping.
+Names describe observed layouts/APIs, with uncertain identities marked
+provisional. Physical source files remain available for per-function review.
+See [subsystem index and accounting correction](REPORT_SUBSYSTEMS.md).
+
+Validation: combined build prints `build/boktai3.gba: OK`; RAM-literal audit
+passes. Against the final ELF, 82 changed translation units match their full reviewed
+extents and eight guarded drafts compile with recorded full-extent scores. The compiled
+extent audit checks 1,410 single-function C units with no retained-tail
+flags. Clang audits 1,296 relevant/changed files with 0 errors and seven reviewed
+return warnings (ignored results or the documented inventory category domain).
+All 50 tooling tests, 4 context tests and 10 progress tests pass; formatting,
+inventory and diff checks pass. No handwritten instruction bodies or explicit
+r7 bindings were introduced. Main-only CI publishes the grouped report.
 
 ## October 15 closeout: ground motion and collision helpers
 

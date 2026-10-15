@@ -39,7 +39,7 @@ void SceneInput_BeginPairTransition(struct SceneInputPair *pairInput, const u32 
             register u32 targetOffset asm("r3");
             widget->flags &= ~1;
             Anim_LoadKeyframe(widget, pair, (u16)*localFrames, 1);
-            position = &pair->widgets[0].position;
+            position = (struct SceneInputPosition *)&pair->widgets[0].position;
             asm("" ::"r"(position));
             {
                 register u32 offset asm("r3") = widgetOffset;

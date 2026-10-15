@@ -1,7 +1,7 @@
 #include "global.h"
 void sub_08121458(void);
 void Collider_SetPosition(void *, void *, u32);
-void Collider_Refresh(void *);
+s32 Collider_Refresh(void *);
 void sub_081214E0(u32 a, u8 *s)
 {
     u8 *p, *q;

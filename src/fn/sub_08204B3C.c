@@ -9,7 +9,7 @@ struct Z {
 void Collider_Init(u8 *, u16, u32, u32, u32, struct Z *, struct Z *);
 void Collider_SetCallback(u8 *, void (*)(void), u8 *);
 void Collider_SetPosition(u8 *, u8 *, u32);
-void Collider_Refresh(u8 *);
+s32 Collider_Refresh(u8 *);
 void sub_08204990(void);
 void sub_0821FF7C(void *, u32, u32, u32);
 struct Q {
