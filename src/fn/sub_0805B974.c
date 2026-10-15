@@ -7,7 +7,7 @@ void ScenePanel_AdvanceArrivalRamp(struct ScenePanel *input)
     if (*frame <= 69) {
         *frame += 1;
         if (*frame == 70)
-            sub_08057978(input, 3);
+            ScenePanel_CallPendingScript(input, 3);
     }
     if (panel->arrivalRampEnabled) {
         u16 *fade = &panel->arrivalRampFrame;

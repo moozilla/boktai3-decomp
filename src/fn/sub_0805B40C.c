@@ -54,7 +54,7 @@ void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *input)
         Sound_PlaySong(249);
     } else if (frame <= 69) {
         if (panel->variant != 2 && frame == 20) {
-            sub_08058150((void *)panel, sub_080582B8);
+            ScenePanel_SetState((void *)panel, ScenePanel_BeginLongSequence);
             Sound_PlaySong(294);
         }
         sub_082260A4((70 - panel->frame) >> 1);
@@ -69,7 +69,7 @@ void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *input)
         }
         sub_0815AF14(SCENE_PANEL_PLAYER, -1);
         Sound_PlaySong(250);
-        sub_08057960((void *)panel, 2);
+        ScenePanel_SetEffectState((void *)panel, 2);
     } else if (panel->variant == 1) {
         s32 anyActive;
         register u32 count asm("r0");
@@ -88,15 +88,15 @@ void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *input)
             } while (remaining != 0);
         }
         if (anyActive)
-            sub_08057960((void *)panel, 4);
+            ScenePanel_SetEffectState((void *)panel, 4);
         else
-            sub_08057960((void *)panel, 3);
+            ScenePanel_SetEffectState((void *)panel, 3);
     } else {
         sub_0815AF14(SCENE_PANEL_PLAYER, -1);
         sub_0815C99C(SCENE_PANEL_PLAYER);
         Sound_PlaySong(490);
         gUnk_02000488->state = 14;
-        sub_080595AC(&panel->rig, 1);
-        sub_08057960((void *)panel, 10);
+        ScenePanelRig_SetState(&panel->rig, 1);
+        ScenePanel_SetEffectState((void *)panel, 10);
     }
 }

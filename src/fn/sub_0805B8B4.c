@@ -15,7 +15,7 @@ void ScenePanel_AdvanceSubjectDeparture(struct ScenePanel *input)
             if (subject->state == 4)
                 sub_0805CB88((void *)subject, 5);
         }
-        sub_08058150((void *)panel, sub_080582B8);
+        ScenePanel_SetState((void *)panel, ScenePanel_BeginLongSequence);
         sub_0822B058(4);
     } else if (frame == 90) {
         sub_08226508(16);
@@ -24,9 +24,9 @@ void ScenePanel_AdvanceSubjectDeparture(struct ScenePanel *input)
         struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
         if (!player->tetherMode) {
             sub_0815C99C(player);
-            sub_08057960((void *)panel, 3);
+            ScenePanel_SetEffectState((void *)panel, 3);
             panel->allSubjectsNotified = 0;
-            sub_08057978((void *)panel, 2);
+            ScenePanel_CallPendingScript((void *)panel, 2);
         }
     }
 }

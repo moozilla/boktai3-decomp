@@ -7,6 +7,6 @@ void ScenePanel_WaitInitialTether(struct ScenePanel *input)
         u32 zero;
         sub_0815B15C(SCENE_PANEL_PLAYER, 0, -1, 0, zero = 0);
         panel->variant = zero;
-        sub_08057960(input, 1);
+        ScenePanel_SetEffectState(input, 1);
     }
 }

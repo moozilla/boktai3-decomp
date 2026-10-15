@@ -6,7 +6,7 @@ void ScenePanel_WaitTetherReturn(struct ScenePanel *input)
     if (sub_0805B2CC(input)) {
         sub_0815B15C(SCENE_PANEL_PLAYER, 0, -1, 0, 0);
         panel->variant = 2;
-        sub_08057960(input, 1);
+        ScenePanel_SetEffectState(input, 1);
     } else if (sub_0805B3A0(input)) {
         struct TetherActor *tether = gUnk_02000488;
         s32 sourceX = tether->position.x;
@@ -24,7 +24,7 @@ void ScenePanel_WaitTetherReturn(struct ScenePanel *input)
         }
         TetherActor_BeginAuxiliaryState(gUnk_02000488);
         sub_08226380(16, &gUnk_02000488->position);
-        sub_08057960(input, 13);
-        sub_08057978(input, 6);
+        ScenePanel_SetEffectState(input, 13);
+        ScenePanel_CallPendingScript(input, 6);
     }
 }

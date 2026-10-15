@@ -6,7 +6,7 @@ void ScenePanel_WaitRigIdle(struct ScenePanel *input)
     if (panel->rig.state == 0) {
         Sound_PlaySong(491);
         TetherActor_BeginDirectedState(&panel->center);
-        sub_08057960(input, 12);
-        sub_08057978(input, 5);
+        ScenePanel_SetEffectState(input, 12);
+        ScenePanel_CallPendingScript(input, 5);
     }
 }
