@@ -1,19 +1,14 @@
-#include "global.h"
-u8 *Task_Create(u32, u32);
-void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
-s32 sub_08051EA8(u8 *, u32, u32);
-void Task_Kill(u8 *);
-void sub_08051DA4(void);
-void sub_08051DE4(void);
-u8 *sub_080520E8(u32 a, u32 b)
+#include "proximity_emitter.h"
+struct ProximityEmitter *ProximityEmitter_CreateFromScript(u32 a, u32 b)
 {
-    u8 *r = Task_Create(9, 0x268);
-    if (r) {
-        Task_SetCallbacks(r, (void (*)(void))sub_08051DA4, (void (*)(void))sub_08051DE4);
-        if (sub_08051EA8(r, a, b) < 0) {
-            Task_Kill(r);
+    struct ProximityEmitter *emitter = Task_Create(9, 0x268);
+    if (emitter) {
+        Task_SetCallbacks(emitter, (void (*)(void *))ProximityEmitter_Tick,
+                          (void (*)(void *))ProximityEmitter_Destroy);
+        if (ProximityEmitter_InitializeFromScript(emitter, a, b) < 0) {
+            Task_Kill(emitter);
             return 0;
         }
     }
-    return r;
+    return emitter;
 }

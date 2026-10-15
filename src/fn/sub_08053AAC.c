@@ -1,5 +1,4 @@
-#include "global.h"
-
-void sub_08053AAC(void)
+#include "interaction_marker.h"
+void InteractionMarker_TickDormant(struct InteractionMarker *marker)
 {
 }

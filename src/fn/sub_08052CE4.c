@@ -1,27 +1,18 @@
-#include "global.h"
-struct P {
-    u8 f[0x1c0];
-    u16 f1c0;
-    u8 f1c2[0x382 - 0x1c2];
-    u16 f382;
-};
-void sub_08052418(struct P *);
+#include "stacked_actor.h"
 void Sound_PlaySong(u32);
-void sub_08052628(struct P *, void (*)(void));
-void sub_08052D34(void);
-void sub_08052CE4(struct P *p)
+void StackedActor_ExtendForScript(struct StackedActor *p)
 {
-    u16 *c = &p->f1c0;
+    u16 *c = &p->height;
     if (*c <= 6) {
         *c += 1;
-        sub_08052418(p);
+        StackedActor_UpdateSegments(p);
     } else {
-        u16 *d = &p->f382;
+        u16 *d = &p->frame;
         u32 v = *d + 1;
         *d = v;
         if ((u16)v > 0x1f) {
             Sound_PlaySong(0x15f);
-            sub_08052628(p, sub_08052D34);
+            StackedActor_SetUpdate(p, StackedActor_WaitForScriptParticles);
         }
     }
 }

@@ -1,35 +1,20 @@
-#include "global.h"
-void sub_08051CB4(void);
-void Sound_PlaySong(s32);
-struct Obj {
-    u8 pad0[0x18];
-    u32 f18;
-    u8 pad1[0x44];
-    u32 f60;
-    u8 pad2[2];
-    u8 f66;
-    u8 f67;
-    u8 f68;
-    u8 f69;
-    u8 pad3[0x40];
-    u16 timer;
-};
-void sub_08051D28(struct Obj *p)
+#include "proximity_emitter.h"
+void ProximityEmitter_TickGrow(struct ProximityEmitter *emitter)
 {
-    p->f18 |= 1;
-    p->f60 &= ~1;
-    p->timer++;
-    if (p->timer > 0x3f) {
-        p->f60 &= ~2;
-        p->f68 = 0x40;
-        p->f69 = 0x40;
-        p->timer = 0;
-        *(void (**)(void))((u8 *)p + 0xb4) = sub_08051CB4;
-        Sound_PlaySong(0x32f);
+    emitter->primary.sprite.flags |= 1;
+    emitter->secondary.sprite.flags &= ~1;
+    emitter->stateFrame++;
+    if (emitter->stateFrame > 63) {
+        emitter->secondary.sprite.flags &= ~2;
+        emitter->secondary.sprite.unknown8[0] = 64;
+        emitter->secondary.sprite.unknown8[1] = 64;
+        emitter->stateFrame = 0;
+        emitter->update = ProximityEmitter_TickRise;
+        Sound_PlaySong(0x32F);
     } else {
-        p->f60 |= 2;
-        p->f68 = p->timer;
-        p->f69 = p->timer;
-        p->f66 = p->timer << 2;
+        emitter->secondary.sprite.flags |= 2;
+        emitter->secondary.sprite.unknown8[0] = emitter->stateFrame;
+        emitter->secondary.sprite.unknown8[1] = emitter->stateFrame;
+        emitter->secondary.sprite.unknown4[2] = emitter->stateFrame << 2;
     }
 }

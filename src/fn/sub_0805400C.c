@@ -1,8 +1,7 @@
-#include "global.h"
-void Sprite_Remove(u8 *);
-u32 sub_0805400C(u8 *p)
+#include "saved_position_marker.h"
+u32 SavedPositionMarker_Destroy(struct SavedPositionMarker *marker)
 {
-    Sprite_Remove(p + 0x1C);
-    Sprite_Remove(p + 0x6C);
+    Sprite_Remove(&marker->primary.sprite);
+    Sprite_Remove(&marker->secondary.sprite);
     return 0;
 }

@@ -1,7 +1,6 @@
-#include "global.h"
-void sub_0824923C(u8 *, u32);
-u32 sub_08053FF8(u8 *p)
+#include "saved_position_marker.h"
+u32 SavedPositionMarker_Tick(struct SavedPositionMarker *marker)
 {
-    sub_0824923C(p, *(u32 *)(p + 0xC8));
+    sub_0824923C(marker, marker->update);
     return 0;
 }
