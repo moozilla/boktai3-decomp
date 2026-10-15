@@ -4,8 +4,9 @@ struct SceneSteeringPlayerView {
     struct ContactPosition position;
 };
 extern struct SceneSteeringPlayerView *gUnk_02000580[4];
-void sub_0806C7B0(const struct ContactPosition *, const struct ContactPosition *,
-                                      s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+void SceneSteeringActor_CreateTravelActor(const struct ContactPosition *,
+                                          const struct ContactPosition *, s32, s32, s32, s32, s32,
+                                          s32, s32, s32, s32, s32, s32);
 #define SceneSteeringActor_CreateFixedTravelActor sub_0806CF4C
 void SceneSteeringActor_CreateFixedTravelActor(void)
 {
@@ -38,6 +39,6 @@ void SceneSteeringActor_CreateFixedTravelActor(void)
         delta->z = target->z - origin.position.z;
     }
     angle = Math_Atan2(delta->x, delta->z);
-    sub_0806C7B0(&origin.position, &(*location)->position, 20, angle,
-                 60, 4, 12, 4, 24, zero, zero, zero, zero);
+    SceneSteeringActor_CreateTravelActor(&origin.position, &(*location)->position, 20, angle, 60, 4,
+                                         12, 4, 24, zero, zero, zero, zero);
 }

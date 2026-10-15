@@ -1,5 +1,4 @@
 #include "scene_actor_registry.h"
-#define SceneActorRegistry_AdvanceInactiveActors sub_08071470
 extern const u8 gUnk_08605C18[];
 u8 sub_08070C24(struct SceneActorRegistryActor *, const void *);
 static inline u8 SceneActorRegistry_IsPaused(void)

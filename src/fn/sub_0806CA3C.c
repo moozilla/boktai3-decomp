@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_steering_actor.h"
-static inline void Step(struct SceneSteeringActor *slot, struct DisplaySequenceState *state, u32 one)
+static inline void Step(struct SceneSteeringActor *slot, struct DisplaySequenceState *state,
+                        u32 one)
 {
     register const volatile u16 *command asm("r4");
     u32 ended, bit;
@@ -128,15 +129,18 @@ static inline void Step(struct SceneSteeringActor *slot, struct DisplaySequenceS
 
 struct SceneSteeringActorPool *SceneSteeringActor_EnsurePool(void);
 struct SceneSteeringActor *SceneSteeringActor_Allocate(struct SceneSteeringActorPool *);
-void SceneSteeringActor_InitializeCollider(struct SceneSteeringActor *, s32,s32,s32,s32,s32,s32,s32);
-u32 ScaledShadow_Initialize(void *,const struct ContactPosition *,s32,s32,s32,s32,s32,s32,s32,s32,s32);
-void sub_08013B98(void *,s32,s32);
-void sub_08013BBC(void *,s32);
+void SceneSteeringActor_InitializeCollider(struct SceneSteeringActor *, s32, s32, s32, s32, s32,
+                                           s32, s32);
+u32 ScaledShadow_Initialize(void *, const struct ContactPosition *, s32, s32, s32, s32, s32, s32,
+                            s32, s32, s32);
+void sub_08013B98(void *, s32, s32);
+void sub_08013BBC(void *, s32);
 void sub_08013728(void *);
-#define SceneSteeringActor_CreateBobbingActor sub_0806CA3C
-void SceneSteeringActor_CreateBobbingActor(const struct ContactPosition *position, const struct ContactPosition *target,
-                  s32 velocityY, s32 direction, s32 steeringTimer,s32 turnStep,s32 steeringDelay,
-                  s32 speed,s32 speedLimit,s32 a,s32 b,s32 c,s32 d)
+void SceneSteeringActor_CreateBobbingActor(const struct ContactPosition *position,
+                                           const struct ContactPosition *target, s32 velocityY,
+                                           s32 direction, s32 steeringTimer, s32 turnStep,
+                                           s32 steeringDelay, s32 speed, s32 speedLimit, s32 a,
+                                           s32 b, s32 c, s32 d)
 {
     const struct ContactPosition *savedTarget = target;
     s32 savedVelocityY = velocityY;
@@ -153,10 +157,12 @@ void SceneSteeringActor_CreateBobbingActor(const struct ContactPosition *positio
     pool = gUnk_02000188;
     if (!pool) {
         pool = SceneSteeringActor_EnsurePool();
-        if (!pool) return;
+        if (!pool)
+            return;
     }
     slot = SceneSteeringActor_Allocate(pool);
-    if (!slot) return;
+    if (!slot)
+        return;
     {
         u32 offset = 0x122;
         u8 *state = (void *)((u8 *)slot + offset);
@@ -198,11 +204,11 @@ void SceneSteeringActor_CreateBobbingActor(const struct ContactPosition *positio
             *(u8 *)((u8 *)slot + turnOffset) = turnStep;
         }
 
-    {
-        register u32 offset asm("r1") = 0x127;
-        paletteToken = offset;
-        *(u8 *)((u8 *)slot + offset) = steeringDelay;
-    }
+        {
+            register u32 offset asm("r1") = 0x127;
+            paletteToken = offset;
+            *(u8 *)((u8 *)slot + offset) = steeringDelay;
+        }
         offset += 2;
         {
             register u16 *field asm("r1") = (void *)((u8 *)slot + offset);
@@ -229,18 +235,18 @@ void SceneSteeringActor_CreateBobbingActor(const struct ContactPosition *positio
         clear = zero;
         {
             register u32 *source asm("r0") = &clear;
-            CpuSet(source,destination,0x05000002);
+            CpuSet(source, destination, 0x05000002);
         }
     }
     slot->velocity.y = savedVelocityY;
     sprite = slot;
     slot->position = *position;
-    slot->sequenceResource = ScriptProc_Start(0x922E,0x121B);
-    Sprite_Init(slot,pool->graphics,0);
+    slot->sequenceResource = ScriptProc_Start(0x922E, 0x121B);
+    Sprite_Init(slot, pool->graphics, 0);
     sequence = &slot->sequence;
-    Anim_SetSequence(sequence,(void *)slot->sequenceResource,7,0,zero);
-    AnimData_SelectPaletteBank(slot->graphics,paletteToken);
-    Step(slot,sequence,one);
+    Anim_SetSequence(sequence, (void *)slot->sequenceResource, 7, 0, zero);
+    AnimData_SelectPaletteBank(slot->graphics, paletteToken);
+    Step(slot, sequence, one);
     {
         u32 finalZero = 0;
         u32 priority = 2;
@@ -248,11 +254,12 @@ void SceneSteeringActor_CreateBobbingActor(const struct ContactPosition *positio
         late = sprite;
         late->priority = priority;
         late->flags &= ~1;
-    SceneSteeringActor_InitializeCollider(slot,a,b,c,d,finalZero,finalZero,finalZero);
-    shadow = slot->shadow;
-    slot->shadowStatus = ScaledShadow_Initialize(shadow,&slot->position,64,64,64,100,finalZero,finalZero,5,1,finalZero);
-    sub_08013B98(shadow,0x1C1B,6);
-    sub_08013BBC(shadow,0);
-    sub_08013728(shadow);
+        SceneSteeringActor_InitializeCollider(slot, a, b, c, d, finalZero, finalZero, finalZero);
+        shadow = slot->shadow;
+        slot->shadowStatus = ScaledShadow_Initialize(shadow, &slot->position, 64, 64, 64, 100,
+                                                     finalZero, finalZero, 5, 1, finalZero);
+        sub_08013B98(shadow, 0x1C1B, 6);
+        sub_08013BBC(shadow, 0);
+        sub_08013728(shadow);
     }
 }

@@ -1,5 +1,4 @@
 #include "route_sprite_actor.h"
-#define RouteSpritePool_RequestFinishAll sub_0806E2A8
 static inline u8 Occupied(u32 *mask, s32 index, u32 one)
 {
     if (*mask & (one << index))
@@ -14,7 +13,7 @@ void RouteSpritePool_RequestFinishAll(void)
     u32 one;
     u32 stride;
     if (!pool) {
-        pool = sub_0806E250();
+        pool = RouteSpritePool_Create();
         if (!pool)
             return;
     }

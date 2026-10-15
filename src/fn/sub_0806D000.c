@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "route_sprite_playback.h"
-#define RouteSpriteActor_FinishAnimation sub_0806D000
 void RouteSpriteActor_FinishAnimation(struct RouteSpritePool *pool, struct RouteSpriteActor *actor)
 {
     if (actor->entered) {

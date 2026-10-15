@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define Memory_ClearWordPair sub_08073BFC
-
 /* The initializer callers consume the preserved incoming pointer as status. */
 u32 *Memory_ClearWordPair(u32 *p)
 {

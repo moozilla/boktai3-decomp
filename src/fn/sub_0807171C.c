@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reset.h"
-#define SceneActorRegistry_ResetRoute sub_0807171C
 void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *argument)
 {
     struct SceneActorRegistryResetView *actor = (void *)argument;

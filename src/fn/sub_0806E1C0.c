@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "route_sprite_actor.h"
-#define RouteSpritePool_Destroy sub_0806E1C0
 static inline u8 Occupied(u32 *mask, s32 index)
 {
     if (*mask & (1 << index))

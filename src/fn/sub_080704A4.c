@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-#define SceneActorRegistry_FindLiving sub_080704A4
 struct SceneActorRegistryManager *sub_08072B44(void);
 struct SceneActorRegistryActor *SceneActorRegistry_FindLiving(void)
 {

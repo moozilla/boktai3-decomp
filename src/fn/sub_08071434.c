@@ -1,5 +1,4 @@
 #include "scene_actor_registry.h"
-#define SceneActorRegistry_DestroyActors sub_08071434
 void SceneActorRegistry_DestroyActors(void)
 {
     struct SceneActorRegistryNode *node = gUnk_020004AC;
