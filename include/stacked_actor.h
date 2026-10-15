@@ -7,8 +7,8 @@ struct StackedActorPosition {
 } __attribute__((aligned(4)));
 struct StackedActorSprite {
     u32 flags;
-    u8 unknown4[3], renderMode;
-    u8 unknown8[8];
+    u8 unknown4[2], rotation, renderMode;
+    u8 scaleX, scaleY, unknownA[6];
     u16 frame;
     u8 unknown12[10];
     struct StackedActorPosition position;
@@ -25,7 +25,7 @@ struct StackedActorParticle {
 };
 struct StackedActor {
     u8 task[0x18], trigger[0x34];
-    u16 unknown4C, baseFrame;
+    u16 proximityState, baseFrame;
     struct StackedActorSprite sprite;
     u8 graphics[0x1C];
     struct StackedActorPosition world;
@@ -37,7 +37,8 @@ struct StackedActor {
     u8 unknown1C2, tetherAccepted;
     u16 tileBase, animationPhase;
     struct StackedActorParticle particles[8];
-    u8 lift, unknown369[3];
+    u8 lift, interactionEnabled;
+    u16 interactionDelay;
     u32 pendingScriptId, unknown370, unknown374, unknown378, unknown37C;
     u16 unknown380, frame;
     void (*update)(struct StackedActor *);
