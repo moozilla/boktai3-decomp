@@ -1,5 +1,4 @@
 #include "level_advance_display.h"
-#define LevelAdvanceDisplay_StartLevelAnimation sub_080570BC
 void LevelAdvanceDisplay_StartLevelAnimation(struct LevelAdvanceManager *manager)
 {
     s32 i;

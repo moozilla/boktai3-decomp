@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "level_advance_display.h"
-#define LevelAdvanceDisplay_InitFromScript sub_08057480
 s32 LevelAdvanceDisplay_InitFromScript(struct LevelAdvanceManager *manager)
 {
     s32 level;
@@ -15,12 +14,12 @@ s32 LevelAdvanceDisplay_InitFromScript(struct LevelAdvanceManager *manager)
             sample = *address;
             if (sample <= 98) {
                 s32 argument = sample;
-                manager->nextThreshold = sub_08056F20(manager, argument);
+                manager->nextThreshold = LevelAdvanceDisplay_GetThreshold(manager, argument);
             }
         }
     }
-    sub_080573F8(manager);
-    sub_08057430(manager);
+    LevelAdvanceDisplay_InitSprite(manager);
+    LevelAdvanceDisplay_InitParticles(manager);
     gUnk_02000120 = manager;
     return 0;
 }

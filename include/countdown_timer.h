@@ -9,8 +9,8 @@ struct CountdownTimer {
 extern struct CountdownTimer *gUnk_0200049C;
 void sub_081783C0(u16 *);
 void sub_08178404(void);
-void sub_08057538(void);
-s32 sub_08057574(struct CountdownTimer *);
-void sub_0805759C(void);
-s32 sub_080575A8(struct CountdownTimer *, void *, void *);
+void CountdownTimer_Stop(void);
+s32 CountdownTimer_Update(struct CountdownTimer *);
+void CountdownTimer_Destroy(void);
+s32 CountdownTimer_InitFromScript(struct CountdownTimer *, void *, void *);
 #endif

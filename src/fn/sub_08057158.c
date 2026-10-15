@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "level_advance_display.h"
-#define LevelAdvanceDisplay_UpdateAnimation sub_08057158
 void LevelAdvanceDisplay_UpdateAnimation(struct LevelAdvanceManager *manager)
 {
     u16 *active = &manager->active;
@@ -23,7 +22,7 @@ void LevelAdvanceDisplay_UpdateAnimation(struct LevelAdvanceManager *manager)
         i = 7;
         do {
             if (particle->active)
-                sub_0805704C(particle, manager->particleResource);
+                LevelAdvanceDisplay_UpdateParticle(particle, manager->particleResource);
             particle++;
         } while (--i >= 0);
         {
@@ -33,7 +32,7 @@ void LevelAdvanceDisplay_UpdateAnimation(struct LevelAdvanceManager *manager)
             if ((shifted >> 16) <= 63 && !(sample & 3)) {
                 shifted >>= 18;
                 shifted &= 7;
-                sub_08056F88(&manager->particles[shifted]);
+                LevelAdvanceDisplay_StartParticle(&manager->particles[shifted]);
             }
         }
         {

@@ -1,5 +1,4 @@
 #include "countdown_timer.h"
-#define CountdownTimer_InitFromScript sub_080575A8
 s32 CountdownTimer_InitFromScript(struct CountdownTimer *timer, void *unused1, void *unused2)
 {
     u32 value;

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "level_advance_display.h"
-#define LevelAdvanceDisplay_TryAdvanceLevel sub_08056F30
 s32 LevelAdvanceDisplay_TryAdvanceLevel(struct LevelAdvanceManager *manager)
 {
     struct LevelAdvanceProgress *progress = LEVEL_ADVANCE_PROGRESS;
@@ -11,6 +10,7 @@ s32 LevelAdvanceDisplay_TryAdvanceLevel(struct LevelAdvanceManager *manager)
     asm("" : : "r"(level) : "memory");
     LEVEL_ADVANCE_PROGRESS->levelBonus += 2;
     asm("" : : : "memory");
-    manager->nextThreshold = sub_08056F20(manager, LEVEL_ADVANCE_PROGRESS->level);
+    manager->nextThreshold =
+        LevelAdvanceDisplay_GetThreshold(manager, LEVEL_ADVANCE_PROGRESS->level);
     return 1;
 }

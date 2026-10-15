@@ -2,9 +2,8 @@
 
 The08058130–080586C0 subsection is26 exact functions /1,424 bytes. One new
 200-byte background initializer adds0.0083 percentage points without hints.
-Three hidden entry thunks at58168 (28),58184 (28) and5822C (32) are newly
-recovered C but add no net byte progress: their88 bytes were already credited
-inside58150 and581F8. Both inventories now expose the three actual boundaries.
+The25 already-C helpers (1,224 bytes), including three previously recorded hidden
+entry thunks, receive typed contracts without new progress credit.
 All26 reviewed extents match without register concessions. This subsection is
 part of a larger presentation object; it does not establish its in-game name.
 

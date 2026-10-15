@@ -1,5 +1,4 @@
 #include "countdown_timer.h"
-#define CountdownTimer_AddFromScript sub_08057648
 void CountdownTimer_AddFromScript(void)
 {
     struct CountdownTimer *timer = gUnk_0200049C;

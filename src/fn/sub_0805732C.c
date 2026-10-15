@@ -1,5 +1,4 @@
 #include "level_advance_display.h"
-#define LevelAdvanceDisplay_UpdateManager sub_0805732C
 void Sound_PlaySong(u32);
 s32 LevelAdvanceDisplay_UpdateManager(struct LevelAdvanceManager *manager)
 {
@@ -16,12 +15,13 @@ s32 LevelAdvanceDisplay_UpdateManager(struct LevelAdvanceManager *manager)
             }
         } else {
             s32 kind;
-            sub_08057158(manager);
-            if (sub_08056F30(manager)) {
-                sub_080570BC(manager);
+            LevelAdvanceDisplay_UpdateAnimation(manager);
+            if (LevelAdvanceDisplay_TryAdvanceLevel(manager)) {
+                LevelAdvanceDisplay_StartLevelAnimation(manager);
                 Sound_PlaySong(904);
-            } else if (manager->kind == 0 && (kind = sub_08056F80(manager)) >= 0) {
-                sub_08057114(manager, kind);
+            } else if (manager->kind == 0 &&
+                       (kind = LevelAdvanceDisplay_PollSecondaryEvent(manager)) >= 0) {
+                LevelAdvanceDisplay_StartSecondaryAnimation(manager, kind);
                 Sound_PlaySong(897);
             }
         }

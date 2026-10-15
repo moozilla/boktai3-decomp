@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "level_advance_display.h"
-#define LevelAdvanceDisplay_StartParticle sub_08056F88
 void LevelAdvanceDisplay_StartParticle(struct LevelAdvanceParticle *particle)
 {
     const u16 *table;
