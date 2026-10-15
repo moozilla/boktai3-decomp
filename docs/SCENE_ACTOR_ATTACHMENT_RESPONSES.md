@@ -189,7 +189,7 @@ mode2 applies a health/fall response. These interpretations remain tentative.
 Before dispatch it clears actor2B8. If flags2D4 mask0x2000 is set, it emits three
 08231500 effects using actor47C configuration and origin484, with origin Y+128,
 random jitter X/Z in[-7,8], Y in[-16,15], packed vector(5,10,5), and two trailing
-40 arguments. This advances the shared random-table cursor nine times. It then
+40 arguments. The prefix makes nine explicit random-table cursor advances. It then
 clears actorAA/2B8 and flags2D4 mask0x2000. Invalid modes return after this prefix.
 
 Modes0/1 select response21/callback5FC unless substate2B5 is already21, set flags2D0
@@ -218,8 +218,9 @@ state3/phase1/behavior0. Its subsequent branch is controlled by flags2D4 mask0x8
 In that branch it refreshes destination5D4 from route450 and terrain height. The
 source cell comes from the targetSourceDC object's X/Z in single-player mode; in
 multiplayer mode, its byte8 identifies a player slot0..3, and the cell comes from
-that player's object40 halfword6. Missing/invalid multiplayer source indices take
-the fallback callback path. The source cell is compared to actor2F4, with a player
+that player's object40 halfword6. An absent DC source or out-of-range byte8 takes
+the fallback callback path. A valid slot still requires its player and object40
+pointers to be nonnull; single-player mode likewise requires a valid DC source. The source cell is compared to actor2F4, with a player
 status0x20000 exception. A differing cell attempts F204/F7A8 at that cell's center;
 accepted results install response behavior12/timer60/callback41C. Query failure
 clears flags2D4 mask0x200 and calls actor5F8 through the r1 trampoline.
