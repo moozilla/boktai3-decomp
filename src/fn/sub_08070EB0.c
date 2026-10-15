@@ -1,8 +1,6 @@
-#include "global.h"
-
-extern u8 *gUnk_020004AC;
-
-u32 sub_08070EB0(void)
+#include "scene_actor_registry.h"
+#define SceneActorRegistry_GetFirstActor sub_08070EB0
+struct SceneActorRegistryActor *SceneActorRegistry_GetFirstActor(void)
 {
-    return *(u32 *)(gUnk_020004AC + 4);
+    return gUnk_020004AC->actor;
 }
