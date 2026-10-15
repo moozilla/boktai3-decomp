@@ -26,3 +26,11 @@ Remaining reset/callback/shake and particle-emission routines in this range
 are private drafts and do not count as matches. The ordinary disassembler
 start at `77654` hides a real helper boundary at `77444`; `772C0` ends there
 with388 bytes and the hidden helper has528 bytes.
+
+`77654` consumes callback-request flag80 at2D6, invokes the optional pointer
+at23C through0824923C, then clears180 and returns one. It returns zero for
+actors marked unavailable (2D4 bit40,2D0 bit20000,or nonpositive signed health),
+zero flags,or absent request. The original retains a second flags read; an
+inline test also saves its pointer for the post-callback clear. Its144-byte
+extent is exact with two empty lifetime barriers after minimization. No
+callback is dereferenced by authored C; dispatch retains the engine ABI.
