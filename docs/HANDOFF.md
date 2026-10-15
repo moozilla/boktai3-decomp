@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 29.679% matching (2026-10-15). This file is the single
+Last updated after reaching 29.789% matching (2026-10-15). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,48 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 15 continuation: contact targets and reaction transitions
+
+Exact code is **29.789%**, up **0.1100 percentage points** (+2,656 bytes)
+from PR163: **7,066 /11,490 functions**, **719,514 /2,415,354 bytes**.
+Without register pinning: **21.154%**; Register-pinned: **8.635%**, included
+above. All six new bodies use minimized register/lifetime concessions. This
+batch changes no function boundaries; the78 guarded drafts remain uncredited.
+
+F4B8/F710 form an exact868-byte contact-response reset and target-selection
+pair. They connect contact ownership, response commands, per-player counters,
+pending registry IDs, terrain cell2F8 and facing. FAD8 adds388 bytes for guarded
+reset-command modes, and its existing12-byte script wrapper now has typed
+actor/script arguments and an observed halfword payload at script+2. See
+[target/contact control](SCENE_ACTOR_TARGET_CONTROL.md). Its matching process
+rejected a trial where overlapping hard-r5 locals made agbcc omit mode0; all
+accepted388 bytes include the complete three-path behavior.
+
+The adjoining reaction section adds81290/8148C/81B9C (1,400 bytes): sinking and
+removal, stagger with a randomized particle packet, and animation completion
+that resumes a stored control. Shared animation, sound and collision-timer
+contracts use canonical declarations and explicit actor-view casts. Remaining
+settling, timed-particle, direction and saved-response callbacks are reviewed
+in [reaction transitions](SCENE_ACTOR_REACTION_TRANSITIONS.md); the prior
+[reaction cohort](SCENE_ACTOR_REACTION_STATES.md) also has full private semantic
+drafts for all remaining bodies. No draft receives exact matching credit.
+
+Validation: the complete build prints `build/boktai3.gba: OK` and the RAM-literal
+audit passes. All7 changed/promoted single-function units match their full
+reviewed extents against the final ELF; source audit has no warnings/errors.
+All9 progress/boundary tests, formatting, inventory and diff checks pass.
+No handwritten instruction bodies or explicit r7 bindings were introduced.
+
+Target remains **30% exact or20% account usage remaining**; last meter31%
+remaining, no reset consumed. Root continues the contact/control span with a
+complete700-byte F81C semantic draft (688 bytes/52.9% fuzzy); E334's cardinal
+terrain scan and larger E9D0/F130 gaps remain private. Sol retains A8CC's
+1736-byte99.3% candidate and a full4488-byte AF94 semantic draft. Lifecycle
+has80FB4's full732-byte98.9% candidate in a four-hour frozen permuter queue and
+is refining80494; Tail continues81290–82648 after its three new matches.
+Other suitable route/query residue remains in bounded frozen queues. Any
+mutation still requires source validity and full resolved-byte acceptance.
 
 ## October 15 continuation: reaction restoration and route transitions
 
