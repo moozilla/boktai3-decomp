@@ -10,8 +10,9 @@ s32 sub_08030C84(void *);
 void sub_08030F20(s32, s32, s32, s32);
 void sub_08030B78(s32);
 void sub_08030DBC(s32);
-void SceneInputPanel_ShowDescription(struct SceneInputPanelMessageView *panel, s32 mode)
+void SceneInputPanel_ShowDescription(void *owner, s32 mode, const void *unusedText, s32 unusedItem)
 {
+    struct SceneInputPanelMessageView *panel = owner;
     sub_08033468();
     panel->banner.flags |= 1;
     sub_08030C84(panel->text);

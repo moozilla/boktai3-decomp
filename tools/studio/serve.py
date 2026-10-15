@@ -11,6 +11,7 @@ first); it writes only build/text/bank.tsv and, on request, build/mod.gba.
 The server listens on localhost only.
 """
 import argparse
+import csv
 import http.server
 import json
 import os
@@ -62,6 +63,30 @@ def resource_file(label, h):
         if eh == h.upper():
             return f
     return None
+
+
+GUIDE_TYPES = {"items": "item", "weapons": "weapon", "accessories": "accessory", "gunframes": "gun frame",
+               "gunlenses": "gun lens", "bikeparts": "bike part", "dolls": "doll", "photos": "photo", "valuables": "valuable"}
+
+
+def guide_entries(trans):
+    """(icon, type, id, name) from DarthNemesis's Shin Bokura no Taiyou guide in
+    the translation project (../boktai3trans/shinbok guide), when present."""
+    import html as _html
+    import re
+    d = os.path.join(trans, "shinbok guide")
+    out = []
+    for page, kind in GUIDE_TYPES.items():
+        f = os.path.join(d, page + ".html")
+        if not os.path.exists(f):
+            continue
+        s = open(f, encoding="utf-8", errors="replace").read()
+        for icon, rest in re.findall(r'<img[^>]*src="images/([a-z]+[0-9a-f]+)\.png"[^>]*>(.*?)</tr>', s, re.S):
+            text = re.sub(r"\s+", " ", _html.unescape(re.sub(r"<[^>]+>", " ", rest))).strip()
+            text = text.split(" Desc:")[0].split(" Found:")[0].strip()
+            m = re.match(r"([0-9A-Fa-f]{2}) (.*)", text)
+            out.append({"icon": icon, "type": kind, "id": m.group(1).upper() if m else "", "name": m.group(2) if m else text})
+    return out
 
 
 def stages():
@@ -236,6 +261,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, open(os.path.join(HERE, "live.html"), "rb").read(), "text/html; charset=utf-8")
         elif self.path in ("/captures", "/captures.html"):
             self.send(200, open(os.path.join(HERE, "captures.html"), "rb").read(), "text/html; charset=utf-8")
+        elif self.path == "/api/guide":
+            self.send(200, guide_entries(self.server.trans))
+        elif self.path.startswith("/api/guide/"):
+            f = os.path.join(self.server.trans, "shinbok guide", "images", os.path.basename(self.path))
+            if os.path.isfile(f):
+                self.send(200, open(f, "rb").read(), "image/png" if f.endswith(".png") else "image/gif")
+            else:
+                self.send(404, {"error": "not found"})
         elif self.path == "/api/display":
             self.send(200, {"jp": self.server.display_jp, "en": self.server.display_en})
         elif self.path in ("/static/common.js", "/static/common.css", "/static/inspector.js"):
@@ -243,6 +276,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, open(os.path.join(HERE, os.path.basename(self.path)), "rb").read(), ctype + "; charset=utf-8")
         elif self.path == "/api/notes":
             self.send(200, live.notes())
+        elif self.path == "/api/items":
+            f = os.path.join(ROOT, "data", "items.csv")
+            self.send(200, list(csv.DictReader(open(f, encoding="utf-8"))) if os.path.exists(f) else [])
         elif self.path == "/api/captures":
             self.send(200, live.list_captures(limit=None))
         elif self.path == "/api/live":
@@ -330,6 +366,7 @@ def main():
     srv = http.server.ThreadingHTTPServer(("127.0.0.1", a.port), Handler)
     srv.original = original_strings()
     srv.live = live.Live(a.link_port)
+    srv.trans = a.trans
     srv.display_jp, srv.display_en = display_strings(a.trans)
     print(f"studio: http://localhost:{a.port}")
     srv.serve_forever()

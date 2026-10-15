@@ -1,8 +1,6 @@
-#include "global.h"
+#include "scene_inventory_actions.h"
 
-s32 sub_0822CDA8(s32);
-
-s32 sub_08060958(void)
+s32 SceneInventory_FindEmptyItemSlot(const void *unusedOwner)
 {
     s32 i;
     for (i = 0; i < 16; i++) {

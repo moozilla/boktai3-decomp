@@ -85,6 +85,19 @@ callers (r0 = pool entry). So a large sprite's entry is passed in by the
 actor that draws it; which actor field holds it is the next step (watch a
 run with the enemy on screen, e.g. the ghoul `9247`, pool entry 403).
 
+**Items, swords and accessories** (`tools/assets/items.py` → `data/items.csv`).
+Their names are text strings at a fixed base plus the ID: items 988 + ID
+(descriptions 1043 + ID; valuables such as the Dark Card are items 0x27 and
+up), swords 817 + ID, accessories 1107 + ID. The bank keeps the other menu
+lists the same way: gun frames from 942, lenses from 970, dungeon floors from
+1204, places from 1266. The bags are in GameState: items `+0xA0` (u16 per
+slot, `0xFFFF` empty), accessories `+0x160` (u16), swords `+0x1C0` (16-byte
+records, ID first), valuables `+0x838` (u16). Menu captures show each slot's
+icon: sprite package `5D04` (menu icons, pool entry 884) frame 240 + ID for
+swords, 289 + ID for accessories, 337 + ID for items 0x00-0x1D, 370 for every
+tarot card (0x20-0x26), 333 + ID from 0x27. No table holding these frames or
+string IDs turned up in ROM; the menu code presumably adds the bases.
+
 **Stage palettes** are named by the scripts: a stage load `proc_884(map,
 tileset, hp)` is followed by `proc_888(palette, 0, 0)` (194 stages); 104 of the
 166 palettes learned from captures equal that argument.

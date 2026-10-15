@@ -12,7 +12,7 @@ from pathlib import Path
 import re
 
 from romlib import ROOT
-from split import c_functions, nonmatching_functions
+from split import c_functions, nonmatching_functions, function_nonentries
 
 CODE_END = 0x0824DAFA
 INVENTORY = Path(ROOT) / "symbols/progress_functions.csv"
@@ -68,9 +68,10 @@ def load_groups(funcs, sizes, path, prefix):
 def assembly_addresses(path):
     """Read only function-start addresses, never instructions or ROM bytes."""
     code = Path(path).read_text()
+    nonentries = function_nonentries()
     return [int(a, 16) for a in re.findall(
         r"^\t(?:thumb|arm|non_word_aligned_thumb)_func_start \S+\n\w+: @ 0x([0-9A-F]{8})",
-        code, re.M)]
+        code, re.M) if int(a, 16) not in nonentries]
 
 
 def write_inventory(path, addresses):

@@ -1,39 +1,33 @@
-#include "global.h"
-s32 sub_080611AC(u8 *);
-void Sound_PlaySong(u32);
-void sub_0806167C(u8 *);
-void sub_08061780(u8 *);
-void sub_08061628(u8 *);
-void sub_08061914(u8 *);
-void sub_08061FAC(u8 *s)
+#include "scene_inventory_control.h"
+void SceneInventory_ConfirmItemAction(struct SceneInventoryControlView *s)
 {
-    switch (s[0x1AA6]) {
+    switch (s->mode) {
         case 4:
         case 5:
-            switch (sub_080611AC(s)) {
+            switch (SceneInventory_ClassifyItemAction(s)) {
                 case 0:
                     goto error;
                 case 1:
                     Sound_PlaySong(0xDD);
-                    sub_0806167C(s);
+                    SceneInventory_BeginPurchaseConfirmation(s);
                     break;
                 case -1:
                     Sound_PlaySong(0xDD);
-                    sub_08061780(s);
+                    SceneInventory_BeginSaleConfirmation(s);
                     break;
             }
             break;
         case 1:
             Sound_PlaySong(0xDD);
-            sub_08061628(s);
+            SceneInventory_BeginReposition(s);
             break;
         case 2:
-            if (sub_080611AC(s) == 0) {
+            if (SceneInventory_ClassifyItemAction(s) == 0) {
             error:
                 Sound_PlaySong(0x192);
             } else {
                 Sound_PlaySong(0xDD);
-                sub_08061914(s);
+                SceneInventory_BeginRemovalConfirmation(s);
             }
             break;
     }

@@ -1,0 +1,37 @@
+# Inventory action controller
+
+Reviewed 08061000–08061540, stopping at the next independent controller state. All twelve complete extents are exact. Ten new functions add **0.0520 percentage points** (1,256 bytes): 480 ordinary-C bytes and 776 bytes with minimized allocation concessions. The two previously exact functions at 612D0/6130C total 88 bytes and receive types/names without new credit. No explicit r7 binding, handwritten instruction body, full worker build or runtime coverage claim is used.
+
+The shared partial view is `scene_inventory_control.h`. Static accesses establish interactionFlags at 1AA4, mode at 1AA6, category at 1AA8, page at 1AB0, destination at 1AEC, frame at 1AEE and navigation grid at 1BE4. The prompt glyph pair is addressed at 1C14. The callback at 1CFC is kept in a separate view because it overlaps the broad glyph-pair view; the full lifetime/storage interpretation remains provisional. Likewise the catalog view at 1AB3 overlaps controller/transition storage used in other phases.
+
+61000 and 61080 classify item/consumable moves. For an inventory source (saved selection 0..15), a different destination with at least one occupied endpoint is actionable only in mode 1, returning 1. For a special source, selecting it again moves the cursor to the cached destination and returns 4. Selecting an empty ordinary slot also returns 4. All other paths return 0. The consumable version indexes signed table160 entries in the game-state block.
+
+61120/611AC/6122C classify equipment, item and consumable actions. Catalog selections use index `(page*8 - 16) + selection`; negative catalog entries are invalid. A purchase returns +1 when the signed funds field at game-state+7B0 covers the base value and destination is nonnegative. Ordinary inventory removal returns -1 when each category's validity predicates pass; otherwise the result is zero. Equipment preserves the extra kind query even though its return is unused. Consumable removal also rejects the auxiliary slot predicate and a zero signed definition value at +8. The purchase/sale handlers at62414/62634 establish the economic use of these values. The equipment path retains a redundant comparison of a sign-extended byte with 255, as observed.
+
+612D0 dispatches these predicates by category 0/1/2. Its out-of-range category path falls through without establishing a return value, preserving the original incidental r0 behavior. Callers should use the established category range. 6130C stores the controller callback and sets frame to 0xFFFF.
+
+61328 selects the second prompt glyph: mode 1 uses 3; modes 4/5 use 7 for purchase, 6 for removal, or hidden for an unavailable action. The first glyph is zero. 613BC updates the mode cursor and prompt for its presentation argument: 1 recomputes the action prompt, 2 updates the mode cursor then clears the second glyph, 0 clears only the second glyph, and 3 updates the cursor then hides both glyphs.
+
+6143C dispatches category-specific free-destination queries; the owner argument is forwarded but unused by those helpers. 6147C selects the cached destination and converts it to cursorX=`(destination&3)+4`, cursorY=`selection>>2`. 614B4 starts an action-selection phase, sets interactionFlags=0x64 (tentative flag interpretation), initializes the grid at X=0 or X=4 (kind1, Y0, flags28), or restores the saved grid, then caches a destination, clears the action prompt and installs callback 620D4.
+
+Full reviewed checker extents: 61000=128,61080=160,61120=140,611AC=128,6122C=164,612D0=60,6130C=28,61328=148,613BC=128,6143C=64,6147C=56,614B4=140. Concessions were minimized with depin --write (61000:2,61080:8,61120:1,611AC:2,6122C:7,6147C:1 retained hints). The consumable slot views keep the index adjustment before the structure member offset; narrowing temporary pointer scopes allows subsequent signed-load scratch registers to be reused. Full combined ROM validation belongs to parent integration.
+
+## Menu input and confirmation: 61C3C–620D4
+
+All seven functions in this adjoining subsection match their full extents. Three new functions add **0.0268 percentage points** (648 bytes): 484 ordinary-C bytes and 164 bytes retaining four minimized allocation hints. Four existing functions total 528 bytes and gain shared contracts without new credit.
+
+61C3C consumes input while Select (held key mask4) is held, setting interactionFlags bit2. An A press then cycles clockMode at 1AAB through 0,1,2 with sound DC. Releasing Select clears bit2. The mode interpretation follows 632AC, which passes this byte to the clock and numeric HUD functions DE3C/DF08.
+
+61CA8 updates category only when catalogMode at 1AA7 is 3: pages below itemPageCount at 1AB2 select item category1, and subsequent pages select consumable category2. It then refreshes the cached destination. This previously exact function falls through with incidental r0 rather than defining a return value; current consumers ignore it. No new claim is made that its declared u32 result has a useful contract.
+
+61CFC processes L/R key presses when interactionFlags bit1 is set. L decrements page, wrapping zero through pageCount; R increments and wraps at pageCount-1. The comparison with pageCount-1 is signed. A handled key plays 10A, sets interactionFlags bit40 and refreshes the mixed catalog category. Its result reports whether paging consumed the input.
+
+61DA0 updates the mode cursor, prompt and active highlight palette, then gives clock and page shortcuts priority over ordinary mode-menu input. B reports cancellation (return1). A activates the handler for mode4,1,3,2 in the observed source order. Up/down alone cycle modeIndex through0..3 and obtain the actual mode from ROM table0824DF38, playing DC. Other paths return0. The highlight colors start at1D00.
+
+The existing 61F18/61FAC/62040 functions confirm equipment/item/consumable actions. Modes4/5 dispatch +1 and -1 actions to their purchase/removal preparation handlers; zero plays failure sound192. Mode1 prepares a move with soundDD. Mode2 checks validity then prepares the alternate action or plays192. The typed source retains their exact switch order.
+
+The broad SceneInputPair type reserves transition-only fields after its two widgets. The glyph-only operations here use only resource+widgets (through1CF4). Their broader reserved tail overlaps the callback/highlight view, but these consumers do not demonstrate simultaneous writes to that overlapping tail; a future shared glyph-pair view can narrow its footprint. The catalog/controller overlap is likewise retained as separate partial views.
+
+Reviewed extents: C3C108,CA8=84,CFC164,DA0376,F18148,FAC148,62040148. Final checks cover both new and previously exact functions. No new runtime coverage or full worker build was performed.
+
+The callback setter stores function-pointer bits and resets the frame; it does not invoke the handler. Its shared storage boundary uses `SceneInventoryCallback` (`void (*)(void)`) with explicit casts. Concrete handlers retain their observed status return types, and assembly interworking invokes them. The palette consumers pass the highlight color array explicitly.

@@ -1,20 +1,8 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x1AA4];
-    u8 a;
-    u8 g1[2];
-    u8 m;
-};
-
-void sub_080614B4(struct S *, s32);
-void SceneInput_SetGridFlags(u8 *, s32);
-void sub_080613BC(struct S *, s32);
-
-void sub_08061BCC(struct S *p)
+#include "scene_inventory_states.h"
+void SceneInventory_BeginThirdSelection(struct SceneInventoryControlView *panel)
 {
-    sub_080614B4(p, 3);
-    p->a = 0x80 | p->a;
-    SceneInput_SetGridFlags((u8 *)p + 0x1BE4, 0x1e);
-    sub_080613BC(p, 1);
+    SceneInventory_BeginActionSelection(panel, 3);
+    panel->interactionFlags |= 0x80;
+    SceneInput_SetGridFlags(&panel->grid, 0x1E);
+    SceneInventory_UpdateModePrompt(panel, 1);
 }

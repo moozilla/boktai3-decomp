@@ -46,7 +46,8 @@ canvas { image-rendering: pixelated; display: block; }
 .strip { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
 .cell { background: var(--stage); border-radius: 6px; padding: 4px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; border: 2px solid transparent; }
 .cell.on { border-color: var(--accent); }
-.cell span { font-size: 10px; color: #cfd2e6; font-variant-numeric: tabular-nums; }
+.cell span { font-size: 10px; color: #cfd2e6; font-variant-numeric: tabular-nums; text-align: center; max-width: 88px; }
+.cell .flab { display: block; font-weight: 500; color: #ffd9a8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 10px 0; font-size: 13px; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 6px; }
 .grid .cell { height: 96px; justify-content: center; }
@@ -126,6 +127,8 @@ async function boot() {
 const NOTE_KIND = { sprites: 'spr', big: 'big', maps: 'map', palettes: 'pal', tiles: 'res', data: 'res' };
 const noteKeyOf = key => tab === 'maps' ? key.split('-')[0] : key;
 const labelOf = i => NOTE_KIND[tab] && noteOf(NOTE_KIND[tab], noteKeyOf(i.key))?.label;
+// labels of a package's frames, for searching ("Healing Potion" finds 5D04)
+const frameLabels = i => (tab === 'sprites' || tab === 'big') ? Object.values(NOTES_DB).filter(n => n.kind === (tab === 'big' ? 'bigframe' : 'sprframe') && n.key.startsWith(i.key + '/')).map(n => n.label).concat(tab === 'sprites' ? Object.entries(ITEM_FRAMES).filter(([k]) => k.startsWith(i.key + '/')).flatMap(([, l]) => l.map(x => x.name + ' ' + x.jp)) : []).join(' ') : '';
 let wantFrame = null;
 
 function route() {
@@ -142,7 +145,7 @@ function route() {
 }
 function renderList() {
   const q = $('q').value.trim().toUpperCase();
-  const hits = items.filter(i => !q || i.key.includes(q) || (i.note || '').toUpperCase().includes(q) || (labelOf(i) || '').toUpperCase().includes(q));
+  const hits = items.filter(i => !q || i.key.includes(q) || (i.note || '').toUpperCase().includes(q) || (labelOf(i) || '').toUpperCase().includes(q) || frameLabels(i).toUpperCase().includes(q));
   $('count').textContent = `${hits.length} of ${items.length}`;
   $('list').replaceChildren(...hits.map(i => {
     const d = document.createElement('div');
@@ -232,19 +235,30 @@ let _caps = null;
 const capturesList = () => (_caps ??= fetch('/api/captures').then(r => r.json()).catch(() => []));
 
 // The frames of a sprite, a page at a time; click one (or pass `pick`) to show it still.
-function frameStrip(n, imgAt, pick) {
-  const strip = $('strip'), PAGE = 240, cells = [];
+// Frames can be labelled one by one (notes kind sprframe/bigframe, key HASH/FRAME).
+function frameStrip(n, imgAt, pick, kind, hash) {
+  const strip = $('strip'), PAGE = 600, cells = [];
   let shown = 0;
   const more = document.createElement('button'); more.className = 'more';
   strip.appendChild(more);
+  const lab = i => noteOf(kind, `${hash}/${i}`)?.label || (kind === 'sprframe' && itemLabel(hash, i));
+  const caption = (c, i) => { const l = lab(i); c.querySelector('span').innerHTML = `${i}${l ? `<b class="flab">${esc(l)}</b>` : ''}`; c.title = l || ''; };
   const mark = i => cells.forEach((c, k) => c.classList.toggle('on', k === i));
-  const still = i => { clearInterval(timer); const img = imgAt(i); $('stage').replaceChildren(img ? toCanvas(img, zoom) : ''); mark(i); };
+  const still = i => {
+    clearInterval(timer); const img = imgAt(i); $('stage').replaceChildren(img ? toCanvas(img, zoom) : ''); mark(i);
+    history.replaceState(null, '', `#${tab}/${hash}/${i}`);
+    const fn = $('framenote');
+    if (fn) {
+      const its = ITEM_FRAMES[`${hash}/${i}`] || [];
+      fn.innerHTML = `<div class="meta" style="margin:6px 0 0">Frame ${i}${its.length ? ' · icon of ' + its.map(x => `${x.category} ${x.id} <b>${esc(x.name)}</b> (${esc(x.jp)}, string ${peekLink('/#' + x.string, '#' + x.string)})`).join(', ') : ''}</div>`; fn.appendChild(noteEditor(kind, `${hash}/${i}`, () => caption(cells[i], i)));
+    }
+  };
   const add = upto => {
     while (shown < Math.min(n, upto)) {
       const i = shown++, img = imgAt(i), c = document.createElement('div');
       c.className = 'cell';
       if (img) c.appendChild(toCanvas(img, 1));
-      c.insertAdjacentHTML('beforeend', `<span>${i}</span>`);
+      c.insertAdjacentHTML('beforeend', `<span></span>`); caption(c, i);
       c.onclick = () => still(i);
       strip.insertBefore(c, more); cells[i] = c;
     }
@@ -278,7 +292,7 @@ views.sprites = {
     v.innerHTML = `<h2>Sprite package ${h}</h2><div class="meta">${NOTES[h] ? NOTES[h] + ' · ' : ''}${pkg.frames.length} frames · ${pkg.anims.length} animations · ${pkg.ntiles} tiles · palette: ${peekLink('/gfx#pool/' + base, 'pool entry ' + base)}</div>
       <div class="controls">Animation <select id="anim"></select> <span id="ainfo" style="color:var(--muted)"></span>
         Colors <select id="sprpal"><option value="pool">in-game (palette pool)</option><option value="capture"${learnedColors('spr', h) ? '' : ' disabled'}>as seen in a capture</option><option value="menu">palette menu</option></select> <span id="tagslot"></span></div>
-      <div class="stage" id="stage"></div><div class="strip" id="strip"></div>
+      <div class="stage" id="stage"></div><div id="framenote"></div><div class="strip" id="strip"></div>
       <h2 style="margin-top:20px">All animations</h2><div class="meta">Every animation playing; click one to open it above.</div><div class="grid" id="anims"></div>`;
     const cache = [], imgAt = i => (cache[i] ??= compose(pkg.parts(pkg.frames[i]), colors));
     const sel = $('anim');
@@ -294,7 +308,7 @@ views.sprites = {
     };
     sel.onchange = play; play();
     $('sprpal').value = mode; $('sprpal').onchange = () => { localStore('sprpal', $('sprpal').value); refresh(); };
-    frameStrip(pkg.frames.length, imgAt, wantFrame);
+    frameStrip(pkg.frames.length, imgAt, wantFrame, 'sprframe', h);
     animGrid(pkg, colors, i => { sel.value = i; play(); $('stage').scrollIntoView({ block: 'nearest' }); });
     $('tagslot').appendChild(tagButton('spr', h));
   },
@@ -316,7 +330,7 @@ views.big = {
     const r = big.recs[i], frames = big.frames(i);
     v.innerHTML = `<h2>Large sprite ${h}</h2><div class="meta">${NOTES[h] ? NOTES[h] + ' · ' : ''}${frames.length} frames · ${r.w}×${r.h}${learnedNote('big', h)}, centre (${r.cx}, ${r.cy}) · frame order shown, not the game's animation timing</div>
       <div class="controls"><label>Speed <select id="spd"><option value="4">fast</option><option value="8" selected>normal</option><option value="16">slow</option></select></label> <span id="tagslot"></span></div>
-      <div class="stage" id="stage"></div><div class="strip" id="strip"></div>
+      <div class="stage" id="stage"></div><div id="framenote"></div><div class="strip" id="strip"></div>
       <h2 style="margin-top:20px">All large sprites</h2><div class="meta">First frame of each; click to open.</div><div class="grid" id="all"></div>`;
     const ps = frames.map(f => big.parts(f)), all = ps.flat();
     const box = all.length ? [Math.min(...all.map(p => p.x)), Math.min(...all.map(p => p.y)), Math.max(...all.map(p => p.x + p.w)), Math.max(...all.map(p => p.y + p.h))] : null;
@@ -324,7 +338,7 @@ views.big = {
     $('tagslot').appendChild(tagButton('big', h));
     const play = () => player($('stage'), imgs.filter(Boolean).map(img => ({ canvas: toCanvas(img, zoom), dur: +$('spd').value })));
     $('spd').onchange = play; play();
-    frameStrip(imgs.length, k => imgs[k], wantFrame);
+    frameStrip(imgs.length, k => imgs[k], wantFrame, 'bigframe', h);
     const grid = $('all'), poolColors = {};
     await Promise.all(big.recs.map(async rr => { const p = learned.sprites[`big:${rr.hash}`]?.pool; if (p != null) poolColors[rr.hash] = await packageColors(null, p); }));
     big.recs.forEach((rr, k) => {

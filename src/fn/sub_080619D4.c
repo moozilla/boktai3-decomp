@@ -1,35 +1,20 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x1AA4];
-    u8 a;
-    u8 g[3];
-    u8 m;
-};
-
-void SceneInput_SaveSelection(u8 *);
-void sub_0806147C(struct S *);
-void sub_080607B0(struct S *);
-void sub_08060F4C(struct S *);
-void sub_08060C54(struct S *);
-void sub_0806130C(struct S *, void (*)(void));
-void sub_08062414(void);
-
-void sub_080619D4(struct S *p)
+#include "scene_inventory_states.h"
+void SceneInventory_BeginCatalogTransition(struct SceneInventoryControlView *panel)
 {
-    p->a = 0x80;
-    SceneInput_SaveSelection((u8 *)p + 0x1BE4);
-    sub_0806147C(p);
-    switch (p->m) {
+    panel->interactionFlags = 0x80;
+    SceneInput_SaveSelection(&panel->grid);
+    SceneInventory_SelectActionDestination(panel);
+    switch (panel->category) {
         case 0:
-            sub_080607B0(p);
+            SceneInventory_BeginEquipmentCatalogMove((void *)panel);
             break;
         case 1:
-            sub_08060F4C(p);
+            SceneInventory_BeginItemCatalogMove((void *)panel);
             break;
         case 2:
-            sub_08060C54(p);
+            SceneInventory_BeginConsumableCatalogMove((void *)panel);
             break;
     }
-    sub_0806130C(p, sub_08062414);
+    SceneInventory_SetControllerCallback(
+        panel, (SceneInventoryCallback)SceneInventory_TickPurchaseTransition);
 }

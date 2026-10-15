@@ -1,6 +1,5 @@
 #include "global.h"
-
-s32 sub_08063868(void)
+s32 SceneAudioEvent_Destroy(void)
 {
     return 0;
 }
