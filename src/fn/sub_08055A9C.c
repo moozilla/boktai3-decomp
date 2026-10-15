@@ -1,15 +1,15 @@
-#include "global.h"
-s32 sub_08055828(u8 *);
-s32 sub_08055A9C(u8 *p)
+#include "script_keyframe_pool.h"
+#define ScriptKeyframe_TickManager sub_08055A9C
+u32 ScriptKeyframe_TickManager(struct ScriptKeyframeManager *manager)
 {
     s32 i = 0;
-    if (i < p[0x19]) {
-        u8 *q = p + 0x1c;
+    if (i < manager->count) {
+        struct ScriptKeyframeEntry *entry = manager->entries;
         do {
-            sub_08055828(q);
-            q += 0xbc;
+            sub_08055828(entry);
+            entry++;
             i++;
-        } while (i < p[0x19]);
+        } while (i < manager->count);
     }
     return 0;
 }
