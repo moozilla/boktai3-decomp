@@ -39,7 +39,7 @@ clobber; nine tooling tests cover preparation, including that regression.
 Close search outputs remain subject to source review and exact checks.
 
 The goal remains **30% exact or20% account usage remaining**. Latest meter:
-82% remaining after an external reset; no reset consumed by us. Root owns
+79% remaining after an external reset; no reset consumed by us. Root owns
 68500–697C8, Sol697C8–6B2C4, lifecycle65C40–67148, and tail finishes67E3C
 then6B2C4–6CA3C. All use private builds; the primary dirty Claude checkout is
 untouched. Root's frozen searches are listed in
@@ -48,8 +48,12 @@ from score275; the old two-argument-offset baseline was discarded.
 
 PR150 merged at8d591c7b and main Actions38702476656 passed. This batch has
 69/69 full-extent pre-promotion checks and a compiler source audit with no
-uninitialized/unsequenced diagnostics. Combined build and post-promotion
-validation are being completed before merge.
+uninitialized/unsequenced diagnostics. The final combined build includes
+Claude's Studio/terrain updates through74eb759f and printed
+`build/boktai3.gba: OK`; RAM-literal and format checks pass. All86/86 changed
+promoted function units pass full-extent checks (`build/pools-post-promotion.json`).
+Nine permuter-preparation tests and eleven progress/boundary tests pass.
+The final build log is `build/pools-combined-final.log`.
 
 ## October 15 (Claude): stage terrain, doors and the map projection (tooling)
 
