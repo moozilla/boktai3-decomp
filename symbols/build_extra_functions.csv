@@ -406,3 +406,4 @@ address,isa,evidence,replacement_end
 08248E70,thumb,Independent 156-byte RTC write body; exact standalone C check; docs/RTC.md,08248F0C
 08248F0C,thumb,Separate RTC alarm body with own push/sub-sp and pop/bx after 08248E70 return; retained unmatched; docs/RTC.md,
 08067BA8,thumb,Independent request-all slot loop with own push and pop-bx in retained 08067984 tail; full exact 100-byte C body,08067C0C
+08067C0C,thumb,Independent bx-lr empty leaf after request-all return; full exact 4-byte extent,08067C10
