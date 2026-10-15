@@ -1,22 +1,11 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x1AA4];
-    u8 a;
-    u8 g[0x1AB1 - 0x1AA5];
-    u8 b;
-};
-
-void sub_080614B4(struct S *, s32);
-void SceneInput_SetGridFlags(u8 *, s32);
-void sub_080613BC(struct S *, s32);
-
-void sub_08061B48(struct S *p)
+#include "scene_inventory_states.h"
+#define SceneInventory_BeginAlternateSelection sub_08061B48
+void SceneInventory_BeginAlternateSelection(struct SceneInventoryControlView *panel)
 {
-    sub_080614B4(p, 2);
-    p->a |= 0x90;
-    if (p->b > 1)
-        p->a |= 1;
-    SceneInput_SetGridFlags((u8 *)p + 0x1BE4, 0x1c);
-    sub_080613BC(p, 1);
+    sub_080614B4(panel, 2);
+    panel->interactionFlags |= 144;
+    if (panel->pageCount > 1)
+        panel->interactionFlags |= 1;
+    SceneInput_SetGridFlags(&panel->grid, 0x1C);
+    sub_080613BC(panel, 1);
 }
