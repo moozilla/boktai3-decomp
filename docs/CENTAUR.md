@@ -66,6 +66,7 @@ its `flags.h`), else against the system mGBA 0.10, which cannot read them.
 `first_level_from_start.txt` replays to the same final frame (32208) and
 screen in both.
 | `where()` | frame, map, tileset, palette, life, last text |
+| `story()`, `setvar(region, offset, type, bit, value)` | read the story state; write a script variable (Story state panel) |
 | `callproc(id, {args})` | run a script procedure (also on the Live page) |
 | `warp(scene[, entrance])`, `scene()` | go to a scene the way a door does, player placed (see below); current scene |
 | `peek*/poke*`, `watch(a)` | memory helpers |
@@ -90,6 +91,17 @@ screen in both.
 Links to maps, sprites and palettes anywhere in the studio open in a side
 panel (Esc closes it; ⌘-click opens a tab). Every page has the same menu.
 
+* **Story state**: the story progress counter (`r708[0x3c]`) with −/+/Set,
+  every variable the current scene's setup tests (from
+  `build/assets/stages.json`) with its live value and an editor, each of the
+  scene's conditions marked true or false with what it gates (doors, items,
+  enemies), and the 160 event-flag bits at `GameState+0x720`–`0x733`.
+  **Reload scene** warps back in at the entrance used, so the scene sets up
+  again with the new values. Centaur sends a `story` message every 20 frames
+  (progress, entrance, flag words, watched variables); the page chooses the
+  variables with the `vars` command and writes with `setvar {r, o, t, b,
+  value}` (region, offset, type, bit), also available in Lua as
+  `setvar("r708", 0x3c, 1, 0, 5)` and `story()`.
 * **Map around the player**: the Maps view of the current stage (chosen by
   the scene) with the player and the screen rectangle drawn over it, and the
   stage's doors, entrances, items and enemies (see below); it follows the
