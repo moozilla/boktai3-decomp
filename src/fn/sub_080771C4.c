@@ -1,10 +1,10 @@
-#include "global.h"
-
-void sub_080771C4(u8 *p)
+#include "scene_actor_terrain.h"
+#define SceneActorTerrain_ClearCollisionTimers sub_080771C4
+void SceneActorTerrain_ClearCollisionTimers(struct SceneActorTerrainCollisionView *actor)
 {
-    u16 *q = (u16 *)(p + 0x134);
-    u16 z = 0;
-    q[0x1f] = z;
-    *(u16 *)(p + 0x2e4) = z;
-    *(u16 *)(p + 0x2e6) = z;
+    struct ContactCollider *collider = &actor->collider;
+    u16 zero = 0;
+    collider->cost = zero;
+    actor->field2E4 = zero;
+    actor->field2E6 = zero;
 }
