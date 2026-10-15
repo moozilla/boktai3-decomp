@@ -1,19 +1,21 @@
-#include "global.h"
-u8 *Task_Create(u32, u32);
-void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
-s32 sub_0804DD48(u8 *, u32);
-void Task_Kill(u8 *);
-void sub_0804DC40(void);
-u32 sub_0804DD10(u8 *);
-u8 *sub_0804DEFC(u32 a)
+#include "staged_effect.h"
+#define StagedEffect_CreateFromScript sub_0804DEFC
+struct StagedEffect *Task_Create(u32, u32);
+void Task_SetCallbacks(struct StagedEffect *, s32 (*)(struct StagedEffect *),
+                       s32 (*)(struct StagedEffect *));
+s32 sub_0804DD48(struct StagedEffect *, u32);
+void Task_Kill(struct StagedEffect *);
+s32 sub_0804DC40(struct StagedEffect *);
+s32 sub_0804DD10(struct StagedEffect *);
+struct StagedEffect *StagedEffect_CreateFromScript(u32 script)
 {
-    u8 *r = Task_Create(8, 0x190);
-    if (r) {
-        Task_SetCallbacks(r, sub_0804DC40, (void (*)(void))sub_0804DD10);
-        if (sub_0804DD48(r, a) < 0) {
-            Task_Kill(r);
+    struct StagedEffect *effect = Task_Create(8, sizeof(struct StagedEffect));
+    if (effect) {
+        Task_SetCallbacks(effect, sub_0804DC40, sub_0804DD10);
+        if (sub_0804DD48(effect, script) < 0) {
+            Task_Kill(effect);
             return 0;
         }
     }
-    return r;
+    return effect;
 }
