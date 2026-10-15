@@ -1171,6 +1171,7 @@ addr,name,mode,confidence,source,notes
 080585E8,ScenePanel_InitBackground,thumb,low,src-alias,
 080586B0,ScenePanel_SetPresentationMode,thumb,low,src-alias,
 080586C0,ScenePanel_BeginBackgroundBurst,thumb,low,src-alias,
+08058700,ScenePanel_UpdateBackgroundEffect,thumb,low,src-alias,
 08058AF4,ScenePanel_InitOverlay,thumb,low,src-alias,
 08058B88,ScenePanel_CycleOverlayPalette,thumb,low,src-alias,
 08058FF8,ScenePanel_DrawBackgroundLayers,thumb,low,src-alias,
