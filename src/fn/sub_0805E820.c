@@ -1,23 +1,13 @@
-#include "global.h"
-u8 sub_0805E5D0(void *);
-void Sound_PlaySong(u32);
-struct S {
-    u8 f0;
-    u8 b1;
-    u8 b2;
-    u8 b3;
-    u8 f4[8];
-    s8 t[1];
-};
-u32 sub_0805E820(struct S *p)
+#include "scene_input_navigation.h"
+u32 SceneInput_MoveUp(struct SceneInputGridView *grid)
 {
-    s32 base = p->t[p->b2 + p->b1 * 4];
-    u32 i = (p->b2 + 3) & 3;
-    while (i != p->b2) {
-        s32 v = p->t[i + p->b1 * 4];
+    s32 base = grid->cells[grid->cursorY + grid->cursorX * 4];
+    u32 i = (grid->cursorY + 3) & 3;
+    while (i != grid->cursorY) {
+        s32 v = grid->cells[i + grid->cursorX * 4];
         if (v >= 0 && v != base) {
-            p->b2 = i;
-            p->b3 = sub_0805E5D0(p);
+            grid->cursorY = i;
+            grid->selection = SceneInput_GetGridSelection(grid);
             Sound_PlaySong(0xdc);
             return 1;
         }

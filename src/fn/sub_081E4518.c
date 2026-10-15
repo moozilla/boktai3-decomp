@@ -8,7 +8,7 @@ struct S {
 };
 extern u8 gUnk_03005430[];
 void Sound_PlaySong(u32);
-void sub_08228D88(void);
+void SunClock_GetBaseHour(void);
 void sub_081E4518(struct S *p)
 {
     if (--p->timer == 0) {
@@ -16,6 +16,6 @@ void sub_081E4518(struct S *p)
         if ((u8)(gUnk_03005430[14] - 1) <= 2)
             Sound_PlaySong(0x120);
         else
-            sub_08228D88();
+            SunClock_GetBaseHour();
     }
 }

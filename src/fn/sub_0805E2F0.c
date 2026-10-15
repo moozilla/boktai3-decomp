@@ -1,14 +1,10 @@
-#include "global.h"
-
-void Anim_Remove(u8 *);
-
-void sub_0805E2F0(u8 *p)
+#include "scene_input.h"
+void SceneInput_DestroyGlyphPair(struct SceneInputPair *pair)
 {
-    u8 *q = p + 0x20;
-    s32 i;
-
-    for (i = 1; i >= 0; i--) {
-        Anim_Remove(q);
-        q += 0x60;
+    struct SceneInputWidget *widget = pair->widgets;
+    s32 remaining;
+    for (remaining = 1; remaining >= 0; remaining--) {
+        Anim_Remove(widget);
+        widget++;
     }
 }

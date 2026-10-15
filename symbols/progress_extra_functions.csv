@@ -109,6 +109,7 @@ address,evidence
 0805BCE8,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0805C754,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0805CD60,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
+0805E014,Independent four-argument palette helper after 0805E000 return and literal; own push r4-r7-lr and pop-bx plus pool; exact136-byte C
 08064B20,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08064D3C,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08066FD8,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C

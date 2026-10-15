@@ -50,7 +50,7 @@ int sub_08224D78(void);
 int Script_ParseStringRef(const void *);
 const u8 *Text_LookupString(int);
 int sub_08228DB8(void);
-int sub_08228D88(void);
+int SunClock_GetBaseHour(void);
 void sub_08036D2C(const void *, void *, int);
 void sub_08224DAC(void *, int, int, int, int, const void *, const void *);
 extern u16 gUnk_0203B400[];
@@ -109,7 +109,7 @@ int sub_08034A80(struct Engine *p)
             chance = ((u8 *)table)[position * 2];
             if (chance <= 63) {
                 u32 form = sub_08228DB8();
-                int stage = sub_08228D88();
+                int stage = SunClock_GetBaseHour();
                 if (form - 1 <= 2) {
                     offset = 1;
                     if (stage <= 11)

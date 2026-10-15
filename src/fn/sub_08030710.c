@@ -27,8 +27,8 @@ struct Manager {
 extern struct Manager *gUnk_02000480;
 extern struct Player *gUnk_02000580[4];
 int sub_08018420(void);
-int sub_08228D88(void);
-int sub_08228D94(void);
+int SunClock_GetBaseHour(void);
+int SunClock_GetBaseMinute(void);
 void sub_0802D9C0(void *, struct Actor *);
 void sub_0802E188(struct Manager *);
 void sub_0802E04C(void *);
@@ -45,9 +45,9 @@ int sub_08030710(struct Manager *m)
         m->target = 0;
     }
     m->event = sub_08018420();
-    m->phase = sub_08228D88();
+    m->phase = SunClock_GetBaseHour();
     {
-        int frame = sub_08228D94();
+        int frame = SunClock_GetBaseMinute();
         u8 *current = &m->frame;
         u8 *previous;
         int old;

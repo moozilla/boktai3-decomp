@@ -58,7 +58,7 @@ void NumericDisplay_DrawStatusValues(struct StatusScreen *unused)
     s16 *dst;
     int row, col;
     register int *values asm("r12");
-    int left = sub_08228D88(), right = sub_08228D94();
+    int left = SunClock_GetBaseHour(), right = SunClock_GetBaseMinute();
     digits[0] = Div(left, 10);
     digits[1] = left - digits[0] * 10;
     dst = (s16 *)sub_0800E3E0(0, 16, 11);

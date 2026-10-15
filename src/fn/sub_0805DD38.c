@@ -1,13 +1,11 @@
-#include "global.h"
-u16 *sub_0805DD18(u32, u32, u32);
-void sub_0805DD38(u32 a, u32 b, s32 n)
+#include "scene_hud_map.h"
+void SceneHud_FillTile001(u32 x, u32 y, s32 count)
 {
-    u16 *q = sub_0805DD18(0, a, b);
-    if (n > 0) {
+    u16 *cell = SceneHud_GetMapCell(0, x, y);
+    if (count > 0) {
         do {
-            *q = 0xF001;
-            q++;
-            n--;
-        } while (n > 0);
+            *cell++ = 0xF001;
+            count--;
+        } while (count > 0);
     }
 }
