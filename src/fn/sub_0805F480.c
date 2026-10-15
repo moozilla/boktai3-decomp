@@ -2,7 +2,6 @@
 #include "scene_input_compare.h"
 #include "scene_hud_map.h"
 #include "scene_input_grid.h"
-#define SceneInputPanel_ShowItemComparison sub_0805F480
 void SceneInputPanel_ShowItemComparison(struct SceneInputWidget *primary,
                                         struct SceneInputWidget *secondary,
                                         struct SceneInputResource *resource,
@@ -25,7 +24,7 @@ void SceneInputPanel_ShowItemComparison(struct SceneInputWidget *primary,
         reference = 0;
     else
         reference = sub_0822E288(referenceIndex);
-    sub_0805F3A4(&primaryValue, &secondaryValue, &equipped, 0);
+    SceneInputPanel_GetEquippedValues(&primaryValue, &secondaryValue, &equipped, 0);
     if (candidate) {
         sub_0822D740(candidate, converted);
         value = sub_08159030(converted, reference);
@@ -34,7 +33,7 @@ void SceneInputPanel_ShowItemComparison(struct SceneInputWidget *primary,
             comparison = 1;
         else if (value < primaryValue)
             comparison = 2;
-        sub_0805F374(value, digits);
+        SceneInputPanel_SplitThreeDigits(value, digits);
     } else {
         if (primaryValue > 0) {
             sub_0822D740(&equipped, converted);
@@ -46,7 +45,7 @@ void SceneInputPanel_ShowItemComparison(struct SceneInputWidget *primary,
             comparison = 1;
         else if (value < primaryValue)
             comparison = 2;
-        sub_0805F374(value, digits);
+        SceneInputPanel_SplitThreeDigits(value, digits);
     }
     {
         if (primaryValue > 0 || ({
@@ -79,7 +78,7 @@ void SceneInputPanel_ShowItemComparison(struct SceneInputWidget *primary,
             }
         }
     }
-    sub_0805F374(secondaryValue, digits);
+    SceneInputPanel_SplitThreeDigits(secondaryValue, digits);
     {
         if (secondaryValue > 0 && !({
                 register const void *test asm("r1") = candidate;

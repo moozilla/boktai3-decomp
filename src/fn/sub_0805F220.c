@@ -1,5 +1,4 @@
 #include "scene_input_panel.h"
-#define SceneInputPanel_HighlightMode sub_0805F220
 extern u8 *gUnk_030042E4;
 void SceneInputPanel_HighlightMode(struct SceneInputPanel *panel, u16 *palette)
 {

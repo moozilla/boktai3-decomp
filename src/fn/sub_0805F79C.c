@@ -1,5 +1,4 @@
 #include "scene_input_panel.h"
-#define SceneInputPanel_ShowDescription sub_0805F79C
 struct SceneInputPanelMessageView {
     u8 unknown0[0xD08];
     struct SceneInputWidget banner;

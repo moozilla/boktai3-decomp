@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_input_panel.h"
-#define SceneInputPanel_PositionModeCursor sub_0805F0E8
 void SceneInputPanel_PositionModeCursor(struct SceneInputPanel *owner, u32 mode)
 {
     register struct SceneInputPanel *panel asm("r2") = owner;

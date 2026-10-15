@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_input_compare.h"
-#define SceneInputPanel_ShowAttributeComparison sub_0805F63C
 void SceneInputPanel_ShowAttributeComparison(struct SceneInputWidget *first,
                                              struct SceneInputWidget *second,
                                              struct SceneInputWidget *third,
@@ -28,7 +27,7 @@ void SceneInputPanel_ShowAttributeComparison(struct SceneInputWidget *first,
     {
         s32 *digit;
         s32 offset;
-        sub_0805F374(target0, digits);
+        SceneInputPanel_SplitThreeDigits(target0, digits);
         {
             s32 product = comparison * 5;
             offset = product * 2;
@@ -52,7 +51,7 @@ void SceneInputPanel_ShowAttributeComparison(struct SceneInputWidget *first,
     {
         s32 *digit;
         register s32 offset asm("r6");
-        sub_0805F374(target1, digits);
+        SceneInputPanel_SplitThreeDigits(target1, digits);
         {
             register s32 product asm("r0") = comparison * 5;
             asm("" : "+r"(product));
@@ -76,7 +75,7 @@ void SceneInputPanel_ShowAttributeComparison(struct SceneInputWidget *first,
     {
         s32 *digit;
         register s32 offset asm("r6");
-        sub_0805F374(target2, digits);
+        SceneInputPanel_SplitThreeDigits(target2, digits);
         asm("" : "+r"(comparison));
         {
             register s32 product asm("r0") = comparison * 5;

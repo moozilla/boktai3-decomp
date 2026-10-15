@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_item_values.h"
-#define SceneItemValue_CalculateEquipment sub_0805F7E0
 s32 SceneItemValue_CalculateEquipment(u32 slot)
 {
     struct SceneValueEquipment *equipment = sub_0822D6C8(slot);

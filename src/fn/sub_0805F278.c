@@ -1,5 +1,4 @@
 #include "scene_input_panel.h"
-#define SceneInputPanel_HighlightCompare sub_0805F278
 extern u8 *gUnk_030042E4;
 void SceneInputPanel_HighlightCompare(struct SceneInputPanel *panel, u16 *palette)
 {

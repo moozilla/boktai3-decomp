@@ -1,5 +1,4 @@
 #include "scene_inventory_actions.h"
-#define SceneInventory_RefreshEquipmentValue sub_08060344
 void SceneInventory_RefreshEquipmentValue(struct SceneInventoryActionView *panel)
 {
     struct SceneInputPosition position;
@@ -9,7 +8,7 @@ void SceneInventory_RefreshEquipmentValue(struct SceneInventoryActionView *panel
         case 5:
             if (panel->selection <= 15) {
                 kind = sub_0822D6E0(panel->selection);
-                value = sub_0805F7E0(panel->selection);
+                value = SceneItemValue_CalculateEquipment(panel->selection);
                 label = 1;
                 goto ready;
             } else if (panel->selection <= 23) {

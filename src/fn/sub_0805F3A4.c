@@ -1,5 +1,4 @@
 #include "scene_input_compare.h"
-#define SceneInputPanel_GetEquippedValues sub_0805F3A4
 void SceneInputPanel_GetEquippedValues(s32 *primaryValue, s32 *secondaryValue,
                                        struct SceneInputItemDescriptor *primaryDescriptor,
                                        u32 *secondaryDescriptor)

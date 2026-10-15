@@ -1,5 +1,4 @@
 #include "scene_inventory_actions.h"
-#define SceneInventory_RefreshItemValue sub_080603EC
 void SceneInventory_RefreshItemValue(struct SceneInventoryActionView *panel)
 {
     struct SceneInputPosition position;
@@ -8,7 +7,7 @@ void SceneInventory_RefreshItemValue(struct SceneInventoryActionView *panel)
         kind = sub_0822CDA8(panel->selection);
         if (kind < 0)
             goto hidden;
-        value = sub_0805F87C(panel->selection);
+        value = SceneItemValue_CalculateItem(panel->selection);
         label = 1;
     } else if (panel->selection <= 23) {
         s32 index = (panel->page << 3) - 16;
@@ -16,7 +15,7 @@ void SceneInventory_RefreshItemValue(struct SceneInventoryActionView *panel)
         kind = panel->catalog[index];
         if (kind < 0)
             goto hidden;
-        value = sub_0805F86C(kind);
+        value = SceneItemValue_GetItemBaseValue(kind);
         label = 0;
     } else {
         kind = -1;

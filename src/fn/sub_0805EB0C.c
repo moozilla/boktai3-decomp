@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_input_panel.h"
-#define SceneInputPanel_InitWidgets sub_0805EB0C
 void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
 {
     register struct SceneInputPanel *incoming asm("r0") = owner;

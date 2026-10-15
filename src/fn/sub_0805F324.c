@@ -1,5 +1,4 @@
 #include "scene_input_panel.h"
-#define SceneInputPanel_ResetHighlights sub_0805F324
 extern u8 *gUnk_030042E4;
 void SceneInputPanel_ResetHighlights(struct SceneInputPanel *panel,
                                      struct SceneInputHighlight *unused)

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_panel.h"
-#define SceneInventory_ShowItemDescription sub_0805FA6C
 void SceneInventory_ShowItemDescription(struct SceneInventoryPanel *panel)
 {
     s32 item, frame;
@@ -52,7 +51,9 @@ void SceneInventory_ShowItemDescription(struct SceneInventoryPanel *panel)
             sub_0803343C(Text_LookupString(text + item));
         }
     }
-    sub_0805F480(panel->comparison[0], panel->comparison[1], &panel->display.widgetResource, 0, -1);
-    sub_0805F63C(panel->comparison[2], panel->comparison[3], panel->comparison[4],
-                 &panel->display.widgetResource, -1);
+    SceneInputPanel_ShowItemComparison(panel->comparison[0], panel->comparison[1],
+                                       &panel->display.widgetResource, 0, -1);
+    SceneInputPanel_ShowAttributeComparison(panel->comparison[2], panel->comparison[3],
+                                            panel->comparison[4], &panel->display.widgetResource,
+                                            -1);
 }
