@@ -1,5 +1,6 @@
-#include "global.h"
-void sub_08064BF8(u32 n, s32 *a, s32 *b)
+#include "actor_attachment.h"
+#define ActorAttachment_GetDefaultOffset sub_08064BF8
+void ActorAttachment_GetDefaultOffset(u32 n, s32 *a, s32 *b, s32 unused)
 {
     switch (n) {
         case 0:
