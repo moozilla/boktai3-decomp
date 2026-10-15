@@ -31,8 +31,9 @@ evidence in [ASSETS.md](ASSETS.md) ("Stage terrain", "Stage scripts"):
   expressions, `Script_ApplyOperator` (`0821B938`) the operators. Doors are
   `proc_934(box, scene, entrance, back)` traps on HP boxes; the entrance number
   travels in `r708[0x70]` and the destination's entrance procedures test it.
-  The warp in Centaur does not set it yet, which may be why warps never place
-  the player.
+  Centaur's `warp(scene, entrance)` now calls `proc_945` (the door transition
+  without a box) and the player is placed; the old warp left `r708[0x70]`
+  stale, so no entrance procedure matched (CENTAUR.md, "Scenes, warps").
 
 Tools: `tools/assets/hp.py`, `tools/assets/stages.py` (per-scene doors,
 entrances, items, enemies → `build/assets/stages.json`), `gcx.py` now prints
