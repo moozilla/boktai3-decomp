@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 26.170% matching (2026-10-14). This file is the single
+Last updated after reaching 26.388% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,48 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex/Sol): panel interaction, configuration and lifecycle
+
+Exact code is **26.388%**, up **0.2174 percentage points** (+5,252 bytes):
+**6,725 / 11,473 functions**, **637,358 / 2,415,354 bytes**. Without register
+pinning: **20.349%**; Register-pinned: **6.038%**, included above. Twenty-four
+new functions add 4,060 ordinary-C bytes and 1,192 with minimized concessions.
+The 77 guarded drafts remain outside exact progress.
+
+The reviewed cohort is **5B28C–5CB38**, **47 functions /6,316 bytes**.
+Sol recovered player/tether acquisition, all fifteen interaction handlers,
+initial-mode orchestration, script-status exports, banked message dispatch,
+and approach-sprite rendering. Root recovered palette/auxiliary initialization,
+script configuration, four subject spawn positions, and the lifecycle driver,
+initializer and cleanup. Twenty-three previously exact functions now have typed contracts or names;
+they receive no additional exact-byte credit.
+All newly recovered code except five conceded functions is ordinary C.
+
+Shared partial views remain distinct where layouts differ: the main palette
+sprite embeds sixteen palette halfwords at 48, whereas rig sprites embed the
+sequence there. C0F also selects saved versus global game mode, so its earlier
+skipMainSprite name is tentative. Script reference decoding/writing now has a
+thin shared header, avoiding an unrelated existing AA00 prototype mismatch.
+
+Contracts and static evidence: [interaction](SCENE_PANEL_INTERACTION.md),
+[configuration](SCENE_PANEL_CONFIGURATION.md),
+[orchestration](SCENE_PANEL_ORCHESTRATION.md),
+[commands](SCENE_PANEL_COMMANDS.md), [lifecycle](SCENE_PANEL_LIFECYCLE.md).
+The contiguous exact-C span reaches **4E008–5CB38**, **433 functions /60,208
+bytes**, with no gaps. No new runtime coverage or specific scene identity is
+claimed. PR142 main Actions passed at f272d0d4 (run38683192611).
+
+Combined validation printed `build/boktai3.gba: OK` in
+`build/interaction-config-combined.log`; the RAM-literal check passed.
+Pre-promotion checks passed 35/35 plus 12/12 full reviewed extents. Formatting,
+inventory and structured-data checks passed. Final post-promotion checks are
+recorded in `build/interaction-config-post-promotion.json`.
+
+Continue toward **30% matching or 40% account usage remaining**, latest read
+**44% remaining**. Root scratch covers **5CD64–5D2B0**, subject sequence states.
+Sol's disjoint **5CB38–5CD64** subject creation/state/contact cohort is active.
+Do not alter the primary Claude checkout. Worker build outputs remain private.
 
 ## October 14 (Codex/Sol): complete rig states, animation and setup
 
@@ -49,18 +91,7 @@ Formatting, progress inventory, structured data and RAM-literal checks passed.
 PR141 main Actions passed at31eaddca (run38679224515). No new runtime coverage
 or final game identity is claimed.
 
-Continue toward **30% matching or 40% account usage remaining**; latest read
-**46% remaining**. Sol's next **5B28C–5BCEC** cohort is complete on
-`codex/contiguous-section-sol`: import **83d8e5b9..f9db8440**, twenty functions
-plus one naming cleanup, 2,172 new bytes (+0.0899 pp), 1,120 ordinary /1,052
-conceded; nine existing functions /484 bytes typed. Sol is now working the
-following **5C310–5C680** callbacks (eight functions /880 bytes, three new /696).
-Parent owns **5BCEC–5C310** configuration and secondary-sprite setup: five new
-functions /1,472 bytes plus two old helpers /100 bytes. Initial drafts and typed
-views are under `wip/scene_panel_config.h` and `wip/sub_0805BCEC.c` onward.
-Do not run per-function checks against an ELF while a combined build is writing
-it. Keep production frozen during combined validation. The Claude-owned primary
-checkout remains untouched.
+This batch was merged as PR142. The newer entry above supersedes its next-work assignments.
 
 ## October 14 (Codex/Sol): overlay renderer, scheduled actions and rig control
 
