@@ -39,6 +39,6 @@ struct ActorAttachmentSlotView *sub_080666D8(struct ContactPosition *, void *, s
                                              void *, struct ActorAttachmentFollowView *);
 struct ActorAttachmentSlotView *sub_080668B0(struct ContactPosition *, void *, s32, s32, u32,
                                              void *, struct ActorAttachmentFollowView *);
-struct ActorAttachmentSlotView *sub_08066474(u8, struct ContactPosition *, void *, s32, u32, s16 *,
+struct ActorAttachmentSlotView *sub_08066474(u32, struct ContactPosition *, void *, s32, u32, s16 *,
                                              s32, u32, struct ActorAttachmentFollowView *, u32);
 #endif
