@@ -1,11 +1,12 @@
-#include "global.h"
-extern u8 *gUnk_02000710;
-void sub_0805C774(u8 *p)
+#include "scene_panel_commands.h"
+#include "game_state.h"
+#define ScenePanel_SelectMode sub_0805C774
+void ScenePanel_SelectMode(struct ScenePanelInteractionView *panel)
 {
-    s32 v;
-    if (p[0xc0f] == 0)
-        v = *(s16 *)(gUnk_02000710 + 0x876);
+    s32 mode;
+    if (panel->skipMainSprite == 0)
+        mode = gUnk_02000710->unk876;
     else
-        v = p[0xc11];
-    p[0xc10] = v;
+        mode = panel->savedMode;
+    panel->mode = mode;
 }
