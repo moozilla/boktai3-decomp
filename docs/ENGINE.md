@@ -338,7 +338,13 @@ one operand and returns its type and value. The first byte selects the type:
   else uses `gUnk_02000708`. The low 16 bits are the offset from that base. When
   the first byte's high nibble is `2`, an index operand follows. The
   matched accessors are `sub_0821B34C`, `sub_0821B4C8`, `sub_0821B540` and
-  `sub_0821B5BC`.
+  `sub_0821B5BC`. Types (`sub_0821B34C`): 1 and 6 are 16-bit, 2 and 3 a byte,
+  4 a single bit (bits 16–19 give its number, the index adds to it), 8 is
+  24-bit and 9 a word. `gcx.py` prints them as `region[offset.bit]:type`
+  (`r708[0x6e.2]:t4`). At the `start` bookmark the regions are `gs` =
+  `0x0203C400`, `r708` = `0x0203DA00` (the script work area: story progress
+  `r708[0x3c]`, the arrival entrance `r708[0x70]`, most scene flags) and
+  `r700` = `0x0203E200` (scratch).
 
 ### Command names
 
