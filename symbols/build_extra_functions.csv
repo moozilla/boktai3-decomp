@@ -424,3 +424,5 @@ address,isa,evidence,replacement_end
 08245394,arm,Existing bx r0 callback trampoline; retained assembly; docs/RFU.md,
 08248E70,thumb,Independent 156-byte RTC write body; exact standalone C check; docs/RTC.md,08248F0C
 08248F0C,thumb,Separate RTC alarm body with own push/sub-sp and pop/bx after 08248E70 return; retained unmatched; docs/RTC.md,
+08083F3C,thumb,Independent collision latch clear leaf after 83E98 return and literal pool; full 32-byte exact C,08083F5C
+08083F5C,thumb,Independent terrain response function with own push and pop-bx following collision latch helper; full 232-byte reviewed extent,08084044
