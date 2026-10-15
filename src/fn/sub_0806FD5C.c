@@ -1,17 +1,14 @@
-#include "global.h"
-s32 sub_0821A3E8(void *, void *);
-void sub_0806FC24(u32, void *);
-void sub_0806FC64(u32, void *);
-void sub_0806FD08(u32, void *, u32);
-struct Entry {
-    u32 unk;
-    u8 *data;
-};
-void sub_0806FD5C(u8 *p)
+#include "scene_actor_registry.h"
+#define SceneActorRegistry_DispatchMessages sub_0806FD5C
+s32 sub_0821A3E8(u32, struct SceneActorRegistryMessage **);
+void sub_0806FC24(u8, void *);
+void sub_0806FC64(u8, void *);
+void sub_0806FD08(u8, void *, u16);
+void SceneActorRegistry_DispatchMessages(struct SceneActorRegistryManager *p)
 {
-    s32 n = sub_0821A3E8(*(void **)(p + 0x24), p + 0x18);
+    s32 n = sub_0821A3E8(p->resourceId, &p->messages);
     if (n > 0) {
-        struct Entry *q = *(struct Entry **)(p + 0x18);
+        struct SceneActorRegistryMessage *q = p->messages;
         n--;
         do {
             u8 *d = q->data;
