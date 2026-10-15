@@ -44,8 +44,8 @@ struct ScenePanelInteractionView {
     u8 unknownC18[0x54];
     struct ScenePanelRig rig;
     u8 unknown1320[0x16];
-    u8 allSubjectsNotified, fadeEnabled;
-    u16 fadeFrame;
+    u8 allSubjectsNotified, arrivalRampEnabled;
+    u16 arrivalRampFrame;
     u8 unknown133A[0x10];
     u16 transitionSound;
 };
