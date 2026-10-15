@@ -1,5 +1,5 @@
-#include "global.h"
-s32 sub_08056F80(void)
+#include "level_advance_display.h"
+s32 LevelAdvanceDisplay_PollSecondaryEvent(struct LevelAdvanceManager *manager)
 {
     return -1;
 }

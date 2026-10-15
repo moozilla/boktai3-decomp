@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 25.561% matching (2026-10-14). This file is the single
+Last updated after reaching 25.657% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,53 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex/Sol): level display, countdown and presentation states
+
+Exact code is **25.657%**, up **0.0962 percentage points** (+2,324 bytes):
+**6,658 / 11,473 functions**, **619,702 / 2,415,354 bytes**. Without register
+pinning: **20.039%**; Register-pinned: **5.618%**, included above. Fifteen new
+functions add1,340 unpinned bytes and984 with minimized concessions. Seventy-seven
+guarded drafts remain outside exact progress.
+
+Sol completed **56F20–5751C**, level-advance display: fourteen functions /1,532
+bytes, ten new /1,376. A typed threshold table advances the signed level and
+caches the next threshold, while a shared animation state staggers eight particles
+and shows timed sprite frames. The second notification's poll is disabled but
+retains its observed manager argument. All hints were minimized; no explicit r7
+binding. [Level display contracts](LEVEL_ADVANCE_DISPLAY.md).
+
+Parent completed **5751C–57678**, countdown: eight functions /348 bytes, one
+new /80; its remaining-tick pointer is consumed by the HUD. **57678–57960**,
+proximity icon: five /744, three new /668, displays within an inclusive player
+X/Z square. Both cohorts are unpinned, and their typed helpers receive no new
+credit. See [countdown notes](../notes/countdown-timer_2026-10-14.md) and
+[proximity icon](../notes/proximity-icon_2026-10-14.md).
+
+Parent also completed the **58130–586C0** presentation-state subsection:
+26 functions /1,424 bytes, one new /200 without hints. A shared partial view
+records channel2 sequences, palette selection and background initialization.
+The three small entry thunks58168/58184/5822C were **already recorded and already
+C**, so only their contracts change. An attempted duplicate-boundary addition
+was caught by the combined build and removed before rebuilding; there is no
+inventory or extra credit change for these thunks. The earlier56D24 correction
+remains valid and separate. [Panel state notes](../notes/scene-panel-states_2026-10-14.md).
+
+The complete contiguous span is **4E008–57960**, **298 exact C functions /
+39,256 bytes**. The gap57960–58130 is Sol's active particle/palette subsection
+of the same larger presentation object; it will bridge to the completed states.
+Combined validation passed: `build/boktai3.gba: OK` in
+`build/level-combined.log`, plus all53 post-promotion reviewed-extent checks.
+Formatting, inventory, structured data and RAM-literal checks passed. Main PR138 Actions
+passed atf848a199 (run38673382798). No new execution coverage claims.
+
+Continue toward **30% matching or40% account usage remaining**; last read54%
+remaining. Sol owns57960–58130 using a compatible separate effects layout view.
+Parent is working from586C0 onward: background effect58700 is a1012-byte draft,
+while overlay init58AF4 (148 bytes) is exact/unpinned and palette cycle58B88
+(80 bytes) is exact with five minimized concessions in scratch. Keep the running
+combined build's production sources frozen, integrate scratch in a later batch,
+and retain the Claude-owned primary checkout untouched.
 
 ## October 14 (Codex/Sol): staged icons, terrain markers and script utilities
 

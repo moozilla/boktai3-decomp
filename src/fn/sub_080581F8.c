@@ -1,17 +1,8 @@
-#include "global.h"
-struct P {
-    u8 f[0x22e];
-    u16 f22e;
-};
-void sub_08058130(struct P *, u32, u32);
-void sub_08058150(struct P *, u32);
-void sub_080581F8(struct P *p)
+#include "scene_panel.h"
+void ScenePanel_TickForwardFour(struct ScenePanel *panel)
 {
-    u16 *c = &p->f22e;
-    u32 v = *c + 1;
-    *c = v;
-    if ((u16)v > 7) {
-        sub_08058130(p, 2, 5);
-        sub_08058150(p, 0);
+    if (++panel->stateFrame > 7) {
+        ScenePanel_SetChannelValue(panel, 2, 5);
+        ScenePanel_SetState(panel, 0);
     }
 }

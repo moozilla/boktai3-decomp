@@ -1,8 +1,5 @@
-#include "global.h"
-
-extern u32 gUnk_0200049C;
-
-void sub_0805759C(void)
+#include "countdown_timer.h"
+void CountdownTimer_Destroy(void)
 {
     gUnk_0200049C = 0;
 }

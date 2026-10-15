@@ -1,14 +1,6 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x22e];
-    u16 a;
-    u8 g[0x250 - 0x230];
-    u32 b;
-};
-
-void sub_08058150(struct S *p, u32 v)
+#include "scene_panel.h"
+void ScenePanel_SetState(struct ScenePanel *panel, void (*state)(struct ScenePanel *))
 {
-    p->b = v;
-    p->a = 0;
+    panel->state = state;
+    panel->stateFrame = 0;
 }

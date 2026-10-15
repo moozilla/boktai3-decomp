@@ -1,18 +1,11 @@
-#include "global.h"
-struct P {
-    u8 f[0x18];
-    u16 f18;
-    u16 f1a;
-};
-extern struct P *gUnk_0200049C;
-s32 Script_GetKeywordValue(u32, u32);
-void sub_08057648(void)
+#include "countdown_timer.h"
+void CountdownTimer_AddFromScript(void)
 {
-    struct P *p = gUnk_0200049C;
-    if (p != 0) {
-        if (p->f1a == 0) {
-            if (p->f18 != 0)
-                p->f18 += Script_GetKeywordValue(0x74, 0);
+    struct CountdownTimer *timer = gUnk_0200049C;
+    if (timer) {
+        if (timer->locked == 0) {
+            if (timer->remaining != 0)
+                timer->remaining += Script_GetKeywordValue('t', 0);
         }
     }
 }
