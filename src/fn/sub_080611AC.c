@@ -14,7 +14,7 @@ s32 SceneInventory_ClassifyItemAction(struct SceneInventoryControlView *panel)
             goto invalid;
         {
             s32 funds = gUnk_02000710->unk7B0;
-            if (funds < (s32)sub_0805F86C(entry))
+            if (funds < (s32)SceneItemValue_GetItemBaseValue(entry))
                 goto invalid;
         }
         if (panel->destination >= 0)
