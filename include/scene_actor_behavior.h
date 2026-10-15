@@ -28,4 +28,11 @@ struct SceneActorBehaviorView {
     u8 unknown2F6[0xE];
     s32 counter304;
 };
+struct SceneActorBehaviorDestination {
+    u16 flags;
+    u8 unknown2[10];
+    struct ContactPosition position;
+    u8 unknown14[8];
+    struct ContactPosition destination;
+};
 #endif
