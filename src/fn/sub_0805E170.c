@@ -1,23 +1,12 @@
-#include "global.h"
-
-struct E {
-    u32 a;
-    u32 b;
-    u32 flags;
-    u8 f[0x54];
-};
-struct P {
-    u8 f[0x1308];
-    struct E e[5];
-};
-
-void sub_0805E170(struct P *p)
+#include "scene_hud_display.h"
+#define SceneHud_HideFourDigits sub_0805E170
+void SceneHud_HideFourDigits(struct SceneHudDigitView *parent)
 {
-    struct E *e = p->e;
-    u32 m = 1;
-    s32 i = 4;
+    struct SceneInputWidget *widget = &parent->label;
+    u32 hidden = 1;
+    s32 remaining = 4;
     do {
-        e->flags |= m;
-        e++;
-    } while (--i >= 0);
+        widget->flags |= hidden;
+        widget++;
+    } while (--remaining >= 0);
 }
