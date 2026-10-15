@@ -1,8 +1,6 @@
-#include "global.h"
-
-void sub_0816381C(u8 *, u8 *);
-
-void sub_0805F210(u8 *p)
+#include "scene_input_panel.h"
+#define SceneInputPanel_TickHighlight sub_0805F210
+void SceneInputPanel_TickHighlight(struct SceneInputHighlight *highlight)
 {
-    sub_0816381C(p + 0x18, p + 0x20);
+    sub_0816381C(&highlight->colors[12], &highlight->phase);
 }
