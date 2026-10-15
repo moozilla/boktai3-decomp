@@ -1,9 +1,7 @@
-#include "global.h"
-s32 sub_0806F9D8(u16, u16);
-s32 sub_0806F9AC(void);
-u32 sub_0806FAB0(u16 a, u16 b)
+#include "scene_actor_record.h"
+#define SceneActorRecord_CanRecordPair sub_0806FAB0
+u32 SceneActorRecord_CanRecordPair(u16 key,u16 id)
 {
-    if (sub_0806F9D8(a, b) == 0 && sub_0806F9AC() != 0)
-        return 1;
-    return 0;
+ if(!sub_0806F9D8(key,id) && sub_0806F9AC())return 1;
+ return 0;
 }
