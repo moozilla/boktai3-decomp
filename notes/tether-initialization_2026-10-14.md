@@ -18,7 +18,7 @@ The following world-position update at 4AF80 has a typed 80.0% scratch candidate
   Kind table 08605A04 scales the primary pair 40C/40E by 120 and secondary
   pair 3F8/3FA by 60. Kinds 2/9 disable interaction and directly reset states
   3/4 to 0; this direct store preserves the frame counter. Other kinds enable
-  interaction and reselect states 3/4. Secondary timer 402 is 300; mode 400 is 0.
+  interaction and reselect states 3/4. Recovery duration402 is300; recovery countdown400 is0 (names refined by4C304).
 - 4A600 (256): default palette index 10. Kind 9 initializes keyframes from
   resource 35E3; others initialize sequence resource 2499 / sequence 3D95,
   set entry 0, select the palette, copy 16 RGB555 colors, and point the display
@@ -79,7 +79,7 @@ It calculates a cardinal direction from displacement toward the cell center
 and calls the kind-9 action API with **both** arguments `(100, direction)`.
 The resulting direction can be 256 before the action API truncates its byte.
 It optionally plays 3F4/4ED and decrements byte 3E9, sets 3E8, then calls the
-script pointer at 3EC if present.
+script resource ID at3EC if present (confirmed by the0821ACDC table lookup).
 
 A bounded permuter run improved allocation after two pointer aliases were
 introduced. One early run stopped on an implicit `Mod` declaration; explicit

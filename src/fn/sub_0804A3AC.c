@@ -4,5 +4,5 @@ void TetherActor_RequestPositionSample(void)
 {
     struct TetherActor *p = (struct TetherActor *)gUnk_02000488;
     if (p)
-        p->sampleRequested = 1;
+        p->destroyRequested = 1;
 }

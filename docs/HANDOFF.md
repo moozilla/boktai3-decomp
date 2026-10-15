@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 24.184% matching (2026-10-14). This file is the single
+Last updated after reaching 24.388% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,44 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex): complete tether roaming and lifecycle states
+
+Exact code is **24.388%**, up **0.2045 percentage points** (+4,940 bytes)
+from sixteen new functions. There are **6,522 / 11,471 functions** and
+**589,058 / 2,415,354 bytes**. Without register pinning: **19.595%**;
+Register-pinned: **4.793%**, included above. Seventy-seven guarded drafts remain.
+
+The contiguous **0804C104–0804D620** subsection is fully exact: 5,404 bytes,
+including five existing typed/named helpers. Recovery countdown, wandering,
+departure/return, auxiliary flicker, descent, recoil/bounce, directed movement,
+state dispatch and initialization contracts are recorded in the
+[roaming/lifecycle notes](../notes/tether-roaming-states_2026-10-14.md).
+Five new functions (992 bytes) need no hints; eleven retain minimized concessions.
+
+Corrected prior provisional fields: **3EC/418 are u32 script resource IDs**,
+not pointers;0821ACDC masks the high bit and indexes a one-based script table.
+**241/242 are angle/magnitude;400/402 are recovery countdown/duration;473 is
+actor destruction request**, confirmed by the main tick's Task_Kill checks.
+47C remains a real effect pointer. The reverse state deliberately compares
+position against target after copying target into position. Initialization
+clears contactCooldown392 (not paletteOverrideTimer390).
+
+**4BF04 is now a guarded93.5% draft**, with no exact credit,512-byte reviewed
+extent and sixteen scratch-register byte differences. Greedy hint removal
+reduced27 concessions to16. No explicitr7 bindings or handwritten instructions.
+
+The combined build printed **`build/boktai3.gba: OK`** in
+`build/tether-roaming-combined.log`. **100 complete post-promotion extent checks passed**, covering all exact
+actor-header users and adapted lifecycle wrappers. Format/inventory/RAM checks and
+all twelve data round trips pass. No new emulator claims.
+
+Latest user target: **30% exact or40% account usage remaining**, superseding
+prior25%/60% limits. Latest check:69% remaining. One user-requested
+**GPT-6.1 Sol High** subagent works in its own checkout on **0804D620–0805002C**;
+its first staged-effect subsection awaits batch integration. Parent begins
+**0805002C onward**, with exact scratch candidates for the script entry and
+cell-gate behaviors. Claude's separate checkout owns main.
 
 ## October 14 (Codex): tether world position, player boundary and state helpers
 
@@ -48,8 +86,8 @@ emulator claims. Main remains based on Claude's PRs 127–129.
 
 Continue at **0804BF04**, the state-3 movement callback (typed 73.7% scratch draft),
 then **4C104/4C304** and the remaining adjacent state handlers through 4D5CC.
-BF04 reveals that **418 is a script pointer**; refine the older provisional
-`interactionValue` name with that consumer in the next batch. The distance
+Later review corrected this interpretation: **418 is a script resource ID**;
+0821ACDC masks the high bit and indexes the script table. See the next batch. The distance
 limiter's allocation draft remains available for a later pass. Continue toward
 **25% exact or 60% usage remaining**; latest usage is **72% remaining**.
 Claude's separate checkout owns main.
