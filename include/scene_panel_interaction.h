@@ -29,7 +29,8 @@ struct ScenePanelInteractionSubject {
 struct ScenePanelInteractionView {
     u8 unknown0[0x1E];
     u8 subjectCount;
-    u8 unknown1F[0x235];
+    u8 unknown1F[0x231];
+    void (*presentationState)(struct ScenePanel *);
     u32 mainSpriteFlags;
     u8 unknown258[0x2A4];
     u16 state, frame;
@@ -45,6 +46,8 @@ struct ScenePanelInteractionView {
     u8 unknown1320[0x16];
     u8 allSubjectsNotified, fadeEnabled;
     u16 fadeFrame;
+    u8 unknown133A[0x10];
+    u16 transitionSound;
 };
 
 extern struct TetherActor *gUnk_02000488;
@@ -72,6 +75,8 @@ void sub_0815B2E0(struct ScenePanelInteractionPlayer *, s32, u32);
 void sub_0815C4FC(struct ScenePanelInteractionPlayer *, u32);
 void sub_0815C99C(struct ScenePanelInteractionPlayer *);
 void TetherActor_SetInteractionTarget(const void *, u32);
+void TetherActor_BeginAuxiliaryState(struct TetherActor *);
+void TetherActor_BeginDirectedState(struct ContactPosition *);
 void sub_082260A4(s32);
 void sub_08226380(u32, const void *);
 void sub_08226508(u32);
