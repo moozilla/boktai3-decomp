@@ -10,7 +10,8 @@ struct SceneActorBehaviorView {
     u8 unknown6C[0x2C];
     u8 category, unknown99[3];
     s16 health;
-    u8 unknown9E[0x76];
+    u8 field9E, defense9F, reactionA0;
+    u8 unknownA1[0x73];
     u32 flags114;
     u8 unknown118[0x1C];
     struct ContactCollider primaryCollider, secondaryCollider;
@@ -25,11 +26,14 @@ struct SceneActorBehaviorView {
     u8 unknown2B6[8];
     u16 groundHeight;
     u16 flags2C0;
-    u8 unknown2C2[0xE];
+    u8 unknown2C2[0xA];
+    u32 flags2CC;
     u32 flags2D0;
     u16 flags2D4, flags2D6;
     s32 parameter2D8;
-    u8 unknown2DC[0x18];
+    u32 reaction2DC, payload2E0;
+    u16 result2E4, mode2E6;
+    u8 unknown2E8[0xC];
     u16 terrainCell;
     u8 unknown2F6[0xE];
     s32 counter304;
@@ -39,6 +43,18 @@ struct SceneActorBehaviorView {
     u16 biasZ314;
     u8 unknown316[0xB7];
     u8 requestedDirection;
+};
+struct SceneActorBehaviorContactView {
+    u8 unknown0[6];
+    u16 flags;
+    u8 unknown8[2];
+    u16 kind;
+    u8 unknownC[0x28];
+    u32 parameter34, reactionFlags;
+    u16 unknown3C, remaining, power;
+    u8 unknown42, mode;
+    u16 parameter44;
+    u8 unknown46[0xE];
 };
 struct SceneActorBehaviorDestination {
     u16 flags;
