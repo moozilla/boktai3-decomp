@@ -1,7 +1,6 @@
-#include "global.h"
-
-u8 sub_08228D88(void)
+#include "sun_clock.h"
+#define SunClock_GetBaseHour sub_08228D88
+u32 SunClock_GetBaseHour(void)
 {
-    u8 *p = (u8 *)0x03005430;
-    return p[4];
+    return gUnk_03005430.baseHour;
 }
