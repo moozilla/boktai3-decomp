@@ -1,14 +1,6 @@
-#include "global.h"
-
-s32 sub_08221774(s32 a, s32 b)
+#include "scalar_approach.h"
+#define ScalarApproach_StepHalf sub_08221774
+s32 ScalarApproach_StepHalf(s32 current, s32 target)
 {
-    s32 d = b - a;
-    s32 t;
-    if ((u32)(d + 1) <= 2)
-        return b;
-    if (d >= 0)
-        t = d >> 1;
-    else
-        t = -(-d >> 1);
-    return a + t;
+    return ScalarApproach_Half(current, target);
 }
