@@ -1,10 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_steering_actor.h"
-#define SceneSteeringActor_DestroyPool sub_0806CE24
 void sub_08013B74(void *);
 static inline u8 Used(struct SceneSteeringActorPool *pool, u32 bit)
 {
-    if (pool->used & bit) return 1;
+    if (pool->used & bit)
+        return 1;
     return 0;
 }
 s32 SceneSteeringActor_DestroyPool(struct SceneSteeringActorPool *input)

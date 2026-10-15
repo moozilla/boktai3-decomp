@@ -1,5 +1,4 @@
 #include "burst_emitter.h"
-#define BurstEmitter_InitCollider sub_08069BC8
 void sub_0821FF58(void *, s32, s32, s32, s32, s32);
 struct BurstEmitterSize {
     u32 x : 16, y : 16, z : 16;

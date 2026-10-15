@@ -1,8 +1,8 @@
 #include "bouncing_object.h"
-#define BouncingObject_DestroyPool sub_080695C8
 static inline u8 Occupied(const u32 *mask, u32 bit)
 {
-    if (*mask & bit) return TRUE;
+    if (*mask & bit)
+        return TRUE;
     return FALSE;
 }
 s32 BouncingObject_DestroyPool(struct BouncingPool *input)
@@ -16,7 +16,7 @@ s32 BouncingObject_DestroyPool(struct BouncingPool *input)
             u32 slotOffset = i;
             struct BouncingObject *slot;
             slotOffset *= sizeof(*slot);
-            slotOffset += (u32)&((struct BouncingPool *)0)->slots;
+            slotOffset += (u32) & ((struct BouncingPool *)0)->slots;
             slot = (void *)((u32)pool + slotOffset);
             Sprite_Remove(slot);
             sub_08013684(slot->registration);

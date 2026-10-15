@@ -1,5 +1,4 @@
 #include "burst_emitter.h"
-#define BurstEmitter_PlayAmbientSound sub_08069B68
 void BurstEmitter_PlayAmbientSound(struct BurstEmitter *emitter)
 {
     if (!(gUnk_030053F4 & 0x800) && !emitter->context) {

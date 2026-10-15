@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "burst_emitter.h"
-#define BurstEmitter_EmitFrame sub_08069964
 void sub_08126AD4(const struct ContactPosition *, s32, s32, s32, s32, s32, u32);
 void sub_08126348(const struct ContactPosition *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                   s32, s32);

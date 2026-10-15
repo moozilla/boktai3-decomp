@@ -179,3 +179,24 @@ The constructor passed a separate full-size 776-byte check after minimization
 volatile argument homes; removing either or both changes 15–18 bytes. Velocity
 squared accumulation and bias negation use unsigned arithmetic to preserve the
 observed machine wrap without signed-overflow assumptions.
+
+## Following steering pool lifecycle (6CCC8–6CFE4)
+
+`6CD68` requests state five and sets entry for occupied actors not already
+leaving. `6CDC0` dispatches used entries by state. `6CE24` removes a shadow only
+when its status is zero, then removes the sprite, clears the singleton, and
+returns zero. The initializer loads resourceF422; ensure uses task list10 and
+pool size97C, while reset only clears the singleton. Their actual callback
+contracts are now typed. `6CCC8` remains a retargeting gap: occupied state-three
+actors receive a target, lifetime and vertical velocity, then state four/entry.
+
+Boundary review corrected an old accounting error: the12-byte6CF0C reset was
+previously credited through6CFE4, including204 bytes of independent routines.
+The recovered52-byte6CF18 loop converts state four to five across all eight
+records without checking occupancy or setting entry. It is exact ordinary C.
+The152-byte6CF4C fixed-position wrapper remains assembly-backed, reducing old
+exact credit by152 bytes. It computes a heading from `(0x980,0x2DC,0x880)` to
+the primary player's position and invokes the state-one creator; its close
+private draft is queued for instruction-order permutation. Lifecycle additions
+contribute356 new bytes (240 ordinary,116 pinned), separately from this negative
+correction. Existing typed lifecycle bodies add no duplicate byte credit.

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_steering_actor.h"
-#define SceneSteeringActor_EmitRandomParticle sub_0806BDB8
 extern const u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
 extern const s16 gUnk_086149C4[];

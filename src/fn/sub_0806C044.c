@@ -1,9 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_steering_actor.h"
-#define SceneSteeringActor_AppearIdle sub_0806C044
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
-void sub_0806BDB8(struct ContactPosition *);
+void SceneSteeringActor_EmitRandomParticle(struct ContactPosition *);
 /* The final timer load keeps an asm-defined scratch token alive in r1.
  * Only empty-asm inputs consume it; C never uses its value. Preserve its
  * defining output when minimizing hints. The other two loads need clobbers. */
@@ -189,7 +188,7 @@ void SceneSteeringActor_AppearIdle(struct SceneSteeringActorPool *unused,
         {
             u16 *frame = (void *)((u8 *)p + offset);
             if (Mod(*frame, 8) == 0)
-                sub_0806BDB8(&p->position);
+                SceneSteeringActor_EmitRandomParticle(&p->position);
         }
     }
     {

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "sprite_effect_controller.h"
-#define SpriteEffectController_FadeAndDestroy sub_0806B2C4
 struct SequenceDrawable {
     u32 flags;
     u8 active;

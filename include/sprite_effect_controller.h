@@ -45,11 +45,14 @@ struct SpriteEffectControllerPool {
     struct SpriteEffectController slots[24];
 };
 extern struct SpriteEffectControllerPool *gUnk_02000178;
-void sub_0806A60C(struct SpriteEffectControllerPool *);
-void sub_0806A694(struct SpriteEffectController *, struct ContactPosition *);
-void sub_0806A6D0(struct SpriteEffectController *, s32, s32, s32, s32);
-struct SpriteEffectController *sub_0806A788(struct SpriteEffectControllerPool *);
-void sub_0806A7D8(struct SpriteEffectControllerPool *, struct SpriteEffectController *);
+void SpriteEffectController_QueueColliders(struct SpriteEffectControllerPool *);
+void SpriteEffectController_RefreshCollider(struct SpriteEffectController *,
+                                            struct ContactPosition *);
+void SpriteEffectController_InitCollider(struct SpriteEffectController *, s32, s32, s32, s32);
+struct SpriteEffectController *
+SpriteEffectController_AllocateSlot(struct SpriteEffectControllerPool *);
+void SpriteEffectController_TickAnimation(struct SpriteEffectControllerPool *,
+                                          struct SpriteEffectController *);
 void sub_0806AB1C(struct SpriteEffectControllerPool *, struct SpriteEffectController *);
 void sub_0806AF74(struct SpriteEffectControllerPool *, struct SpriteEffectController *);
 #endif

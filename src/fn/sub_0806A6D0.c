@@ -1,10 +1,9 @@
 #include "sprite_effect_controller.h"
-#define SpriteEffectController_InitCollider sub_0806A6D0
 struct SpriteEffectColliderVector {
     u32 x : 16, y : 16, z : 16;
 };
 void sub_0821FF58(void *, u32, u32, u32, u32, u32);
-void sub_0806A6CC(void);
+void SpriteEffectController_IgnoreContact(void);
 void SpriteEffectController_InitCollider(struct SpriteEffectController *controller, s32 a, s32 b,
                                          s32 c, s32 d)
 {
@@ -18,7 +17,7 @@ void SpriteEffectController_InitCollider(struct SpriteEffectController *controll
     collider = &controller->collider;
     Collider_Init(collider, 0, 0x2001, 0, 16, &size, &offset);
     sub_0821FF58(collider, a, b, 0, c, d);
-    Collider_SetCallback(collider, sub_0806A6CC, controller);
+    Collider_SetCallback(collider, SpriteEffectController_IgnoreContact, controller);
     if (controller->flags & 8)
         Collider_SetPosition(
             collider, &((struct SpriteEffectSequenceDrawable *)controller->drawable)->position, 0);

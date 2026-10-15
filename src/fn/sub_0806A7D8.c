@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "sprite_effect_playback.h"
-#define SpriteEffectController_TickAnimation sub_0806A7D8
 void Heap_Free(void *);
 void SpriteEffectController_TickAnimation(struct SpriteEffectControllerPool *unusedPool,
                                           struct SpriteEffectController *controller)
@@ -31,7 +30,7 @@ void SpriteEffectController_TickAnimation(struct SpriteEffectControllerPool *unu
         ended = SpriteEffectController_StepDrawable(controller, 0);
         position = &((struct SpriteEffectTileDrawable *)controller->drawable)->position;
     }
-    sub_0806A694(controller, position);
+    SpriteEffectController_RefreshCollider(controller, position);
     if (*flags & 0x80) {
         register struct ContactPosition *velocity asm("r1") = &controller->velocity;
         register u32 x asm("r0");

@@ -1,9 +1,9 @@
 #include "scene_steering_actor.h"
-#define SceneSteeringActor_UpdatePool sub_0806CDC0
 extern void *gUnk_08605B98[];
 static inline u8 Used(struct SceneSteeringActorPool *pool, u32 bit)
 {
-    if (pool->used & bit) return 1;
+    if (pool->used & bit)
+        return 1;
     return 0;
 }
 s32 SceneSteeringActor_UpdatePool(struct SceneSteeringActorPool *input)

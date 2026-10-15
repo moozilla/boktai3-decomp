@@ -1,8 +1,8 @@
 #include "scene_steering_actor.h"
-#define SceneSteeringActor_RequestRemovalAll sub_0806CD68
 static inline u8 Used(const u32 *mask, u32 bit)
 {
-    if (*mask & bit) return 1;
+    if (*mask & bit)
+        return 1;
     return 0;
 }
 void SceneSteeringActor_RequestRemovalAll(void)

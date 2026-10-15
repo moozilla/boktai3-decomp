@@ -1,5 +1,4 @@
 #include "spark_particle.h"
-#define SparkParticle_InitPool sub_0806A520
 s32 SparkParticle_InitPool(struct SparkParticlePool *pool)
 {
     u8 *active;

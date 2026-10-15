@@ -1,5 +1,4 @@
 #include "spark_particle.h"
-#define SparkParticle_DestroyPool sub_0806A138
 s32 SparkParticle_DestroyPool(struct SparkParticlePool *pool)
 {
     struct SparkParticleSprite *sprite = &pool->particles[0].sprite;

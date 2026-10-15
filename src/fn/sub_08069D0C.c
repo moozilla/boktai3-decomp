@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "burst_emitter.h"
-#define BurstEmitter_AllocateSlot sub_08069D0C
 static inline u8 BurstEmitter_IsOccupied(struct BurstEmitterPool *pool, s32 index, u32 one)
 {
     if (pool->used & (one << index))

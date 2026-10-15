@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "sprite_effect_controller.h"
-#define SpriteEffectController_Create sub_0806B5D4
 struct SequenceDrawable {
     u32 flags;
     u8 active, unknown5[2], priority;
@@ -24,8 +23,8 @@ struct TileDrawable {
     u8 unknown20[8];
     void *graphics;
 };
-struct SpriteEffectControllerPool *sub_0806BA00(void);
-void *sub_0806B5B0(struct SpriteEffectController *, s32, u32);
+struct SpriteEffectControllerPool *SpriteEffectController_EnsurePool(void);
+void *SpriteEffectController_LoadSpriteResources(struct SpriteEffectController *, s32, u32);
 void sub_08217DE0(void *, void *, s32);
 void sub_08217EC4(void *, s32, s32);
 void sub_08217ECC(void *, s32);
@@ -176,7 +175,7 @@ struct SpriteEffectController *SpriteEffectController_Create(
     context = contextInput;
     p = gUnk_02000178;
     if (!p) {
-        p = sub_0806BA00();
+        p = SpriteEffectController_EnsurePool();
         if (!p)
             return 0;
     }
@@ -187,7 +186,7 @@ struct SpriteEffectController *SpriteEffectController_Create(
     }
     if (gUnk_02000560 & 4)
         return 0;
-    slot = sub_0806A788(p);
+    slot = SpriteEffectController_AllocateSlot(p);
     if (!slot)
         return 0;
     {
@@ -252,7 +251,8 @@ struct SpriteEffectController *SpriteEffectController_Create(
                 asm("" : "+r"(arg));
                 graphics = graphicsId;
                 resourceContext = context;
-                resource = sub_0806B5B0(arg, graphics, resourceContext);
+                resource =
+                    SpriteEffectController_LoadSpriteResources(arg, graphics, resourceContext);
             }
             cursor = (void *)slot;
             {
@@ -375,7 +375,7 @@ struct SpriteEffectController *SpriteEffectController_Create(
     {
         register s32 a asm("r2") = contactA;
         if (a > 0) {
-            sub_0806A6D0(slot, a, contactB, contactC, contactD);
+            SpriteEffectController_InitCollider(slot, a, contactB, contactC, contactD);
             {
                 register u16 *write asm("r3") = slotFlags;
                 u32 bits;

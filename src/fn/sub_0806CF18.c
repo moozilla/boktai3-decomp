@@ -11,7 +11,8 @@ void SceneSteeringActor_FinishSettledAll(void)
         u32 stride = sizeof(pool->slots[0]);
         s32 i = 7;
         do {
-            if (*state == 4) *state = replacement;
+            if (*state == 4)
+                *state = replacement;
             state = (void *)((u32)state + stride);
             i--;
         } while (i >= 0);

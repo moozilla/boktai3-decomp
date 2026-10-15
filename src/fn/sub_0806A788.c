@@ -1,5 +1,4 @@
 #include "sprite_effect_controller.h"
-#define SpriteEffectController_AllocateSlot sub_0806A788
 static inline u8 SpriteEffectController_IsUsed(u32 *m, s32 i)
 {
     if (*m & (1 << i))
