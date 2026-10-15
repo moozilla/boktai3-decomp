@@ -61,3 +61,11 @@ remain opaque until indirect dispatch establishes the complete ABI.
 `7171C` adds 444 exact bytes (about 0.0184 percentage points), all counted as
 register-pinned. `depin.py --write` reduced 46 hints to 14. All nine extents
 using the expanded shared header pass; proof is `build/registry-reset-final.json`.
+
+`714E4` adds the collider reset variant (568 exact bytes, about 0.0235
+percentage points). Categories 9, 18, 19 and 22 skip the route-placement call
+sequence; all categories sample terrain, restore palette and clear movement.
+This variant copies the saved direction, synchronizes both colliders and clears
+collider flag 4 plus its field at offset 0x44. `depin.py --write` reduced 34
+hints to 11. It remains in the register-pinned category. Expanding the phase
+view for the next defaults-restoration routine preserves both reset matches.
