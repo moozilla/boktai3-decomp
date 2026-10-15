@@ -14,7 +14,8 @@ struct ScenePanelSubjectView {
     void *sequenceResource;
     u8 sequenceRow, sequenceVariant, kind, state;
     u16 stateFrame, contactProgress, contactLimit;
-    u8 unknownDA[4];
+    u8 unknownDA[2];
+    u16 progressStep;
     u16 timer, appearDelay, unknownE2, contactCooldown, requested;
     u16 requestLevel, unknownEA, hold;
     u8 unknownEE, contactKind, changed, positionReset;

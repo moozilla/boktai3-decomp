@@ -11,4 +11,5 @@ void sub_0805D770(struct ScenePanelSubjectView *);
 s32 sub_0805D800(struct ScenePanelSubjectView *);
 s32 sub_0805D884(struct ScenePanelSubjectView *);
 void sub_0805D8A8(struct ScenePanelSubjectView *, u32);
+s32 sub_0805D92C(struct ScenePanelSubjectView *, const struct ContactPosition *, u32, u32, u32, u32, u32, u32, u32);
 #endif
