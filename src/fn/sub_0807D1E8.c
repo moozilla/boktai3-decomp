@@ -1,13 +1,13 @@
-#include "global.h"
-
-u32 sub_0822B694(u8 *, s8);
-void sub_0807CDC4(u32, u32, u8 *, u8 *);
-
-void sub_0807D1E8(u8 *p, u32 a, u32 b, s32 c)
+#include "scene_actor_position_search.h"
+#define SceneActorPosition_ResolveTaggedPosition sub_0807D1E8
+/* The signed byte index must address valid storage in the active 16-byte table. */
+void SceneActorPosition_ResolveTaggedPosition(struct SceneActorTaggedPosition *target,
+                                              const struct SceneActorPositionSource *source,
+                                              void *context, s32 index)
 {
-    u8 *q = p + 0xc;
-    u32 r = sub_0822B694(q, (s8)c);
-    *(u32 *)(p + 0x18) = r;
-    if (r == 0xB546)
-        sub_0807CDC4(a, b, q, q);
+    struct ContactPosition *position = &target->position;
+    u32 tag = sub_0822B694((u16 *)position, (s8)index);
+    target->tag = tag;
+    if (tag == 0xB546)
+        sub_0807CDC4(source, context, position, position);
 }
