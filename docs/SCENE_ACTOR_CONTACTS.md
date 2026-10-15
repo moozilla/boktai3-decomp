@@ -19,8 +19,10 @@ This contributes about 0.0104 percentage points, in the register-pinned category
 A pre-existing ABI draft needs care: `72BA8` clears manager fields and exits
 with its link address in r0 (`pop {r0}; bx r0`). Initializer `73B84` does not
 produce a defined C status, although creator `73BA0` compares that incidental
-r0 value with zero. The initializer will be void; the creator remains assembly
-until a defined representation is established. No output-only empty operand,
+r0 value with zero. The valid void initializer draft also differs in its epilogue, so both
+initializer and creator retain assembly until a defined representation is
+established. The parent will remove the legacy initializer fall-through C
+from exact credit. No output-only empty operand,
 fall-through return or fabricated status is used to claim a match.
 
 Profile records occupy `0x80` bytes. The registry's two-word subsystem at
@@ -39,3 +41,9 @@ list view at registry offset `0x280` naturally produces the shared pointer
 lifetime, and retaining category 0 explicitly gives the original switch table
 bounds. The inline entry setter writes three bytes within each four-byte entry;
 all indexes stay within the allocated 128-byte record.
+
+The update callback explicitly returns its new frame count, matching retained
+r0. The destruction leaf clears the singleton and returns its original manager
+argument unchanged, also matching its actual r0 value. Callback consumers
+discard these outputs. The manager count is signed; the preceding registration
+helper compares it with five using a signed branch (six candidate capacity).
