@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_state.h"
 #define ActorAttachment_TickLandingBounce sub_08065A70
-void sub_08064790(void *, struct ActorAttachmentSlotView *);
+void ActorAttachment_TickWideShake(void *, struct ActorAttachmentSlotView *);
 void ActorAttachment_TickLandingBounce(struct ActorAttachmentSlotView *slot)
 {
     struct ActorAttachmentManagerView *manager = gUnk_02000124;
@@ -35,7 +35,7 @@ void ActorAttachment_TickLandingBounce(struct ActorAttachmentSlotView *slot)
                     }
                 }
                 slot->status[0] |= 1;
-                sub_08064790(manager, slot);
+                ActorAttachment_TickWideShake(manager, slot);
             } else {
                 s32 y = slot->anchor->y + slot->position.z;
                 s32 wave;
