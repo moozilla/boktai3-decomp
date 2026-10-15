@@ -15,7 +15,8 @@
 --   * What is loading: resource lookups (ScriptProc_Start, 0821A520) and stage
 --     tilesets (sub_08215D40), logged and shown in the HUD.
 --   * Bookmarks: named savestates with screenshots (bm, go, bms) - a warp list.
---   * Studio link: connects to `python3 tools/studio/serve.py` (port 8643) to
+--   * Studio link: connects to `python3 tools/studio/serve.py` (port 8643, or
+--     $CENTAUR_LINK_PORT for a studio started with --link-port) to
 --     stream text/resources and take commands (capture, bookmarks, keys, ...).
 --     Open http://localhost:8642/live.
 --   * Input recorder for the headless harness (rec_start / rec_stop).
@@ -211,7 +212,7 @@ local function link_poll()
     -- Connect through the raw socket: socket.connect() registers a frame
     -- callback, and adding callbacks from inside a callback crashes mGBA.
     local s = socket.tcp()
-    if s._s:connect("127.0.0.1", 8643) ~= 0 then s._s:close(); s = nil end
+    if s._s:connect("127.0.0.1", tonumber(os.getenv("CENTAUR_LINK_PORT") or "") or 8643) ~= 0 then s._s:close(); s = nil end
     if s then
       link.sock = s
       link.out = {}
@@ -307,6 +308,7 @@ local function on_resource()
   S.res[#S.res + 1] = { type = ty, name = name, frame = f }
   if #S.res > 60 then table.remove(S.res, 1) end
   if label == "map" then S.stage.map = hex4(name); S.dirty = true
+  elseif label == "hp" then S.stage.hp = hex4(name)
   elseif label == "pal" then S.stage.pal = hex4(name) end
   send({ t = "res", type = hex4(ty), label = label, name = hex4(name), frame = f })
 end
@@ -679,6 +681,20 @@ function scene()
   local gs = emu:read32(ADDR.GameState)
   return (gs >= 0x02000000 and gs < 0x02040000) and emu:read32(gs + 0x5A4) or nil
 end
+-- The player's world position (GameState+0x30/+0x32/+0x34, s16 x, y, z) and
+-- the BG2 camera: the game keeps each BG's full scroll in a 0x30-byte record at
+-- 0x03004C30 + 0x30 * bg (+0x20 x, +0x22 y, map pixels); Bg_UpdateScrollShadow masks
+-- them into the shadow at 0x03004C20 that is copied to BGxHOFS/VOFS.
+local function s16(v) return v >= 0x8000 and v - 0x10000 or v end
+function where_player()
+  local gs = emu:read32(ADDR.GameState)
+  local m = { t = "player", frame = emu:currentFrame(), scene = scene(), map = S.stage.map, hp = S.stage.hp }
+  if gs >= 0x02000000 and gs < 0x02040000 then
+    m.x, m.y, m.z = s16(emu:read16(gs + 0x30)), s16(emu:read16(gs + 0x32)), s16(emu:read16(gs + 0x34))
+  end
+  m.cx, m.cy = emu:read16(0x03004CB0), emu:read16(0x03004CB2)
+  return m
+end
 function centaur_state() return { map = S.stage.map, tileset = S.stage.tileset, pal = S.stage.pal, scene = scene(), items = S.items, text = S.text } end
 
 -- Run a script procedure: callproc(id, {args...}). At the next entry of the
@@ -815,12 +831,13 @@ callbacks:add("frame", function()
   if f % 15 == 0 and S.text then S.dirty = true end  -- unplaced subtitles expire
   if f % 2 == 0 then link_poll() end
   link_flush()
+  if f % 6 == 0 then send(where_player()) end
   if f % 30 == 0 then
     local gs = emu:read32(ADDR.GameState)
     local life = (gs >= 0x02000000 and gs < 0x02040000) and emu:read16(gs + 0x28) or nil
     local onscreen = {}
     for _, it in ipairs(S.items) do onscreen[#onscreen + 1] = { id = it.id, x0 = it.x0, y0 = it.y0, x1 = it.x1, y1 = it.y1 } end
-    send({ t = "state", frame = f, rec = rec ~= nil, pos = S.pos, onscreen = onscreen, scene = scene(), map = S.stage.map, tileset = S.stage.tileset, pal = S.stage.pal, life = life, mode = S.mode, style = S.style, size = S.size, offset = S.offset, god = S.god })
+    send({ t = "state", frame = f, rec = rec ~= nil, pos = S.pos, onscreen = onscreen, scene = scene(), map = S.stage.map, tileset = S.stage.tileset, hp = S.stage.hp, pal = S.stage.pal, life = life, mode = S.mode, style = S.style, size = S.size, offset = S.offset, god = S.god })
   end
   draw()
 end)

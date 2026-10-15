@@ -61,6 +61,7 @@ canvas { image-rendering: pixelated; display: block; }
 .legend { display: flex; gap: 12px; font-size: 12px; color: var(--muted); margin: 8px 0; flex-wrap: wrap; }
 .legend b { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
 .row .lab { color: var(--ink); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#ms svg * { pointer-events: auto; }
 body.embed #side { display: none; }
 body.embed main { grid-template-columns: 1fr; }
 @media (max-width: 760px) { main { grid-template-columns: 1fr; height: auto; } #side { height: 40vh; } }
@@ -81,6 +82,7 @@ body.embed main { grid-template-columns: 1fr; }
 studioHeader(`<label style="font-size:13px;color:var(--muted)">Palette <select id="palSel"></select></label>
   <label style="font-size:13px;color:var(--muted)">Zoom <select id="zoom"><option>1</option><option selected>2</option><option>3</option><option>4</option></select></label>`);
 if (EMBED) document.body.insertAdjacentHTML('afterbegin', '<div hidden><select id="palSel"></select><select id="zoom"><option>1</option><option selected>2</option><option>3</option><option>4</option></select></div>');
+if (new URLSearchParams(location.search).has('live')) $('zoom').value = '1';  // the Live page's map: the whole stage at once
 // Tentative identifications from docs/ASSETS.md (visual guesses unless noted).
 const NOTES = {
   B96C: 'slime (name hash confirmed; red in game)', 9506: 'bee (name hash confirmed)', DA6D: 'bat', 9247: 'ghoul / zombie', D637: 'hooded figure (wraith?)', D28E: 'flame / wisp (runs in field)',
@@ -90,7 +92,8 @@ const NOTES = {
   DF11: 'light bulb', '731D': 'copyright line', '82F1': 'PURIFICATION COMPLETED!', E89F: 'Boktai 2 title',
 };
 
-let index = {}, palettes = [], curPal = null, zoom = 2, big = null, font = null, charmap = {};
+let palPicked = false;  // the palette menu was used this session: it overrides a stage's own palette
+let index = {}, palettes = [], curPal = null, zoom = +$('zoom').value, big = null, font = null, charmap = {};
 function palColors(p) { // 256 RGB triples, or a grey ramp
   if (!p) return Array.from({ length: 256 }, (_, i) => { const v = (i & 15) * 17; return [v, v, v]; });
   return Array.from({ length: 256 }, (_, i) => rgb(le(p.data, 20 + i * 2)));
@@ -113,7 +116,7 @@ async function boot() {
   const saved = localStore('pal');
   $('palSel').value = saved ?? String(palettes.findIndex(p => p.hash === '081B'));
   curPal = palettes[+$('palSel').value] || null;
-  $('palSel').onchange = () => { curPal = palettes[+$('palSel').value] || null; localStore('pal', $('palSel').value); refresh(); };
+  $('palSel').onchange = () => { curPal = palettes[+$('palSel').value] || null; palPicked = true; localStore('pal', $('palSel').value); refresh(); };
   $('zoom').onchange = () => { zoom = +$('zoom').value; refresh(); };
   $('q').oninput = renderList;
   listKeys(() => $('list'), '.row');
@@ -167,7 +170,7 @@ async function refresh() {
   if (sel === undefined) return;
   await views[tab].show(sel);
   const h = $('view').querySelector('h2');
-  if (h && NOTE_KIND[tab] && sel) h.after(noteEditor(NOTE_KIND[tab], noteKeyOf(sel), renderList));
+  if (h && NOTE_KIND[tab] && sel && !LIVE) h.after(noteEditor(NOTE_KIND[tab], noteKeyOf(sel), renderList));
   wantFrame = null;
 }
 const colorsNow = () => palColors(curPal);
@@ -412,10 +415,94 @@ function renderMP(m, ent, tileAt, colors, grid, into) {
   if (grid) for (let y = 0; y < H * 16; y++) for (let x = 0; x < W * 16; x++) if (x % 16 === 0 || y % 16 === 0) { const o = (y * W * 16 + x) * 4; d[o] = d[o] * .6 + 60; d[o + 1] *= .6; d[o + 2] *= .6; }
   return { img, cells };
 }
+// ---------- stage data over a map: terrain (HP), doors, entrances, items, enemies ----------
+// World units: 256 per cell and per height level; tools/assets/hp.py has the
+// projection (fitted to the game's BG2 camera).
+let stageMeta = null;
+const LIVE = new URLSearchParams(location.search).has('live');
+async function loadStageMeta() { return stageMeta ||= await fetch('/api/stagemeta').then(r => r.json()).catch(() => []); }
+const hpCache = {};
+function loadHP(h) { return hpCache[h] ||= fetch('/api/hp/' + h).then(r => r.ok ? r.json() : null); }
+const proj = (hp, x, y, z) => [hp.origin[0] + 3 * (x - z) / 32, hp.origin[1] + 3 * (x + z - y) / 32];
+const cellLevel = (hp, x, z) => { const cx = Math.floor(x / 256), cz = Math.floor(z / 256); return cx >= 0 && cz >= 0 && cx < hp.width && cz < hp.height ? hp.cells[cz * hp.width + cx][0] : 0; };
+const stageKey = st => st && `${st.map}-${st.tileset}-${st.hp}`;
+function sceneStage(n) { return stageMeta?.find(s => s.scene === n)?.stage; }
+const SVGNS = 'http://www.w3.org/2000/svg';
+function svgEl(tag, attrs, title) {
+  const e = document.createElementNS(SVGNS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (title) { const t = document.createElementNS(SVGNS, 'title'); t.textContent = title; e.appendChild(t); }
+  return e;
+}
+function rectPoints(hp, x0, z0, x1, z1, y) { return [[x0, z0], [x1, z0], [x1, z1], [x0, z1]].map(([x, z]) => proj(hp, x, y, z).join(',')).join(' '); }
+const condText = r => r.cond?.length ? '\nif ' + r.cond.join(' and ') : '';
+// Group records at the same place so alternatives (story progress, entrance used) share one marker.
+function grouped(list, keyOf) { const m = new Map(); for (const r of list) { const k = keyOf(r); if (!m.has(k)) m.set(k, []); m.get(k).push(r); } return [...m.values()]; }
+function drawStageOverlay(svg, hp, scene, opt) {
+  svg.replaceChildren();
+  const g = (cls) => { const e = svgEl('g', { class: cls }); svg.appendChild(e); return e; };
+  if (opt.terrain) {
+    const t = g('terrain');
+    for (let cz = 0; cz < hp.height; cz++) for (let cx = 0; cx < hp.width; cx++) {
+      const [lvl, kind, tile, flags] = hp.cells[cz * hp.width + cx];
+      if (flags === 3 && !lvl) continue;
+      const fill = flags === 0x40B ? 'rgba(230,70,60,.28)' : kind ? 'rgba(240,200,40,.35)' : flags & 8 ? 'rgba(255,140,0,.4)' : 'rgba(80,220,120,.18)';
+      t.appendChild(svgEl('polygon', { points: rectPoints(hp, cx * 256, cz * 256, cx * 256 + 256, cz * 256 + 256, lvl * 256), fill, stroke: 'rgba(255,255,255,.25)', 'stroke-width': .5 },
+        `cell (${cx}, ${cz}) · level ${lvl}${kind ? ' · slope' : ''} · flags 0x${flags.toString(16)}`));
+    }
+    const bx = g('boxes');
+    for (const b of hp.boxes) {
+      if (b.x0 === 0 && b.z0 === 0 && b.x1 >= hp.width * 256 - 256) continue;  // the whole-stage area
+      bx.appendChild(svgEl('polygon', { points: rectPoints(hp, b.x0, b.z0, b.x1, b.z1, b.y0), fill: 'none', stroke: '#6fd3ff', 'stroke-width': .8, 'stroke-dasharray': '3 2' }, `box ${b.name} · x ${b.x0}–${b.x1} z ${b.z0}–${b.z1} y ${b.y0}–${b.y1}`));
+    }
+  }
+  if (!scene || !opt.objects) return;
+  const en = g('enemies');
+  for (const grp of grouped(scene.enemies.filter(e => e.x != null), e => `${e.x},${e.z}`)) {
+    const e = grp[0], y = cellLevel(hp, e.x, e.z) * 256;
+    if (e.route?.length > 1) en.appendChild(svgEl('polyline', { points: e.route.map(([x, z]) => proj(hp, x, cellLevel(hp, x, z) * 256, z).join(',')).join(' '), fill: 'none', stroke: 'rgba(255,80,80,.8)', 'stroke-width': 1, 'stroke-dasharray': '2 2' }));
+    const [px, py] = proj(hp, e.x, y, e.z);
+    en.appendChild(svgEl('circle', { cx: px, cy: py, r: 4, fill: '#e04848', stroke: '#fff', 'stroke-width': 1 },
+      grp.map(e => `enemy: ${e.families.join('/')} (spawner proc_${e.proc}, name ${e.name}, path ${e.path})${condText(e)}`).join('\n\n')));
+  }
+  const it = g('items');
+  for (const grp of grouped(scene.items.filter(i => i.x != null), i => `${i.x},${i.z}`)) {
+    const i = grp[0], [px, py] = proj(hp, i.x, i.y ?? 0, i.z);
+    it.appendChild(svgEl('rect', { x: px - 4, y: py - 4, width: 8, height: 8, rx: i.chest ? 1 : 4, fill: i.chest ? '#b07a2a' : '#f2c84b', stroke: '#fff', 'stroke-width': 1 },
+      grp.map(i => `${i.chest ? 'chest' : 'item'}: ${i.name || `category ${i.category} item ${i.item}`} (flag ${i.flag})${condText(i)}`).join('\n\n')));
+  }
+  const ent = g('entrances');
+  for (const grp of grouped(scene.entrances.filter(e => e.x != null), e => `${e.x},${e.z}`)) {
+    const e = grp[0], [px, py] = proj(hp, e.x, e.y ?? 0, e.z), hot = grp.some(e => e.id === opt.entrance);
+    if (hot) ent.appendChild(svgEl('circle', { cx: px, cy: py, r: 9, fill: 'none', stroke: '#7dff9a', 'stroke-width': 2 }));
+    ent.appendChild(svgEl('circle', { cx: px, cy: py, r: 3.5, fill: '#3fbf6a', stroke: '#fff', 'stroke-width': 1 },
+      grp.map(e => `entrance ${e.id}${e.box ? ' at box ' + e.box : ''}, facing ${e.facing} (proc_${e.proc})${condText(e)}`).join('\n\n')));
+    ent.appendChild(svgEl('text', { x: px + 5, y: py - 3, 'font-size': 7, fill: '#bfffd0', 'paint-order': 'stroke', stroke: '#000', 'stroke-width': 2 })).textContent = [...new Set(grp.map(e => e.id))].join(',');
+  }
+  const dr = g('doors');
+  for (const grp of grouped(scene.doors, d => d.box ?? `${d.x},${d.z}`)) {
+    const d = grp[0], dests = [...new Map(grp.map(d => [`${d.scene}.${d.entrance}`, d])).values()];
+    const tip = grp.map(d => `door ${d.box ?? ''} → scene ${d.scene}, entrance ${d.entrance} (proc_${d.proc})${condText(d)}`).join('\n\n') + '\n\nclick to go there';
+    const a = svgEl('g', { class: 'door', style: 'cursor:pointer' }, tip);
+    let lx, ly;
+    if (d.rect) { a.appendChild(svgEl('polygon', { points: rectPoints(hp, ...d.rect, d.y ?? 0), fill: 'rgba(255,150,40,.55)', stroke: '#ffb347', 'stroke-width': 1.2 })); [lx, ly] = proj(hp, d.x, d.y ?? 0, d.z); }
+    else if (d.x != null) { [lx, ly] = proj(hp, d.x, d.y ?? 0, d.z); a.appendChild(svgEl('circle', { cx: lx, cy: ly, r: 5, fill: 'rgba(255,150,40,.7)', stroke: '#ffb347' })); }
+    else continue;
+    a.appendChild(svgEl('text', { x: lx, y: ly - 7, 'font-size': 8, 'text-anchor': 'middle', fill: '#ffe2b8', 'paint-order': 'stroke', stroke: '#000', 'stroke-width': 2.5 })).textContent = '→ ' + dests.map(d => d.scene).filter((v, k, l) => l.indexOf(v) === k).join(' / ');
+    a.onclick = ev => { ev.stopPropagation(); goScene(dests[0].scene, dests[0].entrance); };
+    dr.appendChild(a);
+  }
+}
+function goScene(scene, entrance) {
+  const st = sceneStage(scene);
+  if (!st) { alert(`Scene ${scene} has no stage in the scripts.`); return; }
+  location.hash = `#maps/${stageKey(st)}/${scene}${entrance != null ? '.' + entrance : ''}`;
+}
 views.maps = {
   async init() {
     await loadPtn();
     if (!stageList) stageList = await fetch('/api/stages').then(r => r.json());
+    await loadStageMeta();
     const staged = new Set(stageList.map(s => s.map));
     items = [
       ...stageList.map(s => ({ key: `${s.map}-${s.tileset}-${s.hp}`, note: `stage · tiles ${s.tileset} · hp ${s.hp}`, n: s.procs.length + '×', stage: s })),
@@ -434,8 +521,10 @@ views.maps = {
         ${m.count > 1 ? 'Layer <select id="lay"><option value="-1">all, layer 0 in front</option>' + m.ents.map((e, i) => `<option value="${i}">${i}: ${e.hash} (${e.w}×${e.h})</option>`).join('') + '</select>' : ''}
         ${own ? '' : `Tileset <select id="tsel">${tsList.map(t => `<option ${t === (ts || savedTs) ? 'selected' : ''}>${t}</option>`).join('')}</select>`}
         <label><input type="checkbox" id="grid"> metatile grid</label>
+        ${st ? `<label><input type="checkbox" id="ovobj" checked> doors, items, enemies</label> <label><input type="checkbox" id="ovter"> terrain</label> <span id="scnslot"></span>` : ''}
         <span id="palhint" style="color:var(--muted)"></span> <span id="capslot"></span> <span id="tagslot"></span>
       </div>
+      ${st ? '<div class="legend" id="ovlegend"><span><b style="background:#ffb347"></b>door (click to follow)</span><span><b style="background:#3fbf6a;border-radius:5px"></b>entrance</span><span><b style="background:#f2c84b;border-radius:5px"></b>item</span><span><b style="background:#b07a2a"></b>chest</span><span><b style="background:#e04848;border-radius:5px"></b>enemy and patrol path</span>' + (LIVE ? '<span><b style="background:none;border:1.5px solid #fff"></b>screen</span><span><b style="background:#4aa3ff;border-radius:5px"></b>player</span>' : '') + '</div>' : ''}
       <div class="stage" id="ms" style="padding:0;overflow:auto;max-width:100%"></div><div class="meta" id="hover" style="margin-top:6px">&nbsp;</div>`;
     const known = learned.stages.find(x => x.map === mh);
     $('palhint').innerHTML = known ? `Captured palette for this stage: <a href="#" id="usepal">${known.palette}</a>` : 'Palette is chosen at runtime; capture this stage in Live to learn it.';
@@ -454,13 +543,60 @@ views.maps = {
       capColors = c && $('capsel').value !== '' ? (await loadCapture(c.name)).bgColors : null;
     };
     await pickCap();
+    // Stage data: the HP terrain and the scenes that load this stage (tools/assets/stages.py).
+    const hp = st ? await loadHP(st.hp) : null;
+    const scenes = st ? (stageMeta || []).filter(x => stageKey(x.stage) === key) : [];
+    const [wantScene, wantEnt] = (location.hash.split('/')[2] || '').split('.').map(x => x === '' ? null : +x);
+    let svg = null;
+    if (st && scenes.length) {
+      $('scnslot').innerHTML = `Scene <select id="scn">${scenes.map(x => `<option value="${x.scene}">${x.scene} · ${x.doors.length} doors, ${x.items.length} items, ${x.enemies.length} enemies</option>`).join('')}</select>`;
+      if (scenes.some(x => x.scene === wantScene)) $('scn').value = wantScene;
+    } else if (st) $('scnslot').textContent = 'No scene loads this stage directly.';
+    const overlay = () => {
+      if (!svg || !hp) return;
+      const scene = scenes.find(x => x.scene === +$('scn')?.value);
+      drawStageOverlay(svg, hp, scene, { terrain: $('ovter')?.checked, objects: $('ovobj')?.checked, entrance: scene?.scene === wantScene ? wantEnt : null });
+      liveLayer = svgEl('g', { class: 'live' }); svg.appendChild(liveLayer); liveDraw();
+    };
+    // Live page: the player and the screen rectangle (Centaur's "player" messages).
+    let liveLayer = null, lastLive = null;
+    const liveDraw = () => {
+      const p = lastLive;
+      if (!liveLayer || !p) return;
+      liveLayer.replaceChildren();
+      liveLayer.appendChild(svgEl('rect', { x: p.cx, y: p.cy, width: 240, height: 160, fill: 'none', stroke: '#fff', 'stroke-width': 1.5, 'stroke-dasharray': '6 3' }, `screen: BG2 camera (${p.cx}, ${p.cy})`));
+      if (hp && p.x != null) {
+        const [px, py] = proj(hp, p.x, p.y, p.z);
+        liveLayer.appendChild(svgEl('circle', { cx: px, cy: py, r: 4.5, fill: '#4aa3ff', stroke: '#fff', 'stroke-width': 1.5 }, `player (${p.x}, ${p.y}, ${p.z})`));
+      }
+      if ($('livefollow')?.checked) {
+        const box = $('ms'), z = zoom;
+        box.scrollLeft = (p.cx + 120) * z - box.clientWidth / 2; box.scrollTop = (p.cy + 80) * z - box.clientHeight / 2;
+      }
+    };
+    if (LIVE) {
+      clearInterval(views.maps.liveTimer);
+      $('ms').style.maxHeight = 'calc(100vh - 170px)';
+      $('ms').insertAdjacentHTML('beforebegin', '<div class="meta" id="livebar"><label><input type="checkbox" id="livefollow" checked> follow the player</label> <span id="livepos">waiting for the game…</span></div>');
+      views.maps.liveTimer = setInterval(async () => {
+        const p = await fetch('/api/live/player').then(r => r.json()).catch(() => null);
+        if (!p || p.scene == null) return;
+        const want = sceneStage(p.scene);
+        if (want && stageKey(want) !== key) { location.hash = `#maps/${stageKey(want)}/${p.scene}`; return; }
+        if (scenes.some(x => x.scene === p.scene) && $('scn') && +$('scn').value !== p.scene) { $('scn').value = p.scene; overlay(); }
+        lastLive = p; liveDraw();
+        $('livepos').textContent = `scene ${p.scene} · player (${p.x}, ${p.y}, ${p.z}) · camera (${p.cx}, ${p.cy})`;
+      }, 250);
+    }
     const draw = () => {
       const li = $('lay') ? +$('lay').value : 0, ent = m.ents[Math.max(0, li)];
       if (!ent) { $('ms').textContent = 'No layers.'; return; }
       let tileAt;
       if (own) tileAt = t => t < m.ntiles ? [m.b, m.tiles + t * 32] : null;
       else { const id = $('tsel').value; localStore('mapts.' + mh, id); tileAt = tilesetOffsets(id) || (() => null); }
-      const cols = capColors || colorsNow();
+      // the scene names its BG palette (proc_888); captures and the palette menu override it
+      const scenePal = !capColors && !palPicked && palettes.find(p => p.hash === scenes.find(x => x.scene === +$('scn')?.value)?.palette);
+      const cols = capColors || (scenePal ? palColors(scenePal) : colorsNow());
       let img, cells;
       if (li < 0) {  // composite: back layers first
         const W = Math.max(...m.ents.map(e => e.w)), H = Math.max(...m.ents.map(e => e.h));
@@ -469,13 +605,19 @@ views.maps = {
         for (let k = 0; k < img.data.length; k += 4) { img.data[k] = R0; img.data[k + 1] = G0; img.data[k + 2] = B0; img.data[k + 3] = 255; }
         for (let k = m.ents.length - 1; k >= 0; k--) ({ cells } = renderMP(m, m.ents[k], tileAt, cols, $('grid').checked && k === 0, img));
       } else ({ img, cells } = renderMP(m, ent, tileAt, cols, $('grid').checked));
-      const cv = toCanvas(img, zoom); $('ms').replaceChildren(cv);
+      const cv = toCanvas(img, zoom), wrap = document.createElement('div');
+      wrap.style.cssText = 'position:relative;display:inline-block';
+      svg = svgEl('svg', { viewBox: `0 0 ${cv.width} ${cv.height}`, width: cv.width * zoom, height: cv.height * zoom, style: 'position:absolute;left:0;top:0;overflow:visible;pointer-events:none' });
+      wrap.append(cv, svg); $('ms').replaceChildren(wrap);
+      overlay();
       cv.onmousemove = ev => {
         const r = cv.getBoundingClientRect(), x = Math.floor((ev.clientX - r.left) / zoom / 16), y = Math.floor((ev.clientY - r.top) / zoom / 16);
         if (x >= 0 && y >= 0 && x < ent.w && y < ent.h) $('hover').textContent = `metatile (${x}, ${y}) = #${cells[y * ent.w + x]}`;
       };
     };
     ['lay', 'tsel', 'grid'].forEach(id => $(id) && ($(id).onchange = draw));
+    ['ovobj', 'ovter'].forEach(id => $(id) && ($(id).onchange = overlay));
+    if ($('scn')) $('scn').onchange = draw;
     draw();
   },
 };

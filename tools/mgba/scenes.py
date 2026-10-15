@@ -6,7 +6,7 @@
 A scene is a script procedure that the `load` command (08225508) puts in
 0x030039F0 and GameState+0x5A4 (the field scene of tests/saves/ShinBok2.sav is
 3243). Scene entries begin `proc_861 1; proc_864 0|2`; the stage is the first
-proc_884(map, tileset, hp) reached from it (two calls deep). Note that
+proc_884(map, tileset, hp) (or proc_885 or proc_876) reached from it (two calls deep). Note that
 tools/assets/gcx.py prints procedure headers one lower than the IDs that calls
 use: the body of scene 3243 is printed as "proc 3242".
 """
@@ -35,7 +35,7 @@ def scenes():
 
     def stage_of(pid, depth=0):
         for ln in body.get(pid, []):
-            m = re.match(r"proc_884 (0x\w+) (0x\w+) (0x\w+)", ln)
+            m = re.match(r"proc_(?:884|885|876) (0x\w+) (0x\w+) (0x\w+)", ln)
             if m:
                 return [f"{int(x, 16):04X}" for x in m.groups()]
         if depth < 2:

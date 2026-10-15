@@ -11,9 +11,9 @@ extern u32 gUnk_02000610[];
 u8 *Script_DecodeOperand(u8 *, s32 *, s32 *);
 void sub_0821A91C(s32, u32);
 u8 *sub_0821B3E4(u8 *, s32);
-s32 sub_0821B938(s32, s32, s32);
+s32 Script_ApplyOperator(s32, s32, s32);
 u32 sub_0821AF2C(u8 *, u32, u32);
-u32 sub_0821BA5C(u8 *p)
+u32 Script_EvalExpression(u8 *p)
 {
     struct Frame frame;
     struct Slot *slot = (struct Slot *)((u32)frame.stack - 8);
@@ -37,7 +37,7 @@ u32 sub_0821BA5C(u8 *p)
                 saved->value = ((struct Slot *)((u32)slot + 8))->value;
             } else {
                 slot->value =
-                    sub_0821B938(op, slot->value, ((struct Slot *)((u32)slot + 8))->value);
+                    Script_ApplyOperator(op, slot->value, ((struct Slot *)((u32)slot + 8))->value);
                 slot->reference = 0;
             }
             p++;
