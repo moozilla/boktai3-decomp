@@ -1,4 +1,4 @@
-# Actor attachment offsets
+# Actor attachment state and offsets
 
 Reviewed geometry subsection 080648B0–08064D40. Nine offset helpers/dispatcher are exact for their complete reviewed extents. Two newly recovered functions add **0.0166 percentage points** (400 ordinary-C bytes); the previously exact helpers gain types and provisional names without additional credit. The already recovered hidden 64B20 and independent 64D3C leaf boundaries remain in existing extra-function metadata. The 64C48 dispatcher ends at 64D3C, not at the next ordinary disassembler label 64D40.
 
@@ -22,7 +22,7 @@ The initializer retains six minimized register hints after depin19→6. Explicit
 
 ## Sprite and value update tail
 
-The completed tail contains 65260,654AC,656D4,65904,659C4,65A70,65B4C and65BEC. Five newly recovered updaters add **0.0874 percentage points** (2,112 register-concession bytes); the three existing functions gain typed contracts without new coverage. The only remaining reviewed gap in this worker's ownership is 64DF8, the 1,128-byte three-part orbit/detachment loop. Its ignored candidate is not credited.
+The completed tail contains 65260,654AC,656D4,65904,659C4,65A70,65B4C and65BEC. Five newly recovered updaters add **0.0874 percentage points** (2,112 register-concession bytes); the three existing functions gain typed contracts without new coverage. The1,128-byte three-part orbit/detachment loop64DF8 is also exact and detailed below.
 
 65260 updates one rising part: signed sine displacement uses half the signed counter, vertical jitter advances by two, and a single RNG-table entry advances its phase by0..7. Its sequence index switches at vertical jitter60 and120. At above210 it clears the occupied bit and all three status/phase/counter/threshold arrays, removes the part animation, resets the part mask and slot index, and disables its update callback. Kind2/3 selects the manager's part resource; other kinds yield a null resource in the original before the decoder reads it, so valid-kind use remains a caller precondition rather than an invented fallback.
 
@@ -33,3 +33,13 @@ The completed tail contains 65260,654AC,656D4,65904,659C4,65A70,65B4C and65BEC. 
 65B4C follows the actor pointer134. ActionFF copies its observed offset vector34 directly. Other actions call64C48 with resourceKind, action, direction9, two stack coordinate outputs and the sixth source5C argument. Resource kinds2/3 apply X/Z to each active part; other kinds store one offset vector. A resource-kind callback table then dispatches through0824923C. The sixth argument remains explicitly present even though64C48 currently ignores it. 65BEC allocates the first free bit among eight manager slots, writes the signed slot index3D and returns the corresponding0x138-byte entry.
 
 Full reviewed exact extents:65260=588,654AC=552,656D4=560,65904=192,659C4=172,65A70=220,65B4C=160,65BEC=84. Helpers and TUs are minimized before promotion; all hints operate on defined values, and no register is explicitly bound to r7. The descending clamp orders an observed anchor-Y halfword reread with a localized volatile read; it adds no memory access. No runtime coverage is inferred from these static contracts.
+
+## Three-part orbit and detachment
+
+64DF8 closes the full reviewed 08064790–08065C40 ownership range. The final range adds **0.1583 percentage points** (nine new functions,3,824 bytes:400 ordinary and3,424 register-concession bytes). The newly completed tail alone contributes **0.1342 percentage points** (six functions,3,240 concession bytes). Existing typed functions and the independent four-byte 64D3C leaf add no new credit.
+
+The loop visits three parts using partMask3C. An inactive part is hidden and counted complete. A status bit1 marks detachment: after counter14 the part is hidden; until then its tile/flip/timing decoder advances, each coordinate adds its current jitter/offset, its vertical jitter decreases by half the signed counter, and the counter advances. Without that bit, positive counters delay the orbit by decrementing; otherwise the part follows an ellipse using signed sine values scaled by896/1120, advances phase by5 and invokes64D40 to test the per-part threshold. The packed XY temporary uses ordinary signed bitfields; both fields are assigned before their coordinate consumers. Its compiler-generated first-field store preserves the as-yet-unwritten neighboring bits, as the original does, without an authored uninitialized-value read.
+
+Once all three parts are complete,64DF8 clears flags31 and the manager occupied bit, disables update24 and the value pointer4C, then clears all status/phase/counter/threshold arrays once for each selected part before removing that part animation. Repeated clearing is retained. It invokes645D4, clears partMask and sets slotId toFF. No broader identity or runtime coverage is claimed. The readable decoder and updater retain minimized defined operand/register concessions; r7 is naturally allocated to the slot, never explicitly bound.
+
+64DF8 minimization:163→55 exploratory TU hints for the initial macro, then an ordinary static-inline helper conversion and final62→40 TU hints; the final helper has10 jointly minimized hints across both call paths. The committed code uses a standard inline function, not the exploratory macro. Final full-range checks cover22 reviewed extents and5,296 bytes; fast checks authorize worker commits, with complete-ROM validation deferred to parent integration.
