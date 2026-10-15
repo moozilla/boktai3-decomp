@@ -92,6 +92,19 @@ Note: `check.py FILE` without `--nonmatching` compiles a draft's
   without binding r7 explicitly. Keep independent particle fields typed; the
   reused local is a compiler-lifetime concession rather than shared game state.
 
+## Grid reload scratch registers
+
+The inventory grids provide another reload example. In `080600DC`, manually
+binding the large constant289 to r3 produced the desired immediate instruction
+but did not advance reload's spill-register rotation. Leaving `(kind + 289)`
+ordinary and keeping already-defined r0/r1 temporaries live made reload choose
+r3 naturally. Later signed halfword loads then selected the original scratch
+registers. The complete 616-byte extent matched; `depin.py` reduced104 trial
+hints to44. The Thumb `*extendhisi2_insn` pattern emits both a scratch-constant
+move and `ldrsh` from one RTL instruction, so inspect `.greg` and the final
+assembly together when diagnosing its scratch choice. Lifetime constraints must
+use defined values, and this does not justify binding r7 or writing instructions.
+
 ## Known patterns not solved yet
 
 * **Commutative operand order** (`adds r1, r1, r0` vs `adds r1, r0, r1`).

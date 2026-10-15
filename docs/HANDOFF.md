@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 26.655% matching (2026-10-14). This file is the single
+Last updated after reaching 26.912% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,43 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex/Sol): inventory grids, descriptions and input-panel initialization
+
+Exact code is **26.912%**, up **0.2574 percentage points** (+6,216 bytes):
+**6,780 /11,474 functions**, **650,030 /2,415,354 bytes**. Without register
+pinning: **20.489%**; Register-pinned: **6.423%**, included above. Twenty-two
+new functions add1,408 ordinary-C bytes and4,808 bytes with minimized register
+concessions. The79 guarded drafts remain outside exact progress.
+
+The reviewed cohort **5EA58–6055C** contains33 functions /6,916 bytes. Thirty-two
+are exact, including ten previously matched leaves (one untouched); F904 is the
+sole360-byte gap. Root recovered values, descriptions and all three536/420/616-byte
+grids. Sol recovered the1,432-byte initializer, cursor/highlight/comparison
+helpers, message display and three value refresh functions. Existing leaves
+receive typed contracts and names without new credit. See
+[input-panel contracts](SCENE_INPUT_PANEL.md) and
+[inventory contracts](SCENE_INVENTORY_PANEL.md). The catalog and transition-pair
+views explicitly overlap phase-dependent storage. No runtime coverage or
+specific screen identity is claimed.
+
+The F904 catalog path appears to pass an incompletely initialized equipment
+record to a helper that reads its kind byte. Keep it in assembly pending a
+valid representation or additional evidence. Earlier E484/E5E4 guarded drafts
+remain91.3%/97.9%; the continuous exact span still stops at5E484.
+
+The user renewed the goal to **30% matching or20% account usage remaining**,
+and explicitly clarified that20% is the stopping remainder after the meter
+changed. The latest reading was98% remaining. The historical40% stop below no
+longer applies. Sol owns6055C–60708 in a private checkout; root continues from
+60708 after this batch. New worker results after the frozen cohort belong to
+the next batch.
+
+Combined validation printed `build/boktai3.gba: OK` in
+`build/inventory-combined.log`; the RAM-literal check passed. Final promoted
+full-extent checks are recorded in `build/inventory-post-promotion.json`.
+The primary Claude checkout remains untouched; generated files and builds are
+private. Integration PR and main Actions details follow after validation.
 
 ## October 14 (Codex/Sol): HUD display and scene input; usage stop
 

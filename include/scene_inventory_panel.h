@@ -13,6 +13,7 @@ struct SceneInventoryPanel {
     u8 descriptionState[0x14];
     u8 page;
     u8 unknown1AB1[2];
+    /* Phase workspace: overlaps the transition pair at 0x1AF0..0x1BE4. */
     s8 catalog[0x134];
     u8 selection;
 };
