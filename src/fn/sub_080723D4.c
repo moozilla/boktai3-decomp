@@ -36,7 +36,7 @@ void SceneActorScript_SetPropertiesFromScript(void)
             actor->range = value;
             actor->rangeCopy = value;
             firstSquare = &actor->rangeSquared;
-            square = actor->range * actor->range;
+            square = (u32)actor->range * actor->range;
             *firstSquare = square;
             actor->rangeSquaredCopy = square;
         }
@@ -105,7 +105,7 @@ void SceneActorScript_SetPropertiesFromScript(void)
         if (value >= 0) {
             u32 square;
             control->radius = value;
-            square = control->radius * control->radius;
+            square = (u32)control->radius * control->radius;
             control->radiusSquared = square;
         }
         value = ReadOrMinusOne();
