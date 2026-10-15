@@ -3,7 +3,7 @@
 #include "global.h"
 /* The category-specific pairs feed Y/Z offset arguments of attachment creators. */
 void sub_0807C11C(u8 event, u8 category, u8 variant);
-void sub_0807C374(u8 gate, u8 event, u8 category, u8 variant);
+void sub_0807C374(u8 gate, u32 event, u32 category, u32 variant);
 void sub_0807C394(u8 kind, s32 *yOffset, s32 *zOffset);
 void sub_0807C3D8(u8 kind, s32 *yOffset, s32 *zOffset);
 void sub_0807C424(u8 kind, s32 *yOffset, s32 *zOffset);
