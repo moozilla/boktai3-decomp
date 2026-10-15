@@ -25,5 +25,12 @@ void sub_08069BC8(struct BurstEmitter *, s32, s32, s32, s32);
 void sub_08069C98(struct BurstEmitterPool *, struct BurstEmitter *);
 void sub_08069CD8(struct BurstEmitterPool *, struct BurstEmitter *);
 struct BurstEmitter *sub_08069D0C(struct BurstEmitterPool *);
+s32 sub_08069D50(const struct ContactPosition *, u32, u32, s32, s32, s32, s32);
+void sub_08069DB8(void);
+s32 sub_08069ED0(struct BurstEmitterPool *);
+void sub_08069F24(struct BurstEmitterPool *);
+void sub_08069F30(void);
+s32 sub_08069F34(struct BurstEmitterPool *, u32);
 struct BurstEmitterPool *sub_08069F4C(void);
+void sub_08069F98(void);
 #endif
