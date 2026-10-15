@@ -50,6 +50,6 @@ void sub_080545A4(struct HitSwitchManager *);
 s32 sub_080546B8(struct HitSwitchManager *);
 s32 sub_08054728(struct HitSwitchManager *);
 void sub_080547B0(struct HitSwitchEntry *);
-u32 sub_08054834(struct HitSwitchManager *);
+void sub_08054834(struct HitSwitchManager *);
 struct HitSwitchManager *sub_08054AD0(void);
 #endif
