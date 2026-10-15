@@ -1,8 +1,3 @@
-#include "global.h"
-
-extern u32 gUnk_0200019C;
-
-void sub_0806F54C(void)
-{
-    gUnk_0200019C = 0;
-}
+#include "scene_effect_schedule.h"
+#define SceneEffectSchedule_Destroy sub_0806F54C
+void SceneEffectSchedule_Destroy(void *unused){gUnk_0200019C=0;}
