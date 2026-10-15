@@ -1,26 +1,12 @@
-#include "global.h"
-struct E {
-    u8 f[0x30];
-    u16 v;
-    u8 pad[2];
-};
-struct P {
-    u8 f[0xb4];
-    u32 fb4;
-    u32 fb8;
-    u8 fbc[4];
-    struct E e[8];
-};
-void sub_08051A3C(struct E *, u32);
-void sub_0824923C(struct P *, u32);
-s32 sub_08051DA4(struct P *p)
+#include "proximity_emitter.h"
+#define ProximityEmitter_Tick sub_08051DA4
+s32 ProximityEmitter_Tick(struct ProximityEmitter *emitter)
 {
     s32 i = 0;
     do {
-        if (p->e[i].v != 0)
-            sub_08051A3C(&p->e[i], p->fb8);
-        i++;
-    } while (i <= 7);
-    sub_0824923C(p, p->fb4);
+        if (emitter->particles[i].active != 0)
+            sub_08051A3C(&emitter->particles[i], emitter->particleResource);
+    } while (++i <= 7);
+    sub_0824923C(emitter, emitter->update);
     return 0;
 }
