@@ -1,22 +1,21 @@
-#include "global.h"
-void Sprite_Remove(u8 *);
-void sub_0805AD18(u8 *p)
+#include "scene_panel_rig_setup.h"
+void ScenePanelRig_RemoveSprites(struct ScenePanelRig *rig)
 {
-    u8 *q;
-    s32 j;
-    Sprite_Remove(p);
-    q = p + 0x68;
-    j = 7;
+    struct SceneRigSprite *sprite;
+    s32 remaining;
+    Sprite_Remove(&rig->main);
+    sprite = rig->primary;
+    remaining = 7;
     do {
-        Sprite_Remove(q);
-        q += 0x68;
-        j--;
-    } while (j >= 0);
-    q = p + 0x3a8;
-    j = 5;
+        Sprite_Remove(sprite);
+        sprite++;
+        remaining--;
+    } while (remaining >= 0);
+    sprite = rig->secondary;
+    remaining = 5;
     do {
-        Sprite_Remove(q);
-        q += 0x68;
-        j--;
-    } while (j >= 0);
+        Sprite_Remove(sprite);
+        sprite++;
+        remaining--;
+    } while (remaining >= 0);
 }
