@@ -1,6 +1,5 @@
 #include "scene_actor_control.h"
 #include "game_state.h"
-#define SceneActorControl_IsEnabledForScene sub_08067190
 struct SceneActorControlSystem {
     u8 unknown0[14];
     u8 mode;

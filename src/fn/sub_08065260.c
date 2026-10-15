@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_rising_playback.h"
-#define ActorAttachment_TickRisingPart sub_08065260
 void ActorAttachment_TickRisingPart(struct ActorAttachmentSlotView *slot)
 {
     s8 *finalSlotId;

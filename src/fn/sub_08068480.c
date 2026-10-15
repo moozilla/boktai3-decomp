@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_particle_pool.h"
-#define SceneParticle_AllocateSlot sub_08068480
 static inline u8 IsUsed(u32 *used, u32 index, u32 one)
 {
     if (*used & (one << index))

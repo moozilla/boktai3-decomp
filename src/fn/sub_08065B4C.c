@@ -1,5 +1,4 @@
 #include "actor_attachment_state.h"
-#define ActorAttachment_UpdateFollowingOffset sub_08065B4C
 struct ActorAttachmentFollowView {
     u8 unknown0[9];
     u8 direction;
@@ -20,7 +19,8 @@ void ActorAttachment_UpdateFollowingOffset(struct ActorAttachmentSlotView *slot)
             s32 index;
             struct ActorAttachmentPartSprite *part;
             u8 *mask;
-            ActorAttachment_GetActionOffset(*kind, slot->action, follow->direction, &x, &z, slot->source);
+            ActorAttachment_GetActionOffset(*kind, slot->action, follow->direction, &x, &z,
+                                            slot->source);
             if ((u8)(*kind - 2) <= 1) {
                 index = 0;
                 mask = &slot->partMask;

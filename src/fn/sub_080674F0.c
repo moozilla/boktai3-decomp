@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control.h"
-#define SceneActorControl_TryActivateNearby sub_080674F0
 struct SceneActorControlNearbyPlayer {
     u8 unknown0[0x30];
     struct ContactPosition position;

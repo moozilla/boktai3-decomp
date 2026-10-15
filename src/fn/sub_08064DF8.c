@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_orbit_playback.h"
-#define ActorAttachment_TickDetachedParts sub_08064DF8
 void ActorAttachment_TickDetachedParts(struct ActorAttachmentSlotView *slot)
 {
     register struct ActorAttachmentManagerView *loaded asm("r0") = gUnk_02000124;

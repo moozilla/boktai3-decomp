@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_manager.h"
-#define ActorAttachment_TickManager sub_08066AE0
 extern void *gUnk_08605B34[];
 s32 ActorAttachment_TickManager(struct ActorAttachmentManagerView *incoming)
 {

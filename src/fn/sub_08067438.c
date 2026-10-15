@@ -1,5 +1,4 @@
 #include "scene_actor_control.h"
-#define SceneActorControl_TickDeparture sub_08067438
 s32 Mod(s32, s32);
 extern const u8 gUnk_08605B40[];
 void sub_08214374(void *, u32);

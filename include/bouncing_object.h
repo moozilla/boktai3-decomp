@@ -35,11 +35,12 @@ extern u32 gUnk_02000560;
 extern u32 gUnk_030053F0;
 struct BouncingPool *sub_08069668(void);
 void Shadow_Initialize(void *, struct ContactPosition *, s32);
-void sub_08068A78(struct BouncingObject *, s16, s16);
+void BouncingObject_InitializeColliders(struct BouncingObject *, s16, s16);
 void sub_08013684(void *);
 extern struct BouncingPool *gUnk_0200014C;
-struct BouncingObject *sub_08068B8C(struct BouncingPool *);
-void sub_080688D0(struct BouncingContact *, struct BouncingContact *, struct BouncingObject *);
+struct BouncingObject *BouncingObject_Allocate(struct BouncingPool *);
+void BouncingObject_ApplyContactImpulse(struct BouncingContact *, struct BouncingContact *,
+                                        struct BouncingObject *);
 void sub_08068A3C(struct BouncingContact *, void *, struct BouncingObject *);
 void sub_0821FF58(void *, s32, s32, s32, s32, s32);
 s32 Math_Atan2(s32, s32);

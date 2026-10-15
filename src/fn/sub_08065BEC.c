@@ -1,5 +1,4 @@
 #include "actor_attachment_state.h"
-#define ActorAttachment_AllocateSlot sub_08065BEC
 static inline u8 ActorAttachment_TestOccupied(u32 *mask, s32 index)
 {
     if (*mask & (1 << index))

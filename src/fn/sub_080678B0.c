@@ -1,5 +1,4 @@
 #include "scene_actor_control.h"
-#define SceneActorControl_Destroy sub_080678B0
 extern struct SceneActorControlManager *gUnk_02000128;
 u32 SceneActorControl_Destroy(struct SceneActorControlManager *p)
 {

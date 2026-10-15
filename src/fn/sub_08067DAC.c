@@ -1,5 +1,4 @@
 #include "scene_particle_burst.h"
-#define SceneParticleBurst_ReleaseSlot sub_08067DAC
 void SceneParticleBurst_ReleaseSlot(struct SceneParticleBurstPool *p,
                                     struct SceneParticleBurstSlot *slot)
 {

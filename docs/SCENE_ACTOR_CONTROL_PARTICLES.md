@@ -129,9 +129,12 @@ of the contract and produced misleading register-allocation differences.
 ## Validation and remaining work
 
 The current committed cohort contains 33 exact functions across 4,332 reviewed
-bytes: 3,804 new exact bytes, approximately **+0.1575 percentage points**, and 528
-old exact bytes reviewed for types/names without additional credit. New ordinary
-C contributes 688 bytes; register-pinning concessions contribute 3,116 bytes.
+bytes: 3,164 net new exact bytes, approximately **+0.1310 percentage points**, and
+1,168 previously credited bytes reviewed explicitly or for types/names. The
+640-byte tail formerly credited under `67984` receives no second byte credit.
+New ordinary C contributes 684 bytes; register-pinning concessions contribute
+2,480 new bytes. The recovered 536/100-byte bodies are now classified as
+register-pinned, while their preceding reset retains only its 12-byte extent.
 Every affected full extent passed `tools/check.py --target-size`; the private
 summary is `build/control-pools-final.json`. The integrator performs the combined
 build and name promotion before merging. Worker commits do not claim ROM-wide

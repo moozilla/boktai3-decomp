@@ -125,7 +125,8 @@ struct SceneObjectManager {
 extern struct SceneObjectManager *gUnk_02000024;
 
 /* Engine helpers shared by the functions below. */
-void sub_08068108(struct SceneVec *, s32, struct SceneExtent *, s32, s32, s32);
+void SceneParticleBurst_CreateWithPause(struct SceneVec *, s32, struct SceneExtent *, s32, s32,
+                                        s32);
 void AnimatedParticles_EmitDirectional(s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, void *);
 
 /* Update states (stored in SceneObject.update). */

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_sprite_playback.h"
-#define ActorAttachment_TickAscendingSprite sub_080656D4
 void ActorAttachment_TickNarrowShake(void *, struct ActorAttachmentSlotView *);
 void ActorAttachment_TickAscendingSprite(struct ActorAttachmentSlotView *slot)
 {

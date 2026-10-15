@@ -1,5 +1,4 @@
 #include "scene_actor_control.h"
-#define SceneActorControl_AllocateSlot sub_08067148
 struct SceneActorControlSlot *SceneActorControl_AllocateSlot(struct SceneActorControlManager *p)
 {
     s32 i;

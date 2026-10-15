@@ -1,5 +1,4 @@
 #include "scene_actor_control.h"
-#define SceneActorControl_DecodeDirection sub_08067658
 void SceneActorControl_DecodeDirection(const struct SceneActorControlInput *input, u8 *folded,
                                        u8 *flip)
 {

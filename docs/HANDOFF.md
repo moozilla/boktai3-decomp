@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 27.405% matching (2026-10-15). This file is the single
+Last updated after reaching 27.779% matching (2026-10-15). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,47 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 15 continuation: attachment ownership, scene control and particle pools
+
+Exact code is **27.779%**, up **0.3743 percentage points** (+9,040 net bytes)
+from PR150: **6,876 /11,476 functions**, **670,962 /2,415,354 bytes**.
+Without register pinning: **20.726%**; Register-pinned: **7.053%**, included
+above. New bodies add1,796 ordinary-C bytes and7,244 register-pinned bytes.
+Four independent functions formerly hidden inside already-C inventory spans
+add explicit source review and four boundaries, without duplicate byte credit;
+892 of their previously credited bytes now carry their actual pin classification.
+The78 guarded drafts remain outside exact credit.
+
+The attachment update range64790–65C40 is exact throughout:22 reviewed
+functions /5,296 bytes. The following manager section still has65FD0,66278,
+66474,666D8 and668B0 gaps. Actor control and both particle pools through68500
+have only the716-byte67E3C burst-spawner gap. Root also recovered collision
+impulses, collider initialization, allocation and anchored-pool lifecycle in the
+following twelve-slot bouncing family. See [attachment updates](ACTOR_ATTACHMENT.md),
+[manager ownership](ACTOR_ATTACHMENT_MANAGER.md),
+[scene control/particles](SCENE_ACTOR_CONTROL_PARTICLES.md) and
+[bouncing objects](BOUNCING_OBJECTS.md). Names remain provisional; no runtime
+coverage or screen identity is claimed.
+
+Shared contract review preserves byte-valued attachment removal status and
+both full-word X/Y arguments to08217EC4. The permuter preparation wrapper now
+retains empty inline-asm constraints even when the last operand is a quoted
+clobber; nine tooling tests cover preparation, including that regression.
+Close search outputs remain subject to source review and exact checks.
+
+The goal remains **30% exact or20% account usage remaining**. Latest meter:
+82% remaining after an external reset; no reset consumed by us. Root owns
+68500–697C8, Sol697C8–6B2C4, lifecycle65C40–67148, and tail finishes67E3C
+then6B2C4–6CA3C. All use private builds; the primary dirty Claude checkout is
+untouched. Root's frozen searches are listed in
+`build/inventory-permuter-jobs.json`. The corrected68500 spawner search starts
+from score275; the old two-argument-offset baseline was discarded.
+
+PR150 merged at8d591c7b and main Actions38702476656 passed. This batch has
+69/69 full-extent pre-promotion checks and a compiler source audit with no
+uninitialized/unsequenced diagnostics. Combined build and post-promotion
+validation are being completed before merge.
 
 ## October 15 (Codex/team): inventory controller, events and attachment helpers
 

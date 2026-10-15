@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_manager.h"
-#define ActorAttachment_DestroyManager sub_08066B28
 void Effect_Remove(void *);
 static inline u8 Occupied(struct ActorAttachmentManagerView *manager, s32 i)
 {

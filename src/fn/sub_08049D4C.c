@@ -3,7 +3,7 @@
 extern struct TetherActor *gUnk_02000488;
 void TetherActor_UpdatePendingEffect(struct TetherActor *);
 void TetherActor_SelectInteractionState(struct TetherActor *);
-void *sub_08066DB8(void *, void *, u32, u32, void *, u32, u32, u32);
+void *ActorAttachment_UpdateFromDescriptor(void *, void *, u32, u32, void *, u32, u32, u32);
 void TetherActor_StartInteractionEffect(void)
 {
     struct TetherActor *actor = gUnk_02000488;
@@ -37,7 +37,8 @@ void TetherActor_StartInteractionEffect(void)
     }
     *cooldown = delay;
     actor->effectValue = zero;
-    actor->pendingEffectHandle = sub_08066DB8(actor->pendingEffectHandle, &actor->bodyConfig, 1,
-                                              zero, &actor->effectValue, 200, 250, 330);
+    actor->pendingEffectHandle =
+        ActorAttachment_UpdateFromDescriptor(actor->pendingEffectHandle, &actor->bodyConfig, 1,
+                                             zero, &actor->effectValue, 200, 250, 330);
 done:;
 }

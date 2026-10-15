@@ -11,7 +11,6 @@ static inline void Vector(struct ContactPosition *result, s32 angle, s32 magnitu
     result->y = 0;
     result->z = Truncate(gUnk_086149C4[angle & 255] * magnitude);
 }
-#define BouncingObject_ApplyContactImpulse sub_080688D0
 void BouncingObject_ApplyContactImpulse(struct BouncingContact *a, struct BouncingContact *b,
                                         struct BouncingObject *object)
 {

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_manager.h"
-#define ActorAttachment_CreateSpriteSlot sub_08065DBC
 static inline u8 Any(u32 bits)
 {
     if (bits)
@@ -45,7 +44,7 @@ ActorAttachment_CreateSpriteSlot(u32 frame, struct ContactPosition *anchor, void
     startFrame = (u8)frame;
     existing = gUnk_02000124;
     if (!existing) {
-        manager = sub_08066C34();
+        manager = ActorAttachment_CreateManager();
         if (manager)
             goto gotManager;
     failed:
@@ -152,9 +151,10 @@ gotManager:
             } else {
                 u32 resourceKind = *resourcePointer;
                 lowAction = savedAction;
-                ActorAttachment_GetActionOffset(resourceKind, *lowAction,
-                             ((struct ActorAttachmentFollowView *)slot->followActor)->direction,
-                             &xOffset, &zOffset, slot->source);
+                ActorAttachment_GetActionOffset(
+                    resourceKind, *lowAction,
+                    ((struct ActorAttachmentFollowView *)slot->followActor)->direction, &xOffset,
+                    &zOffset, slot->source);
                 slot->offset.x = xOffset;
                 slot->offset.y = 0;
                 slot->offset.z = zOffset;

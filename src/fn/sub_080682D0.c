@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_particle_pool.h"
-#define SceneParticle_UpdateSlot sub_080682D0
 static inline u32 Step(struct DisplaySequenceState *state, struct SceneParticleEffect *sprite,
                        const u16 *graphicsInput)
 {

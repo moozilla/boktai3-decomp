@@ -1,14 +1,13 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control.h"
-#define SceneActorControl_CreateFromPosition sub_08067680
 extern struct SceneActorControlManager *gUnk_02000128;
-struct SceneActorControlManager *sub_08067938(void);
-struct SceneActorControlSlot *sub_08067148(struct SceneActorControlManager *);
-void sub_08067658(const void *, u8 *, u8 *);
+struct SceneActorControlManager *SceneActorControl_EnsureSingleton(void);
+struct SceneActorControlSlot *SceneActorControl_AllocateSlot(struct SceneActorControlManager *);
+void SceneActorControl_DecodeDirection(const void *, u8 *, u8 *);
 s32 sub_0822C034(const struct ContactPosition *);
 void sub_082144E4(void *, void *, u32);
 u32 sub_0804DFC0(s32);
-void sub_080670B8(struct SceneActorControlSlot *, s32, s32);
+void SceneActorControl_InitCollider(struct SceneActorControlSlot *, s32, s32);
 static inline u16 *Step(struct SceneActorControlSlot *slot,
                         struct SceneActorControlSprite *inputSprite, u16 *inputFlags)
 {
@@ -162,21 +161,21 @@ s32 SceneActorControl_CreateFromPosition(const struct SceneActorControlInput *ar
     register struct SceneActorControlSprite *sprite asm("r10");
     u16 *slotFlags;
     if (!found) {
-        p = sub_08067938();
+        p = SceneActorControl_EnsureSingleton();
         if (!p) {
         failure:
             return -1;
         }
     } else
         p = found;
-    slot = sub_08067148(p);
+    slot = SceneActorControl_AllocateSlot(p);
     if (!slot)
         goto failure;
     {
         register u32 zero asm("r5") = 0;
         register u32 one asm("r0") = 1;
         slot->kind = one;
-        sub_08067658(input, &unused, PreserveKind(&sequence, one));
+        SceneActorControl_DecodeDirection(input, &unused, PreserveKind(&sequence, one));
         saved = &slot->savedPosition;
         {
             const struct SceneActorControlInput *read = input;
@@ -218,6 +217,6 @@ s32 SceneActorControl_CreateFromPosition(const struct SceneActorControlInput *ar
             *lateFlags = mask;
         }
     }
-    sub_080670B8(slot, 0, 0);
+    SceneActorControl_InitCollider(slot, 0, 0);
     return slot->index;
 }
