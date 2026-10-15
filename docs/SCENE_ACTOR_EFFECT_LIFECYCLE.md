@@ -90,3 +90,9 @@ the existing helper ignores those latter arguments and only clears its local
 state bytes8/9/A and wordsC/10. Its definition now records the observed
 three-word argument contract, still exact over16 bytes. No runtime coverage is
 claimed by these static observations.
+
+Reviewing the existing reset helper also exposed false retained-tail progress:
+12E084 is16 bytes, followed by an independent132-byte command-selection body
+at12E094 with its own high-register save/restore and literal pool through12E118.
+The boundary is now explicit and132 previously credited bytes are removed;
+12E094 stays assembly. The reset ABI review itself earns no new matching credit.
