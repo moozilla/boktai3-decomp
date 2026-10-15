@@ -1,9 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_actor.h"
 #include "player.h"
-#define SceneActorAttachment_RetargetNearestPlayer sub_0807D220
+#include "scene_actor_contact_list.h"
 extern u16 gUnk_02000544;
-void sub_08072E08(void *);
 struct RetargetActorView {
     u8 unknown0[0xDC];
     void *targetSource;
@@ -58,7 +57,7 @@ void SceneActorAttachment_RetargetNearestPlayer(struct RetargetActorView *input,
         u32 value = *flags;
         if (value & mask) {
             void **owned = &actor->ownedTarget;
-            sub_08072E08(*owned);
+            SceneActorContacts_ReleaseNode(*owned);
             {
                 u32 updated = *flags & ~mask;
                 register u32 zero asm("r1") = 0;
