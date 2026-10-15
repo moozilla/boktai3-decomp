@@ -1,16 +1,9 @@
-#include "global.h"
-
-struct P {
-    u8 f[0xa1c];
-    u32 v;
-};
-extern struct P *gUnk_02000124;
-void sub_08066BB8(struct P *);
-
-s32 sub_08066C0C(struct P *p)
+#include "actor_attachment_manager.h"
+void ActorAttachment_LoadManagerResources(struct ActorAttachmentManagerResources *);
+s32 ActorAttachment_InitManager(struct ActorAttachmentManagerView *manager)
 {
-    p->v = 0;
-    sub_08066BB8(p);
-    gUnk_02000124 = p;
+    manager->occupiedMask = 0;
+    ActorAttachment_LoadManagerResources((struct ActorAttachmentManagerResources *)manager);
+    gUnk_02000124 = manager;
     return 0;
 }
