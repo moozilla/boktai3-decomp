@@ -1,6 +1,6 @@
 #include "actor_attachment.h"
 #define ActorAttachment_GetActionOffset sub_08064C48
-void ActorAttachment_GetActionOffset(s32 kind, u32 action, u32 angle, s32 *x, s32 *y)
+void ActorAttachment_GetActionOffset(s32 kind, u32 action, u32 angle, s32 *x, s32 *y, void *unused)
 {
     angle = (s32)((angle + 0x20) & 0xFF) >> 6;
     switch (action) {
