@@ -69,3 +69,34 @@ This variant copies the saved direction, synchronizes both colliders and clears
 collider flag 4 plus its field at offset 0x44. `depin.py --write` reduced 34
 hints to 11. It remains in the register-pinned category. Expanding the phase
 view for the next defaults-restoration routine preserves both reset matches.
+
+`718D8` restores saved actor defaults after the collider reset. Its two paths
+both restore flags, direction, behavior bytes, control pointer, signed health
+(clamped at zero), and common movement/control state. The path with a nonnull
+object additionally resets the sequence block at `0x460`, clears its surrounding
+state, and recreates attachment kinds 1 and 3 using the actor ID. The final
+optional callback is at `0x248`; the earlier phase-view label at `0x468` was
+provisional and has been corrected to an unknown word. The initial control-mode
+clear is at `0x42A`, distinct from the later byte clears at `0x464..0x467`.
+`72188` takes no arguments; incidental r0 values at these calls are not inputs.
+`12E084` consumes only its first argument, but the caller retains the observed
+resource/parameter arguments in the local prototype. The two attachment calls
+forward the first returned handle directly into the second.
+
+The defaults restoration is exact over 984 bytes (about 0.0407 percentage
+points). First `depin.py --write` reduced 177 hints to 66; after replacing raw
+stores with named fields and removing unused address assignments, a second
+pass reduced those to 51. Explicit offset temporaries remain where the old
+compiler's pointer lifetimes affect allocation. All three reset routines
+(1,996 bytes, register-pinned) pass their full reviewed extents against the
+expanded phase view: `build/registry-reset-cohort-final.json`.
+
+The remaining `70FA8` gap has a concrete packing diagnosis: creating addresses
+of stack unions before their first packed-field assignments selects halfword
+memory stores in this compiler. Assigning packed fields first, then creating
+the addresses, produces the required word-mask stores and the target stack
+order (velocity `sp+0xC`, bounds `sp+0x14`, position `sp+0x1C`). The ignored
+`build/registry-tick-delayed-address.c` preserves this version; it is not exact.
+The unsigned bitfield view in the common header need not change; this private
+candidate uses a local signed packed-vector union. The older draft and each
+allocation experiment remain under ignored `build/` for later comparison.
