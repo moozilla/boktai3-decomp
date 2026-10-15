@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-void sub_08078700(struct SceneActorRegistryActor *);
+void SceneActorBehavior_UpdateColliders(struct SceneActorRegistryActor *);
 static inline u32 IsUnavailable(struct SceneActorRegistryActor *actor)
 {
     u32 result = 0;
@@ -43,7 +43,7 @@ s32 SceneActorMovement_RequestAvailableAction(struct SceneActorRegistryActor *ac
     {
         u32 result;
         if (!unavailable) {
-            sub_08078700(actor);
+            SceneActorBehavior_UpdateColliders(actor);
             result = 1;
         } else {
             result = 0;
