@@ -155,7 +155,7 @@ void Collider_SetPosition(void *collider, void *position, u32 value);
 
 void Collider_SetCallback(void *collider, void *callback, void *owner);
 
-void Collider_Refresh(
+s32 Collider_Refresh(
     void *collider); /* (guess) re-link if flag 0x2000, otherwise run sub_0821FDC8 */
 
 void Collider_Remove(void *collider); /* unlink from the active collider list */
