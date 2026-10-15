@@ -103,7 +103,12 @@ struct SceneActorRegistryManager {
     u32 flags;
     u8 mode, unknown31;
     u16 field32;
-    u8 unknown34[0x2E];
+    struct Task *controlTask, *variantTask, *attachmentTask;
+    u8 unknown40[0x10];
+    struct Task *category14Task;
+    u16 controlTaskId, variantTaskId, attachmentTaskId;
+    u8 unknown5A[6];
+    u16 category14TaskId;
     u16 field62;
     u8 unknown64[0x21C];
     u32 subsystem[2];
