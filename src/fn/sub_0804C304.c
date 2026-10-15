@@ -4,7 +4,7 @@ void TetherActor_SetState(struct TetherActor *, u32);
 void TetherActor_SetEntry(struct TetherActor *, u32);
 void TetherActor_SelectInteractionState(struct TetherActor *);
 void TetherActor_EmitRandomEffect(struct TetherActor *);
-void sub_08066F90(s32);
+void SceneActorControl_RequestDeparture(s32);
 s32 Mod(s32, s32);
 void TetherActor_UpdateRecoveryState(struct TetherActor *actor)
 {
@@ -25,7 +25,7 @@ void TetherActor_UpdateRecoveryState(struct TetherActor *actor)
         register u32 colliderOffset asm("r6");
         actor->glowMode = 2;
         if (actor->parameter >= 0)
-            sub_08066F90(actor->parameter);
+            SceneActorControl_RequestDeparture(actor->parameter);
         if (actor->transitionReason == 2) {
             actor->secondaryCollider.bounds.x = 256;
             {

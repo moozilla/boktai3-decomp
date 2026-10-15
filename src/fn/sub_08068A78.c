@@ -1,5 +1,4 @@
 #include "bouncing_object.h"
-#define BouncingObject_InitializeColliders sub_08068A78
 void BouncingObject_InitializeColliders(struct BouncingObject *object, s16 category, s16 value)
 {
     union {
@@ -16,7 +15,7 @@ void BouncingObject_InitializeColliders(struct BouncingObject *object, s16 categ
                   &offset.position);
     sub_0821FF58(&object->bodyCollider, category, value, 0, 0, 0);
     Collider_SetPosition(&object->bodyCollider, &object->sprite.position, 0);
-    Collider_SetCallback(&object->bodyCollider, sub_080688D0, object);
+    Collider_SetCallback(&object->bodyCollider, BouncingObject_ApplyContactImpulse, object);
     size.position.x = 64;
     size.position.y = 128;
     size.position.z = 64;

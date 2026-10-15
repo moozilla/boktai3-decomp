@@ -2,12 +2,12 @@
 #include "scene_actor_control.h"
 #define SceneActorControl_CreateFromScript sub_08067990
 extern struct SceneActorControlManager *gUnk_02000128;
-struct SceneActorControlManager *sub_08067938(void);
-struct SceneActorControlSlot *sub_08067148(struct SceneActorControlManager *);
+struct SceneActorControlManager *SceneActorControl_EnsureSingleton(void);
+struct SceneActorControlSlot *SceneActorControl_AllocateSlot(struct SceneActorControlManager *);
 s32 sub_0822C034(const struct ContactPosition *);
 void sub_082144E4(void *, void *, u32);
 u32 sub_0804DFC0(s32);
-void sub_080670B8(struct SceneActorControlSlot *, s32, s32);
+void SceneActorControl_InitCollider(struct SceneActorControlSlot *, s32, s32);
 static inline u16 *Step(struct SceneActorControlSlot *slot,
                         struct SceneActorControlSprite *inputSprite, u16 *inputFlags)
 {
@@ -147,11 +147,11 @@ void SceneActorControl_CreateFromScript(void)
     register struct SceneActorControlSprite *sprite asm("r8");
     register u16 *slotFlags asm("r9");
     if (!p) {
-        p = sub_08067938();
+        p = SceneActorControl_EnsureSingleton();
         if (!p)
             return;
     }
-    slot = sub_08067148(p);
+    slot = SceneActorControl_AllocateSlot(p);
     if (!slot)
         return;
     slot->kind = 1;
@@ -202,5 +202,5 @@ void SceneActorControl_CreateFromScript(void)
             *lateFlags = mask;
         }
     }
-    sub_080670B8(slot, 0, 0);
+    SceneActorControl_InitCollider(slot, 0, 0);
 }

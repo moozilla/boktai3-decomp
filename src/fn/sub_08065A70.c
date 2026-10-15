@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_state.h"
-#define ActorAttachment_TickLandingBounce sub_08065A70
 void ActorAttachment_TickWideShake(void *, struct ActorAttachmentSlotView *);
 void ActorAttachment_TickLandingBounce(struct ActorAttachmentSlotView *slot)
 {

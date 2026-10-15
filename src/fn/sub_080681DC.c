@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_particle_burst.h"
-#define SceneParticleBurst_Destroy sub_080681DC
 extern struct SceneParticleBurstPool *gUnk_02000130;
 static inline u8 IsUsed(u32 *used, u32 index)
 {

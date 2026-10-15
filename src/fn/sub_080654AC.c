@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_sprite_playback.h"
-#define ActorAttachment_TickDescendingSprite sub_080654AC
 void ActorAttachment_TickWideShake(void *, struct ActorAttachmentSlotView *);
 void ActorAttachment_TickDescendingSprite(struct ActorAttachmentSlotView *slot)
 {

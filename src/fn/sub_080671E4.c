@@ -1,5 +1,4 @@
 #include "scene_actor_control.h"
-#define SceneActorControl_ClearUnusedParameters sub_080671E4
 struct SceneActorControlPlayer {
     u8 unknown0[0x4F3];
     u8 parameter;

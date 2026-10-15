@@ -1,5 +1,4 @@
 #include "scene_actor_control.h"
-#define SceneActorControl_RequestDeparture sub_08066F90
 extern struct SceneActorControlManager *gUnk_02000128;
 void SceneActorControl_RequestDeparture(s32 index)
 {

@@ -32,5 +32,5 @@ struct SceneParticlePool {
     u32 used;
     struct SceneParticleSlot slots[8];
 };
-struct SceneParticleSlot *sub_08068480(struct SceneParticlePool *);
+struct SceneParticleSlot *SceneParticle_AllocateSlot(struct SceneParticlePool *);
 #endif

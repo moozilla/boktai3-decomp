@@ -1,5 +1,4 @@
 #include "scene_particle_pool.h"
-#define SceneParticle_ReleaseSlot sub_0806843C
 void SceneParticle_ReleaseSlot(struct SceneParticlePool *p, struct SceneParticleSlot *slot)
 {
     Effect_Remove((u8 *)p + (slot->index * 0x28 + 0x20));

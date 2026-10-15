@@ -1,5 +1,4 @@
 #include "actor_attachment_manager.h"
-#define ActorAttachment_LoadManagerResources sub_08066BB8
 void ActorAttachment_LoadManagerResources(struct ActorAttachmentManagerResources *manager)
 {
     AnimData_Load(manager->graphicsA, 0x363C);

@@ -1,5 +1,4 @@
 #include "scene_particle_burst.h"
-#define SceneParticleBurst_LoadResources sub_08068230
 void SceneParticleBurst_LoadResources(struct SceneParticleBurstPool *p)
 {
     p->graphicsResource = AnimData_FindEntry(0x1C1A);

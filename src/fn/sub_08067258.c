@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control.h"
-#define SceneActorControl_TickActive sub_08067258
 struct SceneActorControlPlayerView {
     u8 unknown0[0x20];
     u32 flags;
@@ -14,10 +13,11 @@ struct SceneActorControlGameView {
 extern struct SceneActorControlPlayerView *gUnk_02000580[4];
 void sub_08214374(void *, u32);
 void sub_082143A0(void *, u32);
-void sub_08067018(struct SceneActorControlManager *, struct SceneActorControlSlot *);
+void SceneActorControl_TickJitter(struct SceneActorControlManager *,
+                                  struct SceneActorControlSlot *);
 void sub_08158EC8(struct ContactPosition *);
-u32 sub_08067190(struct SceneActorControlSlot *);
-void sub_080674F0(struct SceneActorControlSlot *);
+u32 SceneActorControl_IsEnabledForScene(struct SceneActorControlSlot *);
+void SceneActorControl_TryActivateNearby(struct SceneActorControlSlot *);
 static inline u8 PlayerHasControlFlag(void)
 {
     u32 mask = 0x80000;
@@ -75,7 +75,7 @@ void SceneActorControl_TickActive(struct SceneActorControlManager *p,
                 sub_08214374(sprite, 0);
             if (*flags & 4) {
                 slot->timer = 60;
-                sub_08067018(p, slot);
+                SceneActorControl_TickJitter(p, slot);
                 sub_08158EC8(&slot->position);
                 {
                     u16 *target = previous;
@@ -96,7 +96,7 @@ void SceneActorControl_TickActive(struct SceneActorControlManager *p,
         if (!slot->active)
             sub_08214374(slot, 0);
         if (*flags & 4) {
-            sub_08067018(p, slot);
+            SceneActorControl_TickJitter(p, slot);
             ClearFlags(flags, 4);
         }
         if (*flags & 2) {
@@ -112,7 +112,7 @@ void SceneActorControl_TickActive(struct SceneActorControlManager *p,
         if (visible ||
             ((*flags & 0x20) &&
              ((struct SceneActorControlGameView *)gUnk_02000710)->parameter > 0) ||
-            (u8)sub_08067190(slot)) {
+            (u8)SceneActorControl_IsEnabledForScene(slot)) {
             if (!sprite->active)
                 sub_08214374(sprite, 0);
         } else {
@@ -138,5 +138,5 @@ applyMask:
     return;
 normal:
     if (!(slot->flags & 0x50))
-        sub_080674F0(slot);
+        SceneActorControl_TryActivateNearby(slot);
 }

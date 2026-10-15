@@ -1,5 +1,4 @@
 #include "actor_attachment_manager.h"
-#define ActorAttachment_CreateThreePartSlot sub_08066A88
 struct ActorAttachmentSlotView *
 ActorAttachment_CreateThreePartSlot(u8 frame, struct ContactPosition *anchor, void *update, s32 z,
                                     u32 action, s16 *value, s32 count,

@@ -8,7 +8,6 @@ static inline u8 Occupied(const u32 *mask, u32 bit)
         return TRUE;
     return FALSE;
 }
-#define SceneParticlePool_Update sub_08068784
 s32 SceneParticlePool_Update(struct SceneParticlePool *input)
 {
     register struct SceneParticlePool *pool asm("r6") = input;

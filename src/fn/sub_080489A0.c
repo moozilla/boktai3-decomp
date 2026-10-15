@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "tether_actor.h"
-void sub_08068124(void *, void *, void *, u32, u32, u32);
+void SceneParticleBurst_CreateWhilePaused(void *, void *, void *, u32, u32, u32);
 static inline s32 scaleEmission(s32 value)
 {
     if (value >= 0)
@@ -35,5 +35,5 @@ void TetherActor_EmitDirectionalEffect(struct TetherActor *input)
     size.x = 32;
     size.y = 0;
     size.z = 32;
-    sub_08068124(&position, &velocity, &size, 1, 3, 4);
+    SceneParticleBurst_CreateWhilePaused(&position, &velocity, &size, 1, 3, 4);
 }

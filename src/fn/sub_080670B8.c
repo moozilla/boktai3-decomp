@@ -1,6 +1,5 @@
 #include "scene_actor_control.h"
-#define SceneActorControl_InitCollider sub_080670B8
-void sub_080670A0(void *, void *, struct SceneActorControlSlot *);
+void SceneActorControl_OnContact(void *, void *, struct SceneActorControlSlot *);
 void SceneActorControl_InitCollider(struct SceneActorControlSlot *slot)
 {
     struct ContactPackedVector bounds, offset;
@@ -14,6 +13,6 @@ void SceneActorControl_InitCollider(struct SceneActorControlSlot *slot)
     collider = &slot->collider;
     Collider_Init(collider, 0, 0x4001, 0, 0x10, &offset, &bounds);
     Collider_SetPosition(collider, &slot->savedPosition, 0);
-    Collider_SetCallback(collider, sub_080670A0, slot);
+    Collider_SetCallback(collider, SceneActorControl_OnContact, slot);
     Collider_Refresh(collider);
 }

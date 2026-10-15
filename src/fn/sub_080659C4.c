@@ -1,6 +1,5 @@
 #include "actor_attachment_state.h"
-#define ActorAttachment_TickValueFrame sub_080659C4
-void sub_08065904(struct ActorAttachmentSlotView *);
+void ActorAttachment_UpdateValueFrame(struct ActorAttachmentSlotView *);
 u8 ActorAttachment_TickRemoval(void *, void *);
 void ActorAttachment_TickValueFrame(struct ActorAttachmentSlotView *slot)
 {
@@ -9,7 +8,7 @@ void ActorAttachment_TickValueFrame(struct ActorAttachmentSlotView *slot)
         struct ActorAttachmentManagerView *owner = manager;
         struct ContactSwarmSprite *sprite = &slot->sprite;
         sprite->flags &= -2;
-        sub_08065904(slot);
+        ActorAttachment_UpdateValueFrame(slot);
         sprite->frame = slot->frame;
         if (slot->anchor != NULL) {
             s32 dy;

@@ -1,5 +1,4 @@
 #include "scene_particle_pool.h"
-#define SceneParticle_CreateParticles sub_080684D0
 s32 sub_08068500(const struct ContactPosition *, const struct ContactPosition *,
                  const struct ContactPosition *, const struct ContactPosition *, s32, u32);
 s32 SceneParticle_CreateParticles(const struct ContactPosition *anchor,

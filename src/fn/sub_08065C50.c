@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_manager.h"
-#define ActorAttachment_ReleaseResource sub_08065C50
 void Effect_Remove(void *);
 struct ActorAttachmentSlotView *
 ActorAttachment_ReleaseResource(struct ActorAttachmentSlotView *incoming, u32 resourceKind,

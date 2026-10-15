@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_state.h"
-#define ActorAttachment_UpdateValueFrame sub_08065904
 void ActorAttachment_UpdateValueFrame(struct ActorAttachmentSlotView *input)
 {
     struct ActorAttachmentSlotView *slot = input;

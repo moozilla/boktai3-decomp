@@ -1,5 +1,4 @@
 #include "scene_actor_control.h"
-#define SceneActorControl_Initialize sub_08067900
 extern struct SceneActorControlManager *gUnk_02000128;
 s32 SceneActorControl_Initialize(struct SceneActorControlManager *p)
 {

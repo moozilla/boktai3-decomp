@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_particle_burst.h"
-#define SceneParticleBurst_AllocateSlot sub_08067DF0
 static inline u8 IsUsed(u32 *used, u32 index, u32 one)
 {
     if (*used & (one << index))

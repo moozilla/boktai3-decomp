@@ -1,7 +1,6 @@
 #include "scene_actor_control.h"
-#define SceneActorControl_Update sub_08067854
 extern void (*gUnk_08605B44[])(struct SceneActorControlManager *, struct SceneActorControlSlot *);
-void sub_080671E4(struct SceneActorControlManager *);
+void SceneActorControl_ClearUnusedParameters(struct SceneActorControlManager *);
 s32 SceneActorControl_Update(struct SceneActorControlManager *p)
 {
     struct SceneActorControlSlot *slots = p->slots;
@@ -13,7 +12,7 @@ s32 SceneActorControl_Update(struct SceneActorControlManager *p)
                 sub_08249240(p, s, gUnk_08605B44[s->kind]);
             }
         }
-        sub_080671E4(p);
+        SceneActorControl_ClearUnusedParameters(p);
     }
     return 0;
 }

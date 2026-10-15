@@ -1,5 +1,4 @@
 #include "scene_particle_burst.h"
-#define SceneParticleBurst_CreateWithPause sub_08068108
 s32 sub_08067E3C(const struct ContactPosition *, const struct ContactPosition *,
                  const struct ContactPosition *, s32, u32, u32, u32);
 s32 SceneParticleBurst_CreateWithPause(const struct ContactPosition *position,

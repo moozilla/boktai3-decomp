@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control.h"
-#define SceneActorControl_TickJitter sub_08067018
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 void SceneActorControl_TickJitter(void *unused, struct SceneActorControlSlot *slot)

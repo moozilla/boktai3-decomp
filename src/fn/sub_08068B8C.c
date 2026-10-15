@@ -6,7 +6,6 @@ static inline u8 Occupied(const u32 *mask, u32 bit)
         return TRUE;
     return FALSE;
 }
-#define BouncingObject_Allocate sub_08068B8C
 struct BouncingObject *BouncingObject_Allocate(struct BouncingPool *pool)
 {
     s32 i = 0;
