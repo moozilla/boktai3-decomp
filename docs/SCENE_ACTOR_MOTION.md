@@ -104,3 +104,35 @@ A private compile-time layout check (`wip/layout_0807A8CC.c`) confirms all
 named offsets from health `9C` through failure callback `5F8`, including the
 new subject/route/saved-control fields. It retains the baseline seven-byte
 mismatch. No shared header or source has been promoted for this cohort.
+
+The later readable v81/v87 candidate narrows A8CC to five byte differences
+at its full 1,736-byte extent (99.5%). The initial health load at AA78/AA7A
+uses scratch `r4` instead of `r1`; the mode-2E6 constant/address pair at
+AE60/AE62 uses `r6` instead of `r2`. The terrain width loads, direction
+calculation, both reaction-health loads and tail constants now match.
+Initialized game-offset and collider values remain live through the first
+width load; the center pointer, saved Z and current-position pointer remain
+live through the first signed direction-coordinate load. Those are actual
+initialized C values, not captures of incidental register contents.
+
+Private `build/actor-A8CC-v87.c` and active `wip/sub_0807A8CC.c` preserve
+this result after removing 21 redundant register bindings and six empty
+barriers. The reviewed checkpoint is
+`build/candidates/599dcea7796806ca/attempt-mgrui1yq/record.json`.
+The alternate v83 matches the mode constant by adding an offset barrier,
+but loses three primary-collider constant-register bytes. Keeping both
+barriers crosses the compiler's conservative short-branch estimate and
+adds a long branch despite the actual emitted center body fitting.
+Moving payload-offset barriers later also changes constant folding and
+allocation. Explicit initialized lifetimes can fix the initial health
+scratch, but the tested versions change later velocity/old-position scratch
+choices; read-only fixed-zero operands add unwanted materialization.
+None of these trials is exact, and no code or byte credit is promoted.
+
+The old full-source base30 search was stopped and replaced by a scope-unique
+v81 search at base20: `build/permute/sub_0807A8CC/run-tdbg56_d`, log
+`build/actor-A8CC-v81-scoped-permute.log` (one job, four-hour cap). Preparation
+renames 191 local/formal bindings and resolves every member type with zero
+failures; its compiled starting bytes retain the same five-byte mismatch.
+The earlier center-only base30 search is separate. Both use only private
+prepared source and the reviewed target split; no shared tool is changed.
