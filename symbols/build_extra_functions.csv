@@ -108,6 +108,7 @@ address,isa,evidence,replacement_end
 080688CC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080688D0
 08069788,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched),080697C8
 08069C94,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08069C98
+0806A420,thumb,Independent256-byte script wrapper after704-byte particle creator return and literal pool; own prologue and return; docs/SPARK_PARTICLE.md,0806A520
 0806A784,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0806A788
 0806BE80,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0806BE84
 0806CFFC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0806D000
