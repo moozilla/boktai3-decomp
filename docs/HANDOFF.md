@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 25.657% matching (2026-10-14). This file is the single
+Last updated after reaching 25.788% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,50 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex/Sol): scene panel particles, palettes and background effect
+
+Exact code is **25.788%**, up **0.1310 percentage points** (+3,164 bytes):
+**6,669 / 11,473 functions**, **622,866 / 2,415,354 bytes**. Without register
+pinning: **20.082%**; Register-pinned: **5.706%**, included above. Eleven new
+functions add1,032 unpinned bytes and2,132 with minimized concessions. The77
+guarded drafts remain outside exact progress.
+
+Sol completed **57960–58130**:12 functions /2,000 bytes, seven new /1,792.
+This is the same larger object as the existing presentation states. A compatible
+additional view records its32-slot particle ring, sixteen palette rows, three
+palette sources and timed RGB15 blends. The full-word phase getter contract is
+retained rather than narrowed tobyte. Remaining hints were minimized, with no
+explicit r7 binding. [Particle/palette contracts](SCENE_PANEL_EFFECTS.md).
+
+Parent recovered overlay setup58AF4 (148 bytes, unpinned), palette cycling58B88
+(80, conceded) and layer driver58FF8 (132, unpinned), and typed the old64-byte
+burst entry586C0. Sol then closed the1,012-byte background effect58700, minimized
+70→17 constraints. Its packed word view preserves halfword wrapping, signed Y,
+unsigned X/Z extraction and the fourth/fifth RNG index-store ordering. The final
+post-background-call decrement reloads panel->mode rather than the earlier
+cached pointer. [Background notes](../notes/scene-panel-background_2026-10-14.md).
+
+The complete contiguous span is now **4E008–58BD8**, **340 exact C functions /
+43,984 bytes**. Sole next rendering gap **58BD8–58FF8,1,056 bytes** remains Sol's
+active draft; the following driver is already exact. The shared ScenePanel and
+effects layouts are partial views of a larger object, not allocation-size claims.
+No particular game identity or new runtime coverage is established.
+
+Combined validation passed with `build/boktai3.gba: OK` in
+`build/scene-combined-final.log`. All22 final reviewed-extent checks passed, along with formatting, inventory,
+structured data and RAM-literal checks. Main
+PR139 Actions passed at61d7e491 (run38674670880).
+
+Continue toward **30% matching or40% account usage remaining**; latest reading
+**52% remaining**. Sol owns the overlay gap58BD8. Parent has **5907C–59428**
+scheduled-action subsection exact in scratch (eight functions /940 bytes, six
+new /908;600 unpinned /308 conceded). All eight reviewed extents pass. Its setup
+uses scoped function-pointer bindings, which depin does not recognize; each was
+also manually tested for necessity. Notes and header are in parent wip. Promote
+only after this batch merges, then continue the following object subsection.
+Keep production frozen during combined validation and preserve private build
+outputs. The Claude-owned primary checkout remains untouched.
 
 ## October 14 (Codex/Sol): level display, countdown and presentation states
 

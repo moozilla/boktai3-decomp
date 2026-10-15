@@ -1,27 +1,21 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x6e];
-    u16 t;
-};
-
-s32 sub_08057C78(struct S *p)
+#include "scene_panel_effects.h"
+s32 ScenePanel_AdvancePaletteFrame(struct ScenePanelMainSprite *sprite)
 {
-    u16 *tp = &p->t;
-    u32 t;
-    (*tp)++;
-    if (*tp > 0x81)
-        *tp = 0;
-    t = *tp;
-    if (t <= 0x1d)
+    u16 *counter = &sprite->phaseCounter;
+    u32 frame;
+    (*counter)++;
+    if (*counter > 129)
+        *counter = 0;
+    frame = *counter;
+    if (frame <= 29)
         return 0;
-    if (t <= 0x27)
+    if (frame <= 39)
         return 1;
-    if (t <= 0x31)
+    if (frame <= 49)
         return 2;
-    if (t <= 0x6d)
+    if (frame <= 109)
         return 3;
-    if (t <= 0x77)
+    if (frame <= 119)
         return 2;
     return 1;
 }
