@@ -139,6 +139,8 @@ address,isa,evidence,replacement_end
 080800A4,thumb,Independent 1008-byte body begins with complete high-register save prologue; 080800AC is its interior push; prior 0808005C ends at080800A4 after literal pool,
 08082BF0,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08082C68
 08082D20,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08082D80
+08083F3C,thumb,Independent collision latch clear leaf after 83E98 return and literal pool; full 32-byte exact C,08083F5C
+08083F5C,thumb,Independent terrain response function with own push and pop-bx following collision latch helper; full 232-byte reviewed extent,08084044
 08084280,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08084284
 0808AED8,thumb,Independent random pattern selector (own push/pop-bx and literal pool) left as incbin by gbadisasm; exact standalone C,0808AF38
 0808F9E4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0808F9E8
