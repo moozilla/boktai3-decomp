@@ -1,5 +1,4 @@
 #include "scene_actor_script.h"
-#define SceneActorScript_SetControlBytesFromScript sub_08072264
 static inline s32 ReadOrZero(void)
 {
     if (Script_GetPc())
@@ -14,7 +13,7 @@ void SceneActorScript_SetControlBytesFromScript(void)
     s32 first, second;
     if (!id)
         return;
-    actor = sub_08070EBC(id);
+    actor = SceneActorRegistry_FindById(id);
     if (!actor)
         return;
     control = (void *)((u32)actor + 0x3D4);

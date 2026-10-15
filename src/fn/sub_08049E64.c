@@ -2,7 +2,7 @@
 extern u8 *gUnk_02000488;
 void TetherActor_SetState(u8 *, u32);
 void TetherActor_UpdatePendingEffect(u8 *);
-void sub_08072C40(u8 *);
+void SceneActorContacts_RemoveNode(u8 *);
 void TetherActor_BeginDetachedState(u32 a)
 {
     u8 *p = gUnk_02000488;
@@ -14,7 +14,7 @@ void TetherActor_BeginDetachedState(u32 a)
             TetherActor_SetState(p, 6);
         q = p + 0x254;
         if (*q) {
-            sub_08072C40(p + 0x244);
+            SceneActorContacts_RemoveNode(p + 0x244);
             *q = 0;
         }
         *(u16 *)(p + 0x380) = 0;

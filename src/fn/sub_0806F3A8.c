@@ -1,5 +1,4 @@
 #include "scene_effect_schedule.h"
-#define SceneEffectSchedule_FindById sub_0806F3A8
 
 static inline u8 Tst(u32 m, s32 one, s32 i)
 {

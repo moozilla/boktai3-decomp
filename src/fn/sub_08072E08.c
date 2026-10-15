@@ -1,5 +1,4 @@
 #include "scene_actor_contact_list.h"
-#define SceneActorContacts_ReleaseNode sub_08072E08
 void SceneActorContacts_ReleaseNode(struct SceneActorContactNode *input)
 {
     struct SceneActorContactManager *manager = gUnk_020001A0;

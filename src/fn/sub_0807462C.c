@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-#define SceneActorRegistry_RegisterCategoryReceiver sub_0807462C
 s32 SceneMessages_RegisterReceiver(u8 *, s32, s32);
 static inline u8 IsScenePaused(void)
 {

@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-#define SceneActorRegistry_RequestScriptState sub_08070834
-struct SceneActorRegistryActor *sub_08070EBC(u32);
+struct SceneActorRegistryActor *SceneActorRegistry_FindById(u32);
 void sub_0807FC90(u8 *);
 static inline u8 HasMovementFlag(struct SceneActorRegistryActor *actor)
 {
@@ -18,7 +17,7 @@ void SceneActorRegistry_RequestScriptState(void)
     u32 id = Script_GetKeywordValue('n', 0);
     u32 preserveControl = Script_GetKeywordValue('m', 0);
     if (id) {
-        struct SceneActorRegistryActor *actor = sub_08070EBC(id);
+        struct SceneActorRegistryActor *actor = SceneActorRegistry_FindById(id);
         if (actor && HasMovementFlag(actor)) {
             u32 state = 2;
             register u32 offset asm("r4") = 0x2a8;

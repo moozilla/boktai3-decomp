@@ -1,5 +1,4 @@
 #include "scene_actor_contact_list.h"
-#define SceneActorContacts_RemoveNode sub_08072C40
 void SceneActorContacts_RemoveNode(struct SceneActorContactNode *node)
 {
     struct SceneActorContactManager *manager = gUnk_020001A0;

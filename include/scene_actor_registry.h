@@ -112,7 +112,7 @@ void SceneActorRegistry_DestroyActors(void);
 void SceneActorRegistry_AdvanceInactiveActors(struct SceneActorRegistryManager *);
 void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *);
 void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *);
-void sub_080718D8(struct SceneActorRegistryActor *);
+void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *);
 void SceneActorRegistry_UpdateBackgroundFlag(struct SceneActorRegistryManager *);
 s32 SceneActorRegistry_TickManager(struct SceneActorRegistryManager *);
 s32 SceneActorRegistry_DestroyManager(struct SceneActorRegistryManager *);

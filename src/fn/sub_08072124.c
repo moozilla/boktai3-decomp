@@ -24,11 +24,11 @@ u32 SceneActorPalette_IsTransitionComplete(void)
     if (Test(gUnk_030053F4, 0x4800))
         id = 10;
     else {
-        if (sub_080703F0(10))
+        if (SceneActorRegistry_CountLivingByCategory(10))
             return 0;
         id = 23;
     }
-    if (sub_080703F0(id))
+    if (SceneActorRegistry_CountLivingByCategory(id))
         return 0;
     return 1;
 }

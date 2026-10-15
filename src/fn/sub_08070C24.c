@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 #include "player.h"
-#define SceneActorRegistry_TestNearestPlayerBounds sub_08070C24
 s32 sub_0821E7EC(u16 *, u32, u32);
 extern u16 gUnk_02000544;
 u32 SceneActorRegistry_TestNearestPlayerBounds(struct SceneActorRegistryActor *input,

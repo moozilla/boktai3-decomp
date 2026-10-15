@@ -1,12 +1,12 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-struct SceneActorRegistryManager *sub_08072B44(void);
+struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 s32 SceneActorRegistry_CountLiving(void)
 {
     struct SceneActorRegistryNode *node;
     struct SceneActorRegistryActor *actor;
     s32 count;
-    sub_08072B44();
+    SceneActorRegistry_GetManager();
     /* The allocated terminal node carries a NULL actor; an absent list head
      * is outside this helper's caller contract. */
     node = gUnk_020004AC;

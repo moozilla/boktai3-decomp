@@ -1,5 +1,4 @@
 #include "scene_actor_contact_list.h"
-#define SceneActorContacts_FindObjectById sub_08072CF0
 void *SceneActorContacts_FindObjectById(u16 id)
 {
     struct SceneActorContactManager *manager = gUnk_020001A0;

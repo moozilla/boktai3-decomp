@@ -1,5 +1,4 @@
 #include "scene_actor_script.h"
-#define SceneActorScript_SetPositionFromScript sub_080722C0
 static inline s32 ReadOrZero(void)
 {
     if (Script_GetPc())
@@ -50,7 +49,7 @@ void SceneActorScript_SetPositionFromScript(void)
     s16 *height;
     if (!id)
         return;
-    actor = (void *)sub_08070EBC(id);
+    actor = (void *)SceneActorRegistry_FindById(id);
     if (!actor)
         return;
     if (!Script_SeekToKeyword('p'))

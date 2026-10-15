@@ -1,10 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-#define SceneActorRegistry_DefeatActorsFromScript sub_080704EC
-struct SceneActorRegistryManager *sub_08072B44(void);
+struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 void sub_0807FC90(u8 *);
 void sub_080771E4(struct SceneActorRegistryActor *);
-void sub_0806FA74(u32, u32);
+void SceneActorRecord_RecordPair(u32, u32);
 extern u16 gUnk_030039F0;
 static inline u8 IsUnavailable(struct SceneActorRegistryActor *input)
 {
@@ -62,7 +61,7 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
     register struct SceneActorRegistryActor *actor asm("r4");
     u32 special;
     u32 category;
-    sub_08072B44();
+    SceneActorRegistry_GetManager();
     node = gUnk_020004AC;
     actor = node->actor;
     special = Script_GetKeywordValue('s', 0);
@@ -183,7 +182,7 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
                 }
                 sub_080771E4(actor);
                 if (!IsScenePaused() && !ReadSuppressionFlag(actor))
-                    sub_0806FA74(gUnk_030039F0, (u16)actor->id);
+                    SceneActorRecord_RecordPair(gUnk_030039F0, (u16)actor->id);
             }
             goto next;
         ordinary: {

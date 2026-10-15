@@ -1,5 +1,4 @@
 #include "scene_actor_contact_list.h"
-#define SceneActorContacts_ResetList sub_08072BA8
 void SceneActorContacts_ResetList(void)
 {
     struct SceneActorContactManager *manager = gUnk_020001A0;

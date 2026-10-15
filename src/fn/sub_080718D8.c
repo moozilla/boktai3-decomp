@@ -1,14 +1,13 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reset.h"
-#define SceneActorRegistry_RestoreActorDefaults sub_080718D8
-#define ACTOR_OFFSET(member)                    ((u32) & ((struct SceneActorRegistryResetView *)0)->member)
+#define ACTOR_OFFSET(member) ((u32) & ((struct SceneActorRegistryResetView *)0)->member)
 /* Offset temporaries preserve pointer lifetimes required by the original allocator. */
 void sub_0807FC90(u8 *);
-void sub_08072188(void);
+void SceneActorPalette_ClearCompletedTransitions(void);
 /* The latter two arguments are observed but unused by this initializer. */
 void sub_0812E084(void *, const void *, u32);
-void *sub_08065C50(void *, u32, u32);
-void *sub_08065D1C(void *, u32, u32);
+void *ActorAttachment_ReleaseResource(void *, u32, u32);
+void *ActorAttachment_ReleasePartsResource(void *, u32, u32);
 extern const u8 gUnk_0824E0D8[];
 static inline u8 SceneActorRegistry_HasNoObject(struct SceneActorRegistryResetView *actor)
 {
@@ -21,7 +20,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
     struct SceneActorRegistryResetView *actor = (void *)argument;
     u32 *flags;
     u32 noObject;
-    sub_080714E4((void *)actor);
+    SceneActorRegistry_ResetRouteAndColliders((void *)actor);
     {
         u32 state = 3;
         u32 offset2 = ACTOR_OFFSET(state2A8);
@@ -228,7 +227,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
             *address = byteZero;
             actor->fieldDC = wordZero;
         }
-        sub_08072188();
+        SceneActorPalette_ClearCompletedTransitions();
     } else {
         u32 wordZero;
         u32 byteZero;
@@ -467,7 +466,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
                 u8 *address = (u8 *)actor + offset1;
                 *address = byteZero;
             }
-            sub_08072188();
+            SceneActorPalette_ClearCompletedTransitions();
         }
         {
             register u32 offset2 asm("r2") = ACTOR_OFFSET(attachment);
@@ -476,9 +475,9 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
             asm("" : "+r"(offset2));
             address = (void **)((u8 *)actor + offset2);
             attachment = *address;
-            attachment = sub_08065C50(attachment, 1, actor->id);
+            attachment = ActorAttachment_ReleaseResource(attachment, 1, actor->id);
             *address = attachment;
-            attachment = sub_08065D1C(attachment, 3, actor->id);
+            attachment = ActorAttachment_ReleasePartsResource(attachment, 3, actor->id);
             *address = attachment;
         }
     }
@@ -511,5 +510,5 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
         if (callback)
             sub_0824923C(actor, callback);
     }
-    sub_08072188();
+    SceneActorPalette_ClearCompletedTransitions();
 }
