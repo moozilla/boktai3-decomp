@@ -1,16 +1,9 @@
-#include "global.h"
-struct S {
-    u8 f[0x22e];
-    u16 c;
-};
-void sub_08058130(void *, u32, u32);
-void sub_08058150(void *, void (*)(void));
-void sub_0805849C(void);
-void sub_08058464(struct S *p)
+#include "scene_panel.h"
+#define ScenePanel_TickPulseRest sub_08058464
+void ScenePanel_TickPulseRest(struct ScenePanel *panel)
 {
-    p->c++;
-    if (p->c > 37) {
-        sub_08058130(p, 2, 12);
-        sub_08058150(p, sub_0805849C);
+    if (++panel->stateFrame > 37) {
+        sub_08058130(panel, 2, 12);
+        sub_08058150(panel, sub_0805849C);
     }
 }
