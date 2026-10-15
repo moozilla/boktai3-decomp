@@ -1,4 +1,5 @@
 #include "global.h"
+#define AreaEffect_TestPlayerCoverage sub_0804E10C
 struct S {
     u8 f[0x868];
     u32 fl;
@@ -25,7 +26,7 @@ static inline u8 eq1(u16 v)
         return TRUE;
     return FALSE;
 }
-s32 sub_0804E10C(u8 *a)
+s32 AreaEffect_TestPlayerCoverage(u8 *a)
 {
     struct S *s = gUnk_02000710;
     if (s->v == 0)
