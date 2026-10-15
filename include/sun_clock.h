@@ -20,6 +20,8 @@ struct SunClock {
 };
 extern struct SunClock gUnk_03005430;
 extern u8 *gUnk_030053F8;
+u32 SunClock_GetBaseHour(void);
+u32 SunClock_GetBaseMinute(void);
 s32 Div(s32, s32);
 u8 sub_08228DB8(void);
 extern u32 gUnk_0300546C;
