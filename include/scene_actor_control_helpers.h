@@ -16,4 +16,6 @@ static inline u8 SceneActorControl_TestFlags(u32 flags, u32 mask)
         return 1;
     return 0;
 }
+void sub_08084180(struct SceneActorRegistryResetView *);
+void sub_08084044(struct SceneActorRegistryResetView *);
 #endif
