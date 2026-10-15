@@ -20,6 +20,12 @@ struct SceneRigSetupSprite {
     u16 randomPhase, phase;
 };
 
+struct SceneRigPayloadView {
+    u8 unknown0[0x6A0];
+    u16 firstX, firstY, firstZ, unknown6A6;
+    u16 secondX, secondY, secondZ;
+};
+
 struct SceneRigSetupParentView {
     u8 unknown0[0x510];
     struct ContactPosition center;
