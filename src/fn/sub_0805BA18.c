@@ -1,5 +1,4 @@
 #include "scene_panel_interaction.h"
-#define ScenePanel_WaitTetherDirectedState sub_0805BA18
 void ScenePanel_WaitTetherDirectedState(struct ScenePanel *input)
 {
     struct ScenePanelInteractionView *panel = (void *)input;

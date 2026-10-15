@@ -1,5 +1,4 @@
 #include "scene_panel_interaction.h"
-#define ScenePanel_WaitRigIdle sub_0805BAE4
 void ScenePanel_WaitRigIdle(struct ScenePanel *input)
 {
     struct ScenePanelInteractionView *panel = (void *)input;

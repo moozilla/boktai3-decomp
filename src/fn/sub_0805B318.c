@@ -1,5 +1,4 @@
 #include "scene_panel_interaction.h"
-#define ScenePanel_AreSubjectsSettled sub_0805B318
 s32 ScenePanel_AreSubjectsSettled(struct ScenePanel *input)
 {
     struct ScenePanelInteractionView *panel = (void *)input;

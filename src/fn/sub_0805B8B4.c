@@ -1,7 +1,6 @@
 #include "scene_panel_interaction.h"
 // MATCHING_CONCESSION: register-pinning
 
-#define ScenePanel_AdvanceSubjectDeparture sub_0805B8B4
 void ScenePanel_AdvanceSubjectDeparture(struct ScenePanel *input)
 {
     struct ScenePanelInteractionView *panel = (void *)input;

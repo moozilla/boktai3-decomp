@@ -1,6 +1,5 @@
 #include "scene_panel_commands.h"
-#define ScenePanel_DispatchCommands sub_0805C680
-void sub_0805C680(struct ScenePanel *owner)
+void ScenePanel_DispatchCommands(struct ScenePanel *owner)
 {
     struct ScenePanelInteractionView *panel = (void *)owner;
     struct ScenePanelReceiver *receiver = &((struct ScenePanelCommandView *)owner)->receiver;

@@ -1,5 +1,4 @@
 #include "scene_panel_orchestration.h"
-#define ScenePanel_InitializeInteraction sub_0805C310
 void ScenePanel_InitializeInteraction(struct ScenePanel *input)
 {
     struct ScenePanelInteractionView *panel = (void *)input;
@@ -7,8 +6,8 @@ void ScenePanel_InitializeInteraction(struct ScenePanel *input)
     switch (mode) {
         case 0: {
             s32 option;
-            if (sub_0805C2DC((void *)panel)) {
-                sub_0805BCEC((void *)panel);
+            if (ScenePanel_AreSubjectsIdle((void *)panel)) {
+                ScenePanel_InitPaletteSprite((void *)panel);
                 ScenePanel_SetEffectState((void *)panel, 0);
                 return;
             }
@@ -40,13 +39,13 @@ void ScenePanel_InitializeInteraction(struct ScenePanel *input)
                     return;
                 }
             } else
-                sub_0805BCEC((void *)panel);
+                ScenePanel_InitPaletteSprite((void *)panel);
             ScenePanel_SetEffectState((void *)panel, 3);
             break;
         }
         case 1: {
             ScenePanel_InitRig((void *)panel);
-            sub_0805C084((void *)panel);
+            ScenePanel_InitResourceConfiguration((void *)panel);
             gUnk_02000488->state = 12;
             gUnk_02000488->position = panel->center;
             gUnk_02000488->heading = 0;
@@ -59,7 +58,7 @@ void ScenePanel_InitializeInteraction(struct ScenePanel *input)
                 panel->resourceScale = 100;
             ScenePanel_InitBackground((void *)panel);
             ScenePanel_InitOverlay((void *)panel);
-            sub_0805BD78((void *)panel);
+            ScenePanel_InitAuxiliarySprite((void *)panel);
             ScenePanel_SetEffectState((void *)panel, 8);
         }
     }

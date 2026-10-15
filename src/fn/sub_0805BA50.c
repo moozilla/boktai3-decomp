@@ -1,5 +1,4 @@
 #include "scene_panel_interaction.h"
-#define ScenePanel_WaitRigRelease sub_0805BA50
 void ScenePanel_WaitRigRelease(struct ScenePanel *input)
 {
     struct ScenePanelInteractionView *panel = (void *)input;

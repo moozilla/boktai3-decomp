@@ -1,5 +1,4 @@
 #include "scene_panel_interaction.h"
-#define ScenePanel_AdvanceTetherReturn sub_0805BC10
 void ScenePanel_AdvanceTetherReturn(struct ScenePanel *input)
 {
     struct ScenePanelInteractionView *panel = (void *)input;

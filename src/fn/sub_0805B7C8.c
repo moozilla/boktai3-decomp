@@ -1,5 +1,4 @@
 #include "scene_panel_interaction.h"
-#define ScenePanel_AdvancePlayerArrival sub_0805B7C8
 void ScenePanel_AdvancePlayerArrival(struct ScenePanel *input)
 {
     struct ScenePanelInteractionView *panel = (void *)input;

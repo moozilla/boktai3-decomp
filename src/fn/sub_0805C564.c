@@ -1,5 +1,4 @@
 #include "scene_panel_orchestration.h"
-#define ScenePanel_WriteScriptStatus sub_0805C564
 void ScenePanel_WriteScriptStatus(void)
 {
     if (gUnk_020004A4) {
