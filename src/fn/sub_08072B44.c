@@ -1,8 +1,6 @@
-#include "global.h"
-
-extern u32 gUnk_020004A8;
-
-u32 sub_08072B44(void)
+#include "scene_actor_registry.h"
+#define SceneActorRegistry_GetManager sub_08072B44
+struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void)
 {
     return gUnk_020004A8;
 }
