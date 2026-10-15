@@ -64,6 +64,24 @@ state2A8/phase2A9/counter2AC, chooses behavior2AA=3, sets field2B1=1, and sets
 `flags2D0 & 1000`. These numeric states are deliberately retained: the reviewed
 stores do not establish a game-level departure/reset animation identity.
 
+`704EC` reads optional category filter `k` and secondary flag `s`. Healthy actors
+with `flags2CC & 2` take its primary path: health and fieldAA become zero,
+position becomes `(0,30000,0)`, the drawable is hidden, and control21C becomes
+`7FC90` with substate2B5=16 and behavior state2A8=3. It then calls `771E4` and,
+unless scene flags `030053F4 & 4800` or actor flag `2D0 & 800` suppress it,
+passes global halfword `030039F0` and the low 16 bits of actor ID to `6FA74`.
+That helper manages a 20-entry key/ID table at GameState+670; its mode-derived
+counter is not established as a frame timer. The secondary path selects other
+available actors with the same category filter, clears health/fieldAA, sets
+`flags2CC & 1000`, and conditionally sets `flags2D0 & 400000` when `s` is nonzero.
+
+`70834` reads actor ID `n` and preservation flag `m`, requires `flags2C0 & 100`,
+then requests numeric state2A8=2, clears phase/behavior/counter, and sets
+field2B1=1. A zero `m` additionally installs `7FC90`, chooses substate2B5=16,
+and resets the control-entry fields. Both cases set `flags2D4 & 4000` and
+`flags2D0 & 8`. The numeric state remains unnamed pending stronger caller
+contracts. `7FC90` itself only clears byte2B2 when it is nonzero.
+
 ## Boundaries and validation
 
 The section spans 3,896 bytes and has 22 function entries, including known
@@ -72,8 +90,8 @@ independent entries `70444` and `70E44` that gbadisasm leaves as data. Thus
 has size 68, followed by the separate 108-byte `70E44`. These entries already
 exist in the repository's build/progress extra-function metadata.
 
-The current frozen query/control cohort contains eleven new exact functions,
-**+0.0492 percentage points** (1,188 bytes), all register-pinned. Four prior exact functions
+The current frozen query/control cohort contains thirteen new exact functions,
+**+0.0789 percentage points** (1,904 bytes), all register-pinned. Four prior exact functions
 (124 bytes) were reviewed and typed without additional credit. Each function
 passed a full-size fast check after formatting. The parent performs name
 promotion and one combined complete ROM build before integration.
@@ -84,8 +102,10 @@ promotion and one combined complete ROM build before integration.
 | 080703F0 | 84 | Count living actors in a category | New, pinned |
 | 08070444 | 96 | Count with category and field1E6 filter | New, pinned |
 | 080704A4 | 72 | Find first living actor | New, pinned |
+| 080704EC | 496 | Defeat selected scripted actors and change control | New, pinned |
 | 080706DC | 272 | Reset control/state for selected categories | New, pinned |
 | 080707EC | 72 | Restore scripted actor fieldAA | New, pinned |
+| 08070834 | 220 | Request state with optional control preservation | New, pinned |
 | 08070A40 | 80 | Set scripted actor movement mode | New, pinned |
 | 08070A90 | 140 | Set movement mode across eligible registry actors | New, pinned |
 | 08070E00 | 68 | Continue after ID, excluding flag bit one | New, pinned |
@@ -101,6 +121,7 @@ and 3→2 respectively. The continuation helpers retain 3 and 3 hints (the latte
 reduced from 8), and the flags query reduced 17→8. No handwritten instruction bodies or explicit r7 bindings are used.
 The control reset reduced 42→17 hints, the field-restoration script 7→3, the
 individual movement-mode request 9→3, and the registry-wide mode request 21→10.
+The defeat routine reduced 90→26 hints and the individual state request 35→12.
 
 The control reset also demonstrated the compiler branch-length estimate issue:
 its near-exact body measured 276 bytes, with a long entry branch and consequent
