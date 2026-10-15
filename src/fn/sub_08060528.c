@@ -1,17 +1,10 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x68];
-    s16 v[8];
-};
-extern struct S *gUnk_02000710;
-
-s32 sub_08060528(s32 a)
+#include "scene_inventory_actions.h"
+s32 SceneInventory_FindEquippedSlot(s32 selected)
 {
     s32 i = 0;
-    s16 *p = gUnk_02000710->v;
-    for (i = 0; i < 8; p++, i++) {
-        if (*p == a)
+    s16 *slot = ((struct SceneInputEquipmentView *)gUnk_02000710)->primary;
+    for (i = 0; i < 8; slot++, i++) {
+        if (*slot == selected)
             return i;
     }
     return -1;

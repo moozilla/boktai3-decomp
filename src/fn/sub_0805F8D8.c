@@ -1,12 +1,5 @@
-#include "global.h"
-
-struct S {
-    u8 f[8];
-    s16 v;
-};
-struct S *sub_0822E288(void);
-
-s32 sub_0805F8D8(void)
+#include "scene_item_values.h"
+s32 SceneItemValue_GetConsumableBaseValue(u32 index)
 {
-    return sub_0822E288()->v;
+    return sub_0822E288(index)->baseValue;
 }

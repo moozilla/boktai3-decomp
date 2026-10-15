@@ -4,7 +4,7 @@ extern u8 *gUnk_02000710;
 void SceneHud_DrawClock(int);
 void SceneHud_DrawNumericStatus(int);
 void sub_08215F38(int, int, int, int, int, int, int);
-void sub_0805F3A4(int *, int *, int, int);
+void SceneInputPanel_GetEquippedValues(int *, int *, int, int);
 void SceneHud_FillTile020(int, int, int);
 int sub_0815A384(int);
 void sub_0801A634(void *);
@@ -25,7 +25,7 @@ void SelectionMenu_DrawStatistics(u8 *p)
     }
     a = 0;
     b = 0;
-    sub_0805F3A4(&a, &b, 0, 0);
+    SceneInputPanel_GetEquippedValues(&a, &b, 0, 0);
     if (b > 0)
         sub_08215F38(0, 9, 10, b, 33, 3, 15);
     else
