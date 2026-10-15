@@ -1,5 +1,4 @@
 #include "directional_force.h"
-#define DirectionalForce_Stop sub_080510B8
 void DirectionalForce_Stop(void)
 {
     struct DirectionalForce *force = gUnk_02000114;

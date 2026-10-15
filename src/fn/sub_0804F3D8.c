@@ -1,22 +1,21 @@
 #include "global.h"
-#define ResourceStation_Tick sub_0804F3D8
-void sub_0804F384(u8 *);
-void sub_0804EFB4(u8 *);
-void sub_0804F0B4(u8 *);
-void sub_0804F140(u8 *);
-void sub_0804F1FC(u8 *);
+void ResourceStation_ReadDisplayCommands(u8 *);
+void ResourceStation_CheckInteraction(u8 *);
+void ResourceStation_TransferStoredResource(u8 *);
+void ResourceStation_UpdateAnimation(u8 *);
+void ResourceStation_UpdateDigits(u8 *);
 u32 ResourceStation_Tick(u8 *p)
 {
-    sub_0804F384(p);
+    ResourceStation_ReadDisplayCommands(p);
     switch (p[0x262]) {
         case 0:
-            sub_0804EFB4(p);
+            ResourceStation_CheckInteraction(p);
             break;
         case 1:
-            sub_0804F0B4(p);
+            ResourceStation_TransferStoredResource(p);
             break;
     }
-    sub_0804F140(p);
-    sub_0804F1FC(p);
+    ResourceStation_UpdateAnimation(p);
+    ResourceStation_UpdateDigits(p);
     return 0;
 }

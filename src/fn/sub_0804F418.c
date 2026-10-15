@@ -1,5 +1,4 @@
 #include "global.h"
-#define ResourceStation_Destroy sub_0804F418
 extern u8 *gUnk_02000114;
 void Sprite_Remove(u8 *);
 void Anim_Remove(u8 *);

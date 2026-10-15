@@ -1,5 +1,4 @@
 #include "resource_station.h"
-#define ResourceStation_UpdateAnimation sub_0804F140
 void ResourceStation_UpdateAnimation(struct ResourceStation *station)
 {
     struct ResourceStationPlayer *player = station->player;

@@ -6,7 +6,7 @@ void RepeatedEffect_AddFromScript(void)
     s32 tag, initialState, bodyEnabled, behaviorFlags, constrainCell;
     struct ContactPackedVector position;
     if (!manager)
-        manager = sub_0804FFEC();
+        manager = RepeatedEffect_CreateManager();
     if (manager->count > 7)
         return;
     if (Script_SeekToKeyword('n'))
@@ -38,7 +38,7 @@ void RepeatedEffect_AddFromScript(void)
         constrainCell = Script_GetValue();
     else
         constrainCell = 0;
-    sub_0804FEFC(manager, tag, (struct RepeatedEffectPosition *)&position, initialState,
-                 bodyEnabled, behaviorFlags, constrainCell);
+    RepeatedEffect_InitEntry(manager, tag, (struct RepeatedEffectPosition *)&position, initialState,
+                             bodyEnabled, behaviorFlags, constrainCell);
     manager->count++;
 }

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "breakable_prop.h"
-#define BreakableProp_InitializeFromScript sub_08051858
 static inline u32 cellAtPosition(struct ContactPosition *position)
 {
     s16 *xAddress = (s16 *)position;
@@ -74,8 +73,8 @@ s32 BreakableProp_InitializeFromScript(struct BreakableProp *input, u32 id, u32 
         prop->height = (point->y >> 8) + 1;
     }
     sub_0821D698(prop->terrainRegistration, prop->cell, 0, prop->height, 255, 0x103);
-    sub_0805175C(prop, &packet);
-    sub_080517D0(prop, id, &packet);
+    BreakableProp_InitializeSprite(prop, &packet);
+    BreakableProp_InitializeCollider(prop, id, &packet);
     script = Script_SeekToKeyword('R');
     if (script)
         prop->scriptId = Script_GetValue();

@@ -1,8 +1,7 @@
 #include "directional_force.h"
-#define DirectionalForce_ConfigureRandomFromScript sub_0805110C
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-void sub_080510E0(s32, s32, s32, s32);
+void DirectionalForce_ConfigureRandom(s32, s32, s32, s32);
 void DirectionalForce_ConfigureRandomFromScript(void)
 {
     s32 a, b, c, d;
@@ -20,5 +19,5 @@ void DirectionalForce_ConfigureRandomFromScript(void)
         c = 0x78;
         d = 0x78;
     }
-    sub_080510E0(a, b, c, d);
+    DirectionalForce_ConfigureRandom(a, b, c, d);
 }

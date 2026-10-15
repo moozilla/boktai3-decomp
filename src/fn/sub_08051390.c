@@ -1,5 +1,4 @@
 #include "directional_force.h"
-#define DirectionalForce_Destroy sub_08051390
 
 extern u16 gUnk_0200052C;
 extern u16 gUnk_02000550;

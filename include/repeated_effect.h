@@ -43,23 +43,24 @@ struct RepeatedEffectManager {
     struct RepeatedEffect entries[8];
 };
 extern struct RepeatedEffectManager *gUnk_02000110;
-void sub_0804F7D0(struct RepeatedEffect *, u8, void (*)(struct RepeatedEffect *));
-void sub_0804F8CC(struct RepeatedEffect *);
-void sub_0804F888(struct RepeatedEffect *);
-void sub_0804F91C(struct RepeatedEffect *);
-void sub_0804F9C4(struct RepeatedEffect *);
-void sub_0804F970(struct RepeatedEffect *);
-void sub_0804FB0C(struct RepeatedEffect *);
-void sub_0804FB48(struct RepeatedEffect *);
-void sub_0804FD70(struct RepeatedEffect *, u32, struct RepeatedEffectPosition *, u32, u32, u32);
-void sub_0804FDB4(struct RepeatedEffect *, struct RepeatedEffectPosition *, u32);
-void sub_0804FE20(struct RepeatedEffect *);
-void sub_0804FEA8(struct RepeatedEffect *);
-void sub_0804FEFC(struct RepeatedEffectManager *, u32, struct RepeatedEffectPosition *, u32, u32,
-                  u32, u32);
-void sub_0804FC84(struct RepeatedEffect *);
-s32 sub_0804FF48(struct RepeatedEffectManager *);
-s32 sub_0804FF70(struct RepeatedEffectManager *);
-s32 sub_0804FFDC(struct RepeatedEffectManager *);
-struct RepeatedEffectManager *sub_0804FFEC(void);
+void RepeatedEffect_SetState(struct RepeatedEffect *, u8, void (*)(struct RepeatedEffect *));
+void RepeatedEffect_TickLowerTransition(struct RepeatedEffect *);
+void RepeatedEffect_TickLowerState(struct RepeatedEffect *);
+void RepeatedEffect_TickLowerRecovery(struct RepeatedEffect *);
+void RepeatedEffect_TickUpperTransition(struct RepeatedEffect *);
+void RepeatedEffect_TickUpperState(struct RepeatedEffect *);
+void RepeatedEffect_TickUpperRecovery(struct RepeatedEffect *);
+void RepeatedEffect_TickNeutral(struct RepeatedEffect *);
+void RepeatedEffect_InitParameters(struct RepeatedEffect *, u32, struct RepeatedEffectPosition *,
+                                   u32, u32, u32);
+void RepeatedEffect_InitSprite(struct RepeatedEffect *, struct RepeatedEffectPosition *, u32);
+void RepeatedEffect_InitCollider(struct RepeatedEffect *);
+void RepeatedEffect_InitState(struct RepeatedEffect *);
+void RepeatedEffect_InitEntry(struct RepeatedEffectManager *, u32, struct RepeatedEffectPosition *,
+                              u32, u32, u32, u32);
+void RepeatedEffect_TickEntry(struct RepeatedEffect *);
+s32 RepeatedEffect_TickManager(struct RepeatedEffectManager *);
+s32 RepeatedEffect_DestroyManager(struct RepeatedEffectManager *);
+s32 RepeatedEffect_InitManager(struct RepeatedEffectManager *);
+struct RepeatedEffectManager *RepeatedEffect_CreateManager(void);
 #endif

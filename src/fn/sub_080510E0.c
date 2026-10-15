@@ -1,5 +1,4 @@
 #include "directional_force.h"
-#define DirectionalForce_ConfigureRandom sub_080510E0
 void DirectionalForce_ConfigureRandom(u32 a, u32 b, u32 c, u32 d)
 {
     struct DirectionalForce *p = gUnk_02000114;

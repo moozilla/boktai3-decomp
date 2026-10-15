@@ -1,5 +1,4 @@
 #include "directional_force.h"
-#define DirectionalForce_ConfigureFixed sub_08051158
 void DirectionalForce_ConfigureFixed(u32 a, u32 b, u32 c, u32 d, u32 e)
 {
     struct DirectionalForce *p = gUnk_02000114;

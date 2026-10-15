@@ -1,5 +1,4 @@
 #include "global.h"
-#define ResourceStation_InitializeDigits sub_0804F4AC
 struct Z {
     u32 x, y;
 };

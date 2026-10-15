@@ -1,5 +1,4 @@
 #include "repeated_effect.h"
-#define RepeatedEffect_TickLowerRecovery sub_0804F91C
 void Sound_PlaySong(s32);
 
 void RepeatedEffect_TickLowerRecovery(struct RepeatedEffect *p)
@@ -17,6 +16,6 @@ void RepeatedEffect_TickLowerRecovery(struct RepeatedEffect *p)
     } else {
         p->sprite.frame = 2;
         Sound_PlaySong(0x1a0);
-        sub_0804F7D0(p, 0, sub_0804FB48);
+        RepeatedEffect_SetState(p, 0, RepeatedEffect_TickNeutral);
     }
 }

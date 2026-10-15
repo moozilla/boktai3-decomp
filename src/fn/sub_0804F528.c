@@ -1,5 +1,4 @@
 #include "global.h"
-#define ResourceStation_SetTriggerPosition sub_0804F528
 
 struct D {
     u32 a;

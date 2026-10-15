@@ -1,5 +1,4 @@
 #include "global.h"
-#define ResourceStation_InitializeCollider sub_0804F568
 struct H {
     u32 lo : 16;
     u32 hi : 16;

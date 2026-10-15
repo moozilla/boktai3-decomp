@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "repeated_effect.h"
-#define RepeatedEffect_TickNeutral sub_0804FB48
 void RepeatedEffect_TickNeutral(struct RepeatedEffect *effect)
 {
     if (effect->request) {
@@ -49,7 +48,7 @@ void RepeatedEffect_TickNeutral(struct RepeatedEffect *effect)
             } else {
                 effect->balance--;
                 if (effect->balance < -300)
-                    sub_0804F7D0(effect, 1, sub_0804F8CC);
+                    RepeatedEffect_SetState(effect, 1, RepeatedEffect_TickLowerTransition);
             }
         } else if (intensity > 7) {
             if (effect->behaviorFlags & 1) {
@@ -59,7 +58,7 @@ void RepeatedEffect_TickNeutral(struct RepeatedEffect *effect)
             } else {
                 effect->balance++;
                 if (effect->balance > 300)
-                    sub_0804F7D0(effect, 2, sub_0804F9C4);
+                    RepeatedEffect_SetState(effect, 2, RepeatedEffect_TickUpperTransition);
             }
         }
     }

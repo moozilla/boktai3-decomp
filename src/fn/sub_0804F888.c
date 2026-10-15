@@ -1,5 +1,4 @@
 #include "repeated_effect.h"
-#define RepeatedEffect_TickLowerState sub_0804F888
 
 void RepeatedEffect_TickLowerState(struct RepeatedEffect *p)
 {
@@ -8,6 +7,6 @@ void RepeatedEffect_TickLowerState(struct RepeatedEffect *p)
         u32 v = *c + 1;
         *c = v;
         if ((s32)(v << 16) > 0x012B0000)
-            sub_0804F7D0(p, 0, sub_0804F91C);
+            RepeatedEffect_SetState(p, 0, RepeatedEffect_TickLowerRecovery);
     }
 }
