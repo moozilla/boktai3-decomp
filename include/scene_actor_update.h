@@ -2,6 +2,10 @@
 #define GUARD_SCENE_ACTOR_UPDATE_H
 #include "scene_actor_behavior.h"
 #include "scene_actor_contact_list.h"
+struct SceneActorUpdateStatePair {
+    u8 unknown0[0xA8];
+    s16 values[2];
+};
 /* Narrow update-phase views; offsets and names remain provisional. */
 struct SceneActorUpdateControl {
     u8 unknown0[0x1F6];
