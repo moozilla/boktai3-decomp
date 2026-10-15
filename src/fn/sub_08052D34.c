@@ -1,15 +1,8 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x382];
-    u16 t;
-};
-void sub_08052628(struct S *, void (*)(void));
-void sub_08052D60(void);
-
-void sub_08052D34(struct S *p)
+#include "stacked_actor.h"
+#define StackedActor_WaitForScriptParticles sub_08052D34
+void StackedActor_WaitForScriptParticles(struct StackedActor *p)
 {
-    p->t++;
-    if (p->t > 0xf)
+    p->frame++;
+    if (p->frame > 0xf)
         sub_08052628(p, sub_08052D60);
 }
