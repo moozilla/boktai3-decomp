@@ -1,16 +1,12 @@
-#include "global.h"
-struct P {
-    u8 f[0x6a0];
-    u16 f6a0, f6a2, f6a4;
-    u16 f6a6;
-    u16 f6a8, f6aa, f6ac;
-};
-void sub_0805B0B4(struct P *p)
+#include "scene_panel_rig_setup.h"
+#define ScenePanelRig_InitPayloadVectors sub_0805B0B4
+void ScenePanelRig_InitPayloadVectors(struct ScenePanelRig *rig)
 {
-    p->f6a0 = 0xa0;
-    p->f6a2 = 0xa0;
-    p->f6a4 = 0xa0;
-    p->f6a8 = 0x40;
-    p->f6aa = 0x20;
-    p->f6ac = 0x40;
+    struct SceneRigPayloadView *view = (void *)rig;
+    view->firstX = 160;
+    view->firstY = 160;
+    view->firstZ = 160;
+    view->secondX = 64;
+    view->secondY = 32;
+    view->secondZ = 64;
 }
