@@ -1,3 +1,6 @@
+#include "global.h"
+#ifdef NONMATCHING
+// fuzzy: 26.9%
 #include "proximity_emitter.h"
 u32 ProximityEmitter_IsTetherNearby(struct ProximityEmitter *emitter)
 {
@@ -22,4 +25,10 @@ u32 ProximityEmitter_IsTetherNearby(struct ProximityEmitter *emitter)
         if (dx * dx + dz * dz <= 16383)
             return 1;
     }
+    /* The original retains this nonnull pointer in the square corners. */
+    return (u32)tether;
 }
+
+#else
+INCLUDE_ASM("asm/nonmatching", ProximityEmitter_IsTetherNearby);
+#endif
