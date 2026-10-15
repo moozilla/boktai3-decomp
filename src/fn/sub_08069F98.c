@@ -1,8 +1,6 @@
-#include "global.h"
-
-extern u32 gUnk_02000160;
-
-void sub_08069F98(void)
+#include "burst_emitter.h"
+#define BurstEmitter_ClearPool sub_08069F98
+void BurstEmitter_ClearPool(void)
 {
-    gUnk_02000160 = 0;
+    gUnk_02000160 = NULL;
 }
