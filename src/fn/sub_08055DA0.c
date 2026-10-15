@@ -1,5 +1,4 @@
 #include "stage_icon_display.h"
-#define StageIconDisplay_Destroy sub_08055DA0
 s32 StageIconDisplay_Destroy(struct StageIconDisplay *display)
 {
     struct ProjectedDisplayEntry *indicator;

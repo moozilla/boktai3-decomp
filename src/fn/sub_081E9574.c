@@ -77,7 +77,7 @@ struct Child {
     u8 rest[0xdc - 6];
 };
 void sub_081E5608(void *, void *);
-void sub_08056CC0(void);
+void ScriptUtility_ClearControlFlag(void);
 void sub_081E4174(void *);
 void AnimData_SelectPaletteBank(void *, s32);
 void Sound_PlaySong(s32);
@@ -158,7 +158,7 @@ void sub_081E9574(struct S *p)
     p->done = done;
     if (done) {
         if (*((u8 *)p + 0xf76))
-            sub_08056CC0();
+            ScriptUtility_ClearControlFlag();
         p->obj.flags |= 1;
         p->oldMode = p->mode;
         {

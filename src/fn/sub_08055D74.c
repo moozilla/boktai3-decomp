@@ -1,5 +1,4 @@
 #include "stage_icon_display.h"
-#define StageIconDisplay_Tick sub_08055D74
 s32 StageIconDisplay_Tick(struct StageIconDisplay *display)
 {
     if (display->killRequested)

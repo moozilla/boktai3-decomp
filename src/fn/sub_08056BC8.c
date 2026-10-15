@@ -1,5 +1,4 @@
 #include "script_utility.h"
-#define ScriptUtility_GetKeys sub_08056BC8
 u32 ScriptUtility_GetKeys(void)
 {
     if (Script_SeekToKeyword('p')) {

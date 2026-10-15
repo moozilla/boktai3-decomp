@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "stage_icon_display.h"
-#define StageIconDisplay_Initialize sub_08055EEC
 s32 StageIconDisplay_Initialize(struct StageIconDisplay *display, s32 variant, u32 option,
                                 void (*completion)(void *, struct StageIconDisplay *),
                                 void *argument)
@@ -9,8 +8,8 @@ s32 StageIconDisplay_Initialize(struct StageIconDisplay *display, s32 variant, u
     display->completion = completion;
     display->completionArgument = argument;
     display->option = option;
-    sub_08055DD4(display, variant);
-    sub_08055EB8(display, variant);
+    StageIconDisplay_InitAnimations(display, variant);
+    StageIconDisplay_SelectUpdate(display, variant);
     {
         s32 incidental;
         asm("" : "=r"(incidental));

@@ -1,5 +1,4 @@
 #include "script_utility.h"
-#define ScriptUtility_CallRepeatedFromScript sub_08056A90
 s32 ScriptUtility_CallRepeatedFromScript(void)
 {
     struct ScriptUtilityArguments args;

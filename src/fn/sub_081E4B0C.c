@@ -18,7 +18,7 @@ struct G {
     u8 e;
 };
 void Sound_PlaySong(u32);
-void sub_08056CC0(void);
+void ScriptUtility_ClearControlFlag(void);
 void sub_081E4B0C(u32 phase)
 {
     struct G *g = (struct G *)gUnk_020003C8;
@@ -33,7 +33,7 @@ void sub_081E4B0C(u32 phase)
         return;
     }
     if (phase == 14) {
-        sub_08056CC0();
+        ScriptUtility_ClearControlFlag();
         return;
     }
     phase = (u16)phase;

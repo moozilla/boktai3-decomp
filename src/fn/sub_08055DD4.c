@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "stage_icon_display.h"
 #include "scene_object.h"
-#define StageIconDisplay_InitAnimations sub_08055DD4
 void StageIconDisplay_InitAnimations(struct StageIconDisplay *argument, s32 variantArgument)
 {
     struct StageIconDisplay *display = argument;

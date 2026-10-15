@@ -1,5 +1,4 @@
 #include "script_utility.h"
-#define ScriptUtility_ClearControlFlag sub_08056CC0
 void sub_0822B560(void);
 void ScriptUtility_ClearControlFlag(void)
 {

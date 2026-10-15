@@ -1,5 +1,4 @@
 #include "shake_icon_display.h"
-#define ShakeIconDisplay_Tick sub_08056DBC
 s32 ShakeIconDisplay_Tick(struct ShakeIconDisplay *display)
 {
     u16 *frame;

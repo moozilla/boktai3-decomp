@@ -15,6 +15,6 @@ void sub_0821AAD8(struct ScriptUtilityReference *);
 void sub_0821B4C8(struct ScriptUtilityReference *, s32, s32);
 s32 sub_0821AA00(const void *);
 u32 sub_0821AFB4(u32, struct ScriptUtilityArguments *);
-void sub_08056C6C(s32);
-void sub_08056CC0(void);
+void ScriptUtility_SetControlFlag(s32);
+void ScriptUtility_ClearControlFlag(void);
 #endif
