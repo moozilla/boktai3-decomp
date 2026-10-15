@@ -9,7 +9,8 @@ u32 ProximityEmitter_Destroy(struct ProximityEmitter *emitter)
     particle = emitter->particles;
     i = 7;
     do {
-        Effect_Remove(particle++);
+        Effect_Remove(particle);
+        particle++;
     } while (--i >= 0);
     return 0;
 }
