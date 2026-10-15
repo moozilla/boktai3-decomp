@@ -59,18 +59,18 @@ struct ScenePanelEffectsView {
     u8 unknown1432[0x37A];
     u32 pendingScriptId;
 };
-void sub_08057960(struct ScenePanel *, u16);
-void sub_08057978(struct ScenePanel *, u32);
-void sub_080579B0(struct ScenePanel *);
-void sub_08057A44(struct ScenePanel *, union ScenePanelPosition *, union ScenePanelPosition *, u32,
-                  u32);
-void sub_08057ADC(struct ScenePanel *);
-void sub_08057AFC(struct ScenePanel *);
-void sub_08057B5C(struct ScenePanel *, s32);
-s32 sub_08057C58(struct ScenePanelMainSprite *);
-s32 sub_08057C78(struct ScenePanelMainSprite *);
-void sub_08057CB8(struct ScenePanel *);
-void sub_08057E04(struct ScenePanel *);
+void ScenePanel_SetEffectState(struct ScenePanel *, u16);
+void ScenePanel_CallPendingScript(struct ScenePanel *, u32);
+void ScenePanel_UpdateParticles(struct ScenePanel *);
+void ScenePanel_AddParticle(struct ScenePanel *, union ScenePanelPosition *,
+                            union ScenePanelPosition *, u32, u32);
+void ScenePanel_DestroyParticles(struct ScenePanel *);
+void ScenePanel_InitParticles(struct ScenePanel *);
+void ScenePanel_SelectTimePalette(struct ScenePanel *, s32);
+s32 ScenePanel_IsSpriteVisible(struct ScenePanelMainSprite *);
+s32 ScenePanel_AdvancePaletteFrame(struct ScenePanelMainSprite *);
+void ScenePanel_InitTimePalette(struct ScenePanel *);
+void ScenePanel_UpdateTimePalette(struct ScenePanel *);
 void sub_08217DE0(struct ScenePanelParticle *, void *, u32);
 void sub_08217EEC(struct ScenePanelParticle *, void *, u32);
 void sub_08217EC4(struct ScenePanelParticle *, s32, s32);

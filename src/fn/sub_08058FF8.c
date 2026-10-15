@@ -1,5 +1,4 @@
 #include "scene_panel.h"
-#define ScenePanel_DrawBackgroundLayers sub_08058FF8
 void sub_08058700(struct ScenePanel *, s32, s32, s32, s32);
 void sub_08058BD8(struct ScenePanel *, s32, s32, s32, s32);
 void ScenePanel_DrawBackgroundLayers(struct ScenePanel *panel)

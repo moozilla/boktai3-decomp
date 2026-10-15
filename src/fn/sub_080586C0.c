@@ -1,5 +1,4 @@
 #include "scene_panel.h"
-#define ScenePanel_BeginBackgroundBurst sub_080586C0
 void ScenePanel_BeginBackgroundBurst(void)
 {
     if (gUnk_020004A4) {

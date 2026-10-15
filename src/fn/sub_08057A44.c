@@ -1,5 +1,4 @@
 #include "scene_panel_effects.h"
-#define ScenePanel_AddParticle sub_08057A44
 void ScenePanel_AddParticle(struct ScenePanel *input, union ScenePanelPosition *position,
                             union ScenePanelPosition *velocity, u32 lifetime, u32 renderMode)
 {

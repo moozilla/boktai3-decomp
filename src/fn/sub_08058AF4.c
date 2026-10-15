@@ -1,5 +1,4 @@
 #include "scene_panel.h"
-#define ScenePanel_InitOverlay sub_08058AF4
 void ScenePanel_InitOverlay(struct ScenePanel *panel)
 {
     struct OverlayResource {

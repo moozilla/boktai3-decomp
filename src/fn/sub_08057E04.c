@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_panel_effects.h"
-#define ScenePanel_UpdateTimePalette sub_08057E04
 /* Persistent loop state; empty barriers preserve the reviewed stack layout. */
 struct ScenePanelPaletteScratch {
     s32 column;
@@ -19,7 +18,7 @@ void ScenePanel_UpdateTimePalette(struct ScenePanel *input)
     phaseField = &panel->timePhase;
     if (*phaseField != phase) {
         *phaseField = phase;
-        sub_08057B5C((struct ScenePanel *)panel, *phaseField);
+        ScenePanel_SelectTimePalette((struct ScenePanel *)panel, *phaseField);
     }
     if (panel->paletteBlendActive) {
         u16 *blendFrame;
@@ -45,8 +44,8 @@ void ScenePanel_UpdateTimePalette(struct ScenePanel *input)
             panel->paletteBlendActive = 0;
             {
                 struct ScenePanelMainSprite *sprite = &panel->mainSprite;
-                if (sub_08057C58(sprite)) {
-                    s32 frame = sub_08057C78(sprite);
+                if (ScenePanel_IsSpriteVisible(sprite)) {
+                    s32 frame = ScenePanel_AdvancePaletteFrame(sprite);
                     u16 *framePointer = &panel->mainSprite.paletteFrame;
                     *framePointer = frame;
                     {
@@ -57,7 +56,7 @@ void ScenePanel_UpdateTimePalette(struct ScenePanel *input)
                         frameValue = *framePointer;
                         frameValue += 0x203;
                         bank += frameValue;
-                        sub_08215284(graphics, bank);
+                        AnimData_SelectPaletteBank(graphics, bank);
                     }
                 }
             }
@@ -149,8 +148,8 @@ void ScenePanel_UpdateTimePalette(struct ScenePanel *input)
             } while (row <= 15);
             {
                 struct ScenePanelMainSprite *sprite = &panel->mainSprite;
-                if (sub_08057C58(sprite)) {
-                    s32 frame = sub_08057C78(sprite);
+                if (ScenePanel_IsSpriteVisible(sprite)) {
+                    s32 frame = ScenePanel_AdvancePaletteFrame(sprite);
                     u8 **ram = &gUnk_030042E4;
                     u32 offset;
                     u8 *ramBase;
@@ -231,8 +230,8 @@ void ScenePanel_UpdateTimePalette(struct ScenePanel *input)
         }
     } else {
         struct ScenePanelMainSprite *sprite = &panel->mainSprite;
-        if (sub_08057C58(sprite)) {
-            s32 frame = sub_08057C78(sprite);
+        if (ScenePanel_IsSpriteVisible(sprite)) {
+            s32 frame = ScenePanel_AdvancePaletteFrame(sprite);
             u16 *framePointer = &panel->mainSprite.paletteFrame;
             {
                 register u32 oldFrame asm("r3") = *framePointer;
@@ -251,7 +250,7 @@ void ScenePanel_UpdateTimePalette(struct ScenePanel *input)
                             frameValue += paletteBase;
                         }
                         bank += frameValue;
-                        sub_08215284(graphics, bank);
+                        AnimData_SelectPaletteBank(graphics, bank);
                     }
                 }
             }

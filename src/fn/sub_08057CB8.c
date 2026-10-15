@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_panel_effects.h"
-#define ScenePanel_InitTimePalette sub_08057CB8
 void ScenePanel_InitTimePalette(struct ScenePanel *input)
 {
     struct ScenePanelEffectsView *panel = (void *)input;
@@ -27,7 +26,7 @@ void ScenePanel_InitTimePalette(struct ScenePanel *input)
         do {
             u32 offset = i << 2;
             u8 *resource;
-            resource = sub_0821A520(0x92B3, (u16)*read++);
+            resource = ScriptProc_Start(0x92B3, (u16)*read++);
             {
                 u8 *base = (u8 *)panel + 0x220;
                 base += offset;
@@ -37,7 +36,7 @@ void ScenePanel_InitTimePalette(struct ScenePanel *input)
         } while (i < 3);
     }
     panel->timePhase = sub_08228DB8();
-    sub_08057B5C((struct ScenePanel *)panel, panel->timePhase);
+    ScenePanel_SelectTimePalette((struct ScenePanel *)panel, panel->timePhase);
     panel->paletteBlendActive = 0;
     panel->paletteBlendFrame = 0;
     colors = panel->paletteSources[panel->targetPalette];
@@ -70,8 +69,8 @@ void ScenePanel_InitTimePalette(struct ScenePanel *input)
     }
     {
         struct ScenePanelMainSprite *sprite = &panel->mainSprite;
-        if (sub_08057C58(sprite)) {
-            sprite->paletteFrame = sub_08057C78(sprite);
+        if (ScenePanel_IsSpriteVisible(sprite)) {
+            sprite->paletteFrame = ScenePanel_AdvancePaletteFrame(sprite);
             {
                 struct ScenePanelGraphics *graphics = &sprite->graphics;
                 u32 bank;
@@ -80,7 +79,7 @@ void ScenePanel_InitTimePalette(struct ScenePanel *input)
                 paletteFrame = sprite->paletteFrame;
                 paletteFrame += 0x203;
                 bank += paletteFrame;
-                sub_08215284(graphics, bank);
+                AnimData_SelectPaletteBank(graphics, bank);
             }
         }
     }

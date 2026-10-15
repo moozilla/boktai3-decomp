@@ -1,5 +1,4 @@
 #include "scene_panel_effects.h"
-#define ScenePanel_SelectTimePalette sub_08057B5C
 void ScenePanel_SelectTimePalette(struct ScenePanel *input, s32 phase)
 {
     struct ScenePanelEffectsView *panel = (void *)input;
