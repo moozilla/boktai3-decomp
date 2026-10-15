@@ -2,6 +2,7 @@
 #define GUARD_SCENE_INVENTORY_TAIL_H
 #include "scene_input_navigation.h"
 #include "scene_input_panel.h"
+#include "scene_inventory_callback.h"
 /* Phase-specific controller view; the catalog/transition workspace overlaps it. */
 struct SceneInventoryTail {
     struct SceneInputPanel display;
@@ -13,8 +14,8 @@ struct SceneInventoryTail {
     u8 unknown1C14[0x1D00 - 0x1C14];
     struct SceneInputHighlight highlight;
 };
-void SceneInputPanel_HighlightCompare(void *, void *);
-void SceneInputPanel_HighlightPrompt(void *, void *);
+void SceneInputPanel_HighlightCompare(struct SceneInputPanel *, u16 *);
+void SceneInputPanel_HighlightPrompt(struct SceneInputPanel *, u16 *);
 u32 SceneInput_NavigateGrid(struct SceneInputGridView *);
 s32 sub_08061C3C(struct SceneInventoryTail *);
 s32 sub_08061CFC(struct SceneInventoryTail *);
