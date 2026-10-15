@@ -1,5 +1,4 @@
 #include "stacked_actor.h"
-#define StackedActor_RetractToIdle sub_080528D0
 void Trigger_ConsumePending(void *, u32);
 void StackedActor_RetractToIdle(struct StackedActor *o)
 {
@@ -8,10 +7,10 @@ void StackedActor_RetractToIdle(struct StackedActor *o)
         o->sprite.position.y += 2;
     if (o->height != 0) {
         o->height--;
-        sub_08052418(o);
+        StackedActor_UpdateSegments(o);
     } else {
         o->shadow.flags &= ~1;
-        sub_08052628(o, sub_08052A40);
+        StackedActor_SetUpdate(o, StackedActor_TickIdle);
         Trigger_ConsumePending(&o->trigger, 1);
     }
 }

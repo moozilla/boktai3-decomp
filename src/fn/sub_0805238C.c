@@ -1,5 +1,4 @@
 #include "stacked_actor.h"
-#define StackedActor_IsTetherNearby sub_0805238C
 struct StackedActorTetherView {
     u8 unknown0[0x1A], mode, unknown1B[0x23A], phase;
 };

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "proximity_emitter.h"
-#define ProximityEmitter_InitializeFromScript sub_08051EA8
 s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 unused1,
                                           u32 unused2)
 {
@@ -108,16 +107,16 @@ s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 
         asm("" : "+r"(source));
         *destination = *source;
     }
-    sub_08051E10(emitter);
+    ProximityEmitter_InitializeParticles(emitter);
     if (Script_SeekToKeyword('m') && Script_GetValue()) {
         emitter->primary.sprite.flags |= 1;
         emitter->secondary.sprite.flags |= 1;
-        emitter->update = sub_08051D28;
+        emitter->update = ProximityEmitter_TickGrow;
         Sound_PlaySong(0x15E);
     } else
-        emitter->update = sub_08051BD8;
+        emitter->update = ProximityEmitter_TickActive;
     emitter->stateFrame = 0;
-    if (sub_08051B70(emitter)) {
+    if (ProximityEmitter_IsTetherNearby(emitter)) {
         emitter->nearby = 1;
         nearby = &emitter->nearby;
     } else {
@@ -144,7 +143,7 @@ s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 
         destination = (u32 *)((u8 *)emitter + offset);
         *destination = script;
     }
-    if (sub_08051B70(emitter)) {
+    if (ProximityEmitter_IsTetherNearby(emitter)) {
         u32 value = 1;
         *nearby = value;
         TetherActor_RequestPaletteBlend(value);

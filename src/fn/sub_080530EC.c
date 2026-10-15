@@ -1,10 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "stacked_actor.h"
-#define StackedActor_ConsumeTriggers sub_080530EC
 extern u8 *gUnk_0200047C;
 u32 sub_08020D54(void *, void *);
-void sub_08052660(struct StackedActor *);
-void sub_0805278C(struct StackedActor *);
+void StackedActor_RaiseLift(struct StackedActor *);
+void StackedActor_LowerLift(struct StackedActor *);
 void StackedActor_ConsumeTriggers(struct StackedActor *actor)
 {
     u8 *receiver = actor->trigger;
@@ -30,10 +29,10 @@ void StackedActor_ConsumeTriggers(struct StackedActor *actor)
             sub_08020D54(receiver, message);
             switch (message[6]) {
                 case 5:
-                    sub_08052628(actor, sub_08052660);
+                    StackedActor_SetUpdate(actor, StackedActor_RaiseLift);
                     break;
                 case 6:
-                    sub_08052628(actor, sub_0805278C);
+                    StackedActor_SetUpdate(actor, StackedActor_LowerLift);
                     break;
             }
             i++;

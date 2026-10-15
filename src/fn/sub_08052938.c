@@ -1,5 +1,4 @@
 #include "stacked_actor.h"
-#define StackedActor_Appear sub_08052938
 void AnimData_SelectTiles(void *, u32);
 void StackedActor_Appear(struct StackedActor *actor)
 {
@@ -38,7 +37,7 @@ void StackedActor_Appear(struct StackedActor *actor)
         else {
             AnimData_SelectTiles(actor->graphics, actor->tileBase);
             actor->sprite.flags |= 1;
-            sub_08052628(actor, sub_08052A40);
+            StackedActor_SetUpdate(actor, StackedActor_TickIdle);
         }
     }
 }

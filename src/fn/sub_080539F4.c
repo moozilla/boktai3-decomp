@@ -1,5 +1,4 @@
 #include "interaction_marker.h"
-#define InteractionMarker_TickInteraction sub_080539F4
 struct MarkerScriptArgs {
     u32 count : 16;
     u32 pad : 16;
@@ -16,7 +15,7 @@ void InteractionMarker_TickInteraction(struct InteractionMarker *marker)
         marker->primary.sprite.flags &= ~0x200;
         marker->primary.sprite.priority = 3;
         marker->secondary.sprite.flags |= 1;
-        sub_08053854(marker, sub_08053AAC);
+        InteractionMarker_SetState(marker, InteractionMarker_TickDormant);
         if (marker->scriptId) {
             u32 values[2];
             struct MarkerScriptArgs args;

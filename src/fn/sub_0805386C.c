@@ -1,12 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "interaction_marker.h"
-#define InteractionMarker_TickIdle sub_0805386C
 void InteractionMarker_TickIdle(struct InteractionMarker *marker)
 {
     u32 nearby;
     if (!(gUnk_030053F4 & 0x200) && marker->inputCooldown <= 9)
         marker->inputCooldown++;
-    nearby = sub_080537D0(marker);
+    nearby = InteractionMarker_IsPlayerNearby(marker);
     if (nearby) {
         if (marker->nearby != 1) {
             Sound_PlaySong(0x198);
@@ -33,7 +32,7 @@ void InteractionMarker_TickIdle(struct InteractionMarker *marker)
                         marker->activationFrame = 8;
                         sub_08056C6C(1);
                         sub_0815B0A8(gUnk_02000580[0], &marker->position, 0, 4);
-                        sub_08053854(marker, sub_080539F4);
+                        InteractionMarker_SetState(marker, InteractionMarker_TickInteraction);
                     }
                 }
             }

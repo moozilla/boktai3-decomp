@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "proximity_emitter.h"
-#define ProximityEmitter_TickParticle sub_08051A3C
 void ProximityEmitter_TickParticle(struct ProximityEmitterParticle *particle, void *resource)
 {
     register u32 previous asm("r0") = particle->frame;

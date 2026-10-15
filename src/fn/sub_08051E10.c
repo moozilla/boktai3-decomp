@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "proximity_emitter.h"
-#define ProximityEmitter_InitializeParticles sub_08051E10
 static inline void *resourceAt(void **resource)
 {
     void **address = resource;

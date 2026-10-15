@@ -1,5 +1,4 @@
 #include "proximity_emitter.h"
-#define ProximityEmitter_Destroy sub_08051DE4
 u32 ProximityEmitter_Destroy(struct ProximityEmitter *emitter)
 {
     struct ProximityEmitterParticle *particle;

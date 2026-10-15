@@ -1,5 +1,4 @@
 #include "stacked_actor.h"
-#define StackedActor_RaiseLift sub_08052660
 void Sound_PlaySong(u32);
 void AnimData_SelectTiles(void *, u32);
 void Trigger_ConsumePending(void *, u32);
@@ -29,7 +28,7 @@ void StackedActor_RaiseLift(struct StackedActor *actor)
     else
         AnimData_SelectTiles(actor->graphics, actor->tileBase);
     if (actor->lift > 23) {
-        sub_08052628(actor, sub_08052744);
+        StackedActor_SetUpdate(actor, StackedActor_HoldLift);
         Trigger_ConsumePending(actor->trigger, 1);
     }
 }

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "saved_position_marker.h"
-#define SavedPositionMarker_InitializeFromScript sub_08054028
 u8 *sub_0821D64C(s32, s32);
 s32 SavedPositionMarker_InitializeFromScript(struct SavedPositionMarker *marker, u32 unused1,
                                              u32 unused2)
@@ -199,6 +198,6 @@ s32 SavedPositionMarker_InitializeFromScript(struct SavedPositionMarker *marker,
         destination[0] = lo;
         destination[1] = hi;
     }
-    sub_08053DE8(marker, sub_08053DF8);
+    SavedPositionMarker_SetState(marker, SavedPositionMarker_TickIdle);
     return 0;
 }

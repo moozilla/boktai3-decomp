@@ -1,5 +1,4 @@
 #include "stacked_actor.h"
-#define StackedActor_Disappear sub_08052FE4
 void AnimData_SelectTiles(void *, u32);
 void Task_Kill(struct StackedActor *);
 void StackedActor_Disappear(struct StackedActor *actor)

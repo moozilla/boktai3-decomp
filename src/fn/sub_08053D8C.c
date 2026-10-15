@@ -1,5 +1,4 @@
 #include "saved_position_marker.h"
-#define SavedPositionMarker_IsStoredPositionNearby sub_08053D8C
 u32 SavedPositionMarker_IsStoredPositionNearby(struct SavedPositionMarker *marker)
 {
     struct GameState *state = gUnk_02000710;

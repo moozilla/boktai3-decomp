@@ -28,14 +28,14 @@ struct InteractionMarkerPlayer {
 extern struct InteractionMarkerPlayer *gUnk_02000580[4];
 extern u32 gUnk_02000560;
 extern u16 gUnk_03005260[];
-u32 sub_080537D0(struct InteractionMarker *);
-void sub_08053854(struct InteractionMarker *, void (*)(struct InteractionMarker *));
-void sub_0805386C(struct InteractionMarker *);
-void sub_080539F4(struct InteractionMarker *);
-void sub_08053AAC(struct InteractionMarker *);
+u32 InteractionMarker_IsPlayerNearby(struct InteractionMarker *);
+void InteractionMarker_SetState(struct InteractionMarker *, void (*)(struct InteractionMarker *));
+void InteractionMarker_TickIdle(struct InteractionMarker *);
+void InteractionMarker_TickInteraction(struct InteractionMarker *);
+void InteractionMarker_TickDormant(struct InteractionMarker *);
 void sub_08056C6C(u32);
 void sub_0815B0A8(struct InteractionMarkerPlayer *, struct ContactPosition *, u32, u32);
-u32 sub_08053AB0(struct InteractionMarker *);
-u32 sub_08053AC4(struct InteractionMarker *);
-s32 sub_08053AEC(struct InteractionMarker *, u32, u32);
+u32 InteractionMarker_Tick(struct InteractionMarker *);
+u32 InteractionMarker_Destroy(struct InteractionMarker *);
+s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *, u32, u32);
 #endif

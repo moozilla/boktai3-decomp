@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "proximity_emitter.h"
-#define ProximityEmitter_TickActive sub_08051BD8
 static inline u32 advanceParticleFrame(struct ProximityEmitter *emitter)
 {
     u16 *address = &emitter->particleFrame;
@@ -20,7 +19,7 @@ void ProximityEmitter_TickActive(struct ProximityEmitter *emitter)
 {
     u16 *nearby = &emitter->nearby;
     if (*nearby == 0) {
-        if (sub_08051B70(emitter) && gUnk_02000488->activation == 1) {
+        if (ProximityEmitter_IsTetherNearby(emitter) && gUnk_02000488->activation == 1) {
             *nearby = 1;
             {
                 register u32 offset asm("r2") = 0x260;
@@ -40,10 +39,10 @@ void ProximityEmitter_TickActive(struct ProximityEmitter *emitter)
             frame &= 7;
             asm("" : "+r"(frame));
             if (frame == 0)
-                sub_08051A8C(emitter, emitter->particleResource);
+                ProximityEmitter_EmitParticle(emitter, emitter->particleResource);
         }
     } else {
-        u32 close = sub_08051B70(emitter);
+        u32 close = ProximityEmitter_IsTetherNearby(emitter);
         if (!close) {
             if (emitter->leaveScriptId)
                 Script_Call(emitter->leaveScriptId, 0);
@@ -56,7 +55,7 @@ void ProximityEmitter_TickActive(struct ProximityEmitter *emitter)
             frame &= 3;
             asm("" : "+r"(frame));
             if (frame == 0)
-                sub_08051A8C(emitter, emitter->particleResource);
+                ProximityEmitter_EmitParticle(emitter, emitter->particleResource);
         }
     }
 }

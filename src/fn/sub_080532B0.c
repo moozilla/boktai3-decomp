@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "stacked_actor.h"
-#define StackedActor_Initialize sub_080532B0
 struct ActorMapView {
     u8 unknown0[4];
     u8 *cells;
@@ -16,17 +15,17 @@ u8 *sub_0821D64C(u32, u32);
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void AnimData_SelectTiles(void *, u32);
-void sub_0805321C(struct StackedActor *);
+void StackedActor_InitParticles(struct StackedActor *);
 s32 SceneMessages_RegisterReceiver(void *, s32, s32);
 void Sound_PlaySong(u32);
 void sub_08056C6C(u32);
 void sub_081593A0(u8 *, struct StackedActorPosition *);
 void sub_0815AEE0(u8 *);
-void sub_08052640(struct StackedActor *);
-void sub_08052938(struct StackedActor *);
-void sub_08052E80(struct StackedActor *);
-s32 sub_0804A0A4(void);
-void sub_08049FFC(struct StackedActorPosition *);
+void StackedActor_TickDisabled(struct StackedActor *);
+void StackedActor_Appear(struct StackedActor *);
+void StackedActor_WaitForPlayerRelease(struct StackedActor *);
+s32 TetherActor_BeginKindFourStateTen(void);
+void TetherActor_SetPosition(struct StackedActorPosition *);
 s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
 {
     struct InitCache {
@@ -254,7 +253,7 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
                 }
                 count = i;
             } while (count <= 2);
-            sub_0805321C(actor);
+            StackedActor_InitParticles(actor);
             SceneMessages_RegisterReceiver(cache.receiver, cache.tag, 10);
             if (Script_SeekToKeyword('D')) {
                 register u32 zeroByte asm("r2") = 0;
@@ -264,7 +263,7 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
                 actor->animationPhase = zeroHalf;
                 actor->interactionDelay = zeroHalf;
                 actor->lift = zeroByte;
-                sub_08052628(actor, sub_08052640);
+                StackedActor_SetUpdate(actor, StackedActor_TickDisabled);
             } else {
                 s32 active = 0;
                 s32 appear;
@@ -296,7 +295,7 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
                         destination = (void *)((u8 *)actor + offset);
                         *destination = 7;
                     }
-                    sub_08052418(actor);
+                    StackedActor_UpdateSegments(actor);
                     {
                         register u32 offset asm("r3") = 0x1C6;
                         register u16 *destination asm("r1");
@@ -320,14 +319,14 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
                         *destination = 24;
                     }
                     actor->removeAfterUse = appear;
-                    sub_08052628(actor, sub_08052E80);
+                    StackedActor_SetUpdate(actor, StackedActor_WaitForPlayerRelease);
                     tether = 0;
                     if (Script_SeekToKeyword('w'))
                         tether = Script_GetValue();
                     if (tether) {
-                        if (!sub_0804A0A4())
+                        if (!TetherActor_BeginKindFourStateTen())
                             return 0;
-                        sub_08049FFC(cache.world);
+                        TetherActor_SetPosition(cache.world);
                     }
                 } else {
                     {
@@ -365,9 +364,9 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
                         actor->sprite.scaleY = one;
                         actor->shadow.scaleX = one;
                         actor->shadow.scaleY = one;
-                        sub_08052628(actor, sub_08052938);
+                        StackedActor_SetUpdate(actor, StackedActor_Appear);
                     } else
-                        sub_08052628(actor, sub_08052A40);
+                        StackedActor_SetUpdate(actor, StackedActor_TickIdle);
                 }
             }
         }

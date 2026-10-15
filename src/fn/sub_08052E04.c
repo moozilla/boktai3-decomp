@@ -7,12 +7,12 @@ void StackedActor_RetractSegments(struct StackedActor *actor)
         actor->sprite.position.y += 2;
     if (actor->height) {
         actor->height--;
-        sub_08052418(actor);
+        StackedActor_UpdateSegments(actor);
     } else {
         actor->shadow.flags &= ~1;
         if (actor->removeAfterUse)
-            sub_08052628(actor, sub_08052FE4);
+            StackedActor_SetUpdate(actor, StackedActor_Disappear);
         else
-            sub_08052628(actor, sub_08052A40);
+            StackedActor_SetUpdate(actor, StackedActor_TickIdle);
     }
 }
