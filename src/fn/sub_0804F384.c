@@ -1,10 +1,11 @@
 #include "global.h"
+#define ResourceStation_ReadDisplayCommands sub_0804F384
 struct M {
     u32 a;
     u16 *b;
 };
 s32 sub_0821A3E8(u32, struct M **);
-void sub_0804F384(u8 *p)
+void ResourceStation_ReadDisplayCommands(u8 *p)
 {
     struct M *m;
     s32 n = sub_0821A3E8(*(u16 *)(p + 0x260), &m);
