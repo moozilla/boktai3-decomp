@@ -5,6 +5,6 @@ s32 ScalarApproach_ApplyProfile(s32 current, s32 target, s32 profile)
 
     if (profile > 15)
         profile = 15;
-    profile = gUnk_08614D4C[profile];
+    profile = ScalarApproach_ProfileCoefficient(profile);
     return ScalarApproach_Profile(current, target, profile);
 }
