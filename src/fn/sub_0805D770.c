@@ -1,6 +1,6 @@
 #include "scene_panel_subject_tail.h"
-#define ScenePanelSubject_UpdateGraphicTiles sub_0805D770
-void ScenePanelSubject_UpdateGraphicTiles(struct ScenePanelSubjectTail *subject)
+#define ScenePanelSubject_UpdatePaletteBank sub_0805D770
+void ScenePanelSubject_UpdatePaletteBank(struct ScenePanelSubjectView *subject)
 {
     if (subject->requested) {
         if (subject->requestLevel <= 11)
@@ -9,12 +9,12 @@ void ScenePanelSubject_UpdateGraphicTiles(struct ScenePanelSubjectTail *subject)
     } else if (subject->requestLevel)
         subject->requestLevel--;
     if (subject->requestLevel == 12)
-        AnimData_SelectTiles(subject->graphics, 0x250);
+        AnimData_SelectPaletteBank(subject->graphics, 0x250);
     else if (subject->requestLevel)
-        AnimData_SelectTiles(subject->graphics, 0x24F);
+        AnimData_SelectPaletteBank(subject->graphics, 0x24F);
     else if (subject->contactKind) {
-        AnimData_SelectTiles(subject->graphics, 0x192);
+        AnimData_SelectPaletteBank(subject->graphics, 0x192);
         subject->contactKind--;
     } else
-        AnimData_SelectTiles(subject->graphics, subject->tile);
+        AnimData_SelectPaletteBank(subject->graphics, subject->paletteBank);
 }

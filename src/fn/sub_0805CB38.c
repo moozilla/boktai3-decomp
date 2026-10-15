@@ -7,9 +7,10 @@ struct ScenePanel *ScenePanel_Create(u32 actorId)
         return gUnk_020004A4;
     panel = Task_Create(9, 0x17E4);
     if (panel) {
-        Task_SetCallbacks(panel, (void (*)(void *))sub_0805C8D8, (void (*)(void *))sub_0805CA20);
+        Task_SetCallbacks(panel, (void (*)(void *))ScenePanel_TickLifecycle,
+                          (void (*)(void *))ScenePanel_DestroyLifecycle);
         ((struct ScenePanelCommandView *)panel)->actorId = actorId;
-        if (sub_0805CA7C((void *)panel) < 0) {
+        if (ScenePanel_InitializeLifecycle((void *)panel) < 0) {
             Task_Kill(panel);
             return NULL;
         }

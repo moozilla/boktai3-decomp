@@ -1,6 +1,6 @@
 #include "scene_panel_subject_tail.h"
 #define ScenePanelSubject_InitCollider sub_0805D8A8
-void ScenePanelSubject_InitCollider(struct ScenePanelSubjectTail *subject, u32 value)
+void ScenePanelSubject_InitCollider(struct ScenePanelSubjectView *subject, u32 value)
 {
     struct ScenePanelInteractionPackedPosition size, offset;
     struct ContactCollider *collider = &subject->collider;
