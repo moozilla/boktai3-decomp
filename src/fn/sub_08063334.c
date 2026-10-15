@@ -28,20 +28,20 @@ s32 SceneInventory_InitializeController(struct SceneInventoryLifecycleView *owne
     owner->unknown1AAD[0] = 0;
     owner->page = 0;
     owner->pageCount = 1;
-    owner->savedPageCount = 0;
+    owner->itemPageCount = 0;
     switch (owner->presentation) {
         case 0:
             sub_08062DEC(owner);
-            owner->savedPageCount = owner->pageCount;
+            owner->itemPageCount = owner->pageCount;
             break;
         case 2:
             sub_080630FC(owner);
-            owner->savedPageCount = owner->pageCount;
+            owner->itemPageCount = owner->pageCount;
             break;
         case 1:
         default:
             sub_08062F10(owner);
-            owner->savedPageCount = owner->pageCount;
+            owner->itemPageCount = owner->pageCount;
             break;
         case 3:
         case 4:
