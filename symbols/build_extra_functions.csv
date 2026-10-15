@@ -101,6 +101,7 @@ address,isa,evidence,replacement_end
 0805E014,thumb,Independent four-argument palette helper after 0805E000 return and literal; own push r4-r7-lr and pop-bx plus pool; exact136-byte C,0805E09C
 08064B20,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08064B70
 08064D3C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08064D40
+08066CB8,thumb,Independent unused-looking attachment release-all after query return and literal; complete push-loop-pop-bx; no ROM Thumb pointer or direct branch encoding found; exact standalone C,08066DB8
 08066FD8,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08067014
 08067014,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08067018
 080682CC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080682D0
@@ -405,3 +406,6 @@ address,isa,evidence,replacement_end
 08245394,arm,Existing bx r0 callback trampoline; retained assembly; docs/RFU.md,
 08248E70,thumb,Independent 156-byte RTC write body; exact standalone C check; docs/RTC.md,08248F0C
 08248F0C,thumb,Separate RTC alarm body with own push/sub-sp and pop/bx after 08248E70 return; retained unmatched; docs/RTC.md,
+08067BA8,thumb,Independent request-all slot loop with own push and pop-bx in retained 08067984 tail; full exact 100-byte C body,08067C0C
+08067C0C,thumb,Independent bx-lr empty leaf after request-all return; full exact 4-byte extent,08067C10
+08067990,thumb,Independent script constructor with own prologue calls pop-bx and embedded literals in retained 08067984 tail; full exact 536-byte C extent,08067BA8

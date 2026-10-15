@@ -1,8 +1,5 @@
-#include "global.h"
-
-extern u32 gUnk_02000124;
-
-void sub_08066C80(void)
+#include "actor_attachment_manager.h"
+void ActorAttachment_ClearManagerPointer(void)
 {
     gUnk_02000124 = 0;
 }

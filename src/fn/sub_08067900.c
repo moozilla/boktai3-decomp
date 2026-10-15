@@ -1,19 +1,10 @@
-#include "global.h"
-
-struct P {
-    u8 f[0x34];
-    u32 a;
-    u32 b;
-};
-extern struct P *gUnk_02000128;
-void AnimData_Load(u8 *, s32);
-u32 ScriptProc_Start(s32, s32);
-
-s32 sub_08067900(struct P *p)
+#include "scene_actor_control.h"
+extern struct SceneActorControlManager *gUnk_02000128;
+s32 SceneActorControl_Initialize(struct SceneActorControlManager *p)
 {
-    AnimData_Load((u8 *)p + 0x18, 0x1c1b);
-    p->b = 0;
-    p->a = ScriptProc_Start(0x922e, 0x3dc2);
+    AnimData_Load(p->graphics, 0x1C1B);
+    p->used = 0;
+    p->sequenceResource = ScriptProc_Start(0x922E, 0x3DC2);
     gUnk_02000128 = p;
     return 0;
 }

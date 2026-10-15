@@ -1,8 +1,6 @@
-#include "global.h"
-
-extern u32 gUnk_02000128;
-
-void sub_08067984(void)
+#include "scene_actor_control.h"
+extern struct SceneActorControlManager *gUnk_02000128;
+void SceneActorControl_ResetSingleton(void)
 {
     gUnk_02000128 = 0;
 }

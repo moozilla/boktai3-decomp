@@ -3,7 +3,7 @@
 void Sound_PlaySong(int);
 void Sound_StopSong(int);
 void SceneObject_UpdateLowered(void);
-void sub_08068124(void *, int, void *, int, int, int);
+void SceneParticleBurst_CreateWhilePaused(void *, int, void *, int, int, int);
 void SceneObject_UpdateLowering(u8 *s)
 {
     struct {
@@ -42,10 +42,10 @@ void SceneObject_UpdateLowering(u8 *s)
         one &= s[0x38];
         if (one) {
             *(u32 *)&v = 128;
-            sub_08068124(s + 0x70, 0, &v, 5, 2, clear);
+            SceneParticleBurst_CreateWhilePaused(s + 0x70, 0, &v, 5, 2, clear);
         } else {
             v.z = 128;
-            sub_08068124(s + 0x70, 0, &v, 5, 2, one);
+            SceneParticleBurst_CreateWhilePaused(s + 0x70, 0, &v, 5, 2, one);
         }
     }
     {
