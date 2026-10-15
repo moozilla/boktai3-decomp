@@ -1,12 +1,11 @@
 #include "cell_gate.h"
-#define CellGate_UpdateConditionalBarrier sub_080505BC
 void CellGate_UpdateConditionalBarrier(struct CellGate *gate)
 {
-    s32 result = sub_08050188(gate);
+    s32 result = CellGate_TestPlayerHeight(gate);
     if (result) {
-        if (sub_08050128(gate)) {
-            if (sub_08050574(gate))
-                sub_080503A0(gate, 64);
+        if (CellGate_TestPlayerCell(gate)) {
+            if (CellGate_TestTraversalMode(gate))
+                CellGate_ClampPlayerEdge(gate, 64);
             else if (gate->registered) {
                 u8 retained = gate->flags & 32;
                 if (retained) {
@@ -23,7 +22,7 @@ void CellGate_UpdateConditionalBarrier(struct CellGate *gate)
                     Script_Call(gate->scriptId, 0);
             }
         } else {
-            if (sub_08050574(gate) && sub_080501AC(gate, 64)) {
+            if (CellGate_TestTraversalMode(gate) && CellGate_TestPlayerEdge(gate, 64)) {
                 if (!gate->registered) {
                     sub_0821D698(gate->registration, gate->cell, 0, gate->height, 255, 0x82A);
                     gate->registered = 1;

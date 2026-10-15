@@ -1,5 +1,4 @@
 #include "cell_gate.h"
-#define CellGate_TestPlayerHeight sub_08050188
 s32 CellGate_TestPlayerHeight(struct CellGate *gate)
 {
     if (gUnk_02000580->position.y == (s32)(gate->height << 8))

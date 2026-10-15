@@ -1,6 +1,5 @@
 #include "staged_effect.h"
 // MATCHING_CONCESSION: register-pinning
-#define StagedEffect_WaitBetweenShakes sub_0804DB60
 void StagedEffect_WaitBetweenShakes(struct StagedEffect *effect)
 {
     register u32 next asm("r0");

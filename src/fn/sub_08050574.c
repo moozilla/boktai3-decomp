@@ -1,6 +1,5 @@
 #include "cell_gate.h"
-#define CellGate_TestTraversalMode sub_08050574
-s32 sub_08050574(struct CellGate *gate)
+s32 CellGate_TestTraversalMode(struct CellGate *gate)
 {
     u32 x;
     u32 w = gUnk_02000534;

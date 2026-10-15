@@ -1,5 +1,4 @@
 #include "staged_effect.h"
-#define StagedEffect_Tick sub_0804DC40
 extern void (*const gUnk_08605A58[])(struct StagedEffect *);
 void sub_0824923C(void *, void *);
 s32 StagedEffect_Tick(struct StagedEffect *effect)

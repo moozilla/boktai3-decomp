@@ -1,5 +1,4 @@
 #include "cell_gate.h"
-#define CellGate_TestPlayerCell sub_08050128
 s32 CellGate_TestPlayerCell(struct CellGate *gate)
 {
     s32 x = gUnk_02000580->position.x >> 8;

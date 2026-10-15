@@ -1,5 +1,4 @@
 #include "staged_effect.h"
-#define StagedEffect_BlendAndShake sub_0804DAC8
 // MATCHING_CONCESSION: register-pinning
 void sub_082260A4(u32);
 void StagedEffect_BlendAndShake(struct StagedEffect *effect)
@@ -21,9 +20,9 @@ void StagedEffect_BlendAndShake(struct StagedEffect *effect)
         u32 frame = effect->frame;
         if (frame <= 3) {
             sub_082260A4(40);
-            sub_0804D778(effect, 10, 8, effect->frame << 4);
+            StagedEffect_BlendPalette(effect, 10, 8, effect->frame << 4);
         } else
-            sub_0804D778(effect, 8, 10, (frame - 4) << 4);
+            StagedEffect_BlendPalette(effect, 8, 10, (frame - 4) << 4);
     }
     if (effect->frame > 7) {
         effect->shakeX = 0;

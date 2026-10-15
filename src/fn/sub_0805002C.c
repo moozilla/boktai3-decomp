@@ -6,7 +6,6 @@ struct EntryManagerView {
 extern struct EntryManagerView *gUnk_02000110;
 struct EntryManagerView *sub_0804FFEC(void);
 void sub_0804FEFC(struct EntryManagerView *, s32, struct ContactPackedVector *, s32, s32, s32, s32);
-#define RepeatedEffect_AddFromScript sub_0805002C
 void RepeatedEffect_AddFromScript(void)
 {
     struct EntryManagerView *manager = gUnk_02000110;

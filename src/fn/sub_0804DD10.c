@@ -1,5 +1,4 @@
 #include "staged_effect.h"
-#define StagedEffect_Destroy sub_0804DD10
 void Sprite_Remove(struct StagedEffectSprite *);
 void sub_08020D08(void *);
 s32 StagedEffect_Destroy(struct StagedEffect *effect)

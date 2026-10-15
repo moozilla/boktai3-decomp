@@ -1,6 +1,5 @@
 #include "staged_effect.h"
 // MATCHING_CONCESSION: register-pinning
-#define StagedEffect_ShakeAndReveal sub_0804D980
 void StagedEffect_ShakeAndReveal(struct StagedEffect *effect)
 {
     u32 phase;
@@ -22,9 +21,9 @@ void StagedEffect_ShakeAndReveal(struct StagedEffect *effect)
     }
     phase = effect->frame & 3;
     if (phase == 0)
-        sub_0804D890(effect);
+        StagedEffect_MarkOuterSpritesAlternate(effect);
     else if (phase == 2)
-        sub_0804D874(effect);
+        StagedEffect_MarkOuterSprites(effect);
     nextFrame = effect->frame;
     if (nextFrame > 15) {
         effect->sprites[0].flags &= ~1;

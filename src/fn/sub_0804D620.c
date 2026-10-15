@@ -1,5 +1,4 @@
 #include "global.h"
-#define Countdown_Tick sub_0804D620
 struct CountdownTask {
     u8 unknown0[0x18];
     u16 frame, interval;

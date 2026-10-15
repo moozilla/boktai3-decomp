@@ -1,9 +1,8 @@
 #include "cell_gate.h"
 // MATCHING_CONCESSION: register-pinning
-void sub_08050280(struct CellGate *);
-void sub_08050404(struct CellGate *);
-void sub_080505BC(struct CellGate *);
-#define CellGate_InitializeFromScript sub_080506CC
+void CellGate_UpdatePassageBarrier(struct CellGate *);
+void CellGate_UpdateForcedDirection(struct CellGate *);
+void CellGate_UpdateConditionalBarrier(struct CellGate *);
 s32 CellGate_InitializeFromScript(struct CellGate *gate, u32 id)
 {
     struct ContactPackedVector position;
@@ -49,18 +48,18 @@ s32 CellGate_InitializeFromScript(struct CellGate *gate, u32 id)
     {
         u32 flags = gate->flags;
         if (flags & 1) {
-            callback = sub_08050280;
+            callback = CellGate_UpdatePassageBarrier;
             goto assign;
         }
         {
             u32 mask = 2;
             mask &= flags;
             if (mask) {
-                callback = sub_08050404;
+                callback = CellGate_UpdateForcedDirection;
                 goto assign;
             }
         }
-        callback = sub_080505BC;
+        callback = CellGate_UpdateConditionalBarrier;
     assign:
         gate->update = callback;
     }
