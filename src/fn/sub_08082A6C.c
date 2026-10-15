@@ -9,7 +9,6 @@ static inline u8 Tick(void)
     asm("" : "+r"(offset) : "r"(player));
     return *(player + offset);
 }
-#define SceneActorControl_UpdateTimedFacing sub_08082A6C
 void SceneActorControl_UpdateTimedFacing(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *actor = input;

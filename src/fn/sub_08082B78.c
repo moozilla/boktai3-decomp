@@ -1,5 +1,4 @@
 #include "scene_actor_control_phase.h"
-#define SceneActorControl_UpdateFacingAnimation sub_08082B78
 void SceneActorControl_UpdateFacingAnimation(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorControlState *control = SceneActorControl_GetState(actor);

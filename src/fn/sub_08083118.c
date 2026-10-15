@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_phase.h"
-#define SceneActorControl_BeginSavedHeadingPhase sub_08083118
 void SceneActorControl_BeginSavedHeadingPhase(struct SceneActorRegistryResetView *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->field2B1))

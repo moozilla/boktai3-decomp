@@ -25,7 +25,6 @@ static inline u8 Unavailable(struct SceneActorRegistryResetView *actor)
     }
     return 0;
 }
-#define SceneActorControl_ApplyContactPowerFloor sub_080829C0
 void SceneActorControl_ApplyContactPowerFloor(struct SceneActorBehaviorContactView *source,
                                               struct SceneActorBehaviorContactView *destination,
                                               struct SceneActorRegistryResetView *actor)

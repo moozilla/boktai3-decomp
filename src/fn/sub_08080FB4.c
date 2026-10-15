@@ -1,12 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
-#define SceneActorReaction_BeginHiddenDefeat sub_08080FB4
 void sub_0807C72C(void *, u32, u32, u32);
 void sub_0807E7B0(void *, u32);
 void *sub_081D4F20(u32, u32);
 void sub_081D5204(void *);
-void sub_0806FA74(u16, u16);
+void SceneActorRecord_RecordPair(u16, u16);
 extern u16 gUnk_030039F0;
 static inline u8 IsPrimary(struct SceneActorRegistryResetView *actor)
 {
@@ -122,7 +121,7 @@ void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *ac
     SetControl(actor);
     SetAnimation(actor, 1, 0, 2);
     if (!Test(gUnk_030053F4, 0x4800) && !Flag(actor, 0x800, 0x2D0))
-        sub_0806FA74(gUnk_030039F0, actor->id);
+        SceneActorRecord_RecordPair(gUnk_030039F0, actor->id);
     ActorShadow_Disable((u8 *)actor + 0x320);
     switch (actor->category) {
         case 4:
@@ -132,7 +131,7 @@ void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *ac
             Sound_PlaySong(253);
             break;
         case 3:
-            sub_08077848(actor, 1);
+            SceneActorPlacement_PlayVariantEventSound((void *)actor, 1);
             break;
         case 25:
             Sound_PlaySong(459);
