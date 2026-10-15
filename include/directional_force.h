@@ -1,0 +1,14 @@
+#ifndef GUARD_DIRECTIONAL_FORCE_H
+#define GUARD_DIRECTIONAL_FORCE_H
+#include "engine.h"
+struct DirectionalForce {
+    u8 unknown0[0x18];
+    u16 id, mode;
+    u16 baseMagnitude, magnitudeRange, baseDelay, delayRange;
+    u16 magnitude, targetMagnitude, angle, targetAngle, delay, unknown2E;
+};
+extern struct DirectionalForce *gUnk_02000114;
+extern u16 gUnk_0200052C, gUnk_02000550, gUnk_0200053C;
+extern u32 gUnk_03005308;
+s32 Mod(s32, s32);
+#endif
