@@ -21,24 +21,24 @@ struct SceneEventDispatchState {
 };
 extern struct SceneEventDispatchState *gUnk_0200047C;
 void sub_08020D54(struct SceneEventReceiver *, struct SceneEventCommand *);
-void sub_08063634(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
-                  struct SceneEventCommand *);
-void sub_08063650(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
-                  struct SceneEventCommand *);
-void sub_0806366C(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
-                  struct SceneEventCommand *);
-void sub_08063688(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
-                  struct SceneEventCommand *);
-void sub_080636A4(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
-                  struct SceneEventCommand *);
-void sub_080636C0(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
-                  struct SceneEventCommand *);
-void sub_080636DC(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
-                  struct SceneEventCommand *);
-void sub_080636F8(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
-                  struct SceneEventCommand *);
-void sub_08063714(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
-                  struct SceneEventCommand *);
-void sub_08063730(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
-                  struct SceneEventCommand *);
+void SceneAudioEvent_PlaySong(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
+                              struct SceneEventCommand *);
+void SceneAudioEvent_StartSongDirect(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
+                                     struct SceneEventCommand *);
+void SceneAudioEvent_StartTrackedSong(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
+                                      struct SceneEventCommand *);
+void SceneAudioEvent_FadeInChannel10(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
+                                     struct SceneEventCommand *);
+void SceneAudioEvent_PauseChannel10(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
+                                    struct SceneEventCommand *);
+void SceneAudioEvent_FadeOutChannel10(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
+                                      struct SceneEventCommand *);
+void SceneAudioEvent_StartChannel12(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
+                                    struct SceneEventCommand *);
+void SceneAudioEvent_FadeInChannel12(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
+                                     struct SceneEventCommand *);
+void SceneAudioEvent_PauseChannel12(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
+                                    struct SceneEventCommand *);
+void SceneAudioEvent_FadeOutChannel12(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
+                                      struct SceneEventCommand *);
 #endif

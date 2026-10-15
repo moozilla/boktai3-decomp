@@ -1,5 +1,4 @@
 #include "scene_inventory_panel.h"
-#define SceneInventory_ClearDescription sub_08062978
 void SceneInventory_ClearDescription(struct SceneInventoryPanel *p)
 {
     p->display.banner.flags |= 1;

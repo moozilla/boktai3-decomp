@@ -1,5 +1,4 @@
 #include "scene_inventory_states.h"
-#define SceneInventory_BeginSaleConfirmation sub_08061780
 void SceneInventory_BeginSaleConfirmation(struct SceneInventoryControlView *panel)
 {
     SceneInput_SaveSelection(&panel->grid);
@@ -26,8 +25,9 @@ void SceneInventory_BeginSaleConfirmation(struct SceneInventoryControlView *pane
             break;
         }
     }
-    sub_080613BC(panel, 2);
+    SceneInventory_UpdateModePrompt(panel, 2);
     SceneInput_BeginChoice(&panel->display.prompt, &panel->display.widgetResource,
                            &panel->choiceValue, 0, &panel->choiceBlink);
-    sub_0806130C(panel, (SceneInventoryCallback)sub_080625E0);
+    SceneInventory_SetControllerCallback(
+        panel, (SceneInventoryCallback)SceneInventory_TickSaleConfirmation);
 }

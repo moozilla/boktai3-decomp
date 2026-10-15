@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_slot.h"
-#define ActorAttachment_TickRemoval sub_0806466C
 static inline u8 IsRemoving(struct ActorAttachmentSlot *slot)
 {
     u32 bit = 1;
@@ -112,7 +111,7 @@ s32 ActorAttachment_TickRemoval(struct ActorAttachmentOwner *owner,
                 low->position.x = x + jitter;
             }
         }
-        sub_080645D4(slot);
+        ActorAttachment_NotifySourceState(slot);
         slot->timer--;
     }
     return 0;

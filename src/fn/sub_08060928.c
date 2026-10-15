@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneInventory_FindEmptyConsumableSlot sub_08060928
 
 struct SceneInventorySlotsView {
     u8 unknown0[0x160];

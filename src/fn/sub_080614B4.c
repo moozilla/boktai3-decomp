@@ -1,5 +1,4 @@
 #include "scene_inventory_control.h"
-#define SceneInventory_BeginActionSelection sub_080614B4
 void SceneInventory_BeginActionSelection(struct SceneInventoryControlView *panel, s32 mode)
 {
     panel->interactionFlags = 100;
@@ -14,7 +13,8 @@ void SceneInventory_BeginActionSelection(struct SceneInventoryControlView *panel
             SceneInput_RestoreSelection(&panel->grid);
             break;
     }
-    panel->destination = sub_0806143C(panel);
-    sub_080613BC(panel, 0);
-    sub_0806130C(panel, (SceneInventoryCallback)sub_080620D4);
+    panel->destination = SceneInventory_FindActionDestination(panel);
+    SceneInventory_UpdateModePrompt(panel, 0);
+    SceneInventory_SetControllerCallback(
+        panel, (SceneInventoryCallback)SceneInventory_TickActionSelection);
 }

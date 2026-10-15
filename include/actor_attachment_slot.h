@@ -31,5 +31,5 @@ struct ActorAttachmentOwner {
     u8 unknown0[0xA1C];
     u32 occupiedSlots;
 };
-void sub_080645D4(struct ActorAttachmentSlot *);
+void ActorAttachment_NotifySourceState(struct ActorAttachmentSlot *);
 #endif

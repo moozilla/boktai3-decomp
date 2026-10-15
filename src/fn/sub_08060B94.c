@@ -5,7 +5,6 @@ struct SceneInventoryOwnedConsumables {
     s16 id;
 };
 extern struct GameState *gUnk_02000710;
-#define SceneInventory_BeginConsumableSpecialMove sub_08060B94
 void SceneInventory_BeginConsumableSpecialMove(struct SceneInventoryActionView *panel)
 {
     struct SceneInputPosition starts[2], targets[2];

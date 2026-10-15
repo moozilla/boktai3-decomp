@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneInventory_FindConsumableAssignment sub_08060A3C
 
 struct SceneInventorySlotsView {
     u8 unknown0[0x58];

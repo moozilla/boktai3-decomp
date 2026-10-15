@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "roaming_object.h"
-#define RoamingObject_ApplyImpulse sub_08063A68
 static inline s32 Scale(s32 value)
 {
     if (value >= 0)
@@ -31,6 +30,6 @@ void RoamingObject_ApplyImpulse(struct RoamingObject *owner)
             s32 mask = -2;
             ((typeof(owner->listener) *)listener)->flags &= mask;
         }
-        sub_080638BC(owner, 0);
+        RoamingObject_SetState(owner, 0);
     }
 }

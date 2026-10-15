@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_control.h"
-#define SceneInventory_ClassifyItemMove sub_08061000
 s32 SceneInventory_ClassifyItemMove(struct SceneInventoryControlView *panel)
 {
     if (panel->grid.savedSelection <= 15) {
@@ -14,7 +13,7 @@ s32 SceneInventory_ClassifyItemMove(struct SceneInventoryControlView *panel)
             return 1;
     } else {
         if (panel->grid.selection == panel->grid.savedSelection) {
-            sub_0806147C(panel);
+            SceneInventory_SelectActionDestination(panel);
             return 4;
         }
         if (panel->grid.selection <= 15) {

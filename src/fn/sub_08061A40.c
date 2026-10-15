@@ -1,18 +1,18 @@
 #include "scene_inventory_states.h"
-#define SceneInventory_BeginSpecialTransition sub_08061A40
 void SceneInventory_BeginSpecialTransition(struct SceneInventoryControlView *panel)
 {
     panel->interactionFlags = 0x80;
     switch (panel->category) {
         case 0:
-            sub_08060660((void *)panel);
+            SceneInventory_BeginEquipmentSpecialMove((void *)panel);
             break;
         case 1:
-            sub_08060EA4((void *)panel);
+            SceneInventory_BeginItemSpecialMove((void *)panel);
             break;
         case 2:
-            sub_08060B94((void *)panel);
+            SceneInventory_BeginConsumableSpecialMove((void *)panel);
             break;
     }
-    sub_0806130C(panel, (SceneInventoryCallback)sub_08062634);
+    SceneInventory_SetControllerCallback(panel,
+                                         (SceneInventoryCallback)SceneInventory_TickSaleTransition);
 }

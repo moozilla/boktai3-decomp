@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_control.h"
-#define SceneInventory_ClassifyConsumableMove sub_08061080
 s32 SceneInventory_ClassifyConsumableMove(struct SceneInventoryControlView *owner)
 {
     register struct SceneInventoryControlView *incomingPanel asm("r5") = owner;
@@ -35,7 +34,7 @@ s32 SceneInventory_ClassifyConsumableMove(struct SceneInventoryControlView *owne
         selectedPtr = (void *)((u32)panel + selectionOffset);
         selected = *selectedPtr;
         if (selected == incoming) {
-            sub_0806147C(panel);
+            SceneInventory_SelectActionDestination(panel);
             return 4;
         }
         if (selected <= 15) {

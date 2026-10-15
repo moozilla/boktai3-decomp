@@ -5,7 +5,6 @@ struct SceneInventoryOwnedConsumables {
     s16 id;
 };
 extern struct GameState *gUnk_02000710;
-#define SceneInventory_BeginConsumableRemoveMove sub_0806097C
 void SceneInventory_BeginConsumableRemoveMove(struct SceneInventoryActionView *panel)
 {
     struct SceneInputPosition starts[2], targets[2];

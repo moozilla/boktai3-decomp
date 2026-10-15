@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_control.h"
-#define SceneInventory_ClassifyItemAction sub_080611AC
 s32 SceneInventory_ClassifyItemAction(struct SceneInventoryControlView *panel)
 {
     s32 result;

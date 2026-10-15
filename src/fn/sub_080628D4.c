@@ -1,6 +1,5 @@
 #include "scene_inventory_tail.h"
 #include "scene_inventory_panel.h"
-#define SceneInventory_RefreshCatalogDisplay sub_080628D4
 struct SceneInventoryPageView {
     u8 unknown0[0x1AB0];
     u8 page, pageCount;
@@ -13,7 +12,7 @@ void SceneInventory_RefreshCatalogDisplay(struct SceneInventoryTail *p)
 {
     struct SceneInventoryPanel *display = (struct SceneInventoryPanel *)p;
     struct SceneInventoryPageView *pages = (struct SceneInventoryPageView *)p;
-    sub_08061540(p);
+    SceneInventory_BeginBrowse(p);
     SceneInputPanel_SetMeterGlyph(&p->display, pages->page, pages->pageCount);
     switch (p->category) {
         case 0:

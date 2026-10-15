@@ -1,11 +1,10 @@
 #include "scene_inventory_control.h"
-#define SceneInventory_UpdateActionPrompt sub_08061328
 void SceneInventory_UpdateActionPrompt(struct SceneInventoryControlView *panel)
 {
     switch (panel->mode) {
         case 4:
         case 5: {
-            s32 action = sub_080612D0(panel);
+            s32 action = SceneInventory_ClassifySelectedAction(panel);
             if (action) {
                 switch (action) {
                     case 0:

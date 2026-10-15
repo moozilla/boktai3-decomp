@@ -1,5 +1,4 @@
 #include "scene_inventory_lifecycle.h"
-#define SceneInventory_TickController sub_080632AC
 void SceneHud_DrawNumericStatus(u8);
 void SceneHud_DrawClock(u8);
 s32 SceneInventory_TickController(struct SceneInventoryLifecycleView *owner)

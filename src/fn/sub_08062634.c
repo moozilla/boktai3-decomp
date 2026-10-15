@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_tail.h"
 #include "scene_item_values.h"
-#define SceneInventory_TickSaleTransition sub_08062634
 struct SceneInventorySaleView {
     u8 unknown0[0x1AF0];
     struct SceneInputPair pair;
@@ -25,7 +24,7 @@ s32 SceneItemValue_CalculateConsumable(u32);
 void sub_0822D918(u32);
 void sub_0822CE18(u32);
 void sub_0822E11C(u32);
-s32 sub_08062778(struct SceneInventoryTail *);
+s32 SceneInventory_TickSaleFeedback(struct SceneInventoryTail *);
 static inline void AddFunds(s32 value, struct GameState **location)
 {
     register u32 offset asm("r2");
@@ -90,7 +89,8 @@ s32 SceneInventory_TickSaleTransition(struct SceneInventoryTail *input)
                 break;
         }
         ((struct SceneInventorySaleFlags *)p)->sold = 1;
-        sub_0806130C(p, (SceneInventoryCallback)sub_08062778);
+        SceneInventory_SetControllerCallback(
+            p, (SceneInventoryCallback)SceneInventory_TickSaleFeedback);
     }
     return 0;
 }

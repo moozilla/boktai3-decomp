@@ -14,9 +14,9 @@ struct SceneInventoryLifecycleView {
     u8 unknown1AF0[0x1CF8 - 0x1AF0];
     void (*action)(struct SceneInventoryLifecycleView *);
 };
-s32 sub_080632AC(struct SceneInventoryLifecycleView *);
-s32 sub_080632EC(struct SceneInventoryLifecycleView *);
-s32 sub_08063334(struct SceneInventoryLifecycleView *);
+s32 SceneInventory_TickController(struct SceneInventoryLifecycleView *);
+s32 SceneInventory_DestroyController(struct SceneInventoryLifecycleView *);
+s32 SceneInventory_InitializeController(struct SceneInventoryLifecycleView *);
 #include "scene_inventory_tail.h"
 struct SceneInventoryLifecycle {
     u8 unknown0[0x1AAC];

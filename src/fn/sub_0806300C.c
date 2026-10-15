@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_tail.h"
-#define SceneInventory_ReadScriptCatalog sub_0806300C
 #include "scene_inventory_catalog.h"
 void SceneInventory_ReadScriptCatalog(struct SceneInventoryScriptCatalog *p)
 {

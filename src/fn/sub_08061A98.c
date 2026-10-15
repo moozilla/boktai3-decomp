@@ -1,5 +1,4 @@
 #include "scene_inventory_states.h"
-#define SceneInventory_BeginSwapTransition sub_08061A98
 void SceneInventory_BeginSwapTransition(struct SceneInventoryControlView *panel)
 {
     panel->interactionFlags = 0x80;
@@ -14,5 +13,6 @@ void SceneInventory_BeginSwapTransition(struct SceneInventoryControlView *panel)
             sub_08060A70((void *)panel);
             break;
     }
-    sub_0806130C(panel, (SceneInventoryCallback)sub_08062324);
+    SceneInventory_SetControllerCallback(panel,
+                                         (SceneInventoryCallback)SceneInventory_TickSwapTransition);
 }

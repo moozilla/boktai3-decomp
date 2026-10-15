@@ -1,5 +1,4 @@
 #include "scene_inventory_control.h"
-#define SceneInventory_HandleClockShortcut sub_08061C3C
 s32 SceneInventory_HandleClockShortcut(struct SceneInventoryControlView *panel)
 {
     if (gUnk_03005260[0] & 4) {

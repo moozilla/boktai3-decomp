@@ -1,5 +1,4 @@
 #include "actor_attachment.h"
-#define ActorAttachment_GetAction21Offset sub_08064A58
 void ActorAttachment_GetAction21Offset(s32 kind, s32 *x, s32 *y, s32 direction)
 {
     switch (kind) {

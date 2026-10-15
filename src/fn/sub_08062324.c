@@ -1,5 +1,4 @@
 #include "scene_inventory_tail.h"
-#define SceneInventory_TickSwapTransition sub_08062324
 struct SceneInventorySwapView {
     u8 unknown0[0x1AF0];
     struct SceneInputPair pair;
@@ -23,7 +22,7 @@ s32 SceneInventory_TickSwapTransition(struct SceneInventoryTail *p)
                 sub_0822E138(p->grid.savedSelection, p->grid.selection);
                 break;
         }
-        sub_08061BCC(p);
+        SceneInventory_BeginThirdSelection(p);
     }
     return 0;
 }

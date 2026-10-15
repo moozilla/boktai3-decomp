@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_states.h"
-#define SceneInventory_BeginPurchaseConfirmation sub_0806167C
 void SceneInventory_BeginPurchaseConfirmation(struct SceneInventoryControlView *panel)
 {
     SceneInput_SaveSelection(&panel->grid);
@@ -55,12 +54,13 @@ void SceneInventory_BeginPurchaseConfirmation(struct SceneInventoryControlView *
             break;
         }
     }
-    sub_080613BC(panel, 2);
+    SceneInventory_UpdateModePrompt(panel, 2);
     {
         register u32 promptOffset asm("r5") = (u32)&panel->display.prompt - (u32)panel;
         asm("" : "+r"(promptOffset));
         SceneInput_BeginChoice((void *)((u32)panel + promptOffset), &panel->display.widgetResource,
                                &panel->choiceValue, 1, &panel->choiceBlink);
     }
-    sub_0806130C(panel, (SceneInventoryCallback)sub_080623C0);
+    SceneInventory_SetControllerCallback(
+        panel, (SceneInventoryCallback)SceneInventory_TickPurchaseConfirmation);
 }

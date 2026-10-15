@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_actions.h"
 u32 sub_0822D604(s32);
-#define SceneInventory_BeginItemCatalogMove sub_08060F4C
 void SceneInventory_BeginItemCatalogMove(struct SceneInventoryActionView *panel)
 {
     struct SceneInputPosition starts[2], targets[2];

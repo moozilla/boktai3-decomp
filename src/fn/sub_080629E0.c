@@ -2,7 +2,6 @@
 #include "scene_inventory_panel.h"
 #include "scene_inventory_catalog.h"
 #include "scene_hud_display.h"
-#define SceneInventory_UpdateDisplay sub_080629E0
 void SceneInput_PositionCursor(struct SceneInputGridView *, struct SceneInputWidget *);
 void SceneHud_HideFourDigits(struct SceneHudDigitView *);
 void SceneInputPanel_TickHighlight(struct SceneInputHighlight *);
@@ -16,7 +15,7 @@ void sub_08060488(struct SceneInventoryTail *);
 void sub_0805F904(struct SceneInventoryTail *);
 void SceneInventory_ShowItemDescription(struct SceneInventoryPanel *);
 void SceneInventory_ShowConsumableDescription(struct SceneInventoryPanel *);
-void sub_08062978(struct SceneInventoryTail *);
+void SceneInventory_ClearDescription(struct SceneInventoryTail *);
 void SceneInventory_UpdateDisplay(struct SceneInventoryTail *p)
 {
     u32 bits = p->interactionFlags & 3;
@@ -66,7 +65,7 @@ void SceneInventory_UpdateDisplay(struct SceneInventoryTail *p)
                 if (p->interactionFlags & 0x20)
                     sub_0805F904(p);
                 else
-                    sub_08062978(p);
+                    SceneInventory_ClearDescription(p);
                 break;
             case 1:
                 if (p->interactionFlags & 0x10)
@@ -74,7 +73,7 @@ void SceneInventory_UpdateDisplay(struct SceneInventoryTail *p)
                 if (p->interactionFlags & 0x20)
                     SceneInventory_ShowItemDescription((struct SceneInventoryPanel *)p);
                 else
-                    sub_08062978(p);
+                    SceneInventory_ClearDescription(p);
                 break;
             case 2:
                 if (p->interactionFlags & 0x10)
@@ -82,7 +81,7 @@ void SceneInventory_UpdateDisplay(struct SceneInventoryTail *p)
                 if (p->interactionFlags & 0x20)
                     SceneInventory_ShowConsumableDescription((struct SceneInventoryPanel *)p);
                 else
-                    sub_08062978(p);
+                    SceneInventory_ClearDescription(p);
                 break;
         }
     }

@@ -1,5 +1,4 @@
 #include "scene_event_dispatch.h"
-#define SceneAudioEvent_FadeInChannel12 sub_080636F8
 void sub_0822B114(s32);
 void Trigger_ConsumePending(void *, s32);
 /* Preserve the signed full-word command argument observed at this call site. */

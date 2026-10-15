@@ -1,5 +1,4 @@
 #include "actor_attachment.h"
-#define ActorAttachment_GetAction1Offset sub_08064918
 
 void ActorAttachment_GetAction1Offset(s32 k, s32 *a, s32 *b, s32 unused)
 {

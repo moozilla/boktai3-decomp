@@ -2,7 +2,6 @@
 #include "scene_inventory_tail.h"
 #include "scene_inventory_catalog.h"
 #include "scene_item_values.h"
-#define SceneInventory_TickPurchaseTransition sub_08062414
 struct SceneInventoryPurchaseDescriptor {
     u32 prefix[3];
     u8 modifierA, unknownD[3], modifierB, unknown11[3], modifierC, unknown15[11];
@@ -96,7 +95,7 @@ s32 SceneInventory_TickPurchaseTransition(struct SceneInventoryTail *p)
         }
         ((struct SceneInventoryPurchaseFlags *)p)->purchased = 1;
         Sound_PlaySong(0x111);
-        sub_08061B48(p);
+        SceneInventory_BeginAlternateSelection(p);
     }
     return 0;
 }

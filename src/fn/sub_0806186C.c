@@ -1,5 +1,4 @@
 #include "scene_inventory_states.h"
-#define SceneInventory_BeginExitConfirmation sub_0806186C
 void SceneInventory_BeginExitConfirmation(struct SceneInventoryControlView *panel)
 {
     panel->interactionFlags = 0;
@@ -14,8 +13,9 @@ void SceneInventory_BeginExitConfirmation(struct SceneInventoryControlView *pane
             SceneInputPanel_ShowDescription(panel, 3, panel->itemText, -1);
             break;
     }
-    sub_080613BC(panel, 3);
+    SceneInventory_UpdateModePrompt(panel, 3);
     SceneInput_BeginChoice(&panel->display.prompt, &panel->display.widgetResource,
                            &panel->choiceValue, 1, &panel->choiceBlink);
-    sub_0806130C(panel, (SceneInventoryCallback)sub_08062298);
+    SceneInventory_SetControllerCallback(
+        panel, (SceneInventoryCallback)SceneInventory_TickResetConfirmation);
 }

@@ -50,7 +50,7 @@ static inline u8 ActorAttachment_TestByteFlags(const u8 *flags, u32 mask)
         return TRUE;
     return FALSE;
 }
-void sub_08064D40(struct ActorAttachmentSlotView *, s32);
-void sub_080645D4(struct ActorAttachmentSlotView *);
+void ActorAttachment_BeginPartJitter(struct ActorAttachmentSlotView *, s32);
+void ActorAttachment_NotifySourceState(struct ActorAttachmentSlotView *);
 void sub_08217EAC(struct ActorAttachmentPartSprite *);
 #endif

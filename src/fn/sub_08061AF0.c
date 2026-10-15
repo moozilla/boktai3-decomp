@@ -1,18 +1,18 @@
 #include "scene_inventory_states.h"
-#define SceneInventory_BeginRemovalTransition sub_08061AF0
 void SceneInventory_BeginRemovalTransition(struct SceneInventoryControlView *panel)
 {
     panel->interactionFlags = 0x80;
     switch (panel->category) {
         case 0:
-            sub_08060708((void *)panel);
+            SceneInventory_BeginEquipmentRemoveMove((void *)panel);
             break;
         case 1:
-            sub_08060D0C((void *)panel);
+            SceneInventory_BeginItemRemoveMove((void *)panel);
             break;
         case 2:
-            sub_0806097C((void *)panel);
+            SceneInventory_BeginConsumableRemoveMove((void *)panel);
             break;
     }
-    sub_0806130C(panel, (SceneInventoryCallback)sub_08062818);
+    SceneInventory_SetControllerCallback(
+        panel, (SceneInventoryCallback)SceneInventory_TickDiscardTransition);
 }
