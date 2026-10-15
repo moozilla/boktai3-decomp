@@ -95,8 +95,13 @@ struct SceneActorRegistryNode {
     struct SceneActorRegistryNode *next;
     struct SceneActorRegistryActor *actor;
 };
+struct SceneActorRegistryMessage {
+    u16 receiverId, unknown2;
+    u8 *data;
+};
 struct SceneActorRegistryManager {
-    u8 task[0x1C];
+    u8 task[0x18];
+    struct SceneActorRegistryMessage *messages;
     struct SceneActorRegistryNode *sentinel, *cursor;
     u32 resourceId;
     u16 unknown28, frame;
