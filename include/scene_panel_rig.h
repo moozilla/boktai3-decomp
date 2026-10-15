@@ -4,7 +4,16 @@
 #include "contact_actor.h"
 struct SceneRigSprite {
     u32 flags;
-    u8 unknown4[0x64];
+    u8 unknown4[0xC];
+    u16 frame;
+    u8 unknown12[0xA];
+    struct ContactPosition position;
+    u8 unknown24[8];
+    u8 graphics[0x1C];
+    struct DisplaySequenceState sequence;
+    void *animationResource;
+    u8 unknown5C[8];
+    u16 randomPhase, phase;
 };
 struct SceneRigSubject {
     u8 unknown0[0xD3];
@@ -29,7 +38,8 @@ struct ScenePanelRig {
     struct ContactPosition position;
     u8 unknown620[0x54];
     struct ContactPosition origin;
-    u16 state, stateFrame, angle, turnFrame;
+    u16 state, stateFrame, angle;
+    s16 turnFrame;
     s16 turnRate;
     u16 turnDuration;
     u16 distance, speed;
@@ -37,9 +47,10 @@ struct ScenePanelRig {
     u8 motionFlag;
     u8 contactDirection;
     u16 contactForce, contactEffect;
-    u8 unknown696[4];
-    u16 resourceAccumulator;
-    u8 unknown69C[4];
+    s8 selectedSubject;
+    u8 unknown697[3];
+    u16 resourceAccumulator, selectionTimer;
+    u8 unknown69E[2];
     u8 payloadA[8], payloadB[8];
     struct ScenePanel *parent;
 };
@@ -49,8 +60,12 @@ struct SceneRigContact {
     u16 power, unknown3E;
     u8 unknown40[2], direction;
 };
+u32 ScenePanelRig_IsSubjectState(struct ScenePanelRig *, u32, u32);
+void ScenePanelRig_SetSubjectState(struct ScenePanelRig *, u32, u32);
+void ScenePanelRig_RequestSubject(struct ScenePanelRig *, u32, u32);
 void ScenePanelRig_SetState(struct ScenePanelRig *, u32);
 void ScenePanelRig_RandomizeMovement(struct ScenePanelRig *);
+s32 ScenePanelRig_SelectActiveSubject(struct ScenePanelRig *);
 u32 ScenePanelRig_GetParentMode(struct ScenePanelRig *);
 void ScenePanelRig_HideSprites(struct ScenePanelRig *);
 void ScenePanelRig_ShowSprites(struct ScenePanelRig *);
