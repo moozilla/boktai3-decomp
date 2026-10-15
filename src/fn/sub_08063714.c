@@ -1,15 +1,12 @@
-#include "global.h"
-
-struct C {
-    u8 f[8];
-    s16 v;
-};
-
+#include "scene_event_dispatch.h"
+#define SceneAudioEvent_PauseChannel12 sub_08063714
 void sub_0822B180(s32);
 void Trigger_ConsumePending(void *, s32);
-
-void sub_08063714(void *a, void *b, struct C *c)
+/* Preserve the signed full-word command argument observed at this call site. */
+void SceneAudioEvent_PauseChannel12(struct SceneEventDispatchTask *owner,
+                                    struct SceneEventReceiver *receiver,
+                                    struct SceneEventCommand *command)
 {
-    sub_0822B180(c->v);
-    Trigger_ConsumePending(b, 1);
+    sub_0822B180(command->value);
+    Trigger_ConsumePending(receiver, 1);
 }
