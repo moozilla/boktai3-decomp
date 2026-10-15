@@ -62,17 +62,25 @@ selects palette bank `140`, copies the anchor, and assigns priority 1. Failure t
 load graphics leaves the already-allocated record as the original does; no new
 rollback is added. `6CFE4` invokes a nonzero integer script ID with null arguments.
 
+`6DCE4` restores the saved position on each tick and jitters X/Z for the first
+ten frames. At frame 4 it selects palette bank `143`, emits through `1287D4`
+using a stack copy whose signed packed Y field is reduced by 60, then runs the
+slot event script. On playback completion it decrements the unsigned repetition
+count and restores palette bank `140`; a nonzero count returns to state 2,
+otherwise it enters final state 5. The packed adjustment uses the established
+`ContactPackedVector` bitfield layout in a local union with `ContactPosition`.
+
 ## Matching evidence and remaining work
 
-Current new exact bodies are `6D000` (388), `6DB20` (452), and `6DFC8` (360):
-**1,200 bytes / +0.0497 percentage points**, all temporarily register-pinned.
+Current new exact bodies are `6D000` (388), `6DB20` (452), `6DCE4` (636), and `6DFC8` (360):
+**1,836 bytes / +0.0760 percentage points**, all temporarily register-pinned.
 The allocator, wrapper, event-script callback, and empty state total 132
 previously credited bytes, independently reviewed and checked in full.
 Temporary hints were minimized: completion TU 4→2 plus eleven shared playback
-hints, pausing 60→26, and creation 52→24. No source binds `r7`.
+hints, pausing 60→26, emission 79→31, and creation 52→24. No source binds `r7`.
 
 Unmatched bodies remain `6D184` (692), waypoint helper `6D438` (776), movement
-state `6D740` (992), and emission/repetition state `6DCE4` (636). A spreading-state
+state `6D740` (992). A spreading-state
 candidate is retained privately and is being matched across its full extent.
 The bounded permuter search produced an apparent 455 score by deleting a
 register temporary's initialization before an asm input; that output was
