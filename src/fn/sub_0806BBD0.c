@@ -1,28 +1,23 @@
-#include "global.h"
-struct H {
-    u32 lo : 16;
-    u32 hi : 16;
-};
-struct Z {
-    struct H a, b;
-};
-void Collider_Init(u8 *, u32, u32, u32, u32, struct Z *, struct Z *);
-void sub_0821FF58(u8 *, u32, u32, u32, u32, u32);
-void Collider_SetCallback(u8 *, void (*)(void), u8 *);
-void Collider_SetPosition(u8 *, u8 *, u32);
-void sub_0806BBB8(void);
-void sub_0806BBD0(u8 *p, u32 a, u32 b, u32 c, u32 d)
+#include "scene_steering_actor.h"
+#define SceneSteeringActor_InitializeCollider sub_0806BBD0
+void sub_0806BBB8(u32, u32, struct SceneSteeringActor *);
+void SceneSteeringActor_InitializeCollider(struct SceneSteeringActor *p, u32 a, u32 b, u32 c, u32 d,
+                                           u32 unusedE, u32 unusedF, u32 unusedG)
 {
-    struct Z s1, s2;
-    u8 *q;
-    s1.a.lo = 0x40;
-    s1.a.hi = 0x80;
-    s1.b.lo = 0x40;
-    *(u32 *)&s2.a = 0;
-    *(u32 *)&s2.b &= 0xFFFF0000;
-    q = p + 0xa8;
-    Collider_Init(q, 0, 0x2403, 0, 0x10, &s1, &s2);
-    sub_0821FF58(q, a, b, 0, c, d);
-    Collider_SetCallback(q, sub_0806BBB8, p);
-    Collider_SetPosition(q, p + 0x1c, 0);
+    union {
+        struct ContactPackedVector packed;
+        struct ContactPosition position;
+    } size, offset;
+    struct ContactCollider *collider;
+    size.packed.x = 64;
+    size.packed.y = 128;
+    size.packed.z = 64;
+    offset.packed.x = 0;
+    offset.packed.y = 0;
+    offset.packed.z = 0;
+    collider = &p->collider;
+    Collider_Init(collider, 0, 0x2403, 0, 16, &size.position, &offset.position);
+    sub_0821FF58(collider, a, b, 0, c, d);
+    Collider_SetCallback(collider, sub_0806BBB8, p);
+    Collider_SetPosition(collider, &p->position, 0);
 }
