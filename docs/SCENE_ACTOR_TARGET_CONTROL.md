@@ -15,8 +15,10 @@ from actor position5C feed Math_Atan2(X,Z), whose low byte becomes direction59.
 The vector pad is never read as a scalar. It returns1 after this path. Without
 a positive ID, EB bit2 gates clearing EB bit10, and it returns0.
 
-All268 bytes match with six minimized register/lifetime hints. Underlying
-F4B8 remains assembly: it releases owned contact45C, resets command460 and
+All268 bytes match with six minimized register/lifetime hints. The adjoining
+F4B8 is exact over600 bytes with14 minimized hints: it releases owned contact45C, resets command460 and
 route control, installs FC90/substate16, resets actor state3/1/0, clears contact
 flags, releases attachment C72C, and records the same capped per-player counters
-as789EC. Its complete600-byte semantic draft is private and uncredited.
+as789EC. It requires the current target object for the per-player counter lookup. Counters
+cap at9999 using the observed signed-halfword comparisons, matching789EC.
+F4B8 plusF710 recover868 exact bytes (+0.0359 percentage points).
