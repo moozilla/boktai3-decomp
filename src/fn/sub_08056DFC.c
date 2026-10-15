@@ -1,9 +1,7 @@
-#include "global.h"
-
-void Anim_Remove(u8 *);
-
-u32 sub_08056DFC(u8 *p)
+#include "shake_icon_display.h"
+#define ShakeIconDisplay_Destroy sub_08056DFC
+u32 ShakeIconDisplay_Destroy(struct ShakeIconDisplay *display)
 {
-    Anim_Remove(p + 0x38);
+    Anim_Remove(&display->animation);
     return 0;
 }
