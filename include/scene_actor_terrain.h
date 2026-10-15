@@ -52,4 +52,34 @@ static inline s32 SceneActorTerrain_GetHeight(s32 cell, const struct ContactPosi
     }
     return height;
 }
+static inline s32 SceneActorTerrain_GetCellIndex(const struct ContactPosition *position)
+{
+    s32 x = position->x >> 8;
+    s32 z = position->z >> 8;
+    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        return 0;
+    return gUnk_030052F4->rows[z] + x;
+}
+static inline void SceneActorTerrain_Subtract(struct ContactPosition *out,
+                                              const struct ContactPosition *a,
+                                              const struct ContactPosition *b)
+{
+    out->x = a->x - b->x;
+    out->y = a->y - b->y;
+    out->z = a->z - b->z;
+}
+/* Collision-control prefix used by the adjacent reset/disable helpers. */
+struct SceneActorTerrainCollisionView {
+    void *object, *drawable;
+    u8 drawableKind;
+    u8 unknown9[0x8F];
+    u8 category;
+    u8 unknown99[0x9B];
+    struct ContactCollider collider;
+    u8 unknown188[0x144];
+    u32 flags2CC, flags2D0;
+    u16 flags2D4, flags2D6;
+    u8 unknown2D8[0xC];
+    u16 field2E4, field2E6;
+};
 #endif
