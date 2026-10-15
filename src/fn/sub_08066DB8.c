@@ -1,30 +1,52 @@
+#include "global.h"
+#ifdef NONMATCHING
+// fuzzy: 95.9%
+// MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_manager.h"
+/* Unsupported kind127/frame0 is reached by49258 and4AB40. It forwards the
+ * final parts-release result. On frame127, unsupported kinds preserve the
+ * original slot. These defined defaults differ in register allocation only. */
 struct ActorAttachmentSlotView *
 ActorAttachment_UpdateFromDescriptor(struct ActorAttachmentSlotView *slot,
-                                     struct ActorAttachmentFollowView *descriptor, u8 kind,
-                                     u8 frame, s16 *value, u16 count, s32 z, s32 y)
+                                     struct ActorAttachmentFollowView *descriptor, u32 inputKind,
+                                     u32 inputFrame, s16 *value, u32 inputCount, s32 z, s32 y)
 {
+    register u32 kind asm("r8");
+    register u32 frame asm("r6");
+    register u32 count asm("r9");
     u32 action;
-    if (!descriptor)
-        return 0;
-    if (frame == 127) {
-        if (!slot)
+    struct ActorAttachmentSlotView *fallback;
+    {
+        register struct ActorAttachmentSlotView *original asm("r0") = slot;
+        asm("" : "+r"(original));
+        {
+            register u32 rawCount asm("r1") = inputCount;
+            inputKind = (u8)inputKind;
+            kind = inputKind;
+            frame = (u8)inputFrame;
+            count = (u16)rawCount;
+        }
+        if (!descriptor)
             return 0;
-        switch (kind) {
-            case 0:
-                return ActorAttachment_ReleaseResource(slot, 0, descriptor->identity);
-            case 1:
-                return ActorAttachment_ReleaseResource(slot, 1, descriptor->identity);
-            case 3:
-                return ActorAttachment_ReleasePartsResource(slot, 3, descriptor->identity);
-            case 2:
-                return ActorAttachment_ReleaseResource(slot, 2, descriptor->identity);
-            case 4:
-                return ActorAttachment_ReleaseResource(slot, 4, descriptor->identity);
-            case 5:
-                return ActorAttachment_ReleaseResource(slot, 5, descriptor->identity);
-            default:
-                goto done;
+        if (frame == 127) {
+            if (!slot)
+                return 0;
+            switch (inputKind) {
+                case 0:
+                    return ActorAttachment_ReleaseResource(slot, 0, descriptor->identity);
+                case 1:
+                    return ActorAttachment_ReleaseResource(slot, 1, descriptor->identity);
+                case 3:
+                    return ActorAttachment_ReleasePartsResource(slot, 3, descriptor->identity);
+                case 2:
+                    return ActorAttachment_ReleaseResource(slot, 2, descriptor->identity);
+                case 4:
+                    return ActorAttachment_ReleaseResource(slot, 4, descriptor->identity);
+                case 5:
+                    return ActorAttachment_ReleaseResource(slot, 5, descriptor->identity);
+                default:
+                    return original;
+            }
         }
     }
     slot = ActorAttachment_ReleaseResource(slot, 0, descriptor->identity);
@@ -32,17 +54,20 @@ ActorAttachment_UpdateFromDescriptor(struct ActorAttachmentSlotView *slot,
     slot = ActorAttachment_ReleaseResource(slot, 2, descriptor->identity);
     slot = ActorAttachment_ReleaseResource(slot, 4, descriptor->identity);
     slot = ActorAttachment_ReleaseResource(slot, 5, descriptor->identity);
-    ActorAttachment_ReleasePartsResource(slot, 3, descriptor->identity);
+    fallback = ActorAttachment_ReleasePartsResource(slot, 3, descriptor->identity);
     {
-        u32 mask = 4;
-        u32 bits;
+        register u32 mask asm("r2") = 4;
+        register u32 bits asm("r1");
+        asm("" : "+r"(mask));
         bits = descriptor->flags & mask;
         action = 0;
         if (bits)
             action = 255;
     }
     {
-        switch (kind) {
+        register u32 selectedKind asm("r1") = kind;
+        asm("" : "+r"(selectedKind));
+        switch (selectedKind) {
             case 0:
                 return ActorAttachment_CreateSpriteSlot(
                     frame, &descriptor->anchor, descriptor->identity, y, z, action, 0, descriptor);
@@ -66,8 +91,11 @@ ActorAttachment_UpdateFromDescriptor(struct ActorAttachmentSlotView *slot,
                 return ActorAttachment_CreateAlternateSpriteSlot(
                     &descriptor->anchor, descriptor->identity, y, z, action, 0, descriptor);
             default:
-                break;
+                return fallback;
         }
     }
-done:;
 }
+
+#else
+INCLUDE_ASM("asm/nonmatching", ActorAttachment_UpdateFromDescriptor);
+#endif
