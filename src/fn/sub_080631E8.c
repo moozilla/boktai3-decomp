@@ -1,15 +1,13 @@
-#include "global.h"
-
-s32 sub_0824923C(u8 *, u32);
-void sub_080629E0(u8 *);
-void Sound_PlaySong(s32);
+#include "scene_inventory_lifecycle.h"
+#define SceneInventory_RunController sub_080631E8
+void sub_080629E0(struct SceneInventoryTail *);
 void sub_082279A8(s32, s32, s32, s32, s32, s32, s32);
-void SceneInputPanel_RequestAction(u8 *, s32 (*)(u8 *));
-s32 sub_08063248(u8 *);
-
-s32 sub_080631E8(u8 *p)
+void SceneInputPanel_RequestAction(struct SceneInventoryTail *,
+                                   s32 (*)(struct SceneInventoryTail *));
+s32 sub_08063248(struct SceneInventoryTail *);
+s32 SceneInventory_RunController(struct SceneInventoryTail *p)
 {
-    if (sub_0824923C(p, *(u32 *)(p + 0x1CFC)) == 0) {
+    if (sub_0824923C(p, ((struct SceneInventoryLifecycle *)p)->callback) == 0) {
         sub_080629E0(p);
     } else {
         Sound_PlaySong(0x119);
