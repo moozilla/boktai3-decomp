@@ -1,8 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_sprite_playback.h"
 #define ActorAttachment_TickDescendingSprite sub_080654AC
-void sub_08214514(struct ContactSwarmSprite *);
-void sub_08064790(void *, struct ActorAttachmentSlotView *);
+void ActorAttachment_TickWideShake(void *, struct ActorAttachmentSlotView *);
 void ActorAttachment_TickDescendingSprite(struct ActorAttachmentSlotView *slot)
 {
     if (gUnk_02000124) {
@@ -64,8 +63,8 @@ void ActorAttachment_TickDescendingSprite(struct ActorAttachmentSlotView *slot)
             slot->status[0] = 0;
             slot->update = NULL;
             slot->counters[0] = 0;
-            sub_08214514(sprite);
-            slot->active = 0;
+            Sprite_Remove(sprite);
+            slot->active48 = 0;
             slot->slotId = -1;
         } else {
             sprite->flags &= ~1;
@@ -88,7 +87,7 @@ void ActorAttachment_TickDescendingSprite(struct ActorAttachmentSlotView *slot)
                     sprite->position.z = z + spriteZ;
                 }
             }
-            sub_08064790(manager, slot);
+            ActorAttachment_TickWideShake(manager, slot);
             slot->counters[0]++;
         }
     }
