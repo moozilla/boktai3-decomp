@@ -38,8 +38,8 @@ void SceneInventory_BeginEquipmentSpecialMove(struct SceneInventoryActionView *p
         target[1].x = 0;
         target[1].y = 0;
         target[1].z = 0;
-        SceneInput_BeginPairTransition(&((struct SceneInventoryTransitionView *)panel)->pair, enabled, starts, target,
-                     frameOut, attributeOut, 12);
+        SceneInput_BeginPairTransition(&((struct SceneInventoryTransitionView *)panel)->pair,
+                                       enabled, starts, target, frameOut, attributeOut, 12);
     }
     Sound_PlaySong(0x38A);
 }
