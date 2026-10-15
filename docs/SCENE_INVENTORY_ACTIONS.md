@@ -1,6 +1,6 @@
 # Scene inventory action display and transition control
 
-Reviewed 08060344–08060708: four new functions are exact (652 bytes, +0.0270 percentage points), with 484 ordinary-C bytes and 168 bytes retaining two minimized allocation hints. Existing 60528 is typed/exact for its full 52-byte extent, with no new credit. The fifth new function, 6055C (260 bytes), remains an ignored scratch draft at 99.2%, not counted as matching. Its loop, stack layout and outgoing call arguments are exact; only the reverse-copy pointer setup versus counter initialization is reordered. Resume source: wip/sub_0806055C.c, checkpoint build/check/run-n9aq_sbq.
+Reviewed 08060344–08060708: four new functions are exact (652 bytes, +0.0270 percentage points), with 484 ordinary-C bytes and 168 bytes retaining one minimized allocation hint. Existing 60528 is typed/exact for its full 52-byte extent, with no new credit. The fifth new function, 6055C (260 bytes), remains an ignored scratch draft at 99.2%, not counted as matching. Its loop, stack layout and outgoing call arguments are exact; only the reverse-copy pointer setup versus counter initialization is reordered. Resume source: wip/sub_0806055C.c, checkpoint build/check/run-n9aq_sbq.
 
 60344/603EC/60488 compute equipment, item and consumable values for the saved selection and show four digits at the value display positions. They hide the display when no usable selection is present. 60528 searches eight equipped slots for the supplied primary inventory index and returns -1 when absent.
 
