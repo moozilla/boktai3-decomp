@@ -35,4 +35,6 @@ struct RouteSpriteActor *sub_0806DF60(struct RouteSpritePool *);
 struct RouteSpriteActor *sub_0806DFB8(struct RouteSpritePool *);
 struct RouteSpritePool *sub_0806E250(void);
 void sub_08013B74(void *);
+void sub_0806DFC8(struct ContactPosition *, void *, s32, s32, s32, u32, u32, u32, u32, void *,
+                  void *, s32);
 #endif
