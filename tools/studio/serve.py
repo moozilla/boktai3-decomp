@@ -2,7 +2,9 @@
 """Local studio: browse, search and edit the script text with a live preview in
 the game font, then build a modified ROM; browse sprites, palettes, the font and
 raw tiles from the resource archives (/gfx); and a live view of the game
-running in mGBA with tools/mgba/centaur.lua (/live, link on port 8643).
+running in mGBA with tools/mgba/centaur.lua (/live, link on port 8643); the
+script actor registry (/actors), script procedures (/scripts) and any
+function's disassembly and C (/code), from tools/assets/actors.py.
 
   python3 tools/studio/serve.py [--port 8642]    then open http://localhost:8642
 
@@ -25,6 +27,8 @@ sys.path.insert(0, HERE)
 from datafmt import load_manifest  # noqa: E402
 from datafmt import text_bank  # noqa: E402
 import live  # noqa: E402
+sys.path.insert(0, os.path.join(ROOT, "tools", "assets"))
+import actors  # noqa: E402
 
 BANK = os.path.join(ROOT, "build", "text", "bank.tsv")
 
@@ -148,6 +152,12 @@ def scene_list():
     return sc
 
 
+def scene_info():
+    """{scene: {map, shot}}: the stage each scene shows and whether the stage
+    survey captured it (captures/scene_NNNN)."""
+    return {s["scene"]: {"map": s.get("shown") or s.get("map"), "shot": s["shot"]} for s in scene_list()}
+
+
 def ensure_bank():
     if not os.path.exists(BANK):
         for e in load_manifest():
@@ -235,6 +245,22 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, open(os.path.join(HERE, "gfx.html"), "rb").read(), "text/html; charset=utf-8")
         elif self.path in ("/live", "/live.html"):
             self.send(200, open(os.path.join(HERE, "live.html"), "rb").read(), "text/html; charset=utf-8")
+        elif self.path in ("/actors", "/scripts", "/code"):
+            self.send(200, open(os.path.join(HERE, self.path[1:] + ".html"), "rb").read(), "text/html; charset=utf-8")
+        elif self.path == "/api/actors":
+            self.send(200, {"actors": actors.actors(), "enemies": actors.name_list(*actors.ENEMY_NAMES),
+                            "characters": actors.name_list(*actors.CHARACTER_NAMES), "scenes": scene_info()})
+        elif self.path == "/api/procs":
+            self.send(200, {"procs": actors.proc_list(), "scenes": scene_info()})
+        elif self.path.startswith("/api/proc/"):
+            d = actors.proc_detail(int(os.path.basename(self.path)))
+            self.send(200 if d else 404, d or {"error": "no such procedure"})
+        elif self.path.startswith("/api/code/"):
+            try:
+                d = actors.code_info(int(os.path.basename(self.path), 16))
+            except ValueError:
+                d = None
+            self.send(200 if d else 404, d or {"error": "no function there"})
         elif self.path in ("/captures", "/captures.html"):
             self.send(200, open(os.path.join(HERE, "captures.html"), "rb").read(), "text/html; charset=utf-8")
         elif self.path == "/api/guide":

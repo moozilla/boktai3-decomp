@@ -122,6 +122,40 @@ palette in the `9B1B` pool (see ASSETS.md, Sprite palettes), which the Sprites
 view uses by default ("in-game"), with the capture's colors or the palette
 menu as alternatives. The pool itself is browsable at `/gfx#pool`.
 
+## Actors, scripts and code (http://localhost:8642/actors, /scripts, /code)
+
+Cross-referenced by `tools/assets/actors.py` (also a command line:
+`actors.py actors`, `procs`, `code ADDR`), from `data/actor_registry.csv`,
+the generated disassembly (`gen/code.s`), the script image and the text bank.
+
+* **Actors**: the 722 entries of the script actor registry, which scripts
+  create with `chara KEY NAME` or `cmd_B745 KEY` (every B745 operand is a
+  registry key; enemy families are created that way). Each shows its callback
+  and *loader* (the function the callback hands its newly allocated actor to),
+  the sprites they name (16-bit literals in the callback, loader and their
+  nearby callees that are sprite package or large sprite hashes, with a
+  thumbnail in captured colors when the survey saw them), the procedures that
+  create it, the scenes that reach those procedures, and a label/notes editor
+  (kind `actor`). Filters: with a sprite, created by a script. Keys are hashes
+  of the original names, which are not recovered.
+* **Names from the game** (the first row of the Actors list): the monster list
+  (strings 9838–9921) and the character list (9818–9833), with the registry
+  entries linked to each. The links are candidates through the family's
+  sprite, from the visual identifications in ASSETS.md; the code that adds
+  9838 to an enemy kind is not found (see `actors.py`'s docstring for what was
+  ruled out).
+* **Scripts**: every procedure in the gcx image, numbered as calls use them
+  (one above `gcx.py dis` headers). Each shows callers and callees, the scenes
+  that reach it, the actors it creates, its strings (opening in the text
+  editor) and debug prints, and the body with procedures, strings and actor
+  keys linked; label/notes kind `script`. Enemy spawner procedures (flags 5
+  and 6) have no script callers: the engine or stage data starts them, so no
+  scene is listed for them.
+* **Code** (`/code#ADDRESS`): any function's disassembly as `tools/asmat.py`
+  prints it, its callers and callees, and its C from `src/` when it is
+  decompiled (marked when it is a NONMATCHING draft). Function addresses
+  anywhere in the studio open here in the side panel.
+
 ## Notes on anything
 
 `data/notes.csv` (kind, key, label, notes) labels maps, sprite packages, large

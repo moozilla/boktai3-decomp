@@ -320,3 +320,19 @@ confirmed by the render counts.
 
 Two families load small-sprite packages instead: `sub_080B43BC` (`3DB6`, a
 black winged creature) and `sub_080C3260` (`AE52`, skeletons).
+
+**The game's own enemy names (2026-10-15, partial).** The text bank holds a
+monster book: names at 9838-9921 (in the order DarthNemesis's guide numbers
+monsters), descriptions from 2509, then `通常:`/`レア:` (9924/9925, drops),
+elements (9926 `---`, 9927-9935) and classes (9936-9940 ビースト, アンデッド,
+シング, ファントム, イモータル). No code adds 9838 to an enemy kind: code
+reaches strings as a script-supplied base (`Script_ParseStringRef`, the base
+kept in the object) plus an offset, and no script operand gives a base near
+9838; the `0`/`2` entries beside the lists (9834-9837, 9922, 9941-9951) are
+`B` data records, not bases. The late-game save's pause menus never call
+`Text_LookupString` in that range. Enemy families are created by
+`cmd_B745 KEY` in spawner procedures (flags 5 and 6) that no script calls, so
+the engine or stage data starts them, probably with the variant (ghoul,
+zombie, ghoul+) among their seven arguments. The studio's Actors page links
+families to names through the sprite identifications above
+(`tools/assets/actors.py`, `SPRITE_NAMES`), as candidates.
