@@ -1,0 +1,63 @@
+// MATCHING_CONCESSION: register-pinning
+#include "stacked_actor.h"
+#define StackedActor_InitRisingParticle sub_080521DC
+void StackedActor_InitRisingParticle(struct StackedActorParticle *particle,
+                                     struct StackedActorPosition *position)
+{
+    particle->position = *position;
+    {
+        u16 *random = (u16 *)RANDOM_TABLE_ADDR;
+        register u32 *rng asm("r9") = &gUnk_03005308;
+        register u32 index asm("r2") = *rng + 1;
+        u32 mask = 1023;
+        register u32 mask31 asm("r5");
+        register u32 zero asm("r8");
+        u32 sample;
+        u32 coordinate;
+        u32 scratch;
+        u16 *sampleAddress;
+        index &= mask;
+        sample = random[index];
+        coordinate = (u16)particle->position.x;
+        coordinate -= 15;
+        mask31 = 31;
+        sample &= mask31;
+        coordinate += sample;
+        zero = 0;
+        particle->position.x = coordinate;
+        index = (index + 1) & mask;
+        sampleAddress = (u16 *)(index * 2 + (u32)random);
+        scratch = 768;
+        asm("" : "+r"(scratch) : "r"(coordinate));
+        coordinate = scratch;
+        scratch = (u16)particle->position.y;
+        coordinate += scratch;
+        coordinate += *(u8 *)sampleAddress;
+        particle->position.y = coordinate;
+        index = (index + 1) & mask;
+        sample = random[index];
+        coordinate = (u16)particle->position.z;
+        coordinate -= 15;
+        sample &= mask31;
+        coordinate += sample;
+        particle->position.z = coordinate;
+        particle->life = 24;
+        {
+            u32 zeroX = zero;
+            particle->velocityX = zeroX;
+        }
+        index = (index + 1) & mask;
+        {
+            register u32 *store asm("r3") = rng;
+            *store = index;
+        }
+        {
+            u32 sample = random[index];
+            particle->velocityY = -((sample & mask31) + 32);
+        }
+        scratch = zero;
+        particle->velocityZ = scratch;
+        particle->flags &= ~1;
+        particle->enabled = 1;
+    }
+}
