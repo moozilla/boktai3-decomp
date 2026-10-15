@@ -24,8 +24,8 @@ struct ActorAttachmentSlotView *sub_08065C50(struct ActorAttachmentSlotView *, u
 struct ActorAttachmentSlotView *sub_08065D1C(struct ActorAttachmentSlotView *, u32, void *);
 struct ActorAttachmentSlotView *sub_08065DBC(u32, struct ContactPosition *, void *, s32, s32, u32,
                                              void *, struct ActorAttachmentFollowView *);
-struct ActorAttachmentSlotView *sub_08065FD0(u8, struct ContactPosition *, void *, s32, s32, u32,
-                                             s16 *, s16, u32, void *,
+struct ActorAttachmentSlotView *sub_08065FD0(u32, struct ContactPosition *, void *, s32, s32, u32,
+                                             s16 *, s32, u32, void *,
                                              struct ActorAttachmentFollowView *);
 struct ActorAttachmentSlotView *sub_08066278(u32, struct ContactPosition *, void *, s32, u32,
                                              struct ActorAttachmentFollowView *);
