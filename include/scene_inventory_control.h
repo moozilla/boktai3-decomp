@@ -40,7 +40,7 @@ s32 sub_0822DFDC(u32);
 s32 sub_0822E224(u32);
 struct SceneInventoryControlDefinition *sub_08227F5C(u32);
 struct SceneInventoryControlConsumable *sub_0822E288(u32);
-u32 sub_0805F86C(s32);
+s32 sub_0805F86C(s32);
 s32 sub_0805F8D8(u32);
 s32 sub_08061120(struct SceneInventoryControlView *);
 s32 sub_080611AC(struct SceneInventoryControlView *);
