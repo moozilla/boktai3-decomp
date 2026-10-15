@@ -1,17 +1,19 @@
-#include "global.h"
-s32 sub_0805B318(u8 *p)
+#include "scene_panel_interaction.h"
+#define ScenePanel_AreSubjectsSettled sub_0805B318
+s32 ScenePanel_AreSubjectsSettled(struct ScenePanel *input)
 {
+    struct ScenePanelInteractionView *panel = (void *)input;
     s32 i = 0;
-    s32 n = p[0x1e];
-    if (i < n) {
-        s32 m = n;
-        u8 **q = (u8 **)(p + 0xbe8);
+    s32 count = panel->subjectCount;
+    if (i < count) {
+        s32 limit = count;
+        struct ScenePanelInteractionSubject **subject = panel->subjects;
         do {
-            if ((*q)[0xd3] != 2)
+            if ((*subject)->state != 2)
                 return 0;
-            q++;
+            subject++;
             i++;
-        } while (i < m);
+        } while (i < limit);
     }
     return 1;
 }
