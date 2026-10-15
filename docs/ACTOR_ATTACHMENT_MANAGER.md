@@ -76,36 +76,68 @@ values modulo 40 minus 20, then decrements the timer. This continuation is
 shared with the adjacent worker; names describe observed effects and do not
 identify the surrounding scene.
 
-## Exact accounting and remaining gaps
+## Creator family and descriptor dispatch
 
-New ordinary-boundary exact bodies in this batch are `65C50` (204), `65D1C`
-(160), `65DBC` (532), `66AE0` (72), `66B28` (144), and `67018` (136): **1,248
-bytes, +0.0517 percentage points**. Those bodies carry temporary register-pin
-concessions, reduced with `tools/depin.py`; none binds `r7` or embeds instruction
-bodies. Descriptor dispatch at `66DB8` adds a further **472 ordinary C bytes**,
-for **1,720 new bytes / +0.0712 percentage points** before the single-part
-creator. `66278` adds **508 register-pinned bytes**, bringing this cohort to
-**2,228 new bytes / +0.0922 percentage points** (472 ordinary, 1,756 pinned).
-Its 109 initial hints were reduced to 62. Integer address temporaries preserve
-two-step stack addressing while reconstructing pointers to the actual output
-locals; no pointer outside an object is formed. Its five initial
-register hints were all removed after correcting the forwarding wrapper count
-parameter to a full word. The wrapper itself does not truncate that argument;
-its caller explicitly sign-extends the halfword value before forwarding. `66CB8` adds explicit correctness evidence for previously credited bytes.
-Every changed C unit is checked across its full reviewed inventory extent.
+The whole `65C40–67148` assignment is now exact. The contiguous creator family
+uses the same ownership, offset geometry, resource selection, and packed anchor
+copy contracts:
+
+| Creator | Kind / resource kind | Initial display state |
+| --- | --- | --- |
+| `65DBC` | 0 / 0 or 6 | Caller frame, ten-frame timer, first status byte set |
+| `65FD0` | 1 / 1 | Value-dependent ordinary sprite frame |
+| `66278` | 2 / 2 | One part, part mask 1, ordinary sprite absent |
+| `66474` | 3 / 3 | Explicit part count, ordinary sprite absent |
+| `666D8` | 4 / 4 | Ordinary sprite frame 5 |
+| `668B0` | 5 / 5 | Ordinary sprite frame 6 |
+
+`65FD0` explicitly narrows its incoming frame to eight bits and its incoming
+range to a signed halfword before dividing by five. It selects frame 0 when
+the pointed-to value reaches four threshold units, otherwise searches indices
+3 down to 1 and chooses frame `4 - index`; its fallback is frame 3. It writes
+the incoming Z value into both position halfwords `2C` and `2E`. An optional
+trailing path advances the RNG, discards a modulo-three result, and prepares
+three stack positions from the anchor. No later consumer or effect-creation
+call exists in this body; a visual burst interpretation remains tentative.
+
+The part creator `66474` divides the full-word total range by three, then
+initializes each requested part with threshold `partIndex * (total / 3)` and
+counter `17 * partIndex`. Its count comparison is signed; a nonpositive count
+skips initialization. There is no local clamp to the three-record capacity.
+The two exact forwarding wrappers `66A88`/`66AB4` expose fixed-three-part and
+explicit-part-count contracts. They select count, while the creator sets kind
+3 itself. Both part creators clear the three status, phase, threshold, and
+counter elements, reset timer and first jitter coordinates, and install the
+follow descriptor. Action `FF` copies the follow offset; other actions clear
+the slot offset after computing part offsets through `64C48`.
+
+The descriptor dispatcher `66DB8` accepts kinds 0–5. Frame `7F` requests
+release; other frames first release matching identity/resource variants and
+then create the requested kind. Descriptor flag 4 selects action `FF`.
+Reviewed callers use the 0–5 domain. The invalid-kind path retains the original
+incidental return register.
+
+## Exact accounting and validation
+
+The twelve new ordinary-boundary bodies total **4,464 bytes, +0.1848 percentage
+points**. Descriptor dispatch `66DB8` contributes **472 ordinary C bytes**; the
+other **3,992 bytes** retain temporary register-pin concessions. No source binds
+`r7` or embeds an instruction body. The hidden `66CB8` body adds explicit
+correctness evidence for 256 previously credited bytes and receives no new net
+byte credit. Previously matching helpers were also reviewed and typed without
+claiming new progress.
+
+The final six creator matches were minimized with `tools/depin.py`:
+`65DBC` 58→16 hints, `65FD0` 58→47, `66278` 109→62, `66474` 146→82,
+and `666D8`/`668B0` 72→37 each. Integer address temporaries in `66278`
+reconstruct pointers to actual stack output locals; they do not form a pointer
+outside an object. Local clear variables used as CpuSet fill sources are
+initialized before their values are consumed.
+
+Permuter searches were used on close candidates. One speculative dispatcher
+output read an uninitialized local and was discarded. Source type corrections
+and hint removal produced its ordinary C match. The final value-sprite search
+started from the actual 99.4% candidate (permuter base score 220); manual flag
+lifetime and commutative-address corrections closed the match, and its search
+was stopped. Every changed C unit is checked across its full reviewed extent.
 The orchestrator performs the combined ROM build before integration.
-
-Unmatched bodies remain `65FD0` (680), `66474` (612), `666D8`
-(472), `668B0` (472). The first two form the value/part
-creation family. Two exact forwarding wrappers at `66A88`/`66AB4` expose its
-fixed-three-part and explicit-part-count call contracts. The common creator
-sets kind 3 itself, divides the total value range by three, and initializes each
-requested part with threshold `partIndex * (total / 3)` and counter
-`17 * partIndex`. The wrappers therefore select part count, rather than kind. The now-exact descriptor dispatcher at
-`66DB8` accepts kinds 0–5; frame `7F` requests release, while other frames first
-release all resource variants for the same identity, then create the requested
-kind. Descriptor flag 4 selects action `FF`. A permuter search helped isolate the final allocation problem; its speculative
-uninitialized-local candidate was discarded. Correcting the source types and
-removing unnecessary hints produced the exact ordinary C body. The invalid-kind
-path retains the original incidental return register, and callers reviewed for
-this contract use the 0–5 domain.
