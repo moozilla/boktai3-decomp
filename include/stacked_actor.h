@@ -16,7 +16,7 @@ struct StackedActorSprite {
 };
 struct StackedActorParticle {
     u32 flags;
-    u8 unknown4[0xB],renderMode,priority,unknown11[7];
+    u8 unknown4[0xB], renderMode, priority, unknown11[7];
     struct StackedActorPosition position;
     u8 unknown20[8];
     u8 enabled, life, unknown2A[2];
@@ -63,4 +63,13 @@ void sub_08052F48(struct StackedActor *);
 void sub_08052FE4(struct StackedActor *);
 void sub_080521DC(struct StackedActorParticle *, struct StackedActorPosition *);
 void sub_0805228C(struct StackedActorParticle *, struct StackedActorPosition *);
+void sub_08052640(struct StackedActor *);
+void sub_0805278C(struct StackedActor *);
+void sub_08052938(struct StackedActor *);
+void sub_08052E80(struct StackedActor *);
+void sub_08052130(struct StackedActorParticle *);
+void sub_0805321C(struct StackedActor *);
+void sub_080530EC(struct StackedActor *);
+s32 sub_08053178(struct StackedActor *);
+s32 sub_080531BC(struct StackedActor *);
 #endif
