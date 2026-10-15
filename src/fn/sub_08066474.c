@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_manager.h"
-#define ActorAttachment_CreateMeterPartsSlot sub_08066474
 void sub_08217DE0(void *, const void *, s32);
 void sub_08217EC4(void *, s32, s32);
 struct ActorAttachmentSlotView *ActorAttachment_CreateMeterPartsSlot(
@@ -275,8 +274,8 @@ partLoop: {
         asm("" : "+r"(offset));
         followPointer = (void *)((u32)slot + offset);
         asm("" : "+r"(followPointer));
-        ActorAttachment_GetActionOffset(resource, action, (*followPointer)->direction, &xOffset, &zOffset,
-                     slot->source);
+        ActorAttachment_GetActionOffset(resource, action, (*followPointer)->direction, &xOffset,
+                                        &zOffset, slot->source);
     }
     sub_08217EC4(part, xOffset, zOffset);
     {

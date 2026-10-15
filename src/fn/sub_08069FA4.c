@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "spark_particle.h"
-#define SparkParticle_UpdatePool sub_08069FA4
 s32 SparkParticle_UpdatePool(struct SparkParticlePool *pool)
 {
     if (pool->activeCount) {

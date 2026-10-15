@@ -1,5 +1,4 @@
 #include "scene_steering_actor.h"
-#define SceneSteeringActor_InitializePool sub_0806CE98
 s32 SceneSteeringActor_InitializePool(struct SceneSteeringActorPool *pool)
 {
     pool->used = 0;

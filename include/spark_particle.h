@@ -35,14 +35,14 @@ struct SparkParticlePool {
     u32 activeCount;
 };
 extern struct SparkParticlePool *gUnk_02000168;
-s32 sub_08069FA4(struct SparkParticlePool *);
-s32 sub_0806A138(struct SparkParticlePool *);
+s32 SparkParticle_UpdatePool(struct SparkParticlePool *);
+s32 SparkParticle_DestroyPool(struct SparkParticlePool *);
 s32 sub_0806A160(const struct ContactPosition *, u8, const struct ContactPosition *, s32, s32, s32,
                  s32, u32);
 void sub_0806A420(void);
-s32 sub_0806A520(struct SparkParticlePool *);
-struct SparkParticlePool *sub_0806A5B4(void);
-void sub_0806A600(void);
+s32 SparkParticle_InitPool(struct SparkParticlePool *);
+struct SparkParticlePool *SparkParticle_CreatePool(void);
+void SparkParticle_ClearPool(void);
 void sub_08217DE0(void *, const void *, u32);
 void sub_08217EC4(void *, s32, s32);
 void sub_08217ECC(void *, u32);

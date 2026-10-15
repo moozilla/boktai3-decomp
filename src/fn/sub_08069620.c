@@ -1,5 +1,4 @@
 #include "bouncing_object.h"
-#define BouncingObject_InitializePool sub_08069620
 s32 BouncingObject_InitializePool(struct BouncingPool *pool)
 {
     AnimData_Load(pool->graphics, 0xE74B);

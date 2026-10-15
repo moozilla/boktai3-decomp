@@ -1,8 +1,8 @@
 #include "bouncing_object.h"
-#define BouncingObject_GetNearbyHeading sub_080696C0
 static inline u8 Occupied(const u32 *mask, u32 bit)
 {
-    if (*mask & bit) return TRUE;
+    if (*mask & bit)
+        return TRUE;
     return FALSE;
 }
 s32 BouncingObject_GetNearbyHeading(const struct ContactPosition *input)
@@ -15,10 +15,12 @@ s32 BouncingObject_GetNearbyHeading(const struct ContactPosition *input)
     struct ContactPosition difference;
     struct ContactPosition *delta;
     s32 i;
-    if (!pool) return -1;
+    if (!pool)
+        return -1;
     slots = pool->slots;
     firstMask = &pool->used;
-    if (!*firstMask) return -1;
+    if (!*firstMask)
+        return -1;
     i = 0;
     used = firstMask;
     delta = &difference;

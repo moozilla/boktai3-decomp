@@ -1,8 +1,7 @@
 #include "sprite_effect_controller.h"
-#define SpriteEffectController_EnsurePool sub_0806BA00
-s32 sub_0806B9F0(struct SpriteEffectControllerPool *);
-s32 sub_0806B8DC(struct SpriteEffectControllerPool *);
-s32 sub_0806B96C(struct SpriteEffectControllerPool *);
+s32 SpriteEffectController_InitializePool(struct SpriteEffectControllerPool *);
+s32 SpriteEffectController_UpdatePool(struct SpriteEffectControllerPool *);
+s32 SpriteEffectController_DestroyPool(struct SpriteEffectControllerPool *);
 struct SpriteEffectControllerPool *SpriteEffectController_EnsurePool(void)
 {
     struct SpriteEffectControllerPool *p;
@@ -10,8 +9,9 @@ struct SpriteEffectControllerPool *SpriteEffectController_EnsurePool(void)
         return gUnk_02000178;
     p = Task_Create(10, sizeof(*p));
     if (p) {
-        Task_SetCallbacks(p, (void (*)(void *))sub_0806B8DC, (void (*)(void *))sub_0806B96C);
-        if (sub_0806B9F0(p) < 0) {
+        Task_SetCallbacks(p, (void (*)(void *))SpriteEffectController_UpdatePool,
+                          (void (*)(void *))SpriteEffectController_DestroyPool);
+        if (SpriteEffectController_InitializePool(p) < 0) {
             Task_Kill(p);
             return 0;
         }

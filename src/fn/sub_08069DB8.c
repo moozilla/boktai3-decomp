@@ -1,5 +1,4 @@
 #include "burst_emitter.h"
-#define BurstEmitter_CreateFromScript sub_08069DB8
 static inline s32 BurstEmitter_GetScriptValue(void)
 {
     if (Script_GetPc())
@@ -18,11 +17,11 @@ void BurstEmitter_CreateFromScript(void)
     struct BurstEmitter *emitter;
     s32 a, b, c, d;
     if (!pool) {
-        pool = sub_08069F4C();
+        pool = BurstEmitter_CreatePool();
         if (!pool)
             return;
     }
-    emitter = sub_08069D0C(pool);
+    emitter = BurstEmitter_AllocateSlot(pool);
     if (!emitter)
         return;
     if (Script_SeekToKeyword('p')) {
@@ -53,5 +52,5 @@ void BurstEmitter_CreateFromScript(void)
         emitter->frame = zero;
         emitter->mode = 2;
     }
-    sub_08069BC8(emitter, a, b, c, d);
+    BurstEmitter_InitCollider(emitter, a, b, c, d);
 }

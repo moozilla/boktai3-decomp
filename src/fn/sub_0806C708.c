@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_steering_actor.h"
-#define SceneSteeringActor_DestroySlot sub_0806C708
-s32 sub_08069D50(const struct ContactPosition *, u32, u32, s32, s32, s32, s32);
+s32 BurstEmitter_Create(const struct ContactPosition *, u32, u32, s32, s32, s32, s32);
 void sub_08013B74(void *);
 static inline s32 Dimension(u16 *field)
 {
@@ -25,7 +24,7 @@ void SceneSteeringActor_DestroySlot(struct SceneSteeringActorPool *p,
         asm("" : "+r"(field));
         height = Dimension(field);
         asm("" : "+r"(height));
-        sub_08069D50(&actor->position, 2, 0, width, height, 40, 16);
+        BurstEmitter_Create(&actor->position, 2, 0, width, height, 40, 16);
         {
             u16 *frame = &actor->stateFrame;
             register u32 zero asm("r8") = 0;

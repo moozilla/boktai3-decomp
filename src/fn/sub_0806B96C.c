@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "sprite_effect_controller.h"
-#define SpriteEffectController_DestroyPool sub_0806B96C
 struct DrawablePrefix {
     u32 flags;
     u8 active;

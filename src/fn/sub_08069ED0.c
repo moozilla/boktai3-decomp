@@ -1,5 +1,4 @@
 #include "burst_emitter.h"
-#define BurstEmitter_UpdatePool sub_08069ED0
 static inline u8 BurstEmitter_IsOccupied(struct BurstEmitterPool *pool, s32 index)
 {
     if (pool->used & (1 << index))

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_manager.h"
-#define ActorAttachment_CreateValueSpriteSlot sub_08065FD0
 static inline u8 AlternateMode(void)
 {
     u32 bit = 0x80;
@@ -224,8 +223,8 @@ gotManager:
             {
                 u32 action = *lowAction;
                 lowFollow = followPointer;
-                ActorAttachment_GetActionOffset(resource, action, (*lowFollow)->direction, &xOffset, &zOffset,
-                             slot->source);
+                ActorAttachment_GetActionOffset(resource, action, (*lowFollow)->direction, &xOffset,
+                                                &zOffset, slot->source);
             }
             slot->offset.x = xOffset;
             slot->offset.y = 0;

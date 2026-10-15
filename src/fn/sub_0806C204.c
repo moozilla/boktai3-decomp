@@ -1,9 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_steering_actor.h"
-#define SceneSteeringActor_BobInPlace sub_0806C204
 s32 Mod(s32, s32);
-void sub_0806BDB8(struct ContactPosition *);
-void sub_0806BC6C(struct SceneSteeringActor *);
+void SceneSteeringActor_EmitRandomParticle(struct ContactPosition *);
+void SceneSteeringActor_RefreshCollider(struct SceneSteeringActor *);
 void sub_0801370C(void *);
 static inline s32 Truncate(s32 v)
 {
@@ -194,12 +193,12 @@ void SceneSteeringActor_BobInPlace(struct SceneSteeringActorPool *unused,
                 {
                     u16 *frame = (void *)((u8 *)p + offset);
                     if (Mod(*frame, 128) == 0)
-                        sub_0806BDB8(left);
+                        SceneSteeringActor_EmitRandomParticle(left);
                 }
             }
         }
     }
-    sub_0806BC6C(p);
+    SceneSteeringActor_RefreshCollider(p);
     Step(p);
     {
         register u32 offset asm("r1") = 0x124;

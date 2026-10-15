@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "sprite_effect_controller.h"
-#define SpriteEffectController_RefreshCollider sub_0806A694
 void SpriteEffectController_RefreshCollider(struct SpriteEffectController *controller,
                                             struct ContactPosition *position)
 {

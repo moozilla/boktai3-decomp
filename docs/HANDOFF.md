@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 27.779% matching (2026-10-15). This file is the single
+Last updated after reaching 28.237% matching (2026-10-15). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,52 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 15 continuation: creator families and contiguous steering lifecycle
+
+Exact code is **28.237%**, up **0.4576 percentage points** (+11,052 net bytes)
+from PR157: **6,917 /11,479 functions**, **682,014 /2,415,354 bytes**.
+Without register pinning: **20.814%**; Register-pinned: **7.423%**, included
+above. The 78 guarded drafts remain outside exact credit. This batch contains
+11,204 newly recovered bytes and removes 152 bytes of erroneous old extent
+credit; independent function boundaries must never count retained executable
+assembly as matched C.
+
+The attachment range **64790–67148 is exact throughout**. All five remaining
+manager creator variants are now recovered, including the optional source,
+action offset, palette, random offset and shared slot lifecycle contracts.
+The burst-emitter family69964–69FA4 is exact throughout. The following spark
+particle pool has its updater, initializer and hidden script wrapper exact;
+its704-byte creator remains a near-match under a frozen permuter search.
+The sprite/effect controller now has exact dual-layout construction, queued
+collider refresh, animation playback, pool update/destruction and fade state.
+See [manager](ACTOR_ATTACHMENT_MANAGER.md), [burst emitter](BURST_EMITTER.md),
+[spark particles](SPARK_PARTICLE.md), [controller](SPRITE_EFFECT_CONTROLLER.md),
+[steering actors](SPRITE_EFFECT_STEERING_ACTORS.md), and
+[bouncing objects](BOUNCING_OBJECTS.md).
+
+The root's steering pool lifecycle at6CD68–6CF4C is exact apart from the
+160-byte6CCC8 retarget entry immediately before it. New boundary review split
+old6CF0C into its actual12-byte reset, the independent52-byte state-four-to-five
+loop6CF18, and a152-byte fixed-position constructor wrapper6CF4C. The loop is
+exact ordinary C. The wrapper remains ASM-backed, removing its previous false
+credit; its private98.65% draft is queued for a long frozen permuter search.
+This loop intentionally neither checks allocation bits nor sets entry latches.
+
+The five literal native-GCX callers of script7314 all supply position and
+velocity triples, establishing the whole-vector precondition of6BA58; packet
+addresses and dispatch evidence are documented in the steering review. An
+absent whole vector keyword must not be silently zero-initialized to hide an
+unproved caller contract. Controller6A60C has an observed first-slot flag check
+for every occupied slot; its per-entry cooldown and flags writes still advance.
+
+The user target remains **30% exact or20% account usage remaining**. Latest
+meter check was73% remaining after the reset; no reset was consumed here.
+Root owns6CA3C–6D000, Sol owns697C8–6B2C4, tail owns6B2C4–6CA3C, and lifecycle
+owns6D000–6E130 plus the preceding6CFE4/CFFC typed callbacks. Keep the four
+checkouts/build outputs isolated. Frozen permuter jobs continue for close
+register/order residues; audit candidates for deleted initialization before
+acceptance. Some lower-scoring outputs were rejected for precisely that reason.
 
 ## October 15 continuation: attachment ownership, scene control and particle pools
 

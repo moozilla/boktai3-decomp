@@ -1,9 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "sprite_effect_controller.h"
-#define SpriteEffectController_UpdatePool sub_0806B8DC
 extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560;
 extern void *gUnk_08605B84[];
-void sub_0806A60C(struct SpriteEffectControllerPool *);
+void SpriteEffectController_QueueColliders(struct SpriteEffectControllerPool *);
 static inline u8 IsUsed(struct SpriteEffectControllerPool *p, u32 index)
 {
     if (p->used & (1U << index))
@@ -24,7 +23,7 @@ s32 SpriteEffectController_UpdatePool(struct SpriteEffectControllerPool *input)
             if (gUnk_02000560 & mask)
                 return 0;
         }
-        sub_0806A60C(p);
+        SpriteEffectController_QueueColliders(p);
         {
             s32 i = 0;
             void **table = gUnk_08605B84;

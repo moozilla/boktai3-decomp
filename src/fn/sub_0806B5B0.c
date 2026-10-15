@@ -1,5 +1,4 @@
 #include "sprite_effect_controller.h"
-#define SpriteEffectController_LoadSpriteResources sub_0806B5B0
 /* The resource loader consumes r1 as the graphics ID; the prior one-argument
  * declaration happened to leave that argument register untouched. */
 void *SpriteEffectController_LoadSpriteResources(struct SpriteEffectController *slot,

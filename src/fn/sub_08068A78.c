@@ -25,6 +25,6 @@ void BouncingObject_InitializeColliders(struct BouncingObject *object, s16 categ
     Collider_Init(&object->removalCollider, (u16)object->colliderConfig, 0x4001, 0, 16,
                   &size.position, &offset.position);
     Collider_SetPosition(&object->removalCollider, &object->sprite.position, 0);
-    Collider_SetCallback(&object->removalCollider, sub_08068A3C, object);
+    Collider_SetCallback(&object->removalCollider, BouncingObject_HandleTimerContact, object);
     Collider_Refresh(&object->removalCollider);
 }

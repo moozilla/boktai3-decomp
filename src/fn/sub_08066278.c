@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_manager.h"
-#define ActorAttachment_CreateSinglePartSlot sub_08066278
 void sub_08217DE0(void *, const void *, s32);
 void sub_08217EC4(void *, s32, s32);
 struct ActorAttachmentSlotView *
@@ -231,8 +230,8 @@ gotManager:
     {
         register u8 *lowResource asm("r1") = resourcePointer;
         asm("" : "+r"(lowResource));
-        ActorAttachment_GetActionOffset(*lowResource, *actionPointer, (*followPointer)->direction, xPointer, zPointer,
-                     slot->source);
+        ActorAttachment_GetActionOffset(*lowResource, *actionPointer, (*followPointer)->direction,
+                                        xPointer, zPointer, slot->source);
     }
     sub_08217EC4(renderPart, xOffset, zOffset);
     if (*actionPointer == 255) {

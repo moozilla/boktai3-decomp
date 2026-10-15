@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "sprite_effect_controller.h"
-#define SpriteEffectController_QueueColliders sub_0806A60C
 static inline u8 SpriteEffectController_IsUsed(struct SpriteEffectControllerPool *pool, s32 index)
 {
     if (pool->used & (1 << index))

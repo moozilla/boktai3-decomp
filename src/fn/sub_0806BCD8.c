@@ -1,5 +1,4 @@
 #include "scene_steering_actor.h"
-#define SceneSteeringActor_TurnTowardTarget sub_0806BCD8
 void SceneSteeringActor_TurnTowardTarget(struct SceneSteeringActor *p)
 {
     if (p->steeringDelay) {
