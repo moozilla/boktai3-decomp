@@ -1,10 +1,11 @@
 #include "global.h"
+#define ResourceStation_Initialize sub_0804F5F4
 extern u32 gUnk_02000580;
 void sub_0804F448(u8 *);
 void sub_0804F528(u8 *);
 void sub_0804F568(u8 *);
 void sub_0804F4AC(u8 *);
-s32 sub_0804F5F4(u8 *p, u32 v)
+s32 ResourceStation_Initialize(u8 *p, u32 v)
 {
     u32 g = gUnk_02000580;
     u32 z;
