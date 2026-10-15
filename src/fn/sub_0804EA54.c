@@ -1,4 +1,5 @@
 #include "global.h"
+#define AreaEffect_Tick sub_0804EA54
 struct S {
     u8 f[0x868];
     u32 fl;
@@ -30,7 +31,7 @@ static inline u8 tst(u32 v)
         return TRUE;
     return FALSE;
 }
-s32 sub_0804EA54(struct O *o)
+s32 AreaEffect_Tick(struct O *o)
 {
     if (o->b29 != 0)
         o->b29 = 0;
