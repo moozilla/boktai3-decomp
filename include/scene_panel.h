@@ -2,6 +2,8 @@
 #define GUARD_SCENE_PANEL_H
 #include "engine.h"
 #include "background_controller.h"
+#include "contact_actor.h"
+#include "scene_object.h"
 /* Tentative presentation/state view; fields belong to observed consumers. */
 struct ScenePanel {
     u8 unknown0[0x22E];
@@ -10,13 +12,21 @@ struct ScenePanel {
     void (*state)(struct ScenePanel *);
     u8 unknown254[0x280];
     void *backgroundMap, *palette;
-    u8 unknown4DC[0x734];
+    void *overlayMap, *overlayPalette;
+    u8 targetLevels[4], currentLevels[4];
+    u16 overlayFrame;
+    u8 unknown4EE[0x22];
+    struct ContactPackedVector center;
+    u8 unknown518[0x6F8];
     u8 paletteMode;
     u8 unknownC11[0x717];
     u16 mode;
-    u8 unknown132A[0x10];
+    s16 shakeOffset;
+    u8 unknown132C[0xE];
     u8 resourceIndex;
-    u8 unknown133B[0xED];
+    u8 unknown133B[0x3D];
+    u16 effectPhase;
+    u8 unknown137A[0xAE];
     u32 transitionComplete;
     u8 unknown142C[4];
     u16 channelsDirty;
@@ -48,4 +58,10 @@ void ScenePanel_TickPulseRest(struct ScenePanel *);
 void ScenePanel_TickPulseTwelve(struct ScenePanel *);
 void ScenePanel_TickPulseThirteen(struct ScenePanel *);
 void ScenePanel_TickPulseTwo(struct ScenePanel *);
+extern struct ScenePanel *gUnk_020004A4;
+void sub_08057978(struct ScenePanel *, u32);
+union ScenePanelPosition;
+void sub_08057A44(struct ScenePanel *, union ScenePanelPosition *, union ScenePanelPosition *, u32,
+                  u32);
+void sub_0806A160(const void *, s32, const void *, s32, s32, s32, s32, s32);
 #endif
