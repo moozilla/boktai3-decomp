@@ -12,7 +12,8 @@ struct DisplayTrackGraphics {
 struct DisplayTrack {
     u16 tag;
     u8 flags, mirror, runDuringPause;
-    u8 unknown5[0x23];
+    u8 unknown5[3];
+    u16 blendedPalette[16];
     struct ContactSwarmSprite sprite;
     struct DisplayTrackGraphics graphics;
     struct ContactPosition origin, target;
@@ -20,7 +21,7 @@ struct DisplayTrack {
         paletteDuration, unknown8E;
     u16 scaleStart, scaleEnd, scaleFrame, scaleDuration;
     u8 sequenceId, sequenceRow, sequenceEvent, unknown9B;
-    u8 sequenceState[0x10];
+    struct DisplaySequenceState sequenceState;
     const void *sequenceResource;
     u32 sequenceEventValue;
     void *ownedResource;
