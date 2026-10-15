@@ -1,4 +1,5 @@
 #include "global.h"
+#define ResourceStation_InitializeCollider sub_0804F568
 struct H {
     u32 lo : 16;
     u32 hi : 16;
@@ -11,7 +12,7 @@ void sub_0821FF7C(u8 *, u32, u32, u32);
 void Collider_SetCallback(u8 *, u32, u8 *);
 void Collider_SetPosition(u8 *, u8 *, u32);
 s32 Collider_Refresh(u8 *);
-s32 sub_0804F568(u8 *p)
+s32 ResourceStation_InitializeCollider(u8 *p)
 {
     struct Z s1, s2;
     u8 *q = p + 0x200;
