@@ -1,15 +1,15 @@
 #include "global.h"
 u32 sub_08228DB8(void);
-void sub_08228D88(void);
-void sub_08228D94(void);
+void SunClock_GetBaseHour(void);
+void SunClock_GetBaseMinute(void);
 void sub_0816589C(u32, u32);
 void sub_08165830(u32, u32);
 void sub_08165870(u32, u32);
 void sub_081657F0(u32, u32);
 void sub_081755FC(void)
 {
-    sub_08228D88();
-    sub_08228D94();
+    SunClock_GetBaseHour();
+    SunClock_GetBaseMinute();
     switch (sub_08228DB8()) {
         case 0:
         case 4:

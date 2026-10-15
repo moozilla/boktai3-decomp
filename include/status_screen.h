@@ -83,8 +83,8 @@ void sub_0800E974(struct StatusScreen *);
 void sub_0800EF90(struct StatusScreen *);
 
 s32 Div(s32, s32);
-s32 sub_08228D88(void); // counter values
-s32 sub_08228D94(void);
+s32 SunClock_GetBaseHour(void); // counter values
+s32 SunClock_GetBaseMinute(void);
 u32 sub_08228D7C(void);
 void sub_082286E0(s32 *, s32 *, s32 *, u32);
 void sub_082279A8(s32, s32, s32, s32, s32, s32, s32); // (guess) start a screen transition

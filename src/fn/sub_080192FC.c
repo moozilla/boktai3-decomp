@@ -8,8 +8,8 @@ struct Clock {
     u8 armed[4];
 };
 extern u8 gUnk_03005430[];
-int sub_08228D88(void);
-int sub_08228D94(void);
+int SunClock_GetBaseHour(void);
+int SunClock_GetBaseMinute(void);
 int sub_08228DA0(void);
 void ClockEvents_RunScript(void *, int);
 static inline int distance(int a, int b)
@@ -41,8 +41,8 @@ int ClockEvents_Update(struct Clock *p)
     if (p->tick > 59)
         p->tick = zero;
     else {
-        p->hour = sub_08228D88();
-        p->minute = sub_08228D94();
+        p->hour = SunClock_GetBaseHour();
+        p->minute = SunClock_GetBaseMinute();
         p->second = sub_08228DA0();
         p->seconds = p->hour * 3600 + p->minute * 60 + p->second;
         if (distance(p->seconds, 43230) <= 30) {

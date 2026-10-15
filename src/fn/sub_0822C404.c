@@ -6,7 +6,7 @@ struct Context {
 };
 extern struct Context *gUnk_02000710;
 u32 sub_08228D7C(void);
-s32 sub_08228D88(void), sub_08228D94(void), sub_08228DA0(void);
+s32 SunClock_GetBaseHour(void), SunClock_GetBaseMinute(void), sub_08228DA0(void);
 void sub_082286E0(s32 *, s32 *, s32 *, s32);
 u32 sub_082285C4(s32, s32, s32, s32, s32, s32);
 u32 sub_0822C404(void)
@@ -23,8 +23,8 @@ u32 sub_0822C404(void)
             goto yes;
         delta = 86400;
     }
-    hour = sub_08228D88();
-    minute = sub_08228D94();
+    hour = SunClock_GetBaseHour();
+    minute = SunClock_GetBaseMinute();
     second = sub_08228DA0();
     time = (hour * 60 + minute) * 60 + second;
     old = (gUnk_02000710->hour * 60 + gUnk_02000710->minute) * 60 + gUnk_02000710->second;
