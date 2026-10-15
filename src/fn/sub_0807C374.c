@@ -1,9 +1,7 @@
-#include "global.h"
-
-void sub_0807C11C(u32, u32, u32);
-
-void sub_0807C374(u8 a, u8 b, u8 c, u8 d)
+#include "scene_actor_attachment.h"
+#define SceneActorEffect_PlayCategorySoundIfEnabled sub_0807C374
+void SceneActorEffect_PlayCategorySoundIfEnabled(u8 gate, u8 event, u8 category, u8 variant)
 {
-    if (a == 0)
-        sub_0807C11C(b, c, d);
+    if (gate == 0)
+        sub_0807C11C(event, category, variant);
 }
