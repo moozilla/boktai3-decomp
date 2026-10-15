@@ -1,15 +1,12 @@
-#include "global.h"
-
-void sub_08030BF8(void);
-void sub_08033468(void);
-void SceneInputPanel_ShowItemComparison(u8 *, u8 *, u8 *, s32, s32);
-void SceneInputPanel_ShowAttributeComparison(u8 *, u8 *, u8 *, u8 *, s32);
-
-void sub_08062978(u8 *p)
+#include "scene_inventory_panel.h"
+#define SceneInventory_ClearDescription sub_08062978
+void SceneInventory_ClearDescription(struct SceneInventoryPanel *p)
 {
-    *(u32 *)(p + 0xD10) |= 1;
+    p->display.banner.flags |= 1;
     sub_08030BF8();
     sub_08033468();
-    SceneInputPanel_ShowItemComparison(p + 0x14E8, p + 0x1608, p + 0x20, 0, -1);
-    SceneInputPanel_ShowAttributeComparison(p + 0x1728, p + 0x1848, p + 0x1968, p + 0x20, -1);
+    SceneInputPanel_ShowItemComparison(p->comparison[0], p->comparison[1],
+                                       &p->display.widgetResource, 0, -1);
+    SceneInputPanel_ShowAttributeComparison(p->comparison[2], p->comparison[3], p->comparison[4],
+                                            &p->display.widgetResource, -1);
 }
