@@ -1,4 +1,5 @@
 #include "global.h"
+#define AreaEffect_ScaleLinkGainAtPosition sub_0804EC00
 struct S {
     u8 f[0x868];
     u32 fl;
@@ -6,7 +7,7 @@ struct S {
 extern struct S *gUnk_02000710;
 extern u8 *gUnk_020004B4;
 s32 sub_0804E030(u8 *);
-s32 sub_0804EBD8(u8 *);
+s32 sub_0804EBD8(s32);
 static inline u32 mk(u32 *a, u32 m)
 {
     return *a & m;
@@ -23,7 +24,7 @@ static inline u16 g62(u8 *p)
         return 0;
     return *(u16 *)(p + 0x62);
 }
-s32 sub_0804EC00(u8 *a, u8 *b)
+s32 AreaEffect_ScaleLinkGainAtPosition(u8 *a, s32 gain)
 {
     if (g62(gUnk_020004B4) == 0)
         goto no;
@@ -38,5 +39,5 @@ s32 sub_0804EC00(u8 *a, u8 *b)
 no:
     return 0;
 yes:
-    return sub_0804EBD8(b);
+    return sub_0804EBD8(gain);
 }
