@@ -1,5 +1,4 @@
 #include "scene_panel_rig.h"
-#define ScenePanelRig_ShowSprites sub_0805956C
 void ScenePanelRig_ShowSprites(struct ScenePanelRig *rig)
 {
     s32 i;

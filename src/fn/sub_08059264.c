@@ -1,5 +1,4 @@
 #include "scene_panel_schedule.h"
-#define ScenePanel_TickHandleActionA sub_08059264
 void ScenePanel_TickHandleActionA(struct ScenePanel *input)
 {
     struct ScenePanelScheduleView *panel = (void *)input;

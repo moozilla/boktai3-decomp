@@ -1,5 +1,4 @@
 #include "scene_panel_rig.h"
-#define ScenePanelRig_SetState sub_080595AC
 void ScenePanelRig_SetState(struct ScenePanelRig *rig, u32 state)
 {
     if (rig->state == 0) {
@@ -13,7 +12,7 @@ void ScenePanelRig_SetState(struct ScenePanelRig *rig, u32 state)
     rig->state = state;
     rig->stateFrame = 0;
     if (rig->state == 0)
-        sub_0805952C(rig);
+        ScenePanelRig_HideSprites(rig);
     else
-        sub_0805956C(rig);
+        ScenePanelRig_ShowSprites(rig);
 }

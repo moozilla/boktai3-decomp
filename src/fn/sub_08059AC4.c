@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_panel_rig.h"
-#define ScenePanelRig_TickRise sub_08059AC4
 void ScenePanelRig_TickRise(struct ScenePanelRig *rig)
 {
     struct SceneRigParentView *parent = (void *)rig->parent;
@@ -15,12 +14,12 @@ void ScenePanelRig_TickRise(struct ScenePanelRig *rig)
     if ((u16)frame > 15) {
         rig->position.y += 128;
         if (parent->mode != 0 && parent->activeCount != 0)
-            sub_080595AC(rig, 2);
+            ScenePanelRig_SetState(rig, 2);
         else {
-            sub_080597E0(rig);
+            ScenePanelRig_RandomizeMovement(rig);
             rig->speed = 448;
             rig->verticalStep = 96;
-            sub_080595AC(rig, 3);
+            ScenePanelRig_SetState(rig, 3);
         }
     } else {
         u32 truncated;
