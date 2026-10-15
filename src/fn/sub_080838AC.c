@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_motion.h"
-#define SceneActorControl_TickGroundBob sub_080838AC
 static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input, u32 offset)
 {
     u32 mask = input;

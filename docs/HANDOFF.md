@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 29.945% matching (2026-10-15). This file is the single
+Last updated after reaching 29.984% matching (2026-10-15). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,33 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 15 closeout: ground motion and collision helpers
+
+Exact code is **29.9844246%**, up **0.0395801 percentage points** (+956 bytes)
+from PR166: **7,086 /11,492 functions**, **724,230 /2,415,354 bytes**.
+Without register pinning: **21.169%** (511,318 bytes); Register-pinned:
+**8.815%** (212,912 bytes), included above. New full exact bodies are
+838AC(480),83B90(108),83E34(60),83E98(164),hidden83F3C(32), and84210(112), all register-pinned.
+The old83AEC initializer remains ordinary/exact164B after replacing two
+indeterminate scalar reads with initialized XYZ bitfield-member assignments.
+
+The complete83AEC–84280 helper subsection was reviewed. Its old83E98 span
+contains three independent entries:83E98(164),83F3C(32),83F5C(232). Two new
+reviewed boundaries increase the function denominator by2 without changing
+the code-byte denominator. See [helper contracts](SCENE_ACTOR_CONTROL_HELPERS.md)
+and [motion states](SCENE_ACTOR_CONTROL_MOTION.md).
+
+The account meter reached **20% remaining**, so new matching stopped at the
+user's cutoff before30%. Reaching30% requires at least724,607 exact bytes;
+**377 additional bytes** remain. No reset was consumed. Existing bounded
+permuter searches may continue independently of model usage. Five newly
+published full reviewed drafts retain ASM fallbacks and no exact credit:
+A8CC,80494,82184,83354,83560. Their sources record the current full-extent fuzzy
+scores. The project now has83 guarded drafts. The [permuter handoff](PERMUTER_HANDOFF_2026-10-15.md)
+records frozen queues, private worktrees, residues and drafts withheld pending
+contract review. Preserve these active worktrees; ignored private experiments
+must not be lost through archival.
 
 ## October 15 continuation: saved motion and lift/sway control
 

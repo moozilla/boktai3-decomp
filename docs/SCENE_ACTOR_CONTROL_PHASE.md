@@ -86,7 +86,7 @@ hard-register trial incorrectly omitted one whole path and was rejected. The
 accepted whole496 bytes include both paths and use no explicit r7 binding.
 
 All entries in82648–83550 now have complete static semantic review. The two
-remaining assembly bodies have valid private C drafts.82648(888-byte target,
+remaining assembly bodies have complete C drafts:83354 is published behind NONMATCHING, while82648 remains private.82648(888-byte target,
 880-byte draft/53.8% fuzzy) admits destination kind1 and performs two actor
 availability checks, conditionally records contact ID4 at actor304, clears2D0
 bit01000000 and calls the shared contact operation. Field1E6 values1 or12–15
