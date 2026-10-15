@@ -1,20 +1,19 @@
-#include "global.h"
-
-extern u8 *gUnk_020004A8;
-
-u32 sub_08073C70(u32 a, u32 b)
+#include "scene_actor_profile.h"
+#define SceneActorProfiles_Find sub_08073C70
+struct SceneActorProfile *SceneActorProfiles_Find(u32 id, u32 mode)
 {
-    u8 *e = *(u8 **)(gUnk_020004A8 + 0x280);
-    s32 i = 0;
-    if (e != 0) {
+    struct SceneActorProfileList *list = (void *)gUnk_020004A8->subsystem;
+    struct SceneActorProfile *profile = list->head;
+    s32 count = 0;
+    if (profile) {
         do {
-            if (e[4] == a && e[5] == b)
-                return (u32)e;
-            e = *(u8 **)e;
-            i++;
-            if (i > 11)
+            if (profile->id == id && profile->mode == mode)
+                return profile;
+            profile = profile->next;
+            count++;
+            if (count > 11)
                 break;
-        } while (e != 0);
+        } while (profile);
     }
     return 0;
 }
