@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_placement.h"
-#define SceneActorPlacement_EmitTimedParticles sub_08077C48
 struct SceneActorEmissionPhase {
     u8 unknown0[0x2B6];
     u8 direction, unknown2B7[3];

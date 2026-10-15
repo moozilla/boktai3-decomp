@@ -1,5 +1,4 @@
 #include "scene_actor_registry.h"
-#define SceneActorAttachment_TestPositionWindow sub_0807CA00
 u32 SceneActorAttachment_TestPositionWindow(struct SceneActorRegistryActor *actor,
                                             const struct ContactPosition *position, u32 xWindow,
                                             u32 zWindow)

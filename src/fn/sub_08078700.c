@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_behavior.h"
-#define SceneActorBehavior_UpdateColliders sub_08078700
-u8 sub_08078078(struct SceneActorRegistryActor *);
+u8 SceneActorBehavior_IsNearParticipant(struct SceneActorRegistryActor *);
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)
@@ -101,7 +100,7 @@ activeTest: {
     if (ReadControl(0x110, control))
         goto secondaryUpdate;
     {
-        u32 near = (u32)sub_08078078((void *)actor) << 24;
+        u32 near = (u32)SceneActorBehavior_IsNearParticipant((void *)actor) << 24;
         position = (void *)actor;
         position = (void *)((u32)position + 0x5C);
         if (!near || ReadControl(6, control))

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_behavior.h"
-#define SceneActorBehavior_ActivatePendingControl sub_08078DEC
 static inline u8 Unavailable(struct SceneActorBehaviorView *actor)
 {
     if (actor) {

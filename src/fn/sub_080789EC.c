@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_behavior.h"
-#define SceneActorBehavior_RecordDefeat sub_080789EC
 void sub_0807C72C(struct SceneActorBehaviorView *, u32, u32, u32);
 struct SceneActorBehaviorPlayerSlot {
     u8 unknown0[8];

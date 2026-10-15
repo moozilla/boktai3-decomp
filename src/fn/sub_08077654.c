@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_placement.h"
-#define SceneActorPlacement_ConsumeCallbackFlag sub_08077654
 static inline u8 SceneActorPlacement_TestAndSaveFlags(u32 mask, u16 *source, u16 **saved)
 {
     u32 bits = *source & mask;

@@ -4,7 +4,8 @@
 u8 *sub_0821D64C(s32, s32);
 s32 sub_0821F204(void *, const struct ContactPosition *, const struct ContactPosition *);
 s32 sub_0821F7A8(void *, const struct ContactPosition *, const struct ContactPosition *);
-u8 sub_0807CA00(struct SceneActorRegistryActor *, const struct ContactPosition *, u32, u32);
+u8 SceneActorAttachment_TestPositionWindow(struct SceneActorRegistryActor *,
+                                           const struct ContactPosition *, u32, u32);
 void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorRegistryActor *, u32);
 struct MovementRouteState {
     u8 unknown0[6];
@@ -160,7 +161,7 @@ slopeDone:;
             phase->field6 = initial;
         }
     }
-    if (!sub_0807CA00(actor, &target, 32, 32)) {
+    if (!SceneActorAttachment_TestPositionWindow(actor, &target, 32, 32)) {
         {
             register u32 mask asm("r1") = ~0xc0;
             register u32 *flags asm("r2") = cachedFlags;

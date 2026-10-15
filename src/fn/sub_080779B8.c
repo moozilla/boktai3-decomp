@@ -1,5 +1,4 @@
 #include "scene_actor_placement.h"
-#define SceneActorPlacement_PlayCategoryEventSound sub_080779B8
 void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *argument)
 {
     struct SceneActorPlacementView *actor = (void *)argument;
@@ -17,7 +16,7 @@ void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *
             Sound_PlaySong(256);
             break;
         case 3:
-            sub_08077848(actor, 0);
+            SceneActorPlacement_PlayVariantEventSound(actor, 0);
             break;
         case 2:
             Sound_PlaySong(275);

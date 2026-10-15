@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_route.h"
 #include "script_utility.h"
-void sub_0807E7DC(struct SceneActorRegistryActor *);
+void SceneActorMovement_ResolveRoutePosition(struct SceneActorRegistryActor *);
 extern const u8 gUnk_08610814[];
 void SceneActorRoute_AdvanceActorPoint(struct SceneActorRegistryActor *actor,
                                        struct SceneActorRouteCursor *cursor)
@@ -24,7 +24,7 @@ void SceneActorRoute_AdvanceActorPoint(struct SceneActorRegistryActor *actor,
     mode = cursor->point->attributes >> 4;
     near = (u8)sub_0821E8C8(cursor, &actor->position, 32, 32);
     if (near) {
-        sub_0807E7DC(actor);
+        SceneActorMovement_ResolveRoutePosition(actor);
         {
             u32 behavior = 2;
             u32 offset = 0x2a8;

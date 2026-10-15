@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_placement.h"
-#define SceneActorPlacement_PlayVariantEventSound sub_08077848
 void SceneActorPlacement_PlayVariantEventSound(struct SceneActorPlacementView *actor, u32 event)
 {
     s32 variant = actor->paletteOffset;

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_behavior.h"
-#define SceneActorBehavior_ApplyContactReaction sub_08078854
 void sub_0821FF8C(struct SceneActorBehaviorContactView *, struct SceneActorBehaviorContactView *);
 void sub_0812F520(struct SceneActorBehaviorView *, struct SceneActorBehaviorContactView *,
                   struct SceneActorBehaviorContactView *);

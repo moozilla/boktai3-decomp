@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 29.283% matching (2026-10-15). This file is the single
+Last updated after reaching 29.610% matching (2026-10-15). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,53 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 15 continuation: actor feedback, reactions and attachment lifecycle
+
+Exact code is **29.610%**, up **0.3267 percentage points** (+7,892 net bytes)
+from PR161: **7,052 /11,488 functions**, **715,182 /2,415,354 bytes**.
+Without register pinning: **21.149%**; Register-pinned: **8.460%**, included
+above. Newly authored exact bodies cover8,088 bytes. Correct boundary review
+removes196 bytes of false old7827C retained-tail credit:7827C is240 bytes;
+7836C is an independent196-byte blink callback, now actually matched. Another
+independent252-byte helper begins78550 after78430's288-byte extent; it is a
+queued next-batch match and receives no credit in these figures. The total byte
+denominator is unchanged, and two reviewed boundaries add two functions.
+
+The new contiguous work covers the timed particle emitter and category sounds,
+proximity/script/descriptor helpers, collider activation and contact reactions,
+defeat accounting, and pending control activation. A62C/A714 form an exact672-byte
+pair for timer/contact updates and priority flag dispatch. Attachment selectors
+produce observed Y/Z offsets, followed by a position-window query, stable signed
+candidate sort, and nearest-player retargeting. See
+[placement](SCENE_ACTOR_PLACEMENT.md), [behavior frontier](SCENE_ACTOR_BEHAVIOR_FRONTIER.md),
+[update callbacks](SCENE_ACTOR_UPDATE.md), and
+[attachment responses](SCENE_ACTOR_ATTACHMENT_RESPONSES.md).
+
+The adjoining E6FC/E7DC/E908 effect-offset, route-target and cleanup helpers add
+648 exact bytes. Their E334 cardinal scan is understood but still private C.
+See [terrain/effect lifecycle](SCENE_ACTOR_EFFECT_LIFECYCLE.md). The scene reset
+F2CC adds220 ordinary-C bytes after a reviewed permuter recovery; tracing two
+remaining immediate differences exposed three wrong offsets in the private
+baseline, corrected to7FA/7FE/7F8. The result has no hints. See
+[state/query contracts](SCENE_STATE_QUERIES.md). Names and unknown fields remain
+provisional; none of these static contracts establishes runtime coverage.
+
+The target remains **30% exact or20% account usage remaining**; latest meter
+39% remaining, no reset consumed. Sol ownsA8CC–C11C, Tail C11C–E334, and Root
+E334–8005C. Lifecycle is starting800A4–81290 after its completed helper prefix;
+78BB4's unsupported-category output contract and the whole5956-byte78EE8 update
+remain private. Tail's C72C has the same unresolved conditional-output issue.
+No initialized defaults or semantic changes are invented to close those gaps.
+Prior route/grid/steering drafts are retained. Frozen permuters continue to be
+used for suitable residue, with source validity and full-extent checks required.
+
+Validation: the final combined build prints `build/boktai3.gba: OK` and the
+RAM-literal audit passes. All58 changed/promoted single-function units pass
+full reviewed extents against that final ELF. Source audit:58 C files, no
+warnings/errors. All9 progress/boundary tests, formatting and inventory checks
+pass. The78 guarded drafts remain outside exact credit. A later queued252-byte
+ordinary steering match and further worker ABI reviews are not included above.
 
 ## October 15 continuation: animation, palette and registry scheduling
 

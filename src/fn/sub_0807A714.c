@@ -13,7 +13,6 @@ static inline u8 TestValue(u32 value)
         return 1;
     return 0;
 }
-#define SceneActorBehavior_DispatchPendingFlags sub_0807A714
 s32 SceneActorBehavior_DispatchPendingFlags(struct SceneActorRegistryActor *actor)
 {
     register u32 mask asm("r0");
