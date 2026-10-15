@@ -47,9 +47,9 @@ ActorAttachment_ReleaseResource(struct ActorAttachmentSlotView *incoming, u32 re
         {
             u32 kind = *resource;
             if (kind <= 1 || kind == 4 || kind == 5 || kind == 6) {
-                if (slot->unknown48[0]) {
+                if (slot->active48) {
                     Sprite_Remove(sprite);
-                    slot->unknown48[0] = 0;
+                    slot->active48 = 0;
                 }
             } else {
                 i = 0;
