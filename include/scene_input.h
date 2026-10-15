@@ -23,7 +23,7 @@ struct SceneInputPackedPosition {
     u32 x : 16, y : 16, z : 16;
 };
 extern u16 gUnk_03005260[];
-void sub_08219728(void *, void *, u32);
+s32 sub_08219728(void *, void *, u32);
 void sub_0821983C(void *, void *, u32, u32, u32, u32, u32, void *);
 void sub_0816381C(u16 *, u8 *);
 void sub_0805E190(struct SceneInputWidget *, void *, u8 *, u32, u8 *);
