@@ -118,6 +118,7 @@ address,evidence
 080688CC,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08069788,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched)
 08069C94,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
+0806A420,Independent256-byte guarded particle script wrapper; exact C; original0806A160 span split704+256; docs/SPARK_PARTICLE.md
 0806A784,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0806BE80,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0806CFFC,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
