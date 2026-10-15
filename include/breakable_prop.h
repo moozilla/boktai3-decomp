@@ -26,16 +26,17 @@ struct BreakablePropContact {
     u8 unknown0[0x34];
     u32 flags;
 };
-void sub_080515C0(struct BreakablePropContact *, s32, struct BreakableProp *);
-void sub_080515DC(struct BreakableProp *);
-u32 sub_080516FC(struct BreakableProp *);
-u32 sub_0805173C(struct BreakableProp *);
-s32 sub_08051858(struct BreakableProp *, u32, u32);
+void BreakableProp_RequestBreakOnContact(struct BreakablePropContact *, s32,
+                                         struct BreakableProp *);
+void BreakableProp_EmitBreakParticles(struct BreakableProp *);
+u32 BreakableProp_Tick(struct BreakableProp *);
+u32 BreakableProp_Destroy(struct BreakableProp *);
+s32 BreakableProp_InitializeFromScript(struct BreakableProp *, u32, u32);
 s32 AnimatedParticles_Create(s32, void *, struct AnimatedParticleConfig *);
 extern u32 gUnk_03005308;
 s32 Mod(s32, s32);
-void sub_0805175C(struct BreakableProp *, void *);
-void sub_080517D0(struct BreakableProp *, u32, void *);
+void BreakableProp_InitializeSprite(struct BreakableProp *, void *);
+void BreakableProp_InitializeCollider(struct BreakableProp *, u32, void *);
 u8 *sub_0821D64C(s32, s32);
 void sub_0821D698(void *, u32, u32, u32, u32, u32);
 #endif

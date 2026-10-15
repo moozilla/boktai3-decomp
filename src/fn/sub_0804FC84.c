@@ -1,5 +1,4 @@
 #include "repeated_effect.h"
-#define RepeatedEffect_TickEntry sub_0804FC84
 void sub_0824923C(struct RepeatedEffect *, void (*)(struct RepeatedEffect *));
 void RepeatedEffect_TickEntry(struct RepeatedEffect *effect)
 {
@@ -14,16 +13,16 @@ void RepeatedEffect_TickEntry(struct RepeatedEffect *effect)
             if (constrainedValue) {
                 u8 state = effect->state;
                 if (state == 0) {
-                    sub_0804F7D0(effect, 0, sub_0804FB48);
+                    RepeatedEffect_SetState(effect, 0, RepeatedEffect_TickNeutral);
                     effect->sprite.frame = state;
                     effect->flashing = 0;
                     effect->request = 0;
                 } else if (state == 2) {
-                    sub_0804F7D0(effect, 2, sub_0804F970);
+                    RepeatedEffect_SetState(effect, 2, RepeatedEffect_TickUpperState);
                     effect->sprite.frame = 8;
                     effect->transitionHold = 16;
                 } else if (state == 1) {
-                    sub_0804F7D0(effect, 2, sub_0804F888);
+                    RepeatedEffect_SetState(effect, 2, RepeatedEffect_TickLowerState);
                     effect->sprite.frame = 5;
                     effect->transitionHold = 16;
                 }

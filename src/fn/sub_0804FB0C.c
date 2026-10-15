@@ -1,5 +1,4 @@
 #include "repeated_effect.h"
-#define RepeatedEffect_TickUpperRecovery sub_0804FB0C
 
 void RepeatedEffect_TickUpperRecovery(struct RepeatedEffect *p)
 {
@@ -12,6 +11,6 @@ void RepeatedEffect_TickUpperRecovery(struct RepeatedEffect *p)
         p->sprite.frame = 6;
     } else {
         p->sprite.frame = 2;
-        sub_0804F7D0(p, 0, sub_0804FB48);
+        RepeatedEffect_SetState(p, 0, RepeatedEffect_TickNeutral);
     }
 }

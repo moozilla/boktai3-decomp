@@ -1,5 +1,4 @@
 #include "breakable_prop.h"
-#define BreakableProp_InitializeSprite sub_0805175C
 void BreakableProp_InitializeSprite(struct BreakableProp *prop, void *packet)
 {
     struct ContactSwarmSprite *sprite = &prop->sprite;

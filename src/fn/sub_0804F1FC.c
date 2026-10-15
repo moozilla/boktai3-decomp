@@ -1,6 +1,5 @@
 #include "resource_station.h"
 // MATCHING_CONCESSION: register-pinning
-#define ResourceStation_UpdateDigits sub_0804F1FC
 s32 Div(s32, s32);
 void Anim_LoadKeyframe(void *, void *, u16, u32);
 static inline s32 truncateScale(s32 value)

@@ -1,6 +1,5 @@
 #include "resource_station.h"
 // MATCHING_CONCESSION: register-pinning
-#define ResourceStation_CheckInteraction sub_0804EFB4
 void sub_08158ECC(struct ResourceStationPlayer *, struct ResourceStationPosition *, u32);
 void ResourceStation_CheckInteraction(struct ResourceStation *station)
 {

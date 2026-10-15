@@ -1,5 +1,4 @@
 #include "repeated_effect.h"
-#define RepeatedEffect_InitSprite sub_0804FDB4
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, s32);
 void AnimData_SelectTiles(void *, u32);

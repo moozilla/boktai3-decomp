@@ -1,5 +1,4 @@
 #include "global.h"
-#define RepeatedEffect_GetStateFromScript sub_0804F774
 extern u8 *gUnk_02000110;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);

@@ -1,5 +1,4 @@
 #include "repeated_effect.h"
-#define RepeatedEffect_DestroyManager sub_0804FF70
 void sub_08225938(void *);
 void Sprite_Remove(void *);
 void Collider_Remove(void *);

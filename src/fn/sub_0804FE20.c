@@ -1,5 +1,4 @@
 #include "repeated_effect.h"
-#define RepeatedEffect_InitCollider sub_0804FE20
 struct H {
     u32 lo : 16;
     u32 hi : 16;
@@ -18,8 +17,8 @@ void Collider_SetCallback(u8 *,
                           struct RepeatedEffect *);
 void Collider_SetPosition(u8 *, u8 *, u32);
 void Collider_Refresh(u8 *);
-void sub_0804F7E8(struct RepeatedEffectCollider *, struct RepeatedEffectCollider *,
-                  struct RepeatedEffect *);
+void RepeatedEffect_HandleContact(struct RepeatedEffectCollider *, struct RepeatedEffectCollider *,
+                                  struct RepeatedEffect *);
 void RepeatedEffect_InitCollider(struct RepeatedEffect *p)
 {
     struct Z s1, s2;
@@ -30,7 +29,7 @@ void RepeatedEffect_InitCollider(struct RepeatedEffect *p)
     *(u32 *)&s2.a = 0;
     *(u32 *)&s2.b &= 0xFFFF0000;
     Collider_Init(q, p->tag, 0x4003, 0, 0x10, &s1, &s2);
-    Collider_SetCallback(q, sub_0804F7E8, p);
+    Collider_SetCallback(q, RepeatedEffect_HandleContact, p);
     Collider_SetPosition(q, (u8 *)&p->sprite.position, 0);
     Collider_Refresh(q);
     ((struct Q *)q)->v = 0x258;

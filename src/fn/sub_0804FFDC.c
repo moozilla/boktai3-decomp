@@ -1,5 +1,4 @@
 #include "repeated_effect.h"
-#define RepeatedEffect_InitManager sub_0804FFDC
 s32 RepeatedEffect_InitManager(struct RepeatedEffectManager *manager)
 {
     manager->count = 0;

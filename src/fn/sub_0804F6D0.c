@@ -1,5 +1,4 @@
 #include "repeated_effect.h"
-#define RepeatedEffect_RequestNearby sub_0804F6D0
 s32 RepeatedEffect_RequestNearby(struct RepeatedEffectPosition *point)
 {
     struct RepeatedEffectManager *manager = gUnk_02000110;

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "breakable_prop.h"
-#define BreakableProp_EmitBreakParticles sub_080515DC
 void BreakableProp_EmitBreakParticles(struct BreakableProp *prop)
 {
     struct {

@@ -1,5 +1,4 @@
 #include "global.h"
-#define ResourceStation_ReadDisplayCommands sub_0804F384
 struct M {
     u32 a;
     u16 *b;

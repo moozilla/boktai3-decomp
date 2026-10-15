@@ -1,5 +1,4 @@
 #include "global.h"
-#define ResourceStation_InitializeSprite sub_0804F448
 struct Q {
     u32 a;
     u8 f[0xc];

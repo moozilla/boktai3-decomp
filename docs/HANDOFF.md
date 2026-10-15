@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 24.682% matching (2026-10-14). This file is the single
+Last updated after reaching 24.840% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,42 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex/Sol): station, repeated effects, force and breakable props
+
+Exact code is **24.840%**, up **0.1588 percentage points** (+3,836 bytes)
+from fifteen new functions. There are **6,570 / 11,471 functions** and
+**599,982 / 2,415,354 bytes**. Without register pinning: **19.742%**;
+Register-pinned: **5.098%**, included above. Seventy-seven guarded drafts remain.
+New exact bytes comprise872 without hints and2,964 with minimized concessions.
+
+Four complete cohorts now have shared layouts and named lifecycle/state
+contracts: resource station **0804EFB4–0804F6C4** (1,808 bytes), repeated-effect
+manager **0804F6C4–08050128** (2,660 bytes including the script wrapper),
+directional force **080510B8–080515C0** (1,288 bytes), and breakable prop
+**080515C0–08051A3C** (1,148 bytes). Together with the prior cell-gate and
+orbit batches, **0804E008–08051A3C** is now contiguous exact C.
+
+The repeated-effect manager has eight0xFC entries; its seven-argument entry
+initializer takes a tag, position, initial state, body-enabled flag, behavior
+flags and cell constraint. The script wrapper now uses this full header.
+Review aligned the area/station player+418 view with established actionMode,
+and kept player+1C as an uncertain state tag. Station creator F67C ends at hidden
+helperF6C4; its full extent is72 bytes. See [station notes](../notes/resource-station_2026-10-14.md),
+[repeated-effect notes](../notes/repeated-effect_2026-10-14.md),
+[force notes](../notes/directional-force_2026-10-14.md) and
+[prop notes](../notes/breakable-prop_2026-10-14.md).
+
+Combined build printed **`build/boktai3.gba: OK`** in
+`build/force-props-combined.log`; **90 complete post-promotion extent checks pass**,
+including every changed area-player header consumer. Format/inventory/RAM
+checks and all twelve data round trips pass. No new runtime coverage claims.
+
+Continue toward **30% exact or40% account usage remaining**. Latest usage:
+**65% remaining**. Parent owns **08051A3C–08052130**, provisionally a proximity
+emitter tied to the tether actor. Sol owns **08052130–080537D0**, provisionally
+a stacked actor with eight particles, in its isolated checkout. Both continue
+with readable C and per-function commits; batch full builds before integration.
 
 ## October 14 (Codex/Sol): area managers and orbit-positioned background
 

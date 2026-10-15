@@ -1,6 +1,5 @@
 #include "directional_force.h"
 // MATCHING_CONCESSION: register-pinning
-#define DirectionalForce_Tick sub_08051224
 s32 DirectionalForce_Tick(struct DirectionalForce *force)
 {
     u32 countdown;

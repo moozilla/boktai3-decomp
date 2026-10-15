@@ -1,10 +1,9 @@
 #include "global.h"
-#define ResourceStation_Initialize sub_0804F5F4
 extern u32 gUnk_02000580;
-void sub_0804F448(u8 *);
-void sub_0804F528(u8 *);
-void sub_0804F568(u8 *);
-void sub_0804F4AC(u8 *);
+void ResourceStation_InitializeSprite(u8 *);
+void ResourceStation_SetTriggerPosition(u8 *);
+void ResourceStation_InitializeCollider(u8 *);
+void ResourceStation_InitializeDigits(u8 *);
 s32 ResourceStation_Initialize(u8 *p, u32 v)
 {
     u32 g = gUnk_02000580;
@@ -16,10 +15,10 @@ s32 ResourceStation_Initialize(u8 *p, u32 v)
     h = (u16 *)(p + 0x260);
     z = 0;
     *h = v;
-    sub_0804F448(p);
-    sub_0804F528(p);
-    sub_0804F568(p);
-    sub_0804F4AC(p);
+    ResourceStation_InitializeSprite(p);
+    ResourceStation_SetTriggerPosition(p);
+    ResourceStation_InitializeCollider(p);
+    ResourceStation_InitializeDigits(p);
     p[0x262] = z;
     p[0x264] = z;
     p[0x265] = z;

@@ -1,5 +1,4 @@
 #include "global.h"
-#define ResourceStation_TransferStoredResource sub_0804F0B4
 struct P {
     u8 f[0x25c];
     u32 x;

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "repeated_effect.h"
-#define RepeatedEffect_TickUpperTransition sub_0804F9C4
 extern u32 gUnk_03005308;
 void Sound_PlaySong(s32);
 void sub_08015B84(u32, u32, u32, u32, struct RepeatedEffectPosition *);
@@ -82,6 +81,6 @@ void RepeatedEffect_TickUpperTransition(struct RepeatedEffect *effect)
         }
     } else {
         effect->sprite.frame = 8;
-        sub_0804F7D0(effect, 2, sub_0804F970);
+        RepeatedEffect_SetState(effect, 2, RepeatedEffect_TickUpperState);
     }
 }

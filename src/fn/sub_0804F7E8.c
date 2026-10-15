@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "repeated_effect.h"
-#define RepeatedEffect_HandleContact sub_0804F7E8
 void RepeatedEffect_HandleContact(struct RepeatedEffectCollider *contact,
                                   struct RepeatedEffectCollider *other,
                                   struct RepeatedEffect *effect)
@@ -17,13 +16,13 @@ void RepeatedEffect_HandleContact(struct RepeatedEffectCollider *contact,
         if (flags & mask) {
             u8 state = initial->state;
             if (state == 0)
-                sub_0804F7D0(initial, 2, sub_0804F9C4);
+                RepeatedEffect_SetState(initial, 2, RepeatedEffect_TickUpperTransition);
             else if (state == 1)
-                sub_0804F7D0(initial, 0, sub_0804F91C);
+                RepeatedEffect_SetState(initial, 0, RepeatedEffect_TickLowerRecovery);
             other->cooldown = 30;
         } else if (flags & 8) {
             if (initial->state == 0)
-                sub_0804F7D0(initial, 1, sub_0804F8CC);
+                RepeatedEffect_SetState(initial, 1, RepeatedEffect_TickLowerTransition);
             *cooldown = 30;
         } else if (saved->state == 0) {
             u8 *request = &saved->request;
