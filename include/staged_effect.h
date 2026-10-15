@@ -20,7 +20,7 @@ struct StagedEffect {
     s16 travel, initialTravel, spread, initialSpread;
     s16 shakeX, shakeZ;
     u32 frame;
-    void *pendingScript;
+    u32 pendingScriptId;
     union {
         u32 words[2];
         struct {
