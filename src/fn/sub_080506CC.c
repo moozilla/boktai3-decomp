@@ -1,0 +1,68 @@
+#include "cell_gate.h"
+// MATCHING_CONCESSION: register-pinning
+void sub_08050280(struct CellGate *);
+void sub_08050404(struct CellGate *);
+void sub_080505BC(struct CellGate *);
+#define CellGate_InitializeFromScript sub_080506CC
+s32 CellGate_InitializeFromScript(struct CellGate *gate, u32 id)
+{
+    struct ContactPackedVector position;
+
+    s32 x, z;
+    u32 value;
+    register CellGateUpdate callback asm("r0");
+    u32 cell;
+    gate->id = id;
+    gate->registered = 0;
+    if (Script_SeekToKeyword('t'))
+        value = Script_GetValue();
+    else
+        value = 9;
+    gate->flags = value;
+    if (Script_SeekToKeyword('p')) {
+        position.x = Script_GetValue();
+        position.y = Script_GetValue();
+        position.z = Script_GetValue();
+    } else {
+        position.x = 0;
+        position.y = 0;
+        position.z = 0;
+    }
+    {
+        struct ContactPosition *coord = (void *)&position;
+        {
+            s16 *xp = (void *)&position;
+            x = *xp >> 8;
+        }
+        z = coord->z >> 8;
+    }
+    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        cell = 0;
+    else
+        cell = gUnk_030052F4->rows[z] + x;
+    gate->cell = cell;
+    gate->height = ((struct ContactPosition *)&position)->y >> 8;
+    value = Script_SeekToKeyword('R');
+    if (value)
+        value = Script_GetValue();
+    gate->scriptId = value;
+    {
+        u32 flags = gate->flags;
+        if (flags & 1) {
+            callback = sub_08050280;
+            goto assign;
+        }
+        {
+            u32 mask = 2;
+            mask &= flags;
+            if (mask) {
+                callback = sub_08050404;
+                goto assign;
+            }
+        }
+        callback = sub_080505BC;
+    assign:
+        gate->update = callback;
+    }
+    return 0;
+}
