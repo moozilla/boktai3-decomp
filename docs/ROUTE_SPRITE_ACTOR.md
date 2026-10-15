@@ -1,9 +1,9 @@
 # Route sprite actor pool (tentative)
 
-The `0806D000–0806E130` subsection belongs to the four-slot pool at singleton
+The reviewed `0806CFE4–0806E34C` subsection belongs to the four-slot pool at singleton
 `02000198`. Its identity in the game remains unverified; names describe the
-observed route, sequence, movement, and repetition mechanisms. The adjacent
-manager lifecycle begins at `6E130` and is owned by the integrator.
+observed route, sequence, movement, and repetition mechanisms. The manager lifecycle begins at `6E130`; the following terrain helpers begin
+at the independently recovered `6E34C` boundary.
 
 ## Storage and callbacks
 
@@ -70,14 +70,43 @@ count and restores palette bank `140`; a nonzero count returns to state 2,
 otherwise it enters final state 5. The packed adjustment uses the established
 `ContactPackedVector` bitfield layout in a local union with `ContactPosition`.
 
+## Manager continuation and recovered boundaries
+
+`6E130` dispatches occupied slots only when the combined engine pause flags
+`030053F0/F4 & 400` and mode flag `02000560 & 4` are clear. Its state cursor is
+an unsigned address so the unused final stride does not form a pointer beyond
+the pool object. `6E1C0` removes present sprites and successfully initialized
+shadows, then clears the singleton. `6E224` looks up the sequence resource with
+hashes `(922E,1DC3)`; the legacy callee name `ScriptProc_Start` is misleading
+here. `6E250` allocates a category-10 task with size `600`, and `6E29C` only
+resets the singleton.
+
+`6E2A8` requests final state 5 on every occupied slot that is not already in that
+state. Its full body is **96 bytes**, not the old 552-byte inventory span. Two
+independent functions followed its return inside a raw-byte tail: `6E308–6E34C`
+is a **68-byte capacity query**; `6E34C–6E4D0` is a **388-byte terrain sampler**.
+Both have their own prologues and complete returns. An addressed ROM audit
+found no stored Thumb pointers or halfword-aligned direct B/Bcc/BL encoding
+targeting either start, including data. No execution coverage is claimed. Both
+build/progress extra-boundary tables now record the full reviewed ends. The
+function denominator increases by two; the code-byte denominator is unchanged.
+The terrain body belongs to the integrator's next subsection and remains
+unmatched in this worker. `6E308` returns true when all four slots are occupied
+or manager creation fails, and false when any slot is free.
+
 ## Matching evidence and remaining work
 
 Current new exact bodies are `6D000` (388), `6DB20` (452), `6DCE4` (636), and `6DFC8` (360):
-**1,836 bytes / +0.0760 percentage points**, all temporarily register-pinned.
-The allocator, wrapper, event-script callback, and empty state total 132
-previously credited bytes, independently reviewed and checked in full.
+**1,836 bytes** before the manager lifecycle extension. `6E130` (144),
+`6E1C0` (100), `6E2A8` (96), and recovered `6E308` (68) bring the cohort to
+**2,244 bytes / +0.0929 percentage points**: 164 ordinary C bytes and 2,080
+temporarily register-pinned bytes.
+The allocator, wrapper, event-script callback, empty state, initializer,
+constructor, and singleton reset total **264 previously credited bytes**,
+independently reviewed and checked in full.
 Temporary hints were minimized: completion TU 4→2 plus eleven shared playback
-hints, pausing 60→26, emission 79→31, and creation 52→24. No source binds `r7`.
+hints, pausing 60→26, emission 79→31, creation 52→24, updater 11→1,
+destructor 2→1, and finish request 4→0. No source binds `r7`.
 
 Unmatched bodies remain `6D184` (692), waypoint helper `6D438` (776), movement
 state `6D740` (992). A spreading-state
