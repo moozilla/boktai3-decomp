@@ -1,16 +1,8 @@
-#include "global.h"
-
-struct S {
-    u8 pad0[24];
-    u16 f2;
-    u32 f4;
-    u32 f8;
-};
-extern struct S *gUnk_0200049C;
-
-u16 sub_0805751C(void)
+#include "countdown_timer.h"
+#define CountdownTimer_GetRemaining sub_0805751C
+u16 CountdownTimer_GetRemaining(void)
 {
-    if (gUnk_0200049C == 0)
+    if (!gUnk_0200049C)
         return 0;
-    return gUnk_0200049C->f2;
+    return gUnk_0200049C->remaining;
 }
