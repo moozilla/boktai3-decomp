@@ -1,35 +1,23 @@
-#include "global.h"
-
-struct E {
-    u8 a[0x3D];
-    u8 idx;
-    u8 b[0x138 - 0x3E];
-};
-struct S {
-    u8 pad0[0x5C];
-    struct E e[8];
-    u8 pad[0xA1C - 0x5C - 0x138 * 8];
-    u32 mask;
-};
-
-static inline u8 Tst(u32 *m, s32 i)
+#include "actor_attachment_state.h"
+#define ActorAttachment_AllocateSlot sub_08065BEC
+static inline u8 ActorAttachment_TestOccupied(u32 *mask, s32 index)
 {
-    if (*m & (1 << i))
+    if (*mask & (1 << index))
         return TRUE;
     return FALSE;
 }
-
-struct E *sub_08065BEC(struct S *b)
+struct ActorAttachmentSlotView *
+ActorAttachment_AllocateSlot(struct ActorAttachmentManagerView *manager)
 {
-    s32 i;
-    struct E *e;
-    for (i = 0; i < 8; i++) {
-        if (!Tst(&b->mask, i)) {
-            e = &b->e[i];
-            b->mask |= 1 << i;
-            e->idx = i;
-            return e;
+    s32 index;
+    struct ActorAttachmentSlotView *slot;
+    for (index = 0; index < 8; index++) {
+        if (!ActorAttachment_TestOccupied(&manager->occupiedMask, index)) {
+            slot = &manager->slots[index];
+            manager->occupiedMask |= 1 << index;
+            slot->slotId = index;
+            return slot;
         }
     }
-    return 0;
+    return NULL;
 }
