@@ -131,6 +131,7 @@ address,evidence
 0806E29C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0806E308,Independent 68-byte four-slot capacity query with push and pop-bx after 0806E2A8 return; no stored Thumb pointer or direct B/Bcc/BL reference found; full extent ends 0806E34C
 0806E34C,Independent 388-byte terrain position sampler with push-save prologue after 0806E308 return and padding; reviewed end 0806E4D0; full extent ends 0806E4D0
+0806EB70,Independent 916-byte grid route resolver after 0806E900 return; own push-save stack prologue and complete pop-bx return before 0806EF04; assembly-backed pending recovery
 0807006C,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08070444,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched)
 08070E44,Independent actor-list search function left as incbin by gbadisasm; retained assembly (not yet matched)
