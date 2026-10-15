@@ -25,9 +25,18 @@ for the matching build; the English ROM reads better but differs in timing.
 ## In the game window
 
 * **Subtitles**: each string the game fetches (`Text_LookupString`, `0821ADD4`)
-  is drawn in English at the bottom of the screen. `subs("both")` adds the
-  Japanese, `subs("jp")` / `subs("off")`, `subpos("top")` moves the box above
-  bottom-of-screen UI, `subid(true)` shows string numbers.
+  is drawn in English in a small box just under the place where the game
+  draws it, and stays only while its glyphs are on screen. Every string on
+  screen gets its own box (menus show one per item). How: the text renderer
+  puts glyphs into BG0's map with `sub_08218FB4` (16×16) and `sub_08218F2C`
+  (8×16), tile x/y in r1/r2, as palette 15 entries for tiles 0x100–0x1FF (the
+  glyph cache, `Text_DrawGlyph`). Centaur gives those cells to the last string
+  fetched and drops a string when its cells no longer hold glyph entries in
+  VRAM. A string that never draws glyphs (names, control strings, text in
+  graphics) shows briefly at the bottom edge if it is longer than a name.
+  `subs("both")` adds the Japanese, `subs("jp")` / `subs("off")`,
+  `subpos("top")` moves that fallback box to the top, `subid(true)` shows
+  string numbers.
 * **HUD** (top left): recording timer, current map and tileset, god mode, and
   whether the studio is connected. `hud(false)` hides it.
 
@@ -39,8 +48,9 @@ for the matching build; the English ROM reads better but differs in timing.
 | `bm("name")`, `go("name")`, `bms()` | save / load / list bookmarks (savestate + screenshot): the warp list |
 | `capture("tag")` | dump palettes, VRAM, OAM, I/O, RAM and a screenshot for the studio |
 | `god(true)` | keep life at maximum |
-| `rec_start("name")`, `rec_stop()` | record inputs (from a reset) as a harness script in `build/centaur/` |
-| `replay("tests/x.txt")` | play a harness input script inside mGBA |
+| `rec_start("name")`, `rec_stop()` | record inputs from here: `build/centaur/NAME.ss` + `NAME.txt` starting with `loadstate NAME.ss`; `go()` while recording adds a `loadstate` line |
+| `rec_start("name", "reset")` | record from power-on, replayable by the harness |
+| `replay("build/centaur/x.txt")` | play an input script inside mGBA (harness format plus `loadstate`) |
 | `where()` | frame, map, tileset, palette, life, last text |
 | `callproc(id, {args})` | run a script procedure (also on the Live page) |
 | `warp(scene)`, `scene()` | experimental scene load (see below); current scene |
@@ -48,19 +58,47 @@ for the matching build; the English ROM reads better but differs in timing.
 
 ## The Live page (http://localhost:8642/live)
 
-* **Now on screen**: the current line in English and Japanese, linked to the
-  text editor; subtitle mode buttons.
-* **Game**: map, tileset, palette, life; capture, god mode, recording.
-* **Remote pad**: press buttons from the browser (arrows, Z/X = B/A, A/S = L/R,
-  Enter = Start; Shift for a long press).
-* **Text the game fetched** / **Resources loaded**: live logs; click a string to
-  edit it, a resource to open it in the Graphics page.
-* **Bookmarks**: thumbnails; click to jump there.
-* **Captures**: the screenshot plus analysis: the palette resource that the BG
-  palette RAM came from (remembered per stage in `data/stage_palettes.csv`, then
-  used by the Maps view), and each on-screen sprite matched to its resource
-  with its real 16 colours (kept in `build/centaur/sprite_palettes.json`, then
-  used by the Sprites and Large sprites views).
+* **Now on screen**: every string whose glyphs are on screen, in English and
+  Japanese with its tile rectangle, linked to the text editor; subtitle mode buttons.
+* **Game**: map (with its label), scene, tileset, palette, life; capture (with
+  an optional label), god mode, recording (from here, or from power-on).
+* **Text the game fetched**: newest first, with a divider wherever the scene or
+  map changed. **Resources loaded**: with a preview; click to open it in the
+  side panel.
+* **Bookmarks**: thumbnails; click to jump there. **Recent captures** link to
+  the Captures page.
+
+Links to maps, sprites and palettes anywhere in the studio open in a side
+panel (Esc closes it; ⌘-click opens a tab). Every page has the same menu.
+
+## The Captures page (http://localhost:8642/captures)
+
+A capture list (label, group, filter; the stage survey is hidden unless
+asked) and an inspector:
+
+* the screenshot with a box on every sprite: hover for its OAM entry and
+  resource, click for its detail (drawn from the captured VRAM, the exact
+  resource frame, a label/notes editor, "Has text…");
+* **Sprites**: every OAM entry drawn inline, with its resource and frame
+  (matched by tile contents), label and palette bank;
+* **BG layers**: each background map as it sits in VRAM (unscrolled: the
+  capture cannot read the scroll registers);
+* **Palettes**: BG and OBJ palette RAM, and which resources match each bank.
+
+The analysis remembers the stage palette per map (`data/stage_palettes.csv`)
+and, per sprite resource, the whole OBJ palette RAM with the bank its palette
+bank 0 used (`build/centaur/sprite_palettes.json`). Package parts carry their
+own banks: the title screen package 731D draws its parts with OBJ bank = part
+bank + 2, so a single learned bank used to colour the subtitle wrongly. The
+Maps view can colour a map with the palette RAM of a capture that showed it.
+
+## Notes on anything
+
+`data/notes.csv` (kind, key, label, notes) labels maps, sprite packages, large
+sprites, palettes and resources; the label shows in lists and searches and is
+edited in place in the Graphics page, the capture inspector and the side
+panel. Capture labels, groups and notes live with the capture
+(`build/centaur/captures/NAME/info.json`).
 * **Graphics with text**: sprites and maps tagged as containing text (from a
   capture or the Graphics page), with their English and a status; stored in
   `data/gfx_text.csv`, the to-do list for graphics translation.
@@ -112,7 +150,26 @@ the game continued. Procedure numbers are the ones calls use (one more than
 
 ## Next
 
-* Real warps. `warp(N)` now replays what "continue" does (`sub_081E132C` at
+* Real warps, from the door in `first_level` (the `start` bookmark plus that
+  recording; see below). A door does: exit trigger → `Script_Call(860)` with
+  no arguments (GameState+0x740 goes 7 → 8) → `Script_Call(860)` again from
+  `0821B8FF` and `0822832F` → request `0x030053E8 = 0x11` with the next scene
+  `0x030039F0` (2698 → 2705) and GameState+0x5A4 → the player object pointer
+  `0x02000580` becomes 0 → `Script_Call(2705)` from `08225173` → the player
+  position is set to the entrance (640, 256, 2688) → a new player object 11
+  frames after the request. **GameState+0x30/+0x32/+0x34 is the live player
+  position** (x, y, z), updated every frame while walking. The same writes
+  from the `start` bookmark, with or without proc 860 first, load the right
+  map (ED78, as the door does) but never place or create the player: what is
+  still missing is upstream of the request (compare RAM from the door frame
+  with a warp attempt, outside GameState, e.g. `030042A0` changes at the
+  request). Scene procedures run their setup inside
+  `if expr<857368030000c1aba0>`, worth decoding.
+* `first_level` was recorded from a reset with `go("start")` partway, before
+  recordings could start from a bookmark; replay it as `loadstate
+  bookmarks/start.ss` followed by its inputs after the first wait (it stays in
+  sync: the door at about 1,950 frames in).
+* Real warps (older notes). `warp(N)` now replays what "continue" does (`sub_081E132C` at
   `081E14E0`): `0x0300546C = 0`, `Script_Call(*0x020003A8)` (the continue
   procedure, 1436 in the test save), `0x0300523C = 0`, request `0x11`, next
   scene `N`. The stage loads; the player object (`0x02000580`) is still not
