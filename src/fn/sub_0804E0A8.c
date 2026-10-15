@@ -1,4 +1,5 @@
 #include "global.h"
+#define AreaEffect_ScaleGainAtPosition sub_0804E0A8
 struct S {
     u8 f[0x868];
     u32 fl;
@@ -19,7 +20,7 @@ static inline u8 tst(u32 v)
         return TRUE;
     return FALSE;
 }
-s32 sub_0804E0A8(u8 *a, s32 b)
+s32 AreaEffect_ScaleGainAtPosition(u8 *a, s32 b)
 {
     struct S *s = gUnk_02000710;
     if (s->v == 0)
