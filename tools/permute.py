@@ -74,7 +74,11 @@ def prepare_source(src, func):
     if names != [func]:
         raise ValueError(f"isolate {func} in a file with one ROM function before permuting; found {names}")
     pre = build.preprocess(src)
-    return re.sub(r'^\s*asm\s*\(".*?"\);\s*$', "", pre, flags=re.M)
+    # Remove only the file-scope macro include. A broad asm/string regex also
+    # swallowed empty-asm register/memory clobbers inside the candidate, so a
+    # near match could start its search from materially different code.
+    return re.sub(r'^[ \t]*asm\s*\(\s*"\.include (?:\\.|[^"\\\n])*"\s*\)\s*;[ \t]*$',
+                  "", pre, flags=re.M)
 
 
 def main():

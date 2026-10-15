@@ -15,6 +15,19 @@ import split
 
 
 class PermuteTests(unittest.TestCase):
+    def test_candidate_clobbers_survive_file_scope_include_removal(self):
+        include = 'asm(".include \\"asm/macros.inc\\"");\n'
+        body = ('int f(int x) {\n'
+                '    asm("" ::: "r3");\n'
+                '    asm("" ::: "memory");\n'
+                '    asm("" : "+r"(x) : : "r0", "r1");\n'
+                '    return x;\n}\n')
+        with tempfile.TemporaryDirectory() as d:
+            src = Path(d) / "candidate.c"
+            src.write_text(include + body)
+            with patch.object(build, "preprocess", return_value=include + body):
+                self.assertEqual(permute.prepare_source(str(src), "f"), "\n" + body)
+
     def test_compact_nested_body_and_inline_helper_are_preserved(self):
         source = "static inline int\nh(int x) { return x + 1; }\n"
         source += "int f(int n) { if(n>0) { do { n=h(n); } while(n<4); } return n; }\n"
