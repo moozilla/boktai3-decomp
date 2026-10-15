@@ -1,19 +1,12 @@
-#include "global.h"
-struct P {
-    u8 f[0x67e];
-    u16 f67e;
-    u8 f680[0x694 - 0x680];
-    u16 f694;
-};
-void ScenePanelRig_RandomizeMovement(struct P *);
-void ScenePanelRig_SetState(struct P *, u32);
-void sub_0805A3D4(struct P *p)
+#include "scene_panel_rig.h"
+#define ScenePanelRig_TickContactPause sub_0805A3D4
+void ScenePanelRig_TickContactPause(struct ScenePanelRig *rig)
 {
-    u16 *c = &p->f67e;
-    u32 v = *c + 1;
-    *c = v;
-    if ((u16)v >= p->f694) {
-        ScenePanelRig_RandomizeMovement(p);
-        ScenePanelRig_SetState(p, 3);
+    u16 *counter = &rig->stateFrame;
+    u32 frame = *counter + 1;
+    *counter = frame;
+    if ((u16)frame >= rig->contactEffect) {
+        ScenePanelRig_RandomizeMovement(rig);
+        ScenePanelRig_SetState(rig, 3);
     }
 }
