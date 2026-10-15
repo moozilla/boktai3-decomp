@@ -63,3 +63,13 @@ below the context halfword3D8 minus20, it calls84044; otherwise it increments
 the counter. This is a threshold relation, not yet a confirmed physical height.
 The eight new bodies total1280 bytes (+0.0530 percentage points), of which268
 are ordinary and1012 register-pinned.
+
+82F70 matches424 register-pinned bytes. Preparation selects animation10, plays
+category event sound and sets the primary collider's flag4. After the drawable
+frame-window predicate succeeds, it sets2B0 and optionally sends an initialized
+eight-value script packet (signed XYZ,1FC/200/204/2E0, actor ID). It frees the
+category resource when2D4 lacks4000 and category is outside11–13; it calls the
+terrain script when2CC lacks0400. Neither test clears its flags. It then clears
+AA, installs default response controlFC90/kind16, sets animation1/0/2 and
+disables the shadow. All nine new bodies total1704 bytes (+0.0705 percentage
+points):268 ordinary and1436 register-pinned.
