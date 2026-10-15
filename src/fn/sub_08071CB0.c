@@ -1,19 +1,17 @@
-#include "global.h"
-
-extern u8 *gUnk_02000710;
+#include "scene_actor_registry.h"
+#define SceneActorRegistry_UpdateBackgroundFlag sub_08071CB0
 s32 OrbitBackground_IsEnabled(void);
-
-void sub_08071CB0(u8 *p)
+void SceneActorRegistry_UpdateBackgroundFlag(struct SceneActorRegistryManager *manager)
 {
-    if ((*(u16 *)(p + 0x2a) & 0xf) == 0) {
-        if (OrbitBackground_IsEnabled() == 0) {
-            u32 m = 0x20;
-            u32 *a = (u32 *)(gUnk_02000710 + 0x868);
-            *a |= m;
+    if (!(manager->frame & 15)) {
+        if (!OrbitBackground_IsEnabled()) {
+            u32 mask = 0x20;
+            u32 *flags = &gUnk_02000710->flags868;
+            *flags |= mask;
         } else {
-            u32 *a = (u32 *)(gUnk_02000710 + 0x868);
-            u32 m = ~0x20;
-            *a &= m;
+            u32 *flags = &gUnk_02000710->flags868;
+            u32 mask = ~0x20;
+            *flags &= mask;
         }
     }
 }
