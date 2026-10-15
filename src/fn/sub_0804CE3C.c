@@ -1,19 +1,20 @@
-#include "global.h"
-void TetherActor_SetState(u8 *, s32);
-s32 TetherActor_SetEntry(u8 *, s32);
-void sub_0804CE3C(u8 *p)
+#include "tether_actor.h"
+void TetherActor_SetState(struct TetherActor *, s32);
+s32 TetherActor_SetEntry(struct TetherActor *, s32);
+#define TetherActor_UpdateSpecialEntryTransition sub_0804CE3C
+void TetherActor_UpdateSpecialEntryTransition(struct TetherActor *p)
 {
     u16 *q;
     u32 z, v, m;
-    if (p[0x255] != 0xe)
+    if (p->state != 0xe)
         TetherActor_SetState(p, 0xe);
-    q = (u16 *)(p + 0x136);
+    q = &p->chargeCollider.flags;
     v = *q;
     m = 4;
     z = 0;
     m |= v;
     *q = m;
-    p[0x260] = z;
+    p->heading = z;
     if (TetherActor_SetEntry(p, 9))
         TetherActor_SetState(p, 0xd);
 }
