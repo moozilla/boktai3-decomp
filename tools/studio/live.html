@@ -144,8 +144,8 @@ code { font-size: 12px; }
       <div class="thumbs" id="caps"><div class="empty">Capture a scene to inspect its sprites, layers and palettes.</div></div>
     </div>
     <div class="card">
-      <h2>Scenes · warp (experimental) <span class="sp"></span><input id="scq" placeholder="scene or map" style="width:8em"></h2>
-      <div class="howto" style="margin-bottom:6px">Loads the scene's stage; the player is not placed yet, so use bookmarks for play. Current scene: <b id="cursc">—</b></div>
+      <h2>Scenes · warp <span class="sp"></span><input id="scq" placeholder="scene or map" style="width:8em"></h2>
+      <div class="howto" style="margin-bottom:6px">Click to go there the way a door does (the game's own transition, <code>proc_945</code>), arriving at the scene's first entrance; pick another entrance on the map. Story flags stay as they are, so a scene may look different from a real playthrough. Current scene: <b id="cursc">—</b></div>
       <div class="log" id="scenes" style="max-height:300px"><div class="empty">Loading…</div></div>
     </div>
     <div class="card">
@@ -365,8 +365,8 @@ function renderScenes() {
     const e = document.createElement('div'); e.className = 'e'; e.style.gridTemplateColumns = s.shot ? '4.2em 72px 1fr' : '4.2em 1fr';
     const lab = noteOf('map', s.shown || s.map || '')?.label;
     e.innerHTML = `<span class="id">${s.scene}</span>${s.shot ? `<img loading="lazy" src="/api/live/file/captures/scene_${String(s.scene).padStart(4, '0')}/screen.png" style="width:72px;image-rendering:pixelated;border-radius:3px" alt="">` : ''}
-      <span>${s.map ? `map ${peekLink(`/gfx#maps/${s.map}-${s.tileset}-${s.hp}`, s.map)}` : 'no stage'}${s.shown && s.shown !== s.map ? ` · shows ${s.shown}` : ''}${s.palette ? ` · pal ${s.palette}` : ''}${s.became && s.became !== s.scene ? ` · → ${s.became}` : ''}${lab ? ` · <b>${esc(lab)}</b>` : ''}</span>`;
-    e.onclick = ev => { if (!ev.target.closest('a') && last?.connected) cmd({ c: 'warp', scene: s.scene }); };
+      <span>${s.map ? `map ${peekLink(`/gfx#maps/${s.map}-${s.tileset}-${s.hp}`, s.map)}` : 'no stage'}${s.shown && s.shown !== s.map ? ` · shows ${s.shown}` : ''}${s.palette ? ` · pal ${s.palette}` : ''}${s.entrance != null ? ` · entrance ${s.entrance}` : ''}${s.became && s.became !== s.scene ? ` · → ${s.became}` : ''}${lab ? ` · <b>${esc(lab)}</b>` : ''}</span>`;
+    e.onclick = ev => { if (!ev.target.closest('a') && last?.connected) cmd({ c: 'warp', scene: s.scene, entrance: s.entrance ?? undefined }); };
     return e;
   });
   if (all.length > sceneLimit) {
