@@ -54,7 +54,7 @@ void Collider_Init(void *, u32, u32, u32, u32, void *, void *);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_SetCallback(void *, void *, void *);
 void sub_0821FF7C(void *, u32, u32, u32);
-void Collider_Refresh(void *);
+s32 Collider_Refresh(void *);
 void Collider_Remove(void *);
 void *Task_Create(s32, s32);
 void Task_SetCallbacks(void *, void *, void *);

@@ -18,7 +18,7 @@ void Collider_SetCallback(u8 *, void (*)(void), u8 *);
 void sub_0821FF58(u8 *, s32, s32, u32, u32, s32);
 void Collider_SetPosition(u8 *, u8 *, u32);
 void sub_0821FF7C(void *, u32, u32, u32);
-void Collider_Refresh(u8 *);
+s32 Collider_Refresh(u8 *);
 void sub_082015D0(void);
 void sub_082015D4(void);
 void sub_08201784(u8 *p)

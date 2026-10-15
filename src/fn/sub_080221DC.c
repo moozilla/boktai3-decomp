@@ -6,7 +6,7 @@ void Collider_Init(void *, int, int, int, int, void *, void *);
 void Collider_SetPosition(void *, void *, int);
 void Collider_SetCallback(void *, void *, void *);
 void sub_0821FF7C(void *, int, int, int);
-void Collider_Refresh(void *);
+s32 Collider_Refresh(void *);
 void sub_080221D8(void);
 extern u32 gUnk_030053F4;
 void sub_0821FF58(void *, int, int, int, int, int);

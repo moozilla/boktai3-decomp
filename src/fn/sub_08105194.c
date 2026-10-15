@@ -13,7 +13,7 @@ void Collider_Init(u8 *, u32, u32, u32, u32, struct Z *, struct Z *);
 void sub_0821FF7C(u8 *, u32, u32, u32);
 void Collider_SetPosition(u8 *, u8 *, u32);
 void Collider_SetCallback(u8 *, void (*)(void), u8 *);
-void Collider_Refresh(u8 *);
+s32 Collider_Refresh(u8 *);
 void sub_08104F98(void);
 void sub_08105194(u8 *s, u32 a, u32 b, u32 c)
 {

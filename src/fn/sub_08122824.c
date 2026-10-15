@@ -7,7 +7,7 @@ struct S {
 };
 u8 sub_0812266C(void);
 void Collider_SetPosition(void *, void *, u32);
-void Collider_Refresh(void *);
+s32 Collider_Refresh(void *);
 void sub_08122824(u8 *s)
 {
     if (sub_0812266C() == 0) {
