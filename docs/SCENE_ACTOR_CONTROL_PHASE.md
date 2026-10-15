@@ -42,3 +42,8 @@ in the secondary collider. This call requires a nonzero pulseInterval. Elapsed
 clock time wraps by256 and is stored as a byte; exceeding maxElapsed sets2B0,
 otherwise heading changes restart animation1 and unchanged headings clear2B3.
 The observed clock offset is not assigned a broader gameplay meaning.
+
+83118 matches112 register-pinned bytes: it consumes state-changed2B1, restores
+heading from E9 only when that flag was set, then unconditionally sets animation
+state/phase/behavior0/2/0, clears the counter, marks state changed again, and
+increments the counter to1. The clear-then-increment sequence is retained.
