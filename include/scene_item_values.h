@@ -15,7 +15,9 @@ struct SceneValueEquipmentDefinition {
     u8 unknown8[0x18];
 };
 struct SceneValueItemDefinition {
-    u32 unknown0[3], baseValue;
+    u32 unknown0;
+    u16 conditionKey, unknown6;
+    u32 unknown8, baseValue;
 };
 struct SceneValueConsumableDefinition {
     u8 unknown0[8];
