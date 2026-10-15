@@ -28,6 +28,8 @@ button.primary { background: var(--accent); color: var(--accent-ink); border-col
 button:disabled { opacity: .5; cursor: default; }
 main { display: grid; grid-template-columns: minmax(280px, 380px) 1fr; height: calc(100vh - 53px); }
 #side { border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
+body.embed #side { display: none; }
+body.embed main { grid-template-columns: 1fr; }
 #filters { padding: 10px; display: flex; flex-direction: column; gap: 6px; border-bottom: 1px solid var(--line); }
 input[type=search] { width: 100%; padding: 7px 10px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; }
 #count { color: var(--muted); font-size: 12px; }
@@ -121,6 +123,7 @@ async function load() {
   render();
   const h = parseInt(location.hash.slice(1));
   if (byId.has(h)) select(h);
+  window.addEventListener('hashchange', () => { const n = parseInt(location.hash.slice(1)); if (byId.has(n)) select(n); });
 }
 
 function plain(t) { return t.replace(/<[^>]*>/g, '').replace(/\\n/g, ' ⏎ '); }
@@ -156,6 +159,7 @@ $('list').addEventListener('click', e => {
   if (r) select(+r.dataset.id);
 });
 $('q').addEventListener('input', render);
+listKeys(() => $('list'), '.row');
 $('onlyEdited').addEventListener('change', render);
 
 function select(id) {
