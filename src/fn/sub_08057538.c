@@ -1,20 +1,12 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x18];
-    u16 v;
-};
-extern struct S *gUnk_0200049C;
-void sub_08178404(void);
-void Task_Kill(struct S *);
-
-void sub_08057538(void)
+#include "countdown_timer.h"
+#define CountdownTimer_Stop sub_08057538
+void CountdownTimer_Stop(void)
 {
     if (gUnk_0200049C) {
-        struct S *p;
+        struct CountdownTimer *timer;
         sub_08178404();
-        p = gUnk_0200049C;
-        p->v = 0;
-        Task_Kill(p);
+        timer = gUnk_0200049C;
+        timer->remaining = 0;
+        Task_Kill(timer);
     }
 }
