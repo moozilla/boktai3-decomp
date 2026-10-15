@@ -130,3 +130,48 @@ This updater matches its complete 1,012-byte extent, an additional 0.0419
 percentage points. Its temporary hints were minimized from 70 to 17; the
 function has no explicit r7 binding. Its additional layout comes from the
 integrator's `scene_panel.h` view, rather than a competing structure definition.
+
+## Overlay tile renderer
+
+`08058BD8–08058FF8` first calls the overlay-state helper at `08058B88`, then
+records the four supplied layer-position arguments in `gUnk_03004CC0`. The
+additional layer/resource views are in `scene_panel_overlay.h`. The layer has
+signed width/height at `0x18/0x1A`, its 2-by-2 tile table at `0x24`, selected
+block map at `0x28`, and output pointer at `0x2C`. The renderer doubles the
+stored dimensions for its world-tile bounds checks.
+
+It projects `overlayOrigin` at panel offset `0x500`: projected X is
+`3 * (x - z) / 32`, while projected Y/Z are `3 * (x + z) / 32` minus/plus
+`3 * y / 32`. Each division truncates toward zero. Camera offsets are added
+before division by eight; the resulting Y center is rounded down to an even
+value. Supplied tile offsets are then subtracted from the centers.
+
+The map resource has a 24-byte header. Its fourth word is a relative offset
+to 12-byte map entries, whose third word is a relative block-map offset.
+Relocation occurs in local header/entry copies. The four quadrant slots use
+the observed order 0, 2, 3, 1: left/top, right/top, left/bottom, right/bottom.
+The left/top extents are seven columns and six rows; right/bottom extend seven
+columns and four rows. Maxima are exclusive. Only minima clamp to zero; an
+additional early rejection tests negative maxima or minima above 31.
+
+For each slot, palette mode zero or effect state outside 10/14 selects level
+5. Otherwise the referenced subject's state byte at `0xD3` selects level 0
+when it equals 4, and level 5 otherwise. The requested level is stored in the
+four bytes at `0x4E4`; comparison with the current bytes at `0x4E8` suppresses
+unchanged quadrants. A transition to zero requests one sound 245 after all
+slots. `overlayChanged` at `0x132E` is cleared at entry to this process.
+
+Level 5 clears pairs of output rows. Other levels select map entry
+`level + 1`. The block lookup uses the world tile's 32-by-32 block coordinates,
+a stride of stored width divided by sixteen, and a 16-by-16 array of 2-by-2
+tile references within each block. The tile reference selects four halfwords
+from the tile table; column parity chooses the left or right pair. World
+coordinates outside the doubled dimensions produce a cleared pair instead.
+The output column and first row each mask with 31. The second row uses
+`maskedRow + 1` without an additional wrap mask, preserving the original.
+
+The renderer matches all 1,056 reviewed bytes, another 0.0437 percentage
+points. Temporary register bindings and empty barriers were minimized from
+142 to 48. The remaining scratch output is defined by an empty asm output
+before its input uses; the function has no explicit r7 binding. The literal
+RAM alias names `gUnk_03004CC0` for the combined build's address check.
