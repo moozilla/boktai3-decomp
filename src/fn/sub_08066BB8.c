@@ -1,21 +1,10 @@
-#include "global.h"
-
-struct P {
-    u8 f[0x34];
-    u8 g[0x1c];
-    u32 a;
-    u32 b;
-    u32 c;
-};
-void AnimData_Load(u8 *, s32);
-u32 AnimData_FindEntry(s32);
-u32 ScriptProc_Start(s32, s32);
-
-void sub_08066BB8(struct P *p)
+#include "actor_attachment_manager.h"
+#define ActorAttachment_LoadManagerResources sub_08066BB8
+void ActorAttachment_LoadManagerResources(struct ActorAttachmentManagerResources *manager)
 {
-    AnimData_Load((u8 *)p + 0x18, 0x363c);
-    AnimData_Load((u8 *)p + 0x34, 0x363d);
-    p->c = AnimData_FindEntry(0x1c1c);
-    p->a = ScriptProc_Start(0x922e, 0x6830);
-    p->b = ScriptProc_Start(0x922e, 0xd41f);
+    AnimData_Load(manager->graphicsA, 0x363C);
+    AnimData_Load(manager->graphicsB, 0x363D);
+    manager->partResource = AnimData_FindEntry(0x1C1C);
+    manager->sequenceA = ScriptProc_Start(0x922E, 0x6830);
+    manager->sequenceB = ScriptProc_Start(0x922E, 0xD41F);
 }
