@@ -75,7 +75,7 @@ void RouteSpriteActor_Create(struct ContactPosition *anchor, void *unused, s32 i
             *dst = context;
         }
     }
-    sub_0821E5C4(actor->route, route, 0, 0);
+    sub_0821E5C4(&actor->route, route, 0, 0);
     {
         s32 shadowResult;
         shadowResult = ScaledShadow_Initialize(actor->shadow, &actor->sprite.position, 64, 16, 96,
