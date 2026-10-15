@@ -49,8 +49,13 @@ three swap candidates retain private resumable search directories.
 
 PR148 merged at1c5b441b and main Actions38694896406 passed. Claude's subsequent
 studio PR149 merged atbbbf4025 with main Actions38697482794 successful. This
-batch's combined build and final promoted extent checks are recorded below
-when complete.
+batch's combined validation printed `build/boktai3.gba: OK` and the RAM-literal
+check passed (`build/moves-combined.log`). All138/138 changed promoted TUs
+passed full reviewed extents (`build/moves-post-promotion.json`). Format and
+the eleven relevant metadata/progress tests pass. The build caught and corrected
+three stale display-value references that per-function address stubs had resolved.
+Per-mutant score improvements remain subject to source review: the E484 score245
+mutant changes the enabled cursor and is not a faithful guarded draft.
 
 ## October 14 (Codex/Sol): inventory grids, descriptions and input-panel initialization
 
