@@ -1,5 +1,4 @@
 #include "global.h"
-#define AreaEffect_DisableEntryFromScript sub_0804E5AC
 struct O {
     u8 f[0x26];
     u8 n;

@@ -1,8 +1,7 @@
 #include "area_effect.h"
 // MATCHING_CONCESSION: register-pinning
-#define AreaEffect_UpdateActionParticles sub_0804E8D8
-s32 sub_0804E030(struct AreaEffectPosition *);
-void sub_0804E758(struct AreaEffectManager *);
+s32 AreaEffect_FindContainingEntry(struct AreaEffectPosition *);
+void AreaEffect_UpdateGraphicsId(struct AreaEffectManager *);
 void sub_0800AC44(u32, u32, u32, void *, void *, u32, u32);
 struct PackedHalfword {
     u32 lo : 16;
@@ -36,7 +35,7 @@ void AreaEffect_UpdateActionParticles(struct AreaEffectManager *manager)
     if (manager->player->state == 1) {
         if (gUnk_02000710->flags868 & 2)
             goto action;
-        if (sub_0804E030(&manager->player->position) >= 0)
+        if (AreaEffect_FindContainingEntry(&manager->player->position) >= 0)
             active = 1;
     }
     if (active) {
@@ -84,7 +83,7 @@ void AreaEffect_UpdateActionParticles(struct AreaEffectManager *manager)
     }
     } else
         manager->actionFrame = active;
-    sub_0804E758(manager);
+    AreaEffect_UpdateGraphicsId(manager);
     {
         struct AreaEffectPlayer *player = manager->player;
         u32 mask = 32;
@@ -96,6 +95,6 @@ void AreaEffect_UpdateActionParticles(struct AreaEffectManager *manager)
             u32 negative = 0 - (flags & 16);
             mode = negative >> 31;
         }
-        sub_0804E618(manager, mode);
+        AreaEffect_AccumulatePlayerResource(manager, mode);
     }
 }

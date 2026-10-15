@@ -1,6 +1,5 @@
 #include "area_effect.h"
 // MATCHING_CONCESSION: register-pinning
-#define AreaEffect_AddRectangleFromScript sub_0804E2AC
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
 u32 sub_0822C034(void *);

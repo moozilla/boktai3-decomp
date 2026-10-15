@@ -1,5 +1,4 @@
 #include "area_effect.h"
-#define AreaEffect_Destroy sub_0804EAFC
 void Sprite_Remove(void *);
 s32 AreaEffect_Destroy(struct AreaEffectManager *manager)
 {

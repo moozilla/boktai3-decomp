@@ -1,5 +1,4 @@
 #include "global.h"
-#define AreaEffect_TestPlayerCoverage sub_0804E10C
 struct S {
     u8 f[0x868];
     u32 fl;
@@ -9,7 +8,7 @@ struct S {
 extern struct S *gUnk_02000710;
 extern u8 *gUnk_0200010C;
 extern u16 gUnk_02000528;
-s32 sub_0804E030(u8 *);
+s32 AreaEffect_FindContainingEntry(u8 *);
 static inline u32 mk(u32 *a, u32 m)
 {
     return *a & m;
@@ -38,7 +37,7 @@ s32 AreaEffect_TestPlayerCoverage(u8 *a)
     }
     if (gUnk_0200010C == 0)
         goto no;
-    if (sub_0804E030(a + 0x30) >= 0)
+    if (AreaEffect_FindContainingEntry(a + 0x30) >= 0)
         goto yes;
     {
         u32 v = gUnk_02000528;

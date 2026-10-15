@@ -44,6 +44,6 @@ extern struct AreaEffectManager *gUnk_0200010C;
 extern const u16 gUnk_08605A78[], gUnk_08605A80[];
 extern u32 gUnk_030053F4, gUnk_02000560;
 extern u16 gUnk_03005260;
-void sub_0804E180(struct AreaEffectEntry *, s32, struct AreaEffectPosition *, s32);
-void sub_0804E618(struct AreaEffectManager *, s32);
+void AreaEffect_SetBounds(struct AreaEffectEntry *, s32, struct AreaEffectPosition *, s32);
+void AreaEffect_AccumulatePlayerResource(struct AreaEffectManager *, s32);
 #endif

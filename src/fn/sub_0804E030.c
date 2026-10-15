@@ -1,5 +1,4 @@
 #include "global.h"
-#define AreaEffect_FindContainingEntry sub_0804E030
 struct E {
     u8 f[0xc6];
     u8 on;

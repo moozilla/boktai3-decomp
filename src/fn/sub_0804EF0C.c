@@ -1,5 +1,4 @@
 #include "global.h"
-#define AreaEffect_InitializeLink sub_0804EF0C
 
 struct S {
     u8 filler[0x24];

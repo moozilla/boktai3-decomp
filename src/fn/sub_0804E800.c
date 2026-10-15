@@ -1,7 +1,6 @@
 #include "area_effect.h"
 // MATCHING_CONCESSION: register-pinning
-#define AreaEffect_ShowEnabledSprites sub_0804E800
-void sub_0804E758(struct AreaEffectManager *);
+void AreaEffect_UpdateGraphicsId(struct AreaEffectManager *);
 void AreaEffect_ShowEnabledSprites(struct AreaEffectManager *manager)
 {
     if (!manager->visible) {
@@ -32,7 +31,7 @@ void AreaEffect_ShowEnabledSprites(struct AreaEffectManager *manager)
             } while (i < *count);
         }
     }
-    sub_0804E758(manager);
+    AreaEffect_UpdateGraphicsId(manager);
     {
         struct AreaEffectPlayer *player = manager->player;
         u32 mask = 32;
@@ -44,6 +43,6 @@ void AreaEffect_ShowEnabledSprites(struct AreaEffectManager *manager)
             u32 negative = 0 - (flags & 16);
             mode = negative >> 31;
         }
-        sub_0804E618(manager, mode);
+        AreaEffect_AccumulatePlayerResource(manager, mode);
     }
 }

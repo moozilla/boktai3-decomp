@@ -4,7 +4,6 @@ extern u16 gUnk_03004BD8;
 void *ScriptProc_Start(u16, u16);
 void sub_082161B4(u32, u32, void *, u32, u32, u32, void *);
 void sub_08215A74(u32, u32);
-#define OrbitBackground_LoadResource sub_08050E9C
 void OrbitBackground_LoadResource(struct OrbitBackground *p)
 {
     u32 z[1];

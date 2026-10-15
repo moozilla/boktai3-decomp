@@ -1,5 +1,4 @@
 #include "area_effect.h"
-#define AreaEffect_InitializeEntry sub_0804E214
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void AnimData_SelectTiles(void *, u32);
@@ -28,6 +27,6 @@ void AreaEffect_InitializeEntry(struct AreaEffectEntry *entry, s32 kind,
     entry->displayPosition = entry->position;
     entry->renderMode = 3;
     entry->hasSprite = 1;
-    sub_0804E180(entry, kind, position, rotated);
+    AreaEffect_SetBounds(entry, kind, position, rotated);
     entry->cachedValue = sub_0822C034(entry);
 }

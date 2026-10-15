@@ -1,6 +1,5 @@
 #include "area_effect_link.h"
 // MATCHING_CONCESSION: register-pinning
-#define AreaEffect_UpdateLinkVisibility sub_0804EDD0
 static inline s32 localPlayer(void)
 {
     if (!gUnk_020004B4)

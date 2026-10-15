@@ -1,5 +1,4 @@
 #include "global.h"
-#define AreaEffect_TestParticleMode sub_0804EA38
 
 struct S {
     u8 filler[0x1c];

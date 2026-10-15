@@ -1,6 +1,5 @@
 #include "area_effect.h"
 // MATCHING_CONCESSION: register-pinning
-#define AreaEffect_UpdateGraphicsId sub_0804E758
 u32 sub_08228DB8(void);
 void AnimData_SelectTiles(void *, u32);
 void AreaEffect_UpdateGraphicsId(struct AreaEffectManager *manager)

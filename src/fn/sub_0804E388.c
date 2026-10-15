@@ -1,9 +1,9 @@
 #include "area_effect.h"
 #include "engine.h"
 // MATCHING_CONCESSION: register-pinning
-#define AreaEffect_AddSpriteFromScript sub_0804E388
 u8 *sub_0821D64C(s32, s32);
-void sub_0804E214(struct AreaEffectEntry *, s32, struct AreaEffectPosition *, s32, u32);
+void AreaEffect_InitializeEntry(struct AreaEffectEntry *, s32, struct AreaEffectPosition *, s32,
+                                u32);
 struct PackedPosition {
     s32 x : 16;
     s32 y : 16;
@@ -78,8 +78,9 @@ void AreaEffect_AddSpriteFromScript(void)
                 rotated = 0;
             {
                 u8 *entryCount = count;
-                sub_0804E214(&manager->entries[*entryCount], kind,
-                             (struct AreaEffectPosition *)&position, rotated, manager->graphicsId);
+                AreaEffect_InitializeEntry(&manager->entries[*entryCount], kind,
+                                           (struct AreaEffectPosition *)&position, rotated,
+                                           manager->graphicsId);
                 {
                     u32 enabledOffset = *entryCount * sizeof(struct AreaEffectEntry);
                     u8 *enabled = (u8 *)manager + enabledOffset + 0xC6;

@@ -1,6 +1,5 @@
 #include "area_effect_link.h"
 // MATCHING_CONCESSION: register-pinning
-#define AreaEffect_UpdateLinkPlayerResources sub_0804ECD0
 void sub_081594F4(struct AreaEffectPlayer *, s32);
 static inline u32 playerMode(struct AreaEffectPlayer *player)
 {

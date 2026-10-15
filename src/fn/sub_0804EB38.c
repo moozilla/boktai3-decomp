@@ -1,5 +1,4 @@
 #include "global.h"
-#define AreaEffect_GetInitialParticleMode sub_0804EB38
 
 extern u32 gUnk_030053F4;
 s32 sub_082290DC(void);

@@ -1,7 +1,6 @@
 #include "orbit_background.h"
 // MATCHING_CONCESSION: register-pinning
-struct OrbitBackground *sub_08051000(u32, s32, u32);
-#define OrbitBackground_CreateFromScript sub_08051054
+struct OrbitBackground *OrbitBackground_Create(u32, s32, u32);
 struct OrbitBackground *OrbitBackground_CreateFromScript(u32 id)
 {
     register s32 player asm("r4");
@@ -21,5 +20,5 @@ struct OrbitBackground *OrbitBackground_CreateFromScript(u32 id)
         enabled = Script_GetValue();
     else
         enabled = 1;
-    return sub_08051000(id, player, enabled);
+    return OrbitBackground_Create(id, player, enabled);
 }
