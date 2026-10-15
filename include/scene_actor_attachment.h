@@ -16,4 +16,9 @@ void sub_0807C5C4(u8 kind, s32 *yOffset, s32 *zOffset);
 void sub_0807C604(u8 kind, s32 *yOffset, s32 *zOffset);
 /* Unhandled category/kind combinations leave the caller's outputs unchanged. */
 void sub_0807C644(u8 category, u8 kind, s32 *yOffset, s32 *zOffset);
+struct SceneActorEffectCandidate {
+    s32 key;
+    u32 value;
+};
+void sub_0807CD80(struct SceneActorEffectCandidate *, s32 count);
 #endif
