@@ -9,6 +9,9 @@ static inline s32 Read(void)
         return Script_GetValue();
     return 0;
 }
+/* Requires p and v keyword triples. All five literal-key7314 GCX call sites
+ * supply both (reviewed in SPRITE_EFFECT_STEERING_ACTORS.md); dynamic callers
+ * must preserve that precondition. An absent keyword has no invented default. */
 void SpriteEffectController_CreateFromScript(void)
 {
     union {
