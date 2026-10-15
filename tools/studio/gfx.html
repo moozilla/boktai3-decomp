@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Boktai 3 Studio</title>
+<link rel="stylesheet" href="/static/common.css">
 <style>
 :root {
   --bg: #f6f3ec; --panel: #fffdf8; --ink: #2b2620; --muted: #7d7468; --line: #e3dccf;
@@ -58,30 +59,14 @@ canvas { image-rendering: pixelated; display: block; }
 #tip { position: fixed; pointer-events: none; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; font-size: 13px; display: none; box-shadow: 0 4px 16px rgba(0,0,0,.2); }
 .legend { display: flex; gap: 12px; font-size: 12px; color: var(--muted); margin: 8px 0; flex-wrap: wrap; }
 .legend b { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.row .lab { color: var(--ink); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+body.embed #side { display: none; }
+body.embed main { grid-template-columns: 1fr; }
 @media (max-width: 760px) { main { grid-template-columns: 1fr; height: auto; } #side { height: 40vh; } }
 </style>
 </head>
 <body>
-<header>
-  <h1>Boktai 3 Studio</h1>
-  <nav>
-    <a href="/">Text</a>
-    <a href="/live">Live</a>
-    <a href="#sprites" data-tab="sprites">Sprites</a>
-    <a href="#big" data-tab="big">Large sprites</a>
-    <a href="#maps" data-tab="maps">Maps</a>
-    <a href="#palettes" data-tab="palettes">Palettes</a>
-    <a href="#font" data-tab="font">Font</a>
-    <a href="#tiles" data-tab="tiles">Tiles</a>
-  </nav>
-  <span class="sp"></span>
-  <label style="font-size:13px;color:var(--muted)">Palette
-    <select id="palSel"></select>
-  </label>
-  <label style="font-size:13px;color:var(--muted)">Zoom
-    <select id="zoom"><option>1</option><option selected>2</option><option>3</option><option>4</option></select>
-  </label>
-</header>
+<header id="top"></header>
 <main>
   <section id="side">
     <div class="tools"><input id="q" type="search" placeholder="Filter by hash or note" autocomplete="off"><div class="count" id="count"></div></div>
@@ -90,10 +75,11 @@ canvas { image-rendering: pixelated; display: block; }
   <section id="view"></section>
 </main>
 <div id="tip"></div>
+<script src="/static/common.js"></script>
 <script>
-// ---------- data + decoding ----------
-const $ = id => document.getElementById(id);
-const SIZES = { 0: [[8, 8], [16, 16], [32, 32], [64, 64]], 1: [[16, 8], [32, 8], [32, 16], [64, 32]], 2: [[8, 16], [8, 32], [16, 32], [32, 64]], 3: [[8, 8], [8, 8], [8, 8], [8, 8]] };
+studioHeader(`<label style="font-size:13px;color:var(--muted)">Palette <select id="palSel"></select></label>
+  <label style="font-size:13px;color:var(--muted)">Zoom <select id="zoom"><option>1</option><option selected>2</option><option>3</option><option>4</option></select></label>`);
+if (EMBED) document.body.insertAdjacentHTML('afterbegin', '<div hidden><select id="palSel"></select><select id="zoom"><option>1</option><option selected>2</option><option>3</option><option>4</option></select></div>');
 // Tentative identifications from docs/ASSETS.md (visual guesses unless noted).
 const NOTES = {
   B96C: 'slime (name hash confirmed; red in game)', 9506: 'bee (name hash confirmed)', DA6D: 'bat', 9247: 'ghoul / zombie', D637: 'hooded figure (wraith?)', D28E: 'flame / wisp (runs in field)',
@@ -102,111 +88,13 @@ const NOTES = {
   DE23: 'playable character', '761E': 'character (1253 frames)', F761: 'large beast', F771: 'large bird', F7D2: 'boss face', A2DB: 'eruption effect', '1BC7': 'flames',
   DF11: 'light bulb', '731D': 'copyright line', '82F1': 'PURIFICATION COMPLETED!', E89F: 'Boktai 2 title',
 };
-const le = (b, o) => b[o] | b[o + 1] << 8;
-const s16 = (b, o) => (le(b, o) << 16) >> 16;
-const u32 = (b, o) => (b[o] | b[o + 1] << 8 | b[o + 2] << 16 | b[o + 3] << 24) >>> 0;
-const s8 = (b, o) => (b[o] << 24) >> 24;
 
 let index = {}, palettes = [], curPal = null, zoom = 2, big = null, font = null, charmap = {};
-const cache = new Map();
-async function res(label, hash) {
-  const k = label + '/' + hash;
-  if (!cache.has(k)) cache.set(k, fetch(`/api/res/${label}/${hash}`).then(r => r.arrayBuffer()).then(b => new Uint8Array(b)));
-  return cache.get(k);
-}
-
-function rgb(c) { return [(c & 31) * 255 / 31 | 0, (c >> 5 & 31) * 255 / 31 | 0, (c >> 10 & 31) * 255 / 31 | 0]; }
 function palColors(p) { // 256 RGB triples, or a grey ramp
   if (!p) return Array.from({ length: 256 }, (_, i) => { const v = (i & 15) * 17; return [v, v, v]; });
   return Array.from({ length: 256 }, (_, i) => rgb(le(p.data, 20 + i * 2)));
 }
 
-// Draw one 4bpp 8x8 tile into ImageData at (x, y), with flips inside a w x h part.
-function tile(img, src, off, x, y, colors, bank, hf, vf) {
-  const W = img.width, d = img.data;
-  for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
-    const v = (src[off + r * 4 + (c >> 1)] >> (4 * (c & 1))) & 15;
-    if (!v) continue;
-    const px = x + (hf ? 7 - c : c), py = y + (vf ? 7 - r : r);
-    if (px < 0 || py < 0 || px >= W || py >= img.height) continue;
-    const [R, G, B] = colors[bank * 16 + v], o = (py * W + px) * 4;
-    d[o] = R; d[o + 1] = G; d[o + 2] = B; d[o + 3] = 255;
-  }
-}
-
-function toCanvas(img, z = zoom) {
-  const cv = document.createElement('canvas');
-  cv.width = img.width; cv.height = img.height;
-  cv.getContext('2d').putImageData(img, 0, 0);
-  cv.style.width = img.width * z + 'px'; cv.style.height = img.height * z + 'px';
-  return cv;
-}
-
-// Compose parts [{x,y,w,h,tiles:(tx,ty)->offset, bank, hf, vf}] into one image.
-function compose(parts, colors, box) {
-  if (!parts.length) return null;
-  let x0 = Math.min(...parts.map(p => p.x)), y0 = Math.min(...parts.map(p => p.y));
-  let x1 = Math.max(...parts.map(p => p.x + p.w)), y1 = Math.max(...parts.map(p => p.y + p.h));
-  if (box) { x0 = Math.min(x0, box[0]); y0 = Math.min(y0, box[1]); x1 = Math.max(x1, box[2]); y1 = Math.max(y1, box[3]); }
-  const img = new ImageData(Math.max(1, x1 - x0), Math.max(1, y1 - y0));
-  for (const p of [...parts].reverse()) {
-    const tw = p.w / 8, th = p.h / 8;
-    for (let ty = 0; ty < th; ty++) for (let tx = 0; tx < tw; tx++) {
-      const dx = p.hf ? (tw - 1 - tx) * 8 : tx * 8, dy = p.vf ? (th - 1 - ty) * 8 : ty * 8;
-      tile(img, p.src, p.tileOff(tx, ty), p.x - x0 + dx, p.y - y0 + dy, colors, p.bank, p.hf, p.vf);
-    }
-  }
-  return img;
-}
-
-// CB05 sprite package (tools/assets/sprites.py)
-function parsePackage(b) {
-  const nframes = le(b, 2), nanims = le(b, 4), offs = [0, 1, 2, 3, 4].map(i => u32(b, 0xC + i * 4));
-  const frames = [], anims = [];
-  for (let i = 0; i < nframes; i++) {
-    const o = offs[0] + i * 20;
-    frames.push({ id: le(b, o), n: le(b, o + 2), po: u32(b, o + 16) });
-  }
-  for (let i = 0; i < nanims; i++) {
-    const o = offs[1] + i * 8, n = le(b, o + 2), ko = u32(b, o + 4), keys = [];
-    for (let k = 0; k < n; k++) keys.push({ frame: le(b, offs[3] + ko + k * 4), dur: le(b, offs[3] + ko + k * 4 + 2) });
-    anims.push({ id: le(b, o), keys });
-  }
-  const parts = f => {
-    const out = [];
-    for (let k = 0; k < f.n; k++) {
-      const o = offs[2] + f.po + k * 8, attr = le(b, o), a2 = le(b, o + 6);
-      const [w, h] = SIZES[(attr >> 8) & 3][(attr >> 10) & 3], t = a2 & 0x3FF;
-      out.push({ x: s16(b, o + 2), y: s16(b, o + 4), w, h, bank: a2 >> 12, hf: !!(attr & 4), vf: !!(attr & 8), src: b, tileOff: (tx, ty) => offs[4] + (t + ty * 16 + tx) * 32 });
-    }
-    return out;
-  };
-  return { frames, anims, parts, ntiles: le(b, 10) };
-}
-
-// 98F5 large sprites (tools/assets/bigsprites.py)
-function parseBig(d) {
-  const count = u32(d, 4), pixels = u32(d, 0xC), framesAt = u32(d, 0x10), partsAt = u32(d, 0x14), recs = [];
-  for (let i = 0; i < count; i++) {
-    const o = 0x18 + i * 12;
-    recs.push({ hash: u32(d, o).toString(16).toUpperCase().padStart(4, '0'), w: d[o + 4], h: d[o + 5], cx: d[o + 6], cy: d[o + 7], foff: u32(d, o + 8) });
-  }
-  const frames = i => {
-    const a = recs[i].foff, e = i + 1 < count ? recs[i + 1].foff : partsAt - framesAt, out = [];
-    for (let o = a; o < e; o += 12) out.push({ n: d[framesAt + o], pix: u32(d, framesAt + o + 4), po: u32(d, framesAt + o + 8) });
-    return out;
-  };
-  const parts = f => {
-    const out = []; let t = 0;
-    for (let k = 0; k < f.n; k++) {
-      const o = partsAt + f.po + k * 4, attr = d[o], [w, h] = SIZES[attr & 3][(attr >> 2) & 3], t0 = t;
-      out.push({ x: s8(d, o + 2), y: s8(d, o + 3), w, h, bank: 0, hf: false, vf: false, src: d, tileOff: (tx, ty) => pixels + f.pix + (t0 + ty * (w / 8) + tx) * 32 });
-      t += (w / 8) * (h / 8);
-    }
-    return out;
-  };
-  return { recs, frames, parts };
-}
 
 // ---------- shell ----------
 let tab = 'sprites', items = [], sel = null, timer = null;
@@ -215,6 +103,7 @@ const views = {};
 let learned = { stages: [], sprites: {} }, tagList = [];
 async function boot() {
   index = await fetch('/api/res').then(r => r.json());
+  await loadNotes();
   learned = await fetch('/api/learned').then(r => r.json()).catch(() => learned);
   tagList = await fetch('/api/tags').then(r => r.json()).catch(() => []);
   const ps = index.t92B3 || [];
@@ -229,40 +118,58 @@ async function boot() {
   window.onhashchange = route;
   route();
 }
-function localStore(k, v) { try { if (v === undefined) return localStorage.getItem('studio.' + k); localStorage.setItem('studio.' + k, v); } catch (e) { return null; } }
+// Notes (data/notes.csv) per tab: kind and key of the selected item.
+const NOTE_KIND = { sprites: 'spr', big: 'big', maps: 'map', palettes: 'pal', tiles: 'res', data: 'res' };
+const noteKeyOf = key => tab === 'maps' ? key.split('-')[0] : key;
+const labelOf = i => NOTE_KIND[tab] && noteOf(NOTE_KIND[tab], noteKeyOf(i.key))?.label;
+let wantFrame = null;
 
 function route() {
-  const [t, s] = (location.hash.slice(1) || 'sprites').split('/');
+  const [t, s, f] = (location.hash.slice(1) || 'sprites').split('/');
   tab = views[t] ? t : 'sprites';
-  document.querySelectorAll('nav a[data-tab]').forEach(a => a.classList.toggle('on', a.dataset.tab === tab));
-  views[tab].init().then(() => { renderList(); if (s) select(s); else if (!sel || !items.some(i => i.key === sel)) select(items[0]?.key); else refresh(); });
+  wantFrame = f !== undefined && f !== '' ? +f : null;
+  markNav();
+  views[tab].init().then(() => {
+    renderList();
+    // a map hash alone opens its stage entry (MAP-TILESET-HP) when there is one
+    const key = s && (items.find(i => i.key === s) || items.find(i => i.key.startsWith(s + '-')) || items.find(i => i.key.toUpperCase() === s.toUpperCase()))?.key;
+    if (key) select(key, true); else if (s) select(s); else if (!sel || !items.some(i => i.key === sel)) select(items[0]?.key); else refresh();
+  });
 }
 function renderList() {
   const q = $('q').value.trim().toUpperCase();
-  const hits = items.filter(i => !q || i.key.includes(q) || (i.note || '').toUpperCase().includes(q));
+  const hits = items.filter(i => !q || i.key.includes(q) || (i.note || '').toUpperCase().includes(q) || (labelOf(i) || '').toUpperCase().includes(q));
   $('count').textContent = `${hits.length} of ${items.length}`;
   $('list').replaceChildren(...hits.map(i => {
     const d = document.createElement('div');
     d.className = 'row' + (i.key === sel ? ' on' : '');
-    d.innerHTML = `<code>${i.key}</code>${i.note ? `<span class="note"></span>` : ''}<span class="n">${i.n ?? ''}</span>`;
+    d.dataset.key = i.key;
+    const lab = labelOf(i);
+    d.innerHTML = `<code>${i.key}</code>${lab ? '<span class="lab"></span>' : ''}${i.note ? `<span class="note"></span>` : ''}<span class="n">${i.n ?? ''}</span>`;
+    if (lab) d.querySelector('.lab').textContent = lab;
     if (i.note) d.querySelector('.note').textContent = i.note;
     d.onclick = () => { history.replaceState(null, '', `#${tab}/${i.key}`); select(i.key); };
     return d;
   }));
 }
-function select(key) {
+function select(key, scroll) {
   sel = key;
-  document.querySelectorAll('.row').forEach(r => r.classList.toggle('on', r.querySelector('code').textContent === key));
+  document.querySelectorAll('.row').forEach(r => r.classList.toggle('on', r.dataset.key === key));
+  if (scroll) document.querySelector('.row.on')?.scrollIntoView({ block: 'center' });
   refresh();
 }
-function refresh() { clearInterval(timer); timer = null; if (sel !== undefined) views[tab].show(sel); }
+async function refresh() {
+  clearInterval(timer); timer = null;
+  if (sel === undefined) return;
+  await views[tab].show(sel);
+  const h = $('view').querySelector('h2');
+  if (h && NOTE_KIND[tab] && sel) h.after(noteEditor(NOTE_KIND[tab], noteKeyOf(sel), renderList));
+  wantFrame = null;
+}
 const colorsNow = () => palColors(curPal);
 // A sprite's palette as captured in-game (tools/mgba/centaur.lua capture), for every bank.
 function learnedColors(kind, hash) {
-  const c = learned.sprites[`${kind}:${hash}`];
-  if (!c) return null;
-  const one = c.map(rgb);
-  return Array.from({ length: 256 }, (_, i) => one[i & 15]);
+  return learnedPalette(learned.sprites[`${kind}:${hash}`]);
 }
 function learnedNote(kind, hash) {
   return learned.sprites[`${kind}:${hash}`] ? ' · <span style="color:var(--accent)">colours from an in-game capture</span>' : '';
@@ -280,6 +187,33 @@ function tagButton(kind, hash, part = '') {
   return b;
 }
 
+let _caps = null;
+const capturesList = () => (_caps ??= fetch('/api/captures').then(r => r.json()).catch(() => []));
+
+// The frames of a sprite, a page at a time; click one (or pass `pick`) to show it still.
+function frameStrip(n, imgAt, pick) {
+  const strip = $('strip'), PAGE = 240, cells = [];
+  let shown = 0;
+  const more = document.createElement('button'); more.className = 'more';
+  strip.appendChild(more);
+  const mark = i => cells.forEach((c, k) => c.classList.toggle('on', k === i));
+  const still = i => { clearInterval(timer); const img = imgAt(i); $('stage').replaceChildren(img ? toCanvas(img, zoom) : ''); mark(i); };
+  const add = upto => {
+    while (shown < Math.min(n, upto)) {
+      const i = shown++, img = imgAt(i), c = document.createElement('div');
+      c.className = 'cell';
+      if (img) c.appendChild(toCanvas(img, 1));
+      c.insertAdjacentHTML('beforeend', `<span>${i}</span>`);
+      c.onclick = () => still(i);
+      strip.insertBefore(c, more); cells[i] = c;
+    }
+    more.hidden = shown >= n; more.textContent = `Show ${Math.min(PAGE, n - shown)} more of ${n - shown} frames`;
+  };
+  more.onclick = () => add(shown + PAGE);
+  add(pick != null ? Math.max(PAGE, pick + 1) : PAGE);
+  if (pick != null && pick < n) { still(pick); cells[pick].scrollIntoView({ block: 'nearest' }); }
+}
+
 // Animation player over a list of images with durations (frames at 60 Hz).
 function player(target, seq) {
   clearInterval(timer);
@@ -294,35 +228,31 @@ function player(target, seq) {
 views.sprites = {
   async init() { items = (index.tCB05 || []).map(([h, n]) => ({ key: h, note: NOTES[h], n: (n / 1024).toFixed(0) + ' KB' })); },
   async show(h) {
-    const pkg = parsePackage(await res('tCB05', h)), colors = learnedColors('spr', h) || colorsNow();
+    const bytes = await res('tCB05', h), pkg = parsePackage(bytes), base = le(bytes, 0);
+    // colours: the package's own palette from the 9B1B pool (what the game uses
+    // unless the code showing it picks another), a capture, or the palette menu
+    const mode = localStore('sprpal') || 'pool';
+    const colors = mode === 'capture' && learnedColors('spr', h) || mode === 'menu' && colorsNow() || await packageColors(bytes);
     const v = $('view');
-    v.innerHTML = `<h2>Sprite package ${h}</h2><div class="meta">${NOTES[h] ? NOTES[h] + ' · ' : ''}${pkg.frames.length} frames · ${pkg.anims.length} animations · ${pkg.ntiles} tiles${learnedNote('spr', h)}</div>
-      <div class="controls">Animation <select id="anim"></select> <span id="ainfo" style="color:var(--muted)"></span> <span id="tagslot"></span></div>
+    v.innerHTML = `<h2>Sprite package ${h}</h2><div class="meta">${NOTES[h] ? NOTES[h] + ' · ' : ''}${pkg.frames.length} frames · ${pkg.anims.length} animations · ${pkg.ntiles} tiles · palette: ${peekLink('/gfx#pool/' + base, 'pool entry ' + base)}</div>
+      <div class="controls">Animation <select id="anim"></select> <span id="ainfo" style="color:var(--muted)"></span>
+        Colours <select id="sprpal"><option value="pool">in-game (palette pool)</option><option value="capture"${learnedColors('spr', h) ? '' : ' disabled'}>as seen in a capture</option><option value="menu">palette menu</option></select> <span id="tagslot"></span></div>
       <div class="stage" id="stage"></div><div class="strip" id="strip"></div>`;
-    // Shared box per package so animations do not jitter.
-    const imgs = pkg.frames.map(f => compose(pkg.parts(f), colors));
-    const strip = $('strip');
-    const max = 300;
-    imgs.slice(0, max).forEach((img, i) => {
-      const c = document.createElement('div'); c.className = 'cell';
-      if (img) c.appendChild(toCanvas(img, 1));
-      c.insertAdjacentHTML('beforeend', `<span>${i}</span>`);
-      c.onclick = () => { clearInterval(timer); $('stage').replaceChildren(img ? toCanvas(img) : ''); strip.querySelectorAll('.cell').forEach(x => x.classList.toggle('on', x === c)); };
-      strip.appendChild(c);
-    });
-    if (imgs.length > max) strip.insertAdjacentHTML('beforeend', `<div class="meta">…and ${imgs.length - max} more frames</div>`);
+    const cache = [], imgAt = i => (cache[i] ??= compose(pkg.parts(pkg.frames[i]), colors));
     const sel = $('anim');
     sel.innerHTML = pkg.anims.map((a, i) => `<option value="${i}">#${i} (id ${a.id}, ${a.keys.length} keys)</option>`).join('') || '<option>none</option>';
     const play = () => {
-      const a = pkg.anims[+sel.value]; if (!a) { if (imgs[0]) $('stage').replaceChildren(toCanvas(imgs[0])); return; }
+      const a = pkg.anims[+sel.value]; if (!a) { if (imgAt(0)) $('stage').replaceChildren(toCanvas(imgAt(0), zoom)); return; }
       const fs = a.keys.map(k => pkg.frames[k.frame] ? pkg.parts(pkg.frames[k.frame]) : []);
       const all = fs.flat();
       const box = all.length ? [Math.min(...all.map(p => p.x)), Math.min(...all.map(p => p.y)), Math.max(...all.map(p => p.x + p.w)), Math.max(...all.map(p => p.y + p.h))] : null;
-      const seq = a.keys.map((k, i) => { const img = compose(fs[i], colors, box); return { canvas: img ? toCanvas(img) : document.createElement('span'), dur: k.dur || 8 }; });
+      const seq = a.keys.map((k, i) => { const img = compose(fs[i], colors, box); return { canvas: img ? toCanvas(img, zoom) : document.createElement('span'), dur: k.dur || 8 }; });
       $('ainfo').textContent = a.keys.map(k => `${k.frame}×${k.dur}`).slice(0, 12).join(' ') + (a.keys.length > 12 ? ' …' : '');
       player($('stage'), seq);
     };
     sel.onchange = play; play();
+    $('sprpal').value = mode; $('sprpal').onchange = () => { localStore('sprpal', $('sprpal').value); refresh(); };
+    frameStrip(pkg.frames.length, imgAt, wantFrame);
     $('tagslot').appendChild(tagButton('spr', h));
   },
 };
@@ -334,7 +264,10 @@ views.big = {
     items = big.recs.map((r, i) => ({ key: r.hash, idx: i, note: NOTES[r.hash], n: big.frames(i).length + 'f' }));
   },
   async show(h) {
-    const i = big.recs.findIndex(r => r.hash === h), colors = learnedColors('big', h) || colorsNow();
+    // a large sprite's palette is whatever pool entry its OBJ bank held when a
+    // capture saw it (unfaded, from 9B1B); else the captured RAM, else the menu
+    const lp = learned.sprites[`big:${h}`]?.pool;
+    const i = big.recs.findIndex(r => r.hash === h), colors = lp != null ? await packageColors(null, lp) : learnedColors('big', h) || colorsNow();
     const v = $('view');
     if (i < 0) { v.textContent = 'Not found'; return; }
     const r = big.recs[i], frames = big.frames(i);
@@ -346,19 +279,14 @@ views.big = {
     const box = all.length ? [Math.min(...all.map(p => p.x)), Math.min(...all.map(p => p.y)), Math.max(...all.map(p => p.x + p.w)), Math.max(...all.map(p => p.y + p.h))] : null;
     const imgs = ps.map(p => compose(p, colors, box));
     $('tagslot').appendChild(tagButton('big', h));
-    const play = () => player($('stage'), imgs.filter(Boolean).map(img => ({ canvas: toCanvas(img), dur: +$('spd').value })));
+    const play = () => player($('stage'), imgs.filter(Boolean).map(img => ({ canvas: toCanvas(img, zoom), dur: +$('spd').value })));
     $('spd').onchange = play; play();
-    imgs.forEach((img, k) => {
-      const c = document.createElement('div'); c.className = 'cell';
-      if (img) c.appendChild(toCanvas(img, 1));
-      c.insertAdjacentHTML('beforeend', `<span>${k}</span>`);
-      c.onclick = () => { clearInterval(timer); $('stage').replaceChildren(toCanvas(img)); };
-      $('strip').appendChild(c);
-    });
-    const grid = $('all');
+    frameStrip(imgs.length, k => imgs[k], wantFrame);
+    const grid = $('all'), poolColors = {};
+    await Promise.all(big.recs.map(async rr => { const p = learned.sprites[`big:${rr.hash}`]?.pool; if (p != null) poolColors[rr.hash] = await packageColors(null, p); }));
     big.recs.forEach((rr, k) => {
       const c = document.createElement('div'); c.className = 'cell' + (k === i ? ' on' : ''); c.title = (NOTES[rr.hash] || '') + ' ' + rr.hash;
-      const f = big.frames(k)[0], img = f ? compose(big.parts(f), colors) : null;
+      const f = big.frames(k)[0], img = f ? compose(big.parts(f), poolColors[rr.hash] || colors) : null;
       if (img) { const cv = toCanvas(img, 1), s = Math.min(1, 72 / Math.max(img.width, img.height)); cv.style.width = img.width * s + 'px'; cv.style.height = img.height * s + 'px'; c.appendChild(cv); }
       c.insertAdjacentHTML('beforeend', `<span>${rr.hash}</span>`);
       c.onclick = () => { location.hash = `big/${rr.hash}`; };
@@ -451,21 +379,34 @@ views.maps = {
         ${m.count > 1 ? 'Layer <select id="lay">' + m.ents.map((e, i) => `<option value="${i}">${e.hash} (${e.w}×${e.h})</option>`).join('') + '</select>' : ''}
         ${own ? '' : `Tileset <select id="tsel">${tsList.map(t => `<option ${t === (ts || savedTs) ? 'selected' : ''}>${t}</option>`).join('')}</select>`}
         <label><input type="checkbox" id="grid"> metatile grid</label>
-        <span id="palhint" style="color:var(--muted)"></span> <span id="tagslot"></span>
+        <span id="palhint" style="color:var(--muted)"></span> <span id="capslot"></span> <span id="tagslot"></span>
       </div>
       <div class="stage" id="ms" style="padding:0;overflow:auto;max-width:100%"></div><div class="meta" id="hover" style="margin-top:6px">&nbsp;</div>`;
     const known = learned.stages.find(x => x.map === mh);
     $('palhint').innerHTML = known ? `Captured palette for this stage: <a href="#" id="usepal">${known.palette}</a>` : 'Palette is chosen at runtime; capture this stage in Live to learn it.';
     if (known) $('usepal').onclick = ev => { ev.preventDefault(); const i = palettes.findIndex(p => p.hash === known.palette); $('palSel').value = i; curPal = palettes[i]; draw(); };
     $('tagslot').appendChild(tagButton('map', mh, $('lay') ? m.ents[0].hash : ''));
+    // Captures that showed this map: their palette RAM has every bank as the game set it.
+    const caps = (await capturesList()).filter(c => c.stage_map === mh || c.map === mh);
+    let capColors = null;
+    if (caps.length) {
+      $('capslot').innerHTML = `Colours <select id="capsel"><option value="">from the palette menu</option>${caps.map((c, i) => `<option value="${i}">palette RAM of capture ${esc(c.label || c.name)}</option>`).join('')}</select>`;
+      $('capsel').value = localStore('mapcap.' + mh) ?? '0';
+      $('capsel').onchange = async () => { localStore('mapcap.' + mh, $('capsel').value); await pickCap(); draw(); };
+    }
+    const pickCap = async () => {
+      const c = caps[+($('capsel')?.value ?? '')];
+      capColors = c && $('capsel').value !== '' ? (await loadCapture(c.name)).bgColors : null;
+    };
+    await pickCap();
     const draw = () => {
       const ent = m.ents[$('lay') ? +$('lay').value : 0];
       if (!ent) { $('ms').textContent = 'No layers.'; return; }
       let tileAt;
       if (own) tileAt = t => t < m.ntiles ? [m.b, m.tiles + t * 32] : null;
       else { const id = $('tsel').value; localStore('mapts.' + mh, id); tileAt = tilesetOffsets(id) || (() => null); }
-      const { img, cells } = renderMP(m, ent, tileAt, colorsNow(), $('grid').checked);
-      const cv = toCanvas(img); $('ms').replaceChildren(cv);
+      const { img, cells } = renderMP(m, ent, tileAt, capColors || colorsNow(), $('grid').checked);
+      const cv = toCanvas(img, zoom); $('ms').replaceChildren(cv);
       cv.onmousemove = ev => {
         const r = cv.getBoundingClientRect(), x = Math.floor((ev.clientX - r.left) / zoom / 16), y = Math.floor((ev.clientY - r.top) / zoom / 16);
         if (x >= 0 && y >= 0 && x < ent.w && y < ent.h) $('hover').textContent = `metatile (${x}, ${y}) = #${cells[y * ent.w + x]}`;
@@ -477,6 +418,56 @@ views.maps = {
 };
 
 // ---------- palettes ----------
+// ---------- sprite palette pool (9B1B) ----------
+views.pool = {
+  async init() {
+    const pool = await spritePool();
+    // which packages start where
+    const users = {};
+    await Promise.all((index.tCB05 || []).map(async ([h]) => { const b = await res('tCB05', h); (users[le(b, 0)] ||= []).push(h); }));
+    this.users = users;
+    items = Array.from({ length: Math.ceil(pool.n / 32) }, (_, k) => ({ key: String(k * 32), note: `entries ${k * 32}–${Math.min(pool.n, k * 32 + 32) - 1}`, n: Object.keys(users).filter(u => u >= k * 32 && u < k * 32 + 32).length + ' pkg' }));
+  },
+  async show(key) {
+    const pool = await spritePool(), want = +key, start = Math.floor(want / 32) * 32, v = $('view');
+    v.innerHTML = `<h2>Sprite palette pool</h2><div class="meta">Resource 9B1B: ${pool.n} sub-palettes of 16 colours. The game copies entries into OBJ palette banks as sprites need them; a sprite package's first word is the entry its palette bank 0 uses. Showing ${start}–${Math.min(pool.n, start + 32) - 1}.</div><div class="palgrid" id="pg"></div>`;
+    for (let i = start; i < Math.min(pool.n, start + 32); i++) {
+      const card = document.createElement('div'); card.className = 'palcard' + (i === want ? ' on' : '');
+      const us = this.users[i] || [];
+      card.innerHTML = `<code>#${i}</code> ${us.map(h => `<a href="#sprites/${h}">${h}</a>${NOTES[h] ? ' ' + esc(NOTES[h]) : ''}`).join(', ')}<div class="pal" style="grid-template-columns:repeat(16,14px)">${pool.entry(i).map(([r, g, b]) => `<i style="background:rgb(${r},${g},${b})"></i>`).join('')}</div>`;
+      if (i === want) setTimeout(() => card.scrollIntoView({ block: 'center' }), 0);
+      $('pg').appendChild(card);
+    }
+  },
+};
+
+// ---------- data: resources that are not graphics ----------
+views.data = {
+  async init() { items = Object.entries(index).flatMap(([lab, es]) => es.map(([h, n]) => ({ key: `${lab}:${h}`, note: lab, n: n >= 1024 ? (n / 1024).toFixed(0) + ' KB' : n + ' B' }))); },
+  async show(key) {
+    const [lab, h] = key.split(':');
+    let d = await res(lab, h);
+    const packed = d[0] === 0x10 && d.length > 4;
+    if (packed) { try { d = lz77(d); } catch (e) { /* not LZ77 after all */ } }
+    const v = $('view'), PAGE = 4096;
+    let off = 0;
+    v.innerHTML = `<h2>${esc(lab)} ${esc(h)}</h2><div class="meta">${esc(RES_TYPES[lab] || 'not decoded yet')} · ${d.length.toLocaleString()} bytes${packed ? ' (LZ77-decompressed)' : ''} · <a href="#tiles/${key}">view as tiles</a></div>
+      <div class="controls"><button id="prev">◀</button> <span id="where"></span> <button id="next">▶</button></div><pre id="hex" style="font:12px/1.5 ui-monospace,Menlo,monospace;margin:0"></pre>`;
+    const draw = () => {
+      const rows = [];
+      for (let o = off; o < Math.min(d.length, off + PAGE); o += 16) {
+        const bs = [...d.slice(o, o + 16)];
+        rows.push(`${o.toString(16).padStart(6, '0')}  ${bs.map(x => x.toString(16).padStart(2, '0')).join(' ').padEnd(48)}  ${bs.map(x => x >= 32 && x < 127 ? String.fromCharCode(x) : '·').join('')}`);
+      }
+      $('hex').textContent = rows.join('\n');
+      $('where').textContent = `${off.toString(16)}–${Math.min(d.length, off + PAGE).toString(16)} of ${d.length.toString(16)}`;
+    };
+    $('prev').onclick = () => { off = Math.max(0, off - PAGE); draw(); };
+    $('next').onclick = () => { if (off + PAGE < d.length) off += PAGE; draw(); };
+    draw();
+  },
+};
+
 views.palettes = {
   async init() { items = palettes.map((p, i) => ({ key: p.hash, i })); },
   async show(h) {
@@ -560,7 +551,7 @@ views.tiles = {
       if (n <= 0) { $('ts').textContent = 'Offset past the end.'; return; }
       const img = new ImageData(w * 8, rows * 8), colors = colorsNow();
       for (let t = 0; t < n; t++) tile(img, d, off + t * 32, (t % w) * 8, Math.floor(t / w) * 8, colors, bank);
-      $('ts').replaceChildren(toCanvas(img));
+      $('ts').replaceChildren(toCanvas(img, zoom));
     };
     ['tw', 'to', 'tb'].forEach(id => $(id).oninput = draw);
     draw();

@@ -4,7 +4,8 @@
 --   replay(path, function() capture("x") end)     run a function when it ends
 --
 -- Understood: wait N, hold KEYS N, tap KEYS, shot NAME (screenshot to
--- build/centaur/), lux/mark/trace/probe/dump/watch (ignored). The game is not
+-- build/centaur/), loadstate FILE (an mGBA savestate, relative to the script:
+-- Centaur recordings start with one), lux/mark/trace/probe/dump/watch (ignored). The game is not
 -- reset: start it the way the recording did (same battery save, fresh boot).
 -- Loaded by centaur.lua; also usable alone.
 
@@ -22,15 +23,18 @@ end
 
 local function parse(path)
   local steps = {}
-  local f = io.open(path, "r") or io.open(ROOT .. "/" .. path, "r")
+  local f = io.open(path, "r")
+  if not f then path = ROOT .. "/" .. path; f = io.open(path, "r") end
   if not f then error("cannot open " .. path) end
+  local dir = path:match("^(.*)/[^/]*$") or "."
   for raw in f:lines() do
     local ln = raw:gsub("#.*", "")
     local cmd, a, b = ln:match("^%s*(%S+)%s*(%S*)%s*(%S*)")
     if cmd == "wait" then steps[#steps + 1] = { keys = 0, n = tonumber(a) }
     elseif cmd == "hold" then steps[#steps + 1] = { keys = mask(a), n = tonumber(b) }
     elseif cmd == "tap" then steps[#steps + 1] = { keys = mask(a), n = 2 }; steps[#steps + 1] = { keys = 0, n = 8 }
-    elseif cmd == "shot" then steps[#steps + 1] = { shot = a, n = 0 } end
+    elseif cmd == "shot" then steps[#steps + 1] = { shot = a, n = 0 }
+    elseif cmd == "loadstate" then steps[#steps + 1] = { state = a:sub(1, 1) == "/" and a or (dir .. "/" .. a), n = 0 } end
   end
   f:close()
   return steps
@@ -54,6 +58,10 @@ callbacks:add("frame", function()
   local s = R.steps[R.i]
   while s and s.n == 0 do
     if s.shot then pcall(function() emu:screenshot(ROOT .. "/build/centaur/" .. s.shot .. ".png") end) end
+    if s.state then
+      local sf = io.open(s.state, "rb")
+      if sf then emu:loadStateBuffer(sf:read("a")); sf:close() else console:error("replay: no savestate " .. s.state) end
+    end
     R.i = R.i + 1; s = R.steps[R.i]
   end
   if not s then

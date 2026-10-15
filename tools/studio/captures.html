@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boktai 3 Captures</title>
+<link rel="stylesheet" href="/static/common.css">
+<style>
+:root {
+  --bg: #f6f3ec; --panel: #fffdf8; --ink: #2b2620; --muted: #7d7468; --line: #e3dccf;
+  --accent: #b5462f; --accent-ink: #fff; --sel: #f3e3d6; --ok: #2f7d4f; --stage: #3b3f55; --box: #ffd34d;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1b1916; --panel: #24211d; --ink: #ece6dc; --muted: #9a9083; --line: #3a352e;
+    --accent: #e0745a; --accent-ink: #1b1916; --sel: #3a2c25; --ok: #6cc596;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Hiragino Sans", sans-serif; }
+a { color: var(--accent); }
+button, input, select, textarea { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
+button { cursor: pointer; }
+main { display: grid; grid-template-columns: 280px 1fr; height: calc(100vh - 53px); }
+#side { border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
+#side .tools { padding: 10px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
+#side .count { color: var(--muted); font-size: 12px; }
+#list { overflow-y: auto; flex: 1; }
+.grp { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding: 10px 10px 4px; position: sticky; top: 0; background: var(--bg); }
+.cap { display: grid; grid-template-columns: 72px 1fr; gap: 8px; padding: 6px 10px; border-bottom: 1px solid var(--line); cursor: pointer; align-items: center; }
+.cap:hover { background: var(--sel); }
+.cap.on { background: var(--sel); box-shadow: inset 3px 0 var(--accent); }
+.cap img { width: 72px; aspect-ratio: 3/2; object-fit: cover; image-rendering: pixelated; border-radius: 3px; background: var(--stage); display: block; }
+.cap b { font-weight: 500; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cap small { color: var(--muted); font-size: 11px; }
+#view { overflow: auto; padding: 14px 20px 40px; min-width: 0; }
+h2 { font-size: 15px; margin: 0 0 6px; }
+h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 18px 0 8px; font-weight: 600; }
+.meta { color: var(--muted); font-size: 13px; }
+.info { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin: 8px 0; }
+.info input { width: 14em; }
+.info textarea { flex: 1; min-width: 16em; resize: vertical; }
+.top { display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-start; }
+.screen { position: relative; width: 720px; max-width: 100%; aspect-ratio: 3/2; background: var(--stage); border-radius: 6px; overflow: hidden; flex: none; }
+.screen img { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
+.screen .ob { position: absolute; border: 1px solid rgba(255, 211, 77, .55); cursor: pointer; }
+.screen.nobox .ob { border-color: transparent; }
+.screen .ob:hover, .screen .ob.hl { border: 2px solid var(--box); background: rgba(255, 211, 77, .18); z-index: 2; }
+.screen .ob.sel { border: 2px solid var(--accent); background: rgba(224, 116, 90, .2); z-index: 3; }
+.screen .tx { position: absolute; border: 1px dashed rgba(120, 220, 255, .8); pointer-events: none; }
+#tip { position: fixed; pointer-events: none; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; font-size: 12px; display: none; box-shadow: 0 4px 16px rgba(0,0,0,.2); z-index: 40; max-width: 320px; }
+#detail { flex: 1; min-width: 260px; }
+.big { background: var(--stage); border-radius: 6px; padding: 10px; display: inline-block; }
+.big canvas { image-rendering: pixelated; }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: 16px 0 10px; }
+.tabs button { border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: none; padding: 6px 12px; color: var(--muted); }
+.tabs button.on { border-bottom-color: var(--accent); color: var(--ink); }
+table { border-collapse: collapse; font-size: 12px; width: 100%; }
+td, th { text-align: left; padding: 3px 6px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+th { color: var(--muted); font-weight: 500; position: sticky; top: 0; background: var(--bg); }
+tr.sp:hover, tr.sp.hl { background: var(--sel); }
+tr.sp.sel { background: var(--sel); box-shadow: inset 3px 0 var(--accent); }
+td.img { background: var(--stage); width: 72px; text-align: center; }
+td.img canvas { image-rendering: pixelated; display: inline-block; }
+.sw { display: inline-flex; }
+.sw i { width: 8px; height: 12px; display: block; }
+.pal { display: grid; grid-template-columns: repeat(16, 14px); gap: 1px; }
+.pal i { width: 14px; height: 14px; display: block; }
+.layers { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.layer { border: 1px solid var(--line); border-radius: 8px; padding: 8px; background: var(--panel); }
+.layer .cv { background: var(--stage); overflow: auto; max-height: 520px; border-radius: 4px; }
+.layer canvas { image-rendering: pixelated; }
+.empty { color: var(--muted); }
+.lab { color: var(--accent); }
+body.embed #side { display: none; }
+body.embed main { grid-template-columns: 1fr; }
+body.embed .screen { width: 100%; }
+@media (max-width: 860px) { main { grid-template-columns: 1fr; height: auto; } #side { height: 40vh; } }
+</style>
+</head>
+<body>
+<header id="top"></header>
+<main>
+  <section id="side">
+    <div class="tools">
+      <input id="q" type="search" placeholder="Filter: label, name, map, group" autocomplete="off">
+      <label class="count"><input type="checkbox" id="showscenes"> include the stage survey (scene_*)</label>
+      <div class="count" id="count"></div>
+    </div>
+    <div id="list"></div>
+  </section>
+  <section id="view"><div class="empty">Pick a capture. Capture scenes from the Live page or with <code>capture("tag")</code> in mGBA.</div></section>
+</main>
+<div id="tip"></div>
+<script src="/static/common.js"></script>
+<script>
+studioHeader();
+let caps = [], sel = null, an = null, cap = null, ents = [], selOam = null;
+const rgbCss = cssRgb;
+
+async function loadList() {
+  caps = await fetch('/api/captures').then(r => r.json());
+  renderList();
+}
+function renderList() {
+  const q = $('q').value.trim().toUpperCase(), scenes = $('showscenes').checked;
+  const hits = caps.filter(c => (scenes || !c.name.startsWith('scene_') || c.name === sel) &&
+    (!q || [c.name, c.label, c.group, c.map, c.stage_map, String(c.scene ?? '')].some(x => (x || '').toUpperCase().includes(q))));
+  $('count').textContent = `${hits.length} of ${caps.length} captures`;
+  const groups = {};
+  for (const c of hits) (groups[c.group || ''] ||= []).push(c);
+  const order = Object.keys(groups).sort((a, b) => (a === '') - (b === '') || a.localeCompare(b));
+  $('list').replaceChildren(...order.flatMap(g => {
+    const out = [];
+    if (order.length > 1 || g) { const h = document.createElement('div'); h.className = 'grp'; h.textContent = g || 'Ungrouped'; out.push(h); }
+    for (const c of groups[g].slice(0, 400)) {
+      const d = document.createElement('div'); d.className = 'cap' + (c.name === sel ? ' on' : ''); d.dataset.name = c.name;
+      d.innerHTML = `<img loading="lazy" alt="" src="/api/live/file/captures/${encodeURIComponent(c.name)}/screen.png"><span><b></b><small></small></span>`;
+      d.querySelector('b').textContent = c.label || c.name;
+      d.querySelector('small').textContent = [c.label ? c.name : '', c.map ? 'map ' + c.map : '', c.scene ? 'scene ' + c.scene : '', (c.time || '').slice(5, 16)].filter(Boolean).join(' · ');
+      d.onclick = () => { location.hash = encodeURIComponent(c.name); };
+      out.push(d);
+    }
+    return out;
+  }));
+}
+$('q').oninput = renderList;
+$('showscenes').onchange = renderList;
+
+async function show(name) {
+  sel = name; selOam = null;
+  document.querySelectorAll('.cap').forEach(d => d.classList.toggle('on', d.dataset.name === name));
+  document.querySelector('.cap.on')?.scrollIntoView({ block: 'nearest' });
+  const c = caps.find(x => x.name === name) || { name };
+  $('view').innerHTML = '<div class="empty">Loading…</div>';
+  [an, cap] = await Promise.all([fetch(`/api/live/analysis/${encodeURIComponent(name)}`).then(r => r.json()), loadCapture(name)]);
+  ents = parseOam(cap.oam);
+  const byOam = Object.fromEntries((an.sprites || []).map(s => [s.oam, s]));
+  ents.forEach(e => e.an = byOam[e.oam]);
+  const m = an.meta || {};
+  const metaBits = [
+    m.time && esc(m.time), m.frame != null && `frame ${m.frame}`, m.scene != null && `scene ${m.scene}`,
+    m.map && `map ${peekLink(gfxHref('map', an.stage_map || m.map), esc(an.stage_map || m.map))}${an.stage_map && m.map && an.stage_map !== m.map ? ` (last map resource ${esc(m.map)})` : ''}`,
+    m.tileset && `tiles ${esc(m.tileset)}`, m.pal && `pal ${peekLink(gfxHref('pal', m.pal), esc(m.pal))}`,
+    m.text != null && `last text <a href="/#${m.text}" target="_blank">#${m.text}</a>`,
+  ].filter(Boolean).join(' · ');
+  $('view').innerHTML = `
+    <h2>${esc(c.label || name)}</h2><div class="meta">${c.label ? esc(name) + ' · ' : ''}${metaBits}</div>
+    <div class="info"><input id="clabel" placeholder="Label" value="${esc(c.label)}"><input id="cgroup" placeholder="Group (e.g. intro, field 1)" value="${esc(c.group)}" list="groups">
+      <textarea id="cnotes" rows="1" placeholder="Notes">${esc(c.notes)}</textarea><span id="csaved" class="meta"></span></div>
+    <datalist id="groups">${[...new Set(caps.map(x => x.group).filter(Boolean))].map(g => `<option value="${esc(g)}">`).join('')}</datalist>
+    <div class="top">
+      <div>
+        <div class="screen" id="screen"><img alt="" src="/api/live/file/captures/${encodeURIComponent(name)}/screen.png?t=${Date.now()}"></div>
+        <div class="meta" style="margin-top:4px"><label><input type="checkbox" id="boxes" checked> sprite boxes</label> · hover a box or row, click to inspect · ${ents.length} sprites, ${ents.filter(e => e.an?.match).length} matched to resources</div>
+      </div>
+      <div id="detail"><div class="empty">Click a sprite on the screen or in the list.</div></div>
+    </div>
+    <div class="tabs"><button data-t="sprites" class="on">Sprites</button><button data-t="layers">BG layers</button><button data-t="palettes">Palettes</button></div>
+    <div id="tab"></div>`;
+  const saveInfo = async () => {
+    const info = await post(`/api/captures/${encodeURIComponent(name)}`, { label: $('clabel').value, group: $('cgroup').value, notes: $('cnotes').value });
+    Object.assign(c, info); $('csaved').textContent = 'saved'; setTimeout(() => $('csaved').textContent = '', 1500); renderList();
+  };
+  ['clabel', 'cgroup', 'cnotes'].forEach(id => $(id).onchange = saveInfo);
+  $('boxes').onchange = () => $('screen').classList.toggle('nobox', !$('boxes').checked);
+  drawBoxes();
+  document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => { document.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('on', x === b)); TABS[b.dataset.t](); });
+  TABS.sprites();
+}
+
+const spriteName = e => e.an?.match ? `${e.an.match[0] === 'big' ? 'large sprite' : 'sprite'} ${e.an.match[1]}${e.an.frame != null ? ' frame ' + e.an.frame : ''}` : 'unidentified';
+// OBJ bank -> pool entry (9B1B) the palette manager loaded there
+const poolOf = bank => { const p = cap.objPool?.[bank]; return p != null && p < 0x8000 ? p : null; };
+const poolLink = bank => { const p = poolOf(bank); return p != null ? peekLink('/gfx#pool/' + p, '#' + p) : (cap.objPool?.length ? 'special' : ''); };
+const spriteLabel = e => e.an?.match && noteOf(e.an.match[0], e.an.match[1])?.label;
+function drawBoxes() {
+  const sc = $('screen');
+  sc.querySelectorAll('.ob,.tx').forEach(x => x.remove());
+  // back to front so the frontmost (lowest OAM index) is on top
+  for (const e of [...ents].reverse()) {
+    const b = document.createElement('div'); b.className = 'ob'; b.dataset.oam = e.oam;
+    Object.assign(b.style, { left: e.x / 2.4 + '%', top: e.y / 1.6 + '%', width: e.w / 2.4 + '%', height: e.h / 1.6 + '%' });
+    b.onmouseenter = ev => { hl(e.oam, true); tip(ev, e); };
+    b.onmousemove = ev => tip(ev, e);
+    b.onmouseleave = () => { hl(e.oam, false); $('tip').style.display = 'none'; };
+    b.onclick = () => pick(e.oam);
+    sc.appendChild(b);
+  }
+}
+function tip(ev, e) {
+  const t = $('tip'), lab = spriteLabel(e);
+  t.innerHTML = `<b>OAM ${e.oam}</b> · ${e.w}×${e.h} at (${e.x}, ${e.y})<br>${esc(spriteName(e))}${lab ? `<br><span class="lab">${esc(lab)}</span>` : ''}`;
+  t.style.display = 'block'; t.style.left = ev.clientX + 14 + 'px'; t.style.top = ev.clientY + 14 + 'px';
+}
+function hl(oam, on) {
+  document.querySelectorAll(`[data-oam="${oam}"]`).forEach(x => x.classList.toggle('hl', on));
+}
+function pick(oam) {
+  selOam = oam;
+  document.querySelectorAll('[data-oam]').forEach(x => x.classList.toggle('sel', +x.dataset.oam === oam));
+  const e = ents.find(x => x.oam === oam);
+  const d = $('detail');
+  const cv = toCanvas(oamImage(cap, e), Math.max(2, Math.floor(160 / Math.max(e.w, e.h))));
+  const mt = e.an?.match;
+  d.innerHTML = `<h2>OAM ${e.oam} · ${e.w}×${e.h}</h2>
+    <div class="meta">at (${e.x}, ${e.y}) · tile ${e.tile} · OBJ palette ${e.bpp8 ? '256-colour' : 'bank ' + e.bank + (poolOf(e.bank) != null ? ' = pool entry ' + poolLink(e.bank) : '')} · priority ${e.prio}${e.affine ? ' · affine (shown unrotated)' : ''}${e.mode ? ' · mode ' + ['normal', 'semi-transparent', 'window'][e.mode] : ''}</div>
+    <div class="big" style="margin:8px 0"></div>
+    <div>${mt ? `From ${peekLink(gfxHref(mt[0], mt[1], e.an.frame), esc(spriteName(e)))} (${e.an.matched} of ${e.an.tiles} tiles matched)` : 'No resource found with these tiles (generated at runtime, compressed, or a format not indexed yet).'}</div>
+    <div id="dnote"></div><div id="dtag"></div>`;
+  d.querySelector('.big').appendChild(cv);
+  if (mt) {
+    $('dnote').appendChild(noteEditor(mt[0], mt[1], () => { TABS.sprites(true); }));
+    const b = document.createElement('button'); b.textContent = 'Has text…';
+    b.onclick = async () => {
+      const note = prompt(`What text does ${mt[0]} ${mt[1]} show? (Japanese or a description)`);
+      if (note === null) return;
+      await post('/api/tags', { kind: mt[0], hash: mt[1], part: e.an.frame ?? '', note });
+      b.textContent = 'Tagged: ' + note;
+    };
+    $('dtag').appendChild(b);
+  }
+  document.querySelector(`tr[data-oam="${oam}"]`)?.scrollIntoView({ block: 'nearest' });
+}
+
+const TABS = {
+  sprites(keep) {
+    const t = $('tab');
+    const rows = ents.map(e => {
+      const mt = e.an?.match, lab = spriteLabel(e);
+      return `<tr class="sp" data-oam="${e.oam}"><td class="img"></td><td>${e.oam}</td><td>${e.x}, ${e.y}</td><td>${e.w}×${e.h}</td>
+        <td>${mt ? peekLink(gfxHref(mt[0], mt[1], e.an.frame), esc(spriteName(e))) : '<span class="empty">unidentified</span>'}</td>
+        <td>${lab ? `<span class="lab">${esc(lab)}</span>` : ''}</td>
+        <td><span class="sw">${Array.from({ length: 16 }, (_, k) => `<i style="background:${rgbCss(le(cap.pal, 0x200 + (e.bank * 16 + k) * 2))}"></i>`).join('')}</span> ${e.bpp8 ? '256' : e.bank}</td><td>${e.bpp8 ? '' : poolLink(e.bank)}</td></tr>`;
+    });
+    t.innerHTML = ents.length ? `<table><tr><th></th><th>OAM</th><th>x, y</th><th>Size</th><th>Resource</th><th>Label</th><th>Palette (OBJ bank)</th><th>Pool</th></tr>${rows.join('')}</table>` : '<div class="empty">No sprites on screen.</div>';
+    t.querySelectorAll('tr.sp').forEach(r => {
+      const e = ents.find(x => x.oam === +r.dataset.oam);
+      r.querySelector('.img').appendChild(fitCanvas(toCanvas(oamImage(cap, e)), 64));
+      r.onmouseenter = () => hl(e.oam, true); r.onmouseleave = () => hl(e.oam, false);
+      r.onclick = ev => { if (!ev.target.closest('a')) pick(e.oam); };
+    });
+    if (selOam != null) document.querySelectorAll('[data-oam]').forEach(x => x.classList.toggle('sel', +x.dataset.oam === selOam));
+    if (keep && selOam != null) drawBoxes();
+  },
+  layers() {
+    const disp = le(cap.io, 0), mode = disp & 7, t = $('tab');
+    t.innerHTML = `<div class="meta" style="margin-bottom:8px">Video mode ${mode} · whole BG maps from VRAM, unscrolled (the capture has no scroll registers) · tiles in palette RAM colours</div><div class="layers" id="lays"></div>`;
+    for (let n = 0; n < 4; n++) {
+      const on = !!(disp & (0x100 << n)), d = document.createElement('div'); d.className = 'layer';
+      if (mode !== 0 && !(mode === 1 && n < 2)) { d.innerHTML = `<b>BG${n}</b> <span class="meta">${on ? 'affine/bitmap layer, not drawn here' : 'off'}</span>`; $('lays').appendChild(d); continue; }
+      const L = bgLayer(cap, n);
+      d.innerHTML = `<b>BG${n}</b> <span class="meta">${on ? 'shown' : 'off'} · priority ${L.prio} · ${L.W}×${L.H} tiles · chars ${(L.cb / 0x4000)} · map block ${L.sb / 0x800}${L.bpp8 ? ' · 256 colours' : ''}</span><div class="cv"></div>`;
+      d.querySelector('.cv').appendChild(toCanvas(L.img, 1));
+      if (!on) d.style.opacity = .55;
+      $('lays').appendChild(d);
+    }
+    if (an.bg_best) t.insertAdjacentHTML('beforeend', `<p class="meta">BG palette RAM matches palette resource ${peekLink(gfxHref('pal', an.bg_best), an.bg_best)} in banks ${an.bg.filter(b => b.resources.includes(an.bg_best)).map(b => b.bank).join(', ')}.</p>`);
+  },
+  palettes() {
+    const t = $('tab'), banks = off => Array.from({ length: 16 }, (_, b) => `<div class="pal" style="margin-bottom:2px" title="bank ${b}">${Array.from({ length: 16 }, (_, k) => `<i style="background:${rgbCss(le(cap.pal, off + (b * 16 + k) * 2))}"></i>`).join('')}</div>`).join('');
+    t.innerHTML = `<div class="top"><div><h3>BG palette RAM</h3>${banks(0)}</div><div><h3>OBJ palette RAM</h3>${banks(0x200)}</div><div><h3>OBJ bank → pool entry</h3>${Array.from({ length: 16 }, (_, b) => `<div class="meta" style="height:16px">bank ${b}: ${poolLink(b) || '—'}</div>`).join('')}</div>
+      <div><h3>Matches</h3>${(an.bg || []).map(b => `<div class="meta">bank ${b.bank}: ${b.resources.length ? b.resources.map(h => peekLink(gfxHref('pal', h), h)).join(', ') : 'no resource'}</div>`).join('') || '<div class="empty">none</div>'}</div></div>`;
+  },
+};
+
+window.onhashchange = () => { const n = decodeURIComponent(location.hash.slice(1)); if (n && n !== sel) show(n); };
+(async () => {
+  await loadNotes();
+  await loadList();
+  const n = decodeURIComponent(location.hash.slice(1)) || caps.find(c => !c.name.startsWith('scene_'))?.name;
+  if (n) { if (!location.hash) history.replaceState(null, '', '#' + encodeURIComponent(n)); show(n); }
+})();
+</script>
+</body>
+</html>

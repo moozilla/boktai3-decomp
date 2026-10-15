@@ -9,3 +9,4 @@ tools/emu/harness
 gen/
 wip/
 gen
+*.dSYM/
