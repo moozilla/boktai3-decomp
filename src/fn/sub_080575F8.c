@@ -1,27 +1,19 @@
-#include "global.h"
-
-void *Task_Create(s32, s32);
-void Task_SetCallbacks(void *, void *, void *);
-s32 sub_080575A8(void *, void *, void *);
-void Task_Kill(void *);
-void sub_08057574(void);
-void sub_0805759C(void);
-extern void *gUnk_0200049C;
-
-void *sub_080575F8(void *a, void *b)
+#include "countdown_timer.h"
+#define CountdownTimer_CreateFromScript sub_080575F8
+struct CountdownTimer *CountdownTimer_CreateFromScript(void *unused1, void *unused2)
 {
-    void *r = gUnk_0200049C;
-    void *q;
-    if (r == 0) {
-        q = Task_Create(8, 0x20);
-        if (q != 0) {
-            Task_SetCallbacks(q, sub_08057574, sub_0805759C);
-            if (sub_080575A8(q, a, b) < 0) {
-                Task_Kill(q);
+    struct CountdownTimer *timer = gUnk_0200049C, *created;
+    if (!timer) {
+        created = Task_Create(8, sizeof(struct CountdownTimer));
+        if (created) {
+            Task_SetCallbacks(created, (void (*)(void *))sub_08057574,
+                              (void (*)(void *))sub_0805759C);
+            if (sub_080575A8(created, unused1, unused2) < 0) {
+                Task_Kill(created);
                 return 0;
             }
         }
-        r = q;
+        timer = created;
     }
-    return r;
+    return timer;
 }
