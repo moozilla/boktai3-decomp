@@ -1,11 +1,9 @@
-#include "global.h"
-void Sprite_Remove(void *);
-void Collider_Remove(void *);
-void sub_0823233C(void *);
-u32 sub_0805D884(u8 *p)
+#include "scene_panel_subject_tail.h"
+#define ScenePanelSubject_Destroy sub_0805D884
+s32 ScenePanelSubject_Destroy(struct ScenePanelSubjectTail *subject)
 {
-    Sprite_Remove(p + 0x18);
-    Collider_Remove(p + 0x68);
-    sub_0823233C(p + 0x104);
+    Sprite_Remove(&subject->drawable);
+    Collider_Remove(&subject->collider);
+    sub_0823233C(subject->effects);
     return 0;
 }
