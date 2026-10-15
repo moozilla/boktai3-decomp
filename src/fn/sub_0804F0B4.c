@@ -1,11 +1,12 @@
 #include "global.h"
+#define ResourceStation_TransferStoredResource sub_0804F0B4
 struct P {
     u8 f[0x25c];
     u32 x;
 };
 extern u8 *gUnk_02000710;
 void AnimData_SelectTiles(u8 *, s32);
-void sub_0804F0B4(struct P *p)
+void ResourceStation_TransferStoredResource(struct P *p)
 {
     u32 *q = &p->x;
     u8 *x = (u8 *)*q;
