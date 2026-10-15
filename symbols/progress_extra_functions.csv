@@ -229,6 +229,7 @@ address,evidence
 0812B918,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0812C4E4,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0812D17C,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
+0812E094,Independent 132-byte command-selection function after 0812E084 actual16-byte leaf; own high-register prologue return and literal pool through0812E118; retained unmatched
 0812EED0,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0812F5C4,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0812F5C8,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C
