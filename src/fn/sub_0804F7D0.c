@@ -1,18 +1,10 @@
-#include "global.h"
+#include "repeated_effect.h"
+#define RepeatedEffect_SetState sub_0804F7D0
 
-struct S {
-    u8 filler[0xe4];
-    u8 a;
-    u8 filler2[0xf];
-    u16 c;
-    u16 d;
-    u32 b;
-};
-
-void sub_0804F7D0(struct S *p, u8 a, u32 b)
+void RepeatedEffect_SetState(struct RepeatedEffect *p, u8 a, void (*b)(struct RepeatedEffect *))
 {
-    p->a = a;
-    p->b = b;
-    p->c = 0;
-    p->d = 0;
+    p->state = a;
+    p->update = b;
+    p->balance = 0;
+    p->stateFrame = 0;
 }
