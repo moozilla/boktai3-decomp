@@ -4,7 +4,8 @@
 /* The builders initialize seven pages of eight entries. Other controller phases
  * overlay this region with transition and grid state. */
 struct SceneInventoryScriptCatalog {
-    u8 unknown0[0x1A94];
+    u8 unknown0[0x1A8C];
+    u32 equipmentText, equipmentLabel;
     u32 itemText, consumableText;
     u8 unknown1A9C[0x14];
     u8 page, pageCount, itemPageCount;
