@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_08076034(void *, u32);
+void SceneActorAnimation_SelectDirectionalEntry(void *, u32);
 
 static inline u8 TakeFlag(u8 *flag)
 {
@@ -14,7 +14,7 @@ static inline u8 TakeFlag(u8 *flag)
 void sub_0808005C(u8 *p)
 {
     if (TakeFlag(p + 0x2B2))
-        sub_08076034(p, 0xB);
+        SceneActorAnimation_SelectDirectionalEntry(p, 0xB);
     if (*(u8 *)(p + 0x2B3))
         *(u8 *)(p + 0x2B0) = 1;
 }

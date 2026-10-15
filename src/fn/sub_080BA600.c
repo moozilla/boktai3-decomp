@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08076034(void *, u32);
+void SceneActorAnimation_SelectDirectionalEntry(void *, u32);
 void sub_080BA688(void);
 static inline u8 tk(u8 *a)
 {
@@ -29,7 +29,7 @@ struct S {
 void sub_080BA600(struct S *p)
 {
     if (tk(&p->b2b2))
-        sub_08076034(p, 0x13);
+        SceneActorAnimation_SelectDirectionalEntry(p, 0x13);
     if (p->b2b3) {
         void (*f)(void) = sub_080BA688;
         u32 k = 0x28;

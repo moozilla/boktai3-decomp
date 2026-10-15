@@ -1,6 +1,6 @@
 #include "global.h"
 extern void ActorShadow_Disable(void *);
-extern void sub_08076034(void *, s32);
+extern void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 extern void sub_08086C1C(void);
 static inline u8 take6030(u8 *s)
 {
@@ -39,7 +39,7 @@ void sub_08086B6C(u8 *s, s32 arg, u32 unused)
         u32 code;
         u32 *flags;
         u32 mask;
-        sub_08076034(s, 9);
+        SceneActorAnimation_SelectDirectionalEntry(s, 9);
         fn = sub_08086C1C;
         code = 0xD;
         s[0x2B2] = 1;

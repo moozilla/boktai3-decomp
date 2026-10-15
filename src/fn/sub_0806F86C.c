@@ -1,5 +1,5 @@
-#include "global.h"
-u32 sub_0806F86C(void)
+#include "scene_range_watch.h"
+u32 SceneRangeWatch_Destroy(void *unused)
 {
     return 0;
 }

@@ -7,7 +7,7 @@ void sub_08013684(void *);
 void sub_08003C10(void *);
 void sub_08225938(void *);
 void Collider_Remove(void *);
-void sub_0806FBC8(void *);
+void SceneActorRegistry_UnlinkActor(void *);
 
 static inline u8 tst(u16 *a, u32 m)
 {
@@ -49,6 +49,6 @@ u32 sub_080EC364(struct S *s)
 
     sub_08225938(q);
     Collider_Remove((u8 *)s + 0x134);
-    sub_0806FBC8(s);
+    SceneActorRegistry_UnlinkActor(s);
     return 0;
 }
