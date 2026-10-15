@@ -199,7 +199,7 @@ void ActorAttachment_TickDetachedParts(struct ActorAttachmentSlotView *slot)
                         slot->anchor->y + circle.y + slot->position.z + slot->offset.y;
                     sprite->position.z = slot->anchor->z - circle.x + slot->offset.z;
                     sprite->flags &= ~1;
-                    sub_08064D40(slot, i);
+                    ActorAttachment_BeginPartJitter(slot, i);
                 }
             }
             {
@@ -288,14 +288,14 @@ void ActorAttachment_TickDetachedParts(struct ActorAttachmentSlotView *slot)
                             offset <<= 3;
                             {
                                 struct ActorAttachmentPartSprite *base = parts;
-                                sub_08217EAC((void *)((u32)base + offset));
+                                Effect_Remove((void *)((u32)base + offset));
                             }
                         }
                     }
                     i = next;
                     postIndex = i;
                 } while (postIndex <= 2);
-                sub_080645D4(slot);
+                ActorAttachment_NotifySourceState(slot);
                 {
                     u32 zero = 0;
                     register u8 *mask asm("r3");
