@@ -8,7 +8,6 @@ void TetherActor_InitSecondaryCollider(struct TetherActor *);
 void TetherActor_InitializeSegments(struct TetherActor *);
 void TetherActor_InitStateParameters(struct TetherActor *);
 extern struct TetherActor *gUnk_02000488;
-#define TetherActor_InitializeFromScript sub_0804D500
 s32 TetherActor_InitializeFromScript(struct TetherActor *actor)
 {
     TetherActor_InitKindFromScript(actor);

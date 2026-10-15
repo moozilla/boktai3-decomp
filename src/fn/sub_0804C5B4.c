@@ -5,7 +5,6 @@ void TetherActor_SetState(struct TetherActor *, u32);
 void DisplayAnimation_SetFlags(struct DisplayAnimation *, u32);
 void DisplayAnimation_ClearFlags(struct DisplayAnimation *, u32);
 s32 DisplayAnimation_SetPalette(struct DisplayAnimation *, u32, u32, u32);
-#define TetherActor_UpdateDisplayDeparture sub_0804C5B4
 void TetherActor_UpdateDisplayDeparture(struct TetherActor *actor)
 {
     u16 *frame;

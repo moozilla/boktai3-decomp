@@ -4,8 +4,7 @@ void TetherActor_SetState(struct TetherActor *, s32);
 s32 TetherActor_SetEntry(struct TetherActor *, s32);
 void TetherActor_UpdateLockedShake(struct TetherActor *);
 void TetherActor_UpdateShake(struct TetherActor *);
-void sub_0804CF5C(struct TetherActor *);
-#define TetherActor_UpdateDirectedState sub_0804D094
+void TetherActor_UpdateDirectedMovement(struct TetherActor *);
 void TetherActor_UpdateDirectedState(struct TetherActor *p)
 {
     u16 *q;
@@ -23,7 +22,7 @@ void TetherActor_UpdateDirectedState(struct TetherActor *p)
             *q = v;
             TetherActor_UpdateShake(p);
         } else {
-            sub_0804CF5C(p);
+            TetherActor_UpdateDirectedMovement(p);
         }
     }
 }

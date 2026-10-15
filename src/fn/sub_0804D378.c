@@ -15,7 +15,6 @@ static inline u32 segmentsOnly(void)
     u32 mask = 4;
     return gUnk_02000560 & mask;
 }
-#define TetherActor_Tick sub_0804D378
 s32 TetherActor_Tick(struct TetherActor *actor)
 {
     actor->blendHold = 0;

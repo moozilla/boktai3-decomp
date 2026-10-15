@@ -1,7 +1,6 @@
 #include "tether_actor.h"
 void TetherActor_SetState(struct TetherActor *, s32);
 s32 TetherActor_SetEntry(struct TetherActor *, s32);
-#define TetherActor_UpdateSpecialEntryTransition sub_0804CE3C
 void TetherActor_UpdateSpecialEntryTransition(struct TetherActor *p)
 {
     u16 *q;

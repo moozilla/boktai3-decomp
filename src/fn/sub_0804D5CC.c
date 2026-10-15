@@ -1,9 +1,8 @@
 #include "tether_actor.h"
 extern struct TetherActor *gUnk_02000488;
-s32 sub_0804D500(struct TetherActor *, u32, u32);
-s32 sub_0804D378(struct TetherActor *);
-struct TetherActor *sub_0804D4B0(struct TetherActor *);
-#define TetherActor_CreateFromScript sub_0804D5CC
+s32 TetherActor_InitializeFromScript(struct TetherActor *, u32, u32);
+s32 TetherActor_Tick(struct TetherActor *);
+struct TetherActor *TetherActor_Destroy(struct TetherActor *);
 struct TetherActor *TetherActor_CreateFromScript(u32 a, u32 b)
 {
     struct TetherActor *r;
@@ -11,8 +10,9 @@ struct TetherActor *TetherActor_CreateFromScript(u32 a, u32 b)
         return gUnk_02000488;
     r = Task_Create(9, 0x484);
     if (r) {
-        Task_SetCallbacks(r, (void (*)(void *))sub_0804D378, (void (*)(void *))sub_0804D4B0);
-        if (sub_0804D500(r, a, b) < 0) {
+        Task_SetCallbacks(r, (void (*)(void *))TetherActor_Tick,
+                          (void (*)(void *))TetherActor_Destroy);
+        if (TetherActor_InitializeFromScript(r, a, b) < 0) {
             Task_Kill(r);
             return 0;
         }

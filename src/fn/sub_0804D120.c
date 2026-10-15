@@ -2,7 +2,6 @@
 // MATCHING_CONCESSION: register-pinning
 void TetherActor_SetState(struct TetherActor *, u32);
 void TetherActor_LimitPlayerDistance(struct TetherActor *);
-#define TetherActor_UpdateReverseDirectedMovement sub_0804D120
 static inline s32 scale(s32 value)
 {
     if (value >= 0)

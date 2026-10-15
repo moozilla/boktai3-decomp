@@ -1,6 +1,5 @@
 #include "tether_actor.h"
 // MATCHING_CONCESSION: register-pinning
-#define TetherActor_UpdateWanderingState sub_0804C104
 void TetherActor_SetState(struct TetherActor *, u32);
 void TetherActor_SetEntry(struct TetherActor *, u32);
 void TetherActor_SetHeadingEntry(struct TetherActor *, u32);
@@ -30,11 +29,13 @@ void TetherActor_UpdateWanderingState(struct TetherActor *actor)
     if (actor->roamFrame == 90) {
         if (actor->turnAfterBlock) {
             gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-            actor->heading = (actor->heading + Mod(((u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308], 5) + 2) & 7;
+            actor->heading =
+                (actor->heading + Mod(((u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308], 5) + 2) & 7;
             actor->turnAfterBlock = 0;
         } else {
             gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-            actor->heading = (actor->heading + Mod(((u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308], 3) + 7) & 7;
+            actor->heading =
+                (actor->heading + Mod(((u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308], 3) + 7) & 7;
         }
     } else if (actor->roamFrame > 90) {
         u32 angle;

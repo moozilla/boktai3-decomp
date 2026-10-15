@@ -6,7 +6,6 @@ void DisplayAnimation_Destroy(void *);
 
 void TetherActor_RemoveSegments(struct TetherActor *);
 void TetherActor_RemoveAuxiliarySprite(struct TetherActor *);
-#define TetherActor_Destroy sub_0804D4B0
 struct TetherActor *TetherActor_Destroy(struct TetherActor *p)
 {
     if (p->auxiliaryRegistered != 0)

@@ -1,6 +1,5 @@
 #include "tether_actor.h"
 // MATCHING_CONCESSION: register-pinning
-#define TetherActor_UpdateAuxiliaryTransition sub_0804C748
 void TetherActor_SetState(struct TetherActor *, u32);
 void TetherActor_SetEntry(struct TetherActor *, u32);
 void TetherActor_RemoveAuxiliarySprite(struct TetherActor *);
