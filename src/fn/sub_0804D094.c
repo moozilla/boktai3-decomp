@@ -1,28 +1,28 @@
-#include "global.h"
+#include "tether_actor.h"
 extern u32 gUnk_030053F4;
-void TetherActor_SetState(u8 *, s32);
-void TetherActor_SetEntry(u8 *, s32);
-void TetherActor_UpdateLockedShake(u8 *);
-void TetherActor_UpdateShake(u8 *);
-void sub_0804CF5C(u8 *);
-void sub_0804D094(u8 *p)
+void TetherActor_SetState(struct TetherActor *, s32);
+s32 TetherActor_SetEntry(struct TetherActor *, s32);
+void TetherActor_UpdateLockedShake(struct TetherActor *);
+void TetherActor_UpdateShake(struct TetherActor *);
+void TetherActor_UpdateDirectedMovement(struct TetherActor *);
+void TetherActor_UpdateDirectedState(struct TetherActor *p)
 {
     u16 *q;
-    if (p[0x255] != 0x10)
+    if (p->state != 0x10)
         TetherActor_SetState(p, 0x10);
-    *(u16 *)(p + 0x136) &= ~4;
-    q = (u16 *)(p + 0x38a);
+    *&p->chargeCollider.flags &= ~4;
+    q = &p->glowMode;
     *q = 1;
     TetherActor_SetEntry(p, 0);
     if ((gUnk_030053F4 & 0x200) == 0) {
-        u32 v = *(u16 *)(p + 0x3fc);
+        u32 v = p->interactionLock;
         if (v != 0) {
             TetherActor_UpdateLockedShake(p);
-        } else if (*(u16 *)(p + 0x384) != 0) {
+        } else if (p->chargeReady != 0) {
             *q = v;
             TetherActor_UpdateShake(p);
         } else {
-            sub_0804CF5C(p);
+            TetherActor_UpdateDirectedMovement(p);
         }
     }
 }

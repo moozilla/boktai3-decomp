@@ -1,18 +1,18 @@
-#include "global.h"
-extern u32 gUnk_02000488;
-void sub_08072C40(u8 *);
-void sub_08225938(u8 *);
-void DisplayAnimation_Destroy(u8 *);
-void Collider_Remove(u8 *);
-void TetherActor_RemoveSegments(u8 *);
-void TetherActor_RemoveAuxiliarySprite(u8 *);
-u32 sub_0804D4B0(u8 *p)
+#include "tether_actor.h"
+extern struct TetherActor *gUnk_02000488;
+void sub_08072C40(void *);
+void sub_08225938(void *);
+void DisplayAnimation_Destroy(void *);
+
+void TetherActor_RemoveSegments(struct TetherActor *);
+void TetherActor_RemoveAuxiliarySprite(struct TetherActor *);
+struct TetherActor *TetherActor_Destroy(struct TetherActor *p)
 {
-    if (p[0x254] != 0)
-        sub_08072C40(p + 0x244);
-    sub_08225938(p + 0x44);
-    DisplayAnimation_Destroy(p + 0x8C);
-    Collider_Remove(p + 0x130);
+    if (p->auxiliaryRegistered != 0)
+        sub_08072C40(p->auxiliaryRegistration);
+    sub_08225938(&p->bodyConfig);
+    DisplayAnimation_Destroy(&p->display.animation);
+    Collider_Remove(&p->chargeCollider);
     TetherActor_RemoveSegments(p);
     TetherActor_RemoveAuxiliarySprite(p);
     return gUnk_02000488 = 0;
