@@ -128,6 +128,7 @@ address,evidence
 08070E44,Independent actor-list search function left as incbin by gbadisasm; retained assembly (not yet matched)
 08072124,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08072204,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched)
+080762A8,Independent 296-byte profile animation selector with own push and pop-bx; preceding08076174 ends080762A8
 08078B48,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 0807C468,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 0807C53C,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
