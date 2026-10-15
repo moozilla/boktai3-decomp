@@ -29,6 +29,8 @@ struct AreaEffectPlayer {
     struct AreaEffectPosition position;
     u8 unknown38[0x3E0];
     u8 kind;
+    u8 unknown419[0x3E];
+    u8 action, actionPhase;
 };
 struct AreaEffectManager {
     u8 unknown0[0x18];
