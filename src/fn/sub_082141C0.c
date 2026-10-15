@@ -5,7 +5,7 @@ struct Dma {
 extern u32 gUnk_03003A04, gUnk_03003A08, gUnk_03004260;
 extern u16 gUnk_03004BD8;
 extern u8 gUnk_03004390[];
-void sub_082158B0(void);
+void Bg_UpdateScrollShadow(void);
 void sub_08213F80(void);
 void sub_082192F0(void);
 void sub_082173A8(void);
@@ -18,7 +18,7 @@ u32 sub_082141C0(void)
 {
     u32 *flags;
     vu16 *disp;
-    sub_082158B0();
+    Bg_UpdateScrollShadow();
     sub_08213F80();
     sub_082192F0();
     flags = &gUnk_03003A04;
