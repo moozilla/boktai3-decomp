@@ -1,4 +1,5 @@
 #include "global.h"
+#define AreaEffect_HideSprites sub_0804E87C
 struct O {
     u8 f[0x18];
     u32 *q;
@@ -12,7 +13,7 @@ static inline u32 tst(u32 *a, u32 m)
     return *a & m;
 }
 void sub_0804E618(struct O *, u32);
-void sub_0804E87C(struct O *o)
+void AreaEffect_HideSprites(struct O *o)
 {
     if (o->s == 1) {
         s32 i;
