@@ -3,7 +3,6 @@
 // fuzzy: 91.3%
 // Register allocation around zero, step and widget offset still differs (192/180 bytes).
 // MATCHING_CONCESSION: register-pinning
-#define SceneInput_BeginPairTransition sub_0805E484
 void SceneInput_BeginPairTransition(struct SceneInputPair *pairInput, const u32 *enabledInput,
                                     const struct SceneInputPosition *startsInput,
                                     const struct SceneInputPosition *targetsInput,
@@ -122,5 +121,5 @@ void SceneInput_BeginPairTransition(struct SceneInputPair *pairInput, const u32 
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0805E484);
+INCLUDE_ASM("asm/nonmatching", SceneInput_BeginPairTransition);
 #endif

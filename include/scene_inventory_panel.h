@@ -26,10 +26,11 @@ s32 sub_08030B78(s32);
 s32 sub_08030DBC(s32);
 s32 sub_0803343C(const u8 *);
 s32 sub_08033478(s32, s32);
-void sub_0805F480(struct SceneInputWidget *, struct SceneInputWidget *, struct SceneInputResource *,
-                  const void *, s32);
-void sub_0805F63C(struct SceneInputWidget *, struct SceneInputWidget *, struct SceneInputWidget *,
-                  struct SceneInputResource *, s32);
+void SceneInputPanel_ShowItemComparison(struct SceneInputWidget *, struct SceneInputWidget *,
+                                        struct SceneInputResource *, const void *, s32);
+void SceneInputPanel_ShowAttributeComparison(struct SceneInputWidget *, struct SceneInputWidget *,
+                                             struct SceneInputWidget *, struct SceneInputResource *,
+                                             s32);
 struct SceneInventoryWidgetFlags {
     u32 flags;
     u8 unknown4[0x5C];

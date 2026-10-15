@@ -28,12 +28,12 @@ struct SceneInputHighlight {
     u16 colors[16];
     u8 phase;
 };
-void sub_0805F324(struct SceneInputPanel *, struct SceneInputHighlight *);
+void SceneInputPanel_ResetHighlights(struct SceneInputPanel *, struct SceneInputHighlight *);
 extern u8 gUnk_03005160[];
 extern const u16 gUnk_0824DEEA[], gUnk_0824DEF4[], gUnk_0824DF14[], gUnk_0824DF1E[],
     gUnk_0824DEE0[];
 extern const u32 gUnk_0824DF00[];
 void sub_08220D20(struct DisplaySequenceState *, void *, u32, u32, u32);
-void sub_0805EB0C(struct SceneInputPanel *, s32);
-void sub_0805EA58(struct SceneInputPanel *, s32, u32);
+void SceneInputPanel_InitWidgets(struct SceneInputPanel *, s32);
+void SceneInputPanel_InitBackground(struct SceneInputPanel *, s32, u32);
 #endif

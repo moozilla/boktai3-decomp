@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_panel.h"
-#define SceneInventory_PopulateEquipmentGrid sub_0805FD20
 void SceneInventory_PopulateEquipmentGrid(struct SceneInventoryPanel *input)
 {
     struct SceneInventoryPanel *panel = input;

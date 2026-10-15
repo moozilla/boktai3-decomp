@@ -1,5 +1,4 @@
 #include "scene_item_values.h"
-#define SceneItemValue_CalculateItem sub_0805F87C
 s32 SceneItemValue_CalculateItem(u32 slot)
 {
     s32 state = sub_0816D820(slot);
@@ -12,7 +11,7 @@ s32 SceneItemValue_CalculateItem(u32 slot)
         if (percent <= 19)
             percent = 20;
     }
-    result = Div(sub_0805F86C(sub_0822CDA8(slot)) * percent, 100);
+    result = Div(SceneItemValue_GetItemBaseValue(sub_0822CDA8(slot)) * percent, 100);
     if (result <= 0)
         result = 1;
     if (result > 9999)

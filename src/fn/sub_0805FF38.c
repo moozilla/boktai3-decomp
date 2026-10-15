@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_panel.h"
-#define SceneInventory_PopulateItemGrid sub_0805FF38
 void SceneInventory_PopulateItemGrid(struct SceneInventoryPanel *input)
 {
     struct SceneInventoryPanel *panel = input;
@@ -110,7 +109,7 @@ void SceneInventory_PopulateItemGrid(struct SceneInventoryPanel *input)
                     }
                 }
                 currency = gUnk_02000710->unk7B0;
-                if (currency < (s32)sub_0805F86C(kind))
+                if (currency < (s32)SceneItemValue_GetItemBaseValue(kind))
                     SceneHud_SetKeyframePaletteBank(widget, 0x374);
                 else
                     SceneHud_SetKeyframePaletteBank(widget, 0x373);

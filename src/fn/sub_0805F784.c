@@ -1,5 +1,4 @@
 #include "scene_input_panel.h"
-#define SceneInputPanel_RequestAction sub_0805F784
 struct SceneInputPanelActionView {
     u8 unknown0[0x1AEE];
     u16 frame;

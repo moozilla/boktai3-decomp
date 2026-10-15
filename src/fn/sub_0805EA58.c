@@ -1,6 +1,5 @@
 #include "scene_input_panel.h"
 #include "scene_hud_map.h"
-#define SceneInputPanel_InitBackground sub_0805EA58
 void SceneInputPanel_InitBackground(struct SceneInputPanel *panel, s32 unused, u32 meter)
 {
     s32 zero;

@@ -30,6 +30,6 @@ struct SceneValueConsumableDefinition *sub_0822E288(u32);
 s32 sub_0816D820(u32);
 s32 sub_0822CDA8(u32);
 s32 sub_0822E104(u32);
-u32 sub_0805F86C(s32);
-s32 sub_0805F8D8(u32);
+u32 SceneItemValue_GetItemBaseValue(s32);
+s32 SceneItemValue_GetConsumableBaseValue(u32);
 #endif

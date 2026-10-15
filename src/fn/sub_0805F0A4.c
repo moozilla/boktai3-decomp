@@ -1,6 +1,5 @@
 #include "scene_input_panel.h"
 #include "scene_hud_map.h"
-#define SceneInputPanel_SetMeterGlyph sub_0805F0A4
 extern const u16 gUnk_0824DF28[];
 void SceneInputPanel_SetMeterGlyph(struct SceneInputPanel *panel, s32 value, s32 kind)
 {

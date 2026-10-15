@@ -14,11 +14,13 @@ struct SceneInputGrid {
     u8 unknown9[3];
     s8 cells[9][4];
 };
-void sub_0805E484(struct SceneInputPair *, const u32 *, const struct SceneInputPosition *,
-                  const struct SceneInputPosition *, const u32 *, const u32 *, u32);
+void SceneInput_BeginPairTransition(struct SceneInputPair *, const u32 *,
+                                    const struct SceneInputPosition *,
+                                    const struct SceneInputPosition *, const u32 *, const u32 *,
+                                    u32);
 s32 SceneInput_TickPairTransition(struct SceneInputPair *);
 s8 SceneInput_GetGridSelection(struct SceneInputGrid *);
-void sub_0805E5E4(struct SceneInputGrid *);
+void SceneInput_RebuildGrid(struct SceneInputGrid *);
 void SceneInput_SetGridFlags(struct SceneInputGrid *, u32);
 u32 SceneInput_TestGridFlags(struct SceneInputGrid *, u32);
 #endif

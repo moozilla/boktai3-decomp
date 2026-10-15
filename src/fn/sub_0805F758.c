@@ -1,5 +1,4 @@
 #include "scene_input_panel.h"
-#define SceneInputPanel_AdjustSlidingY sub_0805F758
 s32 SceneInputPanel_AdjustSlidingY(struct SceneInputWidget *widget, s32 y, s32 frame)
 {
     if (frame <= 11) {

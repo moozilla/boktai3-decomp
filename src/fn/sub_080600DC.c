@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_panel.h"
-#define SceneInventory_PopulateConsumableGrid sub_080600DC
 void SceneInventory_PopulateConsumableGrid(struct SceneInventoryPanel *input)
 {
     register struct SceneInventoryPanel *panel asm("r8") = input;

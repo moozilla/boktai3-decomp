@@ -31,15 +31,15 @@ struct SceneInventoryActionDefinition {
     u16 baseValue;
 };
 s32 sub_0822D6E0(u32);
-s32 sub_0805F7E0(u32);
+s32 SceneItemValue_CalculateEquipment(u32);
 struct SceneInventoryActionDefinition *sub_08227F5C(u32);
 s32 sub_0822CDA8(u32);
-s32 sub_0805F87C(u32);
-u32 sub_0805F86C(s32);
+s32 SceneItemValue_CalculateItem(u32);
+u32 SceneItemValue_GetItemBaseValue(s32);
 s32 sub_0822E104(u32);
-s32 sub_0805F8E8(u32);
-s32 sub_0805F8D8(u32);
+s32 SceneItemValue_CalculateConsumable(u32);
+s32 SceneItemValue_GetConsumableBaseValue(u32);
 void SceneHud_ShowFourDigits(struct SceneHudDigitView *, const struct ContactPosition *, s32, u32);
 void SceneHud_HideFourDigits(struct SceneHudDigitView *);
-s32 sub_08060528(s32);
+s32 SceneInventory_FindEquippedSlot(s32);
 #endif

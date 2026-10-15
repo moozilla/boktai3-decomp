@@ -3,7 +3,6 @@
 // fuzzy: 97.9%
 // Five FF constant birth orders differ (480/480 bytes).
 // MATCHING_CONCESSION: register-pinning
-#define SceneInput_RebuildGrid sub_0805E5E4
 void SceneInput_RebuildGrid(struct SceneInputGrid *grid)
 {
     s32 column, row;
@@ -104,5 +103,5 @@ void SceneInput_RebuildGrid(struct SceneInputGrid *grid)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0805E5E4);
+INCLUDE_ASM("asm/nonmatching", SceneInput_RebuildGrid);
 #endif

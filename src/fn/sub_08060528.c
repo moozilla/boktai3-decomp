@@ -1,5 +1,4 @@
 #include "scene_inventory_actions.h"
-#define SceneInventory_FindEquippedSlot sub_08060528
 s32 SceneInventory_FindEquippedSlot(s32 selected)
 {
     s32 i = 0;

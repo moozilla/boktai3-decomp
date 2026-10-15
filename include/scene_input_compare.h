@@ -20,6 +20,6 @@ s32 sub_08159030(const void *, const void *);
 void *sub_0822E288(u32);
 s32 sub_0815A384(s32);
 s32 sub_0815A3C4(s32, s32);
-void sub_0805F374(s32, s32 *);
-void sub_0805F3A4(s32 *, s32 *, struct SceneInputItemDescriptor *, u32 *);
+void SceneInputPanel_SplitThreeDigits(s32, s32 *);
+void SceneInputPanel_GetEquippedValues(s32 *, s32 *, struct SceneInputItemDescriptor *, u32 *);
 #endif

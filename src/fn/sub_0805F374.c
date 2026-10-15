@@ -1,5 +1,4 @@
 #include "scene_input_compare.h"
-#define SceneInputPanel_SplitThreeDigits sub_0805F374
 
 s32 Div(s32, s32);
 void SceneInputPanel_SplitThreeDigits(s32 n, s32 *out)
