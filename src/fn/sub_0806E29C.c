@@ -1,9 +1,7 @@
 // COMPILER: old_agbcc
-#include "global.h"
-
-extern u32 gUnk_02000198;
-
-void sub_0806E29C(void)
+#include "route_sprite_actor.h"
+#define RouteSpritePool_ResetSingleton sub_0806E29C
+void RouteSpritePool_ResetSingleton(void)
 {
     gUnk_02000198 = 0;
 }

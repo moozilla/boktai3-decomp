@@ -1,15 +1,12 @@
-#include "global.h"
-
-extern u32 *gUnk_020004AC;
-
-u32 sub_08070EBC(u32 a)
+#include "scene_actor_registry.h"
+struct SceneActorRegistryActor *SceneActorRegistry_FindById(u32 id)
 {
-    u32 *n = gUnk_020004AC;
-    u8 *e;
-    while ((e = (u8 *)n[1]) != 0) {
-        if (*(u32 *)(e + 0x50) == a)
-            return (u32)e;
-        n = (u32 *)*n;
+    struct SceneActorRegistryNode *node = gUnk_020004AC;
+    struct SceneActorRegistryActor *actor;
+    while ((actor = node->actor) != NULL) {
+        if (actor->id == id)
+            return actor;
+        node = node->next;
     }
-    return 0;
+    return NULL;
 }

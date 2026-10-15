@@ -2,7 +2,7 @@
 
 extern u8 *gUnk_020004A8;
 extern u32 gUnk_030053F4;
-s32 sub_080703F0(u32);
+s32 SceneActorRegistry_CountLivingByCategory(u32);
 
 static inline u8 Test(u32 v, u32 mask)
 {
@@ -26,11 +26,11 @@ u32 sub_08072124(void)
     if (Test(gUnk_030053F4, 0x4800))
         id = 10;
     else {
-        if (sub_080703F0(10))
+        if (SceneActorRegistry_CountLivingByCategory(10))
             return 0;
         id = 23;
     }
-    if (sub_080703F0(id))
+    if (SceneActorRegistry_CountLivingByCategory(id))
         return 0;
     return 1;
 }
