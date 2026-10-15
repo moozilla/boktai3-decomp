@@ -1,38 +1,33 @@
-#include "global.h"
-
-struct S {
-    u8 f[0xc10];
-    u8 m;
-};
-
-s32 sub_08058544(struct S *p)
+#include "scene_panel.h"
+#define ScenePanel_GetPaletteOffset sub_08058544
+s32 ScenePanel_GetPaletteOffset(struct ScenePanel *panel)
 {
-    s32 r;
-    switch (p->m) {
+    s32 result;
+    switch (panel->paletteMode) {
         case 0:
-            r = 8;
+            result = 8;
             break;
         case 1:
         case 2:
-            r = 6;
+            result = 6;
             break;
         case 3:
-            r = 4;
+            result = 4;
             break;
         case 4:
-            r = 2;
+            result = 2;
             break;
         case 7:
         case 8:
-            r = 10;
+            result = 10;
             break;
         case 9:
         case 10:
-            r = 12;
+            result = 12;
             break;
         default:
-            r = 0;
+            result = 0;
             break;
     }
-    return r;
+    return result;
 }
