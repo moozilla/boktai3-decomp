@@ -57,17 +57,21 @@ bodies were rechecked against the ROM; this naming correction adds no credit.
 |---|---:|---|---|
 | 0807462C | 108 | Register selected category receivers | New, pinned |
 | 08074698 | 288 | Advance route point, run optional script, select behavior | New, pinned |
+| 08074A98 | 348 | Update terrain/player height and synchronize drawable position | New, pinned |
 | 08074BF4 | 112 | Embedded collider134, flags5109, direct properties, refresh | New, ordinary |
 | 08074C64 | 112 | Same, caller flags narrowed to16 bits | New, ordinary |
 | 08074CD4 | 96 | Caller collider, narrowed caller flags, direct properties, refresh | New, ordinary |
 | 08074D34 | 140 | Embedded collider188, flags2401, indexed properties, field34=0 | New, ordinary |
 | 08074DC0 | 120 | Caller collider, flags2001, indexed properties, field34=0 | New, ordinary |
 | 08074E38 | 120 | Same, caller-selected field34 | Prior exact, ordinary |
+| 08075508 | 128 | Project a forward probe and snapshot prior position | New, pinned |
+| 08075FC8 | 88 | Clear action field, test eligibility, request available action | New, pinned |
 | 08076020 | 20 | Set object/context/type | Prior exact, pinned |
 
 The last three helpers retain their observed lack of `Collider_Refresh`.
-The current frozen subset adds **+0.0404 percentage points** (976 bytes):
-580 ordinary and396 register-pinned. Prior exact E38 and the setter contribute
+The current frozen subset adds **+0.0638 percentage points** (1,540 bytes):
+580 ordinary and960 register-pinned. Twelve of fifteen entries are exact,
+covering1,680 reviewed bytes. Prior exact E38 and the setter contribute
 140 reviewed bytes without new credit. E38 also corrects the old raw formal
 argument widths to the actual collision-engine setters, retaining its match. Each body passed a full-size fast check;
 the parent performs promotion and one complete combined ROM build.
@@ -100,12 +104,35 @@ The full 288-byte transition matches with six register hints after minimizing
 sixteen. Its scalar lifetimes and independent cursor/owner contract were
 audited after minimization.
 
+## Height, projection, and eligibility contracts
+
+`74A98` computes terrain height from cell2F4, preferring the override cell returned
+by0821D64C and falling back to map cells+12+index×4. The low nibble supplies height
+in units256; high nibble1 subtracts the position's low Z byte, and2 subtracts low X.
+Category22 adjusts displacement2EA by the change in ground height2BE. Categories
+17–20 and23 can instead use player slot0 Y unless flags2D4 bit4000 is set.
+Unless flags2C0 bit20 preserves Y, actorY becomes ground height plus displacement.
+The position is copied as an aggregate into sequence drawable+1C or tile drawable+40.
+Full348 bytes match, with six hints retained after minimizing seventeen.
+
+`75508` uses direction byte2B6 and separate word scale arguments. It shifts scales
+left2, multiplies them by sine(angle+64) for X and sine(angle) for Z, and uses an
+arithmetic right shift12 on the wrapped word products. Projected X/Y/Z are stored
+at310/312/314, retaining actorY; the prior ContactPosition is copied to318. The full
+128 bytes match with two hints after minimizing sixteen. Padding travels only
+through the aggregate copy, without C scalar reads.
+
+`75FC8` first clears word304 unconditionally, so callers must supply a valid actor
+even though its subsequent inline eligibility predicate handles NULL. Flags2D4
+bit40, flags2D0 bit20000, or health<=0 reject the action. Otherwise78700 is called
+and the callback returns1; rejected requests return0. The full88 bytes match with
+five hints after minimizing eleven. The game-facing meaning of78700 remains
+unconfirmed, so the action name is provisional.
+
 ## Remaining contiguous bodies
 
-The remaining six functions retain assembly until their full spans match:
-movement helpers747B8 (736) and74A98 (348),
-movement update74EB0 (1,624), forward probe75508 (128), actor update75588 (2,624),
-and availability callback75FC8 (88). Their behavior names are tentative review
+The remaining three functions retain assembly until their full spans match:
+impulse/bounce747B8 (736), movement update74EB0 (1,624), and actor update75588 (2,624). Their behavior names are tentative review
 labels, not promoted complete contracts. The prior registry-wide state request
 70910 remains a separate 304-byte gap; its bounded permuter found no saved
 improvement over the valid three-byte scratch-alias candidate.
