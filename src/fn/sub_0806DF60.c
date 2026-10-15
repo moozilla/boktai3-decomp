@@ -1,36 +1,22 @@
-#include "global.h"
-
-void Memory_Clear(void *, u32);
-
-struct E {
-    u8 a[0x153];
-    u8 idx;
-    u8 b[0x178 - 0x153 - sizeof(u8)];
-};
-struct S {
-    u8 pad0[0x1C];
-    u32 mask;
-    struct E e[4];
-};
-
-static inline u8 Tst(u32 *m, s32 i)
+#include "route_sprite_actor.h"
+#define RouteSpritePool_AllocateSlot sub_0806DF60
+static inline u8 Occupied(u32 *mask, s32 index)
 {
-    if (*m & (1 << i))
+    if (*mask & (1 << index))
         return TRUE;
     return FALSE;
 }
-
-struct E *sub_0806DF60(struct S *b)
+struct RouteSpriteActor *RouteSpritePool_AllocateSlot(struct RouteSpritePool *pool)
 {
     s32 i;
-    struct E *e;
+    struct RouteSpriteActor *slot;
     for (i = 0; i < 4; i++) {
-        if (!Tst(&b->mask, i)) {
-            e = &b->e[i];
-            b->mask |= 1 << i;
-            Memory_Clear(e, 0x178);
-            e->idx = i;
-            return e;
+        if (!Occupied(&pool->occupiedMask, i)) {
+            slot = &pool->slots[i];
+            pool->occupiedMask |= 1 << i;
+            Memory_Clear(slot, 0x178);
+            slot->index = i;
+            return slot;
         }
     }
     return 0;
