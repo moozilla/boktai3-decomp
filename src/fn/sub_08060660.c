@@ -21,7 +21,7 @@ void SceneInventory_BeginEquipmentSpecialMove(struct SceneInventoryActionView *p
     SceneInput_GetGridPosition(target, 26);
     {
         register u32 *frameOut asm("r6");
-        register u32 placeholder asm("r0");
+        u32 placeholder;
         u32 *attributeOut;
         enabled[1] = 0;
         placeholder = 0x189;
