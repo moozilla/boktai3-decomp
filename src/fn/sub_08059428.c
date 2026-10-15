@@ -1,5 +1,4 @@
 #include "scene_panel_rig.h"
-#define ScenePanelRig_ApplyContact sub_08059428
 void ScenePanelRig_ApplyContact(struct SceneRigContact *source, struct SceneRigContact *target,
                                 struct ScenePanelRig *input)
 {

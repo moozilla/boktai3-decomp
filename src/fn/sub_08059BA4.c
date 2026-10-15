@@ -1,10 +1,9 @@
 #include "scene_panel_rig.h"
-#define ScenePanelRig_TickReturn sub_08059BA4
 void ScenePanelRig_TickReturn(struct ScenePanelRig *rig)
 {
     rig->scale = 16;
     if (++rig->stateFrame > 15)
-        sub_080595AC(rig, 0);
+        ScenePanelRig_SetState(rig, 0);
     else {
         s32 weight = 16 - rig->stateFrame, divisor = weight + 1;
         rig->position.x = Div(rig->position.x * weight + rig->origin.x, divisor);

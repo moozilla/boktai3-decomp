@@ -1,5 +1,4 @@
 #include "scene_panel_schedule.h"
-#define ScenePanel_TickHandlePosition sub_080591E8
 void ScenePanel_TickHandlePosition(struct ScenePanel *input)
 {
     struct ScenePanelScheduleView *panel = (void *)input;

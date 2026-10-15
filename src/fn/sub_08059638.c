@@ -1,5 +1,4 @@
 #include "scene_panel_rig.h"
-#define ScenePanelRig_InitMovement sub_08059638
 void ScenePanelRig_InitMovement(struct ScenePanelRig *rig)
 {
     s32 dx = rig->position.x - rig->origin.x, dz = rig->position.z - rig->origin.z;

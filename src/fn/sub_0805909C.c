@@ -1,5 +1,4 @@
 #include "scene_panel_schedule.h"
-#define ScenePanel_TickHazardSpawner sub_0805909C
 void ScenePanel_TickHazardSpawner(struct ScenePanel *input)
 {
     struct ScenePanelScheduleView *panel = (void *)input;

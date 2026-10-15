@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_panel_schedule.h"
-#define ScenePanel_InitScheduledAction sub_080592F4
 void ScenePanel_InitScheduledAction(struct ScenePanel *input)
 {
     struct ScenePanelScheduleView *panel = (void *)input;
@@ -13,30 +12,30 @@ void ScenePanel_InitScheduledAction(struct ScenePanel *input)
             panel->handle = 0;
             handleOffset = 0x1364;
             destination = &panel->action;
-            action = sub_0805909C;
+            action = ScenePanel_TickHazardSpawner;
             goto shared;
         case 1:
             panel->handle = sub_081A3710(panel->resourceId, 10, 30);
             handleOffset = 0x1364;
             destination = &panel->action;
-            action = sub_0805911C;
+            action = ScenePanel_TickAngleBurst;
             goto shared;
         case 2:
             panel->handle = sub_0819AD94(panel->resourceId, &panel->origin);
             handleOffset = 0x1364;
             destination = &panel->action;
-            action = sub_080592AC;
+            action = ScenePanel_TickHandleActionB;
             goto shared;
         case 3:
             panel->handle = sub_08190704(panel->resourceId, panel->parameter);
-            panel->action = sub_080591E8;
+            panel->action = ScenePanel_TickHandlePosition;
             panel->interval = 360;
             break;
         case 4:
             panel->handle = sub_0819AA8C(panel->resourceId, &panel->origin);
             handleOffset = 0x1364;
             destination = &panel->action;
-            action = sub_08059264;
+            action = ScenePanel_TickHandleActionA;
         shared:
             *destination = action;
             {

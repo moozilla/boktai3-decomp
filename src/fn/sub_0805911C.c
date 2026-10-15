@@ -1,5 +1,4 @@
 #include "scene_panel_schedule.h"
-#define ScenePanel_TickAngleBurst sub_0805911C
 void ScenePanel_TickAngleBurst(struct ScenePanel *input)
 {
     struct ScenePanelScheduleView *panel = (void *)input;

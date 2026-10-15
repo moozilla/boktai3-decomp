@@ -6,11 +6,10 @@ static inline s32 randomValue(void)
     offset = gUnk_03005308 * 2;
     return *(const u16 *)(offset + (u32)gUnk_0203B400);
 }
-#define ScenePanelRig_SelectActiveSubject sub_08059768
 s32 ScenePanelRig_SelectActiveSubject(struct ScenePanelRig *rig)
 {
     struct SceneRigParentView *parent = (void *)rig->parent;
-    s32 count = sub_08059728(rig);
+    s32 count = ScenePanelRig_GetActiveCount(rig);
     s32 i, selected;
     if (count == 0)
         return -1;

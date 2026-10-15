@@ -1,5 +1,4 @@
 #include "scene_panel_rig.h"
-#define ScenePanelRig_HideSprites sub_0805952C
 void ScenePanelRig_HideSprites(struct ScenePanelRig *rig)
 {
     struct SceneRigSprite *sprite;

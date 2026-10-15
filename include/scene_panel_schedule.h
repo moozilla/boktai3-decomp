@@ -26,9 +26,9 @@ void sub_0819AAD8(void *);
 void sub_0819ADF4(void *);
 void sub_08190B10(void *, const void *, const void *);
 extern const u8 gUnk_0824DEA4[];
-void sub_0805909C(struct ScenePanel *);
-void sub_0805911C(struct ScenePanel *);
-void sub_080591E8(struct ScenePanel *);
-void sub_08059264(struct ScenePanel *);
-void sub_080592AC(struct ScenePanel *);
+void ScenePanel_TickHazardSpawner(struct ScenePanel *);
+void ScenePanel_TickAngleBurst(struct ScenePanel *);
+void ScenePanel_TickHandlePosition(struct ScenePanel *);
+void ScenePanel_TickHandleActionA(struct ScenePanel *);
+void ScenePanel_TickHandleActionB(struct ScenePanel *);
 #endif

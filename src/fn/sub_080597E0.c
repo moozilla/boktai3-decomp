@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_panel_rig.h"
 #include "player.h"
-#define ScenePanelRig_RandomizeMovement sub_080597E0
 static inline s32 randomValue(const u16 *table)
 {
     u32 offset;
@@ -30,7 +29,7 @@ void ScenePanelRig_RandomizeMovement(struct ScenePanelRig *input)
     register const u16 *table asm("r5");
     u32 zero;
     s32 facing;
-    sub_08059638(rig);
+    ScenePanelRig_InitMovement(rig);
     table = gUnk_0203B400;
     rig->speed = randomByte(table) + 192;
     angle = Math_Atan2(gUnk_02000580[0]->position.x - rig->origin.x,

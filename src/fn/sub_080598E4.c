@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_panel_rig.h"
-#define ScenePanelRig_TickResourceDrain sub_080598E4
 static inline s32 randomValue(void)
 {
     u32 offset;
@@ -25,7 +24,7 @@ static inline s32 randomFirst(void)
 void ScenePanelRig_TickResourceDrain(struct ScenePanelRig *rig)
 {
     struct SceneRigParentView *parent = (void *)rig->parent;
-    s32 count = sub_08059728(rig), mode = sub_08059734(rig);
+    s32 count = ScenePanelRig_GetActiveCount(rig), mode = ScenePanelRig_GetParentMode(rig);
     if (count > 0 && mode > 0) {
         s32 rate = 0, drain = 0;
         register u32 stateValue asm("r0") = getState(rig);
