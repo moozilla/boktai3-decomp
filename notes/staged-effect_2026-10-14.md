@@ -17,7 +17,7 @@ The effect owns five 0x2C-byte display sprites at 0x74. Each sprite has flags at
 at 0x1C/0x1E/0x20. The parent task has script-presence/state/palette/scale
 halfwords at 0x4C/0x4E/0x50/0x52, release frame at 0x54, travel/initial travel
 at 0x58/0x5A, spread/initial spread at 0x5C/0x5E, shake X/Z at 0x60/0x62,
-frame at 0x64, pending script at 0x68 and packed center XYZ at 0x6C.
+frame at 0x64, pending script resource ID at 0x68 and packed center XYZ at 0x6C.
 
 Graphics storage begins at 0x150, its palette pointer is 0x15C, the separately
 selected active palette is 0x16C, and sixteen blended colors start at 0x170.
@@ -28,12 +28,12 @@ Palette source indices are relative to the global graphics pointer + 0x5060.
 Initialization (`DD48`) reads script keyword `0x4F` for an optional script
 context and `0x70` for center XYZ (otherwise GameState+0x30/32/34). Config
 keyword `0x68` defaults travel to 1024; `0x6D` defaults spread to 512. Keyword
-`0x65` supplies pending script and release frame. Five sprites share graphics
+`0x65` supplies a pending script resource ID and release frame. Five sprites share graphics
 resource 0x2499. The palette starts from graphics +0x51A0. Callback dispatch
 uses the ROM table at 08605A58 and accepts the task pointer. Destruction returns
 zero after removing five sprites and its optional script context.
 
-`D874` and `D890` are identical: both OR flag bit1 into sprites1–4. Their
+`D874` and `D890` are identical: both OR flag value 1 into sprites1–4. Their
 names deliberately avoid guessing distinct hide/show behavior. State callbacks
 also use the low flag bit for center-sprite reveal and script completion.
 
