@@ -1,4 +1,5 @@
 #include "global.h"
+#define ResourceStation_SetTriggerPosition sub_0804F528
 
 struct D {
     u32 a;
@@ -13,7 +14,7 @@ struct S {
     struct D dst;
 };
 
-void sub_0804F528(struct S *p)
+void ResourceStation_SetTriggerPosition(struct S *p)
 {
     p->dst = p->src;
     if (p->flags & 4)
