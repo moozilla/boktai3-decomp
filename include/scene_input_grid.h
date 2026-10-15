@@ -12,7 +12,7 @@ struct SceneInputGrid {
     u8 unknown3[3];
     u8 fallback, flags, repeat;
     u8 unknown9[3];
-    s8 primary[4][4], secondary[4][4], special[4];
+    s8 cells[9][4];
 };
 void sub_0805E484(struct SceneInputPair *, const u32 *, const struct SceneInputPosition *,
                   const struct SceneInputPosition *, const u32 *, const u32 *, u32);
