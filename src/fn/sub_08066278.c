@@ -188,7 +188,7 @@ gotManager:
             asm("" : "+r"(low));
             *low = resource;
         }
-        slot->source = zero;
+        slot->source = (void *)zero;
         {
             register u32 offset asm("r2") = 0x134;
             register struct ActorAttachmentFollowView **low asm("r1");
