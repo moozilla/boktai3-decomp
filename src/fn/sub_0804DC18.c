@@ -1,12 +1,13 @@
-#include "global.h"
-void Script_Call(u32, u32);
-void sub_0804DC18(u8 *p)
+#include "staged_effect.h"
+#define StagedEffect_ReleaseScript sub_0804DC18
+void Script_Call(void *, u32);
+void StagedEffect_ReleaseScript(struct StagedEffect *effect)
 {
-    if (*(u32 *)(p + 0x64) == *(u32 *)(p + 0x54)) {
-        if (*(u32 *)(p + 0x68) != 0) {
-            Script_Call(*(u32 *)(p + 0x68), 0);
-            *(u32 *)(p + 0x68) = 0;
+    if (effect->frame == effect->scriptReleaseFrame) {
+        if (effect->pendingScript) {
+            Script_Call(effect->pendingScript, 0);
+            effect->pendingScript = 0;
         }
     }
-    *(u32 *)(p + 0x64) += 1;
+    effect->frame++;
 }
