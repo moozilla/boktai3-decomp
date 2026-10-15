@@ -2,7 +2,7 @@
 #include "scene_actor_reaction.h"
 void sub_0807C72C(void *, u32, u32, u32);
 void sub_0807E7B0(void *, u32);
-void sub_08080FB4(void *, s32);
+void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *);
 static inline u8 IsControlled(struct SceneActorRegistryResetView *a)
 {
     if (a->object == (void *)1)
@@ -119,7 +119,7 @@ void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *input,
             sub_0807C72C(actor, 3, 127, 0);
             sub_0807E7B0(actor, 4);
             {
-                register void *control asm("r2") = sub_08080FB4;
+                register void *control asm("r2") = SceneActorReaction_BeginHiddenDefeat;
                 u32 kind = 23;
                 actor->field2B2 = 1;
                 actor->field2B0 = zeroByte;

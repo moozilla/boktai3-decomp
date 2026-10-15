@@ -1,12 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
-void sub_08082C68(struct SceneActorRegistryResetView *);
-#define SceneActorControl_UpdatePersistentPhase sub_08083188
+void SceneActorControl_UpdatePersistentAnimation(struct SceneActorRegistryResetView *);
 void SceneActorControl_UpdatePersistentPhase(struct SceneActorRegistryResetView *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        void *control = (void *)sub_08082C68;
+        void *control = (void *)SceneActorControl_UpdatePersistentAnimation;
         u32 kind;
         kind = 34;
         actor->field2B2 = 1;

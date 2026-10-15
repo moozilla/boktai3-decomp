@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
-#define SceneActorReaction_RestoreAfterTurns sub_08082444
-void sub_08076034(void *, s32);
 extern u32 gUnk_03005308;
 void SceneActorReaction_RestoreAfterTurns(struct SceneActorRegistryResetView *input, s32 inputFrame)
 {
@@ -14,7 +12,7 @@ void SceneActorReaction_RestoreAfterTurns(struct SceneActorRegistryResetView *in
     frame = inputFrame;
     group = (u8 *)actor + 0x3D4;
     if (SceneActorReaction_TakePrepared(actor)) {
-        sub_08076034(actor, 0);
+        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         {
             register u32 mask asm("r0") = 0x400;
             register u32 offset asm("r3") = 0x2D4;

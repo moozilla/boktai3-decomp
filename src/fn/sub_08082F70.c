@@ -4,7 +4,7 @@
 #include "script_utility.h"
 void *sub_081D4F20(u32, u32);
 void sub_081D5204(void *);
-void sub_08078160(struct SceneActorRegistryResetView *);
+void SceneActorBehavior_CallTerrainScript(struct SceneActorBehaviorView *);
 void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *);
 u8 sub_082212DC(void *, s32, s32, s32);
 static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
@@ -16,7 +16,6 @@ static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 st
     actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
-#define SceneActorControl_CompleteScriptedResponse sub_08082F70
 void SceneActorControl_CompleteScriptedResponse(struct SceneActorRegistryResetView *actor,
                                                 s32 frame)
 {
@@ -57,7 +56,7 @@ void SceneActorControl_CompleteScriptedResponse(struct SceneActorRegistryResetVi
     {
         u32 mask = 0x400;
         if (!(actor->flags2CC & mask))
-            sub_08078160(actor);
+            SceneActorBehavior_CallTerrainScript((void *)actor);
     }
     actor->fieldAA = 0;
     {

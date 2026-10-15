@@ -1,5 +1,4 @@
 #include "scene_actor_control_phase.h"
-#define SceneActorControl_UpdatePersistentAnimation sub_08082C68
 void SceneActorControl_UpdatePersistentAnimation(struct SceneActorRegistryResetView *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->field2B2))

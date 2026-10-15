@@ -2,18 +2,17 @@
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
 extern const s16 gUnk_086149C4[];
-void sub_08082CA8(struct SceneActorRegistryResetView *);
+void SceneActorControl_UpdateShadowReturn(struct SceneActorRegistryResetView *);
 void sub_08084044(struct SceneActorRegistryResetView *);
 static inline s32 Scale(s32 value)
 {
     return value >= 0 ? value >> 12 : -(-value >> 12);
 }
-#define SceneActorControl_UpdateShadowReturnPhase sub_08083224
 void SceneActorControl_UpdateShadowReturnPhase(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorControlState *control = SceneActorControl_GetState(actor);
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        void *callback = (void *)sub_08082CA8;
+        void *callback = (void *)SceneActorControl_UpdateShadowReturn;
         u32 kind;
         kind = 35;
         actor->field2B2 = 1;
