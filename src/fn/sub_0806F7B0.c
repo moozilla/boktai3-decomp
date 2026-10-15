@@ -1,54 +1,37 @@
-#include "global.h"
-struct A {
-    u32 a, b, c;
-};
-struct B {
-    u32 flags;
-    struct A *args;
-};
-struct P {
-    u8 f0[0x18];
-    u16 f18;
-    u16 f1a;
-    u32 f1c;
-    u32 f20;
-    u8 f24[4];
-    u16 f28;
-    u8 f2a;
-    u8 f2b;
-};
-extern u8 *gUnk_02000710;
-void Script_Call(u32, struct B *);
-void sub_0806F7B0(struct P *p)
+#include "scene_range_watch.h"
+#include "script_utility.h"
+#define SceneRangeWatch_CheckRange sub_0806F7B0
+void SceneRangeWatch_CheckRange(struct SceneRangeWatch *p)
 {
-    s32 v = *(s16 *)(gUnk_02000710 + 0x876);
+    s32 v = gUnk_02000710->unk876;
     u32 r;
-    if (p->f2a <= v && p->f2b >= v) {
+    if (p->minimum <= v && p->maximum >= v) {
         r = 1;
-        if (p->f28 == 1)
+        if (p->inside == 1)
             return;
     } else {
         r = 0;
-        if (p->f28 == 0)
+        if (p->inside == 0)
             return;
     }
     {
-        struct A a;
-        struct B b;
-        a.a = v;
-        a.b = p->f1c;
-        a.c = p->f20;
-        b.flags = (b.flags & 0xFFFF0000) | 3;
-        b.args = &a;
+        s32 values[3];
+        struct ScriptUtilityArguments args;
+        values[0] = v;
+        values[1] = p->arguments[0];
+        values[2] = p->arguments[1];
+        /* Assign only the count bitfield; leave upper-half padding unspecified. */
+        args.count = 3;
+        args.values = values;
         if (r != 0) {
-            if (p->f18 != 0) {
-                Script_Call(p->f18, &b);
-                p->f28 = 1;
+            if (p->enterScript != 0) {
+                Script_Call(p->enterScript, &args);
+                p->inside = 1;
             }
         } else {
-            if (p->f1a != 0) {
-                Script_Call(p->f1a, &b);
-                p->f28 = r;
+            if (p->leaveScript != 0) {
+                Script_Call(p->leaveScript, &args);
+                p->inside = r;
             }
         }
     }
