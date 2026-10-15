@@ -5,7 +5,7 @@ void ScenePanelRig_TickRise(struct ScenePanelRig *rig)
     struct SceneRigParentView *parent = (void *)rig->parent;
     u16 *counter;
     u32 frame;
-    rig->scale = 16;
+    rig->colliderHold = 16;
     rig->position = rig->origin;
     counter = &rig->stateFrame;
     frame = *counter + 1;

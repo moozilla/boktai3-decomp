@@ -1,12 +1,7 @@
-#include "global.h"
-
-void sub_0805ADE0(void *);
-void sub_0805AE58(void *);
-void sub_0805AF88(void *);
-
-void sub_0805B098(void *p)
+#include "scene_panel_rig_setup.h"
+void ScenePanelRig_InitSprites(struct ScenePanelRig *rig)
 {
-    sub_0805ADE0(p);
-    sub_0805AE58(p);
-    sub_0805AF88(p);
+    ScenePanelRig_InitMainSprite(rig);
+    ScenePanelRig_InitPrimarySprites(rig);
+    ScenePanelRig_InitSecondarySprites(rig);
 }

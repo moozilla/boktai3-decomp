@@ -1,7 +1,7 @@
 #include "scene_panel_rig.h"
 void ScenePanelRig_TickReturn(struct ScenePanelRig *rig)
 {
-    rig->scale = 16;
+    rig->colliderHold = 16;
     if (++rig->stateFrame > 15)
         ScenePanelRig_SetState(rig, 0);
     else {

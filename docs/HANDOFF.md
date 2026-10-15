@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 25.949% matching (2026-10-14). This file is the single
+Last updated after reaching 26.170% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,58 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex/Sol): complete rig states, animation and setup
+
+Exact code is **26.170%**, up **0.2218 percentage points** (+5,356 bytes):
+**6,701 / 11,473 functions**, **632,106 / 2,415,354 bytes**. Without register
+pinning: **20.181%**; Register-pinned: **5.989%**, included above. Fifteen new
+functions add 832 ordinary-C bytes and 4,524 bytes with minimized concessions.
+The 77 protected drafts remain outside exact progress.
+
+Parent completed **59C48–5AD18**, twelve functions /4,304 bytes (eleven new /
+4,248), plus the already-counted subject-request ABI. This closes hover,
+wandering, approach, subject action, knockback, contact pause, hide burst,
+contact transitions, all fifteen sprite animations and the parent driver.
+The ten-state callback table is documented alongside the shared sequence
+command decoder and the primary/secondary sprite geometry.
+[State and animation notes](../notes/scene-panel-rig-states_2026-10-14.md).
+
+Sol completed **5AD18–5B28C**, eight functions /1,396 bytes (four new /1,108).
+Setup now shares the update path's 104-byte sprite and 84-byte collider layouts.
+Three fresh samples per primary sprite select phase, sequence and flag; rig
+initialization preserves the discarded modulus call and delayed index stores.
+The primary setup loop retains two defined C-label address inputs in an empty
+asm to preserve copy boundaries without expanding the short back-edge estimate.
+This is documented as a temporary matching concession, with no handwritten
+instructions or explicit r7 binding. [Setup contracts](SCENE_PANEL_RIG_SETUP.md).
+
+The driver corrects earlier provisional names: rig `68E` is `colliderHold`,
+which counts down while setting collider flag four and suppressing position
+refresh; `682` is the smoothed signed `turnStep`. The hidden callback is now
+`TickHidden`, with its existing alias left file-local because the boundary is
+not a raw function label. No new boundary or extra credit was introduced.
+
+The complete span is **4E008–5B28C**, **386 consecutive exact C functions /
+53,892 bytes**, with no gaps. Combined validation printed
+`build/boktai3.gba: OK` in `build/rig-states-combined.log`; all **26** final
+reviewed-extent checks passed in `build/rig-states-post-promotion.json`.
+Formatting, progress inventory, structured data and RAM-literal checks passed.
+PR141 main Actions passed at31eaddca (run38679224515). No new runtime coverage
+or final game identity is claimed.
+
+Continue toward **30% matching or 40% account usage remaining**; latest read
+**46% remaining**. Sol's next **5B28C–5BCEC** cohort is complete on
+`codex/contiguous-section-sol`: import **83d8e5b9..f9db8440**, twenty functions
+plus one naming cleanup, 2,172 new bytes (+0.0899 pp), 1,120 ordinary /1,052
+conceded; nine existing functions /484 bytes typed. Sol is now working the
+following **5C310–5C680** callbacks (eight functions /880 bytes, three new /696).
+Parent owns **5BCEC–5C310** configuration and secondary-sprite setup: five new
+functions /1,472 bytes plus two old helpers /100 bytes. Initial drafts and typed
+views are under `wip/scene_panel_config.h` and `wip/sub_0805BCEC.c` onward.
+Do not run per-function checks against an ELF while a combined build is writing
+it. Keep production frozen during combined validation. The Claude-owned primary
+checkout remains untouched.
 
 ## October 14 (Codex/Sol): overlay renderer, scheduled actions and rig control
 
@@ -36,7 +88,7 @@ Parent completed **59428–59C48**, sixteen rig functions /2,080 bytes (ten new 
 1,920). Shared partial views record fifteen sprites, contact response, parent
 subject access, polar movement, randomized turning, rise/return states and
 resource drain. The drain's one-time quarter-reference warning selects sound,
-starts a transition and calls pending script4. Sixteen whole-parent functions
+starts a transition and calls pending script4. Sixteen rig functions
 receive names and typed contracts; the old16-byte hidden59AB4 boundary remains
 unchanged and earns no new credit. [Rig notes](../notes/scene-panel-rig_2026-10-14.md).
 
