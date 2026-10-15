@@ -17,12 +17,12 @@ scalar gain and passes to EBD8. Its reviewed extent is96 (EC60 is another
 pre-existing function), not the next named seedECD0.
 
 New ECD0(252) visits four player pointers at02000580. It updates only nonnull
-state1 players. Mode2 derives from flag20; otherwise flag10 selects mode1/0.
-Kind6 adds40 fractional units for mode2 or5 for mode0. Other kinds add the
+state-tag1 players. Mode2 derives from flag20; otherwise flag10 selects mode1/0.
+Action mode6 adds40 fractional units for mode2 or5 for mode0. Other action modes add the
 session's player value times8 for mode2 or its base value for mode1. Each
 player has a separate trailing manager counter atAAC+2*i. Every120 units is
 converted to one player resource increment through081594F4. Unlike the solo
-callback there is no idle-time gate and no kind2 quadrupling.
+callback there is no idle-time gate and no action-mode2 quadrupling.
 
 New EDD0(196) uses the local session value to select visibility. A nonzero value
 shows enabled sprite entries by clearing flag value1. A zero value hides all

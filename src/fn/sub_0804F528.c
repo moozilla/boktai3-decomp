@@ -13,7 +13,7 @@ struct S {
     struct D dst;
 };
 
-void sub_0804F528(struct S *p)
+void ResourceStation_SetTriggerPosition(struct S *p)
 {
     p->dst = p->src;
     if (p->flags & 4)

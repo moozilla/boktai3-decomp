@@ -1,8 +1,8 @@
-#include "global.h"
+#include "directional_force.h"
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-void sub_080510E0(s32, s32, s32, s32);
-void sub_0805110C(void)
+void DirectionalForce_ConfigureRandom(s32, s32, s32, s32);
+void DirectionalForce_ConfigureRandomFromScript(void)
 {
     s32 a, b, c, d;
     if (Script_SeekToKeyword(0x70)) {
@@ -19,5 +19,5 @@ void sub_0805110C(void)
         c = 0x78;
         d = 0x78;
     }
-    sub_080510E0(a, b, c, d);
+    DirectionalForce_ConfigureRandom(a, b, c, d);
 }

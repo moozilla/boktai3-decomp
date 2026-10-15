@@ -1,15 +1,14 @@
-#include "global.h"
-void sub_0804FC84(u8 *);
-u32 sub_0804FF48(u8 *p)
+#include "repeated_effect.h"
+s32 RepeatedEffect_TickManager(struct RepeatedEffectManager *p)
 {
     s32 i = 0;
-    if (i < *(u16 *)(p + 0x18)) {
-        u8 *q = p + 0x1C;
+    if (i < p->count) {
+        struct RepeatedEffect *q = p->entries;
         do {
-            sub_0804FC84(q);
-            q += 0xFC;
+            RepeatedEffect_TickEntry(q);
+            q++;
             i++;
-        } while (i < *(u16 *)(p + 0x18));
+        } while (i < p->count);
     }
     return 0;
 }

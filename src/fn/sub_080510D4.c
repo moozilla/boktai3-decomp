@@ -1,8 +1,8 @@
-#include "global.h"
+#include "directional_force.h"
 
-void sub_080510B8(void);
+void DirectionalForce_Stop(void);
 
-void sub_080510D4(void)
+void DirectionalForce_StopFromScript(void)
 {
-    sub_080510B8();
+    DirectionalForce_Stop();
 }
