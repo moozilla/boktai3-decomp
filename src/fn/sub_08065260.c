@@ -105,7 +105,7 @@ void ActorAttachment_TickRisingPart(struct ActorAttachmentSlotView *slot)
                 slot->thresholds[i] = 0;
             }
             slot->update = NULL;
-            sub_08217EAC(sprite);
+            Effect_Remove(sprite);
             *partMask = 0;
             *(u8 *)finalSlotId = 0xFF;
         } else {
