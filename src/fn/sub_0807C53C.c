@@ -1,23 +1,24 @@
-#include "global.h"
+#include "scene_actor_attachment.h"
+#define SceneActorAttachment_SelectAlternateCategory21Offsets sub_0807C53C
 
-void sub_0807C53C(u8 kind, s32 *x, s32 *y)
+void SceneActorAttachment_SelectAlternateCategory21Offsets(u8 kind, s32 *yOffset, s32 *zOffset)
 {
     switch (kind) {
         case 0:
-            *x = 390;
-            *y = 310;
+            *yOffset = 390;
+            *zOffset = 310;
             break;
         case 1:
-            *x = 0;
-            *y = 320;
+            *yOffset = 0;
+            *zOffset = 320;
             break;
         case 2:
-            *x = 0;
-            *y = 260;
+            *yOffset = 0;
+            *zOffset = 260;
             break;
         case 3:
-            *x = 0;
-            *y = 260;
+            *yOffset = 0;
+            *zOffset = 260;
             break;
     }
 }
