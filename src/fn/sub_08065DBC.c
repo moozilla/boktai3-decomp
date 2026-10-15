@@ -63,7 +63,7 @@ gotManager:
     {
         u32 zero = 0;
         *frameLow = startFrame;
-        slot->active = 1;
+        slot->flags31 = 1;
         kindPointer = &slot->kind;
         *kindPointer = zero;
         actionPointer = &slot->action;
@@ -95,7 +95,7 @@ gotManager:
             }
         }
     }
-    activeLow = &slot->unknown48[0];
+    activeLow = &slot->active48;
     {
         u32 zero = 0;
         *activeLow = 1;
@@ -152,7 +152,7 @@ gotManager:
             } else {
                 u32 resourceKind = *resourcePointer;
                 lowAction = savedAction;
-                sub_08064C48(resourceKind, *lowAction,
+                ActorAttachment_GetActionOffset(resourceKind, *lowAction,
                              ((struct ActorAttachmentFollowView *)slot->followActor)->direction,
                              &xOffset, &zOffset, slot->source);
                 slot->offset.x = xOffset;
