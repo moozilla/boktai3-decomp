@@ -1,5 +1,6 @@
-#include "global.h"
-void sub_08064B70(u32 a, s32 *x, s32 *y, s32 d)
+#include "actor_attachment.h"
+#define ActorAttachment_GetAction25Offset sub_08064B70
+void ActorAttachment_GetAction25Offset(u32 a, s32 *x, s32 *y, s32 d)
 {
     s32 v;
     switch (a) {
