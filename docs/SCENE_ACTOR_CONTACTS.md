@@ -29,7 +29,13 @@ has next/id/mode/category/entry-count fields at `0/4/5/6/7`, followed by thirty
 four-byte entries. Each entry's first three bytes are initialized as value,
 flags and state; the fourth is unknown. These names remain provisional.
 `73CC4` uses 26 category cases and 228 entry assignments; the semantic data was
-recovered from the full switch and retained privately for review. It is not
-counted until its complete 2,364-byte extent matches. Allocation/linking occurs
+recovered from the full switch and retained privately for review. Its complete 2,364-byte extent matches as ordinary C, contributing about
+0.0979 percentage points. Allocation/linking occurs
 before category validation, so category 0 or an out-of-range category can leave
 a linked record while returning -1. This original quirk must remain.
+
+The large profile constructor needs no hints: keeping a typed `{head, count}`
+list view at registry offset `0x280` naturally produces the shared pointer
+lifetime, and retaining category 0 explicitly gives the original switch table
+bounds. The inline entry setter writes three bytes within each four-byte entry;
+all indexes stay within the allocated 128-byte record.
