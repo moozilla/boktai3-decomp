@@ -1,20 +1,15 @@
-#include "global.h"
-struct N {
-    struct N *next;
-    u8 *obj;
-};
-extern struct N *gUnk_020004AC;
-void sub_08249240(u8 *, u32, u32);
-void sub_0806FC64(u8 a, u32 b)
+#include "scene_actor_registry.h"
+#define SceneActorRegistry_SendToCategory sub_0806FC64
+void SceneActorRegistry_SendToCategory(u8 a, void *data)
 {
-    struct N *n = gUnk_020004AC;
+    struct SceneActorRegistryNode *n = gUnk_020004AC;
     if (n != 0) {
         while (n->next != 0) {
-            u8 *o = n->obj;
-            u32 t;
-            if (*(u8 *)(o + 0x98) == a) {
-                if ((t = *(u32 *)(o + 0x24c)) != 0)
-                    sub_08249240(o, b, t);
+            struct SceneActorRegistryActor *o = n->actor;
+            void *callback;
+            if (o->category == a) {
+                if ((callback = o->messageCallback) != 0)
+                    sub_08249240(o, data, callback);
             }
             n = n->next;
         }
