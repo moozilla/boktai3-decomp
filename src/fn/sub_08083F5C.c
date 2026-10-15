@@ -8,7 +8,7 @@ void SceneActorControl_ReflectTerrainProbe(struct SceneActorRegistryResetView *i
     struct ContactPosition *sum = &next;
     const struct ContactPosition *position;
     const struct ContactPosition *motion;
-    s32 x, z asm("r1");
+    s32 x, z;
     u32 cell;
     s32 height;
     struct ContactPosition *terrainPosition;
