@@ -34,3 +34,11 @@ passes the availability helper and is invalid if execution reaches the final
 context access. These caller preconditions are separate from the helper's gate.
 Together the four newly recovered bodies add440 bytes (+0.0182 percentage
 points):268 ordinary and172 register-pinned.
+
+82A6C matches268 register-pinned bytes. Preparation snapshots byte4F4 from the
+first global player pointer, selects directional animation1, and saves heading.
+A zero remainder of actor halfword2CA modulo context pulseInterval clears bit4
+in the secondary collider. This call requires a nonzero pulseInterval. Elapsed
+clock time wraps by256 and is stored as a byte; exceeding maxElapsed sets2B0,
+otherwise heading changes restart animation1 and unchanged headings clear2B3.
+The observed clock offset is not assigned a broader gameplay meaning.
