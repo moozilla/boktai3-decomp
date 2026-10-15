@@ -1,20 +1,8 @@
-#include "global.h"
-
-struct G {
-    u8 f[0x85e];
-    u16 v;
-};
-struct S {
-    u8 f[0x30];
-    u16 a;
-    u16 b;
-    u16 c;
-};
-extern struct G *gUnk_02000710;
-
-void sub_080508F0(struct S *p)
+#include "orbit_background.h"
+#define OrbitBackground_ResetOrbit sub_080508F0
+void OrbitBackground_ResetOrbit(struct OrbitBackground *background)
 {
-    p->a = gUnk_02000710->v;
-    p->b = 300;
-    p->c = 0;
+    background->angle = gUnk_02000710->unk85E;
+    background->radius = 300;
+    background->blendFrame = 0;
 }

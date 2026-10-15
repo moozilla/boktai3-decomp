@@ -1,8 +1,7 @@
-#include "global.h"
-
-extern u32 gUnk_0200048C;
-
-s32 sub_08050E90(void)
+#include "orbit_background.h"
+#define OrbitBackground_ClearSingleton sub_08050E90
+s32 OrbitBackground_ClearSingleton(void)
 {
-    return gUnk_0200048C = 0;
+    gUnk_0200048C = 0;
+    return 0;
 }
