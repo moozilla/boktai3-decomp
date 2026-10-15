@@ -1,4 +1,5 @@
 #include "scene_inventory_tail.h"
+#include "scene_inventory_actions.h"
 #include "scene_inventory_panel.h"
 #include "scene_inventory_catalog.h"
 #include "scene_hud_display.h"
@@ -9,9 +10,9 @@ void SceneInputPanel_SetMeterGlyph(struct SceneInputPanel *, u32, u32);
 void SceneInventory_PopulateEquipmentGrid(struct SceneInventoryPanel *);
 void SceneInventory_PopulateItemGrid(struct SceneInventoryPanel *);
 void SceneInventory_PopulateConsumableGrid(struct SceneInventoryPanel *);
-void sub_08060344(struct SceneInventoryTail *);
-void sub_080603EC(struct SceneInventoryTail *);
-void sub_08060488(struct SceneInventoryTail *);
+void SceneInventory_RefreshEquipmentValue(struct SceneInventoryActionView *);
+void SceneInventory_RefreshItemValue(struct SceneInventoryActionView *);
+void SceneInventory_RefreshConsumableValue(struct SceneInventoryActionView *);
 void sub_0805F904(struct SceneInventoryTail *);
 void SceneInventory_ShowItemDescription(struct SceneInventoryPanel *);
 void SceneInventory_ShowConsumableDescription(struct SceneInventoryPanel *);
@@ -61,7 +62,7 @@ void SceneInventory_UpdateDisplay(struct SceneInventoryTail *p)
         switch (p->category) {
             case 0:
                 if (p->interactionFlags & 0x10)
-                    sub_08060344(p);
+                    SceneInventory_RefreshEquipmentValue((struct SceneInventoryActionView *)p);
                 if (p->interactionFlags & 0x20)
                     sub_0805F904(p);
                 else
@@ -69,7 +70,7 @@ void SceneInventory_UpdateDisplay(struct SceneInventoryTail *p)
                 break;
             case 1:
                 if (p->interactionFlags & 0x10)
-                    sub_080603EC(p);
+                    SceneInventory_RefreshItemValue((struct SceneInventoryActionView *)p);
                 if (p->interactionFlags & 0x20)
                     SceneInventory_ShowItemDescription((struct SceneInventoryPanel *)p);
                 else
@@ -77,7 +78,7 @@ void SceneInventory_UpdateDisplay(struct SceneInventoryTail *p)
                 break;
             case 2:
                 if (p->interactionFlags & 0x10)
-                    sub_08060488(p);
+                    SceneInventory_RefreshConsumableValue((struct SceneInventoryActionView *)p);
                 if (p->interactionFlags & 0x20)
                     SceneInventory_ShowConsumableDescription((struct SceneInventoryPanel *)p);
                 else
