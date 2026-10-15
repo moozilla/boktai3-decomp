@@ -234,7 +234,7 @@ const capturesList = () => (_caps ??= fetch('/api/captures').then(r => r.json())
 // The frames of a sprite, a page at a time; click one (or pass `pick`) to show it still.
 // Frames can be labelled one by one (notes kind sprframe/bigframe, key HASH/FRAME).
 function frameStrip(n, imgAt, pick, kind, hash) {
-  const strip = $('strip'), PAGE = 240, cells = [];
+  const strip = $('strip'), PAGE = 600, cells = [];
   let shown = 0;
   const more = document.createElement('button'); more.className = 'more';
   strip.appendChild(more);
