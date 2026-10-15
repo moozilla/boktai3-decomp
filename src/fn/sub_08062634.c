@@ -26,7 +26,6 @@ void sub_0822D918(u32);
 void sub_0822CE18(u32);
 void sub_0822E11C(u32);
 s32 sub_08062778(struct SceneInventoryTail *);
-void sub_0806130C(struct SceneInventoryTail *, s32 (*)(struct SceneInventoryTail *));
 static inline void AddFunds(s32 value, struct GameState **location)
 {
     register u32 offset asm("r2");
@@ -91,7 +90,7 @@ s32 SceneInventory_TickSaleTransition(struct SceneInventoryTail *input)
                 break;
         }
         ((struct SceneInventorySaleFlags *)p)->sold = 1;
-        sub_0806130C(p, sub_08062778);
+        sub_0806130C(p, (SceneInventoryCallback)sub_08062778);
     }
     return 0;
 }
