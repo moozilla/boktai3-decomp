@@ -36,7 +36,6 @@ static inline void SetPhase(struct SceneActorRegistryResetView *actor, u8 state,
     actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
-#define SceneActorControl_ConvergeSavedMotion sub_08082D80
 void SceneActorControl_ConvergeSavedMotion(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *actor = input;

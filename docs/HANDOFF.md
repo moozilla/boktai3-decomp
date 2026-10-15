@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 29.911% matching (2026-10-15). This file is the single
+Last updated after reaching 29.945% matching (2026-10-15). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,51 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 15 continuation: saved motion and lift/sway control
+
+Exact code is **29.945%**, up **0.0335 percentage points** (+808 bytes)
+from PR165: **7,080 /11,490 functions**, **723,274 /2,415,354 bytes**.
+Without register pinning: **21.169%** (511,318 bytes); Register-pinned:
+**8.775%** (211,956 bytes), included above. Three new full bodies match:
+82D80(496),837D4(216) and83A8C(96); the last is ordinary C. The existing
+16-byte83550 preset setter gains types/name without extra matching credit.
+No boundaries change and78 guarded drafts remain uncredited.
+
+82D80 adds the whole saved-motion convergence and both reaction paths. Its
+quarter-deltas truncate toward zero, clamp to±200, and update saved/current
+motion. Termination tests those truncated deltas, so it does not require exact
+coordinate equality. A hard-register trial that omitted one whole branch was
+rejected; reducing56 hints to21 retains the full accepted496 bytes. See
+[control phases](SCENE_ACTOR_CONTROL_PHASE.md), which now reviews every entry
+in82648–83550, including private full drafts for contact health-recovery82648
+and random-direction83354. The latter remains508 bytes/six differing bytes;
+its four-hour frozen j1 queue is run-g042m0h3. Additional lifetime reduction,
+named verified RAM-table literals and magnitude helper trials made no gain.
+
+The adjoining83550–83AEC cohort now has an observed context extension through
+storedPosition434.837D4 consumes contextflag2 into a lift/reaction state when
+a player exists;83A8C implements signed sway with retained one-tick overshoot.
+See [control motion](SCENE_ACTOR_CONTROL_MOTION.md). Remaining initializer and
+ground-following bodies have complete private semantic drafts. Root's front
+contact callback is also in a distinct bounded900-second search from a valid
+880-byte draft; its changing fuzzy score receives no exact credit.
+
+Validation: combined build prints `build/boktai3.gba: OK`; RAM-literal audit
+passes. All4 changed/promoted translation units match full reviewed extents
+against the final ELF; source audit is clean. All9 progress/boundary tests,
+formatting, inventory and diff checks pass. There are no instruction bodies or
+explicit r7 bindings.
+
+Target remains **30% exact or20% account usage remaining**; latest meter22%
+remaining, no reset consumed. The strict30% byte threshold is724,607, so another
+1,333 exact bytes are needed. Life has a further480-byte ground-following match
+ready for the next combined batch; Sol has A8CC's full1736-byte/five-byte residue
+and scoped valid four-hour queue; Tail's full704-byte82184/nine-byte residue has
+a distinct focused1800-second queue after the broad run produced a verified
+zero-store simplification. Tail now extends static review to the adjacent
+83AEC–84280 helper cohort, including callers'83E34/83E98/84044 APIs. See the
+worker subsystem documents for retained contracts and unresolved whole bodies.
 
 ## October 15 continuation: actor control phases and saved reactions
 
