@@ -1,6 +1,6 @@
 #include "scene_panel_commands.h"
 #define ScenePanel_DispatchCommands sub_0805C680
-void ScenePanel_DispatchCommands(struct ScenePanel *owner)
+void sub_0805C680(struct ScenePanel *owner)
 {
     struct ScenePanelInteractionView *panel = (void *)owner;
     struct ScenePanelReceiver *receiver = &((struct ScenePanelCommandView *)owner)->receiver;
@@ -16,7 +16,7 @@ void ScenePanel_DispatchCommands(struct ScenePanel *owner)
                     Trigger_ConsumePending(receiver, 1);
                     break;
                 case 1:
-                    sub_08058150((void *)panel, sub_080581A0);
+                    ScenePanel_SetState((void *)panel, ScenePanel_BeginForwardSequence);
                     Trigger_ConsumePending(receiver, 1);
                     break;
             }

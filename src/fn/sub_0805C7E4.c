@@ -1,6 +1,6 @@
 #include "scene_panel_commands.h"
 #define ScenePanel_UpdateApproachSprite sub_0805C7E4
-void ScenePanel_UpdateApproachSprite(struct ScenePanelInteractionView *panel)
+void sub_0805C7E4(struct ScenePanelInteractionView *panel)
 {
     if (panel->mode && panel->activeCount && (panel->state == 10 || panel->state == 14)) {
         u32 scale, offset;

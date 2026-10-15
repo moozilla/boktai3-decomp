@@ -1,6 +1,6 @@
 #include "scene_panel_commands.h"
 #define ScenePanel_SubmitPlayerMidpoint sub_0805C86C
-void ScenePanel_SubmitPlayerMidpoint(struct ScenePanelInteractionView *panel)
+void sub_0805C86C(struct ScenePanelInteractionView *panel)
 {
     struct ScenePanelInteractionPackedPosition position;
     struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
