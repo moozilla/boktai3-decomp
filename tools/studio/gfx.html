@@ -475,8 +475,9 @@ function drawStageOverlay(svg, hp, scene, opt) {
   for (const grp of grouped(scene.entrances.filter(e => e.x != null), e => `${e.x},${e.z}`)) {
     const e = grp[0], [px, py] = proj(hp, e.x, e.y ?? 0, e.z), hot = grp.some(e => e.id === opt.entrance);
     if (hot) ent.appendChild(svgEl('circle', { cx: px, cy: py, r: 9, fill: 'none', stroke: '#7dff9a', 'stroke-width': 2 }));
-    ent.appendChild(svgEl('circle', { cx: px, cy: py, r: 3.5, fill: '#3fbf6a', stroke: '#fff', 'stroke-width': 1 },
-      grp.map(e => `entrance ${e.id}${e.box ? ' at box ' + e.box : ''}, facing ${e.facing} (proc_${e.proc})${condText(e)}`).join('\n\n')));
+    const dot = ent.appendChild(svgEl('circle', { cx: px, cy: py, r: 3.5, fill: '#3fbf6a', stroke: '#fff', 'stroke-width': 1, style: 'cursor:pointer' },
+      grp.map(e => `entrance ${e.id}${e.box ? ' at box ' + e.box : ''}, facing ${e.facing} (proc_${e.proc})${condText(e)}`).join('\n\n') + '\n\nclick to warp here in the game (Live)'));
+    dot.onclick = ev => { ev.stopPropagation(); warpTo(scene.scene, e.id); };
     ent.appendChild(svgEl('text', { x: px + 5, y: py - 3, 'font-size': 7, fill: '#bfffd0', 'paint-order': 'stroke', stroke: '#000', 'stroke-width': 2 })).textContent = [...new Set(grp.map(e => e.id))].join(',');
   }
   const dr = g('doors');
@@ -492,6 +493,12 @@ function drawStageOverlay(svg, hp, scene, opt) {
     a.onclick = ev => { ev.stopPropagation(); goScene(dests[0].scene, dests[0].entrance); };
     dr.appendChild(a);
   }
+}
+// Ask the game connected to the Live page to go there (Centaur's warp: proc_945).
+async function warpTo(scene, entrance) {
+  if (!confirm(`Warp the running game to scene ${scene}, entrance ${entrance}?`)) return;
+  const r = await fetch('/api/live/cmd', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ c: 'warp', scene, entrance }) }).then(r => r.json()).catch(() => ({}));
+  if (!r.ok) alert('No game connected (start mGBA with Centaur; see the Live page).');
 }
 function goScene(scene, entrance) {
   const st = sceneStage(scene);
@@ -524,7 +531,7 @@ views.maps = {
         ${st ? `<label><input type="checkbox" id="ovobj" checked> doors, items, enemies</label> <label><input type="checkbox" id="ovter"> terrain</label> <span id="scnslot"></span>` : ''}
         <span id="palhint" style="color:var(--muted)"></span> <span id="capslot"></span> <span id="tagslot"></span>
       </div>
-      ${st ? '<div class="legend" id="ovlegend"><span><b style="background:#ffb347"></b>door (click to follow)</span><span><b style="background:#3fbf6a;border-radius:5px"></b>entrance</span><span><b style="background:#f2c84b;border-radius:5px"></b>item</span><span><b style="background:#b07a2a"></b>chest</span><span><b style="background:#e04848;border-radius:5px"></b>enemy and patrol path</span>' + (LIVE ? '<span><b style="background:none;border:1.5px solid #fff"></b>screen</span><span><b style="background:#4aa3ff;border-radius:5px"></b>player</span>' : '') + '</div>' : ''}
+      ${st ? '<div class="legend" id="ovlegend"><span><b style="background:#ffb347"></b>door (click to follow)</span><span><b style="background:#3fbf6a;border-radius:5px"></b>entrance (click to warp the game there)</span><span><b style="background:#f2c84b;border-radius:5px"></b>item</span><span><b style="background:#b07a2a"></b>chest</span><span><b style="background:#e04848;border-radius:5px"></b>enemy and patrol path</span>' + (LIVE ? '<span><b style="background:none;border:1.5px solid #fff"></b>screen</span><span><b style="background:#4aa3ff;border-radius:5px"></b>player</span>' : '') + '</div>' : ''}
       <div class="stage" id="ms" style="padding:0;overflow:auto;max-width:100%"></div><div class="meta" id="hover" style="margin-top:6px">&nbsp;</div>`;
     const known = learned.stages.find(x => x.map === mh);
     $('palhint').innerHTML = known ? `Captured palette for this stage: <a href="#" id="usepal">${known.palette}</a>` : 'Palette is chosen at runtime; capture this stage in Live to learn it.';

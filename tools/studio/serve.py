@@ -157,7 +157,7 @@ def display_strings(trans):
 def scene_list():
     """Scene entries (tools/mgba/scenes.py) with survey results when present."""
     path = os.path.join(ROOT, "build", "centaur", "scenes.json")
-    if not os.path.exists(path):
+    if not os.path.exists(path) or "entrance" not in (json.load(open(path)) or [{}])[0]:
         subprocess.run([sys.executable, os.path.join(ROOT, "tools", "mgba", "scenes.py")], cwd=ROOT)
     sc = json.load(open(path))
     pals = {r["map"]: r["palette"] for r in live.stage_palettes()}
