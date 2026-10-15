@@ -1,4 +1,5 @@
 #include "global.h"
+#define AreaEffect_Initialize sub_0804EB60
 
 struct S {
     u8 filler[0x1c];
@@ -12,7 +13,7 @@ struct S {
 extern struct S *gUnk_0200010C;
 u16 sub_0804EB38(struct S *);
 
-s32 sub_0804EB60(struct S *p)
+s32 AreaEffect_Initialize(struct S *p)
 {
     u8 z;
     p->v = sub_0804EB38(p);
