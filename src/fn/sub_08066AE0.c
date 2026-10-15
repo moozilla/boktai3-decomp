@@ -8,7 +8,7 @@ s32 ActorAttachment_TickManager(struct ActorAttachmentManagerView *incoming)
     register struct ActorAttachmentSlotView *base asm("r2") = manager->slots;
     if (manager->occupiedMask) {
         void **dispatch = gUnk_08605B34;
-        u8 *active = &manager->slots[0].active;
+        u8 *active = &manager->slots[0].flags31;
         struct ActorAttachmentSlotView *slot = base;
         s32 i = 7;
         do {
