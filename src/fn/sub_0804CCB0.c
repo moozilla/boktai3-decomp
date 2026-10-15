@@ -22,13 +22,13 @@ void TetherActor_UpdateKindNineRecoil(struct TetherActor *actor)
     if (!actor->stateFrame)
         actor->displayOffsetY = 300;
     {
-        register u32 angle asm("r3") = actor->actionVariant;
+        register u32 angle asm("r3") = actor->actionAngle;
         const s16 *table = gUnk_086149C4;
-        actor->movementDelta.x = scale(table[(angle + 64) & 255] * actor->actionValue);
-        actor->movementDelta.z = scale(table[angle] * actor->actionValue);
+        actor->movementDelta.x = scale(table[(angle + 64) & 255] * actor->actionMagnitude);
+        actor->movementDelta.z = scale(table[angle] * actor->actionMagnitude);
         asm("" : : "r"(angle));
     }
-    actor->actionValue = (actor->actionValue * 3) >> 2;
+    actor->actionMagnitude = (actor->actionMagnitude * 3) >> 2;
     {
         register u16 *frame asm("r3") = &actor->stateFrame;
         u32 current;
@@ -45,7 +45,7 @@ void TetherActor_UpdateKindNineRecoil(struct TetherActor *actor)
         }
     }
     ++actor->stateFrame;
-    if (actor->actionValue <= 19 && !actor->displayOffsetY) {
+    if (actor->actionMagnitude <= 19 && !actor->displayOffsetY) {
         actor->displayOffsetY = 0;
         Sound_PlaySong(0x2A8);
         TetherActor_SetState(actor, 0);

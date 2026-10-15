@@ -35,6 +35,6 @@ void TetherActor_UpdateLockedShake(struct TetherActor *actor)
         else
             actor->transitionReason = 1;
         TetherActor_SetState(actor, 2);
-        actor->secondaryMode = actor->secondaryTimer;
+        actor->recoveryTimer = actor->recoveryDuration;
     }
 }

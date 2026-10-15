@@ -79,7 +79,7 @@ void TetherActor_UpdateAuxiliaryTransition(struct TetherActor *actor)
             emit = 1;
     }
     if (visible) {
-show:
+    show:
         activeDisplay = &actor->display.animation;
         DisplayAnimation_ClearFlags(activeDisplay, 1);
         actor->auxiliarySprite.flags &= ~1;
@@ -96,8 +96,12 @@ show:
             surface = *properties >> 4;
             height = (*properties & 15) << 8;
             switch (surface) {
-            case 1: height -= (u8)position->z; break;
-            case 2: height -= (u8)position->x; break;
+                case 1:
+                    height -= (u8)position->z;
+                    break;
+                case 2:
+                    height -= (u8)position->x;
+                    break;
             }
             actor->auxiliarySprite.position.y = height;
         }
@@ -118,15 +122,15 @@ show:
     if (++actor->stateFrame > 255) {
         TetherActor_RemoveAuxiliarySprite(actor);
         TetherActor_SetState((struct TetherActor *)gUnk_02000488, 0);
-        if (actor->interactionValue) {
-            u32 script = actor->interactionValue;
-            actor->interactionValue = 0;
+        if (actor->interactionScriptId) {
+            u32 script = actor->interactionScriptId;
+            actor->interactionScriptId = 0;
             Script_Call(script, 0);
-            actor->sampleRequested = 1;
+            actor->destroyRequested = 1;
             DisplayAnimation_SetFlags(display, 1);
         } else {
             DisplayAnimation_SetFlags(display, 1);
-            actor->sampleRequested = 1;
+            actor->destroyRequested = 1;
         }
     }
 }

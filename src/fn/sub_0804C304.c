@@ -19,7 +19,7 @@ void TetherActor_UpdateRecoveryState(struct TetherActor *actor)
     frozen = gUnk_030053F4 & 512;
     if (frozen)
         return;
-    rawTimer = actor->secondaryMode;
+    rawTimer = actor->recoveryTimer;
     highTimer = rawTimer << 16;
     if ((highTimer >> 16) > 64) {
         struct ContactCollider *collider;
@@ -99,26 +99,26 @@ void TetherActor_UpdateRecoveryState(struct TetherActor *actor)
                 TetherActor_EmitRandomEffect(actor);
         }
         {
-        u32 chargeHigh = (u32)actor->charge << 16;
-        if (chargeHigh) {
-            s32 reduction = chargeHigh >> 19;
-            register u16 *current asm("r6") = timer;
-            u32 remaining = *current;
-            if ((s32)remaining < reduction + 64) {
-                *current = 64;
-            } else {
-                u16 *destination;
-                register u32 value asm("r0") = remaining - reduction;
-                destination = timer;
-                *destination = value;
+            u32 chargeHigh = (u32)actor->charge << 16;
+            if (chargeHigh) {
+                s32 reduction = chargeHigh >> 19;
+                register u16 *current asm("r6") = timer;
+                u32 remaining = *current;
+                if ((s32)remaining < reduction + 64) {
+                    *current = 64;
+                } else {
+                    u16 *destination;
+                    register u32 value asm("r0") = remaining - reduction;
+                    destination = timer;
+                    *destination = value;
+                }
+                actor->charge = 0;
+                {
+                    register u32 readyOffset asm("r6") = 0x384;
+                    *(u16 *)((u8 *)actor + readyOffset) = 0;
+                    asm("" : : "r"(readyOffset));
+                }
             }
-            actor->charge = 0;
-            {
-                register u32 readyOffset asm("r6") = 0x384;
-                *(u16 *)((u8 *)actor + readyOffset) = 0;
-                asm("" : : "r"(readyOffset));
-            }
-        }
         }
     } else {
         s32 amplitude = highTimer >> 17;
@@ -153,45 +153,45 @@ void TetherActor_UpdateRecoveryState(struct TetherActor *actor)
         actor->charge = frozen;
         actor->chargeReady = frozen;
         {
-        u32 soundFrame = actor->lockSoundFrame + 1;
-        register u32 truncation asm("r6");
-        u32 mask;
-        actor->lockSoundFrame = soundFrame;
-        truncation = 65535;
-        asm("" : "+r"(truncation));
-        mask = truncation;
-        asm("" : "+r"(mask));
-        soundFrame &= mask;
-        mask = 7;
-        soundFrame &= mask;
-        if (soundFrame == 0) {
-            u32 *slot = randomIndex;
-            u32 index = *slot + 1;
-            u32 mask = randomMask;
-            u32 sample;
-            index &= mask;
-            *slot = index;
-            sample = table[index];
-            sample &= 1;
-            if (sample)
-                Sound_PlaySong(0x2B9);
-        }
+            u32 soundFrame = actor->lockSoundFrame + 1;
+            register u32 truncation asm("r6");
+            u32 mask;
+            actor->lockSoundFrame = soundFrame;
+            truncation = 65535;
+            asm("" : "+r"(truncation));
+            mask = truncation;
+            asm("" : "+r"(mask));
+            soundFrame &= mask;
+            mask = 7;
+            soundFrame &= mask;
+            if (soundFrame == 0) {
+                u32 *slot = randomIndex;
+                u32 index = *slot + 1;
+                u32 mask = randomMask;
+                u32 sample;
+                index &= mask;
+                *slot = index;
+                sample = table[index];
+                sample &= 1;
+                if (sample)
+                    Sound_PlaySong(0x2B9);
+            }
         }
     }
     counterOffset = 0x400;
     asm("" : "+r"(counterOffset));
     {
-    register u16 *counter asm("r1") = (u16 *)((u8 *)actor + counterOffset);
-    if (--*counter == 0) {
-        if (actor->unknown1B == 1) {
-            TetherActor_SetState(actor, 16);
-            {
-                u32 offset = 0x46A;
-                u16 *directed = (u16 *)((u8 *)actor + offset);
-                *directed = 30;
-            }
-        } else
-            TetherActor_SelectInteractionState(actor);
-    }
+        register u16 *counter asm("r1") = (u16 *)((u8 *)actor + counterOffset);
+        if (--*counter == 0) {
+            if (actor->unknown1B == 1) {
+                TetherActor_SetState(actor, 16);
+                {
+                    u32 offset = 0x46A;
+                    u16 *directed = (u16 *)((u8 *)actor + offset);
+                    *directed = 30;
+                }
+            } else
+                TetherActor_SelectInteractionState(actor);
+        }
     }
 }
