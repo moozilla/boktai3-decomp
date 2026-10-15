@@ -1,5 +1,6 @@
 #include "global.h"
+#define AreaEffect_KeepLinkVisibility sub_0804EDCC
 
-void sub_0804EDCC(void)
+void AreaEffect_KeepLinkVisibility(void)
 {
 }
