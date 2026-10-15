@@ -28,8 +28,10 @@ zero definition value returns zero. The percentage is20 for condition0,50 for
 1–250,80 for251–500,90 for501–750, and100 for751–1000. Values above1000 retain
 the default80. Either modifier adds30; grade1 adds10 and grade2 adds20. The
 definition's unsigned halfword at6 is multiplied by this percentage, divided
-by100 with signed division, and clamped to at least1. Callers do not yet justify
-naming this a sale price.
+by100 with signed division, and clamped to at least1. The sale handler at62634
+adds these calculated values to signed currency at7B0 and removes the selected
+owned object, establishing their use as sale prices. The purchase handler at62414
+subtracts the definition values instead.
 
 `SceneItemValue_CalculateItem` (`5F87C`, 92 bytes) combines the owned item ID and
 slot state. State394 uses50 percent. Otherwise the percentage is
