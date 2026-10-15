@@ -1,5 +1,4 @@
 #include "scene_actor_control_motion.h"
-#define SceneActorControl_TickSway sub_08083A8C
 void SceneActorControl_TickSway(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);

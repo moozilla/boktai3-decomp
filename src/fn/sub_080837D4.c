@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_motion.h"
 #include "player.h"
-#define SceneActorControl_ConsumeLiftFlag sub_080837D4
 static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input, u32 offset)
 {
     u32 mask = input;
