@@ -1,12 +1,9 @@
-#include "global.h"
+#include "scene_actor_behavior.h"
+#define SceneActorBehavior_TestDefeated sub_08078B48
 
-struct Sprite08078B48 {
-    u8 pad[0xf];
-    u8 flags;
-};
-void sub_080789EC(u8 *);
+void SceneActorBehavior_RecordDefeat(struct SceneActorBehaviorView *);
 
-static inline u8 TestMask(struct Sprite08078B48 *s, u32 mask)
+static inline u8 TestMask(struct SceneActorBehaviorGateView *s, u32 mask)
 {
     if (s->flags & mask)
         return TRUE;
@@ -18,22 +15,22 @@ static inline u32 OrV(u16 m, u16 *f)
     return m | *f;
 }
 
-u32 sub_08078B48(u8 *p)
+u32 SceneActorBehavior_TestDefeated(struct SceneActorBehaviorView *actor)
 {
-    struct Sprite08078B48 *sprite;
-    if (*(s32 *)(p + 0x304) > 0) {
+    struct SceneActorBehaviorGateView *sprite;
+    if (actor->counter304 > 0) {
         u8 m;
-        sub_080789EC(p);
+        SceneActorBehavior_RecordDefeat(actor);
         {
-            s32 v = OrV(0x80, (u16 *)(p + 0x2d6)) & ~0x100;
-            *(u16 *)(p + 0x2d6) = v;
+            s32 v = OrV(0x80, &actor->flags2D6) & ~0x100;
+            *&actor->flags2D6 = v;
         }
-        sprite = (void *)(p + 0xdc);
+        sprite = &actor->gate;
         m = 0x10;
         sprite->flags |= m;
         return 1;
     }
-    sprite = (void *)(p + 0xdc);
+    sprite = &actor->gate;
     if (TestMask(sprite, 2)) {
         s32 m = ~0x10;
         sprite->flags &= m;

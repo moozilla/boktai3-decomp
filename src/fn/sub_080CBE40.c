@@ -1,7 +1,7 @@
 #include "global.h"
 void sub_0808005C(void);
 void sub_0807C72C(u8 *, u32, u32, u32);
-void sub_08078264(u8 *);
+void SceneActorBehavior_CallActionScript(u8 *);
 void sub_080C4EF0(u8 *);
 inline static u8 TakeFlag(u8 *p)
 {
@@ -77,7 +77,7 @@ void sub_080CBE40(struct S *obj)
             obj->at59 = byte;
         }
         sub_0807C72C((u8 *)obj, 0, 0, obj->at98);
-        sub_08078264((u8 *)obj);
+        SceneActorBehavior_CallActionScript((u8 *)obj);
         h = (u16 *)(((u8 *)obj) + 0x414);
         {
             u32 flag = 4;

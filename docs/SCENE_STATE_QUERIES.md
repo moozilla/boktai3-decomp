@@ -39,3 +39,22 @@ The new exact functions in this document total 972 bytes. The reset, tilemap
 leaves, counter updater and insertion are ordinary C; rectangle/player queries
 and pair lookup/ticking retain initialized register-lifetime concessions.
 The old clear, empty-slot and capacity helpers are typed without new credit.
+
+## Runtime field reset:0806F2CC
+
+The full220-byte reset now matches ordinary C, adding **+0.0091 percentage
+points**. It clears halfwords7A0/7A2/7A4, writes-1 to7A6, clears81A and
+7B2/7B4/7B6, then clears7FA/7FC/7FE. It writes2000 to818,1 to each word
+7B8/7BC/7C0,0 to word7C4,1 to halfword7F8, and0 to word81C. Calls811D358,
+811DB6C and811D54C follow, then word820 is cleared. The field roles remain
+provisional; offsets describe observations rather than inferred gameplay.
+
+A four-hour frozen permuter search improved weighted score805→210 by applying
+an ordinary inline halfword-address helper to the clear stores. The reviewed
+result had only two differing instruction bytes. Auditing the cached address
+arithmetic exposed three transcribed offsets in the private baseline:800/804/800
+should have been7FA/7FE/7F8. Correcting those source offsets produced a full exact
+match with the helper; the mutations had not introduced the transcription error.
+The obsolete search was stopped. No register hints, empty asm, unfinished scalar
+reads, or raw mutation output were promoted. The final fast proof is
+build/scene-state-F2CC-final.json; parent combined validation owns integration.

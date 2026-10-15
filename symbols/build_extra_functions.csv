@@ -130,6 +130,8 @@ address,isa,evidence,replacement_end
 08072124,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08072188
 08072204,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched),08072264
 080762A8,thumb,Independent 296-byte profile animation selector with own push and pop-bx inside gbadisasm raw byte range after08076174,080763D0
+0807836C,thumb,Independent 196-byte drawable blink/cadence routine with PUSH-r4-r5-r6-LR and POP/BX after 0807827C return and literal pool; no stored Thumb pointer or direct branch reference found,08078430
+08078550,thumb,Independent 252-byte descriptor steering routine with PUSH/save prologue and POP/BX after 08078430 return; no stored Thumb pointer or direct branch reference found,0807864C
 08078B48,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08078BB4
 0807C468,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0807C4B4
 0807C53C,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0807C580
