@@ -1,9 +1,10 @@
-#include "global.h"
-s32 Script_GetValue(void);
-s32 sub_08070EBC(void);
-u32 sub_08070F10(void)
+#include "scene_actor_registry.h"
+#define SceneActorRegistry_TestScriptActorPresent sub_08070F10
+struct SceneActorRegistryActor *sub_08070EBC(u32);
+u32 SceneActorRegistry_TestScriptActorPresent(void)
 {
-    if (Script_GetValue() != 0 && sub_08070EBC() != 0)
+    u32 id = Script_GetValue();
+    if (id && sub_08070EBC(id))
         return 1;
     return 0;
 }
