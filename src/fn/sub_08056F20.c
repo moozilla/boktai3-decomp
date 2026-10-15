@@ -1,14 +1,7 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x78];
-    s32 *t;
-};
-
-s32 sub_08056F20(struct S *p, u32 i)
+#include "level_advance_display.h"
+#define LevelAdvanceDisplay_GetThreshold sub_08056F20
+s32 LevelAdvanceDisplay_GetThreshold(struct LevelAdvanceManager *manager, u32 level)
 {
-    {
-        s32 *q = p->t;
-        return *(s32 *)((u8 *)q + (i << 2)) * 10;
-    }
+    s32 *thresholds = manager->thresholds;
+    return *(s32 *)((u8 *)thresholds + (level << 2)) * 10;
 }
