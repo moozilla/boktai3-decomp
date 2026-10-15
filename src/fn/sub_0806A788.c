@@ -1,35 +1,22 @@
-#include "global.h"
-
-void Memory_Clear(void *, u32);
-
-struct E {
-    u8 a[0x73];
-    u8 idx;
-    u8 b[0x7C - 0x74];
-};
-struct S {
-    u8 pad0[0x18];
-    u32 mask;
-    struct E e[24];
-};
-
-static inline u8 Tst(u32 *m, s32 i)
+#include "sprite_effect_controller.h"
+static inline u8 SpriteEffectController_IsUsed(u32 *m, s32 i)
 {
     if (*m & (1 << i))
         return TRUE;
     return FALSE;
 }
 
-struct E *sub_0806A788(struct S *b)
+struct SpriteEffectController *
+SpriteEffectController_AllocateSlot(struct SpriteEffectControllerPool *b)
 {
     s32 i;
-    struct E *e;
+    struct SpriteEffectController *e;
     for (i = 0; i < 24; i++) {
-        if (!Tst(&b->mask, i)) {
-            e = &b->e[i];
-            b->mask |= 1 << i;
+        if (!SpriteEffectController_IsUsed(&b->used, i)) {
+            e = &b->slots[i];
+            b->used |= 1 << i;
             Memory_Clear(e, 0x7C);
-            e->idx = i;
+            e->index = i;
             return e;
         }
     }

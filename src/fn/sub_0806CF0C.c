@@ -1,6 +1,5 @@
-#include "global.h"
-extern u32 gUnk_02000188;
-void sub_0806CF0C(void)
+#include "scene_steering_actor.h"
+void SceneSteeringActor_ResetPool(void)
 {
     gUnk_02000188 = 0;
 }

@@ -1,8 +1,5 @@
-#include "global.h"
-
-extern u32 gUnk_02000168;
-
-void sub_0806A600(void)
+#include "spark_particle.h"
+void SparkParticle_ClearPool(void)
 {
-    gUnk_02000168 = 0;
+    gUnk_02000168 = NULL;
 }

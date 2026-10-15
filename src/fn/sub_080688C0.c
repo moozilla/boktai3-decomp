@@ -1,8 +1,6 @@
-#include "global.h"
-
-extern u32 gUnk_02000134;
-
-void sub_080688C0(void)
+#include "scene_particle_pool.h"
+extern struct SceneParticlePool *gUnk_02000134;
+void SceneParticlePool_ResetSingleton(void)
 {
     gUnk_02000134 = 0;
 }

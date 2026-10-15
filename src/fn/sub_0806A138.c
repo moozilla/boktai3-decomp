@@ -1,18 +1,16 @@
-#include "global.h"
-void Effect_Remove(void *);
-extern u32 gUnk_02000168;
-u32 sub_0806A138(u8 *p)
+#include "spark_particle.h"
+s32 SparkParticle_DestroyPool(struct SparkParticlePool *pool)
 {
-    u8 *e = p + 0x28;
-    s32 i = 0x2f;
+    struct SparkParticleSprite *sprite = &pool->particles[0].sprite;
+    s32 i = 47;
     do {
-        Effect_Remove(e);
-        e += 0x44;
+        Effect_Remove(sprite);
+        sprite = (struct SparkParticleSprite *)((u8 *)sprite + sizeof(struct SparkParticle));
         i--;
     } while (i >= 0);
     {
-        u32 z = 0;
-        gUnk_02000168 = z;
+        u32 zero = 0;
+        gUnk_02000168 = (struct SparkParticlePool *)zero;
     }
     return 0;
 }

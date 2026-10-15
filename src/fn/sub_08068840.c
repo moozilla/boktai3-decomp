@@ -1,16 +1,6 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x18];
-    s32 a;
-    s32 b;
-};
-
-s32 AnimData_FindEntry(s32);
-s32 ScriptProc_Start(s32, s32);
-
-void sub_08068840(struct S *p)
+#include "scene_particle_pool.h"
+void SceneParticlePool_LoadResources(struct SceneParticlePool *pool)
 {
-    p->b = AnimData_FindEntry(0x1C1A);
-    p->a = ScriptProc_Start(0x922E, 0xD1B8);
+    pool->graphicsResource = AnimData_FindEntry(0x1C1A);
+    pool->sequenceResource = ScriptProc_Start(0x922E, 0xD1B8);
 }

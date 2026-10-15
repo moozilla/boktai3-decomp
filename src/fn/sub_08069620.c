@@ -1,22 +1,10 @@
-#include "global.h"
-
-struct P {
-    u8 f[0x34];
-    u32 a;
-    u8 g[0xfc8 - 0x38];
-    u32 b;
-    u32 c;
-};
-extern struct P *gUnk_0200014C;
-void AnimData_Load(u8 *, s32);
-u32 ScriptProc_Start(s32, s32);
-
-s32 sub_08069620(struct P *p)
+#include "bouncing_object.h"
+s32 BouncingObject_InitializePool(struct BouncingPool *pool)
 {
-    AnimData_Load((u8 *)p + 0x18, 0xE74B);
-    p->a = ScriptProc_Start(0x922e, 0x871c);
-    p->b = 0;
-    p->c = 0;
-    gUnk_0200014C = p;
+    AnimData_Load(pool->graphics, 0xE74B);
+    pool->sequenceResource = ScriptProc_Start(0x922E, 0x871C);
+    pool->used = 0;
+    pool->stopping = 0;
+    gUnk_0200014C = pool;
     return 0;
 }

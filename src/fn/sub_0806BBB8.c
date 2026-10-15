@@ -1,6 +1,6 @@
-#include "global.h"
-void sub_0806BBB8(u32 a, u32 b, u8 *p)
+#include "scene_steering_actor.h"
+void SceneSteeringActor_RequestDeparture(u32 a, u32 b, struct SceneSteeringActor *p)
 {
-    *(u8 *)(p + 0x122) = 5;
-    *(u8 *)(p + 0x126) = 1;
+    p->state = 5;
+    p->enter = 1;
 }

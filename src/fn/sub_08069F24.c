@@ -1,8 +1,5 @@
-#include "global.h"
-
-extern u32 gUnk_02000160;
-
-void sub_08069F24(void)
+#include "burst_emitter.h"
+void BurstEmitter_DestroyPool(struct BurstEmitterPool *unused)
 {
-    gUnk_02000160 = 0;
+    gUnk_02000160 = NULL;
 }

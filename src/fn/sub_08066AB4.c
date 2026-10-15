@@ -4,5 +4,6 @@ ActorAttachment_CreatePartsSlotWithCount(u8 frame, struct ContactPosition *ancho
                                          s32 z, u32 action, s16 *value, s32 count, u32 partCount,
                                          struct ActorAttachmentFollowView *follow, u32 unused)
 {
-    return sub_08066474(frame, anchor, update, z, action, value, count, partCount, follow, unused);
+    return ActorAttachment_CreateMeterPartsSlot(frame, anchor, update, z, action, value, count,
+                                                partCount, follow, unused);
 }

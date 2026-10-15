@@ -53,3 +53,22 @@ The new twelve-slot cohort currently adds728 exact bytes (364+276+88), of which
 640 are ordinary C and88 register-pinned. The adjacent anchored allocator and
 lifecycle add268 bytes with register concessions. Exact checks cover each full
 reviewed extent; batch-wide ROM validation is performed by the integrator.
+
+## Timer removal, heading query, and pool lifecycle
+
+`68A3C` advances the contact timer/flags path; `69214` removes an expired slot
+and writes the signed index sentinel. The pool updater69510 walks occupied
+entries while respecting the engine pause and stopping flags. Destruction695C8
+removes the sprite and its registration record for every occupied slot, clears the
+singleton, and returns zero. Typed initialize/ensure/reset helpers preserve
+the actual task callback return contract.
+
+`696C0` returns the heading from the input position to the first eligible
+occupied entry, rather than searching for the nearest entry. It excludes
+negative indices, zero timers and state two, and compares the signed wrapped
+horizontal squared distance against102399. `69788` answers whether a signed
+slot index is active. These additions contribute776 bytes:468 ordinary C and
+308 register-pinned. This includes the previously hidden64-byte query as a
+newly matched explicit boundary; the large physics/creator and script bodies
+remain separate assembly-backed gaps. The close584-byte creator has a frozen
+long permuter run from a two-register-byte difference.
