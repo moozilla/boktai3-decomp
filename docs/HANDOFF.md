@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 25.788% matching (2026-10-14). This file is the single
+Last updated after reaching 25.949% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,52 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex/Sol): overlay renderer, scheduled actions and rig control
+
+Exact code is **25.949%**, up **0.1608 percentage points** (+3,884 bytes):
+**6,686 / 11,473 functions**, **626,750 / 2,415,354 bytes**. Without register
+pinning: **20.147%**; Register-pinned: **5.802%**, included above. Seventeen new
+functions add1,572 unpinned bytes and2,312 with minimized concessions. The77
+protected drafts remain outside exact progress.
+
+Sol closed **58BD8–58FF8**, the1,056-byte overlay renderer, minimizing142→48
+hints with natural r7 throughout. The layer/resource contracts cover signed
+projection, relative map relocation, changed-quadrant redraw,32-by-32 output
+indexing and paired tile rows. The second output row intentionally uses masked
+row+1 without a second wrap. A defined opaque scratch output precedes all its
+input uses. The layer RAM literal is named and checked against its linked symbol.
+[Overlay contracts](SCENE_PANEL_EFFECTS.md#overlay-tile-renderer).
+
+Parent completed **5907C–59428**, eight scheduled actions /940 bytes (six new /
+908). Resource selection chooses periodic callbacks and handles, with frame,
+interval and burst-angle contracts preserved. Setup keeps four minimized hints,
+including two function-pointer bindings that depin does not recognize and were
+tested manually. [Schedule notes](../notes/scene-panel-schedule_2026-10-14.md).
+
+Parent completed **59428–59C48**, sixteen rig functions /2,080 bytes (ten new /
+1,920). Shared partial views record fifteen sprites, contact response, parent
+subject access, polar movement, randomized turning, rise/return states and
+resource drain. The drain's one-time quarter-reference warning selects sound,
+starts a transition and calls pending script4. Sixteen whole-parent functions
+receive names and typed contracts; the old16-byte hidden59AB4 boundary remains
+unchanged and earns no new credit. [Rig notes](../notes/scene-panel-rig_2026-10-14.md).
+
+The complete span is **4E008–59C48**, **366 consecutive exact C functions /
+48,192 bytes**, with no gaps. Combined validation passed with
+`build/boktai3.gba: OK` in `build/scene-schedule-overlay-combined.log`; all26
+post-promotion reviewed-extent checks passed, plus formatting, inventory,
+structured data and RAM-literal checks. Main PR140 Actions passed at99b41c31
+(run38677202682). No new runtime coverage or final game identity is claimed.
+
+Continue toward **30% matching or40% account usage remaining**; last read
+**50% remaining**. Sol owns rig setup/render **5AD18–5B28C**. Parent owns the
+intervening **59C48–5AD18** state handlers. Scratch already has hover-selection
+59C48 exact with five minimized concessions, subject-action5A1FC and hide-burst
+5A40C exact without hints, and knockback5A2BC exact with all hints removed.
+5A3D4 is an old typed56-byte helper; wandering59DF8 and contact transition5A4FC
+are active drafts. Work in coherent subsections and keep production frozen
+during combined builds. The primary Claude-owned checkout remains untouched.
 
 ## October 14 (Codex/Sol): scene panel particles, palettes and background effect
 

@@ -1,6 +1,6 @@
 #include "scene_panel.h"
 void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *, s32, s32, s32, s32);
-void sub_08058BD8(struct ScenePanel *, s32, s32, s32, s32);
+void ScenePanel_DrawOverlay(struct ScenePanel *, s32, s32, s32, s32);
 void ScenePanel_DrawBackgroundLayers(struct ScenePanel *panel)
 {
     s32 x = gUnk_03005418[0] + gUnk_030042A0.offsetX;
@@ -9,5 +9,5 @@ void ScenePanel_DrawBackgroundLayers(struct ScenePanel *panel)
     x -= 120;
     y -= 80;
     ScenePanel_UpdateBackgroundEffect(panel, tileX, tileY, x, y);
-    sub_08058BD8(panel, tileX, tileY, x, y);
+    ScenePanel_DrawOverlay(panel, tileX, tileY, x, y);
 }

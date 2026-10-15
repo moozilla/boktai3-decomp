@@ -1,14 +1,7 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x1360];
-    u32 v;
-};
-void sub_0824923C(struct S *, u32);
-
-void sub_0805907C(struct S *p)
+#include "scene_panel_schedule.h"
+void ScenePanel_RunScheduledAction(struct ScenePanel *input)
 {
-    u32 v = p->v;
-    if (v)
-        sub_0824923C(p, v);
+    struct ScenePanelScheduleView *panel = (void *)input;
+    if (panel->action)
+        sub_0824923C(panel, panel->action);
 }

@@ -4,9 +4,15 @@
 #include "background_controller.h"
 #include "contact_actor.h"
 #include "scene_object.h"
+struct ScenePanelSubject {
+    u8 unknown0[0xD3];
+    u8 displayState;
+};
 /* Tentative presentation/state view; fields belong to observed consumers. */
 struct ScenePanel {
-    u8 unknown0[0x22E];
+    u8 unknown0[0x1E];
+    u8 overlayCount;
+    u8 unknown1F[0x20F];
     u16 stateFrame, channels[8];
     u8 unknown240[0x10];
     void (*state)(struct ScenePanel *);
@@ -15,14 +21,21 @@ struct ScenePanel {
     void *overlayMap, *overlayPalette;
     u8 targetLevels[4], currentLevels[4];
     u16 overlayFrame;
-    u8 unknown4EE[0x22];
+    u8 unknown4EE[0xE];
+    u16 effectState, effectFrame;
+    struct ContactPosition overlayOrigin;
+    u8 unknown508[8];
     struct ContactPackedVector center;
-    u8 unknown518[0x6F8];
+    u8 unknown518[0x6D0];
+    struct ScenePanelSubject *subjects[4];
+    u8 unknownBF8[0x18];
     u8 paletteMode;
     u8 unknownC11[0x717];
     u16 mode;
     s16 shakeOffset;
-    u8 unknown132C[0xE];
+    u8 unknown132C[2];
+    u8 overlayChanged;
+    u8 unknown132F[0xB];
     u8 resourceIndex;
     u8 unknown133B[0x3D];
     u16 effectPhase;
