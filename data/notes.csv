@@ -1,4 +1,8 @@
 kind,key,label,notes
 big,593A,Character portraits,"Dialog/status portraits; frame 0 is Django (item menu, capture cap34284)."
 map,C5A7,Title screen,"The logo map behind the title menu (capture cap27820, scene 1479)."
+spr,0658,megaman,
+spr,1289,,skylight sun
+spr,5D04,items/equipment,
 spr,731D,Title screen sprites,"Frame 0 copyright, 1 logo, 2 subtitle (逆襲のサバタ), 11-15 PUSH START / GAME START / OPTIONS / LINK / SOUND. OBJ banks = part bank + 2."
+spr,DE23,django,

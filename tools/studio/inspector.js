@@ -150,7 +150,11 @@ class Inspector {
   poolOf(bank) { const p = this.cap.objPool?.[bank]; return p != null && p < 0x8000 ? p : null; }
   poolLink(bank) { const p = this.poolOf(bank); return p != null ? peekLink('/gfx#pool/' + p, '#' + p) : (this.cap.objPool?.length ? 'special' : ''); }
   name_(it) { const a = it.an; return a?.match ? `${a.match[0] === 'big' ? 'large sprite' : 'sprite'} ${a.match[1]}${a.frame != null ? ' frame ' + a.frame : ''}` : 'unidentified'; }
-  label(it) { return it.an?.match && noteOf(it.an.match[0], it.an.match[1])?.label; }
+  label(it) {
+    const a = it.an;
+    if (!a?.match) return null;
+    return (a.frame != null && (noteOf(a.match[0] + 'frame', `${a.match[1]}/${a.frame}`)?.label || itemLabel(a.match[1], a.frame))) || noteOf(a.match[0], a.match[1])?.label;
+  }
   image(ents) {  // entries drawn together, back to front (lower OAM index is in front)
     const x0 = Math.min(...ents.map(e => e.x)), y0 = Math.min(...ents.map(e => e.y));
     const w = Math.max(...ents.map(e => e.x + e.w)) - x0, h = Math.max(...ents.map(e => e.y + e.h)) - y0;

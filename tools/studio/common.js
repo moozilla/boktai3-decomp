@@ -59,10 +59,19 @@ const peekLink = (href, text) => `<a href="${href}" data-peek>${text}</a>`;
 const gfxHref = (kind, hash, frame) => ({ spr: '/gfx#sprites/', big: '/gfx#big/', bigspr: '/gfx#big/', map: '/gfx#maps/', pal: '/gfx#palettes/' }[kind] || '/gfx#tiles/') + hash + (frame != null ? '/' + frame : '');
 
 // ---------- notes (data/notes.csv: kind, key, label, notes) ----------
-let NOTES_DB = {};
+let NOTES_DB = {}, ITEM_FRAMES = {};
+// Item, sword and accessory names on their menu icons (data/items.csv, from the
+// game's text bank): 'HASH/FRAME' -> [{category, id, name}]
+async function loadItems() {
+  const rows = await fetch('/api/items').then(r => r.json()).catch(() => []);
+  ITEM_FRAMES = {};
+  for (const r of rows) if (r.icon) (ITEM_FRAMES[r.icon] ||= []).push({ ...r, name: r.en || r.jp });
+  return ITEM_FRAMES;
+}
+const itemLabel = (hash, frame) => { const l = ITEM_FRAMES[`${hash}/${frame}`]; return l ? (l.length > 3 ? `${l[0].name} (+${l.length - 1})` : l.map(x => x.name).join(' / ')) : null; };
 const noteKey = (kind, key) => `${kind}:${String(key).toUpperCase()}`;
 async function loadNotes() {
-  const rows = await fetch('/api/notes').then(r => r.json()).catch(() => []);
+  const [rows] = await Promise.all([fetch('/api/notes').then(r => r.json()).catch(() => []), loadItems()]);
   NOTES_DB = Object.fromEntries(rows.map(r => [noteKey(r.kind, r.key), r]));
   return NOTES_DB;
 }
