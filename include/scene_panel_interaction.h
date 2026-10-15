@@ -27,7 +27,9 @@ struct ScenePanelInteractionSubject {
     u8 changed;
 };
 struct ScenePanelInteractionView {
-    u8 unknown0[0x1E];
+    u8 unknown0[0x1A];
+    u16 initialMode;
+    u8 unknown1C[2];
     u8 subjectCount;
     u8 unknown1F[0x231];
     void (*presentationState)(struct ScenePanel *);
@@ -37,8 +39,10 @@ struct ScenePanelInteractionView {
     struct ContactPosition origin, approachPosition, center;
     u8 unknown518[0x6D0];
     struct ScenePanelInteractionSubject *subjects[4];
-    u8 unknownBF8[0x18];
-    u8 mode, unknownC11, gateC12;
+    u16 resourceScale;
+    u8 unknownBFA[0x15];
+    u8 skipMainSprite;
+    u8 mode, savedMode, gateC12;
     u8 unknownC13[3];
     u16 variant;
     u8 unknownC18[0x54];
