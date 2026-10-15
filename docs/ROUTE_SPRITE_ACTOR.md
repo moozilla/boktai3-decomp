@@ -114,3 +114,45 @@ candidate is retained privately and is being matched across its full extent.
 The bounded permuter search produced an apparent 455 score by deleting a
 register temporary's initialization before an asm input; that output was
 rejected. It is not a valid improvement over the initialized source.
+
+## Recovered path contracts (remaining bodies)
+
+The route state at `58` has a byte index at `5A`, completion byte at `5B`,
+resource pointer at `5C`, and current-point pointer at `60`. The resource's byte
+zero is its point count; its halfword at two is an offset used by `21E76C` to
+resolve the point array against the current map resource. A route point is eight
+bytes: `21E780` reads its X from offset zero and Z from two, while `21E7A0`
+reads flags from its halfword at four. It is therefore a separate format from
+`ContactPosition`; in particular its second halfword is not Y.
+
+The `D8–137` region holds twelve generated `ContactPosition` points and `138–13F`
+holds a final endpoint. The movement state can read point index twelve, so its
+private draft uses an unsigned address to select the endpoint without C array
+indexing beyond the twelve-point array. Byte `15C` is the current waypoint
+index. `D0` is a reference position: creation initially raises its Y by `2C8`,
+then path generation replaces it with a randomized player-relative destination.
+The existing `elevatedPosition` field name is retained pending integration.
+
+`6D438` selects a random route index, avoiding the previous index when possible,
+resolves the current route point, and chooses an X/Z offset around the player's
+position. It clears both endpoint heights, evaluates twelve cubic steps using
+fixed-point truncation, then copies the reference position into the endpoint.
+An initial actor-minus-player vector is calculated but not subsequently read;
+its observed stack writes are retained in the private matching draft. The
+coefficient expression includes the scalar tangent terms exactly as observed;
+no idealized spline formula is substituted.
+
+`6D740` initializes sequence `E`, copies the initial timer, chooses a random
+heading and tangent with magnitude 24, resets the movement timer to 1120, and
+prepares a path. Each tick approaches the current waypoint in X/Z using a
+minimum-one divisor derived from movement time divided by 64. Movement time is
+reduced by the increasing frame count. Reaching a point advances the waypoint;
+a completed set snaps to the reference point and prepares a new path. Its Y
+comes from the saved baseline plus a small sine-table bob, independently of the
+path's Y coordinate. Once the separate timer is zero, completion of a path
+cycle enters pause state 3. Packed playback updates sprite frames and flip
+flags but its completion result does not control this transition.
+
+All three remaining bodies have private full-extent semantic drafts. None are
+credited as exact; the permuter remains bounded and its candidates are audited
+for initialized register inputs, valid pointer lifetimes, and unchanged offsets.
