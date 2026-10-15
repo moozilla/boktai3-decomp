@@ -89,6 +89,7 @@ address,isa,evidence,replacement_end
 0804E1E0,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0804E214
 0804F6C4,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0804F6D0
 080511EC,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,080511F8
+08052E04,thumb,Independent 124-byte retract-state helper with push/pop-bx and two callback literals between52D60 and52E80; complete exact C,08052E80
 08058168,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08058184
 08058184,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,080581A0
 0805822C,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0805824C
