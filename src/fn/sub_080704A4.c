@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 struct SceneActorRegistryManager *sub_08072B44(void);
-struct SceneActorRegistryActor *SceneActorRegistry_FindLiving(void)
+struct SceneActorRegistryActor *SceneActorRegistry_FindLiving(u32 unusedCategory)
 {
     struct SceneActorRegistryNode *node;
     struct SceneActorRegistryActor *actor;
