@@ -1,13 +1,6 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x1cc];
-    u32 v;
-};
-void Script_Call(u32, u32);
-
-void sub_08055BC8(struct S *p)
+#include "stage_icon_display.h"
+void StageIconDisplay_CallCompletionScript(struct StageIconDisplay *display)
 {
-    if (p->v)
-        Script_Call(p->v, 0);
+    if (display->completionScriptId)
+        Script_Call(display->completionScriptId, 0);
 }

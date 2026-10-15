@@ -1,16 +1,8 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x1b8];
-    u8 m;
-};
-void sub_08055BA8(struct S *);
-void sub_08055BC8(struct S *);
-
-void sub_08055BE0(struct S *p)
+#include "stage_icon_display.h"
+void StageIconDisplay_NotifyCompletion(struct StageIconDisplay *display)
 {
-    if (p->m == 0)
-        sub_08055BA8(p);
+    if (!display->scriptCompletion)
+        StageIconDisplay_NotifyNative(display);
     else
-        sub_08055BC8(p);
+        StageIconDisplay_CallCompletionScript(display);
 }

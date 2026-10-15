@@ -1,8 +1,5 @@
-#include "global.h"
-
-void sub_08056CC0(void);
-
-void sub_08056CF8(void)
+#include "script_utility.h"
+void ScriptUtility_ClearControlFlagFromScript(void)
 {
-    sub_08056CC0();
+    ScriptUtility_ClearControlFlag();
 }
