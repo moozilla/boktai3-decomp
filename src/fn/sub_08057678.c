@@ -1,5 +1,4 @@
 #include "proximity_icon.h"
-#define ProximityIcon_IsPlayerNearby sub_08057678
 s32 ProximityIcon_IsPlayerNearby(struct ProximityIcon *icon)
 {
     s32 dx, dz;

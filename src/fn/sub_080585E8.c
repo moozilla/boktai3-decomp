@@ -1,5 +1,4 @@
 #include "scene_panel.h"
-#define ScenePanel_InitBackground sub_080585E8
 void ScenePanel_InitBackground(struct ScenePanel *panel)
 {
     void *map = ScriptProc_Start(0xC091, gUnk_08605A88[panel->resourceIndex]);

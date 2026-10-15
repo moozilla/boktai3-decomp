@@ -1,5 +1,4 @@
 #include "proximity_icon.h"
-#define ProximityIcon_InitFromScript sub_08057714
 s32 ProximityIcon_InitFromScript(struct ProximityIcon *icon)
 {
     struct ProjectedDisplayResource resource, *original = ScriptProc_Start(0xCB05, 0x82F1);
@@ -66,7 +65,7 @@ s32 ProximityIcon_InitFromScript(struct ProximityIcon *icon)
     sub_0821983C(&icon->animation, &resource, (u16)frame, 0, (u8)priority, 0, 60, &position);
     if (gUnk_030053F4 & 0x200)
         icon->animation.flags |= 1;
-    else if (sub_08057678(icon))
+    else if (ProximityIcon_IsPlayerNearby(icon))
         icon->animation.flags &= ~1;
     else
         icon->animation.flags |= 1;

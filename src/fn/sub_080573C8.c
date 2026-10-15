@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "level_advance_display.h"
-#define LevelAdvanceDisplay_DestroyManager sub_080573C8
 s32 LevelAdvanceDisplay_DestroyManager(struct LevelAdvanceManager *manager)
 {
     struct LevelAdvanceParticle *particle;

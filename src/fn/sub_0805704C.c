@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "level_advance_display.h"
-#define LevelAdvanceDisplay_UpdateParticle sub_0805704C
 void LevelAdvanceDisplay_UpdateParticle(struct LevelAdvanceParticle *input, void *resourceInput)
 {
     struct LevelAdvanceParticle *particle = input;

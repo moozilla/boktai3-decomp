@@ -1,5 +1,4 @@
 #include "level_advance_display.h"
-#define LevelAdvanceDisplay_InitSprite sub_080573F8
 void LevelAdvanceDisplay_InitSprite(struct LevelAdvanceManager *manager)
 {
     u8 *graphics = manager->graphics;

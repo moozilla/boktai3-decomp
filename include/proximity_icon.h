@@ -9,9 +9,9 @@ struct ProximityIcon {
     struct ProjectedDisplayEntry animation;
     struct ContactPosition origin;
 };
-s32 sub_08057678(struct ProximityIcon *);
-s32 sub_080576C8(struct ProximityIcon *);
-u32 sub_08057704(struct ProximityIcon *);
-s32 sub_08057714(struct ProximityIcon *);
+s32 ProximityIcon_IsPlayerNearby(struct ProximityIcon *);
+s32 ProximityIcon_Update(struct ProximityIcon *);
+u32 ProximityIcon_Destroy(struct ProximityIcon *);
+s32 ProximityIcon_InitFromScript(struct ProximityIcon *);
 void sub_0821983C(void *, void *, u32, u32, u32, u32, s32, const void *);
 #endif

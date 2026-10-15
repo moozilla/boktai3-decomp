@@ -1,5 +1,4 @@
 #include "scene_panel.h"
-#define ScenePanel_GetPaletteOffset sub_08058544
 s32 ScenePanel_GetPaletteOffset(struct ScenePanel *panel)
 {
     s32 result;

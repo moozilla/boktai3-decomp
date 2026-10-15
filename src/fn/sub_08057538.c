@@ -1,5 +1,4 @@
 #include "countdown_timer.h"
-#define CountdownTimer_Stop sub_08057538
 void CountdownTimer_Stop(void)
 {
     if (gUnk_0200049C) {

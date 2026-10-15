@@ -1,5 +1,4 @@
 #include "level_advance_display.h"
-#define LevelAdvanceDisplay_InitParticles sub_08057430
 void LevelAdvanceDisplay_InitParticles(struct LevelAdvanceManager *manager)
 {
     struct LevelAdvanceParticle *particle;
