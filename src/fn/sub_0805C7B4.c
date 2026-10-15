@@ -1,6 +1,6 @@
 #include "scene_panel_commands.h"
 #define ScenePanel_CountActiveSubjects sub_0805C7B4
-s32 ScenePanel_CountActiveSubjects(struct ScenePanelInteractionView *panel)
+s32 sub_0805C7B4(struct ScenePanelInteractionView *panel)
 {
     s32 active = 0;
     s32 remaining = panel->subjectCount;
