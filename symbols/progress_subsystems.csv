@@ -100,7 +100,86 @@ Orbit contact actor (tentative),08046880,08046B28,,Rotating resource-contact spr
 Floating number display,08046B34,0804732C,,Four-group decimal glyph singleton keyed by collision source; priority reuse world projection bounce and removal; notes/orbit-number-display_2026-10-14.md
 Transient sprite effects,08047338,080476F4,,Sixteen 0x58 slots; velocity damping animation aging singleton spawning and hidden script wrapper; notes/effects-background-flash_2026-10-14.md
 BG1 flash and scrolling controller (tentative),080476F4,08047BB4,,Five visibility/page states; camera-relative dual-page scrolling randomized speed and periodic effect forwarding; notes/effects-background-flash_2026-10-14.md
+Temporary animation pool,08047BB4,08047DBC,,notes/animation-contact-burst_2026-10-14.md; temporary animation allocation and lifecycle
+Directional particles,08047DBC,08047F68,,notes/animation-contact-burst_2026-10-14.md; update and guarded spawner
+Contact burst effects,08047F68,080483A0,,notes/animation-contact-burst_2026-10-14.md; contact-triggered effect controller
+Wireless link indicator,080483A0,080485FC,,notes/wireless-tether_2026-10-14.md; link indicator state and lifecycle
+Tether actor (tentative),080485FC,0804D620,,notes/tether-initialization_2026-10-14.md; notes/tether-world-states_2026-10-14.md; notes/tether-roaming-states_2026-10-14.md; shared tether state and segment ownership
+Countdown controller,0804D620,0804D778,,Countdown_Tick and adjacent script initialization in src/fn/sub_0804D620.c; shared timer task
+Staged sprite effect (tentative),0804D778,0804DF40,,notes/staged-effect_2026-10-14.md; five-sprite scripted effect and palette states
+Rectangular area effects,0804DF40,0804EFB4,,include/area_effect.h; singleton0200010C reset and bounds query precede notes/area-effect_2026-10-14.md and notes/area-effect-link_2026-10-14.md
+Stored-resource station (tentative),0804EFB4,0804F6C4,,notes/resource-station_2026-10-14.md; resource transfer and digit display lifecycle
+Repeated effects (tentative),0804F6C4,08050128,,notes/repeated-effect_2026-10-14.md; shared eight-entry manager; following script creator remains in same family
+Cell traversal gates,08050128,08050820,,notes/cell-gates_2026-10-14.md; cell registration and player traversal constraints
+Orbit background controller,08050820,080510B8,,notes/orbit-background_2026-10-14.md; shared player camera BG1 projection controller
+Directional force controller,080510B8,080515C0,,notes/directional-force_2026-10-14.md; threshold state and scripted force task
+Breakable props (tentative),080515C0,08051A3C,,notes/breakable-prop_2026-10-14.md; contact transition and prop lifecycle
+Proximity particle emitter,08051A3C,08052130,,notes/proximity-emitter_2026-10-14.md; particle slots and proximity owner
+Stacked actor (tentative),08052130,080537D0,,include/stacked_actor.h; StackedActor state callbacks and shared task ownership
+Interaction marker,080537D0,08053D8C,,notes/interaction-marker_2026-10-14.md; proximity marker state and lifecycle
+Saved-position marker,08053D8C,08054294,,notes/saved-position-marker_2026-10-14.md; stored-position predicate and marker lifecycle
+Hit switch (tentative),08054294,08054B80,,include/hit_switch.h; HitSwitch state callbacks contact and lifecycle
+Scripted display tracks,08054B80,08055678,,notes/display-track_2026-10-14.md; dynamic tagged animation tracks
+Script keyframe pool,08055678,08055B74,,notes/script-keyframe-pool_2026-10-14.md; shared dynamic keyframe manager
+Stage icon display (tentative),08055B74,0805606C,,notes/stage-icon-display_2026-10-14.md; four keyframe icons and staged reveal
+Terrain edge markers,0805606C,08056A60,,include/terrain_edge_marker.h; TerrainEdgeMarker states and resource lifecycle
+Script utility references,08056A60,08056D70,,notes/script-utility_2026-10-14.md; script flag and operand reference helpers
+Shaking icon display,08056D70,08056F20,,notes/shake-icon-display_2026-10-14.md; timed shake and completion task
+Level advance display (tentative),08056F20,0805751C,,include/level_advance_display.h; threshold display and script completion
+Countdown timer,0805751C,08057678,,notes/countdown-timer_2026-10-14.md; timer lifecycle and controls
+Proximity icon,08057678,08057960,,notes/proximity-icon_2026-10-14.md; proximity and icon lifecycle
+Scene panel presentation (tentative),08057960,08059428,,docs/SCENE_PANEL_EFFECTS.md; notes/scene-panel-states_2026-10-14.md; notes/scene-panel-background_2026-10-14.md; notes/scene-panel-schedule_2026-10-14.md
+Scene panel sprite rig,08059428,0805B28C,,notes/scene-panel-rig_2026-10-14.md; notes/scene-panel-rig-states_2026-10-14.md; docs/SCENE_PANEL_RIG_SETUP.md; fifteen shared rig sprites
+Scene panel control and lifecycle,0805B28C,0805CB88,,docs/SCENE_PANEL_INTERACTION.md; docs/SCENE_PANEL_CONFIGURATION.md; docs/SCENE_PANEL_ORCHESTRATION.md; docs/SCENE_PANEL_COMMANDS.md; docs/SCENE_PANEL_LIFECYCLE.md; parent creator endsCB88
+Scene panel subjects,0805CB88,0805DD18,,docs/SCENE_PANEL_SUBJECT.md; docs/SCENE_PANEL_SUBJECT_STATES.md; docs/SCENE_PANEL_SUBJECT_TAIL.md; docs/SCENE_PANEL_SUBJECT_INITIALIZER.md; subject states and creator
+HUD tilemaps and clock digits,0805DD18,0805E190,,docs/SCENE_HUD_MAP.md; docs/SCENE_HUD_DISPLAY.md
+Input marker widgets,0805E190,0805E484,,docs/SCENE_INPUT.md; shared marker pairs and input rendering
+Input grid and navigation,0805E484,0805EA58,,docs/SCENE_INPUT_GRID.md; docs/SCENE_INPUT_NAVIGATION.md; same grid storage and saved cursor
+Inventory values and display,0805EA58,0806055C,,docs/SCENE_INPUT_PANEL.md; docs/SCENE_INVENTORY_PANEL.md; docs/SCENE_INVENTORY_ACTIONS.md; shared comparison and catalog owner
+Inventory action transitions,0806055C,08061C3C,,docs/SCENE_INVENTORY_ACTIONS.md; docs/SCENE_INVENTORY_CONTROL.md; docs/SCENE_INVENTORY_STATES.md
+Inventory transactions and catalogs,08061C3C,08063634,,docs/SCENE_INVENTORY_TAIL.md; docs/SCENE_INVENTORY_LIFECYCLE.md; shared inventory task completion and catalog builders
+Scene audio events,08063634,080638BC,,docs/SCENE_INVENTORY_LIFECYCLE.md; event-to-song command dispatcher
+Roaming objects (tentative),080638BC,080645D4,,docs/SCENE_INVENTORY_LIFECYCLE.md; paired task layouts and parallel wander flash impulse states
+Actor attachment manager,080645D4,08066F90,,docs/ACTOR_ATTACHMENT.md; docs/ACTOR_ATTACHMENT_MANAGER.md; docs/SCENE_INVENTORY_LIFECYCLE.md; eight attachment slots and geometry helpers
+Scene actor slot controller,08066F90,08067C10,,docs/SCENE_ACTOR_CONTROL_PARTICLES.md; eight-slot controller at02000128 including hidden constructor and request loop
+Scene particle pools,08067C10,080688D0,,docs/SCENE_ACTOR_CONTROL_PARTICLES.md; include/scene_particle_pool.h; separate burst and anchored particle records
+Bouncing object pool (tentative),080688D0,08069964,,docs/BOUNCING_OBJECTS.md; shared physics pool contact state and active query
+Five-slot burst emitter,08069964,08069FA4,,docs/BURST_EMITTER.md; pool02000160
+Moving tile particles,08069FA4,0806A60C,,docs/SPARK_PARTICLE.md; 48-entry pool02000168
+Sprite effect controllers,0806A60C,0806BBB8,,docs/SPRITE_EFFECT_CONTROLLER.md; docs/SPRITE_EFFECT_STEERING_ACTORS.md; 24-entry pool02000178
+Steering actor pool (tentative),0806BBB8,0806CFE4,,docs/SPRITE_EFFECT_STEERING_ACTORS.md; pool02000188 and following state lifecycle
+Route sprite actor pool,0806CFE4,0806E34C,,docs/ROUTE_SPRITE_ACTOR.md; four-slot pool02000198
+Scene grid queries,0806E34C,0806EF04,,docs/SCENE_GRID.md; eight-column ten-row terrain-relative board
+Scene state and spatial queries,0806EF04,0806F3A8,,docs/SCENE_STATE_QUERIES.md; reset spatial filters and runtime-field updates
+Scheduled scene effects,0806F3A8,0806F7B0,,docs/SCENE_EFFECT_SCHEDULE.md; twelve-entry task0200019C
+Scene range watcher,0806F7B0,0806F990,,docs/SCENE_RANGE_WATCH.md; signed range transitions and script callbacks
+Scene actor pair records,0806F990,0806FAD4,,docs/SCENE_STATE_QUERIES.md; keyed actor pair-record operations
+Scene actor registry lifecycle,0806FAD4,08070070,,docs/SCENE_ACTOR_REGISTRY_LIFECYCLE.md; terminal nodes messages and rotating update cursor
+Scene actor registry queries,08070070,08070FA8,,docs/SCENE_ACTOR_REGISTRY_QUERIES.md; actor linked-list queries and script state access
+Scene actor registry manager,08070FA8,08071E00,,docs/SCENE_ACTOR_REGISTRY.md; manager020004A8 and actor-list020004AC
+Scene actor palettes and scripts,08071E00,08072854,,docs/SCENE_ACTOR_PALETTE_SCRIPT_CONTACTS.md; palette transitions and shared script properties
+Scene actor terrain reactions,08072854,08072BA8,,docs/SCENE_ACTOR_PALETTE_SCRIPT_CONTACTS.md; independent terrain reaction and manager access
+Scene actor contact candidates,08072BA8,08073C04,,docs/SCENE_ACTOR_PALETTE_SCRIPT_CONTACTS.md; docs/SCENE_ACTOR_CONTACTS.md; candidate list and selection
+Scene actor profiles,08073C04,0807462C,,docs/SCENE_ACTOR_CONTACTS.md; profile allocation and records initialized at73CC4
+Scene actor collision setup,0807462C,08076034,,docs/SCENE_ACTOR_BEHAVIOR.md; receiver registration colliders and behavior setup
+Scene actor animation selection,08076034,08076910,,docs/SCENE_ACTOR_ANIMATION.md; directional profile animation selection
+Scene actor terrain transitions,08076910,080772C0,,docs/SCENE_ACTOR_TERRAIN.md; neighbor cells slopes and script parameters
+Scene actor placement and feedback,080772C0,08078078,,docs/SCENE_ACTOR_PLACEMENT.md; reset callback shake and category sounds
+Scene actor behavior dispatch,08078078,0807A62C,,docs/SCENE_ACTOR_BEHAVIOR_FRONTIER.md; contact activation descriptor acceleration and complete behavior dispatcher
+Scene actor motion and updates,0807A62C,0807C11C,,docs/SCENE_ACTOR_UPDATE.md; docs/SCENE_ACTOR_MOTION.md; pending flags animation and route motion
+Scene actor attachment responses,0807C11C,0807E334,,docs/SCENE_ACTOR_ATTACHMENT_RESPONSES.md; attachment selection and responses
+Scene actor terrain targets and effects,0807E334,0807E9D0,,docs/SCENE_ACTOR_EFFECT_LIFECYCLE.md; terrain scans offsets route positions and resource cleanup
+Scene actor target and contact control,0807E9D0,0808005C,,docs/SCENE_ACTOR_TARGET_CONTROL.md; target resolution contact ownership and restored controls
+Scene actor reaction callbacks,0808005C,08082648,,docs/SCENE_ACTOR_REACTION_STATES.md; docs/SCENE_ACTOR_REACTION_TRANSITIONS.md; prepared state and drawable reaction paths
+Scene actor control phases,08082648,08084280,symbols/proposed/report-subsystems.csv,docs/SCENE_ACTOR_CONTROL_PHASE.md; docs/SCENE_ACTOR_CONTROL_MOTION.md; docs/SCENE_ACTOR_CONTROL_HELPERS.md; shared control context and interpolation helpers
+Scene actor visibility and stored motion,08084280,08084F44,,docs/SCENE_ACTOR_VISIBILITY.md; reviewed control-context visibility oscillation stored-position and entry callbacks
+Directional sprite effect (tentative),0813C040,0813C26C,,docs/REPORT_SUBSYSTEMS.md; shared sprite7FC and sequence840 orbit/directional effect consumers
+Four-effect center controller (tentative),0813C2EC,0813C798,,docs/REPORT_SUBSYSTEMS.md; shared four-effect array9A8 and center coordinatesA80/A84
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
+Large scene animation controller (tentative),081915E0,0819792C,,docs/REPORT_SUBSYSTEMS.md; reviewed controller portion with sixteen keyframes543C; task creators19783C and197890 allocate72FC bytes
+Buffered animation task (tentative),0819792C,08197DD0,,docs/REPORT_SUBSYSTEMS.md; independent graphics-buffer owner allocated count*32+0x28 with sprite and animation initialization
+Time palette transitions (tentative),08197DD0,08197EC4,symbols/proposed/report-subsystems.csv,docs/REPORT_SUBSYSTEMS.md; three phase-selected palette sources and64-tick transition through08221110
+Scripted key trigger,08197EC4,0819804C,,src/fn/sub_08197EC4.c; KeyTrigger_Update Init Create and task key-mask/message consumers
 State actor kind 086121C4 (tentative),081C66F8,081CC690,symbols/proposed/state-actors.csv,96-state table gUnk_086121C4 (first 16 shared with 0x0802FD60-0x08030658); helpers 081C66F8-081C6B84 precede the handlers; include/state_actor.h
 Scripted message actor 08612344 (tentative),081CC690,081CD484,symbols/proposed/state-actors.csv,state table gUnk_08612344 and dispatcher 081CD43C; command states wait on scene messages; src/message_actor_08612344.c
 Sound-test menu,081E1AF4,081E270C,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md and allocator 081E26CC callback chain
@@ -113,6 +192,7 @@ Task scheduler,08219F50,0821A184,symbols/proposed/subsystems.csv,Fourteen priori
 Resource registry,0821A184,0821A2DC,,Registration and lookup implementations in src/fn/sub_0821A184.c through sub_0821A2C4.c
 Message queue,0821A2DC,0821A454,,docs/MGS_GCL_MATCHING.md double-buffered message posting and receiving
 Script virtual machine,0821A454,0821BAFC,,docs/MGS_GCL_MATCHING.md resource lookup and bytecode decoding through expression evaluator; following allocator starts map/collision resource
+Scalar and vector interpolation,08221774,0822223C,symbols/proposed/report-subsystems.csv,docs/REPORT_SUBSYSTEMS.md; scalar approach wrapped angle clamp and vector helpers; 31 raw-tail entries independently reviewed and remain unmatched until exact C verification
 Clock and sun schedule (tentative),082284F4,0822AE7C,,RTC date helpers Clock_DaysInMonth; sun clock src/sun_clock.c and sub_08228C40; Time_CalculateSunriseSunset ends the block
 Music player slots (tentative),0822AE7C,0822B5D0,,Sound_PlaySong/StopSong wrappers over m4aSongNum* on 0x03005470; fade helpers 0822AF78-B058; song table 0x082643EC readers end at 0822B590
 Cartridge solar sensor,08243C10,08243EFC,symbols/proposed/solar.csv,docs/SOLAR_SENSOR.md complete eight-function GPIO and timer block

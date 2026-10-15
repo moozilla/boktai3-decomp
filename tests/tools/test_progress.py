@@ -84,6 +84,18 @@ class ProgressTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "overlap"):
             progress.make_report(funcs, sizes, done, libraries, pinned, groups + groups)
 
+    def test_scalar_helper_does_not_absorb_retained_math_routines(self):
+        funcs, sizes = progress.load_functions()
+        names = {address: name for name, address in funcs}
+        # The old next-labelled-start span credited 2,484 retained ASM bytes
+        # to this independently verified 52-byte C helper.
+        self.assertEqual(sizes[names[0x08221800]], 52)
+        self.assertEqual(sizes[names[0x08221834]], 40)
+        tail = [name for name, address in funcs
+                if 0x08221834 <= address < 0x082221E8]
+        self.assertEqual(len(tail), 31)
+        self.assertEqual(sum(sizes[name] for name in tail), 2484)
+
     def test_inventory_and_named_address_alias(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
