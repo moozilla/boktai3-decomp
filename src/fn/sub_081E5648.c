@@ -65,7 +65,7 @@ static inline u32 mode_bits(u8 *p, u32 mask)
     return result;
 }
 void sub_081E4174(void *);
-void AnimData_SelectTiles(void *, s32);
+void AnimData_SelectPaletteBank(void *, s32);
 void Sound_PlaySong(s32);
 void Script_Call(void *, s32);
 void ActorShadow_Enable(void *);

@@ -18,7 +18,7 @@ int BoardPiece_Initialize(struct GroupObjects *owner, struct GroupPiece *p, int 
     {
         void *r = resource;
         asm("" : "+r"(r));
-        AnimData_SelectTiles(r, 0x2D3);
+        AnimData_SelectPaletteBank(r, 0x2D3);
     }
     resource->palette = owner->palette;
     sprite = &p->sprite;
@@ -209,7 +209,7 @@ int sub_0800FC28(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
         p->sprite.position = p->position;
         p->sprite.flags &= ~1;
         sub_0800FA5C(m, r, 0);
-        AnimData_SelectTiles(&r->resource, 0x2D3);
+        AnimData_SelectPaletteBank(&r->resource, 0x2D3);
         p->resource.palette = m->palette;
         ActorShadow_Enable(r->transform);
     }
@@ -265,7 +265,7 @@ int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
         p->sprite.position = p->position;
         p->sprite.flags &= ~1;
         sub_0800FA5C(m, r, 0);
-        AnimData_SelectTiles(&r->resource, 0x2D3);
+        AnimData_SelectPaletteBank(&r->resource, 0x2D3);
         p->resource.palette = m->palette;
         ActorShadow_Enable(r->transform);
     }

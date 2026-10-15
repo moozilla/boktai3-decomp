@@ -82,7 +82,7 @@ s32 ContactActorPool_Start(struct ContactActorPool *pool, const struct ContactPo
         sprite->position = slot->position;
         slot->sprite.flags &= ~1;
         ContactActor_SetDirectionalSequence(pool, slot, 0);
-        AnimData_SelectTiles(slot->graphics, 0x2D3);
+        AnimData_SelectPaletteBank(slot->graphics, 0x2D3);
         sprite->tileData = (u8 *)pool + 0x1700;
         ActorShadow_Enable(slot->shadow);
         Collider_SetPosition(&slot->resourceCollider, actorPosition, 0);

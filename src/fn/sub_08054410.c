@@ -1,5 +1,4 @@
 #include "hit_switch.h"
-#define HitSwitch_UpdateBobbing sub_08054410
 void HitSwitch_UpdateBobbing(struct HitSwitchEntry *entry)
 {
     if (entry->bobPeriod) {
@@ -19,7 +18,7 @@ void HitSwitch_UpdateBobbing(struct HitSwitchEntry *entry)
         u16 *state;
         u32 flags;
         entry->completed = 1;
-        sub_080542A4(entry);
+        HitSwitch_RegisterCompletedCell(entry);
         state = &entry->collider.state;
         flags = *state;
         {
@@ -27,6 +26,6 @@ void HitSwitch_UpdateBobbing(struct HitSwitchEntry *entry)
             mask |= flags;
             *state = mask;
         }
-        sub_08054294(entry, sub_080544B4);
+        HitSwitch_SetUpdate(entry, HitSwitch_AnimateBobbingCompletion);
     }
 }

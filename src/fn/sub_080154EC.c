@@ -51,7 +51,7 @@ struct Config {
 };
 struct Manager *sub_0801548C(int, int);
 int Mod(int, int);
-void AnimData_SelectTiles(void *, int);
+void AnimData_SelectPaletteBank(void *, int);
 int AnimatedParticle_PriorityFromFlags(int);
 void sub_08220D44(void *, int);
 void sub_08214374(void *, int);
@@ -153,27 +153,27 @@ start:
             p->velocity.z = scale12(p->direction.z, p->horizontalScale);
             if (p->pad1 == 5) {
                 AnimData_Load(p->resource, 0x61f9);
-                AnimData_SelectTiles(p->resource, 0x29f);
+                AnimData_SelectPaletteBank(p->resource, 0x29f);
                 setFrame(&p->sprite, 32);
                 a = &p->anim;
                 Anim_SetSequence(a, gUnk_02000068->resources[1], 6, 0, 0);
             } else if (p->pad1 == 6) {
                 AnimData_Load(p->resource, 0x61f9);
-                AnimData_SelectTiles(p->resource, 0x2a7);
+                AnimData_SelectPaletteBank(p->resource, 0x2a7);
                 setFrame(&p->sprite, 32);
                 a = &p->anim;
                 Anim_SetSequence(a, gUnk_02000068->resources[1], 6, 0, 0);
                 asm("" : : "r"(a), "i"(6));
             } else if (p->pad1 == 7) {
                 AnimData_Load(p->resource, 0x61f9);
-                AnimData_SelectTiles(p->resource, 0x2a6);
+                AnimData_SelectPaletteBank(p->resource, 0x2a6);
                 setFrame(&p->sprite, 45);
                 a = &p->anim;
                 Anim_SetSequence(a, gUnk_02000068->resources[1], 8, 0, 0);
                 asm("" : : "r"(a), "i"(7));
             } else {
                 AnimData_Load(p->resource, 0x4384);
-                AnimData_SelectTiles(p->resource, p->pad1 + 182);
+                AnimData_SelectPaletteBank(p->resource, p->pad1 + 182);
                 a = &p->anim;
                 Anim_SetSequence(a, gUnk_02000068->resources[0], 0, 0, 0);
             }

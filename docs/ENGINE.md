@@ -620,8 +620,9 @@ Most logic is in the controllers listed in section 4.
   animation resource (`include/engine.h`). Animation resources live in the
   registry-like header at `gUnk_03004300`, with sub-table bases at
   `gUnk_030042F8`/`gUnk_030042FC` (`sub_082151C0`). `AnimData_FindEntry(id)` and
-  `AnimData_Load(anim, id)` find an entry by id. `AnimData_SelectTiles(anim, index)`
-  selects one 32-byte tile from the bank at `gUnk_030042E4` *(guess)*.
+  `AnimData_Load(anim, id)` find an entry by id. `AnimData_SelectPaletteBank(anim, index)`
+  selects one 32-byte palette bank at `gUnk_030042E4`. The display-track and hit-switch
+  updaters read its sixteen RGB15 colors and blend each 5-bit channel independently.
 * **Command queues.** The background and colour-fade controllers accept up to
   eight queued commands, filled by script commands and drained by the frame update.
 * **Scanline effects.** Per-scanline (HBlank) tables drive wave distortion,

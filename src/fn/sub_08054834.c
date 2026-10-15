@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "hit_switch.h"
-#define HitSwitch_InitEntryFromScript sub_08054834
 void sub_08225AB4(struct SceneBody *, u32, struct SceneVec *, u32, u32, struct HitSwitchEntry *);
 void sub_08003C00(struct SceneBody *);
 void HitSwitch_InitEntryFromScript(struct HitSwitchManager *input)
@@ -84,7 +83,7 @@ void HitSwitch_InitEntryFromScript(struct HitSwitchManager *input)
             period = Script_GetValue();
         entry->bobPeriod = period;
     }
-    sub_080547B0(entry);
+    HitSwitch_InitCollider(entry);
     {
         u8 *cooldown = &entry->hitCooldown;
         register u32 zero asm("r0") = 0;
@@ -100,7 +99,7 @@ void HitSwitch_InitEntryFromScript(struct HitSwitchManager *input)
     if (entry->completed) {
         u16 *state;
         u32 flags, mask;
-        sub_080542A4(entry);
+        HitSwitch_RegisterCompletedCell(entry);
         state = &entry->collider.state;
         flags = *state;
         mask = 4;
@@ -109,17 +108,17 @@ void HitSwitch_InitEntryFromScript(struct HitSwitchManager *input)
         sprite->frame = 2;
         if (entry->kind == 0) {
             sprite->renderMode = 2;
-            sub_08054294(entry, sub_0805440C);
+            HitSwitch_SetUpdate(entry, HitSwitch_TickCompletedStatic);
         } else
-            sub_08054294(entry, sub_08054538);
+            HitSwitch_SetUpdate(entry, HitSwitch_UpdateCompletedBobbing);
     } else {
         entry->cellRegistered = 0;
         sprite->frame = 0;
         sprite->renderMode = 3;
         if (entry->kind == 0)
-            sub_08054294(entry, sub_08054354);
+            HitSwitch_SetUpdate(entry, HitSwitch_UpdateStatic);
         else
-            sub_08054294(entry, sub_08054410);
+            HitSwitch_SetUpdate(entry, HitSwitch_UpdateBobbing);
     }
     if (Script_SeekToKeyword('g')) {
         entry->tag = Script_GetValue();

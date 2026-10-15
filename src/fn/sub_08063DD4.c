@@ -6,7 +6,7 @@ struct P {
 void AnimData_Load(u8 *, u32);
 void Sprite_Init(u8 *, u8 *, u32);
 void sub_08225B28(u8 *, u8 *);
-void AnimData_SelectTiles(u8 *, u32);
+void AnimData_SelectPaletteBank(u8 *, u32);
 u32 ScriptProc_Start(u32, u32);
 void sub_08063B24(u8 *);
 
@@ -18,7 +18,7 @@ void sub_08063DD4(u8 *p)
     b = p + 0x64;
     Sprite_Init(b, a, 0);
     sub_08225B28(p + 0x1c, b);
-    AnimData_SelectTiles(a, 0x193);
+    AnimData_SelectPaletteBank(a, 0x193);
     *(struct P *)(p + 0x80) = *(struct P *)(p + 0x28);
     *(u32 *)(p + 0x120) = ScriptProc_Start(0x922E, 0x1DF8);
     *(u16 *)(p + 0x138) = 7;

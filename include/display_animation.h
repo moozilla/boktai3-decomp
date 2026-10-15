@@ -3,7 +3,11 @@
 /* Tentative common display wrapper: kind 1 uses sequence sprites; kind 2 uses keyframes. */
 #include "engine.h"
 struct DisplayAnimationResource {
-    u8 unknown0[0x28];
+    u8 unknown0[6];
+    u16 paletteIndex;
+    u8 unknown8[4];
+    const void *paletteData;
+    u8 unknown10[0x18];
     u32 flags;
     u8 unknown2C[0x2C];
     void *sequence;
@@ -44,6 +48,6 @@ struct DisplayKeyframeState {
     u8 palette, paletteVariant;
     u16 attribute;
     u8 unknown38[2];
-    u16 tile;
+    u16 paletteIndex;
 };
 #endif

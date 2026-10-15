@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "display_track.h"
-#define DisplayTrack_AddFromScript sub_08055268
 void sub_08220D44(void *, u32);
 void DisplayTrack_AddFromScript(void)
 {
@@ -37,7 +36,7 @@ void DisplayTrack_AddFromScript(void)
         {
             u32 palette = Script_GetKeywordValue('c', 0);
             if (palette)
-                AnimData_SelectTiles(graphics, palette);
+                AnimData_SelectPaletteBank(graphics, palette);
         }
         track->paletteBase = graphics->defaultPalette;
         track->mirror = 0;

@@ -1,6 +1,6 @@
 #include "stacked_actor.h"
 void Sound_PlaySong(u32);
-void AnimData_SelectTiles(void *, u32);
+void AnimData_SelectPaletteBank(void *, u32);
 void Trigger_ConsumePending(void *, u32);
 void StackedActor_RaiseLift(struct StackedActor *actor)
 {
@@ -22,11 +22,11 @@ void StackedActor_RaiseLift(struct StackedActor *actor)
         actor->sprite.position.y = (u16)actor->world.y + actor->lift;
     }
     if (actor->animationPhase > 7)
-        AnimData_SelectTiles(actor->graphics, actor->tileBase + 2);
+        AnimData_SelectPaletteBank(actor->graphics, actor->paletteBase + 2);
     else if (actor->animationPhase)
-        AnimData_SelectTiles(actor->graphics, actor->tileBase + 1);
+        AnimData_SelectPaletteBank(actor->graphics, actor->paletteBase + 1);
     else
-        AnimData_SelectTiles(actor->graphics, actor->tileBase);
+        AnimData_SelectPaletteBank(actor->graphics, actor->paletteBase);
     if (actor->lift > 23) {
         StackedActor_SetUpdate(actor, StackedActor_HoldLift);
         Trigger_ConsumePending(actor->trigger, 1);

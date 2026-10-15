@@ -5,7 +5,7 @@ s32 DisplayAnimation_InitializeKeyframes(struct DisplayAnimation *, u32, s32,
                                          const struct DisplayPosition *);
 s32 DisplayAnimation_InitializeSequence(struct DisplayAnimation *, s32, u32, s32,
                                         const struct DisplayPosition *);
-void DisplayAnimation_SelectTiles(struct DisplayAnimation *, u32);
+void DisplayAnimation_SelectPaletteBank(struct DisplayAnimation *, u32);
 void DisplayAnimation_SetTileSource(struct DisplayAnimation *, u32);
 void DisplayAnimation_SetPriority(struct DisplayAnimation *, u32);
 void TetherActor_InitDisplayFromScript(struct TetherActor *actor)
@@ -43,7 +43,7 @@ void TetherActor_InitDisplayFromScript(struct TetherActor *actor)
         DisplayAnimation_InitializeSequence(display, 0x2499, 0x3D95, 0, initialPosition);
         TetherActor_SetEntry(actor, 0);
         actor->appliedPalette = *paletteIndex;
-        DisplayAnimation_SelectTiles(display, actor->appliedPalette + 0x283);
+        DisplayAnimation_SelectPaletteBank(display, actor->appliedPalette + 0x283);
         if (display->kind == 2)
             palette = actor->display.colors.keyframePalette;
         else

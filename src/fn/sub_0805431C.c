@@ -1,5 +1,4 @@
 #include "hit_switch.h"
-#define HitSwitch_ReceiveCollision sub_0805431C
 void HitSwitch_ReceiveCollision(struct SceneCollider *other, void *unused,
                                 struct HitSwitchEntry *entry)
 {

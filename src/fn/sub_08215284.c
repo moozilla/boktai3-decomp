@@ -1,18 +1,18 @@
 #include "global.h"
 
-struct Obj {
-    u8 pad[6];
-    u16 f6;
-    u8 pad8[4];
-    u32 fC;
+struct SequencePaletteView {
+    u8 unknown0[6];
+    u16 paletteIndex;
+    u8 unknown8[4];
+    u32 paletteData;
 };
 extern u16 gUnk_030042E0;
 extern u8 *gUnk_030042E4;
 
-void AnimData_SelectTiles(struct Obj *o, s32 i)
+void AnimData_SelectPaletteBank(struct SequencePaletteView *o, s32 i)
 {
     if (i < gUnk_030042E0) {
-        o->f6 = i;
-        o->fC = (u32)gUnk_030042E4 + (o->f6 << 5);
+        o->paletteIndex = i;
+        o->paletteData = (u32)gUnk_030042E4 + (o->paletteIndex << 5);
     }
 }

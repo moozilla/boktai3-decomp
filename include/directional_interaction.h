@@ -76,7 +76,7 @@ s32 sub_0822C034(struct SceneVec *);
 s32 Math_Atan2(s32, s32);
 s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
-void AnimData_SelectTiles(void *, u32 animation);
+void AnimData_SelectPaletteBank(void *, u32 animation);
 void Sprite_Remove(void *);
 void Heap_Free(void *);
 void *Heap_Alloc(u32);

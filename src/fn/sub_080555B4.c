@@ -1,5 +1,4 @@
 #include "display_track.h"
-#define DisplayTrack_DestroyManager sub_080555B4
 void sub_08013684(void);
 s32 DisplayTrack_DestroyManager(struct DisplayTrackManager *manager)
 {

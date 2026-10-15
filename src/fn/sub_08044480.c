@@ -23,7 +23,7 @@ void ContactSwarm_UpdateReaction(struct ContactSwarm *pool, struct ContactSwarmS
         slot->enter = 0;
         collider = &slot->display.healthCollider;
         collider->flags |= 4;
-        AnimData_SelectTiles(&slot->display.animation.draw.graphics, 0x192);
+        AnimData_SelectPaletteBank(&slot->display.animation.draw.graphics, 0x192);
         ContactSwarm_SetDirectionalSequence(pool, slot, 1);
         Sound_PlaySong(0xE8);
     }
@@ -58,7 +58,7 @@ void ContactSwarm_UpdateReaction(struct ContactSwarm *pool, struct ContactSwarmS
         ContactSwarm_HideSlot(pool, slot, index);
     else {
         if (slot->stateFrame == 6)
-            AnimData_SelectTiles(&slot->display.animation.draw.graphics, 0x2D3);
+            AnimData_SelectPaletteBank(&slot->display.animation.draw.graphics, 0x2D3);
         if ((slot->stateFrame >> 2) & 1)
             slot->display.animation.draw.sprite.flags &= ~1;
         else

@@ -1,5 +1,4 @@
 #include "hit_switch.h"
-#define HitSwitch_AnimateStaticCompletion sub_08054394
 void HitSwitch_AnimateStaticCompletion(struct HitSwitchEntry *entry)
 {
     entry->sprite.renderMode = 2;
@@ -10,7 +9,7 @@ void HitSwitch_AnimateStaticCompletion(struct HitSwitchEntry *entry)
         entry->sprite.frame = 1;
     else {
         entry->sprite.frame = 2;
-        sub_08054294(entry, sub_0805440C);
+        HitSwitch_SetUpdate(entry, HitSwitch_TickCompletedStatic);
         if (entry->completedScriptId) {
             s32 value;
             struct HitSwitchScriptArgs args;

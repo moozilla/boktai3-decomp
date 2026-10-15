@@ -56,7 +56,7 @@ void SavedPositionMarker_TickIdle(struct SavedPositionMarker *marker)
         marker->primary.sprite.position.y = marker->position.y + marker->height;
     }
     if (marker->activationFrame > 7)
-        AnimData_SelectTiles(&marker->primary.graphics, 0x168);
+        AnimData_SelectPaletteBank(&marker->primary.graphics, 0x168);
     else
-        AnimData_SelectTiles(&marker->primary.graphics, marker->baseTile);
+        AnimData_SelectPaletteBank(&marker->primary.graphics, marker->paletteBase);
 }

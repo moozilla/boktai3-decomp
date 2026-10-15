@@ -1,10 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "script_keyframe_pool.h"
-#define ScriptKeyframe_FindFromScript sub_08055678
-struct ScriptKeyframeTagView {
-    u8 prefix[0xB4];
-    u16 tag;
-};
 struct ScriptKeyframeEntry *ScriptKeyframe_FindFromScript(void)
 {
     struct ScriptKeyframeManager **manager = &gUnk_02000498;

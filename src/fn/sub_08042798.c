@@ -1,12 +1,12 @@
 #include "display_animation.h"
-void sub_08219A80(void *, u32);
-s32 DisplayAnimation_SelectTiles(struct DisplayAnimation *display, u32 index)
+void Anim_SelectPaletteBank(void *, u32);
+s32 DisplayAnimation_SelectPaletteBank(struct DisplayAnimation *display, u32 index)
 {
     if (!display->kind)
         return -1;
     if (display->kind == 1)
-        AnimData_SelectTiles(&display->resource, index);
+        AnimData_SelectPaletteBank(&display->resource, index);
     else
-        sub_08219A80((u8 *)display + 0x2C, index);
+        Anim_SelectPaletteBank((u8 *)display + 0x2C, index);
     return 0;
 }

@@ -1,5 +1,4 @@
 #include "script_keyframe_pool.h"
-#define ScriptKeyframe_UpdateEntry sub_08055828
 void ScriptKeyframe_UpdateEntry(struct ScriptKeyframeEntry *entry)
 {
     if (entry->moving) {

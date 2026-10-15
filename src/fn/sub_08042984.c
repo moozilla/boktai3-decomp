@@ -24,7 +24,7 @@ void ContactActor_InitializeSlot(struct ContactActorPool *pool, struct ContactAc
     slot->direction = 0;
     graphics = slot->graphics;
     AnimData_Load(graphics, 0xDA6D);
-    AnimData_SelectTiles(graphics, 0x2D3);
+    AnimData_SelectPaletteBank(graphics, 0x2D3);
     *(void **)((u8 *)graphics + 0xC) = pool->tileData;
     sprite = &slot->sprite;
     Sprite_Init(sprite, graphics, 1);

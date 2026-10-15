@@ -1,8 +1,7 @@
 #include "script_keyframe_pool.h"
-#define ScriptKeyframe_SetTargetFromScript sub_080557BC
 void ScriptKeyframe_SetTargetFromScript(void)
 {
-    struct ScriptKeyframeEntry *entry = sub_08055678();
+    struct ScriptKeyframeEntry *entry = ScriptKeyframe_FindFromScript();
     if (entry) {
         if (Script_SeekToKeyword('p')) {
             entry->target.x = Script_GetValue();

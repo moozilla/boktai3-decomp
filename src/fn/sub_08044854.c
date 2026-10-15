@@ -37,7 +37,7 @@ s32 ContactSwarm_SpawnCharge(struct ContactSwarm *poolInput,
                 const struct ContactPosition *current = position;
                 *destination = *current;
             }
-            AnimData_SelectTiles(&slot->display.animation.draw.graphics, 0x2D3);
+            AnimData_SelectPaletteBank(&slot->display.animation.draw.graphics, 0x2D3);
             {
                 register struct ContactSwarmColliderAnimation *display asm("r6") = (void *)health;
                 display->animation.draw.sprite.flags &= ~1;

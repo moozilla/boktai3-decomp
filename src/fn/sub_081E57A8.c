@@ -57,7 +57,7 @@ void sub_081E4188(void *);
 void ActorShadow_Disable(void *);
 void sub_081E41EC(void *);
 void sub_081E4174(void *);
-void AnimData_SelectTiles(void *, s32);
+void AnimData_SelectPaletteBank(void *, s32);
 void Sound_PlaySong(s32);
 void Script_Call(void *, s32);
 void ActorShadow_Enable(void *);
@@ -91,7 +91,7 @@ void sub_081E5608(void *, void *);
 void sub_081E57A8(struct S *p, struct Child *c)
 {
     if (child_take(c)) {
-        AnimData_SelectTiles(c->sprite, c->effect + 2);
+        AnimData_SelectPaletteBank(c->sprite, c->effect + 2);
         c->flags &= ~1;
     }
 }

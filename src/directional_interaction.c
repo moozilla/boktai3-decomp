@@ -59,7 +59,7 @@ u32 sub_080095B4(struct DirectionalController *p, u32 level)
 {
     void *animation = p->animation;
     if (p->disabled == 0)
-        AnimData_SelectTiles(animation, level + 0x6b);
+        AnimData_SelectPaletteBank(animation, level + 0x6b);
 }
 
 /* Places the controller and its marker around the given point. */

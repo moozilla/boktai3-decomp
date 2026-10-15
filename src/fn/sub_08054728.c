@@ -1,5 +1,4 @@
 #include "hit_switch.h"
-#define HitSwitch_DestroyManager sub_08054728
 void sub_08225938(struct SceneBody *);
 void sub_0821D6D0(struct SceneCellRef *);
 s32 HitSwitch_DestroyManager(struct HitSwitchManager *manager)

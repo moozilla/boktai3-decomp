@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "display_track.h"
-#define DisplayTrack_Update sub_08054EC0
 
 void DisplayTrack_Update(struct DisplayTrack *track)
 {
@@ -24,7 +23,7 @@ void DisplayTrack_Update(struct DisplayTrack *track)
         track->paletteFrame++;
         duration = &track->paletteDuration;
         if (track->paletteFrame >= *duration) {
-            AnimData_SelectTiles(&track->graphics, track->paletteBase + track->paletteEnd);
+            AnimData_SelectPaletteBank(&track->graphics, track->paletteBase + track->paletteEnd);
             track->flags &= ~2;
         } else {
             s32 i;

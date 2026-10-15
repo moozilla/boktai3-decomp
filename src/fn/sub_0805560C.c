@@ -1,8 +1,7 @@
 #include "display_track.h"
-#define DisplayTrack_CreateManagerFromScript sub_0805560C
-u32 sub_08055578(struct DisplayTrackManager *);
-s32 sub_080555B4(struct DisplayTrackManager *);
-s32 sub_080555F8(struct DisplayTrackManager *, u32, u32, u32);
+u32 DisplayTrack_TickManager(struct DisplayTrackManager *);
+s32 DisplayTrack_DestroyManager(struct DisplayTrackManager *);
+s32 DisplayTrack_InitManager(struct DisplayTrackManager *, u32, u32, u32);
 struct DisplayTrackManager *DisplayTrack_CreateManagerFromScript(u32 arg1, u32 arg2)
 {
     if (gUnk_02000494)
@@ -16,9 +15,9 @@ struct DisplayTrackManager *DisplayTrack_CreateManagerFromScript(u32 arg1, u32 a
             capacity = 1;
         manager = Task_Create(9, capacity * sizeof(struct DisplayTrack) + 0x1C);
         if (manager) {
-            Task_SetCallbacks(manager, (void (*)(void *))sub_08055578,
-                              (void (*)(void *))sub_080555B4);
-            if (sub_080555F8(manager, arg1, arg2, capacity) < 0) {
+            Task_SetCallbacks(manager, (void (*)(void *))DisplayTrack_TickManager,
+                              (void (*)(void *))DisplayTrack_DestroyManager);
+            if (DisplayTrack_InitManager(manager, arg1, arg2, capacity) < 0) {
                 Task_Kill(manager);
                 return 0;
             }

@@ -1,5 +1,4 @@
 #include "hit_switch.h"
-#define HitSwitch_GetCompletionFromScript sub_08054B08
 u32 HitSwitch_GetCompletionFromScript(void)
 {
     struct HitSwitchManager *manager = gUnk_02000490;

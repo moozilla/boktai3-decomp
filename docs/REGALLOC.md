@@ -82,6 +82,16 @@ Note: `check.py FILE` without `--nonmatching` compiles a draft's
 * **Two shifts.** The permuter found `(c->height >> 2) >> 2` for `>> 4`
   (`sub_08013458`).
 
+* **Natural r7 allocation.** `local-alloc.c` excludes every eliminable register
+  in `find_free_reg` (lines1917–1918 in the pinned source), including the Thumb
+  frame pointer. Global allocation can still place a pseudo there and relocate
+  it if reload needs a frame pointer. In `StackedActor_InitRisingParticle`
+  (`080521DC`), reusing one ordinary u32 scratch for768, the loaded Y coordinate
+  and the final zero Z velocity gave it multiple lifetimes and moved it into
+  global allocation. The compiler then selected r7 naturally, closing the match
+  without binding r7 explicitly. Keep independent particle fields typed; the
+  reused local is a compiler-lifetime concession rather than shared game state.
+
 ## Known patterns not solved yet
 
 * **Commutative operand order** (`adds r1, r1, r0` vs `adds r1, r0, r1`).

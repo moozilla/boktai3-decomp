@@ -1,5 +1,4 @@
 #include "script_keyframe_pool.h"
-#define ScriptKeyframe_DestroyManager sub_08055AC4
 s32 ScriptKeyframe_DestroyManager(struct ScriptKeyframeManager *manager)
 {
     s32 i = 0;

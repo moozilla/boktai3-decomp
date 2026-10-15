@@ -3,7 +3,7 @@
 // fuzzy: 73.3%
 // 19 differing instruction runs; first diff at +0xA (sub sp, #4 vs sub sp, #8)
 void AnimData_Load(u8 *, u32);
-void AnimData_SelectTiles(u8 *, u32);
+void AnimData_SelectPaletteBank(u8 *, u32);
 void Sprite_Init(u8 *, u8 *, u32);
 void *ScriptProc_Start(u32, u32);
 void sub_081625C0(u8 *s, u8 *source, void *a, void *b)
@@ -24,19 +24,19 @@ void sub_081625C0(u8 *s, u8 *source, void *a, void *b)
     p += 0x1C;
     key = 0x6250;
     AnimData_Load(p, key);
-    AnimData_SelectTiles(p, 0x116);
+    AnimData_SelectPaletteBank(p, 0x116);
     p += 0x1C;
     AnimData_Load(p, key);
-    AnimData_SelectTiles(p, 0x118);
+    AnimData_SelectPaletteBank(p, 0x118);
     p += 0x1C;
     AnimData_Load(p, key);
-    AnimData_SelectTiles(p, 0x119);
+    AnimData_SelectPaletteBank(p, 0x119);
     p += 0x1C;
     AnimData_Load(p, key);
-    AnimData_SelectTiles(p, 0x11A);
+    AnimData_SelectPaletteBank(p, 0x11A);
     p += 0x1C;
     AnimData_Load(p, key);
-    AnimData_SelectTiles(p, 0x11B);
+    AnimData_SelectPaletteBank(p, 0x11B);
     entry = s + 0xC4;
     i = 0;
     do {

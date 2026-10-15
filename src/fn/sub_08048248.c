@@ -20,7 +20,7 @@ s32 ContactBurst_Initialize(struct ContactBurst *effect, const struct ContactPos
         return -1;
     sprite = &effect->sprite;
     Sprite_Init(sprite, graphics, 0x211);
-    AnimData_SelectTiles(graphics, 0x164);
+    AnimData_SelectPaletteBank(graphics, 0x164);
     sprite->frame = 27;
     sprite->priority = 1;
     bounds.x = 96;
