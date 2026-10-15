@@ -1,18 +1,14 @@
-#include "global.h"
-
-void SceneInputPanel_ResetHighlights(u8 *, u8 *);
-void Sound_PlaySong(s32);
-s32 SceneInputPanel_AdjustSlidingY(u8 *, s32, u16);
-void sub_08061B48(u8 *);
-
-s32 sub_08062778(u8 *p)
+#include "scene_inventory_lifecycle.h"
+s32 SceneInputPanel_AdjustSlidingY(struct SceneInputWidget *, s32, u16);
+void SceneInventory_BeginAlternateSelection(struct SceneInventoryTail *);
+s32 SceneInventory_TickSaleFeedback(struct SceneInventoryTail *p)
 {
-    u16 *q;
-    SceneInputPanel_ResetHighlights(p, p + 0x1D00);
-    q = (u16 *)(p + 0x1AEE);
-    if (*q == 0)
-        Sound_PlaySong(0x276);
-    if (SceneInputPanel_AdjustSlidingY(p + 0xB88, 0x20, *q))
-        sub_08061B48(p);
+    u16 *frame;
+    SceneInputPanel_ResetHighlights(&p->display, &p->highlight);
+    frame = &((struct SceneInventoryLifecycle *)p)->frame;
+    if (*frame == 0)
+        Sound_PlaySong(630);
+    if (SceneInputPanel_AdjustSlidingY(&p->display.buttons[0], 32, *frame))
+        SceneInventory_BeginAlternateSelection(p);
     return 0;
 }

@@ -1,11 +1,10 @@
-#include "global.h"
-
-void SceneInputPanel_RequestAction(u8 *, s32 (*)(u8 *));
-s32 sub_080631E8(u8 *);
-
-s32 sub_080631C4(u8 *p)
+#include "scene_inventory_lifecycle.h"
+s32 SceneInventory_RunController(struct SceneInventoryTail *);
+void SceneInputPanel_RequestAction(struct SceneInventoryTail *,
+                                   s32 (*)(struct SceneInventoryTail *));
+s32 SceneInventory_WaitForController(struct SceneInventoryTail *p)
 {
-    if (*(u16 *)(p + 0x1AEE) > 0x1f)
-        SceneInputPanel_RequestAction(p, sub_080631E8);
+    if (((struct SceneInventoryLifecycle *)p)->frame > 31)
+        SceneInputPanel_RequestAction(p, SceneInventory_RunController);
     return 0;
 }

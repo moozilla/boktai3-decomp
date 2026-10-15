@@ -1,9 +1,7 @@
-#include "global.h"
-
-void sub_0806374C(void *);
-
-s32 sub_0806385C(void *p)
+#include "scene_event_dispatch.h"
+s32 SceneAudioEvent_DispatchPending(struct SceneEventDispatchTask *);
+s32 SceneAudioEvent_Tick(struct SceneEventDispatchTask *owner)
 {
-    sub_0806374C(p);
+    SceneAudioEvent_DispatchPending(owner);
     return 0;
 }

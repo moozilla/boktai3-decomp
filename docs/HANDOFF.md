@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 26.912% matching (2026-10-14). This file is the single
+Last updated after reaching 27.405% matching (2026-10-15). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,53 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 15 (Codex/team): inventory controller, events and attachment helpers
+
+Exact code is **27.405%**, up **0.4924 percentage points** (+11,892 bytes)
+from PR148: **6,838 /11,472 functions**, **661,922 /2,415,354 bytes**.
+Without register pinning: **20.688%**; Register-pinned: **6.717%**, included
+above. Fifty-eight new exact functions add4,808 ordinary-C bytes and7,084 bytes
+with minimized concessions. The78 guarded drafts (25,620 bytes) receive no
+exact credit;645D4 is now exact. Two false interior push starts6070C/60D10
+were removed through reviewed `symbols/function_nonentries.csv` metadata;
+the byte denominator is unchanged. The metadata has two regression tests.
+
+The reviewed range **6055C–64DF8** contains145 functions /18,588 bytes:
+142 exact /17,796 bytes, with three swap-setup gaps (6055C/60A70/60DB4,
+792 bytes). The last differences in all three are reverse-copy setup ordering;
+long permuter searches continue in private build directories. Earlier E484,
+E5E4 and F904 gaps remain, so the continuous exact span still stops at5E484.
+
+Recovered contracts cover inventory move predicates and animation setup,
+confirmation and transaction states, catalog population and controller lifecycle,
+audio command dispatch, two roaming-object families and attachment geometry.
+See [state setups](SCENE_INVENTORY_STATES.md),
+[control](SCENE_INVENTORY_CONTROL.md), [tail](SCENE_INVENTORY_TAIL.md),
+[lifecycle/events](SCENE_INVENTORY_LIFECYCLE.md) and
+[attachments](ACTOR_ATTACHMENT.md). Purchase/sale handlers establish the
+previously tentative economic interpretation of displayed values. Callback
+storage preserves concrete handler return contracts; script metadata uses a
+16-bit bitfield store rather than an uninitialized scalar read. No new runtime
+coverage or specific screen identity is claimed.
+
+The goal remains **30% exact or20% account usage remaining**. The meter reset
+externally; latest reading90% remaining, no reset consumed by us. Three workers
+are active on separate following ranges: Sol64DF8–65C40, lifecycle65C40–67148,
+tail67148–68500. Root owns68500 onward after integration. All use private builds;
+the dirty primary Claude checkout remains untouched. Frozen permuter job
+metadata is in root `build/inventory-permuter-jobs.json`; E484/E5E4 and the
+three swap candidates retain private resumable search directories.
+
+PR148 merged at1c5b441b and main Actions38694896406 passed. Claude's subsequent
+studio PR149 merged atbbbf4025 with main Actions38697482794 successful. This
+batch's combined validation printed `build/boktai3.gba: OK` and the RAM-literal
+check passed (`build/moves-combined.log`). All138/138 changed promoted TUs
+passed full reviewed extents (`build/moves-post-promotion.json`). Format and
+the eleven relevant metadata/progress tests pass. The build caught and corrected
+three stale display-value references that per-function address stubs had resolved.
+Per-mutant score improvements remain subject to source review: the E484 score245
+mutant changes the enabled cursor and is not a faithful guarded draft.
 
 ## October 14 (Codex/Sol): inventory grids, descriptions and input-panel initialization
 
