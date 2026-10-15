@@ -62,5 +62,5 @@ void SceneInventory_BeginPurchaseConfirmation(struct SceneInventoryControlView *
         SceneInput_BeginChoice((void *)((u32)panel + promptOffset), &panel->display.widgetResource,
                                &panel->choiceValue, 1, &panel->choiceBlink);
     }
-    sub_0806130C(panel, (void (*)(struct SceneInventoryControlView *))sub_080623C0);
+    sub_0806130C(panel, (SceneInventoryCallback)sub_080623C0);
 }
