@@ -8,12 +8,14 @@ establish the new boundaries; correcting the inventory must precede counting
 the recovered helpers. Nothing here establishes runtime coverage or a
 particular game subsystem.
 
-Twenty newly recovered helpers account for 1,512 bytes: 780 ordinary C bytes
-and 732 bytes with minimized register-allocation concessions. Every promoted
-function passed its entire independently reviewed extent. Nine affected TUs
+Twenty-five newly recovered helpers account for 2,016 bytes: 780 ordinary C bytes
+and 1,236 bytes with minimized register-allocation concessions. Every promoted
+function passed its entire independently reviewed extent. Fourteen affected TUs
 retain empty operand barriers or local register constraints; none contains
 instruction bodies or an explicit r7 binding. The shared
-`include/scalar_approach.h` contains ordinary C only.
+`include/scalar_approach.h` contains ordinary C only. The four existing scalar
+seeds at `21774`, `21798`, `217CC` and `21800` now use the same explicit wrapping helpers;
+their original full 36/52/52/52-byte extents stay exact without extra credit.
 
 ## Contracts
 
@@ -70,7 +72,7 @@ alignment and literal pool where present.
 | 08221A48 | 112 | C | Divisor-based angle step |
 | 08221AB8 | 68 | ASM | Linear angle step |
 | 08221AFC | 96 | C | Angle profile |
-| 08221B5C | 64 | ASM | Half-step array |
+| 08221B5C | 64 | H | Half-step array |
 | 08221B9C | 76 | H | Quarter-step array |
 | 08221BE8 | 76 | H | Eighth-step array |
 | 08221C34 | 76 | H | Sixteenth-step array |
@@ -78,10 +80,10 @@ alignment and literal pool where present.
 | 08221CC8 | 60 | ASM | Centered clamp array |
 | 08221D04 | 60 | ASM | Linear scalar array |
 | 08221D40 | 92 | H | Scalar profile array |
-| 08221D9C | 100 | ASM | Half-angle array |
-| 08221E00 | 112 | ASM | Quarter-angle array |
-| 08221E70 | 112 | ASM | Eighth-angle array |
-| 08221EE0 | 116 | ASM | Sixteenth-angle array |
+| 08221D9C | 100 | H | Half-angle array |
+| 08221E00 | 112 | H | Quarter-angle array |
+| 08221E70 | 112 | H | Eighth-angle array |
+| 08221EE0 | 116 | H | Sixteenth-angle array |
 | 08221F54 | 152 | ASM | Timed angle-array helper, tentative |
 | 08221FEC | 96 | ASM | Linear angle array |
 | 0822204C | 72 | H | Snap/step array, shift 1 |
@@ -90,7 +92,7 @@ alignment and literal pool where present.
 | 08222124 | 72 | H | Snap/step array, shift 4 |
 | 0822216C | 124 | H | Angle profile array |
 
-The 11 remaining hidden entries total 972 bytes. Their private candidates
+The six remaining hidden entries total 468 bytes. Their private candidates
 are useful allocation references, not published exact C. In particular,
 `082218A8` and `08221AB8` retain a commutative ADD operand-order difference.
 No BL references to the hidden entries were found in the reviewed code scan;
@@ -122,3 +124,10 @@ covered by five independent metadata entries, all rechecked over their full
 76/56/64/56/60-byte extents. These findings support separate owner/state,
 animation/palette-task and key-trigger groups, rather than treating the
 entire numeric run as one subsystem.
+
+
+The final five full-extent checks areD9C100(run-2v0zpew_),E00112(run-fybloa42),
+E70112(run-5kon9g7a),EE0116(run-6u9iddsj),B5C64(run-2gx83cy8). Depinning
+reduces each angle array from20 to9 hints and the half array from9 to5. Every
+hard-register value is initialized from an actual load or arithmetic result;
+there are no handwritten instruction bodies or explicit r7 bindings.
