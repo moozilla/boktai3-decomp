@@ -44,5 +44,6 @@ SceneActorControl_GetMotionState(struct SceneActorRegistryResetView *actor)
 void SceneActorControl_SetDefaultPreset(struct SceneActorRegistryResetView *);
 /* Phase-dispatch callers supply an actor with an initialized control context. */
 void SceneActorControl_ConsumeLiftFlag(struct SceneActorRegistryResetView *);
+void SceneActorControl_TickGroundBob(struct SceneActorRegistryResetView *);
 void SceneActorControl_TickSway(struct SceneActorRegistryResetView *);
 #endif
