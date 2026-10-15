@@ -101,6 +101,7 @@ address,isa,evidence,replacement_end
 0805E014,thumb,Independent four-argument palette helper after 0805E000 return and literal; own push r4-r7-lr and pop-bx plus pool; exact136-byte C,0805E09C
 08064B20,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08064B70
 08064D3C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08064D40
+08066CB8,thumb,Independent unused-looking attachment release-all after query return and literal; complete push-loop-pop-bx; no ROM Thumb pointer or direct branch encoding found; exact standalone C,08066DB8
 08066FD8,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08067014
 08067014,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08067018
 080682CC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080682D0
