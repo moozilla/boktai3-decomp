@@ -24,7 +24,7 @@ void AreaEffect_AccumulatePlayerResource(struct AreaEffectManager *manager, s32 
         return;
     {
         register struct AreaEffectPlayer *candidate asm("r0") = object->player;
-        u32 kind = candidate->kind;
+        u32 kind = candidate->actionMode;
         player = candidate;
         if (kind == 6) {
             if (activeMode == 2)

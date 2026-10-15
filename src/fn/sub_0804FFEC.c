@@ -1,21 +1,17 @@
-#include "global.h"
-
-void *Task_Create(s32, s32);
-void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
-void Task_Kill(void *);
-void sub_0804FF48(void);
-void sub_0804FF70(void);
-s32 sub_0804FFDC(void *);
-
-void *sub_0804FFEC(void)
+#include "repeated_effect.h"
+struct RepeatedEffectManager *Task_Create(s32, s32);
+void Task_SetCallbacks(struct RepeatedEffectManager *, s32 (*)(struct RepeatedEffectManager *),
+                       s32 (*)(struct RepeatedEffectManager *));
+void Task_Kill(struct RepeatedEffectManager *);
+struct RepeatedEffectManager *RepeatedEffect_CreateManager(void)
 {
-    void *p = Task_Create(9, 0x7FC);
-    if (p) {
-        Task_SetCallbacks(p, sub_0804FF48, sub_0804FF70);
-        if (sub_0804FFDC(p) < 0) {
-            Task_Kill(p);
+    struct RepeatedEffectManager *manager = Task_Create(9, sizeof(*manager));
+    if (manager) {
+        Task_SetCallbacks(manager, RepeatedEffect_TickManager, RepeatedEffect_DestroyManager);
+        if (RepeatedEffect_InitManager(manager) < 0) {
+            Task_Kill(manager);
             return 0;
         }
     }
-    return p;
+    return manager;
 }
