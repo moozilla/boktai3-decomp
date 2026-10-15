@@ -75,8 +75,6 @@ void sub_08217DE0(struct ScenePanelParticle *, void *, u32);
 void sub_08217EEC(struct ScenePanelParticle *, void *, u32);
 void sub_08217EC4(struct ScenePanelParticle *, s32, s32);
 void sub_08217ECC(struct ScenePanelParticle *, u32);
-void sub_08215284(void *, u32);
-u8 *sub_0821A520(u16, u16);
 u8 sub_08228DB8(void);
 extern u16 gUnk_03004FC0[];
 #endif
