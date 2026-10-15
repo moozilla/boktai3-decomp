@@ -1,7 +1,3 @@
-#include "global.h"
-void sub_0805EA00(u8 *p)
-{
-    p[4] = p[1];
-    p[5] = p[2];
-    p[6] = p[3];
-}
+#include "scene_input_navigation.h"
+#define SceneInput_SaveSelection sub_0805EA00
+void SceneInput_SaveSelection(struct SceneInputGridView *grid){grid->savedX=grid->cursorX;grid->savedY=grid->cursorY;grid->savedSelection=grid->selection;}
