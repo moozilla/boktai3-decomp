@@ -1,38 +1,32 @@
-#include "global.h"
-void sub_080648B0(u32, u32, u32, u32);
-void sub_08064918(u32, u32, u32, u32);
-void sub_08064954(u32, u32, u32, u32);
-void sub_08064990(u32, u32, u32, u32);
-void sub_08064A58(u32, u32, u32, u32);
-void sub_08064B70(u32, u32, u32, u32);
-void sub_08064BF8(u32, u32, u32, u32);
-void sub_08064C48(u32 a, u32 b, u32 c, u32 d, u32 e)
+#include "actor_attachment.h"
+#define ActorAttachment_GetActionOffset sub_08064C48
+void ActorAttachment_GetActionOffset(s32 kind, u32 action, u32 angle, s32 *x, s32 *y)
 {
-    c = (s32)((c + 0x20) & 0xFF) >> 6;
-    switch (b) {
+    angle = (s32)((angle + 0x20) & 0xFF) >> 6;
+    switch (action) {
         case 4:
-            sub_080648B0(a, d, e, c);
+            sub_080648B0(kind, x, y, angle);
             break;
         case 1:
-            sub_08064918(a, d, e, c);
+            sub_08064918(kind, x, y, angle);
             break;
         case 3:
-            sub_08064954(a, d, e, c);
+            sub_08064954(kind, x, y, angle);
             break;
         case 5:
         case 6:
         case 7:
         case 8:
-            sub_08064990(a, d, e, c);
+            sub_08064990(kind, x, y, angle);
             break;
         case 21:
-            sub_08064A58(a, d, e, c);
+            sub_08064A58(kind, x, y, angle);
             break;
         case 25:
-            sub_08064B70(a, d, e, c);
+            sub_08064B70(kind, x, y, angle);
             break;
         default:
-            sub_08064BF8(a, d, e, c);
+            sub_08064BF8(kind, x, y, angle);
             break;
     }
 }
