@@ -1,6 +1,5 @@
 #include "scene_actor_terrain.h"
-#define SceneActorTerrain_DisableCollision sub_080771E4
-void sub_08072188(void);
+void SceneActorPalette_ClearCompletedTransitions(void);
 static inline u32 ReadMasked(const u32 *flags, u32 mask)
 {
     return *flags & mask;
@@ -28,7 +27,7 @@ void SceneActorTerrain_DisableCollision(struct SceneActorTerrainCollisionView *a
     actor->flags2CC |= mask;
     collider = &actor->collider;
     collider->flags |= 4;
-    sub_08072188();
+    SceneActorPalette_ClearCompletedTransitions();
     {
         u32 queryMask = 0x800;
         if (ReadMasked(&actor->flags2D0, queryMask) && IsDisposable(actor)) {

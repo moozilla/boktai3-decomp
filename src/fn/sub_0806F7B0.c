@@ -1,6 +1,5 @@
 #include "scene_range_watch.h"
 #include "script_utility.h"
-#define SceneRangeWatch_CheckRange sub_0806F7B0
 void SceneRangeWatch_CheckRange(struct SceneRangeWatch *p)
 {
     s32 v = gUnk_02000710->unk876;

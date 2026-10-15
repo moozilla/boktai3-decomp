@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-#define SceneActorRegistry_ScheduleAvailableActors sub_0806FE88
-s32 sub_0806FE18(void);
+s32 SceneActorRegistry_CountAvailable(void);
 s32 Div(s32, s32);
 static inline u8 Inactive(struct SceneActorRegistryActor *actor)
 {
@@ -21,7 +20,7 @@ static inline u8 Inactive(struct SceneActorRegistryActor *actor)
 }
 void SceneActorRegistry_ScheduleAvailableActors(void)
 {
-    s32 count = sub_0806FE18();
+    s32 count = SceneActorRegistry_CountAvailable();
     if (count > 0) {
         struct SceneActorRegistryNode *node = gUnk_020004AC;
         struct SceneActorRegistryActor *actor = node->actor;

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-#define SceneActorRegistry_CountAvailable sub_0806FE18
 s32 SceneActorRegistry_CountAvailable(void)
 {
     struct SceneActorRegistryNode *node = gUnk_020004AC;

@@ -5,7 +5,7 @@ void SceneActorAnimation_SelectDirectionalExtraFlags(struct SceneActorAnimationV
                                                      s32 index, u32 extraFlags)
 {
     struct SceneActorProfileEntry *entry =
-        (void *)sub_08073CB0(actor->profileId, actor->profileMode, index);
+        (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, index);
     u8 directionVariant, mirror;
     u32 selection;
     u8 *mirrorPointer;

@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
-#define SceneActorRegistry_UnlinkActor sub_0806FBC8
 void SceneActorRegistry_UnlinkActor(struct SceneActorRegistryActor *actor)
 {
     struct SceneActorRegistryManager *manager = SceneActorRegistry_GetManager();

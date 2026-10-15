@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-#define SceneActorRegistry_AdvanceCursor sub_0806FDE0
 void SceneActorRegistry_AdvanceCursor(struct SceneActorRegistryManager *manager)
 {
     if (!(manager->frame & 1)) {

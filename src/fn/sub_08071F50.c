@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_palette.h"
-#define SceneActorPalette_ApplyTransition sub_08071F50
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)

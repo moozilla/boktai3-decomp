@@ -1,9 +1,8 @@
 #include "scene_actor_animation.h"
-#define SceneActorAnimation_SelectProfileEntry sub_08076818
 void SceneActorAnimation_SelectProfileEntry(struct SceneActorAnimationView *actor, s32 index)
 {
     struct SceneActorProfileEntry *entry =
-        (void *)sub_08073CB0(actor->profileId, actor->profileMode, index);
+        (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, index);
     u32 selection = entry->value;
     u32 variant = entry->state;
     u32 flags = entry->flags;

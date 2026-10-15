@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-#define SceneActorMovement_ProjectProbe sub_08075508
 void SceneActorMovement_ProjectProbe(struct SceneActorRegistryActor *input, u32 xScale, u32 zScale)
 {
     struct SceneActorRegistryActor *actor = input;

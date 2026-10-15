@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 28.986% matching (2026-10-15). This file is the single
+Last updated after reaching 29.283% matching (2026-10-15). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,56 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 15 continuation: animation, palette and registry scheduling
+
+Exact code is **29.283%**, up **0.2966 percentage points** (+7,164 net bytes)
+from PR160: **7,019 /11,486 functions**, **707,290 /2,415,354 bytes**.
+Without register pinning: **21.081%**; Register-pinned: **8.202%**, included
+above. New recovery totals7,172 bytes; eight falsely credited prologue bytes
+at800A4 are removed from the old8005C sound/animation callback extent. The
+true adjoining function begins800A4;800AC is its interior high-register push.
+The old callback passes its actual72-byte extent. The78 guarded drafts remain
+outside exact credit.
+
+The complete76034–76910 animation selector family is exact: eight new functions,
+2,268 bytes, with the hidden762A8 boundary reviewed separately. The selectors
+share canonical engine calls and explicit argument narrowing. Terrain neighbor
+height queries and script parameter readers follow, plus facing and collision
+flag helpers. The movement resolver76CDC remains a private near-match.
+See [animation](SCENE_ACTOR_ANIMATION.md) and [terrain](SCENE_ACTOR_TERRAIN.md).
+
+Palette transition71E00–72264 is now exact throughout (five functions,1,124 bytes),
+as is the contact-list prefix72BA8–72F4C (932 bytes). The RGB/Q5 accumulation,
+once-per-category frame guard, invalid-owner cooldown and player-condition
+contracts are documented in [palette/script/contacts](SCENE_ACTOR_PALETTE_SCRIPT_CONTACTS.md).
+The whole752-byte terrain reaction and2,800-byte contact evaluator remain
+private semantic drafts; neither contributes exact credit.
+
+The range-watcher family6F7B0–6F990 and registry list/message/cadence span
+6FAD4–70070 are exact throughout. The watcher uses a count bitfield instead
+of reading an uninitialized flags word. Registry records now expose queue,
+sentinel, cursor and callback fields; registration is capped at twenty actors.
+Cadence schedules1/2/4 actors with per-actor delays; lazy subsystem setup stores
+actual task IDs. See [watcher](SCENE_RANGE_WATCH.md) and
+[registry lifecycle](SCENE_ACTOR_REGISTRY_LIFECYCLE.md). Additional actor route,
+height, collider and probe contracts are in [behavior](SCENE_ACTOR_BEHAVIOR.md).
+
+The target remains **30% exact or20% account usage remaining**; latest meter
+51% remaining, no reset consumed. Tail retains7462C–76020 gaps; Sol owns
+76034–78078. Lifecycle now owns the adjoining78078–7A62C frontier after closing
+its palette/contact prefix. Root retains scene/grid gaps and coordinates batches.
+The212-byte XYZ query is reduced to11 differing bytes with no empty asm and
+initialized register bindings; a frozen four-hour permuter run starts
+from weighted score40. The412-byte effect script remains two differing bytes
+under its bounded search. Raw mutations still require initialized-value review.
+
+Validation: all113 changed/promoted single-function units pass their full
+reviewed extents against the final combined ELF. Complete build prints
+`build/boktai3.gba: OK`; RAM-literal audit passes. Source audit:113 files,
+no warnings/errors. Boundary/progress tests (11), formatting and inventory
+checks pass. Final extent review corrected8005C before integration, rather than
+counting the following function's retained prologue as C.
 
 ## October 15 continuation: registry scripts, profiles and scene state
 

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_contact_list.h"
-#define SceneActorContacts_ReleaseInvalidOwners sub_08072D34
 static inline u8 Unavailable(struct SceneActorRegistryActor *inputActor, u16 *inputState,
                              u32 inputDisabled, u32 inputExcluded)
 {

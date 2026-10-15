@@ -29,12 +29,12 @@ struct SceneActorAnimationTileDrawable {
     u8 unknown0[0x20];
     struct SceneActorAnimationTile tile;
 };
-void sub_08076034(struct SceneActorAnimationView *, s32);
-void sub_08076174(struct SceneActorAnimationView *, s32, u32);
+void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorAnimationView *, s32);
+void SceneActorAnimation_SelectDirectionalEntryFlags(struct SceneActorAnimationView *, s32, u32);
 void sub_080762A8(struct SceneActorAnimationView *, s32, u32);
-void sub_080763D0(struct SceneActorAnimationView *, s32, u32);
-void sub_080764C8(struct SceneActorAnimationView *, s32, u32);
-void sub_080765F8(struct SceneActorAnimationView *, s32, u32, u32);
-void sub_080766F8(struct SceneActorAnimationView *, s32);
-void sub_08076818(struct SceneActorAnimationView *, s32);
+void SceneActorAnimation_SelectEntryFlags(struct SceneActorAnimationView *, s32, u32);
+void SceneActorAnimation_SelectDirectionFlagsVariant(struct SceneActorAnimationView *, s32, u32);
+void SceneActorAnimation_SelectExplicitVariant(struct SceneActorAnimationView *, s32, u32, u32);
+void SceneActorAnimation_SelectDirectionalFlags(struct SceneActorAnimationView *, s32);
+void SceneActorAnimation_SelectProfileEntry(struct SceneActorAnimationView *, s32);
 #endif

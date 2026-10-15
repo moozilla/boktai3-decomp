@@ -1,5 +1,4 @@
 #include "scene_actor_collision.h"
-#define SceneActorCollision_InitAttack sub_08074D34
 void SceneActorCollision_InitAttack(struct SceneActorRegistryActor *actor, void *inputSize,
                                     void *inputOffset, void *inputCallback, u32 inputIndex,
                                     void *owner)

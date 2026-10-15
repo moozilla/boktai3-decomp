@@ -144,6 +144,7 @@ address,evidence
 08078B48,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 0807C468,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 0807C53C,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+080800A4,Complete high-register prologue and matching restore through08080494; replaces interior080800AC boundary; removes8 falsely credited prior bytes
 08082BF0,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08082D20,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08084280,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C

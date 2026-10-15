@@ -10,8 +10,8 @@ struct SceneRangeWatch {
     u16 interval, frame, inside;
     u8 minimum, maximum;
 };
-void sub_0806F7B0(struct SceneRangeWatch *);
-u32 sub_0806F838(struct SceneRangeWatch *);
-u32 sub_0806F86C(void *);
-s32 sub_0806F870(struct SceneRangeWatch *);
+void SceneRangeWatch_CheckRange(struct SceneRangeWatch *);
+u32 SceneRangeWatch_Tick(struct SceneRangeWatch *);
+u32 SceneRangeWatch_Destroy(void *);
+s32 SceneRangeWatch_Initialize(struct SceneRangeWatch *);
 #endif

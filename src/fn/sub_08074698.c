@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_route.h"
 #include "script_utility.h"
-#define SceneActorRoute_AdvanceActorPoint sub_08074698
 void sub_0807E7DC(struct SceneActorRegistryActor *);
 extern const u8 gUnk_08610814[];
 void SceneActorRoute_AdvanceActorPoint(struct SceneActorRegistryActor *actor,

@@ -1,11 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_animation.h"
-#define SceneActorAnimation_SelectDirectionFlagsVariant sub_080764C8
 void SceneActorAnimation_SelectDirectionFlagsVariant(struct SceneActorAnimationView *actor,
                                                      s32 index, u32 variantArgument)
 {
     struct SceneActorProfileEntry *entry =
-        (void *)sub_08073CB0(actor->profileId, actor->profileMode, index);
+        (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, index);
     u8 directionVariant, mirror;
     u32 selection;
     u8 *mirrorPointer;

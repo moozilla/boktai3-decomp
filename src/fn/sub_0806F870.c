@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_range_watch.h"
-#define SceneRangeWatch_Initialize sub_0806F870
 static inline s32 Read(s32 fallback)
 {
     return Script_GetPc() ? Script_GetValue() : fallback;
