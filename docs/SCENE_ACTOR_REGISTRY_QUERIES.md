@@ -13,7 +13,7 @@ not establish runtime coverage or specific game-character identities.
 The shared view identifies ID `50`, position `5C`, category byte `98`, signed
 health `9C`, flags words `2CC/2D0`, flags halfwords `2D4/2D6`, and context `3D0`.
 Byte `98` is provisionally a category: it selects stable sets of numeric values
-in the reviewed queries. The larger movement setup (`70070`, still assembly)
+in the reviewed queries. The movement setup (`70070`, now exact)
 uses behavior-state bytes around `2A8`–`2B6`, distinct from category `98`.
 Halfword `1E6` is an additional equality filter in `70444`; the adjacent worker
 also observes palette-related use of this region. Its complete meaning remains
@@ -48,6 +48,36 @@ any bit from the caller's `flags2CC` mask. Its availability predicate rejects
 retains the observed NULL-pointer case and normalized zero/one result before the
 caller checks its flag mask.
 
+## Movement-mode setup
+
+`70070(actor,mode)` always clears `flags2D0 & 4` and `flags2D4 & 4000` before
+handling numeric modes 0 and 1. Other mode values perform only those clears.
+Mode 0 sets `flags2CC & 10`, takes X/Z from two halfwords at the pointer stored
+at actor+450, and probes the current terrain grid, using cell 0 for out-of-range
+coordinates. The high nibble selects slope adjustments; the low nibble supplies
+height in units of 256. The resulting temporary height is stored, then replaced
+by the actor's current Y before route tests; the observed probe/stores remain.
+
+Both modes call `0821F204` then, on nonzero result, `0821F7A8` with the route
+object at actor+5D0 and current/target positions. A zero result clears
+`flags2D4 & 200`; a second result other than 0 or 2 clears the eight-byte motion
+vector. These are numeric result contracts pending a complete route-engine
+review. Mode 0 also writes 1 to halfword 6 of the separate pointer at actor+5D4.
+
+Mode 0 tests a 32-by-32 X/Z proximity window through `7CA00`. Outside the window
+it clears `flags2CC & C0`, chooses behavior 7/substate 1, and restores pointer 228
+to control21C. Inside, it clears `flags2CC & D0`, chooses behavior 0/substate 0,
+and restores pointer 22C. The distinction between those saved pointers matters.
+Both reset state/phase/counter, set entry bytes, clear field2C8 and field104,
+clear `flags114 & 1`, and set field2C2=64.
+
+Mode 1 sets `flags414 & 4` and `flags2D4 & 80`, copies field416 to field418,
+calls `76034(actor,0)`, and targets player slot 0 at its position 30. After the
+route checks it chooses behavior 12/substate 26 and restores pointer 41C to
+control21C, with the same control-entry clearing pattern. It assumes player 0
+and the route/context pointers are valid; no new defensive guards are invented.
+The actor's category 98 is separate from these numeric behavior-state fields.
+
 ## Scripted control changes
 
 `707EC` reads keyword `n` (actor ID), requires a non-NULL field5DC pointer, copies
@@ -59,10 +89,48 @@ predicate and have `flags2D4 & 4000`; it reads only keyword `d`.
 
 `706DC` resets eligible categories `{4,1,3}` after the same health/status test.
 It copies control5F4 to control21C, writes field2B2=1, field2B0=0, substate2B5=5,
-clears field2C8 and field104, and clears bit one of flags114. It then resets
+clears field2C8 and field104, and clears `flags114 & 1`. It then resets
 state2A8/phase2A9/counter2AC, chooses behavior2AA=3, sets field2B1=1, and sets
 `flags2D0 & 1000`. These numeric states are deliberately retained: the reviewed
 stores do not establish a game-level departure/reset animation identity.
+
+`704EC` reads optional category filter `k` and secondary flag `s`. Healthy actors
+with `flags2CC & 2` take its primary path: health and fieldAA become zero,
+position becomes `(0,30000,0)`, the drawable is hidden, and control21C becomes
+`7FC90` with substate2B5=16 and behavior state2A8=3. It then calls `771E4` and,
+unless scene flags `030053F4 & 4800` or actor flag `2D0 & 800` suppress it,
+passes global halfword `030039F0` and the low 16 bits of actor ID to `6FA74`.
+That helper manages a 20-entry key/ID table at GameState+670; its mode-derived
+counter is not established as a frame timer. The secondary path selects other
+available actors with the same category filter, clears health/fieldAA, sets
+`flags2CC & 1000`, and conditionally sets `flags2D0 & 400000` when `s` is nonzero.
+
+`70834` reads actor ID `n` and preservation flag `m`, requires `flags2C0 & 100`,
+then requests numeric state2A8=2, clears phase/behavior/counter, and sets
+field2B1=1. A zero `m` additionally installs `7FC90`, chooses substate2B5=16,
+and resets the control-entry fields. Both cases set `flags2D4 & 4000` and
+`flags2D0 & 8`. The numeric state remains unnamed pending stronger caller
+contracts. `7FC90` itself only clears byte2B2 when it is nonzero.
+
+`70D24` searches the linked registry for the nearest available actor in categories
+`{4,1,3}`, excluding substate2B5=21. It computes X/Z squared distance after
+16-bit displacement wrapping, using signed comparison of the wrapped 32-bit
+sum, and accepts only values strictly below the initial 10,000,000 threshold.
+The first equal-distance actor wins; an unsuccessful search returns NULL.
+
+`70B1C` resets available actors in categories `{4,1,3}` only when none of
+`flags2D4 & A007` is set. It installs `7FC90`, chooses substate2B5=16,
+resets control-entry fields, and sets state2A8=0, phase2A9=1, behavior2AA=0,
+counter2AC=0, and field2B1=1. The masked flags value is known zero in this path
+and supplies the observed zero stores.
+
+`70C24` resolves actor bytes `458/45A` through `0821E7EC`, chooses the nearest
+non-NULL player from `02000580[0..02000544)`, and checks its wrapped X/Z
+displacement against the supplied signed component bounds. It keeps the first
+strictly nearest result, using signed comparison of the wrapped square sum.
+Category10 instead returns whether `flags2D0 & 4000000` is set. The origin lookup
+returns zero coordinates on failure; its return value is ignored. The fourth
+halfword of displacement aggregates is unspecified and never scalar-read.
 
 ## Boundaries and validation
 
@@ -72,22 +140,28 @@ independent entries `70444` and `70E44` that gbadisasm leaves as data. Thus
 has size 68, followed by the separate 108-byte `70E44`. These entries already
 exist in the repository's build/progress extra-function metadata.
 
-The current frozen query/control cohort contains eleven new exact functions,
-**+0.0492 percentage points** (1,188 bytes), all register-pinned. Four prior exact functions
+The current frozen query/control cohort contains seventeen new exact functions,
+**+0.1436 percentage points** (3,468 bytes), all register-pinned. Four prior exact functions
 (124 bytes) were reviewed and typed without additional credit. Each function
 passed a full-size fast check after formatting. The parent performs name
 promotion and one combined complete ROM build before integration.
 
 | Address | Reviewed bytes | Contract | Credit |
 |---|---:|---|---|
+| 08070070 | 824 | Set route or player-target movement mode | New, pinned |
 | 080703A8 | 72 | Count living actors | New, pinned |
 | 080703F0 | 84 | Count living actors in a category | New, pinned |
 | 08070444 | 96 | Count with category and field1E6 filter | New, pinned |
 | 080704A4 | 72 | Find first living actor | New, pinned |
+| 080704EC | 496 | Defeat selected scripted actors and change control | New, pinned |
 | 080706DC | 272 | Reset control/state for selected categories | New, pinned |
 | 080707EC | 72 | Restore scripted actor fieldAA | New, pinned |
+| 08070834 | 220 | Request state with optional control preservation | New, pinned |
 | 08070A40 | 80 | Set scripted actor movement mode | New, pinned |
 | 08070A90 | 140 | Set movement mode across eligible registry actors | New, pinned |
+| 08070B1C | 264 | Reset eligible category actor state | New, pinned |
+| 08070C24 | 256 | Test nearest player displacement bounds | New, pinned |
+| 08070D24 | 220 | Find nearest eligible category actor | New, pinned |
 | 08070E00 | 68 | Continue after ID, excluding flag bit one | New, pinned |
 | 08070E44 | 108 | Continue with category whitelist | New, pinned |
 | 08070EB0 | 12 | Get first actor | Prior exact, ordinary |
@@ -101,6 +175,11 @@ and 3→2 respectively. The continuation helpers retain 3 and 3 hints (the latte
 reduced from 8), and the flags query reduced 17→8. No handwritten instruction bodies or explicit r7 bindings are used.
 The control reset reduced 42→17 hints, the field-restoration script 7→3, the
 individual movement-mode request 9→3, and the registry-wide mode request 21→10.
+The defeat routine reduced 90→26 hints and the individual state request 35→12.
+The nearest-category search reduced 28→7 hints, the category-state reset 37→18,
+and the nearest-player bounds query 38→16. Movement-mode setup reduced 115→57
+hints; its final constant-birth ordering used a byte-zero R4 binding and a
+separate initialized phase value R0 binding before minimization.
 
 The control reset also demonstrated the compiler branch-length estimate issue:
 its near-exact body measured 276 bytes, with a long entry branch and consequent
@@ -111,6 +190,8 @@ barriers; trial twelve shortened the compiler-selected branch and yielded all
 compiler's estimated branch distance. Normal exact-only depin followed this
 preliminary minimization.
 
-The remaining section includes movement/response setup, script-driven actor
-mutation, and additional selection/query helpers; those bodies retain assembly
-until their complete reviewed spans match.
+Only registry-wide state request `70910` (304 bytes) remains assembly in this
+section until its complete reviewed span matches. Its valid draft has all 304
+bytes and three scratch-register alias differences; a bounded permuter runs on
+that base. An earlier lower-scoring candidate moved a flag store before its OR
+and was rejected by source audit.

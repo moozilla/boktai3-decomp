@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-struct SceneActorRegistryManager *sub_08072B44(void);
-void sub_08070070(struct SceneActorRegistryActor *, s32);
+struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
+void SceneActorRegistry_SetMovementMode(struct SceneActorRegistryActor *, s32);
 static inline u32 ReadExclusionFlags(struct SceneActorRegistryActor *actor)
 {
     register u32 mask asm("r1") = 0x20000;
@@ -18,7 +18,7 @@ void SceneActorRegistry_SetMovementModesFromScript(void)
     struct SceneActorRegistryNode *node;
     struct SceneActorRegistryActor *actor;
     s32 mode;
-    if (!sub_08072B44())
+    if (!SceneActorRegistry_GetManager())
         return;
     node = gUnk_020004AC;
     actor = node->actor;
@@ -51,7 +51,7 @@ void SceneActorRegistry_SetMovementModesFromScript(void)
             }
             asm("" : "+r"(unavailable));
             if (!unavailable && (*flags & enabled))
-                sub_08070070(actor, mode);
+                SceneActorRegistry_SetMovementMode(actor, mode);
             node = node->next;
             actor = node->actor;
         } while (actor);

@@ -121,6 +121,9 @@ address,isa,evidence,replacement_end
 0806E308,thumb,Independent 68-byte four-slot capacity query with push and pop-bx after 0806E2A8 return; no stored Thumb pointer or direct B/Bcc/BL reference found,0806E34C
 0806E34C,thumb,Independent 388-byte terrain position sampler with push-save prologue after 0806E308 return and padding; reviewed end 0806E4D0,0806E4D0
 0806EB70,thumb,Independent 916-byte grid route resolver after 0806E900 return; own push-save stack prologue and complete pop-bx return before 0806EF04; assembly-backed pending recovery,0806EF04
+0806EFB8,thumb,Independent180-byte actor rectangle query with own push/save prologue and pop/bx return following scene subsystem reset,0806F06C
+0806F1B0,thumb,Independent32-byte wrapped background tilemap address leaf ending bx lr before its literal,0806F1D0
+0806F1D0,thumb,Independent72-byte background tile rectangle fill with own push/save prologue and pop/bx return,0806F218
 0807006C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08070070
 08070444,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched),080704A4
 08070E44,thumb,Independent actor-list search function left as incbin by gbadisasm; retained assembly (not yet matched),08070EB0

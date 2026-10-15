@@ -1,19 +1,18 @@
-#include "global.h"
-extern u8 *gUnk_02000710;
-u8 *sub_0806F9AC(void)
+#include "scene_actor_record.h"
+struct SceneActorRecord *SceneActorRecord_FindEmpty(void)
 {
     s32 i = 0;
-    u8 *q = gUnk_02000710 + 0x670;
-    u8 *r;
+    struct SceneActorRecord *entry = SCENE_ACTOR_RECORDS;
+    struct SceneActorRecord *result;
     do {
-        if (*(u16 *)(q + 2) == 0) {
-            r = q;
-            goto end;
+        if (!entry->id) {
+            result = entry;
+            goto done;
         }
-        q += 6;
+        entry++;
         i++;
-    } while (i <= 0x13);
-    r = 0;
-end:
-    return r;
+    } while (i <= 19);
+    result = 0;
+done:
+    return result;
 }

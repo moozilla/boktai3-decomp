@@ -9,7 +9,9 @@ struct SceneActorRegistryControl {
     u32 counter;
 };
 struct SceneActorRegistryControlGroup {
-    u8 unknown0[0x4C];
+    u8 unknown0[0x40];
+    u16 flags414, field416, field418;
+    u8 unknown46[6];
     struct SceneActorRegistryControl control;
     u8 unknown68[0xC];
 };
@@ -22,7 +24,9 @@ struct SceneActorRegistryResetView {
     void *object;
     void *drawable;
     u8 drawableKind;
-    u8 unknown9[0x50];
+    u8 unknown9[0x47];
+    u32 id;
+    u8 unknown54[5];
     u8 direction;
     u8 unknown5A[0x2];
     struct ContactPosition position;
@@ -64,7 +68,9 @@ struct SceneActorRegistryResetView {
     void *target;
     u8 unknown220[0xC];
     void *savedTarget;
-    u8 unknown230[0x78];
+    u8 unknown230[0x18];
+    void *callback248;
+    u8 unknown24C[0x5C];
     u8 state2A8, phase2A9, behavior2AA, unknown2AB;
     u32 counter2AC;
     u8 field2B0, field2B1, field2B2, field2B3;
@@ -72,7 +78,9 @@ struct SceneActorRegistryResetView {
     u16 field2B8;
     u8 unknown2BA[6];
     u16 flags2C0, field2C2;
-    u8 unknown2C4[8];
+    u8 unknown2C4[4];
+    u16 field2C8;
+    u8 unknown2CA[2];
     u32 flags2CC;
     u32 flags2D0;
     u16 flags2D4;
@@ -90,9 +98,10 @@ struct SceneActorRegistryResetView {
     u8 field3CC, unknown3CD[7];
     struct SceneActorRegistryControlGroup group;
     struct SceneActorRegistryRoute route;
-    u8 unknown45C[8];
+    u8 unknown45C[4];
+    u32 word460;
     u8 field464, field465, field466, field467;
-    void *callback468;
+    u32 field468;
     u8 unknown46C[8];
     void *attachment;
     u8 unknown478[0x140];
@@ -106,6 +115,6 @@ struct SceneActorRegistryResetView {
 };
 u8 *sub_0821D64C(s32, s32);
 void sub_0821E5C4(struct SceneActorRegistryRoute *, u32, u32, u32);
-void sub_0821E7EC(struct ContactPosition *, u32, u32);
+s32 sub_0821E7EC(u16 *, u32, u32);
 void sub_0821FD3C(void *, struct ContactPosition *);
 #endif

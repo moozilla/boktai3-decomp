@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08072C40(void *);
+void SceneActorContacts_RemoveNode(void *);
 void Anim_Remove(void *);
 void Sprite_Remove(void *);
 void Collider_Remove(void *);
@@ -10,7 +10,7 @@ extern u32 gUnk_02000580[];
 extern u16 gUnk_02000544;
 s32 sub_082439EC(u8 *p)
 {
-    sub_08072C40(p + 0x2E8);
+    SceneActorContacts_RemoveNode(p + 0x2E8);
     Anim_Remove(p + 0x8C);
     Sprite_Remove(p + 0x14C);
     Collider_Remove(p + 0x230);
