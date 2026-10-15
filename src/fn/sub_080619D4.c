@@ -16,5 +16,5 @@ void SceneInventory_BeginCatalogTransition(struct SceneInventoryControlView *pan
             sub_08060C54((void *)panel);
             break;
     }
-    sub_0806130C(panel, (void (*)(struct SceneInventoryControlView *))sub_08062414);
+    sub_0806130C(panel, (SceneInventoryCallback)sub_08062414);
 }
