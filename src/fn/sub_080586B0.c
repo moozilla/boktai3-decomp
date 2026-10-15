@@ -1,11 +1,5 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x1328];
-    u16 a;
-};
-
-void sub_080586B0(struct S *p)
+#include "scene_panel.h"
+void ScenePanel_SetPresentationMode(struct ScenePanel *panel)
 {
-    p->a = 0x30;
+    panel->mode = 0x30;
 }

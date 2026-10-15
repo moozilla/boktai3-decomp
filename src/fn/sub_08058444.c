@@ -1,11 +1,6 @@
-#include "global.h"
-
-void sub_08058130(void *, s32, s32);
-void sub_08058150(void *, void (*)(void));
-void sub_0805849C(void);
-
-void sub_08058444(void *p)
+#include "scene_panel.h"
+void ScenePanel_BeginPulseSequence(struct ScenePanel *panel)
 {
-    sub_08058130(p, 2, 12);
-    sub_08058150(p, sub_0805849C);
+    ScenePanel_SetChannelValue(panel, 2, 12);
+    ScenePanel_SetState(panel, ScenePanel_TickPulseTwelve);
 }
