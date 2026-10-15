@@ -27,8 +27,9 @@ The fading state (`6B2C4`) resets its frame on entry and steps the corresponding
 animation representation. Both walkers apply command flip bits and advance the
 sequence index/duration. The sequence-sprite walker also stores frame weight and
 clamps a zero computed duration to one; the tile walker does neither. The shared
-blink helper `082212DC(drawable, frame, 60, 40)` toggles flag one with one of three
-periods and reports completion after frame 60. Completion clears the pool bit
+blink helper `082212DC(drawable, frame, 60, 40)` uses a three-period table and reports completion after frame 60. For this
+`(60,40)` call, it selects table index zero through frame 40, then index two;
+index one is not selected because the helper tests its fourth argument first. Completion clears the pool bit
 and slot state, removes/frees an active drawable, then writes index `-1` and zero
 flags. Otherwise the frame increments. The otherwise redundant flags-bit-8 mask
 before the blink call remains as an empty-asm lifetime concession.
@@ -40,8 +41,32 @@ loader declaration happened to leave `r1` unchanged. It returns resource lookup
 position keyword `70` and velocity keyword `76`, with missing components inside
 each present triple defaulting to zero. An absent whole keyword leaves that
 local vector unassigned, matching the observed wrapper; callers need to supply
-the vector keywords for a defined vector input. It then reads keywords `50`,
-`64`, `72`, and `6C` and calls the constructor with graphics ID `1C1E`, context
+the vector keywords for a defined vector input. The registry maps key `7314`
+to Thumb callback `0806BA59`. All five literal-key callers in the ROM's GCX image
+supply both `p` and `v`, with three operands in each triple:
+
+| Native packet address | Procedure index | Present vector keywords |
+|---|---:|---|
+| 08DF2AEA | 8799 | p, v |
+| 08DF3B6D | 1717 | p, v |
+| 08E50ED4 | 6013 | p, v |
+| 08E50F77 | 6015 | p, v |
+| 08E540AA | 6144 | p, v |
+
+These are native `B745` packets, whose handler `08225590` uses the same actor
+registry lookup `08225884` before invoking the callback. The bytecode has a short
+argument-list envelope containing key `7314`, followed by keyword envelopes
+inside the full native packet; inspecting only `gcx.py chara` output misses
+these callers and keyword tails. An exhaustive little-endian key-byte scan of
+the GCX body has eight hits: these five callers and three unrelated compact
+length/procedure-byte coincidences. The reviewed packet bounds and decoded
+triples are retained privately in `build/7314-native-call-keywords.json` and the
+raw-hit classification in `build/7314-key-occurrences.json`. This proves the
+precondition for the five literal-key callers, without claiming runtime
+coverage or proving the arguments of arbitrary dynamically computed dispatch.
+Dynamic/nonliteral callers must also supply both vector keywords.
+
+The wrapper then reads keywords `50`, `64`, `72`, and `6C` and calls the constructor with graphics ID `1C1E`, context
 `D43F`, slot flags `11`, palette bank one, and two negative-four bias parameters.
 
 The constructor (`6B5D4`) remains a private nonmatching draft. Its recovered
