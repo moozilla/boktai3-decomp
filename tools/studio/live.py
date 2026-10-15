@@ -20,6 +20,7 @@ import time
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 OUT = os.path.join(ROOT, "build", "centaur")
 TAGS = os.path.join(ROOT, "data", "gfx_text.csv")
+NOTES = os.path.join(ROOT, "data", "notes.csv")
 STAGE_PALS = os.path.join(ROOT, "data", "stage_palettes.csv")
 SPRITE_PALS = os.path.join(OUT, "sprite_palettes.json")
 SIZES = {0: [(8, 8), (16, 16), (32, 32), (64, 64)], 1: [(16, 8), (32, 8), (32, 16), (64, 32)],
@@ -127,7 +128,16 @@ class Live:
             }
 
 
-def list_captures():
+def _json(path, default):
+    try:
+        return json.load(open(path))
+    except (OSError, ValueError):
+        return default
+
+
+def list_captures(limit=40):
+    """Captures, newest first, with their label/group (info.json) and the stage
+    map the analysis found."""
     d = os.path.join(OUT, "captures")
     if not os.path.isdir(d):
         return []
@@ -135,12 +145,28 @@ def list_captures():
     for name in os.listdir(d):
         m = os.path.join(d, name, "meta.json")
         if os.path.exists(m):
-            try:
-                meta = json.load(open(m))
-            except ValueError:
-                meta = {}
-            out.append(dict(meta, name=name, mtime=os.path.getmtime(m)))
-    return sorted(out, key=lambda x: -x["mtime"])[:40]
+            meta = _json(m, {})
+            info = _json(os.path.join(d, name, "info.json"), {})
+            an = os.path.join(d, name, "analysis.json")
+            stage = _json(an, {}).get("stage_map") if limit is None and os.path.exists(an) else None
+            out.append(dict(meta, name=name, mtime=os.path.getmtime(m), label=info.get("label", ""),
+                            group=info.get("group", ""), notes=info.get("notes", ""), stage_map=stage))
+    out.sort(key=lambda x: -x["mtime"])
+    return out[:limit] if limit else out
+
+
+def set_capture_info(name, req):
+    """Label, group and notes of a capture (build/centaur/captures/NAME/info.json)."""
+    d = os.path.join(OUT, "captures", os.path.basename(name))
+    if not os.path.isdir(d):
+        raise FileNotFoundError(name)
+    p = os.path.join(d, "info.json")
+    info = _json(p, {})
+    for k in ("label", "group", "notes"):
+        if k in req:
+            info[k] = str(req[k]).strip()
+    json.dump(info, open(p, "w"), ensure_ascii=False, indent=1)
+    return info
 
 
 # -- capture analysis ----------------------------------------------------------
@@ -159,8 +185,42 @@ def _archive(label):
     return []
 
 
+_pkg_frames = {}
+
+
+def package_frames(h):
+    """CB05 package -> [(set of pool tile numbers, set of part palette banks)] per
+    frame (tools/assets/sprites.py)."""
+    if h in _pkg_frames:
+        return _pkg_frames[h]
+    f = dict(_archive("tCB05")).get(h)
+    out = []
+    if f:
+        b = open(f, "rb").read()
+        nframes = struct.unpack_from("<H", b, 2)[0]
+        offs = struct.unpack_from("<5I", b, 0xC)
+        for i in range(nframes):
+            n, = struct.unpack_from("<H", b, offs[0] + i * 20 + 2)
+            po, = struct.unpack_from("<I", b, offs[0] + i * 20 + 16)
+            tiles, banks = set(), set()
+            for k in range(n):
+                o = offs[2] + po + k * 8
+                attr, a2 = struct.unpack_from("<H", b, o)[0], struct.unpack_from("<H", b, o + 6)[0]
+                w, hh = SIZES[(attr >> 8) & 3][(attr >> 10) & 3]
+                t = a2 & 0x3FF
+                banks.add(a2 >> 12)
+                for ty in range(hh // 8):
+                    for tx in range(w // 8):
+                        tiles.add(t + ty * 16 + tx)
+            out.append((tiles, banks))
+    _pkg_frames[h] = out
+    return out
+
+
 def tile_index():
-    """32-byte 4bpp tile -> (kind, hash) for the sprite resources (CB05 packages, 98F5 sprites)."""
+    """32-byte 4bpp tile -> (kind, hash, n) for the sprite resources: CB05
+    packages (n = tile number in the package's pool) and 98F5 large sprites
+    (n = frame)."""
     global _tile_index
     if _tile_index is not None:
         return _tile_index
@@ -171,7 +231,7 @@ def tile_index():
         for o in range(tiles, len(d) - 31, 32):
             t = d[o:o + 32]
             if any(t):
-                idx.setdefault(t, ("spr", h))
+                idx.setdefault(t, ("spr", h, (o - tiles) // 32))
     for h, f in _archive("t98F5"):
         d = open(f, "rb").read()
         count, = struct.unpack_from("<I", d, 4)
@@ -179,12 +239,12 @@ def tile_index():
         recs = [struct.unpack_from("<IBBBBI", d, 0x18 + i * 12) for i in range(count)]
         for i, r in enumerate(recs):
             end = recs[i + 1][5] if i + 1 < count else parts_at - frames_at
-            for o in range(r[5], end, 12):
+            for fi, o in enumerate(range(r[5], end, 12)):
                 n_parts, n_tiles, _, pix, _ = struct.unpack_from("<BBHII", d, frames_at + o)
                 for k in range(n_tiles):
                     t = d[pixels + pix + k * 32:pixels + pix + k * 32 + 32]
                     if any(t):
-                        idx.setdefault(t, ("big", f"{r[0] & 0xFFFF:04X}"))
+                        idx.setdefault(t, ("big", f"{r[0] & 0xFFFF:04X}", fi))
     _tile_index = idx
     return idx
 
@@ -272,21 +332,41 @@ def analyse_capture(name):
         if y >= 160 and y < 228:
             continue
         found = collections.Counter()
+        nums = collections.defaultdict(list)
         tw = w // 8
         for k in range((w // 8) * (h // 8)):
             tx, ty = k % tw, k // tw
             t = tile + (ty * tw + tx if obj1d else ty * 32 + tx)
-            o = 0x10000 + t * 32
+            o = 0x10000 + (t & 0x3FF) * 32
             hit = idx.get(vram[o:o + 32])
             if hit:
-                found[hit] += 1
+                found[hit[:2]] += 1
+                nums[hit[:2]].append(hit[2])
         match = found.most_common(1)[0][0] if found else None
+        frame = None
+        if match and match[0] == "big":
+            frame = collections.Counter(nums[match]).most_common(1)[0][0]
+        elif match:
+            got = set(nums[match])
+            best = max(enumerate(package_frames(match[1])), key=lambda f: len(f[1][0] & got), default=None)
+            frame = best[0] if best and best[1][0] & got else None
         colors = list(struct.unpack_from("<16H", pal, 0x200 + bank * 32))
         sprites.append({"oam": i, "x": x if x < 256 else x - 512, "y": y if y < 160 else y - 256, "w": w, "h": h,
-                        "tile": tile, "bank": bank, "match": list(match) if match else None, "colors": colors})
+                        "tile": tile, "bank": bank, "match": list(match) if match else None, "frame": frame,
+                        "tiles": (w // 8) * (h // 8), "matched": found[match] if match else 0, "colors": colors})
         if match:
-            learned[f"{match[0]}:{match[1]}"] = colors
-    # remember what was learned
+            learned.setdefault(f"{match[0]}:{match[1]}", []).append((bank, frame))
+    # remember what was learned: the whole OBJ palette RAM, and which bank the
+    # resource's palette bank 0 landed in (package parts carry their own bank)
+    objpal = list(struct.unpack_from("<256H", pal, 0x200))
+    for key, seen in list(learned.items()):
+        kind, h = key.split(":")
+        part_min = 0
+        if kind == "spr":
+            frames = package_frames(h)
+            got = [frames[f][1] for _, f in seen if f is not None and f < len(frames)]
+            part_min = min((min(b) for b in got if b), default=0)
+        learned[key] = {"pal": objpal, "base": max(0, min(b for b, _ in seen) - part_min)}
     if learned:
         known = {}
         if os.path.exists(SPRITE_PALS):
@@ -333,6 +413,32 @@ def sprite_palettes():
         return json.load(open(SPRITE_PALS))
     except ValueError:
         return {}
+
+
+# -- notes on anything: maps, sprites, palettes, scenes, strings ---------------
+NOTE_FIELDS = ["kind", "key", "label", "notes"]
+
+
+def notes():
+    if not os.path.exists(NOTES):
+        return []
+    return list(csv.DictReader(open(NOTES, encoding="utf-8")))
+
+
+def save_note(n):
+    rows = {(r["kind"], r["key"]): r for r in notes()}
+    key = (str(n.get("kind", "")), str(n.get("key", "")).upper())
+    label, text = str(n.get("label", "")).strip(), str(n.get("notes", "")).strip()
+    if not label and not text:
+        rows.pop(key, None)
+    else:
+        rows[key] = {"kind": key[0], "key": key[1], "label": label, "notes": text}
+    with open(NOTES, "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, NOTE_FIELDS)
+        w.writeheader()
+        for k in sorted(rows):
+            w.writerow(rows[k])
+    return notes()
 
 
 # -- graphics containing text ---------------------------------------------------
