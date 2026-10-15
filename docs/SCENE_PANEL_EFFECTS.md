@@ -1,0 +1,94 @@
+# Scene panel particles and time palettes
+
+`08057960–08058130` is an earlier group of consumers of the same large object
+viewed by `scene_panel.h`. The additional layout is in
+`include/scene_panel_effects.h`; its public functions take `struct ScenePanel *`
+and cast to the local effects view. `ScenePanel` remains a tentative identity.
+These are static contracts, without claims of observed gameplay coverage.
+
+The effect state/frame halfwords at `0x4FC/0x4FE` are separate from the state
+callback at `0x250` and its counter at `0x22E`. The state setter stores the new
+state and clears its counter. An optional script resource ID at `0x17AC` is
+called with one unchanged argument word through the standard argument
+count/pointer descriptor. The descriptor sets its low count halfword to one
+and preserves the upper halfword, as in the original.
+
+The particle resource is at `0x560`. Thirty-two `0x34` entries begin at `0x564`;
+shared active/cursor bytes are at `0xBE4/0xBE5`. Each particle has flags at zero,
+render-mode byte at `0x0F`, 8-byte position at `0x18`, 8-byte velocity at `0x28`,
+and active/age/lifetime bytes at `0x30/0x31/0x32`. Insertion overwrites the
+current cyclic slot, clears hidden flag 1, copies the supplied position and
+velocity, selects animation frame 2, stores the lifetime and render mode,
+clears age, and marks the entry and pool active. The cursor wraps after 31.
+There is no inactive-slot search or capacity rejection.
+
+While the pool is active, update visits every slot. An active particle hides
+and deactivates when its age is already at least its lifetime. Otherwise it
+adds velocity to position, selects animation frame 3 at age 6, then increments
+age. The shared active byte becomes whether any particle took that motion
+path. Initialization finds resource `0x1C1E`, clears the shared active byte,
+initializes every sprite with helper mode 1, scale `(-4, -4)`, and render helper
+mode 1, then clears each entry's active byte. It does not explicitly reset the
+cursor. Destruction removes all thirty-two sprites.
+
+The panel has a 256-color buffer at `0x20`, arranged as sixteen rows of sixteen
+RGB15 colors. Three palette source pointers are at `0x220`; source and target
+selection bytes are at `0x22C/0x22D`. The current time phase is at `0xC0B`.
+Palette blend frame/active and channel-dirty halfwords are at
+`0x142C/0x142E/0x1430`.
+
+Initialization reads three optional `A` values, defaulting to `0x2365`,
+`0xF80C`, and `0xA344`. It narrows each resource name to sixteen bits, looks it
+up with extension hash `0x92B3`, and stores the returned address plus `0x14`.
+It preserves the original absence of a null check. It samples the time phase,
+applies the selection below, then clears blend frame/active and copies the
+target source into the full 256-color buffer and the first three staging rows
+at `gUnk_03004FC0`. It initializes channels 0–2 to 0, 1, and 2 and clears the
+state callback.
+
+| Time phase | Source | Target | Starts a blend |
+| --- | --- | --- | --- |
+| 0 | 2 | 2 | No |
+| 1 | 2 | 0 | Yes |
+| 2 | 0 | 0 | No |
+| 3 | 0 | 1 | Yes |
+| 4 | 1 | 2 | Yes |
+| 5 | 2 | 2 | No |
+
+Starting a blend clears its frame and sets active. The other cases preserve
+an existing blend's counter and active field. The phase getter at `08228DB8`
+returns full-word values 0–5; this updater compares the full return value
+before narrowing the stored phase byte.
+
+A blend update marks channels dirty and increments the sixteen-bit frame.
+Frames 1–63 blend every RGB channel independently with weights `64 - frame`
+and `frame`, using a signed shift right by six. At frame 64 the target source
+is copied directly and active clears. The main sprite at `0x254` is eligible
+for palette animation when its active halfword at relative `0x68` is nonzero
+and hidden flag 1 is clear. Its graphics are at relative `0x2C`, palette
+pointer at `0x38`, sixteen-color working buffer at `0x48`, cached palette frame
+at `0x6A`, and palette-cycle counter at `0x6E`.
+
+The cycle counter advances only when the visibility predicate succeeds and
+wraps after 129. It selects frames 0 for 0–29, 1 for 30–39, 2 for 40–49, 3 for
+50–109, 2 for 110–119, and 1 for 120–129. The palette bank is
+`0x203 + selection * 4 + frame`. During a blend, the updater also blends the
+sprite's sixteen colors from the corresponding source/target banks in
+`gUnk_030042E4`, installs its working-buffer pointer, and leaves the cached
+palette frame unchanged. At blend completion it updates the cache and selects
+the target bank. With no active blend, it reselects a bank only when that
+cached frame changes.
+
+The dispatcher calls a nonnull state callback, updates the time palette, and
+then uploads the first three selected channel rows into `gUnk_03004FC0` when
+channels are dirty. Each row is a 32-byte CpuSet copy. It clears dirty after
+the uploads. This is a staging-buffer update, without an asserted direct VRAM
+write.
+
+All twelve functions match their complete reviewed extents. Seven are newly
+recovered, totaling 1,792 bytes, a 0.0742 percentage-point gain; five existing
+matching functions totaling 208 bytes now share these contracts. Remaining
+register bindings and empty barriers are temporary matching concessions,
+minimized before commit. The explicit palette-loop scratch structure records
+persistent loop state; no handwritten instruction body or explicit r7 binding
+is used. Combined ROM validation belongs to the integrator's batch.
