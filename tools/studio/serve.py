@@ -212,7 +212,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, open(os.path.join(HERE, "live.html"), "rb").read(), "text/html; charset=utf-8")
         elif self.path in ("/captures", "/captures.html"):
             self.send(200, open(os.path.join(HERE, "captures.html"), "rb").read(), "text/html; charset=utf-8")
-        elif self.path in ("/static/common.js", "/static/common.css"):
+        elif self.path == "/api/display":
+            self.send(200, {"jp": self.server.display_jp, "en": self.server.display_en})
+        elif self.path in ("/static/common.js", "/static/common.css", "/static/inspector.js"):
             ctype = "text/javascript" if self.path.endswith(".js") else "text/css"
             self.send(200, open(os.path.join(HERE, os.path.basename(self.path)), "rb").read(), ctype + "; charset=utf-8")
         elif self.path == "/api/notes":

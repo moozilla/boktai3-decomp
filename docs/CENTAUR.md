@@ -36,7 +36,11 @@ for the matching build; the English ROM reads better but differs in timing.
   graphics) shows briefly at the bottom edge if it is longer than a name.
   `subs("both")` adds the Japanese, `subs("jp")` / `subs("off")`,
   `subpos("top")` moves that fallback box to the top, `subid(true)` shows
-  string numbers.
+  string numbers. `substyle("shadow")` (outlined text, the default) or
+  `substyle("box")`, `subsize(1.0)` (1 = 6 GBA pixels) and `suboffset(px)`
+  set the look; the Live page has the same controls, and they are kept in
+  `build/centaur/settings.json`. Text the game draws as sprites (the region
+  select screen's button labels, for example) is not subtitled yet.
 * **HUD** (top left): recording timer, current map and tileset, god mode, and
   whether the studio is connected. `hud(false)` hides it.
 
@@ -75,9 +79,11 @@ screen in both.
 * **Text the game fetched**: newest first, with a divider wherever the scene or
   map changed. **Resources loaded**: with a preview; click to open it in the
   side panel.
+* **Screen** (the middle column): the game screen with the inspector below
+  (see the Captures page). **Refresh** captures it as `live`; **follow**
+  refreshes every 2 s.
 * **Bookmarks**: thumbnails; click to jump there. **Recent captures** link to
-  the Captures page. **Inspect screen** captures the screen as `live` and opens
-  it in the side panel: every sprite, layer and palette right now.
+  the Captures page.
 * **Resources loaded** has a filter per type; types that are not graphics
   (`hp`, `anm`, ...) open in a data view (description, LZ77-decompressed hex).
 
@@ -89,11 +95,16 @@ panel (Esc closes it; ⌘-click opens a tab). Every page has the same menu.
 A capture list (label, group, filter; the stage survey is hidden unless
 asked) and an inspector:
 
-* the screenshot with a box on every sprite: hover for its OAM entry and
-  resource, click for its detail (drawn from the captured VRAM, the exact
-  resource frame, a label/notes editor, "Has text…");
-* **Sprites**: every OAM entry drawn inline, with its resource and frame
-  (matched by tile contents), label and palette bank;
+* the screenshot with outlines on every sprite and on the text the game drew:
+  hover for the resource or string, click a sprite for its detail (drawn from
+  the captured VRAM, the resource frame, a label/notes editor, "Has text…"),
+  shift-click to combine several, click a string to edit it in the side panel;
+* **Sprites** or **OAM entries**: by default the OAM entries of one sprite
+  are grouped (same package, boxes touching or a tile apart in a row) and the
+  group's frame is the one whose parts use most of its tiles, so a button
+  icon and its label read as one sprite; each is drawn inline with its
+  resource, frame, label, palette bank and pool entry;
+* **Text**: every string on screen, English and Japanese;
 * **BG layers**: each background map as it sits in VRAM (unscrolled: the
   capture cannot read the scroll registers);
 * **Palettes**: BG and OBJ palette RAM, which resources match each bank, and
@@ -103,12 +114,12 @@ asked) and an inspector:
 The analysis remembers the stage palette per map (`data/stage_palettes.csv`)
 and, per sprite resource, the whole OBJ palette RAM with the bank its palette
 bank 0 used (`build/centaur/sprite_palettes.json`). Package parts carry their
-own banks, so a single learned bank used to colour the title subtitle wrongly.
-The Maps view can colour a map with the palette RAM of a capture that showed it.
+own banks, so a single learned bank used to color the title subtitle wrongly.
+The Maps view can color a map with the palette RAM of a capture that showed it.
 
-Sprite packages no longer need a capture for their colours: each names its
+Sprite packages no longer need a capture for their colors: each names its
 palette in the `9B1B` pool (see ASSETS.md, Sprite palettes), which the Sprites
-view uses by default ("in-game"), with the capture's colours or the palette
+view uses by default ("in-game"), with the capture's colors or the palette
 menu as alternatives. The pool itself is browsable at `/gfx#pool`.
 
 ## Notes on anything
