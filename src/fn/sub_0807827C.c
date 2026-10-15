@@ -1,13 +1,13 @@
-#include "global.h"
-void Sound_PlaySong(u32);
-void sub_0807827C(u8 *p)
+#include "scene_actor_behavior.h"
+#define SceneActorBehavior_PlayReactionSound sub_0807827C
+void SceneActorBehavior_PlayReactionSound(struct SceneActorBehaviorView *actor)
 {
     u32 m = 6;
-    if (*(u16 *)(p + 0x2d4) & m) {
+    if (actor->flags2D4 & m) {
         Sound_PlaySong(0x13e);
         return;
     }
-    switch (p[0x98]) {
+    switch (actor->category) {
         case 4:
             Sound_PlaySong(0xd4);
             break;
@@ -15,7 +15,7 @@ void sub_0807827C(u8 *p)
             Sound_PlaySong(0xfd);
             break;
         case 3:
-            switch (*(u16 *)(p + 0x1e6)) {
+            switch (actor->paletteOffset) {
                 case 0:
                 case 1:
                 case 3:
