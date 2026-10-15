@@ -29,8 +29,9 @@ struct SceneActorPaletteTileView {
 struct SceneActorRegistryActor *SceneActorRegistry_FindLiving(u32);
 s32 SceneActorRegistry_CountLivingByCategory(s32);
 u32 SceneActorRegistry_TestCategoryFlags(s32, u32);
-void sub_08071E00(u32, u32, u32, s32, u32);
-u32 sub_08071F50(struct SceneActorPaletteManagerView *, struct SceneActorRegistryActor *);
+void SceneActorPalette_BeginTransition(u32, u32, u32, s32, u32);
+u32 SceneActorPalette_ApplyTransition(struct SceneActorPaletteManagerView *,
+                                      struct SceneActorRegistryActor *);
 u32 sub_08072124(void);
 void SceneActorPalette_ClearCompletedTransitions(void);
 void sub_08072204(struct SceneActorRegistryActor *);

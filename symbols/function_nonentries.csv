@@ -1,3 +1,4 @@
 address,evidence
 0806070C,Interior push in 08060708 prologue after push r4-r6/lr and mov r6/r8; single return restores the complete saved set; sole caller targets 08060708
 08060D10,Interior push in 08060D0C prologue after push r4-r6/lr and mov r6/r8; single return restores the complete saved set; callers target 08060D0C
+080800AC,Interior push r5-r7 after prologue at080800A4 saves r4-r7/lr and copies sl/sb/r8; return restores all saved registers; no decoded ROM BL targets080800AC; raw pointer-shaped word at0878EB14 lies inside map resourceE44F at+15EC

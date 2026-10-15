@@ -5,7 +5,7 @@ u8 *sub_0821D64C(s32, s32);
 s32 sub_0821F204(void *, const struct ContactPosition *, const struct ContactPosition *);
 s32 sub_0821F7A8(void *, const struct ContactPosition *, const struct ContactPosition *);
 u8 sub_0807CA00(struct SceneActorRegistryActor *, const struct ContactPosition *, u32, u32);
-void sub_08076034(struct SceneActorRegistryActor *, u32);
+void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorRegistryActor *, u32);
 struct MovementRouteState {
     u8 unknown0[6];
     u16 field6;
@@ -319,7 +319,7 @@ modeOne: {
         field = (void *)((u8 *)actor + writeOffset);
         *field = value;
     }
-    sub_08076034(actor, 0);
+    SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     {
         struct Player **players = gUnk_02000580;
         register u32 offset asm("r6") = 0x5d0;

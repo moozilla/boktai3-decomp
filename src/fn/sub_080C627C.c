@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08076034(void *, u32);
+void SceneActorAnimation_SelectDirectionalEntry(void *, u32);
 static inline u32 orr(u32 k, u16 *a)
 {
     return k | *a;
@@ -27,7 +27,7 @@ void sub_080C627C(struct S *p, s32 n)
     if (tk(&p->b2)) {
         s32 m;
         u16 *a;
-        sub_08076034(p, 7);
+        SceneActorAnimation_SelectDirectionalEntry(p, 7);
         a = &p->h4;
         m = -2;
         *a = m & *a;

@@ -10,7 +10,7 @@ struct Actor080A5FC0 {
     u16 flags;
     u16 flags2;
 };
-void sub_08076034(void *, u32);
+void SceneActorAnimation_SelectDirectionalEntry(void *, u32);
 
 static inline u8 Consume(u8 *flag)
 {
@@ -34,7 +34,7 @@ static inline void Or(u16 m, u16 *f)
 void sub_080A5FC0(struct Actor080A5FC0 *p, s32 time)
 {
     if (Consume(&p->pending)) {
-        sub_08076034(p, 7);
+        SceneActorAnimation_SelectDirectionalEntry(p, 7);
         Clr(&p->flags, ~1);
     }
     if (time == 40)

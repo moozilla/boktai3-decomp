@@ -2,7 +2,7 @@
 #include "scene_actor_registry.h"
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 void sub_0807FC90(u8 *);
-void sub_080771E4(struct SceneActorRegistryActor *);
+void SceneActorTerrain_DisableCollision(struct SceneActorRegistryActor *);
 void SceneActorRecord_RecordPair(u32, u32);
 extern u16 gUnk_030039F0;
 static inline u8 IsUnavailable(struct SceneActorRegistryActor *input)
@@ -180,7 +180,7 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
                         *field = entry;
                     }
                 }
-                sub_080771E4(actor);
+                SceneActorTerrain_DisableCollision(actor);
                 if (!IsScenePaused() && !ReadSuppressionFlag(actor))
                     SceneActorRecord_RecordPair(gUnk_030039F0, (u16)actor->id);
             }

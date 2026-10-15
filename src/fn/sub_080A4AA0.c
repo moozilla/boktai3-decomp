@@ -7,7 +7,7 @@ void sub_08013B74(void *);
 void sub_08003C10(void *);
 void sub_08225938(void *);
 void Collider_Remove(void *);
-void sub_0806FBC8(void *);
+void SceneActorRegistry_UnlinkActor(void *);
 
 s32 sub_080A4AA0(u8 *p)
 {
@@ -22,6 +22,6 @@ s32 sub_080A4AA0(u8 *p)
     sub_08003C10(p + 0x50);
     sub_08225938(p + 0x50);
     Collider_Remove(p + 0x134);
-    sub_0806FBC8(p);
+    SceneActorRegistry_UnlinkActor(p);
     return 0;
 }

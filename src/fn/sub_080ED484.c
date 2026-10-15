@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_080766F8(u8 *, u32);
+void SceneActorAnimation_SelectDirectionalFlags(u8 *, u32);
 
 static inline u8 Consume(u8 *flag)
 {
@@ -25,6 +25,6 @@ void sub_080ED484(u8 *p)
             *(u16 *)(p + 0x13a) = v & 0xfff7;
         }
         Or(0x800, (u16 *)(p + 0x2c0));
-        sub_080766F8(p, 20);
+        SceneActorAnimation_SelectDirectionalFlags(p, 20);
     }
 }
