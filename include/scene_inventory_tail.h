@@ -11,7 +11,7 @@ struct SceneInventoryTail {
     u8 page, unknown1AB1[0x1BE4 - 0x1AB1];
     struct SceneInputGridView grid;
     u8 unknown1C14[0x1D00 - 0x1C14];
-    u8 highlight;
+    struct SceneInputHighlight highlight;
 };
 void SceneInputPanel_HighlightCompare(void *, void *);
 void SceneInputPanel_HighlightPrompt(void *, void *);
