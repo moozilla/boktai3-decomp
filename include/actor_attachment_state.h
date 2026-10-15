@@ -17,14 +17,14 @@ struct ActorAttachmentSlotView {
     struct ContactPosition offset;
     void *update;
     struct ContactPosition position;
-    u8 frame, active, flags, action;
+    u8 frame, flags31, flags, action;
     u16 unknown34;
     u8 status[3], phase[3];
     u8 partMask;
     s8 slotId;
     u8 kind, resourceKind;
     s16 timer, thresholds[3];
-    u8 unknown48[4];
+    u8 active, unknown49[3];
     s16 *value;
     s32 counters[3];
     void *source;
