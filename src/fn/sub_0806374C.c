@@ -49,4 +49,5 @@ s32 SceneAudioEvent_DispatchPending(struct SceneEventDispatchTask *owner)
         }
         i++;
     }
+    /* The task driver discards the original incidental return register. */
 }
