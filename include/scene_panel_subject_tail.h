@@ -5,7 +5,10 @@
 /* A separate view until the subject state-handler layouts are integrated. */
 struct ScenePanelSubjectDrawable {
     u32 flags;
-    u8 unknown4[0x18];
+    u8 unknown4[3], priority;
+    u8 unknown8[8];
+    u16 frame;
+    u8 unknown12[0xA];
     struct ContactPosition position;
     u8 unknown24[8];
 };
@@ -19,7 +22,8 @@ struct ScenePanelSubjectTail {
     void *resource;
     u8 row, variant, kind, state;
     u16 stateFrame, contactProgress, contactLimit;
-    u8 unknownDA[4];
+    u8 unknownDA[2];
+    u16 progressStep;
     u16 timer, appearDelay, unknownE2, contactCooldown, requested;
     u16 requestLevel, unknownEA, hold;
     u8 unknownEE, contactKind, changed, positionReset;
@@ -38,4 +42,6 @@ void sub_0805D770(struct ScenePanelSubjectTail *);
 s32 sub_0805D800(struct ScenePanelSubjectTail *);
 s32 sub_0805D884(struct ScenePanelSubjectTail *);
 void sub_0805D8A8(struct ScenePanelSubjectTail *, u32);
+s32 sub_0805D92C(struct ScenePanelSubjectTail *, const struct ContactPosition *, u32, u32, u32, u32,
+                 u32, u32, u32);
 #endif
