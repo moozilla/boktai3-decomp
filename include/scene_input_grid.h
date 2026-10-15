@@ -16,9 +16,9 @@ struct SceneInputGrid {
 };
 void sub_0805E484(struct SceneInputPair *, const u32 *, const struct SceneInputPosition *,
                   const struct SceneInputPosition *, const u32 *, const u32 *, u32);
-s32 sub_0805E538(struct SceneInputPair *);
-s8 sub_0805E5D0(struct SceneInputGrid *);
+s32 SceneInput_TickPairTransition(struct SceneInputPair *);
+s8 SceneInput_GetGridSelection(struct SceneInputGrid *);
 void sub_0805E5E4(struct SceneInputGrid *);
-void sub_0805E7C4(struct SceneInputGrid *, u32);
-u32 sub_0805E7D0(struct SceneInputGrid *, u32);
+void SceneInput_SetGridFlags(struct SceneInputGrid *, u32);
+u32 SceneInput_TestGridFlags(struct SceneInputGrid *, u32);
 #endif

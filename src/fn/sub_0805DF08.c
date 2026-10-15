@@ -1,9 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_hud_display.h"
-#define SceneHud_DrawNumericStatus sub_0805DF08
 void SceneHud_DrawNumericStatus(u32 mode)
 {
-    u16 *output = sub_0805DD18(0, 20, 1);
+    u16 *output = SceneHud_GetMapCell(0, 20, 1);
     if (mode == 0) {
         {
             register u32 glyph asm("r2") = 0xF0C0;
@@ -54,7 +53,7 @@ void SceneHud_DrawNumericStatus(u32 mode)
             field = (const s16 *)((const u8 *)state + offset);
             value = *field;
             asm("" ::"r"(offset));
-            sub_0805DD98(value, 10000, 24, 1, mode);
+            SceneHud_DrawDecimal(value, 10000, 24, 1, mode);
         }
     } else if (mode == 1) {
         {
@@ -97,7 +96,8 @@ void SceneHud_DrawNumericStatus(u32 mode)
                 output[1] = stored;
             }
         }
-        sub_0805DD98(((struct SceneHudNumericView *)gUnk_02000710)->value50C, 10000, 24, 1, mode);
+        SceneHud_DrawDecimal(((struct SceneHudNumericView *)gUnk_02000710)->value50C, 10000, 24, 1,
+                             mode);
     } else {
         {
             register u32 glyph asm("r2") = 0xF0B5;
@@ -148,7 +148,7 @@ void SceneHud_DrawNumericStatus(u32 mode)
             field = (const s32 *)((const u8 *)state + offset);
             value = *field;
             asm("" ::"r"(offset));
-            sub_0805DD98(value, 10000, 24, 1, 0);
+            SceneHud_DrawDecimal(value, 10000, 24, 1, 0);
         }
     }
 }

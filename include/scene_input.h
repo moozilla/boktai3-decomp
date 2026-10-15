@@ -27,20 +27,20 @@ struct SceneInputPair {
     struct SceneInputResource resource;
     struct SceneInputWidget widgets[2];
     struct SceneInputPosition targets[2];
-    u16 frame,duration;
+    u16 frame, duration;
 };
 
 extern u16 gUnk_03005260[];
 s32 sub_08219728(void *, void *, u32);
 void sub_0821983C(void *, void *, u32, u32, u32, u32, u32, void *);
 void sub_0816381C(u16 *, u8 *);
-void sub_0805E190(struct SceneInputWidget *, void *, u8 *, u32, u8 *);
-s32 sub_0805E1D0(struct SceneInputWidget *, void *, u8 *, u8 *);
-void sub_0805E270(struct SceneInputPair *);
-void sub_0805E2F0(struct SceneInputPair *);
-s32 sub_0805E30C(s32);
-void sub_0805E31C(struct SceneInputPair *, s32, s32);
-void sub_0805E394(struct SceneInputPosition *, s32);
-void sub_0805E3FC(struct SceneInputPair *);
-void sub_0805E468(struct SceneInputPair *);
+void SceneInput_BeginChoice(struct SceneInputWidget *, void *, u8 *, u32, u8 *);
+s32 SceneInput_TickChoice(struct SceneInputWidget *, void *, u8 *, u8 *);
+void SceneInput_InitGlyphPair(struct SceneInputPair *);
+void SceneInput_DestroyGlyphPair(struct SceneInputPair *);
+s32 SceneInput_MapGlyphIndex(s32);
+void SceneInput_SetGlyphPair(struct SceneInputPair *, s32, s32);
+void SceneInput_GetGridPosition(struct SceneInputPosition *, s32);
+void SceneInput_InitMarkerPair(struct SceneInputPair *);
+void SceneInput_DestroyMarkerPair(struct SceneInputPair *);
 #endif

@@ -14,8 +14,8 @@ struct SceneHudNumericView {
     u8 unknown0[0x50C];
     s32 value50C;
 };
-u32 sub_08228D88(void);
-u32 sub_08228D94(void);
-u32 sub_0805E7D0(const void *, u32);
-void sub_0805E000(struct SceneInputWidget *, u32);
+u32 SunClock_GetBaseHour(void);
+u32 SunClock_GetBaseMinute(void);
+u32 SceneInput_TestGridFlags(const void *, u32);
+void SceneHud_SetKeyframePaletteBank(struct SceneInputWidget *, u32);
 #endif

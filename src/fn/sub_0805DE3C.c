@@ -1,9 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_hud_display.h"
-#define SceneHud_DrawClock sub_0805DE3C
 void SceneHud_DrawClock(u32 mode)
 {
-    u16 *output = sub_0805DD18(0, 20, 0);
+    u16 *output = SceneHud_GetMapCell(0, 20, 0);
     if (mode == 0) {
         {
             register u32 glyph asm("r2") = 0xF0BD;
@@ -29,8 +28,8 @@ void SceneHud_DrawClock(u32 mode)
                 output[1] = stored;
             }
         }
-        sub_0805DD98(sub_08228D88(), 10, 24, 0, mode);
-        sub_0805DD98(sub_08228D94(), 10, 27, 0, mode);
+        SceneHud_DrawDecimal(SunClock_GetBaseHour(), 10, 24, 0, mode);
+        SceneHud_DrawDecimal(SunClock_GetBaseMinute(), 10, 27, 0, mode);
     } else if (mode == 1) {
         {
             register u32 glyph asm("r2") = 0xF07C;
@@ -56,8 +55,8 @@ void SceneHud_DrawClock(u32 mode)
                 output[1] = stored;
             }
         }
-        sub_0805DD98(gUnk_03005430.hourA, 10, 24, 0, 0);
-        sub_0805DD98(gUnk_03005430.minuteA, 10, 27, 0, 0);
+        SceneHud_DrawDecimal(gUnk_03005430.hourA, 10, 24, 0, 0);
+        SceneHud_DrawDecimal(gUnk_03005430.minuteA, 10, 27, 0, 0);
     } else {
         {
             register u32 glyph asm("r2") = 0xF07C;
@@ -83,7 +82,7 @@ void SceneHud_DrawClock(u32 mode)
                 output[1] = stored;
             }
         }
-        sub_0805DD98(gUnk_03005430.hourB, 10, 24, 0, 0);
-        sub_0805DD98(gUnk_03005430.minuteB, 10, 27, 0, 0);
+        SceneHud_DrawDecimal(gUnk_03005430.hourB, 10, 24, 0, 0);
+        SceneHud_DrawDecimal(gUnk_03005430.minuteB, 10, 27, 0, 0);
     }
 }

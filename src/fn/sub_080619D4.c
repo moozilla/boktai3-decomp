@@ -7,7 +7,7 @@ struct S {
     u8 m;
 };
 
-void sub_0805EA00(u8 *);
+void SceneInput_SaveSelection(u8 *);
 void sub_0806147C(struct S *);
 void sub_080607B0(struct S *);
 void sub_08060F4C(struct S *);
@@ -18,7 +18,7 @@ void sub_08062414(void);
 void sub_080619D4(struct S *p)
 {
     p->a = 0x80;
-    sub_0805EA00((u8 *)p + 0x1BE4);
+    SceneInput_SaveSelection((u8 *)p + 0x1BE4);
     sub_0806147C(p);
     switch (p->m) {
         case 0:

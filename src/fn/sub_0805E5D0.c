@@ -5,7 +5,6 @@ struct SceneInputGridSelectionView {
     u8 unknown3[9];
     s8 cells[9][4];
 };
-#define SceneInput_GetGridSelection sub_0805E5D0
 s8 SceneInput_GetGridSelection(struct SceneInputGrid *owner)
 {
     struct SceneInputGridSelectionView *grid = (void *)owner;
