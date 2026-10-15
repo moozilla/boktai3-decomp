@@ -207,7 +207,7 @@ def package_frames(h):
                 o = offs[2] + po + k * 8
                 attr, a2 = struct.unpack_from("<H", b, o)[0], struct.unpack_from("<H", b, o + 6)[0]
                 w, hh = SIZES[(attr >> 8) & 3][(attr >> 10) & 3]
-                t = a2 & 0x3FF
+                t = a2 & 0xFFF  # 12-bit tile number in packages with more than 1024 tiles
                 banks.add(a2 >> 12)
                 for ty in range(hh // 8):
                     for tx in range(w // 8):
@@ -359,6 +359,12 @@ def analyse_capture(name):
     # remember what was learned: the whole OBJ palette RAM, and which bank the
     # resource's palette bank 0 landed in (package parts carry their own bank)
     objpal = list(struct.unpack_from("<256H", pal, 0x200))
+    # the palette manager's pool entry (resource 9B1B) per OBJ bank
+    objpool = None
+    if os.path.exists(os.path.join(d, "iwram.bin")):
+        iw = open(os.path.join(d, "iwram.bin"), "rb").read()
+        if len(iw) >= 0x5210:
+            objpool = list(struct.unpack_from("<16H", iw, 0x51F0))
     for key, seen in list(learned.items()):
         kind, h = key.split(":")
         part_min = 0
@@ -367,6 +373,10 @@ def analyse_capture(name):
             got = [frames[f][1] for _, f in seen if f is not None and f < len(frames)]
             part_min = min((min(b) for b in got if b), default=0)
         learned[key] = {"pal": objpal, "base": max(0, min(b for b, _ in seen) - part_min)}
+        if kind == "big" and objpool:  # one bank: remember its pool entry, unfaded
+            p = objpool[min(b for b, _ in seen)]
+            if p < 0x8000:
+                learned[key]["pool"] = p
     if learned:
         known = {}
         if os.path.exists(SPRITE_PALS):
@@ -380,7 +390,7 @@ def analyse_capture(name):
     stage_map = ram_maps[0][1] if ram_maps else meta.get("map")
     if bg_best and stage_map:
         remember_stage_palette(stage_map, meta.get("tileset") or "", bg_best)
-    result = {"bg": bg, "bg_best": bg_best, "sprites": sprites, "meta": meta,
+    result = {"bg": bg, "bg_best": bg_best, "sprites": sprites, "meta": meta, "objpool": objpool,
               "ram_maps": [[f"{a:08X}", h] for a, h in ram_maps], "stage_map": stage_map}
     json.dump(result, open(os.path.join(d, "analysis.json"), "w"))
     return result
