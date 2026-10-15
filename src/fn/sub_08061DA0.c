@@ -2,12 +2,13 @@
 #define SceneInventory_TickModeMenu sub_08061DA0
 s32 SceneInventory_TickModeMenu(struct SceneInventoryControlView *panel)
 {
-    sub_0805F0E8((void *)panel, panel->mode);
+    SceneInputPanel_PositionModeCursor((void *)panel, panel->mode);
     if (panel->mode == 3)
         SceneInput_SetGlyphPair(&panel->prompt, 0, 4);
     else
         SceneInput_SetGlyphPair(&panel->prompt, 0, -1);
-    sub_0805F220((void *)panel, ((struct SceneInventoryHighlightView *)panel)->colors);
+    SceneInputPanel_HighlightMode((void *)panel,
+                                  ((struct SceneInventoryHighlightView *)panel)->colors);
     if (sub_08061C3C(panel))
         goto handled;
     if (sub_08061CFC(panel))
