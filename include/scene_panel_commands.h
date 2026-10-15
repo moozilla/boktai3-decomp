@@ -28,4 +28,14 @@ u32 sub_08020D54(void *, void *);
 void sub_08020D08(void *);
 s32 SceneMessages_RegisterReceiver(void *, u32, u32);
 void sub_08225F88(const void *);
+
+void sub_0805C680(struct ScenePanel *);
+void sub_0805C728(struct ScenePanelCommandView *);
+void sub_0805C73C(struct ScenePanelCommandView *);
+void sub_0805C754(void);
+u32 sub_0805C760(void);
+void sub_0805C774(struct ScenePanelInteractionView *);
+s32 sub_0805C7B4(struct ScenePanelInteractionView *);
+void sub_0805C7E4(struct ScenePanelInteractionView *);
+void sub_0805C86C(struct ScenePanelInteractionView *);
 #endif
