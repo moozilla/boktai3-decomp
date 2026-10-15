@@ -134,3 +134,48 @@ category restriction. This is not evidence for unrestricted defined scalar reads
 A broader constructor/configuration proof remains outstanding; no default offsets
 or additional exact credit are claimed. The bounded permuter runs on the preserved
 conditional candidate while that evidence gap is retained explicitly.
+
+## Reviewed private route/contact drafts
+
+CA44 first selects animation entry0, writes actor destination5D4 from route point
+450 (X/Z), and computes its terrain Y. Terrain index uses signed coordinates >>8,
+map bounds, and row offsets24; out-of-bounds coordinates select cell0. Height is
+low nibble<<8, with slope kinds1/2 subtracting low Z/X respectively.
+
+It then tests contact node45C's object position+0C against actor position5C using
+query context5D0: F204 must succeed, then F7A8 must return nonzero. Result2 keeps
+velocity; other accepted results clear velocity64. Failure clears flags2D4 bit200.
+On first failure it repeats the queries for a temporary route-point vector,
+computing terrain height again. The fallback resumes callback228 with actor
+state0/phase0/behavior2 and entry1, regardless of the second query outcome.
+
+First-target success instead requests attachment kind0/frame1/category98, selects
+actor state3/phase1/behavior0, and installs FDC0 at21C. The embedded response at460
+starts state0/phase0/behavior7, timer46C=30, and saved callback470=actor228. Flags2CC
+bit10 and flags2D4 bit1000 are set; destination5D4's trailing halfword is cleared.
+Both paths clear field2C8, flags114 bit1, and field104. The field2C8 clear is not a
+clear of the similarly nearby route cursor448. Callback interpretations remain
+tentative. FDC0's first operand is an actor pointer and its second operand is a
+signed threshold compared to timer46C; its reviewed epilogue has no explicit
+scalar return.
+
+CDC4 first accepts the supplied candidate if its terrain halfword attributes lack
+maskC3 and F204 accepts it relative to source position+0C. Otherwise it constructs
+four candidates in order: cell+1, cell+rowStride, cell-1, cell-rowStride. Each center
+uses signed Mod/Div by the positive map stride, X/Z center128 within the cell, and
+Y=(heightLowNibble<<8). This neighbor Y calculation **does not** apply the slope
+subtraction used by CA44. Each key is a halfword-truncated X/Z squared distance
+from source; Y delta is also written but does not affect the key. The sum wraps
+before signed comparison. CD80 sorts these keys stably, so equal-distance ties
+retain right/down/left/up order. The first sorted candidate with clear C3 terrain
+bits and a successful F204 query is copied to output. Failure writes X/Z=30000
+and Y=0, preserving the output padding halfword.
+
+All named XYZ components in the private CDC4 draft are initialized. Eight-byte
+aggregate transfers may carry unspecified padding; no padding scalar is read.
+The map must have a positive nonzero stride and valid backing storage for the
+four queried indices. Neighbor index arithmetic is kept in unsigned integer
+address formation before pointer conversion, preserving target wrapping without
+an intermediate huge/out-of-bounds C pointer addition for negative indices.
+These drafts remain private and uncredited; their matching and caller/storage
+preconditions still require completion before promotion.
