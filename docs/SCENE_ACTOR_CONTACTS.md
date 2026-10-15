@@ -47,3 +47,23 @@ r0. The destruction leaf clears the singleton and returns its original manager
 argument unchanged, also matching its actual r0 value. Callback consumers
 discard these outputs. The manager count is signed; the preceding registration
 helper compares it with five using a signed branch (six candidate capacity).
+
+Final reviewed span: `08073A3C` through `0807462C` exclusive (3,056 bytes).
+Eleven worker functions are exact: four new functions total 2,728 bytes, about
+0.1130 percentage points (2,432 ordinary C and 296 register-pinned), and seven
+existing functions total 212 typed bytes. The independently corrected
+`Memory_ClearWordPair` at `73BFC` contributes its existing eight bytes. The
+remaining 108 bytes are initializer `73B84` (28) and creator `73BA0` (80).
+The parent's integration removes the legacy initializer's false 28-byte C
+credit and retains assembly. Its valid void worker draft is
+`wip/sub_08073B84.c`, 84.6% over all 28 bytes: only the epilogue differs.
+An explicit `__builtin_return_address(0)` model in the neighboring worker did
+not match and was not promoted.
+
+`73C2C` finds the first category match with mode zero, considering at most twelve
+records. Its ordinary-C scan/found/missing labels retain the cold return outside
+the loop backedge; structured loops otherwise move the preheader. `74600`
+uses this default lookup only for mode zero and allocates on a miss; nonzero
+modes allocate directly. Its forwarded argument lifetimes retain three of six
+initial hints after `depin.py --write`. All eleven worker extents are recorded
+in `build/scene-actor-contacts-final.json`; parent owns combined ROM validation.
