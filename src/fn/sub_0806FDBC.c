@@ -1,10 +1,7 @@
-#include "global.h"
-
-extern u8 *gUnk_02000710;
-
-void sub_0806FDBC(u8 a)
+#include "scene_actor_registry.h"
+#define SceneActorRegistry_MarkCategoryOne sub_0806FDBC
+void SceneActorRegistry_MarkCategoryOne(u8 category)
 {
-    if (a == 1) {
-        *(u32 *)(gUnk_02000710 + 0x868) |= a;
-    }
+    if (category == 1)
+        gUnk_02000710->flags868 |= category;
 }
