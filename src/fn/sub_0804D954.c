@@ -5,7 +5,7 @@ struct P {
     u8 f5e[6];
     u32 f64;
 };
-void sub_0804D954(struct P *p)
+void StagedEffect_ContractSpread(struct P *p)
 {
     u16 *q = &p->f5c;
     u32 v = *q - 0x46;

@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0804D874(u8 *p)
+void StagedEffect_MarkOuterSprites(u8 *p)
 {
     u32 m = 1;
     s32 i;

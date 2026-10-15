@@ -1,23 +1,22 @@
-#include "global.h"
-extern u8 *gUnk_02000580;
-void sub_080503A0(u8 *p, s32 b)
+#include "cell_gate.h"
+void CellGate_ClampPlayerEdge(struct CellGate *p, s32 b)
 {
-    if (p[0x1c] & 8) {
-        u32 v = *(u16 *)(gUnk_02000580 + 0x30);
+    if (p->flags & 8) {
+        u32 v = *(u16 *)&gUnk_02000580->position.x;
         if ((s32)(v & 0xff) >= b) {
-            *(u16 *)(gUnk_02000580 + 0x30) = ((s16)v >> 8 << 8) + b;
+            *(u16 *)&gUnk_02000580->position.x = ((s16)v >> 8 << 8) + b;
             {
-                u16 t = *(u16 *)(gUnk_02000580 + 0x30);
-                *(u16 *)(gUnk_02000580 + 0x168) = t;
+                u16 t = *(u16 *)&gUnk_02000580->position.x;
+                *(u16 *)((u8 *)gUnk_02000580 + 0x168) = t;
             }
         }
     } else {
-        u32 v = *(u16 *)(gUnk_02000580 + 0x34);
+        u32 v = *(u16 *)&gUnk_02000580->position.z;
         if ((s32)(v & 0xff) >= b) {
-            *(u16 *)(gUnk_02000580 + 0x34) = ((s16)v >> 8 << 8) + b;
+            *(u16 *)&gUnk_02000580->position.z = ((s16)v >> 8 << 8) + b;
             {
-                u16 t = *(u16 *)(gUnk_02000580 + 0x34);
-                *(u16 *)(gUnk_02000580 + 0x16c) = t;
+                u16 t = *(u16 *)&gUnk_02000580->position.z;
+                *(u16 *)((u8 *)gUnk_02000580 + 0x16c) = t;
             }
         }
     }
