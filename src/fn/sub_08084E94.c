@@ -1,6 +1,5 @@
 #include "global.h"
 #include "player.h"
-#define SceneActorControl_BindPrimaryPlayer sub_08084E94
 
 void sub_0812F12C(u8 *);
 

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_helpers.h"
-#define SceneActorControl_RequestVisibility sub_08084A60
 static inline u32 ReadFlags16(struct SceneActorRegistryResetView *actor, u32 inputMask)
 {
     u32 mask = inputMask;

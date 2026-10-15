@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_helpers.h"
-#define SceneActorControl_RestartPositionCurve sub_08084044
 #include "player.h"
 void SceneActorControl_RestartPositionCurve(struct SceneActorRegistryResetView *actor)
 {
@@ -84,5 +83,5 @@ void SceneActorControl_RestartPositionCurve(struct SceneActorRegistryResetView *
         *field = 1;
     }
     ActorShadow_Enable((u8 *)actor + 0x320);
-    sub_08083E98(actor, (void *)&gUnk_02000580[0]->position);
+    SceneActorControl_StartPositionCurve(actor, (void *)&gUnk_02000580[0]->position);
 }
