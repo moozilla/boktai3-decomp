@@ -1,20 +1,14 @@
-#include "global.h"
-
-struct P {
-    u8 f[0x22];
-    s16 v;
-};
-
-s32 sub_0805F758(struct P *p, s32 a, s32 b)
+#include "scene_input_panel.h"
+#define SceneInputPanel_AdjustSlidingY sub_0805F758
+s32 SceneInputPanel_AdjustSlidingY(struct SceneInputWidget *widget, s32 y, s32 frame)
 {
-    if (b <= 0xb) {
-        if ((b & 2) == 0) {
-            p->v = a - ((0x14 - b) >> 3);
+    if (frame <= 11) {
+        if ((frame & 2) == 0) {
+            widget->position.y = y - ((20 - frame) >> 3);
             return 0;
         }
-    } else if (b > 0xf) {
+    } else if (frame > 15)
         return 1;
-    }
-    p->v = a;
+    widget->position.y = y;
     return 0;
 }
