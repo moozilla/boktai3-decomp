@@ -1,16 +1,17 @@
-#include "global.h"
-u8 *Task_Create(u32, u32);
-void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
-s32 sub_080532B0(u8 *, u32, u32);
-void Task_Kill(u8 *);
-void sub_08053178(void);
-void sub_080531BC(void);
-u8 *sub_0805376C(u32 a, u32 b)
+#include "stacked_actor.h"
+struct StackedActor *Task_Create(u32, u32);
+void Task_SetCallbacks(struct StackedActor *, s32 (*)(struct StackedActor *),
+                       s32 (*)(struct StackedActor *));
+s32 StackedActor_Initialize(struct StackedActor *, s32, s32);
+void Task_Kill(struct StackedActor *);
+s32 StackedActor_Tick(struct StackedActor *);
+s32 StackedActor_Destroy(struct StackedActor *);
+struct StackedActor *StackedActor_CreateFromScript(u32 a, u32 b)
 {
-    u8 *r = Task_Create(9, 0x388);
+    struct StackedActor *r = Task_Create(9, 0x388);
     if (r) {
-        Task_SetCallbacks(r, (void (*)(void))sub_08053178, (void (*)(void))sub_080531BC);
-        if (sub_080532B0(r, a, b) < 0) {
+        Task_SetCallbacks(r, StackedActor_Tick, StackedActor_Destroy);
+        if (StackedActor_Initialize(r, a, b) < 0) {
             Task_Kill(r);
             return 0;
         }

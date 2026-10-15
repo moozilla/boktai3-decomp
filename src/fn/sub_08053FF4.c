@@ -1,5 +1,4 @@
-#include "global.h"
-
-void sub_08053FF4(void)
+#include "saved_position_marker.h"
+void SavedPositionMarker_TickDormant(struct SavedPositionMarker *marker)
 {
 }

@@ -1,38 +1,26 @@
-#include "global.h"
-struct S {
-    u32 flags;
-    u8 pad4[0x14];
-    u16 x, y, z;
-    u8 pad1e[0xa];
-    u8 mode;
-    u8 cnt;
-    u8 pad2a[2];
-    s16 vx, vy, vz;
-};
-u32 AnimData_FindEntry(u32);
-void sub_08217EEC(void *, u32, u32);
-static inline s32 dec(s32 v)
+#include "stacked_actor.h"
+void *AnimData_FindEntry(u32);
+void sub_08217EEC(struct StackedActorParticle *, void *, u32);
+static inline s32 damp(s32 v)
 {
-    s32 t = v * 15;
-    if (t >= 0)
-        return t >> 4;
-    return -(-t >> 4);
+    s32 scaled = v * 15;
+    if (scaled >= 0)
+        return scaled >> 4;
+    return -((-scaled) >> 4);
 }
-void sub_08052130(struct S *s)
+void StackedActor_TickParticle(struct StackedActorParticle *particle)
 {
-    u8 *pc = &s->cnt;
-    u32 c;
-    c = (*pc = *pc - 1);
-    if (c == 0) {
-        s->flags |= 1;
-        s->mode = c;
+    particle->life--;
+    if (particle->life == 0) {
+        particle->flags |= 1;
+        particle->enabled = 0;
     } else {
-        s->x += s->vx;
-        s->y += s->vy;
-        s->z += s->vz;
-        sub_08217EEC(s, AnimData_FindEntry(0x1C1E), ((*pc >> 2) & 1) + 2);
-        s->vx = dec(s->vx);
-        s->vy = dec(s->vy);
-        s->vz = dec(s->vz);
+        particle->position.x += particle->velocityX;
+        particle->position.y += particle->velocityY;
+        particle->position.z += particle->velocityZ;
+        sub_08217EEC(particle, AnimData_FindEntry(0x1C1E), ((particle->life >> 2) & 1) + 2);
+        particle->velocityX = damp(particle->velocityX);
+        particle->velocityY = damp(particle->velocityY);
+        particle->velocityZ = damp(particle->velocityZ);
     }
 }

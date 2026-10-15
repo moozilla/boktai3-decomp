@@ -1,7 +1,6 @@
-#include "global.h"
-void sub_0824923C(void *, u32);
-u32 sub_08053AB0(u8 *p)
+#include "interaction_marker.h"
+u32 InteractionMarker_Tick(struct InteractionMarker *marker)
 {
-    sub_0824923C(p, *(u32 *)(p + 0x114));
+    sub_0824923C(marker, marker->update);
     return 0;
 }

@@ -1,15 +1,7 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x382];
-    u16 t;
-};
-void sub_08052628(struct S *, void (*)(void));
-void sub_08052F48(void);
-
-void sub_08052F1C(struct S *p)
+#include "stacked_actor.h"
+void StackedActor_WaitForRetraction(struct StackedActor *p)
 {
-    p->t++;
-    if (p->t > 0xf)
-        sub_08052628(p, sub_08052F48);
+    p->frame++;
+    if (p->frame > 0xf)
+        StackedActor_SetUpdate(p, StackedActor_FinishPlayerInteraction);
 }

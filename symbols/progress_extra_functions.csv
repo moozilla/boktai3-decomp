@@ -100,6 +100,7 @@ address,evidence
 0804E1E0,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 0804F6C4,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 080511EC,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
+08052E04,Independent124-byte retract-state helper with own prologue/return and callbacks; exact C at src/fn/sub_08052E04.c
 08058168,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08058184,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 0805822C,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
