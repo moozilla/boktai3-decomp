@@ -1,5 +1,4 @@
 #include "scene_panel_effects.h"
-#define ScenePanel_CallPendingScript sub_08057978
 struct ScenePanelScriptArguments {
     u32 count;
     s32 *values;

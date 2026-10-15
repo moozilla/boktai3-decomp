@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_panel.h"
-#define ScenePanel_CycleOverlayPalette sub_08058B88
 void ScenePanel_CycleOverlayPalette(struct ScenePanel *panel)
 {
     u32 frame;

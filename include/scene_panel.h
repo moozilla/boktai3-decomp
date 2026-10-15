@@ -59,9 +59,9 @@ void ScenePanel_TickPulseTwelve(struct ScenePanel *);
 void ScenePanel_TickPulseThirteen(struct ScenePanel *);
 void ScenePanel_TickPulseTwo(struct ScenePanel *);
 extern struct ScenePanel *gUnk_020004A4;
-void sub_08057978(struct ScenePanel *, u32);
+void ScenePanel_CallPendingScript(struct ScenePanel *, u32);
 union ScenePanelPosition;
-void sub_08057A44(struct ScenePanel *, union ScenePanelPosition *, union ScenePanelPosition *, u32,
-                  u32);
+void ScenePanel_AddParticle(struct ScenePanel *, union ScenePanelPosition *,
+                            union ScenePanelPosition *, u32, u32);
 void sub_0806A160(const void *, s32, const void *, s32, s32, s32, s32, s32);
 #endif

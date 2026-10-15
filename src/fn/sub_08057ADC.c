@@ -1,5 +1,4 @@
 #include "scene_panel_effects.h"
-#define ScenePanel_DestroyParticles sub_08057ADC
 void ScenePanel_DestroyParticles(struct ScenePanel *input)
 {
     struct ScenePanelEffectsView *panel = (void *)input;

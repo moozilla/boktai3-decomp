@@ -1,5 +1,4 @@
 #include "scene_panel_effects.h"
-#define ScenePanel_AdvancePaletteFrame sub_08057C78
 s32 ScenePanel_AdvancePaletteFrame(struct ScenePanelMainSprite *sprite)
 {
     u16 *counter = &sprite->phaseCounter;

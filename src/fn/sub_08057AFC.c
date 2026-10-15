@@ -1,5 +1,4 @@
 #include "scene_panel_effects.h"
-#define ScenePanel_InitParticles sub_08057AFC
 void ScenePanel_InitParticles(struct ScenePanel *input)
 {
     struct ScenePanelEffectsView *panel = (void *)input;
