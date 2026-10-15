@@ -96,7 +96,9 @@ def operand(b, p):
     if fam in (0x10, 0x20):
         d = b[p] << 24 | b[p + 1] << 16 | b[p + 2] << 8 | b[p + 3]
         region = {0x800000: "gs", 0x100000: "r700"}.get(d & 0xF00000, "r708")
-        text = f"{region}[{d & 0xFFFF:#x}]:t{(d >> 24) & 15}"
+        t = (d >> 24) & 15
+        bit = f".{(d >> 16) & 15}" if t == 4 else ""  # type 4 is one bit: bits 16-19 give its number
+        text = f"{region}[{d & 0xFFFF:#x}{bit}]:t{t}"
         q = p + 4
         if fam == 0x20:
             a, q = operand(b, q)
@@ -114,11 +116,44 @@ def operand(b, p):
         inner = operands(b, start + 1, start + n)
         return f"{chr(b[start])}:{' '.join(inner)}", start + n
     if fam == 0x30:
-        return f"expr<{bytes(b[start:start + n]).hex()}>", start + n
+        return f"({expression(b, start, start + n)})", start + n
     if fam == 0x80:  # a nested block used as an operand (switch cases, keyword values)
         inner = instructions(b, start, start + n)
         return "{ " + "; ".join(t for _, t in inner) + " }", start + n
     return f"?{op:02x}", start + n
+
+
+OPS = {4: "+", 5: "-", 6: "*", 7: "/", 8: "%", 9: "<<", 10: ">>", 11: "==", 12: "!=",
+       13: "<", 14: "<=", 15: ">", 16: ">=", 17: "|", 18: "&", 19: "^", 20: "||", 21: "&&",
+       22: "="}
+UNARY = {1: "-", 2: "!", 3: "~"}
+KEYWORDS = {"e": "else", "i": "elif", "c": "case", "d": "default"}
+
+
+def expression(b, p, end):
+    """Infix text of an expression (sub_0821BA5C): operands are pushed, a byte
+    0xA0 | op pops two and pushes the result (sub_0821B938), 0xA0 ends it.
+    Unary operators (1-3) use only the top of the stack; 22 assigns."""
+    stack = []
+    while p < end:
+        op = b[p]
+        if op & 0xE0 == 0xA0:
+            o = op & 0x1F
+            if o == 0:
+                break
+            r = stack.pop() if stack else "?"
+            if o in UNARY:
+                stack.append(f"{UNARY[o]}{r}")
+            else:
+                left = stack.pop() if stack else "?"
+                text = f"{left} {OPS.get(o, f'op{o}')} {r}"
+                stack.append(text if o == 22 else f"({text})")
+            p += 1
+            continue
+        t, p = operand(b, p)
+        stack.append(t)
+    text = " ".join(stack)
+    return text[1:-1] if text.startswith("(") and text.endswith(")") and text.count("(") == 1 else text
 
 
 def arglist(b, p):
@@ -169,11 +204,34 @@ def instructions(b, p, end, depth=0, out=None):
                 args.append(t)
             if args or not out or out[-1] != (depth, "}"):
                 out.append((depth, f"{name} {' '.join(args)}".rstrip()))
+            # Keyword items after the argument list: `if` takes `e` (else) and
+            # `i` (else if: condition, block); `switch` takes `c` (case: value,
+            # block) and `d` (default).
+            while q < start + n and b[q] & 0xF0 == 0x50:
+                s2, n2 = length(b, q)
+                k = chr(b[s2])
+                label, r = [KEYWORDS[k] if name in ("if", "switch") and k in KEYWORDS else k + ":"], s2 + 1
+                while r < s2 + n2:
+                    if b[r] & 0xF0 == 0x80:
+                        s3, n3 = length(b, r)
+                        out.append((depth, " ".join(label + ["{"])))
+                        label = []
+                        instructions(b, s3, s3 + n3, depth + 1, out)
+                        out.append((depth, "}"))
+                        r = s3 + n3
+                        continue
+                    t, r = operand(b, r)
+                    label.append(t)
+                if label and out[-1][0] == depth and out[-1][1] != "}":
+                    out[-1] = (depth, out[-1][1] + " " + " ".join(label))
+                elif label:
+                    out.append((depth, " ".join(label)))
+                q = s2 + n2
         elif kind == 7:
             pid = b[start] | b[start + 1] << 8
             out.append((depth, f"proc_{pid} {' '.join(operands(b, start + 2, start + n))}".rstrip()))
         elif kind == 3:
-            out.append((depth, f"expr {bytes(b[start:start + n]).hex()}"))
+            out.append((depth, expression(b, start, start + n)))
         else:
             out.append((depth, f".byte {bytes(b[p:start + n]).hex()}"))
         p = start + n

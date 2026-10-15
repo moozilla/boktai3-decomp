@@ -2,15 +2,18 @@
 """Local studio: browse, search and edit the script text with a live preview in
 the game font, then build a modified ROM; browse sprites, palettes, the font and
 raw tiles from the resource archives (/gfx); and a live view of the game
-running in mGBA with tools/mgba/centaur.lua (/live, link on port 8643).
+running in mGBA with tools/mgba/centaur.lua (/live, link on port 8643); the
+script actor registry (/actors), script procedures (/scripts) and any
+function's disassembly and C (/code), from tools/assets/actors.py.
 
-  python3 tools/studio/serve.py [--port 8642]    then open http://localhost:8642
+  python3 tools/studio/serve.py [--port 8642] [--link-port 8643]    then open http://localhost:8642
 
 Everything it reads is ROM-derived and extracted under build/ (run `make` once
 first); it writes only build/text/bank.tsv and, on request, build/mod.gba.
 The server listens on localhost only.
 """
 import argparse
+import csv
 import http.server
 import json
 import os
@@ -24,6 +27,8 @@ sys.path.insert(0, HERE)
 from datafmt import load_manifest  # noqa: E402
 from datafmt import text_bank  # noqa: E402
 import live  # noqa: E402
+sys.path.insert(0, os.path.join(ROOT, "tools", "assets"))
+import actors  # noqa: E402
 
 BANK = os.path.join(ROOT, "build", "text", "bank.tsv")
 
@@ -64,8 +69,33 @@ def resource_file(label, h):
     return None
 
 
+GUIDE_TYPES = {"items": "item", "weapons": "weapon", "accessories": "accessory", "gunframes": "gun frame",
+               "gunlenses": "gun lens", "bikeparts": "bike part", "dolls": "doll", "photos": "photo", "valuables": "valuable"}
+
+
+def guide_entries(trans):
+    """(icon, type, id, name) from DarthNemesis's Shin Bokura no Taiyou guide in
+    the translation project (../boktai3trans/shinbok guide), when present."""
+    import html as _html
+    import re
+    d = os.path.join(trans, "shinbok guide")
+    out = []
+    for page, kind in GUIDE_TYPES.items():
+        f = os.path.join(d, page + ".html")
+        if not os.path.exists(f):
+            continue
+        s = open(f, encoding="utf-8", errors="replace").read()
+        for icon, rest in re.findall(r'<img[^>]*src="images/([a-z]+[0-9a-f]+)\.png"[^>]*>(.*?)</tr>', s, re.S):
+            text = re.sub(r"\s+", " ", _html.unescape(re.sub(r"<[^>]+>", " ", rest))).strip()
+            text = text.split(" Desc:")[0].split(" Found:")[0].strip()
+            m = re.match(r"([0-9A-Fa-f]{2}) (.*)", text)
+            out.append({"icon": icon, "type": kind, "id": m.group(1).upper() if m else "", "name": m.group(2) if m else text})
+    return out
+
+
 def stages():
-    """Stage loads in the scripts: proc_884(map, tileset, hp) -> the procedures using them."""
+    """Stage loads in the scripts: proc_884(map, tileset, hp) (or proc_885, or the
+    loader both wrap, proc_876) -> the procedures using them."""
     out = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "assets", "gcx.py"), "dis"],
                          cwd=ROOT, capture_output=True, text=True).stdout
     found, proc = {}, None
@@ -74,11 +104,34 @@ def stages():
             proc = int(ln.split()[1])
             continue
         f = ln.split()
-        if f and f[0] == "proc_884" and len(f) >= 4 and all(x.startswith("0x") for x in f[1:4]):
+        if (f and f[0] in ("proc_884", "proc_885", "proc_876") and len(f) >= 4
+                and all(x.startswith("0x") for x in f[1:4])):
             key = tuple(int(x, 16) for x in f[1:4])
             found.setdefault(key, []).append(proc)
     return [{"map": f"{m:04X}", "tileset": f"{t:04X}", "hp": f"{h:04X}", "procs": ps}
             for (m, t, h), ps in sorted(found.items())]
+
+
+STAGEMETA = os.path.join(ROOT, "build", "assets", "stages.json")
+
+
+def stage_meta():
+    """Per-scene doors, entrances, items and enemies (tools/assets/stages.py)."""
+    tools = [os.path.join(ROOT, "tools", "assets", n) for n in ("stages.py", "gcx.py", "hp.py")]
+    if not os.path.exists(STAGEMETA) or os.path.getmtime(STAGEMETA) < max(map(os.path.getmtime, tools)):
+        subprocess.run([sys.executable, os.path.join(ROOT, "tools", "assets", "stages.py"), "json", STAGEMETA],
+                       cwd=ROOT)
+    return open(STAGEMETA, "rb").read()
+
+
+def hp_data(h):
+    """A decoded HP (terrain) resource, tools/assets/hp.py."""
+    f = resource_file("tAE6C", h)
+    if not f:
+        return None
+    sys.path.insert(0, os.path.join(ROOT, "tools", "assets"))
+    import hp
+    return hp.decode(open(f, "rb").read())
 
 
 def display_strings(trans):
@@ -104,7 +157,7 @@ def display_strings(trans):
 def scene_list():
     """Scene entries (tools/mgba/scenes.py) with survey results when present."""
     path = os.path.join(ROOT, "build", "centaur", "scenes.json")
-    if not os.path.exists(path):
+    if not os.path.exists(path) or "entrance" not in (json.load(open(path)) or [{}])[0]:
         subprocess.run([sys.executable, os.path.join(ROOT, "tools", "mgba", "scenes.py")], cwd=ROOT)
     sc = json.load(open(path))
     pals = {r["map"]: r["palette"] for r in live.stage_palettes()}
@@ -121,6 +174,12 @@ def scene_list():
                 pass
         s["palette"] = pals.get(s.get("shown") or s.get("map") or "")
     return sc
+
+
+def scene_info():
+    """{scene: {map, shot}}: the stage each scene shows and whether the stage
+    survey captured it (captures/scene_NNNN)."""
+    return {s["scene"]: {"map": s.get("shown") or s.get("map"), "shot": s["shot"]} for s in scene_list()}
 
 
 def ensure_bank():
@@ -210,8 +269,32 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, open(os.path.join(HERE, "gfx.html"), "rb").read(), "text/html; charset=utf-8")
         elif self.path in ("/live", "/live.html"):
             self.send(200, open(os.path.join(HERE, "live.html"), "rb").read(), "text/html; charset=utf-8")
+        elif self.path in ("/actors", "/scripts", "/code"):
+            self.send(200, open(os.path.join(HERE, self.path[1:] + ".html"), "rb").read(), "text/html; charset=utf-8")
+        elif self.path == "/api/actors":
+            self.send(200, {"actors": actors.actors(), "enemies": actors.name_list(*actors.ENEMY_NAMES),
+                            "characters": actors.name_list(*actors.CHARACTER_NAMES), "scenes": scene_info()})
+        elif self.path == "/api/procs":
+            self.send(200, {"procs": actors.proc_list(), "scenes": scene_info()})
+        elif self.path.startswith("/api/proc/"):
+            d = actors.proc_detail(int(os.path.basename(self.path)))
+            self.send(200 if d else 404, d or {"error": "no such procedure"})
+        elif self.path.startswith("/api/code/"):
+            try:
+                d = actors.code_info(int(os.path.basename(self.path), 16))
+            except ValueError:
+                d = None
+            self.send(200 if d else 404, d or {"error": "no function there"})
         elif self.path in ("/captures", "/captures.html"):
             self.send(200, open(os.path.join(HERE, "captures.html"), "rb").read(), "text/html; charset=utf-8")
+        elif self.path == "/api/guide":
+            self.send(200, guide_entries(self.server.trans))
+        elif self.path.startswith("/api/guide/"):
+            f = os.path.join(self.server.trans, "shinbok guide", "images", os.path.basename(self.path))
+            if os.path.isfile(f):
+                self.send(200, open(f, "rb").read(), "image/png" if f.endswith(".png") else "image/gif")
+            else:
+                self.send(404, {"error": "not found"})
         elif self.path == "/api/display":
             self.send(200, {"jp": self.server.display_jp, "en": self.server.display_en})
         elif self.path in ("/static/common.js", "/static/common.css", "/static/inspector.js"):
@@ -219,6 +302,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, open(os.path.join(HERE, os.path.basename(self.path)), "rb").read(), ctype + "; charset=utf-8")
         elif self.path == "/api/notes":
             self.send(200, live.notes())
+        elif self.path == "/api/items":
+            f = os.path.join(ROOT, "data", "items.csv")
+            self.send(200, list(csv.DictReader(open(f, encoding="utf-8"))) if os.path.exists(f) else [])
         elif self.path == "/api/captures":
             self.send(200, live.list_captures(limit=None))
         elif self.path == "/api/live":
@@ -245,6 +331,16 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, live.tags())
         elif self.path == "/api/stages":
             self.send(200, stages())
+        elif self.path == "/api/stagemeta":
+            self.send(200, stage_meta(), "application/json")
+        elif self.path.startswith("/api/hp/"):
+            d = hp_data(os.path.basename(self.path))
+            if d:
+                self.send(200, d)
+            else:
+                self.send(404, {"error": "no such hp resource"})
+        elif self.path == "/api/live/player":
+            self.send(200, self.server.live.player or {})
         elif self.path == "/api/res":
             self.send(200, resource_index())
         elif self.path.startswith("/api/res/"):
@@ -289,12 +385,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=8642)
+    ap.add_argument("--link-port", type=int, default=8643, help="port Centaur connects to (its CENTAUR_LINK_PORT)")
     ap.add_argument("--trans", default=os.path.join(os.path.dirname(ROOT), "boktai3trans"))
     a = ap.parse_args()
     ensure_bank()
     srv = http.server.ThreadingHTTPServer(("127.0.0.1", a.port), Handler)
     srv.original = original_strings()
-    srv.live = live.Live()
+    srv.live = live.Live(a.link_port)
+    srv.trans = a.trans
     srv.display_jp, srv.display_en = display_strings(a.trans)
     print(f"studio: http://localhost:{a.port}")
     srv.serve_forever()

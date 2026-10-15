@@ -19,6 +19,9 @@ struct SceneExtent {
 };
 
 /* One terrain cell (4 bytes). */
+/* One terrain cell: 256 world units square; a level is 256 units of height (a
+ * level-1 floor is y = 256). In the HP data: kind 1 marks stairs/slopes; flags
+ * 0x0003 outside the stage, 0x040B walls, 0x000A door cells (docs/ASSETS.md). */
 struct SceneCell {
     u8 height; /* low nibble: height level (0-15); high nibble: kind (0 = solid floor, else open) */
     u8 tile;

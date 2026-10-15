@@ -7,8 +7,8 @@
 -- Each scene gets a capture named scene_NNNN (palettes, VRAM, OAM, screenshot),
 -- analysed by the studio (stage palettes -> data/stage_palettes.csv, sprite
 -- palettes -> build/centaur/sprite_palettes.json). Results also go to
--- build/centaur/survey.tsv. A warp loads the stage but does not spawn the player
--- (see docs/CENTAUR.md), which is enough for palettes and scenery.
+-- build/centaur/survey.tsv. A warp arrives at the scene's default entrance with
+-- the player placed (docs/CENTAUR.md); scenes without one load without a player.
 local SRC = (debug.getinfo(1, "S").source or ""):gsub("^@", "")
 local ROOT = SRC:match("^(.*)/tools/mgba/[^/]*$") or "."
 dofile(ROOT .. "/tools/mgba/centaur.lua")

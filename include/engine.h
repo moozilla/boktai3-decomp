@@ -34,10 +34,16 @@ struct HeapBlock {
     u32 unused;
 };
 
-/* Terrain/collision map header of the current scene. */
+/* Terrain/collision map header of the current scene. Terrain_LoadHP (08225C48)
+ * fills it from the stage's "HP" resource (type AE6C, the third argument of the
+ * script's proc_884(map, tileset, hp); format in docs/ASSETS.md, decoder
+ * tools/assets/hp.py): +4 the grid, +0xC named boxes (doors, camera area),
+ * +0x10 patrol paths, +0x14 nav meshes. +0x1C..+0x22 are the neighbour index
+ * offsets -width, +1, +width, -1 (Terrain_SetNeighborOffsets). */
 struct EngineMap {
     u32 unused0;
-    u8 *cells; /* +0 u16 width? (`((s16 *)cells)[2]` is the row stride), cells start at +12 */
+    u8 *cells; /* grid: +0 u32 0, +4 u16 width (the row stride), +6 u16 height, +8 s16 origin x/y
+                  (BG map pixels * 16), cells (struct SceneCell) from +12 */
     u8 pad8[28];
     u16 rows[1]; /* first cell index of each row */
 };

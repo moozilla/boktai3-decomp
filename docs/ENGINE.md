@@ -338,7 +338,13 @@ one operand and returns its type and value. The first byte selects the type:
   else uses `gUnk_02000708`. The low 16 bits are the offset from that base. When
   the first byte's high nibble is `2`, an index operand follows. The
   matched accessors are `sub_0821B34C`, `sub_0821B4C8`, `sub_0821B540` and
-  `sub_0821B5BC`.
+  `sub_0821B5BC`. Types (`sub_0821B34C`): 1 and 6 are 16-bit, 2 and 3 a byte,
+  4 a single bit (bits 16–19 give its number, the index adds to it), 8 is
+  24-bit and 9 a word. `gcx.py` prints them as `region[offset.bit]:type`
+  (`r708[0x6e.2]:t4`). At the `start` bookmark the regions are `gs` =
+  `0x0203C400`, `r708` = `0x0203DA00` (the script work area: story progress
+  `r708[0x3c]`, the arrival entrance `r708[0x70]`, most scene flags) and
+  `r700` = `0x0203E200` (scratch).
 
 ### Command names
 
@@ -358,11 +364,14 @@ saved with the game), and sets the request word `0x030053E8` to 1, or `0x11`
 unless keyword `n` is given as 0. A scene number is a script procedure: the
 late-game test save stands in scene 3243, whose entry runs `proc_861 1;
 proc_864 0`, then the stage setup (`proc_884 0xcf70 0xf8ea 0x7239`) and the
-area's objects. `tools/mgba/scenes.py` lists 354 scene entries (321 with a
+area's objects. `tools/mgba/scenes.py` lists 354 scene entries (347 with a
 stage). Writing the three words from Lua loads the scene's stage but does not
-spawn the player; ordinary doors pass an entrance as well (*guess*: the door
-objects' `proc_912`/`proc_916` arguments). Note that `tools/assets/gcx.py`
-prints procedure headers one lower than the numbers calls use.
+spawn the player; ordinary doors pass an entrance as well: the door's event
+sets the entrance number in `r708[0x70]` (`proc_953`) and the destination's
+entrance procedures (`proc_909`, `proc_916`, ...) test it to place the player
+(ASSETS.md, "Stage scripts"; `tools/assets/stages.py`). Note that
+`tools/assets/gcx.py` prints procedure headers one lower than the numbers
+calls use.
 
 The 722-entry table at `08603300` (`data/actor_registry.csv`) has the same
 layout. It is the `chara` table: every object a script can create by name,

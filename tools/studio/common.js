@@ -11,7 +11,7 @@ function localStore(k, v) { try { if (v === undefined) return localStorage.getIt
 // ---------- header ----------
 const NAV = [
   ['Text', '/'], ['Sprites', '/gfx#sprites'], ['Large sprites', '/gfx#big'], ['Maps', '/gfx#maps'], ['Palettes', '/gfx#palettes'],
-  ['Sprite palettes', '/gfx#pool'], ['Font', '/gfx#font'], ['Tiles', '/gfx#tiles'], ['Data', '/gfx#data'], ['Live', '/live'], ['Captures', '/captures'],
+  ['Sprite palettes', '/gfx#pool'], ['Font', '/gfx#font'], ['Tiles', '/gfx#tiles'], ['Data', '/gfx#data'], ['Actors', '/actors'], ['Scripts', '/scripts'], ['Live', '/live'], ['Captures', '/captures'],
 ];
 // Fills <header id="top">; `tools` is HTML for the right-hand side.
 function studioHeader(tools = '') {
@@ -56,13 +56,29 @@ document.addEventListener('click', e => {
   peek(a.getAttribute('href'));
 }, true);
 const peekLink = (href, text) => `<a href="${href}" data-peek>${text}</a>`;
+// A function address (8 hex digits, Thumb bit ignored): its disassembly and,
+// if matched, its C (/code). A script procedure, a text string, an actor.
+const codeHref = addr => '/code#' + ((parseInt(addr, 16) & ~1) >>> 0).toString(16).toUpperCase().padStart(8, '0');
+const codeLink = (addr, text) => peekLink(codeHref(addr), esc(text || addr));
+const procLink = (id, text) => peekLink('/scripts#' + id, esc(text || 'proc ' + id));
+const stringLink = (id, text) => peekLink('/#' + id, esc(text || '#' + id));
+const actorLink = (key, text) => peekLink('/actors#' + key, esc(text || key));
 const gfxHref = (kind, hash, frame) => ({ spr: '/gfx#sprites/', big: '/gfx#big/', bigspr: '/gfx#big/', map: '/gfx#maps/', pal: '/gfx#palettes/' }[kind] || '/gfx#tiles/') + hash + (frame != null ? '/' + frame : '');
 
 // ---------- notes (data/notes.csv: kind, key, label, notes) ----------
-let NOTES_DB = {};
+let NOTES_DB = {}, ITEM_FRAMES = {};
+// Item, sword and accessory names on their menu icons (data/items.csv, from the
+// game's text bank): 'HASH/FRAME' -> [{category, id, name}]
+async function loadItems() {
+  const rows = await fetch('/api/items').then(r => r.json()).catch(() => []);
+  ITEM_FRAMES = {};
+  for (const r of rows) if (r.icon) (ITEM_FRAMES[r.icon] ||= []).push({ ...r, name: r.en || r.jp });
+  return ITEM_FRAMES;
+}
+const itemLabel = (hash, frame) => { const l = ITEM_FRAMES[`${hash}/${frame}`]; return l ? (l.length > 3 ? `${l[0].name} (+${l.length - 1})` : l.map(x => x.name).join(' / ')) : null; };
 const noteKey = (kind, key) => `${kind}:${String(key).toUpperCase()}`;
 async function loadNotes() {
-  const rows = await fetch('/api/notes').then(r => r.json()).catch(() => []);
+  const [rows] = await Promise.all([fetch('/api/notes').then(r => r.json()).catch(() => []), loadItems()]);
   NOTES_DB = Object.fromEntries(rows.map(r => [noteKey(r.kind, r.key), r]));
   return NOTES_DB;
 }
@@ -245,6 +261,29 @@ function spritePool() {
 async function packageColors(pkgBytes, base = le(pkgBytes, 0)) {
   const pool = await spritePool(), grey = k => { const v = k * 17; return [v, v, v]; };
   return Array.from({ length: 256 }, (_, i) => (pool.entry(base + (i >> 4)) || null)?.[i & 15] ?? grey(i & 15));
+}
+
+// A thumbnail of a sprite's first frame ('spr' = CB05 package, 'big' = 98F5
+// large sprite), in captured colors when the stage survey saw it.
+let _learnedSpr = null, _bigSpr = null;
+const learnedSprites = () => _learnedSpr ??= fetch('/api/learned').then(r => r.json()).then(l => l.sprites || {}).catch(() => ({}));
+const bigSprites = () => _bigSpr ??= fetch('/api/res').then(r => r.json()).then(ix => res('t98F5', ix.t98F5[0][0])).then(parseBig);
+async function spriteThumb(kind, hash, max = 64) {
+  const L = await learnedSprites();
+  let parts, colors;
+  if (kind === 'big') {
+    const big = await bigSprites(), i = big.recs.findIndex(r => r.hash === hash), f = i >= 0 && big.frames(i)[0];
+    if (!f) return null;
+    const lp = L[`big:${hash}`]?.pool;
+    colors = lp != null ? await packageColors(null, lp) : learnedPalette(L[`big:${hash}`]) || await packageColors(null, -1);
+    parts = big.parts(f);
+  } else {
+    const b = await res('tCB05', hash), pkg = parsePackage(b), k = pkg.anims[0]?.keys[0]?.frame ?? 0;
+    if (!pkg.frames[k]) return null;
+    colors = await packageColors(b); parts = pkg.parts(pkg.frames[k]);
+  }
+  const img = compose(parts, colors);
+  return img && fitCanvas(toCanvas(img), max);
 }
 
 // ---------- GBA screen state from a capture (pal/vram/oam/io .bin) ----------
