@@ -1,16 +1,12 @@
-#include "global.h"
-u8 *sub_08055678(void);
-s32 Script_SeekToKeyword(u32);
-u32 Script_GetValue(void);
-void sub_08055708(void)
+#include "script_keyframe_pool.h"
+#define ScriptKeyframe_SetMirrorFromScript sub_08055708
+void ScriptKeyframe_SetMirrorFromScript(void)
 {
-    u8 *p = sub_08055678();
-    if (p) {
-        if (Script_SeekToKeyword(0x66)) {
-            if (Script_GetValue() != 0)
-                *(u32 *)(p + 0x40) |= 4;
-            else
-                *(u32 *)(p + 0x40) &= -5;
-        }
+    struct ScriptKeyframeEntry *entry = sub_08055678();
+    if (entry && Script_SeekToKeyword('f')) {
+        if (Script_GetValue())
+            entry->animation.display.flags |= 4;
+        else
+            entry->animation.display.flags &= ~4;
     }
 }
