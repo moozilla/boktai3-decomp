@@ -31,7 +31,7 @@ void SceneActorControl_StartStoredCurve(struct SceneActorRegistryResetView *acto
         }
         {
             register u32 entryOffset asm("r0") = 0x2B1;
-            register u8 *entry asm("r1");
+            u8 *entry;
             entry = (u8 *)actor + entryOffset;
             *entry = 1;
         }
@@ -41,7 +41,7 @@ void SceneActorControl_StartStoredCurve(struct SceneActorRegistryResetView *acto
             *flags &= behavior;
         }
         {
-            register u32 offset asm("r1") = 0x2B1;
+            u32 offset = 0x2B1;
             actor = (void *)((u8 *)actor + offset);
             *(u8 *)actor = zero;
         }
