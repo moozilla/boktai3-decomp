@@ -1,6 +1,6 @@
 #include "scene_actor_registry.h"
 extern const u8 gUnk_08605C18[];
-u8 sub_08070C24(struct SceneActorRegistryActor *, const void *);
+u8 SceneActorRegistry_TestNearestPlayerBounds(struct SceneActorRegistryActor *, const void *);
 static inline u8 SceneActorRegistry_IsPaused(void)
 {
     if (gUnk_030053F4 & 0x4800)
@@ -18,8 +18,8 @@ void SceneActorRegistry_AdvanceInactiveActors(struct SceneActorRegistryManager *
                 do {
                     node = node->next;
                     if (actor->health <= 0 && (actor->flags2CC & one) &&
-                        !sub_08070C24(actor, gUnk_08605C18))
-                        sub_080718D8(actor);
+                        !SceneActorRegistry_TestNearestPlayerBounds(actor, gUnk_08605C18))
+                        SceneActorRegistry_RestoreActorDefaults(actor);
                     actor = node->actor;
                 } while (actor);
             }

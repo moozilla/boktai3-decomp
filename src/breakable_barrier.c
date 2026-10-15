@@ -223,7 +223,6 @@ void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct Breakable
 
 void sub_08028DDC(void);
 void sub_08003588(s32, s32, s32);
-void sub_0821AD08(void *, s32);
 
 #ifdef NONMATCHING
 // fuzzy: 83.1% (random index kept in r6 instead of r0, table/pointer registers differ)
@@ -264,7 +263,7 @@ void sub_0801310C(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
             step = (4 - m->remaining) << 4;
             sub_08003588(step - 16, step, 64);
             if (m->remaining == 0 && m->script != 0) {
-                sub_0821AD08((void *)m->script, 0);
+                Script_Call(m->script, 0);
                 m->script = 0;
             }
         }

@@ -6,7 +6,7 @@ struct H {
 struct Z {
     struct H a, b;
 };
-void sub_08074BF4(u8 *, struct Z *, struct Z *, void (*)(void), u8 *);
+void SceneActorCollision_InitBody(u8 *, struct Z *, struct Z *, void (*)(void), u8 *);
 void sub_08074D34(u8 *, struct Z *, struct Z *, void (*)(void), u32, u8 *);
 void sub_080A5BF8(void);
 void sub_080A5B8C(void);
@@ -18,7 +18,7 @@ void sub_080AA078(u8 *p)
     s1.b.lo = 0x40;
     *(u32 *)&s2.a = 0x800000;
     *(u32 *)&s2.b &= 0xFFFF0000;
-    sub_08074BF4(p, &s1, &s2, sub_080A5BF8, p);
+    SceneActorCollision_InitBody(p, &s1, &s2, sub_080A5BF8, p);
     s3.a.lo = 0x40;
     s3.a.hi = 0x64;
     s3.b.lo = 0x40;

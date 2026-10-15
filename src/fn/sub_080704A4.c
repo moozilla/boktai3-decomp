@@ -1,11 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-struct SceneActorRegistryManager *sub_08072B44(void);
-struct SceneActorRegistryActor *SceneActorRegistry_FindLiving(void)
+struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
+struct SceneActorRegistryActor *SceneActorRegistry_FindLiving(u32 unusedCategory)
 {
     struct SceneActorRegistryNode *node;
     struct SceneActorRegistryActor *actor;
-    sub_08072B44();
+    SceneActorRegistry_GetManager();
     /* The allocated terminal node carries a NULL actor; an absent list head
      * is outside this helper's caller contract. */
     node = gUnk_020004AC;

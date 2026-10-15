@@ -1,6 +1,6 @@
 #include "global.h"
 
-s32 sub_08074600(s32, s32);
+s32 SceneActorProfiles_FindOrAdd(s32, s32);
 
 struct S {
     u8 filler[0x98];
@@ -11,5 +11,5 @@ struct S {
 
 void sub_080F05CC(struct S *s)
 {
-    s->v = sub_08074600(s->b, 0);
+    s->v = SceneActorProfiles_FindOrAdd(s->b, 0);
 }

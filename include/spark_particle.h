@@ -46,5 +46,4 @@ void SparkParticle_ClearPool(void);
 void sub_08217DE0(void *, const void *, u32);
 void sub_08217EC4(void *, s32, s32);
 void sub_08217ECC(void *, u32);
-void sub_08220C8C(struct DisplaySequenceState *, const void *, u32, u32, u32);
 #endif
