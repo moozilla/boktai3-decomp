@@ -16,5 +16,5 @@ void SceneInventory_BeginActionSelection(struct SceneInventoryControlView *panel
     }
     panel->destination = sub_0806143C(panel);
     sub_080613BC(panel, 0);
-    sub_0806130C(panel, sub_080620D4);
+    sub_0806130C(panel, (SceneInventoryCallback)sub_080620D4);
 }
