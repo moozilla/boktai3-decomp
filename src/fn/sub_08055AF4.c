@@ -1,10 +1,11 @@
-#include "global.h"
-extern u8 *gUnk_02000498;
-u32 sub_08055AF4(u8 *p, u32 b, u32 c, u32 d)
+#include "script_keyframe_pool.h"
+#define ScriptKeyframe_InitManager sub_08055AF4
+s32 ScriptKeyframe_InitManager(struct ScriptKeyframeManager *manager, u32 unused1, u32 unused2,
+                               u32 capacity)
 {
-    u32 z = 0;
-    p[0x18] = d;
-    p[0x19] = z;
-    gUnk_02000498 = p;
+    u32 zero = 0;
+    manager->capacity = capacity;
+    manager->count = zero;
+    gUnk_02000498 = manager;
     return 0;
 }
