@@ -11,8 +11,8 @@ s32 StagedEffect_Tick(struct StagedEffect *effect)
         do {
             struct StagedEffectSprite *sprite = &effect->sprites[i];
             s32 spread;
-            u32 xy = effect->positionXY;
-            u32 z = effect->positionZ;
+            u32 xy = effect->position.words[0];
+            u32 z = effect->position.words[1];
             *(u32 *)&sprite->x = xy;
             *(u32 *)&sprite->z = z;
             spread = effect->spread;
