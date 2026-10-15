@@ -5,20 +5,24 @@
 struct SceneInputResource {
     u32 words[8];
 };
+struct SceneInputPosition {
+    s16 x, y, z, pad;
+} __attribute__((aligned(4)));
 struct SceneInputWidget {
     u8 unknown0[8];
     u32 flags;
-    u8 unknownC[0x3C];
+    u8 unknownC[0x14];
+    struct SceneInputPosition position;
+    u8 unknown28[0x20];
     u16 *palette;
     u8 unknown4C[0x14];
 };
 struct SceneInputPair {
     struct SceneInputResource resource;
     struct SceneInputWidget widgets[2];
+    struct SceneInputPosition targets[2];
+    u16 frame, duration;
 };
-struct SceneInputPosition {
-    s16 x, y, z, pad;
-} __attribute__((aligned(4)));
 struct SceneInputPackedPosition {
     u32 x : 16, y : 16, z : 16;
 };
