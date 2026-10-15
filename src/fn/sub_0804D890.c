@@ -1,6 +1,7 @@
 #include "global.h"
+#define StagedEffect_MarkOuterSpritesAlternate sub_0804D890
 
-void sub_0804D890(u8 *p)
+void StagedEffect_MarkOuterSpritesAlternate(u8 *p)
 {
     u32 m = 1;
     s32 i;
