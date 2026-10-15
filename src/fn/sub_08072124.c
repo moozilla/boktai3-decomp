@@ -1,8 +1,5 @@
-#include "global.h"
-
-extern u8 *gUnk_020004A8;
-extern u32 gUnk_030053F4;
-s32 SceneActorRegistry_CountLivingByCategory(u32);
+#include "scene_actor_palette.h"
+#define SceneActorPalette_IsTransitionComplete sub_08072124
 
 static inline u8 Test(u32 v, u32 mask)
 {
@@ -18,19 +15,20 @@ static inline u8 TestP(u32 mask, u32 *p)
     return FALSE;
 }
 
-u32 sub_08072124(void)
+u32 SceneActorPalette_IsTransitionComplete(void)
 {
     u32 id;
-    if (gUnk_020004A8 == NULL || !TestP(0x2000, (u32 *)(gUnk_020004A8 + 0x2c)))
+    struct SceneActorPaletteManagerView *manager = (void *)gUnk_020004A8;
+    if (manager == NULL || !TestP(0x2000, &manager->flags))
         return 1;
     if (Test(gUnk_030053F4, 0x4800))
         id = 10;
     else {
-        if (SceneActorRegistry_CountLivingByCategory(10))
+        if (sub_080703F0(10))
             return 0;
         id = 23;
     }
-    if (SceneActorRegistry_CountLivingByCategory(id))
+    if (sub_080703F0(id))
         return 0;
     return 1;
 }
