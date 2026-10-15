@@ -1,4 +1,5 @@
 #include "global.h"
+#define ResourceStation_InitializeDigits sub_0804F4AC
 struct Z {
     u32 x, y;
 };
@@ -8,7 +9,7 @@ struct C {
 struct C *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(u8 *, struct C *);
 void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, struct Z *);
-void sub_0804F4AC(u8 *p)
+void ResourceStation_InitializeDigits(u8 *p)
 {
     struct Z z;
     struct C *r = ScriptProc_Start(0xCB05, 0x530D);
