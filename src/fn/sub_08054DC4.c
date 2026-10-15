@@ -13,17 +13,17 @@ void DisplayTrack_SetSequenceFromScript(void)
             if (Script_SeekToKeyword('r')) {
                 register u32 variant asm("r4");
                 u32 event;
-                u8 *state;
+                void *state;
                 track->mirror = Script_GetValue();
                 variant = 0;
                 if (Script_SeekToKeyword('E'))
                     variant = Script_GetValue();
                 if (variant) {
-                    state = track->sequenceState;
+                    state = &track->sequenceState;
                     sub_08220D20(state, track->sequenceResource, track->sequenceId,
                                  track->sequenceRow, track->mirror);
                 } else {
-                    state = track->sequenceState;
+                    state = &track->sequenceState;
                     Anim_SetSequence(state, track->sequenceResource, track->sequenceId,
                                      track->sequenceRow, track->mirror);
                 }
