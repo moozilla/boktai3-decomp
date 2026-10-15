@@ -11,7 +11,7 @@ void sub_0821FF7C(u8 *, u32, u32, u32);
 void Collider_SetCallback(u8 *, void (*)(void), u8 *);
 void Collider_SetPosition(u8 *, u8 *, u32);
 void Collider_Refresh(u8 *);
-void sub_08059428(void);
+void ScenePanelRig_ApplyContact(void);
 void sub_0805AD50(u8 *p, u32 x)
 {
     struct Z s1, s2;
@@ -24,6 +24,6 @@ void sub_0805AD50(u8 *p, u32 x)
     Collider_Init(q, 0, 0x4001, 0, 0x10, &s1, &s2);
     sub_0821FF7C(q, x, 0, 0);
     Collider_SetPosition(q, p + 0x618, 0);
-    Collider_SetCallback(q, sub_08059428, p);
+    Collider_SetCallback(q, ScenePanelRig_ApplyContact, p);
     Collider_Refresh(q);
 }

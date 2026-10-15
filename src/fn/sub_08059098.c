@@ -1,4 +1,4 @@
-#include "global.h"
-void sub_08059098(void)
+#include "scene_panel_schedule.h"
+void ScenePanel_NoOpAction(struct ScenePanel *panel)
 {
 }
