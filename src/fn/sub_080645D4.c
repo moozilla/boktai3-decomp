@@ -1,55 +1,49 @@
-#include "global.h"
-
-#ifdef NONMATCHING
-// fuzzy: 97.3%
-
-extern u8 *gUnk_02000710;
-void Sound_PlaySong(u32);
-void sub_08077848(u8 *, u32);
-
-static inline u8 same(u16 *q)
+// MATCHING_CONCESSION: register-pinning
+#include "actor_attachment_slot.h"
+#define ActorAttachment_NotifySourceState sub_080645D4
+void sub_08077848(struct ActorAttachmentSource *, u32);
+static inline u8 SameOwner(u16 *key)
 {
-    if (*(u32 *)(gUnk_02000710 + 0x5a0) == *q)
+    if (gUnk_02000710->region == *key)
         return TRUE;
     return FALSE;
 }
-
-void sub_080645D4(u8 *p)
+void ActorAttachment_NotifySourceState(struct ActorAttachmentSlot *slot)
 {
-    u8 *e = *(u8 **)(p + 0x5c);
-    u8 *f;
-    u32 t;
+    struct ActorAttachmentSource *source = slot->source;
+    u8 *flags;
     u32 one;
-    if (e == NULL)
+    register u32 bits asm("r1");
+    if (!source)
         return;
-    if (!same((u16 *)(e + 0x2fa)))
+    if (!SameOwner(&source->ownerKey))
         return;
-    f = p + 0x32;
+    flags = &slot->flags32;
+    bits = *flags;
     one = 1;
-    if (*f & 1)
+    asm("" : "+r"(one), "+r"(bits));
+    if (bits & 1)
         return;
-    if (e[0x2b5] == 0x15)
+    if (source->category == 0x15)
         return;
-    switch (e[0x98]) {
+    switch (source->state) {
         case 4:
-            Sound_PlaySong(0xee);
-            goto done;
+            Sound_PlaySong(0xEE);
+            break;
         case 1:
-            if (p[0x3f] == 3)
+            if (slot->kind == 3)
                 return;
-            Sound_PlaySong(0xff);
-            goto done;
+            Sound_PlaySong(0xFF);
+            break;
         case 3:
-            sub_08077848(e, 3);
-        done:
+            sub_08077848(source, 3);
             break;
         default:
             return;
     }
-    t = *f;
-    t |= one;
-    *f = t;
+    {
+        u32 updated = *flags;
+        updated |= one;
+        *flags = updated;
+    }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080645D4);
-#endif
