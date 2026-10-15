@@ -21,7 +21,7 @@ s32 SceneInventory_ClassifyConsumableAction(struct SceneInventoryControlView *pa
             goto invalid;
         {
             s32 funds = gUnk_02000710->unk7B0;
-            if (funds < sub_0805F8D8(entry))
+            if (funds < SceneItemValue_GetConsumableBaseValue(entry))
                 goto invalid;
         }
         {
