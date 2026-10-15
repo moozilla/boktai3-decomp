@@ -1,4 +1,5 @@
 #include "global.h"
+#define StagedEffect_CheckScriptCompletion sub_0804D8AC
 struct E {
     u8 a[6];
     u8 t;
@@ -14,7 +15,7 @@ struct G {
 };
 extern struct G *gUnk_0200047C;
 void sub_08020D54(struct L *, struct E *);
-s32 sub_0804D8AC(u8 *p)
+s32 StagedEffect_CheckScriptCompletion(u8 *p)
 {
     struct L *l = (struct L *)(p + 0x18);
     s32 i = 0;
