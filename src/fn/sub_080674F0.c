@@ -12,7 +12,7 @@ u32 TetherActor_CopyPosition(struct ContactPosition *);
 u32 TetherActor_IsStateOne(void);
 s32 TetherActor_GetParameter(void);
 void TetherActor_SetParameter(s32);
-void sub_0806FCAC(u32, u32, u16 *);
+void SceneActorRegistry_SendToCategoryPaletteOffset(u32, u32, u16 *);
 static inline s32 SignedZ(u32 value)
 {
     register s32 shifted asm("r0") = value << 16;
@@ -47,7 +47,7 @@ static inline u8 TryPlayer(struct SceneActorControlSlot *input,
             slot->parameter = *(u8 *)((u8 *)active + offset);
         }
         args = 6;
-        sub_0806FCAC(2, 1, &args);
+        SceneActorRegistry_SendToCategoryPaletteOffset(2, 1, &args);
         Sound_PlaySong(0x115);
         return 1;
     }

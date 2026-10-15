@@ -1,5 +1,4 @@
 #include "scene_actor_registry.h"
-#define SceneActorRegistry_InitializeList sub_0806FAD4
 void SceneActorRegistry_InitializeList(struct SceneActorRegistryManager *manager)
 {
     struct SceneActorRegistryNode *node;

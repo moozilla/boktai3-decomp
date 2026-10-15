@@ -1,6 +1,5 @@
 #include "scene_actor_terrain.h"
 #include "scene_actor_animation.h"
-#define SceneActorTerrain_ResumeDrawable sub_08077288
 void SceneActorTerrain_ResumeDrawable(struct SceneActorTerrainCollisionView *actor)
 {
     u32 *flags = &actor->flags2CC;

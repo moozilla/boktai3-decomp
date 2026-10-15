@@ -21,7 +21,7 @@ extern struct SceneActorContactManager *gUnk_020001A0;
 void SceneActorScript_DispatchKindPayload(void *);
 void SceneActorContacts_ResetList(void);
 u8 SceneActorContacts_CanSelectNode(struct SceneActorContactNode *);
-void sub_08072D34(void);
+void SceneActorContacts_ReleaseInvalidOwners(void);
 u8 sub_08072F4C(struct SceneActorContactNode *, struct SceneActorRegistryActor *, s32 *);
 struct SceneActorContactNode *SceneActorContacts_SelectForActor(struct SceneActorRegistryActor *,
                                                                 u32);

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-#define SceneActorRegistry_SendToCategoryPaletteOffset sub_0806FCAC
 void SceneActorRegistry_SendToCategoryPaletteOffset(u8 category, u8 palette, void *data)
 {
     struct SceneActorRegistryNode *node = gUnk_020004AC;

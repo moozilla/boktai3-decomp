@@ -1,5 +1,4 @@
 #include "scene_actor_registry.h"
-#define SceneActorRegistry_SendToActorId sub_0806FD08
 void SceneActorRegistry_SendToActorId(u8 a, void *data, u16 c)
 {
     struct SceneActorRegistryNode *n = gUnk_020004AC;

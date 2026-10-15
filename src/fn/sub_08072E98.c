@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_contact_list.h"
 #include "player.h"
-#define SceneActorContacts_TestPlayerCondition sub_08072E98
 struct SceneActorContactObjectView {
     u8 unknown0[8];
     u8 playerSlot;

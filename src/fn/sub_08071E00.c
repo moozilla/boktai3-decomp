@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_palette.h"
-#define SceneActorPalette_BeginTransition sub_08071E00
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)
@@ -39,7 +38,7 @@ void SceneActorPalette_BeginTransition(u32 destinationBank, u32 sourceBank, u32 
 category10:
     transition = &manager->category10;
 selected:
-    sub_080704A4(category);
+    SceneActorRegistry_FindLiving(category);
     {
         register u8 **bankPointer asm("r0") = &gUnk_030042E4;
         destinationOffset = destinationBank * 32;

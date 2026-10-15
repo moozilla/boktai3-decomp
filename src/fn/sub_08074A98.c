@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 #include "player.h"
-#define SceneActorMovement_UpdateHeight sub_08074A98
 u8 *sub_0821D64C(s32, s32);
 static inline u32 TerrainHeight(struct SceneActorRegistryActor *actor, u32 index)
 {

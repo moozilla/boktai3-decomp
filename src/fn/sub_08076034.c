@@ -1,10 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_animation.h"
-#define SceneActorAnimation_SelectDirectionalEntry sub_08076034
 void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorAnimationView *actor, s32 index)
 {
     struct SceneActorProfileEntry *entry =
-        (void *)sub_08073CB0(actor->profileId, actor->profileMode, index);
+        (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, index);
     u8 directionVariant, mirror;
     u32 selection;
     register u8 *mirrorPointer asm("r2");

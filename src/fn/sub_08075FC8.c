@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-#define SceneActorMovement_RequestAvailableAction sub_08075FC8
 void sub_08078700(struct SceneActorRegistryActor *);
 static inline u32 IsUnavailable(struct SceneActorRegistryActor *actor)
 {

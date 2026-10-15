@@ -1,6 +1,6 @@
 #include "global.h"
 s32 Mod(s32, s32);
-void sub_08076034(u8 *, s32);
+void SceneActorAnimation_SelectDirectionalEntry(u8 *, s32);
 void sub_0807C72C(u8 *, s32, s32, u32);
 void sub_080C627C(void);
 inline static u8 TakeFlag(u8 *flag)
@@ -22,7 +22,7 @@ void sub_080C61AC(u8 *s, s32 arg)
         u32 test;
         u16 *flags;
         u32 value;
-        sub_08076034(s, 6);
+        SceneActorAnimation_SelectDirectionalEntry(s, 6);
         test = 2;
         flags = (u16 *)(s + 0x2D4);
         value = *flags;

@@ -1,11 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_animation.h"
-#define SceneActorAnimation_SelectExplicitVariant sub_080765F8
 void SceneActorAnimation_SelectExplicitVariant(struct SceneActorAnimationView *actor, s32 index,
                                                u32 variant, u32 flags)
 {
     struct SceneActorProfileEntry *entry =
-        (void *)sub_08073CB0(actor->profileId, actor->profileMode, index);
+        (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, index);
     u32 selection = entry->value;
     u32 force;
     u8 *restart;

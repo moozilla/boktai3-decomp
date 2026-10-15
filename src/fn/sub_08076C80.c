@@ -3,7 +3,6 @@ static inline u16 ReadParameter(s32 keyword)
 {
     return Script_GetKeywordValue(keyword, 0);
 }
-#define SceneActorTerrain_ReadScriptParameters sub_08076C80
 void SceneActorTerrain_ReadScriptParameters(struct SceneActorTerrainView *actor)
 {
     actor->scriptParameterI = ReadParameter('I');

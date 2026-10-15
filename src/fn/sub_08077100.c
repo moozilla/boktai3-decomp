@@ -1,5 +1,4 @@
 #include "scene_actor_terrain.h"
-#define SceneActorTerrain_IsFacingPosition sub_08077100
 u32 SceneActorTerrain_IsFacingPosition(struct SceneActorTerrainView *actor,
                                        const struct ContactPosition *position)
 {

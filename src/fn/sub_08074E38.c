@@ -1,5 +1,4 @@
 #include "scene_actor_collision.h"
-#define SceneActorCollision_InitExternalAttackWithField34 sub_08074E38
 void SceneActorCollision_InitExternalAttackWithField34(struct SceneActorRegistryActor *actor,
                                                        struct ContactCollider *collider, void *size,
                                                        void *offset, void *callback, u32 index,

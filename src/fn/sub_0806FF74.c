@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-#define SceneActorRegistry_EnsureActorSubsystems sub_0806FF74
 #include "scene_actor_control.h"
 #include "actor_attachment_manager.h"
 #include "scene_particle_burst.h"
