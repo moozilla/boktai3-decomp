@@ -82,4 +82,5 @@ struct SceneActorTerrainCollisionView {
     u8 unknown2D8[0xC];
     u16 field2E4, field2E6;
 };
+void SceneActorTerrain_ClearCollisionTimers(struct SceneActorTerrainCollisionView *);
 #endif
