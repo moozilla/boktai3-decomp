@@ -7,7 +7,7 @@ struct SceneActorTargetLink {
     u8 unknownE0[0xB];
     u8 flags;
 };
-void sub_0807F4B8(struct SceneActorBehaviorView *);
+void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *);
 static inline u8 TargetHasFlag(struct SceneActorTargetLink *state)
 {
     u32 mask = 2;
@@ -15,7 +15,6 @@ static inline u8 TargetHasFlag(struct SceneActorTargetLink *state)
         return 1;
     return 0;
 }
-#define SceneActorTarget_ResolvePendingObject sub_0807F710
 s32 SceneActorTarget_ResolvePendingObject(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorRegistryResetView *owner = actor;
@@ -28,7 +27,7 @@ s32 SceneActorTarget_ResolvePendingObject(struct SceneActorRegistryResetView *ac
         struct ContactPosition *target;
         s32 x, z;
         u32 cell;
-        sub_0807F4B8((void *)owner);
+        SceneActorTarget_ResetContactResponse((void *)owner);
         {
             u16 *flags = &owner->group.flags414;
             register u32 mask asm("r0");

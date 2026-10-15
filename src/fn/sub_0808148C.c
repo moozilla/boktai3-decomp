@@ -1,9 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
-#define SceneActorReaction_PlayStaggerBurst sub_0808148C
-void sub_08076034(void *, s32);
-void sub_08076818(void *, s32);
-void sub_08077B1C(void *);
 void sub_0806A160(const void *, s32, const void *, s32, s32, s32, s32, s32);
 extern u32 gUnk_03005308;
 static inline u8 IsControlled(struct SceneActorRegistryResetView *a)
@@ -38,9 +34,9 @@ void SceneActorReaction_PlayStaggerBurst(struct SceneActorRegistryResetView *inp
         if (IsControlled(actor))
             ClearRoute(actor, group);
         if (category == 22)
-            sub_08076818(actor, 3);
+            SceneActorAnimation_SelectProfileEntry((void *)actor, 3);
         else
-            sub_08076034(actor, 3);
+            SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
         {
             if (!actor->drawableKind) {
                 u32 *flags = actor->drawable;
@@ -94,7 +90,7 @@ void SceneActorReaction_PlayStaggerBurst(struct SceneActorRegistryResetView *inp
             value = *fields;
             *fields = mask & value;
         }
-        sub_08077B1C(actor);
+        SceneActorPlacement_PlayCategoryResponseSound((void *)actor);
         Sound_PlaySong(298);
         range.packed.x = 60;
         range.packed.y = 60;

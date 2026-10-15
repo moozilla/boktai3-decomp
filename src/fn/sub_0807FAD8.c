@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reset.h"
-void sub_080714E4(struct SceneActorRegistryResetView *);
-void sub_0807171C(struct SceneActorRegistryResetView *);
-void sub_080718D8(struct SceneActorRegistryResetView *);
 static inline u32 Unavailable(struct SceneActorRegistryResetView *actor, u32 flags)
 {
     u32 result;
@@ -38,7 +35,6 @@ done:
     asm("" : "+r"(result));
     return result;
 }
-#define SceneActorTarget_ApplyResetCommand sub_0807FAD8
 void SceneActorTarget_ApplyResetCommand(struct SceneActorRegistryResetView *actor,
                                         const u16 *inputArgument)
 {
@@ -66,7 +62,7 @@ void SceneActorTarget_ApplyResetCommand(struct SceneActorRegistryResetView *acto
             u32 mask = 1;
             if (actor->flags2CC & mask) {
                 register u32 offset asm("r3");
-                sub_080718D8(actor);
+                SceneActorRegistry_RestoreActorDefaults((void *)actor);
                 offset = 0x178;
                 {
                     u16 *field = (void *)((u8 *)actor + offset);
@@ -87,7 +83,7 @@ void SceneActorTarget_ApplyResetCommand(struct SceneActorRegistryResetView *acto
             if (!(value & prior))
                 return;
             *flags = value & ~3;
-            sub_080714E4(actor);
+            SceneActorRegistry_ResetRouteAndColliders((void *)actor);
             {
                 register u32 state asm("r1") = 3;
                 register u32 stateOffset asm("r2") = 0x2A8;
@@ -148,7 +144,7 @@ void SceneActorTarget_ApplyResetCommand(struct SceneActorRegistryResetView *acto
             flags = (void *)((u8 *)actor + offset);
             mask = ~3;
             *flags &= mask;
-            sub_0807171C(actor);
+            SceneActorRegistry_ResetRoute((void *)actor);
             {
                 register u32 state asm("r1") = 3;
                 u32 stateOffset = 0x2A8;
