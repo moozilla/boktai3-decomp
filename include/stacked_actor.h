@@ -16,7 +16,7 @@ struct StackedActorSprite {
 };
 struct StackedActorParticle {
     u32 flags;
-    u8 unknown4[0x14];
+    u8 unknown4[0xB],renderMode,priority,unknown11[7];
     struct StackedActorPosition position;
     u8 unknown20[8];
     u8 enabled, life, unknown2A[2];
