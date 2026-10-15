@@ -59,7 +59,9 @@ struct ScenePanelConfigView {
 struct ScenePanelSpawnPosition {
     u32 x : 16, y : 16, z : 16;
 };
-void *sub_0805DCAC(const void *, u32, u32, u32, u32, s32, s32, u32);
+struct ScenePanelSubjectView;
+struct ScenePanelSubjectView *ScenePanelSubject_Create(const struct ContactPosition *, u32, u32,
+                                                       u32, u32, u32, u32, u32);
 void ScenePanel_InitScheduledAction(struct ScenePanel *);
 void ScenePanel_InitPaletteSprite(struct ScenePanel *);
 void ScenePanel_InitAuxiliarySprite(struct ScenePanel *);

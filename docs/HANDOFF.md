@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 26.388% matching (2026-10-14). This file is the single
+Last updated after reaching 26.570% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,58 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex/Sol): complete scene-panel subject subsystem
+
+Exact code is **26.570%**, up **0.1823 percentage points** (+4,404 bytes):
+**6,741 / 11,473 functions**, **641,762 / 2,415,354 bytes**. Without register
+pinning: **20.391%**; Register-pinned: **6.179%**, included above. Sixteen new
+functions add 996 ordinary-C bytes and 3,408 bytes with minimized concessions.
+The 77 guarded drafts remain outside exact progress.
+
+The reviewed cohort is **5CB38–5DD18**, **19 functions /4,576 bytes**, plus
+rechecking the earlier 504-byte parent spawn routine after argument naming.
+Sol recovered the singleton creator, subject state/contact helpers, final
+state/driver, collider/cleanup and 896-byte initializer. Root recovered six
+animation states and the 108-byte subject factory. Three existing leaves gain
+types or names without new credit. The subject view now shares the established
+drawable, collider and sequence types; tail APIs use the same consolidated view.
+
+Subject activation sets changedF0, which the parent consumes for sound 294 and
+its presentation callback. Departure either returns directly to settled or
+enters a 90-frame reset/jitter delay, depending on kind. The factory confirms
+that parent per-slot values 6/9/3/0 are appearance delays, rather than directions;
+the row/variant, initial state, kind, contact limit and collider arguments now
+have evidence-backed names. Prior configuration notes were corrected.
+
+Integration also corrects the worker baseline's SelectTiles name: 08215284
+selects 32-byte RGB15 palette banks. Subject F2/F4 and constants 24C–250 are
+palette selections, separate from entry songs FB/FC. The initializer and six
+state handlers share one inline decoder, with eleven jointly minimized hints;
+local state hints and the initializer's limit pointer remain minimized too.
+No instruction bodies or explicit r7 bindings are present.
+
+Contracts: [helpers](SCENE_PANEL_SUBJECT.md),
+[state machine](SCENE_PANEL_SUBJECT_STATES.md),
+[final state/driver](SCENE_PANEL_SUBJECT_TAIL.md),
+[initializer/factory](SCENE_PANEL_SUBJECT_INITIALIZER.md).
+The contiguous exact-C span reaches **4E008–5DD18**, **452 functions /64,784
+bytes**, with no gaps. PR143 main Actions passed at 2f9295a9 (run38684705279).
+No new runtime coverage or specific scene identity is claimed.
+
+Combined validation printed `build/boktai3.gba: OK` in
+`build/subject-combined.log`, and the RAM-literal check passed. All 20
+pre-promotion full reviewed extents passed in `build/subject-pre-promotion.json`;
+formatting, inventory and structured-data checks passed. Final checks are
+recorded in `build/subject-post-promotion.json`.
+
+Continue toward **30% matching or 40% account usage remaining**, latest read
+**43% remaining**. Sol owns **5DD18–5DE3C** HUD map/decimal/meter helpers;
+root scratch starts **5DE3C–5E09C**, clock/numeric display and palette helpers.
+E014 is an independent 136-byte prologue/return left as raw bytes after E000;
+review and add its boundary metadata before claiming the full E000–E09C span.
+The existing sun_clock.h identifies base/hourA/hourB fields used by DE3C.
+Keep the primary Claude checkout untouched and worker build outputs private.
 
 ## October 14 (Codex/Sol): panel interaction, configuration and lifecycle
 
@@ -47,10 +99,7 @@ Pre-promotion checks passed 35/35 plus 12/12 full reviewed extents. Formatting,
 inventory and structured-data checks passed. Final post-promotion checks are
 recorded in `build/interaction-config-post-promotion.json`.
 
-Continue toward **30% matching or 40% account usage remaining**, latest read
-**44% remaining**. Root scratch covers **5CD64–5D2B0**, subject sequence states.
-Sol's disjoint **5CB38–5CD64** subject creation/state/contact cohort is active.
-Do not alter the primary Claude checkout. Worker build outputs remain private.
+This batch was merged as PR143. Newer entries supersede its next-work assignments.
 
 ## October 14 (Codex/Sol): complete rig states, animation and setup
 
