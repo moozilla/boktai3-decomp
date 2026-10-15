@@ -6,7 +6,7 @@
 /* Catalog and transition/controller storage overlap across UI phases. */
 struct SceneInventoryControlView {
     u8 unknown0[0x1AA4];
-    u8 promptDelay, unknown1AA5, mode, unknown1AA7, category;
+    u8 interactionFlags, unknown1AA5, mode, unknown1AA7, category;
     u8 unknown1AA9[7];
     u8 page, unknown1AB1[2];
     u8 unknown1AB3[0x1AEC - 0x1AB3];

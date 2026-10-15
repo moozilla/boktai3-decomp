@@ -2,7 +2,7 @@
 #define SceneInventory_BeginActionSelection sub_080614B4
 void SceneInventory_BeginActionSelection(struct SceneInventoryControlView *panel, s32 mode)
 {
-    panel->promptDelay = 100;
+    panel->interactionFlags = 100;
     switch (mode) {
         case 0:
             SceneInput_InitGrid(&panel->grid, 1, 0, 0, 28);
