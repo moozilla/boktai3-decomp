@@ -80,19 +80,24 @@ identify the surrounding scene.
 
 New ordinary-boundary exact bodies in this batch are `65C50` (204), `65D1C`
 (160), `65DBC` (532), `66AE0` (72), `66B28` (144), and `67018` (136): **1,248
-bytes, +0.0517 percentage points**. All currently carry temporary register-pin
+bytes, +0.0517 percentage points**. Those bodies carry temporary register-pin
 concessions, reduced with `tools/depin.py`; none binds `r7` or embeds instruction
-bodies. `66CB8` adds explicit correctness evidence for previously credited bytes.
+bodies. Descriptor dispatch at `66DB8` adds a further **472 ordinary C bytes**,
+for **1,720 new bytes / +0.0712 percentage points** in total. Its five initial
+register hints were all removed after correcting the forwarding wrapper count
+parameter to a full word. The wrapper itself does not truncate that argument;
+its caller explicitly sign-extends the halfword value before forwarding. `66CB8` adds explicit correctness evidence for previously credited bytes.
 Every changed C unit is checked across its full reviewed inventory extent.
 The orchestrator performs the combined ROM build before integration.
 
 Unmatched bodies remain `65FD0` (680), `66278` (508), `66474` (612), `666D8`
-(472), `668B0` (472), and `66DB8` (472). The first three form the value/part
+(472), `668B0` (472). The first three form the value/part
 creation family. Two exact forwarding wrappers at `66A88`/`66AB4` expose its
-fixed-kind and explicit-kind call contracts. The descriptor dispatcher at
+fixed-kind and explicit-kind call contracts. The now-exact descriptor dispatcher at
 `66DB8` accepts kinds 0–5; frame `7F` requests release, while other frames first
 release all resource variants for the same identity, then create the requested
-kind. Descriptor flag 4 selects action `FF`. Its useful 94.0% draft is private
-and runs through the permuter; it earns no exact progress. The invalid-kind
+kind. Descriptor flag 4 selects action `FF`. A permuter search helped isolate the final allocation problem; its speculative
+uninitialized-local candidate was discarded. Correcting the source types and
+removing unnecessary hints produced the exact ordinary C body. The invalid-kind
 path retains the original incidental return register, and callers reviewed for
 this contract use the 0–5 domain.
