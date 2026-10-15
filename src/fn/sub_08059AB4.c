@@ -1,7 +1,6 @@
-// COMPILER: old_agbcc
-#include "global.h"
-
-void sub_08059AB4(u8 *p)
+#include "scene_panel_rig.h"
+#define ScenePanelRig_ResetScale sub_08059AB4
+void ScenePanelRig_ResetScale(struct ScenePanelRig *rig)
 {
-    *(u16 *)(p + 0x68e) = 16;
+    rig->scale = 16;
 }
