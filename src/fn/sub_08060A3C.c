@@ -1,17 +1,18 @@
 #include "global.h"
+#define SceneInventory_FindConsumableAssignment sub_08060A3C
 
-struct S {
-    u8 f[0x58];
-    s16 v[4];
+struct SceneInventorySlotsView {
+    u8 unknown0[0x58];
+    s16 slots[4];
 };
-extern struct S *gUnk_02000710;
+extern struct SceneInventorySlotsView *gUnk_02000710;
 
-s32 sub_08060A3C(s32 a)
+s32 SceneInventory_FindConsumableAssignment(s32 slot)
 {
     s32 i = 0;
-    s16 *p = gUnk_02000710->v;
+    s16 *p = gUnk_02000710->slots;
     for (; i < 4; p++, i++) {
-        if (*p == a)
+        if (*p == slot)
             return i;
     }
     return -1;
