@@ -87,4 +87,5 @@ static inline u8 SceneActorPlacement_TestMask(u32 mask, u32 flags)
         return 1;
     return 0;
 }
+void SceneActorPlacement_PlayCategoryResponseSound(struct SceneActorRegistryActor *);
 #endif

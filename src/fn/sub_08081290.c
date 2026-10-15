@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
-#define SceneActorReaction_SinkAndRemove sub_08081290
-void sub_08076034(void *, s32);
 void sub_0807C72C(void *, u32, u32, u32);
 void sub_0807E7B0(void *, u32);
 void sub_08080FB4(void *, s32);
@@ -42,7 +40,7 @@ void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *input,
         u32 category = actor->category;
         if (IsControlled(actor))
             ClearRoute(actor);
-        sub_08076034(actor, 3);
+        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
         if (category != 2 && category != 22) {
             register u32 forwarded asm("r3") = category;
             sub_0807C72C(actor, 0, 1, forwarded);

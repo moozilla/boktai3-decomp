@@ -36,7 +36,6 @@ static inline void IncrementFirst(u16 *input)
     }
     *counter = result;
 }
-#define SceneActorTarget_ResetContactResponse sub_0807F4B8
 void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *inputActor)
 {
     struct SceneActorBehaviorView *early = inputActor;

@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
-#define SceneActorReaction_ResumeAfterAnimation sub_08081B9C
-void sub_08076034(void *, s32);
-void sub_080771C4(void *);
 static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
 {
     register u32 offset asm("r2") = 0x2B2;
@@ -21,8 +18,8 @@ void SceneActorReaction_ResumeAfterAnimation(struct SceneActorRegistryResetView 
     u8 *group = (u8 *)actor + 0x3D4;
     u32 phaseOffset;
     if (TakePrepared(actor)) {
-        sub_08076034(actor, 7);
-        sub_080771C4(actor);
+        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 7);
+        SceneActorTerrain_ClearCollisionTimers((void *)actor);
         {
             register u32 offset asm("r3") = 0x2D4;
             register u16 *flags asm("r0");
@@ -65,7 +62,7 @@ void SceneActorReaction_ResumeAfterAnimation(struct SceneActorRegistryResetView 
                 flags = (u32 *)((u8 *)actor + offset);
                 *flags |= mask;
             }
-            sub_08076034(actor, 0);
+            SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
             {
                 register u32 state asm("r1") = 3;
                 u32 stateOffset = 0x2A8;
