@@ -20,11 +20,11 @@ struct ResourceStationDigit {
 };
 struct ResourceStationPlayer {
     u8 unknown0[0x1C];
-    u32 kind, flags;
+    u32 stateTag, flags; /* stateTag interpretation is tentative; active value is1 */
     u8 unknown24[12];
     struct ResourceStationPosition position;
     u8 unknown38[0x3E0];
-    u8 characterKind;
+    u8 actionMode;
     u8 unknown419[0xF];
     u16 resource, resourceMaximum;
     u8 unknown42C[0x2B];

@@ -30,13 +30,13 @@ void AreaEffect_UpdateLinkPlayerResources(struct AreaEffectManager *manager)
     do {
         struct AreaEffectPlayer *player = gUnk_02000580[i];
         s32 next = i + 1;
-        if (player && player->state == 1) {
+        if (player && player->stateTag == 1) {
             u32 mode = playerMode(player);
             u32 offset;
             {
                 u32 gain;
                 u16 *destination;
-                if (player->kind == 6) {
+                if (player->actionMode == 6) {
                     if (mode == 2) {
                         offset = i * 2;
                         destination = (u16 *)((u8 *)fractions + offset);

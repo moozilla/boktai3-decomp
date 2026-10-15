@@ -1,8 +1,9 @@
-#include "global.h"
+#include "directional_force.h"
+#define DirectionalForce_ConfigureFixedFromScript sub_08051188
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void sub_08051158(s32, s32, s32, s32, s32);
-void sub_08051188(void)
+void DirectionalForce_ConfigureFixedFromScript(void)
 {
     s32 a, b, c, d, e;
     if (Script_SeekToKeyword(0x64))

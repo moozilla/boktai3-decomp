@@ -19,7 +19,7 @@ void ResourceStation_CheckInteraction(struct ResourceStation *station)
     if (x > 128 || z > 128)
         goto outside;
     {
-        u32 playerKind = player->kind;
+        u32 playerKind = player->stateTag;
         if (playerKind != 1) {
             register u32 offset asm("r2") = 0x264;
             asm("" : "+r"(offset));
