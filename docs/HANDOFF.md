@@ -42,13 +42,16 @@ row/column view describe the same storage; keep their interpretation explicit.
 reached. Do not resume matching without renewed allowance.** Root E484 is a
 91.3% draft (192/180 bytes), with copy/step register allocation still different.
 Sol E5E4 is 97.9% (480/480 bytes), with five FF constant birth orders remaining.
-Both are preserved for resumption and receive no exact credit. The exact work
+Both are preserved on main as guarded NONMATCHING sources (91.3%/97.9%)
+and receive no exact credit; there are now 79 guarded drafts. The exact work
 was committed individually and combined for one integration batch.
 
-Validation: combined ROM build in `build/hud-combined.log`; final reviewed
-extents in `build/hud-post-promotion.json`; navigation pre-promotion checks
-10/10 in `build/navigation-pre-promotion.json`. Consult the merge/validation
-result before treating the batch as integrated. The primary Claude checkout
+Validation: combined ROM build passed in `build/hud-combined.log`; all 67/67
+changed function TUs passed final reviewed extents in `build/hud-post-promotion.json`; navigation pre-promotion checks
+10/10 in `build/navigation-pre-promotion.json`. PR145 merged at 8af3038d;
+main Actions run38688378461 succeeded. Draft scores were recorded with
+`check.py --nonmatching --record`; their default ASM paths are validated in
+`build/retained-drafts-combined.log`. The primary Claude checkout
 remains untouched; worker builds and generated files remain private.
 
 ## October 14 (Codex/Sol): complete scene-panel subject subsystem
