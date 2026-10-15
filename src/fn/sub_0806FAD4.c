@@ -1,15 +1,13 @@
-#include "global.h"
-u8 *Heap_Alloc(u32);
-void Memory_Clear(u8 *, u32);
-extern u8 *gUnk_020004AC;
-void sub_0806FAD4(u8 *p)
+#include "scene_actor_registry.h"
+#define SceneActorRegistry_InitializeList sub_0806FAD4
+void SceneActorRegistry_InitializeList(struct SceneActorRegistryManager *manager)
 {
-    u8 *q;
-    *(u8 **)(p + 0x1c) = Heap_Alloc(8);
-    Memory_Clear(*(u8 **)(p + 0x1c), 8);
-    q = *(u8 **)(p + 0x1c);
-    *(u32 *)q = 0;
-    *(u32 *)(q + 4) = 0;
-    gUnk_020004AC = q;
-    *(u8 **)(p + 0x20) = q;
+    struct SceneActorRegistryNode *node;
+    manager->sentinel = Heap_Alloc(8);
+    Memory_Clear(manager->sentinel, 8);
+    node = manager->sentinel;
+    node->next = 0;
+    node->actor = 0;
+    gUnk_020004AC = node;
+    manager->cursor = node;
 }
