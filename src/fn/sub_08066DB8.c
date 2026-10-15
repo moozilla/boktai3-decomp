@@ -47,11 +47,12 @@ ActorAttachment_UpdateFromDescriptor(struct ActorAttachmentSlotView *slot,
                 return ActorAttachment_CreateSpriteSlot(
                     frame, &descriptor->anchor, descriptor->identity, y, z, action, 0, descriptor);
             case 1:
-                return sub_08065FD0(frame, &descriptor->anchor, descriptor->identity, y, z, action,
-                                    value, (s16)count, 0, 0, descriptor);
+                return ActorAttachment_CreateValueSpriteSlot(frame, &descriptor->anchor,
+                                                             descriptor->identity, y, z, action,
+                                                             value, (s16)count, 0, 0, descriptor);
             case 2:
-                return sub_08066278(1, &descriptor->anchor, descriptor->identity, z, action,
-                                    descriptor);
+                return ActorAttachment_CreateSinglePartSlot(
+                    1, &descriptor->anchor, descriptor->identity, z, action, descriptor);
             case 3: {
                 s16 *parameter = value;
                 return ActorAttachment_CreateThreePartSlot(7, &descriptor->anchor,
@@ -59,11 +60,11 @@ ActorAttachment_UpdateFromDescriptor(struct ActorAttachmentSlotView *slot,
                                                            parameter, (s16)count, descriptor, 0);
             }
             case 4:
-                return sub_080666D8(&descriptor->anchor, descriptor->identity, y, z, action, 0,
-                                    descriptor);
+                return ActorAttachment_CreateFixedSpriteSlot(
+                    &descriptor->anchor, descriptor->identity, y, z, action, 0, descriptor);
             case 5:
-                return sub_080668B0(&descriptor->anchor, descriptor->identity, y, z, action, 0,
-                                    descriptor);
+                return ActorAttachment_CreateAlternateSpriteSlot(
+                    &descriptor->anchor, descriptor->identity, y, z, action, 0, descriptor);
             default:
                 break;
         }

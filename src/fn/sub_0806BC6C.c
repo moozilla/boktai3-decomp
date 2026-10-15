@@ -1,9 +1,7 @@
-#include "global.h"
-void Collider_SetPosition(u8 *, u8 *, u32);
-void Collider_Refresh(u8 *);
-void sub_0806BC6C(u8 *p)
+#include "scene_steering_actor.h"
+void SceneSteeringActor_RefreshCollider(struct SceneSteeringActor *p)
 {
-    u8 *q = p + 0xa8;
-    Collider_SetPosition(q, p + 0x1c, 0);
-    Collider_Refresh(q);
+    struct ContactCollider *collider = &p->collider;
+    Collider_SetPosition(collider, &p->position, 0);
+    Collider_Refresh(collider);
 }

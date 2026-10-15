@@ -4,5 +4,6 @@ ActorAttachment_CreateThreePartSlot(u8 frame, struct ContactPosition *anchor, vo
                                     u32 action, s16 *value, s32 count,
                                     struct ActorAttachmentFollowView *follow, u32 unused)
 {
-    return sub_08066474(frame, anchor, update, z, action, value, count, 3, follow, unused);
+    return ActorAttachment_CreateMeterPartsSlot(frame, anchor, update, z, action, value, count, 3,
+                                                follow, unused);
 }

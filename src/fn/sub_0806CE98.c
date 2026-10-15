@@ -1,10 +1,8 @@
-#include "global.h"
-void AnimData_Load(u8 *, u32);
-extern u8 *gUnk_02000188;
-u32 sub_0806CE98(u8 *p)
+#include "scene_steering_actor.h"
+s32 SceneSteeringActor_InitializePool(struct SceneSteeringActorPool *pool)
 {
-    *(u32 *)(p + 0x38) = 0;
-    AnimData_Load(p + 0x18, 0xF422);
-    gUnk_02000188 = p;
+    pool->used = 0;
+    AnimData_Load(pool->graphics, 0xF422);
+    gUnk_02000188 = pool;
     return 0;
 }

@@ -1,9 +1,7 @@
-#include "global.h"
-
-void sub_08068840(void *);
-
-s32 sub_08068868(void *p)
+#include "scene_particle_pool.h"
+void SceneParticlePool_LoadResources(struct SceneParticlePool *);
+s32 SceneParticlePool_Initialize(struct SceneParticlePool *pool)
 {
-    sub_08068840(p);
+    SceneParticlePool_LoadResources(pool);
     return 0;
 }

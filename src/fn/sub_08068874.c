@@ -1,24 +1,22 @@
-#include "global.h"
-extern u8 *gUnk_02000134;
-u8 *Task_Create(u32, u32);
-void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
-s32 sub_08068868(u8 *);
-void Task_Kill(u8 *);
-void SceneParticlePool_Update(void);
-void SceneParticlePool_Destroy(void);
-u8 *sub_08068874(void)
+#include "scene_particle_pool.h"
+extern struct SceneParticlePool *gUnk_02000134;
+s32 SceneParticlePool_Initialize(struct SceneParticlePool *);
+s32 SceneParticlePool_Update(struct SceneParticlePool *);
+s32 SceneParticlePool_Destroy(struct SceneParticlePool *);
+struct SceneParticlePool *SceneParticlePool_EnsureSingleton(void)
 {
-    u8 *r;
-    if (gUnk_02000134 != 0)
+    struct SceneParticlePool *pool;
+    if (gUnk_02000134)
         return gUnk_02000134;
-    r = Task_Create(10, 0x2C4);
-    gUnk_02000134 = r;
-    if (r) {
-        Task_SetCallbacks(r, SceneParticlePool_Update, SceneParticlePool_Destroy);
-        if (sub_08068868(r) < 0) {
-            Task_Kill(r);
+    pool = Task_Create(10, 0x2C4);
+    gUnk_02000134 = pool;
+    if (pool) {
+        Task_SetCallbacks(pool, (void (*)(void *))SceneParticlePool_Update,
+                          (void (*)(void *))SceneParticlePool_Destroy);
+        if (SceneParticlePool_Initialize(pool) < 0) {
+            Task_Kill(pool);
             return 0;
         }
     }
-    return r;
+    return pool;
 }
