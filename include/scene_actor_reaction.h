@@ -11,6 +11,12 @@ struct SceneActorReactionGroup {
     u8 unknown46[6];
     struct SceneActorRegistryControl control;
 };
+struct SceneActorReactionCommand {
+    u8 unknown0[8];
+    u8 first, second, kind, unknownB;
+    u32 duration;
+    void *payload;
+};
 struct SceneActorReactionTail {
     u8 unknown0[0x5D4];
     struct ContactPosition *destination;
@@ -19,7 +25,7 @@ void sub_080764C8(void *, u32, u32);
 void sub_08076034(void *, u32);
 void sub_08077848(void *, u32);
 void sub_0807FC90(void);
-void sub_0807FDC0(void);
+void sub_0807FDC0(void *, s32);
 s32 sub_0821F204(void *, struct ContactPosition *, struct ContactPosition *);
 s32 sub_0821F7A8(void *, struct ContactPosition *, struct ContactPosition *);
 static inline u8 SceneActorReaction_TakePrepared(struct SceneActorRegistryResetView *actor)
