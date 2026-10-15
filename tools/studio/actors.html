@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boktai 3 Actors</title>
+<link rel="stylesheet" href="/static/common.css">
+<style>
+:root {
+  --bg: #f6f3ec; --panel: #fffdf8; --ink: #2b2620; --muted: #7d7468; --line: #e3dccf;
+  --accent: #b5462f; --accent-ink: #fff; --sel: #f3e3d6; --ok: #2f7d4f; --stage: #3b3f55;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1b1916; --panel: #24211d; --ink: #ece6dc; --muted: #9a9083; --line: #3a352e;
+    --accent: #e0745a; --accent-ink: #1b1916; --sel: #3a2c25; --ok: #6cc596;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Hiragino Sans", sans-serif; }
+button, input, select, textarea { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
+main { display: grid; grid-template-columns: 300px 1fr; height: calc(100vh - 53px); }
+#side { border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
+#side .tools { padding: 10px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
+.count, .chk { color: var(--muted); font-size: 12px; }
+#list { overflow-y: auto; flex: 1; }
+.row { padding: 6px 10px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.row:hover { background: var(--sel); }
+.row.on { background: var(--sel); box-shadow: inset 3px 0 var(--accent); }
+.row b { font-weight: 500; }
+.row code { font-size: 12px; color: var(--muted); margin-right: 6px; }
+.row small { display: block; color: var(--muted); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row.special { font-weight: 500; color: var(--accent); }
+#view { overflow: auto; padding: 14px 20px 40px; min-width: 0; }
+h2 { font-size: 16px; margin: 0 0 4px; }
+h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 18px 0 8px; font-weight: 600; }
+.meta { color: var(--muted); font-size: 13px; }
+.empty { color: var(--muted); }
+code, .mono { font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; }
+dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; }
+dt { color: var(--muted); }
+dd { margin: 0; }
+.sprites { display: flex; gap: 10px; flex-wrap: wrap; }
+.spr { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); min-width: 90px; text-decoration: none; color: var(--ink); }
+.spr .pic { min-height: 64px; display: flex; align-items: center; image-rendering: pixelated; }
+.spr .pic canvas { image-rendering: pixelated; }
+.spr small { color: var(--muted); font-size: 11px; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip { font-size: 12px; padding: 1px 8px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); white-space: nowrap; }
+.chip a { text-decoration: none; }
+table { border-collapse: collapse; font-size: 13px; }
+td, th { padding: 3px 10px 3px 0; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 500; }
+.cand { color: var(--muted); font-size: 12px; }
+body.embed #side { display: none; }
+body.embed main { grid-template-columns: 1fr; }
+@media (max-width: 860px) { main { grid-template-columns: 1fr; height: auto; } #side { height: 40vh; } }
+</style>
+</head>
+<body>
+<header id="top"></header>
+<main>
+  <section id="side">
+    <div class="tools">
+      <input id="q" type="search" placeholder="Filter: key, label, name, function, sprite" autocomplete="off">
+      <label class="chk"><input type="checkbox" id="fspr"> with a sprite</label>
+      <label class="chk"><input type="checkbox" id="fused"> created by a script</label>
+      <div class="count" id="count"></div>
+    </div>
+    <div id="list"></div>
+  </section>
+  <section id="view"><div class="empty">Loading…</div></section>
+</main>
+<script src="/static/common.js"></script>
+<script>
+// The script actor registry (data/actor_registry.csv): every object a script
+// can create by key with `chara KEY NAME` or `cmd_B745 KEY`. Cross-references
+// come from tools/assets/actors.py.
+studioHeader();
+let A = [], byKey = {}, enemies = [], characters = [], scenes = {}, en = {}, sel = null;
+
+const label = a => noteOf('actor', a.key)?.label;
+const title = a => label(a) || (a.names.length ? a.names.map(n => n.jp).join(' / ') + '?' : a.callback_name);
+
+function renderList() {
+  const q = $('q').value.trim().toUpperCase(), fs = $('fspr').checked, fu = $('fused').checked;
+  const hits = A.filter(a => (!fs || a.sprites.length) && (!fu || a.procs.length) &&
+    (!q || [a.key, label(a), a.callback_name, a.loader_name, ...a.sprites.map(s => s.hash), ...a.names.map(n => n.jp + ' ' + (en[n.id] || ''))].some(x => (x || '').toUpperCase().includes(q))));
+  $('count').textContent = `${hits.length} of ${A.length} registry entries`;
+  const special = document.createElement('div');
+  special.className = 'row special' + (sel === 'names' ? ' on' : ''); special.dataset.key = 'names';
+  special.textContent = 'Name lists from the game (monsters, characters)';
+  special.onclick = () => { location.hash = 'names'; };
+  $('list').replaceChildren(special, ...hits.map(a => {
+    const d = document.createElement('div'); d.className = 'row' + (a.key === sel ? ' on' : ''); d.dataset.key = a.key;
+    d.innerHTML = `<code>${a.key}</code><b></b><small></small>`;
+    d.querySelector('b').textContent = title(a);
+    d.querySelector('small').textContent = [a.callback_name !== title(a) && a.callback_name, a.sprites.length && 'sprite ' + a.sprites.map(s => s.hash).join(','),
+      a.procs.length && `${a.procs.length} proc${a.procs.length > 1 ? 's' : ''}`, a.scenes.length && `${a.scenes.length} scenes`].filter(Boolean).join(' · ');
+    d.onclick = () => { location.hash = a.key; };
+    return d;
+  }));
+}
+
+const sceneChip = s => {
+  const sc = scenes[s] || {};
+  return `<span class="chip">${sc.shot ? peekLink('/captures#scene_' + String(s).padStart(4, '0'), 'scene ' + s) : 'scene ' + s}${sc.map ? ' · ' + peekLink(gfxHref('map', sc.map), esc(noteOf('map', sc.map)?.label || sc.map)) : ''} · ${procLink(s, '▸')}</span>`;
+};
+
+async function show(key) {
+  sel = key;
+  document.querySelectorAll('.row').forEach(d => d.classList.toggle('on', d.dataset.key === key));
+  document.querySelector('.row.on')?.scrollIntoView({ block: 'nearest' });
+  if (key === 'names') return showNames();
+  const a = byKey[key], v = $('view');
+  if (!a) { v.innerHTML = `<div class="empty">No registry entry ${esc(key)}.</div>`; return; }
+  const names = a.names.map(n => `${stringLink(n.id)} ${esc(n.jp)}${en[n.id] ? ` <span class="cand">(${esc(en[n.id])})</span>` : ''}`).join('<br>');
+  const procs = a.procs, unreached = procs.length && !a.scenes.length;
+  v.innerHTML = `<h2></h2><div class="meta">Registry key <code>${a.key}</code>: a 16-bit hash of the original actor name (not recovered; docs/DATA.md)</div>
+    <div id="ned"></div>
+    <dl>
+      <dt>Callback</dt><dd>${codeLink(a.callback, a.callback_name)} <span class="mono meta">${a.callback}</span></dd>
+      <dt>Loader</dt><dd>${a.loader ? `${codeLink(a.loader, a.loader_name)} <span class="mono meta">${a.loader}</span> <span class="meta">(the function the callback hands its new actor to)</span>` : '<span class="empty">none (the callback does not allocate an actor and pass it on)</span>'}</dd>
+      <dt>Names</dt><dd>${names || '<span class="empty">no name from the game linked yet</span>'}${a.names.length ? `<div class="cand">Candidates from the monster list (string 9838 on), linked through the sprite by its look in captures (docs/ASSETS.md); not from the game's own index, which is not found yet.</div>` : ''}</dd>
+    </dl>
+    <h3>Sprites</h3>${a.sprites.length ? `<div class="sprites" id="sprites"></div><div class="meta" style="margin-top:6px">16-bit literals in the callback, the loader and their nearby callees that name a sprite package (CB05) or a large sprite (98F5).</div>` : '<div class="empty">No sprite named in the callback or loader.</div>'}
+    <h3>Created by scripts (${a.spawns} time${a.spawns === 1 ? '' : 's'}, ${procs.length} procedure${procs.length === 1 ? '' : 's'})</h3>
+    ${procs.length ? `<div class="chips">${procs.map(p => `<span class="chip">${procLink(p)}</span>`).join('')}</div>` : '<div class="empty">No script creates it (engine-only, or created by code).</div>'}
+    <h3>Scenes (${a.scenes.length})</h3>
+    ${a.scenes.length ? `<div class="chips">${a.scenes.map(sceneChip).join('')}</div><div class="meta" style="margin-top:6px">Scenes whose entry procedure reaches one of these procedures through calls.</div>`
+      : unreached ? '<div class="empty">None found: these procedures have no script callers (they are started by the engine or stage data, not by a call).</div>' : '<div class="empty">None.</div>'}`;
+  v.querySelector('h2').textContent = title(a);
+  $('ned').replaceWith(noteEditor('actor', a.key, () => { v.querySelector('h2').textContent = title(a); renderList(); }));
+  const box = $('sprites');
+  for (const s of a.sprites) {
+    const el = document.createElement('a'); el.className = 'spr'; el.href = gfxHref(s.kind, s.hash); el.dataset.peek = '';
+    el.innerHTML = `<div class="pic"></div><span class="mono">${s.hash}</span><small>${s.kind === 'big' ? 'large sprite' : 'sprite package'} · in ${esc(s.in)}</small>`;
+    const lab = noteOf(s.kind === 'big' ? 'big' : 'spr', s.hash)?.label;
+    if (lab) el.insertAdjacentHTML('beforeend', `<small>${esc(lab)}</small>`);
+    box.appendChild(el);
+    spriteThumb(s.kind, s.hash, 64).then(cv => cv && el.querySelector('.pic').appendChild(cv)).catch(() => {});
+  }
+}
+
+function showNames() {
+  const linked = {};
+  for (const a of A) for (const n of a.names) (linked[n.id] ||= []).push(a);
+  const row = n => `<tr><td>${stringLink(n.id)}</td><td>${esc(n.jp)}</td><td class="cand">${esc(en[n.id] || '')}</td><td>${(linked[n.id] || []).map(a => `<a href="#${a.key}">${a.key}</a> <span class="cand">via ${a.names.find(x => x.id === n.id).via}</span>`).join(', ')}</td></tr>`;
+  $('view').innerHTML = `<h2>Name lists from the game</h2>
+    <div class="meta">Text-bank strings (click an ID to open it in the text editor). English in grey is the fan translation, for reading only.</div>
+    <h3>Monsters (strings ${enemies[0]?.id}–${enemies.at(-1)?.id})</h3>
+    <p class="meta">The game shows these as base + index somewhere (a bestiary-like set: descriptions follow at 2509, elements at 9927, classes at 9936), but the code or script that adds 9838 to an enemy kind is not found yet: code reaches strings as a script-supplied base plus an offset, no script operand supplies a base near 9838, and the late-game save's pause menus never look one up. Links below go through the family's sprite (visual identification), so they are candidates.</p>
+    <table><tr><th>String</th><th>Name</th><th></th><th>Registry entries</th></tr>${enemies.map(row).join('')}</table>
+    <h3>Characters (strings ${characters[0]?.id}–${characters.at(-1)?.id})</h3>
+    <table><tr><th>String</th><th>Name</th><th></th><th></th></tr>${characters.map(row).join('')}</table>`;
+}
+
+$('q').oninput = renderList; $('fspr').onchange = renderList; $('fused').onchange = renderList;
+listKeys(() => $('list'), '.row');
+window.onhashchange = () => { const k = location.hash.slice(1); if (k && k !== sel) show(k); };
+(async () => {
+  await loadNotes();
+  const [d, e] = await Promise.all([fetch('/api/actors').then(r => r.json()), fetch('/api/english').then(r => r.json()).catch(() => ({}))]);
+  A = d.actors; enemies = d.enemies; characters = d.characters; scenes = d.scenes; en = e;
+  byKey = Object.fromEntries(A.map(a => [a.key, a]));
+  renderList();
+  const k = location.hash.slice(1).toUpperCase() === 'NAMES' ? 'names' : location.hash.slice(1).toUpperCase() || A.find(a => a.loader && a.sprites.length)?.key;
+  if (k) { if (!location.hash) history.replaceState(null, '', '#' + k); show(k); }
+})();
+</script>
+</body>
+</html>

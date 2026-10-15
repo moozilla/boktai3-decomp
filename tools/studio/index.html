@@ -151,7 +151,7 @@ function render() {
     frag.appendChild(d);
   }
   $('list').replaceChildren(frag);
-  $('dirty').textContent = `${strings.filter(s => s.edited).length} edited`;
+  if ($('dirty')) $('dirty').textContent = `${strings.filter(s => s.edited).length} edited`;  // the header is gone in embed mode
 }
 
 $('list').addEventListener('click', e => {
@@ -275,7 +275,7 @@ async function save(text) {
 $('save').onclick = () => save();
 $('revert').onclick = () => save(original[cur]);
 
-$('build').onclick = async () => {
+if ($('build')) $('build').onclick = async () => {
   const b = $('build'); b.disabled = true; b.textContent = 'Building…';
   $('log').style.display = 'block'; $('log').textContent = 'make mod…';
   try {
