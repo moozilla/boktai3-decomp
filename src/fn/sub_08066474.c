@@ -30,7 +30,7 @@ struct ActorAttachmentSlotView *ActorAttachment_CreateMeterPartsSlot(
     frame = (u8)incomingFrame;
     existing = gUnk_02000124;
     if (!existing) {
-        manager = sub_08066C34();
+        manager = ActorAttachment_CreateManager();
         if (manager)
             goto gotManager;
     failed:
@@ -61,7 +61,7 @@ gotManager:
         actionLow = &slot->action;
         *actionLow = action;
         slot->value = value;
-        slot->active = 1;
+        slot->flags31 = 1;
         kindLow = &slot->kind;
         *kindLow = 3;
         slot->unknown34 = zero;
@@ -275,7 +275,7 @@ partLoop: {
         asm("" : "+r"(offset));
         followPointer = (void *)((u32)slot + offset);
         asm("" : "+r"(followPointer));
-        sub_08064C48(resource, action, (*followPointer)->direction, &xOffset, &zOffset,
+        ActorAttachment_GetActionOffset(resource, action, (*followPointer)->direction, &xOffset, &zOffset,
                      slot->source);
     }
     sub_08217EC4(part, xOffset, zOffset);
