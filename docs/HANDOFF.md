@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 29.789% matching (2026-10-15). This file is the single
+Last updated after reaching 29.911% matching (2026-10-15). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,51 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 15 continuation: actor control phases and saved reactions
+
+Exact code is **29.911%**, up **0.1222 percentage points** (+2,952 bytes)
+from PR164: **7,077 /11,490 functions**, **722,466 /2,415,354 bytes**.
+Without register pinning: **21.166%** (511,222 bytes); Register-pinned:
+**8.746%** (211,244 bytes), included above. Eleven new full bodies match;
+three are ordinary C and eight use minimized initialized register/lifetime
+concessions. No boundaries change; the78 guarded drafts remain uncredited.
+
+The contiguous82648–83550 control group adds nine exact bodies/1,704 bytes:
+contact power flooring, wrapped-clock facing and collider pulses, facing-only
+maintenance, persistent and shadow-return animation, script-response completion,
+and saved-heading/persistent/shadow-return state phases. The context at actor3D0
+has a narrow observed layout and explicit nonzero-interval/caller preconditions.
+See [control phases](SCENE_ACTOR_CONTROL_PHASE.md). Its remaining motion
+convergence82D80 and random-direction83354 have full valid semantic drafts;
+82648's full front callback still needs review and matching. No runtime coverage
+is inferred from static matching.
+
+Life adds80FB4's full732-byte hidden-defeat response with only3 hints after an
+initialized typed animation helper fixed the final allocation differences. Its
+old35-point permuter was stopped after manual closure. Tail adds82444's full516
+bytes: saved control460, animation464–466, kind467 and turn-count5DA restoration.
+Its full four-slot130-byte effect-controller contract also corrects particle
+counts: three service attempts do not establish three emitted particles. See
+[reaction states](SCENE_ACTOR_REACTION_STATES.md) and
+[reaction transitions](SCENE_ACTOR_REACTION_TRANSITIONS.md).
+
+Validation: combined build prints `build/boktai3.gba: OK`; RAM-literal audit
+passes. All13 changed/promoted translation units match complete reviewed
+extents against the final ELF. Source audit is clean; all9 progress/boundary
+tests, formatting, inventory and diff checks pass. Callback declarations and
+actor-view casts are reconciled when promoting names. No instruction bodies or
+explicit r7 bindings were introduced.
+
+Target remains **30% exact or20% account usage remaining**; latest meter28%
+remaining, no reset consumed. Another2,141 exact bytes reach30%. Root continues
+the control group, Life now owns the adjoining83550–83AEC group while its valid
+80494 two-hour search continues; Tail retains8170C/81C98/82184. Sol retains
+A8CC1736-byte/7-byte residue and the full AF94 semantic/stack model. Its new
+valid randomizer seed fixes shared pycparser Struct nodes, local struct types
+and shadowed names without changing tools; see
+[motion contracts](SCENE_ACTOR_MOTION.md). All queues remain bounded, frozen,
+and require source review plus complete-byte acceptance before counting.
 
 ## October 15 continuation: contact targets and reaction transitions
 
