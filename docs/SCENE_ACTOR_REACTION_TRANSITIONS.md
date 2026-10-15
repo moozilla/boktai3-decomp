@@ -16,14 +16,14 @@ control at420. No global actor layout changes are introduced by this cohort.
 |08081B9C|08081C98|252|Exact, register-pinned: resume after animation|
 |08081C98|08082184|1260|Assembly, semantics reviewed|
 |08082184|08082444|704|Private semantic draft|
-|08082444|08082648|516|Private semantic draft|
+|08082444|08082648|516|Exact, register-pinned: turn-response restoration|
 
-The section contains5048 bytes. Its three exact callbacks add approximately
-**0.0580 percentage points** of matching progress:1400 new bytes, all in the
+The section contains5048 bytes. Its four exact callbacks add approximately
+**0.0793 percentage points** of matching progress:1916 new bytes, all in the
 Register-pinned category, with no previously credited bytes counted again.
-The remaining3648 bytes do not count as exact progress. Full reviewed extents,
+The remaining3132 bytes do not count as exact progress. Full reviewed extents,
 including literal pools, were used for all exact checks. Standard hint removal
-reduced81290 from36 to18 hints,81B9C from75 to31, and8148C from27 to21. Parent batch integration
+reduced81290 from36 to18 hints,81B9C from75 to31, 8148C from27 to21, and82444 from40 to30. Parent batch integration
 performs the combined build and ROM comparison.
 
 ## Sink and remove, 08081290
@@ -133,13 +133,13 @@ redundant flag test is present in the ROM and is not evidence of a separate
 external transition.
 
 The unsigned timer2B8 is compared with timer5CE and twice timer5CE. Either equality
-emits one particle from config47C/origin484, with origin Y+128, random jitter
+makes one emission attempt through config47C/origin484, with origin Y+128, random jitter
 X/Z[-7,8],Y[-16,15], vector5/10/5, and trailing40/40. This consumes three explicit
 random-table advances and sets flags2D6 mask0x20. Timer<=10 also sets that mask;
 field1EA is written65 every update. A nonzero timer decrements.
 
 At timer zero, collider134 mask0x100 is enabled. If flags2D4 mask0x2000 is set,
-three further particles are emitted (nine explicit random advances), and AA/2B8
+three further emission attempts are made (nine explicit random advances), and AA/2B8
 are cleared. The callback clears mask0x2000, resets state3/1/0, and resumes
 actor5E4 control with substate15. Finally2B6 is derived from facing+128, truncated
 to a byte. The complete1260-byte body remains assembly with no C matching credit.
@@ -160,7 +160,7 @@ threshold60,control228. Valid route, destination, and geometry storage remain
 caller preconditions; the draft adds no fallback positions or invented bounds.
 Private source is `wip/sub_08082184.c`; the whole704-byte target is not exact.
 
-## Turn-response restoration draft, 08082444
+## Turn-response restoration, 08082444
 
 Prepared entry selects animation0, sets flags2D4 mask0x400, and sets2C2=32.
 Signed byte5DA is the remaining-turn count. While positive and frame>60, the
@@ -173,5 +173,32 @@ therefore between one and four on that sampled path.
 A nonpositive count is normalized to255. After signed frame>30, callback460 and
 saved substate467 are restored, followed by state464/phase465/behavior466,
 counter2AC zero and2B1 set. Flags2D4 mask0x400 is cleared. This links directly to
-the temporary response packet written by the earlier DB34 cohort. Private draft
-`wip/sub_08082444.c` covers all516 target bytes but does not count as exact.
+the temporary response packet written by the earlier DB34 cohort. All516 target bytes are exact after initialized-lifetime review and standard
+hint removal. The expired frame scalar is reused for intermediate addresses and
+the saved control word; no extra C read of the old frame occurs on that path.
+
+## Effect-controller extent and private drafts
+
+The first eight bytes at47C are only a prefix of the effect controller. The
+reviewed08231568 initializer touches a full0x130-byte object: four slots of0x48
+bytes beginning at+0xC, followed by a callback at+0x12C (actor5A8). The position
+source pointer at484 is controller+8. The private timed-response view therefore
+uses a full storage union rather than claiming that the controller is an
+eight-byte object.
+
+08231500 checks the four slots for state1, services at most one through08014634,
+then decrements controller bytes2/3 on that path. Its second incoming word is
+forwarded as14634's first operand; controller byte1 becomes the second. It always
+returns word zero. The downstream particle count is not established by these
+callbacks, so one or three calls above are emission attempts, not a guaranteed
+one or three particles. Their explicit RNG advances occur before the attempted
+service and are still observable when no slot is available.
+
+The three unmatched bodies remain private and uncredited. Current valid scratch
+sources are `wip/sub_0808170C.c` (1248/1168 bytes,60.529% fuzzy),
+`wip/sub_08081C98.c` (1332/1260,46.468%), and `wip/sub_08082184.c`
+(716/704,63.689%). The motion draft explicitly reads AA as signed16 despite the
+shared reset view's unsigned storage declaration. The route draft reloads the
+destination after terrain lookup and again on accepted response setup, preserving
+the ROM's reads across external geometry calls. None of these drafts is an exact
+progress claim or a new work-in-progress branch.
