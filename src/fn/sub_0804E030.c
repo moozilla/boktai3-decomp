@@ -1,4 +1,5 @@
 #include "global.h"
+#define AreaEffect_FindContainingEntry sub_0804E030
 struct E {
     u8 f[0xc6];
     u8 on;
@@ -18,7 +19,7 @@ struct P {
     s16 pad;
     s16 y;
 };
-s32 sub_0804E030(struct P *p)
+s32 AreaEffect_FindContainingEntry(struct P *p)
 {
     struct O *o = gUnk_0200010C;
     s32 i;
