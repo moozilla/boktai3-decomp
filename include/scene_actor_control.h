@@ -26,8 +26,14 @@ struct SceneActorControlSlot {
     struct ContactCollider collider;
     struct ContactPosition savedPosition;
 };
+struct SceneActorControlInput {
+    u8 unknown0[9], direction, unknownA[2];
+    struct ContactPosition position;
+};
 struct SceneActorControlManager {
-    u8 unknown0[0x38];
+    u8 unknown0[0x18];
+    u8 graphics[0x1C];
+    const void *sequenceResource;
     u32 used;
     struct SceneActorControlSlot slots[8];
 };
