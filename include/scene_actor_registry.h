@@ -6,19 +6,60 @@
 struct SceneActorRegistryActor {
     void *object;
     void *drawable;
-    u8 drawableKind, unknown9[0x53];
+    u8 drawableKind, unknown9[0x47];
+    u32 id;
+    u8 unknown54[8];
     struct ContactPosition position;
     u8 unknown64[0x34];
-    u8 state, unknown99[3];
+    u8 category, unknown99[3];
     s16 health;
-    u8 unknown9E[0x1BA];
+    u8 unknown9E[0xC];
+    u16 fieldAA;
+    u8 unknownAC[0xCC];
+    u16 field178;
+    u8 unknown17A[0x64];
+    u16 paletteBank, basePaletteBank;
+    u8 unknown1E2[4];
+    u16 paletteOffset;
+    u8 unknown1E8[0x70];
     s32 (*update)(void *);
     s32 (*destroy)(void *);
-    u8 unknown260[0x6C];
+    u8 unknown260[0x54];
+    u8 enabled, unknown2B5[3];
+    u16 field2B8;
+    u8 unknown2BA[0x12];
     u32 flags2CC, flags2D0;
     u16 flags2D4, flags2D6;
-    u8 unknown2D8[0xF8];
+    u8 unknown2D8[0x22];
+    u16 regionId;
+    u8 unknown2FC[0xD4];
     void *context;
+    u8 unknown3D4[0xA8];
+    u32 effectConfig[2];
+    const struct ContactPosition *effectOrigin;
+};
+struct SceneActorRegistrySequenceDrawable {
+    u32 flags;
+    u8 unknown4[0x18];
+    struct ContactPosition position;
+    u8 unknown24[8], animation[6];
+    u16 paletteBank;
+};
+struct SceneActorRegistryTileDrawable {
+    u8 unknown0[0x28];
+    u32 flags;
+    u8 unknown2C[0x14];
+    struct ContactPosition position;
+    u8 unknown48[0x12];
+    u16 paletteBank;
+    u8 unknown5C[0xC];
+    u8 *palette;
+};
+union SceneActorRegistryPackedPosition {
+    struct ContactPosition position;
+    struct {
+        u32 x : 16, y : 16, z : 16, padding : 16;
+    } packed;
 };
 struct SceneActorRegistryNode {
     struct SceneActorRegistryNode *next;
