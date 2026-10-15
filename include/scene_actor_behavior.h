@@ -2,6 +2,13 @@
 #define GUARD_SCENE_ACTOR_BEHAVIOR_H
 #include "scene_actor_registry.h"
 /* Tentative view shared by the behavior helpers beginning at08078078. */
+struct SceneActorBehaviorGateView {
+    void *object;
+    u8 unknown4[0xB];
+    u8 flags;
+    u8 unknown10[0x14];
+    u32 enabled;
+};
 struct SceneActorBehaviorView {
     void *object, *drawable;
     u8 drawableKind, unknown9[0x50];
@@ -11,7 +18,11 @@ struct SceneActorBehaviorView {
     u8 category, unknown99[3];
     s16 health;
     u8 field9E, defense9F, reactionA0;
-    u8 unknownA1[0x73];
+    u8 unknownA1[0x3B];
+    struct SceneActorBehaviorGateView gate;
+    const void *savedControl104;
+    void *allocation108, *allocationArgument10C;
+    u32 savedKind110;
     u32 flags114;
     u8 unknown118[0x1C];
     struct ContactCollider primaryCollider, secondaryCollider;
@@ -21,12 +32,17 @@ struct SceneActorBehaviorView {
     u8 unknown1E8[8];
     u32 script1F0, script1F4, script1F8;
     s32 parameters1FC[5];
-    u8 unknown210[0xA5];
+    u8 unknown210[0xC];
+    const void *control;
+    u8 unknown220[0x90];
+    u8 substate, resetRequested, prepared, unknown2B3, unknown2B4;
     u8 kind;
     u8 unknown2B6[8];
     u16 groundHeight;
     u16 flags2C0;
-    u8 unknown2C2[0xA];
+    u8 unknown2C2[6];
+    u16 field2C8;
+    u8 unknown2CA[2];
     u32 flags2CC;
     u32 flags2D0;
     u16 flags2D4, flags2D6;
