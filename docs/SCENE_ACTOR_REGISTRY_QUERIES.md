@@ -35,12 +35,18 @@ The former tests positive health; the latter tests presence. The old exact C
 incorrectly declared the lookup with no arguments and happened to preserve R0.
 The corrected typed calls retain all original instructions.
 
-The reviewed but not yet frozen searches `70E00` and `70E44` use zero as a start
+The exact searches `70E00` and `70E44` use zero as a start
 marker. A nonzero argument scans past the actor with that ID, then considers
 subsequent nodes. Candidates require `flags2CC & 1` clear. The filtered variant
 also requires category in `{4,1,3,5,7,6,8,25,21}`; the order of its comparisons
 is preserved. The names' "available" interpretation is provisional: the bit's
 complete lifecycle meaning has not yet been established.
+
+`70F2C` traverses with `70EB0` then `70E00`, seeking its requested category and
+any bit from the caller's `flags2CC` mask. Its availability predicate rejects
+`flags2D4 & 40`, `flags2D0 & 20000`, and nonpositive health. The inline predicate
+retains the observed NULL-pointer case and normalized zero/one result before the
+caller checks its flag mask.
 
 ## Boundaries and validation
 
@@ -50,8 +56,8 @@ independent entries `70444` and `70E44` that gbadisasm leaves as data. Thus
 has size 68, followed by the separate 108-byte `70E44`. These entries already
 exist in the repository's build/progress extra-function metadata.
 
-The first frozen query cohort contains four new exact functions, **+0.0134
-percentage points** (324 bytes), all register-pinned. Four prior exact functions
+The current frozen query cohort contains seven new exact functions, **+0.0258
+percentage points** (624 bytes), all register-pinned. Four prior exact functions
 (124 bytes) were reviewed and typed without additional credit. Each function
 passed a full-size fast check after formatting. The parent performs name
 promotion and one combined complete ROM build before integration.
@@ -62,13 +68,17 @@ promotion and one combined complete ROM build before integration.
 | 080703F0 | 84 | Count living actors in a category | New, pinned |
 | 08070444 | 96 | Count with category and field1E6 filter | New, pinned |
 | 080704A4 | 72 | Find first living actor | New, pinned |
+| 08070E00 | 68 | Continue after ID, excluding flag bit one | New, pinned |
+| 08070E44 | 108 | Continue with category whitelist | New, pinned |
 | 08070EB0 | 12 | Get first actor | Prior exact, ordinary |
 | 08070EBC | 40 | Find actor by ID | Prior exact, ordinary |
 | 08070EE4 | 44 | Test scripted actor's health | Prior exact, ordinary |
 | 08070F10 | 28 | Test scripted actor's presence | Prior exact, ordinary |
+| 08070F2C | 124 | Test category and flags among eligible actors | New, pinned |
 
-Register-hint minimization reduced these new leaves 5→3, 3→3, 11→7, and 3→2
-respectively. No handwritten instruction bodies or explicit r7 bindings are used.
+Register-hint minimization reduced the first four new leaves 5→3, 3→3, 11→7,
+and 3→2 respectively. The continuation helpers retain 3 and 3 hints (the latter
+reduced from 8), and the flags query reduced 17→8. No handwritten instruction bodies or explicit r7 bindings are used.
 The remaining section includes movement/response setup, script-driven actor
 mutation, and additional selection/query helpers; those bodies retain assembly
 until their complete reviewed spans match.
