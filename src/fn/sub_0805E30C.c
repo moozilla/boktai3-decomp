@@ -1,10 +1,10 @@
-#include "global.h"
-
-s32 sub_0805E30C(s32 a)
+#include "scene_input.h"
+#define SceneInput_MapGlyphIndex sub_0805E30C
+s32 SceneInput_MapGlyphIndex(s32 value)
 {
-    if (a != 0)
-        a += 0x80;
+    if (value)
+        value += 0x80;
     else
-        a = 0x7f;
-    return a;
+        value = 0x7F;
+    return value;
 }
