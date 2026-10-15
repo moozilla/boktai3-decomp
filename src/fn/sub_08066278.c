@@ -40,7 +40,7 @@ ActorAttachment_CreateSinglePartSlot(u32 incomingFrame, struct ContactPosition *
     frame = (u8)incomingFrame;
     existing = gUnk_02000124;
     if (!existing) {
-        manager = sub_08066C34();
+        manager = ActorAttachment_CreateManager();
         if (manager)
             goto gotManager;
     failed:
@@ -64,7 +64,7 @@ gotManager:
         *frameLow = frame;
         actionLow = &slot->action;
         *actionLow = action;
-        slot->active = 1;
+        slot->flags31 = 1;
         kindLow = &slot->kind;
         *kindLow = 2;
         slot->unknown34 = zero;
@@ -148,7 +148,7 @@ gotManager:
         partMaskPointer = low;
     }
     {
-        register u8 *low asm("r1") = &slot->unknown48[0];
+        register u8 *low asm("r1") = &slot->active48;
         asm("" : "+r"(low));
         activePointer = low;
     }
@@ -231,7 +231,7 @@ gotManager:
     {
         register u8 *lowResource asm("r1") = resourcePointer;
         asm("" : "+r"(lowResource));
-        sub_08064C48(*lowResource, *actionPointer, (*followPointer)->direction, xPointer, zPointer,
+        ActorAttachment_GetActionOffset(*lowResource, *actionPointer, (*followPointer)->direction, xPointer, zPointer,
                      slot->source);
     }
     sub_08217EC4(renderPart, xOffset, zOffset);
