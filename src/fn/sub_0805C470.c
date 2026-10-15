@@ -1,13 +1,13 @@
-#include "global.h"
-extern u8 *gUnk_020004A4;
-void sub_0805C470(void)
+#include "scene_panel_orchestration.h"
+#define ScenePanel_SuppressMainPresentation sub_0805C470
+void ScenePanel_SuppressMainPresentation(void)
 {
-    if (gUnk_020004A4 != 0) {
-        u8 *p;
-        u8 t;
-        gUnk_020004A4[0xc0f] = 1;
-        p = gUnk_020004A4;
-        t = p[0xc10];
-        p[0xc11] = t;
+    if (gUnk_020004A4) {
+        struct ScenePanelInteractionView *panel;
+        u8 mode;
+        SCENE_PANEL_GLOBAL->skipMainSprite = 1;
+        panel = SCENE_PANEL_GLOBAL;
+        mode = panel->mode;
+        panel->savedMode = mode;
     }
 }
