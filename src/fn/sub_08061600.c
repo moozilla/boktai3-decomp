@@ -1,12 +1,8 @@
-#include "global.h"
-
-void sub_080614B4(u8 *, s32);
-void SceneInput_SetGridFlags(u8 *, s32);
-void sub_080613BC(u8 *, s32);
-
-void sub_08061600(u8 *p)
+#include "scene_inventory_states.h"
+#define SceneInventory_BeginConsumableSelection sub_08061600
+void SceneInventory_BeginConsumableSelection(struct SceneInventoryControlView *panel)
 {
-    sub_080614B4(p, 1);
-    SceneInput_SetGridFlags(p + 0x1BE4, 0x1e);
-    sub_080613BC(p, 1);
+    sub_080614B4(panel, 1);
+    SceneInput_SetGridFlags(&panel->grid, 0x1E);
+    sub_080613BC(panel, 1);
 }
