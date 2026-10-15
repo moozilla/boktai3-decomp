@@ -1,5 +1,4 @@
 #include "scene_inventory_tail.h"
-#include "scene_inventory_actions.h"
 #include "scene_inventory_panel.h"
 #include "scene_inventory_catalog.h"
 #include "scene_hud_display.h"
@@ -10,6 +9,7 @@ void SceneInputPanel_SetMeterGlyph(struct SceneInputPanel *, u32, u32);
 void SceneInventory_PopulateEquipmentGrid(struct SceneInventoryPanel *);
 void SceneInventory_PopulateItemGrid(struct SceneInventoryPanel *);
 void SceneInventory_PopulateConsumableGrid(struct SceneInventoryPanel *);
+struct SceneInventoryActionView;
 void SceneInventory_RefreshEquipmentValue(struct SceneInventoryActionView *);
 void SceneInventory_RefreshItemValue(struct SceneInventoryActionView *);
 void SceneInventory_RefreshConsumableValue(struct SceneInventoryActionView *);
