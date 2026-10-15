@@ -42,7 +42,7 @@ void ScenePanelRig_RandomizeMovement(struct ScenePanelRig *input)
     else
         rig->turnRate = -((randomValue(table) & 7) + 12);
     {
-        u16 *counter = &rig->turnStep;
+        u16 *counter = (u16 *)&rig->turnStep;
         zero = 0;
         asm("" : "+r"(zero));
         *counter = 0;
