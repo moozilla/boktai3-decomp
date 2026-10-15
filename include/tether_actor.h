@@ -36,7 +36,9 @@ struct TetherInteractionProbe {
     u8 unknown2[0x1A];
     struct ContactPosition target;
     u16 bodyId;
-    u8 unknown26[0x42];
+    u8 unknown26[2];
+    struct ContactPosition *position;
+    u8 unknown2C[0x3C];
 };
 struct TetherActor {
     u8 unknown0[0x18];
@@ -56,8 +58,8 @@ struct TetherActor {
     struct TetherMovementProbe movementProbeStorage;
     struct ContactCollider chargeCollider, secondaryCollider;
     struct TetherInteractionProbe interactionProbe;
-    u8 actionRequested, actionVariant;
-    u16 actionValue;
+    u8 actionRequested, actionAngle;
+    u16 actionMagnitude;
     u8 auxiliaryRegistration[0x10];
     u8 auxiliaryRegistered, state;
     u16 stateFrame;
@@ -82,17 +84,17 @@ struct TetherActor {
     u8 unknown3E5;
     u16 statusTag;
     u8 requestStatus, requestMode, unknown3EA[2];
-    const void *onActionScript;
+    u32 onActionScriptId;
     struct ContactPosition targetPosition;
     u16 secondaryValue, secondaryMaximum;
     u16 interactionLock;
     u16 lockFrame;
-    u16 secondaryMode, secondaryTimer;
+    u16 recoveryTimer, recoveryDuration;
     u16 lockSoundFrame, transitionReason;
     s16 parameter;
     u16 interactionEnabled, currentValue, maximumValue;
     struct ContactPosition interactionTarget;
-    u32 interactionValue;
+    u32 interactionScriptId;
     u16 interactionReset, interactionCooldown;
     u16 roamFrame, turnAfterBlock;
     struct ContactPosition directedTarget;
@@ -104,20 +106,23 @@ struct TetherActor {
     u16 directedTimer, directedHeading;
     u16 blendHold;
     u16 directedStep;
-    u8 blendRequested, sampleRequested;
+    u8 blendRequested, destroyRequested;
     struct ContactPosition sampledPosition;
     void *pendingEffectHandle;
     u16 effectValue, unknown482;
 };
 /* Additional player view: heading, side and tetherMode are distinct from facing/actionMode. */
 struct TetherPlayer {
-    u8 unknown0[0x30];
+    u8 unknown0[0x1C];
+    u32 unknown1C;
+    u8 unknown20[0x10];
     struct ContactPosition position;
     u8 unknown38[0x36A];
     u8 heading, side;
     u8 facing;
     u8 unknown3A5[0xB2];
-    u8 tetherMode;
+    u8 tetherMode, unknown458, unknown459;
+    u16 unknown45A;
 };
 extern struct TetherPlayer *gUnk_02000580[4];
 extern const s16 gUnk_086149C4[];

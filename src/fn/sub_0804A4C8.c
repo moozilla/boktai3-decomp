@@ -17,9 +17,9 @@ void TetherActor_InitInteractionFromScript(struct TetherActor *actor)
     }
     value = Script_SeekToKeyword('O');
     if (value)
-        actor->interactionValue = Script_GetValue();
+        actor->interactionScriptId = Script_GetValue();
     else
-        actor->interactionValue = value;
+        actor->interactionScriptId = value;
     capacity = gUnk_08605A04[actor->kind] * 120;
     actor->maximumValue = capacity;
     actor->currentValue = capacity;
@@ -35,6 +35,6 @@ void TetherActor_InitInteractionFromScript(struct TetherActor *actor)
     capacity = gUnk_08605A04[actor->kind] * 60;
     actor->secondaryMaximum = capacity;
     actor->secondaryValue = capacity;
-    actor->secondaryTimer = 300;
-    actor->secondaryMode = 0;
+    actor->recoveryDuration = 300;
+    actor->recoveryTimer = 0;
 }

@@ -39,6 +39,6 @@ void TetherActor_UpdateDescendingState(struct TetherActor *actor)
         }
         actor->displayOffsetY -= 30;
         if (*frame > 8)
-            actor->sampleRequested = 1;
+            actor->destroyRequested = 1;
     }
 }

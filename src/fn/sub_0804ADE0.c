@@ -91,8 +91,8 @@ void TetherActor_HandleFlaggedCell(struct TetherActor *actor)
                 --actor->requestMode;
             }
             actor->requestStatus = 1;
-            if (actor->onActionScript) {
-                Script_Call(actor->onActionScript, 0);
+            if (actor->onActionScriptId) {
+                Script_Call(actor->onActionScriptId, 0);
             }
         }
     }
