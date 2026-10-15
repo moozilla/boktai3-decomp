@@ -3,6 +3,7 @@
 #include "scene_input_panel.h"
 #include "scene_input_navigation.h"
 #include "game_state.h"
+#include "scene_inventory_callback.h"
 /* Catalog and transition/controller storage overlap across UI phases. */
 struct SceneInventoryControlView {
     struct SceneInputPanel display;
@@ -34,7 +35,7 @@ struct SceneInventoryCallbackView {
     u8 unknown0[0x1AEE];
     u16 frame;
     u8 unknown1AF0[0x1CFC - 0x1AF0];
-    void (*callback)(struct SceneInventoryControlView *);
+    SceneInventoryCallback callback;
 };
 struct SceneInventoryControlDefinition {
     u8 unknown0[6];
@@ -60,14 +61,13 @@ void sub_08061328(struct SceneInventoryControlView *);
 void sub_080613BC(struct SceneInventoryControlView *, s32);
 s32 sub_0806143C(struct SceneInventoryControlView *);
 void sub_0806147C(struct SceneInventoryControlView *);
-void sub_0806130C(struct SceneInventoryControlView *, void (*)(struct SceneInventoryControlView *));
 void SceneInputPanel_PositionModeCursor(struct SceneInputPanel *, u32);
 void SceneInput_RestoreSelection(struct SceneInputGridView *);
 void SceneInput_InitGrid(struct SceneInputGridView *, u32, u32, u32, u32);
 s32 sub_08060904(const void *);
 s32 sub_08060958(const void *);
 s32 sub_08060928(const void *);
-void sub_080620D4(struct SceneInventoryControlView *);
+s32 sub_080620D4(struct SceneInventoryControlView *);
 s32 sub_08061C3C(struct SceneInventoryControlView *);
 u32 sub_08061CA8(struct SceneInventoryControlView *);
 s32 sub_08061CFC(struct SceneInventoryControlView *);
