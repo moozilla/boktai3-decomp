@@ -4,13 +4,13 @@ struct A {
     void *f4;
 };
 extern struct A *gUnk_030052F4;
-void sub_0821BB98(void);
+void Terrain_SetNeighborOffsets(void);
 void sub_0821BBBC(void);
-void sub_0821BBF8(void);
-void sub_0821BC4C(void *v)
+void Terrain_UpdateSize(void);
+void Terrain_SetGrid(void *v)
 {
     gUnk_030052F4->f4 = v;
-    sub_0821BB98();
+    Terrain_SetNeighborOffsets();
     sub_0821BBBC();
-    sub_0821BBF8();
+    Terrain_UpdateSize();
 }

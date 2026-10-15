@@ -358,11 +358,14 @@ saved with the game), and sets the request word `0x030053E8` to 1, or `0x11`
 unless keyword `n` is given as 0. A scene number is a script procedure: the
 late-game test save stands in scene 3243, whose entry runs `proc_861 1;
 proc_864 0`, then the stage setup (`proc_884 0xcf70 0xf8ea 0x7239`) and the
-area's objects. `tools/mgba/scenes.py` lists 354 scene entries (321 with a
+area's objects. `tools/mgba/scenes.py` lists 354 scene entries (347 with a
 stage). Writing the three words from Lua loads the scene's stage but does not
-spawn the player; ordinary doors pass an entrance as well (*guess*: the door
-objects' `proc_912`/`proc_916` arguments). Note that `tools/assets/gcx.py`
-prints procedure headers one lower than the numbers calls use.
+spawn the player; ordinary doors pass an entrance as well: the door's event
+sets the entrance number in `r708[0x70]` (`proc_953`) and the destination's
+entrance procedures (`proc_909`, `proc_916`, ...) test it to place the player
+(ASSETS.md, "Stage scripts"; `tools/assets/stages.py`). Note that
+`tools/assets/gcx.py` prints procedure headers one lower than the numbers
+calls use.
 
 The 722-entry table at `08603300` (`data/actor_registry.csv`) has the same
 layout. It is the `chara` table: every object a script can create by name,

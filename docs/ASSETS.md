@@ -25,7 +25,7 @@ Types whose extension is known (the type is the hash of the string):
 | `98F5` | ? | `08A2D944` | 1 | 1.7 MB: 381 large sprites (enemies, props, boss parts; below) |
 | `A635` | `fnt` | `089F8ED8` | 1 | font |
 | `A8D9` | `gcx` | `08D5A85C` | — | compiled scripts, a single image (MGS's GCL file extension); not an archive (below) |
-| `AE6C` | ? | `087C4C98` | 528 | LZ77; decompressed header magic `HP` |
+| `AE6C` | ? | `087C4C98` | 528 | LZ77; magic `HP`: stage terrain (height grid, named boxes, patrol paths, nav mesh; below) |
 | `C091` | `map` | `08617084` | 287 | LZ77; decompressed header magic `MP` |
 | `CB05` | ? | `08BDDE08` | 46 | sprite packages (below) |
 | `CEEF` | `ptn` | `0883BDA8` | 1 | tileset library (below) |
@@ -137,7 +137,7 @@ start of the BG character block.
 **Stages.** The scripts load a stage with `proc_884(map, tileset, hp)`, which
 calls into the `map` command and creates the `Background_CreateFromScript`
 actor; 398 distinct triples appear. The third argument names an `AE6C` entry
-(LZ77, magic `HP`), probably collision or height data (not decoded). The
+(LZ77, magic `HP`), the stage's terrain (below). The
 field stage of the save is `proc_884 0xcf70 0xf8ea 0x7239` (procedures 1491,
 3241, 6388): map `CF70` (32 × 48 metatiles), tileset `F8EA` (351 tiles), BG
 palette `92B3:E39B` banks 0-6 (matched against palette RAM; the script does
@@ -146,7 +146,111 @@ day). The OBJ palette banks 0-5 of that scene match no palette resource, so
 sprite colours are assembled at runtime.
 
 The studio's Maps view renders every stage and map this way
-(`tools/studio/serve.py`, `/gfx#maps`).
+(`tools/studio/serve.py`, `/gfx#maps`), with the stage data below drawn over it.
+
+### Stage terrain (`HP`, type `AE6C`)
+
+`tools/assets/hp.py list | show HASH | json [HASH...]` decodes all 528
+entries. `Terrain_LoadHP(hp)` (`08225C48`) finds the resource and hands the four offsets of
+its header (`"HP\0\0"`, then `u32` offsets from `HP`) to the terrain map
+`gUnk_030052F4` (`struct EngineMap`, include/engine.h):
+
+| Offset | Section | Loader | `EngineMap` field |
+|---|---|---|---|
+| `+0x04` | height grid | `Terrain_SetGrid` | `+0x04` (`cells`) |
+| `+0x08` | named boxes | `Terrain_SetBoxes` | `+0x0C` |
+| `+0x0C` | patrol paths | `Terrain_SetPaths` | `+0x10` |
+| `+0x10` | nav meshes (0 = none) | `Terrain_SetNavMeshes` | `+0x14` |
+
+* **Grid.** `u32 0, u16 width, u16 height` (cells; `Terrain_UpdateSize` copies them
+  to `gUnk_030052F8`/`FC`), `s16 origin x, s16 origin y` (BG map pixels × 16),
+  then `width × height` four-byte `struct SceneCell`s from `+12` (as
+  `scene_object.c` indexes them): `u8 height` (low nibble = level, high nibble
+  = kind: 0 flat, 1 slope), `u8 tile`, `u16 flags`. Seen in the first dungeon:
+  `0x0003` outside the stage, `0x040B` walls, `0x0000` floor, `0x000A` on the
+  cell of a door (bit 3 = blocks entry, from the scene-object code).
+* **Boxes.** `u32 count`, then 12 bytes each: `u16 x0, z0, x1, z1` (world
+  units), `u8 y0, y1` (world units / 16), `u16 name hash`. Scripts refer to
+  them by name: doors (`CD22`, `CD23`, ... in nearly every stage), the camera
+  area `A679` (`proc_895 0xa679`), traps (`trap 0x4ca7 ...`).
+  `cmd 0xB745 0xDA5A name` copies a box into the script work area
+  (`r700[0x72]`...), which `proc_931` uses to place the player at a door.
+* **Paths.** `u32 count`, `count × (u16 points, u16 offset)` from the section,
+  then eight-byte points `u16 x, z, u8 wait, u8 direction (256 = turn), u16
+  flags`. Enemy spawners take a path index (`proc_1496 name path ...`).
+* **Nav meshes.** `u32 count`, `count` offsets; a mesh is `u16 rects, u16
+  portals, u32 extra`, then offsets (from the mesh) of 16-byte rects (`u8 x0,
+  z0, x1, z1` in cells and 12 portal indices, `0xFF` = none), 12-byte portals
+  (`u16 x, z, ?`, two rect indices) and `extra` u16 values (unknown). Probably
+  for enemy pathfinding; only the layout is known.
+
+**World coordinates and the map projection.** Positions (the player's at
+`GameState+0x30/+0x32/+0x34`, s16 x, y, z; script arguments) use 256 units per
+cell and per height level: x and z run along the grid, y is the height (a
+floor of level 1 is y = 256). The BG map pixel of a point is
+
+    px = origin_x / 16 + 3 * (x - z) / 32
+    py = origin_y / 16 + 3 * (x + z - y) / 32
+
+so a cell is a 48 × 48 diamond. Fitted to a replay of `first_level_from_start`
+(stage 7EFB, scene 2698, and ED78, scene 2705): every still frame matched to
+under a pixel, and climbing the stairs (y 256 → 619) confirmed the y term.
+The camera keeps the player at screen (120, 94).
+
+**BG scroll in RAM.** The scroll registers are write-only, but the game keeps
+each background's full scroll in a 0x30-byte record at `0x03004C30 + 0x30 ×
+bg`: `+0x20` x, `+0x22` y in map pixels (BG2, the stage: `0x03004CB0`/`CB2`).
+`Bg_UpdateScrollShadow` (`082158B0`) masks them to 8 bits into the shadow at `0x03004C20` (BG0-3 H/V,
+eight halfwords), which `sub_08213FD8` copies to `0x04000010` in VBlank (found
+with write watchpoints on `REG_BG2HOFS` and the shadow in headless mGBA).
+
+### Stage scripts: doors, entrances, items, enemies
+
+`tools/assets/stages.py show SCENE... | json [OUT]` walks each scene
+procedure (`tools/mgba/scenes.py`, plus every door destination it lists) with
+literal arguments substituted and writes `build/assets/stages.json` (429
+scenes: 1,057 doors, 1,223 entrances, 185 items, 598 enemy spawners). Each
+record keeps the conditions it sits under (`progress` = `r708[0x3c]`, the
+story counter; `entrance` = `r708[0x70]`, the entrance used to arrive).
+A scene's setup runs inside `if (proc_872() == 0)` and calls scene-local
+procedures that use these library ones (call IDs; `gcx.py dis` prints one
+less):
+
+| Procedures | Arguments | Meaning |
+|---|---|---|
+| `884`, `885`, `876` | map, tileset, hp | load the stage (`876` is the loader the others wrap) |
+| `888` | palette, 0, 0 | the stage's BG palette |
+| `909`, `910`, `921`-`925` | box, facing, id[, proc] | entrance `id`: the player starts at HP box `box` |
+| `911`-`913` | box, facing, ..., id | the same with more options |
+| `914`-`918` | x, z, facing, ..., id | entrance at a position (`916`: x, z, facing, ?, ?, ?, id, proc, proc) |
+| `919`, `920` | box, facing, id, ... | entrance at a door actor (`proc_961`, actor `0xA8F1`) |
+| `934`-`938`, `949`, `950` | box, scene, entrance, back, ... | door: a trap on the box (`trap box 0xf5eb`) whose event loads `scene` at `entrance` |
+| `940`-`945`, `951` | scene, entrance, ... | the same transition without a box, called from a `trap` event block |
+| `946` | box, ?, ?, box, scene, entrance | a locked door (the first box opens it) |
+| `1118` | category, item, x, z, facing, flags, flag | an item on the floor |
+| `1119` | category, item, x, z, facing, chest, ?, flags, flag, proc | an item; `chest` = 1 puts it in a chest |
+| `1496`-`1627` | name, path, ... | enemy spawners, one actor family each (`cmd 0xB745 KEY N: name r: path`) |
+
+Entrances work like this: a door's event (`proc_953`) stores the entrance in
+`r708[0x70]` and the door's fourth argument, the entrance that leads back to it
+(the "8" of `proc_934 0xcd23 0xa91 57 8`, *guess*), in `GameState+0x740`;
+`proc_952` starts the transition actor with the scene. The destination scene's
+entrance procedures each test `if (r708[0x70] == id)` and the matching one
+places the player (`proc_932` writes `GameState+0x30`/`+0x34`, gets the height
+with `cmd 0xB745 0xCD4`, and the facing into `+0x36`). In the replay, the
+first dungeon's door (scene 2698, box `CD23`) leads to scene 2705 entrance 57,
+`proc_910 0xcd22 1 57`, the centre of box `CD22` at (640, 256, 2688), where
+the game put the player.
+
+Items: `proc_1120` creates either the pickup (`cmd 0xB745 0xDDCF I: category
+item s: x y z`) or, for chests, actor `0x430D` whose event spawns it. The item
+sits at the centre of its cell (x + 128, z + 128). `flags` low byte selects
+the "already taken" flag table (1: 48 flags at `r708[0x13f]`, 2: 256 at
+`r708[0x41]`) and `flag` the index. Category 0 items are named by strings
+988 + item (#988 回復薬, #989 大地の実, ... #1001 太陽の実 = item 13; their
+descriptions are 1043 + item); the first dungeon holds 太陽の実 (13) and
+大地の実 (1). The other categories (1, 2, 4, 6, 8, 9) are not mapped to names
+yet.
 
 ## The script image (`gcx`)
 
@@ -165,6 +269,14 @@ argument list with its own length (one byte below 0x80, else two big-endian
 bytes & 0x7FFF, `sub_0821A6C0`) holding operands. Kind 7 calls a procedure,
 kind 3 is an expression, kind 0 ends a block. Operands follow
 `Script_DecodeOperand`; nested `0x8X` blocks hold `if`/`switch` bodies.
+Expressions (`Script_EvalExpression`) are postfix: operands are pushed and a byte
+`0xA0 | op` applies operator `op` (`Script_ApplyOperator`: 1 neg, 2 not, 3 invert,
+4 `+`, 5 `-`, 6 `*`, 7 `/`, 8 `%`, 9 `<<`, 10 `>>`, 11-16 comparisons, 17 `|`,
+18 `&`, 19 `^`, 20 `||`, 21 `&&`, 22 assign, 23 right operand); `0xA0` ends it.
+`gcx.py` prints them infix. A command's argument list may be followed by
+keyword items (tag `0x5X`, letter, values): `if` has `e` (else) and `i` (else
+if) blocks, `switch` has `c` (case value, block) and `d` (default), and other
+commands take named parameters this way (`p:` position, `e:` event block, ...).
 
 **`chara` usage.** The procedures contain 1,525 `chara` commands naming 151
 distinct registry keys, all present in `data/actor_registry.csv` (for example

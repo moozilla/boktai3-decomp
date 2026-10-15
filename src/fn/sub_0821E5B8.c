@@ -4,7 +4,7 @@ struct A {
     void *f10;
 };
 extern struct A *gUnk_030052F4;
-void sub_0821E5B8(void *v)
+void Terrain_SetPaths(void *v)
 {
     gUnk_030052F4->f10 = v;
 }

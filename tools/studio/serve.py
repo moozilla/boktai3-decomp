@@ -4,7 +4,7 @@ the game font, then build a modified ROM; browse sprites, palettes, the font and
 raw tiles from the resource archives (/gfx); and a live view of the game
 running in mGBA with tools/mgba/centaur.lua (/live, link on port 8643).
 
-  python3 tools/studio/serve.py [--port 8642]    then open http://localhost:8642
+  python3 tools/studio/serve.py [--port 8642] [--link-port 8643]    then open http://localhost:8642
 
 Everything it reads is ROM-derived and extracted under build/ (run `make` once
 first); it writes only build/text/bank.tsv and, on request, build/mod.gba.
@@ -65,7 +65,8 @@ def resource_file(label, h):
 
 
 def stages():
-    """Stage loads in the scripts: proc_884(map, tileset, hp) -> the procedures using them."""
+    """Stage loads in the scripts: proc_884(map, tileset, hp) (or proc_885, or the
+    loader both wrap, proc_876) -> the procedures using them."""
     out = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "assets", "gcx.py"), "dis"],
                          cwd=ROOT, capture_output=True, text=True).stdout
     found, proc = {}, None
@@ -74,11 +75,34 @@ def stages():
             proc = int(ln.split()[1])
             continue
         f = ln.split()
-        if f and f[0] == "proc_884" and len(f) >= 4 and all(x.startswith("0x") for x in f[1:4]):
+        if (f and f[0] in ("proc_884", "proc_885", "proc_876") and len(f) >= 4
+                and all(x.startswith("0x") for x in f[1:4])):
             key = tuple(int(x, 16) for x in f[1:4])
             found.setdefault(key, []).append(proc)
     return [{"map": f"{m:04X}", "tileset": f"{t:04X}", "hp": f"{h:04X}", "procs": ps}
             for (m, t, h), ps in sorted(found.items())]
+
+
+STAGEMETA = os.path.join(ROOT, "build", "assets", "stages.json")
+
+
+def stage_meta():
+    """Per-scene doors, entrances, items and enemies (tools/assets/stages.py)."""
+    tools = [os.path.join(ROOT, "tools", "assets", n) for n in ("stages.py", "gcx.py", "hp.py")]
+    if not os.path.exists(STAGEMETA) or os.path.getmtime(STAGEMETA) < max(map(os.path.getmtime, tools)):
+        subprocess.run([sys.executable, os.path.join(ROOT, "tools", "assets", "stages.py"), "json", STAGEMETA],
+                       cwd=ROOT)
+    return open(STAGEMETA, "rb").read()
+
+
+def hp_data(h):
+    """A decoded HP (terrain) resource, tools/assets/hp.py."""
+    f = resource_file("tAE6C", h)
+    if not f:
+        return None
+    sys.path.insert(0, os.path.join(ROOT, "tools", "assets"))
+    import hp
+    return hp.decode(open(f, "rb").read())
 
 
 def display_strings(trans):
@@ -245,6 +269,16 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, live.tags())
         elif self.path == "/api/stages":
             self.send(200, stages())
+        elif self.path == "/api/stagemeta":
+            self.send(200, stage_meta(), "application/json")
+        elif self.path.startswith("/api/hp/"):
+            d = hp_data(os.path.basename(self.path))
+            if d:
+                self.send(200, d)
+            else:
+                self.send(404, {"error": "no such hp resource"})
+        elif self.path == "/api/live/player":
+            self.send(200, self.server.live.player or {})
         elif self.path == "/api/res":
             self.send(200, resource_index())
         elif self.path.startswith("/api/res/"):
@@ -289,12 +323,13 @@ class Handler(http.server.BaseHTTPRequestHandler):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=8642)
+    ap.add_argument("--link-port", type=int, default=8643, help="port Centaur connects to (its CENTAUR_LINK_PORT)")
     ap.add_argument("--trans", default=os.path.join(os.path.dirname(ROOT), "boktai3trans"))
     a = ap.parse_args()
     ensure_bank()
     srv = http.server.ThreadingHTTPServer(("127.0.0.1", a.port), Handler)
     srv.original = original_strings()
-    srv.live = live.Live()
+    srv.live = live.Live(a.link_port)
     srv.display_jp, srv.display_en = display_strings(a.trans)
     print(f"studio: http://localhost:{a.port}")
     srv.serve_forever()

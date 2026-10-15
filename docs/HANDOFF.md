@@ -10,6 +10,35 @@ allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
 
+## October 15 (Claude): stage terrain, doors and the map projection (tooling)
+
+No matching change (names and comments only). Findings for C work, with
+evidence in [ASSETS.md](ASSETS.md) ("Stage terrain", "Stage scripts"):
+
+* **HP resources (`AE6C`) are the stage terrain.** `Terrain_LoadHP` (`08225C48`)
+  hands four sections to `struct EngineMap` (`gUnk_030052F4`): grid
+  (`Terrain_SetGrid`, `+4`), named boxes (`Terrain_SetBoxes`, `+0xC`), patrol
+  paths (`Terrain_SetPaths`, `+0x10`), nav meshes (`Terrain_SetNavMeshes`,
+  `+0x14`). The grid header is `u32 0, u16 w, u16 h, s16 origin x, y`; cells
+  from `+12`. Comments in `include/engine.h` and `include/scene_object.h`.
+* **World units**: 256 per cell and per height level; x, z along the grid, y
+  height. BG2 map pixel = `(ox/16 + 3(x-z)/32, oy/16 + 3(x+z-y)/32)`.
+* **BG scroll**: `gUnk_03004C30[bg]` (`struct BackgroundLayer`, 0x30 bytes)
+  `.x/.y` at `+0x20` are the full scroll; `Bg_UpdateScrollShadow`
+  (`082158B0`) masks them into `gUnk_03004C20`, copied to the BG registers by
+  `sub_08213FD8` in VBlank.
+* **Scripts**: `Script_EvalExpression` (`0821BA5C`) evaluates postfix
+  expressions, `Script_ApplyOperator` (`0821B938`) the operators. Doors are
+  `proc_934(box, scene, entrance, back)` traps on HP boxes; the entrance number
+  travels in `r708[0x70]` and the destination's entrance procedures test it.
+  The warp in Centaur does not set it yet, which may be why warps never place
+  the player.
+
+Tools: `tools/assets/hp.py`, `tools/assets/stages.py` (per-scene doors,
+entrances, items, enemies → `build/assets/stages.json`), `gcx.py` now prints
+expressions and `else`/`case` bodies. The studio's Maps view draws all of it
+(click a door to follow it) and the Live page shows the map around the player.
+
 ## October 14 (Codex/Sol): inventory grids, descriptions and input-panel initialization
 
 Exact code is **26.912%**, up **0.2574 percentage points** (+6,216 bytes):

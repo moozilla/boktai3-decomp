@@ -3,7 +3,7 @@ u8 *sub_0821B2B0(u8 *, s32 *, s32 *);
 s32 sub_0821A8DC(s32);
 s32 sub_0821A908(s32);
 u8 *sub_0821A66C(u8 *, u32 *);
-s32 sub_0821BA5C(u8 *);
+s32 Script_EvalExpression(u8 *);
 u8 *Text_LookupString(u16);
 u8 *Script_DecodeOperand(u8 *p, s32 *type, s32 *value)
 {
@@ -90,7 +90,7 @@ u8 *Script_DecodeOperand(u8 *p, s32 *type, s32 *value)
                 break;
             case 0x30:
                 cursor = sub_0821A66C(cursor, &length);
-                *value = sub_0821BA5C(cursor);
+                *value = Script_EvalExpression(cursor);
                 cursor += length;
                 break;
             case 0x50:
