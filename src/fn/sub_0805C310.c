@@ -9,7 +9,7 @@ void ScenePanel_InitializeInteraction(struct ScenePanel *input)
             s32 option;
             if (sub_0805C2DC((void *)panel)) {
                 sub_0805BCEC((void *)panel);
-                sub_08057960((void *)panel, 0);
+                ScenePanel_SetEffectState((void *)panel, 0);
                 return;
             }
             if (Script_SeekToKeyword('O'))
@@ -36,16 +36,16 @@ void ScenePanel_InitializeInteraction(struct ScenePanel *input)
                     } while (remaining != 0);
                 }
                 if (active) {
-                    sub_08057960((void *)panel, 4);
+                    ScenePanel_SetEffectState((void *)panel, 4);
                     return;
                 }
             } else
                 sub_0805BCEC((void *)panel);
-            sub_08057960((void *)panel, 3);
+            ScenePanel_SetEffectState((void *)panel, 3);
             break;
         }
         case 1: {
-            sub_0805B0F0((void *)panel);
+            ScenePanel_InitRig((void *)panel);
             sub_0805C084((void *)panel);
             gUnk_02000488->state = 12;
             gUnk_02000488->position = panel->center;
@@ -57,10 +57,10 @@ void ScenePanel_InitializeInteraction(struct ScenePanel *input)
                 panel->resourceScale = 120;
             else
                 panel->resourceScale = 100;
-            sub_080585E8((void *)panel);
-            sub_08058AF4((void *)panel);
+            ScenePanel_InitBackground((void *)panel);
+            ScenePanel_InitOverlay((void *)panel);
             sub_0805BD78((void *)panel);
-            sub_08057960((void *)panel, 8);
+            ScenePanel_SetEffectState((void *)panel, 8);
         }
     }
 }
