@@ -61,13 +61,14 @@ bodies were rechecked against the ROM; this naming correction adds no credit.
 | 08074CD4 | 96 | Caller collider, narrowed caller flags, direct properties, refresh | New, ordinary |
 | 08074D34 | 140 | Embedded collider188, flags2401, indexed properties, field34=0 | New, ordinary |
 | 08074DC0 | 120 | Caller collider, flags2001, indexed properties, field34=0 | New, ordinary |
-| 08074E38 | 120 | Same, caller-selected field34 | New, ordinary |
+| 08074E38 | 120 | Same, caller-selected field34 | Prior exact, ordinary |
 | 08076020 | 20 | Set object/context/type | Prior exact, pinned |
 
 The last three helpers retain their observed lack of `Collider_Refresh`.
-The current frozen subset adds **+0.0335 percentage points** (808 bytes):
-700 ordinary and108 register-pinned. The prior exact setter contributes20
-reviewed bytes without new credit. Each body passed a full-size fast check;
+The current frozen subset adds **+0.0285 percentage points** (688 bytes):
+580 ordinary and108 register-pinned. Prior exact E38 and the setter contribute
+140 reviewed bytes without new credit. E38 also corrects the old raw formal
+argument widths to the actual collision-engine setters, retaining its match. Each body passed a full-size fast check;
 the parent performs promotion and one complete combined ROM build.
 
 Receiver registration reduced5→2 hints, the old setter3→2, and the first
