@@ -1,29 +1,22 @@
-#include "global.h"
-struct H {
-    u32 lo : 16;
-    u32 hi : 16;
+#include "scene_panel_rig_setup.h"
+#define ScenePanelRig_InitCollider sub_0805AD50
+struct SceneRigColliderVector {
+    u32 x : 16;
+    u32 y : 16;
+    u32 z : 16;
 };
-struct Z {
-    struct H a, b;
-};
-void Collider_Init(u8 *, u32, u32, u32, u32, struct Z *, struct Z *);
-void sub_0821FF7C(u8 *, u32, u32, u32);
-void Collider_SetCallback(u8 *, void (*)(void), u8 *);
-void Collider_SetPosition(u8 *, u8 *, u32);
-void Collider_Refresh(u8 *);
-void sub_08059428(void);
-void sub_0805AD50(u8 *p, u32 x)
+void ScenePanelRig_InitCollider(struct ScenePanelRig *rig, u32 power)
 {
-    struct Z s1, s2;
-    u8 *q = p + 0x620;
-    s1.a.lo = 0x80;
-    s1.a.hi = 0x80;
-    s1.b.lo = 0x80;
-    *(u32 *)&s2.a = 0;
-    *(u32 *)&s2.b &= 0xFFFF0000;
-    Collider_Init(q, 0, 0x4001, 0, 0x10, &s1, &s2);
-    sub_0821FF7C(q, x, 0, 0);
-    Collider_SetPosition(q, p + 0x618, 0);
-    Collider_SetCallback(q, sub_08059428, p);
-    Collider_Refresh(q);
+    struct SceneRigColliderVector size, offset;
+    void *collider = rig->unknown620;
+    size.x = 128;
+    size.y = 128;
+    size.z = 128;
+    *(u32 *)&offset = 0;
+    ((u32 *)&offset)[1] &= 0xFFFF0000;
+    Collider_Init(collider, 0, 0x4001, 0, 0x10, &size, &offset);
+    sub_0821FF7C(collider, power, 0, 0);
+    Collider_SetPosition(collider, &rig->position, 0);
+    Collider_SetCallback(collider, sub_08059428, rig);
+    Collider_Refresh(collider);
 }
