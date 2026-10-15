@@ -7,7 +7,6 @@ struct SceneInventorySwapView {
 s32 SceneInput_TickPairTransition(struct SceneInputPair *);
 void sub_0822D918(u32);
 s32 sub_0806288C(struct SceneInventoryTail *);
-void sub_0806130C(struct SceneInventoryTail *, s32 (*)(struct SceneInventoryTail *));
 void sub_0822CE18(u32);
 void sub_0822E11C(u32);
 s32 SceneInventory_TickDiscardTransition(struct SceneInventoryTail *p)
@@ -26,7 +25,7 @@ s32 SceneInventory_TickDiscardTransition(struct SceneInventoryTail *p)
                 sub_0822E11C(selection);
                 break;
         }
-        sub_0806130C(p, sub_0806288C);
+        sub_0806130C(p, (SceneInventoryCallback)sub_0806288C);
     }
     return 0;
 }
