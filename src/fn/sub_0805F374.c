@@ -1,7 +1,7 @@
-#include "global.h"
+#include "scene_input_compare.h"
 
 s32 Div(s32, s32);
-void sub_0805F374(s32 n, s32 *out)
+void SceneInputPanel_SplitThreeDigits(s32 n, s32 *out)
 {
     s32 q;
     out[0] = q = Div(n, 100);
