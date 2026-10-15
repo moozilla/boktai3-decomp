@@ -28,7 +28,7 @@ struct ActorAttachmentSlotView {
     s8 slotId;
     u8 kind, resourceKind;
     s16 timer, thresholds[3];
-    u8 active, unknown49[3];
+    u8 active48, unknown49[3];
     s16 *value;
     s32 counters[3];
     void *source;
@@ -56,5 +56,4 @@ static inline u8 ActorAttachment_TestByteFlags(const u8 *flags, u32 mask)
 }
 void ActorAttachment_BeginPartJitter(struct ActorAttachmentSlotView *, s32);
 void ActorAttachment_NotifySourceState(struct ActorAttachmentSlotView *);
-void sub_08217EAC(struct ActorAttachmentPartSprite *);
 #endif
