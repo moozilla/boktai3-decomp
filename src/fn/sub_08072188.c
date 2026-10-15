@@ -1,0 +1,34 @@
+#include "scene_actor_palette.h"
+#define SceneActorPalette_ClearCompletedTransitions sub_08072188
+static inline u8 Test(u32 value, u32 mask)
+{
+    if (value & mask)
+        return TRUE;
+    return FALSE;
+}
+static inline u8 TestP(u32 mask, u32 *field)
+{
+    if (*field & mask)
+        return TRUE;
+    return FALSE;
+}
+static inline void KeepFlags(u32 mask, u32 *field)
+{
+    *field = mask & *field;
+}
+void SceneActorPalette_ClearCompletedTransitions(void)
+{
+    struct SceneActorPaletteManagerView *manager = (void *)gUnk_020004A8;
+    s32 pending;
+    if (!manager || !TestP(0x2000, &manager->flags))
+        return;
+    if (Test(gUnk_030053F4, 0x4800)) {
+        pending = sub_080703F0(10);
+    } else {
+        if ((u8)sub_08070F2C(10, 0x20000))
+            return;
+        pending = sub_08070F2C(23, 0x20000) << 24;
+    }
+    if (!pending)
+        KeepFlags(~0x22000, &manager->flags);
+}
