@@ -1,5 +1,4 @@
 #include "terrain_edge_marker.h"
-#define TerrainEdgeMarker_Add sub_080560C0
 void sub_08217DE0(struct TerrainMarkerSprite *, void *, u32);
 void sub_08217EEC(struct TerrainMarkerSprite *, void *, u32);
 void sub_08217EC4(struct TerrainMarkerSprite *, s32, s32);

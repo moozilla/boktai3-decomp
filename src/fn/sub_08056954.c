@@ -1,5 +1,4 @@
 #include "terrain_edge_marker.h"
-#define TerrainEdgeMarker_UpdateVisibility sub_08056954
 s32 TerrainEdgeMarker_UpdateVisibility(struct TerrainMarkerManager *manager)
 {
     u32 visible = 0;

@@ -1,5 +1,4 @@
 #include "terrain_edge_marker.h"
-#define TerrainEdgeMarker_SetModeFromScript sub_0805606C
 void TerrainEdgeMarker_SetModeFromScript(void)
 {
     if (Script_SeekToKeyword('m')) {

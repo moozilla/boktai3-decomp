@@ -1,5 +1,4 @@
 #include "terrain_edge_marker.h"
-#define TerrainEdgeMarker_DestroyManager sub_080569D8
 void Effect_Remove(void *);
 s32 TerrainEdgeMarker_DestroyManager(struct TerrainMarkerManager *manager)
 {

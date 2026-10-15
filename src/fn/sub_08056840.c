@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "terrain_edge_marker.h"
-#define TerrainEdgeMarker_AddRegionFromScript sub_08056840
 struct TerrainMarkerRegion *sub_0821E104(u16, u16 *);
 u8 *sub_0821D64C(u32, u32);
 void TerrainEdgeMarker_AddRegionFromScript(void)
@@ -69,14 +68,14 @@ void TerrainEdgeMarker_AddRegionFromScript(void)
                 break;
         }
         world->world.y = height;
-        direction = sub_08056298(region);
+        direction = TerrainEdgeMarker_FindTerrainDirection(region);
         if (direction >= 0) {
             s32 kind;
             if (Script_SeekToKeyword('t'))
                 kind = Script_GetValue();
             else
                 kind = 0;
-            sub_080560C0(world, direction, kind, 0);
+            TerrainEdgeMarker_Add(world, direction, kind, 0);
         }
     }
 }

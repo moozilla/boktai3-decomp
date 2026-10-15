@@ -28,9 +28,9 @@ struct TerrainMarkerRegion {
     u16 unknown8, tag;
 };
 struct TerrainMarkerManager *sub_0821A2C4(u16);
-void sub_080560C0(union TerrainMarkerPosition *, s32, s32, s32);
-s32 sub_08056298(struct TerrainMarkerRegion *);
-s32 sub_08056954(struct TerrainMarkerManager *);
-s32 sub_080569D8(struct TerrainMarkerManager *);
-s32 sub_08056A00(struct TerrainMarkerManager *);
+void TerrainEdgeMarker_Add(union TerrainMarkerPosition *, s32, s32, s32);
+s32 TerrainEdgeMarker_FindTerrainDirection(struct TerrainMarkerRegion *);
+s32 TerrainEdgeMarker_UpdateVisibility(struct TerrainMarkerManager *);
+s32 TerrainEdgeMarker_DestroyManager(struct TerrainMarkerManager *);
+s32 TerrainEdgeMarker_InitManager(struct TerrainMarkerManager *);
 #endif

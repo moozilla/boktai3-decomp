@@ -30,7 +30,7 @@ void SavedPositionMarker_TickIdle(struct SavedPositionMarker *marker)
                     u32 blocked = 0x100000;
                     if (!(player->flags & blocked) && marker->inputCooldown > 9) {
                         marker->activationFrame = 8;
-                        sub_08056C6C(1);
+                        ScriptUtility_SetControlFlag(1);
                         sub_0815B0A8(gUnk_02000580[0], &marker->position, 0, 4);
                         SavedPositionMarker_SetState(marker, SavedPositionMarker_TickInteraction);
                     }

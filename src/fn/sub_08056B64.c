@@ -1,5 +1,4 @@
 #include "script_utility.h"
-#define ScriptUtility_GetRandom sub_08056B64
 s32 ScriptUtility_GetRandom(void)
 {
     if (Script_SeekToKeyword('p')) {

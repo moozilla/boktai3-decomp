@@ -33,7 +33,7 @@ void InteractionMarker_SetState(struct InteractionMarker *, void (*)(struct Inte
 void InteractionMarker_TickIdle(struct InteractionMarker *);
 void InteractionMarker_TickInteraction(struct InteractionMarker *);
 void InteractionMarker_TickDormant(struct InteractionMarker *);
-void sub_08056C6C(u32);
+void ScriptUtility_SetControlFlag(u32);
 void sub_0815B0A8(struct InteractionMarkerPlayer *, struct ContactPosition *, u32, u32);
 u32 InteractionMarker_Tick(struct InteractionMarker *);
 u32 InteractionMarker_Destroy(struct InteractionMarker *);

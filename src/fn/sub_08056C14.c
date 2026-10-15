@@ -1,5 +1,4 @@
 #include "script_utility.h"
-#define ScriptUtility_ReadIndexed sub_08056C14
 u32 Script_GetValueSafe(void);
 s32 ScriptUtility_ReadIndexed(void)
 {

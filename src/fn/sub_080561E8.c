@@ -1,5 +1,4 @@
 #include "terrain_edge_marker.h"
-#define TerrainEdgeMarker_AddFromScript sub_080561E8
 void TerrainEdgeMarker_AddFromScript(void)
 {
     union TerrainMarkerPosition position;
@@ -25,5 +24,5 @@ void TerrainEdgeMarker_AddFromScript(void)
         kind = Script_GetValue();
     else
         kind = 0;
-    sub_080560C0(&position, ((direction >> 1) + 1) & 3, kind, preserveHeight);
+    TerrainEdgeMarker_Add(&position, ((direction >> 1) + 1) & 3, kind, preserveHeight);
 }

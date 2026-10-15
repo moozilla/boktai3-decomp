@@ -1,5 +1,4 @@
 #include "script_utility.h"
-#define ScriptUtility_WriteValuesToReference sub_08056A60
 s32 ScriptUtility_WriteValuesToReference(void)
 {
     struct ScriptUtilityReference reference;

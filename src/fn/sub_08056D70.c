@@ -1,5 +1,4 @@
 #include "shake_icon_display.h"
-#define ShakeIconDisplay_TickShake sub_08056D70
 void ShakeIconDisplay_TickShake(struct ShakeIconDisplay *display)
 {
     if (display->stateFrame <= 5) {

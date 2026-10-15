@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "stage_icon_display.h"
-#define StageIconDisplay_TickShake sub_08055CA4
 extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 void StageIconDisplay_TickShake(struct StageIconDisplay *display)

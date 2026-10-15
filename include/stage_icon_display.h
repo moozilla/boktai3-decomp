@@ -16,19 +16,19 @@ struct StageIconDisplay {
     void (*update)(struct StageIconDisplay *);
 };
 extern struct StageIconDisplay *gUnk_0200011C;
-void sub_08055B90(struct StageIconDisplay *, void (*)(struct StageIconDisplay *));
-void sub_08055BA8(struct StageIconDisplay *);
-void sub_08055BC8(struct StageIconDisplay *);
-void sub_08055BE0(struct StageIconDisplay *);
-void sub_08055C04(struct StageIconDisplay *);
-void sub_08055CA4(struct StageIconDisplay *);
-void sub_08055D38(struct StageIconDisplay *);
-s32 sub_08055D74(struct StageIconDisplay *);
-s32 sub_08055DA0(struct StageIconDisplay *);
-void sub_08055DD4(struct StageIconDisplay *, s32);
-void sub_08055EB8(struct StageIconDisplay *, s32);
-s32 sub_08055EEC(struct StageIconDisplay *, s32, u32, void (*)(void *, struct StageIconDisplay *),
-                 void *);
-s32 sub_08055FA4(struct StageIconDisplay *);
+void StageIconDisplay_SetUpdate(struct StageIconDisplay *, void (*)(struct StageIconDisplay *));
+void StageIconDisplay_NotifyNative(struct StageIconDisplay *);
+void StageIconDisplay_CallCompletionScript(struct StageIconDisplay *);
+void StageIconDisplay_NotifyCompletion(struct StageIconDisplay *);
+void StageIconDisplay_TickReveal(struct StageIconDisplay *);
+void StageIconDisplay_TickShake(struct StageIconDisplay *);
+void StageIconDisplay_TickDelay(struct StageIconDisplay *);
+s32 StageIconDisplay_Tick(struct StageIconDisplay *);
+s32 StageIconDisplay_Destroy(struct StageIconDisplay *);
+void StageIconDisplay_InitAnimations(struct StageIconDisplay *, s32);
+void StageIconDisplay_SelectUpdate(struct StageIconDisplay *, s32);
+s32 StageIconDisplay_Initialize(struct StageIconDisplay *, s32, u32,
+                                void (*)(void *, struct StageIconDisplay *), void *);
+s32 StageIconDisplay_InitFromScript(struct StageIconDisplay *);
 void sub_0821983C(void *, void *, u32, u32, u32, u32, s32, const void *);
 #endif

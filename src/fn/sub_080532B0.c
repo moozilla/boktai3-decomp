@@ -18,7 +18,7 @@ void AnimData_SelectPaletteBank(void *, u32);
 void StackedActor_InitParticles(struct StackedActor *);
 s32 SceneMessages_RegisterReceiver(void *, s32, s32);
 void Sound_PlaySong(u32);
-void sub_08056C6C(u32);
+void ScriptUtility_SetControlFlag(u32);
 void sub_081593A0(u8 *, struct StackedActorPosition *);
 void sub_0815AEE0(u8 *);
 void StackedActor_TickDisabled(struct StackedActor *);
@@ -276,7 +276,7 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
                     s32 tether;
                     Sound_PlaySong(0x160);
                     actor->unknown380 = one;
-                    sub_08056C6C(0);
+                    ScriptUtility_SetControlFlag(0);
                     sub_081593A0(gUnk_02000580, cache.world);
                     sub_0815AEE0(gUnk_02000580);
                     actor->sprite.flags &= ~1;

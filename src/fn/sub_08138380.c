@@ -1,6 +1,6 @@
 #include "global.h"
 void sub_08138154(void *, u32, u32);
-void sub_08055B74(void);
+void StageIconDisplay_RequestKill(void);
 void sub_08223270(void);
 void sub_08138380(u8 *p, u32 b)
 {
@@ -9,6 +9,6 @@ void sub_08138380(u8 *p, u32 b)
     t = p[0x1c];
     p[0x20] = t;
     sub_08138154(p, 0, b);
-    sub_08055B74();
+    StageIconDisplay_RequestKill();
     sub_08223270();
 }

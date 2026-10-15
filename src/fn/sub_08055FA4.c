@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "stage_icon_display.h"
-#define StageIconDisplay_InitFromScript sub_08055FA4
 s32 StageIconDisplay_InitFromScript(struct StageIconDisplay *display)
 {
     s32 variant;
@@ -21,8 +20,8 @@ s32 StageIconDisplay_InitFromScript(struct StageIconDisplay *display)
         display->completionScriptId = Script_GetValue();
     else
         display->completionScriptId = value;
-    sub_08055DD4(display, variant);
-    sub_08055EB8(display, variant);
+    StageIconDisplay_InitAnimations(display, variant);
+    StageIconDisplay_SelectUpdate(display, variant);
     {
         s32 incidental;
         asm("" : "=r"(incidental));

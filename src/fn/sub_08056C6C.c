@@ -1,5 +1,4 @@
 #include "script_utility.h"
-#define ScriptUtility_SetControlFlag sub_08056C6C
 void sub_0822B548(void);
 void ScriptUtility_SetControlFlag(s32 stopSong)
 {

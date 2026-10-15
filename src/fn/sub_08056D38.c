@@ -1,5 +1,4 @@
 #include "script_utility.h"
-#define ScriptUtility_WriteFlag800ToReference sub_08056D38
 void ScriptUtility_WriteFlag800ToReference(void)
 {
     struct ScriptUtilityReference reference;

@@ -1,5 +1,4 @@
 #include "shake_icon_display.h"
-#define ShakeIconDisplay_Initialize sub_08056E0C
 s32 ShakeIconDisplay_Initialize(struct ShakeIconDisplay *display)
 {
     struct ProjectedDisplayResource *resource = ScriptProc_Start(0xCB05, 0x1289);
@@ -23,7 +22,7 @@ s32 ShakeIconDisplay_Initialize(struct ShakeIconDisplay *display)
         display->lifetime = Script_GetValue();
     else
         display->lifetime = 60;
-    display->update = sub_08056D70;
+    display->update = ShakeIconDisplay_TickShake;
     position = &display->position;
     position->x = 0;
     display->position.y = 0;

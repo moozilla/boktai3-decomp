@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "stage_icon_display.h"
-#define StageIconDisplay_TickReveal sub_08055C04
 void StageIconDisplay_TickReveal(struct StageIconDisplay *display)
 {
     if (!display->stateFrame)
@@ -19,8 +18,8 @@ void StageIconDisplay_TickReveal(struct StageIconDisplay *display)
                 *flags |= hidden;
                 flags = (void *)((u8 *)flags + sizeof(struct ProjectedDisplayEntry));
             } while (--i >= 0);
-            sub_08055B90(display, sub_08055CA4);
-            sub_08055BE0(display);
+            StageIconDisplay_SetUpdate(display, StageIconDisplay_TickShake);
+            StageIconDisplay_NotifyCompletion(display);
         } else {
             Sound_PlaySong(540);
             {

@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 25.399% matching (2026-10-14). This file is the single
+Last updated after reaching 25.561% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,54 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex/Sol): staged icons, terrain markers and script utilities
+
+Exact code is **25.561%**, up **0.1615 percentage points** (+3,900 bytes):
+**6,643 / 11,473 functions**, **617,378 / 2,415,354 bytes**. Without register
+pinning: **19.984%**; Register-pinned: **5.577%**, included above. Eighteen new
+ordinary boundaries add3,900 exact bytes (1,436 unpinned /2,464 conceded).
+A nineteenth recovered function, the20-byte leaf56D24, adds no net exact-byte
+credit: its bytes were already credited inside query56D04. Both extra-boundary
+inventories now split that query's old52-byte extent into32+20. The leaf is
+independent, with its own return/literal and registry key15B3 pointing to56D25.
+Its20 bytes move from the old unpinned query credit into the conceded category,
+so category gains are1,416 unpinned /2,484 conceded.
+Seventy-seven guarded drafts remain outside exact progress.
+
+Four adjacent cohorts are now complete, with shared layouts and contract notes:
+
+- **55B74–5606C**, staged keyframe icon:16 functions /1,272 bytes, seven new /896.
+  Three indicators reveal in sequence before a shake/deletion state; native and
+  script completion modes preserve their observed incidental initializer ABI.
+  [Stage icon notes](../notes/stage-icon-display_2026-10-14.md).
+- **5606C–56A60**, terrain-edge markers:9 /2,548, five new /2,236. FD22 owns
+  seventeen directional markers; a1,448-byte selector tests four sides against
+  terrain kind/height connection rules. Minimized selector concessions use no
+  explicit r7 binding. [Terrain contracts](TERRAIN_EDGE_MARKER.md).
+- **56A60–56D70**, script utilities:12 /784. Four ordinary new bodies /476 are
+  unpinned; the additional20-byte flag setter corrects inventory credit as above.
+  Repeated calls use a VLA argument descriptor, random/key queries expose script
+  input, indexed reads preserve the unusual signed-halfword load at stride4.
+  [Script utility notes](../notes/script-utility_2026-10-14.md).
+- **56D70–56F20**, short-lived shake icon:5 /432, two new /292, both unpinned.
+  Its task, random stream and completion timing differ from the staged icon.
+  [Shake icon notes](../notes/shake-icon-display_2026-10-14.md).
+
+The span **4E008–56F20** is now **271 consecutive exact C functions /36,632
+bytes**, with no assembly gaps. Palette names from the previous batch are
+retained. Combined validation passed: `build/boktai3.gba: OK` in
+`build/stage-combined.log`. All56 post-promotion reviewed-extent checks passed, along with formatting,
+inventory, structured data and RAM-literal checks. Main PR137 Actions passed at463c3cc2
+(run38672772240). No new runtime coverage claims.
+
+Continue toward **30% matching or40% account usage remaining**; latest reading
+is **55% remaining**. Sol owns level-advance display56F20–5751C, then the next
+cohort from579B0. Parent has countdown5751C–57678 and proximity icon57678–57960
+exact in scratch: four new bodies /748 bytes, all unpinned. Two existing helpers
+57960–579B0 will receive typed contracts with the following cohort's context.
+Keep production frozen during the combined build; integrate these scratch bodies
+in the next batch. Never update the Claude-owned primary main checkout.
 
 ## October 14 (Codex/Sol): complete stacked actor, hit switches and display pools
 
