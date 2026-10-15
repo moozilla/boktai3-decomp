@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boktai 3 Code</title>
+<link rel="stylesheet" href="/static/common.css">
+<style>
+:root {
+  --bg: #f6f3ec; --panel: #fffdf8; --ink: #2b2620; --muted: #7d7468; --line: #e3dccf;
+  --accent: #b5462f; --accent-ink: #fff; --sel: #f3e3d6; --ok: #2f7d4f; --warn: #a0661c;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1b1916; --panel: #24211d; --ink: #ece6dc; --muted: #9a9083; --line: #3a352e;
+    --accent: #e0745a; --accent-ink: #1b1916; --sel: #3a2c25; --ok: #6cc596; --warn: #e0b060;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Hiragino Sans", sans-serif; }
+input { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
+main { padding: 14px 20px 40px; max-width: 1100px; height: auto !important; }
+h2 { font-size: 16px; margin: 0 0 4px; font-family: ui-monospace, Menlo, monospace; }
+h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 18px 0 6px; font-weight: 600; }
+.meta { color: var(--muted); font-size: 13px; }
+.st { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; border: 1px solid var(--line); }
+.st.ok { color: var(--ok); border-color: var(--ok); }
+.st.nm { color: var(--warn); border-color: var(--warn); }
+pre { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; overflow: auto; font: 12px/1.5 ui-monospace, Menlo, monospace; margin: 0; }
+pre a { text-decoration: none; }
+.refs { display: flex; flex-wrap: wrap; gap: 4px 12px; font: 12px ui-monospace, Menlo, monospace; }
+.empty { color: var(--muted); }
+#go { width: 12em; font-family: ui-monospace, Menlo, monospace; }
+</style>
+</head>
+<body>
+<header id="top"></header>
+<main>
+  <div id="view"><div class="empty">Loading…</div></div>
+</main>
+<script src="/static/common.js"></script>
+<script>
+// One function: the generated disassembly (gen/code.s, as tools/asmat.py
+// prints it) and, when src/ has it, the C. Opened as /code#ADDRESS.
+studioHeader('<input id="go" placeholder="Address or name" autocomplete="off">');
+const go = $('go');
+if (go) go.onkeydown = e => { if (e.key === 'Enter') { const v = go.value.trim().replace(/^0x/i, '').replace(/^sub_/, ''); if (/^[0-9a-f]{7,8}$/i.test(v)) location.hash = v.toUpperCase().padStart(8, '0'); } };
+
+async function show(addr) {
+  const v = $('view');
+  const d = await fetch('/api/code/' + addr).then(r => r.ok ? r.json() : null);
+  if (!d) { v.innerHTML = `<div class="empty">No function at ${esc(addr)}.</div>`; return; }
+  document.title = d.name + ' · Boktai 3 Code';
+  const status = d.c ? (d.c.nonmatching ? '<span class="st nm">NONMATCHING draft</span>' : '<span class="st ok">matched C</span>') : '<span class="st">not decompiled (INCLUDE_ASM)</span>';
+  const byName = Object.fromEntries(d.calls.map(c => [c.name, c.addr]));
+  const genName = {};  // gen/code.s names the callees by sub_ address
+  for (const c of d.calls) genName['sub_' + c.addr] = c.addr;
+  // link bl targets and local branch labels in the listing
+  const asm = esc(d.asm).replace(/\b(bl|b[a-z]{0,2}) (\w+)/g, (m, op, t) => {
+    const a = byName[t] || genName[t];
+    if (op === 'bl' && a) return `${op} <a href="${codeHref(a)}">${t}</a>`;
+    return m;
+  });
+  v.innerHTML = `<h2>${esc(d.name)}</h2>
+    <div class="meta">${d.addr} · ${d.mode}${d.name !== d.gen_name ? ' · ' + esc(d.gen_name) : ''}${d.confidence ? ' · name confidence ' + esc(d.confidence) : ''} · ${status}</div>
+    ${d.notes ? `<p>${esc(d.notes)}</p>` : ''}
+    <h3>Called by (${d.callers.length})</h3><div class="refs">${d.callers.map(c => `<a href="${codeHref(c.addr)}">${esc(c.name)}</a>`).join('') || '<span class="empty">no direct calls (a callback, table entry or entry point)</span>'}</div>
+    <h3>Calls (${d.calls.length})</h3><div class="refs">${d.calls.map(c => `<a href="${codeHref(c.addr)}">${esc(c.name)}</a>`).join('') || '<span class="empty">none</span>'}</div>
+    ${d.c ? `<h3>C · <code style="text-transform:none;letter-spacing:0">${esc(d.c.file)}:${d.c.line}</code></h3><pre>${esc(d.c.text)}</pre>` : ''}
+    <h3>Disassembly · gen/code.s</h3><pre>${asm}</pre>`;
+}
+// links inside this page stay in it (embedded or not)
+document.addEventListener('click', e => {
+  const a = e.target.closest && e.target.closest('a[href^="/code#"]');
+  if (!a || e.metaKey || e.ctrlKey) return;
+  e.preventDefault(); e.stopPropagation(); location.hash = a.getAttribute('href').split('#')[1];
+}, true);
+const fromHash = () => (location.hash.slice(1) || '').toUpperCase();
+window.onhashchange = () => { if (fromHash()) show(fromHash()); window.scrollTo(0, 0); };
+if (fromHash()) show(fromHash()); else $('view').innerHTML = '<div class="empty">Open a function as /code#ADDRESS, or type one above.</div>';
+</script>
+</body>
+</html>

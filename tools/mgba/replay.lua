@@ -57,7 +57,10 @@ callbacks:add("frame", function()
   if not R then return end
   local s = R.steps[R.i]
   while s and s.n == 0 do
-    if s.shot then pcall(function() emu:screenshot(ROOT .. "/build/centaur/" .. s.shot .. ".png") end) end
+    if s.shot then
+      pcall(function() emu:screenshot(ROOT .. "/build/centaur/" .. s.shot .. ".png") end)
+      if REPLAY_CAPTURE and capture then capture(s.shot) end  -- set by a script: full captures at each shot
+    end
     if s.state then
       local sf = io.open(s.state, "rb")
       if sf then emu:loadStateBuffer(sf:read("a")); sf:close() else console:error("replay: no savestate " .. s.state) end

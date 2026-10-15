@@ -10,7 +10,7 @@ struct A {
 };
 extern struct A *gUnk_030052F4;
 extern s32 gUnk_030052F8, gUnk_030052FC;
-void sub_0821BBF8(void)
+void Terrain_UpdateSize(void)
 {
     gUnk_030052F8 = gUnk_030052F4->f4->w;
     gUnk_030052FC = gUnk_030052F4->f4->h;

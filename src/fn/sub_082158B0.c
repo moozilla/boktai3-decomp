@@ -10,7 +10,7 @@ struct Background {
 extern u16 gUnk_03004C20[], gUnk_03004BEC, gUnk_03004BF0[], gUnk_03004BD0[];
 extern struct Background gUnk_03004C30[];
 extern u32 gUnk_03004C18[], gUnk_03004BF8, gUnk_03004C00;
-void sub_082158B0(void)
+void Bg_UpdateScrollShadow(void)
 {
     u16 *dst = gUnk_03004C20;
     struct Background *src = gUnk_03004C30;
@@ -38,5 +38,5 @@ void sub_082158B0(void)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_082158B0);
+INCLUDE_ASM("asm/nonmatching", Bg_UpdateScrollShadow);
 #endif

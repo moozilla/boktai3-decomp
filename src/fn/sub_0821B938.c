@@ -1,7 +1,7 @@
 #include "global.h"
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
-s32 sub_0821B938(u32 operation, s32 left, s32 right)
+s32 Script_ApplyOperator(u32 operation, s32 left, s32 right)
 {
     switch (operation) {
         case 1:

@@ -33,6 +33,8 @@ class Live:
         self.conn = None
         self.hello = None
         self.state = {}
+        self.player = None  # latest {"t": "player"}: world position and BG2 camera
+        self.story = None  # latest {"t": "story"}: progress, entrance, event flags, watched variables
         self.texts = collections.deque(maxlen=300)
         self.res = collections.deque(maxlen=300)
         self.events = collections.deque(maxlen=100)
@@ -87,6 +89,10 @@ class Live:
                 self.hello = e
             elif t == "state":
                 self.state = e
+            elif t == "player":
+                self.player = e
+            elif t == "story":
+                self.story = e
             elif t == "text":
                 self.texts.append(e)
             elif t in ("res", "tileset"):
@@ -120,6 +126,8 @@ class Live:
                 "connected": self.conn is not None,
                 "hello": self.hello,
                 "state": self.state,
+                "player": self.player,
+                "story": self.story,
                 "texts": [dict(x, jp=strings_jp.get(x["id"]), en=strings_en.get(x["id"])) for x in reversed(texts)],
                 "res": list(self.res)[-60:][::-1],
                 "events": list(self.events)[-20:][::-1],

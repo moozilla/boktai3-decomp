@@ -9,7 +9,7 @@ struct A {
     u16 f22;
 };
 extern struct A *gUnk_030052F4;
-void sub_0821BB98(void)
+void Terrain_SetNeighborOffsets(void)
 {
     struct A *a = gUnk_030052F4;
     u16 *s = a->f4;
