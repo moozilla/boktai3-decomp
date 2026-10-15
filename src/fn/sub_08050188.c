@@ -1,18 +1,8 @@
-#include "global.h"
-
-struct S {
-    u8 filler[0x32];
-    s16 v;
-};
-extern struct S *gUnk_02000580;
-struct P {
-    u8 filler[0x20];
-    u16 w;
-};
-
-s32 sub_08050188(struct P *p)
+#include "cell_gate.h"
+#define CellGate_TestPlayerHeight sub_08050188
+s32 CellGate_TestPlayerHeight(struct CellGate *gate)
 {
-    if (gUnk_02000580->v == (s32)(p->w << 8))
+    if (gUnk_02000580->position.y == (s32)(gate->height << 8))
         return 1;
     return 0;
 }

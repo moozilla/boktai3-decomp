@@ -1,9 +1,8 @@
-#include "global.h"
-extern u8 *gUnk_02000580;
-void sub_0824923C(u8 *, u32);
-u32 sub_08050694(u8 *p)
+#include "cell_gate.h"
+#define CellGate_Tick sub_08050694
+u32 sub_08050694(struct CellGate *p)
 {
-    if (!(*(u32 *)(gUnk_02000580 + 0x1C) & 4))
-        sub_0824923C(p, *(u32 *)(p + 0x38));
+    if (!(gUnk_02000580->flags & 4))
+        sub_0824923C(p, p->update);
     return 0;
 }
