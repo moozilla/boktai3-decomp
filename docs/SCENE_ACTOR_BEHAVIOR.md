@@ -56,6 +56,7 @@ bodies were rechecked against the ROM; this naming correction adds no credit.
 | Address | Bytes | Behavior | Credit |
 |---|---:|---|---|
 | 0807462C | 108 | Register selected category receivers | New, pinned |
+| 08074698 | 288 | Advance route point, run optional script, select behavior | New, pinned |
 | 08074BF4 | 112 | Embedded collider134, flags5109, direct properties, refresh | New, ordinary |
 | 08074C64 | 112 | Same, caller flags narrowed to16 bits | New, ordinary |
 | 08074CD4 | 96 | Caller collider, narrowed caller flags, direct properties, refresh | New, ordinary |
@@ -65,8 +66,8 @@ bodies were rechecked against the ROM; this naming correction adds no credit.
 | 08076020 | 20 | Set object/context/type | Prior exact, pinned |
 
 The last three helpers retain their observed lack of `Collider_Refresh`.
-The current frozen subset adds **+0.0285 percentage points** (688 bytes):
-580 ordinary and108 register-pinned. Prior exact E38 and the setter contribute
+The current frozen subset adds **+0.0404 percentage points** (976 bytes):
+580 ordinary and396 register-pinned. Prior exact E38 and the setter contribute
 140 reviewed bytes without new credit. E38 also corrects the old raw formal
 argument widths to the actual collision-engine setters, retaining its match. Each body passed a full-size fast check;
 the parent performs promotion and one complete combined ROM build.
@@ -77,10 +78,32 @@ the original address/read ordering where register barriers caused worse global
 allocation. The indexed embedded initializer reduced2→0 hints. No handwritten
 instruction bodies or explicit r7 bindings are used.
 
+## Route-point transition
+
+`74698` optionally calls the actor script selected by halfword1EC, passing three
+words: the embedded cursor index, actor ID, and category. The embedded cursor
+at448 supplies that script index independently of the cursor argument. The
+shared script argument convention initializes count and values while leaving
+the unused halfword unspecified; the source does not read that halfword.
+
+`0821E618` advances the supplied cursor, wrapping its index by definition byte0,
+clearing cursor byte3, and calculating its point from the map base plus10,
+definition halfword2, and index×8. Points contain X/Z at0/2 and attributes at6,
+which explains the earlier `70070` two-halfword target read through actor450.
+`74698` uses the high attribute nibble to index table08610814 and narrows the
+word return of proximity helper0821E8C8 to a byte. Proximity selects numeric
+behavior2 and setting2C2=64; otherwise the table selects behavior1 or0. Each
+branch clears state/phase/counter and marks field2B1=1; behavior1 also clears
+flags2D0 bit20. Game-facing behavior meanings remain tentative.
+
+The full 288-byte transition matches with six register hints after minimizing
+sixteen. Its scalar lifetimes and independent cursor/owner contract were
+audited after minimization.
+
 ## Remaining contiguous bodies
 
-The remaining seven functions retain assembly until their full spans match:
-route-entry transition74698 (288), movement helpers747B8 (736) and74A98 (348),
+The remaining six functions retain assembly until their full spans match:
+movement helpers747B8 (736) and74A98 (348),
 movement update74EB0 (1,624), forward probe75508 (128), actor update75588 (2,624),
 and availability callback75FC8 (88). Their behavior names are tentative review
 labels, not promoted complete contracts. The prior registry-wide state request
