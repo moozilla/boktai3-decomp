@@ -93,7 +93,10 @@ The orchestrator performs the combined ROM build before integration.
 Unmatched bodies remain `65FD0` (680), `66278` (508), `66474` (612), `666D8`
 (472), `668B0` (472). The first three form the value/part
 creation family. Two exact forwarding wrappers at `66A88`/`66AB4` expose its
-fixed-kind and explicit-kind call contracts. The now-exact descriptor dispatcher at
+fixed-three-part and explicit-part-count call contracts. The common creator
+sets kind 3 itself, divides the total value range by three, and initializes each
+requested part with threshold `partIndex * (total / 3)` and counter
+`17 * partIndex`. The wrappers therefore select part count, rather than kind. The now-exact descriptor dispatcher at
 `66DB8` accepts kinds 0–5; frame `7F` requests release, while other frames first
 release all resource variants for the same identity, then create the requested
 kind. Descriptor flag 4 selects action `FF`. A permuter search helped isolate the final allocation problem; its speculative
