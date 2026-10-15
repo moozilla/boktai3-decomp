@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Boktai 3 Live</title>
+<link rel="stylesheet" href="/static/common.css">
 <style>
 :root {
   --bg: #f6f3ec; --panel: #fffdf8; --ink: #2b2620; --muted: #7d7468; --line: #e3dccf;
@@ -17,12 +18,6 @@
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Hiragino Sans", sans-serif; }
-header { display: flex; align-items: center; gap: 16px; padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--panel); flex-wrap: wrap; }
-header h1 { font-size: 16px; margin: 0; }
-nav { display: flex; gap: 4px; }
-nav a { color: var(--muted); text-decoration: none; padding: 5px 10px; border-radius: 6px; }
-nav a.on { background: var(--sel); color: var(--ink); }
-.sp { flex: 1; }
 .pill { font-size: 12px; padding: 3px 10px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); }
 .pill.on { color: var(--ok); border-color: var(--ok); }
 .pill.rec { color: #e04848; border-color: #e04848; }
@@ -32,9 +27,12 @@ main { display: grid; grid-template-columns: minmax(300px, 1.1fr) minmax(280px, 
 .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; }
 .card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
 .card h2 .sp { flex: 1; }
-.sub-en { font-size: 20px; line-height: 1.35; white-space: pre-wrap; min-height: 1.4em; }
-.sub-jp { font-size: 15px; color: var(--muted); white-space: pre-wrap; margin-top: 6px; }
-.sub-meta { font-size: 12px; color: var(--muted); margin-top: 8px; }
+.card h2 .aside { font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 12px; }
+.line { padding: 6px 0; border-bottom: 1px solid var(--line); }
+.line:last-child { border-bottom: 0; }
+.sub-en { font-size: 18px; line-height: 1.35; white-space: pre-wrap; }
+.sub-jp { font-size: 14px; color: var(--muted); white-space: pre-wrap; margin-top: 2px; }
+.sub-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
 a { color: var(--accent); }
 button, input, select { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 5px 10px; }
 button { cursor: pointer; }
@@ -46,25 +44,28 @@ button:disabled { opacity: .45; cursor: default; }
 .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 6px 0; }
 .kv { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font-size: 13px; }
 .kv b { font-weight: 500; color: var(--muted); }
-.log { max-height: 340px; overflow: auto; font-size: 13px; }
-.log .e { padding: 5px 2px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 4.2em 1fr; gap: 6px; cursor: pointer; }
+.log { max-height: 420px; overflow: auto; font-size: 13px; }
+.log .e { padding: 5px 2px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 4.2em 1fr; gap: 6px; cursor: pointer; align-items: center; }
 .log .e:hover { background: var(--sel); }
 .log .id { color: var(--muted); font-variant-numeric: tabular-nums; }
 .log .jp { color: var(--muted); font-size: 12px; }
-.res .e { grid-template-columns: 3.6em 4.2em 1fr; }
-.pad { display: grid; grid-template-columns: repeat(3, 42px) 18px repeat(2, 48px); grid-template-rows: repeat(3, 34px); gap: 4px; align-items: center; justify-items: center; }
-.pad button { width: 100%; height: 100%; padding: 0; font-size: 13px; }
+.log .brk { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; padding: 8px 2px 3px; border-bottom: 2px solid var(--line); }
+.res .e { grid-template-columns: 4em 52px 1fr; }
+.res .pv { width: 52px; height: 36px; background: var(--stage); border-radius: 4px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.res .pv canvas { image-rendering: pixelated; }
+.res .lab { color: var(--accent); font-size: 12px; }
+.chips { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
+.chips button { font-size: 12px; padding: 2px 9px; border-radius: 99px; }
+.chips button.on { background: var(--sel); border-color: var(--accent); }
 .thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; }
 .thumb { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; cursor: pointer; background: var(--stage); }
 .thumb img { width: 100%; display: block; image-rendering: pixelated; aspect-ratio: 3/2; object-fit: cover; }
 .thumb div { font-size: 11px; padding: 3px 6px; background: var(--panel); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.thumb.on { outline: 2px solid var(--accent); }
-.shot { width: 100%; image-rendering: pixelated; border-radius: 6px; display: block; }
 table { width: 100%; border-collapse: collapse; font-size: 12px; }
 td, th { text-align: left; padding: 3px 4px; border-bottom: 1px solid var(--line); vertical-align: middle; }
 th { color: var(--muted); font-weight: 500; }
 .sw { display: inline-flex; }
-.sw i { width: 9px; height: 12px; display: block; }
+.sw i { width: 6px; height: 14px; display: block; }
 .empty { color: var(--muted); font-size: 13px; }
 code { font-size: 12px; }
 .howto { font-size: 13px; color: var(--muted); }
@@ -73,44 +74,32 @@ code { font-size: 12px; }
 </style>
 </head>
 <body>
-<header>
-  <h1>Boktai 3 Studio</h1>
-  <nav><a href="/">Text</a><a href="/gfx">Graphics</a><a href="/live" class="on">Live</a></nav>
-  <span class="sp"></span>
-  <span class="pill" id="rec" hidden>● REC</span>
-  <span class="pill" id="conn">waiting for mGBA</span>
-</header>
+<header id="top"></header>
 <main>
   <section>
     <div class="card">
       <h2>Now on screen <span class="sp"></span>
         <span class="seg" id="mode"><button data-m="en">EN</button><button data-m="both">Both</button><button data-m="jp">JP</button><button data-m="off">Off</button></span>
       </h2>
-      <div class="sub-en" id="en"></div>
-      <div class="sub-jp" id="jp"></div>
-      <div class="sub-meta" id="submeta"></div>
+      <div id="now"></div>
     </div>
     <div class="card">
       <h2>Game</h2>
       <div class="kv" id="game"></div>
       <div class="row" style="margin-top:10px">
+        <input id="capname" placeholder="capture label" style="width:10em">
         <button id="capture" class="primary">Capture scene</button>
+        <button id="inspect" title="Capture the screen as &quot;live&quot; and open it: every sprite, layer and palette">Inspect screen</button>
         <button id="god">God mode</button>
-        <input id="recname" placeholder="recording name" style="width:9.5em">
-        <button id="recbtn">Record</button>
+      </div>
+      <div class="row">
+        <input id="recname" placeholder="recording name" style="width:10em">
+        <button id="recbtn">Record from here</button>
       </div>
       <div class="row">
         <input id="procid" placeholder="procedure #" style="width:7.5em">
         <input id="procargs" placeholder="args, e.g. 896 1920 1" style="width:12em">
         <button id="procrun">Run script procedure</button>
-      </div>
-    </div>
-    <div class="card">
-      <h2>Remote pad <span class="sp"></span><span style="font-weight:400;text-transform:none;letter-spacing:0">hold Shift for a long press</span></h2>
-      <div class="pad">
-        <span></span><button data-k="UP">▲</button><span></span><span></span><button data-k="L">L</button><button data-k="R">R</button>
-        <button data-k="LEFT">◀</button><span></span><button data-k="RIGHT">▶</button><span></span><button data-k="B">B</button><button data-k="A">A</button>
-        <span></span><button data-k="DOWN">▼</button><span></span><span></span><button data-k="SELECT">Sel</button><button data-k="START">Start</button>
       </div>
     </div>
     <div class="card howto" id="howto">
@@ -122,11 +111,12 @@ code { font-size: 12px; }
   </section>
   <section>
     <div class="card">
-      <h2>Text the game fetched</h2>
+      <h2>Text the game fetched <span class="sp"></span><span class="aside">a line marks a new scene or map</span></h2>
       <div class="log" id="texts"><div class="empty">Nothing yet.</div></div>
     </div>
     <div class="card">
-      <h2>Resources loaded</h2>
+      <h2>Resources loaded <span class="sp"></span><span class="aside">click to open beside this page</span></h2>
+      <div class="chips" id="reschips"></div>
       <div class="log res" id="res"><div class="empty">Nothing yet.</div></div>
     </div>
   </section>
@@ -136,9 +126,8 @@ code { font-size: 12px; }
       <div class="thumbs" id="bms"><div class="empty">No bookmarks yet. Save one while playing; click it later to jump back.</div></div>
     </div>
     <div class="card">
-      <h2>Captures</h2>
-      <div class="thumbs" id="caps"><div class="empty">Capture a scene to see its real palettes and sprites.</div></div>
-      <div id="capview"></div>
+      <h2>Recent captures <span class="sp"></span><a class="aside" href="/captures">all captures ›</a></h2>
+      <div class="thumbs" id="caps"><div class="empty">Capture a scene to inspect its sprites, layers and palettes.</div></div>
     </div>
     <div class="card">
       <h2>Scenes · warp (experimental) <span class="sp"></span><input id="scq" placeholder="scene or map" style="width:8em"></h2>
@@ -146,17 +135,16 @@ code { font-size: 12px; }
       <div class="log" id="scenes" style="max-height:300px"><div class="empty">Loading…</div></div>
     </div>
     <div class="card">
-      <h2>Graphics with text <span class="sp"></span><span id="tagcount" style="font-weight:400"></span></h2>
+      <h2>Graphics with text <span class="sp"></span><span id="tagcount" class="aside"></span></h2>
       <div id="tags" class="empty">Tag sprites or maps that contain text (from a capture, or the Graphics page).</div>
     </div>
   </section>
 </main>
+<script src="/static/common.js"></script>
 <script>
-const $ = id => document.getElementById(id);
-const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-let last = null, selCap = null;
-const cmd = c => fetch('/api/live/cmd', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(c) }).then(r => r.json());
-const gfxLink = (label, name) => ({ spr: `/gfx#sprites/${name}`, bigspr: `/gfx#big/${name}`, map: `/gfx#maps/${name}`, pal: `/gfx#palettes/${name}` }[label]);
+studioHeader(`<span class="pill rec" id="rec" hidden>● REC</span><span class="pill" id="conn">waiting for mGBA</span>`);
+let last = null, index = {};
+const cmd = c => post('/api/live/cmd', c);
 
 async function poll() {
   let d;
@@ -167,124 +155,194 @@ async function poll() {
   $('conn').className = 'pill' + (d.connected ? ' on' : '');
   $('howto').hidden = d.connected;
   $('rec').hidden = !st.rec;
-  $('rec').className = 'pill rec';
   document.querySelectorAll('#mode button').forEach(b => b.classList.toggle('on', b.dataset.m === (st.mode || 'en')));
   $('god').textContent = st.god ? 'God mode: on' : 'God mode';
-  $('recbtn').textContent = st.rec ? 'Stop recording' : 'Record';
-  ['capture', 'god', 'recbtn', 'bmsave', 'procrun'].forEach(id => $(id).disabled = !d.connected);
-  // current text: the most recent fetched string that has text
-  const cur = d.texts.find(t => t.jp || t.en);
-  $('en').textContent = cur ? (cur.en || '(no translation)') : '';
-  $('jp').textContent = cur ? (cur.jp || '') : '';
-  $('submeta').innerHTML = cur ? `string <a href="/#${cur.id}">#${cur.id}</a> · frame ${cur.frame}` : (d.connected ? 'No text fetched yet.' : '');
+  $('recbtn').textContent = st.rec ? 'Stop recording' : 'Record from here';
+  ['capture', 'inspect', 'god', 'recbtn', 'bmsave', 'procrun'].forEach(id => $(id).disabled = !d.connected);
+  renderNow(d, st);
+  const mapNote = st.map && noteOf('map', st.map)?.label;
   $('game').innerHTML = [
-    ['Map', st.map ? `<a href="/gfx#maps">${esc(st.map)}</a>` : '—'],
+    ['Map', st.map ? `${peekLink(gfxHref('map', st.map), esc(st.map))}${mapNote ? ` · ${esc(mapNote)}` : ''}` : '—'],
+    ['Scene', st.scene ?? '—'],
     ['Tileset', esc(st.tileset || '—')],
-    ['Palette', st.pal ? `<a href="/gfx#palettes/${esc(st.pal)}">${esc(st.pal)}</a>` : '—'],
+    ['Palette', st.pal ? peekLink(gfxHref('pal', st.pal), esc(st.pal)) : '—'],
     ['Life', st.life ?? '—'],
     ['mGBA', d.hello ? `${esc(d.hello.title)} · breakpoints ${d.hello.bp ? 'on' : 'off'} · overlay ${d.hello.canvas ? 'on' : 'off'}` : '—'],
   ].map(([k, v]) => `<b>${k}</b><span>${v}</span>`).join('');
-  renderLog('texts', d.texts.filter(t => t.jp || t.en), t => `<span class="id">#${t.id}</span><span>${esc(t.en || t.jp)}${t.en && t.jp ? `<div class="jp">${esc(t.jp)}</div>` : ''}</span>`, t => location.href = `/#${t.id}`);
-  renderLog('res', d.res, r => r.t === 'tileset'
-    ? `<span class="id">${r.frame}</span><span>tiles</span><span><code>${esc(r.ids.join(', '))}</code></span>`
-    : `<span class="id">${r.frame}</span><span>${esc(r.label)}</span><span><code>${esc(r.name)}</code></span>`,
-    r => { const l = gfxLink(r.label, r.name); if (l) window.open(l, '_blank'); });
+  renderTexts(d.texts.filter(t => t.jp || t.en));
+  renderRes(d.res);
   renderThumbs('bms', d.bookmarks, b => `/api/live/file/bookmarks/${encodeURIComponent(b.name)}.png`, b => `${b.name}${b.map ? ' · ' + b.map : ''}`, b => cmd({ c: 'load', name: b.name }));
-  renderThumbs('caps', d.captures, c => `/api/live/file/captures/${encodeURIComponent(c.name)}/screen.png`, c => `${c.name}${c.map ? ' · ' + c.map : ''}`, c => showCapture(c.name), c => c.name === selCap);
+  renderThumbs('caps', d.captures.slice(0, 8), c => `/api/live/file/captures/${encodeURIComponent(c.name)}/screen.png`, c => c.label || c.name, c => location.href = `/captures#${encodeURIComponent(c.name)}`);
+  $('cursc').textContent = st.scene ?? '—';
 }
+
+// Every string whose glyphs are on screen now (Centaur tracks the BG0 cells), else the last one fetched.
+let nowSig = '';
+function renderNow(d, st) {
+  const strings = Object.fromEntries(d.texts.map(t => [t.id, t]));
+  let list = (st.onscreen || []).map(o => ({ ...(strings[o.id] || { id: o.id }), pos: o }));
+  const lastText = d.texts.find(t => t.jp || t.en);
+  const fallback = !list.length && lastText;
+  if (fallback) list = [lastText];
+  const sig = JSON.stringify(list.map(x => [x.id, x.en, x.pos])) + fallback;
+  if (sig === nowSig) return; nowSig = sig;
+  $('now').innerHTML = list.length ? list.map(t => `<div class="line"><div class="sub-en">${esc(t.en || '(no translation)')}</div>${t.jp ? `<div class="sub-jp">${esc(t.jp)}</div>` : ''}
+    <div class="sub-meta">string <a href="/#${t.id}" target="_blank">#${t.id}</a>${t.pos ? ` · tiles ${t.pos.x0},${t.pos.y0}–${t.pos.x1},${t.pos.y1}` : ' · last fetched (no glyphs on screen)'}</div></div>`).join('')
+    : `<div class="empty">${d.connected ? 'No text on screen.' : ''}</div>`;
+}
+
 const sig = {};
-function renderLog(id, list, html, click) {
-  const key = JSON.stringify(list.slice(0, 30));
-  if (sig[id] === key) return; sig[id] = key;
+function renderTexts(list) {
+  const key = JSON.stringify(list.slice(0, 40).map(t => [t.id, t.frame]));
+  if (sig.texts === key) return; sig.texts = key;
   if (!list.length) return;
-  $(id).replaceChildren(...list.slice(0, 60).map(x => { const e = document.createElement('div'); e.className = 'e'; e.innerHTML = html(x); e.onclick = () => click(x); return e; }));
+  const out = [];
+  list.slice(0, 80).forEach((t, i) => {
+    const e = document.createElement('div'); e.className = 'e';
+    e.innerHTML = `<span class="id">#${t.id}</span><span>${esc(t.en || t.jp)}${t.en && t.jp ? `<div class="jp">${esc(t.jp)}</div>` : ''}</span>`;
+    e.onclick = () => window.open(`/#${t.id}`, '_blank');
+    out.push(e);
+    const older = list[i + 1];  // newest first: a break below marks where this screen began
+    if (older && (older.scene !== t.scene || older.map !== t.map)) {
+      const b = document.createElement('div'); b.className = 'brk';
+      b.textContent = [t.scene != null ? `scene ${t.scene}` : '', t.map ? `map ${t.map}` : ''].filter(Boolean).join(' · ') || 'new screen';
+      out.push(b);
+    }
+  });
+  $('texts').replaceChildren(...out);
 }
-function renderThumbs(id, list, src, label, click, on) {
-  const key = JSON.stringify(list) + selCap;
+
+// Resource rows with a small preview, opening in the peek panel.
+function resHref(r) {
+  if (r.label === 'spr') return gfxHref('spr', r.name);
+  if (r.label === 'bigspr') return gfxHref('big', r.name);
+  if (r.label === 'map') return gfxHref('map', r.name);
+  if (r.label === 'pal') return gfxHref('pal', r.name);
+  const a = archiveFor(r.label, r.type, index);
+  return a && (index[a] || []).some(([h]) => h === r.name) ? `/gfx#data/${a}:${r.name}` : null;
+}
+const previews = new Map();
+async function preview(r) {
+  const k = r.label + r.name;
+  if (!previews.has(k)) previews.set(k, (async () => {
+    if (r.label === 'spr') {
+      const b = await res('tCB05', r.name), pkg = parsePackage(b), f = pkg.frames.find(f => f.n);
+      const img = f && compose(pkg.parts(f), await packageColors(b));
+      return img && fitCanvas(toCanvas(img), 36);
+    }
+    if (r.label === 'pal') {
+      const b = await res('t92B3', r.name), d = document.createElement('div'); d.className = 'sw';
+      let bank = 0; while (bank < 15 && !b.slice(20 + bank * 32, 52 + bank * 32).some(x => x)) bank++;
+      d.innerHTML = Array.from({ length: 8 }, (_, i) => `<i style="background:${cssRgb(le(b, 20 + bank * 32 + i * 4))}"></i>`).join('');
+      return d;
+    }
+    return null;
+  })().catch(() => null));
+  return previews.get(k);
+}
+let learnedSprites = {}, resFilter = localStore('resfilter') || '';
+function renderRes(all) {
+  const kinds = [...new Set(all.map(r => r.t === 'tileset' ? 'tiles' : r.label))].sort();
+  const ck = kinds.join() + resFilter;
+  if (sig.chips !== ck) {
+    sig.chips = ck;
+    $('reschips').replaceChildren(...['', ...kinds].map(k => {
+      const b = document.createElement('button'); b.textContent = k || 'all'; b.className = k === resFilter ? 'on' : '';
+      b.title = RES_TYPES[k] || RES_TYPES['t' + (all.find(r => r.label === k)?.type || '')] || '';
+      b.onclick = () => { resFilter = k; localStore('resfilter', k); sig.res = null; sig.chips = null; renderRes(last.res); };
+      return b;
+    }));
+  }
+  const list = resFilter ? all.filter(r => (r.t === 'tileset' ? 'tiles' : r.label) === resFilter) : all;
+  const key = JSON.stringify(list.slice(0, 40)) + resFilter;
+  if (sig.res === key) return; sig.res = key;
+  if (!list.length) { $('res').innerHTML = '<div class="empty">Nothing of this type yet.</div>'; return; }
+  $('res').replaceChildren(...list.slice(0, 60).map(r => {
+    const e = document.createElement('div'); e.className = 'e';
+    if (r.t === 'tileset') { e.innerHTML = `<span class="id">${r.frame}</span><span class="pv"></span><span>tiles <code>${esc(r.ids.join(', '))}</code></span>`; return e; }
+    const href = resHref(r), lab = noteOf(r.label === 'bigspr' ? 'big' : r.label, r.name)?.label;
+    e.innerHTML = `<span class="id">${r.frame}</span><span class="pv"></span><span>${esc(r.label)} <code>${esc(r.name)}</code>${lab ? ` <span class="lab">${esc(lab)}</span>` : ''}</span>`;
+    if (href) e.onclick = () => peek(href); else e.style.cursor = 'default';
+    preview(r).then(p => { if (p) e.querySelector('.pv').appendChild(p.cloneNode ? (p.tagName === 'CANVAS' ? cloneCanvas(p) : p.cloneNode(true)) : p); });
+    return e;
+  }));
+}
+function cloneCanvas(c) { const n = document.createElement('canvas'); n.width = c.width; n.height = c.height; n.getContext('2d').drawImage(c, 0, 0); n.style.cssText = c.style.cssText; return n; }
+
+function renderThumbs(id, list, src, label, click) {
+  const key = JSON.stringify(list);
   if (sig[id] === key) return; sig[id] = key;
   if (!list || !list.length) return;
   $(id).replaceChildren(...list.map(x => {
-    const e = document.createElement('div'); e.className = 'thumb' + (on && on(x) ? ' on' : '');
+    const e = document.createElement('div'); e.className = 'thumb';
     e.innerHTML = `<img alt="" src="${src(x)}?t=${x.mtime || x.when || ''}" onerror="this.style.visibility='hidden'"><div>${esc(label(x))}</div>`;
     e.onclick = () => click(x); return e;
   }));
 }
 
-async function showCapture(name) {
-  selCap = name; sig.caps = null;
-  const a = await fetch(`/api/live/analysis/${encodeURIComponent(name)}`).then(r => r.json());
-  const rgb = c => `rgb(${(c & 31) * 8},${(c >> 5 & 31) * 8},${(c >> 10 & 31) * 8})`;
-  const sprites = a.sprites.filter(s => s.match);
-  const groups = {};
-  for (const s of sprites) (groups[s.match.join(':')] ||= { ...s, n: 0 }).n++;
-  $('capview').innerHTML = `
-    <img class="shot" src="/api/live/file/captures/${encodeURIComponent(name)}/screen.png" alt="">
-    <div class="kv" style="margin:8px 0"><b>BG palette</b><span>${a.bg_best ? `<a href="/gfx#palettes/${a.bg_best}">${a.bg_best}</a> (banks ${a.bg.filter(b => b.resources.includes(a.bg_best)).map(b => b.bank).join(', ')})` : 'no match'}${a.meta.map ? ` · remembered for map ${a.meta.map}` : ''}</span>
-    <b>Sprites</b><span>${a.sprites.length} on screen, ${sprites.length} identified; their palettes are now used by the Graphics page</span></div>
-    <table><tr><th>Resource</th><th>Parts</th><th>Palette (OBJ bank)</th><th></th></tr>
-    ${Object.values(groups).map(s => `<tr><td><a href="${s.match[0] === 'big' ? '/gfx#big/' : '/gfx#sprites/'}${s.match[1]}" target="_blank">${s.match[0]} ${s.match[1]}</a></td><td>${s.n}</td>
-      <td><span class="sw">${s.colors.map(c => `<i style="background:${rgb(c)}"></i>`).join('')}</span> ${s.bank}</td>
-      <td><button data-tag="${s.match[0]}:${s.match[1]}">Has text</button></td></tr>`).join('')}</table>`;
-  $('capview').querySelectorAll('[data-tag]').forEach(b => b.onclick = () => tag(...b.dataset.tag.split(':')));
-}
-
-async function tag(kind, hash) {
-  const note = prompt(`What text does ${kind} ${hash} show? (Japanese or a description)`);
-  if (note === null) return;
-  await fetch('/api/tags', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ kind, hash, part: '', note }) });
-  loadTags();
-}
 async function loadTags() {
   const t = await fetch('/api/tags').then(r => r.json());
   $('tagcount').textContent = t.length ? `${t.length} tagged · ${t.filter(x => x.status === 'done').length} done` : '';
   if (!t.length) return;
   $('tags').className = '';
   $('tags').innerHTML = `<table><tr><th>Graphic</th><th>Shows</th><th>English</th><th>Status</th></tr>${t.map((x, i) => `<tr class="tagrow">
-    <td><a href="${x.kind === 'big' ? '/gfx#big/' : x.kind === 'map' ? '/gfx#maps/' : '/gfx#sprites/'}${x.hash}" target="_blank">${esc(x.kind)} ${esc(x.hash)}${x.part ? ' · ' + esc(x.part) : ''}</a></td>
+    <td>${peekLink(gfxHref(x.kind, x.hash, x.part !== '' && !isNaN(+x.part) ? +x.part : undefined), `${esc(x.kind)} ${esc(x.hash)}${x.part ? ' · ' + esc(x.part) : ''}`)}</td>
     <td>${esc(x.note)}</td><td><input data-i="${i}" data-f="english" value="${esc(x.english)}"></td>
     <td><select data-i="${i}" data-f="status">${['todo', 'translated', 'drawn', 'done'].map(s => `<option ${s === x.status ? 'selected' : ''}>${s}</option>`).join('')}</select></td></tr>`).join('')}</table>`;
   $('tags').querySelectorAll('[data-i]').forEach(el => el.onchange = async () => {
     const x = t[+el.dataset.i]; x[el.dataset.f] = el.value;
-    await fetch('/api/tags', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(x) });
+    await post('/api/tags', x);
     loadTags();
   });
 }
 
 document.querySelectorAll('#mode button').forEach(b => b.onclick = () => cmd({ c: 'subs', mode: b.dataset.m }));
-document.querySelectorAll('.pad button').forEach(b => b.onclick = ev => cmd({ c: 'keys', keys: b.dataset.k, frames: ev.shiftKey ? 30 : 4 }));
 $('procrun').onclick = () => {
   const id = parseInt($('procid').value); if (isNaN(id)) return;
   const args = $('procargs').value.trim().split(/[\s,]+/).filter(Boolean).map(x => parseInt(x));
   cmd({ c: 'callproc', id, args });
 };
-$('capture').onclick = () => cmd({ c: 'capture' }).then(() => setTimeout(poll, 800));
+$('inspect').onclick = async () => {
+  await cmd({ c: 'capture', name: 'live' });
+  setTimeout(() => peek(`/captures?t=${Date.now()}#live`), 900);
+};
+$('capture').onclick = () => { cmd({ c: 'capture', name: $('capname').value.trim() || undefined }); $('capname').value = ''; setTimeout(poll, 800); };
 $('god').onclick = () => cmd({ c: 'god', on: !(last?.state?.god) });
 $('recbtn').onclick = () => last?.state?.rec ? cmd({ c: 'rec_stop' }) : cmd({ c: 'rec_start', name: $('recname').value || 'playthrough' });
 $('bmsave').onclick = () => { cmd({ c: 'bookmark', name: $('bmname').value || undefined }); $('bmname').value = ''; };
-document.addEventListener('keydown', e => {
-  if (e.target.tagName === 'INPUT') return;
-  const map = { ArrowUp: 'UP', ArrowDown: 'DOWN', ArrowLeft: 'LEFT', ArrowRight: 'RIGHT', z: 'B', x: 'A', a: 'L', s: 'R', Enter: 'START', Backspace: 'SELECT' };
-  if (map[e.key] && last?.connected) { e.preventDefault(); cmd({ c: 'keys', keys: map[e.key], frames: e.shiftKey ? 30 : 4 }); }
-});
+
 let sceneList = [];
 async function loadScenes() {
   sceneList = await fetch('/api/scenes').then(r => r.json()).catch(() => []);
   renderScenes();
 }
+let sceneLimit = 150;
 function renderScenes() {
   const q = $('scq').value.trim().toUpperCase();
-  const hits = sceneList.filter(s => !q || String(s.scene).includes(q) || (s.map || '').includes(q) || (s.shown || '').includes(q)).slice(0, 200);
-  $('scenes').replaceChildren(...hits.map(s => {
+  const all = sceneList.filter(s => !q || String(s.scene).includes(q) || (s.map || '').includes(q) || (s.shown || '').includes(q) || (noteOf('map', s.shown || s.map || '')?.label || '').toUpperCase().includes(q));
+  const rows = all.slice(0, sceneLimit).map(s => {
     const e = document.createElement('div'); e.className = 'e'; e.style.gridTemplateColumns = s.shot ? '4.2em 72px 1fr' : '4.2em 1fr';
-    e.innerHTML = `<span class="id">${s.scene}</span>${s.shot ? `<img src="/api/live/file/captures/scene_${String(s.scene).padStart(4, '0')}/screen.png" style="width:72px;image-rendering:pixelated;border-radius:3px" alt="">` : ''}
-      <span>${s.map ? `map <a href="/gfx#maps/${s.map}-${s.tileset}-${s.hp}" target="_blank" onclick="event.stopPropagation()">${s.map}</a>` : 'no stage'}${s.shown && s.shown !== s.map ? ` · shows ${s.shown}` : ''}${s.palette ? ` · pal ${s.palette}` : ''}${s.became && s.became !== s.scene ? ` · → ${s.became}` : ''}</span>`;
-    e.onclick = () => { if (last?.connected) cmd({ c: 'warp', scene: s.scene }); };
+    const lab = noteOf('map', s.shown || s.map || '')?.label;
+    e.innerHTML = `<span class="id">${s.scene}</span>${s.shot ? `<img loading="lazy" src="/api/live/file/captures/scene_${String(s.scene).padStart(4, '0')}/screen.png" style="width:72px;image-rendering:pixelated;border-radius:3px" alt="">` : ''}
+      <span>${s.map ? `map ${peekLink(`/gfx#maps/${s.map}-${s.tileset}-${s.hp}`, s.map)}` : 'no stage'}${s.shown && s.shown !== s.map ? ` · shows ${s.shown}` : ''}${s.palette ? ` · pal ${s.palette}` : ''}${s.became && s.became !== s.scene ? ` · → ${s.became}` : ''}${lab ? ` · <b>${esc(lab)}</b>` : ''}</span>`;
+    e.onclick = ev => { if (!ev.target.closest('a') && last?.connected) cmd({ c: 'warp', scene: s.scene }); };
     return e;
-  }));
+  });
+  if (all.length > sceneLimit) {
+    const b = document.createElement('button'); b.className = 'more'; b.textContent = `Show more (${all.length - sceneLimit} left)`;
+    b.onclick = () => { sceneLimit += 300; renderScenes(); };
+    rows.push(b);
+  }
+  $('scenes').replaceChildren(...rows);
 }
-$('scq').oninput = renderScenes;
-setInterval(() => { if (last?.state?.scene) $('cursc').textContent = last.state.scene; }, 1000);
-poll(); setInterval(poll, 700); loadTags(); loadScenes();
+$('scq').oninput = () => { sceneLimit = 150; renderScenes(); };
+
+(async () => {
+  index = await fetch('/api/res').then(r => r.json()).catch(() => ({}));
+  learnedSprites = (await fetch('/api/learned').then(r => r.json()).catch(() => ({}))).sprites || {};
+  await loadNotes();
+  poll(); setInterval(poll, 700); loadTags(); loadScenes();
+})();
 </script>
 </body>
 </html>

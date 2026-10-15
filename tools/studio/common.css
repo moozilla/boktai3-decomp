@@ -1,0 +1,24 @@
+/* Shared by the studio pages (see common.js): header, peek panel, notes. */
+a { color: var(--accent); }
+#top { display: flex; align-items: center; gap: 14px; padding: 8px 16px; border-bottom: 1px solid var(--line); background: var(--panel); flex-wrap: wrap; min-height: 53px; }
+#top h1 { font-size: 16px; margin: 0; letter-spacing: .02em; white-space: nowrap; }
+#top nav { display: flex; gap: 2px; flex-wrap: wrap; }
+#top nav a { color: var(--muted); text-decoration: none; padding: 5px 9px; border-radius: 6px; white-space: nowrap; }
+#top nav a:hover { color: var(--ink); }
+#top nav a.on { background: var(--sel); color: var(--ink); }
+#top .sp { flex: 1; }
+body.embed main { height: 100vh !important; }
+
+#peek { position: fixed; top: 0; right: 0; bottom: 0; width: min(760px, 92vw); background: var(--panel); border-left: 1px solid var(--line); box-shadow: -8px 0 32px rgba(0,0,0,.18); transform: translateX(105%); transition: transform .18s ease; z-index: 50; display: flex; flex-direction: column; }
+#peek.on { transform: none; }
+#peek .peekbar { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-bottom: 1px solid var(--line); font-size: 13px; }
+#peek .peekbar .sp { flex: 1; }
+#peek .peekbar button { border: 0; background: none; color: var(--muted); font-size: 16px; cursor: pointer; padding: 2px 8px; }
+#peek iframe { flex: 1; border: 0; width: 100%; background: var(--bg); }
+
+.noteed { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin: 6px 0 10px; }
+.noteed .nl { width: 16em; }
+.noteed .nn { flex: 1; min-width: 14em; resize: vertical; font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
+.noteed .ns { font-size: 12px; color: var(--muted); }
+.more { display: block; margin: 8px auto; }
+.more[hidden], [hidden] { display: none !important; }

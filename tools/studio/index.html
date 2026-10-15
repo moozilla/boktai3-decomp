@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Boktai 3 Studio</title>
+<link rel="stylesheet" href="/static/common.css">
 <style>
 :root {
   --bg: #f6f3ec; --panel: #fffdf8; --ink: #2b2620; --muted: #7d7468; --line: #e3dccf;
@@ -62,11 +63,7 @@ pre#log { background: var(--panel); border: 1px solid var(--line); border-radius
 </style>
 </head>
 <body>
-<header>
-  <h1>Boktai 3 Studio · Text</h1>
-  <a href="/gfx" style="color:var(--muted);text-decoration:none">Graphics</a>
-  <a href="/live" style="color:var(--muted);text-decoration:none">Live</a>
-  <span class="sp"></span>
+<header id="top">
   <span id="dirty" style="color:var(--muted);font-size:12px"></span>
   <button id="build" class="primary" title="make mod → build/mod.gba">Build mod ROM</button>
 </header>
@@ -104,8 +101,9 @@ pre#log { background: var(--panel); border: 1px solid var(--line); border-radius
       Strings may grow: later data moves automatically. Characters must exist in the game font (<code>data/charmap.tsv</code>); ASCII uses the half-width font.</p>
   </section>
 </main>
+<script src="/static/common.js"></script>
 <script>
-const $ = id => document.getElementById(id);
+studioHeader($('top').innerHTML);
 let strings = [], byId = new Map(), original = {}, inverse = new Map(), font = null, cur = null, fan = {};
 const SCALE = 2;
 

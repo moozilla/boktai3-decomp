@@ -14,6 +14,8 @@
 //   tap KEYS            hold for 2 frames, release for 8
 //   shot NAME           write OUTDIR/NAME.ppm
 //   save NAME / load NAME   savestate to/from OUTDIR/NAME.ss
+//   loadstate PATH      load an mGBA savestate (raw or PNG, e.g. one Centaur
+//                       wrote); PATH relative to the script's directory
 //   dump NAME ADDR:LEN  raw memory dump (hex address and length)
 //   watch ADDR:LEN      log stores into a RAM range (hex) to stderr
 //   poke ADDR[:SIZE] V  write V (hex) to memory once (SIZE 1/2/4, default 4)
@@ -33,6 +35,11 @@
 #include <mgba/gba/interface.h>
 #include <mgba/internal/arm/arm.h>
 #include <mgba-util/vfs.h>
+#if __has_include(<mgba-util/image.h>)  // mGBA 0.11 (tools/mgba/build_mgba.sh): savestates match Centaur's
+#include <mgba-util/image.h>
+typedef mColor color_t;
+#define desiredVideoDimensions baseVideoSize
+#endif
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -309,6 +316,20 @@ static void savestate(const char* name, int load) {
 	free(buf);
 }
 
+static char scriptdir[1024] = ".";
+
+static void loadstate(const char* rel) {
+	char path[2048];
+	if (rel[0] == '/') snprintf(path, sizeof(path), "%s", rel);
+	else snprintf(path, sizeof(path), "%s/%s", scriptdir, rel);
+	struct VFile* vf = VFileOpen(path, O_RDONLY);
+	if (!vf) { fprintf(stderr, "no state %s\n", path); exit(1); }
+	if (!mCoreLoadStateNamed(core, vf, SAVESTATE_SAVEDATA | SAVESTATE_RTC)) {
+		fprintf(stderr, "cannot load state %s (made by a newer mGBA?)\n", path); exit(1);
+	}
+	vf->close(vf);
+}
+
 int main(int argc, char** argv) {
 	if (argc != 4) { fprintf(stderr, "usage: %s ROM SCRIPT OUTDIR\n", argv[0]); return 1; }
 	outdir = argv[3];
@@ -354,6 +375,10 @@ int main(int argc, char** argv) {
 	seg_exec = NULL;
 
 	FILE* s = fopen(argv[2], "r");
+	{
+		const char* sl = strrchr(argv[2], '/');
+		if (sl) snprintf(scriptdir, sizeof(scriptdir), "%.*s", (int) (sl - argv[2]), argv[2]);
+	}
 	if (!s) { perror("script"); return 1; }
 	char line[512];
 	while (fgets(line, sizeof(line), s)) {
@@ -367,6 +392,7 @@ int main(int argc, char** argv) {
 		else if (!strcmp(cmd, "shot")) shot(a1);
 		else if (!strcmp(cmd, "save")) savestate(a1, 0);
 		else if (!strcmp(cmd, "load")) savestate(a1, 1);
+		else if (!strcmp(cmd, "loadstate")) loadstate(a1);
 		else if (!strcmp(cmd, "dump")) {
 			// dump NAME ADDR:LEN  (hex) -> OUTDIR/NAME.bin
 			unsigned addr = 0, len = 0;
