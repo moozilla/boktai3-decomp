@@ -1,6 +1,5 @@
 #include "area_effect.h"
 // MATCHING_CONCESSION: register-pinning
-#define AreaEffect_AccumulatePlayerResource sub_0804E618
 void sub_081594F4(struct AreaEffectPlayer *, s32);
 static inline u32 test(u32 *value, u32 mask)
 {

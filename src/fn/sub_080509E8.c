@@ -1,6 +1,5 @@
 #include "orbit_background.h"
 // MATCHING_CONCESSION: register-pinning
-#define OrbitBackground_UpdatePosition sub_080509E8
 static inline s32 scale(s32 value)
 {
     if (value >= 0)

@@ -1,6 +1,5 @@
 #include "orbit_background.h"
 // MATCHING_CONCESSION: register-pinning
-#define OrbitBackground_UpdateVisibility sub_08050910
 static inline u32 isSpecial(void)
 {
     u32 value = gUnk_02000528;
@@ -29,7 +28,7 @@ void OrbitBackground_UpdateVisibility(struct OrbitBackground *input)
         else if (background->enabled)
             goto enable;
         else {
-            sub_080508F0(background);
+            OrbitBackground_ResetOrbit(background);
             background->enabled = 1;
         }
         if (background->enabled)
@@ -52,7 +51,7 @@ void OrbitBackground_UpdateVisibility(struct OrbitBackground *input)
                 *saved = special;
                 if (!background->enabled)
                     goto disable;
-                sub_080508F0(background);
+                OrbitBackground_ResetOrbit(background);
             }
         }
         if (!background->enabled)

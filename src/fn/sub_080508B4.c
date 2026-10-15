@@ -1,5 +1,4 @@
 #include "orbit_background.h"
-#define OrbitBackground_IsEnabled sub_080508B4
 u32 OrbitBackground_IsEnabled(void)
 {
     u32 value = gUnk_02000528;

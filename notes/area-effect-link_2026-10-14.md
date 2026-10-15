@@ -34,3 +34,8 @@ were named and checked exactly.
 
 No gaps or drafts remain in the link variant. Next: EFB4–F6D0, a separate
 scripted player-interaction/display object; keep its identity provisional.
+
+Integration: combined orbit/area ROM build printed `build/boktai3.gba: OK`;
+51 complete post-promotion extent checks passed, along with format/inventory/
+RAM checks and all twelve data round trips. Aggregate exact progress24.682%
+(+0.1726 percentage points for this batch).

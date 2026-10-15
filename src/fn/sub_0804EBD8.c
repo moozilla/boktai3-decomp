@@ -1,5 +1,4 @@
 #include "area_effect_link.h"
-#define AreaEffect_ScaleLinkResourceGain sub_0804EBD8
 // MATCHING_CONCESSION: register-pinning
 s32 Div(s32, s32);
 s32 AreaEffect_ScaleLinkResourceGain(s32 gain)

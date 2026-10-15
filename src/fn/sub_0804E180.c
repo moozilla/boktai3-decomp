@@ -1,6 +1,5 @@
 #include "area_effect.h"
 // MATCHING_CONCESSION: register-pinning
-#define AreaEffect_SetBounds sub_0804E180
 void AreaEffect_SetBounds(struct AreaEffectEntry *entry, s32 kind,
                           struct AreaEffectPosition *position, s32 rotated)
 {

@@ -39,10 +39,10 @@ extern struct ContactPosition gUnk_030042A0;
 extern s16 gUnk_03005418[];
 extern u16 gUnk_02000528, gUnk_03004BD8;
 extern const s16 gUnk_086149C4[];
-void sub_080508F0(struct OrbitBackground *);
-void sub_08050910(struct OrbitBackground *);
-void sub_080509E8(struct OrbitBackground *);
-s32 sub_08050DBC(struct OrbitBackground *);
-void sub_08050E9C(struct OrbitBackground *);
+void OrbitBackground_ResetOrbit(struct OrbitBackground *);
+void OrbitBackground_UpdateVisibility(struct OrbitBackground *);
+void OrbitBackground_UpdatePosition(struct OrbitBackground *);
+s32 OrbitBackground_Tick(struct OrbitBackground *);
+void OrbitBackground_LoadResource(struct OrbitBackground *);
 s32 Div(s32, s32);
 #endif

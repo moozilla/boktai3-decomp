@@ -1,5 +1,4 @@
 #include "orbit_background.h"
-#define OrbitBackground_Initialize sub_08050F40
 static inline s32 scale(s32 value)
 {
     if (value >= 0)
@@ -11,8 +10,8 @@ s32 OrbitBackground_Initialize(struct OrbitBackground *background, u32 id, u32 p
     background->id = id;
     background->playerIndex = player;
     background->enabled = enabled;
-    sub_08050E9C(background);
-    sub_080508F0(background);
+    OrbitBackground_LoadResource(background);
+    OrbitBackground_ResetOrbit(background);
     background->position.x =
         gUnk_02000580[background->playerIndex]->position.x -
         scale(gUnk_086149C4[(background->angle + 64) & 255] * background->radius);
@@ -22,7 +21,7 @@ s32 OrbitBackground_Initialize(struct OrbitBackground *background, u32 id, u32 p
     }
     background->position.z = gUnk_02000580[background->playerIndex]->position.z -
                              scale(gUnk_086149C4[background->angle & 255] * background->radius);
-    sub_08050DBC(background);
+    OrbitBackground_Tick(background);
     gUnk_0200048C = background;
     return 0;
 }

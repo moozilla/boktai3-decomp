@@ -65,3 +65,8 @@ Known canonical engine APIs (Sprite_Init, AnimData_Load, AnimData_SelectTiles)
 are used in new code. No new drafts or gaps remain before EBD8.
 
 Continue with EBD8 onward, the adjacent multiplayer form of the area updater.
+
+Integration: combined orbit/area ROM build printed `build/boktai3.gba: OK`;
+51 complete post-promotion extent checks passed, along with format/inventory/
+RAM checks and all twelve data round trips. Aggregate exact progress24.682%
+(+0.1726 percentage points for this batch).

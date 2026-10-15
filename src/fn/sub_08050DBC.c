@@ -1,6 +1,5 @@
 #include "orbit_background.h"
 // MATCHING_CONCESSION: register-pinning
-#define OrbitBackground_Tick sub_08050DBC
 static inline s32 scale(s32 value, u32 shift)
 {
     if (value >= 0)
@@ -10,11 +9,11 @@ static inline s32 scale(s32 value, u32 shift)
 s32 OrbitBackground_Tick(struct OrbitBackground *background)
 {
     struct ContactPosition screen;
-    sub_08050910(background);
+    OrbitBackground_UpdateVisibility(background);
     if (background->enabled) {
         struct ContactPosition *projected;
         struct ContactPosition *position;
-        sub_080509E8(background);
+        OrbitBackground_UpdatePosition(background);
         projected = &screen;
         position = &background->position;
         {

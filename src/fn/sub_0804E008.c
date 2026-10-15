@@ -1,5 +1,4 @@
 #include "global.h"
-#define AreaEffect_ScaleResourceGain sub_0804E008
 
 struct S {
     u8 filler[0x876];
