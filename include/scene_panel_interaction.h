@@ -26,18 +26,28 @@ struct ScenePanelInteractionSubject {
     u8 unknownD4[0x1C];
     u8 changed;
 };
+struct ScenePanelApproachSprite {
+    u32 flags;
+    u8 unknown4[4];
+    u8 scaleX, scaleY;
+    u8 unknownA[6];
+    u16 frame;
+    u8 unknown12[0x56];
+};
 struct ScenePanelInteractionView {
     u8 unknown0[0x1A];
     u16 initialMode;
     u8 unknown1C[2];
     u8 subjectCount;
-    u8 unknown1F[0x231];
+    u8 activeCount;
+    u8 unknown20[0x230];
     void (*presentationState)(struct ScenePanel *);
     u32 mainSpriteFlags;
     u8 unknown258[0x2A4];
     u16 state, frame;
     struct ContactPosition origin, approachPosition, center;
-    u8 unknown518[0x6D0];
+    struct ScenePanelApproachSprite approachSprite;
+    u8 unknown580[0x668];
     struct ScenePanelInteractionSubject *subjects[4];
     u16 resourceScale;
     u8 unknownBFA[0x15];
