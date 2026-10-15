@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_panel_rig.h"
-#define ScenePanelRig_TickApproachSubject sub_0805A044
 static inline s32 scale12(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);

@@ -4,7 +4,9 @@
 #include "contact_actor.h"
 struct SceneRigSprite {
     u32 flags;
-    u8 unknown4[0xC];
+    u8 unknown4[3];
+    u8 renderMode;
+    u8 unknown8[8];
     u16 frame;
     u8 unknown12[0xA];
     struct ContactPosition position;
@@ -36,14 +38,14 @@ struct SceneRigParentView {
 struct ScenePanelRig {
     struct SceneRigSprite main, primary[8], secondary[6];
     struct ContactPosition position;
-    u8 unknown620[0x54];
+    struct ContactCollider collider;
     struct ContactPosition origin;
     u16 state, stateFrame, angle;
-    s16 turnFrame;
+    s16 turnStep;
     s16 turnRate;
     u16 turnDuration;
     u16 distance, speed;
-    u16 verticalStep, scale;
+    u16 verticalStep, colliderHold;
     u8 motionFlag;
     u8 contactDirection;
     u16 contactForce, contactEffect;

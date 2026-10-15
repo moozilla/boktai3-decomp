@@ -3,8 +3,8 @@
 The reviewed setup cohort is `0805AD18–0805B28C`. It operates on the same
 15-sprite rig as the preceding state handlers: one main sprite, eight primary
 sprites, and six secondary sprites, each occupying `0x68` bytes. The next
-function is an unrelated X/Z proximity helper. `scene_panel_rig_setup.h` adds
-local setup views without changing the integrator's shared rig structure.
+function is an unrelated X/Z proximity helper. The setup code uses the shared `SceneRigSprite` and collider layout;
+`scene_panel_rig_setup.h` retains partial parent and payload views.
 
 `0805AD18` removes all fifteen sprites. `0805AD50` initializes the collider at
 rig offset `0x620` with dimensions `(128,128,128)`, offset `(0,0,0)`, and owner
@@ -61,5 +61,6 @@ addresses. There are no computed jumps and no handwritten instructions. The
 counter's defined final values are constrained by an empty input asm after the
 loop. Separating the animation hash evaluation from the resource lookup keeps
 the resource key from occupying r7 across the hash call. Primary, secondary, and rig initializer hints were minimized to 20, 10,
-and 7 respectively. Sprite offset `0x10` is animation frame; rig scale at
-`0x68E` is a separate field.
+and 7 respectively. Sprite offset `0x10` is animation frame. The driver shows rig offset
+`0x68E` is a collider hold timer, not a sprite scale; it sets collider flag four,
+counts down, and suppresses the position update while nonzero.

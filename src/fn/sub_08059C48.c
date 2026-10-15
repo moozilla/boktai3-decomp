@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_panel_rig.h"
-#define ScenePanelRig_TickHoverSelection sub_08059C48
 static inline s32 randomValue(void)
 {
     u32 offset;
@@ -23,7 +22,7 @@ void ScenePanelRig_TickHoverSelection(struct ScenePanelRig *rig)
 {
     register u32 observed asm("r4");
     s32 sample;
-    rig->scale = 16;
+    rig->colliderHold = 16;
     rig->position.x = quarter(rig->position.x * 3 + rig->origin.x);
     observed = 0x0403B714;
     sample = randomFirst();

@@ -1,5 +1,4 @@
 #include "scene_panel_rig.h"
-#define ScenePanelRig_TickKnockback sub_0805A2BC
 static inline s32 scale(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);
@@ -9,7 +8,7 @@ void ScenePanelRig_TickKnockback(struct ScenePanelRig *input)
     struct ScenePanelRig *rig = input;
     s32 dx, dz;
     u16 *zptr;
-    rig->scale = 6;
+    rig->colliderHold = 6;
     {
         u32 force = rig->contactForce;
         {

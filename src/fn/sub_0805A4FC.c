@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_panel_rig.h"
-#define ScenePanelRig_CheckContactTransition sub_0805A4FC
 void ScenePanelRig_CheckContactTransition(struct ScenePanelRig *rig)
 {
     u32 state = rig->state;
