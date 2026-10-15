@@ -1,20 +1,10 @@
-#include "global.h"
-
-struct S {
-    u8 pad[0x90];
-    u8 a[0xA8];
-    u16 st;
-    u16 pad2[2];
-    u16 d;
-};
-void AnimData_SelectPaletteBank(void *, u32);
-
-void sub_080640AC(struct S *s)
+#include "roaming_object.h"
+void RoamingObjectB_FlashPalette(struct RoamingObject *owner)
 {
-    if (s->d <= 5)
-        AnimData_SelectPaletteBank(s->a, 0x192);
+    if (owner->flashCount <= 5)
+        AnimData_SelectPaletteBank(owner->graphics, 0x192);
     else
-        AnimData_SelectPaletteBank(s->a, 0x193);
-    s->st = 2;
-    s->d++;
+        AnimData_SelectPaletteBank(owner->graphics, 0x193);
+    owner->animation = 2;
+    owner->flashCount++;
 }

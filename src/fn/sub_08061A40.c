@@ -1,31 +1,18 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x1AA4];
-    u8 a;
-    u8 g[3];
-    u8 m;
-};
-
-void sub_08060660(struct S *);
-void sub_08060EA4(struct S *);
-void sub_08060B94(struct S *);
-void sub_0806130C(struct S *, void (*)(void));
-void sub_08062634(void);
-
-void sub_08061A40(struct S *p)
+#include "scene_inventory_states.h"
+void SceneInventory_BeginSpecialTransition(struct SceneInventoryControlView *panel)
 {
-    p->a = 0x80;
-    switch (p->m) {
+    panel->interactionFlags = 0x80;
+    switch (panel->category) {
         case 0:
-            sub_08060660(p);
+            SceneInventory_BeginEquipmentSpecialMove((void *)panel);
             break;
         case 1:
-            sub_08060EA4(p);
+            SceneInventory_BeginItemSpecialMove((void *)panel);
             break;
         case 2:
-            sub_08060B94(p);
+            SceneInventory_BeginConsumableSpecialMove((void *)panel);
             break;
     }
-    sub_0806130C(p, sub_08062634);
+    SceneInventory_SetControllerCallback(panel,
+                                         (SceneInventoryCallback)SceneInventory_TickSaleTransition);
 }

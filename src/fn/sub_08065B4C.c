@@ -1,7 +1,7 @@
 #include "global.h"
 
 extern const u32 gUnk_08605B18[];
-void sub_08064C48(u32, u32, u32, s32 *, s32 *, u32);
+void ActorAttachment_GetActionOffset(u32, u32, u32, s32 *, s32 *, u32);
 void sub_08217EC4(u8 *, s32, s32);
 void sub_0824923C(u8 *, u32);
 
@@ -19,7 +19,7 @@ void sub_08065B4C(u8 *p)
             u8 *m = p + 0x3f;
             s32 i;
             u8 *q;
-            sub_08064C48(*m, p[0x33], e[9], &a, &b, *(u32 *)(p + 0x5c));
+            ActorAttachment_GetActionOffset(*m, p[0x33], e[9], &a, &b, *(u32 *)(p + 0x5c));
             if ((u8)(*m - 2) <= 1) {
                 i = 0;
                 q = p + 0x3c;

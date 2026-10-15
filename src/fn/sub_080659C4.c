@@ -32,7 +32,7 @@ struct O {
 extern const s16 gUnk_086149C4[];
 extern u8 *gUnk_02000124;
 void sub_08065904(struct O *);
-u8 sub_0806466C(u8 *, struct O *);
+u8 ActorAttachment_TickRemoval(u8 *, struct O *);
 
 static inline u32 tst(u8 *a, u32 m)
 {
@@ -74,7 +74,7 @@ void sub_080659C4(struct O *o)
             q->pos.h.y = o->y + dy + q->pos.h.y;
             q->pos.h.z = q->pos.h.z + o->z;
         }
-        if (!sub_0806466C(e2, o))
+        if (!ActorAttachment_TickRemoval(e2, o))
             o->ang += 4;
     }
 }
