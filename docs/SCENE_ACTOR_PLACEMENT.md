@@ -34,3 +34,13 @@ zero flags,or absent request. The original retains a second flags read; an
 inline test also saves its pointer for the post-callback clear. Its144-byte
 extent is exact with two empty lifetime barriers after minimization. No
 callback is dereferenced by authored C; dispatch retains the engine ABI.
+
+`776E4` uses the same availability gate and consumes drawable-shake flags10
+and20 at2D6. The first takes precedence and adds independent random offsets
+from minus5 through4 to X/Z; the second uses minus8 through7. The position
+belongs to the sequence drawable at1C or tile drawable at40. Each random
+read advances the shared index modulo1024 before loading the table value.
+Halfword arithmetic wraps on the store, matching the original unsigned loads.
+The356-byte extent is exact. Minimization removed all nineteen allocation
+and coordinate hints, leaving only the same two lifetime barriers used by
+the callback consumer.
