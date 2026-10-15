@@ -82,6 +82,12 @@ and resets the control-entry fields. Both cases set `flags2D4 & 4000` and
 `flags2D0 & 8`. The numeric state remains unnamed pending stronger caller
 contracts. `7FC90` itself only clears byte2B2 when it is nonzero.
 
+`70D24` searches the linked registry for the nearest available actor in categories
+`{4,1,3}`, excluding substate2B5=21. It computes X/Z squared distance after
+16-bit displacement wrapping, using signed comparison of the wrapped 32-bit
+sum, and accepts only values strictly below the initial 10,000,000 threshold.
+The first equal-distance actor wins; an unsuccessful search returns NULL.
+
 ## Boundaries and validation
 
 The section spans 3,896 bytes and has 22 function entries, including known
@@ -90,8 +96,8 @@ independent entries `70444` and `70E44` that gbadisasm leaves as data. Thus
 has size 68, followed by the separate 108-byte `70E44`. These entries already
 exist in the repository's build/progress extra-function metadata.
 
-The current frozen query/control cohort contains thirteen new exact functions,
-**+0.0789 percentage points** (1,904 bytes), all register-pinned. Four prior exact functions
+The current frozen query/control cohort contains fourteen new exact functions,
+**+0.0879 percentage points** (2,124 bytes), all register-pinned. Four prior exact functions
 (124 bytes) were reviewed and typed without additional credit. Each function
 passed a full-size fast check after formatting. The parent performs name
 promotion and one combined complete ROM build before integration.
@@ -108,6 +114,7 @@ promotion and one combined complete ROM build before integration.
 | 08070834 | 220 | Request state with optional control preservation | New, pinned |
 | 08070A40 | 80 | Set scripted actor movement mode | New, pinned |
 | 08070A90 | 140 | Set movement mode across eligible registry actors | New, pinned |
+| 08070D24 | 220 | Find nearest eligible category actor | New, pinned |
 | 08070E00 | 68 | Continue after ID, excluding flag bit one | New, pinned |
 | 08070E44 | 108 | Continue with category whitelist | New, pinned |
 | 08070EB0 | 12 | Get first actor | Prior exact, ordinary |
@@ -122,6 +129,7 @@ reduced from 8), and the flags query reduced 17→8. No handwritten instruction 
 The control reset reduced 42→17 hints, the field-restoration script 7→3, the
 individual movement-mode request 9→3, and the registry-wide mode request 21→10.
 The defeat routine reduced 90→26 hints and the individual state request 35→12.
+The nearest-category search reduced 28→7 hints.
 
 The control reset also demonstrated the compiler branch-length estimate issue:
 its near-exact body measured 276 bytes, with a long entry branch and consequent
