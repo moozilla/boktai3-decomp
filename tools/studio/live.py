@@ -353,7 +353,8 @@ def analyse_capture(name):
         colors = list(struct.unpack_from("<16H", pal, 0x200 + bank * 32))
         sprites.append({"oam": i, "x": x if x < 256 else x - 512, "y": y if y < 160 else y - 256, "w": w, "h": h,
                         "tile": tile, "bank": bank, "match": list(match) if match else None, "frame": frame,
-                        "tiles": (w // 8) * (h // 8), "matched": found[match] if match else 0, "colors": colors})
+                        "tiles": (w // 8) * (h // 8), "matched": found[match] if match else 0, "colors": colors,
+                        "nums": sorted(set(nums[match])) if match and match[0] == "spr" else None})
         if match:
             learned.setdefault(f"{match[0]}:{match[1]}", []).append((bank, frame))
     # remember what was learned: the whole OBJ palette RAM, and which bank the

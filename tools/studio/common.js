@@ -98,7 +98,7 @@ function rgb(c) { return [(c & 31) * 255 / 31 | 0, (c >> 5 & 31) * 255 / 31 | 0,
 const cssRgb = c => { const [r, g, b] = rgb(c); return `rgb(${r},${g},${b})`; };
 // A sprite palette learned from a capture (build/centaur/sprite_palettes.json):
 // the OBJ palette RAM and the bank the resource's bank 0 used; older entries
-// are one bank of 16 colours.
+// are one bank of 16 colors.
 function learnedPalette(c) {
   if (!c) return null;
   if (Array.isArray(c)) { const one = c.map(rgb); return Array.from({ length: 256 }, (_, i) => one[i & 15]); }
@@ -219,8 +219,8 @@ function parseBig(d) {
 
 // ---------- resource types (docs/ASSETS.md) ----------
 const RES_TYPES = {
-  anm: 'animation scripts (922E)', t92B3: 'palettes: 20-byte header + 256 colours (92B3)',
-  t9B1B: 'sprite palette pool (9B1B): u16 count, u16 ?, then 16-colour sub-palettes; a sprite package names its first entry',
+  anm: 'animation scripts (922E)', t92B3: 'palettes: 20-byte header + 256 colors (92B3)',
+  t9B1B: 'sprite palette pool (9B1B): u16 count, u16 ?, then 16-color sub-palettes; a sprite package names its first entry',
   t98F5: 'large sprites (98F5)', fnt: 'font (A635)', gcx: 'compiled scripts (A8D9)',
   tAE6C: 'HP data (AE6C): LZ77, magic "HP"; the third argument of proc_884(map, tileset, hp), probably collision or height, not decoded',
   map: 'maps (C091): LZ77, magic "MP"', tCB05: 'sprite packages (CB05)', ptn: 'tileset library (CEEF)', tCEAA: 'unknown 10 KB blob (CEAA)',
@@ -241,7 +241,7 @@ function spritePool() {
     return { n, entry: i => i >= 0 && i < n ? Array.from({ length: 16 }, (_, k) => rgb(le(b, 4 + i * 32 + k * 2))) : null };
   });
 }
-// 256 colours for a package: bank b = pool entry base + b.
+// 256 colors for a package: bank b = pool entry base + b.
 async function packageColors(pkgBytes, base = le(pkgBytes, 0)) {
   const pool = await spritePool(), grey = k => { const v = k * 17; return [v, v, v]; };
   return Array.from({ length: 256 }, (_, i) => (pool.entry(base + (i >> 4)) || null)?.[i & 15] ?? grey(i & 15));
@@ -300,4 +300,18 @@ async function loadCapture(name) {
   // pool index per OBJ bank (high bit set: not a pool entry)
   const objPool = iwram.length >= 0x5210 ? Array.from({ length: 16 }, (_, b) => le(iwram, 0x51F0 + b * 2)) : [];
   return { name, pal, vram, oam, io, objPool, bgColors: palFromBytes(pal, 0), objColors: palFromBytes(pal, 0x200) };
+}
+
+// Up/down arrows move through a list (outside text fields): the row matching
+// `onSel` is the current one; the next/previous row is clicked.
+function listKeys(listEl, rowSel, onSel = '.on') {
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    if (e.target.closest && e.target.closest('input, textarea, select')) return;
+    const rows = [...listEl().querySelectorAll(rowSel)];
+    if (!rows.length) return;
+    const i = rows.findIndex(r => r.matches(onSel));
+    const n = rows[Math.max(0, Math.min(rows.length - 1, i < 0 ? 0 : i + (e.key === 'ArrowDown' ? 1 : -1)))];
+    if (n && n !== rows[i]) { e.preventDefault(); n.click(); n.scrollIntoView({ block: 'nearest' }); }
+  });
 }

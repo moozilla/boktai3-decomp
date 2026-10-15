@@ -21,9 +21,11 @@ body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 syst
 .pill { font-size: 12px; padding: 3px 10px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); }
 .pill.on { color: var(--ok); border-color: var(--ok); }
 .pill.rec { color: #e04848; border-color: #e04848; }
-main { display: grid; grid-template-columns: minmax(300px, 1.1fr) minmax(280px, 1fr) minmax(300px, 1.1fr); gap: 14px; padding: 14px; align-items: start; }
-@media (max-width: 1100px) { main { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 720px) { main { grid-template-columns: 1fr; } }
+main { display: grid; grid-template-columns: minmax(260px, 320px) minmax(500px, 1fr) minmax(280px, 360px); gap: 14px; padding: 14px; align-items: start; }
+@media (max-width: 1250px) { main { grid-template-columns: minmax(260px, 320px) 1fr; } main > section:last-child { grid-column: 1 / -1; } }
+@media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+.subset { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 8px; align-items: center; font-size: 12px; color: var(--muted); margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line); }
+.subset input[type=range] { width: 100%; }
 .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; }
 .card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
 .card h2 .sp { flex: 1; }
@@ -82,6 +84,11 @@ code { font-size: 12px; }
         <span class="seg" id="mode"><button data-m="en">EN</button><button data-m="both">Both</button><button data-m="jp">JP</button><button data-m="off">Off</button></span>
       </h2>
       <div id="now"></div>
+      <div class="subset">
+        <span>Look</span><span class="seg" id="style"><button data-s="shadow">Outline</button><button data-s="box">Box</button></span><span></span>
+        <span>Size</span><input type="range" id="subsize" min="0.5" max="2" step="0.1"><span id="subsizev"></span>
+        <span>Offset</span><input type="range" id="suboff" min="-24" max="24" step="1"><span id="suboffv"></span>
+      </div>
     </div>
     <div class="card">
       <h2>Game</h2>
@@ -89,7 +96,6 @@ code { font-size: 12px; }
       <div class="row" style="margin-top:10px">
         <input id="capname" placeholder="capture label" style="width:10em">
         <button id="capture" class="primary">Capture scene</button>
-        <button id="inspect" title="Capture the screen as &quot;live&quot; and open it: every sprite, layer and palette">Inspect screen</button>
         <button id="god">God mode</button>
       </div>
       <div class="row">
@@ -111,6 +117,12 @@ code { font-size: 12px; }
   </section>
   <section>
     <div class="card">
+      <h2>Screen <span class="sp"></span><button id="snap">Refresh</button><label class="aside"><input type="checkbox" id="follow"> follow (every 2 s)</label></h2>
+      <div id="screenview"><div class="empty">Connect mGBA, then Refresh to see every sprite, text, layer and palette on screen.</div></div>
+    </div>
+  </section>
+  <section>
+    <div class="card">
       <h2>Text the game fetched <span class="sp"></span><span class="aside">a line marks a new scene or map</span></h2>
       <div class="log" id="texts"><div class="empty">Nothing yet.</div></div>
     </div>
@@ -119,8 +131,6 @@ code { font-size: 12px; }
       <div class="chips" id="reschips"></div>
       <div class="log res" id="res"><div class="empty">Nothing yet.</div></div>
     </div>
-  </section>
-  <section>
     <div class="card">
       <h2>Bookmarks · warp <span class="sp"></span><input id="bmname" placeholder="name" style="width:8em"><button id="bmsave">Save here</button></h2>
       <div class="thumbs" id="bms"><div class="empty">No bookmarks yet. Save one while playing; click it later to jump back.</div></div>
@@ -141,6 +151,7 @@ code { font-size: 12px; }
   </section>
 </main>
 <script src="/static/common.js"></script>
+<script src="/static/inspector.js"></script>
 <script>
 studioHeader(`<span class="pill rec" id="rec" hidden>● REC</span><span class="pill" id="conn">waiting for mGBA</span>`);
 let last = null, index = {};
@@ -158,7 +169,10 @@ async function poll() {
   document.querySelectorAll('#mode button').forEach(b => b.classList.toggle('on', b.dataset.m === (st.mode || 'en')));
   $('god').textContent = st.god ? 'God mode: on' : 'God mode';
   $('recbtn').textContent = st.rec ? 'Stop recording' : 'Record from here';
-  ['capture', 'inspect', 'god', 'recbtn', 'bmsave', 'procrun'].forEach(id => $(id).disabled = !d.connected);
+  ['capture', 'snap', 'god', 'recbtn', 'bmsave', 'procrun'].forEach(id => $(id).disabled = !d.connected);
+  document.querySelectorAll('#style button').forEach(b => b.classList.toggle('on', b.dataset.s === (st.style || 'shadow')));
+  if (document.activeElement !== $('subsize') && st.size != null) { $('subsize').value = st.size; $('subsizev').textContent = (+st.size).toFixed(1) + '×'; }
+  if (document.activeElement !== $('suboff') && st.offset != null) { $('suboff').value = st.offset; $('suboffv').textContent = st.offset + ' px'; }
   renderNow(d, st);
   const mapNote = st.map && noteOf('map', st.map)?.label;
   $('game').innerHTML = [
@@ -187,7 +201,7 @@ function renderNow(d, st) {
   const sig = JSON.stringify(list.map(x => [x.id, x.en, x.pos])) + fallback;
   if (sig === nowSig) return; nowSig = sig;
   $('now').innerHTML = list.length ? list.map(t => `<div class="line"><div class="sub-en">${esc(t.en || '(no translation)')}</div>${t.jp ? `<div class="sub-jp">${esc(t.jp)}</div>` : ''}
-    <div class="sub-meta">string <a href="/#${t.id}" target="_blank">#${t.id}</a>${t.pos ? ` · tiles ${t.pos.x0},${t.pos.y0}–${t.pos.x1},${t.pos.y1}` : ' · last fetched (no glyphs on screen)'}</div></div>`).join('')
+    <div class="sub-meta">string <a href="/#${t.id}" data-peek>#${t.id}</a>${t.pos ? ` · tiles ${t.pos.x0},${t.pos.y0}–${t.pos.x1},${t.pos.y1}` : ' · last fetched (no glyphs on screen)'}</div></div>`).join('')
     : `<div class="empty">${d.connected ? 'No text on screen.' : ''}</div>`;
 }
 
@@ -200,7 +214,7 @@ function renderTexts(list) {
   list.slice(0, 80).forEach((t, i) => {
     const e = document.createElement('div'); e.className = 'e';
     e.innerHTML = `<span class="id">#${t.id}</span><span>${esc(t.en || t.jp)}${t.en && t.jp ? `<div class="jp">${esc(t.jp)}</div>` : ''}</span>`;
-    e.onclick = () => window.open(`/#${t.id}`, '_blank');
+    e.onclick = () => peek(`/#${t.id}`);
     out.push(e);
     const older = list[i + 1];  // newest first: a break below marks where this screen began
     if (older && (older.scene !== t.scene || older.map !== t.map)) {
@@ -302,10 +316,33 @@ $('procrun').onclick = () => {
   const args = $('procargs').value.trim().split(/[\s,]+/).filter(Boolean).map(x => parseInt(x));
   cmd({ c: 'callproc', id, args });
 };
-$('inspect').onclick = async () => {
-  await cmd({ c: 'capture', name: 'live' });
-  setTimeout(() => peek(`/captures?t=${Date.now()}#live`), 900);
-};
+// The screen: capture it as "live" and inspect it here.
+const insp = new Inspector($('screenview'));
+let snapping = false;
+async function snap() {
+  if (snapping || !last?.connected) return;
+  snapping = true;
+  try {
+    const before = last?.events?.find(e => e.t === 'capture' && e.name === 'live')?.time;
+    await cmd({ c: 'capture', name: 'live' });
+    for (let k = 0; k < 20; k++) {  // wait for the capture event
+      await new Promise(r => setTimeout(r, 150));
+      const d = await fetch('/api/live').then(r => r.json());
+      const ev = d.events.find(e => e.t === 'capture' && e.name === 'live');
+      if (ev && ev.time !== before) break;
+    }
+    await insp.load('live');
+  } finally { snapping = false; }
+}
+$('snap').onclick = snap;
+$('follow').checked = localStore('follow') === '1';
+$('follow').onchange = () => localStore('follow', $('follow').checked ? '1' : '0');
+setInterval(() => { if ($('follow').checked) snap(); }, 2000);
+document.querySelectorAll('#style button').forEach(b => b.onclick = () => cmd({ c: 'subs', style: b.dataset.s }));
+$('subsize').oninput = () => { $('subsizev').textContent = (+$('subsize').value).toFixed(1) + '×'; };
+$('subsize').onchange = () => cmd({ c: 'subs', size: +$('subsize').value });
+$('suboff').oninput = () => { $('suboffv').textContent = $('suboff').value + ' px'; };
+$('suboff').onchange = () => cmd({ c: 'subs', offset: +$('suboff').value });
 $('capture').onclick = () => { cmd({ c: 'capture', name: $('capname').value.trim() || undefined }); $('capname').value = ''; setTimeout(poll, 800); };
 $('god').onclick = () => cmd({ c: 'god', on: !(last?.state?.god) });
 $('recbtn').onclick = () => last?.state?.rec ? cmd({ c: 'rec_stop' }) : cmd({ c: 'rec_start', name: $('recname').value || 'playthrough' });
