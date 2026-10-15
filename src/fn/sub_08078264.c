@@ -1,10 +1,8 @@
-#include "global.h"
-
-void Script_Call(u32, u32);
-
-void sub_08078264(u8 *p)
+#include "scene_actor_behavior.h"
+#define SceneActorBehavior_CallActionScript sub_08078264
+void SceneActorBehavior_CallActionScript(struct SceneActorBehaviorView *actor)
 {
-    u32 v = *(u16 *)(p + 0x1f0);
-    if (v)
-        Script_Call(v, 0);
+    u32 script = *(u16 *)&actor->script1F0;
+    if (script)
+        Script_Call(script, NULL);
 }
