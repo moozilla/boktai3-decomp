@@ -1,8 +1,8 @@
-#include "global.h"
-
-void SceneInputPanel_InitBackground(u8 *, s32, u8);
-
-void sub_08062BF4(u8 *p, s32 a)
+#include "scene_inventory_catalog.h"
+#include "scene_inventory_tail.h"
+#define SceneInventory_InitCatalogBackground sub_08062BF4
+void SceneInventory_InitCatalogBackground(struct SceneInventoryTail *p, s32 mode)
 {
-    SceneInputPanel_InitBackground(p, a, *(u8 *)(p + 0x1AB1));
+    SceneInputPanel_InitBackground(&p->display, mode,
+                                   ((struct SceneInventoryScriptCatalog *)p)->pageCount);
 }
