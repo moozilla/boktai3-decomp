@@ -6,13 +6,13 @@ and placement helpers and ends after the complete DB34 response body.
 
 ## Exact prefix and neighboring helpers
 
-The current worker has checked 16 entries / 1,880 bytes exactly. Of those,
+The current worker has checked 17 entries / 1,936 bytes exactly. Of those,
 **1,472 bytes are new exact C**: 1,280 ordinary C and 192 register-pinned bytes.
-The other 408 bytes were already exact (C374, C468, C53C, C644), and receive no
+The other 464 bytes were already exact (C374, C468, C53C, C644, D1E8), and receive no
 additional progress credit. This is approximately **+0.0610 percentage points**
 against the current code denominator; the integrator derives the authoritative
-whole-repo percentage after merging metadata. D1E8 is another 56-byte existing
-exact wrapper, still awaiting this cohort's typed review.
+whole-repo percentage after merging metadata. The adjacent core query
+0822B694 is also reviewed as existing exact and earns no additional credit.
 
 | Address | Size | Contract | Classification |
 |---|---:|---|---|
@@ -31,6 +31,7 @@ exact wrapper, still awaiting this cohort's typed review.
 | 0807C644 | 232 | Dispatch category-specific offset selector | Existing ordinary |
 | 0807CA00 | 68 | Test halfword-difference X/Z window | New ordinary |
 | 0807CD80 | 68 | Stable ascending signed-key candidate sort | New ordinary |
+| 0807D1E8 | 56 | Tagged-position lookup with grid fallback | Existing ordinary |
 | 0807D220 | 192 | Retarget to nearest non-null player | New register-pinned |
 
 `scene_actor_attachment.h` records the typed prefix APIs. C644 writes signed
@@ -46,7 +47,11 @@ Arguments to C11C are narrowed to bytes. Events 0 and 3 share one sound; event 1
 and event 2 choose the other sounds shown below. Category 10 also shares its
 first sound with event 1. Category 3 accepts variant bytes 0, 1, 3, or 5 only.
 Unsupported category/event/variant combinations do nothing. C374's first byte
-is an additional zero-valued gate.
+is an additional zero-valued gate. Its four arguments have word ABI formals and
+are explicitly narrowed to local bytes. Narrowing all four at the declaration
+boundary added unwanted caller instructions once the caller's hints obscured
+value ranges; word forwarding preserves the observed call sequence. Declaring
+the gate byte local first also preserves C374's ordinary exact prologue.
 
 | Category | Events 0/3 | Event 1 | Event 2 |
 |---|---:|---:|---:|
@@ -101,3 +106,31 @@ CA44 places a route-related target on terrain and attempts contact/position
 resolution, then selects route or response control. CDC4 builds/sorts position
 candidates before another search. D2E0 and DB34 are large response/state bodies;
 subsystem names beyond their observed effects remain tentative.
+
+## Tagged-position query ABI and remaining preconditions
+
+0822B694 reads an entry in the active 16-byte-stride table at 030025FC, writes
+X/zero-Y/Z to the output, and returns its 16-bit tag. Its ABI return is a **word
+containing a zero-extended 16-bit value**: declaring u16 at D1E8 added a pair of
+caller narrowing shifts absent from the ROM. The corrected core returns u32 and
+still matches all 52 bytes. The index is also a word formal, narrowed to a byte
+before sign extension to the stride; D1E8 explicitly passes a signed-byte index.
+The core's left shift now uses unsigned arithmetic before the signed right shift,
+removing the old signed-left-shift overflow while preserving the exact code.
+
+D1E8 writes the tag to +18 and invokes CDC4 with the same input/output vector at
++0C only for tag B546. This is a tagged-position fallback wrapper, not a script
+result wrapper. The table index must refer to valid table storage; no new bounds
+check is invented. If the table is absent, the core returns zero without writing
+the vector. Both core and wrapper remain ordinary exact C.
+
+C72C remains held despite its close candidate: the selector leaves automatic
+local offsets untouched for unsupported categories. An inventory found 81 direct
+ROM calls, with 41 literal frame127 release calls (which never read those offsets)
+and 40 other contexts, mostly forwarding actor category98. The reviewed 78EE8
+activation branch excludes categories2/25 but does **not** establish the supported
+selector set; 78BB4's three observed dispatcher callers likewise provide no local
+category restriction. This is not evidence for unrestricted defined scalar reads.
+A broader constructor/configuration proof remains outstanding; no default offsets
+or additional exact credit are claimed. The bounded permuter runs on the preserved
+conditional candidate while that evidence gap is retained explicitly.
