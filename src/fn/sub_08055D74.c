@@ -1,19 +1,9 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x1bc];
-    u32 a;
-    u8 g[0x1d0 - 0x1c0];
-    u32 b;
-};
-void Task_Kill(struct S *);
-void sub_0824923C(struct S *, u32);
-
-s32 sub_08055D74(struct S *p)
+#include "stage_icon_display.h"
+s32 StageIconDisplay_Tick(struct StageIconDisplay *display)
 {
-    if (p->a)
-        Task_Kill(p);
+    if (display->killRequested)
+        Task_Kill(display);
     else
-        sub_0824923C(p, p->b);
+        display->update(display);
     return 0;
 }

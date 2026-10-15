@@ -1,13 +1,10 @@
-#include "global.h"
-extern u32 gUnk_030053F4;
-void sub_0821AAD8(u32 *);
-void sub_0821B4C8(u32 *, u32, u32);
-void sub_08056D38(void)
+#include "script_utility.h"
+void ScriptUtility_WriteFlag800ToReference(void)
 {
-    u32 buf[2];
-    sub_0821AAD8(buf);
+    struct ScriptUtilityReference reference;
+    sub_0821AAD8(&reference);
     if (gUnk_030053F4 & 0x800)
-        sub_0821B4C8(buf, 0, 1);
+        sub_0821B4C8(&reference, 0, 1);
     else
-        sub_0821B4C8(buf, 0, 0);
+        sub_0821B4C8(&reference, 0, 0);
 }

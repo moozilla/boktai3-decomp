@@ -1,15 +1,15 @@
-#include "global.h"
-void Effect_Remove(u8 *);
-u32 sub_080569D8(u8 *p)
+#include "terrain_edge_marker.h"
+void Effect_Remove(void *);
+s32 TerrainEdgeMarker_DestroyManager(struct TerrainMarkerManager *manager)
 {
     s32 i = 0;
-    if (i < *(u16 *)(p + 0x1C)) {
-        u8 *q = p + 0x20;
+    if (i < manager->count) {
+        struct TerrainMarkerSprite *marker = manager->markers;
         do {
-            Effect_Remove(q);
-            q += 0x28;
+            Effect_Remove(marker);
+            marker++;
             i++;
-        } while (i < *(u16 *)(p + 0x1C));
+        } while (i < manager->count);
     }
     return 0;
 }

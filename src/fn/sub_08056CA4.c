@@ -1,13 +1,10 @@
-#include "global.h"
-s32 Script_SeekToKeyword(s32);
-s32 Script_GetValue(void);
-void sub_08056C6C(s32);
-void sub_08056CA4(void)
+#include "script_utility.h"
+void ScriptUtility_SetControlFlagFromScript(void)
 {
-    s32 v;
-    if (Script_SeekToKeyword(0x70))
-        v = Script_GetValue();
+    s32 value;
+    if (Script_SeekToKeyword('p'))
+        value = Script_GetValue();
     else
-        v = 0;
-    sub_08056C6C(v);
+        value = 0;
+    ScriptUtility_SetControlFlag(value);
 }

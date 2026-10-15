@@ -1,19 +1,14 @@
-#include "global.h"
-u8 *Task_Create(u32, u32);
-void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
-s32 sub_08056E0C(u8 *);
-void Task_Kill(u8 *);
-void sub_08056DBC(void);
-void sub_08056DFC(void);
-u8 *sub_08056EE4(void)
+#include "shake_icon_display.h"
+struct ShakeIconDisplay *ShakeIconDisplay_CreateFromScript(void)
 {
-    u8 *p = Task_Create(9, 0xb0);
-    if (p != 0) {
-        Task_SetCallbacks(p, sub_08056DBC, sub_08056DFC);
-        if (sub_08056E0C(p) != 0) {
-            Task_Kill(p);
+    struct ShakeIconDisplay *display = Task_Create(9, sizeof(struct ShakeIconDisplay));
+    if (display) {
+        Task_SetCallbacks(display, (void (*)(void *))ShakeIconDisplay_Tick,
+                          (void (*)(void *))ShakeIconDisplay_Destroy);
+        if (ShakeIconDisplay_Initialize(display) != 0) {
+            Task_Kill(display);
             return 0;
         }
     }
-    return p;
+    return display;
 }
