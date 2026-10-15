@@ -1,14 +1,11 @@
-#include "global.h"
-s32 Script_GetValue(void);
-u8 *Script_GetPc(void);
-void sub_0821AAD8(u32 *);
-void sub_0821B4C8(u32 *, s32, s32);
-s32 sub_08056A60(void)
+#include "script_utility.h"
+#define ScriptUtility_WriteValuesToReference sub_08056A60
+s32 ScriptUtility_WriteValuesToReference(void)
 {
-    u32 buf[2];
+    struct ScriptUtilityReference reference;
     s32 i;
-    sub_0821AAD8(buf);
+    sub_0821AAD8(&reference);
     for (i = 0; Script_GetPc() != 0; i++)
-        sub_0821B4C8(buf, i, Script_GetValue());
+        sub_0821B4C8(&reference, i, Script_GetValue());
     return 0;
 }
