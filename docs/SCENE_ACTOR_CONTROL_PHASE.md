@@ -54,3 +54,12 @@ and disables the shadow. Every call then invokes callback270 and increments
 counter2AC only when its low-byte result is zero. The callback's effect is not
 inferred from its result alone. The seven new bodies now recover976 bytes
 (+0.0404 percentage points):268 ordinary and708 register-pinned.
+
+83224 matches304 register-pinned bytes. State-changed2B1 installs shadow-return
+callback82CA8/kind35, clears flag100000 in2D0, and initializes secondary motion:
+X/Z use the sine table at heading+64/heading, scaled by4 then divided toward
+zero by4096; Y is cleared before being set to10. If2B0 is set and signed2EA is
+below the context halfword3D8 minus20, it calls84044; otherwise it increments
+the counter. This is a threshold relation, not yet a confirmed physical height.
+The eight new bodies total1280 bytes (+0.0530 percentage points), of which268
+are ordinary and1012 register-pinned.
