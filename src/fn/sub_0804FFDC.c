@@ -1,14 +1,8 @@
-#include "global.h"
-
-struct S {
-    u8 filler[0x18];
-    u16 v;
-};
-extern struct S *gUnk_02000110;
-
-s32 sub_0804FFDC(struct S *p)
+#include "repeated_effect.h"
+#define RepeatedEffect_InitManager sub_0804FFDC
+s32 RepeatedEffect_InitManager(struct RepeatedEffectManager *manager)
 {
-    p->v = 0;
-    gUnk_02000110 = p;
+    manager->count = 0;
+    gUnk_02000110 = manager;
     return 0;
 }
