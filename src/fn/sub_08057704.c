@@ -1,9 +1,7 @@
-#include "global.h"
-
-void Anim_Remove(u8 *);
-
-u32 sub_08057704(u8 *p)
+#include "proximity_icon.h"
+#define ProximityIcon_Destroy sub_08057704
+u32 ProximityIcon_Destroy(struct ProximityIcon *icon)
 {
-    Anim_Remove(p + 0x1C);
+    Anim_Remove(&icon->animation);
     return 0;
 }
