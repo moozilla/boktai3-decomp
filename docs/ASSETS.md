@@ -21,7 +21,7 @@ Types whose extension is known (the type is the hash of the string):
 |---|---|---|---|---|
 | `922E` | `anm` | `08614DCC` | 75 | animation scripts |
 | `92B3` | palette | `088223C4` | 195 | palettes: 20-byte header + 16 × 16 colours (532 B each) |
-| `9B1B` | ? | `08D530DC` | 1 | 30 KB blob |
+| `9B1B` | ? | `08D530DC` | 1 | sprite palette pool: `u16 count` (955), `u16 ?` (183), then 16-colour sub-palettes (below) |
 | `98F5` | ? | `08A2D944` | 1 | 1.7 MB: 381 large sprites (enemies, props, boss parts; below) |
 | `A635` | `fnt` | `089F8ED8` | 1 | font |
 | `A8D9` | `gcx` | `08D5A85C` | — | compiled scripts, a single image (MGS's GCL file extension); not an archive (below) |
@@ -49,18 +49,37 @@ its five offsets.
 
 | Offset | Content |
 |---|---|
-| `+0x00` | `u16 h0` (unknown), then counts: frames, animations, parts, keys, tiles |
+| `+0x00` | `u16` palette: the `9B1B` pool entry of palette bank 0, then counts: frames, animations, parts, keys, tiles |
 | `+0x0C` | frames, 20 B: `u16 id, u16 parts, u32 ?, s16 x, s16 y, u16 w, u16 h, u32 part offset` |
 | `+0x10` | animations, 8 B: `u16 id, u16 keys, u32 key offset` |
-| `+0x14` | parts, 8 B: `u16 attr, s16 x, s16 y, u16 OAM attr2` |
+| `+0x14` | parts, 8 B: `u16 attr, s16 x, s16 y, u16 tile 0-11 / palette bank 12-15` |
 | `+0x18` | keys, 4 B: `u16 frame index, u16 duration` |
 | `+0x1C` | 4bpp tiles, stored as a sheet 16 tiles wide |
 
 A part's `attr` is `size << 10 | shape << 8 | vflip << 3 | hflip << 2` (GBA OBJ
-shape and size); its last word is OAM attribute 2 (tile in bits 0-9, priority
-10-11, palette 12-15). An OBJ's tile rows are 16 tiles apart in the sheet.
-Palettes are not in the package; the renders below borrow OBJ palette RAM from
-a field scene (`dump 05000200:200` in the harness), so colours can be wrong.
+shape and size); its last word is a 12-bit tile number and a palette bank in
+bits 12-15. Eight packages have more than 1024 tiles (`DE23` has 4096) and use
+bits 10-11 of the tile number; reading it as OAM attribute 2 (10-bit tile)
+drew the wrong tiles, for example two bodies for Django. An OBJ's tile rows
+are 16 tiles apart in the sheet.
+
+**Sprite palettes.** A package's first word is its palette: part bank `b` uses
+entry `word0 + b` of the `9B1B` pool (Django `DE23`: 42; the title screen
+`731D`: 785). The palette manager (`sub_08217430` and neighbours) copies pool
+entries into OBJ banks as sprites need them: IWRAM `0x030051F0` holds the
+pool entry per OBJ bank (`0x030051CC` a count), `0x03004DC0` the shadow of OBJ
+palette RAM (`0x03004FC0` of BG palette RAM), faded or tinted before it is
+copied to the hardware. Across 359 captures, 2,297 of 5,493 used banks equal
+their pool entry exactly; the rest are fades (survey warps caught mid-fade)
+and a few banks flagged with the high bit (`0xB100`). The package word is a
+default: 618 sprite/bank pairs follow it, while menus draw some UI packages
+with other entries (`1289` buttons with entry 939, not 807). Large sprites
+(`98F5`) carry no palette; captures record which entry their bank held
+(`build/centaur/sprite_palettes.json`, `pool`).
+
+**Stage palettes** are named by the scripts: a stage load `proc_884(map,
+tileset, hp)` is followed by `proc_888(palette, 0, 0)` (194 stages); 104 of the
+166 palettes learned from captures equal that argument.
 
 ### What the packages show (tentative, from renders)
 

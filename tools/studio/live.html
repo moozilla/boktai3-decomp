@@ -54,6 +54,9 @@ button:disabled { opacity: .45; cursor: default; }
 .res .pv { width: 52px; height: 36px; background: var(--stage); border-radius: 4px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 .res .pv canvas { image-rendering: pixelated; }
 .res .lab { color: var(--accent); font-size: 12px; }
+.chips { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
+.chips button { font-size: 12px; padding: 2px 9px; border-radius: 99px; }
+.chips button.on { background: var(--sel); border-color: var(--accent); }
 .thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; }
 .thumb { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; cursor: pointer; background: var(--stage); }
 .thumb img { width: 100%; display: block; image-rendering: pixelated; aspect-ratio: 3/2; object-fit: cover; }
@@ -86,12 +89,12 @@ code { font-size: 12px; }
       <div class="row" style="margin-top:10px">
         <input id="capname" placeholder="capture label" style="width:10em">
         <button id="capture" class="primary">Capture scene</button>
+        <button id="inspect" title="Capture the screen as &quot;live&quot; and open it: every sprite, layer and palette">Inspect screen</button>
         <button id="god">God mode</button>
       </div>
       <div class="row">
         <input id="recname" placeholder="recording name" style="width:10em">
         <button id="recbtn">Record from here</button>
-        <label class="howto"><input type="checkbox" id="recreset"> from power-on (for the harness)</label>
       </div>
       <div class="row">
         <input id="procid" placeholder="procedure #" style="width:7.5em">
@@ -113,6 +116,7 @@ code { font-size: 12px; }
     </div>
     <div class="card">
       <h2>Resources loaded <span class="sp"></span><span class="aside">click to open beside this page</span></h2>
+      <div class="chips" id="reschips"></div>
       <div class="log res" id="res"><div class="empty">Nothing yet.</div></div>
     </div>
   </section>
@@ -154,7 +158,7 @@ async function poll() {
   document.querySelectorAll('#mode button').forEach(b => b.classList.toggle('on', b.dataset.m === (st.mode || 'en')));
   $('god').textContent = st.god ? 'God mode: on' : 'God mode';
   $('recbtn').textContent = st.rec ? 'Stop recording' : 'Record from here';
-  ['capture', 'god', 'recbtn', 'bmsave', 'procrun'].forEach(id => $(id).disabled = !d.connected);
+  ['capture', 'inspect', 'god', 'recbtn', 'bmsave', 'procrun'].forEach(id => $(id).disabled = !d.connected);
   renderNow(d, st);
   const mapNote = st.map && noteOf('map', st.map)?.label;
   $('game').innerHTML = [
@@ -209,22 +213,21 @@ function renderTexts(list) {
 }
 
 // Resource rows with a small preview, opening in the peek panel.
-const archiveOf = r => index[r.label] ? r.label : index['t' + r.type] ? 't' + r.type : null;
 function resHref(r) {
   if (r.label === 'spr') return gfxHref('spr', r.name);
   if (r.label === 'bigspr') return gfxHref('big', r.name);
   if (r.label === 'map') return gfxHref('map', r.name);
   if (r.label === 'pal') return gfxHref('pal', r.name);
-  const a = archiveOf(r);
-  return a ? `/gfx#tiles/${a}:${r.name}` : null;
+  const a = archiveFor(r.label, r.type, index);
+  return a && (index[a] || []).some(([h]) => h === r.name) ? `/gfx#data/${a}:${r.name}` : null;
 }
 const previews = new Map();
 async function preview(r) {
   const k = r.label + r.name;
   if (!previews.has(k)) previews.set(k, (async () => {
     if (r.label === 'spr') {
-      const pkg = parsePackage(await res('tCB05', r.name)), f = pkg.frames.find(f => f.n);
-      const img = f && compose(pkg.parts(f), PREVIEW_COLORS(r.label, r.name));
+      const b = await res('tCB05', r.name), pkg = parsePackage(b), f = pkg.frames.find(f => f.n);
+      const img = f && compose(pkg.parts(f), await packageColors(b));
       return img && fitCanvas(toCanvas(img), 36);
     }
     if (r.label === 'pal') {
@@ -237,16 +240,23 @@ async function preview(r) {
   })().catch(() => null));
   return previews.get(k);
 }
-let learnedSprites = {};
-const PREVIEW_COLORS = (kind, h) => {
-  const c = learnedPalette(learnedSprites[`${kind}:${h}`]);
-  if (c) return c;
-  return Array.from({ length: 256 }, (_, i) => { const v = (i & 15) * 17; return [v, v, v]; });
-};
-function renderRes(list) {
-  const key = JSON.stringify(list.slice(0, 40));
+let learnedSprites = {}, resFilter = localStore('resfilter') || '';
+function renderRes(all) {
+  const kinds = [...new Set(all.map(r => r.t === 'tileset' ? 'tiles' : r.label))].sort();
+  const ck = kinds.join() + resFilter;
+  if (sig.chips !== ck) {
+    sig.chips = ck;
+    $('reschips').replaceChildren(...['', ...kinds].map(k => {
+      const b = document.createElement('button'); b.textContent = k || 'all'; b.className = k === resFilter ? 'on' : '';
+      b.title = RES_TYPES[k] || RES_TYPES['t' + (all.find(r => r.label === k)?.type || '')] || '';
+      b.onclick = () => { resFilter = k; localStore('resfilter', k); sig.res = null; sig.chips = null; renderRes(last.res); };
+      return b;
+    }));
+  }
+  const list = resFilter ? all.filter(r => (r.t === 'tileset' ? 'tiles' : r.label) === resFilter) : all;
+  const key = JSON.stringify(list.slice(0, 40)) + resFilter;
   if (sig.res === key) return; sig.res = key;
-  if (!list.length) return;
+  if (!list.length) { $('res').innerHTML = '<div class="empty">Nothing of this type yet.</div>'; return; }
   $('res').replaceChildren(...list.slice(0, 60).map(r => {
     const e = document.createElement('div'); e.className = 'e';
     if (r.t === 'tileset') { e.innerHTML = `<span class="id">${r.frame}</span><span class="pv"></span><span>tiles <code>${esc(r.ids.join(', '))}</code></span>`; return e; }
@@ -292,9 +302,13 @@ $('procrun').onclick = () => {
   const args = $('procargs').value.trim().split(/[\s,]+/).filter(Boolean).map(x => parseInt(x));
   cmd({ c: 'callproc', id, args });
 };
+$('inspect').onclick = async () => {
+  await cmd({ c: 'capture', name: 'live' });
+  setTimeout(() => peek(`/captures?t=${Date.now()}#live`), 900);
+};
 $('capture').onclick = () => { cmd({ c: 'capture', name: $('capname').value.trim() || undefined }); $('capname').value = ''; setTimeout(poll, 800); };
 $('god').onclick = () => cmd({ c: 'god', on: !(last?.state?.god) });
-$('recbtn').onclick = () => last?.state?.rec ? cmd({ c: 'rec_stop' }) : cmd({ c: 'rec_start', name: $('recname').value || 'playthrough', from: $('recreset').checked ? 'reset' : undefined });
+$('recbtn').onclick = () => last?.state?.rec ? cmd({ c: 'rec_stop' }) : cmd({ c: 'rec_start', name: $('recname').value || 'playthrough' });
 $('bmsave').onclick = () => { cmd({ c: 'bookmark', name: $('bmname').value || undefined }); $('bmname').value = ''; };
 
 let sceneList = [];
