@@ -47,7 +47,7 @@ ActorAttachment_CreateValueSpriteSlot(u32 incomingFrame, struct ContactPosition 
     thresholdCount = countLow;
     existing = gUnk_02000124;
     if (!existing) {
-        manager = sub_08066C34();
+        manager = ActorAttachment_CreateManager();
         if (manager)
             goto gotManager;
     failed:
@@ -63,7 +63,7 @@ gotManager:
     asm("" : "+r"(slot));
     framePointer = &slot->frame;
     *framePointer = frame;
-    slot->active = 1;
+    slot->flags31 = 1;
     slot->position.y = savedY;
     actionLow = &slot->action;
     *actionLow = action;
@@ -75,7 +75,7 @@ gotManager:
         asm("" : "+r"(thresholdLow));
         *thresholdLow = threshold;
     }
-    activeLow = &slot->unknown48[0];
+    activeLow = &slot->active48;
     *activeLow = 1;
     {
         register u32 offset asm("r3") = 0x134;
@@ -224,7 +224,7 @@ gotManager:
             {
                 u32 action = *lowAction;
                 lowFollow = followPointer;
-                sub_08064C48(resource, action, (*lowFollow)->direction, &xOffset, &zOffset,
+                ActorAttachment_GetActionOffset(resource, action, (*lowFollow)->direction, &xOffset, &zOffset,
                              slot->source);
             }
             slot->offset.x = xOffset;
@@ -289,7 +289,7 @@ gotManager:
         gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
         {
             u32 offset = gUnk_03005308 * 2;
-            register u16 *table asm("r2");
+            register const u16 *table asm("r2");
             table = gUnk_0203B400;
             Mod(*(u16 *)(offset + (u32)table), 3);
         }
