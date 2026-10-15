@@ -1,12 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_helpers.h"
-#define SceneActorControl_StartStoredCurve sub_080849DC
 void SceneActorControl_StartStoredCurve(struct SceneActorRegistryResetView *actor)
 {
     struct ContactPosition position;
     gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
     position = *(struct ContactPosition *)((u8 *)actor + 0x2FC);
-    sub_08083E98(actor, &position);
+    SceneActorControl_StartPositionCurve(actor, &position);
     {
         u32 state = 2;
         u32 behavior = 3;

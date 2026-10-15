@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_helpers.h"
-#define SceneActorControl_SetCollisionResponse sub_08084180
 void SceneActorControl_SetCollisionResponse(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *actor = input;

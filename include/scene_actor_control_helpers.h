@@ -16,7 +16,7 @@ static inline u8 SceneActorControl_TestFlags(u32 flags, u32 mask)
         return 1;
     return 0;
 }
-void sub_08084180(struct SceneActorRegistryResetView *);
-void sub_08084044(struct SceneActorRegistryResetView *);
+void SceneActorControl_SetCollisionResponse(struct SceneActorRegistryResetView *);
+void SceneActorControl_RestartPositionCurve(struct SceneActorRegistryResetView *);
 void sub_08083F5C(struct SceneActorRegistryResetView *);
 #endif

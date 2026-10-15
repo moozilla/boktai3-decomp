@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_helpers.h"
-#define SceneActorControl_ConsumePendingEntry sub_08084DB8
 static inline u32 TakeEntry(struct SceneActorRegistryResetView *actor)
 {
     if (actor->field2B1) {
