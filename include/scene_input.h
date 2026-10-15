@@ -6,6 +6,12 @@
 struct SceneInputResource {
     u32 words[8];
 };
+struct SceneInputPosition {
+    s16 x, y, z, pad;
+} __attribute__((aligned(4)));
+struct SceneInputPackedPosition {
+    u32 x : 16, y : 16, z : 16;
+};
 struct SceneInputWidget {
     u8 unknown0[8];
     u32 flags;
@@ -20,13 +26,10 @@ struct SceneInputWidget {
 struct SceneInputPair {
     struct SceneInputResource resource;
     struct SceneInputWidget widgets[2];
+    struct SceneInputPosition targets[2];
+    u16 frame,duration;
 };
-struct SceneInputPosition {
-    s16 x, y, z, pad;
-} __attribute__((aligned(4)));
-struct SceneInputPackedPosition {
-    u32 x : 16, y : 16, z : 16;
-};
+
 extern u16 gUnk_03005260[];
 s32 sub_08219728(void *, void *, u32);
 void sub_0821983C(void *, void *, u32, u32, u32, u32, u32, void *);
