@@ -1,11 +1,10 @@
-#include "global.h"
-void sub_0824923C(u8 *, u32);
-void sub_08063B24(u8 *);
-void sub_08225B74(u8 *);
-u32 sub_08063C60(u8 *p)
+#include "roaming_object.h"
+void RoamingObject_UpdateAnimation(struct RoamingObject *);
+void sub_08225B74(void *);
+u32 RoamingObject_Tick(struct RoamingObject *owner)
 {
-    sub_0824923C(p, *(u32 *)(p + 0x140));
-    sub_08063B24(p);
-    sub_08225B74(p + 0x1c);
+    sub_0824923C(owner, (void (*)(void *))owner->update);
+    RoamingObject_UpdateAnimation(owner);
+    sub_08225B74((u8 *)owner + 0x1C);
     return 0;
 }

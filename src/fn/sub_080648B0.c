@@ -1,6 +1,6 @@
-#include "global.h"
+#include "actor_attachment.h"
 
-void sub_080648B0(s32 k, s32 *a, s32 *b, s32 d)
+void ActorAttachment_GetAction4Offset(s32 k, s32 *a, s32 *b, s32 d)
 {
     switch (k) {
         case 0:

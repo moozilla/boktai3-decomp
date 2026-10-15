@@ -1,6 +1,7 @@
-#include "global.h"
+#include "actor_attachment.h"
+#define ActorAttachment_GetUnusedOffset sub_08064B20
 
-void sub_08064B20(s32 kind, s32 *x, s32 *y, s32 dir)
+void ActorAttachment_GetUnusedOffset(s32 kind, s32 *x, s32 *y, s32 dir)
 {
     switch (kind) {
         case 0:

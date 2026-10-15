@@ -25,6 +25,33 @@ FUNC_START = re.compile(r"^\t(?:thumb|arm|non_word_aligned_thumb)_func_start (\S
 FUNC_LABEL = re.compile(r"^(\w+): @ 0x([0-9A-F]{8})")
 LABEL = re.compile(r"^(\w+):")
 SET_LABEL = re.compile(r"^\t\.set (\w+),")
+NONENTRIES = os.path.join(ROOT, "symbols", "function_nonentries.csv")
+
+
+def function_nonentries(path=NONENTRIES):
+    """Reviewed disassembler labels inside real function bodies."""
+    if not os.path.exists(path):
+        return set()
+    entries = set()
+    with open(path, newline="") as source:
+        for row in csv.DictReader(source):
+            address = int(row["address"], 16)
+            if (address in entries or address & 1 or
+                    not 0x08000000 <= address < 0x0824DAFA or not row["evidence"].strip()):
+                raise ValueError("invalid reviewed non-entry boundary")
+            entries.add(address)
+    return entries
+
+
+def remove_nonentry_starts(code, addresses):
+    """Keep interior labels/instructions, removing only their function directive."""
+    result = []
+    for i, line in enumerate(code):
+        label = FUNC_LABEL.match(code[i + 1]) if i + 1 < len(code) else None
+        if FUNC_START.match(line) and label and int(label.group(2), 16) in addresses:
+            continue
+        result.append(line)
+    return result
 C_FUNC = re.compile(r"^(?!static\b)[A-Za-z_][\w \*]*?\b(\w+)\s*\([^;]*\)\s*$|^(?!static\b)[A-Za-z_][\w \*]*?\b(\w+)\s*\([^;]*\)\s*\{", re.M)
 
 
@@ -221,6 +248,7 @@ def apply_extra_boundaries(code, path):
 
 def main():
     code = open(os.path.join(ROOT, "gen", "code_sym.s")).read().split("\n")
+    code = remove_nonentry_starts(code, function_nonentries())
     boundary_path = os.path.join(ROOT, "symbols", "build_extra_functions.csv")
     code = apply_extra_boundaries(code, boundary_path)
     with open(boundary_path, newline="") as source:

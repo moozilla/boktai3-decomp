@@ -1,21 +1,17 @@
-#include "global.h"
-
-void SceneInputPanel_HighlightPrompt(u8 *, u8 *);
-s32 SceneInput_TickChoice(u8 *, u8 *, u8 *, u8 *);
-void Sound_PlaySong(s32);
-void sub_080619D4(u8 *);
-void sub_08061B48(u8 *);
-
-s32 sub_080623C0(u8 *p)
+#include "scene_inventory_tail.h"
+void SceneInventory_BeginCatalogTransition(struct SceneInventoryTail *);
+void SceneInventory_BeginAlternateSelection(struct SceneInventoryTail *);
+s32 SceneInventory_TickPurchaseConfirmation(struct SceneInventoryTail *p)
 {
-    s32 r;
-    SceneInputPanel_HighlightPrompt(p, p + 0x1D00);
-    r = SceneInput_TickChoice(p + 0x1C8, p + 0x20, p + 0x1AAA, p + 0x1AAF);
-    if (r == 1) {
-        sub_080619D4(p);
-    } else if (r == 0) {
-        Sound_PlaySong(0xde);
-        sub_08061B48(p);
+    s32 result;
+    SceneInputPanel_HighlightPrompt(&p->display, p->highlight.colors);
+    result = SceneInput_TickChoice(&p->display.prompt, &p->display.widgetResource, &p->choiceState,
+                                   &p->choiceRepeat);
+    if (result == 1)
+        SceneInventory_BeginCatalogTransition(p);
+    else if (result == 0) {
+        Sound_PlaySong(0xDE);
+        SceneInventory_BeginAlternateSelection(p);
     }
     return 0;
 }
