@@ -2,14 +2,28 @@
 #define GUARD_ROUTE_SPRITE_ACTOR_H
 #include "contact_swarm.h"
 /* Tentative four-slot route-driven actor pool; visual/story identity is unknown. */
+struct RouteSpriteRouteResource {
+    u8 pointCount, unknown1;
+    u16 pointsOffset;
+};
+struct RouteSpriteRoutePoint {
+    s16 x, z;
+    u16 flags;
+    u8 unknown6[2];
+};
+struct RouteSpriteRoute {
+    u8 unknown0, unknown1, index, ended;
+    const struct RouteSpriteRouteResource *resource;
+    const struct RouteSpriteRoutePoint *current;
+};
 struct RouteSpriteActor {
     struct ContactSwarmSprite sprite;
     u8 graphics[0x1C];
     struct DisplaySequenceState sequence;
-    u8 route[0xC];
+    struct RouteSpriteRoute route;
     u8 shadow[0x6C];
     struct ContactPosition elevatedPosition;
-    u8 unknownD8[0x68];
+    struct ContactPosition waypoints[12], endpoint;
     struct ContactPosition target, savedPosition;
     u16 flags150;
     u8 state;
@@ -18,7 +32,7 @@ struct RouteSpriteActor {
     u8 entered, positionChanged, animationEnded, heading;
     s8 angle;
     s8 shadowAbsent;
-    u8 unknown15C, kind, option, variant;
+    u8 waypointIndex, kind, option, variant;
     u32 parameter;
     s16 amount;
     u8 prepared, unknown167;
