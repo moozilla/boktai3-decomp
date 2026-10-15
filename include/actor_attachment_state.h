@@ -26,7 +26,7 @@ struct ActorAttachmentSlotView {
     s16 timer, thresholds[3];
     u8 unknown48[4];
     s16 *value;
-    u32 counters[3];
+    s32 counters[3];
     void *source;
     struct ContactSwarmSprite sprite;
     struct ActorAttachmentPartSprite parts[3];
@@ -50,4 +50,7 @@ static inline u8 ActorAttachment_TestByteFlags(const u8 *flags, u32 mask)
         return TRUE;
     return FALSE;
 }
+void sub_08064D40(struct ActorAttachmentSlotView *, s32);
+void sub_080645D4(struct ActorAttachmentSlotView *);
+void sub_08217EAC(struct ActorAttachmentPartSprite *);
 #endif
