@@ -1,5 +1,4 @@
 #include "scene_panel_subject.h"
-#define ScenePanelSubject_KeepPlayerOutside sub_0805CC44
 void ScenePanelSubject_KeepPlayerOutside(struct ScenePanelSubjectView *subject)
 {
     s32 x = SCENE_PANEL_PLAYER->position.x - subject->home.x;

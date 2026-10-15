@@ -32,9 +32,9 @@ s32 ScenePanel_DestroyLifecycle(struct ScenePanelLifecycleView *);
 s32 ScenePanel_InitializeLifecycle(struct ScenePanelLifecycleView *);
 s32 Math_Atan2(s32, s32);
 void Sound_PlaySong(u32);
-struct ScenePanel *sub_0805CB38(u32);
-void sub_0805CBD4(struct ScenePanelSubjectView *);
-void sub_0805CC44(struct ScenePanelSubjectView *);
-void sub_0805CCF0(struct ContactCollider *, struct ContactCollider *, void *);
+struct ScenePanel *ScenePanel_Create(u32);
+void ScenePanelSubject_ResetPosition(struct ScenePanelSubjectView *);
+void ScenePanelSubject_KeepPlayerOutside(struct ScenePanelSubjectView *);
+void ScenePanelSubject_ApplyContact(struct ContactCollider *, struct ContactCollider *, void *);
 void sub_0805CD60(struct ScenePanelSubjectView *);
 #endif

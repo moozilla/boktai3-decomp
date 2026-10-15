@@ -1,5 +1,4 @@
 #include "scene_panel_subject.h"
-#define ScenePanelSubject_SetState sub_0805CB88
 void ScenePanelSubject_SetState(struct SceneRigSubject *owner, u32 state)
 {
     struct ScenePanelSubjectView *subject = (void *)owner;

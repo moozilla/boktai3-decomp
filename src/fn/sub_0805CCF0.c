@@ -1,5 +1,4 @@
 #include "scene_panel_subject.h"
-#define ScenePanelSubject_ApplyContact sub_0805CCF0
 void ScenePanelSubject_ApplyContact(struct ContactCollider *contact, struct ContactCollider *other,
                                     void *owner)
 {
@@ -14,7 +13,7 @@ void ScenePanelSubject_ApplyContact(struct ContactCollider *contact, struct Cont
             subject->contactProgress += amount;
             if (subject->contactProgress >= subject->contactLimit) {
                 subject->contactProgress = subject->contactLimit;
-                sub_0805CB88((void *)subject, 3);
+                ScenePanelSubject_SetState((void *)subject, 3);
             } else {
                 subject->contactCooldown = 12;
                 Sound_PlaySong(0x127);

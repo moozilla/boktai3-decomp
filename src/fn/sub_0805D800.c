@@ -1,15 +1,14 @@
 #include "scene_panel_subject_tail.h"
-#define ScenePanelSubject_Update sub_0805D800
 s32 ScenePanelSubject_Update(struct ScenePanelSubjectView *subject)
 {
     if (subject->state)
-        sub_0805CC44((void *)subject);
+        ScenePanelSubject_KeepPlayerOutside((void *)subject);
     if (subject->timer)
         subject->timer--;
     if (subject->contactCooldown)
         subject->contactCooldown--;
     subject->update(subject);
-    sub_0805D770(subject);
+    ScenePanelSubject_UpdatePaletteBank(subject);
     {
         u16 *hold = &subject->hold;
         if (*hold) {

@@ -1,5 +1,4 @@
 #include "scene_panel_subject.h"
-#define ScenePanel_Create sub_0805CB38
 struct ScenePanel *ScenePanel_Create(u32 actorId)
 {
     struct ScenePanel *panel;

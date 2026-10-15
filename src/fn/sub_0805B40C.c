@@ -62,7 +62,7 @@ void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *input)
         if (i < panel->subjectCount) {
             struct ScenePanelInteractionSubject **subject = panel->subjects;
             do {
-                sub_0805CB88((void *)*subject++, 1);
+                ScenePanelSubject_SetState((void *)*subject++, 1);
                 i++;
             } while (i < panel->subjectCount);
         }

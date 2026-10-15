@@ -1,5 +1,4 @@
 #include "scene_panel_subject_tail.h"
-#define ScenePanelSubject_UpdatePaletteBank sub_0805D770
 void ScenePanelSubject_UpdatePaletteBank(struct ScenePanelSubjectView *subject)
 {
     if (subject->requested) {

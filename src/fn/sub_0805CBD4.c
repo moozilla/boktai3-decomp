@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_panel_subject.h"
-#define ScenePanelSubject_ResetPosition sub_0805CBD4
 void ScenePanelSubject_ResetPosition(struct ScenePanelSubjectView *subject)
 {
     s32 offset;
