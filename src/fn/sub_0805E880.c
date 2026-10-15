@@ -1,5 +1,4 @@
 #include "scene_input_navigation.h"
-#define SceneInput_MoveDown sub_0805E880
 u32 SceneInput_MoveDown(struct SceneInputGridView *grid)
 {
     s32 base = grid->cells[grid->cursorY + grid->cursorX * 4];
@@ -8,7 +7,7 @@ u32 SceneInput_MoveDown(struct SceneInputGridView *grid)
         s32 v = grid->cells[i + grid->cursorX * 4];
         if (v >= 0 && v != base) {
             grid->cursorY = i;
-            grid->selection = sub_0805E5D0(grid);
+            grid->selection = SceneInput_GetGridSelection(grid);
             Sound_PlaySong(0xdc);
             return 1;
         }

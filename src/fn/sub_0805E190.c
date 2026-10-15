@@ -1,5 +1,4 @@
 #include "scene_input.h"
-#define SceneInput_BeginChoice sub_0805E190
 void SceneInput_BeginChoice(struct SceneInputWidget *widget, void *resource, u8 *selection,
                             u32 initial, u8 *blink)
 {

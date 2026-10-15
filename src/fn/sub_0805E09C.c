@@ -1,5 +1,4 @@
 #include "scene_hud_display.h"
-#define SceneHud_ShowFourDigits sub_0805E09C
 void SceneHud_ShowFourDigits(struct SceneHudDigitView *parent,
                              const struct ContactPosition *position, s32 value, u32 label)
 {

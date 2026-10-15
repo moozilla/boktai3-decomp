@@ -9,9 +9,9 @@ struct SceneHudMapLayer {
 };
 extern const u8 gUnk_0824DEB8[];
 extern const u16 gUnk_0824DEC0[], gUnk_0824DED0[];
-u16 *sub_0805DD18(u32, u32, u32);
-void sub_0805DD38(u32, u32, s32);
-void sub_0805DD68(u32, u32, s32);
-void sub_0805DD98(s32, s32, u32, u32, s32);
-void sub_0805DDE8(s32);
+u16 *SceneHud_GetMapCell(u32, u32, u32);
+void SceneHud_FillTile001(u32, u32, s32);
+void SceneHud_FillTile020(u32, u32, s32);
+void SceneHud_DrawDecimal(s32, s32, u32, u32, s32);
+void SceneHud_DrawCenteredMeter(s32);
 #endif

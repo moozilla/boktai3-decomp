@@ -1,7 +1,7 @@
 #include "global.h"
 void Anim_Remove(u8 *);
-void sub_0805E468(u8 *);
-void sub_0805E2F0(u8 *);
+void SceneInput_DestroyMarkerPair(u8 *);
+void SceneInput_DestroyGlyphPair(u8 *);
 void sub_081BFEDC(u8 *p)
 {
     u8 *q = p + 0x18;
@@ -12,6 +12,6 @@ void sub_081BFEDC(u8 *p)
         q += 0x60;
         i--;
     } while (i >= 0);
-    sub_0805E468(p + 0x1558);
-    sub_0805E2F0(p + 0x164c);
+    SceneInput_DestroyMarkerPair(p + 0x1558);
+    SceneInput_DestroyGlyphPair(p + 0x164c);
 }

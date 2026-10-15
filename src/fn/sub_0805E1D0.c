@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_input.h"
-#define SceneInput_TickChoice sub_0805E1D0
 s32 SceneInput_TickChoice(struct SceneInputWidget *widget, void *resource, u8 *selection, u8 *blink)
 {
     u32 keys = gUnk_03005260[1];

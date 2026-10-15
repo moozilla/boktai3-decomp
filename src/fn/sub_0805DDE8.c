@@ -1,9 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_hud_map.h"
-#define SceneHud_DrawCenteredMeter sub_0805DDE8
 void SceneHud_DrawCenteredMeter(s32 count)
 {
-    register u16 *cell asm("r2") = sub_0805DD18(0, 5, 2);
+    register u16 *cell asm("r2") = SceneHud_GetMapCell(0, 5, 2);
     s32 i = 0;
     s32 start = gUnk_0824DEB8[count - 1];
     s32 end = start + count;

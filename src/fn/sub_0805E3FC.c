@@ -1,5 +1,4 @@
 #include "scene_input.h"
-#define SceneInput_InitMarkerPair sub_0805E3FC
 void SceneInput_InitMarkerPair(struct SceneInputPair *pair)
 {
     struct {

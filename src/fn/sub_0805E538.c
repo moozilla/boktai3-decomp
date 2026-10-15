@@ -1,5 +1,4 @@
 #include "scene_input_grid.h"
-#define SceneInput_TickPairTransition sub_0805E538
 s32 SceneInput_TickPairTransition(struct SceneInputPair *pair)
 {
     pair->frame++;

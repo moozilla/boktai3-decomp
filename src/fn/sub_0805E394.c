@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_input.h"
-#define SceneInput_GetGridPosition sub_0805E394
 void SceneInput_GetGridPosition(struct SceneInputPosition *position, s32 index)
 {
     if (index <= 15) {

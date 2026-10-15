@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_input.h"
-#define SceneInput_InitGlyphPair sub_0805E270
 void SceneInput_InitGlyphPair(struct SceneInputPair *pair)
 {
     struct {
