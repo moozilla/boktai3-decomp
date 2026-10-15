@@ -16,7 +16,7 @@ struct SceneSteeringActor {
     struct DisplaySequenceState sequence;
     u8 shadow[0x6c];
     struct ContactCollider collider;
-    u8 unknownFC[8];
+    struct ContactPosition velocity;
     struct ContactPosition target;
     u8 initialDirection, direction, steeringTimer, turnStep;
     u16 speed, parameter;
