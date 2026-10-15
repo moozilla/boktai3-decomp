@@ -8,5 +8,5 @@ void SceneInventory_BeginReposition(struct SceneInventoryControlView *panel)
     panel->display.category.position = panel->display.compareA.position;
     SceneInput_SetGridFlags(grid, 0x1E);
     sub_080613BC(panel, 1);
-    sub_0806130C(panel, (void (*)(struct SceneInventoryControlView *))sub_08062190);
+    sub_0806130C(panel, (SceneInventoryCallback)sub_08062190);
 }
