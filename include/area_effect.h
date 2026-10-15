@@ -24,11 +24,11 @@ struct AreaEffectEntry {
 };
 struct AreaEffectPlayer {
     u8 unknown0[0x1C];
-    u32 state, flags;
+    u32 stateTag, flags; /* stateTag interpretation is tentative; active value is1 */
     u8 unknown24[12];
     struct AreaEffectPosition position;
     u8 unknown38[0x3E0];
-    u8 kind;
+    u8 actionMode;
     u8 unknown419[0x3E];
     u8 action, actionPhase;
 };

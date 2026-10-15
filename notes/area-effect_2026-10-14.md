@@ -42,14 +42,14 @@ helpers affect the first matching nonzero tag and update sprite flag value1.
 
 `E618` clears idle time on engine flag100 or nonzero03005260, otherwise advances
 it through900. It skips accumulation for masked engine flags200 and02000560 bit4.
-Player kind6 gains40 fraction units in mode2, or5 in mode0 while idle<=899.
-Other kinds use signed GameState+876 times8 in mode2, or its base value in mode1
-while idle<=899. Kind2 multiplies the accumulated fraction by4. Every120 units
+Player action mode6 gains40 fraction units in mode2, or5 in mode0 while idle<=899.
+Other action modes use signed GameState+876 times8 in mode2, or its base value in mode1
+while idle<=899. Action mode2 multiplies the accumulated fraction by4. Every120 units
 are converted to one increment through081594F4, which clamps player+428 against
 player+42A. `E730` selects mode2 from player flags20, otherwise mode1/0 from10.
 The exact gameplay name of player resource428 remains tentative.
 
-`E8D8` shows enabled sprites and may emit action particles when player state1
+`E8D8` shows enabled sprites and may emit action particles when player state tag1
 and a matching area (or GameState flags868 bit2) allows it. Player action457 must
 be7 and phase458 must be2/3. During action frames0..62 it emits every eighth
 frame from player position offset(-100,+256,-100), with extent(256,0,256), then
@@ -70,3 +70,7 @@ Integration: combined orbit/area ROM build printed `build/boktai3.gba: OK`;
 51 complete post-promotion extent checks passed, along with format/inventory/
 RAM checks and all twelve data round trips. Aggregate exact progress24.682%
 (+0.1726 percentage points for this batch).
+
+Review correction: player+418 uses the existing player view's `actionMode` name;
+word1C is tentatively `stateTag`, observed active value1. These are distinct
+from the action/transition bytes457/458. No additional exact credit.

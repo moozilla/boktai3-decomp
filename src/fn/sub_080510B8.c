@@ -1,23 +1,12 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x1a];
-    u16 a;
-    u8 g[0xa];
-    u16 x;
-    u8 h[2];
-    u16 y;
-    u16 z;
-};
-extern struct S *gUnk_02000114;
-
-void sub_080510B8(void)
+#include "directional_force.h"
+#define DirectionalForce_Stop sub_080510B8
+void DirectionalForce_Stop(void)
 {
-    struct S *p = gUnk_02000114;
-    if (p) {
-        p->a = 0;
-        p->y = 0;
-        p->x = 0;
-        p->z = 0;
+    struct DirectionalForce *force = gUnk_02000114;
+    if (force) {
+        force->mode = 0;
+        force->targetAngle = 0;
+        force->targetMagnitude = 0;
+        force->delay = 0;
     }
 }

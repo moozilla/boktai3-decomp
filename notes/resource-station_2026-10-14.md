@@ -17,11 +17,11 @@ four0x60-byte digit animations80, collider200, trigger position254, player25C,
 script handle260, state262, animation frame263, nearby264, digit visibility265,
 interaction variant266. Digit flags lie8 bytes into each animation and position
 at20. The player view records observed input pointer4EC, busy byte464,
-character kind418 and action457.
+action mode418 and action457.
 
 New EFB4(256) accepts player positions on exactly the trigger's Y plane and
-within128 units on each X/Z axis. Only player kind1 can be nearby. Interaction
-is suppressed by globals02000534/nonzero plus02000500/value5, character kinds
+within128 units on each X/Z axis. Only player state-tag1 can be nearby. Interaction
+is suppressed by globals02000534/nonzero plus02000500/value5, action modes
 3/4/5, busy464, missing input flag1, or action other than7. Otherwise it invokes
 08158ECC(player,trigger,variant) and enters station state1. Observed player
 pointer reloads are retained.
