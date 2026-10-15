@@ -1,13 +1,7 @@
-#include "global.h"
-
-struct S {
-    u8 f[7];
-    u8 v;
-};
-void sub_0805E5E4(struct S *);
-
-void sub_0805E7C4(struct S *p, u8 v)
+#include "scene_input_grid.h"
+#define SceneInput_SetGridFlags sub_0805E7C4
+void SceneInput_SetGridFlags(struct SceneInputGrid *grid, u32 flags)
 {
-    p->v = v;
-    sub_0805E5E4(p);
+    grid->flags = flags;
+    sub_0805E5E4(grid);
 }
