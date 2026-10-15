@@ -29,6 +29,4 @@ struct SceneActorAnimationTileDrawable {
     u8 unknown0[0x20];
     struct SceneActorAnimationTile tile;
 };
-u32 sub_08220C8C(void *, const void *, u16, u8, u8);
-void sub_08220D78(struct SceneActorAnimationTile *, const void *, u16, u16, u16);
 #endif

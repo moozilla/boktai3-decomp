@@ -18,7 +18,8 @@ void SceneActorAnimation_SelectProfileEntry(struct SceneActorAnimationView *acto
         struct SceneActorAnimationSequenceDrawable *drawable;
         actor->selection = selection;
         drawable = actor->drawable;
-        sub_08220C8C(drawable->sequence, drawable->resource, selection, variant, flags);
+        Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
+                         (u8)variant, (u8)flags);
         restart = &actor->restart;
     } else {
         struct SceneActorAnimationTile *tile =
@@ -41,8 +42,8 @@ void SceneActorAnimation_SelectProfileEntry(struct SceneActorAnimationView *acto
                 mode = 6;
             else
                 mode = 4;
-            sub_08220D78(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile,
-                         actor->drawable, selection, 2, mode);
+            Anim_SetKeyframes(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile,
+                              actor->drawable, (u16)selection, 2, (u16)mode);
             if (flags & 1)
                 tile->flags |= mask;
             else
