@@ -7,19 +7,19 @@ void ScenePanelSubject_ResetPosition(struct ScenePanelSubjectView *subject)
     s32 random;
     register s32 current asm("r1");
     const u16 *table;
-    subject->position = subject->home;
+    subject->drawable.position = subject->home;
     subject->positionReset = 1;
     table = gUnk_0203B400;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     offset = gUnk_03005308 * 2;
     random = Mod(*(const u16 *)(offset + (u32)table), 10);
-    current = (u16)subject->position.x;
+    current = (u16)subject->drawable.position.x;
     current -= 5;
-    subject->position.x = current + random;
+    subject->drawable.position.x = current + random;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     offset = gUnk_03005308 * 2;
     random = Mod(*(const u16 *)(offset + (u32)table), 10);
-    current = (u16)subject->position.z;
+    current = (u16)subject->drawable.position.z;
     current -= 5;
-    subject->position.z = current + random;
+    subject->drawable.position.z = current + random;
 }

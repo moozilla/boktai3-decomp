@@ -17,21 +17,22 @@ parameters eight/nine to 96 and render mode one, then places it 72 units above
 the center. Its code is ordinary C.
 
 `BDD0` reads optional keyword g into two creation arguments (defaults 100 and
-zero). Keyword a supplies one profile per subject; absent profiles are zero.
-Each subject slot is cleared before reading its profile. Keyword S supplies a
+zero). Keyword a supplies one initial state per subject; absent initial states are zero.
+Each subject slot is cleared before reading its initial state. Keyword S supplies a
 halfword parameter, default zero. The category-one flag is passed to each
-creation call. Copies of the origin receive the following X/Z offsets, two
-boolean creation arguments, and a direction code:
+creation call. Copies of the origin receive the following X/Z offsets, sequence row/variant arguments, and an appearance delay:
 
-| Slot | X | Z | First | Second | Direction |
+| Slot | X | Z | Row | Variant | Delay |
 | --- | --- | --- | --- | --- | --- |
 | 0 | -514 | 76 | 1 | 0 | 6 |
 | 1 | 514 | -76 | 0 | 1 | 9 |
 | 2 | 76 | -514 | 1 | 1 | 3 |
 | 3 | -76 | 514 | 0 | 0 | 0 |
 
-Y and the copied position padding are preserved. The factory at 0805DCAC is
-not yet recovered; profile/creation argument meanings remain tentative.
+Y and the copied position padding are preserved. The recovered factory at 0805DCAC forwards row, variant, initial state, kind,
+contact limit, collider setting and appearance delay to the subject initializer.
+The formerly tentative direction code is an appearance delay; profiles supply
+initial states. The g arguments are contact limit and collider setting.
 The original assumes the stored subject count fits the four local profiles.
 Source case order and the scope of the shared negative offset recover the
 entire routine without pins or barriers.

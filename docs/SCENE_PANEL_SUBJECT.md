@@ -16,3 +16,7 @@ Reviewed range: **0805CB38–0805CD64**, six functions, 556 bytes. Five newly re
 The contact callback keeps its third argument as opaque owner data until the reaction test succeeds, then views it as a subject. Its first two arguments are collider views, not subject-position pointers. Existing rig callers declare the state setter with `SceneRigSubject *`; the setter casts into the expanded view internally, preserving the established u32 state argument ABI. Integration may unify those layout-compatible partial views.
 
 The constructor's actual lifecycle callbacks return s32; their forward declarations use ScenePanelLifecycleView to agree with the adjoining cohort. Task_SetCallbacks' older generic void callback declaration requires an explicit function-pointer cast at that boundary; no callback result is used here. The constructor treats any nonnegative initializer result as success.
+
+Integration confirms that 08215284 selects a 32-byte bank of sixteen RGB15 colors.
+The worker baseline name SelectTiles was superseded by SelectPaletteBank on main;
+F2/F4 and constants 24C–250 refer to palette banks. State-entry FB/FC remain songs.

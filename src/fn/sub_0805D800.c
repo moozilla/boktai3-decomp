@@ -1,6 +1,6 @@
 #include "scene_panel_subject_tail.h"
 #define ScenePanelSubject_Update sub_0805D800
-s32 ScenePanelSubject_Update(struct ScenePanelSubjectTail *subject)
+s32 ScenePanelSubject_Update(struct ScenePanelSubjectView *subject)
 {
     if (subject->state)
         sub_0805CC44((void *)subject);
