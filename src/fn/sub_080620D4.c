@@ -2,7 +2,7 @@
 #define SceneInventory_TickActionSelection sub_080620D4
 s32 SceneInventory_TickActionSelection(struct SceneInventoryTail *p)
 {
-    SceneInputPanel_HighlightCompare(p, &p->highlight);
+    SceneInputPanel_HighlightCompare(&p->display, p->highlight.colors);
     if (sub_08061C3C(p))
         return 0;
     if (sub_08061CFC(p)) {
