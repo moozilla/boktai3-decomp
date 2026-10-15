@@ -2,7 +2,6 @@
 
 // MATCHING_CONCESSION: register-pinning
 
-#define ScenePanelRig_InitPrimarySprites sub_0805AE58
 void ScenePanelRig_InitPrimarySprites(struct ScenePanelRig *rig)
 {
     struct ScenePanelRig *owner;
@@ -28,8 +27,8 @@ void ScenePanelRig_InitPrimarySprites(struct ScenePanelRig *rig)
     /* Keep the copies distinct without enlarging the short loop branch estimate. */
     asm("" : : "g"(&&primary_offset_ready), "g"(&&primary_parity_ready));
     do {
-        register struct SceneRigSetupSprite *sprite asm("r5");
-        register struct SceneRigSetupSprite *animated asm("r6");
+        register struct SceneRigSprite *sprite asm("r5");
+        register struct SceneRigSprite *animated asm("r6");
         const u16 *table;
         void *graphics, *resource;
         u16 animationKey;
@@ -54,11 +53,11 @@ void ScenePanelRig_InitPrimarySprites(struct ScenePanelRig *rig)
         primary_parity_ready:
             bit = 1;
             if (parity & bit) {
-                struct SceneRigSetupSprite *arg0 = sprite;
+                struct SceneRigSprite *arg0 = sprite;
                 register void *arg1 asm("r1") = graphics;
                 Sprite_Init(arg0, arg1, 512);
             } else {
-                struct SceneRigSetupSprite *arg0 = sprite;
+                struct SceneRigSprite *arg0 = sprite;
                 register void *arg1 asm("r1") = graphics;
                 Sprite_Init(arg0, arg1, 1024);
             }
@@ -66,7 +65,7 @@ void ScenePanelRig_InitPrimarySprites(struct ScenePanelRig *rig)
         {
             register u32 zero asm("r0") = 0;
             register u32 mode asm("r1");
-            sprite->scale = zero;
+            sprite->frame = zero;
             mode = 1;
             sprite->renderMode = mode;
         }
@@ -92,7 +91,7 @@ void ScenePanelRig_InitPrimarySprites(struct ScenePanelRig *rig)
             u32 mask = indexMask;
             (*randomIndex) = next & mask;
         }
-        Anim_SetSequence(animated->animation, animated->animationResource,
+        Anim_SetSequence(&animated->sequence, animated->animationResource,
                          (u16)(Mod(table[(*randomIndex)], 3) + 1), 0, 0);
         {
             u32 next = (*randomIndex) + 1;

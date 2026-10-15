@@ -1,8 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_panel_rig.h"
-void sub_0805A5B8(struct ScenePanelRig *, u32);
-void sub_0805A7E4(struct ScenePanelRig *, u32);
-#define ScenePanelRig_TickSprites sub_0805AAC8
+void ScenePanelRig_TickPrimarySprites(struct ScenePanelRig *, u32);
+void ScenePanelRig_TickSecondarySprites(struct ScenePanelRig *, u32);
 void ScenePanelRig_TickSprites(struct ScenePanelRig *rig, u32 palette)
 {
     struct DisplaySequenceState *state;
@@ -134,6 +133,6 @@ void ScenePanelRig_TickSprites(struct ScenePanelRig *rig, u32 palette)
         }
     }
     AnimData_SelectPaletteBank(rig->main.graphics, palette);
-    sub_0805A5B8(rig, palette);
-    sub_0805A7E4(rig, palette);
+    ScenePanelRig_TickPrimarySprites(rig, palette);
+    ScenePanelRig_TickSecondarySprites(rig, palette);
 }

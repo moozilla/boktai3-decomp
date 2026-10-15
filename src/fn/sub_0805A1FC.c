@@ -1,5 +1,4 @@
 #include "scene_panel_rig.h"
-#define ScenePanelRig_TickSubjectAction sub_0805A1FC
 static inline s32 randomValue(void)
 {
     u32 offset;

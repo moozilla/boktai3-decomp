@@ -12,7 +12,6 @@ static inline s32 scale5(s32 v)
 {
     return v >= 0 ? v >> 5 : -((-v) >> 5);
 }
-#define ScenePanelRig_TickSecondarySprites sub_0805A7E4
 void ScenePanelRig_TickSecondarySprites(struct ScenePanelRig *rig, u32 palette)
 {
     s32 i = 0;

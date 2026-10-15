@@ -11,20 +11,19 @@ struct SceneRigDriverView {
     void *action;
 };
 extern void *gUnk_08605A94[];
-void sub_0805A4FC(struct ScenePanelRig *);
+void ScenePanelRig_CheckContactTransition(struct ScenePanelRig *);
 void ScenePanelRig_TickResourceDrain(struct ScenePanelRig *);
-void sub_0805AAC8(struct ScenePanelRig *, u32);
-#define ScenePanel_TickRig sub_0805AC3C
+void ScenePanelRig_TickSprites(struct ScenePanelRig *, u32);
 void ScenePanel_TickRig(struct ScenePanel *input)
 {
     struct SceneRigDriverView *parent = (void *)input;
     struct ScenePanelRig *rig = &parent->rig;
     u32 palette;
-    sub_0805A4FC(rig);
+    ScenePanelRig_CheckContactTransition(rig);
     sub_0824923C(rig, gUnk_08605A94[parent->rig.state]);
-    if (parent->rig.scale) {
+    if (parent->rig.colliderHold) {
         register u32 flagOffset asm("r1") =
-            (u32) & ((struct SceneRigDriverView *)0)->rig.unknown620[6];
+            (u32) & ((struct SceneRigDriverView *)0)->rig.collider.flags;
         u16 *flags;
         asm("" : "+r"(flagOffset));
         flags = (void *)((u8 *)parent + flagOffset);
@@ -36,16 +35,17 @@ void ScenePanel_TickRig(struct ScenePanel *input)
                 *flags = mask;
             }
         }
-        parent->rig.scale--;
+        parent->rig.colliderHold--;
     } else {
-        register u32 offset asm("r3") = (u32) & ((struct SceneRigDriverView *)0)->rig.unknown620[6];
+        register u32 offset asm("r3") =
+            (u32) & ((struct SceneRigDriverView *)0)->rig.collider.flags;
         register u16 *flags asm("r2");
         asm("" : "+r"(offset));
         flags = (void *)((u8 *)parent + offset);
         *flags &= 0xFFFB;
         {
             register u32 colliderOffset asm("r1") =
-                (u32) & ((struct SceneRigDriverView *)0)->rig.unknown620;
+                (u32) & ((struct SceneRigDriverView *)0)->rig.collider;
             void *collider;
             register u32 positionOffset asm("r2");
             void *position;
@@ -103,5 +103,5 @@ void ScenePanel_TickRig(struct ScenePanel *input)
         }
     }
 done:
-    sub_0805AAC8(rig, palette);
+    ScenePanelRig_TickSprites(rig, palette);
 }

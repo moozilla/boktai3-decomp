@@ -1,10 +1,9 @@
 #include "scene_panel_rig.h"
-#define ScenePanelRig_TickHideBurst sub_0805A40C
 void ScenePanelRig_TickHideBurst(struct ScenePanelRig *rig)
 {
     struct ContactPackedVector extent;
     u16 *counter;
-    rig->scale = 16;
+    rig->colliderHold = 16;
     counter = &rig->stateFrame;
     if (*counter <= 63) {
         if (*counter == 0) {

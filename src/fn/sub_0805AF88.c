@@ -2,7 +2,6 @@
 
 // MATCHING_CONCESSION: register-pinning
 
-#define ScenePanelRig_InitSecondarySprites sub_0805AF88
 void ScenePanelRig_InitSecondarySprites(struct ScenePanelRig *rig)
 {
     struct ScenePanelRig *owner = rig;
@@ -11,8 +10,8 @@ void ScenePanelRig_InitSecondarySprites(struct ScenePanelRig *rig)
     register u32 zero asm("r10") = i;
     asm("" : "+r"(owner), "+r"(i), "+r"(one), "+r"(zero));
     do {
-        register struct SceneRigSetupSprite *sprite asm("r5");
-        struct SceneRigSetupSprite *animated;
+        register struct SceneRigSprite *sprite asm("r5");
+        struct SceneRigSprite *animated;
         s32 next;
         void *graphics, *resource;
         {
@@ -39,7 +38,7 @@ void ScenePanelRig_InitSecondarySprites(struct ScenePanelRig *rig)
         }
         {
             register u32 value asm("r3") = zero;
-            sprite->scale = value;
+            sprite->frame = value;
         }
         {
             u32 mode;
@@ -64,10 +63,10 @@ void ScenePanelRig_InitSecondarySprites(struct ScenePanelRig *rig)
         }
         resource = ScriptProc_Start(0x922E, (u16)sub_08219BD8(gUnk_0824DEB0));
         animated->animationResource = resource;
-        Anim_SetSequence(animated->animation, resource, (u16)({
-                             next = i + 1;
-                             5 - (next >> 1);
-                         }),
+        Anim_SetSequence(&animated->sequence, resource, (u16)({
+            next = i + 1;
+            5 - (next >> 1);
+        }),
                          0, zero);
         if (i & one)
             sprite->flags |= 4;

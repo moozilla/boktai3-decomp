@@ -1,7 +1,6 @@
 #include "scene_panel_rig_setup.h"
 
 // MATCHING_CONCESSION: register-pinning
-#define ScenePanel_InitRig sub_0805B0F0
 void ScenePanel_InitRig(struct ScenePanel *input)
 {
     struct SceneRigSetupParentView *panel = (void *)input;
@@ -17,20 +16,20 @@ void ScenePanel_InitRig(struct ScenePanel *input)
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     Mod(*(u16 *)(RANDOM_TABLE_ADDR + gUnk_03005308 * 2), 600);
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    sub_0805B098(rig);
+    ScenePanelRig_InitSprites(rig);
     if (Script_SeekToKeyword('L'))
         power = Script_GetValue();
     else
         power = 5;
-    sub_0805AD50(rig, power);
-    sub_080595AC(rig, 0);
+    ScenePanelRig_InitCollider(rig, power);
+    ScenePanelRig_SetState(rig, 0);
     {
         u16 *angle = &rig->angle;
         u32 initialZero = 0;
         zero = initialZero;
         *angle = 160;
     }
-    rig->turnFrame = zero;
+    rig->turnStep = zero;
     {
         const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;
         u32 *randomIndex;
@@ -94,11 +93,11 @@ void ScenePanel_InitRig(struct ScenePanel *input)
         }
     }
     {
-        u16 *duration = (void *)rig->unknown69C;
+        u16 *duration = &rig->selectionTimer;
         register u32 value asm("r0");
         value = 600;
         *duration = value;
     }
-    sub_0805B0B4(rig);
+    ScenePanelRig_InitPayloadVectors(rig);
     rig->parent = input;
 }

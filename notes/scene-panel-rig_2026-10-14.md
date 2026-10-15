@@ -2,13 +2,13 @@
 
 The same parent ScenePanel owns subjects and a separate sprite rig. The reviewed
 59428–59C48 span contains sixteen functions /2,080 bytes: ten new exact bodies
-add1,920 bytes. The five old parent helpers and16-byte scale leaf receive typed
+add1,920 bytes. The five old parent helpers and16-byte hidden-state leaf receive typed
 contracts without new matching credit. No game identity or execution coverage
 is inferred solely from these offsets.
 
 Rig layout: fifteen104-byte sprite records (main, eight primary, six secondary),
-position618, origin674, state67C/frame67E, angle680/turnFrame682, signed turnRate684,
-turnDuration686, distance688/speed68A, verticalStep68C, scale68E, motionFlag690,
+position618, origin674, state67C/frame67E, angle680/turnStep682, signed turnRate684,
+turnDuration686, distance688/speed68A, verticalStep68C, colliderHold68E, motionFlag690,
 contact direction691/force692/effect694, resource accumulator69A, effect payloads
 6A0/6A8 and parent6B0. Parent fields1E/1F count subjects/active participants;
 subject pointersBE8 point to stateD3/requestE6. Parent BF8 scales resource drain;

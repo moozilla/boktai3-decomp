@@ -1,5 +1,4 @@
 #include "scene_panel_rig_setup.h"
-#define ScenePanelRig_InitPayloadVectors sub_0805B0B4
 void ScenePanelRig_InitPayloadVectors(struct ScenePanelRig *rig)
 {
     struct SceneRigPayloadView *view = (void *)rig;

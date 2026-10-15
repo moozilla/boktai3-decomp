@@ -1,5 +1,4 @@
 #include "scene_panel_rig_setup.h"
-#define ScenePanelRig_InitCollider sub_0805AD50
 struct SceneRigColliderVector {
     u32 x : 16;
     u32 y : 16;
@@ -8,7 +7,7 @@ struct SceneRigColliderVector {
 void ScenePanelRig_InitCollider(struct ScenePanelRig *rig, u32 power)
 {
     struct SceneRigColliderVector size, offset;
-    void *collider = rig->unknown620;
+    void *collider = &rig->collider;
     size.x = 128;
     size.y = 128;
     size.z = 128;

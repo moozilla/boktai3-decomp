@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_panel_rig.h"
-#define ScenePanelRig_TickWandering sub_08059DF8
 static inline s32 scale12(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);
@@ -21,10 +20,10 @@ void ScenePanelRig_TickWandering(struct ScenePanelRig *rig)
     register s32 x asm("r3");
     s32 z;
     u16 *timer;
-    if (rig->turnFrame < rig->turnRate)
-        rig->turnFrame++;
-    else if (rig->turnFrame > rig->turnRate)
-        rig->turnFrame--;
+    if (rig->turnStep < rig->turnRate)
+        rig->turnStep++;
+    else if (rig->turnStep > rig->turnRate)
+        rig->turnStep--;
     timer = &rig->turnDuration;
     if (--*timer == 0) {
         register const u16 *table asm("r3") = gUnk_0203B400;
@@ -43,7 +42,7 @@ void ScenePanelRig_TickWandering(struct ScenePanelRig *rig)
         *cursor = (*cursor + 1) & mask;
         *timer = (readWord(table, *cursor) & 63) + 32;
     }
-    rig->angle = (rig->angle + 4095 + (u16)rig->turnFrame) & 4095;
+    rig->angle = (rig->angle + 4095 + (u16)rig->turnStep) & 4095;
     angle = rig->angle >> 4;
     timer = &rig->verticalStep;
     if (--*timer == 0) {

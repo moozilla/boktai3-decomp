@@ -1,5 +1,4 @@
 #include "scene_panel_rig_setup.h"
-#define ScenePanelRig_RemoveSprites sub_0805AD18
 void ScenePanelRig_RemoveSprites(struct ScenePanelRig *rig)
 {
     struct SceneRigSprite *sprite;

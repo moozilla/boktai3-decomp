@@ -8,7 +8,6 @@ static inline s32 absolute(s32 v)
 {
     return v < 0 ? -v : v;
 }
-#define ScenePanelRig_TickPrimarySprites sub_0805A5B8
 void ScenePanelRig_TickPrimarySprites(struct ScenePanelRig *rig, u32 palette)
 {
     s32 i;
