@@ -9,7 +9,7 @@ struct S {
 };
 extern struct S *gUnk_0200010C;
 
-s32 sub_0804EF0C(struct S *p)
+s32 AreaEffect_InitializeLink(struct S *p)
 {
     p->b = 0;
     p->a = 0x1C7;

@@ -1,8 +1,7 @@
-#include "global.h"
-extern u8 *gUnk_0200048C;
-void sub_0805089C(void)
+#include "orbit_background.h"
+void OrbitBackground_Disable(void)
 {
-    u8 *p = gUnk_0200048C;
-    if (p)
-        p[0x1F] = 0;
+    struct OrbitBackground *background = gUnk_0200048C;
+    if (background)
+        background->enabled = 0;
 }

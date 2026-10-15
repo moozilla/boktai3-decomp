@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 24.509% matching (2026-10-14). This file is the single
+Last updated after reaching 24.682% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,43 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex/Sol): area managers and orbit-positioned background
+
+Exact code is **24.682%**, up **0.1726 percentage points** (+4,168 bytes)
+from nineteen new functions. There are **6,555 / 11,471 functions** and
+**596,146 / 2,415,354 bytes**. Without register pinning: **19.706%**;
+Register-pinned: **4.975%**, included above. Seventy-seven guarded drafts remain.
+Five new functions (504 bytes) need no hints; fourteen retain minimized concessions.
+
+Sol completed **0804E008–0804EFB4**: 4,012 contiguous exact bytes across the
+rectangular area manager and four-player link variant. New contracts include
+inclusive unsigned bounds, terrain-height placement, palette/environment
+selection, sprite visibility and120:1 fractional resource accumulation.
+The link variant uses four separate counters and a session scalar. Review
+corrected the old EC00 second argument from a pointer to a scalar gain.
+See the [area notes](../notes/area-effect_2026-10-14.md) and
+[link-variant notes](../notes/area-effect-link_2026-10-14.md).
+
+The parent completed **08050820–080510B8**, 2,200 contiguous exact bytes:
+orbit visibility, the980-byte position updater, signed world-to-screen
+projection, initialization and script creation, plus twelve named/typed
+existing controls. Camera and player-target interpolation are distinct from
+normal orbit following, which wraps angle and contracts/flips radius near
+opposite headings. The exact visual identity remains provisional; observed
+output positions a BG1 image. See [orbit-background notes](../notes/orbit-background_2026-10-14.md).
+
+The combined build printed **`build/boktai3.gba: OK`** in
+`build/orbit-areas-combined.log`; **51 complete post-promotion extent checks passed**.
+Format/inventory/RAM checks and all twelve data round trips pass. No new runtime
+coverage claims. Main's PR132 Actions passed at **bbddf4ef**; PR133 merged
+at **130f65d3** with its combined build and33 full-extent checks.
+
+Continue toward **30% exact or40% account usage remaining**. Sol continues
+**0804EFB4–0805002C** in its isolated checkout. Parent starts **080510B8**,
+a directional-force controller whose outputs0550/053C and threshold052C are
+consumed by the previously recovered tether slope-movement draft. Keep its
+wind/gameplay interpretation tentative. Latest usage check:66% remaining.
 
 ## October 14 (Codex/Sol): staged effects and complete cell gates
 

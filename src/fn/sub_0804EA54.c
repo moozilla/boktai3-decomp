@@ -15,11 +15,11 @@ extern struct S *gUnk_02000710;
 extern u32 gUnk_02000580;
 extern u16 gUnk_02000528;
 extern u16 gUnk_02000590;
-s32 sub_0804EA38(struct O *);
-void sub_0804E8D8(struct O *);
-void sub_0804E87C(struct O *);
-void sub_0804E730(struct O *);
-void sub_0804E800(struct O *);
+s32 AreaEffect_TestParticleMode(struct O *);
+void AreaEffect_UpdateActionParticles(struct O *);
+void AreaEffect_HideSprites(struct O *);
+void AreaEffect_UpdateResourceFromPlayerFlags(struct O *);
+void AreaEffect_ShowEnabledSprites(struct O *);
 static inline u32 mk(u32 *a, u32 m)
 {
     return *a & m;
@@ -30,7 +30,7 @@ static inline u8 tst(u32 v)
         return TRUE;
     return FALSE;
 }
-s32 sub_0804EA54(struct O *o)
+s32 AreaEffect_Tick(struct O *o)
 {
     if (o->b29 != 0)
         o->b29 = 0;
@@ -38,15 +38,15 @@ s32 sub_0804EA54(struct O *o)
     if (o->q != 0) {
         struct S *s = gUnk_02000710;
         if (s->v == 0) {
-            if (sub_0804EA38(o) != 0)
-                sub_0804E8D8(o);
+            if (AreaEffect_TestParticleMode(o) != 0)
+                AreaEffect_UpdateActionParticles(o);
             else
-                sub_0804E87C(o);
+                AreaEffect_HideSprites(o);
         } else {
             if (s->fl & 2)
-                sub_0804E730(o);
+                AreaEffect_UpdateResourceFromPlayerFlags(o);
             else
-                sub_0804E800(o);
+                AreaEffect_ShowEnabledSprites(o);
         }
         {
             u32 v = gUnk_02000528;

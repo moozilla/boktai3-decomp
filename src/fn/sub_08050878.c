@@ -1,13 +1,9 @@
-#include "global.h"
-extern u8 *gUnk_0200048C;
-void sub_080508F0(u8 *);
-void sub_08050878(void)
+#include "orbit_background.h"
+void OrbitBackground_Enable(void)
 {
-    u8 *g = gUnk_0200048C;
-    if (g != 0) {
-        if (g[0x1f] == 0) {
-            sub_080508F0(g);
-            g[0x1f] = 1;
-        }
+    struct OrbitBackground *background = gUnk_0200048C;
+    if (background && !background->enabled) {
+        OrbitBackground_ResetOrbit(background);
+        background->enabled = 1;
     }
 }

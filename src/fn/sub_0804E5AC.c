@@ -8,7 +8,7 @@ struct O {
 extern struct O *gUnk_0200010C;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-void sub_0804E5AC(void)
+void AreaEffect_DisableEntryFromScript(void)
 {
     struct O *o = gUnk_0200010C;
     if (o != 0) {
