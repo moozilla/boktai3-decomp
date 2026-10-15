@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_animation.h"
-#define SceneActorAnimation_SelectForcedDirectionFlags sub_080762A8
-void SceneActorAnimation_SelectForcedDirectionFlags(struct SceneActorAnimationView *actor,
-                                                    s32 index, u32 extraFlags)
+#define SceneActorAnimation_SelectDirectionalExtraFlags sub_080762A8
+void SceneActorAnimation_SelectDirectionalExtraFlags(struct SceneActorAnimationView *actor,
+                                                     s32 index, u32 extraFlags)
 {
     struct SceneActorProfileEntry *entry =
         (void *)sub_08073CB0(actor->profileId, actor->profileMode, index);
