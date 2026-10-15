@@ -197,8 +197,17 @@ service and are still observable when no slot is available.
 The three unmatched bodies remain private and uncredited. Current valid scratch
 sources are `wip/sub_0808170C.c` (1248/1168 bytes,60.529% fuzzy),
 `wip/sub_08081C98.c` (1332/1260,46.468%), and `wip/sub_08082184.c`
-(716/704,63.689%). The motion draft explicitly reads AA as signed16 despite the
+(704/704,98.256%, nine differing bytes). The motion draft explicitly reads AA as signed16 despite the
 shared reset view's unsigned storage declaration. The route draft reloads the
 destination after terrain lookup and again on accepted response setup, preserving
 the ROM's reads across external geometry calls. None of these drafts is an exact
 progress claim or a new work-in-progress branch.
+
+A bounded 900-second, two-worker permuter search on the earlier valid route
+baseline produced a useful simplification: the animation completion byte can
+receive literal zero after selection, removing an unnecessary scalar lifetime.
+Combining that result with initialized register-lifetime hints leaves only the
+failure reset's phase/behavior offset register choices in the best retained
+704-byte source. The complete success path and terrain calculation match.
+The run remains private at `build/permute/sub_08082184/run-cevixidy`; neither
+its scoring nor the retained near match earns exact coverage.
