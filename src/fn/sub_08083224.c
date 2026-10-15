@@ -3,7 +3,7 @@
 #include "scene_actor_reaction.h"
 extern const s16 gUnk_086149C4[];
 void SceneActorControl_UpdateShadowReturn(struct SceneActorRegistryResetView *);
-void sub_08084044(struct SceneActorRegistryResetView *);
+void SceneActorControl_RestartPositionCurve(struct SceneActorRegistryResetView *);
 static inline s32 Scale(s32 value)
 {
     return value >= 0 ? value >> 12 : -(-value >> 12);
@@ -55,7 +55,7 @@ void SceneActorControl_UpdateShadowReturnPhase(struct SceneActorRegistryResetVie
         actor->secondaryMotion.y = 10;
     }
     if (actor->field2B0 && (s16)actor->field2EA < *(u16 *)((u8 *)control + 0x3D8) - 20)
-        sub_08084044(actor);
+        SceneActorControl_RestartPositionCurve(actor);
     else
         ++actor->counter2AC;
 }

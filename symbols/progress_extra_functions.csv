@@ -378,6 +378,37 @@ address,evidence
 082215B8,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 082215BC,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C
 082215D0,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C
+08221834,"Independent hidden Thumb prologue; CFG returns at 08221854; literals and zero alignment close at 0822185C; preserved raw tail of 08221800, not matched C"
+0822185C,"Independent hidden Thumb prologue; CFG returns at 0822186E; literals and zero alignment close at 08221870; preserved raw tail of 08221800, not matched C"
+08221870,"Independent hidden Thumb prologue; CFG returns at 082218A2; literals and zero alignment close at 082218A8; preserved raw tail of 08221800, not matched C"
+082218A8,"Independent hidden Thumb prologue; CFG returns at 082218C4; literals and zero alignment close at 082218C8; preserved raw tail of 08221800, not matched C"
+082218C8,"Independent hidden Thumb prologue; CFG returns at 08221904; literals and zero alignment close at 08221908; preserved raw tail of 08221800, not matched C"
+08221908,"Independent hidden Thumb prologue; CFG returns at 0822194A; literals and zero alignment close at 0822194C; preserved raw tail of 08221800, not matched C"
+0822194C,"Independent hidden Thumb prologue; CFG returns at 0822199C; literals and zero alignment close at 082219A0; preserved raw tail of 08221800, not matched C"
+082219A0,"Independent hidden Thumb prologue; CFG returns at 082219F0; literals and zero alignment close at 082219F4; preserved raw tail of 08221800, not matched C"
+082219F4,"Independent hidden Thumb prologue; CFG returns at 08221A46; literals and zero alignment close at 08221A48; preserved raw tail of 08221800, not matched C"
+08221A48,"Independent hidden Thumb prologue; CFG returns at 08221AB4; literals and zero alignment close at 08221AB8; preserved raw tail of 08221800, not matched C"
+08221AB8,"Independent hidden Thumb prologue; CFG returns at 08221AFA; literals and zero alignment close at 08221AFC; preserved raw tail of 08221800, not matched C"
+08221AFC,"Independent hidden Thumb prologue; CFG returns at 08221B58; literals and zero alignment close at 08221B5C; preserved raw tail of 08221800, not matched C"
+08221B5C,"Independent hidden Thumb prologue; CFG returns at 08221B98; literals and zero alignment close at 08221B9C; preserved raw tail of 08221800, not matched C"
+08221B9C,"Independent hidden Thumb prologue; CFG returns at 08221BE4; literals and zero alignment close at 08221BE8; preserved raw tail of 08221800, not matched C"
+08221BE8,"Independent hidden Thumb prologue; CFG returns at 08221C30; literals and zero alignment close at 08221C34; preserved raw tail of 08221800, not matched C"
+08221C34,"Independent hidden Thumb prologue; CFG returns at 08221C7E; literals and zero alignment close at 08221C80; preserved raw tail of 08221800, not matched C"
+08221C80,"Independent hidden Thumb prologue; CFG returns at 08221CC0; literals and zero alignment close at 08221CC8; preserved raw tail of 08221800, not matched C"
+08221CC8,"Independent hidden Thumb prologue; CFG returns at 08221D02; literals and zero alignment close at 08221D04; preserved raw tail of 08221800, not matched C"
+08221D04,"Independent hidden Thumb prologue; CFG returns at 08221D3E; literals and zero alignment close at 08221D40; preserved raw tail of 08221800, not matched C"
+08221D40,"Independent hidden Thumb prologue; CFG returns at 08221D94; literals and zero alignment close at 08221D9C; preserved raw tail of 08221800, not matched C"
+08221D9C,"Independent hidden Thumb prologue; CFG returns at 08221DFC; literals and zero alignment close at 08221E00; preserved raw tail of 08221800, not matched C"
+08221E00,"Independent hidden Thumb prologue; CFG returns at 08221E6E; literals and zero alignment close at 08221E70; preserved raw tail of 08221800, not matched C"
+08221E70,"Independent hidden Thumb prologue; CFG returns at 08221EDE; literals and zero alignment close at 08221EE0; preserved raw tail of 08221800, not matched C"
+08221EE0,"Independent hidden Thumb prologue; CFG returns at 08221F50; literals and zero alignment close at 08221F54; preserved raw tail of 08221800, not matched C"
+08221F54,"Independent hidden Thumb prologue; CFG returns at 08221FEA; literals and zero alignment close at 08221FEC; preserved raw tail of 08221800, not matched C"
+08221FEC,"Independent hidden Thumb prologue; CFG returns at 0822204A; literals and zero alignment close at 0822204C; preserved raw tail of 08221800, not matched C"
+0822204C,"Independent hidden Thumb prologue; CFG returns at 08222090; literals and zero alignment close at 08222094; preserved raw tail of 08221800, not matched C"
+08222094,"Independent hidden Thumb prologue; CFG returns at 082220D8; literals and zero alignment close at 082220DC; preserved raw tail of 08221800, not matched C"
+082220DC,"Independent hidden Thumb prologue; CFG returns at 08222120; literals and zero alignment close at 08222124; preserved raw tail of 08221800, not matched C"
+08222124,"Independent hidden Thumb prologue; CFG returns at 08222168; literals and zero alignment close at 0822216C; preserved raw tail of 08221800, not matched C"
+0822216C,"Independent hidden Thumb prologue; CFG returns at 082221DC; literals and zero alignment close at 082221E8; preserved raw tail of 08221800, not matched C"
 08222A00,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08222A04,Code following a reviewed gap leaf; retained assembly
 08224F8C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C

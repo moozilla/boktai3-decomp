@@ -6,7 +6,7 @@ void LevelAdvanceDisplay_StartParticle(struct LevelAdvanceParticle *particle)
     register u32 *randomIndex asm("r12");
     register u32 mask asm("r8");
     register u32 index asm("r2");
-    s32 x, y asm("r4"), z asm("r3");
+    s32 x, y, z;
     u32 rangeMask;
     u32 zero;
     particle->flags &= ~1;

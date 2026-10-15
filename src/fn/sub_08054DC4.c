@@ -23,7 +23,7 @@ void DisplayTrack_SetSequenceFromScript(void)
                                  track->sequenceRow, track->mirror);
                 } else {
                     state = &track->sequenceState;
-                    Anim_SetSequence(state, track->sequenceResource, track->sequenceId,
+                    Anim_SetSequence(state, (void *)track->sequenceResource, track->sequenceId,
                                      track->sequenceRow, track->mirror);
                 }
                 if (Script_SeekToKeyword('P'))

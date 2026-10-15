@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_helpers.h"
-void sub_0808484C(struct SceneActorRegistryResetView *);
+void SceneActorControl_TickVisibility(struct SceneActorRegistryResetView *);
 void SceneActorControl_TickGroundBob(struct SceneActorRegistryResetView *);
 s32 SceneActorControl_TickHiddenResponse(struct SceneActorRegistryResetView *actor)
 {
@@ -34,7 +34,7 @@ s32 SceneActorControl_TickHiddenResponse(struct SceneActorRegistryResetView *act
                 *flags &= mask;
             }
         } else
-            sub_0808484C(actor);
+            SceneActorControl_TickVisibility(actor);
     }
     SceneActorControl_TickGroundBob(actor);
     return 1;

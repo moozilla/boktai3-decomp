@@ -14,7 +14,7 @@ struct P {
 extern u32 gUnk_0300523C;
 extern u32 gUnk_030053F4;
 
-void Collider_Refresh(void *);
+s32 Collider_Refresh(void *);
 void Task_Kill(void *);
 
 void sub_0815FF40(struct P *p)

@@ -1,7 +1,7 @@
 #include "global.h"
 extern u32 gUnk_030053F4;
 void sub_082260A4(s32);
-void Collider_Refresh(u8 *);
+s32 Collider_Refresh(u8 *);
 void Task_Kill(u8 *);
 #define H(o) (*(u16 *)(p + (o)))
 void sub_082352C8(u8 *p)
