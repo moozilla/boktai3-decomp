@@ -1,16 +1,17 @@
-#include "global.h"
-s32 sub_0805C7B4(u8 *p)
+#include "scene_panel_commands.h"
+#define ScenePanel_CountActiveSubjects sub_0805C7B4
+s32 ScenePanel_CountActiveSubjects(struct ScenePanelInteractionView *panel)
 {
-    s32 n = 0;
-    s32 c = p[0x1e];
-    if (n < c) {
-        u8 **q = (u8 **)(p + 0xbe8);
+    s32 active = 0;
+    s32 remaining = panel->subjectCount;
+    if (active < remaining) {
+        struct ScenePanelInteractionSubject **subject = panel->subjects;
         do {
-            if ((*q)[0xd3] == 4)
-                n++;
-            q++;
-            c--;
-        } while (c != 0);
+            if ((*subject)->state == 4)
+                active++;
+            subject++;
+            remaining--;
+        } while (remaining != 0);
     }
-    return n;
+    return active;
 }
