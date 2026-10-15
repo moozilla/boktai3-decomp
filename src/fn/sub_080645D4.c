@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_slot.h"
-void sub_08077848(struct ActorAttachmentSource *, u32);
+void SceneActorPlacement_PlayVariantEventSound(struct ActorAttachmentSource *, u32);
 static inline u8 SameOwner(u16 *key)
 {
     if (gUnk_02000710->region == *key)
@@ -35,7 +35,7 @@ void ActorAttachment_NotifySourceState(struct ActorAttachmentSlot *slot)
             Sound_PlaySong(0xFF);
             break;
         case 3:
-            sub_08077848(source, 3);
+            SceneActorPlacement_PlayVariantEventSound(source, 3);
             break;
         default:
             return;

@@ -44,10 +44,10 @@ struct SceneActorPlacementView {
     struct SceneActorRegistryControlGroup group;
     struct SceneActorRegistryRoute route;
 };
-void sub_080714E4(struct SceneActorRegistryActor *);
-void sub_0807171C(struct SceneActorRegistryActor *);
-void sub_080718D8(struct SceneActorRegistryActor *);
-void sub_08077848(struct SceneActorPlacementView *, u32);
+void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *);
+void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *);
+void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *);
+void SceneActorPlacement_PlayVariantEventSound(struct SceneActorPlacementView *, u32);
 static inline u32 SceneActorPlacement_ReadFlags16(struct SceneActorPlacementView *actor, u32 mask)
 {
     return actor->flags2D4 & mask;

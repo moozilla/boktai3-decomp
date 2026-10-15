@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_behavior.h"
-#define SceneActorBehavior_AccelerateTowardDescriptor sub_08078430
 static inline s32 Magnitude(s32 value)
 {
     if (value < 0)

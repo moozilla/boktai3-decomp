@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_effects.h"
-#define SceneActorEffects_EmitRandomOffsets sub_0807E6FC
 void SceneActorEffects_EmitRandomOffsets(struct SceneActorRegistryActor *actor, s32 count, u32 mode,
                                          s32 inputSpan, s32 spanY, u32 value)
 {

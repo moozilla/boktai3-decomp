@@ -1,5 +1,4 @@
 #include "scene_actor_attachment.h"
-#define SceneActorEffect_SortCandidates sub_0807CD80
 void SceneActorEffect_SortCandidates(struct SceneActorEffectCandidate *entries, s32 count)
 {
     /* Count is a nonnegative element count within the supplied array. */

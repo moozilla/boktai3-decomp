@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_placement.h"
-#define SceneActorPlacement_PlayCategoryResponseSound sub_08077B1C
 void SceneActorPlacement_PlayCategoryResponseSound(struct SceneActorRegistryActor *argument)
 {
     struct SceneActorPlacementView *actor = (void *)argument;
@@ -24,7 +23,7 @@ void SceneActorPlacement_PlayCategoryResponseSound(struct SceneActorRegistryActo
             Sound_PlaySong(253);
             break;
         case 3:
-            sub_08077848(actor, 1);
+            SceneActorPlacement_PlayVariantEventSound(actor, 1);
             break;
         case 2:
             Sound_PlaySong(274);

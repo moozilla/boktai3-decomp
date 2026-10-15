@@ -2,7 +2,6 @@
 #include "scene_actor_behavior.h"
 u8 *sub_0821D64C(u32, u32);
 #include "script_utility.h"
-#define SceneActorBehavior_CallTerrainScript sub_08078160
 static inline u8 *CellData(u32 cell)
 {
     u8 *override = sub_0821D64C(cell, 1);

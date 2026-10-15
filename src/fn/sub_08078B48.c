@@ -1,7 +1,7 @@
 #include "scene_actor_behavior.h"
 #define SceneActorBehavior_TestDefeated sub_08078B48
 
-void sub_080789EC(struct SceneActorBehaviorView *);
+void SceneActorBehavior_RecordDefeat(struct SceneActorBehaviorView *);
 
 static inline u8 TestMask(struct SceneActorBehaviorGateView *s, u32 mask)
 {
@@ -20,7 +20,7 @@ u32 SceneActorBehavior_TestDefeated(struct SceneActorBehaviorView *actor)
     struct SceneActorBehaviorGateView *sprite;
     if (actor->counter304 > 0) {
         u8 m;
-        sub_080789EC(actor);
+        SceneActorBehavior_RecordDefeat(actor);
         {
             s32 v = OrV(0x80, &actor->flags2D6) & ~0x100;
             *&actor->flags2D6 = v;

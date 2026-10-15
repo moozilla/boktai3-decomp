@@ -1,9 +1,9 @@
 #include "global.h"
 
-void sub_0807E908(void);
+void SceneActorEffects_ReleaseResources(void);
 
 u32 sub_0808D1CC(void)
 {
-    sub_0807E908();
+    SceneActorEffects_ReleaseResources();
     return 0;
 }

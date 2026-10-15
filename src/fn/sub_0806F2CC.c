@@ -7,7 +7,6 @@ static inline u16 *SceneState_HalfwordAt(u8 *base, s32 offset)
     return (u16 *)(base + offset);
 }
 
-#define SceneState_ResetRuntimeFields sub_0806F2CC
 void SceneState_ResetRuntimeFields(void)
 {
     *SceneState_HalfwordAt((u8 *)gUnk_02000710, 0x7A0) = 0;

@@ -1,6 +1,5 @@
 #include "engine.h"
 #include "scene_actor_attachment.h"
-#define SceneActorEffect_PlayCategorySound sub_0807C11C
 void SceneActorEffect_PlayCategorySound(u8 event, u8 category, u8 variant)
 {
     switch (category) {

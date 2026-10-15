@@ -19,7 +19,6 @@ static inline u8 TestValue(u32 value)
         return 1;
     return 0;
 }
-#define SceneActorEffects_ReleaseResources sub_0807E908
 void SceneActorEffects_ReleaseResources(struct SceneActorEffectsView *actor)
 {
     u8 *control = (u8 *)actor + 0x3D4;

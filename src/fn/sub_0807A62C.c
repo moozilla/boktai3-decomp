@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_update.h"
-void sub_08078700(struct SceneActorBehaviorView *);
+void SceneActorBehavior_UpdateColliders(struct SceneActorBehaviorView *);
 static inline u8 Inactive(struct SceneActorBehaviorView *actor)
 {
     u32 offset;
@@ -26,7 +26,6 @@ static inline u8 Inactive(struct SceneActorBehaviorView *actor)
         return 1;
     return 0;
 }
-#define SceneActorBehavior_UpdateTimersAndContacts sub_0807A62C
 s32 SceneActorBehavior_UpdateTimersAndContacts(struct SceneActorBehaviorView *actor)
 {
     register struct SceneActorBehaviorView *updateActor asm("r2") = actor;
@@ -36,7 +35,7 @@ s32 SceneActorBehavior_UpdateTimersAndContacts(struct SceneActorBehaviorView *ac
     inactive = Inactive(actor);
     if (!inactive) {
         struct SceneActorUpdateControl *control;
-        sub_08078700(updateActor);
+        SceneActorBehavior_UpdateColliders(updateActor);
         control = (void *)((u8 *)actor + 0x3D4);
         {
             u32 mask = 0x2000;

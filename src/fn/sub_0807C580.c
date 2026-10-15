@@ -1,5 +1,4 @@
 #include "scene_actor_attachment.h"
-#define SceneActorAttachment_SelectCategory21Offsets sub_0807C580
 /* Offsets are selected by effect kind; interpretations remain tentative. */
 void SceneActorAttachment_SelectCategory21Offsets(u8 kind, s32 *yOffset, s32 *zOffset)
 {

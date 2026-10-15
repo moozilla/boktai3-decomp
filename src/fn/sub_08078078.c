@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_contact_list.h"
 #include "player.h"
-#define SceneActorBehavior_IsNearParticipant sub_08078078
 extern u16 gUnk_02000544;
 struct SceneActorBehaviorContactObject {
     u8 unknown0[12];
@@ -41,7 +40,7 @@ u8 SceneActorBehavior_IsNearParticipant(struct SceneActorRegistryActor *actor)
         index++;
     } while (index <= last);
 playersDone:
-    node = sub_08072C80(4);
+    node = SceneActorContacts_FindNodeByKind(4);
     if (node) {
         u16 *positionX = (void *)&actor->position.x;
         struct SceneActorBehaviorContactObject *object;

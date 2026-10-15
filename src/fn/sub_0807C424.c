@@ -1,5 +1,4 @@
 #include "scene_actor_attachment.h"
-#define SceneActorAttachment_SelectCommonOffsets sub_0807C424
 /* Offsets are selected by effect kind; interpretations remain tentative. */
 void SceneActorAttachment_SelectCommonOffsets(u8 kind, s32 *yOffset, s32 *zOffset)
 {

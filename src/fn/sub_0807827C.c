@@ -1,5 +1,4 @@
 #include "scene_actor_behavior.h"
-#define SceneActorBehavior_PlayReactionSound sub_0807827C
 void SceneActorBehavior_PlayReactionSound(struct SceneActorBehaviorView *actor)
 {
     u32 m = 6;

@@ -27,7 +27,7 @@ bits together; they are not just acknowledgments of the tested bit.
 
 Bit2 writes state2A8=3, phase2A9=0, behavior2AA=0, counter2AC=0, fields2B1/2B2=1,
 field2B0=0, kind2B5=7, control21C=the saved pointer5DC, and field2C8=0. It clears
-flags114 bit1 and word104, then copies signed halfwordA8 to adjacent halfwordAA.
+flags114 mask1 and word104, then copies signed halfwordA8 to adjacent halfwordAA.
 The narrow update view models these adjacent halfwords as a two-element array
 so the observed pointer increment stays inside its C array object. Bit800 calls
 7CA44. Bits80 and100 choose optional callbacks23C and5EC; the dispatcher tests

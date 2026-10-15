@@ -29,7 +29,6 @@ static inline s32 GetHeight(s32 cell, struct SceneActorRouteTargetPosition *p)
     }
     return h;
 }
-#define SceneActorMovement_ResolveRoutePosition sub_0807E7DC
 void SceneActorMovement_ResolveRoutePosition(struct SceneActorRegistryActor *actor)
 {
     /* This local vector has halfword alignment; aggregate copies are not used. */
