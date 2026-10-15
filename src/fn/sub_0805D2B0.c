@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_panel_subject_playback.h"
-#define ScenePanelSubject_TickDeparting sub_0805D2B0
 void ScenePanelSubject_TickDeparting(struct ScenePanelSubjectView *owner)
 {
     if (owner->kind) {
@@ -16,7 +15,7 @@ void ScenePanelSubject_TickDeparting(struct ScenePanelSubjectView *owner)
         if (ScenePanelSubject_StepPlayback(owner)) {
             owner->contactProgress = 0;
             owner->unknownE2 = 90;
-            sub_0805CB88((void *)owner, 6);
+            ScenePanelSubject_SetState((void *)owner, 6);
         }
     } else {
         if (owner->sequence.index == 5 && owner->sequence.elapsed == 0)
@@ -25,7 +24,7 @@ void ScenePanelSubject_TickDeparting(struct ScenePanelSubjectView *owner)
                          owner->sequenceVariant);
         if (ScenePanelSubject_StepPlayback(owner)) {
             owner->contactProgress = 0;
-            sub_0805CB88((void *)owner, 2);
+            ScenePanelSubject_SetState((void *)owner, 2);
         }
     }
 }

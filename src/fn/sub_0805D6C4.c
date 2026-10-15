@@ -1,5 +1,4 @@
 #include "scene_panel_subject_tail.h"
-#define ScenePanelSubject_UpdateTimedEffect sub_0805D6C4
 void ScenePanelSubject_UpdateTimedEffect(struct ScenePanelSubjectView *subject)
 {
     if (subject->byteTimer)
@@ -11,7 +10,7 @@ void ScenePanelSubject_UpdateTimedEffect(struct ScenePanelSubjectView *subject)
         if (subject->stateFrame > 15) {
             subject->drawable.position = subject->home;
             subject->paletteBank = 0x24E;
-            sub_0805CB88((void *)subject, 4);
+            ScenePanelSubject_SetState((void *)subject, 4);
             subject->collider.cost = 0;
             subject->stateFrame = 0;
         } else

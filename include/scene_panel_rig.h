@@ -73,7 +73,7 @@ void ScenePanelRig_HideSprites(struct ScenePanelRig *);
 void ScenePanelRig_ShowSprites(struct ScenePanelRig *);
 void ScenePanelRig_InitMovement(struct ScenePanelRig *);
 u32 ScenePanelRig_GetActiveCount(struct ScenePanelRig *);
-void sub_0805CB88(struct SceneRigSubject *, u32);
+void ScenePanelSubject_SetState(struct SceneRigSubject *, u32);
 extern const s16 gUnk_086149C4[];
 void sub_082279A8(s32, s32, s32, s32, s32, s32, s32);
 #endif

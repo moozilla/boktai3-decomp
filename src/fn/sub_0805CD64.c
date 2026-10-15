@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_panel_subject_playback.h"
-#define ScenePanelSubject_TickAppearing sub_0805CD64
 void ScenePanelSubject_TickAppearing(struct ScenePanelSubjectView *owner)
 {
     if (owner->appearDelay)
@@ -13,7 +12,7 @@ void ScenePanelSubject_TickAppearing(struct ScenePanelSubjectView *owner)
                          owner->sequenceVariant);
         if (ScenePanelSubject_StepPlayback(owner)) {
             Collider_Refresh(&owner->collider);
-            sub_0805CB88((void *)owner, 2);
+            ScenePanelSubject_SetState((void *)owner, 2);
         }
     }
 }

@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_panel_subject_tail.h"
 #include "scene_panel_subject_playback.h"
-#define ScenePanelSubject_Initialize sub_0805D92C
 s32 ScenePanelSubject_Initialize(struct ScenePanelSubjectView *subject,
                                  const struct ContactPosition *home, u32 row, u32 variant,
                                  u32 initialState, u32 kind, u32 contactLimit, u32 colliderSetting,
@@ -20,8 +19,8 @@ s32 ScenePanelSubject_Initialize(struct ScenePanelSubjectView *subject,
     Sprite_Init(sprite, subject->graphics, 0);
     sprite->position = subject->home;
     subject->sequenceResource = ScriptProc_Start(0x922E, 0x3449);
-    sub_0805D8A8(subject, colliderSetting);
-    sub_0805CB88((void *)subject, initialState);
+    ScenePanelSubject_InitCollider(subject, colliderSetting);
+    ScenePanelSubject_SetState((void *)subject, initialState);
     switch (subject->state) {
         case 0:
             subject->contactProgress = 0;

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_panel_subject_playback.h"
-#define ScenePanelSubject_TickActivating sub_0805CFE8
 void ScenePanelSubject_TickActivating(struct ScenePanelSubjectView *owner)
 {
     if (owner->kind) {
@@ -27,6 +26,6 @@ void ScenePanelSubject_TickActivating(struct ScenePanelSubjectView *owner)
                      owner->sequenceVariant);
     if (ScenePanelSubject_StepPlayback(owner)) {
         owner->changed = 1;
-        sub_0805CB88((void *)owner, 4);
+        ScenePanelSubject_SetState((void *)owner, 4);
     }
 }
