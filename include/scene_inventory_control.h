@@ -6,9 +6,9 @@
 /* Catalog and transition/controller storage overlap across UI phases. */
 struct SceneInventoryControlView {
     u8 unknown0[0x1AA4];
-    u8 interactionFlags, unknown1AA5, mode, unknown1AA7, category;
-    u8 unknown1AA9[7];
-    u8 page, unknown1AB1[2];
+    u8 interactionFlags, modeIndex, mode, catalogMode, category;
+    u8 unknown1AA9[2], clockMode, unknown1AAC[4];
+    u8 page, pageCount, itemPageCount;
     u8 unknown1AB3[0x1AEC - 0x1AB3];
     s16 destination;
     u16 frame;
@@ -19,6 +19,11 @@ struct SceneInventoryControlView {
 struct SceneInventoryCatalogView {
     u8 unknown0[0x1AB3];
     s8 entries[0x134];
+};
+struct SceneInventoryHighlightView {
+    u8 unknown0[0x1D00];
+    u16 colors[16];
+    u8 phase;
 };
 struct SceneInventoryCallbackView {
     u8 unknown0[0x1AEE];
@@ -58,4 +63,17 @@ s32 sub_08060904(struct SceneInventoryControlView *);
 s32 sub_08060958(struct SceneInventoryControlView *);
 s32 sub_08060928(struct SceneInventoryControlView *);
 void sub_080620D4(struct SceneInventoryControlView *);
+s32 sub_08061C3C(struct SceneInventoryControlView *);
+u32 sub_08061CA8(struct SceneInventoryControlView *);
+s32 sub_08061CFC(struct SceneInventoryControlView *);
+void sub_0806158C(struct SceneInventoryControlView *);
+void sub_080615D8(struct SceneInventoryControlView *);
+void sub_0806186C(struct SceneInventoryControlView *);
+void sub_08061600(struct SceneInventoryControlView *);
+void sub_0806167C(struct SceneInventoryControlView *);
+void sub_08061780(struct SceneInventoryControlView *);
+void sub_08061628(struct SceneInventoryControlView *);
+void sub_08061914(struct SceneInventoryControlView *);
+void sub_0805F220(struct SceneInputPanel *, u16 *);
+extern const u8 gUnk_0824DF38[];
 #endif
