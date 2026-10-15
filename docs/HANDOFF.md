@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 26.570% matching (2026-10-14). This file is the single
+Last updated after reaching 26.655% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,47 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex/Sol): HUD display and scene input; usage stop
+
+Exact code is **26.655%**, up **0.0850 percentage points** (+2,052 bytes)
+from the subject batch: **6,758 /11,474 functions**, **643,814 /2,415,354
+bytes**. Without register pinning: **20.431%**; Register-pinned: **6.224%**,
+included above. Seventeen new functions add 972 ordinary-C bytes and 1,080
+concession bytes. The newly reviewed E014 boundary adds one inventory function
+without changing the byte denominator. Existing typed leaves receive no new
+credit. The contiguous exact span now reaches **4E008–5E484**; the next two
+holes are E484 (180 bytes) and E5E4 (480 bytes).
+
+HUD helpers recover wrapped map access, decimal and centered-meter formatting,
+clock modes, numeric status labels, palette-bank selection and four-digit
+widgets. Input helpers recover Boolean choice/confirmation, resource-backed
+widget pairs, grid coordinates, pair interpolation and a wrapping 9×4 cursor.
+The input map skips disabled and duplicate selections; key-repeat and saved
+selection behavior are documented. The shared widget now has position at20,
+palette bank3A and palette pointer48. Position/resource layouts and full-word
+clock-return/flag-argument contracts were checked against consumers. No new
+runtime coverage or specific screen identity is claimed.
+
+Contracts: [HUD map](SCENE_HUD_MAP.md), [HUD display](SCENE_HUD_DISPLAY.md),
+[input widgets](SCENE_INPUT.md), [pair/grid](SCENE_INPUT_GRID.md),
+[navigation](SCENE_INPUT_NAVIGATION.md). Register concessions were minimized
+before integration; no explicit r7 bindings or handwritten instruction bodies
+are used. Navigation's named physical-axis view and the builder's provisional
+row/column view describe the same storage; keep their interpretation explicit.
+
+**Stopped at the requested 40% account usage remaining. The 30% target was not
+reached. Do not resume matching without renewed allowance.** Root E484 is a
+91.3% draft (192/180 bytes), with copy/step register allocation still different.
+Sol E5E4 is 97.9% (480/480 bytes), with five FF constant birth orders remaining.
+Both are preserved for resumption and receive no exact credit. The exact work
+was committed individually and combined for one integration batch.
+
+Validation: combined ROM build in `build/hud-combined.log`; final reviewed
+extents in `build/hud-post-promotion.json`; navigation pre-promotion checks
+10/10 in `build/navigation-pre-promotion.json`. Consult the merge/validation
+result before treating the batch as integrated. The primary Claude checkout
+remains untouched; worker builds and generated files remain private.
 
 ## October 14 (Codex/Sol): complete scene-panel subject subsystem
 
@@ -54,13 +95,8 @@ pre-promotion full reviewed extents passed in `build/subject-pre-promotion.json`
 formatting, inventory and structured-data checks passed. Final checks are
 recorded in `build/subject-post-promotion.json`.
 
-Continue toward **30% matching or 40% account usage remaining**, latest read
-**43% remaining**. Sol owns **5DD18–5DE3C** HUD map/decimal/meter helpers;
-root scratch starts **5DE3C–5E09C**, clock/numeric display and palette helpers.
-E014 is an independent 136-byte prologue/return left as raw bytes after E000;
-review and add its boundary metadata before claiming the full E000–E09C span.
-The existing sun_clock.h identifies base/hourA/hourB fields used by DE3C.
-Keep the primary Claude checkout untouched and worker build outputs private.
+The following HUD/navigation batch completed this assignment; see the latest
+entry above. The worker assignments in this historical entry are closed.
 
 ## October 14 (Codex/Sol): panel interaction, configuration and lifecycle
 
