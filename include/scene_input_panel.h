@@ -23,6 +23,11 @@ struct SceneInputPanel {
     struct SceneInputWidget heading, valueLabel, glyph, meterGlyph;
     struct SceneInputWidget digits[8], numericLabel, smallDigits[4];
 };
+struct SceneInputHighlight {
+    u16 colors[16];
+    u8 phase;
+};
+void sub_0805F324(struct SceneInputPanel *, struct SceneInputHighlight *);
 extern u8 gUnk_03005160[];
 extern const u16 gUnk_0824DEEA[], gUnk_0824DEF4[], gUnk_0824DF14[], gUnk_0824DF1E[],
     gUnk_0824DEE0[];
