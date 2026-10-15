@@ -1,16 +1,14 @@
-#include "global.h"
-
-u32 sub_0806143C(u8 *);
-
-u32 sub_08061CA8(u8 *p)
+#include "scene_inventory_control.h"
+#define SceneInventory_UpdateMixedCatalogCategory sub_08061CA8
+u32 SceneInventory_UpdateMixedCatalogCategory(struct SceneInventoryControlView *panel)
 {
-    u32 r = 0;
-    if (*(u8 *)(p + 0x1AA7) == 3) {
-        if (*(u8 *)(p + 0x1AB0) < *(u8 *)(p + 0x1AB2))
-            *(u8 *)(p + 0x1AA8) = 1;
+    u32 destination = 0;
+    if (panel->catalogMode == 3) {
+        if (panel->page < panel->itemPageCount)
+            panel->category = 1;
         else
-            *(u8 *)(p + 0x1AA8) = 2;
-        r = sub_0806143C(p);
-        *(u16 *)(p + 0x1AEC) = r;
+            panel->category = 2;
+        destination = sub_0806143C(panel);
+        panel->destination = destination;
     }
 }
