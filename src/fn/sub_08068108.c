@@ -1,8 +1,11 @@
-#include "global.h"
-
-s32 sub_08067E3C(s32, s32, s32, s32, s32, s32, s32);
-
-s32 sub_08068108(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f)
+#include "scene_particle_burst.h"
+#define SceneParticleBurst_CreateWithPause sub_08068108
+s32 sub_08067E3C(const struct ContactPosition *, const struct ContactPosition *,
+                 const struct ContactPosition *, s32, u32, u32, u32);
+s32 SceneParticleBurst_CreateWithPause(const struct ContactPosition *position,
+                                       const struct ContactPosition *range,
+                                       const struct ContactPosition *jitter, s32 count,
+                                       u32 priority, u32 flip)
 {
-    return sub_08067E3C(a, b, c, d, e, f, 1);
+    return sub_08067E3C(position, range, jitter, count, priority, flip, 1);
 }
