@@ -1,8 +1,7 @@
-#include "global.h"
+#include "scene_inventory_actions.h"
+#define SceneInventory_FindEmptyEquipmentSlot sub_08060904
 
-s32 sub_0822D6E0(s32);
-
-s32 sub_08060904(void)
+s32 SceneInventory_FindEmptyEquipmentSlot(void)
 {
     s32 i;
     for (i = 0; i < 16; i++) {
