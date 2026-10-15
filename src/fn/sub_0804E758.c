@@ -2,7 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 #define AreaEffect_UpdateGraphicsId sub_0804E758
 u32 sub_08228DB8(void);
-void sub_08215284(void *, u32);
+void AnimData_SelectTiles(void *, u32);
 void AreaEffect_UpdateGraphicsId(struct AreaEffectManager *manager)
 {
     u32 id;
@@ -45,7 +45,7 @@ void AreaEffect_UpdateGraphicsId(struct AreaEffectManager *manager)
                         u8 *graphics = (u8 *)manager + graphicsOffset;
                         s32 j = 1;
                         do {
-                            sub_08215284(graphics, manager->graphicsId);
+                            AnimData_SelectTiles(graphics, manager->graphicsId);
                             graphics += 0x1C;
                         } while (--j >= 0);
                     }
