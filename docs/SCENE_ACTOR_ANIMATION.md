@@ -26,3 +26,36 @@ crediting the raw hidden bytes to the preceding selector.
 
 The first exact selector (`08076818`, 248 bytes) is ordinary C with no matching
 hints. Its complete reviewed extent was checked against the private baseline.
+
+The completed eight-function subsection adds 2,268 exact bytes, approximately
+0.0939 percentage points: 804 bytes in ordinary C and 1,464 with minimized
+allocation hints. Each selector has its own fast check over the entire reviewed
+body, literal pool and padding; `build/scene-actor-animation-final.json` records
+the final eight checks. The integrator still performs the combined ROM build.
+
+| Address | Variant | Playback flags | Bytes | Hints |
+| --- | --- | --- | ---: | ---: |
+| 76034 | Direction fold | Mirror OR entry flags | 320 | 6 |
+| 76174 | Direction fold | Mirror OR extra OR entry flags | 308 | 0 |
+| 762A8 | Zero | Mirror OR extra OR entry flags | 296 | 1 |
+| 763D0 | Zero | Extra OR entry flags | 248 | 0 |
+| 764C8 | Explicit argument | Mirror OR entry flags | 304 | 3 |
+| 765F8 | Explicit argument | Explicit argument | 256 | 1 |
+| 766F8 | Zero | Mirror OR entry flags | 288 | 4 |
+| 76818 | Entry state byte | Entry flags | 248 | 0 |
+
+The direction fold uses `((direction + 0x60) >> 6) & 3`; quadrants greater than
+one produce mirror one and variant three minus quadrant, otherwise mirror zero
+and variant quadrant. Some selectors preserve both byte stores even when the
+variant is unused. Explicit pointer lifetimes retain those original accesses.
+Caller argument narrowing is explicit and the APIs use the canonical
+`engine.h` declarations, avoiding duplicate animation setter prototypes.
+The explicit-argument variants add the full argument to the tile selection;
+only the sequence-path row is narrowed to a byte. The final tile mirror control
+uses option mask `1`, distinct from playback mode mask `4`.
+
+Allocation concessions retain pointer/value lifetimes and call-argument setup
+order. `765F8` uses three empty-asm input references to the same initialized
+flags value to change global allocation priority; reducing that to two changes
+the actor/flags allocation. No hinted selector binds register seven. Each
+hinted source was passed through `tools/depin.py --write` before promotion.
