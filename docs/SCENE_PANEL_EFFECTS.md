@@ -92,3 +92,41 @@ register bindings and empty barriers are temporary matching concessions,
 minimized before commit. The explicit palette-loop scratch structure records
 persistent loop state; no handwritten instruction body or explicit r7 binding
 is used. Combined ROM validation belongs to the integrator's batch.
+
+## Background effect updater
+
+`08058700–08058AF4` is an additional consumer of the same panel. It takes the
+panel and four tilemap positioning arguments. It controls display-shadow bit
+`0x200`, the alpha register at `0x04000052`, and tilemap layer 1. Its palette
+source at `0x4D8` is copied from offset `0x20` into the sixteen-color staging
+area at `0x03005140` when `gUnk_02000710->unk618` is nonpositive.
+
+When that global field is positive, the shared `mode` counter controls a
+fade/shake path. A zero counter clears the display-shadow bit. Values above
+31 use alpha 16; values above 35 additionally sample a shake offset in 0–7,
+while 32–35 use offset 5. Values at most 31 use half the counter as alpha and
+decrease a positive shake offset on counters divisible by four. The updater
+loads the tilemap with the shake added to screen Y, then decrements the counter.
+
+With a nonpositive global field and `effectPhase` at `0x1378` equal to zero,
+the counter cycles through 0–63. Its triangular contribution gives alpha
+12–16, with a freshly sampled shake offset every update. Every fourth frame
+it submits a packed center offset by 64 in X and Z, and a velocity of 300 on
+all three axes, to `0806A160` with the unchanged remaining arguments.
+
+For a nonzero effect phase, a nonzero counter produces one local panel
+particle per update. The packed center at `0x510` receives three independent
+random offsets in -250–249. Its vertical component is interpreted as signed
+sixteen-bit; the horizontal components use their unsigned sixteen-bit values
+before wrapping the final result. Velocity is `(0, 16–47, 0)`, lifetime is
+8–15, and render mode is 1. The fourth random index remains local until the
+fifth sample advances the shared index, preserving the original write order.
+The packed word view preserves the original untouched padding bits and word
+writes. Alpha is the counter divided by four; shake rises toward seven every
+eighth frame. The final tilemap call is followed by a fresh counter access;
+reaching zero invokes `08057978` on the global panel with script argument 9.
+
+This updater matches its complete 1,012-byte extent, an additional 0.0419
+percentage points. Its temporary hints were minimized from 70 to 17; the
+function has no explicit r7 binding. Its additional layout comes from the
+integrator's `scene_panel.h` view, rather than a competing structure definition.
