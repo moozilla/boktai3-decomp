@@ -60,7 +60,8 @@ static inline int trunc12(int x)
     return x >= 0 ? x >> 12 : -(-x >> 12);
 }
 void SceneActors_StartAnimation(void *, void *, void *, int, int, int);
-void sub_0806C7B0(void *, void *, int, int, int, int, int, int, int, int, int, int, int);
+void SceneSteeringActor_CreateTravelActor(void *, void *, int, int, int, int, int, int, int, int,
+                                          int, int, int);
 typedef struct {
     s16 x, y, z;
 } Vec;
@@ -111,9 +112,9 @@ void sub_08026C38(ActorAnimation *p, int tick)
                 }
                 add(&spawn, (Vec *)((u8 *)p + 0x54));
                 spawn.y += 300;
-                sub_0806C7B0(&spawn, *(void **)((u8 *)p + 0x110), 2, p->requestedAngle, 90, 4, 20,
-                             3, 25, *(s16 *)((u8 *)p2 + 0x37c), *(s16 *)((u8 *)p2 + 0x37e), 0x40000,
-                             30);
+                SceneSteeringActor_CreateTravelActor(
+                    &spawn, *(void **)((u8 *)p + 0x110), 2, p->requestedAngle, 90, 4, 20, 3, 25,
+                    *(s16 *)((u8 *)p2 + 0x37c), *(s16 *)((u8 *)p2 + 0x37e), 0x40000, 30);
             }
             if (*((u8 *)p2 + 0x25d) & 2)
                 p->finished = 1;

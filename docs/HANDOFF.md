@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 28.237% matching (2026-10-15). This file is the single
+Last updated after reaching 28.578% matching (2026-10-15). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,53 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 15 continuation: route actors, grid traversal and actor registry
+
+Exact code is **28.578%**, up **0.3415 percentage points** (+8,248 bytes)
+from PR158: **6,950 /11,482 functions**, **690,262 /2,415,354 bytes**.
+Without register pinning: **20.842%**; Register-pinned: **7.736%**, included
+above. The 78 guarded drafts remain outside exact credit.
+
+The root steering cohort now has exact bobbing-actor creation and the actual
+152-byte fixed-travel constructor at6CF4C. The latter is ordinary C after
+reviewing a permuter result and removing its unused local and constraints;
+the raw candidate had deleted initialization and was not accepted as-is.
+The route-sprite pool has exact construction, ticking, destruction, completion
+requests and full-pool query. Its generated routes use twelve signed-byte
+waypoints and a separate endpoint, with recorded duration/cycle/script fields.
+Three larger creation/playback gaps remain private. See
+[steering actors](SPRITE_EFFECT_STEERING_ACTORS.md) and
+[route actors](ROUTE_SPRITE_ACTOR.md).
+
+The grid cohort6E34C–6EB70 is exact: random nearby-position selection, cell
+deltas, endpoint resolution, row/column scans and directional terrain traversal.
+An independent916-byte resolver begins6EB70; its split adds no duplicate credit
+and it remains assembly-backed. See [grid contracts](SCENE_GRID.md).
+The actor registry now has exact lookup, filtering, scripted mode changes and
+category reset routines, followed by initialization and route/collider reset
+helpers. Actor fields are consolidated in a shared typed header; phase-specific
+reset fields have their own view. See [registry](SCENE_ACTOR_REGISTRY.md).
+
+An agbcc branch-length issue closed three near matches: redundant empty asm
+barriers contribute estimated instructions even though they emit no bytes.
+Removing unnecessary barriers restored short branches and literal pools. The
+compiler source and reviewed examples are recorded in [REGALLOC](REGALLOC.md).
+
+The target remains **30% exact or20% account usage remaining**. Latest meter:
+63% remaining; no reset consumed. Root owns6E34C–70070, tail70070–70FA8,
+Sol70FA8–71E00, and lifecycle retains6D000–6E34C gaps before extending from71E00.
+All workers retain private build outputs. Frozen searches continue for signed
+load scratch-register and instruction-order residues, with initialized-value
+review required before accepting any output.
+
+Validation: all 53 changed/promoted C units pass their complete reviewed
+extents against the final combined ELF. The full build prints
+`build/boktai3.gba: OK`; the RAM-literal audit passes. The source audit reports
+no uninitialized or unsequenced accesses. All 20 build/progress/permuter tests,
+formatting and inventory checks pass. Compiler stdin is now file-backed to
+avoid a macOS two-pipe stall; a large-input/early-output regression covers it.
+No ROM, generated assembly, emulator dump or permuter output is committed.
 
 ## October 15 continuation: creator families and contiguous steering lifecycle
 

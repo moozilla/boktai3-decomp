@@ -15,6 +15,7 @@ import re
 import shlex
 import subprocess
 import sys
+import tempfile
 
 from romlib import BASEROM_SHA1, ROOT
 
@@ -126,8 +127,13 @@ def build_c(src, obj):
     if stamp_ok(os.path.join(ROOT, obj), key):
         return
     pre = preprocess(src)
-    asm = subprocess.run([compiler] + cflags + ["-o", "-"], input=pre, cwd=ROOT,
-                         capture_output=True, text=True)
+    # agbcc emits assembly before it has consumed all preprocessed input.
+    # File-backed stdin avoids a two-pipe deadlock observed on macOS.
+    with tempfile.TemporaryFile(mode="w+") as compiler_input:
+        compiler_input.write(pre)
+        compiler_input.seek(0)
+        asm = subprocess.run([compiler] + cflags + ["-o", "-"], stdin=compiler_input,
+                             cwd=ROOT, capture_output=True, text=True)
     if asm.returncode or "error" in asm.stderr:
         sys.stderr.write(asm.stderr)
         sys.exit(f"{os.path.basename(compiler)} failed on {src}")

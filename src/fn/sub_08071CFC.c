@@ -1,27 +1,18 @@
-#include "global.h"
-
-struct P {
-    u8 f[0x2a];
-    u16 n;
-    u32 fl;
-};
-void sub_08071470(struct P *);
-void sub_0806FD5C(struct P *);
-void sub_0806FDE0(struct P *);
-void sub_0806FE88(struct P *);
-void sub_08071CB0(struct P *);
-void sub_08070FA8(struct P *);
-s32 sub_08071CFC(struct P *p)
+#include "scene_actor_registry.h"
+void sub_0806FD5C(struct SceneActorRegistryManager *);
+void sub_0806FDE0(struct SceneActorRegistryManager *);
+void sub_0806FE88(struct SceneActorRegistryManager *);
+s32 SceneActorRegistry_TickManager(struct SceneActorRegistryManager *manager)
 {
-    u32 m;
-    sub_08071470(p);
-    sub_0806FD5C(p);
-    sub_0806FDE0(p);
-    sub_0806FE88(p);
-    sub_08071CB0(p);
-    sub_08070FA8(p);
-    m = 0xFFFF3FFF;
-    p->fl = p->fl & m;
-    p->n++;
+    u32 mask;
+    SceneActorRegistry_AdvanceInactiveActors(manager);
+    sub_0806FD5C(manager);
+    sub_0806FDE0(manager);
+    sub_0806FE88(manager);
+    SceneActorRegistry_UpdateBackgroundFlag(manager);
+    sub_08070FA8(manager);
+    mask = 0xFFFF3FFF;
+    manager->flags &= mask;
+    manager->frame++;
     return 0;
 }
