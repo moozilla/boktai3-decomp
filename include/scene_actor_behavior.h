@@ -27,6 +27,12 @@ struct SceneActorBehaviorView {
     u16 terrainCell;
     u8 unknown2F6[0xE];
     s32 counter304;
+    u8 unknown308[8];
+    u16 biasX310;
+    u8 unknown312[2];
+    u16 biasZ314;
+    u8 unknown316[0xB7];
+    u8 requestedDirection;
 };
 struct SceneActorBehaviorDestination {
     u16 flags;
