@@ -1,21 +1,13 @@
-#include "global.h"
-
-struct T {
-    u32 a, b, c;
+#include "roaming_object.h"
+#define RoamingObject_SetState sub_080638BC
+struct RoamingStateTable {
+    void (*entries[3])(struct RoamingObject *);
 };
-extern const struct T gUnk_0824DF8C;
-
-struct S {
-    u8 f[0x13C];
-    u16 a;
-    u16 b;
-    u32 c;
-};
-
-void sub_080638BC(struct S *p, u16 i)
+extern const struct RoamingStateTable gUnk_0824DF8C;
+void RoamingObject_SetState(struct RoamingObject *owner, u16 state)
 {
-    struct T t = gUnk_0824DF8C;
-    p->a = i;
-    p->b = 0;
-    p->c = ((u32 *)&t)[p->a];
+    struct RoamingStateTable table = gUnk_0824DF8C;
+    owner->state = state;
+    owner->flashCount = 0;
+    owner->update = table.entries[owner->state];
 }
