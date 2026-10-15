@@ -1,5 +1,6 @@
 #include "global.h"
-void sub_0812E084(u8 *p)
+/* Callers also forward a command table and index; this implementation ignores them. */
+void sub_0812E084(u8 *p, const void *table, u32 index)
 {
     u32 z = 0;
     p[8] = z;
