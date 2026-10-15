@@ -1,26 +1,36 @@
-#include "global.h"
-
-void Sprite_Remove(u8 *);
-void Anim_Remove(u8 *);
-void SceneInput_DestroyMarkerPair(u8 *);
-void SceneInput_DestroyGlyphPair(u8 *);
+#include "contact_swarm.h"
+#include "scene_input_panel.h"
+#include "scene_input_grid.h"
+#define SceneInventory_DestroyController sub_080632EC
+/* The cleanup span contains 54 panel widgets and 15 comparison widgets. */
+struct SceneInventoryCleanupView {
+    u8 task[0x60];
+    struct ContactSwarmSprite sprite;
+    u8 graphics[0x1C];
+    struct SceneInputWidget widgets[69];
+    u8 unknown1A88[0x1AF0 - 0x1A88];
+    struct SceneInputPair transition;
+    u8 unknown1BE4[0x30];
+    struct SceneInputPair prompt;
+};
+void SceneInput_DestroyMarkerPair(struct SceneInputPair *);
+void SceneInput_DestroyGlyphPair(struct SceneInputPair *);
 void sub_08030BF8(void);
 void sub_08033468(void);
-
-s32 sub_080632EC(u8 *p)
+s32 SceneInventory_DestroyController(struct SceneInventoryCleanupView *owner)
 {
-    u8 *q;
+    struct SceneInputWidget *widget;
     s32 i;
-    Sprite_Remove(p + 0x60);
-    q = p + 0xa8;
-    i = 0x44;
+    Sprite_Remove(&owner->sprite);
+    widget = owner->widgets;
+    i = 68;
     do {
-        Anim_Remove(q);
-        q += 0x60;
+        Anim_Remove(widget);
+        widget++;
         i--;
     } while (i >= 0);
-    SceneInput_DestroyMarkerPair(p + 0x1af0);
-    SceneInput_DestroyGlyphPair(p + 0x1c14);
+    SceneInput_DestroyMarkerPair(&owner->transition);
+    SceneInput_DestroyGlyphPair(&owner->prompt);
     sub_08030BF8();
     sub_08033468();
     return 0;
