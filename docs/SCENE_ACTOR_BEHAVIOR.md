@@ -129,6 +129,56 @@ and the callback returns1; rejected requests return0. The full88 bytes match wit
 five hints after minimizing eleven. The game-facing meaning of78700 remains
 unconfirmed, so the action name is provisional.
 
+## Reviewed movement/status gaps
+
+The remaining bodies have complete semantic scratch drafts but retain assembly
+and add no exact credit. `747B8` has a full736-byte baseline with six differing
+bytes, all signed-load scratch choices. A broad bounded permuter found no saved
+improvement; a separate search focuses on the bounce calculations. Register-hint
+minimization retained that baseline while reducing140→47 hints. A local volatile
+fill scalar currently controls stack-slot placement; an equivalent ordinary
+scalar plus an output-only memory-placement hint was also checked. Both variants
+assign the fill scalar explicitly before every actual read or `CpuSet` use.
+Neither variant is promoted pending a full match and source audit.
+
+`747B8` applies the vector at2EC and displacement2EA. With flags2D0 bit100000
+clear, it subtracts2 from vertical impulse, adds that impulse to displacement,
+and accumulates X/Z into velocity64/68. Ground contact either clears the vector
+when factor2E8 is zero or scales X/Z by5/10 and absolute Y by factor/10. It can
+emit a particle burst except for categories17,23,19,18,14,12, then invokes the
+optional actor240 callback. The alternate flag100000 path halves X/Z toward zero
+every fourth frame and accumulates horizontal velocity. The bit10 updates differ
+between an initially stationary actor and an actor that has just stopped; no
+persistent game-facing meaning is assigned to that bit.
+
+`74EB0` advances sequence or tile playback unless byte2B3 is1, then steps impulse,
+refreshes motion/cell data, calls the exact height helper, and reacts to cell
+changes. Byte2B3 is also the adjacent animation selector's refresh/restart input,
+so it remains a numeric latch in the shared actor view. New-cell attribute40 can
+select control238 or fallback81290 and numeric substate22. Attribute80 with game
+flags868 bit10 computes an impulse direction toward the cell center and prepares
+collider cost/current-health fields. Its height comparison retains the observed
+additional displacement2EA read after the height update. A full1624-byte scratch
+baseline scores68.29%; it is not exact progress.
+
+`75588` combines palette/status and contact-derived presentation updates. Palette
+base1E0 plus offset1E6 supplies the normal bank; fields1DC and1E4 are alternate
+banks selected by flags2D0 bit4000. Signed timers1E8/1EA govern flash/blink paths.
+The offset1E6 is the same physical field used by adjacent sound-selection code;
+this does not establish a separate sound-only runtime role. Palette transition
+calls retain all five arguments of71E00; the transition manager handles categories
+10 and23, as documented in the neighboring palette cohort.
+
+Actor178 is collider134+44. In this status phase it is a visibility countdown:
+with the relevant status guards clear, `(timer>>2)&1` selects drawable hidden bit0
+and shadow visibility, the counter decrements, and expiry restores visibility.
+This local evidence does not rename collider field44 globally. Other paths reset
+numeric control states17/18, sanitize contact flags, emit particles every fourth
+step of timer30C, and update target angleE9 and wrapped squared distanceF0 from
+sourceDC. Player-selection indices and the player-forced target source retain
+the original valid-player/storage preconditions; no new fallback is invented.
+The full2624-byte status body remains a nonmatching draft.
+
 ## Remaining contiguous bodies
 
 The remaining three functions retain assembly until their full spans match:
