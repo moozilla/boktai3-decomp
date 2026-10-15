@@ -53,9 +53,10 @@ and damps each velocity by signed `15/16`, truncating toward zero. Both particle
 initializers copy all eight position bytes, consume four successive masked RNG
 indices, and publish the final index after the fourth. X/Z vary by `(sample&31)-15`.
 Falling particles add a random byte to Y and start with Y velocity
-`(sample&31)+24`. The remaining rising initializer starts 768 units higher with
-negative Y velocity `-((sample&31)+32)`; it remains an assembly gap pending exact
-register allocation, and receives no matching credit.
+`(sample&31)+24`. The rising initializer starts 768 units higher with negative Y velocity
+`-((sample&31)+32)`. One ordinary scratch is reused across its height and final
+zero-velocity assignments. This gives the global allocator a value with multiple
+lifetimes and lets it select r7 naturally; no explicit r7 binding is present.
 
 The message receiver reloads the current manager selector and message count
 through the loop, consumes every message, and maps type 6 subcodes 5/6 to lift
@@ -68,8 +69,8 @@ particle emitter. Its control flow retracts the actor and selects idle versus
 disappearance; it is a separate reviewed function, not data in the emitter. The
 integrator records it in both extra-function inventories.
 
-Current new exact work: 17 functions, 4,344 bytes, +0.1798 percentage points of
-the `0x24DC0C` denominator. Of these, 1,936 bytes are unpinned and 2,408 retain
+Current new exact work: 18 functions, 4,520 bytes, +0.1871 percentage points of
+the `0x24DC0C` denominator. Of these, 1,936 bytes are unpinned and 2,584 retain
 minimized matching concessions. Sixteen preexisting exact helpers totaling
 1,272 bytes were named and converted to the common layout without byte credit.
 All changed functions were checked over their full reviewed extents. The worker
