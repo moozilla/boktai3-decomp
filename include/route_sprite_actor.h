@@ -15,14 +15,17 @@ struct RouteSpriteActor {
     u8 state;
     s8 index;
     u16 frames;
-    u8 entered, positionChanged, animationEnded, heading, angle;
+    u8 entered, positionChanged, animationEnded, heading;
+    s8 angle;
     s8 shadowAbsent;
     u8 unknown15C, kind, option, variant;
     u32 parameter;
     s16 amount;
     u8 prepared, unknown167;
-    s16 height, initialTimer, timer, moveTimer;
-    void *owner, *context;
+    u16 cyclesRemaining;
+    s16 initialTimer, timer, moveTimer;
+    u32 script;
+    void *context;
 };
 struct RouteSpritePool {
     u8 task[0x18];
@@ -35,6 +38,6 @@ struct RouteSpriteActor *sub_0806DF60(struct RouteSpritePool *);
 struct RouteSpriteActor *sub_0806DFB8(struct RouteSpritePool *);
 struct RouteSpritePool *sub_0806E250(void);
 void sub_08013B74(void *);
-void sub_0806DFC8(struct ContactPosition *, void *, s32, s32, s32, u32, u32, u32, u32, void *,
+void sub_0806DFC8(struct ContactPosition *, void *, s32, s32, s32, u32, u32, u32, u32, u32,
                   void *, s32);
 #endif

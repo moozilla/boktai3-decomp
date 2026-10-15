@@ -4,12 +4,12 @@
 u8 sub_0821E5C4(void *, s32, s32, s32);
 s32 ScaledShadow_Initialize(u8 *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void RouteSpriteActor_Create(struct ContactPosition *anchor, void *unused, s32 initialTimer,
-                             s32 height, s32 amount, u32 kind, u32 parameter, u32 option,
-                             u32 variant, void *owner, void *context, s32 route)
+                             s32 cycles, s32 amount, u32 kind, u32 parameter, u32 option,
+                             u32 variant, u32 script, void *context, s32 route)
 {
     struct ContactPosition *savedAnchor = anchor;
     s32 savedTimer = initialTimer;
-    s32 savedHeight = height;
+    s32 savedCycles = cycles;
     register struct RouteSpritePool *pool asm("r6");
     struct RouteSpriteActor *actor;
     u32 zero;
@@ -46,7 +46,7 @@ void RouteSpriteActor_Create(struct ContactPosition *anchor, void *unused, s32 i
         offsetB = 0x154;
         *(u16 *)((u32)actor + offsetB) = zero;
         offsetA += 0x18;
-        *(s16 *)((u32)actor + offsetA) = savedHeight;
+        *(s16 *)((u32)actor + offsetA) = savedCycles;
         actor->variant = variant;
         offsetB += 0x10;
         *(s16 *)((u32)actor + offsetB) = amount;
@@ -64,8 +64,8 @@ void RouteSpriteActor_Create(struct ContactPosition *anchor, void *unused, s32 i
         }
         offsetA += 6;
         {
-            register void **dst asm("r1") = (void *)((u32)actor + offsetA);
-            *dst = owner;
+            register u32 *dst asm("r1") = (void *)((u32)actor + offsetA);
+            *dst = script;
         }
         {
             register u32 offset asm("r0") = 0x174;
