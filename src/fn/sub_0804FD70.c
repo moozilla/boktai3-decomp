@@ -1,8 +1,8 @@
 #include "repeated_effect.h"
 #define RepeatedEffect_InitParameters sub_0804FD70
 s32 sub_0822C034(struct RepeatedEffectPosition *);
-void RepeatedEffect_InitParameters(struct RepeatedEffect *effect, u16 tag,
-                                   struct RepeatedEffectPosition *position, u8 state, u32 behavior,
+void RepeatedEffect_InitParameters(struct RepeatedEffect *effect, u32 tag,
+                                   struct RepeatedEffectPosition *position, u32 state, u32 behavior,
                                    u32 constrain)
 {
     effect->tag = tag;
