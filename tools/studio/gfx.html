@@ -115,6 +115,7 @@ async function boot() {
   $('palSel').onchange = () => { curPal = palettes[+$('palSel').value] || null; localStore('pal', $('palSel').value); refresh(); };
   $('zoom').onchange = () => { zoom = +$('zoom').value; refresh(); };
   $('q').oninput = renderList;
+  listKeys(() => $('list'), '.row');
   window.onhashchange = route;
   route();
 }
@@ -133,7 +134,7 @@ function route() {
     renderList();
     // a map hash alone opens its stage entry (MAP-TILESET-HP) when there is one
     const key = s && (items.find(i => i.key === s) || items.find(i => i.key.startsWith(s + '-')) || items.find(i => i.key.toUpperCase() === s.toUpperCase()))?.key;
-    if (key) select(key, true); else if (s) select(s); else if (!sel || !items.some(i => i.key === sel)) select(items[0]?.key); else refresh();
+    if (key) select(key, true); else if (s && views[tab].free) select(s); else if (!sel || !items.some(i => i.key === sel)) select(items[0]?.key); else refresh();
   });
 }
 function renderList() {
@@ -172,7 +173,7 @@ function learnedColors(kind, hash) {
   return learnedPalette(learned.sprites[`${kind}:${hash}`]);
 }
 function learnedNote(kind, hash) {
-  return learned.sprites[`${kind}:${hash}`] ? ' · <span style="color:var(--accent)">colours from an in-game capture</span>' : '';
+  return learned.sprites[`${kind}:${hash}`] ? ' · <span style="color:var(--accent)">colors from an in-game capture</span>' : '';
 }
 function tagButton(kind, hash, part = '') {
   const t = tagList.find(x => x.kind === kind && x.hash === hash && x.part === String(part));
@@ -185,6 +186,43 @@ function tagButton(kind, hash, part = '') {
     b.textContent = `Text: ${note} (${t?.status || 'todo'})`;
   };
   return b;
+}
+
+// Every animation of a package playing at once, a page at a time.
+let animTimer = null;
+function animGrid(pkg, colors, open) {
+  clearInterval(animTimer);
+  const grid = $('anims'), PAGE = 60, players = [];
+  let shown = 0;
+  const more = document.createElement('button'); more.className = 'more';
+  grid.after(more);
+  const add = () => {
+    for (const end = Math.min(pkg.anims.length, shown + PAGE); shown < end; shown++) {
+      const i = shown, a = pkg.anims[i];
+      const fs = a.keys.map(k => pkg.frames[k.frame] ? pkg.parts(pkg.frames[k.frame]) : []), all = fs.flat();
+      if (!all.length) continue;
+      const box = [Math.min(...all.map(p => p.x)), Math.min(...all.map(p => p.y)), Math.max(...all.map(p => p.x + p.w)), Math.max(...all.map(p => p.y + p.h))];
+      const imgs = fs.map(f => compose(f, colors, box));
+      const c = document.createElement('div'); c.className = 'cell'; c.title = `animation #${i} (id ${a.id}, ${a.keys.length} keys)`;
+      const cv = document.createElement('canvas'); cv.width = box[2] - box[0]; cv.height = box[3] - box[1];
+      const s = Math.min(2, 72 / Math.max(cv.width, cv.height)); cv.style.width = cv.width * s + 'px'; cv.style.height = cv.height * s + 'px';
+      c.append(cv); c.insertAdjacentHTML('beforeend', `<span>#${i}</span>`);
+      c.onclick = () => open(i);
+      grid.appendChild(c);
+      players.push({ cv, imgs, keys: a.keys, k: 0, left: 0 });
+    }
+    more.hidden = shown >= pkg.anims.length; more.textContent = `Show more animations (${pkg.anims.length - shown} left)`;
+  };
+  more.onclick = add; add();
+  animTimer = setInterval(() => {
+    if (!document.body.contains(grid)) return clearInterval(animTimer);
+    for (const p of players) {
+      if (--p.left > 0) continue;
+      p.k = (p.k + 1) % p.keys.length; p.left = Math.max(1, p.keys[p.k].dur || 8);
+      const img = p.imgs[p.k], ctx = p.cv.getContext('2d');
+      ctx.clearRect(0, 0, p.cv.width, p.cv.height); if (img) ctx.putImageData(img, 0, 0);
+    }
+  }, 1000 / 60);
 }
 
 let _caps = null;
@@ -229,15 +267,16 @@ views.sprites = {
   async init() { items = (index.tCB05 || []).map(([h, n]) => ({ key: h, note: NOTES[h], n: (n / 1024).toFixed(0) + ' KB' })); },
   async show(h) {
     const bytes = await res('tCB05', h), pkg = parsePackage(bytes), base = le(bytes, 0);
-    // colours: the package's own palette from the 9B1B pool (what the game uses
+    // colors: the package's own palette from the 9B1B pool (what the game uses
     // unless the code showing it picks another), a capture, or the palette menu
     const mode = localStore('sprpal') || 'pool';
     const colors = mode === 'capture' && learnedColors('spr', h) || mode === 'menu' && colorsNow() || await packageColors(bytes);
     const v = $('view');
     v.innerHTML = `<h2>Sprite package ${h}</h2><div class="meta">${NOTES[h] ? NOTES[h] + ' · ' : ''}${pkg.frames.length} frames · ${pkg.anims.length} animations · ${pkg.ntiles} tiles · palette: ${peekLink('/gfx#pool/' + base, 'pool entry ' + base)}</div>
       <div class="controls">Animation <select id="anim"></select> <span id="ainfo" style="color:var(--muted)"></span>
-        Colours <select id="sprpal"><option value="pool">in-game (palette pool)</option><option value="capture"${learnedColors('spr', h) ? '' : ' disabled'}>as seen in a capture</option><option value="menu">palette menu</option></select> <span id="tagslot"></span></div>
-      <div class="stage" id="stage"></div><div class="strip" id="strip"></div>`;
+        Colors <select id="sprpal"><option value="pool">in-game (palette pool)</option><option value="capture"${learnedColors('spr', h) ? '' : ' disabled'}>as seen in a capture</option><option value="menu">palette menu</option></select> <span id="tagslot"></span></div>
+      <div class="stage" id="stage"></div><div class="strip" id="strip"></div>
+      <h2 style="margin-top:20px">All animations</h2><div class="meta">Every animation playing; click one to open it above.</div><div class="grid" id="anims"></div>`;
     const cache = [], imgAt = i => (cache[i] ??= compose(pkg.parts(pkg.frames[i]), colors));
     const sel = $('anim');
     sel.innerHTML = pkg.anims.map((a, i) => `<option value="${i}">#${i} (id ${a.id}, ${a.keys.length} keys)</option>`).join('') || '<option>none</option>';
@@ -253,6 +292,7 @@ views.sprites = {
     sel.onchange = play; play();
     $('sprpal').value = mode; $('sprpal').onchange = () => { localStore('sprpal', $('sprpal').value); refresh(); };
     frameStrip(pkg.frames.length, imgAt, wantFrame);
+    animGrid(pkg, colors, i => { sel.value = i; play(); $('stage').scrollIntoView({ block: 'nearest' }); });
     $('tagslot').appendChild(tagButton('spr', h));
   },
 };
@@ -336,11 +376,12 @@ function tilesetOffsets(id) { // -> function(tile) -> [src, offset]
   const ids = Array.from({ length: s.n }, (_, k) => le(ptn.p, ptn.I + s.off + k * 2));
   return t => t < ids.length ? [ptn.p, ptn.D + ids[t] * 32] : null;
 }
-function renderMP(m, ent, tileAt, colors, grid) {
+// One layer; `into` draws it over an existing image (color 0 transparent).
+function renderMP(m, ent, tileAt, colors, grid, into) {
   const W = ent.w, H = ent.h, B = (W % 16 === 0 && H % 16 === 0) ? 16 : 0;
-  const img = new ImageData(W * 16, H * 16), d = img.data;
+  const img = into || new ImageData(W * 16, H * 16), d = img.data;
   const [R0, G0, B0] = colors[0];
-  for (let k = 0; k < d.length; k += 4) { d[k] = R0; d[k + 1] = G0; d[k + 2] = B0; d[k + 3] = 255; }
+  if (!into) for (let k = 0; k < d.length; k += 4) { d[k] = R0; d[k + 1] = G0; d[k + 2] = B0; d[k + 3] = 255; }
   const cells = [];
   for (let i = 0; i < W * H; i++) {
     let x, y;
@@ -376,7 +417,7 @@ views.maps = {
     v.innerHTML = `<h2>Map ${mh}${st ? ` · stage` : ''}</h2>
       <div class="meta">${m.count} layer${m.count > 1 ? 's' : ''} · ${m.nmeta} metatiles · ${own ? m.ntiles + ' own tiles' : 'tiles from ptn tileset (' + m.ntiles + ' used)'}${st ? ` · loaded by script procs ${st.procs.join(', ')} with HP data ${st.hp}` : ''}</div>
       <div class="controls">
-        ${m.count > 1 ? 'Layer <select id="lay">' + m.ents.map((e, i) => `<option value="${i}">${e.hash} (${e.w}×${e.h})</option>`).join('') + '</select>' : ''}
+        ${m.count > 1 ? 'Layer <select id="lay"><option value="-1">all, layer 0 in front</option>' + m.ents.map((e, i) => `<option value="${i}">${i}: ${e.hash} (${e.w}×${e.h})</option>`).join('') + '</select>' : ''}
         ${own ? '' : `Tileset <select id="tsel">${tsList.map(t => `<option ${t === (ts || savedTs) ? 'selected' : ''}>${t}</option>`).join('')}</select>`}
         <label><input type="checkbox" id="grid"> metatile grid</label>
         <span id="palhint" style="color:var(--muted)"></span> <span id="capslot"></span> <span id="tagslot"></span>
@@ -390,7 +431,7 @@ views.maps = {
     const caps = (await capturesList()).filter(c => c.stage_map === mh || c.map === mh);
     let capColors = null;
     if (caps.length) {
-      $('capslot').innerHTML = `Colours <select id="capsel"><option value="">from the palette menu</option>${caps.map((c, i) => `<option value="${i}">palette RAM of capture ${esc(c.label || c.name)}</option>`).join('')}</select>`;
+      $('capslot').innerHTML = `Colors <select id="capsel"><option value="">from the palette menu</option>${caps.map((c, i) => `<option value="${i}">palette RAM of capture ${esc(c.label || c.name)}</option>`).join('')}</select>`;
       $('capsel').value = localStore('mapcap.' + mh) ?? '0';
       $('capsel').onchange = async () => { localStore('mapcap.' + mh, $('capsel').value); await pickCap(); draw(); };
     }
@@ -400,12 +441,20 @@ views.maps = {
     };
     await pickCap();
     const draw = () => {
-      const ent = m.ents[$('lay') ? +$('lay').value : 0];
+      const li = $('lay') ? +$('lay').value : 0, ent = m.ents[Math.max(0, li)];
       if (!ent) { $('ms').textContent = 'No layers.'; return; }
       let tileAt;
       if (own) tileAt = t => t < m.ntiles ? [m.b, m.tiles + t * 32] : null;
       else { const id = $('tsel').value; localStore('mapts.' + mh, id); tileAt = tilesetOffsets(id) || (() => null); }
-      const { img, cells } = renderMP(m, ent, tileAt, capColors || colorsNow(), $('grid').checked);
+      const cols = capColors || colorsNow();
+      let img, cells;
+      if (li < 0) {  // composite: back layers first
+        const W = Math.max(...m.ents.map(e => e.w)), H = Math.max(...m.ents.map(e => e.h));
+        img = new ImageData(W * 16, H * 16);
+        const [R0, G0, B0] = cols[0];
+        for (let k = 0; k < img.data.length; k += 4) { img.data[k] = R0; img.data[k + 1] = G0; img.data[k + 2] = B0; img.data[k + 3] = 255; }
+        for (let k = m.ents.length - 1; k >= 0; k--) ({ cells } = renderMP(m, m.ents[k], tileAt, cols, $('grid').checked && k === 0, img));
+      } else ({ img, cells } = renderMP(m, ent, tileAt, cols, $('grid').checked));
       const cv = toCanvas(img, zoom); $('ms').replaceChildren(cv);
       cv.onmousemove = ev => {
         const r = cv.getBoundingClientRect(), x = Math.floor((ev.clientX - r.left) / zoom / 16), y = Math.floor((ev.clientY - r.top) / zoom / 16);
@@ -420,6 +469,7 @@ views.maps = {
 // ---------- palettes ----------
 // ---------- sprite palette pool (9B1B) ----------
 views.pool = {
+  free: true,  // any entry number, not just the listed pages
   async init() {
     const pool = await spritePool();
     // which packages start where
@@ -430,7 +480,7 @@ views.pool = {
   },
   async show(key) {
     const pool = await spritePool(), want = +key, start = Math.floor(want / 32) * 32, v = $('view');
-    v.innerHTML = `<h2>Sprite palette pool</h2><div class="meta">Resource 9B1B: ${pool.n} sub-palettes of 16 colours. The game copies entries into OBJ palette banks as sprites need them; a sprite package's first word is the entry its palette bank 0 uses. Showing ${start}–${Math.min(pool.n, start + 32) - 1}.</div><div class="palgrid" id="pg"></div>`;
+    v.innerHTML = `<h2>Sprite palette pool</h2><div class="meta">Resource 9B1B: ${pool.n} sub-palettes of 16 colors. The game copies entries into OBJ palette banks as sprites need them; a sprite package's first word is the entry its palette bank 0 uses. Showing ${start}–${Math.min(pool.n, start + 32) - 1}.</div><div class="palgrid" id="pg"></div>`;
     for (let i = start; i < Math.min(pool.n, start + 32); i++) {
       const card = document.createElement('div'); card.className = 'palcard' + (i === want ? ' on' : '');
       const us = this.users[i] || [];
@@ -443,6 +493,7 @@ views.pool = {
 
 // ---------- data: resources that are not graphics ----------
 views.data = {
+  free: true,
   async init() { items = Object.entries(index).flatMap(([lab, es]) => es.map(([h, n]) => ({ key: `${lab}:${h}`, note: lab, n: n >= 1024 ? (n / 1024).toFixed(0) + ' KB' : n + ' B' }))); },
   async show(key) {
     const [lab, h] = key.split(':');
@@ -472,7 +523,7 @@ views.palettes = {
   async init() { items = palettes.map((p, i) => ({ key: p.hash, i })); },
   async show(h) {
     const v = $('view');
-    v.innerHTML = `<h2>Palettes</h2><div class="meta">${palettes.length} resources of 256 colours (16 banks). Sprites choose a bank per part; which palette the game loads for a sprite is set at runtime (scripts, stage data), so pick one here. Click a palette to use it everywhere.</div><div class="palgrid" id="pg"></div>`;
+    v.innerHTML = `<h2>Palettes</h2><div class="meta">${palettes.length} resources of 256 colors (16 banks). Sprites choose a bank per part; which palette the game loads for a sprite is set at runtime (scripts, stage data), so pick one here. Click a palette to use it everywhere.</div><div class="palgrid" id="pg"></div>`;
     const pg = $('pg');
     palettes.forEach((p, i) => {
       const card = document.createElement('div'); card.className = 'palcard' + (curPal === p ? ' on' : '');
