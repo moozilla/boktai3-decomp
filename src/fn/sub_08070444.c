@@ -23,7 +23,7 @@ s32 SceneActorRegistry_CountLivingByCategoryAndField(s32 inputCategory, s32 inpu
                 u32 offset = 0x2d0;
                 u32 *flags;
                 flags = (void *)((u8 *)actor + offset);
-                if (!(*flags & mask) && actor->state == category) {
+                if (!(*flags & mask) && actor->category == category) {
                     offset -= 0xea;
                     {
                         register u16 *criterion asm("r0") = (void *)((u8 *)actor + offset);
