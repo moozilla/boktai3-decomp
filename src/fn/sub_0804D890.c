@@ -1,5 +1,4 @@
 #include "global.h"
-#define StagedEffect_MarkOuterSpritesAlternate sub_0804D890
 
 void StagedEffect_MarkOuterSpritesAlternate(u8 *p)
 {

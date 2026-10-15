@@ -1,5 +1,4 @@
 #include "cell_gate.h"
-#define CellGate_UpdateForcedDirection sub_08050404
 static inline u8 specialMode(void)
 {
     u32 mode = gUnk_02000534;
@@ -10,9 +9,9 @@ static inline u8 specialMode(void)
 }
 void CellGate_UpdateForcedDirection(struct CellGate *gate)
 {
-    s32 result = sub_08050188(gate);
+    s32 result = CellGate_TestPlayerHeight(gate);
     if (result) {
-        result = sub_08050128(gate);
+        result = CellGate_TestPlayerCell(gate);
         if (result) {
             if (!gate->playerInside) {
                 gUnk_02000580->gateCount++;
@@ -26,7 +25,7 @@ void CellGate_UpdateForcedDirection(struct CellGate *gate)
                 sub_0821D6D0(gate->registration);
                 gate->registered = 0;
             }
-            sub_080503A0(gate, 40);
+            CellGate_ClampPlayerEdge(gate, 40);
             if (gUnk_02000580->transitionMode != 4 && !specialMode()) {
                 struct CellGatePlayer *player = gUnk_02000580;
                 u32 action = player->actionMode;
@@ -46,7 +45,7 @@ void CellGate_UpdateForcedDirection(struct CellGate *gate)
                 gUnk_02000580->gateCount--;
                 gate->playerInside = result;
             }
-            if (!sub_08050310(gate)) {
+            if (!CellGate_TestForcedPassage(gate)) {
                 if (!gate->registered) {
                     sub_0821D698(gate->registration, gate->cell, 0, gate->height, 255, 0x80B);
                     gate->registered = 1;

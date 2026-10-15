@@ -1,5 +1,4 @@
 #include "staged_effect.h"
-#define StagedEffect_PlayShakeSequence sub_0804DB80
 // MATCHING_CONCESSION: register-pinning
 void StagedEffect_PlayShakeSequence(struct StagedEffect *effect)
 {
@@ -24,7 +23,7 @@ void StagedEffect_PlayShakeSequence(struct StagedEffect *effect)
         effect->shakeZ = 0;
     }
     if (effect->frame == 10 || effect->frame == 20 || effect->frame == 60 || effect->frame == 70)
-        sub_0822B2F8(0xD3);
+        Sound_PlaySong(0xD3);
     nextFrame = effect->frame;
     if (nextFrame > 89) {
         register u32 state asm("r1") = 7;

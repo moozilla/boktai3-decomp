@@ -1,12 +1,11 @@
 #include "staged_effect.h"
-#define StagedEffect_Initialize sub_0804DD48
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
-void sub_08020CD4(void *, u32, u32);
-u32 sub_0804DD44(void);
-u32 sub_0821ABA8(u32, u32);
-void sub_082151E4(void *, u32);
-void sub_082144A4(void *, void *, u32);
+void SceneMessages_RegisterReceiver(void *, u32, u32);
+u32 StagedEffect_GetPaletteIndex(void);
+u32 Script_GetKeywordValue(u32, u32);
+void AnimData_Load(void *, u32);
+void Sprite_Init(void *, void *, u32);
 extern u8 *gUnk_02000710;
 s32 StagedEffect_Initialize(struct StagedEffect *effect, u32 script)
 {
@@ -22,7 +21,7 @@ s32 StagedEffect_Initialize(struct StagedEffect *effect, u32 script)
     else
         effect->hasScript = hasScript;
     if (effect->hasScript) {
-        sub_08020CD4((u8 *)effect + 0x18, script, 10);
+        SceneMessages_RegisterReceiver((u8 *)effect + 0x18, script, 10);
         {
             u32 state = 0;
             u16 *destination = &effect->state;
@@ -36,7 +35,7 @@ s32 StagedEffect_Initialize(struct StagedEffect *effect, u32 script)
         *destination = state;
         effect->frame = 0;
         hide = 0;
-        sub_0822B2F8(0x1C6);
+        Sound_PlaySong(0x1C6);
     }
     if (Script_SeekToKeyword(0x70)) {
         effect->position.axes.x = Script_GetValue();
@@ -49,17 +48,17 @@ s32 StagedEffect_Initialize(struct StagedEffect *effect, u32 script)
         effect->position.axes.z = *(u16 *)(game + 0x34);
     }
     {
-        u32 value = sub_0804DD44();
+        u32 value = StagedEffect_GetPaletteIndex();
         paletteIndex = &effect->paletteIndex;
         *paletteIndex = value;
     }
     {
-        u32 value = sub_0821ABA8(0x68, 1024);
+        u32 value = Script_GetKeywordValue(0x68, 1024);
         travel = &effect->travel;
         *travel = value;
     }
     effect->initialTravel = *travel;
-    effect->spread = sub_0821ABA8(0x6D, 512);
+    effect->spread = Script_GetKeywordValue(0x6D, 512);
     effect->initialSpread = effect->spread;
     effect->scale = 2032;
     {
@@ -74,12 +73,12 @@ s32 StagedEffect_Initialize(struct StagedEffect *effect, u32 script)
             effect->scriptReleaseFrame = 0;
         }
     }
-    sub_082151E4(&effect->graphics, 0x2499);
+    AnimData_Load(&effect->graphics, 0x2499);
     i = 0;
     do {
         struct StagedEffectSprite *sprite = &effect->sprites[i];
         u32 xy, z;
-        sub_082144A4(sprite, &effect->graphics, 2);
+        Sprite_Init(sprite, &effect->graphics, 2);
         sprite->priority = *savedPaletteIndex * 7;
         xy = effect->position.words[0];
         z = effect->position.words[1];

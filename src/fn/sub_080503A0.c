@@ -1,6 +1,5 @@
 #include "cell_gate.h"
-#define CellGate_ClampPlayerEdge sub_080503A0
-void sub_080503A0(struct CellGate *p, s32 b)
+void CellGate_ClampPlayerEdge(struct CellGate *p, s32 b)
 {
     if (p->flags & 8) {
         u32 v = *(u16 *)&gUnk_02000580->position.x;

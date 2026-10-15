@@ -1,5 +1,4 @@
 #include "staged_effect.h"
-#define StagedEffect_BlendPalette sub_0804D778
 void StagedEffect_BlendPalette(struct StagedEffect *effect, s32 first, s32 second, s32 blend)
 {
     const u16 *a = gUnk_030042E4 + (first + 0x283) * 16;

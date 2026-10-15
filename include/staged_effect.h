@@ -41,8 +41,8 @@ struct StagedEffect {
 extern u16 *gUnk_030042E4;
 extern u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
-void sub_0804D874(struct StagedEffect *);
-void sub_0804D890(struct StagedEffect *);
-void sub_0804D778(struct StagedEffect *, s32, s32, s32);
-void sub_0822B2F8(u32);
+void StagedEffect_MarkOuterSprites(struct StagedEffect *);
+void StagedEffect_MarkOuterSpritesAlternate(struct StagedEffect *);
+void StagedEffect_BlendPalette(struct StagedEffect *, s32, s32, s32);
+void Sound_PlaySong(u32);
 #endif

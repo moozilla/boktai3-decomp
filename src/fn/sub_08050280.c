@@ -1,11 +1,10 @@
 #include "cell_gate.h"
-#define CellGate_UpdatePassageBarrier sub_08050280
-s32 sub_080501E8(struct CellGate *);
-void sub_08050280(struct CellGate *p)
+s32 CellGate_TestPassage(struct CellGate *);
+void CellGate_UpdatePassageBarrier(struct CellGate *p)
 {
-    s32 r = sub_08050188(p);
+    s32 r = CellGate_TestPlayerHeight(p);
     if (r != 0) {
-        if (sub_08050128(p) != 0 && (r = sub_080501E8(p)) == 0) {
+        if (CellGate_TestPlayerCell(p) != 0 && (r = CellGate_TestPassage(p)) == 0) {
             if (p->registered != 0) {
                 sub_0821D6D0(p->registration);
                 p->registered = r;

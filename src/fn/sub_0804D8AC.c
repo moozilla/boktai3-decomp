@@ -1,5 +1,4 @@
 #include "global.h"
-#define StagedEffect_CheckScriptCompletion sub_0804D8AC
 struct E {
     u8 a[6];
     u8 t;

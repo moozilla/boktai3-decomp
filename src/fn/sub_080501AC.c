@@ -1,5 +1,4 @@
 #include "cell_gate.h"
-#define CellGate_TestPlayerEdge sub_080501AC
 s32 CellGate_TestPlayerEdge(struct CellGate *gate, s32 limit)
 {
     u32 value, mask;

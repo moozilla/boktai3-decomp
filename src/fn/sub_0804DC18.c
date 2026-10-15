@@ -1,5 +1,4 @@
 #include "staged_effect.h"
-#define StagedEffect_ReleaseScript sub_0804DC18
 void Script_Call(u32, u32);
 void StagedEffect_ReleaseScript(struct StagedEffect *effect)
 {

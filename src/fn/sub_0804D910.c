@@ -1,9 +1,8 @@
 #include "staged_effect.h"
-#define StagedEffect_WaitForScript sub_0804D910
-s32 sub_0804D8AC(struct StagedEffect *);
+s32 StagedEffect_CheckScriptCompletion(struct StagedEffect *);
 void StagedEffect_WaitForScript(struct StagedEffect *effect)
 {
-    if (sub_0804D8AC(effect)) {
+    if (StagedEffect_CheckScriptCompletion(effect)) {
         u16 *state = &effect->state;
         u32 mask = ~1;
         struct StagedEffectSprite *sprite = &effect->sprites[1];
@@ -16,6 +15,6 @@ void StagedEffect_WaitForScript(struct StagedEffect *effect)
             *state = 1;
             effect->frame = zero;
         }
-        sub_0822B2F8(0x1C6);
+        Sound_PlaySong(0x1C6);
     }
 }

@@ -1,5 +1,4 @@
 #include "global.h"
-#define StagedEffect_ContractSpread sub_0804D954
 struct P {
     u8 f[0x5c];
     u16 f5c;

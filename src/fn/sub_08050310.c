@@ -1,6 +1,5 @@
 #include "cell_gate.h"
-#define CellGate_TestForcedPassage sub_08050310
-s32 sub_08050310(struct CellGate *p)
+s32 CellGate_TestForcedPassage(struct CellGate *p)
 {
     struct CellGatePlayer *g = gUnk_02000580;
     if (g->transitionMode == 4) {
@@ -30,7 +29,7 @@ s32 sub_08050310(struct CellGate *p)
                 goto no;
         }
     call:
-        if (sub_080501AC(p, 0x28) != 0)
+        if (CellGate_TestPlayerEdge(p, 0x28) != 0)
             goto yes;
         goto no;
     }

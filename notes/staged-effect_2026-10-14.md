@@ -60,3 +60,7 @@ pointer reloads between writes are preserved.
 
 No gaps/drafts remain in the completed effect subsection. Continue at 0804E180
 (the surrounding DF4C/E030 descriptor helpers were already exact).
+
+Integration validation: the combined effects/gates build printed
+`build/boktai3.gba: OK`, with 33 complete post-promotion extent checks.
+Aggregate exact progress is24.509%, up0.1209 percentage points.

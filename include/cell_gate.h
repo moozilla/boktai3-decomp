@@ -29,12 +29,12 @@ struct CellGatePlayer {
 typedef void (*CellGateUpdate)(struct CellGate *);
 extern struct CellGatePlayer *gUnk_02000580;
 extern u16 gUnk_02000534, gUnk_02000500;
-s32 sub_08050188(struct CellGate *);
-s32 sub_08050128(struct CellGate *);
-s32 sub_080501AC(struct CellGate *, s32);
-s32 sub_08050310(struct CellGate *);
-s32 sub_08050574(struct CellGate *);
-void sub_080503A0(struct CellGate *, s32);
+s32 CellGate_TestPlayerHeight(struct CellGate *);
+s32 CellGate_TestPlayerCell(struct CellGate *);
+s32 CellGate_TestPlayerEdge(struct CellGate *, s32);
+s32 CellGate_TestForcedPassage(struct CellGate *);
+s32 CellGate_TestTraversalMode(struct CellGate *);
+void CellGate_ClampPlayerEdge(struct CellGate *, s32);
 void sub_0821D6D0(void *);
 void sub_0821D698(void *, u32, u32, u32, u32, u32);
 void sub_08158CD8(struct CellGatePlayer *);
