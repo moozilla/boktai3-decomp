@@ -67,9 +67,9 @@ void ScenePanel_CreateSubjects(struct ScenePanelConfigView *parent)
                     variant = 0;
                     appearDelay = 0;
             }
-            parent->subjects[i] =
-                ScenePanelSubject_Create((const void *)&position, row, variant, initialStates[i],
-                                         kind, contactLimit, colliderSetting, appearDelay);
+            parent->subjects[i] = (struct SceneRigSubject *)ScenePanelSubject_Create(
+                (const void *)&position, row, variant, initialStates[i], kind, contactLimit,
+                colliderSetting, appearDelay);
         }
     }
 }
