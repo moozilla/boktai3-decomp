@@ -12,6 +12,6 @@ addr,name,confidence,evidence
 0804271C,DisplayAnimation_TestFlags,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
 08042738,DisplayAnimation_SetPriority,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
 0804275C,DisplayAnimation_SetPalette,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
-08042798,DisplayAnimation_SelectTiles,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
+08042798,DisplayAnimation_SelectPaletteBank,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
 080427C0,DisplayAnimation_SetTileSource,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md
 080427E0,DisplayAnimation_GetTileIndex,low,Observed contiguous selector/display lifecycle; notes/script-selector-display_2026-10-14.md

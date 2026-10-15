@@ -78,7 +78,7 @@ struct PooledPackedArgs {
 
 /* Engine helpers. */
 void sub_08219918(void *, void *, s32, s32, s32, s32, s32, void *);
-void sub_08219A80(void *, u32);
+void Anim_SelectPaletteBank(void *, u32);
 void sub_08214424(void *, u32);
 u32 sub_0821E67C(void *, void *, void *, void *, u32, u32, u32);
 void sub_0821E618(void *);

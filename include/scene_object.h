@@ -37,7 +37,7 @@ struct SceneBody {
 
 struct SceneAnimation {
     u8 pad0[6];
-    u16 initial; /* default animation index */
+    u16 paletteIndex; /* selected bank of sixteen RGB15 colors */
     u8 pad8[4];
     void *palette; /* palette override used by type 6 objects */
     u8 tail[12];
@@ -88,7 +88,7 @@ struct SceneObject {
     s16 health;
     u8 damageTimer; /* counts down while the object is invulnerable */
     u8 mode;        /* 0 normal, 2 removed, 3 destroyed by script */
-    u16 initialAnimation;
+    u16 basePalette;
     u16 animation;
     u8 active; /* slot in use */
     u8 animationTimer;
@@ -165,7 +165,7 @@ struct SceneObjectManager *sub_08005778(void *);
 struct SceneObject *sub_080057D0(struct SceneObjectManager *);
 struct SceneObject *sub_080057FC(struct SceneObjectManager *, u32 id);
 s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *position,
-                              u32 animationResource, s32 drawMode, s32 health, s32 initialAnimation,
+                              u32 animationResource, s32 drawMode, s32 health, s32 basePalette,
                               s32 animation, u32 script);
 s32 SceneObjects_CreateFromScript(void);
 s32 SceneObjects_SwitchPaletteFromScript(void);

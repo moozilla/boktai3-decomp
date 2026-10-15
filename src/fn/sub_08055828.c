@@ -1,37 +1,25 @@
-#include "global.h"
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct Obj {
-    u8 pad0[0x40];
-    u32 flags;
-    u8 pad44[0x14];
-    struct Vec pos;
-    u8 pad60[0x3a];
-    u16 active, enable, hidden, timer, duration;
-    struct Vec current, from, to;
-};
-extern u8 *gUnk_02000710;
-s32 Div(s32, s32);
-void sub_08055828(struct Obj *p)
+#include "script_keyframe_pool.h"
+void ScriptKeyframe_UpdateEntry(struct ScriptKeyframeEntry *entry)
 {
-    if (p->active) {
-        p->timer++;
-        if (p->timer >= p->duration) {
-            p->current = p->to;
-            p->active = 0;
+    if (entry->moving) {
+        if (++entry->moveFrame >= entry->moveDuration) {
+            entry->position = entry->target;
+            entry->moving = 0;
         } else {
-            s32 remaining = p->duration - p->timer;
-            p->current.x = Div(p->to.x * p->timer + p->from.x * remaining, p->duration);
-            p->current.y = Div(p->to.y * p->timer + p->from.y * remaining, p->duration);
-            p->current.z = Div(p->to.z * p->timer + p->from.z * remaining, p->duration);
+            s32 left = entry->moveDuration - entry->moveFrame;
+            entry->position.x = Div(entry->target.x * entry->moveFrame + entry->origin.x * left,
+                                    entry->moveDuration);
+            entry->position.y = Div(entry->target.y * entry->moveFrame + entry->origin.y * left,
+                                    entry->moveDuration);
+            entry->position.z = Div(entry->target.z * entry->moveFrame + entry->origin.z * left,
+                                    entry->moveDuration);
         }
-        p->pos = p->current;
+        entry->animation.display.position = entry->position;
     }
-    if (p->enable) {
-        if (p->hidden == 0 && *(s16 *)(gUnk_02000710 + 0x14) != 0)
-            p->flags &= ~1;
+    if (entry->conditionalVisibility) {
+        if (!entry->hidden && gUnk_02000710->unk14)
+            entry->animation.display.flags &= ~1;
         else
-            p->flags |= 1;
+            entry->animation.display.flags |= 1;
     }
 }

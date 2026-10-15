@@ -49,5 +49,5 @@ struct ResourceStation {
 };
 extern u16 gUnk_02000534, gUnk_02000500;
 extern struct ResourceStationPosition gUnk_03005418;
-void AnimData_SelectTiles(void *, s32);
+void AnimData_SelectPaletteBank(void *, s32);
 #endif

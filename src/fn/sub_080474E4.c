@@ -31,7 +31,7 @@ s32 TransientSpriteEffects_Spawn(u32 kind, u32 options, const struct ContactPosi
                 zero = 0;
                 CpuSet(&zero, destination, 0x05000002);
             }
-            AnimData_SelectTiles(&slot->graphics, kind + 0x153);
+            AnimData_SelectPaletteBank(&slot->graphics, kind + 0x153);
             sprite->position.vector = *position;
             sprite->priority = priority;
             if (options & 1)

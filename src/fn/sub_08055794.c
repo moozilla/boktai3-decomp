@@ -1,12 +1,7 @@
-#include "global.h"
-u8 *sub_08055678(void);
-s32 Script_SeekToKeyword(u32);
-u32 Script_GetValue(void);
-void sub_08055794(void)
+#include "script_keyframe_pool.h"
+void ScriptKeyframe_SetPriorityFromScript(void)
 {
-    u8 *p = sub_08055678();
-    if (p) {
-        if (Script_SeekToKeyword(0x70))
-            p[0x52] = Script_GetValue();
-    }
+    struct ScriptKeyframeEntry *entry = ScriptKeyframe_FindFromScript();
+    if (entry && Script_SeekToKeyword('p'))
+        entry->animation.keyframe.priority = Script_GetValue();
 }

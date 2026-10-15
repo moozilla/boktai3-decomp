@@ -1,5 +1,5 @@
 #include "stacked_actor.h"
-void AnimData_SelectTiles(void *, u32);
+void AnimData_SelectPaletteBank(void *, u32);
 void Sound_PlaySong(u32);
 void StackedActor_HoldLift(struct StackedActor *o)
 {
@@ -7,5 +7,5 @@ void StackedActor_HoldLift(struct StackedActor *o)
     o->animationPhase = 8;
     o->sprite.flags &= ~1;
     o->sprite.position.y = o->world.y + o->lift;
-    AnimData_SelectTiles(&o->graphics, o->tileBase + 2);
+    AnimData_SelectPaletteBank(&o->graphics, o->paletteBase + 2);
 }

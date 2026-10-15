@@ -16,7 +16,7 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
     register struct ContactSwarmSprite *secondary asm("r10");
     u32 frame;
     register u32 priority asm("r5");
-    u16 *baseTile;
+    u16 *paletteBase;
     register u32 resourceId asm("r8");
     u32 keyword;
     s32 i;
@@ -161,8 +161,8 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
         sub_08225AB4(marker->body, marker->id, position, 0, 7, marker);
         sub_08003C00(marker->body);
     }
-    baseTile = &marker->baseTile;
-    *baseTile = 0xA9;
+    paletteBase = &marker->paletteBase;
+    *paletteBase = 0xA9;
     {
         register u32 value asm("r1") = 0xBA8;
         asm("" : "+r"(value));
@@ -175,7 +175,7 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
         register struct ContactSwarmSprite *write asm("r2") = primary;
         write->frame = frame;
     }
-    AnimData_SelectTiles(graphics, *baseTile);
+    AnimData_SelectPaletteBank(graphics, *paletteBase);
     marker->primary.sprite.flags |= 0x200;
     priority = 3;
     {
@@ -199,8 +199,8 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
     }
     secondary->frame = frame;
     {
-        u32 tile = *baseTile;
-        AnimData_SelectTiles(secondaryGraphics, tile);
+        u32 tile = *paletteBase;
+        AnimData_SelectPaletteBank(secondaryGraphics, tile);
     }
     {
         register struct ContactSwarmSprite *read asm("r1") = secondary;

@@ -151,7 +151,7 @@ void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct Breakable
     struct BarrierExtent size;
     if (sub_08012D20(p)) {
         p->sprite.flags &= ~1;
-        AnimData_SelectTiles(p->resource, 136);
+        AnimData_SelectPaletteBank(p->resource, 136);
     }
     p->frame++;
     if (p->frame == 7)
@@ -208,13 +208,13 @@ void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct Breakable
             sub_08012B34(m, p);
             sub_08012B34(m, p);
             Sound_PlaySongChecked(232);
-            AnimData_SelectTiles(p->resource, 402);
+            AnimData_SelectPaletteBank(p->resource, 402);
         }
     }
     if (p->flash) {
         p->flash--;
         if (!p->flash) {
-            AnimData_SelectTiles(p->resource, 136);
+            AnimData_SelectPaletteBank(p->resource, 136);
             enable(&p->collider);
         } else
             disable(&p->collider);

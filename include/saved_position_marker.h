@@ -8,7 +8,7 @@ struct SavedPositionMarker {
     struct ContactSwarmDrawPacket primary;
     struct ContactPosition position;
     struct ContactSwarmDrawPacket secondary;
-    u16 baseTile, activationFrame, height, inputCooldown;
+    u16 paletteBase, activationFrame, height, inputCooldown;
     u16 scriptArgs[2];
     u32 scriptId;
     u16 stateFrame, unknownC6;

@@ -10,7 +10,7 @@ s32 SavedPositionMarker_InitializeFromScript(struct SavedPositionMarker *marker,
         struct ContactPosition *secondaryPosition;
         u8 *primaryPriority;
     } views;
-    u16 *baseTile;
+    u16 *paletteBase;
     struct ContactSwarmSprite *primary;
     register struct ContactSwarmGraphics *secondaryGraphics asm("r9");
     struct ContactSwarmGraphics *graphics;
@@ -88,7 +88,7 @@ s32 SavedPositionMarker_InitializeFromScript(struct SavedPositionMarker *marker,
             register u8 *address1 asm("r1");
             register u8 *address2 asm("r2");
             offset0 += (u32)marker;
-            baseTile = (void *)offset0;
+            paletteBase = (void *)offset0;
             graphics = &marker->primary.graphics;
             {
                 register u32 offset1 asm("r1") = 0x1C;
@@ -122,7 +122,7 @@ s32 SavedPositionMarker_InitializeFromScript(struct SavedPositionMarker *marker,
             register u8 *address2 asm("r0");
             asm("" : "+r"(offset0));
             offset0 += (u32)marker;
-            baseTile = (void *)offset0;
+            paletteBase = (void *)offset0;
             graphics = &marker->primary.graphics;
             {
                 register u32 offset1 asm("r2") = 0x1C;
@@ -158,13 +158,13 @@ s32 SavedPositionMarker_InitializeFromScript(struct SavedPositionMarker *marker,
     if (marker->variant == 0) {
         u32 tile = 0x166;
         register u16 *destination asm("r2");
-        destination = baseTile;
+        destination = paletteBase;
         asm("" : "+r"(destination));
         *destination = tile;
     } else {
         u32 tile = 0x167;
         register u16 *destination asm("r1");
-        destination = baseTile;
+        destination = paletteBase;
         asm("" : "+r"(destination));
         *destination = tile;
     }
@@ -172,9 +172,9 @@ s32 SavedPositionMarker_InitializeFromScript(struct SavedPositionMarker *marker,
     AnimData_Load(graphics, resourceId);
     Sprite_Init(primary, graphics, 0);
     {
-        register u16 *source asm("r2") = baseTile;
+        register u16 *source asm("r2") = paletteBase;
         asm("" : "+r"(source));
-        AnimData_SelectTiles(graphics, *source);
+        AnimData_SelectPaletteBank(graphics, *source);
     }
     marker->primary.sprite.flags |= 0x200;
     priority = 3;
@@ -183,9 +183,9 @@ s32 SavedPositionMarker_InitializeFromScript(struct SavedPositionMarker *marker,
     AnimData_Load(secondaryGraphics, resourceId);
     Sprite_Init(views.secondary, secondaryGraphics, 0);
     {
-        register u16 *source asm("r2") = baseTile;
+        register u16 *source asm("r2") = paletteBase;
         asm("" : "+r"(source));
-        AnimData_SelectTiles(secondaryGraphics, *source);
+        AnimData_SelectPaletteBank(secondaryGraphics, *source);
     }
     marker->secondary.sprite.flags |= 0x400;
     *views.secondaryPriority = priority;

@@ -1,16 +1,10 @@
-#include "global.h"
-u8 *sub_08055678(void);
-s32 Script_SeekToKeyword(u32);
-u32 Script_GetValue(void);
-void Anim_LoadKeyframe(u8 *, u8 *, u32, u32);
-void sub_080556D0(void)
+#include "script_keyframe_pool.h"
+void ScriptKeyframe_SetFrameFromScript(void)
 {
-    u8 *p = sub_08055678();
-    if (p) {
-        if (Script_SeekToKeyword(0x70)) {
-            u8 *a = p + 0x38;
-            u8 *b = p + 0x18;
-            Anim_LoadKeyframe(a, b, (u16)Script_GetValue(), 0);
-        }
+    struct ScriptKeyframeEntry *entry = ScriptKeyframe_FindFromScript();
+    if (entry && Script_SeekToKeyword('p')) {
+        union ScriptKeyframeAnimation *animation = &entry->animation;
+        struct ProjectedDisplayResource *resource = &entry->resource;
+        Anim_LoadKeyframe(animation, resource, (u16)Script_GetValue(), 0);
     }
 }

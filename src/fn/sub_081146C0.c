@@ -2,7 +2,7 @@
 s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 u32 ScriptProc_Start(u32, u32);
-void AnimData_SelectTiles(void *, u32);
+void AnimData_SelectPaletteBank(void *, u32);
 void Anim_SetSequence(void *, u32, u32, u32, u32);
 void sub_081146C0(u8 *s, s32 x)
 {
@@ -19,6 +19,6 @@ void sub_081146C0(u8 *s, s32 x)
         } else {
             Anim_SetSequence(s + 0x8c, r, 5, 0, 0);
         }
-        AnimData_SelectTiles(s + 0x44, 0xe4);
+        AnimData_SelectPaletteBank(s + 0x44, 0xe4);
     }
 }

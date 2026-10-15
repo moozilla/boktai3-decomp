@@ -53,7 +53,7 @@ extern u32 gUnk_03005308;                 /* index (0..1023) into the random tab
 extern const u16 gUnk_0203B400[];         /* 1024 entry random table (guess) */
 extern const s16 gUnk_086149C4[];         /* sine table (guess) */
 extern u32 gUnk_030053F4; /* more engine flags (bit 10 mutes Sound_PlaySongChecked; guess) */
-extern u8 *gUnk_030042E4; /* graphics tile bank used by AnimData_SelectTiles */
+extern u8 *gUnk_030042E4; /* 16-color palette banks used by AnimData_SelectPaletteBank */
 
 /* ---- Tasks and memory -------------------------------------------------- */
 
@@ -117,8 +117,9 @@ void Effect_Remove(void *effect); /* unlink from pool gUnk_030042D0 (guess) */
 void Sprite_Init(void *sprite, void *animData,
                  s32 flags); /* (guess) set up an idle sprite object */
 
-void AnimData_SelectTiles(void *animData,
-                          s32 index); /* (guess) point at 32 byte tile `index` of gUnk_030042E4 */
+void AnimData_SelectPaletteBank(
+    void *animData,
+    s32 index); /* select a 32-byte bank of sixteen RGB15 colors from gUnk_030042E4 */
 
 s32 AnimData_Load(
     void *animData,

@@ -70,7 +70,7 @@ s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 
     Sprite_Init(sprite, graphics, 0);
     zero = 0;
     sprite->frame = zero;
-    AnimData_SelectTiles(graphics, 0xA2);
+    AnimData_SelectPaletteBank(graphics, 0xA2);
     emitter->primary.sprite.flags |= 0x200;
     {
         register u32 value asm("r1") = 3;
@@ -92,7 +92,7 @@ s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 
     sprite = &emitter->secondary.sprite;
     Sprite_Init(sprite, graphics, 0);
     sprite->frame = zero;
-    AnimData_SelectTiles(graphics, 0xA0);
+    AnimData_SelectPaletteBank(graphics, 0xA0);
     emitter->secondary.sprite.flags |= 0x400;
     {
         u8 *destination = &emitter->secondary.sprite.priority;

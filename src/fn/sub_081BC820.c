@@ -10,7 +10,7 @@ void Anim_LoadKeyframe(u8 *, u8 *, u32, u32);
 void sub_081BC3B4(u8 *);
 void sub_081BC5F0(u8 *);
 void sub_081BC468(u8 *);
-void AnimData_SelectTiles(u8 *, u32);
+void AnimData_SelectPaletteBank(u8 *, u32);
 void sub_08030DBC(u32);
 void sub_081BCCD4(void);
 void sub_081BC694(u8 *, void (*)(void));
@@ -59,7 +59,7 @@ void sub_081BC820(u8 *s)
     *(u16 *)(s + 0x90A) = latezero;
     ((struct Word8 *)(s + 0x778))->flags &= (mask3 = ~1);
     *(u32 *)(s + 0x898) &= mask3;
-    AnimData_SelectTiles(s + 0x8C4, 0x1B4);
+    AnimData_SelectPaletteBank(s + 0x8C4, 0x1B4);
     ((struct Word8 *)(s + 0x7D8))->flags &= mask3;
     ((struct Word8 *)(s + 0x838))->flags &= mask3;
     sub_08030DBC(4);

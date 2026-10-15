@@ -116,9 +116,9 @@ void sub_08008C1C(struct PooledInteractableManager *manager, struct PooledIntera
         void *q = &slot->drawable;
         Anim_SetKeyframes(q, slot->resource, gUnk_086049CE[slot->kind][0], 1, 0);
         if (slot->kind != 2)
-            sub_08219A80(q, gUnk_086049DA[slot->kind] + 1);
+            Anim_SelectPaletteBank(q, gUnk_086049DA[slot->kind] + 1);
         else
-            sub_08219A80(q, gUnk_086049DA[2]);
+            Anim_SelectPaletteBank(q, gUnk_086049DA[2]);
     }
 }
 
@@ -127,7 +127,7 @@ void Breakable_Idle(struct PooledInteractableManager *manager, struct PooledInte
     if (sub_08008AA4(slot)) {
         void *drawable = &slot->drawable;
         Anim_SetKeyframes(drawable, slot->resource, gUnk_086049CE[slot->kind][1], 1, 0);
-        sub_08219A80(drawable, gUnk_086049DA[slot->kind]);
+        Anim_SelectPaletteBank(drawable, gUnk_086049DA[slot->kind]);
     }
     if (slot->timeout >= 0 && slot->counter >= slot->timeout)
         sub_08008A98(slot, 4);
@@ -138,7 +138,7 @@ void Breakable_React(struct PooledInteractableManager *manager, struct PooledInt
     if (sub_08008AA4(slot)) {
         void *drawable = &slot->drawable;
         Anim_SetKeyframes(drawable, slot->resource, gUnk_086049CE[slot->kind][1], 1, 0);
-        sub_08219A80(drawable, gUnk_086049DA[slot->kind]);
+        Anim_SelectPaletteBank(drawable, gUnk_086049DA[slot->kind]);
         slot->flash = 10;
         Sound_PlaySong(331);
         sub_08008BD0(slot);
@@ -159,7 +159,7 @@ void Breakable_Activate(struct PooledInteractableManager *manager, struct Pooled
         slot->flash = 10;
         sub_08008BD0(slot);
         if (slot->kind != 2) {
-            sub_08219A80(drawable, gUnk_086049DA[slot->kind] + 1);
+            Anim_SelectPaletteBank(drawable, gUnk_086049DA[slot->kind] + 1);
             effect = POSITION;
             effect.x = POSITION.x;
             effect.y = POSITION.y + 400;
@@ -409,16 +409,16 @@ s32 Breakable_ScriptCreate(void)
                 Anim_SetKeyframes(drawable, res, gUnk_086049CE[slot->kind][0], 1, 0);
             }
             if (slot->kind != 2)
-                sub_08219A80(drawable, gUnk_086049DA[slot->kind] + 1);
+                Anim_SelectPaletteBank(drawable, gUnk_086049DA[slot->kind] + 1);
             else
-                sub_08219A80(drawable, gUnk_086049DA[2]);
+                Anim_SelectPaletteBank(drawable, gUnk_086049DA[2]);
         } else {
             drawable = &slot->drawable;
             {
                 struct PooledResource *res = *resource;
                 Anim_SetKeyframes(drawable, res, gUnk_086049CE[slot->kind][1], 1, 0);
             }
-            sub_08219A80(drawable, gUnk_086049DA[slot->kind]);
+            Anim_SelectPaletteBank(drawable, gUnk_086049DA[slot->kind]);
         }
         sub_08214424(drawable, 0);
         slot->active = 1;

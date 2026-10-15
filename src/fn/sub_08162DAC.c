@@ -6,12 +6,12 @@ struct P {
     u8 sub[1];
 };
 
-void AnimData_SelectTiles(void *, s32);
+void AnimData_SelectPaletteBank(void *, s32);
 
 void sub_08162DAC(struct P *p)
 {
     if (p != 0) {
         p->st = 2;
-        AnimData_SelectTiles((u8 *)p + 0xbc, 0x65);
+        AnimData_SelectPaletteBank((u8 *)p + 0xbc, 0x65);
     }
 }
