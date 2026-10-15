@@ -22,3 +22,17 @@ flags, releases attachment C72C, and records the same capped per-player counters
 as789EC. It requires the current target object for the per-player counter lookup. Counters
 cap at9999 using the observed signed-halfword comparisons, matching789EC.
 F4B8 plusF710 recover868 exact bytes (+0.0359 percentage points).
+
+FAD8 is exact over388 bytes with29 minimized hints. A set D4 bit800 makes the
+command a no-op; otherwise it sets that bit before reading the halfword mode.
+Mode0 requires CC bit1 and clears CC bits1/2 before ResetRouteAndColliders.
+Mode1 requires an available actor (D4 bit40 clear, D0 bit20000 clear, positive
+health), clears the same CC bits and calls ResetRoute. Both reset actor state
+3/0/0, counter2AC and substate2B0, set2B1/2B2, install substate12 and copy
+control220 to21C, then clear2C8/104 and flags114 bit1. Other modes restore actor
+defaults and clear collider value178 only when CC bit1 is set.
+
+A rejected allocation trial bound both the earlier flags pointer and the later
+mode to r5; agbcc omitted the entire mode0 path (268 versus388 bytes). Removing
+the overlapping pointer binding restored all paths. The accepted full-extent
+check includes all three reset calls and their complete state transitions.
