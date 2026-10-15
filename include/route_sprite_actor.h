@@ -33,11 +33,19 @@ struct RouteSpritePool {
     u32 occupiedMask;
     struct RouteSpriteActor slots[4];
 };
+typedef void (*RouteSpriteStateCallback)(struct RouteSpritePool *, struct RouteSpriteActor *);
+extern RouteSpriteStateCallback gUnk_08605BB0[];
 extern struct RouteSpritePool *gUnk_02000198;
 struct RouteSpriteActor *sub_0806DF60(struct RouteSpritePool *);
 struct RouteSpriteActor *sub_0806DFB8(struct RouteSpritePool *);
+s32 sub_0806E130(struct RouteSpritePool *);
+s32 sub_0806E1C0(struct RouteSpritePool *);
+s32 sub_0806E224(struct RouteSpritePool *);
 struct RouteSpritePool *sub_0806E250(void);
+void sub_0806CFE4(struct RouteSpriteActor *);
+void sub_0806CFFC(struct RouteSpritePool *, struct RouteSpriteActor *);
+u8 sub_0806E308(void);
 void sub_08013B74(void *);
-void sub_0806DFC8(struct ContactPosition *, void *, s32, s32, s32, u32, u32, u32, u32, u32,
-                  void *, s32);
+void sub_0806DFC8(struct ContactPosition *, void *, s32, s32, s32, u32, u32, u32, u32, u32, void *,
+                  s32);
 #endif
