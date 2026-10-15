@@ -96,7 +96,9 @@ def operand(b, p):
     if fam in (0x10, 0x20):
         d = b[p] << 24 | b[p + 1] << 16 | b[p + 2] << 8 | b[p + 3]
         region = {0x800000: "gs", 0x100000: "r700"}.get(d & 0xF00000, "r708")
-        text = f"{region}[{d & 0xFFFF:#x}]:t{(d >> 24) & 15}"
+        t = (d >> 24) & 15
+        bit = f".{(d >> 16) & 15}" if t == 4 else ""  # type 4 is one bit: bits 16-19 give its number
+        text = f"{region}[{d & 0xFFFF:#x}{bit}]:t{t}"
         q = p + 4
         if fam == 0x20:
             a, q = operand(b, q)
