@@ -15,6 +15,11 @@ struct ScenePanelInteractionPlayer {
     u8 unknown419[0x3E];
     u8 tetherMode;
 };
+struct ScenePanelInteractionPackedPosition {
+    u32 x : 16;
+    u32 y : 16;
+    u32 z : 16;
+};
 struct ScenePanelInteractionSubject {
     u8 unknown0[0xD3];
     u8 state;
@@ -24,7 +29,9 @@ struct ScenePanelInteractionSubject {
 struct ScenePanelInteractionView {
     u8 unknown0[0x1E];
     u8 subjectCount;
-    u8 unknown1F[0x4DD];
+    u8 unknown1F[0x235];
+    u32 mainSpriteFlags;
+    u8 unknown258[0x2A4];
     u16 state, frame;
     struct ContactPosition origin, approachPosition, center;
     u8 unknown518[0x6D0];
@@ -54,7 +61,8 @@ void sub_080582B8(struct ScenePanel *);
 void sub_08058444(struct ScenePanel *);
 void sub_0805907C(struct ScenePanel *);
 void sub_080595AC(struct ScenePanelRig *, u32);
-void sub_0815B15C(struct ScenePanelInteractionPlayer *, u32, s32, u32, u32);
+void sub_0815B15C(struct ScenePanelInteractionPlayer *, const struct ContactPosition *, s32, u32,
+                  u32);
 void sub_0815AF14(struct ScenePanelInteractionPlayer *, s32);
 void sub_0815AF50(struct ScenePanelInteractionPlayer *, s32, u32);
 void sub_0815B0A8(struct ScenePanelInteractionPlayer *, const struct ContactPosition *, u32, u32);
@@ -63,6 +71,7 @@ void sub_0815B28C(struct ScenePanelInteractionPlayer *, u32);
 void sub_0815B2E0(struct ScenePanelInteractionPlayer *, s32, u32);
 void sub_0815C4FC(struct ScenePanelInteractionPlayer *, u32);
 void sub_0815C99C(struct ScenePanelInteractionPlayer *);
+void TetherActor_SetInteractionTarget(const void *, u32);
 void sub_082260A4(s32);
 void sub_08226380(u32, const void *);
 void sub_08226508(u32);
