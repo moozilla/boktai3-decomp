@@ -21,7 +21,7 @@ with its link address in r0 (`pop {r0}; bx r0`). Initializer `73B84` does not
 produce a defined C status, although creator `73BA0` compares that incidental
 r0 value with zero. The valid void initializer draft also differs in its epilogue, so both
 initializer and creator retain assembly until a defined representation is
-established. The parent will remove the legacy initializer fall-through C
+established. The integration removes the legacy initializer fall-through C
 from exact credit. No output-only empty operand,
 fall-through return or fabricated status is used to claim a match.
 
@@ -54,7 +54,7 @@ Eleven worker functions are exact: four new functions total 2,728 bytes, about
 existing functions total 212 typed bytes. The independently corrected
 `Memory_ClearWordPair` at `73BFC` contributes its existing eight bytes. The
 remaining 108 bytes are initializer `73B84` (28) and creator `73BA0` (80).
-The parent's integration removes the legacy initializer's false 28-byte C
+The integration removes the legacy initializer's false 28-byte C
 credit and retains assembly. Its valid void worker draft is
 `wip/sub_08073B84.c`, 84.6% over all 28 bytes: only the epilogue differs.
 An explicit `__builtin_return_address(0)` model in the neighboring worker did

@@ -28,7 +28,7 @@ void sub_082250EC(void);
 void sub_082257E4(void);
 void sub_0821B90C(void);
 void sub_08227DC4(void);
-void sub_0806EF04(void);
+void SceneLifecycle_ResetSubsystems(void);
 void sub_082210B8(void);
 void sub_08177D54(void);
 s32 sub_082250FC(struct Task *);
@@ -60,7 +60,7 @@ void sub_08225328(void)
     gUnk_030053E8 = 0;
     gUnk_030054B0 = 0;
     sub_08227DC4();
-    sub_0806EF04();
+    SceneLifecycle_ResetSubsystems();
     sub_082210B8();
     sub_08177D54();
     {

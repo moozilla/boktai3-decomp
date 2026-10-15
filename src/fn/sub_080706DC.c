@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-struct SceneActorRegistryManager *sub_08072B44(void);
+struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 static inline u8 IsUnavailable(struct SceneActorRegistryActor *input, u32 disabled, u32 excluded)
 {
     register struct SceneActorRegistryActor *actor asm("r3") = input;
@@ -32,7 +32,7 @@ void SceneActorRegistry_ResetCategoryControl(void)
 {
     struct SceneActorRegistryNode *node;
     register struct SceneActorRegistryActor *actor asm("r3");
-    sub_08072B44();
+    SceneActorRegistry_GetManager();
     node = gUnk_020004AC;
     actor = node->actor;
     if (actor) {

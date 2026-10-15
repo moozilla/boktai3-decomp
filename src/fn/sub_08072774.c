@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_script.h"
-#define SceneActorScript_SetFlagFromScript sub_08072774
 static inline void KeepFlags(u32 mask, u32 *field)
 {
     *field = mask & *field;
@@ -15,7 +14,7 @@ void SceneActorScript_SetFlagFromScript(void)
     struct SceneActorRegistryActor *actor;
     if (!id)
         return;
-    actor = sub_08070EBC(id);
+    actor = SceneActorRegistry_FindById(id);
     if (!actor)
         return;
     if (!Script_GetKeywordValue('f', 0)) {

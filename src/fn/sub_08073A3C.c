@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_contacts.h"
-#define SceneActorContacts_SelectForActor sub_08073A3C
 static inline u8 SceneActorContacts_AreDisabled(void)
 {
     u32 mask = 0x40;
@@ -29,8 +28,8 @@ SceneActorContacts_SelectForActor(struct SceneActorRegistryActor *argument, u32 
     node = manager->head;
     contactFlags = (u8 *)owner + 0xDC;
     while (node) {
-        if ((node->flags & 1) && node->object && (node->kind & kindMask) && sub_08072BC4(node) &&
-            sub_08072F4C(node, actor, &distance)) {
+        if ((node->flags & 1) && node->object && (node->kind & kindMask) &&
+            SceneActorContacts_CanSelectNode(node) && sub_08072F4C(node, actor, &distance)) {
             best = node;
             selectionStatus = (s32)best;
         }
@@ -54,7 +53,7 @@ SceneActorContacts_SelectForActor(struct SceneActorRegistryActor *argument, u32 
                 value &= clearMask;
                 *flags = value;
             }
-                sub_08072B50(best->object);
+                SceneActorScript_DispatchKindPayload(best->object);
                 break;
         }
     }

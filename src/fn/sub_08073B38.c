@@ -1,5 +1,4 @@
 #include "scene_actor_contacts.h"
-#define SceneActorContacts_TickCooldowns sub_08073B38
 void SceneActorContacts_TickCooldowns(void)
 {
     if (gUnk_020001A0) {

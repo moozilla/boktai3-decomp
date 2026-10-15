@@ -1,5 +1,4 @@
 #include "scene_actor_profile.h"
-#define SceneActorProfiles_Find sub_08073C70
 struct SceneActorProfile *SceneActorProfiles_Find(u32 id, u32 mode)
 {
     struct SceneActorProfileList *list = (void *)gUnk_020004A8->subsystem;

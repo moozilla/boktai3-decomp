@@ -48,6 +48,6 @@ struct SceneActorScriptPropertiesView {
     u8 unknown45C[0x15A];
     u16 quarterHealth;
 };
-struct SceneActorRegistryActor *sub_08070EBC(u32);
+struct SceneActorRegistryActor *SceneActorRegistry_FindById(u32);
 u8 *sub_0821D64C(u32, u32);
 #endif

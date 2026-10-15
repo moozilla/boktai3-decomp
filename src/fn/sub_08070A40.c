@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 struct SceneActorRegistryActor *SceneActorRegistry_FindById(u32);
-void sub_08070070(struct SceneActorRegistryActor *, s32);
+void SceneActorRegistry_SetMovementMode(struct SceneActorRegistryActor *, s32);
 static inline u8 HasMovementFlag(struct SceneActorRegistryActor *actor)
 {
     register u32 mask asm("r1") = 0x100;
@@ -21,7 +21,7 @@ void SceneActorRegistry_SetScriptActorMovementMode(void)
         if (actor) {
             u32 enabled = HasMovementFlag(actor);
             if (enabled)
-                sub_08070070(actor, mode);
+                SceneActorRegistry_SetMovementMode(actor, mode);
         }
     }
 }

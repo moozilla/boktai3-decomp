@@ -14,9 +14,9 @@ struct SceneActorProfileList {
     struct SceneActorProfile *head;
     s32 count;
 };
-s32 sub_08073C2C(u32);
-struct SceneActorProfile *sub_08073C70(u32, u32);
-u32 sub_08073CB0(u32, u32, s32);
-s32 sub_08073CC4(u32, u32);
-s32 sub_08074600(u32, u32);
+s32 SceneActorProfiles_FindDefaultIndex(u32);
+struct SceneActorProfile *SceneActorProfiles_Find(u32, u32);
+u32 SceneActorProfiles_GetEntryAddress(u32, u32, s32);
+s32 SceneActorProfiles_Add(u32, u32);
+s32 SceneActorProfiles_FindOrAdd(u32, u32);
 #endif

@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 #define SceneActorRegistry_CountLivingByCategoryAndField sub_08070444
-struct SceneActorRegistryManager *sub_08072B44(void);
+struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 /* Byte98 and halfword1E6 are caller-supplied classification filters; the
  * field1E6 interpretation remains tentative. The registry has a NULL-actor
  * terminal node and requires an allocated head. */
@@ -12,7 +12,7 @@ s32 SceneActorRegistry_CountLivingByCategoryAndField(s32 inputCategory, s32 inpu
     register struct SceneActorRegistryNode *node asm("r2");
     register struct SceneActorRegistryActor *actor asm("r1");
     register s32 count asm("r3");
-    sub_08072B44();
+    SceneActorRegistry_GetManager();
     node = gUnk_020004AC;
     actor = node->actor;
     count = 0;

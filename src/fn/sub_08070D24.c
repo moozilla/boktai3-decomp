@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-#define SceneActorRegistry_FindNearestCategoryActor sub_08070D24
 static inline u32 IsUnavailable(struct SceneActorRegistryActor *input, u32 disabledInput,
                                 u32 excludedInput)
 {

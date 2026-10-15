@@ -1,5 +1,4 @@
 #include "scene_actor_contact_list.h"
-#define SceneActorContacts_RegisterNode sub_08072BF0
 u8 SceneActorContacts_RegisterNode(struct SceneActorContactNode *node, void *object, u32 kind)
 {
     struct SceneActorContactManager *manager = gUnk_020001A0;

@@ -1,5 +1,4 @@
 #include "scene_actor_profile.h"
-#define SceneActorProfiles_Add sub_08073CC4
 /* The cursor stays within the 128-byte record; bytes8..10 are each entry's payload. */
 static inline void SceneActorProfile_SetEntry(struct SceneActorProfile *profile, u32 index,
                                               u32 value, u32 flags, u32 state)

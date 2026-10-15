@@ -1,5 +1,4 @@
 #include "scene_actor_script.h"
-#define SceneActorScript_DispatchKindPayload sub_08072B50
 struct SceneActorScriptPayloadView {
     u8 unknown0[8];
     u8 kind;

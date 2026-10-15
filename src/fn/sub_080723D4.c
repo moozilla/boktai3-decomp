@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_script.h"
-#define SceneActorScript_SetPropertiesFromScript sub_080723D4
 static inline s32 ReadOrMinusOne(void)
 {
     if (Script_GetPc())
@@ -25,7 +24,7 @@ void SceneActorScript_SetPropertiesFromScript(void)
     s32 value, i;
     if (!id)
         return;
-    actor = (void *)sub_08070EBC(id);
+    actor = (void *)SceneActorRegistry_FindById(id);
     if (!actor)
         return;
     if (Script_SeekToKeyword('e')) {

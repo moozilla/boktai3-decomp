@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_contact_list.h"
-#define SceneActorContacts_CanSelectNode sub_08072BC4
 u8 SceneActorContacts_CanSelectNode(struct SceneActorContactNode *node)
 {
     register u32 flags asm("r1") = node->flags;

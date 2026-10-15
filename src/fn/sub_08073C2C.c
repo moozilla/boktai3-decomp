@@ -1,5 +1,4 @@
 #include "scene_actor_profile.h"
-#define SceneActorProfiles_FindDefaultIndex sub_08073C2C
 s32 SceneActorProfiles_FindDefaultIndex(u32 category)
 {
     struct SceneActorProfileList *list = (void *)gUnk_020004A8->subsystem;

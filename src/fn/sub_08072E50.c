@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_contact_list.h"
-#define SceneActorContacts_SetDistanceGate sub_08072E50
 static inline u8 TestGate(struct SceneActorContactGateView *gate, u32 mask)
 {
     if (gate->flags & mask)

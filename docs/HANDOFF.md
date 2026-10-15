@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 28.578% matching (2026-10-15). This file is the single
+Last updated after reaching 28.986% matching (2026-10-15). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,53 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 15 continuation: registry scripts, profiles and scene state
+
+Exact code is **28.986%**, up **0.4084 percentage points** (+9,864 net bytes)
+from PR159: **6,989 /11,485 functions**, **700,126 /2,415,354 bytes**.
+Without register pinning: **21.018%**; Register-pinned: **7.968%**, included
+above. This recovers 9,892 new bytes and removes 28 bytes of false legacy C
+credit at73B84: the old initializer fell through with an undefined return value.
+Its creator compares incidental r0 from the callee's return sequence. Both
+functions retain assembly until a defined C representation is established.
+The 78 guarded drafts remain outside exact credit.
+
+The actor registry70070–70FA8 is now21/22 exact;70910 retains a three-byte
+scratch-register residue. Its setup, defeat script, category resets and spatial
+filters have shared typed views. The following reset callback718D8 is exact.
+Palette restoration, actor script properties and the bounded contact list are
+recovered, including the complete eight-function script span72264–72854.
+The adjoining73A3C–7462C cohort has exact contact selection and thirty-entry
+profile records, including all26 constructor categories. Category validation
+occurs after allocation/linking; preserve that original behavior. See
+[registry](SCENE_ACTOR_REGISTRY.md), [palette/script/contact contracts](SCENE_ACTOR_PALETTE_SCRIPT_CONTACTS.md),
+and [contact/profile contracts](SCENE_ACTOR_CONTACTS.md).
+
+Root recovered scene reset, inclusive spatial queries, wrapped tilemap leaves,
+counters, pair records and the twelve-slot effect scheduler. See
+[state/query contracts](SCENE_STATE_QUERIES.md) and
+[effect schedule](SCENE_EFFECT_SCHEDULE.md). The scheduler's412-byte script
+creator remains uncredited with two differing bytes under a frozen3600-second
+permuter search. Search outputs require initialized-value review before use.
+Three body-collider initializers and the adjoining receiver are also exact;
+field interpretations remain provisional and are being refined against callers.
+
+The target remains **30% exact or20% account usage remaining**. Latest meter:
+54% remaining; no reset consumed. Root retains6E34C–70070 gaps. Tail owns7462C–76020;
+Sol owns76034–78078, beginning with the animation selector family;
+lifecycle retains71E00–73A3C gaps and its three route-playback gaps.
+All worker build outputs remain private. The next animation/collision matches
+are committed on worker branches and are not included in these figures.
+
+Validation:109 changed/promoted single-function units pass their full reviewed
+extents against the final combined ELF; the changed breakable-barrier unit also
+matches all1,720 bytes. The complete build prints `build/boktai3.gba: OK` and
+the RAM-literal audit passes. Source audit:110 C files, no warnings/errors.
+All21 build/progress/permuter/name-promotion tests, formatting and inventory
+checks pass. Name promotion now normalizes already-promoted raw references;
+a regression covers older worker call sites. Two duplicate declaration conflicts
+exposed by normalization were repaired without changing the matched ROM.
 
 ## October 15 continuation: route actors, grid traversal and actor registry
 

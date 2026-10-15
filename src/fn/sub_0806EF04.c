@@ -1,7 +1,6 @@
 #include "global.h"
-#define SceneLifecycle_ResetSubsystems sub_0806EF04
 extern u32 gUnk_020004B4;
-void sub_0806F75C(void);
+void SceneEffectSchedule_Reset(void);
 void sub_08122DE4(void);
 void sub_081084D8(void);
 void sub_081000B4(void);
@@ -9,8 +8,8 @@ void SceneActorRegistry_ResetManager(void);
 void ActorAttachment_ClearManagerPointer(void);
 void SceneParticleBurst_ResetSingleton(void);
 void SceneParticlePool_ResetSingleton(void);
-void sub_0806F990(void);
-void sub_08073BF0(void);
+void SceneActorRecord_Clear(void);
+void SceneActorContacts_Reset(void);
 void sub_0812265C(void);
 void sub_08125B58(void);
 void sub_08123188(void);
@@ -44,7 +43,7 @@ void sub_0811BA10(void);
 void sub_08108A98(void);
 void SceneLifecycle_ResetSubsystems(void)
 {
-    sub_0806F75C();
+    SceneEffectSchedule_Reset();
     sub_08122DE4();
     sub_081084D8();
     sub_081000B4();
@@ -52,8 +51,8 @@ void SceneLifecycle_ResetSubsystems(void)
     ActorAttachment_ClearManagerPointer();
     SceneParticleBurst_ResetSingleton();
     SceneParticlePool_ResetSingleton();
-    sub_0806F990();
-    sub_08073BF0();
+    SceneActorRecord_Clear();
+    SceneActorContacts_Reset();
     sub_0812265C();
     sub_08125B58();
     sub_08123188();

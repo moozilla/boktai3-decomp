@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 #include "player.h"
-#define SceneActorRegistry_SetMovementMode sub_08070070
 u8 *sub_0821D64C(s32, s32);
 s32 sub_0821F204(void *, const struct ContactPosition *, const struct ContactPosition *);
 s32 sub_0821F7A8(void *, const struct ContactPosition *, const struct ContactPosition *);

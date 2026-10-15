@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
-#define SceneActorRegistry_SetObjectContext sub_08076020
 void SceneActorRegistry_SetObjectContext(struct SceneActorRegistryActor *actor, void *context,
                                          u32 kind, void *object)
 {
