@@ -24,3 +24,13 @@ sets actor2B0 and enables shadow320. These three helpers recover268 new bytes
 The larger front and state-control bodies remain assembly/private until their
 full reviewed extents match. Existing82BF0/82CFC/82D20 already had exact C and
 receive no new matching credit from this review.
+
+829C0 now matches its complete172-byte extent (register-pinned): it rejects
+unavailable actors and source-contact flag0800, applies the shared contact
+reaction, advances the1024-entry RNG cursor, subtracts the sample's low four
+bits from destination power40 with a signed floor20, and clears context flag8.
+The function does not add a null-actor fallback: as in assembly, a null actor
+passes the availability helper and is invalid if execution reaches the final
+context access. These caller preconditions are separate from the helper's gate.
+Together the four newly recovered bodies add440 bytes (+0.0182 percentage
+points):268 ordinary and172 register-pinned.
