@@ -24,7 +24,7 @@ static inline u32 firstCellAtPosition(struct ContactPosition *position)
         return 0;
     return gUnk_030052F4->rows[z] + x;
 }
-s32 BreakableProp_InitializeFromScript(struct BreakableProp *input, u32 id)
+s32 BreakableProp_InitializeFromScript(struct BreakableProp *input, u32 id, u32 unused)
 {
     struct BreakableProp *prop = input;
     struct ContactPackedVector packet;
