@@ -4,9 +4,12 @@
 /* Tentative identity: a five-sprite scripted burst/transition effect. */
 struct StagedEffectSprite {
     u32 flags;
-    u8 unknown4[4];
+    u8 unknown4[3];
+    u8 renderMode;
     u8 scaleX, scaleY;
-    u8 unknownA[0x12];
+    u8 unknownA[6];
+    u16 priority;
+    u8 unknown12[10];
     u16 x, y, z, unknown22;
     u8 unknown24[8];
 };
@@ -18,9 +21,20 @@ struct StagedEffect {
     s16 shakeX, shakeZ;
     u32 frame;
     void *pendingScript;
-    u32 positionXY, positionZ;
+    union {
+        u32 words[2];
+        struct {
+            u16 x, y, z, pad;
+        } axes;
+    } position;
     struct StagedEffectSprite sprites[5];
-    u8 unknown150[0x1C];
+    union {
+        u8 bytes[0x1C];
+        struct {
+            u8 unknown0[12];
+            const u16 *palette;
+        } view;
+    } graphics;
     const u16 *activePalette;
     u16 blendedPalette[16];
 };
