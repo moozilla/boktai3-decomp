@@ -1,42 +1,44 @@
-#include "global.h"
-
-extern const u32 gUnk_08605B18[];
-void sub_08064C48(u32, u32, u32, s32 *, s32 *, u32);
-void sub_08217EC4(u8 *, s32, s32);
-void sub_0824923C(u8 *, u32);
-
-void sub_08065B4C(u8 *p)
+#include "actor_attachment_state.h"
+#define ActorAttachment_UpdateFollowingOffset sub_08065B4C
+struct ActorAttachmentFollowView {
+    u8 unknown0[9];
+    u8 direction;
+    u8 unknownA[0x2A];
+    struct ContactPosition offset;
+};
+extern void *const gUnk_08605B18[];
+void sub_08217EC4(struct ActorAttachmentPartSprite *, s32, s32);
+void ActorAttachment_UpdateFollowingOffset(struct ActorAttachmentSlotView *slot)
 {
-    u8 *e = *(u8 **)(p + 0x134);
-    if (e != NULL) {
-        s32 a, b;
-        if (p[0x33] == 0xff) {
-            u32 x = *(u32 *)(e + 0x34);
-            u32 y = *(u32 *)(e + 0x38);
-            *(u32 *)(p + 0x1c) = x;
-            *(u32 *)(p + 0x20) = y;
-        } else {
-            u8 *m = p + 0x3f;
-            s32 i;
-            u8 *q;
-            sub_08064C48(*m, p[0x33], e[9], &a, &b, *(u32 *)(p + 0x5c));
-            if ((u8)(*m - 2) <= 1) {
-                i = 0;
-                q = p + 0x3c;
-                m += 0x4d;
-                for (; i <= 2; i++) {
-                    if ((*q >> i) & 1)
-                        sub_08217EC4(m, a, b);
-                    m += 0x28;
+    struct ActorAttachmentFollowView *follow = slot->followActor;
+    if (follow) {
+        s32 x, z;
+        if (slot->action == 0xFF)
+            slot->offset = follow->offset;
+        else {
+            u8 *kind = &slot->resourceKind;
+            s32 index;
+            struct ActorAttachmentPartSprite *part;
+            u8 *mask;
+            sub_08064C48(*kind, slot->action, follow->direction, &x, &z, slot->source);
+            if ((u8)(*kind - 2) <= 1) {
+                index = 0;
+                mask = &slot->partMask;
+                kind += 0x4D;
+                part = (void *)kind;
+                for (; index <= 2; index++) {
+                    if ((*mask >> index) & 1)
+                        sub_08217EC4(part, x, z);
+                    part++;
                 }
             } else {
-                s32 x = a;
-                s32 z = 0;
-                *(u16 *)(p + 0x1c) = x;
-                *(u16 *)(p + 0x1e) = z;
-                *(u16 *)(p + 0x20) = b;
+                s32 copyX = x;
+                s32 y = 0;
+                slot->offset.x = copyX;
+                slot->offset.y = y;
+                slot->offset.z = z;
             }
         }
     }
-    sub_0824923C(p, gUnk_08605B18[p[0x3f]]);
+    sub_0824923C(slot, gUnk_08605B18[slot->resourceKind]);
 }
