@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 24.388% matching (2026-10-14). This file is the single
+Last updated after reaching 24.509% matching (2026-10-14). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,41 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 14 (Codex/Sol): staged effects and complete cell gates
+
+Exact code is **24.509%**, up **0.1209 percentage points** (+2,920 bytes)
+from fourteen new functions. There are **6,536 / 11,471 functions** and
+**591,978 / 2,415,354 bytes**. Without register pinning: **19.685%**;
+Register-pinned: **4.824%**, included above. Seventy-seven guarded drafts remain.
+Nine new functions need no hints; five retain minimized concessions.
+
+The user-requested **GPT-6.1 Sol High** worker recovered the five-sprite
+**0804D778–0804DF40** staged-effect subsection (1,992 contiguous exact bytes),
+plus the adjacent countdown tick. Palette blending, reveal/contraction/shake,
+script release, dispatch, initialization and destruction are documented in the
+[staged-effect notes](../notes/staged-effect_2026-10-14.md). Review corrected
+pending script storage to an integer resource ID and updated numeric callees
+to main's canonical names before combined linking.
+
+The parent completed **08050128–08050820**, the cell-gate subsection
+(1,784 contiguous exact bytes). Three new matches recover script setup and two
+passage behaviors; eleven existing helpers now have names and ten use the
+shared view. Flags select terrain barriers, edge clamping, forced direction,
+player entry counts and an optional script. The preceding **0805002C** manager
+script entry is also exact. See [cell-gate notes](../notes/cell-gates_2026-10-14.md).
+Gameplay identities remain tentative; static contracts are stronger evidence.
+
+The combined build printed **`build/boktai3.gba: OK`** in
+`build/cell-gates-staged-combined.log`; **33 complete post-promotion extent checks
+passed** across both subsections and the manager script entry. Format/inventory/RAM
+checks and all twelve data round trips pass. No new emulator claims.
+
+Continue toward **30% exact or40% account usage remaining**; latest check is
+**68% remaining**. Sol owns **0804E180–0805002C** in its isolated checkout;
+parent owns **08050820 onward**. The next orbit-background subsection already
+has five exact scratch candidates, including the980-byte position updater.
+Main is owned by Claude's separate checkout. PR132 merged at **bbddf4ef**.
 
 ## October 14 (Codex): complete tether roaming and lifecycle states
 
