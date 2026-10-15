@@ -27,7 +27,7 @@ void ScenePanelRig_TickHoverSelection(struct ScenePanelRig *rig)
     observed = 0x0403B714;
     sample = randomFirst();
     {
-        u16 *originY = &rig->origin.y;
+        u16 *originY = (u16 *)&rig->origin.y;
         sample = (sample & 63) + 128;
         rig->position.y = *originY + sample;
     }
