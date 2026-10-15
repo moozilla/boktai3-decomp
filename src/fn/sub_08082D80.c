@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_phase.h"
 #include "player.h"
-void sub_08083E34(struct SceneActorRegistryResetView *);
-void sub_08083E98(struct SceneActorRegistryResetView *, struct SceneVec *);
+void SceneActorControl_ResetCollisionPhase(struct SceneActorRegistryResetView *);
+void SceneActorControl_StartPositionCurve(struct SceneActorRegistryResetView *, struct SceneVec *);
 static inline s32 Quarter(s32 v)
 {
     return v >= 0 ? v >> 2 : -(-v >> 2);
@@ -130,7 +130,7 @@ void SceneActorControl_ConvergeSavedMotion(struct SceneActorRegistryResetView *i
                 stateTest = 0;
                 zeroWord = 0;
                 *flags = mask | loaded;
-                sub_08083E98(actor, &gUnk_02000580[0]->position);
+                SceneActorControl_StartPositionCurve(actor, &gUnk_02000580[0]->position);
                 {
                     u32 phase = 2;
                     register u32 offset asm("r2") = 0x2A8;
@@ -154,7 +154,7 @@ void SceneActorControl_ConvergeSavedMotion(struct SceneActorRegistryResetView *i
                         *field = 1;
                     }
                 }
-                sub_08083E34(actor);
+                SceneActorControl_ResetCollisionPhase(actor);
             } else {
                 register u32 mask asm("r0") = 8;
                 packet[15] = mask | packet[15];
@@ -186,7 +186,7 @@ void SceneActorControl_ConvergeSavedMotion(struct SceneActorRegistryResetView *i
                         }
                     }
                 }
-                sub_08083E34(actor);
+                SceneActorControl_ResetCollisionPhase(actor);
             }
         }
     }

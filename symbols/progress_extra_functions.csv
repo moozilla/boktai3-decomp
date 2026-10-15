@@ -150,6 +150,8 @@ address,evidence
 080800A4,Complete high-register prologue and matching restore through08080494; replaces interior080800AC boundary; removes8 falsely credited prior bytes
 08082BF0,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08082D20,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+08083F3C,Independent collision latch clear leaf after 83E98 return and literal pool; exact32-byte body
+08083F5C,Independent terrain response prologue and return following83F3C; full232-byte reviewed extent
 08084280,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0808AED8,Independent random pattern selector (own push/pop-bx and literal pool) left as incbin by gbadisasm; exact standalone C
 0808F9E4,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
