@@ -7,5 +7,5 @@ void SceneInventory_BeginBrowse(struct SceneInventoryControlView *panel)
         panel->interactionFlags = 0x41;
     panel->destination = sub_0806143C(panel);
     sub_080613BC(panel, 0);
-    sub_0806130C(panel, (void (*)(struct SceneInventoryControlView *))sub_08061DA0);
+    sub_0806130C(panel, (SceneInventoryCallback)sub_08061DA0);
 }
