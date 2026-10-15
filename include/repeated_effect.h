@@ -51,4 +51,15 @@ void sub_0804F9C4(struct RepeatedEffect *);
 void sub_0804F970(struct RepeatedEffect *);
 void sub_0804FB0C(struct RepeatedEffect *);
 void sub_0804FB48(struct RepeatedEffect *);
+void sub_0804FD70(struct RepeatedEffect *, u16, struct RepeatedEffectPosition *, u8, u32, u32);
+void sub_0804FDB4(struct RepeatedEffect *, struct RepeatedEffectPosition *, u32);
+void sub_0804FE20(struct RepeatedEffect *);
+void sub_0804FEA8(struct RepeatedEffect *);
+void sub_0804FEFC(struct RepeatedEffectManager *, u16, struct RepeatedEffectPosition *, u8, u32,
+                  u32, u32);
+void sub_0804FC84(struct RepeatedEffect *);
+s32 sub_0804FF48(struct RepeatedEffectManager *);
+s32 sub_0804FF70(struct RepeatedEffectManager *);
+s32 sub_0804FFDC(struct RepeatedEffectManager *);
+struct RepeatedEffectManager *sub_0804FFEC(void);
 #endif
