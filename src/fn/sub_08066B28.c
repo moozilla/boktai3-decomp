@@ -28,7 +28,7 @@ s32 ActorAttachment_DestroyManager(struct ActorAttachmentManagerView *manager)
                 part++;
                 j++;
             } while (j <= 2);
-            if (slot->unknown48[0])
+            if (slot->active48)
                 Sprite_Remove(&slot->sprite);
         }
     }
