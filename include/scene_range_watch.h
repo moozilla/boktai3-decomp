@@ -12,6 +12,6 @@ struct SceneRangeWatch {
 };
 void sub_0806F7B0(struct SceneRangeWatch *);
 u32 sub_0806F838(struct SceneRangeWatch *);
-u32 sub_0806F86C(void);
+u32 sub_0806F86C(void *);
 s32 sub_0806F870(struct SceneRangeWatch *);
 #endif
