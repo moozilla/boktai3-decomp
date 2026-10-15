@@ -1,13 +1,7 @@
-#include "global.h"
-
-struct S {
-    u8 f[0x4fc];
-    u16 a;
-    u16 b;
-};
-
-void sub_08057960(struct S *p, u16 v)
+#include "scene_panel_effects.h"
+void ScenePanel_SetEffectState(struct ScenePanel *input, u16 state)
 {
-    p->a = v;
-    p->b = 0;
+    struct ScenePanelEffectsView *panel = (void *)input;
+    panel->effectState = state;
+    panel->effectFrame = 0;
 }

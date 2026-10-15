@@ -1,21 +1,18 @@
-#include "global.h"
-struct A {
-    u32 a;
+#include "scene_panel_effects.h"
+struct ScenePanelScriptArguments {
+    u32 count;
+    s32 *values;
 };
-struct B {
-    u32 flags;
-    struct A *args;
-};
-void Script_Call(u32, struct B *);
-void sub_08057978(u8 *p, u32 x)
+void ScenePanel_CallPendingScript(struct ScenePanel *input, u32 value)
 {
-    u32 r = *(u32 *)(p + 0x17ac);
-    if (r != 0) {
-        struct A a;
-        struct B b;
-        b.flags = (b.flags & 0xFFFF0000) | 1;
-        a.a = x;
-        b.args = &a;
-        Script_Call(r, &b);
+    struct ScenePanelEffectsView *panel = (void *)input;
+    u32 scriptId = panel->pendingScriptId;
+    if (scriptId) {
+        s32 argument;
+        struct ScenePanelScriptArguments arguments;
+        arguments.count = (arguments.count & 0xFFFF0000) | 1;
+        argument = value;
+        arguments.values = &argument;
+        Script_Call(scriptId, &arguments);
     }
 }
