@@ -133,7 +133,7 @@ sections call.
 
 | Range | Functions | What they do |
 |---|---|---|
-| `08213D10`, `082144A4`–`08215400` | `InterruptsAndVideo_Initialize`, `Sprite_Init`, `Sprite_Remove`, `AnimData_FindEntry`, `AnimData_Load`, `AnimData_SelectTiles`, `ObjGfx_LoadTiles` | interrupt and video setup, sprite and animation resource loading (ENGINE.md section 10) |
+| `08213D10`, `082144A4`–`08215400` | `InterruptsAndVideo_Initialize`, `Sprite_Init`, `Sprite_Remove`, `AnimData_FindEntry`, `AnimData_Load`, `AnimData_SelectPaletteBank`, `ObjGfx_LoadTiles` | interrupt and video setup, sprite and animation resource loading (ENGINE.md section 10) |
 | `08215698`–`08216584` | `Video_GetBackgroundMap`, `Bg_ClearTilemap`, `BgGfx_LoadTilemapSimple`, `BgGfx_LoadTilemap` | background tilemap helpers |
 | `08217EAC`, `082195E0`, `0821980C` | `Effect_Remove`, `Anim_Remove`, `Anim_LoadKeyframe` | pool removal and keyframe loading |
 | `08218D1C`, `08218E5C` | `Text_DrawGlyph`, `TextWindow_BlankRect` | glyph drawing and window clearing (section 7) |

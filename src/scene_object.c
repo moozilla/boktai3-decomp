@@ -275,7 +275,7 @@ void Scene_ApplyTerrainInteraction(struct SceneCollider *contact, void *unused,
             actor->health -= 24;
             actor->damageTimer = 10;
             actor->animationTimer = 2;
-            AnimData_SelectTiles(&actor->animationData, actor->animation);
+            AnimData_SelectPaletteBank(&actor->animationData, actor->animation);
             applied = 1;
         }
     } else if (actor->type == 1) {
@@ -290,7 +290,7 @@ void Scene_ApplyTerrainInteraction(struct SceneCollider *contact, void *unused,
             actor->health -= 24;
             actor->damageTimer = 10;
             actor->animationTimer = 2;
-            AnimData_SelectTiles(&actor->animationData, actor->animation);
+            AnimData_SelectPaletteBank(&actor->animationData, actor->animation);
             if (!actor->cooldown) {
                 actor->cooldown = 10;
                 Sound_PlaySong(0x15C);
@@ -306,7 +306,7 @@ void Scene_ApplyTerrainInteraction(struct SceneCollider *contact, void *unused,
             actor->health -= 24;
             actor->damageTimer = 10;
             actor->animationTimer = 2;
-            AnimData_SelectTiles(&actor->animationData, actor->animation);
+            AnimData_SelectPaletteBank(&actor->animationData, actor->animation);
             applied = 1;
         }
     }
@@ -1242,7 +1242,7 @@ s32 SceneObjects_Update(struct SceneObjectManager *manager)
             disableCollision(&p->collider.state);
         }
         if (p->animationTimer && !--p->animationTimer)
-            AnimData_SelectTiles(&p->animationData, p->initialAnimation);
+            AnimData_SelectPaletteBank(&p->animationData, p->basePalette);
     }
     if (manager->fading) {
         sub_08221110(manager->paletteA, manager->fromA, manager->toA, manager->fade, 5);
@@ -1378,7 +1378,7 @@ static inline u16 flags16(struct SceneObject *p, u32 mask)
 
 // MATCHING_CONCESSION: register-pinning
 s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *position,
-                              u32 animationResource, s32 drawMode, s32 health, s32 initialAnimation,
+                              u32 animationResource, s32 drawMode, s32 health, s32 basePalette,
                               s32 animation, u32 script)
 {
     struct SceneExtent size, offset;
@@ -1503,14 +1503,14 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
                          }),
                          16);
     {
-        register s32 initial asm("r3") = initialAnimation;
+        register s32 initial asm("r3") = basePalette;
         asm("" : "+r"(initial));
         if (initial >= 0)
-            p->initialAnimation = initial;
+            p->basePalette = initial;
         else
-            p->initialAnimation = p->animationData.initial;
+            p->basePalette = p->animationData.paletteIndex;
     }
-    AnimData_SelectTiles(&p->animationData, p->initialAnimation);
+    AnimData_SelectPaletteBank(&p->animationData, p->basePalette);
     p->animation = animation;
     p->link.id = p->body.id;
     p->link.position = pos;
@@ -1616,20 +1616,20 @@ s32 SceneObjects_SwitchPaletteFromScript(void)
     sound = Script_GetKeywordValue('S', 1);
     if (!mode) {
         if (draw->mode == 0 || draw->mode == 2) {
-            p->initialAnimation = 4;
-            AnimData_SelectTiles(&p->animationData, 4);
+            p->basePalette = 4;
+            AnimData_SelectPaletteBank(&p->animationData, 4);
         } else {
-            p->initialAnimation = 5;
-            AnimData_SelectTiles(&p->animationData, 5);
+            p->basePalette = 5;
+            AnimData_SelectPaletteBank(&p->animationData, 5);
         }
     } else {
         if (draw->mode == 0 || draw->mode == 2) {
-            p->initialAnimation = 6;
-            AnimData_SelectTiles(&p->animationData, 6);
+            p->basePalette = 6;
+            AnimData_SelectPaletteBank(&p->animationData, 6);
             p->animationData.palette = manager->paletteA;
         } else {
-            p->initialAnimation = 7;
-            AnimData_SelectTiles(&p->animationData, 7);
+            p->basePalette = 7;
+            AnimData_SelectPaletteBank(&p->animationData, 7);
             p->animationData.palette = manager->paletteB;
         }
         manager->stopFade = 1;

@@ -10,7 +10,7 @@ struct O {
 };
 struct O *sub_0818F218(void *);
 void AnimData_Load(void *, s32);
-void AnimData_SelectTiles(void *, s32);
+void AnimData_SelectPaletteBank(void *, s32);
 void Sprite_Init(void *, void *, s32);
 void sub_08220D20(void *, s32, s32, s32, s32);
 void sub_0818EE38(void);
@@ -23,7 +23,7 @@ void sub_0818F2C0(u8 *p, struct V *q)
         void (*a)(void);
         void (*b)(void);
         AnimData_Load(r, 0xC7ED);
-        AnimData_SelectTiles(r, 0x1A8);
+        AnimData_SelectPaletteBank(r, 0x1A8);
         Sprite_Init((u8 *)o + 0x24, r, 0);
         sub_08220D20((u8 *)o + 0x50, *(s32 *)(p + 0x53AC), 1, 0, 0);
         o->v = *q;

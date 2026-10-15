@@ -11,12 +11,12 @@ void ContactSequenceActor_Update(struct ContactSequenceOwner *parent,
     actor->flags = 0;
     sub_08249240(parent, actor, (void *)gUnk_086059A4[actor->state]);
     if (actor->cooldown) {
-        AnimData_SelectTiles(&actor->graphics, 0x192);
+        AnimData_SelectPaletteBank(&actor->graphics, 0x192);
         ContactSequenceActor_SetFlags(actor, 1);
         --actor->cooldown;
     } else {
         u32 tile = gUnk_0860597C[actor->sequence.index];
-        AnimData_SelectTiles(&actor->graphics, tile);
+        AnimData_SelectPaletteBank(&actor->graphics, tile);
         if (tile == 0x165)
             actor->graphics.paletteData = parent->palette;
     }

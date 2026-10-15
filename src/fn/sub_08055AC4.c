@@ -1,16 +1,15 @@
-#include "global.h"
-extern u32 gUnk_02000498;
-void Anim_Remove(u8 *);
-s32 sub_08055AC4(u8 *p)
+#include "script_keyframe_pool.h"
+s32 ScriptKeyframe_DestroyManager(struct ScriptKeyframeManager *manager)
 {
     s32 i = 0;
-    if (i < p[0x19]) {
-        u8 *q = p + 0x54;
+    if (i < manager->count) {
+        union ScriptKeyframeAnimation *animation = &manager->entries[0].animation;
         do {
-            Anim_Remove(q);
-            q += 0xbc;
+            Anim_Remove(animation);
+            animation = (void *)((u8 *)animation + sizeof(struct ScriptKeyframeEntry));
             i++;
-        } while (i < p[0x19]);
+        } while (i < manager->count);
     }
-    return gUnk_02000498 = 0;
+    gUnk_02000498 = 0;
+    return 0;
 }

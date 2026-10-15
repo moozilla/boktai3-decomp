@@ -15,7 +15,7 @@ void EffectEmitter_ReceiveHit(struct EmitterAttack *attack, void *unused,
     }
     if (!object->cooldown && damage > 0) {
         object->cooldown = 8;
-        AnimData_SelectTiles(&object->resource, 487);
+        AnimData_SelectPaletteBank(&object->resource, 487);
         object->flash = 8;
         object->health -= damage;
         if (object->health <= 0) {
@@ -59,7 +59,7 @@ s32 EffectEmitter_Update(struct EffectEmitter *object)
         if (object->flash) {
             object->flash--;
             if (!object->flash)
-                AnimData_SelectTiles(&object->resource, 486);
+                AnimData_SelectPaletteBank(&object->resource, 486);
         }
         if (++object->timer >= gUnk_08604AB4[object->phase]) {
             object->timer = 0;
@@ -140,7 +140,7 @@ s32 EffectEmitter_Initialize(struct EffectEmitter *object, u32 id, u32 unused)
     sprite = &object->sprite;
     Sprite_Init(sprite, resource, 0);
     sprite->frame = 0;
-    AnimData_SelectTiles(resource, 486);
+    AnimData_SelectPaletteBank(resource, 486);
     object->sprite.position = *(struct EmitterVec *)&position;
     Shadow_Initialize(object->shadow, &object->sprite.position, 0);
     return 0;

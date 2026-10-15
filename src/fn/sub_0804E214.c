@@ -1,7 +1,7 @@
 #include "area_effect.h"
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
-void AnimData_SelectTiles(void *, u32);
+void AnimData_SelectPaletteBank(void *, u32);
 u32 sub_0822C034(void *);
 void AreaEffect_InitializeEntry(struct AreaEffectEntry *entry, s32 kind,
                                 struct AreaEffectPosition *position, s32 rotated, u32 graphicsId)
@@ -23,7 +23,7 @@ void AreaEffect_InitializeEntry(struct AreaEffectEntry *entry, s32 kind,
     sprite = (struct Sprite *)&entry->spriteFlags;
     Sprite_Init(sprite, graphics, mirror);
     sprite->priority = *kindField;
-    AnimData_SelectTiles(graphics, graphicsId);
+    AnimData_SelectPaletteBank(graphics, graphicsId);
     entry->displayPosition = entry->position;
     entry->renderMode = 3;
     entry->hasSprite = 1;

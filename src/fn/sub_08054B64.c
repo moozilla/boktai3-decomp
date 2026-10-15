@@ -1,10 +1,15 @@
-#include "global.h"
-extern u32 gUnk_02000490;
-void sub_08054AD0(void);
-u32 sub_08054834(void);
-u32 sub_08054B64(void)
+// MATCHING_CONCESSION: register-pinning
+#include "hit_switch.h"
+u32 HitSwitch_AddFromScript(void)
 {
-    if (gUnk_02000490 == 0)
-        sub_08054AD0();
-    return sub_08054834();
+    struct HitSwitchManager *manager = gUnk_02000490;
+    if (manager == 0)
+        manager = HitSwitch_CreateManager();
+    HitSwitch_InitEntryFromScript(manager);
+    {
+        /* The registry dispatcher observes r0; no semantic return is established. */
+        u32 result;
+        asm("" : "=r"(result));
+        return result;
+    }
 }

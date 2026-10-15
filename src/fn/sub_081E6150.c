@@ -66,7 +66,7 @@ static inline u32 frame_factor(u16 v)
 }
 void Actor_ProjectAndClampToScreen(void *);
 void sub_081E4174(void *);
-void AnimData_SelectTiles(void *, s32);
+void AnimData_SelectPaletteBank(void *, s32);
 void Sound_PlaySong(s32);
 void Script_Call(void *, s32);
 void ActorShadow_Enable(void *);
@@ -99,7 +99,7 @@ void sub_081E6150(struct S *p)
         *(u16 *)((u8 *)p + 0xee2) = p->obj.angle;
         ActorShadow_Disable(p->p2);
         sub_081E4174(p);
-        AnimData_SelectTiles(p->effect, 343);
+        AnimData_SelectPaletteBank(p->effect, 343);
     }
     o = &p->obj;
     a = &p->anim;

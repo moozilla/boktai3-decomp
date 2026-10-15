@@ -1,17 +1,17 @@
-#include "global.h"
+#include "display_track.h"
 extern u32 gUnk_0300523C;
-void sub_08054EC0(u8 *);
-u32 sub_08055578(u8 *p)
+void DisplayTrack_Update(struct DisplayTrack *);
+u32 DisplayTrack_TickManager(struct DisplayTrackManager *manager)
 {
     s32 i = 0;
-    if (i < p[0x19]) {
-        u8 *q = p + 0x1C;
+    if (i < manager->count) {
+        struct DisplayTrack *track = manager->entries;
         do {
-            if (!(gUnk_0300523C != 0 && q[4] == 0))
-                sub_08054EC0(q);
-            q += 0xB8;
+            if (!(gUnk_0300523C != 0 && track->runDuringPause == 0))
+                DisplayTrack_Update(track);
+            track++;
             i++;
-        } while (i < p[0x19]);
+        } while (i < manager->count);
     }
     return 0;
 }

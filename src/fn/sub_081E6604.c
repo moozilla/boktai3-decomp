@@ -65,7 +65,7 @@ static inline u32 frame_factor(u16 v)
     return mask & value;
 }
 void sub_081E4174(void *);
-void AnimData_SelectTiles(void *, s32);
+void AnimData_SelectPaletteBank(void *, s32);
 void Sound_PlaySong(s32);
 void Script_Call(void *, s32);
 void ActorShadow_Enable(void *);
@@ -86,7 +86,7 @@ void sub_081E6604(struct S *p)
         p->obj.scaleX = 127;
         ActorShadow_Disable(p->p2);
         sub_081E4174(p);
-        AnimData_SelectTiles(p->effect, 343);
+        AnimData_SelectPaletteBank(p->effect, 343);
         p->phase = 0;
         if (p->oldMode == 3 && p->mode == 3) {
             p->savedFrame = p->anim.frame;

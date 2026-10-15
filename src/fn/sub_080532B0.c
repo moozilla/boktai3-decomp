@@ -14,7 +14,7 @@ s32 Script_GetValue(void);
 u8 *sub_0821D64C(u32, u32);
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
-void AnimData_SelectTiles(void *, u32);
+void AnimData_SelectPaletteBank(void *, u32);
 void StackedActor_InitParticles(struct StackedActor *);
 s32 SceneMessages_RegisterReceiver(void *, s32, s32);
 void Sound_PlaySong(u32);
@@ -126,11 +126,11 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
         mode = 3;
     {
         register u16 *source asm("r1") = baseFrame;
-        actor->tileBase = (*source >> 1) * 3 + 160;
+        actor->paletteBase = (*source >> 1) * 3 + 160;
     }
     {
         void *graphics = actor->graphics;
-        u16 *tiles = &actor->tileBase;
+        u16 *tiles = &actor->paletteBase;
         struct StackedActorSprite *sprite;
         void *shadowGraphics;
         struct StackedActorSprite *shadow;
@@ -142,7 +142,7 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
             register u16 *source asm("r1") = baseFrame;
             sprite->frame = *source;
         }
-        AnimData_SelectTiles(graphics, *tiles);
+        AnimData_SelectPaletteBank(graphics, *tiles);
         actor->sprite.flags |= 0x200;
         {
             u8 *destination = &actor->sprite.renderMode;
@@ -161,7 +161,7 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
             register u16 *source asm("r1") = baseFrame;
             shadow->frame = *source;
         }
-        AnimData_SelectTiles(shadowGraphics, *tiles);
+        AnimData_SelectPaletteBank(shadowGraphics, *tiles);
         shadow->flags |= 0x400;
         {
             u8 *destination = &actor->shadow.renderMode;
@@ -225,7 +225,7 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
                     register u16 *tiles asm("r0");
                     asm("" : : "r"(tileOffset));
                     tiles = (void *)((u8 *)actor + tileOffset);
-                    AnimData_SelectTiles(segmentGraphics, *tiles + 2);
+                    AnimData_SelectPaletteBank(segmentGraphics, *tiles + 2);
                 }
                 {
                     register struct StackedActorSprite *base asm("r0") = cache.segments;
@@ -281,8 +281,8 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
                     sub_0815AEE0(gUnk_02000580);
                     actor->sprite.flags &= ~1;
                     {
-                        u32 tile = actor->tileBase + 2;
-                        AnimData_SelectTiles(cache.graphics, tile);
+                        u32 tile = actor->paletteBase + 2;
+                        AnimData_SelectPaletteBank(cache.graphics, tile);
                     }
                     {
                         register struct StackedActorSprite *target asm("r1") = savedShadow;

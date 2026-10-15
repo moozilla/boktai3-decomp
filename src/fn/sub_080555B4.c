@@ -1,22 +1,21 @@
-#include "global.h"
-extern u32 gUnk_02000494;
-void Sprite_Remove(u8 *);
+#include "display_track.h"
 void sub_08013684(void);
-void Heap_Free(u32);
-s32 sub_080555B4(u8 *p)
+s32 DisplayTrack_DestroyManager(struct DisplayTrackManager *manager)
 {
     s32 i;
-    for (i = 0; i < p[0x19]; i++) {
-        u32 off = i * 0xb8;
-        u32 *q;
-        u8 *b;
-        Sprite_Remove((u8 *)(off + (u32)p) + 0x44);
-        b = p + 0xd0;
-        q = (u32 *)(b + off);
-        if (*q != 0) {
+    for (i = 0; i < manager->count; i++) {
+        u32 offset = i * sizeof(struct DisplayTrack);
+        void **resource;
+        u8 *base;
+        /* Manager+44 is the first sprite; manager+D0 is its owned resource. */
+        Sprite_Remove((void *)(offset + (u32)manager + 0x44));
+        base = (u8 *)manager + 0xD0;
+        resource = (void **)(base + offset);
+        if (*resource) {
             sub_08013684();
-            Heap_Free(*q);
+            Heap_Free(*resource);
         }
     }
-    return gUnk_02000494 = 0;
+    gUnk_02000494 = 0;
+    return 0;
 }

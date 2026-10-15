@@ -78,9 +78,10 @@ elapsed counter is zero, or keyframe frame when status bit 4 is set. These query
 paths do not have the setters' inactive guard; adding one would change behavior.
 
 Priority and palette/attribute setters dispatch to the appropriate object view.
-Tile selection dispatches to AnimData_SelectTiles or 08219A80. Their consumers
-confirm the tile-source pointer at wrapper +0x18 (sequence) / +0x74 (keyframes)
-and tile index at +0x12 / +0x66. The position setter returns -1 when inactive;
+Palette selection dispatches to AnimData_SelectPaletteBank or Anim_SelectPaletteBank
+(08219A80). Their consumers confirm the palette-source pointer at wrapper +0x18
+(sequence) / +0x74 (keyframes) and palette index at +0x12 / +0x66. The later
+display-track and hit-switch reviews prove these are sixteen RGB15 colors per bank. The position setter returns -1 when inactive;
 on success the original returns the incoming wrapper pointer, retained explicitly
 in C. Set/clear/test flag helpers use the +0x90 pointer, with test returning zero
 for an inactive wrapper.

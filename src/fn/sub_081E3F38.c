@@ -90,7 +90,7 @@ void sub_081E574C(void *, void *);
 void sub_081E5648(void *, void *);
 void sub_081E4174(void *);
 void sub_081E44D4(void *);
-void AnimData_SelectTiles(void *, s32);
+void AnimData_SelectPaletteBank(void *, s32);
 // Select the closest eligible interaction target and animate its selection marker.
 void Actor_SelectNearestInteraction(struct G *p)
 {
@@ -169,17 +169,17 @@ void Actor_SelectNearestInteraction(struct G *p)
         q = (struct Partner *)((u8 *)p + 0x1c + i * 0xdc);
         if (i == p->group) {
             if (++q->timer > 10) {
-                AnimData_SelectTiles((u8 *)q + 0x2c, q->resource);
+                AnimData_SelectPaletteBank((u8 *)q + 0x2c, q->resource);
                 q->timer = 10;
             } else
-                AnimData_SelectTiles((u8 *)q + 0x2c, q->resource + 1);
+                AnimData_SelectPaletteBank((u8 *)q + 0x2c, q->resource + 1);
         } else {
             u8 old = q->timer--;
             if (old == 0) {
                 q->timer = 0;
-                AnimData_SelectTiles((u8 *)q + 0x2c, q->resource + 2);
+                AnimData_SelectPaletteBank((u8 *)q + 0x2c, q->resource + 2);
             } else
-                AnimData_SelectTiles((u8 *)q + 0x2c, q->resource + 1);
+                AnimData_SelectPaletteBank((u8 *)q + 0x2c, q->resource + 1);
         }
     }
 }

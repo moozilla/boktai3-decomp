@@ -96,7 +96,7 @@ s32 ContactSwarm_SpawnPairedAdvance(struct ContactSwarm *pool,
                 view->sprite.flags &= ~1;
             }
             ContactSwarm_SetDirectionalSequence(pool, slot, 0);
-            AnimData_SelectTiles(&slot->display.animation.draw.graphics, 0x2D7);
+            AnimData_SelectPaletteBank(&slot->display.animation.draw.graphics, 0x2D7);
             {
                 void *palette = pool->palette;
                 struct ContactSwarmDrawPacket *view;

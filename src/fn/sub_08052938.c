@@ -1,5 +1,5 @@
 #include "stacked_actor.h"
-void AnimData_SelectTiles(void *, u32);
+void AnimData_SelectPaletteBank(void *, u32);
 void StackedActor_Appear(struct StackedActor *actor)
 {
     u16 *frame = &actor->frame;
@@ -12,7 +12,7 @@ void StackedActor_Appear(struct StackedActor *actor)
     if (value <= 63) {
         actor->sprite.flags = (actor->sprite.flags & ~1) | 2;
         actor->shadow.flags |= 2;
-        AnimData_SelectTiles(actor->graphics, actor->tileBase + 2);
+        AnimData_SelectPaletteBank(actor->graphics, actor->paletteBase + 2);
         {
             u32 scale = *frame;
             actor->sprite.scaleX = scale;
@@ -33,9 +33,9 @@ void StackedActor_Appear(struct StackedActor *actor)
     } else if (value > 79) {
         actor->sprite.position.y--;
         if (actor->sprite.position.y > actor->world.y)
-            AnimData_SelectTiles(actor->graphics, actor->tileBase + 1);
+            AnimData_SelectPaletteBank(actor->graphics, actor->paletteBase + 1);
         else {
-            AnimData_SelectTiles(actor->graphics, actor->tileBase);
+            AnimData_SelectPaletteBank(actor->graphics, actor->paletteBase);
             actor->sprite.flags |= 1;
             StackedActor_SetUpdate(actor, StackedActor_TickIdle);
         }

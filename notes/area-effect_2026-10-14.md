@@ -61,7 +61,7 @@ Packed word masks preserve the original padding and access widths.
 E18096, E214152, E2AC220, E388428, E618280, E73040, E758168, E800124,
 E8D8352, EAFC60. All ten are individual matching translation-unit commits.
 Thirteen pre-existing exact helpers were also named and checked in full.
-Known canonical engine APIs (Sprite_Init, AnimData_Load, AnimData_SelectTiles)
+Known canonical engine APIs (Sprite_Init, AnimData_Load, AnimData_SelectPaletteBank)
 are used in new code. No new drafts or gaps remain before EBD8.
 
 Continue with EBD8 onward, the adjacent multiplayer form of the area updater.

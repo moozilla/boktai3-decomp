@@ -54,7 +54,7 @@ static inline u32 frame_factor(u16 v)
     u32 mask = 15;
     return mask & value;
 }
-void AnimData_SelectTiles(void *, s32);
+void AnimData_SelectPaletteBank(void *, s32);
 void ActorShadow_Enable(void *);
 void ActorPalette_BeginReverseFade(void *);
 void sub_081E7DFC(struct S *p)
@@ -68,7 +68,7 @@ void sub_081E7DFC(struct S *p)
     if (take(p)) {
         p->state = 12;
         Anim_SetSequence(&p->anim, p->arg, 12, 0, 0);
-        AnimData_SelectTiles((u8 *)p + 0xe08, 346);
+        AnimData_SelectPaletteBank((u8 *)p + 0xe08, 346);
         o = &p->obj;
         a = &p->anim;
         entry = a->data + a->frame;

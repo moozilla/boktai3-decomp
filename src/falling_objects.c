@@ -238,7 +238,7 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
     p->sprite.priority = 2;
     p->sprite.position = p->position;
     if (type > 1)
-        AnimData_SelectTiles(resource, 739 + variant);
+        AnimData_SelectPaletteBank(resource, 739 + variant);
     if (p->flags & 4) {
         p->sprite.flags |= 2;
         p->sprite.scaleY = 120;

@@ -17,7 +17,7 @@ void sub_081944C4(u8 *t)
     u16 hz;
     u8 bz;
     AnimData_Load(anim, 0xc7f0);
-    AnimData_SelectTiles(anim, 0x1a3);
+    AnimData_SelectPaletteBank(anim, 0x1a3);
     sprite = t + 0x713c;
     Sprite_Init(sprite, anim, 0);
     *(u32 *)sprite |= 1;

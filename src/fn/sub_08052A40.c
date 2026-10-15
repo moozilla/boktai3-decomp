@@ -4,7 +4,7 @@ extern u8 *gUnk_02000580;
 extern u16 gUnk_03005260[];
 s32 StackedActor_IsPlayerNearby(struct StackedActor *);
 void Sound_PlaySong(u32);
-void AnimData_SelectTiles(void *, u32);
+void AnimData_SelectPaletteBank(void *, u32);
 void sub_0815B0A8(u8 *, struct StackedActorPosition *, u32, u32);
 void StackedActor_TickIdle(struct StackedActor *actor)
 {
@@ -65,9 +65,9 @@ void StackedActor_TickIdle(struct StackedActor *actor)
         actor->sprite.position.y = (u16)actor->world.y + actor->lift;
     }
     if (actor->animationPhase > 7)
-        AnimData_SelectTiles(actor->graphics, actor->tileBase + 2);
+        AnimData_SelectPaletteBank(actor->graphics, actor->paletteBase + 2);
     else if (actor->animationPhase)
-        AnimData_SelectTiles(actor->graphics, actor->tileBase + 1);
+        AnimData_SelectPaletteBank(actor->graphics, actor->paletteBase + 1);
     else
-        AnimData_SelectTiles(actor->graphics, actor->tileBase);
+        AnimData_SelectPaletteBank(actor->graphics, actor->paletteBase);
 }

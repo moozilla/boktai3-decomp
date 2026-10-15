@@ -38,7 +38,7 @@ void *ScriptProc_Start(int, int);
 void ResourceHeader_Relocate(void *, void *);
 void sub_0821983C(void *, void *, int, int, int, int, int, void *);
 void AnimData_Load(void *, int);
-void AnimData_SelectTiles(void *, int);
+void AnimData_SelectPaletteBank(void *, int);
 void Sprite_Init(void *, void *, int);
 void sub_08220D20(void *, void *, int, int, int);
 void *sub_08037DCC(int);
@@ -115,7 +115,7 @@ initialize:
     }
     resource = ScriptProc_Start(0x922E, 0x4BBF);
     AnimData_Load(glyph, 0x593A);
-    AnimData_SelectTiles(glyph, 503);
+    AnimData_SelectPaletteBank(glyph, 503);
     Sprite_Init(savedSprite, glyph, 0x2011);
     sub_08220D20(&saved.animation, resource, 0, 0, 0);
     sprite = savedSprite;

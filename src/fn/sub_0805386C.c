@@ -56,9 +56,9 @@ void InteractionMarker_TickIdle(struct InteractionMarker *marker)
         marker->primary.sprite.position.y = marker->position.y + marker->height;
     }
     if (marker->activationFrame > 7)
-        AnimData_SelectTiles(&marker->primary.graphics, marker->baseTile + 2);
+        AnimData_SelectPaletteBank(&marker->primary.graphics, marker->paletteBase + 2);
     else if (marker->activationFrame != 0)
-        AnimData_SelectTiles(&marker->primary.graphics, marker->baseTile + 1);
+        AnimData_SelectPaletteBank(&marker->primary.graphics, marker->paletteBase + 1);
     else
-        AnimData_SelectTiles(&marker->primary.graphics, marker->baseTile);
+        AnimData_SelectPaletteBank(&marker->primary.graphics, marker->paletteBase);
 }

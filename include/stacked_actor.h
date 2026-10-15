@@ -35,7 +35,7 @@ struct StackedActor {
     u8 segmentGraphics[3][0x1C];
     u16 height;
     u8 removeAfterUse, tetherAccepted;
-    u16 tileBase, animationPhase;
+    u16 paletteBase, animationPhase;
     struct StackedActorParticle particles[8];
     u8 lift, interactionEnabled;
     u16 interactionDelay;
@@ -61,7 +61,7 @@ void StackedActor_EmitRisingParticles(struct StackedActor *);
 void StackedActor_WaitForRetraction(struct StackedActor *);
 void StackedActor_FinishPlayerInteraction(struct StackedActor *);
 void StackedActor_Disappear(struct StackedActor *);
-void sub_080521DC(struct StackedActorParticle *, struct StackedActorPosition *);
+void StackedActor_InitRisingParticle(struct StackedActorParticle *, struct StackedActorPosition *);
 void StackedActor_InitFallingParticle(struct StackedActorParticle *, struct StackedActorPosition *);
 void StackedActor_TickDisabled(struct StackedActor *);
 void StackedActor_LowerLift(struct StackedActor *);

@@ -1256,11 +1256,11 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
     p->started = hidden;
     p->condition = condition;
     if ((u8)condition == 0)
-        AnimData_SelectTiles(p->other, 772);
+        AnimData_SelectPaletteBank(p->other, 772);
     else if ((u8)condition == 1)
-        AnimData_SelectTiles(p->other, 775);
+        AnimData_SelectPaletteBank(p->other, 775);
     else
-        AnimData_SelectTiles(p->other, 776);
+        AnimData_SelectPaletteBank(p->other, 776);
     {
         s32 hidden = p->started;
         if (hidden) {

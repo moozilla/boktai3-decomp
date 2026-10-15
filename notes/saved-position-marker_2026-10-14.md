@@ -30,8 +30,7 @@ forwards two unused script-call arguments as in the original. The separate
 SavedPositionMarker name avoids confusing this predicate with the live-player
 predicate of InteractionMarker. No new runtime coverage is claimed.
 
-Palette evidence: new display-track update54EC0 interpolates sixteen RGB15
-colors from the32-byte banks of030042E4. The established helper name
-AnimData_SelectTiles is therefore misleading; it selects palette banks.
-The source field baseTile in these marker views is a retained legacy name,
-with semantic renaming scheduled for the next combined build.
+Palette evidence: display-track update54EC0 interpolates sixteen RGB15 colors
+from the 32-byte banks of030042E4. The helper is now named
+AnimData_SelectPaletteBank (formerly AnimData_SelectTiles), and the marker fields
+are named paletteBase. These names replace the earlier tile interpretation.
