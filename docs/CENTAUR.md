@@ -67,7 +67,7 @@ its `flags.h`), else against the system mGBA 0.10, which cannot read them.
 screen in both.
 | `where()` | frame, map, tileset, palette, life, last text |
 | `callproc(id, {args})` | run a script procedure (also on the Live page) |
-| `warp(scene)`, `scene()` | experimental scene load (see below); current scene |
+| `warp(scene[, entrance])`, `scene()` | go to a scene the way a door does, player placed (see below); current scene |
 | `peek*/poke*`, `watch(a)` | memory helpers |
 
 ## The Live page (http://localhost:8642/live)
@@ -209,10 +209,29 @@ panel. Capture labels, groups and notes live with the capture
 
 ## Scenes, warps and the stage survey
 
-`warp(N)` requests scene `N` the way the script `load` command does (see
-ENGINE.md, Scenes): the stage loads with its real palette, but the player is
-not spawned, so it is for looking, not playing. The Live page lists the scenes
-(`tools/mgba/scenes.py`) with a click-to-warp list.
+`warp(N, E)` goes to scene `N`, arriving at entrance `E`, the way a door
+does: it runs `proc_945(N, E, 0)`, the game's own door transition without a
+trigger box. That calls `proc_953`, which puts the entrance in `r708[0x70]`
+(the number the scene's entrance procedures test to place the player), and
+`proc_952`, which starts the transition actor that loads the scene. Without
+`E` it uses the scene's default entrance from `build/centaur/scenes.lua`
+(`tools/mgba/scenes.py`: the first unconditional entrance that
+`tools/assets/stages.py` finds); a scene with none falls back to the older
+"continue" warp, which loads the stage without a player. The Live page lists
+the scenes with a click-to-warp list, and clicking an entrance on a map warps
+there. Story flags stay as they are, so a scene can look different from a
+real playthrough.
+
+Verified headlessly: from the `start` bookmark (scene 2698), `warp(2705, 57)`
+creates the player at (640, 256, 2688) and walks him in to (640, 378, 2438),
+exactly as the door in `first_level` does; `warp(2712, 8)`, `warp(2712)`
+(entrance 7) and `warp(3243, 126)` (the late field) place a playable player
+too, and so does `warp(2712)` from the field of the late-game test save.
+
+What was missing before: the older warp wrote the scene request words
+directly, so `r708[0x70]` kept the entrance of the last real door; no entrance
+procedure of the new scene matched it, nothing placed the player, and the
+player object was never created.
 
 `tools/mgba/headless.sh tools/mgba/survey.lua` warps through every scene from
 the field of the test save and captures each one (about ten minutes). The
@@ -240,34 +259,16 @@ the game continued. Procedure numbers are the ones calls use (one more than
 
 ## Next
 
-* Real warps, from the door in `first_level` (the `start` bookmark plus that
-  recording; see below). A door does: exit trigger → `Script_Call(860)` with
-  no arguments (GameState+0x740 goes 7 → 8) → `Script_Call(860)` again from
-  `0821B8FF` and `0822832F` → request `0x030053E8 = 0x11` with the next scene
-  `0x030039F0` (2698 → 2705) and GameState+0x5A4 → the player object pointer
-  `0x02000580` becomes 0 → `Script_Call(2705)` from `08225173` → the player
-  position is set to the entrance (640, 256, 2688) → a new player object 11
-  frames after the request. **GameState+0x30/+0x32/+0x34 is the live player
-  position** (x, y, z), updated every frame while walking. The same writes
-  from the `start` bookmark, with or without proc 860 first, load the right
-  map (ED78, as the door does) but never place or create the player: what is
-  still missing is upstream of the request (compare RAM from the door frame
-  with a warp attempt, outside GameState, e.g. `030042A0` changes at the
-  request). Scene procedures run their setup inside `if (proc_872() == 0)`;
-  the entrance comes from `r708[0x70]`, which the door's `proc_953` sets
-  (ASSETS.md, "Stage scripts"), so a warp should set it as well.
+* Warps are solved (see "Scenes, warps and the stage survey"). For the record,
+  a door does: exit trigger → `Script_Call(860)` (GameState+0x740 goes 7 → 8,
+  the back entrance) → request `0x030053E8 = 0x11` with the next scene
+  `0x030039F0` → the player object pointer `0x02000580` becomes 0 →
+  `Script_Call(2705)` from `08225173` → the entrance procedure matching
+  `r708[0x70]` places the player → a new player object 11 frames after the
+  request. **GameState+0x30/+0x32/+0x34 is the live player position**.
 * `first_level` was recorded from a reset with `go("start")` partway, before
   recordings could start from a bookmark; replay it as `loadstate
   bookmarks/start.ss` followed by its inputs after the first wait (it stays in
   sync: the door at about 1,950 frames in).
-* Real warps (older notes). `warp(N)` now replays what "continue" does (`sub_081E132C` at
-  `081E14E0`): `0x0300546C = 0`, `Script_Call(*0x020003A8)` (the continue
-  procedure, 1436 in the test save), `0x0300523C = 0`, request `0x11`, next
-  scene `N`. The stage loads; the player object (`0x02000580`) is still not
-  created, also with `GameState+0x30` (the saved position, s16 x/y/z) seeded
-  from one of the scene's entrances. Tried and ruled out: request word 1 vs
-  `0x11`, calling an entrance procedure (`916`) after the load. Next: trace a
-  real door (walk through one in a recording, `emu:setWatchpoint` on
-  `0x02000580`) and diff what it sets.
 * Event flags (`GameState +0x720`–`+0x730`) as a named, editable list.
 * Sprite palettes per enemy family from captures, to settle which enemy is which.
