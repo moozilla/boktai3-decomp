@@ -405,3 +405,4 @@ address,isa,evidence,replacement_end
 08245394,arm,Existing bx r0 callback trampoline; retained assembly; docs/RFU.md,
 08248E70,thumb,Independent 156-byte RTC write body; exact standalone C check; docs/RTC.md,08248F0C
 08248F0C,thumb,Separate RTC alarm body with own push/sub-sp and pop/bx after 08248E70 return; retained unmatched; docs/RTC.md,
+08067BA8,thumb,Independent request-all slot loop with own push and pop-bx in retained 08067984 tail; full exact 100-byte C body,08067C0C
