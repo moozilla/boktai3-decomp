@@ -1,11 +1,7 @@
-#include "global.h"
-
-void sub_08058130(void *, u32, u32);
-void sub_08058150(void *, void *);
-void sub_0805824C(void);
-
-void sub_0805822C(void *p)
+#include "scene_panel.h"
+#define ScenePanel_BeginReverseSequence sub_0805822C
+void ScenePanel_BeginReverseSequence(struct ScenePanel *panel)
 {
-    sub_08058130(p, 2, 4);
-    sub_08058150(p, sub_0805824C);
+    sub_08058130(panel, 2, 4);
+    sub_08058150(panel, sub_0805824C);
 }
