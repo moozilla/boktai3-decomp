@@ -18,11 +18,11 @@ void ScenePanel_WaitRigRelease(struct ScenePanel *input)
         }
     }
     if (gUnk_02000710->unk618 > 0)
-        sub_0805907C((void *)panel);
+        ScenePanel_RunScheduledAction((void *)panel);
     if (anyActive)
         panel->frame = 0;
     else if (++panel->frame > 119) {
-        sub_080595AC(&panel->rig, 6);
-        sub_08057960((void *)panel, 11);
+        ScenePanelRig_SetState(&panel->rig, 6);
+        ScenePanel_SetEffectState((void *)panel, 11);
     }
 }

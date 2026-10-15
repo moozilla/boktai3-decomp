@@ -13,12 +13,12 @@ void ScenePanel_AdvancePlayerArrival(struct ScenePanel *input)
         if (panel->mode) {
             sub_0815B1D0(SCENE_PANEL_PLAYER, 1, 0);
             Sound_PlaySong(5);
-            sub_08058150(input, sub_080581A0);
-            sub_08057960(input, 7);
+            ScenePanel_SetState(input, ScenePanel_BeginForwardSequence);
+            ScenePanel_SetEffectState(input, 7);
         } else {
             sub_0815B1D0(SCENE_PANEL_PLAYER, 0, 0);
             Sound_PlaySong(407);
-            sub_08057960(input, 6);
+            ScenePanel_SetEffectState(input, 6);
         }
     }
 }

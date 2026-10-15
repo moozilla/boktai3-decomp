@@ -18,19 +18,19 @@ void ScenePanel_UpdateActiveSubjects(struct ScenePanel *input)
             active++;
             if ((*subject)->changed) {
                 Sound_PlaySong(294);
-                sub_08058150((void *)panel, sub_080582B8);
+                ScenePanel_SetState((void *)panel, ScenePanel_BeginLongSequence);
                 (*subject)->changed = 0;
             }
         }
     }
     if (!panel->allSubjectsNotified && active >= panel->subjectCount) {
         panel->allSubjectsNotified = 1;
-        sub_08057978((void *)panel, 1);
+        ScenePanel_CallPendingScript((void *)panel, 1);
     }
     if (!panel->presentationState)
-        sub_08058150((void *)panel, sub_08058444);
+        ScenePanel_SetState((void *)panel, ScenePanel_BeginPulseSequence);
     if (sub_0805B34C((void *)panel)) {
         sub_0815B0A8(SCENE_PANEL_PLAYER, &panel->approachPosition, 0, 4);
-        sub_08057960((void *)panel, 5);
+        ScenePanel_SetEffectState((void *)panel, 5);
     }
 }

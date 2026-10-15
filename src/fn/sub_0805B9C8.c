@@ -9,6 +9,6 @@ void ScenePanel_WaitTransitionGate(struct ScenePanel *input)
     else if (!panel->gateC12) {
         Sound_PlaySong(490);
         gUnk_02000488->state = 14;
-        sub_08057960(input, 9);
+        ScenePanel_SetEffectState(input, 9);
     }
 }

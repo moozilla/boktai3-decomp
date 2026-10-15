@@ -27,7 +27,7 @@ void ScenePanel_AdvanceTetherReturn(struct ScenePanel *input)
             sub_0815B2E0(SCENE_PANEL_PLAYER, -1, 0);
             break;
         case 360:
-            sub_08057978(input, 7);
+            ScenePanel_CallPendingScript(input, 7);
             break;
     }
 }
