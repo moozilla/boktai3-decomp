@@ -1,9 +1,8 @@
-#include "global.h"
-
-void SceneMessages_RegisterReceiver(u8 *, s32, s32);
-
-s32 sub_0806386C(u8 *p, s32 a)
+#include "scene_event_dispatch.h"
+#define SceneAudioEvent_Register sub_0806386C
+void SceneMessages_RegisterReceiver(void *, s32, s32);
+s32 SceneAudioEvent_Register(struct SceneEventDispatchTask *owner, s32 receiverId)
 {
-    SceneMessages_RegisterReceiver(p + 0x1c, a, 8);
+    SceneMessages_RegisterReceiver(&owner->receiver, receiverId, 8);
     return 0;
 }
