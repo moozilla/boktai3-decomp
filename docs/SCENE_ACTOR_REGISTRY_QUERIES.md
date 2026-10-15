@@ -88,6 +88,20 @@ contracts. `7FC90` itself only clears byte2B2 when it is nonzero.
 sum, and accepts only values strictly below the initial 10,000,000 threshold.
 The first equal-distance actor wins; an unsuccessful search returns NULL.
 
+`70B1C` resets available actors in categories `{4,1,3}` only when none of
+`flags2D4 & A007` is set. It installs `7FC90`, chooses substate2B5=16,
+resets control-entry fields, and sets state2A8=0, phase2A9=1, behavior2AA=0,
+counter2AC=0, and field2B1=1. The masked flags value is known zero in this path
+and supplies the observed zero stores.
+
+`70C24` resolves actor bytes `458/45A` through `0821E7EC`, chooses the nearest
+non-NULL player from `02000580[0..02000544)`, and checks its wrapped X/Z
+displacement against the supplied signed component bounds. It keeps the first
+strictly nearest result, using signed comparison of the wrapped square sum.
+Category10 instead returns whether `flags2D0 & 4000000` is set. The origin lookup
+returns zero coordinates on failure; its return value is ignored. The fourth
+halfword of displacement aggregates is unspecified and never scalar-read.
+
 ## Boundaries and validation
 
 The section spans 3,896 bytes and has 22 function entries, including known
@@ -96,8 +110,8 @@ independent entries `70444` and `70E44` that gbadisasm leaves as data. Thus
 has size 68, followed by the separate 108-byte `70E44`. These entries already
 exist in the repository's build/progress extra-function metadata.
 
-The current frozen query/control cohort contains fourteen new exact functions,
-**+0.0879 percentage points** (2,124 bytes), all register-pinned. Four prior exact functions
+The current frozen query/control cohort contains sixteen new exact functions,
+**+0.1095 percentage points** (2,644 bytes), all register-pinned. Four prior exact functions
 (124 bytes) were reviewed and typed without additional credit. Each function
 passed a full-size fast check after formatting. The parent performs name
 promotion and one combined complete ROM build before integration.
@@ -114,6 +128,8 @@ promotion and one combined complete ROM build before integration.
 | 08070834 | 220 | Request state with optional control preservation | New, pinned |
 | 08070A40 | 80 | Set scripted actor movement mode | New, pinned |
 | 08070A90 | 140 | Set movement mode across eligible registry actors | New, pinned |
+| 08070B1C | 264 | Reset eligible category actor state | New, pinned |
+| 08070C24 | 256 | Test nearest player displacement bounds | New, pinned |
 | 08070D24 | 220 | Find nearest eligible category actor | New, pinned |
 | 08070E00 | 68 | Continue after ID, excluding flag bit one | New, pinned |
 | 08070E44 | 108 | Continue with category whitelist | New, pinned |
@@ -129,7 +145,8 @@ reduced from 8), and the flags query reduced 17→8. No handwritten instruction 
 The control reset reduced 42→17 hints, the field-restoration script 7→3, the
 individual movement-mode request 9→3, and the registry-wide mode request 21→10.
 The defeat routine reduced 90→26 hints and the individual state request 35→12.
-The nearest-category search reduced 28→7 hints.
+The nearest-category search reduced 28→7 hints, the category-state reset 37→18,
+and the nearest-player bounds query 38→16.
 
 The control reset also demonstrated the compiler branch-length estimate issue:
 its near-exact body measured 276 bytes, with a long entry branch and consequent
@@ -140,6 +157,6 @@ barriers; trial twelve shortened the compiler-selected branch and yielded all
 compiler's estimated branch distance. Normal exact-only depin followed this
 preliminary minimization.
 
-The remaining section includes movement/response setup, script-driven actor
-mutation, and additional selection/query helpers; those bodies retain assembly
-until their complete reviewed spans match.
+Only movement/response setup `70070` (824 bytes) and registry-wide state request
+`70910` (304 bytes) remain assembly in this section until their complete reviewed
+spans match.
