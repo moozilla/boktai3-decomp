@@ -1,6 +1,5 @@
-#include "global.h"
-void SceneMessages_RegisterReceiver(u8 *, u32, u32);
-void sub_0805C73C(u8 *p)
+#include "scene_panel_commands.h"
+void ScenePanel_RegisterReceiver(struct ScenePanelCommandView *panel)
 {
-    SceneMessages_RegisterReceiver(p + 0x17b0, *(u16 *)(p + 0x18), 9);
+    SceneMessages_RegisterReceiver(&panel->receiver, panel->actorId, 9);
 }
