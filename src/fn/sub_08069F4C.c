@@ -1,8 +1,5 @@
 #include "burst_emitter.h"
 #define BurstEmitter_CreatePool sub_08069F4C
-s32 sub_08069ED0(struct BurstEmitterPool *);
-void sub_08069F24(void *);
-s32 sub_08069F34(struct BurstEmitterPool *, u32);
 struct BurstEmitterPool *BurstEmitter_CreatePool(void)
 {
     struct BurstEmitterPool *pool;
