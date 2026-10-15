@@ -41,7 +41,7 @@ ActorAttachment_CreateAlternateSpriteSlot(struct ContactPosition *anchor, void *
     s32 xOffset, zOffset;
     existing = gUnk_02000124;
     if (!existing) {
-        manager = sub_08066C34();
+        manager = ActorAttachment_CreateManager();
         if (manager)
             goto gotManager;
     failed:
@@ -65,13 +65,13 @@ gotManager:
             u32 frame = 6;
             asm("" : "+r"(zero), "+r"(frame));
             *low = frame;
-            slot->active = 1;
+            slot->flags31 = 1;
             slot->position.y = savedY;
             actionPointer = &slot->action;
             *actionPointer = action;
             slot->position.z = savedZ;
             slot->position.pad = savedZ;
-            activeLow = &slot->unknown48[0];
+            activeLow = &slot->active48;
             *activeLow = 1;
             slot->unknown34 = zero;
             {
@@ -146,7 +146,7 @@ gotManager:
         target = (void *)((u32)slot + offset);
         slot->offset = (*target)->offset;
     } else {
-        sub_08064C48(*resourcePointer, *actionPointer,
+        ActorAttachment_GetActionOffset(*resourcePointer, *actionPointer,
                      ((struct ActorAttachmentFollowView *)slot->followActor)->direction, &xOffset,
                      &zOffset, slot->source);
         slot->offset.x = xOffset;
