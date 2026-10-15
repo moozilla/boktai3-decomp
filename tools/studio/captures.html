@@ -72,6 +72,9 @@ td.img canvas { image-rendering: pixelated; display: inline-block; }
 .layer canvas { image-rendering: pixelated; }
 .empty { color: var(--muted); }
 .lab { color: var(--accent); }
+body.embed #side { display: none; }
+body.embed main { grid-template-columns: 1fr; }
+body.embed .screen { width: 100%; }
 @media (max-width: 860px) { main { grid-template-columns: 1fr; height: auto; } #side { height: 40vh; } }
 </style>
 </head>
@@ -148,7 +151,7 @@ async function show(name) {
     <datalist id="groups">${[...new Set(caps.map(x => x.group).filter(Boolean))].map(g => `<option value="${esc(g)}">`).join('')}</datalist>
     <div class="top">
       <div>
-        <div class="screen" id="screen"><img alt="" src="/api/live/file/captures/${encodeURIComponent(name)}/screen.png"></div>
+        <div class="screen" id="screen"><img alt="" src="/api/live/file/captures/${encodeURIComponent(name)}/screen.png?t=${Date.now()}"></div>
         <div class="meta" style="margin-top:4px"><label><input type="checkbox" id="boxes" checked> sprite boxes</label> · hover a box or row, click to inspect · ${ents.length} sprites, ${ents.filter(e => e.an?.match).length} matched to resources</div>
       </div>
       <div id="detail"><div class="empty">Click a sprite on the screen or in the list.</div></div>
@@ -167,6 +170,9 @@ async function show(name) {
 }
 
 const spriteName = e => e.an?.match ? `${e.an.match[0] === 'big' ? 'large sprite' : 'sprite'} ${e.an.match[1]}${e.an.frame != null ? ' frame ' + e.an.frame : ''}` : 'unidentified';
+// OBJ bank -> pool entry (9B1B) the palette manager loaded there
+const poolOf = bank => { const p = cap.objPool?.[bank]; return p != null && p < 0x8000 ? p : null; };
+const poolLink = bank => { const p = poolOf(bank); return p != null ? peekLink('/gfx#pool/' + p, '#' + p) : (cap.objPool?.length ? 'special' : ''); };
 const spriteLabel = e => e.an?.match && noteOf(e.an.match[0], e.an.match[1])?.label;
 function drawBoxes() {
   const sc = $('screen');
@@ -198,7 +204,7 @@ function pick(oam) {
   const cv = toCanvas(oamImage(cap, e), Math.max(2, Math.floor(160 / Math.max(e.w, e.h))));
   const mt = e.an?.match;
   d.innerHTML = `<h2>OAM ${e.oam} · ${e.w}×${e.h}</h2>
-    <div class="meta">at (${e.x}, ${e.y}) · tile ${e.tile} · OBJ palette ${e.bpp8 ? '256-colour' : 'bank ' + e.bank} · priority ${e.prio}${e.affine ? ' · affine (shown unrotated)' : ''}${e.mode ? ' · mode ' + ['normal', 'semi-transparent', 'window'][e.mode] : ''}</div>
+    <div class="meta">at (${e.x}, ${e.y}) · tile ${e.tile} · OBJ palette ${e.bpp8 ? '256-colour' : 'bank ' + e.bank + (poolOf(e.bank) != null ? ' = pool entry ' + poolLink(e.bank) : '')} · priority ${e.prio}${e.affine ? ' · affine (shown unrotated)' : ''}${e.mode ? ' · mode ' + ['normal', 'semi-transparent', 'window'][e.mode] : ''}</div>
     <div class="big" style="margin:8px 0"></div>
     <div>${mt ? `From ${peekLink(gfxHref(mt[0], mt[1], e.an.frame), esc(spriteName(e)))} (${e.an.matched} of ${e.an.tiles} tiles matched)` : 'No resource found with these tiles (generated at runtime, compressed, or a format not indexed yet).'}</div>
     <div id="dnote"></div><div id="dtag"></div>`;
@@ -225,9 +231,9 @@ const TABS = {
       return `<tr class="sp" data-oam="${e.oam}"><td class="img"></td><td>${e.oam}</td><td>${e.x}, ${e.y}</td><td>${e.w}×${e.h}</td>
         <td>${mt ? peekLink(gfxHref(mt[0], mt[1], e.an.frame), esc(spriteName(e))) : '<span class="empty">unidentified</span>'}</td>
         <td>${lab ? `<span class="lab">${esc(lab)}</span>` : ''}</td>
-        <td><span class="sw">${Array.from({ length: 16 }, (_, k) => `<i style="background:${rgbCss(le(cap.pal, 0x200 + (e.bank * 16 + k) * 2))}"></i>`).join('')}</span> ${e.bpp8 ? '256' : e.bank}</td></tr>`;
+        <td><span class="sw">${Array.from({ length: 16 }, (_, k) => `<i style="background:${rgbCss(le(cap.pal, 0x200 + (e.bank * 16 + k) * 2))}"></i>`).join('')}</span> ${e.bpp8 ? '256' : e.bank}</td><td>${e.bpp8 ? '' : poolLink(e.bank)}</td></tr>`;
     });
-    t.innerHTML = ents.length ? `<table><tr><th></th><th>OAM</th><th>x, y</th><th>Size</th><th>Resource</th><th>Label</th><th>Palette</th></tr>${rows.join('')}</table>` : '<div class="empty">No sprites on screen.</div>';
+    t.innerHTML = ents.length ? `<table><tr><th></th><th>OAM</th><th>x, y</th><th>Size</th><th>Resource</th><th>Label</th><th>Palette (OBJ bank)</th><th>Pool</th></tr>${rows.join('')}</table>` : '<div class="empty">No sprites on screen.</div>';
     t.querySelectorAll('tr.sp').forEach(r => {
       const e = ents.find(x => x.oam === +r.dataset.oam);
       r.querySelector('.img').appendChild(fitCanvas(toCanvas(oamImage(cap, e)), 64));
@@ -253,7 +259,7 @@ const TABS = {
   },
   palettes() {
     const t = $('tab'), banks = off => Array.from({ length: 16 }, (_, b) => `<div class="pal" style="margin-bottom:2px" title="bank ${b}">${Array.from({ length: 16 }, (_, k) => `<i style="background:${rgbCss(le(cap.pal, off + (b * 16 + k) * 2))}"></i>`).join('')}</div>`).join('');
-    t.innerHTML = `<div class="top"><div><h3>BG palette RAM</h3>${banks(0)}</div><div><h3>OBJ palette RAM</h3>${banks(0x200)}</div>
+    t.innerHTML = `<div class="top"><div><h3>BG palette RAM</h3>${banks(0)}</div><div><h3>OBJ palette RAM</h3>${banks(0x200)}</div><div><h3>OBJ bank → pool entry</h3>${Array.from({ length: 16 }, (_, b) => `<div class="meta" style="height:16px">bank ${b}: ${poolLink(b) || '—'}</div>`).join('')}</div>
       <div><h3>Matches</h3>${(an.bg || []).map(b => `<div class="meta">bank ${b.bank}: ${b.resources.length ? b.resources.map(h => peekLink(gfxHref('pal', h), h)).join(', ') : 'no resource'}</div>`).join('') || '<div class="empty">none</div>'}</div></div>`;
   },
 };

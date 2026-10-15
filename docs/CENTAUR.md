@@ -49,8 +49,18 @@ for the matching build; the English ROM reads better but differs in timing.
 | `capture("tag")` | dump palettes, VRAM, OAM, I/O, RAM and a screenshot for the studio |
 | `god(true)` | keep life at maximum |
 | `rec_start("name")`, `rec_stop()` | record inputs from here: `build/centaur/NAME.ss` + `NAME.txt` starting with `loadstate NAME.ss`; `go()` while recording adds a `loadstate` line |
-| `rec_start("name", "reset")` | record from power-on, replayable by the harness |
+| `rec_start("name", "reset")` | record from power-on instead |
 | `replay("build/centaur/x.txt")` | play an input script inside mGBA (harness format plus `loadstate`) |
+
+Recordings replay in the headless harness too:
+`tools/emu/harness baserom.gba build/centaur/NAME.txt OUTDIR`. `loadstate PATH`
+(relative to the script) loads an mGBA savestate; Centaur's states come from
+mGBA 0.11, so `tools/emu/Makefile` builds the harness against the
+`tools/mgba/build_mgba.sh` library when it exists (with that library's own
+compile definitions: `ENABLE_DIRECTORIES` changes `struct mCore` and is not in
+its `flags.h`), else against the system mGBA 0.10, which cannot read them.
+`first_level_from_start.txt` replays to the same final frame (32208) and
+screen in both.
 | `where()` | frame, map, tileset, palette, life, last text |
 | `callproc(id, {args})` | run a script procedure (also on the Live page) |
 | `warp(scene)`, `scene()` | experimental scene load (see below); current scene |
@@ -66,7 +76,10 @@ for the matching build; the English ROM reads better but differs in timing.
   map changed. **Resources loaded**: with a preview; click to open it in the
   side panel.
 * **Bookmarks**: thumbnails; click to jump there. **Recent captures** link to
-  the Captures page.
+  the Captures page. **Inspect screen** captures the screen as `live` and opens
+  it in the side panel: every sprite, layer and palette right now.
+* **Resources loaded** has a filter per type; types that are not graphics
+  (`hp`, `anm`, ...) open in a data view (description, LZ77-decompressed hex).
 
 Links to maps, sprites and palettes anywhere in the studio open in a side
 panel (Esc closes it; ⌘-click opens a tab). Every page has the same menu.
@@ -83,14 +96,20 @@ asked) and an inspector:
   (matched by tile contents), label and palette bank;
 * **BG layers**: each background map as it sits in VRAM (unscrolled: the
   capture cannot read the scroll registers);
-* **Palettes**: BG and OBJ palette RAM, and which resources match each bank.
+* **Palettes**: BG and OBJ palette RAM, which resources match each bank, and
+  the sprite palette pool entry (`9B1B`) the game loaded into each OBJ bank.
+  The sprite list shows that entry per sprite.
 
 The analysis remembers the stage palette per map (`data/stage_palettes.csv`)
 and, per sprite resource, the whole OBJ palette RAM with the bank its palette
 bank 0 used (`build/centaur/sprite_palettes.json`). Package parts carry their
-own banks: the title screen package 731D draws its parts with OBJ bank = part
-bank + 2, so a single learned bank used to colour the subtitle wrongly. The
-Maps view can colour a map with the palette RAM of a capture that showed it.
+own banks, so a single learned bank used to colour the title subtitle wrongly.
+The Maps view can colour a map with the palette RAM of a capture that showed it.
+
+Sprite packages no longer need a capture for their colours: each names its
+palette in the `9B1B` pool (see ASSETS.md, Sprite palettes), which the Sprites
+view uses by default ("in-game"), with the capture's colours or the palette
+menu as alternatives. The pool itself is browsable at `/gfx#pool`.
 
 ## Notes on anything
 

@@ -1,4 +1,5 @@
 /* Shared by the studio pages (see common.js): header, peek panel, notes. */
+a { color: var(--accent); }
 #top { display: flex; align-items: center; gap: 14px; padding: 8px 16px; border-bottom: 1px solid var(--line); background: var(--panel); flex-wrap: wrap; min-height: 53px; }
 #top h1 { font-size: 16px; margin: 0; letter-spacing: .02em; white-space: nowrap; }
 #top nav { display: flex; gap: 2px; flex-wrap: wrap; }

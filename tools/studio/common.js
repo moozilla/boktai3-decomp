@@ -11,7 +11,7 @@ function localStore(k, v) { try { if (v === undefined) return localStorage.getIt
 // ---------- header ----------
 const NAV = [
   ['Text', '/'], ['Sprites', '/gfx#sprites'], ['Large sprites', '/gfx#big'], ['Maps', '/gfx#maps'], ['Palettes', '/gfx#palettes'],
-  ['Font', '/gfx#font'], ['Tiles', '/gfx#tiles'], ['Live', '/live'], ['Captures', '/captures'],
+  ['Sprite palettes', '/gfx#pool'], ['Font', '/gfx#font'], ['Tiles', '/gfx#tiles'], ['Data', '/gfx#data'], ['Live', '/live'], ['Captures', '/captures'],
 ];
 // Fills <header id="top">; `tools` is HTML for the right-hand side.
 function studioHeader(tools = '') {
@@ -185,7 +185,7 @@ function parsePackage(b) {
     const out = [];
     for (let k = 0; k < f.n; k++) {
       const o = offs[2] + f.po + k * 8, attr = le(b, o), a2 = le(b, o + 6);
-      const [w, h] = SIZES[(attr >> 8) & 3][(attr >> 10) & 3], t = a2 & 0x3FF;
+      const [w, h] = SIZES[(attr >> 8) & 3][(attr >> 10) & 3], t = a2 & 0xFFF;  // 12-bit tile number (DE23 has 4096 tiles)
       out.push({ x: s16(b, o + 2), y: s16(b, o + 4), w, h, bank: a2 >> 12, hf: !!(attr & 4), vf: !!(attr & 8), src: b, tileOff: (tx, ty) => offs[4] + (t + ty * 16 + tx) * 32 });
     }
     return out;
@@ -215,6 +215,36 @@ function parseBig(d) {
     return out;
   };
   return { recs, frames, parts };
+}
+
+// ---------- resource types (docs/ASSETS.md) ----------
+const RES_TYPES = {
+  anm: 'animation scripts (922E)', t92B3: 'palettes: 20-byte header + 256 colours (92B3)',
+  t9B1B: 'sprite palette pool (9B1B): u16 count, u16 ?, then 16-colour sub-palettes; a sprite package names its first entry',
+  t98F5: 'large sprites (98F5)', fnt: 'font (A635)', gcx: 'compiled scripts (A8D9)',
+  tAE6C: 'HP data (AE6C): LZ77, magic "HP"; the third argument of proc_884(map, tileset, hp), probably collision or height, not decoded',
+  map: 'maps (C091): LZ77, magic "MP"', tCB05: 'sprite packages (CB05)', ptn: 'tileset library (CEEF)', tCEAA: 'unknown 10 KB blob (CEAA)',
+};
+// Which archive (as /api/res names it) a Centaur resource event belongs to.
+const archiveFor = (label, type, index) => index[label] ? label : index['t' + type] ? 't' + type : label === 'hp' ? 'tAE6C' : null;
+
+// ---------- sprite palettes: the 9B1B pool ----------
+// Sprite package word 0 is the pool index of its palette bank 0; part bank b
+// uses pool entry base + b by default (the code showing a sprite may choose
+// another, as menus do). The palette manager copies pool entries into OBJ
+// banks: IWRAM 0x030051F0 holds the pool index per bank, 0x03004DC0 the
+// shadow of OBJ palette RAM.
+let _pool = null;
+function spritePool() {
+  return _pool ??= fetch('/api/res').then(r => r.json()).then(ix => res('t9B1B', ix.t9B1B[0][0])).then(b => {
+    const n = le(b, 0);
+    return { n, entry: i => i >= 0 && i < n ? Array.from({ length: 16 }, (_, k) => rgb(le(b, 4 + i * 32 + k * 2))) : null };
+  });
+}
+// 256 colours for a package: bank b = pool entry base + b.
+async function packageColors(pkgBytes, base = le(pkgBytes, 0)) {
+  const pool = await spritePool(), grey = k => { const v = k * 17; return [v, v, v]; };
+  return Array.from({ length: 256 }, (_, i) => (pool.entry(base + (i >> 4)) || null)?.[i & 15] ?? grey(i & 15));
 }
 
 // ---------- GBA screen state from a capture (pal/vram/oam/io .bin) ----------
@@ -266,6 +296,8 @@ function bgLayer(cap, n) {
 }
 async function loadCapture(name) {
   const f = n => fetch(`/api/live/file/captures/${encodeURIComponent(name)}/${n}`).then(r => r.ok ? r.arrayBuffer() : new ArrayBuffer(0)).then(b => new Uint8Array(b));
-  const [pal, vram, oam, io] = await Promise.all(['pal.bin', 'vram.bin', 'oam.bin', 'io.bin'].map(f));
-  return { name, pal, vram, oam, io, bgColors: palFromBytes(pal, 0), objColors: palFromBytes(pal, 0x200) };
+  const [pal, vram, oam, io, iwram] = await Promise.all(['pal.bin', 'vram.bin', 'oam.bin', 'io.bin', 'iwram.bin'].map(f));
+  // pool index per OBJ bank (high bit set: not a pool entry)
+  const objPool = iwram.length >= 0x5210 ? Array.from({ length: 16 }, (_, b) => le(iwram, 0x51F0 + b * 2)) : [];
+  return { name, pal, vram, oam, io, objPool, bgColors: palFromBytes(pal, 0), objColors: palFromBytes(pal, 0x200) };
 }

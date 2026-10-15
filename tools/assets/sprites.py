@@ -14,7 +14,7 @@ Package layout (offsets relative to the package; ResourceHeader_Relocate
                                u16 w, u16 h, u32 byte offset into the part table
   +0x10 animation table   8 B: u16 id, u16 key count, u32 byte offset into the key table
   +0x14 part table        8 B: u16 attr (size << 10 | shape << 8 | vflip 8 | hflip 4),
-                               s16 x, s16 y, u16 OAM attr2 (tile 0-9, priority 10-11, palette 12-15)
+                               s16 x, s16 y, u16 tile 0-11 (4096 tiles in DE23), palette 12-15
   +0x18 key table         4 B: u16 frame index, u16 duration
   +0x1C tiles             4bpp, 32 B each, a 2D sheet 16 tiles wide (an OBJ's
                           rows are 16 tiles apart)
@@ -52,7 +52,9 @@ class Package:
         for i in range(frame["parts"]):
             attr, x, y, tile = struct.unpack_from("<HhhH", self.data, base + i * 8)
             w, h = SIZES[(attr >> 8) & 3][(attr >> 10) & 3]
-            yield dict(x=x, y=y, w=w, h=h, tile=tile & 0x3FF, palette=tile >> 12, priority=(tile >> 10) & 3,
+            # 12-bit tile number: packages with more than 1024 tiles (DE23 has
+            # 4096) use bits 10-11; there is no priority field here
+            yield dict(x=x, y=y, w=w, h=h, tile=tile & 0xFFF, palette=tile >> 12,
                        hflip=bool(attr & 4), vflip=bool(attr & 8))
 
     def animations(self):
