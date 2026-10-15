@@ -69,7 +69,7 @@ Dynamic/nonliteral callers must also supply both vector keywords.
 The wrapper then reads keywords `50`, `64`, `72`, and `6C` and calls the constructor with graphics ID `1C1E`, context
 `D43F`, slot flags `11`, palette bank one, and two negative-four bias parameters.
 
-The constructor (`6B5D4`) remains a private nonmatching draft. Its recovered
+The exact constructor (`6B5D4`) has a recovered
 18-argument contract is position, velocity, graphics ID, context, sequence,
 drawable flags, slot flags, palette, priority, variant, animation flags, lifetime,
 four contact parameters, and two bias parameters. A nonzero velocity sets flag
@@ -135,18 +135,19 @@ constructor begins at the next worker boundary `6CA3C`.
 
 ## Validation and accounting
 
-The frozen cohort contains 19 exact functions covering 3,708 reviewed bytes.
-Ten newly recovered bodies contribute **+0.1356 percentage points** (3,276 bytes):
-**+0.0238 points ordinary C** (576 bytes) and **+0.1118 points register-pinned**
-(2,700 bytes). Nine pre-existing exact bodies were reviewed and typed (432 bytes)
-without new matching credit. The three outstanding body spans are `6B5D4` (776),
-`6C3A0` (872), and `6C7B0` (652). Global progress is authoritative only after the
+The frozen cohort contains 20 exact functions covering 4,484 reviewed bytes.
+Eleven newly recovered bodies contribute **+0.1678 percentage points** (4,052 bytes):
+**+0.0238 points ordinary C** (576 bytes) and **+0.1439 points register-pinned**
+(3,476 bytes). Nine pre-existing exact bodies were reviewed and typed (432 bytes)
+without new matching credit. The two outstanding body spans are `6C3A0` (872)
+and `6C7B0` (652). Global progress is authoritative only after the
 parent's combined import, name promotion, and complete ROM build.
 
 | Address | Reviewed bytes | Contract | Category |
 |---|---:|---|---|
 | 0806B2C4 | 748 | Fade and destroy drawable | New, pinned |
 | 0806B5B0 | 36 | Load sprite resources | Prior exact |
+| 0806B5D4 | 776 | Construct sprite/effect controller | New, pinned |
 | 0806B8DC | 144 | Update pool | New, pinned |
 | 0806B96C | 132 | Destroy pool | New, pinned |
 | 0806B9F0 | 16 | Initialize pool | Prior exact |
@@ -168,7 +169,13 @@ parent's combined import, name promotion, and complete ROM build.
 Full reviewed sizes passed the fast checker after the final formatting and
 semantic audit (`build/visual-steering-final.json`, private verification output).
 The parent runs a combined build before integration. Register hint minimization
-included `6B2C4` 169→70, `6B8DC` 10→2, `6B96C` 15→3, `6BDB8` 33→12,
+included `6B2C4` 169→70, `6B5D4` 133→52, `6B8DC` 10→2, `6B96C` 15→3, `6BDB8` 33→12,
 `6C204` 57→29, and `6C708` 20→13. The scale-in states started at 61→34 hints,
 then replaced two output-token pairs with clobbers and repaired the final token's
 definition; no handwritten instruction bodies or explicit `r7` bindings are used.
+
+The constructor passed a separate full-size 776-byte check after minimization
+(`build/check/run-b3vkzacb`). Its graphics ID and context retain documented
+volatile argument homes; removing either or both changes 15–18 bytes. Velocity
+squared accumulation and bias negation use unsigned arithmetic to preserve the
+observed machine wrap without signed-overflow assumptions.
