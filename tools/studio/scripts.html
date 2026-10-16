@@ -48,6 +48,14 @@ pre .cmt { color: var(--muted); }
 table { border-collapse: collapse; font-size: 13px; }
 td, th { padding: 3px 12px 3px 0; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
 th { color: var(--muted); font-weight: 500; }
+.mode { display: flex; gap: 4px; }
+.mode button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+details.cat > summary { padding: 6px 10px; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; cursor: pointer; border-bottom: 1px solid var(--line); background: var(--bg); position: sticky; top: 0; }
+.row.sub { padding-left: 24px; }
+.row.sub b { font-size: 12px; }
+.row.shared b { color: var(--muted); }
+pre .def { color: var(--accent); font-weight: 600; }
+pre .inl { color: var(--ok); }
 body.embed #side { display: none; }
 body.embed main { grid-template-columns: 1fr; }
 @media (max-width: 860px) { main { grid-template-columns: 1fr; height: auto; } #side { height: 40vh; } }
@@ -58,8 +66,9 @@ body.embed main { grid-template-columns: 1fr; }
 <main>
   <section id="side">
     <div class="tools">
+      <div class="mode"><button id="mfiles">Files</button><button id="mprocs">Procedures</button></div>
       <input id="q" type="search" placeholder="Filter: proc number, label, actor key" autocomplete="off">
-      <div class="chks">
+      <div class="chks" id="pchks">
         <label class="chk"><input type="checkbox" id="fscene"> scene entries</label>
         <label class="chk"><input type="checkbox" id="fspawn"> create actors</label>
         <label class="chk"><input type="checkbox" id="ftext"> show strings</label>
@@ -78,8 +87,80 @@ body.embed main { grid-template-columns: 1fr; }
 // calls use, one above the headers gcx.py prints.
 studioHeader();
 let P = [], byId = {}, scenes = {}, actorsBy = {}, keyOfName = {}, callees = {}, procNames = {}, procOfName = {}, sel = null, shown = 300, lastD = null;
-let readable = true;
-try { readable = localStorage.getItem('scripts.readable') !== '0'; } catch (e) {}
+let readable = true, inline = false, mode = 'files', F = [], fileOf = {}, selFile = null;
+try { readable = localStorage.getItem('scripts.readable') !== '0'; inline = localStorage.getItem('scripts.inline') === '1'; mode = localStorage.getItem('scripts.mode') || 'files'; } catch (e) {}
+const keep = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+
+// ---------- files: scene files, library files by category, shared runs (tools/assets/gclfiles.py)
+function fileRow(f) {
+  const d = document.createElement('div');
+  d.className = 'row' + (f.id === selFile ? ' on' : '') + (f.kind === 'shared' ? ' shared' : '');
+  const range = f.procs.length > 1 ? `${f.procs[0]}–${f.procs[f.procs.length - 1]}` : `${f.procs[0]}`;
+  const ml = f.entry && scenes[f.entry]?.map ? noteOf('map', scenes[f.entry].map)?.label : '';
+  d.innerHTML = `<b>${esc(f.title)}</b>${ml ? `<span class="lab">${esc(ml)}</span>` : ''}<small>${[`${f.procs.length} procs`, range, f.kind === 'scene' ? '' : f.description].filter(Boolean).map(esc).join(' · ')}</small>`;
+  d.onclick = () => { location.hash = 'file=' + f.id; };
+  return d;
+}
+function procRow(id) {
+  const d = document.createElement('div'); d.className = 'row sub' + (id === sel ? ' on' : ''); d.dataset.id = id;
+  d.innerHTML = `<b>${procNames[id] ? esc(procNames[id]) : 'proc_' + id}</b><small>proc ${id}${byId[id]?.scene ? ' · scene entry' : ''}</small>`;
+  d.onclick = e => { e.stopPropagation(); location.hash = id; };
+  return d;
+}
+const hitFile = (f, q) => [f.id, f.title, f.description, f.category].some(x => (x || '').toUpperCase().includes(q));
+const hitProc = (c, q) => String(c) === q || (procNames[c] || '').toUpperCase().includes(q) || (label(byId[c] || { id: c }) || '').toUpperCase().includes(q);
+function renderFiles() {
+  const q = $('q').value.trim().toUpperCase();
+  const hit = f => !q || hitFile(f, q) || f.procs.some(c => hitProc(c, q));
+  const hits = F.filter(hit);
+  $('count').textContent = `${hits.length} of ${F.length} files · library by category, scenes in source order`;
+  const groups = [];
+  for (const f of hits) {
+    const g = f.kind === 'library' ? f.category : 'Scenes and shared files';
+    let G = groups.find(x => x.name === g); if (!G) groups.push(G = { name: g, files: [] });
+    G.files.push(f);
+  }
+  groups.sort((a, b) => (a.name === 'Scenes and shared files') - (b.name === 'Scenes and shared files'));
+  $('list').replaceChildren(...groups.map(G => {
+    const det = document.createElement('details'); det.className = 'cat';
+    det.open = !!q || G.files.some(f => f.id === selFile) || G.name === 'Scenes and shared files';
+    det.innerHTML = `<summary>${esc(G.name)} (${G.files.length})</summary>`;
+    for (const f of G.files.slice(0, G.name === 'Scenes and shared files' ? shown : 1e9)) {
+      det.append(fileRow(f));
+      if (f.id === selFile || f.kind === 'library') f.procs.filter(c => !q || f.kind !== 'library' || hitProc(c, q) || hitFile(f, q)).forEach(c => det.append(procRow(c)));
+    }
+    return det;
+  }));
+  $('more').hidden = !groups.some(G => G.name === 'Scenes and shared files' && G.files.length > shown);
+}
+
+async function showFile(fid) {
+  selFile = fid; sel = null;
+  if (F.length) renderSide();
+  document.querySelector('.row.on')?.scrollIntoView({ block: 'nearest' });
+  const f = F.find(x => x.id === fid), v = $('view');
+  if (!f) { v.innerHTML = `<div class="empty">No file ${esc(fid)}.</div>`; return; }
+  const d = await fetch(`/api/file/${fid}${inline ? '/inline' : ''}${readable ? '' : '/raw'}`).then(r => r.json());
+  const sc = f.entry ? scenes[f.entry] : null;
+  v.innerHTML = `<h2>${esc(f.title)}</h2>
+    <div class="meta">${esc(f.category)} · ${f.procs.length} procedures (${f.procs[0]}–${f.procs[f.procs.length - 1]}) · ${f.kind === 'scene' ? `entry <a href="#${f.entry}">proc ${f.entry}</a>` : `used by ${f.scenes} scenes`}${sc?.map ? ` · map ${peekLink(gfxHref('map', sc.map), esc(noteOf('map', sc.map)?.label || sc.map))}` : ''}${sc?.shot ? ' · ' + peekLink('/captures#scene_' + String(f.entry).padStart(4, '0'), 'capture') : ''}${f.kind !== 'scene' && f.description ? ' · ' + esc(f.description) : ''}</div>
+    <h3>Source <label class="chk" style="text-transform:none;letter-spacing:0;font-weight:400;margin-left:8px"><input type="checkbox" id="readable"${readable ? ' checked' : ''}> readable</label>
+      <label class="chk" style="text-transform:none;letter-spacing:0;font-weight:400;margin-left:8px"><input type="checkbox" id="inline"${inline ? ' checked' : ''}${readable ? '' : ' disabled'}> inline single-use helpers (${d.inlined.length})</label></h3>
+    <div class="meta" style="margin-bottom:6px">One file as Konami's compiler laid it out: procedures in table order, each keeping its id. ${inline ? 'Calls to procedures used once, from inside this file, are expanded in place (for reading; the ROM has a real call).' : ''}</div>
+    <pre id="body">${d.lines.map(([c, ln]) => readable ? linkFileLine(c, ln) : (/^# proc \d+$/.test(ln) ? `<span class="def" id="p-${c}"><a href="#${c}">${esc(ln)}</a></span>` : linkLine(ln))).join('\n')}</pre>`;
+  $('readable').onchange = e => { readable = e.target.checked; keep('scripts.readable', readable ? '1' : '0'); showFile(fid); };
+  $('inline').onchange = e => { inline = e.target.checked; keep('scripts.inline', inline ? '1' : '0'); showFile(fid); };
+}
+function linkFileLine(c, ln) {
+  if (ln.startsWith('def ')) return `<span class="def" id="p-${c}">${linkReadable(ln)}</span>`;
+  if (/^\s*# inlined: /.test(ln)) return `<span class="inl">${esc(ln)}</span>`;
+  return linkReadable(ln);
+}
+function renderSide() {
+  $('mfiles').classList.toggle('on', mode === 'files'); $('mprocs').classList.toggle('on', mode === 'procs');
+  $('pchks').hidden = mode === 'files';
+  mode === 'files' ? renderFiles() : renderList();
+}
 
 const label = p => noteOf('script', p.id)?.label;
 function renderList() {
@@ -101,7 +182,7 @@ function renderList() {
   }));
   $('more').hidden = hits.length <= shown;
 }
-$('more').onclick = () => { shown += 600; renderList(); };
+$('more').onclick = () => { shown += 600; renderSide(); };
 
 const sceneChip = s => {
   const sc = scenes[s] || {};
@@ -142,8 +223,8 @@ function renderBody(d) {
 }
 
 async function show(id) {
-  sel = id;
-  if (P.length) renderList();
+  sel = id; selFile = fileOf[id] || selFile;
+  if (P.length) renderSide();
   document.querySelectorAll('.row').forEach(d => d.classList.toggle('on', +d.dataset.id === id));
   document.querySelector('.row.on')?.scrollIntoView({ block: 'nearest' });
   const v = $('view');
@@ -154,13 +235,13 @@ async function show(id) {
   for (const s of d.spawns) (spawns[s.key] ||= { ...s, n: 0, args: [] }).n++, s.arg && spawns[s.key].args.push(s.arg);
   lastD = d;
   v.innerHTML = `<h2>Procedure ${id}${procNames[id] ? ' · <code>' + esc(procNames[id]) + '</code>' : ''}${d.scene ? ' · scene entry' : ''}</h2>
-    <div class="meta">flag ${d.flag} · ${d.lines.length} lines · printed as <code>proc ${id - 1}</code> by <code>gcx.py dis</code>${d.scene && sc?.map ? ` · loads map ${peekLink(gfxHref('map', sc.map), esc(noteOf('map', sc.map)?.label || sc.map))}` : ''}${d.scene && sc?.shot ? ' · ' + peekLink('/captures#scene_' + String(id).padStart(4, '0'), 'stage survey capture') : ''}</div>
+    <div class="meta">${d.file ? `in file <a href="#file=${d.file}">${esc(F.find(f => f.id === d.file)?.title || d.file)}</a> · ` : ''}flag ${d.flag} · ${d.lines.length} lines · printed as <code>proc ${id - 1}</code> by <code>gcx.py dis</code>${d.scene && sc?.map ? ` · loads map ${peekLink(gfxHref('map', sc.map), esc(noteOf('map', sc.map)?.label || sc.map))}` : ''}${d.scene && sc?.shot ? ' · ' + peekLink('/captures#scene_' + String(id).padStart(4, '0'), 'stage survey capture') : ''}</div>
     <div id="ned"></div>
     <h3>Called by (${d.callers.length})</h3>${d.callers.length ? `<div class="chips">${d.callers.map(c => `<span class="chip"><a href="#${c}">proc ${c}</a></span>`).join('')}</div>`
       : `<div class="empty">No script calls it${d.scene ? ' (a scene: entered with load)' : d.flag ? ' (the engine or stage data starts it)' : ''}.</div>`}
     <h3>Calls (${d.calls.length})</h3>${d.calls.length ? `<div class="chips">${d.calls.map(c => `<span class="chip"><a href="#${c}">proc ${c}</a></span>`).join('')}</div>` : '<div class="empty">None.</div>'}
     ${d.loads.length ? `<h3>Loads scenes</h3><div class="chips">${[...new Set(d.loads)].map(sceneChip).join('')}</div>` : ''}
-    <h3>Used by scenes (${d.scenes.length})</h3>${d.scenes.length ? `<div class="chips" id="scenes">${d.scenes.slice(0, 80).map(s => sceneChip(s.scene)).join('')}${d.scenes.length > 80 ? `<span class="chip">+${d.scenes.length - 80} more</span>` : ''}</div>` : '<div class="empty">No scene reaches it through calls.</div>'}
+    <h3>Used by scenes (${d.scenes.length})</h3>${d.scenes.length ? `<div class="chips" id="scenes">${d.scenes.slice(0, 80).map(s => sceneChip(s.scene)).join('')}${d.scenes.length > 80 ? `<span class="chip">+${d.scenes.length - 80} more</span>` : ''}</div>` : '<div class="empty">No scene reaches it through calls or callbacks.</div>'}
     ${d.spawns.length ? `<h3>Creates actors</h3><table><tr><th>Key</th><th>Actor</th><th>Callback</th><th>Command</th></tr>${Object.values(spawns).map(s => `<tr><td>${actorLink(s.key)}</td><td>${esc(actorName(s.key))}</td><td>${s.callback ? codeLink(s.callback, s.name) : '?'}</td><td class="meta">${s.cmd}${s.n > 1 ? ' ×' + s.n : ''}${s.args.length ? ' (' + esc([...new Set(s.args)].slice(0, 6).join(', ')) + ')' : ''}</td></tr>`).join('')}</table>` : ''}
     ${d.texts.length ? `<h3>Strings</h3><table>${d.texts.map(t => t.data ? `<tr><td>#${t.id}</td><td class="meta">a data record in the text bank, not text</td></tr>` : `<tr><td>${stringLink(t.id)}</td><td>${esc(t.jp)}</td></tr>`).join('')}</table>` : ''}
     ${d.prints.length ? `<h3>Debug prints</h3><div class="meta" style="margin-bottom:6px">Developer messages; <code>print</code> outputs nothing in this ROM (0821B858). English from gcl/prints.csv.</div><table>${d.prints.map(t => `<tr><td>${esc(t.text)}</td><td class="meta">${esc(t.en)}</td></tr>`).join('')}</table>` : ''}
@@ -169,24 +250,32 @@ async function show(id) {
     <pre id="body"></pre>`;
   renderBody(d);
   $('readable').onchange = e => { readable = e.target.checked; try { localStorage.setItem('scripts.readable', readable ? '1' : '0'); } catch (x) {} show(id); };
-  $('ned').replaceWith(noteEditor('script', id, renderList));
+  $('ned').replaceWith(noteEditor('script', id, renderSide));
 }
 
-$('q').oninput = () => { shown = 300; renderList(); };
-['fscene', 'fspawn', 'ftext'].forEach(i => $(i).onchange = () => { shown = 300; renderList(); });
+$('q').oninput = () => { shown = 300; renderSide(); };
+$('mfiles').onclick = () => { mode = 'files'; keep('scripts.mode', mode); renderSide(); };
+$('mprocs').onclick = () => { mode = 'procs'; keep('scripts.mode', mode); renderSide(); };
+['fscene', 'fspawn', 'ftext'].forEach(i => $(i).onchange = () => { shown = 300; renderSide(); });
 listKeys(() => $('list'), '.row');
-window.onhashchange = () => { const n = parseInt(location.hash.slice(1)); if (n && n !== sel) show(n); };
+function route() {
+  const h = location.hash.slice(1);
+  if (h.startsWith('file=')) { if (h.slice(5) !== selFile || sel) showFile(h.slice(5)); return; }
+  const n = parseInt(h); if (n && n !== sel) show(n);
+}
+window.onhashchange = route;
 (async () => {
   await loadNotes();
-  const [d, a] = await Promise.all([fetch('/api/procs').then(r => r.json()), fetch('/api/actors').then(r => r.json())]);
+  const [d, a, fl] = await Promise.all([fetch('/api/procs').then(r => r.json()), fetch('/api/actors').then(r => r.json()), fetch('/api/files').then(r => r.json())]);
+  F = fl.files; fileOf = Object.fromEntries(F.flatMap(f => f.procs.map(c => [c, f.id])));
   P = d.procs; scenes = d.scenes; byId = Object.fromEntries(P.map(p => [p.id, p]));
   callees = d.callees || {}; procOfName = d.procnames || {};
   procNames = Object.fromEntries(Object.entries(procOfName).map(([n, i]) => [i, n]));
   actorsBy = Object.fromEntries(a.actors.map(x => [x.key, x]));
   keyOfName = Object.fromEntries(a.actors.filter(x => x.gcl.length).map(x => [x.gcl[0].name, x.key]));
-  renderList();
-  const n = parseInt(location.hash.slice(1)) || P.find(p => p.scene)?.id;
-  if (n) { if (!location.hash) history.replaceState(null, '', '#' + n); show(n); }
+  if (!location.hash) history.replaceState(null, '', '#file=' + (F.find(f => f.kind === 'scene')?.id || ''));
+  renderSide();
+  route();
 })();
 </script>
 </body>

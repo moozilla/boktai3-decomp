@@ -31,7 +31,7 @@ import gclnames  # noqa: E402
 import gcx  # noqa: E402
 
 # ---------- decoding into nodes ----------
-# values: ("int", v, hex?) ("str", s) ("text", id) ("var", region, off, bit, t, a, i) ("arg", n)
+# values: ("int", v, hex?) ("proc", call id) ("str", s) ("text", id) ("var", region, off, bit, t, a, i) ("arg", n)
 #   ("local", n) ("expr", node) ("block", stmts) ("end",) ("raw", text)
 # expression nodes: values, ("bin", op, l, r), ("un", op, x)
 # statements: ("cmd", name, cid, args, opts) with opts [(letter, [values])],
@@ -46,7 +46,9 @@ def value(b, p):
     if fam == 0:
         if op == 0:
             return ("end",), p + 1
-        if op in (8, 6):
+        if op == 8:  # a procedure reference: callbacks such as on_press=, then_proc=
+            return ("proc", b[p + 1] | b[p + 2] << 8), p + 3
+        if op == 6:
             return ("int", b[p + 1] | b[p + 2] << 8, True), p + 3
         if op == 1:
             v = b[p + 1] | b[p + 2] << 8
@@ -227,8 +229,10 @@ PY_UNARY = {1: "-", 2: "not ", 3: "~"}
 
 
 class Readable:
-    def __init__(self, names, cid):
+    def __init__(self, names, cid, inline=None, stack=()):
+        """inline(pid) -> True expands a call statement to pid in place."""
         self.n, self.cid, self.lines = names, cid, []
+        self.inline_ok, self.stack = inline, stack + (cid,)
 
     # values
     def val(self, v, top=True):
@@ -239,6 +243,9 @@ class Readable:
                 return ps[v[1] - 1]
         if k == "int":
             return f"{v[1]:#x}" if v[2] and v[1] > 9 else str(v[1])
+        if k == "proc":
+            r = self.n.procs.get(v[1])
+            return r["name"] if r else f"proc_{v[1]}"
         if k == "str":
             return '"' + v[1].replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n") + '"'
         if k == "text":
@@ -357,6 +364,13 @@ class Readable:
         if k == "eval":
             self.emit(depth, self.expr(s[1]))
         elif k == "call":
+            if self.inline_ok and s[1] not in self.stack and self.inline_ok(s[1]):
+                text, note = self.call(s)
+                self.emit(depth, f"# inlined: {text}", note)
+                sub = Readable(self.n, s[1], self.inline_ok, self.stack)
+                sub.body(procedure(_image(), s[1]) or [], depth)
+                self.lines += sub.lines
+                return
             self.emit(depth, *self.call(s))
         elif k == "raw":
             self.emit(depth, s[1])
@@ -430,8 +444,28 @@ class Readable:
 _names = None
 
 
-def render(img, cid):
-    """Readable lines of a procedure (by call id), or None."""
+_img = None
+
+
+def _image():
+    global _img
+    with gcx._lock:
+        if _img is None:
+            _img = gcx.Image(gcx.load_rom())
+    return _img
+
+
+def names():
+    global _names
+    with gcx._lock:
+        if _names is None:
+            _names = Names()
+    return _names
+
+
+def render(img, cid, inline=None):
+    """Readable lines of a procedure (by call id), or None. inline(pid) -> True
+    expands call statements to pid in place (see gclfiles.py)."""
     global _names
     stmts = procedure(img, cid)
     if stmts is None:
@@ -439,7 +473,7 @@ def render(img, cid):
     with gcx._lock:
         if _names is None:
             _names = Names()
-    r = Readable(_names, cid)
+    r = Readable(_names, cid, inline)
     r.body(stmts, 0)
     return r.lines
 

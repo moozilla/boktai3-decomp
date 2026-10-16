@@ -118,6 +118,43 @@ spawners...); a procedure's own named parameters replace `argN` inside it.
 
 A worked example, a whole puzzle read end to end: [examples/scale_quiz.md](examples/scale_quiz.md).
 
+Procedure references are their own value type (GCL type 8, as against type 6
+for hashes), so callbacks show by name: `on_press=open_east_door`,
+`script=judge_scale_answer`, `door(scene=...)` (a scene is its entry
+procedure). Every type-8 value is a valid procedure id.
+
+## Source files
+
+`tools/assets/gclfiles.py` (and the Studio's Scripts page, "Files") groups
+the procedures into the source files Konami compiled. Procedure ids are table
+slots assigned in source order, and a scene's private procedures sit right
+before and after its entry procedure: 232 of the 354 scenes have all of
+theirs in one contiguous run, and 89% of procedures called once are within
+50 ids of their caller. So:
+
+| File | What goes in it |
+|---|---|
+| scene (354) | a scene entry procedure and every procedure only it reaches, through calls and callbacks |
+| library (15) | an id range in `names/files.csv`, with a category; ids 2-1875 are ordered by topic (scene setup, doors, events, objects, items, enemies...) |
+| shared (101) | a contiguous run of what is left: procedures several scenes use (the largest, 1876-2595, holds 595 rooms and helpers used by 35 scenes) |
+
+A file prints as Python-style `def`s in table order, each carrying its id:
+
+```
+def scale_setup():  # proc 5757
+    spawn_scene_objects_manager(mode=1)
+    ...
+def proc_5764():  # proc 5764, the scene entry
+    ...
+```
+
+The id comment is what makes a file recompilable: a compiler assigns slots in
+file order and checks them against the ids, so the table comes out
+byte-identical. `--inline` (the Studio's "inline single-use helpers") expands
+calls to procedures that are private to the file and called once, marked
+`# inlined: name(args)`. That is for reading only: the ROM has a real call
+there, and the inlined body keeps its own parameter names.
+
 ## Konami's naming, from the game's own debug prints
 
 The scripts' `print` strings are EUC-JP developer messages that often print a
