@@ -340,7 +340,12 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif self.path == "/api/scenes":
             self.send(200, scene_list())
         elif self.path == "/api/learned":
-            self.send(200, {"stages": live.stage_palettes(), "sprites": live.sprite_palettes()})
+            import bigpalettes  # the code's palette for large sprites no capture has seen
+            sprites = live.sprite_palettes()
+            for k, v in bigpalettes.learned().items():
+                sprites.setdefault(k, v)
+            self.send(200, {"stages": live.stage_palettes(), "sprites": sprites,
+                            "bigpools": {f"{h:04X}": sorted(v) for h, v in bigpalettes.pools().items()}})
         elif self.path == "/api/tags":
             self.send(200, live.tags())
         elif self.path == "/api/stages":
