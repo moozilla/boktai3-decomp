@@ -1873,6 +1873,7 @@ addr,name,mode,confidence,source,notes
 080FF754,Axe_Create,thumb,medium,gcl-name,name from GCL key 2D30 アックス (Axe); registry callback
 08100298,WoodenCrate_Create,thumb,medium,gcl-name,name from GCL key 820B 木箱 (Wooden Crate); registry callback
 0810067C,FloorSwitch_Create,thumb,high,gcl-behavior,registry AB8E; S options are on_press/on_release callbacks (procs 3945/3946 toggle a door); starts pressed when an object rests in its 256x32 box
+08103110,NamedObject_CreateFromScript,thumb,low,src-alias,
 08103ADC,NamedActor_SetFlag20FromScript,thumb,low,src-alias,
 08103B94,NamedActor_SetMoveModeFromScript,thumb,low,src-alias,
 08103CF8,NamedActor_SetRouteFromScript,thumb,low,src-alias,

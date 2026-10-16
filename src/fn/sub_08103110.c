@@ -1,0 +1,293 @@
+#include "global.h"
+#include "engine.h"
+#ifdef NONMATCHING
+// fuzzy: 66.2%
+// Open: register allocation (the object should live in r8 and its sprite in
+// sb), one extra spill slot, and the kind-2 palette switch, whose calls the
+// original does not cross-jump.
+#include "display_animation.h"
+#include "actor_attachment_sprite_playback.h"
+struct NamedObjectSprite {
+    u32 flags;
+    u8 pad4[3];
+    u8 field7;
+    u8 pad8[8];
+    u16 frame;
+    u8 pad12[0xA];
+    u16 x, y;
+    u8 pad20[0xC];
+};
+struct NamedObjectBody {
+    u8 pad0[0xC];
+    s16 x, height, z;
+    u8 pad12[0xA];
+    u32 field1C;
+    u8 pad20[0x28];
+    u8 field48[0x54];
+};
+struct NamedObject {
+    struct NamedObjectSprite sprite;
+    u8 anim[0x1C];
+    struct DisplaySequenceState sequence;
+    u8 pad58[0x5C];
+    s16 index;
+    u16 state;
+    s16 flags;
+    u8 fieldBA, fieldBB;
+    u16 fieldBC, fieldBE, fieldC0, fieldC2;
+    u32 fieldC4, fieldC8, fieldCC;
+    u16 row;
+    u8 padD2[2];
+    u32 heightLow, heightHigh;
+    u32 name;
+    u32 fieldE0;
+    void *handlers[3];
+    u8 fieldF0, fieldF1, fieldF2, kind;
+    u8 fieldF4[0xC];
+    struct NamedObjectBody body;
+};
+struct NamedObjectManager {
+    u8 pad0[0x18];
+    void *sequences;
+    u8 pad1C[0x1354];
+    u32 field1370;
+    u32 field1374;
+};
+extern struct NamedObjectManager *gUnk_020001AC;
+extern u8 *gUnk_02000580;
+struct NamedObject *sub_08100BC8(struct NamedObjectManager *);
+void sub_0821E7EC(void *, u32, u32);
+void sub_08225AB4(void *, s32, void *, s32, s32, void *);
+void sub_08225B28(void *, void *);
+void sub_08225B4C(void *, void *, u32, u32, u32);
+void sub_081028F8(u32, s32);
+void sub_08159404(void *, s32, u32);
+void sub_0821D698(void *, s32, s32, s32, s32, s32);
+void sub_081593A0(void *, void *);
+void TetherActor_SetPosition(void *);
+void TetherActor_AddStatusFlags(s32, u32);
+void sub_08103060(struct NamedObjectManager *, struct NamedObject *);
+u8 sub_08100F28(void *, void *, s32);
+void sub_08101E6C(void);
+void sub_08102570(void);
+void sub_08101D2C(void);
+void sub_08101FF8(void);
+void sub_0810271C(void);
+void sub_081021DC(void);
+void sub_081023CC(void);
+static inline s32 optionalValue(void)
+{
+    if (Script_GetPc())
+        return Script_GetValue();
+    return 0;
+}
+static inline void readOptional(u32 *dst)
+{
+    if (Script_GetPc())
+        *dst = Script_GetValue();
+    else
+        *dst = 0;
+}
+/* Registry routine A4FC: creates a named scene object (-n) of kind -k (0-3)
+   in the gUnk_020001AC object pool, with heights -Y, sprite rows -T and
+   optional terrain registration (-f). */
+void NamedObject_CreateFromScript(void)
+{
+    struct NamedObjectManager *manager = gUnk_020001AC;
+    struct NamedObject *e;
+    struct NamedObjectSprite *sprite;
+    u32 sequence;
+    s32 follow;
+    s32 x, z, cell;
+    if (!manager)
+        return;
+    sequence = 0;
+    e = sub_08100BC8(manager);
+    if (!e)
+        return;
+    e->flags = sequence;
+    e->fieldBC = sequence;
+    sprite = &e->sprite;
+    if (Script_SeekToKeyword('r')) {
+        e->fieldF0 = optionalValue();
+        e->fieldF1 = 0;
+        e->fieldF2 = optionalValue();
+        sub_0821E7EC(&sprite->x, e->fieldF0, e->fieldF2);
+    }
+    e->kind = Script_GetKeywordValue('k', 0);
+    if (Script_GetKeywordValue('O', 0))
+        e->flags |= 0x2000;
+    if (Script_SeekToKeyword('Y')) {
+        s32 height;
+        readOptional(&e->heightLow);
+        readOptional(&e->heightHigh);
+        height = optionalValue();
+        if (e->kind == 2) {
+            if (height == e->heightLow) {
+                sprite->y = height;
+                e->flags &= ~2;
+            } else if (height == e->heightHigh) {
+                sprite->y = height;
+                e->flags |= 2;
+            }
+        } else
+            sprite->y = e->heightLow;
+        e->body.height = sprite->y;
+    }
+    e->name = Script_GetKeywordValue('n', 0);
+    e->fieldC4 = Script_GetKeywordValue('p', 0);
+    e->fieldC8 = Script_GetKeywordValue('R', 0);
+    e->fieldCC = Script_GetKeywordValue('S', 0);
+    e->row = Script_GetKeywordValue('T', 0);
+    AnimData_Load(e->anim, 0xB019);
+    switch (e->kind) {
+        case 0: {
+            s32 m;
+            sprite->y = e->heightLow;
+            e->state = 1;
+            e->handlers[0] = sub_08101E6C;
+            e->handlers[1] = sub_08102570;
+            e->handlers[2] = sub_08101D2C;
+            sequence = 1;
+            AnimData_SelectPaletteBank(e->anim, 0x240);
+            m = Script_GetKeywordValue('m', 0);
+            if (m)
+                e->fieldE0 = m;
+            e->row = 0;
+            break;
+        }
+        case 3: {
+            s32 m;
+            sprite->y = e->heightLow;
+            e->state = 1;
+            e->handlers[0] = sub_08101E6C;
+            e->handlers[1] = sub_08102570;
+            e->handlers[2] = sub_08101D2C;
+            sequence = 1;
+            AnimData_SelectPaletteBank(e->anim, 0x246);
+            m = Script_GetKeywordValue('m', 0);
+            if (m)
+                e->fieldE0 = m;
+            e->row = 0;
+            break;
+        }
+        case 1: {
+            s32 m;
+            sprite->y = e->heightLow;
+            e->state = 1;
+            e->handlers[0] = sub_08101FF8;
+            e->handlers[1] = sub_0810271C;
+            e->handlers[2] = sub_08101D2C;
+            sequence = 2;
+            switch (e->row) {
+                case 0:
+                    AnimData_SelectPaletteBank(e->anim, 0x241);
+                    break;
+                case 1:
+                    AnimData_SelectPaletteBank(e->anim, 0x244);
+                    break;
+                case 2:
+                    AnimData_SelectPaletteBank(e->anim, 0x245);
+                    break;
+            }
+            m = Script_GetKeywordValue('m', 0);
+            if (m)
+                e->fieldE0 = m;
+            if (e->row > 2)
+                e->row = 0;
+            break;
+        }
+        case 2:
+            e->state = 4;
+            e->handlers[0] = sub_081021DC;
+            e->handlers[1] = sub_081023CC;
+            e->handlers[2] = sub_08101D2C;
+            sequence = 0;
+            switch (e->row) {
+                case 0:
+                    AnimData_SelectPaletteBank(e->anim, 0x23F);
+                    break;
+                case 1:
+                    AnimData_SelectPaletteBank(e->anim, 0x241);
+                    break;
+                case 2:
+                    AnimData_SelectPaletteBank(e->anim, 0x246);
+                    break;
+                case 3:
+                    AnimData_SelectPaletteBank(e->anim, 0x245);
+                    break;
+                case 4:
+                    AnimData_SelectPaletteBank(e->anim, 0x247);
+                    break;
+            }
+            e->fieldE0 = Script_GetKeywordValue('m', 1);
+            e->fieldC0 = Script_GetKeywordValue('w', 0x78);
+            if (Script_GetKeywordValue('M', 0))
+                e->fieldBC = e->fieldC0;
+            break;
+    }
+    Sprite_Init(sprite, e->anim, 0);
+    Anim_SetSequence(&e->sequence, manager->sequences, sequence, e->row, 0);
+    ActorAttachment_StepSprite((struct ContactSwarmSprite *)sprite, &e->sequence);
+    sprite->flags &= ~1;
+    sprite->field7 = 2;
+    sub_08225AB4(&e->body, e->index + 0xD0E9, &sprite->x, 0, 7, e);
+    sub_08225B28(&e->body, sprite);
+    sub_08225B4C(&e->body, e->fieldF4, e->fieldF0, e->fieldF1, e->fieldF2);
+    e->body.field1C = 0;
+    sprite->x -= 0x100;
+    if (Script_GetKeywordValue('d', 0))
+        e->flags |= 0x80;
+    if (Script_GetKeywordValue('F', 0))
+        e->flags |= 0x1000;
+    e->fieldBA = 0;
+    e->fieldC2 = 0;
+    follow = Script_GetKeywordValue('f', 0);
+    if (follow) {
+        switch ((s8)e->kind) {
+            case 0:
+            case 1:
+            case 3:
+                e->state = 1;
+                break;
+            case 2:
+                e->state = 4;
+                break;
+        }
+        sub_081028F8(manager->field1370, 0);
+        manager->field1370 = e->name;
+        sub_08159404(gUnk_02000580, 1, e->name);
+        e->flags |= 8;
+        gUnk_02000580[0x701] |= 1;
+        x = e->body.x >> 8;
+        z = e->body.z >> 8;
+        if (x < 0 || z < 0 || x >= gUnk_030052F8 || z >= gUnk_030052FC)
+            cell = 0;
+        else
+            cell = gUnk_030052F4->rows[z] + x;
+        sub_0821D698(e->body.field48, cell, 0, e->body.height >> 8, 0xFF, 4);
+        e->flags |= 1;
+        sub_081593A0(gUnk_02000580, &e->body.x);
+        if (follow == 2) {
+            TetherActor_SetPosition(&e->body.x);
+            sub_081028F8(manager->field1374, 1);
+            manager->field1374 = e->name;
+            TetherActor_AddStatusFlags(3, e->name);
+            e->flags |= 0x10;
+        }
+    }
+    sub_08103060(manager, e);
+    e->fieldBE = Script_GetKeywordValue('s', 6);
+    switch ((s8)e->kind) {
+        case 0:
+        case 1:
+        case 3:
+            if (sub_08100F28(sprite, &e->body.x, (s16)e->fieldBE))
+                e->state = 3;
+            break;
+    }
+    e->fieldBB = 0;
+}
+#else
+INCLUDE_ASM("asm/nonmatching", NamedObject_CreateFromScript);
+#endif
