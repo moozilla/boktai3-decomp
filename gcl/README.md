@@ -91,6 +91,31 @@ Operand roles worth knowing:
 * "chara" is GCL's word for any scripted object (キャラ); the Studio's Actors
   page is the same registry.
 
+## The readable view
+
+`tools/assets/gclview.py PROC` (and the Studio's Scripts page, "readable",
+on by default) renders the same bytecode for reading rather than as source:
+English names, named arguments, `match`/`case`, and debug prints as `# log:`
+comments (they do nothing at runtime):
+
+```
+trap(area=arg1, who=Player, event=ANY, names=[block_name]):
+    on_trigger:
+        if arg3 == 0xdd2:
+            # log: Crest on! {block_name}
+            SceneObjects_SwitchPalette(id=block_name, mode=1, sound=0)
+load_stage(map=0xcf70, tileset=0xf8ea, hp=0x7239)
+spawn OrbitingParticles(name=0x355f, pos=(x=2688, y=512, z=2432), radius=128, duration=15, type=4)
+```
+
+It decodes into nodes (statements, values, expressions) instead of text, so it
+does not depend on the Konami-style printer. `chara` is shown as `spawn
+Type(name=...)`, `command` as a call; callables use the English of
+`names/chara.csv` (high and medium confidence), else the callback's function
+name. Procedure calls use `names/proc.csv` (our names and parameters for
+library procedures: `load_stage`, `door`, `entrance_at_box`, the enemy
+spawners...); a procedure's own named parameters replace `argN` inside it.
+
 ## Konami's naming, from the game's own debug prints
 
 The scripts' `print` strings are EUC-JP developer messages that often print a

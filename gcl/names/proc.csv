@@ -1,0 +1,96 @@
+proc,name,params,confidence,evidence
+872,scene_is_set_up,,low,scene setup runs inside if (proc_872() == 0) (docs/ASSETS.md)
+876,load_stage_raw,"map,tileset,hp",medium,"the loader 884/885 wrap (docs/ASSETS.md, Stage scripts)"
+884,load_stage,"map,tileset,hp",high,loads the stage (docs/ASSETS.md); 194 stages follow it with proc_888
+885,load_stage_alt,"map,tileset,hp",medium,wraps 876 like 884 (docs/ASSETS.md)
+888,set_stage_palette,"palette,,",high,"the stage BG palette resource (docs/ASSETS.md, Stage palettes)"
+895,set_camera_area,box,medium,called with the camera box A679 (docs/ASSETS.md)
+909,entrance_at_box_909,"box,facing,entrance,proc",medium,entrance: the player starts at HP box `box` (docs/ASSETS.md; 910 verified in a replay)
+910,entrance_at_box,"box,facing,entrance,proc",high,entrance: the player starts at HP box `box` (docs/ASSETS.md; 910 verified in a replay)
+911,entrance_at_box_911,"box,facing",low,the same with more options (docs/ASSETS.md)
+912,entrance_at_box_912,"box,facing",low,the same with more options (docs/ASSETS.md)
+913,entrance_at_box_913,"box,facing",low,the same with more options (docs/ASSETS.md)
+914,entrance_at_914,"x,z,facing",medium,entrance at a position (docs/ASSETS.md)
+915,entrance_at_915,"x,z,facing",medium,entrance at a position (docs/ASSETS.md)
+916,entrance_at_916,"x,z,facing",medium,entrance at a position (docs/ASSETS.md)
+917,entrance_at_917,"x,z,facing",medium,entrance at a position (docs/ASSETS.md)
+918,entrance_at_918,"x,z,facing",medium,entrance at a position (docs/ASSETS.md)
+919,entrance_at_door_actor_919,"box,facing,entrance",medium,"entrance at a door actor (proc_961, actor A8F1)"
+920,entrance_at_door_actor_920,"box,facing,entrance",medium,"entrance at a door actor (proc_961, actor A8F1)"
+921,entrance_at_box_921,"box,facing,entrance,proc",medium,entrance: the player starts at HP box `box` (docs/ASSETS.md; 910 verified in a replay)
+922,entrance_at_box_922,"box,facing,entrance,proc",medium,entrance: the player starts at HP box `box` (docs/ASSETS.md; 910 verified in a replay)
+923,entrance_at_box_923,"box,facing,entrance,proc",medium,entrance: the player starts at HP box `box` (docs/ASSETS.md; 910 verified in a replay)
+924,entrance_at_box_924,"box,facing,entrance,proc",medium,entrance: the player starts at HP box `box` (docs/ASSETS.md; 910 verified in a replay)
+925,entrance_at_box_925,"box,facing,entrance,proc",medium,entrance: the player starts at HP box `box` (docs/ASSETS.md; 910 verified in a replay)
+931,place_player_at_box,,medium,places the player at the copied door box (docs/ASSETS.md)
+932,set_player_position,,medium,writes GameState+0x30/+0x34 and the facing (docs/ASSETS.md)
+934,door,"box,scene,entrance,back",high,a trap on the box whose event loads scene at entrance (docs/ASSETS.md)
+935,door_935,"box,scene,entrance,back",medium,a trap on the box whose event loads scene at entrance (docs/ASSETS.md)
+936,door_936,"box,scene,entrance,back",medium,a trap on the box whose event loads scene at entrance (docs/ASSETS.md)
+937,door_937,"box,scene,entrance,back",medium,a trap on the box whose event loads scene at entrance (docs/ASSETS.md)
+938,door_938,"box,scene,entrance,back",medium,a trap on the box whose event loads scene at entrance (docs/ASSETS.md)
+940,door_transition_940,"scene,entrance",medium,the door transition without a box (docs/CENTAUR.md: warp uses 945)
+941,door_transition_941,"scene,entrance",medium,the door transition without a box (docs/CENTAUR.md: warp uses 945)
+942,door_transition_942,"scene,entrance",medium,the door transition without a box (docs/CENTAUR.md: warp uses 945)
+943,door_transition_943,"scene,entrance",medium,the door transition without a box (docs/CENTAUR.md: warp uses 945)
+944,door_transition_944,"scene,entrance",medium,the door transition without a box (docs/CENTAUR.md: warp uses 945)
+945,door_transition,"scene,entrance",high,the door transition without a box (docs/CENTAUR.md: warp uses 945)
+946,locked_door,"key_box,,,box,scene,entrance",medium,the first box opens it (docs/ASSETS.md)
+949,door_949,"box,scene,entrance,back",medium,a trap on the box whose event loads scene at entrance (docs/ASSETS.md)
+950,door_950,"box,scene,entrance,back",medium,a trap on the box whose event loads scene at entrance (docs/ASSETS.md)
+951,door_transition_951,"scene,entrance",medium,the door transition without a box (docs/CENTAUR.md: warp uses 945)
+952,start_scene_transition,scene,medium,starts the transition actor that loads the scene (docs/ASSETS.md)
+953,set_arrival_entrance,"entrance,back",high,"stores the entrance in r708[0x70] (docs/ENGINE.md, CENTAUR.md)"
+1118,floor_item,"category,item,x,z,facing,flags,flag",medium,an item on the floor (docs/ASSETS.md)
+1119,place_item,"category,item,x,z,facing,chest,,flags,flag,proc",medium,an item; chest = 1 puts it in a chest (docs/ASSETS.md)
+1120,create_item,,medium,creates the pickup or the chest actor 430D (docs/ASSETS.md)
+1502,spawn_mummy_1,"name,path",medium,"enemy spawner: creates key 6913 (docs/ASSETS.md, 1496-1627)"
+1503,spawn_mummy_2,"name,path",medium,"enemy spawner: creates key 6913 (docs/ASSETS.md, 1496-1627)"
+1504,spawn_mummy_3,"name,path",medium,"enemy spawner: creates key 6913 (docs/ASSETS.md, 1496-1627)"
+1506,spawn_golem_1,"name,path",medium,"enemy spawner: creates key 98EC (docs/ASSETS.md, 1496-1627)"
+1507,spawn_golem_2,"name,path",medium,"enemy spawner: creates key 98EC (docs/ASSETS.md, 1496-1627)"
+1508,spawn_golem_3,"name,path",medium,"enemy spawner: creates key 98EC (docs/ASSETS.md, 1496-1627)"
+1510,spawn_skeleton_1,"name,path",medium,"enemy spawner: creates key AD03 (docs/ASSETS.md, 1496-1627)"
+1511,spawn_skeleton_2,"name,path",medium,"enemy spawner: creates key AD03 (docs/ASSETS.md, 1496-1627)"
+1512,spawn_skeleton_3,"name,path",medium,"enemy spawner: creates key AD03 (docs/ASSETS.md, 1496-1627)"
+1513,spawn_skeleton_4,"name,path",medium,"enemy spawner: creates key AD03 (docs/ASSETS.md, 1496-1627)"
+1514,spawn_skeleton_5,"name,path",medium,"enemy spawner: creates key AD03 (docs/ASSETS.md, 1496-1627)"
+1515,spawn_skeleton_6,"name,path",medium,"enemy spawner: creates key AD03 (docs/ASSETS.md, 1496-1627)"
+1516,spawn_skeleton_7,"name,path",medium,"enemy spawner: creates key AD03 (docs/ASSETS.md, 1496-1627)"
+1517,spawn_skeleton_8,"name,path",medium,"enemy spawner: creates key AD03 (docs/ASSETS.md, 1496-1627)"
+1518,spawn_skeleton_9,"name,path",medium,"enemy spawner: creates key AD03 (docs/ASSETS.md, 1496-1627)"
+1519,spawn_skeleton_10,"name,path",medium,"enemy spawner: creates key AD03 (docs/ASSETS.md, 1496-1627)"
+1520,spawn_skeleton_11,"name,path",medium,"enemy spawner: creates key AD03 (docs/ASSETS.md, 1496-1627)"
+1529,spawn_vorn_1,"name,path",medium,"enemy spawner: creates key DFDC (docs/ASSETS.md, 1496-1627)"
+1530,spawn_vorn_2,"name,path",medium,"enemy spawner: creates key DFDC (docs/ASSETS.md, 1496-1627)"
+1541,spawn_bat_1,"name,path",medium,"enemy spawner: creates key F8BE (docs/ASSETS.md, 1496-1627)"
+1542,spawn_bat_2,"name,path",medium,"enemy spawner: creates key F8BE (docs/ASSETS.md, 1496-1627)"
+1545,spawn_crow_1,"name,path",medium,"enemy spawner: creates key 9E8D (docs/ASSETS.md, 1496-1627)"
+1546,spawn_crow_2,"name,path",medium,"enemy spawner: creates key 9E8D (docs/ASSETS.md, 1496-1627)"
+1549,spawn_spider_1,"name,path",medium,"enemy spawner: creates key 87E4 (docs/ASSETS.md, 1496-1627)"
+1550,spawn_spider_2,"name,path",medium,"enemy spawner: creates key 87E4 (docs/ASSETS.md, 1496-1627)"
+1557,spawn_bee_1,"name,path",medium,"enemy spawner: creates key E131 (docs/ASSETS.md, 1496-1627)"
+1558,spawn_bee_2,"name,path",medium,"enemy spawner: creates key E131 (docs/ASSETS.md, 1496-1627)"
+1559,spawn_bee_3,"name,path",medium,"enemy spawner: creates key E131 (docs/ASSETS.md, 1496-1627)"
+1562,spawn_slime_1,"name,path",medium,"enemy spawner: creates key C3BC (docs/ASSETS.md, 1496-1627)"
+1564,spawn_slime_2,"name,path",medium,"enemy spawner: creates key C3BC (docs/ASSETS.md, 1496-1627)"
+1565,spawn_slime_3,"name,path",medium,"enemy spawner: creates key C3BC (docs/ASSETS.md, 1496-1627)"
+1567,spawn_slime_4,"name,path",medium,"enemy spawner: creates key C3BC (docs/ASSETS.md, 1496-1627)"
+1568,spawn_slime_5,"name,path",medium,"enemy spawner: creates key C3BC (docs/ASSETS.md, 1496-1627)"
+1570,spawn_slime_6,"name,path",medium,"enemy spawner: creates key C3BC (docs/ASSETS.md, 1496-1627)"
+1571,spawn_slime_7,"name,path",medium,"enemy spawner: creates key C3BC (docs/ASSETS.md, 1496-1627)"
+1573,spawn_slime_8,"name,path",medium,"enemy spawner: creates key C3BC (docs/ASSETS.md, 1496-1627)"
+1579,spawn_ghost_1,"name,path",medium,"enemy spawner: creates key CCD3 (docs/ASSETS.md, 1496-1627)"
+1580,spawn_ghost_2,"name,path",medium,"enemy spawner: creates key CCD3 (docs/ASSETS.md, 1496-1627)"
+1582,spawn_mimic,"name,path",medium,"enemy spawner: creates key BEF5 (docs/ASSETS.md, 1496-1627)"
+1585,spawn_octopus,"name,path",medium,"enemy spawner: creates key 3F99 (docs/ASSETS.md, 1496-1627)"
+1600,spawn_dragon_puppy,"name,path",medium,"enemy spawner: creates key 3D38 (docs/ASSETS.md, 1496-1627)"
+1609,spawn_fan_cannon_manager,"name,path",medium,"enemy spawner: creates key 9CC2 (docs/ASSETS.md, 1496-1627)"
+1612,spawn_vulcan_cannon,"name,path",medium,"enemy spawner: creates key F083 (docs/ASSETS.md, 1496-1627)"
+1615,spawn_poison_hand,"name,path",medium,"enemy spawner: creates key FE92 (docs/ASSETS.md, 1496-1627)"
+1617,spawn_screamer,"name,path",medium,"enemy spawner: creates key 84CF (docs/ASSETS.md, 1496-1627)"
+1621,spawn_ooze,"name,path",medium,"enemy spawner: creates key DA0E (docs/ASSETS.md, 1496-1627)"
+1623,spawn_sword_1,"name,path",medium,"enemy spawner: creates key DB8D (docs/ASSETS.md, 1496-1627)"
+1624,spawn_sword_2,"name,path",medium,"enemy spawner: creates key DB8D (docs/ASSETS.md, 1496-1627)"
+1626,spawn_axe_1,"name,path",medium,"enemy spawner: creates key 2D30 (docs/ASSETS.md, 1496-1627)"
+1627,spawn_axe_2,"name,path",medium,"enemy spawner: creates key 2D30 (docs/ASSETS.md, 1496-1627)"
