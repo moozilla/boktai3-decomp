@@ -24,6 +24,7 @@ import os
 import re
 import struct
 import sys
+import threading
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -33,8 +34,9 @@ from romlib import ROOT, load_rom  # noqa: E402
 ROM_BASE = 0x08000000
 IMAGE = 0x08D5A85C
 COMMANDS = {k: r["name"] for k, r in gclnames.best("command").items()}
-KEYED = ("chara", "command")  # the first operand is a registry key (gcl/names/chara.csv)
+KEYED = {"chara": 0, "command": 0, "trap": 1}  # operand that is a registry key (gcl/names/chara.csv)
 _keys = None  # {key: name row} while disassembling with names
+_opts = None  # (registry key schemas, command schemas, {key: callback name}) with names
 _prints = {}  # {print text: English} while disassembling with names
 _collect = None  # a list that gets each print's operand texts (print_args)
 
@@ -195,6 +197,7 @@ def instructions(b, p, end, depth=0, out=None):
             name = COMMANDS.get(cid, f"cmd_{cid:04X}")
             q, alen = arglist(b, start + 2)  # the argument list has its own length
             args, aend, note, first, line0 = [], q + alen, "", True, len(out)
+            ai, owner, used = 0, (_opts[1].get(name) if _opts else None), []
             while q < aend:
                 if b[q] & 0xF0 == 0x80:
                     s2, n2 = length(b, q)
@@ -208,14 +211,20 @@ def instructions(b, p, end, depth=0, out=None):
                 t, q = operand(b, q)
                 if q is None:
                     break
-                if first and name in KEYED and _keys is not None and t.startswith("0x"):
-                    r = _keys.get(int(t, 16))
+                if KEYED.get(name) == ai and _keys is not None and t.startswith("0x"):
+                    key = int(t, 16)
+                    r = _keys.get(key)
                     if r:
-                        note = f"  # {int(t, 16):04X}" + (f" {r['english']}" if r["english"] else "")
+                        note = f"{key:04X}" + (f" {r['english']}" if r["english"] else "")
                         t = r["name"]
+                    elif key in _opts[2]:
+                        note = f"{key:04X} {_opts[2][key]}"
+                    if key in _opts[2] and name != "trap":
+                        owner = _opts[0].get(key)
                 elif first and name == "print" and t[:1] == "'" and _prints.get(t[1:-1]):
-                    note = "  # " + _prints[t[1:-1]]
+                    note = _prints[t[1:-1]]
                 first = False
+                ai += 1
                 args.append(t)
             if name == "print" and _collect is not None:
                 _collect.append(list(args))
@@ -227,7 +236,9 @@ def instructions(b, p, end, depth=0, out=None):
             while q < start + n and b[q] & 0xF0 == 0x50:
                 s2, n2 = length(b, q)
                 k = chr(b[s2])
-                label, r = [KEYWORDS[k] if name in ("if", "switch") and k in KEYWORDS else k + ":"], s2 + 1
+                konami = _opts is not None and not (name in ("if", "switch") and k in KEYWORDS)
+                label, r = [KEYWORDS[k] if name in ("if", "switch") and k in KEYWORDS else ("-" + k if konami else k + ":")], s2 + 1
+                used.append(k)
                 while r < s2 + n2:
                     if b[r] & 0xF0 == 0x80:
                         s3, n3 = length(b, r)
@@ -239,13 +250,20 @@ def instructions(b, p, end, depth=0, out=None):
                         continue
                     t, r = operand(b, r)
                     label.append(t)
+                if konami and len(label) > 2 and label[0] == "-" + k:  # values of an option: -p x,y,z
+                    label = [label[0], ",".join(label[1:])]
                 if label and out[-1][0] == depth and out[-1][1] != "}":
                     out[-1] = (depth, out[-1][1] + " " + " ".join(label))
                 elif label:
                     out.append((depth, " ".join(label)))
                 q = s2 + n2
+            if owner and used:
+                import gcloptions
+                desc = gcloptions.describe(owner, list(dict.fromkeys(used)))
+                if desc:
+                    note = (note + ": " if note else "") + desc
             if note:
-                out[line0] = (out[line0][0], out[line0][1] + note)
+                out[line0] = (out[line0][0], out[line0][1] + "  # " + note)
         elif kind == 7:
             pid = b[start] | b[start + 1] << 8
             out.append((depth, f"proc_{pid} {' '.join(operands(b, start + 2, start + n))}".rstrip()))
@@ -304,6 +322,58 @@ def name_variables(text, cid):
     return code + sep + note
 
 
+_callbacks = None
+_lock = threading.RLock()  # the module globals above are per call (the studio serves threads)
+
+
+def callback_names():
+    """{registry key: its callback's current function name}."""
+    global _callbacks
+    if _callbacks is None:
+        fn = {}
+        with open(os.path.join(ROOT, "symbols", "functions.csv")) as f:
+            for r in csv.DictReader(f):
+                fn[int(r[next(iter(r))], 16)] = r["name"]
+        _callbacks = {}
+        with open(os.path.join(ROOT, "data", "actor_registry.csv")) as f:
+            for r in csv.DictReader(f):
+                cb = int(r["callback"], 16) & ~1
+                _callbacks[int(r["key"], 16)] = fn.get(cb, f"sub_{cb:08X}")
+    return _callbacks
+
+
+_texts = None
+
+
+def text_excerpts():
+    """{string id: short English (or Japanese) excerpt} from the extracted text
+    bank (build/text/bank.tsv) and the fan translation (build/text/english.tsv)
+    when they exist; ROM- and translation-derived, shown only, never stored."""
+    global _texts
+    if _texts is None:
+        _texts = {}
+        for f in ("bank.tsv", "english.tsv"):  # English overrides Japanese
+            try:
+                for ln in open(os.path.join(ROOT, "build", "text", f), encoding="utf-8"):
+                    p = ln.rstrip("\n").split("\t")
+                    if len(p) > 2 and p[1] == "T" and p[0].isdigit():
+                        t = re.sub(r"<[^>]*>", "", p[2]).replace("\\n", " ").strip()
+                        if t:
+                            _texts[int(p[0])] = t if len(t) <= 48 else t[:47] + "…"
+            except OSError:
+                pass
+    return _texts
+
+
+def name_texts(text):
+    """Add the excerpt of each text#N in a line's code to its comment."""
+    code, sep, note = text.partition("  # ")
+    ex = [f'text#{n} "{text_excerpts()[int(n)]}"' for n in re.findall(r"text#(\d+)", code) if int(n) in text_excerpts()]
+    if not ex:
+        return text
+    return code + "  # " + "; ".join(([note] if note else []) + ex)
+
+
 def disassemble(img, pid, names=False):
     """(depth, text) lines of procedure slot pid. With names, registry keys
     after chara/command print as their GCL names (gcl/names/chara.csv), the
@@ -312,7 +382,12 @@ def disassemble(img, pid, names=False):
     by the debug prints (gcl/names/var.csv, param.csv) print Konami-style
     (`$f:NAME`, `$:P_NAME`) with the storage in the comment; without, keys
     and storage stay raw (for tools that parse the text)."""
-    global _keys, _prints
+    with _lock:
+        return _disassemble(img, pid, names)
+
+
+def _disassemble(img, pid, names):
+    global _keys, _prints, _opts
     a = img.proc_address(pid)
     if a is None:
         return []
@@ -320,11 +395,14 @@ def disassemble(img, pid, names=False):
     start, n = length(b, a)
     _keys = gclnames.best("chara") if names else None
     _prints = gclnames.prints() if names else {}
+    if names:
+        import gcloptions
+        _opts = (gcloptions.registry_schemas(), gcloptions.command_schemas(), callback_names())
     try:
         out = instructions(b, start, start + n)
-        return [(d, name_variables(t, pid + 1)) for d, t in out] if names else out
+        return [(d, name_texts(name_variables(t, pid + 1))) for d, t in out] if names else out
     finally:
-        _keys, _prints = None, {}
+        _keys, _prints, _opts = None, {}, None
 
 
 def print_args(img, pid):
@@ -334,12 +412,13 @@ def print_args(img, pid):
     if a is None:
         return []
     start, n = length(img.rom, a)
-    _collect = []
-    try:
-        instructions(img.rom, start, start + n)
-        return _collect
-    finally:
-        _collect = None
+    with _lock:
+        _collect = []
+        try:
+            instructions(img.rom, start, start + n)
+            return _collect
+        finally:
+            _collect = None
 
 
 def main():
