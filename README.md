@@ -4,142 +4,127 @@
 [![Functions](https://decomp.dev/moozilla/boktai3-decomp.svg?mode=shield&measure=functions&label=Functions)](https://decomp.dev/moozilla/boktai3-decomp)
 
 A matching decompilation of **Shin Bokura no Taiyou: Gyakushuu no Sabata**
-(Boktai 3, GBA, Japan: `BOKTAI3` / `U33J`). The goal is C source that compiles
-back to the original ROM byte-for-byte. The English fan translation
-([boktai3trans](https://github.com/moozilla/boktai3trans)) will be built on
-top of it, but the translation lives in its own repo.
+(Boktai 3, GBA, `U33J`): C source that compiles back to the original ROM byte
+for byte, plus a local studio for reading and editing the game's text,
+graphics, maps and scripts.
 
-📈 **Progress: [decomp.dev](https://decomp.dev/moozilla/boktai3-decomp) · [PROGRESS.md](PROGRESS.md).**
+## About
 
-**Status:**
+This project started as a way to revive the English fan translation I worked
+on back in 2007 ([boktai3trans](https://github.com/moozilla/boktai3trans)). It
+has since grown into editing tools and a studio for digging into how the game
+actually works. Boktai 3 turned out to be a deeper rabbit hole than I expected:
+its scenes run on GCL, the scripting system Konami also used in Metal Gear
+Solid, so the game's logic can be read back almost like source. Eventually I'd
+like the tools to cover the whole Boktai series.
+
+This project is entirely agent-driven: all code and documentation is written by
+AI agents (Claude Opus 5.5, GPT-6 Astra and GPT-6.1 Sol, with teams of Sonnet,
+Haiku and Luna subagents) that I direct and review. I was inspired by Chris
+Lewis's posts on [decompiling Snowboard Kids with coding agents](https://blog.chrislewis.au/using-coding-agents-to-decompile-nintendo-64-games/),
+and one of my goals is to see how deep fully agentic decompilation and ROM
+hacking can go. I aim to stand apart from the AI-generated ports that led to
+[decomp.dev's sunsetting](https://decomp.dev): this comes from a deep curiosity
+about the game. ROM hacking was my main hobby as a teenager, much of it on fan
+translations. I now work as a professional software developer, with almost a
+decade of writing production code by hand. I don't believe agents *have to be*
+a force for disempowerment: with creativity, agents can allow you to go deeper
+and be far more ambitious than you ever could before. I'm hoping to prove that
+with this project.
+
+## State of the decomp
 
 | | |
 |---|---|
-| Disassembly | every function (incl. callbacks found via data-region pointer tables), reassembles **bit-identical** (`make compare`) |
-| Shiftable | every ROM pointer is a symbol; all 13.7 MB of data can move. Moving it by 64 KiB plays **pixel-identical** in every scripted test (`make shifttest`) |
-| Compiler | identified as **agbcc** (pret's GCC 2.95 GBA compiler), `-O2 -mthumb-interwork`; float/double libgcc: `old_agbcc -O2`; RFU ISR: `agbcc_arm -O2` |
-| C pipeline | `src/*.c` → agbcc → spliced into the ROM in place of the asm; `INCLUDE_ASM` for unfinished functions; matched counts in [PROGRESS.md](PROGRESS.md); `tools/check.py` per-function diff, `tools/permute.py` for decomp-permuter |
-| Libraries | 57 of 58 MP2K (`m4a`) functions in C (`src/lib/m4a.c`, from pret's pokeemerald plus older-SDK variants) (`tools/sigmatch.py`); 40 float/double libgcc and 22 fdlibm routines, two memory primitives, 15 RTC routines, five EEPROM routines and the 145-function RFU SDK in C; solar timer/IRQ code traced and matched ([sensor evidence](docs/SOLAR_SENSOR.md)); `libagbsyscall` identified |
-| Text | script bank format decoded (9,976 strings round-trip byte-exact); the text itself is handled by the translation repo |
-| Sound | MP2K engine; 1,483 songs, 5,525 track streams, 81 voicegroups, 415 samples walked |
-| Symbols | `symbols/` — named functions (incl. raphaelr's), data map, confirmed pointers |
+| Matching | [PROGRESS.md](PROGRESS.md) and the badges above; the ROM rebuilds byte-identical |
+| Data | every ROM pointer is a symbol, so all data can move or grow ([shiftability](docs/SHIFTABILITY.md)) |
+| Scripts | the scene scripts are compiled GCL, Konami's scripting language (documented by the Metal Gear Solid reverse-engineering community: [KCEJ wiki](https://github.com/metalgeardev/KCEJ_Wiki/tree/master/common/gcl), [mgs_reversing](https://github.com/FoxdieTeam/mgs_reversing/tree/master/source/libgcl)); bytecode, interpreter and recovered names in [gcl/](gcl/README.md) |
+| Assets | text bank, font, sprites, maps, palettes, terrain and stage scripts decoded ([docs/ASSETS.md](docs/ASSETS.md)) |
 
-See [docs/ROM_MAP.md](docs/ROM_MAP.md) for what lives where,
-[docs/FINDINGS.md](docs/FINDINGS.md) for engine notes,
-[docs/screens/](docs/screens/) for per-screen graphics sources, and
-[CLAUDE.md](CLAUDE.md) for the decompilation workflow, and
-**[docs/HANDOFF.md](docs/HANDOFF.md) for current state, open issues and next steps.**
+## Toolchain
+
+| | |
+|---|---|
+| Compiler | [agbcc](https://github.com/pret/agbcc) (pret's GCC 2.95 for the GBA), `-O2 -mthumb-interwork`; `old_agbcc` and ARM mode for some libraries |
+| Libraries | MP2K sound (`m4a`), libgcc and fdlibm, RTC, EEPROM and the RFU wireless SDK, matched in C |
+
+Current work and next steps: [docs/HANDOFF.md](docs/HANDOFF.md). All docs: [docs/INDEX.md](docs/INDEX.md).
 
 ## Setup
 
-You need your own copy of the ROM:
+Supply your own ROM at `baserom.gba` (SHA-1 `2651c5e6875ac60abff734510d152166d211c87c`).
+Nothing derived from it is committed.
 
-```
-baserom.gba   SHA-1 2651c5e6875ac60abff734510d152166d211c87c
-```
-
-Put it (or a symlink) at `baserom.gba` in this repository's root.
-`BOKTAI3_ROM` also selects the input for the ROM-reading Python tools, but the
-assembler and regression scripts expect the root-level file or symlink.
-Nothing derived from the ROM is committed: generated assembly lives in `gen/`
-and build output in `build/`, and both are gitignored. See
-[THIRD_PARTY.md](THIRD_PARTY.md) for what comes from elsewhere. Our own code is
-MIT ([LICENSE](LICENSE)).
-
-System packages (Debian/Ubuntu):
-
-```
-apt install build-essential cmake binutils-arm-none-eabi libmgba-dev python3-numpy python3-pil
-pip install capstone
-make setup          # pinned gbadisasm, agbcc, armips, permuter, and mGBA harness
-```
-
-On macOS with Homebrew and the Xcode Command Line Tools installed:
+macOS (Homebrew, Xcode Command Line Tools):
 
 ```sh
 brew install cmake arm-none-eabi-binutils mgba python
-python3 -m venv build/venv
-source build/venv/bin/activate
+python3 -m venv build/venv && source build/venv/bin/activate
 python -m pip install -r requirements.txt
-make setup
-make disasm
-make
+make setup     # pinned gbadisasm, agbcc, armips, permuter, mGBA harness
 ```
 
-Activate `build/venv` in each new shell before using the Python tools. The
-harness Makefile detects Homebrew's mGBA headers and library on macOS; set
-`MGBA_PREFIX` if it lives elsewhere. All third-party source and build products
-stay under the ignored `build/` directory.
-
-For ROM-free GitHub Actions reporting and decomp.dev registration, see
-[docs/PROGRESS_CI.md](docs/PROGRESS_CI.md).
+Debian/Ubuntu: `apt install build-essential cmake binutils-arm-none-eabi libmgba-dev python3-numpy python3-pil`, then the same `pip` and `make setup`.
 
 ## Building
 
+```sh
+make disasm      # generate the disassembly into gen/ (~18 min, once)
+make             # compile, link, verify: prints build/boktai3.gba: OK
+make shifttest   # move all data by 64 KiB and compare emulator screenshots
+make mod         # build/mod.gba from edited text and assets
 ```
-make disasm         # generate gen/code.s (gbadisasm, ~18 min) and symbolize it into gen/
-make                # split around src/*.c, compile C with agbcc, link, verify SHA-1
-make shifttest      # move all data by 64 KiB and compare emulator screenshots
+
+To match a function: `python3 tools/asmat.py ADDR`, write C under `src/`,
+`python3 tools/check.py FILE`, then `make`. The workflow and compiler notes are
+in [CLAUDE.md](CLAUDE.md) and [docs/WORKER.md](docs/WORKER.md).
+
+## Studio
+
+```sh
+python3 tools/studio/serve.py    # http://localhost:8642
 ```
+
+| | |
+|---|---|
+| ![Text](docs/img/studio-text.png) | **Text**: every string with the fan translation, previewed in the game font at the game's line width; *Build mod ROM* writes a playable ROM. |
+| ![Sprites](docs/img/studio-sprites.png) | **Sprites**: sprite packages and large sprites with every frame and animation, in their in-game palettes. |
+| ![Maps](docs/img/studio-map.png) | **Maps**: stages with captured palettes, doors, entrances, items, enemies and patrol paths from the stage scripts. |
+| ![Scripts](docs/img/studio-scripts.png) | **Scripts**: procedures in a readable view with recovered names, the developers' debug messages and their translations. |
+| ![Actors](docs/img/studio-actors.png) | **Actors**: every object a script can create, with its GCL name, code, sprites and scenes. |
+| ![Screen inspector](docs/img/studio-captures.png) | **Screen inspector** (Live and Captures): every sprite, text box, layer and palette on screen, matched to its resource. Live mode connects to mGBA through [Centaur](docs/CENTAUR.md). |
+
+Also: palette, font and tile viewers.
 
 ## Layout
 
-```
-asm/          hand-written asm (macros, top-level ROM for the pure-asm build)
-include/      C headers
-src/          decompiled C, one file per contiguous run of functions
-symbols/      functions.csv, data.csv  -- names (source of truth for labels)
-              pointers.txt             -- ROM words proven to be pointers (emulator)
-              nonpointer_*.txt         -- ranges proven/declared not to hold pointers
-gen/          generated asm (gitignored, shared by worktrees)
-notes/        per-worker notes (functions that resisted matching)
-tests/        input scripts for the emulator harness
-tools/        everything that generates or checks the above
-  disasm.py       run gbadisasm with seeds (BL targets, pointer-derived), iterate
-  symbolize.py    make every ROM pointer symbolic; split data into labeled slices
-  split.py        cut asm around C units; build.py compiles/links/compares
-  m4a.py          MP2K sound walker (songs, tracks incl. unaligned GOTO/PATT, voices, samples)
-  emu/harness.c   headless mGBA: scripted input, screenshots, code/data coverage,
-                  word-load pointer evidence, RAM dumps, write watchpoints, fixed RTC
-  runtime_ptrs.py turn harness evidence into symbols/pointers.txt + nonpointer_runtime.txt
-  shift_test.sh   shiftability regression; ramdiff.py / shift_diff.py to debug it
-  vram_map.py     which ROM bytes the tiles on screen came from
-  sigmatch.py     find library functions (compiled .o) in the ROM, relocation-masked
-  progress.py     functions/bytes decompiled (+ objdiff-style JSON)
-  ghidra/         headless Ghidra import/analysis/export scripts
-  mgba/centaur.lua  desktop mGBA script: record playthroughs as harness scripts, peek/poke/watch
-  worklist.py     remaining functions with difficulty signals; --chunks for parallel ranges
-  worktree.sh     isolated worktree for a parallel worker
-  ghidra_c.py     Ghidra pseudo-C for a function (draft only)
-  gfx.py, lz77.py, coverage.py, asmat.py
-```
+Decompilation:
 
-## Decompiling a function
+| Path | Contents |
+|---|---|
+| `src/`, `include/`, `asm/` | decompiled C, headers, hand-written asm |
+| `symbols/` | function and data names, pointer evidence |
+| `data/` | data tables kept as source (actor registry, charmap, items) |
+| `tools/*.py` | build, split, check, worklist, permuter, progress |
+| `gen/`, `build/` | generated from the ROM, never committed |
 
-1. `python3 tools/asmat.py 08033568` shows the asm.
-2. Write C in `src/` (functions in a file must be contiguous, in ROM order;
-   phase 1 uses one file per function in `src/fn/`, see [docs/WORKER.md](docs/WORKER.md)).
-   RAM globals can be referenced as `gUnk_0200XXXX`; the linker defines them.
-3. `make` — prints `OK` or the first mismatching address.
+Studio and tooling:
 
-Matching notes so far: plain `agbcc -O2 -mthumb-interwork` reproduces leaf
-functions including the always-pushed `lr`; `old_agbcc` does not (it omits the
-push in leaf functions). Rename a function by adding it to
-`symbols/functions.csv` — no re-disassembly needed.
+| Path | Contents |
+|---|---|
+| `tools/studio/` | the Studio |
+| `tools/assets/` | asset and script decoders (`gcx.py`, `gclview.py`, `stages.py`, `sprites.py`, `text.py`) |
+| `tools/mgba/`, `tools/emu/` | Centaur (desktop mGBA script), headless emulator harness |
+| `gcl/` | recovered script names, debug-print translations, worked examples |
 
-## How shiftability was proven
+Documentation:
 
-Pointer detection is heuristic (aligned words in ROM range, table shapes,
-MP2K structure walking) plus evidence from the emulator: the harness records
-which ROM words the program loads with `LDR`/`LDM` (pointers) versus words it
-only reads as plain data (halfword loads, DMA, BIOS copies). Bulk-copy loops are
-discounted. The shift test then moves all data and diffs screenshots; RAM
-snapshots (`tools/ramdiff.py`) pinpoint the first divergence when it fails.
+| Path | Contents |
+|---|---|
+| `docs/` | engine, subsystems and process; start at [docs/INDEX.md](docs/INDEX.md) |
+| `notes/` | per-batch worker notes |
 
-The tests so far cover boot/setup, title, new game + intro cutscene, a
-late-game save, every pause-menu tab and some field play — about 6% of the
-code. Areas no test reaches may still hide a bad pointer guess; extending
-`tests/` with more of the game is the way to find them.
+## License
 
-Research and tooling directions: [backlog](docs/BACKLOG.md).
-Compact checking and WIP records: [candidate workflow](docs/CANDIDATES.md).
+MIT ([LICENSE](LICENSE)). Third-party code and its licenses: [THIRD_PARTY.md](THIRD_PARTY.md).
+Boktai 3 is © Konami; the ROM is not included.
