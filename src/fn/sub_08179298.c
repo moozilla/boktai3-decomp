@@ -1,7 +1,6 @@
 #include "global.h"
 #include "engine.h"
 #include "game_state.h"
-#define Hud_Create sub_08179298
 void *sub_0817923C(u32, u32);
 void *sub_081791E0(u32, u32);
 void *sub_08178B3C(u32, u32);

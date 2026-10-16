@@ -1,6 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#define ScriptActor_TurnFromScript sub_0815CCF8
 struct PackedVec {
     u32 x : 16, y : 16, z : 16, pad : 16;
 };

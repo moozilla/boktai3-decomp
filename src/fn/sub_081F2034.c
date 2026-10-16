@@ -1,6 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#define SingletonSlot7_Create sub_081F2034
 void *sub_0802140C(u32 slot);
 void sub_081F1B14(void *);
 void sub_081F1BF8(void *);

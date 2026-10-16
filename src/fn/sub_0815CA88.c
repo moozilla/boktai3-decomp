@@ -1,6 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#define ScriptActor_SetAnimationFromScript sub_0815CA88
 extern u8 *gUnk_02000580[];
 s32 sub_0815A400(void);
 void sub_0815AEAC(u8 *actor, s32 animation);

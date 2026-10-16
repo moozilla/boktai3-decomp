@@ -1,6 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#define Terrain_LoadFromScript sub_08225CB8
 struct Grid {
     u8 pad0[8];
     s16 originX, originY; /* BG map pixels * 16 */
