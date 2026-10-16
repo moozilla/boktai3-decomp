@@ -32,11 +32,13 @@ Recent work, newest first (details in [history](history/README.md)):
   helpers inlined on request. See [gcl/README.md](../gcl/README.md).
 * **Script decomp targets**: [tasks/script_targets.md](tasks/script_targets.md)
   ranks the native routines scripts call that are still unmatched (95 used,
-  23 KB at the start). The campaign started 2026-10-16: eight batches matched 73
+  23 KB at the start). The campaign started 2026-10-16: nine batches matched 75
   of them, all of the original top 15 included (`trap`, 081D0C04 and
-  `place_character`'s 081CE1BC too;
-  [notes](../notes/script-entry-points_2026-10-16.md)); the near-misses,
-  FloorSwitch_Create and A4FC are guarded drafts. Regenerate the list with
+  `place_character`'s 081CE1BC too), plus shared callees such as
+  AnimData_Load and Hud_SetMode
+  ([notes](../notes/script-entry-points_2026-10-16.md)). The near-misses,
+  FloorSwitch_Create and A4FC are guarded drafts; most of what is left is
+  large and inlines the packed-command sprite stepper. Regenerate the list with
   `python3 tools/assets/script_targets.py --markdown docs/tasks/script_targets.md`.
 * **30% reached** (2026-10-15) with a credit correction: retained assembly
   falsely absorbed by small C helpers was removed from the count
