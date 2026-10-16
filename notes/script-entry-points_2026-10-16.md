@@ -1,4 +1,4 @@
-# Script entry points, batch 1 (2026-10-16)
+# Script entry points, batches 1-2 (2026-10-16)
 
 Tags: #scripts #text #actors #tooling
 
@@ -64,3 +64,59 @@ The two hidden functions were counted as part of the entry point before them
 * A `while (Script_GetPc()) { a[n] = Script_GetValue(); n++; }` loop needs the
   increment as its own statement to keep the load/add/store after the call
   (080311F0).
+
+## Batch 2
+
+Matched (27 functions, 3,448 bytes, +0.143 percentage points):
+
+| Address | Name | Key | Notes |
+|---|---|---|---|
+| 08225624 | `Trap_CreateFromScript` | command trap | see "trap" below |
+| 08103DCC | `NamedActor_SetSpeedFromScript` | 15ED | `-n` actor, `-s` (6) at +0xBE |
+| 0815CA88 | `ScriptActor_SetAnimationFromScript` | C12D | `-p` + 366 to sub_0815AEAC |
+| 0815CCF8 | `ScriptActor_TurnFromScript` | 9763 | optional `-p` point, `-d`, `-f`, `-e` for sub_0815B15C |
+| 08225CB8 | `Terrain_LoadFromScript` | 30AD | `-p` HP resource or `-h`/`-t`/`-r`/`-z`; `-v` map callback set |
+| 08179298 | `Hud_Create` | CC28 | picks one of three HUD creators |
+| 081F2034 | `SingletonSlot7_Create` | 5856 | slot 7 of the singleton table at 0x020000B8 |
+| 0820A460 / 0820A4D0 | `Slot600_ActivateFromScript` / `Slot600_DeactivateFromScript` | 2863 / 81C7 | slot `-n` of the eight-slot manager at 0x02000600 |
+| 0822E304 | `GameState_AddListEntryFromScript` | 297E | `-a` into the first free table160 entry |
+| 081A3270 | `Hresvelgr_Create` | C077 | |
+| 081BA5D0 | `Registry2388_Create` | 2388 | |
+| 0822E340, 0822E564, 0822E924, 0822DE64, 0822ECC8 | `GameState_Reset*FromScript`, `SolarFruit_Command` | 01AB, 1887, 1606, 65E2, FE88 | reset a game-state list, then refill it from `-n` count and two value options |
+| 0822DB54 | `RecordEntry_AddFromScript` | 3757 | copies a 32-byte record of 08E6092C |
+| 081DC618, 081DE520, 081EB724 | `ScreenParams_SetFromScript`, `ScreenParams328_SetFromScript`, `Params3D0_SetFromScript` | 317B, FE3F, 3578 | parameter blocks for three screens |
+| 0811D358, 0811D1C0 | `GameState_ClearSlots7A8FromScript`, `GameState_SetNameFromScript` | 7245, 98D8 | |
+| 08178564 | `Hud_CloseMessageFromScript` | C8D1 | HUD mode 7 |
+| 0815A5E8 | `ScriptActor_SetLevelFromScript` | 5335 | |
+| 080F752C | `Sword_Create` | DB8D | |
+| 08073BA0 | `SceneActorContacts_Create` | D854 | |
+
+Guarded drafts (not counted): 081D0C04 `SceneNpc_CreateFromScript` (66.8%),
+081AF4F4 `Vanargand_ResetFromScript` (97.3%, two zero constants in the other order),
+0815A838 (92.0%) and 0815A680 (51%), which both keep a second copy of the actor pointer
+that no tested source form reproduces, and 08119EF0 `Glove_StartFromScript` (58.5%).
+
+### trap (08225624)
+
+The clearing loops are the project's usual signed pointer form (see
+choice_menu.c, directional_interaction.c): `s32 zero = 0; u16 *out = list + 3;
+do { *out-- = zero; } while ((s32)out >= (s32)base);`. The rest came from the
+permuter: the names list needs `u16 *base = *&names;` (taking its address stops
+`names + 3` being hoisted into a callee-saved register before the `-w` loop),
+and the `-s` loop is `for (i = 0, list = names; ...)`.
+
+### Idioms
+
+* "Found" code placed between the keyword test and the search loop comes from
+  an early `if (!Script_SeekToKeyword('n')) return ...;` instead of wrapping
+  the loop in `if (...) { }` (0822E304, 0820A460).
+* Game-state arrays addressed index first (`lsls; adds base; adds #off`) need
+  `*(s16 *)((u8 *)gUnk_02000710 + i * 2 + OFF)`; `state->array[i]` adds the
+  offset first. Storing -1 that way also gives the `movs; rsbs; adds` copy.
+* A loop that only counts (`for (i = 0; i < count; i++) f(Script_GetValue());`)
+  is reversed by agbcc into `subs; cmp #0; bne`; writing the count-down
+  yourself gives `bgt` instead.
+* Callback names: check `symbols/functions.csv` before declaring a `sub_`
+  callback. A renamed one (sub_08073B60 is `SceneActorContacts_Update`)
+  links to nothing in `tools/check.py`, which then reports a one-bit literal
+  mismatch, and `make` fails with an undefined reference.

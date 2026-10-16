@@ -101,7 +101,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/ENTRY_AND_MENUS.md](../docs/ENTRY_AND_MENUS.md) | Entry point and contiguous subsystem batch |  | 5 |
 | [docs/FINDINGS.md](../docs/FINDINGS.md) | Engine findings |  | 5 |
 | [docs/GAME_LAYOUT.md](../docs/GAME_LAYOUT.md) | Boktai 3 game layout: from ROM to gameplay | *#assets* | 33 |
-| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 8 |
+| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 9 |
 | [docs/HIT_SWITCH.md](../docs/HIT_SWITCH.md) | Hit-counted switch pool (tentative identity) |  | 5 |
 | [docs/KNIDL_PROCESS_REVIEW_2026-10-09.md](../docs/KNIDL_PROCESS_REVIEW_2026-10-09.md) | KNIDL workflow review and implications for Boktai 3 | *#process* | 13 |
 | [docs/LEVEL_ADVANCE_DISPLAY.md](../docs/LEVEL_ADVANCE_DISPLAY.md) | Level advancement display (tentative presentation identity) |  | 4 |
@@ -185,12 +185,12 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/WORKER.md](../docs/WORKER.md) | Worker brief: family-oriented matching | *#matching #process* | 15 |
 | [docs/WORKER_ROUND.md](../docs/WORKER_ROUND.md) | Standard round brief (only when workers are authorized) |  | 3 |
 | [docs/tasks/m4a.md](../docs/tasks/m4a.md) | Task: lift the MP2K (m4a) sound library from pokeemerald | *#sound #library* | 3 |
-| [docs/tasks/script_targets.md](../docs/tasks/script_targets.md) | Decomp targets: the code the scripts call | *#scripts #assets #tooling* | 7 |
+| [docs/tasks/script_targets.md](../docs/tasks/script_targets.md) | Decomp targets: the code the scripts call | *#scripts #assets #tooling* | 5 |
 | [docs/history/2026-10-12.md](../docs/history/2026-10-12.md) | Handoff history: 2026-10-12 | #actors #animation #assets #hardware #inventory #library #menu #panel #particles #scene #scripts #sound #text #tooling #wireless | 49 |
 | [docs/history/2026-10-13.md](../docs/history/2026-10-13.md) | Handoff history: 2026-10-13 | #actors #assets #inventory #menu #particles #scene #scripts #text #tooling #wireless | 13 |
 | [docs/history/2026-10-14.md](../docs/history/2026-10-14.md) | Handoff history: 2026-10-14 | #actors #animation #assets #hud #inventory #library #menu #panel #particles #scene #scripts #sound #tether #text #tooling #wireless | 83 |
 | [docs/history/2026-10-15.md](../docs/history/2026-10-15.md) | Handoff history: 2026-10-15 | #actors #animation #assets #inventory #particles #scene #scripts #sound #text #tooling | 41 |
-| [docs/history/2026-10-16.md](../docs/history/2026-10-16.md) | Handoff history: 2026-10-16 | #actors #scripts #text | 1 |
+| [docs/history/2026-10-16.md](../docs/history/2026-10-16.md) | Handoff history: 2026-10-16 | #actors #scripts #text #tooling | 1 |
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 15 |
 | [gcl/README.md](../gcl/README.md) | GCL: the game's scripts | *#scripts #scene #assets #tooling* | 11 |
@@ -270,7 +270,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/scene-panel-states_2026-10-14.md](../notes/scene-panel-states_2026-10-14.md) | Scene panel state and background controls (tentative) | *#scene #panel* | 2 |
 | [notes/scene-pool-states_2026-10-13.md](../notes/scene-pool-states_2026-10-13.md) | Scene pool state family: second contiguous batch | *#scene* | 6 |
 | [notes/scene-pool_2026-10-13.md](../notes/scene-pool_2026-10-13.md) | Scene pool and actor controls, 0803CDF0–0803EE58 | *#actors #scene #tooling* | 5 |
-| [notes/script-entry-points_2026-10-16.md](../notes/script-entry-points_2026-10-16.md) | Script entry points, batch 1 (2026-10-16) | #scripts #text #actors #tooling | 4 |
+| [notes/script-entry-points_2026-10-16.md](../notes/script-entry-points_2026-10-16.md) | Script entry points, batches 1-2 (2026-10-16) | #scripts #text #actors #tooling | 8 |
 | [notes/script-keyframe-pool_2026-10-14.md](../notes/script-keyframe-pool_2026-10-14.md) | Script keyframe pool | *#scripts* | 2 |
 | [notes/script-selector-display_2026-10-14.md](../notes/script-selector-display_2026-10-14.md) | Script selector and shared display animation | *#scripts #animation* | 7 |
 | [notes/script-utility_2026-10-14.md](../notes/script-utility_2026-10-14.md) | Script utility commands and reference ABI | *#scripts #inventory* | 3 |
