@@ -342,7 +342,7 @@ void *sub_080040F8(u16 x, u16 y)
     return s;
 }
 
-s32 sub_08004194(void)
+s32 Centipede_Create(void)
 {
     s32 a = Script_GetKeywordValue(0x6d, 0);
     s32 b = Script_GetKeywordValue(0x6e, 0);

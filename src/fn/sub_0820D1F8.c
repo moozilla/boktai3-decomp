@@ -5,7 +5,7 @@ void Task_Kill(void *);
 void sub_0820C9AC(void);
 void sub_0820CCF4(void);
 s32 sub_0820CD00(void *, void *);
-void *sub_0820D1F8(void *p)
+void *Screamer_Create(void *p)
 {
     void *r = Task_Create(8, 0x220);
     if (r) {

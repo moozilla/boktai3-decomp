@@ -7,7 +7,7 @@ void Task_Kill(void *);
 void sub_081BD2C0(void);
 void sub_081BD2D4(void);
 
-void *sub_081BD814(void)
+void *DarkLoan_Create(void)
 {
     void *r = Task_Create(0xb, 2356);
     if (r != 0) {

@@ -113,7 +113,7 @@ void MessageMenu_UpdateTask(void);
 
 void MessageMenu_DestroyTask(void);
 
-void *sub_080114CC(void)
+void *Password_Create(void)
 {
     void *obj;
     obj = Task_Create(11, 0x4D8);

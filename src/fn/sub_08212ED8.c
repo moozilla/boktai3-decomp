@@ -6,7 +6,7 @@ s32 sub_08212D84(void *, u32);
 void sub_0821290C(void);
 void sub_08212D64(void);
 extern void *gUnk_02000608;
-void *sub_08212ED8(u32 a)
+void *ForgingBook_Create(u32 a)
 {
     void *p = Task_Create(8, 0xbf0);
     if (p) {

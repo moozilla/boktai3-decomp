@@ -5,7 +5,7 @@ s32 sub_081D6984(void *, void *);
 void Task_Kill(void *);
 void sub_081D61C0(void);
 void sub_081D68AC(void);
-void *sub_081D6BC0(void *a)
+void *MonsterBook_Create(void *a)
 {
     void *p = Task_Create(8, 0xf20);
     if (p) {

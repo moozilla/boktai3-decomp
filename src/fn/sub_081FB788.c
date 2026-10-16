@@ -6,7 +6,7 @@ void sub_081FAD74(void);
 void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
 s32 sub_081FAE0C(void *, void *);
 void Task_Kill(void *);
-void *sub_081FB788(void *arg)
+void *Ratatosk_Create(void *arg)
 {
     void *p = sub_0802140C(4);
     if (p)
