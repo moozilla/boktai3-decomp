@@ -17,7 +17,7 @@ const NAV = [
 function studioHeader(tools = '') {
   const h = $('top');
   if (!h) return;
-  if (EMBED) { h.remove(); document.body.classList.add('embed'); return; }
+  if (EMBED) { h.remove(); document.body.classList.add('embed'); keepEmbed(); return; }
   const here = location.pathname === '/index.html' ? '/' : location.pathname;
   const tab = (location.hash.slice(1) || '').split('/')[0];
   h.innerHTML = `<h1>Boktai 3 Studio</h1><nav>${NAV.map(([n, u]) => {
@@ -32,6 +32,21 @@ function markNav() {
 }
 
 // ---------- peek panel ----------
+// Inside a panel, links to other Studio pages keep ?embed=1, so the page they
+// open has no header of its own either.
+const embedHref = href => { const u = new URL(href, location.href); u.searchParams.set('embed', '1'); return u.toString(); };
+function keepEmbed() {
+  document.addEventListener('click', e => {
+    const a = e.target.closest && e.target.closest('a[href]');
+    if (!a || a.target === '_blank' || e.defaultPrevented) return;
+    const u = new URL(a.href, location.href);
+    if (u.origin !== location.origin || u.searchParams.has('embed')) return;
+    if (u.pathname === location.pathname && u.search === location.search) return;  // same page: a hash change
+    e.preventDefault();
+    location.href = embedHref(u.toString());
+  }, true);
+}
+
 // peek('/gfx#maps/C5A7') opens the page in a panel on the right (embed mode).
 function peek(url) {
   let p = $('peek');
@@ -52,7 +67,7 @@ document.addEventListener('click', e => {
   const a = e.target.closest && e.target.closest('a[data-peek]');
   if (!a || e.metaKey || e.ctrlKey || e.shiftKey) return;
   e.preventDefault(); e.stopPropagation();
-  if (EMBED && window.parent !== window) { location.href = a.getAttribute('href') + ''; return; }
+  if (EMBED && window.parent !== window) { location.href = embedHref(a.href); return; }
   peek(a.getAttribute('href'));
 }, true);
 const peekLink = (href, text) => `<a href="${href}" data-peek>${text}</a>`;
