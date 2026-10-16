@@ -1349,7 +1349,7 @@ void sub_08225AB4(struct SceneBody *, u32, struct SceneVec *, s32, s32, struct S
 
 void sub_08225B28(struct SceneBody *, struct SceneDraw *);
 
-u32 sub_0822C034(struct SceneVec *);
+u32 Region_FindContaining(struct SceneVec *);
 
 u32 sub_0821D698(void *, u32, u32, u32, u32, u32);
 
@@ -1412,7 +1412,7 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     sub_08225B28(&p->body, draw);
     p->body.position = p->center;
     if (flags16(p, 16)) {
-        p->owner = sub_0822C034(&p->body.position);
+        p->owner = Region_FindContaining(&p->body.position);
         pos = &p->body.position;
     } else {
         p->owner = 0;

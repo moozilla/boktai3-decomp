@@ -120,7 +120,7 @@ s32 EffectEmitter_Initialize(struct EffectEmitter *object, u32 id, u32 unused)
         position.y = 0;
         position.z = 0;
     }
-    object->scene = sub_0822C034(&position);
+    object->scene = Region_FindContaining(&position);
     object->rising = 0;
     object->baseY = ((struct EmitterVec *)&position)->y;
     object->offset = 0;

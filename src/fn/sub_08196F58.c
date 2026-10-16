@@ -22,7 +22,7 @@ struct P08196F58 {
 void sub_08193680(void *, u32);
 void sub_08195014(void *, s32, s32);
 void sub_08195254(void *);
-void sub_08177DEC(u32);
+void Hud_SetMode(u32);
 void sub_082279A8(u32, u32, u32, u32, u32, u32, u32);
 void sub_08159164(u32);
 void sub_081D5204(u32);
@@ -58,7 +58,7 @@ void sub_08196F58(struct P08196F58 *t)
             t->pos.z = (z >> 8) + t->base.z;
             if (t->a >= 0) {
                 t->state++;
-                sub_08177DEC(7);
+                Hud_SetMode(7);
                 sub_082279A8(3, 4, 0x1f, 0x1f, 0x1f, 0xffff, 0);
             }
             break;

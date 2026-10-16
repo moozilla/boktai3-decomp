@@ -53,7 +53,7 @@ void *sub_0800C7AC(u32, u32);
 
 /* Engine helpers. */
 s32 sub_0800AFE8(s32, u32, s32, struct EmitterVec *, void *, s32, s32);
-void *sub_0822C034(void *);
+void *Region_FindContaining(void *);
 void sub_08013684(void *);
 void Shadow_Initialize(void *, void *, u32);
 

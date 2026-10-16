@@ -91,7 +91,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/BOUNCING_OBJECTS.md](../docs/BOUNCING_OBJECTS.md) | Twelve-slot bouncing objects (080688D0–08069964) | *#particles* | 4 |
 | [docs/BURST_EMITTER.md](../docs/BURST_EMITTER.md) | Five-slot burst emitter (tentative identity) | *#particles* | 2 |
 | [docs/CANDIDATES.md](../docs/CANDIDATES.md) | Compact checking and candidate checkpoints | *#tooling* | 3 |
-| [docs/CENTAUR.md](../docs/CENTAUR.md) | Centaur: playing with the decomp | *#scene #tooling* | 17 |
+| [docs/CENTAUR.md](../docs/CENTAUR.md) | Centaur: playing with the decomp | *#scene #tooling* | 19 |
 | [docs/COMPILER_REFERENCES.md](../docs/COMPILER_REFERENCES.md) | Community references and checked agbcc patterns | *#assets #matching* | 4 |
 | [docs/DATA.md](../docs/DATA.md) | Decoded data |  | 7 |
 | [docs/DEVLOG_2026-10-08.md](../docs/DEVLOG_2026-10-08.md) | Boktai 3 devlog for October 8 2026 | *#process* | 21 |
@@ -271,7 +271,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/scene-panel-states_2026-10-14.md](../notes/scene-panel-states_2026-10-14.md) | Scene panel state and background controls (tentative) | *#scene #panel* | 2 |
 | [notes/scene-pool-states_2026-10-13.md](../notes/scene-pool-states_2026-10-13.md) | Scene pool state family: second contiguous batch | *#scene* | 6 |
 | [notes/scene-pool_2026-10-13.md](../notes/scene-pool_2026-10-13.md) | Scene pool and actor controls, 0803CDF0–0803EE58 | *#actors #scene #tooling* | 5 |
-| [notes/script-entry-points_2026-10-16.md](../notes/script-entry-points_2026-10-16.md) | Script entry points, batches 1-8 (2026-10-16) | #scripts #text #actors #tooling | 16 |
+| [notes/script-entry-points_2026-10-16.md](../notes/script-entry-points_2026-10-16.md) | Script entry points, batches 1-9 (2026-10-16) | #scripts #text #actors #tooling | 17 |
 | [notes/script-keyframe-pool_2026-10-14.md](../notes/script-keyframe-pool_2026-10-14.md) | Script keyframe pool | *#scripts* | 2 |
 | [notes/script-selector-display_2026-10-14.md](../notes/script-selector-display_2026-10-14.md) | Script selector and shared display animation | *#scripts #animation* | 7 |
 | [notes/script-utility_2026-10-14.md](../notes/script-utility_2026-10-14.md) | Script utility commands and reference ABI | *#scripts #inventory* | 3 |

@@ -1,4 +1,4 @@
-# Script entry points, batches 1-8 (2026-10-16)
+# Script entry points, batches 1-9 (2026-10-16)
 
 Tags: #scripts #text #actors #tooling
 
@@ -262,3 +262,40 @@ differently and the scratch registers in its hoisted-address region differ.
 
 Enemy spawners (registry kinds 51-63) stay unnamed: all of them load the shared
 sprites 7E82/7E7D, so no family in docs/ASSETS.md picks them out.
+
+## Batch 9
+
+Matched 10. Two are entry points:
+
+* 081CE6DC `SceneCharacter_CommandFromScript` (registry F9D7). It finds the
+  character named `-n`; for kind 29 it applies `-C` and resets the speed to
+  400, then runs the same `-i` behavior switch as place_character, except that
+  case 2 falls through into case 4. No register pinning needed.
+* 08054B64 `HitSwitch_AddFromScript` returns whatever its (void) callee leaves
+  in r0, so the callee is declared with a result in that file.
+
+Eight are routines that entry points call:
+
+* 082151E4 `AnimData_Load` (9 callers), 08177DEC `Hud_SetMode` (4) and
+  0822B358 `Sound_StopSong` (3).
+* 0822C034 `Region_FindContaining` (7) and 082265F8 `Camera_ReadMoveRate` (8).
+* 0822E498 `GameState_AddEquipment`, 0822E668 `GameState_AddUnlock` and
+  081975C8 `Nidhoggr_ReadOptions`.
+
+Idioms:
+
+* `for (i = 0, p = base; i < n; p++, i++)`: the order of the increments (and
+  of the initializers) decides the instruction order (0822C034, 082151E4).
+* After `if (busy) return;`, write the stores of zero as literal `0`: agbcc
+  reuses the known-zero register (08177DEC). Storing the variable adds a copy.
+* A loop-invariant `mask = ~1` re-assigned before each loop matches where
+  `&= ~1` doesn't (08177DEC).
+* `x = v = f();` before the zero temporaries are set orders the stores
+  (081975C8).
+
+Guarded drafts: Registry1745_Create (0810B914, a singleton task creator),
+Pool1B8_FindByName (081081F0, 4 bytes off), Route_Start (0821E5C4),
+Anim_SetSequence (08220C8C, one register) and Math_Atan2 (082215E4); the
+Glove_StartFromScript draft went from 58.5% to 82.9%. The remaining
+unmatched entry points are mostly large and inline the packed-command
+sprite stepper.

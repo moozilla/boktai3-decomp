@@ -2,7 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
-u32 sub_0822C034(void *);
+u32 Region_FindContaining(void *);
 struct PackedPoint {
     u32 xy;
     u32 z : 16;
@@ -37,7 +37,7 @@ void AreaEffect_AddRectangleFromScript(void)
                         ((u32 *)&point)[1] = (((u32 *)&point)[1] & mask) | z;
                     }
                 }
-                manager->entries[*count].cachedValue = sub_0822C034(&point);
+                manager->entries[*count].cachedValue = Region_FindContaining(&point);
                 manager->entries[*count].enabled = 1;
                 (*count)++;
             }
