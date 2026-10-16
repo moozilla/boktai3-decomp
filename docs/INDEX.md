@@ -85,7 +85,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/ACTOR_ATTACHMENT_MANAGER.md](../docs/ACTOR_ATTACHMENT_MANAGER.md) | Attachment manager lifecycle and scene actor pool prefix | *#actors #scene #assets* | 8 |
 | [docs/ANIMATION_081E.md](../docs/ANIMATION_081E.md) | Animation controller matching batch | *#scripts #animation #assets #matching* | 5 |
 | [docs/ASM_OUTPUT_QC.md](../docs/ASM_OUTPUT_QC.md) | Empty-asm outputs and return-value QC |  | 5 |
-| [docs/ASSETS.md](../docs/ASSETS.md) | Resources and asset formats | *#scripts #assets #text #tooling* | 29 |
+| [docs/ASSETS.md](../docs/ASSETS.md) | Resources and asset formats | *#scripts #assets #text #tooling* | 30 |
 | [docs/BACKGROUND_CONTROLLERS.md](../docs/BACKGROUND_CONTROLLERS.md) | Background controllers and scheduler report groups | *#assets #progress* | 3 |
 | [docs/BACKLOG.md](../docs/BACKLOG.md) | Research and development backlog |  | 15 |
 | [docs/BOUNCING_OBJECTS.md](../docs/BOUNCING_OBJECTS.md) | Twelve-slot bouncing objects (080688D0–08069964) | *#particles* | 4 |
