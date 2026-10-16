@@ -334,8 +334,8 @@ views.big = {
     const v = $('view');
     if (i < 0) { v.textContent = 'Not found'; return; }
     const r = big.recs[i], frames = big.frames(i);
-    v.innerHTML = `<h2>Large sprite ${h}</h2><div class="meta">${NOTES[h] ? NOTES[h] + ' · ' : ''}${frames.length} frames · ${r.w}×${r.h} · palette entry ${lp}${lp === dflt ? ' (default, from the sprite data)' : ' (a variant the code selects)'}, centre (${r.cx}, ${r.cy}) · frame order shown, not the game's animation timing</div>
-      <div class="controls"><label>Speed <select id="spd"><option value="4">fast</option><option value="8" selected>normal</option><option value="16">slow</option></select></label>${variants.length > 1 ? ` <label>Palette <select id="bigpool">${variants.map(p => `<option value="${p}"${p === lp ? ' selected' : ''}>pool ${p}${p === dflt ? ' (default)' : ''}</option>`).join('')}</select></label>` : ''} <span id="tagslot"></span></div>
+    v.innerHTML = `<h2>Large sprite ${h}</h2><div class="meta">${NOTES[h] ? NOTES[h] + ' · ' : ''}${frames.length} frames · ${r.w}×${r.h} · palette entry <a href="#pool/${lp}">${lp}</a>${noteOf('pool', String(lp))?.label ? ' ' + esc(noteOf('pool', String(lp)).label) : ''}${lp === dflt ? ' (default, from the sprite data)' : ' (a variant the code selects)'}, centre (${r.cx}, ${r.cy}) · frame order shown, not the game's animation timing</div>
+      <div class="controls"><label>Speed <select id="spd"><option value="4">fast</option><option value="8" selected>normal</option><option value="16">slow</option></select></label>${variants.length > 1 ? ` <label>Palette <select id="bigpool">${variants.map(p => `<option value="${p}"${p === lp ? ' selected' : ''}>pool ${p}${p === dflt ? ' (default)' : ''}${noteOf('pool', String(p))?.label ? ' · ' + esc(noteOf('pool', String(p)).label) : ''}</option>`).join('')}</select></label>` : ''} <span id="tagslot"></span></div>
       <div class="stage" id="stage"></div><div id="framenote"></div><div class="strip" id="strip"></div>
       <h2 style="margin-top:20px">All large sprites</h2><div class="meta">First frame of each; click to open.</div><div class="grid" id="all"></div>`;
     const ps = frames.map(f => big.parts(f)), all = ps.flat();
@@ -641,25 +641,73 @@ views.maps = {
 views.pool = {
   free: true,  // any entry number, not just the listed pages
   async init() {
+    if (this.users) return;
     const pool = await spritePool();
-    // which packages start where
+    // who draws with each entry: small packages (bank b uses base + b, over
+    // every bank their parts use) and large sprites (the default in their
+    // data, and the variants the game selects: data/sprite_palettes.csv)
     const users = {};
-    await Promise.all((index.tCB05 || []).map(async ([h]) => { const b = await res('tCB05', h); (users[le(b, 0)] ||= []).push(h); }));
+    const add = (i, u) => (users[i] ||= []).push(u);
+    await Promise.all((index.tCB05 || []).map(async ([h]) => {
+      const b = await res('tCB05', h), pkg = parsePackage(b), base = le(b, 0);
+      let banks = 1;
+      for (const f of pkg.frames) for (const p of pkg.parts(f)) banks = Math.max(banks, p.bank + 1);
+      for (let k = 0; k < banks; k++) add(base + k, { kind: 'spr', hash: h, bank: k });
+    }));
+    if (!big) { const e = index.t98F5[0][0]; big = parseBig(await res('t98F5', e)); }
+    big.recs.forEach(r => {
+      const vs = (learned.bigpools || {})[r.hash] || [r.pal];
+      vs.forEach(p => add(p, { kind: 'big', hash: r.hash, variant: p !== r.pal }));
+      if (!vs.includes(r.pal)) add(r.pal, { kind: 'big', hash: r.hash, variant: false });
+    });
     this.users = users;
-    items = Array.from({ length: Math.ceil(pool.n / 32) }, (_, k) => ({ key: String(k * 32), note: `entries ${k * 32}–${Math.min(pool.n, k * 32 + 32) - 1}`, n: Object.keys(users).filter(u => u >= k * 32 && u < k * 32 + 32).length + ' pkg' }));
+    items = Array.from({ length: Math.ceil(pool.n / 32) }, (_, k) => ({ key: String(k * 32), note: `entries ${k * 32}–${Math.min(pool.n, k * 32 + 32) - 1}`,
+      n: Array.from({ length: 32 }, (_, j) => (users[k * 32 + j] || []).length).reduce((x, y) => x + y, 0) + ' uses' }));
   },
   async show(key) {
     const pool = await spritePool(), want = +key, start = Math.floor(want / 32) * 32, v = $('view');
-    v.innerHTML = `<h2>Sprite palette pool</h2><div class="meta">Resource 9B1B: ${pool.n} sub-palettes of 16 colors. The game copies entries into OBJ palette banks as sprites need them; a sprite package's first word is the entry its palette bank 0 uses. Showing ${start}–${Math.min(pool.n, start + 32) - 1}.</div><div class="palgrid" id="pg"></div>`;
+    v.innerHTML = `<h2>Sprite palette pool</h2><div class="meta">Resource 9B1B: ${pool.n} sub-palettes of 16 colors. A small sprite package's first word is the entry its bank 0 uses (bank b uses entry + b); a large sprite's default entry is in its frame data, and the code can select others (variants, often a different monster: data/sprite_palettes.csv). Each card lists what draws with that entry, in that entry's colors; click one to open it in this palette. Showing ${start}–${Math.min(pool.n, start + 32) - 1}.</div><div class="palgrid" id="pg"></div>`;
     for (let i = start; i < Math.min(pool.n, start + 32); i++) {
       const card = document.createElement('div'); card.className = 'palcard' + (i === want ? ' on' : '');
-      const us = this.users[i] || [];
-      card.innerHTML = `<code>#${i}</code> ${us.map(h => `<a href="#sprites/${h}">${h}</a>${NOTES[h] ? ' ' + esc(NOTES[h]) : ''}`).join(', ')}<div class="pal" style="grid-template-columns:repeat(16,14px)">${pool.entry(i).map(([r, g, b]) => `<i style="background:rgb(${r},${g},${b})"></i>`).join('')}</div>`;
-      if (i === want) setTimeout(() => card.scrollIntoView({ block: 'center' }), 0);
+      const us = this.users[i] || [], lab = noteOf('pool', String(i))?.label;
+      card.innerHTML = `<code>#${i}</code>${lab ? ` <b>${esc(lab)}</b>` : ''} <span class="meta">${us.length ? us.length + ' use' + (us.length > 1 ? 's' : '') : 'unused as far as known'}</span><div class="pal" style="grid-template-columns:repeat(16,14px)">${pool.entry(i).map(([r, g, b]) => `<i style="background:rgb(${r},${g},${b})"></i>`).join('')}</div><div class="uses" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>`;
+      const box = card.querySelector('.uses');
+      for (const u of us.slice(0, 24)) {
+        const a = document.createElement('a');
+        a.href = `#${u.kind === 'big' ? 'big' : 'sprites'}/${u.hash}`;
+        a.title = `${u.kind === 'big' ? 'large sprite' : 'sprite package'} ${u.hash}${u.kind === 'spr' && u.bank ? ' bank ' + u.bank : ''}${u.kind === 'big' ? (u.variant ? ' (variant)' : ' (default)') : ''}${NOTES[u.hash] ? ': ' + NOTES[u.hash] : ''}`;
+        a.style.cssText = 'display:inline-flex;flex-direction:column;align-items:center;font-size:10px;text-decoration:none';
+        a.onclick = () => { if (u.kind === 'big') bigPool[u.hash] = i; };
+        a.innerHTML = `<span class="th" style="width:48px;height:48px;display:flex;align-items:center;justify-content:center"></span>${u.hash}${u.variant ? '*' : ''}`;
+        box.appendChild(a);
+        thumbIn(u, i).then(cv => cv && a.querySelector('.th').appendChild(cv));
+      }
+      if (us.length > 24) box.insertAdjacentHTML('beforeend', `<span class="meta">+${us.length - 24} more</span>`);
+      card.onclick = e => { if (e.target.closest('a,input,textarea')) return; location.hash = 'pool/' + i; };
+      if (i === want) {
+        card.appendChild(noteEditor('pool', String(i), () => views.pool.show(key)));
+        setTimeout(() => card.scrollIntoView({ block: 'center' }), 0);
+      }
       $('pg').appendChild(card);
     }
   },
 };
+// a 48px thumbnail of a sprite's first frame drawn with pool entry `entry`
+// (for a package, entry is its bank `u.bank`'s entry, so bank 0 = entry - bank)
+async function thumbIn(u, entry) {
+  let parts, colors;
+  if (u.kind === 'big') {
+    const k = big.recs.findIndex(r => r.hash === u.hash), f = k >= 0 && big.frames(k)[0];
+    if (!f) return null;
+    parts = big.parts(f); colors = await packageColors(null, entry);
+  } else {
+    const b = await res('tCB05', u.hash), pkg = parsePackage(b), k = pkg.anims[0]?.keys[0]?.frame ?? 0;
+    if (!pkg.frames[k]) return null;
+    parts = pkg.parts(pkg.frames[k]); colors = await packageColors(null, entry - u.bank);
+  }
+  const img = compose(parts, colors);
+  return img && fitCanvas(toCanvas(img), 48);
+}
 
 // ---------- data: resources that are not graphics ----------
 views.data = {
