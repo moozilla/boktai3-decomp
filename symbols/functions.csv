@@ -27,7 +27,7 @@ addr,name,mode,confidence,source,notes
 080035F0,Palette_SetBrightnessFromScript,thumb,low,src-alias,
 080038B4,ColorFade_ApplyCommand,thumb,low,src-alias,
 08003960,ColorFade_ApplyCommands,thumb,low,src-alias,
-08003B00,ScreenFade_FromScript,thumb,low,gcl-behavior,registry 9C2C; proc 899 passes a color index mapped to an RGB triple and a frame count
+08003B00,ColorFade_FromScript,thumb,low,gcl-behavior,registry 9C2C; proc 899 passes a color index mapped to an RGB triple and a frame count
 08003BB8,TerrainOverlay_QueueCommand,thumb,low,src-alias,
 08003C20,TerrainOverlay_Update,thumb,low,src-alias,
 08004018,TerrainOverlay_DestroyDrawables,thumb,low,src-alias,
