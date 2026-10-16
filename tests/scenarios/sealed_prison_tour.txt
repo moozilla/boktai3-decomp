@@ -1,0 +1,14 @@
+# Tour of the Sealed Prison: warp in, move the player, run a procedure, capture.
+from field
+warp 2712 8                # skylight and Solar Gauge tutorial room
+wait 240
+shot skylight_room
+pos 1152 256 1152          # move the player across the room
+wait 20
+shot moved
+call 1437                  # a procedure: sets sunrise/sunset times
+wait 10
+warp 2705 57               # Gun Del Sol room (opens on Otenko's dialogue)
+wait 240
+shot gun_del_sol_room
+capture gun_del_sol
