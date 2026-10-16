@@ -5,7 +5,7 @@ void Task_Kill(void *);
 void sub_0820B3E0(void);
 void sub_0820B7D4(void);
 s32 sub_0820B7E0(void *, void *);
-void *sub_0820BCE0(void *p)
+void *DragonPuppy_Create(void *p)
 {
     void *r = Task_Create(8, 0x198);
     if (r) {

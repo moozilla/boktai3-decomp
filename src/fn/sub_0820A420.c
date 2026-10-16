@@ -6,7 +6,7 @@ void Task_Kill(void *);
 void sub_0820A2C8(void);
 void sub_0820A364(void);
 
-void *sub_0820A420(void)
+void *FanCannonManager_Create(void)
 {
     void *p = Task_Create(8, 0xc1c);
     if (p) {

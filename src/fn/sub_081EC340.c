@@ -6,7 +6,7 @@ void sub_081EC1A8(void);
 void sub_081EC1F8(void);
 s32 sub_081EC204(void *);
 
-void *sub_081EC340(void)
+void *Results_Create(void)
 {
     void *r = Task_Create(0xb, 0x138);
     if (r != 0) {

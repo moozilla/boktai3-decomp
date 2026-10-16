@@ -6,7 +6,7 @@ void sub_081E132C(void);
 void sub_081E154C(void);
 s32 sub_081E15C8(void *);
 
-void *sub_081E1AB4(void)
+void *GameStart_Create(void)
 {
     void *r = Task_Create(0xb, 0x4f0);
     if (r != 0) {

@@ -5,7 +5,7 @@ void Task_Kill(void *);
 void sub_08206030(void);
 void sub_0820608C(void);
 s32 sub_08206098(void *, void *);
-void *sub_08206470(void *p)
+void *Ooze_Create(void *p)
 {
     void *r = Task_Create(8, 0x160);
     if (r) {

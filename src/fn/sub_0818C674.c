@@ -11,7 +11,7 @@ void sub_0818A820(void);
 void sub_0818ADB4(void);
 s32 sub_0818C0BC(void *, s32, s32);
 void SceneMessages_RegisterReceiver(void *, s32, s32);
-struct P *sub_0818C674(u16 a, u16 b)
+struct P *Armor_Create(u16 a, u16 b)
 {
     struct P *p = Task_Create(8, 0x1134);
     if (p != 0) {
