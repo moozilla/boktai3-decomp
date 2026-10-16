@@ -12,16 +12,16 @@ dungeon or town sit next to each other in the script numbering, while doors
 across larger gaps lead to the world map, another town or a story scene.
 Areas are numbered by their lowest scene id. This is a working grouping for
 browsing, not a game structure; with today's data it gives 76 areas, the same
-numbering the vision pass used (data/vision/areas_*.csv).
+numbering the labeling pass used (data/labels/areas.csv).
 
-Labels: an area takes the vision pass label (data/vision/areas_*.csv) of the
-vision area that shares the most scenes with it (data/vision/scenes_*.csv);
+Labels: an area takes the labeling pass place (data/labels/areas.csv, a Codex
+pass that read the walkthroughs and the translation project's guide) of the
+labeled area that shares the most scenes with it (data/labels/scenes.csv);
 scenes keep their data/notes.csv label (kind=script, key = scene).
 Output is ROM-derived; keep it under build/.
 """
 import collections
 import csv
-import glob
 import json
 import os
 import sys
@@ -33,7 +33,7 @@ from romlib import ROOT  # noqa: E402
 
 GAP = 60
 STAGES = os.path.join(ROOT, "build", "assets", "stages.json")
-VISION = os.path.join(ROOT, "data", "vision")
+LABELS = os.path.join(ROOT, "data", "labels")
 NOTES = os.path.join(ROOT, "data", "notes.csv")
 
 
@@ -76,14 +76,17 @@ def group(scenes, gap=GAP):
 
 
 def vision_labels():
-    """({vision area: {label, confidence, evidence}}, {scene: vision area}, {scene: row})."""
+    """({labeled area: {label, confidence, evidence}}, {scene: labeled area}, {scene: row})."""
     areas, scene_area, scene_rows = {}, {}, {}
-    for f in sorted(glob.glob(os.path.join(VISION, "areas_*.csv"))):
+    f = os.path.join(LABELS, "areas.csv")
+    if os.path.exists(f):
         for r in csv.DictReader(open(f, encoding="utf-8")):
-            areas[int(r["area"])] = r
-    for f in sorted(glob.glob(os.path.join(VISION, "scenes_*.csv"))):
+            areas[int(r["area"])] = dict(r, label=r["place"])
+    f = os.path.join(LABELS, "scenes.csv")
+    if os.path.exists(f):
         for r in csv.DictReader(open(f, encoding="utf-8")):
-            scene_area[int(r["scene"])] = int(r["area"])
+            if r["area"].isdigit():
+                scene_area[int(r["scene"])] = int(r["area"])
             scene_rows[int(r["scene"])] = r
     return areas, scene_area, scene_rows
 
