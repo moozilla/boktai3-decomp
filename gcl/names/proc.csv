@@ -5,9 +5,11 @@ proc,name,params,confidence,evidence
 558,update_elapsed_days,,low,compares the saved date r708[0xc2..0xc6] with today (r700[0x56..]); prints 日数差を取得 (got the day difference)
 861,scene_start,flags,low,"first call of every scene entry: sets scene flags r700[0x6c] (early story, entrance ranges, stage ranges)"
 864,scene_set_mode,mode,low,second call of every scene entry: sets gs[0x868]
+868,set_hud_layout,,low,sub_081780D4 with element visibility lists
 872,scene_is_set_up,,low,scene setup runs inside if (proc_872() == 0) (docs/ASSETS.md)
 875,advance_story,value,high,"story = max(story, value)"
 876,load_stage_raw,"map,tileset,hp",medium,"the loader 884/885 wrap (docs/ASSETS.md, Stage scripts)"
+878,load_background_layer,"name,tiles,scroll,data",medium,Background_LoadTiles/LoadMaps on layer 2
 879,spawn_background,"name,map,,,",medium,a Background actor (the c_f/c_i/c_d options)
 884,load_stage,"map,tileset,hp",high,loads the stage (docs/ASSETS.md); 194 stages follow it with proc_888
 885,load_stage_alt,"map,tileset,hp",medium,wraps 876 like 884 (docs/ASSETS.md)
@@ -60,8 +62,10 @@ proc,name,params,confidence,evidence
 1022,message_then,proc,medium,"proc_1019 with r700[0xb.1] set; follows a message (1C64), e.g. proc_1022(0x1392) continues with proc 5010"
 1024,close_message_window_if_open,,medium,gs[0x86c] = 0 and sub_08030C78 when the window is open
 1025,close_message_window,,medium,proc_1024 then sub_0817809C(m=7)
+1026,end_dialogue,,medium,"end_event, close the message window, restore the HUD mode"
 1036,end_event_restore_hud,,low,"sub_081D105C, end_event, then HUD mode 0 (2 in stages 521-525)"
 1048,play_bgm,id,medium,"proc_1051(1, id, 0): music with a fade; r708[0x72] is the current track"
+1049,play_bgm_with_fade,"fade,id",medium,"play_bgm_fade(fade, id, 0)"
 1051,play_bgm_fade,"fade,id,urgent",medium,"fade 0 plays at once (print: No fade, play immediately!); keeps the previous track in r708[0x74]"
 1052,add_display_track,id,low,proc_1053 then a palette track
 1059,place_scene_object,"id,type,x,z",medium,proc_1060 with defaults
@@ -69,10 +73,18 @@ proc,name,params,confidence,evidence
 1072,add_area_sprite,"entries,x,z,kind",medium,AreaEffect_AddSprite at the cell centre
 1092,place_object_at,"name,type,,x,z,dx,dz",low,proc_1093 at cell centre plus offset
 1093,place_object,"name,type,,x,z",low,sub_081B897C with a size from the type
+1096,box_edge_position,"box,facing",medium,sets r700[0x76]/[0x64]/[0x78] to the point on the box edge for a facing
+1097,place_object_at_box_2,"name,box,facing,",low,proc_1098 with defaults
 1100,place_object_at_box,"name,box,facing,",low,copies the box (proc_1096) and creates the object at it (proc_1102)
+1101,place_numbered_object_at_box,"box,facing,variant",low,up to eight objects named 0x6A40+n (r700[0xc5] counts them)
+1102,append_scene_object,"name,x,y,z,,facing,variant",medium,SceneObjects_ScriptAppend
 1118,floor_item,"category,item,x,z,facing,flags,flag",medium,an item on the floor (docs/ASSETS.md)
 1119,place_item,"category,item,x,z,facing,chest,,flags,flag,proc",medium,an item; chest = 1 puts it in a chest (docs/ASSETS.md)
 1120,create_item,,medium,creates the pickup or the chest actor 430D (docs/ASSETS.md)
+1126,item_flag_state,flag,medium,reads the 256 item-taken flags r708[0x41] and two more tables; returns 0-3
+1131,place_random_items,"table,count",low,"up to eight items from a text-bank data table (e.g. text#210), via proc_1132"
+1132,place_random_item,"table,index",low,"reads a (kind, item, ...) triplet from the table"
+1154,actor_name_of,id,low,maps a number to a hash (name) in a 120-line table
 1156,spawn_ghost_npc,"name,x,z,facing",low,a Ghost actor (CCD3) with script state
 1200,enemy_count_slot,,low,"index of the first set flag r708[0x6e.2][0..3], else -1 (enemy-count missions)"
 1204,begin_enemy_count,id,low,finds id in r708[0x215][0..63] and starts counting
@@ -81,14 +93,23 @@ proc,name,params,confidence,evidence
 1208,enemy_spawned,"name,slot",low,proc_1209 and proc_1203
 1211,enemy_may_spawn,kind,low,returns 1 or 0 for a spawner kind under the current mission
 1212,enemy_slot_taken,,low,r708[0x256.0][...] == 1 while counting
+1219,place_goddess_statue,"x,z",medium,"in an enemy-count mission: items 0x32-0x34, the Fate/Existence/Necessity Goddess Statues, by stage"
 1265,spawn_scene_managers,,medium,"proc_1266, 1267, 1268; every scene entry calls it"
 1266,spawn_common_managers,,medium,"the Continue? prompt, DemoManager, audio, actor registry, terrain markers..."
 1267,spawn_message_managers,,low,"the message window actors, then closes the window"
 1268,spawn_pause_menu,,low,an actor given the item and menu text ids
 1493,enemy_level,value,low,used by spawners for HP/attack formulas
+1495,spawn_bok_by_kind,"name,kind,path",medium,"picks one of procs [1496, 1497, 1498, 1499, 1500] by kind"
+1496,spawn_bok_1,"name,path",medium,"enemy spawner: creates the bok family (docs/ASSETS.md, 1496-1627)"
+1497,spawn_bok_2,"name,path",medium,"enemy spawner: creates the bok family (docs/ASSETS.md, 1496-1627)"
+1498,spawn_bok_3,"name,path",medium,"enemy spawner: creates the bok family (docs/ASSETS.md, 1496-1627)"
+1499,spawn_bok_4,"name,path",medium,"enemy spawner: creates the bok family (docs/ASSETS.md, 1496-1627)"
+1500,spawn_bok_5,"name,path",medium,"enemy spawner: creates the bok family (docs/ASSETS.md, 1496-1627)"
+1501,spawn_mummy_by_kind,"name,kind,path",medium,"picks one of procs [1502, 1503, 1504] by kind"
 1502,spawn_mummy_1,"name,path",medium,"enemy spawner: creates key 6913 (docs/ASSETS.md, 1496-1627)"
 1503,spawn_mummy_2,"name,path",medium,"enemy spawner: creates key 6913 (docs/ASSETS.md, 1496-1627)"
 1504,spawn_mummy_3,"name,path",medium,"enemy spawner: creates key 6913 (docs/ASSETS.md, 1496-1627)"
+1505,spawn_golem_by_kind,"name,kind,path",medium,"picks one of procs [1506, 1507, 1508, 9737] by kind"
 1506,spawn_golem_1,"name,path",medium,"enemy spawner: creates key 98EC (docs/ASSETS.md, 1496-1627)"
 1507,spawn_golem_2,"name,path",medium,"enemy spawner: creates key 98EC (docs/ASSETS.md, 1496-1627)"
 1508,spawn_golem_3,"name,path",medium,"enemy spawner: creates key 98EC (docs/ASSETS.md, 1496-1627)"
@@ -104,12 +125,23 @@ proc,name,params,confidence,evidence
 1518,spawn_skeleton_9,"name,path",medium,"enemy spawner: creates key AD03 (docs/ASSETS.md, 1496-1627)"
 1519,spawn_skeleton_10,"name,path",medium,"enemy spawner: creates key AD03 (docs/ASSETS.md, 1496-1627)"
 1520,spawn_skeleton_11,"name,path",medium,"enemy spawner: creates key AD03 (docs/ASSETS.md, 1496-1627)"
+1521,spawn_dog_by_kind,"name,kind,path",medium,"picks one of procs [1522, 1523, 1524, 1525] by kind"
+1522,spawn_dog_1,"name,path",medium,enemy spawner: creates key F836
+1523,spawn_dog_2,"name,path",medium,enemy spawner: creates key F836
+1524,spawn_dog_3,"name,path",medium,enemy spawner: creates key F836
+1525,spawn_dog_4,"name,path",medium,enemy spawner: creates key F836
+1526,spawn_vorn_by_kind_1,"name,kind,path",medium,"picks one of procs [1529, 1530] by kind"
+1527,spawn_vorn_by_kind_2,"name,kind,path",medium,"picks one of procs [1529, 1530] by kind"
+1528,spawn_vorn_by_kind_3,"name,kind,path",medium,"picks one of procs [1529, 1530] by kind"
 1529,spawn_vorn_1,"name,path",medium,"enemy spawner: creates key DFDC (docs/ASSETS.md, 1496-1627)"
 1530,spawn_vorn_2,"name,path",medium,"enemy spawner: creates key DFDC (docs/ASSETS.md, 1496-1627)"
+1536,spawn_bat_by_kind,"name,kind,path",medium,"picks one of procs [1541, 1542] by kind"
 1541,spawn_bat_1,"name,path",medium,"enemy spawner: creates key F8BE (docs/ASSETS.md, 1496-1627)"
 1542,spawn_bat_2,"name,path",medium,"enemy spawner: creates key F8BE (docs/ASSETS.md, 1496-1627)"
+1543,spawn_crow_by_kind,"name,kind,path",medium,"picks one of procs [1545, 1546] by kind"
 1545,spawn_crow_1,"name,path",medium,"enemy spawner: creates key 9E8D (docs/ASSETS.md, 1496-1627)"
 1546,spawn_crow_2,"name,path",medium,"enemy spawner: creates key 9E8D (docs/ASSETS.md, 1496-1627)"
+1547,spawn_spider_by_kind,"name,kind,path",medium,"picks one of procs [1549, 1550] by kind"
 1549,spawn_spider_1,"name,path",medium,"enemy spawner: creates key 87E4 (docs/ASSETS.md, 1496-1627)"
 1550,spawn_spider_2,"name,path",medium,"enemy spawner: creates key 87E4 (docs/ASSETS.md, 1496-1627)"
 1557,spawn_bee_1,"name,path",medium,"enemy spawner: creates key E131 (docs/ASSETS.md, 1496-1627)"
@@ -123,6 +155,7 @@ proc,name,params,confidence,evidence
 1570,spawn_slime_6,"name,path",medium,"enemy spawner: creates key C3BC (docs/ASSETS.md, 1496-1627)"
 1571,spawn_slime_7,"name,path",medium,"enemy spawner: creates key C3BC (docs/ASSETS.md, 1496-1627)"
 1573,spawn_slime_8,"name,path",medium,"enemy spawner: creates key C3BC (docs/ASSETS.md, 1496-1627)"
+1577,spawn_ghost_by_kind,"name,kind,path",medium,"picks one of procs [1579, 1580] by kind"
 1579,spawn_ghost_1,"name,path",medium,"enemy spawner: creates key CCD3 (docs/ASSETS.md, 1496-1627)"
 1580,spawn_ghost_2,"name,path",medium,"enemy spawner: creates key CCD3 (docs/ASSETS.md, 1496-1627)"
 1582,spawn_mimic,"name,path",medium,"enemy spawner: creates key BEF5 (docs/ASSETS.md, 1496-1627)"
@@ -135,10 +168,15 @@ proc,name,params,confidence,evidence
 1621,spawn_ooze,"name,path",medium,"enemy spawner: creates key DA0E (docs/ASSETS.md, 1496-1627)"
 1623,spawn_sword_1,"name,path",medium,"enemy spawner: creates key DB8D (docs/ASSETS.md, 1496-1627)"
 1624,spawn_sword_2,"name,path",medium,"enemy spawner: creates key DB8D (docs/ASSETS.md, 1496-1627)"
+1625,spawn_axe_by_kind,"name,kind,path",medium,"picks one of procs [1626, 1627] by kind"
 1626,spawn_axe_1,"name,path",medium,"enemy spawner: creates key 2D30 (docs/ASSETS.md, 1496-1627)"
 1627,spawn_axe_2,"name,path",medium,"enemy spawner: creates key 2D30 (docs/ASSETS.md, 1496-1627)"
 1666,stop_weather_and_continue,,low,stops the weather (proc_1045) and continues through proc_1674
 1668,restore_hud,,low,"end_event, then HUD mode 0, 1 or 2 by stage"
+1786,toggle_switch,"index,kind,on_proc,off_proc",medium,flips a switch flag (r708[0x1a9]/[0x1ab]... by kind) and calls on_proc or off_proc
+1787,story_chapter,,high,"0-6 from story ranges 30, 64, 93, 117, 150, 174, 191"
+2292,show_counter,"slot,value,max",low,sub_08030FFC; called with money (max 999999) and counters
+3269,place_wall,"name,wall_type,x,y,z",medium,display track by wall type ($:P_壁種類 wall type; print: Unknown wall type???)
 4932,set_area_story,"area,value",high,sets an area story flag; prints NNNエリアのストーリーフラグを更新 (update area NNN story flag)
 4941,place_pushable_block,"name,,slot,",low,used by the scale quiz for its six blocks (gcl/examples/scale_quiz.md)
 4949,npc_line,"conversation_no,",low,one message per conversation number (the scale floor: Johnny)

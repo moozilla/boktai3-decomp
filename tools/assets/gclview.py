@@ -186,6 +186,14 @@ class Names:
                 self.procs = {int(r["proc"]): r for r in csv.DictReader(f)}
         except OSError:
             pass
+        self.data = set()  # text-bank ids that are data records, not text
+        try:
+            for ln in open(os.path.join(gcx.ROOT, "build", "text", "bank.tsv"), encoding="utf-8"):
+                p = ln.split("\t", 2)
+                if len(p) > 1 and p[1] == "B" and p[0].isdigit():
+                    self.data.add(int(p[0]))
+        except OSError:
+            pass
         self.labels = {}
         try:
             with open(os.path.join(gcx.ROOT, "data", "notes.csv"), encoding="utf-8") as f:
@@ -234,7 +242,7 @@ class Readable:
         if k == "str":
             return '"' + v[1].replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n") + '"'
         if k == "text":
-            return f"text({v[1]})"
+            return f"data({v[1]})" if v[1] in self.n.data else f"text({v[1]})"
         if k == "arg":
             r = self.n.params.get((self.cid, f"arg{v[1]}"))
             return ident(r["english"]) if r and r["english"] else f"arg{v[1]}"
