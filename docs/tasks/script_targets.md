@@ -6,11 +6,11 @@ handlers; their callees are found through `bl` calls and Thumb function pointers
 
 | Set | Functions | Bytes | Share of code | Matched |
 |---|---:|---:|---:|---:|
-| Entry points | 738 | 84,436 | 3.5% | 76.9% |
-| Entry points and their direct callees | 1422 | 290,160 | 12.0% | 41.4% |
-| Everything reachable from scripts | 3136 | 535,198 | 22.2% | 46.4% |
+| Entry points | 738 | 84,436 | 3.5% | 77.6% |
+| Entry points and their direct callees | 1422 | 290,160 | 12.0% | 41.7% |
+| Everything reachable from scripts | 3136 | 535,198 | 22.2% | 46.5% |
 
-## Unmatched entry points, by script uses (26 used, 13,568 bytes)
+## Unmatched entry points, by script uses (23 used, 12,952 bytes)
 
 | Uses | Address | Bytes | Function | Script name | GCL name |
 |---:|---|---:|---|---|---|
@@ -25,7 +25,6 @@ handlers; their callees are found through `bl` calls and Thumb function pointers
 | 2 | `08103B94` | 136 | `NamedActor_SetMoveModeFromScript` | registry 7E33 |  |
 | 2 | `0810858C` | 448 | `sub_0810858C` | registry 8192 |  |
 | 2 | `081803D8` | 176 | `BossSlot2_AdvanceStepFromScript` | registry 4EC9 |  |
-| 2 | `081BB294` | 248 | `sub_081BB294` | registry 61A0 |  |
 | 2 | `081C4080` | 276 | `sub_081C4080` | registry F3E4 |  |
 | 2 | `081CE6DC` | 716 | `sub_081CE6DC` | registry F9D7 |  |
 | 2 | `0820A5CC` | 1392 | `sub_0820A5CC` | registry 056E |  |
@@ -33,12 +32,10 @@ handlers; their callees are found through `bl` calls and Thumb function pointers
 | 1 | `0806F5C0` | 412 | `sub_0806F5C0` | registry FD6B |  |
 | 1 | `08072854` | 752 | `sub_08072854` | registry 1E97 |  |
 | 1 | `080FF87C` | 636 | `sub_080FF87C` | registry F04B |  |
-| 1 | `08100298` | 132 | `WoodenCrate_Create` | registry 820B | Wooden Crate |
 | 1 | `08106870` | 860 | `sub_08106870` | registry 377D |  |
 | 1 | `08107EBC` | 820 | `sub_08107EBC` | registry 2FA5 |  |
 | 1 | `0810B914` | 504 | `sub_0810B914` | registry 1745 |  |
 | 1 | `08121268` | 208 | `sub_08121268` | registry A8CB |  |
-| 1 | `081DCE34` | 236 | `Time_OnLoadSave` | registry 7978 |  |
 | 1 | `0822BFC8` | 72 | `sub_0822BFC8` | registry 3C8D |  |
 
 ## Unmatched functions called directly by several entry points
