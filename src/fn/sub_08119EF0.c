@@ -1,8 +1,13 @@
 #include "global.h"
 #include "engine.h"
 #ifdef NONMATCHING
-// fuzzy: 58.5%
-// Open: offset/constant register choice around the first store.
+// fuzzy: 82.9%
+// Open: the original materializes the update pointer, the active offset,
+// 0 and 1 in that order (r2, r1, r3, r1); this draft loads 1 first.
+struct GloveDraw {
+    u8 pad0[0x16];
+    u16 flags;
+};
 struct Glove {
     u8 pad0[0x864];
     u32 timer;
@@ -10,10 +15,7 @@ struct Glove {
     u8 pad869[3];
     void (*update)(void);
     u8 pad870[0x58];
-    struct {
-        u8 pad0[0x16];
-        u16 flags;
-    } draw;
+    struct GloveDraw draw;
 };
 extern struct Glove *gUnk_020004F0[];
 void sub_081188F4(void);
@@ -26,13 +28,14 @@ void Glove_StartFromScript(void)
     glove = gUnk_020004F0[i];
     if (glove) {
         void (*update)(void) = sub_081188F4;
-        u8 *active = &glove->active;
-        u32 zero = 0;
-        u32 one = 1;
-        *active = one;
+        u16 one = 1;
+        glove->active = one;
         glove->update = update;
-        glove->timer = zero;
-        glove->draw.flags |= one;
+        glove->timer = 0;
+        {
+            struct GloveDraw *draw = &glove->draw;
+            draw->flags |= one;
+        }
     }
 }
 #else
