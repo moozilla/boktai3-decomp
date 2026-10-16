@@ -1,0 +1,89 @@
+#include "global.h"
+#include "engine.h"
+#ifdef NONMATCHING
+// fuzzy: 91.8%
+// Open: which base register the state field stores are addressed from.
+struct F3E4Actor {
+    u8 pad0[0x18];
+    u8 animData[0x1C];
+    u8 sprite[7];
+    u8 field3B;
+    u8 pad3C[0x14];
+    s16 x, y, z;
+    u8 pad56[0xA];
+    u8 receiver[0x38];
+    struct State {
+        u16 mode;
+        u8 pad2[2];
+        u16 field4, field6;
+        u32 field8;
+        u8 padC[0x24];
+        u8 field30, field31;
+        u8 pad32[0xA];
+        u32 field3C;
+    } state;
+    u32 fieldD8;
+    u8 padDC[0x14];
+    s32 name;
+    void (*update)(void);
+    u32 fieldF8;
+};
+extern struct F3E4Actor *gUnk_02000268;
+void sub_081C3F7C(void *);
+void sub_081C3FA4(void *);
+void SceneMessages_RegisterReceiver(void *, s32, s32);
+void sub_081C39F8(struct F3E4Actor *);
+void sub_081C3AF8(void);
+static inline void fill32(void *dst, u32 *tmp, u32 control)
+{
+    *tmp = 0;
+    CpuSet(tmp, dst, control);
+}
+static inline void setUpdate(void (*fn)(void), void (**slot)(void))
+{
+    *slot = fn;
+}
+/* Registry routine F3E4: creates its task (gUnk_02000268, sprite 0x3641) for
+   the given name: -p x y z (default 0), -c palette bank (+0x4B), registers it
+   for scene messages, and -i nonzero starts it via sub_081C39F8, else idles
+   with update sub_081C3AF8 (tentative). */
+struct F3E4Actor *RegistryF3E4_Create(u32 name)
+{
+    struct F3E4Actor **current = &gUnk_02000268;
+    struct F3E4Actor *p = Task_Create(8, 0xFC);
+    u32 zero;
+    if (p)
+        Task_SetCallbacks(p, sub_081C3F7C, sub_081C3FA4);
+    *current = p;
+    p->name = name;
+    AnimData_Load(p->animData, 0x3641);
+    Sprite_Init(p->sprite, p->animData, 2);
+    p->field3B = 2;
+    if (Script_SeekToKeyword('p')) {
+        p->x = Script_GetValue();
+        p->y = Script_GetValue();
+        p->z = Script_GetValue();
+    } else
+        fill32(&p->x, &zero, 0x05000002);
+    if (Script_SeekToKeyword('c'))
+        AnimData_SelectPaletteBank(p->animData, Script_GetValue() + 0x4B);
+    p->state.mode = 2;
+    p->state.field4 = 0;
+    p->state.field6 = 0;
+    p->state.field8 = 0;
+    p->state.field31 = 0;
+    p->state.field30 = 0;
+    (&p->state)->field3C = 0;
+    SceneMessages_RegisterReceiver(p->receiver, p->name, 10);
+    if (Script_SeekToKeyword('i') && Script_GetValue())
+        sub_081C39F8(p);
+    else {
+        setUpdate(sub_081C3AF8, &p->update);
+        p->fieldF8 = 0;
+        p->fieldD8 = 0;
+    }
+    return p;
+}
+#else
+INCLUDE_ASM("asm/nonmatching", RegistryF3E4_Create);
+#endif
