@@ -1,10 +1,19 @@
 proc,name,params,confidence,evidence
+1,nop,,high,empty procedure; every scene entry calls it
+553,scene_common_init,,medium,calls 554 (reset scene state) and 558 (elapsed days); every scene entry calls it
+554,scene_reset_state,,low,resets the actor manager mode and script work area (r700[0x28]..)
+558,update_elapsed_days,,low,compares the saved date r708[0xc2..0xc6] with today (r700[0x56..]); prints 日数差を取得 (got the day difference)
+861,scene_start,flags,low,"first call of every scene entry: sets scene flags r700[0x6c] (early story, entrance ranges, stage ranges)"
+864,scene_set_mode,mode,low,second call of every scene entry: sets gs[0x868]
 872,scene_is_set_up,,low,scene setup runs inside if (proc_872() == 0) (docs/ASSETS.md)
+875,advance_story,value,high,"story = max(story, value)"
 876,load_stage_raw,"map,tileset,hp",medium,"the loader 884/885 wrap (docs/ASSETS.md, Stage scripts)"
 884,load_stage,"map,tileset,hp",high,loads the stage (docs/ASSETS.md); 194 stages follow it with proc_888
 885,load_stage_alt,"map,tileset,hp",medium,wraps 876 like 884 (docs/ASSETS.md)
 888,set_stage_palette,"palette,,",high,"the stage BG palette resource (docs/ASSETS.md, Stage palettes)"
 895,set_camera_area,box,medium,called with the camera box A679 (docs/ASSETS.md)
+896,area_trap,"box,w",low,traps on the box for the player and the coffin
+905,scene_apply_reset,,low,if r708[0x1c0.6] is set: clear it and reset (proc_907)
 909,entrance_at_box_909,"box,facing,entrance,proc",medium,entrance: the player starts at HP box `box` (docs/ASSETS.md; 910 verified in a replay)
 910,entrance_at_box,"box,facing,entrance,proc",high,entrance: the player starts at HP box `box` (docs/ASSETS.md; 910 verified in a replay)
 911,entrance_at_box_911,"box,facing",low,the same with more options (docs/ASSETS.md)
@@ -41,15 +50,43 @@ proc,name,params,confidence,evidence
 951,door_transition_951,"scene,entrance",medium,the door transition without a box (docs/CENTAUR.md: warp uses 945)
 952,start_scene_transition,scene,medium,starts the transition actor that loads the scene (docs/ASSETS.md)
 953,set_arrival_entrance,"entrance,back",high,"stores the entrance in r708[0x70] (docs/ENGINE.md, CENTAUR.md)"
+956,set_continue_proc,proc,medium,stores a procedure in r700[0x24]; proc_957 calls it
+957,run_continue_proc,,medium,calls the procedure stored by proc_956
+1016,begin_event,"mode,flag",low,sets the script control flag (input lock?) before dialogue and cutscenes
+1019,open_message_window,proc,medium,"opens the message window (sub_080311F0, bottom rows; top during story 190-191) continuing with proc"
+1022,message_then,proc,medium,"proc_1019 with r700[0xb.1] set; follows a message (1C64), e.g. proc_1022(0x1392) continues with proc 5010"
+1024,close_message_window_if_open,,medium,gs[0x86c] = 0 and sub_08030C78 when the window is open
+1025,close_message_window,,medium,proc_1024 then sub_0817809C(m=7)
+1048,play_bgm,id,medium,"proc_1051(1, id, 0): music with a fade; r708[0x72] is the current track"
+1051,play_bgm_fade,"fade,id,urgent",medium,"fade 0 plays at once (print: No fade, play immediately!); keeps the previous track in r708[0x74]"
+1052,add_display_track,id,low,proc_1053 then a palette track
+1059,place_scene_object,"id,type,x,z",medium,proc_1060 with defaults
+1060,scene_object,"id,type,flags,x,z,health,resource,drawmode,script",medium,"SceneObjects at the cell centre (x + 128, z + 128)"
+1092,place_object_at,"name,type,,x,z,dx,dz",low,proc_1093 at cell centre plus offset
+1093,place_object,"name,type,,x,z",low,sub_081B897C with a size from the type
 1118,floor_item,"category,item,x,z,facing,flags,flag",medium,an item on the floor (docs/ASSETS.md)
 1119,place_item,"category,item,x,z,facing,chest,,flags,flag,proc",medium,an item; chest = 1 puts it in a chest (docs/ASSETS.md)
 1120,create_item,,medium,creates the pickup or the chest actor 430D (docs/ASSETS.md)
+1156,spawn_ghost_npc,"name,x,z,facing",low,a Ghost actor (CCD3) with script state
+1200,enemy_count_slot,,low,"index of the first set flag r708[0x6e.2][0..3], else -1 (enemy-count missions)"
+1204,begin_enemy_count,id,low,finds id in r708[0x215][0..63] and starts counting
+1206,count_enemy,,low,r700[0xef] += 1 while counting
+1207,register_enemy_count,,low,print: 番目の配列に を登録しました (stored the count in the array)
+1208,enemy_spawned,"name,slot",low,proc_1209 and proc_1203
+1211,enemy_may_spawn,kind,low,returns 1 or 0 for a spawner kind under the current mission
+1212,enemy_slot_taken,,low,r708[0x256.0][...] == 1 while counting
+1265,spawn_scene_managers,,medium,"proc_1266, 1267, 1268; every scene entry calls it"
+1266,spawn_common_managers,,medium,"the Continue? prompt, DemoManager, audio, actor registry, terrain markers..."
+1267,spawn_message_managers,,low,"the message window actors, then closes the window"
+1268,spawn_pause_menu,,low,an actor given the item and menu text ids
+1493,enemy_level,value,low,used by spawners for HP/attack formulas
 1502,spawn_mummy_1,"name,path",medium,"enemy spawner: creates key 6913 (docs/ASSETS.md, 1496-1627)"
 1503,spawn_mummy_2,"name,path",medium,"enemy spawner: creates key 6913 (docs/ASSETS.md, 1496-1627)"
 1504,spawn_mummy_3,"name,path",medium,"enemy spawner: creates key 6913 (docs/ASSETS.md, 1496-1627)"
 1506,spawn_golem_1,"name,path",medium,"enemy spawner: creates key 98EC (docs/ASSETS.md, 1496-1627)"
 1507,spawn_golem_2,"name,path",medium,"enemy spawner: creates key 98EC (docs/ASSETS.md, 1496-1627)"
 1508,spawn_golem_3,"name,path",medium,"enemy spawner: creates key 98EC (docs/ASSETS.md, 1496-1627)"
+1509,spawn_skeleton_by_kind,"name,kind,path",medium,"picks a skeleton spawner by kind (5, 6, 7, 1285...)"
 1510,spawn_skeleton_1,"name,path",medium,"enemy spawner: creates key AD03 (docs/ASSETS.md, 1496-1627)"
 1511,spawn_skeleton_2,"name,path",medium,"enemy spawner: creates key AD03 (docs/ASSETS.md, 1496-1627)"
 1512,spawn_skeleton_3,"name,path",medium,"enemy spawner: creates key AD03 (docs/ASSETS.md, 1496-1627)"
@@ -94,3 +131,22 @@ proc,name,params,confidence,evidence
 1624,spawn_sword_2,"name,path",medium,"enemy spawner: creates key DB8D (docs/ASSETS.md, 1496-1627)"
 1626,spawn_axe_1,"name,path",medium,"enemy spawner: creates key 2D30 (docs/ASSETS.md, 1496-1627)"
 1627,spawn_axe_2,"name,path",medium,"enemy spawner: creates key 2D30 (docs/ASSETS.md, 1496-1627)"
+4932,set_area_story,"area,value",high,sets an area story flag; prints NNNエリアのストーリーフラグを更新 (update area NNN story flag)
+4941,place_pushable_block,"name,,slot,",low,used by the scale quiz for its six blocks (gcl/examples/scale_quiz.md)
+4949,npc_line,"conversation_no,",low,one message per conversation number (the scale floor: Johnny)
+5010,brothers_reply_none,,medium,scale quiz: answer to John with no blocks
+5011,brothers_reply_some,,medium,scale quiz: answer to John with some blocks
+5012,brothers_reply_all,,medium,scale quiz: answer to John with all blocks
+5040,brothers_reply,,medium,scale quiz: picks 5010-5012 by how John was answered
+5737,jack_question,,high,scale quiz: Jack asks; answer 5
+5741,george_question,,high,scale quiz: George asks; answer 7
+5745,john_question,,high,scale quiz: John asks; any answer
+5752,scale_west_room_monsters,,medium,scale quiz: the monsters per question
+5756,scale_room_stage,,medium,"scale room: stage, palette, camera"
+5757,scale_setup,,high,scale quiz: the six blocks and the weighing trap
+5758,johnny_talk,,medium,scale quiz: Johnny by story stage
+5759,set_quiz_question,"next_story,line",medium,"r700[0x2f5] = story after a correct answer, r700[0x2f6] = the line after"
+5761,judge_scale_answer,choice,high,scale quiz: compares scale_weight with the answer
+5762,wrong_answer_cutscene,"direction,",medium,scale quiz: too light (-1) or too heavy (1)
+5763,correct_answer_cutscene,,medium,scale quiz: correct
+5765,scale_room_doors,,medium,scale room: doors by story stage
