@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 97.3%
-// Open: the two zero constants are materialized in the opposite order.
 struct Vanargand {
     u8 pad0[0xAA];
     u8 fieldAA;
@@ -19,25 +16,24 @@ extern struct Vanargand *gUnk_02000250;
 void sub_081A68CC(void *);
 /* Registry routine 4D12: resets state fields of the Vanargand task
    (tentative; no options). */
+/* Shared state change of the boss tasks (also used by 081803D8). */
+static inline void setState(struct Vanargand *p, u8 state)
+{
+    p->fieldAC = 0;
+    p->fieldAD = 0;
+    p->fieldAE = state;
+    p->fieldC4 = 0;
+    p->fieldB0 = 1;
+}
+/* Registry routine 4D12: puts the Vanargand task back into state 14 (shared
+   state fields +0xAC..+0xC4) and mode 16; clears +0x526 (tentative). */
 void Vanargand_ResetFromScript(void)
 {
     struct Vanargand *p = gUnk_02000250;
-    u8 clear, delay, mode;
-    u32 zero;
-    u16 *field526 = &p->field526;
-    zero = 0;
-    clear = 0;
-    *field526 = zero;
-    delay = 14;
-    p->fieldAC = clear;
-    p->fieldAD = clear;
-    p->fieldAE = delay;
-    p->fieldC4 = zero;
-    p->fieldB0 = 1;
+    u8 mode;
+    p->field526 = 0;
+    setState(p, 14);
     mode = 16;
     sub_081A68CC(p->block21C);
     p->fieldAA = mode;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_ResetFromScript);
-#endif
