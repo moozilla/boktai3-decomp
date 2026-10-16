@@ -255,10 +255,12 @@ address,evidence
 0815AD24,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C
 0815AD3C,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C
 0815AD60,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C
+0815CC78,Independent 128-byte sibling of ScriptActor_MoveToFromScript (gbadisasm left it as .byte after 0815CBF8)
 0815F578,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C
 0815F588,Code following a reviewed gap function; retained assembly
 0816CE8C,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C
 0816D3E8,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C
+081780B4,Independent 32-byte HUD mode refresh after Hud_SetModeFromScript (gbadisasm left it as .byte)
 081792F8,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 081792FC,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C
 0817A238,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
