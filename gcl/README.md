@@ -116,6 +116,8 @@ name. Procedure calls use `names/proc.csv` (our names and parameters for
 library procedures: `load_stage`, `door`, `entrance_at_box`, the enemy
 spawners...); a procedure's own named parameters replace `argN` inside it.
 
+A worked example, a whole puzzle read end to end: [examples/scale_quiz.md](examples/scale_quiz.md).
+
 ## Konami's naming, from the game's own debug prints
 
 The scripts' `print` strings are EUC-JP developer messages that often print a

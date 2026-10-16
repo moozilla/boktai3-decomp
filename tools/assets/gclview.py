@@ -408,8 +408,7 @@ class Readable:
         pos = {"trap": ["area", "who"], "load": ["scene"], "call": ["proc"]}.get(name, [])
         args = list(args)
         if name == "trap" and len(args) > 1 and args[1][0] == "int":
-            callee, _ = self.n.callee(args[1][1])
-            args[1] = ("raw", callee)
+            args[1] = ("raw", ANY.get(args[1][1]) or self.n.callee(args[1][1])[0])
         if name == "trap":
             opts = [(lt, [("raw", ANY[v[1]]) if v[0] == "int" and v[1] in ANY else v for v in vs]) for lt, vs in opts]
         text, blocks = self.call_args(owner, args, opts, pos)
