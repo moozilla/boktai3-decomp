@@ -6,7 +6,7 @@ void Heap_Free(void *);
 s32 sub_0809DD78(void *);
 void sub_0809DCE4(void *);
 
-void Flower_Create(void)
+void Lun_Create(void)
 {
     void *m = Heap_Alloc(0x44c);
     if (m != 0) {
