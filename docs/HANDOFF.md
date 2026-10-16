@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after corrected 30.003% matching and subsystem cleanup (2026-10-15). This file is the single
+Last updated after script entry-point batch 1 at 30.078% (2026-10-16). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,38 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 16 (Claude): script entry points, batch 1
+
+Exact code is **30.0778%** (+0.0750 pp): **7,128 / 11,525 functions**,
+**726,486 / 2,415,354 bytes**. The batch matches 13 of the most-used unmatched
+script entry points from [script_targets.md](tasks/script_targets.md) plus two
+hidden siblings found in their trailing data (15 functions, 1,812 bytes):
+`Hud_SetModeFromScript` (0817809C, 129 script uses), `Terrain_GetFloorHeightFromScript`
+(08227A10), `MessageWindow_OpenFromScript` (080311F0, replaces a 70.8% draft),
+`GameState_SetAreaFlagFromScript`, `Packet_QueueFromScript`, `Camera_SetFollowFromScript`,
+`ScriptActor_MoveToFromScript`, `NamedActor_SetRouteFromScript`, `Hud_SetLayoutFromScript`,
+`TextWindowManager_Create`, `GameFlag_TestFromScript`,
+`ScriptActor_EnterStateFourFromScript`, `Vanargand_Create`, and the hidden
+`081780B4` (HUD mode refresh) and `0815CC78` (move-to sibling), now listed in
+`symbols/build_extra_functions.csv`, `progress_extra_functions.csv` and
+`progress_functions.csv` so their bytes are no longer absorbed by the entry point
+before them. Names are provisional (low); options are named in the C and in
+`gcl/names/option.csv`. Entry points matched: 65.3% -> 67.5% of entry-point bytes.
+
+Still open at the top of the list: `trap` (08225624) matches except its two
+four-word clearing loops, which agbcc emits as a pointer compare (`cmp r0, r2;
+bge`, no counter); no tested C loop form reproduces it yet; the guarded draft
+(93.5%) is in `src/fn/sub_08225624.c`. `081D0C04` (registry BB34, 804 bytes, scene NPC creator) has a
+draft at about 63%. Useful idioms from this batch: a packed `x:16,y:16,z:16`
+bitfield struct written `x = v; y = 0;` reproduces a single `str` plus a mask
+kept in a callee-saved register (08227A10); an optional script byte read as
+`if (Script_GetPc()) v = Script_GetValue(); else v = 0; return v;` in a
+`static inline u8` helper matches 08103CF8; `trap.flags |= 0;` reproduces a
+redundant halfword reload/store.
+
+Validation: combined build prints `build/boktai3.gba: OK`; each unit passes
+`tools/check.py`.
 
 ## October 15 cleanup: corrected 30% and subsystem reports
 
