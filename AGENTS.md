@@ -1,6 +1,7 @@
 # Boktai 3 agent entry point
 
 Read `README.md`, `CLAUDE.md`, `docs/HANDOFF.md`, then `docs/WORKER.md`.
+Look everything else up in `docs/INDEX.md` (`python3 tools/docindex.py ADDR`).
 The matching and evidence requirements in those files apply to every model.
 
 Use `build/venv/bin/python` (or activate `build/venv`) for local tooling.
@@ -25,6 +26,11 @@ Provisional descriptive names are welcome: mark uncertain interpretations as
 tentative and correct them as understanding improves. Do not block matching on
 a naming investigation. Coverage tags describe observed execution.
 Report code progress as percentage and percentage-point gain, with bytes secondary.
+Totals live only in `PROGRESS.md` (regenerated once per batch integration) and
+the README badges; don't restate them in README, HANDOFF or subsystem docs.
+A history entry may state its own batch's gain.
+Record work as `docs/HANDOFF.md` describes ("Recording your work"): notes and
+history entries with `Tags:` lines, then `python3 tools/docindex.py`.
 
 The user prefers batched integration: workers commit each match separately, and
 the orchestrator reviews and validates their combined work before merging a
