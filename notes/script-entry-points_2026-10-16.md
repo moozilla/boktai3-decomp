@@ -1,4 +1,4 @@
-# Script entry points, batches 1-4 (2026-10-16)
+# Script entry points, batches 1-5 (2026-10-16)
 
 Tags: #scripts #text #actors #tooling
 
@@ -165,3 +165,36 @@ original top 15 are done. It took, in order:
   `t` pinned to r2 with an empty asm barrier between `a + 0x70` and `>> 5`;
   without the barrier agbcc turns the arithmetic shift into a logical one.
   `tools/depin.py` reduced it to these two hints.
+
+## Batch 5
+
+Matched (3 functions, 1,108 bytes, +0.046 percentage points):
+* 081D0F28 `SceneNpc_CommandFromScript` (8918): selects an NPC (-n, else the
+  last created) and puts it in the scripted state; -p, -d angle, -w face the
+  player (Math_Atan2), -s. Its `setAngle` inline is the facing code of
+  081D0C04, and needed the same register-pinning concession.
+* 0811B848 `RegistryE7BC_CreateFromScript` (E7BC): three required points
+  -p/-s/-o for sub_0811B278.
+* 08018664 `PaletteBlend_AddFromScript` (3A89): adds one of 16 blend entries
+  to the palette blend task (0x02000094). The early returns had to be separate
+  `if`s (`if (!p) return -1; if (p->entryCount > 15) return -1;`).
+
+Named (already matched): 08030864 `SceneActorManager_Create` (286F) and
+081C0BD4 `SceneActorManager_Exists` (FB4A), the scene actor manager at
+0x02000480 that also holds the message packet queue.
+
+In progress, not committed: 0810067C `FloorSwitch_Create` (53%, register
+allocation of the slot pointer and the hoisted field addresses),
+0810858C (97%, a permuter run found `one = e->field60 = 1;` and an `f = fr`
+copy) and 08111A48, a palette fade start (8.24 channel deltas; the colour
+channels' zero-extension and constant placement differ).
+
+The six enemy spawners named in the request (F426 08204704, D459 08205900,
+F639 082109D8, 4CD8 08208FD8, 5153 08202608, 01A2 0820FD10) and 0820361C
+(98CB) are already matched C, but each is just Task_Create plus an init
+callback, so the C does not say which enemy or object they create. They are
+left unnamed until the kind numbers can be confirmed from script data.
+
+Tooling: decomp-permuter crashes ("nodes should only appear once in AST") on
+a multi-declarator with a struct type (`struct T *a, *b;`); declare such
+pointers separately.

@@ -6,11 +6,11 @@ handlers; their callees are found through `bl` calls and Thumb function pointers
 
 | Set | Functions | Bytes | Share of code | Matched |
 |---|---:|---:|---:|---:|
-| Entry points | 738 | 84,436 | 3.5% | 73.4% |
-| Entry points and their direct callees | 1422 | 290,160 | 12.0% | 40.4% |
-| Everything reachable from scripts | 3136 | 535,198 | 22.2% | 45.8% |
+| Entry points | 738 | 84,436 | 3.5% | 74.7% |
+| Entry points and their direct callees | 1422 | 290,160 | 12.0% | 40.8% |
+| Everything reachable from scripts | 3136 | 535,198 | 22.2% | 46.0% |
 
-## Unmatched entry points, by script uses (48 used, 16,556 bytes)
+## Unmatched entry points, by script uses (45 used, 15,448 bytes)
 
 | Uses | Address | Bytes | Function | Script name | GCL name |
 |---:|---|---:|---|---|---|
@@ -21,12 +21,9 @@ handlers; their callees are found through `bl` calls and Thumb function pointers
 | 3 | `08104350` | 1016 | `sub_08104350` | registry F1F9 |  |
 | 3 | `08119EF0` | 84 | `Glove_StartFromScript` | registry E3EE | Glove |
 | 3 | `0815A838` | 52 | `ScriptActor_GetField534FromScript` | registry 0E15 |  |
-| 3 | `081D0F28` | 308 | `sub_081D0F28` | registry 8918 |  |
-| 2 | `08018664` | 344 | `sub_08018664` | registry 3A89 |  |
-| 2 | `0810067C` | 700 | `sub_0810067C` | registry AB8E |  |
+| 2 | `0810067C` | 700 | `FloorSwitch_Create` | registry AB8E |  |
 | 2 | `08103B94` | 136 | `NamedActor_SetMoveModeFromScript` | registry 7E33 |  |
 | 2 | `0810858C` | 448 | `sub_0810858C` | registry 8192 |  |
-| 2 | `0811B848` | 456 | `sub_0811B848` | registry E7BC |  |
 | 2 | `081803D8` | 176 | `BossSlot2_AdvanceStepFromScript` | registry 4EC9 |  |
 | 2 | `081BB294` | 248 | `sub_081BB294` | registry 61A0 |  |
 | 2 | `081C4080` | 276 | `sub_081C4080` | registry F3E4 |  |
