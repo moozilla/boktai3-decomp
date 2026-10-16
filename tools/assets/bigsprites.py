@@ -12,7 +12,8 @@ Layout (offsets relative to the resource; inferred, confidence medium):
         ScriptProc_Start(0xCB05, name) in actor code), u8 width, u8 height,
         u8 centre x, u8 centre y, u32 byte offset into the frame table.
         A sprite's frames run to the next record's offset.
-  frame, 12 B: u8 parts, u8 tiles, u16 flags, u32 pixel offset (from the
+  frame, 12 B: u8 parts, u8 tiles, u16 palette (the default 9B1B pool entry,
+        the same in every frame; AnimData_Load applies it), u32 pixel offset (from the
         pixel data start; 4bpp tiles, consumed by the parts in order),
         u32 byte offset into the part table.
   part, 4 B: u8 size << 2 | shape (GBA OBJ), u8 flags, s8 x, s8 y.
@@ -48,7 +49,7 @@ class BigSprites:
 
     def render(self, frame, pal):
         from PIL import Image
-        nparts, ntiles, flags, pix, po = frame
+        nparts, ntiles, palette, pix, po = frame
         parts = []
         tile = 0
         for k in range(nparts):

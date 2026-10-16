@@ -218,7 +218,7 @@ function parseBig(d) {
   }
   const frames = i => {
     const a = recs[i].foff, e = i + 1 < count ? recs[i + 1].foff : partsAt - framesAt, out = [];
-    for (let o = a; o < e; o += 12) out.push({ n: d[framesAt + o], pix: u32(d, framesAt + o + 4), po: u32(d, framesAt + o + 8) });
+    for (let o = a; o < e; o += 12) out.push({ n: d[framesAt + o], pal: le(d, framesAt + o + 2), pix: u32(d, framesAt + o + 4), po: u32(d, framesAt + o + 8) });
     return out;
   };
   const parts = f => {
@@ -230,6 +230,10 @@ function parseBig(d) {
     }
     return out;
   };
+  // a frame's u16 at +2 is its default palette pool entry (9B1B); AnimData_Load
+  // (082151E4) applies the first frame's, so it is the sprite's palette until
+  // code picks another (AnimData_SelectPaletteBank, data/sprite_palettes.csv)
+  recs.forEach((r, i) => { r.pal = frames(i)[0]?.pal ?? -1; });
   return { recs, frames, parts };
 }
 
@@ -274,8 +278,7 @@ async function spriteThumb(kind, hash, max = 64) {
   if (kind === 'big') {
     const big = await bigSprites(), i = big.recs.findIndex(r => r.hash === hash), f = i >= 0 && big.frames(i)[0];
     if (!f) return null;
-    const lp = L[`big:${hash}`]?.pool;
-    colors = lp != null ? await packageColors(null, lp) : learnedPalette(L[`big:${hash}`]) || await packageColors(null, -1);
+    colors = await packageColors(null, big.recs[i].pal);
     parts = big.parts(f);
   } else {
     const b = await res('tCB05', hash), pkg = parsePackage(b), k = pkg.anims[0]?.keys[0]?.frame ?? 0;
