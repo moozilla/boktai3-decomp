@@ -570,9 +570,14 @@ evidence in [ASSETS.md](ASSETS.md) ("Stage terrain", "Stage scripts"):
   command ids are EUC-JP name hashes. `gcl/names/chara.csv` has 52 recovered
   names with English (enemies such as スライム/Slime, routines such as
   ランダム/Random, `command` = `B745`); `tools/assets/gclnames.py crack` finds
-  more. The scripts' debug prints give original variable, parameter, define
-  and procedure names (`$f:...`, `$:P_...`, `d:...`, `@st01_43_ruins_after`):
-  the next step is a variable-name table from them.
+  more. The scripts' debug prints give original names in GCL syntax;
+  `gclnames.py labels --write` pairs each label with the operand printed
+  after it: `gcl/names/var.csv` (26 variables, e.g. `r708[0x70]:t1` =
+  `$w:登場ポイント`, the entrance point above; `r708[0x145.0]:t4(16)` =
+  `$f:燭台点灯フラグ`), `define.csv` (14) and `param.csv` (19 `$:P_` args and
+  `$$:` locals). `gcx.py dis` and the Studio print them Konami-style with the
+  storage in a comment. Next: name more slots from code context (story
+  values `d:ST:` against `$w:story`), and the `@` load-destination prints.
 
 Tools: `tools/assets/hp.py`, `tools/assets/stages.py` (per-scene doors,
 entrances, items, enemies → `build/assets/stages.json`), `gcx.py` now prints
