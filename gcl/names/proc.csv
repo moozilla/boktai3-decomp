@@ -15,6 +15,8 @@ proc,name,params,confidence,evidence
 885,load_stage_alt,"map,tileset,hp",medium,wraps 876 like 884 (docs/ASSETS.md)
 886,spawn_area_effect,"count,resource,mode",low,sub_0801973C
 888,set_stage_palette,"palette,,",high,"the stage BG palette resource (docs/ASSETS.md, Stage palettes)"
+892,spawn_palette_controller,"value_p,value_d,,,,,,",medium,sub_080033FC (src/palette_controller.c)
+894,spawn_terrain_overlay,"key,count",medium,"sub_080040F8 (src/terrain_overlay.c): a TerrainOverlay task, n = actor count (default 8)"
 895,set_camera_area,box,medium,called with the camera box A679 (docs/ASSETS.md)
 896,area_trap,"box,w",low,traps on the box for the player and the coffin
 905,scene_apply_reset,,low,if r708[0x1c0.6] is set: clear it and reset (proc_907)
@@ -63,6 +65,8 @@ proc,name,params,confidence,evidence
 1024,close_message_window_if_open,,medium,gs[0x86c] = 0 and sub_08030C78 when the window is open
 1025,close_message_window,,medium,proc_1024 then sub_0817809C(m=7)
 1026,end_dialogue,,medium,"end_event, close the message window, restore the HUD mode"
+1030,place_directional_controller,"id,x,z,orientation,start_proc",medium,proc_1031 with defaults
+1031,directional_controller,"id,disabled,x,z,orientation,start_proc,end_proc",medium,DirectionalController at the floor height
 1036,end_event_restore_hud,,low,"sub_081D105C, end_event, then HUD mode 0 (2 in stages 521-525)"
 1048,play_bgm,id,medium,"proc_1051(1, id, 0): music with a fade; r708[0x72] is the current track"
 1049,play_bgm_with_fade,"fade,id",medium,"play_bgm_fade(fade, id, 0)"
@@ -74,6 +78,8 @@ proc,name,params,confidence,evidence
 1072,add_area_sprite,"entries,x,z,kind",medium,AreaEffect_AddSprite at the cell centre
 1092,place_object_at,"name,type,,x,z,dx,dz",low,proc_1093 at cell centre plus offset
 1093,place_object,"name,type,,x,z",low,sub_081B897C with a size from the type
+1094,spawn_scene_objects_manager,mode,medium,sub_0802091C: the SceneObjects task (destroy callback SceneObjects_Destroy) with the sprite runs 7ACD-7AD6
+1095,spawn_scene_objects_manager_2,mode,medium,as 1094 with S=7AD2
 1096,box_edge_position,"box,facing",medium,sets r700[0x76]/[0x64]/[0x78] to the point on the box edge for a facing
 1097,place_object_at_box_2,"name,box,facing,",low,proc_1098 with defaults
 1100,place_object_at_box,"name,box,facing,",low,copies the box (proc_1096) and creates the object at it (proc_1102)
@@ -160,13 +166,16 @@ proc,name,params,confidence,evidence
 1577,spawn_ghost_by_kind,"name,kind,path",medium,"picks one of procs [1579, 1580] by kind"
 1579,spawn_ghost_1,"name,path",medium,"enemy spawner: creates key CCD3 (docs/ASSETS.md, 1496-1627)"
 1580,spawn_ghost_2,"name,path",medium,"enemy spawner: creates key CCD3 (docs/ASSETS.md, 1496-1627)"
+1581,place_mimic,"name,path,x,z",medium,proc_1127 then spawn_mimic
 1582,spawn_mimic,"name,path",medium,"enemy spawner: creates key BEF5 (docs/ASSETS.md, 1496-1627)"
 1585,spawn_octopus,"name,path",medium,"enemy spawner: creates key 3F99 (docs/ASSETS.md, 1496-1627)"
+1599,place_dragon_puppy,"name,x,z",medium,spawn_dragon_puppy at a cell (data table text-bank 1565)
 1600,spawn_dragon_puppy,"name,path",medium,"enemy spawner: creates key 3D38 (docs/ASSETS.md, 1496-1627)"
 1609,spawn_fan_cannon_manager,"name,path",medium,"enemy spawner: creates key 9CC2 (docs/ASSETS.md, 1496-1627)"
 1612,spawn_vulcan_cannon,"name,path",medium,"enemy spawner: creates key F083 (docs/ASSETS.md, 1496-1627)"
 1615,spawn_poison_hand,"name,path",medium,"enemy spawner: creates key FE92 (docs/ASSETS.md, 1496-1627)"
 1617,spawn_screamer,"name,path",medium,"enemy spawner: creates key 84CF (docs/ASSETS.md, 1496-1627)"
+1620,place_ooze,"name,path,x,z",medium,spawn_ooze at a cell (data table text-bank 9949)
 1621,spawn_ooze,"name,path",medium,"enemy spawner: creates key DA0E (docs/ASSETS.md, 1496-1627)"
 1623,spawn_sword_1,"name,path",medium,"enemy spawner: creates key DB8D (docs/ASSETS.md, 1496-1627)"
 1624,spawn_sword_2,"name,path",medium,"enemy spawner: creates key DB8D (docs/ASSETS.md, 1496-1627)"
