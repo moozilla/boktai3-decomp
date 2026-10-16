@@ -8,8 +8,10 @@ proc,name,params,confidence,evidence
 872,scene_is_set_up,,low,scene setup runs inside if (proc_872() == 0) (docs/ASSETS.md)
 875,advance_story,value,high,"story = max(story, value)"
 876,load_stage_raw,"map,tileset,hp",medium,"the loader 884/885 wrap (docs/ASSETS.md, Stage scripts)"
+879,spawn_background,"name,map,,,",medium,a Background actor (the c_f/c_i/c_d options)
 884,load_stage,"map,tileset,hp",high,loads the stage (docs/ASSETS.md); 194 stages follow it with proc_888
 885,load_stage_alt,"map,tileset,hp",medium,wraps 876 like 884 (docs/ASSETS.md)
+886,spawn_area_effect,"count,resource,mode",low,sub_0801973C
 888,set_stage_palette,"palette,,",high,"the stage BG palette resource (docs/ASSETS.md, Stage palettes)"
 895,set_camera_area,box,medium,called with the camera box A679 (docs/ASSETS.md)
 896,area_trap,"box,w",low,traps on the box for the player and the coffin
@@ -53,17 +55,21 @@ proc,name,params,confidence,evidence
 956,set_continue_proc,proc,medium,stores a procedure in r700[0x24]; proc_957 calls it
 957,run_continue_proc,,medium,calls the procedure stored by proc_956
 1016,begin_event,"mode,flag",low,sets the script control flag (input lock?) before dialogue and cutscenes
+1018,end_event,,low,proc_1017 and sub_0815D590; pairs with begin_event (1016)
 1019,open_message_window,proc,medium,"opens the message window (sub_080311F0, bottom rows; top during story 190-191) continuing with proc"
 1022,message_then,proc,medium,"proc_1019 with r700[0xb.1] set; follows a message (1C64), e.g. proc_1022(0x1392) continues with proc 5010"
 1024,close_message_window_if_open,,medium,gs[0x86c] = 0 and sub_08030C78 when the window is open
 1025,close_message_window,,medium,proc_1024 then sub_0817809C(m=7)
+1036,end_event_restore_hud,,low,"sub_081D105C, end_event, then HUD mode 0 (2 in stages 521-525)"
 1048,play_bgm,id,medium,"proc_1051(1, id, 0): music with a fade; r708[0x72] is the current track"
 1051,play_bgm_fade,"fade,id,urgent",medium,"fade 0 plays at once (print: No fade, play immediately!); keeps the previous track in r708[0x74]"
 1052,add_display_track,id,low,proc_1053 then a palette track
 1059,place_scene_object,"id,type,x,z",medium,proc_1060 with defaults
 1060,scene_object,"id,type,flags,x,z,health,resource,drawmode,script",medium,"SceneObjects at the cell centre (x + 128, z + 128)"
+1072,add_area_sprite,"entries,x,z,kind",medium,AreaEffect_AddSprite at the cell centre
 1092,place_object_at,"name,type,,x,z,dx,dz",low,proc_1093 at cell centre plus offset
 1093,place_object,"name,type,,x,z",low,sub_081B897C with a size from the type
+1100,place_object_at_box,"name,box,facing,",low,copies the box (proc_1096) and creates the object at it (proc_1102)
 1118,floor_item,"category,item,x,z,facing,flags,flag",medium,an item on the floor (docs/ASSETS.md)
 1119,place_item,"category,item,x,z,facing,chest,,flags,flag,proc",medium,an item; chest = 1 puts it in a chest (docs/ASSETS.md)
 1120,create_item,,medium,creates the pickup or the chest actor 430D (docs/ASSETS.md)
@@ -131,6 +137,8 @@ proc,name,params,confidence,evidence
 1624,spawn_sword_2,"name,path",medium,"enemy spawner: creates key DB8D (docs/ASSETS.md, 1496-1627)"
 1626,spawn_axe_1,"name,path",medium,"enemy spawner: creates key 2D30 (docs/ASSETS.md, 1496-1627)"
 1627,spawn_axe_2,"name,path",medium,"enemy spawner: creates key 2D30 (docs/ASSETS.md, 1496-1627)"
+1666,stop_weather_and_continue,,low,stops the weather (proc_1045) and continues through proc_1674
+1668,restore_hud,,low,"end_event, then HUD mode 0, 1 or 2 by stage"
 4932,set_area_story,"area,value",high,sets an area story flag; prints NNNエリアのストーリーフラグを更新 (update area NNN story flag)
 4941,place_pushable_block,"name,,slot,",low,used by the scale quiz for its six blocks (gcl/examples/scale_quiz.md)
 4949,npc_line,"conversation_no,",low,one message per conversation number (the scale floor: Johnny)
