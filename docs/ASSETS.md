@@ -275,6 +275,26 @@ descriptions are 1043 + item); the first dungeon holds 太陽の実 (13) and
 大地の実 (1). The other categories (1, 2, 4, 6, 8, 9) are not mapped to names
 yet.
 
+### Areas: how the rooms connect
+
+`tools/assets/areas.py list | show AREA... | json [OUT]` builds the door graph
+from `stages.json` and groups scenes into areas: two scenes share an area when
+a door connects them and their scene ids are less than 60 apart (rooms of one
+dungeon or town are numbered together; longer doors go to the world map,
+another town or a story scene). Areas are numbered by their lowest scene id:
+76 areas from single rooms to a 77-room dungeon, with 69 links between them
+(door counts per direction). It is a browsing grouping, not a game structure.
+Labels come from the vision pass: an area takes the `data/vision/areas_*.csv`
+label of the vision area sharing most of its scenes (`scenes_*.csv`), and
+scenes keep their `data/notes.csv` label (kind `script`, key = scene).
+
+The Studio's World page (`/world`) draws the areas as a graph (circle size =
+scenes, outline = label confidence, dashed = one-way doors). Clicking an area
+shows its vision label and evidence, the linked areas, a door graph of its
+scenes (other areas as dashed boxes) and a card per scene: the stage survey
+screenshot (`build/centaur/captures/scene_NNNN`), its label, doors, and links
+to its script (`/scripts#file=scene_NNNN`), map (`/gfx#maps/...`) and capture.
+
 ## The script image (`gcx`)
 
 `tools/assets/gcx.py info | dis [PROC...] | chara` decodes it.

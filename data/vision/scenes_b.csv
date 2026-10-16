@@ -1,0 +1,88 @@
+scene,area,label,confidence,evidence
+5210,38,"unknown (ice castle, outer room)",low,"Shared tileset and map with 5218, 5251, 5255, 5259"
+5215,38,Master Otenko talk point in the ice castle,medium,Otenko: 'This atmosphere... Do you remember?'
+5227,38,Frost and Flame puzzle room (east shutter),medium,"Debug 'ice puzzle solved', 'east shutter linked 134'; hound enemy"
+5237,38,ice castle corridor,low,Shared puzzle debug strings with 5227
+5247,38,ice castle corridor,low,Shared puzzle debug strings with 5227
+5251,38,earth fruit room (大地の実),low,Item 大地の実 (Earth fruit) only
+5255,38,sun fruit room (太陽の実),low,Item 太陽の実 (Sun fruit) only
+5268,38,Frost and Flame crest element room,medium,"Debug 'Changed to ice element', 'fire element', 'no element, shutter closed'; Otenko: 'Frost and Flame crest blocks...'"
+5279,39,Johnny's labyrinth entrance (the start room),medium,"Johnny: 'You messed up again', 'Start over?' (restart prompt); escape-circle items"
+5297,39,labyrinth room with skeleton; escape magic circle demo,low,Debug 'Escape magic circle appearance demo ended'
+5313,39,labyrinth room with hooded figure,low,Debug escape demo; hooded figure enemy
+5344,40,labyrinth exit room,low,Only door is to scene 5279 (labyrinth start)
+5349,41,"elevator room, tower floor",medium,Elevator debug; 'There's a dark seal on the switch that sends it to the top floor'; 'おいしい肉' item
+5373,43,elevator room with mimic,medium,Same elevator strings as scene 5349
+5493,46,elevator room,medium,Same elevator strings as scene 5349
+5997,66,elevator room,medium,Same elevator strings as scene 5349
+5498,47,seasons/elements hub (main room),low,"Doors to areas 35, 45, 49, 50, 51"
+5538,47,seasons sign room (four seasons),medium,"Strings [Spring] [Summer] [Autumn] [Winter]; 'Solved, so placing in front'"
+5550,47,"Vorn summon room (black wings, mummy)",low,Debug 'Summoning Vorn!!!!!'; enemies black wings and mummy; items 回復薬 and 大地の実
+5559,47,"element-switch room (earth, ice, fire, cloud)",medium,Debug 'Changed to earth/ice/fire/cloud element'
+5577,47,season quote room (spring/summer/autumn/winter text),medium,"Four season quotes (Spring is the season of budding life...); enemies black wings, chloro worm, hound, skeleton"
+5590,47,slime room (crp10),low,Debug 'crp10 demo ended'
+5615,49,Solar Root junction (north/west elements),low,"Debug 'north area element', 'west area element', element pairs"
+5624,49,"Solar Root wall room (flame worm, spider)",low,"Debug 'Haven't broken the wall yet'; 'Wall broken, or cloud element'"
+5634,49,Solar Root chamber (red key room),medium,Item 赤のカギ (red key); debug 'Solar Root not yet grown'
+5646,49,"item room (cat6 item10), flame worm and spider room",low,Item only
+5657,49,lever and moving-floor room,medium,"Debug 'Lever not yet turned ON', 'Moving floor released'"
+5717,50,Solar Root placing room (yellow key),medium,Debug 'placing Solar Root'; item 黄のカギ (yellow key)
+5722,50,mimic room with potions,low,Mimic enemy; 回復薬 and 魔法薬 items
+5746,51,"Blackbeard ghost hall (Red, Blue, Purple ghosts)",high,"Ghosts say 'I am the third Blackbeard Brother, Jack' and 'eldest Blackbeard Brother, John'"
+5754,51,weight quiz room (question),medium,"Debug 'Weight quiz 1 question_end', 'First, go hear the question!'"
+5764,51,weight scale room (judgement),medium,"Otenko-era judgement prompt; debug 'Rock', 'Wooden box', 'scale weight', 'Correct demo ended'"
+5772,51,ghost hint corridor,low,Ghost: 'I'll give you a hint.'
+5780,51,black wings and tentacle room with potions,low,Items 回復薬 and 魔法薬
+5787,51,Sun and Moon card room,low,Items 太陽のカード and 月のカード
+5802,51,Johnny exit room,low,"Johnny: 'Hee hee!'; 'See you again, if you come back alive'"
+5808,51,dried-meat room,low,Item 干し肉
+5813,51,hooded figure and skeleton room,low,Enemies only
+5817,51,hint-ghost room,low,Connects to ghost hint corridors
+5820,52,Johnny exit room (demo),low,"Johnny: 'Hee hee!'; 'See you again, if you come back alive'"
+5830,52,hint-ghost hall,medium,Ghost: 'I'll give you a hint.' (repeated)
+5836,52,hooded figure room,low,Enemy only
+5846,53,unnamed treasure room,low,Several items including 魔法薬
+5854,54,black wings and hooded figure room,low,Enemies; item 月のカード
+5871,55,number sign: digit 8,medium,Text '[The number 8 is displayed]'
+5875,56,small room with hound and おいしい肉,low,Enemy hound; item
+5894,57,number sign: digit 13,medium,Text '[The number 13 is displayed]'
+5898,58,hound and cat6 item11 room,low,Enemy and item only
+5917,59,number sign: digit 3,medium,Text '[The number 3 is displayed]'
+5921,60,potion room (Hel's castle),low,Item 回復薬; door to areas 60 and 65
+5926,60,ghoul and skeleton room,low,Enemies; item 魔法薬
+5940,60,hooded figure room with Sun card,low,Item 太陽のカード
+5994,60,junction room (Hel's castle),low,"Doors to areas 60, 61 and 62"
+5931,61,Ratatosk's stronghold entrance,low,Doors to area 53 and area 60
+5944,61,stronghold corridor,low,No strings
+5948,61,"item room (万能薬, 回復薬, 魔法薬)",low,Items only
+5952,61,Ratatosk cornered; Pile Driver summon,low,Otenko: 'I summon the Pile Driver!'; 'Ratatosk the Puppeteer! We've finally cornered you'
+5934,62,Ratatosk puppet-clone room,low,Ratatosk: 'You saw through my puppet clone'; Sabata and Trinity talk
+5979,63,number-sign hub,low,"Doors to areas 54, 56, 59"
+5983,64,number-sign hub,low,"Doors to areas 55, 56, 58"
+5987,65,number-sign hub,low,"Doors to areas 57, 58, 60"
+6079,67,Istrakan entrance (Phantom Sabata first meeting),medium,"Phantom Sabata: 'The City of Death, Istrakan'; Otenko: 'We finally made it'"
+6086,67,"Istrakan hall (Phantom Sabata, Hel)",low,"Phantom Sabata talks of 'Queen of Immortals, Hel'"
+6092,67,"Istrakan main hall (Phantom Sabata, San Miguel)",medium,"Phantom Sabata: 'The City of the Sun, San Miguel'"
+6097,67,Istrakan corridor,low,Enemy skeleton only
+6102,67,"Istrakan corridor (Ratatosk, Vanargand)",low,Phantom Sabata: 'my soul was offered to Vanargand'
+6109,67,Istrakan seal room,medium,Debug 'Seal before collapse' and 'Seal after collapse'
+6115,67,Istrakan seal room (Otenko: head for the center),medium,"Otenko: 'Take a detour, and head for the center of the city'; seal debug"
+6121,67,Istrakan corridor,low,Door-link only
+6126,67,Istrakan corridor,low,Enemy skeleton
+6131,67,Istrakan corridor,low,Enemy skeleton
+6135,67,Istrakan corridor,low,Door-link only
+6138,67,Carmilla room (Karmira),medium,"Carmilla: 'Hurry, <NAME>!'; 'nothing I can do to save him anymore'"
+6142,67,Istrakan corridor,low,Door-link only
+6147,67,Istrakan corridor,low,Door-link only
+6152,67,Istrakan corridor,low,Door-link only
+6156,67,Istrakan corridor,low,Door-link only
+6160,67,ending: credits and final boss-fight triggers,medium,"Text 'BOKTAI 3 SABATA'S COUNTERATTACK THE END'; ending flag, Normal/True ED roll, White and Black Django and Vanargand boss-start debug"
+6172,68,Sabata and Carmilla cutscene room,low,Sabata: 'If I give in to Vanargand again'
+6201,69,The Count arena (final stage),medium,"Debug 'Count ~last stage~'; Hresvelgr, Nidhoggr, Ratatosk dialogue"
+6211,70,The Count arena (final stage),medium,Same strings and debug as scene 6201
+6239,71,The Count arena (final stage),medium,Same strings and debug as scene 6201
+6248,72,The Count arena (final stage),medium,Same strings and debug as scene 6201
+6256,73,Black Knight encounter room,low,"Black Knight: 'Well met, Warrior of Light'"
+6260,73,Black Knight reward room,low,Item cat9 item261
+6360,74,bike customization menu,medium,Bike color and tire obtained; COFFIN GRAY
+6385,75,bonus challenge select (rank menu),low,'Attempt which rank?' Bronze to Platinum
