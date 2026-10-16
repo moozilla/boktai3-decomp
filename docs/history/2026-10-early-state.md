@@ -1,0 +1,369 @@
+# Handoff history: state as of October 9-12
+
+Moved verbatim from `docs/HANDOFF.md` on 2026-10-16. Numbers and instructions here are historical;
+the current state is in `docs/HANDOFF.md`. Search with `grep -rn ADDRESS docs notes`.
+
+## Where things stood (written October 9-12; numbers superseded)
+Tags: #scripts #actors #inventory #menu #wireless #sound #hardware #library #assets #tooling
+
+| | |
+|---|---|
+| Matched C | **4,964 / 11,088 functions (44.77%)**, 369,910 / 2,415,354 code bytes (15.315%; `PROGRESS.md`) |
+| Build | `make` / `python3 tools/build.py` rebuilds the ROM **bit-identical** (SHA-1 `2651c5e6875ac60abff734510d152166d211c87c`) |
+| Shiftable | all data relocatable; `make shifttest` (3 scenarios, 35 screenshots) passes |
+| Code layout | `src/fn/sub_XXXXXXXX.c`, one function per file; `src/lib/m4a.c` (MP2K sound, 57/58) |
+| Names | still mostly `sub_XXXXXXXX`; first evidence-based pause-menu leads in `docs/MENU_CONTEXT.md` |
+
+The solo family tranche adds **54 functions / 8,488 exact bytes** on top of
+`7037e3a`, following the KNIDL process review. The 20% code target remains
+unmet by **150,257 bytes** after the October 12 pilot. [The tranche notes](../../notes/solo-family_2026-10-09.md)
+record accepted sources, reusable patterns and unresolved candidates.
+081DB1D8 contributes only its 116-byte body; two newly inventoried 108-byte
+wrappers at 081DB24C and 081DB2B8 are now exact C. Their reviewed replacement
+endpoints consume the complete bodies across symbolized incbin fragments.
+[The tail ledger](../../notes/solo-tail_2026-10-09.csv) records the six tail
+matches (752 bytes). The [final ledger](../../notes/solo-final_2026-10-09.csv)
+adds two more exact functions (312 bytes). The objdiff report now groups eight identified libraries
+into contiguous units with verified names; see [reporting policy](../PROGRESS_CI.md).
+
+**Historical October 9 authorization: work alone until 15% plan usage remains.** The user
+explicitly authorized new matching after the KNIDL review and prohibited
+subagents for this tranche. The meter reached **15% remaining** in the final bounded pass; matching
+work stopped there, followed only by validation, documentation and preservation.
+The tranche is integrated and its sources/checkpoints are pushed; do not
+launch another tranche without renewed user authorization.
+
+The preceding existing-draft rescue added 48 functions / 3,724 bytes and
+ended with 65 unresolved targets. Its one-hour/15% limit and the subsequent
+WIP preservation decision describe that earlier pass.
+
+The [draft inventory](../DRAFT_INVENTORY_2026-10-09.md) covers 113 previously
+unmatched targets from 435 retained C files (many duplicates or already merged).
+48 are now exact; **65 remain nonmatching** after the bounded pass. All exact
+source is separately committed through `82d700d` in the reviewed combined
+integration; no unmatched draft is promoted. The complete original and restored
+ROM builds print `build/boktai3.gba: OK`; all 35 shifted-data screenshots and
+five focused boundary/compiler tests pass. Sol workers remain finished; the existing Astra-low worker was
+resumed for three capped tasks and produced no new match. No new agents were
+started. Source review rejected an invalid permuter candidate.
+
+Nonmatching C and check/permuter outputs remain ignored in local checkouts:
+`../wt/push20-integrate/wip/`, `../wt/push20-high-last/wip/`,
+`../wt/push20-high/wip/`, `../wt/push20-mid/wip/`, `../wt/push20-low/wip/`,
+`../wt/push20-astra-motion/wip/`, and this checkout's `wip/`.
+The user subsequently authorized source retention on a separate branch.
+[**codex/wip-drafts-2026-10-09**](https://github.com/moozilla/boktai3-decomp/tree/codex/wip-drafts-2026-10-09/drafts)
+preserves the original 519 candidate C files plus the solo-family drafts and
+alternate experiments, including already-matched drafts. `drafts/targets.csv` maps all 65 unresolved selected candidates to
+preserved files; `drafts/manifest.csv` records every source hash. A fresh clone
+can recover them by fetching that branch. The original local WIP and a
+source-only archive under `build/existing-draft-sources_2026-10-09.tar.gz`
+are also retained. No ROM, assembly, dumps or binary build outputs were pushed.
+
+The best large near-match is 08160EA4: 1,060 emitted bytes, four differing
+instruction locations. FDB4 has a 300-byte body, not its 788-byte span; its
+488-byte tail is a separate body. Other useful near-matches and their selected
+source hashes are listed in the inventory. 08235000 is now exact, so the older
+handoff's claim that it remains blocked is superseded.
+
+The current policy prohibits nonmatching C on `main` while allowing dedicated
+WIP branches outside production `src/`. Candidate source retention is now
+implemented by the branch above. Fuzzy/partial progress reporting remains
+unimplemented pending further research; preserved source receives zero exact
+progress credit. Family/library reuse should be prioritized over repeated
+isolated register-allocation retries; one-function commits are bookkeeping,
+not a requirement to solve functions independently.
+
+The [KNIDL process review](../KNIDL_PROCESS_REVIEW_2026-10-09.md) compares its
+multiweek module/family campaigns with our recent run. The solo tranche applied seeded cohorts, typed layouts, compiler diagnostics
+and durable WIP checkpoints. Its evidence and limits are recorded in the
+tranche notes; the 20% goal remains unmet. No partial-credit metric
+or compiler recipe change was implemented by the review.
+
+Historical run details follow; their meter limits and counts describe earlier
+stages rather than the current state.
+
+Why bytes trail functions: workers go easiest-first. ~7,000 functions remain;
+most small ones (<=40 insns) are done in most ranges, so the frontier is the
+41-150 instruction tier, switches, and the logged skip classes below.
+
+History in one paragraph: session 1 built the disassembly (gbadisasm),
+shiftable data (46k symbolized pointers), the C pipeline and the first 664
+matches. Session 2 added `check.py`, `clones.py`, `permute.py`, found 3,096
+hidden functions (data-table seeds), and solved three "impossible" codegen
+patterns. Session 3 ran 5-6 Sonnet workers overnight (~1,950 matches).
+
+The local session built and verified the native macOS toolchain, added ROM-free
+progress Actions and registered [decomp.dev](https://decomp.dev/moozilla/boktai3-decomp).
+The reporting denominator now includes three already-matched SDK boundaries
+that the old numerator counted but the old denominator omitted (11,028 report
+functions versus 11,025 generated disassembly starts). This is an accounting
+correction, not three new matches.
+
+An isolated six-target pilot produced six new matches: Sol 5/6, Astra 6/6,
+Luna 4/6 after an explicit continuation. See `docs/MODEL_BENCHMARK.md` for
+attempts, elapsed times and limitations. Use Sol as the initial default matcher;
+escalate hard cases to Astra and give Luna bounded tasks with explicit retry
+rules. No per-model plan-usage/cost measurement was available. This runtime
+allows three simultaneous workers alongside the orchestrator. Workers retain
+per-function commits; the orchestrator validates and merges batches into main.
+Progress Actions run only for main pushes or manual dispatch.
+
+Production round 1 then added **52 new matches**: Luna A 15, Luna B 11,
+Sol 26 including a compiler-thunk follow-up. One redundant rewrite was excluded.
+The verified `_call_via_r4` alias unblocks ordinary C indirect calls through r4.
+Per-worker patterns and failures are in `notes/round1-*.md`; detailed accounting
+and limitations are appended to `docs/MODEL_BENCHMARK.md`.
+
+The community-reference pass found real permuter wrapper bugs: symbolic versus
+numeric addresses incurred false penalties, retained data inflated scores, and
+regex source stripping could erase compact loops. `tools/permute.py --debug`
+now diagnoses the base without those errors. It preserves static inline helpers,
+requires one target ROM function and creates isolated run directories. See
+`docs/COMPILER_REFERENCES.md` for tested GCC patterns, upstream/fork evaluation
+and validation. A 60-second trial on `081A55D4` did not solve its remaining
+register allocation difference; keep that candidate for future escalation.
+
+Production round 2 added **113 new functions and 14,996 progress-span bytes**:
+Luna A five, Luna B 21, Sol 40, main-thread counter family seven and libgcc 40.
+Three redundant rewrites were excluded. Sol's bounded permuter trials solved
+three targets, and allocator-wrapper null fallthroughs are now matched across
+the family. The main thread matched both floating-point runtime units with
+`old_agbcc -O2`; 18 hidden library boundaries were added to the inventory.
+See `docs/LIBGCC.md`, `notes/round2-*.md` and `docs/MODEL_BENCHMARK.md`.
+
+The user authorized continued work until 20% matched code bytes or weekly
+allowance below **35% remaining** (extended from 50%, then 40%, by explicit user requests),
+then draining all existing assignments. Check
+the account meter before each new round. Two Luna workers began round 3 while
+a single requested Astra worker reviewed external development-history claims
+and SolDec. Its completed `docs/PROCESS_REVIEW.md` identifies concrete GCL-family
+script correspondences, B3-specific decoding differences and a 722-target actor
+registry. `tools/soldec_audit.py` supplies bounded, read-only checks; no speculative
+engine/compiler claims were adopted. The main thread continues hard matching and reviewed batch integration.
+Do not conflate worker commit counts with new coverage.
+
+Production batch 3 adds **97 functions and 22,800 progress-span bytes**:
+Luna A six, Luna B four, Sol 40, MGS-focused Sol 25 across two rounds, and the
+main thread 22 fdlibm functions. See `docs/LIBM.md` for exact historical source
+matches and `docs/MGS_GCL_MATCHING.md` for all MGS comparisons, B3 differences
+and remaining candidates. One Sol worker remains dedicated to MGS at the
+user's request. No speculative gameplay names were installed.
+
+The user challenged continuing Luna after its lower recent output. Luna B's
+next 9-minute round added zero matches and was stopped; its slot now runs Sol
+6.1 on retained family seeds. This supersedes the earlier decision to keep
+Luna production workers running. No measured Pareto-efficiency claim is valid:
+account usage cannot be attributed to individual models, and these rounds have
+different targets. Prioritize useful native-byte output over further benchmarking.
+
+Production batch 4 adds 43 functions / 6,142 progress bytes (6,144 emitted):
+Sol family rounds 1–2 (13), Sol round 4 (8), MGS round 3 (4), and root's
+14 unoptimized SIIRTC routines, two memcpy/memset primitives and two clone
+ports. See `docs/RTC.md` for the compiler/bitfield evidence. A reviewed but
+unintegrated RTC entry at `08248E70` is now an unmatched progress boundary,
+preventing 464 retained assembly bytes from receiving false C credit.
+Terminal code alignment is handled once by the splitter. All 35 combined
+shift screenshots and 32 tool/context tests pass.
+
+Production batch 5 adds **135 functions / 23,220 progress bytes**: Sol round 5
+(15), Sol family rounds 3–4 (10), MGS round 4 (14), and root EEPROM/RFU work
+(96). MGS round 5 adds no matches and documents three remaining candidates plus
+unsafe permutations that must not be reused. All findings are in
+`docs/MGS_GCL_MATCHING.md`. The exact RFU_V1024 source matches consolidate 54
+existing functions and add 91; seven ARM interrupt routines use `agbcc_arm`.
+Ten reviewed ARM boundaries exclude three retained assembly trampolines from
+C credit. See `docs/RFU.md`, `docs/EEPROM.md`, and the ROM-free inventories.
+The complete combined ROM is byte-identical; all 35 shift screenshots and
+36 local tool/context tests pass.
+The user extended the floor again to **35% weekly allowance remaining**. This
+supersedes older 40%/50% instructions; finish existing work after crossing it.
+Do not recheck the live decomp.dev page; local reports and Actions suffice.
+
+Production batch 6 adds **34 functions / 4,812 code bytes**: Sol round 6 and
+short follow-up (10), Sol family rounds 5–6 (13), MGS round 6 (7), and root's
+solar timer/IRQ routines plus teardown helper (4). MGS round 7 adds evidence
+without new matches. Three independently reviewed retained Thumb entries
+(081B61E0, 0821E0D0, 0821E2F8) exclude 340 assembly bytes from the new matches'
+progress spans. `docs/SOLAR_SENSOR.md` maps the low-level sensor API and RAM:
+four emulator threshold inputs give measured results within one count, with
+identical snapshots/probes in the original and rebuilt ROMs. The standard
+`tools/emu/harness` has now been rebuilt with the corrected probe source.
+
+**The earlier run stopped at its allowance limit.** The meter reached 35%
+remaining, no further assignments began, and all in-flight work was finished;
+it showed 34% while integrating the final batch. The final combined ROM
+SHA-1, all 35 shifted-data screenshots and all 36 tool/context tests pass. All three Sol workers are
+idle with committed work integrated and ignored WIP preserved in their isolated
+checkouts. The sustained run from `e2546f6` added **422 functions / 71,970 code
+bytes**, advancing 9.302% to 12.282%; it stopped on allowance, before 20% code.
+Across all dedicated MGS rounds, 50 functions / 7,024 emitted bytes matched,
+with complete evidence and remaining targets in `docs/MGS_GCL_MATCHING.md`.
+
+The new `docs/SCRIPT_TRACING.md` records 698 native calls and 90 actor callbacks
+from the intro, verified against command tables and the 722-entry actor registry.
+The main thread fixed execution-sample PC adjustment and IRQ timing in the
+harness. **Regenerate older execution coverage before entry-level claims.**
+Existing memory-hook evidence is unaffected. `tests/script_probes.txt` and
+`tools/script_trace.py` provide a reproducible read-only runtime trace.
+
+The deeper task connects emulator coverage to function boundaries:
+`tools/function_context.py`, `docs/RUNTIME_CONTEXT.md`, and `docs/MENU_CONTEXT.md`.
+Screenshot review corrected a one-tab offset in the menu replay's labels and
+separated transition marks from stable screens. Inputs and all 12 screenshots
+remain unchanged. Config/sleep/save confirmation handlers are promising naming
+leads; an A-button replay is the next evidence step before adopting the names.
+
+## Former section 2: Setting up (new machine/session)
+Tags: #tooling #process
+
+The ROM is never in git. On the current Mac, it is already at `baserom.gba`,
+extracted from the user's Downloads ZIP and SHA-1 verified. `build/venv`,
+`build/tools`, `gen/`, and a verified baseline `build/boktai3.elf` are ready.
+Activate `source build/venv/bin/activate` before using Python tools. Homebrew
+provides `arm-none-eabi-binutils` and mGBA; `make setup` builds the pinned
+compiler, disassembler, assembler, permuter and harness. See README for macOS
+installation instructions. Full `make` and all 35 shift-test screenshots passed
+after the production batches were integrated.
+
+On a fresh Linux machine, supply the ROM, then:
+
+```
+ln -s /path/to/rom.gba baserom.gba        # SHA-1 above (Japanese, U33J)
+apt install build-essential cmake binutils-arm-none-eabi libmgba-dev python3-numpy python3-pil
+pip install -r requirements.txt
+make setup      # gbadisasm (patched), agbcc, armips, permuter, emulator harness
+make disasm     # ~15-20 min: gen/code.s -> gen/code_sym.s + gen/data.s (11,025 functions)
+make            # must print build/boktai3.gba: OK
+```
+
+`gen/` and `build/` are generated, gitignored, never committed (ROM-derived).
+
+
+## Former section 3: How to match a function (the inner loop)
+Tags: #tooling #process
+
+```
+python3 tools/worklist.py --range 08000000 080492B0 --max-insns 80   # unmatched, easiest first
+python3 tools/asmat.py 0800E08C 60      # the asm (runs past the end; stop at the next func_start)
+python3 tools/ghidra_c.py 0800E08C      # Ghidra draft, if gen/ghidra export exists (optional)
+mkdir -p wip && $EDITOR wip/sub_0800E08C.c
+python3 tools/check.py wip/sub_0800E08C.c   # ~0.5 s; side-by-side diff, '!' = differs; ends MATCH/MISMATCH
+cp wip/sub_0800E08C.c src/fn/ && python3 tools/build.py   # must print OK, then commit
+```
+
+Rules that matter (all in `docs/WORKER.md`, which also has ~40 agbcc tricks):
+* Only commit files that MATCH and a build that prints OK. Never hand-written asm.
+* Never write raw ROM data addresses (`0x086xxxxx`) in C: declare the
+  `gen/data.s` label (`extern const u8 gUnk_08603300[];`). build.py rejects them;
+  they break the shift test.
+* RAM: `extern T gUnk_02xxxxxx;` (the linker defines it from the name).
+* Callees: declare locally with their `sub_` name. Functions that have a real
+  name in gen (e.g. `Script_*`, m4a names) must be defined under that name.
+* Always read check.py's final MATCH line; a compile error prints no `!` lines.
+
+
+## Former section 4: Tools
+Tags: #tooling #process
+
+| Tool | What |
+|---|---|
+| `tools/build.py` | split asm around src/*.c, compile (agbcc -O2 -mthumb-interwork; per-file `// CFLAGS:` override), link, SHA-1 check |
+| `tools/check.py FILE` | one file vs ROM at its address, compact aligned diff |
+| `tools/worklist.py` | unmatched functions with size/branch/jumptable signals; `--chunks N` to split ranges |
+| `tools/clones.py` | clone families: `--stats`, `--port [--loose] [--range A B]` copies matched C to identical siblings (loose = immediates may differ), keeps what check.py accepts. ~6 min for the full ROM. Run after every merge. |
+| `tools/permute.py FILE --run SECS` | decomp-permuter for register-allocation misses |
+| `tools/progress.py [--markdown PROGRESS.md]` | numbers |
+| `tools/disasm.py` / `symbolize.py` | regenerate gen/ (seeds: BL targets, code literals, data-region function tables, aligned gap targets) |
+| `tools/shift_test.sh`, `make shifttest` | move data 64 KiB, compare emulator screenshots |
+| `tools/emu/harness` | headless mGBA: scripted input, screenshots, coverage, `dump/watch/poke/freeze` |
+| `tools/mgba/centaur.lua` | desktop mGBA: input recorder + peek/poke console |
+
+
+## Former section 5: Running parallel workers (what worked)
+Tags: #tooling #process
+
+* `tools/worktree.sh NAME` -> `../wt/NAME` on branch `codex/NAME`, sharing gen/,
+  the ROM and tools by symlink. Existing worktrees: `../wt/s0`..`s5`, `bk`, `disc`.
+* Ranges used in session 3 (each has ~1,000+ functions left):
+  s0 `08000000-080492B0`, s1 `080492B0-0810ECEC`, s2 `0810ECEC-08182F24`,
+  s3 `08182F24-081F612C`, s4 `081F612C-0824DAFA` (skip MP2K `0822F248-08231440`).
+* Give each worker `docs/WORKER_ROUND.md` with NAME/START/END. Sonnet-class
+  models did 80-135 matches per round at 130-340k tokens. Workers commit
+  after every batch, so a usage-limit cutoff loses little.
+* Lead merges: `git merge work/NAME`; on add/add conflicts (two workers or
+  clones.py matched the same function) keep either side (`git checkout --ours`),
+  check for `<<<<<<<`, build, push. Then `clones.py --port --loose`.
+* A "seeder" worker is high-leverage: list unseeded clone families
+  (see the snippet in the session-3 log: `clones.LOOSE=True; clones.families(...)`,
+  families with no matched member, largest first), match one representative
+  each, then port siblings. Top families gave 10-50 functions each.
+* Run `make shifttest` after big merges; once, a worker's raw addresses broke it.
+* Builds slow down to 30-120 s with 5-6 workers on 4 cores; workers batch.
+
+### Helping from another plan / another agent
+
+Pick a range nobody else is working on (coordinate via a GitHub issue or a
+branch name), branch from `main`, follow sections 2-3, commit one function per
+commit (`match sub_XXXXXXXX`), and open a PR. Every file must MATCH and
+`build.py` must print OK on the branch. Good first targets:
+`python3 tools/worklist.py --range START END --max-insns 40`, then 41-80.
+Skips are logged per range in `notes/s*.md` (with reasons) — a fresh model
+solving those is the most useful test of capability.
+
+
+## Former section 6: Known-hard classes (backlog for stronger models / permuter)
+Tags: #tooling #process
+
+Solved (see WORKER.md): `mov ip, r0` leaves (struct arrays); redundant null
+check (`return &p->unk0`); materialised bools (`static inline u8` helpers);
+function pointers; switches (case order = asm order); fall-off-the-end returns.
+
+Open:
+1. A big constant derived from another constant's register (`movs r2,#0x94;
+   lsls; ... subs r2,#4`) instead of separate literals (081A6108, 081A6EF8,
+   0813BA24, 0814DF0C). Real struct fields get partway.
+2. Alloc/init/free wrappers: solved in round 2 with guarded initialization and
+   non-void null fallthrough retaining allocator r0; see notes/round2-sol.md.
+3. `movs r1,#3; ands r1,r0` (result in the constant's register): 081F612C family.
+4. Stack `s16[3]` vectors whose address lives in a callee-saved register
+   (081C43B0 family; 08201CAC's `u16 *q = (u16 *)&v` trick may help).
+5. Loops where agbcc hoists or strength-reduces what the original recomputes
+   (0811E8B0 family, 080150D0).
+6. Pure register-allocation swaps (most remaining skips): `tools/permute.py`.
+7. `CgbSound` (last m4a function): stack layout solved, registers left;
+   `notes/cgb.md`, best permuter candidate `notes/cgb_permuted_1480.c`.
+8. Float/double libgcc units are now matched with `// COMPILER: old_agbcc` and
+   `// CFLAGS: -O2`. Remaining libc and integer helpers are library candidates;
+   compiler choice requires exact-byte evidence (docs/LIBGCC.md).
+
+
+## Former section 7: Other open work
+Tags: #tooling #process
+
+* Progress reporting is live on decomp.dev; maintain the ROM-free report and
+  batched main-only CI as the source layout evolves (`docs/PROGRESS_CI.md`).
+* Naming/context pass: tag functions by the screens they run on (harness
+  coverage per `mark` segment), name subsystems, apply `symbols/proposed/*.csv`.
+* Cleanup: merge `src/fn/*.c` into real translation units with shared headers
+  and structs (contiguous runs); extract assets (graphics, tilemaps, songs:
+  classify the 1,483 song-table entries).
+* Coverage: record playthroughs with `tools/mgba/centaur.lua`; only ~6% of
+  code is exercised by the scripted tests.
+* Lua pseudo debug menu (user idea): extend `centaur.lua` with scene jumps,
+  flag toggles, warps, sun level, using RAM addresses as the decomp names them.
+
+
+## Former section 8: Translation (separate repo)
+Tags: #tooling #process
+
+[boktai3trans](https://github.com/moozilla/boktai3trans), branch
+`claude/kind-shannon-ugkern`: text tooling (`decomp/tools/text_dump.py`,
+`charmap.py`, `text/script.jsonl` with Japanese + 2007 English per string).
+Ideas: inserter with box-width checks (1.47 MB free ROM space), `{1F}{xx}`
+accents, VWF via `Text_DrawGlyph` (`08218D1C`). Lan Hikari's 0.9 PR there is
+still open (recommendation: merge for players, ask for sources).
+
+User preference: after the confirmed live integrations, do not spend browser
+work rechecking decomp.dev for each batch. Local reports and Actions results
+are sufficient; the user explicitly requested this on 2026-10-09 UTC.

@@ -1,6 +1,8 @@
 # Working on the Boktai 3 decomp (notes for agents and humans)
 
-Read `README.md` first, then `docs/HANDOFF.md` (current state and next steps). The ROM (`baserom.gba`, SHA-1 `2651c5e6…`) is never
+Read `README.md` first, then `docs/HANDOFF.md` (current state and next steps). Look
+things up in `docs/INDEX.md` and with `python3 tools/docindex.py ADDR` rather than
+reading docs in full; `docs/history/` is a record, not required reading. The ROM (`baserom.gba`, SHA-1 `2651c5e6…`) is never
 committed, and neither is anything generated from it (`build/`, `extracted/`).
 
 ## Ground rules
