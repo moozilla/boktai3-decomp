@@ -1864,11 +1864,12 @@ addr,name,mode,confidence,source,notes
 080E986C,Mimic_Create,thumb,high,gcl-name,name from GCL key BEF5 ミミック (Mimic); registry callback
 080EC3F8,Octopus_Init,thumb,medium,gcl-name,name from GCL key 3F99 オクトパス (Octopus); loader called by Octopus_Create
 080ED2F0,Octopus_Create,thumb,medium,gcl-name,name from GCL key 3F99 オクトパス (Octopus); registry callback
+080F1BD4,Ivy_Create,thumb,medium,gcl-behavior,"registry 1744, enemy kind 50; proc 3278 places 'ivy as destroyed remains' with this family's sprite D638"
 080F752C,Sword_Create,thumb,medium,gcl-name,name from GCL key DB8D ソード (Sword); registry callback
 080FE68C,Axe_Init,thumb,medium,gcl-name,name from GCL key 2D30 アックス (Axe); loader called by Axe_Create
 080FF754,Axe_Create,thumb,medium,gcl-name,name from GCL key 2D30 アックス (Axe); registry callback
 08100298,WoodenCrate_Create,thumb,medium,gcl-name,name from GCL key 820B 木箱 (Wooden Crate); registry callback
-0810067C,FloorSwitch_Create,thumb,medium,gcl-behavior,registry AB8E; S options are on_press/on_release callbacks (procs 3945/3946 toggle a door); starts pressed when an object rests in its 256x32 box
+0810067C,FloorSwitch_Create,thumb,high,gcl-behavior,registry AB8E; S options are on_press/on_release callbacks (procs 3945/3946 toggle a door); starts pressed when an object rests in its 256x32 box
 08103B94,NamedActor_SetMoveModeFromScript,thumb,low,src-alias,
 08103CF8,NamedActor_SetRouteFromScript,thumb,low,src-alias,
 08103DCC,NamedActor_SetSpeedFromScript,thumb,low,src-alias,

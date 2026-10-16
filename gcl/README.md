@@ -193,6 +193,29 @@ strings, `#` comments ([KCEJ GCL examples](https://github.com/metalgeardev/KCEJ_
 The readable GCL in `src/` will use that syntax, with placeholders where a
 name is not recovered (`0x2502` keys, `r708[0x70]` variables, `proc_884`).
 
+### Naming procedures (`names/proc.csv`)
+
+Our procedure names are ASCII `snake_case`, verb first, so a script reads as
+commands: `place_slime(...)`, `open_choice_menu(...)`. Native routines stay
+noun first (`Slime(...)`, `NamedActor_SetRoute(...)`), which keeps the two
+layers apart. Grouping by subject comes from always using the same noun for
+one thing (`slime`, never also `ooze`), so a search for it finds the family.
+
+| Verb | Meaning |
+|---|---|
+| `spawn_` | create an actor at the position given |
+| `place_` | work out the position first (floor height, path point, box), then spawn |
+| `set_` / `get_` / `is_` | write / read / test state |
+| `open_` / `close_`, `start_` / `end_`, `begin_` | paired actions |
+| `play_`, `add_`, `load_`, `show_` | as in English |
+
+Variants of one procedure take a descriptive suffix (`_by_kind`,
+`_at_path_point`, `_default`) or, when nothing tells them apart yet, a
+number (`spawn_slime_3`). Procedures for one stage or area take Konami's
+stage prefix (`st05_440_`); library procedures used across the game take
+none. A Konami name from a debug print (`@st01_43_ruins_after`) wins over
+ours.
+
 ## Not names
 
 Script procedures are table slots, not hashes: a procedure's number cannot be
