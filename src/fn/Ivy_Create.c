@@ -6,7 +6,7 @@ s32 sub_080F0C20(u8 *);
 void sub_080F0B8C(u8 *);
 void Heap_Free(u8 *);
 
-void sub_080F1BD4(void)
+void Ivy_Create(void)
 {
     u8 *p = Heap_Alloc(0x640);
     if (p != 0) {

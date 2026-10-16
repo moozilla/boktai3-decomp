@@ -386,7 +386,7 @@ leads for naming, not facts.
 | `sub_080E5744` | `F836` (`sub_080E6814`) | `D635` | 64 | small dragon | ドラゴンパピー? |
 | `sub_080E87C4` | `BEF5` (`sub_080E986C`) | `3876` | 8 | arcade cabinet | ? |
 | `sub_080EC3F8` | `3F99` (`sub_080ED2F0`) | `D291` | 35 | flame worm | モエルルン? |
-| `sub_080F0C20` | `1744` (`sub_080F1BD4`) | `D638` | 37 | pale worm | ヒエルルン / クロロホルルン? |
+| `sub_080F0C20` | `1744` (`sub_080F1BD4`) | `D638` | 37 | pale worm | アイビー (Ivy): proc 3278 places "ivy as destroyed remains" with D638 |
 | `sub_080FE68C` | `2D30` (`sub_080FF754`) | `5291` | 4 | living sword | ソード |
 
 Each family is spawned through the script actor registry
