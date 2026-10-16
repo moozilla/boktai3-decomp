@@ -173,11 +173,11 @@ proc,name,params,confidence,evidence
 1528,spawn_vorn_by_kind_3,"name,kind,path",medium,"picks one of procs [1529, 1530] by kind"
 1529,spawn_vorn_1,"name,path",medium,"enemy spawner: creates key DFDC (docs/ASSETS.md, 1496-1627)"
 1530,spawn_vorn_2,"name,path",medium,"enemy spawner: creates key DFDC (docs/ASSETS.md, 1496-1627)"
-1531,spawn_flower_by_kind,"name,kind,path,point,level",low,"picks procs 1533-1535 (enemy kinds 26-28, registry 680E); log 'Invalid type! Enemy not registered.'"
-1532,spawn_flower_group,"name,kind,path,first_point,last_point",low,calls spawn_flower_by_kind up to 10 times with names +10 each
-1533,spawn_flower_1,"name,path,point,level,proc",low,"enemy kind 26, registry 680E (Flower_Create)"
-1534,spawn_flower_2,"name,path,point,level,proc",low,"enemy kind 27, registry 680E"
-1535,spawn_flower_3,"name,path,point,level,proc",low,"enemy kind 28, registry 680E"
+1531,spawn_lun_by_kind,"name,kind,path,point,level",low,"picks procs 1533-1535 (enemy kinds 26-28, registry 680E); log 'Invalid type! Enemy not registered.'"
+1532,spawn_lun_group,"name,kind,path,first_point,last_point",low,calls spawn_lun_by_kind up to 10 times with names +10 each
+1533,spawn_lun_1,"name,path,point,level,proc",low,"enemy kind 26, registry 680E (Lun_Create): Klorofolun, Burrnun or Chillun"
+1534,spawn_lun_2,"name,path,point,level,proc",low,"enemy kind 27, registry 680E"
+1535,spawn_lun_3,"name,path,point,level,proc",low,"enemy kind 28, registry 680E"
 1536,spawn_bat_by_kind,"name,kind,path",medium,"picks one of procs [1541, 1542] by kind"
 1537,place_bat_at_path_point,"name,kind,path,point,a,b,c",medium,"Path_GetPointFromScript(path, point) and spawn_bat_by_kind 220 above that point"
 1538,place_bat,"name,kind,x,z,wall,on_wall,a",medium,"spawn_bat_by_kind 220 above the floor, shifted half a tile onto a wall face when on_wall"
