@@ -68,6 +68,7 @@ proc,name,params,confidence,evidence
 1049,play_bgm_with_fade,"fade,id",medium,"play_bgm_fade(fade, id, 0)"
 1051,play_bgm_fade,"fade,id,urgent",medium,"fade 0 plays at once (print: No fade, play immediately!); keeps the previous track in r708[0x74]"
 1052,add_display_track,id,low,proc_1053 then a palette track
+1053,display_track_add,"id,resource,frame",medium,DisplayTrack_Add with a position wrapped to the cell
 1059,place_scene_object,"id,type,x,z",medium,proc_1060 with defaults
 1060,scene_object,"id,type,flags,x,z,health,resource,drawmode,script",medium,"SceneObjects at the cell centre (x + 128, z + 128)"
 1072,add_area_sprite,"entries,x,z,kind",medium,AreaEffect_AddSprite at the cell centre
@@ -147,6 +148,7 @@ proc,name,params,confidence,evidence
 1557,spawn_bee_1,"name,path",medium,"enemy spawner: creates key E131 (docs/ASSETS.md, 1496-1627)"
 1558,spawn_bee_2,"name,path",medium,"enemy spawner: creates key E131 (docs/ASSETS.md, 1496-1627)"
 1559,spawn_bee_3,"name,path",medium,"enemy spawner: creates key E131 (docs/ASSETS.md, 1496-1627)"
+1561,spawn_slime_by_color,"name,path,color,x,z,y",medium,places a slime at a cell; color 4/5/1/2 picks the spawner
 1562,spawn_slime_1,"name,path",medium,"enemy spawner: creates key C3BC (docs/ASSETS.md, 1496-1627)"
 1564,spawn_slime_2,"name,path",medium,"enemy spawner: creates key C3BC (docs/ASSETS.md, 1496-1627)"
 1565,spawn_slime_3,"name,path",medium,"enemy spawner: creates key C3BC (docs/ASSETS.md, 1496-1627)"

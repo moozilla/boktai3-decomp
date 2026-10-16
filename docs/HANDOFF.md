@@ -573,8 +573,10 @@ evidence in [ASSETS.md](ASSETS.md) ("Stage terrain", "Stage scripts"):
   unmatched ones scripts use are 23 KB, led by `0817809C` (message window
   mode, 129 uses), `08227A10` (floor height, 105), the `trap` handler
   (`08225624`, 103) and `080311F0` (open the message window, 94).
-  `gcl/names/proc.csv` names 151 procedures; 60% of call sites now go to a
-  named procedure.
+  `gcl/names/proc.csv` names 199 procedures; 68% of call sites now go to a
+  named procedure. The next most-called unnamed ones are thin wrappers around
+  unnamed natives (`sub_080040F8`, `sub_0802091C`, `sub_0810067C`...), so
+  naming those natives (decomp) is what unlocks them.
 * **GCL names** ([gcl/README.md](../gcl/README.md)): registry keys and
   command ids are EUC-JP name hashes. `gcl/names/chara.csv` has 52 recovered
   names with English (enemies such as スライム/Slime, routines such as
