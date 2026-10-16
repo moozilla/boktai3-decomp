@@ -25,7 +25,7 @@ extern s32 gUnk_03005408;
 extern u16 gUnk_03005260[]; // [1] = newly pressed keys
 
 u8 sub_0822BE20(void);
-void sub_08177DEC(s32);
+void Hud_SetMode(s32);
 void sub_08033778(s32);
 s32 sub_08033690(u32, u32, u32, u32);
 void sub_080337FC(s32);

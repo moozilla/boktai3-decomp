@@ -4,7 +4,7 @@ extern struct SceneActorControlManager *gUnk_02000128;
 struct SceneActorControlManager *SceneActorControl_EnsureSingleton(void);
 struct SceneActorControlSlot *SceneActorControl_AllocateSlot(struct SceneActorControlManager *);
 void SceneActorControl_DecodeDirection(const void *, u8 *, u8 *);
-s32 sub_0822C034(const struct ContactPosition *);
+s32 Region_FindContaining(const struct ContactPosition *);
 void sub_082144E4(void *, void *, u32);
 u32 sub_0804DFC0(s32);
 void SceneActorControl_InitCollider(struct SceneActorControlSlot *, s32, s32);
@@ -181,7 +181,7 @@ s32 SceneActorControl_CreateFromPosition(const struct SceneActorControlInput *ar
             const struct SceneActorControlInput *read = input;
             *saved = read->position;
         }
-        slot->scene = sub_0822C034(saved);
+        slot->scene = Region_FindContaining(saved);
         {
             u16 *temp = &slot->flags;
             slotFlags = temp;

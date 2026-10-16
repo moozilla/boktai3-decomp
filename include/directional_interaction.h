@@ -72,7 +72,7 @@ s32 Script_GetKeywordValue(u32, s32);
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetPc(void);
 s32 Script_GetValue(void);
-s32 sub_0822C034(struct SceneVec *);
+s32 Region_FindContaining(struct SceneVec *);
 s32 Math_Atan2(s32, s32);
 s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);

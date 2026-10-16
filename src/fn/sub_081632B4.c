@@ -5,7 +5,7 @@ struct P {
 };
 extern struct P *gUnk_02000210;
 void sub_0816310C(struct P *);
-void sub_08177DEC(s32);
+void Hud_SetMode(s32);
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void sub_082279A8(s32, s32, s32, s32, s32, s32, s32);
@@ -14,7 +14,7 @@ void sub_081632B4(void)
     struct P *p = gUnk_02000210;
     if (p != 0) {
         sub_0816310C(p);
-        sub_08177DEC(7);
+        Hud_SetMode(7);
         p->x = 1;
         if (Script_SeekToKeyword(0x66) != 0) {
             if (Script_GetValue() != 0)

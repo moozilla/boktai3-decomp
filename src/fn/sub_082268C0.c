@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine.h"
 extern u32 gUnk_03005420; /* camera (guess) */
-void sub_082265F8(u32);
+void Camera_ReadMoveRate(u32);
 void sub_08226558(s32 target, s32 frames, s32 mode);
 /* Script: -w target, -f (default 1), -N (default 0); stops the current camera
    move and hands the three values to sub_08226558 (tentative: camera follow). */
@@ -18,7 +18,7 @@ void Camera_SetFollowFromScript(void)
             mode = Script_GetValue();
         else
             mode = 0;
-        sub_082265F8(gUnk_03005420);
+        Camera_ReadMoveRate(gUnk_03005420);
         sub_08226558(target, frames, mode);
     }
 }
