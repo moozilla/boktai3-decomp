@@ -12,7 +12,7 @@ void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *argument)
     s32 computedCell;
     u8 *data;
     route->fieldC = route->parameterC;
-    sub_0821E5C4(route, route->parameterA, route->parameterB, route->parameterC);
+    Route_Start(route, route->parameterA, route->parameterB, route->parameterC);
     {
         register u32 offset asm("r2") = 0x5D0;
         void *object;

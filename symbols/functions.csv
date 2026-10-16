@@ -1879,7 +1879,9 @@ addr,name,mode,confidence,source,notes
 08103CF8,NamedActor_SetRouteFromScript,thumb,low,src-alias,
 08103DCC,NamedActor_SetSpeedFromScript,thumb,low,src-alias,
 08103E60,NamedActor_SetRangeFromScript,thumb,low,src-alias,
+081081F0,Pool1B8_FindByName,thumb,low,src-alias,
 0810858C,AnimatedTile_CreateFromScript,thumb,low,src-alias,
+0810B914,Registry1745_Create,thumb,low,src-alias,
 0810BDB4,RegistryC5BD_SetTimeFromScript,thumb,low,src-alias,
 0810BE58,Registry1022_GetValueFromScript,thumb,low,src-alias,
 08111A48,PaletteFade_StartFromScript,thumb,low,src-alias,
@@ -1902,6 +1904,7 @@ addr,name,mode,confidence,source,notes
 0815F4F4,Player_Create,thumb,medium,gcl-name,name from GCL key F5EB プレイヤー (Player); registry callback
 0816B834,GameState_ClearAreaFlagsFromScript,thumb,low,src-alias,
 0816B884,GameState_SetAreaFlagFromScript,thumb,low,src-alias,
+08177DEC,Hud_SetMode,thumb,low,src-alias,
 08178008,Hud_RefreshSpriteFromScript,thumb,low,src-alias,
 0817809C,Hud_SetModeFromScript,thumb,low,src-alias,
 081780D4,Hud_SetLayoutFromScript,thumb,low,src-alias,
@@ -1910,6 +1913,7 @@ addr,name,mode,confidence,source,notes
 08179298,Hud_Create,thumb,low,src-alias,
 081803D8,BossSlot2_AdvanceStepFromScript,thumb,low,src-alias,
 0818C674,Armor_Create,thumb,medium,gcl-name,name from GCL key E043 アーマー (Armor); registry callback
+081975C8,Nidhoggr_ReadOptions,thumb,low,src-alias,
 0819783C,Nidhoggr_Create,thumb,medium,gcl-name,name from GCL key B06E ニーズホッグ (Nidhoggr); registry callback
 08197EC4,KeyTrigger_Update,thumb,low,src-alias,
 08197F64,KeyTrigger_Destroy,thumb,low,src-alias,
@@ -1927,6 +1931,7 @@ addr,name,mode,confidence,source,notes
 081C0BD4,SceneActorManager_Exists,thumb,low,src-alias,
 081C4080,RegistryF3E4_Create,thumb,low,src-alias,
 081CE1BC,SceneCharacter_PlaceFromScript,thumb,low,src-alias,
+081CE6DC,SceneCharacter_CommandFromScript,thumb,low,src-alias,
 081D0C04,SceneNpc_CreateFromScript,thumb,low,src-alias,
 081D0F28,SceneNpc_CommandFromScript,thumb,low,src-alias,
 081D105C,SceneNpc_StopFromScript,thumb,low,src-alias,
@@ -2052,6 +2057,7 @@ addr,name,mode,confidence,source,notes
 0821BC4C,Terrain_SetGrid,thumb,low,src-alias,"HP grid -> EngineMap+4, then neighbour offsets and size"
 0821DDF4,Terrain_SetBoxes,thumb,low,src-alias,"HP named boxes (doors, camera area) -> EngineMap+0xC"
 0821E5B8,Terrain_SetPaths,thumb,low,src-alias,HP patrol paths -> EngineMap+0x10
+0821E5C4,Route_Start,thumb,low,src-alias,
 0821E860,Path_GetPointFromScript,thumb,low,gcl-behavior,"registry 3DB8; looks up point B of path A (sub_0821E748/E76C/E780) and stores x, y, z into three script variables"
 0821F180,Terrain_SetNavMeshes,thumb,low,src-alias,HP nav meshes -> EngineMap+0x14
 0821FE40,Collider_Refresh,thumb,low,src-alias,
@@ -2070,6 +2076,7 @@ addr,name,mode,confidence,source,notes
 08225624,Trap_CreateFromScript,thumb,low,src-alias,
 08225C48,Terrain_LoadHP,thumb,low,disasm,"ScriptProc_Start(0xAE6C, hp): hands the HP header offsets to Terrain_SetGrid/SetBoxes/SetPaths/SetNavMeshes; docs/ASSETS.md"
 08225CB8,Terrain_LoadFromScript,thumb,low,src-alias,
+082265F8,Camera_ReadMoveRate,thumb,low,src-alias,
 082268C0,Camera_SetFollowFromScript,thumb,low,src-alias,
 08227888,PlayerName_SetFromScript,thumb,low,src-alias,
 08227A10,Terrain_GetFloorHeightFromScript,thumb,low,src-alias,
@@ -2084,11 +2091,14 @@ addr,name,mode,confidence,source,notes
 0822B358,Sound_StopSong,thumb,low,src-alias,
 0822B3BC,Sound_PlaySongChecked,thumb,low,src-alias,
 0822BFC8,Registry3C8D_RunFromScript,thumb,low,src-alias,
+0822C034,Region_FindContaining,thumb,low,src-alias,
 0822DB54,RecordEntry_AddFromScript,thumb,low,src-alias,
 0822DE64,GameState_ResetEntriesFromScript,thumb,low,src-alias,
 0822E304,GameState_AddListEntryFromScript,thumb,low,src-alias,
 0822E340,GameState_ResetListsFromScript,thumb,low,src-alias,
+0822E498,GameState_AddEquipment,thumb,low,src-alias,
 0822E564,GameState_ResetSlotsFromScript,thumb,low,src-alias,
+0822E668,GameState_AddUnlock,thumb,low,src-alias,
 0822E924,GameState_ResetUnlocksFromScript,thumb,low,src-alias,
 0822E9C8,GameState_HasUnlockFromScript,thumb,low,src-alias,
 0822ECC8,SolarFruit_Command,thumb,medium,gcl-name,name from GCL key FE88 太陽の実 (Solar Fruit); registry callback (script command)

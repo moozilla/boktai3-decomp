@@ -2,7 +2,7 @@
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
-u32 sub_0822C034(void *);
+u32 Region_FindContaining(void *);
 void AreaEffect_InitializeEntry(struct AreaEffectEntry *entry, s32 kind,
                                 struct AreaEffectPosition *position, s32 rotated, u32 graphicsId)
 {
@@ -28,5 +28,5 @@ void AreaEffect_InitializeEntry(struct AreaEffectEntry *entry, s32 kind,
     entry->renderMode = 3;
     entry->hasSprite = 1;
     AreaEffect_SetBounds(entry, kind, position, rotated);
-    entry->cachedValue = sub_0822C034(entry);
+    entry->cachedValue = Region_FindContaining(entry);
 }

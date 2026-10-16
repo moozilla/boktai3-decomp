@@ -13,7 +13,7 @@ struct PooledResource {
     u32 data[8]; /* copied animation resource; three are held by the manager */
 };
 
-/* Route follower state (copied/stepped by sub_0821E5C4 and friends). */
+/* Route follower state (copied/stepped by Route_Start and friends). */
 struct PooledRoute {
     u32 data[2];
     void *current; /* current route point */
@@ -83,10 +83,10 @@ void sub_08214424(void *, u32);
 u32 sub_0821E67C(void *, void *, void *, void *, u32, u32, u32);
 void sub_0821E618(void *);
 u16 sub_0821E7E4(void *);
-u8 sub_0821E5C4(struct PooledRoute *, s32, s32, s32);
+u8 Route_Start(struct PooledRoute *, s32, s32, s32);
 void sub_0821E780(struct SceneVec *, void *, u32);
 struct SceneVec *sub_08103EF4(s32);
-s32 sub_0822C034(struct SceneVec *);
+s32 Region_FindContaining(struct SceneVec *);
 u8 *sub_0821D64C(s32, s32);
 
 /* Slot helpers and state handlers. */

@@ -1,12 +1,12 @@
 #include "global.h"
 #include "engine.h"
-void sub_0822E498(s32 value);
+void GameState_AddEquipment(s32 value);
 /* game state fields, addressed index-first as the original does */
 #define STATE_U32(offset) (*(u32 *)((u8 *)gUnk_02000710 + (offset)))
 #define STATE_U16(offset) (*(u16 *)((u8 *)gUnk_02000710 + (offset)))
 #define SLOT(i)           (*(s16 *)((u8 *)gUnk_02000710 + (i) * 2 + 0x88))
 /* Script: clears the unlock mask (+0x4C), the four slots at +0x88 and the
-   selection (+0x52), then -n count, -m count values for sub_0822E498 and -q
+   selection (+0x52), then -n count, -m count values for GameState_AddEquipment and -q
    four slot values. */
 void GameState_ResetSlotsFromScript(void)
 {
@@ -22,7 +22,7 @@ void GameState_ResetSlotsFromScript(void)
     if (count > 0) {
         if (Script_SeekToKeyword('m'))
             for (i = 0; i < count; i++)
-                sub_0822E498(Script_GetValue());
+                GameState_AddEquipment(Script_GetValue());
         if (Script_SeekToKeyword('q'))
             for (i = 0; i <= 3; i++)
                 SLOT(i) = Script_GetValue();

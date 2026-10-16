@@ -2,7 +2,7 @@
 #include "engine.h"
 extern void *gUnk_020001AC;
 u8 *sub_08101A3C(s32 name);
-void sub_0821E5C4(void *route, u32 id, u32 point, u32 mode);
+void Route_Start(void *route, u32 id, u32 point, u32 mode);
 static inline u8 optionalByte(void)
 {
     u8 value;
@@ -13,7 +13,7 @@ static inline u8 optionalByte(void)
     return value;
 }
 /* Script: actor -n (looked up by sub_08101A3C) starts following route -r id mode
-   (sub_0821E5C4 on its route block at +0xF4, which +0x128 then points to). */
+   (Route_Start on its route block at +0xF4, which +0x128 then points to). */
 void NamedActor_SetRouteFromScript(void)
 {
     s32 name = Script_GetKeywordValue('n', 0);
@@ -29,7 +29,7 @@ void NamedActor_SetRouteFromScript(void)
             point = 0;
             mode = optionalByte();
         }
-        sub_0821E5C4(actor + 0xF4, id, point, mode);
+        Route_Start(actor + 0xF4, id, point, mode);
         *(void **)(actor + 0x128) = actor + 0xF4;
     }
 }

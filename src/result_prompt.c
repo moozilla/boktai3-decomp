@@ -17,7 +17,7 @@ int ResultPrompt_Update(struct ResultPrompt *p)
         }
     }
     if ((p->result >= 0 && p->timer > 119 && (gUnk_03005260[1] & 1)) || p->timer > 299) {
-        sub_08177DEC(7);
+        Hud_SetMode(7);
         if (p->script) {
             int value = p->result;
             struct ResultPromptArgs args;
@@ -41,7 +41,7 @@ u32 sub_0800F914(struct ResultPrompt *p)
 s32 sub_0800F924(struct ResultPrompt *p)
 {
     s32 r;
-    sub_08177DEC(3);
+    Hud_SetMode(3);
     p->script = Script_GetKeywordValue(0x65, 0);
     p->timer = 0;
     r = -1;

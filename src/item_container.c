@@ -15,7 +15,7 @@ u8 sub_082212DC(void *, u32, s32, s32);
 void sub_08217DE0(struct TriggerSprite *, struct TriggerGraphics *, u32);
 void sub_08217EC4(struct TriggerSprite *, s32, s32);
 s32 sub_0821D6F4(struct SceneVec *, s32);
-s32 sub_0822C034();
+s32 Region_FindContaining();
 void ScaledShadow_Initialize(void *, struct SceneVec *, s32, s32, s32, s32, s32, s32, s32, s32,
                              s32);
 
@@ -1121,7 +1121,7 @@ s32 Trigger_CreateDrop(struct SceneVec *position, s32 id, s32 kind, u32 script, 
     p->sprite->priority = 16;
     p->position = &p->sprite->position;
     if (sound)
-        p->sound = sub_0822C034(p->position, sound);
+        p->sound = Region_FindContaining(p->position, sound);
     else
         p->sound = sound;
     p->persistent = persistent;
@@ -1306,7 +1306,7 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
                 register s32 input asm("r3") = sound;
                 input;
             }))
-            value = sub_0822C034(&p->object->position);
+            value = Region_FindContaining(&p->object->position);
         else
             value = *(u16 *)&sound;
         p->sound = value;

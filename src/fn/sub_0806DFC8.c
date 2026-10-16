@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "route_sprite_actor.h"
-u8 sub_0821E5C4(void *, s32, s32, s32);
+u8 Route_Start(void *, s32, s32, s32);
 s32 ScaledShadow_Initialize(u8 *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void RouteSpriteActor_Create(struct ContactPosition *anchor, void *unused, s32 initialTimer,
                              s32 cycles, s32 amount, u32 kind, u32 parameter, u32 option,
@@ -74,7 +74,7 @@ void RouteSpriteActor_Create(struct ContactPosition *anchor, void *unused, s32 i
             *dst = context;
         }
     }
-    sub_0821E5C4(&actor->route, route, 0, 0);
+    Route_Start(&actor->route, route, 0, 0);
     {
         s32 shadowResult;
         shadowResult = ScaledShadow_Initialize(actor->shadow, &actor->sprite.position, 64, 16, 96,
