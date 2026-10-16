@@ -145,6 +145,14 @@ Solved patterns are in `docs/WORKER.md`. Still open:
 * Translation units: merge `src/fn/*.c` into contiguous units with shared
   headers and structs ([UNIT_WORKER.md](UNIT_WORKER.md)).
 * Coverage: record playthroughs with Centaur; little code is exercised by the scripted tests.
+* Debug scenarios (backlog): let Centaur and the headless emulator load a given
+  scene, spawn a given actor or run a given script procedure on demand, so a
+  test can trigger one piece of code, watch it and screenshot it. This also
+  reaches the large-sprite palette variants the scene survey misses (attacks,
+  bosses, menus; `tools/mgba/palette_survey.lua`, `data/sprite_palettes.csv`).
+* Stitched maps (backlog): screenshot every room from such scenarios and stitch
+  each dungeon (or the whole world) into one map you can scroll through, laid
+  out by the door graph (`tools/assets/areas.py`, the Studio's World page).
 * Translation (separate repo [boktai3trans](https://github.com/moozilla/boktai3trans)):
   inserter with box-width checks, VWF via `Text_DrawGlyph` (`08218D1C`).
 
