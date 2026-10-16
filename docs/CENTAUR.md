@@ -280,6 +280,36 @@ built at `0x0203FF00`. Verified headlessly: procedure 916 ran exactly once and
 the game continued. Procedure numbers are the ones calls use (one more than
 `gcx.py dis` headers).
 
+## Debug scenarios
+
+`tools/mgba/scenario.lua` runs a scenario file headlessly: set up a situation,
+trigger script code, take screenshots.
+
+    SCENARIO=tests/scenarios/slime_colors.txt tools/mgba/headless.sh tools/mgba/scenario.lua
+
+Steps, one per line: `from field|none|bookmark NAME`, `warp SCENE [ENTRANCE]`,
+`wait N`, `call PROC [ARGS...]` (any script procedure, through `callproc`),
+`set REGION OFF TYPE[.BIT] VALUE` (a script variable), `pos X Y Z` (moves the
+player: the player object at `*0x02000580` keeps its position at +0x30 with
+copies at +0xAC and +0x10C; GameState +0x30 only mirrors it), `keys KEYS N`,
+`shot NAME`, `capture NAME`, `log TEXT`, `quit`. Output goes to
+`build/centaur/scenarios/NAME/`. An actor is spawned by calling its spawner
+procedure (`gcl/names/proc.csv`): `tests/scenarios/slime_colors.txt` places one
+slime of each color with `place_slime` (1560) to compare palette variants, and
+`tests/scenarios/sealed_prison_tour.txt` warps, moves the player and captures.
+
+## Stitched dungeon maps
+
+The Studio's Dungeons tab (`/gfx#dungeon/AREA`, linked from each area on the
+World page) draws an area's rooms as one map: each room is its stage map (all
+layers, the scene's palette), placed so that a door in one room lines up with
+the entrance it leads to in the next (`proj` of the door and entrance world
+points), breadth first from the area's first room. The status line counts
+doors whose placements disagree (stacked floors, ships) and rooms no door
+reaches. The Sealed Prison (area 1) comes out as one contiguous dungeon;
+outdoor areas with full backdrops (Pirate Island) overlap. Next: screenshots
+of every room from scenarios for areas whose maps need runtime state.
+
 ## Next
 
 * Warps are solved (see "Scenes, warps and the stage survey"). For the record,
