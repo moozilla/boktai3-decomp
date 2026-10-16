@@ -52,6 +52,8 @@ table { border-collapse: collapse; font-size: 13px; }
 td, th { padding: 3px 10px 3px 0; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
 th { color: var(--muted); font-weight: 500; }
 .cand { color: var(--muted); font-size: 12px; }
+.conf { font-size: 10px; padding: 0 5px; border-radius: 8px; border: 1px solid var(--line); color: var(--muted); vertical-align: 1px; }
+.conf-high { border-color: var(--ok, #2f7d4f); color: var(--ok, #2f7d4f); }
 body.embed #side { display: none; }
 body.embed main { grid-template-columns: 1fr; }
 @media (max-width: 860px) { main { grid-template-columns: 1fr; height: auto; } #side { height: 40vh; } }
@@ -63,6 +65,7 @@ body.embed main { grid-template-columns: 1fr; }
   <section id="side">
     <div class="tools">
       <input id="q" type="search" placeholder="Filter: key, label, name, function, sprite" autocomplete="off">
+      <label class="chk"><input type="checkbox" id="fgcl"> with a GCL name</label>
       <label class="chk"><input type="checkbox" id="fspr"> with a sprite</label>
       <label class="chk"><input type="checkbox" id="fused"> created by a script</label>
       <div class="count" id="count"></div>
@@ -74,18 +77,20 @@ body.embed main { grid-template-columns: 1fr; }
 <script src="/static/common.js"></script>
 <script>
 // The script actor registry (data/actor_registry.csv): every object a script
-// can create by key with `chara KEY NAME` or `cmd_B745 KEY`. Cross-references
-// come from tools/assets/actors.py.
+// can create by key with `chara KEY NAME` or call with `command KEY`. Recovered
+// GCL names come from gcl/names/chara.csv; cross-references from
+// tools/assets/actors.py.
 studioHeader();
 let A = [], byKey = {}, enemies = [], characters = [], scenes = {}, en = {}, sel = null;
 
 const label = a => noteOf('actor', a.key)?.label;
-const title = a => label(a) || (a.names.length ? a.names.map(n => n.jp).join(' / ') + '?' : a.callback_name);
+const gclTitle = a => a.gcl.length ? a.gcl[0].name + (a.gcl[0].english ? ` (${a.gcl[0].english})` : '') : '';
+const title = a => label(a) || gclTitle(a) || (a.names.length ? a.names.map(n => n.jp).join(' / ') + '?' : a.callback_name);
 
 function renderList() {
-  const q = $('q').value.trim().toUpperCase(), fs = $('fspr').checked, fu = $('fused').checked;
-  const hits = A.filter(a => (!fs || a.sprites.length) && (!fu || a.procs.length) &&
-    (!q || [a.key, label(a), a.callback_name, a.loader_name, ...a.sprites.map(s => s.hash), ...a.names.map(n => n.jp + ' ' + (en[n.id] || ''))].some(x => (x || '').toUpperCase().includes(q))));
+  const q = $('q').value.trim().toUpperCase(), fs = $('fspr').checked, fu = $('fused').checked, fg = $('fgcl').checked;
+  const hits = A.filter(a => (!fs || a.sprites.length) && (!fu || a.procs.length) && (!fg || a.gcl.length) &&
+    (!q || [a.key, label(a), a.callback_name, a.loader_name, ...a.sprites.map(s => s.hash), ...a.names.map(n => n.jp + ' ' + (en[n.id] || '')), ...a.gcl.map(g => g.name + ' ' + g.english)].some(x => (x || '').toUpperCase().includes(q))));
   $('count').textContent = `${hits.length} of ${A.length} registry entries`;
   const special = document.createElement('div');
   special.className = 'row special' + (sel === 'names' ? ' on' : ''); special.dataset.key = 'names';
@@ -116,9 +121,11 @@ async function show(key) {
   if (!a) { v.innerHTML = `<div class="empty">No registry entry ${esc(key)}.</div>`; return; }
   const names = a.names.map(n => `${stringLink(n.id)} ${esc(n.jp)}${en[n.id] ? ` <span class="cand">(${esc(en[n.id])})</span>` : ''}`).join('<br>');
   const procs = a.procs, unreached = procs.length && !a.scenes.length;
-  v.innerHTML = `<h2></h2><div class="meta">Registry key <code>${a.key}</code>: a 16-bit hash of the original actor name (not recovered; docs/DATA.md)</div>
+  const gcl = a.gcl.map((g, i) => `<div${i ? ' class="cand"' : ''}><b>${esc(g.name)}</b>${g.english ? ` <span class="cand">(${esc(g.english)})</span>` : ''} <span class="conf conf-${esc(g.confidence)}">${esc(g.confidence)}</span>${i ? ' <span class="cand">alternative with the same hash</span>' : ''}<div class="cand">${esc(g.evidence)}</div></div>`).join('');
+  v.innerHTML = `<h2></h2><div class="meta">Registry key <code>${a.key}</code>: the 16-bit hash of the original GCL name, hashed as EUC-JP (gcl/names/chara.csv)</div>
     <div id="ned"></div>
     <dl>
+      <dt>GCL name</dt><dd>${gcl || '<span class="empty">not recovered yet (<code>tools/assets/gclnames.py crack chara</code> lists leads)</span>'}</dd>
       <dt>Callback</dt><dd>${codeLink(a.callback, a.callback_name)} <span class="mono meta">${a.callback}</span></dd>
       <dt>Loader</dt><dd>${a.loader ? `${codeLink(a.loader, a.loader_name)} <span class="mono meta">${a.loader}</span> <span class="meta">(the function the callback hands its new actor to)</span>` : '<span class="empty">none (the callback does not allocate an actor and pass it on)</span>'}</dd>
       <dt>Names</dt><dd>${names || '<span class="empty">no name from the game linked yet</span>'}${a.names.length ? `<div class="cand">Candidates from the monster list (string 9838 on), linked through the sprite by its look in captures (docs/ASSETS.md); not from the game's own index, which is not found yet.</div>` : ''}</dd>
@@ -155,7 +162,7 @@ function showNames() {
     <table><tr><th>String</th><th>Name</th><th></th><th></th></tr>${characters.map(row).join('')}</table>`;
 }
 
-$('q').oninput = renderList; $('fspr').onchange = renderList; $('fused').onchange = renderList;
+$('q').oninput = renderList; $('fspr').onchange = renderList; $('fused').onchange = renderList; $('fgcl').onchange = renderList;
 listKeys(() => $('list'), '.row');
 window.onhashchange = () => { const k = location.hash.slice(1); if (k && k !== sel) show(k); };
 (async () => {

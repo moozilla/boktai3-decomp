@@ -1,0 +1,17 @@
+key,name,english,confidence,evidence
+0CC8,ch,,low,two-letter hash in table 080F38C8 (all three entries have two-letter preimages)
+0CD8,cx,,low,two-letter hash in table 080F38C8
+0CF4,dt,,low,two-letter hash in table 080F38C8
+0D86,if,,high,MGS GCL basic table; handler 0821B794 selects a block (docs/MGS_GCL_MATCHING.md)
+121F,call,,high,basic table; handler 0821B8AC calls a computed procedure
+22FF,mesg,,high,MGS GCL name; engine table handler 082255BC
+4A6F,switch,,high,basic table; handler 0821B7B0 (c/d case packets)
+64C0,eval,,high,MGS GCL basic table; handler 0821B80C
+9906,chara,,high,MGS GCL name; handler 08225560 creates the registry entry's actor
+B745,command,,high,handler 08225590 calls the registry routine of its key and keeps the result; MGS4 'command NAME' does the same
+B96E,print,,high,MGS GCL basic table; handler 0821B858
+C091,map,,high,MGS GCL name; engine table handler 08225620 (a stub)
+C8BB,load,,high,MGS GCL name; handler 08225508 changes scene
+CD3A,return,,high,MGS GCL basic table; handler 0821B82C
+D4CB,trap,,high,MGS GCL name; handler 08225624
+E43C,restart,,high,MGS GCL name; handler 082257A0

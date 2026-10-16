@@ -44,6 +44,7 @@ h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
 pre { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; overflow: auto; font: 12px/1.55 ui-monospace, Menlo, monospace; margin: 0; }
 pre a { text-decoration: none; }
 pre .kw { color: var(--kw); }
+pre .cmt { color: var(--muted); }
 table { border-collapse: collapse; font-size: 13px; }
 td, th { padding: 3px 12px 3px 0; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
 th { color: var(--muted); font-weight: 500; }
@@ -76,7 +77,7 @@ body.embed main { grid-template-columns: 1fr; }
 // cross-referenced by tools/assets/actors.py). Procedures carry the numbers
 // calls use, one above the headers gcx.py prints.
 studioHeader();
-let P = [], byId = {}, scenes = {}, actorsBy = {}, sel = null, shown = 300;
+let P = [], byId = {}, scenes = {}, actorsBy = {}, keyOfName = {}, sel = null, shown = 300;
 
 const label = p => noteOf('script', p.id)?.label;
 function renderList() {
@@ -104,17 +105,19 @@ const sceneChip = s => {
   const sc = scenes[s] || {};
   return `<span class="chip"><a href="#${s}">scene ${s}</a>${sc.map ? ' · ' + peekLink(gfxHref('map', sc.map), esc(noteOf('map', sc.map)?.label || sc.map)) : ''}${sc.shot ? ' · ' + peekLink('/captures#scene_' + String(s).padStart(4, '0'), 'capture') : ''}</span>`;
 };
-const actorName = k => noteOf('actor', k)?.label || (actorsBy[k]?.names.length ? actorsBy[k].names.map(n => n.jp).join(' / ') + '?' : actorsBy[k]?.callback_name) || '';
+const gclName = k => { const g = actorsBy[k]?.gcl?.[0]; return g && g.name + (g.english ? ` (${g.english})` : ''); };
+const actorName = k => noteOf('actor', k)?.label || gclName(k) || (actorsBy[k]?.names.length ? actorsBy[k].names.map(n => n.jp).join(' / ') + '?' : actorsBy[k]?.callback_name) || '';
 // one disassembled line, with procedures, strings and actors linked
 function linkLine(ln) {
   return esc(ln)
-    .replace(/\b(if|else|switch|case|return|load|chara|mesg|print|trap|map|eval|call)\b/g, '<span class="kw">$1</span>')
+    .replace(/\/\* .*? \*\/|  # .*$/g, m => `<span class="cmt">${m}</span>`)
+    .replace(/\b(if|else|switch|case|return|load|chara|command|mesg|print|trap|map|eval|call)\b/g, '<span class="kw">$1</span>')
     .replace(/\bproc_(\d+)/g, (m, n) => byId[n] ? `<a href="#${n}">${m}</a>` : m)
     .replace(/text#(\d+)/g, (m, n) => stringLink(n, m))
     .replace(/(<span class="kw">load<\/span> )(0x[0-9a-f]+|\d+)/g, (m, a, n) => `${a}<a href="#${parseInt(n)}">${n}</a>`)
-    .replace(/(<span class="kw">chara<\/span> |cmd_B745 )(0x[0-9a-f]+)/g, (m, a, k) => {
-      const key = parseInt(k, 16).toString(16).toUpperCase().padStart(4, '0');
-      return `${a}<span title="${esc(actorName(key))}">${actorLink(key, k)}</span>`;
+    .replace(/(<span class="kw">(?:chara|command)<\/span> )(0x[0-9a-f]+|[^\s<]+)/g, (m, a, k) => {
+      const key = k.startsWith('0x') ? parseInt(k, 16).toString(16).toUpperCase().padStart(4, '0') : keyOfName[k];
+      return key ? `${a}<span title="${esc(actorName(key))}">${actorLink(key, k)}</span>` : m;
     });
 }
 
@@ -139,7 +142,7 @@ async function show(id) {
     <h3>Used by scenes (${d.scenes.length})</h3>${d.scenes.length ? `<div class="chips" id="scenes">${d.scenes.slice(0, 80).map(s => sceneChip(s.scene)).join('')}${d.scenes.length > 80 ? `<span class="chip">+${d.scenes.length - 80} more</span>` : ''}</div>` : '<div class="empty">No scene reaches it through calls.</div>'}
     ${d.spawns.length ? `<h3>Creates actors</h3><table><tr><th>Key</th><th>Actor</th><th>Callback</th><th>Command</th></tr>${Object.values(spawns).map(s => `<tr><td>${actorLink(s.key)}</td><td>${esc(actorName(s.key))}</td><td>${s.callback ? codeLink(s.callback, s.name) : '?'}</td><td class="meta">${s.cmd}${s.n > 1 ? ' ×' + s.n : ''}${s.args.length ? ' (' + esc([...new Set(s.args)].slice(0, 6).join(', ')) + ')' : ''}</td></tr>`).join('')}</table>` : ''}
     ${d.texts.length ? `<h3>Strings</h3><table>${d.texts.map(t => t.data ? `<tr><td>#${t.id}</td><td class="meta">a data record in the text bank, not text</td></tr>` : `<tr><td>${stringLink(t.id)}</td><td>${esc(t.jp)}</td></tr>`).join('')}</table>` : ''}
-    ${d.prints.length ? `<h3>Debug prints</h3><table>${d.prints.map(t => `<tr><td>${esc(t)}</td></tr>`).join('')}</table>` : ''}
+    ${d.prints.length ? `<h3>Debug prints</h3><div class="meta" style="margin-bottom:6px">Developer messages; <code>print</code> outputs nothing in this ROM (0821B858). English from gcl/prints.csv.</div><table>${d.prints.map(t => `<tr><td>${esc(t.text)}</td><td class="meta">${esc(t.en)}</td></tr>`).join('')}</table>` : ''}
     <h3>Body</h3><pre>${d.lines.map(linkLine).join('\n')}</pre>`;
   $('ned').replaceWith(noteEditor('script', id, renderList));
 }
@@ -153,6 +156,7 @@ window.onhashchange = () => { const n = parseInt(location.hash.slice(1)); if (n 
   const [d, a] = await Promise.all([fetch('/api/procs').then(r => r.json()), fetch('/api/actors').then(r => r.json())]);
   P = d.procs; scenes = d.scenes; byId = Object.fromEntries(P.map(p => [p.id, p]));
   actorsBy = Object.fromEntries(a.actors.map(x => [x.key, x]));
+  keyOfName = Object.fromEntries(a.actors.filter(x => x.gcl.length).map(x => [x.gcl[0].name, x.key]));
   renderList();
   const n = parseInt(location.hash.slice(1)) || P.find(p => p.scene)?.id;
   if (n) { if (!location.hash) history.replaceState(null, '', '#' + n); show(n); }

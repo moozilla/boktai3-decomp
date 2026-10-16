@@ -12,6 +12,8 @@
 --     under the place where the game draws it (the BG0 cells its glyphs go to,
 --     sub_08218FB4 / sub_08218F2C), for as long as those glyphs stay on screen.
 --     Run `python3 tools/mgba/gen_centaur_data.py` first (writes build/centaur/data.lua).
+--   * GCL debug prints: the scripts' `print` messages (dropped by this ROM),
+--     with their English, in a "GCL print" console pane and centaur.log.
 --   * What is loading: resource lookups (ScriptProc_Start, 0821A520) and stage
 --     tilesets (sub_08215D40), logged and shown in the HUD.
 --   * Bookmarks: named savestates with screenshots (bm, go, bms) - a warp list.
@@ -74,6 +76,7 @@ local ADDR = {
   GameState = 0x02000710,       -- pointer; +0x28 life, +0x2A lifeMax
   GlyphAt16 = 0x08218FB4,       -- (glyph, x, y, ...) 16x16 glyph into the BG0 map at tile x, y
   GlyphAt8 = 0x08218F2C,        -- (glyph, x, y, ...) 8x16 glyph
+  Script_Print = 0x0821B858,    -- GCL `print` handler (r0 = its operands); prints nothing in this ROM
 }
 
 local S = {
@@ -254,6 +257,45 @@ local function on_text()
   send({ t = "text", id = id, frame = f, scene = scene(), map = S.stage.map })
 end
 
+-- GCL `print`: the handler drops its text in this ROM, so log it here. The
+-- first operand is an inline string (type 7: length byte, EUC-JP bytes);
+-- D.prints maps those bytes to the text and its English (gcl/prints.csv).
+-- Lines are queued and written from the frame callback.
+local printq, printbuf = {}, nil
+local function on_print()
+  local p = emu:readRegister("r0")
+  if emu:read8(p) ~= 7 then return end
+  local t = {}
+  for i = 0, emu:read8(p + 1) - 1 do
+    local c = emu:read8(p + 2 + i)
+    if c == 0 then break end
+    t[#t + 1] = string.char(c)
+  end
+  local raw = table.concat(t)
+  local e = D.prints and D.prints[raw]
+  if #printq < 200 then printq[#printq + 1] = e or { jp = (not raw:find("[\128-\255]")) and raw or nil, raw = raw } end
+end
+
+local function print_flush()
+  if not printq[1] then return end
+  if printbuf == nil then  -- no panes headless (creating one there crashes)
+    local ok, b = false, nil
+    if not CENTAUR_HEADLESS and not os.getenv("CENTAUR_HEADLESS") then
+      ok, b = pcall(function() return console:createBuffer("GCL print") end)
+    end
+    printbuf = ok and b or false
+  end
+  local f = emu:currentFrame()
+  for _, e in ipairs(printq) do
+    local jp = e.jp or ("<" .. e.raw:gsub(".", function(c) return string.format("%02X", c:byte()) end) .. ">")
+    local line = string.format("[%d] %s", f, jp) .. (e.en and e.en ~= "" and ("\n        " .. e.en) or "")
+    if printbuf then printbuf:print(line .. "\n") else console:log("print: " .. line) end
+    if LOGF then LOGF:write(os.date("%H:%M:%S "), "print: ", line, "\n"); LOGF:flush() end
+    send({ t = "print", frame = f, jp = e.jp, en = e.en, scene = scene() })
+  end
+  printq = {}
+end
+
 -- A glyph drawn at BG0 tile (x, y), w x 2 tiles: it belongs to the last string
 -- fetched. Cells it covers are taken from any older string there.
 local function on_glyph(w)
@@ -329,6 +371,7 @@ if HAS_BP then
     emu:setBreakpoint(on_tileset, ADDR.TilesetLoad)
     emu:setBreakpoint(function() on_glyph(2) end, ADDR.GlyphAt16)
     emu:setBreakpoint(function() on_glyph(1) end, ADDR.GlyphAt8)
+    emu:setBreakpoint(on_print, ADDR.Script_Print)
   else
     HAS_BP = false  -- no debugger attached (headless: set MGBA_SCRIPT_DEBUGGER=1)
   end
@@ -830,6 +873,7 @@ callbacks:add("frame", function()
   if f % 4 == 0 then check_items() end
   if f % 15 == 0 and S.text then S.dirty = true end  -- unplaced subtitles expire
   if f % 2 == 0 then link_poll() end
+  print_flush()
   link_flush()
   if f % 6 == 0 then send(where_player()) end
   if f % 30 == 0 then

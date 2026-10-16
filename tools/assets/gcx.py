@@ -2,7 +2,8 @@
 """Disassemble the compiled script image (the `gcx` resource, 08D5A85C).
 
   gcx.py info                 image layout
-  gcx.py dis [PROC...]        disassemble procedures (default: all)
+  gcx.py dis [PROC...]        disassemble procedures (default: all), with
+                              recovered names (gcl/names) and English comments
   gcx.py chara                every `chara` command: procedure, key, callback
                               (from data/actor_registry.csv)
 
@@ -15,8 +16,8 @@ and a fourth. The body starts with its u32 size.
 Instructions and operands follow Script_DecodeOperand (0821A6F0) and the block
 dispatcher (0821AF2C): the high nibble of the first byte selects the kind and
 the low nibble the payload length (13/14/15: a 1/2/3-byte little-endian length
-follows, sub_0821A66C). Command ids are hashes of command names (docs/ENGINE.md,
-"Command names"). Output is ROM-derived; keep dumps under build/.
+follows, sub_0821A66C). Command ids are hashes of command names
+(gcl/names/command.csv; tools/assets/gclnames.py). Inline strings are EUC-JP. Output is ROM-derived; keep dumps under build/.
 """
 import csv
 import os
@@ -24,13 +25,16 @@ import struct
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import gclnames  # noqa: E402
 from romlib import ROOT, load_rom  # noqa: E402
 
 ROM_BASE = 0x08000000
 IMAGE = 0x08D5A85C
-COMMANDS = {0x0D86: "if", 0x4A6F: "switch", 0x64C0: "eval", 0x121F: "call", 0xCD3A: "return",
-            0xB96E: "print", 0x22FF: "mesg", 0x9906: "chara", 0xD4CB: "trap", 0xC8BB: "load",
-            0xC091: "map", 0xE43C: "restart"}
+COMMANDS = {k: r["name"] for k, r in gclnames.best("command").items()}
+KEYED = ("chara", "command")  # the first operand is a registry key (gcl/names/chara.csv)
+_keys = None  # {key: name row} while disassembling with names
+_prints = {}  # {print text: English} while disassembling with names
 
 
 class Image:
@@ -89,7 +93,8 @@ def operand(b, p):
             return str(b[p + 1]), p + 2
         if op == 7:
             n = b[p + 1]
-            return repr(bytes(b[p + 2:p + 2 + n]).split(b"\0")[0].decode("latin-1")), p + 2 + n
+            s = bytes(b[p + 2:p + 2 + n]).split(b"\0")[0].decode("euc_jp", "backslashreplace")
+            return "'" + s.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n") + "'", p + 2 + n
         if op == 14:
             return f"text#{b[p + 1] | b[p + 2] << 8}", p + 3
         return f"?{op:02x}", p + 1
@@ -116,8 +121,8 @@ def operand(b, p):
     if fam == 0x30:
         return f"({expression(b, start, start + n)})", start + n
     if fam == 0x80:  # a nested block used as an operand (switch cases, keyword values)
-        inner = instructions(b, start, start + n)
-        return "{ " + "; ".join(t for _, t in inner) + " }", start + n
+        inner = [t.split("  # ", 1) for _, t in instructions(b, start, start + n)]
+        return "{ " + "; ".join(t[0] + (f" /* {t[1]} */" if len(t) > 1 else "") for t in inner) + " }", start + n
     return f"?{op:02x}", start + n
 
 
@@ -185,7 +190,7 @@ def instructions(b, p, end, depth=0, out=None):
             cid = b[start] | b[start + 1] << 8
             name = COMMANDS.get(cid, f"cmd_{cid:04X}")
             q, alen = arglist(b, start + 2)  # the argument list has its own length
-            args, aend = [], q + alen
+            args, aend, note, first, line0 = [], q + alen, "", True, len(out)
             while q < aend:
                 if b[q] & 0xF0 == 0x80:
                     s2, n2 = length(b, q)
@@ -199,6 +204,14 @@ def instructions(b, p, end, depth=0, out=None):
                 t, q = operand(b, q)
                 if q is None:
                     break
+                if first and name in KEYED and _keys is not None and t.startswith("0x"):
+                    r = _keys.get(int(t, 16))
+                    if r:
+                        note = f"  # {int(t, 16):04X}" + (f" {r['english']}" if r["english"] else "")
+                        t = r["name"]
+                elif first and name == "print" and t[:1] == "'" and _prints.get(t[1:-1]):
+                    note = "  # " + _prints[t[1:-1]]
+                first = False
                 args.append(t)
             if args or not out or out[-1] != (depth, "}"):
                 out.append((depth, f"{name} {' '.join(args)}".rstrip()))
@@ -225,6 +238,8 @@ def instructions(b, p, end, depth=0, out=None):
                 elif label:
                     out.append((depth, " ".join(label)))
                 q = s2 + n2
+            if note:
+                out[line0] = (out[line0][0], out[line0][1] + note)
         elif kind == 7:
             pid = b[start] | b[start + 1] << 8
             out.append((depth, f"proc_{pid} {' '.join(operands(b, start + 2, start + n))}".rstrip()))
@@ -236,13 +251,24 @@ def instructions(b, p, end, depth=0, out=None):
     return out
 
 
-def disassemble(img, pid):
+def disassemble(img, pid, names=False):
+    """(depth, text) lines of procedure slot pid. With names, registry keys
+    after chara/command print as their GCL names (gcl/names/chara.csv), the
+    key and English in a trailing comment, and Japanese print strings get
+    their translation (gcl/prints.csv); without, keys stay hex (for tools
+    that parse the text)."""
+    global _keys, _prints
     a = img.proc_address(pid)
     if a is None:
         return []
     b = img.rom
     start, n = length(b, a)
-    return instructions(b, start, start + n)
+    _keys = gclnames.best("chara") if names else None
+    _prints = gclnames.prints() if names else {}
+    try:
+        return instructions(b, start, start + n)
+    finally:
+        _keys, _prints = None, {}
 
 
 def main():
@@ -257,7 +283,7 @@ def main():
     elif cmd == "dis":
         pids = [int(x, 0) for x in sys.argv[2:]] or range(len(img.procs))
         for pid in pids:
-            lines = disassemble(img, pid)
+            lines = disassemble(img, pid, names=True)
             if lines:
                 print(f"proc {pid} (flag {img.procs[pid] >> 24}):")
                 for d, t in lines:

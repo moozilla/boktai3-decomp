@@ -33,6 +33,13 @@ evidence in [ASSETS.md](ASSETS.md) ("Stage terrain", "Stage scripts"):
   travels in `r708[0x70]` and the destination's entrance procedures test it.
   The warp in Centaur does not set it yet, which may be why warps never place
   the player.
+* **GCL names** ([gcl/README.md](../gcl/README.md)): registry keys and
+  command ids are EUC-JP name hashes. `gcl/names/chara.csv` has 52 recovered
+  names with English (enemies such as スライム/Slime, routines such as
+  ランダム/Random, `command` = `B745`); `tools/assets/gclnames.py crack` finds
+  more. The scripts' debug prints give original variable, parameter, define
+  and procedure names (`$f:...`, `$:P_...`, `d:...`, `@st01_43_ruins_after`):
+  the next step is a variable-name table from them.
 
 Tools: `tools/assets/hp.py`, `tools/assets/stages.py` (per-scene doors,
 entrances, items, enemies → `build/assets/stages.json`), `gcx.py` now prints

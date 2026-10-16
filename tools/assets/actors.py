@@ -15,9 +15,10 @@ Sources (all ROM-derived or in the repository):
     loader's nearby callees (within LOCAL bytes, the family's own code) that
     name a sprite package (CB05) or a large sprite (98F5 record), which the
     code requests by name through ScriptProc_Start / AnimData_Load.
-  * the gcx script image (tools/assets/gcx.py): `chara KEY NAME` and
-    `cmd_B745 KEY` both create a registry entry (every B745 operand is a
-    registry key). Procedures are numbered by the IDs calls use, which are one
+  * the gcx script image (tools/assets/gcx.py): `chara KEY NAME` creates a
+    registry entry's actor and `command KEY` (B745) calls its routine and keeps
+    the result (every operand is a registry key). Recovered GCL names of keys
+    are in gcl/names/chara.csv (tools/assets/gclnames.py). Procedures are numbered by the IDs calls use, which are one
     above gcx.py's printed headers. A scene is an entry procedure that starts
     `proc_861 1; proc_864 0|2` (tools/mgba/scenes.py); a scene uses every
     procedure it reaches through calls (not through `load`).
@@ -45,6 +46,7 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import archive  # noqa: E402
+import gclnames  # noqa: E402
 import gcx  # noqa: E402
 from romlib import load_rom  # noqa: E402
 
@@ -259,35 +261,28 @@ def name_list(first, count):
 
 
 # ---------- scripts ----------
-def _euc(s):
-    try:
-        return s.encode("latin-1").decode("euc-jp")
-    except (UnicodeError, ValueError):
-        return s
-
-
 @cached
 def procs():
     """{call id: {"lines", "calls", "spawns", "texts", "prints", "loads", "scene"}}."""
     img = gcx.Image(load_rom())
     out = {}
     for pid in range(len(img.procs)):
-        lines = gcx.disassemble(img, pid)
+        lines = gcx.disassemble(img, pid)  # keys in hex, for parsing
         if not lines:
             continue
         cid = pid + 1
-        p = out[cid] = {"flag": img.procs[pid] >> 24, "lines": [["    " * d + t] for d, t in lines],
+        shown = gcx.disassemble(img, pid, names=True)
+        p = out[cid] = {"flag": img.procs[pid] >> 24, "lines": ["    " * d + t for d, t in shown],
                         "calls": [], "spawns": [], "texts": [], "prints": [], "loads": []}
         for _, t in lines:
             p["calls"] += [int(x) for x in re.findall(r"\bproc_(\d+)", t)]
             for k, n in re.findall(r"\bchara (0x[0-9a-f]+|\d+)(?: (\S+))?", t):
                 p["spawns"].append({"key": f"{int(k, 0):04X}", "cmd": "chara", "arg": n})
-            for k in re.findall(r"\bcmd_B745 (0x[0-9a-f]+|\d+)", t):
-                p["spawns"].append({"key": f"{int(k, 0):04X}", "cmd": "B745"})
+            for k in re.findall(r"\bcommand (0x[0-9a-f]+|\d+)", t):
+                p["spawns"].append({"key": f"{int(k, 0):04X}", "cmd": "command"})
             p["texts"] += [int(x) for x in re.findall(r"text#(\d+)", t)]
-            p["prints"] += [_euc(x) for x in re.findall(r"\bprint '(.*)'", t)]
+            p["prints"] += re.findall(r"\bprint '((?:[^'\\]|\\.)*)'", t)
             p["loads"] += [int(x, 0) for x in re.findall(r"\bload (0x[0-9a-f]+|\d+)", t)]
-        p["lines"] = [x[0] for x in p["lines"]]
         p["scene"] = len(lines) >= 2 and lines[0][1] == "proc_861 1 <end>" and lines[1][1] in ("proc_864 0 <end>", "proc_864 2 <end>")
     for cid, p in out.items():
         p["calls"] = sorted(set(p["calls"]))
@@ -348,7 +343,8 @@ def proc_detail(cid):
     b, reg = bank(), registry()
     st = scene_stages()
     scenes = proc_scenes().get(cid, [])
-    return dict(p, id=cid, callers=proc_callers().get(cid, []), scenes=[{"scene": s, "map": st.get(s)} for s in scenes],
+    en = gclnames.prints()
+    return dict(p, id=cid, callers=proc_callers().get(cid, []), prints=[{"text": t, "en": en.get(t, "")} for t in p["prints"]], scenes=[{"scene": s, "map": st.get(s)} for s in scenes],
                 texts=[{"id": t, "jp": b.get(t) or "", "data": t in b and b[t] is None} for t in sorted(set(p["texts"]))],
                 spawns=[dict(s, callback=reg.get(s["key"], {}).get("callback"), name=reg.get(s["key"], {}).get("name"))
                         for s in p["spawns"]])
@@ -395,6 +391,7 @@ def actors():
             spawned[s["key"]].append(cid)
     sc = proc_scenes()
     b = bank()
+    gcl = gclnames.load("chara")
     out = []
     for key, r in sorted(reg.items()):
         cb = int(r["callback"], 16) & ~1
@@ -416,7 +413,7 @@ def actors():
         out.append({"key": key, "callback": f"{cb:08X}", "callback_name": cbname,
                     "loader": f"{lda:08X}" if lda else None, "loader_name": ld,
                     "sprites": spr, "procs": ps, "scenes": scenes, "spawns": sum(1 for p in ps for s in procs()[p]["spawns"] if s["key"] == key),
-                    "names": cand})
+                    "names": cand, "gcl": gcl.get(int(key, 16), [])})
     return out
 
 
