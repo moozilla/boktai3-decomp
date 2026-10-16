@@ -1642,6 +1642,7 @@ addr,name,mode,confidence,source,notes
 0806F54C,SceneEffectSchedule_Destroy,thumb,low,src-alias,
 0806F558,SceneEffectSchedule_Initialize,thumb,low,src-alias,
 0806F570,SceneEffectSchedule_Create,thumb,low,src-alias,
+0806F5C0,SceneEffectSchedule_AddFromScript,thumb,low,src-alias,
 0806F75C,SceneEffectSchedule_Reset,thumb,low,src-alias,
 0806F768,SceneEffectSchedule_RemoveFromScript,thumb,low,src-alias,
 0806F7B0,SceneRangeWatch_CheckRange,thumb,low,src-alias,
@@ -1872,18 +1873,22 @@ addr,name,mode,confidence,source,notes
 080FF754,Axe_Create,thumb,medium,gcl-name,name from GCL key 2D30 アックス (Axe); registry callback
 08100298,WoodenCrate_Create,thumb,medium,gcl-name,name from GCL key 820B 木箱 (Wooden Crate); registry callback
 0810067C,FloorSwitch_Create,thumb,high,gcl-behavior,registry AB8E; S options are on_press/on_release callbacks (procs 3945/3946 toggle a door); starts pressed when an object rests in its 256x32 box
+08103110,NamedObject_CreateFromScript,thumb,low,src-alias,
 08103ADC,NamedActor_SetFlag20FromScript,thumb,low,src-alias,
 08103B94,NamedActor_SetMoveModeFromScript,thumb,low,src-alias,
 08103CF8,NamedActor_SetRouteFromScript,thumb,low,src-alias,
 08103DCC,NamedActor_SetSpeedFromScript,thumb,low,src-alias,
 08103E60,NamedActor_SetRangeFromScript,thumb,low,src-alias,
+0810858C,AnimatedTile_CreateFromScript,thumb,low,src-alias,
 0810BDB4,RegistryC5BD_SetTimeFromScript,thumb,low,src-alias,
 0810BE58,Registry1022_GetValueFromScript,thumb,low,src-alias,
+08111A48,PaletteFade_StartFromScript,thumb,low,src-alias,
 08119EF0,Glove_StartFromScript,thumb,low,src-alias,
 0811B848,RegistryE7BC_CreateFromScript,thumb,low,src-alias,
 0811D1C0,GameState_SetNameFromScript,thumb,low,src-alias,
 0811D358,GameState_ClearSlots7A8FromScript,thumb,low,src-alias,
 0811DE68,GameFlag_TestFromScript,thumb,low,src-alias,
+08121268,RegistryA8CB_CreateFromScript,thumb,low,src-alias,
 08136C74,SceneActorScript_ApplyTargetResetCommand,thumb,low,src-alias,
 0815A5E8,ScriptActor_SetLevelFromScript,thumb,low,src-alias,
 0815A680,ScriptActor_TestFlagFromScript,thumb,low,src-alias,
@@ -1920,6 +1925,8 @@ addr,name,mode,confidence,source,notes
 081BD814,DarkLoan_Create,thumb,medium,gcl-name,name from GCL key E9D3 暗黒ローン (Dark Loan); registry callback
 081BFF88,Storage_Create,thumb,medium,gcl-name,name from GCL key E02E 倉庫 (Storage); registry callback
 081C0BD4,SceneActorManager_Exists,thumb,low,src-alias,
+081C4080,RegistryF3E4_Create,thumb,low,src-alias,
+081CE1BC,SceneCharacter_PlaceFromScript,thumb,low,src-alias,
 081D0C04,SceneNpc_CreateFromScript,thumb,low,src-alias,
 081D0F28,SceneNpc_CommandFromScript,thumb,low,src-alias,
 081D105C,SceneNpc_StopFromScript,thumb,low,src-alias,
@@ -2076,6 +2083,7 @@ addr,name,mode,confidence,source,notes
 0822B2F8,Sound_PlaySong,thumb,low,src-alias,
 0822B358,Sound_StopSong,thumb,low,src-alias,
 0822B3BC,Sound_PlaySongChecked,thumb,low,src-alias,
+0822BFC8,Registry3C8D_RunFromScript,thumb,low,src-alias,
 0822DB54,RecordEntry_AddFromScript,thumb,low,src-alias,
 0822DE64,GameState_ResetEntriesFromScript,thumb,low,src-alias,
 0822E304,GameState_AddListEntryFromScript,thumb,low,src-alias,

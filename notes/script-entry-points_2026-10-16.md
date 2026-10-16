@@ -1,4 +1,4 @@
-# Script entry points, batches 1-7 (2026-10-16)
+# Script entry points, batches 1-8 (2026-10-16)
 
 Tags: #scripts #text #actors #tooling
 
@@ -232,3 +232,33 @@ rate at +0x598 per day, capped at 9999, then sets a new rate) and 081DCE34
 Near misses kept in wip with permuter runs: 0806F5C0 (scene effect schedule,
 score 55: reload register choices), 081C4080 (registry F3E4, score 60),
 0810858C (7 bytes), 08121268 (14 bytes), 0822BFC8, FloorSwitch_Create.
+
+## Batch 8
+
+Matched 1 (1,312 bytes, counted as register-pinned): 081CE1BC
+`SceneCharacter_PlaceFromScript` (registry 8EA3, behind GCL `place_character`).
+It creates a scene character named `-n` of kind `-k` (default 9) at `-p`
+facing `-d`. It picks the model, palette and extra setup by kind (kind 29 copies
+its own palette and reads `-C` tag and sound), installs six callbacks, and
+starts the behavior picked by `-i` (0-8). It reuses the SceneNpc layout and
+idioms of 081D0C04, with these new ones:
+
+* Plain `0`/`1` literals in the kind-29 behavior blocks (not shared `zero`/`one`
+  temporaries) give the original's constant order (`movs r3, #0; movs r2, #0`).
+* The update-handler temporaries are a two-element array (`updates[0]` and
+  `updates[1]`, found by the permuter). In case 2 one block-local `fn` is
+  shared by both branches; two separate scalars don't match.
+* The facing math keeps the 081D0C04 pins, plus `angle` pinned to r9.
+
+Guarded drafts (no exact gain): FloorSwitch_Create (0810067C), 0810858C
+`AnimatedTile_CreateFromScript`, 08121268 `RegistryA8CB_CreateFromScript`,
+0822BFC8 `Registry3C8D_RunFromScript`, 0806F5C0
+`SceneEffectSchedule_AddFromScript`, 081C4080 `RegistryF3E4_Create`, 08111A48
+`PaletteFade_StartFromScript` and 08103110 `NamedObject_CreateFromScript`
+(registry A4FC, 66%; it inlines the packed-command sprite stepper of
+`include/actor_attachment_sprite_playback.h`). FloorSwitch_Create stays near
+70% after about an hour of permuter time: the "pressed" block is placed
+differently and the scratch registers in its hoisted-address region differ.
+
+Enemy spawners (registry kinds 51-63) stay unnamed: all of them load the shared
+sprites 7E82/7E7D, so no family in docs/ASSETS.md picks them out.
