@@ -566,6 +566,13 @@ evidence in [ASSETS.md](ASSETS.md) ("Stage terrain", "Stage scripts"):
   Centaur's `warp(scene, entrance)` now calls `proc_945` (the door transition
   without a box) and the player is placed; the old warp left `r708[0x70]`
   stale, so no entrance procedure matched (CENTAUR.md, "Scenes, warps").
+* **GCL names** ([gcl/README.md](../gcl/README.md)): registry keys and
+  command ids are EUC-JP name hashes. `gcl/names/chara.csv` has 52 recovered
+  names with English (enemies such as スライム/Slime, routines such as
+  ランダム/Random, `command` = `B745`); `tools/assets/gclnames.py crack` finds
+  more. The scripts' debug prints give original variable, parameter, define
+  and procedure names (`$f:...`, `$:P_...`, `d:...`, `@st01_43_ruins_after`):
+  the next step is a variable-name table from them.
 
 Tools: `tools/assets/hp.py`, `tools/assets/stages.py` (per-scene doors,
 entrances, items, enemies → `build/assets/stages.json`), `gcx.py` now prints

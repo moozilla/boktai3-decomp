@@ -6,7 +6,8 @@
 Contents: per string ID, the Japanese (decoded from the extracted text bank)
 and the English of the fan translation (boktai3trans scriptEd/script.sjs), as
 plain display text (markup tags removed); plus resource type names and known
-sprite notes for the overlay. ROM- and translation-derived, so it stays in
+sprite notes for the overlay; and the scripts' debug `print` strings by their
+raw EUC-JP bytes, with the English of gcl/prints.csv, for the print log. ROM- and translation-derived, so it stays in
 build/ (ignored).
 """
 import argparse
@@ -20,6 +21,8 @@ sys.path.insert(0, os.path.join(ROOT, "tools"))
 sys.path.insert(0, os.path.join(ROOT, "tools", "trans"))
 from datafmt import load_manifest  # noqa: E402
 import english  # noqa: E402
+sys.path.insert(0, os.path.join(ROOT, "tools", "assets"))
+import gclnames  # noqa: E402
 
 TYPES = {0x922E: "anm", 0x92B3: "pal", 0x9B1B: "9B1B", 0x98F5: "bigspr", 0xA635: "fnt", 0xA8D9: "gcx",
          0xAE6C: "hp", 0xC091: "map", 0xCB05: "spr", 0xCEEF: "ptn", 0xCEAA: "CEAA"}
@@ -77,10 +80,16 @@ def main():
     lines += [f"[{i}]={lua_str(s)}," for i, s in sorted(en.items()) if s]
     lines += ["},", "types = {"]
     lines += [f"[0x{t:04X}]={lua_str(n)}," for t, n in TYPES.items()]
+    lines += ["},", "prints = {"]
+    for text, e in gclnames.prints().items():
+        u = re.sub(r"\\(.)", lambda m: {"n": "\n"}.get(m.group(1), m.group(1)), text)  # gcx.py escapes
+        raw = u.encode("euc_jp")
+        lines.append("[\"" + "".join(f"\\{c}" for c in raw) + f"\"]={{jp={lua_str(u)}, en={lua_str(e)}}},")
     lines += ["},", "}"]
     path = os.path.join(out_dir, "data.lua")
     open(path, "w", encoding="utf-8").write("\n".join(lines) + "\n")
-    print(f"wrote {os.path.relpath(path, ROOT)}: {len(jp)} Japanese, {len(en)} English strings")
+    print(f"wrote {os.path.relpath(path, ROOT)}: {len(jp)} Japanese, {len(en)} English strings, "
+          f"{len(gclnames.prints())} prints")
 
 
 if __name__ == "__main__":
