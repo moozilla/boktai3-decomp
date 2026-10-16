@@ -6,29 +6,16 @@ handlers; their callees are found through `bl` calls and Thumb function pointers
 
 | Set | Functions | Bytes | Share of code | Matched |
 |---|---:|---:|---:|---:|
-| Entry points | 738 | 84,596 | 3.5% | 65.3% |
-| Entry points and their direct callees | 1422 | 290,320 | 12.0% | 38.1% |
-| Everything reachable from scripts | 3136 | 535,358 | 22.2% | 44.5% |
+| Entry points | 738 | 84,436 | 3.5% | 67.4% |
+| Entry points and their direct callees | 1422 | 290,160 | 12.0% | 38.7% |
+| Everything reachable from scripts | 3136 | 535,198 | 22.2% | 44.9% |
 
-## Unmatched entry points, by script uses (95 used, 23,376 bytes)
+## Unmatched entry points, by script uses (82 used, 21,564 bytes)
 
 | Uses | Address | Bytes | Function | Script name | GCL name |
 |---:|---|---:|---|---|---|
-| 129 | `0817809C` | 56 | `sub_0817809C` | registry C6AA |  |
-| 105 | `08227A10` | 196 | `sub_08227A10` | registry 0CD4 |  |
-| 103 | `08225624` | 380 | `sub_08225624` | command trap | trap |
-| 94 | `080311F0` | 384 | `sub_080311F0` | registry DD91 |  |
-| 59 | `0816B884` | 84 | `sub_0816B884` | registry 0C1B |  |
-| 50 | `0802E3BC` | 172 | `sub_0802E3BC` | registry DDD0 |  |
-| 33 | `082268C0` | 88 | `sub_082268C0` | registry CAEE |  |
-| 17 | `0815CBF8` | 256 | `sub_0815CBF8` | registry 933C |  |
-| 15 | `08103CF8` | 140 | `sub_08103CF8` | registry 5D74 |  |
-| 11 | `081780D4` | 40 | `sub_081780D4` | registry 2FA0 |  |
-| 10 | `08033BD4` | 72 | `sub_08033BD4` | registry 6273 |  |
-| 9 | `0811DE68` | 96 | `sub_0811DE68` | registry 1E6E |  |
-| 9 | `0815CDAC` | 120 | `sub_0815CDAC` | registry BB01 |  |
+| 103 | `08225624` | 380 | `Trap_CreateFromScript` | command trap | trap |
 | 8 | `081D0C04` | 804 | `sub_081D0C04` | registry BB34 |  |
-| 7 | `081AF488` | 108 | `Vanargand_Create` | registry 7C56 | Vanargand |
 | 6 | `08103DCC` | 60 | `sub_08103DCC` | registry 15ED |  |
 | 6 | `0815CA88` | 64 | `sub_0815CA88` | registry C12D |  |
 | 6 | `0815CCF8` | 180 | `sub_0815CCF8` | registry 9763 |  |

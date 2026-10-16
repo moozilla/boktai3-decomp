@@ -425,12 +425,15 @@ addr,name,mode,confidence,source,notes
 08024F2C,SceneActorAnimation_TransitionVariant,thumb,low,src-alias,
 08029798,Vampire_Create,thumb,medium,gcl-name,name from GCL key D972 ヴァンパイア (Vampire); registry callback
 0802DCD8,Actor_PlayAnimationEntry,thumb,low,src-alias,
+0802E3BC,Packet_QueueFromScript,thumb,low,src-alias,
+080311F0,MessageWindow_OpenFromScript,thumb,low,src-alias,
 0803223C,Text_FindChar,thumb,medium,raphaelr,strchr variant used by script parsing
 08032C34,TextState_Reset,thumb,low,src-alias,
 08032C54,TextState_SetBounds,thumb,low,src-alias,
 08033634,TextWindow_Find,thumb,low,src-alias,
 0803386C,TextWindow_SetScript,thumb,low,src-alias,
 08033924,TextWindow_Refresh,thumb,low,src-alias,
+08033BD4,TextWindowManager_Create,thumb,low,src-alias,
 0803CDF0,ScenePool_ParseEntryParameters,thumb,low,src-alias,
 0803D1E8,ScenePool_ReadActorBounds,thumb,low,src-alias,
 0803D61C,ScenePool_CreateEntryFromScript,thumb,low,src-alias,
@@ -1861,8 +1864,15 @@ addr,name,mode,confidence,source,notes
 080FE68C,Axe_Init,thumb,medium,gcl-name,name from GCL key 2D30 アックス (Axe); loader called by Axe_Create
 080FF754,Axe_Create,thumb,medium,gcl-name,name from GCL key 2D30 アックス (Axe); registry callback
 08100298,WoodenCrate_Create,thumb,medium,gcl-name,name from GCL key 820B 木箱 (Wooden Crate); registry callback
+08103CF8,NamedActor_SetRouteFromScript,thumb,low,src-alias,
+0811DE68,GameFlag_TestFromScript,thumb,low,src-alias,
 08136C74,SceneActorScript_ApplyTargetResetCommand,thumb,low,src-alias,
+0815CBF8,ScriptActor_MoveToFromScript,thumb,low,src-alias,
+0815CDAC,ScriptActor_EnterStateFourFromScript,thumb,low,src-alias,
 0815F4F4,Player_Create,thumb,medium,gcl-name,name from GCL key F5EB プレイヤー (Player); registry callback
+0816B884,GameState_SetAreaFlagFromScript,thumb,low,src-alias,
+0817809C,Hud_SetModeFromScript,thumb,low,src-alias,
+081780D4,Hud_SetLayoutFromScript,thumb,low,src-alias,
 0818C674,Armor_Create,thumb,medium,gcl-name,name from GCL key E043 アーマー (Armor); registry callback
 0819783C,Nidhoggr_Create,thumb,medium,gcl-name,name from GCL key B06E ニーズホッグ (Nidhoggr); registry callback
 08197EC4,KeyTrigger_Update,thumb,low,src-alias,
@@ -1994,7 +2004,10 @@ addr,name,mode,confidence,source,notes
 08221798,ScalarApproach_StepQuarter,thumb,low,src-alias,
 082217CC,ScalarApproach_StepEighth,thumb,low,src-alias,
 08221800,ScalarApproach_StepSixteenth,thumb,low,src-alias,
+08225624,Trap_CreateFromScript,thumb,low,src-alias,
 08225C48,Terrain_LoadHP,thumb,low,disasm,"ScriptProc_Start(0xAE6C, hp): hands the HP header offsets to Terrain_SetGrid/SetBoxes/SetPaths/SetNavMeshes; docs/ASSETS.md"
+082268C0,Camera_SetFollowFromScript,thumb,low,src-alias,
+08227A10,Terrain_GetFloorHeightFromScript,thumb,low,src-alias,
 082284F4,Clock_ClearState,thumb,low,src-alias,
 08228548,Clock_DaysInMonth,thumb,low,manual,days in month; February uses the Gregorian leap-year rule
 08228D88,SunClock_GetBaseHour,thumb,low,src-alias,

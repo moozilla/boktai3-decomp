@@ -1,153 +1,85 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 70.8%
-// 28 differing instruction runs; size +8 bytes; first diff at +0x6 (ldr r0, [pc, #0x7c] vs ldr r0, [pc, #0xe0])
+#include "engine.h"
+#include "game_state.h"
 struct State {
-    u8 pad0[15];
-    u8 fresh;
-    u8 pad10[5];
-    s8 current;
-    u8 pad16[6];
-    void *pc;
-};
-struct Render {
-    u32 flags;
-    u8 pad[12];
-    u16 tile;
-};
-struct Frames {
-    u16 *data;
-    u8 flags, count, multiplier, duration;
-    u16 index, pada, rate, timer;
+    u8 pad0[9];
+    u8 lineWidth;
+    u8 pad0a[3];
+    u8 valueCount;
+    u8 pad0e[3];
+    u8 spacing;
+    u8 pad12[0xb6];
+    u32 values[1];
 };
 struct Actor {
     u8 pad0[0x18];
     struct State state;
-    u8 pad38[0x144];
-    u8 x, y, width, height;
+    u8 pad[0x180 - 0x18 - sizeof(struct State)];
     u16 scriptIndex;
-    u8 mode, pad183, previousMode, pad185, scrollMode, defaultMode;
+    u8 mode, flag183, previousMode, pad185, scrollMode, defaultMode;
     u16 scrollStep, scrollCounter;
-    void *custom;
-    u32 customCount;
+    u8 pad18c[8];
     u16 palette, wait;
     u32 scrollFlags;
-    u32 counter;
-    u8 pad1a0[4];
+    u8 pad19c[8];
     void *script;
-    u16 scriptFrame, scriptCount;
-    u8 pad1ac[0x6c];
-    u32 flags;
-    u8 pad21c[0x54];
-    u8 sprite[0x1c];
-    struct Render render;
-    u8 pad2a0[0x18];
-    struct Frames frames;
-    void *resource;
-    void *callback;
 };
 extern struct Actor *gUnk_020000DC;
-int sub_0803092C(struct Actor *);
-void sub_080316A4(void);
-void sub_080317D8(void);
-void sub_080317CC(void);
-int TextWindow_BlankRect(int, int, int, int);
-void *sub_080313C8(struct Actor *, int);
-void TextState_Reset(struct State *);
-int TextState_SetBounds(struct State *, int, int, int, int);
-int Script_GetValue(void);
-static inline void setCallback(void *fn, struct Actor *p)
-{
-    p->callback = fn;
-}
-static inline void setCallbackB(struct Actor *p, void *fn)
-{
-    p->callback = fn;
-}
-struct Vm {
-    u8 pad0[9];
-    u8 mode;
-    u8 pada[3];
-    u8 choiceCount;
-    u8 pade[3];
-    u8 spacing;
-    u8 pad12[0xb6];
-    u32 choices[16];
-};
-struct Sun {
-    u8 pad[0x12];
-    s16 level;
-};
-extern struct Sun *gUnk_02000710;
-int Script_SeekToKeyword(int);
 void *sub_08227E90(void);
-void *Script_GetPc(void);
-int Script_GetKeywordValue(int, int);
+void sub_08030C84(void *);
+int sub_08030F20(int x, int y, int width, int height);
 int sub_080308D0(struct Actor *, int);
 void sub_08030908(struct Actor *);
-int sub_08030C84(void *);
-int sub_08030F20(int, int, int, int);
-int sub_080311F0(void)
+int MessageWindow_OpenFromScript(void)
 {
     struct Actor *p = gUnk_020000DC;
-    struct Vm *vm;
-    int result;
+    struct State *state;
     if (!p)
-        goto fail;
-    vm = (struct Vm *)&p->state;
-    if (Script_SeekToKeyword(0x73)) {
+        return -1;
+    state = &p->state;
+    if (Script_SeekToKeyword('s')) {
         void *script = sub_08227E90();
         p->script = script;
         if (!script)
-            goto fail;
+            return -1;
         sub_08030C84(script);
     }
-    if (Script_SeekToKeyword(0x72)) {
+    if (Script_SeekToKeyword('r')) {
         int x = Script_GetValue();
         int y = Script_GetValue();
-        int w = Script_GetValue();
-        int h = Script_GetValue();
-        sub_08030F20(x, y, w, h);
+        int width = Script_GetValue();
+        int height = Script_GetValue();
+        sub_08030F20(x, y, width, height);
     }
-    if (sub_080308D0(p, Script_GetKeywordValue(0x63, p->palette)) < 0)
-        goto fail;
-    sub_08030908(p);
-    p->scriptIndex = Script_GetKeywordValue(0x69, p->scriptIndex);
-    vm->spacing = Script_GetKeywordValue(0x6d, vm->spacing);
-    vm->mode = Script_GetKeywordValue(0x77, gUnk_02000710->level);
     {
-        int found = Script_SeekToKeyword(0x64);
-        if (found) {
-            p->scrollMode = Script_GetValue();
-            p->scrollStep = Script_GetValue();
-            p->scrollFlags = 1;
-        } else {
-            int zero = 0;
-            p->scrollMode = zero;
-            p->scrollStep = found;
-            p->scrollFlags = found;
-        }
+        s32 palette = Script_GetKeywordValue('c', p->palette);
+        if (sub_080308D0(p, palette) < 0)
+            return -1;
+    }
+    sub_08030908(p);
+    p->scriptIndex = Script_GetKeywordValue('i', p->scriptIndex);
+    state->spacing = Script_GetKeywordValue('m', state->spacing);
+    state->lineWidth = Script_GetKeywordValue('w', (s16)gUnk_02000710->unk12);
+    if (Script_SeekToKeyword('d')) {
+        p->scrollMode = Script_GetValue();
+        p->scrollStep = Script_GetValue();
+        p->scrollFlags = 1;
+    } else {
+        p->scrollMode = 0;
+        p->scrollStep = 0;
+        p->scrollFlags = 0;
     }
     p->scrollCounter = 0;
-    if (Script_SeekToKeyword(0x70)) {
-        vm->choiceCount = 0;
+    if (Script_SeekToKeyword('p')) {
+        state->valueCount = 0;
         while (Script_GetPc()) {
-            int value = Script_GetValue();
-            vm->choices[vm->choiceCount] = value;
-            vm->choiceCount++;
+            state->values[state->valueCount] = Script_GetValue();
+            state->valueCount++;
         }
     }
-    result = Script_SeekToKeyword(0x61);
-    if (result) {
-        result = Script_GetValue();
-        if (result)
-            p->pad183 = 0;
+    if (Script_SeekToKeyword('a')) {
+        if (Script_GetValue())
+            p->flag183 = 0;
     } else
-        p->pad183 = result;
-    return result;
-fail:
-    return -1;
+        p->flag183 = 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080311F0);
-#endif
