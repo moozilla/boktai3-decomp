@@ -1,10 +1,19 @@
 #!/usr/bin/env python3
-"""Which sprite palette pool entry (9B1B) the code gives each large sprite.
+"""The sprite palette pool entries (9B1B) each large sprite is drawn with.
 
-  bigpalettes.py [HASH...]     print hash, pool entries and the functions
+  bigpalettes.py [HASH...]     print hash, default, variants and their sources
+  bigpalettes.py write         regenerate data/sprite_palettes.csv
 
-A large sprite (98F5) names no palette. The code that shows one calls
-AnimData_Load(anim, hash) (082151E4) and then
+Every large sprite has a default entry in its own data: the u16 at +2 of each
+frame record (the same in every frame), which AnimData_Load applies. Code
+then selects variants for different monsters or states sharing one sprite
+(the ghoul 9247 defaults to 400 and is drawn with 403 and 404). Variants come
+from two sources: a runtime log of every AnimData_SelectPaletteBank call while
+the game visits every scene (tools/mgba/palette_survey.lua ->
+build/centaur/sprite_pools.tsv, folded into data/sprite_palettes.csv by
+`write`), and constant call pairs in the code (below).
+
+Code pairs: AnimData_Load(anim, hash) (082151E4) and then
 AnimData_SelectPaletteBank(anim, pool_index) (08215284), which points the
 sprite's bank 0 at pool entry `pool_index` (index < *0x030042E0, the entry at
 *0x030042E4 + 32 * index). This scans gen/code.s for those calls with
@@ -14,8 +23,9 @@ same function. One sprite can take several entries: nine enemy routines draw
 armor (551).
 
 Only constant hashes are found (35 sprites); sprites chosen from tables or
-script options (`T=` in FloorSwitch) are not. The Studio uses these where no
-capture has seen the sprite (build/centaur/sprite_palettes.json wins).
+script options (`T=` in FloorSwitch) are covered by the runtime log only.
+Variants that neither source has seen (attacks, bosses and menus the survey
+does not reach) are still missing; the default is always known.
 """
 import collections
 import functools
@@ -73,16 +83,86 @@ def pools():
     return {h: dict(v) for h, v in out.items()}
 
 
-def learned():
-    """{"big:HASH": {"pool", "pools", "source"}} in the Studio's learned-palette form."""
-    return {f"big:{h:04X}": {"pool": min(v), "pools": sorted(v), "source": "code"} for h, v in pools().items()}
+CSV = os.path.join(ROOT, "data", "sprite_palettes.csv")
+RUNTIME = os.path.join(ROOT, "build", "centaur", "sprite_pools.tsv")
+
+
+@functools.lru_cache(None)
+def defaults():
+    """{hash: default pool entry} from the sprite data (frame +2)."""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    from bigsprites import BigSprites
+    from romlib import load_rom
+    bs = BigSprites(load_rom())
+    out = {}
+    for i, r in enumerate(bs.records):
+        fr = next(iter(bs.frames(i)), None)
+        if fr:
+            out[r[0]] = fr[2]
+    return out
+
+
+def runtime():
+    """{hash: {pool: set of callers}} from the palette survey log, if present."""
+    import csv
+    out = collections.defaultdict(lambda: collections.defaultdict(set))
+    if os.path.exists(RUNTIME):
+        for r in csv.DictReader(open(RUNTIME), delimiter="\t"):
+            if r["hash"] != "?":
+                out[int(r["hash"], 16)][int(r["pool"])].add(r["caller"])
+    return out
+
+
+@functools.lru_cache(None)
+def table():
+    """{hash: {"default", "variants": {pool: sources}}} from data/sprite_palettes.csv."""
+    import csv
+    out = {}
+    if os.path.exists(CSV):
+        for r in csv.DictReader(open(CSV, encoding="utf-8")):
+            v = {}
+            for part in filter(None, r["variants"].split(";")):
+                p, _, src = part.partition("@")
+                v[int(p)] = src
+            out[int(r["hash"], 16)] = {"default": int(r["default"]), "variants": v}
+    return out
+
+
+def variants(h):
+    """Sorted pool entries the game draws sprite h with (default first)."""
+    t = table().get(h, {})
+    vs = set(t.get("variants", {})) | set(pools().get(h, {}))
+    d = t.get("default", defaults().get(h))
+    return [d] + sorted(vs - {d}) if d is not None else sorted(vs)
+
+
+def write():
+    import csv
+    rt, code, d = runtime(), pools(), defaults()
+    old = table()
+    with open(CSV, "w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f, lineterminator="\n")
+        w.writerow(["hash", "default", "variants"])
+        for h in sorted(d):
+            v = {p: s for p, s in old.get(h, {}).get("variants", {}).items()}
+            for p, callers in rt.get(h, {}).items():
+                v[p] = "run " + " ".join(sorted(callers))
+            for p, fs in code.get(h, {}).items():
+                v.setdefault(p, "code " + " ".join(fs))
+            w.writerow([f"{h:04X}", d[h], ";".join(f"{p}@{v[p]}" for p in sorted(v))])
+    print(f"{CSV}: {len(d)} sprites, {sum(1 for h in d if h in rt or h in code)} with variants seen")
 
 
 def main():
+    if sys.argv[1:] == ["write"]:
+        return write()
     want = {int(a, 16) for a in sys.argv[1:]}
-    for h, v in sorted(pools().items()):
+    t = table()
+    for h in sorted(defaults()):
         if not want or h in want:
-            print(f"{h:04X}  " + "  ".join(f"{p} ({', '.join(fs)})" for p, fs in sorted(v.items())))
+            vs = t.get(h, {}).get("variants", {})
+            print(f"{h:04X}  default {defaults()[h]}  " + "  ".join(f"{p} ({vs.get(p) or 'code ' + ' '.join(pools().get(h, {}).get(p, []))})" for p in variants(h)[1:]))
 
 
 if __name__ == "__main__":
