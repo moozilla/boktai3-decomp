@@ -6,58 +6,31 @@ handlers; their callees are found through `bl` calls and Thumb function pointers
 
 | Set | Functions | Bytes | Share of code | Matched |
 |---|---:|---:|---:|---:|
-| Entry points | 738 | 84,436 | 3.5% | 67.4% |
-| Entry points and their direct callees | 1422 | 290,160 | 12.0% | 38.7% |
-| Everything reachable from scripts | 3136 | 535,198 | 22.2% | 44.9% |
+| Entry points | 738 | 84,436 | 3.5% | 71.5% |
+| Entry points and their direct callees | 1422 | 290,160 | 12.0% | 39.9% |
+| Everything reachable from scripts | 3136 | 535,198 | 22.2% | 45.5% |
 
-## Unmatched entry points, by script uses (82 used, 21,564 bytes)
+## Unmatched entry points, by script uses (55 used, 18,116 bytes)
 
 | Uses | Address | Bytes | Function | Script name | GCL name |
 |---:|---|---:|---|---|---|
-| 103 | `08225624` | 380 | `Trap_CreateFromScript` | command trap | trap |
-| 8 | `081D0C04` | 804 | `sub_081D0C04` | registry BB34 |  |
-| 6 | `08103DCC` | 60 | `sub_08103DCC` | registry 15ED |  |
-| 6 | `0815CA88` | 64 | `sub_0815CA88` | registry C12D |  |
-| 6 | `0815CCF8` | 180 | `sub_0815CCF8` | registry 9763 |  |
+| 8 | `081D0C04` | 804 | `SceneNpc_CreateFromScript` | registry BB34 |  |
 | 6 | `081CE1BC` | 1312 | `sub_081CE1BC` | registry 8EA3 |  |
-| 6 | `08225CB8` | 232 | `sub_08225CB8` | registry 30AD |  |
 | 5 | `08103110` | 1856 | `sub_08103110` | registry A4FC |  |
-| 5 | `08179298` | 96 | `sub_08179298` | registry CC28 |  |
-| 5 | `081F2034` | 80 | `sub_081F2034` | registry 5856 |  |
-| 5 | `0820A460` | 112 | `sub_0820A460` | registry 2863 |  |
 | 4 | `08111A48` | 380 | `sub_08111A48` | registry 734C |  |
-| 4 | `0815A680` | 116 | `sub_0815A680` | registry 440F |  |
-| 4 | `081AF4F4` | 76 | `sub_081AF4F4` | registry 4D12 |  |
-| 4 | `081EB724` | 184 | `sub_081EB724` | registry 3578 |  |
-| 4 | `0822DE64` | 212 | `sub_0822DE64` | registry 65E2 |  |
-| 4 | `0822E924` | 164 | `sub_0822E924` | registry 1606 |  |
-| 4 | `0822ECC8` | 156 | `SolarFruit_Command` | registry FE88 | Solar Fruit |
-| 3 | `08073BA0` | 80 | `sub_08073BA0` | registry D854 |  |
+| 4 | `0815A680` | 116 | `ScriptActor_TestFlagFromScript` | registry 440F |  |
+| 4 | `081AF4F4` | 76 | `Vanargand_ResetFromScript` | registry 4D12 |  |
 | 3 | `08104350` | 1016 | `sub_08104350` | registry F1F9 |  |
-| 3 | `08119EF0` | 84 | `sub_08119EF0` | registry E3EE | Glove |
-| 3 | `0815A838` | 52 | `sub_0815A838` | registry 0E15 |  |
-| 3 | `081A3270` | 92 | `Hresvelgr_Create` | registry C077 | Hresvelgr |
-| 3 | `081BA5D0` | 92 | `sub_081BA5D0` | registry 2388 |  |
+| 3 | `08119EF0` | 84 | `Glove_StartFromScript` | registry E3EE | Glove |
+| 3 | `0815A838` | 52 | `ScriptActor_GetField534FromScript` | registry 0E15 |  |
 | 3 | `081D0F28` | 308 | `sub_081D0F28` | registry 8918 |  |
-| 3 | `081DC618` | 120 | `sub_081DC618` | registry 317B |  |
-| 3 | `081DE520` | 132 | `sub_081DE520` | registry FE3F |  |
-| 3 | `0820A4D0` | 112 | `sub_0820A4D0` | registry 81C7 |  |
-| 3 | `0822DB54` | 208 | `sub_0822DB54` | registry 3757 |  |
-| 3 | `0822E304` | 60 | `sub_0822E304` | registry 297E |  |
-| 3 | `0822E340` | 176 | `sub_0822E340` | registry 01AB |  |
-| 3 | `0822E564` | 144 | `sub_0822E564` | registry 1887 |  |
 | 2 | `08016764` | 216 | `sub_08016764` | registry 3535 |  |
 | 2 | `08018664` | 344 | `sub_08018664` | registry 3A89 |  |
-| 2 | `080F752C` | 80 | `Sword_Create` | registry DB8D | Sword |
 | 2 | `0810067C` | 700 | `sub_0810067C` | registry AB8E |  |
 | 2 | `08103B94` | 136 | `sub_08103B94` | registry 7E33 |  |
 | 2 | `0810858C` | 448 | `sub_0810858C` | registry 8192 |  |
 | 2 | `0811B848` | 456 | `sub_0811B848` | registry E7BC |  |
-| 2 | `0811D1C0` | 88 | `sub_0811D1C0` | registry 98D8 |  |
-| 2 | `0811D358` | 44 | `sub_0811D358` | registry 7245 |  |
-| 2 | `0815A5E8` | 64 | `sub_0815A5E8` | registry 5335 |  |
 | 2 | `0815D524` | 108 | `sub_0815D524` | registry 4CDD |  |
-| 2 | `08178564` | 36 | `sub_08178564` | registry C8D1 |  |
 | 2 | `081803D8` | 176 | `sub_081803D8` | registry 4EC9 |  |
 | 2 | `081BB294` | 248 | `sub_081BB294` | registry 61A0 |  |
 | 2 | `081C4080` | 276 | `sub_081C4080` | registry F3E4 |  |
