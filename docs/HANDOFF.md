@@ -566,6 +566,15 @@ evidence in [ASSETS.md](ASSETS.md) ("Stage terrain", "Stage scripts"):
   Centaur's `warp(scene, entrance)` now calls `proc_945` (the door transition
   without a box) and the player is placed; the old warp left `r708[0x70]`
   stale, so no entrance procedure matched (CENTAUR.md, "Scenes, warps").
+* **Script decomp targets** ([tasks/script_targets.md](tasks/script_targets.md),
+  `tools/assets/script_targets.py`): native code the scripts reach is 22% of
+  the ROM's code (3,136 functions, 535 KB, 45% matched). The 738 entry points
+  (registry routines and command handlers) are 85 KB, 65% matched; the 95
+  unmatched ones scripts use are 23 KB, led by `0817809C` (message window
+  mode, 129 uses), `08227A10` (floor height, 105), the `trap` handler
+  (`08225624`, 103) and `080311F0` (open the message window, 94).
+  `gcl/names/proc.csv` names 151 procedures; 60% of call sites now go to a
+  named procedure.
 * **GCL names** ([gcl/README.md](../gcl/README.md)): registry keys and
   command ids are EUC-JP name hashes. `gcl/names/chara.csv` has 52 recovered
   names with English (enemies such as スライム/Slime, routines such as
