@@ -82,18 +82,24 @@ clears it, `sub_082172E0` finds or adds a pool entry (in r4) and returns its
 bank, reached from the draw path `08214A45` ← `08219E27` ← `08215501` ←
 actor code; an IWRAM routine around `0x03000078` does the same for other
 callers (r0 = pool entry). So a large sprite's entry is passed in by the
-actor that draws it. The actor sets it once: `AnimData_Load(anim, hash)`
-(`082151E4`) picks the sprite and `AnimData_SelectPaletteBank(anim, entry)`
-(`08215284`) stores the pool entry in the anim (`+6`, and `+0xC` the entry's
+actor that draws it. Each large sprite's default entry is in its data: the
+`u16` at +2 of its frame records (the same in every frame), which
+`AnimData_Load` copies to the anim. Code then selects variants:
+`data/sprite_palettes.csv` lists every sprite's default and the variants seen,
+from a runtime log of every palette selection across all scenes
+(`tools/mgba/palette_survey.lua`, 108 sprites have variants: the ghoul `9247`
+defaults to 400 and is drawn in 403 and 404) and constant call pairs.
+`AnimData_Load(anim, hash)` (`082151E4`) picks the sprite and its default;
+`AnimData_SelectPaletteBank(anim, entry)` (`08215284`) stores another pool
+entry in the anim (`+6`, and `+0xC` the entry's
 address, `*0x030042E4 + 32 * entry`; entries at or past `*0x030042E0` are
 ignored). `tools/assets/bigpalettes.py` pairs the two calls where both
-arguments are constants: 35 sprites, used by the Studio when no capture saw
-the sprite. One sprite can take several entries, and then each is a
+arguments are constants (35 sprites). One sprite can take several entries, and then each is a
 different monster or state: `7E82` is the statue (549) and the armor (551),
-and ten routines draw `7E7D` in ten entries (286, 439-453). Sprites whose
-hash comes from a table or a script option (`FloorSwitch` `T=`) are not
-found this way; their entries are also called with `0x16C`/`0x16D` by the
-floor switch (pressed and released), so palette swaps mark states too.
+and `7E7D` (default 439) is drawn in 440-453 by a dozen routines. Sprites
+whose hash comes from a table or a script option (`FloorSwitch` `T=`) are
+only in the runtime log. Palette swaps mark states too: the floor switch
+selects `0x16C`/`0x16D` (pressed and released).
 
 **Items, swords and accessories** (`tools/assets/items.py` → `data/items.csv`).
 Their names are text strings at a fixed base plus the ID: items 988 + ID
@@ -388,7 +394,7 @@ the `CB05` lookup must also search this resource; the exact path is not yet
 traced. Layout (inferred): `+0x04` count, `+0x0C` pixel data start, `+0x10`
 frame table, `+0x14` part table; at `+0x18`, records of 12 bytes
 `{u32 name hash, u8 w, u8 h, u8 centre x, u8 centre y, u32 frame offset}`;
-frames of 12 bytes `{u8 parts, u8 tiles, u16 flags, u32 pixel offset,
+frames of 12 bytes `{u8 parts, u8 tiles, u16 palette, u32 pixel offset,
 u32 part offset}`; parts of 4 bytes `{u8 size << 2 | shape, u8 flags, s8 x,
 s8 y}`, whose tiles follow each other in the frame's 4bpp pixel block.
 Matching these sprites to the monster names and actor kinds is open.
