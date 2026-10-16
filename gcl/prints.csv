@@ -1,0 +1,392 @@
+text,english
+　　⇒ 100年以上もマイナス差がありますよ！,Off by over 100 years (negative)!
+　　⇒ 日数差はマイナスでした！,Day difference was negative!
+　　⇒ 100年以上も差がありますよ！,Off by over 100 years!
+　　⇒ 日数差を取得しました！,Got day difference.
+　■■■■■■■■■■■,(divider)
+　　⇒バトルドライブ中なので、棺桶設置座標を固定値で上書きします！,"In battle drive, overriding coffin placement coords with fixed values!"
+　×棺桶は設置できません！,x Coffin cannot be placed!
+　　★★★ フェードせずに、即再生します！ -id ,"*** No fade, play immediately! -id"
+視界スポット共通処理,Common vision spot processing
+天窓エリア闇になった,Skylight area became dark
+天窓エリア明るくなった,Skylight area became bright
+スポットオフエリア スポットオフ,Spot-off area: spot off
+スポットONエリア スポットON,Spot-ON area: spot on
+燭台エリア闇になった,Candle-stand area became dark
+燭台エリア明るくなった,Candle-stand area became bright
+引き数１,Arg 1
+引き数２,Arg 2
+引き数３,Arg 3
+引き数４,Arg 4
+=================================カギドアオープン！！,Key door open!!
+アイテムリスト:カギを持っていません。,Item list: no key in possession.
+○のカギを開けた！！,Opened the ○ key!!
+△のカギを開けた！！,Opened the △ key!!
+□のカギを開けた！！,Opened the □ key!!
+×のカギを開けた！！,Opened the × key!!
+■$b:敵設置数登録配列[]の、,"■ $b: enemy placement count registration array[], ..."
+　　●ミッションタイマーを設置します,● Setting mission timer
+　　　→現在のカウンター = ,→ current counter = 
+ループトゲ床,Loop spike floor
+接触トゲ床,Contact spike floor
+スイッチトゲ床,Switch spike floor
+通信中,Communicating
+通信していません,Not communicating
+時間タイ,Time tie
+-----昼間設定-------,----- Daytime settings -----
+-----夜間設定-------,----- Night settings -----
+＊＊＊＊＊ゲームスタート＊＊＊＊＊,***** Game start *****
+＊＊＊＊＊続きから＊＊＊＊＊,***** Continue *****
+＊＊＊　日の出、日の入り時刻を設定しました。　＊＊＊,*** Sunrise/sunset times set. ***
+＊＊＊ゲームスタート画面＊＊＊,*** Game start screen ***
+＊＊＊ゲームスタート画面コマンド終了＊＊＊,*** Game start screen command end ***
+データ配信成立しました,Data distribution succeeded
+アストロ,Astro
+ソードライセンス,Sword license
+バイクパーツオープン,Bike parts opened
+想定外のものを取得,Obtained unexpected item
+パスワードを入力しますか,Enter password?
+名前入力＿パスワードなし,Name entry _ no password
+解説,Tutorial
+汎用カウンタ　：,General counter:
+解説デモ（チャプター）を再生します。,Playing tutorial cutscene (chapter).
+解説デモをキャンセルします!!（準備フェイズ）,Canceling tutorial cutscene!! (prep phase)
+△▽△▽△▽△▽△▽ 解説デモの再生が終了しました,Tutorial cutscene playback ended
+＊＊＊　おてんこ消え　＊＊＊,*** Otenko vanished ***
+解説デモのチャプターが１つ再生し終わりました,One tutorial chapter finished playing
+解説デモの再生を全て終了しました,All tutorial cutscene playback ended
+解説デモがキャンセルされました!!!,Tutorial cutscene was canceled!!!
+△▽△▽△▽△▽△▽ 解説デモを終了して、下の場所へ戻ります,Tutorial cutscene ended; returning to location below
+コナミロゴへ,To Konami logo
+タイトルへ,To title
+体験会メインタイトルへ,To trial-event main title
+メインタイトルへ,To main title
+オプションへ,To options
+△▽△▽△▽△▽△▽ タイトル解説デモを再生します。,Playing title tutorial cutscene.
+タイトル解説デモタイプ：  ,Title tutorial cutscene type:
+タイトル解説デモ再生位置：,Title tutorial cutscene playback position:
+△▽△▽△▽△▽△▽ オプション解説デモを再生します。,Playing options tutorial cutscene.
+オプション解説デモタイプ：  ,Options tutorial cutscene type:
+オプション解説デモ再生位置：,Options tutorial playback position:
+△▽△▽△▽△▽△▽ 起動時解説デモを再生します。,Playing boot-time tutorial cutscene.
+起動時解説デモタイプ： ,Boot tutorial cutscene type:
+起動時解説デモ再生位置：,Boot tutorial playback position:
+　◆タイプ指定が間違っています！！！　敵は登録されませんでした◆,◆ Invalid type! Enemy not registered. ◆
+　◆設定数が限界を超えています！！！　敵は登録されません◆,◆ Count limit exceeded! Enemy not registered. ◆
+Z軸の壁面（東向き）にセットします,Setting to wall face (east-facing) on Z axis
+X軸の壁面（南向き）にセットします,Setting to wall face (south-facing) on X axis
+　◆設定数が限界を超えています！！！　10匹を超えた敵は登録されません◆,◆ Count limit exceeded! Enemies past 10 not registered. ◆
+　扇風砲マネージャ を起動します,Starting fan cannon manager
+　◆扇風砲マネージャは既に起動しています！◆,◆ Fan cannon manager already running! ◆
+◆◆開始時,◆◆ Start time
+◆◆開始分,◆◆ Start minute
+◆◆現在時,◆◆ Current hour
+◆◆現在分,◆◆ Current minute
+　⇒フェード:イン,→ Fade: in
+　⇒フェード:アウト,→ Fade: out
+　★フェード指定が不正な値です！！！！！★,★ Invalid fade value!!!! ★
+◆◆現在ステージ,◆◆ Current stage
+◆◆謎の男を指定外(ST01〜ST04以外)に置こうとしています◆◆,◆◆ Mystery man placed outside allowed set (ST01–ST04) ◆◆
+◆◆ガリガリ君を指定外(ST01〜ST04以外)に置こうとしています◆◆,◆◆ Gari-gari-kun placed outside allowed set (ST01–ST04) ◆◆
+◆◆行商人買い物_復帰GCL,◆◆ Traveling merchant shopping return GCL
+◆◆行商人買い物_復帰位置,◆◆ Traveling merchant shopping return position
+◆◆デモモード◆◆,◆◆ Demo mode ◆◆
+◆◆街モード◆◆,◆◆ Town mode ◆◆
+◆◆カウンタ:,◆◆ Counter:
+■■ダメージポイント:,■■ Damage points:
+開始サウンドディレイ,Start sound delay
+窓口サウンドディレイ,Window sound delay
+◆◆1,◆◆ 1
+◆◆2,◆◆ 2
+◆◆3,◆◆ 3
+◆◆項目数,◆◆ Item count
+◆◆カウンタ,◆◆ Counter
+◆◆テーブル数,◆◆ Table count
+◆◆パーツ数,◆◆ Part count
+◆◆セーブ情報の書き換え◆◆,◆◆ Rewriting save info ◆◆
+■■カウンタ,■■ Counter
+■■仕事会話番号,■■ Job conversation number
+■■クリア数,■■ Clear count
+■■Sクリア数,■■ S-clear count
+0マージあたい,0 merge value
+1マージあたい,1 merge value
+◆◆ザジ寝る◆◆,◆◆ Zazie sleeping ◆◆
+★★★★★★★ 日数差はマイナスでした！！！！！！,★★★ Day difference was negative!!!!!!
+◆◆0,◆◆ 0
+◆◆ぬいぐるみ,◆◆ Plush toy
+◆◆ぬいぐるみ変更回数,◆◆ Plush toy change count
+◆すでにある,◆ Already exists
+◆どろんぼさま効果回数クリア(tw00_09_town),◆ Doronbo-sama effect count clear (tw00_09_town)
+◆もう出ている,◆ Already out
+◆◆時間,◆◆ Time
+★★★,★★★
+●●●●●●ゾクタイパスワードなし！！,No Zoktai (Boktai 2) password!
+●●●●●●ゾクタイパスワードあり。お父さんの思い出話,No Zoktai (Boktai 2) password!
+シャッター開けステップ,Shutter-open step
+シャッター開け終了。おつかれさまでした。,Shutter open finished. Thanks for your work.
+画面揺れ時間,Screen shake time
+トラップ部屋スケルトンげきはー,Trap room skeleton hit
+カラミティとか○カギとか,"Calamity and ○ keys, etc."
+ぬいぐるみ１,Plush toy 1
+ぬいぐるみ２,Plush toy 2
+ぬいぐるみ３,Plush toy 3
+ぬいぐるみ４,Plush toy 4
+　→ぬいぐるみ会話閉め,→ Plush toy conversation close
+　→ぬいぐるみ取得(σ´∀`)σ,→ Plush toy acquired (σ´∀`)σ
+　→ぬいぐるみ取得終了,→ Plush toy acquisition finished
+■★■タイマーカウンターは,■★■ Timer counter is
+共通ロード設定 *** @st01_43伯爵戦前へ,Common load setting *** to before Count fight @st01_43
+共通ロード設定 *** @st01_43 通常モードでボス部屋へ,"Common load setting *** to boss room, normal mode @st01_43"
+コウモリカーテン破壊,Bat curtain destroyed
+マーカー設置デスよ,Marker placed desu
+共通ロード設定 *** @st01_43_ruins_after,Common load setting *** @st01_43_ruins_after
+▼伯爵戦用ダイナミックハザード▼出口閉じまーす,▼ Count-fight dynamic hazard ▼ closing exit
+不明な壁種類です？？？？？,Unknown wall type???
+$:P_壁種類,$: P_wall type
+不明な橋種類です？？？？？,Unknown bridge type???
+$:P_橋種類,$: P_bridge type
+全滅ミッション中はアイビーを破壊跡で設置します！！！！！,"During mission to eliminate all enemies, placing ivy as destroyed remains!!!!!"
+全滅ミッション中は蜂の巣を設置しません！！！！！,"During eliminate-all mission, not placing beehive!!!!!"
+d:ST:st02_さらわれたトリニティ_終了,d:ST:st02_kidnapped Trinity_end
+d:ST:st02_ゴーレム初登場_終了,d:ST:st02_golem first appearance_end
+まだ解けてないので初期配置,"Not solved yet, so initial layout"
+もう正解しているので正解配置,"Already solved, so solved layout"
+アースレンズ取得前なので、デモ付きで宝箱を設置,"Before obtaining Earth Lens, placing treasure chest with demo"
+アースレンズ取得後なので、デモなしで宝箱を設置,"After obtaining Earth Lens, placing treasure chest without demo"
+さあ、判定は…,"Now, let's see the result..."
+12_昇降床スイッチ１　,12_elevator-floor switch 1
+12_昇降床スイッチ２　,12_elevator-floor switch 2
+全問正解！！！！！！！！,All answers correct!!!!!!!!
+残念でした・・・・・・・,Sorry...
+１回目：エインヘルヤル,1st time: Einherjar
+２回目：フレスベルグのブロマイド,2nd time: Fresbelg bromide
+３回目：大地の巫女リタのブロマイド,3rd time: Earth priestess Rita bromide
+４回目：レディのブロマイド,4th time: Lady bromide
+５回目：魔法薬,5th time: magic potion
+Ｄミッション:敵全滅では昇降床ロードを設置しません・・・・・,D mission: not placing elevator-floor load in enemy-elimination...
+Ｄミッション:敵全滅では昇降床を設置しません・・・・・,D mission: not placing elevator floor in enemy-elimination...
+起動中だよ！！！！！,Already running!!!!!
+移動床起動！！！！！,Moving floor started!!!!!
+移動床停止・・・・・,Moving floor stopped...
+Ｄミッション:宝箱探索は移動床を設置しません・・・・・,D mission: treasure search does not place moving floor...
+燭台１の反応,Candle 1 response
+燭台２の反応,Candle 2 response
+$f:st02_27_燭台シャッターフラグ,$f: st02_27_candle shutter flag
+$f:燭台点灯フラグ[d:st02_燭台スイッチ番号:27_燭台１],$f: candle-stand lit flag[d:st02_candle switch no.:27_candle 1]
+$f:燭台点灯フラグ[d:st02_燭台スイッチ番号:27_燭台２],$f: candle-stand lit flag[d:st02_candle switch no.:27_candle 2]
+$f:床スイッチフラグ[d:st02_床スイッチ番号:36_床スイッチ１],$f: floor switch flag[d:st02_floor switch no.:36_floor switch 1]
+$f:床スイッチフラグ[d:st02_床スイッチ番号:36_床スイッチ２],$f: floor switch flag[d:st02_floor switch no.:36_floor switch 2]
+見せかけの昇降床（オブジェ）を設置,Placing fake elevator floor (object)
+用意してない会話カウントになっている？？？？？　$$b:トリニティ会話カウント,Conversation count not prepared???? $$b: Trinity conversation count
+$$b:すまきトリニティダメージ,$$b: bound Trinity damage
+特にトリニティダメージデモはありません・・・・・,No special Trinity damage demo...
+すまきトリニティダメージデモ発生中なので、ダメージ判定はキャンセル・・・・・,"Bound Trinity damage demo in progress, so damage check canceled..."
+燭台の反応,Candle response
+$f:st02_53_燭台シャッターフラグ,$f: st02_53_candle shutter flag
+$f:燭台点灯フラグ[d:st02_燭台スイッチ番号:53_燭台１],$f: candle-stand lit flag[d:st02_candle switch no.:53_candle 1]
+$f:燭台点灯フラグ[d:st02_燭台スイッチ番号:53_燭台２],$f: candle-stand lit flag[d:st02_candle switch no.:53_candle 2]
+$f:燭台点灯フラグ[d:st02_燭台スイッチ番号:53_燭台３],$f: candle-stand lit flag[d:st02_candle switch no.:53_candle 3]
+$f:燭台点灯フラグ[d:st02_燭台スイッチ番号:53_燭台４],$f: candle-stand lit flag[d:st02_candle switch no.:53_candle 4]
+$f:燭台点灯フラグ[d:st02_燭台スイッチ番号:53_燭台５],$f: candle-stand lit flag[d:st02_candle switch no.:53_candle 5]
+■■■■■■■■■■■■■■■■■$f:st04_08_重量スイッチオン,$f: st04_08_weight switch on
+シャッターオープンデモ  0,Shutter open demo 0
+シャッターオープンデモ  1,Shutter open demo 1
+シャッターオープンデモ  2,Shutter open demo 2
+シャッターオープンデモ  3,Shutter open demo 3
+■■■■■■■■■■■■■■■■■■■■■■■壱号ブロックを最終位置に,Moving block 1 to final position
+■■■■■■■■■■■■■■■■■■■■■■■初期に戻す,Returning to initial position
+■■■■■■■■■■■■■■■■■■■■■■■弐号ブロックステップ:最終位置仮置き,Block 2 step: provisional placement at final position
+☆☆☆☆☆☆プレイヤーエネルギー____,Player energy ____
+**********停滞プロック呼び出しＯＫ,Stagnation block call OK
+死体遺棄,Body disposal
+ニーズホッグ外部終了,Nidhoggr external end
+110エリアのストーリーフラグを更新,Updating story flag for area 110
+120エリアのストーリーフラグを更新,Updating story flag for area 120
+130エリアのストーリーフラグを更新,Updating story flag for area 130
+140エリアのストーリーフラグを更新,Updating story flag for area 140
+410エリアのストーリーフラグを更新,Updating story flag for area 410
+420エリアのストーリーフラグを更新,Updating story flag for area 420
+430エリアのストーリーフラグを更新,Updating story flag for area 430
+440エリアのストーリーフラグを更新,Updating story flag for area 440
+指定のエリア用ストーリーフラグは登録されてません！！！,Story flag for specified area not registered!!!
+フレイムカラーで設定,Set to flame color
+フロストカラーで設定,Set to frost color
+アースカラーで設定,Set to earth color
+クラウドカラーで設定,Set to cloud color
+？？？？？しらない属性なので無属性で設定,"??? Unknown element, set to no element"
+なし/アースで設定,None/Earth set
+クラウド/アースで設定,Cloud/Earth set
+アース/なしで設定,Earth/None set
+なし/クラウドで設定,None/Cloud set
+アース/クラウドで設定,Earth/Cloud set
+クラウド/なしで設定,Cloud/None set
+全部判定に引っかからなかったので、なし/なしで設定,"No condition matched, so set to none/none"
+$f:燭台点灯フラグ[$:P_燭台スイッチ番号],$f: candle-stand lit flag[$: P_candle switch no.]
+$$:燭台状態,$$: candle state
+燭台点火！！！！！,Candle lit!!!!!
+$:P_燭台スイッチ番号,$: P_candle switch no.
+$f:燭台点灯フラグ[ $3 ],$f: candle-stand lit flag[ $3 ]
+ジョニー会話処理失敗・・・・・,Johnny conversation processing failed...
+知らない$:P_会話番号です！！！！！,Unknown $: P_conversation no.!!!!!
+指定された終了プロックに飛びます,Jumping to specified end block
+おしおき停止しました・・・・・,Punishment stopped...
+おしおきは起動してません・・・・・,Punishment not active...
+片道シャッター全閉鎖判定処理・・・・・,One-way shutter all-closed judgment processing...
+st05_147フロア：アウトでした…,st05_147 floor: out...
+st05_147フロア：セーフ！！！！！,st05_147 floor: safe!!!!!
+そのフロアはハマリにはなりません　$:P_フロア,That floor won't be a stuck-spot $: P_floor
+アウトでした…　$$:シャッター開閉判定,Out... $$: shutter open/close judgment
+まだセーフ！　$$:シャッター開閉判定,Still safe! $$: shutter open/close judgment
+共通紋章ブロック橋レバーデモ終了,Common crest block bridge lever demo ended
+共通モジュール内終了プロック呼び出し処理をします,Calling common module end-block processing
+$:P_ブロック名 ,$: P_block name 
+紋章オン！！！！！　$:P_ブロック名 ,Crest on!!!!! $: P_block name 
+crp01デモ：102/202/302/402側→前のフロアへ,crp01 demo: 102/202/302/402 side -> previous floor
+破壊デモ：103/203/303/403側→101側へ,Destruction demo: 103/203/303/403 side -> 101 side
+$b:st05_440エリア正解重量が不正な値になっている？？？？？,$b: st05_440 area correct weight has invalid value????
+まだ封印が解けてないので、パネルは利用不可カラー,"Seal not yet broken, so panel unavailable color"
+現在いる階なので、パネルは現在階カラー,"Current floor, so panel current-floor color"
+封印が解けているので、パネルは利用可能カラー,"Seal broken, so panel available color"
+上に行きます・・・・・,Going up...
+・・・・・下に行きます,...Going down
+同じ階なので移動しません,"Same floor, not moving"
+またガタガタ,Rattling again
+1階分、移動,Moving 1 floor
+前の階　,Previous floor
+d:1階分の距離 ,d: 1-floor distance
+今の階　,Current floor
+crp04エレベータデモ終了,crp04 elevator demo ended
+点滅パネルデモ終了,Blinking panel demo ended
+？？？　どこの階か判定失敗… $:P_階数,??? Floor determination failed... $: P_floor
+？？？　とりあえずＢ１５Ｆに・・・,"??? For now, going to B15F..."
+crpデモ：101側→前のフロアへ,crp demo: 101 side -> previous floor
+南シャッターを開けます！,Opening south shutter!
+もう南シャッターギミッククリア済みなので開きません,"South shutter gimmick already cleared, not opening"
+北シャッターを開けます！,Opening north shutter!
+もう北シャッターギミッククリア済みなので開きません,"North shutter gimmick already cleared, not opening"
+南シャッターを閉じます・・・・・,Closing south shutter...
+もう南シャッターギミッククリア済みなので閉じません,"South shutter gimmick already cleared, not closing"
+北シャッターを閉じます・・・・・,Closing north shutter...
+もう北シャッターギミッククリア済みなので閉じません,"North shutter gimmick already cleared, not closing"
+北シャッタークリア！！！！！,North shutter cleared!!!!!
+南シャッタークリア！！！！！,South shutter cleared!!!!!
+$$f:切替レバー中央状態,$$f: switch lever center state
+$$b:移動床中央ルート,$$b: moving floor center route
+移動床中央ポイント番号,Moving floor center point number
+移動床中央ルートを４に切替！！！！！,Switched moving floor center route to 4!!!!!
+移動床中央ルートを３に切替！！！！！,Switched moving floor center route to 3!!!!!
+$$f:切替レバー南状態,$$f: switch lever south state
+$$b:移動床南ルート,$$b: moving floor south route
+移動床南ポイント番号,Moving floor south point number
+移動床南ルートを６に切替！！！！！,Switched moving floor south route to 6!!!!!
+移動床南ルートを５に切替！！！！！,Switched moving floor south route to 5!!!!!
+移動床中央停止解除,Moving floor center stop released
+移動床中央＋60f停止,Moving floor center +60f stop
+移動床南停止解除,Moving floor south stop released
+移動床南＋60f停止,Moving floor south +60f stop
+？？？？？　変な属性が設定されている…とりあえずフレイムを設定,??? Strange element set... for now set flame
+まだパズルに正解していない,Not yet solved the puzzle
+d:STORY_05_130:氷パズル正解_終了,d:STORY_05_130: ice puzzle solved_end
+$b:st05_130エリアストーリー,$b: st05_130 area story
+$f:床スイッチフラグ[d:st05_床スイッチ番号:東シャッター連動134],$f: floor switch flag[d:st05 floor switch no.: east shutter linked 134]
+もうパズルは正解している,Puzzle already solved
+シャッター開処理_st05_134_castle,Shutter open processing_st05_134_castle
+シャッター閉処理_st05_134_castle,Shutter close processing_st05_134_castle
+d:STORY_05_130:氷パズル正解_終了！！！,d:STORY_05_130: ice puzzle solved_end!!!
+フロスト用ギミックはナシ,No frost gimmick
+？？？？？　変な属性が設定されている…,??? Strange element set...
+？？？？？　変な属性が設定されている…とりあえずそのまま初期配置,??? Strange element set... for now keep initial layout
+炎属性に変更！！！！！！！！,Changed to fire element!!!!!!!!
+氷属性に変更！！！！！！！！,Changed to ice element!!!!!!!!
+無属性に変更、シャッター閉鎖！！！！！！！！,"Changed to no element, shutter closed!!!!!!!!"
+脱出魔方陣を利用しましたね・・・・・,You used the escape magic circle...
+$b:st05_140エリア脱出利用カウンタ,$b: st05_140 area escape-use counter
+はまりすぎ・・・・・脱出利用カウンタの上限は６にしてます,Too much stuck... escape-use counter cap set to 6
+$f:シャッター_141東_146南西  ,$f: shutter_141 east_146 southwest
+$f:シャッター_141南東_142北東,$f: shutter_141 southeast_142 northeast
+$f:シャッター_141南西_142北西,$f: shutter_141 southwest_142 northwest
+$f:シャッター_141西_144東    ,$f: shutter_141 west_144 east
+脱出魔方陣出現デモ終了,Escape magic circle appearance demo ended
+crp00：カギ宝箱出現デモ終了,crp00: key chest appearance demo ended
+crp00：シャッター封印解除デモ終了,crp00: shutter seal release demo ended
+crp00デモ：147側終了　ゲーム再開,"crp00 demo: 147 side ended, game resumed"
+まだ正解してないので奥に配置,"Not solved yet, so placing in back"
+正解しているので手前に配置,"Solved, so placing in front"
+crp09デモ終了,crp09 demo ended
+ヴォーン召喚！！！！！,Summoning Vorn!!!!!
+地属性に変更！！！！！！！！,Changed to earth element!!!!!!!!
+雲属性に変更！！！！！！！！,Changed to cloud element!!!!!!!!
+crp10デモ終了,crp10 demo ended
+西エリア属性：地属性に変更！！！！！！！！,West area element: changed to earth!!!!!!!!
+西エリア属性：雲属性に変更！！！！！！！！,West area element: changed to cloud!!!!!!!!
+北エリア属性：地属性に変更！！！！！！！！,North area element: changed to earth!!!!!!!!
+北エリア属性：雲属性に変更！！！！！！！！,North area element: changed to cloud!!!!!!!!
+残念、どちらかセットされてません・・・,"Sorry, one of them isn't set..."
+$b:st05_420西エリア属性,$b: st05_420 west area element
+$b:st05_420北エリア属性,$b: st05_420 north area element
+両方ともセットされているのでシャッターを開けます,"Both are set, so opening shutter"
+？？？？？　変な属性が設定されている…とりあえずアースを設定,??? Strange element set... for now set earth
+まだ壁を壊してないので、ld002ロードは設定しません・・・・・,"Haven't broken the wall yet, so not setting ld002 load..."
+もう壁を壊した、またはクラウド属性なので、ld002ロードを設定します！！！！！,"Wall broken, or cloud element, so setting ld002 load!!!!!"
+今の所、クラウド属性では敵を出さない予定,"For now, no enemies planned for cloud element"
+クラウド属性＆太陽の根がまだ成長してないので、何も出ません,"Cloud element & Solar Root not yet grown, so nothing appears"
+まだレバーをＯＮにしてません！！！！！,Lever not yet turned ON!!!!!
+移動床を開放！！！！！,Moving floor released!!!!!
+今の所、フロスト属性では敵を出さない予定,"For now, no enemies planned for frost element"
+アース属性、または成長後なので太陽の根を設置します,"Earth element, or grown, so placing Solar Root"
+$b:st05_430エリア属性,$b: st05_430 area element
+$f:st05_436_太陽の根状態フラグ,$f: st05_436_solar root state flag
+重量クイズはもうないよ！！！！！,Weight quiz no longer exists!!!!!
+判定できない$w:登場ポイント・・・・・,Cannot determine $w: appearance point...
+クイズ賞品出現デモ終了,Quiz prize appearance demo ended
+もう問題はないよ・・・・・,No more questions...
+まずは問題を聞いてこい！！！,"First, go hear the question!!!"
+$b:st05_440エリアストーリー,$b: st05_440 area story
+重量クイズ１出題_終了,Weight quiz 1 question_end
+重量クイズ１正解_終了,Weight quiz 1 correct_end
+重量クイズ２出題_終了,Weight quiz 2 question_end
+重量クイズ２正解_終了,Weight quiz 2 correct_end
+重量クイズ３出題_終了,Weight quiz 3 question_end
+重量クイズ３正解_終了,Weight quiz 3 correct_end
+木箱00 → $$b:はかり重量 ,Wooden box 00 -> $$b: scale weight
+木箱01 → $$b:はかり重量 ,Wooden box 01 -> $$b: scale weight
+岩00 → $$b:はかり重量 ,Rock 00 -> $$b: scale weight
+岩01 → $$b:はかり重量 ,Rock 01 -> $$b: scale weight
+鉄箱00 → $$b:はかり重量 ,Iron box 00 -> $$b: scale weight
+鉄箱01 → $$b:はかり重量 ,Iron box 01 -> $$b: scale weight
+一体、何が落ちてきたんだ？,What on earth fell down?
+$:キャラ名 ,$: character name 
+３問目は強制的に正解！,Question 3 forced correct!
+不正解デモ終了,Incorrect demo ended
+正解デモ終了,Correct demo ended
+デモからの登場なのでおしおきSE対策をしません,"Appears from a demo, so no punishment SE handling"
+崩壊前のＢＧＭ設定をします　BGM_st06_01,Setting pre-collapse BGM BGM_st06_01
+崩壊後のＢＧＭ設定をします　BGM_st06_02,Setting post-collapse BGM BGM_st06_02
+ここは今の所、地震は発生させない予定・・・・・,No earthquake planned here for now...
+登録されてないステージなので地震は発生させません　$w:現在ステージ,"Stage not registered, so no earthquake $w: current stage"
+崩壊前なので地震はまだ発生しません・・・・・,"Before collapse, so no earthquake yet..."
+*****封印の崩壊前,***** Seal before collapse
+*****封印の崩壊後,***** Seal after collapse
+◆◆石化◆◆,◆◆ Petrification ◆◆
+◆◆ヴァナル死亡瞬間,◆◆ Vanargand death moment ◆◆
+◆◆ヴァナル死亡完了,◆◆ Vanargand death complete ◆◆
+　デモのために浄化移行ロックをかけます！,Locking purification transition for demo!
+　◆白ジャンゴ覚醒デモ準備完了,◆ White Django awakening demo ready
+　伯爵〜最後の晴れ舞台〜,Count ~last stage~
+　>>> プレイヤーライフが20%を割りました！：,>>> Player life dropped below 20%!:
+　●伯爵前半戦終了●,● Count first half ended ●
+■■,■■
+◆◆白ジャンゴトランスヴィジュアルデモ設定,◆◆ White Django trance visual demo setup
+◆◆黒ジャンゴトランスヴィジュアルデモ設定,◆◆ Black Django trance visual demo setup
+◆◆ボス戦開始(白ジャンゴ)◆◆,◆◆ Boss fight start (White Django) ◆◆
+◆◆ボス戦開始(黒ジャンゴ)◆◆,◆◆ Boss fight start (Black Django) ◆◆
+◆◆エンディングフラグ,◆◆ Ending flag
+◆◆白ジャンゴ・トゥルー◆◆,◆◆ White Django True ◆◆
+◆◆白ジャンゴ・ノーマル◆◆,◆◆ White Django Normal ◆◆
+◆◆黒ジャンゴ・トゥルー◆◆,◆◆ Black Django True ◆◆
+◆◆黒ジャンゴ・ノーマル◆◆,◆◆ Black Django Normal ◆◆
+◆◆白ジャンゴ・バッド◆◆,◆◆ White Django Bad ◆◆
+◆◆黒ジャンゴ・バッド◆◆,◆◆ Black Django Bad ◆◆
+◆◆バッドEDエンドロール◆◆,◆◆ Bad ED end roll ◆◆
+◆◆ノーマル/トゥルーEDエンドロール◆◆,◆◆ Normal/True ED end roll ◆◆
+？？？　$:P_ブリザード方向,??? $: P_blizzard direction

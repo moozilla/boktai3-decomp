@@ -350,13 +350,14 @@ one operand and returns its type and value. The first byte selects the type:
 
 Native command ids are 16-bit hashes of the command names, as in MGS's GCL.
 The hashes match MGS's names exactly, which shows that the script system
-derives from GCL:
+derives from GCL. Recovered names of commands and registry keys are in
+`gcl/names/` (see [gcl/README.md](../gcl/README.md)):
 
 | Table | Entries (hash = name) |
 |---|---|
 | `0861418C` basic | `0D86` if, `4A6F` switch, `64C0` eval, `121F` call, `CD3A` return, `B96E` print |
-| `08E8791C` engine | `22FF` mesg (`082255BC`), `9906` chara (`08225560`), `D4CB` trap (`08225624`), `C8BB` load (`08225508`), `C091` map (`08225620`), `E43C` restart (`082257A0`), `B745` and `0BB3` unknown |
-| `080F38C8` | three entries `0CF4`, `0CC8`, `0CD8` (names unknown) |
+| `08E8791C` engine | `22FF` mesg (`082255BC`), `9906` chara (`08225560`), `D4CB` trap (`08225624`), `C8BB` load (`08225508`), `C091` map (`08225620`), `E43C` restart (`082257A0`), `B745` command (`08225590`: calls the registry routine of its key and keeps the result, like MGS4's `command`), `0BB3` unknown |
+| `080F38C8` | three entries `0CF4`, `0CC8`, `0CD8` (two-letter hashes `dt`, `ch`, `cx`; low confidence) |
 
 **Scenes.** The `load` command (`08225508`) changes scene: it stores the scene
 number in `0x030039F0` (`sub_0821B03C`) and in `GameState+0x5A4` (the scene

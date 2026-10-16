@@ -1,0 +1,54 @@
+key,name,english,confidence,evidence
+05A5,ボク,Bok?,low,hash only (text#2171); loads the ghoul sprite 9247 (GHOUL/ZOMBIE in the monster list)
+0AD8,センチピード,Centipede,medium,monster list CENTIPEDE (text#9851)
+0B50,棺桶,Coffin,medium,hash (text#1086); created by chara in 2 procedures
+15DE,ゲームスタート,Game Start,medium,hash (text#2460); shares sprites E2AB/530D with Options and Results
+1C82,リザルト,Results,medium,hash (text#9428); shares sprites E2AB/530D with Options and Game Start
+1E93,ラタトスク,Ratatosk,medium,boss name (text#9919); unique sprite FB81
+2687,名前入力,Name Entry,high,printed in proc_1459 which creates this key
+2D30,アックス,Axe,medium,monster list AXE (text#9888); loads the sword sprite 5291 (SWORD/AXE are one family)
+3469,ランダム,Random,high,callback ScriptUtility_GetRandom
+34EA,魔物図鑑,Monster Book,medium,hash (text#3531); 鍛冶図鑑 (text#3532) hits 7CA2 too
+3D38,ドラゴンパピー,Dragon Puppy,medium,monster list DRAGON PUPPY (text#9841); sprite 7E7D shared with Ooze/Screamer/Poison Hand
+3F99,オクトパス,Octopus,medium,monster list OCTOPUS (text#9857)
+4631,ガン・デル・ヘル,Gun Del Hell,medium,hash (Sabata's gun)
+4E69,デモマネージャ,Demo Manager,medium,hash; callback SceneMessages_Create (scene/cutscene messages)
+5734,コウモリカーテン,Bat Curtain,medium,printed in proc_3252 ('コウモリカーテン破壊')
+6913,マミー,Mummy,high,loads sprite 48DE (the mummy family)
+744F,武器屋,Weapon Shop,medium,hash (text#3264)
+7C56,ヴァナルガンド,Vanargand,medium,boss name (text#9920); unique sprite 05A2
+7CA2,鍛冶図鑑,Forging Book,medium,hash (text#3532); 魔物図鑑 (text#3531) hits 34EA too
+7F5E,太陽バンク,Solar Bank,medium,hash (text#5134); callback 081BC27C beside Dark Loan 081BD814 and Storage 081BFF88
+820B,木箱,Wooden Crate,medium,printed in proc_5757
+84CF,スクリーマー,Screamer,medium,monster list SCREAMER (text#9871)
+87E4,スパイダー,Spider,high,loads sprite 528F (the spider family)
+9519,パスワード,Password,medium,hash (text#9345); sprite E2AB as the title menus
+96CD,オプション,Options,medium,hash (text#2403); shares sprites E2AB/530D with Game Start and Results
+98EC,ゴーレム,Golem,high,loads sprite 5290 (the golem family)
+9CC2,扇風砲マネージャ,Fan Cannon Manager,high,printed in proc_1609 which creates this key
+9E8D,クロウ,Crow,high,loads sprite 5A6E (the crow family)
+9E8D,地下牢獄,Underground Prison,low,hash only (text#4113); the crow sprite favors クロウ
+A8F1,ワープ魔方陣,Warp Circle,medium,hash (text#7519)
+AD03,スケルトン,Skeleton,high,loads sprite AE52 (the skeleton family)
+B06E,ニーズホッグ,Nidhoggr,medium,boss name (text#9903)
+B3D7,アルバム,Album,low,hash (menu word); no script creates it
+BEF5,ミミック,Mimic,high,loads sprite 3876 (the opening chest)
+C077,フレスベルグ,Hresvelgr,medium,boss name (text#9916); sprite 1C1B shared with Vampire
+C3BC,スライム,Slime,high,loads sprite B96C whose own name hash is 'slime'
+CBB0,パイルドライバー,Pile Driver,medium,hash; callback ScenePanel_Create
+CCD3,ゴースト,Ghost,high,loads sprite D637 (the hooded ghost/wraith family)
+D972,ヴァンパイア,Vampire,medium,hash; sprite 1C1B shared with Hresvelgr
+DA0E,ウーズ,Ooze,medium,monster list WALL/FLOOR OOZE (text#9904)
+DB8D,ソード,Sword,medium,monster list SWORD (text#9886)
+DC21,太陽スタンド,Solar Stand,medium,hash (text#5134)
+DFDC,ヴォーン,Vorn,medium,monster list VORN (text#9864); loads the black winged sprite 3DB6
+E02E,倉庫,Storage,medium,hash (text#4227); callback 081BFF88 beside Solar Bank and Dark Loan
+E043,アーマー,Armor,medium,monster list ARMOR (text#9867); created in 13 procedures
+E131,ビー,Bee,high,loads sprite 9506 whose own name hash is 'bee'
+E3EE,グローブ,Glove,low,hash only
+E9D3,暗黒ローン,Dark Loan,medium,hash (text#212); callback 081BD814 beside Solar Bank and Storage
+F083,バルカン砲,Vulcan Cannon,medium,monster list VULCAN CANNON (text#9873)
+F5EB,プレイヤー,Player,medium,hash; created 15 times in 7 procedures
+F8BE,バット,Bat,high,loads sprite DA6D (the bat family)
+FE88,太陽の実,Solar Fruit,medium,hash (text#1001); 4 uses by command
+FE92,ポイズンハンド,Poison Hand,medium,monster list POISON HAND (text#9870)

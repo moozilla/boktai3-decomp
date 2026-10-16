@@ -258,6 +258,17 @@ stage): probably time-of-day variants of one palette, so the recorded palette
 is the one seen at that moment. Run `python3 tools/studio/live.py analyse-all` if the studio was not
 running during a survey.
 
+## GCL debug prints
+
+The scripts' `print` command outputs nothing in this ROM (its handler,
+`0821B858`, converts the text and drops it). Centaur sets a breakpoint there
+and logs each message with its English (`gcl/prints.csv`, through
+`build/centaur/data.lua`) in a "GCL print" console pane, in
+`build/centaur/centaur.log` and as `print` events on the studio link.
+Rerun `python3 tools/mgba/gen_centaur_data.py` after changing the CSV.
+Verified headlessly with `callproc(1437, {})`, which prints
+`＊＊＊　日の出、日の入り時刻を設定しました。　＊＊＊` ("Sunrise/sunset times set").
+
 ## Running script procedures
 
 `callproc(id, {args})` diverts the CPU at the next entry of
