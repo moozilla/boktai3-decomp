@@ -6,11 +6,11 @@ handlers; their callees are found through `bl` calls and Thumb function pointers
 
 | Set | Functions | Bytes | Share of code | Matched |
 |---|---:|---:|---:|---:|
-| Entry points | 738 | 84,436 | 3.5% | 71.5% |
-| Entry points and their direct callees | 1422 | 290,160 | 12.0% | 39.9% |
-| Everything reachable from scripts | 3136 | 535,198 | 22.2% | 45.5% |
+| Entry points | 738 | 84,436 | 3.5% | 72.4% |
+| Entry points and their direct callees | 1422 | 290,160 | 12.0% | 40.1% |
+| Everything reachable from scripts | 3136 | 535,198 | 22.2% | 45.7% |
 
-## Unmatched entry points, by script uses (55 used, 18,116 bytes)
+## Unmatched entry points, by script uses (49 used, 17,360 bytes)
 
 | Uses | Address | Bytes | Function | Script name | GCL name |
 |---:|---|---:|---|---|---|
@@ -19,25 +19,19 @@ handlers; their callees are found through `bl` calls and Thumb function pointers
 | 5 | `08103110` | 1856 | `sub_08103110` | registry A4FC |  |
 | 4 | `08111A48` | 380 | `sub_08111A48` | registry 734C |  |
 | 4 | `0815A680` | 116 | `ScriptActor_TestFlagFromScript` | registry 440F |  |
-| 4 | `081AF4F4` | 76 | `Vanargand_ResetFromScript` | registry 4D12 |  |
 | 3 | `08104350` | 1016 | `sub_08104350` | registry F1F9 |  |
 | 3 | `08119EF0` | 84 | `Glove_StartFromScript` | registry E3EE | Glove |
 | 3 | `0815A838` | 52 | `ScriptActor_GetField534FromScript` | registry 0E15 |  |
 | 3 | `081D0F28` | 308 | `sub_081D0F28` | registry 8918 |  |
-| 2 | `08016764` | 216 | `sub_08016764` | registry 3535 |  |
 | 2 | `08018664` | 344 | `sub_08018664` | registry 3A89 |  |
 | 2 | `0810067C` | 700 | `sub_0810067C` | registry AB8E |  |
-| 2 | `08103B94` | 136 | `sub_08103B94` | registry 7E33 |  |
+| 2 | `08103B94` | 136 | `NamedActor_SetMoveModeFromScript` | registry 7E33 |  |
 | 2 | `0810858C` | 448 | `sub_0810858C` | registry 8192 |  |
 | 2 | `0811B848` | 456 | `sub_0811B848` | registry E7BC |  |
-| 2 | `0815D524` | 108 | `sub_0815D524` | registry 4CDD |  |
-| 2 | `081803D8` | 176 | `sub_081803D8` | registry 4EC9 |  |
+| 2 | `081803D8` | 176 | `BossSlot2_AdvanceStepFromScript` | registry 4EC9 |  |
 | 2 | `081BB294` | 248 | `sub_081BB294` | registry 61A0 |  |
 | 2 | `081C4080` | 276 | `sub_081C4080` | registry F3E4 |  |
 | 2 | `081CE6DC` | 716 | `sub_081CE6DC` | registry F9D7 |  |
-| 2 | `081DBA54` | 172 | `sub_081DBA54` | registry 02A7 |  |
-| 2 | `081DBF98` | 84 | `sub_081DBF98` | registry E3B3 |  |
-| 2 | `081DCD90` | 100 | `sub_081DCD90` | registry 1595 |  |
 | 2 | `081E03F4` | 128 | `sub_081E03F4` | registry BC12 |  |
 | 2 | `081E1A2C` | 136 | `sub_081E1A2C` | registry 6866 |  |
 | 2 | `081EC0A8` | 192 | `sub_081EC0A8` | registry 65EE |  |

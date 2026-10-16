@@ -1,4 +1,4 @@
-# Script entry points, batches 1-2 (2026-10-16)
+# Script entry points, batches 1-3 (2026-10-16)
 
 Tags: #scripts #text #actors #tooling
 
@@ -120,3 +120,30 @@ and the `-s` loop is `for (i = 0, list = names; ...)`.
   callback. A renamed one (sub_08073B60 is `SceneActorContacts_Update`)
   links to nothing in `tools/check.py`, which then reports a one-bit literal
   mismatch, and `make` fails with an undefined reference.
+
+## Batch 3
+
+Matched (6 functions, 756 bytes, +0.031 percentage points): 081AF4F4
+`Vanargand_ResetFromScript` (was a 97.3% draft), 08016764
+`PaletteLevels_ConfigureFromScript` (3535), 0815D524 `ScriptActor_SetModeFromScript`
+(4CDD), and three more parameter blocks: 081DBF98, 081DCD90, 081DBA54
+(`ScreenParams2E8/310/2C0_SetFromScript`).
+
+New guarded drafts: 081803D8 `BossSlot2_AdvanceStepFromScript` (74.7%) and
+08103B94 `NamedActor_SetMoveModeFromScript` (47.7%).
+
+081D0C04 `SceneNpc_CreateFromScript` is at 92% in wip (not yet committed):
+writing `zero = 0` inside the `sub_0802D760(..., zero = 0)` call fixes the whole
+front half (it shifts reload's register rotation, which also stops the mask
+constant from being kept in r4), setHandler/setBox inlines and a separate
+`speed` local fix the stores; still open are the facing computation (result in
+the constant's register) and how the five `-i` cases cross-jump.
+
+Idioms:
+* Boss tasks share a state setter: `static inline void setState(p, u8 state)
+  { p->fieldAC = 0; p->fieldAD = 0; p->fieldAE = state; p->fieldC4 = 0;
+  p->fieldB0 = 1; }` (081AF4F4, 081803D8).
+* Two copies of one pointer (`adds r3, r0; mov ip, r3`) came from
+  `struct T *task = f(); struct T *p = task;` with each used somewhere (081803D8).
+* A bound held in a register (`cmp r2, ip`) is a local count (`s32 count = 3;`)
+  declared before the loop (0822DB54).

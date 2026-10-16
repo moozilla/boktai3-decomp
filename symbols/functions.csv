@@ -226,6 +226,7 @@ addr,name,mode,confidence,source,notes
 0801655C,PaletteLevels_Decrease,thumb,low,src-alias,
 08016600,PaletteLevels_Update,thumb,low,src-alias,
 080166C4,PaletteLevels_Configure,thumb,low,src-alias,
+08016764,PaletteLevels_ConfigureFromScript,thumb,low,src-alias,
 0801683C,PaletteLevels_Reset,thumb,low,src-alias,
 080168B8,FloatingEffect_Project,thumb,low,src-alias,
 08016944,FloatingEffect_Bob,thumb,low,src-alias,
@@ -1865,6 +1866,7 @@ addr,name,mode,confidence,source,notes
 080FE68C,Axe_Init,thumb,medium,gcl-name,name from GCL key 2D30 アックス (Axe); loader called by Axe_Create
 080FF754,Axe_Create,thumb,medium,gcl-name,name from GCL key 2D30 アックス (Axe); registry callback
 08100298,WoodenCrate_Create,thumb,medium,gcl-name,name from GCL key 820B 木箱 (Wooden Crate); registry callback
+08103B94,NamedActor_SetMoveModeFromScript,thumb,low,src-alias,
 08103CF8,NamedActor_SetRouteFromScript,thumb,low,src-alias,
 08103DCC,NamedActor_SetSpeedFromScript,thumb,low,src-alias,
 08119EF0,Glove_StartFromScript,thumb,low,src-alias,
@@ -1879,12 +1881,14 @@ addr,name,mode,confidence,source,notes
 0815CBF8,ScriptActor_MoveToFromScript,thumb,low,src-alias,
 0815CCF8,ScriptActor_TurnFromScript,thumb,low,src-alias,
 0815CDAC,ScriptActor_EnterStateFourFromScript,thumb,low,src-alias,
+0815D524,ScriptActor_SetModeFromScript,thumb,low,src-alias,
 0815F4F4,Player_Create,thumb,medium,gcl-name,name from GCL key F5EB プレイヤー (Player); registry callback
 0816B884,GameState_SetAreaFlagFromScript,thumb,low,src-alias,
 0817809C,Hud_SetModeFromScript,thumb,low,src-alias,
 081780D4,Hud_SetLayoutFromScript,thumb,low,src-alias,
 08178564,Hud_CloseMessageFromScript,thumb,low,src-alias,
 08179298,Hud_Create,thumb,low,src-alias,
+081803D8,BossSlot2_AdvanceStepFromScript,thumb,low,src-alias,
 0818C674,Armor_Create,thumb,medium,gcl-name,name from GCL key E043 アーマー (Armor); registry callback
 0819783C,Nidhoggr_Create,thumb,medium,gcl-name,name from GCL key B06E ニーズホッグ (Nidhoggr); registry callback
 08197EC4,KeyTrigger_Update,thumb,low,src-alias,
@@ -1900,7 +1904,9 @@ addr,name,mode,confidence,source,notes
 081BFF88,Storage_Create,thumb,medium,gcl-name,name from GCL key E02E 倉庫 (Storage); registry callback
 081D0C04,SceneNpc_CreateFromScript,thumb,low,src-alias,
 081D6BC0,MonsterBook_Create,thumb,medium,gcl-name,name from GCL key 34EA 魔物図鑑 (Monster Book); registry callback
+081DBA54,ScreenParams2C0_SetFromScript,thumb,low,src-alias,
 081DBB0C,Options_Create,thumb,medium,gcl-name,name from GCL key 96CD オプション (Options); registry callback
+081DBF98,ScreenParams2E8_SetFromScript,thumb,low,src-alias,
 081DC02C,Menu_EraseRect,thumb,high,raphaelr,"(x, y, w, h) clear UI text area; must be called before overdrawing text"
 081DC054,Menu_DrawText,thumb,high,raphaelr,"(x, y, char *text) draw text in the UI"
 081DC618,ScreenParams_SetFromScript,thumb,low,src-alias,
@@ -1909,6 +1915,7 @@ addr,name,mode,confidence,source,notes
 081DC7A0,Time_HandleRegionKeypad,thumb,medium,raphaelr,
 081DCA6C,Time_DestroyRegionMenu,thumb,medium,raphaelr,
 081DCA9C,Time_LoadRegionList,thumb,medium,raphaelr,
+081DCD90,ScreenParams310_SetFromScript,thumb,low,src-alias,
 081DCE34,Time_OnLoadSave,thumb,medium,raphaelr,
 081DE520,ScreenParams328_SetFromScript,thumb,low,src-alias,
 081DE5A4,NameEntry_Create,thumb,high,gcl-name,name from GCL key 2687 名前入力 (Name Entry); registry callback
