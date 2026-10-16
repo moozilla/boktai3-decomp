@@ -377,7 +377,7 @@ leads for naming, not facts.
 | `sub_08090FEC` | `C3BC` (`sub_08091E1C`) | `B96C` | 16 | dome with an eye | スライム |
 | `sub_08094764` | `E131` (`sub_08095540`) | `9506` | 29 | small winged insect | ビー |
 | `sub_08099B44` | `CCD3` (`sub_0809ADD4`) | `D637` | 29 | hooded cloaked figure | ? |
-| `sub_0809DD78` | `680E` (`sub_0809ECC8`) | `D28E` | 42 | small ring-like | ? |
+| `sub_0809DD78` | `680E` (`sub_0809ECC8`) | `D28E` | 42 | small ring-like | ポイズナー / パープレクサー / ポップバド? (enemy kinds 26-28, between Vorn and Bat) |
 | `sub_080A1440` | `9E8D` (`sub_080A2010`) | `5A6E` | 23 | black bird | クロウ / レイブン |
 | `sub_080A4AFC` | `87E4` (`sub_080A5B54`) | `528F` | 16 | spider | スパイダー |
 | `sub_080ABDCC` | `0AC7` (`sub_080ACBA8`) | `D636` | 44 | round body with tentacles | オクトパス? |
