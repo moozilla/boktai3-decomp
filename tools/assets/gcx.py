@@ -21,6 +21,7 @@ follows, sub_0821A66C). Command ids are hashes of command names
 """
 import csv
 import os
+import re
 import struct
 import sys
 
@@ -35,6 +36,7 @@ COMMANDS = {k: r["name"] for k, r in gclnames.best("command").items()}
 KEYED = ("chara", "command")  # the first operand is a registry key (gcl/names/chara.csv)
 _keys = None  # {key: name row} while disassembling with names
 _prints = {}  # {print text: English} while disassembling with names
+_collect = None  # a list that gets each print's operand texts (print_args)
 
 
 class Image:
@@ -215,6 +217,8 @@ def instructions(b, p, end, depth=0, out=None):
                     note = "  # " + _prints[t[1:-1]]
                 first = False
                 args.append(t)
+            if name == "print" and _collect is not None:
+                _collect.append(list(args))
             if args or not out or out[-1] != (depth, "}"):
                 out.append((depth, f"{name} {' '.join(args)}".rstrip()))
             # Keyword items after the argument list: `if` takes `e` (else) and
@@ -253,12 +257,61 @@ def instructions(b, p, end, depth=0, out=None):
     return out
 
 
+VARIABLE = re.compile(r"\b(gs|r700|r708)\[(0x[0-9a-f]+(?:\.\d+)?)\]:t(\d+)(?:\((\d+),(\([^()]*\)|[^(),]*)\))?"
+                      r"|\b(arg\d+|local\d+)\b")
+
+
+def name_variables(text, cid):
+    """Konami-style names for the variables in one line (gcl/names/var.csv,
+    param.csv), the raw storage and English added to a trailing comment.
+    Quoted strings and comments are left alone."""
+    vars_, params = gclnames.var_names(), gclnames.param_names()
+    code, sep, note = text.partition("  # ")
+    notes = []
+
+    def sub(m):
+        if m[6]:
+            r = params.get((cid, m[6]))
+            if not r:
+                return m[0]
+            notes.append(f"{m[6]}" + (f" {r['english']}" if r["english"] else ""))
+            return r["name"]
+        key = f"{m[1]}:{m[2]}:t{m[3]}" + (f"({m[4]})" if m[4] else "")
+        r = vars_.get(key)
+        if not r:
+            return m[0]
+        notes.append(f"{m[0] if not m[4] else key.replace(':', '[', 1).replace(':t', ']:t', 1)}"
+                     + (f" {r['english']}" if r["english"] else ""))
+        if not m[4]:
+            return r["name"]
+        i = m[5]
+        d = gclnames.index_define(key, i, cid)
+        if d:
+            return f"{r['name']}[{d}]"
+        a = re.fullmatch(r"\(?(arg\d+|local\d+)\)?", i)
+        if a and (cid, a[1]) in params:
+            p = params[cid, a[1]]
+            notes.append(a[1] + (f" {p['english']}" if p["english"] else ""))
+            i = p["name"]
+        return f"{r['name']}[{i}]"
+
+    parts = re.split(r"('(?:[^'\\]|\\.)*')", code)
+    code = "".join(p if p[:1] == "'" else VARIABLE.sub(sub, p) for p in parts)
+    if notes:
+        seen = list(dict.fromkeys(notes))
+        note = note + ("; " if note else "") + "; ".join(seen)
+        sep = "  # "
+    return code + sep + note
+
+
 def disassemble(img, pid, names=False):
     """(depth, text) lines of procedure slot pid. With names, registry keys
     after chara/command print as their GCL names (gcl/names/chara.csv), the
-    key and English in a trailing comment, and Japanese print strings get
-    their translation (gcl/prints.csv); without, keys stay hex (for tools
-    that parse the text)."""
+    key and English in a trailing comment, Japanese print strings get their
+    translation (gcl/prints.csv), and variables, parameters and locals named
+    by the debug prints (gcl/names/var.csv, param.csv) print Konami-style
+    (`$f:NAME`, `$:P_NAME`) with the storage in the comment; without, keys
+    and storage stay raw (for tools that parse the text)."""
     global _keys, _prints
     a = img.proc_address(pid)
     if a is None:
@@ -268,9 +321,25 @@ def disassemble(img, pid, names=False):
     _keys = gclnames.best("chara") if names else None
     _prints = gclnames.prints() if names else {}
     try:
-        return instructions(b, start, start + n)
+        out = instructions(b, start, start + n)
+        return [(d, name_variables(t, pid + 1)) for d, t in out] if names else out
     finally:
         _keys, _prints = None, {}
+
+
+def print_args(img, pid):
+    """The operand texts of every print in procedure slot pid (names off)."""
+    global _collect
+    a = img.proc_address(pid)
+    if a is None:
+        return []
+    start, n = length(img.rom, a)
+    _collect = []
+    try:
+        instructions(img.rom, start, start + n)
+        return _collect
+    finally:
+        _collect = None
 
 
 def main():
@@ -291,7 +360,6 @@ def main():
                 for d, t in lines:
                     print("    " * (d + 1) + t)
     elif cmd == "chara":
-        import re
         reg = {}
         with open(os.path.join(ROOT, "data", "actor_registry.csv")) as f:
             for r in csv.DictReader(f):

@@ -1,0 +1,27 @@
+storage,name,english,confidence,conflict,evidence
+gs:0x740:t1,$w:現在ステージ,current stage,high,,print in proc_6008
+r700:0x89:t2,$$b:すまきトリニティダメージ,bound Trinity damage,high,,print in proc_3596
+r700:0x2be:t2,$$b:トリニティ会話カウント,Trinity conversation count,high,,print in proc_3595
+r700:0x2ec.0:t4,$$f:切替レバー中央状態,switch lever center state,high,,"print in proc_5173, proc_5175"
+r700:0x2ec.1:t4,$$f:切替レバー南状態,switch lever south state,high,,"print in proc_5174, proc_5176"
+r700:0x2ed:t2,$$b:移動床中央ルート,moving floor center route,high,,print in proc_5173
+r700:0x2ee:t2,$$b:移動床南ルート,moving floor south route,high,,print in proc_5174
+r700:0x2f4:t2,$$b:はかり重量,scale weight,high,,print in proc_5757
+r708:0x3c:t1,$w:story,story,high,,print in proc_3293
+r708:0x66.6:t4,$f:st02_27_燭台シャッターフラグ,st02_27_candle shutter flag,high,,print in proc_3529
+r708:0x66.7:t4,$f:st02_53_燭台シャッターフラグ,st02_53_candle shutter flag,high,,print in proc_3679
+r708:0x70:t1,$w:登場ポイント,appearance point,high,,print in proc_5748
+r708:0x133.0:t4(48),$f:床スイッチフラグ,floor switch flag,high,,"print in proc_3578, proc_5232, proc_5233, proc_5234"
+r708:0x145.0:t4(16),$f:燭台点灯フラグ,candle-stand lit flag,high,,"print in proc_3529, proc_3679, proc_4944, proc_4945"
+r708:0x153:t2,$b:st05_130エリアストーリー,st05_130 area story,high,,print in proc_5232
+r708:0x158:t2,$b:st05_440エリアストーリー,st05_440 area story,high,,print in proc_5752
+r708:0x159:t2,$b:st05_140エリア脱出利用カウンタ,st05_140 area escape-use counter,high,,print in proc_5282
+r708:0x15b:t2,$b:st05_440エリア正解重量,st05_440 area correct weight,medium,,print in proc_5040
+r708:0x1ba:t2,$b:st05_420西エリア属性,st05_420 west area element,high,,print in proc_5613
+r708:0x1bb:t2,$b:st05_420北エリア属性,st05_420 north area element,high,,print in proc_5613
+r708:0x1bc:t2,$b:st05_430エリア属性,st05_430 area element,high,,print in proc_5709
+r708:0x1be.6:t4,$f:シャッター_141東_146南西,shutter_141 east_146 southwest,high,,print in proc_5289
+r708:0x1be.7:t4,$f:シャッター_141南東_142北東,shutter_141 southeast_142 northeast,high,,print in proc_5289
+r708:0x1bf.0:t4,$f:シャッター_141南西_142北西,shutter_141 southwest_142 northwest,high,,print in proc_5289
+r708:0x1bf.1:t4,$f:シャッター_141西_144東,shutter_141 west_144 east,high,,print in proc_5289
+r708:0x1c0.0:t4,$f:st05_436_太陽の根状態フラグ,st05_436_solar root state flag,high,,print in proc_5709
