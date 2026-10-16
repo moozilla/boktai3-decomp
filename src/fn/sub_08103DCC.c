@@ -1,6 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#define NamedActor_SetSpeedFromScript sub_08103DCC
 extern void *gUnk_020001AC;
 u8 *sub_08101A3C(s32 name);
 /* Script: actor -n gets -s (default 6) at +0xBE (tentative: route speed). */

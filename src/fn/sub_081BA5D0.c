@@ -1,6 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#define Registry2388_Create sub_081BA5D0
 extern void *gUnk_0200025C;
 void sub_081BA27C(void *);
 void sub_081BA2A4(void *);

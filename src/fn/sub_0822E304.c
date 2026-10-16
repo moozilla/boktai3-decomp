@@ -1,6 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#define GameState_AddListEntryFromScript sub_0822E304
 s32 sub_0822E104(s32 slot);
 void sub_0822E0DC(s32 slot, s32 value);
 /* Script: stores -a in the first empty (negative) entry of the first 16 of

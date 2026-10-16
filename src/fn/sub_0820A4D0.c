@@ -1,6 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#define Slot600_DeactivateFromScript sub_0820A4D0
 struct Slot600 {
     u8 pad0[4];
     s32 name;
@@ -14,7 +13,7 @@ struct Slot600Manager {
     struct Slot600 slots[8];
 };
 extern struct Slot600Manager *gUnk_02000600;
-void *sub_0820A420(void);
+void *FanCannonManager_Create(void);
 /* Script: in the eight-slot manager at 0x02000600 (created if missing, which
    fails the call), the used slot named -n clears +0x124 and sets +0x125 (tentative: stop). */
 s32 Slot600_DeactivateFromScript(void)
@@ -23,7 +22,7 @@ s32 Slot600_DeactivateFromScript(void)
     struct Slot600 *slot;
     s32 name, i;
     if (!manager) {
-        sub_0820A420();
+        FanCannonManager_Create();
         return -1;
     }
     if (!Script_SeekToKeyword('n'))
