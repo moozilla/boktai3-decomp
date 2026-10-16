@@ -85,7 +85,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/ACTOR_ATTACHMENT_MANAGER.md](../docs/ACTOR_ATTACHMENT_MANAGER.md) | Attachment manager lifecycle and scene actor pool prefix | *#actors #scene #assets* | 8 |
 | [docs/ANIMATION_081E.md](../docs/ANIMATION_081E.md) | Animation controller matching batch | *#scripts #animation #assets #matching* | 5 |
 | [docs/ASM_OUTPUT_QC.md](../docs/ASM_OUTPUT_QC.md) | Empty-asm outputs and return-value QC |  | 5 |
-| [docs/ASSETS.md](../docs/ASSETS.md) | Resources and asset formats | *#scripts #assets #text #tooling* | 27 |
+| [docs/ASSETS.md](../docs/ASSETS.md) | Resources and asset formats | *#scripts #assets #text #tooling* | 28 |
 | [docs/BACKGROUND_CONTROLLERS.md](../docs/BACKGROUND_CONTROLLERS.md) | Background controllers and scheduler report groups | *#assets #progress* | 3 |
 | [docs/BACKLOG.md](../docs/BACKLOG.md) | Research and development backlog |  | 15 |
 | [docs/BOUNCING_OBJECTS.md](../docs/BOUNCING_OBJECTS.md) | Twelve-slot bouncing objects (080688D0–08069964) | *#particles* | 4 |
@@ -194,7 +194,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-16.md](../docs/history/2026-10-16.md) | Handoff history: 2026-10-16 | #actors #scripts #text #tooling | 2 |
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 15 |
-| [gcl/README.md](../gcl/README.md) | GCL: the game's scripts | *#scripts #scene #assets #tooling* | 12 |
+| [gcl/README.md](../gcl/README.md) | GCL: the game's scripts | *#scripts #scene #assets #tooling* | 14 |
 | [gcl/examples/scale_quiz.md](../gcl/examples/scale_quiz.md) | Worked example: the Blackbeard Brothers' scale quiz | *#scripts #assets #tooling* | 10 |
 | [notes/animation-contact-burst_2026-10-14.md](../notes/animation-contact-burst_2026-10-14.md) | Temporary animations and contact-burst effect, October 14 | *#particles #animation* | 7 |
 | [notes/area-effect-link_2026-10-14.md](../notes/area-effect-link_2026-10-14.md) | Link variant of area effects (Sol, 2026-10-14) |  | 2 |
