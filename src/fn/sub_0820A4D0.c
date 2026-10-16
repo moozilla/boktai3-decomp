@@ -1,0 +1,41 @@
+#include "global.h"
+#include "engine.h"
+#define Slot600_DeactivateFromScript sub_0820A4D0
+struct Slot600 {
+    u8 pad0[4];
+    s32 name;
+    u8 pad8[0x11C];
+    u8 active, stopped;
+    u8 pad126[0x5A];
+};
+struct Slot600Manager {
+    u8 pad0[0x18];
+    u32 used;
+    struct Slot600 slots[8];
+};
+extern struct Slot600Manager *gUnk_02000600;
+void *sub_0820A420(void);
+/* Script: in the eight-slot manager at 0x02000600 (created if missing, which
+   fails the call), the used slot named -n clears +0x124 and sets +0x125 (tentative: stop). */
+s32 Slot600_DeactivateFromScript(void)
+{
+    struct Slot600Manager *manager = gUnk_02000600;
+    struct Slot600 *slot;
+    s32 name, i;
+    if (!manager) {
+        sub_0820A420();
+        return -1;
+    }
+    if (!Script_SeekToKeyword('n'))
+        return -1;
+    name = Script_GetValue();
+    slot = manager->slots;
+    for (i = 0; i <= 7; i++, slot++) {
+        if ((1 << i) & manager->used && slot->name == name) {
+            slot->active = 0;
+            slot->stopped = 1;
+            return 0;
+        }
+    }
+    return -1;
+}
