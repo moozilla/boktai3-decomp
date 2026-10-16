@@ -1,0 +1,54 @@
+#include "global.h"
+#ifdef NONMATCHING
+// fuzzy: 74.7%
+// Open: the step address is kept in a callee-saved register; the original
+// recomputes it per branch, and the zero/one constants reuse the step value.
+struct BossTask {
+    u8 pad0[0xAC];
+    u8 fieldAC, fieldAD, fieldAE;
+    u8 padAF;
+    u8 fieldB0;
+    u8 padB1[2];
+    u8 fieldB3;
+    u8 padB4[0x10];
+    u32 fieldC4;
+    u8 padC8[0x420];
+    u8 field4E8;
+    u8 pad4E9;
+    u8 step, field4EB;
+};
+void *sub_0802140C(u32 slot);
+/* Shared state change of the boss tasks (as in Vanargand_ResetFromScript). */
+static inline void setState(struct BossTask *p, u8 state)
+{
+    p->fieldAC = 0;
+    p->fieldAD = 0;
+    p->fieldAE = state;
+    p->fieldC4 = 0;
+    p->fieldB0 = 1;
+}
+/* Registry routine 4EC9: cycles the singleton in slot 2 through steps 0-2
+   (+0x4EA), entering state 8, 10 or 3, then clears +0xB3, +0x4EB, +0x4E8. */
+void BossSlot2_AdvanceStepFromScript(void)
+{
+    struct BossTask *task = sub_0802140C(2);
+    struct BossTask *p = task;
+    if (p) {
+        if (p->step == 0) {
+            p->step = 1;
+            setState(p, 8);
+        } else if (p->step == 1) {
+            p->step = 2;
+            setState(p, 10);
+        } else {
+            p->step = 0;
+            setState(p, 3);
+        }
+        task->fieldB3 = 0;
+        p->field4EB = 0;
+        p->field4E8 = 0;
+    }
+}
+#else
+INCLUDE_ASM("asm/nonmatching", BossSlot2_AdvanceStepFromScript);
+#endif
