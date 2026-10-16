@@ -325,16 +325,17 @@ views.big = {
     items = big.recs.map((r, i) => ({ key: r.hash, idx: i, note: NOTES[r.hash], n: big.frames(i).length + 'f' }));
   },
   async show(h) {
-    // a large sprite's palette is whatever pool entry its OBJ bank held when a
-    // capture saw it (unfaded, from 9B1B); else the captured RAM, else the menu
-    const L = learned.sprites[`big:${h}`], lp = bigPool[h] ?? L?.pool;
-    const variants = [...new Set([L?.pool, ...(L?.pools || []), ...((learned.bigpools || {})[h] || [])].filter(x => x != null))].sort((a, b) => a - b);
-    const i = big.recs.findIndex(r => r.hash === h), colors = lp != null ? await packageColors(null, lp) : learnedColors('big', h) || colorsNow();
+    // the default palette is in the sprite data (frame +2); variants are the
+    // entries the game code selects (data/sprite_palettes.csv, captures)
+    const i = big.recs.findIndex(r => r.hash === h), L = learned.sprites[`big:${h}`];
+    const dflt = i >= 0 ? big.recs[i].pal : -1, lp = bigPool[h] ?? dflt;
+    const variants = [...new Set([dflt, ...((learned.bigpools || {})[h] || []), ...(L?.pool != null ? [L.pool] : [])].filter(x => x != null && x >= 0))].sort((a, b) => a - b);
+    const colors = await packageColors(null, lp);
     const v = $('view');
     if (i < 0) { v.textContent = 'Not found'; return; }
     const r = big.recs[i], frames = big.frames(i);
-    v.innerHTML = `<h2>Large sprite ${h}</h2><div class="meta">${NOTES[h] ? NOTES[h] + ' · ' : ''}${frames.length} frames · ${r.w}×${r.h}${learnedNote('big', h)}, centre (${r.cx}, ${r.cy}) · frame order shown, not the game's animation timing</div>
-      <div class="controls"><label>Speed <select id="spd"><option value="4">fast</option><option value="8" selected>normal</option><option value="16">slow</option></select></label>${variants.length > 1 ? ` <label>Palette <select id="bigpool">${variants.map(p => `<option value="${p}"${p === lp ? ' selected' : ''}>pool ${p}</option>`).join('')}</select></label>` : ''} <span id="tagslot"></span></div>
+    v.innerHTML = `<h2>Large sprite ${h}</h2><div class="meta">${NOTES[h] ? NOTES[h] + ' · ' : ''}${frames.length} frames · ${r.w}×${r.h} · palette entry ${lp}${lp === dflt ? ' (default, from the sprite data)' : ' (a variant the code selects)'}, centre (${r.cx}, ${r.cy}) · frame order shown, not the game's animation timing</div>
+      <div class="controls"><label>Speed <select id="spd"><option value="4">fast</option><option value="8" selected>normal</option><option value="16">slow</option></select></label>${variants.length > 1 ? ` <label>Palette <select id="bigpool">${variants.map(p => `<option value="${p}"${p === lp ? ' selected' : ''}>pool ${p}${p === dflt ? ' (default)' : ''}</option>`).join('')}</select></label>` : ''} <span id="tagslot"></span></div>
       <div class="stage" id="stage"></div><div id="framenote"></div><div class="strip" id="strip"></div>
       <h2 style="margin-top:20px">All large sprites</h2><div class="meta">First frame of each; click to open.</div><div class="grid" id="all"></div>`;
     const ps = frames.map(f => big.parts(f)), all = ps.flat();
@@ -346,7 +347,7 @@ views.big = {
     if ($('bigpool')) $('bigpool').onchange = e => { bigPool[h] = +e.target.value; views.big.show(h); };
     frameStrip(imgs.length, k => imgs[k], wantFrame, 'bigframe', h);
     const grid = $('all'), poolColors = {};
-    await Promise.all(big.recs.map(async rr => { const p = learned.sprites[`big:${rr.hash}`]?.pool; if (p != null) poolColors[rr.hash] = await packageColors(null, p); }));
+    await Promise.all(big.recs.map(async rr => { poolColors[rr.hash] = await packageColors(null, rr.pal); }));
     big.recs.forEach((rr, k) => {
       const c = document.createElement('div'); c.className = 'cell' + (k === i ? ' on' : ''); c.title = (NOTES[rr.hash] || '') + ' ' + rr.hash;
       const f = big.frames(k)[0], img = f ? compose(big.parts(f), poolColors[rr.hash] || colors) : null;
