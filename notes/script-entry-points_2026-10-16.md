@@ -1,4 +1,4 @@
-# Script entry points, batches 1-3 (2026-10-16)
+# Script entry points, batches 1-4 (2026-10-16)
 
 Tags: #scripts #text #actors #tooling
 
@@ -147,3 +147,21 @@ Idioms:
   `struct T *task = f(); struct T *p = task;` with each used somewhere (081803D8).
 * A bound held in a register (`cmp r2, ip`) is a local count (`s32 count = 3;`)
   declared before the loop (0822DB54).
+
+## Batch 4: 081D0C04
+
+`SceneNpc_CreateFromScript` (registry BB34, 804 bytes) matches, so all of the
+original top 15 are done. It took, in order:
+* `sub_0802D760(npc, 1, model, 0xC6A0, zero = 0)`: assigning zero inside the
+  call fixed the whole front half (reload register rotation; the position
+  mask is then reloaded per write as in the original).
+* `setHandler(fn, &npc->callbacks[i])` and `setBox(npc, 16, 20)` inlines,
+  a block-local `s32 speed = 400` for the motion stores.
+* Per-case shapes in the `-i` switch so that only cases 3 and 4 cross-jump:
+  callback temps assigned before the state store in cases 0-4, a mode temp
+  in cases 2-4, and a block-local `u8 one = 1` in case 0 (found with a small
+  brute force over these choices plus three permuter runs).
+* The facing computation: register-pinning concession (marked in the file).
+  `t` pinned to r2 with an empty asm barrier between `a + 0x70` and `>> 5`;
+  without the barrier agbcc turns the arithmetic shift into a logical one.
+  `tools/depin.py` reduced it to these two hints.

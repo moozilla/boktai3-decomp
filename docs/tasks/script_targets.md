@@ -6,15 +6,14 @@ handlers; their callees are found through `bl` calls and Thumb function pointers
 
 | Set | Functions | Bytes | Share of code | Matched |
 |---|---:|---:|---:|---:|
-| Entry points | 738 | 84,436 | 3.5% | 72.4% |
-| Entry points and their direct callees | 1422 | 290,160 | 12.0% | 40.1% |
-| Everything reachable from scripts | 3136 | 535,198 | 22.2% | 45.7% |
+| Entry points | 738 | 84,436 | 3.5% | 73.4% |
+| Entry points and their direct callees | 1422 | 290,160 | 12.0% | 40.4% |
+| Everything reachable from scripts | 3136 | 535,198 | 22.2% | 45.8% |
 
-## Unmatched entry points, by script uses (49 used, 17,360 bytes)
+## Unmatched entry points, by script uses (48 used, 16,556 bytes)
 
 | Uses | Address | Bytes | Function | Script name | GCL name |
 |---:|---|---:|---|---|---|
-| 8 | `081D0C04` | 804 | `SceneNpc_CreateFromScript` | registry BB34 |  |
 | 6 | `081CE1BC` | 1312 | `sub_081CE1BC` | registry 8EA3 |  |
 | 5 | `08103110` | 1856 | `sub_08103110` | registry A4FC |  |
 | 4 | `08111A48` | 380 | `sub_08111A48` | registry 734C |  |
