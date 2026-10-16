@@ -3,8 +3,9 @@
 the game font, then build a modified ROM; browse sprites, palettes, the font and
 raw tiles from the resource archives (/gfx); and a live view of the game
 running in mGBA with tools/mgba/centaur.lua (/live, link on port 8643); the
-script actor registry (/actors), script procedures (/scripts) and any
-function's disassembly and C (/code), from tools/assets/actors.py.
+script actor registry (/actors), script procedures (/scripts), how the rooms
+connect (/world, tools/assets/areas.py) and any function's disassembly and C
+(/code), from tools/assets/actors.py.
 
   python3 tools/studio/serve.py [--port 8642] [--link-port 8643]    then open http://localhost:8642
 
@@ -122,6 +123,22 @@ def stage_meta():
         subprocess.run([sys.executable, os.path.join(ROOT, "tools", "assets", "stages.py"), "json", STAGEMETA],
                        cwd=ROOT)
     return open(STAGEMETA, "rb").read()
+
+
+def world():
+    """Scenes grouped into areas by their doors (tools/assets/areas.py), with
+    which scenes the stage survey captured."""
+    import areas
+    import gclfiles
+    w = areas.build(json.loads(stage_meta()))
+    file_of = gclfiles.file_of()
+    for i, s in w["scenes"].items():
+        s["file"] = file_of.get(i)  # scene_NNNN, or a shared file for scenes only doors reach
+    for i, info in scene_info().items():
+        if i in w["scenes"]:
+            w["scenes"][i]["shot"] = info["shot"]
+            w["scenes"][i]["map"] = w["scenes"][i]["map"] or info["map"]
+    return w
 
 
 def hp_data(h):
@@ -269,7 +286,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, open(os.path.join(HERE, "gfx.html"), "rb").read(), "text/html; charset=utf-8")
         elif self.path in ("/live", "/live.html"):
             self.send(200, open(os.path.join(HERE, "live.html"), "rb").read(), "text/html; charset=utf-8")
-        elif self.path in ("/actors", "/scripts", "/code"):
+        elif self.path in ("/actors", "/scripts", "/code", "/world"):
             self.send(200, open(os.path.join(HERE, self.path[1:] + ".html"), "rb").read(), "text/html; charset=utf-8")
         elif self.path == "/api/actors":
             self.send(200, {"actors": actors.actors(), "enemies": actors.name_list(*actors.ENEMY_NAMES),
@@ -350,6 +367,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, live.tags())
         elif self.path == "/api/stages":
             self.send(200, stages())
+        elif self.path == "/api/areas":
+            self.send(200, world())
         elif self.path == "/api/stagemeta":
             self.send(200, stage_meta(), "application/json")
         elif self.path.startswith("/api/hp/"):
