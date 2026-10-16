@@ -2,6 +2,7 @@ proc,name,params,confidence,evidence
 1,nop,,high,empty procedure; every scene entry calls it
 553,scene_common_init,,medium,calls 554 (reset scene state) and 558 (elapsed days); every scene entry calls it
 554,scene_reset_state,,low,resets the actor manager mode and script work area (r700[0x28]..)
+557,reset_dungeon_on_entry,dungeon,low,"when entering at appearance points 1-6, clears the floor-switch, candle-stand and other per-dungeon flag arrays and runs the dungeon's own reset (procs 571-580 by gs[0x5ac])"
 558,update_elapsed_days,,low,compares the saved date r708[0xc2..0xc6] with today (r700[0x56..]); prints 日数差を取得 (got the day difference)
 861,scene_start,flags,low,"first call of every scene entry: sets scene flags r700[0x6c] (early story, entrance ranges, stage ranges)"
 862,set_scene_flags,bits,low,r700[0x6c] |= bits
@@ -24,6 +25,7 @@ proc,name,params,confidence,evidence
 895,set_camera_area,box,medium,called with the camera box A679 (docs/ASSETS.md)
 896,area_trap,"box,w",low,traps on the box for the player and the coffin
 897,screen_fade_simple,"mode,color,frames",low,"calls screen_fade(mode, 3, color, frames, 8191, none)"
+898,screen_fade_then,"mode,color,frames,then_proc",low,screen_fade with step 3 and mask 8191
 899,screen_fade,"mode,step,color,frames,mask,then_proc",low,"color 0-4 sets an RGB triple (4,4,4)/(31,31,31)/green/red/blue for registry 9C2C; runs then_proc after frames"
 905,scene_apply_reset,,low,if r708[0x1c0.6] is set: clear it and reset (proc_907)
 909,entrance_at_box_909,"box,facing,entrance,proc",medium,entrance: the player starts at HP box `box` (docs/ASSETS.md; 910 verified in a replay)
@@ -87,7 +89,7 @@ proc,name,params,confidence,evidence
 1072,add_area_sprite,"entries,x,z,kind",medium,AreaEffect_AddSprite at the cell centre
 1082,floor_switch_tile,"kind,x,z",medium,"compares the floor height at the four corners of a 256x256 tile and returns the plate sprite that fits the slope (families 17C7-17CB, B0A9-B0AD, B0BC/C583)"
 1083,place_floor_switch_at_point,"name,point,w,pressed,tile,on_press,on_release",low,resolves a point (proc 972) and calls place_floor_switch
-1084,place_floor_switch,"name,x,z,w,pressed,tile,on_press,on_release",medium,"creates registry AB8E (floor switch) on the floor; on_press/on_release are the S callbacks, e.g. procs 3945/3946 activate and deactivate a door"
+1084,place_floor_switch,"name,x,z,w,pressed,tile,on_press,on_release",high,"creates registry AB8E (floor switch) on the floor; on_press/on_release are the S callbacks, e.g. procs 3945/3946 activate and deactivate a door; a debug print labels its pressed argument $f:床スイッチフラグ (floor switch flag)"
 1092,place_object_at,"name,type,,x,z,dx,dz",low,proc_1093 at cell centre plus offset
 1093,place_object,"name,type,,x,z",low,sub_081B897C with a size from the type
 1094,spawn_scene_objects_manager,mode,medium,sub_0802091C: the SceneObjects task (destroy callback SceneObjects_Destroy) with the sprite runs 7ACD-7AD6
@@ -109,6 +111,8 @@ proc,name,params,confidence,evidence
 1154,actor_name_of,id,low,maps a number to a hash (name) in a 120-line table
 1155,place_character_default,"id,x,z,direction,proc",low,"place_character with w=(256, 512, 1024)"
 1156,spawn_ghost_npc,"name,x,z,facing",low,a Ghost actor (CCD3) with script state
+1165,place_floor_switch_custom,"name,w,x,z,tile,r_a,r_b,d,s,f,on_press,on_release",medium,"floor height at x,z, then spawn_floor_switch with every option"
+1166,spawn_floor_switch,"name,w,x,y,z,tile,r_a,r_b,d,s,f,on_press,on_release",medium,FloorSwitch with every option given
 1177,spawn_particles_default,"count,x,y,z,type,a",low,spawn_particles with fixed speed and lifetime
 1178,spawn_particles,"count,x,y,z,type,a,speed,spread,life,fade",medium,only spawns AnimatedParticles
 1180,place_collision_controller,"id,type,kind,x,z,attack_a,attack_b,attack_c",low,CollisionController on the floor; type is random 0/1 when r708[0x171] == 2
@@ -123,10 +127,12 @@ proc,name,params,confidence,evidence
 1211,enemy_may_spawn,kind,low,returns 1 or 0 for a spawner kind under the current mission
 1212,enemy_slot_taken,,low,r708[0x256.0][...] == 1 while counting
 1219,place_goddess_statue,"x,z",medium,"in an enemy-count mission: items 0x32-0x34, the Fate/Existence/Necessity Goddess Statues, by stage"
+1235,place_spike_floor,"id,x,z,v,d,period",medium,log 'Contact spike floor'; a SceneIndicator on the floor
 1265,spawn_scene_managers,,medium,"proc_1266, 1267, 1268; every scene entry calls it"
 1266,spawn_common_managers,,medium,"the Continue? prompt, DemoManager, audio, actor registry, terrain markers..."
 1267,spawn_message_managers,,low,"the message window actors, then closes the window"
 1268,spawn_pause_menu,,low,an actor given the item and menu text ids
+1271,spawn_continue_managers,,low,"spawns the managers of the continue screen: the Dark Loan prompt (text 1323), DemoManager, HUD and message managers"
 1493,enemy_level,value,low,used by spawners for HP/attack formulas
 1495,spawn_bok_by_kind,"name,kind,path",medium,"picks one of procs [1496, 1497, 1498, 1499, 1500] by kind"
 1496,spawn_bok_1,"name,path",medium,"enemy spawner: creates the bok family (docs/ASSETS.md, 1496-1627)"
@@ -171,6 +177,8 @@ proc,name,params,confidence,evidence
 1535,spawn_flower_3,"name,path,point,level,proc",low,"enemy kind 28, registry 680E"
 1536,spawn_bat_by_kind,"name,kind,path",medium,"picks one of procs [1541, 1542] by kind"
 1537,place_bat_at_path_point,"name,kind,path,point,a,b,c",medium,"Path_GetPointFromScript(path, point) and spawn_bat_by_kind 220 above that point"
+1538,place_bat,"name,kind,x,z,wall,on_wall,a",medium,"spawn_bat_by_kind 220 above the floor, shifted half a tile onto a wall face when on_wall"
+1539,place_bats_on_wall,"name,kind,path,first_point,last_point,count",medium,"up to 10 bats scattered along the wall between two path points; logs 'Setting to wall face (east-facing) on Z axis', 'Count limit exceeded! Enemy not registered.'"
 1541,spawn_bat_1,"name,path",medium,"enemy spawner: creates key F8BE (docs/ASSETS.md, 1496-1627)"
 1542,spawn_bat_2,"name,path",medium,"enemy spawner: creates key F8BE (docs/ASSETS.md, 1496-1627)"
 1543,spawn_crow_by_kind,"name,kind,path",medium,"picks one of procs [1545, 1546] by kind"
@@ -199,6 +207,9 @@ proc,name,params,confidence,evidence
 1581,place_mimic,"name,path,x,z",medium,proc_1127 then spawn_mimic
 1582,spawn_mimic,"name,path",medium,"enemy spawner: creates key BEF5 (docs/ASSETS.md, 1496-1627)"
 1585,spawn_octopus,"name,path",medium,"enemy spawner: creates key 3F99 (docs/ASSETS.md, 1496-1627)"
+1586,spawn_ivy_default,"name,path,point,level",low,spawn_ivy with proc 0x633
+1587,place_ivy_remains,"x,y,z",medium,display track with the ivy sprite D638; proc 3278 logs 'placing ivy as destroyed remains'
+1588,spawn_ivy,"name,path,point,a,level,proc",medium,"enemy kind 50, registry 1744 (Ivy_Create); proc 3278 logs 'During mission to eliminate all enemies, placing ivy as destroyed remains!'"
 1599,place_dragon_puppy,"name,x,z",medium,spawn_dragon_puppy at a cell (data table text-bank 1565)
 1600,spawn_dragon_puppy,"name,path",medium,"enemy spawner: creates key 3D38 (docs/ASSETS.md, 1496-1627)"
 1609,spawn_fan_cannon_manager,"name,path",medium,"enemy spawner: creates key 9CC2 (docs/ASSETS.md, 1496-1627)"
@@ -216,8 +227,10 @@ proc,name,params,confidence,evidence
 1668,restore_hud,,low,"end_event, then HUD mode 0, 1 or 2 by stage"
 1677,place_character_2,"id,x,z,direction,i",low,like place_character: actor_name_of(id) and registry 8EA3 on the floor; id 27 only once
 1771,place_disabled_directional_controller,"id,x,z,orientation,start_proc",low,directional_controller with disabled=1
+1785,run_once,"index,a,proc",medium,calls proc and returns 1 only the first time (sets r708[0x19a][index])
 1786,toggle_switch,"index,kind,on_proc,off_proc",medium,flips a switch flag (r708[0x1a9]/[0x1ab]... by kind) and calls on_proc or off_proc
 1787,story_chapter,,high,"0-6 from story ranges 30, 64, 93, 117, 150, 174, 191"
+1823,set_script_actor_mode,mode,high,only ScriptActor_SetMode
 2292,show_counter,"slot,value,max",low,sub_08030FFC; called with money (max 999999) and counters
 3269,place_wall,"name,wall_type,x,y,z",medium,display track by wall type ($:P_壁種類 wall type; print: Unknown wall type???)
 4932,set_area_story,"area,value",high,sets an area story flag; prints NNNエリアのストーリーフラグを更新 (update area NNN story flag)
