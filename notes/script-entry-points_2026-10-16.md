@@ -1,4 +1,4 @@
-# Script entry points, batches 1-6 (2026-10-16)
+# Script entry points, batches 1-7 (2026-10-16)
 
 Tags: #scripts #text #actors #tooling
 
@@ -220,3 +220,15 @@ Still open: FloorSwitch_Create (a permuter run is at score 4130 from 5099; the
 `struct Vec16 *d = &delta` pointer for the scene-object scan put the slot in r7
 as in the original), 0810858C (97%), 08121268 (97%, one constant placement),
 0822BFC8 (89%, an extra pointer copy), 08111A48.
+
+## Batch 7
+
+Matched 3 (616 bytes, +0.025 percentage points): 08100298 `WoodenCrate_Create`
+(820B; really a command on the crate named -n), 081BB294
+`SolarBank_ApplyInterestFromScript` (61A0: grows the balance at +0x7B0 by the
+rate at +0x598 per day, capped at 9999, then sets a new rate) and 081DCE34
+`Time_OnLoadSave` (7978: parses the region table and computes sunrise/sunset).
+
+Near misses kept in wip with permuter runs: 0806F5C0 (scene effect schedule,
+score 55: reload register choices), 081C4080 (registry F3E4, score 60),
+0810858C (7 bytes), 08121268 (14 bytes), 0822BFC8, FloorSwitch_Create.
