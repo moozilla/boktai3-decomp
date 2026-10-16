@@ -6,7 +6,7 @@ void sub_081DDBC0(void);
 void sub_081DE078(void);
 s32 sub_081DE0CC(void *);
 
-void *sub_081DE5A4(void)
+void *NameEntry_Create(void)
 {
     void *r = Task_Create(0xb, 0x3e4);
     if (r != 0) {

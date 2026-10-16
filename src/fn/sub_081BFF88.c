@@ -7,7 +7,7 @@ void Task_Kill(void *);
 void sub_081BFEAC(void);
 void sub_081BFEDC(void);
 
-void *sub_081BFF88(void)
+void *Storage_Create(void)
 {
     void *r = Task_Create(0xb, 6136);
     if (r != 0) {

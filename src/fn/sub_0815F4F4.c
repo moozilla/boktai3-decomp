@@ -7,7 +7,7 @@ void Task_Kill(void *);
 void sub_0815F0D0(void);
 void sub_0815F224(void);
 
-void *sub_0815F4F4(void *a, void *b)
+void *Player_Create(void *a, void *b)
 {
     void *r = Task_Create(6, 0xCAC);
     if (r != 0) {

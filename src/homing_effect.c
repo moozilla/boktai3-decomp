@@ -34,7 +34,7 @@ s32 sub_0800A830(void *unused)
     return 0;
 }
 
-u32 sub_0800A86C(void *p)
+u32 GunDelHell_Create(void *p)
 {
     return sub_0800A830(p);
 }

@@ -5,7 +5,7 @@ void Task_Kill(void *);
 void sub_082074F0(void);
 void sub_082079F4(void);
 s32 sub_08207A00(void *, void *);
-void *sub_08207F68(void *p)
+void *VulcanCannon_Create(void *p)
 {
     void *r = Task_Create(8, 0x1a8);
     if (r) {

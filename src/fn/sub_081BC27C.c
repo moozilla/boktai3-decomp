@@ -5,7 +5,7 @@ s32 sub_081BC22C(void *);
 void Task_Kill(void *);
 void sub_081BBD94(void);
 void sub_081BBDA8(void);
-void *sub_081BC27C(void)
+void *SolarBank_Create(void)
 {
     void *p = Task_Create(0xb, 0x734);
     if (p) {
