@@ -39,7 +39,9 @@ int sub_08030818(struct Manager *);
 void Task_Kill(void *);
 void sub_08030710(void);
 void sub_080307D8(void);
-struct Manager *sub_08030864(void)
+/* Registry routine 286F: returns the scene actor manager (gUnk_02000480,
+   which also holds the message packet queue), creating its task on first use. */
+struct Manager *SceneActorManager_Create(void)
 {
     struct Manager *p;
     if (gUnk_02000480)
