@@ -45,7 +45,7 @@ extern void *gUnk_020001A8;
 void *sub_08100A0C(void);
 struct FloorSwitch *sub_0810033C(void *);
 struct SceneObjectList *sub_08225AA0(void);
-s32 sub_0822C034(struct Vec16 *);
+s32 Region_FindContaining(struct Vec16 *);
 static inline s32 optionalValue(void)
 {
     s32 value;
@@ -134,7 +134,7 @@ void FloorSwitch_Create(void)
     }
     e->field8E = Script_GetKeywordValue('d', 0);
     e->field8C = 0;
-    e->region = sub_0822C034((struct Vec16 *)&p->x);
+    e->region = Region_FindContaining((struct Vec16 *)&p->x);
     if (*(s32 *)((u8 *)gUnk_02000710 + 0x5A0) == e->region)
         p->flags &= ~1;
     else

@@ -463,7 +463,7 @@ s32 DirectionalController_ScriptCreate(void)
             }
             sub_080095D4(manager, p, &position);
             if (findRegion)
-                p->region = sub_0822C034(&p->position);
+                p->region = Region_FindContaining(&p->position);
             else
                 p->region = -1;
             sub_080095B4(p, 2);
@@ -518,5 +518,5 @@ s32 DirectionalController_ScriptMove(void)
     }
     sub_080095D4(manager, p, &position);
     if (p->region >= 0)
-        p->region = sub_0822C034(&p->position);
+        p->region = Region_FindContaining(&p->position);
 }

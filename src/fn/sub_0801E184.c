@@ -5,7 +5,7 @@ typedef struct {
 } Vec;
 void *Heap_Alloc(int);
 void Memory_Clear(void *, int);
-int sub_0822C034(void *);
+int Region_FindContaining(void *);
 void sub_0801F058(void *, void *);
 void sub_0801F5EC(void *, void *);
 void sub_0801EC4C(void *, void *);
@@ -36,7 +36,7 @@ int SceneObjects_Append(u8 *p, u16 id, Vec *position, int value, u8 kind, u8 var
     slot[0x41] = field41;
     *(int *)(slot + 0x4c) = value;
     *(u16 *)(slot + 0x80) = zeroHalf;
-    *(u16 *)(slot + 0x42) = sub_0822C034(position);
+    *(u16 *)(slot + 0x42) = Region_FindContaining(position);
     slot[0x44] = field44;
     *(void **)(slot + 0x2c) = Heap_Alloc(16);
     if (!*(void **)(slot + 0x2c))

@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define Region_FindContaining sub_0822C034
 /* Up to 16 region ids (positive; the list ends at the first id <= 0). */
 struct RegionList {
     u8 pad0[0x18];

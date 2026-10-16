@@ -354,7 +354,7 @@ s32 Breakable_ScriptCreate(void)
     placed = 0;
     if (Script_SeekToKeyword('r')) {
         s32 route = Script_GetValue(), point = Script_GetValue(), mode = Script_GetValue();
-        if (!sub_0821E5C4(&slot->route, route, point, mode))
+        if (!Route_Start(&slot->route, route, point, mode))
             goto fail;
         slot->motion = 1;
         slot->delay = sub_0821E7E4(&slot->route);
@@ -397,7 +397,7 @@ s32 Breakable_ScriptCreate(void)
         if (motion != 2)
             position.y = groundHeight(&position);
         if (Script_GetKeywordValue('M', 0))
-            slot->region = sub_0822C034(&position);
+            slot->region = Region_FindContaining(&position);
         else
             slot->region = -1;
         slot->drawable.position = position;

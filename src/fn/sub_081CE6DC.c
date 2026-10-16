@@ -101,7 +101,6 @@ static inline void setHandler(void *fn, void **slot)
 {
     *slot = fn;
 }
-#define SceneCharacter_CommandFromScript sub_081CE6DC
 /* Registry routine F9D7: commands the scene character named -n. For kind 29,
    -C sets its tag and sound choice (as in place_character) and resets its
    speed; -i restarts a behavior as in SceneCharacter_PlaceFromScript. Returns

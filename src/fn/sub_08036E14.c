@@ -26,7 +26,7 @@ void sub_08218B30(void);
 void sub_08215114(void);
 void sub_0821969C(void);
 void sub_0821447C(int, void *, void *, void *);
-void sub_08177DEC(int);
+void Hud_SetMode(int);
 void Bg_ClearTilemap(int);
 void *ScriptProc_Start(int, int);
 void sub_082161B4(int, int, void *, int, int, int, void *);
@@ -58,6 +58,6 @@ void sub_08036E14(struct LinkMenu *p)
     }
     sub_08215490(1);
     sub_0821447C(0, sub_08218B30, sub_08215114, sub_0821969C);
-    sub_08177DEC(7);
+    Hud_SetMode(7);
     Bg_ClearTilemap(0);
 }

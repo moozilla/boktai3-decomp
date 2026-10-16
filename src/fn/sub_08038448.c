@@ -18,7 +18,7 @@ struct Save {
 extern struct Save *gUnk_02000710;
 extern u32 gUnk_03003A50, gUnk_03005308;
 extern u16 gUnk_0203B400[];
-void sub_0822E498(int);
+void GameState_AddEquipment(int);
 int Mod(int, int);
 
 void sub_08038448(struct P *p)
@@ -28,20 +28,20 @@ void sub_08038448(struct P *p)
     register int i asm("r5");
     u32 *random;
     gUnk_02000710->selection = mask;
-    sub_0822E498(0);
+    GameState_AddEquipment(0);
     {
         u32 t = 1;
         mask = t;
     }
     if ((p->rightMask & 2) && p->round > 3) {
-        sub_0822E498(1);
+        GameState_AddEquipment(1);
         {
             u32 t = 3;
             mask = t;
         }
     }
     if ((p->rightMask & 4) && p->round > 3) {
-        sub_0822E498(2);
+        GameState_AddEquipment(2);
         {
             register u32 t asm("r1") = mask;
             t |= 4;
@@ -49,7 +49,7 @@ void sub_08038448(struct P *p)
         }
     }
     if (p->rightMask & 64) {
-        sub_0822E498(6);
+        GameState_AddEquipment(6);
         {
             register u32 t asm("r3") = mask;
             t |= 64;
@@ -57,7 +57,7 @@ void sub_08038448(struct P *p)
         }
     }
     if (p->rightMask & 128) {
-        sub_0822E498(7);
+        GameState_AddEquipment(7);
         {
             u32 t = mask;
             t |= 128;
@@ -65,7 +65,7 @@ void sub_08038448(struct P *p)
         }
     }
     if (p->rightMask & 256) {
-        sub_0822E498(8);
+        GameState_AddEquipment(8);
         {
             register u32 t asm("r1") = mask;
             t |= 256;
@@ -73,7 +73,7 @@ void sub_08038448(struct P *p)
         }
     }
     if (p->rightMask & 512) {
-        sub_0822E498(9);
+        GameState_AddEquipment(9);
         {
             register u32 t asm("r3") = mask;
             t |= 512;
@@ -81,7 +81,7 @@ void sub_08038448(struct P *p)
         }
     }
     if (p->rightMask & 1024) {
-        sub_0822E498(10);
+        GameState_AddEquipment(10);
         {
             u32 t = mask;
             t |= 1024;
@@ -89,7 +89,7 @@ void sub_08038448(struct P *p)
         }
     }
     if (p->rightMask & 2048) {
-        sub_0822E498(11);
+        GameState_AddEquipment(11);
         {
             register u32 t asm("r1") = mask;
             t |= 2048;

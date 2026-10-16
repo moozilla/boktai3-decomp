@@ -9,17 +9,16 @@ extern u8 *gUnk_02000710;
 extern u32 gUnk_030053F4;
 void sub_08168534(u8 *);
 void sub_08177DAC(u8 *);
-void sub_082156B8(s32);
+void Bg_ClearTilemap(s32);
 void sub_08163F14(u8 *, void *, s32, s32, s32);
 void sub_081685B4(u8 *);
 void sub_080311B0(s32);
 void sub_08169BE0(u8 *);
 /* The HUD block is large and mostly unmapped; offsets are read raw. */
-#define HUD_U8(o)   (*(u8 *)(hud + (o)))
-#define HUD_U16(o)  (*(u16 *)(hud + (o)))
-#define HUD_U32(o)  (*(u32 *)(hud + (o)))
-#define HUD_PTR(o)  (*(void **)(hud + (o)))
-#define Hud_SetMode sub_08177DEC
+#define HUD_U8(o)  (*(u8 *)(hud + (o)))
+#define HUD_U16(o) (*(u16 *)(hud + (o)))
+#define HUD_U32(o) (*(u32 *)(hud + (o)))
+#define HUD_PTR(o) (*(void **)(hud + (o)))
 /* Records HUD mode (+0xA5E) and applies it unless the HUD is busy
    (+0xA5C). Modes 7, 8 and 3 and up set bit 0 in four element groups'
    flags; 8 also clears it in eight more elements; 9 uses row 2, 0-2 row 0
@@ -44,7 +43,7 @@ void Hud_SetMode(u32 mode)
         ((struct HudElement *)(hud + 0xBC8))->flags |= 1;
         HUD_U8(0xA9B) = 0;
         sub_08177DAC(hud);
-        sub_082156B8(0);
+        Bg_ClearTilemap(0);
     } else if ((u8)mode == 8) {
         struct HudElement *e;
         s32 i;
@@ -65,7 +64,7 @@ void Hud_SetMode(u32 mode)
             for (i = 5; i >= 0; e++, i--)
                 e->flags &= mask;
         }
-        sub_082156B8(0);
+        Bg_ClearTilemap(0);
         sub_08163F14(hud, HUD_PTR(0x28), 0, 0, HUD_U32(0x38));
     } else if ((u8)mode == 9) {
         sub_08163F14(hud, HUD_PTR(0x18), 0, 2, HUD_U32(0x2C));

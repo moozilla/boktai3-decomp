@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define GameState_AddUnlock sub_0822E668
 extern u8 *gUnk_02000710;
 void sub_0822E650(s32 slot, s32 value); /* sets unlock slot */
 

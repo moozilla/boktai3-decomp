@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define Camera_ReadMoveRate sub_082265F8
 struct Camera {
     u8 pad0[0x1E];
     u16 field1E;

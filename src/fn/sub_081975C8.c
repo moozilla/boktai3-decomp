@@ -9,7 +9,6 @@ struct Nidhoggr {
     u8 pad72A7[0x19];
     u32 field72C0;
 };
-#define Nidhoggr_ReadOptions sub_081975C8
 /* Script options of the Nidhoggr boss (both of its creators call this):
    -l (4000, kept twice, likely current and maximum life), -g, -Y, -e, -A,
    -D, -E, -S, and -c two or -f three values with a mode byte (0 or 1). */
