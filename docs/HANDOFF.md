@@ -30,10 +30,10 @@ Recent work, newest first (details in [history](history/README.md)):
   readable Python-style view. See [gcl/README.md](../gcl/README.md).
 * **Script decomp targets**: [tasks/script_targets.md](tasks/script_targets.md)
   ranks the native routines scripts call that are still unmatched (95 used,
-  23 KB at the start). The campaign started 2026-10-16: two batches matched 40
+  23 KB at the start). The campaign started 2026-10-16: three batches matched 46
   of them, 14 of the original top 15 included (`trap` too;
-  [notes](../notes/script-entry-points_2026-10-16.md)); 081D0C04 (804 bytes)
-  and five small near-misses are guarded drafts. Regenerate the list with
+  [notes](../notes/script-entry-points_2026-10-16.md)); 081D0C04 (804 bytes,
+  92% in progress) and five near-misses are guarded drafts. Regenerate the list with
   `python3 tools/assets/script_targets.py --markdown docs/tasks/script_targets.md`.
 * **30% reached** (2026-10-15) with a credit correction: retained assembly
   falsely absorbed by small C helpers was removed from the count
