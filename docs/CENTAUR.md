@@ -306,9 +306,12 @@ layers, the scene's palette), placed so that a door in one room lines up with
 the entrance it leads to in the next (`proj` of the door and entrance world
 points), breadth first from the area's first room. The status line counts
 doors whose placements disagree (stacked floors, ships) and rooms no door
-reaches. The Sealed Prison (area 1) comes out as one contiguous dungeon;
-outdoor areas with full backdrops (Pirate Island) overlap. Next: screenshots
-of every room from scenarios for areas whose maps need runtime state.
+reaches. Each room's backdrop (the few metatiles filling its border, such as
+the sea or a dithered void) is cleared where it connects to the border, so
+outdoor rooms overlap without hiding each other. The Sealed Prison (area 1)
+comes out as one contiguous dungeon and Pirate Island (area 29) as the island
+with its harbor and ships; interiors at the same coordinates (ship decks,
+stacked floors) still overlap.
 
 ## Next
 
