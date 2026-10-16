@@ -365,7 +365,7 @@ u32 sub_0801324C(struct BreakableBarrierManager *);
 
 u32 sub_08013270(struct BreakableBarrierManager *);
 
-void *sub_08013380(void)
+void *BatCurtain_Create(void)
 {
     void *obj;
     obj = Task_Create(8, 0x2FC);

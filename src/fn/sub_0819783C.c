@@ -10,7 +10,7 @@ void sub_0819736C(void);
 void sub_0819744C(void);
 void sub_081975C8(void *);
 s32 sub_081976E4(void *, s32, s32);
-struct P *sub_0819783C(u16 a, u16 b)
+struct P *Nidhoggr_Create(u16 a, u16 b)
 {
     struct P *p = Task_Create(8, 0x72FC);
     if (p != 0) {

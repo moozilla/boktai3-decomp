@@ -6,7 +6,7 @@ void sub_081DB474(void);
 void sub_081DB75C(void);
 s32 sub_081DB794(void *);
 
-void *sub_081DBB0C(void)
+void *Options_Create(void)
 {
     void *r = Task_Create(0xb, 0x304);
     if (r != 0) {

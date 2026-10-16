@@ -87,7 +87,7 @@ extern EffectParticleUpdate gUnk_08604A78[][5];
 void sub_0800A800(void);
 u32 sub_0800A80C(struct EffectManager *, struct Effect *);
 s32 sub_0800A830(void *);
-u32 sub_0800A86C(void *);
+u32 GunDelHell_Create(void *);
 s32 EffectManager_UpdateParticles(struct EffectManager *, struct Effect *, struct EffectContext *);
 s32 EffectManager_UpdateAll(struct EffectManager *);
 s32 sub_0800AB18(struct EffectManager *);

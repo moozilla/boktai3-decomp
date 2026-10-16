@@ -6,7 +6,7 @@ int sub_08028F24(void *);
 int sub_08028F48(void *);
 int sub_08028F78(void *, void *);
 void Task_Kill(void *);
-void *sub_08029798(void *arg)
+void *Vampire_Create(void *arg)
 {
     void *p = sub_0802140C(0);
     if (p)
