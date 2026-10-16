@@ -1,0 +1,15 @@
+define,value,english,confidence,conflict,evidence
+d:1階分の距離,6,1-floor distance,high,,print in proc_5067
+d:ST:st02_さらわれたトリニティ_終了,67,st02_kidnapped Trinity_end,high,,print in proc_3293
+d:ST:st02_ゴーレム初登場_終了,68,st02_golem first appearance_end,high,,print in proc_3293
+d:STORY_05_130:氷パズル正解_終了,5,ice puzzle solved_end,high,,print in proc_5232
+d:st02_床スイッチ番号:36_床スイッチ１,7,36_floor switch 1,high,,print in proc_3578; index of r708:0x133.0:t4(48)
+d:st02_床スイッチ番号:36_床スイッチ２,8,36_floor switch 2,high,,print in proc_3578; index of r708:0x133.0:t4(48)
+d:st02_燭台スイッチ番号:27_燭台１,1,27_candle 1,high,,print in proc_3529; index of r708:0x145.0:t4(16)
+d:st02_燭台スイッチ番号:27_燭台２,2,27_candle 2,high,,print in proc_3529; index of r708:0x145.0:t4(16)
+d:st02_燭台スイッチ番号:53_燭台１,3,53_candle 1,high,,print in proc_3679; index of r708:0x145.0:t4(16)
+d:st02_燭台スイッチ番号:53_燭台２,4,53_candle 2,high,,print in proc_3679; index of r708:0x145.0:t4(16)
+d:st02_燭台スイッチ番号:53_燭台３,5,53_candle 3,high,,print in proc_3679; index of r708:0x145.0:t4(16)
+d:st02_燭台スイッチ番号:53_燭台４,6,53_candle 4,high,,print in proc_3679; index of r708:0x145.0:t4(16)
+d:st02_燭台スイッチ番号:53_燭台５,7,53_candle 5,high,,print in proc_3679; index of r708:0x145.0:t4(16)
+d:st05_床スイッチ番号:東シャッター連動134,7,east shutter linked 134,high,,"print in proc_5232, proc_5233, proc_5234; index of r708:0x133.0:t4(48)"

@@ -6,6 +6,10 @@
   gclnames.py crack KIND [--all]    corpus words whose hash is a KIND key, with
                                     what the key maps to (default: unnamed keys)
   gclnames.py find HASH...          corpus words with that hash (any kind)
+  gclnames.py labels [--write]      variable, define and parameter names from
+                                    the scripts' debug prints; --write updates
+                                    gcl/names/{var,define,param}.csv (English
+                                    already in the files is kept)
 
 GCL names are hashed with sub_08219BD8 (h = rotl16(h, 5) + byte) over their
 EUC-JP bytes, as GCL source was EUC-JP (KCEJ GCL reference; the actor keys
@@ -134,6 +138,211 @@ def corpus(rom):
     return out
 
 
+# ---------- names from the scripts' debug prints ----------
+# A print operand string that ends in a GCL label (`$f:NAME`, `$$b:NAME`,
+# `$:P_NAME`, `d:GROUP:NAME`) names the operand right after it.
+VAR = re.compile(r"(\$\$?)([bfw]?):([^\s　・！？!?…,、。\[\]']+)(?:\[([^\]]*)\])?")
+DEFINE = re.compile(r"\bd:([^\s　:\[\]']+)(?::([^\s　\[\]']+))?")
+PROSE = ("が不正な値になっている", "です")  # sentence tails after a label, not part of it
+STORE = re.compile(r"^(gs|r700|r708)\[(0x[0-9a-f]+(?:\.\d+)?)\]:t(\d+)(?:\((\d+),(.*)\))?$")
+LETTER = {"f": 4, "b": 2, "w": 1}
+TAIL = re.compile(r"[\s　・！？!?…]*$")
+VAR_COLS = ["storage", "name", "english", "confidence", "conflict", "evidence"]
+DEFINE_COLS = ["define", "value", "english", "confidence", "conflict", "evidence"]
+PARAM_COLS = ["proc", "storage", "name", "english", "confidence", "conflict", "evidence"]
+
+
+def storage(op):
+    """(key, index operand or None) for a variable operand, e.g.
+    r708[0x145.0]:t4(16,1) -> ('r708:0x145.0:t4(16)', '1'); else None."""
+    m = STORE.match(op)
+    if not m:
+        return None
+    reg, off, t, n, i = m.groups()
+    return f"{reg}:{off}:t{t}" + (f"({n})" if n else ""), i
+
+
+def _sigil_ok(sigil, letter, key):
+    reg, _, t = key.split(":")[:3]
+    return (sigil == "$$") == (reg == "r700") and (not letter or int(t[1:].split("(")[0]) == LETTER[letter])
+
+
+def _english(en, marker):
+    """The part of a print's English that translates the label at marker."""
+    if not en:
+        return ""
+    i = en.rfind(marker)
+    if i < 0:
+        return ""
+    e = en[i + len(marker):].strip()
+    e = re.sub(r"\[.*?\]", "", e)
+    e = re.sub(r"^P_\s*", "", e)
+    return TAIL.sub("", e).rstrip(".!?… ")
+
+
+def labels(rom):
+    """Every (label, operand) pairing in the scripts' prints, as dicts with
+    kind (var, define, param), proc (call id), and the row fields."""
+    import gcx
+    img = gcx.Image(rom)
+    en = prints()
+    out = []
+    for pid in range(len(img.procs)):
+        cid = pid + 1
+        for args in gcx.print_args(img, pid):
+            for s, op in zip(args, args[1:] + [None]):
+                if s[:1] != "'":
+                    continue
+                text = s[1:-1]
+                ok = op is not None and op[:1] != "'"
+                found = list(VAR.finditer(text))
+                if found:
+                    m = found[-1]
+                    sigil, letter, name, index = m.groups()
+                    if not ok or index == "" or TAIL.sub("", text[m.end():]):
+                        continue  # no operand, an array description (`NAME[]`), or prose follows
+                    tidy = True
+                    for t in PROSE:
+                        if name.endswith(t):
+                            name, tidy = name[:-len(t)], False
+                    label = f"{sigil}{letter}:{name}"
+                    english = _english(en.get(text, ""), f"{sigil}{letter}:")
+                    conf = "high" if tidy else "medium"
+                    st = storage(op)
+                    if st and letter:
+                        key, iop = st
+                        good = _sigil_ok(sigil, letter, key)
+                        out.append(dict(kind="var", proc=cid, storage=key, name=label, english=english,
+                                        confidence=conf if good else "low",
+                                        note="" if good else "sigil/type disagree with storage"))
+                        if index and iop is not None:
+                            dm = re.fullmatch(r"\s*d:([^:]+):(.+?)\s*", index)
+                            pm = re.fullmatch(r"\s*\$:(\S+?)\s*", index)
+                            am = re.fullmatch(r"\(?(arg\d+|local\d+)\)?", iop)
+                            if dm and iop.isdigit():
+                                e = re.search(r"\[d:[^:\]]*:([^\]]*)\]", en.get(text, ""))
+                                out.append(dict(kind="define", proc=cid, define=f"d:{dm[1]}:{dm[2]}", value=iop,
+                                                english=e[1].strip() if e else "", confidence="high", array=key, note=""))
+                            elif pm and am:
+                                out.append(dict(kind="param", proc=cid, storage=am[1], name=f"$:{pm[1]}",
+                                                english="", confidence="high", note="index of " + label))
+                    elif not letter and re.fullmatch(r"arg\d+|local\d+", op):
+                        out.append(dict(kind="param", proc=cid, storage=op, name=label, english=english,
+                                        confidence=conf, note=""))
+                    continue
+                m = DEFINE.search(text)
+                if m and ok and re.fullmatch(r"-?\d+", op) and not TAIL.sub("", text[m.end():]):
+                    d = f"d:{m[1]}:{m[2]}" if m[2] else f"d:{m[1]}"
+                    out.append(dict(kind="define", proc=cid, define=d, value=op,
+                                    english=_english(en.get(text, ""), "d:").split(":")[-1].strip(), confidence="high", array="", note=""))
+    return out
+
+
+def _merge(found, kind, cols, keyf, slot, name, group=lambda r: ""):
+    """CSV rows for one kind: one per distinct (slot, name), with the procs as
+    evidence, conflicts flagged, and English kept from the existing file."""
+    path = os.path.join(NAMES, kind + ".csv")
+    old = {}
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as f:
+            old = {keyf(r): r for r in csv.DictReader(f)}
+    rows_ = {}
+    for x in found:
+        r = rows_.setdefault(keyf(x), dict(x, procs=[], notes=set()))
+        r["procs"].append(x["proc"])
+        if x["note"]:
+            r["notes"].add(x["note"])
+        if RANK[x["confidence"]] < RANK[r["confidence"]]:
+            r["confidence"] = x["confidence"]
+        r["english"] = r["english"] or x["english"]
+    by_slot, by_name = {}, {}
+    for r in rows_.values():
+        by_slot.setdefault((group(r), slot(r)), set()).add(name(r))
+        by_name.setdefault((group(r), name(r)), set()).add(slot(r))
+    out = []
+    for k, r in rows_.items():
+        c, s_, n_ = [], by_slot[group(r), slot(r)], by_name[group(r), name(r)]
+        if len(s_) > 1:
+            c.append("slot also named " + ", ".join(sorted(s_ - {name(r)})))
+        if len(n_) > 1:
+            c.append("name also on " + ", ".join(sorted(n_ - {slot(r)})))
+        procs = sorted(set(r["procs"]))
+        ev = "print in " + ", ".join(f"proc_{p}" for p in procs[:6]) + (f" (+{len(procs) - 6})" if len(procs) > 6 else "")
+        if r.get("array"):
+            ev += f"; index of {r['array']}"
+        ev = "; ".join([ev] + sorted(r["notes"]))
+        row = dict(r, english=old.get(k, {}).get("english") or r["english"], conflict="; ".join(c), evidence=ev)
+        out.append({c_: row.get(c_, "") for c_ in cols})
+    return out
+
+
+def write_labels(rom):
+    found = labels(rom)
+    sk = lambda s: (s.split(":")[0], int(s.split(":")[1].split(".")[0], 16), s)  # noqa: E731
+    specs = [
+        ("var", VAR_COLS, lambda r: (r["storage"], r["name"]), lambda r: r["storage"], lambda r: r["name"],
+         lambda r: (sk(r["storage"]), r["name"])),
+        ("define", DEFINE_COLS, lambda r: (r["define"], r["value"]), lambda r: r["define"], lambda r: r["value"],
+         lambda r: (r["define"], int(r["value"])), lambda r: r["define"].rsplit(":", 1)[0]),
+        ("param", PARAM_COLS, lambda r: (str(r["proc"]), r["storage"], r["name"]),
+         lambda r: r["storage"], lambda r: r["name"],
+         lambda r: (int(r["proc"]), r["storage"], r["name"]), lambda r: str(r["proc"])),
+    ]
+    for kind, cols, keyf, slot, name, order, *group in specs:
+        rows_ = sorted(_merge([x for x in found if x["kind"] == kind], kind, cols, keyf, slot, name, *group), key=order)
+        with open(os.path.join(NAMES, kind + ".csv"), "w", encoding="utf-8", newline="") as f:
+            w = csv.DictWriter(f, cols, lineterminator="\n")
+            w.writeheader()
+            w.writerows(rows_)
+        print(f"{kind}.csv: {len(rows_)} rows")
+
+
+def _table(kind):
+    try:
+        with open(os.path.join(NAMES, kind + ".csv"), encoding="utf-8") as f:
+            return list(csv.DictReader(f))
+    except OSError:
+        return []
+
+
+@functools.lru_cache(None)
+def var_names():
+    """{storage key: preferred var row} (gcl/names/var.csv)."""
+    out = {}
+    for r in sorted(_table("var"), key=lambda r: RANK.get(r["confidence"], 3)):
+        out.setdefault(r["storage"], r)
+    return out
+
+
+@functools.lru_cache(None)
+def param_names():
+    """{(proc call id, argN/localN): preferred row} (gcl/names/param.csv)."""
+    out = {}
+    for r in sorted(_table("param"), key=lambda r: RANK.get(r["confidence"], 3)):
+        out.setdefault((int(r["proc"]), r["storage"]), r)
+    return out
+
+
+@functools.lru_cache(None)
+def index_defines():
+    """{(array storage key, value): [(define, {procs whose prints use it})]}
+    from the index defines in gcl/names/define.csv."""
+    out = {}
+    for r in _table("define"):
+        m = re.search(r"index of (\S+)", r["evidence"])
+        if m:
+            procs = {int(p) for p in re.findall(r"proc_(\d+)", r["evidence"])}
+            out.setdefault((m[1], r["value"]), []).append((r["define"], procs))
+    return out
+
+
+def index_define(key, value, cid):
+    """The define that names index value of array key in procedure cid: the
+    one its prints use, else the only one; None when unknown or ambiguous."""
+    ds = index_defines().get((key, value), [])
+    here = [d for d, procs in ds if cid in procs]
+    return here[0] if len(here) == 1 else ds[0][0] if len(ds) == 1 else None
+
 def main():
     cmd, args = (sys.argv[1], sys.argv[2:]) if len(sys.argv) > 1 else ("check", [])
     if cmd == "hash":
@@ -152,7 +361,13 @@ def main():
     from romlib import load_rom
     rom = load_rom()
     words_ = corpus(rom)
-    if cmd == "find":
+    if cmd == "labels":
+        if "--write" in args:
+            write_labels(rom)
+        else:
+            for x in labels(rom):
+                print("\t".join(str(x.get(k, "")) for k in ("kind", "proc", "storage", "define", "name", "value", "confidence", "english")))
+    elif cmd == "find":
         want = {int(a, 16) for a in args}
         for w, src in sorted(words_.items()):
             if strhash(w) in want:
