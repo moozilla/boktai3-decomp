@@ -649,11 +649,33 @@ async function renderStage(st, palHash) {
   const tileAt = own ? (t => t < m.ntiles ? [m.b, m.tiles + t * 32] : null) : (tilesetOffsets(st.tileset) || (() => null));
   const p = palettes.find(x => x.hash === palHash), cols = p ? palColors(p) : colorsNow();
   const W = Math.max(...m.ents.map(e => e.w)), H = Math.max(...m.ents.map(e => e.h));
-  const img = new ImageData(W * 16, H * 16);
-  for (let k = m.ents.length - 1; k >= 0; k--) renderMP(m, m.ents[k], tileAt, cols, false, img);
-  // colour 0 is the backdrop: make it transparent so rooms can overlap cleanly
+  const img = new ImageData(W * 16, H * 16), layers = [];
+  for (let k = m.ents.length - 1; k >= 0; k--) layers.push({ ent: m.ents[k], cells: renderMP(m, m.ents[k], tileAt, cols, false, img).cells });
+  // transparent: colour 0, and the backdrop: the few metatiles that fill each
+  // layer's border (the sea around an island, a dithered void), cleared where
+  // they connect to the border, so rooms can overlap without hiding each other
+  const backdrop = layers.map(({ ent, cells }) => {
+    const c = new Map(); let n = 0;
+    const see = (x, y) => { const v = cells[y * ent.w + x]; c.set(v, (c.get(v) || 0) + 1); n++; };
+    for (let x = 0; x < ent.w; x++) { see(x, 0); see(x, ent.h - 1); }
+    for (let y = 1; y < ent.h - 1; y++) { see(0, y); see(ent.w - 1, y); }
+    const set = new Set(); let cum = 0;
+    for (const [v, k] of [...c.entries()].sort((p, q) => q[1] - p[1])) { if (k < n * 0.05 || cum >= n * 0.9) break; set.add(v); cum += k; }
+    return cum >= n * 0.6 ? set : new Set();
+  });
+  const isBack = (cx, cy) => layers.every(({ ent, cells }, li) => cx >= ent.w || cy >= ent.h || cells[cy * ent.w + cx] >= m.nmeta || backdrop[li].has(cells[cy * ent.w + cx]));
   const [R0, G0, B0] = cols[0], d = img.data;
   for (let k = 0; k < d.length; k += 4) if (d[k] === R0 && d[k + 1] === G0 && d[k + 2] === B0) d[k + 3] = 0;
+  const seen = new Uint8Array(W * H), q = [];
+  for (let x = 0; x < W; x++) q.push([x, 0], [x, H - 1]);
+  for (let y = 0; y < H; y++) q.push([0, y], [W - 1, y]);
+  while (q.length) {
+    const [cx, cy] = q.pop();
+    if (cx < 0 || cy < 0 || cx >= W || cy >= H || seen[cy * W + cx] || !isBack(cx, cy)) continue;
+    seen[cy * W + cx] = 1;
+    for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) d[((cy * 16 + y) * W * 16 + cx * 16 + x) * 4 + 3] = 0;
+    q.push([cx + 1, cy], [cx - 1, cy], [cx, cy + 1], [cx, cy - 1]);
+  }
   return toCanvas(img, 1);
 }
 let areasData = null;
@@ -673,7 +695,15 @@ views.dungeon = {
       <div class="controls">Zoom <select id="dz"><option>0.25</option><option selected>0.5</option><option>1</option></select> <label><input type="checkbox" id="dlab" checked> room labels</label> <span id="dstat" class="meta">rendering…</span></div>
       <div id="dbox" style="position:relative;overflow:auto;max-height:calc(100vh - 190px);border:1px solid var(--line);border-radius:8px;background:#111"></div>`;
     const hps = {}, canv = {};
-    await Promise.all(rooms.map(async r => { hps[r.scene] = await loadHP(r.stage.hp); canv[r.scene] = await renderStage(r.stage, r.palette); }));
+    let done = 0, next = 0;  // four at a time: a burst of requests drops sockets
+    const worker = async () => {
+      while (next < rooms.length) {
+        const r = rooms[next++];
+        hps[r.scene] = await loadHP(r.stage.hp).catch(() => null); canv[r.scene] = await renderStage(r.stage, r.palette);
+        $('dstat').textContent = `rendering ${++done}/${rooms.length}…`;
+      }
+    };
+    await Promise.all([worker(), worker(), worker(), worker()]);
     const pos = {}, misfit = [];
     const placeFrom = start => {
       pos[start] ||= [0, 0];
