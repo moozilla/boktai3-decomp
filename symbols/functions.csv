@@ -1925,6 +1925,7 @@ addr,name,mode,confidence,source,notes
 081BFF88,Storage_Create,thumb,medium,gcl-name,name from GCL key E02E 倉庫 (Storage); registry callback
 081C0BD4,SceneActorManager_Exists,thumb,low,src-alias,
 081C4080,RegistryF3E4_Create,thumb,low,src-alias,
+081CE1BC,SceneCharacter_PlaceFromScript,thumb,low,src-alias,
 081D0C04,SceneNpc_CreateFromScript,thumb,low,src-alias,
 081D0F28,SceneNpc_CommandFromScript,thumb,low,src-alias,
 081D105C,SceneNpc_StopFromScript,thumb,low,src-alias,
