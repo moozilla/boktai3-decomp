@@ -1,7 +1,7 @@
 key,name,english,confidence,evidence
-05A5,ボク,Bok?,low,hash only (text#2171); loads the ghoul sprite 9247 (GHOUL/ZOMBIE in the monster list)
+05A5,ボク,Bok,high,loads the ghoul sprite 9247; ボク is the ghoul family's Japanese name (reviewed by hand)
 0AD8,センチピード,Centipede,medium,monster list CENTIPEDE (text#9851)
-0B50,棺桶,Coffin,medium,hash (text#1086); created by chara in 2 procedures
+0B50,棺桶,Coffin,high,"the callback is TetherActor (a chained, dragged object): Django drags coffins on a chain"
 15DE,ゲームスタート,Game Start,medium,hash (text#2460); shares sprites E2AB/530D with Options and Results
 1C82,リザルト,Results,medium,hash (text#9428); shares sprites E2AB/530D with Options and Game Start
 1E93,ラタトスク,Ratatosk,medium,boss name (text#9919); unique sprite FB81
@@ -11,8 +11,8 @@ key,name,english,confidence,evidence
 34EA,魔物図鑑,Monster Book,medium,hash (text#3531); 鍛冶図鑑 (text#3532) hits 7CA2 too
 3D38,ドラゴンパピー,Dragon Puppy,medium,monster list DRAGON PUPPY (text#9841); sprite 7E7D shared with Ooze/Screamer/Poison Hand
 3F99,オクトパス,Octopus,medium,monster list OCTOPUS (text#9857)
-4631,ガン・デル・ヘル,Gun Del Hell,medium,hash (Sabata's gun)
-4E69,デモマネージャ,Demo Manager,medium,hash; callback SceneMessages_Create (scene/cutscene messages)
+4631,ガン・デル・ヘル,Gun Del Hell,low,"hash only; GunDelHell_Create is a flag-and-call routine used from the first dungeon on, so likely a collision (reviewed by hand)"
+4E69,デモマネージャ,Demo Manager,high,callback SceneMessages_Create runs cutscene (demo) messages (reviewed by hand)
 5734,コウモリカーテン,Bat Curtain,medium,printed in proc_3252 ('コウモリカーテン破壊')
 6913,マミー,Mummy,high,loads sprite 48DE (the mummy family)
 744F,武器屋,Weapon Shop,medium,hash (text#3264)
@@ -40,7 +40,7 @@ CCD3,ゴースト,Ghost,high,loads sprite D637 (the hooded ghost/wraith family)
 D972,ヴァンパイア,Vampire,medium,hash; sprite 1C1B shared with Hresvelgr
 DA0E,ウーズ,Ooze,medium,monster list WALL/FLOOR OOZE (text#9904)
 DB8D,ソード,Sword,medium,monster list SWORD (text#9886)
-DC21,太陽スタンド,Solar Stand,medium,hash (text#5134)
+DC21,太陽スタンド,Solar Stand,high,"the callback is ResourceStation_CreateFromScript, a solar station"
 DFDC,ヴォーン,Vorn,medium,monster list VORN (text#9864); loads the black winged sprite 3DB6
 E02E,倉庫,Storage,medium,hash (text#4227); callback 081BFF88 beside Solar Bank and Dark Loan
 E043,アーマー,Armor,medium,monster list ARMOR (text#9867); created in 13 procedures

@@ -77,20 +77,22 @@ body.embed main { grid-template-columns: 1fr; }
 // cross-referenced by tools/assets/actors.py). Procedures carry the numbers
 // calls use, one above the headers gcx.py prints.
 studioHeader();
-let P = [], byId = {}, scenes = {}, actorsBy = {}, keyOfName = {}, sel = null, shown = 300;
+let P = [], byId = {}, scenes = {}, actorsBy = {}, keyOfName = {}, callees = {}, procNames = {}, procOfName = {}, sel = null, shown = 300, lastD = null;
+let readable = true;
+try { readable = localStorage.getItem('scripts.readable') !== '0'; } catch (e) {}
 
 const label = p => noteOf('script', p.id)?.label;
 function renderList() {
   const q = $('q').value.trim().toUpperCase(), fs = $('fscene').checked, fa = $('fspawn').checked, ft = $('ftext').checked;
   const hits = P.filter(p => (!fs || p.scene) && (!fa || p.spawns) && (!ft || p.texts || p.prints) &&
-    (!q || String(p.id) === q || [label(p), ...p.keys, ...p.keys.map(k => noteOf('actor', k)?.label)].some(x => (x || '').toUpperCase().includes(q)) || String(p.id).startsWith(q)));
+    (!q || String(p.id) === q || [label(p), procNames[p.id], ...p.keys, ...p.keys.map(k => noteOf('actor', k)?.label)].some(x => (x || '').toUpperCase().includes(q)) || String(p.id).startsWith(q)));
   const at = hits.findIndex(p => p.id === sel);
   if (at >= shown) shown = at + 50;
   $('count').textContent = `${hits.length} of ${P.length} procedures`;
   $('list').replaceChildren(...hits.slice(0, shown).map(p => {
     const d = document.createElement('div'); d.className = 'row' + (p.id === sel ? ' on' : ''); d.dataset.id = p.id;
     const sc = scenes[p.id];
-    d.innerHTML = `<b>proc ${p.id}</b>${p.scene ? '<span class="tag">scene</span>' : ''}<span class="lab"></span><small>${[
+    d.innerHTML = `<b>proc ${p.id}${procNames[p.id] ? ' ' + esc(procNames[p.id]) : ''}</b>${p.scene ? '<span class="tag">scene</span>' : ''}<span class="lab"></span><small>${[
       `${p.n} lines`, p.callers ? `${p.callers} callers` : 'no callers', p.scenes && !p.scene ? `${p.scenes} scenes` : '',
       p.spawns ? `${p.spawns} actors` : '', p.texts + p.prints ? `${p.texts + p.prints} strings` : '', p.scene && sc?.map ? 'map ' + sc.map : ''].filter(Boolean).join(' · ')}</small>`;
     d.querySelector('.lab').textContent = label(p) || '';
@@ -121,6 +123,24 @@ function linkLine(ln) {
     });
 }
 
+// one line of the readable view (tools/assets/gclview.py)
+function linkReadable(ln) {
+  const code = ln.split('  # ')[0], note = ln.slice(code.length);
+  const c = esc(code)
+    .replace(/^(\s*)(#.*)$/, '$1<span class="cmt">$2</span>')
+    .replace(/\b(if|elif|else|match|case|return|spawn|and|or|not|pass)\b(?![^<]*<\/span>)/g, '<span class="kw">$1</span>')
+    .replace(/\bproc_(\d+)\(/g, (m, n) => byId[n] ? `<a href="#${n}">proc_${n}</a>(` : m)
+    .replace(/\b([A-Za-z_]\w*)\(/g, (m, n) => procOfName[n] ? `<a href="#${procOfName[n]}" title="proc ${procOfName[n]}">${n}</a>(`
+      : callees[n] ? `<span title="${esc(actorName(callees[n]))}">${actorLink(callees[n], n)}</span>(` : m)
+    .replace(/\btext\((\d+)\)/g, (m, n) => 'text(' + stringLink(n, n) + ')');
+  return c + (note ? `<span class="cmt">${esc(note)}</span>` : '');
+}
+
+function renderBody(d) {
+  const box = $('body'); if (!box) return;
+  box.innerHTML = readable && d.readable?.length ? d.readable.map(linkReadable).join('\n') : d.lines.map(linkLine).join('\n');
+}
+
 async function show(id) {
   sel = id;
   if (P.length) renderList();
@@ -132,7 +152,8 @@ async function show(id) {
   const sc = scenes[id];
   const spawns = {};
   for (const s of d.spawns) (spawns[s.key] ||= { ...s, n: 0, args: [] }).n++, s.arg && spawns[s.key].args.push(s.arg);
-  v.innerHTML = `<h2>Procedure ${id}${d.scene ? ' · scene entry' : ''}</h2>
+  lastD = d;
+  v.innerHTML = `<h2>Procedure ${id}${procNames[id] ? ' · <code>' + esc(procNames[id]) + '</code>' : ''}${d.scene ? ' · scene entry' : ''}</h2>
     <div class="meta">flag ${d.flag} · ${d.lines.length} lines · printed as <code>proc ${id - 1}</code> by <code>gcx.py dis</code>${d.scene && sc?.map ? ` · loads map ${peekLink(gfxHref('map', sc.map), esc(noteOf('map', sc.map)?.label || sc.map))}` : ''}${d.scene && sc?.shot ? ' · ' + peekLink('/captures#scene_' + String(id).padStart(4, '0'), 'stage survey capture') : ''}</div>
     <div id="ned"></div>
     <h3>Called by (${d.callers.length})</h3>${d.callers.length ? `<div class="chips">${d.callers.map(c => `<span class="chip"><a href="#${c}">proc ${c}</a></span>`).join('')}</div>`
@@ -143,7 +164,11 @@ async function show(id) {
     ${d.spawns.length ? `<h3>Creates actors</h3><table><tr><th>Key</th><th>Actor</th><th>Callback</th><th>Command</th></tr>${Object.values(spawns).map(s => `<tr><td>${actorLink(s.key)}</td><td>${esc(actorName(s.key))}</td><td>${s.callback ? codeLink(s.callback, s.name) : '?'}</td><td class="meta">${s.cmd}${s.n > 1 ? ' ×' + s.n : ''}${s.args.length ? ' (' + esc([...new Set(s.args)].slice(0, 6).join(', ')) + ')' : ''}</td></tr>`).join('')}</table>` : ''}
     ${d.texts.length ? `<h3>Strings</h3><table>${d.texts.map(t => t.data ? `<tr><td>#${t.id}</td><td class="meta">a data record in the text bank, not text</td></tr>` : `<tr><td>${stringLink(t.id)}</td><td>${esc(t.jp)}</td></tr>`).join('')}</table>` : ''}
     ${d.prints.length ? `<h3>Debug prints</h3><div class="meta" style="margin-bottom:6px">Developer messages; <code>print</code> outputs nothing in this ROM (0821B858). English from gcl/prints.csv.</div><table>${d.prints.map(t => `<tr><td>${esc(t.text)}</td><td class="meta">${esc(t.en)}</td></tr>`).join('')}</table>` : ''}
-    <h3>Body</h3><pre>${d.lines.map(linkLine).join('\n')}</pre>`;
+    <h3>Body <label class="chk" style="text-transform:none;letter-spacing:0;font-weight:400;margin-left:8px"><input type="checkbox" id="readable"${readable ? ' checked' : ''}> readable</label></h3>
+    <div class="meta" style="margin-bottom:6px">${readable ? 'Readable view (tools/assets/gclview.py): English names, named arguments; debug prints as # log comments. Untick for GCL as compiled (gcx.py).' : 'GCL as compiled, Konami-style (tools/assets/gcx.py).'}</div>
+    <pre id="body"></pre>`;
+  renderBody(d);
+  $('readable').onchange = e => { readable = e.target.checked; try { localStorage.setItem('scripts.readable', readable ? '1' : '0'); } catch (x) {} show(id); };
   $('ned').replaceWith(noteEditor('script', id, renderList));
 }
 
@@ -155,6 +180,8 @@ window.onhashchange = () => { const n = parseInt(location.hash.slice(1)); if (n 
   await loadNotes();
   const [d, a] = await Promise.all([fetch('/api/procs').then(r => r.json()), fetch('/api/actors').then(r => r.json())]);
   P = d.procs; scenes = d.scenes; byId = Object.fromEntries(P.map(p => [p.id, p]));
+  callees = d.callees || {}; procOfName = d.procnames || {};
+  procNames = Object.fromEntries(Object.entries(procOfName).map(([n, i]) => [i, n]));
   actorsBy = Object.fromEntries(a.actors.map(x => [x.key, x]));
   keyOfName = Object.fromEntries(a.actors.filter(x => x.gcl.length).map(x => [x.gcl[0].name, x.key]));
   renderList();
