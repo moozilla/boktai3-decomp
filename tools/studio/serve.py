@@ -275,7 +275,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, {"actors": actors.actors(), "enemies": actors.name_list(*actors.ENEMY_NAMES),
                             "characters": actors.name_list(*actors.CHARACTER_NAMES), "scenes": scene_info()})
         elif self.path == "/api/procs":
-            self.send(200, {"procs": actors.proc_list(), "scenes": scene_info()})
+            import gclview
+            self.send(200, {"procs": actors.proc_list(), "scenes": scene_info(), "callees": gclview.callee_names(),
+                            "procnames": {r["name"]: int(p) for p, r in gclview.Names().procs.items()}})
         elif self.path.startswith("/api/proc/"):
             d = actors.proc_detail(int(os.path.basename(self.path)))
             self.send(200 if d else 404, d or {"error": "no such procedure"})

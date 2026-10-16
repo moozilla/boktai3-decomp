@@ -262,6 +262,11 @@ def name_list(first, count):
 
 # ---------- scripts ----------
 @cached
+def image():
+    return gcx.Image(load_rom())
+
+
+@cached
 def procs():
     """{call id: {"lines", "calls", "spawns", "texts", "prints", "loads", "scene"}}."""
     img = gcx.Image(load_rom())
@@ -343,8 +348,10 @@ def proc_detail(cid):
     b, reg = bank(), registry()
     st = scene_stages()
     scenes = proc_scenes().get(cid, [])
+    import gclview
     en = gclnames.prints()
-    return dict(p, id=cid, callers=proc_callers().get(cid, []), prints=[{"text": t, "en": en.get(t, "")} for t in p["prints"]], scenes=[{"scene": s, "map": st.get(s)} for s in scenes],
+    readable = gclview.render(image(), cid) or []
+    return dict(p, id=cid, callers=proc_callers().get(cid, []), prints=[{"text": t, "en": en.get(t, "")} for t in p["prints"]], readable=readable, scenes=[{"scene": s, "map": st.get(s)} for s in scenes],
                 texts=[{"id": t, "jp": b.get(t) or "", "data": t in b and b[t] is None} for t in sorted(set(p["texts"]))],
                 spawns=[dict(s, callback=reg.get(s["key"], {}).get("callback"), name=reg.get(s["key"], {}).get("name"))
                         for s in p["spawns"]])
