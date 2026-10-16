@@ -1,0 +1,8 @@
+owner,letter,name,english,evidence
+trap,m,event,event,"08225624: one value, default 0DD2; '？' (14C9) and '＊' (1516) are EUC-JP wildcards"
+trap,e,exec,run block,"08225624: block run when the trap fires (stored with the trap, slot +0x24)"
+trap,p,proc,run procedure,"08225624: procedure id in the -e slot, flag 0x20; the alternative to -e"
+trap,s,names,names,"08225624: up to four values (sub_0821AA00); scripts pass block names here"
+trap,b,b,,"08225624: one value, sets flag 0x10"
+load,n,fade,,"08225508: absent or 0 adds request flag 0x10 (docs/ENGINE.md, Scenes)"
+1C64,r,text,text,"08030D9C: a text# string, else the block at the cursor; passed to sub_08030C84 (message window)"

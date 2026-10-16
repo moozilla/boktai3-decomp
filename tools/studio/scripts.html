@@ -115,7 +115,7 @@ function linkLine(ln) {
     .replace(/\bproc_(\d+)/g, (m, n) => byId[n] ? `<a href="#${n}">${m}</a>` : m)
     .replace(/text#(\d+)/g, (m, n) => stringLink(n, m))
     .replace(/(<span class="kw">load<\/span> )(0x[0-9a-f]+|\d+)/g, (m, a, n) => `${a}<a href="#${parseInt(n)}">${n}</a>`)
-    .replace(/(<span class="kw">(?:chara|command)<\/span> )(0x[0-9a-f]+|[^\s<]+)/g, (m, a, k) => {
+    .replace(/(<span class="kw">(?:chara|command)<\/span> |<span class="kw">trap<\/span> \S+ )(0x[0-9a-f]+|[^\s<]+)/g, (m, a, k) => {
       const key = k.startsWith('0x') ? parseInt(k, 16).toString(16).toUpperCase().padStart(4, '0') : keyOfName[k];
       return key ? `${a}<span title="${esc(actorName(key))}">${actorLink(key, k)}</span>` : m;
     });
