@@ -1,0 +1,77 @@
+area,place,story_order,confidence,evidence,source
+0,San Miguel hub / town and service menus,3,medium,"Scene 2569 contains shop, bike, repair and item strings; it is the hub reached after the opening dungeon.","Devis0r §§5.03 San Miguel, 8.01 Maps; GX01 §San Miguel; TaiyouWiki Locations"
+1,Sealed Prison (opening tutorial dungeon),1,high,"Otenko tutorial strings cover movement, skylight, blocks, switches, spiderwebs and dark seals; escape scene 2823 returns to hub. Labeled local guide maps cover 1F through B4F.",GX01 §Sealed Prison; local Darth Nemesis sealed_prison.html + map_sp_*; Devis0r §5.02 Cemetary
+2,Unidentified / unused room,0,low,"Single isolated scene, no doors, no translated strings or story markers in area record.",areas/area_02.md; no guide match
+3,Lifeless Town,4,high,"Scene 2961 says undead are in the city; townspeople, Trinity, rescued child, keys, Dark Trance, Solar Barrier and Count boss align with the Lifeless Town chapter.",GX01 §Lifeless Town; local Darth Nemesis lifeless_town.html + maps; Devis0r §5.04 Town
+4,Ancient Tree (entrance and lower floors),5,high,"Scene 3363 identifies a giant tree; kidnapped Trinity and golem/ivy tutorials, followed by map-specific tree puzzles. Labeled local guide maps span 1F–6F.",GX01 §Ancient Tree; local Darth Nemesis ancient_tree.html + maps; Devis0r §5.05 Tree
+5,Ancient Tree (slime/puzzle rooms),5,medium,Connected to the tree route; room text teaches purple slime and includes a starting-over puzzle chest.,GX01 §Ancient Tree; local Darth Nemesis Ancient Tree floor maps
+6,Ancient Tree (lower-floor passages and scene event),5,medium,"Connects to areas 12, 18 and 19 in the same tree branch; scene/event rooms interrupt the traversal.",GX01 §Ancient Tree; local Darth Nemesis Ancient Tree floor maps
+7,Ancient Tree (moving-floor passage),5,medium,"Only room marker is [Moving Floors], matching the Ancient Tree traversal sequence.",GX01 §Ancient Tree; local Darth Nemesis Ancient Tree floor maps
+8,Ancient Tree (crest-block passage),5,medium,Crest Blocks tutorial and same tree-area connections identify this as a tree puzzle route.,GX01 §Ancient Tree; local Darth Nemesis Ancient Tree floor maps
+9,Ancient Tree (solar-floor room),5,medium,Solar Floors tutorial and moving-floor debug output; connected with area 21 tree branch.,GX01 §Ancient Tree; local Darth Nemesis Ancient Tree floor maps
+10,Ancient Tree (candle-switch room),5,medium,Candle stand/two-candle shutter flags and door graph place this in the tree dungeon.,GX01 §Ancient Tree; local Darth Nemesis Ancient Tree floor maps
+11,Ancient Tree (treasure room),5,medium,Two treasures tutorial in the tree branch.,GX01 §Ancient Tree; local Darth Nemesis Ancient Tree floor maps
+12,Ancient Tree (golem and Trinity rescue route),5,medium,Golem tutorial and Trinity-in-danger scene strings identify a tree side branch.,GX01 §Ancient Tree; local Darth Nemesis Ancient Tree floor maps
+13,Ancient Tree (unidentified side room),5,low,Connected through the tree-area graph; no scene-specific story text.,GX01 §Ancient Tree; local Darth Nemesis Ancient Tree floor maps
+14,Ancient Tree (side room),5,low,Door-connected to the tree route; same map hash family as the upper tree rooms.,GX01 §Ancient Tree; local Darth Nemesis Ancient Tree floor maps
+15,Ancient Tree (side room),5,low,Door-connected to the tree route; same map hash family as the upper tree rooms.,GX01 §Ancient Tree; local Darth Nemesis Ancient Tree floor maps
+16,Ancient Tree (side room),5,low,Door-connected to the tree route; nearby area 4 tree passages.,GX01 §Ancient Tree; local Darth Nemesis Ancient Tree floor maps
+17,Ancient Tree (side room),5,low,Door-connected to the tree route; nearby area 4 tree passages.,GX01 §Ancient Tree; local Darth Nemesis Ancient Tree floor maps
+18,Ancient Tree (side room),5,low,Door-connected to the tree route; nearby areas 4 and 8.,GX01 §Ancient Tree; local Darth Nemesis Ancient Tree floor maps
+19,Ancient Tree (tentacle event room),5,medium,Tentacle body encounter/event and area links match Ancient Tree passages.,GX01 §Ancient Tree; local Darth Nemesis Ancient Tree floor maps
+20,Ancient Tree (beehive passage),5,medium,Tutorial identifies beehive; door links tree rooms.,GX01 §Ancient Tree; local Darth Nemesis Ancient Tree floor maps
+21,Ancient Tree (candle puzzle / final-floor route),5,medium,Candle shutter puzzle and connected moving-floor passages match the final Tree route before the Wyvern.,GX01 §Ancient Tree; local Darth Nemesis Ancient Tree floor maps
+22,Ancient Tree optional challenge / Black Knight encounter,5,medium,Black Knight dialogue offers a challenge/reward; linked from the tree route.,GX01 §Ancient Tree; local Darth Nemesis Ancient Tree floor maps
+23,Ancient Tree (side rooms),5,low,Connected back to tree route; no unique room text in area record.,GX01 §Ancient Tree; local Darth Nemesis Ancient Tree floor maps
+24,Ancient Tree (side room),5,low,Connected back to tree route; no unique room text in area record.,GX01 §Ancient Tree; local Darth Nemesis Ancient Tree floor maps
+25,Ancient Tree (puddle and solar-wind rooms),5,medium,Tutorials explicitly name puddles and solar wind; area connects to the Tree route.,GX01 §Ancient Tree; local Darth Nemesis Ancient Tree floor maps
+26,White Forest,6,high,"Frost/ice puzzles, frost enemies, Carmilla encounters and Sabata battle match the chapter; local guide labels White Forest A/B maps.",GX01 §White Forest; local Darth Nemesis white_forest.html + maps; TaiyouWiki Locations
+27,White Forest (Sabata/story event),6,medium,Trinity/Sabata dialogue is the White Forest confrontation sequence.,GX01 §White Forest; local Darth Nemesis white_forest.html
+28,White Forest (ice puzzle variant),6,medium,Ice Block tutorial with shutter demo; linked to area 26.,GX01 §White Forest; local Darth Nemesis white_forest.html + maps
+29,Pirate Island,7,high,"Scene 4359 names Pirate Island and asks for a ship; route contains ship decks, keys, cannon puzzles and Nidhoggr.",GX01 §Pirate Island; local monsters/items guide; TaiyouWiki Locations
+30,Pirate Island (ship route and Nidhoggr event),7,high,Scene text finds a third ship; scene 4868 names Nidhoggr/Giant Iron Dragon and shows Trinity rescue.,GX01 §Pirate Island; TaiyouWiki Locations
+31,Pirate Island (ship room),7,medium,Isolated link from Pirate Island sequence; scene range follows ship progression.,GX01 §Pirate Island; areas/area_31.md
+32,Pirate Island (ship room),7,low,Isolated room in the Pirate Island scene sequence; no unique translated text.,GX01 §Pirate Island; areas/area_32.md
+33,Pirate Island (ship room),7,low,Isolated room in the Pirate Island scene sequence; no unique translated text.,GX01 §Pirate Island; areas/area_33.md
+34,Pirate Island (ship room),7,low,Isolated room in the Pirate Island scene sequence; no unique translated text.,GX01 §Pirate Island; areas/area_34.md
+35,Dark Castle A (elevator and B12F route),8,high,Elevator scene explicitly references sealed top floor and floor changes; map A/elemental warp structure matches Dark Castle A.,"GX01 §Dark Castle, parts A–C; TaiyouWiki Locations"
+36,Dark Castle A (elemental warp passage),8,medium,Dark Castle A uses four elemental warps; shutters and locked paths are consistent with that traversal.,GX01 §Dark Castle A
+37,Dark Castle A (moving-floor puzzle route),8,medium,Moving-floor route and Dark Castle elevator story markers.,GX01 §Dark Castle A
+38,Dark Castle A (frost/flame cube puzzle),8,high,"Frost and Flame crest blocks, element cube flags and ice puzzle debug identify the elemental warp puzzle.",GX01 §Dark Castle A
+39,Dark Castle A (Johnny labyrinth),8,high,"Johnny, Blackbeard Brothers and labyrinth-clearing strings identify this special puzzle room in the castle route.",GX01 §Dark Castle A
+40,Dark Castle A (side room),8,low,Connected to Dark Castle elevator chain; no unique scene text.,GX01 §Dark Castle A
+41,Dark Castle A (elevator),8,high,Scene explicitly discusses the sealed top-floor elevator and moving between floors.,GX01 §Dark Castle A
+42,Dark Castle A (side rooms),8,low,Connected to the Dark Castle A elevator route; no unique room text.,GX01 §Dark Castle A
+43,Dark Castle A (elevator),8,high,Scene explicitly discusses the sealed top-floor elevator and moving between floors.,GX01 §Dark Castle A
+44,Dark Castle A (side room),8,low,Connected to the Dark Castle A elevator route; no unique room text.,GX01 §Dark Castle A
+45,Dark Castle A (side rooms),8,low,Connected to the Dark Castle A route; local scene sequence aligns with the dungeon.,GX01 §Dark Castle A
+46,Dark Castle A (elevator),8,high,Scene explicitly discusses the sealed top-floor elevator and moving between floors.,GX01 §Dark Castle A
+47,Dark Castle B (seasonal puzzle and Vorn rooms),9,high,"Season selector, four-season hint panels and seasonal elemental layout match Dark Castle B.",GX01 §Dark Castle B
+48,Dark Castle B (side rooms),9,low,"Door-connected side rooms in the castle route, no unique strings.",GX01 §Dark Castle B
+49,Dark Castle B (elemental cube rooms),9,medium,Switches between Cloud/Earth elements and Solar Root state; elemental room structure matches Dark Castle B.,GX01 §Dark Castle B
+50,Dark Castle B (elemental cube rooms),9,medium,Elemental cube and Solar Root flags; connected to area 47 castle B route.,GX01 §Dark Castle B
+51,Dark Castle B (Blackbeard Brothers weight quiz),9,high,Three ghosts name the Blackbeard Brothers; debug strings explicitly track weight quiz questions and rock/box scales.,GX01 §Dark Castle B
+52,Dark Castle B (Johnny and hint rooms),9,medium,Johnny and ghost hint dialogues link to the Blackbeard/seasonal puzzle sequence.,GX01 §Dark Castle B
+53,Dark Castle (Ratatosk final approach),10,medium,"Directly connects to area 61, which summons the Pile Driver and begins Ratatosk boss dialogue.","GX01 §Dark Castle, Ratatosk fight; areas/area_53.md"
+54,Dark Castle (Ratatosk final approach),10,medium,Door-linked to final approach area 63 and area 35 elevator; this is the late castle encounter branch.,GX01 §Dark Castle
+55,Dark Castle (final approach numeric puzzle),10,medium,Room explicitly displays puzzle number 8; connects to area 64 in the final castle approach.,GX01 §Dark Castle
+56,Dark Castle (final approach),10,low,Connected to numbered puzzle branches leading into final approach.,GX01 §Dark Castle
+57,Dark Castle (final approach numeric puzzle),10,medium,Room explicitly displays puzzle number 13; connects to area 65.,GX01 §Dark Castle
+58,Dark Castle (final approach),10,low,Connected to numbered puzzle branches leading into final approach.,GX01 §Dark Castle
+59,Dark Castle (final approach numeric puzzle),10,medium,Room explicitly displays puzzle number 3; connects to area 63.,GX01 §Dark Castle
+60,Dark Castle (Ratatosk boss arena and route),10,high,Scene 5952 summons the Pile Driver and begins Ratatosk’s boss sequence during a lunar eclipse.,"GX01 §Dark Castle, Immortal Ratatosk"
+61,Dark Castle (Pile Driver / Ratatosk boss sequence),10,high,Scene 5952 explicitly activates Pile Driver and opens Ratatosk dialogue; door graph links to the final rooms.,"GX01 §Dark Castle, Immortal Ratatosk"
+62,Dark Castle (Sabata puppet-clone event),10,high,"Scene 5934 explicitly reveals Ratatosk’s Sabata puppet clone, matching the Dark Castle climax.",GX01 §Dark Castle
+63,Dark Castle (final approach),10,low,Connected puzzle wing around rooms numbered 8 and 3.,GX01 §Dark Castle
+64,Dark Castle (final approach),10,low,Connected puzzle wing around rooms numbered 8 and 13.,GX01 §Dark Castle
+65,Dark Castle (final approach),10,low,Connected to the Ratatosk arena via area 60.,GX01 §Dark Castle
+66,Dark Castle (elevator / top-floor seal),10,high,Scene explicitly describes the sealed switch to the top floor and floor-by-floor elevator movement.,GX01 §Dark Castle
+67,"Paradise (ruined city, Sabata memories and ending)",11,high,"Phantom Sabata narrates memories of Istrakan, San Miguel and White Forest; Carmilla guides the route and the area contains ending roll strings.",GX01 §Paradise; TaiyouWiki Locations
+68,Paradise (Sabata/Carmilla epilogue),11,medium,Sabata’s epilogue dialogue with Carmilla belongs after the Paradise finale.,GX01 §Paradise
+69,Lifeless Town route transition / Count event scene,4,medium,Connects San Miguel hub to Lifeless Town; reused Count-fight and White Django awakening event strings indicate a scripted route/event transition rather than an ordinary walkable room.,"GX01 §§San Miguel, Lifeless Town; areas/area_69.md"
+70,Ancient Tree route transition / Count event scene,5,medium,Connects San Miguel hub to Ancient Tree; contains the shared Count-fight and White Django awakening event strings.,"GX01 §§San Miguel, Ancient Tree; areas/area_70.md"
+71,White Forest route transition / Count event scene,6,medium,Connects San Miguel hub to White Forest; contains shared Count-fight and White Django awakening event strings.,"GX01 §§San Miguel, White Forest; areas/area_71.md"
+72,Pirate Island route transition / Count event scene,7,medium,Connects San Miguel hub to Pirate Island; contains shared Count-fight and White Django awakening event strings.,"GX01 §§San Miguel, Pirate Island; areas/area_72.md"
+73,Arena / Black Knight challenge,13,high,Black Knight dialogue presents and resolves an optional challenge with a reward; entered from the Ancient Tree/Arena side branch.,TaiyouWiki Locations; GX01 §Miscellaneous; areas/area_73.md
+74,Menu / bike setup screen,0,high,"Contains bike color, tire and standard setup strings rather than exploration-room data.",GX01 §Controls and Menu / §New game +; areas/area_74.md
+75,Mission / challenge selection room,13,high,Offers Bronze/Silver/Gold ranks and challenge completion/debug flags; entered from hub.,GX01 §Miscellaneous; areas/area_75.md
