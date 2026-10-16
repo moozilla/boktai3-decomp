@@ -103,8 +103,9 @@ or scan the table below. Each entry has a `Tags:` line under its heading (vocabu
 | [2026-10-15.md](2026-10-15.md#L504) | October 15 continuation: attachment ownership, scene control and particle pools | actors scene inventory particles tooling | 0 |
 | [2026-10-15.md](2026-10-15.md#L550) | October 15 (Claude): stage terrain, doors and the map projection (tooling) | scripts scene assets tooling | 8 |
 | [2026-10-15.md](2026-10-15.md#L604) | October 15 (Codex/team): inventory controller, events and attachment helpers | scripts inventory animation tooling | 0 |
-| [2026-10-16.md](2026-10-16.md#L3) | October 16 (Claude): script entry points, batch 2 | scripts actors tooling | 2 |
-| [2026-10-16.md](2026-10-16.md#L11) | October 16 (Claude): script entry points, batch 1 | scripts text actors | 15 |
+| [2026-10-16.md](2026-10-16.md#L3) | October 16 (Claude): script entry points, batch 3 | scripts actors | 0 |
+| [2026-10-16.md](2026-10-16.md#L10) | October 16 (Claude): script entry points, batch 2 | scripts actors tooling | 2 |
+| [2026-10-16.md](2026-10-16.md#L18) | October 16 (Claude): script entry points, batch 1 | scripts text actors | 15 |
 | [2026-10-early-state.md](2026-10-early-state.md#L6) | Where things stood (written October 9-12; numbers superseded) | scripts actors inventory menu wireless sound hardware library assets tooling | 10 |
 | [2026-10-early-state.md](2026-10-early-state.md#L217) | Former section 2: Setting up (new machine/session) | tooling process | 0 |
 | [2026-10-early-state.md](2026-10-early-state.md#L243) | Former section 3: How to match a function (the inner loop) | tooling process | 3 |
