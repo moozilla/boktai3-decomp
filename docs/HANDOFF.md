@@ -27,7 +27,9 @@ Recent work, newest first (details in [history](history/README.md)):
   Konami GCL. `gcl/` holds recovered names (registry keys, commands,
   variables, defines, parameters, 199 procedures), the debug prints'
   translations and a worked example; the Studio's Scripts page shows a
-  readable Python-style view. See [gcl/README.md](../gcl/README.md).
+  readable Python-style view, grouped into Konami's source files (scenes,
+  library by category, shared; `tools/assets/gclfiles.py`) with single-use
+  helpers inlined on request. See [gcl/README.md](../gcl/README.md).
 * **Script decomp targets**: [tasks/script_targets.md](tasks/script_targets.md)
   ranks the native routines scripts call that are still unmatched (95 used,
   23 KB at the start). The campaign started 2026-10-16: five batches matched 50
@@ -114,7 +116,7 @@ the earlier worktree layout, ranges, merge and clone-seeding procedure are in
 | `tools/docindex.py [ADDR / --tag T]` | docs index; who wrote about an address or topic |
 | `tools/emu/harness`, `tools/mgba/` | headless mGBA scripted runs; desktop Centaur script ([CENTAUR.md](CENTAUR.md)) |
 | `tools/studio/serve.py` | the Studio: text, sprites, maps, actors, scripts, code, live view (port 8642) |
-| `tools/assets/gcx.py`, `gclview.py`, `gclnames.py`, `gcloptions.py` | scripts: Konami-style and readable views, hash names, option schemas |
+| `tools/assets/gcx.py`, `gclview.py`, `gclfiles.py`, `gclnames.py`, `gcloptions.py` | scripts: Konami-style and readable views, source files, hash names, option schemas |
 | `tools/assets/script_targets.py` | native code reachable from scripts, ranked unmatched targets |
 | `tools/assets/stages.py`, `hp.py`, `sprites.py`, `text.py` | stage scripts, terrain, sprites, text bank |
 | `tools/script_trace.py`, `tools/function_context.py`, `tools/coverage.py` | runtime evidence: script calls, screens a function runs on |

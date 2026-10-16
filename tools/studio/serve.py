@@ -280,7 +280,19 @@ class Handler(http.server.BaseHTTPRequestHandler):
                             "procnames": {r["name"]: int(p) for p, r in gclview.Names().procs.items()}})
         elif self.path.startswith("/api/proc/"):
             d = actors.proc_detail(int(os.path.basename(self.path)))
+            if d:
+                import gclfiles
+                d["file"] = gclfiles.file_of().get(d["id"])
             self.send(200 if d else 404, d or {"error": "no such procedure"})
+        elif self.path == "/api/files":
+            import gclfiles
+            self.send(200, {"files": gclfiles.files()})
+        elif self.path.startswith("/api/file/"):
+            import gclfiles
+            fid, *opts = self.path[len("/api/file/"):].split("/")  # /api/file/ID[/inline][/raw]
+            lines = gclfiles.render(fid, inline="inline" in opts, readable="raw" not in opts)
+            self.send(200 if lines is not None else 404,
+                      {"lines": lines, "inlined": sorted(gclfiles.inlinable(fid))} if lines is not None else {"error": "no such file"})
         elif self.path.startswith("/api/code/"):
             try:
                 d = actors.code_info(int(os.path.basename(self.path), 16))
@@ -328,7 +340,12 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif self.path == "/api/scenes":
             self.send(200, scene_list())
         elif self.path == "/api/learned":
-            self.send(200, {"stages": live.stage_palettes(), "sprites": live.sprite_palettes()})
+            import bigpalettes  # the code's palette for large sprites no capture has seen
+            sprites = live.sprite_palettes()
+            for k, v in bigpalettes.learned().items():
+                sprites.setdefault(k, v)
+            self.send(200, {"stages": live.stage_palettes(), "sprites": sprites,
+                            "bigpools": {f"{h:04X}": sorted(v) for h, v in bigpalettes.pools().items()}})
         elif self.path == "/api/tags":
             self.send(200, live.tags())
         elif self.path == "/api/stages":

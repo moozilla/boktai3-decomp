@@ -82,8 +82,18 @@ clears it, `sub_082172E0` finds or adds a pool entry (in r4) and returns its
 bank, reached from the draw path `08214A45` ← `08219E27` ← `08215501` ←
 actor code; an IWRAM routine around `0x03000078` does the same for other
 callers (r0 = pool entry). So a large sprite's entry is passed in by the
-actor that draws it; which actor field holds it is the next step (watch a
-run with the enemy on screen, e.g. the ghoul `9247`, pool entry 403).
+actor that draws it. The actor sets it once: `AnimData_Load(anim, hash)`
+(`082151E4`) picks the sprite and `AnimData_SelectPaletteBank(anim, entry)`
+(`08215284`) stores the pool entry in the anim (`+6`, and `+0xC` the entry's
+address, `*0x030042E4 + 32 * entry`; entries at or past `*0x030042E0` are
+ignored). `tools/assets/bigpalettes.py` pairs the two calls where both
+arguments are constants: 35 sprites, used by the Studio when no capture saw
+the sprite. One sprite can take several entries, and then each is a
+different monster or state: `7E82` is the statue (549) and the armor (551),
+and ten routines draw `7E7D` in ten entries (286, 439-453). Sprites whose
+hash comes from a table or a script option (`FloorSwitch` `T=`) are not
+found this way; their entries are also called with `0x16C`/`0x16D` by the
+floor switch (pressed and released), so palette swaps mark states too.
 
 **Items, swords and accessories** (`tools/assets/items.py` → `data/items.csv`).
 Their names are text strings at a fixed base plus the ID: items 988 + ID
@@ -377,7 +387,7 @@ leads for naming, not facts.
 | `sub_08090FEC` | `C3BC` (`sub_08091E1C`) | `B96C` | 16 | dome with an eye | スライム |
 | `sub_08094764` | `E131` (`sub_08095540`) | `9506` | 29 | small winged insect | ビー |
 | `sub_08099B44` | `CCD3` (`sub_0809ADD4`) | `D637` | 29 | hooded cloaked figure | ? |
-| `sub_0809DD78` | `680E` (`sub_0809ECC8`) | `D28E` | 42 | small ring-like | ポイズナー / パープレクサー / ポップバド? (enemy kinds 26-28, between Vorn and Bat) |
+| `sub_0809DD78` | `680E` (`sub_0809ECC8`) | `D28E` | 42 | small flame | クロロホルルン / モエルルン / ヒエルルン (Klorofolun, Burrnun, Chillun)? Enemy kinds 26-28; rendered in captured colors it is a flame, not a ring |
 | `sub_080A1440` | `9E8D` (`sub_080A2010`) | `5A6E` | 23 | black bird | クロウ / レイブン |
 | `sub_080A4AFC` | `87E4` (`sub_080A5B54`) | `528F` | 16 | spider | スパイダー |
 | `sub_080ABDCC` | `0AC7` (`sub_080ACBA8`) | `D636` | 44 | round body with tentacles | オクトパス? |

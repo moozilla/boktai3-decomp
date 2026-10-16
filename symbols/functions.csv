@@ -1849,7 +1849,7 @@ addr,name,mode,confidence,source,notes
 08095540,Bee_Create,thumb,high,gcl-name,name from GCL key E131 ビー (Bee); registry callback
 08099B44,Ghost_Init,thumb,high,gcl-name,name from GCL key CCD3 ゴースト (Ghost); loader called by Ghost_Create
 0809ADD4,Ghost_Create,thumb,high,gcl-name,name from GCL key CCD3 ゴースト (Ghost); registry callback
-0809ECC8,Flower_Create,thumb,low,gcl-behavior,registry 680E spawner for enemy kinds 26-28; the monster list's unmatched triple there is Poisoner/Perplexer/Pop Bud
+0809ECC8,Lun_Create,thumb,low,gcl-behavior,"registry 680E spawner for enemy kinds 26-28; its sprite D28E is a small flame in three variants, matching the -lun spirits クロロホルルン/モエルルン/ヒエルルン (KLOROFOLUN/BURRNUN/CHILLUN)"
 080A1440,Crow_Init,thumb,high,gcl-name,name from GCL key 9E8D クロウ (Crow); loader called by Crow_Create
 080A2010,Crow_Create,thumb,high,gcl-name,name from GCL key 9E8D クロウ (Crow); registry callback
 080A4AFC,Spider_Init,thumb,high,gcl-name,name from GCL key 87E4 スパイダー (Spider); loader called by Spider_Create
