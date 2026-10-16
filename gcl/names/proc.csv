@@ -4,6 +4,7 @@ proc,name,params,confidence,evidence
 554,scene_reset_state,,low,resets the actor manager mode and script work area (r700[0x28]..)
 557,reset_dungeon_on_entry,dungeon,low,"when entering at appearance points 1-6, clears the floor-switch, candle-stand and other per-dungeon flag arrays and runs the dungeon's own reset (procs 571-580 by gs[0x5ac])"
 558,update_elapsed_days,,low,compares the saved date r708[0xc2..0xc6] with today (r700[0x56..]); prints 日数差を取得 (got the day difference)
+860,no_callback,,high,empty procedure; passed as the default callback 494 times
 861,scene_start,flags,low,"first call of every scene entry: sets scene flags r700[0x6c] (early story, entrance ranges, stage ranges)"
 862,set_scene_flags,bits,low,r700[0x6c] |= bits
 864,scene_set_mode,mode,low,second call of every scene entry: sets gs[0x868]
@@ -88,8 +89,10 @@ proc,name,params,confidence,evidence
 1071,place_cell_gate,"name,value,x,y,z",medium,only spawns CellGate
 1072,add_area_sprite,"entries,x,z,kind",medium,AreaEffect_AddSprite at the cell centre
 1082,floor_switch_tile,"kind,x,z",medium,"compares the floor height at the four corners of a 256x256 tile and returns the plate sprite that fits the slope (families 17C7-17CB, B0A9-B0AD, B0BC/C583)"
-1083,place_floor_switch_at_point,"name,point,w,pressed,tile,on_press,on_release",low,resolves a point (proc 972) and calls place_floor_switch
-1084,place_floor_switch,"name,x,z,w,pressed,tile,on_press,on_release",high,"creates registry AB8E (floor switch) on the floor; on_press/on_release are the S callbacks, e.g. procs 3945/3946 activate and deactivate a door; a debug print labels its pressed argument $f:床スイッチフラグ (floor switch flag)"
+1083,place_floor_switch_at_point,"name,point,switch_no,pressed,tile,on_press,on_release",low,resolves a point (proc 972) and calls place_floor_switch
+1084,place_floor_switch,"name,x,z,switch_no,pressed,tile,on_press,on_release",high,"creates registry AB8E (floor switch) on the floor; on_press/on_release are the S callbacks, e.g. procs 3945/3946 activate and deactivate a door; a debug print labels its pressed argument $f:床スイッチフラグ (floor switch flag); R is (1085, 1086), which set floor_switch_flag[switch_no] and call on_press/on_release"
+1085,on_floor_switch_pressed,"name,a,b,on_press,on_release,switch_no",high,sets floor_switch_flag[switch_no] = 1 and calls on_press; the R handler of place_floor_switch
+1086,on_floor_switch_released,"name,a,b,on_press,on_release,switch_no",high,sets floor_switch_flag[switch_no] = 0 and calls on_release
 1092,place_object_at,"name,type,,x,z,dx,dz",low,proc_1093 at cell centre plus offset
 1093,place_object,"name,type,,x,z",low,sub_081B897C with a size from the type
 1094,spawn_scene_objects_manager,mode,medium,sub_0802091C: the SceneObjects task (destroy callback SceneObjects_Destroy) with the sprite runs 7ACD-7AD6
@@ -110,9 +113,9 @@ proc,name,params,confidence,evidence
 1153,direction_to_angle,direction,high,"maps directions 0-7 to angles 160,192,224,0,32,64,96,128"
 1154,actor_name_of,id,low,maps a number to a hash (name) in a 120-line table
 1155,place_character_default,"id,x,z,direction,proc",low,"place_character with w=(256, 512, 1024)"
-1156,spawn_ghost_npc,"name,x,z,facing",low,a Ghost actor (CCD3) with script state
-1165,place_floor_switch_custom,"name,w,x,z,tile,r_a,r_b,d,s,f,on_press,on_release",medium,"floor height at x,z, then spawn_floor_switch with every option"
-1166,spawn_floor_switch,"name,w,x,y,z,tile,r_a,r_b,d,s,f,on_press,on_release",medium,FloorSwitch with every option given
+1156,spawn_ghost_npc,"name,x,z,talk_proc",low,"a Ghost actor (CCD3) with script state; the 4th argument is a procedure reference (Ghost's d option), e.g. johnny_talk"
+1165,place_floor_switch_custom,"name,switch_no,x,z,tile,pressed_handler,released_handler,d,s,f,on_press,on_release",medium,"floor height at x,z, then spawn_floor_switch with every option"
+1166,spawn_floor_switch,"name,switch_no,x,y,z,tile,pressed_handler,released_handler,d,s,f,on_press,on_release",medium,FloorSwitch with every option given
 1177,spawn_particles_default,"count,x,y,z,type,a",low,spawn_particles with fixed speed and lifetime
 1178,spawn_particles,"count,x,y,z,type,a,speed,spread,life,fade",medium,only spawns AnimatedParticles
 1180,place_collision_controller,"id,type,kind,x,z,attack_a,attack_b,attack_c",low,CollisionController on the floor; type is random 0/1 when r708[0x171] == 2

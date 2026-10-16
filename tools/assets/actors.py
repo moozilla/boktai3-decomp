@@ -296,21 +296,10 @@ def procs():
 
 @cached
 def proc_scenes():
-    """{proc: sorted scenes reaching it}, and {proc: callers}."""
-    ps = procs()
-    reach = defaultdict(set)
-    for s, p in ps.items():
-        if not p["scene"]:
-            continue
-        seen, q = {s}, deque([s])
-        while q:
-            c = q.popleft()
-            reach[c].add(s)
-            for n in ps.get(c, {}).get("calls", []):
-                if n not in seen:
-                    seen.add(n)
-                    q.append(n)
-    return {k: sorted(v) for k, v in reach.items()}
+    """{proc: sorted scenes reaching it}, through calls and procedure references
+    (callbacks); see gclfiles.owners."""
+    import gclfiles
+    return {k: sorted(v) for k, v in gclfiles.owners().items() if v}
 
 
 @cached
