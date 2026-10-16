@@ -1,0 +1,531 @@
+pool,hash,label,confidence,evidence,source
+4,B306,Red and gold crest,medium,"Default frames are crimson, gold, and dark brown; four crest icons share this palette.",sprites_exact/B306.png
+5,B306,Blue and red crest,medium,This pool recolors the inset emblems blue while retaining red outlines.,sprites_exact/B306_pool5.png
+6,B306,Red and green crest,medium,Pool 6 changes the red crest pieces to green; E02A uses this family for Ancient Tree scenes.,sprites_exact/B306_pool6.png
+7,B306,Blue and purple crest,medium,Pool 7 changes the crest icons to blue and violet with red accents.,sprites_exact/B306_pool7.png
+104,A850,Teal fragment,low,The default 16x32 shard is teal with a pale center.,sprites_exact/A850.png
+109,A850,Gold fragment,low,Pool 109 turns the two shard frames yellow-gold with dark edging.,sprites_exact/A850_pool109.png
+140,D28E,Klorofolun,high,Lun kind 26 passes C=0 and selects the 140 base; the purple spirit appearance matches the dark Klorofolun form.,sprites_exact/D28E.png; monsters.md; spawners.txt; ~/git/boktai3trans/shinbok guide/monsters.xml
+141,D28E,Burrnun,high,"Lun kind 27 passes C=1, selecting pool 141 from the 140 base; its amber flame coloration matches the Flame-element Burrnun.",sprites_exact/D28E_pool141.png; monsters.md; spawners.txt; ~/git/boktai3trans/shinbok guide/monsters.xml
+160,0BA8,Gold-red warp rings,medium,"Default ring and diamond marker pieces are gold, red, and dark brown.",sprites_exact/0BA8.png; sprite_batch_0.md
+163,0BA8,Blue and red warp rings,low,Pool 163 recolors the circular and diamond marker rows blue/red.,sprites_exact/0BA8_pool163.png
+165,0BA8,Green and violet warp rings,low,Pool 165 uses green with violet highlights across the ring-marker set.,sprites_exact/0BA8_pool165.png
+166,0BA8,Green and blue warp rings,low,"Pool 166 shifts the markers to green, cyan, and navy.",sprites_exact/0BA8_pool166.png
+167,0BA8,Bright green warp rings,low,Pool 167 is the brighter green palette for the repeated rings and diamonds.,sprites_exact/0BA8_pool167.png
+168,0BA8,White and purple warp rings,low,Pool 168 renders the marker motifs pale lavender and white.,sprites_exact/0BA8_pool168.png
+169,0BA8,Pink and white warp rings,low,"Pool 169 makes the repeated ring pieces pale pink, white, and cyan.",sprites_exact/0BA8_pool169.png
+170,0BA8,Gold and green warp rings,low,Pool 170 has gold-yellow rings with green centers.,sprites_exact/0BA8_pool170.png
+171,0BA8,White and gray warp rings,low,Pool 171 replaces the saturated colors with pale gray and white marker icons.,sprites_exact/0BA8_pool171.png
+230,7AD3,Blue-violet door,high,Default 7AD3 frames show the Ancient Tree paneled door in blue/violet.,sprites_exact/7AD3.png
+231,7AD3,Red-orange door,high,Pool 231 changes the same opened/closed door views to red-orange panels.,sprites_exact/7AD3_pool231.png
+232,7AD3,Gold door,high,Pool 232 changes the door panels to yellow-gold while keeping the same frame design.,sprites_exact/7AD3_pool232.png
+237,7AD3,Green door,high,Pool 237 turns the panel fills green; the three door orientations remain identical.,sprites_exact/7AD3_pool237.png
+349,4147,Red and gold emblems,low,Default contains red/gold diamonds and circular motifs in the 38-frame icon set.,sprites_exact/4147.png
+356,4147,Blue and green emblems,low,"Pool 356 changes the 38-frame motif set to green, blue, and cyan accents.",sprites_exact/4147_pool356.png
+400,9247,unknown,unknown,"The sheet's default 400 palette is pale cream/yellow, while the spawner's named Ghoul palette base is 402; this default pool is not tied to an observed enemy C value.",sprites_exact/9247.png; spawners.txt
+403,9247,Zombie,high,"C=1 selects pool 403 from palette base 402; the frames become blue-green, matching the Zombie variant.",sprites_exact/9247_pool403.png; spawners.txt; monsters.md
+404,9247,Ghoul +,high,C=2 selects pool 404 from base 402; the dark red frames match the blood-stained Ghoul+.,sprites_exact/9247_pool404.png; spawners.txt; https://boktai.fandom.com/wiki/Monsters
+364,17C8,Pale storage chest,medium,Default two views are cream stone with blue-violet trim.,sprites_exact/17C8.png
+365,17C8,Orange storage chest,medium,Pool 365 changes the chest's purple center accents to orange-red while retaining the same container design.,sprites_exact/17C8_pool365.png
+416,BB68,Silver-blue block,medium,Default four mechanical block poses are silver with cyan-blue edge details.,sprites_exact/BB68.png
+417,BB68,Red-orange block,medium,Pool 417 changes the mechanical block surfaces to red-orange and dark copper.,sprites_exact/BB68_pool417.png
+439,7E7D,Red-spotted Dragon Puppy,medium,Default frames 0-5 show the spiny creature with red spots and the cannon assembly gray; DragonPuppy_Create loads this resource.,sprites_exact/7E7D.png; sprite_batch_0.md; https://boktai.fandom.com/wiki/Monsters?file=Dragon_Puppy.gif
+286,7E7D,Purple and cyan spines,low,Pool 286 recolors the spiny creature portion purple/cyan and its projectile marks pale blue.,sprites_exact/7E7D_pool286.png
+440,7E7D,Red-orange spines,low,Pool 440 keeps the spiny creature in red/orange shades with a darker turret glow.,sprites_exact/7E7D_pool440.png
+441,7E7D,Green spines,low,Pool 441 changes the creature and small projectile effects to bright green.,sprites_exact/7E7D_pool441.png
+442,7E7D,Blue and violet spines,low,Pool 442 renders the creature blue-violet with pale cyan spots.,sprites_exact/7E7D_pool442.png
+443,7E7D,Red and green spines,low,Pool 443 uses red accents with green body pixels on the same creature frames.,sprites_exact/7E7D_pool443.png
+444,7E7D,Blue-white spines,low,Pool 444 changes the creature and shots to pale blue-white.,sprites_exact/7E7D_pool444.png
+445,7E7D,Pink and pale blue spines,low,Pool 445 adds pink/cyan accents to the small spiny forms.,sprites_exact/7E7D_pool445.png
+446,7E7D,Dark green spines,low,Pool 446 gives the spiny frames dark green bodies with green and black highlights.,sprites_exact/7E7D_pool446.png
+447,7E7D,Cyan and green spines,low,Pool 447 changes the spiny and projectile motifs to teal-green.,sprites_exact/7E7D_pool447.png
+448,7E7D,Green spines with pale spots,low,Pool 448 is a brighter green version of the same spiny frame set.,sprites_exact/7E7D_pool448.png
+449,7E7D,Orange-red spines,low,Pool 449 uses orange and red bodies with yellow highlights.,sprites_exact/7E7D_pool449.png
+451,7E7D,Violet and magenta spines,low,Pool 451 changes the creature to purple-magenta with blue highlights.,sprites_exact/7E7D_pool451.png
+452,7E7D,Amber spines,low,Pool 452 is orange-yellow with dark red spot accents.,sprites_exact/7E7D_pool452.png
+453,7E7D,Gray-blue spines,low,Pool 453 changes the spiny forms and turret details to gray-blue.,sprites_exact/7E7D_pool453.png
+459,5A6E,Crow,high,Kind 31 creates Crow with C=0 and the default bird is dark navy with an orange beak.,sprites_exact/5A6E.png; monsters.md; spawners.txt
+460,5A6E,Raven,medium,Pool 460 changes the bird's feathers to green; the related Crow spawner family has a second dark bird entry named Raven in the list.,sprites_exact/5A6E_pool460.png; monsters.md; spawners.txt
+491,D637,Pale Ghost,medium,Default ghost animation is pale cyan/white with magenta highlights.,sprites_exact/D637.png; monsters.md
+492,D637,Wraith,high,"Kind 47 passes C=1 to Ghost, selecting pool 492 from the base; the enemy list names this second dark ghost form Wraith.",sprites_exact/D637_pool492.png; monsters.md; spawners.txt; https://boktai.fandom.com/wiki/Monsters
+494,D637,Pink Ghost,medium,Pool 494 changes the same floating Ghost animation to pink and white; no named C value is listed for this pool.,sprites_exact/D637_pool494.png; spawners.txt
+495,D637,Gold Ghost,medium,Pool 495 makes the Ghost frames yellow-green and amber; no named C value is listed for this pool.,sprites_exact/D637_pool495.png; spawners.txt
+503,593A,"Character portraits, pale palette",low,Default face tiles use pale pink skin tones and black shadow/silhouette panels.,sprites_exact/593A.png
+505,593A,"Character portraits, warm palette",low,Pool 505 shifts the face tiles toward peach/orange while preserving their panel layout.,sprites_exact/593A_pool505.png
+575,B019,Orange floor plate,medium,Default is the orange-brown diamond plate with four small corner studs.,sprites_exact/B019.png
+576,B019,White patterned floor plate,low,Pool 576 turns the plate white with orange/green corner details.,sprites_exact/B019_pool576.png
+577,B019,Ivory floor plate,low,Pool 577 is pale ivory and gold with the same faceted plate pattern.,sprites_exact/B019_pool577.png
+580,B019,Gold floor plate,low,Pool 580 recolors the complete plate warm yellow-gold.,sprites_exact/B019_pool580.png
+581,B019,Blue floor plate,low,Pool 581 gives the plate a blue-violet tiled surface.,sprites_exact/B019_pool581.png
+582,B019,Pale patterned floor plate,low,Pool 582 uses a pale white/pink patterned face with gold edging.,sprites_exact/B019_pool582.png
+583,B019,Yellow floor plate,low,Pool 583 turns the square plate bright yellow with light highlights.,sprites_exact/B019_pool583.png
+627,D635,Hound,high,"Default canine frames are pink-gray; F836 is Dog_Create, the base Hound form.",sprites_exact/D635.png; monsters.md; spawners.txt
+628,D635,Ice Dog,high,"Kind 22 passes C=1 to Dog, selecting pool 628 from base 627; the blue-black canine palette matches the guide's Frost-element Ice Dog.",sprites_exact/D635_pool628.png; ~/git/boktai3trans/shinbok guide/monsters.xml; spawners.txt
+630,D635,Hot Dog,high,"Kind 21 passes C=3 to Dog, selecting pool 630 from base 627; the orange/red canine palette matches the guide's Flame-element Hot Dog.",sprites_exact/D635_pool630.png; ~/git/boktai3trans/shinbok guide/monsters.xml; spawners.txt
+637,5290,Clay Golem,high,Kind 7 passes C=0 and selects the orange-brown default; Golem_Create is the registry actor for this family.,sprites_exact/5290.png; monsters.md; spawners.txt
+638,5290,Stone Golem,high,Kind 8 passes C=1 and selects pool 638; its gray-violet body matches the Stone Golem form.,sprites_exact/5290_pool638.png; monsters.md; spawners.txt; https://boktai.fandom.com/wiki/Monsters
+58,081B,unknown silhouette,unknown,The black figure remains featureless in the default sheet and pool 59.,sprites_exact/081B.png
+59,081B,"unknown silhouette, alternate palette",unknown,Pool 59 changes only the narrow visible edge pixels; the upright silhouette itself remains black.,sprites_exact/081B_pool59.png
+670,61F9,Yellow pollen and burst,medium,Default frames show yellow pollen blooms and pale motes.,sprites_exact/61F9.png
+671,61F9,Cyan-white pollen and burst,low,Pool 671 recolors the same impact bloom cyan-white.,sprites_exact/61F9_pool671.png
+678,61F9,Tan pollen and burst,low,Pool 678 uses beige/tan motes and matching brown-gold blooms.,sprites_exact/61F9_pool678.png
+679,61F9,Pink pollen and burst,low,Pool 679 makes the tiny motes pink-white and the round blooms pale pink.,sprites_exact/61F9_pool679.png
+722,DA6D,Bat,high,Kind 29 creates Bat with C=0; default frames are charcoal/navy with pale accents.,sprites_exact/DA6D.png; monsters.md; spawners.txt
+723,DA6D,Vampire Bat,high,Kind 30 passes C=1 and selects pool 723 from base 722; its pale violet palette marks the vampire form.,sprites_exact/DA6D_pool723.png; monsters.md; spawners.txt; https://boktai.fandom.com/wiki/Monsters
+746,A945,Gray rubble,medium,Default two frames are gray angular stone/metal fragments.,sprites_exact/A945.png
+747,A945,Purple-gray rubble,medium,Pool 747 changes the same two fragments to purple-gray with black shadow edges.,sprites_exact/A945_pool747.png
+769,4211,White stone shards,low,Default six chips are white-gray diamond pieces.,sprites_exact/4211.png
+770,4211,Red shards,low,Pool 770 changes the six shard clusters to red and black.,sprites_exact/4211_pool770.png
+771,4211,Cyan shards,low,Pool 771 makes those same six clusters bright cyan/blue.,sprites_exact/4211_pool771.png
+772,3876,Gold Mimic,high,Default eight poses are gold/orange chest-creature frames and registry BEF5 is Mimic_Create.,sprites_exact/3876.png; spawners.txt; https://boktai.fandom.com/wiki/Monsters
+775,3876,Green and blue Mimic,high,"Pool 775 recolors the chest creature green/cyan with blue highlights, retaining the Mimic animation.",sprites_exact/3876_pool775.png; spawners.txt
+2,2E90,Purple slash effect,low,"Default streak frames are dark pink-purple, consistent with the visible diagonal slash animation.",sprites_exact/2E90.png
+58,081C,unknown silhouette,unknown,Default sprite is a featureless black 64x128 figure/mask.,sprites_exact/081C.png
+61,7AEE,Orange-red paneled door,high,Default three door views have orange-red inset panels.,sprites_exact/7AEE.png
+110,9D43,Gray-green pedestal,medium,Default device is silver-gray with green/yellow indicators.,sprites_exact/9D43.png
+0,1C1B,Gray tether and dark puffs,low,Default tiny frames are gray streaks and black/purple round puffs.,sprites_exact/1C1B.png
+182,4384,Blue-white frost burst,medium,Default impact/mist frames are pale blue-white.,sprites_exact/4384.png
+196,05A2,"Stone slab, cyan edge",medium,Default slab is gray-beige with cyan outline lighting.,sprites_exact/05A2.png
+203,7AD2,Gray iron-bar gate,high,Default three views are dark gray vertical bars and a rectangular crossbar.,sprites_exact/7AD2.png
+75,3641,Gold sun orb,high,Default two sun-disc frames are pale yellow and bright gold.,sprites_exact/3641.png
+213,C3C3,Green-brown tendril growth,medium,"Default clumps use olive green, brown, and purple shadow pixels.",sprites_exact/C3C3.png
+238,7AF3,Gray metal door,high,Default door panels are slate gray and silver.,sprites_exact/7AF3.png
+244,9506,Yellow Bee,high,Default bee animation has yellow-orange body and pale wings.,sprites_exact/9506.png; monsters.md
+343,97D3,Yellow-green flower sprites,low,Default tiny repeated forms are yellow petals over green stems.,sprites_exact/97D3.png
+358,A152,Cyan-violet save marker,medium,The single orb has a cyan center and violet ring.,sprites_exact/A152.png
+361,2173,Orange ship's wheel,medium,Both nautical wheel frames are orange and gold with dark spokes.,sprites_exact/2173.png
+407,C046,Silver-blue control panel,low,Three angled panel frames are silver with cyan details.,sprites_exact/C046.png
+455,CBE1,White impact flash,medium,The four-frame diamond-to-burst animation is white/ivory.,sprites_exact/CBE1.png
+464,E0C9,Red-brown pillar,medium,The single upright faceted object is salmon-brown with golden floor trim.,sprites_exact/E0C9.png
+486,066A,Green crystal,high,The four gem frames are bright emerald green.,sprites_exact/066A.png
+490,9385,Gold fragments,low,Three curled fragments are yellow-gold with orange shadows.,sprites_exact/9385.png
+508,0E48,Pale green axe blade,medium,Axe_Create loads the single greenish angled blade sprite.,sprites_exact/0E48.png; sprite_batch_0.md
+527,24B9,"Armor, dark steel",high,The base 38-frame armor animation is dark brown/black with ochre accents.,sprites_exact/24B9.png; monsters.md; spawners.txt
+554,D636,unknown segmented insect-like sprites,unknown,Default frames show orange and blue segmented bug-like bodies followed by round gold forms; kind 45 uses sub_080ACBA8 but has no resolved name in the input list.,sprites_exact/D636.png; monsters.md; spawners.txt
+42,D495,Tan projectile fragments,low,Default 22-frame set is brown/tan shards and streaks.,sprites_exact/D495.png
+584,D291,Pink Octopus,high,Default tentacle sequence is pink and pale lavender; 3F99 is Octopus_Create.,sprites_exact/D291.png; monsters.md; spawners.txt
+597,CC88,Pale pink sparkle,medium,The four tiny 8x8 clusters are white-pink pixels.,sprites_exact/CC88.png
+633,9D40,Orange wooden crate,high,The single crate is warm orange wood with dark plank seams.,sprites_exact/9D40.png
+643,2499,Gold-orange staged debris,low,"The mixed 63-frame parts use amber, orange, and brown.",sprites_exact/2499.png
+654,4FDA,Orange fire burst,medium,Default palette colors the eight small burst poses orange and rust; resource 377D is reused across multiple scene groups.,sprites_exact/4FDA.png; sprite_batch_1.md
+339,863A,Yellow-orange flame jets,medium,Default palette gives the six shrinking flame plumes yellow cores and orange edges.,sprites_exact/863A.png; sprite_batch_1.md
+682,7ACD,Brown wooden door,high,The three door views are plank-brown; 6D69 places this door in Ancient Tree passages.,sprites_exact/7ACD.png; sprite_batch_1.md
+696,9D41,Tan stone boulder,medium,The single irregular boulder is shaded tan and ochre with a dark underside.,sprites_exact/9D41.png; sprite_batch_1.md
+700,CD6C,Red ember trail,low,The tiny initial ember and falling sparks are red with dark red tails.,sprites_exact/CD6C.png; sprite_batch_1.md
+701,5291,Gold and silver axe parts,medium,The four tall weapon poses use pale metal blades with gold and dark handles; Axe_Create loads this weapon sheet.,sprites_exact/5291.png; sprite_batch_1.md
+706,84EE,Blue-white ice crystals,high,All four breakable-looking chunks are shaded icy blue with white highlights.,sprites_exact/84EE.png; sprite_batch_1.md
+619,B07C,Multicolor dungeon props,medium,"The default props include a brown urn, blue crystal, red wooden chest, pale debris, and blue-gold container.",sprites_exact/B07C.png; sprite_batch_1.md
+619,6BEA,Orange-blue bird pedestal,medium,"The bird figure has orange plumage, blue wing accents, and a brown circular base.",sprites_exact/6BEA.png; sprite_batch_1.md
+752,3071,White spark flecks,low,The tiny marks are white to pale gray across the 8-frame trail.,sprites_exact/3071.png; sprite_batch_1.md
+9,081A,Black humanoid silhouette,low,The silhouette is nearly solid black with no visible clothing or face detail.,sprites_exact/081A.png; sprite_batch_1.md
+9,778B,Orange-violet corner panel,medium,The clipped panel has orange flame-like streaks over violet and dark gray.,sprites_exact/778B.png; sprite_batch_1.md
+10,778B,Violet-orange corner panel,medium,Pool 10 recolors the same angled panel toward violet while its orange highlights remain visible.,sprites_exact/778B_pool10.png
+11,77AB,Red-brown carved panel,medium,The default lower-edge detail is red-brown against a dark panel.,sprites_exact/77AB.png
+12,77AB,Green-gold carved panel,medium,Pool 12 changes the lower carved edge to olive green and gold.,sprites_exact/77AB_pool12.png
+13,77AB,Purple carved panel,medium,Pool 13 changes the same lower-edge detail to purple and magenta.,sprites_exact/77AB_pool13.png
+14,77AB,Blue-violet carved panel,medium,Pool 14 shifts the carved detail to blue and violet.,sprites_exact/77AB_pool14.png
+64,21B2,Blue-violet slatted panel,medium,The diagonal slats are lavender and blue with dark purple gaps.,sprites_exact/21B2.png
+69,21B2,Rust-brown slatted panel,medium,Pool 69 changes the same parallel slats to reddish brown and charcoal.,sprites_exact/21B2_pool69.png
+64,77CC,Blue-violet masonry corner,medium,The inset stone blocks are blue and violet with dark seams.,sprites_exact/77CC.png
+72,77CC,Blue masonry corner,medium,Pool 72 shifts the blocks toward brighter blue while preserving the block pattern.,sprites_exact/77CC_pool72.png
+64,A57B,Gold diamond slat emblem,medium,The diamond border and inset bars are gold with brown shading.,sprites_exact/A57B.png
+72,A57B,Pale gold diamond slat emblem,medium,Pool 72 makes the same bars pale ivory and gold.,sprites_exact/A57B_pool72.png
+73,A57B,Blue diamond slat emblem,medium,Pool 73 recolors the slats blue and cyan within the same diamond border.,sprites_exact/A57B_pool73.png
+91,A0D5,Purple particle cloud,medium,The motes are pink-purple with darker violet outlines as they expand.,sprites_exact/A0D5.png
+93,A0D5,Green particle cloud,medium,Pool 93 changes the expanding motes to yellow-green and dark olive.,sprites_exact/A0D5_pool93.png
+97,A680,Tan-cyan miniature symbols,low,"The 12 tiny symbols mix brown, tan, and cyan highlights in the default sheet.",sprites_exact/A680.png
+98,A680,Blue-cyan miniature symbols,low,"Pool 98 shifts the same miniature symbols toward blue, white, and cyan.",sprites_exact/A680_pool98.png
+100,A680,Tan-violet miniature symbols,low,Pool 100 gives the symbols tan and pale gold bodies with violet accents.,sprites_exact/A680_pool100.png
+58,77AD,Orange stone corner,medium,The default rock face is bright orange with red-brown vertical shading.,sprites_exact/77AD.png
+60,77AD,Pale gray stone corner,medium,Pool 60 changes the same faceted rock face to chalk gray and lavender.,sprites_exact/77AD_pool60.png
+64,77CD,Brown-gray inset panel,medium,The default narrow panel has gray-brown trim and warm highlights.,sprites_exact/77CD.png
+73,77CD,Violet inset panel,medium,Pool 73 shifts the trim to violet while keeping the inset geometry unchanged.,sprites_exact/77CD_pool73.png
+111,89CB,Multicolor circular icons,low,"The default 38 tiny icons use mixed cream, red, green, and brown colors.",sprites_exact/89CB.png
+131,89CB,Gold circular icons,low,Pool 131 changes the same rings and disks to mostly yellow-gold and brown.,sprites_exact/89CB_pool131.png
+474,89CB,Pale pink circular icons,low,"Pool 474 renders the same icons in pale pink, white, and dark maroon.",sprites_exact/89CB_pool474.png
+111,89CC,Multicolor tiny icons,low,"The default small irregular forms use cream, red, and dark brown pixels.",sprites_exact/89CC.png
+125,89CC,Gold tiny icons,low,Pool 125 changes the small forms to gold and dark brown.,sprites_exact/89CC_pool125.png
+126,89CC,Red tiny icons,low,Pool 126 makes the same little forms red with dark outlines.,sprites_exact/89CC_pool126.png
+64,A57C,Orange diamond medallion,medium,The round center is orange-red within a dark rust diamond frame.,sprites_exact/A57C.png
+68,A57C,Pale gray diamond medallion,medium,Pool 68 changes the center to pale gray and the border to charcoal.,sprites_exact/A57C_pool68.png
+82,778E,Gray corner panel,medium,The beveled corner has pale gray and muted brown shading.,sprites_exact/778E.png
+85,778E,Green-gray corner panel,medium,Pool 85 gives the bevel a green cast with dark gray seams.,sprites_exact/778E_pool85.png
+88,778E,Violet corner panel,medium,Pool 88 recolors the beveled edge violet and purple.,sprites_exact/778E_pool88.png
+58,77AE,Orange stone corner,medium,The default rock face is orange with deep rust-colored side shading.,sprites_exact/77AE.png
+60,77AE,Pale gray stone corner,medium,Pool 60 changes the same angled rock face to pale gray-lavender.,sprites_exact/77AE_pool60.png
+64,77CE,Red-blue inset wall panel,medium,The default narrow inset has red and blue bands with dark trim.,sprites_exact/77CE.png
+72,77CE,Red-violet inset wall panel,medium,Pool 72 changes the blue band to violet while preserving the striped wall shape.,sprites_exact/77CE_pool72.png
+64,A57D,Gold slatted panel,medium,The three diagonal inset strips are pale gold and yellow.,sprites_exact/A57D.png
+72,A57D,Green slatted panel,medium,Pool 72 shifts those strips to pale green and olive.,sprites_exact/A57D_pool72.png
+73,A57D,Cyan slatted panel,medium,Pool 73 changes the strips to light cyan and blue.,sprites_exact/A57D_pool73.png
+75,6250,Orange-yellow sparks,medium,"The default 15 tiny marks are orange crosses, gold stars, and yellow-white orbs.",sprites_exact/6250.png
+278,6250,Pale yellow sparks,medium,Pool 278 renders the tiny impact marks pale cream and yellow.,sprites_exact/6250_pool278.png
+280,6250,Orange sparks,medium,Pool 280 intensifies the crosses and orbs to orange and amber.,sprites_exact/6250_pool280.png
+281,6250,Cyan sparks,medium,Pool 281 recolors the spark and orb shapes cyan and pale blue.,sprites_exact/6250_pool281.png
+282,6250,Violet sparks,medium,Pool 282 colors the same tiny effects violet and magenta.,sprites_exact/6250_pool282.png
+283,6250,Green sparks,medium,Pool 283 changes the sparks to bright and dark green.,sprites_exact/6250_pool283.png
+175,1B59,Gray metal gate,medium,The three narrow grates have silver frames and dark gray bars.,sprites_exact/1B59.png
+498,1B59,Orange metal gate,medium,Pool 498 changes the bars and frame highlights to orange and rust.,sprites_exact/1B59_pool498.png
+82,778F,Gray-green corner panel,medium,The default clipped surface is gray-green with pale green inset lines.,sprites_exact/778F.png
+85,778F,Blue-violet corner panel,medium,Pool 85 changes the same small panel toward blue and violet.,sprites_exact/778F_pool85.png
+64,F439,Orange-red faceted block,low,The tall angular block is orange-red with dark red side faces.,sprites_exact/F439.png
+69,F439,Violet-gray faceted block,low,Pool 69 recolors the same block violet-gray with pale lavender facets.,sprites_exact/F439_pool69.png
+82,77D0,Pale green wall corner,medium,The clipped wall face is pale green with thin dark-green lines.,sprites_exact/77D0.png
+88,77D0,Violet wall corner,medium,Pool 88 shifts the face to pale violet and purple.,sprites_exact/77D0_pool88.png
+227,409C,Black oval ground mark,medium,The flat ellipse is solid black without object details.,sprites_exact/409C.png
+228,409C,Red oval ground mark,medium,Pool 228 recolors the same flat ellipse deep red.,sprites_exact/409C_pool228.png
+64,20C6,Blue-gray ribbed panel,medium,The diagonal slats are blue-gray with dark charcoal channels.,sprites_exact/20C6.png
+69,20C6,Brown ribbed panel,medium,Pool 69 changes the slats to rust brown and dark charcoal.,sprites_exact/20C6_pool69.png
+230,7AD4,Blue-violet double door,medium,The three matching frames have blue-violet door panes and dark wood edges.,sprites_exact/7AD4.png
+232,7AD4,Orange double door,medium,Pool 232 changes the same door panes to orange-red.,sprites_exact/7AD4_pool232.png
+230,7AD6,Blue-violet double door,medium,"The door frames have blue-violet panes in open, closed, and side views.",sprites_exact/7AD6.png
+231,7AD6,Orange-red double door,medium,Pool 231 recolors the panes to orange and red while keeping all three door views.,sprites_exact/7AD6_pool231.png
+232,7AD6,Yellow-gold double door,medium,Pool 232 changes the same panes to bright yellow and gold.,sprites_exact/7AD6_pool232.png
+237,7AD6,Green double door,medium,Pool 237 recolors the door panes green while preserving the three views.,sprites_exact/7AD6_pool237.png
+230,7AED,Blue-violet double door,medium,"The default open, closed, and side views share the blue-violet pane palette.",sprites_exact/7AED.png
+231,7AED,Orange-red double door,medium,Pool 231 changes the same three door views to orange-red panes.,sprites_exact/7AED_pool231.png
+239,D2CC,Gray stone statue,medium,The standing armored statue and stepped plinth are shaded gray-green stone.,sprites_exact/D2CC.png
+240,D2CC,Orange elemental statue,medium,Pool 240 recolors the stone figure orange and red.,sprites_exact/D2CC_pool240.png
+241,D2CC,Blue elemental statue,medium,Pool 241 changes the statue to blue and cyan.,sprites_exact/D2CC_pool241.png
+242,D2CC,Green elemental statue,medium,Pool 242 changes the figure and plinth to green hues.,sprites_exact/D2CC_pool242.png
+243,D2CC,Violet elemental statue,medium,Pool 243 changes the figure to violet and purple.,sprites_exact/D2CC_pool243.png
+251,856E,Purple ring effect,medium,The default small rings are purple with magenta dots.,sprites_exact/856E.png
+257,856E,Green-teal ring effect,medium,Pool 257 shifts the rings to green and teal.,sprites_exact/856E_pool257.png
+75,210E,Yellow-white glow,medium,The four expanding circles have yellow edges and bright white centers.,sprites_exact/210E.png
+77,210E,Red-orange glow,medium,Pool 77 changes the expanding circles to red-orange with pale centers.,sprites_exact/210E_pool77.png
+75,2110,Cream-yellow flecks,low,The horizontal sequence uses cream bodies and small yellow highlights.,sprites_exact/2110.png
+81,2110,Red flecks,low,Pool 81 changes the repeated trail marks to red and dark red.,sprites_exact/2110_pool81.png
+82,7791,Pale green barred panel,medium,The vertical panel is pale green with narrow darker green lines.,sprites_exact/7791.png
+86,7791,Red barred panel,medium,Pool 86 recolors those vertical lines and panel shading red-brown.,sprites_exact/7791_pool86.png
+64,77D1,Red-trimmed dark corner panel,medium,The clipped corner has dark red and violet edge trim.,sprites_exact/77D1.png
+72,77D1,Violet-trimmed dark corner panel,medium,Pool 72 shifts the visible trim to violet.,sprites_exact/77D1_pool72.png
+73,77D1,Blue-violet trimmed panel,medium,Pool 73 changes the same trim to blue-violet.,sprites_exact/77D1_pool73.png
+294,848F,Pale debris fragments,medium,The irregular chips and slivers are cream and gray against transparent space.,sprites_exact/848F.png
+81,848F,Red-black debris fragments,medium,Pool 81 recolors the same tiny chips red and black.,sprites_exact/848F_pool81.png
+0,E74B,Multicolor tiny object icons,low,"The default 24 tiny icons mix red, green, and dark colors across disks and angular pieces.",sprites_exact/E74B.png
+402,E74B,Pale gray tiny object icons,low,Pool 402 renders the same icons white and light gray with dark outlines.,sprites_exact/E74B_pool402.png
+9,778A,Orange flame-lit corner,medium,The clipped panel has orange flame-like streaks and dark violet edging.,sprites_exact/778A.png
+10,778A,Violet-orange flame-lit corner,medium,Pool 10 moves the edge coloring toward violet while retaining orange highlights.,sprites_exact/778A_pool10.png
+11,77AA,Red-brown carved panel,medium,The default lower edge is red-brown with dark shadowing.,sprites_exact/77AA.png
+12,77AA,Green-gold carved panel,medium,Pool 12 changes the same edge pattern to olive and yellow.,sprites_exact/77AA_pool12.png
+13,77AA,Purple carved panel,medium,Pool 13 recolors the patterned edge purple and magenta.,sprites_exact/77AA_pool13.png
+14,77AA,Blue-violet carved panel,medium,Pool 14 recolors the edge blue and violet.,sprites_exact/77AA_pool14.png
+64,77CA,Red-blue striped panel,medium,The vertical stripes are orange-red and blue with dark trim.,sprites_exact/77CA.png
+72,77CA,Purple-red striped panel,medium,Pool 72 changes the blue stripe to violet.,sprites_exact/77CA_pool72.png
+73,77CA,Blue-violet striped panel,medium,Pool 73 shifts the stripes toward blue and violet.,sprites_exact/77CA_pool73.png
+316,D45E,Tan weapon and debris sprites,low,"The default sheet combines pale metal blades, brown shafts, thin fragments, dark puddle poses, and two pale spiky orbs.",sprites_exact/D45E.png
+319,D45E,Violet weapon and debris sprites,low,"Pool 319 recolors the mixed blade, fragment, puddle, and orb sheet purple-magenta.",sprites_exact/D45E_pool319.png
+320,D45E,Gray-green weapon and debris sprites,low,Pool 320 gives the same mixed sheet gray-green highlights.,sprites_exact/D45E_pool320.png
+349,4148,Green-white-red faceted orb,medium,The orb is green with white highlights and red patches.,sprites_exact/4148.png
+351,4148,Green-gold faceted orb,medium,Pool 351 shifts the orb's red patches to yellow-gold while leaving its green body.,sprites_exact/4148_pool351.png
+82,7792,Leaf-covered roof corner,medium,Default green-yellow canopy over the same single isometric timber corner seen in the sheet.,sprites_exact/7792.png
+87,7792,Yellow-orange leaf roof corner,medium,Run 08054D20 selects pool 87 and the canopy shifts from green to yellow-orange while the timber remains.,sprites_exact/7792_pool87.png; sprites_codex.md
+364,17C7,Silver-blue hinged panel,medium,Default panel has a blue inset and cool silver frame in both views.,sprites_exact/17C7.png
+365,17C7,Orange-red inset hinged panel,medium,Palette pool 365 changes the inset from blue to orange-red; run 08054D20 / 08100808 select it.,sprites_exact/17C7_pool365.png; sprites_codex.md
+408,FB75,Orange-purple glowing pillar,low,Default two poses show a tall orange-topped pillar with magenta-green color fringe.,sprites_exact/FB75.png
+411,FB75,Red-orange pillar,low,Pool 411 is a redder recolor of the same pair of tall pillar poses.,sprites_exact/FB75_pool411.png; sprites_codex.md
+419,C7ED,Green-leafed red bud,medium,Default frames show a red-orange bud with green foliage and seed/burst cells.,sprites_exact/C7ED.png
+422,C7ED,Orange-leafed bud,medium,Palette 422 changes the bud/effect atlas toward orange and yellow while retaining its leaf and seed shapes.,sprites_exact/C7ED_pool422.png; sprites_codex.md
+424,C7ED,Gray-white bud,medium,Palette 424 is a pale grayscale recolor of the bud and its detached effect cells.,sprites_exact/C7ED_pool424.png; sprites_codex.md
+425,C7ED,Pink-magenta bud,medium,Palette 425 shifts the bud and effects toward pink/red-magenta.,sprites_exact/C7ED_pool425.png; sprites_codex.md
+426,C7ED,Blue bud,medium,Palette 426 changes the plant sequence to blue-cyan tones.,sprites_exact/C7ED_pool426.png; sprites_codex.md
+430,A47C,Green hanging vine,low,Default single frond is dark green with pale ribbing and a curled tendril.,sprites_exact/A47C.png
+433,A47C,Pale gray hanging vine,low,Pool 433 changes the long green frond to pale gray-white.,sprites_exact/A47C_pool433.png; sprites_codex.md
+436,A47C,Violet hanging vine,low,Pool 436 gives the same ribbed hanging frond a violet-purple tint.,sprites_exact/A47C_pool436.png; sprites_codex.md
+474,8202,Multicolor light and ring effects,medium,"Default 13-cell atlas includes black, purple, gray, white, pink and red circular light/ring states.",sprites_exact/8202.png
+111,8202,Bright yellow light effects,medium,Pool 111 recolors the tiny disc and ring cells toward yellow-orange; selected by sub_081B7394.,sprites_exact/8202_pool111.png; sprites_codex.md
+475,8202,Pale lavender-white light effects,medium,"Pool 475 uses pale lavender, gray and white discs/rings; selected by sub_081B6888.",sprites_exact/8202_pool475.png; sprites_codex.md
+512,50C1,Red-gold diamond emblems,medium,Default five diamond emblems have red centers and gold/orange trim.,sprites_exact/50C1.png
+513,50C1,Gold diamond emblems,medium,Pool 513 changes the five emblems to bright yellow-gold.,sprites_exact/50C1_pool513.png; sprites_codex.md
+514,50C1,Cyan-blue diamond emblems,medium,Pool 514 changes the same beveled symbols to cyan and blue.,sprites_exact/50C1_pool514.png; sprites_codex.md
+364,17CA,Silver-blue angled panel,medium,Default two frames show a silver frame with a blue inner panel.,sprites_exact/17CA.png
+365,17CA,Orange-red angled panel,medium,Pool 365 recolors the inset orange-red.,sprites_exact/17CA_pool365.png; sprites_codex.md
+439,7E7C,Orange-red mixed projectile effects,low,"Default atlas combines orange-red pellets, curved slivers, ring bursts and a small green mark.",sprites_exact/7E7C.png
+441,7E7C,Yellow-orange mixed projectile effects,low,Pool 441 gives the cell atlas a yellow-orange cast; selected in sub_08202B30.,sprites_exact/7E7C_pool441.png; sprites_codex.md
+447,7E7C,Orange and red mixed projectile effects,low,Pool 447 recolors the streaks and burst cells warm orange-red; selected in sub_0820D684.,sprites_exact/7E7C_pool447.png; sprites_codex.md
+552,7E7C,Cyan mixed projectile effects,low,Pool 552 changes many cells to cyan-blue while retaining orange secondary marks.,sprites_exact/7E7C_pool552.png; sprites_codex.md
+553,7E7C,Bright cyan mixed projectile effects,low,Pool 553 uses bright cyan-blue for the same projectile and impact atlas.,sprites_exact/7E7C_pool553.png; sprites_codex.md
+364,17CB,Silver-blue facing panel,medium,Default two views show a blue inset and beveled silver border.,sprites_exact/17CB.png
+365,17CB,Orange-red facing panel,medium,Pool 365 changes the same panel's blue inset to orange-red.,sprites_exact/17CB_pool365.png; sprites_codex.md
+615,1792,Pink-violet luminous pod,medium,Default pod has pale pink and violet lobes around a blue-white center.,sprites_exact/1792.png
+616,1792,Gold-orange luminous pod,medium,Pool 616 recolors the lobed pod gold and orange.,sprites_exact/1792_pool616.png; sprites_codex.md
+618,1792,Orange-pink luminous pod,medium,Pool 618 warms the pod toward peach/orange while retaining pink-violet outer lobes.,sprites_exact/1792_pool618.png; sprites_codex.md
+75,1C1D,Pale beige slash streaks,medium,Default cells are thin pale curved/straight streaks with small ring forms.,sprites_exact/1C1D.png
+1,1C1D,Darkened slash streaks,medium,Pool 1 darkens the narrow streaks compared with the default pale palette.,sprites_exact/1C1D_pool1.png; sprites_codex.md
+364,B0BC,Silver-blue beveled panel,medium,Default panel views have a blue inset and silver bevel.,sprites_exact/B0BC.png
+365,B0BC,Orange-red beveled panel,medium,Pool 365 changes the panel inset to orange-red.,sprites_exact/B0BC_pool365.png; sprites_codex.md
+364,C583,Blue-centered diamond panel,medium,Default pair of square frames has a bright blue diamond center and light metal border.,sprites_exact/C583.png
+365,C583,Orange-centered diamond panel,medium,Pool 365 changes the blue diamond to orange-red.,sprites_exact/C583_pool365.png; sprites_codex.md
+739,24BA,Turquoise-green spiked orb,low,Default three poses show a turquoise round body with pointed lobes.,sprites_exact/24BA.png
+741,24BA,Pale cyan spiked orb,low,Pool 741 recolors the spiked orb to pale mint/cyan.,sprites_exact/24BA_pool741.png; sprites_codex.md
+752,3070,Pale beige slash effects,medium,"Default 13-cell atlas contains pale curved slashes, streaks, rings and impact specks.",sprites_exact/3070.png
+754,3070,Orange-tinted slash effects,medium,Pool 754 warms the curved slash and impact atlas toward orange.,sprites_exact/3070_pool754.png; sprites_codex.md
+756,3070,Pale yellow slash effects,medium,Pool 756 gives the same slash atlas a brighter yellow-white tint.,sprites_exact/3070_pool756.png; sprites_codex.md
+2,2E91,Red-magenta burst fragments,medium,"Default 12-frame miniature effect atlas uses red and magenta bursts, flecks and curved pieces.",sprites_exact/2E91.png
+8,F680,White-gray canine figure,low,Default two poses show a pale quadruped with a long snout and small adjacent fragments.,sprites_exact/F680.png
+0,A5B3,Orange sun-like disc,low,The single orange disc has a yellow glint and pale gray rim.,sprites_exact/A5B3.png
+0,A5B4,Gold-white circular marks,low,Four small circular marks use pale yellow and white highlights on transparent ground.,sprites_exact/A5B4.png
+15,77CB,Orange flame plume,medium,One orange flame with dark base and branching tongues.,sprites_exact/77CB.png
+16,5AFD,Purple eye diamonds,medium,Three purple diamond marks contain a dark central eye/target motif.,sprites_exact/5AFD.png
+16,5AFE,Multicolor ring markers,medium,"Four thin ring outlines vary among yellow-green, red, orange and olive.",sprites_exact/5AFE.png
+32,CE03,Beige debris fragments,low,Default 11-frame atlas has irregular beige chips and clustered fragment bursts.,sprites_exact/CE03.png
+35,D4EE,Beige streak and fragment effects,low,"Default 12 frames show narrow beige slivers, diagonal streaks and grouped fragments.",sprites_exact/D4EE.png
+35,924B,Tan armored humanoid,low,Default eight frames show a small upright tan-and-dark figure with a bulky helmet/shoulder outline.,sprites_exact/924B.png
+40,238C,Pale spectral face,medium,Both frames show the white-lavender floating face and dark red central mark.,sprites_exact/238C.png
+41,2C12,Brown-gray debris clusters,low,Four cells contain rough tan and dark material shards.,sprites_exact/2C12.png
+42,8F5D,Beige shards and rings,low,"The 15-frame sheet mixes beige patterned chips, curved pieces, rings, and one red square chip.",sprites_exact/8F5D.png
+61,7AEF,Pink-gold ornate door panel,medium,Three tall frames show side and angled views of the pink-gold inset door.,sprites_exact/7AEF.png
+61,7AF0,Orange-pink inset door,medium,Three tall views include a centered orange door face and angled side panels.,sprites_exact/7AF0.png
+61,7AF1,Gold-pink paneled door,medium,Three tall views show the side and front of a deeper paneled gold-pink door.,sprites_exact/7AF1.png
+61,7AF2,Gray-blue ornate door,medium,Three frames show the same tall door form in gray-blue stone/metal tones.,sprites_exact/7AF2.png
+63,7B0E,Gray stone gate,medium,Three tall side/front views show a blocky gray-blue stone or metal gate.,sprites_exact/7B0E.png
+75,A20C,Golden sparkle,medium,The four 8x8 frames are yellow-white star/cross flashes.,sprites_exact/A20C.png
+82,778C,Pale pointed spikes,low,One sprite contains three narrow ivory spike/teeth shapes rising at angles.,sprites_exact/778C.png
+82,77AC,Brown-green rubble,low,One sprite shows a heap of irregular green-gray and brown chunks over a shadow.,sprites_exact/77AC.png
+89,B0E2,Cream hanging lamp,medium,Two frames show a rounded cream lantern head with a short dark stem.,sprites_exact/B0E2.png
+42,7E5F,Pale impact flash,medium,Three tiny cross-shaped flashes increase in size across the 8x8 atlas.,sprites_exact/7E5F.png
+94,2AF0,Gold ornate figure or crest,low,Four frames show a small upright gold ornament with a round base and changing internal detail.,sprites_exact/2AF0.png
+96,10B7,Unknown purple-red coiled humanoid figure,low,"The one tall figure has a pale core, coiled red-purple lower half, and dark magenta arc; no definite enemy match is established.",sprites_exact/10B7.png
+102,A6A0,Pale green wisp,medium,Four translucent upright mint-green flame-like shapes vary slightly across the sheet.,sprites_exact/A6A0.png
+42,B250,Beige dust and impact fragments,low,"Sixteen 128x128 cells show tiny tan streaks, chips and dust shapes.",sprites_exact/B250.png
+42,B251,Beige impact debris sequence,low,Fourteen cells show beige shard sprays and a denser central fragment cluster.,sprites_exact/B251.png
+42,9E50,Fine beige particle spray,low,Sixteen cells contain thin tan streaks and small flecks.,sprites_exact/9E50.png
+42,9E51,"Fine beige particle spray, alternate",low,Sixteen cells contain thin diagonal tan streaks in a distinct distribution.,sprites_exact/9E51.png
+42,9E52,Three-frame beige impact fragments,low,Three cells show a compact tan fleck/chunk cluster changing shape.,sprites_exact/9E52.png
+42,6650,Beige streak and chip effects,low,Sixteen cells contain repeated directional groups of narrow tan streaks and small chips.,sprites_exact/6650.png
+42,6651,Rotating sword-blade projectiles,medium,The default pool-42 sheet shows short silver blades in several directions.,sprites_exact/6651.png
+42,6652,Rotating sword-blade projectiles,medium,The default pool-42 sheet shows narrow pale blade forms in varied angles.,sprites_exact/6652.png
+42,6653,Straight narrow blade or bolt projectiles,low,The default pool-42 sheet shows seven sparse rod-like streaks; blade versus bolt is unclear.,sprites_exact/6653.png
+82,778D,White door or wall panel with orange inset stripes,medium,The default pool-82 image is a single striped isometric architectural panel.,sprites_exact/778D.png
+103,2D41,Purple ring-and-orb dark-energy effect,medium,"The default pool-103 frames form purple rings, orbs, and small bursts.",sprites_exact/2D41.png
+32,85C4,Tan stone blocks and stair pieces,medium,"The default pool-32 sheet contains a faceted block, stairs, and isometric stone pieces.",sprites_exact/85C4.png
+111,89CA,Skull shrinking into a red flame-headed figure,medium,The default pool-111 frames transition from a pale skull into a red-haired head.,sprites_exact/89CA.png
+127,89CD,Dark red claw and open-jaw forms,low,The default pool-127 sheet has two oversized maroon claw or jaw-like forms; creature unknown.,sprites_exact/89CD.png
+134,6AF6,Small hooded or masked figures turning,medium,The default pool-134 sheet shows seven small hunched figures in different orientations.,sprites_exact/6AF6.png
+0,9FF5,Tiny mixed particle and indicator sprites,low,"The default pool-0 frames are tiny colored dots, circles, and flecks without a clear identity.",sprites_exact/9FF5.png
+136,9929,Purple thorny plant clump,medium,The default pool-136 sheet shows two views of a dense spiked purple plant mass.,sprites_exact/9929.png
+137,2D85,White snow or ice creature in two poses,low,The default pool-137 sheet shows a white-eyed snowy body and a separated-chunk pose; species unknown.,sprites_exact/2D85.png
+32,A606,Dark jagged terrain silhouettes,medium,The default pool-32 frames have stepped and peaked ridge silhouettes.,sprites_exact/A606.png
+143,8D95,Blue cannon firing with muzzle flash and smoke,medium,The default pool-143 sheet shows a blue barrel followed by orange fire and smoke frames.,sprites_exact/8D95.png
+143,6B95,Four spotted orb or ball sprites,medium,"The default pool-143 frames are white, yellow, red, and purple spotted spheres.",sprites_exact/6B95.png
+145,1B40,Pale narrow blade or shard projectiles,low,The default pool-145 frames are pale tapered streaks with no recognizable weapon handle.,sprites_exact/1B40.png
+145,1B41,Pale narrow blade or shard projectiles,low,The default pool-145 frames are short diagonal silver streaks; exact projectile unknown.,sprites_exact/1B41.png
+42,1B42,Short pale streak fragments,low,The default pool-42 frames are four small irregular pale streaks.,sprites_exact/1B42.png
+160,0BA9,Large gold fourfold magic seal,medium,The default pool-160 image is a symmetric gold-brown circular rune seal.,sprites_exact/0BA9.png
+0,363C,Alert punctuation icons,high,The default pool-0 icons include visible exclamation and question marks in three colors.,sprites_exact/363C.png
+0,363D,Speech and emotion bubble icons,high,"The default pool-0 sheet shows dotted, hatched, heart, and music-note speech bubbles.",sprites_exact/363D.png
+134,6AF7,Black Knight,medium,"The default pool-134 frame is a dark cloaked, gold-pink armored humanoid matching the Boktai 3 Black Knight sprite reference.",sprites_exact/6AF7.png; https://www.spriters-resource.com/game_boy_advance/boktai3/asset/56574/; monsters.md
+42,B2D0,Thin blade and rod projectiles,low,The default pool-42 frames are narrow silver bars and pointed streaks at varied angles.,sprites_exact/B2D0.png
+42,B2D1,Thin blade and rod projectiles,low,The default pool-42 frames repeat the thin pale rod and streak shapes.,sprites_exact/B2D1.png
+42,9ED0,Thin rod and blade projectiles,low,The default pool-42 frames are isolated bars and angled pale slivers.,sprites_exact/9ED0.png
+42,9ED1,Sword-blade projectiles,medium,The default pool-42 sheet contains tapered silver blades with crossguard-like marks.,sprites_exact/9ED1.png
+42,9ED2,Long straight rod projectiles,low,The default pool-42 frames are three long upright capped rods.,sprites_exact/9ED2.png
+42,66D0,Straight rod projectiles,low,The default pool-42 frames are narrow pale upright bars and small end marks.,sprites_exact/66D0.png
+42,66D1,Sword-blade projectiles,medium,The default pool-42 frames show tapered blades with small crosspiece details.,sprites_exact/66D1.png
+42,66D2,Sword-blade projectiles,medium,The default pool-42 frames show pale blades with crosspiece details at different angles.,sprites_exact/66D2.png
+42,66D3,Straight rod projectiles,low,"The default pool-42 sheet contains seven short, thin vertical bars.",sprites_exact/66D3.png
+137,2D86,Snow-covered tree prop,medium,The default pool-137 image is a pale layered conifer with a snowy base.,sprites_exact/2D86.png
+176,BCA8,Isometric cube block and flat diamond shadow,medium,The default pool-176 frames show an outlined cube and a flat diamond plane.,sprites_exact/BCA8.png
+181,77AF,Slanted purple-and-gold paneled wall or door,medium,"The default pool-181 image is a gold-edged, blue-purple isometric panel.",sprites_exact/77AF.png
+64,77CF,Tall purple-blue masonry wall panel,medium,The default pool-64 image is an angled masonry section with blue inset highlights.,sprites_exact/77CF.png
+187,4385,Teal sparkle burst particles,medium,The default pool-187 frames are small teal crosses and spreading spark flecks.,sprites_exact/4385.png
+199,34C0,Barred metal door or gate,medium,The default pool-199 image has a framed panel with visible vertical bars.,sprites_exact/34C0.png
+204,7031,Gold coin,high,The default pool-204 sprite is a highlighted gold oval coin.,sprites_exact/7031.png
+204,7032,Gold coin glints and fragments,high,The default pool-204 frames are tiny gold crescent and sparkle fragments.,sprites_exact/7032.png
+32,E857,Dark angular silhouette masks,low,"The default pool-32 frames are near-black peaked, stepped, and rounded shapes.",sprites_exact/E857.png
+210,C870,Orange-and-black equipment or weapon parts,low,"The default pool-210 frames show mixed mechanical, bottle-like, and blade-like forms without one clear object.",sprites_exact/C870.png
+215,1C84,Rolled pale parchment or scroll,medium,The default pool-215 image is a beige cylindrical roll with layered paper edges.,sprites_exact/1C84.png
+9,7A40,Black silhouette mask for a tall structure,low,The default pool-9 image is a single black angular vertical silhouette.,sprites_exact/7A40.png
+82,7790,Green-topped stone roof or building corner,medium,The default pool-82 image combines pale green roof tiles and a brown stone facade.,sprites_exact/7790.png
+181,77B0,Dark stone wall or roof-edge segment,low,The default pool-181 frame is a dark angled masonry face with sparse blue highlights.,sprites_exact/77B0.png
+227,409D,White gust or feather streak animation,medium,The default pool-227 frames show white tapered trails and a long low plume.,sprites_exact/409D.png
+227,409E,Small white and gold sparkle particles,medium,The default pool-227 frames contain tiny pale and gold starbursts and dots.,sprites_exact/409E.png
+227,409F,Gold and white impact puffs,medium,The default pool-227 frames shift from gold-orange bursts to white round puffs.,sprites_exact/409F.png
+227,40A0,Yellow circular flash or projectile stages,medium,The default pool-227 frames show expanding yellow discs and rings.,sprites_exact/40A0.png
+227,40A1,Two small horizontal yellow-white projectile bars,low,The default pool-227 frames are two capped yellow-white horizontal bars; exact function unclear.,sprites_exact/40A1.png
+227,40A2,gold and pale slash/capsule effect,medium,The default palette colors the slashes ochre and the final two capsule shapes pale cream; no alternate pool is listed for this hash.,sprites_exact/40A2.png; sprites_exact.tsv
+229,96F7,pink striped signpost,high,The single-frame default shows a pink-red diagonal sign on a gray post; sprites_exact.tsv lists no variant pool.,sprites_exact/96F7.png; sprites_exact.tsv
+0,A5BD,white COMBO / SCORE UI lettering,high,The pale lettering and black backing are visible in the two default frames; no alternate palette is listed.,sprites_exact/A5BD.png; sprites_exact.tsv
+230,7AD5,purple-blue dungeon door,medium,Default colors are purple and blue across the three door faces; no variant pool is recorded.,sprites_exact/7AD5.png; sprites_exact.tsv
+238,7AF4,gray stone dungeon door,medium,The default palette renders the three door faces pale gray above dark masonry; no variant pool is recorded.,sprites_exact/7AF4.png; sprites_exact.tsv
+238,7AF5,gray stone dungeon door,medium,The default palette uses pale gray stone panels with darker lower masonry; no variant pool is recorded.,sprites_exact/7AF5.png; sprites_exact.tsv
+238,7AF6,gray stone dungeon door,medium,The default palette colors the three door faces pale gray and charcoal; no variant pool is recorded.,sprites_exact/7AF6.png; sprites_exact.tsv
+238,7B0D,gray stone door assembly,medium,The default palette shows pale gray stone faces with dark lower sections; no variant pool is recorded.,sprites_exact/7B0D.png; sprites_exact.tsv
+210,C871,green leafy monster head,low,The one default frame is dark and bright green with yellow-green highlights and a white mouth; no alternate pool is listed.,sprites_exact/C871.png; sprites_exact.tsv; https://boktai.fandom.com/wiki/Monsters
+249,41B1,multicolored small spark fragments,medium,"Default frames use pale green, orange, cream, and blue fragments; sprites_exact.tsv has no variant pool.",sprites_exact/41B1.png; sprites_exact.tsv
+260,AE8E,red and gold barrier panels,medium,Default panel frames use deep red/dark interiors and gold borders; sprites_exact.tsv has no variant pool.,sprites_exact/AE8E.png; sprites_exact.tsv
+260,1397,orange-red slash projectiles,medium,The default frames are orange-red narrow streaks; sprites_exact.tsv has no variant pool.,sprites_exact/1397.png; sprites_exact.tsv
+260,40A3,orange and green bulb objects,low,The default pair is orange and green with a shared gray base; sprites_exact.tsv has no variant pool.,sprites_exact/40A3.png; sprites_exact.tsv
+260,6698,green-gray stone chunks,medium,Both default frames are green-gray angular stone; sprites_exact.tsv has no variant pool.,sprites_exact/6698.png; sprites_exact.tsv
+261,6157,tan object with red outline,low,The single default frame has a tan center surrounded by a bright red outline; sprites_exact.tsv has no variant pool.,sprites_exact/6157.png; sprites_exact.tsv
+271,D962,pink-red door panels,medium,The default sheet uses pink-red faces and dark outlines across its eight door poses; sprites_exact.tsv has no variant pool.,sprites_exact/D962.png; sprites_exact.tsv
+278,2112,gold rings and sparkles,medium,The sixteen default frames use pale gold circles and radial marks; sprites_exact.tsv lists no variant pool.,sprites_exact/2112.png; sprites_exact.tsv
+75,2111,pale gold luminous orb,medium,The default frames render the three orb sizes in pale yellow and cream; sprites_exact.tsv has no variant pool.,sprites_exact/2111.png; sprites_exact.tsv
+366,210F,yellow spark burst,medium,Five default frames are yellow starbursts and thin radial strokes; sprites_exact.tsv lists no variant pool.,sprites_exact/210F.png; sprites_exact.tsv
+32,CCA1,tan dungeon object icons,low,"Default object fragments are shaded tan, brown, and dark umber; sprites_exact.tsv has no variant pool.",sprites_exact/CCA1.png; sprites_exact.tsv
+285,18A8,white UI glyph fragments,low,Default frames show sparse white marks against transparency; sprites_exact.tsv lists no variant pool.,sprites_exact/18A8.png; sprites_exact.tsv
+285,18A9,white UI digits,high,The digits are white in the default palette; sprites_exact.tsv has no variant pool.,sprites_exact/18A9.png; sprites_exact.tsv
+286,2769,blue-violet flame and green-ringed orb,medium,Default colors are blue-violet on the upright capsule and blue-green on the second orb; no variant pool is recorded.,sprites_exact/2769.png; sprites_exact.tsv
+291,634C,pale stone fragments,medium,The two default frames are pale pink-gray stone and darker rubble; sprites_exact.tsv lists no variant pool.,sprites_exact/634C.png; sprites_exact.tsv
+64,77B1,black doorway with purple-red trim,medium,Default palette shows a nearly black interior and purple-red striped boundary; no variant pool is recorded.,sprites_exact/77B1.png; sprites_exact.tsv
+137,474D,pale vertical sprite,unknown,The only default frame is pale colored and narrow; its identity and palette purpose are unclear.,sprites_exact/474D.png; sprites_exact.tsv
+294,F422,tan mechanical and treasure fragments,low,Default pieces are tan and brown with dark outlines; sprites_exact.tsv lists no variant pool.,sprites_exact/F422.png; sprites_exact.tsv
+294,8490,pale gold light effect,low,The six default frames use pale gold and cream for star and orb shapes; no variant pool is recorded.,sprites_exact/8490.png; sprites_exact.tsv
+298,EF69,red-black banner panel with gold edging,medium,The single default panel is dark red and black with orange-gold edges; sprites_exact.tsv has no variant pool.,sprites_exact/EF69.png; sprites_exact.tsv
+64,77EA,orange-gold doorway panel,medium,Default frames show orange-gold panels and darker edge shading; sprites_exact.tsv lists no variant pool.,sprites_exact/77EA.png; sprites_exact.tsv
+314,9A1F,red and white PUSH START BUTTON text,high,The default UI letters are red with pale highlights and dark outlines; sprites_exact.tsv has no variant pool.,sprites_exact/9A1F.png; sprites_exact.tsv
+315,C459,pale yellow diamond marker,medium,The one default frame is cream-yellow with a white double border; no variant pool is listed.,sprites_exact/C459.png; sprites_exact.tsv
+316,D85E,cream smoke and bubble effect,medium,Default frames use cream-white rings and wisps that fade into dark forms; sprites_exact.tsv lists no variant pool.,sprites_exact/D85E.png; sprites_exact.tsv
+332,EFD8,blue rune diamonds,medium,Default frames are dark blue diamonds with pale cyan runes; no variant pool is recorded.,sprites_exact/EFD8.png; sprites_exact.tsv
+339,8639,orange-yellow explosion,medium,The default sequence starts orange-yellow and ends in dark silhouettes; no variant pool is listed.,sprites_exact/8639.png; sprites_exact.tsv
+343,97D4,green and yellow flower-like effects,low,Default frames use green stems or flecks and yellow-orange centers; no variant pool is listed.,sprites_exact/97D4.png; sprites_exact.tsv
+343,97D5,green and yellow flower-like effects,low,Default frames use green and yellow-orange colors like related 97D4 poses; no variant pool is listed.,sprites_exact/97D5.png; sprites_exact.tsv
+348,C42D,pale blue-white creature or object,low,The single frame is pale cyan and white with brown protrusions; sprites_exact.tsv lists no alternate palette.,sprites_exact/C42D.png; sprites_exact.tsv
+348,0334,pale blue-white tiny fragment,low,The 8-pixel default image shows a pale cyan-white mark; no variant pool is recorded.,sprites_exact/0334.png; sprites_exact.tsv
+32,7C5A,tan stone wall debris,medium,The default frames show tan masonry that transitions into dark and pale broken forms; no variant pool is listed.,sprites_exact/7C5A.png; sprites_exact.tsv
+64,77B2,black doorway with purple-red trim,medium,Default palette shows the opposite angled doorway edge to 77B1 in matching purple-red and black; no variant pool is recorded.,sprites_exact/77B2.png; sprites_exact.tsv
+58,77D2,orange rock-like form,low,The default frame is orange with reddish-brown facets and dark central marks; no variant pool is recorded.,sprites_exact/77D2.png; sprites_exact.tsv
+364,B0A9,pale blue crystal fragments,medium,Default frames use pale cyan-white crystal faces with dark blue-gray outlines; no variant pool is recorded.,sprites_exact/B0A9.png; sprites_exact.tsv
+381,CA1F,small multicolored creature-like icons,low,"The default frames contain separate small figures in green, yellow, purple, and brown; sprites_exact.tsv lists no variant palette.",sprites_exact/CA1F.png; sprites_exact.tsv; https://boktai.fandom.com/wiki/Monsters
+393,FF95,brown wooden crate,high,The default crate is shaded brown with darker slat seams and pale reinforced corners; no variant pool is listed.,sprites_exact/FF95.png; sprites_exact.tsv
+32,78E3,tan and brown dungeon fragments,low,"Default pieces are tan, umber, and dark brown isometric forms; sprites_exact.tsv lists no alternate palette.",sprites_exact/78E3.png; sprites_exact.tsv
+399,5D5F,brown stacked wooden boards,high,The single default frame uses brown boards with lighter layered edges; no variant pool is listed.,sprites_exact/5D5F.png; sprites_exact.tsv
+402,D4EA,white humanoid silhouettes,medium,"All ten default poses are monochrome pale white, consistent with a mask or hit-flash sheet; sprites_exact.tsv lists no alternate pool.",sprites_exact/D4EA.png; sprites_exact.tsv
+402,47DE,white humanoid silhouettes,medium,The default pool colors all 25 humanoid poses pale white; no alternate pool is listed.,sprites_exact/47DE.png; sprites_exact.tsv
+32,CCB0,Ancient stone fixtures and ruin pieces,medium,"Default palette 32 renders the 16 frames as tan and brown stone fixtures, stairs, carved pedestals, and broken wall edges.",sprites_exact/CCB0.png; sprites_codex.md
+82,7793,Orange-slit metal door panel,medium,Default palette 82 shows a gray door face with six orange-lit slots.,sprites_exact/7793.png
+413,77B3,Pale stone creature or rock formation,low,Default palette 413 shows a pale lavender craggy mass; no named creature match is established.,sprites_exact/77B3.png
+414,77D3,unknown,unknown,Default palette 414 shows one dark square with a gray irregular silhouette and one blank frame.,sprites_exact/77D3.png
+415,2097,Glowing rune pedestal,medium,Default palette 415 renders bronze pedestal frames with cyan runes that vary by frame.,sprites_exact/2097.png
+364,B0AA,Blue-glass diamond panel,medium,Default palette 364 renders a silver beveled plate with a cyan glass center.,sprites_exact/B0AA.png
+416,BD29,Lever switch,medium,Default palette 416 renders a blue lever on a gray metal mounting block.,sprites_exact/BD29.png
+419,C7EE,Green and orange beetle-like creature,low,Default palette 419 shows a small green-blue and orange creature body section.,sprites_exact/C7EE.png; sprites_codex.md
+419,C7EF,Green and orange creature fragments,low,"Default palette 419 renders small green, yellow, and orange creature fragments.",sprites_exact/C7EF.png; sprites_codex.md
+419,C7F0,Green segmented beetle-like creature,medium,Default palette 419 shows the green armored insect-like body with orange undersides.,sprites_exact/C7F0.png; sprites_codex.md
+429,505C,Small food and bottle item icons,medium,Default palette 429 renders tiny food shapes and bottle-like icons.,sprites_exact/505C.png; local fan guide items.html
+439,7E7E,Red spiny creature and burst frames,medium,"Default palette 439 shows red spines and blue legs, burst frames, and red bomb-like objects.",sprites_exact/7E7E.png; sprites_codex.md
+439,7E7F,Red cannon,medium,Default palette 439 renders the cannon red and orange with gray firing parts.,sprites_exact/7E7F.png; sprites_codex.md
+439,7E80,Cannon impact and wreckage,medium,Default palette 439 renders a red projectile and red-gray cannon fragments.,sprites_exact/7E80.png; sprites_codex.md
+439,7E81,Red mechanical projectile and debris,medium,Default palette 439 renders red-gray machine parts and a red trail.,sprites_exact/7E81.png; sprites_codex.md
+0,A8E7,UI toggle and status symbols,medium,Default palette 0 displays colored checkbox and green status glyphs.,sprites_exact/A8E7.png
+458,2E94,Red and violet barred doorway,medium,Default palette 458 renders a red barrier with violet glowing edges.,sprites_exact/2E94.png
+459,5A6F,Flying crow animation,medium,Default palette 459 renders blue-black bird silhouettes; neighboring 5A6E is loaded by Crow_Create.,sprites_exact/5A6F.png; sprites_codex.md (5A6E Crow_Create)
+465,8203,Pulsing pink-white orb,medium,Default palette 465 renders the orb pink and white with a purple curled mark.,sprites_exact/8203.png
+465,8204,Purple bubbles,medium,Default palette 465 renders both bubbles violet with white highlights.,sprites_exact/8204.png
+474,8205,Purple key-shaped icons,medium,Default palette 474 renders the four keylike shapes purple.,sprites_exact/8205.png
+465,8206,Purple orb and spiked fragments,medium,Default palette 465 renders bubbles and blocklike fragments in purple.,sprites_exact/8206.png
+465,8207,Small purple orb fragments,medium,Default palette 465 renders tiny violet particles and chips.,sprites_exact/8207.png
+488,BE6F,Purple metal rod,medium,Default palette 488 renders a single purple-gray beveled bar.,sprites_exact/BE6F.png
+364,17C9,Blue-glass diamond panel,medium,Default palette 364 renders a silver-framed cyan diamond plate.,sprites_exact/17C9.png
+364,B0AB,Blue-glass diamond cap,medium,Default palette 364 renders a silver diamond frame with a cyan triangular insert.,sprites_exact/B0AB.png
+490,B626,Orb breakable,medium,"Default palette 490 shows a gold sphere with dangling pieces, matching the local guide's b_orb.gif breakable illustration.","sprites_exact/B626.png; local fan guide breakables.html (Orb, Dark Castle)"
+496,E7EA,Five colored UI markers,medium,"Default palette 496 renders plus-shaped markers in purple, magenta, red, cream, and mint green.",sprites_exact/E7EA.png
+497,DFCF,Thorned ooze or tendril,low,Default palette 497 renders a curved dark pink and brown spiked loop.,sprites_exact/DFCF.png
+498,8E5A,Multicolor slash and orb effects,medium,"Default palette 498 renders gold/lavender streaks, fiery circular bursts, and colored disks.",sprites_exact/8E5A.png
+498,8E5B,Pale slash and sparkle particles,medium,"Default palette 498 renders white, gray, and lavender streaks, crosses, and shards.",sprites_exact/8E5B.png
+503,593B,Character mugshot and dialogue tiles,medium,Default palette 503 displays cropped portraits and dialogue/status tiles; Spriters Resource lists a Mugshots asset.,sprites_exact/593B.png; https://www.spriters-resource.com/game_boy_advance/boktai3/
+512,80AC,Red glowing marker,medium,Default palette 512 renders a red slanted panel with a yellow glow.,sprites_exact/80AC.png
+515,C039,Blank tan oval plaque,medium,Default palette 515 renders a beige plaque with a blank inset oval.,sprites_exact/C039.png
+64,52EF,Stone staircase,medium,Default palette 64 renders dark gray stone steps with blue edge highlights.,sprites_exact/52EF.png
+543,DC7A,White orb charge or impact,medium,Default palette 543 renders a small white-yellow orb with red orbit marks and expanding rings.,sprites_exact/DC7A.png
+393,F2F1,Wooden marker in cyan diamond frame,medium,Default palette 393 renders a brown plank inside a cyan diamond outline.,sprites_exact/F2F1.png
+548,7C30,Red-brown barred panel,medium,Default palette 548 renders a red-brown slatted panel with a pale diagonal brace.,sprites_exact/7C30.png
+364,B0AC,Blue-glass diamond corner panel,medium,Default palette 364 renders silver and cyan beveled corner shapes.,sprites_exact/B0AC.png
+554,E769,Hresvelgr,high,"Default palette 554 shows the gold-blue beaked, spined bird creature matching Hresvelgr's named enemy/boss reference.",sprites_exact/E769.png; https://www.spriters-resource.com/game_boy_advance/boktai3/asset/56583/; https://boktai.fandom.com/wiki/Monsters
+554,E76A,Hresvelgr spark and feather effects,medium,Default palette 554 renders gold-blue spiky fragments and starbursts matching the adjacent Hresvelgr sheet.,sprites_exact/E76A.png; https://www.spriters-resource.com/game_boy_advance/boktai3/asset/56583/
+554,E76B,Hresvelgr body and wing pieces,medium,"Default palette 554 renders gold-blue head and wing sections in several poses, matching the adjacent Hresvelgr body sheet.",sprites_exact/E76B.png; https://www.spriters-resource.com/game_boy_advance/boktai3/asset/56583/
+32,65D5,Wooden furniture and floor pieces,medium,"Default palette 32 renders a carved box, stairs, barrels, beams, and plank corners in brown shades.",sprites_exact/65D5.png; sprites_codex.md
+570,654B,GAME OVER text,high,Default palette 570 renders red letter sprites spelling GAME OVER.,sprites_exact/654B.png
+549,7E83,White puff and crescent effect,medium,Default palette 549 renders fading white puffs and a crescent.,sprites_exact/7E83.png; sprites_codex.md
+571,9D3F,Rock-orb icon with Japanese text,medium,Default palette 571 shows a rock sphere and faint blue Japanese text and numerals.,sprites_exact/9D3F.png
+574,7C99,Colored elemental/status emblems,medium,Default palette 574 renders seven distinct colored symbols.,sprites_exact/7C99.png
+575,DA09,Amber stone chunk with cyan edge,medium,Default palette 575 renders an orange faceted chunk with cyan edges.,sprites_exact/DA09.png
+575,C3BD,Cyan-centered diamond floor pad,medium,Default palette 575 renders a turquoise center in a patterned red-cyan diamond border.,sprites_exact/C3BD.png
+575,9462,Amber faceted block,medium,Default palette 575 renders a gold-orange faceted block at an isometric angle.,sprites_exact/9462.png
+575,75D6,Amber and cyan inset diamond plate,medium,"Palette 575 renders the plate amber with a pale inset and cyan rim accents, as visible in the single frame.",sprites_exact/75D6.png
+575,7605,Copper diamond plate with cyan corner studs,medium,"Palette 575 gives the rounded diamond face copper-orange, with cyan corner studs and a darker raised border.",sprites_exact/7605.png
+575,2E81,Cyan diamond panel with four black arrowheads,medium,Palette 575 colors the diamond bright cyan and keeps its four central arrowhead marks dark.,sprites_exact/2E81.png
+584,D292,Cyan-white cloud burst,medium,Palette 584 renders the single cloud-like burst in pale cyan and white with a turquoise jagged edge.,sprites_exact/D292.png
+32,3A54,Brown shards and pale streak effect atlas,medium,Palette 32 colors the clustered fragments brown and the fine slash-like marks pale beige.,sprites_exact/3A54.png
+42,B290,Pale diagonal blade and rod effects,medium,"Palette 42 renders the isolated blades and short rods in beige, gray, and dark brown.",sprites_exact/B290.png
+42,B291,Pale curved slash and fragment effects,medium,Palette 42 gives the curved slivers pale tan edges with dark outlines.,sprites_exact/B291.png
+42,9E90,Small angled blade streak atlas,medium,Palette 42 uses pale gold and gray for the small angled streaks against transparent cells.,sprites_exact/9E90.png
+42,9E91,Straight pale blade and sliver effects,medium,Palette 42 renders the horizontal and diagonal slivers in muted cream and gray.,sprites_exact/9E91.png
+42,9E92,Three gold-capped rod projectiles,medium,Palette 42 shows dark shafts with small light-gold caps on three differently sized rods.,sprites_exact/9E92.png
+42,6690,Pale blade fragments and short rods,medium,Palette 42 renders the blades and upright marks as tan-gold and dark gray pieces.,sprites_exact/6690.png
+42,6691,Pale curved blade streaks,medium,Palette 42 colors each hooked light streak cream with a gray-brown edge.,sprites_exact/6691.png
+42,6692,Pale angled slash fragments,medium,Palette 42 renders the thin slashes in pale beige and muted gray-brown.,sprites_exact/6692.png
+42,6693,Gold-tipped vertical rod effects,medium,Palette 42 gives the rods dark shafts and pale gold end caps.,sprites_exact/6693.png
+588,C038,Green orb and splatter effect sequence,medium,Palette 588 is visibly green across the expanding round glows and the later scattered flecks.,sprites_exact/C038.png
+364,B0AD,Silver-framed cyan diamond arrow panel,medium,Palette 364 shows the beveled border in silver-gray and the panel center in bright cyan-blue.,sprites_exact/B0AD.png
+612,3A2D,Diagonal pale green tiled slab,medium,Palette 612 renders alternating cream and pale green tile rows with dark edge pixels.,sprites_exact/3A2D.png
+32,3C0F,Numbered dark emblem tiles,medium,Palette 32 makes the badge row dark brown with pale tan numeral and glyph marks.,sprites_exact/3C0F.png
+619,83A6,Mixed colored shard and impact particles,medium,"Palette 619 displays the fragments in mixed tan, blue, orange, and off-white colors.",sprites_exact/83A6.png
+627,E369,Pink and violet fragment streaks,medium,Palette 627 colors the isolated streaks saturated pink and magenta with dark violet outlines.,sprites_exact/E369.png
+633,A874,Orange-red flame or blade plume,low,Palette 633 shows an orange central plume with a dark red underside; hue alone does not resolve flame versus blade.,sprites_exact/A874.png
+633,A875,Small orange cross-shaped fragment,medium,Palette 633 renders the tiny cross-shaped mark orange with dark pixels along its edge.,sprites_exact/A875.png
+32,D1A7,Three dark silhouette mask shapes,medium,"Palette 32 renders all three polygonal shapes nearly black, with no interior color detail.",sprites_exact/D1A7.png
+643,249A,Gold and cyan beetle-like particle pieces,low,Palette 643 shows the repeated tiny forms in gold-orange with cyan accents; the palette does not determine whether these are a creature or effect.,sprites_exact/249A.png
+42,B2B0,Pale diagonal blade and rod effects,medium,"Palette 42 colors the isolated slender blades and bars in cream, gold, and muted gray.",sprites_exact/B2B0.png
+42,B2B1,Pale curved slash and fragment effects,medium,Palette 42 renders the hooked slashes in pale beige with dark outlines.,sprites_exact/B2B1.png
+42,9EB0,Fine angled blade streaks,medium,Palette 42 shows fine tan and gray diagonal streaks and small pale slivers.,sprites_exact/9EB0.png
+42,9EB1,Fine curved slash fragments,medium,Palette 42 renders the curved marks in light beige with dark brown edges.,sprites_exact/9EB1.png
+42,9EB2,Three dark gold-capped rods,medium,Palette 42 shows three dark narrow shafts with small pale gold tips.,sprites_exact/9EB2.png
+42,66B0,Short upright rod and shard effects,medium,Palette 42 renders thin vertical bars and their small slivers in muted tan and gray.,sprites_exact/66B0.png
+42,66B1,Curved pale blade streaks,medium,Palette 42 colors the bent strokes pale cream with darker gray-brown edges.,sprites_exact/66B1.png
+42,66B2,Pale blade and shard orientations,medium,Palette 42 renders the curved slivers and shards in beige and muted gray.,sprites_exact/66B2.png
+42,66B3,Long gold-tipped rods,medium,Palette 42 gives the long dark bars pale gold end caps and cream highlights.,sprites_exact/66B3.png
+348,04B3,Two-pose teal flame creature or burst,low,Palette 348 renders both curled shapes in sea-green and pale cyan with a small orange base; it does not settle their identity.,sprites_exact/04B3.png
+399,61BF,Wooden crate in two states,high,"Palette 399 shows two tan-brown plank crates with dark openings, matching the local guide image b_crate.gif.",sprites_exact/61BF.png; ~/git/boktai3trans/shinbok guide/images/b_crate.gif
+339,8638,Orange flame and ember sequence,medium,"Palette 339 colors the flame-like and ember marks yellow-orange, with dark red-brown edges.",sprites_exact/8638.png
+681,2058,Blue-violet slash and spark fragments,medium,Palette 681 renders the narrow slashes blue-violet and the small highlights pale blue-white.,sprites_exact/2058.png
+682,7ACE,"Red inset door panels, side and front views",medium,Palette 682 makes the door faces red-orange with pale trim and dark outlines.,sprites_exact/7ACE.png
+682,7ACF,"Red inset door panels, alternate facing set",medium,Palette 682 renders the alternate paneled door views in matching red-orange and pale border colors.,sprites_exact/7ACF.png
+682,7AD0,"Red paneled door, broad front and side views",medium,Palette 682 shows the wide front in orange-red planks framed by cream trim.,sprites_exact/7AD0.png
+682,7AD1,"Red paneled door, broad front and side views",medium,Palette 682 uses the same red-orange plank and pale edging colors on this separate three-view door sheet.,sprites_exact/7AD1.png
+32,7509,Brown stone and bone-like fragments,low,Palette 32 shows small brown and tan clusters with dark edges; these colors fit debris but do not identify a specific object.,sprites_exact/7509.png
+684,2E78,Blue-white discs and concentric rings,medium,Palette 684 renders the round forms and ring outlines pale blue and white with bright yellow centers on some icons.,sprites_exact/2E78.png
+684,2E79,Small blue-white droplets and orbs,medium,Palette 684 colors the droplets blue-white with pale highlights and tiny detached flecks.,sprites_exact/2E79.png
+684,2E7A,Blue-white wave or splash sequence,medium,Palette 684 gives each horizontal curved form a blue body and white crest-like highlights.,sprites_exact/2E7A.png
+684,2E7B,Blue-white circular markers and rings,medium,"Palette 684 alternates blue-edged round markers, pale discs, and blue concentric rings.",sprites_exact/2E7B.png
+684,2E7C,Tiny blue ring and dot particles,medium,Palette 684 renders the tiny circles and hollow rings in blue with pale centers.,sprites_exact/2E7C.png
+696,A894,Tan-gold rock or debris chunk,low,"Palette 696 gives the single irregular chunk a tan-gold top, brown edge, and purple-gray underside; it remains an unnamed debris-like object.",sprites_exact/A894.png
+696,A895,Small tan-gold debris fragment,low,Palette 696 shows a smaller tan-gold and purple-gray fragment with the same color set as A894.,sprites_exact/A895.png
+42,B270,Tan pointed shard / dart projectile,low,Default palette 42 colors the 16 rotated pointed pieces beige with dark outlines; visually consistent as a small shard or dart.,sprites_exact/B270.png
+42,B271,Tan pointed shard / dart projectile,low,Default palette 42 colors the 14 short spike poses beige; this sheet has broader tips than B270.,sprites_exact/B271.png
+42,9E70,Thin tan needle projectile,low,Default palette 42 colors the repeated long narrow needles beige; the wider diagonal tips remain the same shape family.,sprites_exact/9E70.png
+42,9E71,Tan arrowhead / dart projectile,low,"Default palette 42 colors the arrow-like pointed bars tan across horizontal, diagonal, and vertical poses.",sprites_exact/9E71.png
+42,9E72,Three tan needle sprites,low,Default palette 42 colors all three upright narrow points tan with dark caps.,sprites_exact/9E72.png
+42,6670,Thin tan needle projectile,low,Default palette 42 colors the thin slivers and wider diagonal shard poses tan.,sprites_exact/6670.png
+42,6671,Tan blade-like dart projectile,low,Default palette 42 colors the wider pointed blade poses tan with dark bases.,sprites_exact/6671.png
+42,6672,Tan blade and needle projectiles,low,Default palette 42 gives the broad blade shapes and narrow needles the same tan body color.,sprites_exact/6672.png
+42,6673,Tan vertical needle projectile,low,Default palette 42 colors all seven narrow vertical bars tan with dark edges.,sprites_exact/6673.png
+701,5292,Small weapon sprites,medium,"The default palette 701 renders five distinct blade sprites in white, gray, and gold; the neighboring weapon sheet 5291 is associated with Axe_Create.",sprites_exact/5292.png; sprites_codex.md (5291 Axe_Create); local guide weapons.html
+738,354D,Curved blue-and-orange slash or swoosh effect,low,"Default palette 738 gives the curved arc cream, blue, peach, and brown bands.",sprites_exact/354D.png
+738,39A3,Small wooden-handled axe,medium,Default palette 738 renders a brown wooden shaft and dark metal axe head in one side-view pose.,sprites_exact/39A3.png
+746,70EE,Two-state isometric panel or hatch,low,Default palette 746 colors the two gray inset-plate states with a magenta edge.,sprites_exact/70EE.png
+749,0C0A,Four-frame analog clock face,medium,Default palette 749 renders a cream dial with dark rim and moving dark hands across four frames.,sprites_exact/0C0A.png; local guide photos.html (clocktower manager)
+58,9D2F,Orange flame-textured isometric block,low,"Default palette 58 supplies the orange, yellow, and red ridges on the cube.",sprites_exact/9D2F.png
+750,2567,Curled blue-green vine or tendril,low,Default palette 750 colors the curled strand teal-green with orange joints.,sprites_exact/2567.png
+750,DF0E,Short curved green tendril,low,Default palette 750 colors the short hooked segment blue-green with orange joint pixels.,sprites_exact/DF0E.png
+750,1E15,unknown,low,"Default palette 750 colors the 8x8 diagonal fleck green and orange, but it is too small to identify.",sprites_exact/1E15.png
+32,8734,Isometric rocks and dry vegetation,low,Default palette 32 colors two bare trees and several pale stone formations in earthy beige and brown.,sprites_exact/8734.png; codex_out/world.md
+32,0463,Isometric room props and fixtures,low,"Default palette 32 renders the 16 isometric objects in a monochrome beige/brown palette, showing containers, steps, rubble, fixtures, and vegetation.",sprites_exact/0463.png; codex_out/world.md
+752,306E,White crescent claw or blade effect,medium,Default palette 752 renders the hooked crescent white with an orange tip across six rotations.,sprites_exact/306E.png
+752,306F,Gray-blue whirlwind effect,medium,Default palette 752 colors the five curled wind poses gray-blue; the shape is a tapered spiral gust.,"sprites_exact/306F.png; https://gamefaqs.gamespot.com/gba/926529-shin-bokura-no-taiyou-gyakushuu-no-sabata/faqs/38163 (Boss Guide, Tree boss)"
+768,0DDE,unknown,low,Default palette 768 colors the small brown-haired figure's clothes gray and black; identity is not established.,sprites_exact/0DDE.png; local guide photos.html
+627,84B4,Pink feather-like streak and impact effect,medium,Default palette 627 colors the fine streaks and large feather-shaped burst pink and white.,"sprites_exact/84B4.png; https://gamefaqs.gamespot.com/gba/926529-shin-bokura-no-taiyou-gyakushuu-no-sabata/faqs/38163 (Boss Guide, Tree boss)"
+627,96C1,Pink feather-like slash and burst effect,medium,Default palette 627 matches the white-pink streaks and curved burst frames in the related 84B4 sheet.,"sprites_exact/96C1.png; https://gamefaqs.gamespot.com/gba/926529-shin-bokura-no-taiyou-gyakushuu-no-sabata/faqs/38163 (Boss Guide, Tree boss)"
+627,96C2,Pink impact particles,medium,Default palette 627 colors six clusters of bright pink flecks; the palette matches the burst sheets 84B4 and 96C1.,sprites_exact/96C2.png; sprites_exact/84B4.png; sprites_exact/96C1.png
+204,B96C,Slime (yellow default palette),medium,"The default sheet body is yellow with a green center, and the sheet is the same droplet-shaped Slime actor as the four color variants. The documented kinds 41–44 use C=4,5,1,2 and never C=0, so this base color is not assigned to one of the four listed slime kinds.",sprites_exact/B96C.png; monsters.md (kinds 41–44); spawners.txt (procs 1562–1571)
+205,B96C,Green Slime,high,"C=1 selects pool 205; the sprite is green with a pale orange core, matching the listed Green Slime kind.",sprites_exact/B96C_pool205.png; monsters.md (kind 43); spawners.txt (proc 1568); https://gamefaqs.gamespot.com/gba/926529-shin-bokura-no-taiyou-gyakushuu-no-sabata/faqs/38163
+206,B96C,Purple Slime,high,"C=2 selects pool 206; the sprite body is purple and pink, matching the listed Purple Slime kind.",sprites_exact/B96C_pool206.png; monsters.md (kind 44); spawners.txt (proc 1571); https://gamefaqs.gamespot.com/gba/926529-shin-bokura-no-taiyou-gyakushuu-no-sabata/faqs/38163
+208,B96C,Red Slime,high,"C=4 selects pool 208; the sprite body is red, matching the listed Red Slime kind.",sprites_exact/B96C_pool208.png; monsters.md (kind 41); spawners.txt (proc 1562); https://gamefaqs.gamespot.com/gba/926529-shin-bokura-no-taiyou-gyakushuu-no-sabata/faqs/38163
+209,B96C,Blue Slime,high,"C=5 selects pool 209; the sprite body is blue and cyan, matching the listed Blue Slime kind.",sprites_exact/B96C_pool209.png; monsters.md (kind 42); spawners.txt (proc 1565); https://gamefaqs.gamespot.com/gba/926529-shin-bokura-no-taiyou-gyakushuu-no-sabata/faqs/38163
+200,528F,Spider,high,Spider kind 33 uses C=0 and the default pool 200; the sheet shows a gray-bodied spider with ochre legs.,sprites_exact/528F.png; monsters.md (kind 33); spawners.txt (proc 1549); https://www.spriters-resource.com/game_boy_advance/boktai3/
+201,528F,Poison Spider,high,"Spider kind 34 uses C=1 and selects pool 201; the same spider's body and legs shift to teal and green, matching Poison Spider.",sprites_exact/528F_pool201.png; monsters.md (kind 34); spawners.txt (proc 1550); https://www.spriters-resource.com/game_boy_advance/boktai3/
+35,48DE,Mummy,high,Mummy kind 4 uses C=0 and pool 35; the default palette is beige bandages on a dark body.,sprites_exact/48DE.png; monsters.md (kind 4); spawners.txt (proc 1502); https://gamefaqs.gamespot.com/gba/926529-shin-bokura-no-taiyou-gyakushuu-no-sabata/faqs/38163
+36,48DE,Mummy (blue palette),high,Mummy kind 5 uses C=1 and selects pool 36; the same bandaged figure changes to blue and violet.,sprites_exact/48DE_pool36.png; monsters.md (kind 5); spawners.txt (proc 1503); https://gamefaqs.gamespot.com/gba/926529-shin-bokura-no-taiyou-gyakushuu-no-sabata/faqs/38163
+298,D638,Ivy,high,"Pool 298 is the only palette on the 37-frame Ivy sheet; the sheet depicts a green, spotted plant enemy, and kind 50 invokes Ivy.",sprites_exact/D638.png; monsters.md (kind 50); spawners.txt (proc 1588); https://gamefaqs.gamespot.com/gba/926529-shin-bokura-no-taiyou-gyakushuu-no-sabata/faqs/38163
+549,7E82,Stone Beast Statue,high,The default pool is used by the statue spawner (kind 51); frames 0–3 show a pale stone beast on a plinth.,sprites_exact/7E82.png; monsters.md (kind 51); spawners.txt (proc 1590); https://gamefaqs.gamespot.com/gba/926529-shin-bokura-no-taiyou-gyakushuu-no-sabata/faqs/38163
+551,7E82,Armor,high,Pool 551 is selected by the armor spawner (kind 52); frames 4–9 show a dark armored knight with sword and shield.,sprites_exact/7E82_pool551.png; monsters.md (kind 52); spawners.txt (proc 1593); https://gamefaqs.gamespot.com/gba/926529-shin-bokura-no-taiyou-gyakushuu-no-sabata/faqs/38163
