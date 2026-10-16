@@ -1,18 +1,16 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 91.7%
-#include "hit_switch.h"
-u32 HitSwitch_AddFromScript(void)
+
+struct HitSwitchManager;
+extern struct HitSwitchManager *gUnk_02000490;
+struct HitSwitchManager *HitSwitch_CreateManager(void);
+/* Declared with a result here: the original forwards whatever r0 holds when
+   this (really void) routine returns. */
+s32 HitSwitch_InitEntryFromScript(struct HitSwitchManager *);
+
+s32 HitSwitch_AddFromScript(void)
 {
     struct HitSwitchManager *manager = gUnk_02000490;
     if (manager == 0)
         manager = HitSwitch_CreateManager();
-    HitSwitch_InitEntryFromScript(manager);
-    /* The original forwards the void callee's incidental return-address word.
-     * This draft provides an explicit result; ASM preserves the original ABI. */
-    return 0;
+    return HitSwitch_InitEntryFromScript(manager);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", HitSwitch_AddFromScript);
-#endif
