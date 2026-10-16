@@ -190,6 +190,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-13.md](../docs/history/2026-10-13.md) | Handoff history: 2026-10-13 | #actors #assets #inventory #menu #particles #scene #scripts #text #tooling #wireless | 13 |
 | [docs/history/2026-10-14.md](../docs/history/2026-10-14.md) | Handoff history: 2026-10-14 | #actors #animation #assets #hud #inventory #library #menu #panel #particles #scene #scripts #sound #tether #text #tooling #wireless | 83 |
 | [docs/history/2026-10-15.md](../docs/history/2026-10-15.md) | Handoff history: 2026-10-15 | #actors #animation #assets #inventory #particles #scene #scripts #sound #text #tooling | 41 |
+| [docs/history/2026-10-16.md](../docs/history/2026-10-16.md) | Handoff history: 2026-10-16 | #actors #scripts #text | 1 |
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 15 |
 | [gcl/README.md](../gcl/README.md) | GCL: the game's scripts | *#scripts #scene #assets #tooling* | 11 |
@@ -269,6 +270,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/scene-panel-states_2026-10-14.md](../notes/scene-panel-states_2026-10-14.md) | Scene panel state and background controls (tentative) | *#scene #panel* | 2 |
 | [notes/scene-pool-states_2026-10-13.md](../notes/scene-pool-states_2026-10-13.md) | Scene pool state family: second contiguous batch | *#scene* | 6 |
 | [notes/scene-pool_2026-10-13.md](../notes/scene-pool_2026-10-13.md) | Scene pool and actor controls, 0803CDF0–0803EE58 | *#actors #scene #tooling* | 5 |
+| [notes/script-entry-points_2026-10-16.md](../notes/script-entry-points_2026-10-16.md) | Script entry points, batch 1 (2026-10-16) | #scripts #text #actors #tooling | 4 |
 | [notes/script-keyframe-pool_2026-10-14.md](../notes/script-keyframe-pool_2026-10-14.md) | Script keyframe pool | *#scripts* | 2 |
 | [notes/script-selector-display_2026-10-14.md](../notes/script-selector-display_2026-10-14.md) | Script selector and shared display animation | *#scripts #animation* | 7 |
 | [notes/script-utility_2026-10-14.md](../notes/script-utility_2026-10-14.md) | Script utility commands and reference ABI | *#scripts #inventory* | 3 |
