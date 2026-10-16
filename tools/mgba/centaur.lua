@@ -32,7 +32,7 @@
 --   hud(true|false)         status overlay
 --   bm("name") / go("name") / bms()   save / load / list bookmarks
 --   god(true|false)         keep life at maximum (GameState +0x28/+0x2A)
---   warp(scene), scene()    experimental: load a scene (stage loads, player does not spawn)
+--   warp(scene[, entrance]), scene()   go to a scene the way a door does (player placed)
 --   callproc(id, {args})    run a script procedure (Script_Call) at the next frame
 --   capture()               send a scene capture to the studio
 --   rec_start("name"), rec_stop()     record inputs from here (savestate + inputs;
@@ -701,12 +701,28 @@ in game: SELECT+L cycles subtitles, SELECT+R saves a quick bookmark
 studio: python3 tools/studio/serve.py, then http://localhost:8642/live]])
 end
 
--- Warp to scene N the way "continue" does (sub_081E132C at 081E14E0):
--- 0x0300546C = 0; Script_Call(*0x020003A8, 0); 0x0300523C = 0 (task mask: a
--- full rebuild, player included); request word 0x030053E8 = 0x11; next scene
--- 0x030039F0 = N (sub_0821B03C), with GameState+0x5A4 = N as the saved scene.
--- Scenes are script procedures; python3 tools/mgba/scenes.py lists them.
-function warp(scene)
+-- Warp to scene N, arriving at entrance E, the way a door does: proc_945(scene,
+-- entrance, back) runs proc_953 (r708[0x70] = entrance, the number the scene's
+-- entrance procedures test to place the player) and proc_952 (the transition
+-- actor that loads the scene). Without E, the scene's default entrance from
+-- build/centaur/scenes.lua (tools/mgba/scenes.py) is used; entrances per scene
+-- are in build/assets/stages.json (tools/assets/stages.py, docs/ASSETS.md).
+-- Verified headlessly from the start bookmark: 2705/57, 2712/8 and the late
+-- field 3243/126 all load with the player placed and playable.
+local SCENE_ENTRANCE = nil
+local function default_entrance(scene)
+  if not SCENE_ENTRANCE then
+    SCENE_ENTRANCE = {}
+    local ok, list = pcall(dofile, OUT .. "/scenes.lua")
+    if ok and type(list) == "table" then
+      for _, s in ipairs(list) do SCENE_ENTRANCE[s.scene] = s.entrance end
+    end
+  end
+  return SCENE_ENTRANCE[scene]
+end
+-- The older warp, for scenes without a known entrance: what "continue" does
+-- (sub_081E132C at 081E14E0). It loads the stage but does not place the player.
+local function warp_continue(scene)
   local gs = emu:read32(ADDR.GameState)
   local cont = emu:read32(0x020003A8)
   if gs >= 0x02000000 and gs < 0x02040000 then emu:write32(gs + 0x5A4, scene) end
@@ -717,8 +733,18 @@ function warp(scene)
     emu:write16(0x030039F0, scene)
   end
   if HAS_BP and cont > 0 and cont < 0x10000 then callproc(cont, {}, finish) else finish() end
+  return cont
+end
+function warp(scene, entrance)
+  entrance = entrance or default_entrance(scene)
+  if HAS_BP and entrance then
+    callproc(945, { scene, entrance, 0 })
+    LOG(string.format("warp to scene %d entrance %d", scene, entrance)); toast(string.format("warp %d.%d", scene, entrance))
+  else
+    local cont = warp_continue(scene)
+    LOG(string.format("warp to scene %d (no entrance; continue proc %d)", scene, cont)); toast("warp " .. scene)
+  end
   S.stage = {}; S.dirty = true
-  LOG(string.format("warp to scene %d (continue proc %d)", scene, cont)); toast("warp " .. scene)
 end
 function scene()
   local gs = emu:read32(ADDR.GameState)
@@ -737,6 +763,49 @@ function where_player()
   end
   m.cx, m.cy = emu:read16(0x03004CB0), emu:read16(0x03004CB2)
   return m
+end
+-- Story state: script variables as gcx.py prints them, region[offset.bit]:type.
+-- Regions are pointers: r700 at 0x02000700 (scratch), r708 at 0x02000708 (the
+-- script work area, where progress r708[0x3c] and most scene flags live), gs =
+-- GameState (0x02000710). Types (sub_0821B20C/Script_SetVar): 1/6 16-bit, 2/3
+-- byte, 4 one bit, 8 24-bit, 9 word. The page chooses what to watch ("vars").
+local VAR_BASE = { r700 = 0x02000700, r708 = 0x02000708, gs = 0x02000710 }
+local STORY_VARS = {}
+local function var_addr(v)
+  local p = VAR_BASE[v.r] and emu:read32(VAR_BASE[v.r])
+  if not p or p < 0x02000000 or p >= 0x02040000 then return nil end
+  return p + v.o
+end
+local function read_var(v)
+  local a = var_addr(v)
+  if not a then return nil end
+  if v.t == 4 then return (emu:read8(a + ((v.b or 0) >> 3)) >> ((v.b or 0) & 7)) & 1
+  elseif v.t == 2 or v.t == 3 then return emu:read8(a)
+  elseif v.t == 8 then return emu:read32(a) & 0xFFFFFF
+  elseif v.t == 9 then return emu:read32(a)
+  else local x = emu:read16(a); return v.t == 1 and x >= 0x8000 and x - 0x10000 or x end
+end
+local function write_var(v, value)
+  local a = var_addr(v)
+  if not a then return end
+  if v.t == 4 then
+    local q, m = a + ((v.b or 0) >> 3), 1 << ((v.b or 0) & 7)
+    emu:write8(q, value ~= 0 and (emu:read8(q) | m) or (emu:read8(q) & ~m))
+  elseif v.t == 2 or v.t == 3 then emu:write8(a, value & 0xFF)
+  elseif v.t == 8 then emu:write32(a, (emu:read32(a) & 0xFF000000) | (value & 0xFFFFFF))
+  elseif v.t == 9 then emu:write32(a, value)
+  else emu:write16(a, value & 0xFFFF) end
+end
+function story()
+  local m = { t = "story", progress = read_var({ r = "r708", o = 0x3C, t = 1 }),
+              entrance = read_var({ r = "r708", o = 0x70, t = 1 }), scene = scene(), flags = {}, vars = {} }
+  for k = 0, 4 do m.flags[#m.flags + 1] = read_var({ r = "gs", o = 0x720 + 4 * k, t = 9 }) or false end
+  for i, v in ipairs(STORY_VARS) do m.vars[i] = read_var(v) or false end
+  return m
+end
+function setvar(r, o, t, b, value)
+  write_var({ r = r, o = o, t = t, b = b }, value)
+  LOG(string.format("set %s[0x%x%s]:t%d = %d", r, o, t == 4 and ("." .. (b or 0)) or "", t, value))
 end
 function centaur_state() return { map = S.stage.map, tileset = S.stage.tileset, pal = S.stage.pal, scene = scene(), items = S.items, text = S.text } end
 
@@ -792,7 +861,9 @@ COMMANDS = {
   bookmark = function(c) bm(c.name) end,
   load = function(c) go(c.name) end,
   bookmarks = function() send({ t = "bookmarks", list = bm_index() }) end,
-  warp = function(c) warp(c.scene) end,
+  warp = function(c) warp(c.scene, c.entrance) end,
+  vars = function(c) STORY_VARS = c.list or {}; send(story()) end,
+  setvar = function(c) setvar(c.r, c.o, c.t, c.b, c.value); send(story()) end,
   callproc = function(c) callproc(c.id, c.args) end,
   subs = function(c)
     if c.mode then subs(c.mode) end
@@ -876,6 +947,7 @@ callbacks:add("frame", function()
   print_flush()
   link_flush()
   if f % 6 == 0 then send(where_player()) end
+  if f % 20 == 10 then send(story()) end
   if f % 30 == 0 then
     local gs = emu:read32(ADDR.GameState)
     local life = (gs >= 0x02000000 and gs < 0x02040000) and emu:read16(gs + 0x28) or nil

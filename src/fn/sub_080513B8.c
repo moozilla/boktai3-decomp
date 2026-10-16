@@ -2,10 +2,11 @@
 // MATCHING_CONCESSION: register-pinning
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-static inline void readRanges(struct DirectionalForce *force)
+static inline s32 readRanges(struct DirectionalForce *force)
 {
     u32 magnitude;
     u32 delay;
+    register s32 status asm("r0");
     if (Script_SeekToKeyword('p')) {
         force->baseMagnitude = Script_GetValue();
         magnitude = Script_GetValue();
@@ -15,18 +16,22 @@ static inline void readRanges(struct DirectionalForce *force)
     }
     force->magnitudeRange = magnitude;
     delay = Script_SeekToKeyword('t');
+    status = delay;
     if (delay) {
         force->baseDelay = Script_GetValue();
         delay = Script_GetValue();
+        status = delay;
     } else {
         delay = 120;
         force->baseDelay = delay;
     }
     force->delayRange = delay;
+    return status;
 }
 s32 DirectionalForce_InitializeFromScript(struct DirectionalForce *force, u32 id)
 {
     u32 value;
+    register s32 status asm("r0");
     force->id = id;
     {
         u32 mode;
@@ -37,11 +42,21 @@ s32 DirectionalForce_InitializeFromScript(struct DirectionalForce *force, u32 id
         force->mode = mode;
     }
     {
-        u32 found = Script_SeekToKeyword('H');
-        if (found)
-            gUnk_0200052C = Script_GetValue();
-        else
-            gUnk_0200052C = found;
+        u32 found;
+        status = Script_SeekToKeyword('H');
+        found = status;
+        if (found) {
+            u16 *destination = &gUnk_0200052C;
+            status = Script_GetValue();
+            {
+                u32 value = status;
+                asm("" : : "r"(value));
+                *destination = value;
+            }
+        } else {
+            u16 *destination = &gUnk_0200052C;
+            *destination = found;
+        }
     }
     switch ((s32)force->mode) {
         case 0:
@@ -49,11 +64,11 @@ s32 DirectionalForce_InitializeFromScript(struct DirectionalForce *force, u32 id
             force->targetMagnitude = 0;
             break;
         case 1:
-            readRanges(force);
+            status = readRanges(force);
             {
                 register const u16 *random asm("r4") = (const u16 *)RANDOM_TABLE_ADDR;
                 u32 *indexAddress = &gUnk_03005308;
-                register u32 oldIndex asm("r1") = *indexAddress;
+                u32 oldIndex = *indexAddress;
                 u32 index;
                 u32 mask;
                 index = oldIndex + 1;
@@ -65,9 +80,11 @@ s32 DirectionalForce_InitializeFromScript(struct DirectionalForce *force, u32 id
                     value = force->baseMagnitude;
                 else {
                     u32 next = (index + 1) & mask;
-                    register s32 sample asm("r2");
+                    s32 sample;
                     *indexAddress = next;
-                    sample = Mod(random[next], force->magnitudeRange);
+                    status = Mod(random[next], force->magnitudeRange);
+                    sample = status;
+                    asm("" : : "r"(sample));
                     value = force->baseMagnitude + sample;
                 }
             }
@@ -85,23 +102,27 @@ s32 DirectionalForce_InitializeFromScript(struct DirectionalForce *force, u32 id
                 direction = Script_GetValue();
             force->targetAngle = direction;
         }
-            readRanges(force);
+            status = readRanges(force);
             if (!force->magnitudeRange)
                 value = force->baseMagnitude;
             else {
-                register s32 random asm("r2");
+                s32 random;
                 gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-                random = Mod(((u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308], force->magnitudeRange);
+                status = Mod(((u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308], force->magnitudeRange);
+                random = status;
+                asm("" : : "r"(random));
                 value = force->baseMagnitude + random;
             }
             force->targetMagnitude = value << 4;
             if (!force->delayRange)
                 value = force->baseDelay;
             else {
-                register s32 random asm("r2");
+                s32 random;
             randomDelay:
                 gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-                random = Mod(((u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308], force->delayRange);
+                status = Mod(((u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308], force->delayRange);
+                random = status;
+                asm("" : : "r"(random));
                 value = force->baseDelay + random;
             }
         storeDelay:
@@ -109,4 +130,5 @@ s32 DirectionalForce_InitializeFromScript(struct DirectionalForce *force, u32 id
             break;
     }
     gUnk_02000114 = force;
+    return status;
 }

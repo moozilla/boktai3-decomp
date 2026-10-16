@@ -74,7 +74,7 @@ typedef struct Obj {
 } Obj;
 void ActorShadow_Enable(void *);
 void sub_080DA678(Obj *);
-void sub_08072188(void);
+void SceneActorPalette_ClearCompletedTransitions(void);
 static inline u8 take_flag(Obj *s)
 {
     if (s->unk2B2) {
@@ -143,6 +143,6 @@ void sub_080D1EA0(Obj *s)
         s->unk2E6 = 0;
         s->unk3CC = 0;
         s->unkDC = 0;
-        sub_08072188();
+        SceneActorPalette_ClearCompletedTransitions();
     }
 }

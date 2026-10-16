@@ -2,7 +2,7 @@
 
 extern const u8 gUnk_0824F67C[];
 void sub_0824923C(u8 *, u32);
-void Collider_Refresh(u8 *);
+s32 Collider_Refresh(u8 *);
 void Collider_SetPosition(u8 *, u8 *, u32);
 
 void sub_08198B08(u8 *p)

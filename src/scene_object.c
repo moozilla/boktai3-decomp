@@ -62,7 +62,7 @@ void Scene_SpawnEdgeParticles(struct SceneVec *position, s32 offset)
             random = (const u16 *)(index * 2 + (u32)table);
             p[2] += offset + edgeJitter(random);
         }
-        sub_08068108(&point, 0, &size, 1, 3, 4);
+        SceneParticleBurst_CreateWithPause(&point, 0, &size, 1, 3, 4);
     }
 }
 
@@ -692,7 +692,7 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                 }
                 break;
         }
-        sub_08068108((struct SceneVec *)particle, 0, &size, 1, 2, 4);
+        SceneParticleBurst_CreateWithPause((struct SceneVec *)particle, 0, &size, 1, 2, 4);
         i = ({
             register s32 count asm("r2") = i;
             asm("" : : "r"(count));

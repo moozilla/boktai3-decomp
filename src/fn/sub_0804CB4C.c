@@ -3,7 +3,8 @@
 void TetherActor_SetState(struct TetherActor *, u32);
 void TetherActor_RemoveAuxiliarySprite(struct TetherActor *);
 void TetherActor_EmitRingEffects(struct TetherActor *);
-void *sub_08066DB8(void *, struct TetherBodyConfig *, u32, u32, u16 *, u32, u32, u32);
+void *ActorAttachment_UpdateFromDescriptor(void *, struct TetherBodyConfig *, u32, u32, u16 *, u32,
+                                           u32, u32);
 void TetherActor_UpdateBounceReturn(struct TetherActor *actor)
 {
     u16 *frame;
@@ -113,8 +114,8 @@ void TetherActor_UpdateBounceReturn(struct TetherActor *actor)
                     value = 287;
                     *charge = value;
                     handle = &actor->pendingEffectHandle;
-                    *handle =
-                        sub_08066DB8(*handle, &actor->bodyConfig, 1, 0, charge, value, 250, 290);
+                    *handle = ActorAttachment_UpdateFromDescriptor(*handle, &actor->bodyConfig, 1,
+                                                                   0, charge, value, 250, 290);
                 }
             }
         }

@@ -1,13 +1,15 @@
 #include "global.h"
 extern u8 *gUnk_030025FC;
-u16 sub_0822B694(u16 *o, u8 i)
+/* The word return contains a zero-extended 16-bit table tag. */
+u32 sub_0822B694(u16 *o, u32 inputIndex)
 {
+    u8 i = inputIndex;
     u8 *e = gUnk_030025FC;
     u8 *q;
     u16 a, z;
     if (e == 0)
         return 0;
-    q = e + ((s32)(i << 24) >> 20);
+    q = e + ((s32)((u32)i << 24) >> 20);
     a = *(u16 *)(q + 0x18);
     z = 0;
     o[0] = a;

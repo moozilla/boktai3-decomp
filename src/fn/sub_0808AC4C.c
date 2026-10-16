@@ -9,8 +9,8 @@ struct Z {
 struct W {
     u16 a, b, c;
 };
-void sub_08074BF4(u8 *, struct Z *, struct Z *, void (*)(void), u8 *);
-void sub_08074D34(u8 *, struct Z *, struct Z *, void (*)(void), u32, u8 *);
+void SceneActorCollision_InitBody(u8 *, struct Z *, struct Z *, void (*)(void), u8 *);
+void SceneActorCollision_InitAttack(u8 *, struct Z *, struct Z *, void (*)(void), u32, u8 *);
 void sub_08085DC4(void);
 void sub_08085D58(void);
 void sub_0808AC4C(u8 *p)
@@ -21,12 +21,12 @@ void sub_0808AC4C(u8 *p)
     s1.b.lo = 0x40;
     *(u32 *)&s2.a = 0x800000;
     *(u32 *)&s2.b &= 0xFFFF0000;
-    sub_08074BF4(p, &s1, &s2, sub_08085DC4, p);
+    SceneActorCollision_InitBody(p, &s1, &s2, sub_08085DC4, p);
     ((struct W *)&s1)->a = 0x40;
     ((struct W *)&s1)->b = 0x64;
     ((struct W *)&s1)->c = 0x40;
     ((struct W *)&s2)->a = 0;
     ((struct W *)&s2)->b = 0x80;
     ((struct W *)&s2)->c = 0;
-    sub_08074D34(p, &s1, &s2, sub_08085D58, 0, p);
+    SceneActorCollision_InitAttack(p, &s1, &s2, sub_08085D58, 0, p);
 }

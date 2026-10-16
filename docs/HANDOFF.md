@@ -1,6 +1,6 @@
 # Handoff: state of the project and how to continue
 
-Last updated after reaching 27.405% matching (2026-10-15). This file is the single
+Last updated after corrected 30.003% matching and subsystem cleanup (2026-10-15). This file is the single
 entry point for a new agent, a new thread after compaction, or a helper on
 another plan. Read it fully, then `docs/WORKER.md` (the matching playbook).
 
@@ -9,6 +9,538 @@ results. The [retrospective](RETROSPECTIVE_2026-10-08.md) audits progress versus
 allowance and local per-response token records. It corrects the pilot's
 reasoning-setting claim and identifies the Astra main thread as the dominant
 published-rate cost proxy; exact subscription-cost attribution remains unknown.
+
+## October 15 cleanup: corrected 30% and subsystem reports
+
+Exact code is **30.0028070%**, a net **+0.0183824 percentage points** from
+PR167: **7,113 /11,523 functions**,
+**724,674 /2,415,354 bytes**. Without register pinning: **21.080%**
+(509,146 bytes); Register-pinned: **8.923%**
+(215,528 bytes), included above. The strict 30% threshold is 724,607 bytes.
+
+The batch adds 32 full exact bodies / 3,628 bytes: 25 scalar/angle helpers and 7
+adjoining actor-control/visibility helpers. Correcting earlier credit removes
+2,484 bytes of retained assembly falsely absorbed by the 52-byte `08221800` helper,
+and 700 bytes at five consumed-return ABI boundaries (55EB8/54B64/51B70/821FE40/
+66DB8). These five now have valid scored guarded drafts and original ASM
+fallbacks; 88 drafts total remain uncredited. Both stage-icon initializers,
+the contact-burst initializer and directional-force initializer retain exact C
+with defined results. The net gain is 444 bytes after all corrections.
+The 31 reviewed hidden boundaries increase the function denominator, not the
+ROM-byte denominator. See [scalar helpers](SCALAR_APPROACH.md),
+[ABI audit](ASM_OUTPUT_QC.md) and [visibility callbacks](SCENE_ACTOR_VISIBILITY.md).
+
+All previous bounded permuter runs have finished without an additional accepted
+exact result. No new search or worker remains active. Their bases/logs/private
+candidates are preserved; see [completed-run handoff](PERMUTER_HANDOFF_2026-10-15.md).
+The new matches came from manual source and allocation work, with concessions
+minimized before integration.
+
+The treemap/report cleanup adds 80 documented subsystem ranges (117→197),
+covering recent `08047BB4–08084F44` work and seven middle-ROM families. On identical
+current function data, report units decrease 8,907→7,574. Per-function sizes,
+exact/fuzzy scores, totals and register categories are unchanged by grouping.
+Names describe observed layouts/APIs, with uncertain identities marked
+provisional. Physical source files remain available for per-function review.
+See [subsystem index and accounting correction](REPORT_SUBSYSTEMS.md).
+
+Validation: combined build prints `build/boktai3.gba: OK`; RAM-literal audit
+passes. Against the final ELF, 82 changed translation units match their full reviewed
+extents and eight guarded drafts compile with recorded full-extent scores. The compiled
+extent audit checks 1,410 single-function C units with no retained-tail
+flags. Clang audits 1,296 relevant/changed files with 0 errors and seven reviewed
+return warnings (ignored results or the documented inventory category domain).
+All 50 tooling tests, 4 context tests and 10 progress tests pass; formatting,
+inventory and diff checks pass. No handwritten instruction bodies or explicit
+r7 bindings were introduced. Main-only CI publishes the grouped report.
+
+## October 15 closeout: ground motion and collision helpers
+
+Exact code is **29.9844246%**, up **0.0395801 percentage points** (+956 bytes)
+from PR166: **7,086 /11,492 functions**, **724,230 /2,415,354 bytes**.
+Without register pinning: **21.169%** (511,318 bytes); Register-pinned:
+**8.815%** (212,912 bytes), included above. New full exact bodies are
+838AC(480),83B90(108),83E34(60),83E98(164),hidden83F3C(32), and84210(112), all register-pinned.
+The old83AEC initializer remains ordinary/exact164B after replacing two
+indeterminate scalar reads with initialized XYZ bitfield-member assignments.
+
+The complete83AEC–84280 helper subsection was reviewed. Its old83E98 span
+contains three independent entries:83E98(164),83F3C(32),83F5C(232). Two new
+reviewed boundaries increase the function denominator by2 without changing
+the code-byte denominator. See [helper contracts](SCENE_ACTOR_CONTROL_HELPERS.md)
+and [motion states](SCENE_ACTOR_CONTROL_MOTION.md).
+
+The account meter reached **20% remaining**, so new matching stopped at the
+user's cutoff before30%. Reaching30% requires at least724,607 exact bytes;
+**377 additional bytes** remain. No reset was consumed. Existing bounded
+permuter searches may continue independently of model usage. Five newly
+published full reviewed drafts retain ASM fallbacks and no exact credit:
+A8CC,80494,82184,83354,83560. Their sources record the current full-extent fuzzy
+scores. The project now has83 guarded drafts. The [permuter handoff](PERMUTER_HANDOFF_2026-10-15.md)
+records frozen queues, private worktrees, residues and drafts withheld pending
+contract review. Preserve these active worktrees; ignored private experiments
+must not be lost through archival.
+
+## October 15 continuation: saved motion and lift/sway control
+
+Exact code is **29.945%**, up **0.0335 percentage points** (+808 bytes)
+from PR165: **7,080 /11,490 functions**, **723,274 /2,415,354 bytes**.
+Without register pinning: **21.169%** (511,318 bytes); Register-pinned:
+**8.775%** (211,956 bytes), included above. Three new full bodies match:
+82D80(496),837D4(216) and83A8C(96); the last is ordinary C. The existing
+16-byte83550 preset setter gains types/name without extra matching credit.
+No boundaries change and78 guarded drafts remain uncredited.
+
+82D80 adds the whole saved-motion convergence and both reaction paths. Its
+quarter-deltas truncate toward zero, clamp to±200, and update saved/current
+motion. Termination tests those truncated deltas, so it does not require exact
+coordinate equality. A hard-register trial that omitted one whole branch was
+rejected; reducing56 hints to21 retains the full accepted496 bytes. See
+[control phases](SCENE_ACTOR_CONTROL_PHASE.md), which now reviews every entry
+in82648–83550, including private full drafts for contact health-recovery82648
+and random-direction83354. The latter remains508 bytes/six differing bytes;
+its four-hour frozen j1 queue is run-g042m0h3. Additional lifetime reduction,
+named verified RAM-table literals and magnitude helper trials made no gain.
+
+The adjoining83550–83AEC cohort now has an observed context extension through
+storedPosition434.837D4 consumes contextflag2 into a lift/reaction state when
+a player exists;83A8C implements signed sway with retained one-tick overshoot.
+See [control motion](SCENE_ACTOR_CONTROL_MOTION.md). Remaining initializer and
+ground-following bodies have complete private semantic drafts. Root's front
+contact callback is also in a distinct bounded900-second search from a valid
+880-byte draft; its changing fuzzy score receives no exact credit.
+
+Validation: combined build prints `build/boktai3.gba: OK`; RAM-literal audit
+passes. All4 changed/promoted translation units match full reviewed extents
+against the final ELF; source audit is clean. All9 progress/boundary tests,
+formatting, inventory and diff checks pass. There are no instruction bodies or
+explicit r7 bindings.
+
+Target remains **30% exact or20% account usage remaining**; latest meter22%
+remaining, no reset consumed. The strict30% byte threshold is724,607, so another
+1,333 exact bytes are needed. Life has a further480-byte ground-following match
+ready for the next combined batch; Sol has A8CC's full1736-byte/five-byte residue
+and scoped valid four-hour queue; Tail's full704-byte82184/nine-byte residue has
+a distinct focused1800-second queue after the broad run produced a verified
+zero-store simplification. Tail now extends static review to the adjacent
+83AEC–84280 helper cohort, including callers'83E34/83E98/84044 APIs. See the
+worker subsystem documents for retained contracts and unresolved whole bodies.
+
+## October 15 continuation: actor control phases and saved reactions
+
+Exact code is **29.911%**, up **0.1222 percentage points** (+2,952 bytes)
+from PR164: **7,077 /11,490 functions**, **722,466 /2,415,354 bytes**.
+Without register pinning: **21.166%** (511,222 bytes); Register-pinned:
+**8.746%** (211,244 bytes), included above. Eleven new full bodies match;
+three are ordinary C and eight use minimized initialized register/lifetime
+concessions. No boundaries change; the78 guarded drafts remain uncredited.
+
+The contiguous82648–83550 control group adds nine exact bodies/1,704 bytes:
+contact power flooring, wrapped-clock facing and collider pulses, facing-only
+maintenance, persistent and shadow-return animation, script-response completion,
+and saved-heading/persistent/shadow-return state phases. The context at actor3D0
+has a narrow observed layout and explicit nonzero-interval/caller preconditions.
+See [control phases](SCENE_ACTOR_CONTROL_PHASE.md). Its remaining motion
+convergence82D80 and random-direction83354 have full valid semantic drafts;
+82648's full front callback still needs review and matching. No runtime coverage
+is inferred from static matching.
+
+Life adds80FB4's full732-byte hidden-defeat response with only3 hints after an
+initialized typed animation helper fixed the final allocation differences. Its
+old35-point permuter was stopped after manual closure. Tail adds82444's full516
+bytes: saved control460, animation464–466, kind467 and turn-count5DA restoration.
+Its full four-slot130-byte effect-controller contract also corrects particle
+counts: three service attempts do not establish three emitted particles. See
+[reaction states](SCENE_ACTOR_REACTION_STATES.md) and
+[reaction transitions](SCENE_ACTOR_REACTION_TRANSITIONS.md).
+
+Validation: combined build prints `build/boktai3.gba: OK`; RAM-literal audit
+passes. All13 changed/promoted translation units match complete reviewed
+extents against the final ELF. Source audit is clean; all9 progress/boundary
+tests, formatting, inventory and diff checks pass. Callback declarations and
+actor-view casts are reconciled when promoting names. No instruction bodies or
+explicit r7 bindings were introduced.
+
+Target remains **30% exact or20% account usage remaining**; latest meter28%
+remaining, no reset consumed. Another2,141 exact bytes reach30%. Root continues
+the control group, Life now owns the adjoining83550–83AEC group while its valid
+80494 two-hour search continues; Tail retains8170C/81C98/82184. Sol retains
+A8CC1736-byte/7-byte residue and the full AF94 semantic/stack model. Its new
+valid randomizer seed fixes shared pycparser Struct nodes, local struct types
+and shadowed names without changing tools; see
+[motion contracts](SCENE_ACTOR_MOTION.md). All queues remain bounded, frozen,
+and require source review plus complete-byte acceptance before counting.
+
+## October 15 continuation: contact targets and reaction transitions
+
+Exact code is **29.789%**, up **0.1100 percentage points** (+2,656 bytes)
+from PR163: **7,066 /11,490 functions**, **719,514 /2,415,354 bytes**.
+Without register pinning: **21.154%**; Register-pinned: **8.635%**, included
+above. All six new bodies use minimized register/lifetime concessions. This
+batch changes no function boundaries; the78 guarded drafts remain uncredited.
+
+F4B8/F710 form an exact868-byte contact-response reset and target-selection
+pair. They connect contact ownership, response commands, per-player counters,
+pending registry IDs, terrain cell2F8 and facing. FAD8 adds388 bytes for guarded
+reset-command modes, and its existing12-byte script wrapper now has typed
+actor/script arguments and an observed halfword payload at script+2. See
+[target/contact control](SCENE_ACTOR_TARGET_CONTROL.md). Its matching process
+rejected a trial where overlapping hard-r5 locals made agbcc omit mode0; all
+accepted388 bytes include the complete three-path behavior.
+
+The adjoining reaction section adds81290/8148C/81B9C (1,400 bytes): sinking and
+removal, stagger with a randomized particle packet, and animation completion
+that resumes a stored control. Shared animation, sound and collision-timer
+contracts use canonical declarations and explicit actor-view casts. Remaining
+settling, timed-particle, direction and saved-response callbacks are reviewed
+in [reaction transitions](SCENE_ACTOR_REACTION_TRANSITIONS.md); the prior
+[reaction cohort](SCENE_ACTOR_REACTION_STATES.md) also has full private semantic
+drafts for all remaining bodies. No draft receives exact matching credit.
+
+Validation: the complete build prints `build/boktai3.gba: OK` and the RAM-literal
+audit passes. All7 changed/promoted single-function units match their full
+reviewed extents against the final ELF; source audit has no warnings/errors.
+All9 progress/boundary tests, formatting, inventory and diff checks pass.
+No handwritten instruction bodies or explicit r7 bindings were introduced.
+
+Target remains **30% exact or20% account usage remaining**; last meter31%
+remaining, no reset consumed. Root continues the contact/control span with a
+complete700-byte F81C semantic draft (688 bytes/52.9% fuzzy); E334's cardinal
+terrain scan and larger E9D0/F130 gaps remain private. Sol retains A8CC's
+1736-byte99.3% candidate and a full4488-byte AF94 semantic draft. Lifecycle
+has80FB4's full732-byte98.9% candidate in a four-hour frozen permuter queue and
+is refining80494; Tail continues81290–82648 after its three new matches.
+Other suitable route/query residue remains in bounded frozen queues. Any
+mutation still requires source validity and full resolved-byte acceptance.
+
+## October 15 continuation: reaction restoration and route transitions
+
+Exact code is **29.679%**, up **0.0694 percentage points** (+1,676 net bytes)
+from PR162: **7,060 /11,490 functions**, **716,858 /2,415,354 bytes**.
+Without register pinning: **21.154%**; Register-pinned: **8.525%**, included
+above. Newly authored exact bodies total1,808 bytes. Extent review removes132
+false ordinary-C bytes from the old12E084 retained tail: its actual reset leaf
+is16 bytes, followed by an independent132-byte12E094 function, still assembly.
+A second newly recognized boundary at7FE80 separates a200-byte restoration
+callback from7FDC0's actual192-byte body. Two entries add two functions; the
+code-byte denominator stays unchanged. The78 guarded drafts remain uncredited.
+
+The batch closes78550's252-byte descriptor steering helper in ordinary C.
+FDC0/FE80/FF48 restore delayed actor state and control;80008 consumes the prepared
+flag and selects animation after a wordF0 threshold gate. The reaction section
+adds80868/80984/80AF0: faded-state preparation, category reaction sounds, and a
+turn-back route transition. Shared command/phase views and canonical animation
+and placement signatures are reconciled. Existing attachment sound-gate and
+position-query ABIs now preserve word-sized forwarding and return values; those
+reviews earn no new exact credit. See [reaction callbacks](SCENE_ACTOR_REACTION_STATES.md),
+[effect lifecycle](SCENE_ACTOR_EFFECT_LIFECYCLE.md), [behavior frontier](SCENE_ACTOR_BEHAVIOR_FRONTIER.md),
+and [attachment responses](SCENE_ACTOR_ATTACHMENT_RESPONSES.md).
+
+Validation: all12 changed/promoted single-function units pass their full reviewed
+extents against the final combined ELF. The combined build prints
+`build/boktai3.gba: OK`; the RAM-literal audit passes. Source audit:12 files,
+no warnings/errors. All9 progress/boundary tests and the inventory/diff checks
+pass. No handwritten instruction bodies or explicit r7 bindings were introduced.
+FDC0's diagnostic/manual closure reduced17 hints to2; FE80 and FF48 need1 each.
+The suitable residue remains in bounded frozen permuter queues; zero scores
+still require initialized-value review and resolved-byte acceptance.
+
+Target remains **30% exact or20% account usage remaining**; latest meter36%
+remaining, no reset consumed. Sol owns7A8CC–7C11C and has a full1736-byte98.1%
+private candidate; Lifecycle owns800A4–81290 with four full semantic gaps after
+its three new matches. Tail completed semantic review of7C11C–7E334 and now
+owns81290–82648. Root continuesE334–8005C: F710 is a separate268-byte exact
+private target-selection candidate queued for the next batch. Earlier route,
+query and attachment gaps remain private and receive no exact credit.
+
+## October 15 continuation: actor feedback, reactions and attachment lifecycle
+
+Exact code is **29.610%**, up **0.3267 percentage points** (+7,892 net bytes)
+from PR161: **7,052 /11,488 functions**, **715,182 /2,415,354 bytes**.
+Without register pinning: **21.149%**; Register-pinned: **8.460%**, included
+above. Newly authored exact bodies cover8,088 bytes. Correct boundary review
+removes196 bytes of false old7827C retained-tail credit:7827C is240 bytes;
+7836C is an independent196-byte blink callback, now actually matched. Another
+independent252-byte helper begins78550 after78430's288-byte extent; it is a
+queued next-batch match and receives no credit in these figures. The total byte
+denominator is unchanged, and two reviewed boundaries add two functions.
+
+The new contiguous work covers the timed particle emitter and category sounds,
+proximity/script/descriptor helpers, collider activation and contact reactions,
+defeat accounting, and pending control activation. A62C/A714 form an exact672-byte
+pair for timer/contact updates and priority flag dispatch. Attachment selectors
+produce observed Y/Z offsets, followed by a position-window query, stable signed
+candidate sort, and nearest-player retargeting. See
+[placement](SCENE_ACTOR_PLACEMENT.md), [behavior frontier](SCENE_ACTOR_BEHAVIOR_FRONTIER.md),
+[update callbacks](SCENE_ACTOR_UPDATE.md), and
+[attachment responses](SCENE_ACTOR_ATTACHMENT_RESPONSES.md).
+
+The adjoining E6FC/E7DC/E908 effect-offset, route-target and cleanup helpers add
+648 exact bytes. Their E334 cardinal scan is understood but still private C.
+See [terrain/effect lifecycle](SCENE_ACTOR_EFFECT_LIFECYCLE.md). The scene reset
+F2CC adds220 ordinary-C bytes after a reviewed permuter recovery; tracing two
+remaining immediate differences exposed three wrong offsets in the private
+baseline, corrected to7FA/7FE/7F8. The result has no hints. See
+[state/query contracts](SCENE_STATE_QUERIES.md). Names and unknown fields remain
+provisional; none of these static contracts establishes runtime coverage.
+
+The target remains **30% exact or20% account usage remaining**; latest meter
+39% remaining, no reset consumed. Sol ownsA8CC–C11C, Tail C11C–E334, and Root
+E334–8005C. Lifecycle is starting800A4–81290 after its completed helper prefix;
+78BB4's unsupported-category output contract and the whole5956-byte78EE8 update
+remain private. Tail's C72C has the same unresolved conditional-output issue.
+No initialized defaults or semantic changes are invented to close those gaps.
+Prior route/grid/steering drafts are retained. Frozen permuters continue to be
+used for suitable residue, with source validity and full-extent checks required.
+
+Validation: the final combined build prints `build/boktai3.gba: OK` and the
+RAM-literal audit passes. All58 changed/promoted single-function units pass
+full reviewed extents against that final ELF. Source audit:58 C files, no
+warnings/errors. All9 progress/boundary tests, formatting and inventory checks
+pass. The78 guarded drafts remain outside exact credit. A later queued252-byte
+ordinary steering match and further worker ABI reviews are not included above.
+
+## October 15 continuation: animation, palette and registry scheduling
+
+Exact code is **29.283%**, up **0.2966 percentage points** (+7,164 net bytes)
+from PR160: **7,019 /11,486 functions**, **707,290 /2,415,354 bytes**.
+Without register pinning: **21.081%**; Register-pinned: **8.202%**, included
+above. New recovery totals7,172 bytes; eight falsely credited prologue bytes
+at800A4 are removed from the old8005C sound/animation callback extent. The
+true adjoining function begins800A4;800AC is its interior high-register push.
+The old callback passes its actual72-byte extent. The78 guarded drafts remain
+outside exact credit.
+
+The complete76034–76910 animation selector family is exact: eight new functions,
+2,268 bytes, with the hidden762A8 boundary reviewed separately. The selectors
+share canonical engine calls and explicit argument narrowing. Terrain neighbor
+height queries and script parameter readers follow, plus facing and collision
+flag helpers. The movement resolver76CDC remains a private near-match.
+See [animation](SCENE_ACTOR_ANIMATION.md) and [terrain](SCENE_ACTOR_TERRAIN.md).
+
+Palette transition71E00–72264 is now exact throughout (five functions,1,124 bytes),
+as is the contact-list prefix72BA8–72F4C (932 bytes). The RGB/Q5 accumulation,
+once-per-category frame guard, invalid-owner cooldown and player-condition
+contracts are documented in [palette/script/contacts](SCENE_ACTOR_PALETTE_SCRIPT_CONTACTS.md).
+The whole752-byte terrain reaction and2,800-byte contact evaluator remain
+private semantic drafts; neither contributes exact credit.
+
+The range-watcher family6F7B0–6F990 and registry list/message/cadence span
+6FAD4–70070 are exact throughout. The watcher uses a count bitfield instead
+of reading an uninitialized flags word. Registry records now expose queue,
+sentinel, cursor and callback fields; registration is capped at twenty actors.
+Cadence schedules1/2/4 actors with per-actor delays; lazy subsystem setup stores
+actual task IDs. See [watcher](SCENE_RANGE_WATCH.md) and
+[registry lifecycle](SCENE_ACTOR_REGISTRY_LIFECYCLE.md). Additional actor route,
+height, collider and probe contracts are in [behavior](SCENE_ACTOR_BEHAVIOR.md).
+
+The target remains **30% exact or20% account usage remaining**; latest meter
+51% remaining, no reset consumed. Tail retains7462C–76020 gaps; Sol owns
+76034–78078. Lifecycle now owns the adjoining78078–7A62C frontier after closing
+its palette/contact prefix. Root retains scene/grid gaps and coordinates batches.
+The212-byte XYZ query is reduced to11 differing bytes with no empty asm and
+initialized register bindings; a frozen four-hour permuter run starts
+from weighted score40. The412-byte effect script remains two differing bytes
+under its bounded search. Raw mutations still require initialized-value review.
+
+Validation: all113 changed/promoted single-function units pass their full
+reviewed extents against the final combined ELF. Complete build prints
+`build/boktai3.gba: OK`; RAM-literal audit passes. Source audit:113 files,
+no warnings/errors. Boundary/progress tests (11), formatting and inventory
+checks pass. Final extent review corrected8005C before integration, rather than
+counting the following function's retained prologue as C.
+
+## October 15 continuation: registry scripts, profiles and scene state
+
+Exact code is **28.986%**, up **0.4084 percentage points** (+9,864 net bytes)
+from PR159: **6,989 /11,485 functions**, **700,126 /2,415,354 bytes**.
+Without register pinning: **21.018%**; Register-pinned: **7.968%**, included
+above. This recovers 9,892 new bytes and removes 28 bytes of false legacy C
+credit at73B84: the old initializer fell through with an undefined return value.
+Its creator compares incidental r0 from the callee's return sequence. Both
+functions retain assembly until a defined C representation is established.
+The 78 guarded drafts remain outside exact credit.
+
+The actor registry70070–70FA8 is now21/22 exact;70910 retains a three-byte
+scratch-register residue. Its setup, defeat script, category resets and spatial
+filters have shared typed views. The following reset callback718D8 is exact.
+Palette restoration, actor script properties and the bounded contact list are
+recovered, including the complete eight-function script span72264–72854.
+The adjoining73A3C–7462C cohort has exact contact selection and thirty-entry
+profile records, including all26 constructor categories. Category validation
+occurs after allocation/linking; preserve that original behavior. See
+[registry](SCENE_ACTOR_REGISTRY.md), [palette/script/contact contracts](SCENE_ACTOR_PALETTE_SCRIPT_CONTACTS.md),
+and [contact/profile contracts](SCENE_ACTOR_CONTACTS.md).
+
+Root recovered scene reset, inclusive spatial queries, wrapped tilemap leaves,
+counters, pair records and the twelve-slot effect scheduler. See
+[state/query contracts](SCENE_STATE_QUERIES.md) and
+[effect schedule](SCENE_EFFECT_SCHEDULE.md). The scheduler's412-byte script
+creator remains uncredited with two differing bytes under a frozen3600-second
+permuter search. Search outputs require initialized-value review before use.
+Three body-collider initializers and the adjoining receiver are also exact;
+field interpretations remain provisional and are being refined against callers.
+
+The target remains **30% exact or20% account usage remaining**. Latest meter:
+54% remaining; no reset consumed. Root retains6E34C–70070 gaps. Tail owns7462C–76020;
+Sol owns76034–78078, beginning with the animation selector family;
+lifecycle retains71E00–73A3C gaps and its three route-playback gaps.
+All worker build outputs remain private. The next animation/collision matches
+are committed on worker branches and are not included in these figures.
+
+Validation:109 changed/promoted single-function units pass their full reviewed
+extents against the final combined ELF; the changed breakable-barrier unit also
+matches all1,720 bytes. The complete build prints `build/boktai3.gba: OK` and
+the RAM-literal audit passes. Source audit:110 C files, no warnings/errors.
+All21 build/progress/permuter/name-promotion tests, formatting and inventory
+checks pass. Name promotion now normalizes already-promoted raw references;
+a regression covers older worker call sites. Two duplicate declaration conflicts
+exposed by normalization were repaired without changing the matched ROM.
+
+## October 15 continuation: route actors, grid traversal and actor registry
+
+Exact code is **28.578%**, up **0.3415 percentage points** (+8,248 bytes)
+from PR158: **6,950 /11,482 functions**, **690,262 /2,415,354 bytes**.
+Without register pinning: **20.842%**; Register-pinned: **7.736%**, included
+above. The 78 guarded drafts remain outside exact credit.
+
+The root steering cohort now has exact bobbing-actor creation and the actual
+152-byte fixed-travel constructor at6CF4C. The latter is ordinary C after
+reviewing a permuter result and removing its unused local and constraints;
+the raw candidate had deleted initialization and was not accepted as-is.
+The route-sprite pool has exact construction, ticking, destruction, completion
+requests and full-pool query. Its generated routes use twelve signed-byte
+waypoints and a separate endpoint, with recorded duration/cycle/script fields.
+Three larger creation/playback gaps remain private. See
+[steering actors](SPRITE_EFFECT_STEERING_ACTORS.md) and
+[route actors](ROUTE_SPRITE_ACTOR.md).
+
+The grid cohort6E34C–6EB70 is exact: random nearby-position selection, cell
+deltas, endpoint resolution, row/column scans and directional terrain traversal.
+An independent916-byte resolver begins6EB70; its split adds no duplicate credit
+and it remains assembly-backed. See [grid contracts](SCENE_GRID.md).
+The actor registry now has exact lookup, filtering, scripted mode changes and
+category reset routines, followed by initialization and route/collider reset
+helpers. Actor fields are consolidated in a shared typed header; phase-specific
+reset fields have their own view. See [registry](SCENE_ACTOR_REGISTRY.md).
+
+An agbcc branch-length issue closed three near matches: redundant empty asm
+barriers contribute estimated instructions even though they emit no bytes.
+Removing unnecessary barriers restored short branches and literal pools. The
+compiler source and reviewed examples are recorded in [REGALLOC](REGALLOC.md).
+
+The target remains **30% exact or20% account usage remaining**. Latest meter:
+63% remaining; no reset consumed. Root owns6E34C–70070, tail70070–70FA8,
+Sol70FA8–71E00, and lifecycle retains6D000–6E34C gaps before extending from71E00.
+All workers retain private build outputs. Frozen searches continue for signed
+load scratch-register and instruction-order residues, with initialized-value
+review required before accepting any output.
+
+Validation: all 53 changed/promoted C units pass their complete reviewed
+extents against the final combined ELF. The full build prints
+`build/boktai3.gba: OK`; the RAM-literal audit passes. The source audit reports
+no uninitialized or unsequenced accesses. All 20 build/progress/permuter tests,
+formatting and inventory checks pass. Compiler stdin is now file-backed to
+avoid a macOS two-pipe stall; a large-input/early-output regression covers it.
+No ROM, generated assembly, emulator dump or permuter output is committed.
+
+## October 15 continuation: creator families and contiguous steering lifecycle
+
+Exact code is **28.237%**, up **0.4576 percentage points** (+11,052 net bytes)
+from PR157: **6,917 /11,479 functions**, **682,014 /2,415,354 bytes**.
+Without register pinning: **20.814%**; Register-pinned: **7.423%**, included
+above. The 78 guarded drafts remain outside exact credit. This batch contains
+11,204 newly recovered bytes and removes 152 bytes of erroneous old extent
+credit; independent function boundaries must never count retained executable
+assembly as matched C.
+
+The attachment range **64790–67148 is exact throughout**. All five remaining
+manager creator variants are now recovered, including the optional source,
+action offset, palette, random offset and shared slot lifecycle contracts.
+The burst-emitter family69964–69FA4 is exact throughout. The following spark
+particle pool has its updater, initializer and hidden script wrapper exact;
+its704-byte creator remains a near-match under a frozen permuter search.
+The sprite/effect controller now has exact dual-layout construction, queued
+collider refresh, animation playback, pool update/destruction and fade state.
+See [manager](ACTOR_ATTACHMENT_MANAGER.md), [burst emitter](BURST_EMITTER.md),
+[spark particles](SPARK_PARTICLE.md), [controller](SPRITE_EFFECT_CONTROLLER.md),
+[steering actors](SPRITE_EFFECT_STEERING_ACTORS.md), and
+[bouncing objects](BOUNCING_OBJECTS.md).
+
+The root's steering pool lifecycle at6CD68–6CF4C is exact apart from the
+160-byte6CCC8 retarget entry immediately before it. New boundary review split
+old6CF0C into its actual12-byte reset, the independent52-byte state-four-to-five
+loop6CF18, and a152-byte fixed-position constructor wrapper6CF4C. The loop is
+exact ordinary C. The wrapper remains ASM-backed, removing its previous false
+credit; its private98.65% draft is queued for a long frozen permuter search.
+This loop intentionally neither checks allocation bits nor sets entry latches.
+
+The five literal native-GCX callers of script7314 all supply position and
+velocity triples, establishing the whole-vector precondition of6BA58; packet
+addresses and dispatch evidence are documented in the steering review. An
+absent whole vector keyword must not be silently zero-initialized to hide an
+unproved caller contract. Controller6A60C has an observed first-slot flag check
+for every occupied slot; its per-entry cooldown and flags writes still advance.
+
+The user target remains **30% exact or20% account usage remaining**. Latest
+meter check was71% remaining after the reset; no reset was consumed here.
+Root owns6CA3C–6D000 and6E34C–70070, Sol owns697C8–6B2C4, tail owns
+6B2C4–6CA3C, and lifecycle owns6D000–6E34C plus preceding6CFE4/CFFC callbacks. Keep the four
+checkouts/build outputs isolated. Frozen permuter jobs continue for close
+register/order residues; audit candidates for deleted initialization before
+acceptance. Some lower-scoring outputs were rejected for precisely that reason.
+
+Validation: all 78 changed/promoted C units pass their complete reviewed extents
+against the final combined ELF. The complete build prints `build/boktai3.gba: OK`
+and the RAM-literal audit passes. The source audit reports no uninitialized or
+unsequenced accesses; the existing 66DB8 non-void out-of-domain return warning
+is unchanged. All 18 progress/permuter regression tests pass. No ROM, generated
+assembly, native bytecode packet dump or permuter output is committed.
+
+## October 15 continuation: attachment ownership, scene control and particle pools
+
+Exact code is **27.779%**, up **0.3743 percentage points** (+9,040 net bytes)
+from PR150: **6,876 /11,476 functions**, **670,962 /2,415,354 bytes**.
+Without register pinning: **20.726%**; Register-pinned: **7.053%**, included
+above. New bodies add1,796 ordinary-C bytes and7,244 register-pinned bytes.
+Four independent functions formerly hidden inside already-C inventory spans
+add explicit source review and four boundaries, without duplicate byte credit;
+892 of their previously credited bytes now carry their actual pin classification.
+The78 guarded drafts remain outside exact credit.
+
+The attachment update range64790–65C40 is exact throughout:22 reviewed
+functions /5,296 bytes. The following manager section still has65FD0,66278,
+66474,666D8 and668B0 gaps. Actor control and both particle pools through68500
+have only the716-byte67E3C burst-spawner gap. Root also recovered collision
+impulses, collider initialization, allocation and anchored-pool lifecycle in the
+following twelve-slot bouncing family. See [attachment updates](ACTOR_ATTACHMENT.md),
+[manager ownership](ACTOR_ATTACHMENT_MANAGER.md),
+[scene control/particles](SCENE_ACTOR_CONTROL_PARTICLES.md) and
+[bouncing objects](BOUNCING_OBJECTS.md). Names remain provisional; no runtime
+coverage or screen identity is claimed.
+
+Shared contract review preserves byte-valued attachment removal status and
+both full-word X/Y arguments to08217EC4. The permuter preparation wrapper now
+retains empty inline-asm constraints even when the last operand is a quoted
+clobber; nine tooling tests cover preparation, including that regression.
+Close search outputs remain subject to source review and exact checks.
+
+The goal remains **30% exact or20% account usage remaining**. Latest meter:
+79% remaining after an external reset; no reset consumed by us. Root owns
+68500–697C8, Sol697C8–6B2C4, lifecycle65C40–67148, and tail finishes67E3C
+then6B2C4–6CA3C. All use private builds; the primary dirty Claude checkout is
+untouched. Root's frozen searches are listed in
+`build/inventory-permuter-jobs.json`. The corrected68500 spawner search starts
+from score275; the old two-argument-offset baseline was discarded.
+
+PR150 merged at8d591c7b and main Actions38702476656 passed. This batch has
+69/69 full-extent pre-promotion checks and a compiler source audit with no
+uninitialized/unsequenced diagnostics. The final combined build includes
+Claude's Studio/terrain updates through74eb759f and printed
+`build/boktai3.gba: OK`; RAM-literal and format checks pass. All86/86 changed
+promoted function units pass full-extent checks (`build/pools-post-promotion.json`).
+Nine permuter-preparation tests and eleven progress/boundary tests pass.
+The final build log is `build/pools-combined-final.log`.
 
 ## October 15 (Claude): stage terrain, doors and the map projection (tooling)
 
@@ -31,8 +563,9 @@ evidence in [ASSETS.md](ASSETS.md) ("Stage terrain", "Stage scripts"):
   expressions, `Script_ApplyOperator` (`0821B938`) the operators. Doors are
   `proc_934(box, scene, entrance, back)` traps on HP boxes; the entrance number
   travels in `r708[0x70]` and the destination's entrance procedures test it.
-  The warp in Centaur does not set it yet, which may be why warps never place
-  the player.
+  Centaur's `warp(scene, entrance)` now calls `proc_945` (the door transition
+  without a box) and the player is placed; the old warp left `r708[0x70]`
+  stale, so no entrance procedure matched (CENTAUR.md, "Scenes, warps").
 * **GCL names** ([gcl/README.md](../gcl/README.md)): registry keys and
   command ids are EUC-JP name hashes. `gcl/names/chara.csv` has 52 recovered
   names with English (enemies such as スライム/Slime, routines such as

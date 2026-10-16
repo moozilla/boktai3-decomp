@@ -1,0 +1,35 @@
+addr,name,evidence
+08083F3C,SceneActorControl_ClearCollisionLatch,src/fn/sub_08083F3C.c; provisional semantic name from reviewed full-extent C
+08083F5C,SceneActorControl_ReflectTerrainProbe,src/fn/sub_08083F5C.c; provisional semantic name from reviewed full-extent C
+08197DD0,TimePalette_SelectPhaseIndex,src/fn/sub_08197DD0.c; map phase3 to1 and phases0/4/5 to2; default0
+08197E0C,TimePalette_UpdateBlend,src/fn/sub_08197E0C.c; select phase sources and interpolate over64 ticks
+08197E74,TimePalette_InitializeBlend,src/fn/sub_08197E74.c; initialize three sources phase indices and update callback
+08221774,ScalarApproach_StepHalf,src/fn/sub_08221774.c; halve signed distance and snap withinone
+08221798,ScalarApproach_StepQuarter,src/fn/sub_08221798.c; quarter signed distance with minimum step
+082217CC,ScalarApproach_StepEighth,src/fn/sub_082217CC.c; eighth signed distance with minimum step
+08221800,ScalarApproach_StepSixteenth,src/fn/sub_08221800.c; full52-byte independently verified helper
+08221834,ScalarApproach_UnwrapAngle,src/fn/sub_08221834.c; provisional semantic name from reviewed full-extent C
+0822185C,ScalarApproach_ClampCentered,src/fn/sub_0822185C.c; provisional semantic name from reviewed full-extent C
+08221870,ScalarApproach_ClampAngle,src/fn/sub_08221870.c; provisional semantic name from reviewed full-extent C
+082218C8,ScalarApproach_ApplyProfile,src/fn/sub_082218C8.c; provisional semantic name from reviewed full-extent C
+08221908,ScalarApproach_HalfAngle,src/fn/sub_08221908.c; provisional semantic name from reviewed full-extent C
+0822194C,ScalarApproach_QuarterAngle,src/fn/sub_0822194C.c; provisional semantic name from reviewed full-extent C
+082219A0,ScalarApproach_EighthAngle,src/fn/sub_082219A0.c; provisional semantic name from reviewed full-extent C
+082219F4,ScalarApproach_SixteenthAngle,src/fn/sub_082219F4.c; provisional semantic name from reviewed full-extent C
+08221A48,ScalarApproach_DivideAngleStep,src/fn/sub_08221A48.c; provisional semantic name from reviewed full-extent C
+08221AFC,ScalarApproach_ApplyAngleProfile,src/fn/sub_08221AFC.c; provisional semantic name from reviewed full-extent C
+08221B5C,ScalarApproach_HalfArray,src/fn/sub_08221B5C.c; provisional semantic name from reviewed full-extent C
+08221B9C,ScalarApproach_QuarterArray,src/fn/sub_08221B9C.c; provisional semantic name from reviewed full-extent C
+08221BE8,ScalarApproach_EighthArray,src/fn/sub_08221BE8.c; provisional semantic name from reviewed full-extent C
+08221C34,ScalarApproach_SixteenthArray,src/fn/sub_08221C34.c; provisional semantic name from reviewed full-extent C
+08221C80,ScalarApproach_UnwrapAngleArray,src/fn/sub_08221C80.c; provisional semantic name from reviewed full-extent C
+08221D40,ScalarApproach_ApplyProfileArray,src/fn/sub_08221D40.c; provisional semantic name from reviewed full-extent C
+08221D9C,ScalarApproach_HalfAngleArray,src/fn/sub_08221D9C.c; provisional semantic name from reviewed full-extent C
+08221E00,ScalarApproach_QuarterAngleArray,src/fn/sub_08221E00.c; provisional semantic name from reviewed full-extent C
+08221E70,ScalarApproach_EighthAngleArray,src/fn/sub_08221E70.c; provisional semantic name from reviewed full-extent C
+08221EE0,ScalarApproach_SixteenthAngleArray,src/fn/sub_08221EE0.c; provisional semantic name from reviewed full-extent C
+0822204C,ScalarApproach_Snap2Array,src/fn/sub_0822204C.c; provisional semantic name from reviewed full-extent C
+08222094,ScalarApproach_Snap4Array,src/fn/sub_08222094.c; provisional semantic name from reviewed full-extent C
+082220DC,ScalarApproach_Snap8Array,src/fn/sub_082220DC.c; provisional semantic name from reviewed full-extent C
+08222124,ScalarApproach_Snap16Array,src/fn/sub_08222124.c; provisional semantic name from reviewed full-extent C
+0822216C,ScalarApproach_ApplyAngleProfileArray,src/fn/sub_0822216C.c; provisional semantic name from reviewed full-extent C

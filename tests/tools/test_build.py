@@ -54,5 +54,41 @@ class CompilerCacheTests(unittest.TestCase):
             build.compiler_identity.cache_clear()
 
 
+class CompilerInputTests(unittest.TestCase):
+    def test_large_input_and_early_output_use_file_backed_stdin(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for path in ('include/gba', 'tools', 'build'):
+                (root / path).mkdir(parents=True)
+            (root / 'tools/build.py').write_text('fixture')
+            (root / 'candidate.c').write_text('int f(void) { return 1; }')
+            compiler = root / 'agbcc'
+            compiler.write_text(
+                '#!' + sys.executable + '\n'
+                'import os, stat, sys\n'
+                'assert stat.S_ISREG(os.fstat(0).st_mode)\n'
+                'sys.stdout.write(" " * 131072)\n'
+                'sys.stdout.flush()\n'
+                'assert sys.stdin.read() == "large input" * 65536\n'
+                'sys.stdout.write("f:\\n bx lr\\n")\n')
+            compiler.chmod(0o755)
+            run = subprocess.run
+
+            def bounded_run(command, **kwargs):
+                return run(command, timeout=5, **kwargs)
+
+            def assemble(command):
+                (root / 'build/candidate.o').write_bytes(b'object')
+
+            with patch.object(build, 'ROOT', directory), \
+                 patch.object(build, 'AGBCC', str(compiler)), \
+                 patch.object(build, 'preprocess', return_value='large input' * 65536), \
+                 patch.object(build.subprocess, 'run', side_effect=bounded_run), \
+                 patch.object(build, 'sh', side_effect=assemble):
+                build.build_c('candidate.c', 'build/candidate.o')
+            self.assertTrue((root / 'build/candidate.o.hash').exists())
+            build.compiler_identity.cache_clear()
+
+
 if __name__ == '__main__':
     unittest.main()

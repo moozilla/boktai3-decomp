@@ -1,7 +1,7 @@
 #include "tether_actor.h"
 extern u8 *gUnk_02000488;
 void TetherActor_SetState(struct TetherActor *, u32);
-u32 sub_08066DB8(u32, u8 *, u32, u32, u32, u32, u32, u32);
+u32 ActorAttachment_UpdateFromDescriptor(u32, u8 *, u32, u32, u32, u32, u32, u32);
 void TetherActor_UpdateChargeDecay(struct TetherActor *p)
 {
     u16 *q = &p->charge;
@@ -13,7 +13,7 @@ void TetherActor_UpdateChargeDecay(struct TetherActor *p)
         if ((u16)v == 1) {
             p->chargeReady = z;
             *q = z;
-            *(u32 *)((u8 *)p + 0x47C) = sub_08066DB8(
+            *(u32 *)((u8 *)p + 0x47C) = ActorAttachment_UpdateFromDescriptor(
                 *(u32 *)((u8 *)p + 0x47C), (u8 *)&p->bodyConfig, 0x7F, z, z, z, 0xFA, 0x122);
         }
     }

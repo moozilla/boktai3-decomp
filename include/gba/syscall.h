@@ -67,6 +67,7 @@ void RLUnCompWram(const u32 *src, void *dest);
 
 void RLUnCompVram(const u32 *src, void *dest);
 
+struct MultiBootParam;
 int MultiBoot(struct MultiBootParam *mp);
 
 s32 Div(s32 num, s32 denom);

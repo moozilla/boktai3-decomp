@@ -60,7 +60,7 @@ static inline int trunc12(int x)
     return x >= 0 ? x >> 12 : -(-x >> 12);
 }
 void SceneActors_StartAnimation(void *, void *, void *, int, int, int);
-void sub_0806DFC8(void *, void *, int, int, int, int, int, int, int, int, int, int);
+void RouteSpriteActor_Create(void *, void *, int, int, int, int, int, int, int, int, int, int);
 typedef struct {
     s16 x, y, z;
 } Vec;
@@ -113,8 +113,9 @@ void sub_08026AA4(ActorAnimation *p, int tick)
                 }
                 spawn.y = 256;
                 add(&spawn, (Vec *)((u8 *)p + 0x54));
-                sub_0806DFC8(&spawn, *(void **)((u8 *)p + 0x110), 6, 6, *(s16 *)((u8 *)p2 + 0x378),
-                             *(s16 *)((u8 *)p2 + 0x37a), zeroCall, 20, 20, zeroCall, zeroCall, 3);
+                RouteSpriteActor_Create(&spawn, *(void **)((u8 *)p + 0x110), 6, 6,
+                                        *(s16 *)((u8 *)p2 + 0x378), *(s16 *)((u8 *)p2 + 0x37a),
+                                        zeroCall, 20, 20, zeroCall, zeroCall, 3);
             }
             if (*((u8 *)p2 + 0x25d) & 2)
                 p->finished = 1;

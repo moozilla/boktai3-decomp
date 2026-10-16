@@ -11,8 +11,8 @@ struct Z {
     struct H a;
     struct Tail b;
 };
-void sub_08074BF4(u8 *, struct Z *, struct Z *, void (*)(void), u8 *);
-void sub_08074D34(u8 *, struct Z *, struct Z *, void (*)(void), u32, u8 *);
+void SceneActorCollision_InitBody(u8 *, struct Z *, struct Z *, void (*)(void), u8 *);
+void SceneActorCollision_InitAttack(u8 *, struct Z *, struct Z *, void (*)(void), u32, u8 *);
 void sub_080C58DC(void);
 void sub_080C553C(void);
 void sub_080C5314(u8 *p)
@@ -24,12 +24,12 @@ void sub_080C5314(u8 *p)
     s2.a.lo = 0;
     s2.a.hi = 0x80;
     s2.b.lo = 0;
-    sub_08074BF4(p, &s1, &s2, sub_080C58DC, p);
+    SceneActorCollision_InitBody(p, &s1, &s2, sub_080C58DC, p);
     s3.a.lo = 0x40;
     s3.a.hi = 0x78;
     s3.b.lo = 0x40;
     s4.a.lo = 0;
     s4.a.hi = 0x80;
     s4.b.lo = 0;
-    sub_08074D34(p, &s3, &s4, sub_080C553C, 0, p);
+    SceneActorCollision_InitAttack(p, &s3, &s4, sub_080C553C, 0, p);
 }

@@ -1,8 +1,6 @@
-#include "global.h"
-
-void Shadow_Initialize(u8 *, u8 *, u32);
-
-void sub_080786E8(u8 *p)
+#include "scene_actor_registry.h"
+void Shadow_Initialize(void *, void *, u32);
+void SceneActorBehavior_InitializeShadow(struct SceneActorRegistryActor *actor)
 {
-    Shadow_Initialize(p + 0x320, p + 0x5c, 0);
+    Shadow_Initialize((u8 *)actor + 0x320, &actor->position, 0);
 }

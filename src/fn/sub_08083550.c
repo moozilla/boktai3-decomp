@@ -1,8 +1,6 @@
-#include "global.h"
-
-extern u8 gUnk_08605C28[];
-
-void sub_08083550(u8 *p)
+#include "scene_actor_control_motion.h"
+extern const u8 gUnk_08605C28[];
+void SceneActorControl_SetDefaultPreset(struct SceneActorRegistryResetView *actor)
 {
-    *(u8 **)(p + 0x284) = gUnk_08605C28;
+    ((struct SceneActorControlPresetView *)actor)->preset284 = gUnk_08605C28;
 }

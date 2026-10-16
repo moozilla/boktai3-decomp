@@ -116,3 +116,34 @@ use defined values, and this does not justify binding r7 or writing instructions
 * **Reused shifts across an inlined test.** GCSE/CSE2 merge `one << i`
   computed in an inline test with the same expression later
   (`sub_08125B68`).
+
+## Empty barriers can change branch length before emitting any instructions
+
+agbcc includes empty `asm("")` statements in its estimated instruction lengths.
+With enough lifetime barriers, it can choose a long conditional-branch sequence
+even when the final machine-code distance fits a short Thumb branch. The extra
+branch can also shift literal pools and padding. Adding more pins can therefore
+make a near match worse even though the barriers emit no physical instructions.
+
+Three independently reviewed October 15 examples demonstrate this effect:
+
+* `0806E690` matched all body instructions but had a long failure branch;
+  removing seven redundant barriers gave the exact 316-byte extent.
+* `0806E7CC` had the same issue in its bounds check; removing four barriers
+  gave the exact 308-byte extent.
+* `080706DC` was 276 bytes against a 272-byte target at 97.794% fuzzy match.
+  A greedy pass allowing equal scores removed ten barriers; the twelfth trial
+  shortened the branch and aligned its pools, producing an exact match.
+
+The normal depin pass accepts only exact candidates, so it cannot begin from
+these mismatching bases. First remove barriers while accepting unchanged or
+improved scores; review the resulting source, then require a complete byte
+match and run normal hint minimization. Keep a checkpoint and check the full
+reviewed extent, including pools and padding. Do not remove a barrier that
+provides the only definition of a value retained by another asm input.
+
+The compiler source confirms the mechanism: `gcc/final.c` in the bundled
+agbcc source initializes `asm_insn_count` to one, then adds entries for newline
+or separator characters. Even an empty template therefore contributes one
+estimated instruction when branch shortening computes its length. Check the
+actual emitted branch distance before attributing the extra branch to C flow.

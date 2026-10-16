@@ -1,28 +1,13 @@
-#include "global.h"
-
-struct Ent {
-    u8 pad0[0x3e];
-    s16 a;
-    u16 b;
-    s16 c;
-    u8 pad44[0x12];
-    u16 d;
-    u8 pad58[0x54];
-};
-struct Mgr {
-    u8 pad[0x3c];
-    struct Ent e[1];
-};
-extern struct Mgr *gUnk_02000128;
-
-void sub_08066F90(s32 i)
+#include "scene_actor_control.h"
+extern struct SceneActorControlManager *gUnk_02000128;
+void SceneActorControl_RequestDeparture(s32 index)
 {
-    struct Mgr *m = gUnk_02000128;
-    if (i >= 0) {
-        struct Ent *e = &m->e[i];
-        if (e->c >= 0 && e->a != 2) {
-            e->b |= 2;
-            e->d |= 4;
+    struct SceneActorControlManager *manager = gUnk_02000128;
+    if (index >= 0) {
+        struct SceneActorControlSlot *slot = &manager->slots[index];
+        if (slot->index >= 0 && slot->kind != 2) {
+            slot->flags |= 2;
+            slot->collider.flags |= 4;
         }
     }
 }

@@ -4,7 +4,7 @@ u8 *sub_0821D64C(s32, s32);
 u32 sub_08225AB4(void *, u32, const struct ContactPosition *, u32, u32, void *);
 u32 sub_08225B28(void *, void *);
 u32 sub_08225B30(void *, void *);
-u32 sub_08072BF0(void *, void *, u32);
+u32 SceneActorContacts_RegisterNode(void *, void *, u32);
 void sub_0821BC68(void *, void *);
 void sub_08003C00(void *);
 void TetherActor_InitBodyFromScript(struct TetherActor *actor)
@@ -73,9 +73,9 @@ displayDone:
     actor->interactionProbe.bodyId = actor->bodyConfig.id;
     if (actor->kind != 3) {
         if (!actor->kindValue)
-            sub_08072BF0(actor->auxiliaryRegistration, config, 1);
+            SceneActorContacts_RegisterNode(actor->auxiliaryRegistration, config, 1);
         else
-            sub_08072BF0(actor->auxiliaryRegistration, config, 4);
+            SceneActorContacts_RegisterNode(actor->auxiliaryRegistration, config, 4);
         actor->auxiliaryRegistered = 1;
     }
     if (actor->kind == 9) {

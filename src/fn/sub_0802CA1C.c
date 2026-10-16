@@ -3,7 +3,7 @@ void Collider_Init(u8 *, u32, u32, u32, u32, void *, void *);
 void Collider_SetPosition(u8 *, void *, u32);
 void Collider_SetCallback(u8 *, void *, u8 *);
 void sub_0821FF7C(u8 *, u32, u32, u32);
-void Collider_Refresh(u8 *);
+s32 Collider_Refresh(u8 *);
 void sub_0802CA1C(u8 *p, void *a, void *b, void *fn)
 {
     u8 *q = p + 0xc0;

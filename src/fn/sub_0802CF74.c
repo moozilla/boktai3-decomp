@@ -22,7 +22,7 @@ struct Manager {
     u32 slot;
 };
 struct Manager *sub_0802C678(void);
-void Collider_Refresh(void *);
+s32 Collider_Refresh(void *);
 void DisplayAnimation_SelectPaletteBank(void *, u32);
 void sub_0802C994(struct Object *);
 static inline void enable(struct Object *p)

@@ -1,6 +1,7 @@
-#include "global.h"
-extern u32 gUnk_020001A0;
-u32 sub_08073B78(void)
+#include "scene_actor_contacts.h"
+struct SceneActorContactManager *
+SceneActorContacts_Destroy(struct SceneActorContactManager *unusedManager)
 {
     gUnk_020001A0 = 0;
+    return unusedManager;
 }

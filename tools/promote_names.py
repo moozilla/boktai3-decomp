@@ -69,6 +69,10 @@ def main():
         sys.exit("\n".join(errors))
 
     new = {label: name for label, name in alias.items() if label[4:] not in by_addr}
+    # Workers based on an older checkout can still call a previously promoted
+    # sub_ label. Normalize those references as well as this batch's aliases.
+    renames = {"sub_" + addr: name for addr, name in by_addr.items()}
+    renames.update(alias)
     print(f"{len(alias)} aliases, {len(new)} new names for functions.csv")
     if args.dry_run:
         return
@@ -77,8 +81,8 @@ def main():
     changed = 0
     for path in sources():
         text = open(path).read()
-        out = ALIAS.sub(lambda m: "" if m.group(2) in alias else m.group(0), text)
-        out = ref.sub(lambda m: alias.get(m.group(0), m.group(0)), out)
+        out = ALIAS.sub(lambda m: "" if renames.get(m.group(2)) == m.group(1) else m.group(0), text)
+        out = ref.sub(lambda m: renames.get(m.group(0), m.group(0)), out)
         if out != text:
             open(path, "w").write(out)
             changed += 1
@@ -88,8 +92,8 @@ def main():
     ld = os.path.join(ROOT, "symbols", "ram.ld")
     text = open(ld).read()
     out = re.sub(r"^(\w+) = (sub_[0-9A-F]{8});\n",
-                 lambda m: "" if alias.get(m.group(2)) == m.group(1) else m.group(0), text, flags=re.M)
-    out = ref.sub(lambda m: alias.get(m.group(0), m.group(0)), out)
+                 lambda m: "" if renames.get(m.group(2)) == m.group(1) else m.group(0), text, flags=re.M)
+    out = ref.sub(lambda m: renames.get(m.group(0), m.group(0)), out)
     if out != text:
         open(ld, "w").write(out)
 

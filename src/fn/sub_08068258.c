@@ -1,10 +1,8 @@
-#include "global.h"
-
-void sub_08068230(void *);
-
-s32 sub_08068258(u8 *p, s32 v)
+#include "scene_particle_burst.h"
+void SceneParticleBurst_LoadResources(struct SceneParticleBurstPool *);
+s32 SceneParticleBurst_Initialize(struct SceneParticleBurstPool *p, u32 mode)
 {
-    *(s32 *)(p + 0x724) = v;
-    sub_08068230(p);
+    p->mode = mode;
+    SceneParticleBurst_LoadResources(p);
     return 0;
 }

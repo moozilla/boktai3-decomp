@@ -1,24 +1,21 @@
-#include "global.h"
-
-extern u32 *gUnk_020001A0;
-
-void sub_08072C40(u32 *a)
+#include "scene_actor_contact_list.h"
+void SceneActorContacts_RemoveNode(struct SceneActorContactNode *node)
 {
-    u32 *base = gUnk_020001A0;
-    if (base) {
-        u32 *cur = (u32 *)base[10];
-        u32 *prev = 0;
-        while (cur) {
-            if (cur == a) {
-                if (prev == 0)
-                    base[10] = cur[3];
+    struct SceneActorContactManager *manager = gUnk_020001A0;
+    if (manager) {
+        struct SceneActorContactNode *current = manager->head;
+        struct SceneActorContactNode *previous = NULL;
+        while (current) {
+            if (current == node) {
+                if (!previous)
+                    manager->head = current->next;
                 else
-                    prev[3] = cur[3];
-                base[7] = base[7] - 1;
+                    previous->next = current->next;
+                manager->count--;
                 return;
             }
-            prev = cur;
-            cur = (u32 *)cur[3];
+            previous = current;
+            current = current->next;
         }
     }
 }
