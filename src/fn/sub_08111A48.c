@@ -2,7 +2,7 @@
 #include "engine.h"
 #ifdef NONMATCHING
 // fuzzy: 54.6%
-// Open: the colour channels: the original re-zero-extends the colours and
+// Open: the color channels: the original re-zero-extends the colors and
 // uses fresh constants for the red channel.
 struct PaletteFade {
     u8 pad0[0x24];
