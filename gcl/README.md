@@ -56,6 +56,41 @@ chara 扇風砲マネージャ 0x9cc2  # 9CC2 Fan Cannon Manager
 local1 = (({ command ランダム p: (arg2 << 4) /* 3469 Random */ } >> 4) % arg2)
 ```
 
+## Options
+
+A command's options are a letter and values, written Konami-style by
+`gcx.py dis` (`-p 2688,512,2432 -d 128`). The compiled script keeps only the
+letter, so letters are the source spelling (MGS1's GCL also used letters).
+What a letter means belongs to the routine that reads it:
+`tools/assets/gcloptions.py KEY|COMMAND` scans the routine's code for
+`Script_SeekToKeyword('p')` / `Script_GetKeywordValue('d', 256)` calls (the
+letter, its default, how many values) and takes names from the matched C
+(`radius = Script_GetKeywordValue('d', 256)`). `names/option.csv` (owner,
+letter, name, english, evidence) adds names by hand and wins. The comment
+lists what is known:
+
+```
+chara 0x99ca 0x355f -p 2688,512,2432 -d 128 -t 15 -T 4  # 99CA OrbitingParticles_CreateFromScript: -p pos, -d radius, -t duration, -T type
+trap arg1 プレイヤー -m 0x14c9 -s $:P_ブロック名  # F5EB Player: -m event, -s names, -e run block
+command 0x1c64 -r text#1800  # 1C64 sub_08030D9C: -r text; text#1800 "Destroy the bats on the 4 windows in the north …"
+```
+
+Keys without a recovered name show their callback's function name. `text#N`
+operands get a short excerpt of the string (English when
+`build/text/english.tsv` exists). About a third of the option uses in the
+scripts are explained so far; the two most used routines without names are
+`1C64` (message window) and `7348` (`SceneMessages_ScriptStart`).
+
+Operand roles worth knowing:
+
+* `chara TYPE NAME`: the registry key, then the instance's own name hash
+  (MGS's `chara TYPE NAME` too; `mesg` addresses instances by that name).
+* `trap AREA WHO`: `WHO` is a registry key, usually プレイヤー (F5EB, 82 of 101
+  traps). `-m` is the event, default `0DD2`; `？` (14C9) and `＊` (1516) are
+  the EUC-JP hashes of the full-width wildcards the source wrote.
+* "chara" is GCL's word for any scripted object (キャラ); the Studio's Actors
+  page is the same registry.
+
 ## Konami's naming, from the game's own debug prints
 
 The scripts' `print` strings are EUC-JP developer messages that often print a
