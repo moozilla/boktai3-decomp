@@ -27,6 +27,7 @@ addr,name,mode,confidence,source,notes
 080035F0,Palette_SetBrightnessFromScript,thumb,low,src-alias,
 080038B4,ColorFade_ApplyCommand,thumb,low,src-alias,
 08003960,ColorFade_ApplyCommands,thumb,low,src-alias,
+08003B00,ScreenFade_FromScript,thumb,low,gcl-behavior,registry 9C2C; proc 899 passes a color index mapped to an RGB triple and a frame count
 08003BB8,TerrainOverlay_QueueCommand,thumb,low,src-alias,
 08003C20,TerrainOverlay_Update,thumb,low,src-alias,
 08004018,TerrainOverlay_DestroyDrawables,thumb,low,src-alias,
@@ -1846,6 +1847,7 @@ addr,name,mode,confidence,source,notes
 08095540,Bee_Create,thumb,high,gcl-name,name from GCL key E131 ビー (Bee); registry callback
 08099B44,Ghost_Init,thumb,high,gcl-name,name from GCL key CCD3 ゴースト (Ghost); loader called by Ghost_Create
 0809ADD4,Ghost_Create,thumb,high,gcl-name,name from GCL key CCD3 ゴースト (Ghost); registry callback
+0809ECC8,Flower_Create,thumb,low,gcl-behavior,registry 680E spawner for enemy kinds 26-28; the monster list's unmatched triple there is Poisoner/Perplexer/Pop Bud
 080A1440,Crow_Init,thumb,high,gcl-name,name from GCL key 9E8D クロウ (Crow); loader called by Crow_Create
 080A2010,Crow_Create,thumb,high,gcl-name,name from GCL key 9E8D クロウ (Crow); registry callback
 080A4AFC,Spider_Init,thumb,high,gcl-name,name from GCL key 87E4 スパイダー (Spider); loader called by Spider_Create
@@ -1866,6 +1868,7 @@ addr,name,mode,confidence,source,notes
 080FE68C,Axe_Init,thumb,medium,gcl-name,name from GCL key 2D30 アックス (Axe); loader called by Axe_Create
 080FF754,Axe_Create,thumb,medium,gcl-name,name from GCL key 2D30 アックス (Axe); registry callback
 08100298,WoodenCrate_Create,thumb,medium,gcl-name,name from GCL key 820B 木箱 (Wooden Crate); registry callback
+0810067C,FloorSwitch_Create,thumb,medium,gcl-behavior,registry AB8E; S options are on_press/on_release callbacks (procs 3945/3946 toggle a door); starts pressed when an object rests in its 256x32 box
 08103B94,NamedActor_SetMoveModeFromScript,thumb,low,src-alias,
 08103CF8,NamedActor_SetRouteFromScript,thumb,low,src-alias,
 08103DCC,NamedActor_SetSpeedFromScript,thumb,low,src-alias,
@@ -2018,6 +2021,7 @@ addr,name,mode,confidence,source,notes
 0821BC4C,Terrain_SetGrid,thumb,low,src-alias,"HP grid -> EngineMap+4, then neighbour offsets and size"
 0821DDF4,Terrain_SetBoxes,thumb,low,src-alias,"HP named boxes (doors, camera area) -> EngineMap+0xC"
 0821E5B8,Terrain_SetPaths,thumb,low,src-alias,HP patrol paths -> EngineMap+0x10
+0821E860,Path_GetPointFromScript,thumb,low,gcl-behavior,"registry 3DB8; looks up point B of path A (sub_0821E748/E76C/E780) and stores x, y, z into three script variables"
 0821F180,Terrain_SetNavMeshes,thumb,low,src-alias,HP nav meshes -> EngineMap+0x14
 0821FE40,Collider_Refresh,thumb,low,src-alias,
 0821FE6C,Collider_Remove,thumb,low,src-alias,
