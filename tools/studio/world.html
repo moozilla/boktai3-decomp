@@ -232,7 +232,7 @@ function showArea(n, scene) {
   $('view').innerHTML = `
     <h2>Area ${n}: ${esc(areaLabel(a))}${a.confidence ? `<span class="conf">${esc(a.confidence)}</span>` : ''}</h2>
     ${a.evidence ? `<div class="ev">${esc(a.evidence)}</div>` : ''}
-    <div class="meta">${a.scenes.length} scene${a.scenes.length > 1 ? 's' : ''} (${a.scenes[0]}${a.scenes.length > 1 ? '–' + a.scenes[a.scenes.length - 1] : ''}) · ${a.maps.length} map${a.maps.length !== 1 ? 's' : ''} · ${a.doors} doors, ${a.inner} inside · ${a.items} item${a.items !== 1 ? 's' : ''}${fam ? ' · enemies: ' + fam : ''}</div>
+    <div class="meta">${a.scenes.length} scene${a.scenes.length > 1 ? 's' : ''} (${a.scenes[0]}${a.scenes.length > 1 ? '–' + a.scenes[a.scenes.length - 1] : ''}) · ${a.maps.length} map${a.maps.length !== 1 ? 's' : ''} · ${a.doors} doors, ${a.inner} inside · ${a.items} item${a.items !== 1 ? 's' : ''}${fam ? ' · enemies: ' + fam : ''}${a.scenes.length > 1 ? ` · <a href="/gfx#dungeon/${n}">stitched map</a>` : ''}</div>
     <h3>Linked areas</h3>
     <div class="chips">${nb.map(chip).join('') || '<span class="empty">none (doors only inside, or none at all)</span>'}</div>
     <h3>Door graph</h3>

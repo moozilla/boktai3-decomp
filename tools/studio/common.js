@@ -11,7 +11,7 @@ function localStore(k, v) { try { if (v === undefined) return localStorage.getIt
 // ---------- header ----------
 const NAV = [
   ['Text', '/'], ['Sprites', '/gfx#sprites'], ['Large sprites', '/gfx#big'], ['Maps', '/gfx#maps'], ['Palettes', '/gfx#palettes'],
-  ['Sprite palettes', '/gfx#pool'], ['Font', '/gfx#font'], ['Tiles', '/gfx#tiles'], ['Data', '/gfx#data'], ['Actors', '/actors'], ['Scripts', '/scripts'], ['World', '/world'], ['Live', '/live'], ['Captures', '/captures'],
+  ['Sprite palettes', '/gfx#pool'], ['Font', '/gfx#font'], ['Tiles', '/gfx#tiles'], ['Data', '/gfx#data'], ['Actors', '/actors'], ['Scripts', '/scripts'], ['World', '/world'], ['Dungeons', '/gfx#dungeon'], ['Live', '/live'], ['Captures', '/captures'],
 ];
 // Fills <header id="top">; `tools` is HTML for the right-hand side.
 function studioHeader(tools = '') {
