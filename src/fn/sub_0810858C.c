@@ -1,0 +1,118 @@
+#include "global.h"
+#include "engine.h"
+#ifdef NONMATCHING
+// fuzzy: 98.1%
+// Open: operand registers of `one & f->flags`, the `two` constant placement,
+// and the final frame read (the original keeps a halfword load).
+struct Frames {
+    u16 *data;
+    u8 flags, count, multiplier, duration;
+    u16 index, padA, rate, timer;
+};
+struct AnimatedTile {
+    u32 flags;
+    u8 pad4[3];
+    u8 field7;
+    u8 pad8[4];
+    void *anim;
+    u16 field10;
+    u8 pad12[0xA];
+    s16 x, y, z;
+    u8 pad22[0xA];
+    struct Frames frames;
+    u8 pad3C[0x1C];
+    s32 name, field5C;
+    u16 field60;
+    u8 pad62[2];
+    u8 sequence, field65;
+};
+struct AnimatedTileManager {
+    u8 pad0[0x18];
+    void *sequences;
+};
+extern struct AnimatedTileManager *gUnk_020001BC;
+struct AnimatedTileManager *sub_08108A4C(void);
+struct AnimatedTile *sub_081084E4(struct AnimatedTileManager *);
+/* Registry routine 8192: takes a slot of the animated tile manager
+   (0x020001BC, created on demand) with sprite 0x3876: -p x y z, -R (2), -r
+   sequence, -n, -C, -c palette bank (+0x304); then starts the sequence and
+   steps it once (tentative). */
+void AnimatedTile_CreateFromScript(void)
+{
+    struct AnimatedTileManager *manager = gUnk_020001BC;
+    struct AnimatedTile *e;
+    struct AnimatedTile *slot;
+    s32 palette;
+    u32 two;
+    struct Frames *fr;
+    struct Frames *f;
+    u16 *frame;
+    u32 one;
+    if (!manager) {
+        manager = sub_08108A4C();
+        if (!manager)
+            return;
+    }
+    slot = sub_081084E4(manager);
+    if (!slot)
+        return;
+    e = slot;
+    AnimData_Load(&e->frames + 1, 0x3876);
+    Sprite_Init(e, &e->frames + 1, 0);
+    one = e->field60 = 1;
+    e->field65 = 1;
+    if (Script_SeekToKeyword('p')) {
+        e->x = Script_GetValue();
+        e->y = Script_GetValue();
+        e->z = Script_GetValue();
+    }
+    e->field7 = Script_GetKeywordValue('R', 2);
+    e->sequence = Script_GetKeywordValue('r', 0);
+    e->name = Script_GetKeywordValue('n', 0);
+    e->field5C = Script_GetKeywordValue('C', 0);
+    palette = Script_GetKeywordValue('c', 0);
+    AnimData_SelectPaletteBank(e->anim, palette + 0x304);
+    fr = &e->frames;
+    Anim_SetSequence(fr, manager->sequences, 0, 0, e->sequence);
+    f = fr;
+    frame = &f->data[f->index];
+    e->field10 = *frame >> 6;
+    if ((one & f->flags) != (((*frame & 0x30) >> 4) & one))
+        e->flags |= 4;
+    else
+        e->flags &= ~4;
+    two = 2;
+    if ((u8)(f->flags & two) != (((*frame & 0x30) >> 4) & two))
+        e->flags |= 8;
+    else
+        e->flags &= ~8;
+    if (++f->timer >= f->duration) {
+        f->timer = 0;
+        if (f->flags & 4) {
+            u32 index = f->index;
+            if (index == 0) {
+                if (f->flags & 8) {
+                    f->timer = f->duration;
+                    goto next;
+                }
+                index = f->count;
+            }
+            f->index = index - 1;
+        } else if (++f->index >= f->count) {
+            if ((u8)(f->flags & 8)) {
+                f->timer = f->duration;
+                f->index = f->count - 1;
+            } else
+                f->index = 0;
+        }
+    next:
+        frame = &f->data[f->index];
+        f->multiplier = *frame & 0xF;
+        f->duration = (f->multiplier * f->rate) >> 6;
+        if (!f->duration)
+            f->duration = 1;
+    }
+}
+#else
+INCLUDE_ASM("asm/nonmatching", AnimatedTile_CreateFromScript);
+#endif
