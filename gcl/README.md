@@ -74,6 +74,46 @@ before the variable it names, so they tie names to storage:
 | `d:GROUP:NAME` | `d:STORY_05_130:氷パズル正解_終了` (= 5) | a define; values print beside it |
 | `@NAME` | `@st01_43_ruins_after` | a procedure (`@` calls, as in MGS4 source) |
 
+### Variables, defines and parameters from the prints
+
+`python3 tools/assets/gclnames.py labels` walks every `print` in the image and
+pairs a label at the end of a string operand with the operand that follows
+it; `labels --write` regenerates the tables below, keeping any English
+already in them (English comes from `prints.csv`, then hand edits).
+
+| File | Rows | Columns |
+|---|---|---|
+| `names/var.csv` | `$x:` / `$$x:` labels on `r708`, `r700` and `gs` storage | `storage` (`r708:0x66.6:t4`; an indexed flag array as `r708:0x145.0:t4(16)`), `name`, `english`, `confidence`, `conflict`, `evidence` |
+| `names/define.csv` | `d:GROUP:NAME` printed beside a literal, and the `d:` index labels of flag arrays (`[d:st02_燭台スイッチ番号:27_燭台１]` with `(16,1)` = 1) | `define`, `value`, ... (`evidence` names the array for index defines) |
+| `names/param.csv` | `$:P_NAME` / `$:NAME` on `argN` and `$$:NAME` on `localN`, per procedure | `proc` (call id), `storage`, `name`, ... |
+
+Pairing rules: the label must end its string (trailing spaces, `！？・…`
+allowed; the sentence tails `です` and `が不正な値になっている` are cut and
+lower the row to medium); the sigil must agree with the storage (`$$` =
+`r700`, `$` = `r708` or `gs`; `f` = t4, `b` = t2, `w` = t1), or the row is low.
+An array description (`$b:敵設置数登録配列[]の、`) and a label with no operand
+(`$f:st04_08_重量スイッチオン`) are skipped. A slot with several names, or a
+name on several slots, keeps every row and says so in `conflict` (defines
+compare within their group, parameters within their procedure): `proc 4969`
+prints `$:P_ブロック名` for `arg2` and, inside a `trap` event block, `arg11`.
+
+The three `@` prints (`@st01_43_ruins_after`, `@st01_43伯爵戦前へ` in
+`proc_3239` and `proc_3255`) describe a common-load destination; the code
+does not tie them to one procedure, so there is no `proc.csv` yet.
+
+With names, `gcx.py dis` (and the Studio's Scripts page) prints named storage
+Konami-style, the raw storage and English in the trailing comment; an index
+prints as its define when the procedure's prints (or a unique define) say
+which, or as a named parameter:
+
+```
+$f:st02_27_燭台シャッターフラグ = 1  # r708[0x66.6]:t4 st02_27_candle shutter flag
+if (($f:燭台点灯フラグ[$:P_燭台スイッチ番号] == 1)) {  # r708[0x145.0]:t4(16) candle-stand lit flag; arg2 candle switch no.
+proc_1084 0xae2c 2816 2304 7 $f:床スイッチフラグ[d:st05_床スイッチ番号:東シャッター連動134] ...
+```
+
+`gcx.disassemble(..., names=False)`, which tools parse, is unchanged.
+
 Patterns worth following when we name things:
 
 * Stage-scoped names start with the stage and area: `st02_27_`, `st05_130`

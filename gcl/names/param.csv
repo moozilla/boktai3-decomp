@@ -1,0 +1,20 @@
+proc,storage,name,english,confidence,conflict,evidence
+3269,arg2,$:P_壁種類,wall type,high,,print in proc_3269
+3270,arg2,$:P_橋種類,bridge type,high,,print in proc_3270
+4944,arg2,$:P_燭台スイッチ番号,candle switch no.,high,,print in proc_4944; index of $f:燭台点灯フラグ
+4944,local1,$$:燭台状態,candle state,high,,print in proc_4944
+4945,arg3,$:P_燭台スイッチ番号,candle switch no.,high,,print in proc_4945
+4949,arg1,$:P_会話番号,conversation no.,medium,,print in proc_4949
+4952,arg2,$:P_壁種類,wall type,high,,print in proc_4952
+4953,arg2,$:P_壁種類,wall type,high,,print in proc_4953
+4954,arg2,$:P_壁種類,wall type,high,,print in proc_4954
+4955,arg2,$:P_壁種類,wall type,high,,print in proc_4955
+4956,arg2,$:P_壁種類,wall type,high,,print in proc_4956
+4962,arg1,$:P_フロア,floor,high,,print in proc_4962
+4962,local1,$$:シャッター開閉判定,shutter open/close judgment,high,,print in proc_4962
+4969,arg11,$:P_ブロック名,block name,high,name also on arg2,print in proc_4969
+4969,arg2,$:P_ブロック名,block name,high,name also on arg11,print in proc_4969
+5069,arg1,$:P_階数,floor,high,,print in proc_5069
+5289,local1,$$:シャッター開閉判定,shutter open/close judgment,high,,print in proc_5289
+5757,arg1,$:キャラ名,character name,high,,print in proc_5757
+8800,arg4,$:P_ブリザード方向,blizzard direction,high,,print in proc_8800
