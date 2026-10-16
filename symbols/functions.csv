@@ -1872,9 +1872,13 @@ addr,name,mode,confidence,source,notes
 080FF754,Axe_Create,thumb,medium,gcl-name,name from GCL key 2D30 アックス (Axe); registry callback
 08100298,WoodenCrate_Create,thumb,medium,gcl-name,name from GCL key 820B 木箱 (Wooden Crate); registry callback
 0810067C,FloorSwitch_Create,thumb,high,gcl-behavior,registry AB8E; S options are on_press/on_release callbacks (procs 3945/3946 toggle a door); starts pressed when an object rests in its 256x32 box
+08103ADC,NamedActor_SetFlag20FromScript,thumb,low,src-alias,
 08103B94,NamedActor_SetMoveModeFromScript,thumb,low,src-alias,
 08103CF8,NamedActor_SetRouteFromScript,thumb,low,src-alias,
 08103DCC,NamedActor_SetSpeedFromScript,thumb,low,src-alias,
+08103E60,NamedActor_SetRangeFromScript,thumb,low,src-alias,
+0810BDB4,RegistryC5BD_SetTimeFromScript,thumb,low,src-alias,
+0810BE58,Registry1022_GetValueFromScript,thumb,low,src-alias,
 08119EF0,Glove_StartFromScript,thumb,low,src-alias,
 0811B848,RegistryE7BC_CreateFromScript,thumb,low,src-alias,
 0811D1C0,GameState_SetNameFromScript,thumb,low,src-alias,
@@ -1888,12 +1892,16 @@ addr,name,mode,confidence,source,notes
 0815CBF8,ScriptActor_MoveToFromScript,thumb,low,src-alias,
 0815CCF8,ScriptActor_TurnFromScript,thumb,low,src-alias,
 0815CDAC,ScriptActor_EnterStateFourFromScript,thumb,low,src-alias,
+0815CF6C,ScriptActor_StartActionFromScript,thumb,low,src-alias,
 0815D524,ScriptActor_SetModeFromScript,thumb,low,src-alias,
 0815F4F4,Player_Create,thumb,medium,gcl-name,name from GCL key F5EB プレイヤー (Player); registry callback
+0816B834,GameState_ClearAreaFlagsFromScript,thumb,low,src-alias,
 0816B884,GameState_SetAreaFlagFromScript,thumb,low,src-alias,
+08178008,Hud_RefreshSpriteFromScript,thumb,low,src-alias,
 0817809C,Hud_SetModeFromScript,thumb,low,src-alias,
 081780D4,Hud_SetLayoutFromScript,thumb,low,src-alias,
 08178564,Hud_CloseMessageFromScript,thumb,low,src-alias,
+08178588,Hud_ShowPanelFromScript,thumb,low,src-alias,
 08179298,Hud_Create,thumb,low,src-alias,
 081803D8,BossSlot2_AdvanceStepFromScript,thumb,low,src-alias,
 0818C674,Armor_Create,thumb,medium,gcl-name,name from GCL key E043 アーマー (Armor); registry callback
@@ -1905,6 +1913,7 @@ addr,name,mode,confidence,source,notes
 081A3270,Hresvelgr_Create,thumb,medium,gcl-name,name from GCL key C077 フレスベルグ (Hresvelgr); registry callback
 081AF488,Vanargand_Create,thumb,medium,gcl-name,name from GCL key 7C56 ヴァナルガンド (Vanargand); registry callback
 081AF4F4,Vanargand_ResetFromScript,thumb,low,src-alias,
+081BA57C,Registry2388_SetVisibleFromScript,thumb,low,src-alias,
 081BA5D0,Registry2388_Create,thumb,low,src-alias,
 081BC27C,SolarBank_Create,thumb,medium,gcl-name,name from GCL key 7F5E 太陽バンク (Solar Bank); registry callback
 081BD814,DarkLoan_Create,thumb,medium,gcl-name,name from GCL key E9D3 暗黒ローン (Dark Loan); registry callback
@@ -1912,7 +1921,10 @@ addr,name,mode,confidence,source,notes
 081C0BD4,SceneActorManager_Exists,thumb,low,src-alias,
 081D0C04,SceneNpc_CreateFromScript,thumb,low,src-alias,
 081D0F28,SceneNpc_CommandFromScript,thumb,low,src-alias,
+081D105C,SceneNpc_StopFromScript,thumb,low,src-alias,
+081D51B0,RegistryA76D_SetFromScript,thumb,low,src-alias,
 081D6BC0,MonsterBook_Create,thumb,medium,gcl-name,name from GCL key 34EA 魔物図鑑 (Monster Book); registry callback
+081D7510,ScreenParams2A0_SetFromScript,thumb,low,src-alias,
 081DBA54,ScreenParams2C0_SetFromScript,thumb,low,src-alias,
 081DBB0C,Options_Create,thumb,medium,gcl-name,name from GCL key 96CD オプション (Options); registry callback
 081DBF98,ScreenParams2E8_SetFromScript,thumb,low,src-alias,
@@ -1928,6 +1940,8 @@ addr,name,mode,confidence,source,notes
 081DCE34,Time_OnLoadSave,thumb,medium,raphaelr,
 081DE520,ScreenParams328_SetFromScript,thumb,low,src-alias,
 081DE5A4,NameEntry_Create,thumb,high,gcl-name,name from GCL key 2687 名前入力 (Name Entry); registry callback
+081E03F4,ScreenParams358_SetFromScript,thumb,low,src-alias,
+081E1A2C,ScreenParams3A0_SetFromScript,thumb,low,src-alias,
 081E1AB4,GameStart_Create,thumb,medium,gcl-name,name from GCL key 15DE ゲームスタート (Game Start); registry callback
 081E1AF4,SoundTest_CountEntries,thumb,low,src-alias,
 081E1B80,SoundTest_ShowCategory,thumb,low,src-alias,
@@ -1963,14 +1977,17 @@ addr,name,mode,confidence,source,notes
 081E6E0C,Actor_MoveAlongScriptedCurve,thumb,low,src-alias,
 081EA1C0,Actor_ConfigureFromScript,thumb,low,src-alias,
 081EB724,Params3D0_SetFromScript,thumb,low,src-alias,
+081EC0A8,ScreenParams3F8_SetFromScript,thumb,low,src-alias,
 081EC340,Results_Create,thumb,medium,gcl-name,name from GCL key 1C82 リザルト (Results); registry callback
 081F2034,SingletonSlot7_Create,thumb,low,src-alias,
+081F213C,SingletonSlot7_SetTimerFromScript,thumb,low,src-alias,
 081FB788,Ratatosk_Create,thumb,medium,gcl-name,name from GCL key 1E93 ラタトスク (Ratatosk); registry callback
 08206470,Ooze_Create,thumb,medium,gcl-name,name from GCL key DA0E ウーズ (Ooze); registry callback
 08207F68,VulcanCannon_Create,thumb,medium,gcl-name,name from GCL key F083 バルカン砲 (Vulcan Cannon); registry callback
 0820A420,FanCannonManager_Create,thumb,high,gcl-name,name from GCL key 9CC2 扇風砲マネージャ (Fan Cannon Manager); registry callback
 0820A460,Slot600_ActivateFromScript,thumb,low,src-alias,
 0820A4D0,Slot600_DeactivateFromScript,thumb,low,src-alias,
+0820A540,Slot600_ResetFromScript,thumb,low,src-alias,
 0820BCE0,DragonPuppy_Create,thumb,medium,gcl-name,name from GCL key 3D38 ドラゴンパピー (Dragon Puppy); registry callback
 0820D1F8,Screamer_Create,thumb,medium,gcl-name,name from GCL key 84CF スクリーマー (Screamer); registry callback
 0820EBA8,PoisonHand_Create,thumb,medium,gcl-name,name from GCL key FE92 ポイズンハンド (Poison Hand); registry callback
@@ -2046,6 +2063,7 @@ addr,name,mode,confidence,source,notes
 08225C48,Terrain_LoadHP,thumb,low,disasm,"ScriptProc_Start(0xAE6C, hp): hands the HP header offsets to Terrain_SetGrid/SetBoxes/SetPaths/SetNavMeshes; docs/ASSETS.md"
 08225CB8,Terrain_LoadFromScript,thumb,low,src-alias,
 082268C0,Camera_SetFollowFromScript,thumb,low,src-alias,
+08227888,PlayerName_SetFromScript,thumb,low,src-alias,
 08227A10,Terrain_GetFloorHeightFromScript,thumb,low,src-alias,
 082284F4,Clock_ClearState,thumb,low,src-alias,
 08228548,Clock_DaysInMonth,thumb,low,manual,days in month; February uses the Gregorian leap-year rule
@@ -2063,6 +2081,7 @@ addr,name,mode,confidence,source,notes
 0822E340,GameState_ResetListsFromScript,thumb,low,src-alias,
 0822E564,GameState_ResetSlotsFromScript,thumb,low,src-alias,
 0822E924,GameState_ResetUnlocksFromScript,thumb,low,src-alias,
+0822E9C8,GameState_HasUnlockFromScript,thumb,low,src-alias,
 0822ECC8,SolarFruit_Command,thumb,medium,gcl-name,name from GCL key FE88 太陽の実 (Solar Fruit); registry callback (script command)
 0822F1B4,umul3232H32,thumb,low,src-alias,
 0822F1C4,SoundMain,thumb,low,src-alias,
