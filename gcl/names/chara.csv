@@ -49,6 +49,7 @@ E3EE,グローブ,Glove,low,hash only
 E9D3,暗黒ローン,Dark Loan,medium,hash (text#212); callback 081BD814 beside Solar Bank and Storage
 F083,バルカン砲,Vulcan Cannon,medium,monster list VULCAN CANNON (text#9873)
 F5EB,プレイヤー,Player,medium,hash; created 15 times in 7 procedures
+F836,ドッグ,Dog,high,"loads the dog sprite D635 (pink four-legged dog, docs/ASSETS.md); the family is ハウンド/ホットドッグ/アイスドッグ (Hound, Hot Dog, Ice Dog); found by hand"
 F8BE,バット,Bat,high,loads sprite DA6D (the bat family)
 FE88,太陽の実,Solar Fruit,medium,hash (text#1001); 4 uses by command
 FE92,ポイズンハンド,Poison Hand,medium,monster list POISON HAND (text#9870)
