@@ -1,13 +1,13 @@
-#include "global.h"
-
-void sub_08067658(u8 *p, u8 *a, u8 *b)
+#include "scene_actor_control.h"
+void SceneActorControl_DecodeDirection(const struct SceneActorControlInput *input, u8 *folded,
+                                       u8 *flip)
 {
-    u32 v = ((p[9] + 0x60) >> 6) & 3;
-    if (v > 1) {
-        *b = 1;
-        *a = 3 - v;
+    u32 quadrant = ((input->direction + 0x60) >> 6) & 3;
+    if (quadrant > 1) {
+        *flip = 1;
+        *folded = 3 - quadrant;
     } else {
-        *b = 0;
-        *a = v;
+        *flip = 0;
+        *folded = quadrant;
     }
 }

@@ -1,12 +1,11 @@
-#include "global.h"
+#include "scene_range_watch.h"
 s32 Mod(s32, s32);
-void sub_0806F7B0(u8 *);
-u32 sub_0806F838(u8 *p)
+u32 SceneRangeWatch_Tick(struct SceneRangeWatch *p)
 {
-    if (*(u16 *)(p + 0x24) == 0)
-        sub_0806F7B0(p);
-    else if (Mod(*(u16 *)(p + 0x26), *(u16 *)(p + 0x24)) == 0)
-        sub_0806F7B0(p);
-    *(u16 *)(p + 0x26) += 1;
+    if (p->interval == 0)
+        SceneRangeWatch_CheckRange(p);
+    else if (Mod(p->frame, p->interval) == 0)
+        SceneRangeWatch_CheckRange(p);
+    p->frame += 1;
     return 0;
 }

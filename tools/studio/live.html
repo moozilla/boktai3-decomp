@@ -108,6 +108,15 @@ code { font-size: 12px; }
         <button id="procrun">Run script procedure</button>
       </div>
     </div>
+    <div class="card" id="storycard">
+      <h2>Story state <span class="sp"></span><button id="reload" title="Warp back into this scene at the entrance used, so it sets up again with these values">Reload scene</button></h2>
+      <div class="howto" style="margin-bottom:6px">What the scene scripts test. Changes apply when a scene loads, so reload it (or go through a door) to see their effect.</div>
+      <div class="row"><b style="font-weight:500;color:var(--muted)">Progress</b>
+        <button id="progdn">−</button><input id="prog" type="number" style="width:5.5em"><button id="progup">+</button><button id="progset">Set</button>
+        <span id="progcur" class="aside" style="color:var(--muted);font-size:12px"></span></div>
+      <div id="scenevars"></div>
+      <details style="margin-top:8px"><summary style="cursor:pointer;color:var(--muted);font-size:13px">Event flags · GameState+0x720–0x733</summary><div id="evflags" style="margin-top:6px"></div></details>
+    </div>
     <div class="card howto" id="howto">
       <h2>Connect mGBA</h2>
       Start the studio (<code>python3 tools/studio/serve.py</code>), then run mGBA with Centaur:<br>
@@ -144,8 +153,8 @@ code { font-size: 12px; }
       <div class="thumbs" id="caps"><div class="empty">Capture a scene to inspect its sprites, layers and palettes.</div></div>
     </div>
     <div class="card">
-      <h2>Scenes · warp (experimental) <span class="sp"></span><input id="scq" placeholder="scene or map" style="width:8em"></h2>
-      <div class="howto" style="margin-bottom:6px">Loads the scene's stage; the player is not placed yet, so use bookmarks for play. Current scene: <b id="cursc">—</b></div>
+      <h2>Scenes · warp <span class="sp"></span><input id="scq" placeholder="scene or map" style="width:8em"></h2>
+      <div class="howto" style="margin-bottom:6px">Click to go there the way a door does (the game's own transition, <code>proc_945</code>), arriving at the scene's first entrance; pick another entrance on the map. Story flags stay as they are, so a scene may look different from a real playthrough. Current scene: <b id="cursc">—</b></div>
       <div class="log" id="scenes" style="max-height:300px"><div class="empty">Loading…</div></div>
     </div>
     <div class="card">
@@ -192,7 +201,92 @@ async function poll() {
   renderThumbs('bms', d.bookmarks, b => `/api/live/file/bookmarks/${encodeURIComponent(b.name)}.png`, b => `${b.name}${b.map ? ' · ' + b.map : ''}`, b => cmd({ c: 'load', name: b.name }));
   renderThumbs('caps', d.captures.slice(0, 8), c => `/api/live/file/captures/${encodeURIComponent(c.name)}/screen.png`, c => c.label || c.name, c => location.href = `/captures#${encodeURIComponent(c.name)}`);
   $('cursc').textContent = st.scene ?? '—';
+  renderStory(d);
 }
+
+// ---------- story state: progress, the variables this scene's conditions test, event flags ----------
+// Variables as tools/assets/gcx.py prints them: region[offset.bit]:type (type 4 = one bit,
+// 1/6 = 16-bit, 2/3 = byte, 9 = word); `progress` is r708[0x3c], `entrance` r708[0x70].
+let stageMeta = null, storyVars = [], storyScene = null;
+const VAR_RE = /\b(progress|entrance)\b|(r70[08]|gs)\[0x([0-9a-f]+)(?:\.(\d+))?\]:t(\d)(?:\((\d+),([^()]+|\([^()]*\))\))?/g;
+function condVars(text) {
+  const out = [];
+  for (const m of text.matchAll(VAR_RE)) {
+    if (m[1]) { out.push({ key: m[1], r: 'r708', o: m[1] === 'progress' ? 0x3c : 0x70, t: 1, ro: m[1] === 'entrance' }); continue; }
+    if (m[7] !== undefined && !/^-?\d+$/.test(m[7])) continue;  // indexed by a non-literal
+    let o = parseInt(m[3], 16), b = +(m[4] || 0); const t = +m[5], i = +(m[7] || 0);
+    if (t === 4) { b += i; o += b >> 3; b &= 7; } else o += i * ({ 9: 4, 8: 4, 2: 1, 3: 1 }[t] || 2);
+    out.push({ key: m[0], r: m[2], o, t, b: t === 4 ? b : undefined });
+  }
+  return out;
+}
+function condTruth(text, vals) {  // true/false when the condition is plain arithmetic once variables are known
+  let ok = true;
+  const e = text.replace(VAR_RE, k => { const v = vals[k]; if (v === undefined || v === false) ok = false; return `(${v})`; })
+    .replace(/\bnot\b/g, '!');
+  if (!ok || !/^[\s\d()<>=!&|+\-*/%]*$/.test(e)) return null;
+  try { return !!Function(`return (${e})`)(); } catch (err) { return null; }
+}
+async function renderStory(d) {
+  const story = d.story, on = d.connected && story;
+  ['reload', 'progdn', 'progup', 'progset', 'prog'].forEach(id => $(id).disabled = !on);
+  if (!on) { $('progcur').textContent = 'connect mGBA'; return; }
+  $('progcur').textContent = `now ${story.progress} · scene ${story.scene} · arrived by entrance ${story.entrance}`;
+  if (document.activeElement !== $('prog')) $('prog').value = story.progress;
+  stageMeta ||= await fetch('/api/stagemeta').then(r => r.json()).catch(() => []);
+  if (story.scene !== storyScene) {  // watch the variables this scene's conditions test
+    storyScene = story.scene;
+    const sc = stageMeta.find(x => x.scene === story.scene), conds = new Map();
+    for (const k of ['doors', 'entrances', 'items', 'enemies']) for (const r of sc?.[k] || []) for (const c of r.cond) {
+      if (!conds.has(c)) conds.set(c, {}); const n = conds.get(c); n[k] = (n[k] || 0) + 1;
+    }
+    storyVars = [];
+    for (const c of conds.keys()) for (const v of condVars(c)) if (!storyVars.some(x => x.key === v.key)) storyVars.push(v);
+    storyVars.conds = conds;
+    cmd({ c: 'vars', list: storyVars.map(({ r, o, t, b }) => ({ r, o, t, b: b ?? 0 })) });
+    $('scenevars').innerHTML = '';
+  }
+  const vals = {};
+  const ready = (story.vars || []).length === storyVars.length;
+  storyVars.forEach((v, i) => { vals[v.key] = v.key === 'progress' ? story.progress : v.key === 'entrance' ? story.entrance : ready ? story.vars[i] : undefined; });
+  if (!$('scenevars').firstChild) {
+    if (!storyVars.length) { $('scenevars').innerHTML = '<div class="empty">This scene\'s setup tests no variables.</div>'; }
+    else {
+      const others = storyVars.filter(v => v.key !== 'progress');
+      $('scenevars').innerHTML = `${others.length ? `<table><tr><th>Other variables this scene tests</th><th>Value</th></tr>${others.map(v => `<tr><td><code>${esc(v.key)}</code></td><td data-k="${esc(v.key)}"></td></tr>`).join('')}</table>` : ''}
+        <table style="margin-top:8px"><tr><th>Condition</th><th>Gates</th><th>Now</th></tr>${[...storyVars.conds].map(([c, n]) => `<tr><td><code>${esc(c)}</code></td><td style="color:var(--muted)">${Object.entries(n).map(([k, x]) => `${x} ${k}`).join(', ')}</td><td data-c="${esc(c)}"></td></tr>`).join('')}</table>`;
+      for (const v of storyVars) {
+        const td = $('scenevars').querySelector(`td[data-k="${CSS.escape(v.key)}"]`);
+        if (!td) continue;
+        if (v.ro) { td.className = 'ro'; continue; }
+        if (v.t === 4) { td.innerHTML = '<input type="checkbox">'; td.firstChild.onchange = e => cmd({ c: 'setvar', r: v.r, o: v.o, t: v.t, b: v.b, value: e.target.checked ? 1 : 0 }); }
+        else { td.innerHTML = '<input type="number" style="width:6em"> <button>Set</button>'; td.querySelector('button').onclick = () => cmd({ c: 'setvar', r: v.r, o: v.o, t: v.t, b: 0, value: +td.querySelector('input').value }); }
+      }
+    }
+  }
+  for (const v of storyVars) {
+    const td = $('scenevars').querySelector(`td[data-k="${CSS.escape(v.key)}"]`), x = vals[v.key];
+    if (!td || x === undefined) continue;
+    if (v.ro) td.textContent = x;
+    else if (v.t === 4) td.firstChild.checked = !!x;
+    else if (document.activeElement !== td.querySelector('input')) td.querySelector('input').value = x;
+  }
+  for (const td of $('scenevars').querySelectorAll('td[data-c]')) {
+    const t = condTruth(td.dataset.c, vals);
+    td.innerHTML = t === null ? '<span style="color:var(--muted)">?</span>' : t ? '<b style="color:var(--ok)">true</b>' : '<span style="color:var(--muted)">false</span>';
+  }
+  // event flags: five words, one checkbox per bit
+  const ev = $('evflags');
+  if (!ev.firstChild) {
+    ev.innerHTML = [0, 1, 2, 3, 4].map(w => `<div style="display:flex;gap:2px;align-items:center;margin:2px 0"><code style="width:4.5em;font-size:11px">+0x${(0x720 + w * 4).toString(16)}</code>${Array.from({ length: 32 }, (_, b) => `<input type="checkbox" data-w="${w}" data-b="${b}" title="GameState+0x${(0x720 + w * 4).toString(16)} bit ${b} (event flag ${w * 32 + b})" style="margin:0;width:11px;height:11px">`).join('')}</div>`).join('');
+    ev.querySelectorAll('input').forEach(i => i.onchange = () => { const w = +i.dataset.w, b = +i.dataset.b; cmd({ c: 'setvar', r: 'gs', o: 0x720 + w * 4 + (b >> 3), t: 4, b: b & 7, value: i.checked ? 1 : 0 }); });
+  }
+  ev.querySelectorAll('input').forEach(i => { const word = story.flags?.[+i.dataset.w]; if (word !== false && word != null) i.checked = !!((word >>> +i.dataset.b) & 1); });
+}
+$('progset').onclick = () => cmd({ c: 'setvar', r: 'r708', o: 0x3c, t: 1, b: 0, value: +$('prog').value });
+$('progup').onclick = () => { $('prog').value = +$('prog').value + 1; $('progset').onclick(); };
+$('progdn').onclick = () => { $('prog').value = +$('prog').value - 1; $('progset').onclick(); };
+$('reload').onclick = () => { const s = last?.story; if (s) cmd({ c: 'warp', scene: s.scene, entrance: s.entrance }); };
 
 // Every string whose glyphs are on screen now (Centaur tracks the BG0 cells), else the last one fetched.
 let nowSig = '';
@@ -258,7 +352,7 @@ async function preview(r) {
   })().catch(() => null));
   return previews.get(k);
 }
-let learnedSprites = {}, resFilter = localStore('resfilter') || '';
+let resFilter = localStore('resfilter') || '';  // learned sprite palettes: learnedSprites() in common.js
 function renderRes(all) {
   const kinds = [...new Set(all.map(r => r.t === 'tileset' ? 'tiles' : r.label))].sort();
   const ck = kinds.join() + resFilter;
@@ -365,8 +459,8 @@ function renderScenes() {
     const e = document.createElement('div'); e.className = 'e'; e.style.gridTemplateColumns = s.shot ? '4.2em 72px 1fr' : '4.2em 1fr';
     const lab = noteOf('map', s.shown || s.map || '')?.label;
     e.innerHTML = `<span class="id">${s.scene}</span>${s.shot ? `<img loading="lazy" src="/api/live/file/captures/scene_${String(s.scene).padStart(4, '0')}/screen.png" style="width:72px;image-rendering:pixelated;border-radius:3px" alt="">` : ''}
-      <span>${s.map ? `map ${peekLink(`/gfx#maps/${s.map}-${s.tileset}-${s.hp}`, s.map)}` : 'no stage'}${s.shown && s.shown !== s.map ? ` · shows ${s.shown}` : ''}${s.palette ? ` · pal ${s.palette}` : ''}${s.became && s.became !== s.scene ? ` · → ${s.became}` : ''}${lab ? ` · <b>${esc(lab)}</b>` : ''}</span>`;
-    e.onclick = ev => { if (!ev.target.closest('a') && last?.connected) cmd({ c: 'warp', scene: s.scene }); };
+      <span>${s.map ? `map ${peekLink(`/gfx#maps/${s.map}-${s.tileset}-${s.hp}`, s.map)}` : 'no stage'}${s.shown && s.shown !== s.map ? ` · shows ${s.shown}` : ''}${s.palette ? ` · pal ${s.palette}` : ''}${s.entrance != null ? ` · entrance ${s.entrance}` : ''}${s.became && s.became !== s.scene ? ` · → ${s.became}` : ''}${lab ? ` · <b>${esc(lab)}</b>` : ''}</span>`;
+    e.onclick = ev => { if (!ev.target.closest('a') && last?.connected) cmd({ c: 'warp', scene: s.scene, entrance: s.entrance ?? undefined }); };
     return e;
   });
   if (all.length > sceneLimit) {
@@ -380,7 +474,6 @@ $('scq').oninput = () => { sceneLimit = 150; renderScenes(); };
 
 (async () => {
   index = await fetch('/api/res').then(r => r.json()).catch(() => ({}));
-  learnedSprites = (await fetch('/api/learned').then(r => r.json()).catch(() => ({}))).sprites || {};
   await loadNotes();
   poll(); setInterval(poll, 700); loadTags(); loadScenes();
 })();

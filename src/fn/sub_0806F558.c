@@ -1,9 +1,8 @@
-#include "global.h"
+#include "scene_effect_schedule.h"
 void sub_08122DA0(void);
-extern u8 *gUnk_0200019C;
-u32 sub_0806F558(u8 *p)
+s32 SceneEffectSchedule_Initialize(struct SceneEffectSchedule *manager, u32 unusedArgument)
 {
     sub_08122DA0();
-    gUnk_0200019C = p;
+    gUnk_0200019C = manager;
     return 0;
 }

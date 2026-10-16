@@ -164,7 +164,8 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
                     u32 life = table[gUnk_03005308];
                     life &= 7;
                     life += 8;
-                    ScenePanel_AddParticle(panel, positionWords, &velocity, life, 1);
+                    ScenePanel_AddParticle(panel, (union ScenePanelPosition *)positionWords,
+                                           (union ScenePanelPosition *)&velocity, life, 1);
                 }
             }
             {

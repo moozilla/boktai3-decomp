@@ -7,9 +7,9 @@ static inline u8 IsRemoving(struct ActorAttachmentSlot *slot)
         return TRUE;
     return FALSE;
 }
-s32 ActorAttachment_TickRemoval(struct ActorAttachmentOwner *owner,
-                                struct ActorAttachmentSlot *slot)
+u8 ActorAttachment_TickRemoval(void *owner, void *slotInput)
 {
+    struct ActorAttachmentSlot *slot = slotInput;
     struct ContactSwarmSprite *sprite = &slot->sprite;
     if (slot->timer <= 0) {
         if (IsRemoving(slot)) {

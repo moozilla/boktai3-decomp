@@ -6,7 +6,7 @@ struct P {
     u8 f3a8[0x3A8 - 0x3A8];
 };
 
-void Collider_Refresh(void *);
+s32 Collider_Refresh(void *);
 
 void sub_0815DEC4(struct P *p)
 {

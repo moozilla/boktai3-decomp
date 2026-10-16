@@ -7,7 +7,7 @@ void sub_0821FF58(u8 *, s32, s32, s32, s32, s32);
 void Collider_SetCallback(u8 *, void *, u8 *);
 void Collider_SetPosition(u8 *, u8 *, s32);
 void sub_082433C8(void);
-void Collider_Refresh(u8 *);
+s32 Collider_Refresh(u8 *);
 void sub_0823B278(u8 *p)
 {
     struct VecB278 scale;

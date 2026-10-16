@@ -1,8 +1,9 @@
-#include "global.h"
-void AnimData_Load(u8 *);
-u32 ScriptProc_Start(u32, u16);
-u32 sub_0806B5B0(u8 **p, u32 b, u32 c)
+#include "sprite_effect_controller.h"
+/* The resource loader consumes r1 as the graphics ID; the prior one-argument
+ * declaration happened to leave that argument register untouched. */
+void *SpriteEffectController_LoadSpriteResources(struct SpriteEffectController *slot,
+                                                 s32 graphicsId, u32 context)
 {
-    AnimData_Load(*p + 0x2c);
-    ScriptProc_Start(0x922E, c);
+    AnimData_Load((u8 *)slot->drawable + 0x2c, graphicsId);
+    return ScriptProc_Start(0x922e, context);
 }

@@ -184,7 +184,7 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
     }
     {
         register u32 *source asm("r2") = (u32 *)position;
-        u32 lo, hi asm("r1");
+        u32 lo, hi;
         register u32 *destination asm("r2");
         lo = source[0];
         hi = source[1];
@@ -218,7 +218,7 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
     }
     {
         register u32 *source asm("r2") = (u32 *)position;
-        u32 lo, hi asm("r1");
+        u32 lo, hi;
         register u32 *destination asm("r2");
         lo = source[0];
         hi = source[1];

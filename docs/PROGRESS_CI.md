@@ -178,3 +178,12 @@ helpers copied to IWRAM. These remain assembly. We retain the old denominator
 and do not turn header data or handwritten startup assembly into C credit.
 Treemap positions can change as groups and layout change; use unit labels and
 virtual addresses to identify a tile rather than its screen corner.
+
+
+The October 15 cleanup adds documented groups for the recent actor, inventory,
+input, effect and panel work, plus identified middle-ROM controllers and math
+helpers. See [the subsystem index](REPORT_SUBSYSTEMS.md) for range evidence and
+scope. Grouping preserves each function's address, size and fuzzy/exact status,
+all overall byte/function measures, and both register categories. The associated
+retained-tail audit corrects an independent legacy counting error at08221800;
+that correction changes exact credit, while grouping alone does not.

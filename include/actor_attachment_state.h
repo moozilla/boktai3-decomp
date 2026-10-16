@@ -2,6 +2,10 @@
 #define GUARD_ACTOR_ATTACHMENT_STATE_H
 #include "actor_attachment.h"
 #include "contact_swarm.h"
+struct ActorAttachmentPartResource {
+    u32 unknown0;
+    u16 tileBase;
+};
 struct ActorAttachmentPartSprite {
     u32 flags;
     u8 unknown4[4];
@@ -16,15 +20,15 @@ struct ActorAttachmentSlotView {
     struct ContactPosition jitter[3];
     struct ContactPosition offset;
     void *update;
-    struct ContactPosition position;
-    u8 frame, active, flags, action;
-    u16 unknown34;
+    struct ContactPosition position; /* pad at 2E is the observed projected Y. */
+    u8 frame, flags31, flags, action;
+    u16 unknown34; /* Signed vertical accumulator in full-sprite updates. */
     u8 status[3], phase[3];
     u8 partMask;
     s8 slotId;
     u8 kind, resourceKind;
     s16 timer, thresholds[3];
-    u8 unknown48[4];
+    u8 active48, unknown49[3];
     s16 *value;
     s32 counters[3];
     void *source;
@@ -35,7 +39,7 @@ struct ActorAttachmentSlotView {
 };
 struct ActorAttachmentManagerView {
     u8 unknown0[0x58];
-    const void *partResource;
+    const struct ActorAttachmentPartResource *partResource;
     struct ActorAttachmentSlotView slots[8];
     u32 occupiedMask;
 };
@@ -52,5 +56,4 @@ static inline u8 ActorAttachment_TestByteFlags(const u8 *flags, u32 mask)
 }
 void ActorAttachment_BeginPartJitter(struct ActorAttachmentSlotView *, s32);
 void ActorAttachment_NotifySourceState(struct ActorAttachmentSlotView *);
-void sub_08217EAC(struct ActorAttachmentPartSprite *);
 #endif

@@ -1,0 +1,38 @@
+# Scene actor target and contact control
+
+Root's contiguous E9D0–8005C section links registry targets, contact ownership,
+route control and animation responses. Names remain tentative; static analysis
+here does not claim runtime coverage.
+
+F710 resolves a signed-positive pending ID at304. It calls F4B8 to reset the
+contact response, clears group414 bit2, sets2D6 bit80 and clears100, then sets
+EB bit10. It looks up the low16 bits of the pending ID in the contact registry,
+stores the resulting object atDC, and requires that object to exist before
+reading its position at+0C. Signed target X/Z shifted by8 select a terrain cell
+with map-bounds fallback0; this halfword is stored at2F8, distinct from the
+terrainCell field2F4 used by other phase views. Wrapped16-bit XYZ differences
+from actor position5C feed Math_Atan2(X,Z), whose low byte becomes direction59.
+The vector pad is never read as a scalar. It returns1 after this path. Without
+a positive ID, EB bit2 gates clearing EB bit10, and it returns0.
+
+All268 bytes match with six minimized register/lifetime hints. The adjoining
+F4B8 is exact over600 bytes with14 minimized hints: it releases owned contact45C, resets command460 and
+route control, installs FC90/substate16, resets actor state3/1/0, clears contact
+flags, releases attachment C72C, and records the same capped per-player counters
+as789EC. It requires the current target object for the per-player counter lookup. Counters
+cap at9999 using the observed signed-halfword comparisons, matching789EC.
+F4B8 plusF710 recover868 exact bytes (+0.0359 percentage points).
+
+FAD8 is exact over388 bytes with29 minimized hints. A set D4 bit800 makes the
+command a no-op; otherwise it sets that bit before reading the halfword mode.
+Mode0 requires CC bit1 and clears CC bits1/2 before ResetRouteAndColliders.
+Mode1 requires an available actor (D4 bit40 clear, D0 bit20000 clear, positive
+health), clears the same CC bits and calls ResetRoute. Both reset actor state
+3/0/0, counter2AC and substate2B0, set2B1/2B2, install substate12 and copy
+control220 to21C, then clear2C8/104 and flags114 bit1. Other modes restore actor
+defaults and clear collider value178 only when CC bit1 is set.
+
+A rejected allocation trial bound both the earlier flags pointer and the later
+mode to r5; agbcc omitted the entire mode0 path (268 versus388 bytes). Removing
+the overlapping pointer binding restored all paths. The accepted full-extent
+check includes all three reset calls and their complete state transitions.

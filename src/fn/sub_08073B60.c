@@ -1,9 +1,7 @@
-#include "global.h"
-void sub_08072D34(void);
-void sub_08073B38(void);
-u32 sub_08073B60(u8 *p)
+#include "scene_actor_contacts.h"
+u32 SceneActorContacts_Update(struct SceneActorContactManager *manager)
 {
-    sub_08072D34();
-    sub_08073B38();
-    *(u32 *)(p + 0x20) += 1;
+    SceneActorContacts_ReleaseInvalidOwners();
+    SceneActorContacts_TickCooldowns();
+    return ++manager->frame;
 }

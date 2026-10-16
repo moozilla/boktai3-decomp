@@ -4,7 +4,7 @@ extern u32 gUnk_030053F4, gUnk_030053F0;
 extern u32 gUnk_02000560;
 void sub_08197324(void *);
 void sub_08197260(void *);
-void Collider_Refresh(void *);
+s32 Collider_Refresh(void *);
 void sub_082260A4(u32);
 void sub_08194D70(void *);
 void sub_0819465C(void *);

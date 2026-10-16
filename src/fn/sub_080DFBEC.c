@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_08076034(void *, s32);
+void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 
 struct S {
     u8 filler[0x2b2];
@@ -11,5 +11,5 @@ void sub_080DFBEC(struct S *s)
 {
     if (s->f != 0)
         s->f = 0;
-    sub_08076034(s, 1);
+    SceneActorAnimation_SelectDirectionalEntry(s, 1);
 }

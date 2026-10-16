@@ -1,20 +1,8 @@
-#include "global.h"
-
-struct P {
-    u8 f[0x18];
-    u32 mask;
-};
-struct E {
-    u8 f[0x61];
-    u8 a;
-    s8 idx;
-};
-void Memory_Clear(void *, u32);
-
-void sub_08069CD8(struct P *p, struct E *e)
+#include "burst_emitter.h"
+void BurstEmitter_ReleaseSlot(struct BurstEmitterPool *pool, struct BurstEmitter *emitter)
 {
-    e->a = 0;
-    p->mask &= ~(1 << e->idx);
-    e->idx = 0xff;
-    Memory_Clear(e, 0x68);
+    emitter->state = 0;
+    pool->used &= ~(1 << emitter->index);
+    emitter->index = 0xFF;
+    Memory_Clear(emitter, 0x68);
 }

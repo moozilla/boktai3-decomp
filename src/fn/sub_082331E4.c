@@ -1,6 +1,6 @@
 #include "global.h"
 void Sound_PlaySong(u32);
-void Collider_Refresh(u8 *);
+s32 Collider_Refresh(u8 *);
 void Task_Kill(u8 *);
 s32 sub_082331E4(u8 *p)
 {

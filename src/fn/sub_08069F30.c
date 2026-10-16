@@ -1,5 +1,4 @@
-#include "global.h"
-
-void sub_08069F30(void)
+#include "burst_emitter.h"
+void BurstEmitter_ResetPool(void)
 {
 }

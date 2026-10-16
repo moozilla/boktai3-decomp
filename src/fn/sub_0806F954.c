@@ -1,22 +1,14 @@
-#include "global.h"
-
-u8 *Task_Create(u32, u32);
-void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
-s32 sub_0806F870(u8 *);
-void Task_Kill(u8 *);
-void sub_0806F838(void);
-void sub_0806F86C(void);
-
-u8 *sub_0806F954(void)
+#include "scene_range_watch.h"
+struct SceneRangeWatch *SceneRangeWatch_CreateFromScript(void)
 {
-    u8 *p;
-    p = Task_Create(8, 0x2c);
-    if (p != 0) {
-        Task_SetCallbacks(p, sub_0806F838, sub_0806F86C);
-        if (sub_0806F870(p) < 0) {
-            Task_Kill(p);
+    struct SceneRangeWatch *watch = Task_Create(8, 0x2C);
+    if (watch) {
+        Task_SetCallbacks(watch, (void (*)(void *))SceneRangeWatch_Tick,
+                          (void (*)(void *))SceneRangeWatch_Destroy);
+        if (SceneRangeWatch_Initialize(watch) < 0) {
+            Task_Kill(watch);
             return 0;
         }
     }
-    return p;
+    return watch;
 }

@@ -1,5 +1,4 @@
-#include "global.h"
-extern u8 *gUnk_0200019C;
+#include "scene_effect_schedule.h"
 
 static inline u8 Tst(u32 m, s32 one, s32 i)
 {
@@ -8,9 +7,9 @@ static inline u8 Tst(u32 m, s32 one, s32 i)
     return FALSE;
 }
 
-u8 *sub_0806F3A8(u32 x)
+struct SceneEffectScheduleEntry *SceneEffectSchedule_FindById(u32 x)
 {
-    u8 *b = gUnk_0200019C;
+    u8 *b = (u8 *)gUnk_0200019C;
     s32 i;
     u32 m;
     s32 one;
@@ -25,7 +24,7 @@ u8 *sub_0806F3A8(u32 x)
         if (Tst(m, one, i)) {
             u32 o = i * 0x20;
             if (*(u16 *)(p + 0x2C) == x)
-                return b + (o + 0x18);
+                return (void *)(b + (o + 0x18));
         }
         p += 0x20;
     }

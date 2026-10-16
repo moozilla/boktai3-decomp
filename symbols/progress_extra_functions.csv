@@ -112,26 +112,46 @@ address,evidence
 0805E014,Independent four-argument palette helper after 0805E000 return and literal; own push r4-r7-lr and pop-bx plus pool; exact136-byte C
 08064B20,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08064D3C,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
+08066CB8,Independent unused-looking attachment release-all after query return and literal; complete push-loop-pop-bx; no ROM Thumb pointer or direct branch encoding found; exact standalone C
 08066FD8,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08067014,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+08067990,Independent script constructor with own prologue calls pop-bx and embedded literals in retained 08067984 tail; full exact 536-byte C extent
+08067BA8,Independent request-all slot loop with own push and pop-bx in retained 08067984 tail; full exact 100-byte C body
+08067C0C,Independent bx-lr empty leaf after request-all return; full exact 4-byte extent
 080682CC,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 080688CC,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08069788,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched)
 08069C94,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
+0806A420,Independent256-byte guarded particle script wrapper; exact C; original0806A160 span split704+256; docs/SPARK_PARTICLE.md
 0806A784,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0806BE80,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
+0806CF18,Independent 52-byte state-four-to-five loop after singleton reset; own push/pop-bx and literal; docs/SPRITE_EFFECT_STEERING_ACTORS.md
+0806CF4C,"Independent 152-byte fixed-position constructor wrapper with own stack prologue, angle and creator calls, and return; retained assembly gap"
 0806CFFC,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0806E29C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
+0806E308,Independent 68-byte four-slot capacity query with push and pop-bx after 0806E2A8 return; no stored Thumb pointer or direct B/Bcc/BL reference found; full extent ends 0806E34C
+0806E34C,Independent 388-byte terrain position sampler with push-save prologue after 0806E308 return and padding; reviewed end 0806E4D0; full extent ends 0806E4D0
+0806EB70,Independent 916-byte grid route resolver after 0806E900 return; own push-save stack prologue and complete pop-bx return before 0806EF04; assembly-backed pending recovery
+0806EFB8,Independent180-byte actor rectangle query with own push/save prologue and pop/bx return following scene subsystem reset
+0806F1B0,Independent32-byte wrapped background tilemap address leaf ending bx lr before its literal
+0806F1D0,Independent72-byte background tile rectangle fill with own push/save prologue and pop/bx return
 0807006C,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08070444,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched)
 08070E44,Independent actor-list search function left as incbin by gbadisasm; retained assembly (not yet matched)
 08072124,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08072204,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched)
+080762A8,Independent 296-byte profile animation selector with own push and pop-bx; preceding08076174 ends080762A8
+0807836C,Independent 196-byte drawable blink/cadence routine with PUSH-r4-r5-r6-LR and POP/BX after 0807827C return and literal pool; no stored Thumb pointer or direct branch reference found; full extent ends 08078430
+08078550,Independent 252-byte descriptor steering routine with PUSH/save prologue and POP/BX after 08078430 return; no stored Thumb pointer or direct branch reference found; full extent ends 0807864C
 08078B48,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 0807C468,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 0807C53C,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+0807FE80,Independent 200-byte restoration callback after 0807FDC0 actual192-byte extent; own prologue return and pool through0807FF48; no stored Thumb pointer or direct branch reference found
+080800A4,Complete high-register prologue and matching restore through08080494; replaces interior080800AC boundary; removes8 falsely credited prior bytes
 08082BF0,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
 08082D20,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+08083F3C,Independent collision latch clear leaf after 83E98 return and literal pool; exact32-byte body
+08083F5C,Independent terrain response prologue and return following83F3C; full232-byte reviewed extent
 08084280,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0808AED8,Independent random pattern selector (own push/pop-bx and literal pool) left as incbin by gbadisasm; exact standalone C
 0808F9E4,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
@@ -211,6 +231,7 @@ address,evidence
 0812B918,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0812C4E4,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0812D17C,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
+0812E094,Independent 132-byte command-selection function after 0812E084 actual16-byte leaf; own high-register prologue return and literal pool through0812E118; retained unmatched
 0812EED0,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0812F5C4,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0812F5C8,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C
@@ -357,6 +378,37 @@ address,evidence
 082215B8,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 082215BC,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C
 082215D0,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C
+08221834,"Independent hidden Thumb prologue; CFG returns at 08221854; literals and zero alignment close at 0822185C; preserved raw tail of 08221800, not matched C"
+0822185C,"Independent hidden Thumb prologue; CFG returns at 0822186E; literals and zero alignment close at 08221870; preserved raw tail of 08221800, not matched C"
+08221870,"Independent hidden Thumb prologue; CFG returns at 082218A2; literals and zero alignment close at 082218A8; preserved raw tail of 08221800, not matched C"
+082218A8,"Independent hidden Thumb prologue; CFG returns at 082218C4; literals and zero alignment close at 082218C8; preserved raw tail of 08221800, not matched C"
+082218C8,"Independent hidden Thumb prologue; CFG returns at 08221904; literals and zero alignment close at 08221908; preserved raw tail of 08221800, not matched C"
+08221908,"Independent hidden Thumb prologue; CFG returns at 0822194A; literals and zero alignment close at 0822194C; preserved raw tail of 08221800, not matched C"
+0822194C,"Independent hidden Thumb prologue; CFG returns at 0822199C; literals and zero alignment close at 082219A0; preserved raw tail of 08221800, not matched C"
+082219A0,"Independent hidden Thumb prologue; CFG returns at 082219F0; literals and zero alignment close at 082219F4; preserved raw tail of 08221800, not matched C"
+082219F4,"Independent hidden Thumb prologue; CFG returns at 08221A46; literals and zero alignment close at 08221A48; preserved raw tail of 08221800, not matched C"
+08221A48,"Independent hidden Thumb prologue; CFG returns at 08221AB4; literals and zero alignment close at 08221AB8; preserved raw tail of 08221800, not matched C"
+08221AB8,"Independent hidden Thumb prologue; CFG returns at 08221AFA; literals and zero alignment close at 08221AFC; preserved raw tail of 08221800, not matched C"
+08221AFC,"Independent hidden Thumb prologue; CFG returns at 08221B58; literals and zero alignment close at 08221B5C; preserved raw tail of 08221800, not matched C"
+08221B5C,"Independent hidden Thumb prologue; CFG returns at 08221B98; literals and zero alignment close at 08221B9C; preserved raw tail of 08221800, not matched C"
+08221B9C,"Independent hidden Thumb prologue; CFG returns at 08221BE4; literals and zero alignment close at 08221BE8; preserved raw tail of 08221800, not matched C"
+08221BE8,"Independent hidden Thumb prologue; CFG returns at 08221C30; literals and zero alignment close at 08221C34; preserved raw tail of 08221800, not matched C"
+08221C34,"Independent hidden Thumb prologue; CFG returns at 08221C7E; literals and zero alignment close at 08221C80; preserved raw tail of 08221800, not matched C"
+08221C80,"Independent hidden Thumb prologue; CFG returns at 08221CC0; literals and zero alignment close at 08221CC8; preserved raw tail of 08221800, not matched C"
+08221CC8,"Independent hidden Thumb prologue; CFG returns at 08221D02; literals and zero alignment close at 08221D04; preserved raw tail of 08221800, not matched C"
+08221D04,"Independent hidden Thumb prologue; CFG returns at 08221D3E; literals and zero alignment close at 08221D40; preserved raw tail of 08221800, not matched C"
+08221D40,"Independent hidden Thumb prologue; CFG returns at 08221D94; literals and zero alignment close at 08221D9C; preserved raw tail of 08221800, not matched C"
+08221D9C,"Independent hidden Thumb prologue; CFG returns at 08221DFC; literals and zero alignment close at 08221E00; preserved raw tail of 08221800, not matched C"
+08221E00,"Independent hidden Thumb prologue; CFG returns at 08221E6E; literals and zero alignment close at 08221E70; preserved raw tail of 08221800, not matched C"
+08221E70,"Independent hidden Thumb prologue; CFG returns at 08221EDE; literals and zero alignment close at 08221EE0; preserved raw tail of 08221800, not matched C"
+08221EE0,"Independent hidden Thumb prologue; CFG returns at 08221F50; literals and zero alignment close at 08221F54; preserved raw tail of 08221800, not matched C"
+08221F54,"Independent hidden Thumb prologue; CFG returns at 08221FEA; literals and zero alignment close at 08221FEC; preserved raw tail of 08221800, not matched C"
+08221FEC,"Independent hidden Thumb prologue; CFG returns at 0822204A; literals and zero alignment close at 0822204C; preserved raw tail of 08221800, not matched C"
+0822204C,"Independent hidden Thumb prologue; CFG returns at 08222090; literals and zero alignment close at 08222094; preserved raw tail of 08221800, not matched C"
+08222094,"Independent hidden Thumb prologue; CFG returns at 082220D8; literals and zero alignment close at 082220DC; preserved raw tail of 08221800, not matched C"
+082220DC,"Independent hidden Thumb prologue; CFG returns at 08222120; literals and zero alignment close at 08222124; preserved raw tail of 08221800, not matched C"
+08222124,"Independent hidden Thumb prologue; CFG returns at 08222168; literals and zero alignment close at 0822216C; preserved raw tail of 08221800, not matched C"
+0822216C,"Independent hidden Thumb prologue; CFG returns at 082221DC; literals and zero alignment close at 082221E8; preserved raw tail of 08221800, not matched C"
 08222A00,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08222A04,Code following a reviewed gap leaf; retained assembly
 08224F8C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C

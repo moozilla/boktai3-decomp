@@ -1,28 +1,36 @@
+#include "scene_actor_control_phase.h"
 #include "global.h"
-struct H {
-    u32 lo : 16;
-    u32 hi : 16;
-};
+#include "scene_actor_collision.h"
 struct Z {
-    struct H a, b;
+    struct ContactPackedVector bits;
 };
-void sub_08074BF4(u8 *, struct Z *, struct Z *, void (*)(void), u8 *);
-void sub_08074E38(u8 *, u8 *, struct Z *, struct Z *, void (*)(void), u32, u32, u8 *);
-void sub_080829C0(void);
-void sub_08082648(void);
+void SceneActorCollision_InitBody(struct SceneActorRegistryActor *, void *, void *, void *, void *);
+void SceneActorCollision_InitExternalAttackWithField34(struct SceneActorRegistryActor *,
+                                                       struct ContactCollider *, void *, void *,
+                                                       void *, u32, u32, void *);
+void SceneActorControl_ApplyContactPowerFloor(struct SceneActorBehaviorContactView *,
+                                              struct SceneActorBehaviorContactView *,
+                                              struct SceneActorRegistryResetView *);
+void sub_08082648(struct SceneActorBehaviorContactView *, struct SceneActorBehaviorContactView *,
+                  struct SceneActorRegistryResetView *);
 void sub_08083AEC(u8 *p)
 {
     struct Z s1, s2, s3, s4;
-    s1.a.lo = 0x20;
-    s1.a.hi = 0x52;
-    s1.b.lo = 0x20;
-    *(u32 *)&s2.a = 0;
-    *(u32 *)&s2.b &= 0xFFFF0000;
-    sub_08074BF4(p, &s1, &s2, sub_080829C0, p);
-    s3.a.lo = 0x20;
-    s3.a.hi = 0x2a;
-    s3.b.lo = 0x20;
-    *(u32 *)&s4.a = 0;
-    *(u32 *)&s4.b &= 0xFFFF0000;
-    sub_08074E38(p, p + 0x188, &s3, &s4, sub_08082648, 0, 0x200000, p);
+    s1.bits.x = 0x20;
+    s1.bits.y = 0x52;
+    s1.bits.z = 0x20;
+    s2.bits.x = 0;
+    s2.bits.y = 0;
+    s2.bits.z = 0;
+    SceneActorCollision_InitBody((struct SceneActorRegistryActor *)p, &s1, &s2,
+                                 (void *)SceneActorControl_ApplyContactPowerFloor, p);
+    s3.bits.x = 0x20;
+    s3.bits.y = 0x2a;
+    s3.bits.z = 0x20;
+    s4.bits.x = 0;
+    s4.bits.y = 0;
+    s4.bits.z = 0;
+    SceneActorCollision_InitExternalAttackWithField34((struct SceneActorRegistryActor *)p,
+                                                      (struct ContactCollider *)(p + 0x188), &s3,
+                                                      &s4, (void *)sub_08082648, 0, 0x200000, p);
 }

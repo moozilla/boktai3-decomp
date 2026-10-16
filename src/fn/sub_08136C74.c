@@ -1,6 +1,7 @@
-#include "global.h"
-void sub_0807FAD8(u32, u32);
-void sub_08136C74(u32 a, u32 b)
+#include "scene_actor_reset.h"
+void SceneActorTarget_ApplyResetCommand(struct SceneActorRegistryResetView *, const u16 *);
+void SceneActorScript_ApplyTargetResetCommand(struct SceneActorRegistryResetView *actor,
+                                              const u8 *script)
 {
-    sub_0807FAD8(a, b + 2);
+    SceneActorTarget_ApplyResetCommand(actor, (const u16 *)(script + 2));
 }

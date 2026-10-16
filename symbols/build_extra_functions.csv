@@ -101,26 +101,46 @@ address,isa,evidence,replacement_end
 0805E014,thumb,Independent four-argument palette helper after 0805E000 return and literal; own push r4-r7-lr and pop-bx plus pool; exact136-byte C,0805E09C
 08064B20,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08064B70
 08064D3C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08064D40
+08066CB8,thumb,Independent unused-looking attachment release-all after query return and literal; complete push-loop-pop-bx; no ROM Thumb pointer or direct branch encoding found; exact standalone C,08066DB8
 08066FD8,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08067014
 08067014,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08067018
+08067990,thumb,Independent script constructor with own prologue calls pop-bx and embedded literals in retained 08067984 tail; full exact 536-byte C extent,08067BA8
+08067BA8,thumb,Independent request-all slot loop with own push and pop-bx in retained 08067984 tail; full exact 100-byte C body,08067C0C
+08067C0C,thumb,Independent bx-lr empty leaf after request-all return; full exact 4-byte extent,08067C10
 080682CC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080682D0
 080688CC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080688D0
 08069788,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched),080697C8
 08069C94,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08069C98
+0806A420,thumb,Independent256-byte script wrapper after704-byte particle creator return and literal pool; own prologue and return; docs/SPARK_PARTICLE.md,0806A520
 0806A784,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0806A788
 0806BE80,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0806BE84
+0806CF18,thumb,Independent 52-byte state-four-to-five loop after singleton reset; own push/pop-bx and literal; docs/SPRITE_EFFECT_STEERING_ACTORS.md,0806CF4C
+0806CF4C,thumb,"Independent 152-byte fixed-position constructor wrapper with own stack prologue, angle and creator calls, and return; retained assembly gap",0806CFE4
 0806CFFC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0806D000
 0806E29C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0806E2A8
+0806E308,thumb,Independent 68-byte four-slot capacity query with push and pop-bx after 0806E2A8 return; no stored Thumb pointer or direct B/Bcc/BL reference found,0806E34C
+0806E34C,thumb,Independent 388-byte terrain position sampler with push-save prologue after 0806E308 return and padding; reviewed end 0806E4D0,0806E4D0
+0806EB70,thumb,Independent 916-byte grid route resolver after 0806E900 return; own push-save stack prologue and complete pop-bx return before 0806EF04; assembly-backed pending recovery,0806EF04
+0806EFB8,thumb,Independent180-byte actor rectangle query with own push/save prologue and pop/bx return following scene subsystem reset,0806F06C
+0806F1B0,thumb,Independent32-byte wrapped background tilemap address leaf ending bx lr before its literal,0806F1D0
+0806F1D0,thumb,Independent72-byte background tile rectangle fill with own push/save prologue and pop/bx return,0806F218
 0807006C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08070070
 08070444,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched),080704A4
 08070E44,thumb,Independent actor-list search function left as incbin by gbadisasm; retained assembly (not yet matched),08070EB0
 08072124,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08072188
 08072204,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; retained assembly (not yet matched),08072264
+080762A8,thumb,Independent 296-byte profile animation selector with own push and pop-bx inside gbadisasm raw byte range after08076174,080763D0
+0807836C,thumb,Independent 196-byte drawable blink/cadence routine with PUSH-r4-r5-r6-LR and POP/BX after 0807827C return and literal pool; no stored Thumb pointer or direct branch reference found,08078430
+08078550,thumb,Independent 252-byte descriptor steering routine with PUSH/save prologue and POP/BX after 08078430 return; no stored Thumb pointer or direct branch reference found,0807864C
 08078B48,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08078BB4
 0807C468,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0807C4B4
 0807C53C,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,0807C580
+0807FE80,thumb,Independent 200-byte restoration callback with PUSH-r4-r5-r6-r7-LR and POP/BX after 0807FDC0 return and pool; no stored Thumb pointer or direct branch reference found,0807FF48
+080800A4,thumb,Independent 1008-byte body begins with complete high-register save prologue; 080800AC is its interior push; prior 0808005C ends at080800A4 after literal pool,
 08082BF0,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08082C68
 08082D20,thumb,Independent small function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C,08082D80
+08083F3C,thumb,Independent collision latch clear leaf after 83E98 return and literal pool; full 32-byte exact C,08083F5C
+08083F5C,thumb,Independent terrain response function with own push and pop-bx following collision latch helper; full 232-byte reviewed extent,08084044
 08084280,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08084284
 0808AED8,thumb,Independent random pattern selector (own push/pop-bx and literal pool) left as incbin by gbadisasm; exact standalone C,0808AF38
 0808F9E4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0808F9E8
@@ -200,6 +220,7 @@ address,isa,evidence,replacement_end
 0812B918,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812B91C
 0812C4E4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812C4E8
 0812D17C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812D180
+0812E094,thumb,Independent 132-byte command-selection routine with full high-register save prologue and restore after 0812E084 leaf return; removes132 false old retained-tail C bytes,0812E118
 0812EED0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812EED4
 0812F5C4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812F5C8
 0812F5C8,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,0812F5CC
@@ -343,6 +364,37 @@ address,isa,evidence,replacement_end
 082215B8,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,082215BC
 082215BC,thumb,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C,082215D0
 082215D0,thumb,Independent 20-byte leaf left as incbin by gbadisasm; exact standalone C,082215E4
+08221834,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 40 bytes; currently preserved raw tail,0822185C
+0822185C,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 20 bytes; currently preserved raw tail,08221870
+08221870,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 56 bytes; currently preserved raw tail,082218A8
+082218A8,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 32 bytes; currently preserved raw tail,082218C8
+082218C8,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 64 bytes; currently preserved raw tail,08221908
+08221908,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 68 bytes; currently preserved raw tail,0822194C
+0822194C,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 84 bytes; currently preserved raw tail,082219A0
+082219A0,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 84 bytes; currently preserved raw tail,082219F4
+082219F4,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 84 bytes; currently preserved raw tail,08221A48
+08221A48,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 112 bytes; currently preserved raw tail,08221AB8
+08221AB8,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 68 bytes; currently preserved raw tail,08221AFC
+08221AFC,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 96 bytes; currently preserved raw tail,08221B5C
+08221B5C,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 64 bytes; currently preserved raw tail,08221B9C
+08221B9C,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 76 bytes; currently preserved raw tail,08221BE8
+08221BE8,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 76 bytes; currently preserved raw tail,08221C34
+08221C34,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 76 bytes; currently preserved raw tail,08221C80
+08221C80,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 72 bytes; currently preserved raw tail,08221CC8
+08221CC8,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 60 bytes; currently preserved raw tail,08221D04
+08221D04,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 60 bytes; currently preserved raw tail,08221D40
+08221D40,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 92 bytes; currently preserved raw tail,08221D9C
+08221D9C,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 100 bytes; currently preserved raw tail,08221E00
+08221E00,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 112 bytes; currently preserved raw tail,08221E70
+08221E70,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 112 bytes; currently preserved raw tail,08221EE0
+08221EE0,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 116 bytes; currently preserved raw tail,08221F54
+08221F54,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 152 bytes; currently preserved raw tail,08221FEC
+08221FEC,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 96 bytes; currently preserved raw tail,0822204C
+0822204C,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 72 bytes; currently preserved raw tail,08222094
+08222094,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 72 bytes; currently preserved raw tail,082220DC
+082220DC,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 72 bytes; currently preserved raw tail,08222124
+08222124,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 72 bytes; currently preserved raw tail,0822216C
+0822216C,thumb,Independent hidden Thumb prologue and own CFG return; complete code/literal/zero-padding span 124 bytes; currently preserved raw tail,082221E8
 08222A00,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08222A04
 08222A04,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,08222C7C
 08224F8C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08224F98

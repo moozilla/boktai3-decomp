@@ -4,7 +4,7 @@ void TetherActor_CreateAuxiliarySprite(struct TetherActor *);
 void TetherActor_SetState(struct TetherActor *, u32);
 void TetherActor_UpdatePendingEffect(struct TetherActor *);
 u8 *sub_0821D64C(s32, s32);
-void sub_08072C40(void *);
+void SceneActorContacts_RemoveNode(void *);
 void TetherActor_BeginAuxiliaryState(struct TetherActor *input)
 {
     struct TetherActor *actor = input;
@@ -46,7 +46,7 @@ void TetherActor_BeginAuxiliaryState(struct TetherActor *input)
     }
     actor->auxiliarySprite.position.y = height;
     if (actor->auxiliaryRegistered) {
-        sub_08072C40(actor->auxiliaryRegistration);
+        SceneActorContacts_RemoveNode(actor->auxiliaryRegistration);
         actor->auxiliaryRegistered = 0;
     }
     TetherActor_UpdatePendingEffect(actor);

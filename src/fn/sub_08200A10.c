@@ -29,7 +29,7 @@ void sub_08013728(u8 *);
 void Collider_Init(u8 *, u32, u32, u32, u32, struct Vec00A *, struct Vec00A *);
 void Collider_SetCallback(u8 *, void *, u8 *);
 void sub_0821FF7C(u8 *, s32, u32, u32);
-void Collider_Refresh(u8 *);
+s32 Collider_Refresh(u8 *);
 void sub_0821FF58(u8 *, s32, s32, u32, u32, s32);
 void sub_08200324(void);
 void sub_082003B8(void);
