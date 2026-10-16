@@ -23,9 +23,10 @@ Lewis's posts on [decompiling Snowboard Kids with coding agents](https://blog.ch
 and one of my goals is to see how deep fully agentic decompilation and ROM
 hacking can go. I aim to stand apart from the AI-generated ports that led to
 [decomp.dev's sunsetting](https://decomp.dev): this comes from a deep curiosity
-about the game. ROM hacking was my main hobby as a teenager, most of it spent on
-fan translations; after years away from the scene working as a software
-developer, I want to see if I can do better work than I managed back then.
+about the game. ROM hacking was my main hobby as a teenager, much of it on fan
+translations. I've since had a career as a software developer, where agents now
+do much of the work, and I wanted to bring that experience back to a hobby
+project.
 
 ## State of the decomp
 
