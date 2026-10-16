@@ -1,0 +1,14 @@
+# The four slime palette variants side by side: place_slime (proc 1560) with
+# color 4, 5, 1, 2 (C = 4, 5, 1, 2: pool entries 208, 209, 205, 206).
+from field
+warp 2712 8
+wait 240
+pos 1152 256 1152
+wait 10
+call 1560 0x5101 0 4 896 896 0 1     # red
+call 1560 0x5102 0 5 1408 896 0 1    # blue
+call 1560 0x5103 0 1 896 1408 0 1    # green
+call 1560 0x5104 0 2 1408 1408 0 1   # purple
+wait 40
+shot slimes
+capture slimes

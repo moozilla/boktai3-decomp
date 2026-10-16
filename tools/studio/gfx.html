@@ -636,6 +636,101 @@ views.maps = {
   },
 };
 
+// ---------- dungeon: an area's rooms stitched into one map ----------
+// Each room is its stage map (all layers, the scene's palette). Rooms are placed
+// by their doors: a door in room A at world point d leads to entrance e of room
+// B, so B goes where its entrance point lands on A's door point
+// (proj(hpA, d) - proj(hpB, e)), breadth first from the area's first room.
+// Rooms placed two ways report the disagreement ("misfit"); rooms no door
+// reaches go in a row below. Areas come from tools/assets/areas.py.
+async function renderStage(st, palHash) {
+  const m = parseMP(await res('map', st.map));
+  const own = m.tiles !== 0;
+  const tileAt = own ? (t => t < m.ntiles ? [m.b, m.tiles + t * 32] : null) : (tilesetOffsets(st.tileset) || (() => null));
+  const p = palettes.find(x => x.hash === palHash), cols = p ? palColors(p) : colorsNow();
+  const W = Math.max(...m.ents.map(e => e.w)), H = Math.max(...m.ents.map(e => e.h));
+  const img = new ImageData(W * 16, H * 16);
+  for (let k = m.ents.length - 1; k >= 0; k--) renderMP(m, m.ents[k], tileAt, cols, false, img);
+  // colour 0 is the backdrop: make it transparent so rooms can overlap cleanly
+  const [R0, G0, B0] = cols[0], d = img.data;
+  for (let k = 0; k < d.length; k += 4) if (d[k] === R0 && d[k + 1] === G0 && d[k + 2] === B0) d[k + 3] = 0;
+  return toCanvas(img, 1);
+}
+let areasData = null;
+views.dungeon = {
+  free: true,
+  async init() {
+    await loadPtn(); await loadStageMeta();
+    areasData ||= await fetch('/api/areas').then(r => r.json());
+    items = areasData.areas.filter(a => a.scenes.length > 1).map(a => ({ key: String(a.area), note: a.label || `scenes ${a.scenes[0]}–${a.scenes[a.scenes.length - 1]}`, n: a.scenes.length + ' rooms' }));
+  },
+  async show(key) {
+    const a = areasData.areas.find(x => String(x.area) === String(key)), v = $('view');
+    if (!a) { v.textContent = 'No such area.'; return; }
+    const byScene = Object.fromEntries(stageMeta.map(s => [s.scene, s]));
+    const rooms = a.scenes.map(n => byScene[n]).filter(s => s && s.stage);
+    v.innerHTML = `<h2>Area ${a.area}${a.label ? ' · ' + esc(a.label) : ''}</h2><div class="meta">${rooms.length} rooms with a stage · placed by their doors (a door in one room lines up with the entrance it leads to in the next) · <a href="/world#${a.area}">World page</a></div>
+      <div class="controls">Zoom <select id="dz"><option>0.25</option><option selected>0.5</option><option>1</option></select> <label><input type="checkbox" id="dlab" checked> room labels</label> <span id="dstat" class="meta">rendering…</span></div>
+      <div id="dbox" style="position:relative;overflow:auto;max-height:calc(100vh - 190px);border:1px solid var(--line);border-radius:8px;background:#111"></div>`;
+    const hps = {}, canv = {};
+    await Promise.all(rooms.map(async r => { hps[r.scene] = await loadHP(r.stage.hp); canv[r.scene] = await renderStage(r.stage, r.palette); }));
+    const pos = {}, misfit = [];
+    const placeFrom = start => {
+      pos[start] ||= [0, 0];
+      const q = [start];
+      while (q.length) {
+        const A = byScene[q.shift()], hA = hps[A.scene];
+        if (!hA) continue;
+        for (const d of A.doors) {
+          const B = byScene[d.scene];
+          if (!B || !a.scenes.includes(d.scene) || !hps[d.scene] || d.x == null) continue;
+          const e = B.entrances.find(x => x.id === d.entrance && x.x != null);
+          if (!e) continue;
+          const pa = proj(hA, d.x, d.y ?? 0, d.z), pb = proj(hps[d.scene], e.x, e.y ?? 0, e.z);
+          const want = [pos[A.scene][0] + pa[0] - pb[0], pos[A.scene][1] + pa[1] - pb[1]];
+          if (!pos[d.scene]) { pos[d.scene] = want; q.push(d.scene); }
+          else { const err = Math.hypot(want[0] - pos[d.scene][0], want[1] - pos[d.scene][1]); if (err > 32) misfit.push([A.scene, d.scene, Math.round(err)]); }
+        }
+      }
+    };
+    // place each connected group; groups after the first go below the bounding box so far
+    let unreached = [];
+    for (const r of rooms) {
+      if (pos[r.scene]) continue;
+      const before = new Set(Object.keys(pos));
+      if (before.size) {
+        const ys = Object.entries(pos).map(([n, p]) => p[1] + canv[n].height);
+        pos[r.scene] = [0, Math.max(...ys) + 64];
+      }
+      placeFrom(r.scene);
+      if (Object.keys(pos).length === before.size + 1 && rooms.length > 1 && before.size) unreached.push(r.scene);
+    }
+    const xs = Object.entries(pos).map(([n, p]) => p[0]), ys = Object.entries(pos).map(([n, p]) => p[1]);
+    const x0 = Math.min(...xs), y0 = Math.min(...ys);
+    const W = Math.max(...Object.entries(pos).map(([n, p]) => p[0] - x0 + canv[n].width)), H = Math.max(...Object.entries(pos).map(([n, p]) => p[1] - y0 + canv[n].height));
+    const inner = document.createElement('div'); inner.style.cssText = `position:relative;width:${W}px;height:${H}px;transform-origin:0 0`;
+    // big rooms (often a full backdrop) first, then back to front by screen y,
+    // so lower rooms overlap upper ones the way the isometric view does
+    const area = n => canv[n].width * canv[n].height;
+    Object.entries(pos).sort((p, q) => (area(q[0]) > 4 * area(p[0])) - (area(p[0]) > 4 * area(q[0])) || p[1][1] - q[1][1]).forEach(([n, p]) => {
+      const c = canv[n]; c.style.cssText = `position:absolute;left:${p[0] - x0}px;top:${p[1] - y0}px;image-rendering:pixelated`;
+      c.title = `scene ${n}`;
+      const lab = document.createElement('a');
+      const note = noteOf('script', String(n))?.label;
+      lab.className = 'dlab'; lab.href = `#maps/${stageKey(byScene[n].stage)}/${n}`;
+      lab.style.cssText = `position:absolute;left:${p[0] - x0 + 4}px;top:${p[1] - y0 + 4}px;background:rgba(0,0,0,.65);color:#fff;font:12px system-ui;padding:1px 5px;border-radius:4px;text-decoration:none;z-index:2`;
+      lab.textContent = `${n}${note ? ' · ' + note : ''}`;
+      inner.append(c, lab);
+    });
+    $('dbox').replaceChildren(inner);
+    const applyZoom = () => { const z = +$('dz').value; inner.style.transform = `scale(${z})`;
+      inner.querySelectorAll('.dlab').forEach(e => { e.style.transform = `scale(${1 / z})`; e.style.transformOrigin = '0 0'; }); inner.parentElement.style.height = Math.min(H * z + 4, window.innerHeight - 190) + 'px'; inner.style.marginBottom = `${-H * (1 - z)}px`; inner.style.marginRight = `${-W * (1 - z)}px`; };
+    $('dz').onchange = applyZoom; applyZoom();
+    $('dlab').onchange = () => inner.querySelectorAll('.dlab').forEach(e => { e.style.display = $('dlab').checked ? '' : 'none'; });
+    $('dstat').textContent = `${Object.keys(pos).length} rooms placed${misfit.length ? ` · ${misfit.length} doors disagree by more than 32 px (${misfit.slice(0, 4).map(m => m.join('→') + 'px').join(', ')}${misfit.length > 4 ? '…' : ''})` : ''}${unreached.length ? ` · ${unreached.length} rooms not reached by a door (placed below)` : ''}`;
+  },
+};
+
 // ---------- palettes ----------
 // ---------- sprite palette pool (9B1B) ----------
 views.pool = {
