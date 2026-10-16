@@ -1,4 +1,4 @@
-# Script entry points, batches 1-5 (2026-10-16)
+# Script entry points, batches 1-6 (2026-10-16)
 
 Tags: #scripts #text #actors #tooling
 
@@ -198,3 +198,25 @@ left unnamed until the kind numbers can be confirmed from script data.
 Tooling: decomp-permuter crashes ("nodes should only appear once in AST") on
 a multi-declarator with a struct type (`struct T *a, *b;`); declare such
 pointers separately.
+
+## Batch 6
+
+Matched 19 small entry points (1,880 bytes, +0.078 percentage points):
+08103ADC, 08103E60 (`NamedActor_SetFlag20/SetRangeFromScript`), 0810BDB4,
+0810BE58 (registries C5BD/1022 on the object at 0x020004B4), 0815CF6C
+(`ScriptActor_StartActionFromScript`), 0816B834 (`GameState_ClearAreaFlagsFromScript`),
+08178008, 08178588 (`Hud_RefreshSpriteFromScript`, `Hud_ShowPanelFromScript`),
+081BA57C, 081D51B0, 081F213C, 0820A540 (`Slot600_ResetFromScript`), 081D105C
+(`SceneNpc_StopFromScript`), 08227888 (`PlayerName_SetFromScript`, default name
+bytes 80 A2 80 98 80 91 80 9F), 0822E9C8 (`GameState_HasUnlockFromScript`) and
+five more screen parameter blocks (081D7510, 081E1A2C, 081E03F4, 081EC0A8).
+
+Idioms: a parameter block written through the global each time (`gUnk_X.f =`)
+reloads the address per store, through a local pointer it keeps one register;
+an inline that returns through one exit (`goto done; p = 0; done: return p;`)
+reproduces a pointer computed before its test (0810BE58).
+
+Still open: FloorSwitch_Create (a permuter run is at score 4130 from 5099; the
+`struct Vec16 *d = &delta` pointer for the scene-object scan put the slot in r7
+as in the original), 0810858C (97%), 08121268 (97%, one constant placement),
+0822BFC8 (89%, an extra pointer copy), 08111A48.
