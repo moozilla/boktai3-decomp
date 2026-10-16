@@ -8,6 +8,8 @@ A matching decompilation of **Shin Bokura no Taiyou: Gyakushuu no Sabata**
 for byte, plus a local studio for reading and editing the game's text,
 graphics, maps and scripts.
 
+## About
+
 This project started as a way to revive the English fan translation I worked
 on back in 2007 ([boktai3trans](https://github.com/moozilla/boktai3trans)). It
 has since grown into editing tools and a studio for digging into how the game
@@ -24,9 +26,11 @@ and one of my goals is to see how deep fully agentic decompilation and ROM
 hacking can go. I aim to stand apart from the AI-generated ports that led to
 [decomp.dev's sunsetting](https://decomp.dev): this comes from a deep curiosity
 about the game. ROM hacking was my main hobby as a teenager, much of it on fan
-translations. I've since had a career as a software developer, where agents now
-do much of the work, and I wanted to bring that experience back to a hobby
-project.
+translations. I now work as a professional software developer, with almost a
+decade of writing production code by hand. I don't believe agents *have to be*
+a force for disempowerment: with creativity, agents can allow you to go deeper
+and be far more ambitious than you ever could before. I'm hoping to prove that
+with this project.
 
 ## State of the decomp
 
