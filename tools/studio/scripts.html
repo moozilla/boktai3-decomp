@@ -132,7 +132,7 @@ function linkReadable(ln) {
     .replace(/\bproc_(\d+)\(/g, (m, n) => byId[n] ? `<a href="#${n}">proc_${n}</a>(` : m)
     .replace(/\b([A-Za-z_]\w*)\(/g, (m, n) => procOfName[n] ? `<a href="#${procOfName[n]}" title="proc ${procOfName[n]}">${n}</a>(`
       : callees[n] ? `<span title="${esc(actorName(callees[n]))}">${actorLink(callees[n], n)}</span>(` : m)
-    .replace(/\btext\((\d+)\)/g, (m, n) => 'text(' + stringLink(n, n) + ')');
+    .replace(/\b(text|data)\((\d+)\)/g, (m, k, n) => k + '(' + stringLink(n, n) + ')');
   return c + (note ? `<span class="cmt">${esc(note)}</span>` : '');
 }
 
