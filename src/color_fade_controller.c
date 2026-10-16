@@ -267,7 +267,7 @@ s32 sub_08003AA8(u32 id, s32 cnt, u32 *src)
 
 s32 sub_08003AA8(u32, s32, u32 *);
 
-u32 sub_08003B00(void)
+u32 ColorFade_FromScript(void)
 {
     u32 buf[8];
     u32 a = Script_GetKeywordValue(0x72, 0);

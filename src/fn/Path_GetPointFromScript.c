@@ -7,7 +7,7 @@ u32 Script_GetValue(void);
 void sub_0821AAD8(struct Ref *);
 void sub_0821B4C8(struct Ref *, s32, s32);
 s32 sub_0821E7EC(s16 *, u32, u32);
-s32 sub_0821E860(void)
+s32 Path_GetPointFromScript(void)
 {
     s16 vector[4];
     struct Ref ref;
