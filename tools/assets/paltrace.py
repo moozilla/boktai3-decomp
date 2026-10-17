@@ -56,11 +56,44 @@ def rom():
     return load_rom()
 
 
+def _cached(name, build):
+    """build() pickled under build/cache/, keyed by gen/code.s and these tools."""
+    import hashlib
+    import pickle
+    key = hashlib.sha1()
+    for f in (os.path.join(ROOT, "gen", "code.s"), __file__, symeval.__file__):
+        st = os.stat(f)
+        key.update(f"{f}:{st.st_size}:{st.st_mtime_ns}".encode())
+    path = os.path.join(ROOT, "build", "cache", f"paltrace_{name}_{key.hexdigest()[:12]}.pkl")
+    if os.path.exists(path):
+        with open(path, "rb") as f:
+            return pickle.load(f)
+    out = build()
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path + ".tmp", "wb") as f:
+        pickle.dump(out, f)
+    os.replace(path + ".tmp", path)
+    return out
+
+
 @functools.lru_cache(None)
 def program():
-    """{func name: {calls, stores, loads, pals, ptrs, addr}} for every Thumb function."""
+    """{func name: {calls, stores, loads, pals, ptrs}} for every Thumb function."""
+    return _cached("program", _program)
+
+
+def _program():
+    """Two passes: the second applies what each callee stores through its
+    pointer arguments (from the first) to structures callers fill on the stack."""
+    funcs = symeval.parse(os.path.join(ROOT, "gen", "code.s"))
+    first = _evaluate(funcs, None)
+    summ = {f: symeval.arg_stores(r["stores"]) for f, r in first.items()}
+    return _evaluate(funcs, {f: v for f, v in summ.items() if v})
+
+
+def _evaluate(funcs, summaries):
     out = {}
-    for fn in symeval.parse(os.path.join(ROOT, "gen", "code.s")):
+    for fn in funcs:
         rec = {"calls": [], "stores": [], "loads": [], "pals": [], "ptrs": set(), "tables": set()}
         loads = []
 
@@ -79,7 +112,7 @@ def program():
         def on_store(addr, v, size, rec=rec):
             rec["stores"].append((addr, v, size))
 
-        symeval.run(fn, on_call, on_store)
+        symeval.run(fn, on_call, on_store, summaries)
         for ln in fn["lines"]:
             m = re.search(r"@ =(sub_[0-9A-F]{8}|[A-Za-z]\w*)$", ln)
             if m and not m.group(1).startswith("0x"):
@@ -149,6 +182,10 @@ def families():
     """{entry: set of functions} reachable from each script entry point,
     not passing through functions that many families reach (task system,
     shared helpers); those are members but are not followed."""
+    return _cached("families", _families)
+
+
+def _families():
     raw = {}
     for e in entries():
         seen, todo = {e}, [e]
@@ -210,9 +247,13 @@ def subst(v, st):
     if k == "free":
         return v
     if k == "c" or k == "sym" or k == "sp":
-        return v if k != "sp" else None
+        return v
     if k == "f":
         b = subst(v[1], st)
+        if b is not None and b[0] == "sp":
+            # a structure in the caller's frame: what the caller stored there
+            x = st.get("stack", {}).get(b[1] + v[2])
+            return x if x is not None else ("free",)
         return ("f", b, v[2], v[3]) if b is not None else None
     if k == "call":
         return v
@@ -252,6 +293,32 @@ def fill(v, i):
     return tuple(fill(x, i) for x in v)
 
 
+def options(exprs):
+    """{(letter, index)} of the script options the expressions read."""
+    out = set()
+
+    def walk(v):
+        if isinstance(v, tuple):
+            if v and v[0] == "call" and v[1] == KEYWORD and len(v) > 2:
+                out.add((v[2], v[3] if len(v) > 3 else 0))
+            for x in v[1:]:
+                walk(x)
+    for e in exprs:
+        walk(e)
+    return out
+
+
+def put(v, c):
+    """v with option reads replaced by the constants in c ({repr(option): value})."""
+    if not isinstance(v, tuple):
+        return v
+    if v and v[0] == "call" and v[1] == KEYWORD and len(v) > 2:
+        k = repr((v[2], v[3] if len(v) > 3 else 0))
+        if k in c:
+            return C(c[k])
+    return tuple(put(x, c) for x in v)
+
+
 def has_arg(v):
     if not isinstance(v, tuple):
         return False
@@ -276,19 +343,62 @@ def readrom(a, size):
     return v & 0xFFFFFFFF
 
 
+@functools.lru_cache(None)
+def level(root):
+    """How many pointer loads lead to an object: 0 for an incoming pointer or
+    a call result (a new object), 1 for a pointer read from a field, ..."""
+    n = 0
+    while root is not None and root[0] == "f":
+        n += 1
+        root = split(root[1])[0]
+    return n if root is not None and root[0] in ("arg", "call") else None
+
+
+@functools.lru_cache(None)
+def stores_at():
+    """{(offset, size, level): [(function, value)]} of stores through an object pointer."""
+    out = collections.defaultdict(list)
+    for f, rec in program().items():
+        for addr, val, sz in rec["stores"]:
+            root, o = split(addr)
+            lv = level(root)
+            if lv is not None:
+                out[o, sz, lv].append((f, val))
+    return out
+
+
+@functools.lru_cache(None)
+def loads_in():
+    """[(function, anim offset, hash expr)] of every AnimData_Load."""
+    return [(f, split(a)[1] if a is not None else None, h)
+            for f, rec in program().items() for a, h in rec["loads"]]
+
+
 class Tracer:
     """Resolve expressions in one family's context."""
+    _memo = {}
+
+    def __new__(cls, family):
+        t = cls._memo.get(family)
+        if t is None:
+            t = super().__new__(cls)
+            t.family = family
+            t.members = families().get(family, set()) if family else set()
+            t.fields, t.hashes = {}, None
+            cls._memo[family] = t
+        t.evidence = set()
+        return t
 
     def __init__(self, family):
-        self.family = family
-        self.members = families().get(family, set()) if family else set()
-        self.evidence = set()
+        pass
 
     def joint(self, exprs, fn, depth=0):
         """[(values tuple, path)] for expressions that may share incoming
         registers: each caller binds them together."""
         if not any(has_arg(e) for e in exprs) and any(has_free(e) for e in exprs):
             return self.table(exprs, fn, depth)
+        if not any(has_arg(e) for e in exprs) and len(exprs) > 1 and len(options(exprs)) > 1:
+            return self.together(exprs, fn, depth)
         if not any(has_arg(e) for e in exprs):
             sets = [self.vals(e, fn, depth) for e in exprs]
             out = [()]
@@ -321,13 +431,42 @@ class Tracer:
             res = [o + (x,) for o in res for x in st]
         return [(o, (fn,)) for o in res]
 
+    def together(self, exprs, fn, depth):
+        """Expressions reading several script options: the values each
+        script call passes together (a sprite -t with its palette -c)."""
+        import bigpalettes
+        if not self.family or entries()[self.family][0] != "registry":
+            raise Why("options outside a registry entry point")
+        key = int(entries()[self.family][1], 16)
+        opts = sorted(options(exprs))
+        out = set()
+        for call in bigpalettes.script_option_calls().get(key, []):
+            combos = [{}]
+            for o in opts:
+                vs = (set().union(*[v for (lt, _), v in call.items() if lt == chr(o[0])]) or {0}
+                      if o[1] == "*" else call.get((chr(o[0]), o[1]), {0}))
+                combos = [dict(c, **{repr(o): v}) for c in combos for v in vs]
+            for c in combos:
+                es = [put(e, c) for e in exprs]
+                sets = [self.vals(e, fn, depth) for e in es]
+                prod = [()]
+                for st in sets:
+                    prod = [p + (x,) for p in prod for x in st]
+                out |= set(prod)
+        if not out:
+            raise Why(f"no script calls {entries()[self.family][1]}")
+        self.evidence.add(f"options {' '.join('-' + chr(o[0]) for o in opts)} of {entries()[self.family][1]} per call")
+        return [(o, (fn,)) for o in sorted(out)]
+
     def table(self, exprs, fn, depth):
         """A sprite table indexed by a value no caller fixes: every entry,
         index 0 up, while the first expression (the hash) names a sprite."""
         import bigpalettes
         known = set(bigpalettes.defaults())
+        if not has_free(exprs[0]):
+            raise Why("index no caller passes")  # the sprite doesn't bound it
         out = []
-        for i in range(256):
+        for i in range(257):
             try:
                 sets = [self.vals(fill(e, i), fn, depth) for e in exprs]
             except Why:
@@ -335,7 +474,7 @@ class Tracer:
             if not all(len(x) == 1 for x in sets) or next(iter(sets[0])) & 0xFFFF not in known:
                 break
             out.append((tuple(next(iter(x)) for x in sets), (fn,)))
-        if not out:
+        if not out or len(out) > 256:
             raise Why("index no caller passes")
         self.evidence.add(f"table entries 0-{len(out) - 1} in {fn}")
         return out
@@ -378,7 +517,10 @@ class Tracer:
                 bs = None
             if bs and all(0x08000000 <= b < 0x09000000 for b in bs):
                 return self.cap({readrom(b + v[2], v[3]) for b in bs})
-            return self.field(off + v[2], abs(v[3]), depth)
+            lv = level(base)
+            if lv is None:
+                raise Why(f"load from {show(v)}")
+            return self.field(off + v[2], abs(v[3]), depth, lv)
         raise Why(f"{show(v)}")
 
     def keyword(self, letter, index=0):
@@ -393,30 +535,41 @@ class Tracer:
         self.evidence.add(f"-{letter} of {key}")
         return set(vs)
 
-    def field(self, off, size, depth):
-        """Values the family's code stores at actor offset off."""
+    def field(self, off, size, depth, lv=0):
+        """Values the family's code stores at offset off of an object reached
+        through lv pointer loads."""
         if not self.members:
             raise Why(f"field +{off:#x} outside a script entry point")
         if depth > 4:
             raise Why("field chain too deep")
-        out, errs, n = set(), [], 0
-        for f in sorted(self.members):
-            for addr, val, sz in program()[f]["stores"]:
-                root, o = split(addr)
-                if o != off or sz != size or root is None or root[0] == "sp":
+        k = (off, size, lv)
+        if k not in self.fields:
+            out, errs, ev, n = set(), [], set(), 0
+            for f, val in stores_at().get(k, ()):
+                if f not in self.members:
                     continue
                 n += 1
                 try:
                     for vs, _ in self.joint([val], f, depth + 1):
                         out.add(vs[0] & ((1 << (8 * size)) - 1))
-                    self.evidence.add(f"+{off:#x} set by {f}")
+                    ev.add(f"+{off:#x} set by {f}")
                 except Why as w:
                     errs.append(f"+{off:#x} set by {f}: {w}")
-        if errs:
-            raise Why(errs[0])
-        if not n:
-            raise Why(f"nothing in the family stores +{off:#x}")
-        return self.cap(out)
+            if errs and any("too deep" in e for e in errs):
+                raise Why(errs[0])  # depends on where it was asked from: not kept
+            if errs:
+                self.fields[k] = Why(errs[0])
+            elif not n:
+                self.fields[k] = Why(f"nothing in the family stores +{off:#x}")
+            elif len(out) > MAXSET:
+                self.fields[k] = Why(f"{len(out)} values")
+            else:
+                self.fields[k] = (out, ev)
+        r = self.fields[k]
+        if isinstance(r, Why):
+            raise r
+        self.evidence |= r[1]
+        return r[0]
 
     def cap(self, s):
         if len(s) > MAXSET:
@@ -428,24 +581,33 @@ def anim_hashes(tr, anim, fn):
     """Hashes loaded on an anim at the same offset as `anim` in the family,
     else every hash the family loads if that is a single sprite."""
     _, off = split(anim) if anim else (None, None)
-    same, every, errs = set(), set(), []
-    for f in sorted(tr.members) or [fn]:
-        for a, h in program()[f]["loads"]:
-            try:
-                vs = {v[0] & 0xFFFF for v, _ in tr.joint([h], f)}
-            except Why as w:
-                errs.append(f"sprite loaded by {f}: {w}")
+    if tr.hashes is None:
+        tr.hashes, tr.hash_errs = [], []
+        for f, o, h in loads_in():
+            if f not in tr.members and not (not tr.members and f == fn):
                 continue
-            every |= vs
-            if a is not None and split(a)[1] == off:
-                same |= vs
+            try:
+                tr.hashes.append((o, {v[0] & 0xFFFF for v, _ in tr.joint([h], f)}))
+            except Why as w:
+                tr.hash_errs.append(f"sprite loaded by {f}: {w}")
+        if not tr.members:
+            hs, tr.hashes = tr.hashes, None  # outside a family: per function
+        else:
+            hs = tr.hashes
+    else:
+        hs = tr.hashes
+    same, every = set(), set()
+    for o, vs in hs:
+        every |= vs
+        if o == off:
+            same |= vs
     if same:
         return same
     if len(every) == 1:
         return every
     if every:
         raise Why(f"anim not matched among {len(every)} sprites the family loads")
-    raise Why(errs[0] if errs else "no sprite loaded in the family")
+    raise Why(tr.hash_errs[0] if tr.hash_errs else "no sprite loaded in the family")
 
 
 def trace():
@@ -547,6 +709,31 @@ def main():
         rtv = {(h, p) for h, p in rtp if d.get(h) != p}
         print(f"traced variant pairs {len(tpv)}, runtime variant pairs {len(rtv)}, both {len(tpv & rtv)}")
         print("runtime only:", " ".join(f"{h:04X}:{p}" for h, p in sorted(rtv - tpv)))
+        # sprite loads: the hashes each function loaded at runtime against
+        # the hashes traced for its AnimData_Load calls
+        import csv
+        import glob
+        an = addr_names()
+        starts = sorted(an)
+        traced = collections.defaultdict(set)
+        for f, _, h in loads_in():
+            for fam in sorted(family_of().get(f, ())) or [None]:
+                try:
+                    traced[f] |= {v[0] & 0xFFFF for v, _ in Tracer(fam).joint([h], f)}
+                except Why:
+                    pass
+        seen = collections.defaultdict(set)
+        for path in glob.glob(os.path.join(ROOT, "build", "centaur", "**", "sprite_loads.tsv"), recursive=True):
+            for r in csv.DictReader(open(path), delimiter="\t"):
+                a = int(r["caller"], 16)
+                seen[an[starts[bisect.bisect_right(starts, a) - 1]]].add(int(r["hash"], 16))
+        ok = sum(1 for f in seen if seen[f] <= traced.get(f, set()))
+        print(f"sprite loads: {sum(len(v) for v in seen.values())} (function, sprite) pairs at runtime in {len(seen)} functions;"
+              f" all traced in {ok}")
+        for f in sorted(seen):
+            miss = seen[f] - traced.get(f, set())
+            if miss:
+                print(f"  {f}: not traced " + " ".join(f"{h:04X}" for h in sorted(miss)[:12]))
         return
     n = len(sites)
     res = sum(1 for s in sites if s["pairs"])

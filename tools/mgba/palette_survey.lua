@@ -7,7 +7,8 @@
 -- Breakpoints on AnimData_Load(anim, hash) (082151E4) and
 -- AnimData_SelectPaletteBank(anim, entry) (08215284) track the hash each anim
 -- holds; every palette selection is written to build/centaur/sprite_pools.tsv
--- as scene, hash, pool entry and the caller (lr). The game picks the entry, so
+-- as scene, hash, pool entry and the caller (lr), and every sprite load to
+-- build/centaur/sprite_loads.tsv (scene, hash, caller). The game picks the entry, so
 -- this is the palette as the game itself sets it, for every sprite a scene
 -- creates while it loads and runs for WAIT frames.
 local SRC = (debug.getinfo(1, "S").source or ""):gsub("^@", "")
@@ -21,8 +22,14 @@ local out = io.open(ROOT .. "/build/centaur/sprite_pools.tsv", "w")
 out:write("scene\thash\tpool\tcaller\n")
 local anim_hash, seen, scene = {}, {}, -1
 
+-- every sprite load (hash and caller) goes to build/centaur/sprite_loads.tsv
+local loads, lseen = io.open(ROOT .. "/build/centaur/sprite_loads.tsv", "w"), {}
+loads:write("scene\thash\tcaller\n")
 emu:setBreakpoint(function()
-  anim_hash[emu:readRegister("r0")] = emu:readRegister("r1") & 0xFFFF
+  local h = emu:readRegister("r1") & 0xFFFF
+  anim_hash[emu:readRegister("r0")] = h
+  local k = string.format("%d\t%04X\t%08X", scene, h, (emu:readRegister("lr") - 1) & ~1)
+  if not lseen[k] then lseen[k] = true; loads:write(k, "\n"); loads:flush() end
 end, 0x082151E4)
 emu:setBreakpoint(function()
   local a, p, lr = emu:readRegister("r0"), emu:readRegister("r1") & 0xFFFF, emu:readRegister("lr")
