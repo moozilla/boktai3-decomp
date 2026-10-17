@@ -99,7 +99,7 @@ are low confidence unless the handler is named; the rest print as
 
 Character instance names come from `actor_name_of` (proc 1154), a table from
 a character number to a name hash; `cutscenes.py` prints `character N` for
-those not identified on screen yet.
+those not identified on screen yet (1 is Otenko).
 
 ## Decompiling it
 
