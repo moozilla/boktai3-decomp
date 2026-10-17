@@ -391,8 +391,10 @@ addr,name,mode,confidence,source,notes
 08020ED8,SceneMessages_Stop,thumb,low,src-alias,
 08020F1C,SceneMessages_ConsumeSignal,thumb,low,src-alias,
 08020F84,SceneCommands_CreateEffect,thumb,low,src-alias,
+08021044,SceneCommands_Fade,thumb,low,src-alias,"screen cutscene cmd 3 (on, speed, r, g, b, bg, obj, other, last): sub_082279A8 mode 3 (on) or 2"
 080210B0,SceneCommands_FadePalette,thumb,low,src-alias,
 0802113C,SceneCommands_BlendPalette,thumb,low,src-alias,
+0802123C,SceneCommands_Dispatch,thumb,low,src-alias,kind 7 (screen) cutscene receiver: switch on the command byte (10 cases)
 0802141C,SceneActors_FindAvailable,thumb,low,src-alias,
 08021450,SceneActors_ApplyDamage,thumb,low,src-alias,
 080214D4,SceneActors_Initialize,thumb,low,src-alias,
@@ -421,6 +423,7 @@ addr,name,mode,confidence,source,notes
 08022404,SceneActorGraphics_OscillateScale,thumb,low,src-alias,
 080225B4,SceneActors_AddHealthCost,thumb,low,src-alias,
 08022600,SceneActors_AddResourceCost,thumb,low,src-alias,
+08022F88,SceneActors_DispatchCommands,thumb,low,src-alias,"kind 4 (scene actor) cutscene receiver: commands set state 2 with a sub-state, 2 places, 9 effect, 15/16 graphics variant, 25 background flash"
 080236C0,SceneActorState_Acknowledge,thumb,low,src-alias,
 080237C0,SceneActorState_Resume,thumb,low,src-alias,
 08023A48,SceneActorState_Hold,thumb,low,src-alias,
@@ -1904,6 +1907,54 @@ addr,name,mode,confidence,source,notes
 0815A680,ScriptActor_TestFlagFromScript,thumb,low,src-alias,
 0815A838,ScriptActor_GetField534FromScript,thumb,low,src-alias,
 0815A97C,Player_SetSlotValueFromScript,thumb,low,src-alias,
+0815AE94,PlayerCue_OverlaySet,thumb,low,src-alias,"player cutscene cmds 48 (n) and 50: +0xAE4 = 1, +0xAD6 = n + 366 (cmd 50: 378)"
+0815AEAC,PlayerCue_OverlayOn,thumb,low,src-alias,"player cutscene cmd 47 (n): +0xAE4 = 2, +0xAD6 = n + 366"
+0815AEC4,PlayerCue_OverlayOff,thumb,low,src-alias,player cutscene cmd 49: +0xAE4 = 0
+0815AED4,PlayerCue_SetPosition,thumb,low,src-alias,"player cutscene cmd 1 (x, y, z, dir): copies x/y/z to +0x30; the dir argument is unused"
+0815AEE0,PlayerCue_Hide,thumb,low,src-alias,"player cutscene cmd 0: sets flag bit 0 of +0x94, motion 0; the player is off screen after it in cutscene 3 (prologue shots) until a cmd 1 places him"
+0815AF14,PlayerCue_Stand,thumb,low,src-alias,player cutscene cmd 2 (dir): motion 0/0
+0815AF50,PlayerCue_Face,thumb,low,src-alias,"player cutscene cmd 3 (dir): motion 0/0, update sub_0814FA10"
+0815AF8C,PlayerCue_Idle,thumb,low,src-alias,player cutscene cmd 4 (dir): motion 0/1
+0815AFC8,PlayerCue_StandVariant2,thumb,low,src-alias,player cutscene cmd 5 (dir): motion 0/2
+0815B010,PlayerCue_StandVariant3,thumb,low,src-alias,player cutscene cmd 6 (dir): motion 0/3; in state 6 it only counts +0x3A2 down
+0815B0A8,PlayerCue_WalkTo,thumb,low,src-alias,"player cutscene cmd 7 (x, y, z): target +0x590, motion 1/0, update by state (+0x418)"
+0815B15C,PlayerCue_MoveTo,thumb,low,src-alias,"player cutscene cmd 15: target position (or own), motion 6/0, update sub_0814FFA4"
+0815B1D0,PlayerCue_Motion7Front,thumb,low,src-alias,player cutscene cmd 8: faces 4 then motion 7/0 (update sub_081502AC); meaning of motion 7 unknown
+0815B238,PlayerCue_Motion7,thumb,low,src-alias,"player cutscene cmd 9: faces 0, motion 7/0 (update sub_081502AC)"
+0815B28C,PlayerCue_Motion7End,thumb,low,src-alias,"player cutscene cmd 10: if already in motion 7 (variant != 0), switches to variant 3"
+0815B2E0,PlayerCue_Kneel,thumb,low,src-alias,player cutscene cmd 11 (dir): motion 0x15/0; Sabata kneels in cutscene 3 (prologue shots)
+0815B330,PlayerCue_KneelGasp,thumb,low,src-alias,player cutscene cmd 13 (dir): motion 0x15/2 and sound 0xC6; kneeling hold between lines in cutscenes 3 and 5
+0815B378,PlayerCue_KneelDown,thumb,low,src-alias,"player cutscene cmd 12 (dir): motion 0x15/1; starts the kneel in cutscenes 2, 3 and 5"
+0815B3BC,PlayerCue_GetUp,thumb,low,src-alias,player cutscene cmd 14 (dir): motion 0x15/3; Sabata and Django stand up after it (prologue shots)
+0815B52C,PlayerCue_Motion29,thumb,low,src-alias,"player cutscene cmd 16 (dir, n): 4-way facing, motion 0x1D/0, update by state"
+0815B5F8,PlayerCue_Motion30,thumb,low,src-alias,"player cutscene cmd 17 (dir, n, b): 4-way facing, motion 0x1E/0"
+0815B69C,PlayerCue_Motion30End,thumb,low,src-alias,player cutscene cmd 18: motion 0x1E variant 5 -> 4
+0815B6DC,PlayerCue_Motion29B,thumb,low,src-alias,"player cutscene cmd 19 (dir, n): 4-way facing, motion 0x1D/0, update sub_08151078"
+0815B858,PlayerCue_Motion7Turn,thumb,low,src-alias,"player cutscene cmd 20 (dir): motion 7/0, facing by state (+0x418 3: diagonal)"
+0815B968,PlayerCue_Motion7Variant7,thumb,low,src-alias,player cutscene cmd 21 (dir): motion 7/7
+0815B9CC,PlayerCue_Motion7Variant3,thumb,low,src-alias,player cutscene cmd 22 (dir): motion 7/3 (7/4 in states other than 3-5)
+0815BC74,PlayerCue_Aim,thumb,low,src-alias,"player cutscene cmd 23 (dir): motion 3/0, update sub_08151310 (as cmd 24 without the shot); guess: gun stance"
+0815BCBC,PlayerCue_Shoot,thumb,low,src-alias,"player cutscene cmd 24: spawns effect 0x4B (0x51 in state 6) 150 units ahead and 230 up with sound 0xCD (0x203), motion 3/2; guess: fires the gun"
+0815BDD4,PlayerCue_AimHold,thumb,low,src-alias,"player cutscene cmd 25 (dir, n): motion 3/0, +0x59B = n, update sub_08151484"
+0815BE28,PlayerCue_AimEnd,thumb,low,src-alias,"player cutscene cmd 26: motion 3/5, update sub_08151484"
+0815BF18,PlayerCue_RunTo,thumb,low,src-alias,"player cutscene cmd 33 (x, y, z): target +0x590, motion 2/0, update sub_081516C0; guess: run"
+0815BF60,PlayerCue_Run,thumb,low,src-alias,"player cutscene cmd 34 (dir): motion 2/0 with sub_0813AE18 effect, update sub_0815196C"
+0815BFB8,PlayerCue_Motion17,thumb,low,src-alias,"player cutscene cmd 41: faces 1, motion 0x11, update sub_08151988"
+0815BFFC,PlayerCue_Motion17Variant2,thumb,low,src-alias,"player cutscene cmd 42: faces 1, motion 0x11/2, update sub_08151988"
+0815C040,PlayerCue_Windblown,thumb,low,src-alias,"player cutscene cmd 35 (side): motion 0/0 with update sub_0814FAE8, the scarf-in-the-wind stance (prologue shots)"
+0815C0BC,PlayerCue_WindblownVariant3,thumb,low,src-alias,player cutscene cmd 37 (dir): motion 0/3 with update sub_0814FAE8
+0815C138,PlayerCue_WindblownVariant4,thumb,low,src-alias,player cutscene cmd 38 (dir): motion 0/4 with update sub_0814FAE8
+0815C1B4,PlayerCue_WindblownVariant2,thumb,low,src-alias,player cutscene cmd 36 (dir): motion 0/2 with update sub_0814FAE8 (Sabata in cutscene 3)
+0815C230,PlayerCue_StandDiagonal,thumb,low,src-alias,"player cutscene cmd 39 (dir): 4-way (diagonal) facing, motion 0/0, update sub_0814FC24"
+0815C2BC,PlayerCue_StandDiagonalB,thumb,low,src-alias,"player cutscene cmd 40 (dir): 4-way (diagonal) facing, motion 0/0, update sub_081561A8"
+0815C348,PlayerCue_FaceSide,thumb,low,src-alias,"player cutscene cmd 27 (on): direction 5 (mirrored) or 3, motion 0/0, update sub_0814FC54"
+0815C3B8,PlayerCue_Motion11,thumb,low,src-alias,"player cutscene cmd 28: motion 0xB/0, update sub_08146EAC; returns 1"
+0815C3F0,PlayerCue_Motion10,thumb,low,src-alias,"player cutscene cmd 29: motion 0xA/0, update sub_08147768; returns 1"
+0815C428,PlayerCue_FormMotion,thumb,low,src-alias,player cutscene cmd 30: motion 0xA or 0xB by +0x418 (1 or 2); returns 0 when +0x418 is 0
+0815C498,PlayerCue_Motion38To,thumb,low,src-alias,"player cutscene cmd 51 (x, y, z): in state 2 only, target +0x590 and motion 0x26/0"
+0815C4FC,PlayerCue_StateMotion,thumb,low,src-alias,"player cutscene cmd 31: motion 0xD/0xE/0xF by state 3/4/5; returns 0 in states 0, 1, 6"
+0815C5A4,PlayerCue_ShakeEffect,thumb,low,src-alias,"player cutscene cmd 43: random offset by state, sub_082315A8(+0x5B8, 2, 3600) and sound 0x191/0x133 by +0x5B9; clears +0x530"
+0815C730,PlayerCue_Refresh,thumb,low,src-alias,player cutscene cmd 44: calls sub_0813D4E0
 0815CA48,ScriptActor_RequestFromScript,thumb,low,src-alias,
 0815CA88,ScriptActor_SetAnimationFromScript,thumb,low,src-alias,
 0815CBF8,ScriptActor_MoveToFromScript,thumb,low,src-alias,
@@ -1912,6 +1963,7 @@ addr,name,mode,confidence,source,notes
 0815CF24,ScriptActor_FaceFromScript,thumb,low,src-alias,
 0815CF6C,ScriptActor_StartActionFromScript,thumb,low,src-alias,
 0815D524,ScriptActor_SetModeFromScript,thumb,low,src-alias,
+0815D6B0,PlayerCue_Dispatch,thumb,low,src-alias,kind 2 (player) cutscene receiver: switch on the command byte (52 cases); acknowledges with sub_0814F858/sub_0814F874
 0815F4F4,Player_Create,thumb,medium,gcl-name,name from GCL key F5EB プレイヤー (Player); registry callback
 08163E24,ParticlePool_Create,thumb,low,src-alias,
 0816B834,GameState_ClearAreaFlagsFromScript,thumb,low,src-alias,
@@ -1949,6 +2001,7 @@ addr,name,mode,confidence,source,notes
 081C4080,RegistryF3E4_Create,thumb,low,src-alias,
 081CE1BC,SceneCharacter_PlaceFromScript,thumb,low,src-alias,
 081CE6DC,SceneCharacter_CommandFromScript,thumb,low,src-alias,
+081D01C8,SceneNpc_DispatchCommands,thumb,low,src-alias,"kind 5 (NPC) cutscene receiver: commands set state 0 with a sub-state, 4/5/36 walk to a point, 13-16 palette, 64 place"
 081D0C04,SceneNpc_CreateFromScript,thumb,low,src-alias,
 081D0F28,SceneNpc_CommandFromScript,thumb,low,src-alias,
 081D105C,SceneNpc_StopFromScript,thumb,low,src-alias,
@@ -2102,10 +2155,17 @@ addr,name,mode,confidence,source,notes
 08225624,Trap_CreateFromScript,thumb,low,src-alias,
 08225C48,Terrain_LoadHP,thumb,low,disasm,"ScriptProc_Start(0xAE6C, hp): hands the HP header offsets to Terrain_SetGrid/SetBoxes/SetPaths/SetNavMeshes; docs/ASSETS.md"
 08225CB8,Terrain_LoadFromScript,thumb,low,src-alias,
+08226228,Camera_Reset,thumb,low,src-alias,camera cmd 0
+08226268,Camera_SnapTo,thumb,low,src-alias,"camera cmd 1: moves the camera to (x, y, z) at once and recomputes the scroll origin (gUnk_03005418) from the isometric projection"
+0822632C,Camera_PanTo,thumb,low,src-alias,"camera cmd 2 (x, y, z, frames): target +0x6C, mode 2 (1 when frames <= 1)"
+082264D0,Camera_FollowPlayer,thumb,low,src-alias,"camera cmd 5 (frames): mode 6 over frames, or follow at once"
+08226558,Camera_SetSway,thumb,low,src-alias,"camera cmd 4 (a, b, mode): +0x84..+0x8A; (0, 1) clears it; guess from the fields only"
 082265F8,Camera_ReadMoveRate,thumb,low,src-alias,
 082268C0,Camera_SetFollowFromScript,thumb,low,src-alias,
+08226930,Camera_DispatchCommands,thumb,low,src-alias,"kind 6 (camera) cutscene receiver: 0 reset, 1 snap_to, 2 pan_to, 3 sub_08226474, 4 Camera_SetSway, 5 follow_player"
 08226AE4,Camera_SetCenteredBounds,thumb,low,src-alias,
 08226BE0,Camera_SetBounds,thumb,low,src-alias,
+08227478,Camera_Initialize,thumb,low,src-alias,"starts at the saved player position (+150 up), registers as kind 6 receiver, becomes gUnk_03005420"
 08227888,PlayerName_SetFromScript,thumb,low,src-alias,
 08227A10,Terrain_GetFloorHeightFromScript,thumb,low,src-alias,
 082284F4,Clock_ClearState,thumb,low,src-alias,

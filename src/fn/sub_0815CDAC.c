@@ -3,12 +3,12 @@
 extern u8 *gUnk_02000580[];
 s32 sub_0815A400(void);
 s32 sub_0815CA08(void);
-void sub_0815B1D0(u8 *actor, s32 f, s32 e);
-void sub_0815AF14(u8 *actor, s32 state);
+void PlayerCue_Motion7Front(u8 *actor, s32 f, s32 e);
+void PlayerCue_Stand(u8 *actor, s32 state);
 void sub_0814F828(u8 *);
 void sub_0814F838(u8 *);
 /* Script: puts the scripted actor chosen by -i into state 4 with -e (default 0).
-   From states 0, 1 and 6 it goes through sub_0815B1D0, which also takes -f. */
+   From states 0, 1 and 6 it goes through PlayerCue_Motion7Front, which also takes -f. */
 void ScriptActor_EnterStateFourFromScript(void)
 {
     u8 *actor;
@@ -23,11 +23,11 @@ void ScriptActor_EnterStateFourFromScript(void)
                 f = Script_GetValue();
             else
                 f = 0;
-            sub_0815B1D0(actor, f, e);
+            PlayerCue_Motion7Front(actor, f, e);
             sub_0814F828(actor);
         } else {
             *(s32 *)(actor + 0x5A4) = e;
-            sub_0815AF14(actor, 4);
+            PlayerCue_Stand(actor, 4);
             sub_0814F828(actor);
             sub_0814F838(actor);
         }

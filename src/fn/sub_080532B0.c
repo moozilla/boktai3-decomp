@@ -20,7 +20,7 @@ s32 SceneMessages_RegisterReceiver(void *, s32, s32);
 void Sound_PlaySong(u32);
 void ScriptUtility_SetControlFlag(u32);
 void sub_081593A0(u8 *, struct StackedActorPosition *);
-void sub_0815AEE0(u8 *);
+void PlayerCue_Hide(u8 *);
 void StackedActor_TickDisabled(struct StackedActor *);
 void StackedActor_Appear(struct StackedActor *);
 void StackedActor_WaitForPlayerRelease(struct StackedActor *);
@@ -278,7 +278,7 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
                     actor->unknown380 = one;
                     ScriptUtility_SetControlFlag(0);
                     sub_081593A0(gUnk_02000580, cache.world);
-                    sub_0815AEE0(gUnk_02000580);
+                    PlayerCue_Hide(gUnk_02000580);
                     actor->sprite.flags &= ~1;
                     {
                         u32 tile = actor->paletteBase + 2;

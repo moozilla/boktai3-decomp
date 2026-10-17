@@ -2,7 +2,7 @@
 void sub_0815AD78(u8 *);
 void sub_0813AFEC(u8 *, u32, u32);
 void sub_0814FAE8(void);
-void sub_0815C1B4(u8 *p, s32 a, u32 b)
+void PlayerCue_WindblownVariant2(u8 *p, s32 a, u32 b)
 {
     if (a != 0) {
         u8 *q = p + 0x3a4;

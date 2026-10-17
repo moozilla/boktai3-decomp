@@ -5,7 +5,7 @@ extern u16 gUnk_03005260[];
 s32 StackedActor_IsPlayerNearby(struct StackedActor *);
 void Sound_PlaySong(u32);
 void AnimData_SelectPaletteBank(void *, u32);
-void sub_0815B0A8(u8 *, struct StackedActorPosition *, u32, u32);
+void PlayerCue_WalkTo(u8 *, struct StackedActorPosition *, u32, u32);
 void StackedActor_TickIdle(struct StackedActor *actor)
 {
     if (!(gUnk_030053F4 & 0x200) && actor->interactionDelay <= 9)
@@ -38,7 +38,7 @@ void StackedActor_TickIdle(struct StackedActor *actor)
                         if (!(*(u32 *)(player + 0x20) & playerMask) &&
                             actor->interactionDelay > 9) {
                             actor->animationPhase = 8;
-                            sub_0815B0A8(gUnk_02000580, &actor->world, 0, 4);
+                            PlayerCue_WalkTo(gUnk_02000580, &actor->world, 0, 4);
                             StackedActor_SetUpdate(actor, StackedActor_BeginPlayerInteraction);
                         }
                     }
