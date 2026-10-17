@@ -29,6 +29,7 @@ TYPES = {0x922E: "anm", 0x92B3: "pal", 0x9B1B: "9B1B", 0x98F5: "bigspr", 0xA635:
 
 
 def display(s):
+    s = s.replace("<NAME>", "Django")  # the player's name, shown as the default
     s = re.sub(r"<[^>]*>", "", s)
     s = s.replace("\\n", "\n").replace("\\t", " ").replace("\\{", "{").replace("\\\\", "\\")
     s = re.sub(r"\\x[0-9a-fA-F]{2}", "", s)
