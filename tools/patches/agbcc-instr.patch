@@ -1,6 +1,6 @@
 --- a/local-alloc.c
 +++ b/local-alloc.c
-@@ -69,6 +69,169 @@
+@@ -69,6 +69,220 @@
  #include "insn-config.h"
  #include "insn-attr.h"
  #include "recog.h"
@@ -115,6 +115,57 @@
 +  return "-";
 +}
 +
++/* AGBCC_PRI_LABEL="label:delta,...": like AGBCC_PRI, but for the pseudos
++   whose agbcc_pseudo_label is LABEL (a variable name or "=constant"), so a
++   change can be named across different sources.  */
++static int agbcc_label_delta[AGBCC_MAXREG];
++char *agbcc_pseudo_label ();
++static void
++agbcc_apply_labels ()
++{
++  char *e = getenv ("AGBCC_PRI_LABEL");
++  int r, nregs = max_reg_num ();
++  for (r = 0; r < AGBCC_MAXREG; r++)
++    {
++      agbcc_pri_delta[r] -= agbcc_label_delta[r];
++      agbcc_label_delta[r] = 0;
++    }
++  if (! e || ! *e)
++    return;
++  for (r = FIRST_PSEUDO_REGISTER; r < nregs && r < AGBCC_MAXREG; r++)
++    {
++      char *lab = agbcc_pseudo_label (r);
++      char *p = e;
++      if (! lab || ! strcmp (lab, "-"))
++	continue;
++      while (*p)
++	{
++	  char *comma = strchr (p, ',');
++	  char *colon;
++	  int len = comma ? comma - p : strlen (p);
++	  char item[256];
++	  if (len >= (int) sizeof item)
++	    len = sizeof item - 1;
++	  memcpy (item, p, len);
++	  item[len] = 0;
++	  colon = strrchr (item, ':');
++	  if (colon)
++	    {
++	      *colon = 0;
++	      if (! strcmp (item, lab))
++		{
++		  int d = atoi (colon + 1);
++		  agbcc_label_delta[r] += d;
++		  agbcc_pri_delta[r] += d;
++		}
++	    }
++	  if (! comma)
++	    break;
++	  p = comma + 1;
++	}
++    }
++}
++
 +static int agbcc_instr_done;
 +void
 +agbcc_instr_reset ()
@@ -170,7 +221,7 @@
  #include "output.h"
  #include "toplev.h"
  
-@@ -249,6 +412,8 @@
+@@ -249,6 +463,8 @@
  static int qty_sugg_compare    	(int, int);
  static int qty_sugg_compare_1	(const void *, const void *);
  static int qty_compare    	(int, int);
@@ -179,12 +230,20 @@
  static int qty_compare_1	(const void *, const void *);
  static int combine_regs		(rtx, rtx, int, int, rtx, int);
  static int reg_meets_class_p	(int, enum reg_class);
-@@ -1328,6 +1493,21 @@
+@@ -298,6 +514,9 @@
+   register int b, i;
+   int max_qty;
  
-     default:
-       qsort (qty_order, next_qty, sizeof (int), qty_sugg_compare_1);
-+    }
++  agbcc_instr_init ();
++  agbcc_apply_labels ();
 +
+   /* Leaf functions and non-leaf functions have different needs.
+      If defined, let the machine say what kind of ordering we
+      should use.  */
+@@ -1330,12 +1549,29 @@
+       qsort (qty_order, next_qty, sizeof (int), qty_sugg_compare_1);
+     }
+ 
 +  /* Instrumentation: forced quantities take their register first.  */
 +  agbcc_instr_init ();
 +  qty_forced = (char *) alloca (next_qty + 1);
@@ -198,10 +257,11 @@
 +	  qty_phys_reg[i] = agbcc_force[r];
 +	  post_mark_life (agbcc_force[r], qty_mode[i], 1, qty_birth[i], qty_death[i]);
 +	}
-     }
- 
++    }
++
    /* Try to put each quantity in a suggested physical register, if it has one.
-@@ -1336,6 +1516,8 @@
+      This may cause registers to be allocated that otherwise wouldn't be, but
+      this seems acceptable in local allocation (unlike global allocation).  */
    for (i = 0; i < next_qty; i++)
      {
        q = qty_order[i];
@@ -210,7 +270,7 @@
        if (qty_phys_num_sugg[q] != 0 || qty_phys_num_copy_sugg[q] != 0)
  	qty_phys_reg[q] = find_free_reg (qty_min_class[q], qty_mode[q], q,
  					 0, 1, qty_birth[q], qty_death[q]);
-@@ -1387,7 +1569,7 @@
+@@ -1387,7 +1623,7 @@
    for (i = 0; i < next_qty; i++)
      {
        q = qty_order[i];
@@ -219,7 +279,7 @@
  	{
  	  if (N_REG_CLASSES > 1)
  	    {
-@@ -1414,6 +1596,13 @@
+@@ -1414,6 +1650,13 @@
  	for (i = qty_first_reg[q]; i >= 0; i = reg_next_in_qty[i])
  	  reg_renumber[i] = qty_phys_reg[q] + reg_offset[i];
        }
@@ -233,7 +293,7 @@
  }
  
  /* Compare two quantities' priority for getting real registers.
-@@ -1432,11 +1621,21 @@
+@@ -1432,11 +1675,21 @@
     Multiplying this by 10000 can't overflow.
     QTY_CMP_PRI is also used by qty_sugg_compare.  */
  
@@ -256,7 +316,7 @@
  qty_compare (q1, q2)
       int q1, q2;
  {
-@@ -1505,6 +1704,7 @@
+@@ -1505,6 +1758,7 @@
  
  #undef QTY_CMP_SUGG
  #undef QTY_CMP_PRI
@@ -354,7 +414,7 @@
     or perhaps its old hard reg has been commandeered for reloads.
 --- a/reload1.c
 +++ b/reload1.c
-@@ -208,6 +208,32 @@
+@@ -208,6 +208,85 @@
  /* Index of last register assigned as a spill register.  We allocate in
     a round-robin fashion.  */
  static int last_spill_reg;
@@ -362,6 +422,59 @@
 +   spill rotation by D before the K-th reload register choice in a function;
 +   AGBCC_DUMPPRI also logs each choice.  */
 +static int agbcc_reload_count;
++/* AGBCC_SPILL_LABEL="label#n:d,...": shift the rotation by D before the
++   N-th successful reload of a value labelled LABEL (see AGBCC_DUMPPRI).  */
++#define AGBCC_MAXLAB 256
++static char *agbcc_lab_name[AGBCC_MAXLAB];
++static int agbcc_lab_count[AGBCC_MAXLAB], agbcc_lab_used;
++static int
++agbcc_lab_index (lab)
++     char *lab;
++{
++  int i;
++  for (i = 0; i < agbcc_lab_used; i++)
++    if (! strcmp (agbcc_lab_name[i], lab))
++      return i;
++  if (agbcc_lab_used == AGBCC_MAXLAB)
++    return -1;
++  agbcc_lab_name[agbcc_lab_used] = xstrdup (lab);
++  agbcc_lab_count[agbcc_lab_used] = 0;
++  return agbcc_lab_used++;
++}
++static int
++agbcc_label_shift (lab, n)
++     char *lab;
++     int n;
++{
++  char *e = getenv ("AGBCC_SPILL_LABEL");
++  while (e && *e)
++    {
++      char *comma = strchr (e, ',');
++      int len = comma ? comma - e : strlen (e);
++      char item[256], *hash, *colon;
++      if (len >= (int) sizeof item)
++	len = sizeof item - 1;
++      memcpy (item, e, len);
++      item[len] = 0;
++      colon = strrchr (item, ':');
++      if (colon)
++	{
++	  *colon = 0;
++	  hash = strrchr (item, '#');
++	  if (hash)
++	    {
++	      *hash = 0;
++	      if (! strcmp (item, lab) && atoi (hash + 1) == n)
++		return atoi (colon + 1);
++	    }
++	}
++      if (! comma)
++	break;
++      e = comma + 1;
++    }
++  return 0;
++}
++static char *agbcc_reload_label ();
 +extern FILE *agbcc_dump;
 +extern void agbcc_instr_init ();
 +extern char *current_function_name;
@@ -387,21 +500,66 @@
  
  /* Describes order of preference for putting regs into spill_regs.
     Contains the numbers of all the hard regs, in order most preferred first.
-@@ -815,6 +841,8 @@
+@@ -815,6 +894,9 @@
    
    /* Initialize to -1, which means take the first spill register.  */
    last_spill_reg = -1;
 +  agbcc_reload_count = 0;
++  agbcc_lab_used = 0;
 +  agbcc_instr_init ();
  
    spilled_pseudos = ALLOCA_REG_SET ();
  
-@@ -5066,6 +5094,12 @@
+@@ -5027,6 +5109,28 @@
+ 
+    If NOERROR is nonzero, we return 1 if successful,
+    or 0 if we couldn't find a spill reg and we didn't change anything.  */
++
++/* The label of reload R's value: "=constant", "regN" or "-".  */
++static char *
++agbcc_reload_label (r)
++     int r;
++{
++  static char b[64];
++  rtx in = reload_in[r];
++  char *v;
++  if (in && GET_CODE (in) == REG && REGNO (in) >= FIRST_PSEUDO_REGISTER
++      && reg_equiv_constant && reg_equiv_constant[REGNO (in)])
++    in = reg_equiv_constant[REGNO (in)];
++  v = agbcc_const_label (in);
++  if (v)
++    return v;
++  if (in && GET_CODE (in) == REG)
++    {
++      sprintf (b, "reg%d", REGNO (in));
++      return b;
++    }
++  return "-";
++}
+ 
+ static int
+ allocate_reload_reg (chain, r, last_reload, noerror)
+@@ -5066,6 +5170,27 @@
       reloads A and B can share regs.  These need two regs.
       Suppose A and B are given different regs.
       That leaves none for C.  */
 +  {
 +    int d = agbcc_spill_shift (agbcc_reload_count);
++    if (getenv ("AGBCC_SPILL_LABEL"))
++      {
++	int li = agbcc_lab_index (agbcc_reload_label (r));
++	static int done_li = -1, done_n = -1;
++	if (li >= 0 && ! (done_li == li && done_n == agbcc_lab_count[li]))
++	  {
++	    int dl = agbcc_label_shift (agbcc_lab_name[li], agbcc_lab_count[li]);
++	    if (dl)
++	      {
++		d += dl;
++		done_li = li;
++		done_n = agbcc_lab_count[li];
++	      }
++	  }
++      }
 +    if (d && n_spills)
 +      last_spill_reg = ((last_spill_reg + d) % n_spills + n_spills) % n_spills;
 +    agbcc_reload_count++;
@@ -409,10 +567,15 @@
    for (pass = 0; pass < 2; pass++)
      {
        /* I is the index in spill_regs.
-@@ -5203,6 +5237,34 @@
+@@ -5203,6 +5328,28 @@
  
  	    reload_reg_rtx[r] = new;
  	    reload_spill_index[r] = spill_regs[i];
++	    {
++	      int li = agbcc_lab_index (agbcc_reload_label (r));
++	      if (li >= 0)
++		agbcc_lab_count[li]++;
++	    }
 +	    if (agbcc_dump)
 +	      {
 +		rtx p = insn;
@@ -425,21 +588,10 @@
 +		      file = NOTE_SOURCE_FILE (p);
 +		      break;
 +		    }
-+		rtx in = reload_in[r];
-+		char *v;
-+		if (in && GET_CODE (in) == REG && REGNO (in) >= FIRST_PSEUDO_REGISTER
-+		    && reg_equiv_constant && reg_equiv_constant[REGNO (in)])
-+		  in = reg_equiv_constant[REGNO (in)];
-+		v = agbcc_const_label (in);
-+		if (! v && in && GET_CODE (in) == REG)
-+		  {
-+		    static char b[32];
-+		    sprintf (b, "reg%d", REGNO (in));
-+		    v = b;
-+		  }
++		char *v = agbcc_reload_label (r);
 +		fprintf (agbcc_dump, "R %s %d %d %d %d %s %s\n", current_function_name,
 +			 agbcc_reload_count - 1, INSN_UID (insn), spill_regs[i], line, file,
-+			 v ? v : "-");
++			 v);
 +	      }
  	    return 1;
  	  }
