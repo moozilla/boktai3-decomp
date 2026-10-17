@@ -1,9 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#ifdef NONMATCHING
-// fuzzy: 96.0%
-// Open: agbcc keeps model E00E in sb for both calls; the original loads it
-// from the pool each time.
 struct PackedVec {
     u32 x : 16;
     u32 y : 16;
@@ -125,6 +121,9 @@ static inline void setBox(struct SceneNpc *npc, s32 width, s32 height)
    behavior -i (0, 1, 2, 4, 8) as in SceneNpc_CreateFromScript. */
 void TaggedSceneNpc_Create(u32 tag)
 {
+    // The model id as one local for both calls; with the literal in each call
+    // agbcc kept it in sb (found by tools/translate.py).
+    s32 model = 0xE00E;
     void (*updates[2])(void);
     u8 mode;
     void *manager = gUnk_02000480;
@@ -155,7 +154,7 @@ void TaggedSceneNpc_Create(u32 tag)
         return;
     if (sub_0802D728(npc, name, &position, angle) < 0)
         return;
-    if (sub_0802D760(npc, 2, 0xE00E, 0, zero) < 0)
+    if (sub_0802D760(npc, 2, model, 0, zero) < 0)
         return;
     {
         struct Tagged *t = &npc->tagged;
@@ -201,7 +200,7 @@ void TaggedSceneNpc_Create(u32 tag)
     setHandler(sub_081D2A1C, &npc->callbacks[3]);
     setHandler(sub_081D2A28, &npc->callbacks[4]);
     npc->field1B = angle;
-    sub_0802D614(manager, npc, 0xE00E, 0);
+    sub_0802D614(manager, npc, model, 0);
     sub_0802D654(manager, npc);
     sub_0802E698(manager, npc);
     switch (Script_GetKeywordValue('i', 0)) {
@@ -297,6 +296,3 @@ void TaggedSceneNpc_Create(u32 tag)
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", TaggedSceneNpc_Create);
-#endif

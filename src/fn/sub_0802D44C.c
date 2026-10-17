@@ -57,10 +57,8 @@ static inline void hitbox(struct Object *p, struct Vec *size, void *fn, struct V
 {
     sub_0802CA1C(p, size, offset, fn);
 }
-#ifdef NONMATCHING
-// fuzzy: 96.5%
-// Scene actor initializer: 5 bytes differ, all register allocation around the
-// zero shared by the state/action setters.
+// Scene actor initializer. Matches without register hints: the draft's pins
+// and barriers were what made it differ.
 int sub_0802D44C(struct Object *p)
 {
     struct Vec size, offset, size2, offset2;
@@ -68,8 +66,7 @@ int sub_0802D44C(struct Object *p)
     sub_0802CD04(p);
     DisplayAnimation_InitializeSequence(&p->drawable, 0xd495, 0xaf44, 0, &p->pos);
     {
-        register int initialZero asm("r2") = 0;
-        asm("" : "+r"(initialZero));
+        int initialZero = 0;
         zero = initialZero;
         sub_0802D080(p, 1, initialZero, 1, initialZero, initialZero);
     }
@@ -77,7 +74,6 @@ int sub_0802D44C(struct Object *p)
         u32 mask = 2;
         p->flags |= mask;
     }
-    asm("" : "+r"(zero) : : "r9");
     size.x = 32;
     size.y = 128;
     size.z = 32;
@@ -100,6 +96,3 @@ int sub_0802D44C(struct Object *p)
     action(p, sub_0802D218, zero, 1);
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0802D44C);
-#endif

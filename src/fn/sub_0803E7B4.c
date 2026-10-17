@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
-#ifdef NONMATCHING
-// fuzzy: 99.1%
 void ScenePool_UpdateSpeedPulse(struct ScenePoolActor *, struct ScenePoolEntry *,
                                 const struct ScenePoolSpeedBounds *);
 extern const struct ScenePoolSpeedBounds gUnk_086058A0[];
@@ -109,7 +107,7 @@ afterCheck:
         {
             u32 offset = next << 1;
             register const u8 *table asm("r3");
-            table = (const u8 *)gUnk_0203B400;
+            table = (const u8 *)RANDOM_TABLE_ADDR;
             random = *(const u8 *)(offset + (u32)table);
         }
         {
@@ -157,6 +155,3 @@ done:
     return 0;
 }
 
-#else
-INCLUDE_ASM("asm/nonmatching", ScenePool_StateLaunchShortArc);
-#endif
