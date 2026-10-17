@@ -104,6 +104,47 @@ whose hash comes from a table or a script option (`FloorSwitch` `T=`) are
 only in the runtime log. Palette swaps mark states too: the floor switch
 selects `0x16C`/`0x16D` (pressed and released).
 
+**Tracing every palette call** (`tools/assets/paltrace.py`). There are 419
+`AnimData_SelectPaletteBank` calls; 254 pass a constant. The rest compute
+the entry, and the tracer follows the computation through code and ROM data:
+
+* a value a caller passes, in registers or on the stack, symbolically, so a
+  descriptor pointer becomes a ROM address whose fields are read;
+* a structure a caller builds in its own stack frame (directly, or through a
+  setter such as `sub_0821FF7C(&desc, ...)`, whose stores through its
+  pointer argument are applied at the call) and passes to a loader;
+* a ROM table, indexed by a caller's constant, or every entry while the
+  entry's hash names a sprite;
+* an actor field: the values that the code of the same script entry point
+  (the registry routine or command and everything it calls or installs from
+  code and ROM callback tables, not following helpers shared by many entry
+  points) stores at that offset of an object reached the same way (an
+  incoming pointer or a new object, or a pointer read from a field);
+* a script option (`Script_GetKeywordValue`, or an inline
+  `Script_SeekToKeyword` + `Script_GetValue`, values in order, any value
+  when read in a loop), with options read together paired per script call
+  (`08055268` takes its sprite from `-t` and its palette from `-c`);
+* a name hash (`sub_08219BD8`, the 16-bit hash of a ROM string).
+
+The sprite is the load on the same anim, else the function's last load,
+else the family's load on an anim at the same offset (or its only sprite).
+Entries are often arithmetic on such values: the `0BA8` family is
+`160 + 3 * (d / 2)` (+1, +2) from `-d`. 303 calls resolve; the others need
+game state, RAM lists (named objects at `0x02000494`) or script values the
+GCL computes. `paltrace.py check` compares with the runtime logs: at every
+traced call, every pair the game used is traced except at a few calls, and
+none contradicts it; of the functions the survey saw loading sprites
+(`sprite_loads.tsv`, every `AnimData_Load` with its caller), 77 of 85 have
+every sprite traced. Traced pairs the runs never reached are variants such as Ghoul+
+405, Mummy+ 36-39 and the 402 damage flash on more enemies. `paltrace.py
+closure` lists the sprites whose palettes are all accounted for (every
+family that loads them has every palette call resolved): 108, 34 of them
+default only. The others are loaded by code whose sprite or palette is
+still open, or by nothing found yet: 171 sprites are neither traced to a
+load nor loaded in any scene of the survey (bosses, events and menus it
+doesn't reach, or unused). `bigpalettes.py write` adds traced variants as `trace FUNC`.
+Evaluations are cached in `build/cache/` (a run takes about 20 s).
+
 **Items, swords and accessories** (`tools/assets/items.py` → `data/items.csv`).
 Their names are text strings at a fixed base plus the ID: items 988 + ID
 (descriptions 1043 + ID; valuables such as the Dark Card are items 0x27 and
@@ -164,7 +205,16 @@ screen backgrounds are raw maps with their own tiles and several named layers.
 u32 tile pool` at `+0x0C`. A table record is `u16 id, u16 tile count, u32
 offset` into the index lists; each index selects a 4bpp tile in the pool of
 49,638 tiles. A stage's tiles are its tileset's tiles in order, copied to the
-start of the BG character block.
+start of the BG character block. The pool was built tileset by tileset in table
+order: each tileset appends the tiles no earlier tileset had, as one
+contiguous run (4 of the 263 add none), so the library splits into per-tileset
+index lists and tile runs. `tools/assets/tilesets.py list | show ID | json`
+gives each tileset's runs, users (stages, scenes, areas), palette (named by
+its scenes with `proc_888`, else matched in a capture, else guessed from the
+nearest tileset in table order) and per-tile palette bank (from the stage
+maps' metatiles); it also lists the 43 maps that carry their own tiles. The
+studio's Tiles view (`/gfx#tiles`) draws them, with the sprite packages' and
+large sprites' OBJ tiles.
 
 **Stages.** The scripts load a stage with `proc_884(map, tileset, hp)`, which
 calls into the `map` command and creates the `Background_CreateFromScript`

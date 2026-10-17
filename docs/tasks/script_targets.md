@@ -6,9 +6,9 @@ handlers; their callees are found through `bl` calls and Thumb function pointers
 
 | Set | Functions | Bytes | Share of code | Matched |
 |---|---:|---:|---:|---:|
-| Entry points | 738 | 84,436 | 3.5% | 81.3% |
-| Entry points and their direct callees | 1422 | 290,160 | 12.0% | 43.2% |
-| Everything reachable from scripts | 3136 | 535,198 | 22.2% | 47.3% |
+| Entry points | 738 | 84,436 | 3.5% | 83.0% |
+| Entry points and their direct callees | 1422 | 290,160 | 12.0% | 44.4% |
+| Everything reachable from scripts | 3136 | 535,198 | 22.2% | 47.9% |
 
 ## Unmatched entry points, by script uses (16 used, 9,880 bytes)
 
@@ -39,7 +39,6 @@ handlers; their callees are found through `bl` calls and Thumb function pointers
 | 8 | `08248598` | 4 | `Div` |
 | 7 | `0824859C` | 8 | `Mod` |
 | 5 | `08248594` | 4 | `CpuSet` |
-| 3 | `081081F0` | 84 | `Pool1B8_FindByName` |
 | 3 | `08216E54` | 292 | `sub_08216E54` |
 | 2 | `082215E4` | 276 | `Math_Atan2` |
 | 2 | `0821E5C4` | 84 | `Route_Start` |

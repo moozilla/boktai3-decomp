@@ -4,8 +4,9 @@ the game font, then build a modified ROM; browse sprites, palettes, the font and
 raw tiles from the resource archives (/gfx); and a live view of the game
 running in mGBA with tools/mgba/centaur.lua (/live, link on port 8643); the
 script actor registry (/actors), script procedures (/scripts), how the rooms
-connect (/world, tools/assets/areas.py) and any function's disassembly and C
-(/code), from tools/assets/actors.py.
+connect (/world, tools/assets/areas.py), any function's disassembly and C
+(/code), from tools/assets/actors.py, and every MP2K song, playable in the
+browser (/sound, tools/studio/sound.py and mp2k.js).
 
   python3 tools/studio/serve.py [--port 8642] [--link-port 8643]    then open http://localhost:8642
 
@@ -95,22 +96,9 @@ def guide_entries(trans):
 
 
 def stages():
-    """Stage loads in the scripts: proc_884(map, tileset, hp) (or proc_885, or the
-    loader both wrap, proc_876) -> the procedures using them."""
-    out = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "assets", "gcx.py"), "dis"],
-                         cwd=ROOT, capture_output=True, text=True).stdout
-    found, proc = {}, None
-    for ln in out.split("\n"):
-        if ln.startswith("proc "):
-            proc = int(ln.split()[1])
-            continue
-        f = ln.split()
-        if (f and f[0] in ("proc_884", "proc_885", "proc_876") and len(f) >= 4
-                and all(x.startswith("0x") for x in f[1:4])):
-            key = tuple(int(x, 16) for x in f[1:4])
-            found.setdefault(key, []).append(proc)
-    return [{"map": f"{m:04X}", "tileset": f"{t:04X}", "hp": f"{h:04X}", "procs": ps}
-            for (m, t, h), ps in sorted(found.items())]
+    """Stage loads in the scripts (tools/assets/tilesets.py)."""
+    import tilesets
+    return tilesets.script_stages()
 
 
 STAGEMETA = os.path.join(ROOT, "build", "assets", "stages.json")
@@ -286,6 +274,23 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, open(os.path.join(HERE, "gfx.html"), "rb").read(), "text/html; charset=utf-8")
         elif self.path in ("/live", "/live.html"):
             self.send(200, open(os.path.join(HERE, "live.html"), "rb").read(), "text/html; charset=utf-8")
+        elif self.path in ("/atlas", "/atlas.html"):
+            self.send(200, open(os.path.join(HERE, "atlas.html"), "rb").read(), "text/html; charset=utf-8")
+        elif self.path == "/api/atlas":
+            import atlas
+            ix = atlas.load()
+            self.send(200, {"tree": ix["tree"], "entities": ix["entities"]})
+        elif self.path in ("/rom", "/rom.html"):
+            self.send(200, open(os.path.join(HERE, "rom.html"), "rb").read(), "text/html; charset=utf-8")
+        elif self.path == "/api/rommap":
+            import atlas
+            self.send(200, atlas.rom_load())
+        elif self.path == "/api/romtree":
+            import atlas
+            self.send(200, atlas.rom_tree())
+        elif self.path == "/api/atlas/funcs":
+            import atlas
+            self.send(200, atlas.load()["funcs"])
         elif self.path in ("/actors", "/scripts", "/code", "/world"):
             self.send(200, open(os.path.join(HERE, self.path[1:] + ".html"), "rb").read(), "text/html; charset=utf-8")
         elif self.path == "/api/actors":
@@ -306,8 +311,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, {"files": gclfiles.files()})
         elif self.path.startswith("/api/file/"):
             import gclfiles
-            fid, *opts = self.path[len("/api/file/"):].split("/")  # /api/file/ID[/inline][/raw]
-            lines = gclfiles.render(fid, inline="inline" in opts, readable="raw" not in opts)
+            fid, *opts = self.path[len("/api/file/"):].split("/")  # /api/file/ID[/inline][/raw][/en]
+            if "en" in opts:
+                import gclview
+                gclview.ENGLISH = self.server.display_en
+            lines = gclfiles.render(fid, inline="inline" in opts, readable="raw" not in opts, english="en" in opts)
             self.send(200 if lines is not None else 404,
                       {"lines": lines, "inlined": sorted(gclfiles.inlinable(fid))} if lines is not None else {"error": "no such file"})
         elif self.path.startswith("/api/code/"):
@@ -328,7 +336,21 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 self.send(404, {"error": "not found"})
         elif self.path == "/api/display":
             self.send(200, {"jp": self.server.display_jp, "en": self.server.display_en})
-        elif self.path in ("/static/common.js", "/static/common.css", "/static/inspector.js"):
+        elif self.path in ("/sound", "/sound.html"):
+            self.send(200, open(os.path.join(HERE, "sound.html"), "rb").read(), "text/html; charset=utf-8")
+        elif self.path == "/api/sound":
+            import sound
+            self.send(200, sound.load())
+        elif self.path.startswith(("/api/sound/song/", "/api/sound/vg/", "/api/sound/sample/")):
+            import sound  # /api/sound/song/N, /api/sound/vg/ADDR, /api/sound/sample/ADDR
+            what, arg = self.path.split("/")[3:5]
+            try:
+                d = {"song": lambda: sound.song_data(int(arg)), "vg": lambda: sound.voicegroup_data(int(arg, 16)),
+                     "sample": lambda: sound.sample_data(int(arg, 16))}[what]()
+            except ValueError:
+                d = None
+            self.send(200 if d else 404, d or {"error": "no such " + what})
+        elif self.path in ("/static/common.js", "/static/common.css", "/static/inspector.js", "/static/mp2k.js"):
             ctype = "text/javascript" if self.path.endswith(".js") else "text/css"
             self.send(200, open(os.path.join(HERE, os.path.basename(self.path)), "rb").read(), ctype + "; charset=utf-8")
         elif self.path == "/api/notes":
@@ -360,6 +382,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             import bigpalettes  # large sprites: default from the data, variants the game selects
             self.send(200, {"stages": live.stage_palettes(), "sprites": live.sprite_palettes(),
                             "bigpools": {f"{h:04X}": bigpalettes.variants(h) for h in bigpalettes.defaults()},
+                            "bigsources": {f"{h:04X}": {str(p): src for p, src in t["variants"].items()} for h, t in bigpalettes.table().items()},
                             "poolfuncs": {p: [[f, actors.fname(int(f[4:], 16)) if f.startswith("sub_") else f] for f in fs]
                                           for p, fs in bigpalettes.code_selections().items()}})
         elif self.path == "/api/tags":
@@ -368,6 +391,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, stages())
         elif self.path == "/api/areas":
             self.send(200, world())
+        elif self.path == "/api/tilesets":
+            import tilesets
+            self.send(200, tilesets.load())
         elif self.path == "/api/stagemeta":
             self.send(200, stage_meta(), "application/json")
         elif self.path.startswith("/api/hp/"):

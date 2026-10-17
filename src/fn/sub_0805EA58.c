@@ -6,7 +6,7 @@ void SceneInputPanel_InitBackground(struct SceneInputPanel *panel, s32 unused, u
     panel->backgroundResource = ScriptProc_Start(0xC091, 0xA597);
     zero = 0;
     Bg_SetupLayers(0, 0, panel->backgroundResource, 0, 0, 1, &zero);
-    sub_082164AC(0, panel->backgroundResource, 12);
+    Bg_SetLayerMap(0, panel->backgroundResource, 12);
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     panel->labelResource = (const u8 *)ScriptProc_Start(0x92B3, 0x81B) + 0x1B4;
     CpuSet(panel->labelResource, gUnk_03005160, 0x04000018);

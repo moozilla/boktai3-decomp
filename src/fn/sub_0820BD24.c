@@ -9,7 +9,7 @@ struct Message {
 };
 extern u8 *gUnk_02000710;
 void Script_Call(u32, struct Message *);
-void sub_081D5204(s32);
+void GameState_SetEventFlag(s32);
 void sub_08159164(s32);
 #define H(p, n) (*(s16 *)((p) + (n)))
 #define W(p, n) (*(u32 *)((p) + (n)))
@@ -40,7 +40,7 @@ void sub_0820BD24(u8 *p)
         m.args = &a;
         Script_Call(q, &m);
     }
-    sub_081D5204(33);
+    GameState_SetEventFlag(33);
     if (W(p, 0x200) & 1) {
         u16 flags;
         sub_08159164(H(p, 0x1F0));

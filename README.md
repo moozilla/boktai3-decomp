@@ -85,6 +85,24 @@ in [CLAUDE.md](CLAUDE.md) and [docs/WORKER.md](docs/WORKER.md).
 python3 tools/studio/serve.py    # http://localhost:8642
 ```
 
+**Browse** (`/atlas`) is the way in: everything in the game as one tree
+(characters, the monster list in the game's order, objects, places in story
+order, items, scripts, script commands, sprites, songs and code by subsystem), each
+with one page of everything known about it: a monster family's species and
+every palette its sprites are drawn in, where it appears, the scripts that
+create it and how much of its code is decompiled. ⌘K searches everything;
+links to the views below open in a side panel with its own history. The index
+is built by `tools/studio/atlas.py`. Groups come from the game and the code, not
+from hand-made categories: the Cast is the game's character list plus every
+speaker of dialogue in the scripts (with their lines and scenes), the Bestiary
+the game's monster list, Objects and Script routines the registry entries by
+the code subsystem their callback is in. An object's page lists its own
+sprites and palettes, the sprite packages, maps, tilesets and animations its
+code looks up (`sub_0821A520(type, hash)`), and the scenes whose own scripts
+place it; a scene opened from there marks it on the map. **ROM** (`/rom`) is
+the ROM as a treemap in address order, colored by kind or by how well each
+byte is understood.
+
 | | |
 |---|---|
 | ![Text](docs/img/studio-text.png) | **Text**: every string with the fan translation, previewed in the game font at the game's line width; *Build mod ROM* writes a playable ROM. |
@@ -94,7 +112,10 @@ python3 tools/studio/serve.py    # http://localhost:8642
 | ![Actors](docs/img/studio-actors.png) | **Actors**: every object a script can create, with its GCL name, code, sprites and scenes. |
 | ![Screen inspector](docs/img/studio-captures.png) | **Screen inspector** (Live and Captures): every sprite, text box, layer and palette on screen, matched to its resource. Live mode connects to mGBA through [Centaur](docs/CENTAUR.md). |
 
-Also: palette, font and tile viewers.
+Also: palette, font and tile viewers, and **Sound** (`/sound`): every song in
+the song table with its tracks, voices and the scripts, scenes and code that
+start it, played in the browser by a small MP2K player (`tools/studio/mp2k.js`)
+from the ROM's own sequence and sample data.
 
 ## Layout
 
