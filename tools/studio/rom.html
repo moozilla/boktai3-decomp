@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boktai 3 ROM</title>
+<link rel="stylesheet" href="/static/common.css">
+<style>
+:root {
+  --bg: #f6f3ec; --panel: #fffdf8; --ink: #2b2620; --muted: #7d7468; --line: #e3dccf; --accent: #b5462f; --sel: #f3e3d6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #1b1916; --panel: #24211d; --ink: #ece6dc; --muted: #9a9083; --line: #3a352e; --accent: #e0745a; --sel: #3a2c25; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 13px/1.45 system-ui, -apple-system, sans-serif; }
+a { color: var(--accent); text-decoration: none; }
+main { display: grid; grid-template-columns: auto 1fr; gap: 0; height: calc(100vh - 53px); }
+#left { padding: 12px 14px; overflow: auto; border-right: 1px solid var(--line); }
+#right { overflow: auto; padding: 12px 18px 40px; min-width: 0; }
+canvas { display: block; image-rendering: pixelated; cursor: crosshair; }
+.axis { font: 10.5px ui-monospace, Menlo, monospace; color: var(--muted); }
+#tip { position: fixed; pointer-events: none; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; font-size: 12px; box-shadow: 0 6px 20px rgba(0,0,0,.2); display: none; z-index: 40; max-width: 420px; }
+#tip .mono { font: 11.5px ui-monospace, Menlo, monospace; color: var(--muted); }
+.legend { display: grid; grid-template-columns: 14px 1fr auto auto; gap: 3px 8px; align-items: center; font-size: 12px; max-width: 520px; }
+#labels .lb { position: absolute; left: 0; font-size: 11px; line-height: 1.15; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 190px; border-left: 2px solid; padding-left: 5px; cursor: pointer; }
+#labels .lb:hover { color: var(--ink); }
+.legend i { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
+.legend .n { color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+h2 { font-size: 15px; margin: 0 0 2px; }
+h3 { font-size: 11.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 18px 0 8px; font-weight: 650; }
+.mono { font-family: ui-monospace, Menlo, monospace; }
+table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+td, th { padding: 2px 10px 2px 0; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { color: var(--muted); font-weight: 500; }
+td.l { white-space: normal; }
+.sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; vertical-align: -1px; }
+.bar { display: flex; height: 18px; border-radius: 4px; overflow: hidden; margin: 8px 0 2px; }
+.bar > span { height: 100%; }
+.nav { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+button { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 3px 9px; cursor: pointer; }
+</style>
+</head>
+<body>
+<header id="top"></header>
+<main>
+  <section id="left"><div class="legend" id="legend"></div><div class="axis" id="ax" style="margin:12px 0 4px"></div><div id="wrap" style="position:relative;display:flex;gap:8px"><canvas id="all"></canvas><div id="labels" style="position:relative;width:190px"></div></div></section>
+  <section id="right"><div id="detail"></div></section>
+</main>
+<div id="tip"></div>
+<script src="/static/common.js"></script>
+<script>
+// The ROM in address order (tools/studio/atlas.py rom_segments): the
+// regions of docs/ROM_MAP.md, every function (decompiled or not) and every
+// archive resource. Left: the whole 16 MB, 16 KB a row. Right: the range
+// you click, 256 bytes a row, with everything in it.
+studioHeader();
+const COLORS = {
+  code: '#3f9a63', asm: '#8a6d3b', sound: '#8e5bb5', graphics: '#3f7fbf', sprite: '#4aa3d9', map: '#2f6aa8', tiles: '#5b8fc9',
+  palette: '#d0628f', font: '#c9a227', text: '#e07a3b', script: '#d4b53a', animation: '#5fb8b0', collision: '#7a8f99',
+  data: '#6e665c', free: '#2a2622',
+};
+const NAMES = { code: 'code, decompiled', asm: 'code, assembly only', sound: 'sound (MP2K)', graphics: 'graphics', sprite: 'sprites', map: 'maps',
+  tiles: 'tilesets', palette: 'palettes', font: 'fonts', text: 'text', script: 'scripts (GCL)', animation: 'animation', collision: 'collision (HP)', data: 'other data', free: 'free space' };
+let R = null;
+const W = 256, ROW = 16384, BASE = 0x08000000;      // overview: 64 bytes a pixel, 16 KB a row
+const DW = 512, DROW = 256;                          // detail: 0.5 bytes... 256 bytes a row, 2 px a byte pair
+let detailAt = null;
+
+function kindAt(a) {
+  // finest first: an item covering a, else the innermost region
+  let lo = 0, hi = R.items.length - 1, best = null;
+  while (lo <= hi) { const m = (lo + hi) >> 1; if (R.items[m][0] <= a) { best = m; lo = m + 1; } else hi = m - 1; }
+  for (let i = best; i != null && i >= 0 && i > best - 40; i--) { const it = R.items[i]; if (it[0] <= a && a < it[0] + it[1]) return { item: it }; }
+  let reg = null;
+  for (const r of R.regions) if (r[0] <= a && a < r[1] && (!reg || r[1] - r[0] < reg[1] - reg[0])) reg = r;
+  return { region: reg };
+}
+function paint(cv, start, bytes, width, perRow) {
+  const rows = Math.ceil(bytes / perRow), ctx = cv.getContext('2d');
+  cv.width = width; cv.height = rows;
+  const img = ctx.createImageData(width, rows), per = perRow / width;
+  const rgb = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+  // paint regions, then items over them
+  const fill = (a, b, col) => {
+    const c = rgb(col);
+    let p0 = Math.max(0, Math.floor((a - start) / per)), p1 = Math.min(width * rows, Math.ceil((b - start) / per));
+    for (let p = p0; p < p1; p++) { img.data[p * 4] = c[0]; img.data[p * 4 + 1] = c[1]; img.data[p * 4 + 2] = c[2]; img.data[p * 4 + 3] = 255; }
+  };
+  const end = start + bytes;
+  for (const r of [...R.regions].sort((x, y) => (y[1] - y[0]) - (x[1] - x[0]))) if (r[1] > start && r[0] < end) fill(r[0], r[1], COLORS[r[2]] || COLORS.data);
+  for (const it of R.items) if (it[0] + it[1] > start && it[0] < end) fill(it[0], it[0] + it[1], COLORS[it[2]] || COLORS.data);
+  ctx.putImageData(img, 0, 0);
+}
+function hex(a) { return '0x' + (a >>> 0).toString(16).toUpperCase().padStart(8, '0'); }
+function describe(a) {
+  const k = kindAt(a);
+  if (k.item) return `<b>${esc(k.item[3])}</b> <span class="mono">${hex(k.item[0])} · ${k.item[1].toLocaleString()} B</span><br><span class="sw" style="background:${COLORS[k.item[2]]}"></span> ${esc(NAMES[k.item[2]] || k.item[2])}`;
+  if (k.region) return `<b>${esc(k.region[3])}</b><br><span class="mono">${hex(k.region[0])}–${hex(k.region[1])}</span>`;
+  return `<span class="mono">${hex(a)}</span> unmapped`;
+}
+function tipAt(e, a) { const t = $('tip'); t.innerHTML = `<span class="mono">${hex(a)}</span><br>${describe(a)}`; t.style.display = 'block'; t.style.left = (e.clientX + 14) + 'px'; t.style.top = (e.clientY + 12) + 'px'; }
+function addrOf(cv, e, start, width, perRow, scale) {
+  const r = cv.getBoundingClientRect(), x = Math.floor((e.clientX - r.left) / scale), y = Math.floor((e.clientY - r.top) / scale);
+  return start + y * perRow + Math.floor(x * perRow / width);
+}
+const hrefOf = ref => !ref ? null : ref.startsWith('/') ? ref : '/atlas#' + ref;
+
+function overview() {
+  const cv = $('all'), bytes = 0x01000000, scale = 1;
+  paint(cv, BASE, bytes, W, ROW);
+  cv.style.width = W * 2 + 'px'; cv.style.height = cv.height * 2 + 'px';
+  cv.onmousemove = e => tipAt(e, addrOf(cv, e, BASE, W, ROW, 2));
+  cv.onmouseleave = () => { $('tip').style.display = 'none'; };
+  cv.onclick = e => { const a = addrOf(cv, e, BASE, W, ROW, 2); location.hash = hex(a & ~0xFFF); };
+  // totals
+  const tot = {};
+  const add = (k, n) => { tot[k] = (tot[k] || 0) + n; };
+  for (const it of R.items) add(it[2], it[1]);
+  const covered = Object.values(tot).reduce((s, x) => s + x, 0);
+  for (const r of R.regions) if (r[2] === 'free') add('free', r[1] - r[0]);
+  // what the regions hold beyond the items (sound, text, scripts...)
+  for (const k of ['sound', 'text', 'script']) for (const r of R.regions) if (r[2] === k) add(k, r[1] - r[0]);
+  const ks = Object.keys(COLORS).filter(k => tot[k]);
+  $('legend').innerHTML = ks.map(k => `<i style="background:${COLORS[k]}"></i><span>${NAMES[k]}</span><span class="n">${(tot[k] / 1048576).toFixed(2)} MB</span><span class="n">${(100 * tot[k] / 0x01000000).toFixed(1)}%</span>`).join('');
+  $('ax').textContent = 'one row = 16 KB · click to zoom';
+  // region names beside the strip, at the row where each starts
+  // larger regions get their label first; a smaller one only where it fits
+  const taken = [];
+  $('labels').style.height = cv.style.height;
+  $('labels').innerHTML = [...R.regions].sort((x, y) => (y[1] - y[0]) - (x[1] - x[0])).map(r => {
+    const y = Math.floor((r[0] - BASE) / ROW) * 2;
+    if (taken.some(t => Math.abs(t - y) < 13)) return '';
+    taken.push(y);
+    return `<div class="lb" style="top:${y}px;border-color:${COLORS[r[2]]}" data-a="${r[0]}" title="${esc(r[3])}">${esc(r[3].split(/[(:;,]/)[0])}</div>`;
+  }).join('');
+  $('labels').onclick = e => { const l = e.target.closest('.lb'); if (l) location.hash = hex(+l.dataset.a); };
+}
+function detail(a) {
+  const start = Math.max(BASE, a - (a - BASE) % DROW - 64 * DROW), bytes = 192 * DROW, end = start + bytes;
+  detailAt = start;
+  const its = R.items.filter(it => it[0] + it[1] > start && it[0] < end);
+  const regs = R.regions.filter(r => r[1] > start && r[0] < end);
+  const share = {}; for (const it of its) share[it[2]] = (share[it[2]] || 0) + Math.min(end, it[0] + it[1]) - Math.max(start, it[0]);
+  $('detail').innerHTML = `<div class="nav"><button id="up">‹ ${hex(Math.max(BASE, start - bytes))}</button><h2 class="mono">${hex(start)} – ${hex(end)}</h2><button id="dn">${hex(end)} ›</button></div>
+    <div class="muted">${regs.map(r => esc(r[3])).join(' · ')}</div>
+    <div class="bar">${Object.entries(share).map(([k, n]) => `<span title="${esc(NAMES[k] || k)}" style="background:${COLORS[k]};width:${100 * n / bytes}%"></span>`).join('')}</div>
+    <canvas id="zoom"></canvas><div class="axis">one row = 256 bytes</div>
+    <h3>In this range <span>${its.length}</span></h3>
+    <table><tr><th>Address</th><th>Size</th><th>Kind</th><th>What</th></tr>${its.slice(0, 800).map(it => {
+      const h = hrefOf(it[4]);
+      return `<tr><td class="mono">${hex(it[0])}</td><td>${it[1].toLocaleString()}</td><td><span class="sw" style="background:${COLORS[it[2]]}"></span> ${esc(NAMES[it[2]] || it[2])}</td><td class="l">${h ? `<a href="${h}"${h.startsWith('/atlas') ? '' : ' data-peek'}>${esc(it[3])}</a>` : esc(it[3])}</td></tr>`;
+    }).join('')}</table>`;
+  const cv = $('zoom');
+  paint(cv, start, bytes, DW / 2, DROW);
+  cv.style.width = DW + 'px'; cv.style.height = cv.height * 2 + 'px';
+  cv.onmousemove = e => tipAt(e, addrOf(cv, e, start, DW / 2, DROW, 2));
+  cv.onmouseleave = () => { $('tip').style.display = 'none'; };
+  cv.onclick = e => {
+    const k = kindAt(addrOf(cv, e, start, DW / 2, DROW, 2)), h = k.item && hrefOf(k.item[4]);
+    if (h) h.startsWith('/atlas') ? (location.href = h) : peek(h);
+  };
+  $('up').onclick = () => { location.hash = hex(Math.max(BASE, start - bytes) + 64 * DROW); };
+  $('dn').onclick = () => { location.hash = hex(end + 64 * DROW); };
+}
+function route() { const m = location.hash.match(/0x([0-9A-Fa-f]{8})/); detail(m ? parseInt(m[1], 16) : 0x0800145C + 64 * DROW); }
+(async () => {
+  R = await fetch('/api/rommap').then(r => r.json());
+  overview(); window.onhashchange = route; route();
+})();
+</script>
+</body>
+</html>

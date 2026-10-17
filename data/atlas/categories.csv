@@ -6,12 +6,9 @@ pattern,path
 # Entries linked to the game's monster list go under Monsters, and script
 # commands (FromScript, Get/Set/Test routines) under Script commands,
 # before these rows apply.
-^(Player|Player_)(?![a-z]),Characters/Player
-^(SceneNpc|TaggedSceneNpc|SceneCharacter)(?![a-z]),Characters/People
-^ScriptActor\b,Characters/Scripted actors
-^(Dragon Puppy|DragonPuppy)(?![a-z]),Characters/Companions
+^(Player|Player_|Gun Del Hell|GunDelHell)(?![a-z]),Characters
+^(SceneNpc|TaggedSceneNpc|SceneCharacter|ScriptActor)(?![a-z]),Engine/Character objects
 ^(Vanargand|Hresvelgr|Nidhoggr|Ratatosk|BossSlot|BlackKnight|Count)(?![a-z]),Monsters/Bosses
-^(Gun Del Hell|GunDelHell)(?![a-z]),Player gear
 ^(FloorSwitch|HitSwitch|KeyTrigger|Trigger|SceneRangeWatch|InteractionMarker|ProximityIcon)(?![a-z]),Objects/Switches and triggers
 ^(Breakable|BreakableProp|Wooden Crate|WoodenCrate|Coffin)(?![a-z]),Objects/Crates and breakables
 ^(CellGate|Warp Circle|StackedActor|SavedPositionMarker)(?![a-z]),Objects/Gates and warps
