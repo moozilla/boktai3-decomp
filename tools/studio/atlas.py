@@ -53,7 +53,7 @@ INPUTS = ["data/actor_registry.csv", "data/items.csv", "data/notes.csv",
           "gcl/names/files.csv", "symbols/functions.csv", "tools/studio/atlas.py", "tools/assets/actors.py",
           "tools/assets/tilesets.py", "data/stage_palettes.csv", "tools/studio/sound.py", "tools/m4a.py",
           "tools/assets/cutscenes.py", "tools/mgba/scenes.py", "tools/assets/gclfiles.py",
-          "tools/assets/areas.py", "tools/assets/stages.py"]
+          "tools/assets/areas.py", "tools/assets/stages.py", "tools/assets/story.py"]
 # the monster list's bosses: 黒騎士 and ニーズホッグ (9902-9903), then 伯爵 on (9915-)
 BOSSES = {9902, 9903} | set(range(9915, 9922))
 
@@ -650,12 +650,12 @@ def build():
     for n, steps in enumerate(cutscenes.table()):
         if not steps:
             continue
-        st = starts[n][0] if starts[n] else None
-        _, rows = cutscenes.timeline(n, st)
+        start = starts[n][0] if starts[n] else None
+        _, rows = cutscenes.timeline(n, start)
         said = [m for _, row in rows for m in row if "text" in m]
         cast = sorted({m["to"] for _, row in rows for m in row if m["kind"] != 1} - {"audio", "screen", "camera"})
         bgm = [m["args"][0] for _, row in rows for m in row if m["kind"] == 8 and m["cmd"] in ("start_bgm", "start_song") and m["args"]]
-        fid = fof.get(st["proc"]) if st else None
+        fid = fof.get(start["proc"]) if start else None
         f = fkind.get(fid) if fid else None
         sc = E.get(f"scene:{f['entry']}") if f and f.get("entry") is not None else None
         ar = E.get(sc["area"]) if sc else None
@@ -665,7 +665,7 @@ def build():
         path = "Cutscenes/" + (ar["location"] if ar else "No area")
         node_rank[path] = min(node_rank.get(path, 999), node_rank.get("Places/" + ar["location"], 900) if ar else 999)
         e = add(f"cut:{n}", path, kind="cut", key=str(n), order=n, title=title, steps=len(steps),
-                messages=sum(len(s_) for s_ in steps), start=st, starters=[s_["proc"] for s_ in starts[n]],
+                messages=sum(len(s_) for s_ in steps), start=start, starters=[s_["proc"] for s_ in starts[n]],
                 file=f"file:{fid}" if fid else None, scene=sc["id"] if sc else None, area=sc["area"] if sc else None,
                 cast=cast, lines=len(said), speakers=sorted({speaker_of[m["text"]] for m in said if m["text"] in speaker_of}),
                 speaker_of={str(m["text"]): speaker_of[m["text"]] for m in said if m["text"] in speaker_of},
@@ -676,6 +676,43 @@ def build():
             E[f"file:{fid}"].setdefault("cutscenes", []).append(e["id"])
         for c in e["speakers"]:
             E[c].setdefault("cutscenes", []).append(e["id"])
+
+    # ---- the main quest: story progress values (tools/assets/story.py) ----
+    import story
+    stage_doors = collections.defaultdict(list)  # value -> doors whose condition tests it
+    for sd in areas.load_stages():
+        sid = sd["scene"]
+        for d in sd.get("doors", []):
+            for c in d.get("cond", []):
+                for m in re.finditer(r"progress\)? ?(<|<=|==|>=|>|!=) ?(\d+)", c):
+                    stage_doors[int(m.group(2))].append({"from": f"scene:{sid}", "to": f"scene:{d['scene']}", "entrance": d.get("entrance"), "cond": c})
+    prev_loc = "Before the quest"
+    for b in story.beats():
+        v = b["value"]
+        s0 = next((s_ for s_ in b["setters"] if s_["scene"] is not None), b["setters"][0] if b["setters"] else None)
+        sc = E.get(f"scene:{s0['scene']}") if s0 and s0["scene"] is not None else None
+        ar = E.get(sc["area"]) if sc else None
+        # a one-room story scene with no label of its own (a boss room, a
+        # story event) belongs to the chapter of the beat before it
+        loc = ar["location"] if ar and not ar["location"].startswith("Area ") else prev_loc
+        prev_loc = loc
+        cut = E.get(f"cut:{s0['cutscene']}") if s0 and s0["cutscene"] is not None else None
+        line = clean(re.sub(r'^[^:"「]{1,24}:\s*', "", en.get(s0["text"], ""))).strip().strip('"').split("\n")[0] if s0 and s0.get("text") is not None else ""
+        what = line[:48] + ("…" if len(line) > 48 else "") if line else (sc["title"] if sc else (f"set by {s0['file']}" if s0 else "never set"))
+        path = "Story/" + loc
+        node_rank[path] = min(node_rank.get(path, 999), v)
+        add(f"beat:{v}", path, kind="beat", key=str(v), order=v, title=f"{v} · {what}",
+            setters=[{"proc": s_["proc"], "name": procnames.get(s_["proc"], ""), "file": f"file:{s_['file']}" if s_["file"] else None,
+                      "scene": f"scene:{s_['scene']}" if s_["scene"] is not None and f"scene:{s_['scene']}" in E else None,
+                      "cutscene": f"cut:{s_['cutscene']}" if s_["cutscene"] is not None else None, "text": s_["text"]} for s_ in b["setters"]],
+            scene=sc["id"] if sc else None, area=sc["area"] if sc else None, cutscene=cut["id"] if cut else None,
+            doors=stage_doors.get(v, []),
+            tests=[{"proc": t["proc"], "name": procnames.get(t["proc"], ""), "file": f"file:{t['file']}" if t["file"] else None,
+                    "scene": f"scene:{t['scene']}" if t["scene"] is not None and f"scene:{t['scene']}" in E else None, "test": t["test"]} for t in b["tests"]])
+        if sc is not None:
+            sc.setdefault("beats", []).append(f"beat:{v}")
+        if cut is not None:
+            cut.setdefault("beats", []).append(f"beat:{v}")
 
     # ---- explicit links (data/atlas/links.csv) ----
     for r in csv.DictReader(l for l in open(os.path.join(ROOT, "data", "atlas", "links.csv"), encoding="utf-8") if not l.startswith("#")):
@@ -761,7 +798,7 @@ def build():
     # ---- tree ----
     node_rank.update({"Sprites/Large sprites": 0, "Sprites/Sprite packages": 1, "Tiles/Tilesets": 0, "Tiles/Map tiles": 1,
                       "Tiles/Tilesets/Not loaded by a scene": 1000, "Tiles/Tilesets/Not loaded by a script": 1001})
-    order = ["Cast", "Bestiary", "Items", "Places", "Cutscenes", "Objects", "Script routines", "Scripts", "Sprites", "Tiles", "Sound", "Code"]
+    order = ["Story", "Cast", "Bestiary", "Items", "Places", "Cutscenes", "Objects", "Script routines", "Scripts", "Sprites", "Tiles", "Sound", "Code"]
     root = {}
     for path, ids in tree_items.items():
         node = root
