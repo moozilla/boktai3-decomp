@@ -351,3 +351,25 @@ pinned versions' empty asm barrier reproduces that. 15 permuter minutes found
 nothing; none of 18 type/operand combinations did either. Plugged into the
 A4FC draft it scores 64.5%, about the same as the pinned header, because
 A4FC's differences are elsewhere.
+
+## Batch 11
+
+Four earlier drafts now match (1,016 bytes):
+
+* 0810858C `AnimatedTile_CreateFromScript` (registry 8192, register-pinned).
+  It uses the batch 10 stepper with only the two flip tests in the shared
+  header's barrier form: `first = bit; asm("" : "+r"(first)); first &= flags;`
+  for the first test and the r1-pinned `(u8)` form for the second. `const vu16 *`
+  commands keep the halfword weight read. The rest of the stepper is plain C.
+* 08121268 `RegistryA8CB_CreateFromScript` and 08119EF0
+  `Glove_StartFromScript`: in the active/update/timer block, write
+  `{ update = fn; u8 *active = &e->active; u32 zero = 0; u16 one = 1; ... }`.
+  `one` must be u16 for the later `draw->flags = one | draw->flags` to copy it.
+* 081C4080 `RegistryF3E4_Create`: the state stores past +8 go through a
+  sub-struct pointer (`struct StateInner *in = &p->state.inner`); the
+  original addresses them from that base.
+
+Guarded draft: 082161B4 `Bg_SetupLayers` (88%), the background-layer setup
+for a map resource. Wrapping each DISPCNT OR in an inline `enableBg(bits)`
+took it from 59% to 84%, because it puts the constant first. Separate
+variables for mode 7's three bits gave 88%.
