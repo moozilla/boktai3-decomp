@@ -86,12 +86,12 @@ are low confidence unless the handler is named; the rest print as
 | Kind | Receiver | Registered by | Dispatcher | Commands used | Read so far |
 |---|---|---|---|---|---|
 | 1 | director `4E69` | SceneMessages_Initialize | SceneMessages_Dispatch | 3 | all |
-| 2 | player characters (`F5EB` the player, `2B06` actor_name_of 102) | sub_0815D688 | sub_0815D6B0 (52 cases) | 29 | 2 stand(dir), 3 face(dir), 4 idle, 7 walk_to(x, y, z), 15 move_to, 32 pose, 47–50 overlay on/off |
+| 2 | player characters (`F5EB` the player, `2B06` actor_name_of 102) | sub_0815D688 | PlayerCue_Dispatch (52 cases) | 29 | all handlers matched and named (table below) |
 | 3 | registry actors | SceneActorRegistry_RegisterCategoryReceiver, Armor_Create | | 6 | |
-| 4 | scene actors (Vanargand, Ratatosk...) | SceneActors_Initialize | sub_08022F88 (67 cases, inline) | 43 | |
-| 5 | NPCs (`place_character`) | SceneNpc_CreateFromScript, TaggedSceneNpc_Create | sub_081D01C8 (68 cases) | 62 | the player's shapes: 1 stand, 3 face, 4 walk_to, 25 pose, 26 pose_end |
-| 6 | camera `FF40` | sub_08227478 | sub_08226930 | 4 | 0 reset, 1 snap_to(x, y, z), 2 pan_to(x, y, z, frames), 5 follow_player(frames) |
-| 7 | screen `730A` | sub_08021394 | sub_0802123C | 8 | 0 particles_at, 1 particles_stop, 2 particles_on, 3 fade(out, layers, r, g, b, ...), 4 fade_palette, 5 blend_palette, 6 quake(strength, frames), 7 quake_stop, 8 flash |
+| 4 | scene actors (Vanargand, Ratatosk...) | SceneActors_Initialize | SceneActors_DispatchCommands (67 cases, inline; NONMATCHING draft) | 43 | most set state 2 with a sub-state (0-8, 10-14, 18-24, 66); 2 place(x, y, z), 9 effect, 15/16 graphics variant, 25 flash; 26-65 do nothing here |
+| 5 | NPCs (`place_character`) | SceneNpc_CreateFromScript, TaggedSceneNpc_Create | SceneNpc_DispatchCommands (68 cases; NONMATCHING draft) | 62 | the player's shapes: 1 stand, 3 face, 4 walk_to (speed 10), 5 run_to (speed 20), 25 pose, 26 pose_end, 64 place(x, y, z); 13-16 swap the palette; most others set state 0 with a sub-state |
+| 6 | camera `FF40` | Camera_Initialize | Camera_DispatchCommands | 4 | all matched: 0 reset, 1 snap_to(x, y, z), 2 pan_to(x, y, z, frames), 3 `sub_08226474`(frames), 4 sway(a, b, mode) (guess), 5 follow_player(frames) |
+| 7 | screen `730A` | sub_08021394 | SceneCommands_Dispatch | 8 | all matched: 0 particles_at, 1 particles_stop, 2 particles_on, 3 fade(out, speed, r, g, b, bg, obj, other, 0), 4 fade_palette, 5 blend_palette, 6 quake(strength, frames), 7 quake_stop, 8 flash, 9 done |
 | 8 | audio `D3A9` | SceneAudioEvent_Register | SceneAudioEvent_DispatchPending | 9 | all (named handlers): 0 play_sound, 2 start_bgm, 4 fade_out_bgm, 6/9 channel 12 |
 | 9 | scene panel | ScenePanel_RegisterReceiver | ScenePanel_DispatchCommands | | |
 | 10 | group objects, staged effects, stacked actors | GroupObjects_Initialize and others | | 7 | |
@@ -101,15 +101,58 @@ Character instance names come from `actor_name_of` (proc 1154), a table from
 a character number to a name hash; `cutscenes.py` prints `character N` for
 those not identified on screen yet (1 is Otenko).
 
+### Player commands (kind 2)
+
+Handlers are `PlayerCue_*` (`0815AE94`–`0815C73C`); each sets a motion with
+`sub_0813AFEC(p, motion, variant)` (`+0x457`/`+0x458`) and an update routine
+in `+0x58C`. Directions are 0–7. Names with evidence come from screenshots of
+the prologue (cutscenes 2, 3 and 5, `tests/prologue.txt`); `motionN` names
+only say which motion plays (low confidence).
+
+| Cmd | Name | Args | What it does |
+|---|---|---|---|
+| 0 | hide | | flag bit 0 of `+0x94`; off screen until placed again (cutscene 3) |
+| 1 | place | x, y, z, dir | sets the position; dir unused |
+| 2, 3, 4 | stand, face, idle | dir | motion 0 (variants 0, 0, 1) |
+| 5, 6 | stand_v2, stand_v3 | dir | motion 0, variants 2 and 3 |
+| 7 | walk_to | x, y, z | motion 1 to a point |
+| 8, 9, 10 | motion7_front, motion7, motion7_end | | motion 7 facing 4 / 0, then variant 3 |
+| 11–14 | kneel, kneel_down, kneel_gasp, get_up | dir | motion 0x15 variants 0–3 (Sabata wounded in 3, Django waking in 5); 13 plays sound 0xC6 |
+| 15 | move_to | | motion 6 to a point |
+| 16, 19 | motion29, motion29b | dir, n | motion 0x1D, diagonal facing |
+| 17, 18 | motion30, motion30_end | dir, n, b | motion 0x1E; 18 moves variant 5 to 4 |
+| 20, 21, 22 | motion7_turn, motion7_v7, motion7_v3 | dir | motion 7 |
+| 23–26 | aim, shoot, aim_hold, aim_end | dir / dir, n | motion 3; 24 spawns effect 0x4B 150 ahead and 230 up with sound 0xCD (guess: the gun) |
+| 27 | face_side | on | direction 5 (mirrored) or 3 |
+| 28, 29 | motion11, motion10 | | motion 0xB / 0xA |
+| 30 | form_motion | | motion 0xA or 0xB by `+0x418` |
+| 31 | state_motion | | motion 0xD–0xF by state |
+| 32 | pose | n (4, 5: n, a, b) | `sub_0815C73C` |
+| 33, 34 | run_to, run | x, y, z / dir | motion 2 (guess: running) |
+| 35–38 | windblown, _v2–_v4 | side / dir | motion 0 with update `sub_0814FAE8`: the scarf blowing in the wind |
+| 39, 40 | stand_diagonal, stand_diagonal_b | dir | motion 0, diagonal facing |
+| 41, 42 | motion17, motion17_v2 | | motion 0x11, facing 1 |
+| 43 | shake_effect | | random offset, `sub_082315A8`, sound 0x191/0x133 |
+| 44 | refresh | | `sub_0813D4E0` |
+| 45, 46 | flag_5a1_on/off | | `+0x5A1` |
+| 47–50 | overlay_on, overlay_set, overlay_off | n | `+0xAE4`/`+0xAD6` |
+| 51 | motion38_to | x, y, z | motion 0x26 to a point, in state 2 only |
+
+After a command the dispatcher calls `sub_0814F858` and `sub_0814F874`
+(3, 5–11, 14, 16–26, 28, 33 and 35–42 only the first; 29–31 the second only when
+the handler returns 0; 51 neither).
+
 ## Decompiling it
 
 `python3 tools/assets/cutscenes.py --targets` lists each kind's registration,
-dispatcher and handlers with their status. About 15.9 KB, 40% matched. The
-largest are the dispatchers: player `sub_0815D6B0` (1,432 bytes), scene actors
-`sub_08022F88` (1,644, its commands inline), NPCs `sub_081D01C8` (1,552). The
-player's 51 handlers are small (100–400 bytes) and half are matched already.
-Matching a dispatcher names its commands at once, and every cutscene in the
-game reads better for it.
+dispatcher and handlers with their status. The player, camera and screen
+receivers are matched. The scene-actor (`SceneActors_DispatchCommands`,
+1,644 bytes) and NPC (`SceneNpc_DispatchCommands`, 1,552) dispatchers are
+NONMATCHING drafts (81% and 71%): the scene actor's graphics-variant
+branches and the NPC facing math still allocate registers differently. Open:
+Vanargand (`7C56`) is sent scene-actor commands 51–62, which this dispatcher
+ignores, so another receiver must handle them; the only other kind-4
+registration is in `sub_08197890`.
 
 ## Tools
 

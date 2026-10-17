@@ -1,38 +1,36 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 70.6%
-// 12 differing instruction runs; size +4 bytes; first diff at +0x0 (push {r4, lr} vs push {r4, r5, lr})
-void sub_0815AD78(u8 *);
-void sub_0813AFEC(u8 *, u32, u32);
+
+struct P {
+    u8 filler[0x3A2];
+    u8 b3A2;
+    u8 b3A3;
+    u8 dir;
+    u8 filler2[0x58C - 0x3A5];
+    void *fn;
+    u8 filler4[0x598 - 0x590];
+    u16 h598;
+    u8 filler5[0x5A4 - 0x59A];
+    u32 c;
+};
+
+void sub_0815AD78(struct P *);
+void sub_0813AFEC(struct P *, s32, s32);
 void sub_0814FC24(void);
-void sub_0815C230(u8 *s, s32 x, u32 y)
+
+void PlayerCue_StandDiagonal(struct P *p, s32 dir, u32 c)
 {
-    u8 *kind;
-    u8 value;
-    if (x >= 0)
-        s[0x3A4] = x;
-    kind = s + 0x3A4;
-    value = *kind;
-    value |= 1;
-    *kind = value;
-    if ((u8)value > 4) {
-        {
-            s32 n = (8 - *kind) >> 1;
-            s[0x3A2] = n;
-        }
-        s[0x3A3] = 1;
+    if (dir >= 0)
+        p->dir = dir;
+    p->dir |= 1;
+    if (p->dir > 4) {
+        p->b3A2 = (8 - p->dir) >> 1;
+        p->b3A3 = 1;
     } else {
-        {
-            u32 n = value >> 1;
-            s[0x3A2] = n;
-        }
-        s[0x3A3] = 0;
+        p->b3A2 = p->dir >> 1;
+        p->b3A3 = 0;
     }
-    *(u32 *)(s + 0x5A4) = y;
-    sub_0815AD78(s);
-    sub_0813AFEC(s, 0, 0);
-    *(void (**)(void))(s + 0x58C) = sub_0814FC24;
+    p->c = c;
+    sub_0815AD78(p);
+    sub_0813AFEC(p, 0, 0);
+    p->fn = sub_0814FC24;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0815C230);
-#endif

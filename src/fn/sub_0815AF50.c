@@ -13,7 +13,7 @@ void sub_0815AD78(struct P *);
 void sub_0813AFEC(struct P *, s32, s32);
 void sub_0814FA10(void);
 
-void sub_0815AF50(struct P *p, u8 b, u32 c)
+void PlayerCue_Face(struct P *p, u8 b, u32 c)
 {
     p->b = b;
     p->c = c;
