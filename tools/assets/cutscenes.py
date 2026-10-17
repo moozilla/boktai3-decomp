@@ -285,8 +285,11 @@ def speakers():
 
 
 FIXED = {0x4E69: "director", 0x730A: "screen", 0xD3A9: "audio", 0xFF40: "camera"}
-# actor_name_of (proc 1154) ids by name, once one is confirmed on screen
-CHARACTERS = {}
+# actor_name_of (proc 1154) ids by name, once one is confirmed on screen.
+# 1: in the Sealed Prison only Django (the Player) and Otenko are on screen,
+# and the NPC that proc_1676 places as character 1 moves beside the Player in
+# every Otenko conversation there (cutscenes 5, 153-174; medium confidence)
+CHARACTERS = {1: "Otenko"}
 
 
 def receiver_name(to, kind, cn=None):
@@ -353,7 +356,7 @@ def full_text(i):
             t = d.get(k)
             if t is None or (k > i and t.startswith("<LABEL=")):
                 break
-            body = re.sub(r"<[^>]*>", "", t).replace("\\n", " ").strip()
+            body = re.sub(r"<[^>]*>", "", t.replace("<NAME>", "Django")).replace("\\n", " ").strip()
             if body:
                 pages.append(re.sub(r"\s+", " ", body))
             if "<END>" in t:
