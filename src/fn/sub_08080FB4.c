@@ -4,7 +4,7 @@
 void sub_0807C72C(void *, u32, u32, u32);
 void sub_0807E7B0(void *, u32);
 void *sub_081D4F20(u32, u32);
-void sub_081D5204(void *);
+void GameState_SetEventFlag(void *);
 void SceneActorRecord_RecordPair(u16, u16);
 extern u16 gUnk_030039F0;
 static inline u8 IsPrimary(struct SceneActorRegistryResetView *actor)
@@ -116,7 +116,7 @@ void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *ac
         Script_Call(script, &arguments);
     }
     if (!Flag(actor, 0x4000, 0x2D4) && (u32)(actor->category - 11) > 2)
-        sub_081D5204(sub_081D4F20(actor->category, actor->paletteOffset));
+        GameState_SetEventFlag(sub_081D4F20(actor->category, actor->paletteOffset));
     actor->fieldAA = 0;
     SetControl(actor);
     SetAnimation(actor, 1, 0, 2);

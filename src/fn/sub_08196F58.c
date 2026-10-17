@@ -25,7 +25,7 @@ void sub_08195254(void *);
 void Hud_SetMode(u32);
 void sub_082279A8(u32, u32, u32, u32, u32, u32, u32);
 void sub_08159164(u32);
-void sub_081D5204(u32);
+void GameState_SetEventFlag(u32);
 void Sound_PlaySongChecked(u32);
 
 void sub_08196F58(struct P08196F58 *t)
@@ -77,7 +77,7 @@ void sub_08196F58(struct P08196F58 *t)
         }
         case 3:
             sub_08159164(t->h7272);
-            sub_081D5204(0x41);
+            GameState_SetEventFlag(0x41);
             if (t->script)
                 Script_Call(t->script, 0);
             Task_Kill(t);
