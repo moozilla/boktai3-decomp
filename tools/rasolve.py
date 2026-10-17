@@ -36,6 +36,7 @@ import build  # noqa: E402
 import check  # noqa: E402
 import permute  # noqa: E402
 import regdiag  # noqa: E402
+import agbserve  # noqa: E402
 from romlib import ROOT, load_rom, off  # noqa: E402
 
 INSTR = os.path.join(ROOT, "build", "agbcc-instr", "gcc", "agbcc")
@@ -53,14 +54,17 @@ class Pseudo:
 
 
 class Compiler:
-    def __init__(self, src, func):
+    """Compiles variants of one function through the agbcc fork server
+    (tools/agbserve.py) and counts the bytes that differ from the ROM."""
+
+    def __init__(self, src, func, lines=True):
         self.func = func
-        # Keep line markers and compile with -g, so reload choices carry
-        # source lines (-g does not change the code; checked below).
         rel = os.path.relpath(src, ROOT)
         permute.prepare_source(rel, func)  # requires one ROM function
+        # With line markers and -g, reload choices carry source lines
+        # (-g does not change the code).
         self.pre = build.sh(build.CPP + ["-nostdinc", "-undef"] + build.DEFINES +
-                            ["-I", "include", "-iquote", ".", rel])
+                            ["-I", "include", "-iquote", ".", rel]) if lines else None
         self.symbols = check.elf_symbols()
         self.address = self.symbols[func][0] & ~1
         by_label, addrs, sizes = check.inventory()
@@ -68,59 +72,64 @@ class Compiler:
         self.size = sizes.get(key)
         self.rom = load_rom(verify=False)
         self.work = tempfile.mkdtemp(prefix="rasolve-", dir=os.path.join(ROOT, "build"))
-        self.flags = build.cflags_for(os.path.relpath(src, ROOT)) + ["-g"]
+        self.flags = build.cflags_for(rel) + (["-g"] if lines else [])
+        self.resolver = agbserve.Resolver(self.symbols, self.address)
+        self.server = None
         self.cache = {}
         self.compiles = 0
+        self.n = 0
+
+    def __getstate__(self):  # workers make their own server
+        d = dict(self.__dict__)
+        d["server"] = None
+        return d
+
+    def _asm(self, text, env):
+        parts = agbserve.split_source(text, self.func)
+        if parts is None:
+            return agbserve.compile_plain(text, self.flags, INSTR, dict(os.environ, **env))
+        prefix, suffix = parts
+        if self.server is None or self.server.prefix != prefix:
+            if self.server:
+                self.server.close()
+            self.server = agbserve.Server(prefix, self.flags, INSTR, self.work)
+        return self.server.compile(suffix, env)
 
     def run(self, pri=None, force=None, dump=False, spill=None):
         """(differing bytes, dump or None) for one compile."""
-        key = (tuple(sorted((pri or {}).items())), tuple(sorted((force or {}).items())), dump,
+        key = (self.pre, tuple(sorted((pri or {}).items())), tuple(sorted((force or {}).items())), dump,
                tuple(sorted((spill or {}).items())))
         if key in self.cache:
             return self.cache[key]
-        env = dict(os.environ)
-        env.pop("AGBCC_PRI", None)
-        env.pop("AGBCC_FORCE", None)
-        env.pop("AGBCC_DUMPPRI", None)
-        env.pop("AGBCC_SPILL", None)
+        env = {}
         if spill:
             env["AGBCC_SPILL"] = ",".join(f"{k}:{d}" for k, d in spill.items() if d)
         if pri:
             env["AGBCC_PRI"] = ",".join(f"{r}:{d}" for r, d in pri.items() if d)
         if force:
             env["AGBCC_FORCE"] = ",".join(f"{r}:{h}" for r, h in force.items())
-        dump_path = os.path.join(self.work, "dump.txt")
+        self.n += 1
+        dump_path = os.path.join(self.work, f"dump{self.n & 3}.txt")
         if dump:
             if os.path.exists(dump_path):
                 os.remove(dump_path)
             env["AGBCC_DUMPPRI"] = dump_path
-        s_path, o_path = os.path.join(self.work, "c.s"), os.path.join(self.work, "c.o")
-        r = subprocess.run([INSTR, *self.flags, "-o", s_path], input=self.pre, text=True,
-                           capture_output=True, env=env)
+        asm = self._asm(self.pre, env)
         self.compiles += 1
-        if r.returncode:
-            self.cache[key] = (None, None)
-            return self.cache[key]
-        text = open(s_path).read()
-        text = re.sub(r"^(\w+):\n", lambda m: f"{m[1]}:\n\t.global {m[1]}__addr\n{m[1]}__addr:\n"
-                      if not m[1].startswith(".") else m[0], text, flags=re.M)
-        open(s_path, "w").write(text + "\t.text\n\t.align 2, 0\n")
-        build.sh(build.AS + ["-o", o_path, s_path])
-        elf = os.path.join(self.work, "c.elf")
-        try:
-            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-                check.link_object(o_path, elf, syms=self.symbols, address=self.address)
-        except (SystemExit, Exception):  # e.g. a mutation needing float helpers
-            self.cache[key] = (None, None)
-            return self.cache[key]
-        build.sh(["arm-none-eabi-objcopy", "-O", "binary", "-j", ".text", elf, elf + ".bin"])
-        mine = open(elf + ".bin", "rb").read()
-        n = self.size or len(mine)
-        orig = self.rom[off(self.address):off(self.address) + n]
-        diff = sum(1 for i in range(max(n, len(mine))) if orig[i:i + 1] != mine[i:i + 1])
-        pseudos = parse_dump(open(dump_path).read(), self.func) if dump else None
-        self.cache[key] = (diff, pseudos)
-        return self.cache[key]
+        result = (None, None)
+        if asm is not None:
+            obj = self.resolver.assemble(asm, self.work)
+            mine, missing = self.resolver.bytes_of(obj, self.func) if obj else (None, ["as"])
+            if mine is not None and not missing:
+                n = self.size or len(mine)
+                orig = self.rom[off(self.address):off(self.address) + n]
+                mine = mine[:max(n, len(mine))]
+                diff = sum(1 for i in range(max(n, len(mine))) if orig[i:i + 1] != mine[i:i + 1])
+                dumped = parse_dump(open(dump_path).read(), self.func) if dump and os.path.exists(dump_path) else None
+                result = (diff, dumped)
+        if len(self.cache) < 20000:
+            self.cache[key] = result
+        return result
 
 
 class Dump(dict):
@@ -410,7 +419,6 @@ def guided_worker(args):
 
     def evaluate(text):
         cc.pre = text
-        cc.cache = {}
         b, dump = cc.run(dump=True)
         if b is None:
             return None
