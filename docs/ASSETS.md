@@ -104,6 +104,31 @@ whose hash comes from a table or a script option (`FloorSwitch` `T=`) are
 only in the runtime log. Palette swaps mark states too: the floor switch
 selects `0x16C`/`0x16D` (pressed and released).
 
+**Tracing every palette call** (`tools/assets/paltrace.py`). There are 419
+`AnimData_SelectPaletteBank` calls; 254 pass a constant. The rest compute
+the entry, and the tracer follows the computation through code and ROM data:
+a value a caller passes (symbolically, so a descriptor pointer becomes a ROM
+address whose fields are read), a ROM table (indexed by a caller's constant,
+or every entry while it names a sprite), an actor field (the values the
+code of the same script entry point stores there: the registry routine or
+command and everything it calls or installs from code and ROM callback
+tables, not following helpers shared by many entry points), an option the
+scripts pass (`Script_GetKeywordValue`, or an inline `Script_SeekToKeyword` +
+`Script_GetValue`, values in order) and a name hash (`sub_08219BD8`, the
+16-bit hash of a ROM string: sprites named in code). The sprite is the load
+on the same anim, else the function's last load, else the family's load on
+an anim at the same offset (or its only sprite). 291 calls resolve; the
+others need game state, RAM lists (named objects at `0x02000494`), script
+positional values or descriptors copied at runtime (`sub_0821FF58`,
+`sub_0821983C`). Checked against the runtime logs, every pair the game used
+at a traced call is traced except at 4 calls, and none contradicts it;
+the traced pairs it never saw are variants the runs did not reach (Ghoul+
+405, Mummy+ 36-39, the 402 damage flash on more enemies). `paltrace.py
+closure` lists the sprites whose palettes are all accounted for: 99, 26 of
+them default only. 188 sprites are never loaded with a hash the code
+shows (they come from data the descriptor copies carry), so they can't be
+closed yet. `bigpalettes.py write` adds traced variants as `trace FUNC`.
+
 **Items, swords and accessories** (`tools/assets/items.py` → `data/items.csv`).
 Their names are text strings at a fixed base plus the ID: items 988 + ID
 (descriptions 1043 + ID; valuables such as the Dark Card are items 0x27 and
