@@ -1,6 +1,6 @@
 --- a/local-alloc.c
 +++ b/local-alloc.c
-@@ -69,6 +69,155 @@
+@@ -69,6 +69,169 @@
  #include "insn-config.h"
  #include "insn-attr.h"
  #include "recog.h"
@@ -115,10 +115,23 @@
 +  return "-";
 +}
 +
++static int agbcc_instr_done;
++void
++agbcc_instr_reset ()
++{
++  int i;
++  agbcc_instr_done = 0;
++  for (i = 0; i < AGBCC_MAXREG; i++)
++    agbcc_pri_delta[i] = 0;
++  if (agbcc_dump)
++    fclose (agbcc_dump);
++  agbcc_dump = 0;
++}
++
 +void
 +agbcc_instr_init ()
 +{
-+  static int done;
++#define done agbcc_instr_done
 +  char *e;
 +  int i;
 +  if (done)
@@ -153,10 +166,11 @@
 +  if ((e = getenv ("AGBCC_DUMPPRI")) != 0)
 +    agbcc_dump = fopen (e, "a");
 +}
++#undef done
  #include "output.h"
  #include "toplev.h"
  
-@@ -249,6 +398,8 @@
+@@ -249,6 +412,8 @@
  static int qty_sugg_compare    	(int, int);
  static int qty_sugg_compare_1	(const void *, const void *);
  static int qty_compare    	(int, int);
@@ -165,10 +179,12 @@
  static int qty_compare_1	(const void *, const void *);
  static int combine_regs		(rtx, rtx, int, int, rtx, int);
  static int reg_meets_class_p	(int, enum reg_class);
-@@ -1330,12 +1481,29 @@
-       qsort (qty_order, next_qty, sizeof (int), qty_sugg_compare_1);
-     }
+@@ -1328,6 +1493,21 @@
  
+     default:
+       qsort (qty_order, next_qty, sizeof (int), qty_sugg_compare_1);
++    }
++
 +  /* Instrumentation: forced quantities take their register first.  */
 +  agbcc_instr_init ();
 +  qty_forced = (char *) alloca (next_qty + 1);
@@ -182,11 +198,10 @@
 +	  qty_phys_reg[i] = agbcc_force[r];
 +	  post_mark_life (agbcc_force[r], qty_mode[i], 1, qty_birth[i], qty_death[i]);
 +	}
-+    }
-+
+     }
+ 
    /* Try to put each quantity in a suggested physical register, if it has one.
-      This may cause registers to be allocated that otherwise wouldn't be, but
-      this seems acceptable in local allocation (unlike global allocation).  */
+@@ -1336,6 +1516,8 @@
    for (i = 0; i < next_qty; i++)
      {
        q = qty_order[i];
@@ -195,7 +210,7 @@
        if (qty_phys_num_sugg[q] != 0 || qty_phys_num_copy_sugg[q] != 0)
  	qty_phys_reg[q] = find_free_reg (qty_min_class[q], qty_mode[q], q,
  					 0, 1, qty_birth[q], qty_death[q]);
-@@ -1387,7 +1555,7 @@
+@@ -1387,7 +1569,7 @@
    for (i = 0; i < next_qty; i++)
      {
        q = qty_order[i];
@@ -204,7 +219,7 @@
  	{
  	  if (N_REG_CLASSES > 1)
  	    {
-@@ -1414,6 +1582,13 @@
+@@ -1414,6 +1596,13 @@
  	for (i = qty_first_reg[q]; i >= 0; i = reg_next_in_qty[i])
  	  reg_renumber[i] = qty_phys_reg[q] + reg_offset[i];
        }
@@ -218,7 +233,7 @@
  }
  
  /* Compare two quantities' priority for getting real registers.
-@@ -1432,11 +1607,21 @@
+@@ -1432,11 +1621,21 @@
     Multiplying this by 10000 can't overflow.
     QTY_CMP_PRI is also used by qty_sugg_compare.  */
  
@@ -241,7 +256,7 @@
  qty_compare (q1, q2)
       int q1, q2;
  {
-@@ -1505,6 +1690,7 @@
+@@ -1505,6 +1704,7 @@
  
  #undef QTY_CMP_SUGG
  #undef QTY_CMP_PRI
@@ -486,3 +501,99 @@
  	  REG_USERVAR_P (map->reg_map[regno]) = REG_USERVAR_P (orig);
  	  REG_LOOP_TEST_P (map->reg_map[regno]) = REG_LOOP_TEST_P (orig);
  	  RTX_UNCHANGING_P (map->reg_map[regno]) = RTX_UNCHANGING_P (orig);
+--- a/c-lex.c
++++ b/c-lex.c
+@@ -31,9 +31,13 @@
+ #include "flags.h"
+ #include "c-parse.h"
+ #include "toplev.h"
++#include <sys/types.h>
++#include <sys/wait.h>
++#include <unistd.h>
+ 
+ /* Stream for reading from the input file.  */
+ FILE *finput;
++extern FILE *asm_out_file;
+ 
+ extern void yyprint			(FILE *, int, YYSTYPE);
+ 
+@@ -45,8 +49,78 @@
+ /* Cause the `yydebug' variable to be defined.  */
+ #define YYDEBUG 1
+ 
+-#define GETC() getc(finput)
++#define GETC() agbcc_getc()
+ #define UNGETC(c) ungetc(c, finput)
++
++/* Compile server (tools/agbserve.py). With AGBCC_SERVER="RFD:WFD", a byte
++   \001 in the input marks the end of a shared prefix: the parser state at
++   that point is kept, and for each request read from RFD,
++   "SUFFIX-FILE OUTPUT-FILE [NAME=VALUE ...]\n", a child process continues
++   from it with SUFFIX-FILE as the rest of the input and writes the rest of
++   the assembly to OUTPUT-FILE; "STATUS\n" goes back on WFD. The output for
++   the prefix is what the parent wrote to its own -o file.  */
++extern void agbcc_instr_reset ();
++static int
++agbcc_serve ()
++{
++  char *spec = getenv ("AGBCC_SERVER");
++  int rfd, wfd;
++  FILE *req;
++  char line[8192];
++  if (! spec || sscanf (spec, "%d:%d", &rfd, &wfd) != 2)
++    return ' ';
++  fflush (asm_out_file);
++  fflush (stdout);
++  fflush (stderr);
++  req = fdopen (rfd, "r");
++  while (fgets (line, sizeof line, req))
++    {
++      char suffix[4096], out[4096], *rest;
++      int n = 0, status = 0, pid;
++      char reply[32];
++      if (sscanf (line, "%4095s %4095s%n", suffix, out, &n) < 2)
++	break;
++      rest = line + n;
++      pid = fork ();
++      if (pid == 0)
++	{
++	  char *tok;
++	  fclose (req);
++	  close (wfd);
++	  for (tok = strtok (rest, " \t\n"); tok; tok = strtok (0, " \t\n"))
++	    {
++	      char *eq = strchr (tok, '=');
++	      if (eq)
++		{
++		  *eq = 0;
++		  setenv (tok, eq + 1, 1);
++		}
++	    }
++	  agbcc_instr_reset ();
++	  finput = fopen (suffix, "r");
++	  asm_out_file = fopen (out, "w");
++	  if (! finput || ! asm_out_file)
++	    exit (33);
++	  return getc (finput);
++	}
++      if (pid > 0)
++	waitpid (pid, &status, 0);
++      else
++	status = -1;
++      sprintf (reply, "%d\n", status);
++      write (wfd, reply, strlen (reply));
++    }
++  exit (0);
++}
++
++static int
++agbcc_getc ()
++{
++  int c = getc (finput);
++  if (c == 1)
++    return agbcc_serve ();
++  return c;
++}
+ 
+ /* the declaration found for the last IDENTIFIER token read in.
+    yylex must look this up to detect typedefs, which get token type TYPENAME,
