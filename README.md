@@ -85,6 +85,15 @@ in [CLAUDE.md](CLAUDE.md) and [docs/WORKER.md](docs/WORKER.md).
 python3 tools/studio/serve.py    # http://localhost:8642
 ```
 
+**Browse** (`/atlas`) is the way in: everything in the game as one tree
+(characters, the monster list in the game's order, objects, places in story
+order, items, scripts, script commands, sprites and code by subsystem), each
+with one page of everything known about it: a monster family's species and
+every palette its sprites are drawn in, where it appears, the scripts that
+create it and how much of its code is decompiled. ⌘K searches everything;
+links to the views below open in a side panel with its own history. The index
+is built by `tools/studio/atlas.py` and grouped by `data/atlas/categories.csv`.
+
 | | |
 |---|---|
 | ![Text](docs/img/studio-text.png) | **Text**: every string with the fan translation, previewed in the game font at the game's line width; *Build mod ROM* writes a playable ROM. |

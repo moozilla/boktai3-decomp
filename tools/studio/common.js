@@ -10,7 +10,7 @@ function localStore(k, v) { try { if (v === undefined) return localStorage.getIt
 
 // ---------- header ----------
 const NAV = [
-  ['Text', '/'], ['Sprites', '/gfx#sprites'], ['Large sprites', '/gfx#big'], ['Maps', '/gfx#maps'], ['Palettes', '/gfx#palettes'],
+  ['Browse', '/atlas'], ['Text', '/'], ['Sprites', '/gfx#sprites'], ['Large sprites', '/gfx#big'], ['Maps', '/gfx#maps'], ['Palettes', '/gfx#palettes'],
   ['Sprite palettes', '/gfx#pool'], ['Font', '/gfx#font'], ['Tiles', '/gfx#tiles'], ['Data', '/gfx#data'], ['Actors', '/actors'], ['Scripts', '/scripts'], ['World', '/world'], ['Dungeons', '/gfx#dungeon'], ['Live', '/live'], ['Captures', '/captures'],
 ];
 // Fills <header id="top">; `tools` is HTML for the right-hand side.
@@ -52,9 +52,21 @@ function peek(url) {
   let p = $('peek');
   if (!p) {
     p = document.createElement('aside'); p.id = 'peek';
-    p.innerHTML = `<div class="peekbar"><a id="peekopen" target="_blank" title="Open in a new tab">open ↗</a><span class="sp"></span><button id="peekclose" title="Close (Esc)">✕</button></div><iframe id="peekframe"></iframe>`;
+    p.innerHTML = `<div class="peekbar"><button id="peekback" title="Back">‹</button><button id="peekfwd" title="Forward">›</button><span id="peektitle"></span><span class="sp"></span><a id="peekopen" target="_blank" title="Open in a new tab">open ↗</a><button id="peekclose" title="Close (Esc)">✕</button></div><iframe id="peekframe"></iframe>`;
     document.body.appendChild(p);
     $('peekclose').onclick = () => p.classList.remove('on');
+    // the panel keeps its own history: links inside it navigate the frame
+    $('peekback').onclick = () => { try { $('peekframe').contentWindow.history.back(); } catch (e) {} };
+    $('peekfwd').onclick = () => { try { $('peekframe').contentWindow.history.forward(); } catch (e) {} };
+    $('peekframe').addEventListener('load', () => {
+      try {
+        const w = $('peekframe').contentWindow, u = new URL(w.location.href);
+        u.searchParams.delete('embed');
+        $('peekopen').href = u.pathname + u.search + u.hash;
+        $('peektitle').textContent = w.document.title.replace(/^Boktai 3 /, '');
+        w.addEventListener('hashchange', () => { $('peekopen').href = w.location.pathname + w.location.hash; });
+      } catch (e) {}
+    });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') p.classList.remove('on'); });
   }
   const [path, hash] = url.split('#');
@@ -287,16 +299,18 @@ async function packageColors(pkgBytes, base = le(pkgBytes, 0)) {
 let _learnedSpr = null, _bigSpr = null;
 const learnedSprites = () => _learnedSpr ??= fetch('/api/learned').then(r => r.json()).then(l => l.sprites || {}).catch(() => ({}));
 const bigSprites = () => _bigSpr ??= fetch('/api/res').then(r => r.json()).then(ix => res('t98F5', ix.t98F5[0][0])).then(parseBig);
-async function spriteThumb(kind, hash, max = 64) {
+// opt.pool draws a large sprite in another palette pool entry (a variant the
+// code selects); opt.frame picks a frame of a sprite package.
+async function spriteThumb(kind, hash, max = 64, opt = {}) {
   const L = await learnedSprites();
   let parts, colors;
   if (kind === 'big') {
     const big = await bigSprites(), i = big.recs.findIndex(r => r.hash === hash), f = i >= 0 && big.frames(i)[0];
     if (!f) return null;
-    colors = await packageColors(null, big.recs[i].pal);
+    colors = await packageColors(null, opt.pool ?? big.recs[i].pal);
     parts = big.parts(f);
   } else {
-    const b = await res('tCB05', hash), pkg = parsePackage(b), k = pkg.anims[0]?.keys[0]?.frame ?? 0;
+    const b = await res('tCB05', hash), pkg = parsePackage(b), k = opt.frame ?? pkg.anims[0]?.keys[0]?.frame ?? 0;
     if (!pkg.frames[k]) return null;
     colors = await packageColors(b); parts = pkg.parts(pkg.frames[k]);
   }

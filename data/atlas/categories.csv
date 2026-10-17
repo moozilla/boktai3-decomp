@@ -1,0 +1,25 @@
+pattern,path
+# Where each registry entry (an actor or a script command) goes in the Studio's
+# Browse tree (tools/studio/atlas.py). `pattern` is a regular expression
+# matched against the entry's name (its GCL English name or the callback's
+# function name, e.g. FloorSwitch_Create); the first matching row wins.
+# Entries linked to the game's monster list go under Monsters, and script
+# commands (FromScript, Get/Set/Test routines) under Script commands,
+# before these rows apply.
+^(Player|Player_)(?![a-z]),Characters/Player
+^(SceneNpc|TaggedSceneNpc|SceneCharacter)(?![a-z]),Characters/People
+^ScriptActor\b,Characters/Scripted actors
+^(Dragon Puppy|DragonPuppy)(?![a-z]),Characters/Companions
+^(Vanargand|Hresvelgr|Nidhoggr|Ratatosk|BossSlot|BlackKnight|Count)(?![a-z]),Monsters/Bosses
+^(Gun Del Hell|GunDelHell)(?![a-z]),Player gear
+^(FloorSwitch|HitSwitch|KeyTrigger|Trigger|SceneRangeWatch|InteractionMarker|ProximityIcon)(?![a-z]),Objects/Switches and triggers
+^(Breakable|BreakableProp|Wooden Crate|WoodenCrate|Coffin)(?![a-z]),Objects/Crates and breakables
+^(CellGate|Warp Circle|StackedActor|SavedPositionMarker)(?![a-z]),Objects/Gates and warps
+^(Fan Cannon Manager|FanCannonManager|Pile Driver|ScenePanel|FallingObject|DirectionalForce|Bat Curtain|BatCurtain)(?![a-z]),Objects/Machines and hazards
+^(Solar Stand|ResourceStation|Solar Fruit|SolarFruit|Solar Bank|SolarBank)(?![a-z]),Objects/Solar devices
+^(Weapon Shop|SceneInventory|Storage|Dark Loan|DarkLoan|Forging Book|Monster Book|Album)(?![a-z]),Town and services
+^(Options|Name Entry|NameEntry|Password|Results|Game Start|ChoiceMenu|MessageWindow|TextWindowManager|Hud|LevelAdvanceDisplay|StageIconDisplay|ShakeIconDisplay|SceneIndicator)(?![a-z]),Screens and menus
+^(AnimatedParticles|BurstEmitter|OrbitingParticles|ProximityEmitter|StagedEffect|RepeatedEffect|SpriteEffectController|Weather|ScanlineWave|AreaEffect|AnimatedTile|TileAnimation|SceneEffectSchedule|SceneAudioEvent|DisplayTrack|ScriptKeyframe)(?![a-z]),Effects and presentation
+^(PaletteFade|PaletteBlend|PaletteLevels|Palette|ColorFade|Background|OrbitBackground|ScrollingBackground|ScreenParams\w*|Params3D0|Camera)(?![a-z]),Screen and camera
+^(GameState|GameFlag|Inventory|RecordEntry|Random|PlayerName|Time)(?![a-z]),Game state
+.,Engine
