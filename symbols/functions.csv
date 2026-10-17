@@ -1902,6 +1902,7 @@ addr,name,mode,confidence,source,notes
 0815CF6C,ScriptActor_StartActionFromScript,thumb,low,src-alias,
 0815D524,ScriptActor_SetModeFromScript,thumb,low,src-alias,
 0815F4F4,Player_Create,thumb,medium,gcl-name,name from GCL key F5EB プレイヤー (Player); registry callback
+08163E24,ParticlePool_Create,thumb,low,src-alias,
 0816B834,GameState_ClearAreaFlagsFromScript,thumb,low,src-alias,
 0816B884,GameState_SetAreaFlagFromScript,thumb,low,src-alias,
 08177DEC,Hud_SetMode,thumb,low,src-alias,
@@ -1935,6 +1936,7 @@ addr,name,mode,confidence,source,notes
 081D0C04,SceneNpc_CreateFromScript,thumb,low,src-alias,
 081D0F28,SceneNpc_CommandFromScript,thumb,low,src-alias,
 081D105C,SceneNpc_StopFromScript,thumb,low,src-alias,
+081D2A38,TaggedSceneNpc_Create,thumb,low,src-alias,
 081D51B0,RegistryA76D_SetFromScript,thumb,low,src-alias,
 081D6BC0,MonsterBook_Create,thumb,medium,gcl-name,name from GCL key 34EA 魔物図鑑 (Monster Book); registry callback
 081D7510,ScreenParams2A0_SetFromScript,thumb,low,src-alias,

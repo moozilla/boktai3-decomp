@@ -81,7 +81,7 @@ void sub_0802E698(void *, struct SceneNpc *);
 void DisplayAnimation_SetFlags(void *);
 void sub_0802D88C(struct SceneNpc *);
 u8 sub_0802FD14(struct SceneNpc *);
-u32 sub_08163E24(void);
+u32 ParticlePool_Create(void);
 void sub_081CE0E4(struct SceneNpc *, s32);
 void sub_081CC610(void);
 void sub_081CDFFC(void);
@@ -175,7 +175,7 @@ void SceneCharacter_PlaceFromScript(void)
     }
     if (k == 0x19) {
         struct CharacterExtra *x = &npc->extra;
-        x->handle = sub_08163E24();
+        x->handle = ParticlePool_Create();
         x->field12 = 0;
         x->field10 = colorA;
         x->field14 = 0x34;

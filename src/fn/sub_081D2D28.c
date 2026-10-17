@@ -1,6 +1,6 @@
 #include "global.h"
-void sub_081D2A38(s32);
+void TaggedSceneNpc_Create(s32);
 void sub_081D2D28(void)
 {
-    sub_081D2A38(1);
+    TaggedSceneNpc_Create(1);
 }
