@@ -365,8 +365,10 @@ saved with the game), and sets the request word `0x030053E8` to 1, or `0x11`
 unless keyword `n` is given as 0. A scene number is a script procedure: the
 late-game test save stands in scene 3243, whose entry runs `proc_861 1;
 proc_864 0`, then the stage setup (`proc_884 0xcf70 0xf8ea 0x7239`) and the
-area's objects. `tools/mgba/scenes.py` lists 354 scene entries (347 with a
-stage). Writing the three words from Lua loads the scene's stage but does not
+area's objects. `tools/mgba/scenes.py` lists 496 scene entries (456 with a
+stage); an entry is `proc_861 FLAGS; proc_864 MODE` with any flags (the
+prologue uses 56, boss and story scenes 9, 25, 33, 41). Cutscenes inside a
+scene are tables played by SceneMessages: [CUTSCENES](CUTSCENES.md). Writing the three words from Lua loads the scene's stage but does not
 spawn the player; ordinary doors pass an entrance as well: the door's event
 sets the entrance number in `r708[0x70]` (`proc_953`) and the destination's
 entrance procedures (`proc_909`, `proc_916`, ...) test it to place the player

@@ -51,7 +51,8 @@ INPUTS = ["data/actor_registry.csv", "data/items.csv", "data/notes.csv",
           "data/sprite_palettes.csv", "data/labels/areas.csv", "data/labels/scenes.csv",
           "data/labels/sprites.csv", "data/labels/palettes.csv", "gcl/names/proc.csv", "gcl/names/chara.csv",
           "gcl/names/files.csv", "symbols/functions.csv", "tools/studio/atlas.py", "tools/assets/actors.py",
-          "tools/assets/tilesets.py", "data/stage_palettes.csv", "tools/studio/sound.py", "tools/m4a.py"]
+          "tools/assets/tilesets.py", "data/stage_palettes.csv", "tools/studio/sound.py", "tools/m4a.py",
+          "tools/assets/cutscenes.py", "tools/mgba/scenes.py", "tools/assets/gclfiles.py"]
 # the monster list's bosses: 黒騎士 and ニーズホッグ (9902-9903), then 伯爵 on (9915-)
 BOSSES = {9902, 9903} | set(range(9915, 9922))
 
@@ -634,6 +635,47 @@ def build():
                 if ar is not None and f"song:{n}" not in ar.setdefault("songs", []):
                     ar["songs"].append(f"song:{n}")
 
+    # ---- cutscenes: the event tables SceneMessages plays (tools/assets/cutscenes.py) ----
+    import cutscenes
+    speaker_of = {}
+    for e in E.values():
+        if e["kind"] == "char" and e.get("label"):
+            for i in by_label.get(e["label"], []):
+                speaker_of[i] = e["id"]
+    starts = collections.defaultdict(list)
+    for s in cutscenes.scan()["starts"]:
+        starts[s["event"]].append(s)
+    cn = cutscenes.chara_names()
+    for n, steps in enumerate(cutscenes.table()):
+        if not steps:
+            continue
+        st = starts[n][0] if starts[n] else None
+        _, rows = cutscenes.timeline(n, st)
+        said = [m for _, row in rows for m in row if "text" in m]
+        cast = sorted({m["to"] for _, row in rows for m in row if m["kind"] != 1} - {"audio", "screen", "camera"})
+        bgm = [m["args"][0] for _, row in rows for m in row if m["kind"] == 8 and m["cmd"] in ("start_bgm", "start_song") and m["args"]]
+        fid = fof.get(st["proc"]) if st else None
+        f = fkind.get(fid) if fid else None
+        sc = E.get(f"scene:{f['entry']}") if f and f.get("entry") is not None else None
+        ar = E.get(sc["area"]) if sc else None
+        first = re.sub(r'^[^:"「]{1,24}:\s*', "", en.get(said[0]["text"], "")) if said else ""
+        first = clean(first).strip().strip('"').split("\n")[0]
+        title = f"{n} · {first[:40] + ('…' if len(first) > 40 else '')}" if first else f"{n} · {sc['title'] if sc else 'no dialogue'}"
+        path = "Cutscenes/" + (ar["location"] if ar else "No area")
+        node_rank[path] = min(node_rank.get(path, 999), node_rank.get("Places/" + ar["location"], 900) if ar else 999)
+        e = add(f"cut:{n}", path, kind="cut", key=str(n), order=n, title=title, steps=len(steps),
+                messages=sum(len(s_) for s_ in steps), start=st, starters=[s_["proc"] for s_ in starts[n]],
+                file=f"file:{fid}" if fid else None, scene=sc["id"] if sc else None, area=sc["area"] if sc else None,
+                cast=cast, lines=len(said), speakers=sorted({speaker_of[m["text"]] for m in said if m["text"] in speaker_of}),
+                speaker_of={str(m["text"]): speaker_of[m["text"]] for m in said if m["text"] in speaker_of},
+                songs=[f"song:{b}" for b in dict.fromkeys(bgm) if f"song:{b}" in E])
+        if sc is not None:
+            sc.setdefault("cutscenes", []).append(e["id"])
+        if fid and f"file:{fid}" in E:
+            E[f"file:{fid}"].setdefault("cutscenes", []).append(e["id"])
+        for c in e["speakers"]:
+            E[c].setdefault("cutscenes", []).append(e["id"])
+
     # ---- explicit links (data/atlas/links.csv) ----
     for r in csv.DictReader(l for l in open(os.path.join(ROOT, "data", "atlas", "links.csv"), encoding="utf-8") if not l.startswith("#")):
         a, b = r["from"], r["to"]
@@ -718,7 +760,7 @@ def build():
     # ---- tree ----
     node_rank.update({"Sprites/Large sprites": 0, "Sprites/Sprite packages": 1, "Tiles/Tilesets": 0, "Tiles/Map tiles": 1,
                       "Tiles/Tilesets/Not loaded by a scene": 1000, "Tiles/Tilesets/Not loaded by a script": 1001})
-    order = ["Cast", "Bestiary", "Items", "Places", "Objects", "Script routines", "Scripts", "Sprites", "Tiles", "Sound", "Code"]
+    order = ["Cast", "Bestiary", "Items", "Places", "Cutscenes", "Objects", "Script routines", "Scripts", "Sprites", "Tiles", "Sound", "Code"]
     root = {}
     for path, ids in tree_items.items():
         node = root

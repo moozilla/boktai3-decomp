@@ -288,6 +288,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif self.path == "/api/romtree":
             import atlas
             self.send(200, atlas.rom_tree())
+        elif self.path.startswith("/api/cutscene/"):
+            import cutscenes
+            n = int(self.path.rsplit("/", 1)[1])
+            st, rows = cutscenes.timeline(n)
+            self.send(200, {"start": st, "steps": rows})
         elif self.path == "/api/atlas/funcs":
             import atlas
             self.send(200, atlas.load()["funcs"])

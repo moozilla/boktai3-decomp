@@ -23,6 +23,15 @@ README badges (live from decomp.dev). Don't copy totals into other files.
 
 Recent work, newest first (details in [history](history/README.md)):
 
+* **Cutscenes decoded** (2026-10-17): every cutscene is a table of steps and
+  messages (`gEventBytecodePtrs`, 240 of them) that the matched SceneMessages
+  director plays; receivers are the player, NPCs, scene actors, camera,
+  screen and sound, each with its own command switch. `tools/assets/cutscenes.py`
+  prints them; the Studio's Browse › Cutscenes shows each with its timeline.
+  The prologue is worked through end to end ([gcl/examples/prologue.md](../gcl/examples/prologue.md),
+  `tests/prologue.txt`), and scene detection now finds 496 scenes (142 had
+  `scene_start` flags other than 1). Decomp targets: `cutscenes.py --targets`
+  (the player, NPC, scene-actor and camera dispatchers; [CUTSCENES](CUTSCENES.md)).
 * **Scripts (GCL) became readable** (2026-10-15/16): the scene scripts are
   Konami GCL. `gcl/` holds recovered names (registry keys, commands,
   variables, defines, parameters, 199 procedures), the debug prints'
