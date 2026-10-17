@@ -7,7 +7,7 @@ handlers; their callees are found through `bl` calls and Thumb function pointers
 | Set | Functions | Bytes | Share of code | Matched |
 |---|---:|---:|---:|---:|
 | Entry points | 738 | 84,436 | 3.5% | 80.1% |
-| Entry points and their direct callees | 1422 | 290,160 | 12.0% | 42.8% |
+| Entry points and their direct callees | 1422 | 290,160 | 12.0% | 42.9% |
 | Everything reachable from scripts | 3136 | 535,198 | 22.2% | 47.1% |
 
 ## Unmatched entry points, by script uses (20 used, 10,896 bytes)
@@ -48,6 +48,5 @@ handlers; their callees are found through `bl` calls and Thumb function pointers
 | 2 | `082215E4` | 276 | `Math_Atan2` |
 | 2 | `0821E5C4` | 84 | `Route_Start` |
 | 2 | `082161B4` | 736 | `sub_082161B4` |
-| 2 | `081D2A38` | 740 | `sub_081D2A38` |
-| 2 | `08163E24` | 68 | `sub_08163E24` |
+| 2 | `081D2A38` | 740 | `TaggedSceneNpc_Create` |
 | 2 | `0824923C` | 4 | `_call_via_r1` |

@@ -299,3 +299,55 @@ Anim_SetSequence (08220C8C, one register) and Math_Atan2 (082215E4); the
 Glove_StartFromScript draft went from 58.5% to 82.9%. The remaining
 unmatched entry points are mostly large and inline the packed-command
 sprite stepper.
+
+## Batch 10
+
+Matched 1: 08163E24 `ParticlePool_Create`, the 16-sprite task kept by scene
+NPCs and kind-29 characters (68 bytes). Guarded draft: 081D2A38
+`TaggedSceneNpc_Create`, the SceneNpc creator behind two tiny registry
+routines (tag 0 and 1), at about 96%. agbcc keeps model E00E in sb for both
+calls; the original loads it from the pool each time.
+
+### The sprite stepper without pins
+
+All matched copies of the packed-command sprite stepper (the
+`*_playback.h` headers, sub_08045F48 and others) rely on register pins. Most of
+the remaining script entry points inline it, so a natural form would help.
+Tested in ContactSequenceActor_UpdateAppearing (08045F48), this plain inline
+gets within 29 bytes:
+
+```c
+const vu16 *cmd = &s->commands[s->index];
+sprite->frame = *cmd >> 6;
+{ u32 flags = s->flags; u32 bit = 1;
+  if ((bit & flags) != (((*cmd & 0x30) >> 4) & bit)) sprite->flags |= 4;
+  else sprite->flags &= ~4; }
+{ u32 flags = s->flags; u32 bit = 2;
+  if ((u8)(bit & flags) != (((*cmd & 0x30) >> 4) & bit)) sprite->flags |= 8;
+  else sprite->flags &= ~8; }
+if (++s->elapsed >= s->duration) {
+    s->elapsed = 0;
+    if (s->flags & 4) {
+        if (s->index == 0) { if (s->flags & 8) s->elapsed = s->duration;
+                             else s->index = s->frameCount - 1; ended = 1; }
+        else { s->index--; ended = 0; }
+    } else if (++s->index >= s->frameCount) {
+        if ((u8)(s->flags & 8)) { s->elapsed = s->duration; s->index = s->frameCount - 1; }
+        else s->index = 0;
+        ended = 1;
+    } else ended = 0;
+    cmd = &s->commands[s->index];
+    s->frameWeight = *cmd & 15;
+    s->duration = (s->frameWeight * s->speed) >> 6;
+    if (s->duration == 0) s->duration = 1;
+} else ended = 0;
+```
+
+What it needed: a separate block-scoped `bit` for each flip test, so it gets
+a scratch register; explicit `ended` in every branch; and `vu16` commands, so
+the weight read stays a halfword load. One difference remains: the original
+copies `bit` before the AND (`adds r1, r3, #0; ands r1, r0`), and only the
+pinned versions' empty asm barrier reproduces that. 15 permuter minutes found
+nothing; none of 18 type/operand combinations did either. Plugged into the
+A4FC draft it scores 64.5%, about the same as the pinned header, because
+A4FC's differences are elsewhere.
