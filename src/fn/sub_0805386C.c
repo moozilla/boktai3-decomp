@@ -31,7 +31,7 @@ void InteractionMarker_TickIdle(struct InteractionMarker *marker)
                     if (!(player->flags & blocked) && marker->inputCooldown > 9) {
                         marker->activationFrame = 8;
                         ScriptUtility_SetControlFlag(1);
-                        sub_0815B0A8(gUnk_02000580[0], &marker->position, 0, 4);
+                        PlayerCue_WalkTo(gUnk_02000580[0], &marker->position, 0, 4);
                         InteractionMarker_SetState(marker, InteractionMarker_TickInteraction);
                     }
                 }

@@ -21,7 +21,7 @@ void sub_08152A5C(void);
 void sub_08154AF0(void);
 void sub_08150C5C(void);
 
-void sub_0815B52C(struct P *p, s32 dir, u32 h, u32 c)
+void PlayerCue_Motion29(struct P *p, s32 dir, u32 h, u32 c)
 {
     if (dir >= 0)
         p->dir = dir;

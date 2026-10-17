@@ -6,7 +6,7 @@ extern u32 gUnk_03005420;
 u32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
 void Camera_ReadMoveRate(u32);
-void sub_0822632C(s32, struct Packed *);
+void Camera_PanTo(s32, struct Packed *);
 void sub_082266D4(void)
 {
     struct Packed pos;
@@ -17,7 +17,7 @@ void sub_082266D4(void)
             pos.b = Script_GetValue();
             pos.c = Script_GetValue();
             Camera_ReadMoveRate(gUnk_03005420);
-            sub_0822632C(value, &pos);
+            Camera_PanTo(value, &pos);
         }
     }
 }

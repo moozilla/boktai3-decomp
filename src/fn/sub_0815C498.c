@@ -14,7 +14,7 @@ void sub_0815AD78(struct P *);
 void sub_0813AFEC(struct P *, s32, s32);
 void sub_081561EC(void);
 
-u32 sub_0815C498(struct P *p, u16 *pos, u32 c)
+u32 PlayerCue_Motion38To(struct P *p, u16 *pos, u32 c)
 {
     u32 r;
 

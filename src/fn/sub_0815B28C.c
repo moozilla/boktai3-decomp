@@ -22,12 +22,12 @@ struct P {
 void sub_0815AD78(struct P *);
 void sub_0813ADD0(struct P *);
 void sub_0813AFEC(struct P *, s32, s32);
-void sub_0815AF14(struct P *, s32);
+void PlayerCue_Stand(struct P *, s32);
 void sub_081502AC(void);
 void sub_081507F4(void);
 void Sound_PlaySong(s32);
 
-void sub_0815B28C(struct P *p, u32 w)
+void PlayerCue_Motion7End(struct P *p, u32 w)
 {
     if (p->st == 2 && p->c57 == 7 && p->c58 != 0) {
         p->w5a4 = w;

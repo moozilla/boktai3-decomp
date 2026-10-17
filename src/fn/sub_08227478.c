@@ -55,7 +55,7 @@ static inline void updateScroll(void)
 
 /* Camera setup: start at the player's saved position (raised by 150), register
    as the kind 6 (camera) cutscene receiver and become gUnk_03005420. */
-s32 sub_08227478(struct Camera *c, u32 id)
+s32 Camera_Initialize(struct Camera *c, u32 id)
 {
     u8 *gs;
 

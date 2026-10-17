@@ -98,7 +98,7 @@ static inline void setSpeed(struct SceneNpc *npc, s32 speed)
     npc->speed2 = speed * speed;
 }
 
-void sub_081D01C8(struct SceneNpc *npc)
+void SceneNpc_DispatchCommands(struct SceneNpc *npc)
 {
     Entry *entry = &npc->entry;
     struct Sub *sub = &npc->sub20;
@@ -274,5 +274,5 @@ void sub_081D01C8(struct SceneNpc *npc)
         } while (i < entry->count[gUnk_0200047C[0x24]]);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_081D01C8);
+INCLUDE_ASM("asm/nonmatching", SceneNpc_DispatchCommands);
 #endif

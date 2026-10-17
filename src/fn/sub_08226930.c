@@ -18,14 +18,14 @@ extern u8 *gUnk_0200047C;
 void sub_08020D54(void *, void *);
 void sub_08226918(u8 *);
 void sub_08226920(u8 *);
-void sub_08226228(void);
-void sub_08226268(struct Vec *);
-void sub_0822632C(s32, struct Vec *);
+void Camera_Reset(void);
+void Camera_SnapTo(struct Vec *);
+void Camera_PanTo(s32, struct Vec *);
 void sub_08226474(s32);
-void sub_08226558(s32, s32, s32);
-void sub_082264D0(s32);
+void Camera_SetSway(s32, s32, s32);
+void Camera_FollowPlayer(s32);
 
-void sub_08226930(u8 *p)
+void Camera_DispatchCommands(u8 *p)
 {
     Entry *entry = (Entry *)(p + 0x20);
     s32 i;
@@ -42,7 +42,7 @@ void sub_08226930(u8 *p)
             switch (((u8 *)message)[6]) {
                 case 0:
                     sub_08226918(p);
-                    sub_08226228();
+                    Camera_Reset();
                     sub_08226920(p);
                     break;
                 case 1:
@@ -50,7 +50,7 @@ void sub_08226930(u8 *p)
                     snap.x = message[4];
                     snap.y = message[5];
                     snap.z = message[6];
-                    sub_08226268(&snap);
+                    Camera_SnapTo(&snap);
                     sub_08226920(p);
                     break;
                 case 2:
@@ -58,7 +58,7 @@ void sub_08226930(u8 *p)
                     pan.x = message[4];
                     pan.y = message[5];
                     pan.z = message[6];
-                    sub_0822632C((s16)message[7], &pan);
+                    Camera_PanTo((s16)message[7], &pan);
                     break;
                 case 3:
                     sub_08226918(p);
@@ -66,11 +66,11 @@ void sub_08226930(u8 *p)
                     break;
                 case 4:
                     sub_08226918(p);
-                    sub_08226558((s16)message[4], (s16)message[5], (s16)message[6]);
+                    Camera_SetSway((s16)message[4], (s16)message[5], (s16)message[6]);
                     break;
                 case 5:
                     sub_08226918(p);
-                    sub_082264D0((s16)message[4]);
+                    Camera_FollowPlayer((s16)message[4]);
                     break;
             }
             i++;

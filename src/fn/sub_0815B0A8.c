@@ -25,7 +25,7 @@ void sub_08151EB8(void);
 void sub_08153A00(void);
 void sub_0814FC80(void);
 
-void sub_0815B0A8(struct P *p, struct Pos *pos, u32 c, s32 a)
+void PlayerCue_WalkTo(struct P *p, struct Pos *pos, u32 c, s32 a)
 {
     p->target = *pos;
     p->c = c;

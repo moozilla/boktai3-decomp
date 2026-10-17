@@ -12,7 +12,7 @@ struct Camera {
 extern struct Camera *gUnk_03005420;
 extern u32 gUnk_030053F4;
 
-void sub_08226558(s32 a, s32 b, s32 mode)
+void Camera_SetSway(s32 a, s32 b, s32 mode)
 {
     if (gUnk_03005420 && !(gUnk_030053F4 & 0x800)) {
         if (b == 0 && mode == 1) {

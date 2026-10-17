@@ -18,7 +18,7 @@ void sub_08153610(void);
 void sub_08154CD4(void);
 void sub_081556E0(void);
 
-u32 sub_0815C4FC(struct P *p, u32 c)
+u32 PlayerCue_StateMotion(struct P *p, u32 c)
 {
     p->c = c;
     if (p->state <= 1 || p->state == 6)

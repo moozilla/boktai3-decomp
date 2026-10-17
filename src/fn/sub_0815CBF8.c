@@ -7,7 +7,7 @@ extern u8 *gUnk_02000580[];
 s32 sub_0815A400(void);
 s32 sub_0815C9EC(void);
 s32 sub_0815CA08(void);
-void sub_0815B0A8(u8 *actor, struct PackedVec *destination, s32 e, s32 direction);
+void PlayerCue_WalkTo(u8 *actor, struct PackedVec *destination, s32 e, s32 direction);
 void sub_0814F828(u8 *);
 /* Script: -p x y z destination for the scripted actor chosen by -i, with -d
    (default -1) and -e (default 0); tentative: starts a move to that point. */
@@ -24,7 +24,7 @@ void ScriptActor_MoveToFromScript(void)
         destination.z = Script_GetValue();
         direction = sub_0815C9EC();
         e = sub_0815CA08();
-        sub_0815B0A8(actor, &destination, e, direction);
+        PlayerCue_WalkTo(actor, &destination, e, direction);
         sub_0814F828(actor);
     }
 }

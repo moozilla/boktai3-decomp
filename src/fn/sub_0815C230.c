@@ -17,7 +17,7 @@ void sub_0815AD78(struct P *);
 void sub_0813AFEC(struct P *, s32, s32);
 void sub_0814FC24(void);
 
-void sub_0815C230(struct P *p, s32 dir, u32 c)
+void PlayerCue_StandDiagonal(struct P *p, s32 dir, u32 c)
 {
     if (dir >= 0)
         p->dir = dir;

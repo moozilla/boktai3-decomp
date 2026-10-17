@@ -28,7 +28,7 @@ static inline int randomWith(const u16 *table)
     return *(const u16 *)(offset + (u32)table);
 }
 
-void sub_0815C5A4(struct P *p, s32 a)
+void PlayerCue_ShakeEffect(struct P *p, s32 a)
 {
     struct Vec v;
 
