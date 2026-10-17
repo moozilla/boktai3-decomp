@@ -443,7 +443,7 @@ class Readable:
 
     def text_note(self, args, opts):
         ids = [v[1] for v in list(args) + [x for _, vs in opts for x in vs] if v[0] == "text"]
-        tx = lambda i: (ENGLISH.get(i) if self.english else None) or self.n.texts.get(i)
+        tx = lambda i: re.sub(r"\s*\n\s*", " ", (ENGLISH.get(i) if self.english else None) or self.n.texts.get(i) or "")
         return "; ".join(f'"{tx(i)}"' for i in ids if tx(i))
 
 
