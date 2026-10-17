@@ -53,7 +53,8 @@ INPUTS = ["data/actor_registry.csv", "data/items.csv", "data/notes.csv",
           "gcl/names/files.csv", "symbols/functions.csv", "tools/studio/atlas.py", "tools/assets/actors.py",
           "tools/assets/tilesets.py", "data/stage_palettes.csv", "tools/studio/sound.py", "tools/m4a.py",
           "tools/assets/cutscenes.py", "tools/mgba/scenes.py", "tools/assets/gclfiles.py",
-          "tools/assets/areas.py", "tools/assets/stages.py", "tools/assets/story.py"]
+          "tools/assets/areas.py", "tools/assets/stages.py", "tools/assets/story.py",
+          "tools/assets/saves.py"]
 # the monster list's bosses: 黒騎士 and ニーズホッグ (9902-9903), then 伯爵 on (9915-)
 BOSSES = {9902, 9903} | set(range(9915, 9922))
 
@@ -713,6 +714,26 @@ def build():
             sc.setdefault("beats", []).append(f"beat:{v}")
         if cut is not None:
             cut.setdefault("beats", []).append(f"beat:{v}")
+
+    # ---- savestate checkpoints (tools/assets/saves.py; ../boktai3trans/saves) ----
+    import saves
+    try:
+        bank = saves.bank() if os.path.isdir(saves.BANK) else []
+    except Exception:
+        bank = []
+    beat_vals = sorted(int(e["key"]) for e in E.values() if e["kind"] == "beat")
+    for r in bank:
+        if "error" in r:
+            continue
+        ck = {"file": r["file"], "label": r["label"], "save": "build/saves/" + r["file"][:4] + ".sav",
+              "story": r["story"], "scene": r["scene"], "entrance": r["entrance"]}
+        sc = E.get(f"scene:{r['scene']}")
+        if sc is not None:
+            sc.setdefault("checkpoints", []).append(ck)
+        # the beat it is at: the highest story value reached
+        at = max((v for v in beat_vals if v <= r["story"]), default=None)
+        if at is not None:
+            E[f"beat:{at}"].setdefault("checkpoints", []).append(dict(ck, scene_id=sc["id"] if sc else None))
 
     # ---- explicit links (data/atlas/links.csv) ----
     for r in csv.DictReader(l for l in open(os.path.join(ROOT, "data", "atlas", "links.csv"), encoding="utf-8") if not l.startswith("#")):
