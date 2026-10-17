@@ -94,6 +94,10 @@ table.t th { color: var(--muted); font-weight: 500; font-size: 12px; }
 #sres .r .p { color: var(--muted); font-size: 12px; margin-left: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 45%; }
 .mapframe { width: 100%; height: 460px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
 pre.script { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; overflow: auto; max-height: 70vh; font: 12.5px/1.5 ui-monospace, Menlo, monospace; white-space: pre; }
+.dlg { margin: 0 0 16px; }
+.dlg .dh { font-weight: 550; margin-bottom: 4px; }
+.dlg .ln { display: grid; grid-template-columns: 58px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid var(--line); }
+.dlg .en { white-space: normal; }
 .kbd { font-size: 11px; border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; color: var(--muted); }
 @media (max-width: 860px) { main { grid-template-columns: 1fr; height: auto; } #side { height: 40vh; } .page { padding: 14px 16px 40px; } }
 </style>
@@ -214,6 +218,7 @@ function picOf(e, size = 64) {
   if (e.kind === 'sprite') return thumb('big', e.key, size);
   if (e.kind === 'package') return thumb('spr', e.key, size);
   if (e.kind === 'monster') { if (e.palette) return thumb('big', e.palette.sprite, size, { pool: e.palette.pool }); const a = E[e.actors[0]]; return a ? picOf(a, size) : ''; }
+  if (e.kind === 'char' && e.portrait) return thumb('big', e.portrait.sprite, size, { pool: e.portrait.pool, frame: e.portrait.frame });
   if (e.kind === 'char') { const sp = e.sprites?.[0]; if (sp) return sp.startsWith('spr:') ? thumb('spr', sp.slice(4), size) : thumb('big', sp.slice(7), size); return e.actors?.length ? picOf(E[e.actors[0]], size) : ''; }
   if (e.kind === 'actor' && e.pic) return e.pic.startsWith('spr:') ? thumb('spr', e.pic.slice(4), size) : thumb('big', e.pic.slice(7), size);
   if (e.kind === 'actor') { if (e.sprites[0]) return thumb('big', e.sprites[0], size); if (e.small[0]) return thumb('spr', e.small[0], size); return ''; }
@@ -347,13 +352,17 @@ const PAGES = {
   char(e) {
     const big = (e.sprites || []).filter(x => x.startsWith('sprite:')).map(x => x.slice(7));
     const pk = (e.sprites || []).filter(x => x.startsWith('spr:'));
-    return `<div class="page">${head(e, `<span class="jp">${esc(e.jp)}</span> · ${stringLink(e.key, 'string ' + e.key)}`)}
+    const pt = e.portrait;
+    const hero = pt ? `<div style="display:flex;gap:16px;align-items:center;margin:12px 0 4px"><a href="${gfxHref('big', pt.sprite, pt.frame)}" data-peek style="image-rendering:pixelated">${thumb('big', pt.sprite, 96, { pool: pt.pool, frame: pt.frame })}</a><div class="muted">Dialogue portrait: speaker <span class="mono">${esc(e.label)}</span> (id ${pt.id}), frame ${pt.frame} of ${link('sprite:' + pt.sprite)}, palette ${pt.pool}</div></div>` : '';
+    // every line, grouped by the script that shows it, in script order
+    const groups = [];
+    for (const l of e.dialogue || []) { const g = groups[groups.length - 1]; g && g.file === l.file ? g.lines.push(l) : groups.push({ file: l.file, lines: [l] }); }
+    return `<div class="page">${head(e, `<span class="jp">${esc(e.jp)}</span>${/^\d+$/.test(e.key) ? ' · ' + stringLink(e.key, 'string ' + e.key) : ''}`)}${hero}
       ${pk.length || big.length ? `<h3>Sprites</h3>${pk.length ? `<div class="cards">${pk.map(cardFor).join('')}</div>` : ''}${big.map(palettes).join('')}` : ''}
       ${e.monster ? `<h3>In the bestiary</h3><div class="chips">${chip(e.monster)}</div>` : ''}
-      ${e.lines ? `<h3>Speaks <span class="n">${e.lines} lines in ${e.files.length} scripts</span></h3>
-        ${e.nscenes ? `<div class="muted" style="margin-bottom:6px">In ${e.nscenes} scenes' own scripts:</div>${placesOf(e.areas)}` : ''}
-        <table class="t" style="margin-top:10px">${e.sample.map(l => `<tr><td class="mono muted">${stringLink(l.id, '#' + l.id)}</td><td>${esc(l.en || '')}<div class="muted">${esc(l.jp)}</div></td></tr>`).join('')}</table>
-        <div class="chips" style="margin-top:8px">${e.files.slice(0, 40).map(f => chip(f, E[f]?.title)).join('')}</div>` : ''}
+      ${e.lines ? `<h3>Where they speak <span class="n">${e.nscenes} scenes</span></h3>${e.nscenes ? placesOf(e.areas) : '<div class="empty">Only in shared scripts.</div>'}
+        <h3>Dialogue <span class="n">${e.lines} lines in ${groups.length} scripts</span></h3>
+        ${groups.map(g => `<div class="dlg"><div class="dh">${link(g.file, E[g.file]?.title)} · ${peekLink('/scripts#file=' + (E[g.file]?.key || ''), 'read ↗')}</div>${g.lines.map(l => `<div class="ln"><span class="mono muted">${stringLink(l.id, '#' + l.id)}</span><div><div class="en">${esc(l.en || '').replace(/\n/g, '<br>')}</div><div class="muted">${esc(l.jp).replace(/\n/g, '<br>')}</div></div></div>`).join('')}</div>`).join('')}` : ''}
       <h3>Objects</h3>${e.actors.length ? `<div class="cards">${e.actors.map(cardFor).join('')}</div>` : '<div class="empty">Not linked to an object yet: nothing in the code or data names it.</div>'}</div>`;
   },
   package(e) {
