@@ -359,7 +359,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif self.path == "/api/learned":
             import bigpalettes  # large sprites: default from the data, variants the game selects
             self.send(200, {"stages": live.stage_palettes(), "sprites": live.sprite_palettes(),
-                            "bigpools": {f"{h:04X}": bigpalettes.variants(h) for h in bigpalettes.defaults()}})
+                            "bigpools": {f"{h:04X}": bigpalettes.variants(h) for h in bigpalettes.defaults()},
+                            "poolfuncs": {p: [[f, actors.fname(int(f[4:], 16)) if f.startswith("sub_") else f] for f in fs]
+                                          for p, fs in bigpalettes.code_selections().items()}})
         elif self.path == "/api/tags":
             self.send(200, live.tags())
         elif self.path == "/api/stages":
