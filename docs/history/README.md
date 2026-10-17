@@ -103,13 +103,6 @@ or scan the table below. Each entry has a `Tags:` line under its heading (vocabu
 | [2026-10-15.md](2026-10-15.md#L504) | October 15 continuation: attachment ownership, scene control and particle pools | actors scene inventory particles tooling | 0 |
 | [2026-10-15.md](2026-10-15.md#L550) | October 15 (Claude): stage terrain, doors and the map projection (tooling) | scripts scene assets tooling | 8 |
 | [2026-10-15.md](2026-10-15.md#L604) | October 15 (Codex/team): inventory controller, events and attachment helpers | scripts inventory animation tooling | 0 |
-| [2026-10-16.md](2026-10-16.md#L3) | October 16 (Claude): script entry points, batch 7 | scripts | 1 |
-| [2026-10-16.md](2026-10-16.md#L10) | October 16 (Claude): script entry points, batch 6 | scripts actors | 0 |
-| [2026-10-16.md](2026-10-16.md#L17) | October 16 (Claude): script entry points, batch 5 | scripts actors tooling | 0 |
-| [2026-10-16.md](2026-10-16.md#L25) | October 16 (Claude): script entry points, batch 4 | scripts actors | 1 |
-| [2026-10-16.md](2026-10-16.md#L32) | October 16 (Claude): script entry points, batch 3 | scripts actors | 0 |
-| [2026-10-16.md](2026-10-16.md#L39) | October 16 (Claude): script entry points, batch 2 | scripts actors tooling | 2 |
-| [2026-10-16.md](2026-10-16.md#L47) | October 16 (Claude): script entry points, batch 1 | scripts text actors | 15 |
 | [2026-10-early-state.md](2026-10-early-state.md#L6) | Where things stood (written October 9-12; numbers superseded) | scripts actors inventory menu wireless sound hardware library assets tooling | 10 |
 | [2026-10-early-state.md](2026-10-early-state.md#L217) | Former section 2: Setting up (new machine/session) | tooling process | 0 |
 | [2026-10-early-state.md](2026-10-early-state.md#L243) | Former section 3: How to match a function (the inner loop) | tooling process | 3 |
@@ -118,3 +111,16 @@ or scan the table below. Each entry has a `Tags:` line under its heading (vocabu
 | [2026-10-early-state.md](2026-10-early-state.md#L315) | Former section 6: Known-hard classes (backlog for stronger models / permuter) | tooling process | 9 |
 | [2026-10-early-state.md](2026-10-early-state.md#L341) | Former section 7: Other open work | tooling process | 0 |
 | [2026-10-early-state.md](2026-10-early-state.md#L357) | Former section 8: Translation (separate repo) | tooling process | 1 |
+| [2026-10-16.md](2026-10-16.md#L3) | October 16 (Claude): script entry points, batch 12 | scripts actors | 0 |
+| [2026-10-16.md](2026-10-16.md#L11) | October 16 (Claude): script entry points, batch 11 | scripts actors | 0 |
+| [2026-10-16.md](2026-10-16.md#L20) | October 16 (Claude): script entry points, batch 10 | scripts actors | 2 |
+| [2026-10-16.md](2026-10-16.md#L28) | October 16 (Claude): script entry points, batch 9 | scripts actors | 0 |
+| [2026-10-16.md](2026-10-16.md#L37) | October 16 (Claude): script entry points, batch 8 | scripts actors | 1 |
+| [2026-10-16.md](2026-10-16.md#L46) | October 16 (Claude): script entry points, batch 7 | scripts | 0 |
+| [2026-10-16.md](2026-10-16.md#L53) | October 16 (Claude): script entry points, batch 6 | scripts actors | 0 |
+| [2026-10-16.md](2026-10-16.md#L60) | October 16 (Claude): script entry points, batch 5 | scripts actors tooling | 0 |
+| [2026-10-16.md](2026-10-16.md#L68) | October 16 (Claude): script entry points, batch 4 | scripts actors | 1 |
+| [2026-10-16.md](2026-10-16.md#L75) | October 16 (Claude): script entry points, batch 3 | scripts actors | 0 |
+| [2026-10-16.md](2026-10-16.md#L82) | October 16 (Claude): script entry points, batch 2 | scripts actors tooling | 2 |
+| [2026-10-16.md](2026-10-16.md#L90) | October 16 (Claude): script entry points, batch 1 | scripts text actors | 16 |
+| [2026-10-17.md](2026-10-17.md#L3) | October 17 (Claude): script entry points, batch 13 | scripts actors | 0 |
