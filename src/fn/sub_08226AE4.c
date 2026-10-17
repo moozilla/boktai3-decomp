@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define Camera_SetCenteredBounds sub_08226AE4
 struct Rect {
     s16 x, size, y;
 };

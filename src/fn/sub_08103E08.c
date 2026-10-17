@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define NamedObject_ReleaseFromScript sub_08103E08
 extern u8 *gUnk_020001AC;
 extern u8 *gUnk_02000580[];
 u8 *sub_08101A74(void);

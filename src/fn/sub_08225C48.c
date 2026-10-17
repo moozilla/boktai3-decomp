@@ -7,7 +7,7 @@ struct TerrainHeader {
     u32 paths;
     u32 navMeshes;
 };
-void *sub_0821A520(u32, u16);
+void *ScriptProc_Start(u32, u16);
 struct TerrainHeader *sub_08225C08(void);
 void Terrain_SetGrid(u32);
 void Terrain_SetBoxes(u32);
@@ -18,7 +18,7 @@ void Terrain_SetNavMeshes(u32);
 s32 Terrain_LoadHP(u32 id)
 {
     struct TerrainHeader *src, h;
-    if (!sub_0821A520(0xAE6C, (u16)id))
+    if (!ScriptProc_Start(0xAE6C, (u16)id))
         return -1;
     src = sub_08225C08();
     h = *src;

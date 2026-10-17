@@ -49,7 +49,7 @@ void sub_08029AA8(void *);
 void Sound_PlaySongChecked(int);
 void SceneActors_RunFirstEventScript(void *, void *);
 void ContactSequencePool_BeginAllDeaths(void *);
-void sub_081D5204(int);
+void GameState_SetEventFlag(int);
 void SceneActors_RunSecondEventScript(void *, void *);
 static inline void effect(ActorAnimation *p, int mode, int id, int duration)
 {
@@ -76,7 +76,7 @@ void sub_0802A63C(ActorAnimation *p)
         Sound_PlaySongChecked(958);
     }
     if (p->padB2 && !base->stage) {
-        sub_081D5204(80);
+        GameState_SetEventFlag(80);
         SceneActors_RunSecondEventScript(p, (u8 *)base + 0x8a4);
         base->stage++;
     }

@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define ScriptPrompt_SetFromScript sub_081E0CB4
 #include "engine.h"
 struct Settings {
     u8 *m;

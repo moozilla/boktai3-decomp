@@ -517,7 +517,7 @@ s32 Background_LoadMapFromScript(void)
         if (p)
             index = (u16)Background_FindMapId(&resource, sub_0821AA00(p));
     }
-    sub_082164AC(layer, base, index);
+    Bg_SetLayerMap(layer, base, index);
     return index;
 }
 
@@ -531,7 +531,7 @@ s32 sub_080020BC(s32 layer, u16 resourceId, s32 useIndex, u16 index)
     resource.extra += (u32)base;
     if (!useIndex)
         index = Background_FindMapId(&resource, index);
-    sub_082164AC(layer, base, index);
+    Bg_SetLayerMap(layer, base, index);
     return index;
 }
 
