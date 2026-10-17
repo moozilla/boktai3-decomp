@@ -23,6 +23,9 @@
 --   log TEXT              write TEXT to the log
 --   quit                  stop (also at the end of the file)
 --
+-- PALETTE_LOG=1 also logs every large-sprite palette selection to
+-- OUTDIR/sprite_pools.tsv (scene, hash, pool entry, caller).
+--
 -- Spawning an actor is a `call` of its spawner procedure with arguments
 -- (gcl/names/proc.csv names them: spawn_slime_by_color, place_bat, ...).
 local SRC = (debug.getinfo(1, "S").source or ""):gsub("^@", "")
@@ -36,6 +39,22 @@ local OUTDIR = ROOT .. "/build/centaur/scenarios/" .. name
 os.execute('mkdir -p "' .. OUTDIR .. '"')
 local logf = io.open(OUTDIR .. "/log.txt", "w")
 local function say(s) console:log("scenario: " .. s); if logf then logf:write(s, "\n"); logf:flush() end end
+
+-- PALETTE_LOG=1: log every large-sprite palette selection (scene, hash, pool
+-- entry, caller) to OUTDIR/sprite_pools.tsv, as tools/mgba/palette_survey.lua
+-- does; tools/assets/bigpalettes.py folds such logs into data/sprite_palettes.csv
+if os.getenv("PALETTE_LOG") then
+  local pf = io.open(OUTDIR .. "/sprite_pools.tsv", "w")
+  pf:write("scene\thash\tpool\tcaller\n")
+  local anim_hash, seen = {}, {}
+  emu:setBreakpoint(function() anim_hash[emu:readRegister("r0")] = emu:readRegister("r1") & 0xFFFF end, 0x082151E4)
+  emu:setBreakpoint(function()
+    local a, p, lr = emu:readRegister("r0"), emu:readRegister("r1") & 0xFFFF, emu:readRegister("lr")
+    local h = anim_hash[a]
+    local k = string.format("%d\t%s\t%d\t%08X", scene() or -1, h and string.format("%04X", h) or "?", p, (lr - 1) & ~1)
+    if not seen[k] then seen[k] = true; pf:write(k, "\n"); pf:flush() end
+  end, 0x08215284)
+end
 
 local steps = {}
 local f = io.open(path, "r")
