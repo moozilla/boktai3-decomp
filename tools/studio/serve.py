@@ -292,6 +292,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
             import atlas
             ix = atlas.load()
             self.send(200, {"tree": ix["tree"], "entities": ix["entities"]})
+        elif self.path in ("/rom", "/rom.html"):
+            self.send(200, open(os.path.join(HERE, "rom.html"), "rb").read(), "text/html; charset=utf-8")
+        elif self.path == "/api/rommap":
+            import atlas
+            self.send(200, atlas.rom_load())
         elif self.path == "/api/atlas/funcs":
             import atlas
             self.send(200, atlas.load()["funcs"])
@@ -315,8 +320,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, {"files": gclfiles.files()})
         elif self.path.startswith("/api/file/"):
             import gclfiles
-            fid, *opts = self.path[len("/api/file/"):].split("/")  # /api/file/ID[/inline][/raw]
-            lines = gclfiles.render(fid, inline="inline" in opts, readable="raw" not in opts)
+            fid, *opts = self.path[len("/api/file/"):].split("/")  # /api/file/ID[/inline][/raw][/en]
+            if "en" in opts:
+                import gclview
+                gclview.ENGLISH = self.server.display_en
+            lines = gclfiles.render(fid, inline="inline" in opts, readable="raw" not in opts, english="en" in opts)
             self.send(200 if lines is not None else 404,
                       {"lines": lines, "inlined": sorted(gclfiles.inlinable(fid))} if lines is not None else {"error": "no such file"})
         elif self.path.startswith("/api/code/"):

@@ -201,7 +201,7 @@ def header(cid):
     return f"def {name}({params.replace(',', ', ')}):  # proc {cid}"
 
 
-def render(fid, inline=False, readable=True):
+def render(fid, inline=False, readable=True, english=False):
     """[(proc id or None, line)] for one file: each procedure's def line and body
     (readable view), or Konami-style GCL as compiled when not readable."""
     f = next((f for f in files() if f["id"] == fid), None)
@@ -219,7 +219,7 @@ def render(fid, inline=False, readable=True):
         if c in ok:
             continue
         out.append((c, header(c)))
-        lines = gclview.render(img, c, inline=ok.__contains__ if ok else None) or ["pass"]
+        lines = gclview.render(img, c, inline=ok.__contains__ if ok else None, english=english) or ["pass"]
         out += [(c, "    " + ln) for ln in lines]
         out.append((None, ""))
     return out
