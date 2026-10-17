@@ -5,7 +5,7 @@ s32 sub_0815A400(void);
 s32 sub_0815C9EC(void);
 s32 sub_0815CA08(void);
 void sub_0814F828(u8 *);
-void sub_0815B2E0(u8 *, s32, s32);
+void PlayerCue_Kneel(u8 *, s32, s32);
 
 void sub_0815CE54(void)
 {
@@ -15,7 +15,7 @@ void sub_0815CE54(void)
     p = gUnk_02000580[i];
     if (p != 0) {
         a = sub_0815C9EC();
-        sub_0815B2E0(p, a, sub_0815CA08());
+        PlayerCue_Kneel(p, a, sub_0815CA08());
         sub_0814F828(p);
     }
 }

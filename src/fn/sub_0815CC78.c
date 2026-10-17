@@ -7,10 +7,10 @@ extern u8 *gUnk_02000580[];
 s32 sub_0815A400(void);
 s32 sub_0815C9EC(void);
 s32 sub_0815CA08(void);
-void sub_0815BF18(u8 *actor, struct PackedVec *point, s32 direction, s32 e);
+void PlayerCue_RunTo(u8 *actor, struct PackedVec *point, s32 direction, s32 e);
 void sub_0814F828(u8 *);
 /* Sibling of ScriptActor_MoveToFromScript (not referenced directly by the
-   registry): -p x y z, -d and -e for sub_0815BF18. */
+   registry): -p x y z, -d and -e for PlayerCue_RunTo. */
 void sub_0815CC78(void)
 {
     struct PackedVec point;
@@ -24,7 +24,7 @@ void sub_0815CC78(void)
         point.z = Script_GetValue();
         direction = sub_0815C9EC();
         e = sub_0815CA08();
-        sub_0815BF18(actor, &point, direction, e);
+        PlayerCue_RunTo(actor, &point, direction, e);
         sub_0814F828(actor);
     }
 }

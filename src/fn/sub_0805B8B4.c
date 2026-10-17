@@ -18,7 +18,7 @@ void ScenePanel_AdvanceSubjectDeparture(struct ScenePanel *input)
         sub_0822B058(4);
     } else if (frame == 90) {
         sub_08226508(16);
-        sub_0815B28C(SCENE_PANEL_PLAYER, 0);
+        PlayerCue_Motion7End(SCENE_PANEL_PLAYER, 0);
     } else if (frame > 105) {
         struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
         if (!player->tetherMode) {

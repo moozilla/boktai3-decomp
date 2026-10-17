@@ -47,12 +47,12 @@ DIRECTOR = 0x4E69
 # receiver kinds: the class each registration site gives (08020CD4 callers)
 KINDS = {
     1: ("director", "SceneMessages_Initialize", "SceneMessages_Dispatch"),
-    2: ("player", "sub_0815D688", "sub_0815D6B0"),
+    2: ("player", "sub_0815D688", "PlayerCue_Dispatch"),
     3: ("registry actor", "SceneActorRegistry_RegisterCategoryReceiver", None),
-    4: ("scene actor", "SceneActors_Initialize", "sub_08022F88"),
-    5: ("npc", "SceneNpc_CreateFromScript", "sub_081D01C8"),
-    6: ("camera", "sub_08227478", "sub_08226930"),
-    7: ("screen", "sub_08021394", "sub_0802123C"),
+    4: ("scene actor", "SceneActors_Initialize", "SceneActors_DispatchCommands"),
+    5: ("npc", "SceneNpc_CreateFromScript", "SceneNpc_DispatchCommands"),
+    6: ("camera", "Camera_Initialize", "Camera_DispatchCommands"),
+    7: ("screen", "sub_08021394", "SceneCommands_Dispatch"),
     8: ("audio", "SceneAudioEvent_Register", "SceneAudioEvent_DispatchPending"),
     9: ("panel", "ScenePanel_RegisterReceiver", "ScenePanel_DispatchCommands"),
     10: ("object", "GroupObjects_Initialize", None),
@@ -65,15 +65,27 @@ KINDS = {
 # the handler's function name
 COMMANDS = {
     1: {0: "run", 1: "wait", 2: "wait_signal"},
-    # player (sub_0815D6B0): directions are 0-7
-    2: {2: "stand", 3: "face", 4: "idle", 7: "walk_to", 15: "move_to", 32: "pose",
-        47: "overlay_on", 48: "overlay_set", 49: "overlay_off", 50: "overlay_set"},
-    # npc (sub_081D01C8), the same shapes as the player's
-    5: {1: "stand", 3: "face", 4: "walk_to", 25: "pose", 26: "pose_end"},
-    # camera (sub_08226930): 0 sub_08226228, 1 sub_08226268, 2 pan, 3 sub_08226474,
-    # 4 sub_08226558, 5 sub_082264D0 (back to following the player over N frames)
-    6: {0: "reset", 1: "snap_to", 2: "pan_to", 5: "follow_player"},
-    # screen (sub_0802123C)
+    # player (PlayerCue_Dispatch): directions are 0-7. Handlers are PlayerCue_*;
+    # "motionN" names say only which motion (sub_0813AFEC) the command plays
+    2: {0: "hide", 1: "place", 2: "stand", 3: "face", 4: "idle", 5: "stand_v2", 6: "stand_v3",
+        7: "walk_to", 8: "motion7_front", 9: "motion7", 10: "motion7_end", 11: "kneel",
+        12: "kneel_down", 13: "kneel_gasp", 14: "get_up", 15: "move_to", 16: "motion29",
+        17: "motion30", 18: "motion30_end", 19: "motion29b", 20: "motion7_turn",
+        21: "motion7_v7", 22: "motion7_v3", 23: "aim", 24: "shoot", 25: "aim_hold",
+        26: "aim_end", 27: "face_side", 28: "motion11", 29: "motion10", 30: "form_motion",
+        31: "state_motion", 32: "pose", 33: "run_to", 34: "run", 35: "windblown",
+        36: "windblown_v2", 37: "windblown_v3", 38: "windblown_v4", 39: "stand_diagonal",
+        40: "stand_diagonal_b", 41: "motion17", 42: "motion17_v2", 43: "shake_effect",
+        44: "refresh", 45: "flag_5a1_on", 46: "flag_5a1_off", 47: "overlay_on",
+        48: "overlay_set", 49: "overlay_off", 50: "overlay_set", 51: "motion38_to"},
+    # scene actors (SceneActors_DispatchCommands): most commands only set a sub-state
+    4: {2: "place", 9: "effect", 25: "flash"},
+    # npc (SceneNpc_DispatchCommands), the same shapes as the player's
+    5: {1: "stand", 3: "face", 4: "walk_to", 5: "run_to", 25: "pose", 26: "pose_end",
+        64: "place"},
+    # camera (Camera_DispatchCommands): 3 sub_08226474 (mode 5 over N frames)
+    6: {0: "reset", 1: "snap_to", 2: "pan_to", 4: "sway", 5: "follow_player"},
+    # screen (SceneCommands_Dispatch)
     7: {0: "particles_at", 1: "particles_stop", 2: "particles_on", 3: "fade", 4: "fade_palette",
         5: "blend_palette", 6: "quake", 7: "quake_stop", 8: "flash", 9: "done"},
     8: {0: "play_sound", 1: "start_song", 2: "start_bgm", 3: "fade_in_bgm", 4: "fade_out_bgm",
@@ -471,6 +483,10 @@ def main():
         import script_targets
         prog = script_targets.progress()
         byname = {v: k for k, v in paltrace.addr_names().items()}
+        for ln in open(os.path.join(ROOT, "symbols", "functions.csv")):
+            p = ln.split(",")
+            if len(p) > 1 and re.match(r"^[0-9A-F]{8}$", p[0]):
+                byname.setdefault(p[1], int(p[0], 16))
         h = handlers()
         total = done = 0
         for k, (name, reg, disp) in sorted(KINDS.items()):

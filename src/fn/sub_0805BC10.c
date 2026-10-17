@@ -11,7 +11,7 @@ void ScenePanel_AdvanceTetherReturn(struct ScenePanel *input)
             s32 x = sourceX - player->position.x;
             s32 z = tether->position.z - player->position.z;
             s32 direction = (((u16)Math_Atan2(x, z) + 112) >> 5) & 7;
-            sub_0815AF14(player, direction);
+            PlayerCue_Stand(player, direction);
             break;
         }
         case 64:
@@ -23,7 +23,7 @@ void ScenePanel_AdvanceTetherReturn(struct ScenePanel *input)
         case 316:
             if (panel->transitionSound)
                 Sound_PlaySong(panel->transitionSound);
-            sub_0815B2E0(SCENE_PANEL_PLAYER, -1, 0);
+            PlayerCue_Kneel(SCENE_PANEL_PLAYER, -1, 0);
             break;
         case 360:
             ScenePanel_CallPendingScript(input, 7);

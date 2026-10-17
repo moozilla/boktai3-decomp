@@ -12,7 +12,7 @@ void sub_0815AD78(struct P *);
 void sub_0813AFEC(struct P *, s32, s32);
 void sub_0814F90C(void);
 
-void sub_0815AF8C(struct P *p, s32 v)
+void PlayerCue_Idle(struct P *p, s32 v)
 {
     if (v >= 0)
         p->b = v;

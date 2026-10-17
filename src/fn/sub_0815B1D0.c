@@ -22,14 +22,14 @@ struct P {
 void sub_0815AD78(struct P *);
 void sub_0813ADD0(struct P *);
 void sub_0813AFEC(struct P *, s32, s32);
-void sub_0815AF14(struct P *, s32);
+void PlayerCue_Stand(struct P *, s32);
 void sub_081502AC(void);
 void sub_081507F4(void);
 void Sound_PlaySong(s32);
 
-void sub_0815B1D0(struct P *p, u32 b, u32 w)
+void PlayerCue_Motion7Front(struct P *p, u32 b, u32 w)
 {
-    sub_0815AF14(p, 4);
+    PlayerCue_Stand(p, 4);
     p->b9a = b;
     p->w5a4 = w;
     p->a4 = 4;
