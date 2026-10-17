@@ -8,10 +8,11 @@ Every large sprite has a default entry in its own data: the u16 at +2 of each
 frame record (the same in every frame), which AnimData_Load applies. Code
 then selects variants for different monsters or states sharing one sprite
 (the ghoul 9247 defaults to 400 and is drawn with 403 and 404). Variants come
-from two sources: a runtime log of every AnimData_SelectPaletteBank call while
-the game visits every scene (tools/mgba/palette_survey.lua ->
-build/centaur/sprite_pools.tsv, folded into data/sprite_palettes.csv by
-`write`), constant call pairs in the code (below), and the enemy palette
+from: runtime logs of every AnimData_SelectPaletteBank call while the game
+visits every scene (tools/mgba/palette_survey.lua ->
+build/centaur/sprite_pools.tsv) or runs a debug scenario with PALETTE_LOG
+(tools/mgba/scenario.lua; tools/mgba/combat_scenario.py fights every scene's
+enemies), folded into data/sprite_palettes.csv by `write`; constant call pairs in the code (below), and the enemy palette
 keyword: enemy create code selects Script_GetKeywordValue('C') + a constant
 base (the ghoul 9247: 402 + C), so every C value the scripts pass to that
 family's spawner key gives a variant (`keyword()`, through
@@ -216,13 +217,17 @@ def defaults():
 
 
 def runtime():
-    """{hash: {pool: set of callers}} from the palette survey log, if present."""
+    """{hash: {pool: set of callers}} from the palette survey log and every
+    debug scenario run with PALETTE_LOG (build/centaur/scenarios/*/)."""
     import csv
+    import glob
     out = collections.defaultdict(lambda: collections.defaultdict(set))
-    if os.path.exists(RUNTIME):
-        for r in csv.DictReader(open(RUNTIME), delimiter="\t"):
-            if r["hash"] != "?":
-                out[int(r["hash"], 16)][int(r["pool"])].add(r["caller"])
+    logs = [RUNTIME] + sorted(glob.glob(os.path.join(ROOT, "build", "centaur", "scenarios", "*", "sprite_pools.tsv")))
+    for f in logs:
+        if os.path.exists(f):
+            for r in csv.DictReader(open(f), delimiter="\t"):
+                if r["hash"] != "?":
+                    out[int(r["hash"], 16)][int(r["pool"])].add(r["caller"])
     return out
 
 

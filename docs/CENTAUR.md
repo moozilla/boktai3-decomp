@@ -297,6 +297,11 @@ copies at +0xAC and +0x10C; GameState +0x30 only mirrors it), `keys KEYS N`,
 procedure (`gcl/names/proc.csv`): `tests/scenarios/slime_colors.txt` places one
 slime of each color with `place_slime` (1560) to compare palette variants, and
 `tests/scenarios/sealed_prison_tour.txt` warps, moves the player and captures.
+With `PALETTE_LOG=1` a scenario also logs every large-sprite palette selection
+(`sprite_pools.tsv`); `tools/mgba/combat_scenario.py` writes a scenario that
+fights the enemies of every scene (142), which reaches damage flashes and
+attack palettes a scene visit does not. `tools/assets/bigpalettes.py write`
+folds all such logs into `data/sprite_palettes.csv`.
 
 ## Stitched dungeon maps
 
