@@ -84,7 +84,10 @@ def solve_one(func, path, out, a):
             sol = json.load(open(tj))
             kind = "solved in compiler" if sol["score"] == 0 else f"partial in compiler ({sol['score']} left)"
             targets = tj
-        if base is None or base > a.max_bytes:
+        # how far C has to go: the draft's distance, or less when the
+        # compiler-space solution leaves only a small residue
+        reach = base if targets == "none" else min(base or 10 ** 9, sol["score"] + 16)
+        if base is None or reach > a.max_bytes:
             rows.append((func, name, base, kind + "; too far for C search", "", round(time.time() - t0), ""))
             continue
         budget = a.translate_seconds if targets != "none" else a.translate_seconds // 2
