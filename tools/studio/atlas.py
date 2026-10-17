@@ -19,9 +19,10 @@ and func (a code function). The tree groups them:
 * Places: areas in story order, their scenes;
 * Items: data/items.csv by category;
 * Scripts: the GCL source files by category (tools/assets/gclfiles.py);
-* Script commands: registry routines that act rather than appear, by subsystem;
-* Sprites: by the kind of thing that loads them;
-* Code: functions by translation unit subsystem, with decomp status.
+* Sprites: large sprites and sprite packages in archive (ROM) order;
+* Code: subsystems in ROM order, with their functions and decomp status.
+
+rom_tree() is the ROM as nested blocks for tools/studio/rom.html.
 
 Built from the existing tools (actors.py, stages, areas.py, bigpalettes.py,
 paltrace.py families, script_targets.progress) and cached in
