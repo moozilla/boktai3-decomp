@@ -1,10 +1,9 @@
 --- a/local-alloc.c
 +++ b/local-alloc.c
-@@ -69,6 +69,220 @@
- #include "insn-config.h"
+@@ -70,6 +70,269 @@
  #include "insn-attr.h"
  #include "recog.h"
-+#include "output.h"
+ #include "output.h"
 +
 +/* Instrumentation for tools/rasolve.py (Boktai 3 decomp). Never used by the
 +   real build: this copy of agbcc lives in build/agbcc-instr.
@@ -120,11 +119,14 @@
 +   change can be named across different sources.  */
 +static int agbcc_label_delta[AGBCC_MAXREG];
 +char *agbcc_pseudo_label ();
++static char agbcc_label_forced[AGBCC_MAXREG];
++static void agbcc_apply_force_labels ();
 +static void
 +agbcc_apply_labels ()
 +{
 +  char *e = getenv ("AGBCC_PRI_LABEL");
 +  int r, nregs = max_reg_num ();
++  agbcc_apply_force_labels ();
 +  for (r = 0; r < AGBCC_MAXREG; r++)
 +    {
 +      agbcc_pri_delta[r] -= agbcc_label_delta[r];
@@ -157,6 +159,52 @@
 +		  int d = atoi (colon + 1);
 +		  agbcc_label_delta[r] += d;
 +		  agbcc_pri_delta[r] += d;
++		}
++	    }
++	  if (! comma)
++	    break;
++	  p = comma + 1;
++	}
++    }
++}
++
++/* AGBCC_FORCE_LABEL="label:hard,...": like AGBCC_FORCE, by label.  */
++static void
++agbcc_apply_force_labels ()
++{
++  char *e = getenv ("AGBCC_FORCE_LABEL");
++  int r, nregs = max_reg_num ();
++  for (r = 0; r < AGBCC_MAXREG; r++)
++    if (agbcc_label_forced[r])
++      {
++	agbcc_force[r] = -1;
++	agbcc_label_forced[r] = 0;
++      }
++  if (! e || ! *e)
++    return;
++  for (r = FIRST_PSEUDO_REGISTER; r < nregs && r < AGBCC_MAXREG; r++)
++    {
++      char *lab = agbcc_pseudo_label (r);
++      char *p = e;
++      if (! lab || ! strcmp (lab, "-"))
++	continue;
++      while (*p)
++	{
++	  char *comma = strchr (p, ',');
++	  char item[256], *colon;
++	  int len = comma ? comma - p : strlen (p);
++	  if (len >= (int) sizeof item)
++	    len = sizeof item - 1;
++	  memcpy (item, p, len);
++	  item[len] = 0;
++	  colon = strrchr (item, ':');
++	  if (colon)
++	    {
++	      *colon = 0;
++	      if (! strcmp (item, lab))
++		{
++		  agbcc_force[r] = atoi (colon + 1);
++		  agbcc_label_forced[r] = 1;
 +		}
 +	    }
 +	  if (! comma)
@@ -218,10 +266,11 @@
 +    agbcc_dump = fopen (e, "a");
 +}
 +#undef done
- #include "output.h"
++#include "output.h"
  #include "toplev.h"
  
-@@ -249,6 +463,8 @@
+ /* Next quantity number available for allocation.  */
+@@ -249,6 +512,8 @@
  static int qty_sugg_compare    	(int, int);
  static int qty_sugg_compare_1	(const void *, const void *);
  static int qty_compare    	(int, int);
@@ -230,20 +279,22 @@
  static int qty_compare_1	(const void *, const void *);
  static int combine_regs		(rtx, rtx, int, int, rtx, int);
  static int reg_meets_class_p	(int, enum reg_class);
-@@ -298,6 +514,9 @@
+@@ -297,6 +562,9 @@
+ {
    register int b, i;
    int max_qty;
- 
++
 +  agbcc_instr_init ();
 +  agbcc_apply_labels ();
-+
+ 
    /* Leaf functions and non-leaf functions have different needs.
       If defined, let the machine say what kind of ordering we
-      should use.  */
-@@ -1330,12 +1549,29 @@
-       qsort (qty_order, next_qty, sizeof (int), qty_sugg_compare_1);
-     }
+@@ -1328,6 +1596,21 @@
  
+     default:
+       qsort (qty_order, next_qty, sizeof (int), qty_sugg_compare_1);
++    }
++
 +  /* Instrumentation: forced quantities take their register first.  */
 +  agbcc_instr_init ();
 +  qty_forced = (char *) alloca (next_qty + 1);
@@ -257,11 +308,10 @@
 +	  qty_phys_reg[i] = agbcc_force[r];
 +	  post_mark_life (agbcc_force[r], qty_mode[i], 1, qty_birth[i], qty_death[i]);
 +	}
-+    }
-+
+     }
+ 
    /* Try to put each quantity in a suggested physical register, if it has one.
-      This may cause registers to be allocated that otherwise wouldn't be, but
-      this seems acceptable in local allocation (unlike global allocation).  */
+@@ -1336,6 +1619,8 @@
    for (i = 0; i < next_qty; i++)
      {
        q = qty_order[i];
@@ -270,7 +320,7 @@
        if (qty_phys_num_sugg[q] != 0 || qty_phys_num_copy_sugg[q] != 0)
  	qty_phys_reg[q] = find_free_reg (qty_min_class[q], qty_mode[q], q,
  					 0, 1, qty_birth[q], qty_death[q]);
-@@ -1387,7 +1623,7 @@
+@@ -1387,7 +1672,7 @@
    for (i = 0; i < next_qty; i++)
      {
        q = qty_order[i];
@@ -279,7 +329,7 @@
  	{
  	  if (N_REG_CLASSES > 1)
  	    {
-@@ -1414,6 +1650,13 @@
+@@ -1414,6 +1699,13 @@
  	for (i = qty_first_reg[q]; i >= 0; i = reg_next_in_qty[i])
  	  reg_renumber[i] = qty_phys_reg[q] + reg_offset[i];
        }
@@ -293,7 +343,7 @@
  }
  
  /* Compare two quantities' priority for getting real registers.
-@@ -1432,11 +1675,21 @@
+@@ -1432,9 +1724,19 @@
     Multiplying this by 10000 can't overflow.
     QTY_CMP_PRI is also used by qty_sugg_compare.  */
  
@@ -304,19 +354,17 @@
 +#define QTY_CMP_PRI(q) (QTY_CMP_PRI_BASE (q) \
 +  + (qty_first_reg[q] >= 0 && qty_first_reg[q] < AGBCC_MAXREG \
 +     ? agbcc_pri_delta[qty_first_reg[q]] : 0))
- 
- static int
++
++static int
 +qty_compare_pri (q)
 +     int q;
 +{
 +  return QTY_CMP_PRI (q);
 +}
-+
-+static int
+ 
+ static int
  qty_compare (q1, q2)
-      int q1, q2;
- {
-@@ -1505,6 +1758,7 @@
+@@ -1505,6 +1807,7 @@
  
  #undef QTY_CMP_SUGG
  #undef QTY_CMP_PRI

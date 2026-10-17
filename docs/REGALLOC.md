@@ -7,7 +7,7 @@ that moved them. Use it before reaching for register pins.
 
 ## Tools
 
-* `tools/regdiag.py FILE.c [FUNC] [--nonmatching] [--asm]` compiles the file
+* `tools/regdiag.py FILE.c [FUNC] [--nonmatching] [--asm] [--lines]` compiles the file
   with `-g -dp -dl -dg`, aligns the instructions with the ROM and, for each
   register that differs, reports which allocator chose it, the pseudo's
   statistics and the source lines that use it. `--asm` prints the aligned
@@ -15,6 +15,12 @@ that moved them. Use it before reaching for register pins.
 * `tools/unpin.py [FILE.c...]` strips register pins and `asm("")` barriers
   (outside NONMATCHING drafts) and reports which files still match.
   `--write` keeps the result.
+* `tools/regsolve.py FILE.c [FUNC]` replays global allocation from the dumps
+  (it says how many registers the replay reproduces) and reports which
+  pseudo must outrank which, by how many uses or instructions of lifetime,
+  with the C edit; `tools/litsweep.py FILE.c --pairs` tries RAM globals as
+  literal addresses for reload rotation. Workflow and measurements:
+  [PERMUTER.md](PERMUTER.md).
 * `tools/isolate.py UNIT.c FUNC OUT.c [--nonmatching]` copies one function
   out of a unit, so `check.py`, `regdiag.py` and `permute.py` see a file
   with one ROM function. It also splits `int a, b;` declarations, which
@@ -82,6 +88,15 @@ Note: `check.py FILE` without `--nonmatching` compiles a draft's
 * **Two shifts.** The permuter found `(c->height >> 2) >> 2` for `>> 4`
   (`sub_08013458`).
 
+* **Loop depth weights uses.** `flow.c` adds the loop depth to a register's
+  use count for every reference inside a loop, so an empty
+  `do { ... } while (0)` around an assignment raises that value's priority
+  without changing the program. `sub_08010514` needed the random table
+  pointer to outrank two short-lived constants; four nested empty loops
+  around `table = gUnk_0203B400;` did it (found by `tools/translate.py`).
+* **Pins can be the difference.** `sub_0802D44C` was a 96.5% draft with a pin
+  and an r9-clobbering barrier; without them it matches. Try the draft
+  unpinned (`tools/unpin.py`'s `strip_code`) before solving.
 * **Natural r7 allocation.** `local-alloc.c` excludes every eliminable register
   in `find_free_reg` (lines1917–1918 in the pinned source), including the Thumb
   frame pointer. Global allocation can still place a pseudo there and relocate
