@@ -6,7 +6,6 @@ s32 sub_08163E0C(u8 *);
 void Task_Kill(u8 *);
 void sub_08163BD4(void);
 void sub_08163BE0(void);
-#define ParticlePool_Create sub_08163E24
 /* Creates the 0x43C-byte task that owns 16 sprites (0x3C bytes each from
    +0x74; its destructor frees them). Scene NPCs and kind-29 characters keep
    the result (tentative name). */
