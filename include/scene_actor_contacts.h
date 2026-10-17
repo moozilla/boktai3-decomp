@@ -28,6 +28,6 @@ struct SceneActorContactNode *SceneActorContacts_SelectForActor(struct SceneActo
 void SceneActorContacts_TickCooldowns(void);
 u32 SceneActorContacts_Update(struct SceneActorContactManager *);
 struct SceneActorContactManager *SceneActorContacts_Destroy(struct SceneActorContactManager *);
-void sub_08073B84(struct SceneActorContactManager *, u32);
+void SceneActorContacts_SetOwner(struct SceneActorContactManager *, u32);
 void SceneActorContacts_Reset(void);
 #endif
