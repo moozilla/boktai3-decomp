@@ -28,7 +28,7 @@ static inline u8 sideDir(u8 d)
     return 0;
 }
 
-void sub_0815B858(struct P *p, s32 dir, u32 c)
+void PlayerCue_Motion7Turn(struct P *p, s32 dir, u32 c)
 {
     if (dir >= 0)
         p->dir = dir;

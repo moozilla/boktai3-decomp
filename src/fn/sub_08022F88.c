@@ -96,7 +96,7 @@ static inline void effect2(u8 *p, int mode, int id, int duration)
 }
 #define effect(p, id, mode, d) effect2(p, mode, id, d)
 
-void sub_08022F88(struct S *s)
+void SceneActors_DispatchCommands(struct S *s)
 {
     struct T *t = (struct T *)s;
     Entry *entry = &s->entry;
@@ -271,5 +271,5 @@ void sub_08022F88(struct S *s)
         } while (i < entry->count[gUnk_0200047C[0x24]]);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08022F88);
+INCLUDE_ASM("asm/nonmatching", SceneActors_DispatchCommands);
 #endif

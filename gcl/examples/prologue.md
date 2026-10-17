@@ -165,6 +165,10 @@ waking Django) and the tutorial.
   start one, supply the dialogue and spawn the cast.
 * Scene detection missed every scene whose `scene_start` flags are not 1:
   the prologue, boss rooms and story scenes (142 in all).
-* Still unknown: Vanargand's commands (scene actor dispatcher `sub_08022F88`,
-  inline, unmatched), most player commands past the simple ones, the NPC
-  commands, and which character `character 1` is.
+* The player commands are all matched and named (docs/CUTSCENES.md): Sabata
+  kneels and gets up (`kneel_down`, `kneel_gasp`, `get_up`), stands with his
+  scarf in the wind (`windblown_v2`), and the player is hidden and placed
+  between fades (`hide`, `place`).
+* Still unknown: Vanargand's commands 51–62 (the scene-actor dispatcher,
+  `SceneActors_DispatchCommands`, ignores them), most NPC commands, and which
+  character `character 1` is.

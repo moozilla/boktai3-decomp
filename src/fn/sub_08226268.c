@@ -26,7 +26,7 @@ static inline int project(int input)
 
 /* Camera command 1 (snap_to): move the camera to pos at once and recompute
    the scroll origin (gUnk_03005418) from its isometric projection. */
-void sub_08226268(struct Vec *pos)
+void Camera_SnapTo(struct Vec *pos)
 {
     struct Camera *c = gUnk_03005420;
     if (c) {

@@ -5,7 +5,7 @@ s32 sub_0815A400(void);
 s32 sub_0815C9EC(void);
 s32 sub_0815CA08(void);
 void sub_0814F828(u8 *);
-void sub_0815B28C(u8 *, s32);
+void PlayerCue_Motion7End(u8 *, s32);
 
 void sub_0815CE24(void)
 {
@@ -13,7 +13,7 @@ void sub_0815CE24(void)
     s32 i = sub_0815A400();
     p = gUnk_02000580[i];
     if (p != 0) {
-        sub_0815B28C(p, sub_0815CA08());
+        PlayerCue_Motion7End(p, sub_0815CA08());
         sub_0814F828(p);
     }
 }

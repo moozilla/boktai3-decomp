@@ -4,7 +4,7 @@ void sub_082279A8(s32, s32, s32, s32, s32, s32, s32);
 
 /* Screen command 3 (fade): args are on, speed, r, g, b, three layer-group
    switches and a last value; "on" picks mode 3 over mode 2. */
-void sub_08021044(void *p, void *unused, s16 *message)
+void SceneCommands_Fade(void *p, void *unused, s16 *message)
 {
     s16 *args = message + 4;
     u16 mask = 0;

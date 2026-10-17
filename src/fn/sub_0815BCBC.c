@@ -30,7 +30,7 @@ static inline int trunc12(int x)
     return x >= 0 ? x >> 12 : -(-x >> 12);
 }
 
-void sub_0815BCBC(struct P *p, s32 a, u32 c)
+void PlayerCue_Shoot(struct P *p, s32 a, u32 c)
 {
     struct Vec v;
     u32 angle;

@@ -30,7 +30,7 @@ static inline u8 above(u32 q)
     return FALSE;
 }
 
-void sub_0815B010(struct P *p, s32 dir, u32 c)
+void PlayerCue_StandVariant3(struct P *p, s32 dir, u32 c)
 {
     if (p->state == 6) {
         if (p->b3A2 > 1)

@@ -2,7 +2,7 @@
 
 void sub_08226178(void);
 
-void sub_08226228(void)
+void Camera_Reset(void)
 {
     u8 *s = *(u8 **)0x03005420;
     if (s != 0) {

@@ -17,14 +17,14 @@ void Trigger_ConsumePending(void *, s32);
 void SceneCommands_CreateEffect(void *, void *, void *);
 void sub_08020F6C(void *, void *, void *);
 void sub_08020FE4(void *, void *, void *);
-void sub_08021044(void *, void *, void *);
+void SceneCommands_Fade(void *, void *, void *);
 void SceneCommands_FadePalette(void *, void *, void *);
 void SceneCommands_BlendPalette(void *, void *, void *);
 void sub_080211B0(void *, void *, void *);
 void sub_080211C0(void *, void *, void *);
 void sub_080211C8(void *, void *, void *);
 
-s32 sub_0802123C(u8 *p)
+s32 SceneCommands_Dispatch(u8 *p)
 {
     Entry *entry = (Entry *)(p + 0x18);
     s32 i;
@@ -50,7 +50,7 @@ s32 sub_0802123C(u8 *p)
                     Trigger_ConsumePending(entry, 1);
                     break;
                 case 3:
-                    sub_08021044(p, entry, message);
+                    SceneCommands_Fade(p, entry, message);
                     Trigger_ConsumePending(entry, 1);
                     break;
                 case 4:

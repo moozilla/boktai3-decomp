@@ -11,7 +11,7 @@ void sub_0815AD78(struct P *);
 void sub_0813AFEC(struct P *, s32, s32);
 void sub_0814F8C8(void);
 
-void sub_0815AEE0(struct P *p)
+void PlayerCue_Hide(struct P *p)
 {
     sub_0815AD78(p);
     sub_0813AFEC(p, 0, 0);
