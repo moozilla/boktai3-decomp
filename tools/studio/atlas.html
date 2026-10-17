@@ -125,8 +125,8 @@ pre.script { background: var(--panel); border: 1px solid var(--line); border-rad
 studioHeader(`<button id="sbtn" title="Search everything">Search <span class="kbd">⌘K</span></button>`);
 let T = [], E = {}, F = null, open = new Set(), SEL = null;
 const nodes = {};                  // folder path -> node
-const ICON = { package: '▤', actor: '◆', monster: '☠', char: '☺', item: '◇', area: '▣', scene: '▫', file: '≡', sprite: '▤', unit: '{}', tileset: '▦', bgtiles: '▦', song: '♪', cut: '▶' };
-const KIND = { package: 'sprite', actor: 'object', monster: 'monster', char: 'character', item: 'item', area: 'area', scene: 'scene', file: 'script', sprite: 'sprite', unit: 'code', tileset: 'tileset', bgtiles: 'map tiles', song: 'song', cut: 'cutscene' };
+const ICON = { package: '▤', actor: '◆', monster: '☠', char: '☺', item: '◇', area: '▣', scene: '▫', file: '≡', sprite: '▤', unit: '{}', tileset: '▦', bgtiles: '▦', song: '♪', cut: '▶', beat: '★' };
+const KIND = { package: 'sprite', actor: 'object', monster: 'monster', char: 'character', item: 'item', area: 'area', scene: 'scene', file: 'script', sprite: 'sprite', unit: 'code', tileset: 'tileset', bgtiles: 'map tiles', song: 'song', cut: 'cutscene', beat: 'story beat' };
 const href = id => '#' + id;
 const link = (id, text) => E[id] ? `<a href="${href(id)}">${esc(text ?? E[id].title)}</a>` : esc(text ?? id);
 const chip = (id, text, extra = '') => E[id] ? `<a class="chip" href="${href(id)}">${esc(text ?? E[id].title)}${extra}</a>` : '';
@@ -229,6 +229,7 @@ function picOf(e, size = 64) {
   if (e.kind === 'actor') { if (e.sprites[0]) return thumb('big', e.sprites[0], size); if (e.small[0]) return thumb('spr', e.small[0], size); return ''; }
   if (e.kind === 'item') { const [h, f] = (e.icon || '').split('/'); return h ? thumb('spr', h, Math.min(48, size), { frame: +f }) : ''; }
   if (e.kind === 'cut') return e.speakers?.length ? picOf(E[e.speakers[0]], size) : '';
+  if (e.kind === 'beat') return E[e.cutscene] ? picOf(E[e.cutscene], size) : '';
   return '';
 }
 const nodePic = {};
@@ -257,6 +258,7 @@ function cardFor(id) {
   if (e.kind === 'song') small = `song ${e.key} · ${e.ntracks} track${e.ntracks > 1 ? 's' : ''}${e.scenes.length ? ` · ${e.scenes.length} scene${e.scenes.length > 1 ? 's' : ''}` : ''}`;
   if (e.kind === 'bgtiles') small = `map ${e.key} · ${e.tiles} tiles`;
   if (e.kind === 'cut') small = `${e.steps} steps${e.lines ? ` · ${e.lines} lines` : ''}`;
+  if (e.kind === 'beat') small = E[e.scene]?.title || (e.setters.length ? 'shared script' : 'never set');
   return `<a class="card" href="${href(id)}">${pic ? `<span class="picw">${pic}</span>` : ''}<span class="ct">${esc(label(e))}</span><small>${esc(small)}</small></a>`;
 }
 function nodePage(path) {
@@ -349,6 +351,12 @@ function cutTimeline(e) {
   });
   $('cjp').onchange = () => cutTimeline(e);
 }
+// Savestate checkpoints (tools/assets/saves.py): each is also a battery save
+// in build/saves/ that boots there (saves.py bank --make).
+function checkpoints(list, here) {
+  if (!list?.length) return '';
+  return `<h3>Checkpoints <span class="n">${list.length}</span></h3><table class="t"><tr><th>Checkpoint</th><th>Story</th><th>${here ? 'Entrance' : 'Scene'}</th><th>Run it</th></tr>${list.map(c => `<tr><td>${esc(c.label)}</td><td class="mono">${c.story}</td><td>${here ? `<span class="mono">${c.entrance}</span>` : link('scene:' + c.scene, E['scene:' + c.scene]?.title || String(c.scene))}</td><td class="mono muted" style="font-size:11px">BOKTAI3_SAV=${esc(c.save)} tools/emu/harness …</td></tr>`).join('')}</table>`;
+}
 const PAGES = {
   actor(e) {
     const species = e.names.filter(n => E['monster:' + n.id]);
@@ -408,8 +416,23 @@ const PAGES = {
       ${e.speakers.length ? `<h3>Who speaks <span class="n">${e.speakers.length}</span></h3><div class="cards">${e.speakers.map(cardFor).join('')}</div>` : ''}
       <div class="grid2"><div><h3>Receivers <span class="n">${e.cast.length}</span></h3><div class="chips">${e.cast.map(c => `<span class="chip">${esc(c)}</span>`).join('') || '<span class="empty">Only the director, camera, screen and sound.</span>'}</div></div>
       <div><h3>Scripts it runs <span class="n">${st ? st.ids.length : 0}</span></h3><div class="chips">${cast}</div></div></div>
+      ${e.beats?.length ? `<h3>Story progress</h3><div class="chips">${e.beats.map(id => chip(id)).join('')}</div>` : ''}
       ${songsOf(e)}
       <h3>Timeline <label class="muted" style="text-transform:none;letter-spacing:0;font-weight:400"><input type="checkbox" id="cjp"> Japanese</label></h3><div id="timeline" data-n="${e.key}">Loading…</div></div>`;
+  },
+  beat(e) {
+    const prev = E['beat:' + (+e.key - 1)] || Object.values(E).filter(b => b.kind === 'beat' && +b.key < +e.key).sort((a, b) => b.key - a.key)[0];
+    const next = Object.values(E).filter(b => b.kind === 'beat' && +b.key > +e.key).sort((a, b) => a.key - b.key)[0];
+    const where = e.setters.map(s => `<tr><td>${s.scene ? link(s.scene) : link(s.file, E[s.file]?.title)}</td><td>${peekLink('/scripts#' + s.proc, s.name || 'proc ' + s.proc)}</td><td>${s.cutscene ? link(s.cutscene) : ''}</td><td>${s.text != null ? stringLink(s.text, '#' + s.text) : ''}</td></tr>`).join('');
+    const byScene = {};
+    for (const t of e.tests) (byScene[t.scene || t.file || 'elsewhere'] ||= []).push(t);
+    return `<div class="page">${head(e, `story progress <span class="mono">r708[0x3C]</span> = ${e.key} · ${e.area ? link(e.area) : 'no area'}`)}
+      <div class="badges">${prev ? `<a class="badge" href="#${prev.id}">‹ ${esc(prev.title)}</a>` : ''}${next ? `<a class="badge" href="#${next.id}">${esc(next.title)} ›</a>` : ''}</div>
+      ${e.cutscene ? `<h3>Cutscene</h3><div class="cards">${cardFor(e.cutscene)}</div>` : ''}
+      ${checkpoints(e.checkpoints, false)}
+      <h3>Set by <span class="n">${e.setters.length}</span></h3>${e.setters.length ? `<table class="t"><tr><th>Where</th><th>Procedure</th><th>Cutscene</th><th>Line</th></tr>${where}</table>` : '<div class="empty">No script sets it: it is only tested, or set by a computed value.</div>'}
+      <h3>Doors it changes <span class="n">${e.doors.length}</span></h3>${e.doors.length ? `<table class="t"><tr><th>From</th><th>To</th><th>Entrance</th><th>When</th></tr>${e.doors.map(d => `<tr><td>${link(d.from)}</td><td>${link(d.to)}</td><td class="mono">${d.entrance ?? ''}</td><td class="mono muted">${esc(d.cond)}</td></tr>`).join('')}</table>` : '<div class="empty">No door tests this value.</div>'}
+      <h3>Scripts that test it <span class="n">${e.tests.length}</span></h3>${Object.entries(byScene).map(([k, ts]) => `<div class="dlg"><div class="dh">${E[k] ? link(k) : esc(k)}</div>${ts.map(t => `<div class="ln"><span class="mono muted">${peekLink('/scripts#' + t.proc, t.name || 'proc ' + t.proc)}</span><div class="mono">${esc(t.test)}</div></div>`).join('')}</div>`).join('') || '<div class="empty">Nothing tests it.</div>'}</div>`;
   },
   package(e) {
     return `<div class="page"><div style="display:flex;gap:18px;align-items:center"><div style="image-rendering:pixelated">${thumb('spr', e.key, 128)}</div><div>${head(e, `sprite package <span class="mono">${e.key}</span> · ${peekLink(gfxHref('spr', e.key), 'frames ↗')}`)}</div></div>
@@ -439,6 +462,8 @@ const PAGES = {
       ${stageKey ? `<h3>Map${fa ? ` <span class="n">showing where ${link(fa.id)} is placed</span>` : ''}</h3><iframe class="mapframe" src="/gfx?embed=1&bare=1#maps/${stageKey}/${e.key}${hl}" loading="lazy"></iframe>${(e.tilesets || []).length ? `<div class="sub" style="margin-top:6px">Tiles: ${e.tilesets.map(id => link(id)).join(', ')} · map ${e.stage.map}</div>` : ''}` : ''}
       ${Object.entries(groups).map(([t, ids]) => `<h3>${esc(t)} <span class="n">${ids.length}</span></h3><div class="cards">${ids.map(cardFor).join('')}</div>`).join('') || '<h3>Objects</h3><div class="empty">No object placed by this scene\'s script.</div>'}
       ${e.cutscenes?.length ? `<h3>Cutscenes <span class="n">${e.cutscenes.length}</span></h3><div class="cards">${e.cutscenes.map(cardFor).join('')}</div>` : ''}
+      ${checkpoints(e.checkpoints, true)}
+      ${e.beats?.length ? `<h3>Story progress set here <span class="n">${e.beats.length}</span></h3><div class="chips">${e.beats.map(id => chip(id)).join('')}</div>` : ''}
       ${songsOf(e)}
       ${e.speakers?.length ? `<h3>Who speaks here <span class="n">${e.speakers.length}</span></h3><div class="chips">${e.speakers.map(id => chip(id)).join('')}</div>` : ''}
       <h3>Doors to <span class="n">${doors.length}</span></h3>${doors.length ? `<div class="chips">${doors.map(d => chip('scene:' + d.scene, E['scene:' + d.scene]?.title, d.cond?.length ? ' <small>conditional</small>' : '')).join('')}</div>` : '<div class="empty">No doors found in the stage data.</div>'}
@@ -534,7 +559,7 @@ function doSearch() {
     if ([e.jp, e.fname, e.key, ...(e.names || []).map(n => n.jp + ' ' + n.en)].some(x => (x || '').toLowerCase().includes(q))) return 40;
     return 0;
   };
-  const rank = { monster: 9, actor: 8, char: 8, item: 7, area: 6, scene: 5, sprite: 4, tileset: 3, bgtiles: 3, song: 3, cut: 4, file: 3, unit: 2 };
+  const rank = { monster: 9, actor: 8, char: 8, item: 7, area: 6, scene: 5, sprite: 4, tileset: 3, bgtiles: 3, song: 3, cut: 4, beat: 5, file: 3, unit: 2 };
   SR = q ? Object.values(E).map(e => [score(e), e]).filter(x => x[0] > 0).sort((a, b) => b[0] - a[0] || rank[b[1].kind] - rank[a[1].kind] || a[1].title.localeCompare(b[1].title)).slice(0, 60).map(x => x[1]) : [];
   SI = 0; drawSearch();
 }

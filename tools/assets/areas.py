@@ -12,7 +12,8 @@ dungeon or town sit next to each other in the script numbering, while doors
 across larger gaps lead to the world map, another town or a story scene.
 Areas are numbered by their lowest scene id. This is a working grouping for
 browsing, not a game structure; with today's data it gives 76 areas, the same
-numbering the labeling pass used (data/labels/areas.csv).
+numbering the labeling pass used (data/labels/areas.csv); number() keeps
+those numbers when scenes are added.
 
 Labels: an area takes the labeling pass place (data/labels/areas.csv, a Codex
 pass that read the walkthroughs and the translation project's guide) of the
@@ -39,7 +40,7 @@ NOTES = os.path.join(ROOT, "data", "notes.csv")
 
 def load_stages():
     """stages.py output, from build/assets/stages.json when it is newer than the tools."""
-    tools = [os.path.join(HERE, n) for n in ("stages.py", "gcx.py", "hp.py")]
+    tools = [os.path.join(HERE, n) for n in ("stages.py", "gcx.py", "hp.py")] + [os.path.join(ROOT, "tools", "mgba", "scenes.py")]
     if os.path.exists(STAGES) and os.path.getmtime(STAGES) >= max(map(os.path.getmtime, tools)):
         return json.load(open(STAGES, encoding="utf-8"))
     import stages
@@ -75,6 +76,53 @@ def group(scenes, gap=GAP):
     return sorted((sorted(v) for v in out.values()), key=lambda v: v[0])
 
 
+def legacy_scenes():
+    """The scenes the labeling pass knew: entries starting scene_start(1);
+    scene_set_mode(0 or 2), the rule tools/mgba/scenes.py used until 2026-10-17
+    (it now accepts any flags)."""
+    import gcx
+    img = gcx.Image(gcx.load_rom())
+    out = set()
+    for pid in range(1, 16993):
+        try:
+            L = gcx.disassemble(img, pid - 1, names=False)
+        except Exception:
+            continue
+        if len(L) >= 2 and L[0][1] == "proc_861 1 <end>" and L[1][1] in ("proc_864 0 <end>", "proc_864 2 <end>"):
+            out.add(pid)
+    return out
+
+
+def number(groups, scenes, gap=GAP):
+    """The groups in area-number order. The labeling pass numbered the groups
+    of the scenes it knew (data/labels/areas.csv); each group keeps the number
+    of the old group it shares the most scenes with, so labels and links
+    survive new scenes. The rest take the numbers after those."""
+    by_id = {s["scene"]: s for s in scenes}
+    todo = [i for i in legacy_scenes() if i in by_id]
+    known = set(todo)
+    while todo:  # and the door destinations stages.py adds (scene 2569, ...)
+        for d in by_id[todo.pop()]["doors"]:
+            if d["scene"] in by_id and d["scene"] not in known:
+                known.add(d["scene"])
+                todo.append(d["scene"])
+    old = group([by_id[i] for i in known], gap)
+    old_of = {i: n for n, g in enumerate(old) for i in g}
+    out, rest = {}, []
+    for g in groups:
+        votes = collections.Counter(old_of[i] for i in g if i in old_of)
+        n = votes.most_common(1)[0][0] if votes else None
+        if n is not None and n not in out:
+            out[n] = g
+        else:
+            rest.append(g)
+    nxt = max(len(old), max(out, default=-1) + 1)
+    for g in rest:
+        out[nxt] = g
+        nxt += 1
+    return [out.get(n, []) for n in range(nxt)]
+
+
 def vision_labels():
     """({labeled area: {label, confidence, evidence}}, {scene: labeled area}, {scene: row})."""
     areas, scene_area, scene_rows = {}, {}, {}
@@ -106,9 +154,9 @@ def build(scenes=None, gap=GAP):
     """{"areas": [...], "scene_area": {scene: area}, "links": [...], "scenes": {...}}."""
     scenes = scenes if scenes is not None else load_stages()
     by_id = {s["scene"]: s for s in scenes}
-    groups = group(scenes, gap)
-    area_of = {i: n for n, g in enumerate(groups) for i in g}
     v_areas, v_scene_area, v_scenes = vision_labels()
+    groups = number(group(scenes, gap), scenes, gap)
+    area_of = {i: n for n, g in enumerate(groups) for i in g}
     notes = script_notes()
 
     links = collections.Counter()
@@ -123,8 +171,7 @@ def build(scenes=None, gap=GAP):
 
     out_areas = []
     for n, g in enumerate(groups):
-        votes = collections.Counter(v_scene_area[i] for i in g if i in v_scene_area)
-        v = v_areas.get(votes.most_common(1)[0][0] if votes else n, {})
+        v = v_areas.get(n, {}) if g else {}
         doors = [d for i in g for d in by_id[i]["doors"]]
         families = collections.Counter(f for i in g for e in by_id[i]["enemies"] for f in e["families"])
         out_areas.append({
