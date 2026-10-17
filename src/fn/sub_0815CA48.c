@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define ScriptActor_RequestFromScript sub_0815CA48
 #include "engine.h"
 extern u8 *gUnk_02000580[];
 s32 sub_0815A400(void);

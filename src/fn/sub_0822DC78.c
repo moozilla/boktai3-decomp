@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define GameState_ApplySelectedItem sub_0822DC78
 extern u8 *gUnk_02000710;
 extern u8 *gUnk_02000580[];
 void sub_0822D918(s32);

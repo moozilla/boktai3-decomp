@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define Inventory_SetEntryFromScript sub_0822DC24
 #include "engine.h"
 s32 sub_0822D6E0(s32);
 void sub_0822D83C(s32, const void *);

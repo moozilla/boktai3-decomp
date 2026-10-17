@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define SceneActorContacts_SetOwner sub_08073B84
 extern void *gUnk_020001A0;
 s32 SceneActorContacts_ResetList(void); /* void; its r0 is returned */
 /* Makes p the owner of the contact list (gUnk_020001A0), resets the list and

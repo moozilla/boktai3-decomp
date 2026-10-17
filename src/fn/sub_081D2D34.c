@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define SceneNpc_SetSpecialModeFromScript sub_081D2D34
 #include "engine.h"
 struct Npc {
     u8 pad0[2];

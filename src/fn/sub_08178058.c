@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define Hud_RestoreMode sub_08178058
 extern u8 *gUnk_02000214;
 void Hud_SetMode(u32);
 /* Re-applies the HUD mode saved by Hud_SaveMode (+0xA5F), if any, and

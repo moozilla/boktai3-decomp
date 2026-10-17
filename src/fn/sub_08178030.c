@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define Hud_SaveMode sub_08178030
 struct Hud {
     u8 pad[0xA5E];
     u8 mode, savedMode;

@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define Task4E01_GetOrCreate sub_081DA720
 void *sub_0821A2C4(u32);
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
