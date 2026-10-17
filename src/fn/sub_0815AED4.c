@@ -10,7 +10,7 @@ struct Q {
     u32 b;
 };
 
-void sub_0815AED4(struct P *p, struct Q *q)
+void PlayerCue_SetPosition(struct P *p, struct Q *q)
 {
     u32 t = q->b;
     p->a = q->a;

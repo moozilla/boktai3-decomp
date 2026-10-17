@@ -17,7 +17,7 @@ void sub_08038094(struct P *);
 int sub_08037FB4(struct P *, int, const u32 *, int);
 void sub_08038128(struct P *, int);
 void sub_0822B058(int);
-void sub_0815AF14(void *, int);
+void PlayerCue_Stand(void *, int);
 static inline u32 test(u32 *flags, u32 mask)
 {
     return *flags & mask;
@@ -39,7 +39,7 @@ void sub_08038CDC(struct P *p)
         {
             u32 mask = 4;
             if (!(gUnk_02000560 & mask))
-                sub_0815AF14(gUnk_02000580, -1);
+                PlayerCue_Stand(gUnk_02000580, -1);
         }
     }
     if (p->timer > 29 && test(&p->flags, 0xc0) == 0xc0) {

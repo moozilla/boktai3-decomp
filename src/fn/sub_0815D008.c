@@ -6,7 +6,7 @@ s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void sub_0814F828(s32);
 extern s32 gUnk_02000580[];
-void sub_0815B5F8(s32, s32, s32, s32, s32);
+void PlayerCue_Motion30(s32, s32, s32, s32, s32);
 void sub_0815D008(void)
 {
     s32 i = sub_0815A400();
@@ -22,7 +22,7 @@ void sub_0815D008(void)
         else
             c = 0;
         a = sub_0815C9EC();
-        sub_0815B5F8(p, a, b, c, sub_0815CA08());
+        PlayerCue_Motion30(p, a, b, c, sub_0815CA08());
         sub_0814F828(p);
     }
 }
