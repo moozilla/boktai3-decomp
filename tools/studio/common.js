@@ -11,7 +11,7 @@ function localStore(k, v) { try { if (v === undefined) return localStorage.getIt
 // ---------- header ----------
 const NAV = [
   ['Browse', '/atlas'], ['ROM', '/rom'], ['Text', '/'], ['Sprites', '/gfx#sprites'], ['Large sprites', '/gfx#big'], ['Maps', '/gfx#maps'], ['Palettes', '/gfx#palettes'],
-  ['Sprite palettes', '/gfx#pool'], ['Font', '/gfx#font'], ['Tiles', '/gfx#tiles'], ['Data', '/gfx#data'], ['Actors', '/actors'], ['Scripts', '/scripts'], ['World', '/world'], ['Dungeons', '/gfx#dungeon'], ['Live', '/live'], ['Captures', '/captures'],
+  ['Sprite palettes', '/gfx#pool'], ['Font', '/gfx#font'], ['Tiles', '/gfx#tiles'], ['Data', '/gfx#data'], ['Actors', '/actors'], ['Scripts', '/scripts'], ['Sound', '/sound'], ['World', '/world'], ['Dungeons', '/gfx#dungeon'], ['Live', '/live'], ['Captures', '/captures'],
 ];
 // Fills <header id="top">; `tools` is HTML for the right-hand side.
 function studioHeader(tools = '') {
@@ -38,7 +38,7 @@ const embedHref = href => { const u = new URL(href, location.href); u.searchPara
 function keepEmbed() {
   document.addEventListener('click', e => {
     const a = e.target.closest && e.target.closest('a[href]');
-    if (!a || a.target === '_blank' || e.defaultPrevented) return;
+    if (!a || a.target === '_blank' || a.target === '_top' || e.defaultPrevented) return;
     const u = new URL(a.href, location.href);
     if (u.origin !== location.origin || u.searchParams.has('embed')) return;
     if (u.pathname === location.pathname && u.search === location.search) return;  // same page: a hash change

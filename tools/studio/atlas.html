@@ -116,8 +116,8 @@ pre.script { background: var(--panel); border: 1px solid var(--line); border-rad
 studioHeader(`<button id="sbtn" title="Search everything">Search <span class="kbd">⌘K</span></button>`);
 let T = [], E = {}, F = null, open = new Set(), SEL = null;
 const nodes = {};                  // folder path -> node
-const ICON = { package: '▤', actor: '◆', monster: '☠', char: '☺', item: '◇', area: '▣', scene: '▫', file: '≡', sprite: '▤', unit: '{}', tileset: '▦', bgtiles: '▦' };
-const KIND = { package: 'sprite', actor: 'object', monster: 'monster', char: 'character', item: 'item', area: 'area', scene: 'scene', file: 'script', sprite: 'sprite', unit: 'code', tileset: 'tileset', bgtiles: 'map tiles' };
+const ICON = { package: '▤', actor: '◆', monster: '☠', char: '☺', item: '◇', area: '▣', scene: '▫', file: '≡', sprite: '▤', unit: '{}', tileset: '▦', bgtiles: '▦', song: '♪' };
+const KIND = { package: 'sprite', actor: 'object', monster: 'monster', char: 'character', item: 'item', area: 'area', scene: 'scene', file: 'script', sprite: 'sprite', unit: 'code', tileset: 'tileset', bgtiles: 'map tiles', song: 'song' };
 const href = id => '#' + id;
 const link = (id, text) => E[id] ? `<a href="${href(id)}">${esc(text ?? E[id].title)}</a>` : esc(text ?? id);
 const chip = (id, text, extra = '') => E[id] ? `<a class="chip" href="${href(id)}">${esc(text ?? E[id].title)}${extra}</a>` : '';
@@ -243,6 +243,7 @@ function cardFor(id) {
   if (e.kind === 'unit') small = `${e.funcs.length} functions · ${e.size ? Math.round(100 * e.matched / e.size) : 0}% matched`;
   if (e.kind === 'char') small = e.jp;
   if (e.kind === 'tileset') small = `${e.tiles} tiles · ${e.maps.length ? 'map ' + e.maps.map(m => m.map).join(', ') : 'no stage'}`;
+  if (e.kind === 'song') small = `song ${e.key} · ${e.ntracks} track${e.ntracks > 1 ? 's' : ''}${e.scenes.length ? ` · ${e.scenes.length} scene${e.scenes.length > 1 ? 's' : ''}` : ''}`;
   if (e.kind === 'bgtiles') small = `map ${e.key} · ${e.tiles} tiles`;
   return `<a class="card" href="${href(id)}">${pic ? `<span class="picw">${pic}</span>` : ''}<span class="ct">${esc(label(e))}</span><small>${esc(small)}</small></a>`;
 }
@@ -267,6 +268,11 @@ function palettes(hash) {
   const one = (pool, lab, isDef, src) => `<a class="pal${isDef ? ' def' : ''}" href="/gfx#pool/${pool}/${hash}" data-peek>${thumb('big', hash, 64, { pool })}<small><b>${pool}</b>${isDef ? ' · default' : ''}</small>${lab ? `<small>${esc(lab)}</small>` : ''}${src && src !== 'run' ? `<small class="muted">${esc(src)}</small>` : ''}</a>`;
   return `<div class="spritebox"><div class="sh"><a href="#sprite:${hash}">${esc(s.title)}</a> <span class="mono">${hash}</span> · ${peekLink(gfxHref('big', hash), 'frames ↗')}</div>
     <div class="pals">${one(s.default, s.default_label, true)}${s.variants.map(v => one(v.pool, v.label, false, v.source)).join('')}</div></div>`;
+}
+// the songs a scene's or area's scripts start
+function songsOf(e) {
+  const ss = (e.songs || []).filter(id => E[id]);
+  return ss.length ? `<h3>Music and sound <span class="n">${ss.length}</span></h3><div class="chips">${ss.map(id => chip(id, null, ` <small>${E[id].key}</small>`)).join('')}</div>` : '';
 }
 function placesOf(areas, from) {
   const rows = Object.entries(areas || {}).sort((a, b) => (E['area:' + a[0]]?.order ?? 999) - (E['area:' + b[0]]?.order ?? 999));
@@ -344,6 +350,7 @@ const PAGES = {
       <h3>Scenes <span class="n">${e.scenes.length}</span></h3><table class="t"><tr><th>Scene</th><th>Floor</th><th>Objects</th><th>Items</th></tr>${e.scenes.map(s => `<tr><td>${link(s)}</td><td class="muted">${esc(E[s]?.floor || '')}</td><td>${(sceneActors[s] || []).length || ''}</td><td>${(E[s]?.items || []).length || ''}</td></tr>`).join('')}</table>
       ${Object.entries(byTop).map(([t, ids]) => `<h3>${esc(t)} <span class="n">${ids.length}</span></h3><div class="cards">${ids.map(cardFor).join('')}</div>`).join('')}
       ${(e.tilesets || []).length ? `<h3>Tilesets <span class="n">${e.tilesets.length}</span></h3><div class="cards">${e.tilesets.map(cardFor).join('')}</div>` : ''}
+      ${songsOf(e)}
       ${items.length ? `<h3>Items <span class="n">${items.length}</span></h3><div class="chips">${items.map(([s, x]) => `<span class="chip">${esc(x.name || 'item')}${x.chest ? ' <small>chest</small>' : ''} <small>· ${s.split(':')[1]}</small></span>`).join('')}</div>` : ''}</div>`;
   },
   scene(e, from) {
@@ -356,6 +363,7 @@ const PAGES = {
     return `<div class="page">${head(e, `${link(e.area)}${e.floor && e.floor !== 'N/A' ? ' · ' + esc(e.floor) : ''} · scene ${e.key} · ${peekLink(`/world#area=${ar?.key}/scene=${e.key}`, 'world ↗')}`)}
       ${stageKey ? `<h3>Map${fa ? ` <span class="n">showing where ${link(fa.id)} is placed</span>` : ''}</h3><iframe class="mapframe" src="/gfx?embed=1&bare=1#maps/${stageKey}/${e.key}${hl}" loading="lazy"></iframe>${(e.tilesets || []).length ? `<div class="sub" style="margin-top:6px">Tiles: ${e.tilesets.map(id => link(id)).join(', ')} · map ${e.stage.map}</div>` : ''}` : ''}
       ${Object.entries(groups).map(([t, ids]) => `<h3>${esc(t)} <span class="n">${ids.length}</span></h3><div class="cards">${ids.map(cardFor).join('')}</div>`).join('') || '<h3>Objects</h3><div class="empty">No object placed by this scene\'s script.</div>'}
+      ${songsOf(e)}
       <h3>Doors to <span class="n">${doors.length}</span></h3>${doors.length ? `<div class="chips">${doors.map(d => chip('scene:' + d.scene, E['scene:' + d.scene]?.title, d.cond?.length ? ' <small>conditional</small>' : '')).join('')}</div>` : '<div class="empty">No doors found in the stage data.</div>'}
       ${e.items.length ? `<h3>Items <span class="n">${e.items.length}</span></h3><div class="chips">${e.items.map(x => { const it = Object.values(E).find(i => i.kind === 'item' && i.jp === x.name); return it ? chip(it.id, null, x.chest ? ' <small>chest</small>' : '') : `<span class="chip">${esc(x.name || '?')}</span>`; }).join('')}</div>` : ''}
       ${e.file ? `<h3>Script <label class="muted" style="text-transform:none;letter-spacing:0;font-weight:400"><input type="checkbox" id="sen" checked> English text</label> <span class="n">${peekLink('/scripts#file=' + E[e.file].key, 'open in Scripts ↗')}</span></h3><pre class="script" id="script" data-file="${esc(E[e.file].key)}">Loading…</pre>` : ''}</div>`;
@@ -390,6 +398,17 @@ const PAGES = {
       <iframe class="mapframe" style="height:360px" src="/gfx?embed=1&bare=1#tiles/bg:${e.key}" loading="lazy"></iframe>
       ${tilesUsers(e)}</div>`;
   },
+  song(e) {
+    const where = {};
+    for (const s of e.scenes) { const a = E[s]?.area; if (a) (where[a.split(':')[1]] ||= []).push(s.split(':')[1]); }
+    const test = e.test ? badge(`Sound test ${e.test.list} No. ${e.test.no}`) : '';
+    return `<div class="page">${head(e, `song ${e.key} · header <span class="mono">${e.addr}</span> · ${e.player === 10 ? 'music player 10' : 'player ' + e.player} · ${e.ntracks} track${e.ntracks > 1 ? 's' : ''} · ${(e.size / 1024).toFixed(1)} KB · ${peekLink('/sound#vg=' + e.voicegroup, 'voicegroup ' + e.voicegroup)} · ${peekLink('/sound#' + e.key, 'Sound ↗')}`, [test].filter(Boolean))}
+      <iframe class="mapframe" style="height:620px" src="/sound?embed=1&bare=1&compact=1#${e.key}" loading="lazy"></iframe>
+      <div class="grid2"><div><h3>Played in <span class="n">${e.scenes.length} scenes</span></h3>${e.scenes.length ? placesOf(where) : `<div class="empty">${e.shared.length ? 'Started by shared scripts:' : 'Not traced to a scene: started by code, or chosen at run time.'}</div>`}${e.shared.length ? `<div class="chips" style="margin-top:6px">${e.shared.map(f => chip('file:' + f, E['file:' + f]?.title || f)).join('')}</div>` : ''}</div>
+      <div><h3>Started by scripts <span class="n">${e.scripts.length}</span></h3>${e.scripts.length ? `<div class="chips">${e.scripts.map(u => `<a class="chip" href="/scripts#${u.proc}" data-peek>${esc(u.name || 'proc ' + u.proc)} <small>${esc(u.via)}</small></a>`).join('')}</div>` : '<div class="empty">No script call with this song number found.</div>'}</div></div>
+      <h3>Started by code <span class="n">${e.code.length}</span></h3><div id="code"></div>
+      <h3>Notes</h3><div id="ned"></div></div>`;
+  },
   unit(e) {
     return `<div class="page">${head(e, `${e.funcs.length} functions · ${e.size.toLocaleString()} bytes${e.tentative ? ' · tentative grouping' : ''}`)}
       ${e.objects?.length ? `<h3>Registry entries <span class="n">${e.objects.length}</span></h3><div class="cards">${e.objects.map(cardFor).join('')}</div>` : ''}<h3>Functions</h3><div id="code"></div></div>`;
@@ -408,8 +427,8 @@ function route() {
   const v = $('view'); v.innerHTML = html; v.scrollTop = 0;
   hydrate(v);
   const e = E[id];
-  if (e && (e.kind === 'actor' || e.kind === 'unit') && $('code')) codeTable(e.kind === 'actor' ? e.code : e.funcs, $('code'));
-  if (e?.kind === 'actor' && $('ned')) $('ned').replaceWith(noteEditor('actor', e.key));
+  if (e && (e.kind === 'actor' || e.kind === 'unit' || e.kind === 'song') && $('code')) codeTable(e.kind === 'unit' ? e.funcs : [...new Set(e.code)], $('code'));
+  if ((e?.kind === 'actor' || e?.kind === 'song') && $('ned')) $('ned').replaceWith(noteEditor(e.kind, e.key));
   if ($('script')) {
     const load = () => fetch(`/api/file/${$('script').dataset.file}/inline${$('sen').checked ? '/en' : ''}`).then(r => r.json())
       .then(d => { $('script').textContent = (d.lines || []).map(x => x[1]).join('\n'); });
@@ -437,7 +456,7 @@ function doSearch() {
     if ([e.jp, e.fname, e.key, ...(e.names || []).map(n => n.jp + ' ' + n.en)].some(x => (x || '').toLowerCase().includes(q))) return 40;
     return 0;
   };
-  const rank = { monster: 9, actor: 8, char: 8, item: 7, area: 6, scene: 5, sprite: 4, tileset: 3, bgtiles: 3, file: 3, unit: 2 };
+  const rank = { monster: 9, actor: 8, char: 8, item: 7, area: 6, scene: 5, sprite: 4, tileset: 3, bgtiles: 3, song: 3, file: 3, unit: 2 };
   SR = q ? Object.values(E).map(e => [score(e), e]).filter(x => x[0] > 0).sort((a, b) => b[0] - a[0] || rank[b[1].kind] - rank[a[1].kind] || a[1].title.localeCompare(b[1].title)).slice(0, 60).map(x => x[1]) : [];
   SI = 0; drawSearch();
 }
