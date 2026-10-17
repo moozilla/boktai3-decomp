@@ -333,14 +333,14 @@ def regdiag_lines(text, func):
         import contextlib
         import io
         import tempfile
-        d = tempfile.mkdtemp(prefix="tr-", dir=os.path.join(ROOT, "build"))
-        path = os.path.join(d, "state.c")
-        open(path, "w").write(text)
-        try:
-            with contextlib.redirect_stdout(io.StringIO()):
-                lines = regdiag.analyze(path, func).focus_lines()
-        except BaseException:
-            lines = set()
+        with tempfile.TemporaryDirectory(prefix="tr-", dir=os.path.join(ROOT, "build")) as d:
+            path = os.path.join(d, "state.c")
+            open(path, "w").write(text)
+            try:
+                with contextlib.redirect_stdout(io.StringIO()):
+                    lines = regdiag.analyze(path, func).focus_lines()
+            except BaseException:
+                lines = set()
         _regdiag_cache[key] = lines
     return _regdiag_cache[key]
 
@@ -386,7 +386,8 @@ def main():
                     "'none': search the lines whose code differs, by bytes alone")
     ap.add_argument("--seconds", type=int, default=600)
     ap.add_argument("--beam", type=int, default=6)
-    ap.add_argument("-j", type=int, default=os.cpu_count() or 4)
+    ap.add_argument("-j", type=int, default=max(1, (os.cpu_count() or 2) // 2),
+                    help="worker processes (default: half the cores; all of them saturated a 16 GB machine)")
     ap.add_argument("--unsafe", action="store_true", help="also use passes that can change the program's meaning")
     a = ap.parse_args()
     global PASSES
