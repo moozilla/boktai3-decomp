@@ -1,9 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#ifdef NONMATCHING
-// fuzzy: 82.9%
-// Open: the original materializes the update pointer, the active offset,
-// 0 and 1 in that order (r2, r1, r3, r1); this draft loads 1 first.
 struct GloveDraw {
     u8 pad0[0x16];
     u16 flags;
@@ -28,16 +24,15 @@ void Glove_StartFromScript(void)
     glove = gUnk_020004F0[i];
     if (glove) {
         void (*update)(void) = sub_081188F4;
+        u8 *active = &glove->active;
+        u32 zero = 0;
         u16 one = 1;
-        glove->active = one;
+        *active = one;
         glove->update = update;
-        glove->timer = 0;
+        glove->timer = zero;
         {
             struct GloveDraw *draw = &glove->draw;
-            draw->flags |= one;
+            draw->flags = one | draw->flags;
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Glove_StartFromScript);
-#endif
