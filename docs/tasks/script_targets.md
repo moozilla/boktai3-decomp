@@ -6,9 +6,9 @@ handlers; their callees are found through `bl` calls and Thumb function pointers
 
 | Set | Functions | Bytes | Share of code | Matched |
 |---|---:|---:|---:|---:|
-| Entry points | 738 | 84,436 | 3.5% | 82.3% |
-| Entry points and their direct callees | 1422 | 290,160 | 12.0% | 43.7% |
-| Everything reachable from scripts | 3136 | 535,198 | 22.2% | 47.6% |
+| Entry points | 738 | 84,436 | 3.5% | 83.0% |
+| Entry points and their direct callees | 1422 | 290,160 | 12.0% | 44.4% |
+| Everything reachable from scripts | 3136 | 535,198 | 22.2% | 47.9% |
 
 ## Unmatched entry points, by script uses (16 used, 9,880 bytes)
 

@@ -2,7 +2,7 @@
 #ifdef NONMATCHING
 // fuzzy: 60.6%
 // 31 differing instruction runs; first diff at +0x4 (adds r7, r0, #0 vs adds r6, r0, #0)
-void sub_082164AC(u32, u32, u32);
+void Bg_SetLayerMap(u32, u32, u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void sub_081BC664(u8 *);
 void Anim_SetKeyframes(u8 *, u8 *, u32, u32, u32);
@@ -24,7 +24,7 @@ void sub_081BC820(u8 *s)
     u8 *resource;
     u32 *p, *q, *initial;
     s32 i, j;
-    sub_082164AC(0, *(u32 *)(s + 0x8E0), 4);
+    Bg_SetLayerMap(0, *(u32 *)(s + 0x8E0), 4);
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero = 0);
     sub_081BC664(s);
     value = *(u32 *)(s + 0x60);

@@ -407,3 +407,29 @@ Still open (kept as wip): 0821F15C, 0822EA8C and 0811D600 (load order),
 0815A938, 0816B7EC, 0810853C (4 bytes) and the TaggedSceneNpc_Create model
 constant. An s16 prototype parameter reproduces its two pool loads, but the
 value comes out sign-extended.
+
+## Batch 13
+
+Matched 20 more small and medium functions (88-120 bytes) from the
+smallest-first list. Some are named (Glove_StopFromScript,
+NamedObject_ReleaseFromScript, Player_SetSlotValueFromScript,
+ScriptActor_SetLifeEnergyFromScript, ScriptPrompt_SetFromScript,
+RegistryA8CB_ResetFromScript, GameState_SetEventFlag, Pool1B8_Allocate,
+Camera_SetBounds, Camera_SetCenteredBounds, Bg_SetLayerMap and
+Terrain_LoadHP). The rest keep `sub_` names where the C doesn't show their
+purpose.
+
+Idioms:
+
+* A global pointer reloaded before every store means raw offset stores,
+  `*(u16 *)(gs + 0x28) = v`. Struct-field stores don't alias the global (gcc
+  2.x's in-struct heuristic), so agbcc keeps the pointer (0815A578).
+* `u8 *w = gs; w += 0x6F0;` per branch for a three-word bit array (081D5204).
+* An inline `clearFlags(struct X *d, s32 mask) { d->f &= mask; }` puts the
+  mask constant before the load, like `enableBg` in Bg_SetupLayers (08103E08,
+  08119F44).
+* Pass the variable the original stores (`layer->width = w = entry.width;`)
+  when it keeps a loaded value in a register for two stores (082164AC).
+* A caller whose stack setup ends with `movs r0, #0` really passes 0 as the
+  first argument (081BFF18). A routine returning a void callee's r0 is
+  declared returning s32 (081C0B24).
