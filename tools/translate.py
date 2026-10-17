@@ -54,7 +54,7 @@ from src.randomizer import FocusRegion, RandomizationFailure  # noqa: E402
 # expressions, add braces or empty loops, or reorder declarations.
 SAFE_PASSES = [
     "perm_move_to_use", "perm_split_var", "perm_const_var", "perm_literal_address",
-    "perm_addr_deref", "perm_loop_form",
+    "perm_addr_deref", "perm_loop_form", "perm_call_order", "perm_swap_stmts",
     "perm_reorder_decls", "perm_ins_block", "perm_struct_ref", "perm_compound_assignment",
     "perm_commutative", "perm_add_sub", "perm_inequalities", "perm_condition",
     "perm_reverse_cond", "perm_chain_assignment", "perm_split_assignment",
@@ -132,12 +132,43 @@ randomizer.random_weighted = enum_weighted
 agbcc_passes.random_weighted = enum_weighted
 
 
-def neighbors(text, func, focus_lines, passes=PASSES):
+def inline_helpers(ast, func):
+    """Names of the static inline functions FUNC calls (directly or through
+    other helpers): their code is compiled into FUNC."""
+    from perm_pycparser import c_ast as ca
+    defs = {e.decl.name: e for e in ast.ext if isinstance(e, ca.FuncDef)}
+    out, todo = [], [func]
+    while todo:
+        f = defs.get(todo.pop())
+        if f is None:
+            continue
+
+        class V(ca.NodeVisitor):
+            def visit_FuncCall(self, n):
+                if isinstance(n.name, ca.ID) and n.name.name in defs and n.name.name != func \
+                        and n.name.name not in out and "inline" in (defs[n.name.name].decl.funcspec or []):
+                    out.append(n.name.name)
+                    todo.append(n.name.name)
+                self.generic_visit(n)
+
+        V().visit(f.body)
+    return out
+
+
+def neighbors(text, func, focus_lines, passes=PASSES, helpers=True):
     """Every distinct source one pass makes from TEXT, changing only
-    FOCUS_LINES (lines of TEXT); yields (pass name, source)."""
+    FOCUS_LINES (lines of TEXT) in FUNC, or anything in the inline helpers
+    FUNC calls; yields (pass name, source)."""
     base_ast = ast_util.parse_c(text)
     seen = set()
     for name in passes:
+        for target in [func] + (inline_helpers(base_ast, func) if helpers else []):
+            yield from _neighbors_of(base_ast, target, focus_lines if target == func else [],
+                                     name, seen)
+
+
+def _neighbors_of(base_ast, func, focus_lines, name, seen):
+    for name in [name]:
         fn_pass = getattr(randomizer, name, None) or getattr(agbcc_passes, name, None)
         if fn_pass is None:
             continue
@@ -195,6 +226,10 @@ def evaluate(text):
     if b is None:
         return None
     feat = summarize(dump)
+    # where each reload target's statement is in this text
+    lines = [norm_line(x) for x in text.splitlines()]
+    feat["anchors"] = {i: [n + 1 for n, x in enumerate(lines) if x == t["anchor"]]
+                       for i, t in enumerate(_targets or []) if t.get("anchor")}
     # what the candidate compiles to, without debug lines: equal code, equal state
     code = re.sub(r"^\s*\.(stab|loc|file|ident)[^\n]*\n|^\.?L[MBT]?\w*:\n", "",
                   _cc.last_asm or "", flags=re.M)
@@ -210,7 +245,7 @@ def evaluate(text):
 
 def residual_env(feat, targets, base_feat):
     pri, spill = [], []
-    for t in targets:
+    for ti, t in enumerate(targets):
         if t["kind"] == "pri":
             got = feat["pri"].get(t["label"])
             if got:
@@ -219,20 +254,39 @@ def residual_env(feat, targets, base_feat):
                 if (d > 0) == t["raise"] and d:
                     pri.append(f"{t['label']}:{d}")
         else:
-            k_c, k_b = reload_index(feat, t), reload_index(base_feat, t)
+            k_c, k_b = reload_index(feat, t, ti), reload_index(base_feat, t, ti)
             if k_c is not None and k_b is not None:
                 d = t["shift"] - (k_c - k_b)
                 if d:
-                    spill.append(f"{t['label']}#{t['occurrence']}:{d}")
+                    if t.get("anchor"):
+                        spill.append(("index", k_c, d))
+                    else:
+                        spill.append(f"{t['label']}#{t['occurrence']}:{d}")
     env = {}
     if pri:
         env["AGBCC_PRI_LABEL"] = ",".join(pri)
-    if spill:
-        env["AGBCC_SPILL_LABEL"] = ",".join(spill)
+    by_label = [x for x in spill if isinstance(x, str)]
+    by_index = [x for x in spill if not isinstance(x, str)]
+    if by_label:
+        env["AGBCC_SPILL_LABEL"] = ",".join(by_label)
+    if by_index:
+        env["AGBCC_SPILL"] = ",".join(f"{k}:{d}" for _, k, d in by_index)
     return env
 
 
-def reload_index(feat, t):
+def norm_line(x):
+    return re.sub(r"\s+", "", x)
+
+
+def reload_index(feat, t, ti=None):
+    """Index of the target reload among all reloads: the one on the target
+    statement's line (anchor), else by label and occurrence."""
+    if t.get("anchor") and ti is not None and feat.get("anchors", {}).get(ti):
+        line = feat["anchors"][ti][0]
+        on = [k for k, lab, ln in feat["reloads"] if ln == line]
+        if len(on) > t.get("anchor_occ", 0):
+            return on[t.get("anchor_occ", 0)]
+        return None
     same = [k for k, lab, line in feat["reloads"] if lab == t["label"]]
     return same[t["occurrence"]] if len(same) > t["occurrence"] else None
 
@@ -251,7 +305,7 @@ def summarize(dump):
 
 def gap(feat, targets, base_feat):
     total = 0.0
-    for t in targets:
+    for ti, t in enumerate(targets):
         if t["kind"] == "pri":
             got = feat["pri"].get(t["label"])
             if not got:
@@ -261,7 +315,7 @@ def gap(feat, targets, base_feat):
             miss = (t["goal"] - v) if t["raise"] else (v - t["goal"])
             total += max(0.0, miss / max(abs(t["goal"]), 1))
         else:
-            k_c, k_b = reload_index(feat, t), reload_index(base_feat, t)
+            k_c, k_b = reload_index(feat, t, ti), reload_index(base_feat, t, ti)
             if k_c is None or k_b is None:
                 total += 1.0
                 continue
@@ -303,10 +357,18 @@ def focus_for(text, feat, targets, func=None):
             pat = re.compile(rf"\b{re.escape(t['label'])}\b")
             out |= {i + 1 + k for i, ln in enumerate(lines) if pat.search(ln) for k in (-1, 0, 1)}
         elif t["kind"] == "reload":
-            same = [(k, line) for k, lab, line in feat["reloads"] if lab == t["label"]]
-            if len(same) > t["occurrence"]:
-                line = same[t["occurrence"]][1]
-                out |= set(range(line - 4, line + 2))
+            ti = targets.index(t)
+            k = reload_index(feat, t, ti)
+            same = [(kk, ln) for kk, lab, ln in feat["reloads"] if kk == k]
+            if same:
+                k, line = same[0]
+                # a reload anywhere since the previous reload moves the rotation
+                before = [ln for kk, lab, ln in feat["reloads"] if kk < k and 0 < ln <= line]
+                start = max(before) if before else 1
+                if not before:  # the first reload: the function's start
+                    m = re.search(r"\b" + re.escape(func or "") + r"\s*\(", text) if func else None
+                    start = text[:m.start()].count("\n") + 1 if m else max(1, line - 40)
+                out |= set(range(start - 1, line + 2))
     return sorted(x for x in out if x > 0)
 
 
@@ -354,6 +416,18 @@ def main():
     base, _ = permute.prepare_source(os.path.relpath(src, ROOT), func)
     base = ast_util.to_c(ast_util.parse_c(base))  # the form neighbors are printed in
     _init(src, func)
+    base_b, base_feat, _ = evaluate(base)
+    # anchor each reload target to its statement's text in the base
+    base_lines = base.splitlines()
+    for t in targets:
+        if t["kind"] != "reload":
+            continue
+        same = [(k, ln) for k, lab, ln in base_feat["reloads"] if lab == t["label"]]
+        if len(same) > t["occurrence"] and 0 < same[t["occurrence"]][1] <= len(base_lines):
+            k, ln = same[t["occurrence"]]
+            t["anchor"] = norm_line(base_lines[ln - 1])
+            t["anchor_occ"] = [kk for kk, lab, l2 in base_feat["reloads"] if l2 == ln].index(k)
+    _init(src, func, targets)
     base_b, base_feat, _ = evaluate(base)
     g0 = gap(base_feat, targets, base_feat)
     print(f"base: {base_b} differing bytes, target gap {g0:.3f}")

@@ -1,8 +1,8 @@
 diff --git a/default_weights.toml b/default_weights.toml
-index 1a67fff..9ac3ac5 100644
+index 1a67fff..fe2b03b 100644
 --- a/default_weights.toml
 +++ b/default_weights.toml
-@@ -39,6 +39,13 @@ perm_var_cond_block = 5
+@@ -39,6 +39,15 @@ perm_var_cond_block = 5
  perm_alias_array = 1
  perm_remove_var = 5
  perm_reverse_cond = 1
@@ -13,10 +13,12 @@ index 1a67fff..9ac3ac5 100644
 +perm_move_to_use = 0
 +perm_split_var = 0
 +perm_const_var = 0
++perm_call_order = 0
++perm_swap_stmts = 0
  
  [ido]
  perm_float_literal = 10
-@@ -71,3 +78,12 @@ perm_dummy_comma_expr = 0.5
+@@ -71,3 +80,14 @@ perm_dummy_comma_expr = 0.5
  perm_add_self_assignment = 0.5
  perm_duplicate_assignment = 0.5
  perm_pad_var_decl = 0.5
@@ -29,12 +31,14 @@ index 1a67fff..9ac3ac5 100644
 +perm_move_to_use = 20
 +perm_split_var = 10
 +perm_const_var = 15
++perm_call_order = 6
++perm_swap_stmts = 12
 diff --git a/src/agbcc_passes.py b/src/agbcc_passes.py
 new file mode 100644
-index 0000000..5a7b9f6
+index 0000000..603e1b4
 --- /dev/null
 +++ b/src/agbcc_passes.py
-@@ -0,0 +1,696 @@
+@@ -0,0 +1,802 @@
 +"""Randomization passes for agbcc (gcc 2.95) register allocation and scheduling.
 +
 +Each pass is a source change that has closed a match by hand in the Boktai 3
@@ -53,6 +57,7 @@ index 0000000..5a7b9f6
 +from .ast_util import Block, Indices, Statement
 +from .ast_types import build_typemap, resolve_typedefs, set_decl_name
 +from .randomizer import (
++    RandomizationFailure,
 +    RANDOMIZATION_PASSES,
 +    Region,
 +    ensure,
@@ -719,6 +724,109 @@ index 0000000..5a7b9f6
 +            ast_util.insert_statement(block, i, ca.Assignment("=", ca.ID(name), value))
 +
 +
++def perm_call_order(
++    fn: ca.FuncDef, ast: ca.FileAST, indices: Indices, region: Region, random: Random
++) -> None:
++    """Pass a call's arguments through a static inline wrapper whose
++    parameters come in another order, so agbcc evaluates (and loads) them in
++    that order: `f(a, b, 0x05000002)` -> `f_2(0x05000002, a, b)` with
++    `static inline void f_2(u32 c, T a, T b) { f(a, b, c); }`. Only for
++    arguments without side effects, so the order cannot change the result."""
++    typemap = build_typemap(ast, fn)
++    from .ast_types import decayed_expr_type
++
++    cands: List[ca.FuncCall] = []
++
++    class V(ca.NodeVisitor):
++        def visit_FuncCall(self, n: ca.FuncCall) -> None:
++            if (
++                isinstance(n.name, ca.ID)
++                and n.args is not None
++                and len(n.args.exprs) >= 2
++                and region.contains_node(n)
++                and not any(ast_util.is_effectful(e) for e in n.args.exprs)
++            ):
++                cands.append(n)
++            self.generic_visit(n)
++
++    V().visit(fn.body)
++    ensure(cands)
++    call = random.choice(cands)
++    args = list(call.args.exprs)
++    n = len(args)
++    perms = [p for p in __import__("itertools").permutations(range(n)) if list(p) != list(range(n))]
++    ensure(perms)
++    order = random.choice(perms[:24])
++    try:
++        types = [decayed_expr_type(e, typemap) for e in args]
++    except Exception:
++        raise RandomizationFailure
++    callee = call.name.name
++    try:
++        ret = decayed_expr_type(call, typemap)
++    except Exception:
++        ret = ca.TypeDecl(None, [], [], ca.IdentifierType(["int"]))
++    is_void = (
++        isinstance(ret, ca.TypeDecl)
++        and isinstance(ret.type, ca.IdentifierType)
++        and ret.type.names == ["void"]
++    )
++    name = new_name(fn, ast, callee + "_")
++    params = []
++    for k, i in enumerate(order):
++        tp = copy.deepcopy(types[i])
++        inner = tp
++        while not isinstance(inner, ca.TypeDecl):
++            inner = inner.type
++        inner.declname = f"a{i}"
++        inner.quals = [q for q in (inner.quals or []) if q != "const"]
++        params.append(ca.Decl(f"a{i}", [], [], [], [], [], tp, None, None, None))
++    inner_call = ca.FuncCall(ca.ID(callee), ca.ExprList([ca.ID(f"a{i}") for i in range(n)]))
++    body = ca.Compound([inner_call if is_void else ca.Return(inner_call)])
++    rtype = copy.deepcopy(ret)
++    r_inner = rtype
++    while not isinstance(r_inner, ca.TypeDecl):
++        r_inner = r_inner.type
++    r_inner.declname = name
++    fdecl = ca.FuncDecl(ca.ParamList(params), rtype)
++    decl = ca.Decl(name, [], [], ["static"], ["inline"], [], fdecl, None, None, None)
++    helper = ca.FuncDef(decl, None, body)
++    ast.ext.insert(ast.ext.index(fn), helper)
++    call.name = ca.ID(name)
++    call.args = ca.ExprList([args[i] for i in order])
++
++
++def perm_swap_stmts(
++    fn: ca.FuncDef, ast: ca.FileAST, indices: Indices, region: Region, random: Random
++) -> None:
++    """Swap two adjacent statements that are independent: neither writes a
++    variable the other uses, at most one touches memory or calls, and neither
++    jumps. agbcc emits statements in order, so this moves loads, constants
++    and stores relative to each other without changing the program."""
++    cands: List[Tuple[Block, int]] = []
++    for block, _ in all_blocks(fn):
++        stmts = ast_util.get_block_stmts(block, False)
++        for i in range(len(stmts) - 1):
++            a, b = stmts[i], stmts[i + 1]
++            if not (region.contains_node(a) or region.contains_node(b)):
++                continue
++            if any(isinstance(x, (ca.Decl, ca.Label, ca.Case, ca.Default, ca.Pragma, ca.Return))
++                   or has_jumps(x) for x in (a, b)):
++                continue
++            wa, wb = written_names(a), written_names(b)
++            if wa & (names_in(b) | wb) or wb & names_in(a):
++                continue
++            mem_a_w, mem_b_w = touches_memory(a, writes=True), touches_memory(b, writes=True)
++            mem_a_r, mem_b_r = touches_memory(a, writes=False), touches_memory(b, writes=False)
++            if (mem_a_w and (mem_b_w or mem_b_r)) or (mem_b_w and mem_a_r):
++                continue
++            cands.append((block, i))
++    ensure(cands)
++    block, i = random.choice(cands)
++    stmts = ast_util.get_block_stmts(block, True)
++    stmts[i], stmts[i + 1] = stmts[i + 1], stmts[i]
++
++
 +AGBCC_PASSES = [
 +    perm_loop_form,
 +    perm_addr_deref,
@@ -726,6 +834,8 @@ index 0000000..5a7b9f6
 +    perm_move_to_use,
 +    perm_split_var,
 +    perm_const_var,
++    perm_call_order,
++    perm_swap_stmts,
 +]
 +
 +for _p in AGBCC_PASSES:

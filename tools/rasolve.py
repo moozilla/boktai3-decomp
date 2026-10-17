@@ -79,9 +79,10 @@ class Compiler:
         self.compiles = 0
         self.n = 0
 
-    def __getstate__(self):  # workers make their own server
+    def __getstate__(self):  # workers make their own servers
         d = dict(self.__dict__)
         d["server"] = None
+        d["servers"] = {}
         return d
 
     def _asm(self, text, env):
@@ -89,11 +90,18 @@ class Compiler:
         if parts is None:
             return agbserve.compile_plain(text, self.flags, INSTR, dict(os.environ, **env))
         prefix, suffix = parts
-        if self.server is None or self.server.prefix != prefix:
-            if self.server:
-                self.server.close()
-            self.server = agbserve.Server(prefix, self.flags, INSTR, self.work)
-        return self.server.compile(suffix, env)
+        # a few servers, one per declarations prefix (edits to inline helpers
+        # change it); the least recently used one is closed
+        servers = self.__dict__.setdefault("servers", {})
+        srv = servers.pop(prefix, None)
+        if srv is None:
+            srv = agbserve.Server(prefix, self.flags, INSTR, self.work)
+            while len(servers) >= 3:
+                old = next(iter(servers))
+                servers.pop(old).close()
+        servers[prefix] = srv
+        self.server = srv
+        return srv.compile(suffix, env)
 
     def run(self, pri=None, force=None, dump=False, spill=None, env=None):
         """(distance from the ROM in halfwords, dump or None) for one compile."""
@@ -233,9 +241,14 @@ def main():
     if a.all or not involved:
         involved = set(ps)
     moves = []
+    ks = [x[0] for x in ps.reloads]
     for k, uid, hard, line, file, _ in ps.reloads:
         for d in (1, -1, 2):
             moves.append(("spill", k, d, None))
+            # change only this reload's register: undo the shift at the next one
+            nxt = [x for x in ks if x > k]
+            if nxt:
+                moves.append(("spill2", k, d, nxt[0]))
     for r in sorted(involved, key=lambda r: r not in wants):
         p = ps.get(r)
         if not p:
@@ -250,7 +263,15 @@ def main():
 
     def evaluate(state):
         pri = {r: d for kind, r, d in state if kind == "pri"}
-        spill = {k: d for kind, k, d in state if kind == "spill"}
+        spill = {}
+        for kind, k, d in state:
+            if kind == "spill":
+                spill[k] = spill.get(k, 0) + d
+            elif kind == "spill2":
+                spill[k] = spill.get(k, 0) + d
+                after = [x for x in ks if x > k]
+                if after:
+                    spill[after[0]] = spill.get(after[0], 0) - d
         return cc.run(pri=pri, spill=spill)[0]
 
     best = (base, ())
@@ -265,6 +286,10 @@ def main():
                 if (kind, r) in used or time.time() > deadline:
                     continue
                 s2 = state + ((kind, r, d),)
+                if kind == "spill2":
+                    used_k = {x for k2, x, _ in state if k2 in ("spill", "spill2")}
+                    if r in used_k:
+                        continue
                 sc = evaluate(s2)
                 if sc is None:
                     continue
@@ -329,7 +354,7 @@ def main():
     print(f"\n{'EXACT MATCH' if score == 0 else f'{score} differing bytes'} in compiler space with "
           f"{len(state)} change(s); now write C that does the same:")
     for kind, r, d in state:
-        if kind == "spill":
+        if kind in ("spill", "spill2"):
             k, uid, hard, line, file = next(x for x in ps.reloads if x[0] == r)[:5]
             text = ""
             if os.path.abspath(file) == src and 0 < line <= len(src_text):
