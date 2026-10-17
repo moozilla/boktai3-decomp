@@ -96,7 +96,7 @@ class Compiler:
         return self.server.compile(suffix, env)
 
     def run(self, pri=None, force=None, dump=False, spill=None, env=None):
-        """(differing bytes, dump or None) for one compile."""
+        """(distance from the ROM in halfwords, dump or None) for one compile."""
         key = (self.pre, tuple(sorted((pri or {}).items())), tuple(sorted((force or {}).items())), dump,
                tuple(sorted((spill or {}).items())), tuple(sorted((env or {}).items())))
         if key in self.cache:
@@ -124,13 +124,26 @@ class Compiler:
             if mine is not None and not missing:
                 n = self.size or len(mine)
                 orig = self.rom[off(self.address):off(self.address) + n]
-                mine = mine[:max(n, len(mine))]
-                diff = sum(1 for i in range(max(n, len(mine))) if orig[i:i + 1] != mine[i:i + 1])
+                diff = distance(orig, mine)
                 dumped = parse_dump(open(dump_path).read(), self.func) if dump and os.path.exists(dump_path) else None
                 result = (diff, dumped)
         if len(self.cache) < 20000:
             self.cache[key] = result
         return result
+
+
+def distance(orig, mine):
+    """Halfwords that differ once the two are aligned (an inserted or
+    deleted instruction counts once, not as a shift of everything after it);
+    0 exactly when the bytes are equal."""
+    if orig == mine:
+        return 0
+    import difflib
+    a = [orig[i:i + 2] for i in range(0, len(orig), 2)]
+    b = [mine[i:i + 2] for i in range(0, len(mine), 2)]
+    sm = difflib.SequenceMatcher(None, a, b, autojunk=False)
+    d = sum(max(i2 - i1, j2 - j1) for tag, i1, i2, j1, j2 in sm.get_opcodes() if tag != "equal")
+    return max(d, 1)
 
 
 class Dump(dict):

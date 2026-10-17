@@ -262,10 +262,35 @@ def gap(feat, targets, base_feat):
     return total
 
 
-def focus_for(text, feat, targets):
-    """Lines of TEXT the targets point at."""
+_regdiag_cache = {}
+
+
+def regdiag_lines(text, func):
+    """Lines of TEXT whose code differs from the ROM (tools/regdiag.py)."""
+    key = hashlib.sha1(text.encode()).digest()
+    if key not in _regdiag_cache:
+        import contextlib
+        import io
+        import tempfile
+        d = tempfile.mkdtemp(prefix="tr-", dir=os.path.join(ROOT, "build"))
+        path = os.path.join(d, "state.c")
+        open(path, "w").write(text)
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                lines = regdiag.analyze(path, func).focus_lines()
+        except BaseException:
+            lines = set()
+        _regdiag_cache[key] = lines
+    return _regdiag_cache[key]
+
+
+def focus_for(text, feat, targets, func=None):
+    """Lines of TEXT the targets point at; without targets, the lines whose
+    code differs."""
     lines = text.splitlines()
     out = set()
+    if not targets and func:
+        return sorted(x + k for x in regdiag_lines(text, func) for k in (-1, 0, 1) if x + k > 0)
     for t in targets:
         if t["kind"] == "pri" and re.match(r"^[A-Za-z_]\w*$", t["label"]):
             pat = re.compile(rf"\b{re.escape(t['label'])}\b")
@@ -288,7 +313,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("src")
     ap.add_argument("func", nargs="?")
-    ap.add_argument("--targets", help="rasolve.py --json-out file (default: run rasolve)")
+    ap.add_argument("--targets", help="rasolve.py --json-out file (default: run rasolve); "
+                    "'none': search the lines whose code differs, by bytes alone")
     ap.add_argument("--seconds", type=int, default=600)
     ap.add_argument("--beam", type=int, default=6)
     ap.add_argument("-j", type=int, default=os.cpu_count() or 4)
@@ -298,16 +324,19 @@ def main():
     out_dir = os.path.join(ROOT, "build", "translate", func)
     os.makedirs(out_dir, exist_ok=True)
     t0 = time.time()
-    if not a.targets:
+    if a.targets == "none":
+        sol = {"score": None, "targets": []}
+    elif not a.targets:
         a.targets = os.path.join(out_dir, "targets.json")
         r = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "rasolve.py"), src, func,
                             "--seconds", "120", "--json-out", a.targets], capture_output=True, text=True)
         print(r.stdout.strip().split("\n\n")[-2] if "\n\n" in r.stdout else r.stdout.strip()[-2000:])
         if not os.path.exists(a.targets):
             sys.exit("rasolve found no compiler-space solution")
-    sol = json.load(open(a.targets))
+    if a.targets != "none":
+        sol = json.load(open(a.targets))
     targets = sol["targets"]
-    if sol["score"] != 0:
+    if sol["score"]:
         print(f"note: the compiler-space solution leaves {sol['score']} bytes")
     print(f"targets: {targets}")
 
@@ -331,7 +360,7 @@ def main():
             step += 1
             gen_jobs, owners = [], []
             for st in states:
-                focus = focus_for(st[3], st[4], targets)
+                focus = focus_for(st[3], st[4], targets, func)
                 for name in PASSES:
                     gen_jobs.append((st[3], func, focus, name))
                     owners.append(st)
