@@ -95,7 +95,8 @@ def main():
     ap.add_argument("src")
     ap.add_argument("func", nargs="?")
     ap.add_argument("--pairs", action="store_true")
-    ap.add_argument("-j", type=int, default=os.cpu_count() or 4)
+    ap.add_argument("-j", type=int, default=max(1, (os.cpu_count() or 2) // 2),
+                    help="worker processes (default: half the cores; all of them saturated a 16 GB machine)")
     a = ap.parse_args()
     out = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "permute.py"), a.src]
                          + ([a.func] if a.func else []), capture_output=True, text=True, cwd=ROOT)

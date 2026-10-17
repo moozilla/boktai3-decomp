@@ -108,7 +108,8 @@ def main():
     ap.add_argument("items", nargs="+")
     ap.add_argument("--solve-seconds", type=int, default=120)
     ap.add_argument("--translate-seconds", type=int, default=300)
-    ap.add_argument("-j", type=int, default=os.cpu_count() or 4)
+    ap.add_argument("-j", type=int, default=max(1, (os.cpu_count() or 2) // 2),
+                    help="worker processes (default: half the cores; all of them saturated a 16 GB machine)")
     ap.add_argument("--max-bytes", type=int, default=64, help="skip C search beyond this many differing bytes")
     ap.add_argument("--out", default=os.path.join(ROOT, "build", "autosolve"))
     a = ap.parse_args()
