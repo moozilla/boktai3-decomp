@@ -68,11 +68,15 @@ emits exactly what agbcc emits (checked on all 6,422 files in `src/` and the
 | `AGBCC_SPILL=k:d` | advance reload's spill rotation by D before the K-th reload choice |
 | `AGBCC_SPILL_LABEL=label#n:d` | the same before the N-th reload of a value labelled LABEL |
 | `AGBCC_DUMPPRI=file` | log every pseudo's priority, lifetime, uses and register before reload, and every reload with its source line |
+| `AGBCC_FORCE_LABEL=label:hard` | `AGBCC_FORCE` by label |
 | `AGBCC_SERVER=rfd:wfd` | fork server (below) |
 
 Labels name a value across different sources: a C variable (followed
-through inlining), or a constant (`=65535`, `=gUnk_0203B400`). Reloads are
-labelled by the constant they load.
+through inlining), or a constant (`=65535`, `=gUnk_0203B400`), with `#N`
+for the N-th later pseudo with the same label (`=0#3`). Reloads are
+labelled by the constant they load. The search also tries changing a
+single reload's register (shift at one reload, undo at the next), since a
+plain shift moves every later reload too.
 
 `rasolve.py` compiles the draft, then searches these knobs with real
 compiles until the bytes match, and reports the smallest set of changes:
@@ -107,7 +111,16 @@ the labelled reload. `translate.py` then:
   target gap. The second count, the residual, is what still differs once
   the target is met: 0 means the edit broke nothing on the way;
 * keeps a beam of the best on-path states (residual, then gap), the best gap
-  closers and the fewest bytes, and tries each distinct compiled code once.
+  closers and the fewest bytes, and tries each distinct compiled code once;
+* also edits the static inline helpers the function calls (their code is
+  compiled into it), and anchors a reload without a constant label to its
+  statement's text;
+* uses only passes that keep the program's meaning unless `--unsafe` is
+  given (A4FC's best "improvement" with statement moves read an
+  uninitialized pointer). Two passes were added for this: `perm_call_order`
+  (side-effect-free arguments through an inline wrapper in another order,
+  so they load in that order) and `perm_swap_stmts` (adjacent independent
+  statements).
 
 `sub_08010514` matched in four steps (6.5 minutes): residual 0 throughout
 while the gap fell from 0.857 to 0.571 and the bytes from 16 to 0. The edit
@@ -137,7 +150,7 @@ Per candidate on an idle machine (A4FC-sized function, 694-line base):
 | `compile.sh` | 31 ms (shell, mktemp, perl, as, ld) | `as` only; bytes resolved in Python |
 | objdump for scoring | 3 ms | none |
 
-The fork server: with `AGBCC_SERVER`, a marker byte after the declarations
+The compile server: with `AGBCC_SERVER`, a marker byte after the declarations
 stops the parser; each request forks a child that reads only the function
 and writes its assembly. It gives the same assembly as a normal compile for
 every permuter variant tested (140 variants of five drafts), and
@@ -184,6 +197,8 @@ closed matches by hand here; weights are in the `[gcc]` section of
 | `perm_const_var` | a constant becomes a typed local (`u16 one = 1`), at the top, before the statement, or in the expression (`f(x, zero = 0)`) | which copies agbcc shares |
 | `perm_loop_form` | `for` <-> `while` <-> `if (c) do {} while (c)` | loop reversal, exit test place |
 | `perm_addr_deref` | `x` -> `*&x` | stops CSE treating an address as a constant (the `trap` fix) |
+| `perm_call_order` | `f(a, b, K)` -> `f_2(K, a, b)` through a static inline wrapper | argument load order (the `CpuSet` fill idiom) |
+| `perm_swap_stmts` | swaps two adjacent independent statements | instruction order without changing meaning |
 
 Declaration order and adding or removing a temporary already existed
 upstream; their gcc weights are raised. `--focus auto|LINES` restricts all
@@ -208,7 +223,44 @@ reload register is set by earlier reloads, often one that is missing.
 
 ## Results
 
-AUTOSOLVE_RESULTS
+Matched in this work (1,892 bytes):
+
+| Function | Was | How |
+|---|---:|---|
+| `ScenePool_StateLaunchShortArc` (0803E7B4, 484 B) | 99.1% | the fork's `perm_literal_address` in 9 s; `litsweep.py` finds it deterministically |
+| `sub_0802D44C` (292 B) | 96.5% | `rasolve.py` said "one reload of rotation"; the draft matched with its pin and barrier removed |
+| `sub_08010514` (376 B) | 93.0% | `rasolve.py` + `translate.py`: four empty loops around the table load (above) |
+| `TaggedSceneNpc_Create` (081D2A38, 740 B) | 96.0% | `autosolve.py`, unattended: the model id in one local (`perm_const_var`) |
+
+`autosolve.py` over the drafts, best first (first 18 functions of 98; the
+run continues in `build/autosolve/results.tsv`):
+
+| Verdict | Functions |
+|---|---:|
+| translated to a match | 1 |
+| solved partly in the compiler (residue 1-10 halfwords as is) | 5 |
+| not allocation (instruction order, CSE, call-argument order) | 11 |
+| no draft function by that name | 1 |
+
+Distances are halfwords after alignment. Most of the near matches end 1-10
+halfwords away. What is left there:
+
+* Scratch and reload registers that rotation cannot reach: in the ROM a
+  register was free that ours holds (often a call argument loaded too early,
+  `sub_08010C10`, `ContactSequenceActor_UpdateDying`). `perm_call_order`
+  fixed the argument order in `sub_08010C10` (8 -> 2 bytes); its last
+  scratch register needs one more reload before the function's first one,
+  which no meaning-preserving edit found produces.
+* CSE choices the compiler knobs do not cover (`sub_081CC64C`: each zero
+  store uses the other zero's register; `sub_08125B68`: a shift merged
+  across an inlined test, 1 halfword).
+
+A4FC (`NamedObject_CreateFromScript`, 66%): in the compiler, lowering the
+object pointer's priority just below one pseudo (0.518 -> 0.510; ties go by
+definition order) and raising one zero constant halves the distance
+(477 -> 240). The C search's best result (84.6%) read an uninitialized
+pointer and was rejected; that is why the translator now uses only
+meaning-preserving passes by default.
 
 ## Findings
 

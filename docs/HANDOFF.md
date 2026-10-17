@@ -104,7 +104,8 @@ python3 tools/build.py                  # combined build: must print OK
 `docs/WORKER.md` is the playbook (agbcc tricks, data/RAM declarations, unit
 rules, naming with `#define` aliases and `tools/promote_names.py`).
 [REGALLOC.md](REGALLOC.md) covers steering register allocation;
-`tools/permute.py FILE --run SECS` runs the permuter.
+[PERMUTER.md](PERMUTER.md) the order to try `tools/litsweep.py`,
+`tools/regsolve.py` and `tools/permute.py FILE --run SECS --focus auto`.
 
 Parallel workers (only when authorized): give each `docs/WORKER_ROUND.md`;
 the earlier worktree layout, ranges, merge and clone-seeding procedure are in

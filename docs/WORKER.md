@@ -178,9 +178,13 @@ why, and any naming insights.
 ## Permuter (for "only registers differ" skips)
 
 `build/venv/bin/python tools/permute.py wip/sub_X.c --debug` checks the base score first.
-`build/venv/bin/python tools/permute.py wip/sub_X.c --run 60 -j 2` then runs a bounded search
-using the pinned [decomp-permuter](https://github.com/simonlindholm/decomp-permuter)
-installed by `make setup` (or set `PERMUTER` to another checkout).
+`build/venv/bin/python tools/permute.py wip/sub_X.c --run 600 --focus auto` then runs a
+bounded search on all cores, stopping at an exact match, using the pinned
+[decomp-permuter](https://github.com/simonlindholm/decomp-permuter) with the
+project patch, installed by `make setup` (or set `PERMUTER` to another patched
+checkout). Before a long run, try `tools/litsweep.py` (reload registers) and
+`tools/regsolve.py` (which variable must outrank which); see
+[PERMUTER.md](PERMUTER.md) for the workflow and measurements.
 Candidates with better scores land in the printed
 `build/permute/sub_X/run-*/output-*/` directory. Use it on your best non-matching
 attempt when the structure is right and only register allocation or instruction
