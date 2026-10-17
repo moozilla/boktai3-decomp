@@ -21,7 +21,7 @@ extern const s16 gUnk_086149C4[];
 
 void sub_0815AD78(struct P *);
 void sub_0813AFEC(struct P *, s32, s32);
-void sub_0822B2F8(s32);
+void Sound_PlaySong(s32);
 void sub_082375FC(struct Vec *, s32, s32, s32, s32, s32, s32);
 void sub_08151310(void);
 
@@ -42,10 +42,10 @@ void sub_0815BCBC(struct P *p, s32 a, u32 c)
     v.y += 0xE6;
     v.z += trunc12(gUnk_086149C4[angle] * 150);
     if (p->state == 6) {
-        sub_0822B2F8(0x203);
+        Sound_PlaySong(0x203);
         id = 0x51;
     } else {
-        sub_0822B2F8(0xCD);
+        Sound_PlaySong(0xCD);
         id = 0x4B;
     }
     sub_082375FC(&v, id, 0, p->dir, 0x20, 0, a);

@@ -18,7 +18,7 @@ extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 
 s32 sub_082315A8(void *, s32, s32, struct Vec *);
-void sub_0822B2F8(s32);
+void Sound_PlaySong(s32);
 
 static inline int randomWith(const u16 *table)
 {
@@ -50,11 +50,11 @@ void sub_0815C5A4(struct P *p, s32 a)
     }
     if (sub_082315A8(&p->b5B8, a, 0xE10, &v) >= 0) {
         if (p->b5B9 == 1)
-            sub_0822B2F8(0x191);
+            Sound_PlaySong(0x191);
         else if (p->b5B9 == 2)
-            sub_0822B2F8(0x133);
+            Sound_PlaySong(0x133);
         else if (p->b5B9 == 3)
-            sub_0822B2F8(0x133);
+            Sound_PlaySong(0x133);
     }
     p->h530 = 0;
 }
