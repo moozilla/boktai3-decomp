@@ -86,7 +86,10 @@ actor that draws it. Each large sprite's default entry is in its data: the
 `u16` at +2 of its frame records (the same in every frame), which
 `AnimData_Load` copies to the anim. Code then selects variants:
 `data/sprite_palettes.csv` lists every sprite's default and the variants seen,
-from a runtime log of every palette selection across all scenes
+from the enemy palette keyword (enemy create code selects
+`Script_GetKeywordValue('C')` + a constant base, so every `C` the scripts
+pass gives a variant: the ghoul is 402 + C, C = 1, 2, 3), from a runtime log
+of every palette selection across all scenes
 (`tools/mgba/palette_survey.lua`, 108 sprites have variants: the ghoul `9247`
 defaults to 400 and is drawn in 403 and 404) and constant call pairs.
 `AnimData_Load(anim, hash)` (`082151E4`) picks the sprite and its default;
