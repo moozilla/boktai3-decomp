@@ -1,0 +1,1107 @@
+diff --git a/default_weights.toml b/default_weights.toml
+index 1a67fff..9ac3ac5 100644
+--- a/default_weights.toml
++++ b/default_weights.toml
+@@ -39,6 +39,13 @@ perm_var_cond_block = 5
+ perm_alias_array = 1
+ perm_remove_var = 5
+ perm_reverse_cond = 1
++# agbcc passes (src/agbcc_passes.py); off except for gcc
++perm_loop_form = 0
++perm_addr_deref = 0
++perm_literal_address = 0
++perm_move_to_use = 0
++perm_split_var = 0
++perm_const_var = 0
+ 
+ [ido]
+ perm_float_literal = 10
+@@ -71,3 +78,12 @@ perm_dummy_comma_expr = 0.5
+ perm_add_self_assignment = 0.5
+ perm_duplicate_assignment = 0.5
+ perm_pad_var_decl = 0.5
++# agbcc (gcc 2.95): source changes that have closed register-allocation and
++# scheduling mismatches by hand in the Boktai 3 decomp.
++perm_reorder_decls = 20
++perm_loop_form = 8
++perm_addr_deref = 4
++perm_literal_address = 4
++perm_move_to_use = 20
++perm_split_var = 10
++perm_const_var = 15
+diff --git a/src/agbcc_passes.py b/src/agbcc_passes.py
+new file mode 100644
+index 0000000..c4c1241
+--- /dev/null
++++ b/src/agbcc_passes.py
+@@ -0,0 +1,679 @@
++"""Randomization passes for agbcc (gcc 2.95) register allocation and scheduling.
++
++Each pass is a source change that has closed a match by hand in the Boktai 3
++decomp (docs/REGALLOC.md there). Unlike most upstream passes they keep the
++program's meaning, except perm_literal_address, which relies on the symbol
++address table that tools/permute.py writes into settings.toml.
++"""
++
++import copy
++from random import Random
++from typing import Dict, List, Optional, Set, Tuple
++
++from perm_pycparser import c_ast as ca
++
++from . import ast_util
++from .ast_util import Block, Indices, Statement
++from .ast_types import build_typemap, resolve_typedefs, set_decl_name
++from .randomizer import (
++    RANDOMIZATION_PASSES,
++    Region,
++    ensure,
++    random_bool,
++    random_weighted,
++    replace_subexprs,
++    visit_replace,
++)
++
++# Name -> address for perm_literal_address; set from settings.toml.
++SYMBOL_ADDRESSES: Dict[str, int] = {}
++
++INT_TYPES = [
++    ["s32"],
++    ["u32"],
++    ["s16"],
++    ["u16"],
++    ["u8"],
++    ["s8"],
++    ["int"],
++]
++
++
++# --- helpers ---------------------------------------------------------------
++
++
++def all_blocks(fn: ca.FuncDef) -> List[Tuple[Block, int]]:
++    """Every statement list in the function, with its loop depth."""
++    out: List[Tuple[Block, int]] = []
++
++    def rec(block: Block, depth: int) -> None:
++        out.append((block, depth))
++        for stmt in ast_util.get_block_stmts(block, False):
++            inner = depth + (1 if isinstance(stmt, (ca.For, ca.While, ca.DoWhile)) else 0)
++            ast_util.for_nested_blocks(stmt, lambda b: rec(b, inner))
++
++    rec(fn.body, 0)
++    return out
++
++
++def ids_in(node: Optional[ca.Node]) -> List[ca.ID]:
++    """Variable references (not struct field names) below node."""
++    found: List[ca.ID] = []
++    if node is None:
++        return found
++
++    class V(ca.NodeVisitor):
++        def visit_ID(self, n: ca.ID) -> None:
++            found.append(n)
++
++        def visit_StructRef(self, n: ca.StructRef) -> None:
++            self.visit(n.name)
++
++        def visit_FuncCall(self, n: ca.FuncCall) -> None:
++            if not isinstance(n.name, ca.ID):
++                self.visit(n.name)
++            if n.args:
++                self.visit(n.args)
++
++    V().visit(node)
++    return found
++
++
++def names_in(node: Optional[ca.Node]) -> Set[str]:
++    return {i.name for i in ids_in(node)}
++
++
++def written_names(node: ca.Node) -> Set[str]:
++    out: Set[str] = set()
++
++    class V(ca.NodeVisitor):
++        def visit_Assignment(self, n: ca.Assignment) -> None:
++            if isinstance(n.lvalue, ca.ID):
++                out.add(n.lvalue.name)
++            self.generic_visit(n)
++
++        def visit_UnaryOp(self, n: ca.UnaryOp) -> None:
++            if n.op in ("p++", "p--", "++", "--", "&") and isinstance(n.expr, ca.ID):
++                out.add(n.expr.name)  # & : may be written through the pointer
++            self.generic_visit(n)
++
++        def visit_Decl(self, n: ca.Decl) -> None:
++            if n.name:
++                out.add(n.name)
++            if n.init is not None:
++                self.visit(n.init)
++
++    V().visit(node)
++    return out
++
++
++def touches_memory(node: ca.Node, *, writes: bool) -> bool:
++    """Whether node reads (writes=False) or writes/calls (writes=True) memory."""
++    found = False
++
++    class V(ca.NodeVisitor):
++        def visit_FuncCall(self, n: ca.FuncCall) -> None:
++            nonlocal found
++            found = True
++
++        def visit_Assignment(self, n: ca.Assignment) -> None:
++            nonlocal found
++            if writes and not isinstance(n.lvalue, ca.ID):
++                found = True
++            self.generic_visit(n)
++
++        def visit_UnaryOp(self, n: ca.UnaryOp) -> None:
++            nonlocal found
++            if writes and n.op in ("p++", "p--", "++", "--") and not isinstance(n.expr, ca.ID):
++                found = True
++            if not writes and n.op == "*":
++                found = True
++            self.generic_visit(n)
++
++        def visit_StructRef(self, n: ca.StructRef) -> None:
++            nonlocal found
++            if not writes:
++                found = True
++            self.generic_visit(n)
++
++        def visit_ArrayRef(self, n: ca.ArrayRef) -> None:
++            nonlocal found
++            if not writes:
++                found = True
++            self.generic_visit(n)
++
++        def visit_Asm(self, n: ca.Asm) -> None:
++            nonlocal found
++            found = True
++
++    V().visit(node)
++    return found
++
++
++def has_jumps(node: ca.Node) -> bool:
++    found = False
++
++    class V(ca.NodeVisitor):
++        def visit_Break(self, n: ca.Node) -> None:
++            nonlocal found
++            found = True
++
++        visit_Continue = visit_Goto = visit_Label = visit_Break
++
++    V().visit(node)
++    return found
++
++
++def has_own_continue(body: ca.Node) -> bool:
++    """A `continue` that belongs to this loop (not to a nested one)."""
++    found = False
++
++    class V(ca.NodeVisitor):
++        def visit_Continue(self, n: ca.Node) -> None:
++            nonlocal found
++            found = True
++
++        def visit_For(self, n: ca.Node) -> None:
++            pass
++
++        visit_While = visit_DoWhile = visit_For
++
++    V().visit(body)
++    return found
++
++
++def local_decls(fn: ca.FuncDef) -> Dict[str, ca.Decl]:
++    out: Dict[str, ca.Decl] = {}
++
++    class V(ca.NodeVisitor):
++        def visit_Decl(self, n: ca.Decl) -> None:
++            if n.name and not isinstance(n.type, ca.FuncDecl):
++                out[n.name] = n
++            if n.init is not None:
++                self.visit(n.init)
++
++    V().visit(fn.body)
++    assert isinstance(fn.decl.type, ca.FuncDecl)
++    if fn.decl.type.args:
++        for p in fn.decl.type.args.params:
++            if isinstance(p, ca.Decl) and p.name:
++                out[p.name] = p
++    return out
++
++
++def address_taken(fn: ca.FuncDef) -> Set[str]:
++    out: Set[str] = set()
++
++    class V(ca.NodeVisitor):
++        def visit_UnaryOp(self, n: ca.UnaryOp) -> None:
++            if n.op == "&" and isinstance(n.expr, ca.ID):
++                out.add(n.expr.name)
++            self.generic_visit(n)
++
++    V().visit(fn.body)
++    return out
++
++
++def is_scalar_decl(decl: ca.Decl) -> bool:
++    return isinstance(decl.type, (ca.TypeDecl, ca.PtrDecl)) and not (
++        isinstance(decl.type, ca.TypeDecl)
++        and isinstance(decl.type.type, (ca.Struct, ca.Union))
++    ) and "volatile" not in (decl.quals or [])
++
++
++def new_name(fn: ca.FuncDef, ast: ca.FileAST, base: str) -> str:
++    used = set(local_decls(fn)) | {
++        item.name for item in ast.ext if isinstance(item, ca.Decl) and item.name
++    } | {item.decl.name for item in ast.ext if isinstance(item, ca.FuncDef)}
++    i = 2
++    while f"{base}{i}" in used:
++        i += 1
++    return f"{base}{i}"
++
++
++def insert_local_decl(fn: ca.FuncDef, decl: ca.Decl, random: Random) -> None:
++    items = ast_util.get_block_stmts(fn.body, True)
++    n = 0
++    while n < len(items) and isinstance(items[n], ca.Decl):
++        n += 1
++    items.insert(random.randint(0, n), decl)
++
++
++def int_decl(name: str, type_names: List[str], init: Optional[ca.Node]) -> ca.Decl:
++    tp = ca.TypeDecl(declname=name, quals=[], align=[], type=ca.IdentifierType(names=type_names))
++    return ca.Decl(name=name, quals=[], align=[], storage=[], funcspec=[],
++                   gcc_attributes=[], type=tp, init=init, bitsize=None, asmlabel=None)
++
++
++def stmt_index_in_region(block: Block, region: Region) -> List[int]:
++    return [i for i, s in enumerate(ast_util.get_block_stmts(block, False)) if region.contains_node(s)]
++
++
++# --- passes ----------------------------------------------------------------
++
++
++def perm_loop_form(
++    fn: ca.FuncDef, ast: ca.FileAST, indices: Indices, region: Region, random: Random
++) -> None:
++    """Rewrite a loop in another form: for <-> while, or a while into an entry
++    test plus do/while (and back). Loop shape decides agbcc's loop
++    reversal, the exit test's place and which values stay in registers."""
++    cands: List[Tuple[Block, int]] = []
++    for block, _ in all_blocks(fn):
++        for i, stmt in enumerate(ast_util.get_block_stmts(block, False)):
++            if not region.contains_pre(stmt):
++                continue
++            if isinstance(stmt, (ca.For, ca.While)):
++                cands.append((block, i))
++            elif (
++                isinstance(stmt, ca.If)
++                and stmt.iffalse is None
++                and isinstance(stmt.iftrue, ca.Compound)
++                and len(stmt.iftrue.block_items or []) == 1
++                and isinstance(stmt.iftrue.block_items[0], ca.DoWhile)
++                and ast_util.equal_ast(stmt.cond, stmt.iftrue.block_items[0].cond)
++            ):
++                cands.append((block, i))
++    ensure(cands)
++    block, i = random.choice(cands)
++    stmts = ast_util.get_block_stmts(block, True)
++    loop = stmts[i]
++
++    def body_items(stmt: Statement) -> List[Statement]:
++        if isinstance(stmt, ca.Compound):
++            return list(stmt.block_items or [])
++        return [stmt]
++
++    if isinstance(loop, ca.If):
++        dw = loop.iftrue.block_items[0]
++        stmts[i] = ca.While(dw.cond, dw.stmt)
++        return
++
++    if isinstance(loop, ca.For):
++        ensure(not isinstance(loop.init, ca.DeclList))
++        ensure(loop.next is None or not has_own_continue(loop.stmt))
++        cond = loop.cond if loop.cond is not None else ca.Constant("int", "1")
++        body = body_items(loop.stmt)
++        if loop.next is not None:
++            nxt = loop.next
++            if isinstance(nxt, ca.ExprList):
++                body += list(nxt.exprs)
++            else:
++                body.append(nxt)
++        pre = []
++        if loop.init is not None:
++            init = loop.init
++            pre = list(init.exprs) if isinstance(init, ca.ExprList) else [init]
++        if loop.cond is not None and random_bool(random, 0.5):
++            ensure(not ast_util.is_effectful(cond))
++            new: Statement = ca.If(
++                cond,
++                ca.Compound([ca.DoWhile(copy.deepcopy(cond), ca.Compound(body))]),
++                None,
++            )
++        else:
++            new = ca.While(cond, ca.Compound(body))
++        stmts[i : i + 1] = pre + [new]
++        return
++
++    assert isinstance(loop, ca.While)
++    body = body_items(loop.stmt)
++    choice = random.randint(0, 1)
++    if choice == 0:
++        ensure(not ast_util.is_effectful(loop.cond))
++        stmts[i] = ca.If(
++            loop.cond,
++            ca.Compound([ca.DoWhile(copy.deepcopy(loop.cond), ca.Compound(body))]),
++            None,
++        )
++        return
++    # while -> for, folding a preceding assignment and a final step in.
++    init = None
++    if i > 0 and isinstance(stmts[i - 1], (ca.Assignment, ca.UnaryOp)) and random_bool(random, 0.7):
++        init = stmts[i - 1]
++    nxt = None
++    if (
++        body
++        and isinstance(body[-1], (ca.Assignment, ca.UnaryOp))
++        and not has_own_continue(ca.Compound(body))
++        and random_bool(random, 0.7)
++    ):
++        nxt = body.pop()
++    ensure(init is not None or nxt is not None)
++    new_for = ca.For(init, loop.cond, nxt, ca.Compound(body))
++    if init is not None:
++        stmts[i - 1 : i + 1] = [new_for]
++    else:
++        stmts[i] = new_for
++
++
++def perm_addr_deref(
++    fn: ca.FuncDef, ast: ca.FileAST, indices: Indices, region: Region, random: Random
++) -> None:
++    """Write a variable reference x as *&x. For a global or an array this
++    stops CSE from treating its address as a known constant (the address is
++    then not hoisted into a callee-saved register)."""
++    locals_ = local_decls(fn)
++    cands: List[ca.ID] = []
++
++    def collect(node: ca.Node, is_expr: bool) -> None:
++        if isinstance(node, ca.ID) and region.contains_node(node):
++            decl = locals_.get(node.name)
++            if decl is not None and "register" in (decl.storage or []):
++                return
++            cands.append(node)
++        return None
++
++    visit_replace(fn.body, collect)
++    typemap = build_typemap(ast, fn)
++    cands = [
++        c
++        for c in cands
++        if c.name in typemap.var_types
++        and not isinstance(resolve_typedefs(typemap.var_types[c.name], typemap), ca.FuncDecl)
++    ]
++    ensure(cands)
++    # Globals and arrays are where this has mattered; locals become addressable.
++    weighted = [(c, 1.0 if c.name not in locals_ else 0.15) for c in cands]
++    target = random_weighted(random, weighted)
++
++    def repl(node: ca.Node, is_expr: bool) -> Optional[ca.Node]:
++        if node is target:
++            return ca.UnaryOp("*", ca.UnaryOp("&", ca.ID(target.name)))
++        return None
++
++    visit_replace(fn.body, repl)
++
++
++def _typename_for(tp: ca.Node) -> ca.Typename:
++    tp = copy.deepcopy(tp)
++    inner = tp
++    while not isinstance(inner, ca.TypeDecl):
++        inner = inner.type
++    inner.declname = None
++    return ca.Typename(name=None, quals=[], align=[], gcc_attributes=[], type=tp)
++
++
++def perm_literal_address(
++    fn: ca.FuncDef, ast: ca.FileAST, indices: Indices, region: Region, random: Random
++) -> None:
++    """Refer to a global through its literal address, (*(T *)0x0203B400),
++    instead of its symbol. The constant is then loaded by reload, which
++    advances reload's spill-register rotation (REGALLOC.md, sub_08160EA4)."""
++    locals_ = local_decls(fn)
++    typemap = build_typemap(ast, fn)
++
++    def address(name: str) -> Optional[int]:
++        if name in SYMBOL_ADDRESSES:
++            return SYMBOL_ADDRESSES[name]
++        if name.startswith("gUnk_") and len(name) == 13:
++            try:
++                return int(name[5:], 16)
++            except ValueError:
++                return None
++        return None
++
++    cands: List[ca.ID] = []
++
++    def collect(node: ca.Node, is_expr: bool) -> None:
++        if (
++            isinstance(node, ca.ID)
++            and node.name not in locals_
++            and region.contains_node(node)
++            and address(node.name) is not None
++            and node.name in typemap.var_types
++        ):
++            cands.append(node)
++        return None
++
++    visit_replace(fn.body, collect)
++    ensure(cands)
++    target = random.choice(cands)
++    tp = typemap.var_types[target.name]
++    ensure(not isinstance(tp, ca.FuncDecl))
++    addr = ca.Constant("int", f"0x{address(target.name):08X}")
++    if isinstance(tp, ca.ArrayDecl):
++        new: ca.Node = ca.Cast(_typename_for(ca.PtrDecl(quals=[], type=tp.type)), addr)
++    else:
++        new = ca.UnaryOp("*", ca.Cast(_typename_for(ca.PtrDecl(quals=[], type=tp)), addr))
++
++    def repl(node: ca.Node, is_expr: bool) -> Optional[ca.Node]:
++        return new if node is target else None
++
++    visit_replace(fn.body, repl)
++
++
++def perm_move_to_use(
++    fn: ca.FuncDef, ast: ca.FileAST, indices: Indices, region: Region, random: Random
++) -> None:
++    """Move an assignment `x = e;` down to just before the first statement
++    that uses x, or up to just after the last statement it depends on. agbcc
++    emits statements in source order, and the distance sets the lifetime
++    that local-alloc's priority divides by."""
++    locals_ = local_decls(fn)
++    taken = address_taken(fn)
++    moves: List[Tuple[Block, int, int]] = []
++    for block, _ in all_blocks(fn):
++        stmts = ast_util.get_block_stmts(block, False)
++        first = 0
++        while first < len(stmts) and isinstance(stmts[first], ca.Decl):
++            first += 1
++        for i in range(first, len(stmts)):
++            s = stmts[i]
++            if not (
++                isinstance(s, ca.Assignment)
++                and isinstance(s.lvalue, ca.ID)
++                and s.lvalue.name in locals_
++                and s.lvalue.name not in taken
++                and region.contains_node(s)
++            ):
++                continue
++            x = s.lvalue.name
++            reads = names_in(s.rvalue) | ({x} if s.op != "=" else set())
++            mem_read = touches_memory(s.rvalue, writes=False) or bool(reads - set(locals_))
++            effectful = ast_util.is_effectful(s.rvalue) or touches_memory(s.rvalue, writes=True)
++
++            def blocks_move(t: Statement) -> bool:
++                if isinstance(t, (ca.Label, ca.Case, ca.Default, ca.Pragma)) or has_jumps(t):
++                    return True
++                if x in names_in(t) or x in written_names(t):
++                    return True
++                if reads & written_names(t):
++                    return True
++                if (mem_read or effectful) and touches_memory(t, writes=True):
++                    return True
++                if effectful and touches_memory(t, writes=False):
++                    return True
++                return False
++
++            j = i + 1
++            while j < len(stmts) and not blocks_move(stmts[j]):
++                j += 1
++            if j > i + 1:
++                moves.append((block, i, j))  # insert before stmts[j]
++            k = i - 1
++            while k >= first and not blocks_move(stmts[k]):
++                k -= 1
++            if k + 1 < i:
++                moves.append((block, i, k + 1))
++    ensure(moves)
++    block, i, to = random.choice(moves)
++    stmts = ast_util.get_block_stmts(block, True)
++    s = stmts.pop(i)
++    if to > i:
++        to -= 1
++    stmts.insert(to, s)
++
++
++def perm_split_var(
++    fn: ca.FuncDef, ast: ca.FileAST, indices: Indices, region: Region, random: Random
++) -> None:
++    """Give one assignment of a reused variable its own variable, up to the
++    next assignment that replaces it. Several lifetimes in one pseudo send it
++    to global allocation; one per value keeps them local (or the reverse,
++    which perm_remove_var covers)."""
++    locals_ = local_decls(fn)
++    taken = address_taken(fn)
++    writes_count: Dict[str, int] = {}
++    for name in locals_:
++        writes_count[name] = 0
++
++    class Count(ca.NodeVisitor):
++        def visit_Assignment(self, n: ca.Assignment) -> None:
++            if isinstance(n.lvalue, ca.ID) and n.lvalue.name in writes_count:
++                writes_count[n.lvalue.name] += 1
++            self.generic_visit(n)
++
++    Count().visit(fn.body)
++    order: Dict[int, int] = {}
++    cands: List[Tuple[Block, int, int, bool]] = []
++    for block, depth in all_blocks(fn):
++        stmts = ast_util.get_block_stmts(block, False)
++        for i, s in enumerate(stmts):
++            if not (
++                isinstance(s, ca.Assignment)
++                and s.op == "="
++                and isinstance(s.lvalue, ca.ID)
++                and region.contains_node(s)
++            ):
++                continue
++            x = s.lvalue.name
++            decl = locals_.get(x)
++            if decl is None or x in taken or not is_scalar_decl(decl):
++                continue
++            if writes_count.get(x, 0) + (1 if decl.init is not None else 0) < 2:
++                continue
++            j = i + 1
++            while j < len(stmts) and not (
++                isinstance(stmts[j], ca.Assignment)
++                and isinstance(stmts[j].lvalue, ca.ID)
++                and stmts[j].lvalue.name == x
++            ):
++                j += 1
++            rng = stmts[i + 1 : j]
++            if any(has_jumps(t) or isinstance(t, (ca.Case, ca.Default)) for t in rng):
++                continue
++            if j == len(stmts):
++                # No later assignment in this block: only when nothing after
++                # the block can see the value.
++                if depth > 0 or not isinstance(block, ca.Compound):
++                    continue
++                cands.append((block, i, j, False))
++            else:
++                cands.append((block, i, j, True))
++    ensure(cands)
++    block, i, j, killed = random.choice(cands)
++    stmts = ast_util.get_block_stmts(block, True)
++    s = stmts[i]
++    x = s.lvalue.name
++    if not killed:
++        # Every use of x after the block must be inside it.
++        end = indices.ends.get(block)
++        ensure(end is not None)
++
++        bad = False
++
++        class After(ca.NodeVisitor):
++            def visit_ID(self, n: ca.ID) -> None:
++                nonlocal bad
++                if n.name == x and indices.starts.get(n, 0) > end:
++                    bad = True
++
++            def visit_StructRef(self, n: ca.StructRef) -> None:
++                self.visit(n.name)
++
++        After().visit(fn.body)
++        ensure(not bad)
++    x2 = new_name(fn, ast, x + "_")
++
++    def rename(node: ca.Node, is_expr: bool) -> Optional[ca.Node]:
++        if isinstance(node, ca.ID) and node.name == x:
++            return ca.ID(x2)
++        return None
++
++    s.lvalue = ca.ID(x2)
++    for t in stmts[i + 1 : j]:
++        visit_replace(t, rename)
++    if killed:
++        visit_replace(stmts[j].rvalue, rename)
++    decl = copy.deepcopy(locals_[x])
++    decl.init = None
++    decl.name = x2
++    set_decl_name(decl)
++    insert_local_decl(fn, decl, random)
++
++
++def perm_const_var(
++    fn: ca.FuncDef, ast: ca.FileAST, indices: Indices, region: Region, random: Random
++) -> None:
++    """Hold a small constant in a typed local (`u16 one = 1;`, `s32 zero =
++    0;`), assigned at the top, just before the statement, or inside the
++    expression (`f(x, zero = 0)`). The type decides which copies agbcc
++    shares, and the assignment's position moves reload's rotation."""
++    cands: List[Tuple[ca.Constant, Block, int]] = []
++    for block, _ in all_blocks(fn):
++        for i, s in enumerate(ast_util.get_block_stmts(block, False)):
++            if isinstance(s, (ca.Decl, ca.Case, ca.Default, ca.Pragma)):
++                continue
++            # Only the statement's own expressions (not nested blocks).
++            exprs: List[ca.Node] = []
++            if isinstance(s, (ca.If, ca.While, ca.DoWhile, ca.Switch)):
++                exprs = [s.cond]
++            elif isinstance(s, ca.For):
++                exprs = [e for e in (s.init, s.cond, s.next) if e is not None]
++            elif isinstance(s, ca.Compound) or ast_util.has_nested_block(s):
++                exprs = []
++            else:
++                exprs = [s]
++
++            for e in exprs:
++                def collect(n: ca.Node) -> None:
++                    if (
++                        isinstance(n, ca.Constant)
++                        and n.type == "int"
++                        and region.contains_node(n)
++                    ):
++                        try:
++                            v = int(n.value.rstrip("uUlL"), 0)
++                        except ValueError:
++                            return
++                        if -256 <= v <= 0xFFFF:
++                            cands.append((n, block, i))
++                    return None
++
++                replace_subexprs(e, collect)
++    ensure(cands)
++    const, block, i = random.choice(cands)
++    name = new_name(fn, ast, "k")
++    tp = random.choice(INT_TYPES)
++    mode = random.randint(0, 2)
++    value = copy.deepcopy(const)
++
++    def repl(n: ca.Node) -> Optional[ca.Node]:
++        if n is const:
++            if mode == 2:
++                return ca.Assignment("=", ca.ID(name), value)
++            return ca.ID(name)
++        return None
++
++    replace_subexprs(ast_util.get_block_stmts(block, False)[i], repl)
++    if mode == 0:
++        insert_local_decl(fn, int_decl(name, tp, value), random)
++    else:
++        insert_local_decl(fn, int_decl(name, tp, None), random)
++        if mode == 1:
++            ast_util.insert_statement(block, i, ca.Assignment("=", ca.ID(name), value))
++
++
++AGBCC_PASSES = [
++    perm_loop_form,
++    perm_addr_deref,
++    perm_literal_address,
++    perm_move_to_use,
++    perm_split_var,
++    perm_const_var,
++]
++
++for _p in AGBCC_PASSES:
++    if _p not in RANDOMIZATION_PASSES:
++        RANDOMIZATION_PASSES.append(_p)
+diff --git a/src/ast_types.py b/src/ast_types.py
+index 50e6b89..02bfde6 100644
+--- a/src/ast_types.py
++++ b/src/ast_types.py
+@@ -124,7 +124,9 @@ def expr_type(node: ca.Node, typemap: TypeMap) -> Type:
+             return basic_type("int")
+         return basic_type(node.type.split(" "))
+     if isinstance(node, ca.ID):
+-        return typemap.var_types[node.name]
++        # Implicitly declared functions and names the map does not cover
++        # (e.g. from a macro-expanded statement expression) are int.
++        return typemap.var_types.get(node.name) or basic_type("int")
+     if isinstance(node, ca.UnaryOp):
+         if node.op in ["p++", "p--", "++", "--"]:
+             return rec(node.expr)
+@@ -176,6 +178,8 @@ def expr_type(node: ca.Node, typemap: TypeMap) -> Type:
+             return basic_type("int")
+     if isinstance(node, ca.FuncCall):
+         expr = node.name
++        if isinstance(expr, ca.ID) and expr.name not in typemap.var_types:
++            return basic_type("int")
+         fptr_type = resolve_typedefs(rec(expr), typemap)
+         if isinstance(fptr_type, ca.PtrDecl):
+             fptr_type = fptr_type.type
+diff --git a/src/ast_util.py b/src/ast_util.py
+index 2431205..e322147 100644
+--- a/src/ast_util.py
++++ b/src/ast_util.py
+@@ -396,6 +396,107 @@ def normalize_ast(fn: ca.FuncDef, ast: ca.FileAST) -> None:
+     rec(fn.body)
+ 
+ 
++def make_nodes_unique(top_node: ca.Node) -> None:
++    """Copy any node object that appears more than once below top_node.
++
++    pycparser shares one type node between the declarators of a declaration
++    like `struct T *a, *b;`. The randomizer indexes nodes by identity and
++    asserts that each appears once, so give every occurrence its own copy."""
++    seen: Set[int] = set()
++
++    def visit(node: ca.Node) -> None:
++        for attr in node.__slots__:
++            if attr in ("coord", "__weakref__"):
++                continue
++            value = getattr(node, attr, None)
++            if isinstance(value, ca.Node):
++                if id(value) in seen:
++                    value = copy.deepcopy(value)
++                    setattr(node, attr, value)
++                seen.add(id(value))
++                visit(value)
++            elif isinstance(value, list):
++                for i, item in enumerate(value):
++                    if not isinstance(item, ca.Node):
++                        continue
++                    if id(item) in seen:
++                        item = copy.deepcopy(item)
++                        value[i] = item
++                    seen.add(id(item))
++                    visit(item)
++
++    seen.add(id(top_node))
++    visit(top_node)
++
++
++def make_local_names_unique(fn: ca.FuncDef, ast: ca.FileAST) -> Dict[str, str]:
++    """Rename block-scoped locals that reuse a name already declared in the
++    function or at file scope (shadowing). Type inference keys variables by
++    name alone, so `int i` in one block and `u8 *i` in another confuse it.
++    Returns {new name: original name}."""
++    used: Set[str] = set()
++    for item in ast.ext:
++        if isinstance(item, ca.Decl) and item.name:
++            used.add(item.name)
++        elif isinstance(item, ca.FuncDef) and item.decl.name:
++            used.add(item.decl.name)
++    renamed: Dict[str, str] = {}
++    scopes: List[Dict[str, str]] = [{}]
++
++    def lookup(name: str) -> Optional[str]:
++        for scope in reversed(scopes):
++            if name in scope:
++                return scope[name]
++        return None
++
++    def declare(decl: ca.Decl) -> None:
++        name = decl.name
++        assert name is not None
++        new = name
++        counter = 1
++        while new in used:
++            counter += 1
++            new = f"{name}_{counter}"
++        used.add(new)
++        scopes[-1][name] = new
++        if new != name:
++            renamed[new] = name
++            decl.name = new
++            set_decl_name(decl)
++
++    class Visitor(ca.NodeVisitor):
++        def visit_Decl(self, node: ca.Decl) -> None:
++            if node.init is not None:
++                self.visit(node.init)
++            if node.name and not isinstance(node.type, ca.FuncDecl):
++                declare(node)
++            if node.bitsize is not None:
++                self.visit(node.bitsize)
++
++        def visit_ID(self, node: ca.ID) -> None:
++            new = lookup(node.name)
++            if new is not None:
++                node.name = new
++
++        def visit_StructRef(self, node: ca.StructRef) -> None:
++            self.visit(node.name)  # not the field name
++
++        def visit_Compound(self, node: ca.Compound) -> None:
++            scopes.append({})
++            self.generic_visit(node)
++            scopes.pop()
++
++    assert isinstance(fn.decl.type, ca.FuncDecl)
++    if fn.decl.type.args:
++        for param in fn.decl.type.args.params:
++            if isinstance(param, ca.Decl) and param.name:
++                used.add(param.name)
++                scopes[0][param.name] = param.name
++    for stmt in fn.body.block_items or []:
++        Visitor().visit(stmt)
++    return renamed
++
++
+ def deduplicate_typedefs(ast: ca.FileAST) -> None:
+     """Ensure multi-name typedefs sharing an anonymous struct/union/enum emit a
+     single named definition instead of duplicating the body for each typedef."""
+diff --git a/src/candidate.py b/src/candidate.py
+index d4c7d64..c11cd00 100644
+--- a/src/candidate.py
++++ b/src/candidate.py
+@@ -6,7 +6,7 @@ from typing import Mapping, Optional, Tuple
+ from perm_pycparser import c_ast as ca
+ 
+ from .compiler import Compiler
+-from .randomizer import Randomizer
++from .randomizer import Focus, Randomizer
+ from .scorer import Scorer
+ from .perm.perm import EvalState
+ from .perm.ast import apply_ast_perms
+@@ -49,6 +49,8 @@ class Candidate:
+     ) -> Tuple[ca.FuncDef, int, ca.FileAST]:
+         ast = ast_util.parse_c(source)
+         orig_fn, fn_index = ast_util.extract_fn(ast, fn_name)
++        ast_util.make_nodes_unique(orig_fn)
++        ast_util.make_local_names_unique(orig_fn, ast)
+         ast_util.normalize_ast(orig_fn, ast)
+         return orig_fn, fn_index, ast
+ 
+@@ -59,6 +61,7 @@ class Candidate:
+         fn_name: str,
+         randomization_weights: Mapping[str, float],
+         rng_seed: int,
++        focus: Optional[Focus] = None,
+     ) -> "Candidate":
+         # Use the same AST for all instances of the same original source, but
+         # with the target function deeply copied. Since we never change the
+@@ -74,7 +77,7 @@ class Candidate:
+             ast=ast,
+             fn_name=fn_name,
+             rng_seed=rng_seed,
+-            randomizer=Randomizer(randomization_weights, rng_seed),
++            randomizer=Randomizer(randomization_weights, rng_seed, focus),
+         )
+ 
+     def randomize_ast(self) -> None:
+diff --git a/src/main.py b/src/main.py
+index 32965fc..5bad06e 100644
+--- a/src/main.py
++++ b/src/main.py
+@@ -48,6 +48,7 @@ from .permuter import (
+     WorkDone,
+ )
+ from .preprocess import preprocess
++from . import agbcc_passes
+ from .printer import Printer
+ from .profiler import Profiler
+ from .randomizer import RANDOMIZATION_PASSES
+@@ -338,6 +339,9 @@ def run_inner(options: Options, heartbeat: Callable[[], None]) -> List[int]:
+             default_weights, weight_overrides
+         )
+ 
++        for name, address in json_prop(settings, "symbol_addresses", dict, {}).items():
++            agbcc_passes.SYMBOL_ADDRESSES[name] = int(address)
++
+         fn_name: Optional[str] = None
+         if "func_name" in settings:
+             fn_name = json_prop(settings, "func_name", str)
+@@ -390,6 +394,7 @@ def run_inner(options: Options, heartbeat: Callable[[], None]) -> List[int]:
+                 score_threshold=options.score_threshold,
+                 debug_mode=options.debug_mode,
+                 speed=options.speed,
++                focus_lines=json_prop(settings, "focus_lines", list, []),
+             )
+         except CandidateConstructionFailure as e:
+             print(e.message, file=sys.stderr)
+@@ -615,6 +620,10 @@ class PrintRandomizationPassesAction(argparse.Action):
+ def main() -> None:
+     multiprocessing.freeze_support()
+     sys.setrecursionlimit(10000)
++    if sys.platform == "darwin":
++        # macOS defaults to "spawn"; workers would then re-import
++        # agbcc_passes and lose SYMBOL_ADDRESSES, which main() fills in.
++        multiprocessing.set_start_method("fork")
+ 
+     # Ideally we would do:
+     #  multiprocessing.set_start_method("spawn")
+diff --git a/src/permuter.py b/src/permuter.py
+index 861efde..4b28759 100644
+--- a/src/permuter.py
++++ b/src/permuter.py
+@@ -22,6 +22,7 @@ from .perm.perm import EvalState
+ from .perm.eval import perm_evaluate_one, perm_gen_all_seeds
+ from .perm.parse import perm_parse
+ from .profiler import Profiler, Timer
++from .randomizer import Focus
+ from .scorer import Scorer
+ from .helpers import trim_source
+ 
+@@ -91,8 +92,11 @@ class Permuter:
+         score_threshold: Optional[int],
+         debug_mode: bool,
+         speed: int,
++        focus_lines: Optional[List[int]] = None,
+     ) -> None:
+         self.dir = dir
++        # Lines of base.c that passes may change (empty: the whole function).
++        self.focus = Focus(set(focus_lines)) if focus_lines else None
+         self.compiler = compiler
+         self.scorer = scorer
+         self.source_file = source_file
+@@ -147,6 +151,7 @@ class Permuter:
+             self.fn_name,
+             self.randomization_weights,
+             rng_seed=0,
++            focus=self.focus,
+         )
+ 
+         if self._debug_mode:
+@@ -192,6 +197,7 @@ class Permuter:
+                 self.fn_name,
+                 self.randomization_weights,
+                 rng_seed=rng_seed,
++                focus=self.focus,
+             )
+ 
+         if self._permutations.is_random():
+@@ -271,6 +277,8 @@ class Permuter:
+         except _CompileFailure:
+             return EvalError(exc_str=None, seed=self._cur_seed)
+         except Exception:
++            # Don't keep mutating a candidate that a pass left broken.
++            self._cur_cand = None
+             return EvalError(exc_str=traceback.format_exc(), seed=self._cur_seed)
+ 
+     def diff(self, other_source: str) -> str:
+diff --git a/src/randomizer.py b/src/randomizer.py
+index 8604225..7c6efad 100644
+--- a/src/randomizer.py
++++ b/src/randomizer.py
+@@ -145,6 +145,51 @@ class Region:
+         return self.start < index < self.end
+ 
+ 
++class FocusRegion(Region):
++    """A region made of the nodes on chosen source lines (a node without a
++    line of its own, such as one a pass created, takes its parent's)."""
++
++    def __init__(self, fn: ca.FuncDef, indices: Indices, lines: Set[int]) -> None:
++        super().__init__(-1, MAX_INDEX, indices)
++        self.allowed: Set[ca.Node] = set()
++
++        def visit(node: ca.Node, line: int) -> None:
++            coord = getattr(node, "coord", None)
++            if coord is not None and getattr(coord, "line", None):
++                line = coord.line
++            if line in lines:
++                self.allowed.add(node)
++            for _, child in node.children():
++                visit(child, line)
++
++        visit(fn.body, -1)
++        self.allowed_starts = {
++            indices.starts[n] for n in self.allowed if n in indices.starts
++        }
++
++    def is_unbounded(self) -> bool:
++        return False
++
++    def contains_node(self, node: ca.Node) -> bool:
++        return node in self.allowed
++
++    def contains_pre(self, node: ca.Node) -> bool:
++        return node in self.allowed
++
++    def contains_pre_index(self, index: int) -> bool:
++        return index in self.allowed_starts
++
++
++class Focus:
++    def __init__(self, lines: Set[int]) -> None:
++        self.lines = lines
++
++    def region(self, fn: ca.FuncDef, indices: Indices, region: Region) -> Region:
++        if not region.is_unbounded():
++            return region  # an explicit PERM_RANDOMIZE wins
++        return FocusRegion(fn, indices, self.lines)
++
++
+ def reverse_start_indices(indices: Indices) -> Dict[int, ca.Node]:
+     ret: Dict[int, ca.Node] = {}
+     for k, v in indices.starts.items():
+@@ -663,8 +708,9 @@ def perm_temp_for_expr(
+         past_decls = False
+         for index, stmt in enumerate(stmts):
+             if isinstance(stmt, ca.Decl):
+-                assert stmt.name, "Anonymous declarations cannot happen in functions"
+-                if not isinstance(stmt.type, ca.ArrayDecl):
++                # A local struct/union/enum definition has no name; it declares
++                # no variable that could be reused.
++                if stmt.name and not isinstance(stmt.type, ca.ArrayDecl):
+                     reuse_cands.append(stmt.name)
+                     if not isinstance(stmt.type, ca.PtrDecl):
+                         # Make non-pointers more common
+@@ -2661,14 +2707,20 @@ RANDOMIZATION_PASSES: List[RandomizationPass] = [
+     perm_reverse_cond,
+ ]
+ 
++# The agbcc passes use the helpers above. Importing them registers them, also
++# when agbcc_passes is the module imported first.
++from . import agbcc_passes  # noqa: E402,F401
++
+ 
+ class Randomizer:
+     def __init__(
+         self,
+         randomization_weights: Mapping[str, float],
+         rng_seed: int,
++        focus: "Optional[Focus]" = None,
+     ) -> None:
+         self.random = Random(rng_seed)
++        self.focus = focus
+ 
+         for method in RANDOMIZATION_PASSES:
+             if method.__name__ not in randomization_weights:
+@@ -2692,10 +2744,33 @@ class Randomizer:
+         fn = ast_util.extract_fn(ast, fn_name)[0]
+         indices = ast_util.compute_node_indices(fn)
+         region = get_randomization_region(fn, indices, self.random)
+-        while True:
++        if self.focus is not None:
++            region = self.focus.region(fn, indices, region)
++        # Passes are meant to fail before touching the AST, but several fail
++        # (or crash in type inference) after a partial change. Keep a copy and
++        # roll back, so a kept candidate never carries a half-applied pass or
++        # shared nodes into the next round.
++        saved = (copy.deepcopy(fn.decl), copy.deepcopy(fn.body))
++        for attempt in range(1000):
+             method = random_weighted(self.random, self.methods)
+             try:
+                 method(fn, ast, indices, region, self.random)
+-                break
++                ast_util.compute_node_indices(fn)  # nodes must stay unique
++                return
+             except RandomizationFailure:
+-                pass
++                # Cheap check for a pass that changed the tree before failing.
++                try:
++                    failed = ast_util.compute_node_indices(fn).starts.keys() != indices.starts.keys()
++                except AssertionError:
++                    failed = True
++            except (AssertionError, KeyError, AttributeError, TypeError,
++                    IndexError, ValueError, RecursionError):
++                failed = True
++            if failed:
++                fn.decl, fn.body = copy.deepcopy(saved[0]), copy.deepcopy(saved[1])
++                indices = ast_util.compute_node_indices(fn)
++                if self.focus is not None:
++                    region = self.focus.region(fn, indices, get_randomization_region(fn, indices, self.random))
++                else:
++                    region = get_randomization_region(fn, indices, self.random)
++        raise RandomizationFailure

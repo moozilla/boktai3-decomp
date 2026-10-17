@@ -36,7 +36,17 @@ git -C armips submodule update -q --init --recursive
 [ -x armips/build/armips ] || (mkdir -p armips/build && cd armips/build && cmake -DCMAKE_BUILD_TYPE=Release .. >/dev/null && make -s)
 
 # Optional matching search; its parser is bundled, and Python needs toml.
+# The project patch adds agbcc passes, crash fixes and --focus support
+# (docs/PERMUTER.md); an older version of the patch is replaced.
 fetch decomp-permuter https://github.com/simonlindholm/decomp-permuter.git 8556c81d80d1c1af98a858c8f4dc951357f29139
+PATCH="$ROOT/tools/patches/decomp-permuter-agbcc.patch"
+if git -C decomp-permuter apply --check "$PATCH" 2>/dev/null; then
+    git -C decomp-permuter apply "$PATCH"
+elif ! git -C decomp-permuter apply --reverse --check "$PATCH" 2>/dev/null; then
+    git -C decomp-permuter checkout -q -- .
+    git -C decomp-permuter clean -qfd src
+    git -C decomp-permuter apply "$PATCH"
+fi
 
 # mGBA harness
 make -s -C ../../tools/emu
