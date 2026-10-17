@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define GameState_ClearAreaFlagFromScript sub_0816B8D8
 extern u8 *gUnk_02000710;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);

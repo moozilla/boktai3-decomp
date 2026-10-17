@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define GameState_GetUnlockEntry sub_0822E618
 extern u8 *gUnk_02000710;
 extern const u8 gUnk_08E60F4C[][4];
 /* First byte of the gUnk_08E60F4C entry for unlock slot i, or 0 when the

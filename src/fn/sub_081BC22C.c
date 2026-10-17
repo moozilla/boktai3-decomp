@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define SolarBank_Init sub_081BC22C
 #include "engine.h"
 void sub_081BBDE0(u8 *);
 void sub_081BBE20(u8 *);

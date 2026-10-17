@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define Inventory_ContainsFromScript sub_0822DE14
 #include "engine.h"
 s32 sub_0822D6E0(s32);
 /* Script: 1 when item -w is among the first 16 entries (48 with -d set),

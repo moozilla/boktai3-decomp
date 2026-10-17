@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define GameState_SetPairFlag sub_081D5188
 extern u8 *gUnk_02000710;
 /* Sets bit a * 2 + b of the flag words at game state +0x700 (tentative). */
 void GameState_SetPairFlag(s32 a, s32 b)

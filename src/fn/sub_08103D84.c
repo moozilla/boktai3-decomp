@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define NamedObject_SetPaletteFromScript sub_08103D84
 #include "engine.h"
 struct Obj {
     u8 pad[0x2C];

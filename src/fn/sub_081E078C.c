@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define ScriptMessage_SetFromScript sub_081E078C
 #include "engine.h"
 struct Msg {
     void *text;
