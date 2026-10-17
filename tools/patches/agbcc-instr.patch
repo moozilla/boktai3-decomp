@@ -1,0 +1,488 @@
+--- a/local-alloc.c
++++ b/local-alloc.c
+@@ -69,6 +69,155 @@
+ #include "insn-config.h"
+ #include "insn-attr.h"
+ #include "recog.h"
++#include "output.h"
++
++/* Instrumentation for tools/rasolve.py (Boktai 3 decomp). Never used by the
++   real build: this copy of agbcc lives in build/agbcc-instr.
++     AGBCC_PRI="reg:delta,..."   add DELTA to pseudo REG's allocation priority
++     AGBCC_FORCE="reg:hard,..."  allocate pseudo REG to hard register HARD
++     AGBCC_DUMPPRI=FILE          append each pseudo's priority and register  */
++#define AGBCC_MAXREG 40000
++int agbcc_pri_delta[AGBCC_MAXREG];
++int agbcc_force[AGBCC_MAXREG];
++FILE *agbcc_dump;
++
++/* Variable names of pseudos, keyed by the REG rtx (which inlining copies).  */
++#define AGBCC_NAMES 65536
++static rtx agbcc_name_key[AGBCC_NAMES];
++static char *agbcc_name_val[AGBCC_NAMES];
++void
++agbcc_name_set (x, name)
++     rtx x;
++     char *name;
++{
++  unsigned long h = ((unsigned long) x >> 4) & (AGBCC_NAMES - 1);
++  int n;
++  for (n = 0; n < AGBCC_NAMES; n++, h = (h + 1) & (AGBCC_NAMES - 1))
++    if (agbcc_name_key[h] == 0 || agbcc_name_key[h] == x)
++      {
++	agbcc_name_key[h] = x;
++	agbcc_name_val[h] = name;
++	return;
++      }
++}
++char *
++agbcc_name_get (x)
++     rtx x;
++{
++  unsigned long h = ((unsigned long) x >> 4) & (AGBCC_NAMES - 1);
++  int n;
++  for (n = 0; n < AGBCC_NAMES; n++, h = (h + 1) & (AGBCC_NAMES - 1))
++    {
++      if (agbcc_name_key[h] == x)
++	return agbcc_name_val[h];
++      if (agbcc_name_key[h] == 0)
++	return "-";
++    }
++  return "-";
++}
++
++/* "=value" for a constant rtx, else 0.  */
++char *
++agbcc_const_label (x)
++     rtx x;
++{
++  static char bufs[8][128];
++  static int which;
++  char *buf;
++  if (x == 0)
++    return 0;
++  buf = bufs[which++ & 7];
++  switch (GET_CODE (x))
++    {
++    case CONST_INT:
++      sprintf (buf, "=%ld", (long) INTVAL (x));
++      return buf;
++    case SYMBOL_REF:
++      sprintf (buf, "=%s", XSTR (x, 0));
++      return buf;
++    case CONST:
++      if (GET_CODE (XEXP (x, 0)) == PLUS
++	  && GET_CODE (XEXP (XEXP (x, 0), 0)) == SYMBOL_REF
++	  && GET_CODE (XEXP (XEXP (x, 0), 1)) == CONST_INT)
++	{
++	  sprintf (buf, "=%s+%ld", XSTR (XEXP (XEXP (x, 0), 0), 0),
++		   (long) INTVAL (XEXP (XEXP (x, 0), 1)));
++	  return buf;
++	}
++      return 0;
++    default:
++      return 0;
++    }
++}
++
++/* The variable name of pseudo REGNO, or "=constant" if it holds one.  */
++char *
++agbcc_pseudo_label (regno)
++     int regno;
++{
++  char *name = agbcc_name_get (regno_reg_rtx[regno]);
++  rtx insn;
++  if (name && strcmp (name, "-") != 0)
++    return name;
++  for (insn = get_insns (); insn; insn = NEXT_INSN (insn))
++    {
++      rtx set, note;
++      char *c;
++      if (GET_RTX_CLASS (GET_CODE (insn)) != 'i')
++	continue;
++      set = single_set (insn);
++      if (! set || GET_CODE (SET_DEST (set)) != REG || REGNO (SET_DEST (set)) != regno)
++	continue;
++      note = find_reg_note (insn, REG_EQUIV, NULL_RTX);
++      if (! note)
++	note = find_reg_note (insn, REG_EQUAL, NULL_RTX);
++      if (note && (c = agbcc_const_label (XEXP (note, 0))) != 0)
++	return c;
++      if ((c = agbcc_const_label (SET_SRC (set))) != 0)
++	return c;
++      return "-";
++    }
++  return "-";
++}
++
++void
++agbcc_instr_init ()
++{
++  static int done;
++  char *e;
++  int i;
++  if (done)
++    return;
++  done = 1;
++  for (i = 0; i < AGBCC_MAXREG; i++)
++    agbcc_force[i] = -1;
++  if ((e = getenv ("AGBCC_PRI")) != 0)
++    while (*e)
++      {
++	int r, d, n = 0;
++	if (sscanf (e, "%d:%d%n", &r, &d, &n) < 2 || n == 0)
++	  break;
++	if (r >= 0 && r < AGBCC_MAXREG)
++	  agbcc_pri_delta[r] += d;
++	e += n;
++	if (*e == ',')
++	  e++;
++      }
++  if ((e = getenv ("AGBCC_FORCE")) != 0)
++    while (*e)
++      {
++	int r, h, n = 0;
++	if (sscanf (e, "%d:%d%n", &r, &h, &n) < 2 || n == 0)
++	  break;
++	if (r >= 0 && r < AGBCC_MAXREG)
++	  agbcc_force[r] = h;
++	e += n;
++	if (*e == ',')
++	  e++;
++      }
++  if ((e = getenv ("AGBCC_DUMPPRI")) != 0)
++    agbcc_dump = fopen (e, "a");
++}
+ #include "output.h"
+ #include "toplev.h"
+ 
+@@ -249,6 +398,8 @@
+ static int qty_sugg_compare    	(int, int);
+ static int qty_sugg_compare_1	(const void *, const void *);
+ static int qty_compare    	(int, int);
++static int qty_compare_pri	(int);
++static char *qty_forced;
+ static int qty_compare_1	(const void *, const void *);
+ static int combine_regs		(rtx, rtx, int, int, rtx, int);
+ static int reg_meets_class_p	(int, enum reg_class);
+@@ -1330,12 +1481,29 @@
+       qsort (qty_order, next_qty, sizeof (int), qty_sugg_compare_1);
+     }
+ 
++  /* Instrumentation: forced quantities take their register first.  */
++  agbcc_instr_init ();
++  qty_forced = (char *) alloca (next_qty + 1);
++  for (i = 0; i < next_qty; i++)
++    {
++      int r = qty_first_reg[i];
++      qty_forced[i] = 0;
++      if (r >= 0 && r < AGBCC_MAXREG && agbcc_force[r] >= 0)
++	{
++	  qty_forced[i] = 1;
++	  qty_phys_reg[i] = agbcc_force[r];
++	  post_mark_life (agbcc_force[r], qty_mode[i], 1, qty_birth[i], qty_death[i]);
++	}
++    }
++
+   /* Try to put each quantity in a suggested physical register, if it has one.
+      This may cause registers to be allocated that otherwise wouldn't be, but
+      this seems acceptable in local allocation (unlike global allocation).  */
+   for (i = 0; i < next_qty; i++)
+     {
+       q = qty_order[i];
++      if (qty_forced[q])
++	continue;
+       if (qty_phys_num_sugg[q] != 0 || qty_phys_num_copy_sugg[q] != 0)
+ 	qty_phys_reg[q] = find_free_reg (qty_min_class[q], qty_mode[q], q,
+ 					 0, 1, qty_birth[q], qty_death[q]);
+@@ -1387,7 +1555,7 @@
+   for (i = 0; i < next_qty; i++)
+     {
+       q = qty_order[i];
+-      if (qty_phys_reg[q] < 0)
++      if (qty_phys_reg[q] < 0 && !qty_forced[q])
+ 	{
+ 	  if (N_REG_CLASSES > 1)
+ 	    {
+@@ -1414,6 +1582,13 @@
+ 	for (i = qty_first_reg[q]; i >= 0; i = reg_next_in_qty[i])
+ 	  reg_renumber[i] = qty_phys_reg[q] + reg_offset[i];
+       }
++  if (agbcc_dump)
++    for (q = 0; q < next_qty; q++)
++      fprintf (agbcc_dump, "L %s %d %d %d %d %d %d %d %d %d %s\n",
++	       current_function_name, b, qty_first_reg[q], q,
++	       qty_compare_pri (q), qty_birth[q], qty_death[q],
++	       qty_n_refs[q], qty_phys_num_sugg[q] + qty_phys_num_copy_sugg[q],
++	       qty_phys_reg[q], agbcc_pseudo_label (qty_first_reg[q]));
+ }
+ 
+ /* Compare two quantities' priority for getting real registers.
+@@ -1432,11 +1607,21 @@
+    Multiplying this by 10000 can't overflow.
+    QTY_CMP_PRI is also used by qty_sugg_compare.  */
+ 
+-#define QTY_CMP_PRI(q)		\
++#define QTY_CMP_PRI_BASE(q)		\
+   ((int) (((double) (floor_log2 (qty_n_refs[q]) * qty_n_refs[q] * qty_size[q]) \
+ 	  / (qty_death[q] - qty_birth[q])) * 10000))
++#define QTY_CMP_PRI(q) (QTY_CMP_PRI_BASE (q) \
++  + (qty_first_reg[q] >= 0 && qty_first_reg[q] < AGBCC_MAXREG \
++     ? agbcc_pri_delta[qty_first_reg[q]] : 0))
+ 
+ static int
++qty_compare_pri (q)
++     int q;
++{
++  return QTY_CMP_PRI (q);
++}
++
++static int
+ qty_compare (q1, q2)
+      int q1, q2;
+ {
+@@ -1505,6 +1690,7 @@
+ 
+ #undef QTY_CMP_SUGG
+ #undef QTY_CMP_PRI
++#undef QTY_CMP_PRI_BASE
+ 
+ /* Attempt to combine the two registers (rtx's) USEDREG and SETREG.
+    Returns 1 if have done so, or 0 if cannot.
+--- a/global.c
++++ b/global.c
+@@ -263,6 +263,13 @@
+ 
+ static HARD_REG_SET eliminable_regset;
+ 
++extern int agbcc_pri_delta[];
++extern int agbcc_force[];
++extern FILE *agbcc_dump;
++extern void agbcc_instr_init ();
++extern char *agbcc_name_get ();
++extern char *agbcc_pseudo_label ();
++static void force_allocno (int, int);
+ static int allocno_compare	(const void *, const void *);
+ static void global_conflicts	(void);
+ static void expand_preferences	(void);
+@@ -562,6 +569,13 @@
+     gcc_obstack_init (&global_obstack);
+ 
+     global_init (file);
++    agbcc_instr_init ();
++
++    /* Instrumentation: forced allocnos take their register first.  */
++    for (i = 0; i < (size_t) max_allocno; i++)
++      if (allocno_reg[i] < 40000 && agbcc_force[allocno_reg[i]] >= 0
++	  && reg_renumber[allocno_reg[i]] < 0)
++	force_allocno (i, agbcc_force[allocno_reg[i]]);
+   
+     for (i = 0; i < (size_t) max_allocno; i++)
+     {
+@@ -583,6 +597,22 @@
+         }
+     }
+ 
++    if (agbcc_dump)
++      for (i = 0; i < (size_t) max_allocno; i++)
++	fprintf (agbcc_dump, "G %s %d %d %d %d %d %d %s\n", current_function_name,
++		 allocno_reg[allocno_order[i]],
++		 (int) (((double) (floor_log2 (allocno_n_refs[allocno_order[i]])
++				   * allocno_n_refs[allocno_order[i]])
++			 / allocno_live_length[allocno_order[i]])
++			* 10000 * allocno_size[allocno_order[i]])
++		 + (allocno_reg[allocno_order[i]] < 40000
++		    ? agbcc_pri_delta[allocno_reg[allocno_order[i]]] : 0),
++		 allocno_n_refs[allocno_order[i]],
++		 allocno_live_length[allocno_order[i]],
++		 allocno_calls_crossed[allocno_order[i]],
++		 reg_renumber[allocno_reg[allocno_order[i]]],
++		 agbcc_pseudo_label (allocno_reg[allocno_order[i]]));
++
+     /* Do the reloads now while the allocno data still exist, so that we can
+        try to assign new hard regs to any pseudo regs that are spilled.  */
+ 
+@@ -622,6 +652,10 @@
+     = (((double) (floor_log2 (allocno_n_refs[v2]) * allocno_n_refs[v2])
+ 	/ allocno_live_length[v2])
+        * 10000 * allocno_size[v2]);
++  if (allocno_reg[v1] < 40000)
++    pri1 += agbcc_pri_delta[allocno_reg[v1]];
++  if (allocno_reg[v2] < 40000)
++    pri2 += agbcc_pri_delta[allocno_reg[v2]];
+   if (pri2 - pri1)
+     return pri2 - pri1;
+ 
+@@ -1221,6 +1255,23 @@
+     }
+ }
+ 
++/* Instrumentation: give ALLOCNO hard register REGNO, as find_reg does.  */
++static void
++force_allocno (allocno, regno)
++     int allocno, regno;
++{
++  int j;
++  HARD_REG_SET this_reg;
++  reg_renumber[allocno_reg[allocno]] = regno;
++  CLEAR_HARD_REG_SET (this_reg);
++  SET_HARD_REG_BIT (this_reg, regno);
++  SET_HARD_REG_BIT (regs_used_so_far, regno);
++  local_reg_n_refs[regno] = 0;
++  for (j = 0; j < max_allocno; j++)
++    if (CONFLICTP (allocno, j) || CONFLICTP (j, allocno))
++      IOR_HARD_REG_SET (hard_reg_conflicts[j], this_reg);
++}
++
+ /* Called from `reload' to look for a hard reg to put pseudo reg REGNO in.
+    Perhaps it had previously seemed not worth a hard reg,
+    or perhaps its old hard reg has been commandeered for reloads.
+--- a/reload1.c
++++ b/reload1.c
+@@ -208,6 +208,32 @@
+ /* Index of last register assigned as a spill register.  We allocate in
+    a round-robin fashion.  */
+ static int last_spill_reg;
++/* Instrumentation (tools/rasolve.py): AGBCC_SPILL="k:d,..." advances the
++   spill rotation by D before the K-th reload register choice in a function;
++   AGBCC_DUMPPRI also logs each choice.  */
++static int agbcc_reload_count;
++extern FILE *agbcc_dump;
++extern void agbcc_instr_init ();
++extern char *current_function_name;
++extern char *agbcc_const_label ();
++static int
++agbcc_spill_shift (k)
++     int k;
++{
++  char *e = getenv ("AGBCC_SPILL");
++  while (e && *e)
++    {
++      int kk, d, n = 0;
++      if (sscanf (e, "%d:%d%n", &kk, &d, &n) < 2 || n == 0)
++	break;
++      if (kk == k)
++	return d;
++      e += n;
++      if (*e == ',')
++	e++;
++    }
++  return 0;
++}
+ 
+ /* Describes order of preference for putting regs into spill_regs.
+    Contains the numbers of all the hard regs, in order most preferred first.
+@@ -815,6 +841,8 @@
+   
+   /* Initialize to -1, which means take the first spill register.  */
+   last_spill_reg = -1;
++  agbcc_reload_count = 0;
++  agbcc_instr_init ();
+ 
+   spilled_pseudos = ALLOCA_REG_SET ();
+ 
+@@ -5066,6 +5094,12 @@
+      reloads A and B can share regs.  These need two regs.
+      Suppose A and B are given different regs.
+      That leaves none for C.  */
++  {
++    int d = agbcc_spill_shift (agbcc_reload_count);
++    if (d && n_spills)
++      last_spill_reg = ((last_spill_reg + d) % n_spills + n_spills) % n_spills;
++    agbcc_reload_count++;
++  }
+   for (pass = 0; pass < 2; pass++)
+     {
+       /* I is the index in spill_regs.
+@@ -5203,6 +5237,34 @@
+ 
+ 	    reload_reg_rtx[r] = new;
+ 	    reload_spill_index[r] = spill_regs[i];
++	    if (agbcc_dump)
++	      {
++		rtx p = insn;
++		int line = 0;
++		char *file = "-";
++		for (; p; p = PREV_INSN (p))
++		  if (GET_CODE (p) == NOTE && NOTE_LINE_NUMBER (p) > 0)
++		    {
++		      line = NOTE_LINE_NUMBER (p);
++		      file = NOTE_SOURCE_FILE (p);
++		      break;
++		    }
++		rtx in = reload_in[r];
++		char *v;
++		if (in && GET_CODE (in) == REG && REGNO (in) >= FIRST_PSEUDO_REGISTER
++		    && reg_equiv_constant && reg_equiv_constant[REGNO (in)])
++		  in = reg_equiv_constant[REGNO (in)];
++		v = agbcc_const_label (in);
++		if (! v && in && GET_CODE (in) == REG)
++		  {
++		    static char b[32];
++		    sprintf (b, "reg%d", REGNO (in));
++		    v = b;
++		  }
++		fprintf (agbcc_dump, "R %s %d %d %d %d %s %s\n", current_function_name,
++			 agbcc_reload_count - 1, INSN_UID (insn), spill_regs[i], line, file,
++			 v ? v : "-");
++	      }
+ 	    return 1;
+ 	  }
+     }
+--- a/stmt.c
++++ b/stmt.c
+@@ -49,6 +49,7 @@
+ #include "obstack.h"
+ #include "loop.h"
+ #include "recog.h"
++extern void agbcc_name_set ();
+ #include "machmode.h"
+ #include "toplev.h"
+ #include "output.h"
+@@ -3322,6 +3323,8 @@
+ 
+       DECL_RTL (decl) = gen_reg_rtx (reg_mode);
+       mark_user_reg (DECL_RTL (decl));
++      if (DECL_NAME (decl))
++	agbcc_name_set (DECL_RTL (decl), IDENTIFIER_POINTER (DECL_NAME (decl)));
+ 
+       if (POINTER_TYPE_P (type))
+ 	mark_reg_pointer (DECL_RTL (decl),
+--- a/function.c
++++ b/function.c
+@@ -41,6 +41,7 @@
+ #include "config.h"
+ #include "system.h"
+ #include "rtl.h"
++extern void agbcc_name_set ();
+ #include "tree.h"
+ #include "flags.h"
+ #include "except.h"
+@@ -4207,6 +4208,8 @@
+ 
+ 	  parmreg = gen_reg_rtx (promoted_nominal_mode);
+ 	  mark_user_reg (parmreg);
++	  if (DECL_NAME (parm))
++	    agbcc_name_set (parmreg, IDENTIFIER_POINTER (DECL_NAME (parm)));
+ 
+ 	  /* If this was an item that we received a pointer to, set DECL_RTL
+ 	     appropriately.  */
+--- a/integrate.c
++++ b/integrate.c
+@@ -24,6 +24,8 @@
+ #include "system.h"
+ 
+ #include "rtl.h"
++extern void agbcc_name_set ();
++extern char *agbcc_name_get ();
+ #include "tree.h"
+ #include "regs.h"
+ #include "flags.h"
+@@ -2403,6 +2405,7 @@
+       if (map->reg_map[regno] == NULL)
+ 	{
+ 	  map->reg_map[regno] = gen_reg_rtx (mode);
++	  agbcc_name_set (map->reg_map[regno], agbcc_name_get (orig));
+ 	  REG_USERVAR_P (map->reg_map[regno]) = REG_USERVAR_P (orig);
+ 	  REG_LOOP_TEST_P (map->reg_map[regno]) = REG_LOOP_TEST_P (orig);
+ 	  RTX_UNCHANGING_P (map->reg_map[regno]) = RTX_UNCHANGING_P (orig);

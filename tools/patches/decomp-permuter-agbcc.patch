@@ -31,10 +31,10 @@ index 1a67fff..9ac3ac5 100644
 +perm_const_var = 15
 diff --git a/src/agbcc_passes.py b/src/agbcc_passes.py
 new file mode 100644
-index 0000000..c4c1241
+index 0000000..5a7b9f6
 --- /dev/null
 +++ b/src/agbcc_passes.py
-@@ -0,0 +1,679 @@
+@@ -0,0 +1,696 @@
 +"""Randomization passes for agbcc (gcc 2.95) register allocation and scheduling.
 +
 +Each pass is a source change that has closed a match by hand in the Boktai 3
@@ -64,6 +64,8 @@ index 0000000..c4c1241
 +
 +# Name -> address for perm_literal_address; set from settings.toml.
 +SYMBOL_ADDRESSES: Dict[str, int] = {}
++
++MAX = 10**9
 +
 +INT_TYPES = [
 +    ["s32"],
@@ -621,6 +623,21 @@ index 0000000..c4c1241
 +
 +        After().visit(fn.body)
 +        ensure(not bad)
++        # nor jump back from after the block to where x is still read
++        labels: Dict[str, int] = {}
++        gotos: List[Tuple[str, int]] = []
++
++        class Jumps(ca.NodeVisitor):
++            def visit_Label(self, n: ca.Label) -> None:
++                labels[n.name] = indices.starts.get(n, 0)
++                self.generic_visit(n)
++
++            def visit_Goto(self, n: ca.Goto) -> None:
++                gotos.append((n.name, indices.starts.get(n, 0)))
++
++        Jumps().visit(fn.body)
++        here = indices.starts.get(s, 0)
++        ensure(not any(at > here and labels.get(name, MAX) < here for name, at in gotos))
 +    x2 = new_name(fn, ast, x + "_")
 +
 +    def rename(node: ca.Node, is_expr: bool) -> Optional[ca.Node]:
