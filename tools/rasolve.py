@@ -95,13 +95,13 @@ class Compiler:
             self.server = agbserve.Server(prefix, self.flags, INSTR, self.work)
         return self.server.compile(suffix, env)
 
-    def run(self, pri=None, force=None, dump=False, spill=None):
+    def run(self, pri=None, force=None, dump=False, spill=None, env=None):
         """(differing bytes, dump or None) for one compile."""
         key = (self.pre, tuple(sorted((pri or {}).items())), tuple(sorted((force or {}).items())), dump,
-               tuple(sorted((spill or {}).items())))
+               tuple(sorted((spill or {}).items())), tuple(sorted((env or {}).items())))
         if key in self.cache:
             return self.cache[key]
-        env = {}
+        env = dict(env or {})
         if spill:
             env["AGBCC_SPILL"] = ",".join(f"{k}:{d}" for k, d in spill.items() if d)
         if pri:
@@ -115,6 +115,7 @@ class Compiler:
                 os.remove(dump_path)
             env["AGBCC_DUMPPRI"] = dump_path
         asm = self._asm(self.pre, env)
+        self.last_asm = asm
         self.compiles += 1
         result = (None, None)
         if asm is not None:
@@ -155,7 +156,7 @@ def parse_dump(text, func):
                 out[reg].name = p[8] if len(p) > 8 else "-"
         elif p[0] == "R":
             k, uid, hard, line = map(int, p[2:6])
-            reloads.append((k, uid, hard, line, p[6] if len(p) > 6 else "-"))
+            reloads.append((k, uid, hard, line, p[6] if len(p) > 6 else "-", p[7] if len(p) > 7 else "-"))
     out.reloads = reloads
     return out
 
@@ -185,6 +186,7 @@ def main():
     ap.add_argument("--search-c", type=int, default=0, metavar="SECONDS",
                     help="then search C (permuter passes, focused on the variables) toward the solution")
     ap.add_argument("-j", type=int, default=os.cpu_count() or 4)
+    ap.add_argument("--json-out", help="write the compiler-space solution as targets for translate.py")
     ap.add_argument("--all", action="store_true", help="try every pseudo, not just the involved ones")
     a = ap.parse_args()
     if not os.path.exists(INSTR):
@@ -218,7 +220,7 @@ def main():
     if a.all or not involved:
         involved = set(ps)
     moves = []
-    for k, uid, hard, line, file in ps.reloads:
+    for k, uid, hard, line, file, _ in ps.reloads:
         for d in (1, -1, 2):
             moves.append(("spill", k, d, None))
     for r in sorted(involved, key=lambda r: r not in wants):
@@ -294,11 +296,28 @@ def main():
         sc = evaluate(trial)
         if sc is not None and sc <= score:
             state = trial
+    if a.json_out:
+        import json
+        targets = []
+        for kind, r, d in state:
+            if kind == "pri":
+                p = ps[r]
+                targets.append({"kind": "pri", "label": p.name, "raise": d > 0, "goal": p.pri + d,
+                                "base": p.pri, "pseudo": r})
+            else:
+                k, uid, hard, line, file = next(x for x in ps.reloads if x[0] == r)[:5]
+                lab = [x for x in ps.reloads if x[0] == r][0]
+                same = [x for x in ps.reloads if len(x) > 5 and x[5] == lab[5]] if len(lab) > 5 else []
+                targets.append({"kind": "reload", "label": lab[5] if len(lab) > 5 else "-",
+                                "occurrence": [x[0] for x in same].index(r) if same else 0,
+                                "index": r, "shift": d, "line": line})
+        json.dump({"func": func, "base_bytes": base, "score": score, "targets": targets},
+                  open(a.json_out, "w"), indent=1)
     print(f"\n{'EXACT MATCH' if score == 0 else f'{score} differing bytes'} in compiler space with "
           f"{len(state)} change(s); now write C that does the same:")
     for kind, r, d in state:
         if kind == "spill":
-            k, uid, hard, line, file = next(x for x in ps.reloads if x[0] == r)
+            k, uid, hard, line, file = next(x for x in ps.reloads if x[0] == r)[:5]
             text = ""
             if os.path.abspath(file) == src and 0 < line <= len(src_text):
                 text = src_text[line - 1].strip()[:70]
@@ -339,7 +358,7 @@ def main():
             elif kind == "pri":
                 src_lines |= an.pseudo_lines.get(r, set())
             else:  # a reload shift: change the code just before that reload
-                k, uid, hard, line, file = next(x for x in ps.reloads if x[0] == r)
+                k, uid, hard, line, file = next(x for x in ps.reloads if x[0] == r)[:5]
                 if os.path.abspath(file) == src:
                     src_lines |= set(range(line - 3, line + 1))
         guided_search(src, func, cc, targets, a.search_c, a.j, src_lines)
