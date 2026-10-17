@@ -1,9 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
-#ifdef NONMATCHING
-// fuzzy: 98.1%
-// Open: operand registers of `one & f->flags`, the `two` constant placement,
-// and the final frame read (the original keeps a halfword load).
 struct Frames {
     u16 *data;
     u8 flags, count, multiplier, duration;
@@ -46,7 +43,7 @@ void AnimatedTile_CreateFromScript(void)
     u32 two;
     struct Frames *fr;
     struct Frames *f;
-    u16 *frame;
+    const vu16 *frame;
     u32 one;
     if (!manager) {
         manager = sub_08108A4C();
@@ -77,15 +74,30 @@ void AnimatedTile_CreateFromScript(void)
     f = fr;
     frame = &f->data[f->index];
     e->field10 = *frame >> 6;
-    if ((one & f->flags) != (((*frame & 0x30) >> 4) & one))
-        e->flags |= 4;
-    else
-        e->flags &= ~4;
-    two = 2;
-    if ((u8)(f->flags & two) != (((*frame & 0x30) >> 4) & two))
-        e->flags |= 8;
-    else
-        e->flags &= ~8;
+    {
+        u32 input = f->flags;
+        u32 first = one;
+        asm("" : "+r"(first));
+        first &= input;
+        if (first != (((*frame & 0x30) >> 4) & one))
+            e->flags |= 4;
+        else
+            e->flags &= ~4;
+    }
+    {
+        u32 flags = f->flags;
+        register u32 first asm("r1");
+        two = 2;
+        asm("" : "+r"(two));
+        first = two;
+        first &= flags;
+        asm("" : "+r"(first));
+        first = (u8)first;
+        if (first != (((*frame & 0x30) >> 4) & two))
+            e->flags |= 8;
+        else
+            e->flags &= ~8;
+    }
     if (++f->timer >= f->duration) {
         f->timer = 0;
         if (f->flags & 4) {
@@ -113,6 +125,3 @@ void AnimatedTile_CreateFromScript(void)
             f->duration = 1;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", AnimatedTile_CreateFromScript);
-#endif
