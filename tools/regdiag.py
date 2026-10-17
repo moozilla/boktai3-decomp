@@ -207,17 +207,60 @@ def first_function(src):
     return os.path.splitext(os.path.basename(src))[0]
 
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("src")
-    ap.add_argument("func", nargs="?")
-    ap.add_argument("--asm", action="store_true", help="print the aligned listing")
-    ap.add_argument("--nonmatching", action="store_true", help="compile #ifdef NONMATCHING drafts")
-    a = ap.parse_args()
-    if a.nonmatching:
+class Analysis:
+    """What regdiag found, for tools that act on it (permute.py --focus,
+    regsolve.py). Lines are source lines of the compiled file."""
+
+    def __init__(self):
+        self.func = None
+        self.listing = []        # aligned listing lines
+        self.struct_ops = []     # (tag, candidate [(off, text)], original [(off, text)])
+        self.struct_lines = set()  # source lines of differing instructions
+        self.wants = {}          # pseudo -> Counter(wanted register)
+        self.pseudo_lines = {}   # pseudo -> set(lines)
+        self.reloads = []        # (off, uid, cand text, orig text)
+        self.reload_lines = set()
+        self.global_order = []   # pseudos, highest priority first
+        self.stats = {}          # pseudo -> "used N times across M insns ..."
+        self.disp = {}           # pseudo -> hard register it got
+        self.max_uid = 0
+        self.lreg = ""
+        self.greg = ""
+        self.n_insns = 0
+        self.matched = False
+
+    def kind(self, p):
+        return f"global #{self.global_order.index(p) + 1}" if p in self.global_order else "local"
+
+    def focus_lines(self):
+        """Source lines whose code the original emits differently, plus the
+        likely causes: a reload register is set by the reloads before it
+        (the spill rotation), so every reload up to the first differing one
+        is included."""
+        out = set(self.struct_lines) | set(self.reload_lines)
+        for p in self.wants:
+            out |= self.pseudo_lines.get(p, set())
+        if self.reloads:
+            # A missing reload has no instruction to point at: take every line
+            # from the agreeing reloads before the first differing one. A
+            # reload is credited to the next ordinary instruction's line, so
+            # go back two reloads.
+            first = min(co for co, _, _, _ in self.reloads)
+            before = [self.off_line[o] for o, _, _ in self.reload_insns
+                      if o < first and self.off_line.get(o)]
+            end = self.off_line.get(first)
+            if end:
+                start = min([x for x in before[-2:] if x <= end] or [end])
+                out |= set(range(start, end + 1))
+        return out
+
+
+def analyze(src, func=None, nonmatching=False):
+    if nonmatching and "-DNONMATCHING" not in build.DEFINES:
         build.DEFINES.append("-DNONMATCHING")
-    src = a.src if os.path.exists(a.src) else os.path.join(ROOT, "src/fn", a.src + ".c")
-    func = a.func or first_function(src)
+    func = func or first_function(src)
+    an = Analysis()
+    an.func = func
 
     with tempfile.TemporaryDirectory() as wd:
         s_path, o_path, lreg_p, greg_p, ref_o = compile_dumps(src, wd)
@@ -227,6 +270,7 @@ def main():
             print("warning: -g changed the code; insn numbers may not line up")
         lreg = functions_of(open(lreg_p).read()).get(func, "")
         greg = functions_of(open(greg_p).read()).get(func, "")
+    an.lreg, an.greg = lreg, greg
 
     syms = check.elf_symbols()
     if func not in syms:
@@ -241,49 +285,45 @@ def main():
     # only instructions (drop pool words the walker knows about)
     cd = [(o, t) for o, t in cd if o in by_off]
     od = strip_pools(od, len(cand), orig, addr)
+    an.n_insns = len(cd)
     sm = difflib.SequenceMatcher(None, [shape(t) for _, t in cd], [shape(t) for _, t in od], autojunk=False)
 
     l_insns, g_insns = insns_by_uid(lreg), insns_by_uid(greg)
     uid_line = insn_lines(lreg)
-    src_text = open(src).read().splitlines()
     pseudo_lines = collections.defaultdict(set)
     for uid, rtl in l_insns.items():
         for pn, _ in regs_in(rtl):
             if pn >= 16 and uid in uid_line:
                 pseudo_lines[pn].add(uid_line[uid])
+    an.pseudo_lines = pseudo_lines
     # reload insns have no note of their own: use the next ordinary insn's line
     off_line, nxt = {}, None
     for o, uid, _ in reversed(lines):
         if uid in uid_line:
             nxt = uid_line[uid]
         off_line[o] = nxt
-
-    def show_lines(ls, limit=4):
-        out = []
-        for ln in sorted(ls)[:limit]:
-            text = src_text[ln - 1].strip() if 0 < ln <= len(src_text) else ""
-            out.append(f"      {ln:4d}: {text[:90]}")
-        return "\n".join(out)
-    max_uid = max(l_insns) if l_insns else 0
-    global_order = []
+    an.off_line = off_line
+    an.max_uid = max(l_insns) if l_insns else 0
     m = re.search(r";; \d+ regs to allocate:([^\n]*)", greg)
     if m:
-        global_order = [int(x) for x in m.group(1).split()]
-    stats = dict(re.findall(r"^Register (\d+) (used .*)$", lreg, re.M))
-    disp = {int(p): int(h) for p, h in re.findall(r"(\d+) in (\d+)", greg.split(";; Register dispositions:")[-1])} \
+        an.global_order = [int(x) for x in m.group(1).split()]
+    an.stats = {int(k): v for k, v in re.findall(r"^Register (\d+) (used .*)$", lreg, re.M)}
+    an.disp = {int(p): int(h) for p, h in re.findall(r"(\d+) in (\d+)", greg.split(";; Register dispositions:")[-1])} \
         if ";; Register dispositions:" in greg else {}
 
     wants = collections.defaultdict(collections.Counter)
-    reloads = []
-    listing = []
-    struct_ops = []
-    for tag, i1, i2, j1, j2 in sm.get_opcodes():
+    an.cd, an.od, an.opcodes = cd, od, sm.get_opcodes()
+    for tag, i1, i2, j1, j2 in an.opcodes:
         if tag != "equal":
-            struct_ops.append((tag, cd[i1:i2], od[j1:j2]))
+            an.struct_ops.append((tag, cd[i1:i2], od[j1:j2]))
             for o, t in cd[i1:i2]:
-                listing.append(f"  - {o:04X} {t}")
+                an.listing.append(f"  - {o:04X} {t}")
+                if off_line.get(o):
+                    an.struct_lines.add(off_line[o])
             for o, t in od[j1:j2]:
-                listing.append(f"  + {o:04X} {t}")
+                an.listing.append(f"  + {o:04X} {t}")
+            if not cd[i1:i2] and i1 < len(cd) and off_line.get(cd[i1][0]):
+                an.struct_lines.add(off_line[cd[i1][0]])  # an insertion point
             continue
         for (co, ct), (oo, ot) in zip(cd[i1:i2], od[j1:j2]):
             cr, orr = norm_regs(ct), norm_regs(ot)
@@ -292,8 +332,10 @@ def main():
             if cr != orr and len(cr) == len(orr):
                 mark = "!"
                 pairs = {(x, y) for x, y in zip(cr, orr) if x != y}
-                if uid and uid > max_uid:
-                    reloads.append((co, uid, ct, ot))
+                if uid and uid > an.max_uid:
+                    an.reloads.append((co, uid, ct, ot))
+                    if off_line.get(co):
+                        an.reload_lines.add(off_line[co])
                 elif uid in l_insns and uid in g_insns:
                     lp, gp = regs_in(l_insns[uid]), regs_in(g_insns[uid])
                     for (pn, _), (hn, hname) in zip(lp, gp):
@@ -301,12 +343,40 @@ def main():
                             for x, y in pairs:
                                 if hname == x or f"r{hn}" == x:
                                     wants[pn][y] += 1
-            listing.append(f"{mark} {co:04X} {ct:28s} | {ot:28s} insn {uid} line {off_line.get(co)}")
+            an.listing.append(f"{mark} {co:04X} {ct:28s} | {ot:28s} insn {uid} line {off_line.get(co)}")
+    an.wants = wants
+    an.reload_insns = [(o, u, t) for o, u, t in lines if u and u > an.max_uid]
+    an.matched = not an.struct_ops and not any(x.startswith("!") for x in an.listing) and len(cd) == len(od)
+    return an
 
-    def kind(p):
-        return f"global #{global_order.index(p) + 1}" if p in global_order else "local"
 
-    print(f"{func}: {len(cd)} candidate instructions, "
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("src")
+    ap.add_argument("func", nargs="?")
+    ap.add_argument("--asm", action="store_true", help="print the aligned listing")
+    ap.add_argument("--nonmatching", action="store_true", help="compile #ifdef NONMATCHING drafts")
+    ap.add_argument("--lines", action="store_true",
+                    help="print only the source lines that need changes (for permute.py --focus)")
+    a = ap.parse_args()
+    src = a.src if os.path.exists(a.src) else os.path.join(ROOT, "src/fn", a.src + ".c")
+    an = analyze(src, a.func, a.nonmatching)
+    if a.lines:
+        print(" ".join(str(x) for x in sorted(an.focus_lines())))
+        return
+    src_text = open(src).read().splitlines()
+    wants, global_order, stats, disp = an.wants, an.global_order, an.stats, an.disp
+    kind = an.kind
+
+    def show_lines(ls, limit=4):
+        out = []
+        for ln in sorted(ls)[:limit]:
+            text = src_text[ln - 1].strip() if 0 < ln <= len(src_text) else ""
+            out.append(f"      {ln:4d}: {text[:90]}")
+        return "\n".join(out)
+
+    listing, struct_ops = an.listing, an.struct_ops
+    print(f"{an.func}: {an.n_insns} candidate instructions, "
           f"{sum(1 for x in listing if x.startswith('!'))} register diffs, "
           f"{len(struct_ops)} structural diffs")
     if a.asm:
@@ -324,24 +394,23 @@ def main():
         for p in sorted(wants, key=lambda p: (p not in global_order, global_order.index(p) if p in global_order else p)):
             got = f"r{disp[p]}" if p in disp else "?"
             w = ", ".join(f"{r} x{n}" for r, n in wants[p].most_common())
-            print(f"  pseudo {p:4d} {kind(p):10s} got {got:4s} wants {w:14s} {stats.get(str(p), '')}")
-            if pseudo_lines.get(p):
-                print(show_lines(pseudo_lines[p]))
-    if reloads:
+            print(f"  pseudo {p:4d} {kind(p):10s} got {got:4s} wants {w:14s} {stats.get(p, '')}")
+            if an.pseudo_lines.get(p):
+                print(show_lines(an.pseudo_lines[p]))
+    if an.reloads:
         print("\nreload registers (spill rotation; earlier reloads shift later ones):")
-        for co, uid, ct, ot in reloads:
+        for co, uid, ct, ot in an.reloads:
             print(f"  {co:04X} insn {uid}: {ct}  | original {ot}")
-            if off_line.get(co):
-                print(show_lines({off_line[co]}))
-        rel = [(o, u, t) for o, u, t in lines if u and u > max_uid]
-        print("  all reload insns in order: " + "; ".join(f"{o:04X} {t}" for o, u, t in rel[:30]))
+            if an.off_line.get(co):
+                print(show_lines({an.off_line[co]}))
+        print("  all reload insns in order: " + "; ".join(f"{o:04X} {t}" for o, u, t in an.reload_insns[:30]))
     if global_order and wants:
         print("\nglobal allocation order (priority, highest first), got -> wants:")
         for i, p in enumerate(global_order, 1):
             w = wants.get(p)
             got = f"r{disp[p]}" if p in disp else "?"
             flag = f" -> {w.most_common(1)[0][0]}" if w else ""
-            print(f"  #{i:2d} pseudo {p:4d} {got}{flag:7s} {stats.get(str(p), '')}")
+            print(f"  #{i:2d} pseudo {p:4d} {got}{flag:7s} {stats.get(p, '')}")
 
 
 if __name__ == "__main__":
