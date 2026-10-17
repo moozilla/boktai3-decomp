@@ -34,7 +34,8 @@ big one) · [GAME_LAYOUT](GAME_LAYOUT.md) (ROM to gameplay) · [ROM_MAP](ROM_MAP
 **Scripts (GCL).** [gcl/README](../gcl/README.md) (names, views, Konami's
 naming) · [gcl/examples/scale_quiz](../gcl/examples/scale_quiz.md) (a puzzle read
 end to end) · [gcl/examples/prologue](../gcl/examples/prologue.md) (New Game to the
-Sealed Prison) · [CUTSCENES](CUTSCENES.md) (the event tables SceneMessages plays,
+Sealed Prison) · [gcl/examples/sealed_prison](../gcl/examples/sealed_prison.md) (the
+first dungeon, room by room; story progress) · [CUTSCENES](CUTSCENES.md) (the event tables SceneMessages plays,
 receivers and commands) · [MGS_GCL_MATCHING](MGS_GCL_MATCHING.md) (the matched VM) ·
 [PROCESS_REVIEW](PROCESS_REVIEW.md) · [tasks/script_targets](tasks/script_targets.md)
 (native routines scripts call, unmatched first).
@@ -105,7 +106,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/ENTRY_AND_MENUS.md](../docs/ENTRY_AND_MENUS.md) | Entry point and contiguous subsystem batch |  | 5 |
 | [docs/FINDINGS.md](../docs/FINDINGS.md) | Engine findings |  | 5 |
 | [docs/GAME_LAYOUT.md](../docs/GAME_LAYOUT.md) | Boktai 3 game layout: from ROM to gameplay | *#assets* | 33 |
-| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 10 |
+| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 11 |
 | [docs/HIT_SWITCH.md](../docs/HIT_SWITCH.md) | Hit-counted switch pool (tentative identity) |  | 5 |
 | [docs/KNIDL_PROCESS_REVIEW_2026-10-09.md](../docs/KNIDL_PROCESS_REVIEW_2026-10-09.md) | KNIDL workflow review and implications for Boktai 3 | *#process* | 13 |
 | [docs/LEVEL_ADVANCE_DISPLAY.md](../docs/LEVEL_ADVANCE_DISPLAY.md) | Level advancement display (tentative presentation identity) |  | 4 |
@@ -200,9 +201,10 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-17.md](../docs/history/2026-10-17.md) | Handoff history: 2026-10-17 | #actors #scripts | 0 |
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 16 |
-| [gcl/README.md](../gcl/README.md) | GCL: the game's scripts | *#scripts #scene #assets #tooling* | 14 |
+| [gcl/README.md](../gcl/README.md) | GCL: the game's scripts | *#scripts #scene #assets #tooling* | 15 |
 | [gcl/examples/prologue.md](../gcl/examples/prologue.md) | Worked example: the prologue, from New Game to the Sealed Prison | *#scripts #assets #tooling* | 8 |
 | [gcl/examples/scale_quiz.md](../gcl/examples/scale_quiz.md) | Worked example: the Blackbeard Brothers' scale quiz | *#scripts #assets #tooling* | 10 |
+| [gcl/examples/sealed_prison.md](../gcl/examples/sealed_prison.md) | Worked example: the Sealed Prison, the first dungeon | *#scripts #assets #tooling* | 6 |
 | [notes/animation-contact-burst_2026-10-14.md](../notes/animation-contact-burst_2026-10-14.md) | Temporary animations and contact-burst effect, October 14 | *#particles #animation* | 7 |
 | [notes/area-effect-link_2026-10-14.md](../notes/area-effect-link_2026-10-14.md) | Link variant of area effects (Sol, 2026-10-14) |  | 2 |
 | [notes/area-effect_2026-10-14.md](../notes/area-effect_2026-10-14.md) | Rectangular area effect manager (Sol, 2026-10-14) | *#tooling* | 4 |

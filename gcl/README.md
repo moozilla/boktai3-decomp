@@ -118,7 +118,16 @@ spawners...); a procedure's own named parameters replace `argN` inside it.
 
 Worked examples: a whole puzzle read end to end, [examples/scale_quiz.md](examples/scale_quiz.md);
 the prologue from New Game to the Sealed Prison, with its cutscene tables,
-[examples/prologue.md](examples/prologue.md) (the tables: [docs/CUTSCENES.md](../docs/CUTSCENES.md)).
+[examples/prologue.md](examples/prologue.md) (the tables: [docs/CUTSCENES.md](../docs/CUTSCENES.md));
+the first dungeon room by room, [examples/sealed_prison.md](examples/sealed_prison.md).
+
+**Story progress.** `r708[0x3C]` (`story`) is the quest log: `advance_story(value=N)`
+(proc 875) raises it to N, and doors, events and conversations test it. 173
+values from 0 to 194 appear, 165 of them set; `python3 tools/assets/story.py`
+lists each with where it is set, its cutscene and what tests it, and the
+Studio's Browse › Story shows them by chapter. A door before a one-time event
+leads to the room's first-visit entrance (57) while progress is below the
+event's value.
 
 Procedure references are their own value type (GCL type 8, as against type 6
 for hashes), so callbacks show by name: `on_press=open_east_door`,
