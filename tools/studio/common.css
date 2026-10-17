@@ -14,6 +14,8 @@ body.embed main { height: 100vh !important; }
 #peek .peekbar { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-bottom: 1px solid var(--line); font-size: 13px; }
 #peek .peekbar .sp { flex: 1; }
 #peek .peekbar button { border: 0; background: none; color: var(--muted); font-size: 16px; cursor: pointer; padding: 2px 8px; }
+#peek .peekbar button:hover { color: var(--ink); }
+#peek #peektitle { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #peek iframe { flex: 1; border: 0; width: 100%; background: var(--bg); }
 
 .noteed { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin: 6px 0 10px; }

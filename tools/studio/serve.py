@@ -286,6 +286,15 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, open(os.path.join(HERE, "gfx.html"), "rb").read(), "text/html; charset=utf-8")
         elif self.path in ("/live", "/live.html"):
             self.send(200, open(os.path.join(HERE, "live.html"), "rb").read(), "text/html; charset=utf-8")
+        elif self.path in ("/atlas", "/atlas.html"):
+            self.send(200, open(os.path.join(HERE, "atlas.html"), "rb").read(), "text/html; charset=utf-8")
+        elif self.path == "/api/atlas":
+            import atlas
+            ix = atlas.load()
+            self.send(200, {"tree": ix["tree"], "entities": ix["entities"]})
+        elif self.path == "/api/atlas/funcs":
+            import atlas
+            self.send(200, atlas.load()["funcs"])
         elif self.path in ("/actors", "/scripts", "/code", "/world"):
             self.send(200, open(os.path.join(HERE, self.path[1:] + ".html"), "rb").read(), "text/html; charset=utf-8")
         elif self.path == "/api/actors":
