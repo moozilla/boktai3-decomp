@@ -92,7 +92,16 @@ with one page of everything known about it: a monster family's species and
 every palette its sprites are drawn in, where it appears, the scripts that
 create it and how much of its code is decompiled. ⌘K searches everything;
 links to the views below open in a side panel with its own history. The index
-is built by `tools/studio/atlas.py` and grouped by `data/atlas/categories.csv`.
+is built by `tools/studio/atlas.py`. Groups come from the game and the code, not
+from hand-made categories: the Cast is the game's character list plus every
+speaker of dialogue in the scripts (with their lines and scenes), the Bestiary
+the game's monster list, Objects and Script routines the registry entries by
+the code subsystem their callback is in. An object's page lists its own
+sprites and palettes, the sprite packages, maps, tilesets and animations its
+code looks up (`sub_0821A520(type, hash)`), and the scenes whose own scripts
+place it; a scene opened from there marks it on the map. **ROM** (`/rom`) is
+the ROM as a treemap in address order, colored by kind or by how well each
+byte is understood.
 
 | | |
 |---|---|

@@ -241,7 +241,7 @@ function cardFor(id) {
   if (e.kind === 'scene') small = E[e.area]?.title || '';
   if (e.kind === 'file') small = `${e.nprocs} procedures`;
   if (e.kind === 'unit') small = `${e.funcs.length} functions · ${e.size ? Math.round(100 * e.matched / e.size) : 0}% matched`;
-  if (e.kind === 'char') small = e.jp;
+  if (e.kind === 'char') small = e.jp + (e.lines ? ` · ${e.lines} lines` : '');
   if (e.kind === 'tileset') small = `${e.tiles} tiles · ${e.maps.length ? 'map ' + e.maps.map(m => m.map).join(', ') : 'no stage'}`;
   if (e.kind === 'song') small = `song ${e.key} · ${e.ntracks} track${e.ntracks > 1 ? 's' : ''}${e.scenes.length ? ` · ${e.scenes.length} scene${e.scenes.length > 1 ? 's' : ''}` : ''}`;
   if (e.kind === 'bgtiles') small = `map ${e.key} · ${e.tiles} tiles`;
@@ -292,6 +292,16 @@ function codeTable(names, el) {
   });
 }
 
+// Resources an object's code looks up by hash: maps and tilesets (bosses
+// drawn as background layers), palettes, animation scripts.
+function resources(e) {
+  const r = e.resources || {};
+  const row = (k, label, href) => r[k]?.length ? `<div style="margin:4px 0"><span class="muted">${label}</span> <span class="chips" style="display:inline-flex">${r[k].map(h => `<a class="chip" href="${href(h)}" data-peek>${h}</a>`).join('')}</span></div>` : '';
+  const html = row('maps', 'maps', h => gfxHref('map', h)) + row('tilesets', 'tilesets', h => '/gfx#tiles/' + h) + row('palettes', 'palettes', h => gfxHref('pal', h)) + row('animations', 'animation scripts', h => '/gfx#data/' + h);
+  // a boss drawn as a background layer: show the map it loads
+  const preview = r.maps?.length ? `<iframe class="mapframe" style="height:300px;margin-top:6px" src="/gfx?embed=1&bare=1#maps/${r.maps[0]}" loading="lazy"></iframe>` : '';
+  return html ? `<h3>Other resources its code loads</h3>${html}${preview}` : '';
+}
 // Where an object is: scenes whose own script creates it; otherwise the
 // shared scripts that do (run by many scenes, or by the system).
 function placement(e) {
@@ -303,15 +313,18 @@ function placement(e) {
 const PAGES = {
   actor(e) {
     const species = e.names.filter(n => E['monster:' + n.id]);
+    const spoken = Object.values(E).filter(c => c.kind === 'char' && c.monster && species.some(n => 'monster:' + n.id === c.monster));
     const chars = (e.chars || []).filter(id => E[id]);
-    const sub = [e.names.length ? `<span class="jp">${e.names.map(n => esc(n.jp)).join(' · ')}</span>` : '', e.gcl[0] ? `GCL <b>${esc(e.gcl[0].name)}</b>` : '', `key <span class="mono">${e.key}</span>`].filter(Boolean).join(' · ');
+    const sub = [e.title_from ? `<span class="muted">named from ${esc(e.title_from)}</span>` : '', e.names.length ? `<span class="jp">${e.names.map(n => esc(n.jp)).join(' · ')}</span>` : '', e.gcl[0] ? `GCL <b>${esc(e.gcl[0].name)}</b>` : '', `key <span class="mono">${e.key}</span>`].filter(Boolean).join(' · ');
     const b = [`<a class="badge" href="#unit:${esc(e.subsystem)}">code: ${esc(e.subsystem)}</a>`, badge(e.creates ? 'object' : 'script routine'), e.nscenes ? badge(`placed in ${e.nscenes} scenes`) : '', e.procs.length ? badge(`${e.spawns} script calls`) : badge('not created by scripts')];
     return `<div class="page">${head(e, sub, b)}
       ${chars.length ? `<h3>Character</h3><div class="chips">${chars.map(id => chip(id)).join('')}</div>` : ''}
       ${species.length ? `<h3>Species <span class="n">${species.length}</span></h3><div class="chips">${species.map(n => chip('monster:' + n.id, n.en || n.jp, ` <small>${esc(n.jp)}</small>`)).join('')}</div>` : ''}
       <h3>Sprites and palettes <span class="n">${e.sprites.length}</span></h3>${e.sprites.length ? e.sprites.map(palettes).join('') : `<div class="empty">Its own code (${esc(e.fname)}${e.loader_name ? ', ' + esc(e.loader_name) : ''}) loads no large sprite we can trace${e.small.length ? '' : '; it may draw with a sprite package or a background layer'}.</div>`}
       ${e.effects?.length ? `<details style="margin-top:6px"><summary class="muted">Other sprites its code loads <span class="n">${e.effects.length}</span>: effects, projectiles and things it spawns</summary><div class="cards" style="margin-top:8px">${e.effects.map(h => cardFor('sprite:' + h)).join('')}</div></details>` : ''}
-      ${e.small.length ? `<div class="cards" style="margin-top:8px">${e.small.map(h => cardFor('spr:' + h)).join('')}</div>` : ''}
+      ${e.small.length ? `<h3>Sprite packages <span class="n">${e.small.length}</span></h3><div class="cards">${e.small.map(h => E['spr:' + h] ? cardFor('spr:' + h) : `<a class="card" href="${gfxHref('spr', h)}" data-peek>${thumb('spr', h, 64)}<span class="ct">Package ${h}</span></a>`).join('')}</div>` : ''}
+      ${e.effect_pkgs?.length ? `<details style="margin-top:6px"><summary class="muted">Other sprite packages its code loads <span class="n">${e.effect_pkgs.length}</span></summary><div class="cards" style="margin-top:8px">${e.effect_pkgs.map(h => `<a class="card" href="${gfxHref('spr', h)}" data-peek>${thumb('spr', h, 64)}<span class="ct">${esc(E['spr:' + h]?.title || 'Package ' + h)}</span></a>`).join('')}</div></details>` : ''}
+      ${resources(e)}
       <div class="grid2"><div><h3>Placed in <span class="n">${e.nscenes} scenes</span></h3>${placement(e)}</div>
       <div><h3>Created by <span class="n">${e.procs.length} procedures</span></h3>${e.procs.length ? `<div class="chips">${e.procs.map(p => `<a class="chip" href="/scripts#${p.id}" data-peek>${esc(p.name || 'proc ' + p.id)}</a>`).join('')}</div>` : '<div class="empty">No script creates it.</div>'}</div></div>
       <h3>Code</h3><div class="muted" style="margin-bottom:8px">Entry ${codeLink(e.callback, e.fname)}${e.loader ? ` → ${codeLink(e.loader, e.loader_name)}` : ''}, and everything it calls or installs.</div><div id="code"></div>
@@ -326,7 +339,9 @@ const PAGES = {
       <div class="badges">${prev ? `<a class="badge" href="#${prev.id}">‹ ${esc(prev.title)}</a>` : ''}${next ? `<a class="badge" href="#${next.id}">${esc(next.title)} ›</a>` : ''}</div>
       ${fam.length ? fam.map(a => `<h3>Family</h3><div>${link(a.id)} <span class="muted">· ${esc(a.path)}</span></div>
         ${others.length ? `<h3>Related species</h3><div class="chips">${others.map(n => chip('monster:' + n.id, n.en || n.jp)).join('')}</div>` : ''}
-        <h3>Sprites and palettes</h3>${a.sprites.map(palettes).join('') || '<div class="empty">Its own code loads no large sprite we can trace; it may draw with a sprite package or a background layer.</div>'}
+        ${a.sprites.length ? `<h3>Sprites and palettes</h3>${a.sprites.map(palettes).join('')}` : a.small.length || a.resources ? '<h3>Sprites</h3>' : '<h3>Sprites</h3><div class="empty">Its own code loads no sprite we can trace.</div>'}
+        ${a.small.length ? `<div class="cards" style="margin-top:8px">${a.small.map(h => `<a class="card" href="${gfxHref('spr', h)}" data-peek>${thumb('spr', h, 64)}<span class="ct">${esc(E['spr:' + h]?.title || 'Package ' + h)}</span><small>sprite package</small></a>`).join('')}</div>` : ''}
+        ${resources(a)}
         <h3>Placed in <span class="n">${a.nscenes} scenes</span></h3>${placement(a)}`).join('') : '<h3>Family</h3><div class="empty">Not linked to an object in the code yet.</div>'}</div>`;
   },
   char(e) {
@@ -334,7 +349,12 @@ const PAGES = {
     const pk = (e.sprites || []).filter(x => x.startsWith('spr:'));
     return `<div class="page">${head(e, `<span class="jp">${esc(e.jp)}</span> · ${stringLink(e.key, 'string ' + e.key)}`)}
       ${pk.length || big.length ? `<h3>Sprites</h3>${pk.length ? `<div class="cards">${pk.map(cardFor).join('')}</div>` : ''}${big.map(palettes).join('')}` : ''}
-      <h3>Objects</h3>${e.actors.length ? `<div class="cards">${e.actors.map(cardFor).join('')}</div>` : '<div class="empty">Not linked to an object yet.</div>'}</div>`;
+      ${e.monster ? `<h3>In the bestiary</h3><div class="chips">${chip(e.monster)}</div>` : ''}
+      ${e.lines ? `<h3>Speaks <span class="n">${e.lines} lines in ${e.files.length} scripts</span></h3>
+        ${e.nscenes ? `<div class="muted" style="margin-bottom:6px">In ${e.nscenes} scenes' own scripts:</div>${placesOf(e.areas)}` : ''}
+        <table class="t" style="margin-top:10px">${e.sample.map(l => `<tr><td class="mono muted">${stringLink(l.id, '#' + l.id)}</td><td>${esc(l.en || '')}<div class="muted">${esc(l.jp)}</div></td></tr>`).join('')}</table>
+        <div class="chips" style="margin-top:8px">${e.files.slice(0, 40).map(f => chip(f, E[f]?.title)).join('')}</div>` : ''}
+      <h3>Objects</h3>${e.actors.length ? `<div class="cards">${e.actors.map(cardFor).join('')}</div>` : '<div class="empty">Not linked to an object yet: nothing in the code or data names it.</div>'}</div>`;
   },
   package(e) {
     return `<div class="page"><div style="display:flex;gap:18px;align-items:center"><div style="image-rendering:pixelated">${thumb('spr', e.key, 128)}</div><div>${head(e, `sprite package <span class="mono">${e.key}</span> · ${peekLink(gfxHref('spr', e.key), 'frames ↗')}`)}</div></div>
@@ -364,6 +384,7 @@ const PAGES = {
       ${stageKey ? `<h3>Map${fa ? ` <span class="n">showing where ${link(fa.id)} is placed</span>` : ''}</h3><iframe class="mapframe" src="/gfx?embed=1&bare=1#maps/${stageKey}/${e.key}${hl}" loading="lazy"></iframe>${(e.tilesets || []).length ? `<div class="sub" style="margin-top:6px">Tiles: ${e.tilesets.map(id => link(id)).join(', ')} · map ${e.stage.map}</div>` : ''}` : ''}
       ${Object.entries(groups).map(([t, ids]) => `<h3>${esc(t)} <span class="n">${ids.length}</span></h3><div class="cards">${ids.map(cardFor).join('')}</div>`).join('') || '<h3>Objects</h3><div class="empty">No object placed by this scene\'s script.</div>'}
       ${songsOf(e)}
+      ${e.speakers?.length ? `<h3>Who speaks here <span class="n">${e.speakers.length}</span></h3><div class="chips">${e.speakers.map(id => chip(id)).join('')}</div>` : ''}
       <h3>Doors to <span class="n">${doors.length}</span></h3>${doors.length ? `<div class="chips">${doors.map(d => chip('scene:' + d.scene, E['scene:' + d.scene]?.title, d.cond?.length ? ' <small>conditional</small>' : '')).join('')}</div>` : '<div class="empty">No doors found in the stage data.</div>'}
       ${e.items.length ? `<h3>Items <span class="n">${e.items.length}</span></h3><div class="chips">${e.items.map(x => { const it = Object.values(E).find(i => i.kind === 'item' && i.jp === x.name); return it ? chip(it.id, null, x.chest ? ' <small>chest</small>' : '') : `<span class="chip">${esc(x.name || '?')}</span>`; }).join('')}</div>` : ''}
       ${e.file ? `<h3>Script <label class="muted" style="text-transform:none;letter-spacing:0;font-weight:400"><input type="checkbox" id="sen" checked> English text</label> <span class="n">${peekLink('/scripts#file=' + E[e.file].key, 'open in Scripts ↗')}</span></h3><pre class="script" id="script" data-file="${esc(E[e.file].key)}">Loading…</pre>` : ''}</div>`;

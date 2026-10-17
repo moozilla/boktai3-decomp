@@ -183,7 +183,8 @@ def build():
     squash = lambda t: re.sub(r"[^a-z]", "", t.lower())
     for a in A:
         f = a["callback_name"]
-        if f.startswith("sub_") or not a["loader"] or any(n["id"] in monster_ids for n in a["names"]):
+        creator = a["loader"] or re.search(r"_(Create|CreateFromScript|StartFromScript|ScriptCreate)$", f)
+        if f.startswith("sub_") or not creator or any(n["id"] in monster_ids for n in a["names"]):
             continue
         base = squash(re.sub(r"_(Create|CreateFromScript|StartFromScript|ScriptCreate|Command|Start|Init)$", "", f))
         if len(base) < 4:
@@ -321,6 +322,61 @@ def build():
         add(f"file:{f['id']}", path, kind="file", key=f["id"], title=title, description=f.get("description", ""),
             nprocs=len(f["procs"]), procs=f["procs"][:400], scenes=f.get("scenes"), fkind=f["kind"], entry=f.get("entry"))
 
+    # ---- who speaks where: dialogue strings start with the speaker's name
+    # (おてんこさま 「...), and each scene's script names the strings it shows ----
+    img = gclview._image()
+    texts_in = collections.defaultdict(set)  # text id -> scenes whose own script shows it
+
+    def walk_text(x, out):
+        if isinstance(x, tuple):
+            if len(x) == 2 and x[0] == "text" and isinstance(x[1], int):
+                out.add(x[1])
+            for y in x:
+                walk_text(y, out)
+        elif isinstance(x, list):
+            for y in x:
+                walk_text(y, out)
+    text_files = collections.defaultdict(set)  # text id -> every script file that shows it
+    for f in gclfiles.files():
+        ids = set()
+        for c in f["procs"]:
+            walk_text(gclview.procedure(img, c) or [], ids)
+        for i in ids:
+            text_files[i].add(f["id"])
+            if f["kind"] == "scene" and f.get("entry") is not None:
+                texts_in[i].add(f["entry"])
+    cast_jp = {e["jp"]: e for e in E.values() if e["kind"] == "char"}
+    monster_jp = {e["jp"]: e["id"] for e in E.values() if e["kind"] == "monster"}
+    lines_of = collections.defaultdict(list)
+    for i in text_files:
+        m = re.match(r"^([^「\n]{1,14}?)\s*「", jp.get(i, ""))
+        if m and not m.group(1).startswith("?"):
+            lines_of[re.sub(r"\(.*?\)$", "", m.group(1).strip())].append(i)
+    rank = 0
+    for who, ids in sorted(lines_of.items(), key=lambda kv: -len(kv[1])):
+        if len(ids) < 3:
+            continue
+        e = next((c for j, c in cast_jp.items() if who.startswith(j)), None)
+        names = collections.Counter(en.get(i, "").split(":", 1)[0].strip() for i in ids if ":" in en.get(i, "")[:30])
+        if e is None:
+            rank += 1
+            e = add(f"char:{who}", "Cast", kind="char", key=who, jp=who, order=100 + rank, actors=[], sprites=[],
+                    title=clean(names.most_common(1)[0][0]) if names else who)
+        scenes = sorted({s for i in ids for s in texts_in[i]})
+        by_area = collections.defaultdict(list)
+        for sc in scenes:
+            by_area[str(scene_area.get(sc, -1))].append(sc)
+        e["lines"] = len(ids)
+        e["files"] = sorted({f"file:{x}" for i in ids for x in text_files[i]})
+        e["areas"] = dict(by_area)
+        e["nscenes"] = len(scenes)
+        e["sample"] = [{"id": i, "en": en.get(i, ""), "jp": jp.get(i, "")} for i in sorted(ids)[:8]]
+        if who in monster_jp:
+            e["monster"] = monster_jp[who]
+        for sc in scenes:
+            if f"scene:{sc}" in E:
+                E[f"scene:{sc}"].setdefault("speakers", []).append(e["id"])
+
     # ---- sprites ----
     lab = {r["hash"]: r for r in csv.DictReader(open(os.path.join(ROOT, "data", "labels", "sprites.csv"), encoding="utf-8"))}
     plab = collections.defaultdict(dict)
@@ -358,6 +414,39 @@ def build():
                     e["effects"].append(hx)
                     effect_of[hx].append(key)
     big_order = {h: i for i, h in enumerate(bigpalettes.defaults())}  # archive (ROM) order
+    # every resource lookup (sub_0821A520(type, hash)) the family's code makes:
+    # sprite packages, maps, tilesets, palettes, animations (bosses drawn as
+    # background layers load maps and tilesets)
+    RES = {0xCB05: "packages", 0xC091: "maps", 0xCEEF: "tilesets", 0x92B3: "palettes", 0x922E: "animations"}
+    for f, rec in paltrace.program().items():
+        fams_f = sorted(paltrace.family_of().get(f, ()))
+        for t, st in rec["calls"]:
+            if t != "sub_0821A520" or not st.get("r0") or st["r0"][0] != "c" or st["r0"][1] not in RES:
+                continue
+            kind = RES[st["r0"][1]]
+            for fam in fams_f:
+                k2, key = ents.get(fam, (None, None))
+                e = E.get(f"actor:{key}") if k2 == "registry" else None
+                if e is None:
+                    continue
+                try:
+                    hs = {v[0] & 0xFFFF for v, _ in paltrace.Tracer(fam).joint([st.get("r1")], f)}
+                except paltrace.Why:
+                    continue
+                if len(hs) > 12:
+                    continue
+                own = f in (e["fname"], e["loader_name"])
+                for h in hs:
+                    hx = f"{h:04X}"
+                    if kind == "packages":
+                        if own and hx not in e["small"]:
+                            e["small"].append(hx)
+                        elif not own and hx not in e["small"]:
+                            e.setdefault("effect_pkgs", []).append(hx) if hx not in e.get("effect_pkgs", []) else None
+                    else:
+                        lst = e.setdefault("resources", {}).setdefault(kind, [])
+                        if hx not in lst:
+                            lst.append(hx)
     for h, d in sorted(bigpalettes.defaults().items()):
         hx = f"{h:04X}"
         owners = sprite_owner.get(hx, [])
@@ -385,7 +474,8 @@ def build():
     # (or allocates one and hands it to a loader); else a script routine
     for e in E.values():
         if e["kind"] == "actor":
-            e["creates"] = bool(e["allocates"] or e["sprites"] or e["small"])
+            r = e.get("resources", {})
+            e["creates"] = bool(e["allocates"] or e["sprites"] or e["small"] or e.get("effect_pkgs") or r.get("maps") or r.get("tilesets"))
             e["path"] = ("Objects/" if e["creates"] else "Script routines/") + e["subsystem"]
             node_rank[e["path"]] = subsys_start.get(e["subsystem"], 0x09000000)
             tree_items[e["path"]].append(e["id"])
@@ -502,6 +592,27 @@ def build():
         if e["kind"] == "actor":
             top = e["path"].split("/")[0]
             e["placed"] = e["creates"] and 0 < e["nscenes"] <= 120
+
+    # placeholder titles from the data: the procedures that create it
+    # (spawn_lun_1, spawn_lun_2 -> Lun), else its own sprite's label
+    for e in E.values():
+        if e["kind"] != "actor" or not re.match(r"(Object|Routine) [0-9A-F]{4}$", e["title"]):
+            continue
+        stems = collections.Counter()
+        for p in e["procs"]:
+            if {sp_["key"] for sp_ in actors.procs()[p["id"]]["spawns"]} != {e["key"]}:
+                continue  # a procedure that creates other things too names them, not this
+            n = re.sub(r"^(spawn|place|create|make|add|start|set|show|init)_", "", p["name"] or "")
+            n = re.sub(r"(_\d+|_by_\w+)$", "", n)
+            if n and not n.startswith("proc_"):
+                stems[n] += 1
+        sp = E.get(f"sprite:{e['sprites'][0]}") if e["sprites"] else None
+        if stems:
+            e["title"] = stems.most_common(1)[0][0].replace("_", " ").capitalize()
+            e["title_from"] = "the names of the procedures that create it"
+        elif sp and not sp["title"].startswith("Sprite ") and sp["title"].lower() != "unknown":
+            e["title"] = sp["title"]
+            e["title_from"] = f"its sprite {sp['key']}"
 
     # titles shared within a group get the function's name to tell them apart
     seen = collections.defaultdict(list)
