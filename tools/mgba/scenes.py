@@ -8,7 +8,9 @@ tools/assets/stages.py) for Centaur's warp(scene).
 
 A scene is a script procedure that the `load` command (08225508) puts in
 0x030039F0 and GameState+0x5A4 (the field scene of tests/saves/ShinBok2.sav is
-3243). Scene entries begin `proc_861 1; proc_864 0|2`; the stage is the first
+3243). Scene entries begin `proc_861 FLAGS; proc_864 MODE` (scene_start,
+scene_set_mode; most use flags 1 and mode 0 or 2, the prologue 56, boss and
+story scenes 9, 25, 33, 41...); the stage is the first
 proc_884(map, tileset, hp) (or proc_885 or proc_876) reached from it (two calls deep). Note that
 tools/assets/gcx.py prints procedure headers one lower than the IDs that calls
 use: the body of scene 3243 is printed as "proc 3242".
@@ -52,9 +54,9 @@ def scenes():
 
     res = []
     for pid, b in sorted(body.items()):
-        if len(b) >= 2 and b[0] == "proc_861 1 <end>" and b[1] in ("proc_864 0 <end>", "proc_864 2 <end>"):
+        if len(b) >= 2 and re.match(r"proc_861 \S+ <end>$", b[0]) and re.match(r"proc_864 \S+ <end>$", b[1]):
             s = stage_of(pid)
-            res.append({"scene": pid, "kind": int(b[1].split()[1]), "map": s[0] if s else None,
+            res.append({"scene": pid, "kind": int(b[1].split()[1], 0), "map": s[0] if s else None,
                         "tileset": s[1] if s else None, "hp": s[2] if s else None})
     return res
 

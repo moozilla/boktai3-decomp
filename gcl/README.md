@@ -116,7 +116,9 @@ name. Procedure calls use `names/proc.csv` (our names and parameters for
 library procedures: `load_stage`, `door`, `entrance_at_box`, the enemy
 spawners...); a procedure's own named parameters replace `argN` inside it.
 
-A worked example, a whole puzzle read end to end: [examples/scale_quiz.md](examples/scale_quiz.md).
+Worked examples: a whole puzzle read end to end, [examples/scale_quiz.md](examples/scale_quiz.md);
+the prologue from New Game to the Sealed Prison, with its cutscene tables,
+[examples/prologue.md](examples/prologue.md) (the tables: [docs/CUTSCENES.md](../docs/CUTSCENES.md)).
 
 Procedure references are their own value type (GCL type 8, as against type 6
 for hashes), so callbacks show by name: `on_press=open_east_door`,
@@ -128,13 +130,13 @@ procedure). Every type-8 value is a valid procedure id.
 `tools/assets/gclfiles.py` (and the Studio's Scripts page, "Files") groups
 the procedures into the source files Konami compiled. Procedure ids are table
 slots assigned in source order, and a scene's private procedures sit right
-before and after its entry procedure: 232 of the 354 scenes have all of
+before and after its entry procedure: 287 of the 492 scene files have all of
 theirs in one contiguous run, and 89% of procedures called once are within
 50 ids of their caller. So:
 
 | File | What goes in it |
 |---|---|
-| scene (354) | a scene entry procedure and every procedure only it reaches, through calls and callbacks |
+| scene (492) | a scene entry procedure and every procedure only it reaches, through calls and callbacks |
 | library (15) | an id range in `names/files.csv`, with a category; ids 2-1875 are ordered by topic (scene setup, doors, events, objects, items, enemies...) |
 | shared (101) | a contiguous run of what is left: procedures several scenes use (the largest, 1876-2595, holds 595 rooms and helpers used by 35 scenes) |
 
