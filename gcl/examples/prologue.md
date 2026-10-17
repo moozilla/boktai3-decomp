@@ -147,8 +147,9 @@ red (`screen.fade(1, 7, 31, 0, 0, ...)`).
 built from repeated scene cuts: fade to black, move everyone
 (`Player.cmd1(x, y, z, dir)` sets a position and facing), snap the camera,
 fade in, one or two lines. The receivers are the player (`F5EB`), Sabata
-(`2B06`) and `character 1` (actor_name_of 1, a scene NPC placed with
-`proc_1676`). `proc_1683`–`1685` add ScriptKeyframe sprites (actor_name_of
+(`2B06`) and Otenko (actor_name_of 1, a scene NPC placed with
+`proc_1676`; identified in the Sealed Prison, where he is the only other
+character). `proc_1683`–`1685` add ScriptKeyframe sprites (actor_name_of
 116 and others) for the last scenes; Otenko speaks the last line. At the end the continue procedure goes to scene 6559.
 
 ## 6559 and on
@@ -166,5 +167,5 @@ waking Django) and the tutorial.
 * Scene detection missed every scene whose `scene_start` flags are not 1:
   the prologue, boss rooms and story scenes (142 in all).
 * Still unknown: Vanargand's commands (scene actor dispatcher `sub_08022F88`,
-  inline, unmatched), most player commands past the simple ones, the NPC
-  commands, and which character `character 1` is.
+  inline, unmatched), most player commands past the simple ones, and the NPC
+  commands.
