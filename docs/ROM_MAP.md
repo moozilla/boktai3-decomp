@@ -20,14 +20,14 @@ Confidence: **high** = verified by rebuild, emulator, or rendering;
 | `082641EC–0857D8D7` | 3.2 MB | MP2K **PCM samples** (415 wave headers + 8-bit signed data) | high | walk; mixer coverage |
 | `0857D8D8–08602C8B` | 0.5 MB | MP2K **track streams** (5,525) and song headers; 5,611 unaligned GOTO/PATT/REPT pointers | high | walk + shift test |
 | `0860xxxx–0861xxxx` | | pointer tables incl. Thumb function-pointer tables (`086056EC`, `086121C8`, `0861256C`, `08613E18`) — likely actor/state dispatch | medium | scan, readers `0822580C` |
-| `0865xxxx–0875xxxx` | | **BG graphics**: tiles + 0x200-byte tilemaps (`BgGfx_LoadTiles` / `BgGfx_LoadTilemap`), some LZ77 (`LZ77UnCompWram` reads `0870–0881`) | medium | coverage |
-| `0870A230–0870C217` | 8 KB | pause-menu / HUD BG tiles | high | VRAM→ROM map, 2007 notes |
+| `0865xxxx–0875xxxx` | | **BG graphics**: inside the `map` archive (`08617084–087C4C98`): 43 maps carry their own tiles (menus, screens, the HUD), the rest use `ptn` tilesets; loaded by `BgGfx_LoadTiles` / `BgGfx_LoadTilemap`, LZ77 via `LZ77UnCompWram` (`tools/assets/tilesets.py`) | high | archive walk, rendered |
+| `0870A230–0870C217` | 8 KB | pause-menu / HUD BG tiles: the own tiles of map `A597` (raw, entry at `0870A14C`) | high | VRAM→ROM map, 2007 notes, rendered |
 | `0870C238–…` | | pause-menu tilemaps, one per screen every `0x200` (items `0870D578`, status `0870DD78`, config `0870DF78`) | high | coverage per screen |
 | `0882xxxx–088Bxxxx` | | data copied with CpuSet/CpuFastSet; read by `sub_08215D40` | medium | coverage |
 | `089F8F00–089FAEFF` | 8 KB | **8×16 font**, chars `0x20–0x9F` (+ accented Latin at the top) | high | rendered |
 | `089FAF00–08A2AEFF` | 192 KB | **16×16 kana/kanji font**, glyph = code − `0x8000` | high | rendered |
-| `08A2xxxx–08B1xxxx` | | graphics (portraits e.g. `08B154B4`) | medium | VRAM→ROM map |
-| `08BE2F04–08CDxxxx` | | **sprite (OBJ) graphics**: button labels (`08BE2F04`), menu titles (`08C11880`, `08C15880`), bike/course menus | high (spots) | VRAM→ROM map, `ObjGfx_LoadTiles` |
+| `08A2xxxx–08B1xxxx` | | graphics (portraits e.g. `08B154B4`): the pixel data of the `98F5` large sprites (archive `08A2D944–08BDDE08`) | high | archive walk, rendered |
+| `08BE2F04–08CDxxxx` | | **sprite (OBJ) graphics**: the tile sheets of the `CB05` sprite packages (archive `08BDDE08–08D530DC`): button labels (`08BE2F04`, package `1289`), menu titles (`08C11880`, `08C15880`), bike/course menus | high | archive walk, `ObjGfx_LoadTiles`, rendered |
 | `08D5xxxx–08D6B1F7` | | tables read by `Script_ReadProcTable` (`0821ACB4`) + palettes (`08D5943C` …) | medium | coverage |
 | `08D6B1F8–08D74DDB` | 39 KB | **script text pointer table**: 9,977 × u32, bit 31 = text, offset from `08D74DDC` | high | dump round-trips |
 | `08D74DDC–08DD6B95` | 400 KB | **script text bank** (ASCII + 2-byte codes `0x80xx–0x85xx`, inline `<TAG=…>` markup) | high | dump round-trips |

@@ -60,9 +60,10 @@ canvas { image-rendering: pixelated; display: block; }
 #tip { position: fixed; pointer-events: none; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; font-size: 13px; display: none; box-shadow: 0 4px 16px rgba(0,0,0,.2); }
 .legend { display: flex; gap: 12px; font-size: 12px; color: var(--muted); margin: 8px 0; flex-wrap: wrap; }
 .legend b { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.ghead { position: sticky; top: 0; z-index: 1; padding: 6px 10px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); background: var(--panel); border-bottom: 1px solid var(--line); }
 .row .lab { color: var(--ink); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #ms svg * { pointer-events: auto; }
-body.bare #view > h2, body.bare #view > .noteed, body.bare #view > .meta:not(#hover), body.bare #view > .controls { display: none; }
+body.bare #view > h2, body.bare #view > .noteed, body.bare #view > .meta:not(#hover), body.bare #view > .controls, body.bare #users { display: none; }
 body.bare #view { padding: 6px; }
 body.embed #side { display: none; }
 body.embed main { grid-template-columns: 1fr; }
@@ -126,7 +127,7 @@ async function boot() {
   route();
 }
 // Notes (data/notes.csv) per tab: kind and key of the selected item.
-const NOTE_KIND = { sprites: 'spr', big: 'big', maps: 'map', palettes: 'pal', tiles: 'res', data: 'res' };
+const NOTE_KIND = { sprites: 'spr', big: 'big', maps: 'map', palettes: 'pal', tiles: 'tiles', data: 'res' };
 const noteKeyOf = key => tab === 'maps' ? key.split('-')[0] : key;
 const labelOf = i => NOTE_KIND[tab] && noteOf(NOTE_KIND[tab], noteKeyOf(i.key))?.label;
 // labels of a package's frames, for searching ("Healing Potion" finds 5D04)
@@ -152,8 +153,14 @@ function renderList() {
   const q = $('q').value.trim().toUpperCase();
   const hits = items.filter(i => !q || i.key.includes(q) || (i.note || '').toUpperCase().includes(q) || (labelOf(i) || '').toUpperCase().includes(q) || frameLabels(i).toUpperCase().includes(q));
   $('count').textContent = `${hits.length} of ${items.length}`;
-  $('list').replaceChildren(...hits.map(i => {
-    const d = document.createElement('div');
+  let group = null;
+  $('list').replaceChildren(...hits.flatMap(i => {
+    const d = document.createElement('div'), out = [d];
+    if (i.group && i.group !== group && typeof TILE_GROUPS !== 'undefined') {
+      group = i.group;
+      const g = document.createElement('div'); g.className = 'ghead'; g.textContent = TILE_GROUPS[group] || group;
+      out.unshift(g);
+    }
     d.className = 'row' + (i.key === sel ? ' on' : '');
     d.dataset.key = i.key;
     const lab = labelOf(i);
@@ -161,7 +168,7 @@ function renderList() {
     if (lab) d.querySelector('.lab').textContent = lab;
     if (i.note) d.querySelector('.note').textContent = i.note;
     d.onclick = () => { history.replaceState(null, '', `#${tab}/${i.key}`); select(i.key); };
-    return d;
+    return out;
   }));
 }
 function select(key, scroll) {
@@ -886,7 +893,7 @@ views.data = {
     if (packed) { try { d = lz77(d); } catch (e) { /* not LZ77 after all */ } }
     const v = $('view'), PAGE = 4096;
     let off = 0;
-    v.innerHTML = `<h2>${esc(lab)} ${esc(h)}</h2><div class="meta">${esc(RES_TYPES[lab] || 'not decoded yet')} · ${d.length.toLocaleString()} bytes${packed ? ' (LZ77-decompressed)' : ''} · <a href="#tiles/${key}">view as tiles</a></div>
+    v.innerHTML = `<h2>${esc(lab)} ${esc(h)}</h2><div class="meta">${esc(RES_TYPES[lab] || 'not decoded yet')} · ${d.length.toLocaleString()} bytes${packed ? ' (LZ77-decompressed)' : ''}</div>
       <div class="controls"><button id="prev">◀</button> <span id="where"></span> <button id="next">▶</button></div><pre id="hex" style="font:12px/1.5 ui-monospace,Menlo,monospace;margin:0"></pre>`;
     const draw = () => {
       const rows = [];
@@ -968,28 +975,145 @@ views.font = {
 function tipShow(ev, html) { const t = $('tip'); t.innerHTML = html; t.style.display = 'block'; t.style.left = ev.clientX + 14 + 'px'; t.style.top = ev.clientY + 14 + 'px'; }
 function tipHide() { $('tip').style.display = 'none'; }
 
-// ---------- raw tiles ----------
+// ---------- tiles: the game's tile graphics, decoded from their own structures ----------
+// BG: the ptn tileset library (CEEF) one tileset at a time, and the maps that
+// carry their own tiles (menus, screens). OBJ: sprite package tile sheets
+// (CB05) and large sprite pixel data (98F5). Each tile is drawn in the palette
+// bank its users draw it with (map metatiles, sprite parts), in the palette
+// its scenes load (tools/assets/tilesets.py).
+let tilesets = null;
+const TILE_GROUPS = { ts: 'BG · tileset library (CEEF)', bg: 'BG · maps with their own tiles (C091)', obj: 'OBJ · sprite package tiles (CB05)', big: 'OBJ · large sprite pixels (98F5)' };
+const hex8 = a => a == null ? '' : a.toString(16).toUpperCase().padStart(8, '0');
+// A sheet of `n` tiles, `w` wide: tile k from at(k) -> [src, off], drawn in bank(k) (-1: unused, dimmed).
+function tileSheet(n, w, at, bank, colors) {
+  const rows = Math.ceil(n / w), img = new ImageData(w * 8, Math.max(1, rows) * 8);
+  for (let k = 0; k < n; k++) {
+    const src = at(k), b = bank(k);
+    if (!src) continue;
+    const x = (k % w) * 8, y = Math.floor(k / w) * 8;
+    tile(img, src[0], src[1], x, y, colors, Math.max(0, b));
+    if (b < 0) for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) img.data[((y + r) * img.width + x + c) * 4 + 3] *= 0.35;
+  }
+  return img;
+}
+const sceneLink = x => `<a href="/atlas#scene:${x.scene}">${x.scene}${x.label ? ' ' + esc(x.label) : ''}</a>`;
+function usersHtml(u) {
+  const parts = [];
+  if (u.stages?.length) parts.push(`<b>Stages</b> ${u.stages.map(st => `<a href="#maps/${st.key}">map ${st.map}</a> <span style="color:var(--muted)">(hp ${st.hp}, procs ${st.procs.slice(0, 4).join(', ')}${st.procs.length > 4 ? '…' : ''})</span>`).join(' · ')}`);
+  else if (u.maps?.length) parts.push(`<b>Maps</b> ${u.maps.map(m => `<a href="#maps/${m.map}">${m.map}</a>${m.note ? ' ' + esc(m.note) : ''}`).join(' · ')}`);
+  if (u.areas?.length) parts.push(`<b>Areas</b> ${u.areas.map(a => `<a href="/atlas#area:${a.area}">${esc(a.place)}</a>`).join(' · ')}`);
+  if (u.scenes?.length) parts.push(`<b>Scenes</b> ${u.scenes.map(sceneLink).join(' · ')}`);
+  return parts.length ? `<div class="meta" style="line-height:1.8">${parts.join('<br>')}</div>` : '<div class="meta">No script stage loads it (it may be loaded by code, or unused).</div>';
+}
+const PAL_SRC = { script: 'named by its scenes (proc_888)', capture: 'matched in a capture of the stage', neighbor: 'a guess: the palette of the nearest tileset with a known one' };
 views.tiles = {
   async init() {
-    items = Object.entries(index).flatMap(([lab, es]) => es.map(([h, n]) => ({ key: `${lab}:${h}`, n: n >= 1024 ? (n / 1024).toFixed(0) + ' KB' : n + ' B' })));
+    tilesets ||= await fetch('/api/tilesets').then(r => r.json());
+    // an embedded page shows one item: the large sprites only when it is one
+    if (!big && (!EMBED || location.hash.includes('/big:'))) { const e = index.t98F5[0][0]; big = parseBig(await res('t98F5', e)); }
+    items = [
+      ...tilesets.tilesets.map(t => ({ key: 'ts:' + t.id, group: 'ts', note: t.title || (t.maps.length ? 'map ' + t.maps.map(m => m.map).join(', ') : 'no stage'), n: t.tiles })),
+      ...tilesets.bg.map(b => ({ key: 'bg:' + b.map, group: 'bg', note: b.note || b.areas?.[0]?.place || (b.layers > 1 ? `${b.layers} layers` : 'screen'), n: b.tiles })),
+      ...(index.tCB05 || []).map(([h, n]) => ({ key: 'obj:' + h, group: 'obj', note: NOTES[h], n: (n / 1024).toFixed(0) + ' KB' })),
+      ...(big?.recs || []).map((r, i) => ({ key: 'big:' + r.hash, group: 'big', note: NOTES[r.hash], n: big.frames(i).length + 'f' })),
+    ];
   },
   async show(key) {
-    const [lab, h] = key.split(':'), d = await res(lab, h), v = $('view');
-    const st = JSON.parse(localStore('tiles') || '{"w":16,"off":0,"bank":0}');
-    v.innerHTML = `<h2>Raw tiles · ${lab} ${h}</h2><div class="meta">${d.length.toLocaleString()} bytes shown as 4bpp 8×8 tiles, for exploring formats not decoded yet.</div>
-      <div class="controls">Width <input id="tw" type="number" min="1" max="64" value="${st.w}" style="width:4em"> tiles · Offset <input id="to" type="number" min="0" step="32" value="${st.off}" style="width:7em"> bytes · Bank <input id="tb" type="number" min="0" max="15" value="${st.bank}" style="width:3.5em"> · showing at most 1024 tiles</div>
-      <div class="stage" id="ts"></div>`;
-    const draw = () => {
-      const w = +$('tw').value || 16, off = Math.max(0, +$('to').value || 0), bank = +$('tb').value || 0;
-      localStore('tiles', JSON.stringify({ w, off, bank }));
-      const n = Math.min(1024, Math.floor((d.length - off) / 32)), rows = Math.ceil(n / w);
-      if (n <= 0) { $('ts').textContent = 'Offset past the end.'; return; }
-      const img = new ImageData(w * 8, rows * 8), colors = colorsNow();
-      for (let t = 0; t < n; t++) tile(img, d, off + t * 32, (t % w) * 8, Math.floor(t / w) * 8, colors, bank);
-      $('ts').replaceChildren(toCanvas(img, zoom));
+    const [kind, h] = key.split(':'), v = $('view');
+    const st = JSON.parse(localStore('tiles2') || '{"w":16}');
+    const head = (title, meta, extra = '') => {
+      v.innerHTML = `<h2>${title}</h2><div class="meta">${meta}</div>
+        <div class="controls">Width <input id="tw" type="number" min="1" max="64" value="${st.w}" style="width:4em"> tiles ${extra}</div>
+        <div class="stage" id="ts"></div><div class="meta" id="hover" style="margin-top:6px">&nbsp;</div><div id="users"></div>`;
     };
-    ['tw', 'to', 'tb'].forEach(id => $(id).oninput = draw);
-    draw();
+    let n = 0, at = () => null, bank = () => 0, colors = colorsNow(), info = () => '';
+    const draw = () => {
+      const w = Math.max(1, +$('tw').value || 16);
+      localStore('tiles2', JSON.stringify({ w }));
+      const img = tileSheet(n, w, at, bank, colors), cv = toCanvas(img, zoom);
+      $('ts').replaceChildren(cv);
+      cv.onmousemove = ev => {
+        const r = cv.getBoundingClientRect(), k = Math.floor((ev.clientY - r.top) / zoom / 8) * w + Math.floor((ev.clientX - r.left) / zoom / 8);
+        $('hover').textContent = k >= 0 && k < n ? info(k) : '';
+      };
+    };
+    // palette choice: the item's own, others its users load, captures, or the palette menu
+    const palChoice = async (own, others, src, caps = []) => {
+      const opts = [...new Set([own, ...(others || [])].filter(Boolean))];
+      const want = localStore('tilepal.' + key);
+      const html = `Palette <select id="tpal">${opts.map(p => `<option value="p:${p}">${p}${p === own ? ' · ' + esc(PAL_SRC[src] || '') : ''}</option>`).join('')}${caps.map((c, i) => `<option value="c:${i}">palette RAM of capture ${esc(c.label || c.name)}</option>`).join('')}<option value="menu">the palette menu (${curPal ? curPal.hash : 'greyscale'})</option></select>`;
+      const pick = async val => {
+        if (val.startsWith('p:')) { const p = palettes.find(x => x.hash === val.slice(2)); return p ? palColors(p) : colorsNow(); }
+        if (val.startsWith('c:')) return (await loadCapture(caps[+val.slice(2)].name)).bgColors;
+        return colorsNow();
+      };
+      const first = palPicked ? 'menu' : (want && (want === 'menu' || opts.includes(want.slice(2)) || (want.startsWith('c:') && caps[+want.slice(2)])) ? want : opts.length ? 'p:' + opts[0] : caps.length ? 'c:0' : 'menu');
+      return { html, first, pick };
+    };
+    const wire = async pc => {
+      $('tpal').value = pc.first; colors = await pc.pick(pc.first);
+      $('tpal').onchange = async () => { localStore('tilepal.' + key, $('tpal').value); colors = await pc.pick($('tpal').value); draw(); };
+      $('tw').oninput = draw; draw();
+    };
+    if (kind === 'ts') {
+      await loadPtn();
+      const t = tilesets.tilesets.find(x => x.id === h);
+      if (!t) { v.textContent = 'No such tileset.'; return; }
+      const ids = Array.from({ length: t.tiles }, (_, k) => le(ptn.p, ptn.I + ptn.sets[h].off + k * 2));
+      n = t.tiles; at = k => [ptn.p, ptn.D + ids[k] * 32];
+      bank = k => t.banks[k] === '.' ? -1 : parseInt(t.banks[k], 16);
+      info = k => `tile ${k} · pool tile ${ids[k]} at ${hex8(tilesets.library.pool + ids[k] * 32)} · ${t.banks[k] === '.' ? 'no metatile uses it' : 'bank ' + bank(k)}${ids[k] >= t.new_first && ids[k] < t.new_first + t.new_count ? ' · added by this tileset' : ' · shared with an earlier tileset'}`;
+      const caps = (await capturesList()).filter(c => t.maps.some(m => c.stage_map === m.map || c.map === m.map));
+      const pc = await palChoice(t.palette, t.palettes, t.palette_source, caps);
+      head(`Tileset ${h}${t.title ? ' · ' + esc(t.title) : ''}`,
+        `${t.tiles} tiles, ${t.new_count} added to the pool by this tileset (${hex8(t.pool_addr)}, ${(t.new_count * 32).toLocaleString()} bytes), the rest shared with earlier ones · index list at ${hex8(t.index_addr)} · tileset ${t.order + 1} of ${tilesets.tilesets.length} in the CEEF library${t.palette_source === 'neighbor' ? ` · palette guessed from tileset <a href="#tiles/ts:${t.palette_from}">${t.palette_from}</a>` : ''} · dimmed tiles: no map metatile uses them`, pc.html);
+      $('users').innerHTML = usersHtml(t);
+      return wire(pc);
+    }
+    if (kind === 'bg') {
+      const b = tilesets.bg.find(x => x.map === h), m = parseMP(await res('map', h));
+      n = m.ntiles; at = k => [m.b, m.tiles + k * 32];
+      bank = k => b.banks[k] === '.' ? -1 : parseInt(b.banks[k], 16);
+      info = k => `tile ${k}${b.tile_addr != null ? ' at ' + hex8(b.tile_addr + k * 32) : ''} · ${b.banks[k] === '.' ? 'no metatile uses it' : 'bank ' + bank(k)}`;
+      const caps = (await capturesList()).filter(c => c.stage_map === h || c.map === h);
+      const pc = await palChoice(b.palette, b.palettes, b.palette_source, caps);
+      head(`Map ${h} tiles${b.note ? ' · ' + esc(b.note) : ''}`,
+        `${m.ntiles} tiles stored in the map ${b.compressed ? '(LZ77-compressed entry at ' + hex8(b.addr) + ')' : 'at ' + hex8(b.tile_addr)} · ${m.count} layer${m.count > 1 ? 's' : ''} · <a href="#maps/${h}">the map</a>${b.palette ? '' : ' · no palette known: the code picks it; capture the screen in Live to learn it'}`, pc.html);
+      $('users').innerHTML = usersHtml(b);
+      return wire(pc);
+    }
+    if (kind === 'obj') {
+      const bytes = await res('tCB05', h), pkg = parsePackage(bytes), base = u32(bytes, 0xC + 16);
+      const banks = new Int8Array(pkg.ntiles).fill(-1);
+      for (const f of pkg.frames) for (const p of pkg.parts(f)) {
+        const t0 = (p.tileOff(0, 0) - base) / 32;
+        for (let ty = 0; ty < p.h / 8; ty++) for (let tx = 0; tx < p.w / 8; tx++) { const k = t0 + ty * 16 + tx; if (k < pkg.ntiles && banks[k] < 0) banks[k] = p.bank; }
+      }
+      n = pkg.ntiles; at = k => [bytes, base + k * 32]; bank = k => banks[k];
+      const entry = le(bytes, 0);
+      info = k => `tile ${k} · ${banks[k] < 0 ? 'no frame uses it' : `bank ${banks[k]} = pool entry ${entry + banks[k]}`}`;
+      head(`Sprite package ${h} tiles${NOTES[h] ? ' · ' + esc(NOTES[h]) : ''}`,
+        `${pkg.ntiles} OBJ tiles, a sheet 16 tiles wide as the parts address it · colors: the package's palette pool entries from ${peekLink('/gfx#pool/' + entry, entry)} on · <a href="#sprites/${h}">frames and animations</a> · <a href="/atlas#spr:${h}">Browse</a> · dimmed tiles: no frame uses them`);
+      colors = await packageColors(bytes);
+      $('tw').value = 16; $('tw').oninput = draw; draw();
+      return;
+    }
+    if (kind === 'big') {
+      const i = big.recs.findIndex(r => r.hash === h), r = big.recs[i];
+      if (!r) { v.textContent = 'No such sprite.'; return; }
+      // every frame's tiles in the order its parts consume them
+      const offs = [];
+      for (const f of big.frames(i)) for (const p of big.parts(f)) for (let ty = 0; ty < p.h / 8; ty++) for (let tx = 0; tx < p.w / 8; tx++) offs.push(p.tileOff(tx, ty));
+      const uniq = [...new Set(offs)].sort((a, b) => a - b);
+      n = uniq.length;
+      const src = big.parts(big.frames(i)[0])[0]?.src;
+      at = k => [src, uniq[k]];
+      info = k => `tile ${k} · pixel data +${(uniq[k]).toString(16).toUpperCase()} in the 98F5 resource`;
+      head(`Large sprite ${h} pixels${NOTES[h] ? ' · ' + esc(NOTES[h]) : ''}`,
+        `${n} tiles over ${big.frames(i).length} frames, in pixel-data order (each frame's parts read them in turn) · colors: its default palette pool entry ${peekLink('/gfx#pool/' + r.pal, r.pal)} · <a href="#big/${h}">frames</a> · <a href="/atlas#sprite:${h}">Browse</a>`);
+      colors = await packageColors(null, r.pal);
+      $('tw').oninput = draw; draw();
+    }
   },
 };
 

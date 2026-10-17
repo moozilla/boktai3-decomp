@@ -205,7 +205,16 @@ screen backgrounds are raw maps with their own tiles and several named layers.
 u32 tile pool` at `+0x0C`. A table record is `u16 id, u16 tile count, u32
 offset` into the index lists; each index selects a 4bpp tile in the pool of
 49,638 tiles. A stage's tiles are its tileset's tiles in order, copied to the
-start of the BG character block.
+start of the BG character block. The pool was built tileset by tileset in table
+order: each tileset appends the tiles no earlier tileset had, as one
+contiguous run (4 of the 263 add none), so the library splits into per-tileset
+index lists and tile runs. `tools/assets/tilesets.py list | show ID | json`
+gives each tileset's runs, users (stages, scenes, areas), palette (named by
+its scenes with `proc_888`, else matched in a capture, else guessed from the
+nearest tileset in table order) and per-tile palette bank (from the stage
+maps' metatiles); it also lists the 43 maps that carry their own tiles. The
+studio's Tiles view (`/gfx#tiles`) draws them, with the sprite packages' and
+large sprites' OBJ tiles.
 
 **Stages.** The scripts load a stage with `proc_884(map, tileset, hp)`, which
 calls into the `map` command and creates the `Background_CreateFromScript`

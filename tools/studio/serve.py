@@ -95,22 +95,9 @@ def guide_entries(trans):
 
 
 def stages():
-    """Stage loads in the scripts: proc_884(map, tileset, hp) (or proc_885, or the
-    loader both wrap, proc_876) -> the procedures using them."""
-    out = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "assets", "gcx.py"), "dis"],
-                         cwd=ROOT, capture_output=True, text=True).stdout
-    found, proc = {}, None
-    for ln in out.split("\n"):
-        if ln.startswith("proc "):
-            proc = int(ln.split()[1])
-            continue
-        f = ln.split()
-        if (f and f[0] in ("proc_884", "proc_885", "proc_876") and len(f) >= 4
-                and all(x.startswith("0x") for x in f[1:4])):
-            key = tuple(int(x, 16) for x in f[1:4])
-            found.setdefault(key, []).append(proc)
-    return [{"map": f"{m:04X}", "tileset": f"{t:04X}", "hp": f"{h:04X}", "procs": ps}
-            for (m, t, h), ps in sorted(found.items())]
+    """Stage loads in the scripts (tools/assets/tilesets.py)."""
+    import tilesets
+    return tilesets.script_stages()
 
 
 STAGEMETA = os.path.join(ROOT, "build", "assets", "stages.json")
@@ -389,6 +376,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, stages())
         elif self.path == "/api/areas":
             self.send(200, world())
+        elif self.path == "/api/tilesets":
+            import tilesets
+            self.send(200, tilesets.load())
         elif self.path == "/api/stagemeta":
             self.send(200, stage_meta(), "application/json")
         elif self.path.startswith("/api/hp/"):
