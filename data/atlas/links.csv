@@ -1,0 +1,8 @@
+from,to,why
+# Links between the game's name lists and objects that nothing in the data
+# connects yet (tools/studio/atlas.py). One row per link.
+char:9818,actor:F5EB,the player object (Player_Create) is Django
+char:9818,spr:DE23,sprite package DE23 is named django
+char:9820,sprite:97D3,Master Otenko's sunflower follows the player (loaded by Player_Create)
+char:9820,sprite:97D4,Master Otenko's sunflower
+actor:F5EB,spr:DE23,the player object draws Django (its picture)

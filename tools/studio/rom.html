@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boktai 3 ROM</title>
+<link rel="stylesheet" href="/static/common.css">
+<style>
+:root { --bg: #f6f3ec; --panel: #fffdf8; --ink: #2b2620; --muted: #7d7468; --line: #e3dccf; --accent: #b5462f; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #1b1916; --panel: #24211d; --ink: #ece6dc; --muted: #9a9083; --line: #3a352e; --accent: #e0745a; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 13px/1.45 system-ui, -apple-system, sans-serif; }
+a { color: var(--accent); text-decoration: none; }
+main { display: grid; grid-template-rows: auto 1fr; height: calc(100vh - 53px); }
+.bar { display: flex; gap: 14px; align-items: center; padding: 8px 14px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
+.seg button { border: 0; background: var(--panel); color: var(--muted); padding: 4px 11px; font: inherit; cursor: pointer; }
+.seg button.on { background: var(--ink); color: var(--bg); }
+#crumbs { font-size: 13px; }
+#crumbs a { cursor: pointer; }
+.legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.legend i { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
+.legend b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+#box { position: relative; min-height: 0; }
+canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: pointer; }
+#tip { position: fixed; pointer-events: none; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; font-size: 12px; box-shadow: 0 6px 20px rgba(0,0,0,.25); display: none; z-index: 40; max-width: 440px; }
+#tip .m { font: 11.5px ui-monospace, Menlo, monospace; color: var(--muted); }
+</style>
+</head>
+<body>
+<header id="top"></header>
+<main>
+  <div class="bar">
+    <span class="seg"><button id="mkind" class="on">What's there</button><button id="mlevel">How well we understand it</button></span>
+    <span id="crumbs"></span>
+    <span class="legend" id="legend"></span>
+  </div>
+  <div id="box"><canvas id="cv"></canvas></div>
+</main>
+<div id="tip"></div>
+<script src="/static/common.js"></script>
+<script>
+// The ROM as nested blocks in address order (tools/studio/atlas.py rom_tree):
+// code by subsystem and function, each asset archive by resource, sound,
+// text, scripts, other data, unmapped gaps and free space. Click a block to
+// go into it; click a resource or function to open it. Color by kind, or by
+// how well it is understood (decompiled; decoded and named, decoded; located
+// but not decoded; assembly only; unmapped).
+studioHeader();
+const KIND = { code: '#3f9a63', asm: '#8a6d3b', sound: '#8e5bb5', graphics: '#3f7fbf', sprite: '#4aa3d9', map: '#2f6aa8', tiles: '#5b8fc9',
+  palette: '#d0628f', font: '#c9a227', text: '#e07a3b', script: '#d4b53a', animation: '#5fb8b0', collision: '#7a8f99', data: '#6e665c', unknown: '#7a1f2b', free: '#2a2622' };
+const KNAME = { code: 'code', asm: 'code (assembly)', sound: 'sound', graphics: 'graphics', sprite: 'sprites', map: 'maps', tiles: 'tilesets', palette: 'palettes',
+  font: 'fonts', text: 'text', script: 'scripts', animation: 'animation', collision: 'collision', data: 'other data', unknown: 'unmapped', free: 'free' };
+const LEVEL = { decompiled: '#4caf6a', named: '#8fd99c', decoded: '#3d8f8a', located: '#c9a227', assembly: '#b5583a', unmapped: '#8a2433', free: '#2a2622' };
+const LNAME = { decompiled: 'code decompiled to C', named: 'data decoded and named', decoded: 'data decoded', located: 'data located, format not decoded', assembly: 'code in assembly only', unmapped: 'unmapped', free: 'free space' };
+let T = null, mode = 'kind', focus = [], rects = [];
+try { mode = localStorage.getItem('rom.mode') || 'kind'; } catch (e) {}
+
+const color = n => mode === 'kind' ? (KIND[n.k] || KIND.data) : (LEVEL[n.u] || '#555');
+const hex = a => '0x' + (a >>> 0).toString(16).toUpperCase().padStart(8, '0');
+const size = n => n >= 1048576 ? (n / 1048576).toFixed(2) + ' MB' : n >= 1024 ? (n / 1024).toFixed(1) + ' KB' : n + ' B';
+
+// ordered strip treemap: children keep their (address) order, laid out in
+// rows that keep blocks close to square
+function layout(items, x, y, w, h) {
+  const vertical = w > h * 1.6;
+  if (vertical) [x, y, w, h] = [y, x, h, w];
+  const total = items.reduce((s, c) => s + c.n, 0) || 1, scale = w * h / total, out = [];
+  let i = 0, cy = y;
+  while (i < items.length) {
+    let best = Infinity, take = 1, sum = 0;
+    for (let j = i; j < items.length && j < i + 400; j++) {
+      sum += items[j].n;
+      const rh = sum * scale / w;
+      let worst = 0;
+      for (let k = i; k <= j; k++) { const cw = items[k].n * scale / rh; worst = Math.max(worst, cw / rh, rh / cw); }
+      if (worst > best) break;
+      best = worst; take = j - i + 1;
+    }
+    const row = items.slice(i, i + take), rh = row.reduce((s, c) => s + c.n, 0) * scale / w;
+    let cx = x;
+    for (const c of row) { const cw = c.n * scale / rh; out.push(vertical ? [c, cy, cx, rh, cw] : [c, cx, cy, cw, rh]); cx += cw; }
+    cy += rh; i += take;
+  }
+  return out;
+}
+function leaves(n, f) { if (n.c) for (const c of n.c) leaves(c, f); else f(n); }
+function draw() {
+  const cv = $('cv'), box = $('box'), dpr = devicePixelRatio || 1, W = box.clientWidth, H = box.clientHeight;
+  cv.width = W * dpr; cv.height = H * dpr;
+  const g = cv.getContext('2d'); g.scale(dpr, dpr); g.clearRect(0, 0, W, H);
+  const node = focus.length ? focus[focus.length - 1] : { c: T.children, t: 'ROM', n: T.size };
+  rects = [];
+  const fill = (n, x, y, w, h, depth) => {
+    if (w < .5 || h < .5) return;
+    if (n.c && depth < 3 && w * h > 30) {
+      for (const [c, cx, cy, cw, ch] of layout(n.c, x, y, w, h)) fill(c, cx, cy, cw, ch, depth + 1);
+    } else if (n.c) {
+      // too small to open here: colored by its biggest share
+      const share = {};
+      leaves(n, l => { const k = mode === 'kind' ? l.k : l.u; share[k] = (share[k] || 0) + l.n; });
+      const top = Object.entries(share).sort((a, b) => b[1] - a[1])[0][0];
+      g.fillStyle = mode === 'kind' ? KIND[top] || KIND.data : LEVEL[top] || '#555'; g.fillRect(x, y, w, h);
+    } else { g.fillStyle = color(n); g.fillRect(x, y, w, h); }
+    if (w > 2 && h > 2) { g.strokeStyle = depth <= 1 ? 'rgba(0,0,0,.85)' : 'rgba(0,0,0,.35)'; g.lineWidth = depth <= 1 ? 2 : .6; g.strokeRect(x + .5, y + .5, w - 1, h - 1); }
+    rects.push([n, x, y, w, h, depth]);
+    if (depth <= 2 && w > 60 && h > 16 && (n.c || depth === 1)) {
+      g.font = (depth === 1 ? '600 12px' : '11px') + ' system-ui, sans-serif';
+      g.fillStyle = 'rgba(0,0,0,.55)';
+      g.fillRect(x + 2, y + 2, Math.min(w - 4, g.measureText(n.t).width + 8), depth === 1 ? 17 : 15);
+      g.fillStyle = '#fff'; g.save(); g.beginPath(); g.rect(x + 2, y + 2, w - 4, 17); g.clip();
+      g.fillText(n.t, x + 6, y + (depth === 1 ? 15 : 13)); g.restore();
+    }
+  };
+  for (const [c, x, y, w, h] of layout(node.c, 0, 0, W, H)) fill(c, x, y, w, h, 1);
+  // legend: shares within the current block
+  const tot = {}; let all = 0;
+  leaves(node, l => { const k = mode === 'kind' ? l.k : l.u; tot[k] = (tot[k] || 0) + l.n; all += l.n; });
+  const names = mode === 'kind' ? KNAME : LNAME, cols = mode === 'kind' ? KIND : LEVEL;
+  const order = mode === 'kind' ? Object.keys(KIND) : T.levels;
+  $('legend').innerHTML = order.filter(k => tot[k]).map(k => `<span><i style="background:${cols[k]}"></i>${names[k]} <b>${(100 * tot[k] / all).toFixed(1)}%</b></span>`).join('');
+  $('crumbs').innerHTML = ['ROM', ...focus.map(f => f.t)].map((t, i) => i === focus.length ? `<b>${esc(t)}</b>` : `<a data-i="${i}">${esc(t)}</a>`).join(' › ');
+}
+function under(e) {
+  const r = $('cv').getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+  return rects.filter(q => x >= q[1] && x < q[1] + q[3] && y >= q[2] && y < q[2] + q[4]).sort((a, b) => a[5] - b[5]);
+}
+const hrefOf = ref => !ref ? null : ref.startsWith('/') ? ref : '/atlas#' + ref;
+$('cv').onmousemove = e => {
+  const chain = under(e), q = chain[chain.length - 1], t = $('tip');
+  if (!q) { t.style.display = 'none'; return; }
+  const n = q[0], path = chain.slice(0, -1).map(p => p[0].t).join(' › ');
+  t.innerHTML = `${path ? `<div class="m">${esc(path)}</div>` : ''}<b>${esc(n.t)}</b>${n.full ? `<div>${esc(n.full)}</div>` : ''}<div class="m">${hex(n.s)} · ${size(n.n)}</div>${n.u ? `<div><i style="display:inline-block;width:9px;height:9px;background:${LEVEL[n.u]}"></i> ${LNAME[n.u]}</div>` : ''}${n.r ? '<div class="m">click to open</div>' : ''}`;
+  t.style.display = 'block';
+  t.style.left = Math.min(innerWidth - 450, e.clientX + 14) + 'px'; t.style.top = (e.clientY + 14) + 'px';
+};
+$('cv').onmouseleave = () => { $('tip').style.display = 'none'; };
+$('cv').onclick = e => {
+  // go into the outermost group under the pointer; a single resource or
+  // function opens (code in the side panel, game things in Browse)
+  const chain = under(e); if (!chain.length) return;
+  const group = chain.find(p => p[0].c);
+  if (group) { focus.push(group[0]); draw(); return; }
+  const h = hrefOf(chain[chain.length - 1][0].r);
+  if (h) h.startsWith('/atlas') ? (location.href = h) : peek(h);
+};
+$('crumbs').onclick = e => { const a = e.target.closest('a[data-i]'); if (a) { focus = focus.slice(0, +a.dataset.i); draw(); } };
+document.addEventListener('keydown', e => { if ((e.key === 'Backspace' || e.key === 'Escape') && !$('peek')?.classList.contains('on') && focus.length) { focus.pop(); draw(); } });
+const setMode = m => { mode = m; try { localStorage.setItem('rom.mode', m); } catch (e) {} $('mkind').classList.toggle('on', m === 'kind'); $('mlevel').classList.toggle('on', m === 'level'); if (T) draw(); };
+$('mkind').onclick = () => setMode('kind'); $('mlevel').onclick = () => setMode('level');
+addEventListener('resize', () => T && draw());
+setMode(mode);
+(async () => { T = await fetch('/api/romtree').then(r => r.json()); draw(); })();
+</script>
+</body>
+</html>

@@ -33,6 +33,7 @@ class Walker:
         self.voicegroups = set()
         self.songs = []
         self.samples = {}       # wave header address -> end (exclusive)
+        self.voices = set()     # VOICE (program) numbers the walked tracks select
 
     def u32(self, a):
         return u32(self.rom, a - ROM_BASE)
@@ -86,6 +87,8 @@ class Walker:
                 elif c == 0xCD:       # XCMD type param
                     pos += 3
                 elif c in ARGS1:
+                    if c == 0xBD:     # VOICE program
+                        self.voices.add(self.b(pos + 1))
                     pos += 2
                 elif c >= 0xCE:       # EOT / TIE / notes: up to 3 args < 0x80
                     pos += 1
