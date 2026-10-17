@@ -8,8 +8,8 @@ tree, each with one page of everything known about it (tools/studio/atlas.html).
 Entities have an id "kind:key": char (the game's character list), monster
 (the game's monster list, bosses included), actor (a registry entry: an
 object scripts create with `chara KEY`, or a script command), item, area,
-scene, file (a reconstructed GCL source file), sprite (98F5 large sprite)
-and func (a code function). The tree groups them:
+scene, file (a reconstructed GCL source file), sprite (98F5 large sprite),
+tileset (a CEEF tileset), bgtiles (a map's own tiles) and func (a code function). The tree groups them:
 
 * Cast and Bestiary: the game's own name lists, in its order;
 * Objects (registry entries whose callback or loader loads a sprite, or that
@@ -20,6 +20,8 @@ and func (a code function). The tree groups them:
 * Items: data/items.csv by category;
 * Scripts: the GCL source files by category (tools/assets/gclfiles.py);
 * Sprites: large sprites and sprite packages in archive (ROM) order;
+* Tiles: the CEEF tileset library's tilesets by the area that uses them,
+  and the maps that carry their own tiles (tools/assets/tilesets.py);
 * Code: subsystems in ROM order, with their functions and decomp status.
 
 rom_tree() is the ROM as nested blocks for tools/studio/rom.html.
@@ -45,7 +47,8 @@ CACHE = os.path.join(ROOT, "build", "cache", "atlas.json")
 INPUTS = ["data/actor_registry.csv", "data/items.csv", "data/notes.csv",
           "data/sprite_palettes.csv", "data/labels/areas.csv", "data/labels/scenes.csv",
           "data/labels/sprites.csv", "data/labels/palettes.csv", "gcl/names/proc.csv", "gcl/names/chara.csv",
-          "gcl/names/files.csv", "symbols/functions.csv", "tools/studio/atlas.py", "tools/assets/actors.py"]
+          "gcl/names/files.csv", "symbols/functions.csv", "tools/studio/atlas.py", "tools/assets/actors.py",
+          "tools/assets/tilesets.py", "data/stage_palettes.csv"]
 # the monster list's bosses: 黒騎士 and ニーズホッグ (9902-9903), then 伯爵 on (9915-)
 BOSSES = {9902, 9903} | set(range(9915, 9922))
 
@@ -397,6 +400,32 @@ def build():
         add(f"spr:{hx}", "Sprites/Sprite packages", kind="package", key=hx,
             title=(N.get(("spr", hx), {}).get("label") or f"Package {hx}").capitalize(), owners=pkg_owner.get(hx, []))
 
+    # ---- tiles: CEEF tilesets by the area that uses them, maps' own tiles ----
+    import tilesets
+    T = tilesets.load()
+    for t in T["tilesets"]:
+        place = t["areas"][0]["place"] if t["areas"] else ""
+        loc = location(place)[0] if place else ("Not loaded by a scene" if t["maps"] else "Not loaded by a script")
+        node_rank.setdefault("Tiles/Tilesets/" + loc, node_rank.get("Places/" + loc, 900))
+        add(f"tileset:{t['id']}", "Tiles/Tilesets/" + loc, kind="tileset", key=t["id"], order=t["order"],
+            title=f"Tileset {t['id']}", place=place, tiles=t["tiles"], new_count=t["new_count"],
+            pool_addr=f"{t['pool_addr']:08X}", index_addr=f"{t['index_addr']:08X}",
+            palette=t["palette"], palette_source=t["palette_source"], maps=t["maps"], stages=t["stages"],
+            scenes=[f"scene:{x['scene']}" for x in t["scenes"]], areas=[f"area:{a['area']}" for a in t["areas"]])
+        for x in t["scenes"]:
+            sc = E.get(f"scene:{x['scene']}")
+            if sc is not None and f"tileset:{t['id']}" not in sc.setdefault("tilesets", []):
+                sc["tilesets"].append(f"tileset:{t['id']}")
+        for a in t["areas"]:
+            ar = E.get(f"area:{a['area']}")
+            if ar is not None:
+                ar.setdefault("tilesets", []).append(f"tileset:{t['id']}")
+    for b in T["bg"]:
+        add(f"bgtiles:{b['map']}", "Tiles/Map tiles", kind="bgtiles", key=b["map"], order=b["addr"],
+            title=b["note"] or f"Map {b['map']} tiles", tiles=b["tiles"], layers=b["layers"], palette=b.get("palette"),
+            addr=f"{b['addr']:08X}", compressed=b["compressed"], maps=b["maps"], stages=b["stages"],
+            scenes=[f"scene:{x['scene']}" for x in b["scenes"]])
+
     # ---- explicit links (data/atlas/links.csv) ----
     for r in csv.DictReader(l for l in open(os.path.join(ROOT, "data", "atlas", "links.csv"), encoding="utf-8") if not l.startswith("#")):
         a, b = r["from"], r["to"]
@@ -458,8 +487,9 @@ def build():
                 e["title"] = f"{t} ({words(e['fname']) if not e['fname'].startswith('sub_') else e['key']})"
 
     # ---- tree ----
-    node_rank.update({"Sprites/Large sprites": 0, "Sprites/Sprite packages": 1})
-    order = ["Cast", "Bestiary", "Items", "Places", "Objects", "Script routines", "Scripts", "Sprites", "Code"]
+    node_rank.update({"Sprites/Large sprites": 0, "Sprites/Sprite packages": 1, "Tiles/Tilesets": 0, "Tiles/Map tiles": 1,
+                      "Tiles/Tilesets/Not loaded by a scene": 1000, "Tiles/Tilesets/Not loaded by a script": 1001})
+    order = ["Cast", "Bestiary", "Items", "Places", "Objects", "Script routines", "Scripts", "Sprites", "Tiles", "Code"]
     root = {}
     for path, ids in tree_items.items():
         node = root
@@ -571,7 +601,7 @@ def rom_segments():
 
 
 def rom_load():
-    newest = max(os.path.getmtime(os.path.join(ROOT, p)) for p in ("docs/ROM_MAP.md", "symbols/functions.csv", "tools/studio/atlas.py"))
+    newest = max(os.path.getmtime(os.path.join(ROOT, p)) for p in ("docs/ROM_MAP.md", "symbols/functions.csv", "tools/studio/atlas.py", "tools/assets/tilesets.py"))
     if os.path.exists(ROMCACHE) and os.path.getmtime(ROMCACHE) >= newest:
         return json.load(open(ROMCACHE))
     out = rom_segments()
@@ -651,6 +681,33 @@ def rom_tree():
                              "named" if named else "decoded"))
         tables = kids[0]["s"] - base if kids else head["n"]
         archives["t98F5"] = [leaf(base, tables, "sprite", "98F5 frame and part tables", "node:Sprites", "decoded")] + kids
+    # the tileset library is one resource: split it into its table, each
+    # tileset's index list and the run of pool tiles each tileset added
+    if "ptn" in archives:
+        import tilesets
+        T = tilesets.load()
+        lib, head = T["library"], archives["ptn"][0]
+        idx, pool = [], []
+        for t in T["tilesets"]:
+            ref, name = f"tileset:{t['id']}", f"tileset {t['id']} {t['title']}".strip()
+            level = "named" if t["title"] else "decoded"
+            idx.append(leaf(t["index_addr"], t["index_size"], "tiles", name + " (index list)", ref, level))
+            if t["new_count"]:
+                pool.append(leaf(t["pool_addr"], t["new_count"] * 32, "tiles", name, ref, level))
+        archives["ptn"] = [
+            leaf(head["s"], lib["index"] - head["s"], "tiles", "CEEF header and tileset table", "node:Tiles/Tilesets", "decoded"),
+            {"s": lib["index"], "n": lib["pool"] - lib["index"], "k": "tiles", "t": "Tileset index lists", "c": idx},
+            {"s": lib["pool"], "n": head["s"] + head["n"] - lib["pool"], "k": "tiles", "t": "Tile pool", "c": pool},
+        ]
+    # maps with their own tiles lead to them
+    if "map" in archives:
+        import tilesets
+        own = {b["map"] for b in tilesets.load()["bg"]}
+        for x in archives["map"]:
+            h = x["t"].partition(" ")[2]
+            if h in own:
+                x["t"] += " (own tiles)"
+                x["r"] = f"bgtiles:{h}"
     for label, ls in archives.items():
         ls.sort(key=lambda x: x["s"])
         tops.append({"s": ls[0]["s"], "n": sum(x["n"] for x in ls), "k": ls[0]["k"], "t": titles.get(label, label), "c": ls})
