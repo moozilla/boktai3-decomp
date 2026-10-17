@@ -75,7 +75,7 @@ void sub_0802E698(void *, struct SceneNpc *);
 void DisplayAnimation_SetFlags(void *);
 void sub_0802D88C(struct SceneNpc *);
 s32 sub_0802DB78(struct SceneNpc *, s32, s32, s32, s32, s32);
-u32 sub_08163E24(void);
+u32 ParticlePool_Create(void);
 void sub_081D07D8(void *, struct SceneNpc *);
 void sub_081CFFAC(void);
 void sub_081D0864(void);
@@ -278,7 +278,7 @@ void SceneNpc_CreateFromScript(void)
     setBox(npc, 16, 20);
     npc->field200 = 0x100;
     npc->field204 = 0x190;
-    rig->handle = sub_08163E24();
+    rig->handle = ParticlePool_Create();
     if (extra) {
         rig->attached = 1;
         sub_081D07D8(manager, npc);
