@@ -83,12 +83,46 @@ def parse(path):
 
 WRITES = re.compile(r"^(?:adds|subs|movs|mov|add|sub|lsls|lsrs|asrs|ands|orrs|eors|bics|muls|negs|rsbs|mvns|adcs|sbcs|rors|ldr\w*) (\w+)")
 
-def run(fn, on_call, on_store=None):
-    """Evaluate fn; on_call(target, state, line) at each bl, on_store(addr,
-    value, size) at each store through a register with a known base."""
+def subst(v, st):
+    """v (in a callee's terms) with its incoming registers and stack
+    arguments replaced by the caller's values at the call."""
+    if not isinstance(v, tuple):
+        return v
+    if v[0] == "arg":
+        return st.get(v[1])
+    if v[0] == "f":
+        b = subst(v[1], st)
+        if b is not None and b[0] == "sp":
+            return st.get("stack", {}).get(b[1] + v[2])
+        return ("f", b, v[2], v[3]) if b is not None else None
+    if v[0] == "add": return add(subst(v[1], st), subst(v[2], st))
+    if v[0] == "shl": return shl(subst(v[1], st), v[2])
+    if v[0] == "shr": return shr(subst(v[1], st), v[2])
+    if v[0] == "any": return any_of([subst(x, st) for x in v[1]])
+    return v
+
+
+def arg_stores(stores):
+    """[(register, offset, value, size)] of the stores through an incoming
+    pointer (on_store records), for summaries."""
+    out = []
+    for addr, v, sz in stores:
+        root, off = (addr[1], addr[2][1]) if addr and addr[0] == "add" and addr[2] and addr[2][0] == "c" else (addr, 0)
+        if root and root[0] == "arg" and root[1] in REGS:
+            out.append((root[1], off, v, sz))
+    return out
+
+
+def run(fn, on_call, on_store=None, summaries=None):
+    """Evaluate fn; on_call(target, state, line) at each bl (the state also
+    has the outgoing stack arguments s0.. and a snapshot of the frame,
+    "stack"), on_store(addr, value, size) at each store through a register
+    with a known base. summaries: {callee: arg_stores} applied at each call
+    whose pointer argument is a stack address (a structure the caller fills
+    through a setter); stack slots are frame offsets (0 = the caller's sp)."""
     init = {r: ("arg", r) for r in REGS}
     state, label_states, stack, mem = dict(init), collections.defaultdict(list), {}, {}
-    live, seek = True, None
+    live, seek, spd = True, None, 0
     def merge(states):
         if not states: return None
         return {r: any_of([s.get(r) for s in states]) for r in REGS}
@@ -97,10 +131,11 @@ def run(fn, on_call, on_store=None):
     # body writes (or any call clobbers) are unknown there, the rest keep
     # the values that enter the loop
     pos = {l[:-1]: i for i, l in enumerate(lines) if re.match(r"^_[0-9A-F]+:$", l)}
-    back = {}
+    back, inloop = {}, set()
     for i, l in enumerate(lines):
         m = re.match(r"^b\w* (_[0-9A-F]+)$", l)
         if m and m.group(1) in pos and pos[m.group(1)] <= i:
+            inloop.update(range(pos[m.group(1)], i + 1))
             body = lines[pos[m.group(1)]:i + 1]
             w = back.setdefault(m.group(1), set())
             for b in body:
@@ -108,7 +143,7 @@ def run(fn, on_call, on_store=None):
                 if mm: w.add(mm.group(1))
                 if b.startswith("bl "): w |= {"r0", "r1", "r2", "r3", "ip"}
                 if b.startswith(("pop", "ldm")): w |= set(REGS)
-    for l in lines:
+    for li, l in enumerate(lines):
         if not l or l.startswith((".", "@")): continue
         m = re.match(r"^(_[0-9A-F]+):$", l)
         if m:
@@ -128,17 +163,23 @@ def run(fn, on_call, on_store=None):
         def val(x):
             if x.startswith("#"): return C(int(x[1:], 0))
             return g(x)
+        if op in ("push", "pop") and a:
+            n = len([x for x in re.findall(r"[\w]+", l.split(None, 1)[1]) if x in REGS or x in ("lr", "pc")])
+            n += sum(int(y) - int(x) - 1 for x, y in re.findall(r"r(\d+)-r(\d+)", l))
+            spd += 4 * n if op == "push" else -4 * n
+        elif op in ("sub", "add") and len(a) == 2 and a[0] == "sp" and a[1].startswith("#"):
+            spd += int(a[1][1:], 0) if op == "sub" else -int(a[1][1:], 0)
         try:
             if op == "ldr" and len(a) == 2 and "=" in l and "@ =" in l:
                 v = l.split("@ =")[1].strip()
                 state[a[0]] = C(int(v, 16)) if v.startswith("0x") else ("sym", v)
             elif op == "movs" and a[1].startswith("#"): state[a[0]] = C(int(a[1][1:], 0))
-            elif op in ("mov", "movs") and len(a) == 2: state[a[0]] = g(a[1])
+            elif op in ("mov", "movs") and len(a) == 2: state[a[0]] = ("sp", -spd) if a[1] == "sp" else g(a[1])
             elif op in ("adds", "add") and len(a) == 2:
                 if a[0] == "sp" or a[1] == "sp": pass
                 else: state[a[0]] = add(g(a[0]), val(a[1]))
             elif op in ("adds", "add") and len(a) == 3:
-                if a[1] == "sp": state[a[0]] = ("sp", int(a[2][1:], 0)) if a[2].startswith("#") else None
+                if a[1] == "sp": state[a[0]] = ("sp", int(a[2][1:], 0) - spd) if a[2].startswith("#") else None
                 else: state[a[0]] = add(g(a[1]), val(a[2]))
             elif op == "subs" and len(a) == 2 and a[1].startswith("#"): state[a[0]] = add(g(a[0]), C(-int(a[1][1:], 0)))
             elif op == "subs" and len(a) == 3 and a[2].startswith("#"): state[a[0]] = add(g(a[1]), C(-int(a[2][1:], 0)))
@@ -149,24 +190,40 @@ def run(fn, on_call, on_store=None):
                 mm = re.match(r"\[(\w+)(?:, #(0x[0-9a-f]+|\d+)|, (\w+))?\]", a[1])
                 base, off, ireg = mm.group(1), int(mm.group(2), 0) if mm.group(2) else 0, mm.group(3)
                 size = {"ldr": 4, "ldrh": 2, "ldrb": 1, "ldrsh": -2, "ldrsb": -1}[op]
-                if base == "sp": state[a[0]] = stack.get(off)
+                if base == "sp":
+                    # the frame above the pushes holds the caller's stack arguments
+                    fr = off - spd
+                    state[a[0]] = ("arg", f"s{fr // 4}") if fr >= 0 and op == "ldr" else stack.get(fr)
                 else:
                     b = g(base) if not ireg else add(g(base), g(ireg))
                     k = (repr(b), off)
-                    state[a[0]] = mem[k] if b is not None and k in mem else (("f", b, off, size) if b is not None else None)
+                    if b is not None and b[0] == "sp":
+                        state[a[0]] = stack.get(b[1] + off)
+                    else:
+                        state[a[0]] = mem[k] if b is not None and k in mem else (("f", b, off, size) if b is not None else None)
             elif op in ("str", "strh", "strb") and len(a) == 2 and a[1].startswith("[sp"):
                 mm = re.match(r"\[sp(?:, #(0x[0-9a-f]+|\d+))?\]", a[1])
-                if mm: stack[int(mm.group(1), 0) if mm.group(1) else 0] = g(a[0])
+                if mm: stack[(int(mm.group(1), 0) if mm.group(1) else 0) - spd] = g(a[0])
             elif op in ("str", "strh", "strb") and len(a) == 2 and a[1].startswith("["):
                 mm = re.match(r"\[(\w+)(?:, #(0x[0-9a-f]+|\d+)|, (\w+))?\]", a[1])
                 if mm:
                     b = g(mm.group(1)) if not mm.group(3) else add(g(mm.group(1)), g(mm.group(3)))
                     off = int(mm.group(2), 0) if mm.group(2) else 0
-                    if b is not None:
+                    if b is not None and b[0] == "sp":
+                        stack[b[1] + off] = g(a[0])
+                    elif b is not None:
                         mem[(repr(b), off)] = g(a[0])
                         if on_store: on_store(add(b, C(off)), g(a[0]), {"str": 4, "strh": 2, "strb": 1}[op])
             elif op == "bl":
-                on_call(a[0], dict(state), l)
+                cs = dict(state)
+                for n in range(6):  # outgoing stack arguments
+                    cs[f"s{n}"] = stack.get(4 * n - spd)
+                cs["stack"] = dict(stack)
+                on_call(a[0], cs, l)
+                for reg, off, v, sz in (summaries or {}).get(a[0], ()):
+                    b = state.get(reg)
+                    if b is not None and b[0] == "sp":
+                        stack[b[1] + off] = subst(v, cs)
                 r0 = state.get("r0")
                 for r in ("r0", "r1", "r2", "r3", "ip"): state[r] = None
                 mem.clear()
@@ -175,8 +232,9 @@ def run(fn, on_call, on_store=None):
                     state["r0"] = ("call", a[0], r0[1])
                 elif a[0] in GETVALUE and seek:
                     # the values of the option the last seek found, in order:
-                    # the same as Script_GetKeywordValue(letter) for the first
-                    state["r0"] = ("call", KEYWORD, seek[0], seek[1])
+                    # the same as Script_GetKeywordValue(letter) for the first;
+                    # read in a loop, any of them ("*")
+                    state["r0"] = ("call", KEYWORD, seek[0], "*" if li in inloop else seek[1])
                     seek[1] += 1
                 else:
                     state["r0"] = ("call", a[0], r0[1]) if r0 and r0[0] == "c" else ("call", a[0])
@@ -202,7 +260,7 @@ def show(v):
     if k == "arg": return v[1]
     if k == "sym": return v[1]
     if k == "f": return f"{show(v[1])}[{v[2]:#x}]{'' if abs(v[3]) == 4 else ('h' if abs(v[3]) == 2 else 'b')}"
-    if k == "call" and v[1] == KEYWORD and len(v) > 2: return f"-{chr(v[2])}" + (f"[{v[3]}]" if len(v) > 3 and v[3] else "")
+    if k == "call" and v[1] == KEYWORD and len(v) > 2: return f"-{chr(v[2])}" + (f"[{v[3]}]" if len(v) > 3 and v[3] != 0 else "")
     if k == "call": return f"{v[1]}({v[2]:#x})" if len(v) > 2 else f"{v[1]}()"
     if k == "add": return f"({show(v[1])}+{show(v[2])})"
     if k == "shl": return f"({show(v[1])}<<{v[2]})"
