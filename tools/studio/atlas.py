@@ -11,9 +11,11 @@ object scripts create with `chara KEY`, or a script command), item, area,
 scene, file (a reconstructed GCL source file), sprite (98F5 large sprite)
 and func (a code function). The tree groups them:
 
-* Characters, Monsters (in the game's own list order, by family), Objects and
-  the other game-object groups: registry entries placed by
-  data/atlas/categories.csv rules;
+* Cast and Bestiary: the game's own name lists, in its order;
+* Objects (registry entries whose callback or loader loads a sprite, or that
+  allocate an object) and Script routines (the rest), by the code subsystem
+  their callback is in (the translation units; unmatched code takes its ROM
+  neighbors' subsystem), in ROM order;
 * Places: areas in story order, their scenes;
 * Items: data/items.csv by category;
 * Scripts: the GCL source files by category (tools/assets/gclfiles.py);
@@ -39,11 +41,10 @@ for p in (os.path.join(ROOT, "tools", "assets"), os.path.join(ROOT, "tools"), HE
         sys.path.insert(0, p)
 
 CACHE = os.path.join(ROOT, "build", "cache", "atlas.json")
-INPUTS = ["data/atlas/categories.csv", "data/actor_registry.csv", "data/items.csv", "data/notes.csv",
+INPUTS = ["data/actor_registry.csv", "data/items.csv", "data/notes.csv",
           "data/sprite_palettes.csv", "data/labels/areas.csv", "data/labels/scenes.csv",
           "data/labels/sprites.csv", "data/labels/palettes.csv", "gcl/names/proc.csv", "gcl/names/chara.csv",
           "gcl/names/files.csv", "symbols/functions.csv", "tools/studio/atlas.py", "tools/assets/actors.py"]
-COMMAND = re.compile(r"FromScript|Script(?:Set|Get|Create|Move|Release|Start|Stop)|^Script\w*_|_(?:Get|Set|Test|Reset|Clear|Stop|Enable|Disable|Hide|Show|Add|Remove|Release|Query|Hold|Pause|Resume|Apply|Write|Read|Consume|Request|Restore|Defeat|Increment|Exists|Begin|Suppress|Configure|Change|Activate|Deactivate|Raise|Lower|Promote|Append|Switch|Run|Advance|Call|Is|Has|Contains|Place|Move|Turn|Face|Enter|Tick|OnLoadSave)")
 # the monster list's bosses: 黒騎士 and ニーズホッグ (9902-9903), then 伯爵 on (9915-)
 BOSSES = {9902, 9903} | set(range(9915, 9922))
 
@@ -74,12 +75,6 @@ def english_names():
     jp, en = serve.display_strings(os.path.join(os.path.dirname(ROOT), "boktai3trans"))
     return jp, {k: nice(v) for k, v in en.items()}
 
-
-def rules():
-    out = []
-    for r in csv.DictReader(l for l in open(os.path.join(ROOT, "data", "atlas", "categories.csv")) if not l.startswith("#")):
-        out.append((re.compile(r["pattern"]), r["path"]))
-    return out
 
 
 def notes():
@@ -133,11 +128,42 @@ def build():
         funcinfo[name] = {"addr": f"{a:08X}", "name": nm, "size": size, "matched": matched, "unit": unit}
         return name
 
+    # ---- code subsystems, from the translation units (source files are
+    # contiguous in ROM): an unmatched function takes the subsystem of its
+    # neighbors when both agree, else an address bucket ----
+    order_a = sorted(a for a in prog if a in an)
+
+    def unit_sub(u):
+        top, _, sub = (u or "").partition("/")
+        if top == "game":
+            return re.sub(r"/register-pinned$", "", sub)
+        if top == "libraries":
+            return "Library: " + re.sub(r"/register-pinned$", "", sub)
+        return None
+    named = [unit_sub(prog[a][3]) for a in order_a]
+    subsys = {}
+    prev = [None] * len(order_a)
+    nxt = [None] * len(order_a)
+    last = None
+    for i, n in enumerate(named):
+        last = n or last
+        prev[i] = last
+    last = None
+    for i in range(len(named) - 1, -1, -1):
+        last = named[i] or last
+        nxt[i] = last
+    subsys_at = {}
+    for i, a in enumerate(order_a):
+        subsys_at[a] = named[i] or (prev[i] if prev[i] and prev[i] == nxt[i] else f"Unsorted {a >> 16:04X}xxxx")
+        subsys[an[a]] = subsys_at[a]
+    subsys_start = {}
+    for a in order_a:
+        subsys_start.setdefault(subsys_at[a], a)
+
     # ---- registry entries ----
     A = actors.actors()
     procnames = {int(p): r["name"] for p, r in gclview.Names().procs.items()}
     fams = paltrace.families()
-    R = rules()
     sprite_owner = collections.defaultdict(list)
     names_of = collections.defaultdict(list)  # monster/character string id -> actor keys
     for a in A:
@@ -150,7 +176,7 @@ def build():
     squash = lambda t: re.sub(r"[^a-z]", "", t.lower())
     for a in A:
         f = a["callback_name"]
-        if f.startswith("sub_") or COMMAND.search(f) or any(n["id"] in monster_ids for n in a["names"]):
+        if f.startswith("sub_") or not a["loader"] or any(n["id"] in monster_ids for n in a["names"]):
             continue
         base = squash(re.sub(r"_(Create|CreateFromScript|StartFromScript|ScriptCreate|Command|Start|Init)$", "", f))
         if len(base) < 4:
@@ -196,19 +222,12 @@ def build():
         note = N.get(("actor", a["key"]), {}).get("label")
         mnames = [n for n in a["names"] if n["id"] in monster_ids]
         title = note or (en.get(mnames[0]["id"]) if mnames else "") or gname or (words(fname) if not fname.startswith("sub_") else "")
-        key_name = gname or fname
         if mnames:
-            path = "Monsters/Bosses" if any(n["id"] in BOSSES for n in mnames) else "Monsters/Families"
             title = note or " · ".join(dict.fromkeys(en.get(n["id"]) or n["jp"] for n in mnames))
-        elif not fname.startswith("sub_") and COMMAND.search(fname) and not a["sprites"]:
-            group = next((p for rx, p in R if rx.search(key_name) or rx.search(fname)), "Engine").split("/")[-1]
-            prefix = re.sub(r"(?:[0-9A-F]{3,4}|\d+)$", "", fname.split("_")[0]) or fname.split("_")[0]
-            path = f"Script commands/{group}/{words(prefix)}" if group == "Engine" else f"Script commands/{group}"
-        elif fname.startswith("sub_") and not gname:
-            sub = "with sprites" if a["sprites"] else ("used by scripts" if a["procs"] else "unused")
-            path = "Unidentified/" + sub
-        else:
-            path = next((p for rx, p in R if rx.search(key_name) or rx.search(fname)), "Engine")
+        # an object: the callback allocates one and hands it to a loader
+        # (actors.loader_of); a script routine does its work and returns
+        sub = subsys_at.get(int(a["callback"], 16) & ~1, "Unsorted")
+        path = None  # Objects or Script routines, once its sprites are known
         fam = sorted(fams.get(fname, ()))
         code = [f for f in fam if func(f)]
         scenes, shared = placed_in(a["procs"])
@@ -220,11 +239,12 @@ def build():
             if s["kind"] == "big":
                 sprites.append(s["hash"])
                 sprite_owner[s["hash"]].append(a["key"])
-        add(f"actor:{a['key']}", path, kind="actor", key=a["key"], order=1000 if path == "Characters" else 0,
-            title=title or f"Unidentified {a['key']}", fname=fname, gcl=a["gcl"][:1],
+        add(f"actor:{a['key']}", path, kind="actor", key=a["key"], order=int(a["callback"], 16) & ~1,
+            title=title or f"{'Object' if a['loader'] else 'Routine'} {a['key']}", fname=fname, gcl=a["gcl"][:1],
+            subsystem=sub, allocates=bool(a["loader"]),
             names=[{"id": n["id"], "jp": n["jp"], "en": en.get(n["id"], "")} for n in a["names"]],
             callback=a["callback"], loader=a["loader"], loader_name=a["loader_name"],
-            sprites=sprites, small=[s["hash"] for s in a["sprites"] if s["kind"] != "big"],
+            sprites=sprites, effects=[], small=[s["hash"] for s in a["sprites"] if s["kind"] != "big"],
             procs=[{"id": p, "name": procnames.get(p, "")} for p in a["procs"]], spawns=a["spawns"],
             areas={str(k): v for k, v in by_area.items()}, nscenes=len(scenes), shared=shared,
             reach=len(a["scenes"]), code=code)
@@ -233,11 +253,11 @@ def build():
     for n in actors.name_list(*actors.ENEMY_NAMES):
         keys = names_of.get(n["id"], [])
         boss = n["id"] in BOSSES
-        add(f"monster:{n['id']}", "Monsters/Bestiary" + ("/Bosses" if boss else ""), kind="monster",
+        add(f"monster:{n['id']}", "Bestiary" + ("/Bosses" if boss else ""), kind="monster",
             key=str(n["id"]), title=clean(en.get(n["id"]) or n["jp"]), jp=n["jp"], order=n["id"] - actors.ENEMY_NAMES[0] + 1,
             actors=[f"actor:{k}" for k in keys])
     for n in actors.name_list(*actors.CHARACTER_NAMES):
-        add(f"char:{n['id']}", "Characters", kind="char", key=str(n["id"]), title=clean(en.get(n["id"]) or n["jp"]),
+        add(f"char:{n['id']}", "Cast", kind="char", key=str(n["id"]), title=clean(en.get(n["id"]) or n["jp"]),
             jp=n["jp"], order=n["id"] - actors.CHARACTER_NAMES[0], actors=[f"actor:{k}" for k in names_of.get(n["id"], [])], sprites=[])
 
     # ---- places ----
@@ -300,6 +320,7 @@ def build():
     for r in csv.DictReader(open(os.path.join(ROOT, "data", "labels", "palettes.csv"), encoding="utf-8")):
         plab[r["hash"]][int(r["pool"])] = r["label"]
     pal = bigpalettes.table()
+    effect_of = collections.defaultdict(list)
     # loads the palette trace resolves, per script entry point
     ents = paltrace.entries()
     for f, _, hexpr in paltrace.loads_in():
@@ -311,21 +332,28 @@ def build():
                 hs = {v[0] & 0xFFFF for v, _ in paltrace.Tracer(fam).joint([hexpr], f)}
             except paltrace.Why:
                 continue
+            e = E.get(f"actor:{key}")
+            if e is None or len(hs) > 8:
+                continue
+            # its own sprite: loaded by the callback or the loader itself;
+            # anything else its code loads (effects, projectiles, things it spawns)
+            own = f in (e["fname"], e["loader_name"])
             for h in hs:
                 hx = f"{h:04X}"
-                if key not in sprite_owner[hx]:
-                    sprite_owner[hx].append(key)
-                e = E.get(f"actor:{key}")
-                if e is not None and hx not in e["sprites"] and len(hs) <= 8:
-                    e["sprites"].append(hx)
+                if own:
+                    if key not in sprite_owner[hx]:
+                        sprite_owner[hx].append(key)
+                    if hx not in e["sprites"]:
+                        e["sprites"].append(hx)
+                    if hx in e["effects"]:
+                        e["effects"].remove(hx)
+                elif hx not in e["sprites"] and hx not in e["effects"]:
+                    e["effects"].append(hx)
+                    effect_of[hx].append(key)
+    big_order = {h: i for i, h in enumerate(bigpalettes.defaults())}  # archive (ROM) order
     for h, d in sorted(bigpalettes.defaults().items()):
         hx = f"{h:04X}"
-        rank = ["Monsters", "Characters", "Objects", "Player gear", "Town and services", "Screens and menus",
-                "Effects and presentation", "Screen and camera", "Game state", "Engine", "Script commands", "Unidentified"]
-        owners = sorted(sprite_owner.get(hx, []), key=lambda k: rank.index(E[f"actor:{k}"]["path"].split("/")[0])
-                        if E[f"actor:{k}"]["path"].split("/")[0] in rank else 99)
-        top = E[f"actor:{owners[0]}"]["path"].split("/")[0] if owners else "Unassigned"
-        top = {"Script commands": "Shown by scripts (events)"}.get(top, top)
+        owners = sprite_owner.get(hx, [])
         t = pal.get(h, {})
         def plabel(p):
             """This sprite's label for pool entry p: data/labels/palettes.csv,
@@ -340,10 +368,20 @@ def build():
             return ""
         vs = [{"pool": p, "source": s.split(" ")[0], "label": plabel(p)}
               for p, s in sorted(t.get("variants", {}).items()) if p != d]
-        add(f"sprite:{hx}", "Sprites/" + top, kind="sprite", key=hx,
+        add(f"sprite:{hx}", "Sprites/Large sprites", kind="sprite", key=hx, order=big_order.get(h, 0),
             title=N.get(("big", hx), {}).get("label") or lab.get(hx, {}).get("label") or f"Sprite {hx}",
             default=d, default_label=plabel(d),
-            variants=vs, owners=[f"actor:{k}" for k in owners], frames=lab.get(hx, {}).get("frames", ""))
+            variants=vs, owners=[f"actor:{k}" for k in owners], effect_of=[f"actor:{k}" for k in effect_of.get(hx, [])],
+            frames=lab.get(hx, {}).get("frames", ""))
+
+    # an object draws something itself: its callback or loader loads a sprite
+    # (or allocates one and hands it to a loader); else a script routine
+    for e in E.values():
+        if e["kind"] == "actor":
+            e["creates"] = bool(e["allocates"] or e["sprites"] or e["small"])
+            e["path"] = ("Objects/" if e["creates"] else "Script routines/") + e["subsystem"]
+            node_rank[e["path"]] = subsys_start.get(e["subsystem"], 0x09000000)
+            tree_items[e["path"]].append(e["id"])
 
     # ---- sprite packages (CB05) ----
     pkg_owner = collections.defaultdict(list)
@@ -377,24 +415,17 @@ def build():
         sub = unit.split("/", 1)[1] if "/" in unit else unit or "Other"
         top = unit.split("/", 1)[0] if "/" in unit else "game"
         funcinfo.setdefault(an[a], {"addr": f"{a:08X}", "name": nm, "size": size, "matched": matched, "unit": unit})
-    # subsystems: the game's translation units by title; single-function
-    # units (not matched yet) by their name prefix, unnamed ones by ROM region
+    # subsystems in ROM order (the source files' order)
     groups = collections.defaultdict(list)
-    for name, f in funcinfo.items():
-        u = f["unit"] or "other"
-        top, _, sub = u.partition("/")
-        if top in ("game", "libraries"):
-            g = (("Game" if top == "game" else "Libraries"), re.sub(r"/register-pinned$", "", sub))
-        elif not name.startswith("sub_") and "_" in name:
-            g = ("Named, not matched", name.split("_")[0])
-        else:
-            g = ("Unnamed", f"{f['addr'][:4]}xxxx")
-        groups[g].append(name)
-    for (top, sub), fs in groups.items():
+    for name in funcinfo:
+        groups[subsys.get(name, "Unsorted")].append(name)
+    for sub, fs in groups.items():
         size = sum(funcinfo[f]["size"] for f in fs)
         done = sum(funcinfo[f]["size"] for f in fs if funcinfo[f]["matched"])
-        add(f"unit:{top}/{sub}", "Code/" + top, kind="unit", key=f"{top}/{sub}", title=sub.replace(" (tentative)", ""),
-            tentative="(tentative)" in sub, funcs=sorted(fs, key=lambda f: funcinfo[f]["addr"]), size=size, matched=done)
+        objs = sorted(e["id"] for e in E.values() if e["kind"] == "actor" and e["subsystem"] == sub)
+        node_rank[f"Code/{sub}"] = subsys_start.get(sub, 0)
+        add(f"unit:{sub}", "Code", kind="unit", key=sub, title=sub.replace(" (tentative)", ""), order=subsys_start.get(sub, 0),
+            tentative="(tentative)" in sub, funcs=sorted(fs, key=lambda f: funcinfo[f]["addr"]), size=size, matched=done, objects=objs)
 
     # a species drawn in a palette labeled with its name (data/labels/palettes.csv)
     for e in E.values():
@@ -413,7 +444,7 @@ def build():
     for e in E.values():
         if e["kind"] == "actor":
             top = e["path"].split("/")[0]
-            e["placed"] = top not in ("Script commands", "Engine", "Game state", "Screen and camera", "Screens and menus") and 0 < e["nscenes"] <= 120
+            e["placed"] = e["creates"] and 0 < e["nscenes"] <= 120
 
     # titles shared within a group get the function's name to tell them apart
     seen = collections.defaultdict(list)
@@ -426,11 +457,8 @@ def build():
                 e["title"] = f"{t} ({words(e['fname']) if not e['fname'].startswith('sub_') else e['key']})"
 
     # ---- tree ----
-    node_rank.update({"Monsters/Bestiary": 0, "Monsters/Families": 1, "Monsters/Bosses": 2, "Sprites/Unassigned": 1000,
-                      "Sprites/Sprite packages": 999})
-    order = ["Characters", "Monsters", "Objects", "Player gear", "Town and services", "Places", "Items",
-             "Screens and menus", "Effects and presentation", "Screen and camera", "Scripts", "Script commands",
-             "Game state", "Engine", "Unidentified", "Sprites", "Code"]
+    node_rank.update({"Sprites/Large sprites": 0, "Sprites/Sprite packages": 1})
+    order = ["Cast", "Bestiary", "Items", "Places", "Objects", "Script routines", "Scripts", "Sprites", "Code"]
     root = {}
     for path, ids in tree_items.items():
         node = root
@@ -446,7 +474,13 @@ def build():
         path = f"{path}/{name}" if path else name
         sub = sorted(((k, v) for k, v in node.items() if k), key=lambda kv: (node_rank.get(f"{path}/{kv[0]}", 999), kv[0]))
         kids = [emit(k, v, depth + 1, path) for k, v in sub]
-        items = sorted(node.get("", []), key=sortkey)
+        items = list(node.get("", []))
+        if path.split("/")[0] in ("Objects", "Script routines"):
+            # small code groups fold into their parent: everything stays in ROM order
+            for k in [k for k in kids if k["count"] < 3 and not k["children"]]:
+                items += k["items"]
+                kids.remove(k)
+        items = sorted(items, key=sortkey)
         n = len(items) + sum(k["count"] for k in kids)
         return {"title": name, "children": kids, "items": items, "count": n}
 
@@ -543,6 +577,124 @@ def rom_load():
     os.makedirs(os.path.dirname(ROMCACHE), exist_ok=True)
     json.dump(out, open(ROMCACHE, "w"))
     return out
+
+
+
+# understanding levels, best first (tools/studio/rom.html colors and totals)
+LEVELS = ["named", "decoded", "decompiled", "located", "assembly", "unmapped", "free"]
+DECODED = {"sprite", "map", "tiles", "palette", "font", "animation", "text", "script", "sound"}
+
+
+def rom_tree():
+    """The ROM as nested blocks in address order: top-level regions (code by
+    subsystem and function, each asset archive by resource, sound, text,
+    scripts, other data, unmapped gaps, free space), each block with a kind
+    and an understanding level."""
+    seg = rom_load()
+    N = notes()
+    ix = load()
+    unit_of = {}
+    for e in ix["entities"].values():
+        if e["kind"] == "unit":
+            for f in e["funcs"]:
+                unit_of[f] = e["key"]
+    an_rev = {fi["addr"]: name for name, fi in ix["funcs"].items()}
+    note_kind = {"map": "map", "tCB05": "spr", "t92B3": "pal"}
+
+    def leaf(start, size, kind, name, ref, level):
+        return {"s": start, "n": size, "k": kind, "t": name, "r": ref, "u": level}
+
+    tops = []
+    code = collections.OrderedDict()
+    for a, size, kind, name, ref in seg["items"]:
+        if kind in ("code", "asm"):
+            sub = unit_of.get(an_rev.get(f"{a:08X}", ""), "Unsorted")
+            code.setdefault(sub, []).append(leaf(a, size, kind, name, ref, "decompiled" if kind == "code" else "assembly"))
+    code_children = [{"s": fs[0]["s"], "n": sum(f["n"] for f in fs), "k": "code", "t": sub, "r": f"unit:{sub}", "c": fs}
+                     for sub, fs in code.items()]
+    code_children.sort(key=lambda x: x["s"])
+    if code_children:
+        tops.append({"s": code_children[0]["s"], "n": sum(c["n"] for c in code_children), "k": "code", "t": "Code", "c": code_children})
+    archives = collections.OrderedDict()
+    for a, size, kind, name, ref in seg["items"]:
+        if kind in ("code", "asm"):
+            continue
+        label, _, h = name.partition(" ")
+        nk = note_kind.get(label)
+        named = bool(nk and N.get((nk, h), {}).get("label"))
+        level = ("named" if named else "decoded") if kind in DECODED else "located"
+        archives.setdefault(label, []).append(leaf(a, size, kind, name, ref, level))
+    titles = {"anm": "Animation scripts (922E)", "t92B3": "Palettes (92B3)", "t9B1B": "Sprite palette pool (9B1B)",
+              "t98F5": "Large sprites (98F5)", "fnt": "Font (A635)", "tAE6C": "Collision / HP data (AE6C)", "map": "Maps (C091)",
+              "tCB05": "Sprite packages (CB05)", "ptn": "Tileset library (CEEF)", "tCEAA": "Unknown blob (CEAA)"}
+    # the large sprite archive is one resource: split it by each sprite's pixel data
+    if "t98F5" in archives:
+        import bigsprites
+        from romlib import load_rom
+        bs = bigsprites.BigSprites(load_rom())
+        base = archives["t98F5"][0]["s"]
+        lab = {r["hash"]: r["label"] for r in csv.DictReader(open(os.path.join(ROOT, "data", "labels", "sprites.csv"), encoding="utf-8"))}
+        starts = []
+        for i, r in enumerate(bs.records):
+            fr = list(bs.frames(i))
+            if fr:
+                starts.append((min(f[3] for f in fr), r[0]))
+        starts.sort()
+        kids = []
+        head = archives["t98F5"][0]
+        for k, (pix, h) in enumerate(starts):
+            end = starts[k + 1][0] if k + 1 < len(starts) else head["n"] - bs.pixels
+            hx = f"{h:04X}"
+            named = bool(N.get(("big", hx), {}).get("label") or (lab.get(hx) and lab[hx].lower() != "unknown"))
+            kids.append(leaf(base + bs.pixels + pix, end - pix, "sprite", f"sprite {hx} {lab.get(hx, '')}".strip(), f"sprite:{hx}",
+                             "named" if named else "decoded"))
+        tables = kids[0]["s"] - base if kids else head["n"]
+        archives["t98F5"] = [leaf(base, tables, "sprite", "98F5 frame and part tables", "node:Sprites", "decoded")] + kids
+    for label, ls in archives.items():
+        ls.sort(key=lambda x: x["s"])
+        tops.append({"s": ls[0]["s"], "n": sum(x["n"] for x in ls), "k": ls[0]["k"], "t": titles.get(label, label), "c": ls})
+    # the documented regions that items don't cover (sound, text, scripts, graphics, tables)
+    covered = sorted((c["s"], c["s"] + c["n"]) for t in tops for c in (t.get("c") or [t]) for c in (c.get("c") or [c]))
+    merged = []
+    for a, b in covered:
+        if merged and a <= merged[-1][1]:
+            merged[-1][1] = max(merged[-1][1], b)
+        else:
+            merged.append([a, b])
+
+    def uncovered(a, b):
+        out, p = [], a
+        for x, y in merged:
+            if y <= p or x >= b:
+                continue
+            if x > p:
+                out.append((p, x))
+            p = max(p, y)
+        if p < b:
+            out.append((p, b))
+        return out
+    regs = sorted([r for r in seg["regions"] if r[2] != "code" or "tables" in r[3]], key=lambda r: (r[0], -(r[1] - r[0])))
+    used = []
+    for a, b, kind, label in regs:
+        b = min(b, 0x09000000)
+        parts = [(x, y) for x, y in uncovered(a, b) if not any(x < uy and y > ux for ux, uy in used)]
+        size = sum(y - x for x, y in parts)
+        if size < 256:
+            continue
+        used += parts
+        level = "free" if kind == "free" else ("decoded" if kind in DECODED else "located")
+        tops.append({"s": parts[0][0], "n": size, "k": kind, "t": label.split(" (")[0][:60], "full": label, "u": level})
+    # everything else: bytes nobody has mapped
+    allspans = sorted([(c["s"], c["s"] + c["n"]) for c in tops if "c" not in c] + [tuple(m) for m in merged] + used)
+    p, gaps = 0x08000000, []
+    for a, b in sorted(allspans):
+        if a > p and a - p >= 1024:
+            gaps.append((p, a))
+        p = max(p, b)
+    for a, b in gaps:
+        tops.append({"s": a, "n": b - a, "k": "unknown", "t": f"unmapped {a:08X}", "u": "unmapped"})
+    tops.sort(key=lambda t: t["s"])
+    return {"size": seg["size"], "children": tops, "levels": LEVELS}
 
 
 if __name__ == "__main__":

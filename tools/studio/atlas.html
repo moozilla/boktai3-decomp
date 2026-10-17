@@ -165,6 +165,21 @@ $('tree').onclick = e => {
   } else location.hash = t.dataset.id;
 };
 $('q').oninput = renderTree;
+// arrow keys walk the tree (outside text fields): up/down move, right opens a
+// group, left closes it
+document.addEventListener('keydown', e => {
+  if (/INPUT|TEXTAREA/.test(document.activeElement.tagName) || $('search').classList.contains('on')) return;
+  if (!['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(e.key) || e.metaKey || e.altKey) return;
+  const rows = [...document.querySelectorAll('#tree .tn')], i = rows.findIndex(r => r.classList.contains('on'));
+  const cur = rows[i];
+  e.preventDefault();
+  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+    if (cur?.dataset.node) { const p = cur.dataset.node; e.key === 'ArrowRight' ? open.add(p) : open.delete(p); renderTree(); }
+    return;
+  }
+  const next = rows[e.key === 'ArrowDown' ? Math.min(rows.length - 1, i + 1) : Math.max(0, i - 1)];
+  if (next) location.hash = next.dataset.node ? 'node:' + next.dataset.node : next.dataset.id;
+});
 function reveal(path) {
   const parts = path.split('/');
   for (let i = 1; i <= parts.length; i++) open.add(parts.slice(0, i).join('/'));
@@ -240,16 +255,16 @@ function nodePage(path) {
 function palettes(hash) {
   const s = E['sprite:' + hash];
   if (!s) return `<div class="spritebox"><div class="sh"><span class="mono">${hash}</span></div>${thumb('big', hash, 64)}</div>`;
-  const one = (pool, lab, isDef, src) => `<a class="pal${isDef ? ' def' : ''}" href="/gfx#pool/${pool}" data-peek>${thumb('big', hash, 64, { pool })}<small><b>${pool}</b>${isDef ? ' · default' : ''}</small>${lab ? `<small>${esc(lab)}</small>` : ''}${src && src !== 'run' ? `<small class="muted">${esc(src)}</small>` : ''}</a>`;
+  const one = (pool, lab, isDef, src) => `<a class="pal${isDef ? ' def' : ''}" href="/gfx#pool/${pool}/${hash}" data-peek>${thumb('big', hash, 64, { pool })}<small><b>${pool}</b>${isDef ? ' · default' : ''}</small>${lab ? `<small>${esc(lab)}</small>` : ''}${src && src !== 'run' ? `<small class="muted">${esc(src)}</small>` : ''}</a>`;
   return `<div class="spritebox"><div class="sh"><a href="#sprite:${hash}">${esc(s.title)}</a> <span class="mono">${hash}</span> · ${peekLink(gfxHref('big', hash), 'frames ↗')}</div>
     <div class="pals">${one(s.default, s.default_label, true)}${s.variants.map(v => one(v.pool, v.label, false, v.source)).join('')}</div></div>`;
 }
-function placesOf(areas) {
+function placesOf(areas, from) {
   const rows = Object.entries(areas || {}).sort((a, b) => (E['area:' + a[0]]?.order ?? 999) - (E['area:' + b[0]]?.order ?? 999));
   if (!rows.length) return '<div class="empty">Not placed in any scene found so far.</div>';
   const byLoc = {};
   for (const [a, ss] of rows) { const ar = E['area:' + a]; (byLoc[ar?.location || 'Elsewhere'] ||= []).push([a, ss]); }
-  return `<div class="places">${Object.entries(byLoc).map(([loc, list]) => `<div class="pl"><b>${esc(loc)}</b>${list.map(([a, ss]) => `<div style="margin:4px 0 0 0">${link('area:' + a, E['area:' + a]?.short)} <span class="chips" style="display:inline-flex">${ss.map(s => chip('scene:' + s, E['scene:' + s]?.title.startsWith('Scene ') ? String(s) : E['scene:' + s]?.title)).join('')}</span></div>`).join('')}</div>`).join('')}</div>`;
+  return `<div class="places">${Object.entries(byLoc).map(([loc, list]) => `<div class="pl"><b>${esc(loc)}</b>${list.map(([a, ss]) => `<div style="margin:4px 0 0 0">${link('area:' + a, E['area:' + a]?.short)} <span class="chips" style="display:inline-flex">${ss.map(s => from ? `<a class="chip" href="#scene:${s}@${from}">${esc(E['scene:' + s]?.title.startsWith('Scene ') ? String(s) : E['scene:' + s]?.title)}</a>` : chip('scene:' + s, E['scene:' + s]?.title.startsWith('Scene ') ? String(s) : E['scene:' + s]?.title)).join('')}</span></div>`).join('')}</div>`).join('')}</div>`;
 }
 async function funcs() { return F ??= fetch('/api/atlas/funcs').then(r => r.json()); }
 function codeTable(names, el) {
@@ -265,7 +280,7 @@ function codeTable(names, el) {
 // Where an object is: scenes whose own script creates it; otherwise the
 // shared scripts that do (run by many scenes, or by the system).
 function placement(e) {
-  if (e.nscenes) return placesOf(e.areas);
+  if (e.nscenes) return placesOf(e.areas, e.id);
   const sh = (e.shared || []).map(f => E['file:' + f]).filter(Boolean);
   if (!e.procs.length) return '<div class="empty">No script creates it.</div>';
   return `<div class="muted" style="margin-bottom:6px">Not placed by a scene. Created by ${sh.length > 1 ? 'these shared scripts' : 'a shared script'}:</div><div class="chips">${sh.map(f => chip(f.id, f.title, f.description ? ` <small>${esc(f.description)}</small>` : '')).join('')}</div>`;
@@ -275,11 +290,12 @@ const PAGES = {
     const species = e.names.filter(n => E['monster:' + n.id]);
     const chars = (e.chars || []).filter(id => E[id]);
     const sub = [e.names.length ? `<span class="jp">${e.names.map(n => esc(n.jp)).join(' · ')}</span>` : '', e.gcl[0] ? `GCL <b>${esc(e.gcl[0].name)}</b>` : '', `key <span class="mono">${e.key}</span>`].filter(Boolean).join(' · ');
-    const b = [badge(e.path.split('/').slice(-1)[0]), e.nscenes ? badge(`${e.nscenes} scenes`) : '', e.procs.length ? badge(`${e.spawns} script spawns`) : badge('not created by scripts')];
+    const b = [`<a class="badge" href="#unit:${esc(e.subsystem)}">code: ${esc(e.subsystem)}</a>`, badge(e.creates ? 'object' : 'script routine'), e.nscenes ? badge(`placed in ${e.nscenes} scenes`) : '', e.procs.length ? badge(`${e.spawns} script calls`) : badge('not created by scripts')];
     return `<div class="page">${head(e, sub, b)}
       ${chars.length ? `<h3>Character</h3><div class="chips">${chars.map(id => chip(id)).join('')}</div>` : ''}
       ${species.length ? `<h3>Species <span class="n">${species.length}</span></h3><div class="chips">${species.map(n => chip('monster:' + n.id, n.en || n.jp, ` <small>${esc(n.jp)}</small>`)).join('')}</div>` : ''}
-      <h3>Sprites and palettes <span class="n">${e.sprites.length}</span></h3>${e.sprites.length ? e.sprites.map(palettes).join('') : '<div class="empty">No large sprite traced to it.</div>'}
+      <h3>Sprites and palettes <span class="n">${e.sprites.length}</span></h3>${e.sprites.length ? e.sprites.map(palettes).join('') : `<div class="empty">Its own code (${esc(e.fname)}${e.loader_name ? ', ' + esc(e.loader_name) : ''}) loads no large sprite we can trace${e.small.length ? '' : '; it may draw with a sprite package or a background layer'}.</div>`}
+      ${e.effects?.length ? `<details style="margin-top:6px"><summary class="muted">Other sprites its code loads <span class="n">${e.effects.length}</span>: effects, projectiles and things it spawns</summary><div class="cards" style="margin-top:8px">${e.effects.map(h => cardFor('sprite:' + h)).join('')}</div></details>` : ''}
       ${e.small.length ? `<div class="cards" style="margin-top:8px">${e.small.map(h => cardFor('spr:' + h)).join('')}</div>` : ''}
       <div class="grid2"><div><h3>Placed in <span class="n">${e.nscenes} scenes</span></h3>${placement(e)}</div>
       <div><h3>Created by <span class="n">${e.procs.length} procedures</span></h3>${e.procs.length ? `<div class="chips">${e.procs.map(p => `<a class="chip" href="/scripts#${p.id}" data-peek>${esc(p.name || 'proc ' + p.id)}</a>`).join('')}</div>` : '<div class="empty">No script creates it.</div>'}</div></div>
@@ -295,8 +311,8 @@ const PAGES = {
       <div class="badges">${prev ? `<a class="badge" href="#${prev.id}">‹ ${esc(prev.title)}</a>` : ''}${next ? `<a class="badge" href="#${next.id}">${esc(next.title)} ›</a>` : ''}</div>
       ${fam.length ? fam.map(a => `<h3>Family</h3><div>${link(a.id)} <span class="muted">· ${esc(a.path)}</span></div>
         ${others.length ? `<h3>Related species</h3><div class="chips">${others.map(n => chip('monster:' + n.id, n.en || n.jp)).join('')}</div>` : ''}
-        <h3>Sprites and palettes</h3>${a.sprites.map(palettes).join('') || '<div class="empty">No sprite traced.</div>'}
-        <h3>Where it appears</h3>${placesOf(a.areas)}`).join('') : '<h3>Family</h3><div class="empty">Not linked to an object in the code yet.</div>'}</div>`;
+        <h3>Sprites and palettes</h3>${a.sprites.map(palettes).join('') || '<div class="empty">Its own code loads no large sprite we can trace; it may draw with a sprite package or a background layer.</div>'}
+        <h3>Placed in <span class="n">${a.nscenes} scenes</span></h3>${placement(a)}`).join('') : '<h3>Family</h3><div class="empty">Not linked to an object in the code yet.</div>'}</div>`;
   },
   char(e) {
     const big = (e.sprites || []).filter(x => x.startsWith('sprite:')).map(x => x.slice(7));
@@ -320,14 +336,15 @@ const PAGES = {
       ${Object.entries(byTop).map(([t, ids]) => `<h3>${esc(t)} <span class="n">${ids.length}</span></h3><div class="cards">${ids.map(cardFor).join('')}</div>`).join('')}
       ${items.length ? `<h3>Items <span class="n">${items.length}</span></h3><div class="chips">${items.map(([s, x]) => `<span class="chip">${esc(x.name || 'item')}${x.chest ? ' <small>chest</small>' : ''} <small>· ${s.split(':')[1]}</small></span>`).join('')}</div>` : ''}</div>`;
   },
-  scene(e) {
-    const ar = E[e.area], acts = sceneActors[e.id] || [];
+  scene(e, from) {
+    const ar = E[e.area], acts = sceneActors[e.id] || [], fa = E[from];
+    const hl = fa?.procs?.length ? '/hl=' + fa.procs.map(p => p.id).join('.') : '';
     const doors = [...new Map(e.doors.filter(d => d.scene).map(d => [d.scene, d])).values()];
     const groups = {};
     for (const id of acts) (groups[E[id].path.split('/')[0]] ||= []).push(id);
     const stageKey = e.stage ? `${e.stage.map}-${e.stage.tileset}-${e.stage.hp}` : null;
     return `<div class="page">${head(e, `${link(e.area)}${e.floor && e.floor !== 'N/A' ? ' · ' + esc(e.floor) : ''} · scene ${e.key} · ${peekLink(`/world#area=${ar?.key}/scene=${e.key}`, 'world ↗')}`)}
-      ${stageKey ? `<h3>Map</h3><iframe class="mapframe" src="/gfx?embed=1#maps/${stageKey}/${e.key}" loading="lazy"></iframe>` : ''}
+      ${stageKey ? `<h3>Map${fa ? ` <span class="n">showing where ${link(fa.id)} is placed</span>` : ''}</h3><iframe class="mapframe" src="/gfx?embed=1&bare=1#maps/${stageKey}/${e.key}${hl}" loading="lazy"></iframe>` : ''}
       ${Object.entries(groups).map(([t, ids]) => `<h3>${esc(t)} <span class="n">${ids.length}</span></h3><div class="cards">${ids.map(cardFor).join('')}</div>`).join('') || '<h3>Objects</h3><div class="empty">No object placed by this scene\'s script.</div>'}
       <h3>Doors to <span class="n">${doors.length}</span></h3>${doors.length ? `<div class="chips">${doors.map(d => chip('scene:' + d.scene, E['scene:' + d.scene]?.title, d.cond?.length ? ' <small>conditional</small>' : '')).join('')}</div>` : '<div class="empty">No doors found in the stage data.</div>'}
       ${e.items.length ? `<h3>Items <span class="n">${e.items.length}</span></h3><div class="chips">${e.items.map(x => { const it = Object.values(E).find(i => i.kind === 'item' && i.jp === x.name); return it ? chip(it.id, null, x.chest ? ' <small>chest</small>' : '') : `<span class="chip">${esc(x.name || '?')}</span>`; }).join('')}</div>` : ''}
@@ -347,24 +364,25 @@ const PAGES = {
       <h3>Procedures</h3><div class="chips">${e.procs.slice(0, 300).map(p => `<a class="chip" href="/scripts#${p}" data-peek>${p}</a>`).join('')}</div></div>`;
   },
   sprite(e) {
-    const one = (pool, lab, isDef, src) => `<a class="pal${isDef ? ' def' : ''}" href="/gfx#pool/${pool}" data-peek>${thumb('big', e.key, 128, { pool })}<small><b>${pool}</b>${isDef ? ' · default' : ''}</small>${lab ? `<small>${esc(lab)}</small>` : ''}${src ? `<small class="muted">${esc(src)}</small>` : ''}</a>`;
+    const one = (pool, lab, isDef, src) => `<a class="pal${isDef ? ' def' : ''}" href="/gfx#pool/${pool}/${e.key}" data-peek>${thumb('big', e.key, 128, { pool })}<small><b>${pool}</b>${isDef ? ' · default' : ''}</small>${lab ? `<small>${esc(lab)}</small>` : ''}${src ? `<small class="muted">${esc(src)}</small>` : ''}</a>`;
     return `<div class="page">${head(e, `large sprite <span class="mono">${e.key}</span> · ${peekLink(gfxHref('big', e.key), 'frames ↗')}${e.frames ? ' · ' + esc(e.frames) : ''}`)}
       <h3>Palettes <span class="n">${e.variants.length + 1}</span></h3><div class="pals">${one(e.default, e.default_label, true)}${e.variants.map(v => one(v.pool, v.label, false, v.source)).join('')}</div>
       <h3>Used by</h3>${e.owners.length ? `<div class="cards">${e.owners.map(cardFor).join('')}</div>` : '<div class="empty">No owner traced yet.</div>'}</div>`;
   },
   unit(e) {
-    return `<div class="page">${head(e, `${e.funcs.length} functions · ${e.size.toLocaleString()} bytes${e.tentative ? ' · tentative grouping' : ''}`)}<h3>Functions</h3><div id="code"></div></div>`;
+    return `<div class="page">${head(e, `${e.funcs.length} functions · ${e.size.toLocaleString()} bytes${e.tentative ? ' · tentative grouping' : ''}`)}
+      ${e.objects?.length ? `<h3>Registry entries <span class="n">${e.objects.length}</span></h3><div class="cards">${e.objects.map(cardFor).join('')}</div>` : ''}<h3>Functions</h3><div id="code"></div></div>`;
   },
 };
 
 function route() {
-  const id = decodeURIComponent(location.hash.slice(1));
+  const [id, from] = decodeURIComponent(location.hash.slice(1)).split('@');
   SEL = id || null;
   $('peek')?.classList.remove('on');  // a new page: the panel's peek belonged to the old one
   let html;
   if (!id) html = home();
   else if (id.startsWith('node:')) { reveal(id.slice(5)); html = nodePage(id.slice(5)); }
-  else if (E[id]) { if (E[id].path) reveal(E[id].path); html = (PAGES[E[id].kind] || (() => `<div class="page">${head(E[id])}</div>`))(E[id]); }
+  else if (E[id]) { if (E[id].path) reveal(E[id].path); html = (PAGES[E[id].kind] || (() => `<div class="page">${head(E[id])}</div>`))(E[id], from); }
   else html = `<div class="page empty">Nothing called ${esc(id)}.</div>`;
   const v = $('view'); v.innerHTML = html; v.scrollTop = 0;
   hydrate(v);
