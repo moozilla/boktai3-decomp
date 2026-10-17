@@ -4,8 +4,9 @@ the game font, then build a modified ROM; browse sprites, palettes, the font and
 raw tiles from the resource archives (/gfx); and a live view of the game
 running in mGBA with tools/mgba/centaur.lua (/live, link on port 8643); the
 script actor registry (/actors), script procedures (/scripts), how the rooms
-connect (/world, tools/assets/areas.py) and any function's disassembly and C
-(/code), from tools/assets/actors.py.
+connect (/world, tools/assets/areas.py), any function's disassembly and C
+(/code), from tools/assets/actors.py, and every MP2K song, playable in the
+browser (/sound, tools/studio/sound.py and mp2k.js).
 
   python3 tools/studio/serve.py [--port 8642] [--link-port 8643]    then open http://localhost:8642
 
@@ -335,7 +336,21 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 self.send(404, {"error": "not found"})
         elif self.path == "/api/display":
             self.send(200, {"jp": self.server.display_jp, "en": self.server.display_en})
-        elif self.path in ("/static/common.js", "/static/common.css", "/static/inspector.js"):
+        elif self.path in ("/sound", "/sound.html"):
+            self.send(200, open(os.path.join(HERE, "sound.html"), "rb").read(), "text/html; charset=utf-8")
+        elif self.path == "/api/sound":
+            import sound
+            self.send(200, sound.load())
+        elif self.path.startswith(("/api/sound/song/", "/api/sound/vg/", "/api/sound/sample/")):
+            import sound  # /api/sound/song/N, /api/sound/vg/ADDR, /api/sound/sample/ADDR
+            what, arg = self.path.split("/")[3:5]
+            try:
+                d = {"song": lambda: sound.song_data(int(arg)), "vg": lambda: sound.voicegroup_data(int(arg, 16)),
+                     "sample": lambda: sound.sample_data(int(arg, 16))}[what]()
+            except ValueError:
+                d = None
+            self.send(200 if d else 404, d or {"error": "no such " + what})
+        elif self.path in ("/static/common.js", "/static/common.css", "/static/inspector.js", "/static/mp2k.js"):
             ctype = "text/javascript" if self.path.endswith(".js") else "text/css"
             self.send(200, open(os.path.join(HERE, os.path.basename(self.path)), "rb").read(), ctype + "; charset=utf-8")
         elif self.path == "/api/notes":

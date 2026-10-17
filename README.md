@@ -87,7 +87,7 @@ python3 tools/studio/serve.py    # http://localhost:8642
 
 **Browse** (`/atlas`) is the way in: everything in the game as one tree
 (characters, the monster list in the game's order, objects, places in story
-order, items, scripts, script commands, sprites and code by subsystem), each
+order, items, scripts, script commands, sprites, songs and code by subsystem), each
 with one page of everything known about it: a monster family's species and
 every palette its sprites are drawn in, where it appears, the scripts that
 create it and how much of its code is decompiled. ⌘K searches everything;
@@ -103,7 +103,10 @@ is built by `tools/studio/atlas.py` and grouped by `data/atlas/categories.csv`.
 | ![Actors](docs/img/studio-actors.png) | **Actors**: every object a script can create, with its GCL name, code, sprites and scenes. |
 | ![Screen inspector](docs/img/studio-captures.png) | **Screen inspector** (Live and Captures): every sprite, text box, layer and palette on screen, matched to its resource. Live mode connects to mGBA through [Centaur](docs/CENTAUR.md). |
 
-Also: palette, font and tile viewers.
+Also: palette, font and tile viewers, and **Sound** (`/sound`): every song in
+the song table with its tracks, voices and the scripts, scenes and code that
+start it, played in the browser by a small MP2K player (`tools/studio/mp2k.js`)
+from the ROM's own sequence and sample data.
 
 ## Layout
 

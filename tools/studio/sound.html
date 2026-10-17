@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boktai 3 Sound</title>
+<link rel="stylesheet" href="/static/common.css">
+<style>
+:root {
+  --bg: #f6f3ec; --panel: #fffdf8; --ink: #2b2620; --muted: #7d7468; --line: #e3dccf;
+  --accent: #b5462f; --accent-ink: #fff; --sel: #f3e3d6; --ok: #2f7d4f; --soft: #efe9de; --roll: #fbf8f2; --grid: #ece5d8;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1b1916; --panel: #24211d; --ink: #ece6dc; --muted: #9a9083; --line: #3a352e;
+    --accent: #e0745a; --accent-ink: #1b1916; --sel: #3a2c25; --ok: #6cc596; --soft: #2b2723; --roll: #1f1d1a; --grid: #2e2a25;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Hiragino Sans", sans-serif; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button, input, select { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
+button { cursor: pointer; }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+main { display: grid; grid-template-columns: 320px 1fr; height: calc(100vh - 53px); }
+body.embed main, body.bare main { height: 100vh; }
+body.bare main { grid-template-columns: 1fr; }
+body.bare #side { display: none; }
+#side { border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; background: var(--panel); }
+#side .tools { padding: 10px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
+#side .tools input[type=search], #side .tools select { width: 100%; }
+#side .tools label { font-size: 12px; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+#count { font-size: 12px; color: var(--muted); }
+#list { overflow-y: auto; flex: 1; }
+.grp { padding: 8px 10px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 650; position: sticky; top: 0; background: var(--panel); border-bottom: 1px solid var(--line); }
+.row { padding: 4px 10px; display: flex; gap: 8px; cursor: pointer; align-items: baseline; border-bottom: 1px solid var(--line); }
+.row:hover { background: var(--sel); }
+.row.on { background: var(--sel); box-shadow: inset 3px 0 var(--accent); }
+.row .id { color: var(--muted); font-variant-numeric: tabular-nums; min-width: 2.8em; font-size: 12px; }
+.row .t { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row .m { color: var(--muted); font-size: 11px; white-space: nowrap; }
+.row .u { color: var(--ok); font-size: 10px; }
+#view { overflow: auto; min-width: 0; }
+.page { padding: 18px 28px 60px; max-width: 1200px; }
+h1.t { font-size: 24px; margin: 0; font-weight: 650; letter-spacing: -.01em; }
+.sub { color: var(--muted); margin-top: 2px; }
+.badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.badge { font-size: 11.5px; padding: 1px 8px; border-radius: 10px; border: 1px solid var(--line); color: var(--muted); background: var(--panel); }
+h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 26px 0 10px; font-weight: 650; display: flex; align-items: baseline; gap: 8px; }
+h3 .n { font-weight: 500; letter-spacing: 0; text-transform: none; }
+.mono { font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; }
+.muted { color: var(--muted); }
+.empty { color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip { font-size: 12.5px; padding: 2px 9px; border: 1px solid var(--line); border-radius: 11px; background: var(--panel); white-space: nowrap; color: var(--ink); }
+a.chip:hover { border-color: var(--accent); text-decoration: none; }
+.chip small { color: var(--muted); }
+.transport { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 16px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+.transport .time { font-variant-numeric: tabular-nums; min-width: 9em; }
+.transport label { display: flex; gap: 6px; align-items: center; color: var(--muted); font-size: 13px; }
+#roll { width: 100%; height: 240px; display: block; border: 1px solid var(--line); border-radius: 8px; background: var(--roll); margin-top: 10px; cursor: pointer; }
+table.t { border-collapse: collapse; font-size: 13px; width: 100%; }
+table.t td, table.t th { padding: 4px 12px 4px 0; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle; }
+table.t th { color: var(--muted); font-weight: 500; font-size: 12px; }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: middle; }
+.meter { display: inline-block; width: 70px; height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; vertical-align: middle; }
+.meter > i { display: block; height: 100%; width: 0; }
+.ms { display: inline-flex; gap: 2px; }
+.ms button { padding: 0 6px; font-size: 11px; line-height: 18px; }
+.ms button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+button.pv { padding: 0 7px; font-size: 11px; line-height: 18px; }
+.places .pl { margin-bottom: 8px; }
+.wave { width: 100%; height: 120px; display: block; border: 1px solid var(--line); border-radius: 8px; background: var(--roll); }
+.note { font-size: 12.5px; color: var(--muted); max-width: 760px; }
+body.compact .full { display: none; }
+body.compact .page { padding: 4px 10px 20px; }
+@media (max-width: 860px) { main { grid-template-columns: 1fr; height: auto; } #side { height: 40vh; } .page { padding: 14px 16px 40px; } }
+</style>
+</head>
+<body>
+<header id="top"></header>
+<main>
+  <section id="side">
+    <div class="tools">
+      <input id="q" type="search" placeholder="Filter: number, name, address…" autocomplete="off">
+      <select id="grp"></select>
+      <label><input type="checkbox" id="used"> Only songs a script or the code starts</label>
+      <label><input type="checkbox" id="empties"> Show the empty slots</label>
+      <div id="count"></div>
+    </div>
+    <div id="list"></div>
+  </section>
+  <section id="view"><div class="page empty">Loading the song table…</div></section>
+</main>
+<script src="/static/common.js"></script>
+<script src="/static/mp2k.js"></script>
+<script>
+// Sound: every MP2K song in the song table (tools/studio/sound.py), playable
+// with the in-browser player (tools/studio/mp2k.js). #N opens song N,
+// #vg=ADDR a voicegroup, #sample=ADDR a sample; ?bare=1 hides the list.
+studioHeader();
+// ?bare (and the side panel) hides the list; ?compact shows only the player (Browse's song pages)
+const QS = new URLSearchParams(location.search);
+if (QS.has('bare') || EMBED) document.body.classList.add('bare');
+if (QS.has('compact')) document.body.classList.add('compact');
+let C = null, SONGS = [], CUR = null, PL = null, SURVEY = null, RAF = 0;
+const TEST = { music: 'Sound test music', effects: 'Sound test effects', voices: 'Sound test voices' };
+const COLORS = ['#c0533a', '#3a7dc0', '#4f9d4a', '#b58a1a', '#8a4fb5', '#1a9a9a', '#c03a7d', '#6b7a2a', '#d07a2a', '#3a4fc0', '#9a5a3a', '#2a8a6b', '#7a3ac0', '#a0a03a', '#c06a9a', '#5a8ac0'];
+const hex8 = a => (typeof a === 'number' ? a.toString(16) : a).toUpperCase().padStart(8, '0');
+const kb = n => n >= 1024 ? (n / 1024).toFixed(1) + ' KB' : n + ' B';
+const mmss = f => { const s = f / MP2K.FRAME_HZ; return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`; };
+const KEYS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const keyName = k => KEYS[k % 12] + (Math.floor(k / 12) - 1);  // MIDI 60 = C4
+const TESTWORD = { music: 'Music', effects: 'Effect', voices: 'Voice' };
+// a name from data/notes.csv, else its place in the sound test, else its number
+const titleOf = s => noteOf('song', s.n)?.label || (s.test ? `${TESTWORD[s.test.list]} ${s.test.no}` : '') || (s.empty ? 'Empty slot' : `Song ${s.n}`);
+const playerName = p => p === 10 ? 'Player 10 · music' : p === 0 ? 'Player 0 · empty slots' : `Player ${p}`;
+const used = s => s.scripts?.length || s.code?.length;
+
+// ---------- the list ----------
+function renderList() {
+  const q = $('q').value.trim().toLowerCase(), g = $('grp').value, onlyUsed = $('used').checked, empties = $('empties').checked;
+  const rows = SONGS.filter(s => (empties || !s.empty) && (!onlyUsed || used(s)) && (g === '' || String(s.player) === g || (g.startsWith('test:') && s.test?.list === g.slice(5)))
+    && (!q || String(s.n) === q || titleOf(s).toLowerCase().includes(q) || s.addr.toLowerCase().includes(q) || (s.voicegroup || '').toLowerCase().includes(q)));
+  let html = '', last = null;
+  const groupKey = s => g.startsWith('test:') ? TEST[g.slice(5)] : playerName(s.player);
+  const sorted = g.startsWith('test:') ? rows.slice().sort((a, b) => a.test.no - b.test.no) : rows.slice().sort((a, b) => (a.player === 10 ? -1 : a.player) - (b.player === 10 ? -1 : b.player) || a.n - b.n);
+  for (const s of sorted) {
+    const k = groupKey(s);
+    if (k !== last) { html += `<div class="grp">${esc(k)}</div>`; last = k; }
+    html += `<div class="row${CUR?.n === s.n ? ' on' : ''}" data-n="${s.n}"><span class="id">${s.n}</span><span class="t">${esc(titleOf(s))}</span>${used(s) ? '<span class="u" title="started by a script or the code">●</span>' : ''}<span class="m">${s.empty ? '' : `${s.tracks.length}t · ${kb(s.size)}`}</span></div>`;
+  }
+  $('list').innerHTML = html || '<div class="page empty">No songs match.</div>';
+  $('count').textContent = `${rows.length} of ${SONGS.length} song table entries`;
+}
+$('list').onclick = e => { const r = e.target.closest('.row'); if (r) location.hash = r.dataset.n; };
+['q', 'grp', 'used', 'empties'].forEach(id => $(id).addEventListener('input', renderList));
+
+// ---------- a song ----------
+function placesOf(scenes) {
+  const by = {};
+  for (const s of scenes) (by[s.area] ||= []).push(s);
+  return `<div class="places">${Object.entries(by).map(([a, ss]) => `<div class="pl"><a href="/atlas#area:${a}" target="_top">${esc(ss[0].area_title || (a < 0 ? 'No area' : 'Area ' + a))}</a> <span class="chips" style="display:inline-flex">${ss.map(s => `<a class="chip" href="/atlas#scene:${s.scene}" target="_top">${esc(s.title || 'Scene ' + s.scene)} <small>${s.scene}</small></a>`).join('')}</span></div>`).join('')}</div>`;
+}
+function describeVoice(mem, addr) {
+  const t = MP2K.tone(mem, addr), k = t.type & 7;
+  if (t.type & 0x80) return { kind: 'Rhythm (drum kit)', detail: `kit at <span class="mono">${hex8(t.wav)}</span>` };
+  if (t.type & 0x40) return { kind: 'Keysplit', detail: `voices at <span class="mono">${hex8(t.wav)}</span>, table <span class="mono">${hex8(t.extra)}</span>` };
+  const kinds = { 0: 'DirectSound', 1: 'Square 1', 2: 'Square 2', 3: 'Wave', 4: 'Noise' };
+  let detail = '';
+  if (k === 0) { const w = MP2K.wave(mem, t.wav); detail = `sample <a class="mono" href="#sample=${hex8(t.wav)}">${hex8(t.wav)}</a>` + (w ? ` · ${Math.round(w.rate)} Hz · ${kb(w.size)}${w.loop ? ' · loops' : ''}` : ''); }
+  else if (k === 1 || k === 2) detail = `duty ${[12.5, 25, 50, 75][t.wav & 3]}%`;
+  else if (k === 3) detail = `wave <span class="mono">${hex8(t.wav)}</span>`;
+  else if (k === 4) detail = t.wav & 1 ? '7-bit noise' : '15-bit noise';
+  return { kind: kinds[k] + (t.type & 8 ? ' (fixed pitch)' : ''), detail, adsr: `${t.attack} ${t.decay} ${t.sustain} ${t.release}`, key: t.key };
+}
+async function showSong(s) {
+  stop();
+  CUR = s; renderList(); document.querySelector('.row.on')?.scrollIntoView({ block: 'nearest' });
+  document.title = 'Boktai 3 Sound · ' + titleOf(s);
+  if (s.empty) {
+    $('view').innerHTML = `<div class="page"><h1 class="t">Empty slot ${s.n}</h1><div class="sub">Song table entry ${s.n} points at the shared 0-track header <span class="mono">${s.addr}</span> (${s.shared} entries do).</div></div>`;
+    return;
+  }
+  const test = s.test ? `<span class="badge">${TEST[s.test.list]} No. ${s.test.no}</span>` : '';
+  $('view').innerHTML = `<div class="page"><div class="full">
+    <h1 class="t" id="title">${esc(titleOf(s))}</h1>
+    <div class="sub">Song ${s.n} · header <span class="mono">${s.addr}</span> · ${playerName(s.player)} (${s.player_tracks} tracks) · ${s.tracks.length} track${s.tracks.length > 1 ? 's' : ''} · ${kb(s.size)} · voicegroup <a class="mono" href="#vg=${s.voicegroup}">${s.voicegroup}</a></div>
+    <div class="badges">${test}<span class="badge">priority ${s.priority}</span>${s.reverb & 0x7f ? `<span class="badge">reverb ${s.reverb & 0x7f}</span>` : ''}<a class="badge" href="/atlas#song:${s.n}" target="_top">Browse ↗</a></div>
+    <div id="ned" style="margin-top:10px"></div></div>
+    <div class="transport"><button class="primary" id="play">▶ Play</button><button id="stop">■ Stop</button>
+      <span class="time" id="time">0:00</span><label><input type="checkbox" id="loop" checked> Loop</label>
+      <label>Volume <input type="range" id="vol" min="0" max="1.5" step="0.05" value="${localStore('sound.vol') || 1}"></label><span class="muted" id="len"></span></div>
+    <canvas id="roll"></canvas>
+    <h3>Tracks <span class="n">${s.tracks.length}</span></h3><table class="t" id="tracks"><tr><th></th><th>Track</th><th>Address</th><th>Bytes</th><th>Voices</th><th>Now</th><th></th></tr>
+      ${s.tracks.map((t, i) => `<tr><td><span class="sw" style="background:${COLORS[i % 16]}"></span></td><td>${i + 1}</td><td class="mono">${t.addr}</td><td>${t.size}</td><td>${t.voices.join(', ') || '<span class="muted">0</span>'}</td><td><span class="meter"><i id="m${i}" style="background:${COLORS[i % 16]}"></i></span> <span class="mono muted" id="k${i}"></span></td><td><span class="ms"><button data-m="${i}" title="Mute">M</button><button data-s="${i}" title="Solo">S</button></span></td></tr>`).join('')}</table>
+    <h3>Voices <span class="n">${s.voices.length} of voicegroup <a class="mono" href="#vg=${s.voicegroup}">${s.voicegroup}</a></span></h3><div id="voices" class="muted">Loading…</div>
+    <div class="full" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:0 32px">
+      <div><h3>Started by scripts <span class="n">${s.scripts.length}</span></h3>${s.scripts.length ? `<div class="chips">${s.scripts.map(u => `<a class="chip" href="/scripts#${u.proc}" data-peek>${esc(u.name || 'proc ' + u.proc)} <small>${esc(u.via)}</small></a>`).join('')}</div>` : '<div class="empty">No script call with this song number found.</div>'}
+        <h3>Scenes <span class="n">${s.scenes.length}</span></h3>${s.scenes.length ? placesOf(s.scenes) : `<div class="empty">${s.shared_files.length ? 'Started by shared scripts:' : 'Not traced to a scene.'}</div>`}${s.shared_files.length ? `<div class="chips" style="margin-top:6px">${s.shared_files.map(f => `<a class="chip" href="/atlas#file:${esc(f)}" target="_top">${esc(f)}</a>`).join('')}</div>` : ''}</div>
+      <div><h3>Started by code <span class="n">${s.code.length}</span></h3>${s.code.length ? `<div class="chips">${s.code.map(c => `<a class="chip" href="${codeHref(c.addr)}" data-peek>${esc(c.func)} <small>${esc(c.via)}</small></a>`).join('')}</div>` : '<div class="empty">No function passes this song number as a constant.</div>'}</div>
+    </div>
+    <p class="note full">Played by the Studio's own MP2K player from the song's ROM bytes: timing, notes, voices and envelopes follow the m4a driver; reverb is left out and the GB channels are approximate.</p></div>`;
+  $('ned').replaceWith(noteEditor('song', s.n, n => { $('title').textContent = titleOf(s); renderList(); }));
+  const data = await fetch('/api/sound/song/' + s.n).then(r => r.json());
+  if (CUR !== s) return;
+  PL = new MP2K.Player(data, MP2K.rate());
+  SURVEY = PL.survey();
+  $('len').textContent = `${mmss(SURVEY.frames)}${SURVEY.loopFrame ? ' to the loop' : ''} · ${SURVEY.notes.length} notes`;
+  drawRoll();
+  $('voices').innerHTML = `<table class="t"><tr><th>Voice</th><th>Kind</th><th>Base key</th><th>Data</th><th>ADSR</th><th></th></tr>${(s.voices.length ? s.voices : [0]).map(v => {
+    const a = parseInt(s.voicegroup, 16) + 12 * v, d = describeVoice(PL.mem, a);
+    return `<tr><td>${v}</td><td>${esc(d.kind)}</td><td>${d.key != null ? keyName(d.key) : ''}</td><td>${d.detail}</td><td class="mono">${d.adsr || ''}</td><td><button class="pv" data-a="${a}" title="Play C4">▶</button></td></tr>`;
+  }).join('')}</table>`;
+  $('play').onclick = play; $('stop').onclick = stop;
+  $('loop').onchange = () => { if (PL) PL.loop = $('loop').checked; };
+  $('vol').oninput = () => { localStore('sound.vol', $('vol').value); if (PL) PL.volume = +$('vol').value; };
+  $('tracks').onclick = e => {
+    const b = e.target.closest('button'); if (!b || !PL) return;
+    const i = +(b.dataset.m ?? b.dataset.s), t = PL.tracks[i];
+    if (b.dataset.m != null) t.mute = !t.mute; else t.solo = !t.solo;
+    b.classList.toggle('on', b.dataset.m != null ? t.mute : t.solo);
+  };
+  $('voices').onclick = e => { const b = e.target.closest('button.pv'); if (b) preview(data, +b.dataset.a); };
+  $('roll').onclick = e => {
+    if (!PL || !SURVEY) return;
+    const r = $('roll').getBoundingClientRect(), f = Math.round((e.clientX - r.left) / r.width * SURVEY.frames);
+    PL.seek(f); if (!MP2K.playing()) play(false);
+  };
+}
+function preview(data, addr, ticks = 48) {
+  stop();
+  const p = MP2K.Player.preview(data, addr, 60, ticks, MP2K.rate());
+  p.volume = +($('vol')?.value || 1);
+  MP2K.start(p);
+}
+function play(fromStart = true) {
+  if (!PL) return;
+  if (fromStart !== false && (PL.done || !PL.frames)) PL.reset();
+  PL.loop = $('loop').checked; PL.volume = +$('vol').value;
+  PL.onEnd = () => { $('play').textContent = '▶ Play'; };
+  MP2K.start(PL);
+  $('play').textContent = '▶ Playing';
+  cancelAnimationFrame(RAF); RAF = requestAnimationFrame(animate);
+}
+function stop() { if (MP2K.playing()) MP2K.stop(); if (PL) PL.reset(); cancelAnimationFrame(RAF); if ($('play')) $('play').textContent = '▶ Play'; if (SURVEY) drawRoll(); if ($('time')) $('time').textContent = '0:00'; }
+// ---------- piano roll ----------
+let ROLLBG = null;
+function drawRoll(at = null) {
+  const cv = $('roll'); if (!cv || !SURVEY) return;
+  const dpr = devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight;
+  if (!ROLLBG || ROLLBG.w !== W || ROLLBG.song !== CUR) {
+    cv.width = W * dpr; cv.height = H * dpr;
+    const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const ns = SURVEY.notes; let lo = 127, hi = 0;
+    for (const n of ns) { lo = Math.min(lo, n.key); hi = Math.max(hi, n.key); }
+    if (lo > hi) { lo = 48; hi = 72; }
+    lo -= 2; hi += 2;
+    const cs = getComputedStyle(document.body);
+    g.fillStyle = cs.getPropertyValue('--roll'); g.fillRect(0, 0, W, H);
+    const kh = H / (hi - lo + 1), fx = W / Math.max(1, SURVEY.frames);
+    g.fillStyle = cs.getPropertyValue('--grid');
+    for (let k = lo; k <= hi; k++) if ([1, 3, 6, 8, 10].includes(k % 12)) g.fillRect(0, H - (k - lo + 1) * kh, W, kh);
+    for (const n of ns) {
+      g.fillStyle = COLORS[n.track % 16]; g.globalAlpha = 0.35 + 0.65 * n.vel / 127;
+      g.fillRect(n.t * fx, H - (n.key - lo + 1) * kh, Math.max(1.5, n.d * fx), Math.max(1.5, kh - 0.5));
+    }
+    g.globalAlpha = 1;
+    ROLLBG = { w: W, song: CUR, img: g.getImageData(0, 0, W * dpr, H * dpr) };
+  }
+  const g = cv.getContext('2d');
+  g.putImageData(ROLLBG.img, 0, 0);
+  if (at != null) { g.setTransform(dpr, 0, 0, dpr, 0, 0); const x = (at % Math.max(1, SURVEY.frames)) / SURVEY.frames * W; g.fillStyle = getComputedStyle(document.body).getPropertyValue('--accent'); g.fillRect(x, 0, 2, H); }
+}
+function animate() {
+  if (!PL || MP2K.playing() !== PL) return;
+  drawRoll(PL.frames);
+  $('time').textContent = mmss(PL.frames) + (PL.looped ? ` · loop ${PL.looped}` : '');
+  const by = {};
+  for (const c of PL.chans) { const e = c.kind === 0 ? c.env / 255 : c.env / 15; if (!by[c.track.i] || by[c.track.i][0] < e) by[c.track.i] = [e, c.midi]; }
+  PL.tracks.forEach((t, i) => { const m = $('m' + i); if (m) { m.style.width = ((by[i]?.[0] || 0) * 100).toFixed(0) + '%'; $('k' + i).textContent = by[i] ? keyName(by[i][1]) : ''; } });
+  RAF = requestAnimationFrame(animate);
+}
+addEventListener('resize', () => { ROLLBG = null; drawRoll(); });
+
+// ---------- a voicegroup ----------
+async function showVoicegroup(addr) {
+  stop(); CUR = null; renderList();
+  const vg = C.voicegroups.find(v => v.addr === addr);
+  document.title = 'Boktai 3 Sound · voicegroup ' + addr;
+  $('view').innerHTML = `<div class="page"><h1 class="t">Voicegroup <span class="mono">${addr}</span></h1>
+    <div class="sub">128 voices · used by ${vg ? vg.songs.length : 0} songs</div>
+    <h3>Songs</h3><div class="chips">${(vg?.songs || []).map(n => `<a class="chip" href="#${n}">${esc(titleOf(SONGS[n]))} <small>${n}</small></a>`).join('') || '<span class="empty">None.</span>'}</div>
+    <h3>Voices</h3><div id="voices" class="muted">Loading…</div></div>`;
+  const data = await fetch('/api/sound/vg/' + addr).then(r => r.json());
+  const mem = new MP2K.Mem(data.chunks), base = parseInt(addr, 16);
+  const rows = [];
+  for (let v = 0; v < 128; v++) {
+    const a = base + 12 * v, t = MP2K.tone(mem, a);
+    if (t.type === 0 && t.wav === 0) continue;
+    const d = describeVoice(mem, a);
+    rows.push(`<tr><td>${v}</td><td>${esc(d.kind)}</td><td>${d.key != null ? keyName(d.key) : ''}</td><td>${d.detail}</td><td class="mono">${d.adsr || ''}</td><td><button class="pv" data-a="${a}">▶</button></td></tr>`);
+  }
+  $('voices').innerHTML = `<table class="t"><tr><th>Voice</th><th>Kind</th><th>Base key</th><th>Data</th><th>ADSR</th><th></th></tr>${rows.join('')}</table>`;
+  $('voices').onclick = e => { const b = e.target.closest('button.pv'); if (b) preview(data, +b.dataset.a); };
+}
+// ---------- a sample ----------
+async function showSample(addr) {
+  stop(); CUR = null; renderList();
+  document.title = 'Boktai 3 Sound · sample ' + addr;
+  const sm = C.samples.find(x => x.addr === addr);
+  const data = await fetch('/api/sound/sample/' + addr).then(r => r.json());
+  const mem = new MP2K.Mem(data.chunks), w = MP2K.wave(mem, parseInt(addr, 16));
+  $('view').innerHTML = `<div class="page"><h1 class="t">Sample <span class="mono">${addr}</span></h1>
+    <div class="sub">${w ? `${Math.round(w.rate)} Hz · ${w.size.toLocaleString()} samples (${(w.size / w.rate).toFixed(2)} s)${w.loop ? ` · loops from ${w.loopStart}` : ''}` : sm?.wave ? 'GB wave channel pattern (32 4-bit steps)' : ''}</div>
+    <div class="transport"><button class="primary" id="splay">▶ Play at its own rate</button></div>
+    <canvas class="wave" id="wave"></canvas></div>`;
+  if (!w) return;
+  const cv = $('wave'), dpr = devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight;
+  cv.width = W * dpr; cv.height = H * dpr;
+  const g = cv.getContext('2d'); g.scale(dpr, dpr); g.fillStyle = getComputedStyle(document.body).getPropertyValue('--accent');
+  for (let x = 0; x < W; x++) {
+    const a = Math.floor(x / W * w.size), b = Math.max(a + 1, Math.floor((x + 1) / W * w.size));
+    let lo = 1, hi = -1; for (let i = a; i < b; i++) { lo = Math.min(lo, w.data[i]); hi = Math.max(hi, w.data[i]); }
+    g.fillRect(x, H / 2 - hi * H / 2, 1, Math.max(1, (hi - lo) * H / 2));
+  }
+  if (w.loop) { g.fillStyle = getComputedStyle(document.body).getPropertyValue('--ok'); g.fillRect(w.loopStart / w.size * W, 0, 1.5, H); }
+  $('splay').onclick = () => {
+    // a one-voice "voicegroup" in memory: a DirectSound entry pointing at the sample
+    const entry = new Uint8Array(12); entry[1] = 60; entry[8] = 255; entry[9] = 0; entry[10] = 255; entry[11] = 200;
+    new DataView(entry.buffer).setUint32(4, parseInt(addr, 16), true);
+    const fake = 0x09F00000, b64 = btoa(String.fromCharCode(...entry));
+    preview({ song: hex8(fake), chunks: [...data.chunks, [hex8(fake), b64]] }, fake, Math.min(900, Math.ceil(w.size / w.rate * MP2K.FRAME_HZ) + 2));
+  };
+}
+
+function route() {
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (h.startsWith('vg=')) return showVoicegroup(h.slice(3).toUpperCase());
+  if (h.startsWith('sample=')) return showSample(h.slice(7).toUpperCase());
+  const n = parseInt(h, 10);
+  const s = SONGS[Number.isFinite(n) ? n : SONGS.find(x => !x.empty)?.n];
+  if (s) showSong(s);
+}
+(async () => {
+  const [cat] = await Promise.all([fetch('/api/sound').then(r => r.json()), loadNotes()]);
+  C = cat; SONGS = cat.songs;
+  const counts = {};
+  for (const s of SONGS) if (!s.empty) counts[s.player] = (counts[s.player] || 0) + 1;
+  $('grp').innerHTML = `<option value="">All players</option>${Object.keys(counts).sort((a, b) => (a == 10 ? -1 : +a) - (b == 10 ? -1 : +b)).map(p => `<option value="${p}">${playerName(+p)} (${counts[p]})</option>`).join('')}`
+    + Object.entries(TEST).map(([k, v]) => `<option value="test:${k}">${v} (${SONGS.filter(s => s.test?.list === k).length})</option>`).join('');
+  renderList();
+  window.onhashchange = route;
+  route();
+})();
+</script>
+</body>
+</html>

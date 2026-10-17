@@ -9,7 +9,8 @@ Entities have an id "kind:key": char (the game's character list), monster
 (the game's monster list, bosses included), actor (a registry entry: an
 object scripts create with `chara KEY`, or a script command), item, area,
 scene, file (a reconstructed GCL source file), sprite (98F5 large sprite),
-tileset (a CEEF tileset), bgtiles (a map's own tiles) and func (a code function). The tree groups them:
+tileset (a CEEF tileset), bgtiles (a map's own tiles), song (an MP2K song)
+and func (a code function). The tree groups them:
 
 * Cast and Bestiary: the game's own name lists, in its order;
 * Objects (registry entries whose callback or loader loads a sprite, or that
@@ -22,6 +23,8 @@ tileset (a CEEF tileset), bgtiles (a map's own tiles) and func (a code function)
 * Sprites: large sprites and sprite packages in archive (ROM) order;
 * Tiles: the CEEF tileset library's tilesets by the area that uses them,
   and the maps that carry their own tiles (tools/assets/tilesets.py);
+* Sound: the MP2K songs by the music player the song table assigns them
+  (player 10 is the BGM player), from tools/studio/sound.py;
 * Code: subsystems in ROM order, with their functions and decomp status.
 
 rom_tree() is the ROM as nested blocks for tools/studio/rom.html.
@@ -48,7 +51,7 @@ INPUTS = ["data/actor_registry.csv", "data/items.csv", "data/notes.csv",
           "data/sprite_palettes.csv", "data/labels/areas.csv", "data/labels/scenes.csv",
           "data/labels/sprites.csv", "data/labels/palettes.csv", "gcl/names/proc.csv", "gcl/names/chara.csv",
           "gcl/names/files.csv", "symbols/functions.csv", "tools/studio/atlas.py", "tools/assets/actors.py",
-          "tools/assets/tilesets.py", "data/stage_palettes.csv"]
+          "tools/assets/tilesets.py", "data/stage_palettes.csv", "tools/studio/sound.py", "tools/m4a.py"]
 # the monster list's bosses: 黒騎士 and ニーズホッグ (9902-9903), then 伯爵 on (9915-)
 BOSSES = {9902, 9903} | set(range(9915, 9922))
 
@@ -426,6 +429,30 @@ def build():
             addr=f"{b['addr']:08X}", compressed=b["compressed"], maps=b["maps"], stages=b["stages"],
             scenes=[f"scene:{x['scene']}" for x in b["scenes"]])
 
+    # ---- sound: songs by music player, linked to the scenes that start them ----
+    import sound
+    S = sound.load()
+    test_word = {"music": "Music", "effects": "Effect", "voices": "Voice"}
+    for sg in S["songs"]:
+        if sg.get("empty"):
+            continue
+        n, p = sg["n"], sg["player"]
+        group = "Sound/" + ("Music (player 10)" if p == 10 else f"Player {p}")
+        node_rank[group] = -1 if p == 10 else p
+        t = sg["test"]
+        title = N.get(("song", str(n)), {}).get("label") or (f"{test_word[t['list']]} {t['no']}" if t else f"Song {n}")
+        add(f"song:{n}", group, kind="song", key=str(n), order=n, title=title, player=p, addr=sg["addr"],
+            ntracks=len(sg["tracks"]), size=sg["size"], voicegroup=sg["voicegroup"], test=t,
+            scenes=[f"scene:{x['scene']}" for x in sg["scenes"]], scripts=sg["scripts"], shared=sg["shared_files"],
+            code=[c["func"] for c in sg["code"]])
+        for x in sg["scenes"]:
+            sc = E.get(f"scene:{x['scene']}")
+            if sc is not None and f"song:{n}" not in sc.setdefault("songs", []):
+                sc["songs"].append(f"song:{n}")
+                ar = E.get(sc["area"])
+                if ar is not None and f"song:{n}" not in ar.setdefault("songs", []):
+                    ar["songs"].append(f"song:{n}")
+
     # ---- explicit links (data/atlas/links.csv) ----
     for r in csv.DictReader(l for l in open(os.path.join(ROOT, "data", "atlas", "links.csv"), encoding="utf-8") if not l.startswith("#")):
         a, b = r["from"], r["to"]
@@ -489,7 +516,7 @@ def build():
     # ---- tree ----
     node_rank.update({"Sprites/Large sprites": 0, "Sprites/Sprite packages": 1, "Tiles/Tilesets": 0, "Tiles/Map tiles": 1,
                       "Tiles/Tilesets/Not loaded by a scene": 1000, "Tiles/Tilesets/Not loaded by a script": 1001})
-    order = ["Cast", "Bestiary", "Items", "Places", "Objects", "Script routines", "Scripts", "Sprites", "Tiles", "Code"]
+    order = ["Cast", "Bestiary", "Items", "Places", "Objects", "Script routines", "Scripts", "Sprites", "Tiles", "Sound", "Code"]
     root = {}
     for path, ids in tree_items.items():
         node = root
@@ -711,6 +738,56 @@ def rom_tree():
     for label, ls in archives.items():
         ls.sort(key=lambda x: x["s"])
         tops.append({"s": ls[0]["s"], "n": sum(x["n"] for x in ls), "k": ls[0]["k"], "t": titles.get(label, label), "c": ls})
+    # sound (tools/studio/sound.py): the song table, voicegroups, samples and songs
+    import sound
+    S = sound.load()
+    kids = [leaf(int(S["table"]["addr"], 16), S["table"]["size"], "sound", "song table", "node:Sound", "decoded")]
+    vgs = sorted(int(v["addr"], 16) for v in S["voicegroups"])
+    users = {v["addr"]: v["songs"] for v in S["voicegroups"]}
+    vg_leaves = []
+    for i, a in enumerate(vgs):
+        end = min(vgs[i + 1] if i + 1 < len(vgs) else a + 128 * 12, a + 128 * 12)
+        u = users.get(f"{a:08X}", [])
+        vg_leaves.append(leaf(a, end - a, "sound", f"voicegroup {a:08X}" + (f" ({len(u)} songs)" if u else " (inside another)"),
+                              f"/sound#vg={a:08X}", "decoded"))
+    sm_leaves = [leaf(int(x["addr"], 16), x["size"], "sound", f"sample {x['addr']}" + (f" · {x['rate']} Hz" if x.get("rate") else " · GB wave"),
+                      f"/sound#sample={x['addr']}", "decoded") for x in S["samples"]]
+    song_leaves, last = [], 0
+    titles_ = sound.titles()
+    for sg in sorted((x for x in S["songs"] if not x.get("empty")), key=lambda x: x["start"]):
+        a, b = max(sg["start"], last), int(sg["addr"], 16) + 8 + 4 * len(sg["tracks"])
+        if b <= a:
+            continue
+        last = b
+        name = titles_.get(sg["n"])
+        song_leaves.append(leaf(a, b - a, "sound", f"song {sg['n']}" + (f" {name}" if name else ""), f"song:{sg['n']}", "named" if name else "decoded"))
+    # what the walk doesn't reach inside the documented sound regions
+    # (keysplit tables, the player table, padding) stays in the Sound block;
+    # alignment bytes after a block join it
+    ordered = sorted(vg_leaves + sm_leaves + song_leaves + kids, key=lambda x: x["s"])
+    other = []
+    for a, b, kind, label in seg["regions"]:
+        if kind != "sound" or "SoundMainRAM" in label:
+            continue
+        p, prev = a, None
+        for x in ordered + [None]:
+            x0 = b if x is None else x["s"]
+            if x is not None and (x0 + x["n"] <= p or x0 >= b):
+                continue
+            x0 = min(x0, b)
+            if x0 - p >= 16:
+                name = "music player table (gMPlayTable)" if p == sound.PLAYER_TABLE else f"{label.split(' (')[0]}: not walked"
+                other.append(leaf(p, x0 - p, "sound", name, "node:Sound", "decoded" if p == sound.PLAYER_TABLE else "located"))
+            elif x0 > p and prev is not None and prev["s"] + prev["n"] == p:
+                prev["n"] += x0 - p
+            if x is None:
+                break
+            p, prev = max(p, x["s"] + x["n"]), x
+    for title, ls in (("Voicegroups", vg_leaves), ("Samples", sm_leaves), ("Songs", song_leaves), ("Other sound data", other)):
+        if ls:
+            kids.append({"s": ls[0]["s"], "n": sum(x["n"] for x in ls), "k": "sound", "t": title, "c": ls})
+    kids.sort(key=lambda x: x["s"])
+    tops.append({"s": kids[0]["s"], "n": sum(x["n"] for x in kids), "k": "sound", "t": "Sound (MP2K)", "c": kids})
     # the documented regions that items don't cover (sound, text, scripts, graphics, tables)
     covered = sorted((c["s"], c["s"] + c["n"]) for t in tops for c in (t.get("c") or [t]) for c in (c.get("c") or [c]))
     merged = []
