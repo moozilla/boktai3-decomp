@@ -795,7 +795,8 @@ views.pool = {
     for (let i = start; i < Math.min(pool.n, start + 32); i++) {
       const card = document.createElement('div'); card.className = 'palcard' + (i === want ? ' on' : '');
       const us = this.users[i] || [], lab = noteOf('pool', String(i))?.label;
-      card.innerHTML = `<code>#${i}</code>${lab ? ` <b>${esc(lab)}</b>` : ''} <span class="meta">${us.length ? us.length + ' use' + (us.length > 1 ? 's' : '') : 'unused as far as known'}</span><div class="pal" style="grid-template-columns:repeat(16,14px)">${pool.entry(i).map(([r, g, b]) => `<i style="background:rgb(${r},${g},${b})"></i>`).join('')}</div><div class="uses" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>`;
+      const fs = (learned.poolfuncs || {})[i] || [];
+      card.innerHTML = `<code>#${i}</code>${lab ? ` <b>${esc(lab)}</b>` : ''} <span class="meta">${us.length ? us.length + ' use' + (us.length > 1 ? 's' : '') : fs.length ? 'a state palette code applies' : 'unused as far as known'}</span><div class="pal" style="grid-template-columns:repeat(16,14px)">${pool.entry(i).map(([r, g, b]) => `<i style="background:rgb(${r},${g},${b})"></i>`).join('')}</div><div class="uses" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>${fs.length ? `<div class="meta" style="margin-top:4px">selected in code by ${fs.map(([f, n]) => { const a = f.replace(/^sub_/, ''); return /^[0-9A-F]{8}$/.test(a) ? peekLink(codeHref(a), esc(n || f)) : esc(n || f); }).join(', ')}</div>` : ''}`;
       const box = card.querySelector('.uses');
       for (const u of us.slice(0, 24)) {
         const a = document.createElement('a');

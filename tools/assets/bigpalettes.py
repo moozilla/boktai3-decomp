@@ -11,7 +11,11 @@ then selects variants for different monsters or states sharing one sprite
 from two sources: a runtime log of every AnimData_SelectPaletteBank call while
 the game visits every scene (tools/mgba/palette_survey.lua ->
 build/centaur/sprite_pools.tsv, folded into data/sprite_palettes.csv by
-`write`), and constant call pairs in the code (below).
+`write`), constant call pairs in the code (below), and the enemy palette
+keyword: enemy create code selects Script_GetKeywordValue('C') + a constant
+base (the ghoul 9247: 402 + C), so every C value the scripts pass to that
+family's spawner key gives a variant (`keyword()`, through
+tools/assets/symeval.py and the readable GCL).
 
 Code pairs: AnimData_Load(anim, hash) (082151E4) and then
 AnimData_SelectPaletteBank(anim, pool_index) (08215284), which points the
@@ -83,6 +87,114 @@ def pools():
     return {h: dict(v) for h, v in out.items()}
 
 
+KEYWORD = "sub_0821ABA8"  # Script_GetKeywordValue(letter, default)
+
+
+@functools.lru_cache(None)
+def keyword():
+    """{hash: {pool: "script C=n (base b)"}}: enemy palettes base + C."""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import symeval
+    bases = collections.defaultdict(set)
+    for s in symeval.call_sites(os.path.join(ROOT, "gen", "code.s")):
+        v, h = s["argv"], s.get("hashv")
+        if s["kind"] != "pal" or not v or v[0] != "add" or not h or h[0] != "c":
+            continue
+        call, base = (v[1], v[2]) if v[2][0] == "c" else (v[2], v[1])
+        if call[0] == "call" and call[1] == KEYWORD and len(call) > 2 and call[2] == ord("C") and base[0] == "c":
+            bases[h[1] & 0xFFFF].add(base[1])
+    cvals = script_option_values("C")
+    import actors
+    keys_of = collections.defaultdict(set)
+    for a in actors.actors():
+        for sp in a.get("sprites", []):
+            if sp.get("kind") == "big":
+                keys_of[int(sp["hash"], 16)].add(int(a["key"], 16))
+    out = {}
+    for h, bs in bases.items():
+        cs = set()
+        for k in keys_of.get(h, ()):
+            cs |= cvals.get(k, set())
+        for b in bs:
+            for c in cs:
+                out.setdefault(h, {})[b + c] = f"script C={c} (base {b})"
+    return out
+
+
+@functools.lru_cache(None)
+def code_selections():
+    """{pool entry: sorted functions that select it with a constant}: every
+    AnimData_SelectPaletteBank call with a constant entry, including the shared
+    state palettes code applies to whatever actor it handles (fades, hit
+    flashes) rather than to one sprite."""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import symeval
+    out = collections.defaultdict(set)
+    for s in symeval.call_sites(os.path.join(ROOT, "gen", "code.s")):
+        v = s["argv"]
+        if s["kind"] == "pal" and v and v[0] == "c":
+            out[v[1]].add(s["func"])
+    return {p: sorted(fs) for p, fs in out.items()}
+
+
+def script_option_values(letter):
+    """{registry key: set of constant values} of option -LETTER in chara/command
+    calls; an argument is followed up through the procedures that call it, and
+    a call without the option counts as the default 0."""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import actors
+    import gclview
+    img = gclview._image()
+    procs = {c: gclview.procedure(img, c) or [] for c in actors.procs()}
+    callers = collections.defaultdict(list)
+
+    def walk(st, cid, fn):
+        for s in st:
+            fn(s, cid)
+            for x in s[1:]:
+                val(x, cid, fn)
+
+    def val(x, cid, fn):
+        if isinstance(x, tuple):
+            if x and x[0] == "block":
+                walk(x[1], cid, fn)
+            elif x and x[0] == "call":
+                walk([x], cid, fn)
+            else:
+                for y in x:
+                    val(y, cid, fn)
+        elif isinstance(x, list):
+            for y in x:
+                val(y, cid, fn)
+
+    for c, st in procs.items():
+        walk(st, c, lambda s, cid: callers[s[1]].append((cid, s[2])) if s[0] == "call" else None)
+
+    def consts(v, cid, depth=0):
+        if v is None or depth > 6:
+            return set()
+        if v[0] == "int":
+            return {v[1]}
+        if v[0] == "arg":
+            out = set()
+            for caller, args in callers.get(cid, []):
+                if v[1] - 1 < len(args):
+                    out |= consts(args[v[1] - 1], caller, depth + 1)
+            return out
+        return set()
+
+    out = collections.defaultdict(set)
+
+    def opt(s, cid):
+        if s[0] == "cmd" and s[1] in ("chara", "command") and s[3] and s[3][0][0] == "int":
+            vs = [v for lt, v in s[4] if lt == letter]
+            out[s[3][0][1]] |= consts(vs[0][0], cid) if vs and vs[0] else {0}
+
+    for c, st in procs.items():
+        walk(st, c, opt)
+    return out
+
+
 CSV = os.path.join(ROOT, "data", "sprite_palettes.csv")
 RUNTIME = os.path.join(ROOT, "build", "centaur", "sprite_pools.tsv")
 
@@ -139,7 +251,7 @@ def variants(h):
 
 def write():
     import csv
-    rt, code, d = runtime(), pools(), defaults()
+    rt, code, d, kw = runtime(), pools(), defaults(), keyword()
     old = table()
     with open(CSV, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f, lineterminator="\n")
@@ -150,8 +262,13 @@ def write():
                 v[p] = "run " + " ".join(sorted(callers))
             for p, fs in code.get(h, {}).items():
                 v.setdefault(p, "code " + " ".join(fs))
+            for p, src in kw.get(h, {}).items():
+                if p not in v:
+                    v[p] = src
+                elif src not in v[p]:
+                    v[p] += " + " + src
             w.writerow([f"{h:04X}", d[h], ";".join(f"{p}@{v[p]}" for p in sorted(v))])
-    print(f"{CSV}: {len(d)} sprites, {sum(1 for h in d if h in rt or h in code)} with variants seen")
+    print(f"{CSV}: {len(d)} sprites, {sum(1 for h in d if h in rt or h in code or h in kw)} with variants known")
 
 
 def main():
