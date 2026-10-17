@@ -3,7 +3,7 @@ extern u8 gUnk_03004FC0[];
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void *ScriptProc_Start(u32, u32);
-void sub_082161B4(u32, u32, void *, u32, u32, u32, u32 *);
+void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void ResourceHeader_Relocate(u8 *, void *);
 void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
 void sub_081DC1B4(u32);
@@ -30,7 +30,7 @@ u32 sub_081DBE04(u8 *s)
     a = ScriptProc_Start(0xC091, 0x3536);
     *(void **)(s + 0x18) = a;
     value = 6;
-    sub_082161B4(2, 0, a, 0, zero, one = 1, &value);
+    Bg_SetupLayers(2, 0, a, 0, zero, one = 1, &value);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
     p = (u8 *)ScriptProc_Start(0x92B3, 0x204) + 0x14;
     CpuSet(p, gUnk_03004FC0, 0x100);

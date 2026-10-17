@@ -4,7 +4,7 @@ extern u8 gUnk_03004FC0[];
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void *ScriptProc_Start(u32, u32);
-void sub_082161B4(u32, u32, void *, u32, u32, u32, u32 *);
+void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void sub_082164AC(u32, void *, u32);
 void sub_081E2DA0(void)
 {
@@ -29,7 +29,7 @@ void sub_081E2DA0(void)
     }
     p = ScriptProc_Start(0xC091, id);
     value = zero;
-    sub_082161B4(0, 0, p, 0, zero, one, &value);
+    Bg_SetupLayers(0, 0, p, 0, zero, one, &value);
     sub_082164AC(0, p, 4);
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero);
     src = (u16 *)((u8 *)ScriptProc_Start(0x92B3, pal) + 0x1B4);
