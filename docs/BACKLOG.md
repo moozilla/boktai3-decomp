@@ -234,3 +234,18 @@ results and separate model usage records.
 Register pinning is now explicitly authorized (October 12): use marked local
 register declarations for exact matching, with cleanup deferred. Track their
 source completeness separately through decomp.dev progress categories.
+
+## Sprite palettes: unreached sprites (backlogged October 17, 2026)
+
+`tools/assets/paltrace.py` resolves 303 of the 419 palette calls; 108 sprites
+are fully accounted for (34 default only). 171 sprites are neither traced to
+a load nor loaded in any scene of the palette survey: probably bosses,
+events and menus the survey doesn't reach, or unused. The next step would be
+debug scenarios (`tools/mgba/scenario.lua`, late-game save, `call` of the
+boss and event spawner procedures) with `PALETTE_LOG=1`, which now logs
+every sprite load with its caller as well (`sprite_loads.tsv`), then
+`bigpalettes.py write`. Open static cases: sprite `848F` passed through a
+descriptor in four functions, the floor switch's `T=` sprites `17C7`-`17CB`
+(a table), and `-t` values the GCL computes for `08055268`. Backlogged in
+favor of Studio and tooling work; the scenarios would also give runtime
+coverage of boss code for the decomp if picked up.
