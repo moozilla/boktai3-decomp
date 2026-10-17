@@ -52,7 +52,8 @@ INPUTS = ["data/actor_registry.csv", "data/items.csv", "data/notes.csv",
           "data/labels/sprites.csv", "data/labels/palettes.csv", "gcl/names/proc.csv", "gcl/names/chara.csv",
           "gcl/names/files.csv", "symbols/functions.csv", "tools/studio/atlas.py", "tools/assets/actors.py",
           "tools/assets/tilesets.py", "data/stage_palettes.csv", "tools/studio/sound.py", "tools/m4a.py",
-          "tools/assets/cutscenes.py", "tools/mgba/scenes.py", "tools/assets/gclfiles.py"]
+          "tools/assets/cutscenes.py", "tools/mgba/scenes.py", "tools/assets/gclfiles.py",
+          "tools/assets/areas.py", "tools/assets/stages.py"]
 # the monster list's bosses: 黒騎士 and ニーズホッグ (9902-9903), then 伯爵 on (9915-)
 BOSSES = {9902, 9903} | set(range(9915, 9922))
 
