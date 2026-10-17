@@ -11,7 +11,7 @@ void sub_08215A74(u32, u32);
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 u8 *ScriptProc_Start(u32, u32);
-void sub_082161B4(u32, u32, void *, u32, u32, u32, u32 *);
+void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 s32 sub_08210A1C(s32);
 void sub_08215EB4(s32, s32, s32, s32, s32, s32, s32, s32);
 void sub_08210D60(u8 *p)
@@ -29,7 +29,7 @@ void sub_08210D60(u8 *p)
         u8 *res = ScriptProc_Start(0xc091, 0x3536);
         *(u8 **)(p + 0x18) = res;
         size = 16;
-        sub_082161B4(2, 0, res, 0, 0, 1, &size);
+        Bg_SetupLayers(2, 0, res, 0, 0, 1, &size);
     }
     sub_08215A74(3, 3);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);

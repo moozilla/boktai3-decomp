@@ -5,7 +5,7 @@ void ScenePanel_InitBackground(struct ScenePanel *panel)
     s32 id;
     panel->backgroundMap = map;
     id = 0;
-    sub_082161B4(3, 0, map, 0, 0, 1, &id);
+    Bg_SetupLayers(3, 0, map, 0, 0, 1, &id);
     sub_082164AC(1, panel->backgroundMap, 0);
     {
         u16 *control = &gUnk_03004BD8;
