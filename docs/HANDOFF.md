@@ -23,6 +23,13 @@ README badges (live from decomp.dev). Don't copy totals into other files.
 
 Recent work, newest first (details in [history](history/README.md)):
 
+* **Saves decoded; a save at every checkpoint** (2026-10-17): two files of
+  three checksummed regions (script variables, game state, continuation;
+  ENGINE.md section 14). `tools/assets/saves.py` reads saves and VBA-M
+  savestates and writes saves; `saves.py bank --make` turns the 83-checkpoint
+  savestate bank (`../boktai3trans/saves`) into battery saves that boot
+  headless into their scene (all 83 checked). Story beats and scenes list
+  their checkpoints in Browse.
 * **Story progress and the first dungeon** (2026-10-17): story progress
   (`r708[0x3C]`) is the quest log, 173 values; `tools/assets/story.py` and
   Browse › Story list each beat with its scene, cutscene and the doors and

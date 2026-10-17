@@ -47,7 +47,10 @@ committed, and neither is anything generated from it (`build/`, `extracted/`).
 ## Mapping data
 
 * Run the game headless: `tools/emu/harness baserom.gba tests/X.txt OUTDIR`
-  (with `BOKTAI3_SAV=tests/saves/ShinBok2.sav` for a late-game save). Commands are
+  (with `BOKTAI3_SAV=tests/saves/ShinBok2.sav` for a late-game save, or
+  `BOKTAI3_SAV=build/saves/NNNN.sav` for any of 83 checkpoints across the story:
+  `python3 tools/assets/saves.py bank --make` builds them from the savestate bank
+  in `../boktai3trans/saves`, `saves.py bank` lists them). Commands are
   listed at the top of `tools/emu/harness.c`. `mark NAME` records coverage per
   segment; `dump`, `watch ADDR:LEN` and `shot` are available.
 * `tools/coverage.py diff A.read B.read` lists what one screen reads that
