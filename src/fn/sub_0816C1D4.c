@@ -13,7 +13,7 @@ struct S1D4 {
     u8 index;
     u8 state;
 };
-void sub_082164AC(u32, u32, u32);
+void Bg_SetLayerMap(u32, u32, u32);
 void sub_0816BA90(struct S1D4 *);
 void sub_0816BC54(struct S1D4 *);
 void sub_0816BB10(struct S1D4 *);
@@ -21,7 +21,7 @@ void sub_0816C1A4(struct S1D4 *);
 void sub_0816C1D4(struct S1D4 *s)
 {
     if (s->state == 1) {
-        sub_082164AC(1, s->arg, s->entries[s->index].value);
+        Bg_SetLayerMap(1, s->arg, s->entries[s->index].value);
         sub_0816BA90(s);
         sub_0816BC54(s);
     } else {

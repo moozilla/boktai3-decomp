@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define Player_SetSlotValueFromScript sub_0815A97C
 #include "engine.h"
 extern u8 *gUnk_02000580[];
 extern u16 gUnk_02000548[];

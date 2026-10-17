@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define Camera_SetBounds sub_08226BE0
 struct Rect {
     u16 x, y, w;
 };

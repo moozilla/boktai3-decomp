@@ -4,7 +4,7 @@ struct V {
 };
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-void sub_08226BE0(void *, void *);
+void Camera_SetBounds(void *, void *);
 void sub_08226C44(void)
 {
     struct V a, b;
@@ -16,7 +16,7 @@ void sub_08226C44(void)
             b.x = Script_GetValue();
             b.y = Script_GetValue();
             b.z = Script_GetValue();
-            sub_08226BE0(&a, &b);
+            Camera_SetBounds(&a, &b);
         }
     }
 }

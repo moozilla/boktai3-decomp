@@ -1,6 +1,6 @@
 #include "modifier_list.h"
 void ModifierMenu_ResetBackground(struct ModifierMenu *);
-void sub_082164AC(u32, void *, u32);
+void Bg_SetLayerMap(u32, void *, u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void ModifierMenu_DrawBackground(struct ModifierMenu *menu)
 {
@@ -20,7 +20,7 @@ void ModifierMenu_DrawBackground(struct ModifierMenu *menu)
                 visible = 0;
                 break;
         }
-        sub_082164AC(2, menu->backgroundResource, visible);
+        Bg_SetLayerMap(2, menu->backgroundResource, visible);
         BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
     } while (0);
 }

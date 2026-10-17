@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define Bg_SetLayerMap sub_082164AC
 struct BgResource {
     u8 signature[2];
     u16 unk02;

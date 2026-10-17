@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define ScriptActor_SetLifeEnergyFromScript sub_0815A578
 s32 Script_GetKeywordValue(s32, s32);
 struct Actor {
     u8 pad[0x424];

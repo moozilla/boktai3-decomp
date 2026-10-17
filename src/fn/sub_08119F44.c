@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define Glove_StopFromScript sub_08119F44
 #include "engine.h"
 struct GloveDraw {
     u8 pad0[0x16];

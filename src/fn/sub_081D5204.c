@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define GameState_SetEventFlag sub_081D5204
 extern u8 *gUnk_02000710;
 /* Sets flag 0-82 in the three words at game state +0x6F0 (tentative). */
 void GameState_SetEventFlag(u32 flag)

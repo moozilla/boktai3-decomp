@@ -9,7 +9,7 @@ s32 sub_0806A160(const struct ContactPosition *, u8, const struct ContactPositio
 void SceneActorPlacement_PlayCategoryEventSound(void *);
 void sub_0812E714(void *);
 void *sub_081D4F20(u32, u32);
-void sub_081D5204(void *);
+void GameState_SetEventFlag(void *);
 void SceneActorRecord_RecordPair(u16, u16);
 extern u16 gUnk_030039F0;
 static inline u32 NextRandom(const u16 *table)
@@ -208,7 +208,7 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
         Script_Call(script, &arguments);
     }
     if (!Flag(actor, 0x4000, 0x2D4) && (u32)(actor->category - 11) > 2)
-        sub_081D5204(sub_081D4F20(actor->category, actor->paletteOffset));
+        GameState_SetEventFlag(sub_081D4F20(actor->category, actor->paletteOffset));
     SetControl(actor);
     {
         register u8 behavior asm("r1") = 2;

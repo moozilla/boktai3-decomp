@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define Pool1B8_Allocate sub_08107240
 struct Pool {
     u8 pad[0x38];
     u8 *slots[12];
