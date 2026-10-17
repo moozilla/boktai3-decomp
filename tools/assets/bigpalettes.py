@@ -144,6 +144,21 @@ def script_option_values(letter, index=0):
     -LETTER in chara/command calls; an argument is followed up through the
     procedures that call it, and a call without the option counts as the
     default 0."""
+    out = collections.defaultdict(set)
+    for key, calls in script_option_calls().items():
+        for c in calls:
+            if index == "*":  # any of the option's values
+                vs = set().union(*[v for (lt, _), v in c.items() if lt == letter])
+                out[key] |= vs or {0}
+            else:
+                out[key] |= c.get((letter, index), {0})
+    return out
+
+
+@functools.lru_cache(None)
+def script_option_calls():
+    """{registry key: [{(letter, index): set of constant values}]}, one dict
+    per chara/command call, so options passed together stay together."""
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     import actors
     import gclview
@@ -186,12 +201,15 @@ def script_option_values(letter, index=0):
             return out
         return set()
 
-    out = collections.defaultdict(set)
+    out = collections.defaultdict(list)
 
     def opt(s, cid):
         if s[0] == "cmd" and s[1] in ("chara", "command") and s[3] and s[3][0][0] == "int":
-            vs = [v for lt, v in s[4] if lt == letter]
-            out[s[3][0][1]] |= consts(vs[0][index], cid) if vs and len(vs[0]) > index else {0}
+            c = {}
+            for lt, v in s[4]:
+                for i, x in enumerate(v or []):
+                    c[lt, i] = consts(x, cid)
+            out[s[3][0][1]].append(c)
 
     for c, st in procs.items():
         walk(st, c, opt)
@@ -275,7 +293,12 @@ def write():
         w = csv.writer(f, lineterminator="\n")
         w.writerow(["hash", "default", "variants"])
         for h in sorted(d):
-            v = {p: s for p, s in old.get(h, {}).get("variants", {}).items()}
+            v = {}
+            for p, src in old.get(h, {}).get("variants", {}).items():
+                # traced entries are rebuilt from the current trace
+                src = " + ".join(x for x in src.split(" + ") if not x.startswith("trace "))
+                if src:
+                    v[p] = src
             for p, callers in rt.get(h, {}).items():
                 v[p] = "run " + " ".join(sorted(callers))
             for p, fs in code.get(h, {}).items():

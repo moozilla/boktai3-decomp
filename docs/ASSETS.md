@@ -107,27 +107,43 @@ selects `0x16C`/`0x16D` (pressed and released).
 **Tracing every palette call** (`tools/assets/paltrace.py`). There are 419
 `AnimData_SelectPaletteBank` calls; 254 pass a constant. The rest compute
 the entry, and the tracer follows the computation through code and ROM data:
-a value a caller passes (symbolically, so a descriptor pointer becomes a ROM
-address whose fields are read), a ROM table (indexed by a caller's constant,
-or every entry while it names a sprite), an actor field (the values the
-code of the same script entry point stores there: the registry routine or
-command and everything it calls or installs from code and ROM callback
-tables, not following helpers shared by many entry points), an option the
-scripts pass (`Script_GetKeywordValue`, or an inline `Script_SeekToKeyword` +
-`Script_GetValue`, values in order) and a name hash (`sub_08219BD8`, the
-16-bit hash of a ROM string: sprites named in code). The sprite is the load
-on the same anim, else the function's last load, else the family's load on
-an anim at the same offset (or its only sprite). 291 calls resolve; the
-others need game state, RAM lists (named objects at `0x02000494`), script
-positional values or descriptors copied at runtime (`sub_0821FF58`,
-`sub_0821983C`). Checked against the runtime logs, every pair the game used
-at a traced call is traced except at 4 calls, and none contradicts it;
-the traced pairs it never saw are variants the runs did not reach (Ghoul+
-405, Mummy+ 36-39, the 402 damage flash on more enemies). `paltrace.py
-closure` lists the sprites whose palettes are all accounted for: 99, 26 of
-them default only. 188 sprites are never loaded with a hash the code
-shows (they come from data the descriptor copies carry), so they can't be
-closed yet. `bigpalettes.py write` adds traced variants as `trace FUNC`.
+
+* a value a caller passes, in registers or on the stack, symbolically, so a
+  descriptor pointer becomes a ROM address whose fields are read;
+* a structure a caller builds in its own stack frame (directly, or through a
+  setter such as `sub_0821FF7C(&desc, ...)`, whose stores through its
+  pointer argument are applied at the call) and passes to a loader;
+* a ROM table, indexed by a caller's constant, or every entry while the
+  entry's hash names a sprite;
+* an actor field: the values that the code of the same script entry point
+  (the registry routine or command and everything it calls or installs from
+  code and ROM callback tables, not following helpers shared by many entry
+  points) stores at that offset of an object reached the same way (an
+  incoming pointer or a new object, or a pointer read from a field);
+* a script option (`Script_GetKeywordValue`, or an inline
+  `Script_SeekToKeyword` + `Script_GetValue`, values in order, any value
+  when read in a loop), with options read together paired per script call
+  (`08055268` takes its sprite from `-t` and its palette from `-c`);
+* a name hash (`sub_08219BD8`, the 16-bit hash of a ROM string).
+
+The sprite is the load on the same anim, else the function's last load,
+else the family's load on an anim at the same offset (or its only sprite).
+Entries are often arithmetic on such values: the `0BA8` family is
+`160 + 3 * (d / 2)` (+1, +2) from `-d`. 303 calls resolve; the others need
+game state, RAM lists (named objects at `0x02000494`) or script values the
+GCL computes. `paltrace.py check` compares with the runtime logs: at every
+traced call, every pair the game used is traced except at a few calls, and
+none contradicts it; of the functions the survey saw loading sprites
+(`sprite_loads.tsv`, every `AnimData_Load` with its caller), 77 of 85 have
+every sprite traced. Traced pairs the runs never reached are variants such as Ghoul+
+405, Mummy+ 36-39 and the 402 damage flash on more enemies. `paltrace.py
+closure` lists the sprites whose palettes are all accounted for (every
+family that loads them has every palette call resolved): 108, 34 of them
+default only. The others are loaded by code whose sprite or palette is
+still open, or by nothing found yet: 171 sprites are neither traced to a
+load nor loaded in any scene of the survey (bosses, events and menus it
+doesn't reach, or unused). `bigpalettes.py write` adds traced variants as `trace FUNC`.
+Evaluations are cached in `build/cache/` (a run takes about 20 s).
 
 **Items, swords and accessories** (`tools/assets/items.py` → `data/items.csv`).
 Their names are text strings at a fixed base plus the ID: items 988 + ID
