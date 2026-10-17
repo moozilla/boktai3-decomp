@@ -24,7 +24,8 @@
 --   quit                  stop (also at the end of the file)
 --
 -- PALETTE_LOG=1 also logs every large-sprite palette selection to
--- OUTDIR/sprite_pools.tsv (scene, hash, pool entry, caller).
+-- OUTDIR/sprite_pools.tsv (scene, hash, pool entry, caller) and every sprite
+-- load to OUTDIR/sprite_loads.tsv (scene, hash, caller).
 --
 -- Spawning an actor is a `call` of its spawner procedure with arguments
 -- (gcl/names/proc.csv names them: spawn_slime_by_color, place_bat, ...).
@@ -47,7 +48,14 @@ if os.getenv("PALETTE_LOG") then
   local pf = io.open(OUTDIR .. "/sprite_pools.tsv", "w")
   pf:write("scene\thash\tpool\tcaller\n")
   local anim_hash, seen = {}, {}
-  emu:setBreakpoint(function() anim_hash[emu:readRegister("r0")] = emu:readRegister("r1") & 0xFFFF end, 0x082151E4)
+  local lf, lseen = io.open(OUTDIR .. "/sprite_loads.tsv", "w"), {}
+  lf:write("scene\thash\tcaller\n")
+  emu:setBreakpoint(function()
+    local h = emu:readRegister("r1") & 0xFFFF
+    anim_hash[emu:readRegister("r0")] = h
+    local k = string.format("%d\t%04X\t%08X", scene() or -1, h, (emu:readRegister("lr") - 1) & ~1)
+    if not lseen[k] then lseen[k] = true; lf:write(k, "\n"); lf:flush() end
+  end, 0x082151E4)
   emu:setBreakpoint(function()
     local a, p, lr = emu:readRegister("r0"), emu:readRegister("r1") & 0xFFFF, emu:readRegister("lr")
     local h = anim_hash[a]
