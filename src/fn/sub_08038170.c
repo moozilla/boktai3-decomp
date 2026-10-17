@@ -20,7 +20,7 @@ extern u32 gUnk_03003A50, gUnk_03005308;
 extern u16 gUnk_0203B400[];
 int Mod(int, int);
 void sub_0822D808(int, struct ItemInfo *);
-int sub_0822E618(int);
+int GameState_GetUnlockEntry(int);
 void sub_0822EA8C(int, int);
 void sub_0822EACC(int);
 void sub_08038170(struct P *input)
@@ -272,7 +272,7 @@ void sub_08038170(struct P *input)
         row = (s16 *)((u8 *)*t + offset + 0x78);
         if (*row < 0)
             missing = 1;
-        else if (sub_0822E618(*row) == 1) {
+        else if (GameState_GetUnlockEntry(*row) == 1) {
             register int t asm("r0") = 1;
             usable = t;
         }
