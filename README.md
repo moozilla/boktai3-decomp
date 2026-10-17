@@ -87,7 +87,8 @@ python3 tools/studio/serve.py    # http://localhost:8642
 
 **Browse** (`/atlas`) is the way in: everything in the game as one tree
 (characters, the monster list in the game's order, objects, places in story
-order, items, scripts, script commands, sprites, songs and code by subsystem), each
+order, cutscenes with their timelines, items, scripts, script commands, sprites,
+songs and code by subsystem), each
 with one page of everything known about it: a monster family's species and
 every palette its sprites are drawn in, where it appears, the scripts that
 create it and how much of its code is decompiled. ⌘K searches everything;
