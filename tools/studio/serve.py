@@ -297,6 +297,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif self.path == "/api/rommap":
             import atlas
             self.send(200, atlas.rom_load())
+        elif self.path == "/api/romtree":
+            import atlas
+            self.send(200, atlas.rom_tree())
         elif self.path == "/api/atlas/funcs":
             import atlas
             self.send(200, atlas.load()["funcs"])
@@ -377,6 +380,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             import bigpalettes  # large sprites: default from the data, variants the game selects
             self.send(200, {"stages": live.stage_palettes(), "sprites": live.sprite_palettes(),
                             "bigpools": {f"{h:04X}": bigpalettes.variants(h) for h in bigpalettes.defaults()},
+                            "bigsources": {f"{h:04X}": {str(p): src for p, src in t["variants"].items()} for h, t in bigpalettes.table().items()},
                             "poolfuncs": {p: [[f, actors.fname(int(f[4:], 16)) if f.startswith("sub_") else f] for f in fs]
                                           for p, fs in bigpalettes.code_selections().items()}})
         elif self.path == "/api/tags":

@@ -62,6 +62,8 @@ canvas { image-rendering: pixelated; display: block; }
 .legend b { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
 .row .lab { color: var(--ink); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #ms svg * { pointer-events: auto; }
+body.bare #view > h2, body.bare #view > .noteed, body.bare #view > .meta:not(#hover), body.bare #view > .controls { display: none; }
+body.bare #view { padding: 6px; }
 body.embed #side { display: none; }
 body.embed main { grid-template-columns: 1fr; }
 @media (max-width: 760px) { main { grid-template-columns: 1fr; height: auto; } #side { height: 40vh; } }
@@ -129,12 +131,15 @@ const noteKeyOf = key => tab === 'maps' ? key.split('-')[0] : key;
 const labelOf = i => NOTE_KIND[tab] && noteOf(NOTE_KIND[tab], noteKeyOf(i.key))?.label;
 // labels of a package's frames, for searching ("Healing Potion" finds 5D04)
 const frameLabels = i => (tab === 'sprites' || tab === 'big') ? Object.values(NOTES_DB).filter(n => n.kind === (tab === 'big' ? 'bigframe' : 'sprframe') && n.key.startsWith(i.key + '/')).map(n => n.label).concat(tab === 'sprites' ? Object.entries(ITEM_FRAMES).filter(([k]) => k.startsWith(i.key + '/')).flatMap(([, l]) => l.map(x => x.name + ' ' + x.jp)) : []).join(' ') : '';
-let wantFrame = null;
+// ?bare=1 (with embed): only the picture, for pages that embed a map
+if (new URLSearchParams(location.search).has('bare')) document.body.classList.add('bare');
+let wantFrame = null, wantArg = null;  // #tab/key/frame; for pool and maps the third part is an argument
 
 function route() {
   const [t, s, f] = (location.hash.slice(1) || 'sprites').split('/');
   tab = views[t] ? t : 'sprites';
-  wantFrame = f !== undefined && f !== '' ? +f : null;
+  wantFrame = f !== undefined && f !== '' && /^\d+$/.test(f) ? +f : null;
+  wantArg = (location.hash.slice(1).split('/')[t === 'maps' ? 3 : 2]) || null;
   markNav();
   views[tab].init().then(() => {
     renderList();
@@ -168,7 +173,7 @@ function select(key, scroll) {
 async function refresh() {
   clearInterval(timer); timer = null;
   if (sel === undefined) return;
-  await views[tab].show(sel);
+  await views[tab].show(sel, tab === 'pool' ? wantArg : undefined);
   const h = $('view').querySelector('h2');
   if (h && NOTE_KIND[tab] && sel && !LIVE) h.after(noteEditor(NOTE_KIND[tab], noteKeyOf(sel), renderList));
   wantFrame = null;
@@ -337,7 +342,7 @@ views.big = {
     v.innerHTML = `<h2>Large sprite ${h}</h2><div class="meta">${NOTES[h] ? NOTES[h] + ' · ' : ''}${frames.length} frames · ${r.w}×${r.h} · palette entry <a href="#pool/${lp}">${lp}</a>${noteOf('pool', String(lp))?.label ? ' ' + esc(noteOf('pool', String(lp)).label) : ''}${lp === dflt ? ' (default, from the sprite data)' : ' (a variant the code selects)'}, centre (${r.cx}, ${r.cy}) · frame order shown, not the game's animation timing</div>
       <div class="controls"><label>Speed <select id="spd"><option value="4">fast</option><option value="8" selected>normal</option><option value="16">slow</option></select></label>${variants.length > 1 ? ` <label>Palette <select id="bigpool">${variants.map(p => `<option value="${p}"${p === lp ? ' selected' : ''}>pool ${p}${p === dflt ? ' (default)' : ''}${noteOf('pool', String(p))?.label ? ' · ' + esc(noteOf('pool', String(p)).label) : ''}</option>`).join('')}</select></label>` : ''} <span id="tagslot"></span></div>
       <div class="stage" id="stage"></div><div id="framenote"></div><div class="strip" id="strip"></div>
-      <h2 style="margin-top:20px">All large sprites</h2><div class="meta">First frame of each; click to open.</div><div class="grid" id="all"></div>`;
+      ${EMBED ? '' : '<h2 style="margin-top:20px">All large sprites</h2><div class="meta">First frame of each; click to open.</div><div class="grid" id="all"></div>'}`;
     const ps = frames.map(f => big.parts(f)), all = ps.flat();
     const box = all.length ? [Math.min(...all.map(p => p.x)), Math.min(...all.map(p => p.y)), Math.max(...all.map(p => p.x + p.w)), Math.max(...all.map(p => p.y + p.h))] : null;
     const imgs = ps.map(p => compose(p, colors, box));
@@ -347,6 +352,7 @@ views.big = {
     if ($('bigpool')) $('bigpool').onchange = e => { bigPool[h] = +e.target.value; views.big.show(h); };
     frameStrip(imgs.length, k => imgs[k], wantFrame, 'bigframe', h);
     const grid = $('all'), poolColors = {};
+    if (!grid) return;
     await Promise.all(big.recs.map(async rr => { poolColors[rr.hash] = await packageColors(null, rr.pal); }));
     big.recs.forEach((rr, k) => {
       const c = document.createElement('div'); c.className = 'cell' + (k === i ? ' on' : ''); c.title = (NOTES[rr.hash] || '') + ' ' + rr.hash;
@@ -465,11 +471,27 @@ function drawStageOverlay(svg, hp, scene, opt) {
   }
   if (!scene || !opt.objects) return;
   const en = g('enemies');
+  // #maps/KEY/scene/hl=1496.1497: mark the enemies these spawner procedures place
+  const hl = (wantArg || '').startsWith('hl=') ? new Set(wantArg.slice(3).split('.').map(Number)) : null;
+  let hlFirst = null;
   for (const grp of grouped(scene.enemies.filter(e => e.x != null), e => `${e.x},${e.z}`)) {
-    const e = grp[0], y = cellLevel(hp, e.x, e.z) * 256;
+    const e = grp[0], y = cellLevel(hp, e.x, e.z) * 256, on = hl && grp.some(x => hl.has(x.proc));
     if (e.route?.length > 1) en.appendChild(svgEl('polyline', { points: e.route.map(([x, z]) => proj(hp, x, cellLevel(hp, x, z) * 256, z).join(',')).join(' '), fill: 'none', stroke: 'rgba(255,80,80,.8)', 'stroke-width': 1, 'stroke-dasharray': '2 2' }));
     const [px, py] = proj(hp, e.x, y, e.z);
-    en.appendChild(svgEl('circle', { cx: px, cy: py, r: 4, fill: '#e04848', stroke: '#fff', 'stroke-width': 1 },
+    if (on) {
+      const ring = en.appendChild(svgEl('circle', { cx: px, cy: py, r: 11, fill: 'none', stroke: '#ffe14d', 'stroke-width': 2.5 }));
+      if (!hlFirst) {
+        hlFirst = ring;
+        // center it in this page only (scrollIntoView would scroll an embedding page too)
+        setTimeout(() => {
+          const box = $('ms'), r = ring.getBoundingClientRect(), b = box.getBoundingClientRect();
+          box.scrollLeft += r.left - b.left - box.clientWidth / 2;
+          box.scrollTop += r.top - b.top - box.clientHeight / 2;
+          window.scrollBy(0, r.top - innerHeight / 2);
+        }, 300);
+      }
+    }
+    en.appendChild(svgEl('circle', { cx: px, cy: py, r: on ? 6 : 4, fill: on ? '#ffe14d' : '#e04848', stroke: '#fff', 'stroke-width': 1, opacity: hl && !on ? .45 : 1 },
       grp.map(e => `enemy: ${e.families.join('/')} (spawner proc_${e.proc}, name ${e.name}, path ${e.path})${condText(e)}`).join('\n\n')));
   }
   const it = g('items');
@@ -789,10 +811,17 @@ views.pool = {
     items = Array.from({ length: Math.ceil(pool.n / 32) }, (_, k) => ({ key: String(k * 32), note: `entries ${k * 32}–${Math.min(pool.n, k * 32 + 32) - 1}`,
       n: Array.from({ length: 32 }, (_, j) => (users[k * 32 + j] || []).length).reduce((x, y) => x + y, 0) + ' uses' }));
   },
-  async show(key) {
-    const pool = await spritePool(), want = +key, start = Math.floor(want / 32) * 32, v = $('view');
+  async show(key, forHash) {
+    const pool = await spritePool(), want = +key, v = $('view');
+    // in a side panel: just this entry (and, for a sprite, where it comes from)
+    const start = EMBED ? want : Math.floor(want / 32) * 32, stop = EMBED ? want + 1 : Math.min(pool.n, start + 32);
+    if (EMBED) {
+      const src = forHash ? (learned.bigsources?.[forHash] || {})[String(want)] : null;
+      const r = forHash && big ? big.recs.find(x => x.hash === forHash) : null;
+      v.innerHTML = `<h2>Palette ${want}</h2><div class="meta">Entry ${want} of the sprite palette pool (9B1B).${forHash ? ` For large sprite <a href="#big/${forHash}">${forHash}</a>: ${r && r.pal === want ? 'its default, from its own frame data.' : src ? esc(paletteSource(src)) : 'a variant.'}` : ''}</div><div class="palgrid" id="pg"></div>`;
+    } else
     v.innerHTML = `<h2>Sprite palette pool</h2><div class="meta">Resource 9B1B: ${pool.n} sub-palettes of 16 colors. A small sprite package's first word is the entry its bank 0 uses (bank b uses entry + b); a large sprite's default entry is in its frame data, and the code can select others (variants, often a different monster: data/sprite_palettes.csv). Each card lists what draws with that entry, in that entry's colors; click one to open it in this palette. Showing ${start}–${Math.min(pool.n, start + 32) - 1}.</div><div class="palgrid" id="pg"></div>`;
-    for (let i = start; i < Math.min(pool.n, start + 32); i++) {
+    for (let i = start; i < stop; i++) {
       const card = document.createElement('div'); card.className = 'palcard' + (i === want ? ' on' : '');
       const us = this.users[i] || [], lab = noteOf('pool', String(i))?.label;
       const fs = (learned.poolfuncs || {})[i] || [];
@@ -818,6 +847,17 @@ views.pool = {
     }
   },
 };
+// Where a variant palette comes from, in words (data/sprite_palettes.csv sources).
+function paletteSource(src) {
+  return src.split(' + ').map(x => {
+    const [k, ...rest] = x.split(' ');
+    if (k === 'run') return `the game selected it in emulator runs (called from ${rest.join(', ')})`;
+    if (k === 'trace') return `traced from the code in ${rest.join(', ')}`;
+    if (k === 'code') return `a constant in ${rest.join(', ')}`;
+    if (k === 'script') return `the scripts pass option ${rest.join(' ')}`;
+    return x;
+  }).join('; ') + '.';
+}
 // a 48px thumbnail of a sprite's first frame drawn with pool entry `entry`
 // (for a package, entry is its bank `u.bank`'s entry, so bank 0 = entry - bank)
 async function thumbIn(u, entry) {
