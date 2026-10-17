@@ -357,7 +357,7 @@ def text_excerpts():
                 for ln in open(os.path.join(ROOT, "build", "text", f), encoding="utf-8"):
                     p = ln.rstrip("\n").split("\t")
                     if len(p) > 2 and p[1] == "T" and p[0].isdigit():
-                        t = re.sub(r"<[^>]*>", "", p[2]).replace("\\n", " ").strip()
+                        t = re.sub(r"<[^>]*>", "", p[2].replace("<NAME>", "Django")).replace("\\n", " ").strip()
                         if t:
                             _texts[int(p[0])] = t if len(t) <= 48 else t[:47] + "…"
             except OSError:
