@@ -87,8 +87,8 @@ body.embed main { grid-template-columns: 1fr; }
 // calls use, one above the headers gcx.py prints.
 studioHeader();
 let P = [], byId = {}, scenes = {}, actorsBy = {}, keyOfName = {}, callees = {}, procNames = {}, procOfName = {}, sel = null, shown = 300, lastD = null;
-let readable = true, inline = false, mode = 'files', F = [], fileOf = {}, selFile = null;
-try { readable = localStorage.getItem('scripts.readable') !== '0'; inline = localStorage.getItem('scripts.inline') === '1'; mode = localStorage.getItem('scripts.mode') || 'files'; } catch (e) {}
+let readable = true, inline = false, english = true, mode = 'files', F = [], fileOf = {}, selFile = null;
+try { readable = localStorage.getItem('scripts.readable') !== '0'; inline = localStorage.getItem('scripts.inline') === '1'; english = localStorage.getItem('scripts.english') !== '0'; mode = localStorage.getItem('scripts.mode') || 'files'; } catch (e) {}
 const keep = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
 
 // ---------- files: scene files, library files by category, shared runs (tools/assets/gclfiles.py)
@@ -140,16 +140,18 @@ async function showFile(fid) {
   document.querySelector('.row.on')?.scrollIntoView({ block: 'nearest' });
   const f = F.find(x => x.id === fid), v = $('view');
   if (!f) { v.innerHTML = `<div class="empty">No file ${esc(fid)}.</div>`; return; }
-  const d = await fetch(`/api/file/${fid}${inline ? '/inline' : ''}${readable ? '' : '/raw'}`).then(r => r.json());
+  const d = await fetch(`/api/file/${fid}${inline ? '/inline' : ''}${readable ? '' : '/raw'}${english ? '/en' : ''}`).then(r => r.json());
   const sc = f.entry ? scenes[f.entry] : null;
   v.innerHTML = `<h2>${esc(f.title)}</h2>
     <div class="meta">${esc(f.category)} · ${f.procs.length} procedures (${f.procs[0]}–${f.procs[f.procs.length - 1]}) · ${f.kind === 'scene' ? `entry <a href="#${f.entry}">proc ${f.entry}</a>` : `used by ${f.scenes} scenes`}${sc?.map ? ` · map ${peekLink(gfxHref('map', sc.map), esc(noteOf('map', sc.map)?.label || sc.map))}` : ''}${sc?.shot ? ' · ' + peekLink('/captures#scene_' + String(f.entry).padStart(4, '0'), 'capture') : ''}${f.kind !== 'scene' && f.description ? ' · ' + esc(f.description) : ''}</div>
     <h3>Source <label class="chk" style="text-transform:none;letter-spacing:0;font-weight:400;margin-left:8px"><input type="checkbox" id="readable"${readable ? ' checked' : ''}> readable</label>
-      <label class="chk" style="text-transform:none;letter-spacing:0;font-weight:400;margin-left:8px"><input type="checkbox" id="inline"${inline ? ' checked' : ''}${readable ? '' : ' disabled'}> inline single-use helpers (${d.inlined.length})</label></h3>
+      <label class="chk" style="text-transform:none;letter-spacing:0;font-weight:400;margin-left:8px"><input type="checkbox" id="inline"${inline ? ' checked' : ''}${readable ? '' : ' disabled'}> inline single-use helpers (${d.inlined.length})</label>
+      <label class="chk" style="text-transform:none;letter-spacing:0;font-weight:400;margin-left:8px"><input type="checkbox" id="english"${english ? ' checked' : ''}${readable ? '' : ' disabled'}> English text</label></h3>
     <div class="meta" style="margin-bottom:6px">One file as Konami's compiler laid it out: procedures in table order, each keeping its id. ${inline ? 'Calls to procedures used once, from inside this file, are expanded in place (for reading; the ROM has a real call).' : ''}</div>
     <pre id="body">${d.lines.map(([c, ln]) => readable ? linkFileLine(c, ln) : (/^# proc \d+$/.test(ln) ? `<span class="def" id="p-${c}"><a href="#${c}">${esc(ln)}</a></span>` : linkLine(ln))).join('\n')}</pre>`;
   $('readable').onchange = e => { readable = e.target.checked; keep('scripts.readable', readable ? '1' : '0'); showFile(fid); };
   $('inline').onchange = e => { inline = e.target.checked; keep('scripts.inline', inline ? '1' : '0'); showFile(fid); };
+  $('english').onchange = e => { english = e.target.checked; keep('scripts.english', english ? '1' : '0'); showFile(fid); };
 }
 function linkFileLine(c, ln) {
   if (ln.startsWith('def ')) return `<span class="def" id="p-${c}">${linkReadable(ln)}</span>`;

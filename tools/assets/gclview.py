@@ -228,11 +228,16 @@ PY_OPS = {20: "or", 21: "and", 22: "="}
 PY_UNARY = {1: "-", 2: "not ", 3: "~"}
 
 
+# {text id: English} for comments on text references when a caller asks for
+# English (the Studio sets it from the fan translation); Japanese otherwise.
+ENGLISH = {}
+
+
 class Readable:
-    def __init__(self, names, cid, inline=None, stack=()):
+    def __init__(self, names, cid, inline=None, stack=(), english=False):
         """inline(pid) -> True expands a call statement to pid in place."""
         self.n, self.cid, self.lines = names, cid, []
-        self.inline_ok, self.stack = inline, stack + (cid,)
+        self.inline_ok, self.stack, self.english = inline, stack + (cid,), english
 
     # values
     def val(self, v, top=True):
@@ -367,7 +372,7 @@ class Readable:
             if self.inline_ok and s[1] not in self.stack and self.inline_ok(s[1]):
                 text, note = self.call(s)
                 self.emit(depth, f"# inlined: {text}", note)
-                sub = Readable(self.n, s[1], self.inline_ok, self.stack)
+                sub = Readable(self.n, s[1], self.inline_ok, self.stack, english=self.english)
                 sub.body(procedure(_image(), s[1]) or [], depth)
                 self.lines += sub.lines
                 return
@@ -438,7 +443,8 @@ class Readable:
 
     def text_note(self, args, opts):
         ids = [v[1] for v in list(args) + [x for _, vs in opts for x in vs] if v[0] == "text"]
-        return "; ".join(f'"{self.n.texts[i]}"' for i in ids if i in self.n.texts)
+        tx = lambda i: re.sub(r"\s*\n\s*", " ", (ENGLISH.get(i) if self.english else None) or self.n.texts.get(i) or "")
+        return "; ".join(f'"{tx(i)}"' for i in ids if tx(i))
 
 
 _names = None
@@ -463,7 +469,7 @@ def names():
     return _names
 
 
-def render(img, cid, inline=None):
+def render(img, cid, inline=None, english=False):
     """Readable lines of a procedure (by call id), or None. inline(pid) -> True
     expands call statements to pid in place (see gclfiles.py)."""
     global _names
@@ -473,7 +479,7 @@ def render(img, cid, inline=None):
     with gcx._lock:
         if _names is None:
             _names = Names()
-    r = Readable(_names, cid, inline)
+    r = Readable(_names, cid, inline, english=english)
     r.body(stmts, 0)
     return r.lines
 
