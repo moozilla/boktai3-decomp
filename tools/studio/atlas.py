@@ -72,6 +72,50 @@ def nice(s):
     return re.sub(r"(?<=[a-z])'S\b", "'s", t)
 
 
+def speaker_portraits():
+    """{speaker label: {"sprite", "frame", "pool"}}: the tokenizer's ids
+    (sub_0803232C: strncmp against the table, then an id), the portrait
+    animation 922E 4BBF (sequence = id, frame = key >> 6, over 593A's 16
+    frames then 593B's) and the palette sub_0803092C selects per id."""
+    import archive
+    import struct as st_
+    from romlib import load_rom
+    rom = load_rom()
+
+    def cstr(a):
+        o = a - 0x08000000
+        return rom[o:rom.index(b"\0", o)].decode()
+    lines = open(os.path.join(ROOT, "gen", "code.s")).read().split("\n")
+    i0 = next(i for i, l in enumerate(lines) if "thumb_func_start sub_0803232C" in l)
+    ids, cur = {"R_DJANGO": 0, "B_DJANGO": 1, "W_DJANGO": 2}, None
+    for l in lines[i0:i0 + 1200]:
+        m = re.search(r"ldr r1, \S+ @ =0x(0824D[0-9A-F]{3})", l)
+        if m:
+            cur = cstr(int(m.group(1), 16))
+            continue
+        m = re.match(r"\s*movs r0, #(0x[0-9a-f]+|\d+)$", l)
+        if m and cur:
+            ids.setdefault(cur, int(m.group(1), 0))
+            cur = None
+    d = None
+    for label, _, _, ents in archive.archives(rom):
+        if label == "anm":
+            for h, a, sz in ents:
+                if h == 0x4BBF:
+                    d = rom[a - 0x08000000:a - 0x08000000 + sz]
+    if d is None:
+        return {}
+    n = st_.unpack_from("<H", d, 0)[0]
+    pools = {4: 505, 5: 505, 13: 505, 19: 507, 20: 504, 25: 504, 30: 506}
+    out = {}
+    for label, sid in ids.items():
+        if 0 <= sid < n:
+            _, _, off = st_.unpack_from("<BBH", d, 4 + 4 * sid)
+            f = st_.unpack_from("<H", d, off)[0] >> 6
+            out[label] = {"sprite": "593A" if f < 16 else "593B", "frame": f if f < 16 else f - 16, "pool": pools.get(sid, 503), "id": sid}
+    return out
+
+
 def clean(t):
     """A name without the text bank's control sequences ($X=..., {00})."""
     return re.split(r"\$[A-Z]=|\{[0-9A-F]{2}\}", t)[0].strip() or t
@@ -330,52 +374,99 @@ def build():
     def walk_text(x, out):
         if isinstance(x, tuple):
             if len(x) == 2 and x[0] == "text" and isinstance(x[1], int):
-                out.add(x[1])
+                out.append(x[1])
             for y in x:
                 walk_text(y, out)
         elif isinstance(x, list):
             for y in x:
                 walk_text(y, out)
     text_files = collections.defaultdict(set)  # text id -> every script file that shows it
+    text_order = []                            # text ids in file and script order
     for f in gclfiles.files():
-        ids = set()
+        ids = []
         for c in f["procs"]:
             walk_text(gclview.procedure(img, c) or [], ids)
         for i in ids:
+            if not text_files[i]:
+                text_order.append(i)
             text_files[i].add(f["id"])
             if f["kind"] == "scene" and f.get("entry") is not None:
                 texts_in[i].add(f["entry"])
+    # the speaker of a line is its <LABEL=ID> tag (the game's own speaker
+    # table at 0824DCD4, tokenized by sub_0803232C); the message window shows
+    # that speaker's portrait: Anim_SetSequence(portrait, 922E 4BBF, speaker)
+    # over the frames of 593A then 593B, in the pool entry sub_0803092C picks
+    raw = {}
+    for ln in open(os.path.join(ROOT, "build", "text", "bank.tsv"), encoding="utf-8"):
+        p_ = ln.rstrip("\n").split("\t", 2)
+        if len(p_) == 3 and p_[1] == "T" and p_[0].isdigit():
+            raw[int(p_[0])] = p_[2]
+    portrait = speaker_portraits()
     cast_jp = {e["jp"]: e for e in E.values() if e["kind"] == "char"}
     monster_jp = {e["jp"]: e["id"] for e in E.values() if e["kind"] == "monster"}
-    lines_of = collections.defaultdict(list)
-    for i in text_files:
-        m = re.match(r"^([^「\n]{1,14}?)\s*「", jp.get(i, ""))
-        if m and not m.group(1).startswith("?"):
-            lines_of[re.sub(r"\(.*?\)$", "", m.group(1).strip())].append(i)
+    by_label = collections.defaultdict(list)
+    shown = collections.defaultdict(collections.Counter)
+    for i in text_order:
+        m = re.match(r"<LABEL=(\w+)>(.*?)</LABEL>", raw.get(i, ""))
+        if m and m.group(1) not in ("NONE", "PLAYER"):
+            by_label[m.group(1)].append(i)
+            shown[m.group(1)][m.group(2)] += 1
+    # cast without lines in the scripts: the speaker label that contains their name (R_DJANGO)
+    for c in cast_jp.values():
+        lab = next((l for l in portrait if re.search(r"(^|_)" + re.escape(c["title"].upper()) + r"$", l)), None)
+        if lab:
+            c["portrait"] = portrait[lab]
+            c["label"] = None
     rank = 0
-    for who, ids in sorted(lines_of.items(), key=lambda kv: -len(kv[1])):
-        if len(ids) < 3:
-            continue
-        e = next((c for j, c in cast_jp.items() if who.startswith(j)), None)
-        names = collections.Counter(en.get(i, "").split(":", 1)[0].strip() for i in ids if ":" in en.get(i, "")[:30])
+    for label, ids in sorted(by_label.items(), key=lambda kv: -len(kv[1])):
+        names = [n for n, _ in shown[label].most_common() if not n.startswith("?")]
+        who = re.sub(r"\(.*?\)$", "", names[0]).strip() if names else label
+        e = next((c for j, c in cast_jp.items() if who.startswith(j) or any(n.startswith(j) for n in names)), None)
+        same = None
+        if e is not None and e.get("label") and e["label"] != label:
+            same, e = e, None  # a second speaker label with the same name (SABATA_B): its own entry
         if e is None:
             rank += 1
-            e = add(f"char:{who}", "Cast", kind="char", key=who, jp=who, order=100 + rank, actors=[], sprites=[],
-                    title=clean(names.most_common(1)[0][0]) if names else who)
-        scenes = sorted({s for i in ids for s in texts_in[i]})
+            ens = collections.Counter(en.get(i, "").split(":", 1)[0].strip() for i in ids if ":" in en.get(i, "")[:30] and not en.get(i, "").startswith("?"))
+            title = f"{same['title']} ({label})" if same else clean(ens.most_common(1)[0][0]) if ens else who
+            e = add(f"char:{label}", "Cast", kind="char", key=label, jp=who, order=100 + rank, actors=[], sprites=[], title=title)
+        e["label"] = label
+        e["portrait"] = portrait.get(label)
+        scenes = sorted({s_ for i in ids for s_ in texts_in[i]})
         by_area = collections.defaultdict(list)
         for sc in scenes:
             by_area[str(scene_area.get(sc, -1))].append(sc)
         e["lines"] = len(ids)
-        e["files"] = sorted({f"file:{x}" for i in ids for x in text_files[i]})
         e["areas"] = dict(by_area)
         e["nscenes"] = len(scenes)
-        e["sample"] = [{"id": i, "en": en.get(i, ""), "jp": jp.get(i, "")} for i in sorted(ids)[:8]]
+        e["files"] = list(dict.fromkeys(f"file:{x}" for i in ids for x in sorted(text_files[i])))
+        # every line, in script order, under the script that shows it
+        # a message is the labeled first page the script names plus the pages
+        # after it, up to the string with <END> (each string is one page)
+        def pages(i):
+            out = [i]
+            for k in range(i + 1, i + 60):
+                t_ = raw.get(k)
+                if t_ is None or t_.startswith("<LABEL="):
+                    break
+                if re.sub(r"<PROC=\d+>|<END>|\\n|\s", "", t_):
+                    out.append(k)
+                if "<END>" in t_:
+                    break
+            return out
+
+        def joined(d, ks):
+            # a page's wrapped lines run together; pages stay separate
+            return "\n".join(re.sub(r"\s*\n\s*", " ", x).strip() for x in (d.get(k, "") for k in ks) if x)
+        e["dialogue"] = []
+        for i in ids:
+            ks = pages(i)
+            e["dialogue"].append({"id": i, "pages": len(ks), "file": f"file:{sorted(text_files[i])[0]}", "en": joined(en, ks), "jp": joined(jp, ks)})
         if who in monster_jp:
             e["monster"] = monster_jp[who]
         for sc in scenes:
-            if f"scene:{sc}" in E:
-                E[f"scene:{sc}"].setdefault("speakers", []).append(e["id"])
+            if f"scene:{sc}" in E and e["id"] not in E[f"scene:{sc}"].setdefault("speakers", []):
+                E[f"scene:{sc}"]["speakers"].append(e["id"])
 
     # ---- sprites ----
     lab = {r["hash"]: r for r in csv.DictReader(open(os.path.join(ROOT, "data", "labels", "sprites.csv"), encoding="utf-8"))}

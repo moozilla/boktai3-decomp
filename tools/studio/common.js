@@ -305,7 +305,7 @@ async function spriteThumb(kind, hash, max = 64, opt = {}) {
   const L = await learnedSprites();
   let parts, colors;
   if (kind === 'big') {
-    const big = await bigSprites(), i = big.recs.findIndex(r => r.hash === hash), f = i >= 0 && big.frames(i)[0];
+    const big = await bigSprites(), i = big.recs.findIndex(r => r.hash === hash), f = i >= 0 && big.frames(i)[opt.frame ?? 0];
     if (!f) return null;
     colors = await packageColors(null, opt.pool ?? big.recs[i].pal);
     parts = big.parts(f);
