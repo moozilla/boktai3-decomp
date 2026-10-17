@@ -49,17 +49,24 @@ sys.path.insert(0, permute.PERMUTER)
 from src import ast_util, agbcc_passes, randomizer  # noqa: E402
 from src.randomizer import FocusRegion, RandomizationFailure  # noqa: E402
 
-# Passes that keep the program's meaning or change only types and
-# temporaries; those that delete code or add dummy statements are left out.
-PASSES = [
+# Passes that keep the program's meaning (the default). The new agbcc
+# passes check their own safety; the upstream ones listed here only re-spell
+# expressions, add braces or empty loops, or reorder declarations.
+SAFE_PASSES = [
     "perm_move_to_use", "perm_split_var", "perm_const_var", "perm_literal_address",
     "perm_addr_deref", "perm_loop_form",
-    "perm_temp_for_expr", "perm_expand_expr", "perm_reorder_stmts", "perm_reorder_decls",
-    "perm_struct_ref", "perm_split_assignment", "perm_compound_assignment",
-    "perm_commutative", "perm_add_sub", "perm_inequalities", "perm_cast_simple",
-    "perm_ins_block", "perm_remove_var", "perm_chain_assignment", "perm_condition",
-    "perm_randomize_internal_type", "perm_reverse_cond", "perm_inline",
+    "perm_reorder_decls", "perm_ins_block", "perm_struct_ref", "perm_compound_assignment",
+    "perm_commutative", "perm_add_sub", "perm_inequalities", "perm_condition",
+    "perm_reverse_cond", "perm_chain_assignment", "perm_split_assignment",
 ]
+# These can change the meaning (move a statement past a write or into dead
+# code, merge variables, narrow a type, hoist an expression past a call):
+# A4FC's best result with them read an uninitialized pointer. --unsafe.
+UNSAFE_PASSES = [
+    "perm_temp_for_expr", "perm_expand_expr", "perm_reorder_stmts", "perm_remove_var",
+    "perm_cast_simple", "perm_randomize_internal_type", "perm_inline",
+]
+PASSES = SAFE_PASSES
 CAP_CHOICES = 48   # options tried at one choice point
 CAP_RUNS = 400     # runs of one pass per state
 
@@ -318,7 +325,11 @@ def main():
     ap.add_argument("--seconds", type=int, default=600)
     ap.add_argument("--beam", type=int, default=6)
     ap.add_argument("-j", type=int, default=os.cpu_count() or 4)
+    ap.add_argument("--unsafe", action="store_true", help="also use passes that can change the program's meaning")
     a = ap.parse_args()
+    global PASSES
+    if a.unsafe:
+        PASSES = SAFE_PASSES + UNSAFE_PASSES
     src = os.path.abspath(a.src)
     func = a.func or regdiag.first_function(src)
     out_dir = os.path.join(ROOT, "build", "translate", func)
