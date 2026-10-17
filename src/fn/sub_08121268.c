@@ -1,8 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#ifdef NONMATCHING
-// fuzzy: 96.8%
-// Open: placement of the `1` constant shared by the three flag stores.
 struct DrawFlags {
     u8 pad0[0x16];
     u16 flags;
@@ -39,12 +36,6 @@ void sub_0811FDB4(struct A8CBObject *);
 void sub_081202CC(struct A8CBObject *);
 void sub_0811EDC0(void *, void *, s32, s32);
 void sub_08120B44(void);
-static inline void setUpdate(struct A8CBObject *e, void (*update)(void), u32 active)
-{
-    e->active = active;
-    e->update = update;
-    e->field84C = 0;
-}
 /* Registry routine A8CB: takes an object from the manager at 0x0200020C
    (created on demand), reads its options (sub_081200C8: -n, -p, -s, -P),
    loads sprite 0x3D99 and starts it with update sub_08120B44 (tentative). */
@@ -53,7 +44,7 @@ void RegistryA8CB_CreateFromScript(void)
     void *manager = gUnk_0200020C;
     struct A8CBObject *e;
     void *anim;
-    u32 one;
+    u16 one;
     if (!manager) {
         manager = sub_08121210();
         if (!manager)
@@ -70,8 +61,15 @@ void RegistryA8CB_CreateFromScript(void)
     sub_0811C89C(e->block68, anim, e->field4B);
     sub_08112BA8(e->block10);
     sub_0811FDB4(e);
-    one = 1;
-    setUpdate(e, sub_08120B44, one);
+    {
+        void (*update)(void) = sub_08120B44;
+        u8 *active = &e->active;
+        u32 zero = 0;
+        one = 1;
+        *active = one;
+        e->update = update;
+        e->field84C = zero;
+    }
     sub_081202CC(e);
     {
         struct DrawFlags *draw = &e->draw;
@@ -80,6 +78,3 @@ void RegistryA8CB_CreateFromScript(void)
     sub_0811EDC0(e->blockB0, e->block618, 0, 0);
     e->field8B4 = one;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", RegistryA8CB_CreateFromScript);
-#endif
