@@ -192,8 +192,9 @@ random jitter X/Z in[-7,8], Y in[-16,15], packed vector(5,10,5), and two trailin
 40 arguments. The prefix makes nine explicit random-table cursor advances. It then
 clears actorAA/2B8 and flags2D4 mask0x2000. Invalid modes return after this prefix.
 
-Modes0/1 select response21/callback5FC unless substate2B5 is already21, set flags2D0
-masks0x20000 and0x4, reset several contact/timer flags, and copy the supplied
+Modes0/1 select response21/callback5FC and flags2D0 mask0x20000 unless substate2B5
+is already21. Both paths set flags2D0 mask0x4, reset several contact/timer flags,
+and copy the supplied
 position to actor5C with the requested Y adjustment. The copy is mirrored to the
 appropriate sequence/tile drawable at1C/40, then flags2D6 mask0x2000 is set.
 
