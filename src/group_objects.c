@@ -360,8 +360,6 @@ void BoardPiece_Launch(struct GroupObjects *m, struct GroupPiece *p, int delay)
     p->timer++;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 93.0% (register choice for random table/address/mask in the heading roll)
 void sub_08010514(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
@@ -372,7 +370,12 @@ void sub_08010514(struct GroupObjects *m, struct GroupPiece *p, int index)
         p->active = 0;
         p->heading = p->direction =
             Math_Atan2(p->target.x - p->position.x, p->target.z - p->position.z);
-        table = gUnk_0203B400;
+        // agbcc weights a register's uses by loop depth: four empty loops make
+        // `table` outrank the random-index address and mask, so it gets r2
+        // (found by tools/translate.py; see docs/PERMUTER.md).
+        do { do { do { do {
+            table = gUnk_0203B400;
+        } while (0); } while (0); } while (0); } while (0);
         if (randomByte(table) <= 0x7F)
             p->heading = p->heading + (0x40 - (randomWith(table) & 0x3F));
         else
@@ -395,9 +398,6 @@ void sub_08010514(struct GroupObjects *m, struct GroupPiece *p, int index)
     }
     p->timer++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08010514);
-#endif
 void sub_0801068C(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
