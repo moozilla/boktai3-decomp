@@ -23,6 +23,13 @@ README badges (live from decomp.dev). Don't copy totals into other files.
 
 Recent work, newest first (details in [history](history/README.md)):
 
+* **Relatives: start from matched code that shares runs** (2026-10-17):
+  `tools/relatives.py ADDR --c` lists the matched functions that share long
+  instruction runs with an unmatched one (registers abstracted), how much each
+  explains, and their C. `--port --keep` ported 10 functions to exact matches
+  (clones whose matched sibling came later, and constant-only variants);
+  [tasks/relatives.md](tasks/relatives.md) ranks 594 unmatched functions where a
+  matched relative explains half or more. Step 2 of WORKER.md's loop.
 * **Saves decoded; a save at every checkpoint** (2026-10-17): two files of
   three checksummed regions (script variables, game state, continuation;
   ENGINE.md section 14). `tools/assets/saves.py` reads saves and VBA-M
