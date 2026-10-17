@@ -1,6 +1,6 @@
 --- a/local-alloc.c
 +++ b/local-alloc.c
-@@ -70,6 +70,269 @@
+@@ -70,6 +70,325 @@
  #include "insn-attr.h"
  #include "recog.h"
  #include "output.h"
@@ -84,9 +84,65 @@
 +    }
 +}
 +
-+/* The variable name of pseudo REGNO, or "=constant" if it holds one.  */
++static char *agbcc_pseudo_base_label ();
++static char **agbcc_label_cache;
++static char *
++agbcc_pseudo_base_label_cached (k)
++     int k;
++{
++  static char buf[256];
++  char *l = agbcc_label_cache[k], *h;
++  strncpy (buf, l, sizeof buf - 1);
++  buf[sizeof buf - 1] = 0;
++  h = strrchr (buf, '#');
++  if (h && h != buf)
++    *h = 0;
++  return buf;
++}
++
++/* The label of pseudo REGNO: its variable name or "=constant", with "#N"
++   when it is the N-th later pseudo (in creation order) with that label.
++   Cached per function.  */
++static int agbcc_label_n;
++static rtx agbcc_label_first;
 +char *
 +agbcc_pseudo_label (regno)
++     int regno;
++{
++  if (agbcc_label_first != get_insns () || regno >= agbcc_label_n || ! agbcc_label_cache)
++    {
++      int r, n = max_reg_num ();
++      if (agbcc_label_cache)
++	free (agbcc_label_cache);
++      agbcc_label_cache = (char **) xmalloc ((n + 1) * sizeof (char *));
++      for (r = 0; r < n; r++)
++	{
++	  char *base = r < FIRST_PSEUDO_REGISTER ? "-" : agbcc_pseudo_base_label (r);
++	  int k, same = 0;
++	  agbcc_label_cache[r] = base;
++	  if (! strcmp (base, "-"))
++	    continue;
++	  for (k = FIRST_PSEUDO_REGISTER; k < r; k++)
++	    if (! strcmp (agbcc_pseudo_base_label_cached (k), base))
++	      same++;
++	  if (same)
++	    {
++	      char *b = (char *) xmalloc (strlen (base) + 16);
++	      sprintf (b, "%s#%d", base, same);
++	      agbcc_label_cache[r] = b;
++	    }
++	  else
++	    agbcc_label_cache[r] = xstrdup (base);
++	}
++      agbcc_label_n = n;
++      agbcc_label_first = get_insns ();
++    }
++  return regno < agbcc_label_n ? agbcc_label_cache[regno] : "-";
++}
++
++/* The variable name of pseudo REGNO, or "=constant" if it holds one.  */
++static char *
++agbcc_pseudo_base_label (regno)
 +     int regno;
 +{
 +  char *name = agbcc_name_get (regno_reg_rtx[regno]);
@@ -270,7 +326,7 @@
  #include "toplev.h"
  
  /* Next quantity number available for allocation.  */
-@@ -249,6 +512,8 @@
+@@ -249,6 +568,8 @@
  static int qty_sugg_compare    	(int, int);
  static int qty_sugg_compare_1	(const void *, const void *);
  static int qty_compare    	(int, int);
@@ -279,17 +335,17 @@
  static int qty_compare_1	(const void *, const void *);
  static int combine_regs		(rtx, rtx, int, int, rtx, int);
  static int reg_meets_class_p	(int, enum reg_class);
-@@ -297,6 +562,9 @@
- {
+@@ -298,6 +619,9 @@
    register int b, i;
    int max_qty;
-+
+ 
 +  agbcc_instr_init ();
 +  agbcc_apply_labels ();
- 
++
    /* Leaf functions and non-leaf functions have different needs.
       If defined, let the machine say what kind of ordering we
-@@ -1328,6 +1596,21 @@
+      should use.  */
+@@ -1328,6 +1652,21 @@
  
      default:
        qsort (qty_order, next_qty, sizeof (int), qty_sugg_compare_1);
@@ -311,7 +367,7 @@
      }
  
    /* Try to put each quantity in a suggested physical register, if it has one.
-@@ -1336,6 +1619,8 @@
+@@ -1336,6 +1675,8 @@
    for (i = 0; i < next_qty; i++)
      {
        q = qty_order[i];
@@ -320,7 +376,7 @@
        if (qty_phys_num_sugg[q] != 0 || qty_phys_num_copy_sugg[q] != 0)
  	qty_phys_reg[q] = find_free_reg (qty_min_class[q], qty_mode[q], q,
  					 0, 1, qty_birth[q], qty_death[q]);
-@@ -1387,7 +1672,7 @@
+@@ -1387,7 +1728,7 @@
    for (i = 0; i < next_qty; i++)
      {
        q = qty_order[i];
@@ -329,7 +385,7 @@
  	{
  	  if (N_REG_CLASSES > 1)
  	    {
-@@ -1414,6 +1699,13 @@
+@@ -1414,6 +1755,13 @@
  	for (i = qty_first_reg[q]; i >= 0; i = reg_next_in_qty[i])
  	  reg_renumber[i] = qty_phys_reg[q] + reg_offset[i];
        }
@@ -343,7 +399,7 @@
  }
  
  /* Compare two quantities' priority for getting real registers.
-@@ -1432,9 +1724,19 @@
+@@ -1432,11 +1780,21 @@
     Multiplying this by 10000 can't overflow.
     QTY_CMP_PRI is also used by qty_sugg_compare.  */
  
@@ -354,17 +410,19 @@
 +#define QTY_CMP_PRI(q) (QTY_CMP_PRI_BASE (q) \
 +  + (qty_first_reg[q] >= 0 && qty_first_reg[q] < AGBCC_MAXREG \
 +     ? agbcc_pri_delta[qty_first_reg[q]] : 0))
-+
-+static int
+ 
+ static int
 +qty_compare_pri (q)
 +     int q;
 +{
 +  return QTY_CMP_PRI (q);
 +}
- 
- static int
++
++static int
  qty_compare (q1, q2)
-@@ -1505,6 +1807,7 @@
+      int q1, q2;
+ {
+@@ -1505,6 +1863,7 @@
  
  #undef QTY_CMP_SUGG
  #undef QTY_CMP_PRI
