@@ -3,7 +3,7 @@ extern u16 gUnk_03004FC0[];
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 u8 *ScriptProc_Start(u32, u32);
-void sub_082161B4(u32, u32, void *, u32, u32, u32, u32 *);
+void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void sub_08215A74(u32, u32);
 void sub_08212424(u8 *p)
 {
@@ -18,7 +18,7 @@ void sub_08212424(u8 *p)
     res = ScriptProc_Start(0xc091, 0x3536);
     *(u8 **)(p + 0x18) = res;
     size = 15;
-    sub_082161B4(2, 0, res, 0, 0, 1, &size);
+    Bg_SetupLayers(2, 0, res, 0, 0, 1, &size);
     sub_08215A74(3, 2);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
     CpuSet(ScriptProc_Start(0x92b3, 0x204) + 0x14, gUnk_03004FC0, 0x100);

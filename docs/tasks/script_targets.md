@@ -6,11 +6,11 @@ handlers; their callees are found through `bl` calls and Thumb function pointers
 
 | Set | Functions | Bytes | Share of code | Matched |
 |---|---:|---:|---:|---:|
-| Entry points | 738 | 84,436 | 3.5% | 80.1% |
-| Entry points and their direct callees | 1422 | 290,160 | 12.0% | 42.9% |
-| Everything reachable from scripts | 3136 | 535,198 | 22.2% | 47.1% |
+| Entry points | 738 | 84,436 | 3.5% | 81.3% |
+| Entry points and their direct callees | 1422 | 290,160 | 12.0% | 43.2% |
+| Everything reachable from scripts | 3136 | 535,198 | 22.2% | 47.3% |
 
-## Unmatched entry points, by script uses (20 used, 10,896 bytes)
+## Unmatched entry points, by script uses (16 used, 9,880 bytes)
 
 | Uses | Address | Bytes | Function | Script name | GCL name |
 |---:|---|---:|---|---|---|
@@ -18,13 +18,10 @@ handlers; their callees are found through `bl` calls and Thumb function pointers
 | 4 | `08111A48` | 380 | `PaletteFade_StartFromScript` | registry 734C |  |
 | 4 | `0815A680` | 116 | `ScriptActor_TestFlagFromScript` | registry 440F |  |
 | 3 | `08104350` | 1016 | `sub_08104350` | registry F1F9 |  |
-| 3 | `08119EF0` | 84 | `Glove_StartFromScript` | registry E3EE | Glove |
 | 3 | `0815A838` | 52 | `ScriptActor_GetField534FromScript` | registry 0E15 |  |
 | 2 | `0810067C` | 700 | `FloorSwitch_Create` | registry AB8E |  |
 | 2 | `08103B94` | 136 | `NamedActor_SetMoveModeFromScript` | registry 7E33 |  |
-| 2 | `0810858C` | 448 | `AnimatedTile_CreateFromScript` | registry 8192 |  |
 | 2 | `081803D8` | 176 | `BossSlot2_AdvanceStepFromScript` | registry 4EC9 |  |
-| 2 | `081C4080` | 276 | `RegistryF3E4_Create` | registry F3E4 |  |
 | 2 | `0820A5CC` | 1392 | `sub_0820A5CC` | registry 056E |  |
 | 1 | `0806F5C0` | 412 | `SceneEffectSchedule_AddFromScript` | registry FD6B |  |
 | 1 | `08072854` | 752 | `sub_08072854` | registry 1E97 |  |
@@ -32,7 +29,6 @@ handlers; their callees are found through `bl` calls and Thumb function pointers
 | 1 | `08106870` | 860 | `sub_08106870` | registry 377D |  |
 | 1 | `08107EBC` | 820 | `sub_08107EBC` | registry 2FA5 |  |
 | 1 | `0810B914` | 504 | `Registry1745_Create` | registry 1745 |  |
-| 1 | `08121268` | 208 | `RegistryA8CB_CreateFromScript` | registry A8CB |  |
 | 1 | `0822BFC8` | 72 | `Registry3C8D_RunFromScript` | registry 3C8D |  |
 
 ## Unmatched functions called directly by several entry points
@@ -47,6 +43,6 @@ handlers; their callees are found through `bl` calls and Thumb function pointers
 | 3 | `08216E54` | 292 | `sub_08216E54` |
 | 2 | `082215E4` | 276 | `Math_Atan2` |
 | 2 | `0821E5C4` | 84 | `Route_Start` |
-| 2 | `082161B4` | 736 | `sub_082161B4` |
+| 2 | `082161B4` | 736 | `Bg_SetupLayers` |
 | 2 | `081D2A38` | 740 | `TaggedSceneNpc_Create` |
 | 2 | `0824923C` | 4 | `_call_via_r1` |

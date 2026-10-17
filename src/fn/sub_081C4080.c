@@ -1,8 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#ifdef NONMATCHING
-// fuzzy: 91.8%
-// Open: which base register the state field stores are addressed from.
 struct F3E4Actor {
     u8 pad0[0x18];
     u8 animData[0x1C];
@@ -16,11 +13,13 @@ struct F3E4Actor {
         u16 mode;
         u8 pad2[2];
         u16 field4, field6;
-        u32 field8;
-        u8 padC[0x24];
-        u8 field30, field31;
-        u8 pad32[0xA];
-        u32 field3C;
+        struct StateInner {
+            u32 field0;
+            u8 pad4[0x24];
+            u8 field28, field29;
+            u8 pad2A[0xA];
+            u32 field34;
+        } inner;
     } state;
     u32 fieldD8;
     u8 padDC[0x14];
@@ -70,10 +69,13 @@ struct F3E4Actor *RegistryF3E4_Create(u32 name)
     p->state.mode = 2;
     p->state.field4 = 0;
     p->state.field6 = 0;
-    p->state.field8 = 0;
-    p->state.field31 = 0;
-    p->state.field30 = 0;
-    (&p->state)->field3C = 0;
+    {
+        struct StateInner *in = &p->state.inner;
+        in->field0 = 0;
+        in->field29 = 0;
+        in->field28 = 0;
+        in->field34 = 0;
+    }
     SceneMessages_RegisterReceiver(p->receiver, p->name, 10);
     if (Script_SeekToKeyword('i') && Script_GetValue())
         sub_081C39F8(p);
@@ -84,6 +86,3 @@ struct F3E4Actor *RegistryF3E4_Create(u32 name)
     }
     return p;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", RegistryF3E4_Create);
-#endif

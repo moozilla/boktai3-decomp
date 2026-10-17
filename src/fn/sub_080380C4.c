@@ -29,7 +29,7 @@ void sub_0821447C(int, void *, void *, void *);
 void Hud_SetMode(int);
 void Bg_ClearTilemap(int);
 void *ScriptProc_Start(int, int);
-void sub_082161B4(int, int, void *, int, int, int, void *);
+void Bg_SetupLayers(int, int, void *, int, int, int, void *);
 void BgGfx_LoadTilemapSimple(int, int, int, int, int);
 void sub_08036C0C(void);
 void sub_0822B058(int);
@@ -49,7 +49,7 @@ void sub_080380C4(struct LinkMenu *p, int layer)
 {
     void *resource = ScriptProc_Start(0xC091, 0xA597);
     int zero = 0;
-    sub_082161B4(0, 0, resource, 0, zero, 1, &layer);
+    Bg_SetupLayers(0, 0, resource, 0, zero, 1, &layer);
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero);
     CpuSet((u8 *)ScriptProc_Start(0x92B3, 0xEFDA) + 0x14, gUnk_03004FC0, 256);
 }
