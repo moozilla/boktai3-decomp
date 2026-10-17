@@ -75,3 +75,4 @@ area,place,story_order,confidence,evidence,source
 73,Arena / Black Knight challenge,13,high,Black Knight dialogue presents and resolves an optional challenge with a reward; entered from the Ancient Tree/Arena side branch.,TaiyouWiki Locations; GX01 §Miscellaneous; areas/area_73.md
 74,Menu / bike setup screen,0,high,"Contains bike color, tire and standard setup strings rather than exploration-room data.",GX01 §Controls and Menu / §New game +; areas/area_74.md
 75,Mission / challenge selection room,13,high,Offers Bronze/Silver/Gold ranks and challenge completion/debug flags; entered from hub.,GX01 §Miscellaneous; areas/area_75.md
+137,Prologue: Sabata's dream,1,high,"A new game plays the text crawl (scene 6551), then scene 6554: Sabata (Boy in Black) meets Vanargand and the Puppeteer (cutscenes 0-3, strings 5460-5575), then the title card (6559) and the Sealed Prison (2698). Headless run of tests/prologue.txt.",tests/prologue.txt; tools/assets/cutscenes.py
