@@ -188,7 +188,7 @@ struct ResourceRef *sub_0821A2C4(u16);
 void sub_08219574(u32, s32, s32);
 void sub_08215A74(u32, s32);
 void sub_082160B8(u32, u32, void *, s32, s32, s32, s32, void *);
-void sub_082161B4(s32, s32, void *, s16, s16, s32, s32 *);
+void Bg_SetupLayers(s32, s32, void *, s16, s16, s32, s32 *);
 void sub_082164AC(u32, void *, u16);
 void sub_08215D40(u16, void *, s32, u16 *, u16);
 void *Video_GetBackgroundMap(u32);

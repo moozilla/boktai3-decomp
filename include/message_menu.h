@@ -27,7 +27,7 @@ int sub_08033690(int, int, int, int);
 void sub_08033A38(int, int, void *);
 void sub_080337FC(int);
 void sub_08033778(int);
-void sub_082161B4(int, int, void *, int, int, int, void *);
+void Bg_SetupLayers(int, int, void *, int, int, int, void *);
 void sub_0821983C(void *, void *, int, int, int, int, int, void *);
 void EncodedRecord_EncodeFields(void *);
 void EncodedRecord_FormatRows(void *, void *, void *, int);

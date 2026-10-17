@@ -43,7 +43,7 @@ extern u16 gUnk_03004FC0[];
 void Bg_ClearTilemap(s32);
 void BgGfx_LoadTilemapSimple(s32, s32, s32, s32, s32);
 void *ScriptProc_Start(s32, s32);
-void sub_082161B4(s32, s32, void *, s32, s32, s32, void *);
+void Bg_SetupLayers(s32, s32, void *, s32, s32, s32, void *);
 void ResourceHeader_Relocate(void *, void *);
 void sub_0821983C(void *, void *, s32, s32, s32, s32, s32, void *);
 void sub_081DC1B4(s32);
@@ -77,7 +77,7 @@ s32 SoundTest_Initialize(struct Viewer *p)
     {
         void *background = ScriptProc_Start(0xc091, 0x3536);
         option = 10;
-        sub_082161B4(2, 0, background, 0, 0, 1, &option);
+        Bg_SetupLayers(2, 0, background, 0, 0, 1, &option);
     }
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
     CpuSet((u8 *)ScriptProc_Start(0x92b3, 0x204) + 20, gUnk_03004FC0, 256);

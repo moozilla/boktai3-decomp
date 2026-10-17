@@ -2,7 +2,7 @@
 extern u16 gUnk_03004BD8;
 extern u8 gUnk_03004FC0[], gUnk_03004CC0[];
 void *ScriptProc_Start(u32, u32);
-void sub_082161B4(u32, u32, void *, u32, u32, u32, u32 *);
+void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void sub_08215A74(u32, u32);
 void sub_08216520(u32, u32, u32);
 void sub_08215EB4(u32, u32, u32, u32, u32, u32, u32, u32);
@@ -25,7 +25,7 @@ u32 sub_081D5C08(u8 *s, u32 value)
     *reg = mask;
     p = ScriptProc_Start(0xC091, 0x3536);
     *(void **)(s + 0x18) = p;
-    sub_082161B4(1, 0, p, 0, 0, 1, &value);
+    Bg_SetupLayers(1, 0, p, 0, 0, 1, &value);
     sub_08215A74(2, 0);
     sub_08216520(2, 0, 0);
     q = (u8 *)ScriptProc_Start(0x92B3, 0x204) + 0x14;
@@ -40,7 +40,7 @@ u32 sub_081D5C08(u8 *s, u32 value)
         dst--;
     }
     zero = 0;
-    sub_082161B4(2, 0, *(void **)(s + 0x18), 0, zero, one = 1, &value);
+    Bg_SetupLayers(2, 0, *(void **)(s + 0x18), 0, zero, one = 1, &value);
     fields = (struct Fields *)gUnk_03004CC0;
     fields->first = 0x10;
     fields->second = zero;

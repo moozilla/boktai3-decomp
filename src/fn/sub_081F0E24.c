@@ -1,7 +1,7 @@
 #include "global.h"
 void Bg_ClearTilemap(u32);
 void *ScriptProc_Start(u32, u32);
-void sub_082161B4(u32, u32, void *, u32, u32, u32, u32 *);
+void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void sub_08215A74(u32, u32);
 void sub_081F0E24(u8 *s)
@@ -20,13 +20,13 @@ void sub_081F0E24(u8 *s)
         Bg_ClearTilemap(1);
         *(void **)(s + 0x3A4) = (p = ScriptProc_Start(0xC091, 0x42FF));
         scratch.value = 0;
-        sub_082161B4(3, 0, p, 0, 0, 1, &scratch.value);
+        Bg_SetupLayers(3, 0, p, 0, 0, 1, &scratch.value);
         BgGfx_LoadTilemapSimple(1, 0, 0, 0, 0x60);
     } else {
         Bg_ClearTilemap(3);
         *(void **)(s + 0x3A4) = (p = ScriptProc_Start(0xC091, 0x42FF));
         scratch.value = kind;
-        sub_082161B4(2, 0, p, 0, kind, 1, &scratch.value);
+        Bg_SetupLayers(2, 0, p, 0, kind, 1, &scratch.value);
         sub_08215A74(3, 2);
         BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0x60);
     }

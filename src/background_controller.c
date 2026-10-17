@@ -488,7 +488,7 @@ s32 Background_LoadMapsFromScript(void)
     if (base[0] == 'M' && base[1] == 'P') {
         register s32 drawX asm("r5") = x;
         asm("" : "+r"(drawX));
-        sub_082161B4(target, 0, base, drawX, y, n, indices);
+        Bg_SetupLayers(target, 0, base, drawX, y, n, indices);
     }
 }
 

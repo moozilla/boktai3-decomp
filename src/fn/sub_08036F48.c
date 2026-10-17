@@ -29,7 +29,7 @@ void sub_0821447C(int, void *, void *, void *);
 void Hud_SetMode(int);
 void Bg_ClearTilemap(int);
 void *ScriptProc_Start(int, int);
-void sub_082161B4(int, int, void *, int, int, int, void *);
+void Bg_SetupLayers(int, int, void *, int, int, int, void *);
 void BgGfx_LoadTilemapSimple(int, int, int, int, int);
 void sub_08036C0C(void);
 void sub_0822B058(int);

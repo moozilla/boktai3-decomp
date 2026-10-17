@@ -2017,6 +2017,7 @@ addr,name,mode,confidence,source,notes
 08215698,Video_GetBackgroundMap,thumb,high,raphaelr,(int bg) -> EWRAM buffer holding that BG's tilemap
 082156B8,Bg_ClearTilemap,thumb,low,src-alias,
 082158B0,Bg_UpdateScrollShadow,thumb,low,src-alias,masks the BG scroll records gUnk_03004C30[bg].x/y to 8 bits into the HOFS/VOFS shadow gUnk_03004C20
+082161B4,Bg_SetupLayers,thumb,low,src-alias,
 0821656C,BgGfx_LoadTilemapSimple,thumb,low,src-alias,
 08216584,BgGfx_LoadTilemap,thumb,medium,coverage,reads 0x200-byte BG tilemaps (menu screens at 0x0870C238+)
 08217EAC,Effect_Remove,thumb,low,src-alias,
