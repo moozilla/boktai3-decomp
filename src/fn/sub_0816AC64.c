@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 91.1%
-// 5 differing instruction runs; first diff at +0x52 (movs r0, #0xf0 vs movs r2, #0xf0)
 void sub_08163F14(u8 *, u32, u32, u32, u32);
 void sub_08165ACC(u8 *);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
@@ -10,6 +7,7 @@ void sub_08163EA0(u8 *, void *);
 void sub_0816AF5C(void);
 void sub_0816AC64(u8 *s)
 {
+    s32 mark; // the halfword goes through a word register (found by tools/autosolve.py)
     u32 zero;
     u8 *a, *b, *initial;
     u16 *p;
@@ -24,7 +22,8 @@ void sub_0816AC64(u8 *s)
     *(u32 *)(s + 0x3BE8) &= ~1;
     p = (u16 *)(s + 0x3C00);
     zero = 0;
-    *p = 0xFFA8;
+    mark = 0xFFA8;
+    *p = mark;
     *(u16 *)(s + 0x3C02) = 0x20;
     initial = s + 0x3BE0;
     b = s + 0xC4;
@@ -35,6 +34,3 @@ void sub_0816AC64(u8 *s)
     sub_08030DBC(0);
     sub_08163EA0(s, sub_0816AF5C);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0816AC64);
-#endif
