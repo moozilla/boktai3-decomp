@@ -54,6 +54,7 @@ class Show:
         self.r = Rom(translated)
         self.pools = romx.Pools(self.r)
         self.pkgs = {}
+        self.res = {}                  # other new archive entries: {type: {name: data}}
         self.strings = list(strings)   # borrowed string ids, used in order
         self.slots = list(slots)       # borrowed cutscene slots
         self.pages = []                # (string id, characters) of every dialogue page
@@ -100,10 +101,17 @@ class Show:
         self.pkgs[name] = ("alias", source, pool)
         return name
 
+    def resource(self, type_hash, name, data):
+        """A new entry `name` in the archive of type_hash (e.g. a stage palette, 92B3)."""
+        self.res.setdefault(type_hash, {})[name] = data
+        return name
+
     def save(self, path):
         self.pools.build()
         if self.pkgs:
             romx.add_resources(self.r, romx.PKG_TYPE, self.pkgs)
+        for t, items in self.res.items():
+            romx.add_resources(self.r, t, items)
         os.makedirs(os.path.dirname(path), exist_ok=True)
         self.r.save(path)
 

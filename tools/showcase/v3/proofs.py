@@ -432,5 +432,82 @@ def fades():
     print(run.shots(path, st, list(range(60, 420, 30)), "fades", scale=1))
 
 
+SFX = [220, 221, 222, 263, 266, 402, 540, 628, 893, 205, 199, 200, 201, 202, 641, 1243, 208, 1414, 1268, 1244, 853,
+       219, 1425, 1261, 1140, 894, 854, 747, 606, 1402, 1342, 1262, 1242, 1132, 103, 899, 868, 861, 811, 742, 740,
+       531, 488, 349, 244, 234, 231, 230, 1480, 1464, 1427, 1408, 1365, 1338, 1299, 1298, 1251, 1247, 1246, 1241,
+       1136, 1131, 1407]
+SFX_GAP = 60
+
+
+def sfx():
+    """An audition: each sound in SFX, SFX_GAP frames apart, recorded with
+    sound on a quiet stage (the edit picks a snap and an ominous arrival)."""
+    import record
+    show = Show(STRINGS, SLOTS)
+    cut = Cutscene(show)
+    X, Z = 1152, 1152
+    from show import bgm_out
+    cut.at(0, fade(0, 1, 0, 0, 0), cam(X, Z, 1), bgm_out(1))
+    for k, n in enumerate(SFX):
+        cut.at(120 + SFX_GAP * k, sound(n))
+    cut.hold(120 + SFX_GAP * len(SFX) + 120)
+    scene = simple_scene(show, cut, 2718, X, Z + 300)
+    path = os.path.join(OUT, "sfx.gba")
+    show.save(path)
+    st = run.state(path, scene, 58, "sfx", wait=2)
+    out = os.path.join(OUT, "sfx.mp4")
+    record.record(path, st, [], "sfx_rec", out, tail=120 + SFX_GAP * len(SFX) + 200)
+
+
+def arena():
+    """The Pile Driver's arena (scene 6201's stage), with and without the
+    Pile Driver object (proc_6182), for the coffin piece (ARENA_PD=1)."""
+    import part1
+    show = Show(STRINGS, SLOTS)
+    X, Z, Y = 1920, 1920, 512
+    sc = part1.Scene(show, 6201, X, Z + 700, facing=1, y=Y, song=0, camera=(X, Z))
+    if os.environ.get("ARENA_PD"):
+        sc.spawns = [Call(6182, 0)]
+    sc.cut.hold(400)
+    pid = sc.build()
+    path = os.path.join(OUT, "arena.gba")
+    show.save(path)
+    st = run.state(path, pid, 58, "arena", wait=60)
+    print(run.shots(path, st, [10, 120, 300], "arena", scale=1))
+
+
+def kneel():
+    """Django hit and down on one knee: the player commands one at a time
+    (43 shake, 12 kneel_down, 13 kneel_gasp, 14 get_up, 11 kneel)."""
+    import part1
+    show = Show(STRINGS, SLOTS)
+    X, Z, Y = 1664, 2050, 512
+    sc = part1.Scene(show, 3243, X, Z, facing=1, y=Y, song=0, camera=(X, Z))
+    dj = sc.player
+    seq = [[int(x) for x in v.split(":")] for v in os.environ.get("KSEQ", "43,12:1,13:1,14:1,11:1").split(",")]
+    gap = int(os.environ.get("KGAP", "80"))
+    for k, c in enumerate(seq):
+        dj.raw(30 + gap * k, *c)
+    sc.cut.hold(30 + gap * len(seq) + 60)
+    pid = sc.build()
+    path = os.path.join(OUT, "kneel.gba")
+    show.save(path)
+    st = run.state(path, pid, 58, "kneel", wait=30)
+    import record
+    gap = int(os.environ.get("KGAP", "80"))
+    times = [20] + [30 + gap * k + d for k in range(len(seq)) for d in range(5, gap, gap // 6)]
+    lines = [f"loadstate {st}", f"watchpc {record.SCRIPT_START:08X} -2147483648 2147483647", "waitpc 20000"]
+    now = 0
+    for t in times:
+        lines += [f"wait {t - now}", f"shot k{t:05d}"]
+        now = t
+    d = run.harness(path, lines, "kneel")
+    import subprocess
+    files = [os.path.join(d, f"k{t:05d}.png") for t in times]
+    subprocess.run(["magick", "montage", "-font", "/System/Library/Fonts/Supplemental/Arial.ttf", *files, "-tile", "6x",
+                    "-geometry", "240x160+2+2", os.path.join(OUT, "kneel.png")], check=True)
+    print(os.path.join(OUT, "kneel.png"))
+
+
 if __name__ == "__main__":
     globals()[sys.argv[1]]()
