@@ -465,3 +465,4 @@ addr,function,name,family,note
 08172850,sub_08172850,SceneHud_ConfigureActionGrid,"SceneHud","builds selectable action grid for mode and flags"
 08172950,sub_08172950,SceneHud_LayoutActionGrid,"SceneHud","places action and unlock icons in two grid layouts"
 08172BD0,sub_08172BD0,SceneHud_UpdateActionGridInput,"SceneHud","processes action-grid movement confirmation and cancellation"
+08172CE8,sub_08172CE8,SceneHud_UpdateActionChoice,"SceneHud","updates action cursor and accepts or cancels the choice"
