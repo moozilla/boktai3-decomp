@@ -410,13 +410,16 @@ void *Background_CreateFromScript(u32 id)
 // MATCHING_CONCESSION: register-pinning
 s32 Background_FindMapId(struct BackgroundResource *resource, u16 id)
 {
-    register struct BackgroundMapEntry *entry asm("r2") =
+    struct BackgroundMapEntry *entry =
         (struct BackgroundMapEntry *)resource->maps;
     s32 i;
     for (i = 0; i < resource->count; i++) {
-        if (entry->id == id)
+        if (entry->id == id) {
             return i;
+        }
+        do {
         entry++;
+        } while (0);
     }
     return 0;
 }
@@ -767,7 +770,6 @@ s32 ScrollingBackground_Update(struct ScrollingBackground *p)
             p->fadeActive = 0;
     }
 }
-
 
 u32 ScrollingBackground_Destroy(struct ScrollingBackground *p)
 {
