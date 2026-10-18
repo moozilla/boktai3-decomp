@@ -707,3 +707,4 @@ addr,function,name,family,note
 08146870,sub_08146870,Player_UpdateBriefAction,"Player","updates a fifteen-frame player action"
 0814A01C,sub_0814A01C,Player_UpdateStatBAction,"Player","consumes stat B and advances action or empty-stat recovery"
 0814A360,sub_0814A360,Player_UpdateStatBEffectAction,"Player","spends two stat B units to start a phased effect action"
+0814A530,sub_0814A530,Player_CalculateActionStat,"Player action stats","combines action base stat, callbacks, phase scaling and level bonus"
