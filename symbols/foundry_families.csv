@@ -33,3 +33,4 @@ addr,function,name,family,note
 0809D4EC,sub_0809D4EC,SceneActorControl_ConsumeLiftFlagPenalty,"SceneActorControl (actor reset/lift-flag helpers, sibling of SceneActorControl_ConsumeLiftFlag sub_080837D4)","if the actor's lift flag (flags3D4 bit 2) is set, drops the local player's f4F6 counter by 1 when paletteOffset==0, then clears the lift flag"
 0809D948,sub_0809D948,RouteActor_UpdatePlayerDestinationPhase,"RouteActor","initializes pursuit phase and targets the player position"
 0809EE2C,sub_0809EE2C,RouteActor_UpdatePeriodicAnimation,"RouteActor","selects an animation every ninety ticks and advances phase"
+0809EEBC,sub_0809EEBC,RouteActor_UpdateAnimationSequence,"RouteActor","advances animation sequence until phase five completes"
