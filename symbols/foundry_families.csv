@@ -1000,3 +1000,4 @@ addr,function,name,family,note
 0819EAE4,sub_0819EAE4,ActorAction_UpdateDirectionalAnimation,"ActorActionSequence","updates facing starts animation and sound then invokes actor callback"
 081A1CBC,sub_081A1CBC,ActorReaction_BeginCollisionPhase,"ActorReaction (tentative)","sets reaction flags and conditionally configures a collider pair"
 081A2BD4,sub_081A2BD4,ActorReaction_Tick,"ActorReaction (tentative)","runs the actor reaction update stages unless globally paused"
+081A32EC,sub_081A32EC,EffectVariant_SetProperties,"EffectVariant (tentative)","sets a variant byte and table-selected value and flag mode"
