@@ -990,3 +990,4 @@ addr,function,name,family,note
 0819C980,sub_0819C980,ColliderActor_SetTargetPosition,"ColliderActor (tentative)","set target and facing and compute minimum travel time"
 0819CCEC,sub_0819CCEC,OffsetActor_StepTowardTarget,"OffsetActor (tentative)","computes motion toward the saved target with a twelve-unit step"
 0819D1D0,sub_0819D1D0,OffsetActor_UpdateRepeatedAnimation,"OffsetActor (tentative)","cycles animations until five repetitions or a nearby-cell test changes the sequence"
+0819D2C0,sub_0819D2C0,OffsetActor_UpdateAnimationSequence,"OffsetActor (tentative)","plays animation 24, optionally 25, then 10 and marks completion"
