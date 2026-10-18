@@ -1,0 +1,27 @@
+#include "global.h"
+#include "engine.h"
+#define SceneActor_UpdateUnlessPaused sub_0817FD50
+#define SceneActor_DispatchAction BossSlot2_ResetAndRunPhaseCallback
+#define SceneActor_SelectStateCallback BossSlot2_InitStateDispatch
+#define SceneActor_RunUnfrozenState BossSlot2_RunUnpausedStateCallback
+#define gEnginePauseFlags gUnk_0300523C
+struct SceneActorPausedUpdate {
+    u8 pad0[0x4f6];
+    s16 pauseClass;
+};
+void sub_0817F734(struct SceneActorPausedUpdate *);
+void BossSlot2_ResetAndRunPhaseCallback(struct SceneActorPausedUpdate *);
+u32 BossSlot2_InitStateDispatch(struct SceneActorPausedUpdate *);
+void BossSlot2_RunUnpausedStateCallback(struct SceneActorPausedUpdate *);
+void sub_0817F9C0(struct SceneActorPausedUpdate *);
+s32 sub_0817FD50(struct SceneActorPausedUpdate *p)
+{
+    if (!gEnginePauseFlags || (p->pauseClass != 1 && !(gEnginePauseFlags & 7))) {
+        sub_0817F734(p);
+        SceneActor_DispatchAction(p);
+        SceneActor_SelectStateCallback(p);
+        SceneActor_RunUnfrozenState(p);
+        sub_0817F9C0(p);
+    }
+    return 0;
+}
