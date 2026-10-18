@@ -637,3 +637,4 @@ addr,function,name,family,note
 0811EE9C,sub_0811EE9C,ActorEmitter_TryEmit,"ActorEmitter","checks energy, emits an object, and starts a cooldown"
 0811EF40,sub_0811EF40,ActorEmitter_TryEmitLow,"ActorEmitter","emits at a lower height offset and clears the emission timer"
 0811EFF0,sub_0811EFF0,ActorEmitter_UpdateAnimation,"ActorEmitter","steps an emission animation and updates its collision position"
+0811F0B8,sub_0811F0B8,ActorEmitter_TryEmitPair,"ActorEmitter","emits a pair with a kind-dependent height offset"
