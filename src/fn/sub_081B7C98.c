@@ -25,8 +25,8 @@ typedef struct {
 
 extern void sub_081B7B1C(Obj *p);
 extern s32 sub_0824923C(void *arg, void *function);
-extern void sub_08215284(void *a, s32 b);
-extern u32 D_08612154[];
+extern void AnimData_SelectPaletteBank(void *a, s32 b);
+extern u32 gUnk_08612154[];
 
 s32 sub_081B7C98(Obj *p)
 {
@@ -39,10 +39,10 @@ s32 sub_081B7C98(Obj *p)
             if (e->cnt != 0) {
                 e->cnt--;
                 if (e->cnt != 0) {
-                    e->f32 = D_08612154[e->idx];
+                    e->f32 = gUnk_08612154[e->idx];
                     e->f38 = (u8 *)p + (e->idx * 32 + 0x1c);
                 } else {
-                    sub_08215284(&e->obj, 0xd5);
+                    AnimData_SelectPaletteBank(&e->obj, 0xd5);
                 }
             }
         }

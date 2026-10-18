@@ -6,7 +6,7 @@ void sub_0813B134(u8 *, s32);
 s32 sub_081419D4(u32, s32);
 u8 sub_082212DC(void *, u32, s32, s32);
 void sub_082279A8(s32, s32, s32, s32, s32, s32, s32);
-void sub_0822B2F8(s32);
+void Sound_PlaySong(s32);
 extern u32 gUnk_030053F4;
 
 #define F8(o)  (*(u8 *)(p + (o)))
@@ -20,7 +20,7 @@ void sub_081460F4(u8 *p)
             u32 z;
             u8 *q;
             sub_0813AE18(p, sub_081419D4(F8(0x418), 0x29), 0x40, 1);
-            sub_0822B2F8(0x1AD);
+            Sound_PlaySong(0x1AD);
             q = p + 0x153;
             z = 0;
             *q = 1;
@@ -40,15 +40,15 @@ void sub_081460F4(u8 *p)
         case 2:
             if (F16(0x45A) == 9) {
                 if (F8(0x418) == 6)
-                    sub_0822B2F8(0x2EC);
+                    Sound_PlaySong(0x2EC);
                 else
-                    sub_0822B2F8(0x304);
+                    Sound_PlaySong(0x304);
             }
             F16(0x45A) = F16(0x45A) + 1;
             if (F16(0x45A) > 0xe) {
                 sub_0813B03C(p, 3);
                 F16(0x4E8) = 0;
-                sub_0822B2F8(0x1AF);
+                Sound_PlaySong(0x1AF);
             }
             break;
         case 3:

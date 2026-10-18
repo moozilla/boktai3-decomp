@@ -18,7 +18,7 @@ struct M {
     u8 pad[0x3A2 - 0x100 - 12 * 0x38];
 };
 
-extern void *sub_08215184(u32);
+extern void *AnimData_FindEntry(u32);
 extern void sub_08217DE0(struct P *, void *, u32);
 extern void sub_08217EC4(struct P *, s32, s32);
 extern void sub_08217ECC(struct P *, u32);
@@ -32,7 +32,7 @@ void sub_081FE04C(struct M *m)
     void **r;
     *(u16 *)((u8 *)m + 0x3a0) = 0;
     *(u16 *)((u8 *)m + 0x3a2) = 0;
-    m->res = sub_08215184(0x1c1e);
+    m->res = AnimData_FindEntry(0x1c1e);
     r = &m->res;
     z = 0;
     p = (struct P *)((u8 *)m + 0x100);

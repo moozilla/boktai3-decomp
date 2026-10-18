@@ -2,7 +2,7 @@
 
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
-s32 sub_0804F6D0(void *);
+s32 RepeatedEffect_RequestNearby(void *);
 
 struct Inner {
     u8 pad[4];
@@ -28,7 +28,7 @@ struct Obj {
 
 void sub_08140834(struct Obj *o)
 {
-    if (sub_0804F6D0((u8 *)o + 0x30) != 0 && o->busy == 0) {
+    if (RepeatedEffect_RequestNearby((u8 *)o + 0x30) != 0 && o->busy == 0) {
         s32 m = Mod(o->idx, gUnk_030052F4->in->w);
         s32 d = Div(o->idx, gUnk_030052F4->in->w);
         o->x = (m << 8) + 0x80;
