@@ -837,3 +837,4 @@ addr,function,name,family,note
 0817AB2C,sub_0817AB2C,ActorAttachment_PlayEffect,"ActorEffect","updates attachment effect and plays its song"
 0817ACD0,sub_0817ACD0,ActorEffect_SpawnAtAngle,"ActorEffect","offsets a packed position by an angle before spawning an effect"
 0817B058,sub_0817B058,SceneVolume_ConsumePendingEvent,"SceneVolume","clears pending byte equal to one and reports consumption"
+0817B078,sub_0817B078,SceneVolume_ResetPendingSequence,"SceneVolume","resets sequence state length and buffer pointer when requested"
