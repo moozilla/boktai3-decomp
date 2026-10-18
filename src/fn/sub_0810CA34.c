@@ -1,0 +1,68 @@
+#include "global.h"
+#define LinkPanel_InitFromScript sub_0810CA34
+#define gLinkPanel               gUnk_020001C4
+struct LinkPanel {
+    u8 pad0[0x1C];
+    void *resource;
+    u8 pad20[0x304];
+    u8 widget[0xC1C];
+    void (*update)(void);
+    u32 scriptS;
+    u32 scriptC;
+    u8 padF4C[0xC];
+    u8 flagF58;
+    u8 padF59[0x13];
+    u8 flagF6C;
+    u8 padF6D[7];
+    s32 optionE;
+};
+extern struct LinkPanel *gUnk_020001C4;
+s32 Script_SeekToKeyword(u32);
+u32 Script_GetTextSourcePc(void);
+s32 Script_GetKeywordValue(u32, s32);
+void Bg_ClearTilemap(s32);
+void RegistryF246_InitBackgroundResources(struct LinkPanel *);
+void sub_0810BF94(struct LinkPanel *);
+void sub_0810BFD8(struct LinkPanel *);
+void sub_0810C0BC(struct LinkPanel *);
+void ModifierMenu_InitSelectionSnapshot(void *, void *);
+void sub_0810BEF8(struct LinkPanel *);
+void RegistryF246_InitMessageDisplay(struct LinkPanel *);
+void sub_0810C7F4(void);
+void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
+s32 sub_0810CA34(struct LinkPanel *p)
+{
+    if (Script_SeekToKeyword('s')) {
+        p->scriptS = Script_GetTextSourcePc();
+        if (!p->scriptS)
+            return -1;
+    }
+    if (Script_SeekToKeyword('c')) {
+        p->scriptC = Script_GetTextSourcePc();
+        if (!p->scriptC)
+            return -1;
+    }
+    p->optionE = Script_GetKeywordValue('e', 0);
+    Bg_ClearTilemap(3);
+    Bg_ClearTilemap(2);
+    Bg_ClearTilemap(1);
+    Bg_ClearTilemap(0);
+    RegistryF246_InitBackgroundResources(p);
+    sub_0810BF94(p);
+    sub_0810BFD8(p);
+    sub_0810C0BC(p);
+    ModifierMenu_InitSelectionSnapshot(p->widget, p->resource);
+    sub_0810BEF8(p);
+    RegistryF246_InitMessageDisplay(p);
+    {
+        void (*update)(void) = sub_0810C7F4;
+        u32 zero = 0;
+        p->update = update;
+        p->flagF6C = 1;
+        p->flagF58 = zero;
+        if (Script_GetKeywordValue('f', 0))
+            ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xFFFF, zero);
+    }
+    gUnk_020001C4 = p;
+    return 1;
+}
