@@ -72,3 +72,4 @@ addr,function,name,family,note
 080B7580,sub_080B7580,SceneActorReaction_SetProfileEntries,"SceneActorReaction","sets category-specific profile entries from reaction flags"
 080B7688,sub_080B7688,SceneActorReaction_IsRangeReady,"SceneActorReaction","tests category-specific distance and health gates against timers"
 080B7BB4,sub_080B7BB4,SceneActorScript_ReadPParameters,"SceneActorScript / SceneActorRegistry","after seeking script keyword 'P', reads 4 u16 parameters plus one trailing value into the actor's script-context struct"
+080B8AB8,sub_080B8AB8,SceneActorScript_ReadCallScriptConfig,"SceneActorScript / SceneActorRegistry","after seeking script keyword 'x', reads a script id and call-limit from the script (or zeros them), then always resets the call counter"
