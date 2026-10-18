@@ -34,7 +34,21 @@ import re
 import sys
 
 from romlib import ROOT
-from worklist import done_names
+from worklist import done_names as _done_by_name
+
+_done = None
+
+
+def done_names():
+    """gen/code.s names (sub_XXXXXXXX) of matched functions. A C file may
+    define a matched function under its real name only, which the name-based
+    worklist.done_names misses; tools/progress.py decides by address."""
+    global _done
+    if _done is None:
+        sys.path.insert(0, os.path.join(ROOT, "tools", "assets"))
+        import script_targets
+        _done = set(_done_by_name()) | {f"sub_{a:08X}" for a, (_, ok, _, _) in script_targets.progress().items() if ok}
+    return _done
 
 K = 6
 MIN_RUN = 8
@@ -350,15 +364,16 @@ def port(minimum, keep):
             text = res.stdout + res.stderr
             if res.returncode == 0 and "MATCH" in text:
                 verdict = "MATCH" + (" (constants renamed)" if attempt == "constants" else "")
-                if keep:
-                    shutil.copy(out, os.path.join(ROOT, "src", "fn", name + ".c"))
+                dest = os.path.join(ROOT, "src", "fn", name + ".c")
+                if keep and not os.path.exists(dest):  # never replace existing C
+                    shutil.copy(out, dest)
                 break
             m = re.search(r"fuzzy ([\d.]+)%", text)
             v = f"fuzzy {m.group(1)}%" if m else "does not compile: " + (text.strip().split("\n") or [""])[-1][:80]
             verdict = v if verdict is None or (m and v > verdict) else verdict
         rows.append((name, rel, verdict))
         print(f"{name}  from {nm.get(rel, rel):40s} {verdict}", flush=True)
-    n = sum(1 for r in rows if r[2] == "MATCH")
+    n = sum(1 for r in rows if r[2].startswith("MATCH"))
     print(f"\n{n} MATCH of {len(rows)} candidates" + (" (copied to src/fn/)" if keep and n else ""))
 
 

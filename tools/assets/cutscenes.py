@@ -27,8 +27,10 @@ command 0 runs a script, 1 waits N frames, 2 waits for a signal
 (`SceneMessages_ConsumeSignal`, command 2502, from a script). "Run" names an
 entry of `ids`; the script at the same index of `scripts` is called with the
 remaining arguments. The first script is usually the starter's own procedure,
-a `match` on a counter (r700[0x119]) that shows the next dialogue line or
-closes the window each time it runs, so each run of it is one line.
+a `match` on a counter (r700[0x119]): each run from the table shows the next
+line and ends with `message_then` on itself, so dismissing the window runs the
+following case, which closes it and sends the signal the step waits for. Each
+run of it is one line.
 """
 import json
 import os
@@ -311,20 +313,24 @@ def receiver_name(to, kind, cn=None):
 
 def dialogue(pid):
     """What a director script does each time it runs, by counter value:
-    {case: text id, "close" (proc_1025), or None}."""
+    {case: (text id, "close" (proc_1025) or None, continues)}, where continues
+    says the case ends with message_then (proc_1022) on the script itself: the
+    window then runs the next case (the close) when the player dismisses it."""
     out, cur = {}, None
     for _, t in scan()["procs"].get(pid, []):
         m = re.match(r"case (\d+) \{", t)
         if m:
             cur = int(m.group(1))
-            out.setdefault(cur, None)
-        if cur is None or out.get(cur) is not None:
+            out.setdefault(cur, [None, False])
+        if cur is None:
             continue
         m = re.search(r"text#(\d+)", t)
-        if m and "0x1c64" in t:
-            out[cur] = int(m.group(1))
-        elif re.match(r"proc_102[457]\b", t):
-            out[cur] = "close"
+        if m and "0x1c64" in t and out[cur][0] is None:
+            out[cur][0] = int(m.group(1))
+        elif re.match(r"proc_102[457]\b", t) and out[cur][0] is None:
+            out[cur][0] = "close"
+        if re.match(r"proc_1022 ", t):
+            out[cur][1] = True
     return out
 
 
@@ -404,7 +410,7 @@ def timeline(n, start=None):
                 item["script"] = script
                 item["call"] = proc_name(script) if script else f"{who:04X}?"
                 if k == 0:
-                    tid = lines.get(counter)
+                    tid, continues = lines.get(counter, (None, False))
                     item["line"] = counter
                     if tid == "close":
                         item["close"] = True
@@ -412,7 +418,9 @@ def timeline(n, start=None):
                         item["text"] = tid
                         item["say"] = tx.get(tid, f"text#{tid}")
                         item["en"], item["jp"] = full_text(tid)
-                    counter += 1
+                    # a line that ends with message_then runs its own close case
+                    # when dismissed, so the table's next run shows the next line
+                    counter += 2 if continues else 1
             row.append(item)
         out.append((i, row))
     return st, out

@@ -110,13 +110,16 @@ the camera, the screen and the sound.
     3  say "Boy in Black: "Where..."; until the player presses A
     4  Player 2B06.face(5, 0); wait 30f          # looks left, right, left, right
     ...
+   10  say "Boy in Black: "Is this... a dream?"; until the player presses A
    13  camera.pan_to(1144, 406, 1144, 200); wait 120f
    14  Player 2B06.walk_to(1264, 256, 1264, 0); wait 120f
-   15  say "Boy in Black: "Is this... a dream?"; until the player presses A
+   15  say "Boy in Black: Is this what called me here?"; until the player presses A
+   ...
    23  audio.start_ch12(106, 0); audio.play_sound(1425, 0); wait 0f
    24  Vanargand.cmd51(); screen.quake(90, 10); wait 60f     # it rises
    26  audio.fade_out_ch12(8, 0); screen.quake(90, 20); Vanargand.cmd52() and wait
-   29  say "Boy in Black: Is this what called me here?"; until the player presses A
+   29  say "Boy in Black: "Looks like it's already awakened…"; until the player presses A
+   33  say "Boy in Black: "I see..."; until the player presses A
    34  audio.fade_out_bgm(5, 0); audio.play_sound(641, 0); screen.fade(1, 6, 31, 31, 31, ...); wait 180f
 ```
 

@@ -23,6 +23,11 @@ README badges (live from decomp.dev). Don't copy totals into other files.
 
 Recent work, newest first (details in [history](history/README.md)):
 
+* **A showcase scene in the game** (2026-10-17): `tools/showcase/` writes new
+  script procedures (a GCL assembler), dialogue, a cutscene table and stage
+  paths into a ROM copy, and `video.sh` records the result with sound. It
+  also corrected the cutscene dialogue decoding (each run is one message;
+  docs/CUTSCENES.md).
 * **Relatives: start from matched code that shares runs** (2026-10-17):
   `tools/relatives.py ADDR --c` lists the matched functions that share long
   instruction runs with an unmatched one (registers abstracted), how much each

@@ -98,7 +98,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/CANDIDATES.md](../docs/CANDIDATES.md) | Compact checking and candidate checkpoints | *#tooling* | 3 |
 | [docs/CENTAUR.md](../docs/CENTAUR.md) | Centaur: playing with the decomp | *#scene #tooling* | 19 |
 | [docs/COMPILER_REFERENCES.md](../docs/COMPILER_REFERENCES.md) | Community references and checked agbcc patterns | *#assets #matching* | 4 |
-| [docs/CUTSCENES.md](../docs/CUTSCENES.md) | Cutscenes: the SceneMessages event tables | #scripts #scene #actors | 6 |
+| [docs/CUTSCENES.md](../docs/CUTSCENES.md) | Cutscenes: the SceneMessages event tables | #scripts #scene #actors | 11 |
 | [docs/DATA.md](../docs/DATA.md) | Decoded data |  | 7 |
 | [docs/DEVLOG_2026-10-08.md](../docs/DEVLOG_2026-10-08.md) | Boktai 3 devlog for October 8 2026 | *#process* | 21 |
 | [docs/DRAFT_INVENTORY_2026-10-09.md](../docs/DRAFT_INVENTORY_2026-10-09.md) | Existing-draft inventory (October 9, 2026) | *#inventory #matching* | 12 |
@@ -204,7 +204,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 16 |
 | [gcl/README.md](../gcl/README.md) | GCL: the game's scripts | *#scripts #scene #assets #tooling* | 15 |
-| [gcl/examples/prologue.md](../gcl/examples/prologue.md) | Worked example: the prologue, from New Game to the Sealed Prison | *#scripts #assets #tooling* | 8 |
+| [gcl/examples/prologue.md](../gcl/examples/prologue.md) | Worked example: the prologue, from New Game to the Sealed Prison | *#scripts #assets #tooling* | 9 |
 | [gcl/examples/scale_quiz.md](../gcl/examples/scale_quiz.md) | Worked example: the Blackbeard Brothers' scale quiz | *#scripts #assets #tooling* | 10 |
 | [gcl/examples/sealed_prison.md](../gcl/examples/sealed_prison.md) | Worked example: the Sealed Prison, the first dungeon | *#scripts #assets #tooling* | 6 |
 | [notes/animation-contact-burst_2026-10-14.md](../notes/animation-contact-burst_2026-10-14.md) | Temporary animations and contact-burst effect, October 14 | *#particles #animation* | 7 |
