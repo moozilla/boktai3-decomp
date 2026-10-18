@@ -1355,3 +1355,4 @@ addr,function,name,family,note
 08236878,sub_08236878,PlayerEffect_UpdatePhaseCallback,"PlayerEffect","latches an effect callback when player mode nine reaches phase two"
 082369D8,sub_082369D8,ParticleEffect_Update,"ParticleEffect","updates effect components and retires inactive tasks"
 08236A40,sub_08236A40,ParticleEffect_Destroy,"ParticleEffect","removes task sprites and effects and releases pending count"
+08236A8C,sub_08236A8C,ParticleEffect_Initialize,"ParticleEffect","initializes component effects and plays variant sound"
