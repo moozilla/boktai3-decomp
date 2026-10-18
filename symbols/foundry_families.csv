@@ -709,3 +709,4 @@ addr,function,name,family,note
 0814A360,sub_0814A360,Player_UpdateStatBEffectAction,"Player","spends two stat B units to start a phased effect action"
 0814A530,sub_0814A530,Player_CalculateActionStat,"Player action stats","combines action base stat, callbacks, phase scaling and level bonus"
 0814A6B8,sub_0814A6B8,Player_CalculatePreviewActionStat,"Player action stats","calculates a preview stat while temporarily substituting action fields"
+0814A884,sub_0814A884,Player_AccumulateContactCost,"Player contact and action variants","reduces contact cost and adds callback contributions"
