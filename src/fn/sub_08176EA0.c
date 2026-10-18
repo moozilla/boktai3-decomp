@@ -1,5 +1,4 @@
 #include "global.h"
-#define Hud_BeginSavedBlend sub_08176EA0
 #define Hud_SetPhase Hud_SetUpdateCallback
 #define gDisplayUpdateFlags gUnk_0300523C
 struct HudManager {
@@ -12,12 +11,12 @@ extern u32 gUnk_0300523C, gUnk_030051D8;
 extern u16 gUnk_03005214, gUnk_030051C4, gUnk_030051DC, gUnk_03005210;
 s32 sub_08176E20(struct HudManager *);
 void Hud_SetUpdateCallback(struct HudManager *, void (*)(void));
-void sub_081768AC(void);
+void SceneDialog_UpdateEntryFade(void);
 static inline void SetFlags(u32 mask)
 {
     gUnk_0300523C |= mask;
 }
-s32 sub_08176EA0(struct HudManager *p)
+s32 Hud_BeginSavedBlend(struct HudManager *p)
 {
     s32 result;
     if (!sub_08176E20(p)) {
@@ -29,7 +28,7 @@ s32 sub_08176EA0(struct HudManager *p)
         p->savedBlend[1] = gUnk_030051C4;
         p->savedBlend[2] = gUnk_030051DC;
         p->savedBlend[3] = gUnk_03005210;
-        Hud_SetUpdateCallback(p, sub_081768AC);
+        Hud_SetUpdateCallback(p, SceneDialog_UpdateEntryFade);
         result = 1;
     }
     return result;

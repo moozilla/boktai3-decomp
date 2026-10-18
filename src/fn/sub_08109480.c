@@ -1,9 +1,8 @@
-#define LinkSession_GetSlotValues sub_08109480
 #define gLinkDefaultSlotValues gUnk_08606544
 #define gLinkSelectedSlotValues gUnk_08606548
 #include "global.h"
 extern const u8 gUnk_08606544[], gUnk_08606548[];
-void sub_08109480(s32 selected, s32 *a, s32 *b, s32 *c, s32 *d)
+void LinkSession_GetSlotValues(s32 selected, s32 *a, s32 *b, s32 *c, s32 *d)
 {
     *a = gUnk_08606544[0];
     *b = gUnk_08606544[1];

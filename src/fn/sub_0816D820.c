@@ -1,10 +1,9 @@
-#define SceneInventory_GetItemConditionFrame sub_0816D820
 #include "global.h"
 #include "scene_item_values.h"
 extern const struct SceneValueItemDefinition gUnk_08E61280[];
 u32 Inventory_GetItemStateValue(u32);
 s32 Div(s32, s32);
-s32 sub_0816D820(u32 slot)
+s32 SceneInventory_GetItemConditionFrame(u32 slot)
 {
     s32 item = Inventory_GetItemId(slot);
     u32 condition;

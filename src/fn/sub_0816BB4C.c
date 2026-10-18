@@ -1,4 +1,3 @@
-#define MapMenu_ClampScrollAndUpdateArrows sub_0816BB4C
 #include "global.h"
 struct MapMenuArrow {
     u32 flags;
@@ -11,7 +10,7 @@ struct MapMenu {
     s16 scrollX, scrollY;
     s16 minScrollX, minScrollY, maxScrollX, maxScrollY;
 };
-void sub_0816BB4C(struct MapMenu *menu)
+void MapMenu_ClampScrollAndUpdateArrows(struct MapMenu *menu)
 {
     menu->arrows[0].flags &= ~1;
     menu->arrows[1].flags &= ~1;

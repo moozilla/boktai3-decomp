@@ -1,4 +1,3 @@
-#define SceneHud_LayoutActionGrid sub_08172950
 #define SceneHud_SetWidgetPalette PauseMenu_SetSpritePalette
 #include "global.h"
 #include "scene_hud_display.h"
@@ -13,7 +12,7 @@ static inline void SetPosition(struct SceneVec *position, s16 x, s16 y, s16 z)
     position->z = z;
     position->pad = 0;
 }
-void sub_08172950(struct SceneHudState *p)
+void SceneHud_LayoutActionGrid_08172950(struct SceneHudState *p)
 {
     struct SceneVec position;
     s32 i;

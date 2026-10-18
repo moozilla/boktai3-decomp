@@ -80,7 +80,7 @@ void SceneActorBehavior_ActivatePendingControl(struct SceneActorBehaviorView *ac
         void **allocation = &actor->allocation108;
         void *value = *allocation;
         if (value) {
-            sub_0824923C(actor->allocationArgument10C, value);
+            Callback_InvokeActor(actor->allocationArgument10C, value);
             *allocation = (void *)zero;
         }
     }

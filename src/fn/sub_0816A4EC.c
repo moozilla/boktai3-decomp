@@ -1,4 +1,3 @@
-#define ScenePanel_BeginSelection sub_0816A4EC
 #define ScenePanel_SetCallback Hud_SetUpdateCallback
 #include "global.h"
 
@@ -17,13 +16,13 @@ void PauseMenu_HideAllSprites(void *);
 void Bg_SetLayerMap(u32, void *, u16);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
-void sub_08169EDC(void *);
+void StatusPanel_ResetSelectionAnimations(void *);
 void PauseMenu_SetConfirmationIndicator(void *, s32);
 void PauseMenu_SetSpritePosition(void *, s32, s32, s32);
 s32 MessageWindow_ShowMessage(s32);
-void sub_0816A834(void);
+void MenuPrompt_UpdateChoice(void);
 void Hud_SetUpdateCallback(void *, void (*)(void));
-void sub_0816A4EC(struct ScenePanel *p)
+void ScenePanel_BeginSelection(struct ScenePanel *p)
 {
     PauseMenu_HideAllSprites(p);
     Bg_SetLayerMap(0, p->layerMap, 3);
@@ -32,9 +31,9 @@ void sub_0816A4EC(struct ScenePanel *p)
     p->x = 0;
     p->y = 0;
     Anim_SetKeyframes(p->animation, p->keyframes, 7, 2, 0);
-    sub_08169EDC(p);
+    StatusPanel_ResetSelectionAnimations(p);
     PauseMenu_SetConfirmationIndicator(p, 1);
     PauseMenu_SetSpritePosition(p, 7, -8, -8);
     MessageWindow_ShowMessage(1);
-    Hud_SetUpdateCallback(p, sub_0816A834);
+    Hud_SetUpdateCallback(p, MenuPrompt_UpdateChoice);
 }

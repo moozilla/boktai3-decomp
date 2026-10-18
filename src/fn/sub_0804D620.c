@@ -13,8 +13,8 @@ struct CountdownPlayer {
 };
 extern struct CountdownPlayer *gUnk_02000580;
 extern u8 *gUnk_02000710;
-void sub_08178238(s32, s32, u32);
-void sub_0815E790(struct CountdownPlayer *);
+void Hud_UpdateCountdownDisplay(s32, s32, u32);
+void Player_EnterKindFour(struct CountdownPlayer *);
 void Task_Kill(void *);
 s32 Countdown_Tick(struct CountdownTask *task)
 {
@@ -27,7 +27,7 @@ s32 Countdown_Tick(struct CountdownTask *task)
             if (++task->frame >= task->interval) {
                 task->frame = 0;
                 --*remaining;
-                sub_08178238(*(s32 *)(gUnk_02000710 + 0x618), *(s32 *)(gUnk_02000710 + 0x61C), 1);
+                Hud_UpdateCountdownDisplay(*(s32 *)(gUnk_02000710 + 0x618), *(s32 *)(gUnk_02000710 + 0x61C), 1);
                 if (*(s32 *)(gUnk_02000710 + 0x618) <= 0)
                     done = 1;
             }
@@ -36,7 +36,7 @@ s32 Countdown_Tick(struct CountdownTask *task)
         }
         if (done) {
             if (*((u8 *)gUnk_02000580 + 0x457) != 0x18) {
-                sub_0815E790(gUnk_02000580);
+                Player_EnterKindFour(gUnk_02000580);
                 {
                     u8 *transition = &gUnk_02000580->transition;
                     s32 zero = 0;

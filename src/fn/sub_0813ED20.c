@@ -1,9 +1,7 @@
-#define Player_ConsumeActionCharge   sub_0813ED20
-#define Player_BeginDescriptorAction sub_0813EABC
 #include "global.h"
 #include "player.h"
-void sub_08178370(void);
-void sub_0813EABC(struct Player *, struct PlayerActionEntry *);
+void Hud_BeginModeSixCue(void);
+void Player_BeginDescriptorAction(struct Player *, struct PlayerActionEntry *);
 static inline u32 TestFlags(u32 *flags, u32 mask)
 {
     u32 m = mask;
@@ -17,7 +15,7 @@ static inline s32 HasFlag(struct Player *p, u32 mask)
         return TRUE;
     return FALSE;
 }
-void sub_0813ED20(struct Player *p)
+void Player_ConsumeActionCharge(struct Player *p)
 {
     s32 cost;
     struct PlayerActionEntry *entry;
@@ -45,8 +43,8 @@ void sub_0813ED20(struct Player *p)
                     if (entry->remainingCharge != 0) {
                         if (entry->remainingCharge <= cost) {
                             entry->remainingCharge = 0;
-                            sub_08178370();
-                            sub_0813EABC(p, p->statModifierContext.actionEntry);
+                            Hud_BeginModeSixCue();
+                            Player_BeginDescriptorAction(p, p->statModifierContext.actionEntry);
                         } else
                             entry->remainingCharge -= cost;
                     }

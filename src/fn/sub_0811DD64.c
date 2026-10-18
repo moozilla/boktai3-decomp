@@ -1,11 +1,11 @@
 #include "global.h"
 s32 Script_GetKeywordValue(u32, s32);
-void sub_0811DCC4(s32, s32);
+void StateFlags_SetCategoryBit(s32, s32);
 void GameFlag_SetFromScript(void)
 {
     s32 m = -1;
     s32 a = Script_GetKeywordValue(0x6b, m);
     s32 b = Script_GetKeywordValue(0x69, m);
     if (a >= 0 && b >= 0)
-        sub_0811DCC4(a, b);
+        StateFlags_SetCategoryBit(a, b);
 }

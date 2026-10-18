@@ -1,5 +1,4 @@
 #include "global.h"
-#define ScreenMote_SpawnBatch    sub_0813AB04
 #define ScreenMote_Allocate SpriteParticle_AllocateSlot
 #define ScreenMote_CreateManager SpriteParticle_GetOrCreateManager
 #define gScreenMoteManager       gUnk_020001E0
@@ -48,7 +47,7 @@ static inline u32 NextRandom(void)
     gUnk_03005304 = (gUnk_03005304 + 1) & 0x3ff;
     return gUnk_086141BC[gUnk_03005304];
 }
-s32 sub_0813AB04(union ScreenMotePosition *origin, union ScreenMotePosition *target, s16 *range,
+s32 ScreenMote_SpawnBatch(union ScreenMotePosition *origin, union ScreenMotePosition *target, s16 *range,
                  s32 count, u32 mode, u32 unused, u32 flags, u32 options)
 {
     struct ScreenMoteManager *m;

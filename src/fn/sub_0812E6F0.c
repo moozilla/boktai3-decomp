@@ -1,10 +1,9 @@
-#define ActorMode_SelectOddStateVariant sub_0812E6F0
 #include "global.h"
 struct ActorModeState {
     u8 unknown0[0x1E6];
     u16 state;
 };
-u32 sub_0812E6F0(struct ActorModeState *actor)
+u32 ActorMode_SelectOddStateVariant(struct ActorModeState *actor)
 {
     u32 result;
     switch (actor->state) {

@@ -1,4 +1,3 @@
-#define NamedObject_FindNearPosition sub_08100AD4
 #define gNamedObjectManager gUnk_020001AC
 #define gNamedObjectContactBounds gUnk_086064B4
 #include "global.h"
@@ -26,7 +25,7 @@ static inline void Difference(struct ContactPosition *d, const struct ContactPos
     d->y = a->y - b->y;
     d->z = a->z - b->z;
 }
-struct NamedObjectContactSlot *sub_08100AD4(const struct ContactPosition *position)
+struct NamedObjectContactSlot *NamedObject_FindNearPosition(const struct ContactPosition *position)
 {
     struct NamedObjectContactPool *pool = gUnk_020001AC;
     struct ContactPosition delta;

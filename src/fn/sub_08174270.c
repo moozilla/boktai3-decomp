@@ -1,8 +1,7 @@
-#define SceneHud_TickEquipmentFeedback sub_08174270
 #include "global.h"
 #include "scene_hud_display.h"
 void PauseInventory_BeginItemDiscardSelection(void *,s32);
-void sub_08174270(struct SceneHudState *p)
+void SceneHud_TickEquipmentFeedback(struct SceneHudState *p)
 {
     if(p->actionTransferDelay==0) Sound_PlaySong(0x10e);
     if(++p->actionTransferDelay<=11) {

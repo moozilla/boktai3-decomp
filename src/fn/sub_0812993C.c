@@ -1,4 +1,3 @@
-#define BlinkingSprite_UpdateExpiry sub_0812993C
 #include "global.h"
 struct BlinkingSprite {
     u32 flags;
@@ -16,10 +15,10 @@ struct BlinkingSpritePool {
 };
 extern const u8 gUnk_086107B0[];
 s32 Mod(s32, s32);
-void sub_081298F4(struct BlinkingSprite *);
+void SparkParticleSource_Emit(struct BlinkingSprite *);
 void Sprite_Remove(void *);
 void Task_Kill(void *);
-s32 sub_0812993C(struct BlinkingSpritePool *pool, struct BlinkingSprite *sprite)
+s32 BlinkingSprite_UpdateExpiry(struct BlinkingSpritePool *pool, struct BlinkingSprite *sprite)
 {
     struct BlinkingSprite *copy = sprite;
     s32 age = sprite->blinkAge;
@@ -37,12 +36,12 @@ s32 sub_0812993C(struct BlinkingSpritePool *pool, struct BlinkingSprite *sprite)
         } else {
             flags |= bit;
             copy->flags = flags;
-            sub_081298F4(sprite);
+            SparkParticleSource_Emit(sprite);
         }
     }
     if (sprite->blinkAge > 90) {
         u32 one, flags;
-        sub_081298F4(sprite);
+        SparkParticleSource_Emit(sprite);
         flags = copy->flags;
         one = 1;
         copy->flags = flags | one;

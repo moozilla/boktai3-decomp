@@ -1,4 +1,3 @@
-#define Terrain_GetHeightAtPosition sub_0811ADF0
 #define gTerrainColumnIndices       gUnk_020001F8
 #define gTerrainColumns             gUnk_020001FC
 /* Provisional family and semantic names; inferred from static accesses and callers. */
@@ -11,7 +10,7 @@ struct TerrainCoordinate {
 };
 extern u8 *gTerrainColumnIndices;
 extern u8 *gTerrainColumns;
-s32 sub_0811ADF0(struct ScenePoolVec32 *position)
+s32 Terrain_GetHeightAtPosition(struct ScenePoolVec32 *position)
 {
     struct TerrainCoordinate point;
     s32 row, column, cell, index, offset;

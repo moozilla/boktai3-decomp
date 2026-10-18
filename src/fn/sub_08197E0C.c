@@ -9,13 +9,13 @@ struct Fade08197E0C {
     u8 timer;
     u8 out[4];
 };
-u32 sub_08228DB8(void);
+u32 SunClock_GetPhase(void);
 u8 TimePalette_GetSourceIndex(u32);
 void sub_08221110(void *, u32, u32, u32, u32);
 
 void TimePalette_UpdateTransition(struct Fade08197E0C *f)
 {
-    u32 state = sub_08228DB8();
+    u32 state = SunClock_GetPhase();
     if (state != f->state) {
         f->from = TimePalette_GetSourceIndex(f->state);
         f->to = TimePalette_GetSourceIndex(state);

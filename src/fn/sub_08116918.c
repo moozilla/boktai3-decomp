@@ -1,5 +1,4 @@
 #include "global.h"
-#define MotionActor_ParsePosition sub_08116918
 struct ScriptPosition {
     s32 x, y, z, unused;
 };
@@ -13,7 +12,7 @@ s32 Script_GetKeywordValue(u32, s32);
 s32 Script_GetPc(void);
 s32 Script_GetValue(void);
 s32 Script_SeekToKeyword(u32);
-void sub_08116918(u8 *actor)
+void MotionActor_ParsePosition(u8 *actor)
 {
     struct ScriptPosition position;
     struct MotionActorState *state;

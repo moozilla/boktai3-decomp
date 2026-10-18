@@ -1,4 +1,3 @@
-#define SceneHud_ShowActionPreview sub_0816D868
 #define SceneHud_GetSelectedAction Inventory_GetQuantityByStorage
 #include "global.h"
 #include "scene_hud_display.h"
@@ -9,14 +8,14 @@ u8 *Text_LookupString(s32);
 void ScrollingDialogue_RequestShow(void);
 void PauseMenu_ClearSpriteFlags(struct SceneHudState *, s32, u32);
 s32 Inventory_GetQuantityByStorage(u32, u32);
-void sub_0816D868(struct SceneHudState *s)
+void SceneHud_ShowActionPreview(struct SceneHudState *s)
 {
     s32 action, keyframe;
     s32 text;
     if (s->actionCursor <= 15) {
         action = Inventory_GetQuantityByStorage(s->actionCategory, s->actionCursor);
         if (s->actionCategory == 0)
-            keyframe = sub_0816D820(s->actionCursor);
+            keyframe = SceneInventory_GetItemConditionFrame(s->actionCursor);
         else
             keyframe = 394;
     } else {

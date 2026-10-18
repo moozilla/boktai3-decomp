@@ -1,5 +1,4 @@
 #include "global.h"
-#define PlayerTransition_LoadAnimation sub_0815FFDC
 struct TransitionResourceHeader { u32 words[8]; };
 struct PlayerTransition {
     u8 unknown0[0x18];
@@ -14,7 +13,7 @@ void *ScriptProc_Start(u16, u16);
 s32 ResourceHeader_Relocate(void *, void *);
 void sub_0821983C(void *, void *, int, int, int, int, int, void *);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
-void sub_0815FFDC(struct PlayerTransition *p)
+void PlayerTransition_LoadAnimation(struct PlayerTransition *p)
 {
     struct TransitionResourceHeader *resource = ScriptProc_Start(0xcb05, 0xde23);
     if (resource) {

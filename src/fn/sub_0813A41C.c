@@ -1,4 +1,3 @@
-#define SpritePairEntry_CreateEffect sub_0813A41C
 #include "global.h"
 struct EffectPackedCoordinate {
     u32 lo : 16;
@@ -14,9 +13,9 @@ struct SpritePairEffectEntry {
     u32 *height;
 };
 void Position_GetHeightAdjustedCoordinates(u32, u32, void *);
-void sub_0811B278(void *, void *, struct EffectOffset *, struct EffectOffset *, u32, u32, u32, u32,
+void SpatialIndex_InitEntry(void *, void *, struct EffectOffset *, struct EffectOffset *, u32, u32, u32, u32,
                   u32, u32, u32);
-void sub_0813A41C(struct SpritePairEffectEntry *entry, u32 a, u32 b, u32 c)
+void SpritePairEntry_CreateEffect(struct SpritePairEffectEntry *entry, u32 a, u32 b, u32 c)
 {
     u32 position[2];
     struct EffectOffset first, second;
@@ -28,5 +27,5 @@ void sub_0813A41C(struct SpritePairEffectEntry *entry, u32 a, u32 b, u32 c)
     second.a.lo = 10;
     second.a.hi = first.a.hi;
     second.b.lo = -21;
-    sub_0811B278((u8 *)entry + 4, position, &first, &second, 12, c, 5, b, 20, a, (u32)entry);
+    SpatialIndex_InitEntry((u8 *)entry + 4, position, &first, &second, 12, c, 5, b, 20, a, (u32)entry);
 }

@@ -1,12 +1,12 @@
 #include "global.h"
 
-void sub_0813B8A4(u8 *);
+void SceneActor_SpawnModeParticles(u8 *);
 
 void Player_EmitPeriodicEffect(u8 *p)
 {
     u16 *q;
 
-    sub_0813B8A4(p);
+    SceneActor_SpawnModeParticles(p);
     q = (u16 *)(p + 0x442);
     *q = *q + 1;
 }

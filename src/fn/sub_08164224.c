@@ -1,8 +1,6 @@
 #include "global.h"
 #include "player.h"
 #include "game_state.h"
-#define StatDisplay_DrawPlayerValue sub_08164224
-#define StatDisplay_DrawRatio       sub_08163FFC
 struct StatDisplay {
     u8 unknown0[0xA40];
     struct Player *player;
@@ -11,7 +9,7 @@ struct StatDisplay {
 };
 s32 Div(s32, s32);
 void StatDisplay_DrawRatio(struct StatDisplay *, s32, s32, s32, s32, s32, s32, s32);
-void sub_08164224(struct StatDisplay *p, s32 style, s32 x, s32 y)
+void StatDisplay_DrawPlayerValue(struct StatDisplay *p, s32 style, s32 x, s32 y)
 {
     if (p->enabled) {
         if ((u16)((u16)gUnk_02000710->form - 1) <= 1) {

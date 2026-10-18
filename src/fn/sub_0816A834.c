@@ -1,6 +1,4 @@
 #include "global.h"
-#define MenuPrompt_UpdateChoice     sub_0816A834
-#define MenuPrompt_ReadChoice       sub_08165A30
 #define MenuPrompt_SetPhase Hud_SetUpdateCallback
 #define MenuPrompt_SetDisplayLevels Hud_InitSelectionBounds
 struct MenuPrompt {
@@ -11,21 +9,21 @@ struct MenuPrompt {
     u8 anim[4];
 };
 s32 Anim_Step(void *, void *);
-int sub_08165A30(struct MenuPrompt *);
+int SceneHud_UpdateBinaryChoice(struct MenuPrompt *);
 void Sound_PlaySong(u32);
-void sub_0816A880(struct MenuPrompt *);
-void sub_0816A5A8(struct MenuPrompt *);
+void MenuPrompt_FadeChoice(struct MenuPrompt *);
+void ScenePanel_BeginDetail(struct MenuPrompt *);
 void Hud_SetUpdateCallback(struct MenuPrompt *, void (*)(struct MenuPrompt *));
-void sub_0816A834(struct MenuPrompt *p)
+void MenuPrompt_UpdateChoice(struct MenuPrompt *p)
 {
     int choice;
     Anim_Step(p->anim, p->animData);
-    choice = sub_08165A30(p);
+    choice = SceneHud_UpdateBinaryChoice(p);
     if (choice == 0) {
         Sound_PlaySong(0xDE);
-        Hud_SetUpdateCallback(p, sub_0816A880);
+        Hud_SetUpdateCallback(p, MenuPrompt_FadeChoice);
     } else if (choice == 1) {
         Sound_PlaySong(0xDD);
-        sub_0816A5A8(p);
+        ScenePanel_BeginDetail(p);
     }
 }

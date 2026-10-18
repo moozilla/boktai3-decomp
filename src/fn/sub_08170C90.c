@@ -1,10 +1,9 @@
-#define SceneHud_LayoutAlternateActionGrid sub_08170C90
 #define SceneHud_SetWidgetPalette PauseMenu_SetSpritePalette
 #include "global.h"
 #include "scene_hud_display.h"
 void SceneHud_SetWidgetPalette(struct SceneInputWidget *, u16);
 void sub_08170D78(void *);
-void sub_08170C90(struct SceneHudState *s)
+void SceneHud_LayoutAlternateActionGrid(struct SceneHudState *s)
 {
     struct SceneVec pos;
     s32 i;

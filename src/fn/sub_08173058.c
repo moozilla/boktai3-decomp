@@ -1,4 +1,3 @@
-#define SceneHud_FinishActionTransfer sub_08173058
 #include "global.h"
 #include "scene_hud_display.h"
 void PauseMenu_SmoothPoint(void *, void *, s32);
@@ -6,12 +5,12 @@ void PauseMenu_InterpolateActivePairPositions(void *, s32);
 void sub_0822EB14(u32, u32);
 void sub_0822E764(u32, u32);
 void sub_08172638(void *);
-void sub_08172CE8(void);
+void SceneHud_UpdateActionChoice(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
-void sub_081663A0(void *, int, int, int, int);
-void sub_08172850(void *, u32, u32);
-void sub_081723D8(void *);
-void sub_08173058(struct SceneHudState *p)
+void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
+void SceneHud_ConfigureActionGrid(void *, u32, u32);
+void SceneHud_ShowSelectionDescription(void *);
+void SceneHud_FinishActionTransfer(struct SceneHudState *p)
 {
     u16 *timer = &p->actionTransferDelay;
     if (!*timer)
@@ -35,9 +34,9 @@ void sub_08173058(struct SceneHudState *p)
             sub_0822E764(p->actionSelection - 8, p->actionCursor - 8);
         sub_08172638(p);
         p->categoryWidgets[6].flags |= 1;
-        Hud_SetInteractionCallback(p, sub_08172CE8, 1);
-        sub_081663A0(p, 1, 0, 0, 0);
-        sub_08172850(p->actionInput, 0, 0);
-        sub_081723D8(p);
+        Hud_SetInteractionCallback(p, SceneHud_UpdateActionChoice, 1);
+        MenuDisplay_SetPaletteOverrides(p, 1, 0, 0, 0);
+        SceneHud_ConfigureActionGrid(p->actionInput, 0, 0);
+        SceneHud_ShowSelectionDescription(p);
     }
 }

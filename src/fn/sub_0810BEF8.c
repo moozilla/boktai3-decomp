@@ -1,5 +1,3 @@
-#define SlotMenu_CreateTextWindows sub_0810BEF8
-#define TextWindow_Create          sub_08033690
 #define TextWindow_Show TextWindow_StartPlayback
 #include "global.h"
 struct SlotMenu {
@@ -10,11 +8,11 @@ struct SlotMenu {
     s32 secondWindow;
     s32 mainWindow;
 };
-s32 sub_08033690(s32, s32, s32, s32);
+s32 TextWindow_Create(s32, s32, s32, s32);
 s32 TextWindow_SetScript(s32, const u8 *);
 s32 TextWindow_Refresh(s32, s32);
 void TextWindow_StartPlayback(s32);
-void sub_0810BEF8(struct SlotMenu *p)
+void SlotMenu_CreateTextWindows(struct SlotMenu *p)
 {
     p->mainWindow = TextWindow_Create(1, 3, 28, 2);
     p->firstWindow = TextWindow_Create(1, 6, 10, 2);

@@ -6,13 +6,13 @@ struct P {
     u8 g[0x2d4 - 0x270];
     u16 fl;
 };
-u32 sub_0824923C(void *, void *);
+u32 Callback_InvokeActor(void *, void *);
 u8 Golem_InvokeEnabledBehavior(struct P *p)
 {
     u32 m = 0x100;
     u8 r;
     if (p->fl & m)
-        r = sub_0824923C(p, p->cb);
+        r = Callback_InvokeActor(p, p->cb);
     else
         r = 0;
     return r;

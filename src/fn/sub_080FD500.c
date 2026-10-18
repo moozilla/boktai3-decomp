@@ -1,8 +1,7 @@
-#define SceneActorControl_UpdateControl35Phase sub_080FD500
 #include "global.h"
 #include "scene_actor_control_phase.h"
 void sub_080F8E68(void);
-void sub_080F82E8(void);
+void ActorPhase_UpdateSpriteCollapse(void);
 struct SceneActorControl35Context {
     u8 unknown0[0xE4C];
     u32 flagsE4C;
@@ -15,7 +14,7 @@ static inline void Or16(u32 m, u16 *p) { *p = m | *p; }
 static inline void Or32(u32 m, u32 *p) { *p |= m; }
 static inline void Restart(struct SceneActorRegistryResetView *actor)
 {
-        void *callback = (void *)sub_080F82E8;
+        void *callback = (void *)ActorPhase_UpdateSpriteCollapse;
         u32 kind = 0x23;
         u8 zero8;
         u8 one;
@@ -45,7 +44,7 @@ static inline void Restart(struct SceneActorRegistryResetView *actor)
             actor->field2B1 = one;
         }
 }
-void sub_080FD500(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateControl35Phase(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorControl35Context *context = actor->context;
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {

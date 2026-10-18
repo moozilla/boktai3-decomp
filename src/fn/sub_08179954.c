@@ -1,4 +1,3 @@
-#define MeterDisplay_InitializeWidgets sub_08179954
 #include "global.h"
 #include "scene_arc.h"
 struct MeterDisplayWidget {
@@ -21,7 +20,7 @@ struct MeterDisplay {
 };
 s32 sub_0821983C(void *, void *, u16, u32, u32, u32, u32, void *);
 s32 Div(s32, s32);
-void sub_08179954(struct MeterDisplay *s)
+void MeterDisplay_InitializeWidgets(struct MeterDisplay *s)
 {
     s32 i, result;
     u32 zero;

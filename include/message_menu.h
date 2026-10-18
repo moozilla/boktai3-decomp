@@ -23,7 +23,7 @@ struct MessageMenu {
     u8 transition[96]; /* animation object used for the opening effect */
 };
 
-int sub_08033690(int, int, int, int);
+int TextWindow_Create(int, int, int, int);
 void TextWindow_SetString(int, int, void *);
 void TextWindow_StartPlayback(int);
 void TextWindow_Destroy(int);

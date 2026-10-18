@@ -1,4 +1,3 @@
-#define PlayerOrbitEffect_UpdateIntro       sub_0815FAF4
 #define PlayerOrbitEffect_SetUpdateCallback PlayerBurst_SetStateCallback
 #define gEnginePauseFlags                   gUnk_0300523C
 #include "global.h"
@@ -18,7 +17,7 @@ void Sound_PlaySong(u32);
 s32 Anim_Step(void *, void *);
 void sub_0815FB80(void);
 void PlayerBurst_SetStateCallback(void *, void (*)(void));
-void sub_0815FAF4(struct PlayerOrbitEffect *effect)
+void PlayerOrbitEffect_UpdateIntro(struct PlayerOrbitEffect *effect)
 {
     struct Player *player;
     if (effect->frame == 0) {

@@ -1,4 +1,3 @@
-#define ScriptRecord_FindExtendedModifier sub_0811E48C
 #define gScriptRecordTable                gUnk_02000208
 #include "global.h"
 struct ScriptExtendedModifier {
@@ -17,7 +16,7 @@ struct ExtendedModifierResult {
     u16 a, b, c, d, e, f;
 };
 extern struct ScriptRecordTable *gUnk_02000208;
-s32 sub_0811E48C(struct ExtendedModifierResult *out, s32 id)
+s32 ScriptRecord_FindExtendedModifier(struct ExtendedModifierResult *out, s32 id)
 {
     struct ScriptRecordTable *p;
     struct ScriptRecordTable *table = gUnk_02000208;

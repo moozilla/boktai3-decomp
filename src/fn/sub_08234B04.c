@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 void HealthRestoreEffect_UpdateParticles(u8 *s)
 {
     u8 *p = s + 0x8c;
@@ -8,7 +8,7 @@ void HealthRestoreEffect_UpdateParticles(u8 *s)
     do {
         if (*(u16 *)(p + 0x2a) != 0) {
             u8 *q = s + 0xc4;
-            sub_0824923C(p, *(u32 *)(q + o));
+            Callback_InvokeActor(p, *(u32 *)(q + o));
         }
         p += 0x3c;
         o += 0x3c;

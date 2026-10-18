@@ -1,9 +1,8 @@
 #include "global.h"
 #include "scene_hud_display.h"
-#define SceneHud_InitActionIcons      sub_08178920
 #define SceneHud_SetWidgetPaletteBank PauseMenu_SetSpritePalette
 void SceneHud_SetWidgetPaletteBank(struct SceneInputWidget *, u16);
-void sub_08178920(struct SceneHudState *hud)
+void SceneHud_InitActionIcons(struct SceneHudState *hud)
 {
     struct SceneInputPackedPosition pos;
     pos.x = 8;

@@ -1,8 +1,7 @@
-#define MenuTilemap_ClearRect sub_08165BAC
 #define MenuTilemap_GetCell Hud_GetTilemapCell
 #include "global.h"
 extern u16 *MenuTilemap_GetCell(u32, s32, s32);
-void sub_08165BAC(s32 x, s32 y, s32 width, s32 height)
+void MenuTilemap_ClearRect(s32 x, s32 y, s32 width, s32 height)
 {
     s32 row;
     for (row = 0; row < height; row++) {

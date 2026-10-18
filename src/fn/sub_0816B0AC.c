@@ -1,4 +1,3 @@
-#define SelectionMenu_UpdateConfirmInput sub_0816B0AC
 #define SelectionMenu_SetPhase Hud_SetUpdateCallback
 #define SelectionMenu_SetWidgetPosition PauseMenu_SetSpritePosition
 #define gMenuKeys                        gUnk_03005260
@@ -29,11 +28,11 @@ s32 MessageWindow_SetNumberArgument(s32, s32);
 void PauseMenu_SetConfirmationIndicator(struct SelectionMenu *, s32);
 void PauseMenu_SetSpritePosition(struct SelectionMenu *, s32, s32, s32);
 void Hud_SetUpdateCallback(struct SelectionMenu *, void (*)(struct SelectionMenu *));
-void sub_0816B250(struct SelectionMenu *);
-void sub_0816B200(struct SelectionMenu *);
-void sub_0816AEE8(struct SelectionMenu *);
-void sub_0816AC08(struct SelectionMenu *);
-void sub_0816B0AC(struct SelectionMenu *p)
+void SelectionMenu_ApplyConfirmedReward(struct SelectionMenu *);
+void SceneSequence_UpdateRampDown64(struct SelectionMenu *);
+void SceneSequence_BeginAnimation6(struct SelectionMenu *);
+void MenuPrompt_UpdateSelectionSprites(struct SelectionMenu *);
+void SelectionMenu_UpdateConfirmInput(struct SelectionMenu *p)
 {
     Anim_Step(p->primaryAnimation, p->animationData);
     Anim_Step(p->selectionAnimation, p->animationData);
@@ -45,16 +44,16 @@ void sub_0816B0AC(struct SelectionMenu *p)
             MessageWindow_SetNumberArgument(0, (p->count - 1) * 50);
             PauseMenu_SetConfirmationIndicator(p, 0);
             PauseMenu_SetSpritePosition(p, 7, -8, -104);
-            Hud_SetUpdateCallback(p, sub_0816B250);
+            Hud_SetUpdateCallback(p, SelectionMenu_ApplyConfirmedReward);
         } else if (p->pending) {
-            Hud_SetUpdateCallback(p, sub_0816B200);
+            Hud_SetUpdateCallback(p, SceneSequence_UpdateRampDown64);
         }
     } else if (gUnk_03005260[1] & 2) {
         Sound_PlaySong(0xDE);
-        sub_0816AEE8(p);
+        SceneSequence_BeginAnimation6(p);
     } else if (p->owner->mode != 6 && (gUnk_03005260[1] & 0xC0)) {
         Sound_PlaySong(0xDC);
         p->selection = 1 - p->selection;
-        sub_0816AC08(p);
+        MenuPrompt_UpdateSelectionSprites(p);
     }
 }

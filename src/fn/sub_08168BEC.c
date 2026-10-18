@@ -1,11 +1,10 @@
-#define SceneHud_RebuildTertiaryOptions sub_08168BEC
 #define gGameState                      gUnk_02000710
 #include "global.h"
 #include "scene_hud_display.h"
 #include "game_state.h"
 extern struct GameState *gUnk_02000710;
 s32 SolarFruit_GetInventorySlot(s32);
-void sub_08168BEC(struct SceneHudState *p)
+void SceneHud_RebuildTertiaryOptions(struct SceneHudState *p)
 {
     s32 count = 0;
     s32 i;

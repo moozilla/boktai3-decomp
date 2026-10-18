@@ -1,4 +1,3 @@
-#define SlotText_CopySelectedString sub_0810BE0C
 #include "global.h"
 struct SlotText {
     u8 unknown0[0x130];
@@ -9,7 +8,7 @@ struct SlotText {
 void Memory_Clear(void *, u32);
 s32 Script_ParseStringRef(const void *);
 u8 *Text_LookupString(s32);
-void sub_0810BE0C(u8 *dst, struct SlotText *p)
+void SlotText_CopySelectedString(u8 *dst, struct SlotText *p)
 {
     u8 *text;
     s32 i;

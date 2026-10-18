@@ -1,4 +1,3 @@
-#define SelectionPanel_GetSelection sub_0810E1A0
 #include "global.h"
 struct SelectionPanel {
     u8 unknown0[0xD24];
@@ -6,7 +5,7 @@ struct SelectionPanel {
     u8 unknownD25;
     s8 page;
 };
-s32 sub_0810E1A0(struct SelectionPanel *p)
+s32 SelectionPanel_GetSelection(struct SelectionPanel *p)
 {
     s32 index;
     switch (p->page) {

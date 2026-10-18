@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_pool.h"
-#define ScenePool_ClampForwardBias sub_0811CF68
-void sub_0811CF68(struct ScenePoolActor *s)
+void ScenePool_ClampForwardBias(struct ScenePoolActor *s)
 {
     if (s->forwardBias > s->maximumForwardBias)
         s->forwardBias = s->maximumForwardBias;

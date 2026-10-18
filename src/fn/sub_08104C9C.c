@@ -1,5 +1,3 @@
-#define ActorGroup_UpdateMemberRemoval sub_08104C9C
-#define ActorGroup_CallMemberScript    sub_081042DC
 /* Provisional ActorGroup names: static behavior established; semantic ownership tentative. */
 #include "global.h"
 struct ActorGroupMember {
@@ -21,25 +19,25 @@ struct ActorGroupRemovalPool {
     u32 active;
 };
 void sub_0810523C(struct ActorGroupMember *);
-void sub_081055C0(struct ActorGroupMember *, s32);
+void ProximityActor_SetState(struct ActorGroupMember *, s32);
 void ScaledShadow_Destroy(void *);
-void sub_081042DC(struct ActorGroupMember *);
+void ActorGroup_CallMemberScript(struct ActorGroupMember *);
 void Sound_PlaySong(u32);
 void Sprite_Remove(void *);
 void Collider_Remove(void *);
-void sub_08104C9C(struct ActorGroupRemovalPool *group, struct ActorGroupMember *member)
+void ActorGroup_UpdateMemberRemoval(struct ActorGroupRemovalPool *group, struct ActorGroupMember *member)
 {
     if (member->started) {
         sub_0810523C(member);
         if (member->value147 - member->value146 >= 0)
             Sound_PlaySong(0x3C7);
-        sub_081055C0(member, member->value147 - member->value146);
+        ProximityActor_SetState(member, member->value147 - member->value146);
         if (member->markerId != -1) {
             ScaledShadow_Destroy(member->marker);
             member->markerId = -1;
         }
         Sound_PlaySong(0x3C6);
-        sub_081042DC(member);
+        ActorGroup_CallMemberScript(member);
         member->started = 0;
     } else {
         member->flags |= 1;

@@ -1,10 +1,9 @@
-#define Player_UpdateTimedScriptEvent sub_0814139C
 #define gGameState gUnk_02000710
 #include "global.h"
 #include "player.h"
 #include "game_state.h"
 void Player_CallEventScript(struct Player *, u32);
-void sub_0814139C(struct Player *p)
+void Player_UpdateTimedScriptEvent(struct Player *p)
 {
     u32 index = p->timedEventSlot;
     struct GameState *state = gGameState;

@@ -1,5 +1,4 @@
 #include "global.h"
-#define SlotRegistry_ClaimMatchingSlot sub_08114464
 struct RegistrySlot {
     u16 id;
     u8 unk2;
@@ -10,7 +9,7 @@ struct SlotRegistry {
     u8 padding[0xE4];
     struct RegistrySlot slots[16];
 };
-s32 sub_08114464(struct SlotRegistry *registry, s32 start, s32 id, u8 *claimed)
+s32 SlotRegistry_ClaimMatchingSlot(struct SlotRegistry *registry, s32 start, s32 id, u8 *claimed)
 {
     struct RegistrySlot *slot;
     s32 index = start;

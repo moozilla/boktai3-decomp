@@ -1,8 +1,5 @@
-#define SceneHud_BeginRandomActionReturn sub_0816DC78
-#define SceneHud_GetActionIconPosition sub_0816D920
 #define SceneItem_SelectRandomSpecialItem Inventory_RollIcePopStick
 #define SceneItem_SetSlotItem Inventory_SetItemId
-#define SceneHud_BeginIconMotion sub_08165E78
 #include "global.h"
 #include "scene_hud_display.h"
 void SceneHud_GetActionIconPosition(void *, s32);
@@ -11,8 +8,8 @@ void SceneItem_SetSlotItem(s32, s32);
 u32 sub_0822D604(s32);
 void SceneHud_BeginIconMotion(void *, u32, s32, u32, void *, void *, u32, u32);
 void Hud_SetInteractionCallback(void *, void (*)(void), s32);
-void sub_0816DD70(void);
-void sub_0816DC78(struct SceneHudState *s)
+void SceneHud_FinishRandomActionReturn(void);
+void SceneHud_BeginRandomActionReturn(struct SceneHudState *s)
 {
     struct SceneInputPackedPosition from;
     struct ContactPosition to;
@@ -36,5 +33,5 @@ void sub_0816DC78(struct SceneHudState *s)
     later = *selection + 10;
     SceneHud_BeginIconMotion(s, 0, keyframe, s->categoryWidgets[later].paletteBank, &from, &to, 24, 16);
     Sound_PlaySong(0x38a);
-    Hud_SetInteractionCallback(s, sub_0816DD70, 1);
+    Hud_SetInteractionCallback(s, SceneHud_FinishRandomActionReturn, 1);
 }

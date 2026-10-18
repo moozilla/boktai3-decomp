@@ -1,4 +1,3 @@
-#define SpatialIndex_InsertEntry sub_0811B2FC
 #define gSpatialIndex            gUnk_02000200
 /* Provisional family and semantic names; inferred from static accesses and callers. */
 #include "global.h"
@@ -27,7 +26,7 @@ struct SpatialIndex {
 extern struct SpatialIndex *gSpatialIndex;
 s32 Div(s32, s32);
 void *Heap_Alloc(u32);
-void sub_0811B2FC(struct SpatialEntry *entry)
+void SpatialIndex_InsertEntry(struct SpatialEntry *entry)
 {
     struct SpatialIndex *index = gSpatialIndex;
     struct SpatialBucket *bucket;

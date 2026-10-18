@@ -1,9 +1,8 @@
-#define SelectionPanel_ClearTileColumns sub_081681B8
 #define SelectionPanel_GetTileAddress Hud_GetTilemapCell
 
 #include "global.h"
 u16 *Hud_GetTilemapCell(s32, s32, s32);
-void sub_081681B8(void)
+void SelectionPanel_ClearTileColumns(void)
 {
     s32 row, i, next;
     u16 *a, *b, *c;

@@ -1,4 +1,3 @@
-#define SceneActorPlacement_BeginDestinationJump sub_08135C08
 #include "global.h"
 #include "scene_actor_placement.h"
 s32 Math_Atan2(s32, s32);
@@ -9,7 +8,7 @@ static inline void Difference(struct ContactPosition *out, const struct ContactP
     out->y = a->y - b->y;
     out->z = a->z - b->z;
 }
-s32 sub_08135C08(struct SceneActorPlacementView *actor)
+s32 SceneActorPlacement_BeginDestinationJump(struct SceneActorPlacementView *actor)
 {
     struct ContactPosition delta;
     if (actor->category == 3 && SceneActorPlacement_ReadFlags16(actor, 0x100) && (actor->flags2D8 & 0x400)) {

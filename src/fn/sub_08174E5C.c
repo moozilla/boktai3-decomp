@@ -1,9 +1,8 @@
-#define Presentation_CommitListValues sub_08174E5C
 #define gGameState gUnk_02000710
 #include "global.h"
 #include "game_state.h"
 #include "presentation_entry_list.h"
-void sub_08174E5C(struct PresentationEntryList *panel)
+void Presentation_CommitListValues(struct PresentationEntryList *panel)
 {
     s32 i;
     for (i = 0; i <= 2; i++) {

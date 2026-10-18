@@ -1,4 +1,3 @@
-#define PlayerStatusPanel_RestoreStats sub_0816D40C
 #include "global.h"
 #include "player.h"
 struct PlayerStatusPanel {
@@ -14,7 +13,7 @@ struct PlayerStatusPanel {
     u8 active;
 };
 s32 Inventory_HasItem(s32);
-void sub_0816D40C(struct PlayerStatusPanel *panel)
+void PlayerStatusPanel_RestoreStats(struct PlayerStatusPanel *panel)
 {
     panel->player->currentStatA = panel->savedStatA;
     panel->player->currentStatB = panel->savedStatB;

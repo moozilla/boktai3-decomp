@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_pool.h"
-#define Glove_StopWithMessage sub_08119F9C
 #define Packet_Send SceneMessages_Send
 #define gMessagePacket        gUnk_020001F0
 struct Packet {
@@ -17,7 +16,7 @@ static inline void clearDrawFlags(struct ScenePoolPlayerDraw *d, s16 mask)
 {
     d->flags = mask & d->flags;
 }
-void sub_08119F9C(struct ScenePoolPlayer *glove)
+void Glove_StopWithMessage(struct ScenePoolPlayer *glove)
 {
     struct Packet *packet = &gUnk_020001F0;
     u32 zero = 0;

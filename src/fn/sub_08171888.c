@@ -1,8 +1,6 @@
 #include "global.h"
 #include "scene_hud_display.h"
 #include "game_state.h"
-#define SceneHud_TickStatTransfer   sub_08171888
-#define SceneHud_DrawComparisonBars sub_08171014
 #define gStatTransferProfiles       gUnk_08E60F80
 struct StatTransferProfile {
     u8 data[16];
@@ -18,10 +16,10 @@ void sub_08170D78(void *);
 s32 Player_GetCandidateAttribute(s32, s32);
 s32 Player_GetCurrentAttribute(s32);
 s32 Inventory_GetConsumableId(u32);
-void sub_08171014(void *, s32, s32, s16 *);
-void sub_08166ED4(void *, int, int, int, int);
-void sub_08166F84(void *, u32, u32, u32, u32);
-void sub_08171888(struct SceneHudState *p)
+void SceneHud_DrawComparisonBars(void *, s32, s32, s16 *);
+void InventoryPanel_UpdateSelectedUnlock(void *, int, int, int, int);
+void InventoryPanel_UpdateSelectedEquipment(void *, u32, u32, u32, u32);
+void SceneHud_TickStatTransfer(struct SceneHudState *p)
 {
     s16 differences[3];
     s32 i;
@@ -44,9 +42,9 @@ void sub_08171888(struct SceneHudState *p)
             s32 value = Player_GetCandidateAttribute(i, Inventory_GetConsumableId(p->actionCursor));
             differences[i] = value - Player_GetCurrentAttribute(i);
         }
-        sub_08171014(p, 10, 6, differences);
+        SceneHud_DrawComparisonBars(p, 10, 6, differences);
         zero = 0;
-        sub_08166ED4(p, 8, 3, 0, zero);
-        sub_08166F84(p, 8, 4, 0, zero);
+        InventoryPanel_UpdateSelectedUnlock(p, 8, 3, 0, zero);
+        InventoryPanel_UpdateSelectedEquipment(p, 8, 4, 0, zero);
     }
 }

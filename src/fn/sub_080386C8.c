@@ -12,7 +12,7 @@ int WirelessExchange_SendPacket(struct P *, int, const u32 *, int);
 void WirelessGameMenu_SetStatusPanelState(struct P *, int);
 void WirelessGameMenu_SignalStatusPanel(struct P *);
 void WirelessGameItems_StartOutgoingItems(void);
-void sub_08178404(void);
+void Hud_ClearTimer(void);
 static inline void set(u32 mask)
 {
     gUnk_0300523C |= mask;
@@ -40,7 +40,7 @@ void WirelessGameMenu_UpdateRoundHandshake(struct P *p)
         u32 eight;
         u8 *state;
         u32 zero;
-        sub_08178404();
+        Hud_ClearTimer();
         eight = 8;
         state = &p->state;
         zero = 0;

@@ -19,4 +19,4 @@ struct Task4E01 {
     u8 pad40[0xc8];
     struct Task4E01Entry *entries;
 };
-struct Task4E01 *sub_0821A2C4(u16);
+struct Task4E01 *ResourceRegistry_GetResource(u16);

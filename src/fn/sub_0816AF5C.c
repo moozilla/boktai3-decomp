@@ -1,4 +1,3 @@
-#define ScenePanel_UpdateAccountIntro sub_0816AF5C
 #define ScenePanel_SetCallback Hud_SetUpdateCallback
 #include "global.h"
 struct PanelAccount {
@@ -53,10 +52,10 @@ void Hud_InitSelectionBounds(u32, u32);
 void Sound_PlaySong(u32);
 s32 Anim_Step(void *, void *);
 s32 MessageWindow_ShowMessage(s32);
-void sub_0816AC08(void *);
-void sub_0816B0AC(void);
+void MenuPrompt_UpdateSelectionSprites(void *);
+void SelectionMenu_UpdateConfirmInput(void);
 void Hud_SetUpdateCallback(void *, void (*)(void));
-void sub_0816AF5C(struct ScenePanel *p)
+void ScenePanel_UpdateAccountIntro(struct ScenePanel *p)
 {
     if (p->frame <= 15)
         Hud_InitSelectionBounds(p->frame * 4, 0);
@@ -75,7 +74,7 @@ void sub_0816AF5C(struct ScenePanel *p)
         if (p->account->kind != 6)
             p->secondary[1].flags &= ~1;
         p->menuSelection = 0;
-        sub_0816AC08(p);
-        Hud_SetUpdateCallback(p, sub_0816B0AC);
+        MenuPrompt_UpdateSelectionSprites(p);
+        Hud_SetUpdateCallback(p, SelectionMenu_UpdateConfirmInput);
     }
 }

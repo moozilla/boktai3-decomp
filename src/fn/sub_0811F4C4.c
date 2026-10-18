@@ -1,5 +1,4 @@
 #include "global.h"
-#define CallbackStatus_ResetSelectorAndTest sub_0811F4C4
 #define CallbackStatus_IsActiveWithoutCount Modifier_IsFourthSourceReady
 struct CallbackStatus {
     u8 pad0[0x10];
@@ -9,7 +8,7 @@ struct CallbackStatus {
     u16 count;
 };
 u32 Modifier_IsFourthSourceReady(struct CallbackStatus *);
-u32 sub_0811F4C4(struct CallbackStatus *status)
+u32 CallbackStatus_ResetSelectorAndTest(struct CallbackStatus *status)
 {
     u32 result;
     status->selector = 0xff;

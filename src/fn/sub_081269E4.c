@@ -1,5 +1,4 @@
 #include "global.h"
-#define BouncingParticle_Update     sub_081269E4
 #define BouncingParticle_ShowSprite Sprite_LinkToList
 #define BouncingParticle_HideSprite Sprite_UnlinkFromList
 struct BouncingParticle {
@@ -18,7 +17,7 @@ struct BouncingParticle {
 s32 Mod(s32, s32);
 void Sprite_LinkToList(struct BouncingParticle *, s32);
 void Sprite_UnlinkFromList(struct BouncingParticle *, u32);
-void sub_081269E4(void *unused, struct BouncingParticle *particle)
+void BouncingParticle_Update(void *unused, struct BouncingParticle *particle)
 {
     struct BouncingParticle *sprite = particle;
     s32 frame;

@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
-void sub_0806A160(const void *, s32, const void *, s32, s32, s32, s32, s32);
+void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s32);
 extern u32 gUnk_03005308;
 static inline u8 IsControlled(struct SceneActorRegistryResetView *a)
 {
@@ -102,7 +102,7 @@ void SceneActorReaction_PlayStaggerBurst(struct SceneActorRegistryResetView *inp
             index *= 2;
             mode = *(const u16 *)((u32)gUnk_0203B400 + index) & randomMask;
             mode += 1;
-            sub_0806A160(&actor->position, mode, &range.position, actor->direction + 128, 10, 6, 2,
+            SparkParticle_Spawn(&actor->position, mode, &range.position, actor->direction + 128, 10, 6, 2,
                          2);
         }
     }

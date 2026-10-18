@@ -1,6 +1,5 @@
 #include "global.h"
 // Tentative SceneVolume family: ownership and field semantics remain provisional.
-#define SceneVolume_FindNearbyPosition sub_0817AA14
 #define PositionSearch_GetCoordinates SceneStimulus_GetTaggedPosition
 #define PositionSearch_FindNearby SceneStimulus_FindOverlap
 struct SceneVolume {
@@ -13,7 +12,7 @@ struct SceneVolume {
 };
 u32 SceneStimulus_GetTaggedPosition(u16 *, u32);
 s8 SceneStimulus_FindOverlap(u32, u32, u32, u8, u16);
-s32 sub_0817AA14(struct SceneVolume *volume)
+s32 SceneVolume_FindNearbyPosition(struct SceneVolume *volume)
 {
     s8 index = SceneStimulus_FindOverlap(volume->x, volume->z, 0x400, 1, volume->searchFlags);
     s32 result;

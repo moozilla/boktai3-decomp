@@ -1,7 +1,6 @@
-#define Player_ClampCameraOffsets sub_081414E4
 #include "global.h"
 #include "player.h"
-void sub_081414E4(struct Player *p)
+void Player_ClampCameraOffsets(struct Player *p)
 {
     s32 correction = p->cameraOffsetY >> 1;
     s32 a = p->cameraOffsetX - correction;

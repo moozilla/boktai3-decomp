@@ -1,8 +1,7 @@
-#define Player_BeginTerrainRecovery sub_08140550
 #include "global.h"
 #include "player.h"
 #include "engine.h"
-s32 sub_08140550(struct Player *p)
+s32 Player_BeginTerrainRecovery(struct Player *p)
 {
     u32 direction;
     u16 angle;

@@ -16,7 +16,7 @@ extern u16 gUnk_03005260[];
 void WirelessGameMenu_InitItemChoices(struct P *);
 void WirelessGameMenu_InitEquipmentChoices(struct P *);
 void sub_08169DCC(void);
-void sub_08169E94(void);
+void StatusPanel_BeginRefresh(void);
 void WirelessGameMenu_SetStatusPanelState(struct P *, int);
 void WirelessGameMenu_SignalStatusPanel(struct P *);
 void Sound_PlaySong(int);
@@ -54,7 +54,7 @@ void WirelessGameMenu_UpdateSelection(struct P *p)
             *state = four;
             p->entered = 1;
             p->timer = countdown;
-            sub_08169E94();
+            StatusPanel_BeginRefresh();
             WirelessGameMenu_SignalStatusPanel(p);
             if (p->cancel && p->retries)
                 p->retries--;

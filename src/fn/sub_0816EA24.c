@@ -1,4 +1,3 @@
-#define SceneMenuPanel_ShowTimedResult sub_0816EA24
 #define SceneMenuPanel_SetCallback Hud_SetInteractionCallback
 #define gMenuKeys gUnk_03005260
 #include "global.h"
@@ -17,8 +16,8 @@ s32 MessageWindow_SetBounds(s32, s32, s32, s32);
 s32 MessageWindow_ShowMessage(s32);
 s32 MessageWindow_Clear(void);
 void SceneMenuPanel_SetCallback(void *, void (*)(void), s32);
-void sub_0816EB30(void);
-void sub_0816EA24(struct SceneMenuPanel *panel)
+void MenuTransition_UpdateSelectionFade(void);
+void SceneMenuPanel_ShowTimedResult(struct SceneMenuPanel *panel)
 {
     if (panel->delay == 16) {
         MessageWindow_SetMessageTable(panel->text);
@@ -29,6 +28,6 @@ void sub_0816EA24(struct SceneMenuPanel *panel)
     ++panel->delay;
     if (panel->delay > 89 || (panel->delay > 15 && (gMenuKeys[1] & 1))) {
         MessageWindow_Clear();
-        SceneMenuPanel_SetCallback(panel, sub_0816EB30, 1);
+        SceneMenuPanel_SetCallback(panel, MenuTransition_UpdateSelectionFade, 1);
     }
 }

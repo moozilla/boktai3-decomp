@@ -1,5 +1,4 @@
 #include "global.h"
-#define SpriteBurst_Create             sub_08125EEC
 #define SpriteBurst_AllocateEntry SceneMovingParticle_AllocateEntry
 #define SpriteBurst_GetOrCreateManager SceneMovingParticle_EnsurePool
 #define gSpriteBurstManager            gUnk_02000150
@@ -29,7 +28,7 @@ void sub_08217DE0(struct SpriteBurstEntry *, void *, u32);
 void Effect_SetOrigin(struct SpriteBurstEntry *, s32, s32);
 void sub_08217EEC(struct SpriteBurstEntry *, void *, u32);
 void Effect_SetPalette(struct SpriteBurstEntry *, u32);
-struct SpriteBurstEntry *sub_08125EEC(struct SpriteBurstPair *pos, struct SpriteBurstPair *velocity,
+struct SpriteBurstEntry *SpriteBurst_Create(struct SpriteBurstPair *pos, struct SpriteBurstPair *velocity,
                                       u32 kind, u32 direction, u32 mode)
 {
     struct SpriteBurstManager *manager = gUnk_02000150;

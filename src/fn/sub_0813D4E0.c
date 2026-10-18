@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0813D3B0(u8 *);
+void SceneActor_StartRandomizedEffect(u8 *);
 void Player_EmitQueuedEffects(u8 *p)
 {
     u8 t = p[0x5BB];
@@ -7,7 +7,7 @@ void Player_EmitQueuedEffects(u8 *p)
     if (t != 0) {
         n = t;
         do {
-            sub_0813D3B0(p);
+            SceneActor_StartRandomizedEffect(p);
             n--;
         } while (n != 0);
     }

@@ -1,5 +1,4 @@
 #include "global.h"
-#define StateSprite_InitCollider sub_081229E4
 struct StateSprite { u8 unk0[0xD4]; s16 position[4]; u8 collider[0x42]; u8 collisionFlags; };
 struct ColliderVector { s16 x,y,z; };
 extern const struct ColliderVector gUnk_08610710, gUnk_08610718, gUnk_08610720;
@@ -8,7 +7,7 @@ void Collider_SetCallback(void *, void *, void *);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void SceneScheduledEffect_OnColliderContact(void);
-void sub_081229E4(struct StateSprite *sprite, s32 side, s32 type, s32 a, s32 b, s32 c)
+void StateSprite_InitCollider(struct StateSprite *sprite, s32 side, s32 type, s32 a, s32 b, s32 c)
 {
     struct ColliderVector size, offset;
     u8 *collider;

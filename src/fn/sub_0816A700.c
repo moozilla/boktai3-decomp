@@ -1,5 +1,4 @@
 // Tentative StatusPanel family and semantic names; based on static consumers.
-#define StatusPanel_BeginAnimatedTransition sub_0816A700
 #define Panel_SetUpdateCallback Hud_SetUpdateCallback
 #include "global.h"
 struct StatusPanel {
@@ -16,9 +15,9 @@ void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 s32 MessageWindow_ShowMessage(s32);
 void Sound_PlaySong(u32);
-void sub_0816A9A8(void);
+void MenuPrompt_FinishDelayedChoice(void);
 void Hud_SetUpdateCallback(struct StatusPanel *, void (*)(void));
-void sub_0816A700(struct StatusPanel *p)
+void StatusPanel_BeginAnimatedTransition(struct StatusPanel *p)
 {
     PauseMenu_HideAllSprites(p);
     Bg_SetLayerMap(0, p->layerMap, 5);
@@ -27,5 +26,5 @@ void sub_0816A700(struct StatusPanel *p)
     Anim_SetKeyframes(p->animation, p->animationData, 6, 2, 0);
     MessageWindow_ShowMessage(3);
     Sound_PlaySong(0x2C1);
-    Hud_SetUpdateCallback(p, sub_0816A9A8);
+    Hud_SetUpdateCallback(p, MenuPrompt_FinishDelayedChoice);
 }

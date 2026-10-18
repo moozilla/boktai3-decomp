@@ -1,7 +1,6 @@
-#define Player_IsWithinCoordinateBand sub_08142160
 #include "global.h"
 #include "player.h"
-s32 sub_08142160(struct Player *p)
+s32 Player_IsWithinCoordinateBand(struct Player *p)
 {
     u32 coordinate;
     u32 low;

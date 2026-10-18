@@ -1,4 +1,3 @@
-#define WoodenCrate_UpdateShake sub_081000C0
 #define gCrateRandomValues      gUnk_0203B400
 #define gCrateRandomIndex       gUnk_03005308
 #include "global.h"
@@ -16,7 +15,7 @@ struct WoodenCrate {
 extern u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
 s32 Mod(s32, s32);
-void sub_081000C0(struct WoodenCrate *p)
+void WoodenCrate_UpdateShake(struct WoodenCrate *p)
 {
     if (!p->shakeTimer)
         p->position = p->basePosition;

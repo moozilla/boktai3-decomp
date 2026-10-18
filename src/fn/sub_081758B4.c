@@ -1,5 +1,3 @@
-#define SceneCatalog_SaveOptions      sub_081758B4
-#define SceneCatalog_MapSelectionMask sub_0817589C
 #define gGameState                    gUnk_02000710
 #include "global.h"
 #include "game_state.h"
@@ -10,14 +8,14 @@ struct SceneCatalog {
     u8 unknownA44[0x3E7D];
     u8 optionA, optionB, optionC;
 };
-s32 sub_0817589C(s32);
+s32 SceneCatalog_MapSelectionMask(s32);
 void GameState_BackupRegionRange(void *, u32);
-void sub_081758B4(struct SceneCatalog *s)
+void SceneCatalog_SaveOptions(struct SceneCatalog *s)
 {
     struct Player *player;
     s32 mapped;
     gGameState->values08[4] = s->optionA;
-    mapped = sub_0817589C(s->optionB);
+    mapped = SceneCatalog_MapSelectionMask(s->optionB);
     *(u16 *)((u8 *)gGameState + 0x12) = mapped;
     *(u16 *)((u8 *)gGameState + 0x14) = s->optionC;
     GameState_BackupRegionRange(&gGameState->values08[4], 2);

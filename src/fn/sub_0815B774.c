@@ -1,12 +1,11 @@
-#define PlayerCue_BeginOddDirection sub_0815B774
 #include "global.h"
 #include "player.h"
 #include "engine.h"
-void sub_0815AD78(struct Player *);
-s32 sub_081419D4(u32, s32);
-void sub_0813AFEC(struct Player *, s32, s32);
+void Player_EnterKindTwo(struct Player *);
+s32 ActorVariant_GetTableValue(u32, s32);
+void ActorSequence_Begin(struct Player *, s32, s32);
 void sub_08151078(struct Player *);
-void sub_0815B774(struct Player *p, s32 direction)
+void PlayerCue_BeginOddDirection(struct Player *p, s32 direction)
 {
     if (direction >= 0)
         p->facing = direction;
@@ -18,14 +17,14 @@ void sub_0815B774(struct Player *p, s32 direction)
         p->heading = p->facing >> 1;
         p->side = 0;
     }
-    sub_0815AD78(p);
+    Player_EnterKindTwo(p);
     Anim_SetKeyframes(&p->animation, p->animationData,
-        (u16)(p->heading + sub_081419D4(p->actionMode, 0x2e)), 1, 2);
+        (u16)(p->heading + ActorVariant_GetTableValue(p->actionMode, 0x2e)), 1, 2);
     Anim_Step(&p->animation, p->animationData);
     if (p->side)
         p->animation.flags |= 4;
     else
         p->animation.flags &= ~4;
-    sub_0813AFEC(p, 0x1d, 2);
+    ActorSequence_Begin(p, 0x1d, 2);
     p->triggerAnimationCallback = sub_08151078;
 }

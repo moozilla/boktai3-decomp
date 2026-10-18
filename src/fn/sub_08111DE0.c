@@ -1,4 +1,3 @@
-#define MessagePanel_InitSprites sub_08111DE0
 #include "global.h"
 
 struct MessagePanelSprite {
@@ -19,7 +18,7 @@ struct MessagePanel {
 void *ScriptProc_Start(u16, u16);
 s32 ResourceHeader_Relocate(void *, void *);
 void sub_0821983C(void *, void *, int, int, int, int, int, void *);
-void sub_08111DE0(struct MessagePanel *p)
+void MessagePanel_InitSprites(struct MessagePanel *p)
 {
     s32 i;
     s32 zero;

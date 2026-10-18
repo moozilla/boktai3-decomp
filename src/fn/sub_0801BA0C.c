@@ -9,7 +9,7 @@ typedef struct {
 extern Actor *gUnk_02000580;
 int ResultMenu_IsPhaseStart(void *);
 void ResultMenu_SendCommand(void *, int, int, void *);
-void sub_0815BE5C(void *, int);
+void PlayerCue_BeginModeSeven(void *, int);
 void Sound_PlaySong(int);
 void AnimatedParticles_EmitChargeSparkle(int, int, int, int, void *);
 void ResultMenu_SetPhase(void *, void (*)(void));
@@ -23,7 +23,7 @@ void Transformation_Charge(u8 *p)
     if (ResultMenu_IsPhaseStart(p)) {
         param = 2;
         ResultMenu_SendCommand(p, 1, 1, &param);
-        sub_0815BE5C(actor, 3);
+        PlayerCue_BeginModeSeven(actor, 3);
         Sound_PlaySong(0x2e1);
     }
     if (*(u32 *)(p + 0x3c) - 30 <= 69 && !(*(u32 *)(p + 0x3c) & 3)) {

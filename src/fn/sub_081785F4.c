@@ -1,8 +1,7 @@
 #include "global.h"
 #include "scene_hud_display.h"
 #include "player.h"
-#define SceneHud_RefreshActionKeyframes sub_081785F4
-void sub_081785F4(struct SceneHudState *hud)
+void SceneHud_RefreshActionKeyframes(struct SceneHudState *hud)
 {
     if (hud->actionOwner->actionSelectionStamp && (++hud->actionTransferDelay & 1))
         Anim_LoadKeyframe(&hud->primaryWidgets[0], hud->motionResource, 0xC9, 1);

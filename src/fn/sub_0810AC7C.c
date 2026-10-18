@@ -1,4 +1,3 @@
-#define LinkSelection_AdvanceBitExchange sub_0810AC7C
 #define LinkSelection_SwapPages Registry1745_ToggleConnectionRole
 #include "global.h"
 #include "area_effect_link.h"
@@ -12,7 +11,7 @@ static inline u8 ReceiveBit(void)
         return 0;
     return (p->receiveBits >> p->receiveBit) & 1;
 }
-void sub_0810AC7C(struct AreaEffectLinkState *p, u32 flags, u16 *value)
+void LinkSelection_AdvanceBitExchange(struct AreaEffectLinkState *p, u32 flags, u16 *value)
 {
     s32 i;
     if (flags & 1)

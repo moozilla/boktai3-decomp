@@ -4,12 +4,12 @@
 #include "scene_arc.h"
 s32 __divsi3(s32, s32);
 s32 Terrain_GetHeightAtFixedPosition(struct ScenePoolVec32 *);
-s32 sub_0811ADF0(struct ScenePoolVec32 *);
+s32 Terrain_GetHeightAtPosition(struct ScenePoolVec32 *);
 void Collider_SetFixedPositionWithYOffset(void *, struct ScenePoolVec32 *, u32);
-void sub_0811B2FC(void *);
+void SpatialIndex_InsertEntry(void *);
 void GroundEffect_DisableProjection(struct SceneGroundEffect *);
 void SceneArc_ReleaseSlot(struct SceneArcManager *, struct SceneArcSlot *, u32);
-void sub_081135B8(struct ScenePoolVec32 *, void *, void *, u32, u32, u32, u32, u32, u32, u32, u32,
+void SpriteEffect_CreateAtPosition(struct ScenePoolVec32 *, void *, void *, u32, u32, u32, u32, u32, u32, u32, u32,
                   u32, u32, u32, u32);
 struct ArcDirection {
     s32 x : 16;
@@ -115,11 +115,11 @@ void SceneArc_UpdateSlot(struct SceneArcManager *manager, struct SceneArcSlot *s
     if (!paused) {
         if (slot->frame >= slot->endFrame) {
             Collider_SetFixedPositionWithYOffset(collider, position, 0);
-            sub_0811B2FC(collider);
+            SpatialIndex_InsertEntry(collider);
             if (slot->frame == slot->endFrame) {
                 Sound_PlaySongChecked(0x195);
-                slot->position.y = -(sub_0811ADF0(position) << 12);
-                sub_081135B8(position, 0, 0, 0x8639, 0x75f6, paused, paused, paused, paused, 0x153,
+                slot->position.y = -(Terrain_GetHeightAtPosition(position) << 12);
+                SpriteEffect_CreateAtPosition(position, 0, 0, 0x8639, 0x75f6, paused, paused, paused, paused, 0x153,
                              30, paused, paused, 1, paused);
                 sprite->flags |= 1;
                 GroundEffect_DisableProjection(&slot->ground);

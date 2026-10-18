@@ -1,5 +1,4 @@
 #include "global.h"
-#define LinkPanel_InitFromScript sub_0810CA34
 #define gLinkPanel               gUnk_020001C4
 struct LinkPanel {
     u8 pad0[0x1C];
@@ -22,15 +21,15 @@ u32 Script_GetTextSourcePc(void);
 s32 Script_GetKeywordValue(u32, s32);
 void Bg_ClearTilemap(s32);
 void RegistryF246_InitBackgroundResources(struct LinkPanel *);
-void sub_0810BF94(struct LinkPanel *);
-void sub_0810BFD8(struct LinkPanel *);
+void SlotMenu_InitializeEntryValues(struct LinkPanel *);
+void SceneMenu_InitializeDisplay(struct LinkPanel *);
 void sub_0810C0BC(struct LinkPanel *);
 void ModifierMenu_InitSelectionSnapshot(void *, void *);
-void sub_0810BEF8(struct LinkPanel *);
+void SlotMenu_CreateTextWindows(struct LinkPanel *);
 void RegistryF246_InitMessageDisplay(struct LinkPanel *);
 void sub_0810C7F4(void);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
-s32 sub_0810CA34(struct LinkPanel *p)
+s32 LinkPanel_InitFromScript(struct LinkPanel *p)
 {
     if (Script_SeekToKeyword('s')) {
         p->scriptS = Script_GetTextSourcePc();
@@ -48,11 +47,11 @@ s32 sub_0810CA34(struct LinkPanel *p)
     Bg_ClearTilemap(1);
     Bg_ClearTilemap(0);
     RegistryF246_InitBackgroundResources(p);
-    sub_0810BF94(p);
-    sub_0810BFD8(p);
+    SlotMenu_InitializeEntryValues(p);
+    SceneMenu_InitializeDisplay(p);
     sub_0810C0BC(p);
     ModifierMenu_InitSelectionSnapshot(p->widget, p->resource);
-    sub_0810BEF8(p);
+    SlotMenu_CreateTextWindows(p);
     RegistryF246_InitMessageDisplay(p);
     {
         void (*update)(void) = sub_0810C7F4;

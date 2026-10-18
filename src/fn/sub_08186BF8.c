@@ -20,12 +20,12 @@ struct S {
     s16 z;
 };
 extern const u32 gUnk_0824F014[];
-void sub_0824923C(struct S *, u32);
+void Callback_InvokeActor(struct S *, u32);
 void Armor_DispatchBehaviorUpdate(struct S *p)
 {
     const u32 *t = gUnk_0824F014;
     u8 *q = &p->b3c;
-    sub_0824923C(p, t[*q]);
+    Callback_InvokeActor(p, t[*q]);
     switch (*q) {
         case 0x20:
         case 0x1b:

@@ -1,6 +1,5 @@
 #include "global.h"
 /* Provisional names and field interpretations; confidence low. */
-#define Pool1BC_UpdateDelay sub_0810889C
 struct NamedEntry {
     u8 pad0[0x60];
     u16 state;
@@ -8,7 +7,7 @@ struct NamedEntry {
     u8 entered;
     u16 timer;
 };
-void sub_0810889C(void *unused, struct NamedEntry *entry)
+void Pool1BC_UpdateDelay(void *unused, struct NamedEntry *entry)
 {
     if (entry->entered) {
         entry->timer = 0;

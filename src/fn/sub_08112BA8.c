@@ -1,4 +1,3 @@
-#define SceneSlot_RegisterObject sub_08112BA8
 #define SceneSlot_GetOrCreateRegistry ActorMarkerPool_EnsureSingleton
 #define gSceneSlotRegistry gUnk_020004BC
 #include "global.h"
@@ -15,7 +14,7 @@ struct SceneSlotRegistry {
 };
 extern struct SceneSlotRegistry *gUnk_020004BC;
 struct SceneSlotRegistry *ActorMarkerPool_EnsureSingleton(void);
-s32 sub_08112BA8(void *object)
+s32 SceneSlot_RegisterObject(void *object)
 {
     struct SceneSlotRegistry *existing = gSceneSlotRegistry;
     struct SceneSlotRegistry *registry;

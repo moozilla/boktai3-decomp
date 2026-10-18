@@ -1,7 +1,4 @@
-#define Player_EvaluateItemStatA    sub_08159030
-#define Player_ComputeItemStatA     sub_0814A530
 #define Player_ComputeIndexedStatA Player_GetSpecialAttackPower
-#define Player_BuildActionModifiers sub_0813E608
 #define gGameState                  gUnk_02000710
 #include "global.h"
 #include "player.h"
@@ -11,12 +8,12 @@ struct PlayerEquipmentReference {
     u8 unknown1[11];
     u8 slot;
 };
-void sub_0813EDDC(u32, void *, s32);
-s32 sub_0814A530(s32, struct PlayerStatModifierContext *, s32);
+void PlayerAction_RefreshFlagState(u32, void *, s32);
+s32 Player_CalculateActionStat(s32, struct PlayerStatModifierContext *, s32);
 s32 Player_GetSpecialAttackPower(s32, s32);
-void sub_0822D764(const void *, void *);
-void sub_0813E608(struct Player *, struct PlayerStatModifierContext *, const void *);
-s32 sub_08159030(struct PlayerActionEntry *item, struct PlayerEquipmentReference *reference)
+void ActionRecord_CopyFromEntry(const void *, void *);
+void Player_BuildActionModifiers(struct Player *, struct PlayerStatModifierContext *, const void *);
+s32 Player_EvaluateItemStatA(struct PlayerActionEntry *item, struct PlayerEquipmentReference *reference)
 {
     s32 equipment[4];
     s16 stats[8];
@@ -44,14 +41,14 @@ s32 sub_08159030(struct PlayerActionEntry *item, struct PlayerEquipmentReference
         *dst++ = *src++;
     if (reference)
         equipment[reference->slot] = index;
-    sub_0813EDDC(0, statValues, index);
-    sub_0822D764(item, &descriptor);
-    sub_0813E608(0, modifiers, &descriptor);
+    PlayerAction_RefreshFlagState(0, statValues, index);
+    ActionRecord_CopyFromEntry(item, &descriptor);
+    Player_BuildActionModifiers(0, modifiers, &descriptor);
     value = (s16)gUnk_02000710->baseStats[2] + (s16)gUnk_02000710->statBonuses[2] + statValues[5];
     {
         u8 zero = 0;
         *override = zero;
         *entry = item;
-        return sub_0814A530(zero, modifiers, value);
+        return Player_CalculateActionStat(zero, modifiers, value);
     }
 }

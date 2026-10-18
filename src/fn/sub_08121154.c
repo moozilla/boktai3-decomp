@@ -1,5 +1,4 @@
 #include "global.h"
-#define ActorManager_Destroy sub_08121154
 #define gActorManager        gUnk_0200020C
 struct ManagedActor {
     u8 unknown0[0x56C];
@@ -42,7 +41,7 @@ static inline void ClearManager(u32 zero)
 {
     gUnk_0200020C = (void *)zero;
 }
-u8 sub_08121154(struct ActorManager *manager)
+u8 ActorManager_Destroy(struct ActorManager *manager)
 {
     s32 i = 0;
     DestroyActors(manager, i, 0x800);

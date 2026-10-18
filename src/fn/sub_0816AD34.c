@@ -1,4 +1,3 @@
-#define ScenePanel_BeginAccountMenu sub_0816AD34
 #define ScenePanel_SetCallback Hud_SetUpdateCallback
 #include "global.h"
 struct PanelAccount {
@@ -55,11 +54,11 @@ void Hud_SetupBackgroundLayer(void *, u32, int, int, u32);
 void PauseMenu_HideAllSprites(void *);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
-void sub_0816AC08(void *);
+void MenuPrompt_UpdateSelectionSprites(void *);
 s32 MessageWindow_ShowMessage(s32);
-void sub_0816B040(void);
+void SceneSequence_UpdateRamp64(void);
 void Hud_SetUpdateCallback(void *, void (*)(void));
-void sub_0816AD34(struct ScenePanel *p)
+void ScenePanel_BeginAccountMenu(struct ScenePanel *p)
 {
     u32 zero;
     u16 *coord;
@@ -88,7 +87,7 @@ void sub_0816AD34(struct ScenePanel *p)
     anim = &p->detailSprite;
     Anim_LoadKeyframe(anim, p->keyframes, 0x1D, 1);
     Anim_SetKeyframes(anim, p->keyframes, 10, 1, zero);
-    sub_0816AC08(p);
+    MenuPrompt_UpdateSelectionSprites(p);
     MessageWindow_ShowMessage(7);
-    Hud_SetUpdateCallback(p, sub_0816B040);
+    Hud_SetUpdateCallback(p, SceneSequence_UpdateRamp64);
 }

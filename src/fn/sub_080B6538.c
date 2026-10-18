@@ -1,4 +1,3 @@
-#define SceneActorControl_TryBeginNearbyBehavior16 sub_080B6538
 #include "global.h"
 #include "scene_actor_timed_behavior.h"
 u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *);
@@ -11,7 +10,7 @@ static inline u8 IsFlag512Set(struct SceneActorTimedBehaviorContext *context)
         return 1;
     return 0;
 }
-u32 sub_080B6538(struct SceneActorRegistryResetView *s,
+u32 SceneActorControl_TryBeginNearbyBehavior16(struct SceneActorRegistryResetView *s,
                  struct SceneActorTimedBehaviorContext *context, s32 angle)
 {
     if (!SceneActorReaction_IsRangeReady(s)) {

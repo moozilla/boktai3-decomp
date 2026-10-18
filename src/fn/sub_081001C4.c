@@ -1,5 +1,3 @@
-#define WoodenCrate_InitCollider sub_081001C4
-#define WoodenCrate_ReactToHit   sub_08100144
 #include "global.h"
 #include "engine.h"
 struct CratePackedVector {
@@ -18,8 +16,8 @@ struct WoodenCrate {
     u8 padA4[0xB4 - 0xA4];
     u32 colliderId;
 };
-void sub_08100144(void *, void *, struct WoodenCrate *);
-void sub_081001C4(struct WoodenCrate *p)
+void WoodenCrate_ReactToHit(void *, void *, struct WoodenCrate *);
+void WoodenCrate_InitCollider(struct WoodenCrate *p)
 {
     struct CratePackedVector bounds, offset;
     struct CrateCollider *c = &p->collider;
@@ -32,6 +30,6 @@ void sub_081001C4(struct WoodenCrate *p)
     c->id = p->colliderId;
     Collider_Init(c, 0, 0x4001, 0, 16, &offset, &bounds);
     Collider_SetPosition(c, &p->position, 0);
-    Collider_SetCallback(c, sub_08100144, p);
+    Collider_SetCallback(c, WoodenCrate_ReactToHit, p);
     Collider_Refresh(c);
 }

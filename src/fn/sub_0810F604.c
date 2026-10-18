@@ -2,7 +2,7 @@
 s32 Registry1745_GetSessionState(void *);
 void ScrollingDialogue_HideImmediately(void);
 void Task_Kill(void *);
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 struct S {
     u8 filler[0x14D8];
     u32 f;
@@ -15,6 +15,6 @@ s32 LinkLobbyPanel_OnTaskUpdate(struct S *s)
         return -1;
     }
     if (s->f != 0)
-        sub_0824923C(s, s->f);
+        Callback_InvokeActor(s, s->f);
     return 1;
 }

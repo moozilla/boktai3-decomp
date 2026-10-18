@@ -1,5 +1,4 @@
 #include "global.h"
-#define ActorPosition_SaveSelectedPoint sub_0817A324
 struct ActorSavedPoint {
     u32 coordinates[2];
 };
@@ -9,11 +8,11 @@ struct ActorPositionState {
     u8 unknown114[0x364];
     struct ActorSavedPoint savedPoint;
 };
-s32 sub_0817A23C(struct ActorPositionState *);
-s32 sub_0817A324(struct ActorPositionState *p)
+s32 ActorMovement_CanReachTarget(struct ActorPositionState *);
+s32 ActorPosition_SaveSelectedPoint(struct ActorPositionState *p)
 {
     s32 result;
-    if (!sub_0817A23C(p))
+    if (!ActorMovement_CanReachTarget(p))
         result = 0;
     else {
         struct ActorSavedPoint *source = p->selectedPoint;

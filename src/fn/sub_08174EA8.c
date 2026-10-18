@@ -1,9 +1,8 @@
-#define Presentation_InitListValues sub_08174EA8
 #define gGameState gUnk_02000710
 #include "global.h"
 #include "game_state.h"
 #include "presentation_entry_list.h"
-void sub_08174EA8(struct PresentationEntryList *panel)
+void Presentation_InitListValues(struct PresentationEntryList *panel)
 {
     s32 i;
     if (panel->source->mode != 6) {

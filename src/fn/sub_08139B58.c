@@ -1,4 +1,3 @@
-#define CallbackPool_Update sub_08139B58
 #include "global.h"
 struct CallbackPoolEntry {
     void *callback;
@@ -12,7 +11,7 @@ struct CallbackPool {
     u32 frame;
 };
 s32 sub_08249240(void *, u32, void *);
-s32 sub_08139B58(struct CallbackPool *p)
+s32 CallbackPool_Update(struct CallbackPool *p)
 {
     s32 i;
     for (i = 0; i < 6; i++) {

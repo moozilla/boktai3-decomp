@@ -1,5 +1,4 @@
 #include "global.h"
-#define EffectSlot_Release sub_08125E74
 #define gEffectSlotPool gUnk_02000150
 struct EffectSlot {
     u8 unknown[0x30];
@@ -16,7 +15,7 @@ struct EffectSlotPool {
 };
 extern struct EffectSlotPool *gUnk_02000150;
 void Effect_Remove(void *);
-void sub_08125E74(void *unused, struct EffectSlot *slot)
+void EffectSlot_Release(void *unused, struct EffectSlot *slot)
 {
     if (slot->entered) slot->entered = 0;
     {

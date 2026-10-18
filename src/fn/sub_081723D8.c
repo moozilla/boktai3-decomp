@@ -1,4 +1,3 @@
-#define SceneHud_ShowSelectionDescription   sub_081723D8
 #define GameState_GetActionDescriptionIndex SolarFruit_GetInventorySlot
 #define SceneHud_ClearWidgetFlags PauseMenu_ClearSpriteFlags
 #include "global.h"
@@ -8,7 +7,7 @@ s32 GameState_GetUnlockEntry(s32);
 s32 SolarFruit_GetInventorySlot(s32);
 void ScrollingDialogue_RequestShow(void);
 void PauseMenu_ClearSpriteFlags(void *, s32, u32);
-void sub_081723D8(struct SceneHudState *p)
+void SceneHud_ShowSelectionDescription(struct SceneHudState *p)
 {
     s32 entry;
     s32 text;

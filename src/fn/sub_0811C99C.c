@@ -1,5 +1,4 @@
 #include "global.h"
-#define PaletteFlash_SelectPalette sub_0811C99C
 struct PaletteFlashTarget {
     u8 unknown0[0x230];
     u16 palette[16];
@@ -12,7 +11,7 @@ struct PaletteFlash {
     u16 paletteId;
     struct PaletteFlashTarget *target;
 };
-void sub_0811C99C(struct PaletteFlash *flash, s32 mode)
+void PaletteFlash_SelectPalette(struct PaletteFlash *flash, s32 mode)
 {
     struct PaletteFlashTarget *target = flash->target;
     switch (mode) {

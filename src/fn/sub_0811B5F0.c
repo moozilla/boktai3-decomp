@@ -1,14 +1,12 @@
-#define Collision_ProcessGroups sub_0811B5F0
-#define Collision_DispatchOverlaps sub_0811B500
 #include "global.h"
 struct CollisionBody;
 struct CollisionBodyLink { struct CollisionBody *body; void *previous; struct CollisionBodyLink *next; };
 struct CollisionGroup { struct CollisionBodyLink *pending, *targets; s32 unknown, count; };
 struct CollisionManager { u8 pad0[0x18]; struct CollisionGroup groups[10]; };
 void sub_0811B094(struct CollisionManager *, struct CollisionGroup *, s32);
-void sub_0811B500(struct CollisionBody *, struct CollisionBodyLink *);
+void Collision_DispatchOverlaps(struct CollisionBody *, struct CollisionBodyLink *);
 void Heap_Free(void *);
-s32 sub_0811B5F0(struct CollisionManager *manager)
+s32 Collision_ProcessGroups(struct CollisionManager *manager)
 {
     s32 i;
     for (i = 0; i < 10; i++) {
@@ -18,7 +16,7 @@ s32 sub_0811B5F0(struct CollisionManager *manager)
         while (node) {
             struct CollisionBodyLink *old;
             if (manager->groups[i].count > 0)
-                sub_0811B500(node->body, manager->groups[i].targets);
+                Collision_DispatchOverlaps(node->body, manager->groups[i].targets);
             old = node;
             node = node->next;
             Heap_Free(old);

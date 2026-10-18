@@ -1,8 +1,5 @@
-#define SpriteEffect_SpawnWithMotion sub_0812247C
-#define SpriteEffect_AllocateSlot sub_08122020
 #define SpriteEffect_GetOrCreatePool SceneActor14_EnsureSingleton
 #define SpriteEffect_GetFacingVariant SceneActor14_GetFacingAndFlip
-#define SpriteEffect_InitCollider sub_08121F84
 #define gSpriteEffectPool gUnk_0200013C
 #include "global.h"
 
@@ -40,14 +37,14 @@ struct SpriteEffectPool {
 };
 extern struct SpriteEffectPool *gUnk_0200013C;
 struct SpriteEffectPool *SceneActor14_EnsureSingleton(void);
-struct SpriteEffect *sub_08122020(struct SpriteEffectPool *);
+struct SpriteEffect *SpriteEffectPool_AllocateSlot(struct SpriteEffectPool *);
 void SceneActor14_GetFacingAndFlip(struct EffectSourceObject *, u8 *, u8 *);
 void Shadow_Initialize(void *, void *, u32);
 void Sprite_Init(void *, void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
-void sub_08121F84(struct SpriteEffect *, u32, u32, u32, u32);
+void SpriteEffect_InitCollider(struct SpriteEffect *, u32, u32, u32, u32);
 
-s32 sub_0812247C(struct EffectSourceObject *source, struct EffectSourceObject *target, struct EffectMotion *motion, u32 a, u32 b, u32 c, u32 d)
+s32 SpriteEffect_SpawnWithMotion(struct EffectSourceObject *source, struct EffectSourceObject *target, struct EffectMotion *motion, u32 a, u32 b, u32 c, u32 d)
 {
     struct SpriteEffectPool *pool;
     struct SpriteEffect *effect;
@@ -58,7 +55,7 @@ s32 sub_0812247C(struct EffectSourceObject *source, struct EffectSourceObject *t
         if (!pool)
             return -1;
     }
-    effect = sub_08122020(pool);
+    effect = SpriteEffectPool_AllocateSlot(pool);
     if (!effect)
         return -1;
     effect->active = 1;
@@ -73,6 +70,6 @@ s32 sub_0812247C(struct EffectSourceObject *source, struct EffectSourceObject *t
     AnimData_SelectPaletteBank(effect->animation, 0x2c4);
     effect->flags |= 1;
     effect->layer = 2;
-    sub_08121F84(effect, a, b, c, d);
+    SpriteEffect_InitCollider(effect, a, b, c, d);
     return effect->slot;
 }

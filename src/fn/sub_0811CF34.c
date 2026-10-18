@@ -1,6 +1,6 @@
 #include "global.h"
-u8 sub_08112BA8(u32);
+u8 SceneSlot_RegisterObject(u32);
 void CharacterModel_SetPrimaryAppearance(u8 *p, u32 x)
 {
-    *(u8 *)(p + 0x250) = sub_08112BA8(x);
+    *(u8 *)(p + 0x250) = SceneSlot_RegisterObject(x);
 }

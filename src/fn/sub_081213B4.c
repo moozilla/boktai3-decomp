@@ -1,5 +1,4 @@
 #include "global.h"
-#define ActorCollider_Init sub_081213B4
 struct ColliderExtentPair {
     u32 lo : 16, hi : 16;
 };
@@ -21,7 +20,7 @@ void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 void Collider_SetCallback(void *, void (*)(void), void *);
 void Collider_SetPosition(void *, void *, u32);
 void SceneColliderEffect_OnCollision(void);
-void sub_081213B4(struct ColliderObject *object, u32 a, u32 b, u32 value)
+void ActorCollider_Init(struct ColliderObject *object, u32 a, u32 b, u32 value)
 {
     struct ColliderExtents size, offset;
     void *collider;

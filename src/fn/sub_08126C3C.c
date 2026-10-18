@@ -1,4 +1,3 @@
-#define EffectPool_UpdateActive sub_08126C3C
 #define gEffectPoolUpdateCallbacks gUnk_08610764
 #include "global.h"
 struct PoolEffect {
@@ -13,7 +12,7 @@ struct EffectPool {
 };
 extern void *gUnk_08610764[];
 s32 sub_08249240(void *, void *, void *);
-s32 sub_08126C3C(struct EffectPool *pool)
+s32 EffectPool_UpdateActive(struct EffectPool *pool)
 {
     void **callbacks = gUnk_08610764;
     struct PoolEffect *effect = pool->effects;

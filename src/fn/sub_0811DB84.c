@@ -1,4 +1,3 @@
-#define MotionTween_Advance sub_0811DB84
 #include "global.h"
 
 struct MotionTweenObject {
@@ -21,7 +20,7 @@ struct MotionTween {
     u8 valueFrames, coordinateFrames, valueDelay, coordinateDelay;
 };
 s32 Div(s32, s32);
-s32 sub_0811DB84(struct MotionTweenObject *object, struct MotionTween *tween)
+s32 MotionTween_Advance(struct MotionTweenObject *object, struct MotionTween *tween)
 {
     s32 changed = 0;
     if (tween->valueDelay) {

@@ -1,6 +1,4 @@
 #include "global.h"
-#define LinkPanel_DrawPeerTimes sub_0810CCC8
-#define LinkPanel_DrawTime      sub_0810CC28
 #define gLinkSession            gUnk_020004B4
 struct LinkPanel {
     u8 pad0[0x13FD];
@@ -18,7 +16,7 @@ struct LinkSession {
     struct LinkTimeRecord peers[2];
 };
 extern struct LinkSession *gUnk_020004B4;
-void sub_0810CC28(struct LinkTimeRecord *, u8 *, u32, s32);
+void LinkPanel_DrawTime(struct LinkTimeRecord *, u8 *, u32, s32);
 static inline struct LinkTimeRecord *getPeer(s32 i)
 {
     if (!gUnk_020004B4 || gUnk_020004B4->active != 1)
@@ -34,12 +32,12 @@ static inline s32 clampIndex(s32 index, s32 low, s32 high)
         result = low;
     return result;
 }
-void sub_0810CCC8(struct LinkPanel *p)
+void LinkPanel_DrawPeerTimes(struct LinkPanel *p)
 {
     struct LinkTimeRecord *peer = getPeer(0);
     s32 index = p->selection - 6;
     index = clampIndex(index, 0, 5);
-    sub_0810CC28(peer, (u8 *)2, 15, index);
+    LinkPanel_DrawTime(peer, (u8 *)2, 15, index);
     peer = getPeer(1);
-    sub_0810CC28(peer, (u8 *)20, 15, index);
+    LinkPanel_DrawTime(peer, (u8 *)20, 15, index);
 }

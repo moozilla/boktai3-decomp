@@ -1,12 +1,11 @@
 #include "global.h"
-#define MenuSelection_RefreshOptionText sub_08175AF8
 s32 TextWindow_SetScript(s32, const u8 *);
 s32 TextWindow_Refresh(s32, s32);
 void TextWindow_StartPlayback(s32);
 void Hud_SetConfigFirstValueBounds(u8 *);
 void Hud_SetConfigSecondValueBounds(u8 *);
 void Hud_SetConfigThirdValueBounds(u8 *);
-void sub_08175AF8(u8 *s)
+void MenuSelection_RefreshOptionText(u8 *s)
 {
     u8 *row = s + 0x48C0;
     if (*row == 0) {

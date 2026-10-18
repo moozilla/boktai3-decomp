@@ -1,4 +1,3 @@
-#define MessagePanel_UpdateExitDelay     sub_08112464
 #define MessagePanel_UpdateBlink StageResults_UpdateRecordBlink
 #define MessagePanel_FinishExit StageResults_FinishDisplay
 #define MessagePanel_StepPairedAnimation CharacterModel_UpdatePairedAnimations
@@ -26,7 +25,7 @@ static inline void SetState(u8 *p, void (*cb)(void *), u8 state)
     p[0x11CA] = 1;
     p[0x11C8] = state;
 }
-void sub_08112464(struct MessagePanel *p)
+void MessagePanel_UpdateExitDelay(struct MessagePanel *p)
 {
     if (p->entering) {
         ScreenTransition_SendCommand(3, 5, 4, 4, 4, 0xFFFF, 0);

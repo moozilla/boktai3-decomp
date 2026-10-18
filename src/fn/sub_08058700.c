@@ -77,7 +77,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
                     velocity.x = 300;
                     velocity.y = 300;
                     velocity.z = 300;
-                    sub_0806A160(&position, 1, &velocity, 0, zero, 48, 2, 1);
+                    SparkParticle_Spawn(&position, 1, &velocity, 0, zero, 48, 2, 1);
                 }
             }
         } else {

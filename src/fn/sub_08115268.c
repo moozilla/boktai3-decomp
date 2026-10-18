@@ -1,4 +1,3 @@
-#define ActorParticles_SpawnAlternatingBurst sub_08115268
 #define gParticleRandomIndex                 gUnk_03005304
 #define gParticleRandomValues                gUnk_086141BC
 // Tentative family and semantic names; layouts follow observed field offsets.
@@ -24,7 +23,7 @@ static inline u32 ParticleRandom(void)
     gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
     return gUnk_086141BC[gUnk_03005304];
 }
-void sub_08115268(struct ParticleEmitter *p)
+void ActorParticles_SpawnAlternatingBurst(struct ParticleEmitter *p)
 {
     s32 count, mode, i;
     struct ParticleOffset offset;

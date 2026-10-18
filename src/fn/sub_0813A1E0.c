@@ -1,4 +1,3 @@
-#define PairCallbackPool_Update sub_0813A1E0
 #include "global.h"
 struct PairCallbackPoolEntry {
     void *callback;
@@ -12,7 +11,7 @@ struct PairCallbackPool {
     u32 frame;
 };
 s32 sub_08249240(void *, u32, void *);
-s32 sub_0813A1E0(struct PairCallbackPool *p)
+s32 PairCallbackPool_Update(struct PairCallbackPool *p)
 {
     s32 i;
     for (i = 0; i < 2; i++) {

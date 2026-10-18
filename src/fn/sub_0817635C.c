@@ -1,6 +1,4 @@
-#define SceneDialog_BeginTimedMessage sub_0817635C
 #define SceneDialog_SetPhase Hud_SetInteractionCallback
-#define SceneDialog_SelectMessage     sub_08175854
 #define gSceneDialogActive            gUnk_03005408
 #include "global.h"
 struct SceneDialog {
@@ -16,10 +14,10 @@ void TextWindow_SetBounds(s32, s32, s32, s32, s32);
 s32 TextWindow_SetScript(s32, const u8 *);
 s32 TextWindow_Refresh(s32, s32);
 void TextWindow_StartPlayback(int);
-void sub_08175854(u32);
-void sub_081763D4(void);
+void SceneCatalog_SelectDescription(u32);
+void SceneDialog_SelectResultPhase(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
-void sub_0817635C(struct SceneDialog *p)
+void SceneDialog_BeginTimedMessage(struct SceneDialog *p)
 {
     gUnk_03005408 = 1;
     if (!p->timer) {
@@ -27,8 +25,8 @@ void sub_0817635C(struct SceneDialog *p)
         TextWindow_SetScript(p->window, p->script);
         TextWindow_Refresh(p->window, 13);
         TextWindow_StartPlayback(p->window);
-        sub_08175854(12);
+        SceneCatalog_SelectDescription(12);
     }
     if (++p->timer > 59)
-        Hud_SetInteractionCallback(p, sub_081763D4, 1);
+        Hud_SetInteractionCallback(p, SceneDialog_SelectResultPhase, 1);
 }

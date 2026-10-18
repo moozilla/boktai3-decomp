@@ -1,10 +1,8 @@
 #include "global.h"
 /* Tentative family name; visual identity is not yet established. */
 #include "contact_actor.h"
-#define ActorEffect_Spawn         sub_0812B0F8
 #define ActorEffect_CreateManager FragmentProjectilePool_GetOrCreate
 #define ActorEffect_Allocate FragmentProjectilePool_AllocSprite
-#define ActorEffect_InitColliders sub_0812A660
 #define gActorEffectManager       gUnk_02000180
 struct ActorEffect {
     u32 flags;
@@ -31,8 +29,8 @@ struct ActorEffectManager {
 extern struct ActorEffectManager *gUnk_02000180;
 struct ActorEffectManager *FragmentProjectilePool_GetOrCreate(void);
 struct ActorEffect *FragmentProjectilePool_AllocSprite(void *);
-void sub_0812A660(struct ActorEffect *, s32, s32, s32, s32);
-void sub_0812B0F8(struct ContactPosition *position, u32 value, s32 a, s32 b, s32 c, s32 d,
+void ActorEffect_InitColliders(struct ActorEffect *, s32, s32, s32, s32);
+void ActorEffect_Spawn(struct ContactPosition *position, u32 value, s32 a, s32 b, s32 c, s32 d,
                   s32 parameter188, s32 parameter186, s32 parameter180, s32 variant)
 {
     struct ActorEffectManager *manager = gUnk_02000180;
@@ -64,5 +62,5 @@ void sub_0812B0F8(struct ContactPosition *position, u32 value, s32 a, s32 b, s32
     effect->position = *position;
     effect->flags |= 1;
     effect->priority = 1;
-    sub_0812A660(effect, a, b, c, d);
+    ActorEffect_InitColliders(effect, a, b, c, d);
 }

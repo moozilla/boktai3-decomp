@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0824923C(u8 *, u32);
+void Callback_InvokeActor(u8 *, u32);
 
 void CannonBattery_UpdateMuzzleFlash(u8 *p)
 {
@@ -10,7 +10,7 @@ void CannonBattery_UpdateMuzzleFlash(u8 *p)
         *(u32 *)p = z;
         q = *(u32 *)(p + 4);
         if (q) {
-            sub_0824923C(p, q);
+            Callback_InvokeActor(p, q);
             *(u32 *)(p + 4) = z;
         }
     }

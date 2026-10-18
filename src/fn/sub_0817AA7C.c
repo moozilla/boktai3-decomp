@@ -1,6 +1,5 @@
 #include "global.h"
 // Tentative SceneVolume family: ownership and field semantics remain provisional.
-#define SceneVolume_GetActivityState sub_0817AA7C
 struct SceneVolume {
     u8 pad0[0x9C];
     u32 flags;
@@ -9,7 +8,7 @@ struct SceneVolume {
     u8 pad46C[0x84];
     u16 activity;
 };
-s32 sub_0817AA7C(struct SceneVolume *volume)
+s32 SceneVolume_GetActivityState(struct SceneVolume *volume)
 {
     s32 result;
     if (volume->activityTimer > 0) {

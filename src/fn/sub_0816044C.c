@@ -1,6 +1,4 @@
 #include "global.h"
-#define FrameDisplay_UpdateSprite sub_0816044C
-#define FrameDisplay_GetCompactFrameIndex sub_08160380
 struct FrameDisplayPosition { u32 words[2]; };
 struct FrameDisplayAnimation {
     u8 unknown0[0x20];
@@ -28,10 +26,10 @@ static inline void SetFrame(struct FrameDisplaySprite *sprite, s32 frame)
 {
     sprite->frame = frame;
 }
-s32 sub_08160380(struct FrameDisplay *);
-void sub_0816044C(struct FrameDisplay *p)
+s32 FrameDisplay_GetCompactFrameIndex(struct FrameDisplay *);
+void FrameDisplay_UpdateSprite(struct FrameDisplay *p)
 {
-    s32 frame = sub_08160380(p);
+    s32 frame = FrameDisplay_GetCompactFrameIndex(p);
     if (frame != p->compactFrame || (p->sprite.flags & 4) != *p->flip) {
         p->compactFrame = frame;
         if (frame == -1) {

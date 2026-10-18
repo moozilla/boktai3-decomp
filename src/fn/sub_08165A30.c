@@ -1,4 +1,3 @@
-#define SceneHud_UpdateBinaryChoice sub_08165A30
 #define SceneHud_SetWidgetFlags PauseMenu_AddSpriteFlags
 #define SceneHud_SetWidgetKeyframe PauseMenu_LoadSpriteKeyframe
 #define gSceneInputKeyState         gUnk_03005260
@@ -6,7 +5,7 @@
 #include "scene_hud_display.h"
 void PauseMenu_AddSpriteFlags(void *, s32, s32);
 void PauseMenu_LoadSpriteKeyframe(void *, s32, s32);
-s32 sub_08165A30(struct SceneHudState *hud)
+s32 SceneHud_UpdateBinaryChoice(struct SceneHudState *hud)
 {
     u32 changed;
     if (gSceneInputKeyState[1] & 1) {

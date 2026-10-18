@@ -1,5 +1,4 @@
 /* Provisional names and object interpretation; offsets follow static accesses. */
-#define MapMenu_SelectDirection  sub_0816C230
 #define MapMenu_IsAreaUnlocked GameState_GetMapRevealFlag
 #define MapMenu_RefreshSelection MapScreen_RefreshAreaDisplay
 #define gMenuInput               gUnk_03005260
@@ -22,7 +21,7 @@ extern struct {
 } gUnk_03005260;
 u32 GameState_GetMapRevealFlag(u32);
 void MapScreen_RefreshAreaDisplay(struct MapMenu *);
-u32 sub_0816C230(struct MapMenu *s)
+u32 MapMenu_SelectDirection(struct MapMenu *s)
 {
     struct MapMenuEntry *entries = s->entries;
     s32 index = -1;

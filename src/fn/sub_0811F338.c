@@ -1,4 +1,3 @@
-#define ActorAction_InitializeMode sub_0811F338
 // Tentative descriptive names; inferred from static field accesses and callees.
 #include "global.h"
 struct ActorAction {
@@ -18,10 +17,10 @@ struct ActorActionHost {
     struct ActorAction action;
 };
 void Memory_Clear(void *, u32);
-void sub_0811E48C(void *, s32);
-void sub_0811EE9C(void), sub_0811F0B8(void), sub_0811EF40(void), sub_0811F1A8(void),
-    sub_0811EFF0(void);
-void sub_0811F338(struct ActorActionHost *host, void *owner)
+void ScriptRecord_FindExtendedModifier(void *, s32);
+void ActorEmitter_TryEmit(void), ActorEmitter_TryEmitPair(void), ActorEmitter_TryEmitLow(void), ActorEmitter_TryEmitAnimatedPair(void),
+    ActorEmitter_UpdateAnimation(void);
+void ActorAction_InitializeMode(struct ActorActionHost *host, void *owner)
 {
     u8 *source = (u8 *)host + 0x48;
     struct ActorAction *action = &host->action;
@@ -31,45 +30,45 @@ void sub_0811F338(struct ActorActionHost *host, void *owner)
     action->owner = owner;
     params = (u16 *)((u8 *)host + 0x2b4);
     Memory_Clear(params, 16);
-    sub_0811E48C(params, source[13]);
+    ScriptRecord_FindExtendedModifier(params, source[13]);
     switch (action->mode) {
         case 0:
-            action->callback = sub_0811EE9C;
+            action->callback = ActorEmitter_TryEmit;
             action->ready = 1;
             action->animation = 6;
             action->duration = 0xffff;
             action->active = 1;
             break;
         case 1:
-            action->callback = sub_0811F0B8;
+            action->callback = ActorEmitter_TryEmitPair;
             action->ready = 1;
             action->animation = 7;
             action->duration = 0xffff;
             action->active = 1;
             break;
         case 2:
-            action->callback = sub_0811EF40;
+            action->callback = ActorEmitter_TryEmitLow;
             action->ready = 1;
             action->animation = 8;
             action->duration = 0xffff;
             action->active = 1;
             break;
         case 3:
-            action->callback = sub_0811F1A8;
+            action->callback = ActorEmitter_TryEmitAnimatedPair;
             action->ready = 1;
             action->animation = 9;
             action->duration = 30;
             action->active = 1;
             break;
         case 4:
-            action->callback = sub_0811F0B8;
+            action->callback = ActorEmitter_TryEmitPair;
             action->ready = 1;
             action->animation = 10;
             action->duration = 0xffff;
             action->active = 1;
             break;
         case 5:
-            action->callback = sub_0811EFF0;
+            action->callback = ActorEmitter_UpdateAnimation;
             action->ready = 1;
             action->animation = 11;
             action->duration = 31;

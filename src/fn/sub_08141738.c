@@ -1,4 +1,3 @@
-#define Player_BeginDirectionalCameraOffset sub_08141738
 #define gDirectionSineTable                 gUnk_086149C4
 #include "global.h"
 #include "player.h"
@@ -9,7 +8,7 @@ static inline s32 ScaleCameraOffset(s32 value)
         return value >> 12;
     return -(-value >> 12);
 }
-void sub_08141738(struct Player *p)
+void Player_BeginDirectionalCameraOffset(struct Player *p)
 {
     if (p->cameraOffsetActive == 0) {
         s32 angle = ((p->coordinateAxis + 1) & 7) << 5;

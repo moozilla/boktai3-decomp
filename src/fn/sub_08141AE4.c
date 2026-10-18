@@ -1,4 +1,3 @@
-#define Player_GetMovementSpeed sub_08141AE4
 #include "global.h"
 #include "player.h"
 s32 Div(s32, s32);
@@ -27,7 +26,7 @@ static inline s32 IsFastMovement(struct Player *p)
         return 1;
     return HasFastMovement(p);
 }
-s32 sub_08141AE4(struct Player *p)
+s32 Player_GetMovementSpeed(struct Player *p)
 {
     s32 speed;
     if (IsFastMovement(p))

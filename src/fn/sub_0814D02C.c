@@ -1,15 +1,13 @@
 #include "global.h"
 #include "player.h"
-#define Player_SelectActionVariant sub_0814D02C
-#define Player_CollectActionFlags  sub_0814A854
-u32 sub_0814A854(struct Player *);
-s32 sub_0813B480(struct Player *);
+u32 ActorFlags_GetResponseBits(struct Player *);
+s32 ActorFlags_SelectResponse(struct Player *);
 void PlayerAttackEffect_SetElementMode(u32);
 void PlayerAttackEffect_SetDefaultPaletteSource(u32);
-void sub_0814D02C(struct Player *p)
+void Player_SelectActionVariant(struct Player *p)
 {
-    u32 flags = sub_0814A854(p);
-    if (p->currentStatB < sub_0813B480(p)) {
+    u32 flags = ActorFlags_GetResponseBits(p);
+    if (p->currentStatB < ActorFlags_SelectResponse(p)) {
         PlayerAttackEffect_SetElementMode(0);
         p->actionVariant = (u8)p->statModifierContext.savedActionIndex;
     } else if (flags & 1) {

@@ -1,4 +1,3 @@
-#define ActorCollision_InitThreeAuxiliaryAttacks sub_080FC8D4
 #define ActorCollision_IgnoreContact Axe_OnAttackColliderContact
 #include "global.h"
 #include "scene_actor_collision.h"
@@ -7,7 +6,7 @@ struct AuxiliaryAttackGroup {
     struct ContactCollider colliders[3];
 };
 void ActorCollision_IgnoreContact(void);
-void sub_080FC8D4(struct SceneActorRegistryActor *actor)
+void ActorCollision_InitThreeAuxiliaryAttacks(struct SceneActorRegistryActor *actor)
 {
     struct AuxiliaryAttackGroup *group = actor->context;
     struct ContactPackedVector size, offset;

@@ -1,4 +1,3 @@
-#define Hud_RefreshActivePanel sub_08167BDC
 #include "global.h"
 
 /* HUD interpretation and descriptive names are tentative. */
@@ -19,10 +18,10 @@ void sub_08164864(struct Hud *, s32, s32, s32);
 void sub_08165020(struct Hud *);
 void sub_08164DC0(struct Hud *);
 void sub_08164C40(struct Hud *, s32);
-void sub_081678A0(struct Hud *);
+void SelectionPanel_UpdateBlink(struct Hud *);
 void sub_08167910(struct Hud *);
 void sub_08165254(struct Hud *);
-void sub_08167BDC(struct Hud *hud)
+void Hud_RefreshActivePanel(struct Hud *hud)
 {
     if (hud->panel && hud->mode != 7 && hud->mode <= 2) {
         s32 one = 1;
@@ -35,7 +34,7 @@ void sub_08167BDC(struct Hud *hud)
             sub_08164DC0(hud);
         else
             sub_08164C40(hud, hud->mode);
-        sub_081678A0(hud);
+        SelectionPanel_UpdateBlink(hud);
         sub_08167910(hud);
         sub_08165254(hud);
     }

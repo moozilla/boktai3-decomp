@@ -1,4 +1,3 @@
-#define SceneSequence_UpdateRamp64 sub_0816B040
 #define SceneSequence_SetPhase Hud_SetUpdateCallback
 #include "global.h"
 struct SceneSequence {
@@ -12,8 +11,8 @@ struct SceneSequence {
 void Hud_InitSelectionBounds(u32, u32);
 s32 Anim_Step(void *, void *);
 void Hud_SetUpdateCallback(void *, void (*)(void));
-void sub_0816B0AC(void);
-void sub_0816B040(struct SceneSequence *s)
+void SelectionMenu_UpdateConfirmInput(void);
+void SceneSequence_UpdateRamp64(struct SceneSequence *s)
 {
     void *data, *initial;
     if (s->phaseTimer <= 15)
@@ -25,5 +24,5 @@ void sub_0816B040(struct SceneSequence *s)
     Anim_Step(initial, data);
     Anim_Step(s->secondaryAnimation, data);
     if (++s->phaseTimer > 15)
-        Hud_SetUpdateCallback(s, sub_0816B0AC);
+        Hud_SetUpdateCallback(s, SelectionMenu_UpdateConfirmInput);
 }

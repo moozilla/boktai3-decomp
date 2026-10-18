@@ -1,4 +1,3 @@
-#define LinkMenu_LoadSelectionSprite sub_0810FC90
 #define gLinkSession                 gUnk_020004B4
 #define MenuSprite_LoadPalettePair CharacterModel_InitPalettes
 #include "global.h"
@@ -35,7 +34,7 @@ no:
 yes:
     return 1;
 }
-void sub_0810FC90(struct LinkMenu *menu)
+void LinkMenu_LoadSelectionSprite(struct LinkMenu *menu)
 {
     s32 i = menu->selected;
     struct AreaEffectLinkState *link = gUnk_020004B4;

@@ -1,9 +1,8 @@
-#define InventoryGrid_GetSlotPosition sub_081748B8
 #include "global.h"
 struct InventoryGridPosition {
     s16 x, y;
 };
-void sub_081748B8(struct InventoryGridPosition *p, s32 slot)
+void InventoryGrid_GetSlotPosition(struct InventoryGridPosition *p, s32 slot)
 {
     if (slot <= 15) {
         p->x = 0x90 + (slot & 3) * 24;

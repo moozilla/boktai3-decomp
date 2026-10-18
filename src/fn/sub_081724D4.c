@@ -1,4 +1,3 @@
-#define SceneHud_RefreshEquippedActionIcons sub_081724D4
 #define GameState_GetActionDescriptionIndex SolarFruit_GetInventorySlot
 #define gAnimationPaletteData               gUnk_030042E4
 #include "global.h"
@@ -6,7 +5,7 @@
 #include "game_state.h"
 s32 GameState_GetUnlockEntry(s32);
 s32 SolarFruit_GetInventorySlot(s32);
-void sub_081724D4(struct SceneHudState *p)
+void SceneHud_RefreshEquippedActionIcons(struct SceneHudState *p)
 {
     s32 slot, unlock, action, entry, description;
     struct SceneInputWidget *w;

@@ -26,7 +26,7 @@ void *Script_GetTextSourcePc(void);
 void *Script_GetKeywordValue(int, int);
 void WirelessPeerMenu_InitBackground(struct P *);
 int WirelessPeerPanel_Init(struct P *, struct Panel *, int);
-int sub_08033690(int, int, int, int);
+int TextWindow_Create(int, int, int, int);
 void TextWindow_SetScript(int, void *);
 void TextWindow_SetString(int, int, void *);
 void TextWindow_Refresh(int, int);
@@ -63,7 +63,7 @@ int WirelessPeerPanel_Initialize(struct P *p)
         q++;
     } while (i <= 1);
     w = &p->windows[0];
-    *w = sub_08033690(3, 10, 10, 2);
+    *w = TextWindow_Create(3, 10, 10, 2);
     if (*w < 0)
         goto fail;
     TextWindow_SetScript(*w, p->script);
@@ -71,7 +71,7 @@ int WirelessPeerPanel_Initialize(struct P *p)
     TextWindow_Refresh(*w, 3);
     TextWindow_StartPlayback(*w);
     w = &p->windows[1];
-    *w = sub_08033690(17, 10, 10, 2);
+    *w = TextWindow_Create(17, 10, 10, 2);
     if (*w < 0)
         goto fail;
     TextWindow_SetScript(*w, p->script);
@@ -79,7 +79,7 @@ int WirelessPeerPanel_Initialize(struct P *p)
     TextWindow_Refresh(*w, 4);
     TextWindow_StartPlayback(*w);
     w = &p->windows[2];
-    *w = sub_08033690(0, 14, 30, 6);
+    *w = TextWindow_Create(0, 14, 30, 6);
     if (*w < 0)
         goto fail;
     TextWindow_SetScript(*w, p->script);

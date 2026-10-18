@@ -1,6 +1,5 @@
 #include "global.h"
 /* Provisional names and field interpretations; confidence low. */
-#define Pool1BC_FindByName sub_0810853C
 #define gNamedEntryPool gUnk_020001BC
 struct NamedEntry {
     u8 pad0[0x58];
@@ -18,7 +17,7 @@ static inline u8 IsUsed(u32 mask, s32 index, s32 one)
     if (mask & (one << index)) return 1;
     return 0;
 }
-struct NamedEntry *sub_0810853C(u32 name)
+struct NamedEntry *Pool1BC_FindByName(u32 name)
 {
     struct NamedEntryPool *pool = gUnk_020001BC;
     struct NamedEntry *entry;

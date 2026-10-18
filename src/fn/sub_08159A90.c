@@ -1,9 +1,8 @@
-#define Player_ApplyPositionRequest sub_08159A90
 #include "global.h"
 #include "player.h"
 void Sound_PlaySong(u32);
-s32 sub_0815E710(struct Player *, s32, u32, u32, u32, u32);
-s32 sub_08159A90(struct Player *p, struct SceneVec *position, s32 frame, u32 direction,
+s32 PlayerContact_ApplySyntheticContact(struct Player *, s32, u32, u32, u32, u32);
+s32 Player_ApplyPositionRequest(struct Player *p, struct SceneVec *position, s32 frame, u32 direction,
                  s32 resetValue, s32 parameter, s32 request, u32 option)
 {
     s32 result;
@@ -35,7 +34,7 @@ s32 sub_08159A90(struct Player *p, struct SceneVec *position, s32 frame, u32 dir
     p->actionActive489 = 0;
     p->terrainRecoveryActive = 0;
     if (request > 0)
-        result = sub_0815E710(p, request, 0, 0, 0, option);
+        result = PlayerContact_ApplySyntheticContact(p, request, 0, 0, 0, option);
     else
         result = 0;
     if (resetValue > 0)

@@ -1,5 +1,3 @@
-#define PauseMenu_InitSleepTab sub_08176174
-#define PauseMenu_BeginSleepPrompt sub_08176020
 #define PauseMenu_SetCallback Hud_SetInteractionCallback
 #include "global.h"
 struct PauseMenuSleep {
@@ -25,12 +23,12 @@ void PauseMenu_HideAllSprites(void *);
 void PauseMenu_LoadSpriteKeyframe(void *, s32, s32);
 void MessageWindow_SetMessageTable(const void *);
 void MessageWindow_SetPalette(s32);
-void sub_08175854(u32);
+void SceneCatalog_SelectDescription(u32);
 void PauseMenu_SetPromptIconPositions(void *, s32, s32);
-void sub_081660D0(void *, s32, s32);
+void SceneHud_SetPairedIcons(void *, s32, s32);
 void Hud_SetInteractionCallback(void *, void (*)(void), s32);
-void sub_08176020(void);
-void sub_08176174(struct PauseMenuSleep *s)
+void PauseMenu_BeginSleepPrompt(void);
+void PauseMenu_InitSleepTab(struct PauseMenuSleep *s)
 {
     PauseMenu_CloseTextWindows(s);
     MessageWindow_Clear();
@@ -44,9 +42,9 @@ void sub_08176174(struct PauseMenuSleep *s)
     PauseMenu_LoadSpriteKeyframe(s, 0, 0x59);
     MessageWindow_SetMessageTable(s->script);
     MessageWindow_SetPalette(0xEFDA);
-    sub_08175854(0x11);
+    SceneCatalog_SelectDescription(0x11);
     s->sleepState = 0;
     PauseMenu_SetPromptIconPositions(s, 0, -12);
-    sub_081660D0(s, 1, -1);
-    Hud_SetInteractionCallback(s, sub_08176020, 0);
+    SceneHud_SetPairedIcons(s, 1, -1);
+    Hud_SetInteractionCallback(s, PauseMenu_BeginSleepPrompt, 0);
 }

@@ -1,4 +1,3 @@
-#define SceneActorTarget_CanReplaceByDistance sub_0813760C
 #include "global.h"
 #include "scene_actor_registry.h"
 #include "scene_actor_position_search.h"
@@ -9,7 +8,7 @@ static inline void Subtract(struct ContactPosition *out, const struct ContactPos
     out->y = a->y - b->y;
     out->z = a->z - b->z;
 }
-s32 sub_0813760C(struct SceneActorRegistryActor *actor, const struct ContactPosition *position,
+s32 SceneActorTarget_CanReplaceByDistance(struct SceneActorRegistryActor *actor, const struct ContactPosition *position,
                  void *identity)
 {
     struct ContactPosition delta;

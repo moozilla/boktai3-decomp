@@ -1,4 +1,3 @@
-#define ActorGroup_CallMemberScript sub_081042DC
 /* Provisional ActorGroup names: static behavior established; semantic ownership tentative. */
 #include "global.h"
 #include "directional_interaction.h"
@@ -9,7 +8,7 @@ struct ActorGroupMember {
     u32 script;
     s32 parameters[3];
 };
-void sub_081042DC(struct ActorGroupMember *member)
+void ActorGroup_CallMemberScript(struct ActorGroupMember *member)
 {
     s32 values[12];
     struct DirectionalScriptArgs arguments;

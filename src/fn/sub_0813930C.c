@@ -1,4 +1,3 @@
-#define SceneProcSprites_Initialize sub_0813930C
 #define gSceneProcSprites           gUnk_020004CC
 #include "global.h"
 struct SceneProcSprite {
@@ -22,7 +21,7 @@ void *ScriptProc_Start(u16, u16);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void Memory_Clear(void *, u32);
-s32 sub_0813930C(struct SceneProcSprites *p)
+s32 SceneProcSprites_Initialize(struct SceneProcSprites *p)
 {
     s32 i;
     for (i = 0; i < 4; i++) {

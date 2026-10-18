@@ -1,4 +1,3 @@
-#define ScenePanel_BeginDetail sub_0816A5A8
 #define ScenePanel_SetCallback Hud_SetUpdateCallback
 #include "global.h"
 struct PanelSprite {
@@ -37,12 +36,12 @@ void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void sub_0816A0D0(void *);
-void sub_0816A1E0(void *);
+void StatusPanel_UpdateGaugePosition(void *);
 void sub_08169F44(void *);
 s32 MessageWindow_ShowMessage(s32);
-void sub_0816A8E0(void);
+void ScenePanel_UpdateDetail(void);
 void Hud_SetUpdateCallback(void *, void (*)(void));
-void sub_0816A5A8(struct ScenePanel *p)
+void ScenePanel_BeginDetail(struct ScenePanel *p)
 {
     u32 *a, *b;
     s32 i;
@@ -54,7 +53,7 @@ void sub_0816A5A8(struct ScenePanel *p)
     Anim_SetKeyframes(&p->mainSprite, p->keyframes, 5, 1, 0);
     p->timer = 0;
     sub_0816A0D0(p);
-    sub_0816A1E0(p);
+    StatusPanel_UpdateGaugePosition(p);
     p->base.flags &= ~1;
     p->detailSprite.flags &= ~1;
     p->detailSprite.x = 16;
@@ -78,5 +77,5 @@ void sub_0816A5A8(struct ScenePanel *p)
     Anim_LoadKeyframe(&p->detailSprite, p->keyframes, 0x12, 1);
     AnimData_SelectPaletteBank((u8 *)p + 0xC54, 0x1B4);
     MessageWindow_ShowMessage(4);
-    Hud_SetUpdateCallback(p, sub_0816A8E0);
+    Hud_SetUpdateCallback(p, ScenePanel_UpdateDetail);
 }

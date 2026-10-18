@@ -1,13 +1,12 @@
 #include "global.h"
 #include "scene_hud_display.h"
 #include "player.h"
-#define SceneHud_RefillActionStatB sub_0816F4C0
 #define SceneHud_DrawStatRatio Hud_DrawDefaultEnergyMeter
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void Hud_DrawDefaultEnergyMeter(void *, s32, s32, s32, s32, s32);
 s32 Div(s32, s32);
 void sub_0816F5B0(void);
-void sub_0816F4C0(struct SceneHudState *s)
+void SceneHud_RefillActionStatB(struct SceneHudState *s)
 {
     s32 complete;
     s32 step;

@@ -1,4 +1,3 @@
-#define Player_CanUseSceneFeature sub_0814131C
 #define gGameState gUnk_02000710
 #include "global.h"
 #include "player.h"
@@ -14,7 +13,7 @@ static inline u32 Player_TestBonusFlag(u32 *flags, u32 mask)
 {
     return *flags & mask;
 }
-s32 sub_0814131C(struct Player *p)
+s32 Player_CanUseSceneFeature(struct Player *p)
 {
     if (!Player_TestSceneFeature(0x1000))
         return 0;

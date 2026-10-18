@@ -1,9 +1,8 @@
 #include "global.h"
 #include "scene_hud_display.h"
-#define SceneHud_SetTimedState sub_081781B4
 #define gSceneHudState         gUnk_02000214
 extern struct SceneHudState *gUnk_02000214;
-void sub_081781B4(u32 unused, s32 start, u32 value, u32 kind, u32 phaseEnabled, u32 parameter)
+void SceneHud_SetTimedState(u32 unused, s32 start, u32 value, u32 kind, u32 phaseEnabled, u32 parameter)
 {
     struct SceneHudState *p = gUnk_02000214;
     if (p && !p->controlMode) {

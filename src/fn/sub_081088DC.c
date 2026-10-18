@@ -1,6 +1,5 @@
 #include "global.h"
 #include "directional_interaction.h"
-#define AnimatedTile_TickFadeOut sub_081088DC
 struct AnimatedTile {
     u8 unknown0[0x58];
     s32 name;
@@ -14,8 +13,8 @@ struct AnimatedTileManager {
     u8 unknown0[0x154];
     u32 used;
 };
-u8 sub_082212DC(void *, u32, s32, s32);
-void sub_081088DC(struct AnimatedTileManager *manager, struct AnimatedTile *tile)
+u8 Sprite_BlinkUntilExpired(void *, u32, s32, s32);
+void AnimatedTile_TickFadeOut(struct AnimatedTileManager *manager, struct AnimatedTile *tile)
 {
     s32 value;
     struct DirectionalScriptArgs args;
@@ -27,7 +26,7 @@ void sub_081088DC(struct AnimatedTileManager *manager, struct AnimatedTile *tile
         tile->frame = 0;
         tile->entered = 0;
     }
-    if (sub_082212DC(tile, tile->frame, 45, 90)) {
+    if (Sprite_BlinkUntilExpired(tile, tile->frame, 45, 90)) {
         s32 slot = tile->slot;
         u32 *used = &manager->used;
         *used &= ~(1 << slot);

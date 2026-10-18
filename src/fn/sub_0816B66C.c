@@ -1,4 +1,3 @@
-#define SceneSequence_SelectEntryMessage sub_0816B66C
 #define gSceneGameState gUnk_02000710
 #include "global.h"
 #include "game_state.h"
@@ -10,7 +9,7 @@ struct SceneSequence {
     u8 selection;
 };
 s32 MessageWindow_ShowMessage(s32);
-void sub_0816B66C(struct SceneSequence *s)
+void SceneSequence_SelectEntryMessage(struct SceneSequence *s)
 {
     if ((s16)gUnk_02000710->savedX > 5)
         MessageWindow_ShowMessage((s16)gUnk_02000710->savedX + 56);

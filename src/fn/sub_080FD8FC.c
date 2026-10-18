@@ -1,8 +1,7 @@
-#define SceneActorControl_UpdateControl2APhase sub_080FD8FC
 #include "global.h"
 #include "scene_actor_control_phase.h"
 void SceneActor_AdvanceOffsetApproach(void);
-void sub_080F82E8(void);
+void ActorPhase_UpdateSpriteCollapse(void);
 struct SceneActorControl2AContext {
     u8 unknown0[0xEBE];
     u16 fieldEBE;
@@ -20,7 +19,7 @@ static inline void Restart(struct SceneActorRegistryResetView *actor)
     zero8 = 0;
     zero = 0;
     {
-        void *callback = (void *)sub_080F82E8;
+        void *callback = (void *)ActorPhase_UpdateSpriteCollapse;
         u32 kind = 0x23;
         u8 one;
         u8 *taken = &actor->field2B2;
@@ -46,7 +45,7 @@ static inline void Restart(struct SceneActorRegistryResetView *actor)
         }
     }
 }
-void sub_080FD8FC(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateControl2APhase(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorControl2AContext *context = actor->context;
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {

@@ -1,5 +1,4 @@
 #include "global.h"
-#define PaletteFade_AdvanceColors sub_08111410
 #define gPaletteBuffer gUnk_03004FC0
 struct PaletteFade {
     u8 unknown0[0x24];
@@ -10,7 +9,7 @@ struct PaletteFade {
     s32 slot;
 };
 extern u16 gUnk_03004FC0[16][16];
-void sub_08111410(struct PaletteFade *p)
+void PaletteFade_AdvanceColors(struct PaletteFade *p)
 {
     s32 i;
     for (i = 0; i < 16; i++) {

@@ -50,7 +50,7 @@ void Sound_PlaySongChecked(int);
 typedef struct {
     u32 a, b;
 } Point;
-u8 sub_082212DC(int *, int, int, int);
+u8 Sprite_BlinkUntilExpired(int *, int, int, int);
 void GridAttack_UpdateTimedHideState(ActorAnimation *p, int tick)
 {
     ActorAnimation *base = p;
@@ -62,7 +62,7 @@ void GridAttack_UpdateTimedHideState(ActorAnimation *p, int tick)
         *(Point *)((u8 *)p + 0xd0) = *(Point *)(position + 12);
     }
     done = 0;
-    if (sub_082212DC(&done, tick, 10, 30)) {
+    if (Sprite_BlinkUntilExpired(&done, tick, 10, 30)) {
         u32 mask = 16;
         p->flags |= mask;
     } else if (done) {

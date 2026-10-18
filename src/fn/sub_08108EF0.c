@@ -1,7 +1,5 @@
 #include "global.h"
-#define SlotMonitor_Initialize sub_08108EF0
 #define gSlotMonitor gUnk_020004B0
-#define SlotMonitor_PollResult sub_08108C20
 struct SlotMonitor {
  u8 unk0[0x18]; s32 timeout; u32 param, f20; s32 result; u32 f28,f2c,f30,f34,f38;
  u32 f3c,f40; s32 f44,f48; u8 unk4c[0x10]; u16 idleTimer,activeTimer,flags,slots[4],unk6a,config;
@@ -13,8 +11,8 @@ void Solar_PauseMeasurement(void);
 void Serial_InitMultiplayer(void);
 void sub_08223180(void);
 void LinkConnection_SetRetryOptions(void *,u32);
-void sub_08108C20(void);
-s32 sub_08108EF0(struct SlotMonitor *obj, s32 timeout, u32 param, u32 setting, s32 config, u32 mode)
+void SlotMonitor_PollResult(void);
+s32 SlotMonitor_Initialize(struct SlotMonitor *obj, s32 timeout, u32 param, u32 setting, s32 config, u32 mode)
 {
  gUnk_020004B0 = obj;
  Solar_PauseMeasurement();
@@ -46,6 +44,6 @@ s32 sub_08108EF0(struct SlotMonitor *obj, s32 timeout, u32 param, u32 setting, s
  obj->f80 = 0;
  obj->f74 = 0;
  obj->f78 = 0;
- obj->callback = sub_08108C20;
+ obj->callback = SlotMonitor_PollResult;
  return 0;
 }

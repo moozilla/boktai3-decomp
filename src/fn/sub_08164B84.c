@@ -1,10 +1,9 @@
 #include "global.h"
-#define StatDisplay_DrawTwoDigitCounter sub_08164B84
 #define StatDisplay_GetTileAddress Hud_GetTilemapCell
 #define gDisplayFlags                   gUnk_030053F4
 extern u32 gDisplayFlags;
 u16 *StatDisplay_GetTileAddress(u32, s32, s32);
-void sub_08164B84(s32 value)
+void StatDisplay_DrawTwoDigitCounter(s32 value)
 {
     u16 *tiles, *ones;
     s32 tens, remaining;

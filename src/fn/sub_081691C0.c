@@ -1,4 +1,3 @@
-#define SelectionPanel_RefreshSecondaryEntries sub_081691C0
 #define SelectionPanel_LoadSecondaryEntry PauseMenu_LoadStatusIconFrame
 #define SelectionPanel_LoadSelectionMarker PauseMenu_LoadIndexedIconKeyframe
 #include "global.h"
@@ -19,7 +18,7 @@ struct SelectionPanel {
 };
 void PauseMenu_LoadStatusIconFrame(struct SelectionPanel *, void *, s32);
 void PauseMenu_LoadIndexedIconKeyframe(struct SelectionPanel *, void *, s32);
-void sub_081691C0(struct SelectionPanel *p)
+void SelectionPanel_RefreshSecondaryEntries(struct SelectionPanel *p)
 {
     s32 i, index;
     u8 *sprite;

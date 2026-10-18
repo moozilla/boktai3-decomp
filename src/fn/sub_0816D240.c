@@ -1,5 +1,3 @@
-#define SceneHud_IncreaseStatBonus sub_0816D240
-#define SceneHud_SelectUpgradeableStat sub_0816D1A4
 #define Player_RecalculateStats Player_RefreshStatsAndVitals
 #define gGameState gUnk_02000710
 #include "global.h"
@@ -7,7 +5,7 @@
 #include "game_state.h"
 #include "scene_hud_display.h"
 extern struct GameState *gUnk_02000710;
-s32 sub_0816D1A4(s32);
+s32 SceneHud_SelectUpgradeableStat(s32);
 void Player_RefreshStatsAndVitals(struct Player *);
 void Hud_DrawStatusMetersAndCounts(struct SceneHudState *, s32, s32);
 void sub_08166534(void *, s32, s32);
@@ -22,7 +20,7 @@ static inline s32 ClampIncrease(s32 index, s32 amount)
         amount = 100 - base - bonus;
     return amount;
 }
-void sub_0816D240(struct SceneHudState *s, s32 index, s32 amount)
+void SceneHud_IncreaseStatBonus(struct SceneHudState *s, s32 index, s32 amount)
 {
     struct Player *p = s->actionOwner;
     struct GameState *entry;
@@ -31,7 +29,7 @@ void sub_0816D240(struct SceneHudState *s, s32 index, s32 amount)
         if (index <= 2)
             s->selectedStat = index;
         else {
-            s->selectedStat = sub_0816D1A4(amount);
+            s->selectedStat = SceneHud_SelectUpgradeableStat(amount);
             if (s->selectedStat == 255)
                 s->selectedStat = 0;
         }

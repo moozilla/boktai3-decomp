@@ -1,11 +1,10 @@
-#define SceneActorPlacement_ShowActor sub_08136DFC
 #include "global.h"
 #include "scene_actor_placement.h"
 static inline void ClearWord(u32 *p, u32 mask) { *p &= mask; }
 static inline void ClearTile(struct SceneActorPlacementTileFlags *p, u32 mask) { p->flags &= mask; }
 static inline void ClearCollider(struct ContactCollider *p) { p->flags = 0xFFFB & p->flags; }
 void ActorShadow_Enable(void *);
-void sub_08136DFC(struct SceneActorPlacementView *s)
+void SceneActorPlacement_ShowActor(struct SceneActorPlacementView *s)
 {
     if (!SceneActorPlacement_IsUnavailable(s)) {
         u32 zero = 1;

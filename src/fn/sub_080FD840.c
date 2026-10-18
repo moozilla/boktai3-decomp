@@ -1,4 +1,3 @@
-#define SceneActorControl_EndExtendedPhase sub_080FD840
 #define SceneActorControl_SetFourChannelTargets Axe_SetAuxiliarySpriteRenderState
 #include "global.h"
 #include "scene_actor_control_phase.h"
@@ -11,7 +10,7 @@ struct SceneActorExtendedControlContext {
 };
 void Axe_SetAuxiliarySpriteRenderState(struct SceneActorRegistryResetView *, void *, u32);
 static inline u16 Mask16(u16 *p, u32 m) { return *p & m; }
-void sub_080FD840(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_EndExtendedPhase(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorExtendedControlContext *context = actor->context;
     if (SceneActorControl_TakeFlag(&actor->field2B1))

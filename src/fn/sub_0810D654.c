@@ -4,12 +4,12 @@ struct P {
     u8 f[0x42c];
     u16 v;
 };
-void sub_0810E1A0(u8 *);
+void SelectionPanel_GetSelection(u8 *);
 s32 GameState_GetChallengeBestRank(void);
 void sub_08219728(u8 *, u8 *, u32);
 void Registry3C9F_SetSelectedDisplayResource(struct P *p)
 {
-    sub_0810E1A0((u8 *)p);
+    SelectionPanel_GetSelection((u8 *)p);
     p->v = GameState_GetChallengeBestRank() + 0x22;
     sub_08219728((u8 *)p + 0x260, (u8 *)p + 0x400, p->v);
 }

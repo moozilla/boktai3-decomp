@@ -1,4 +1,3 @@
-#define SceneSequence_SlideAnimationLeft sub_0816B1AC
 #define SceneSequence_SetPhase Hud_SetUpdateCallback
 #include "global.h"
 struct SceneSequence {
@@ -11,12 +10,12 @@ struct SceneSequence {
 };
 s32 Anim_Step(void *, void *);
 void Hud_SetUpdateCallback(void *, void (*)(void));
-void sub_08176B00(void);
-void sub_0816B1AC(struct SceneSequence *s)
+void SceneHud_FadeOutPage(void);
+void SceneSequence_SlideAnimationLeft(struct SceneSequence *s)
 {
     Anim_Step(s->animation, s->animationData);
     if (s->animationX > -88)
         s->animationX -= 5;
     if (++s->phaseTimer > 149)
-        Hud_SetUpdateCallback(s, sub_08176B00);
+        Hud_SetUpdateCallback(s, SceneHud_FadeOutPage);
 }

@@ -1,4 +1,3 @@
-#define Hud_SetElementGroupFlags sub_08168534
 #include "global.h"
 
 /* HUD interpretation and descriptive names are tentative. */
@@ -20,7 +19,7 @@ static inline void SetFlag(struct HudElement *e, u32 mask)
 {
     e->flags |= mask;
 }
-void sub_08168534(struct Hud *hud)
+void Hud_SetElementGroupFlags(struct Hud *hud)
 {
     s32 i;
     u32 second, third;

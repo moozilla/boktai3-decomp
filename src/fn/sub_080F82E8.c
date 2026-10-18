@@ -48,11 +48,10 @@ static inline void clearFlags(u32 *p, u32 mask)
     *p &= ~mask;
 }
 
-#define ActorPhase_UpdateSpriteCollapse sub_080F82E8
 void Sound_PlaySong(u32);
 void ActorShadow_Disable(void *);
-void sub_080F83FC(void);
-void sub_080F82E8(struct PhaseActor *s)
+void ActorPhase_WaitBeforeRelocation(void);
+void ActorPhase_UpdateSpriteCollapse(struct PhaseActor *s)
 {
     u8 *data = s->data;
     if (consumeEntry(s)) {
@@ -80,7 +79,7 @@ void sub_080F82E8(struct PhaseActor *s)
         void (*next)(void);
         u32 id;
         s->sprite->flags = 1;
-        next = sub_080F83FC;
+        next = ActorPhase_WaitBeforeRelocation;
         id = 0x24;
         s->entered = 1;
         s->phaseState = 0;

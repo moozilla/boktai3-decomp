@@ -1,5 +1,3 @@
-#define ActorParticles_UpdateEmitter sub_0811C2EC
-#define ActorParticles_CreateAtOffset sub_08113534
 #define gRandomIndex gUnk_03005304
 #define gRandomValues gUnk_086141BC
 #include "global.h"
@@ -7,13 +5,13 @@
 extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 struct ActorParticleEmitter { u8 interval, countdown, count, enabled; };
-u32 sub_08113534(void *, struct SceneExtent *, struct SceneExtent *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
+u32 ActorParticles_CreateAtOffset(void *, struct SceneExtent *, struct SceneExtent *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
 static inline u32 NextRandom(void)
 {
     gUnk_03005304 = (gUnk_03005304 + 1) & 0x3ff;
     return gUnk_086141BC[gUnk_03005304];
 }
-void sub_0811C2EC(void *actor, struct ActorParticleEmitter *emitter)
+void ActorParticles_UpdateEmitter(void *actor, struct ActorParticleEmitter *emitter)
 {
     struct SceneExtent offset, velocity;
     s32 i;
@@ -30,6 +28,6 @@ void sub_0811C2EC(void *actor, struct ActorParticleEmitter *emitter)
         velocity.x = (NextRandom() & 1) + 1;
         velocity.y = -(NextRandom() & 1);
         velocity.z = 0;
-        sub_08113534(actor, &offset, &velocity, 0x4384, 0xf62b, 0, 0, 0, 0, 0xb8, 30, 0, !(i & 1) ? 512 : 1024, 1, 0);
+        ActorParticles_CreateAtOffset(actor, &offset, &velocity, 0x4384, 0xf62b, 0, 0, 0, 0, 0xb8, 30, 0, !(i & 1) ? 512 : 1024, 1, 0);
     }
 }

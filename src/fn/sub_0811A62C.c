@@ -1,5 +1,4 @@
 #include "global.h"
-#define MotionActor_Destroy sub_0811A62C
 #define gMotionActorSlots   gUnk_020004F0
 struct MotionActorAnimation {
     u8 unknown0[0x60];
@@ -24,7 +23,7 @@ void Anim_Remove(void *);
 void Sound_StopSong(u32);
 void SceneMessages_UnregisterReceiver(void *);
 void sub_0811B394(void *);
-s32 sub_0811A62C(struct MotionActor *actor)
+s32 MotionActor_Destroy(struct MotionActor *actor)
 {
     struct MotionActorState *state = &actor->state;
     struct MotionActorAnimation *anim = actor->state.animations;

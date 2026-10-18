@@ -1,7 +1,5 @@
 #include "global.h"
 #include "scene_vec.h"
-#define TileTrigger_TickIdle       sub_08107320
-#define TileTrigger_IsTetherNearby sub_08107298
 struct TileTrigger {
     u32 flags;
     u8 unknown4[0x70];
@@ -16,9 +14,9 @@ struct TileTrigger {
 };
 struct Player *SceneActorQuery_FindPlayerInBounds(const struct SceneVec *, const struct SceneVec *,
                                                   s32);
-u8 sub_08107298(struct TileTrigger *);
+u8 TileTrigger_IsTetherNearby(struct TileTrigger *);
 u32 sub_0806F06C(const struct SceneVec *, const struct SceneVec *, u32 *);
-void sub_08107320(struct TileTrigger *p)
+void TileTrigger_TickIdle(struct TileTrigger *p)
 {
     struct SceneVec radius;
     u32 found;
@@ -31,7 +29,7 @@ void sub_08107320(struct TileTrigger *p)
         if (SceneActorQuery_FindPlayerInBounds(&p->position, &radius, i))
             goto activate;
     }
-    if (sub_08107298(p))
+    if (TileTrigger_IsTetherNearby(p))
         goto activate;
     found = 0;
     if (sub_0806F06C(&p->position, &radius, &found)) {

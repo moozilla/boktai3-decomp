@@ -1,4 +1,3 @@
-#define ActorMovement_CanReachTarget sub_0817A23C
 #define gTerrainMap                  gUnk_030052F4
 #define gTerrainWidth                gUnk_030052F8
 #define gTerrainHeight               gUnk_030052FC
@@ -23,7 +22,7 @@ static inline s32 cellIndex(s32 x, s32 z)
         return 0;
     return gTerrainMap->rows[z] + x;
 }
-s32 sub_0817A23C(struct MovementReachActor *p)
+s32 ActorMovement_CanReachTarget(struct MovementReachActor *p)
 {
     s32 targetCell, actorCell;
     struct ContactPosition *position;

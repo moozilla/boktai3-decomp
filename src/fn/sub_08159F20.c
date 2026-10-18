@@ -1,13 +1,12 @@
-#define Player_ApplyForcedFacing sub_08159F20
 #include "global.h"
 #include "player.h"
 void Sound_PlaySong(u32);
-s32 sub_0815E710(struct Player *, s32, u32, u32, u32, u32);
+s32 PlayerContact_ApplySyntheticContact(struct Player *, s32, u32, u32, u32, u32);
 static inline void lockPositionRequests(u32 *flags, u32 mask)
 {
     *flags |= mask;
 }
-s32 sub_08159F20(struct Player *p, s32 frame, u32 direction, s32 resetValue, s32 request,
+s32 Player_ApplyForcedFacing(struct Player *p, s32 frame, u32 direction, s32 resetValue, s32 request,
                  u32 option)
 {
     if (p->tetherMode == 0x1A)
@@ -35,5 +34,5 @@ s32 sub_08159F20(struct Player *p, s32 frame, u32 direction, s32 resetValue, s32
 noRequest:
     return 0;
 startRequest:
-    return sub_0815E710(p, request, 0, 0, 0, option);
+    return PlayerContact_ApplySyntheticContact(p, request, 0, 0, 0, option);
 }

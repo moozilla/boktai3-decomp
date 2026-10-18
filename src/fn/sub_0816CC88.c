@@ -9,10 +9,10 @@ extern u32 gUnk_08611BA8[], gUnk_08611BC0[], gUnk_08611BD8[];
 void PauseMenu_HideAllSprites(u8 *);
 void Anim_LoadKeyframe(u8 *, u8 *, u32, u32);
 void PauseMenu_SetPromptIconPositions(u8 *, u32, u32);
-void sub_081660D0(u8 *, u32, s32);
+void SceneHud_SetPairedIcons(u8 *, u32, s32);
 void Hud_SetupBackgroundLayer(u8 *, u32, u32, u32, u32);
-void sub_0816C838(u8 *);
-void sub_081663A0(u8 *, u32, u32, u32, u32);
+void MapMenu_InitializeDisplay(u8 *);
+void MenuDisplay_SetPaletteOverrides(u8 *, u32, u32, u32, u32);
 void MapScreen_InitAreaView(u8 *s)
 {
     s16 *index;
@@ -30,8 +30,8 @@ void MapScreen_InitAreaView(u8 *s)
     *(u32 *)(obj + 8) &= ~1;
     Anim_LoadKeyframe(obj, s + 0x64, 0x51, 0);
     PauseMenu_SetPromptIconPositions(s, 0, 0x18);
-    sub_081660D0(s, 1, -1);
+    SceneHud_SetPairedIcons(s, 1, -1);
     Hud_SetupBackgroundLayer(s, *(u32 *)(s + 0x18), 0, 5, *(u32 *)(s + 0x30));
-    sub_0816C838(s);
-    sub_081663A0(s, 0, 0, 0, 0);
+    MapMenu_InitializeDisplay(s);
+    MenuDisplay_SetPaletteOverrides(s, 0, 0, 0, 0);
 }

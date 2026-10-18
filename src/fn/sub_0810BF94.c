@@ -1,10 +1,9 @@
-#define SlotMenu_InitializeEntryValues sub_0810BF94
 #include "global.h"
 struct SlotMenu {
     u8 unknown0[0x300];
     u16 entryValues[7];
 };
-void sub_0810BF94(struct SlotMenu *p)
+void SlotMenu_InitializeEntryValues(struct SlotMenu *p)
 {
     p->entryValues[0] = 0x2C;
     p->entryValues[1] = 0x2C;

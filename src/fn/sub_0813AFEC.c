@@ -1,5 +1,4 @@
 #include "global.h"
-#define ActorSequence_Begin sub_0813AFEC
 struct ActorSequence {
     u8 pad00[0x457];
     u8 sequence;
@@ -8,7 +7,7 @@ struct ActorSequence {
     u16 timer;
     u8 active;
 };
-void sub_0813AFEC(struct ActorSequence *actor, u32 sequence, u32 variant)
+void ActorSequence_Begin(struct ActorSequence *actor, u32 sequence, u32 variant)
 {
     actor->active = 1;
     actor->sequence = sequence;

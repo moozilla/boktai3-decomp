@@ -1,4 +1,3 @@
-#define SceneDialog_UpdateEntryFade sub_081768AC
 #define SceneDialog_SetCallback Hud_SetUpdateCallback
 #include "global.h"
 struct SceneDialogFade {
@@ -8,10 +7,10 @@ struct SceneDialogFade {
 void sub_0822B410(void);
 void Sound_PlaySong(u32);
 void Hud_InitSelectionBounds(u32, u32);
-void sub_081765D4(void *);
-void sub_08176928(void);
+void PauseMenu_SaveDisplayState(void *);
+void Hud_UpdateBlendRamp(void);
 void Hud_SetUpdateCallback(void *, void (*)(void));
-void sub_081768AC(struct SceneDialogFade *p)
+void SceneDialog_UpdateEntryFade(struct SceneDialogFade *p)
 {
     if (p->timer == 1)
         sub_0822B410();
@@ -22,7 +21,7 @@ void sub_081768AC(struct SceneDialogFade *p)
     else
         Hud_InitSelectionBounds(0, 0x1084);
     if (++p->timer > 18) {
-        sub_081765D4(p);
-        Hud_SetUpdateCallback(p, sub_08176928);
+        PauseMenu_SaveDisplayState(p);
+        Hud_SetUpdateCallback(p, Hud_UpdateBlendRamp);
     }
 }

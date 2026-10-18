@@ -1,4 +1,3 @@
-#define SceneActorControl_UpdateSavedControlPhase sub_0813067C
 #include "global.h"
 #include "scene_actor_reset.h"
 static inline u8 TakeFlag(u8 *flag)
@@ -9,7 +8,7 @@ static inline u8 TakeFlag(u8 *flag)
     }
     return 0;
 }
-void sub_0813067C(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateSavedControlPhase(struct SceneActorRegistryResetView *actor)
 {
     if (TakeFlag(&actor->field2B1)) {
         void *callback = actor->savedTarget;

@@ -1,7 +1,5 @@
-#define MenuTransition_UpdateSelectionMessage sub_0816EA98
 #define gMenuTransitionKeys                   gUnk_03005260
 #define MenuTransition_SetCallback Hud_SetInteractionCallback
-#define MenuTransition_UpdateSelectionFade    sub_0816EB30
 #include "global.h"
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void MessageWindow_Clear(void);
@@ -16,8 +14,8 @@ struct MenuMessageView {
     u8 unknown40[0xa4e - 0x40];
     u16 timer;
 };
-void sub_0816EB30(void);
-void sub_0816EA98(u8 *p)
+void MenuTransition_UpdateSelectionFade(void);
+void MenuTransition_UpdateSelectionMessage(u8 *p)
 {
     u16 *timer = &((struct MenuMessageView *)p)->timer;
     if (*timer == 0) {
@@ -34,6 +32,6 @@ void sub_0816EA98(u8 *p)
         u32 *flags = (u32 *)(base + off);
         *flags |= 1;
         MessageWindow_Clear();
-        Hud_SetInteractionCallback(p, sub_0816EB30, 1);
+        Hud_SetInteractionCallback(p, MenuTransition_UpdateSelectionFade, 1);
     }
 }

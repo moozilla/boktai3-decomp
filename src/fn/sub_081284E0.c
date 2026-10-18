@@ -1,4 +1,3 @@
-#define SpriteGroup_Release sub_081284E0
 #define SpriteGroup_CallCompletion FragmentBurst_RunCompletionScript
 #include "global.h"
 struct GroupPartSprite {
@@ -19,7 +18,7 @@ struct SpriteGroup {
 struct SpriteGroupPool { u8 unknown00[0x38]; u32 used; };
 void Sprite_Remove(void *);
 void FragmentBurst_RunCompletionScript(struct SpriteGroup *);
-void sub_081284E0(struct SpriteGroupPool *pool, struct SpriteGroup *group)
+void SpriteGroup_Release(struct SpriteGroupPool *pool, struct SpriteGroup *group)
 {
     s32 i;
     if (group->pendingRelease) {

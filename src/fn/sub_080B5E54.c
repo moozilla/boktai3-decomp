@@ -1,4 +1,3 @@
-#define SceneActorControl_CanTurnTowardTarget sub_080B5E54
 #include "global.h"
 #include "scene_actor_timed_behavior.h"
 static inline u8 HasTargetFlag(struct SceneActorReactionMotion *s)
@@ -8,7 +7,7 @@ static inline u8 HasTargetFlag(struct SceneActorReactionMotion *s)
         return 1;
     return 0;
 }
-u32 sub_080B5E54(struct SceneActorRegistryResetView *s)
+u32 SceneActorControl_CanTurnTowardTarget(struct SceneActorRegistryResetView *s)
 {
     struct SceneActorTimedBehaviorContext *context = s->context;
     s32 x, y, z, angle;

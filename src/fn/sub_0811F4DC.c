@@ -1,6 +1,4 @@
-#define ModifierAction_ActivateCost sub_0811F4DC
 #define ModifierAction_CanActivate Modifier_IsFourthSourceReady
-#define ModifierAction_ConsumeCost sub_0811F490
 #include "global.h"
 struct ModifierActionOwner {
     u8 unknown0[0x18];
@@ -19,10 +17,10 @@ struct ModifierAction {
     struct ModifierActionOwner *owner;
 };
 u8 Modifier_IsFourthSourceReady(struct ModifierAction *);
-s32 sub_0811EAF8(void *, s32, s32);
-void sub_0811F490(void *, struct ModifierAction *, s32);
+s32 CallbackList_RunMatchingState(void *, s32, s32);
+void CallbackList_SubtractStateTenValue(void *, struct ModifierAction *, s32);
 void Sound_PlaySong(u32);
-s32 sub_0811F4DC(struct ModifierAction *action)
+s32 ModifierAction_ActivateCost(struct ModifierAction *action)
 {
     struct ModifierActionOwner *owner;
     void *stats;
@@ -32,9 +30,9 @@ s32 sub_0811F4DC(struct ModifierAction *action)
         owner = action->owner;
         stats = owner->stats;
         if (!action->remaining) {
-            cost = sub_0811EAF8(stats, action->cost, 10);
+            cost = CallbackList_RunMatchingState(stats, action->cost, 10);
             if (owner->available >= cost) {
-                sub_0811F490(stats, action, cost);
+                CallbackList_SubtractStateTenValue(stats, action, cost);
                 action->remaining = action->duration;
                 action->cooldown = action->interval;
                 Sound_PlaySong(0x21e);

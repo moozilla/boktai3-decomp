@@ -1,7 +1,6 @@
-#define SceneInput_BuildActionGrid sub_08170B48
 #include "global.h"
 #include "scene_input_navigation.h"
-void sub_08170B48(struct SceneInputGridView *grid, u32 flags)
+void SceneInput_BuildActionGrid(struct SceneInputGridView *grid, u32 flags)
 {
     s32 row, col;
     u8 *cells;

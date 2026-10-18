@@ -1,11 +1,10 @@
-#define PursuingActor_TurnTowardPlayer sub_0812B7F8
 #define gPlayerSlots                   gUnk_02000580
 #include "global.h"
 #include "player.h"
 #include "pursuing_actor.h"
 s32 Math_Atan2(s32, s32);
 s32 Mod(s32, s32);
-void sub_0812B7F8(struct PursuingActor *actor)
+void PursuingActor_TurnTowardPlayer(struct PursuingActor *actor)
 {
     struct SceneVec delta;
     struct SceneVec *out;

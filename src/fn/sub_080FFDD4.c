@@ -1,6 +1,4 @@
-#define WoodenCrate_CheckTrigger  sub_080FFDD4
 #define WoodenCrate_TestFlag WoodenCrate_HasFlags
-#define WoodenCrate_StartSequence sub_080FFAF8
 #include "global.h"
 struct WoodenCrate {
     u8 pad0[0x66];
@@ -13,8 +11,8 @@ struct WoodenCrate {
     u16 threshold;
 };
 u8 WoodenCrate_HasFlags(struct WoodenCrate *, s32);
-void sub_080FFAF8(struct WoodenCrate *);
-void sub_080FFDD4(struct WoodenCrate *p)
+void WoodenCrate_BeginToggleAnimation(struct WoodenCrate *);
+void WoodenCrate_CheckTrigger(struct WoodenCrate *p)
 {
     if (WoodenCrate_HasFlags(p, 4)) {
         if (p->triggerFlags & 1) {
@@ -28,7 +26,7 @@ void sub_080FFDD4(struct WoodenCrate *p)
             p->flags |= 4;
             if (!WoodenCrate_HasFlags(p, 8) && p->value <= p->threshold) {
                 p->timer = 24;
-                sub_080FFAF8(p);
+                WoodenCrate_BeginToggleAnimation(p);
             }
         }
     }

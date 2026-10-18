@@ -1,8 +1,6 @@
-#define Presentation_ApplyGraphicData sub_08174480
-#define Presentation_ApplyGraphicDataToTarget sub_08174440
 #include "global.h"
-void sub_08174440(u32, s32, void *, void *);
-void sub_08174480(void *data, void *target)
+void TextLabel_DisplaySuffix(u32, s32, void *, void *);
+void Presentation_ApplyGraphicData(void *data, void *target)
 {
-    sub_08174440(0, -1, data, target);
+    TextLabel_DisplaySuffix(0, -1, data, target);
 }

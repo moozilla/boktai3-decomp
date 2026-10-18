@@ -1,6 +1,4 @@
 #define SceneActor_GetEffectElapsedTicks Player_GetEffectTickDelta
-#define SceneActor_SelectEffectDisplayMode sub_0813D754
-#define SceneActor_StartRandomizedEffect sub_0813D3B0
 #define gSceneActorEffectThresholds gUnk_08610918
 #include "global.h"
 struct SceneActorEffectDisplay {
@@ -15,15 +13,15 @@ struct SceneActorEffectDisplay {
     s16 flashTimer;
 };
 extern const u8 gUnk_08610918[];
-void sub_0813D3B0(void *);
+void SceneActor_StartRandomizedEffect(void *);
 s32 Player_GetEffectTickDelta(void *);
-s32 sub_0813D754(struct SceneActorEffectDisplay *p, s32 mode)
+s32 SceneActor_SelectEffectDisplayMode(struct SceneActorEffectDisplay *p, s32 mode)
 {
     s32 original = mode;
     if (p->effectActive) {
         if (p->flags & 1) {
             if (Player_GetEffectTickDelta(p) >= gUnk_08610918[p->effectMode - 1]) {
-                sub_0813D3B0(p);
+                SceneActor_StartRandomizedEffect(p);
                 p->savedTick = p->tick;
             }
         }

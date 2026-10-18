@@ -1,4 +1,3 @@
-#define InventoryGrid_UpdateNumberPhase sub_0816DE28
 #define InventoryGrid_SetPhaseCallback Hud_SetInteractionCallback
 #include "global.h"
 
@@ -17,9 +16,9 @@ struct InventoryGrid {
     struct InventoryNumberDigit attachments[4];
 };
 s32 sub_08165D10(void *);
-void sub_0816DC78(void);
+void SceneHud_BeginRandomActionReturn(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
-void sub_0816DE28(struct InventoryGrid *s)
+void InventoryGrid_UpdateNumberPhase(struct InventoryGrid *s)
 {
     if (s->phaseCounter <= 31) {
         if (++s->phaseCounter == 32) {
@@ -39,6 +38,6 @@ void sub_0816DE28(struct InventoryGrid *s)
             } while (--i >= 0);
         }
     } else if (sub_08165D10(s)) {
-        Hud_SetInteractionCallback(s, sub_0816DC78, 1);
+        Hud_SetInteractionCallback(s, SceneHud_BeginRandomActionReturn, 1);
     }
 }

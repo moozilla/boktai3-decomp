@@ -1,4 +1,3 @@
-#define ActorGroup_GetSelectedMemberId sub_08103B14
 #define gActorGroup                    gUnk_020001AC
 /* Provisional ActorGroup names: static behavior established; semantic ownership tentative. */
 #include "global.h"
@@ -22,7 +21,7 @@ static inline u8 HasBit(u32 value, u32 mask)
         return 1;
     return 0;
 }
-s32 sub_08103B14(void)
+s32 ActorGroup_GetSelectedMemberId(void)
 {
     struct ActorGroup *group;
     struct ActorGroupMember *member;

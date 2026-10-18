@@ -1,4 +1,3 @@
-#define PlayerPanel_GetStatusValue sub_08165C4C
 #define gGameState                 gUnk_02000710
 #include "global.h"
 #include "player.h"
@@ -7,7 +6,7 @@ struct PlayerPanel {
     u8 unknown[0xa40];
     struct Player *player;
 };
-u32 sub_08165C4C(struct PlayerPanel *panel)
+u32 PlayerPanel_GetStatusValue(struct PlayerPanel *panel)
 {
     s32 index;
     s32 ticks;

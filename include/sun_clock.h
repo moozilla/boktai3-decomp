@@ -25,7 +25,7 @@ extern u8 *gUnk_030053F8;
 u32 SunClock_GetBaseHour(void);
 u32 SunClock_GetBaseMinute(void);
 s32 Div(s32, s32);
-u8 sub_08228DB8(void);
+u8 SunClock_GetPhase(void);
 extern u32 gUnk_0300546C;
 void Clock_SyncFromRtc(void);
 static inline void SunClock_Update(void)
@@ -66,7 +66,7 @@ static inline void SunClock_Update(void)
             left = 60 - am;
         t = left << 6;
     }
-    c->phase = sub_08228DB8();
+    c->phase = SunClock_GetPhase();
     switch (c->phase) {
         case 0:
             c->level = Div(t, 60) >> 1;

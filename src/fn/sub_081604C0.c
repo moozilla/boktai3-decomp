@@ -9,7 +9,7 @@ struct P {
     u32 w68;
 };
 
-void sub_0816044C(struct P *);
+void FrameDisplay_UpdateSprite(struct P *);
 
 s32 ActorDebris_Update(struct P *p)
 {
@@ -18,6 +18,6 @@ s32 ActorDebris_Update(struct P *p)
         p->w34 |= m;
         return 0;
     }
-    sub_0816044C(p);
+    FrameDisplay_UpdateSprite(p);
     p->w68++;
 }

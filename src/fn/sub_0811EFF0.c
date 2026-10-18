@@ -1,4 +1,3 @@
-#define ActorEmitter_UpdateAnimation sub_0811EFF0
 #define ActorEmitter_CanEmit Modifier_IsFirstSourceReady
 #include "global.h"
 struct EmitterVector { s32 x, y, z; u32 :32; };
@@ -33,17 +32,17 @@ struct ActorEmitter {
     struct EmitterOwner *owner;
 };
 u8 Modifier_IsFirstSourceReady(struct ActorEmitter *);
-s32 sub_0811EAF8(void *, u32, s32);
+s32 CallbackList_RunMatchingState(void *, u32, s32);
 s32 sub_08114928(struct EmitterVector *, s32, struct EmitterVector *, void *, s32, s32, s32, s32);
-void sub_0811EE68(void *, struct ActorEmitter *, s32);
+void CallbackList_SubtractClampedValue(void *, struct ActorEmitter *, s32);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 s32 Anim_Step(void *, void *);
-u8 sub_08116C74(void *);
+u8 LinkParticipant_IsLocallySelected(void *);
 void Sound_PlaySong(u32);
 void Character_GetHeightAdjustedPosition(void *, s16 *);
-void sub_0811B164(void *, s32, s32, s32);
-void sub_0811B2FC(void *);
-s32 sub_0811EFF0(struct ActorEmitter *emitter)
+void SpatialIndex_SetPosition(void *, s32, s32, s32);
+void SpatialIndex_InsertEntry(void *);
+s32 ActorEmitter_UpdateAnimation(struct ActorEmitter *emitter)
 {
     struct EmitterOwner *owner;
     struct EmitterActor *actor;
@@ -53,22 +52,22 @@ s32 sub_0811EFF0(struct ActorEmitter *emitter)
     if (!Modifier_IsFirstSourceReady(emitter)) goto fail;
     owner = emitter->owner;
     actor = (struct EmitterActor *)((u8 *)owner + 0x18);
-    cost = sub_0811EAF8(actor, emitter->id, 9);
+    cost = CallbackList_RunMatchingState(actor, emitter->id, 9);
     if (owner->energy >= cost) goto active;
 fail:
     return 0;
 active:
     if (emitter->entered) {
         Anim_SetKeyframes((u8 *)owner + 0x670, (u8 *)owner + 0x7F0, emitter->animation, 1, 0);
-        if (sub_08116C74(owner)) Sound_PlaySong(0x93);
+        if (LinkParticipant_IsLocallySelected(owner)) Sound_PlaySong(0x93);
         emitter->entered = 0;
     }
-    sub_0811EE68(actor, emitter, cost);
+    CallbackList_SubtractClampedValue(actor, emitter, cost);
     Anim_Step((u8 *)owner + 0x670, (u8 *)owner + 0x7F0);
     pos = position;
     Character_GetHeightAdjustedPosition(actor, pos);
     emitter = (struct ActorEmitter *)emitter->collision;
-    sub_0811B164(emitter, position[0], pos[1], pos[2]);
-    sub_0811B2FC(emitter);
+    SpatialIndex_SetPosition(emitter, position[0], pos[1], pos[2]);
+    SpatialIndex_InsertEntry(emitter);
     return 1;
 }

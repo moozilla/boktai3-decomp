@@ -1,4 +1,3 @@
-#define MessagePanel_ResetDisplay sub_08109948
 #define MessagePanel_SetCallbacks LinkConnection_SetCallbacks
 #include "global.h"
 #include "engine.h"
@@ -15,16 +14,16 @@ struct MessagePanel {
     u32 unk3C;
 };
 void sub_08108FB4(s32,s32,s32,s32,u32);
-void sub_0810963C(void);
-void sub_081095B4(void);
+void ResultMessage_RunOutcomeScript(void);
+void ResultMessage_ShowOutcome(void);
 void LinkConnection_SetCallbacks(void *, void (*)(void), void (*)(void));
-void sub_08109948(struct MessagePanel *p)
+void MessagePanel_ResetDisplay(struct MessagePanel *p)
 {
     if (p->entering == 1) {
         BgGfx_LoadTilemapSimple(3,0,0,0,0);
         p->entering = 0;
         sub_08108FB4(-1,1,0,0x36,p->unk3C);
-        LinkConnection_SetCallbacks(p,sub_0810963C,sub_081095B4);
+        LinkConnection_SetCallbacks(p,ResultMessage_RunOutcomeScript,ResultMessage_ShowOutcome);
         p->timer = 0;
     }
     if (p->timer < 30) p->timer++;

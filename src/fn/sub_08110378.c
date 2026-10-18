@@ -1,4 +1,3 @@
-#define LinkMenu_UpdateExitDelay sub_08110378
 #define LinkSession_RequestExit Registry1745_RequestHandshakeFinish
 #include "global.h"
 #include "engine.h"
@@ -14,7 +13,7 @@ struct LinkMenuExit {
 };
 void Registry1745_RequestHandshakeFinish(void);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
-void sub_08110378(struct LinkMenuExit *menu)
+void LinkMenu_UpdateExitDelay(struct LinkMenuExit *menu)
 {
     if (menu->entering) {
         TextWindow_SetScript(menu->textWindow, menu->script);

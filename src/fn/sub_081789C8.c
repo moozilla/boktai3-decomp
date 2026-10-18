@@ -1,12 +1,10 @@
 #include "global.h"
 #include "scene_hud_display.h"
-#define SceneHud_InitGameplayResources sub_081789C8
-#define SceneHud_InitActionIcons       sub_08178920
 void Hud_SetupBackgroundLayer(void *, u32, int, int, u32);
-void sub_08167E64(struct SceneHudState *);
-void sub_08167F1C(struct SceneHudState *);
+void Hud_InitializePanelTransition(struct SceneHudState *);
+void Hud_InitializeThreeIcons(struct SceneHudState *);
 void SceneHud_InitActionIcons(struct SceneHudState *);
-void sub_081789C8(struct SceneHudState *hud)
+void SceneHud_InitGameplayResources(struct SceneHudState *hud)
 {
     struct SceneInputResource *resource;
     hud->controlMode = 0;
@@ -24,7 +22,7 @@ void sub_081789C8(struct SceneHudState *hud)
         return;
     *(struct SceneInputResource *)hud->widgetResource = *resource;
     ResourceHeader_Relocate(hud->widgetResource, resource);
-    sub_08167E64(hud);
-    sub_08167F1C(hud);
+    Hud_InitializePanelTransition(hud);
+    Hud_InitializeThreeIcons(hud);
     SceneHud_InitActionIcons(hud);
 }

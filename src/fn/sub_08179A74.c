@@ -1,5 +1,3 @@
-#define MeterDisplay_UpdateOwnerMeters sub_08179A74
-#define MeterDisplay_GetOwnerOffset sub_081798FC
 #define gMeterOwnerSource gUnk_020004B4
 #include "global.h"
 struct MeterDisplayWidget {
@@ -23,20 +21,20 @@ struct MeterDisplay {
 struct MeterOwnerSource { u8 unknown0[0x18]; s16 index; };
 extern struct MeterOwnerSource *gMeterOwnerSource;
 extern u32 gUnk_030053F4, gUnk_030053F0;
-s32 MeterDisplay_GetOwnerOffset(struct MeterDisplay *, s32);
+s32 ViewportGauge_ComputeFill(struct MeterDisplay *, s32);
 static inline s32 OwnerIndex(void)
 {
     if (!gMeterOwnerSource) return -1;
     return gMeterOwnerSource->index;
 }
-void sub_08179A74(struct MeterDisplay *s)
+void MeterDisplay_UpdateOwnerMeters(struct MeterDisplay *s)
 {
     u32 mask = 0x800;
     if ((gUnk_030053F4 | gUnk_030053F0) & mask) {
-        s->widgets[0].x = MeterDisplay_GetOwnerOffset(s, OwnerIndex());
-        s->widgets[1].x = MeterDisplay_GetOwnerOffset(s, OwnerIndex() ^ 1);
+        s->widgets[0].x = ViewportGauge_ComputeFill(s, OwnerIndex());
+        s->widgets[1].x = ViewportGauge_ComputeFill(s, OwnerIndex() ^ 1);
     } else {
-        s->widgets[0].x = MeterDisplay_GetOwnerOffset(s, 0);
+        s->widgets[0].x = ViewportGauge_ComputeFill(s, 0);
         s->widgets[1].flags |= 1;
     }
 }

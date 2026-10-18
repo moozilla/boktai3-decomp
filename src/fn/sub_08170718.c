@@ -1,10 +1,9 @@
-#define SceneHud_LayoutActionGrid sub_08170718
 #define SceneHud_SetWidgetPalette PauseMenu_SetSpritePalette
 #include "global.h"
 #include "scene_hud_display.h"
 void SceneHud_SetWidgetPalette(struct SceneInputWidget *, u16);
-void sub_0816D98C(void *);
-void sub_08170718(struct SceneHudState *s)
+void SceneHud_RefreshActionIcons(void *);
+void SceneHud_LayoutActionGrid(struct SceneHudState *s)
 {
     struct SceneVec pos;
     s32 i;
@@ -29,7 +28,7 @@ void sub_08170718(struct SceneHudState *s)
         s->categoryWidgets[i + 10].position.x += (i & 3) * 24;
         s->categoryWidgets[i + 10].position.y += (i >> 2) * 24;
     }
-    sub_0816D98C(s);
+    SceneHud_RefreshActionIcons(s);
     ((struct SceneInputWidget *)((u8 *)s + 0x2560))->flags &= ~1;
     ((struct SceneInputWidget *)((u8 *)s + 0x25c0))->flags &= ~1;
     if (s->actionCategory == 0) {

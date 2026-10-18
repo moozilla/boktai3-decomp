@@ -1,4 +1,3 @@
-#define EffectPool_ReleaseSlot sub_081267D4
 #define gEffectPool gUnk_02000158
 #include "global.h"
 
@@ -16,7 +15,7 @@ struct EffectPool {
 extern struct EffectPool *gUnk_02000158;
 void Effect_Remove(void *);
 
-void sub_081267D4(void *unused, struct PoolEffect *effect)
+void EffectPool_ReleaseSlot(void *unused, struct PoolEffect *effect)
 {
     struct EffectPool *pool;
     s32 slot;

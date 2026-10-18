@@ -1,4 +1,3 @@
-#define CallbackPool_UpdateShake sub_08104F08
 #define gShakeRandomTable gUnk_0203B400
 #define gShakeRandomIndex gUnk_03005308
 #include "global.h"
@@ -12,7 +11,7 @@ static inline u16 CallbackPool_NextRandom(void)
     gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
     return table[gUnk_03005308];
 }
-void sub_08104F08(struct CallbackPoolEntry *entry)
+void CallbackPool_UpdateShake(struct CallbackPoolEntry *entry)
 {
     if (entry->shakeTimer == 0) {
         entry->position = entry->savedPosition;

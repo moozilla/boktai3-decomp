@@ -12,7 +12,7 @@ struct ActorParticipantProgress {
 extern u8 *gUnk_02000580;
 s32 Mod(s32, s32);
 void SceneActorAnimation_SelectProfileEntry(void *, s32);
-void sub_0815E710(void *, u32, u32, u32, u32, u32);
+void PlayerContact_ApplySyntheticContact(void *, u32, u32, u32, u32, u32);
 void sub_0813D548(void *, u32);
 static inline s32 WrapCounter(s32 n)
 {
@@ -43,7 +43,7 @@ void ActorBehavior_TickParticipantProgress(struct SceneActorRegistryResetView *a
             u32 first = a->fieldB4;
             u32 second = a->fieldBC;
             u32 last = a->fieldCC;
-            sub_0815E710(gUnk_02000580, first, second, 0, value, last);
+            PlayerContact_ApplySyntheticContact(gUnk_02000580, first, second, 0, value, last);
         } else {
             {
                 u32 increment = a->fieldB4;

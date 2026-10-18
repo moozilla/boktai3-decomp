@@ -1,4 +1,3 @@
-#define CollisionReaction_RecordImpact sub_08179B9C
 #include "global.h"
 #include "contact_actor.h"
 struct CollisionReactionActor {
@@ -16,7 +15,7 @@ struct CollisionReactionActor {
 s32 Math_Atan2(s32, s32);
 static inline u32 TestColliderFlags(struct ContactCollider *source, u32 mask)
 { return source->flags & mask; }
-void sub_08179B9C(struct ContactCollider *source, struct ContactCollider *target,
+void CollisionReaction_RecordImpact(struct ContactCollider *source, struct ContactCollider *target,
                   struct CollisionReactionActor *actor)
 {
     s32 delta = actor->direction - actor->referenceDirection;

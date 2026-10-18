@@ -1,4 +1,3 @@
-#define ActionGroup_RunSelectedCallbacks sub_08121A78
 #define gActionGroupCallbacks gUnk_086106C8
 #include "global.h"
 struct ActionGroupEntry {
@@ -19,7 +18,7 @@ static inline u8 ActionGroup_IsSelected(struct ActionGroup *group, s32 index)
         return TRUE;
     return FALSE;
 }
-s32 sub_08121A78(struct ActionGroup *group)
+s32 ActionGroup_RunSelectedCallbacks(struct ActionGroup *group)
 {
     struct ActionGroupEntry *entries = group->entries;
     s32 i;

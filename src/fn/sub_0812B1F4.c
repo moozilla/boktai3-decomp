@@ -1,6 +1,5 @@
 #include "global.h"
 /* Tentative family name; visual identity is not yet established. */
-#define ActorEffect_UpdatePool     sub_0812B1F4
 #define gActorEffectStateCallbacks gUnk_086107C8
 struct ActorEffect {
     u8 unknown0[0x176];
@@ -32,7 +31,7 @@ static inline u8 occupied(u32 *mask, s32 index)
         return 1;
     return 0;
 }
-s32 sub_0812B1F4(struct ActorEffectManager *manager)
+s32 ActorEffect_UpdatePool(struct ActorEffectManager *manager)
 {
     s32 i;
     void **table;

@@ -1,11 +1,10 @@
-#define SceneActorRoute_UpdateWaitPhase sub_08130E60
 #define SceneActorRoute_GetStepDuration Route_GetCurrentPointNodeId
 #include "global.h"
 #include "scene_actor_control_phase.h"
 s32 SceneActorRoute_GetStepDuration(void *);
 u8 sub_0812F3CC(void *);
 void SceneActorRoute_AdvanceActorPoint(void *, void *);
-void sub_08130E60(struct SceneActorRegistryResetView *actor)
+void SceneActorRoute_UpdateWaitPhase(struct SceneActorRegistryResetView *actor)
 {
     u8 *route = (u8 *)actor + 0x448;
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
@@ -23,7 +22,7 @@ void sub_08130E60(struct SceneActorRegistryResetView *actor)
         }
         actor->word104 = zero;
     }
-    if (!(u8)sub_0824923C(actor, actor->update270)) {
+    if (!(u8)Callback_InvokeActor(actor, actor->update270)) {
         u32 zero = sub_0812F3CC(actor);
         if (!zero) {
             u32 kind = (*(u8 **)(route + 8))[6] >> 4;

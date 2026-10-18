@@ -1,6 +1,4 @@
 #include "global.h"
-#define LinkedEffect_ApplyVariant sub_0812A60C
-#define LinkedEffect_SetVariant   sub_0812A928
 struct LinkedEffectCollider {
     u8 unknown[6];
     u16 flags;
@@ -20,7 +18,7 @@ struct EffectVariantSource {
     u8 pad3C[6];
     u8 variant;
 };
-void sub_0812A928(void *, u32);
+void LinkedEffect_SetVariant(void *, u32);
 static inline u32 TestFlags(u32 *flags, u32 mask)
 {
     return *flags & mask;
@@ -29,12 +27,12 @@ static inline void MarkCollider(struct LinkedEffectCollider *sprite)
 {
     sprite->flags |= 4;
 }
-void sub_0812A60C(struct EffectVariantSource *source, void *unused, struct LinkedEffect *effect)
+void LinkedEffect_ApplyVariant(struct EffectVariantSource *source, void *unused, struct LinkedEffect *effect)
 {
     if (TestFlags(&source->flags, 0x20)) {
         u8 *sprite = (u8 *)effect + 0x1C;
-        sub_0812A928(sprite, source->variant);
-        sub_0812A928(sprite, source->variant);
+        LinkedEffect_SetVariant(sprite, source->variant);
+        LinkedEffect_SetVariant(sprite, source->variant);
         MarkCollider(&effect->colliders[0]);
         MarkCollider(&effect->colliders[1]);
         effect->state = 3;

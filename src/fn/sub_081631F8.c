@@ -1,5 +1,4 @@
 #include "global.h"
-#define TransitionPanel_InitOverlay sub_081631F8
 struct TransitionPanelResource {
     u32 words[8];
 };
@@ -24,7 +23,7 @@ struct TransitionPanelPosition {
 void *ScriptProc_Start(u16, u16);
 s32 ResourceHeader_Relocate(void *, void *);
 void sub_08219918(void *, void *, s32, s32, s32, s32, s32, void *);
-void sub_081631F8(struct TransitionPanel *p)
+void TransitionPanel_InitOverlay(struct TransitionPanel *p)
 {
     struct TransitionPanelResource *resource = ScriptProc_Start(0xCB05, 0x530D);
     if (resource) {

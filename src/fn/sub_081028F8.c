@@ -1,4 +1,3 @@
-#define NamedObject_ClearAttachmentFlag sub_081028F8
 #define gNamedObjectManager             gUnk_020001AC
 #include "global.h"
 struct NamedObject {
@@ -21,7 +20,7 @@ static inline u8 isActive(u32 *mask, s32 index)
         return 1;
     return 0;
 }
-void sub_081028F8(u32 name, s32 tether)
+void NamedObject_ClearAttachmentFlag(u32 name, s32 tether)
 {
     struct NamedObjectManager *manager = gUnk_020001AC;
     s32 i;

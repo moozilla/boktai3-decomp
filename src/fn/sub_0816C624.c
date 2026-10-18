@@ -1,5 +1,4 @@
 /* Provisional names and object interpretation; offsets follow static accesses. */
-#define MapMenu_RefreshMarkers sub_0816C624
 #include "global.h"
 struct MapMenuMarker {
     u8 pad0[8];
@@ -24,7 +23,7 @@ struct MapMenu {
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
 void sub_0816BC54(struct MapMenu *);
 u32 MapScreen_GetPositionMarkerKeyframe(struct MapMenu *);
-void sub_0816C624(struct MapMenu *s)
+void MapMenu_RefreshMarkers(struct MapMenu *s)
 {
     sub_0816BC54(s);
     if (s->adjacent != -1) {

@@ -1,4 +1,3 @@
-#define MenuParticle_UpdateMotion sub_08167508
 #include "global.h"
 struct MenuParticle {
     u32 flags;
@@ -9,7 +8,7 @@ struct MenuParticle {
     u8 unknown34[4];
     u8 active, age;
 };
-u32 sub_08167508(struct MenuParticle *particle)
+u32 MenuParticle_UpdateMotion(struct MenuParticle *particle)
 {
     if (++particle->age > 19) {
         particle->flags |= 1;

@@ -1,10 +1,9 @@
 #include "global.h"
-#define Math_GetVectorLength sub_0812DF40
 #define gVectorSineTable gUnk_086149C4
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
-s16 sub_0812DF40(s16 x, s16 y)
+s16 Math_GetVectorLength(s16 x, s16 y)
 {
     u8 angle = Math_Atan2(x, y);
     s32 result;

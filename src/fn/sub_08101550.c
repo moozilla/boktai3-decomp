@@ -1,4 +1,3 @@
-#define NamedObject_IsPlayerWithinContactBounds sub_08101550
 #define gNamedObjectContactBounds gUnk_086064B4
 #define gPlayers gUnk_02000580
 #include "global.h"
@@ -14,7 +13,7 @@ static inline void Difference(struct SceneVec *d, const struct SceneVec *b, cons
     d->y = a->y - b->y;
     d->z = a->z - b->z;
 }
-u32 sub_08101550(struct NamedObjectContactBody *object)
+u32 NamedObject_IsPlayerWithinContactBounds(struct NamedObjectContactBody *object)
 {
     struct Player *player = gUnk_02000580[0];
     struct SceneVec delta;

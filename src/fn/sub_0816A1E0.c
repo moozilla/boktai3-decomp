@@ -1,5 +1,4 @@
 // Tentative StatusPanel family and semantic names; based on static consumers.
-#define StatusPanel_UpdateGaugePosition sub_0816A1E0
 #include "global.h"
 struct PanelGaugeValues { u8 unknown[0x428]; u16 current; u16 maximum; };
 struct StatusPanel {
@@ -14,7 +13,7 @@ struct StatusPanel {
     u16 gaugeIncrement;
 };
 s32 Div(s32, s32);
-void sub_0816A1E0(struct StatusPanel *p)
+void StatusPanel_UpdateGaugePosition(struct StatusPanel *p)
 {
     struct PanelGaugeValues *values = p->values;
     s32 amount = values->current + p->gaugeIncrement;

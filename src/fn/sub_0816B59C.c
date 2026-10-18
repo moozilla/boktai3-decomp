@@ -1,14 +1,12 @@
-#define SceneInput_NavigateGridKeys  sub_0816B59C
-#define SceneInput_GetNavigationKeys sub_0816B3D4
 #define SceneInput_MoveUp Hud_MoveGridUp
 #define SceneInput_MoveDown Hud_MoveGridDown
 #define SceneInput_MoveLeft Hud_MoveGridLeft
 #define SceneInput_MoveRight Hud_MoveGridRight
 #include "global.h"
 #include "scene_input_navigation.h"
-u32 sub_0816B59C(struct SceneInputGridView *grid, u32 keys)
+u32 SceneInput_NavigateGridKeys(struct SceneInputGridView *grid, u32 keys)
 {
-    u32 allowed = SceneInput_GetNavigationKeys(grid);
+    u32 allowed = SceneInput_ReadRepeatingDirections(grid);
     if ((allowed & 0x40) && (keys & 0x40))
         return SceneInput_MoveUp(grid);
     if ((allowed & 0x80) && (keys & 0x80))

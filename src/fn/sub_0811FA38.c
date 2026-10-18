@@ -1,4 +1,3 @@
-#define ModifierAction_InitializeSecondary sub_0811FA38
 #include "global.h"
 struct ModifierSecondaryAction {
     void (*callback)(void);
@@ -15,10 +14,10 @@ struct ModifierSecondaryActor {
     struct ModifierSecondaryAction action;
 };
 void Memory_Clear(void *, u32);
-void sub_0811E3F8(u16 *, s32);
+void ScriptRecord_FindModifier(u16 *, s32);
 void Modifier_EvaluateThirdSourceModeOne(void);
 void Modifier_EvaluateThirdSourceModeTwo(void);
-void sub_0811FA38(struct ModifierSecondaryActor *actor, u32 argument)
+void ModifierAction_InitializeSecondary(struct ModifierSecondaryActor *actor, u32 argument)
 {
     u8 *selection = (u8 *)actor + 0x48;
     struct ModifierSecondaryAction *action = &actor->action;
@@ -28,7 +27,7 @@ void sub_0811FA38(struct ModifierSecondaryActor *actor, u32 argument)
     action->argument = argument;
     config = action->config;
     Memory_Clear(config, 12);
-    sub_0811E3F8(config, selection[15]);
+    ScriptRecord_FindModifier(config, selection[15]);
     switch (action->kind) {
     case 1:
         action->callback = Modifier_EvaluateThirdSourceModeOne;

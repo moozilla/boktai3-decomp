@@ -1,4 +1,3 @@
-#define SlotState_ResetInactiveMode sub_0810BD8C
 #include "global.h"
 
 struct SlotState {
@@ -6,7 +5,7 @@ struct SlotState {
     u8 mode[1];
 };
 
-void sub_0810BD8C(struct SlotState *p)
+void SlotState_ResetInactiveMode(struct SlotState *p)
 {
     s32 i;
     for (i = 0; i <= 0; i++) {

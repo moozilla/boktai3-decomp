@@ -3,7 +3,7 @@
 extern u8 *gUnk_02000710;
 void SceneHud_DrawClock(int);
 void SceneHud_DrawNumericStatus(int);
-void sub_08215F38(int, int, int, int, int, int, int);
+void Text_DrawNumber(int, int, int, int, int, int, int);
 void SceneInputPanel_GetEquippedValues(int *, int *, int, int);
 void SceneHud_FillTile020(int, int, int);
 int Player_GetCurrentAttribute(int);
@@ -21,21 +21,21 @@ void SelectionMenu_DrawStatistics(u8 *p)
     {
         int x = 10;
         asm("" : "+r"(x));
-        sub_08215F38(0, x, 9, value, 33, 2, 15);
+        Text_DrawNumber(0, x, 9, value, 33, 2, 15);
     }
     a = 0;
     b = 0;
     SceneInputPanel_GetEquippedValues(&a, &b, 0, 0);
     if (b > 0)
-        sub_08215F38(0, 9, 10, b, 33, 3, 15);
+        Text_DrawNumber(0, 9, 10, b, 33, 3, 15);
     else
         SceneHud_FillTile020(9, 10, 3);
     if (a > 0)
-        sub_08215F38(0, 9, 11, a, 33, 3, 15);
+        Text_DrawNumber(0, 9, 11, a, 33, 3, 15);
     else
         SceneHud_FillTile020(9, 11, 3);
-    sub_08215F38(0, 11, 12, Player_GetCurrentAttribute(0), 33, 3, 15);
-    sub_08215F38(0, 11, 13, Player_GetCurrentAttribute(1), 33, 3, 15);
-    sub_08215F38(0, 11, 14, Player_GetCurrentAttribute(2), 33, 3, 15);
+    Text_DrawNumber(0, 11, 12, Player_GetCurrentAttribute(0), 33, 3, 15);
+    Text_DrawNumber(0, 11, 13, Player_GetCurrentAttribute(1), 33, 3, 15);
+    Text_DrawNumber(0, 11, 14, Player_GetCurrentAttribute(2), 33, 3, 15);
     SelectionMenu_StepCursors(p);
 }

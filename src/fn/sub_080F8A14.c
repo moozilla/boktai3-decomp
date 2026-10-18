@@ -1,4 +1,3 @@
-#define SceneActorControl_SettleRotation sub_080F8A14
 #include "global.h"
 #include "scene_actor_control_phase.h"
 
@@ -20,7 +19,7 @@ static inline s32 NormalizeAngle(s32 angle)
     return result;
 }
 
-void sub_080F8A14(struct SceneActorAnimationView *actor, s32 elapsed)
+void SceneActorControl_SettleRotation(struct SceneActorAnimationView *actor, s32 elapsed)
 {
     u8 *state = (u8 *)actor->link;
     struct RotatingDrawable *drawable = actor->drawable;

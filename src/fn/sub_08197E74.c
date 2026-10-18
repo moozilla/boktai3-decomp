@@ -8,7 +8,7 @@ struct P {
     u8 pad[2];
     u8 obj[1];
 };
-s32 sub_08228DB8(void);
+s32 SunClock_GetPhase(void);
 s32 TimePalette_GetSourceIndex(s32);
 void Palette_CopyBank(void *, u32);
 void TimePalette_UpdateTransition(void);
@@ -16,7 +16,7 @@ void TimePalette_InitTransition(struct P *o, u32 a, u32 b, u32 c)
 {
     u32 z;
     s32 r;
-    r = TimePalette_GetSourceIndex(sub_08228DB8());
+    r = TimePalette_GetSourceIndex(SunClock_GetPhase());
     z = 0;
     o->b14 = r;
     o->b15 = r;

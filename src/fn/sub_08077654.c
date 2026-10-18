@@ -33,7 +33,7 @@ u32 SceneActorPlacement_ConsumeCallbackFlag(struct SceneActorPlacementView *argu
         if (pending) {
             void *callback = actor->callback23C;
             if (callback)
-                sub_0824923C(actor, callback);
+                Callback_InvokeActor(actor, callback);
             SceneActorPlacement_ClearFlags(flags, ~0x180);
             return 1;
         }

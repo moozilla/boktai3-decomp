@@ -1,4 +1,3 @@
-#define PairCallbackPool_MarkNextOfKind sub_0813A34C
 #include "global.h"
 struct PairCallbackPoolEntry {
     void *callback;
@@ -13,7 +12,7 @@ struct PairCallbackPool {
     struct PairCallbackPoolEntry entries[2];
     u32 frame;
 };
-s32 sub_0813A34C(struct PairCallbackPool *p, s32 first, s32 kind, u8 *visited)
+s32 PairCallbackPool_MarkNextOfKind(struct PairCallbackPool *p, s32 first, s32 kind, u8 *visited)
 {
     s32 i;
     for (i = first; i < 2; i++) {

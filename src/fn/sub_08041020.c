@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
-u32 sub_0811DD94(s32, s32);
+u32 StateFlags_GetCategoryBit(s32, s32);
 void ScrollingDialogue_SetScript(const u8 *);
 extern const u8 gUnk_086058C8[];
 void ModifierMenu_UpdateDescription(struct ModifierMenu *menu)
@@ -24,7 +24,7 @@ void ModifierMenu_UpdateDescription(struct ModifierMenu *menu)
                 s32 tableIndex;
                 const u8 **table;
                 item = &menu->choice.cursor.index;
-                if (!sub_0811DD94(categoryArg, *item))
+                if (!StateFlags_GetCategoryBit(categoryArg, *item))
                     goto unavailable;
                 tableIndex = *category + 7;
                 tableIndex *= sizeof(*table);
@@ -44,7 +44,7 @@ void ModifierMenu_UpdateDescription(struct ModifierMenu *menu)
                 asm("" : "+r"(categoryArg));
                 item = &menu->choice.cursor.index;
                 itemArg = *item;
-                if (sub_0811DD94(4, categoryArg * 3 * 2 + itemArg)) {
+                if (StateFlags_GetCategoryBit(4, categoryArg * 3 * 2 + itemArg)) {
                     categoryValue = *category;
                     itemValue = *item;
                     sourceLocation = &menu->textSources[11];
@@ -61,7 +61,7 @@ void ModifierMenu_UpdateDescription(struct ModifierMenu *menu)
                 asm("" : "+r"(categoryArg));
                 item = &menu->choice.cursor.index;
                 itemArg = *item;
-                if (sub_0811DD94(5, categoryArg * 3 * 2 + itemArg)) {
+                if (StateFlags_GetCategoryBit(5, categoryArg * 3 * 2 + itemArg)) {
                     categoryValue = *category;
                     itemValue = *item;
                     sourceLocation = &menu->textSources[12];

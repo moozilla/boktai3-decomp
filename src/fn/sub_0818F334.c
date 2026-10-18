@@ -6,7 +6,7 @@ struct V {
     u16 a, b, c;
 };
 extern const struct T gUnk_0824F18C[];
-void sub_08121D64(struct V *, s32, s32, s32, s32);
+void SpriteParticle_SpawnBatch(struct V *, s32, s32, s32, s32);
 void Sound_PlaySongChecked(s32);
 void Nidhoggr_CreateThreePointBurst(struct V *p)
 {
@@ -18,7 +18,7 @@ void Nidhoggr_CreateThreePointBurst(struct V *p)
         q->a = p->a + t->a;
         q->b = p->b + t->b;
         q->c = p->c + t->c;
-        sub_08121D64(&v, 1, 2, 1, 0x154);
+        SpriteParticle_SpawnBatch(&v, 1, 2, 1, 0x154);
         i++;
     } while (i <= 2);
     Sound_PlaySongChecked(0x1bd);

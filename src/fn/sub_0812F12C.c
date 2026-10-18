@@ -1,10 +1,9 @@
-#define SceneActor_UpdateActiveCallbacks sub_0812F12C
 #include "global.h"
 #include "scene_actor_registry.h"
 #include "game_state.h"
 extern u32 gUnk_030053F0, gUnk_02000560;
-void sub_08136C80(struct SceneActorRegistryActor *, s32);
-void sub_08136DFC(struct SceneActorRegistryActor *, s32);
+void SceneActorPlacement_HideActor(struct SceneActorRegistryActor *, s32);
+void SceneActorPlacement_ShowActor(struct SceneActorRegistryActor *, s32);
 void sub_08075588(struct SceneActorRegistryActor *);
 void sub_08074EB0(struct SceneActorRegistryActor *);
 void SceneActorPlacement_ConsumeCallbackFlag(struct SceneActorRegistryActor *);
@@ -39,13 +38,13 @@ static inline u32 test(u32 mask, u32 flags)
 }
 static inline void dispatch(void **callback, void *context)
 {
-    sub_0824923C(context, *callback);
+    Callback_InvokeActor(context, *callback);
 }
 static inline u32 engineFlags(u32 mask)
 {
     return (gUnk_030053F4 | gUnk_030053F0) & mask;
 }
-s32 sub_0812F12C(struct SceneActorRegistryActor *p)
+s32 SceneActor_UpdateActiveCallbacks(struct SceneActorRegistryActor *p)
 {
     if (engineFlags(0x400))
         return 0;
@@ -53,11 +52,11 @@ s32 sub_0812F12C(struct SceneActorRegistryActor *p)
         return 0;
     if (!(test(2, p->flags2CC))) {
         if (!sameRegion(&p->regionId)) {
-            sub_08136C80(p, 0);
+            SceneActorPlacement_HideActor(p, 0);
             return 0;
         }
         if (!unavailable(p))
-            sub_0824923C(p, p->activeCallback264);
+            Callback_InvokeActor(p, p->activeCallback264);
         SceneActorPlacement_ConsumeCallbackFlag(p);
         sub_08075588(p);
         dispatch(&p->contextCallback274, p->context);
@@ -68,7 +67,7 @@ s32 sub_0812F12C(struct SceneActorRegistryActor *p)
         return 1;
     } else {
         if (!(p->flags2CC & 1) && sameRegion(&p->regionId))
-            sub_08136DFC(p, 0);
+            SceneActorPlacement_ShowActor(p, 0);
         SceneActorTarget_OnBindingChanged(p);
     }
     return 0;

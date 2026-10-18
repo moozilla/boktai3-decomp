@@ -1,16 +1,15 @@
-#define SceneHud_UpdateActionFeedback sub_0817026C
 
 #include "global.h"
 #include "scene_hud_display.h"
-void sub_0816D98C(void *);
+void SceneHud_RefreshActionIcons(void *);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void PauseMenu_OnItemUseSelectionUpdate(void);
 void sub_0816CDB8(void *, int, int);
-void sub_0816D920(void *, int);
-void sub_0816D868(void *);
+void SceneHud_GetActionIconPosition(void *, int);
+void SceneHud_ShowActionPreview(void *);
 void PauseMenu_ClearSpriteFlags(void *, s32, u32);
-void sub_081663A0(void *, int, int, int, int);
-void sub_0817026C(struct SceneHudState *p)
+void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
+void SceneHud_UpdateActionFeedback(struct SceneHudState *p)
 {
     if (p->actionTransferDelay == 0)
         Sound_PlaySong(0x10E);
@@ -22,12 +21,12 @@ void sub_0817026C(struct SceneHudState *p)
     } else if (p->actionTransferDelay < 16)
         p->actionFeedbackY = 104;
     else {
-        sub_0816D98C(p);
+        SceneHud_RefreshActionIcons(p);
         Hud_SetInteractionCallback(p, PauseMenu_OnItemUseSelectionUpdate, 1);
         sub_0816CDB8(p->actionInput, 1, 0);
-        sub_0816D920((u8 *)p + 0x1620, p->actionCursor);
-        sub_0816D868(p);
+        SceneHud_GetActionIconPosition((u8 *)p + 0x1620, p->actionCursor);
+        SceneHud_ShowActionPreview(p);
         PauseMenu_ClearSpriteFlags(p, 5, 1);
-        sub_081663A0(p, 1, 0, 0, 0);
+        MenuDisplay_SetPaletteOverrides(p, 1, 0, 0, 0);
     }
 }

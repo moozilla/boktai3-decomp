@@ -1,4 +1,3 @@
-#define SceneEffect_UpdateBlink sub_08121458
 #define gSceneEffectBlinkPeriods gUnk_086106C4
 #include "global.h"
 
@@ -17,7 +16,7 @@ struct SceneEffectOwner {
 extern const u8 gUnk_086106C4[];
 s32 Mod(s32, s32);
 
-void sub_08121458(struct SceneEffectOwner *owner, struct SceneEffectBlink *effect)
+void SceneEffect_UpdateBlink(struct SceneEffectOwner *owner, struct SceneEffectBlink *effect)
 {
     struct SceneEffectBlink *p = effect;
     s32 rate;

@@ -1,4 +1,3 @@
-#define SoundDelay_Update sub_08138FE0
 #include "global.h"
 struct SoundDelay {
     void (*update)(struct SoundDelay *);
@@ -9,7 +8,7 @@ struct SoundDelay {
 };
 void Sound_PlaySong(u32);
 void sub_08138CDC(struct SoundDelay *);
-void sub_08138FE0(struct SoundDelay *p)
+void SoundDelay_Update(struct SoundDelay *p)
 {
     if (p->entered) {
         p->timer = 0;

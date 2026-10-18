@@ -7,17 +7,17 @@ struct P {
     void *fn;
 };
 
-void sub_0813ADD0(struct P *);
-void sub_0815AD78(struct P *);
-void sub_0813AFEC(struct P *, s32, s32);
-void sub_0814F90C(void);
+void Player_UpdateFacingSide(struct P *);
+void Player_EnterKindTwo(struct P *);
+void ActorSequence_Begin(struct P *, s32, s32);
+void Player_UpdateTriggerAnimation(void);
 
 void PlayerCue_Stand(struct P *p, s32 v)
 {
     if (v >= 0)
         p->b = v;
-    sub_0813ADD0(p);
-    p->fn = sub_0814F90C;
-    sub_0815AD78(p);
-    sub_0813AFEC(p, 0, 0);
+    Player_UpdateFacingSide(p);
+    p->fn = Player_UpdateTriggerAnimation;
+    Player_EnterKindTwo(p);
+    ActorSequence_Begin(p, 0, 0);
 }

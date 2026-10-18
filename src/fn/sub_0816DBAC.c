@@ -1,7 +1,4 @@
-#define SceneHud_BeginSelectedActionTransfer sub_0816DBAC
 #define SceneHud_FindCategoryAction Inventory_GetQuantityByStorage
-#define SceneHud_GetActionIconPosition sub_0816D920
-#define SceneHud_BeginIconMotion sub_08165E78
 #include "global.h"
 #include "scene_hud_display.h"
 void SceneHud_GetActionIconPosition(void *, s32);
@@ -9,8 +6,8 @@ s32 SceneHud_FindCategoryAction(u32, u32);
 u32 sub_0822D604(s32);
 void SceneHud_BeginIconMotion(void *, u32, s32, u32, void *, void *, u32, u32);
 void Hud_SetInteractionCallback(void *, void (*)(void), s32);
-void sub_0816DEA8(void);
-void sub_0816DBAC(struct SceneHudState *s)
+void InventoryGrid_BeginNumberPhase(void);
+void SceneHud_BeginSelectedActionTransfer(struct SceneHudState *s)
 {
     struct ContactPosition from;
     struct SceneInputPackedPosition to;
@@ -30,5 +27,5 @@ void sub_0816DBAC(struct SceneHudState *s)
     later = *selection + 10;
     SceneHud_BeginIconMotion(s, 0, keyframe, s->categoryWidgets[later].paletteBank, &from, &to, 24, 16);
     Sound_PlaySong(0x38a);
-    Hud_SetInteractionCallback(s, sub_0816DEA8, 1);
+    Hud_SetInteractionCallback(s, InventoryGrid_BeginNumberPhase, 1);
 }

@@ -1,4 +1,3 @@
-#define SceneActorBehavior_DispatchOrEnterState2 sub_08131BC4
 #include "global.h"
 #include "scene_actor_reset.h"
 extern u32 gUnk_030053F0, gUnk_02000560;
@@ -12,7 +11,7 @@ static inline u32 HasOverride(void)
     u32 mask = 4;
     return gUnk_02000560 & mask;
 }
-void sub_08131BC4(struct SceneActorRegistryResetView *actor)
+void SceneActorBehavior_DispatchOrEnterState2(struct SceneActorRegistryResetView *actor)
 {
     if (IsSuspended() || HasOverride()) {
         u32 state = 2;
@@ -26,6 +25,6 @@ void sub_08131BC4(struct SceneActorRegistryResetView *actor)
         actor->counter2AC = zero;
         actor->field2B1 = one;
     } else {
-        sub_0824923C(actor, actor->behaviorCallbacks[actor->behavior2AA]);
+        Callback_InvokeActor(actor, actor->behaviorCallbacks[actor->behavior2AA]);
     }
 }

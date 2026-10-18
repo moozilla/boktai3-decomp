@@ -1,6 +1,5 @@
 #include "global.h"
 #include "contact_actor.h"
-#define SceneTerrain_IsPathBlocked     sub_0812DE38
 #define SceneTerrain_FindReachableCell SceneActorTerrain_FindReachableCell
 s32 SceneActorTerrain_FindReachableCell(struct ContactPosition *, s32, s32);
 static inline s32 SceneTerrain_RoundDistance(s32 x)
@@ -12,7 +11,7 @@ static inline s32 SceneTerrain_RoundDistance(s32 x)
         return x >> 8;
     return -((-x) >> 8);
 }
-s32 sub_0812DE38(struct ContactPosition *a, struct ContactPosition *b, s32 direction,
+s32 SceneTerrain_IsPathBlocked(struct ContactPosition *a, struct ContactPosition *b, s32 direction,
                  s32 targetCell)
 {
     s32 count;

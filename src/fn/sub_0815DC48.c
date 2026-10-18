@@ -1,10 +1,9 @@
-#define PlayerCue_InitCollider sub_0815DC48
 #include "global.h"
 #include "player.h"
 #include "engine.h"
 s32 Div(s32, s32);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
-void sub_0815DC48(struct Player *p)
+void PlayerCue_InitCollider(struct Player *p)
 {
     struct PlayerCueCollider *collider = &p->cueCollider;
     struct PlayerColliderVector size;

@@ -1,4 +1,3 @@
-#define ScriptRecord_FindByteModifier sub_0811E5D0
 #define gScriptRecordTable            gUnk_02000208
 #include "global.h"
 struct ScriptByteModifier {
@@ -20,7 +19,7 @@ struct ByteModifierResult {
     u16 value;
 };
 extern struct ScriptRecordTable *gUnk_02000208;
-s32 sub_0811E5D0(struct ByteModifierResult *out, s32 id)
+s32 ScriptRecord_FindByteModifier(struct ByteModifierResult *out, s32 id)
 {
     struct ScriptRecordTable *p;
     struct ScriptRecordTable *table = gUnk_02000208;

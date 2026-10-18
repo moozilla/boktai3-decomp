@@ -1,4 +1,3 @@
-#define MotionSequence_AdvanceAfterDelay sub_0816F960
 #define MotionSequence_UpdateInterpolation PauseMenu_UpdateSpriteMotion
 #define MotionSequence_SetCallback Hud_SetInteractionCallback
 #include "global.h"
@@ -13,16 +12,16 @@ struct MotionSequence {
 };
 u32 PauseMenu_UpdateSpriteMotion(struct MotionSequence *, u32);
 void sub_0816D634(struct MotionSequence *, u32);
-void sub_0816F9C4(void);
+void SceneHud_UpdateTimedMessage(void);
 void Hud_SetInteractionCallback(struct MotionSequence *, void (*)(void), int);
 void Sound_PlaySong(u32);
-void sub_0816F960(struct MotionSequence *p)
+void MotionSequence_AdvanceAfterDelay(struct MotionSequence *p)
 {
     if (PauseMenu_UpdateSpriteMotion(p, 0)) {
         if (++p->delay > 7) {
             p->flags |= 1;
             sub_0816D634(p, p->selection);
-            Hud_SetInteractionCallback(p, sub_0816F9C4, 1);
+            Hud_SetInteractionCallback(p, SceneHud_UpdateTimedMessage, 1);
             Sound_PlaySong(0x10D);
         }
     }

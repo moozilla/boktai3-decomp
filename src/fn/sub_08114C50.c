@@ -1,5 +1,4 @@
 #include "global.h"
-#define SlotRegistry_RemoveSprite sub_08114C50
 #define gSlotRegistry             gUnk_020004C8
 struct RegistrySpriteSlot {
     u32 owner;
@@ -18,7 +17,7 @@ struct SlotRegistry {
 };
 extern struct SlotRegistry *gUnk_020004C8;
 void Sprite_Remove(void *);
-void sub_08114C50(u32 index)
+void SlotRegistry_RemoveSprite(u32 index)
 {
     struct SlotRegistry *registry = gUnk_020004C8;
     if (registry && index <= 15) {

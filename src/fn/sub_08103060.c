@@ -1,5 +1,3 @@
-#define NamedObject_SnapTetherToPlatform sub_08103060
-#define NamedObject_ClearAttachmentFlag  sub_081028F8
 #define gNamedObjectTetherBounds         gUnk_086064B4
 #include "global.h"
 struct NamedObjectVector {
@@ -25,7 +23,7 @@ extern const struct NamedObjectVector gUnk_086064B4;
 u32 TetherActor_CopyPosition(struct NamedObjectVector *);
 void TetherActor_SetPosition(struct NamedObjectVector *);
 void TetherActor_AddStatusFlags(u32, u32);
-void sub_081028F8(u32, s32);
+void NamedObject_ClearAttachmentFlag(u32, s32);
 static inline void subtractVector(struct NamedObjectVector *d, struct NamedObjectVector *a,
                                   struct NamedObjectVector *b)
 {
@@ -33,7 +31,7 @@ static inline void subtractVector(struct NamedObjectVector *d, struct NamedObjec
     d->y = a->y - b->y;
     d->z = a->z - b->z;
 }
-void sub_08103060(struct NamedObjectManager *manager, struct NamedObject *object)
+void NamedObject_SnapTetherToPlatform(struct NamedObjectManager *manager, struct NamedObject *object)
 {
     struct NamedObjectVector target, delta;
     if (object->kind == 2) {
@@ -42,7 +40,7 @@ void sub_08103060(struct NamedObjectManager *manager, struct NamedObject *object
         if (delta.x <= gUnk_086064B4.x && delta.x >= -gUnk_086064B4.x &&
             delta.z <= gUnk_086064B4.z && delta.z >= -gUnk_086064B4.z) {
             TetherActor_SetPosition(&object->position);
-            sub_081028F8(manager->tetherName, 1);
+            NamedObject_ClearAttachmentFlag(manager->tetherName, 1);
             manager->tetherName = object->name;
             TetherActor_AddStatusFlags(3, object->name);
             {

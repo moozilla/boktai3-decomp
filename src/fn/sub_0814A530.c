@@ -1,4 +1,3 @@
-#define Player_CalculateActionStat     sub_0814A530
 #define ActionEntry_CountUsedModifiers Inventory_CountEquipmentEffectEntries
 #define gGameState                     gUnk_02000710
 #define gPlayerSceneFlags              gUnk_030053F4
@@ -18,7 +17,7 @@ static inline s32 ScaleActionStat(s32 product)
         result = -((-product) >> 6);
     return result;
 }
-s32 sub_0814A530(struct Player *p, struct PlayerStatModifierContext *ctx, s32 bonus)
+s32 Player_CalculateActionStat(struct Player *p, struct PlayerStatModifierContext *ctx, s32 bonus)
 {
     struct SceneInventoryActionDefinition *def;
     s32 count, value, i;

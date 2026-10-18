@@ -1,8 +1,7 @@
-#define LinkSession_CountPlayerKind sub_08109134
 #define gLinkSessionState gUnk_020004B4
 #include "global.h"
 #include "area_effect_link.h"
-s32 sub_08109134(s32 kind)
+s32 LinkSession_CountPlayerKind(s32 kind)
 {
     struct AreaEffectLinkState *p = gUnk_020004B4;
     s32 count, i;

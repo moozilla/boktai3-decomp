@@ -1,4 +1,3 @@
-#define PlayerStatusPanel_ResetScriptCounters sub_0816D0AC
 #define Player_ClearScriptStatus Player_ClearStateTimer
 #define gGameState gUnk_02000710
 #include "global.h"
@@ -11,7 +10,7 @@ struct PlayerStatusPanel {
     u16 resetState;
 };
 void Player_ClearScriptStatus(struct Player *, s32);
-void sub_0816D0AC(struct PlayerStatusPanel *panel, s32 mask)
+void PlayerStatusPanel_ResetScriptCounters(struct PlayerStatusPanel *panel, s32 mask)
 {
     struct Player *player = panel->player;
     s32 i;

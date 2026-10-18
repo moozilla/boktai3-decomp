@@ -1,5 +1,4 @@
 #include "global.h"
-#define SlotMonitor_PollResult sub_08108C20
 #define SlotMonitor_AdvanceTimeout LinkHandshake_AdvanceTimeout
 struct SlotMonitor {
     u8 unk0[0x24]; s32 selection; u8 unk28[4]; s32 finished; u8 unk30[8];
@@ -11,7 +10,7 @@ s32 Serial_DetectRoleAndEnableInterrupt(void);
 void SerialLink_ResetMultiplayer(void);
 u8 LinkHandshake_AdvanceTimeout(void *);
 void sub_08108C94(void);
-void sub_08108C20(struct SlotMonitor *obj)
+void SlotMonitor_PollResult(struct SlotMonitor *obj)
 {
     obj->ticks++;
     obj->selection = Serial_DetectRoleAndEnableInterrupt();

@@ -1,4 +1,3 @@
-#define Hud_InitializePanelTransition sub_08167E64
 #include "global.h"
 
 /* HUD interpretation and descriptive names are tentative. */
@@ -17,7 +16,7 @@ struct Hud {
 };
 extern u32 gUnk_030053F4;
 void sub_0821983C(void *, void *, int, int, int, int, int, void *);
-void sub_08167E64(struct Hud *hud)
+void Hud_InitializePanelTransition(struct Hud *hud)
 {
     struct HudTransitionOffset offset;
     if (gUnk_030053F4 & 0x1000) {

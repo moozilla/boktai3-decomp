@@ -1,14 +1,13 @@
 #include "global.h"
 #include "actor_state.h"
-#define ActorState_UpdateRandomAnimation sub_0817B788
 #define gActorAnimationRandomIndex       gUnk_03005308
 #define gActorAnimationRandomValues      gUnk_0203B400
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
-s32 sub_0817A23C(struct ActorState *);
-s32 sub_0817AA7C(struct ActorState *);
-s32 sub_0817AA14(struct ActorState *);
-void sub_0817B5C0(struct ActorState *, s32);
+s32 ActorMovement_CanReachTarget(struct ActorState *);
+s32 SceneVolume_GetActivityState(struct ActorState *);
+s32 SceneVolume_FindNearbyPosition(struct ActorState *);
+void SceneVolume_BeginPhase(struct ActorState *, s32);
 s32 sub_0817B5E4(struct ActorState *, u32, s32, s32, s32);
 s32 sub_0821E920(void *, u32);
 static inline u8 ConsumeTrigger(struct ActorState *p)
@@ -27,7 +26,7 @@ static inline s32 RandomValue(void)
     offset = gActorAnimationRandomIndex * 2;
     return *(u16 *)(offset + (u32)gActorAnimationRandomValues);
 }
-void sub_0817B788(struct ActorStateOwner *owner)
+void ActorState_UpdateRandomAnimation(struct ActorStateOwner *owner)
 {
     struct ActorState *p = &owner->actor;
     s32 duration;
@@ -42,12 +41,12 @@ void sub_0817B788(struct ActorStateOwner *owner)
         }
     }
     duration = p->mode == 1 ? 20 : 60;
-    if (sub_0817A23C(p))
-        sub_0817B5C0(&owner->actor, 1);
-    else if (sub_0817AA7C(&owner->actor))
-        sub_0817B5C0(&owner->actor, 2);
-    else if (sub_0817AA14(p) == 1)
-        sub_0817B5C0(&owner->actor, 3);
+    if (ActorMovement_CanReachTarget(p))
+        SceneVolume_BeginPhase(&owner->actor, 1);
+    else if (SceneVolume_GetActivityState(&owner->actor))
+        SceneVolume_BeginPhase(&owner->actor, 2);
+    else if (SceneVolume_FindNearbyPosition(p) == 1)
+        SceneVolume_BeginPhase(&owner->actor, 3);
     if (p->requestMode == 2)
         result = sub_0817B5E4(&owner->actor, owner->actor.timer, duration, duration, 1);
     else

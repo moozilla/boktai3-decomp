@@ -1,4 +1,3 @@
-#define PauseMenu_RestoreDisplayState sub_08176718
 #define gDisplayControlShadow gUnk_03004BD8
 #include "global.h"
 #include "background_controller.h"
@@ -34,8 +33,8 @@ void MessageWindow_Clear(void);
 void ScrollingDialogue_RequestHide(void);
 void PauseMenu_CloseTextWindows(void *);
 void Hud_SetupBackgroundLayer(void *, u32, s32, s32, u32);
-void sub_08167BDC(void *);
-void sub_08176718(struct PauseMenuDisplay *s)
+void Hud_RefreshActivePanel(void *);
+void PauseMenu_RestoreDisplayState(struct PauseMenuDisplay *s)
 {
     u32 bgEnable;
     u32 flags;
@@ -64,5 +63,5 @@ void sub_08176718(struct PauseMenuDisplay *s)
     Hud_SetupBackgroundLayer(s, s->resource, 0, 0, s->parameter);
     s->transition0 = 0;
     s->transition1 = 0;
-    sub_08167BDC(s);
+    Hud_RefreshActivePanel(s);
 }

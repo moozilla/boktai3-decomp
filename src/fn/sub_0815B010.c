@@ -12,9 +12,9 @@ struct P {
     u32 c;
 };
 
-void sub_0815AD78(struct P *);
-void sub_0813AFEC(struct P *, s32, s32);
-void sub_0814F90C(void);
+void Player_EnterKindTwo(struct P *);
+void ActorSequence_Begin(struct P *, s32, s32);
+void Player_UpdateTriggerAnimation(void);
 
 static inline u8 inRange(u32 q)
 {
@@ -44,7 +44,7 @@ void PlayerCue_StandVariant3(struct P *p, s32 dir, u32 c)
         *a3 = above(q);
     }
     p->c = c;
-    sub_0815AD78(p);
-    sub_0813AFEC(p, 0, 3);
-    p->fn = sub_0814F90C;
+    Player_EnterKindTwo(p);
+    ActorSequence_Begin(p, 0, 3);
+    p->fn = Player_UpdateTriggerAnimation;
 }

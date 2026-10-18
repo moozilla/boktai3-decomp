@@ -1,4 +1,3 @@
-#define Player_BeginIndexedAction sub_0813EBE0
 #define gPlayerIndexedActions     gUnk_08E60F4C
 #include "global.h"
 #include "player.h"
@@ -8,7 +7,7 @@ void sub_0814EEE0(void);
 void sub_0814E990(void);
 void sub_0814E3D8(void);
 void sub_0813E90C(struct Player *);
-void sub_0813AFEC(struct Player *, s32, s32);
+void ActorSequence_Begin(struct Player *, s32, s32);
 static inline void ClearFlag(struct Player *p, u32 index)
 {
     if (!p)
@@ -20,7 +19,7 @@ static inline void ClearFlag(struct Player *p, u32 index)
     else
         p->statBonusFlags &= ~(1 << index);
 }
-void sub_0813EBE0(struct Player *p, s32 action)
+void Player_BeginIndexedAction(struct Player *p, s32 action)
 {
     s32 index = action - 1;
     const struct PlayerIndexedAction *table = gUnk_08E60F4C;
@@ -47,5 +46,5 @@ void sub_0813EBE0(struct Player *p, s32 action)
         p->actionCallback = sub_0814E3D8;
     sub_0813E90C(p);
     if (p->tetherMode == 3)
-        sub_0813AFEC(p, 0, 0);
+        ActorSequence_Begin(p, 0, 0);
 }

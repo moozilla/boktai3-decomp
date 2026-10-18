@@ -1,4 +1,3 @@
-#define ScriptOptions_LoadEntries sub_0811DEEC
 #include "global.h"
 #include "script_options.h"
 void Memory_Clear(void *, u32);
@@ -6,7 +5,7 @@ s32 Script_GetValue(void);
 s32 Script_GetValueSafe(void);
 s32 Script_SeekToKeyword(u32);
 void Script_SetPc(u8 *);
-void sub_0811DEEC(struct ScriptOptions *options)
+void ScriptOptions_LoadEntries(struct ScriptOptions *options)
 {
     s32 kind;
     if (Script_SeekToKeyword('o')) {

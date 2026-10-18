@@ -1,4 +1,3 @@
-#define PursuingActor_InitColliders sub_0812B68C
 #include "global.h"
 #include "engine.h"
 
@@ -7,7 +6,7 @@ void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Collider_SetBodyProperties(void *, s32, s32, s32);
 void SwooshProjectile_OnPrimaryColliderContact(void);
 void SlashEffect_OnSecondaryColliderContact(void);
-void sub_0812B68C(struct PursuingActor *actor, s32 a, s32 b, s32 c, s32 d)
+void PursuingActor_InitColliders(struct PursuingActor *actor, s32 a, s32 b, s32 c, s32 d)
 {
     struct ActorColliderExtent size, offset;
     void *collider;

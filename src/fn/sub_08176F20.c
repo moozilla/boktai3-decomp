@@ -1,5 +1,4 @@
 #include "global.h"
-#define Hud_RemoveMenuGraphics sub_08176F20
 struct HudAnimation {
     u8 bytes[0x60];
 };
@@ -13,7 +12,7 @@ struct HudManager {
 };
 void Anim_Remove(void *);
 void Sprite_Remove(void *);
-void sub_08176F20(struct HudManager *p)
+void Hud_RemoveMenuGraphics(struct HudManager *p)
 {
     struct HudAnimation *anim = p->animations;
     s32 i = 123;

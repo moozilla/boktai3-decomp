@@ -1,4 +1,3 @@
-#define SpritePool10_AllocateSlot sub_08126D3C
 #include "global.h"
 struct PoolSprite {
     u8 unknown[0xC1];
@@ -16,7 +15,7 @@ static inline u8 IsActive(u32 *mask, s32 slot)
         return TRUE;
     return FALSE;
 }
-struct PoolSprite *sub_08126D3C(struct SpritePool *pool)
+struct PoolSprite *SpritePool10_AllocateSlot(struct SpritePool *pool)
 {
     s32 i = 0;
     for (; i < 10; i++) {

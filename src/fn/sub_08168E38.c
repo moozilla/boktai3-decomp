@@ -1,4 +1,3 @@
-#define SceneHud_CanOpenSecondarySelection sub_08168E38
 #include "global.h"
 #include "scene_hud_display.h"
 #include "player.h"
@@ -7,7 +6,7 @@ static inline u32 TestFlags(u32 mask)
 {
     return (gUnk_030053F4 | gUnk_030053F0) & mask;
 }
-s32 sub_08168E38(struct SceneHudState *p)
+s32 SceneHud_CanOpenSecondarySelection(struct SceneHudState *p)
 {
     struct Player *owner = p->actionOwner;
     if (owner->actionMode == 6)

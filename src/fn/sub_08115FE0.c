@@ -1,4 +1,3 @@
-#define ActorParticles_InitCompactPool sub_08115FE0
 #define gCompactParticlePool           gUnk_020001E8
 // Tentative family and semantic names; layouts follow observed field offsets.
 #include "global.h"
@@ -24,7 +23,7 @@ s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void *ScriptProc_Start(u16, u16);
 void Memory_Clear(void *, u32);
-s32 sub_08115FE0(struct CompactParticlePool *pool)
+s32 ActorParticles_InitCompactPool(struct CompactParticlePool *pool)
 {
     s32 i;
     for (i = 0; i < 16; i++) {

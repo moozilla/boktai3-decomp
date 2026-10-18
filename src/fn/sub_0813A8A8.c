@@ -1,5 +1,4 @@
 #include "global.h"
-#define DisplaySlots_Reserve sub_0813A8A8
 #define DisplaySlots_Create PositionLinkedSprite_EnsureManager
 #define gDisplaySlots        gUnk_020004D8
 /* Tentative family: two display slots owned by a task. */
@@ -15,7 +14,7 @@ struct DisplaySlots {
 };
 extern struct DisplaySlots *gUnk_020004D8;
 struct DisplaySlots *PositionLinkedSprite_EnsureManager(void);
-s32 sub_0813A8A8(u32 x, u32 y)
+s32 DisplaySlots_Reserve(u32 x, u32 y)
 {
     struct DisplaySlots *p;
     s32 i;

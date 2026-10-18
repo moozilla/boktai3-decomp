@@ -6,9 +6,9 @@ struct P {
     u8 b;
 };
 extern const u32 gUnk_08611DDC[];
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 void Hresvelgr_UpdateSecondaryBehavior(struct P *p)
 {
     p->b = 0;
-    sub_0824923C(p, gUnk_08611DDC[p->i]);
+    Callback_InvokeActor(p, gUnk_08611DDC[p->i]);
 }

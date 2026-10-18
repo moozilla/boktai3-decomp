@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_pool.h"
-#define Glove_GetHorizontalBounds sub_0811AB78
-s32 sub_0811AB78(s32 index, s32 *left, s32 *right)
+s32 Glove_GetHorizontalBounds(s32 index, s32 *left, s32 *right)
 {
     struct ScenePoolPlayer *glove;
     if (index <= 1) {

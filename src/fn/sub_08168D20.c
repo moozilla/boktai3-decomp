@@ -1,13 +1,12 @@
-#define SceneHud_ApplySecondarySelection sub_08168D20
 #define gGameState                       gUnk_02000710
 #include "global.h"
 #include "scene_hud_display.h"
 #include "game_state.h"
 extern struct GameState *gUnk_02000710;
 s32 GameState_GetUnlockEntry(s32);
-void sub_0813EBE0(void *, s32);
-void sub_0813EABC(void *, s32);
-void sub_08168D20(struct SceneHudState *p)
+void Player_BeginIndexedAction(void *, s32);
+void Player_BeginDescriptorAction(void *, s32);
+void SceneHud_ApplySecondarySelection(struct SceneHudState *p)
 {
     s32 offset = p->selection * 8;
     u32 entry = (u32)p + offset;
@@ -15,12 +14,12 @@ void sub_08168D20(struct SceneHudState *p)
     if (*(u8 *)(entry + field)) {
         void *owner = p->actionOwner;
         field--;
-        sub_0813EBE0(owner, GameState_GetUnlockEntry(*(s8 *)(entry + field)));
+        Player_BeginIndexedAction(owner, GameState_GetUnlockEntry(*(s8 *)(entry + field)));
     } else {
         void *owner = p->actionOwner;
         u32 data = (u32)p + 0xDAC;
         data += offset;
-        sub_0813EABC(owner, *(s32 *)data);
+        Player_BeginDescriptorAction(owner, *(s32 *)data);
     }
     {
         u16 *out = &gUnk_02000710->unk50;

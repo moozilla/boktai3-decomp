@@ -1,4 +1,3 @@
-#define SpritePool_StartEntry       sub_08139E24
 #define SpritePool_Create ParticleBurstEffect_EnsureManager
 #define SpritePoolEntry_SetCallback ParticleBurstEffect_SetStateCallback
 #define gSpritePool                 gUnk_020004D0
@@ -33,8 +32,8 @@ struct SpritePoolParams {
 };
 extern struct SpritePool *gUnk_020004D0;
 struct SpritePool *ParticleBurstEffect_EnsureManager(void);
-u8 sub_08139D04(struct SpritePool *, u32, u32);
-void sub_08139D9C(struct SpritePoolEntry *, void (*)(void), u32, u32);
+u8 SceneProcParticles_TestCapacity(struct SpritePool *, u32, u32);
+void SceneProcParticles_SubmitBounds(struct SpritePoolEntry *, void (*)(void), u32, u32);
 void ParticleBurstEffect_SetStateCallback(struct SpritePoolEntry *, void (*)(void));
 void ParticleBurstEffect_OnAnimationComplete(void);
 void sub_08139994(void);
@@ -49,7 +48,7 @@ static inline u32 SpritePool_MakeKey(u32 counter, u32 id)
     id |= counter;
     return id;
 }
-s32 sub_08139E24(struct SpritePoolVector *position, void *owner, u32 unused,
+s32 SpritePool_StartEntry(struct SpritePoolVector *position, void *owner, u32 unused,
                  struct SpritePoolParams *params, u32 id)
 {
     struct SpritePool *pool;
@@ -63,7 +62,7 @@ s32 sub_08139E24(struct SpritePoolVector *position, void *owner, u32 unused,
         pool = gUnk_020004D0;
     key = pool->counter;
     key = SpritePool_MakeKey(key, id);
-    if (sub_08139D04(pool, key, 1))
+    if (SceneProcParticles_TestCapacity(pool, key, 1))
         return -1;
     for (i = 0; i < 6; i++) {
         if (!pool->entries[i].active) {
@@ -77,7 +76,7 @@ s32 sub_08139E24(struct SpritePoolVector *position, void *owner, u32 unused,
             key = SpritePool_MakeKey(key, id);
             pool->entries[i].id = key;
             Anim_SetSequence(pool->entries[i].anim, pool->entries[i].data, 7, 0, 0);
-            sub_08139D9C(&pool->entries[i], ParticleBurstEffect_OnAnimationComplete, params->value, id + 1);
+            SceneProcParticles_SubmitBounds(&pool->entries[i], ParticleBurstEffect_OnAnimationComplete, params->value, id + 1);
             ParticleBurstEffect_SetStateCallback(&pool->entries[i], sub_08139994);
             Sound_PlaySong(0x3e5);
             return i;

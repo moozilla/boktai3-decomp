@@ -1,4 +1,3 @@
-#define HiddenEffect_StartAtPosition sub_0813B9B8
 #include "global.h"
 struct HiddenEffectPosition { u32 words[2]; };
 struct HiddenEffectSprite {
@@ -14,7 +13,7 @@ struct HiddenEffectOwner {
     u8 active, ticks, animation;
 };
 void sub_08217EEC(struct HiddenEffectSprite *, void *, u32);
-void sub_0813B9B8(struct HiddenEffectOwner *s, struct HiddenEffectPosition *position, s32 alternate)
+void HiddenEffect_StartAtPosition(struct HiddenEffectOwner *s, struct HiddenEffectPosition *position, s32 alternate)
 {
     struct HiddenEffectSprite *sprite = &s->sprite;
     if (alternate) s->animation = 0x48;

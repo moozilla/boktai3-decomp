@@ -1,5 +1,4 @@
 #include "global.h"
-#define LinkPanel_GetConnectionStatus sub_0810C398
 #define Link_GetState Registry1745_GetSessionState
 #define gLinkSession                  gUnk_020004B4
 struct LinkPanel {
@@ -23,7 +22,7 @@ static inline s32 peerStatus(s32 i)
         return *(statuses + i);
     }
 }
-s32 sub_0810C398(struct LinkPanel *p)
+s32 LinkPanel_GetConnectionStatus(struct LinkPanel *p)
 {
     s32 state, result, status;
     if (p->peerIndex < 0) {

@@ -10,7 +10,7 @@ void SceneActorRegistry_DestroyActors(void)
             node = node->next;
             context = actor->context;
             destroy = actor->destroy;
-            sub_0824923C(context, destroy);
+            Callback_InvokeActor(context, destroy);
             Heap_Free(context);
         }
     }

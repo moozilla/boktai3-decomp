@@ -11,7 +11,7 @@ s32 OrbitContactActor_Update(struct OrbitContactActor *actor)
     register const s16 *sine asm("r2");
     s32 value;
     s32 x;
-    sub_0824923C(actor, (void *)gUnk_086059B4[actor->state]);
+    Callback_InvokeActor(actor, (void *)gUnk_086059B4[actor->state]);
     if (actor->state) {
         {
             u32 spriteOffset = 0x9C;

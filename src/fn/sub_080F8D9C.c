@@ -1,15 +1,13 @@
-#define SceneActorControl_FinishRotation sub_080F8D9C
-#define SceneActorControl_ResetRotation  sub_080F92AC
 #include "global.h"
 #include "rotation_phase.h"
 void Sound_PlaySong(u32);
 s32 Mod(s32, s32);
-void sub_080F92AC(void);
+void SceneActorControl_ResetRotation(void);
 static inline u16 ClearRotationFlag(u16 *flags, u32 mask)
 {
     return mask & *flags;
 }
-void sub_080F8D9C(struct SceneActorRegistryResetView *actor, s32 elapsed)
+void SceneActorControl_FinishRotation(struct SceneActorRegistryResetView *actor, s32 elapsed)
 {
     u8 *state = actor->context;
     struct RotatingDrawable *drawable = actor->drawable;
@@ -26,5 +24,5 @@ void sub_080F8D9C(struct SceneActorRegistryResetView *actor, s32 elapsed)
         *flags = mask;
     }
     if (elapsed > 80)
-        RotationPhase_Change(actor, sub_080F92AC, 52);
+        RotationPhase_Change(actor, SceneActorControl_ResetRotation, 52);
 }

@@ -1,4 +1,3 @@
-#define CallbackPool_RemoveEntry sub_08139F58
 #define gCallbackPool gUnk_020004D0
 #include "global.h"
 struct CallbackPoolEntry {
@@ -19,7 +18,7 @@ struct CallbackPool {
 };
 extern struct CallbackPool *gUnk_020004D0;
 void Sprite_Remove(void *);
-void sub_08139F58(u32 i)
+void CallbackPool_RemoveEntry(u32 i)
 {
     struct CallbackPool *p = gUnk_020004D0;
     if (p && i < 6 && p->entries[i].spriteActive) {

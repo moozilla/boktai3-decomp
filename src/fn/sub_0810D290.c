@@ -1,5 +1,4 @@
 #include "global.h"
-#define PanelSequence_UpdateDelay sub_0810D290
 struct PanelSequence {
     u8 pad0[0x18];
     void *map;
@@ -18,18 +17,18 @@ struct PanelSequence {
 };
 void BgGfx_LoadTilemapSimple(u32,u32,u32,u32,u32);
 void Bg_SetLayerMap(u32,void *,u16);
-void sub_0810CCC8(struct PanelSequence *);
+void LinkPanel_DrawPeerTimes(struct PanelSequence *);
 void CharacterModel_UpdatePairedAnimations(void *, int);
 void PaletteFade_CycleMenuColors(void *);
-void sub_0810D22C(struct PanelSequence *);
-void sub_0810D290(struct PanelSequence *s)
+void PanelTransition_UpdateExit(struct PanelSequence *);
+void PanelSequence_UpdateDelay(struct PanelSequence *s)
 {
     int i;
     u8 *panel;
     if (s->entering) {
         Bg_SetLayerMap(3, s->map, 2);
         BgGfx_LoadTilemapSimple(3,0,0,0,0);
-        sub_0810CCC8(s);
+        LinkPanel_DrawPeerTimes(s);
         s->timer = 0;
         s->entering = 0;
     }
@@ -44,7 +43,7 @@ void sub_0810D290(struct PanelSequence *s)
     if (s->timer < 240) {
         s->timer++;
     } else {
-        void (*next)(struct PanelSequence *) = sub_0810D22C;
+        void (*next)(struct PanelSequence *) = PanelTransition_UpdateExit;
         u32 one = 1;
         s->update = next;
         s->entering = one;

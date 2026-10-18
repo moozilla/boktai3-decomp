@@ -1,5 +1,3 @@
-#define SlotMenu_UpdateExitTransition sub_0810C798
-#define SlotMenu_Destroy              sub_0810C724
 #include "global.h"
 struct SlotMenu {
     u8 unknown0[0xF6C];
@@ -8,8 +6,8 @@ struct SlotMenu {
     u16 transitionTimer;
 };
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
-void sub_0810C724(struct SlotMenu *);
-void sub_0810C798(struct SlotMenu *p)
+void SlotMenu_Destroy(struct SlotMenu *);
+void SlotMenu_UpdateExitTransition(struct SlotMenu *p)
 {
     if (p->transitionPending) {
         ScreenTransition_SendCommand(3, 4, 4, 4, 4, 0xFFFF, 0);

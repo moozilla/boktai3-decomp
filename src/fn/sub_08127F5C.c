@@ -1,7 +1,5 @@
-#define MovingSprite_Create sub_08127F5C
 #define MovingSpritePool_GetOrCreate DirectionalProjectile_EnsurePool
 #define MovingSpritePool_Allocate DirectionalProjectile_AllocateSprite
-#define TimedSprite_InitCollider sub_08127998
 #define gMovingSpritePool gUnk_0200016C
 #include "global.h"
 struct SpritePosition { u32 xy, z; };
@@ -31,7 +29,7 @@ extern struct MovingSpritePool *gUnk_0200016C;
 extern const s16 gUnk_086149C4[];
 struct MovingSpritePool *DirectionalProjectile_EnsurePool(void);
 struct MovingSprite *DirectionalProjectile_AllocateSprite(struct MovingSpritePool *);
-void sub_08127998(struct MovingSprite *, u32, u32, u32, u32);
+void TimedSprite_InitCollider(struct MovingSprite *, u32, u32, u32, u32);
 void Sprite_Init(void *, void *, u32);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
 static inline void SelectDirection(u8 *angle, u8 *row, u8 *flip)
@@ -50,7 +48,7 @@ static inline s32 Scale(s32 value)
     if (value >= 0) return value >> 12;
     return -((-value) >> 12);
 }
-void sub_08127F5C(struct SpritePosition *position, u32 angle, u32 arg2, u32 arg3, u32 arg4, u32 arg5, s32 speed)
+void MovingSprite_Create(struct SpritePosition *position, u32 angle, u32 arg2, u32 arg3, u32 arg4, u32 arg5, s32 speed)
 {
     struct MovingSpritePool *pool = gUnk_0200016C;
     struct MovingSprite *slot;
@@ -66,7 +64,7 @@ void sub_08127F5C(struct SpritePosition *position, u32 angle, u32 arg2, u32 arg3
     slot->age = 0;
     slot->angle = angle;
     slot->blinkAge = 0;
-    sub_08127998(slot, arg2, arg3, arg4, arg5);
+    TimedSprite_InitCollider(slot, arg2, arg3, arg4, arg5);
     sprite = slot;
     Sprite_Init(sprite, pool->graphics, 0);
     SelectDirection(&slot->angle, &row, &flip);

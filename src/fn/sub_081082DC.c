@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_vec.h"
-#define TileTrigger_SetStateFromScript sub_081082DC
 struct TileTrigger {
     u32 flags;
     u8 unknown4[0x70];
@@ -15,7 +14,7 @@ struct TileTrigger {
 };
 struct TileTrigger *Pool1B8_FindByName(u32);
 s32 Script_GetKeywordValue(u32, s32);
-void sub_081082DC(void)
+void TileTrigger_SetStateFromScript(void)
 {
     s32 mode = Script_GetKeywordValue(0x73, 0);
     struct TileTrigger *p = Pool1B8_FindByName(Script_GetKeywordValue(0x69, 0));

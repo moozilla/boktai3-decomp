@@ -1,6 +1,5 @@
 #include "global.h"
 // Tentative SceneVolume family: ownership and field semantics remain provisional.
-#define SceneVolume_ConfigureAttackCollider sub_0817AAD0
 #define Collider_SetExtents Collider_SetAttackProperties
 struct SceneAttackCollider {
     u8 pad0[6];
@@ -17,7 +16,7 @@ struct SceneVolume {
 void Collider_SetPosition(void *, void *, u32);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 s32 Collider_Refresh(void *);
-void sub_0817AAD0(struct SceneVolume *volume, s32 radius, s32 attack, s32 height)
+void SceneVolume_ConfigureAttackCollider(struct SceneVolume *volume, s32 radius, s32 attack, s32 height)
 {
     struct SceneAttackCollider *collider = &volume->collider;
     u32 mask = 0x100;

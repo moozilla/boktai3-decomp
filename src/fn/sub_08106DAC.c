@@ -1,4 +1,3 @@
-#define ScriptTriggerActor_DispatchPendingScripts sub_08106DAC
 #include "global.h"
 #include "directional_interaction.h"
 /* Tentative trigger payload view, established by the two script-call paths. */
@@ -13,7 +12,7 @@ struct ScriptTriggerActor {
     u8 unknownB8[8];
     u16 flags;
 };
-void sub_08106DAC(struct ScriptTriggerActor *actor)
+void ScriptTriggerActor_DispatchPendingScripts(struct ScriptTriggerActor *actor)
 {
     s32 values[8];
     struct DirectionalScriptArgs args;

@@ -1,4 +1,3 @@
-#define SceneActorControl_InitializeHoverState sub_080FAC30
 #define gSceneHeightState gUnk_02000580
 #define gHoverAnimationData gUnk_0824E318
 #include "global.h"
@@ -22,7 +21,7 @@ static inline void Fill(void *dest, u32 *zero)
     *zero = 0;
     CpuSet(zero, dest, 0x05000002);
 }
-void sub_080FAC30(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_InitializeHoverState(struct SceneActorRegistryResetView *actor)
 {
     struct HoverControlContext *context = actor->context;
     u32 zero;

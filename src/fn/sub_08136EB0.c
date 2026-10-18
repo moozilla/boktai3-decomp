@@ -1,4 +1,3 @@
-#define SceneActorControl_RestoreInactiveDefaults sub_08136EB0
 #include "global.h"
 #include "scene_actor_registry.h"
 inline static u8 blocked2048(u8 *c)
@@ -28,7 +27,7 @@ zero:
     return 0;
 }
 
-void sub_08136EB0(struct SceneActorRegistryActor *actor)
+void SceneActorControl_RestoreInactiveDefaults(struct SceneActorRegistryActor *actor)
 {
     u32 one;
     u32 flags;

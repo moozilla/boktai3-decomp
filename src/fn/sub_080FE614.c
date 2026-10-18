@@ -2,7 +2,7 @@
 
 void Axe_PrepareUpdate(void *);
 void Axe_UpdateEffects(void *);
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 void SceneActorControl_DispatchControl(void *);
 
 s32 Axe_OnUpdate(void *p)
@@ -13,7 +13,7 @@ s32 Axe_OnUpdate(void *p)
     Axe_PrepareUpdate(p);
     idx = *(u8 *)((u8 *)p + 0x2A8);
     tbl = *(u32 **)((u8 *)p + 0x27C);
-    sub_0824923C(p, tbl[idx]);
+    Callback_InvokeActor(p, tbl[idx]);
     SceneActorControl_DispatchControl(p);
     Axe_UpdateEffects(p);
     return 1;

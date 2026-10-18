@@ -1,4 +1,3 @@
-#define FloorSwitch_RunStateScript sub_081003D0
 #include "global.h"
 struct FloorSwitch {
     u32 flags;
@@ -40,7 +39,7 @@ static inline void fill(struct FloorSwitch *p, s32 *values)
     values[8] = p->w[3];
     values[9] = p->field5A;
 }
-void sub_081003D0(struct FloorSwitch *p)
+void FloorSwitch_RunStateScript(struct FloorSwitch *p)
 {
     s32 values[10];
     struct FloorSwitchScriptArgs args;

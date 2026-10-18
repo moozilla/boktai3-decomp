@@ -1,5 +1,3 @@
-#define SceneHud_DispatchSelectedAction sub_0816FB0C
-#define SceneHud_UpdateActionSelection  sub_0816FF4C
 #define gSceneHudActionDefinitions      gUnk_08E61280
 #include "global.h"
 #include "scene_hud_display.h"
@@ -7,28 +5,28 @@
 extern const struct SceneValueItemDefinition gUnk_08E61280[];
 void Sound_PlaySong(u32);
 s32 Inventory_GetQuantityByStorage(u32, u32);
-void sub_0816DF48(void *);
-void sub_0816E2C8(void *);
+void InventoryGrid_BeginIconTransfer(void *);
+void MenuTransition_BeginSelectedWidget(void *);
 void sub_0816E570(void *);
 void PauseMenu_BeginCharacterItemUse(void *, u32);
 void sub_0816ECF0(void *, u32);
 void sub_0816F240(void *);
 void PauseMenu_BeginTypeThirteenItemUse(void *);
 void PauseMenu_BeginTypeFourteenItemUse(void *);
-void sub_0816DBAC(void *);
+void SceneHud_BeginSelectedActionTransfer(void *);
 void sub_0816D634(void *, u32);
-void sub_0816D98C(void *);
-void sub_0816FF4C(void);
+void SceneHud_RefreshActionIcons(void *);
+void SceneHud_UpdateActionSelection(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void sub_0816CDB8(void *, int, int);
-void sub_0816D920(void *, int);
-void sub_0816D868(void *);
+void SceneHud_GetActionIconPosition(void *, int);
+void SceneHud_ShowActionPreview(void *);
 void Hud_SaveGridSelection(void *);
 void sub_081672FC(void *);
-void sub_08166B7C(void *, int);
+void MenuDisplay_UpdateActionPrompt(void *, int);
 void sub_0816701C(void *, int, int, int, int, int);
-void sub_081663A0(void *, int, int, int, int);
-void sub_0816FB0C(struct SceneHudState *p)
+void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
+void SceneHud_DispatchSelectedAction(struct SceneHudState *p)
 {
     int index = Inventory_GetQuantityByStorage(p->actionCategory, p->actionSelection);
     void *q;
@@ -38,11 +36,11 @@ void sub_0816FB0C(struct SceneHudState *p)
         case 3:
         case 5:
         case 9:
-            sub_0816DF48(p);
+            InventoryGrid_BeginIconTransfer(p);
             break;
         case 4:
             Sound_PlaySong(0x38A);
-            sub_0816E2C8(p);
+            MenuTransition_BeginSelectedWidget(p);
             break;
         case 7:
             Sound_PlaySong(0x10D);
@@ -66,17 +64,17 @@ void sub_0816FB0C(struct SceneHudState *p)
             Sound_PlaySong(0x10D);
         apply:
             sub_0816D634(p, p->actionSelection);
-            sub_0816D98C(p);
-            Hud_SetInteractionCallback(p, sub_0816FF4C, 1);
+            SceneHud_RefreshActionIcons(p);
+            Hud_SetInteractionCallback(p, SceneHud_UpdateActionSelection, 1);
             q = p->actionInput;
             sub_0816CDB8(q, 1, 0);
-            sub_0816D920((u8 *)p + 0x1620, p->actionCursor);
-            sub_0816D868(p);
+            SceneHud_GetActionIconPosition((u8 *)p + 0x1620, p->actionCursor);
+            SceneHud_ShowActionPreview(p);
             Hud_SaveGridSelection(q);
             sub_081672FC(p);
-            sub_08166B7C(p, 4);
+            MenuDisplay_UpdateActionPrompt(p, 4);
             sub_0816701C(p, 0, 0, 0, 1, 0);
-            sub_081663A0(p, 1, 0, 0, 0);
+            MenuDisplay_SetPaletteOverrides(p, 1, 0, 0, 0);
             break;
         case 13:
             Sound_PlaySong(0x38A);
@@ -87,7 +85,7 @@ void sub_0816FB0C(struct SceneHudState *p)
             PauseMenu_BeginTypeFourteenItemUse(p);
             break;
         case 16:
-            sub_0816DBAC(p);
+            SceneHud_BeginSelectedActionTransfer(p);
             break;
     }
 }

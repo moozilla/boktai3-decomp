@@ -1,11 +1,10 @@
-#define Player_EnterKindFour sub_0815E790
 #include "global.h"
 #include "player.h"
 extern u16 gUnk_02000570, gUnk_02000528, gUnk_02000518;
 void Player_EmitQueuedEffects(struct Player *);
 void Player_StopActionSounds(struct Player *);
 void Player_RestoreCameraFollow(struct Player *);
-void sub_0815E790(struct Player *p)
+void Player_EnterKindFour(struct Player *p)
 {
     s32 i;
     u16 zero;

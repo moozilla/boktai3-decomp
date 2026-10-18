@@ -1,4 +1,3 @@
-#define MessagePanel_Update sub_081099A4
 #include "global.h"
 #include "engine.h"
 struct MessagePanel {
@@ -22,11 +21,11 @@ static inline u8 MessagePanel_IsBlocking(struct MessagePanel *p)
     if (p->flags & 1) return TRUE;
     return FALSE;
 }
-s32 sub_081099A4(struct MessagePanel *p)
+s32 MessagePanel_Update(struct MessagePanel *p)
 {
     Solar_PauseMeasurement();
     gUnk_0300546C = 1;
     if (MessagePanel_IsBlocking(p)) gUnk_03005408 = 1;
-    sub_0824923C(p,p->state);
+    Callback_InvokeActor(p,p->state);
     return 1;
 }

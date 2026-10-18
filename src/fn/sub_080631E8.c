@@ -6,7 +6,7 @@ void SceneInputPanel_RequestAction(struct SceneInventoryTail *,
 s32 SceneInventory_FinishAndCallScript(struct SceneInventoryTail *);
 s32 SceneInventory_RunController(struct SceneInventoryTail *p)
 {
-    if (sub_0824923C(p, ((struct SceneInventoryLifecycle *)p)->callback) == 0) {
+    if (Callback_InvokeActor(p, ((struct SceneInventoryLifecycle *)p)->callback) == 0) {
         SceneInventory_UpdateDisplay(p);
     } else {
         Sound_PlaySong(0x119);

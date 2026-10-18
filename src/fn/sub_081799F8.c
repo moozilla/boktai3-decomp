@@ -1,9 +1,8 @@
 #include "global.h"
-#define FieldHud_InitializeNumber sub_081799F8
 #include "field_hud_widgets.h"
 s32 Div(s32, s32);
 void *ScriptProc_Start(u16, u16);
-void sub_081799F8(struct FieldHudWidgets *p, s32 *source)
+void FieldHud_InitializeNumber(struct FieldHudWidgets *p, s32 *source)
 {
     s32 value;
     p->source = source;

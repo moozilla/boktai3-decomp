@@ -1,8 +1,7 @@
-#define Player_ResetModePosition sub_08159EC0
 #include "global.h"
 #include "player.h"
 void Player_SetActionPhase(struct Player *, u8);
-s32 sub_08159EC0(struct Player *p, const struct SceneVec *position, s32 value)
+s32 Player_ResetModePosition(struct Player *p, const struct SceneVec *position, s32 value)
 {
     if (p->kind == 1 && p->tetherMode == 0x1A) {
         p->position = *position;
