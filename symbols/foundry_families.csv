@@ -586,3 +586,4 @@ addr,function,name,family,note
 0810A698,sub_0810A698,LinkMenu_ShowChoiceMessage,"AreaEffectLinkState / link menu","displays choices and waits for participant acknowledgement"
 0810A790,sub_0810A790,SessionMenu_RunEventScript,"Session menu state callbacks","runs entry script and waits for event one"
 0810A7E8,sub_0810A7E8,LinkMenu_ShowReadyMessage,"AreaEffectLinkState / link menu","displays readiness message and waits for participants"
+0810A8D8,sub_0810A8D8,LinkMenu_ExchangePayload,"AreaEffectLinkState / link menu","exchanges participant payloads with a completion timeout"
