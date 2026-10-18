@@ -65,7 +65,7 @@ def subsystems(min_files):
 
 def matched_bytes(root):
     r = subprocess.run([sys.executable, "tools/progress.py"], cwd=root, capture_output=True, text=True)
-    m = re.search(r"([\d,]+) / [\d,]+ bytes", r.stdout + r.stderr)
+    m = re.search(r"code bytes: (\d+)/\d+", r.stdout + r.stderr)
     return int(m.group(1).replace(",", "")) if m else None
 
 
@@ -82,6 +82,8 @@ function still matching, `tools/build.py` printing `build/boktai3.gba: OK`. Name
 functions you understand with a file-local `#define NewName sub_XXXXXXXX` alias
 (integration promotes them). Do not run git commit (the driver commits after its own
 verification; your sandbox cannot write git metadata); leave the finished work in the tree.
+Don't edit shared docs (docs/HANDOFF.md, INDEX.md, history/, ENGINE.md, GAME_LAYOUT.md):
+every unit worker would collide there. Put findings in notes/{slug}.md instead.
 Finish with the brief's short report.
 """
 
@@ -90,11 +92,11 @@ def state_path(s):
     return os.path.join(OUT, s["slug"] + ".json")
 
 
-def run_one(s, model, base, backend="codex", effort="medium"):
+def run_one(s, model, base, backend="codex", effort="medium", recheck=False):
     st = {"name": s["name"], "slug": s["slug"]}
     if os.path.exists(state_path(s)):
         st = json.load(open(state_path(s)))
-        if st.get("state") in ("verified", "failed"):
+        if st.get("state") == "verified" or (st.get("state") == "failed" and not recheck):
             return st
     if backend == "codex" and subprocess.run([sys.executable, os.path.join(ROOT, "tools", "codex_quota.py"),
                                               "--floor", str(QUOTA_FLOOR)]).returncode:
@@ -103,8 +105,10 @@ def run_one(s, model, base, backend="codex", effort="medium"):
     if not os.path.isdir(d):
         subprocess.run(["sh", "tools/worktree.sh", "unit-" + s["slug"], base], cwd=ROOT, check=True,
                        env={**os.environ, "BRANCH_PREFIX": "unit"}, capture_output=True)
-    before = matched_bytes(d)
+    before = st.get("before") or matched_bytes(ROOT)     # the base this worktree was cut from
     log = os.path.join(OUT, s["slug"] + ".log")
+    if recheck:
+        return verify(s, st, d, before)
     brief = BRIEF.format(n=len(s["files"]), **s)
     with open(log, "w") as fh:
         try:
@@ -119,6 +123,11 @@ def run_one(s, model, base, backend="codex", effort="medium"):
                                cwd=d, stdout=fh, stderr=subprocess.STDOUT, timeout=4 * 3600)
         except subprocess.TimeoutExpired:
             fh.write("\n# worker timed out\n")
+    return verify(s, st, d, before)
+
+
+def verify(s, st, d, before):
+    """The driver's own checks on a finished worker's tree, then one commit per subsystem."""
     subprocess.run(["make", "format"], cwd=d, capture_output=True)
     b = subprocess.run([sys.executable, "tools/build.py"], cwd=d, capture_output=True, text=True)
     ok = "build/boktai3.gba: OK" in b.stdout + b.stderr
@@ -126,7 +135,8 @@ def run_one(s, model, base, backend="codex", effort="medium"):
     unit = os.path.exists(os.path.join(d, "src", s["slug"] + ".c"))
     good = ok and unit and after is not None and before is not None and after >= before
     if good:                      # the worker leaves its changes; commit them here, one per subsystem
-        subprocess.run(["git", "add", "-A", "src", "include", "symbols"], cwd=d, check=True)
+        subprocess.run(["git", "add", "-A", "src", "include", "symbols", "notes"], cwd=d, check=True)
+        subprocess.run(["git", "checkout", "--", "docs"], cwd=d, capture_output=True)   # shared docs collide
         subprocess.run(["git", "commit", "-q", "-m", f"Unit {s['slug']}: merge {s['fn']} files into src/{s['slug']}.c\n\n"
                         f"{s['name']} ({s['start']}-{s['end']}); tools/unitize.py, build OK, "
                         f"matched bytes {before} -> {after}.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"],
@@ -159,7 +169,7 @@ def cmd_run(a):
     base = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
     print(f"{len(todo)} subsystems from {base[:8]}, {a.jobs} at a time", flush=True)
     with ThreadPoolExecutor(a.jobs) as ex:
-        for st in ex.map(lambda s: run_one(s, a.model, base, a.backend, a.effort), todo):
+        for st in ex.map(lambda s: run_one(s, a.model, base, a.backend, a.effort, a.recheck), todo):
             print(f"{st['slug']}: {st.get('state')} (build {st.get('build_ok')}, "
                   f"bytes {st.get('before')} -> {st.get('after')})", flush=True)
 
@@ -185,6 +195,7 @@ def main():
     p.add_argument("--min", type=int, default=8)
     p.add_argument("--only")
     p.add_argument("--limit", type=int, default=10 ** 6)
+    p.add_argument("--recheck", action="store_true", help="re-verify finished worktrees; run no workers")
     sp.add_parser("status")
     a = ap.parse_args()
     {"list": cmd_list, "run": cmd_run, "status": cmd_status}[a.cmd](a)
