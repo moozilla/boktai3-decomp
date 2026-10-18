@@ -899,3 +899,4 @@ addr,function,name,family,note
 08182394,sub_08182394,Armor_InitPaletteBanks,"Armor palette controller","initializes callbacks and saves four armor palette banks"
 0818243C,sub_0818243C,ActorPalette_ReturnImmediately,"ActorPalette","returns immediately without side effects"
 08182440,sub_08182440,ActorPalette_DisableCallbacks,"ActorPalette","installs the empty callback for both palette callbacks"
+08182548,sub_08182548,Armor_SpawnScatterEffect,"Armor movement effects","spawns a scatter sprite effect with randomized lifetime"
