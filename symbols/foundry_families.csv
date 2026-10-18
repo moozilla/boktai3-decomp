@@ -676,3 +676,4 @@ addr,function,name,family,note
 08138AC8,sub_08138AC8,HeightProbe_IsBelowLimit,"HeightProbe","compares sampled height with a position-derived limit"
 0813942C,sub_0813942C,SceneProcSprites_SubmitBounds,"SceneProcSprites","submit sprite bounds and position"
 081394B4,sub_081394B4,SceneProcSprites_CreateEntry,"SceneProcSprites","allocate and configure a moving sprite entry"
+08139D9C,sub_08139D9C,SceneProcParticles_SubmitBounds,"SceneProcParticles","submit particle bounds and position"
