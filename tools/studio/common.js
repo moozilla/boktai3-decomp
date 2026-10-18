@@ -285,7 +285,10 @@ let _pool = null;
 function spritePool() {
   return _pool ??= fetch('/api/res').then(r => r.json()).then(ix => res('t9B1B', ix.t9B1B[0][0])).then(b => {
     const n = le(b, 0);
-    return { n, entry: i => i >= 0 && i < n ? Array.from({ length: 16 }, (_, k) => rgb(le(b, 4 + i * 32 + k * 2))) : null };
+    return { n, entry: i => i >= 0 && i < n ? Array.from({ length: 16 }, (_, k) => rgb(le(b, 4 + i * 32 + k * 2))) : null,
+      // edits in this page (and, through Centaur, in a running game): raw BGR555 words
+      raw: i => Array.from({ length: 16 }, (_, k) => le(b, 4 + i * 32 + k * 2)),
+      set: (i, k, v) => { b[4 + i * 32 + k * 2] = v & 255; b[4 + i * 32 + k * 2 + 1] = v >> 8; } };
   });
 }
 // 256 colors for a package: bank b = pool entry base + b.
