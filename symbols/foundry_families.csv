@@ -1169,3 +1169,4 @@ addr,function,name,family,note
 081EEE34,sub_081EEE34,SceneMover_InterpolateScreenX,"SceneMover","interpolates screen X from its captured start and flags the final frame"
 081EEEBC,sub_081EEEBC,,"unassigned empty callback",""
 081EF7A8,sub_081EF7A8,ScreenPhase_BeginSelection,"screen selection phase","copies a requested selection on phase entry and advances the timer"
+081EF804,sub_081EF804,SceneActors_EnterHorizontalTweenState,"SceneActors","installs horizontal interpolation and signals its completion"
