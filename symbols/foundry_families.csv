@@ -956,3 +956,4 @@ addr,function,name,family,note
 08199374,sub_08199374,SceneEffect_InitializeEmitterOptions,"SceneEffect emitter","reads emitter script options and clears effect callbacks"
 08199B04,sub_08199B04,SceneEffect_UpdatePulsePalette,"SceneEffect pulse palette","delays then cycles a six-color palette blend"
 08199B84,sub_08199B84,CallbackSlot_BeginPaletteTransition,"CallbackPool","selects palette and spawns two owner effects"
+08199C74,sub_08199C74,CallbackSlot_StartWhenTimerReady,"CallbackPool","enters state one when the owner delay expires"
