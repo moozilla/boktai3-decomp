@@ -221,3 +221,4 @@ addr,function,name,family,note
 08116D14,sub_08116D14,MotionActor_RunPendingScript,"MotionActor","runs requested script and clears pending state"
 08116DA0,sub_08116DA0,MotionActor_RunDelayedScript,"MotionActor","runs and consumes a script after sixty frames"
 0811AB78,sub_0811AB78,Glove_GetHorizontalBounds,"Glove / ScenePoolPlayer","returns pixel-aligned horizontal bounds spanning 240 pixels"
+0811AC6C,sub_0811AC6C,Terrain_GetCellHighByte,"TerrainColumn","reads terrain cell high byte at clamped x/z coordinates"
