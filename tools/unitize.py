@@ -2,9 +2,10 @@
 """Consolidate src/fn/ files into subsystem units, one headless worker per subsystem.
 
   unitize.py list [--min 8]                subsystems with at least --min src/fn files
-  unitize.py run [--jobs 4] [--model sonnet] [--min 8] [--only NAME,...] [--limit K]
+  unitize.py run [--jobs 4] [--backend codex|claude] [--model M] [--min 8] [--only NAME,...] [--limit K]
                                            a worktree per subsystem (tools/worktree.sh,
-                                           branch unit/<slug>), a `claude -p` worker
+                                           branch unit/<slug>), a worker (default codex exec
+                                           gpt-6.1-sol, workspace-write: no Claude usage)
                                            following docs/UNIT_WORKER.md, then this
                                            script's own verification
   unitize.py status                        per subsystem: worker state and verification
@@ -77,7 +78,8 @@ BRIEF = """Follow docs/UNIT_WORKER.md (read CLAUDE.md first) for one subsystem:
 Do the whole end state: shared header types, one merged unit in ROM order, every
 function still matching, `tools/build.py` printing `build/boktai3.gba: OK`. Name
 functions you understand with a file-local `#define NewName sub_XXXXXXXX` alias
-(integration promotes them). Commit on this branch as the brief says; don't push.
+(integration promotes them). Do not run git commit (the driver commits after its own
+verification; your sandbox cannot write git metadata); leave the finished work in the tree.
 Finish with the brief's short report.
 """
 
@@ -86,7 +88,7 @@ def state_path(s):
     return os.path.join(OUT, s["slug"] + ".json")
 
 
-def run_one(s, model, base):
+def run_one(s, model, base, backend="codex", effort="medium"):
     st = {"name": s["name"], "slug": s["slug"]}
     if os.path.exists(state_path(s)):
         st = json.load(open(state_path(s)))
@@ -98,18 +100,35 @@ def run_one(s, model, base):
                        env={**os.environ, "BRANCH_PREFIX": "unit"}, capture_output=True)
     before = matched_bytes(d)
     log = os.path.join(OUT, s["slug"] + ".log")
+    brief = BRIEF.format(n=len(s["files"]), **s)
     with open(log, "w") as fh:
-        subprocess.run(["claude", "-p", BRIEF.format(n=len(s["files"]), **s), "--model", model,
-                        "--permission-mode", "bypassPermissions", "--output-format", "text"],
-                       cwd=d, stdout=fh, stderr=subprocess.STDOUT, timeout=4 * 3600)
+        try:
+            if backend == "codex":       # bills to the OpenAI plan, not Claude usage
+                subprocess.run(["codex", "exec", "-m", model, "-s", "workspace-write", "-C", d,
+                                "-c", f"model_reasoning_effort={effort}", brief],
+                               cwd=d, stdout=fh, stderr=subprocess.STDOUT, timeout=4 * 3600,
+                               stdin=subprocess.DEVNULL)
+            else:
+                subprocess.run(["claude", "-p", brief, "--model", model,
+                                "--permission-mode", "bypassPermissions", "--output-format", "text"],
+                               cwd=d, stdout=fh, stderr=subprocess.STDOUT, timeout=4 * 3600)
+        except subprocess.TimeoutExpired:
+            fh.write("\n# worker timed out\n")
+    subprocess.run(["make", "format"], cwd=d, capture_output=True)
     b = subprocess.run([sys.executable, "tools/build.py"], cwd=d, capture_output=True, text=True)
     ok = "build/boktai3.gba: OK" in b.stdout + b.stderr
     after = matched_bytes(d)
     unit = os.path.exists(os.path.join(d, "src", s["slug"] + ".c"))
+    good = ok and unit and after is not None and before is not None and after >= before
+    if good:                      # the worker leaves its changes; commit them here, one per subsystem
+        subprocess.run(["git", "add", "-A", "src", "include", "symbols"], cwd=d, check=True)
+        subprocess.run(["git", "commit", "-q", "-m", f"Unit {s['slug']}: merge {s['fn']} files into src/{s['slug']}.c\n\n"
+                        f"{s['name']} ({s['start']}-{s['end']}); tools/unitize.py, build OK, "
+                        f"matched bytes {before} -> {after}.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"],
+                       cwd=d, capture_output=True)
     dirty = subprocess.run(["git", "status", "--porcelain", "--", "src", "include", "symbols"], cwd=d,
                            capture_output=True, text=True).stdout.strip()
-    st.update(state="verified" if ok and unit and after is not None and before is not None and after >= before
-              and not dirty else "failed",
+    st.update(state="verified" if good and not dirty else "failed",
               build_ok=ok, unit=unit, before=before, after=after, uncommitted=bool(dirty),
               branch="unit/unit-" + s["slug"], worktree=d)
     json.dump(st, open(state_path(s), "w"), indent=1)
@@ -131,7 +150,7 @@ def cmd_run(a):
     base = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
     print(f"{len(todo)} subsystems from {base[:8]}, {a.jobs} at a time", flush=True)
     with ThreadPoolExecutor(a.jobs) as ex:
-        for st in ex.map(lambda s: run_one(s, a.model, base), todo):
+        for st in ex.map(lambda s: run_one(s, a.model, base, a.backend, a.effort), todo):
             print(f"{st['slug']}: {st.get('state')} (build {st.get('build_ok')}, "
                   f"bytes {st.get('before')} -> {st.get('after')})", flush=True)
 
@@ -151,7 +170,9 @@ def main():
     p.add_argument("--min", type=int, default=8)
     p = sp.add_parser("run")
     p.add_argument("--jobs", type=int, default=4)
-    p.add_argument("--model", default="sonnet")
+    p.add_argument("--backend", choices=["codex", "claude"], default="codex")
+    p.add_argument("--model", default="gpt-6.1-sol")
+    p.add_argument("--effort", default="medium", help="codex reasoning effort")
     p.add_argument("--min", type=int, default=8)
     p.add_argument("--only")
     p.add_argument("--limit", type=int, default=10 ** 6)
