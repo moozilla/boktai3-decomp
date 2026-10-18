@@ -361,3 +361,4 @@ addr,function,name,family,note
 08142C4C,sub_08142C4C,Player_SetActionOrigin,"Player","copies position and applies facing-dependent action offsets"
 08143938,sub_08143938,Player_CalculateMovementSpeed,"Player","calculates capped and modified movement speed"
 0814433C,sub_0814433C,Player_UpdateMovementFacing,"Player","updates facing and movement animation"
+0814D7F8,sub_0814D7F8,Player_SelectActionCue,"Player contact and action variants","selects a cue from the action resource and phase"
