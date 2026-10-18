@@ -118,7 +118,8 @@ def shape(t):
 
 
 class Repair:
-    def __init__(self, path, func):
+    def __init__(self, path, func, force=False):
+        self.force = force
         self.path = os.path.abspath(path)
         self.func = func
         self.cc = rasolve.Compiler(self.path, func, lines=False)
@@ -302,6 +303,12 @@ class Repair:
         if best is None:
             sys.exit(f"{self.func}: does not compile")
         start, log = best, []
+        sh_, _ = self.measure(mine)
+        limit = max(8, len(mine) // 2 // 10)
+        if sh_ > limit and not self.force:
+            print(f"{self.func}: shape is {sh_} instructions off (limit {limit}); fix the structure first "
+                  "(values guessed across mismatched code are mostly wrong), or pass --force", flush=True)
+            rounds = 0
         for _ in range(rounds):
             if best == 0:
                 break
@@ -323,9 +330,10 @@ def main():
     ap.add_argument("func")
     ap.add_argument("--write", action="store_true", help="rewrite FILE.c")
     ap.add_argument("--rounds", type=int, default=20)
+    ap.add_argument("--force", action="store_true", help="run even when the shape is far off")
     ap.add_argument("--out-dir", help="write FUNC.c here (default build/repair)")
     a = ap.parse_args()
-    r = Repair(a.file, a.func)
+    r = Repair(a.file, a.func, a.force)
     start, best, text, log, er, ec = r.run(a.rounds)
     dst = a.file if a.write else os.path.join(a.out_dir or r.work, f"{a.func}.c")
     if log:
