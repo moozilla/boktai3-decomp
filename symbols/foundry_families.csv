@@ -417,3 +417,4 @@ addr,function,name,family,note
 0816A8E0,sub_0816A8E0,ScenePanel_UpdateDetail,"ScenePanel","confirms an amount into account and totals or cancels detail selection"
 0816AC08,sub_0816AC08,MenuPrompt_UpdateSelectionSprites,"MenuPrompt (tentative)","loads two selection-dependent keyframes and positions the selection sprite"
 0816B3D4,sub_0816B3D4,SceneInput_ReadRepeatingDirections,"SceneInputRepeat","returns new direction presses or held keys every ten ticks"
+0816B6B4,sub_0816B6B4,SceneSequence_GetSelectedMessage,"SceneSequence","looks up the selected entry message through group and selection tables"
