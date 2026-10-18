@@ -320,3 +320,4 @@ addr,function,name,family,note
 0813A1E0,sub_0813A1E0,PairCallbackPool_Update,"PairCallbackPool","invokes active callbacks in a two-entry pool"
 0813A24C,sub_0813A24C,SpritePairPool_Initialize,"SpritePairPool","initializes two animated sprite entries and registers their pool"
 0813A34C,sub_0813A34C,PairCallbackPool_MarkNextOfKind,"PairCallbackPool","marks first active unvisited slot of matching kind in pair pool"
+0813A390,sub_0813A390,SpritePairPool_TestUnavailable,"SpritePairPool","tests an existing low-byte ID or insufficient free slots"
