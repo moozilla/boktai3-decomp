@@ -374,3 +374,4 @@ addr,function,name,family,note
 08159A90,sub_08159A90,Player_ApplyPositionRequest,"Player","applies position and facing while clearing recovery state"
 08159D00,sub_08159D00,Player_ApplyInterpolatedMovement,"Player","applies position and facing in movement mode twenty-five"
 08159F20,sub_08159F20,Player_ApplyForcedFacing,"Player","sets facing and locks ordinary position requests"
+08159FF4,sub_08159FF4,Player_RequestTimedReset,"Player","requests a timed player reset unless already completing"
