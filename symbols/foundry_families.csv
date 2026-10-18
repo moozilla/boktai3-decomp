@@ -135,3 +135,4 @@ addr,function,name,family,note
 080F2D50,sub_080F2D50,PhaseObject_ApproachTarget,"PhaseObject (tentative)","moves horizontally toward target and advances timed state"
 080F31AC,sub_080F31AC,PhaseObject_BeginEntryMotion,"PhaseObject (tentative)","copies target height to four entries and starts timed motion"
 080F3674,sub_080F3674,ChildGroup_ReadScriptParameters,"ChildGroup","reads four P keyword parameters with defaults"
+080F3728,sub_080F3728,ChildGroup_ProcessEvent,"ChildGroup","updates owner damage or restores its position in response to child events"
