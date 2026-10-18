@@ -97,8 +97,17 @@ class Player:
     def face(self, t, d):
         self.cut.at(t, self._m(3, d))
 
+    WALK = 9      # world units a frame (running is about 18)
+
     def walk(self, t, x, z, y=256):
+        """Walk to (x, z); returns the frame he gets there (if his start is known)."""
         self.cut.at(t, self._m(7, x, y, z, 0))
+        end = t
+        if getattr(self, "pos", None) is not None:
+            import math
+            end = t + int(math.dist(self.pos, (x, z)) / self.WALK)
+        self.pos = (x, z)
+        return end
 
     def run(self, t, x, z, y=256):
         self.cut.at(t, self._m(33, x, y, z, 0))
@@ -127,23 +136,49 @@ class Player:
 
 class Otenko:
     """Master Otenko, the scene NPC `character 1`: placed by proc_1675/1676
-    (the cutscene must list them as scripts), then NPC commands (kind 5)."""
+    (the cutscene must list them as scripts), then NPC commands (kind 5).
 
-    def __init__(self, cut):
+    In a field scene he already exists (he follows the player), and proc_1676
+    then only sends him flying to the spot; place() sets his position
+    outright first (command 64). He keeps his walking pose after a walk until told
+    to face somewhere (the game's scenes follow a walk with a face command),
+    so walk() sends one when he arrives (speed 10 a frame)."""
+
+    SPEED = 10
+
+    def __init__(self, cut, y=256):
         self.cut = cut
+        self.y = y
+        self.pos = None
 
-    def place(self, t, x, z, d=3):
-        self.cut.at(t, self.cut.run(1675))
-        self.cut.at(t + 1, self.cut.run(1676, x, z, d, 1))
+    def place(self, t, x, z, d=3, y=None):
+        y = self.y if y is None else y
+        # set his position first (if he exists), so proc_1676's fly-to has nowhere to go;
+        # if he doesn't exist yet, proc_1676 creates him there
+        self.cut.at(t, actor(OTENKO, 5, 64, x, y + 32, z), actor(OTENKO, 5, 3, d))
+        self.cut.at(t + 1, self.cut.run(1675))
+        self.cut.at(t + 2, self.cut.run(1676, x, z, d, 1))
+        self.cut.at(t + 4, actor(OTENKO, 5, 3, d))
+        self.pos = (x, z)
 
     def face(self, t, d):
         self.cut.at(t, actor(OTENKO, 5, 3, d))
 
-    def walk(self, t, x, z, y=256):
+    def walk(self, t, x, z, y=None, face=1):
+        """Walk to (x, z), then stand facing `face` (None: keep walking pose)."""
+        y = self.y if y is None else y
         self.cut.at(t, actor(OTENKO, 5, 4, x, y, z))
+        if self.pos is not None and face is not None:
+            import math
+            arrive = t + int(math.dist(self.pos, (x, z)) / self.SPEED) + 8
+            self.cut.at(arrive, actor(OTENKO, 5, 3, face))
+        self.pos = (x, z)
+        return t
 
-    def run(self, t, x, z, y=256):
+    def run(self, t, x, z, y=None):
+        y = self.y if y is None else y
         self.cut.at(t, actor(OTENKO, 5, 5, x, y, z))
+        self.pos = (x, z)
 
     def raw(self, t, cmd, *args):
         self.cut.at(t, actor(OTENKO, 5, cmd, *args))

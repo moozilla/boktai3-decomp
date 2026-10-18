@@ -280,3 +280,32 @@ def pool_colors(rom, pool):
     from rom import POOLS
     vals = struct.unpack_from("<16H", rom, POOLS - BASE + 32 * pool)
     return [((v & 31) << 3) << 16 | ((v >> 5 & 31) << 3) << 8 | ((v >> 10 & 31) << 3) for v in vals]
+
+
+STAGE_PAL_TYPE = 0x92B3      # stage palettes: a 20-byte header, then 256 colors (16 banks)
+
+
+def resource(rom, type_hash, name):
+    """The bytes of archive entry `name` of type_hash."""
+    for label, t, base, ents in archive.archives(bytes(rom)):
+        if t == type_hash:
+            for h, a, sz in ents:
+                if h == name:
+                    return bytes(rom[a - BASE:a - BASE + sz])
+    raise KeyError(f"no {type_hash:04X} entry {name:04X}")
+
+
+def recolor_stage_palette(data, fn, banks=range(16)):
+    """A stage palette with fn((r, g, b) 0-255, bank) -> (r, g, b) applied to
+    the colors of `banks` (index 0 and the unused cyan entries kept)."""
+    out = bytearray(data)
+    for bank in banks:
+        for i in range(1, 16):
+            o = 20 + 2 * (bank * 16 + i)
+            c = struct.unpack_from("<H", out, o)[0]
+            rgb = ((c & 31) << 3, (c >> 5 & 31) << 3, (c >> 10 & 31) << 3)
+            if rgb == (0, 248, 248):
+                continue
+            r, g, b = fn(rgb, bank)
+            struct.pack_into("<H", out, o, (r >> 3) | (g >> 3) << 5 | (b >> 3) << 10)
+    return bytes(out)

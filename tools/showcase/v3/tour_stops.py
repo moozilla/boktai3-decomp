@@ -154,16 +154,16 @@ def map_terrain(t):
 
 
 TOOLS = gcard("The <b>tools</b> behind it", [
-    ("agbcc, opened up", "pret's GBA compiler with its register allocator instrumented: solve the allocation, then name the C change that produces it."),
-    ("A permuter", "Searches C variations against the compiler for the functions that resist by hand."),
-    ("relatives.py", "Finds matched functions that share long runs with an unmatched one, and ports their C."),
+    ("agbcc, built for agents", "pret's GBA compiler, instrumented to explain its register allocation, so an agent can see which C change gives the right registers."),
+    ("A faster permuter", "decomp-permuter reworked to search faster and waste less, so agents can run it on every stubborn function."),
+    ("Centaur", "Our mGBA fork with a Lua harness that humans and agents share, talking to the Studio in real time: warps, captures, story state, live edits."),
     ("A headless harness", "Plays the game from scripts, records coverage and video. Every byte of data can move and the game still plays."),
-    ("Centaur", "mGBA linked to the Studio: subtitles, warps, captures, story state, live edits."),
-    ("A GCL assembler", "Writes Konami's scripting language back into the ROM. Every scene in this video is one."),
+    ("A GCL assembler", "Writes Konami's scripting language back into the ROM, byte for byte. Every scene in this video is one."),
+    ("Dozens of Python tools", "Pointers, relocations, assets, coverage, ROM maps: the tooling that keeps every byte accounted for."),
 ])
 
 CLOSING = gcard("Boktai 3, <b>decompiled</b>", [
-    ("31% of the code", "C that compiles back to the exact original bytes, and climbing."),
+    ("31% matching C", "C that compiles back to the exact original bytes, and growing. Contributions welcome!"),
     ("Every script and cutscene", "Decoded, readable, and writable."),
     ("Every room and object", "Mapped, linked, and editable in the Studio."),
     ("All you need is the ROM", "The decomp and the Studio are open source."),
@@ -171,22 +171,24 @@ CLOSING = gcard("Boktai 3, <b>decompiled</b>", [
 
 
 STOPS = [
-    card(gcard("How it was <b>done</b>", text="Everything you just saw was written into the game by reading it first. "
-                                              "This is where the reading happens: the Boktai 3 Studio, in your browser.")),
+    card(gcard("How it was <b>done</b>", text="We decompiled Boktai 3: its C code, its script engine, its cutscene "
+                                              "director and every asset it loads. Then we built the Boktai 3 Studio to "
+                                              "explore all of it, in your browser.")),
     page("/atlas", "Browse", "The whole game, <b>understood</b>",
          ["Not just the code: the story, the cast, every monster, room, cutscene, script, sprite and song, "
           "decoded from the ROM and linked together."], secs=6.0),
     page("/atlas#node:Story", "Browse > Story", "Every <b>beat</b> of the story",
          ["The game keeps its whole plot in one number. We know every value it takes, where it is set, "
           "and which doors it opens."], secs=6.5),
-    page("/atlas#cut:0", "Browse > Cutscenes", "Cutscenes are <b>data</b>",
-         ["Every camera move, line and sound is a table played by a tiny director we decompiled.",
-          "So we wrote our own. Every scene in this video is one."],
+    page("/atlas#cut:0", "Browse > Cutscenes", "We decompiled the <b>cutscene engine</b>",
+         ["Every camera move, line and sound is a table played by a small director in the game's code.",
+          "Every scene you saw in this video ran in the actual game."],
          actions=lambda t: (t.hold(2.5), scroll_by(t, 420, hold=3.5))),
-    page("/scripts#file=scene_6554", "Scripts", "The code <b>inside</b> the code",
-         ["Boktai 3's scenes are written in GCL, the scripting language Konami built for Metal Gear Solid, "
-          "running on its own virtual machine.",
-          "We decompiled the machine, then its bytecode, back into readable scripts."],
+    page("/scripts#file=scene_6554", "Scripts", "A second language, <b>reverse engineered</b>",
+         ["The game's story isn't in its C code. It's in GCL, the scripting language Konami built for "
+          "Metal Gear Solid, compiled to bytecode for its own virtual machine.",
+          "So on top of decompiling the game, we decoded GCL itself: the machine, the bytecode, and an "
+          "assembler that writes it back byte for byte."],
          actions=lambda t: (t.hold(3.5), scroll_by(t, 500, secs=2.0, hold=4.0))),
     page("/atlas#char:9820", "Browse > Cast", "Every character, <b>every line</b>",
          ["Portraits from the game's own speaker table, and everything each character says, "
@@ -220,8 +222,8 @@ STOPS = [
     page("/rom", "ROM", "The whole ROM, <b>mapped</b>",
          ["Every byte: what it is, and how well we understand it."],
          actions=lambda t: (t.hold(2.0), hover_path(t, [(120, 300), (300, 420), (520, 380), (760, 450), (1000, 300)], 5.0))),
-    page("/code#0805592C", "Code", "<b>31%</b> matching C",
-         ["C that compiles back to the exact original bytes.",
+    page("/code#0805592C", "Code", "<b>31%</b> matching C, and growing",
+         ["C that compiles back to the exact original bytes. Contributions welcome!",
           "This function adds a keyframe sprite: everything the stranger did on screen went through it."],
          secs=7.0),
 ]
@@ -243,8 +245,9 @@ def live(t, k, n, still=False):
     here = os.path.dirname(os.path.abspath(__file__))
     root = os.path.dirname(os.path.dirname(os.path.dirname(here)))
     out = os.path.join(root, "build", "showcase", "v3", "live")
-    t.caption("Text, Sprite palettes, Live", "Change the game <b>while it runs</b>",
-              ["Supply the ROM, open the Studio, and edit anything. A linked emulator gets the change instantly."],
+    t.caption("Text, Live", "Change the game <b>while it runs</b>",
+              ["Edit a line of dialogue in the Studio and save it: the running game on the right shows the new line "
+               "at once."],
               k, n, "/live")
     t.top("document.getElementById('gamebox').style.height = '336px'; 1")
     r = t.top("(function(){ var b = document.getElementById('gamebox').getBoundingClientRect(); "
@@ -298,6 +301,10 @@ def live(t, k, n, still=False):
     until(lambda: os.path.exists(os.path.join(out, "c_00699.png")))
     t.hold(9.0, step=1 / 4)
     t.go("/gfx#pool/42")
+    t.caption("Sprite palettes, Live", "Recolor a sprite <b>live</b>",
+              ["This is Django's palette. Change a color and his scarf changes in the running game: "
+               "blue, then Claude's orange."],
+              k, n, "/live")
     t.hold(2.5)
     edits = [(15, "#2878f8"), (14, "#183898"), (15, "#e0745a"), (14, "#a04020")]
     t.meta["live_pool"] = []
