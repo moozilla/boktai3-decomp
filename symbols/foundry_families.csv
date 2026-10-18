@@ -1261,3 +1261,4 @@ addr,function,name,family,note
 082069A8,sub_082069A8,VulcanCannon_FireProjectile,"VulcanCannon","creates a projectile ahead of the cannon"
 08206AB8,sub_08206AB8,VulcanCannon_HasClearShot,"VulcanCannon","checks terrain clearance along the path to the player"
 082095B8,sub_082095B8,FanCannon_IsPathToPlayerClear,"Fan cannon (tentative)","tests sampled terrain heights along the path toward the player"
+08209A38,sub_08209A38,CombatActor_UpdateDefeatEffect,"CombatActor","emits a defeat effect and records defeat at timer one"
