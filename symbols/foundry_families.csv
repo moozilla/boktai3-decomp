@@ -523,3 +523,4 @@ addr,function,name,family,note
 081768AC,sub_081768AC,SceneDialog_UpdateEntryFade,"SceneDialog","updates a sixteen-tick fade and enters the next phase"
 08176928,sub_08176928,Hud_UpdateBlendRamp,"HudManager","advances blend ramp and changes phase after sixteen ticks"
 08176974,sub_08176974,SceneHud_UpdatePageInput,"SceneHud","updates page selection from shoulder buttons"
+08176B00,sub_08176B00,SceneHud_FadeOutPage,"SceneHud","fades out the page and switches menu handlers"
