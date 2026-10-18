@@ -1114,3 +1114,4 @@ addr,function,name,family,note
 081CDFFC,sub_081CDFFC,SceneNpc_UpdateCommands,"scene NPC","updates movement and animation then dispatches commands and clears command phase"
 081CE0E4,sub_081CE0E4,SceneNpc_SetKindMotionVector,"scene NPC","sets the motion vector at offset ninety according to NPC kind and variant"
 081CEA10,sub_081CEA10,SceneNpc_EnterTriggeredMode,"scene NPC","consumes entry trigger and switches to mode ten when pending"
+081CF84C,sub_081CF84C,SceneNpc_PlayAnimation12,"StateActor","plays animation 12 until callback completes"
