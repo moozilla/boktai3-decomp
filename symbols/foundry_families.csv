@@ -1147,3 +1147,4 @@ addr,function,name,family,note
 081DC208,sub_081DC208,PairedFlags_SelectActive,"Screen task paired flags","toggle two flag bits according to selection"
 081DCF20,sub_081DCF20,TextEntry_CopyInitialName,"Text entry screen","copy at most eleven initial-name bytes and terminate"
 081DCF84,sub_081DCF84,TextEntry_DrawName,"Text entry screen","draw five character slots with empty-slot placeholders"
+081DE5E4,sub_081DE5E4,MenuSprites_SetFlagBits,"Menu sprite flags","set bit zero in sixteen menu sprite flag words"
