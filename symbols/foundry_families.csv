@@ -419,3 +419,4 @@ addr,function,name,family,note
 0816B3D4,sub_0816B3D4,SceneInput_ReadRepeatingDirections,"SceneInputRepeat","returns new direction presses or held keys every ten ticks"
 0816B6B4,sub_0816B6B4,SceneSequence_GetSelectedMessage,"SceneSequence","looks up the selected entry message through group and selection tables"
 0816B7EC,sub_0816B7EC,Script_GetSelectedStateSlot,"Script state-slot access","reads a script-selected or default state-table slot"
+0816BA90,sub_0816BA90,MapMenu_InitializePageBounds,"MapMenu","resets scrolling and initializes page bounds in pixels"
