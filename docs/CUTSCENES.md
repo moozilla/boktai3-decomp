@@ -121,10 +121,10 @@ only say which motion plays (low confidence).
 | 5, 6 | stand_v2, stand_v3 | dir | motion 0, variants 2 and 3 |
 | 7 | walk_to | x, y, z | motion 1 to a point |
 | 8, 9, 10 | motion7_front, motion7, motion7_end | | motion 7 facing 4 / 0, then variant 3 |
-| 11–14 | kneel, kneel_down, kneel_gasp, get_up | dir | motion 0x15 variants 0–3 (Sabata wounded in 3, Django waking in 5); 13 plays sound 0xC6 |
+| 11–14 | kneel, kneel_down, kneel_gasp, get_up | dir | motion 0x15 variants 0–3 (Sabata wounded in 3, Django waking in 5); 13 plays sound 0xC6. Sent to Django (`F5EB`) in a field scene they draw him in a pale blue palette |
 | 15 | move_to | | motion 6 to a point |
 | 16, 19 | motion29, motion29b | dir, n | motion 0x1D, diagonal facing |
-| 17, 18 | motion30, motion30_end | dir, n, b | motion 0x1E; 18 moves variant 5 to 4 |
+| 17, 18 | knockback, knockback_end | dir, n, b | motion 0x1E: thrown back (n and b push him further) and flat on the floor for about 70 frames, then up on his own; 18 stands him up at once, back where he was hit (showcase v3, `proofs.kneel`) |
 | 20, 21, 22 | motion7_turn, motion7_v7, motion7_v3 | dir | motion 7 |
 | 23–26 | aim, shoot, aim_hold, aim_end | dir / dir, n | motion 3; 24 spawns effect 0x4B 150 ahead and 230 up with sound 0xCD (guess: the gun) |
 | 27 | face_side | on | direction 5 (mirrored) or 3 |
@@ -136,7 +136,7 @@ only say which motion plays (low confidence).
 | 35–38 | windblown, _v2–_v4 | side / dir | motion 0 with update `sub_0814FAE8`: the scarf blowing in the wind |
 | 39, 40 | stand_diagonal, stand_diagonal_b | dir | motion 0, diagonal facing |
 | 41, 42 | motion17, motion17_v2 | | motion 0x11, facing 1 |
-| 43 | shake_effect | | random offset, `sub_082315A8`, sound 0x191/0x133 |
+| 43 | freeze | | random offset, `sub_082315A8`, sound 0x191/0x133: he turns pale blue and stays that way, and later motions misbehave (seen in a field scene) |
 | 44 | refresh | | `sub_0813D4E0` |
 | 45, 46 | flag_5a1_on/off | | `+0x5A1` |
 | 47–50 | overlay_on, overlay_set, overlay_off | n | `+0xAE4`/`+0xAD6` |
