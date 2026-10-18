@@ -610,3 +610,4 @@ addr,function,name,family,note
 0810E30C,sub_0810E30C,SelectionPanel_RunCancelScript,"SelectionPanel","clears display and runs alternate script without selection arguments"
 0810E3A0,sub_0810E3A0,SelectionPanel_UpdateConfirmTransition,"SelectionPanel","updates a thirty-two-frame confirmation transition"
 0810E450,sub_0810E450,SelectionPanel_UpdateCancelTransition,"SelectionPanel","updates a thirty-two-frame cancellation transition"
+0810E660,sub_0810E660,SceneTask_UpdateConditionalCallback,"Scene callback tasks","kills an inactive scene task under flag 0x800, otherwise invokes its callback"
