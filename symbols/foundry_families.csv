@@ -1391,3 +1391,4 @@ addr,function,name,family,note
 0823C054,sub_0823C054,Player_EmitPositionEffect,"Player","emits positional effect with optional player feedback and song"
 0823D00C,sub_0823D00C,Player_SetActionOrigin,"Player","copies position and applies facing-dependent action offsets"
 0823D714,sub_0823D714,Player_SaveActionIndex,"Player","snapshots optional action index and sets one-based variant"
+0823DDE4,sub_0823DDE4,SceneVec_OffsetPolar,"SceneVec","offsets X and Z by a scaled sine/cosine pair"
