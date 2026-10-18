@@ -1,22 +1,22 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 extern u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
 void AnimatedParticles_EmitBurst(void *, int, int, int, int, int, int, int);
 void SceneActors_SpawnAmbientParticle(u8 *p)
 {
+    s32 k2;
     struct {
         s16 x, y, z;
     } position;
-    register int r asm("r3");
-    register int cursor asm("r1");
+    int r;
+    int cursor;
     u16 *table = gUnk_0203B400;
-    cursor = gUnk_03005308 + 1;
+    *(&cursor) = gUnk_03005308 + 1;
     {
         int mask = 0x3ff;
         cursor &= 0x3ff;
     }
-    r = table[cursor] & 0x7f;
+    r = table[cursor] & (k2 = 0x7f);
     position.x = *(s16 *)(p + 0x54) + r;
     cursor = (cursor + 1) & 0x3ff;
     gUnk_03005308 = cursor;
@@ -25,8 +25,7 @@ void SceneActors_SpawnAmbientParticle(u8 *p)
         u16 *y = (u16 *)(p + 0x56);
         cursor &= 0x1f;
         {
-            register int height asm("r4") = *y;
-            asm("" : "+r"(height));
+            int height = *y;
             cursor += height;
         }
         position.y = cursor;
