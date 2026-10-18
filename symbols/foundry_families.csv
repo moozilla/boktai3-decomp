@@ -89,3 +89,4 @@ addr,function,name,family,note
 080C4CFC,sub_080C4CFC,SceneActorRoute_CommitReachableDestination,"SceneActorRoute","copies a reachable route destination into actor context"
 080C4DBC,sub_080C4DBC,SceneActorRoute_SetReachableDestination,"SceneActorRoute","sets a reachable explicit destination and context flag"
 080C4E8C,sub_080C4E8C,Skeleton_TryTriggerAction,"Skeleton","gates a call to sub_080C4CFC on a linked object's busy flag, own flags, player status, and a countdown field"
+080C5170,sub_080C5170,SceneActor_AccelerateForTerrain,"actor motion","increases motion speed toward a terrain-dependent limit"
