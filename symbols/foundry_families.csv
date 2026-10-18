@@ -974,3 +974,4 @@ addr,function,name,family,note
 0819AC1C,sub_0819AC1C,SceneOrbitHazard_UpdateTravel,"Scene orbit hazard (tentative)","aims and advances the orbit center toward a target"
 0819AD18,sub_0819AD18,SceneEffect_UpdateMovingState,"SceneEffectMoving (tentative)","dispatches animated movement states and advances frame counter"
 0819AD94,sub_0819AD94,SceneEffect_CreateMovingTask,"SceneEffectMoving (tentative)","allocates a moving effect task with resource and origin"
+0819B9E4,sub_0819B9E4,Hresvelgr_HasCellOverride,"Hresvelgr","tests current and side-selected neighboring terrain overrides"
