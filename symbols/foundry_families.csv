@@ -736,3 +736,4 @@ addr,function,name,family,note
 0815F224,sub_0815F224,Player_Destroy,"Player","removes player components and clears player globals"
 0815FAF4,sub_0815FAF4,PlayerOrbitEffect_UpdateIntro,"PlayerOrbitEffect","starts sounds, eases height toward player, and changes phase after sixty ticks"
 0815FEB0,sub_0815FEB0,PlayerTransition_StepReveal,"PlayerTransition","plays reveal animation and restores player state"
+081602D0,sub_081602D0,PlayerStatEffect_Initialize,"PlayerStatEffect","initializes an effect with a half-stat target and decrement step"
