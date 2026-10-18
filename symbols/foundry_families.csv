@@ -527,3 +527,4 @@ addr,function,name,family,note
 08176EA0,sub_08176EA0,Hud_BeginSavedBlend,"HudManager","saves display blend state and starts a transition phase"
 08176F20,sub_08176F20,Hud_RemoveMenuGraphics,"HudManager","removes animation array and four additional graphics objects"
 08177C00,sub_08177C00,SceneHud_ReadScriptOptions,"SceneHud","stores HUD script pointers and a numeric option"
+08177C9C,sub_08177C9C,SceneHud_ReadPageVisibility,"SceneHud","reads page visibility and selects an enabled page"
