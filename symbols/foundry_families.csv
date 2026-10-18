@@ -1153,3 +1153,4 @@ addr,function,name,family,note
 081DF124,sub_081DF124,AnimPanel_LoadSelections,"animation panel (tentative)","restores entry values and selections from saved bytes"
 081DF160,sub_081DF160,AnimPanel_ResetSelections,"animation panel (tentative)","fills entries with 0x41 and clears both selections"
 081DF1A0,sub_081DF1A0,AnimPanel_JoinTextRows,"animation panel text (tentative)","concatenates four bounded 256-byte text rows"
+081DFC1C,sub_081DFC1C,AnimPanel_AppendSelection,"animation panel (tentative)","stores selected value and advances the entry cursor unless full"
