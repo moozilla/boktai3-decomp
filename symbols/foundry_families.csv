@@ -173,3 +173,4 @@ addr,function,name,family,note
 08108244,sub_08108244,Tile_SetEnabledFromScript,"Tile / Pool1B8","sets a named tile's enabled flag from script keywords"
 081082DC,sub_081082DC,TileTrigger_SetStateFromScript,"TileTrigger","sets a named tile state from script keywords"
 08108360,sub_08108360,TileTrigger_TickManager,"TileTrigger","dispatches active tile state callbacks"
+0810853C,sub_0810853C,Pool1BC_FindByName,"NamedEntry / Pool1BC","finds an occupied named entry in the three-slot pool"
