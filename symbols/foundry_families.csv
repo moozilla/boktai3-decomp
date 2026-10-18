@@ -1281,3 +1281,4 @@ addr,function,name,family,note
 082123E0,sub_082123E0,SceneGrid_IsCellBeforeLimit,"Scene selection grid","tests a six-column three-row cell against a selection-dependent table limit"
 08212D84,sub_08212D84,ForgingBook_InitializeFromScript,"Forging book","initializes book entries, script text, sprites and opening transition"
 08213010,sub_08213010,Lookup_FindValueIndex,"lookup tables","finds a value in a ten-entry lookup table"
+0821304C,sub_0821304C,CollectionBook_RefreshCollectedEntryVisibility,"Collection book (tentative)","refreshes display flags for collected entries"
