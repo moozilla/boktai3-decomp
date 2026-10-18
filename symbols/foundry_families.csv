@@ -750,3 +750,4 @@ addr,function,name,family,note
 081660D0,sub_081660D0,SceneHud_SetPairedIcons,"Scene HUD","sets two icon keyframes or hides each when its selector is negative"
 08166B14,sub_08166B14,MenuEntries_CountAvailable,"MenuEntries","counts available entries in one of three categories"
 08166B7C,sub_08166B7C,MenuDisplay_UpdateActionPrompt,"MenuDisplay","selects an action prompt from menu selection and inventory state"
+08166D74,sub_08166D74,InventoryPanel_CreateEntry,"InventoryPanel","creates a panel entry from an inventory slot or item index"
