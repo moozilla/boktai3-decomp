@@ -1,4 +1,3 @@
-#define SceneActorReaction_SetProfileEntries sub_080B7580
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_profile.h"
@@ -7,7 +6,7 @@ static inline void SetEntry(u32 value, struct SceneActorProfileEntry *p)
     p->value = value;
     p->flags = value >> 8;
 }
-void sub_080B7580(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_SetProfileEntries(struct SceneActorRegistryResetView *actor)
 {
     s32 category = actor->category;
     struct SceneActorProfileEntry *entry =

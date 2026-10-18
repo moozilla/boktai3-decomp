@@ -2,9 +2,8 @@
 #include "scene_actor_registry.h"
 #include "scene_actor_script.h"
 
-#define SceneActorScript_TriggerCallOnCount sub_080B8B38
 
-void sub_080B8B38(struct SceneActorRegistryActor *actor)
+void SceneActorScript_TriggerCallOnCount(struct SceneActorRegistryActor *actor)
 {
     s32 zero = 0;
     struct SceneActorScriptPropertiesView *context = actor->context;

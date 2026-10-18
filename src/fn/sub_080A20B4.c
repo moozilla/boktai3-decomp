@@ -1,4 +1,3 @@
-#define SceneActorContact_ApplyWithinBounds sub_080A20B4
 #include "global.h"
 #include "scene_actor_behavior.h"
 void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactView *,
@@ -23,7 +22,7 @@ static inline u32 TestFlag(struct SceneActorBehaviorContactView *s, u32 mask)
 {
     return s->flags & mask;
 }
-void sub_080A20B4(struct SceneActorBehaviorContactView *source,
+void SceneActorContact_ApplyWithinBounds(struct SceneActorBehaviorContactView *source,
                   struct SceneActorBehaviorContactView *destination,
                   struct SceneActorBehaviorView *actor)
 {

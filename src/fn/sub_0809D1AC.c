@@ -1,13 +1,11 @@
-#define RouteActor_UpdateRandomDestination sub_0809D1AC
 #define RouteCursor_SelectRandomPoint Lun_SelectRandomRouteEntry
 #define RouteActor_SetDestination Lun_BeginMoveToPosition
-#define RouteActor_ClearDestinationRequest sub_0809D16C
 #include "global.h"
 #include "scene_actor_route.h"
 #include "scene_actor_terrain.h"
 void Lun_SelectRandomRouteEntry(struct SceneActorRouteCursor *);
 void Lun_BeginMoveToPosition(u8 *, s16 *);
-void sub_0809D16C(u8 *);
+void SceneActorControl_ResetTargetFlags(u8 *);
 struct RouteActorDestinationState {
     u8 unknown0[0x42C];
     struct SceneActorRouteCursor route;
@@ -19,7 +17,7 @@ static inline u16 TestFlag(struct SceneActorRegistryActor *p, u32 mask)
     mask &= p->flags2D4;
     return mask;
 }
-void sub_0809D1AC(struct SceneActorRegistryActor *actor)
+void RouteActor_UpdateRandomDestination(struct SceneActorRegistryActor *actor)
 {
     struct RouteActorDestinationState *state = actor->context;
     if (!TestFlag(actor, 0x100)) {
@@ -56,6 +54,6 @@ void sub_0809D1AC(struct SceneActorRegistryActor *actor)
         }
         p->y = height;
         Lun_BeginMoveToPosition((u8 *)actor, (s16 *)&target);
-        sub_0809D16C((u8 *)actor);
+        SceneActorControl_ResetTargetFlags((u8 *)actor);
     }
 }

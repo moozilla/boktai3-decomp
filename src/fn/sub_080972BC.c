@@ -1,4 +1,3 @@
-#define SceneActor_BeginLinkedIdleReaction sub_080972BC
 #include "global.h"
 #include "scene_actor_reset.h"
 extern u8 *gUnk_02000580;
@@ -43,7 +42,7 @@ static inline u8 LinkedFlag(struct LinkedReactionContext *p)
         return 1;
     return 0;
 }
-void sub_080972BC(struct SceneActorRegistryResetView *s)
+void SceneActor_BeginLinkedIdleReaction(struct SceneActorRegistryResetView *s)
 {
     if (!Blocked(s) && LinkedFlag(s->context)) {
         u32 three = 3;

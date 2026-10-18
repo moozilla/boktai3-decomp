@@ -1,9 +1,8 @@
-#define SceneActorReaction_TickContactAnimation sub_080BA010
 /* Tentative reaction name, based on the observed fields and calls. */
 #include "global.h"
 #include "scene_actor_reaction.h"
-void sub_080BA0EC(void);
-void sub_080BA010(struct SceneActorRegistryResetView *p)
+void SceneActorReaction_ApplyThreshold(void);
+void SceneActorReaction_TickContactAnimation(struct SceneActorRegistryResetView *p)
 {
     u8 *state = p->context;
     u16 *animation = (u16 *)((u8 *)p->drawable + 0x20);
@@ -21,7 +20,7 @@ void sub_080BA010(struct SceneActorRegistryResetView *p)
             Sound_PlaySong(0x3AA);
     }
     if (p->field2B3) {
-        void (*f)(void) = sub_080BA0EC;
+        void (*f)(void) = SceneActorReaction_ApplyThreshold;
         u32 k = 0x3e;
         u32 z;
         u8 *a = &p->field2B2;

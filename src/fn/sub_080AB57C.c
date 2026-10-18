@@ -1,8 +1,7 @@
-#define SceneActor_ResetQueuedState sub_080AB57C
 #include "global.h"
 void SceneActorControl_OnIdle(void);
 #include "scene_actor_reset.h"
-void sub_080AB57C(struct SceneActorRegistryResetView *s)
+void SceneActor_ResetQueuedState(struct SceneActorRegistryResetView *s)
 {
     u32 two = 2;
     u32 zero;

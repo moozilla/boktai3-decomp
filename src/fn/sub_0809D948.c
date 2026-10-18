@@ -1,4 +1,3 @@
-#define RouteActor_UpdatePlayerDestinationPhase sub_0809D948
 #define RouteActor_SetDestination Lun_BeginMoveToPosition
 #define gPlayerSlots                            gUnk_02000580
 #include "global.h"
@@ -23,7 +22,7 @@ static inline u16 SetFlag(struct SceneActorRegistryResetView *actor, u32 mask)
     u16 *flags = &actor->flags2D4;
     return *flags = mask | *flags;
 }
-void sub_0809D948(struct SceneActorRegistryResetView *actor)
+void RouteActor_UpdatePlayerDestinationPhase(struct SceneActorRegistryResetView *actor)
 {
     if (TakeFlag(&actor->field2B1)) {
         struct RouteActorDestinationState *state = actor->context;

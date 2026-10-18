@@ -1,6 +1,5 @@
 #include "global.h"
 /* Tentative family name: owner of the active child-record group. */
-#define ChildGroup_ProcessEvent sub_080F3728
 struct ChildGroupPosition {
     u32 x, y;
 };
@@ -46,7 +45,7 @@ static inline void SetState(struct ChildGroup *p, u8 one, u8 id)
     p->state93 = id;
     p->flags |= one;
 }
-s32 sub_080F3728(struct ChildGroupEvent *event, s32 kind, s32 damage)
+s32 ChildGroup_ProcessEvent(struct ChildGroupEvent *event, s32 kind, s32 damage)
 {
     struct ChildGroup *p = event->owner;
     if (!p || p->health <= 0)

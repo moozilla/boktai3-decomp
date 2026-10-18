@@ -1,4 +1,3 @@
-#define SceneActorReaction_TickQueuedContact sub_080BA13C
 /* Tentative reaction name, based on the observed fields and calls. */
 #include "global.h"
 #include "scene_actor_reaction.h"
@@ -10,7 +9,7 @@ static inline u8 Test(u32 value, u32 mask)
         return 1;
     return 0;
 }
-void sub_080BA13C(struct SceneActorRegistryResetView *p)
+void SceneActorReaction_TickQueuedContact(struct SceneActorRegistryResetView *p)
 {
     u8 *state = p->context;
     u16 *animation = (u16 *)((u8 *)p->drawable + 0x20);

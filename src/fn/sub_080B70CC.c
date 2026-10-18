@@ -1,4 +1,3 @@
-#define SceneActorReaction_SelectTileParameter     sub_080B70CC
 #define gSceneActorReactionCategory7TileParameters gUnk_08606078
 #define gSceneActorReactionDefaultTileParameters   gUnk_08606058
 #include "global.h"
@@ -9,7 +8,7 @@ static inline void SetTileFlag(struct SceneActorRegistryResetView *p, u32 mask)
 {
     p->flags2D0 |= mask;
 }
-u16 sub_080B70CC(struct SceneActorRegistryResetView *actor)
+u16 SceneActorReaction_SelectTileParameter(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorRegistryTileDrawable *drawable = actor->drawable;
     u16 *tile = (u16 *)((u8 *)drawable + 0x20);

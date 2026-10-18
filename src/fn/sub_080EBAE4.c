@@ -1,4 +1,3 @@
-#define SceneActorReaction_ReturnToIdle sub_080EBAE4
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_control_phase.h"
@@ -40,7 +39,7 @@ static inline void ResetState(struct SceneActorRegistryResetView *actor)
         *((u8 *)actor + offset) = one;
     }
 }
-void sub_080EBAE4(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_ReturnToIdle(struct SceneActorRegistryResetView *actor)
 {
     TakeReset(actor);
     if (actor->field2B0) {

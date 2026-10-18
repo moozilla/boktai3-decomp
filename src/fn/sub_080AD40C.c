@@ -1,5 +1,3 @@
-#define SceneActorReaction_ResumeSavedTarget sub_080AD40C
-#define SceneActor_SetPositionXZ             sub_0812E058
 #include "global.h"
 #include "scene_actor_reaction.h"
 struct SceneActorReactionContext {
@@ -12,7 +10,7 @@ struct SceneActorReactionRoutePoint {
     u8 unknown1E[2];
     s16 z;
 };
-void sub_0812E058(void *, s32, s32);
+void SceneActor_SetPositionXZ(void *, s32, s32);
 static inline u32 Reaction_MaskFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
     return actor->flags2D4 & mask;
@@ -32,7 +30,7 @@ static inline void Reaction_SetControl(struct SceneActorRegistryResetView *actor
     }
     actor->word104 = 0;
 }
-void sub_080AD40C(struct SceneActorRegistryResetView *actor, s32 frame)
+void SceneActorReaction_ResumeSavedTarget(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     struct SceneActorReactionContext *context = actor->context;
     struct SceneActorRegistryControlGroup *group = &actor->group;
@@ -51,7 +49,7 @@ void sub_080AD40C(struct SceneActorRegistryResetView *actor, s32 frame)
         blocked = Reaction_MaskFlags(actor, 128);
         if (!blocked) {
             void *target;
-            sub_0812E058(&actor->id,
+            SceneActor_SetPositionXZ(&actor->id,
                          (*(struct SceneActorReactionRoutePoint **)((u8 *)group + 0x1FC))->x,
                          (*(struct SceneActorReactionRoutePoint **)((u8 *)group + 0x1FC))->z);
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);

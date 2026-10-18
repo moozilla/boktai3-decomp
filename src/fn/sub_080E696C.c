@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_actor_reset.h"
-#define SceneActor_UpdateAlternateEntryPhase sub_080E696C
 s32 sub_0824923C(void *, void *);
 static inline u8 TakeEntry(u8 *flag)
 {
@@ -10,7 +9,7 @@ static inline u8 TakeEntry(u8 *flag)
     }
     return 0;
 }
-void sub_080E696C(struct SceneActorRegistryResetView *actor)
+void SceneActor_UpdateAlternateEntryPhase(struct SceneActorRegistryResetView *actor)
 {
     if (TakeEntry(&actor->field2B1)) {
         void *target = actor->entryTarget228;

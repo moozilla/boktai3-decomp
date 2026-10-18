@@ -1,7 +1,6 @@
 #include "global.h"
-#define ResultGame_SetUpdateCallback sub_0801C69C
 
-void sub_0801C69C(u8 *p, void *fn)
+void ResultGame_SetUpdateCallback(u8 *p, void *fn)
 {
     u8 *a;
     u32 zero;

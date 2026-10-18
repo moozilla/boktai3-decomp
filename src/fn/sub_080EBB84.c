@@ -1,4 +1,3 @@
-#define SceneActorReaction_BeginHiddenCollisionless sub_080EBB84
 #include "global.h"
 #include "scene_actor_reaction.h"
 struct SceneActorTerrainCollisionView;
@@ -26,7 +25,7 @@ static inline void ResetState(struct SceneActorRegistryResetView *actor, u32 sta
     *(u32 *)((u8 *)actor + offset) = zero;
     actor->field2B1 = 1;
 }
-void sub_080EBB84(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_BeginHiddenCollisionless(struct SceneActorRegistryResetView *actor)
 {
     if (TakeReset(actor)) {
         u32 mask = 1;

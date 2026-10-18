@@ -1,4 +1,3 @@
-#define SceneActor_UpdateDirectionalAnimation sub_080D0EBC
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
@@ -7,7 +6,7 @@ void sub_080DDD28(struct SceneActorRegistryResetView *);
 s32 Math_Atan2(s32, s32);
 static inline u8 TakeFlag(u8 *flag) { if (*flag) { *flag = 0; return 1; } return 0; }
 static inline u32 ReadFlags(struct SceneActorRegistryResetView *actor, u32 mask) { return actor->flags2D0 & mask; }
-void sub_080D0EBC(struct SceneActorRegistryResetView *actor)
+void SceneActor_UpdateDirectionalAnimation(struct SceneActorRegistryResetView *actor)
 {
     u8 *direction = (u8 *)actor + 0x50;
     struct SceneActorDirectionalSequence *sequence = (void *)((u8 *)actor->drawable + 0x48);

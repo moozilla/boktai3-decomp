@@ -1,9 +1,8 @@
-#define SceneActorReaction_TryStartContact sub_080B9030
 /* Tentative reaction name, based on the observed fields and calls. */
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_script.h"
-void sub_080B5D84(struct SceneActorRegistryResetView *, struct SceneActorScriptPropertiesView *);
+void SceneActorControl_BeginTimedBehavior56(struct SceneActorRegistryResetView *, struct SceneActorScriptPropertiesView *);
 u8 sub_080B5E54(struct SceneActorRegistryResetView *);
 static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input, u32 offset)
 {
@@ -36,7 +35,7 @@ static inline u32 WordFlag(u32 *p, u32 mask)
 {
     return *p & mask;
 }
-void sub_080B9030(u8 *source, u16 *contact, struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_TryStartContact(u8 *source, u16 *contact, struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorScriptPropertiesView *state = actor->context;
     if (IsUnavailable(actor))
@@ -53,7 +52,7 @@ void sub_080B9030(u8 *source, u16 *contact, struct SceneActorRegistryResetView *
         return;
     if (!sub_080B5E54(actor))
         return;
-    sub_080B5D84(actor, state);
+    SceneActorControl_BeginTimedBehavior56(actor, state);
     *((u8 *)state + 0x6D0) = 20;
     actor->field2B6 = actor->fieldE9 + 0x80;
 }

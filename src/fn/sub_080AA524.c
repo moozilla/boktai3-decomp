@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_actor_reset.h"
-#define ActorTrail_RemoveLastSegment sub_080AA524
 struct TrailSegment {
     u8 unknown0[0x1C];
     struct ContactPosition position;
@@ -25,7 +24,7 @@ static inline u8 isUnavailable(struct TrailSegment *segment) {
     return 0;
 }
 static inline void setFlag(struct TrailSegment *segment, u8 mask) { segment->flags |= mask; }
-s32 sub_080AA524(struct SceneActorRegistryResetView *actor) {
+s32 ActorTrail_RemoveLastSegment(struct SceneActorRegistryResetView *actor) {
     struct ActorTrail *trail = actor->context;
     struct TrailSegment *segments = trail->segments;
     s32 i;

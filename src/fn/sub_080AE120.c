@@ -1,4 +1,3 @@
-#define SceneActorReaction_BeginSideStep sub_080AE120
 #include "global.h"
 #include "scene_actor_reaction.h"
 struct SceneActorSideStepContext {
@@ -10,7 +9,7 @@ static inline void SideStep_SetFlags(struct SceneActorReactionMotion *motion, u8
 {
     motion->flags |= mask;
 }
-void sub_080AE120(struct SceneActorRegistryResetView *actor, s32 frame)
+void SceneActorReaction_BeginSideStep(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     struct SceneActorSideStepContext *context = actor->context;
     if (SceneActorReaction_TakePrepared(actor)) {

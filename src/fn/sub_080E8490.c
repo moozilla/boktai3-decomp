@@ -1,4 +1,3 @@
-#define SceneActor_ResetCollisionReaction sub_080E8490
 #include "global.h"
 #include "scene_actor_reaction.h"
 static inline void clearFlag(u32 *flags)
@@ -33,7 +32,7 @@ static inline u32 testFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
     return actor->flags2CC & mask;
 }
-void sub_080E8490(struct SceneActorRegistryResetView *actor)
+void SceneActor_ResetCollisionReaction(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorReactionMotion *motion;
     struct SceneActorRegistryControl *control;

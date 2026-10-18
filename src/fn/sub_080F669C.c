@@ -1,4 +1,3 @@
-#define Sword_UpdateTask       sub_080F669C
 #define Sword_DispatchState Ivy_DispatchState
 #include "global.h"
 struct SwordOwner {
@@ -23,7 +22,7 @@ struct SwordTask {
 void sub_080F645C(struct SwordTask *);
 void Ivy_DispatchState(void *);
 void Sword_UpdateComponents(void *);
-s32 sub_080F669C(struct SwordTask *p)
+s32 Sword_UpdateTask(struct SwordTask *p)
 {
     if (p->owner->flags & 4)
         return 1;

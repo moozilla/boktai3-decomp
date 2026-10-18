@@ -1,9 +1,8 @@
 #include "global.h"
-#define Bat_TickDelayedScript sub_0808B3A0
 
 void Script_Call(u32, void *);
 
-void sub_0808B3A0(u8 *p)
+void Bat_TickDelayedScript(u8 *p)
 {
     s32 k2 = 0; // a zero held in a register from the start (found by tools/autosolve.py)
     u8 *q = *(u8 **)(p + 0x3D0);

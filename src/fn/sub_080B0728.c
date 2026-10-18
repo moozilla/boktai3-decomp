@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 /* Tentative phase-control interpretation; names have low confidence. */
-#define SceneActorPhase_UpdateConditionalMotion sub_080B0728
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
 static inline void SelectControl(struct SceneActorRegistryResetView *p, void *control, u32 kind)
 {
@@ -18,7 +17,7 @@ static inline void SelectControl(struct SceneActorRegistryResetView *p, void *co
     p->word104 = 0;
 }
 u8 sub_080B335C(struct SceneActorRegistryResetView *);
-void sub_080B0728(struct SceneActorRegistryResetView *p)
+void SceneActorPhase_UpdateConditionalMotion(struct SceneActorRegistryResetView *p)
 {
     if (SceneActorControl_TakeFlag(&p->field2B1)) {
         void *control = p->entryTarget224;

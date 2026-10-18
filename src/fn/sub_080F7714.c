@@ -1,4 +1,3 @@
-#define SceneActor_AdvanceOffsetApproach  sub_080F7714
 #define SceneActor_ConfigureTrailSegments Axe_SetAuxiliarySpriteRenderState
 #include "global.h"
 #include "scene_actor_reaction.h"
@@ -13,7 +12,7 @@ struct SceneActorApproachContext {
 void Axe_SetAuxiliarySpriteRenderState(struct SceneActorRegistryResetView *, void *, u32);
 void sub_080FBC84(struct SceneActorRegistryResetView *, struct ContactPosition *, u32);
 void sub_080FC998(struct SceneActorRegistryResetView *);
-void sub_080F7868(struct SceneActorRegistryResetView *);
+void ActorPhase_UpdateTimedFlicker(struct SceneActorRegistryResetView *);
 s32 Div(s32, s32);
 static inline u8 SceneActor_TakeApproachEntry(struct SceneActorRegistryResetView *p)
 {
@@ -46,7 +45,7 @@ static inline void SceneActor_SetApproachControl(struct SceneActorRegistryResetV
     }
     p->word104 = 0;
 }
-void sub_080F7714(struct SceneActorRegistryResetView *p)
+void SceneActor_AdvanceOffsetApproach(struct SceneActorRegistryResetView *p)
 {
     struct SceneActorApproachContext *context = p->context;
     struct ContactPosition difference;
@@ -68,6 +67,6 @@ void sub_080F7714(struct SceneActorRegistryResetView *p)
     current->x += Div(difference.x, context->remaining);
     context->remaining--;
     if (!context->remaining) {
-        SceneActor_SetApproachControl(p, sub_080F7868, 43);
+        SceneActor_SetApproachControl(p, ActorPhase_UpdateTimedFlicker, 43);
     }
 }

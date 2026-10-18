@@ -1,4 +1,3 @@
-#define PhaseObject_BeginEntryMotion sub_080F31AC
 #define PhaseObject_ResetMotion Ivy_InitBobbing
 #include "global.h"
 
@@ -25,7 +24,7 @@ struct PhaseObject {
 void Ivy_InitBobbing(struct PhaseObject *);
 void sub_080F3230(struct PhaseObject *);
 void Sound_PlaySong(u32);
-void sub_080F31AC(struct PhaseObject *p)
+void PhaseObject_BeginEntryMotion(struct PhaseObject *p)
 {
     if (--p->delay == 0) {
         u16 *targetY = &p->targetY;

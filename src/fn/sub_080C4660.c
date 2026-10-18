@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_terrain.h"
-#define SceneActorTerrain_CompareNeighborHeight sub_080C4660
-s32 sub_080C4660(s32 cell, s32 height, s32 direction)
+s32 SceneActorTerrain_CompareNeighborHeight(s32 cell, s32 height, s32 direction)
 {
     s32 slope = -1;
     s32 nextHeight, kind, delta;

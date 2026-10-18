@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_actor_collision.h"
-#define SceneActorCollision_FireSecondaryAttack sub_0809366C
 
 void Collider_SetAttackProperties(void *, u16, u16, u32, u32, u16);
 
@@ -19,7 +18,7 @@ static inline u8 IsUnavailable(struct SceneActorRegistryActor *actor)
     return 0;
 }
 
-void sub_0809366C(struct SceneActorRegistryActor *actor)
+void SceneActorCollision_FireSecondaryAttack(struct SceneActorRegistryActor *actor)
 {
     if (IsUnavailable(actor))
         return;

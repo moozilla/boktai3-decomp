@@ -1,5 +1,4 @@
 #include "global.h"
-#define Bee_ClearActionFlags sub_08097C64
 
 struct Q {
     u8 filler[0x558];
@@ -20,7 +19,7 @@ struct S {
     struct Q *q;
 };
 
-void sub_08097C64(struct S *s)
+void Bee_ClearActionFlags(struct S *s)
 {
     struct Q *q = s->q;
     u16 *hp = &s->h;

@@ -1,4 +1,3 @@
-#define SceneActor_BeginReactionAnimation sub_080E990C
 #include "global.h"
 #include "scene_actor_reaction.h"
 void sub_080E98B4(void);
@@ -23,7 +22,7 @@ static inline void showActor(struct SceneActorRegistryResetView *actor)
         *(u32 *)(drawable + 8) &= mask;
     }
 }
-void sub_080E990C(struct SceneActorRegistryResetView *actor)
+void SceneActor_BeginReactionAnimation(struct SceneActorRegistryResetView *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
         u8 *drawable = actor->drawable;

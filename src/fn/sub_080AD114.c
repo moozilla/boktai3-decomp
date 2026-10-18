@@ -1,4 +1,3 @@
-#define SceneActorReaction_UpdateFacingAttack sub_080AD114
 #define SceneActorContext_RunPendingScript Vorn_RunPendingScript
 #define gSceneActorFacingTarget               gUnk_02000580
 #include "global.h"
@@ -14,7 +13,7 @@ s32 Math_Atan2(s32, s32);
 void Sound_PlaySong(u32);
 void sub_080B23A0(void *, u32);
 void Vorn_RunPendingScript(void *);
-void sub_080AD114(struct SceneActorRegistryResetView *actor, s32 frame)
+void SceneActorReaction_UpdateFacingAttack(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
         if (gUnk_02000580)

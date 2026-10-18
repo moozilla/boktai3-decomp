@@ -1,8 +1,6 @@
-#define ActorContact_UpdateColliderPositions sub_080989FC
-#define ActorContact_TickAuxiliaryTimers     sub_080982E4
 #include "global.h"
 #include "scene_actor_behavior.h"
-void sub_080982E4(struct SceneActorBehaviorView *);
+void ActorContact_TickAuxiliaryTimers(struct SceneActorBehaviorView *);
 u8 SceneActorBehavior_IsNearParticipant(struct SceneActorRegistryActor *);
 void Collider_SetPosition(void *, void *, u32);
 s32 Collider_Refresh(void *);
@@ -10,11 +8,11 @@ static inline u32 ReadControl(u32 mask, u16 *control)
 {
     return *control & mask;
 }
-u32 sub_080989FC(struct SceneActorBehaviorView *a)
+u32 ActorContact_UpdateColliderPositions(struct SceneActorBehaviorView *a)
 {
     u16 *control;
     struct ContactPosition *position;
-    sub_080982E4(a);
+    ActorContact_TickAuxiliaryTimers(a);
     {
         u32 mask = 0x20;
         u32 offset = 0x2D4;

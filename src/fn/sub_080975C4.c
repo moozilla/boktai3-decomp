@@ -1,6 +1,5 @@
 #include "global.h"
-#define Bee_UpdateSway sub_080975C4
-void sub_080975C4(u8 *p)
+void Bee_UpdateSway(u8 *p)
 {
     u8 *q = *(u8 **)(p + 0x3D0);
     s16 *s = (s16 *)(q + 0x5B8);

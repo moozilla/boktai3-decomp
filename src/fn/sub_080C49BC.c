@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_actor_reset.h"
-#define SceneActorControl_RefreshMotionRoute sub_080C49BC
 void sub_080C4EF0(void *);
 void SceneActorControl_OnIdle(void);
 static inline u32 TestFlags(u16 *flags, u32 mask)
@@ -38,7 +37,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->word104 = zero;
 }
-void sub_080C49BC(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_RefreshMotionRoute(struct SceneActorRegistryResetView *actor)
 {
     u32 active = MotionActive((void *)&actor->fieldDC);
     if (active) {

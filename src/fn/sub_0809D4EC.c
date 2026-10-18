@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_control_helpers.h"
 
-#define SceneActorControl_ConsumeLiftFlagPenalty sub_0809D4EC
 
 extern u8 *gUnk_02000580;
 
@@ -19,7 +18,7 @@ static inline u8 LiftFlag(struct SceneActorControlMotionState *state)
     return Test(*(u32 *)((u8 *)state + offset), mask);
 }
 
-void sub_0809D4EC(struct SceneActorRegistryResetView *input)
+void SceneActorControl_ConsumeLiftFlagPenalty(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *actor = input;
     if (!LiftFlag((void *)SceneActorControl_GetMotionState(actor)))

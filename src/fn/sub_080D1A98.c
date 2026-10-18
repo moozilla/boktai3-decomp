@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define SceneActorAnimation_UpdateDirectionalEntry sub_080D1A98
 
 void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorAnimationView *, s32);
 

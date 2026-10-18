@@ -1,4 +1,3 @@
-#define SceneActor_InitLinkedReactionColliders sub_08097690
 #include "global.h"
 #include "scene_actor_reset.h"
 struct SceneActorRegistryActor;
@@ -13,7 +12,7 @@ union LinkedColliderVector {
     struct ContactPackedVector packed;
     struct ContactPosition position;
 };
-void sub_08097690(struct SceneActorRegistryResetView *actor)
+void SceneActor_InitLinkedReactionColliders(struct SceneActorRegistryResetView *actor)
 {
     union LinkedColliderVector size, offset;
     size.packed.x = 16;

@@ -2,7 +2,6 @@
 #include "scene_actor_profile.h"
 #include "scene_actor_palette.h"
 
-#define SceneActor_RefreshLivingCountAndProfile sub_080DE550
 
 void SceneActor_RefreshLivingCountAndProfile(struct SceneActorRegistryActor *actor)
 {

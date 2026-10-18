@@ -1,4 +1,3 @@
-#define SceneActorMotion_UpdateTargetTransition sub_080E2064
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
@@ -35,7 +34,7 @@ static inline void SetPhase(struct SceneActorRegistryResetView *a, u32 phase)
     a->counter2AC = zero;
     a->field2B1 = 1;
 }
-void sub_080E2064(struct SceneActorRegistryResetView *a)
+void SceneActorMotion_UpdateTargetTransition(struct SceneActorRegistryResetView *a)
 {
     u32 *flags;
     struct SceneActorTargetMotionContext *c = a->context;

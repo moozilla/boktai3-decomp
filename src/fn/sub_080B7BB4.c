@@ -2,7 +2,6 @@
 #include "scene_actor_registry.h"
 #include "scene_actor_script.h"
 
-#define SceneActorScript_ReadPParameters sub_080B7BB4
 
 static inline s32 SceneActorScript_GetValue(void)
 {
@@ -11,7 +10,7 @@ static inline s32 SceneActorScript_GetValue(void)
     return 0;
 }
 
-void sub_080B7BB4(struct SceneActorRegistryActor *actor)
+void SceneActorScript_ReadPParameters(struct SceneActorRegistryActor *actor)
 {
     struct SceneActorScriptPropertiesView *context = actor->context;
 

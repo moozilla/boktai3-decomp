@@ -1,4 +1,3 @@
-#define RouteActor_UpdateAnimationSequence sub_0809EEBC
 #include "global.h"
 #include "scene_actor_registry.h"
 #include "scene_actor_animation.h"
@@ -15,7 +14,7 @@ static inline u8 TakeFlag(u8 *p)
     }
     return 0;
 }
-void sub_0809EEBC(struct SceneActorRegistryActor *actor)
+void RouteActor_UpdateAnimationSequence(struct SceneActorRegistryActor *actor)
 {
     struct RouteActorAnimationState *state = actor->context;
     if (TakeFlag(&actor->field2B2)) {

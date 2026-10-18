@@ -1,4 +1,3 @@
-#define ActorBehavior_TickParticipantProgress sub_0809B00C
 #define gPlayerSlots                          gUnk_02000580
 #include "global.h"
 #include "scene_actor_reset.h"
@@ -27,7 +26,7 @@ static inline u8 TakePrepared(struct SceneActorRegistryResetView *a)
     }
     return 0;
 }
-void sub_0809B00C(struct SceneActorRegistryResetView *a)
+void ActorBehavior_TickParticipantProgress(struct SceneActorRegistryResetView *a)
 {
     struct ActorParticipantProgress *s = a->context;
     s32 delta;

@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_actor_reset.h"
-#define ActorTrail_UpdateTimedScale sub_080AB408
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
 struct ActorTrail {
@@ -15,7 +14,7 @@ static inline u8 unavailable(struct SceneActorRegistryResetView *p) {
     if (p && (stateFlag(p, 0x40) || actorFlag(p, 0x20000) || p->health <= 0)) return 1;
     return 0;
 }
-void sub_080AB408(struct SceneActorRegistryResetView *actor) {
+void ActorTrail_UpdateTimedScale(struct SceneActorRegistryResetView *actor) {
     struct ActorTrail *trail;
     if (unavailable(actor)) return;
     trail = actor->context;

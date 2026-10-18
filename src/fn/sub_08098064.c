@@ -1,4 +1,3 @@
-#define SceneActor_InitLinkedSprites sub_08098064
 #include "global.h"
 #include "scene_actor_reset.h"
 void *ScriptProc_Start(u16, u16);
@@ -17,7 +16,7 @@ static inline void ClearElapsed(u8 *animation, u16 value)
 {
     *(u16 *)(animation + 0x30) = value;
 }
-void sub_08098064(struct SceneActorRegistryResetView *actor)
+void SceneActor_InitLinkedSprites(struct SceneActorRegistryResetView *actor)
 {
     struct LinkedReactionVisualContext *state = actor->context;
     u8 *animation = state->visuals[0].animation;

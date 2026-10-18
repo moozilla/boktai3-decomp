@@ -1,4 +1,3 @@
-#define SceneActor_WaitForControlCompletion sub_080D6114
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
@@ -28,7 +27,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->word104 = zero;
 }
-void sub_080D6114(struct SceneActorRegistryResetView *actor)
+void SceneActor_WaitForControlCompletion(struct SceneActorRegistryResetView *actor)
 {
     u8 busy;
     if (TakePrepared(&actor->field2B1)) {

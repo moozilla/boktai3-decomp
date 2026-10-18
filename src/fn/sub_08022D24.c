@@ -1,7 +1,6 @@
 #include "global.h"
-#define SceneActorState_StepTableByte sub_08022D24
 
-void sub_08022D24(u8 *p, u8 *tbl)
+void SceneActorState_StepTableByte(u8 *p, u8 *tbl)
 {
     u16 *cur = (u16 *)(p + 0x3b2);
     u16 old = *cur;

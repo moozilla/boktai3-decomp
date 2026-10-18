@@ -1,4 +1,3 @@
-#define ColorPulse_FinishRedFade sub_080F1F08
 #include "global.h"
 struct ColorPulse {
     u8 pad0[0xcc4];
@@ -19,7 +18,7 @@ static inline u16 color(struct ColorPulse *p)
     return ((u32)p->blue << 10) | ((u32)p->green << 5) | (u32)p->red;
 }
 void Ivy_InitColorTransition(struct ColorPulse *);
-s32 sub_080F1F08(struct ColorPulse *p)
+s32 ColorPulse_FinishRedFade(struct ColorPulse *p)
 {
     s32 result;
     s32 value = Div((u32)p->counter * 16, p->duration);

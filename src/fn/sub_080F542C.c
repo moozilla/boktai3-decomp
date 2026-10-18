@@ -1,4 +1,3 @@
-#define ActorPhase_AccelerateTurn sub_080F542C
 #include "global.h"
 struct PhaseParent { u8 unknown0[0xD80]; u32 flags; };
 struct PhaseActor {
@@ -7,7 +6,7 @@ struct PhaseActor {
  u8 targetAngle, unknown189; s8 direction, turnSteps;
 };
 void Sword_UpdateThrustDelay(void);
-void sub_080F542C(struct PhaseActor *p) {
+void ActorPhase_AccelerateTurn(struct PhaseActor *p) {
  struct PhaseParent *parent = p->parent;
  s32 i;
  for (i = 0; i < p->turnSteps; i++) {

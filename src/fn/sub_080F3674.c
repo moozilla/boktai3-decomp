@@ -1,6 +1,5 @@
 #include "global.h"
 /* Tentative family name: owner of the active child-record group. */
-#define ChildGroup_ReadScriptParameters sub_080F3674
 struct ChildGroup {
     u8 pad0[0xB4C];
     u16 parameterB4C;
@@ -16,7 +15,7 @@ static inline s32 ReadParameter(s32 fallback)
         return Script_GetValue();
     return fallback;
 }
-void sub_080F3674(struct ChildGroup *p)
+void ChildGroup_ReadScriptParameters(struct ChildGroup *p)
 {
     if (Script_SeekToKeyword('P')) {
         p->parameterB4C = ReadParameter(60);

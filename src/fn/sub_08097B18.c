@@ -1,4 +1,3 @@
-#define SceneActor_EndLinkedReaction sub_08097B18
 #include "global.h"
 #include "scene_actor_reset.h"
 extern u8 *gUnk_02000580;
@@ -12,7 +11,7 @@ static inline u8 TestFlags(u32 value, u32 mask)
         return 1;
     return 0;
 }
-void sub_08097B18(struct SceneActorRegistryResetView *actor)
+void SceneActor_EndLinkedReaction(struct SceneActorRegistryResetView *actor)
 {
     struct LinkedReactionContext *state = actor->context;
     {

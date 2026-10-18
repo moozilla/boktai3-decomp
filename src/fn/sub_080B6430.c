@@ -3,9 +3,8 @@
 #include "scene_actor_palette.h"
 #include "scene_actor_profile.h"
 
-#define SceneActor_UpdateProfileForCategory sub_080B6430
 
-void sub_080B6430(struct SceneActorRegistryActor *actor)
+void SceneActor_UpdateProfileForCategory(struct SceneActorRegistryActor *actor)
 {
     s32 category = actor->category;
     s32 count = SceneActorRegistry_CountLivingByCategory(category);

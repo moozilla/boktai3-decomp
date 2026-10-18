@@ -1,4 +1,3 @@
-#define SceneActor_TryLaunchSelectedItem sub_080B0F4C
 #define gPlayers                         gUnk_02000580
 /* Descriptive aliases and object roles are tentative (confidence: low). */
 #include "global.h"
@@ -35,7 +34,7 @@ static inline u8 occupied(struct SceneActorItemLaunch *p)
         return 1;
     return 0;
 }
-s32 sub_080B0F4C(struct SceneActorItemLaunch *p)
+s32 SceneActor_TryLaunchSelectedItem(struct SceneActorItemLaunch *p)
 {
     struct SceneActorItemLaunch *q = p;
     struct PackedItemPosition pos = gUnk_02000580[0]->position;

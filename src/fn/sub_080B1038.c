@@ -1,4 +1,3 @@
-#define SceneActor_UpdateForwardCollider sub_080B1038
 #define gSineTable                       gUnk_086149C4
 /* Descriptive aliases and object roles are tentative (confidence: low). */
 #include "global.h"
@@ -29,7 +28,7 @@ static inline s32 scaled(s32 x)
         return x >> 12;
     return -(-x >> 12);
 }
-void sub_080B1038(struct SceneActorRegistryResetView *p)
+void SceneActor_UpdateForwardCollider(struct SceneActorRegistryResetView *p)
 {
     struct SceneActorForwardCollider *context = p->context;
     union SceneActorRegistryPackedPosition pos;

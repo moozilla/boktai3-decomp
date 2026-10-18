@@ -1,8 +1,7 @@
-#define SceneActorReaction_RestoreAfterControl sub_080EB6E4
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_control_phase.h"
-void sub_080E9B8C(void *);
+void SceneActor_EndReactionAnimation(void *);
 void SceneActorReaction_RestoreAlternateAfterDelay(struct SceneActorRegistryResetView *);
 static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
 {
@@ -18,10 +17,10 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->word104 = 0;
 }
-void sub_080EB6E4(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_RestoreAfterControl(struct SceneActorRegistryResetView *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        SetControl(actor, sub_080E9B8C, 35);
+        SetControl(actor, SceneActor_EndReactionAnimation, 35);
         actor->field2B0 = 0;
     }
     if (actor->field2B0) {

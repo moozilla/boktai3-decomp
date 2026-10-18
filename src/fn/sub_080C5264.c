@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define Skeleton_LookupAnimationEntry sub_080C5264
 
 struct Seq {
     u8 pad0[8];
@@ -18,7 +17,7 @@ struct Obj {
 
 extern u16 gUnk_08606120[];
 
-u16 sub_080C5264(struct Obj *p)
+u16 Skeleton_LookupAnimationEntry(struct Obj *p)
 {
     struct Seq *s = (struct Seq *)(p->inner + 0x48);
     struct Seq *t = s;

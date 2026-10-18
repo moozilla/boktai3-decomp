@@ -1,4 +1,3 @@
-#define SceneActor_InitCollision5005 sub_080F0738
 #include "global.h"
 #include "scene_actor_registry.h"
 void sub_080ED328(void);
@@ -7,7 +6,7 @@ void SceneActorCollision_InitBodyWithFlags(struct SceneActorRegistryActor *, voi
                                            void (*)(void), struct SceneActorRegistryActor *, u32);
 void SceneActorCollision_InitAttack(struct SceneActorRegistryActor *, void *, void *,
                                     void (*)(void), u32, struct SceneActorRegistryActor *);
-void sub_080F0738(struct SceneActorRegistryActor *actor)
+void SceneActor_InitCollision5005(struct SceneActorRegistryActor *actor)
 {
     union SceneActorRegistryPackedPosition bodySize, bodyOffset, attackSize, attackOffset;
     bodySize.packed.x = 0x40;

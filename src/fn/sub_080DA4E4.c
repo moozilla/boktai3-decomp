@@ -1,11 +1,10 @@
-#define SceneGrid_SnapPositionToCellCenter sub_080DA4E4
 #define gSceneGridMap                      gUnk_030052F4
 #define gSceneGridWidth                    gUnk_030052F8
 #define gSceneGridHeight                   gUnk_030052FC
 #include "global.h"
 #include "scene_actor_terrain.h"
 
-void sub_080DA4E4(struct ContactPosition *position)
+void SceneGrid_SnapPositionToCellCenter(struct ContactPosition *position)
 {
     s32 x = position->x >> 8;
     s32 z = position->z >> 8;

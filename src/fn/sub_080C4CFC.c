@@ -2,10 +2,9 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_route.h"
 #include "scene_actor_terrain.h"
-#define SceneActorRoute_CommitReachableDestination sub_080C4CFC
 s32 sub_0821F204(void *, struct ContactPosition *, struct ContactPosition *);
 void sub_080C47B8(struct ContactPosition *);
-void sub_080C4CFC(struct SceneActorRegistryResetView *actor)
+void SceneActorRoute_CommitReachableDestination(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorRouteContext *context = actor->context;
     u8 *group = (u8 *)actor + 0x3D4;

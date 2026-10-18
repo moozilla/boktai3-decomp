@@ -1,8 +1,6 @@
-#define SceneActor_WaitForCategoryAttachment sub_080E766C
-#define SceneActor_GetDirectionFlags         sub_080E81CC
 #include "global.h"
 #include "scene_actor_reset.h"
-u32 sub_080E81CC(u32);
+u32 SceneActor_GetDirectionFlags(u32);
 void SceneActorAnimation_SelectEntryFlags(void *, u32, u32);
 void sub_0807C72C(void *, u32, u32, u32);
 s32 ActorAttachment_IsUnavailable(void *);
@@ -14,10 +12,10 @@ static inline u8 TakeFlag(u8 *flag)
     }
     return FALSE;
 }
-void sub_080E766C(struct SceneActorRegistryResetView *p, s32 frame)
+void SceneActor_WaitForCategoryAttachment(struct SceneActorRegistryResetView *p, s32 frame)
 {
     if (TakeFlag(&p->field2B2)) {
-        u32 flags = sub_080E81CC(p->direction);
+        u32 flags = SceneActor_GetDirectionFlags(p->direction);
         struct ContactCollider *collider;
         SceneActorAnimation_SelectEntryFlags(p, 0, flags);
         collider = &p->colliderB;
