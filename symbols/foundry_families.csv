@@ -1298,3 +1298,4 @@ addr,function,name,family,note
 082208D4,sub_082208D4,PositionList_UpdateTranslatedCoordinates,"PositionList","adds base and offset coordinates across two lists"
 08220A58,sub_08220A58,PositionQueue_FlushPending,"PositionQueue","processes and clears a pending position queue unless paused"
 08220B24,sub_08220B24,Collision_AccumulateNearbyResponse,"CollisionEntry","accumulates response when flagged entries have nearby layer values"
+082212DC,sub_082212DC,Display_BlinkUntilTimeout,"Display","toggles visibility at table periods then sets it after sixty ticks"
