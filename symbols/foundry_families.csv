@@ -813,3 +813,4 @@ addr,function,name,family,note
 08179550,sub_08179550,NumericDisplay_InitializeWidgets,"NumericDisplay","initializes six numeric display widgets and their palette"
 081798FC,sub_081798FC,ViewportGauge_ComputeFill,"Field HUD / viewport gauge","scales player displacement from viewport origin"
 08179954,sub_08179954,MeterDisplay_InitializeWidgets,"MeterDisplay","initializes two meter widgets and computes the scale"
+081799F8,sub_081799F8,FieldHud_InitializeNumber,"Field HUD","initializes clamped number and display resources"
