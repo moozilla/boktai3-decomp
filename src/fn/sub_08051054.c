@@ -15,7 +15,7 @@ struct OrbitBackground *OrbitBackground_CreateFromScript(u32 id)
     } else if (Script_SeekToKeyword('i')) {
         player = Script_GetValue();
     } else {
-            player = 0;
+        player = 0;
     }
     if (Script_SeekToKeyword('m')) {
         enabled = Script_GetValue();

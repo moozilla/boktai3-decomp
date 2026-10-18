@@ -32,21 +32,21 @@ void AreaEffect_AccumulatePlayerResource(struct AreaEffectManager *manager, s32 
                 object->resourceFraction += 40;
             } else if ((activeMode == 0) && (object->idleFrame <= 899)) {
                 object->resourceFraction += 5;
-                }
+            }
         } else if (activeMode == 2) {
-                s32 value = gUnk_02000710->unk876;
-                value <<= 3;
-                {
-                    u32 fraction = object->resourceFraction;
-                    value += fraction;
-                    object->resourceFraction = value;
-                }
-            } else if (activeMode == 1 && object->idleFrame <= 899) {
-                s32 value = gUnk_02000710->unk876;
-                {
-                    u32 fraction = object->resourceFraction;
-                    value += fraction;
-                    object->resourceFraction = value;
+            s32 value = gUnk_02000710->unk876;
+            value <<= 3;
+            {
+                u32 fraction = object->resourceFraction;
+                value += fraction;
+                object->resourceFraction = value;
+            }
+        } else if (activeMode == 1 && object->idleFrame <= 899) {
+            s32 value = gUnk_02000710->unk876;
+            {
+                u32 fraction = object->resourceFraction;
+                value += fraction;
+                object->resourceFraction = value;
             }
         }
     }

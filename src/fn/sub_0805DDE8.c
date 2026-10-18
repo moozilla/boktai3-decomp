@@ -16,8 +16,8 @@ void SceneHud_DrawCenteredMeter(s32 count)
             tile = *empty;
         }
         do {
-        *cell++ = tile;
-        empty++;
+            *cell++ = tile;
+            empty++;
         } while (0);
         offset += 2;
         i++;
