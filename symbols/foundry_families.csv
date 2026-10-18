@@ -725,3 +725,4 @@ addr,function,name,family,note
 08159594,sub_08159594,PlayerAction_RefreshModifiers,"PlayerAction","refreshes mode-dependent response values and action modifiers"
 081598F8,sub_081598F8,PlayerAction_BeginMode24,"PlayerAction","clears player movement and reset state before mode twenty-four"
 08159C0C,sub_08159C0C,Player_BeginInterpolatedMovement,"Player","saves movement endpoints and duration and starts animation"
+08159E28,sub_08159E28,Player_ResetPositionState,"Player","sets position and clears position-reset counters and contact state"
