@@ -284,3 +284,4 @@ addr,function,name,family,note
 0812B1F4,sub_0812B1F4,ActorEffect_UpdatePool,"ActorEffect pooled animated effects (tentative)","dispatches occupied effect slots while gameplay is running"
 0812B3A8,sub_0812B3A8,TwinSpriteEffect_InitGraphics,"TwinSpriteEffect (tentative; separate from preceding pool)","initializes two sprites and their graphics resources"
 0812B5D0,sub_0812B5D0,TimedEffect_UpdateVisibility,"paired timed effect entries (tentative)","count down paired entries and change flags on expiry"
+0812CF50,sub_0812CF50,SceneSlot_Allocate,"SceneSlotPool","allocates a free slot and records its index"
