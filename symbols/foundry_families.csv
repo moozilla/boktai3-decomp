@@ -910,3 +910,4 @@ addr,function,name,family,note
 0818351C,sub_0818351C,ActorController_UpdateDecayingVelocity,"ActorController","scales velocity by a state-dependent right shift"
 081837BC,sub_081837BC,ActorController_UpdateFixedAnimationTransition,"ActorController","starts fixed animation and sets angle on completion"
 08183874,sub_08183874,ActorController_UpdateFadeAnimationTransition,"ActorController","plays directional animations then waits for a white fade"
+08183A88,sub_08183A88,ActorController_UpdatePaletteAnimationTransition,"ActorController","starts directional animation and resets palette transition state"
