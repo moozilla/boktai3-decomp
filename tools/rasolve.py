@@ -53,6 +53,15 @@ class Pseudo:
         return self.death - self.birth if self.kind == "L" else self.live
 
 
+def _cleanup(path):
+    """Remove a work directory when the process exits (it holds only
+    candidate sources, objects and dumps; set RASOLVE_KEEP=1 to keep it)."""
+    import atexit
+    import shutil
+    if not os.environ.get("RASOLVE_KEEP"):
+        atexit.register(shutil.rmtree, path, True)
+
+
 class Compiler:
     """Compiles variants of one function through the agbcc fork server
     (tools/agbserve.py) and counts the bytes that differ from the ROM."""
@@ -72,6 +81,7 @@ class Compiler:
         self.size = sizes.get(key)
         self.rom = load_rom(verify=False)
         self.work = tempfile.mkdtemp(prefix="rasolve-", dir=os.path.join(ROOT, "build"))
+        _cleanup(self.work)
         self.flags = build.cflags_for(rel) + (["-g"] if lines else [])
         self.resolver = agbserve.Resolver(self.symbols, self.address)
         self.server = None
@@ -206,7 +216,8 @@ def main():
     ap.add_argument("--solutions", type=int, default=12, help="exact solutions to collect")
     ap.add_argument("--search-c", type=int, default=0, metavar="SECONDS",
                     help="then search C (permuter passes, focused on the variables) toward the solution")
-    ap.add_argument("-j", type=int, default=os.cpu_count() or 4)
+    ap.add_argument("-j", type=int, default=max(1, (os.cpu_count() or 2) // 2),
+                    help="worker processes (default: half the cores; all of them saturated a 16 GB machine)")
     ap.add_argument("--json-out", help="write the compiler-space solution as targets for translate.py")
     ap.add_argument("--all", action="store_true", help="try every pseudo, not just the involved ones")
     a = ap.parse_args()
