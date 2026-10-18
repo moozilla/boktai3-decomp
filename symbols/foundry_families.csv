@@ -1004,3 +1004,4 @@ addr,function,name,family,note
 081A376C,sub_081A376C,DirectionBurst_Emit,"DirectionBurst (tentative)","lazily initializes a shared emitter and forwards burst parameters"
 081A37E0,sub_081A37E0,EffectPool_FindIdleActiveEntry,"EffectPool (tentative)","find active pool entry with zero state"
 081A3D00,sub_081A3D00,EffectPool_UpdateActiveEntries,"EffectPool (tentative)","update active entries and increment their frame counters"
+081A3F04,sub_081A3F04,EffectPool_Initialize,"EffectPool (tentative)","load animation and start procedure before creating entries"
