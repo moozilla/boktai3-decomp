@@ -410,3 +410,4 @@ addr,function,name,family,note
 08167F1C,sub_08167F1C,Hud_InitializeThreeIcons,"Hud","initializes three horizontally spaced HUD icons and tile pointers"
 08168534,sub_08168534,Hud_SetElementGroupFlags,"Hud","sets flag bit zero across six groups of three HUD elements"
 08168D20,sub_08168D20,SceneHud_ApplySecondarySelection,"SceneHud","applies selected secondary action to the HUD action owner"
+08168E38,sub_08168E38,SceneHud_CanOpenSecondarySelection,"SceneHud","tests player input and state gates for secondary selection"
