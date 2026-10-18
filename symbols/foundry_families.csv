@@ -227,3 +227,4 @@ addr,function,name,family,note
 0811B2FC,sub_0811B2FC,SpatialIndex_InsertEntry,"SpatialIndex","prepends entry to one of two horizontal bucket lists"
 0811B498,sub_0811B498,Bounds_TestOverlap,"Bounds","tests overlap of three-dimensional axis-aligned bounds"
 0811B5F0,sub_0811B5F0,Collision_ProcessGroups,"Collision","processes ten collision groups and frees temporary list nodes"
+0811B668,sub_0811B668,CategoryLists_Destroy,"CategoryLists","frees both linked lists in ten categories and clears manager pointer"
