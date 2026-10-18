@@ -1291,3 +1291,4 @@ addr,function,name,family,note
 08217EEC,sub_08217EEC,SpriteDrawable_SelectTileFrame,"sprite drawable","sets tile dimensions, OAM attributes and frame tile index"
 08218ED8,sub_08218ED8,BackgroundMap_ClearTextRect,"text background map","fills a rectangle on BG0 with tile 0xF001"
 082197A4,sub_082197A4,Anim_InitPositionedWidget,"animation widgets (shared SceneInputWidget)","selects a widget glyph and initializes flags, attributes and position"
+0821BB34,sub_0821BB34,Terrain_ResetMap,"terrain map","clear map resources and reset trap storage"
