@@ -513,3 +513,4 @@ addr,function,name,family,note
 08176308,sub_08176308,SelectionPanel_ProcessSecondChoice,"SelectionPanel (tentative)","accepts or cancels the secondary confirmation"
 0817635C,sub_0817635C,SceneDialog_BeginTimedMessage,"SceneDialog","opens a message window and advances phase after sixty ticks"
 081763D4,sub_081763D4,SceneDialog_SelectResultPhase,"SceneDialog","selects a phase from the result query and sets flag86E"
+08176424,sub_08176424,SceneDialog_FinishSuccessfulResult,"SceneDialog","plays the successful result sound and returns after 120 ticks"
