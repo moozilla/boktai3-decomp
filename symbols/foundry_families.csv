@@ -301,3 +301,4 @@ addr,function,name,family,note
 08131C48,sub_08131C48,SceneActorBehavior_DispatchAlternateOrEnterState2,"SceneActorBehavior","dispatches alternate behavior table or enters state two"
 08131CCC,sub_08131CCC,SceneActorBehavior_InstallCallbackTables,"SceneActorBehavior","installs ten actor callback tables"
 08132898,sub_08132898,SceneActorBehavior_DispatchFlaggedCategory,"SceneActorBehavior","dispatches enabled flagged actors by category"
+08135C08,sub_08135C08,SceneActorPlacement_BeginDestinationJump,"SceneActorPlacement","sets jump velocity toward a saved destination"
