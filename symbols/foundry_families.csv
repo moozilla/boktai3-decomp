@@ -347,3 +347,4 @@ addr,function,name,family,note
 080F1C48,sub_080F1C48,SceneActor_RampColorRed,"SceneActor color cycle","ramp red channel to sixteen and advance color phase"
 080F8D9C,sub_080F8D9C,SceneActorControl_FinishRotation,"SceneActor control phases","plays rotation cue and advances after eighty frames"
 08104F08,sub_08104F08,CallbackPool_UpdateShake,"CallbackPool","restore saved position or apply random shake"
+08105790,sub_08105790,ProximityActor_IsPlayerInsideOriginRange,"ProximityActor","updates cached distance from origin and tests player range"
