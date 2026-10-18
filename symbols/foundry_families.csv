@@ -201,3 +201,4 @@ addr,function,name,family,note
 08110AD4,sub_08110AD4,SceneEffect_ExecuteCommandList,"SceneEffect","dispatches packed x/y/type commands to two effect spawners"
 08111410,sub_08111410,PaletteFade_AdvanceColors,"palette fade","advances fixed-point RGB channels and writes sixteen palette colors"
 08111DE0,sub_08111DE0,MessagePanel_InitSprites,"MessagePanel","initializes 23 sprites and resets selection entries"
+081120BC,sub_081120BC,SceneGauge_SelectThresholdFrame,"Scene gauge animation","selects one of five animation frames using four descending byte thresholds"
