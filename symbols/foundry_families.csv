@@ -889,3 +889,4 @@ addr,function,name,family,note
 081811F0,sub_081811F0,ActorMarker_InitMovingSprite,"ActorMarker","initializes a raised sprite with facing-dependent velocity"
 081813F8,sub_081813F8,ActorMarker_EmitIndexedEffect,"ActorMarker","emits an indexed offset effect directed away from the actor"
 081816B0,sub_081816B0,ActorPalette_RestoreSelectedBanks,"ActorPalette","restores three selected palette banks and one alternate bank"
+081819E0,sub_081819E0,ActorPalette_Reset,"ActorPalette","clears update callback, calls cleanup, and restores selected banks"
