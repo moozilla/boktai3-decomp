@@ -1068,3 +1068,4 @@ addr,function,name,family,note
 081BCB14,sub_081BCB14,,"menu callbacks (tentative)",""
 081BCB58,sub_081BCB58,StatGauge_ConfirmPreview,"StatGaugePreview","confirms a nonzero stat preview or starts a fade"
 081BCCB0,sub_081BCCB0,StatGauge_GetSelectionGroup,"StatGaugePreview","maps four-entry selection groups to zero, one or two"
+081BD118,sub_081BD118,StatGauge_WaitAfterConfirm,"StatGaugePreview","waits 150 frames before selecting completion message or fade"
