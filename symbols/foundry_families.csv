@@ -511,3 +511,4 @@ addr,function,name,family,note
 08176224,sub_08176224,SelectionPanel_ConfirmTransition,"SelectionPanel (tentative)","accepts A press and starts panel transition"
 0817627C,sub_0817627C,SelectionPanel_ProcessFlaggedChoice,"SelectionPanel (tentative)","routes accepted choice according to game-state flag 86E"
 08176308,sub_08176308,SelectionPanel_ProcessSecondChoice,"SelectionPanel (tentative)","accepts or cancels the secondary confirmation"
+0817635C,sub_0817635C,SceneDialog_BeginTimedMessage,"SceneDialog","opens a message window and advances phase after sixty ticks"
