@@ -7,9 +7,9 @@ extern u8 *gUnk_02000580[];
 s32 sub_0815A400(void);
 s32 sub_0815C9EC(void);
 s32 sub_0815CA08(void);
-void sub_0815B15C(u8 *actor, struct PackedVec *point, s32 direction, s32 f, s32 e);
+void PlayerCue_MoveTo(u8 *actor, struct PackedVec *point, s32 direction, s32 f, s32 e);
 void sub_0814F828(u8 *);
-/* Script: sub_0815B15C on the scripted actor chosen by -i, with the optional
+/* Script: PlayerCue_MoveTo on the scripted actor chosen by -i, with the optional
    point -p x y z, -d (default -1), -f (default 0) and -e (default 0);
    tentative: turn to a direction or point. */
 void ScriptActor_TurnFromScript(void)
@@ -30,9 +30,9 @@ void ScriptActor_TurnFromScript(void)
             point.x = Script_GetValue();
             point.y = Script_GetValue();
             point.z = Script_GetValue();
-            sub_0815B15C(actor, &point, direction, f, e);
+            PlayerCue_MoveTo(actor, &point, direction, f, e);
         } else
-            sub_0815B15C(actor, 0, direction, f, e);
+            PlayerCue_MoveTo(actor, 0, direction, f, e);
         sub_0814F828(actor);
     }
 }

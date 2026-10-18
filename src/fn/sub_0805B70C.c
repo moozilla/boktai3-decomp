@@ -29,7 +29,7 @@ void ScenePanel_UpdateActiveSubjects(struct ScenePanel *input)
     if (!panel->presentationState)
         ScenePanel_SetState((void *)panel, ScenePanel_BeginPulseSequence);
     if (ScenePanel_CanAcceptPlayer((void *)panel)) {
-        sub_0815B0A8(SCENE_PANEL_PLAYER, &panel->approachPosition, 0, 4);
+        PlayerCue_WalkTo(SCENE_PANEL_PLAYER, &panel->approachPosition, 0, 4);
         ScenePanel_SetEffectState((void *)panel, 5);
     }
 }

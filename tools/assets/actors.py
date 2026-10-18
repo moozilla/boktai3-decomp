@@ -20,7 +20,7 @@ Sources (all ROM-derived or in the repository):
     the result (every operand is a registry key). Recovered GCL names of keys
     are in gcl/names/chara.csv (tools/assets/gclnames.py). Procedures are numbered by the IDs calls use, which are one
     above gcx.py's printed headers. A scene is an entry procedure that starts
-    `proc_861 1; proc_864 0|2` (tools/mgba/scenes.py); a scene uses every
+    `proc_861 FLAGS; proc_864 MODE` (tools/mgba/scenes.py); a scene uses every
     procedure it reaches through calls (not through `load`).
   * the text bank: `text#N` operands and debug `print` strings (EUC-JP).
 
@@ -288,7 +288,8 @@ def procs():
             p["texts"] += [int(x) for x in re.findall(r"text#(\d+)", t)]
             p["prints"] += re.findall(r"\bprint '((?:[^'\\]|\\.)*)'", t)
             p["loads"] += [int(x, 0) for x in re.findall(r"\bload (0x[0-9a-f]+|\d+)", t)]
-        p["scene"] = len(lines) >= 2 and lines[0][1] == "proc_861 1 <end>" and lines[1][1] in ("proc_864 0 <end>", "proc_864 2 <end>")
+        p["scene"] = (len(lines) >= 2 and bool(re.match(r"proc_861 \S+ <end>$", lines[0][1]))
+                      and bool(re.match(r"proc_864 \S+ <end>$", lines[1][1])))
     for cid, p in out.items():
         p["calls"] = sorted(set(p["calls"]))
     return out

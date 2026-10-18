@@ -365,8 +365,10 @@ saved with the game), and sets the request word `0x030053E8` to 1, or `0x11`
 unless keyword `n` is given as 0. A scene number is a script procedure: the
 late-game test save stands in scene 3243, whose entry runs `proc_861 1;
 proc_864 0`, then the stage setup (`proc_884 0xcf70 0xf8ea 0x7239`) and the
-area's objects. `tools/mgba/scenes.py` lists 354 scene entries (347 with a
-stage). Writing the three words from Lua loads the scene's stage but does not
+area's objects. `tools/mgba/scenes.py` lists 496 scene entries (456 with a
+stage); an entry is `proc_861 FLAGS; proc_864 MODE` with any flags (the
+prologue uses 56, boss and story scenes 9, 25, 33, 41). Cutscenes inside a
+scene are tables played by SceneMessages: [CUTSCENES](CUTSCENES.md). Writing the three words from Lua loads the scene's stage but does not
 spawn the player; ordinary doors pass an entrance as well: the door's event
 sets the entrance number in `r708[0x70]` (`proc_953`) and the destination's
 entrance procedures (`proc_909`, `proc_916`, ...) test it to place the player
@@ -751,12 +753,22 @@ The game's save writer is `sub_0822EE68` (a non-matching draft, in
   same way.
 * The function returns `length + 8` on success and -1 on failure.
 
-What the save contains, and the caller that builds it, are not yet traced.
-The likely payload is the game-state block (sections 6 and 7), because
-`Memory_Clear(+0x30, 0x74A)` resets its save-dependent part, but this is a guess
-(open question 4). A global `030053F8` is described in ROM_MAP as a pointer to
-global save data, and the solar notes read the same address as an object pointer
-(section 17).
+What it holds (traced 2026-10-17 by probing `sub_0822EF44`, the reader, as a
+file loads): two save files, A and B, each three checksummed regions, plus a
+0x28-byte header at block 0 read at boot.
+
+| Region | File A block | File B block | Bytes | Loaded to |
+|---|---|---|---|---|
+| script variables | 0x11 | 0x92 | 0x400 | `0203DA00` (`gUnk_02000708`, the `r708` variables: story progress at `+0x3C`, entrance at `+0x70`) |
+| game state | 0x113 | 0x254 | 0x778 | `0203C400` (`gUnk_02000710`, `struct GameState`) |
+| game state, continued | 0x395 | 0x3B6 | 0xE0 | `0203CB78` |
+
+`sub_0822BBD8` saves and `sub_0822BC6C` loads. Saving first copies the word at
+`0x0200060C`, the script image's build timestamp `0x42A05217`, into the game
+state's first word; loading rejects a file whose first word differs (a game
+that has never saved has 0 there). mGBA and VBA store each 64-bit EEPROM
+block byte-reversed. `tools/assets/saves.py` reads and writes saves, reads
+VBA-M savestates the same way, and builds a battery save from any savestate.
 
 ---
 
@@ -831,8 +843,8 @@ These show up across units. Learn them once and the code reads quickly.
    `sub_08219CB4` (backward) both work on the same heap, and `sub_0821A004` uses
    the second. `symbols/functions.csv` names `08248970` `Rtc_Initialize`, but
    [RTC.md](RTC.md) calls it *Unprotect*.
-4. **Save contents.** The caller of the EEPROM writer `sub_0822EE68` is not
-   identified, so the save payload and its slot layout are not confirmed. The
+4. **Save contents.** Answered in section 14: two files of three regions
+   (variables, game state, continuation); `tools/assets/saves.py`. The
    global `030053F8` is a save-data pointer in [ROM_MAP.md](ROM_MAP.md) and an
    object pointer in [SOLAR_SENSOR.md](SOLAR_SENSOR.md). Both cannot be right
    without more evidence.

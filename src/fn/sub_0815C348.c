@@ -4,7 +4,7 @@ void sub_0813AFEC(u8 *, s32, s32);
 void sub_0814FC54(void);
 /* Sets the actor's +0x3A4 mode to 5 (on) or 3 and +0x3A2/+0x3A3, then
    update sub_0814FC54. */
-void sub_0815C348(u8 *a, u32 on)
+void PlayerCue_FaceSide(u8 *a, u32 on)
 {
     if (on) {
         u32 zero;

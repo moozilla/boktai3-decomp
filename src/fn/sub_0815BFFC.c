@@ -30,14 +30,14 @@ s32 sub_081419D4(s32, s32);
 void sub_0815AD78(struct P *);
 void sub_0813ADD0(struct P *);
 void sub_0813AFEC(struct P *, s32, s32);
-void sub_0815B858(struct P *, s32);
-void sub_0815AF14(struct P *, s32);
+void PlayerCue_Motion7Turn(struct P *, s32);
+void PlayerCue_Stand(struct P *, s32);
 void sub_081502AC(void);
 void sub_081507F4(void);
 void Sound_PlaySong(s32);
 void sub_08151988(void);
 
-void sub_0815BFFC(struct P *p)
+void PlayerCue_Motion17Variant2(struct P *p)
 {
     sub_0815AD78(p);
     p->a4 = 1;

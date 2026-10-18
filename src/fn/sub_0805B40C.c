@@ -66,13 +66,13 @@ void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *input)
                 i++;
             } while (i < panel->subjectCount);
         }
-        sub_0815AF14(SCENE_PANEL_PLAYER, -1);
+        PlayerCue_Stand(SCENE_PANEL_PLAYER, -1);
         Sound_PlaySong(250);
         ScenePanel_SetEffectState((void *)panel, 2);
     } else if (panel->variant == 1) {
         s32 anyActive;
         register u32 count asm("r0");
-        sub_0815AF14(SCENE_PANEL_PLAYER, -1);
+        PlayerCue_Stand(SCENE_PANEL_PLAYER, -1);
         sub_0815C99C(SCENE_PANEL_PLAYER);
         anyActive = 0;
         count = panel->subjectCount;
@@ -91,7 +91,7 @@ void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *input)
         else
             ScenePanel_SetEffectState((void *)panel, 3);
     } else {
-        sub_0815AF14(SCENE_PANEL_PLAYER, -1);
+        PlayerCue_Stand(SCENE_PANEL_PLAYER, -1);
         sub_0815C99C(SCENE_PANEL_PLAYER);
         Sound_PlaySong(490);
         gUnk_02000488->state = 14;

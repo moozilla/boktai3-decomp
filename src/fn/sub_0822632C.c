@@ -11,7 +11,7 @@ struct S {
 };
 extern struct S *gUnk_03005420;
 void sub_08226AAC(struct S *);
-void sub_0822632C(s32 n, u16 *a)
+void Camera_PanTo(s32 n, u16 *a)
 {
     struct S *p = gUnk_03005420;
     if (p) {

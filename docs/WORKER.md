@@ -27,10 +27,16 @@ everything from the worktree root.
    For an exploratory inventory:
    `build/venv/bin/python tools/worklist.py --range START END --max-insns 40 | head`
    Review jump-table boundaries; the flag alone is not a reason to skip a useful family.
-2. Read it: `build/venv/bin/python tools/asmat.py ADDR 80` (asm) and
+2. Find its relatives: `python3 tools/relatives.py ADDR --c` lists the matched
+   functions that share runs of instructions with it (an inline helper both
+   expand, a sibling state handler, a family variant), how much of the target
+   each explains, the instruction ranges, and their C. Start from that C when
+   one covers most of the target; write a shared run as a static inline helper
+   when it repeats inside the target.
+3. Read it: `build/venv/bin/python tools/asmat.py ADDR 80` (asm) and
    `build/venv/bin/python tools/ghidra_c.py ADDR` (Ghidra pseudo-C, often wrong in detail
    but useful for structure).
-3. Draft `wip/sub_XXXXXXXX.c`, one function per file; promote only after review and exact checks:
+4. Draft `wip/sub_XXXXXXXX.c`, one function per file; promote only after review and exact checks:
    ```c
    #include "global.h"
 
@@ -48,12 +54,12 @@ everything from the worktree root.
    * Keep the `sub_XXXXXXXX` name. If you're confident what a function does,
      add a line to `symbols/proposed/<your-worker-name>.csv`:
      `addr,name,confidence,evidence` (e.g. `08033568,Foo_SetFlag,medium,"sets flag 0x17D on gUnk_020000E0 object"`).
-4. Inner loop: `build/venv/bin/python tools/check.py sub_XXXXXXXX` compiles just your file,
+5. Inner loop: `build/venv/bin/python tools/check.py sub_XXXXXXXX` compiles just your file,
    links it at its real address and prints original vs. yours as compact aligned mismatch hunks,
    with `!` on differing lines (`--full` expands the listing) (~0.5 s; exit 0 = MATCH). Literal pools show up
    as junk instructions; that's fine. When it says MATCH, commit the function on the working branch. The integrator
    runs one combined full-ROM build before merging the batch.
-5. Matched: `git add src/fn/sub_XXXXXXXX.c symbols/proposed && git commit -m "match sub_XXXXXXXX"`.
+6. Matched: `git add src/fn/sub_XXXXXXXX.c symbols/proposed && git commit -m "match sub_XXXXXXXX"`.
    If attempts stop yielding useful hypotheses, retain the candidate under `wip/`, add a line to
    `notes/<your-worker-name>.md` with the address and what was off (register
    swap, branch order, ...), and move on. To keep a useful close candidate, commit it
@@ -123,6 +129,12 @@ still differs. Only commit drafts that compile and are worth resuming.
 * **Clone families**: run `build/venv/bin/python tools/clones.py --port --range START END`
   on your range after a few matches; it copies matched C to identical
   siblings and keeps what `check.py` accepts.
+* **Near relatives**: `python3 tools/relatives.py --port --keep` ports the C of
+  every matched function that explains 90% or more of an unmatched one
+  (registers abstracted, so it also finds clones whose matched sibling came
+  later) and keeps the MATCHes; the rest stay in `wip/relatives/` with their
+  fuzzy score as starting drafts. `docs/tasks/relatives.md` ranks the
+  unmatched functions by how much a matched relative explains.
 * **Returns a value it never sets**: a non-void function that falls off the
   end (`u32 f(...) { ...; s->v = 0; }`) gives `pop {r1}; bx r1` with a stale r0.
 * **Work in progress** goes in an untracked `wip/` directory
