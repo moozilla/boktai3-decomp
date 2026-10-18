@@ -188,3 +188,4 @@ addr,function,name,family,note
 0810990C,sub_0810990C,MessagePanel_DelayDismiss,"MessagePanel","waits 120 ticks before the dismissal state"
 08109C24,sub_08109C24,ClockPanel_CaptureTime,"ClockPanel","clears paired values and captures encoded time and sun phase"
 0810AC10,sub_0810AC10,LinkSelection_RecordSlotState,"AreaEffectLinkState","records display slot value and selection bit"
+0810BD8C,sub_0810BD8C,SlotState_ResetInactiveMode,"SlotState","clears mode unless it is six through ten"
