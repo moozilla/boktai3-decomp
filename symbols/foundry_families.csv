@@ -902,3 +902,4 @@ addr,function,name,family,note
 08182548,sub_08182548,Armor_SpawnScatterEffect,"Armor movement effects","spawns a scatter sprite effect with randomized lifetime"
 081825D0,sub_081825D0,SceneActor_SpawnSpriteEffect,"scene actor effects","creates a sprite effect at the actor position"
 08182624,sub_08182624,Armor_EnterFacingAnimation,"Armor animation controller","starts a facing animation and changes collision flags once"
+0818288C,sub_0818288C,,"scene actor state callbacks",""
