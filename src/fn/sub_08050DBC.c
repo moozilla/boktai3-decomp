@@ -1,5 +1,4 @@
 #include "orbit_background.h"
-// MATCHING_CONCESSION: register-pinning
 static inline s32 scale(s32 value, u32 shift)
 {
     if (value >= 0)
@@ -37,12 +36,12 @@ s32 OrbitBackground_Tick(struct OrbitBackground *background)
             }
         }
         {
-            register s32 sourceX asm("r1") = gUnk_03005418[0];
-            register s32 screenX asm("r0") = screen.x;
+            s32 sourceX = gUnk_03005418[0];
+            s32 screenX = screen.x;
             s32 x;
             s32 centerX;
             s32 sourceY;
-            register s32 screenY asm("r1");
+            s32 screenY;
             s32 y;
             s32 centerY;
             x = sourceX - screenX;
