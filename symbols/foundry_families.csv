@@ -702,3 +702,4 @@ addr,function,name,family,note
 08141E80,sub_08141E80,Player_UpdateMovement,"Player","update movement direction velocity animation and periodic stat changes"
 08144824,sub_08144824,Player_UpdateActionEighteen,"Player","advances player action mode eighteen phases"
 0814499C,sub_0814499C,Player_UpdateActionEffectSequence,"Player","advances animation phases and triggers an attached effect"
+08145130,sub_08145130,Player_UpdateCountdownAnimation,"Player","counts down before advancing and completing an animation"
