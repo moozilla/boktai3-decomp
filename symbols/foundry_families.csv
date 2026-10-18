@@ -1325,3 +1325,4 @@ addr,function,name,family,note
 0822E138,sub_0822E138,Inventory_SwapSlots,"Inventory","swap inventory entries and remap four party references"
 0822E458,sub_0822E458,Equipment_AssignUniqueSlot,"Equipment","remove duplicate equipment IDs before assigning a slot"
 0822E6A4,sub_0822E6A4,Inventory_AssignUniqueSecondarySlot,"Inventory","clear duplicate IDs in eight secondary inventory slots then assign"
+0822E728,sub_0822E728,GameState_HasUnlockedInventoryEntry,"GameState","checks the upper eight inventory slots for an unlocked entry"
