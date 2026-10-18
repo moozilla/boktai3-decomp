@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_actor.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 struct ContactReactionGraphics {
@@ -14,6 +13,7 @@ static inline s32 truncateShift12(s32 value)
 void ContactActor_UpdateReaction(struct ContactActorPool *pool, struct ContactActor *slot,
                                  s32 index)
 {
+    s32 k2 = 0x2D3;
     struct ContactPosition delta;
     struct ContactPosition *write;
     u32 direction;
@@ -56,15 +56,15 @@ void ContactActor_UpdateReaction(struct ContactActorPool *pool, struct ContactAc
             struct ContactReactionGraphics *graphics = (void *)slot->graphics;
             {
                 void *argument = graphics;
-                asm("" : "+r"(argument));
-                AnimData_SelectPaletteBank(argument, 0x2D3);
+                AnimData_SelectPaletteBank(argument, k2);
             }
             graphics->tileData = (u8 *)pool + 0x1700;
         }
-        if ((slot->stateFrame >> 2) & 1)
+        if ((slot->stateFrame >> 2) & 1) {
             slot->sprite.flags &= ~1;
-        else
+        } else {
             slot->sprite.flags |= 1;
+        }
         slot->stateFrame++;
     }
 }
