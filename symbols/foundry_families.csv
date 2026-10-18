@@ -1314,3 +1314,4 @@ addr,function,name,family,note
 0822744C,sub_0822744C,Camera_Destroy,"Camera task","unregisters the camera receiver and clears the active camera"
 0822776C,sub_0822776C,Camera_CalculateDistanceScale,"Camera distance scale","divides planar distance between two positions and clamps it to a configured range"
 082277C8,sub_082277C8,CameraTracking_Update,"Camera tracking","updates requested two-position tracking with a 128-frame blend or restores follow mode"
+08227900,sub_08227900,ResourceLookup_FindValue,"Resource lookup","binary searches sorted u16 key-value pairs and returns zero when absent"
