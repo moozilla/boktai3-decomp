@@ -447,3 +447,4 @@ addr,function,name,family,note
 0816F960,sub_0816F960,MotionSequence_AdvanceAfterDelay,"MotionSequence (tentative)","advance after interpolation and an eight-tick delay"
 0816F9C4,sub_0816F9C4,SceneHud_UpdateTimedMessage,"SceneHud","times a text window then returns to menu selection"
 0816FB0C,sub_0816FB0C,SceneHud_DispatchSelectedAction,"SceneHud","dispatches the selected action by definition kind"
+0816FF4C,sub_0816FF4C,SceneHud_UpdateActionSelection,"SceneHud","updates action cursor and confirmation input"
