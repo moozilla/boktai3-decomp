@@ -1364,3 +1364,4 @@ addr,function,name,family,note
 08237108,sub_08237108,ActorAttachment_Initialize,"parent-linked actor attachment (tentative)","initializes parent-linked object and offset"
 08237168,sub_08237168,ActorAttachment_Create,"parent-linked actor attachment (tentative)","allocates and initializes parent-linked task"
 082371F0,sub_082371F0,RisingSprite_Update,"rising sprite pool (tentative)","advances and raises a sprite for sixteen ticks"
+08237368,sub_08237368,RisingSprite_Spawn,"rising sprite pool (tentative)","activates the next sprite in an eight-slot pool"
