@@ -925,3 +925,4 @@ addr,function,name,family,note
 08185E6C,sub_08185E6C,Armor_UpdateFacingAction,"Armor 4 (auto, tentative)","turns toward target then selects alternate action and waits for flag"
 08186568,sub_08186568,Armor_UpdateRandomFlankAction42,"Armor actor behaviors","chooses a random target-relative flank direction and starts action 42"
 08186618,sub_08186618,Armor_UpdateFacingActionSequence,"Armor actor behaviors","faces target then runs actions 25 and 43 with a delay"
+081869F0,sub_081869F0,Armor_UpdateWhiteFadeSequence,"Armor 5 (auto, tentative)","runs two actions around a delayed white-fade variant update"
