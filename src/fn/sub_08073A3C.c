@@ -11,7 +11,7 @@ struct SceneActorContactNode *
 SceneActorContacts_SelectForActor(struct SceneActorRegistryActor *argument, u32 kindMaskArgument)
 {
     struct SceneActorRegistryActor *actor = argument;
-    register u32 kindMask asm("r8") = kindMaskArgument;
+    u32 kindMask = kindMaskArgument;
     register struct SceneActorRegistryActor *owner asm("r9") = actor;
     struct SceneActorContactManager *manager;
 

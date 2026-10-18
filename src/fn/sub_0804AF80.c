@@ -115,7 +115,7 @@ void TetherActor_UpdateWorldPosition(struct TetherActor *actor)
         actor->movementProbeStorage.slope = *properties >> 4;
         {
             u32 byte = *properties;
-            register u32 height asm("r0") = 15;
+            u32 height = 15;
             register u32 heightOffset asm("r4");
             height &= byte;
             heightOffset = 0x129;

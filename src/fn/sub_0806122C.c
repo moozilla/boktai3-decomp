@@ -25,7 +25,7 @@ s32 SceneInventory_ClassifyConsumableAction(struct SceneInventoryControlView *pa
         }
         {
             u32 destinationOffset = 0x1AEC;
-            register s16 *destination asm("r0");
+            s16 *destination;
             s32 current;
             destination = (void *)((u32)panel + destinationOffset);
             current = *destination;

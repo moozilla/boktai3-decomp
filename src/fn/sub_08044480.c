@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
 u32 ContactSwarm_HideSlot(struct ContactSwarm *, struct ContactSwarmSlot *, s32);
@@ -13,9 +12,9 @@ void ContactSwarm_UpdateReaction(struct ContactSwarm *pool, struct ContactSwarmS
 {
     struct ContactSwarmSprite *sprite = &slot->display.animation.draw.sprite;
     struct ContactPosition *velocity;
-    register const struct ContactPosition *read asm("r12");
+    const struct ContactPosition *read;
     s32 product;
-    register u32 rawSpeed asm("r0");
+    u32 rawSpeed;
     u32 direction;
     u32 speed;
     if (slot->enter) {
@@ -28,7 +27,6 @@ void ContactSwarm_UpdateReaction(struct ContactSwarm *pool, struct ContactSwarmS
         Sound_PlaySong(0xE8);
     }
     rawSpeed = 20 - slot->stateFrame;
-    asm("" : "+r"(rawSpeed));
     velocity = &slot->velocity;
     direction = slot->direction;
     speed = rawSpeed * 2;
@@ -46,11 +44,11 @@ void ContactSwarm_UpdateReaction(struct ContactSwarm *pool, struct ContactSwarmS
         struct ContactPosition *position = &sprite->position;
         sprite->position.x += slot->velocity.x;
         {
-            register const struct ContactPosition *current asm("r2") = read;
+            const struct ContactPosition *current = read;
             position->y += current->y;
         }
         {
-            register const struct ContactPosition *current asm("r2") = read;
+            const struct ContactPosition *current = read;
             position->z += current->z;
         }
     }

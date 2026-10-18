@@ -14,7 +14,7 @@ int ResultMenu_CreateGraphics(u8 *arg)
     u8 *out;
     int i;
     register u32 *saved asm("r8");
-    register int clear asm("r7");
+    int clear;
     tmp.zero = 0;
     {
         u32 *src = &tmp.zero;

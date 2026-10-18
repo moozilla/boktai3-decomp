@@ -7,7 +7,7 @@ static inline void Step(struct SceneSteeringActor *slot, struct DisplaySequenceS
     u32 flags;
     {
         u32 offset = state->index << 1;
-        register const volatile u16 *table asm("r1") = slot->sequence.commands;
+        const volatile u16 *table = slot->sequence.commands;
         command = (const volatile u16 *)((u32)table + offset);
     }
     slot->frame = *command >> 6;
@@ -100,7 +100,7 @@ static inline void Step(struct SceneSteeringActor *slot, struct DisplaySequenceS
             }
             {
                 u32 offset = state->index << 1;
-                register const volatile u16 *table asm("r1");
+                const volatile u16 *table;
                 table = state->commands;
                 command = (const volatile u16 *)((u32)table + offset);
             }
@@ -223,7 +223,7 @@ void SceneSteeringActor_CreateTravelActor(const struct ContactPosition *position
     }
     {
         const void *resource = ScriptProc_Start(0x922E, 0x121B);
-        register u32 offset asm("r1") = 0x118;
+        u32 offset = 0x118;
         resourceSlot = (void *)((u8 *)slot + offset);
         *resourceSlot = resource;
     }

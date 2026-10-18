@@ -40,7 +40,7 @@ void TetherActor_BlockPlayerAcrossTerrain(struct TetherActor *actor)
         cellIndex(gUnk_02000580[0]->position.x >> 8, gUnk_02000580[0]->position.z >> 8));
     u32 attributes = *(u16 *)(properties + 2);
     struct ContactPosition *position;
-    register s32 playerCell asm("r4");
+    s32 playerCell;
     s32 actorCell;
     register s32 rowStride asm("r1");
     attributes &= 1;

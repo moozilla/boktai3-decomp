@@ -71,7 +71,7 @@ int sub_080390C4(struct Menu *arg)
         {
             register u8 *a asm("r3") = &p->v2b;
             u8 *b;
-            register u8 *c asm("r1");
+            u8 *c;
             local.v2b = a;
             b = &p->v2c;
             local.v2c = b;
@@ -132,7 +132,7 @@ int sub_080390C4(struct Menu *arg)
             c += 6;
             local.counts = c;
             {
-                register u16 *end asm("r1") = leftBase;
+                u16 *end = leftBase;
                 int zero = 0;
                 register u16 *cursor asm("r0");
                 cursor = (u16 *)(c + 0x62);
@@ -168,7 +168,7 @@ int sub_080390C4(struct Menu *arg)
                             mask = p->leftMask;
                             if (bit & mask) {
                                 register int small asm("r8");
-                                register int one asm("r12");
+                                int one;
                                 u32 used;
                                 {
                                     register int x asm("r3") = 15;
@@ -224,7 +224,7 @@ int sub_080390C4(struct Menu *arg)
             asm("" : "+r"(rightBase));
         } while ((s32)cursor <= (s32)(rightBase + 7));
     } else {
-        register u16 *end asm("r1") = rightBase;
+        u16 *end = rightBase;
         int zero = 0;
         u16 *cursor;
         cursor = rightBase + 7;
@@ -251,7 +251,7 @@ int sub_080390C4(struct Menu *arg)
                 }
                 do {
                     int index;
-                    register u32 mask asm("r1");
+                    u32 mask;
                     if (*q == 1) {
                         index = 0;
                         mask = p->extraMask;
@@ -264,7 +264,7 @@ int sub_080390C4(struct Menu *arg)
                             u32 bit = 1 << index;
                             mask = p->extraMask;
                             if (bit & mask) {
-                                register int small asm("r12");
+                                int small;
                                 register int one asm("r8");
                                 u32 used;
                                 {

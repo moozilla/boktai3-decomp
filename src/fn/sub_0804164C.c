@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
 extern u16 gUnk_03005260[];
 extern const u8 gUnk_086058E8[];
@@ -9,7 +8,7 @@ void ModifierMenu_SelectPendingSource(struct ModifierMenu *);
 s32 ModifierMenu_ApplyPendingSource(struct ModifierMenu *);
 static inline s32 ModifierMenu_ReadRepeatPair(u8 *counterArg, u32 negative, u32 positive)
 {
-    register u8 *counter asm("r5") = counterArg;
+    u8 *counter = counterArg;
     u8 temp;
     s32 period = 15;
     s32 change;

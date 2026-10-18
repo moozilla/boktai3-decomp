@@ -28,7 +28,7 @@ int sub_08036B64(struct Packet *);
 void sub_0803A618(int, int, int);
 void sub_08037DEC(struct Packet *p)
 {
-    register struct P *s asm("r6") = sub_08037DC0();
+    struct P *s = sub_08037DC0();
     struct Entry *e;
     int i;
     register int shift asm("r5");

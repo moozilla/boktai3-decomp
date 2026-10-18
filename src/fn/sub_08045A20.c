@@ -4,7 +4,7 @@ extern u16 gUnk_03005418[];
 struct ProjectedDisplay *ProjectedDisplay_PositionEntry(struct ProjectedDisplay *display, s32 index)
 {
     register struct ProjectedDisplay *result asm("r0") = display;
-    register struct ProjectedDisplayEntry *entry asm("r12");
+    struct ProjectedDisplayEntry *entry;
     entry = &display->entries[index];
     if (index == 1) {
         struct ContactPosition *destination = &entry->position;
@@ -41,7 +41,7 @@ struct ProjectedDisplay *ProjectedDisplay_PositionEntry(struct ProjectedDisplay 
     {
         const s32 *table;
         s32 offset;
-        register const s32 *word asm("r1");
+        const s32 *word;
         s32 bias;
         register struct ProjectedDisplayEntry *view asm("r3");
         table = gUnk_0860594C;

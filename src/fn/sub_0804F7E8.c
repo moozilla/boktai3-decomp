@@ -1,10 +1,9 @@
-// MATCHING_CONCESSION: register-pinning
 #include "repeated_effect.h"
 void RepeatedEffect_HandleContact(struct RepeatedEffectCollider *contact,
                                   struct RepeatedEffectCollider *other,
                                   struct RepeatedEffect *effect)
 {
-    register struct RepeatedEffect *initial asm("r3") = effect;
+    struct RepeatedEffect *initial = effect;
     struct RepeatedEffect *saved = initial;
     u16 *cooldown = &other->cooldown;
     if (!*cooldown) {

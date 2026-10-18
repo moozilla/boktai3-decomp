@@ -16,16 +16,13 @@ int SceneObjects_ScriptLower(void)
     if (!Script_SeekToKeyword(0x6e))
         return -1;
     id = Script_GetValue();
-    asm("" : "+r"(id));
     i = 0;
     if (found < *(u16 *)(p + 0x1a)) {
         u8 **base = (u8 **)(p + 0x42c);
         int zero;
         int one;
-        asm("" : : "r"(base));
         asm("" : "+r"(found));
         zero = 0;
-        asm("" : "+r"(zero));
         one = 1;
         do {
             u8 *s;

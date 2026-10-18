@@ -43,7 +43,7 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
                 {
                     register u32 index asm("r2");
                     {
-                        register u32 *indexPointer asm("r0") = &gUnk_03005308;
+                        u32 *indexPointer = &gUnk_03005308;
                         index = *indexPointer + 1;
                         mask = 1023;
                         index &= mask;
@@ -51,7 +51,7 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
                     {
                         u32 lowMask = 65535;
                         u32 copiedWord;
-                        register s32 oldY asm("r1");
+                        s32 oldY;
                         u32 highY;
                         index = (index + 1) & mask;
                         /* Copy first: the following word update reads only initialized X/Y. */
@@ -142,7 +142,7 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
                 {
                     register u32 index asm("r2");
                     {
-                        register u32 *indexPointer asm("r0") = &gUnk_03005308;
+                        u32 *indexPointer = &gUnk_03005308;
                         index = *indexPointer + 1;
                         mask = 1023;
                         index &= mask;
@@ -150,7 +150,7 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
                     {
                         u32 lowMask = 65535;
                         u32 copiedWord;
-                        register s32 oldY asm("r1");
+                        s32 oldY;
                         u32 highY;
                         index = (index + 1) & mask;
                         /* Copy first: the following word update reads only initialized X/Y. */
@@ -254,7 +254,7 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
                     {
                         u32 lowMask = 65535;
                         u32 copiedWord;
-                        register s32 oldY asm("r1");
+                        s32 oldY;
                         u32 highY;
                         index = (index + 1) & mask;
                         /* Copy first: the following word update reads only initialized X/Y. */

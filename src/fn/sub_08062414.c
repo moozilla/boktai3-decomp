@@ -62,7 +62,6 @@ s32 SceneInventory_TickPurchaseTransition(struct SceneInventoryTail *p)
                 s8 *entries;
                 register s32 offset asm("r0") = *page * 8;
                 s32 value;
-                asm("" : "+r"(offset), "+r"(index));
                 offset = index + offset;
                 entries = catalog->catalog;
                 value = SceneItemValue_GetItemBaseValue(entries[offset]);
@@ -79,7 +78,6 @@ s32 SceneInventory_TickPurchaseTransition(struct SceneInventoryTail *p)
                 s8 *entries;
                 register s32 offset asm("r0") = *page * 8;
                 s32 value;
-                asm("" : "+r"(offset), "+r"(index));
                 offset = index + offset;
                 entries = catalog->catalog;
                 sub_0822E288(entries[offset]);

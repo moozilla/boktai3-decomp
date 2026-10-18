@@ -4,7 +4,7 @@ s32 SceneInput_TickChoice(struct SceneInputWidget *widget, void *resource, u8 *s
 {
     u32 keys = gUnk_03005260[1];
     u32 change;
-    register u32 confirm asm("r2") = 1;
+    u32 confirm = 1;
     u32 accepted;
     accepted = confirm;
     asm("" : "+r"(accepted));

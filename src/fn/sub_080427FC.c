@@ -16,8 +16,8 @@ void ContactActor_ApplyHealthContact(struct ContactCollider *sourceInput,
                                      struct ContactCollider *otherInput,
                                      struct ContactActor *ownerInput)
 {
-    register struct ContactCollider *source asm("r6") = sourceInput;
-    register struct ContactCollider *other asm("r5") = otherInput;
+    struct ContactCollider *source = sourceInput;
+    struct ContactCollider *other = otherInput;
     register struct ContactActor *owner asm("r4") = ownerInput;
     struct ContactPackedVector size;
     u32 directionMask;

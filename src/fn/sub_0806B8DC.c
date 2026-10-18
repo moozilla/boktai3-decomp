@@ -27,7 +27,7 @@ s32 SpriteEffectController_UpdatePool(struct SpriteEffectControllerPool *input)
         {
             s32 i = 0;
             void **table = gUnk_08605B84;
-            register u8 *state asm("r6") = &p->slots[0].state;
+            u8 *state = &p->slots[0].state;
             for (; i < 24; state += 0x7c, slot++, i++) {
                 if (IsUsed(p, i))
                     sub_08249240(p, slot, table[*state]);

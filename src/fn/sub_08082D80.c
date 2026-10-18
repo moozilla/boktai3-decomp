@@ -66,7 +66,7 @@ void SceneActorControl_ConvergeSavedMotion(struct SceneActorRegistryResetView *i
     {
         u32 offset = 0x310;
         s32 current = *(s16 *)((u8 *)actor + offset);
-        register u32 priorOffset asm("r4");
+        u32 priorOffset;
         s16 *field;
         s32 difference;
         priorOffset = 0x318;
@@ -114,7 +114,7 @@ void SceneActorControl_ConvergeSavedMotion(struct SceneActorRegistryResetView *i
             *flags = mask;
             {
                 u32 *flags = &actor->flags2CC;
-                register u32 mask asm("r1") = ~0x80;
+                u32 mask = ~0x80;
                 *flags &= mask;
             }
             *((u8 *)control + 0x3E2) = stateTest;

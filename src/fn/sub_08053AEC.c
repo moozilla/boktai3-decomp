@@ -106,7 +106,7 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
             secondaryPosition = (void *)address1;
         }
         {
-            register u32 offset asm("r2") = 0x108;
+            u32 offset = 0x108;
             argument = (u16 *)((u8 *)marker + offset);
         }
         i = 1;
@@ -116,9 +116,9 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
     } else {
         {
             u32 graphicsOffset = 0x94;
-            register u8 *address0 asm("r0");
+            u8 *address0;
             register u8 *address1 asm("r1");
-            register u8 *address2 asm("r2");
+            u8 *address2;
             graphicsOffset += (u32)marker;
             address0 = (void *)graphicsOffset;
             graphics = (void *)address0;
@@ -139,7 +139,7 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
         }
         {
             u32 zero = 0;
-            register u32 offset asm("r2");
+            u32 offset;
             u16 *clear;
             i = 1;
             offset = 0x10A;
@@ -172,20 +172,20 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
     Sprite_Init(primary, graphics, 0);
     frame = 7;
     {
-        register struct ContactSwarmSprite *write asm("r2") = primary;
+        struct ContactSwarmSprite *write = primary;
         write->frame = frame;
     }
     AnimData_SelectPaletteBank(graphics, *paletteBase);
     marker->primary.sprite.flags |= 0x200;
     priority = 3;
     {
-        register u8 *write asm("r0") = primaryPriority;
+        u8 *write = primaryPriority;
         *write = priority;
     }
     {
         register u32 *source asm("r2") = (u32 *)position;
         u32 lo, hi;
-        register u32 *destination asm("r2");
+        u32 *destination;
         lo = source[0];
         hi = source[1];
         destination = (u32 *)primaryPosition;
@@ -204,7 +204,7 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
     }
     {
         register struct ContactSwarmSprite *read asm("r1") = secondary;
-        register u32 flags asm("r0");
+        u32 flags;
         flags = read->flags | 0x400;
         {
             register struct ContactSwarmSprite *write asm("r2") = secondary;
@@ -212,14 +212,13 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
         }
     }
     {
-        register u8 *write asm("r0") = secondaryPriority;
-        asm("" : "+r"(write));
+        u8 *write = secondaryPriority;
         *write = priority;
     }
     {
         register u32 *source asm("r2") = (u32 *)position;
         u32 lo, hi;
-        register u32 *destination asm("r2");
+        u32 *destination;
         lo = source[0];
         hi = source[1];
         destination = (u32 *)secondaryPosition;

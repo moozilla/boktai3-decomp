@@ -199,7 +199,7 @@ void SceneCharacter_PlaceFromScript(void)
         u16 a = angle;
         {
             register s32 t asm("r2");
-            register u32 m asm("r0");
+            u32 m;
             t = a + 0x70;
             asm("" : "+r"(t));
             t >>= 5;
@@ -209,8 +209,7 @@ void SceneCharacter_PlaceFromScript(void)
         }
         {
             s32 t = (a + 0x60) >> 6;
-            register u32 m asm("r0");
-            asm("" : "+r"(t));
+            u32 m;
             m = 3;
             m &= t;
             npc->facing4 = m;

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
 // fuzzy: 93.5%
 /* Complete body; remaining differences are scratch-register allocation. */
@@ -22,7 +21,7 @@ void TetherActor_UpdateRoamingState(struct TetherActor *actor)
     struct ContactPackedVector delta;
     s32 activeMask;
     s32 headingMask;
-    register u32 chargeOffset asm("r2");
+    u32 chargeOffset;
     if (actor->state != 3)
         TetherActor_SetState(actor, 3);
     if (gUnk_030053F4 & 512)
@@ -30,10 +29,9 @@ void TetherActor_UpdateRoamingState(struct TetherActor *actor)
     chargeOffset = 0x384;
     if (*(u16 *)((u8 *)actor + chargeOffset)) {
         {
-            register u32 glowOffset asm("r3") = 0x38A;
-            asm("" : "+r"(glowOffset));
+            u32 glowOffset = 0x38A;
             {
-                register u16 *glow asm("r0") = (u16 *)((u8 *)actor + glowOffset);
+                u16 *glow = (u16 *)((u8 *)actor + glowOffset);
                 *glow = 0;
             }
         }
@@ -42,7 +40,6 @@ void TetherActor_UpdateRoamingState(struct TetherActor *actor)
             u16 *frame = (u16 *)((u8 *)actor + chargeOffset);
             *frame = 0;
         }
-        asm("" : : "r"(chargeOffset));
         TetherActor_UpdateShake(actor);
         position = &actor->position;
     } else {
@@ -55,26 +52,24 @@ void TetherActor_UpdateRoamingState(struct TetherActor *actor)
             if (currentFrame > 90) {
                 s32 dx;
                 s32 dz;
-                register s16 *z asm("r10");
+                s16 *z;
                 {
-                    register s32 targetX asm("r1") = actor->interactionProbe.target.x;
+                    s32 targetX = actor->interactionProbe.target.x;
                     s32 worldX = position->x;
                     targetX -= worldX;
-                    asm("" : "+r"(targetX));
                     dx = targetX;
                 }
                 headingMask = 7;
                 {
-                    register s32 targetZ asm("r2") = actor->interactionProbe.target.z;
+                    s32 targetZ = actor->interactionProbe.target.z;
                     s16 *worldZ = &actor->position.z;
                     s32 value = *worldZ;
                     targetZ -= value;
-                    asm("" : "+r"(targetZ));
                     dz = targetZ;
                     z = worldZ;
                 }
                 if (dx || dz) {
-                    register u32 angle asm("r5") = Math_Atan2(dx, dz);
+                    u32 angle = Math_Atan2(dx, dz);
                     delta.x = scale(gUnk_086149C4[(angle + 64) & 255] * 3);
                     delta.y = 0;
                     {
@@ -87,9 +82,9 @@ void TetherActor_UpdateRoamingState(struct TetherActor *actor)
                             position->x += delta.x;
                             {
                                 u32 value = (u16)delta.z;
-                                register s16 *source asm("r2") = z;
-                                register u32 current asm("r2") = *(u16 *)source;
-                                register s16 *destination asm("r3");
+                                s16 *source = z;
+                                u32 current = *(u16 *)source;
+                                s16 *destination;
                                 value += current;
                                 destination = z;
                                 *(u16 *)destination = value;
@@ -99,9 +94,8 @@ void TetherActor_UpdateRoamingState(struct TetherActor *actor)
                             actor->moving = accepted;
                     }
                     {
-                        register s32 sector asm("r0") = (u16)angle;
+                        s32 sector = (u16)angle;
                         u32 mask = headingMask;
-                        asm("" : "+r"(sector));
                         sector += 112;
                         sector >>= 5;
                         mask &= sector;

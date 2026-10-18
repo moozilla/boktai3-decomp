@@ -11,7 +11,7 @@ void SceneInventory_ShowItemDescription(struct SceneInventoryPanel *panel)
             register s32 offset asm("r0") = panel->page * 8;
             offset -= 16;
             {
-                register u32 selected asm("r4") = panel->selection;
+                u32 selected = panel->selection;
                 offset += selected;
             }
             item = panel->catalog[offset];

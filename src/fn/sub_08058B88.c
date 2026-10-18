@@ -5,7 +5,7 @@ void ScenePanel_CycleOverlayPalette(struct ScenePanel *panel)
     u32 frame;
     {
         u16 *counter = &panel->overlayFrame;
-        register u32 old asm("r0") = *counter;
+        u32 old = *counter;
         frame = old + 1;
         *counter = frame;
     }

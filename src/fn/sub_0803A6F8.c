@@ -25,7 +25,7 @@ void sub_0803A6F8(void)
         do {
             if (*count) {
                 int value;
-                register int offset asm("r0") = i * 0xb0 + 0x5c;
+                int offset = i * 0xb0 + 0x5c;
                 struct Item *q;
                 q = (struct Item *)((u8 *)p + offset);
                 q->state = state;

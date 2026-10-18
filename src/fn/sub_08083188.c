@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
 void SceneActorControl_UpdatePersistentAnimation(struct SceneActorRegistryResetView *);
@@ -15,7 +14,7 @@ void SceneActorControl_UpdatePersistentPhase(struct SceneActorRegistryResetView 
         actor->field2C8 = 0;
         {
             u32 *flags = &actor->flags114;
-            register u32 mask asm("r1") = ~1;
+            u32 mask = ~1;
             *flags &= mask;
         }
         actor->word104 = 0;

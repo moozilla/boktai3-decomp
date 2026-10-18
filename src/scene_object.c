@@ -709,7 +709,7 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
     struct SceneObject *actor = input;
     register s32 index asm("r4") = idx;
     register s32 direction asm("r8") = dir;
-    register struct SceneCell *reference asm("r10") = &actor->cellRef.cell;
+    struct SceneCell *reference = &actor->cellRef.cell;
     s32 savedIndex;
     s32 delta = 0, dx = 0, dz = 0, speed, step;
     struct SceneCell *cell;
@@ -753,7 +753,7 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
     else
         cell = (struct SceneCell *)(gUnk_030052F4->cells + 12 + savedIndex * 4);
     if (cell) {
-        register u32 heightByte asm("r1") = cell->height;
+        u32 heightByte = cell->height;
         u32 mask = 0xF0;
         s32 type = heightByte >> 4;
         asm("" : : "r"(heightByte));
@@ -765,7 +765,7 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
                 s32 next;
                 s32 current;
                 referenceHeight = ({
-                    register struct SceneCell *p asm("r2") = reference;
+                    struct SceneCell *p = reference;
                     p->height;
                 });
                 asm("" : : "r"(referenceHeight));
@@ -782,7 +782,6 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
                     });
                     actor->direction = ({
                         u32 d = direction;
-                        asm("" : "+r"(d));
                         d;
                     });
                     {
@@ -805,7 +804,7 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
                         y;
                     });
                     referenceHeight = ({
-                        register struct SceneCell *p asm("r2") = reference;
+                        struct SceneCell *p = reference;
                         p->height;
                     });
                     {
@@ -817,11 +816,11 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
                         reference->height = mask;
                     }
                     {
-                        register u32 tile asm("r0") = cell->tile;
+                        u32 tile = cell->tile;
                         reference->tile = tile;
                     }
                     actor->direction = ({
-                        register u32 d asm("r2") = direction;
+                        u32 d = direction;
                         d;
                     });
                     {

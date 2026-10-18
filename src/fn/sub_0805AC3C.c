@@ -44,10 +44,9 @@ void ScenePanel_TickRig(struct ScenePanel *input)
         flags = (void *)((u8 *)parent + offset);
         *flags &= 0xFFFB;
         {
-            register u32 colliderOffset asm("r1") =
-                (u32) & ((struct SceneRigDriverView *)0)->rig.collider;
+            u32 colliderOffset = (u32) & ((struct SceneRigDriverView *)0)->rig.collider;
             void *collider;
-            register u32 positionOffset asm("r2");
+            u32 positionOffset;
             void *position;
             collider = (u8 *)parent + colliderOffset;
             positionOffset = (u32) & ((struct SceneRigDriverView *)0)->rig.position;
@@ -66,7 +65,7 @@ void ScenePanel_TickRig(struct ScenePanel *input)
     }
     palette = 91;
     {
-        register u32 actionOffset asm("r1") = (u32) & ((struct SceneRigDriverView *)0)->action;
+        u32 actionOffset = (u32) & ((struct SceneRigDriverView *)0)->action;
         {
             void **action = (void *)((u8 *)parent + actionOffset);
             if (*action) {
@@ -74,7 +73,7 @@ void ScenePanel_TickRig(struct ScenePanel *input)
                     (u32) & ((struct SceneRigDriverView *)0)->frame;
                 volatile u16 *framePtr;
                 register volatile u16 *intervalPtr asm("r1");
-                register u32 intervalOffset asm("r0");
+                u32 intervalOffset;
                 u32 first;
                 register u32 interval asm("r3");
                 asm("" : "+r"(frameOffset));

@@ -10,7 +10,7 @@ void StageIconDisplay_InitAnimations(struct StageIconDisplay *argument, s32 vari
     resource = ScriptProc_Start(0xCB05, 0x1289);
     if (resource) {
         struct SceneExtent position;
-        register struct ProjectedDisplayResource *header asm("r5");
+        struct ProjectedDisplayResource *header;
         struct ProjectedDisplayResource *savedHeader;
         display->resource = *resource;
         header = &display->resource;

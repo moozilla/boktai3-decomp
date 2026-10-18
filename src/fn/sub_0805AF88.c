@@ -6,17 +6,17 @@ void ScenePanelRig_InitSecondarySprites(struct ScenePanelRig *rig)
 {
     struct ScenePanelRig *owner = rig;
     s32 i = 0;
-    register u32 one asm("r9") = 1;
+    u32 one = 1;
     register u32 zero asm("r10") = i;
     asm("" : "+r"(owner), "+r"(i), "+r"(one), "+r"(zero));
     do {
-        register struct SceneRigSprite *sprite asm("r5");
+        struct SceneRigSprite *sprite;
         struct SceneRigSprite *animated;
         s32 next;
         void *graphics, *resource;
         {
-            register u32 offset asm("r0") = 0x68 * i;
-            register struct ScenePanelRig *base asm("r3");
+            u32 offset = 0x68 * i;
+            struct ScenePanelRig *base;
             offset += 0x3A8;
             base = owner;
             sprite = (void *)((u8 *)base + offset);
@@ -37,7 +37,7 @@ void ScenePanelRig_InitSecondarySprites(struct ScenePanelRig *rig)
                 Sprite_Init(sprite, graphics, 1024);
         }
         {
-            register u32 value asm("r3") = zero;
+            u32 value = zero;
             sprite->frame = value;
         }
         {
@@ -57,7 +57,6 @@ void ScenePanelRig_InitSecondarySprites(struct ScenePanelRig *rig)
             u32 offset = gUnk_03005308 * 2;
             const u8 *table;
             table = (void *)RANDOM_TABLE_ADDR;
-            asm("" : "+r"(table));
             offset += (u32)table;
             animated->randomPhase = *(u8 *)offset;
         }

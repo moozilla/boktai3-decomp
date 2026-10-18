@@ -29,8 +29,7 @@ void SceneActorControl_TickGroundBob(struct SceneActorRegistryResetView *actor)
     s32 delta, absolute;
     struct SceneActorControlMotionState *state;
     {
-        register struct SceneActorControlMotionState *raw asm("r5") =
-            SceneActorControl_GetMotionState(actor);
+        struct SceneActorControlMotionState *raw = SceneActorControl_GetMotionState(actor);
         state = raw;
     }
 

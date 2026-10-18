@@ -71,10 +71,9 @@ static inline void vector(s16 *dst, int direction, int length)
         angle = converted >> 24;
     }
     speed = length;
-    asm("" ::"r"(velocity), "r"(angle));
     {
         int x = trunc12(gUnk_086149C4[(angle + 64) & 255] * speed);
-        register int zero asm("r0") = 0;
+        int zero = 0;
         velocity[0] = x;
         velocity[1] = zero;
     }
@@ -118,7 +117,7 @@ void sub_080280CC(ActorAnimation *p, int tick)
         p->changed = 0;
         sequence = choose(p->mode, 68, 30);
         {
-            register int offset asm("r0") = 0x240;
+            int offset = 0x240;
             SceneActors_StartDirectionalAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence, 2,
                                                   1, 4);
         }

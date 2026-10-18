@@ -23,7 +23,7 @@ void SceneActorEffects_ReleaseResources(struct SceneActorEffectsView *actor)
 {
     u8 *control = (u8 *)actor + 0x3D4;
     register u8 *drawable asm("r4") = actor->drawable;
-    register u16 *flags asm("r6");
+    u16 *flags;
     void *identity;
     if (actor->drawableKind == 0)
         Sprite_Remove(drawable);
@@ -32,7 +32,7 @@ void SceneActorEffects_ReleaseResources(struct SceneActorEffectsView *actor)
     Heap_Free(drawable);
     {
         u32 mask = 0x100;
-        register u16 *pointer asm("r1");
+        u16 *pointer;
         u32 value;
         pointer = &actor->flags2C0;
         value = *pointer & mask;
@@ -41,7 +41,7 @@ void SceneActorEffects_ReleaseResources(struct SceneActorEffectsView *actor)
             sub_08020D08((u8 *)actor + 0xC);
     }
     {
-        register u32 offset asm("r2") = 0x320;
+        u32 offset = 0x320;
         u8 *shadow;
         shadow = (u8 *)actor + offset;
         if (*shadow)

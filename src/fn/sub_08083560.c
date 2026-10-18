@@ -1,7 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
 // fuzzy: 92.2%
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_motion.h"
 void CpuSet(const void *, void *, u32);
 #include "gba/macro.h"
@@ -21,10 +20,9 @@ static inline u32 StepDrawable(struct SceneActorControlMotionDrawable *owner)
     sprite->frame = *command >> 6;
     {
         u32 input = state->flags;
-        register u32 first asm("r1");
+        u32 first;
         u32 maskBit = 1;
         bit = maskBit;
-        asm("" : "+r"(bit));
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit))
@@ -35,12 +33,10 @@ static inline u32 StepDrawable(struct SceneActorControlMotionDrawable *owner)
     {
         u32 input = state->flags;
         u32 bit;
-        register u32 first asm("r1");
+        u32 first;
         bit = 2;
-        asm("" : "+r"(bit));
         first = bit;
         first &= input;
-        asm("" : "+r"(first));
         first = (u8)first;
         if (first != (((*command & 0x30) >> 4) & bit))
             owner->flags |= 8;
@@ -50,14 +46,12 @@ static inline u32 StepDrawable(struct SceneActorControlMotionDrawable *owner)
     {
         u32 elapsed = state->elapsed + 1;
         u32 mask;
-        register u32 temp asm("r1");
-        register u32 savedDuration asm("r3");
+        u32 temp;
+        u32 savedDuration;
         state->elapsed = elapsed;
         temp = 0xFFFF;
-        asm("" : "+r"(temp));
         mask = temp;
         /* Keep the live mask distinct from its source without binding r7. */
-        asm("" : "+&r"(mask) : "r"(temp));
         duration = state->duration;
         elapsed = (u16)elapsed;
         savedDuration = duration;
@@ -87,7 +81,6 @@ static inline u32 StepDrawable(struct SceneActorControlMotionDrawable *owner)
                 frameCount = state->frameCount;
                 if ((index & mask) >= frameCount) {
                     endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
                     endFlag = (u8)endFlag;
                     if (endFlag) {
                         state->elapsed = duration;
@@ -111,7 +104,7 @@ static inline u32 StepDrawable(struct SceneActorControlMotionDrawable *owner)
             }
             state->frameWeight = *command & 15;
             {
-                register s32 weight asm("r1") = state->frameWeight;
+                s32 weight = state->frameWeight;
                 s32 speed;
                 speed = state->speed;
                 speed = (speed * weight) >> 6;
@@ -135,7 +128,7 @@ static inline u32 CellIndex(const struct ContactPosition *position)
 static inline u32 GroundHeight(u32 cell, const struct ContactPosition *position)
 {
     u8 *data = sub_0821D64C(cell, 1);
-    register u32 flags asm("r1");
+    u32 flags;
     u32 shape, height;
     if (data)
         data += 4;
@@ -149,8 +142,7 @@ static inline u32 GroundHeight(u32 cell, const struct ContactPosition *position)
             height -= *(u8 *)&position->z;
             break;
         case 2: {
-            register const struct ContactPosition *raw asm("r4") = position;
-            asm("" : : "r"(raw));
+            const struct ContactPosition *raw = position;
             height -= *(u8 *)&raw->x;
             break;
         }
@@ -159,19 +151,17 @@ static inline u32 GroundHeight(u32 cell, const struct ContactPosition *position)
 }
 void SceneActorControl_RestoreMotion(struct SceneActorRegistryResetView *input)
 {
-    register struct SceneActorRegistryResetView *actor asm("r6") = input;
-    register struct SceneActorControlMotionState *state asm("r5") =
-        SceneActorControl_GetMotionState(actor);
+    struct SceneActorRegistryResetView *actor = input;
+    struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
     struct SceneActorControlMotionDrawable *drawable = actor->drawable;
 
     u32 height;
     state->field3DB = 0;
     {
-        register u32 offset asm("r4") = 0x3E0;
+        u32 offset = 0x3E0;
         u32 zero = 0;
         u8 byteZero = 0;
-        register struct ContactPosition *stored asm("r2");
-        asm("" : "+r"(offset));
+        struct ContactPosition *stored;
         *(u16 *)((u8 *)state + offset) = zero;
         state->phase = byteZero;
         offset += 3;
@@ -185,20 +175,18 @@ void SceneActorControl_RestoreMotion(struct SceneActorRegistryResetView *input)
         stored = (void *)((u8 *)state + offset);
         actor->position = *stored;
         {
-            register u32 cell asm("r1") = CellIndex(stored);
-            asm("" : "+r"(cell));
+            u32 cell = CellIndex(stored);
             actor->terrainCell = cell;
         }
     }
     height = GroundHeight(actor->terrainCell, &state->storedPosition);
     {
-        register u16 *ground asm("r2") = &((struct SceneActorControlGroundView *)actor)->ground;
-        register s16 *actorY asm("r3") = &actor->position.y;
+        u16 *ground = &((struct SceneActorControlGroundView *)actor)->ground;
+        s16 *actorY = &actor->position.y;
         u32 previousY;
-        register u32 offset asm("r4") = 0x2EA;
+        u32 offset = 0x2EA;
         *ground = height;
         previousY = (u16)*actorY;
-        asm("" : "+r"(offset));
         *(u16 *)((u8 *)actor + offset) = previousY - height;
         *actorY = *ground;
     }
@@ -208,18 +196,15 @@ void SceneActorControl_RestoreMotion(struct SceneActorRegistryResetView *input)
         ((struct SceneActorRegistryTileDrawable *)actor->drawable)->position = actor->position;
     {
         u32 zero;
-        register u32 flags asm("r2");
+        u32 flags;
         zero = 0;
         flags = 0x5000002;
-        asm("" : "+r"(flags));
         CpuSet(&zero, &state->vectors[0], flags);
         zero = 0;
         flags = 0x5000002;
-        asm("" : "+r"(flags));
         CpuSet(&zero, &state->vectors[1], flags);
         zero = 0;
         flags = 0x5000002;
-        asm("" : "+r"(flags));
         CpuSet(&zero, &state->vectors[2], flags);
     }
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);

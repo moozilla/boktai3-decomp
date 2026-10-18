@@ -91,7 +91,7 @@ void SceneActorControl_RequestVisibility(struct SceneActorRegistryResetView *inp
     {
         u32 requested = request[1];
         if (requested == 0) {
-            register u32 mask asm("r2") = 0x20;
+            u32 mask = 0x20;
             u32 *flags;
             u32 active;
             u32 *savedFlags;
@@ -104,8 +104,8 @@ void SceneActorControl_RequestVisibility(struct SceneActorRegistryResetView *inp
                 asm("" : "+r"(hidden));
                 if (hidden) {
                     {
-                        register u32 offset asm("r3") = 0x3EE;
-                        register u16 *timer asm("r1");
+                        u32 offset = 0x3EE;
+                        u16 *timer;
                         timer = (void *)((u8 *)state + offset);
                         *timer = 0;
                     }
@@ -121,7 +121,7 @@ void SceneActorControl_RequestVisibility(struct SceneActorRegistryResetView *inp
                 }
             }
         } else if (requested == 1) {
-            register u32 mask asm("r2") = 0x40;
+            u32 mask = 0x40;
             u32 *flags;
             u32 active;
             u32 *savedFlags;
@@ -130,7 +130,7 @@ void SceneActorControl_RequestVisibility(struct SceneActorRegistryResetView *inp
             savedFlags = flags;
             active = SceneActorControl_TestFlags(active, ~0);
             if (!active) {
-                register u32 hidden asm("r1") = IsHidden(actor);
+                u32 hidden = IsHidden(actor);
                 if (!hidden) {
                     u32 hiddenZero = hidden;
                     {

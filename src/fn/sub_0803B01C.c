@@ -95,9 +95,9 @@ void sub_0803B01C(struct P *p)
         u16 *table = gUnk_0203B400;
         register u32 *indexPointer asm("r2");
         register u32 index asm("r0");
-        register u32 mask asm("r4");
+        u32 mask;
         int value;
-        register int smallMask asm("r3");
+        int smallMask;
         indexPointer = &gUnk_03005308;
         index = *indexPointer + 1;
         mask = 1023;

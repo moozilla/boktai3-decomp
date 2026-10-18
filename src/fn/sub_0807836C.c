@@ -68,7 +68,7 @@ u8 SceneActorBehavior_TickDrawableBlink(struct SceneActorRegistryActor *inputAct
             u32 mask = ~1;
             ((struct SceneActorRegistrySequenceDrawable *)base)->flags &= mask;
         } else {
-            register u8 *base asm("r0") = (u8 *)actor->drawable + 0x20;
+            u8 *base = (u8 *)actor->drawable + 0x20;
             u32 mask = ~1;
             *(u32 *)(base + 8) &= mask;
         }

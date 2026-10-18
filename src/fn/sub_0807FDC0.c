@@ -24,7 +24,6 @@ void SceneActorReaction_RestoreAfterDelay(struct SceneActorRegistryActor *actor,
             u32 *field;
             register u32 mask asm("r1");
             field = (void *)((u8 *)owner + offset);
-            asm("" : "+r"(field));
             mask = ~1;
             *field &= mask;
             {

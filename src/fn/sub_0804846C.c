@@ -15,7 +15,7 @@ void WirelessLinkIndicator_UpdateLinkStatus(struct WirelessLinkIndicator *input)
                 s32 index = 0;
                 s32 slots;
                 u8 *values;
-                register u32 connected asm("r6");
+                u32 connected;
                 slots = status->connSlotFlag;
                 connected = 1;
                 values = status->strength;

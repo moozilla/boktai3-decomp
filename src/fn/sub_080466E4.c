@@ -77,7 +77,7 @@ s32 ContactSequencePool_SpawnActor(struct ContactSequenceOwner *pool,
         struct DisplaySequenceState *state = &actor->sequence;
         void *resource = (void *)owner->sequenceResource;
         const struct ContactSequenceFrame *frames = gUnk_08605974;
-        register u32 one asm("r4") = 1;
+        u32 one = 1;
         u32 index;
         register u32 zero asm("r5");
         index = savedVariant;

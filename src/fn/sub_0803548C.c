@@ -54,11 +54,11 @@ void sub_0803548C(struct Engine *argument)
     packet = (u8 *)p + 0x80;
     do {
         int offset = i << 2;
-        register int bit asm("r1") = 2 << i;
+        int bit = 2 << i;
         int test;
         u8 *initialSeen;
         {
-            register u8 *read asm("r3") = scratch;
+            u8 *read = scratch;
             test = read[2] & bit;
         }
         {
@@ -94,7 +94,7 @@ void sub_0803548C(struct Engine *argument)
                             asm("" : "+r"(previousValue));
                             if (previousValue == incoming) {
                                 {
-                                    register u8 *counter asm("r1") = (u8 *)p + 0xD4;
+                                    u8 *counter = (u8 *)p + 0xD4;
                                     counter += i;
                                     (*counter)++;
                                 }
@@ -104,7 +104,7 @@ void sub_0803548C(struct Engine *argument)
                                 }
                             } else if ((u32)previousValue < (u32)incoming) {
                                 {
-                                    register u8 *counter asm("r1") = (u8 *)p + 0xDC;
+                                    u8 *counter = (u8 *)p + 0xDC;
                                     counter += i;
                                     (*counter)++;
                                 }
@@ -114,7 +114,7 @@ void sub_0803548C(struct Engine *argument)
                                 }
                             } else {
                                 {
-                                    register u8 *counter asm("r1") = (u8 *)p + 0xD8;
+                                    u8 *counter = (u8 *)p + 0xD8;
                                     counter += i;
                                     (*counter)++;
                                 }
@@ -134,7 +134,7 @@ void sub_0803548C(struct Engine *argument)
         register int matched asm("r2");
         u8 *sent;
         {
-            register u8 *read asm("r2") = scratch;
+            u8 *read = scratch;
             expected = read[2];
         }
         saved = expected;
@@ -163,10 +163,8 @@ void sub_0803548C(struct Engine *argument)
     checkSent: {
         register u8 *read asm("r2") = seen;
         int value;
-        asm("" : "+r"(read));
         value = *read;
         value &= got;
-        asm("" : "+r"(value));
         if (value != got) {
             u8 *counter = (u8 *)p + 0xE5;
             (*counter)++;

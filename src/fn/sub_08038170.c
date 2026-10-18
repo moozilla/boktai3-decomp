@@ -62,7 +62,7 @@ void sub_08038170(struct P *input)
     do {
         int n = start;
         register struct Save **slot asm("r12");
-        register int limit asm("r6");
+        int limit;
         int index;
         {
             struct Save **t = &gUnk_02000710;
@@ -70,10 +70,9 @@ void sub_08038170(struct P *input)
         }
         limit = start + 16;
         if (start < limit) {
-            register int item asm("r1") = start;
+            int item = start;
             int mod = moduloMask;
-            register u32 bit asm("r3");
-            asm("" : "+r"(item), "+r"(mod));
+            u32 bit;
             item &= mod;
             bit = 1 << item;
             if (({
@@ -93,7 +92,6 @@ void sub_08038170(struct P *input)
                     break;
                 item = n;
                 mod = moduloMask;
-                asm("" : "+r"(item), "+r"(mod));
                 item &= mod;
                 bit = 1 << item;
                 if (({
@@ -162,7 +160,7 @@ void sub_08038170(struct P *input)
             i = 0;
             {
                 register struct Save **t asm("r2") = fallback;
-                register struct Save *save asm("r0");
+                struct Save *save;
                 s16 *row;
                 save = *t;
                 row = (s16 *)((u8 *)save + 0x68);
@@ -225,10 +223,9 @@ void sub_08038170(struct P *input)
         limit = start + 8;
         asm("" : "+r"(limit), "+r"(i));
         if (start < limit) {
-            register int item asm("r1") = start;
+            int item = start;
             int mod = moduloMask;
-            register u32 bit asm("r3");
-            asm("" : "+r"(item), "+r"(mod));
+            u32 bit;
             item &= mod;
             bit = 1 << item;
             if (({
@@ -248,7 +245,6 @@ void sub_08038170(struct P *input)
                     break;
                 item = n;
                 mod = moduloMask;
-                asm("" : "+r"(item), "+r"(mod));
                 item &= mod;
                 bit = 1 << item;
                 if (({
@@ -267,13 +263,13 @@ void sub_08038170(struct P *input)
             }
         }
     selected8: {
-        register struct Save **t asm("r0") = &gUnk_02000710;
+        struct Save **t = &gUnk_02000710;
         s16 *row;
         row = (s16 *)((u8 *)*t + offset + 0x78);
         if (*row < 0)
             missing = 1;
         else if (GameState_GetUnlockEntry(*row) == 1) {
-            register int t asm("r0") = 1;
+            int t = 1;
             usable = t;
         }
     }
@@ -312,7 +308,7 @@ void sub_08038170(struct P *input)
             i = 0;
             {
                 register struct Save **t asm("r1") = fallback;
-                register struct Save *save asm("r0");
+                struct Save *save;
                 s16 *row;
                 save = *t;
                 row = (s16 *)((u8 *)save + 0x78);

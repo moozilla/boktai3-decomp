@@ -38,7 +38,7 @@ void StackedActor_ConsumeTriggers(struct StackedActor *actor)
             i++;
             {
                 u8 *current = *cache;
-                register u8 *counts asm("r0") = receiver + 6;
+                u8 *counts = receiver + 6;
                 u32 selected = current[0x24];
                 counts += selected;
                 count = *counts;

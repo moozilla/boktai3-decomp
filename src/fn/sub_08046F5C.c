@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "damage_number_display.h"
 void DamageNumberGroup_AdvancePhase(struct DamageNumberGroup *);
 extern const u32 gUnk_086059C0[];
@@ -9,7 +8,7 @@ s32 DamageNumberDisplay_UpdateBouncing(struct DamageNumberDisplay *display,
     struct DamageNumberGlyph *digit;
     s32 index;
     u32 horizontalOffset;
-    register s32 value asm("r0");
+    s32 value;
     s32 scaledSin;
     DamageNumber_ProjectPosition(&screen, &group->position);
     digit = group->digits;

@@ -39,7 +39,7 @@ static inline void StepSprite(struct SpriteEffectController *input)
         sprite = *cursor++;
         {
             u32 offset = ((struct DisplaySequenceState *)cursor)->index << 1;
-            register const u16 *table asm("r1") = slot->sequence.commands;
+            const u16 *table = slot->sequence.commands;
             command = (void *)((u32)table + offset);
         }
     }
@@ -145,7 +145,7 @@ static inline void StepSprite(struct SpriteEffectController *input)
                         hold = (u8)hold;
                         if (hold) {
                             register struct DisplaySequenceState *write asm("r5") = state;
-                            register u16 last asm("r0");
+                            u16 last;
                             write->elapsed = duration;
                             last = count - 1;
                             write->index = last;
@@ -201,7 +201,7 @@ static inline void StepEffect(struct SpriteEffectController *input)
         const u16 *graphics;
         register struct DisplaySequenceState *read asm("r5");
         u32 offset;
-        register const u16 *table asm("r1");
+        const u16 *table;
         sprite = *cursor++;
         asm volatile("" : : "r"(cursor));
         graphics = sprite->graphics;
@@ -315,7 +315,7 @@ static inline void StepEffect(struct SpriteEffectController *input)
                         hold = (u8)hold;
                         if (hold) {
                             register struct DisplaySequenceState *write asm("r5") = state;
-                            register u16 last asm("r0");
+                            u16 last;
                             write->elapsed = duration;
                             last = count - 1;
                             write->index = last;
@@ -360,7 +360,7 @@ void SpriteEffectController_FadeAndDestroy(struct SpriteEffectControllerPool *un
         }
     }
     {
-        register u16 *read asm("r2") = &slot->flags;
+        u16 *read = &slot->flags;
         u32 type;
         {
             u32 bits = *read;
@@ -375,7 +375,7 @@ void SpriteEffectController_FadeAndDestroy(struct SpriteEffectControllerPool *un
     }
     {
         u32 bits = *flags;
-        register u32 selected asm("r0") = 8;
+        u32 selected = 8;
         selected &= bits;
         asm volatile("" : : "r"(selected));
     }

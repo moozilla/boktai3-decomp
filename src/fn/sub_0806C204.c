@@ -189,7 +189,7 @@ void SceneSteeringActor_BobInPlace(struct SceneSteeringActorPool *unused,
                 left->z = value + old;
             }
             {
-                register u32 offset asm("r1") = 0x124;
+                u32 offset = 0x124;
                 {
                     u16 *frame = (void *)((u8 *)p + offset);
                     if (Mod(*frame, 128) == 0)
@@ -201,7 +201,7 @@ void SceneSteeringActor_BobInPlace(struct SceneSteeringActorPool *unused,
     SceneSteeringActor_RefreshCollider(p);
     Step(p);
     {
-        register u32 offset asm("r1") = 0x124;
+        u32 offset = 0x124;
         register u16 *frame asm("r0");
         frame = (void *)((u8 *)p + offset);
         {

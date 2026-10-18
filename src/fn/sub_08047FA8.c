@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_burst.h"
 static inline s32 nextRandomHighByte(void)
 {
@@ -30,16 +29,16 @@ void ContactBurst_UpdateContactAnimation(struct ContactBurst *effect)
             sprite->frame = frame;
         } else {
             u32 frame = *contactFrame;
-            register struct TransientEffectSprite *sprite asm("r1") = &effect->sprite;
+            struct TransientEffectSprite *sprite = &effect->sprite;
             sprite->frame = frame + 1;
         }
         --effect->contactTimer;
     } else {
         if (phase <= 3) {
-            register struct TransientEffectSprite *sprite asm("r1") = &effect->sprite;
+            struct TransientEffectSprite *sprite = &effect->sprite;
             sprite->frame = 27;
         } else {
-            register struct TransientEffectSprite *sprite asm("r1") = &effect->sprite;
+            struct TransientEffectSprite *sprite = &effect->sprite;
             sprite->frame = 28;
         }
     }

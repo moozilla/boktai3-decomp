@@ -4,7 +4,7 @@ void LevelAdvanceDisplay_StartParticle(struct LevelAdvanceParticle *particle)
 {
     const u16 *table;
     register u32 *randomIndex asm("r12");
-    register u32 mask asm("r8");
+    u32 mask;
     register u32 index asm("r2");
     s32 x, y, z;
     u32 rangeMask;
@@ -55,7 +55,7 @@ void LevelAdvanceDisplay_StartParticle(struct LevelAdvanceParticle *particle)
         particle->velocityY = (value & lowMask) + 12;
     }
     {
-        register u32 value asm("r1") = zero;
+        u32 value = zero;
         particle->velocityZ = value;
         particle->frame = value;
     }

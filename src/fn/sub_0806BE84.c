@@ -12,7 +12,6 @@ static inline s32 ReadTimer0(s16 *input, u32 offset)
     register u32 token asm("r1");
     register u32 keep asm("r2") = offset;
     s32 result;
-    asm volatile("" : "=r"(token), "+r"(keep));
     result = *timer;
     asm volatile("" : : "r"(token), "r"(keep));
     return result;
@@ -22,16 +21,13 @@ static inline s32 ReadTimer6(s16 *input, u32 offset)
     register s16 *timer asm("r6") = input;
     register u32 keep asm("r2") = offset;
     s32 result;
-    asm volatile("" : "+r"(keep)::"r1");
     result = *timer;
-    asm volatile("" : : "r"(keep) : "r1");
     return result;
 }
 static inline s32 ReadTimer1(s16 *input)
 {
     register s16 *timer asm("r6") = input;
     s32 result;
-    asm volatile("" : ::"r0", "r2");
     result = *timer;
     return result;
 }
@@ -88,9 +84,7 @@ static inline void Step(struct SceneSteeringActor *input)
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;
-        asm("" : "+r"(temp));
         mask = temp;
-        asm("" : "+&r"(mask) : "r"(temp));
         /* Keep the live mask distinct from its source without binding r7. */
         duration = state->duration;
         elapsed = (u16)elapsed;
@@ -171,7 +165,6 @@ void SceneSteeringActor_Appear(struct SceneSteeringActorPool *unused,
             s16 *timer;
             u32 zeroEnter;
             register u32 zeroFrame asm("r1");
-            asm("" : "+r"(timerOffset));
             timer = (void *)((u8 *)p + timerOffset);
             zeroEnter = 0;
             zeroFrame = 0;
@@ -184,7 +177,7 @@ void SceneSteeringActor_Appear(struct SceneSteeringActorPool *unused,
         p->scaleY = 1;
     }
     {
-        register u32 offset asm("r1") = 0x124;
+        u32 offset = 0x124;
         {
             u16 *frame = (void *)((u8 *)p + offset);
             if (Mod(*frame, 8) == 0)
@@ -193,7 +186,7 @@ void SceneSteeringActor_Appear(struct SceneSteeringActorPool *unused,
     }
     {
         u32 offset = 0x116;
-        register s16 *timer asm("r6");
+        s16 *timer;
         timer = (void *)((u8 *)p + offset);
         if (ReadTimer6(timer, offset) > 0) {
             p->scaleX += Div(64 - p->scaleX, *timer);
@@ -203,13 +196,13 @@ void SceneSteeringActor_Appear(struct SceneSteeringActorPool *unused,
     }
     Step(p);
     {
-        register u32 offset asm("r2") = 0x116;
+        u32 offset = 0x116;
         s32 value;
         value = ReadTimer0((void *)((u8 *)p + offset), offset);
         if (value <= 0) {
             {
-                register u32 stateOffset asm("r0") = 0x122;
-                register u8 *state asm("r1");
+                u32 stateOffset = 0x122;
+                u8 *state;
                 state = (void *)((u8 *)p + stateOffset);
                 *state = 4;
             }
@@ -223,7 +216,6 @@ void SceneSteeringActor_Appear(struct SceneSteeringActorPool *unused,
         } else {
             register u32 frameOffset asm("r3") = 0x124;
             register u16 *frame asm("r1");
-            asm("" : "+r"(frameOffset));
             frame = (void *)((u8 *)p + frameOffset);
             (*frame)++;
         }

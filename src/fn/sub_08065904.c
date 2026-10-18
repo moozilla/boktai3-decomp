@@ -7,13 +7,11 @@ void ActorAttachment_UpdateValueFrame(struct ActorAttachmentSlotView *input)
     u32 test = ActorAttachment_TestByteFlags(&slot->status[0], four);
     u32 finished;
     finished = test;
-    asm("" : : "r"(finished));
     if (!finished) {
         struct ActorAttachmentSlotView *view = slot;
         register s16 *value asm("r0");
         s32 current;
         s16 *sample;
-        asm("" : : "r"(view));
         value = view->value;
         current = *value;
         sample = value;
@@ -35,7 +33,7 @@ void ActorAttachment_UpdateValueFrame(struct ActorAttachmentSlotView *input)
             s32 currentValue = *sample;
             register s16 *threshold asm("r1");
             s32 boundary;
-            register s16 *cutoff asm("r5");
+            s16 *cutoff;
             u8 *status;
             s16 *timer;
             register u8 *flags asm("r8");
@@ -57,7 +55,7 @@ void ActorAttachment_UpdateValueFrame(struct ActorAttachmentSlotView *input)
             }
         reset: {
             s32 zero = 0;
-            register s16 *timerView asm("r5");
+            s16 *timerView;
             timerView = timer;
             *timerView = zero;
             zero -= 6;

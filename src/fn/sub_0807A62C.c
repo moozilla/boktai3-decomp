@@ -75,17 +75,17 @@ s32 SceneActorBehavior_UpdateTimersAndContacts(struct SceneActorBehaviorView *ac
             }
         }
         {
-            register u32 contactOffset asm("r3") = 0x45C;
+            u32 contactOffset = 0x45C;
             struct SceneActorUpdateContact *contact = (void *)actor;
             struct SceneActorContactNode **node;
             node = (void *)((u8 *)actor + contactOffset);
             if (*node) {
                 u32 registered = (u8)SceneActorContacts_ContainsActiveNode(*node);
                 if (!registered) {
-                    register u32 cleanupOffset asm("r1") = 0x618;
+                    u32 cleanupOffset = 0x618;
                     void *cleanup;
                     {
-                        register void **cleanupPointer asm("r0");
+                        void **cleanupPointer;
                         cleanupPointer = (void *)((u8 *)contact + cleanupOffset);
                         cleanup = *cleanupPointer;
                     }

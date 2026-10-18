@@ -13,7 +13,7 @@ struct SceneActorRegistryActor *SceneActorRegistry_FindLiving(u32 unusedCategory
     while (actor) {
         if (actor->health > 0) {
             register u32 offset asm("r4") = 0x2d0;
-            register u32 *field asm("r0");
+            u32 *field;
             field = (void *)((u8 *)actor + offset);
             if (!(*field & 0x20000))
                 return actor;

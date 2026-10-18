@@ -85,7 +85,7 @@ int sub_0803536C(struct Engine *p)
                 (*counter)++;
             }
             {
-                register int value asm("r0") = *sequence;
+                int value = *sequence;
                 int zero = 0;
                 *previous = value;
                 (*packet)++;

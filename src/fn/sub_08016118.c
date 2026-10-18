@@ -82,7 +82,7 @@ int FadingParticleGroup_Update(struct Group *g)
                                  (p->sprite.width >> 3) * (p->sprite.height >> 3) * frame;
                 {
                     u32 input = a->flags;
-                    register u32 left asm("r2") = 1;
+                    u32 left = 1;
                     u32 mask = 1;
                     left &= input;
                     if (left != (((*entry & 0x30) >> 4) & mask))

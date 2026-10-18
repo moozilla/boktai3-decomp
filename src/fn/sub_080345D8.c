@@ -47,7 +47,7 @@ static inline void reset(struct Engine *p, int operation, int zero)
 }
 void sub_080345D8(u8 command)
 {
-    register int key asm("r3") = command;
+    int key = command;
     struct Engine *p = gUnk_02000484;
     if (!p)
         goto done;

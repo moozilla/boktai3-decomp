@@ -9,7 +9,7 @@ int SceneObjects_ScriptRaise(void)
     register u8 *p asm("r5") = sub_0821A2C4(0x85e6);
     register int found asm("r6");
     register int i asm("r4");
-    register int id asm("r8");
+    int id;
     if (!p)
         return -1;
     found = 0;
@@ -20,12 +20,10 @@ int SceneObjects_ScriptRaise(void)
     if (found < *(u16 *)(p + 0x1a)) {
         u8 **base = (u8 **)(p + 0x42c);
         int zero;
-        register int count asm("r2");
+        int count;
         void *fn;
         int mask;
-        asm("" : : "r"(base));
         zero = 0;
-        asm("" : "+r"(zero));
         mask = 0xfffc;
         fn = SceneObject_UpdateRaised;
         do {
@@ -34,7 +32,7 @@ int SceneObjects_ScriptRaise(void)
             if (*(u16 *)(s + 0x34) == id) {
                 {
                     u16 *out = (u16 *)(s + 0x82);
-                    register int clear asm("r0");
+                    int clear;
                     clear = 0;
                     *out = clear;
                 }

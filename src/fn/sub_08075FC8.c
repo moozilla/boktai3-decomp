@@ -8,8 +8,8 @@ static inline u32 IsUnavailable(struct SceneActorRegistryActor *actor)
     if (!actor)
         goto end;
     {
-        register u32 mask asm("r1") = 0x40;
-        register u32 offset asm("r3") = 0x2d4;
+        u32 mask = 0x40;
+        u32 offset = 0x2d4;
         u32 value;
         value = *(u16 *)((u8 *)actor + offset);
         if (value & mask)
@@ -17,7 +17,7 @@ static inline u32 IsUnavailable(struct SceneActorRegistryActor *actor)
         mask = 0x20000;
         offset -= 4;
         {
-            register u32 *field asm("r0") = (void *)((u8 *)actor + offset);
+            u32 *field = (void *)((u8 *)actor + offset);
             value = *field;
         }
         if (value & mask)

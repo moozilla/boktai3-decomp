@@ -12,16 +12,14 @@ void SceneActorControl_SetCollisionResponse(struct SceneActorRegistryResetView *
     testMask = 0x100;
     field = &actor->flags2D4;
     if (!(*field & testMask)) {
-        register struct SceneActorControlMotionState *state asm("r0") =
-            SceneActorControl_GetMotionState(actor);
-        register u32 mask asm("r1") = 2;
+        struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
+        u32 mask = 2;
         u32 offset = 0x3D4;
         u32 *flags;
-        asm("" : "+r"(mask));
         flags = (void *)((u8 *)state + offset);
         if (SceneActorControl_TestFlags(*flags, mask)) {
             u32 mask = 0x100;
-            register u16 *flags asm("r2");
+            u16 *flags;
             u32 old;
             u32 zeroByte;
             u32 zeroWord;
@@ -49,7 +47,7 @@ void SceneActorControl_SetCollisionResponse(struct SceneActorRegistryResetView *
                 *(u32 *)field = zeroWord;
             }
             {
-                register u8 *field asm("r1") = &actor->field2B1;
+                u8 *field = &actor->field2B1;
                 *field = 1;
             }
         }

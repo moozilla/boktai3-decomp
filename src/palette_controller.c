@@ -55,7 +55,7 @@ void Palette_BlendRange(u16 *dest, const u16 *source, const u16 *target, u32 amo
                 i = count;
                 do {
                     register u32 from asm("r0") = *a;
-                    register u32 fromRB asm("r3");
+                    u32 fromRB;
                     u32 fromG;
                     u32 to;
                     fromRB = 0x7C1F & from;

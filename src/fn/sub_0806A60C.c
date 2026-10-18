@@ -10,7 +10,7 @@ void SpriteEffectController_QueueColliders(struct SpriteEffectControllerPool *in
 {
     register struct SpriteEffectControllerPool *pool asm("r6") = input;
     struct SpriteEffectController *first = pool->slots;
-    register s32 scheduled asm("r8");
+    s32 scheduled;
     register s32 i asm("r5");
     register u8 *readDelay asm("r3");
     register u8 *writeDelay asm("r4");
