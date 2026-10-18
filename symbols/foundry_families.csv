@@ -688,3 +688,4 @@ addr,function,name,family,note
 0813E53C,sub_0813E53C,Player_ApplyPeriodicStatChanges,"Player stat modifiers","applies flagged one-percent stat recovery and drain"
 0813EABC,sub_0813EABC,Player_BeginDescriptorAction,"Player descriptor actions","initializes action context from an entry descriptor"
 0813F9EC,sub_0813F9EC,Player_SetActionRequest,"Player action requests","sets action request and resets its latch and timers"
+081401A0,sub_081401A0,Player_RefreshActionEquipment,"Player action equipment","applies saved equipment and auxiliary action selection"
