@@ -459,3 +459,4 @@ addr,function,name,family,note
 0817160C,sub_0817160C,SceneHud_PrepareActionTransfer,"SceneHud stat comparison and action transfer","prepare action icon transfer to a stat column"
 08171888,sub_08171888,SceneHud_TickStatTransfer,"SceneHud stat comparison and action transfer","animate and apply stat transfer then refresh comparison"
 08171A5C,sub_08171A5C,SceneHud_PrepareActionTransferToSlot,"SceneHud stat comparison and action transfer","prepare action icon transfer between slots"
+08171E34,sub_08171E34,MotionSequence_ResolveSelection,"MotionSequence (tentative)","dispatch cancel or confirmation of the current selection"
