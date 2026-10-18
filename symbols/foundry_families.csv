@@ -162,3 +162,4 @@ addr,function,name,family,note
 08101550,sub_08101550,NamedObject_IsPlayerWithinContactBounds,"NamedObject","test player proximity using shared signed contact bounds"
 08101810,sub_08101810,NamedObject_ApplyVerticalImpulseAndJitter,"NamedObject","decay negative vertical impulse and apply flag-controlled random jitter"
 081028F8,sub_081028F8,NamedObject_ClearAttachmentFlag,"NamedObject","clear player or tether attachment flag by object name"
+08102FB0,sub_08102FB0,NamedObject_MoveAttachedTether,"NamedObject","apply object motion to the attached tether actor"
