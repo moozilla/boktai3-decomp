@@ -151,3 +151,4 @@ addr,function,name,family,note
 080FA754,sub_080FA754,SceneActorControl_UpdateHoverHeight,"SceneActorControl","updates sinusoidal hover height and advances its angle"
 080FB27C,sub_080FB27C,SceneActorControl_CanAdvanceHover,"SceneActorControl","saves the scene position and tests active actor distance eligibility"
 080FD04C,sub_080FD04C,ActorGroup_ReadScriptOptions,"SceneActor group script configuration","reads six optional O-keyword byte parameters with defaults"
+080FD500,sub_080FD500,SceneActorControl_UpdateControl35Phase,"SceneActorControl","enters control 0x35 and returns to phase 2 on completion"
