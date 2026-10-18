@@ -327,3 +327,4 @@ addr,function,name,family,note
 0813A9D8,sub_0813A9D8,ScreenMote_ApproachTarget,"ScreenMote","interpolate a sprite toward an offset target over twelve frames"
 0813AC78,sub_0813AC78,ScreenMote_UpdateManager,"ScreenMote","dispatch active particle phases subject to pause flags"
 0813AF18,sub_0813AF18,Player_SetDirectionalVelocity,"Player","sets direction-based velocity with axis scaling"
+0813AFEC,sub_0813AFEC,ActorSequence_Begin,"ActorSequence / player cue","sets sequence and variant, enables playback, and clears its timer"
