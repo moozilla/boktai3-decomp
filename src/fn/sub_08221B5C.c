@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scalar_approach.h"
 #define ScalarApproach_HalfArray sub_08221B5C
 void ScalarApproach_HalfArray(s16 *values, const s16 *targets, s32 count)
@@ -6,7 +5,6 @@ void ScalarApproach_HalfArray(s16 *values, const s16 *targets, s32 count)
     s32 remaining = count;
     s16 *cursor = values;
     const s16 *targetCursor;
-    asm("" : "+r"(remaining), "+r"(cursor));
     targetCursor = targets;
     while ((remaining = (s32)((u32)remaining - 1u)) >= 0) {
         s32 target = *targetCursor;
