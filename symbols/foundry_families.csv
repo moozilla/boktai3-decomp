@@ -652,3 +652,4 @@ addr,function,name,family,note
 08121154,sub_08121154,ActorManager_Destroy,"ActorManager","removes actor animations and collision state and clears manager"
 081213B4,sub_081213B4,ActorCollider_Init,"ActorCollider","initializes collider extents and binds owner position and callback"
 08121D64,sub_08121D64,SpriteParticle_SpawnBatch,"SpriteParticlePool","allocates sprite effect slots and initializes position animation palette and layer"
+0812224C,sub_0812224C,SpriteEffect_UpdateBlinkAndExpire,"SpriteEffect","blinks then removes sprite and shadow and releases the effect slot"
