@@ -196,5 +196,5 @@ struct SceneActorRegistryResetView {
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void Route_Start(struct SceneActorRegistryRoute *, u32, u32, u32);
 s32 Path_GetPointPositionById(u16 *, u32, u32);
-void sub_0821FD3C(void *, struct ContactPosition *);
+void ProximityVolume_TranslateBounds(void *, struct ContactPosition *);
 #endif

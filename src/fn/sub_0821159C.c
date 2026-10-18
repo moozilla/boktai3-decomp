@@ -4,7 +4,7 @@ void sub_08210F04(void *);
 s32 Script_SeekToKeyword(s32);
 void *Script_GetTextSourcePc(void);
 void *Script_GetKeywordValue(s32, s32);
-void sub_08210AD4(void *);
+void Collection_UpdateEntryVisibility(void *);
 void Collection_UpdateCountDigits(void *);
 void Collection_UpdatePageIndicator(void *);
 void *TextWindow_Create(u32, u32, u32, u32);
@@ -44,7 +44,7 @@ fail:
     return -1;
 success:
     *(void **)(s + 0xba4) = Script_GetKeywordValue(0x65, 0);
-    sub_08210AD4(s);
+    Collection_UpdateEntryVisibility(s);
     Collection_UpdateCountDigits(s);
     Collection_UpdatePageIndicator(s);
     *(void **)(s + 0xb94) = TextWindow_Create(1, 0x10, 0x1d, 4);

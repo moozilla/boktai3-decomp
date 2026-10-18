@@ -69,7 +69,7 @@ struct Obj {
     s8 spin;
 };
 extern void (*const gUnk_0824F158[])(struct Obj *);
-void sub_0818E4BC(struct Obj *);
+void Armor_UpdatePartColliders(struct Obj *);
 void Armor_UpdatePart(struct Obj *p)
 {
     s32 mask = 16;
@@ -80,7 +80,7 @@ void Armor_UpdatePart(struct Obj *p)
         gUnk_0824F158[p->state](p);
         if (p->callback)
             p->callback(p);
-        sub_0818E4BC(p);
+        Armor_UpdatePartColliders(p);
         if (p->callback1CC)
             p->callback1CC(p);
     }

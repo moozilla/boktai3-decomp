@@ -4,7 +4,7 @@ struct SceneDialogFade {
     u8 pad0[0xA4C];
     u16 timer;
 };
-void sub_0822B410(void);
+void MusicSlots_StopAllAndRetainResumable(void);
 void Sound_PlaySong(u32);
 void Hud_InitSelectionBounds(u32, u32);
 void PauseMenu_SaveDisplayState(void *);
@@ -13,7 +13,7 @@ void Hud_SetUpdateCallback(void *, void (*)(void));
 void SceneDialog_UpdateEntryFade(struct SceneDialogFade *p)
 {
     if (p->timer == 1)
-        sub_0822B410();
+        MusicSlots_StopAllAndRetainResumable();
     if (p->timer == 2)
         Sound_PlaySong(0x118);
     if (p->timer <= 15)

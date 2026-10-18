@@ -7,11 +7,11 @@ struct S {
     void (*f4)(void);
     u32 f8;
 };
-void sub_081C3A98(void);
+void SpriteController_AnimateShrinking(void);
 
 void RegistryF3E4_StartDisappearing(struct S *p)
 {
-    void (*f)(void) = sub_081C3A98;
+    void (*f)(void) = SpriteController_AnimateShrinking;
     p->f4 = f;
     p->f8 = 0;
     p->d8 = 0;

@@ -4,13 +4,13 @@ void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 sub_08235C30(u8 *, u32, u32);
 void Task_Kill(u8 *);
 void HealthBurstEffect_OnUpdate(void);
-void sub_08235984(void);
+void SceneEffectGroup_Remove(void);
 u8 *HealthBurstEffect_Create(u32 a, u32 b)
 {
     u8 *r = Task_Create(11, 0x354);
     if (r) {
         Task_SetCallbacks(r, (void (*)(void))HealthBurstEffect_OnUpdate,
-                          (void (*)(void))sub_08235984);
+                          (void (*)(void))SceneEffectGroup_Remove);
         if (sub_08235C30(r, a, b) < 0) {
             Task_Kill(r);
             return 0;

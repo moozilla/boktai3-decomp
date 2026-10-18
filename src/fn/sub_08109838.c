@@ -12,7 +12,7 @@ struct MessagePanel {
     u16 timer;
 };
 extern u16 gUnk_03005260[];
-void sub_08224FA4(void);
+void System_ShutdownAndSoftReset(void);
 void MessagePanel_WaitForInput(struct MessagePanel *p)
 {
     if (p->entering) {
@@ -25,5 +25,5 @@ void MessagePanel_WaitForInput(struct MessagePanel *p)
     if (p->timer < 60)
         p->timer++;
     else if (gUnk_03005260[1] & 0x30F)
-        sub_08224FA4();
+        System_ShutdownAndSoftReset();
 }

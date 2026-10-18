@@ -6,7 +6,7 @@ void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
 s32 Camera_Initialize(void *, void *);
 void Task_Kill(void *);
 void sub_08227378(void);
-void sub_0822744C(void);
+void Camera_Destroy(void);
 
 void *Camera_Create(void *a)
 {
@@ -15,7 +15,7 @@ void *Camera_Create(void *a)
         return gUnk_03005420;
     p = Task_Create(7, 0xA4);
     if (p != 0) {
-        Task_SetCallbacks(p, sub_08227378, sub_0822744C);
+        Task_SetCallbacks(p, sub_08227378, Camera_Destroy);
         if (Camera_Initialize(p, a) < 0) {
             Task_Kill(p);
             return 0;

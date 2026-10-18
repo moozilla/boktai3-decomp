@@ -1,7 +1,7 @@
 #include "global.h"
 void sub_08181778(void);
 void sub_0818171C(void *);
-void sub_081816B0(void *);
+void ActorPalette_RestoreSelectedBanks(void *);
 void Armor_InitPaletteController(u8 *s)
 {
     u32 *t;
@@ -19,7 +19,7 @@ void Armor_InitPaletteController(u8 *s)
             break;
     }
     t = (u32 *)(s + 0x650);
-    sub_081816B0(t);
+    ActorPalette_RestoreSelectedBanks(t);
     t[0] = 0;
     t[1] = 0;
 }

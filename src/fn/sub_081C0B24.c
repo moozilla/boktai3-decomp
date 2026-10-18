@@ -10,7 +10,7 @@ struct Obj {
     u8 pad40[0x18];
     u16 f58, f5A, f5C;
 };
-void sub_081C0AA0(struct Obj *);
+void PaletteScreen_InitDisplayResources(struct Obj *);
 u32 sub_081C3FBC(s32, s32);
 s32 SceneActorSequence_BeginFadeIn(struct Obj *);
 static inline void fill32(void *dst, u32 *tmp, u32 ctl)
@@ -22,7 +22,7 @@ s32 SceneActorSequence_InitFromScript(struct Obj *p)
 {
     u32 zero;
     u32 e;
-    sub_081C0AA0(p);
+    PaletteScreen_InitDisplayResources(p);
     p->f30 = sub_081C3FBC(2, 0);
     fill32(p->a, &zero, 0x05000002);
     fill32(p->b, &zero, 0x05000002);

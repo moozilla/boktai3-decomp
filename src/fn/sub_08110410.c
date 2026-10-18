@@ -19,7 +19,7 @@ void Serial_StopCommunication(void);
 void TextWindow_SetScript(u32, u32);
 void TextWindow_Refresh(u32, u32);
 void Sound_PlaySong(s32);
-void sub_08224FA4(void);
+void System_ShutdownAndSoftReset(void);
 void SaveMenu_UpdateSaveFailure(struct S *s)
 {
     if (s->c24 != 0) {
@@ -33,6 +33,6 @@ void SaveMenu_UpdateSaveFailure(struct S *s)
     if (s->t <= 0x3b) {
         s->t++;
     } else if (gUnk_03005260[1] & 0x30F) {
-        sub_08224FA4();
+        System_ShutdownAndSoftReset();
     }
 }

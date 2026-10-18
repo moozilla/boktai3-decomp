@@ -26,7 +26,7 @@ struct SpriteBurstManager *SceneMovingParticle_EnsurePool(void);
 struct SpriteBurstEntry *SceneMovingParticle_AllocateEntry(struct SpriteBurstManager *);
 void sub_08217DE0(struct SpriteBurstEntry *, void *, u32);
 void Effect_SetOrigin(struct SpriteBurstEntry *, s32, s32);
-void sub_08217EEC(struct SpriteBurstEntry *, void *, u32);
+void SpriteDrawable_SelectTileFrame(struct SpriteBurstEntry *, void *, u32);
 void Effect_SetPalette(struct SpriteBurstEntry *, u32);
 struct SpriteBurstEntry *SpriteBurst_Create(struct SpriteBurstPair *pos,
                                             struct SpriteBurstPair *velocity, u32 kind,
@@ -82,7 +82,7 @@ struct SpriteBurstEntry *SpriteBurst_Create(struct SpriteBurstPair *pos,
     entry->position = *pos;
     sub_08217DE0(entry, manager->resource, 0);
     Effect_SetOrigin(entry, -4, -4);
-    sub_08217EEC(entry, manager->resource, entry->frame);
+    SpriteDrawable_SelectTileFrame(entry, manager->resource, entry->frame);
     Effect_SetPalette(entry, 1);
     entry->flags |= 1;
     entry->mode = mode;

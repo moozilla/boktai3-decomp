@@ -1,7 +1,7 @@
 #include "contact_actor.h"
 void ContactActorPool_HideSlots(struct ContactActorPool *);
 void ContactActor_UpdateDisplay(struct ContactActor *);
-void sub_08221110(void *, void *, void *, s32, s32);
+void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
 extern void (*const gUnk_086058FC[])(struct ContactActorPool *, struct ContactActor *, s32);
 u32 ContactActorPool_Update(struct ContactActorPool *poolInput)
 {
@@ -37,7 +37,7 @@ u32 ContactActorPool_Update(struct ContactActorPool *poolInput)
             u32 secondOffset = 0x5AA0;
             void *first = gUnk_030042E4 + firstOffset;
             void *second = gUnk_030042E4 + secondOffset;
-            sub_08221110((u8 *)pool + 0x1700, first, second, pool->fadeLevel, 6);
+            Palette_InterpolateBanks((u8 *)pool + 0x1700, first, second, pool->fadeLevel, 6);
         }
         if (pool->hideRequested) {
             ContactActorPool_HideSlots(pool);

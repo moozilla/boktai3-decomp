@@ -58,7 +58,7 @@ struct PlayerStatModifierContext {
     u16 contactCounter;  /* owner + 0xC08 */
     u16 contactTimer;    /* owner + 0xC0A */
     u8 contactHeading;   /* owner + 0xC0C */
-    s8 savedActionIndex; /* owner + 0xC0D: snapshot from sub_0823AB5C (tentative) */
+    s8 savedActionIndex; /* owner + 0xC0D: snapshot from Player_GetActionIndex (tentative) */
     u8 unknownCA[0xA];
     u8 statBOverrideMode;  /* owner + 0xC18: seven selects GameState stat B */
     u8 thresholdSatisfied; /* owner + 0xC19, tentative */

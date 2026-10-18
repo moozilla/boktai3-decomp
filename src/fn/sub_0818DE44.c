@@ -39,7 +39,7 @@ struct Obj {
     s8 delta8;
     s8 delta9;
 };
-void sub_0818DEBC(struct Obj *);
+void Armor_UpdatePartRebound(struct Obj *);
 void ScaledShadow_Destroy(u8 *);
 void Sound_PlaySongChecked(u32);
 void Armor_UpdatePartDescent(struct Obj *p)
@@ -52,7 +52,7 @@ void Armor_UpdatePartDescent(struct Obj *p)
         p->flags4E |= 4;
         p->flags |= 512;
         p->timer = 0;
-        p->callback = sub_0818DEBC;
+        p->callback = Armor_UpdatePartRebound;
         ScaledShadow_Destroy((u8 *)p + 0x160);
         Sound_PlaySongChecked(484);
     }

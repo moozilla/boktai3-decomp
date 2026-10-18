@@ -23,14 +23,14 @@ struct S {
     s16 y;
     s16 z;
 };
-s32 sub_0818505C(struct S *, s32);
+s32 Armor_TryStartAction(struct S *, s32);
 void sub_0818E9B8(void *, s32);
 void Armor_UpdateDelayedAction12(struct S *p)
 {
     u8 s = p->b3d;
     switch (s) {
         case 0:
-            if (sub_0818505C(p, 0xa)) {
+            if (Armor_TryStartAction(p, 0xa)) {
                 p->b3d = 1;
                 p->b3e = s;
             }
@@ -39,7 +39,7 @@ void Armor_UpdateDelayedAction12(struct S *p)
             if (p->b40 == 0xff) {
                 sub_0818E9B8((u8 *)p + 0xB58, 0x64);
                 if (p->b3e > 0x13) {
-                    if (sub_0818505C(p, 0xc))
+                    if (Armor_TryStartAction(p, 0xc))
                         p->b3d = 3;
                 }
             }

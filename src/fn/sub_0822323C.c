@@ -1,7 +1,7 @@
 #include "global.h"
 
 void sub_08223128(void);
-void sub_08222CB0(void);
+void Serial_EnableInterrupt(void);
 
 s32 Serial_DetectRoleAndEnableInterrupt(void)
 {
@@ -10,10 +10,10 @@ s32 Serial_DetectRoleAndEnableInterrupt(void)
     r = *(s32 *)0x03005324;
     if (r >= 0) {
         if (*(s32 *)0x0300531C != 0) {
-            sub_08222CB0();
+            Serial_EnableInterrupt();
             r = 1;
         } else {
-            sub_08222CB0();
+            Serial_EnableInterrupt();
             r = 0;
         }
     }

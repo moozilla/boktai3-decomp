@@ -4,7 +4,7 @@ void TetherActor_SetState(u8 *, u32);
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
 u32 sub_0821FCDC(u8 *);
-void sub_0821FD3C(u8 *, u8 *);
+void ProximityVolume_TranslateBounds(u8 *, u8 *);
 u32 sub_0821F2EC(u8 *, u8 *, u8 *);
 void TetherActor_SetInteractionPathFromScript(void)
 {
@@ -21,8 +21,8 @@ void TetherActor_SetInteractionPathFromScript(void)
             *(u32 *)(p + 0x418) = Script_GetValue();
         if (p[0x255] == 3) {
             a = p + 0x50;
-            if (sub_0821FCDC(a) == 0xFF ||
-                (b = p + 0x1D8, sub_0821FD3C(b, a), sub_0821F2EC(b, a, p + 0x410) == 0))
+            if (sub_0821FCDC(a) == 0xFF || (b = p + 0x1D8, ProximityVolume_TranslateBounds(b, a),
+                                            sub_0821F2EC(b, a, p + 0x410) == 0))
                 TetherActor_SetState(p, 0);
             else
                 TetherActor_SetState(p, 3);

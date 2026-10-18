@@ -9,7 +9,7 @@ void Task_SetCallbacks(void *, void *, void *);
 void Task_Kill(void *);
 void sub_08199094(void);
 void sub_08199314(void);
-s32 sub_08199374(void *);
+s32 SceneEffect_InitializeEmitterOptions(void *);
 struct P *SceneEffectQueue_Create(u16 a)
 {
     struct P *p;
@@ -19,7 +19,7 @@ struct P *SceneEffectQueue_Create(u16 a)
     if (p != 0) {
         p->w = a;
         Task_SetCallbacks(p, sub_08199094, sub_08199314);
-        if (sub_08199374(p) < 0) {
+        if (SceneEffect_InitializeEmitterOptions(p) < 0) {
             Task_Kill(p);
             return 0;
         }

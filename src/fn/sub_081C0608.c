@@ -8,7 +8,7 @@ struct S {
 extern u16 gUnk_03004BD8;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-void sub_081C04B8(void *);
+void PaletteScreen_LoadResources(void *);
 void ScenePaletteFade_BeginDelay(void *);
 u32 ScenePaletteFade_InitFromScript(struct S *p)
 {
@@ -18,7 +18,7 @@ u32 ScenePaletteFade_InitFromScript(struct S *p)
         u32 m = 0xFFFFF0FF;
         *g = *g & m;
     }
-    sub_081C04B8(p);
+    PaletteScreen_LoadResources(p);
     if (Script_SeekToKeyword(0x66))
         v = Script_GetValue();
     else

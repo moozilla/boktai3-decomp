@@ -9,7 +9,7 @@ struct A {
     struct E e[10];
 };
 extern struct A *gUnk_020005E8;
-void sub_081FC900(struct A *, struct E *, s32);
+void SceneProjectile_InitSlot(struct A *, struct E *, s32);
 u32 SceneProjectile_InitPool(struct A *a)
 {
     struct E *e;
@@ -19,7 +19,7 @@ u32 SceneProjectile_InitPool(struct A *a)
     e = a->e;
     i = 0;
     do {
-        sub_081FC900(a, e, i);
+        SceneProjectile_InitSlot(a, e, i);
         i++;
         e++;
     } while (i <= 9);

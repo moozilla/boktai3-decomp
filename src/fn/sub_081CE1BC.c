@@ -82,9 +82,9 @@ void DisplayAnimation_SetFlags(void *);
 void Actor_DisableShadow(struct SceneNpc *);
 u8 SceneCharacter_GetPathNodeState(struct SceneNpc *);
 u32 ParticlePool_Create(void);
-void sub_081CE0E4(struct SceneNpc *, s32);
+void SceneNpc_SetKindMotionVector(struct SceneNpc *, s32);
 void SceneCharacter_OnStateChange(void);
-void sub_081CDFFC(void);
+void SceneNpc_UpdateCommands(void);
 void SceneCharacter_OnCommandUpdate(void);
 void sub_081CC64C(void);
 void SceneCharacter_UpdateDisplay(void);
@@ -216,7 +216,7 @@ void SceneCharacter_PlaceFromScript(void)
         }
     }
     setHandler(SceneCharacter_OnStateChange, &npc->callbacks[5]);
-    setHandler(sub_081CDFFC, &npc->callbacks[0]);
+    setHandler(SceneNpc_UpdateCommands, &npc->callbacks[0]);
     setHandler(SceneCharacter_OnCommandUpdate, &npc->callbacks[1]);
     setHandler(sub_081CC64C, &npc->callbacks[2]);
     setHandler(SceneCharacter_UpdateDisplay, &npc->callbacks[3]);
@@ -425,5 +425,5 @@ void SceneCharacter_PlaceFromScript(void)
     }
     if (npc->animMode == 1)
         Actor_PlayAnimationEntry(npc, 0, 0, 0, 0);
-    sub_081CE0E4(npc, kind);
+    SceneNpc_SetKindMotionVector(npc, kind);
 }

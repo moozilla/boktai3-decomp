@@ -4,12 +4,12 @@ struct S {
     u32 a;
 };
 void Callback_InvokeActor(void *, u32);
-void sub_081C18E8(void *);
-void sub_081C2240(void *);
+void AnimatedObject_AdvanceThreeFrameCycle(void *);
+void SegmentDisplay_UpdateScreenBrightness(void *);
 u32 ControlPanel_OnTaskUpdate(struct S *p)
 {
     Callback_InvokeActor(p, p->a);
-    sub_081C18E8(p);
-    sub_081C2240(p);
+    AnimatedObject_AdvanceThreeFrameCycle(p);
+    SegmentDisplay_UpdateScreenBrightness(p);
     return 0;
 }

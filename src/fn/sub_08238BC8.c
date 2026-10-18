@@ -21,7 +21,7 @@ typedef struct State {
     s16 dy;
 } State;
 extern const s16 gUnk_086149C4[];
-void sub_08238B48(u32, u32 *, u32 *);
+void DirectionalEffect_DecodeAnimationMode(u32, u32 *, u32 *);
 void Anim_SetSequence(void *, void *, s32, u8, u8);
 void Player_ShowDirectionalEffect(State *);
 static inline s32 scale(s32 v)
@@ -42,7 +42,7 @@ void Player_StartDirectionalEffect(State *s, u32 mode, Point *pos)
     sprite->pos.y += scale(240 * gUnk_086149C4[angle & 255]);
     s->dx = scale(10 * gUnk_086149C4[(angle + 64) & 255]);
     s->dy = scale(10 * gUnk_086149C4[angle & 255]);
-    sub_08238B48(mode, &a, &b);
+    DirectionalEffect_DecodeAnimationMode(mode, &a, &b);
     Anim_SetSequence(s->animation, s->resource, 0, a, b);
     Player_ShowDirectionalEffect(s);
 }

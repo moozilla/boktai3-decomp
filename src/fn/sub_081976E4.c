@@ -33,7 +33,7 @@ struct P081976E4 {
     struct Vec081976E4 v7290;
     struct Vec081976E4 v7298;
 };
-void sub_0818EBF4(void *);
+void ScenePanelEffect_InitPool(void *);
 void Nidhoggr_InitBackgrounds(void *);
 void sub_081940F8(void *);
 void Nidhoggr_InitSuspendedObject(void *);
@@ -61,7 +61,7 @@ s32 Nidhoggr_Init(struct P081976E4 *t)
         for (i = 8, p = &t->dead[8]; i >= 0; p--, i--)
             *p = z;
     }
-    sub_0818EBF4(t->effects);
+    ScenePanelEffect_InitPool(t->effects);
     Nidhoggr_InitBackgrounds(t);
     sub_081940F8(t);
     Nidhoggr_InitSuspendedObject(t);

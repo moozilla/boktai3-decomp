@@ -7,12 +7,12 @@ struct T0813BA88 {
     u8 d;
 };
 extern const struct T0813BA88 gUnk_086108F8[];
-void sub_08217EEC(u32 *, u32, u32);
+void SpriteDrawable_SelectTileFrame(u32 *, u32, u32);
 
 void Player_SetDirectionalEffectFrame(u32 *p, u32 a, u32 i)
 {
     const struct T0813BA88 *t = &gUnk_086108F8[i & 7];
-    sub_08217EEC(p, a, t->a);
+    SpriteDrawable_SelectTileFrame(p, a, t->a);
     if (t->b == 1)
         *p |= 4;
     else

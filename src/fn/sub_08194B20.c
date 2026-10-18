@@ -1,7 +1,7 @@
 #include "global.h"
 extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
-s32 sub_08190C98(void *, s32, s32);
+s32 Nidhoggr_ChangeCompletedPartState(void *, s32, s32);
 void Nidhoggr_SelectRandomPart22Animation(u8 *p)
 {
     u8 *c;
@@ -13,7 +13,7 @@ void Nidhoggr_SelectRandomPart22Animation(u8 *p)
     if (*c > 5)
         *c = 0;
     if (p[0x724B] != 0)
-        sub_08190C98(p, 0x16, *c + 0x3f);
+        Nidhoggr_ChangeCompletedPartState(p, 0x16, *c + 0x3f);
     else
-        sub_08190C98(p, 0x16, *c + 0x16);
+        Nidhoggr_ChangeCompletedPartState(p, 0x16, *c + 0x16);
 }

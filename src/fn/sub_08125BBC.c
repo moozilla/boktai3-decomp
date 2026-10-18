@@ -10,7 +10,7 @@ struct S {
     u8 f[0x18];
     u32 p;
 };
-void sub_08217EEC(void *, u32, u32);
+void SpriteDrawable_SelectTileFrame(void *, u32, u32);
 void SceneMovingParticle_UpdateAnimation(struct S *s, struct E *e)
 {
     if (e->a != 0) {
@@ -18,6 +18,6 @@ void SceneMovingParticle_UpdateAnimation(struct S *s, struct E *e)
     } else {
         e->a = 3;
         e->b = (e->b + 1) & 1;
-        sub_08217EEC(e, s->p, e->c + e->b);
+        SpriteDrawable_SelectTileFrame(e, s->p, e->c + e->b);
     }
 }

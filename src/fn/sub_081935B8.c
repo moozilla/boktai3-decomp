@@ -4,7 +4,7 @@ struct Vec081935B8 {
     s16 x, y, z;
 };
 extern u16 gUnk_03005418[];
-void sub_08216520(u32, s32, s32);
+void BgGfx_LoadTilemapAtPosition(u32, s32, s32);
 
 static inline s32 Shift5(s32 x)
 {
@@ -41,6 +41,6 @@ void Nidhoggr_UpdateBackgroundScroll(u8 *t)
         *(s16 *)(t + 0x5416) = tmp;
     }
     *(s16 *)(t + 0x5418) = d.y;
-    sub_08216520(3, *(s16 *)(t + 0x5416), *(s16 *)(t + 0x5418));
-    sub_08216520(1, *(s16 *)(t + 0x5416), *(s16 *)(t + 0x5418));
+    BgGfx_LoadTilemapAtPosition(3, *(s16 *)(t + 0x5416), *(s16 *)(t + 0x5418));
+    BgGfx_LoadTilemapAtPosition(1, *(s16 *)(t + 0x5416), *(s16 *)(t + 0x5418));
 }

@@ -36,7 +36,7 @@ void OrbitingParticles_Advance(struct OrbitingParticles *m, struct OrbitingParti
 {
     p->rise += m->speed;
     if (!(p->timer & 3))
-        sub_08217EEC(&p->sprite, m->resource, m->frame + ((p->timer >> 2) & 1));
+        SpriteDrawable_SelectTileFrame(&p->sprite, m->resource, m->frame + ((p->timer >> 2) & 1));
     p->timer++;
     if (p->rise >= m->limit) {
         p->state = 0;
@@ -224,7 +224,7 @@ int OrbitingParticles_Initialize(struct OrbitingParticles *m, struct SceneVec *s
         p->timer = i * 4;
         sub_08217DE0(s, m->resource, 1);
         Effect_SetOrigin(s, -4, -4);
-        sub_08217EEC(s, m->resource, m->frame);
+        SpriteDrawable_SelectTileFrame(s, m->resource, m->frame);
         Effect_SetPalette(s, 1);
         angle = p->angle;
         r = p->radius;

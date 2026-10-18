@@ -10,9 +10,9 @@ struct Camera {
 };
 extern struct Camera *gUnk_03005420;
 extern u8 gUnk_030042A0[];
-void sub_08225F1C(struct Camera *, void *);
+void Camera_ApplyPositionBounds(struct Camera *, void *);
 /* Camera mode 1 with limits centered on two ranges {center, size, center2}:
-   center - size / 2 (+0x8E..+0x94), then sub_08225F1C (tentative). */
+   center - size / 2 (+0x8E..+0x94), then Camera_ApplyPositionBounds (tentative). */
 void Camera_SetCenteredBounds(struct Rect *a, struct Rect *b)
 {
     struct Camera *c = gUnk_03005420;
@@ -22,6 +22,6 @@ void Camera_SetCenteredBounds(struct Rect *a, struct Rect *b)
         c->field92 = b->x - (b->size >> 1);
         c->field94 = b->y - (b->size >> 1);
         c->mode = 1;
-        sub_08225F1C(c, gUnk_030042A0);
+        Camera_ApplyPositionBounds(c, gUnk_030042A0);
     }
 }
