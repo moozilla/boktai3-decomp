@@ -1016,3 +1016,4 @@ addr,function,name,family,note
 081A5360,sub_081A5360,DamageNumberDisplay_ShowWithDefaultScale,"DamageNumberDisplay","shows damage number using vector 32,0,32"
 081A6104,sub_081A6104,,"PaletteTransition",""
 081A6604,sub_081A6604,PositionedEffect_UpdateVectors,"PositionedEffect","copies source position and updates shifted and combined vectors"
+081A6750,sub_081A6750,PositionedEffect_SetHalfScaleCoordinates,"PositionedEffect","maps X and Z around 640 to half scale around 512"
