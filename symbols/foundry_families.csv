@@ -1253,3 +1253,4 @@ addr,function,name,family,note
 08202FBC,sub_08202FBC,ProximitySequence_TestPlayerDistance,"ProximitySequence","starts sequence 7 when the player enters the trigger radius"
 08203B54,sub_08203B54,EnemyF426_SpawnProjectile,"Enemy F 426 (auto, tentative)","configures and spawns a directional projectile"
 08204C3C,sub_08204C3C,EnemyD459_FireProjectile,"Enemy D 459 (auto, tentative)","spawns a configured projectile ahead of the actor"
+08204D84,sub_08204D84,EnemyD459_UpdateAttackTiming,"Enemy D 459 (auto, tentative)","starts projectile attacks using scheduled or periodic timing"
