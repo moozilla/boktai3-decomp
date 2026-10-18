@@ -1,0 +1,2 @@
+addr,function,name,family,note
+0801C69C,sub_0801C69C,ResultGame_SetUpdateCallback,"Result game","stores the update callback and resets the game state fields"
