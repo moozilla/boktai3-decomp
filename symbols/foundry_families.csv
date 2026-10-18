@@ -330,3 +330,4 @@ addr,function,name,family,note
 0813AFEC,sub_0813AFEC,ActorSequence_Begin,"ActorSequence / player cue","sets sequence and variant, enables playback, and clears its timer"
 0813B080,sub_0813B080,Player_ResetStatus,"Player","rebuilds player status and clears reset fields"
 0813B480,sub_0813B480,ActorFlags_SelectResponse,"ActorResponse","selects response 5, 10, or 0 from actor status bits"
+0813B8A4,sub_0813B8A4,SceneActor_SpawnModeParticles,"SceneActor particles","spawns particles at the actor position selected by mode"
