@@ -386,3 +386,4 @@ addr,function,name,family,note
 0815EF6C,sub_0815EF6C,Player_RecordInputTicks,"Player input statistics","Increments saturating mode and indexed counters while input is held."
 0815FFDC,sub_0815FFDC,PlayerTransition_LoadAnimation,"PlayerTransition","loads and attaches transition animation resource"
 08160060,sub_08160060,PlayerTransition_InitCollider,"PlayerTransition","initializes transition collider from owner attributes"
+08160380,sub_08160380,FrameDisplay_GetCompactFrameIndex,"FrameDisplay","maps animation frame IDs to a compact display index"
