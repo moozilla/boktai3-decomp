@@ -147,3 +147,4 @@ addr,function,name,family,note
 080F82E8,sub_080F82E8,ActorPhase_UpdateSpriteCollapse,"ActorPhase","reduces sprite X scale and increases Y scale before phase 36"
 080F83FC,sub_080F83FC,ActorPhase_WaitBeforeRelocation,"ActorPhase","waits a data-defined delay then selects a distant waypoint"
 080F84D4,sub_080F84D4,ActorPhase_UpdateSpriteRestore,"ActorPhase","restores sprite scales to 64 and marks the phase complete"
+080F8A14,sub_080F8A14,SceneActorControl_SettleRotation,"SceneActor control phases","rotates drawable toward zero after elapsed delay"
