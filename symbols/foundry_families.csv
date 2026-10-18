@@ -463,3 +463,4 @@ addr,function,name,family,note
 081723D8,sub_081723D8,SceneHud_ShowSelectionDescription,"SceneHud","shows description for the selected action or unlock entry"
 081724D4,sub_081724D4,SceneHud_RefreshEquippedActionIcons,"SceneHud","refreshes equipped action and unlock icons with palette"
 08172850,sub_08172850,SceneHud_ConfigureActionGrid,"SceneHud","builds selectable action grid for mode and flags"
+08172950,sub_08172950,SceneHud_LayoutActionGrid,"SceneHud","places action and unlock icons in two grid layouts"
