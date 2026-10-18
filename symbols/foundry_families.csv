@@ -1015,3 +1015,4 @@ addr,function,name,family,note
 081A5100,sub_081A5100,TimedEffect_UpdateShutdown,"TimedEffect","initializes shutdown state then kills effect after timer expires"
 081A5360,sub_081A5360,DamageNumberDisplay_ShowWithDefaultScale,"DamageNumberDisplay","shows damage number using vector 32,0,32"
 081A6104,sub_081A6104,,"PaletteTransition",""
+081A6604,sub_081A6604,PositionedEffect_UpdateVectors,"PositionedEffect","copies source position and updates shifted and combined vectors"
