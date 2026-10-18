@@ -394,3 +394,4 @@ addr,function,name,family,note
 08163C00,sub_08163C00,CollisionVolume_InitCollider,"CollisionVolume","initializes large volume collider"
 08164158,sub_08164158,ResultPanel_DrawCappedCounters,"ResultPanel (tentative)","pass two counters capped at 9999 to the number renderer"
 081641C4,sub_081641C4,ResultPanel_DrawCappedSmallCounters,"ResultPanel (tentative)","pass two counters capped at 999 to the number renderer"
+08164224,sub_08164224,StatDisplay_DrawPlayerValue,"StatDisplay","draws player stat ratio with form-dependent scaling"
