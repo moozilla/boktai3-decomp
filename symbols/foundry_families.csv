@@ -1171,3 +1171,4 @@ addr,function,name,family,note
 081EF7A8,sub_081EF7A8,ScreenPhase_BeginSelection,"screen selection phase","copies a requested selection on phase entry and advances the timer"
 081EF804,sub_081EF804,SceneActors_EnterHorizontalTweenState,"SceneActors","installs horizontal interpolation and signals its completion"
 081F00FC,sub_081F00FC,SceneActors_AdvanceToHorizontalTween,"SceneActors","switches to horizontal interpolation after the initial callback finishes"
+081F022C,sub_081F022C,ScreenPhase_DampenMotion,"screen motion phase","reduces a signed motion value and initializes timers with a random sound"
