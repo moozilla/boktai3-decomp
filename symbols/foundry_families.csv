@@ -842,3 +842,4 @@ addr,function,name,family,note
 0817B5C0,sub_0817B5C0,SceneVolume_BeginPhase,"SceneVolume","restores configured mode and sets phase byte"
 0817B694,sub_0817B694,ActorState_BeginDepletedState,"ActorState","initializes state when depletion flag is set"
 0817B6F8,sub_0817B6F8,ActorState_UpdateDepletedState,"ActorState","updates depleted state and queues a delayed variant request"
+0817B788,sub_0817B788,ActorState_UpdateRandomAnimation,"ActorState","selects random animation and queues timed state transition"
