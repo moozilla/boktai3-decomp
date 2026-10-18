@@ -1348,3 +1348,4 @@ addr,function,name,family,note
 08235294,sub_08235294,FlickerParticle_UpdatePool,"FlickerParticle","invokes callbacks for eight active particle slots"
 08235984,sub_08235984,SceneEffectGroup_Remove,"SceneEffectGroup","removes task animation, eight effects and optional sprite pair"
 08236428,sub_08236428,CallbackGroup_UpdateActive,"CallbackGroup","invokes active entry callbacks and clears an empty group's active flag"
+0823659C,sub_0823659C,PaletteTransition_UpdateFadeIn,"PaletteTransition","increments palette alpha and emits effects at its position for nineteen ticks"
