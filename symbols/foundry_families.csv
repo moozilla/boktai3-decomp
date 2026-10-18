@@ -650,3 +650,4 @@ addr,function,name,family,note
 0811FA38,sub_0811FA38,ModifierAction_InitializeSecondary,"ModifierAction","loads secondary action configuration and selects its callback"
 08120330,sub_08120330,ActorMotion_UpdateDampedFall,"ActorMotion","applies downward acceleration and damping until action completion"
 08121154,sub_08121154,ActorManager_Destroy,"ActorManager","removes actor animations and collision state and clears manager"
+081213B4,sub_081213B4,ActorCollider_Init,"ActorCollider","initializes collider extents and binds owner position and callback"
