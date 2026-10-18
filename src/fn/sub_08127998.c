@@ -16,7 +16,7 @@ void Collider_SetAttackProperties(u8 *, u32, u32, u32, u32, u32);
 void Collider_SetCallback(u8 *, void (*)(void), u8 *);
 void Collider_SetPosition(u8 *, u8 *, u32);
 extern u8 sub_08127994[]; // Thumb address of a `bx lr` stub at 0x0812CE90
-void sub_08127998(u8 *p, u32 a, u32 b, u32 c, u32 d)
+void TimedSprite_InitCollider(u8 *p, u32 a, u32 b, u32 c, u32 d)
 {
     struct Z s1, s2;
     u8 *q;

@@ -12,7 +12,7 @@ s32 CountdownTimer_InitFromScript(struct CountdownTimer *timer, void *unused1, v
         value = Script_GetValue();
     timer->completionScriptId = value;
     if (Script_GetKeywordValue('i', 0) == 0)
-        sub_081783C0(&timer->remaining);
+        Hud_RegisterTimer(&timer->remaining);
     gUnk_0200049C = timer;
     return 0;
 }

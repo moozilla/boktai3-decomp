@@ -16,7 +16,7 @@ void *GameState_GetUnlockDescriptor(u32);
 s32 Player_GetEquipmentValue(const struct SceneInputItemDescriptor *);
 s32 Player_GetEquipmentLevelBonus(const void *);
 void Inventory_InitEquipmentEntryFromDescriptor(const void *, void *);
-s32 sub_08159030(const void *, const void *);
+s32 Player_EvaluateItemStatA(const void *, const void *);
 void *GameState_GetConsumableDescriptor(u32);
 s32 Player_GetCurrentAttribute(s32);
 s32 Player_GetCandidateAttribute(s32, s32);

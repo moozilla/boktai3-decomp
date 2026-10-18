@@ -13,8 +13,8 @@ struct P {
     u32 c;
 };
 
-void sub_0815AD78(struct P *);
-void sub_0813AFEC(struct P *, s32, s32);
+void Player_EnterKindTwo(struct P *);
+void ActorSequence_Begin(struct P *, s32, s32);
 void PlayerCue_UpdateStandDiagonalB(void);
 
 void PlayerCue_StandDiagonalB(struct P *p, s32 dir, u32 c)
@@ -30,7 +30,7 @@ void PlayerCue_StandDiagonalB(struct P *p, s32 dir, u32 c)
         p->b3A3 = 0;
     }
     p->c = c;
-    sub_0815AD78(p);
-    sub_0813AFEC(p, 0, 0);
+    Player_EnterKindTwo(p);
+    ActorSequence_Begin(p, 0, 0);
     p->fn = PlayerCue_UpdateStandDiagonalB;
 }

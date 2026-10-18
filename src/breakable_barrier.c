@@ -189,7 +189,7 @@ void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct Breakable
             index = (index + 1) & mask;
             *indexPtr = index;
             speed = (table[index] & smallMask) + 20;
-            sub_0806A160(&p->sprite.position, 3, &size, angle, count, speed, 2, 2);
+            SparkParticle_Spawn(&p->sprite.position, 3, &size, angle, count, speed, 2, 2);
             {
                 u32 *ptr = indexPtr;
                 index = (*ptr + 1) & mask;
@@ -200,7 +200,7 @@ void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct Breakable
             index = (index + 1) & mask;
             *indexPtr = index;
             speed = (table[index] & smallMask) + 20;
-            sub_0806A160(&p->sprite.position, 3, &size, angle, count, speed, 2, 2);
+            SparkParticle_Spawn(&p->sprite.position, 3, &size, angle, count, speed, 2, 2);
             BreakableBarrier_SetState(p, 2);
             return;
         } else {
@@ -251,7 +251,7 @@ void sub_0801310C(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
         index = (index + 1) & mask;
         *indexPtr = index;
         speed = (table[index] & 3) + 20;
-        sub_0806A160(&p->sprite.position, 1, &size, angle, count, speed, 2, 2);
+        SparkParticle_Spawn(&p->sprite.position, 1, &size, angle, count, speed, 2, 2);
         sub_08012B34(m, p);
         Sound_PlaySongChecked(0x339);
     }

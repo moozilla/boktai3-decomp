@@ -1,7 +1,7 @@
 #include "global.h"
 
 extern void SerialLink_ResetMultiplayer(void);
-void sub_08108C20(void);
+void SlotMonitor_PollResult(void);
 
 void LinkHandshake_UpdateRestartState(u8 *p)
 {
@@ -12,7 +12,7 @@ void LinkHandshake_UpdateRestartState(u8 *p)
         SerialLink_ResetMultiplayer();
         *r4 = 0;
     } else {
-        *(void **)(p + 0x7C) = sub_08108C20;
+        *(void **)(p + 0x7C) = SlotMonitor_PollResult;
         *(u32 *)(p + 0x50) = v;
         *(u32 *)(p + 0x3C) = v;
         *(u32 *)(p + 0x40) = v;

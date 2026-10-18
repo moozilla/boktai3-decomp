@@ -19,11 +19,11 @@ struct P {
 
 extern const s16 gUnk_086149C4[];
 
-void sub_0815AD78(struct P *);
-void sub_0813AFEC(struct P *, s32, s32);
+void Player_EnterKindTwo(struct P *);
+void ActorSequence_Begin(struct P *, s32, s32);
 void Sound_PlaySong(s32);
 void sub_082375FC(struct Vec *, s32, s32, s32, s32, s32, s32);
-void sub_08151310(void);
+void Player_UpdateSixPhaseAction(void);
 
 static inline int trunc12(int x)
 {
@@ -50,7 +50,7 @@ void PlayerCue_Shoot(struct P *p, s32 a, u32 c)
     }
     sub_082375FC(&v, id, 0, p->dir, 0x20, 0, a);
     p->c = c;
-    sub_0815AD78(p);
-    sub_0813AFEC(p, 3, 2);
-    p->fn = sub_08151310;
+    Player_EnterKindTwo(p);
+    ActorSequence_Begin(p, 3, 2);
+    p->fn = Player_UpdateSixPhaseAction;
 }

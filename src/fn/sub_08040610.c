@@ -2,7 +2,7 @@
 s32 Modifier_ApplyPositiveKindThree(struct ModifierSelection *, struct ModifierSelection *, s32,
                                     u32);
 s32 Modifier_ApplyKindTen(struct ModifierSelection *, struct ModifierSelection *, s32, u32);
-u32 sub_0811DD94(s32, s32);
+u32 StateFlags_GetCategoryBit(s32, s32);
 void ModifierMenu_DrawStatComparison(s32, s32, s32, s32, u32);
 void ModifierMenu_DrawUnavailableStat(s32, s32, s32);
 void Bg_SetTilemapEntry(u32, s32, s32, u32, u32, u32);
@@ -31,7 +31,8 @@ void ModifierMenu_DrawFourthSourceStats(struct ModifierMenu *menu)
         }
         case 1: {
             u32 zero, one;
-            if (sub_0811DD94(menu->choice.cursor.category, menu->choice.cursor.index)) {
+            if (StateFlags_GetCategoryBit(menu->choice.cursor.category,
+                                          menu->choice.cursor.index)) {
                 ModifierMenu_DrawStatComparison(first, nextFirst, 8, 13, 9);
                 ModifierMenu_DrawStatComparison(second, nextSecond, 8, 14, 10);
             } else {

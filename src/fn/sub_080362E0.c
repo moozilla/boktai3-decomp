@@ -42,7 +42,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->pending = 1;
 }
 void Wireless_SetStatus(int);
-void sub_0824923C(void *, void *);
+void Callback_InvokeActor(void *, void *);
 void sub_08249238(void *);
 int Wireless_ExchangeChildNiPacket(struct Engine *argument)
 {
@@ -72,7 +72,7 @@ int Wireless_ExchangeChildNiPacket(struct Engine *argument)
         if (state == 0x46) {
             void *callback = p->tail;
             if (callback)
-                sub_0824923C((u8 *)p + 0xC4, callback);
+                Callback_InvokeActor((u8 *)p + 0xC4, callback);
             rfu_clearSlot(8, *slot);
         } else if ((u16)(state - 0x47) <= 1) {
             void *callback = *(void **)((u8 *)p + 0x384);

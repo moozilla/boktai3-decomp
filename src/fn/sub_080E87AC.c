@@ -1,9 +1,9 @@
 #include "global.h"
 
-void sub_0812F270(void);
+void SceneActor_UpdateBehaviorCallbacks(void);
 
 s32 Mimic_OnUpdate(void)
 {
-    sub_0812F270();
+    SceneActor_UpdateBehaviorCallbacks();
     return 0;
 }

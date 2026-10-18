@@ -35,14 +35,14 @@ void ScenePanelRig_TickResourceDrain(struct ScenePanelRig *rig)
                 const void *position = &rig->position;
                 register u32 effectOffset asm("r4") = 0x6A0;
                 asm("" : "+r"(effectOffset) : "r"(position));
-                sub_0806A160(position, 1, (u8 *)rig + effectOffset, 0, 0, 0, 2, 1);
+                SparkParticle_Spawn(position, 1, (u8 *)rig + effectOffset, 0, 0, 0, 2, 1);
             }
         } else if ((u16)(stateValue - 3) <= 2 || state == 7) {
             rate = count * mode;
             if (((randomValue() >> 3) & 7) == 0) {
                 register u32 originOffset asm("r2") = 0x674;
                 asm("" : "+r"(originOffset));
-                sub_0806A160((u8 *)rig + originOffset, 1, rig->payloadB, 0, 0, 0, 2, 1);
+                SparkParticle_Spawn((u8 *)rig + originOffset, 1, rig->payloadB, 0, 0, 0, 2, 1);
             }
         }
         if (rate > 0) {

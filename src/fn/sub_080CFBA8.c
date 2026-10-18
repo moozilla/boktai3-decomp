@@ -1,7 +1,7 @@
 #include "global.h"
 
 void sub_080CC830(void *);
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 void SceneActorControl_DispatchControl(void *);
 void Golem_UpdateEffectsAndContacts(void *);
 
@@ -22,7 +22,7 @@ s32 Golem_OnUpdate(struct S *s)
     sub_080CC830(s);
     m = 0x2000;
     if ((s->flags & m) || s->h2b8 == 0) {
-        sub_0824923C(s, s->tbl[s->idx]);
+        Callback_InvokeActor(s, s->tbl[s->idx]);
         SceneActorControl_DispatchControl(s);
     }
     Golem_UpdateEffectsAndContacts(s);

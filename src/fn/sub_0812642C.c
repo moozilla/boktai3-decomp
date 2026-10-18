@@ -13,8 +13,8 @@ void Sprite_Init(u8 *, u8 *, u32);
 void Anim_SetSequence(u8 *, void *, u32, u32, u32);
 void AnimData_SelectPaletteBank(u8 *, u32);
 s32 Mod(s32, s32);
-void sub_0812642C(u32 *a, s32 b, s32 c, s32 d, s32 e, u32 f, s32 g, s32 h, u32 i, u32 j, u32 k,
-                  u32 l, u32 m, u32 n, u32 o, u32 p, u32 q, u32 r)
+void SpriteParticle_Create(u32 *a, s32 b, s32 c, s32 d, s32 e, u32 f, s32 g, s32 h, u32 i, u32 j,
+                           u32 k, u32 l, u32 m, u32 n, u32 o, u32 p, u32 q, u32 r)
 {
     struct Pair {
         u32 x, y;
@@ -67,5 +67,5 @@ void sub_0812642C(u32 *a, s32 b, s32 c, s32 d, s32 e, u32 f, s32 g, s32 h, u32 i
 end:;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0812642C);
+INCLUDE_ASM("asm/nonmatching", SpriteParticle_Create);
 #endif

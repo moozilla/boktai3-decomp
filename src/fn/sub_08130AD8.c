@@ -5,9 +5,9 @@ struct S {
     u8 f2[0xA];
     u8 idx;
 };
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 void SceneActorState_DispatchTable29CState(struct S *p)
 {
     u32 i = p->idx;
-    sub_0824923C(p, p->tbl[i]);
+    Callback_InvokeActor(p, p->tbl[i]);
 }

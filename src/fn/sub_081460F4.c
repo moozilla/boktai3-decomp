@@ -1,10 +1,10 @@
 #include "global.h"
 
-s32 sub_0813AE18(u8 *, s32, s32, s32);
+s32 Player_SetAnimation(u8 *, s32, s32, s32);
 void Player_SetActionPhase(u8 *p, u8 v);
 void Player_AddControlFlags(u8 *, s32);
-s32 sub_081419D4(u32, s32);
-u8 sub_082212DC(void *, u32, s32, s32);
+s32 ActorVariant_GetTableValue(u32, s32);
+u8 Sprite_BlinkUntilExpired(void *, u32, s32, s32);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 void Sound_PlaySong(s32);
 extern u32 gUnk_030053F4;
@@ -19,7 +19,7 @@ void Player_UpdateDeathSequence(u8 *p)
         case 0: {
             u32 z;
             u8 *q;
-            sub_0813AE18(p, sub_081419D4(F8(0x418), 0x29), 0x40, 1);
+            Player_SetAnimation(p, ActorVariant_GetTableValue(F8(0x418), 0x29), 0x40, 1);
             Sound_PlaySong(0x1AD);
             q = p + 0x153;
             z = 0;
@@ -52,14 +52,14 @@ void Player_UpdateDeathSequence(u8 *p)
             }
             break;
         case 3:
-            sub_0813AE18(p, sub_081419D4(F8(0x418), 0x12), 0x40, 1);
+            Player_SetAnimation(p, ActorVariant_GetTableValue(F8(0x418), 0x12), 0x40, 1);
             F16(0x4E8) = F16(0x4E8) - 0x1E;
             F16(0x45A) = F16(0x45A) + 1;
             if (F16(0x45A) > 0x27) {
                 F16(0x424) = 0;
                 Player_SetActionPhase(p, 4);
             } else {
-                sub_082212DC(p + 0x14C, F16(0x45A), 0xA, 0x14);
+                Sprite_BlinkUntilExpired(p + 0x14C, F16(0x45A), 0xA, 0x14);
             }
             break;
         case 4:

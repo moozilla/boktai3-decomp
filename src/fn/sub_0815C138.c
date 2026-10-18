@@ -1,6 +1,6 @@
 #include "global.h"
-void sub_0815AD78(u8 *);
-void sub_0813AFEC(u8 *, u32, u32);
+void Player_EnterKindTwo(u8 *);
+void ActorSequence_Begin(u8 *, u32, u32);
 void sub_0814FAE8(void);
 void PlayerCue_WindblownVariant4(u8 *p, s32 a, u32 b)
 {
@@ -17,7 +17,7 @@ void PlayerCue_WindblownVariant4(u8 *p, s32 a, u32 b)
         p[0x3a3] = a;
     }
     *(u32 *)(p + 0x5a4) = b;
-    sub_0815AD78(p);
-    sub_0813AFEC(p, 0, 4);
+    Player_EnterKindTwo(p);
+    ActorSequence_Begin(p, 0, 4);
     *(u32 *)(p + 0x58c) = (u32)sub_0814FAE8;
 }

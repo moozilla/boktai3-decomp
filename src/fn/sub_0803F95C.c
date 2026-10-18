@@ -17,7 +17,7 @@ s32 Modifier_CollectSources(struct ModifierSelection *actorArg,
     if (count < selection->count) {
         out = output;
         do {
-            sub_0811E37C(&scratch, ((s16 *)gUnk_02000710->modifierIdsBytes)[i]);
+            ScriptRecord_FindModifierRecord(&scratch, ((s16 *)gUnk_02000710->modifierIdsBytes)[i]);
             *out = scratch;
             out++;
             count++;
@@ -39,7 +39,7 @@ s32 Modifier_CollectSources(struct ModifierSelection *actorArg,
         }
     }
     if (includeSelected == 1) {
-        sub_0811E37C(&scratch, actor->selectedId);
+        ScriptRecord_FindModifierRecord(&scratch, actor->selectedId);
         output[count] = scratch;
         count++;
         {

@@ -4,10 +4,10 @@ struct S {
     u32 x;
 };
 extern u16 gUnk_030054BC;
-void sub_0824923C(struct S *, u32);
+void Callback_InvokeActor(struct S *, u32);
 u32 Solar_UpdateTask(struct S *s)
 {
     if (gUnk_030054BC == 0)
-        sub_0824923C(s, s->x);
+        Callback_InvokeActor(s, s->x);
     return 0;
 }

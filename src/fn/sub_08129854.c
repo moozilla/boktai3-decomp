@@ -15,7 +15,7 @@ void Collider_Init(u8 *, u32, u32, u32, u32, struct Z *, struct Z *);
 void Collider_SetAttackProperties(u8 *, u32, u32, u32, u32, u32);
 void Collider_SetCallback(u8 *, void (*)(void), u8 *);
 void Collider_SetPosition(u8 *, u8 *, u32);
-extern u8 sub_08129834[]; // Thumb address of a `bx lr` stub at 0x0812CE90
+extern u8 SpriteActor_AdvanceContactState[]; // Thumb address of a `bx lr` stub at 0x0812CE90
 void sub_08129854(u8 *p, u32 a, u32 b, u32 c, u32 d)
 {
     struct Z s1, s2;
@@ -29,6 +29,6 @@ void sub_08129854(u8 *p, u32 a, u32 b, u32 c, u32 d)
     q = p + 0x9C;
     Collider_Init(q, 0, 0x2001, 0, 0x10, &s1, &s2);
     Collider_SetAttackProperties(q, a, b, 0, c, d);
-    Collider_SetCallback(q, (void (*)(void))sub_08129834, p);
+    Collider_SetCallback(q, (void (*)(void))SpriteActor_AdvanceContactState, p);
     Collider_SetPosition(q, p + 0x1c, 0);
 }

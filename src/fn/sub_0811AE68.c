@@ -6,11 +6,11 @@ struct H {
 struct Z {
     struct H a, b;
 };
-u32 sub_0811AD8C(struct Z *);
+u32 Terrain_GetCellClearance(struct Z *);
 u32 Terrain_GetHeightAtFixedPosition(u32 *p)
 {
     struct Z z;
     z.a.lo = (p[0] << 4) >> 16;
     z.b.lo = (p[2] << 4) >> 16;
-    return sub_0811AD8C(&z);
+    return Terrain_GetCellClearance(&z);
 }

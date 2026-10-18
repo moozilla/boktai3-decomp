@@ -3,7 +3,7 @@ void CountdownTimer_Stop(void)
 {
     if (gUnk_0200049C) {
         struct CountdownTimer *timer;
-        sub_08178404();
+        Hud_ClearTimer();
         timer = gUnk_0200049C;
         timer->remaining = 0;
         Task_Kill(timer);

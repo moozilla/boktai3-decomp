@@ -7,10 +7,10 @@ struct A {
     u8 g[0xa];
     u8 i;
 };
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 
 void Ratatosk_UpdateBehavior(struct A *p)
 {
     p->a = 0;
-    sub_0824923C(p, gUnk_08613F54[p->i]);
+    Callback_InvokeActor(p, gUnk_08613F54[p->i]);
 }

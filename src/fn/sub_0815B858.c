@@ -13,9 +13,9 @@ struct P {
     u32 c;
 };
 
-void sub_0815AD78(struct P *);
-void sub_0813AFEC(struct P *, s32, s32);
-void sub_0813ADD0(struct P *);
+void Player_EnterKindTwo(struct P *);
+void ActorSequence_Begin(struct P *, s32, s32);
+void Player_UpdateFacingSide(struct P *);
 void sub_08152174(void);
 void sub_081543F0(void);
 void sub_08155008(void);
@@ -33,8 +33,8 @@ void PlayerCue_Motion7Turn(struct P *p, s32 dir, u32 c)
     if (dir >= 0)
         p->dir = dir;
     p->c = c;
-    sub_0815AD78(p);
-    sub_0813AFEC(p, 7, 0);
+    Player_EnterKindTwo(p);
+    ActorSequence_Begin(p, 7, 0);
     if (p->state == 3) {
         p->dir |= 1;
         if (p->dir > 4) {
@@ -48,7 +48,7 @@ void PlayerCue_Motion7Turn(struct P *p, s32 dir, u32 c)
     } else {
         u8 *d = &p->dir;
         *d = sideDir(*d);
-        sub_0813ADD0(p);
+        Player_UpdateFacingSide(p);
         if (p->state == 4) {
             p->fn = sub_081543F0;
         } else if (p->state == 5) {

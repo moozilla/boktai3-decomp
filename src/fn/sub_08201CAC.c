@@ -14,7 +14,8 @@ struct S {
 };
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
-void sub_081263E0(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
+void SpriteParticle_CreateDefaultVariant4384(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
+                                             u32, u32);
 void ScriptCombatActor_RecordDefeat(void *);
 u32 ScriptCombatActor_UpdateDefeatEffect(struct S *p)
 {
@@ -28,7 +29,8 @@ u32 ScriptCombatActor_UpdateDefeatEffect(struct S *p)
             gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
             idx = gUnk_03005308;
             t = *(u8 *)&gUnk_0203B400[idx];
-            sub_081263E0(&v, 0x80, 0x20, 0xc, 0xc, 0x18, t, 0x20, 0x20, 1, 2, 0x200);
+            SpriteParticle_CreateDefaultVariant4384(&v, 0x80, 0x20, 0xc, 0xc, 0x18, t, 0x20, 0x20,
+                                                    1, 2, 0x200);
         }
         if (p->w18 == 1)
             ScriptCombatActor_RecordDefeat(p);

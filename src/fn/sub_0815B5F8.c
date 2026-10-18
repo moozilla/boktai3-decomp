@@ -14,8 +14,8 @@ struct P {
     u32 c;
 };
 
-void sub_0815AD78(struct P *);
-void sub_0813AFEC(struct P *, s32, s32);
+void Player_EnterKindTwo(struct P *);
+void ActorSequence_Begin(struct P *, s32, s32);
 void sub_08150DB0(void);
 
 void PlayerCue_Motion30(struct P *p, s32 dir, u32 h, u32 b, u32 c)
@@ -33,7 +33,7 @@ void PlayerCue_Motion30(struct P *p, s32 dir, u32 h, u32 b, u32 c)
     p->h598 = h;
     p->b59A = b;
     p->c = c;
-    sub_0815AD78(p);
-    sub_0813AFEC(p, 0x1E, 0);
+    Player_EnterKindTwo(p);
+    ActorSequence_Begin(p, 0x1E, 0);
     p->fn = sub_08150DB0;
 }

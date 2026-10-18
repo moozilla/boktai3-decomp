@@ -2,7 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "game_state.h"
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
-u32 sub_08100AD4(struct ContactPosition *);
+u32 NamedObject_FindNearPosition(struct ContactPosition *);
 static inline u8 *propertiesAt(struct ContactPosition *input)
 {
     register struct ContactPosition *position asm("r6") = input;
@@ -73,7 +73,7 @@ u32 TetherActor_TestStepPosition(struct ContactPosition *origin, struct ContactP
         difference = -difference;
     if (difference > 50)
         goto no;
-    if (sub_08100AD4(candidate))
+    if (NamedObject_FindNearPosition(candidate))
         goto no;
     return 1;
 no:

@@ -4,10 +4,10 @@ struct P {
     u8 i;
 };
 extern const u32 gUnk_08611E08[];
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 void sub_0819E408(void *);
 void Hresvelgr_UpdateSecondaryMode(struct P *p)
 {
-    sub_0824923C(p, gUnk_08611E08[p->i]);
+    Callback_InvokeActor(p, gUnk_08611E08[p->i]);
     sub_0819E408(p);
 }

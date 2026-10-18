@@ -10,7 +10,7 @@ struct Obj {
     u32 f28;
 };
 
-void sub_08214588(struct Obj *);
+void Sprite_ApplyAnimation(struct Obj *);
 
 void Sprite_InitUnlinked(struct Obj *o, u32 b, u32 c)
 {
@@ -22,7 +22,7 @@ void Sprite_InitUnlinked(struct Obj *o, u32 b, u32 c)
         o->f9 = 0x40;
         o->f6 = 0;
         o->f7 = 2;
-        sub_08214588(o);
+        Sprite_ApplyAnimation(o);
         o->f24 = 0;
         o->f28 = 0;
     }

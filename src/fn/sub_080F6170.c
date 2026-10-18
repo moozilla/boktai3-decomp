@@ -1,6 +1,6 @@
 #include "global.h"
 void sub_080F52C0(u8 *);
-void sub_0824923C(u8 *, void (*)(u8 *));
+void Callback_InvokeActor(u8 *, void (*)(u8 *));
 static inline u8 Take(u8 *s)
 {
     u32 test = 1;
@@ -28,6 +28,6 @@ void Sword_UpdateThrustAttack(u8 *s)
     {
         void (*fn)(u8 *) = *(void (**)(u8 *))(s + 0x178);
         if (fn)
-            sub_0824923C(s, fn);
+            Callback_InvokeActor(s, fn);
     }
 }

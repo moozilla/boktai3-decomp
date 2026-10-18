@@ -1,11 +1,11 @@
 #include "global.h"
-void sub_08121458(void);
+void SceneEffect_UpdateBlink(void);
 void Collider_SetPosition(void *, void *, u32);
 s32 Collider_Refresh(void *);
 void SceneColliderEffect_UpdateCollider(u32 a, u8 *s)
 {
     u8 *p, *q;
-    sub_08121458();
+    SceneEffect_UpdateBlink();
     p = s + 0x44;
     q = s + 0x1c;
     Collider_SetPosition(p, q, 0);

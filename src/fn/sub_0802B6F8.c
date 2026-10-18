@@ -5,8 +5,8 @@ struct S {
     u8 a;
 };
 extern const u32 gUnk_08605014[];
-void sub_0824923C(struct S *, u32);
+void Callback_InvokeActor(struct S *, u32);
 void GridAttack_DispatchNormalAction(struct S *p)
 {
-    sub_0824923C(p, gUnk_08605014[p->a]);
+    Callback_InvokeActor(p, gUnk_08605014[p->a]);
 }

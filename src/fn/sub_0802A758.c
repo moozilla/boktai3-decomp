@@ -1,6 +1,6 @@
 #include "global.h"
 void GridAttackActor_SetAnimation(u8 *, u32, u32, u32);
-void sub_0824923C(u8 *, void (*)(u8 *));
+void Callback_InvokeActor(u8 *, void (*)(u8 *));
 void GridAttack_UpdateIdleState(u8 *s)
 {
     if (s[0xB1]) {
@@ -19,5 +19,5 @@ void GridAttack_UpdateIdleState(u8 *s)
         u32 *flags = (u32 *)(s + 0x9C);
         *flags |= mask;
     }
-    sub_0824923C(s, *(void (**)(u8 *))(s + 0x108));
+    Callback_InvokeActor(s, *(void (**)(u8 *))(s + 0x108));
 }

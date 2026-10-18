@@ -1,7 +1,7 @@
 #include "global.h"
 
 void Dog_PrepareFrame(void *);
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 void SceneActorControl_DispatchControl(void *);
 void Dog_FinishFrame(void *);
 
@@ -19,7 +19,7 @@ s32 Dog_Update(struct S *s)
     struct S *s2 = s;
     Dog_PrepareFrame(s);
     if (s->h2b8 == 0) {
-        sub_0824923C(s, s->tbl[s->idx]);
+        Callback_InvokeActor(s, s->tbl[s->idx]);
         SceneActorControl_DispatchControl(s);
     }
     Dog_FinishFrame(s2);

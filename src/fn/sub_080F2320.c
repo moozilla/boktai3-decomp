@@ -44,7 +44,7 @@ struct ColorPulse {
 void sub_080F421C(void);
 void Sword_UpdateBodyPaletteRestore(void);
 void sub_0821FF8C(void *, void *);
-void sub_08159860(void *, void *, s32);
+void PlayerStats_AddContactHundredths(void *, void *, s32);
 void AnimData_SelectPaletteBank(void *, u32);
 void Sound_PlaySong(u32);
 void ColorPulse_ApplyContact(struct ColorPulseContact *a, struct ColorPulseContact *b,
@@ -71,7 +71,7 @@ void ColorPulse_ApplyContact(struct ColorPulseContact *a, struct ColorPulseConta
                 p->colliderState = 8;
                 p->hitCallback = Sword_UpdateBodyPaletteRestore;
                 AnimData_SelectPaletteBank(p->animation, p->palette);
-                sub_08159860(a, b, p->hitValue);
+                PlayerStats_AddContactHundredths(a, b, p->hitValue);
             }
         }
         if (b->damage)

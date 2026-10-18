@@ -4,7 +4,7 @@ void PauseMenu_HideAllSprites(u8 *);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 void Anim_LoadKeyframe(void *, void *, u32, u32);
 void Hud_SetUpdateCallback(u8 *, void *);
-void sub_0816AF5C(void);
+void ScenePanel_UpdateAccountIntro(void);
 void Hud_InitRetryPanel(u8 *s)
 {
     u32 zero;
@@ -34,5 +34,5 @@ void Hud_InitRetryPanel(u8 *s)
     Anim_LoadKeyframe(a, b, 0x1D, 1);
     Anim_SetKeyframes(a, b, 10, 1, zero);
     MessageWindow_ShowMessage(0);
-    Hud_SetUpdateCallback(s, sub_0816AF5C);
+    Hud_SetUpdateCallback(s, ScenePanel_UpdateAccountIntro);
 }

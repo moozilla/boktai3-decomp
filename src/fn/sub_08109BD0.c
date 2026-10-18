@@ -1,11 +1,11 @@
 #include "global.h"
 
 void sub_08109AEC(u8 *);
-u32 sub_08228DB8(void);
+u32 SunClock_GetPhase(void);
 
 void Registry1745_InitSessionSettings(u8 *p)
 {
     sub_08109AEC(p);
     *(u8 *)(p + 0x20C) = 0;
-    *(u8 *)(p + 0x11D) = sub_08228DB8();
+    *(u8 *)(p + 0x11D) = SunClock_GetPhase();
 }

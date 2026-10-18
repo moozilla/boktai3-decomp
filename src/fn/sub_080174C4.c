@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_02000710;
-s32 sub_08228DB8(void);
+s32 SunClock_GetPhase(void);
 s32 Weather_GetStormVolume(s16 *p)
 {
     s32 r, v;
@@ -8,7 +8,7 @@ s32 Weather_GetStormVolume(s16 *p)
         r = p[0x19];
     else
         r = (p[0x18] * p[0x19]) >> 6;
-    v = sub_08228DB8();
+    v = SunClock_GetPhase();
     if ((u32)(v - 4) <= 1 || v == 0)
         r >>= 1;
     return r;

@@ -10,7 +10,8 @@ struct R {
     u8 b;
 } __attribute__((packed));
 extern struct R gUnk_0203B400[];
-void sub_081263E0(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+void SpriteParticle_CreateDefaultVariant4384(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
+                                             s32, s32);
 void EnemyF426_RecordDefeat(void *);
 s32 EnemyF426_UpdateDeath(u8 *p)
 {
@@ -23,7 +24,7 @@ s32 EnemyF426_UpdateDeath(u8 *p)
             q->y += 200;
             gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
             r = (*(&gUnk_0203B400[gUnk_03005308])).a;
-            sub_081263E0(&v, 128, 32, 12, 12, 24, r, 32, 32, 1, 1, 512);
+            SpriteParticle_CreateDefaultVariant4384(&v, 128, 32, 12, 12, 24, r, 32, 32, 1, 1, 512);
         }
         if ((*((s32 *)(p + 0x18))) == 12) {
             EnemyF426_RecordDefeat(p);

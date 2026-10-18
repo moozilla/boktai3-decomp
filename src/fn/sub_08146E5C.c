@@ -12,7 +12,7 @@ struct P08146E5C {
     u8 f4EC[0xAC8 - 0x4EC];
     u8 fAC8;
 };
-void sub_08159594(void *);
+void PlayerAction_RefreshModifiers(void *);
 
 void Player_OnMotion11Exit(struct P08146E5C *p)
 {
@@ -21,6 +21,6 @@ void Player_OnMotion11Exit(struct P08146E5C *p)
     p->f4E8 = 0;
     p->f4EA = 0;
     p->f433 = 0;
-    sub_08159594(p);
+    PlayerAction_RefreshModifiers(p);
     p->fAC8 = 0xFF;
 }

@@ -18,7 +18,7 @@ struct Item {
 int Mod(int, int);
 void CharacterModel_SetAnimationFlags(void *, int);
 void ActorMarkerPool_HideMarker(int);
-void sub_0811EE0C(void *);
+void CallbackList_ResetDispatch(void *);
 void ScenePool_ReleaseActorSlot(struct P *input, struct Slot *slotInput, struct Item *item)
 {
     struct P *p = input;
@@ -38,7 +38,7 @@ void ScenePool_ReleaseActorSlot(struct P *input, struct Slot *slotInput, struct 
         u32 *flags = (u32 *)((u8 *)slot + 0x56c);
         *flags |= one;
     }
-    sub_0811EE0C(slot);
+    CallbackList_ResetDispatch(slot);
     {
         u32 offset = 0x854;
         slot = (struct Slot *)((u8 *)slot + offset);

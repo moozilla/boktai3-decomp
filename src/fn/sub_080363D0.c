@@ -41,7 +41,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-void sub_0824923C(void *, void *);
+void Callback_InvokeActor(void *, void *);
 void sub_08249238(void *);
 void Wireless_PollChildNiSend(struct Engine *p)
 {
@@ -53,7 +53,7 @@ void Wireless_PollChildNiSend(struct Engine *p)
         if (state == 0x26) {
             void *callback = p->head;
             if (callback)
-                sub_0824923C((u8 *)p + 0xB8, callback);
+                Callback_InvokeActor((u8 *)p + 0xB8, callback);
             rfu_clearSlot(4, *slot);
             p->mask &= 0xFFFD;
         } else if (state == 0x27) {

@@ -3,9 +3,9 @@
 extern u8 *gUnk_020004D4;
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
-s32 sub_0813A24C(u8 *);
+s32 SpritePairPool_Initialize(u8 *);
 void Task_Kill(u8 *);
-void sub_0813A1E0(void);
+void PairCallbackPool_Update(void);
 void FollowingSpriteEffect_DestroyManager(void);
 
 u8 *FollowingSpriteEffect_EnsureManager(void)
@@ -15,8 +15,8 @@ u8 *FollowingSpriteEffect_EnsureManager(void)
         return gUnk_020004D4;
     p = Task_Create(0xa, 0x1d4);
     if (p != 0) {
-        Task_SetCallbacks(p, sub_0813A1E0, FollowingSpriteEffect_DestroyManager);
-        if (sub_0813A24C(p) < 0) {
+        Task_SetCallbacks(p, PairCallbackPool_Update, FollowingSpriteEffect_DestroyManager);
+        if (SpritePairPool_Initialize(p) < 0) {
             Task_Kill(p);
             return 0;
         }

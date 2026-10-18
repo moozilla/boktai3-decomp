@@ -9,7 +9,7 @@ struct S {
     s32 d;
     u32 flags;
 };
-void sub_08111410(void *);
+void PaletteFade_AdvanceColors(void *);
 void sub_08111578(void *);
 void PaletteFade_UpdateTransition(struct S *s)
 {
@@ -19,7 +19,7 @@ void PaletteFade_UpdateTransition(struct S *s)
             if (s->d > 0)
                 sub_08111578(s);
         } else {
-            sub_08111410(s);
+            PaletteFade_AdvanceColors(s);
             s->cnt--;
         }
     }
