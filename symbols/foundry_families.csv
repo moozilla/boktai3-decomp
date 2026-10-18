@@ -493,3 +493,4 @@ addr,function,name,family,note
 08175474,sub_08175474,SceneCatalog_GetLevelScaledValue,"SceneCatalog","returns ten times the level-indexed table value"
 0817559C,sub_0817559C,SceneCatalog_SetSelection,"SceneCatalog","sets the catalog selection and refreshes its animation"
 081755D4,sub_081755D4,SceneCatalog_ResetTextWindow,"SceneCatalog","loads the description script and refreshes text index zero"
+08175854,sub_08175854,SceneCatalog_SelectDescription,"SceneCatalog","selects a description or clears it for a negative index"
