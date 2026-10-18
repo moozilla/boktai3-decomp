@@ -461,3 +461,4 @@ addr,function,name,family,note
 08171A5C,sub_08171A5C,SceneHud_PrepareActionTransferToSlot,"SceneHud stat comparison and action transfer","prepare action icon transfer between slots"
 08171E34,sub_08171E34,MotionSequence_ResolveSelection,"MotionSequence (tentative)","dispatch cancel or confirmation of the current selection"
 081723D8,sub_081723D8,SceneHud_ShowSelectionDescription,"SceneHud","shows description for the selected action or unlock entry"
+081724D4,sub_081724D4,SceneHud_RefreshEquippedActionIcons,"SceneHud","refreshes equipped action and unlock icons with palette"
