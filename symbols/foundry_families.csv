@@ -1135,3 +1135,4 @@ addr,function,name,family,note
 081D789C,sub_081D789C,SpriteGroup_InitFourSprites,"SpriteGroup","initializes four sprites from resource 0x1C1E"
 081D88D8,sub_081D88D8,SpriteSequence_BeginStageAnimation,"SpriteSequence / SpriteGroup","starts stage-indexed sprite group animation"
 081D8FE8,sub_081D8FE8,TimedEffect_TestDuration,"TimedEffect","tests duration and marks alternating ticks"
+081D9024,sub_081D9024,TimedEffect_BeginPhase26,"TimedEffect","installs callback and begins phase 26 with minimum duration"
