@@ -866,3 +866,4 @@ addr,function,name,family,note
 08180490,sub_08180490,SceneSpriteCollider_Init,"SceneSpriteCollider","initializes sprite animation and a cubic collider"
 081805C8,sub_081805C8,SpriteComponent_Init,"SpriteComponent","initialize state and install update/destructor callbacks"
 081805F0,sub_081805F0,SpriteComponent_SetFramePosition,"SpriteComponent","set byte-sized frame and position, invoke update and clear collision status"
+08180638,sub_08180638,SpriteComponent_Destroy,"SpriteComponent","disable update, invoke destructor and clear it"
