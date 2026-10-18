@@ -992,3 +992,4 @@ addr,function,name,family,note
 0819D1D0,sub_0819D1D0,OffsetActor_UpdateRepeatedAnimation,"OffsetActor (tentative)","cycles animations until five repetitions or a nearby-cell test changes the sequence"
 0819D2C0,sub_0819D2C0,OffsetActor_UpdateAnimationSequence,"OffsetActor (tentative)","plays animation 24, optionally 25, then 10 and marks completion"
 0819D394,sub_0819D394,OffsetActor_UpdateExtendedAnimationSequence,"OffsetActor (tentative)","plays animations 24, optionally 25, then 3, 4, 6, and 12"
+0819D660,sub_0819D660,OffsetActor_UpdateFacingWait,"OffsetActor (tentative)","switches animations on a facing-sector test until the wait exceeds 256 ticks"
