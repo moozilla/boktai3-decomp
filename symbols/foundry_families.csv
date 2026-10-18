@@ -208,3 +208,4 @@ addr,function,name,family,note
 081136B0,sub_081136B0,SpriteEffect_RemoveWithBurst,"SpriteEffect","removes an active sprite and spawns a burst with sound"
 08114464,sub_08114464,SlotRegistry_ClaimMatchingSlot,"SlotRegistry","claims the first active unclaimed slot with matching ID"
 0811455C,sub_0811455C,,"unassigned empty callback",""
+08114C50,sub_08114C50,SlotRegistry_RemoveSprite,"SlotRegistry","removes an active slot sprite and clears its registration"
