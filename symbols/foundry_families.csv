@@ -1308,3 +1308,4 @@ addr,function,name,family,note
 082234C4,sub_082234C4,Serial_ReadLatestPacket,"serial communication","reads four-word packet or fills error sentinel values"
 08224DAC,sub_08224DAC,Wireless_InitSessionConfig,"wireless session configuration","initializes wireless session configuration and name pointers"
 08224E54,sub_08224E54,WirelessPacketQueue_Pop,"wireless packet queue","copies and clears oldest sixteen-byte packet"
+08224FA4,sub_08224FA4,System_ShutdownAndSoftReset,"system shutdown and wireless communication","stops audio and communications before soft reset"
