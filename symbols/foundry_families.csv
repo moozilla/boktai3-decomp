@@ -1238,3 +1238,4 @@ addr,function,name,family,note
 081FD3D8,sub_081FD3D8,Projectile_InitParameters,"Projectile 4 (auto, tentative)","clears projectile configuration and installs default parameters"
 081FD704,sub_081FD704,OrbitEffect_FireProjectileOnContact,"OrbitEffect","fires toward player after contact"
 081FDB40,sub_081FDB40,RisingActor_LowerHeight,"Rising actor controller (tentative)","lowers height every fourth tick and changes callback at threshold"
+081FDBF0,sub_081FDBF0,OrbitEffect_UpdateTrailSprite,"OrbitEffect","contracts orbit trail toward target then hides it"
