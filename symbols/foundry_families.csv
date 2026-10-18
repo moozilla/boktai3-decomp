@@ -930,3 +930,4 @@ addr,function,name,family,note
 0818ADB4,sub_0818ADB4,Armor6_Destroy,"Armor 6 (auto, tentative)","clears callbacks and unregisters actor components"
 0818B178,sub_0818B178,Armor_UpdateAccumulatedBehavior,"Armor actor","accumulates counters and triggers behavior transitions"
 0818BCB4,sub_0818BCB4,Armor_ReceiveTargetEvent,"Armor actor","applies damage and knockback target events"
+0818D384,sub_0818D384,Armor_AcceleratePartTurn,"Armor articulated-part motion","accelerates part rotation toward its lunge heading"
