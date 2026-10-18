@@ -24,8 +24,8 @@ void SceneInput_InitGlyphPair(struct SceneInputPair *pair)
     remaining = 1;
     do {
         do {
-        sub_0821983C(widget, pair, 0x7F, 0x31, zero, zero, 60, positionPointer);
-        positionPointer->y += 8;
+            sub_0821983C(widget, pair, 0x7F, 0x31, zero, zero, 60, positionPointer);
+            positionPointer->y += 8;
         } while (0);
         widget++;
         remaining--;

@@ -25,7 +25,7 @@ void InteractionMarker_TickIdle(struct InteractionMarker *marker)
                 u32 pressed = gUnk_03005260[1];
                 u32 edge = button;
                 do {
-                edge &= pressed;
+                    edge &= pressed;
                 } while (0);
                 if (edge) {
                     struct InteractionMarkerPlayer *player = gUnk_02000580[0];
