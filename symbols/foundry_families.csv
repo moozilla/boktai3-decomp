@@ -475,3 +475,4 @@ addr,function,name,family,note
 08173A7C,sub_08173A7C,SceneHud_BeginEquipmentSelection,"SceneHud","initialize equipment selection widgets and callback"
 08173DD4,sub_08173DD4,SceneHud_InitEquipmentTransfer,"SceneHud","initialize moving equipment icon and destination"
 081741A8,sub_081741A8,MotionSequence_ResolveAlternateSelection,"MotionSequence (tentative)","dispatch cancel or confirmation for the alternate selection path"
+08174270,sub_08174270,SceneHud_TickEquipmentFeedback,"SceneHud","animate equipment feedback then return to selection"
