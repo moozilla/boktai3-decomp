@@ -444,3 +444,4 @@ addr,function,name,family,note
 0816F4C0,sub_0816F4C0,SceneHud_RefillActionStatB,"SceneHud","refills player stat B over about 120 updates and redraws its ratio"
 0816F768,sub_0816F768,SceneMenuPanel_AdvanceAfterMotion,"Scene menu panel","waits after motion then hides the widget and advances the callback"
 0816F7CC,sub_0816F7CC,SceneHud_ShowActionResultText,"SceneHud","shows timed action text, accepts A after sixteen frames and restores controls"
+0816F960,sub_0816F960,MotionSequence_AdvanceAfterDelay,"MotionSequence (tentative)","advance after interpolation and an eight-tick delay"
