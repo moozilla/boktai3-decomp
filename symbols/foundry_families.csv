@@ -280,3 +280,4 @@ addr,function,name,family,note
 081298F4,sub_081298F4,SparkParticleSource_Emit,"SparkParticleSource","emits one spark particle from the embedded position"
 0812993C,sub_0812993C,BlinkingSprite_UpdateExpiry,"BlinkingSprite","blinks a sprite and stops its pool when the final slot expires"
 0812A60C,sub_0812A60C,LinkedEffect_ApplyVariant,"linked collider effect (tentative)","apply source variant and activate paired colliders"
+0812A760,sub_0812A760,LinkedEffect_UpdateColliders,"linked collider effect (tentative)","refresh paired colliders and countdown their flag"
