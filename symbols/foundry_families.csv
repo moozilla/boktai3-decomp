@@ -41,3 +41,4 @@ addr,function,name,family,note
 080A975C,sub_080A975C,SpritePool_ConsumeStateFlag,"Group080A9/Entry080A9 sprite pool (same entries/count/state/obj layout as sub_080A985C's Group080A985C struct; obj at offset 0x888, state flags at 0x8D0)","if the Group080A9 sprite pool's state bit 0 is set, clears it and runs sub_08003C10/sub_08225938 on g->obj"
 080A9AA0,sub_080A9AA0,ActorTrail_ApplyAngularOffsets,"ActorTrail","apply sine offsets and advance each active segment angle"
 080AA10C,sub_080AA10C,ActorTrail_ResetAtSavedPosition,"ActorTrail","restore saved position and reset actor and trail state"
+080AA524,sub_080AA524,ActorTrail_RemoveLastSegment,"ActorTrail","remove the last eligible segment while keeping at least two"
