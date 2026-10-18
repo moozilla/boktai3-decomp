@@ -760,3 +760,4 @@ addr,function,name,family,note
 081686FC,sub_081686FC,SceneHud_UpdateSecondaryWidgets,"SceneHud","loads icons and positions secondary HUD carousel widgets"
 081687D8,sub_081687D8,SceneHud_UpdateTertiaryWidgets,"SceneHud","loads selected tertiary icon and updates carousel positions"
 08168BEC,sub_08168BEC,SceneHud_RebuildTertiaryOptions,"SceneHud","rebuilds eight-slot auxiliary action icon list"
+08168FC4,sub_08168FC4,SelectionPanel_RefreshVisibleEntries,"SelectionPanel","refreshes three wrapped entries and a selection marker"
