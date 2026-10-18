@@ -892,3 +892,4 @@ addr,function,name,family,note
 081819E0,sub_081819E0,ActorPalette_Reset,"ActorPalette","clears update callback, calls cleanup, and restores selected banks"
 08181B00,sub_08181B00,ActorPalette_FadeWhite,"actor palettes","fades four palette banks toward white over sixteen frames"
 08181BF8,sub_08181BF8,ActorPalette_BlendSavedBanks,"actor palettes","blends four saved and source palette banks"
+08181CE8,sub_08181CE8,ActorPalette_BlendSavedBanksSlow,"actor palettes","blends four saved and source palette banks with slower scaling"
