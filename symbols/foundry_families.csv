@@ -312,3 +312,4 @@ addr,function,name,family,note
 081386F0,sub_081386F0,ScriptNotifier_CallWithValue,"script notification","calls an optional script with the object's halfword value"
 08138FE0,sub_08138FE0,SoundDelay_Update,"SoundDelay","plays song on entry and changes callback after thirty frames"
 0813930C,sub_0813930C,SceneProcSprites_Initialize,"SceneProcSprites","initialize four script-backed sprite entries"
+08139B58,sub_08139B58,CallbackPool_Update,"CallbackPool","invokes active entry callbacks and increments frame counter"
