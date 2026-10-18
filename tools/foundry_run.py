@@ -29,7 +29,7 @@ from romlib import ROOT  # noqa: E402
 
 BACKEND = "claude"
 TOOLS = ["Read", "Glob", "Grep", "Edit(wip/**)", "Write(wip/**)", "Edit(build/foundry/**)",
-         "Write(build/foundry/**)", "Edit(include/**)", "Bash(build/venv/bin/python tools/*)"]
+         "Write(build/foundry/**)", "Edit(include/**)", "Write(include/**)", "Bash(build/venv/bin/python tools/*)"]
 
 
 def quota_ok(floor):
