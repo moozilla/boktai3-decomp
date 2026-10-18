@@ -1035,3 +1035,4 @@ addr,function,name,family,note
 081ADFB8,sub_081ADFB8,SceneBackdrop_Initialize,"SceneBackdrop (tentative)","loads background resource and initializes layer values"
 081AF5A0,sub_081AF5A0,SceneAnimation_SelectSequence,"SceneAnimation (tentative)","selects an animation or enters inactive state"
 081AFABC,sub_081AFABC,,"unassigned callback",""
+081B4784,sub_081B4784,SceneParticleEmitter_EmitPeriodically,"SceneParticleEmitter (tentative)","emits variant particles every 32 ticks"
