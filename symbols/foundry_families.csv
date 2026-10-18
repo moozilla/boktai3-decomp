@@ -14,3 +14,4 @@ addr,function,name,family,note
 08093798,sub_08093798,Slime_SetStateFlag,"Slime","sets bit 3 in a state flag byte"
 080975C4,sub_080975C4,Bee_UpdateSway,"Bee","clamps and oscillates a sway offset with direction steps"
 08097C64,sub_08097C64,Bee_ClearActionFlags,"Bee","clears several action flag bits and a script field"
+080986DC,sub_080986DC,Bee_ConsumeFlag80,"Bee","if flag 0x80 is set, subtracts 3 from a counter and clears the flag"
