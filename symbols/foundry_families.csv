@@ -949,3 +949,4 @@ addr,function,name,family,note
 0819117C,sub_0819117C,SceneAnimation_UpdateSlotSequenceSevenEffect,"Scene animation (tentative)","updates slot sequence seven and triggers its delayed effect"
 08191508,sub_08191508,Nidhoggr_HidePartWithExplosion,"Nidhoggr part animation","hides a part, creates an offset explosion, and resets its state"
 0819804C,sub_0819804C,ShadowActor_UpdateTransition,"ShadowActor (tentative animated actor with scaled shadow)","plays a transition animation and advances actor state"
+08198158,sub_08198158,SceneActor_SetSavedPositionOffset,"OffsetSceneActor","sets target coordinates to the saved position plus a diagonal offset"
