@@ -339,3 +339,4 @@ addr,function,name,family,note
 08140550,sub_08140550,Player_BeginTerrainRecovery,"Player terrain movement","starts terrain recovery and faces away from its target"
 081408AC,sub_081408AC,Player_BeginTerrainRecovery,"Player","initialize recovery facing from terrain cell"
 081414E4,sub_081414E4,Player_ClampCameraOffsets,"Player","clamp camera offset sum and difference around half height"
+08141738,sub_08141738,Player_BeginDirectionalCameraOffset,"Player","initialize a directional camera offset"
