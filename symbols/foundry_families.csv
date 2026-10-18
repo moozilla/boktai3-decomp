@@ -354,3 +354,4 @@ addr,function,name,family,note
 081143D8,sub_081143D8,SceneCallbackPool_Initialize,"Scene callback pool","clears sixteen entry buffers and active flags, resets frame and publishes the pool"
 0811DEEC,sub_0811DEEC,ScriptOptions_LoadEntries,"ScriptOptions","load up to 24 script option records"
 0811DF78,sub_0811DF78,ScriptOptions_LoadTargets,"ScriptOptions","load six records from script keyword t"
+0811E038,sub_0811E038,ScriptOptions_LoadWideRecords,"ScriptOptions","load six sixteen-byte records from keyword w"
