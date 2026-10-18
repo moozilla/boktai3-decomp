@@ -996,3 +996,4 @@ addr,function,name,family,note
 0819D768,sub_0819D768,ActorAction_PlayDescentSequence,"ActorActionSequence","plays three animations then waits for height to descend"
 0819D84C,sub_0819D84C,ActorAction_PlayTetherSequence,"ActorActionSequence","plays animation sequence until tether request or animation completion"
 0819E170,sub_0819E170,ActorAction_WaitThenChangeBehavior,"ActorActionSequence","waits sixty frames then installs animation and behavior callback"
+0819E708,sub_0819E708,ActorAnimation_ResetSequence,"ActorAnimationSequence (tentative)","resets sequence counters and initializes the first duration"
