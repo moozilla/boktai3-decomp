@@ -1089,3 +1089,4 @@ addr,function,name,family,note
 081BF57C,sub_081BF57C,Storage_InitEntries,"Storage","initializes six entries and script option e"
 081BF5DC,sub_081BF5DC,Storage_InitBackground,"Storage","loads and configures the screen background"
 081BF9C4,sub_081BF9C4,Storage_InitTextOptions,"Storage","captures four script options and configures text window"
+081BFFC8,sub_081BFFC8,DirectionMarker_GetAnimation,"DirectionMarker (tentative)","maps quadrant and variant to sprite animation"
