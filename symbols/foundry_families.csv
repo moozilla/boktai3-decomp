@@ -777,3 +777,4 @@ addr,function,name,family,note
 0816A880,sub_0816A880,MenuPrompt_FadeChoice,"MenuPrompt (tentative)","ramps display levels down before completing the choice"
 0816A9A8,sub_0816A9A8,MenuPrompt_FinishDelayedChoice,"MenuPrompt (tentative)","waits 150 frames then dispatches a result-dependent script and phase"
 0816AAB0,sub_0816AAB0,MenuPrompt_WaitForChildPhase,"MenuPrompt (tentative)","waits for the child callback phase before restoring display and menu"
+0816AB30,sub_0816AB30,MenuPrompt_PulseDisplay,"MenuPrompt (tentative)","ramps display levels up, holds them, then ramps down over 150 frames"
