@@ -1151,3 +1151,4 @@ addr,function,name,family,note
 081DEDF4,sub_081DEDF4,AnimPanel_RemoveAnimations,"animation panel (tentative)","removes four main animations and twelve entry animations"
 081DF0EC,sub_081DF0EC,AnimPanel_SaveSelections,"animation panel (tentative)","packs 24 entry values and two selections into saved bytes"
 081DF124,sub_081DF124,AnimPanel_LoadSelections,"animation panel (tentative)","restores entry values and selections from saved bytes"
+081DF160,sub_081DF160,AnimPanel_ResetSelections,"animation panel (tentative)","fills entries with 0x41 and clears both selections"
