@@ -561,3 +561,4 @@ addr,function,name,family,note
 08102EE8,sub_08102EE8,NamedObject_MoveAttachedPlayer,"NamedObject","apply object motion to the attached player"
 08103850,sub_08103850,NamedObject_UpdatePool,"NamedObject","run active object callbacks and synchronize sprite positions"
 0810399C,sub_0810399C,ActorGroup_Destroy,"ActorGroup","stops group sounds and releases active members"
+08103C54,sub_08103C54,ActorGroup_RemoveFromScript,"ActorGroup","removes the member named by script keyword n"
