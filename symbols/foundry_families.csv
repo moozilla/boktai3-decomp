@@ -129,3 +129,4 @@ addr,function,name,family,note
 080F0738,sub_080F0738,SceneActor_InitCollision5005,"SceneActor collision initialization","initialize body and attack collision for flags 0x5005"
 080F07BC,sub_080F07BC,SceneActor_BeginReaction22,"SceneActor reaction state","reset phase and install reaction code 0x22"
 080F1E84,sub_080F1E84,ColorPulse_FadeRed,"ColorPulse","fade red and advance the color callback"
+080F1F08,sub_080F1F08,ColorPulse_FinishRedFade,"ColorPulse","finish red fade and reset callback"
