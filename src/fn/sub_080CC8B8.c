@@ -1,8 +1,8 @@
 #include "global.h"
 
 void Camera_RequestShake(u32);
-void sub_080C4E8C(void *);
-void sub_080C52BC(void *);
+void Skeleton_TryTriggerAction(void *);
+void Skeleton_ClearPendingFlag(void *);
 void sub_080C53A8(void *);
 
 struct T {
@@ -28,8 +28,8 @@ s32 Golem_UpdateEffectsAndContacts(struct S *s)
             *p = *p - 1;
         }
     }
-    sub_080C4E8C(s);
-    sub_080C52BC(s);
+    Skeleton_TryTriggerAction(s);
+    Skeleton_ClearPendingFlag(s);
     sub_080C53A8(s);
     return 1;
 }

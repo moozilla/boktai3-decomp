@@ -39,7 +39,8 @@ struct ScenePoolEntry {
 };
 /* Partial actor view established by the frame/state callbacks in this range. */
 struct ScenePoolActor {
-    u8 unknown0[0x10];
+    u8 unknown0[0xc];
+    u32 boundsFlags;
     struct ScenePoolVec32 position;
     u8 unknown20[0x18];
     s32 restrictionMetric;
@@ -47,13 +48,19 @@ struct ScenePoolActor {
     u16 timerA, timerB;
     u8 unknown5c[0xc];
     u32 unknown68;
-    u8 unknown6c[0x54];
+    u8 unknown6c[0x28];
+    s32 minimumForwardSpeed, maximumForwardSpeed;
+    s32 minimumLateralSpeed, maximumLateralSpeed;
+    s32 minimumForwardBias, maximumForwardBias;
+    u8 unknownac[0x14];
     s32 forwardBias; /* +0xc0, added to forwardSpeed (tentative) */
     u8 unknownc4[0x1f0];
     u8 emissionProfile[0xc]; /* observed descriptor prefix; full extent is unknown */
     u8 unknown2c0[0x48];
     u16 unknown308;
-    u8 unknown30a[0x262];
+    u8 unknown30a[0x32];
+    s32 biasClampMode;
+    u8 unknown340[0x22c];
     u32 motionFlags;
     u8 unknown570[0xa];
     u8 unknown57a;
@@ -63,7 +70,9 @@ struct ScenePoolActor {
     s8 motionLock;
     u8 unknown5ed;
     u8 flags5ee;
-    u8 unknown5ef[0xd];
+    u8 unknown5ef[5];
+    struct ScenePoolPlayer *linkedPlayer; /* +0x5f4, restriction flag consumer 0811628C */
+    u8 unknown5f8[4];
     u32 stateFlags;
     u8 unknown600[0x258];
     u32 controlFlags;
@@ -91,10 +100,23 @@ struct ScenePoolSpeedBounds {
 };
 /* Position and flag consumers identify this separate player-pointer array.
  * This is not the gUnk_02000580 Player array from player.h. */
+struct ScenePoolPlayerDraw {
+    u8 unknown0[0x16];
+    u16 flags;
+};
 struct ScenePoolPlayer {
     u8 unknown0[0x28];
     s32 position[3];
-    u8 unknown34[0x8c0];
+    u8 unknown34[0x5c0];
+    s32 viewportOriginX; /* +0x5f4, rounded down to a pixel by 0811AB78 */
+    u8 unknown5f8[0x26c];
+    u32 gloveTimer; /* +0x864, tentative Glove controller state */
+    u8 gloveActive;
+    u8 unknown869[3];
+    void (*gloveUpdate)(void);
+    u8 unknown870[0x58];
+    struct ScenePoolPlayerDraw gloveDraw; /* +0x8c8 */
+    u8 unknown8e0[0x14];
     u16 flags;
 };
 extern struct ScenePoolPlayer *gUnk_020004F0[2];

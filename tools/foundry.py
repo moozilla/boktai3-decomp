@@ -42,8 +42,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from romlib import ROOT  # noqa: E402
 
 PY = os.path.join(ROOT, "build", "venv", "bin", "python")
-OUT = os.path.join(ROOT, "build", "foundry")
-WIP = os.path.join(ROOT, "wip", "foundry")
+RUN = os.environ.get("FOUNDRY_RUN", "foundry")  # a separate run keeps its own state and drafts
+OUT = os.path.join(ROOT, "build", RUN)
+WIP = os.path.join(ROOT, "wip", RUN)
 BUCKETS = [(0, 50, "<50"), (50, 150, "50-150"), (150, 400, "150-400"), (400, 10 ** 9, "400+")]
 
 
@@ -198,6 +199,19 @@ def context(func):
     pack += ["```", ""]
     if use:
         pack += ["## How matched code calls this function", "", "```c"] + use + ["```", ""]
+    lo, hi, sname = subsystem_of(f["addr"])
+    if hi:
+        import collections
+        inc = collections.Counter()
+        for q in glob.glob(os.path.join(ROOT, "src", "fn", "sub_*.c")):
+            a = int(os.path.basename(q)[4:12], 16)
+            if lo <= a < hi:
+                inc.update(re.findall(r'#include "([^"]+\.h)"', open(q, errors="replace").read()))
+        inc.pop("global.h", None)
+        pack += [f"## Subsystem: {sname} ({lo:08X}-{hi:08X})", "",
+                 "Headers its matched functions include (shared types live here; extend them):", ""]
+        pack += [f"* include/{h} (used by {n} matched functions)" for h, n in inc.most_common(6)] or ["* (none yet)"]
+        pack.append("")
     pack += ["## Matched relatives (tools/relatives.py: matched functions sharing code with this one)", "",
              rel.strip() or "(none)", ""]
     path = os.path.join(fdir(func), "context.md")
@@ -213,17 +227,17 @@ matched relatives (start from a relative's C when one covers most of the functio
 Read docs/WORKER.md sections "agbcc matching tips" and the "Wrong values in the right shape"
 bullet for compiler idioms.
 
-Write your C to wip/foundry/{func}.c: `#include "global.h"`, local declarations, then the one
+Write your C to wip/{run}/{func}.c: `#include "global.h"`, local declarations, then the one
 function {func} (keep the sub_ name). Use the names the context pack shows: the linker
 does not resolve sub_XXXXXXXX for a function that has a real name, or D_XXXXXXXX labels. No data definitions, no string literals, no register
 pins (`register ... asm("rN")`), no asm() statements.
 
-Check ONLY with:  build/venv/bin/python tools/foundry.py check wip/foundry/{func}.c
+Check ONLY with:  {env}build/venv/bin/python tools/foundry.py check wip/{run}/{func}.c
 It prints the aligned original/candidate listing (`!` marks differences) and MATCH or a fuzzy %.
 When the shape is right but values differ, run:
-  build/venv/bin/python tools/repair.py wip/foundry/{func}.c {func} --write
+  build/venv/bin/python tools/repair.py wip/{run}/{func}.c {func} --write
 (it takes constants, offsets and callees from the ROM; its "ROM only"/"C only" lines name what
-is structurally missing). Also useful: build/venv/bin/python tools/explain.py wip/foundry/{func}.c {func}
+is structurally missing). Also useful: build/venv/bin/python tools/explain.py wip/{run}/{func}.c {func}
 
 Register copies are reachable in plain C: do not conclude that a pin is needed. When the ROM
 copies a constant or value between registers (`movs r3, #1; adds r1, r3, #0`) or keeps a mask
@@ -234,9 +248,16 @@ early `return` or `goto` that changes block layout; the order of declarations an
 statements that compute the same value. A value computed separately in each branch usually
 means the C repeats the expression in each branch.
 
+Each check also prints a CORE line: the distance with register allocation ignored (copies,
+spills and the frame dropped, registers abstracted), and which regions of the function are
+LOCKED. On anything over ~60 instructions, steer by CORE, not by the fuzzy %: allocation noise
+makes the fuzzy % jump around, while CORE only moves when the C does different work. Lock regions
+one at a time. Once CORE is 0, work on registers (the levers above); the machine stages after
+you also try register allocation.
+
 Budget: {checks} checks. Get the structure right first (calls, branches, loops), then the values,
 then registers. Stop early when you match, or when several checks bring no improvement.
-Do not edit anything outside wip/foundry/. Do not commit.
+Do not edit anything outside wip/{run}/. Do not commit.
 Finish with one line: RESULT {func} MATCH|fuzzy N% checks=K  and a two-sentence note on what
 was left or what made it hard.
 """
@@ -246,7 +267,8 @@ def brief(func, checks=None):
     path, f = context(func)
     if checks is None:
         checks = 12 if f["insns"] < 150 else 20
-    return BRIEF.format(root=ROOT, func=func, context=os.path.relpath(path, ROOT), checks=checks)
+    env = f"FOUNDRY_RUN={RUN} " if RUN != "foundry" else ""
+    return BRIEF.format(root=ROOT, func=func, context=os.path.relpath(path, ROOT), checks=checks, run=RUN, env=env)
 
 
 # ---------------------------------------------------------------- check and stages
@@ -297,6 +319,12 @@ def check(path, func=None):
     with open(os.path.join(d, "checks.tsv"), "a") as fh:
         fh.write(f"{n + 1}\t{time.time():.0f}\t{fz if fz is not None else 'error'}\t{round(time.time() - t0, 2)}\n")
     print(text, end="")
+    if fz != 100.0 and fz is not None:
+        try:
+            import regions
+            print(regions.render(regions.Report(path, func).run(), limit=6))
+        except Exception as e:  # the report is advice; never fail the check over it
+            print(f"(regions report failed: {e!r})")
     bad = link_names(path)
     if bad:
         print("LINK NAMES: the ROM build will not link these; rename them: " + ", ".join(bad))
@@ -367,13 +395,20 @@ def finish(func):
     else:
         sh([PY, "tools/repair.py", cand, func, "--write"], timeout=600)
         st["repair_dist"], st["repair_shape"] = distances(cand, func)
+        try:
+            import regions
+            st["core"] = regions.Report(cand, func).run()["core"]
+        except Exception:
+            st["core"] = None
         if st["repair_dist"] == 0:
             st["stage"] = "matched by repair"
-        elif st["repair_shape"] == 0 and st["repair_dist"]:
+        elif st["repair_dist"] and (st["repair_shape"] == 0 or (st["core"] is not None and st["core"] <= 4)):
             log = sh([PY, "tools/autosolve.py", os.path.relpath(cand, ROOT), func, "--out",
-                      os.path.join(d, "autosolve"), "-j", "2"], timeout=3600)
+                      os.path.join(d, "autosolve"), "-j", "2", "--solve-seconds", "60",
+                      "--translate-seconds", "150"], timeout=1800)
             m = "TRANSLATED" in log or "MATCHES" in log
-            st["stage"] = "matched by register solver" if m else "registers only (solver failed)"
+            st["stage"] = "matched by register solver" if m else (
+                "registers only (solver failed)" if st["core"] == 0 else f"core {st['core']} (solver failed)")
             if m:
                 hit = glob.glob(os.path.join(d, "autosolve", func, "match-*.c"))
                 if hit:
@@ -442,6 +477,308 @@ def report(markdown):
                          f" shape {st.get('repair_shape', st.get('worker_shape'))}" if st else ""))
 
 
+# ---------------------------------------------------------------- at scale
+
+SCALE = os.path.join(OUT, "scale")
+
+
+def make_queue(buckets, max_insns):
+    """Every never-drafted, unmatched function in the buckets, in ROM order."""
+    import worklist
+    done = worklist.done_names()
+    skip = drafted() | {r[0] for r in sample_rows()}
+    want = set(buckets)
+    fs = [f for f in worklist.functions() if f["name"] not in done and f["name"] not in skip
+          and not worklist.in_library(f["addr"]) and f["addr"] >= 0x0800145C and f["insns"] <= max_insns
+          and bucket(f["insns"]) in want]
+    os.makedirs(SCALE, exist_ok=True)
+    with open(os.path.join(SCALE, "queue.tsv"), "w") as fh:
+        for f in fs:
+            fh.write(f"{f['name']}\t{f['insns']}\t{bucket(f['insns'])}\n")
+    print(f"{len(fs)} functions queued")
+
+
+BATCH_BRIEF = """You are a decompilation worker on the Boktai 3 (GBA) decomp in {root}.
+These functions are a contiguous run in the {subsystem} subsystem ({range}). Work through them
+in order, one at a time; neighbours share types and callees, so carry what you learn forward:
+
+{funcs}
+
+For EACH function FUNC:
+1. Run: build/venv/bin/python tools/foundry.py brief FUNC
+   It writes the context pack and prints the per-function instructions. Follow them exactly
+   (its check budget applies to that function alone).
+2. Leave the match organized, not just matched:
+   * NAME it. At the top of wip/foundry/FUNC.c add `#define Subsystem_Verb FUNC` (the style of
+     symbols/functions.csv: e.g. ScenePanel_BeginFade) when you can say what it does; a
+     provisional name is fine. Name callees you understood the same way
+     (`#define Name sub_XXXXXXXX`), and globals with `#define gName gUnk_XXXXXXXX`. Keep the
+     sub_ name as the definition's name (the alias renames it later). Don't invent a name
+     you can't support, and never use placeholder words (Something, Stuff, Thing, Do, Handle
+     alone): if you can't say what it does, write NAME none.
+   * TYPES go in the shared header. If the object it works on has a struct in include/ (the
+     context pack lists the headers this subsystem's matched code uses), use it, and add the
+     fields you discovered there: only by replacing padding/unknown bytes, never moving an
+     existing offset. After editing a header run
+       build/venv/bin/python tools/foundry.py hdrcheck include/HEADER.h
+     which re-checks every matched file that includes it; undo the edit if anything breaks.
+     Don't edit include/global.h or headers outside this subsystem. If the object has no
+     header yet, define its struct locally, named after the object (not `struct S1`).
+3. Write build/foundry/FUNC/result.txt with these lines:
+     RESULT FUNC MATCH checks=K            (or: RESULT FUNC fuzzy N% checks=K)
+     NAME Subsystem_Verb low "what it does, in a few words"      (or: NAME none)
+     FAMILY <the subsystem or object family it belongs to>
+     NOTE <one sentence on what was hard or what is left>
+   If FUNC is not a real function (a split error: a lone epilogue tail or prologue head of a
+   neighbour), write `RESULT FUNC notafunction checks=0` and move on.
+Finish with the RESULT lines, one per function.
+"""
+
+
+_subsys = None
+
+
+def subsystems():
+    global _subsys
+    if _subsys is None:
+        import csv
+        _subsys = [(int(r["start"], 16), int(r["end"], 16), r["name"])
+                   for r in csv.DictReader(open(os.path.join(ROOT, "symbols", "progress_subsystems.csv")))]
+    return _subsys
+
+
+def subsystem_of(addr):
+    return next(((s, e, n) for s, e, n in subsystems() if s <= addr < e), (0, 0, "unassigned"))
+
+
+def batch(n, bucket_filter=None, lo=0, hi=1 << 32):
+    """Claim the next n queued functions of one subsystem not already being worked on, as a
+    contiguous run, and print a batch brief."""
+    q = os.path.join(SCALE, "queue.tsv")
+    claimed_p = os.path.join(SCALE, "claimed.txt")
+    active_p = os.path.join(SCALE, "active.txt")
+    claimed = set(open(claimed_p).read().split()) if os.path.exists(claimed_p) else set()
+    active = set(open(active_p).read().split("\n")) if os.path.exists(active_p) else set()
+    rows = [ln.rstrip("\n").split("\t") for ln in open(q)]
+    names = {f["name"]: f["addr"] for f in __import__("worklist").functions()}
+    take, sub = [], None
+    for r in rows:
+        if r[0] in claimed or (bucket_filter and r[2] != bucket_filter) or not lo <= names[r[0]] < hi:
+            continue
+        s = subsystem_of(names[r[0]])
+        if sub is None:
+            if s[2] in active and s[2] != "unassigned":
+                continue
+            sub = s
+        if s != sub:
+            if take:
+                break
+            continue
+        take.append(r[0])
+        if len(take) >= n:
+            break
+    if not take:
+        sys.exit("queue empty")
+    with open(claimed_p, "a") as fh:
+        fh.write("\n".join(take) + "\n")
+    with open(active_p, "a") as fh:
+        fh.write(sub[2] + "\n")
+    k = len(glob.glob(os.path.join(SCALE, "batch-*.txt"))) + 1
+    path = os.path.join(SCALE, f"batch-{k:03d}.txt")
+    rng = f"{sub[0]:08X}-{sub[1]:08X}" if sub[1] else "no recorded range"
+    open(path, "w").write(BATCH_BRIEF.format(root=ROOT, funcs="\n".join(take), subsystem=sub[2], range=rng))
+    open(path + ".subsystem", "w").write(sub[2])
+    print(path)
+
+
+def release(path):
+    """A batch finished: its subsystem is free for another batch."""
+    sp = path + ".subsystem"
+    if not os.path.exists(sp):
+        return
+    name = open(sp).read()
+    active_p = os.path.join(SCALE, "active.txt")
+    lines = open(active_p).read().split("\n") if os.path.exists(active_p) else []
+    if name in lines:
+        lines.remove(name)
+    open(active_p, "w").write("\n".join(lines))
+
+
+def hdrcheck(header):
+    """Re-check every matched src/ file that includes header; exit 1 if any no longer matches."""
+    base = os.path.basename(header)
+    files = [p for p in glob.glob(os.path.join(ROOT, "src", "**", "*.c"), recursive=True)
+             if f'"{base}"' in open(p, errors="replace").read() and "INCLUDE_ASM" not in open(p).read()]
+    bad = []
+    for p in files:
+        r = subprocess.run([PY, "tools/check.py", p], cwd=ROOT, capture_output=True, text=True)
+        if r.returncode != 0 or "MATCH" not in r.stdout:
+            bad.append(os.path.relpath(p, ROOT))
+    print(f"{len(files)} files include {base}; " + ("all still match" if not bad else f"BROKEN: {' '.join(bad[:20])}"))
+    return 1 if bad else 0
+
+
+def batch_usage(k, tokens, seconds):
+    with open(os.path.join(SCALE, "usage.tsv"), "a") as fh:
+        fh.write(f"{k}\t{tokens}\t{seconds}\t{time.time():.0f}\n")
+
+
+def scale_report():
+    """Funnel over the at-scale run: per bucket, and matches per hour / tokens per match."""
+    q = os.path.join(SCALE, "queue.tsv")
+    rows = [ln.rstrip("\n").split("\t") for ln in open(q)] if os.path.exists(q) else []
+    by = {}
+    for func, insns, b in rows:
+        sp = os.path.join(OUT, func, "stages.json")
+        if not os.path.exists(sp):
+            continue
+        try:
+            st = json.load(open(sp))
+        except ValueError:
+            continue
+        x = by.setdefault(b, {"n": 0, "m": 0, "insns": 0, "minsns": 0, "named": 0})
+        x["n"] += 1
+        x["insns"] += int(insns)
+        if st["stage"].startswith("matched") and "disagrees" not in st["stage"]:
+            x["m"] += 1
+            x["minsns"] += int(insns)
+            nm = parse_result(func).get("NAME", "none")
+            x["named"] += not nm.startswith("none") and bool(nm)
+    up = os.path.join(SCALE, "usage.tsv")
+    us = [ln.split("\t") for ln in open(up)] if os.path.exists(up) else []
+    def batch_tokens(u):
+        j = os.path.join(SCALE, f"batch-{u[0]}.json")
+        if os.path.exists(j):
+            try:
+                d = json.loads(open(j).read().strip().split("\n")[-1])["usage"]
+                return d["input_tokens"] + d["output_tokens"] + d.get("cache_creation_input_tokens", 0)
+            except Exception:
+                pass
+        return int(u[1])
+    tokens = sum(batch_tokens(u) for u in us)
+    cost = sum(float(u[4]) for u in us if len(u) > 4 and u[4].strip())
+    times = [float(u[3]) - float(u[2]) for u in us] + [float(u[3]) for u in us]
+    hours = (max(times) - min(times)) / 3600 if us else 0
+    m = sum(x["m"] for x in by.values())
+    for b, x in by.items():
+        print(f"{b:8s} finished {x['n']:4d}  matched {x['m']:4d} ({100 * x['m'] / max(x['n'], 1):.0f}%)  "
+              f"named {x['named']}/{x['m']}  instructions matched {x['minsns']}/{x['insns']}")
+    print(f"batches {len(us)}  tokens {tokens} (non-cached)  headless cost ${cost:.2f}  matches {m}  "
+          f"tokens/match {tokens // max(m, 1)}  "
+          f"wall {hours:.1f} h  matches/hour {m / hours if hours else 0:.1f}")
+
+
+def committable():
+    """Matched functions not yet in src/: (func, source file)."""
+    out = []
+    seen = set()
+    for rp in glob.glob(os.path.join(OUT, "sub_*", "result.txt")):
+        func = os.path.basename(os.path.dirname(rp))
+        sp = os.path.join(OUT, func, "stages.json")
+        try:
+            st = json.load(open(sp)) if os.path.exists(sp) else None
+        except ValueError:
+            st = None
+        if st is None:
+            # the worker's own MATCH; integrate re-checks the file before committing it
+            first = open(rp).readline()
+            if not re.match(rf"RESULT {func} MATCH\b", first):
+                continue
+            st = {"stage": "matched by worker", "checks": len(open(os.path.join(OUT, func, "checks.tsv")).readlines())
+                  if os.path.exists(os.path.join(OUT, func, "checks.tsv")) else None}
+        if not st["stage"].startswith("matched") or "disagrees" in st["stage"]:
+            continue
+        if os.path.exists(os.path.join(ROOT, "src", "fn", func + ".c")):
+            continue
+        src = os.path.join(WIP, func + ".c") if st["stage"] == "matched by worker" else os.path.join(OUT, func, "candidate.c")
+        out.append((func, src, st["stage"], st.get("checks")))
+    return sorted(out)
+
+
+def parse_result(func):
+    p = os.path.join(OUT, func, "result.txt")
+    out = {}
+    if os.path.exists(p):
+        for ln in open(p):
+            k, _, v = ln.strip().partition(" ")
+            if k in ("NAME", "FAMILY", "NOTE"):
+                out[k] = v.strip()
+    return out
+
+
+def unit_with_placeholder(func):
+    for p in glob.glob(os.path.join(ROOT, "src", "*.c")):
+        if re.search(rf'INCLUDE_ASM\("asm/nonmatching", {func}\);', open(p).read()):
+            return p
+    return None
+
+
+def integrate(dry=False):
+    """Commit each new match, organized: named, placed, family recorded. One commit per function."""
+    fam_p = os.path.join(ROOT, "symbols", "foundry_families.csv")
+    if not os.path.exists(fam_p):
+        open(fam_p, "w").write("addr,function,name,family,note\n")
+    done = 0
+    for func, src, stage, checks in committable():
+        clean = os.path.join(OUT, func, "clean.c")
+        if stage != "matched by worker" and os.path.exists(clean):
+            src = clean
+        if not os.path.exists(src):
+            continue
+        text = open(src).read()
+        if text.lstrip().startswith("typedef"):
+            print(f"{func}: {stage}, but the source is preprocessed solver output; "
+                  f"carry its edit into build/foundry/{func}/clean.c first")
+            continue
+        r = parse_result(func)
+        name = None
+        m = re.match(r"(\w+)\s+(\w+)\s*(.*)", r.get("NAME", ""))
+        if m and m.group(1) != "none":
+            name = m.group(1)
+        if name and not re.search(rf"^#define\s+\w+\s+{func}\b", text, re.M):
+            text = re.sub(r'((?:#include[^\n]*\n)+)', rf"\1#define {name} {func}\n", text, count=1)
+        alias = re.search(rf"^#define\s+(\w+)\s+{func}\b", text, re.M)
+        name = alias.group(1) if alias else None
+        placed = None
+        unit = unit_with_placeholder(func)
+        if unit and not dry:
+            old = open(unit).read()
+            body = "\n".join(ln for ln in text.split("\n") if not ln.startswith("#include"))
+            open(unit, "w").write(old.replace(f'INCLUDE_ASM("asm/nonmatching", {func});', body.strip()))
+            ok = subprocess.run([PY, "tools/check.py", unit], cwd=ROOT, capture_output=True, text=True)
+            if ok.returncode == 0:
+                placed = unit
+            else:
+                open(unit, "w").write(old)
+        if not placed:
+            placed = os.path.join(ROOT, "src", "fn", func + ".c")
+            if not dry:
+                open(placed, "w").write(text)
+                ok = subprocess.run([PY, "tools/check.py", placed], cwd=ROOT, capture_output=True, text=True)
+                if ok.returncode != 0 or "MATCH" not in ok.stdout:
+                    os.remove(placed)
+                    print(f"{func}: no longer matches as src/fn ({ok.stdout.strip()[-80:]}); skipped")
+                    continue
+        addr = func[4:]
+        fam = r.get("FAMILY", "")
+        note = (r.get("NAME", "").split(None, 2)[2:] or [""])[0].strip('"')
+        if not dry:
+            with open(fam_p, "a") as fh:
+                fh.write(f'{addr},{func},{name or ""},"{fam}","{note}"\n')
+        how = {"matched by worker": "a foundry worker", "matched by repair": "a foundry worker plus tools/repair.py",
+               "matched by register solver": "a foundry worker plus tools/autosolve.py"}.get(stage, stage)
+        msg = f"Match {func}" + (f" ({name})" if name else "")
+        body = f"From the foundry: {how}, {checks} checks." + (f" Family: {fam}." if fam else "") + \
+            (f" {note}." if note else "") + (f" Placed in {os.path.relpath(placed, ROOT)}." if unit and placed == unit else "")
+        print(f"{msg} -> {os.path.relpath(placed, ROOT)}")
+        if not dry:
+            subprocess.run(["git", "add", placed, fam_p], cwd=ROOT, check=True)
+            subprocess.run(["git", "commit", "-q", "-m", msg, "-m", body, "-m",
+                            "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"], cwd=ROOT, check=True)
+        done += 1
+    print(f"{done} integrated")
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -461,6 +798,21 @@ def main():
     u.add_argument("func")
     u.add_argument("tokens")
     u.add_argument("seconds")
+    qp = sub.add_parser("queue")
+    qp.add_argument("--buckets", default="<50,50-150")
+    qp.add_argument("--max-insns", type=int, default=150)
+    bp = sub.add_parser("batch")
+    bp.add_argument("n", type=int)
+    bp.add_argument("--bucket")
+    bp.add_argument("--range", nargs=2, help="START END (hex)")
+    bu = sub.add_parser("batch-usage")
+    bu.add_argument("k")
+    bu.add_argument("tokens")
+    bu.add_argument("seconds")
+    sub.add_parser("scale-report")
+    sub.add_parser("committable")
+    sub.add_parser("integrate").add_argument("--dry", action="store_true")
+    sub.add_parser("hdrcheck").add_argument("header")
     r = sub.add_parser("report")
     r.add_argument("--markdown", action="store_true")
     a = ap.parse_args()
@@ -476,6 +828,21 @@ def main():
         print(json.dumps(finish(a.func), indent=1))
     elif a.cmd == "usage":
         usage(a.func, a.tokens, a.seconds)
+    elif a.cmd == "queue":
+        make_queue(a.buckets.split(","), a.max_insns)
+    elif a.cmd == "batch":
+        batch(a.n, a.bucket, *([int(x, 16) for x in a.range] if a.range else []))
+    elif a.cmd == "batch-usage":
+        batch_usage(a.k, a.tokens, a.seconds)
+    elif a.cmd == "scale-report":
+        scale_report()
+    elif a.cmd == "hdrcheck":
+        sys.exit(hdrcheck(a.header))
+    elif a.cmd == "integrate":
+        integrate(a.dry)
+    elif a.cmd == "committable":
+        for row in committable():
+            print(*row, sep="\t")
     else:
         report(a.markdown)
 

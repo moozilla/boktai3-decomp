@@ -1,7 +1,7 @@
 #include "global.h"
 
 u32 sub_0824923C(void *, u32);
-void sub_080F2700(void);
+void ColorPulse_PrepareTargetDash(void);
 
 struct S {
     u8 filler[0xcd8];
@@ -21,6 +21,6 @@ void Ivy_WaitForPrimaryActionCompletion(struct S *s)
     }
     if (s->b > 1) {
         s->b = 0;
-        s->fp = sub_080F2700;
+        s->fp = ColorPulse_PrepareTargetDash;
     }
 }

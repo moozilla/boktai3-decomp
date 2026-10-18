@@ -10,12 +10,16 @@ struct SceneValueEquipment {
     u8 grade, unknownD[3];
 };
 struct SceneValueEquipmentDefinition {
-    u8 unknown0[6];
+    u8 descriptionTitle, unknown1, descriptionStyleA, descriptionStyleB;
+    u8 unknown4[2];
     u16 baseValue;
-    u8 unknown8[0x18];
+    u8 unknown8[4];
+    u8 modifierTextA, unknownD[3];
+    u8 modifierTextB, unknown11[15];
 };
 struct SceneValueItemDefinition {
-    u32 unknown0;
+    u16 unknown0;
+    u16 actionKind; /* 0x2: selected-action dispatch kind */
     u16 conditionKey, unknown6;
     u32 unknown8, baseValue;
 };

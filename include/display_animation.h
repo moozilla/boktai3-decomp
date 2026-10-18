@@ -33,9 +33,12 @@ struct DisplaySequenceSprite {
     u32 flags;
     u8 unknown4[2];
     u8 attribute, priority, palette, paletteVariant;
-    u8 unknownA[6];
+    u8 unknownA[2];
+    const u8 *resource;
     u16 frame;
-    u8 unknown12[0x1a];
+    u8 frameIndex, elapsed, width, height, offsetX, offsetY;
+    u32 attributes;
+    u8 unknown1C[0x10];
 };
 struct DisplayKeyframeState {
     u8 unknown0[0x14];

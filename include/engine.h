@@ -40,12 +40,28 @@ struct HeapBlock {
  * tools/assets/hp.py): +4 the grid, +0xC named boxes (doors, camera area),
  * +0x10 patrol paths, +0x14 nav meshes. +0x1C..+0x22 are the neighbour index
  * offsets -width, +1, +width, -1 (Terrain_SetNeighborOffsets). */
+struct TerrainTrap {
+    u32 serial;
+    u16 f4, f6, id, fa, flags, fe;
+    u16 w[4], s[4];
+    u32 f20, command;
+    void *f28;
+};
+
 struct EngineMap {
-    u32 unused0;
+    u16 trapCount;
+    u16 unknown2;
     u8 *cells; /* grid: +0 u32 0, +4 u16 width (the row stride), +6 u16 height, +8 s16 origin x/y
                   (BG map pixels * 16), cells (struct SceneCell) from +12 */
-    u8 pad8[28];
-    u16 rows[1]; /* first cell index of each row */
+    void *resource8;
+    void *boxes;
+    void *routes;
+    void *navigation;
+    void *boxList;
+    s16 neighborOffsets[4];
+    u16 rows[256]; /* first cell index of each row */
+    struct TerrainTrap traps[64];
+    void *trapTops[64];
 };
 
 extern u32 gUnk_0300523C; /* engine pause/suspend flags (bits 1-2: sound off; list masks) */

@@ -1,6 +1,6 @@
 #include "global.h"
 
-u32 sub_080E81CC(u32);
+u32 SceneActor_GetDirectionFlags(u32);
 void SceneActorAnimation_SelectEntryFlags(void *, u32, u32);
 
 struct W {
@@ -20,7 +20,7 @@ static inline u8 TakeFlag(u8 *flag)
 void Mimic_OnAnimationStateChanged(u8 *p)
 {
     if (TakeFlag(p + 0x2B2)) {
-        u32 r = sub_080E81CC(*(u8 *)(p + 0x59));
+        u32 r = SceneActor_GetDirectionFlags(*(u8 *)(p + 0x59));
         struct W *w;
         SceneActorAnimation_SelectEntryFlags(p, 0, r);
         w = (struct W *)(p + 0x188);

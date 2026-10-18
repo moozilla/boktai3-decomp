@@ -13,9 +13,14 @@ struct SceneInputPackedPosition {
     u32 x : 16, y : 16, z : 16;
 };
 struct SceneInputWidget {
-    u8 unknown0[8];
+    u8 unknown0[2];
+    u16 stamp; /* Copied from 03005238 on initialization; meaning tentative. */
+    u8 unknown4[4];
     u32 flags;
-    u8 unknownC[0x14];
+    u16 fieldC, attributeE, scale;
+    u8 unknown12[8];
+    u8 attribute1A, attribute1B;
+    u8 unknown1C[4];
     struct ContactPosition position;
     u8 unknown28[0x12];
     u16 paletteBank;

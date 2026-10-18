@@ -107,7 +107,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/ENGINE.md](../docs/ENGINE.md) | How the Boktai 3 engine works |  | 46 |
 | [docs/ENTRY_AND_MENUS.md](../docs/ENTRY_AND_MENUS.md) | Entry point and contiguous subsystem batch |  | 5 |
 | [docs/FINDINGS.md](../docs/FINDINGS.md) | Engine findings |  | 5 |
-| [docs/FOUNDRY.md](../docs/FOUNDRY.md) | The foundry: asm to a committed match, measured as a funnel | #matching #tooling | 6 |
+| [docs/FOUNDRY.md](../docs/FOUNDRY.md) | The foundry: asm to a committed match, measured as a funnel | #matching #tooling | 9 |
 | [docs/GAME_LAYOUT.md](../docs/GAME_LAYOUT.md) | Boktai 3 game layout: from ROM to gameplay | *#assets* | 33 |
 | [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 12 |
 | [docs/HIT_SWITCH.md](../docs/HIT_SWITCH.md) | Hit-counted switch pool (tentative identity) |  | 5 |
@@ -203,6 +203,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-15.md](../docs/history/2026-10-15.md) | Handoff history: 2026-10-15 | #actors #animation #assets #inventory #particles #scene #scripts #sound #text #tooling | 41 |
 | [docs/history/2026-10-16.md](../docs/history/2026-10-16.md) | Handoff history: 2026-10-16 | #actors #scripts #text #tooling | 5 |
 | [docs/history/2026-10-17.md](../docs/history/2026-10-17.md) | Handoff history: 2026-10-17 | #actors #scripts | 0 |
+| [docs/history/2026-10-18.md](../docs/history/2026-10-18.md) | 2026-10-18 | #actor-stats #assets #collision #foundry #history #input #inventory #matching #player #route #scene-actor #scene-hud #scripts #state-actor #stats | 5 |
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 16 |
 | [gcl/README.md](../gcl/README.md) | GCL: the game's scripts | *#scripts #scene #assets #tooling* | 15 |
@@ -226,6 +227,18 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/display-track_2026-10-14.md](../notes/display-track_2026-10-14.md) | Script-controlled display tracks | *#scripts* | 4 |
 | [notes/effects-background-flash_2026-10-14.md](../notes/effects-background-flash_2026-10-14.md) | Transient sprite effects and BG1 flash controller, October 14 | *#assets* | 7 |
 | [notes/encoded-records_2026-10-14.md](../notes/encoded-records_2026-10-14.md) | Encoded records and password callers, 08044C80–080454C0 | *#menu #tooling* | 5 |
+| [notes/foundry-actor-route-behavior_2026-10-18.md](../notes/foundry-actor-route-behavior_2026-10-18.md) | Actor route and behavior foundry pass | #matching #foundry #scene-actor #route | 2 |
+| [notes/foundry-actor-stats-style_2026-10-18.md](../notes/foundry-actor-stats-style_2026-10-18.md) | Actor stats, preview palette and style foundry pass | #matching #foundry #actor-stats #scene-actor | 2 |
+| [notes/foundry-display-resources_2026-10-18.md](../notes/foundry-display-resources_2026-10-18.md) | Foundry display resource functions, 2026-10-18 | #matching #assets | 2 |
+| [notes/foundry-hud-page-input_2026-10-18.md](../notes/foundry-hud-page-input_2026-10-18.md) | HUD page input and script configuration foundry pass | #foundry #matching #scene-hud #input #scripts | 1 |
+| [notes/foundry-inventory-stat-previews_2026-10-18.md](../notes/foundry-inventory-stat-previews_2026-10-18.md) | Inventory stat-preview foundry pass | #foundry #matching #scene-hud #inventory | 2 |
+| [notes/foundry-player-action-phases_2026-10-18.md](../notes/foundry-player-action-phases_2026-10-18.md) | Player action phases foundry run (2026-10-18) | #player #matching #foundry | 2 |
+| [notes/foundry-player-action-stats_2026-10-18.md](../notes/foundry-player-action-stats_2026-10-18.md) | Foundry player action and stat candidates | #player #matching #foundry #stats | 2 |
+| [notes/foundry-player-contact_2026-10-18.md](../notes/foundry-player-contact_2026-10-18.md) | Foundry player/contact worker, 2026-10-18 | #player #collision #foundry | 2 |
+| [notes/foundry-player-terrain-camera_2026-10-18.md](../notes/foundry-player-terrain-camera_2026-10-18.md) | Player terrain, force, particles and camera foundry pass | #player #foundry #matching | 2 |
+| [notes/foundry-scene-actor-phases_2026-10-18.md](../notes/foundry-scene-actor-phases_2026-10-18.md) | Foundry scene-actor phase run, 2026-10-18 | #matching #scene-actor #foundry | 2 |
+| [notes/foundry-scene-hud-action-grid_2026-10-18.md](../notes/foundry-scene-hud-action-grid_2026-10-18.md) | Scene HUD action grid foundry candidates | #foundry #matching #scene-hud #input | 3 |
+| [notes/foundry-scene-npc-callbacks_2026-10-18.md](../notes/foundry-scene-npc-callbacks_2026-10-18.md) | Foundry: scene NPC callbacks, 2026-10-18 | #matching #foundry #state-actor | 2 |
 | [notes/interaction-marker_2026-10-14.md](../notes/interaction-marker_2026-10-14.md) | Interaction marker, 080537D0–08053D8C |  | 3 |
 | [notes/link-menus_2026-10-12.md](../notes/link-menus_2026-10-12.md) | Wireless menus and result panels | *#panel #menu #wireless* | 4 |
 | [notes/mgs-gcl-round1.md](../notes/mgs-gcl-round1.md) | MGS/GCL matching round 1 | *#scripts #matching* | 3 |
