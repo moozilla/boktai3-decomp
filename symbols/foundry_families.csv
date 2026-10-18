@@ -807,3 +807,4 @@ addr,function,name,family,note
 08178920,sub_08178920,SceneHud_InitActionIcons,"SceneHud","initialize primary and secondary action icon widgets"
 081789C8,sub_081789C8,SceneHud_InitGameplayResources,"SceneHud","load gameplay HUD panel resources and initialize action icons"
 08178B98,sub_08178B98,Hud_UpdateWithCallback,"Field HUD","binds local player then runs optional HUD callback and update"
+08178BCC,sub_08178BCC,SceneHud_DestroyOwner,"SceneHud","removes owner widgets and restores the HUD mode"
