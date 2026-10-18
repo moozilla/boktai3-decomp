@@ -177,3 +177,4 @@ addr,function,name,family,note
 0810889C,sub_0810889C,Pool1BC_UpdateDelay,"NamedEntry / Pool1BC","advances the entry to state four after an eleven-frame delay"
 081088DC,sub_081088DC,AnimatedTile_TickFadeOut,"AnimatedTile","calls a script then fades and releases a tile"
 08108ADC,sub_08108ADC,SlotMonitor_CheckTimeout,"SlotMonitor","check active-slot and idle timeouts"
+08109090,sub_08109090,LinkSession_ClearFirstPlayerKind,"LinkSession / AreaEffectLinkState","marks the first matching link-session player kind empty"
