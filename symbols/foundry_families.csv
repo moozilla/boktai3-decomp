@@ -1145,3 +1145,4 @@ addr,function,name,family,note
 081DAEA0,sub_081DAEA0,Task4E01_GetKind7Value,"Task4E01 entries","read signed value from a kind-seven entry"
 081DAEE8,sub_081DAEE8,Task4E01_SetEntryPair,"Task4E01 entries","copy two words into an indexed entry"
 081DC208,sub_081DC208,PairedFlags_SelectActive,"Screen task paired flags","toggle two flag bits according to selection"
+081DCF20,sub_081DCF20,TextEntry_CopyInitialName,"Text entry screen","copy at most eleven initial-name bytes and terminate"
