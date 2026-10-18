@@ -515,3 +515,4 @@ addr,function,name,family,note
 081763D4,sub_081763D4,SceneDialog_SelectResultPhase,"SceneDialog","selects a phase from the result query and sets flag86E"
 08176424,sub_08176424,SceneDialog_FinishSuccessfulResult,"SceneDialog","plays the successful result sound and returns after 120 ticks"
 08176488,sub_08176488,SceneDialog_FinishFailedResult,"SceneDialog","plays the alternate result sound and returns after 120 ticks"
+08176590,sub_08176590,SceneDialog_ConfigureVariantSlot,"SceneDialog","runs variant callback and configures slot three"
