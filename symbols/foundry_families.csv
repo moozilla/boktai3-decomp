@@ -922,3 +922,4 @@ addr,function,name,family,note
 08185858,sub_08185858,Armor_UpdateScriptedAttack,"Armor 4 (auto, tentative)","advances attack state and calls a position script"
 08185A10,sub_08185A10,Armor_UpdateTargetFacing,"Armor 4 (auto, tentative)","periodically aims toward the target and advances action"
 08185BF0,sub_08185BF0,Armor_FinalizeDefeat,"Armor 4 (auto, tentative)","records defeat counters and event then runs script and kills task"
+08185E6C,sub_08185E6C,Armor_UpdateFacingAction,"Armor 4 (auto, tentative)","turns toward target then selects alternate action and waits for flag"
