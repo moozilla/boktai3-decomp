@@ -1287,3 +1287,4 @@ addr,function,name,family,note
 08215148,sub_08215148,SpriteTiles_LoadResource,"sprite tile resources","copies resource tiles into object VRAM using DMA3"
 08215490,sub_08215490,SpriteOam_ResetQueue,"sprite OAM queue","clears sprite queue counters and optionally hides OAM entries"
 08216520,sub_08216520,BgGfx_LoadTilemapAtPosition,"background graphics","converts pixel position to aligned tilemap coordinates"
+08217298,sub_08217298,ResourceSlots_Reset,"display resource slots","clears a two-slot resource cache and invalidates its IDs"
