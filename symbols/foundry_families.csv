@@ -765,3 +765,4 @@ addr,function,name,family,note
 081697B8,sub_081697B8,SelectionPanel_RefreshAttachedPanel,"SelectionPanel","runs panel refresh helpers when an owner is attached"
 08169838,sub_08169838,SelectionPanel_ResetSecondarySelection,"SelectionPanel","zeros the secondary selection and refreshes dependent panel elements"
 0816997C,sub_0816997C,SelectionPanel_RefreshPrimaryIfReady,"SelectionPanel","runs primary refresh helpers when global and panel state permit"
+081699BC,sub_081699BC,SceneHud_UpdateOptionControls,"SceneHud","updates option input, highlight pulse and auxiliary toggle animation"
