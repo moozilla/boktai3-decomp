@@ -572,3 +572,4 @@ addr,function,name,family,note
 08108EF0,sub_08108EF0,SlotMonitor_Initialize,"SlotMonitor","initialize timeout, slots and polling callback"
 081095B4,sub_081095B4,ResultMessage_ShowOutcome,"ResultMessage","show one of two outcome messages and play its sound"
 081096CC,sub_081096CC,TimedMessage_ShowNotice,"TimedMessage","shows text and advances after 120 frames"
+08109738,sub_08109738,TimedMessage_ShowFollowup,"TimedMessage","shows follow-up text and branches at frame 120"
