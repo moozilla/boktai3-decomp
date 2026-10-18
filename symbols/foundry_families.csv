@@ -1327,3 +1327,4 @@ addr,function,name,family,note
 0822E6A4,sub_0822E6A4,Inventory_AssignUniqueSecondarySlot,"Inventory","clear duplicate IDs in eight secondary inventory slots then assign"
 0822E728,sub_0822E728,GameState_HasUnlockedInventoryEntry,"GameState","checks the upper eight inventory slots for an unlocked entry"
 0822EA14,sub_0822EA14,GameState_InsertUniqueListEntry,"GameState","adds a nonduplicate value to the eight-entry list"
+0822EA8C,sub_0822EA8C,GameState_MoveSlotEntry,"GameState","clears duplicate slot entries then stores a value at the requested slot"
