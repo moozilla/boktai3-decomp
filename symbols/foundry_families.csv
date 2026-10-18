@@ -132,3 +132,4 @@ addr,function,name,family,note
 080F1F08,sub_080F1F08,ColorPulse_FinishRedFade,"ColorPulse","finish red fade and reset callback"
 080F2320,sub_080F2320,ColorPulse_ApplyContact,"ColorPulse","record contact damage and trigger hit feedback"
 080F2700,sub_080F2700,ColorPulse_PrepareTargetDash,"ColorPulse","accelerate rotation and prepare a dash toward target"
+080F2D50,sub_080F2D50,PhaseObject_ApproachTarget,"PhaseObject (tentative)","moves horizontally toward target and advances timed state"
