@@ -373,9 +373,15 @@ void sub_08010514(struct GroupObjects *m, struct GroupPiece *p, int index)
         // agbcc weights a register's uses by loop depth: four empty loops make
         // `table` outrank the random-index address and mask, so it gets r2
         // (found by tools/translate.py; see docs/PERMUTER.md).
-        do { do { do { do {
-            table = gUnk_0203B400;
-        } while (0); } while (0); } while (0); } while (0);
+        do {
+            do {
+                do {
+                    do {
+                        table = gUnk_0203B400;
+                    } while (0);
+                } while (0);
+            } while (0);
+        } while (0);
         if (randomByte(table) <= 0x7F)
             p->heading = p->heading + (0x40 - (randomWith(table) & 0x3F));
         else

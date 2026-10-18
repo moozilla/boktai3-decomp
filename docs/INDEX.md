@@ -17,7 +17,7 @@ and [AGENTS.md](../AGENTS.md) (rules) · [HANDOFF](HANDOFF.md) (current state) �
 [UNIT_WORKER](UNIT_WORKER.md) (worker briefs).
 
 **Matching craft.** [WORKER](WORKER.md) (agbcc tricks) · [REGALLOC](REGALLOC.md) ·
-[PERMUTER](PERMUTER.md) (permuter fork, regsolve, litsweep, chunks) ·
+[FOUNDRY](FOUNDRY.md) (asm-to-match pipeline and funnel numbers) · [PERMUTER](PERMUTER.md) (permuter fork, regsolve, litsweep, chunks) ·
 [MODEL_BENCHMARK](MODEL_BENCHMARK.md) (explain.py/idioms.py vs check.py with Haiku/Sonnet) ·
 [COMPILER_REFERENCES](COMPILER_REFERENCES.md) · [SCALAR_APPROACH](SCALAR_APPROACH.md)
 (angle/scalar helpers) · [ASM_OUTPUT_QC](ASM_OUTPUT_QC.md) (ABI and credit audits) ·
@@ -97,7 +97,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/BOUNCING_OBJECTS.md](../docs/BOUNCING_OBJECTS.md) | Twelve-slot bouncing objects (080688D0–08069964) | *#particles* | 4 |
 | [docs/BURST_EMITTER.md](../docs/BURST_EMITTER.md) | Five-slot burst emitter (tentative identity) | *#particles* | 2 |
 | [docs/CANDIDATES.md](../docs/CANDIDATES.md) | Compact checking and candidate checkpoints | *#tooling* | 3 |
-| [docs/CENTAUR.md](../docs/CENTAUR.md) | Centaur: playing with the decomp | *#scene #tooling* | 19 |
+| [docs/CENTAUR.md](../docs/CENTAUR.md) | Centaur: playing with the decomp | *#scene #tooling* | 20 |
 | [docs/COMPILER_REFERENCES.md](../docs/COMPILER_REFERENCES.md) | Community references and checked agbcc patterns | *#assets #matching* | 4 |
 | [docs/CUTSCENES.md](../docs/CUTSCENES.md) | Cutscenes: the SceneMessages event tables | #scripts #scene #actors | 11 |
 | [docs/DATA.md](../docs/DATA.md) | Decoded data |  | 7 |
@@ -107,6 +107,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/ENGINE.md](../docs/ENGINE.md) | How the Boktai 3 engine works |  | 46 |
 | [docs/ENTRY_AND_MENUS.md](../docs/ENTRY_AND_MENUS.md) | Entry point and contiguous subsystem batch |  | 5 |
 | [docs/FINDINGS.md](../docs/FINDINGS.md) | Engine findings |  | 5 |
+| [docs/FOUNDRY.md](../docs/FOUNDRY.md) | The foundry: asm to a committed match, measured as a funnel | #matching #tooling | 6 |
 | [docs/GAME_LAYOUT.md](../docs/GAME_LAYOUT.md) | Boktai 3 game layout: from ROM to gameplay | *#assets* | 33 |
 | [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 12 |
 | [docs/HIT_SWITCH.md](../docs/HIT_SWITCH.md) | Hit-counted switch pool (tentative identity) |  | 5 |
@@ -118,7 +119,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/MGS_GCL_MATCHING.md](../docs/MGS_GCL_MATCHING.md) | Boktai 3 / MGS GCL matching evidence | *#scripts #matching* | 66 |
 | [docs/MODEL_BENCHMARK.md](../docs/MODEL_BENCHMARK.md) | Small-model matching benchmark: explain.py vs check.py | #matching #tooling | 7 |
 | [docs/MOTION_0818.md](../docs/MOTION_0818.md) | Motion callback family at 0818D754 | *#tooling* | 7 |
-| [docs/PERMUTER.md](../docs/PERMUTER.md) | Solving register allocation in the compiler, then in C | #matching #tooling | 18 |
+| [docs/PERMUTER.md](../docs/PERMUTER.md) | Solving register allocation in the compiler, then in C | #matching #tooling | 19 |
 | [docs/PERMUTER_HANDOFF_2026-10-15.md](../docs/PERMUTER_HANDOFF_2026-10-15.md) | October 15 matching residue and frozen searches | *#matching* | 5 |
 | [docs/PROCESS_REVIEW.md](../docs/PROCESS_REVIEW.md) | External research review and next experiments | *#scripts #process* | 13 |
 | [docs/PROGRESS_CI.md](../docs/PROGRESS_CI.md) | ROM-free progress reports | *#progress* | 11 |

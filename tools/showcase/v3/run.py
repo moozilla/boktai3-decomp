@@ -5,7 +5,6 @@ for screenshots or a recording with sound.
 Everything goes under build/showcase/ (ROM-derived).
 """
 import os
-import shutil
 import subprocess
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -23,12 +22,14 @@ def state(rom, scene, entrance, name, save=None, wait=90, start="from field", ex
         for line in extra:
             f.write(line + "\n")
         f.write(f"warp {scene} {entrance}\nwait {wait}\nstate {name}\n")
+    path = os.path.join(ROOT, "build", "centaur", "scenarios", name, f"{name}.ss")
+    if os.path.exists(path):        # a stale state would be loaded silently if this run fails to write one
+        os.remove(path)
     env = dict(os.environ, SCENARIO=scen)
     cmd = [os.path.join(ROOT, "tools", "mgba", "headless.sh"), os.path.join(ROOT, "tools", "mgba", "scenario.lua"), rom]
     if save:
         cmd.append(save)
     subprocess.run(cmd, env=env, check=True, stdout=subprocess.DEVNULL)
-    path = os.path.join(ROOT, "build", "centaur", "scenarios", name, f"{name}.ss")
     assert os.path.exists(path), f"no state written: {path}"
     return path
 
@@ -36,9 +37,7 @@ def state(rom, scene, entrance, name, save=None, wait=90, start="from field", ex
 def harness(rom, lines, name, quiet=True, env=None):
     """Run the harness with a script (lines); returns the output directory."""
     d = os.path.join(OUT, "runs", name)
-    if os.path.exists(d):
-        shutil.move(d, os.path.expanduser(f"~/.Trash/{name}-{os.getpid()}-{len(os.listdir(os.path.dirname(d)))}"))
-    os.makedirs(d)
+    os.makedirs(d, exist_ok=True)     # reused: a run's files are overwritten (the coverage alone is ~88 MB a run)
     script = os.path.join(d, "script.txt")
     with open(script, "w") as f:
         f.write("trace off\n" + "\n".join(lines) + "\n")
@@ -65,7 +64,7 @@ def shots(rom, st, times, name, scale=2, montage=True, extra=()):
     d = harness(rom, lines, name)
     if montage:
         out = os.path.join(OUT, f"{name}.png")
-        files = sorted(os.path.join(d, f) for f in os.listdir(d) if f.startswith("t") and f.endswith(".png"))
+        files = [os.path.join(d, f"t{t:05d}.png") for t in times]      # this run's shots only (the dir is reused)
         subprocess.run(["magick", "montage", "-font", "/System/Library/Fonts/Supplemental/Arial.ttf", *files, "-tile", f"{min(4, len(files))}x", "-geometry",
                         f"{240 * scale}x{160 * scale}+2+2", "-filter", "point", out], check=True)
         return out
