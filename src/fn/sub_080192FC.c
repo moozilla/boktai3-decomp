@@ -35,7 +35,7 @@ int ClockEvents_Update(struct Clock *p)
     int zero;
     int tick = (u16)p->tick + 1;
     do {
-    zero = 0;
+        zero = 0;
     } while (0);
     p->tick = tick;
     if (p->tick > 59) {
