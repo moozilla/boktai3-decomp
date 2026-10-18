@@ -16,9 +16,9 @@ void BackgroundFlash_UpdateAppearing(struct BackgroundFlashController *controlle
     control = &gUnk_03004BD8;
     previous = *control;
     do {
-    flags = visible;
-    flags |= previous;
-    *control = flags;
+        flags = visible;
+        flags |= previous;
+        *control = flags;
     } while (0);
     frame = controller->stateFrame;
     if (frame > 14) {
