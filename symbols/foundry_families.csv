@@ -286,3 +286,4 @@ addr,function,name,family,note
 0812B5D0,sub_0812B5D0,TimedEffect_UpdateVisibility,"paired timed effect entries (tentative)","count down paired entries and change flags on expiry"
 0812CF50,sub_0812CF50,SceneSlot_Allocate,"SceneSlotPool","allocates a free slot and records its index"
 0812D180,sub_0812D180,SceneSlot_UpdateTimedPulse,"SceneSlotPool","emits every six ticks then advances state after duration"
+0812D34C,sub_0812D34C,SceneSlot_Remove,"SceneSlotPool","removes sprite and releases its pool occupancy bit"
