@@ -1096,3 +1096,4 @@ addr,function,name,family,note
 081C0AA0,sub_081C0AA0,PaletteScreen_InitDisplayResources,"PaletteScreen (tentative)","sets display layers and loads background palette"
 081C18E8,sub_081C18E8,AnimatedObject_AdvanceThreeFrameCycle,"AnimatedObject","selects a frame and advances a wrapping phase"
 081C1C8C,sub_081C1C8C,SegmentDisplay_UpdatePlayerSegments,"SegmentDisplay","sets seven segment frames from the player count"
+081C1D88,sub_081C1D88,SegmentDisplay_CallSelectionScript,"SegmentDisplay","calls an optional script with the selected value"
