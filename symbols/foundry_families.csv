@@ -7,3 +7,4 @@ addr,function,name,family,note
 0802BF30,sub_0802BF30,GridAttack_Update,"Grid attack actor","runs the grid attack update steps and cycles a frame timer"
 080339B8,sub_080339B8,TextWindow_SetBounds,"Text window manager","blanks a text window rect and sets new bounds"
 08086DD0,sub_08086DD0,Bat_UpdateAnimationRequest,"Bat","handles a queued animation entry request and advances a finished sequence"
+0808AE60,sub_0808AE60,Bat_LookupAnimationEntry,"Bat","flags the object and returns a table entry for the current sequence step"
