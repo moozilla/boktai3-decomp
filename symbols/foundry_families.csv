@@ -571,3 +571,4 @@ addr,function,name,family,note
 08108C20,sub_08108C20,SlotMonitor_PollResult,"SlotMonitor","poll result and advance callback when ready"
 08108EF0,sub_08108EF0,SlotMonitor_Initialize,"SlotMonitor","initialize timeout, slots and polling callback"
 081095B4,sub_081095B4,ResultMessage_ShowOutcome,"ResultMessage","show one of two outcome messages and play its sound"
+081096CC,sub_081096CC,TimedMessage_ShowNotice,"TimedMessage","shows text and advances after 120 frames"
