@@ -681,3 +681,4 @@ addr,function,name,family,note
 0813A41C,sub_0813A41C,SpritePairEntry_CreateEffect,"SpritePairPool","creates an effect from the entry position and packed offsets"
 0813A4C8,sub_0813A4C8,SpritePairPool_StartEntry,"SpritePairPool","starts an available entry with position height effect and callback"
 0813A8A8,sub_0813A8A8,DisplaySlots_Reserve,"DisplaySlots","reserve one of two task-owned display slots"
+0813AB04,sub_0813AB04,ScreenMote_SpawnBatch,"ScreenMote","allocate and initialize sprites with randomized starting positions"
