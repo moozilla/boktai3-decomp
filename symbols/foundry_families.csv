@@ -397,3 +397,4 @@ addr,function,name,family,note
 08164224,sub_08164224,StatDisplay_DrawPlayerValue,"StatDisplay","draws player stat ratio with form-dependent scaling"
 081651B0,sub_081651B0,SceneHud_PlayActionChangeCue,"Scene HUD","plays a cue when the action selection changes"
 0816599C,sub_0816599C,MenuInput_ReadDirectionRepeat,"MenuInput","reads pressed directions with ten-call held repeat"
+08165C4C,sub_08165C4C,PlayerPanel_GetStatusValue,"PlayerPanel","selects a player status value using script status and timed counter"
