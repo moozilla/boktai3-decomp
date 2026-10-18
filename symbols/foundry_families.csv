@@ -678,3 +678,4 @@ addr,function,name,family,note
 081394B4,sub_081394B4,SceneProcSprites_CreateEntry,"SceneProcSprites","allocate and configure a moving sprite entry"
 08139D9C,sub_08139D9C,SceneProcParticles_SubmitBounds,"SceneProcParticles","submit particle bounds and position"
 08139E24,sub_08139E24,SpritePool_StartEntry,"SpritePool","starts an animated entry in a six-slot sprite pool"
+0813A41C,sub_0813A41C,SpritePairEntry_CreateEffect,"SpritePairPool","creates an effect from the entry position and packed offsets"
