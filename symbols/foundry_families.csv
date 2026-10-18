@@ -1328,3 +1328,4 @@ addr,function,name,family,note
 0822E728,sub_0822E728,GameState_HasUnlockedInventoryEntry,"GameState","checks the upper eight inventory slots for an unlocked entry"
 0822EA14,sub_0822EA14,GameState_InsertUniqueListEntry,"GameState","adds a nonduplicate value to the eight-entry list"
 0822EA8C,sub_0822EA8C,GameState_MoveSlotEntry,"GameState","clears duplicate slot entries then stores a value at the requested slot"
+0822F0A4,sub_0822F0A4,Save_WriteBlockWithRetries,"Save transfer","validates a save block and retries its transfer up to eight times"
