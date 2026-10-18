@@ -275,3 +275,4 @@ addr,function,name,family,note
 08127A38,sub_08127A38,TimedSprite_BlinkAndRemove,"TimedSprite","blinks an aging sprite and releases its slot after seventy frames"
 0812808C,sub_0812808C,SpritePool12_UpdateActive,"SpritePool12","dispatches state callbacks for twelve sprite slots"
 08128A5C,sub_08128A5C,SpriteGroupPool_Destroy,"SpriteGroupPool","removes active groups of four sprites and clears the pool"
+08129444,sub_08129444,FadingSprite_UpdateExpiry,"FadingSprite","updates blinking and releases an expired sprite slot"
