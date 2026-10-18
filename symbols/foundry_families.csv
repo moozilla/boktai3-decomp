@@ -309,3 +309,4 @@ addr,function,name,family,note
 0813760C,sub_0813760C,SceneActorTarget_CanReplaceByDistance,"SceneActorTarget","accepts candidate identity when unlocked and no farther than current target"
 081382BC,sub_081382BC,ByteSequence_AdvanceEncodedValue,"indexed byte sequence","encodes the next byte with index bits and advances the cursor"
 08138300,sub_08138300,LinkSession_ReceiveSelectionByte,"LinkSession","assembles selection payload bytes after checking packet kind and sequence"
+081386F0,sub_081386F0,ScriptNotifier_CallWithValue,"script notification","calls an optional script with the object's halfword value"
