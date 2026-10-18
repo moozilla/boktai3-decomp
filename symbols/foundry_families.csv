@@ -1275,3 +1275,4 @@ addr,function,name,family,note
 08210AD4,sub_08210AD4,Collection_UpdateEntryVisibility,"Collection menu","refresh entry visibility for the unlocked current page"
 08210C14,sub_08210C14,SceneKeyframe_SetGridPosition,"Scene grid keyframe owner (tentative)","scales grid coordinates by forty and loads keyframe eighty-eight"
 0821172C,sub_0821172C,ForgingBook_CountDiscoveredCategoryEntries,"Forging book","counts discovered weapons or items in a category"
+08211A1C,sub_08211A1C,ForgingBook_SetAnimation,"Forging book","selects keyframes, applies duration scaling and steps animation"
