@@ -1272,3 +1272,4 @@ addr,function,name,family,note
 0820FFE4,sub_0820FFE4,Combat_SpawnDirectionalProjectile,"combat projectile emitter","spawns a configured projectile offset in an eight-way direction"
 08210100,sub_08210100,ProjectileEmitter_WaitForPlayerApproach,"proximity projectile emitter","starts attack animation and a timer when the player enters range"
 08210180,sub_08210180,ProjectileEmitter_UpdateAttack,"proximity projectile emitter","adjusts attack animation speed by player distance and returns to waiting outside range"
+08210AD4,sub_08210AD4,Collection_UpdateEntryVisibility,"Collection menu","refresh entry visibility for the unlocked current page"
