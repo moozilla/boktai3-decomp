@@ -1180,3 +1180,4 @@ addr,function,name,family,note
 081F067C,sub_081F067C,SingletonSlot7_SetMotionMode,"Singleton slot7 3 (auto, tentative)","changes motion mode and resets actor state"
 081F2088,sub_081F2088,SingletonSlot7_SetMotionModeFromScript,"Singleton slot7 3 (auto, tentative)","reads keyword i and resets slot seven actor motion state"
 081F23A0,sub_081F23A0,SpriteGroup_RemoveSlot,"SpriteGroup (tentative)","removes seven sprites and clears the active slot bit"
+081F2534,sub_081F2534,SpriteTrail_BeginImpact,"SpriteTrail","enters impact transition and spawns an impact sprite"
