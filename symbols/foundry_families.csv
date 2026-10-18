@@ -578,3 +578,4 @@ addr,function,name,family,note
 08109948,sub_08109948,MessagePanel_ResetDisplay,"MessagePanel","clears the background and installs panel callbacks"
 081099A4,sub_081099A4,MessagePanel_Update,"MessagePanel","sets update flags and invokes the current panel state"
 08109A04,sub_08109A04,MessagePanel_InitFromScript,"MessagePanel","initializes message panel from script keywords"
+08109C80,sub_08109C80,ScriptPanel_OpenTextWindow,"ScriptPanel","waits for HUD setup and opens script text window"
