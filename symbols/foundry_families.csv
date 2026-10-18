@@ -409,3 +409,4 @@ addr,function,name,family,note
 08167E64,sub_08167E64,Hud_InitializePanelTransition,"Hud","initializes a panel transition selected by display flags"
 08167F1C,sub_08167F1C,Hud_InitializeThreeIcons,"Hud","initializes three horizontally spaced HUD icons and tile pointers"
 08168534,sub_08168534,Hud_SetElementGroupFlags,"Hud","sets flag bit zero across six groups of three HUD elements"
+08168D20,sub_08168D20,SceneHud_ApplySecondarySelection,"SceneHud","applies selected secondary action to the HUD action owner"
