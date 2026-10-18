@@ -1321,3 +1321,4 @@ addr,function,name,family,note
 0822B410,sub_0822B410,MusicSlots_StopAllAndRetainResumable,"Music player slots (tentative)","stops all players while retaining resumable song slots"
 0822D764,sub_0822D764,ItemRecord_ExpandDescriptor,"ItemDescriptor","copy descriptor defaults and overlay three instance values"
 0822D7C0,sub_0822D7C0,ItemDescriptor_Reset,"ItemDescriptor","reset descriptor fields and mark its type invalid"
+0822DCB4,sub_0822DCB4,ItemRecord_MeetsLevelRequirement,"ItemDescriptor","test descriptor level requirement with selection 0x29 override"
