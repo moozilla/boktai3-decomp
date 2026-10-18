@@ -65,3 +65,4 @@ addr,function,name,family,note
 080B4134,sub_080B4134,Vorn_SendMessage,"Vorn (actor context script-field parsers/tickers, called from Vorn_Init)","if field6C1 is set, sends message {7, actor->id} to category 0x19 via SceneActorRegistry_SendToCategory, then clears field6C1"
 080B5D84,sub_080B5D84,SceneActorControl_BeginTimedBehavior56,"SceneActorControl","starts behavior 56 with a category-dependent timer"
 080B60A4,sub_080B60A4,SceneActorControl_InitBehaviorColliders,"SceneActorControl","initializes two body and two attack collision regions"
+080B61C4,sub_080B61C4,Vorn_SpawnHazard,"Vorn (actor context script-field parsers/tickers, called from Vorn_Init)","reads actor's parallel arrays arrB4/arrBC/arrC4 (u16) and arrCC (u32) at [index] and calls sub_0821FF58(ctx+0x678, arrB4[i], arrBC[i], 0, arrCC[i], arrC4[i])"
