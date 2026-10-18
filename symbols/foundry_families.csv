@@ -1075,3 +1075,4 @@ addr,function,name,family,note
 081BD914,sub_081BD914,ScriptPanel_IsCallbackActive,"ScriptPanel (tentative)","tests whether callback 081BCB14 is installed"
 081BDA44,sub_081BDA44,MenuPanel_IsEntryAvailable,"MenuPanel (tentative)","checks selected catalog entry availability by page type"
 081BDAA8,sub_081BDAA8,MenuPanel_IsEntryEmpty,"MenuPanel (tentative)","checks catalog entry emptiness by page type"
+081BDC34,sub_081BDC34,MenuPanel_ShowDescription,"MenuPanel (tentative)","opens panel description text in the selected mode"
