@@ -595,3 +595,4 @@ addr,function,name,family,note
 0810B534,sub_0810B534,SceneMenu_WaitForAcknowledgements,"SceneMenu","waits for all record acknowledgements and signals readiness"
 0810B63C,sub_0810B63C,SceneMenu_WaitForConfirmation,"SceneMenu","waits for peer confirmations with a timeout"
 0810B8A8,sub_0810B8A8,SessionMenu_Destroy,"Session menu state callbacks","restores callbacks and clears menu singleton"
+0810BEF8,sub_0810BEF8,SlotMenu_CreateTextWindows,"SlotMenu","creates three text windows and initializes the main window"
