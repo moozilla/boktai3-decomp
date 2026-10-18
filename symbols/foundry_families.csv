@@ -982,3 +982,4 @@ addr,function,name,family,note
 0819C0D0,sub_0819C0D0,Hresvelgr_OnBodyContact,"Hresvelgr","records contact magnitude direction flags and response values"
 0819C1B8,sub_0819C1B8,Hresvelgr_OnSecondaryContact,"Hresvelgr","records secondary contact magnitude flags direction and response"
 0819C3D0,sub_0819C3D0,ColliderActor_InitBodyCollider,"ColliderActor (tentative)","initialize body collider and offset"
+0819C484,sub_0819C484,ColliderActor_InitLowerBodyCollider,"ColliderActor (tentative)","initialize body collider with negative vertical offset"
