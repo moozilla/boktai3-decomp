@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_script.h"
 static inline void KeepFlags(u32 mask, u32 *field)
 {
@@ -18,8 +17,7 @@ void SceneActorScript_SetFlagFromScript(void)
     if (!actor)
         return;
     if (!Script_GetKeywordValue('f', 0)) {
-        register u32 *flags asm("r2") = &actor->flags2D0;
-        asm("" : "+r"(flags));
+        u32 *flags = &actor->flags2D0;
         KeepFlags(~0x04000000, flags);
     } else
         SetFlags(0x04000000, &actor->flags2D0);
