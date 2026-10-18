@@ -643,7 +643,16 @@ def scale_report():
             x["named"] += not nm.startswith("none") and bool(nm)
     up = os.path.join(SCALE, "usage.tsv")
     us = [ln.split("\t") for ln in open(up)] if os.path.exists(up) else []
-    tokens = sum(int(u[1]) for u in us)
+    def batch_tokens(u):
+        j = os.path.join(SCALE, f"batch-{u[0]}.json")
+        if os.path.exists(j):
+            try:
+                d = json.loads(open(j).read().strip().split("\n")[-1])["usage"]
+                return d["input_tokens"] + d["output_tokens"] + d.get("cache_creation_input_tokens", 0)
+            except Exception:
+                pass
+        return int(u[1])
+    tokens = sum(batch_tokens(u) for u in us)
     cost = sum(float(u[4]) for u in us if len(u) > 4 and u[4].strip())
     times = [float(u[3]) - float(u[2]) for u in us] + [float(u[3]) for u in us]
     hours = (max(times) - min(times)) / 3600 if us else 0

@@ -45,14 +45,16 @@ struct SceneActorRegistryActor {
     u8 unknown2BA[6];
     u16 flags2C0;
     u16 field2C2;
-    u8 unknown2C4[4];
+    s32 livingCountByCategory;
     u16 field2C8;
     u8 unknown2CA[2];
     u32 flags2CC, flags2D0;
     u16 flags2D4, flags2D6;
     u8 unknown2D8[0x22];
     u16 regionId;
-    u8 unknown2FC[0xD4];
+    u8 unknown2FC[0xC];
+    s32 profileIndex;
+    u8 unknown30C[0xC4];
     void *context;
     u8 unknown3D4[0x40];
     u16 flags414, field416, field418;

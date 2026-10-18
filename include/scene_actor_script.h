@@ -47,6 +47,14 @@ struct SceneActorScriptPropertiesView {
     struct SceneActorScriptControlView control;
     u8 unknown45C[0x15A];
     u16 quarterHealth;
+    u8 unknown5B8[0x114];
+    u16 scriptId6CC;
+    u8 callLimit6CE;
+    u8 callCount6CF;
+    u8 unknown6D0[0x28];
+    u16 parameters6F8[4];
+    u8 unknown700[6];
+    u16 parameter706;
 };
 struct SceneActorRegistryActor *SceneActorRegistry_FindById(u32);
 u8 *sub_0821D64C(u32, u32);
