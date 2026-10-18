@@ -130,3 +130,4 @@ addr,function,name,family,note
 080F07BC,sub_080F07BC,SceneActor_BeginReaction22,"SceneActor reaction state","reset phase and install reaction code 0x22"
 080F1E84,sub_080F1E84,ColorPulse_FadeRed,"ColorPulse","fade red and advance the color callback"
 080F1F08,sub_080F1F08,ColorPulse_FinishRedFade,"ColorPulse","finish red fade and reset callback"
+080F2320,sub_080F2320,ColorPulse_ApplyContact,"ColorPulse","record contact damage and trigger hit feedback"
