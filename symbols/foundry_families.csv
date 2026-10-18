@@ -100,3 +100,4 @@ addr,function,name,family,note
 080D7438,sub_080D7438,SceneActor_EnterMotionPhase,"SceneActor behavior and motion","clear movement flags and initialize or resume the motion phase"
 080DA3AC,sub_080DA3AC,SceneActor_TryTrackNearbyPlayer,"SceneActor behavior and tracking","check player identity and range then set tracking target heading and distance"
 080DA4E4,sub_080DA4E4,SceneGrid_SnapPositionToCellCenter,"SceneGrid terrain","snaps a position to its terrain cell center and height"
+080DA810,sub_080DA810,SceneEffect_EmitPositionPattern,"SceneEffectEmitter","emits one, two, or four particles around an actor position"
