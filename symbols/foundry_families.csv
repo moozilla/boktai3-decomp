@@ -13,3 +13,4 @@ addr,function,name,family,note
 0808FF00,sub_0808FF00,Bat_ReadScriptValuePair,"Bat","reads an optional pair of script values into two fields"
 08093798,sub_08093798,Slime_SetStateFlag,"Slime","sets bit 3 in a state flag byte"
 080975C4,sub_080975C4,Bee_UpdateSway,"Bee","clamps and oscillates a sway offset with direction steps"
+08097C64,sub_08097C64,Bee_ClearActionFlags,"Bee","clears several action flag bits and a script field"
