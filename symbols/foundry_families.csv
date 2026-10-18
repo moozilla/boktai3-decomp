@@ -905,3 +905,4 @@ addr,function,name,family,note
 0818288C,sub_0818288C,,"scene actor state callbacks",""
 08182CDC,sub_08182CDC,Armor_UpdatePositiveTurn,"Armor 3 (tentative)","advances facing in positive quarter turns toward target"
 08182DF4,sub_08182DF4,Armor_UpdateNegativeTurn,"Armor 3 (tentative)","advances facing in negative quarter turns toward target"
+08182F84,sub_08182F84,ActorController_UpdateResetMotionTransition,"Actor controller (auto, tentative)","updates reset-motion animation and optionally sets speed to 120"
