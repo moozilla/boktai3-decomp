@@ -95,3 +95,4 @@ addr,function,name,family,note
 080C62EC,sub_080C62EC,Skeleton_ClearDirectionalEntryFlag,"Skeleton","consumes the one-shot directional-entry flag to select a directional animation and clear restart, then clears the sequence's hE timer when h8==1"
 080D0E20,sub_080D0E20,SceneActor_UpdateAnimationCheckpoint,"scene actor animation","selects animation five and saves a timed checkpoint"
 080D0EBC,sub_080D0EBC,SceneActor_UpdateDirectionalAnimation,"scene actor animation","faces along motion and updates animation completion flags"
+080D1A98,sub_080D1A98,SceneActorAnimation_UpdateDirectionalEntry,"scene_actor_animation (SceneActorAnimationView)","test-and-clear the directional-entry/restart flags on a SceneActorAnimationView, re-triggering SelectDirectionalEntry when a distance arg exceeds 0x10"
