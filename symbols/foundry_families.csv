@@ -1310,3 +1310,4 @@ addr,function,name,family,note
 08224E54,sub_08224E54,WirelessPacketQueue_Pop,"wireless packet queue","copies and clears oldest sixteen-byte packet"
 08224FA4,sub_08224FA4,System_ShutdownAndSoftReset,"system shutdown and wireless communication","stops audio and communications before soft reset"
 08225E2C,sub_08225E2C,Camera_ClampCenteredPosition,"Camera bounds","clamps two position components after subtracting half the middle component"
+08225F1C,sub_08225F1C,Camera_ApplyPositionBounds,"Camera bounds","dispatches camera position clamping by bounds mode"
