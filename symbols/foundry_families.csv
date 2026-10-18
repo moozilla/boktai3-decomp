@@ -1138,3 +1138,4 @@ addr,function,name,family,note
 081D9024,sub_081D9024,TimedEffect_BeginPhase26,"TimedEffect","installs callback and begins phase 26 with minimum duration"
 081D92F0,sub_081D92F0,TimedEffect_UpdateDeceleration,"TimedEffect","subtracts acceleration and transitions on duration or position limit"
 081DA178,sub_081DA178,TimedEffect_RemoveFromManager,"TimedEffect","decrements kind counts, removes sprite and clears active slot"
+081DA61C,sub_081DA61C,TimedEffect_DestroyManager,"TimedEffect","removes pooled effects and active entries, frees entry array"
