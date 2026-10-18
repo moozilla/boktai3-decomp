@@ -775,3 +775,4 @@ addr,function,name,family,note
 0816A7D8,sub_0816A7D8,MenuPrompt_RampDisplay,"MenuPrompt (tentative)","ramps paired display levels while stepping animation"
 0816A834,sub_0816A834,MenuPrompt_UpdateChoice,"MenuPrompt (tentative)","steps animation and dispatches a two-choice menu result"
 0816A880,sub_0816A880,MenuPrompt_FadeChoice,"MenuPrompt (tentative)","ramps display levels down before completing the choice"
+0816A9A8,sub_0816A9A8,MenuPrompt_FinishDelayedChoice,"MenuPrompt (tentative)","waits 150 frames then dispatches a result-dependent script and phase"
