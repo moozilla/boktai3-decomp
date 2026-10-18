@@ -150,3 +150,4 @@ addr,function,name,family,note
 080F8A14,sub_080F8A14,SceneActorControl_SettleRotation,"SceneActor control phases","rotates drawable toward zero after elapsed delay"
 080FA754,sub_080FA754,SceneActorControl_UpdateHoverHeight,"SceneActorControl","updates sinusoidal hover height and advances its angle"
 080FB27C,sub_080FB27C,SceneActorControl_CanAdvanceHover,"SceneActorControl","saves the scene position and tests active actor distance eligibility"
+080FD04C,sub_080FD04C,ActorGroup_ReadScriptOptions,"SceneActor group script configuration","reads six optional O-keyword byte parameters with defaults"
