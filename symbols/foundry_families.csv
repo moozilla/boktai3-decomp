@@ -1076,3 +1076,4 @@ addr,function,name,family,note
 081BDA44,sub_081BDA44,MenuPanel_IsEntryAvailable,"MenuPanel (tentative)","checks selected catalog entry availability by page type"
 081BDAA8,sub_081BDAA8,MenuPanel_IsEntryEmpty,"MenuPanel (tentative)","checks catalog entry emptiness by page type"
 081BDC34,sub_081BDC34,MenuPanel_ShowDescription,"MenuPanel (tentative)","opens panel description text in the selected mode"
+081BDDCC,sub_081BDDCC,MenuPanel_FindEmptyOppositeHalf,"MenuPanel (tentative)","finds an empty catalog slot in the opposite 16-entry half"
