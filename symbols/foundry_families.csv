@@ -1392,3 +1392,4 @@ addr,function,name,family,note
 0823D00C,sub_0823D00C,Player_SetActionOrigin,"Player","copies position and applies facing-dependent action offsets"
 0823D714,sub_0823D714,Player_SaveActionIndex,"Player","snapshots optional action index and sets one-based variant"
 0823DDE4,sub_0823DDE4,SceneVec_OffsetPolar,"SceneVec","offsets X and Z by a scaled sine/cosine pair"
+08242F7C,sub_08242F7C,Player_FindMaskedSlot,"Player selection","selects the first player slot in a mask or slot zero"
