@@ -153,3 +153,4 @@ addr,function,name,family,note
 080FD04C,sub_080FD04C,ActorGroup_ReadScriptOptions,"SceneActor group script configuration","reads six optional O-keyword byte parameters with defaults"
 080FD500,sub_080FD500,SceneActorControl_UpdateControl35Phase,"SceneActorControl","enters control 0x35 and returns to phase 2 on completion"
 080FE544,sub_080FE544,SceneActorControl_AdvanceReactionCount,"SceneActorControl","plays a reaction cue and advances to behavior 6 after three events"
+080FFBA4,sub_080FFBA4,WoodenCrate_UpdatePaletteTimers,"WoodenCrate","updates display timer and chooses flash or variant palette"
