@@ -882,3 +882,4 @@ addr,function,name,family,note
 081808B4,sub_081808B4,SceneCombatActor_ResetAttackMode,"SceneCombatActor","restores saved parameters and resets collider categories for attack mode"
 081809A8,sub_081809A8,SceneCombatActor_ResetDefenseMode,"SceneCombatActor","restores saved parameters and resets collider categories for defense mode"
 08180A88,sub_08180A88,SceneParticle_UpdateBounce,"BouncingSceneParticle","integrates particle velocity, bounces once, then invokes its cleanup callback"
+08180AFC,sub_08180AFC,BouncingEffect_RemoveSprite,"BouncingEffect","hides the embedded sprite and unlinks it from list zero"
