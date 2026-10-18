@@ -368,3 +368,4 @@ addr,function,name,family,note
 081580EC,sub_081580EC,Player_SelectInteractionMode,"Player","selects player mode and attempts nearby trigger opening"
 08158588,sub_08158588,Player_SelectAlternateInteractionMode,"Player","selects alternate interaction mode from player input"
 08158F04,sub_08158F04,Player_BeginDirectionalCue,"Player","starts facing cue with special handling for mode six and global bit 0x800"
+08159284,sub_08159284,PlayerContact_GetOffsetPosition,"PlayerContact","computes a raised and direction-offset player position"
