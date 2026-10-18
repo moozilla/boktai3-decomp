@@ -941,3 +941,4 @@ addr,function,name,family,note
 0818F218,sub_0818F218,EffectPool_AllocateSlot,"EffectPool","claims the first free slot in a 24-entry effect pool"
 0818F444,sub_0818F444,Nidhoggr_CreateBurstEffects,"Nidhoggr effect pool (tentative)","creates six moving sprite effects and an explosion at a position"
 0818F50C,sub_0818F50C,EffectPool_CreateTimedEffect,"EffectPool","creates an animated effect with a lifetime of 100"
+0818F588,sub_0818F588,SceneEffect_ResetState,"SceneEffect","clears effect state fields at offsets 0x174 through 0x184"
