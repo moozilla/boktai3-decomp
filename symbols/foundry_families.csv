@@ -204,3 +204,4 @@ addr,function,name,family,note
 081120BC,sub_081120BC,SceneGauge_SelectThresholdFrame,"Scene gauge animation","selects one of five animation frames using four descending byte thresholds"
 08112A90,sub_08112A90,PanelSpritePool_Init,"PanelSpritePool","initializes eight animation and sprite slots"
 08112CC8,sub_08112CC8,PanelSprite_Create,"PanelSprite","allocates and initializes a parameterized animated sprite"
+08112D6C,sub_08112D6C,PanelKeyframeSprite_Create,"PanelKeyframeSprite","allocates a resource-backed sprite and starts keyframes"
