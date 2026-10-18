@@ -520,3 +520,4 @@ addr,function,name,family,note
 08176718,sub_08176718,PauseMenu_RestoreDisplayState,"PauseMenu","restores saved background state and resets menu transitions"
 08176838,sub_08176838,SceneDialog_FindNextEnabledEntry,"SceneDialog","finds the next enabled entry in a wrapping ten-entry list"
 08176874,sub_08176874,SceneDialog_FindPreviousEnabledEntry,"SceneDialog","finds the previous enabled entry in a wrapping ten-entry list"
+081768AC,sub_081768AC,SceneDialog_UpdateEntryFade,"SceneDialog","updates a sixteen-tick fade and enters the next phase"
