@@ -1378,3 +1378,4 @@ addr,function,name,family,note
 082386A4,sub_082386A4,PlayerLink_IsActionModeAllowed,"Player link control","accept link modes zero four and five"
 08238744,sub_08238744,SpriteEffect_StartBriefAnimation,"SpriteEffect","starts a short sprite animation at a supplied position"
 08238B48,sub_08238B48,DirectionalEffect_DecodeAnimationMode,"DirectionalEffect","maps an effect mode to animation variant and group"
+08238EBC,sub_08238EBC,DirectionalEffect_PlaceSprite,"DirectionalEffect","places and activates an effect sprite with a vertical offset"
