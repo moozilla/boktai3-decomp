@@ -674,3 +674,4 @@ addr,function,name,family,note
 08137CA8,sub_08137CA8,SceneActorTarget_FindNearestEligiblePlayer,"SceneActorTarget","finds nearest player without excluded slot status or terrain flags"
 08138A2C,sub_08138A2C,SpriteSlots_AttachSource,"SpriteSlots","attaches a source pointer to the first inactive sprite slot"
 08138AC8,sub_08138AC8,HeightProbe_IsBelowLimit,"HeightProbe","compares sampled height with a position-derived limit"
+0813942C,sub_0813942C,SceneProcSprites_SubmitBounds,"SceneProcSprites","submit sprite bounds and position"
