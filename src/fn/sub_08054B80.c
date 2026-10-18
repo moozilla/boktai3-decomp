@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "display_track.h"
 struct DisplayTrackTagView {
     u8 prefix[0x1C];
@@ -9,10 +8,11 @@ struct DisplayTrack *DisplayTrack_FindFromScript(void)
     struct DisplayTrackManager **manager = &gUnk_02000494;
     struct DisplayTrackManager *current;
     struct DisplayTrackManager *loaded;
-    register s32 length asm("r1");
-    u32 tag, offset;
+    s32 length;
+    u32 tag;
+    u32 offset;
     s32 i;
-    register s32 count asm("r4");
+    s32 count;
     struct DisplayTrackTagView *scan;
     if (!*manager)
         goto missing;
