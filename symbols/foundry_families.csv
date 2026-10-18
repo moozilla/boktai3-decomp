@@ -314,3 +314,4 @@ addr,function,name,family,note
 0813930C,sub_0813930C,SceneProcSprites_Initialize,"SceneProcSprites","initialize four script-backed sprite entries"
 08139B58,sub_08139B58,CallbackPool_Update,"CallbackPool","invokes active entry callbacks and increments frame counter"
 08139BC0,sub_08139BC0,SceneProcParticles_Initialize,"SceneProcParticles","initialize six script-backed particle entries"
+08139CC0,sub_08139CC0,CallbackPool_MarkNextOfKind,"CallbackPool","marks first active unvisited slot with matching kind"
