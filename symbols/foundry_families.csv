@@ -919,3 +919,4 @@ addr,function,name,family,note
 08184C1C,sub_08184C1C,ActorController_CompleteMotionTransition,"ActorController","selects stopped animation and clears callbacks for selected modes"
 08185280,sub_08185280,ActorController_IsNearTarget,"Actor controller 2 (auto, tentative)","tests X/Z Manhattan distance to movement target below 192"
 0818573C,sub_0818573C,Armor_SpawnPairedProjectiles,"Armor 4 (auto, tentative)","spawns two direction-offset projectiles"
+08185858,sub_08185858,Armor_UpdateScriptedAttack,"Armor 4 (auto, tentative)","advances attack state and calls a position script"
