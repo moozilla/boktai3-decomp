@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
 u32 Modifier_TestSelection(struct ModifierSelection *, s32);
-void sub_080339B8(s32, s32, s32, s32, s32);
+void TextWindow_SetBounds(s32, s32, s32, s32, s32);
 s32 TextWindow_StartPlayback(u32);
 void ModifierMenu_DrawSelectedLabels(struct ModifierMenu *menu)
 {
@@ -15,7 +15,7 @@ void ModifierMenu_DrawSelectedLabels(struct ModifierMenu *menu)
             if (menu->state != 2)
                 break;
             window = &menu->detailWindow;
-            sub_080339B8(*window, 1, 6, 28, 6);
+            TextWindow_SetBounds(*window, 1, 6, 28, 6);
             TextWindow_SetScript(*window, menu->textSources[0]);
             TextWindow_Refresh(*window, 7);
             TextWindow_StartPlayback(*window);
@@ -28,7 +28,7 @@ void ModifierMenu_DrawSelectedLabels(struct ModifierMenu *menu)
         selectedLoop:
             if (!Modifier_TestSelection(current, id))
                 goto nextId;
-            sub_080339B8(*window, 13, y, 16, 2);
+            TextWindow_SetBounds(*window, 13, y, 16, 2);
             TextWindow_SetScript(*window, menu->textSources[5]);
             TextWindow_Refresh(*window, id);
             TextWindow_StartPlayback(*window++);
@@ -61,7 +61,7 @@ void ModifierMenu_DrawSelectedLabels(struct ModifierMenu *menu)
                         row = rowBase + 4;
                     }
                     do {
-                        sub_080339B8(*window, 13, row, 16, 2);
+                        TextWindow_SetBounds(*window, 13, row, 16, 2);
                         asm("" : "+r"(menu));
                         TextWindow_SetScript(*window, menu->textSources[0]);
                         TextWindow_Refresh(*window, 5);
@@ -82,7 +82,7 @@ void ModifierMenu_DrawSelectedLabels(struct ModifierMenu *menu)
                 count = current->secondaryId;
                 if (count >= 0) {
                     window = menu->listWindows;
-                    sub_080339B8(*window, 13, 4, 16, 2);
+                    TextWindow_SetBounds(*window, 13, 4, 16, 2);
                     TextWindow_SetScript(*window, menu->textSources[6]);
                     TextWindow_Refresh(*window, count);
                     TextWindow_StartPlayback(*window);

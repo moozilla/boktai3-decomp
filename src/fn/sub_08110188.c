@@ -26,7 +26,7 @@ void Bg_ClearTilemap(s32);
 void Bg_SetLayerMap(s32, u32, s32);
 void BgGfx_LoadTilemapSimple(s32, s32, s32, s32, s32);
 void TextWindow_Clear(u32);
-void sub_080339B8(u32, s32, s32, s32, s32);
+void TextWindow_SetBounds(u32, s32, s32, s32, s32);
 void TextWindow_SetScript(u32, u32);
 void TextWindow_Refresh(u32, u32);
 void TextWindow_StartPlayback(u32);
@@ -50,7 +50,7 @@ void LinkScorePanel_OnWaitSessionReady(struct S *s)
         Bg_SetLayerMap(0, s->g, 3);
         BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
         TextWindow_Clear(s->h);
-        sub_080339B8(s->h, 1, 6, 0x1c, 6);
+        TextWindow_SetBounds(s->h, 1, 6, 0x1c, 6);
         TextWindow_SetScript(s->h, s->a);
         TextWindow_Refresh(s->h, 8);
         TextWindow_StartPlayback(s->h);
