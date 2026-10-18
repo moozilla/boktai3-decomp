@@ -855,3 +855,4 @@ addr,function,name,family,note
 0817C21C,sub_0817C21C,ActorState_UpdateTrigger,"TriggerActor state callbacks","consumes a trigger and updates pending actor state"
 0817C29C,sub_0817C29C,ActorState_UpdateConditionalTrigger,"TriggerActor state callbacks","updates triggered state with a conditional transition"
 0817C390,sub_0817C390,SceneActorState_WaitForFlagClear,"SceneActorState","reset phase when actor flag bit zero clears"
+0817D5E4,sub_0817D5E4,ActorAnimation_UpdateDirectional,"DirectionalActor animation callbacks","updates eight-direction animation and callback flags"
