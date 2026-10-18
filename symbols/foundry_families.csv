@@ -1255,3 +1255,4 @@ addr,function,name,family,note
 08204C3C,sub_08204C3C,EnemyD459_FireProjectile,"Enemy D 459 (auto, tentative)","spawns a configured projectile ahead of the actor"
 08204D84,sub_08204D84,EnemyD459_UpdateAttackTiming,"Enemy D 459 (auto, tentative)","starts projectile attacks using scheduled or periodic timing"
 08204E5C,sub_08204E5C,SceneSequence_UpdateCountdown,"Scene countdown sequence actor","counts down then selects sequence two and changes update callback"
+08205948,sub_08205948,Ooze_InitAttackCollider,"Ooze","initializes variant-dependent attack collider"
