@@ -138,3 +138,4 @@ addr,function,name,family,note
 080F3728,sub_080F3728,ChildGroup_ProcessEvent,"ChildGroup","updates owner damage or restores its position in response to child events"
 080F3848,sub_080F3848,ChildGroup_UpdateTimedOscillation,"ChildGroup","runs vertical oscillation for 150 ticks then changes callbacks"
 080F542C,sub_080F542C,ActorPhase_AccelerateTurn,"PhaseActor","turns toward target angle with increasing step count"
+080F56D8,sub_080F56D8,ActorPhase_DampMovement,"PhaseActor","applies velocity and halves horizontal movement until stopped"
