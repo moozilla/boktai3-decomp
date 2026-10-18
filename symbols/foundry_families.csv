@@ -46,3 +46,4 @@ addr,function,name,family,note
 080AB408,sub_080AB408,ActorTrail_UpdateTimedScale,"ActorTrail","update timer-dependent scale field and periodic stationary sound"
 080AB57C,sub_080AB57C,SceneActor_ResetQueuedState,"SceneActor","resets action queue and installs default callback"
 080ACBE0,sub_080ACBE0,SceneActor_AimArcAtPlayer,"SceneActor","sets horizontal motion toward player and vertical half-flight term"
+080ACDC4,sub_080ACDC4,SceneActor_UpdateTargetedAttack,"SceneActor","starts attack animation and refreshes collider on frames three and four"
