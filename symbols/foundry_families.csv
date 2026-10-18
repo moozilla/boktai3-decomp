@@ -334,3 +334,4 @@ addr,function,name,family,note
 0813B9B8,sub_0813B9B8,HiddenEffect_StartAtPosition,"HiddenEffect","starts a hidden effect animation at a supplied position"
 0813C000,sub_0813C000,DirectionalEffect_GetAnimationParams,"DirectionalEffect","maps effect mode to animation variant and kind"
 0813EBE0,sub_0813EBE0,Player_BeginIndexedAction,"Player descriptor actions","clears low flags and starts an indexed action"
+0813ED20,sub_0813ED20,Player_ConsumeActionCharge,"Player descriptor actions","deducts pending action cost from the active entry"
