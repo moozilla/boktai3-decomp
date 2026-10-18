@@ -1050,3 +1050,4 @@ addr,function,name,family,note
 081B7868,sub_081B7868,AnimatedMarker_BeginReveal,"AnimatedMarker","resets marker registration and installs reveal update"
 081B78CC,sub_081B78CC,AnimatedMarker_BeginActive,"AnimatedMarker","registers occupied terrain cell and installs active update"
 081B817C,sub_081B817C,SceneScriptObject_RunPendingScript,"SceneScriptObject","calls the pending script with five object arguments and clears it"
+081B8518,sub_081B8518,SceneScriptTask_Update,"SceneScriptTask","dispatches one of two task state callbacks"
