@@ -600,3 +600,4 @@ addr,function,name,family,note
 0810C724,sub_0810C724,SlotMenu_Destroy,"SlotMenu","clears backgrounds, calls the exit script, and kills the menu task"
 0810C798,sub_0810C798,SlotMenu_UpdateExitTransition,"SlotMenu","starts the exit transition and destroys the menu at frame ten"
 0810CA34,sub_0810CA34,LinkPanel_InitFromScript,"LinkPanel","reads script options and initializes panel resources and callback"
+0810CC28,sub_0810CC28,LinkPanel_DrawTime,"LinkPanel","draws a capped time value as whole and fractional digits"
