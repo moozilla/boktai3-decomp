@@ -165,3 +165,27 @@ types), scored by core distance and then bytes, run with long budgets on the
 drafts that are within 3 core instructions. The first measurement is running
 (`build/lastmile/`).
 
+## Codex vs Sonnet (2026-10-18, overnight run)
+
+From 2026-10-18 the at-scale workers run on Codex (`tools/foundry_run.py --backend codex`,
+`gpt-6.1-sol`, medium reasoning), which bills to the OpenAI plan. Batches of 6–8
+contiguous functions run per worker. These are worker-reported results; integration re-checks
+every file before committing it.
+
+| backend | bucket | functions | matched | named | non-cached tokens per match |
+|---|---|---|---|---|---|
+| Codex gpt-6.1-sol | <50 | 773 | 634 (82%) | 761 | ~39k (both buckets) |
+| Codex gpt-6.1-sol | 50–150 (08080000–08180000) | 799 | 550 (69%) | 799 | |
+| Sonnet, headless `claude -p` | <50 | 31 | 25 (81%) | 31 | ~$0.8 per match |
+| Sonnet subagents | <50 / 50–150 (early ROM) | 24 / 18 | 14 / 1 | | |
+
+Codex matches Sonnet on <50, and on 50–150 in the barely-matched regions it reaches 69%.
+The 1-of-18 Sonnet result came from early-ROM leftovers that past workers had already given
+up on, not from the bucket itself. At about 39k non-cached tokens per match, Codex is the
+default; Claude coordinates.
+
+Disk filled once overnight. The finisher's solver stage writes per-run work directories,
+and the volume was at 97% from other sessions. The finisher now runs as several locked
+loops (`build/foundry/scale/finisher.sh`), and the stale `build/rasolve-*` directories from
+killed runs are left for the user to clear.
+
