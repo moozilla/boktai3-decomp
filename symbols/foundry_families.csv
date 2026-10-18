@@ -1373,3 +1373,4 @@ addr,function,name,family,note
 08237E40,sub_08237E40,SpriteBurst_Init,"SpriteBurst","initialize sprite burst parameters and callback"
 0823800C,sub_0823800C,PositionedSprite_Init,"PositionedSprite","load sprite frame palette and position"
 082383D4,sub_082383D4,Player_SetTetherMode,"Player tether control","set tether mode and phase and reset frame"
+082383FC,sub_082383FC,Player_ResetActionState,"Player action control","reset action flags and four state values"
