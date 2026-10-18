@@ -34,6 +34,7 @@ from split import c_functions  # noqa: E402
 
 OUT = os.path.join(ROOT, "build", "unitize")
 WT = os.path.join(os.path.dirname(ROOT), "wt")
+QUOTA_FLOOR = 15        # % of the Codex weekly quota to leave for the user (tools/codex_quota.py)
 
 
 def slug(name):
@@ -95,6 +96,9 @@ def run_one(s, model, base, backend="codex", effort="medium"):
         st = json.load(open(state_path(s)))
         if st.get("state") in ("verified", "failed"):
             return st
+    if backend == "codex" and subprocess.run([sys.executable, os.path.join(ROOT, "tools", "codex_quota.py"),
+                                              "--floor", str(QUOTA_FLOOR)]).returncode:
+        return {**st, "state": "paused (Codex quota below floor)"}
     d = os.path.join(WT, "unit-" + s["slug"])
     if not os.path.isdir(d):
         subprocess.run(["sh", "tools/worktree.sh", "unit-" + s["slug"], base], cwd=ROOT, check=True,
