@@ -155,3 +155,71 @@ def add_paths(r, hp_hash, points):
             struct.pack_into("<I", r.rom, o + oo + 4 * i, na - base)
             return n
     raise KeyError(f"no HP resource {hp_hash:04X}")
+
+
+POOLS = 0x08D530FC  # sprite palette pool entries, 32 bytes each (*0x030042E4; bigpalettes.py)
+
+
+def bgr555(rgb):
+    r, g, b = rgb >> 16 & 255, rgb >> 8 & 255, rgb & 255
+    return (r >> 3) | (g >> 3) << 5 | (b >> 3) << 10
+
+
+def set_pool(r, pool, colors):
+    """Replace palette pool entry `pool` (16 colors, 0xRRGGBB; entry 0 is
+    transparent)."""
+    struct.pack_into("<16H", r.rom, POOLS - BASE + 32 * pool, *[bgr555(c) for c in colors])
+
+
+def package(frames, tiles, h0=903):
+    """A sprite package (archive CB05; tools/assets/sprites.py); h0, the first
+    header word, is the palette pool entry it is drawn with. frames is a
+    list of [(attr, x, y, tile | palette << 12)] parts, tiles 4bpp bytes laid
+    out as a sheet 16 tiles wide; one animation cycling the frames."""
+    nparts = sum(len(f) for f in frames)
+    head = 0x20
+    ftab = b""
+    ptab = b""
+    for i, parts in enumerate(frames):
+        ftab += struct.pack("<HHIhhHHI", i, len(parts), 0, -32, -64, 64, 64, len(ptab))
+        for attr, x, y, tile in parts:
+            ptab += struct.pack("<HhhH", attr, x, y, tile)
+    atab = struct.pack("<HHI", 0, len(frames), 0)
+    ktab = b"".join(struct.pack("<HH", i, 30) for i in range(len(frames)))
+    o_f = head
+    o_a = o_f + len(ftab)
+    o_p = o_a + len(atab)
+    o_k = o_p + len(ptab)
+    o_t = (o_k + len(ktab) + 3) & ~3
+    hdr = struct.pack("<6H5I", h0, len(frames), 1, nparts, len(frames), len(tiles) // 32, o_f, o_a, o_p, o_k, o_t)
+    hdr += b"\0" * (head - len(hdr))
+    body = hdr + ftab + atab + ptab + ktab
+    return body + b"\0" * (o_t - len(body)) + tiles
+
+
+def replace_resource(r, type_hash, name, data):
+    """Point archive entry `name` of resource type `type_hash` at new data."""
+    archive, _ = _hp_mods()
+    for label, t, base, ents in archive.archives(bytes(r.rom)):
+        if t != type_hash:
+            continue
+        for i, (h, a, s) in enumerate(ents):
+            if h == name:
+                na = r.alloc(data, 4)
+                o = base - BASE
+                count, ho, oo, do = struct.unpack_from("<IIII", r.rom, o)
+                struct.pack_into("<I", r.rom, o + oo + 4 * i, na - base)
+                return na
+    raise KeyError(f"no {type_hash:04X} resource {name:04X}")
+
+
+def big_sprite_frame_pixels(r, sprite, frame):
+    """ROM address of the 4bpp pixels of `frame` of large sprite `sprite` (98F5)."""
+    sys.path.insert(0, os.path.join(ROOT, "tools", "assets"))
+    import bigsprites
+    b = bigsprites.BigSprites(bytes(r.rom))
+    archive, _ = _hp_mods()
+    base = next(a for label, _, _, ents in archive.archives(bytes(r.rom)) if label == "t98F5" for _, a, _ in ents[:1])
+    i = next(k for k, rec in enumerate(b.records) if rec[0] == sprite)
+    nparts, ntiles, pal, pix, po = list(b.frames(i))[frame]
+    return base + b.pixels + pix, ntiles
