@@ -419,9 +419,11 @@ s32 DirectionalController_ScriptCreate(void)
     s32 findRegion;
     struct DirectionalManager *manager = gUnk_02000038;
     struct DirectionalController *p;
-    s32 i, id;
-    if (!manager)
+    s32 i;
+    s32 id;
+    if (!manager) {
         goto fail;
+    }
     id = Script_GetKeywordValue('n', 0);
     p = manager->slots;
     for (i = 0; i < manager->count; i++, p++) {
@@ -439,12 +441,13 @@ s32 DirectionalController_ScriptCreate(void)
                 p->distance = distance * distance;
             }
             if (Script_SeekToKeyword('a')) {
-                register s16 *base asm("r6") = p->arguments;
-                s16 *out = base;
+                s16 *base = p->arguments;
+                s16 *out = *(&base);
                 do {
                     s32 value = Script_GetPc();
-                    if (value)
-                        value = Script_GetValue();
+                    if (value) {
+                        *(&value) = Script_GetValue();
+                    }
                     *out++ = value;
                 } while ((s32)out <= (s32)(base + 3));
             } else {
@@ -465,25 +468,30 @@ s32 DirectionalController_ScriptCreate(void)
                 position.z = 0;
             }
             DirectionalController_SetPosition(manager, p, &position);
-            if (findRegion)
+            if (findRegion) {
                 p->region = Region_FindContaining(&p->position);
-            else
+            } else {
                 p->region = -1;
+            }
             DirectionalController_SetMarkerFadeLevel(p, 2);
-            if (p->disabled == 1)
+            if (p->disabled == 1) {
                 *drawable |= 1;
-            else
+            } else {
                 *drawable &= ~1;
-            if (p->orientation == 0)
+            }
+            if (p->orientation == 0) {
                 *drawable &= ~4;
-            else
+            } else {
                 *drawable |= 4;
+            }
             manager->enabled |= 1 << i;
             break;
         }
     }
-    if (i != manager->count)
+
+    if (i != manager->count) {
         return 0;
+    }
 fail:
     return -1;
 }

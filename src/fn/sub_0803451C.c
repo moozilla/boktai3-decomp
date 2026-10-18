@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Engine {
     u8 pad0[0x18];
@@ -50,18 +49,24 @@ void WirelessController_PollPeerRosterSend(struct Engine *p)
             int state;
             state = s->state;
             if (state == 0x26) {
-                register int original asm("r1") = s->bmSlotOrg;
-                register int current asm("r0") = s->bmSlot;
+                int original = s->bmSlotOrg;
+                int current = s->bmSlot;
+                do {
+                } while (0);
                 changed = current ^ original;
                 rfu_clearSlot(4, slot);
                 p->mask &= ~2;
-                if (p->mask & 16)
+                if (p->mask & 16) {
                     p->mask |= 128;
-                if (p->mask & 8)
+                }
+                if (p->mask & 8) {
                     p->mask = (p->mask & ~8) | 32;
+                }
             } else if (state == 0x27) {
-                register int original asm("r1") = s->bmSlotOrg;
-                register int current asm("r0") = s->bmSlot;
+                int original = s->bmSlotOrg;
+                int current = s->bmSlot;
+                do {
+                } while (0);
                 changed = current ^ original;
                 rfu_clearSlot(4, slot);
                 {
@@ -78,7 +83,8 @@ void WirelessController_PollPeerRosterSend(struct Engine *p)
                 }
             }
         }
-        if (changed)
+        if (changed) {
             p->flag35 |= changed;
+        }
     }
 }

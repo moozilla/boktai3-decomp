@@ -151,6 +151,15 @@ def tidy(unit, name, orig):
             return
 
 
+def find_unit(name):
+    r = subprocess.run(["git", "grep", "-l", "-E", r"\b" + name + r"\s*\(", "--", "src/*.c", "src/**/*.c"],
+                       cwd=ROOT, capture_output=True, text=True)
+    for unit in r.stdout.split():
+        if name in dict(definitions(open(os.path.join(ROOT, unit)).read())):
+            return unit
+    return None
+
+
 def cmd_apply(a):
     units = {}
     lst = os.path.join(os.path.dirname(a.results), "..", "list.tsv")
@@ -168,6 +177,8 @@ def cmd_apply(a):
             print(f"{func}: not in the list")
             continue
         unit, name = units[func]
+        if not os.path.exists(os.path.join(ROOT, unit)) or name not in dict(definitions(open(os.path.join(ROOT, unit)).read())):
+            unit = find_unit(name) or unit  # moved since the list was made
         old = splice(unit, name, src, func)
         if old is None:
             print(f"{func}: could not splice into {unit}")
