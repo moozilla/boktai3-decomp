@@ -884,3 +884,4 @@ addr,function,name,family,note
 08180A88,sub_08180A88,SceneParticle_UpdateBounce,"BouncingSceneParticle","integrates particle velocity, bounces once, then invokes its cleanup callback"
 08180AFC,sub_08180AFC,BouncingEffect_RemoveSprite,"BouncingEffect","hides the embedded sprite and unlinks it from list zero"
 08180B14,sub_08180B14,SceneCombatActor_InitBouncingParticle,"SceneCombatActor / BouncingSceneParticle","initializes an embedded bouncing sprite and selects its directional frame"
+08180BC4,sub_08180BC4,ActorMarker_InitFacingSprite,"ActorMarker","initializes an embedded marker sprite from kind and direction"
