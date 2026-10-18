@@ -1146,3 +1146,4 @@ addr,function,name,family,note
 081DAEE8,sub_081DAEE8,Task4E01_SetEntryPair,"Task4E01 entries","copy two words into an indexed entry"
 081DC208,sub_081DC208,PairedFlags_SelectActive,"Screen task paired flags","toggle two flag bits according to selection"
 081DCF20,sub_081DCF20,TextEntry_CopyInitialName,"Text entry screen","copy at most eleven initial-name bytes and terminate"
+081DCF84,sub_081DCF84,TextEntry_DrawName,"Text entry screen","draw five character slots with empty-slot placeholders"
