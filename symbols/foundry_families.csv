@@ -196,3 +196,4 @@ addr,function,name,family,note
 0810CCC8,sub_0810CCC8,LinkPanel_DrawPeerTimes,"LinkPanel","draws both peers' times for the clamped selection"
 0810CEBC,sub_0810CEBC,SlotMenu_InitializeAlternateEntryValues,"SlotMenu","initializes seven alternate entry values at offset 0x300"
 0810CF08,sub_0810CF08,PanelSequence_InitializeSprites,"PanelSequence","starts a script and initializes seven sprite records"
+0810DA68,sub_0810DA68,SelectionPanel_InitEntryIds,"SelectionPanel","initializes ten entry identifiers with a flag-dependent variant"
