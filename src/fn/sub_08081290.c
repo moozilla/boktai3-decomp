@@ -87,7 +87,7 @@ void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *input,
             actor->field2B8 = zero;
         }
         {
-            register u32 mask asm("r2") = 0x20000;
+            u32 mask = 0x20000;
             u32 *flags = &actor->flags2D0;
             *flags |= mask;
         }
@@ -106,11 +106,11 @@ void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *input,
             actor->health = zeroWord;
             {
                 register u32 mask asm("r0") = 8;
-                register u16 *flags asm("r2") = &actor->flags2D4;
+                u16 *flags = &actor->flags2D4;
                 *flags = mask | *flags;
             }
             {
-                register u32 mask asm("r2") = 0x400;
+                u32 mask = 0x400;
                 u32 *flags = &actor->flags2CC;
                 *flags |= mask;
             }
@@ -119,7 +119,7 @@ void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *input,
             sub_0807C72C(actor, 3, 127, 0);
             sub_0807E7B0(actor, 4);
             {
-                register void *control asm("r2") = SceneActorReaction_BeginHiddenDefeat;
+                void *control = SceneActorReaction_BeginHiddenDefeat;
                 u32 kind = 23;
                 actor->field2B2 = 1;
                 actor->field2B0 = zeroByte;

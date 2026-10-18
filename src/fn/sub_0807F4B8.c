@@ -62,11 +62,11 @@ void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *inputA
         register u32 byteZero asm("r8");
         ownership = inputMask;
         {
-            register u32 flagOffset asm("r2") = 0x2D4;
+            u32 flagOffset = 0x2D4;
             flags = (void *)((u8 *)early + flagOffset);
         }
         if (*flags & inputMask) {
-            register u32 nodeOffset asm("r0") = 0x45C;
+            u32 nodeOffset = 0x45C;
             void **node;
             node = (void *)((u8 *)early + nodeOffset);
             SceneActorContacts_ReleaseNode(*node);

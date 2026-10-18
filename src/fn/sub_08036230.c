@@ -62,13 +62,13 @@ void sub_08036230(struct Engine *p)
         register int offset asm("r0") = 0x16A;
         u16 *first;
         struct RfuLinkStatus **initial;
-        register u16 *mine asm("r0");
+        u16 *mine;
         first = (u16 *)((u8 *)p + offset);
         initial = &gUnk_03006A80;
         mine = &(*initial)->my.id;
         if (*first != *mine) {
             struct RfuLinkStatus **cursor = initial;
-            register int offset asm("r1") = 0x16A;
+            int offset = 0x16A;
             u16 *next;
             next = (u16 *)((u8 *)p + offset);
             do {

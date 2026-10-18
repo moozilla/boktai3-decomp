@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_sequence_actor.h"
 void ContactSequenceActor_SetState(struct ContactSequenceActor *, u32);
 void sub_0821FF8C(void *, void *);
@@ -10,7 +9,7 @@ void ContactSequenceActor_ApplyHealthContact(struct ContactCollider *source,
                                              struct ContactSequenceActor *actor)
 {
     struct ContactPackedVector size;
-    register struct ContactSequenceActor *saved asm("r8");
+    struct ContactSequenceActor *saved;
     struct ContactPosition *position;
     saved = actor;
     sub_0821FF8C(source, other);

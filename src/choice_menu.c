@@ -90,7 +90,7 @@ s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p)
     } else if (p->wakeDelay)
         p->wakeDelay--;
     else {
-        register struct ChoiceKeys *initialKeys asm("r1") = &gUnk_03005260;
+        struct ChoiceKeys *initialKeys = &gUnk_03005260;
         struct ChoiceKeys *keys;
         u8 *repeat;
         u32 pressed;
@@ -104,13 +104,12 @@ s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p)
         keys = initialKeys;
         if (sameDirection) {
             u8 *ptr = &p->repeatDelay;
-            register u32 delay asm("r1") = *ptr;
+            u32 delay = *ptr;
             repeat = ptr;
             if (delay) {
                 u32 value = delay - 1;
                 {
                     register u8 *destination asm("r1") = repeat;
-                    asm("" : "+r"(destination));
                     *destination = value;
                 }
             }
@@ -131,7 +130,7 @@ s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p)
                 return 1;
             }
         } else {
-            register u32 one asm("r4") = 1;
+            u32 one = 1;
             if (({
                     u32 bits = one;
                     bits &= pressed;
@@ -548,7 +547,6 @@ struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
         s32 *begin;
         argumentBase = arguments;
         begin = argumentBase;
-        asm("" : "+r"(begin));
         zero = 0;
         arg = arguments + 3;
         do {

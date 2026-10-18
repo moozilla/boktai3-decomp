@@ -55,7 +55,7 @@ void SceneInventory_PopulateEquipmentGrid(struct SceneInventoryPanel *input)
             if (kind != 255) {
                 entry->flags &= ~1;
                 {
-                    register u32 frame asm("r2") = kind;
+                    u32 frame = kind;
                     frame = (u16)(frame + 240);
                     {
                         struct SceneInputWidget *argument = widget;
@@ -128,7 +128,7 @@ void SceneInventory_PopulateEquipmentGrid(struct SceneInventoryPanel *input)
                 struct SceneValueEquipmentDefinition *definition = sub_08227F5C(kind);
                 entry->flags &= ~1;
                 {
-                    register u32 frame asm("r2") = kind;
+                    u32 frame = kind;
                     frame = (u16)(frame + 240);
                     {
                         struct SceneInputWidget *argument = widget;
@@ -151,7 +151,7 @@ void SceneInventory_PopulateEquipmentGrid(struct SceneInventoryPanel *input)
             }
         } while (1);
         {
-            register s32 next asm("r0") = nextRow;
+            s32 next = nextRow;
             row = next;
             if (next > 1)
                 break;
@@ -159,7 +159,7 @@ void SceneInventory_PopulateEquipmentGrid(struct SceneInventoryPanel *input)
     } while (1);
     {
         register struct GameState *state asm("r0") = gUnk_02000710;
-        register const s16 *materials asm("r4");
+        const s16 *materials;
         struct ContactPosition *position;
         struct SceneInventoryWidgetFlags *entry;
         s32 remaining;

@@ -39,7 +39,6 @@ s32 SceneRangeWatch_Initialize(struct SceneRangeWatch *input)
             register u32 last asm("r1") = 0x2B;
             asm("" : "+r"(last));
             last += (u32)watch;
-            asm("" : "+r"(last));
             maximum = (u8 *)last;
         }
         start = (s32)watch->arguments;

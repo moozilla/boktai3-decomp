@@ -27,12 +27,12 @@ void SceneInventory_BeginPurchaseConfirmation(struct SceneInventoryControlView *
             break;
         }
         case 2: {
-            register u32 textOffset asm("r1") = (u32)&panel->consumableText - (u32)panel;
-            register const void **textSlot asm("r0");
+            u32 textOffset = (u32)&panel->consumableText - (u32)panel;
+            const void **textSlot;
             const void *message;
             u32 scratch;
             u8 *saved;
-            register u32 pageOffset asm("r5");
+            u32 pageOffset;
             register s32 index asm("r0");
             s8 *entry;
             s32 item;

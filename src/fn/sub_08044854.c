@@ -44,7 +44,7 @@ s32 ContactSwarm_SpawnCharge(struct ContactSwarm *poolInput,
             }
             ContactSwarm_SetDirectionalSequence(pool, slot, 0);
             {
-                register u32 offset asm("r3") = (u8 *)slot->shadow - (u8 *)slot;
+                u32 offset = (u8 *)slot->shadow - (u8 *)slot;
                 ActorShadow_Enable((u8 *)slot + offset);
             }
             {

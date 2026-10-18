@@ -16,14 +16,14 @@ void SceneActorAttachment_RetargetNearestPlayer(struct RetargetActorView *input,
 {
     struct RetargetActorView *actor = input;
     const struct ContactPosition *origin = inputOrigin;
-    register u32 nearest asm("r9") = 0;
+    u32 nearest = 0;
     s32 bestDistance = 0x7fffffff;
     /* Only the three named halfwords are read. Padding remains unspecified. */
     struct ContactPosition difference;
-    register s32 initialCount asm("r0");
+    s32 initialCount;
     initialCount = gUnk_02000544;
     if ((s32)nearest < initialCount) {
-        register struct ContactPosition *delta asm("r3") = &difference;
+        struct ContactPosition *delta = &difference;
         struct Player **slot = gUnk_02000580;
         s32 count = initialCount;
         do {
@@ -61,7 +61,6 @@ void SceneActorAttachment_RetargetNearestPlayer(struct RetargetActorView *input,
             {
                 u32 updated = *flags & ~mask;
                 register u32 zero asm("r1") = 0;
-                asm("" : "+r"(zero));
                 *flags = updated;
                 *owned = (void *)zero;
             }

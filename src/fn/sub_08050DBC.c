@@ -39,11 +39,11 @@ s32 OrbitBackground_Tick(struct OrbitBackground *background)
         {
             register s32 sourceX asm("r1") = gUnk_03005418[0];
             register s32 screenX asm("r0") = screen.x;
-            register s32 x asm("r4");
+            s32 x;
             s32 centerX;
             s32 sourceY;
             register s32 screenY asm("r1");
-            register s32 y asm("r0");
+            s32 y;
             s32 centerY;
             x = sourceX - screenX;
             centerX = x + 128;

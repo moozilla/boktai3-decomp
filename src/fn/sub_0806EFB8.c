@@ -6,13 +6,11 @@ static inline u8 Inactive(struct SceneActorRegistryActor *a)
 {
     {
         register u32 mask asm("r1") = 0x40;
-        asm("" : "+r"(mask));
         if (a->flags2D4 & mask)
             return 1;
     }
     {
         register u32 mask asm("r1") = 0x20000;
-        asm("" : "+r"(mask));
         if (a->flags2D0 & mask)
             return 1;
     }

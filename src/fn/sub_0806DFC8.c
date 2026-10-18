@@ -82,14 +82,13 @@ void RouteSpriteActor_Create(struct ContactPosition *anchor, void *unused, s32 i
         {
             register u32 offset asm("r3") = 0x15B;
             register s8 *dst asm("r1");
-            asm("" : "+r"(shadowResult), "+r"(offset));
             dst = (void *)((u32)actor + offset);
             *dst = shadowResult;
         }
     }
     {
         struct ContactPosition *dst = &actor->elevatedPosition;
-        register struct ContactPosition *low asm("r3");
+        struct ContactPosition *low;
         struct ContactPosition position;
         low = savedAnchor;
         position = *low;
@@ -114,7 +113,7 @@ void RouteSpriteActor_Create(struct ContactPosition *anchor, void *unused, s32 i
         Anim_SetSequence(&actor->sequence, pool->sequenceResource, 0x17, 0, zero);
         AnimData_SelectPaletteBank(*(void **)&actor->sprite.unknown8[4], 0x140);
         {
-            register struct ContactPosition *low asm("r3") = savedAnchor;
+            struct ContactPosition *low = savedAnchor;
             struct ContactPosition position;
             position = *low;
             actor->sprite.position = position;

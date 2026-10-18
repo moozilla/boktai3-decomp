@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "level_advance_display.h"
 s32 LevelAdvanceDisplay_DestroyManager(struct LevelAdvanceManager *manager)
 {
@@ -11,7 +10,7 @@ s32 LevelAdvanceDisplay_DestroyManager(struct LevelAdvanceManager *manager)
         particle++;
     }
     {
-        register u32 zero asm("r1") = 0;
+        u32 zero = 0;
         gUnk_02000120 = (void *)zero;
     }
     return 0;

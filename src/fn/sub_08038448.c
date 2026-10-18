@@ -23,7 +23,7 @@ int Mod(int, int);
 
 void sub_08038448(struct P *p)
 {
-    register u32 mask asm("r8") = 0;
+    u32 mask = 0;
     register int start asm("r4");
     register int i asm("r5");
     u32 *random;
@@ -43,7 +43,7 @@ void sub_08038448(struct P *p)
     if ((p->rightMask & 4) && p->round > 3) {
         GameState_AddEquipment(2);
         {
-            register u32 t asm("r1") = mask;
+            u32 t = mask;
             t |= 4;
             mask = t;
         }
@@ -51,7 +51,7 @@ void sub_08038448(struct P *p)
     if (p->rightMask & 64) {
         GameState_AddEquipment(6);
         {
-            register u32 t asm("r3") = mask;
+            u32 t = mask;
             t |= 64;
             mask = t;
         }
@@ -67,7 +67,7 @@ void sub_08038448(struct P *p)
     if (p->rightMask & 256) {
         GameState_AddEquipment(8);
         {
-            register u32 t asm("r1") = mask;
+            u32 t = mask;
             t |= 256;
             mask = t;
         }
@@ -75,7 +75,7 @@ void sub_08038448(struct P *p)
     if (p->rightMask & 512) {
         GameState_AddEquipment(9);
         {
-            register u32 t asm("r3") = mask;
+            u32 t = mask;
             t |= 512;
             mask = t;
         }
@@ -91,7 +91,7 @@ void sub_08038448(struct P *p)
     if (p->rightMask & 2048) {
         GameState_AddEquipment(11);
         {
-            register u32 t asm("r1") = mask;
+            u32 t = mask;
             t |= 2048;
             mask = t;
         }
@@ -108,10 +108,10 @@ void sub_08038448(struct P *p)
         int limit;
         int offset;
         int index;
-        register int byteOffset asm("r2");
+        int byteOffset;
         {
             struct Save **slot = &gUnk_02000710;
-            register struct Save *save asm("r1");
+            struct Save *save;
             s16 *row;
             save = *slot;
             byteOffset = i * 2;

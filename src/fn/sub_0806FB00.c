@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 #include "scene_actor_record.h"
 extern u16 gUnk_030039F0;
@@ -35,7 +34,6 @@ u8 SceneActorRegistry_LinkActor(struct SceneActorRegistryActor *actor)
     SceneActorRegistry_MarkCategoryOne(actor->category);
     {
         u32 mask = 0x02000000;
-        asm("" : "+r"(mask));
         if (!(actor->flags2D0 & mask))
             sub_08003C00(&actor->id);
     }

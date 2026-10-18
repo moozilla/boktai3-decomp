@@ -124,7 +124,7 @@ int sub_0803092C(struct Actor *p)
                 r->flags &= ~8;
         }
         {
-            register u32 mask asm("r6");
+            u32 mask;
             int duration;
             register int savedDuration asm("r4");
             u32 timer = f->timer + 1;
@@ -154,7 +154,7 @@ int sub_0803092C(struct Actor *p)
                     index--;
                     goto storeIndex;
                 } else {
-                    register int count asm("r4");
+                    int count;
                     index = f->index + 1;
                     f->index = index;
                     count = f->count;
@@ -172,7 +172,7 @@ int sub_0803092C(struct Actor *p)
             update:
                 word = f->data + f->index;
                 {
-                    register u32 value asm("r2") = *word;
+                    u32 value = *word;
                     u32 low = 15;
                     low &= value;
                     f->multiplier = low;

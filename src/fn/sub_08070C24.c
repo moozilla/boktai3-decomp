@@ -43,7 +43,7 @@ u32 SceneActorRegistry_TestNearestPlayerBounds(struct SceneActorRegistryActor *i
         s32 index = 0;
         s32 initialCount = gUnk_02000544;
         if (index < initialCount) {
-            register s32 count asm("r9");
+            s32 count;
             struct ContactPosition *delta = &difference;
             struct ContactPosition *left = &origin;
             register struct Player **playerSlot asm("r12");

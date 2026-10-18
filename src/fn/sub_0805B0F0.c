@@ -33,7 +33,7 @@ void ScenePanel_InitRig(struct ScenePanel *input)
     {
         const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;
         u32 *randomIndex;
-        register u32 mask asm("r5");
+        u32 mask;
         s32 rate;
         s16 *rateField;
         u32 mask63;
@@ -46,9 +46,8 @@ void ScenePanel_InitRig(struct ScenePanel *input)
         mask = 1023;
         next &= mask;
         {
-            register u32 sample asm("r0") = table[next];
+            u32 sample = table[next];
             sample &= 15;
-            asm("" : "+r"(sample));
             rate = sample;
             rate += 8;
         }
@@ -65,7 +64,7 @@ void ScenePanel_InitRig(struct ScenePanel *input)
             }
         }
         {
-            register u32 *base asm("r2") = randomIndex;
+            u32 *base = randomIndex;
             next = (*base + 1) & mask;
         }
         {
@@ -94,7 +93,7 @@ void ScenePanel_InitRig(struct ScenePanel *input)
     }
     {
         u16 *duration = &rig->selectionTimer;
-        register u32 value asm("r0");
+        u32 value;
         value = 600;
         *duration = value;
     }

@@ -46,7 +46,7 @@ void Memory_Copy(void *, void *, int);
 int sub_0803B40C(struct ResultMenu *arg)
 {
     struct ResultMenu *p = arg;
-    register struct Blob *res asm("r2");
+    struct Blob *res;
     struct Blob *first;
     int pack;
     struct Blob *primary;
@@ -254,7 +254,7 @@ initialize:
         Memory_Copy(p->left, sub_08037DCC(0), 16);
         Memory_Copy(p->right, sub_08037DCC(1), 16);
         {
-            register struct ResultMenu *write asm("r1") = p;
+            struct ResultMenu *write = p;
             int one;
             write->state = zero;
             one = 1;

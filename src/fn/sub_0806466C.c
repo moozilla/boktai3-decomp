@@ -16,15 +16,15 @@ u8 ActorAttachment_TickRemoval(void *owner, void *slotInput)
             s32 i;
             register u32 flagsOffset asm("r2");
             register u8 *flags asm("ip");
-            register u32 idOffset asm("r3");
+            u32 idOffset;
             register s8 *slotId asm("r9");
             u8 *active;
             u32 activeOffset;
             u8 *status;
-            register u32 zero asm("r3");
-            register u8 *secondary asm("r6");
+            u32 zero;
+            u8 *secondary;
             s16 *threshold;
-            register s32 *counter asm("r1");
+            s32 *counter;
             i = 0;
             /* offsetof-style constants retain the original separate address births. */
             flagsOffset = (u32) & ((struct ActorAttachmentSlot *)0)->flags31;

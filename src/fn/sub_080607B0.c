@@ -8,7 +8,7 @@ void SceneInventory_BeginEquipmentCatalogMove(struct SceneInventoryActionView *p
     u32 savedAttribute;
     u8 *saved;
     s32 index;
-    register s8 *entry asm("r1");
+    s8 *entry;
     struct SceneInputPosition *target;
     enabled[0] = 1;
     saved = &panel->savedSelection;

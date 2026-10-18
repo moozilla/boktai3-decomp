@@ -5,8 +5,8 @@ void SceneActorRegistry_SetMovementMode(struct SceneActorRegistryActor *, s32);
 static inline u32 ReadExclusionFlags(struct SceneActorRegistryActor *actor)
 {
     register u32 mask asm("r1") = 0x20000;
-    register u32 offset asm("r3") = 0x2d0;
-    register u32 *field asm("r0");
+    u32 offset = 0x2d0;
+    u32 *field;
     u32 value;
     field = (void *)((u8 *)actor + offset);
     value = *field;
@@ -23,7 +23,6 @@ void SceneActorRegistry_SetMovementModesFromScript(void)
     node = gUnk_020004AC;
     actor = node->actor;
     mode = Script_GetKeywordValue('d', 0);
-    asm("" : "+r"(mode));
     if (actor) {
         u32 disabled = 0x40;
         u32 enabled = 0x4000;

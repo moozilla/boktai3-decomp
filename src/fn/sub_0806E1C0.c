@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "route_sprite_actor.h"
 static inline u8 Occupied(u32 *mask, s32 index)
 {
@@ -21,7 +20,7 @@ s32 RouteSpritePool_Destroy(struct RouteSpritePool *pool)
         i++;
     }
     {
-        register u32 zero asm("r1") = 0;
+        u32 zero = 0;
         gUnk_02000198 = (void *)zero;
     }
     return 0;

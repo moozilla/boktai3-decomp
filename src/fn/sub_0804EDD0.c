@@ -17,7 +17,6 @@ void AreaEffect_UpdateLinkVisibility(struct AreaEffectManager *manager)
     struct AreaEffectManager *object = manager;
     register u32 sample asm("r0") = linkValue(localPlayer());
     u32 value;
-    asm("" : "+r"(sample));
     value = sample;
     if (value) {
         u8 *visibility = &object->visible;

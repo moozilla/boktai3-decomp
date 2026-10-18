@@ -20,7 +20,7 @@ s32 TemporaryAnimationPool_Initialize(struct TemporaryAnimationPool *pool)
         u32 zero;
         struct ContactPosition position;
     } scratch;
-    register s32 index asm("r6");
+    s32 index;
     s32 result;
     u32 fillZero;
     struct ContactPosition *point;

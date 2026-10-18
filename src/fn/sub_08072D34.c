@@ -4,8 +4,8 @@ static inline u8 Unavailable(struct SceneActorRegistryActor *inputActor, u16 *in
                              u32 inputDisabled, u32 inputExcluded)
 {
     register struct SceneActorRegistryActor *actor asm("r3") = inputActor;
-    register u32 disabled asm("r8") = inputDisabled;
-    register u16 *state asm("r1") = inputState;
+    u32 disabled = inputDisabled;
+    u16 *state = inputState;
     register u32 excluded asm("r12") = inputExcluded;
     u32 flags;
     flags = *state;
@@ -30,13 +30,13 @@ void SceneActorContacts_ReleaseInvalidOwners(void)
     if (!node)
         return;
     {
-        register u32 disabled asm("r8") = 0x40;
+        u32 disabled = 0x40;
         register u32 excluded asm("r12") = 0x20000;
-        register u32 required asm("r9") = 0x1000;
+        u32 required = 0x1000;
         u32 invalidMask = 3;
         u32 clearMask = 0xFD;
         do {
-            register u32 incoming asm("r1") = node->flags;
+            u32 incoming = node->flags;
             u32 flags;
             register struct SceneActorRegistryActor *actor asm("r3");
             u16 *state;
@@ -52,7 +52,7 @@ void SceneActorContacts_ReleaseInvalidOwners(void)
             if (!actor)
                 goto invalid;
             {
-                register u32 offset asm("r0") = 0x2D4;
+                u32 offset = 0x2D4;
                 state = (void *)((u32)actor + offset);
             }
             if (Unavailable(actor, state, disabled, excluded) ||
@@ -66,7 +66,7 @@ void SceneActorContacts_ReleaseInvalidOwners(void)
                 node->flags = clear;
                 node->owner = (void *)zero;
                 {
-                    register u32 cooldown asm("r0") = 120;
+                    u32 cooldown = 120;
                     node->cooldown = cooldown;
                 }
                 continue;

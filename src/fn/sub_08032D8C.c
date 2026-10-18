@@ -14,7 +14,7 @@ extern const u8 gUnk_0824DDF4[];
 // MATCHING_CONCESSION: register-pinning
 int sub_08032D8C(struct Vm *arg, int index)
 {
-    register struct Vm *p asm("r8") = arg;
+    struct Vm *p = arg;
     const u8 *s = p->strings[index];
     int n = 0;
     u32 c;
@@ -67,7 +67,7 @@ loop:
         goto test;
     }
     if (c == 31) {
-        register u32 code asm("r1") = (u16)sub_08032070(s);
+        u32 code = (u16)sub_08032070(s);
         if (code == 0xFFFF)
             goto wide;
         {

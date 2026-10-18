@@ -60,7 +60,7 @@ static inline void Show(struct SceneActorRegistryResetView *input)
             u8 unknown0[8];
             u32 flags;
         };
-        register struct Tile *tile asm("r0") = (void *)((u8 *)actor->drawable + 0x20);
+        struct Tile *tile = (void *)((u8 *)actor->drawable + 0x20);
         u32 mask = ~1;
         tile->flags &= mask;
     }
@@ -122,7 +122,7 @@ void SceneActorControl_TickVisibility(struct SceneActorRegistryResetView *input)
                 Hide(actor);
         } else {
             u32 mask = 0x20;
-            register u32 *inputFlags asm("r1");
+            u32 *inputFlags;
             u32 *flags;
             register u32 active asm("r0");
             inputFlags = &state->flags3D4;
@@ -140,7 +140,7 @@ void SceneActorControl_TickVisibility(struct SceneActorRegistryResetView *input)
                         u8 unknown0[8];
                         u32 flags;
                     };
-                    register struct Tile *tile asm("r0") = (void *)((u8 *)actor->drawable + 0x20);
+                    struct Tile *tile = (void *)((u8 *)actor->drawable + 0x20);
                     {
                         u32 mask = ~1;
                         tile->flags &= mask;

@@ -15,11 +15,11 @@ static inline s32 scale5(s32 v)
 void ScenePanelRig_TickSecondarySprites(struct ScenePanelRig *rig, u32 palette)
 {
     s32 i = 0;
-    register u32 byteMask asm("r10") = 255;
+    u32 byteMask = 255;
     s32 amplitude = 24;
     for (;;) {
         u32 product = sizeof(struct SceneRigSprite);
-        register s32 index asm("r4");
+        s32 index;
         struct SceneRigSprite *sprite;
         struct SceneRigSprite *output;
         struct ContactPackedVector base;
@@ -30,13 +30,12 @@ void ScenePanelRig_TickSecondarySprites(struct ScenePanelRig *rig, u32 palette)
         index = i;
         product *= index;
         {
-            register u32 arrayOffset asm("r5") = (u32) & ((struct ScenePanelRig *)0)->secondary;
+            u32 arrayOffset = (u32) & ((struct ScenePanelRig *)0)->secondary;
             product += arrayOffset;
         }
         sprite = (void *)((u8 *)rig + product);
         output = sprite;
         near = index;
-        asm("" : "+r"(near));
         near += 2;
         {
             s32 total = 8;
@@ -113,7 +112,7 @@ void ScenePanelRig_TickSecondarySprites(struct ScenePanelRig *rig, u32 palette)
             {
                 u32 offset = state->index << 1;
                 struct SceneRigSprite *frameSprite = sprite;
-                register const volatile u16 *table asm("r1");
+                const volatile u16 *table;
                 table = frameSprite->sequence.commands;
                 command = (const volatile u16 *)((u32)table + offset);
                 frameSprite->frame = *command >> 6;
@@ -138,7 +137,7 @@ void ScenePanelRig_TickSecondarySprites(struct ScenePanelRig *rig, u32 palette)
                         asm("" : "+r"(out));
                         flags = out->flags | 4;
                     } else {
-                        register struct SceneRigSprite *read asm("r1") = sprite;
+                        struct SceneRigSprite *read = sprite;
                         flags = read->flags & ~4;
                         out = sprite;
                     }
@@ -158,8 +157,8 @@ void ScenePanelRig_TickSecondarySprites(struct ScenePanelRig *rig, u32 palette)
                     out->flags |= 8;
                 } else {
                     register struct SceneRigSprite *read asm("r1") = sprite;
-                    register u32 flags asm("r0");
-                    register struct SceneRigSprite *out asm("r2");
+                    u32 flags;
+                    struct SceneRigSprite *out;
                     asm("" : "+r"(read));
                     flags = read->flags & ~8;
                     out = sprite;
@@ -231,7 +230,7 @@ void ScenePanelRig_TickSecondarySprites(struct ScenePanelRig *rig, u32 palette)
                         speed >>= 6;
                         state->duration = speed;
                         {
-                            register u32 mask asm("r5") = byteMask;
+                            u32 mask = byteMask;
                             speed &= mask;
                             if (!speed)
                                 state->duration = 1;

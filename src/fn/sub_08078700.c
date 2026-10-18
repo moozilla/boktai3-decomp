@@ -15,7 +15,7 @@ static inline u8 Nonzero(u32 value)
 }
 static inline u32 ReadControl(u32 inputMask, u16 *input)
 {
-    register u32 mask asm("r1") = inputMask;
+    u32 mask = inputMask;
     register u16 *field asm("r2") = input;
     u32 value;
     value = *field;
@@ -26,7 +26,7 @@ void SceneActorBehavior_UpdateColliders(struct SceneActorBehaviorView *inputActo
     struct SceneActorBehaviorView *actor = inputActor;
     struct ContactCollider *secondary = &actor->secondaryCollider;
     struct ContactCollider *primary = &actor->primaryCollider;
-    register u16 *control asm("r8");
+    u16 *control;
     u16 *field;
     struct ContactPosition *position;
     {
@@ -35,7 +35,7 @@ void SceneActorBehavior_UpdateColliders(struct SceneActorBehaviorView *inputActo
         if (Test(*(u16 *)((u32)actor + offset), mask)) {
             primary->flags |= 4;
             {
-                register u32 offset asm("r0") = 0x2D6;
+                u32 offset = 0x2D6;
                 field = (void *)((u32)actor + offset);
             }
             goto clearAndReturn;
@@ -44,7 +44,7 @@ void SceneActorBehavior_UpdateColliders(struct SceneActorBehaviorView *inputActo
     {
         u32 category = actor->category;
         if ((u32)(category - 12) <= 1 || category == 23) {
-            register u16 *address asm("r0") = &actor->flags2D6;
+            u16 *address = &actor->flags2D6;
             u32 mask = ~0x4000;
             mask &= *address;
             *address = mask;
@@ -66,7 +66,7 @@ void SceneActorBehavior_UpdateColliders(struct SceneActorBehaviorView *inputActo
 disable:
     primary->flags |= 4;
     {
-        register u32 offset asm("r1") = 0x2D6;
+        u32 offset = 0x2D6;
         field = (void *)((u32)actor + offset);
     }
 clearAndReturn: {

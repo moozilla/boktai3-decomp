@@ -76,7 +76,7 @@ int sub_0802D9F8(void *unused, struct Actor *p)
             if (p->flashing && !(gUnk_030053F4 & 0x200))
                 p->timer = p->duration;
             else {
-                register s16 *timer asm("r0") = &p->timer;
+                s16 *timer = &p->timer;
                 int zero;
                 zero = 0;
                 asm("" : "+r"(zero));

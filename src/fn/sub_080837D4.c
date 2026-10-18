@@ -37,7 +37,7 @@ void SceneActorControl_ConsumeLiftFlag(struct SceneActorRegistryResetView *actor
     state = SceneActorControl_GetMotionState(actor);
     if (LiftFlag(state)) {
         u32 *flags = &state->flags3D4;
-        register u32 clearMask asm("r1");
+        u32 clearMask;
         u8 *parameters;
         register u32 bit asm("r0");
         register u32 old asm("r1");

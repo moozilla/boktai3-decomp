@@ -147,13 +147,13 @@ void sub_08038AD4(struct P *input)
             shift += 4;
         } while (i <= 3);
         if (({
-                register int v asm("r0") = total;
+                int v = total;
                 v;
             }) > 0)
             sub_080397D4(3, 1);
         {
-            register u32 v asm("r2") = packed;
-            register u32 shifted asm("r1");
+            u32 v = packed;
+            u32 shifted;
             shifted = v << 16;
             data |= shifted;
         }

@@ -54,9 +54,8 @@ static inline void setAngle(struct SceneNpc *npc, s32 angle)
         npc->facing8 = m;
     }
     {
-        register s32 t asm("r0") = a + 0x60;
+        s32 t = a + 0x60;
         u32 m;
-        asm("" : "+r"(t));
         t >>= 6;
         m = 3;
         m &= t;

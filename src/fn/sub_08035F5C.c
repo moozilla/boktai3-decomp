@@ -46,7 +46,7 @@ int sub_08035F5C(struct Engine *p)
 {
     int flags = p->mask;
     struct RfuLinkStatus **links;
-    register int one asm("r6");
+    int one;
     u8 *slot;
     int index;
     if (flags & 2)

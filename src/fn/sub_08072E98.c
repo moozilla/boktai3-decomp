@@ -32,14 +32,14 @@ u8 SceneActorContacts_TestPlayerCondition(struct SceneActorContactObjectView *ob
         struct Player *input = player;
 
         struct Player *player = input;
-        register u32 offset asm("r4") = 0x538;
+        u32 offset = 0x538;
         u32 value;
-        register u32 result asm("r1");
+        u32 result;
         value = *(u16 *)((u32)input + offset);
         if (value) {
             offset -= 4;
             {
-                register u16 *field asm("r0") = (void *)((u32)input + offset);
+                u16 *field = (void *)((u32)input + offset);
                 value = *field;
             }
             if (value == condition) {
@@ -50,9 +50,9 @@ u8 SceneActorContacts_TestPlayerCondition(struct SceneActorContactObjectView *ob
         }
         if (!condition) {
             if (player) {
-                register u32 fieldOffset asm("r1") = 0x448;
+                u32 fieldOffset = 0x448;
                 u32 mask;
-                register u32 *field asm("r0");
+                u32 *field;
                 field = (void *)((u32)player + fieldOffset);
                 mask = 4;
                 if (*field & mask) {
@@ -68,7 +68,6 @@ u8 SceneActorContacts_TestPlayerCondition(struct SceneActorContactObjectView *ob
             u32 mask;
             register u32 *field asm("r0");
             u32 value;
-            asm("" : "+r"(fieldOffset));
             field = (void *)((u32)player + fieldOffset);
             mask = 0x40;
             value = *field & mask;

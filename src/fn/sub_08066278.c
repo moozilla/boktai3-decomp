@@ -113,14 +113,14 @@ gotManager:
      * each reconstructed pointer still points to its output local. */
     {
         u32 base = (u32)&xOffset - 0xC;
-        register s32 *low asm("r0");
+        s32 *low;
         asm("" : "+&r"(base));
         low = (s32 *)(base + 0xC);
         xPointer = low;
     }
     {
         register u32 base asm("r1") = (u32)&zOffset - 0x10;
-        register s32 *low asm("r1");
+        s32 *low;
         asm("" : "+&r"(base));
         low = (s32 *)(base + 0x10);
         zPointer = low;
@@ -153,8 +153,8 @@ gotManager:
     }
     {
         u8 *status = slot->status;
-        register s32 zero asm("r2") = 0;
-        register u8 *phase asm("r4");
+        s32 zero = 0;
+        u8 *phase;
         s16 *threshold;
         s32 *counter;
         phase = slot->phase;
@@ -238,7 +238,6 @@ gotManager:
         slot->offset = (*followPointer)->offset;
     } else {
         struct ContactPosition *offset = &slot->offset;
-        asm("" : "+r"(offset));
         clear = 0;
         {
             u32 *source = &clear;
@@ -272,13 +271,13 @@ gotManager:
             break;
     }
     {
-        register u8 *lowFrame asm("r0") = framePointer;
+        u8 *lowFrame = framePointer;
         Anim_SetSequence(sequencePointer, sequence, *lowFrame, 0, 0);
     }
     {
-        register struct ContactPosition *lowAnchor asm("r1") = anchor;
+        struct ContactPosition *lowAnchor = anchor;
         struct ContactPosition position;
-        register struct ActorAttachmentPartSprite *lowPart asm("r2");
+        struct ActorAttachmentPartSprite *lowPart;
         slot->anchor = lowAnchor;
         position = *lowAnchor;
         lowPart = part;
@@ -286,12 +285,12 @@ gotManager:
     }
     {
         u32 one = 1;
-        register u8 *maskLow asm("r3");
+        u8 *maskLow;
         maskLow = partMaskPointer;
         *maskLow = one;
     }
     {
-        register u8 *activeLow asm("r0") = activePointer;
+        u8 *activeLow = activePointer;
         *activeLow = 0;
     }
 

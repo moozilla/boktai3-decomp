@@ -57,7 +57,7 @@ s32 SceneActorBehavior_DispatchPendingFlags(struct SceneActorRegistryActor *acto
     asm("" : "+r"(offset));
     phase = (u8 *)base + offset;
     {
-        register u32 bit asm("r2") = 4;
+        u32 bit = 4;
         register u16 *pointer asm("r1");
         pointer = &base->flags2D6;
         first = *pointer & bit;

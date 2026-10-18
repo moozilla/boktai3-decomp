@@ -12,7 +12,7 @@ static inline u8 IsUnavailable(struct SceneActorRegistryActor *input)
         goto zero;
     {
         u32 mask;
-        register u32 offset asm("r3");
+        u32 offset;
         u32 *field;
         u32 value;
         mask = 0x40;
@@ -45,11 +45,10 @@ static inline u8 IsScenePaused(void)
 }
 static inline u32 ReadSuppressionFlag(struct SceneActorRegistryActor *actor)
 {
-    register u32 mask asm("r1") = 0x800;
+    u32 mask = 0x800;
     register u32 offset asm("r2") = 0x2d0;
     register u32 *field asm("r0");
     u32 value;
-    asm("" : "+r"(offset) : "r"(mask));
     field = (void *)((u8 *)actor + offset);
     value = *field;
     value &= mask;
@@ -69,15 +68,15 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
     if (actor) {
         u32 zero = 0;
         u32 one = 1;
-        register const void *defaultControl asm("r10") = (const void *)sub_0807FC90;
+        const void *defaultControl = (const void *)sub_0807FC90;
         do {
             u32 *flags;
             s16 *health;
             u32 primary;
             {
-                register u32 mask asm("r2") = 2;
-                register u32 offset asm("r3") = 0x2cc;
-                register u32 *field asm("r1");
+                u32 mask = 2;
+                u32 offset = 0x2cc;
+                u32 *field;
                 u32 value;
                 field = (void *)((u8 *)actor + offset);
                 value = *field;
@@ -120,7 +119,7 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
                     u8 *field;
                     field = (u8 *)actor + offset;
                     {
-                        register u32 entry asm("r3") = one;
+                        u32 entry = one;
                         *field = entry;
                     }
                     offset -= 2;
@@ -130,11 +129,10 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
                     field = (u8 *)actor + substateOffset;
                     *field = code;
                     {
-                        register u32 controlOffset asm("r1") = 0x21c;
+                        u32 controlOffset = 0x21c;
                         field = (u8 *)actor + controlOffset;
                         {
-                            register const void *control asm("r2") = defaultControl;
-                            asm("" : "+r"(control));
+                            const void *control = defaultControl;
                             *(const void **)field = control;
                         }
                     }
@@ -143,7 +141,7 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
                     *(u16 *)field = zero;
                     {
                         u32 *flags114 = &actor->flags114;
-                        register u32 mask asm("r1") = ~1;
+                        u32 mask = ~1;
                         u32 value;
                         value = *flags114;
                         value &= mask;
@@ -151,7 +149,6 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
                     }
                     {
                         register u32 fieldOffset asm("r1") = 0x104;
-                        asm("" : "+r"(fieldOffset));
                         field = (u8 *)actor + fieldOffset;
                         *(u32 *)field = zero;
                     }
@@ -199,9 +196,8 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
                 }
                 {
                     u32 specialCopy = special;
-                    asm("" : "+r"(specialCopy));
                     if (specialCopy) {
-                        register u32 offset asm("r3");
+                        u32 offset;
                         register u32 *field asm("r1");
                         u32 value;
                         specialCopy = 0x400000;

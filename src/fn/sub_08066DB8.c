@@ -1,7 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
 // fuzzy: 95.9%
-// MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_manager.h"
 /* Unsupported kind127/frame0 is reached by49258 and4AB40. It forwards the
  * final parts-release result. On frame127, unsupported kinds preserve the
@@ -11,16 +10,15 @@ ActorAttachment_UpdateFromDescriptor(struct ActorAttachmentSlotView *slot,
                                      struct ActorAttachmentFollowView *descriptor, u32 inputKind,
                                      u32 inputFrame, s16 *value, u32 inputCount, s32 z, s32 y)
 {
-    register u32 kind asm("r8");
-    register u32 frame asm("r6");
-    register u32 count asm("r9");
+    u32 kind;
+    u32 frame;
+    u32 count;
     u32 action;
     struct ActorAttachmentSlotView *fallback;
     {
-        register struct ActorAttachmentSlotView *original asm("r0") = slot;
-        asm("" : "+r"(original));
+        struct ActorAttachmentSlotView *original = slot;
         {
-            register u32 rawCount asm("r1") = inputCount;
+            u32 rawCount = inputCount;
             inputKind = (u8)inputKind;
             kind = inputKind;
             frame = (u8)inputFrame;
@@ -56,17 +54,15 @@ ActorAttachment_UpdateFromDescriptor(struct ActorAttachmentSlotView *slot,
     slot = ActorAttachment_ReleaseResource(slot, 5, descriptor->identity);
     fallback = ActorAttachment_ReleasePartsResource(slot, 3, descriptor->identity);
     {
-        register u32 mask asm("r2") = 4;
-        register u32 bits asm("r1");
-        asm("" : "+r"(mask));
+        u32 mask = 4;
+        u32 bits;
         bits = descriptor->flags & mask;
         action = 0;
         if (bits)
             action = 255;
     }
     {
-        register u32 selectedKind asm("r1") = kind;
-        asm("" : "+r"(selectedKind));
+        u32 selectedKind = kind;
         switch (selectedKind) {
             case 0:
                 return ActorAttachment_CreateSpriteSlot(

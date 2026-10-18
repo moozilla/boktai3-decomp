@@ -61,7 +61,7 @@ static inline int trunc12(int x)
 }
 static inline void decay(s16 *p)
 {
-    register s16 *dst asm("r1") = p;
+    s16 *dst = p;
     u32 old = (u16)*dst;
     register int next asm("r0");
     next = *dst > 23 ? old - 24 : 0;
@@ -73,14 +73,14 @@ void sub_08026DE0(ActorAnimation *p)
     ActorAnimation *p2 = p;
     u32 zero;
     if (p->changed) {
-        register int sequence asm("r5");
+        int sequence;
         int angle;
         p->changed = 0;
         angle = p->angle;
         setFacing(p, angle);
         sequence = choose(p->mode, 49, 11);
         {
-            register int offset asm("r0") = 0x240;
+            int offset = 0x240;
             SceneActors_StartDirectionalAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence, 2,
                                                   1, 4);
         }

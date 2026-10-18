@@ -61,7 +61,7 @@ int sub_0803A618(int indexArg, int amountArg, int pendingArg)
     {
         int size = 0xb0;
         int scaled;
-        register int extra asm("r2");
+        int extra;
         int offset;
         scaled = index * size;
         extra = 0x89c;
@@ -72,14 +72,14 @@ int sub_0803A618(int indexArg, int amountArg, int pendingArg)
             register u8 *first asm("r1");
             u8 *second;
             register u8 *dest asm("r5");
-            register int total asm("r2");
+            int total;
             extra = 0x5dc;
             offset = scaled + extra;
             current = (struct Item *)((u8 *)owner + offset);
             if (target->unused) {
                 first = owner->pending;
                 {
-                    register int slot asm("r0") = index;
+                    int slot = index;
                     dest = first + slot;
                 }
                 total = *dest;
@@ -92,7 +92,7 @@ int sub_0803A618(int indexArg, int amountArg, int pendingArg)
             } else {
                 first = owner->current;
                 {
-                    register int slot asm("r2") = index;
+                    int slot = index;
                     dest = first + slot;
                 }
                 total = *dest;
@@ -136,7 +136,7 @@ int sub_0803A618(int indexArg, int amountArg, int pendingArg)
         }
     }
     {
-        register int value asm("r1") = amount;
+        int value = amount;
         int zero;
         if (value > 10)
             value = 10;

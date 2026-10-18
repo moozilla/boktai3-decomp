@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "damage_number_display.h"
 void sub_08217E60(void *, void *, u32);
 void sub_08217EC4(void *, s32, s32);
@@ -9,8 +8,8 @@ s32 DamageNumberDisplay_Initialize(struct DamageNumberDisplay *display)
     struct DamageNumberGlyph *digit;
     s32 i;
     s32 remaining;
-    register struct DamageNumberGroup *nextGroup asm("r8");
-    register s32 nextIndex asm("r9");
+    struct DamageNumberGroup *nextGroup;
+    s32 nextIndex;
     gUnk_02000074 = display;
     display->resource = AnimData_FindEntry(0x1C1C);
     display->activeMask = 0;
@@ -23,7 +22,7 @@ s32 DamageNumberDisplay_Initialize(struct DamageNumberDisplay *display)
             nextIndex = next;
         }
         {
-            register u32 offset asm("r0") = sizeof(*group);
+            u32 offset = sizeof(*group);
             nextGroup = (struct DamageNumberGroup *)(offset + (u32)group);
         }
         remaining = 3;
@@ -37,7 +36,7 @@ s32 DamageNumberDisplay_Initialize(struct DamageNumberDisplay *display)
         } while (remaining >= 0);
         group->priority = 3;
         {
-            register u32 zero asm("r1") = 0;
+            u32 zero = 0;
             group->digitCount = zero;
         }
         i = nextIndex;

@@ -65,7 +65,7 @@ void sub_080251C4(ActorAnimation *p, int tick)
                 sequence = 0;
         }
         {
-            register int offset asm("r2") = 0x240;
+            int offset = 0x240;
             SceneActors_StartEightDirectionAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence,
                                                      1, 1, 4);
         }
@@ -84,7 +84,7 @@ void sub_080251C4(ActorAnimation *p, int tick)
                 sequence = 0;
         }
         {
-            register int offset asm("r2") = 0x240;
+            int offset = 0x240;
             SceneActors_StartEightDirectionAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence,
                                                      1, 1, 1);
         }

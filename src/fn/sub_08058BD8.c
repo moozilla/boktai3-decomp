@@ -51,7 +51,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
         height = layer->height * 2;
     }
     {
-        register s32 x asm("r5"), z asm("r4"), sum asm("r4");
+        s32 x, z asm("r4"), sum asm("r4");
         s32 y;
         const struct ContactPosition *origin;
         projectedPointer = &projected;
@@ -66,16 +66,15 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
             projectedPointer->x = scaleSceneOverlay(value);
         }
         {
-            register s32 subtotal asm("r1") = x + z;
+            s32 subtotal = x + z;
             s32 value;
             value = scaleSceneOverlay(3 * subtotal);
-            asm("" : "+r"(value));
             sum = value;
         }
         y = scaleSceneOverlay(3 * origin->y);
         projectedPointer->y = sum - y;
         {
-            register s32 projectedZ asm("r0") = sum + y;
+            s32 projectedZ = sum + y;
             projectedPointer->z = projectedZ;
         }
     }
@@ -175,7 +174,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
             if (maxX < 0 || maxY < 0 || minX > 31 || minY > 31)
                 goto nextSlot;
             {
-                register struct SceneOverlayLayer *strideLayer asm("r5") = &gUnk_03004CC0;
+                struct SceneOverlayLayer *strideLayer = &gUnk_03004CC0;
                 blockStride = strideLayer->width >> 4;
             }
             if (target == 5) {
@@ -209,16 +208,15 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                     register struct SceneOverlayMapEntry *destination asm("r1"),
                         *mapEntries asm("r3");
                     destination = entryPointer;
-                    asm("" : "+r"(destination));
                     mapEntries = entries;
                     offset += (u32)mapEntries;
                     *destination = *(struct SceneOverlayMapEntry *)offset;
                 }
                 {
                     register void **mapSlot asm("r0");
-                    register struct ScenePanel *mapPanel asm("r4") = panel;
-                    register u32 mapOffset asm("r5") = 0x4DC;
-                    register struct SceneOverlayMapEntry *copied asm("r3");
+                    struct ScenePanel *mapPanel = panel;
+                    u32 mapOffset = 0x4DC;
+                    struct SceneOverlayMapEntry *copied;
                     u32 relative;
                     mapSlot = (void *)((u8 *)mapPanel + mapOffset);
                     copied = entryPointer;
@@ -227,7 +225,6 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                         u32 mapBase = (u32)*mapSlot;
                         relative += mapBase;
                         copied->blocks = (void *)relative;
-                        asm("" : : "m"(gUnk_03004CC0), "r"(mapBase), "r"(copied), "r"(relative));
                         gUnk_03004CC0.map = (void *)relative;
                         blocks = (void *)relative;
                     }
@@ -279,7 +276,6 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                             }
                             dx &= ringMask;
                             dy &= ringMask;
-                            asm("" : "+r"(dx), "+r"(dy));
                             {
                                 s32 scaled = truncate1(dx);
                                 asm("" : "+r"(scaled));

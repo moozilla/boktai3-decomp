@@ -3,8 +3,8 @@
 void Effect_Remove(void *);
 static inline u8 Occupied(struct ActorAttachmentManagerView *manager, s32 i)
 {
-    register u32 *mask asm("r0") = &manager->occupiedMask;
-    register u32 bit asm("r1");
+    u32 *mask = &manager->occupiedMask;
+    u32 bit;
     bit = 1;
     if (*mask & (bit << i))
         return TRUE;
@@ -16,7 +16,7 @@ s32 ActorAttachment_DestroyManager(struct ActorAttachmentManagerView *manager)
     for (i = 0; i < 8; i++) {
         if (Occupied(manager, i)) {
             struct ActorAttachmentSlotView *slot = &manager->slots[i];
-            register s32 j asm("r6") = 0;
+            s32 j = 0;
             struct ActorAttachmentPartSprite *part;
             part = slot->parts;
             do {
@@ -32,7 +32,7 @@ s32 ActorAttachment_DestroyManager(struct ActorAttachmentManagerView *manager)
         }
     }
     {
-        register struct ActorAttachmentManagerView *empty asm("r1") = 0;
+        struct ActorAttachmentManagerView *empty = 0;
         gUnk_02000124 = empty;
     }
     return 0;
