@@ -430,3 +430,4 @@ addr,function,name,family,note
 0816DEA8,sub_0816DEA8,InventoryGrid_BeginNumberPhase,"InventoryGrid","shows the numeric value after icon motion completes"
 0816DF48,sub_0816DF48,InventoryGrid_BeginIconTransfer,"InventoryGrid","transfers a selected inventory icon toward the fixed display position"
 0816E014,sub_0816E014,InventoryGrid_ShowNumber,"InventoryGrid","renders a positive four-digit value with leading zeroes hidden"
+0816E140,sub_0816E140,InventoryGrid_BeginNumberPhaseAlternate,"InventoryGrid","shows the numeric value and enters the alternate delayed phase"
