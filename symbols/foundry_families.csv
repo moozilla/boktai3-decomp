@@ -412,3 +412,4 @@ addr,function,name,family,note
 08168D20,sub_08168D20,SceneHud_ApplySecondarySelection,"SceneHud","applies selected secondary action to the HUD action owner"
 08168E38,sub_08168E38,SceneHud_CanOpenSecondarySelection,"SceneHud","tests player input and state gates for secondary selection"
 08169EDC,sub_08169EDC,StatusPanel_ResetSelectionAnimations,"StatusPanel","clears three animation flags and loads selection keyframes"
+0816A1E0,sub_0816A1E0,StatusPanel_UpdateGaugePosition,"StatusPanel","maps current plus increment onto a 79-pixel gauge"
