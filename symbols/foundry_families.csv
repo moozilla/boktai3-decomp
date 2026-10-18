@@ -226,3 +226,4 @@ addr,function,name,family,note
 0811ADF0,sub_0811ADF0,Terrain_GetHeightAtPosition,"Terrain","reads terrain height for fixed-point X/Z"
 0811B2FC,sub_0811B2FC,SpatialIndex_InsertEntry,"SpatialIndex","prepends entry to one of two horizontal bucket lists"
 0811B498,sub_0811B498,Bounds_TestOverlap,"Bounds","tests overlap of three-dimensional axis-aligned bounds"
+0811B5F0,sub_0811B5F0,Collision_ProcessGroups,"Collision","processes ten collision groups and frees temporary list nodes"
