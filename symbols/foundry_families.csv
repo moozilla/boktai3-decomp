@@ -611,3 +611,4 @@ addr,function,name,family,note
 0810E3A0,sub_0810E3A0,SelectionPanel_UpdateConfirmTransition,"SelectionPanel","updates a thirty-two-frame confirmation transition"
 0810E450,sub_0810E450,SelectionPanel_UpdateCancelTransition,"SelectionPanel","updates a thirty-two-frame cancellation transition"
 0810E660,sub_0810E660,SceneTask_UpdateConditionalCallback,"Scene callback tasks","kills an inactive scene task under flag 0x800, otherwise invokes its callback"
+0810F2DC,sub_0810F2DC,SceneTask_UpdateTextDelay,"Scene text tasks","refreshes a text window after ten ticks and retires the task on scene states 21 or 23"
