@@ -381,3 +381,4 @@ addr,function,name,family,note
 0815BE5C,sub_0815BE5C,PlayerCue_BeginModeSeven,"PlayerCue","starts cue seven with a selected phase and facing"
 0815DC48,sub_0815DC48,PlayerCue_InitCollider,"PlayerCue","initializes the player cue collider and facing angle"
 0815DD3C,sub_0815DD3C,Player_ScaleLevelValue,"Player/GameState","scales a level-derived value with a state adjustment"
+0815E63C,sub_0815E63C,PlayerContact_ApplyStatReward,"Player contact response","Applies gated contact response and proportional stat gain."
