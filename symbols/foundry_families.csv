@@ -1244,3 +1244,4 @@ addr,function,name,family,note
 081FE92C,sub_081FE92C,RisingActorConfig_Initialize,"Rising actor controller configuration (tentative)","clears configuration and installs callback and default durations"
 081FEA80,sub_081FEA80,RisingActorManager_BeginRaise,"Rising actor manager (tentative)","selects raising callback for an active lowered actor slot"
 081FEB38,sub_081FEB38,SlotController_IsSlotIdle,"SlotController","tests whether an active slot has state zero"
+081FEB84,sub_081FEB84,SlotController_SetSlotFlag2,"SlotController","sets flag two on an active slot"
