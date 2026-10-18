@@ -727,3 +727,4 @@ addr,function,name,family,note
 08159C0C,sub_08159C0C,Player_BeginInterpolatedMovement,"Player","saves movement endpoints and duration and starts animation"
 08159E28,sub_08159E28,Player_ResetPositionState,"Player","sets position and clears position-reset counters and contact state"
 08159EC0,sub_08159EC0,Player_ResetModePosition,"Player","copies position and resets phase fields for kind one mode 0x1A"
+0815A11C,sub_0815A11C,Player_AdvanceTetherPhase,"Player","advances selected tether mode phases"
