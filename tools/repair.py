@@ -16,7 +16,7 @@ real difference in shape, which the report lists (calls or stores the ROM
 has and the C lacks, and the reverse) as hints.
 
 FILE.c must hold FUNC alone (tools/isolate.py). Without --write the result
-goes to build/repair/FUNC.c.
+goes to build/repair/FUNC.c (or --out-dir).
 """
 import argparse
 import difflib
@@ -116,8 +116,9 @@ class Repair:
             self.cc.pre, _ = permute.prepare_source(os.path.relpath(tmp, ROOT), self.func)
         except Exception:
             return None, None
+        self.cc.cache.clear()  # a cache hit would leave last_asm stale
         d, _ = self.cc.run()
-        if d is None:
+        if d is None or not self.cc.last_asm:
             return None, None
         obj = self.cc.resolver.assemble(self.cc.last_asm, self.cc.work)
         mine, _ = self.cc.resolver.bytes_of(obj, self.func)
@@ -193,15 +194,17 @@ class Repair:
         for desc, spans in out:
             if len(spans) == 1 and not desc.startswith("every"):
                 u, v = desc.split(" -> ")
-                by_delta.setdefault(int(v, 0) - int(u.lstrip("-"), 0), {})[spans[0][:2]] = spans[0]
+                if u.startswith("-") or v.startswith("-"):
+                    continue
+                by_delta.setdefault(int(v, 0) - int(u, 0), {})[spans[0][:2]] = (spans[0], int(u, 0))
         for delta, group in by_delta.items():
             if abs(delta) >= 0x1000:
                 continue
             if len(group) > 1:
-                out.append((f"every pair moved by {delta:+#x}", list(group.values())))
+                out.append((f"every pair moved by {delta:+#x}", [sp for sp, _ in group.values()]))
             # fields addressed relative to their neighbours never show up in
             # the code, so also move every literal inside the pairs' range
-            us = [int(body[a:b], 0) for a, b in group]
+            us = [u for _, u in group.values()]
             lo, hi = min(us), max(us)
             if hi > lo:
                 inside = [(a, b, (f"0x{val + delta:X}" if raw.lower().startswith("0x") else str(val + delta)))
@@ -277,10 +280,11 @@ def main():
     ap.add_argument("func")
     ap.add_argument("--write", action="store_true", help="rewrite FILE.c")
     ap.add_argument("--rounds", type=int, default=20)
+    ap.add_argument("--out-dir", help="write FUNC.c here (default build/repair)")
     a = ap.parse_args()
     r = Repair(a.file, a.func)
     start, best, text, log, er, ec = r.run(a.rounds)
-    dst = a.file if a.write else os.path.join(r.work, f"{a.func}.c")
+    dst = a.file if a.write else os.path.join(a.out_dir or r.work, f"{a.func}.c")
     if log:
         open(dst, "w").write(text)
     print(f"{a.func}: {start} -> {best} halfwords off" + (f", written to {os.path.relpath(dst, ROOT)}" if log else ""))
