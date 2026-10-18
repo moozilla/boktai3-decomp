@@ -1212,3 +1212,4 @@ addr,function,name,family,note
 081F6078,sub_081F6078,SceneActors_UpdateTimedAnimationReset,"SceneActors","resets motion fields and completes animation at tick thirty-five"
 081F61A0,sub_081F61A0,SceneActors_UpdateOrbitingParticleAnimation,"SceneActors / SceneParticles","spawns particles around an animated actor until tick sixty"
 081F72E8,sub_081F72E8,SceneActor_UpdateDirectionalTrigger,"Scene actor (auto, tentative), directional state callback","updates direction indices and consumes a pending trigger"
+081F7AA4,sub_081F7AA4,AnimationActor_ProcessKeys,"AnimationActor","cycles animation and randomizes target position from shoulder keys"
