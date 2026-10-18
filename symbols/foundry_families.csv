@@ -1256,3 +1256,4 @@ addr,function,name,family,note
 08204D84,sub_08204D84,EnemyD459_UpdateAttackTiming,"Enemy D 459 (auto, tentative)","starts projectile attacks using scheduled or periodic timing"
 08204E5C,sub_08204E5C,SceneSequence_UpdateCountdown,"Scene countdown sequence actor","counts down then selects sequence two and changes update callback"
 08205948,sub_08205948,Ooze_InitAttackCollider,"Ooze","initializes variant-dependent attack collider"
+08205AD0,sub_08205AD0,Ooze_UpdateAttackDelay,"Ooze","schedules attack state from table or periodic delay"
