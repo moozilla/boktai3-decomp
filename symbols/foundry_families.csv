@@ -396,3 +396,4 @@ addr,function,name,family,note
 081641C4,sub_081641C4,ResultPanel_DrawCappedSmallCounters,"ResultPanel (tentative)","pass two counters capped at 999 to the number renderer"
 08164224,sub_08164224,StatDisplay_DrawPlayerValue,"StatDisplay","draws player stat ratio with form-dependent scaling"
 081651B0,sub_081651B0,SceneHud_PlayActionChangeCue,"Scene HUD","plays a cue when the action selection changes"
+0816599C,sub_0816599C,MenuInput_ReadDirectionRepeat,"MenuInput","reads pressed directions with ten-call held repeat"
