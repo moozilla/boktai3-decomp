@@ -207,3 +207,4 @@ addr,function,name,family,note
 08112D6C,sub_08112D6C,PanelKeyframeSprite_Create,"PanelKeyframeSprite","allocates a resource-backed sprite and starts keyframes"
 081136B0,sub_081136B0,SpriteEffect_RemoveWithBurst,"SpriteEffect","removes an active sprite and spawns a burst with sound"
 08114464,sub_08114464,SlotRegistry_ClaimMatchingSlot,"SlotRegistry","claims the first active unclaimed slot with matching ID"
+0811455C,sub_0811455C,,"unassigned empty callback",""
