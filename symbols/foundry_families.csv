@@ -1142,3 +1142,4 @@ addr,function,name,family,note
 081DA770,sub_081DA770,TimedEffect_GetOrCreateManager,"TimedEffect","gets resource 4E01 or creates manager with capacity clamped to 12 through 32"
 081DA7D0,sub_081DA7D0,TimedEffect_FindFreeEntry,"TimedEffect","returns first inactive entry and writes its slot index"
 081DAD28,sub_081DAD28,Task4E01_RemoveEntry,"Task4E01 entries","release an active indexed task entry"
+081DAEA0,sub_081DAEA0,Task4E01_GetKind7Value,"Task4E01 entries","read signed value from a kind-seven entry"
