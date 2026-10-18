@@ -1227,3 +1227,4 @@ addr,function,name,family,note
 081FAD14,sub_081FAD14,SceneDistance_UpdateActor,"SceneDistanceActor","updates metrics, selects position on proximity change, runs state and effects"
 081FAD74,sub_081FAD74,Ratatosk_Destroy,"Ratatosk","kills child tasks and destroys Ratatosk actor components"
 081FB82C,sub_081FB82C,OverlaySlot_Initialize,"Overlay slot manager (tentative)","initializes motion, position and drawable slot"
+081FBDE0,sub_081FBDE0,SlotMotion_Initialize,"Overlay slot motion (tentative)","clears motion state and sets duration, mode, callback and scale"
