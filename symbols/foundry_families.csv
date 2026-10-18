@@ -1264,3 +1264,4 @@ addr,function,name,family,note
 08209A38,sub_08209A38,CombatActor_UpdateDefeatEffect,"CombatActor","emits a defeat effect and records defeat at timer one"
 0820A2C8,sub_0820A2C8,FanCannonManager_Update,"FanCannon","updates occupied cannon slots and stops sound when none are active"
 0820A364,sub_0820A364,FanCannonManager_Destroy,"Fan cannon manager","stops cannon sound and removes all active cannons"
+0820C984,sub_0820C984,SceneDrawablePair_SetFlags,"Scene paired drawable owner (tentative)","sets bit two in paired halfword flags and bit zero in owner flags"
