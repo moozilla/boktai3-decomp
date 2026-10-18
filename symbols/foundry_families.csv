@@ -939,3 +939,4 @@ addr,function,name,family,note
 0818E910,sub_0818E910,SceneEffectPool_Update,"SceneEffectPool","copies owner position and updates effect callbacks"
 0818EBF4,sub_0818EBF4,ScenePanelEffect_InitPool,"ScenePanelEffect","starts script and initializes effect slots and colliders"
 0818F218,sub_0818F218,EffectPool_AllocateSlot,"EffectPool","claims the first free slot in a 24-entry effect pool"
+0818F444,sub_0818F444,Nidhoggr_CreateBurstEffects,"Nidhoggr effect pool (tentative)","creates six moving sprite effects and an explosion at a position"
