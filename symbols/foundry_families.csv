@@ -219,3 +219,4 @@ addr,function,name,family,note
 08116918,sub_08116918,MotionActor_ParsePosition,"MotionActor","parses fixed-point position and limit from script"
 08116C74,sub_08116C74,LinkParticipant_IsLocallySelected,"LinkParticipant","permits the selected participant while link-selection mode is active"
 08116D14,sub_08116D14,MotionActor_RunPendingScript,"MotionActor","runs requested script and clears pending state"
+08116DA0,sub_08116DA0,MotionActor_RunDelayedScript,"MotionActor","runs and consumes a script after sixty frames"
