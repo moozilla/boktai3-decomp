@@ -553,3 +553,4 @@ addr,function,name,family,note
 080FC8D4,sub_080FC8D4,ActorCollision_InitThreeAuxiliaryAttacks,"SceneActor auxiliary attack colliders","initializes three auxiliary colliders using attack slot three"
 080FD334,sub_080FD334,ActorGroup_BeginMotionPhase,"SceneActor group state callbacks","starts group control and transitions to phase two on completion"
 080FD840,sub_080FD840,SceneActorControl_EndExtendedPhase,"SceneActorControl","sets channel targets and returns to behavior 3"
+080FD8FC,sub_080FD8FC,SceneActorControl_UpdateControl2APhase,"SceneActorControl","enters control 0x2A and returns to behavior 4 on completion"
