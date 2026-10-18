@@ -304,3 +304,4 @@ addr,function,name,family,note
 08135C08,sub_08135C08,SceneActorPlacement_BeginDestinationJump,"SceneActorPlacement","sets jump velocity toward a saved destination"
 081369C8,sub_081369C8,SceneActorPlacement_ResetStateThree,"SceneActorPlacement","restores saved control and initializes state three"
 08136C80,sub_08136C80,SceneActorPlacement_HideActor,"SceneActorPlacement","sets hidden drawable flags and disables the shadow"
+08136DFC,sub_08136DFC,SceneActorPlacement_ShowActor,"SceneActorPlacement","clears hidden flags and enables the shadow"
