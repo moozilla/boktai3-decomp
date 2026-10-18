@@ -213,3 +213,4 @@ addr,function,name,family,note
 08115268,sub_08115268,ActorParticles_SpawnAlternatingBurst,"ActorParticles","spawns four particles with alternating settings"
 08115924,sub_08115924,ActorParticles_InitPool,"ActorParticles","initializes 48 animated particle slots"
 08115FAC,sub_08115FAC,CallbackPool_RemoveSmallSprites,"SmallCallbackPool","removes small-pool sprites and clears the global pool pointer"
+08115FE0,sub_08115FE0,ActorParticles_InitCompactPool,"ActorParticles","initializes 16 compact animated particle slots"
