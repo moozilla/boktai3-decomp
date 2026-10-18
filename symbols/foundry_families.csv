@@ -809,3 +809,4 @@ addr,function,name,family,note
 08178B98,sub_08178B98,Hud_UpdateWithCallback,"Field HUD","binds local player then runs optional HUD callback and update"
 08178BCC,sub_08178BCC,SceneHud_DestroyOwner,"SceneHud","removes owner widgets and restores the HUD mode"
 08179194,sub_08179194,FieldHud_RefreshModeEight,"Field HUD","refreshes mode-eight values and HUD widgets"
+081793D0,sub_081793D0,FieldHud_RefreshGaugeIndex,"Field HUD","requests an index update when gauge fill changes"
