@@ -356,3 +356,4 @@ addr,function,name,family,note
 0811DF78,sub_0811DF78,ScriptOptions_LoadTargets,"ScriptOptions","load six records from script keyword t"
 0811E038,sub_0811E038,ScriptOptions_LoadWideRecords,"ScriptOptions","load six sixteen-byte records from keyword w"
 0811E134,sub_0811E134,ScriptOptions_LoadShortRecords,"ScriptOptions","load six twelve-byte records from keyword s"
+0812B7F8,sub_0812B7F8,PursuingActor_TurnTowardPlayer,"pursuing actor","turns toward player with decaying turn speed and delay"
