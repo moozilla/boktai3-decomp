@@ -1382,3 +1382,4 @@ addr,function,name,family,note
 082397B0,sub_082397B0,ActorEffect_SelectModeFlag,"ActorEffect","selects effect flag four or eight using actor and global state"
 0823A550,sub_0823A550,ActorEffect_TestStatusFlags,"ActorEffect","returns ten when any status flag from bit seven through eleven is set"
 0823A590,sub_0823A590,Player_NotifyFirstSelectedSlot,"Player","notifies the first selected player slot when event flags qualify"
+0823AA28,sub_0823AA28,Player_InitializeActionState,"Player","initializes action state and selects its callback"
