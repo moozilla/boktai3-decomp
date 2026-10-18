@@ -241,3 +241,4 @@ addr,function,name,family,note
 0811DC30,sub_0811DC30,ClockDisplay_DrawBaseTime,"ClockDisplay","draw base hour minute and state value"
 0811DCC4,sub_0811DCC4,StateFlags_SetCategoryBit,"StateFlags","sets a bit in one of six persistent flag categories"
 0811DD94,sub_0811DD94,StateFlags_GetCategoryBit,"StateFlags","returns the masked bit from a persistent flag category"
+0811E224,sub_0811E224,ScriptRecord_ReadEntries,"ScriptRecord","reads up to six five-value script records and an option"
