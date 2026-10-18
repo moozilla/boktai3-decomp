@@ -1317,3 +1317,4 @@ addr,function,name,family,note
 08227900,sub_08227900,ResourceLookup_FindValue,"Resource lookup","binary searches sorted u16 key-value pairs and returns zero when absent"
 08227950,sub_08227950,Palette_GetStateBlendIndices,"Palette controller","returns source and destination palette indices for the current palette state"
 08228090,sub_08228090,GameStats_SelectLeadingCounter,"GameState statistics counters","select unique largest counter after division by 54000"
+08229078,sub_08229078,SunClock_SetMoonAge,"Clock and sun schedule (tentative)","stores lunar age in tenths and selects one of eight moon phases"
