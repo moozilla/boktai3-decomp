@@ -83,6 +83,12 @@ sub_0818C0BC (546 instructions, a jump table, 17 checks) and sub_0812DC28
   drafts.
 * **The register solver** converted 1 of 3 register-only residues.
 
+**Link names.** check.py resolves `sub_XXXXXXXX` and `D_XXXXXXXX` from the
+address, but the ROM link does not when a function has a real name. Seven
+matches failed the combined build that way. The context pack now shows real
+names, and `foundry.py check` fails with a `LINK NAMES` line until they are
+fixed.
+
 ## Next: a score with a slope for large functions
 
 The bottleneck is a structural signal that survives allocation differences:
