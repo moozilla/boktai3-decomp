@@ -365,3 +365,4 @@ addr,function,name,family,note
 0814D92C,sub_0814D92C,Player_IsActionCueReady,"Player contact and action variants","tests cue-specific animation flags and frame thresholds"
 0814E3A0,sub_0814E3A0,Player_UpdateAttachedEntryPosition,"Player / SceneEntry","updates indexed scene entry from local player raised position"
 08156CAC,sub_08156CAC,Player_EmitPeriodicParticles,"Player / SparkParticle","emits periodic particles from the player or collider position"
+081580EC,sub_081580EC,Player_SelectInteractionMode,"Player","selects player mode and attempts nearby trigger opening"
