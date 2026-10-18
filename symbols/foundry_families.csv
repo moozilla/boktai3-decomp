@@ -349,3 +349,4 @@ addr,function,name,family,note
 08104F08,sub_08104F08,CallbackPool_UpdateShake,"CallbackPool","restore saved position or apply random shake"
 08105790,sub_08105790,ProximityActor_IsPlayerInsideOriginRange,"ProximityActor","updates cached distance from origin and tests player range"
 08105998,sub_08105998,ProximityActor_InitializeCollider,"ProximityActor","initializes variant-dependent collider bounds and callback"
+08106BCC,sub_08106BCC,RegionActorPool_UpdateActors,"RegionActorPool","dispatches occupied actors and hides actors outside their region"
