@@ -1087,3 +1087,4 @@ addr,function,name,family,note
 081BF3D0,sub_081BF3D0,SceneInventory_UpdateSortConfirmation,"SceneInventoryCategoryMenu","sorts on confirmation and restores the saved menu state"
 081BF51C,sub_081BF51C,SceneInventory_InitWidgetPalette,"SceneInventoryCategoryMenu","copies the default palette and binds three menu widgets"
 081BF57C,sub_081BF57C,Storage_InitEntries,"Storage","initializes six entries and script option e"
+081BF5DC,sub_081BF5DC,Storage_InitBackground,"Storage","loads and configures the screen background"
