@@ -155,3 +155,4 @@ addr,function,name,family,note
 080FE544,sub_080FE544,SceneActorControl_AdvanceReactionCount,"SceneActorControl","plays a reaction cue and advances to behavior 6 after three events"
 080FFBA4,sub_080FFBA4,WoodenCrate_UpdatePaletteTimers,"WoodenCrate","updates display timer and chooses flash or variant palette"
 081000C0,sub_081000C0,WoodenCrate_UpdateShake,"WoodenCrate","jitters position while the shake timer runs"
+081001C4,sub_081001C4,WoodenCrate_InitCollider,"WoodenCrate","initializes the crate collider and hit callback"
