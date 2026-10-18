@@ -340,3 +340,4 @@ addr,function,name,family,note
 081408AC,sub_081408AC,Player_BeginTerrainRecovery,"Player","initialize recovery facing from terrain cell"
 081414E4,sub_081414E4,Player_ClampCameraOffsets,"Player","clamp camera offset sum and difference around half height"
 08141738,sub_08141738,Player_BeginDirectionalCameraOffset,"Player","initialize a directional camera offset"
+08141800,sub_08141800,Player_IsActionAllowed,"Player","tests an action against the current player mode and action-four gate"
