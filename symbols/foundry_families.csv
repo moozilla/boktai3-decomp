@@ -439,3 +439,4 @@ addr,function,name,family,note
 0816EA98,sub_0816EA98,MenuTransition_UpdateSelectionMessage,"MenuTransition","dismisses selection message and activates selected widget"
 0816EB30,sub_0816EB30,MenuTransition_UpdateSelectionFade,"MenuTransition","plays selection sound and advances color fade"
 0816EBE4,sub_0816EBE4,MenuTransition_FinishSelectionMessage,"MenuTransition","dismisses result message and resets selected widget state"
+0816EEC4,sub_0816EEC4,SceneMenuPanel_FinishResultMotion,"Scene menu panel","finishes motion and palette transition then branches on the result"
