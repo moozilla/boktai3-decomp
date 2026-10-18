@@ -1056,3 +1056,4 @@ addr,function,name,family,note
 081BA2A4,sub_081BA2A4,SelectionPanel_Destroy,"SelectionPanel","removes panel animations and clears list and global panel pointers"
 081BAD98,sub_081BAD98,SelectionList_FindEntryAtCursor,"SelectionList","returns the first enabled rectangle containing the cursor or minus one"
 081BAF10,sub_081BAF10,SelectionList_TickCursorShake,"SelectionList","offsets the cursor horizontally for three frames then resumes selection updates"
+081BB060,sub_081BB060,ResourceSprite_CopyEntries,"ResourceSprite","Copies up to sixteen fixed-size entries into the sprite resource object."
