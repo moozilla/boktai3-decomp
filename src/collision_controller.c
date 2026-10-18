@@ -24,7 +24,7 @@ struct CollisionSlot *CollisionController_FindFreeSlot(struct CollisionManager *
 }
 
 void CollisionController_ReceiveHit(struct SceneCollider *collider, struct CollisionOther *other,
-                  struct CollisionSlot *slot)
+                                    struct CollisionSlot *slot)
 {
     u32 m = 0x4000;
     if ((collider->contactFlags2 & m) == 0) {
@@ -415,24 +415,26 @@ s32 CollisionController_InitManager(struct CollisionManager *manager, void *owne
     s32 available;
     gUnk_0200003C = manager;
     mode = gUnk_03005430.mode;
-    if ((u8)(mode - 4) <= 1 || mode == 0)
+    if ((((u8)(mode - 4)) <= 1) || (mode == 0)) {
         goto pause;
-    if (gUnk_030053F4 & 2048)
-        available = stateMode();
-    else {
+    }
+    if (gUnk_030053F4 & 2048) {
+        *(&available) = stateMode();
+    } else {
         struct Player *actor;
-        if (gUnk_02000478 > 0)
+        if (gUnk_02000478 > 0) {
             goto pause;
+        }
         actor = gUnk_02000580[0];
         if (actor) {
             u32 *address = &actor->actionFlags;
             u32 mask = 16;
-            if (*address & mask)
+            if ((*address) & mask) {
                 goto pause;
+            }
         }
         available = globalMode();
     }
-    asm("" : : "r"(available));
     if (available) {
     pause:
         available = 1;
