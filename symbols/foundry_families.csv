@@ -1313,3 +1313,4 @@ addr,function,name,family,note
 08225F1C,sub_08225F1C,Camera_ApplyPositionBounds,"Camera bounds","dispatches camera position clamping by bounds mode"
 0822744C,sub_0822744C,Camera_Destroy,"Camera task","unregisters the camera receiver and clears the active camera"
 0822776C,sub_0822776C,Camera_CalculateDistanceScale,"Camera distance scale","divides planar distance between two positions and clamps it to a configured range"
+082277C8,sub_082277C8,CameraTracking_Update,"Camera tracking","updates requested two-position tracking with a 128-frame blend or restores follow mode"
