@@ -895,3 +895,4 @@ addr,function,name,family,note
 08181CE8,sub_08181CE8,ActorPalette_BlendSavedBanksSlow,"actor palettes","blends four saved and source palette banks with slower scaling"
 08181DD8,sub_08181DD8,Armor_StartPaletteTransition,"Armor palette controller","installs palette transition callbacks, snapshots four banks and resets the timer"
 08182064,sub_08182064,ActorPalette_BeginTransition,"ActorPalette","installs palette update and restore callbacks and clears timer"
+081822C0,sub_081822C0,Armor_StartFullPaletteRestoreDelay,"Armor palette controller (Armor 2, tentative)","copies the scene palette into four banks and schedules delayed restoration"
