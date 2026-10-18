@@ -539,3 +539,4 @@ addr,function,name,family,note
 081783C0,sub_081783C0,Hud_RegisterTimer,"Field HUD","registers the countdown value pointer with HUD"
 08178404,sub_08178404,Hud_ClearTimer,"Field HUD","clears timer pointer and disables its three display sprites"
 081784EC,sub_081784EC,Hud_SetValueSource,"Field HUD","sets HUD value source and mode"
+081785F4,sub_081785F4,SceneHud_RefreshActionKeyframes,"SceneHud","select primary and secondary action icon keyframes"
