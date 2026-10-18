@@ -693,9 +693,16 @@ def integrate(dry=False):
         open(fam_p, "w").write("addr,function,name,family,note\n")
     done = 0
     for func, src, stage, checks in committable():
+        clean = os.path.join(OUT, func, "clean.c")
+        if stage != "matched by worker" and os.path.exists(clean):
+            src = clean
         if not os.path.exists(src):
             continue
         text = open(src).read()
+        if text.lstrip().startswith("typedef"):
+            print(f"{func}: {stage}, but the source is preprocessed solver output; "
+                  f"carry its edit into build/foundry/{func}/clean.c first")
+            continue
         r = parse_result(func)
         name = None
         m = re.match(r"(\w+)\s+(\w+)\s*(.*)", r.get("NAME", ""))
