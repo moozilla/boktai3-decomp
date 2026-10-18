@@ -487,3 +487,4 @@ addr,function,name,family,note
 08174E38,sub_08174E38,Presentation_UpdateListCursor,"Presentation entry list","places the cursor at the selected eight-pixel row"
 08174E5C,sub_08174E5C,Presentation_CommitListValues,"Presentation entry list","adds three pending values and saves the list count"
 08174EA8,sub_08174EA8,Presentation_InitListValues,"Presentation entry list","loads a bounded saved count and clears pending values"
+08174F14,sub_08174F14,SceneCatalog_SetDescription,"SceneCatalog","selects or clears the catalog description panel"
