@@ -1219,3 +1219,4 @@ addr,function,name,family,note
 081F9268,sub_081F9268,SceneEffect_EnterAndRestart,"SceneEffectState","configures effect on entry and restarts when done"
 081FA070,sub_081FA070,Ratatosk_InitBodyCollider,"Ratatosk","initializes body collider dimensions and attack properties"
 081FA11C,sub_081FA11C,Ratatosk_InitHurtCollider,"Ratatosk","initializes and refreshes the damage-receiving collider"
+081FA1B0,sub_081FA1B0,Ratatosk_InitFrontCollider,"Ratatosk","initializes an attack collider offset in the facing direction"
