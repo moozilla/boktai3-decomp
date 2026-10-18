@@ -258,3 +258,4 @@ addr,function,name,family,note
 08121CD4,sub_08121CD4,SpriteGroup_RemoveEntry,"SpriteGroup","removes a sprite and clears its group entry"
 08122020,sub_08122020,SpriteEffectPool_AllocateSlot,"SpriteEffectPool","allocates one of eight large effect slots"
 0812254C,sub_0812254C,SpriteEffectPool_Update,"SpriteEffectPool","dispatches active effect slots by state"
+081228F0,sub_081228F0,StateSpritePool_Tick,"StateSpritePool","dispatches occupied sprite slots by signed state"
