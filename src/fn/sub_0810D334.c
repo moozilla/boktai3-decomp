@@ -7,7 +7,7 @@ struct P {
 s32 Registry1745_GetSessionState(void);
 void ScrollingDialogue_HideImmediately(void);
 void Task_Kill(void *);
-void sub_0824923C(void *, void *);
+void Callback_InvokeActor(void *, void *);
 
 s32 Registry30AC_Update(struct P *p)
 {
@@ -17,6 +17,6 @@ s32 Registry30AC_Update(struct P *p)
         return -1;
     }
     if (p->cb != 0)
-        sub_0824923C(p, p->cb);
+        Callback_InvokeActor(p, p->cb);
     return 1;
 }

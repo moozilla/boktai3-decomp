@@ -1,7 +1,7 @@
 #include "global.h"
-int sub_08165A30(void *);
+int SceneHud_UpdateBinaryChoice(void *);
 void Sound_PlaySong(int);
-void sub_0816DAF8(void *);
+void SceneHud_ReturnToActionGrid(void *);
 void Inventory_SortConsumables(int);
 void Inventory_SortValuables(int);
 struct S {
@@ -12,10 +12,10 @@ struct S {
 };
 void PauseMenu_OnSortConfirmationUpdate(struct S *p)
 {
-    int r = sub_08165A30(p);
+    int r = SceneHud_UpdateBinaryChoice(p);
     if (r == 0) {
         Sound_PlaySong(0xde);
-        sub_0816DAF8(p);
+        SceneHud_ReturnToActionGrid(p);
     } else if (r == 1) {
         Sound_PlaySong(0xdd);
         if (!p->d)
@@ -25,6 +25,6 @@ void PauseMenu_OnSortConfirmationUpdate(struct S *p)
         p->a = 0;
         p->b = 0;
         p->c = 0;
-        sub_0816DAF8(p);
+        SceneHud_ReturnToActionGrid(p);
     }
 }

@@ -5,8 +5,8 @@ void PauseMenu_SetConfirmationIndicator(void *, int);
 void PauseMenu_HidePromptIcons(void *);
 void PauseInventory_UpdateConsumableSortConfirmation(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
-void sub_081663A0(void *, int, int, int, int);
-void sub_08166B7C(void *, int);
+void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
+void MenuDisplay_UpdateActionPrompt(void *, int);
 void PauseInventory_BeginConsumableSortConfirmation(u8 *p)
 {
     PauseMenu_AddSpriteFlags(p, 5, 1);
@@ -15,6 +15,6 @@ void PauseInventory_BeginConsumableSortConfirmation(u8 *p)
     PauseMenu_SetConfirmationIndicator(p, 1);
     PauseMenu_HidePromptIcons(p);
     Hud_SetInteractionCallback(p, PauseInventory_UpdateConsumableSortConfirmation, 1);
-    sub_081663A0(p, 0, 0, 1, 0);
-    sub_08166B7C(p, 3);
+    MenuDisplay_SetPaletteOverrides(p, 0, 0, 1, 0);
+    MenuDisplay_UpdateActionPrompt(p, 3);
 }

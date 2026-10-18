@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_080F1E00(void);
+void SceneActor_LowerColorRedPeak(void);
 
 struct S {
     u8 filler[0xcf0];
@@ -15,7 +15,7 @@ s32 Ivy_WaitForColorRelease(struct S *s)
     if (s->b != 0)
         r = 1;
     else {
-        s->fp = sub_080F1E00;
+        s->fp = SceneActor_LowerColorRedPeak;
         r = 0;
     }
     return r;

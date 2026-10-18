@@ -10,7 +10,7 @@ static inline s32 Truncate(s32 v)
         return v >> 12;
     return -((-v) >> 12);
 }
-void sub_0812CF9C(struct ContactPosition *input)
+void SceneSlot_EmitPulse(struct ContactPosition *input)
 {
     struct ContactPosition *position = input;
     /* The original materializes this dead literal across its inlined RNG.

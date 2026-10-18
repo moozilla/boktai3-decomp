@@ -1,7 +1,7 @@
 #include "global.h"
 
 s32 Mummy_UpdateBehavior(void *);
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 void SceneActorControl_DispatchControl(void *);
 s32 Mummy_UpdateSpecialFlags(void *);
 
@@ -22,7 +22,7 @@ s32 Mummy_OnUpdate(struct S *s)
     Mummy_UpdateBehavior(s);
     m = 0x2000;
     if ((s->flags & m) || s->h2b8 == 0) {
-        sub_0824923C(s, s->tbl[s->idx]);
+        Callback_InvokeActor(s, s->tbl[s->idx]);
         SceneActorControl_DispatchControl(s);
     }
     Mummy_UpdateSpecialFlags(s);

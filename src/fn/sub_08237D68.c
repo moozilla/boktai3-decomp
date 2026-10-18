@@ -1,7 +1,7 @@
 #include "global.h"
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 u32 ActorGlyphTrail_UpdateTask(u8 *s)
 {
-    sub_0824923C(s, *(u32 *)(s + 0x13c));
+    Callback_InvokeActor(s, *(u32 *)(s + 0x13c));
     return 0;
 }

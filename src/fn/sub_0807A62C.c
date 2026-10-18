@@ -89,7 +89,7 @@ s32 SceneActorBehavior_UpdateTimersAndContacts(struct SceneActorBehaviorView *ac
                         cleanupPointer = (void *)((u8 *)contact + cleanupOffset);
                         cleanup = *cleanupPointer;
                     }
-                    sub_0824923C(actor, cleanup);
+                    Callback_InvokeActor(actor, cleanup);
                     *node = (void *)registered;
                 }
             }

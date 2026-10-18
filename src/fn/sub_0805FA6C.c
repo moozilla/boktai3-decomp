@@ -5,7 +5,7 @@ void SceneInventory_ShowItemDescription(struct SceneInventoryPanel *panel)
     s32 frame;
     if (panel->selection <= 15) {
         item = Inventory_GetItemId(panel->selection);
-        frame = sub_0816D820(panel->selection);
+        frame = SceneInventory_GetItemConditionFrame(panel->selection);
     } else if (panel->selection <= 23) {
         {
             s32 offset = panel->page * 8;

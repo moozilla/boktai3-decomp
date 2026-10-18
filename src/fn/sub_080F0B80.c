@@ -1,9 +1,9 @@
 #include "global.h"
 
-void sub_0812F12C(void);
+void SceneActor_UpdateActiveCallbacks(void);
 
 s32 Ivy_UpdateInteraction(void)
 {
-    sub_0812F12C();
+    SceneActor_UpdateActiveCallbacks();
     return 0;
 }

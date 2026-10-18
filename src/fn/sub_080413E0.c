@@ -1,6 +1,6 @@
 #include "global.h"
 
-s32 sub_08033690(u32, u32, u32, u32);
+s32 TextWindow_Create(u32, u32, u32, u32);
 void TextWindow_SetPlaybackRate(s32, u32);
 void ModifierMenu_RefreshTextLabels(u8 *);
 
@@ -10,13 +10,13 @@ s32 ModifierMenu_CreateTextWindows(u8 *p)
     s32 r;
     s32 i;
     s32 y;
-    r = sub_08033690(1, 3, 10, 2);
+    r = TextWindow_Create(1, 3, 10, 2);
     *q = r;
     if (r < 0)
         return -1;
     TextWindow_SetPlaybackRate(r, 5);
     q = (s32 *)(p + 0xf4);
-    r = sub_08033690(1, 6, 0x1c, 6);
+    r = TextWindow_Create(1, 6, 0x1c, 6);
     *q = r;
     if (r < 0)
         return -1;
@@ -25,7 +25,7 @@ s32 ModifierMenu_CreateTextWindows(u8 *p)
     y = 5;
     q = (s32 *)(p + 0xf8);
     do {
-        r = sub_08033690(0xd, y, 0x10, 2);
+        r = TextWindow_Create(0xd, y, 0x10, 2);
         *q = r;
         if (r < 0)
             return -1;

@@ -6,14 +6,14 @@ struct S {
     u8 filler2[0x252 - 0xd4];
     s8 b;
 };
-s32 sub_0811C67C(s32);
+s32 ActorResource_SelectElementResource(s32);
 
 s32 CharacterModel_GetPrimaryPaletteIndex(struct S *s)
 {
     s32 r;
     switch (s->h) {
         case 0:
-            r = sub_0811C67C(s->b);
+            r = ActorResource_SelectElementResource(s->b);
             break;
         case 1:
             r = 0x106;

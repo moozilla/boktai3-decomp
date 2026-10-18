@@ -344,7 +344,7 @@ int SceneIndicator_CreateFromScript(void)
         p->visible = Script_GetValue();
     }
     p->animation = Script_GetKeywordValue('E', 0);
-    sub_08214588(sprite, &m->animations[p->animation]);
+    Sprite_ApplyAnimation(sprite, &m->animations[p->animation]);
     sprite->frame = p->frame + p->visible;
     Collider_SetPosition(effect, position, 0);
     if (Script_GetKeywordValue('v', 1))

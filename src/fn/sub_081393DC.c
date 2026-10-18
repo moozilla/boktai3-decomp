@@ -3,7 +3,7 @@
 extern u8 *gUnk_020004CC;
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
-s32 sub_0813930C(u8 *);
+s32 SceneProcSprites_Initialize(u8 *);
 void Task_Kill(u8 *);
 void BallisticSpriteEffect_UpdateManager(void);
 void BallisticSpriteEffect_DestroyManager(void);
@@ -17,7 +17,7 @@ u8 *BallisticSpriteEffect_EnsureManager(void)
     if (p != 0) {
         Task_SetCallbacks(p, BallisticSpriteEffect_UpdateManager,
                           BallisticSpriteEffect_DestroyManager);
-        if (sub_0813930C(p) < 0) {
+        if (SceneProcSprites_Initialize(p) < 0) {
             Task_Kill(p);
             return 0;
         }

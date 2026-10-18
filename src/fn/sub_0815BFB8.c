@@ -25,24 +25,24 @@ struct P {
     u8 f59e[0x5A4 - 0x59E];
     u32 w5a4;
 };
-void sub_0813AE18(struct P *, s32, s32, s32);
-s32 sub_081419D4(s32, s32);
-void sub_0815AD78(struct P *);
-void sub_0813ADD0(struct P *);
+void Player_SetAnimation(struct P *, s32, s32, s32);
+s32 ActorVariant_GetTableValue(s32, s32);
+void Player_EnterKindTwo(struct P *);
+void Player_UpdateFacingSide(struct P *);
 void PlayerCue_Motion7Turn(struct P *, s32);
 void PlayerCue_Stand(struct P *, s32);
-void sub_081502AC(void);
+void Player_UpdateSongCueAnimation(void);
 void sub_081507F4(void);
 void Sound_PlaySong(s32);
-void sub_08151988(void);
-void sub_0813AFEC();
+void Player_UpdateThreePhaseBaseAnimationAction(void);
+void ActorSequence_Begin();
 
 void PlayerCue_Motion17(struct P *p)
 {
-    sub_0815AD78(p);
+    Player_EnterKindTwo(p);
     p->a4 = 1;
     p->a2 = 0;
     p->a3 = 0;
-    sub_0813AFEC(p, 0x11);
-    p->fn = sub_08151988;
+    ActorSequence_Begin(p, 0x11);
+    p->fn = Player_UpdateThreePhaseBaseAnimationAction;
 }

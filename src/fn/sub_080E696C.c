@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene_actor_reset.h"
-s32 sub_0824923C(void *, void *);
+s32 Callback_InvokeActor(void *, void *);
 static inline u8 TakeEntry(u8 *flag)
 {
     if (*flag) {
@@ -40,6 +40,6 @@ void SceneActor_UpdateAlternateEntryPhase(struct SceneActorRegistryResetView *ac
         actor->counter2AC = zero;
         actor->field2B1 = 1;
     } else {
-        sub_0824923C(actor, actor->update270);
+        Callback_InvokeActor(actor, actor->update270);
     }
 }

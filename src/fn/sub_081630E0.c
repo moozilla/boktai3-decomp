@@ -6,11 +6,11 @@ struct P {
 };
 extern const u32 gUnk_08610E44[];
 
-void sub_0824923C(struct P *, u32);
+void Callback_InvokeActor(struct P *, u32);
 void sub_08163020(struct P *);
 
 void GameOver_UpdateLetterAnimation(struct P *p)
 {
-    sub_0824923C(p, gUnk_08610E44[p->i]);
+    Callback_InvokeActor(p, gUnk_08610E44[p->i]);
     sub_08163020(p);
 }

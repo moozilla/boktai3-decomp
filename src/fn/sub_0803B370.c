@@ -21,7 +21,7 @@ void sub_08249238(void *);
 void Task_Kill(void *);
 int Wireless_GetStatus(void);
 void TextWindow_Destroy(int);
-void sub_0824923C(void *, void *);
+void Callback_InvokeActor(void *, void *);
 void Anim_Remove(void *);
 void Sprite_Remove(void *);
 int WirelessResultPanel_Update(struct ResultMenu *p)
@@ -34,6 +34,6 @@ int WirelessResultPanel_Update(struct ResultMenu *p)
         } while (--i >= 0);
         Task_Kill(p);
     } else
-        sub_0824923C(p, gUnk_08605814[p->state]);
+        Callback_InvokeActor(p, gUnk_08605814[p->state]);
     return 0;
 }

@@ -1,6 +1,6 @@
 #include "global.h"
 void sub_0821FF8C(void *);
-void sub_08159860(void *, void *, u32);
+void PlayerStats_AddContactHundredths(void *, void *, u32);
 struct Dest {
     u8 pad[0x5A4];
     u32 a;
@@ -15,5 +15,5 @@ void sub_081A6108(u8 *a, u8 *b, struct Dest *c)
     v = *(u32 *)(a + 0x38);
     c->a = v;
     c->c = *(u16 *)(a + 0x44);
-    sub_08159860(a, b, 10);
+    PlayerStats_AddContactHundredths(a, b, 10);
 }

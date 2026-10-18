@@ -1,7 +1,7 @@
 #include "global.h"
 
 void ExplosionEffect_Create(u8 *, u32, u32, u32, u32);
-void sub_0824923C(u8 *, u32);
+void Callback_InvokeActor(u8 *, u32);
 
 void CannonBattery_OnProjectileCollision(u8 *p, u32 unused, u8 *q)
 {
@@ -14,7 +14,7 @@ void CannonBattery_OnProjectileCollision(u8 *p, u32 unused, u8 *q)
     *(u32 *)q = z;
     w = *(u32 *)(q + 4);
     if (w) {
-        sub_0824923C(q, w);
+        Callback_InvokeActor(q, w);
         *(u32 *)(q + 4) = z;
     }
 }

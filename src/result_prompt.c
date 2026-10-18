@@ -49,7 +49,7 @@ s32 ResultPrompt_Init(struct ResultPrompt *p)
     if (Script_SeekToKeyword(0x73)) {
         p->message = (const u8 *)Script_GetTextSourcePc();
         if (p->message != 0) {
-            p->window = sub_08033690(1, 0xd, 0x1c, 6);
+            p->window = TextWindow_Create(1, 0xd, 0x1c, 6);
             if (p->window >= 0) {
                 TextWindow_SetScript(p->window, p->message);
                 TextWindow_Refresh(p->window, 0xb);

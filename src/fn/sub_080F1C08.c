@@ -9,11 +9,11 @@ struct P {
     u8 h[0xd32 - 0xcf4];
     u16 v;
 };
-void sub_080F1C48(void);
+void SceneActor_RampColorRed(void);
 s32 Ivy_InitColorTransition(struct P *p)
 {
     u16 *s = &p->v;
     p->a = (*s >> 5) & 0x1f;
     p->b = (*s >> 10) & 0x1f;
-    p->cb = sub_080F1C48;
+    p->cb = SceneActor_RampColorRed;
 }

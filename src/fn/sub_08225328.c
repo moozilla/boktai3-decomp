@@ -30,7 +30,7 @@ void Script_RegisterBuiltinCommands(void);
 void Settings_LoadOrInitializeDefaults(void);
 void SceneLifecycle_ResetSubsystems(void);
 void Random_InitValueTable(void);
-void sub_08177D54(void);
+void Hud_ResetGlobals(void);
 s32 SceneLifecycle_UpdateTask(struct Task *);
 void SceneLifecycle_DestroyTask(void);
 void Task_SetCallbacks(struct Task *, s32 (*)(struct Task *), void (*)(void));
@@ -62,7 +62,7 @@ void SceneLifecycle_InitManager(void)
     Settings_LoadOrInitializeDefaults();
     SceneLifecycle_ResetSubsystems();
     Random_InitValueTable();
-    sub_08177D54();
+    Hud_ResetGlobals();
     {
         u32 value = 2;
         *(u16 *)(gUnk_02000710 + 0x12) = value;

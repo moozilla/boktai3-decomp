@@ -1,7 +1,7 @@
 #include "global.h"
 extern const u32 gUnk_08613DFC[];
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 void SingletonSlot7_DispatchSecondaryModeCallback(u8 *p)
 {
-    sub_0824923C(p, gUnk_08613DFC[p[0xAD]]);
+    Callback_InvokeActor(p, gUnk_08613DFC[p[0xAD]]);
 }

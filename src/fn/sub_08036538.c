@@ -43,7 +43,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
 void sub_08223BC0(int);
 void WirelessController_UpdatePeerRosterSend(struct Engine *);
 void WirelessController_PollPeerRosterSend(struct Engine *);
-int sub_0824923C(void *, void *);
+int Callback_InvokeActor(void *, void *);
 extern void *gUnk_086056EC[];
 int Wireless_UpdateInactiveConnectionSession(struct Engine *p)
 {
@@ -51,5 +51,5 @@ int Wireless_UpdateInactiveConnectionSession(struct Engine *p)
         p->allowed = 0;
         sub_08223BC0(0);
     }
-    sub_0824923C(p, gUnk_086056EC[p->operation]);
+    Callback_InvokeActor(p, gUnk_086056EC[p->operation]);
 }

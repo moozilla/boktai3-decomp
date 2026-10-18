@@ -46,7 +46,7 @@ s32 ModifierMenu_UpdateTask(struct ModifierMenu *menu)
         ModifierMenu_UpdatePreviewAppearance(menu);
         goto incrementFrame;
     }
-    sub_0824923C(menu, gUnk_086058EC[menu->state]);
+    Callback_InvokeActor(menu, gUnk_086058EC[menu->state]);
     if (menu->dirtyFlags) {
         if (menu->dirtyFlags & 1)
             ModifierMenu_StopListTextPlayback(menu);

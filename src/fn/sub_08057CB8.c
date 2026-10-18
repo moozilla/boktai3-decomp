@@ -35,7 +35,7 @@ void ScenePanel_InitTimePalette(struct ScenePanel *input)
             i++;
         } while (i < 3);
     }
-    panel->timePhase = sub_08228DB8();
+    panel->timePhase = SunClock_GetPhase();
     ScenePanel_SelectTimePalette((struct ScenePanel *)panel, panel->timePhase);
     panel->paletteBlendActive = 0;
     panel->paletteBlendFrame = 0;

@@ -3,7 +3,7 @@ extern int gUnk_0824DB94[];
 extern void *gUnknown_02000580;
 void ResultGame_ShowTargetMarker(void *);
 void ResultGame_SetPressVisibility(void *);
-void sub_0815BE5C(void *, int);
+void PlayerCue_BeginModeSeven(void *, int);
 void ResultMenu_SendCommand(void *, int, int, void *);
 void Sound_PlaySong(int);
 void ResultGame_HandlePress(void *);
@@ -36,7 +36,7 @@ void ResultGame_TimedPress(u8 *p)
                     *out = minus;
                 }
             }
-            sub_0815BE5C(gUnknown_02000580, 1);
+            PlayerCue_BeginModeSeven(gUnknown_02000580, 1);
             ResultMenu_SendCommand(p, 0x35, 0, 0);
             Sound_PlaySong(0x4b2);
             break;
@@ -100,7 +100,7 @@ void ResultGame_TimedPress(u8 *p)
                         p[0xc4] = 2;
                     } else {
                         ResultMenu_SendCommand(p, 0x36, 0, 0);
-                        sub_0815BE5C(gUnknown_02000580, 0);
+                        PlayerCue_BeginModeSeven(gUnknown_02000580, 0);
                     }
                 }
             }

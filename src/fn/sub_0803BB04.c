@@ -18,7 +18,7 @@ struct Item {
     u8 flag;
 };
 extern struct Player *gUnk_020004F0;
-void sub_0811D4AC(void *, int, int, int, int, int, int);
+void ActorStats_ConfigureScaledParameters(void *, int, int, int, int, int, int);
 void ScenePool_InitActorBounds(struct P *p, struct Item *item)
 {
     struct Player *player = gUnk_020004F0;
@@ -67,5 +67,5 @@ void ScenePool_InitActorBounds(struct P *p, struct Item *item)
         p->blob.words[5] += x;
         p->blob.words[9] += z;
     } else
-        sub_0811D4AC(p, 0x1000, 0x1000, -0x1000, 0x2000, okay, 0x4000);
+        ActorStats_ConfigureScaledParameters(p, 0x1000, 0x1000, -0x1000, 0x2000, okay, 0x4000);
 }

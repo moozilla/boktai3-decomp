@@ -7,11 +7,11 @@ struct HudElement { /* 0x60 bytes */
 extern u8 *gUnk_02000214; /* field HUD/menu manager */
 extern u8 *gUnk_02000710;
 extern u32 gUnk_030053F4;
-void sub_08168534(u8 *);
-void sub_08177DAC(u8 *);
+void Hud_SetElementGroupFlags(u8 *);
+void Hud_HideAuxiliaryElements(u8 *);
 void Bg_ClearTilemap(s32);
 void Hud_SetupBackgroundLayer(u8 *, void *, s32, s32, s32);
-void sub_081685B4(u8 *);
+void SceneHud_RefreshWidgetVisibility(u8 *);
 void MessageWindow_SetPalette(s32);
 void sub_08169BE0(u8 *);
 /* The HUD block is large and mostly unmapped; offsets are read raw. */
@@ -36,18 +36,18 @@ void Hud_SetMode(u32 mode)
     if (busy)
         return;
     if ((u8)mode == 7) {
-        sub_08168534(hud);
+        Hud_SetElementGroupFlags(hud);
         ((struct HudElement *)(hud + 0xA9C))->flags |= 1;
         ((struct HudElement *)(hud + 0xB08))->flags |= 1;
         ((struct HudElement *)(hud + 0xB68))->flags |= 1;
         ((struct HudElement *)(hud + 0xBC8))->flags |= 1;
         HUD_U8(0xA9B) = 0;
-        sub_08177DAC(hud);
+        Hud_HideAuxiliaryElements(hud);
         Bg_ClearTilemap(0);
     } else if ((u8)mode == 8) {
         struct HudElement *e;
         s32 i;
-        sub_08168534(hud);
+        Hud_SetElementGroupFlags(hud);
         HUD_U32(0xAA4) |= 1;
         HUD_U32(0xB10) |= 1;
         HUD_U32(0xB70) |= 1;
@@ -73,14 +73,14 @@ void Hud_SetMode(u32 mode)
         s32 row;
         if ((u8)mode <= 2) {
             if (!(gUnk_030053F4 & 0x1000))
-                sub_081685B4(hud);
+                SceneHud_RefreshWidgetVisibility(hud);
             if (*current == 1) {
                 u32 value = *(u32 *)(gUnk_02000710 + 0x618);
                 HUD_U16(0xA88) = value;
             }
             row = 0;
         } else {
-            sub_08168534(hud);
+            Hud_SetElementGroupFlags(hud);
             HUD_U32(0xAA4) |= 1;
             HUD_U32(0xB10) |= 1;
             HUD_U32(0xB70) |= 1;
@@ -88,7 +88,7 @@ void Hud_SetMode(u32 mode)
             row = *current - 2;
             shown = 1;
             HUD_U8(0xA9B) = 0;
-            sub_08177DAC(hud);
+            Hud_HideAuxiliaryElements(hud);
         }
         Hud_SetupBackgroundLayer(hud, HUD_PTR(0x18), 0, row, HUD_U32(0x2C));
         if (shown)

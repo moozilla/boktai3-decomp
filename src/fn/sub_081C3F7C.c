@@ -6,13 +6,13 @@ struct S {
 };
 void sub_081C3EF0(struct S *);
 void sub_081C3950(struct S *);
-void sub_0824923C(struct S *, u32);
+void Callback_InvokeActor(struct S *, u32);
 
 void RegistryF3E4_OnTaskUpdate(struct S *p)
 {
     sub_081C3EF0(p);
     if (p->f4) {
         sub_081C3950(p);
-        sub_0824923C(p, p->f4);
+        Callback_InvokeActor(p, p->f4);
     }
 }

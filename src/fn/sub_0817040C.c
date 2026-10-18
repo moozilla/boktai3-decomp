@@ -1,25 +1,25 @@
 #include "global.h"
-int sub_0816B59C(void *, int);
-void sub_0816D920(void *, int);
-void sub_0816D868(void *);
-void sub_08166B7C(void *, int);
-void sub_0816DAF8(void *);
+int SceneInput_NavigateGridKeys(void *, int);
+void SceneHud_GetActionIconPosition(void *, int);
+void SceneHud_ShowActionPreview(void *);
+void MenuDisplay_UpdateActionPrompt(void *, int);
+void SceneHud_ReturnToActionGrid(void *);
 void Sound_PlaySong(int);
 void Hud_SaveGridSelection(void *);
-void sub_081704B4(void);
+void SceneHud_UpdateActionSwap(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 extern u16 gUnk_03005260[];
 void PauseMenu_OnSwapSelectionUpdate(u8 *p)
 {
     u8 *q = p + 0x4384;
-    if (sub_0816B59C(q, 0xf0)) {
+    if (SceneInput_NavigateGridKeys(q, 0xf0)) {
         u8 *a = p + 0x1620;
-        sub_0816D920(a, p[0x4387]);
-        sub_0816D868(p);
+        SceneHud_GetActionIconPosition(a, p[0x4387]);
+        SceneHud_ShowActionPreview(p);
     }
-    sub_08166B7C(p, 4);
+    MenuDisplay_UpdateActionPrompt(p, 4);
     if (gUnk_03005260[1] & 2) {
-        sub_0816DAF8(p);
+        SceneHud_ReturnToActionGrid(p);
         Sound_PlaySong(0xde);
     } else if (1 & gUnk_03005260[1]) {
         u8 *a;
@@ -27,7 +27,7 @@ void PauseMenu_OnSwapSelectionUpdate(u8 *p)
         Hud_SaveGridSelection(q);
         *((u32 *)(p + 0x1668)) &= ~1;
         a = p + 0x1680;
-        sub_0816D920(a, p[0x438a]);
-        Hud_SetInteractionCallback(p, sub_081704B4, 1);
+        SceneHud_GetActionIconPosition(a, p[0x438a]);
+        Hud_SetInteractionCallback(p, SceneHud_UpdateActionSwap, 1);
     }
 }

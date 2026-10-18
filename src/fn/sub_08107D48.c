@@ -1,8 +1,8 @@
 #include "global.h"
 
-void sub_08106DAC(void);
+void ScriptTriggerActor_DispatchPendingScripts(void);
 
 void Pool1B8_RunPendingScripts(void)
 {
-    sub_08106DAC();
+    ScriptTriggerActor_DispatchPendingScripts();
 }

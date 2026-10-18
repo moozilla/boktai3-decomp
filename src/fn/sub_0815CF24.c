@@ -5,8 +5,8 @@ extern u8 *gUnk_02000580[];
 s32 Script_GetActorIndex(void);
 s32 ScriptActor_GetDirectionFromScript(void);
 s32 ScriptActor_GetCueOptionFromScript(void);
-void sub_0815B404(u8 *, s32, s32, s32);
-/* Script: on the scripted actor picked by -i, sub_0815B404 with -d
+void PlayerCue_BeginMode27(u8 *, s32, s32, s32);
+/* Script: on the scripted actor picked by -i, PlayerCue_BeginMode27 with -d
    (direction, -1 to keep), -f and -e (tentative). */
 void ScriptActor_FaceFromScript(void)
 {
@@ -20,6 +20,6 @@ void ScriptActor_FaceFromScript(void)
             f = Script_GetValue();
         else
             f = 0;
-        sub_0815B404(actor, a, f, b);
+        PlayerCue_BeginMode27(actor, a, f, b);
     }
 }

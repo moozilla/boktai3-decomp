@@ -15,14 +15,14 @@ static inline u32 tst(u32 *a, u32 m)
 {
     return *a & m;
 }
-s32 sub_08228DB8(void);
+s32 SunClock_GetPhase(void);
 
 s32 Player_IsActionBlocked(struct P0813B318 *p)
 {
     s32 v;
     if (*(s32 *)((u8 *)gUnk_02000710 + p->idx * 4 + 0x628) > 0 ||
         (p != 0 && tst(&p->flags, 0x4000) != 0) ||
-        ((v = sub_08228DB8()), (u32)(v - 4) <= 1 || v == 0))
+        ((v = SunClock_GetPhase()), (u32)(v - 4) <= 1 || v == 0))
         return 1;
     return 0;
 }

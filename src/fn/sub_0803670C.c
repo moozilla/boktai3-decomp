@@ -44,7 +44,7 @@ void sub_08223BC0(int);
 void RfuManager_SendData(int);
 void Wireless_TryStartParentNiSend(struct Engine *);
 void Wireless_PollParentNiSend(struct Engine *);
-int sub_0824923C(void *, void *);
+int Callback_InvokeActor(void *, void *);
 extern void *gUnk_086056EC[];
 void Wireless_UpdateParentNiSession(struct Engine *argument)
 {
@@ -69,5 +69,5 @@ void Wireless_UpdateParentNiSession(struct Engine *argument)
     }
     Wireless_TryStartParentNiSend(p);
     Wireless_PollParentNiSend(p);
-    sub_0824923C(p, gUnk_086056EC[p->operation]);
+    Callback_InvokeActor(p, gUnk_086056EC[p->operation]);
 }

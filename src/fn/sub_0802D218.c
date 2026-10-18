@@ -2,7 +2,7 @@
 extern u32 gUnk_03005308;
 extern u8 gUnk_0203B400[];
 extern u8 *gUnk_02000580;
-u32 sub_0824923C(u8 *, void *);
+u32 Callback_InvokeActor(u8 *, void *);
 void Actor_StepFacingAngle(u8 *);
 void Actor_SetFacingAnimationEntry(u8 *, u32, u32, u32, u32, u32);
 void MotionPool_InitializeParams(void *);
@@ -25,10 +25,10 @@ void Actor_OnTrackingAction(u8 *p, u32 tick)
     if (p[0x12d])
         p[0x12d] = 0;
     fn = *(void **)(p + 0x124);
-    if (fn && sub_0824923C(p, fn))
+    if (fn && Callback_InvokeActor(p, fn))
         return;
     fn = *(void **)(p + 0x120);
-    if (fn && sub_0824923C(p, fn))
+    if (fn && Callback_InvokeActor(p, fn))
         return;
     Actor_StepFacingAngle(p);
     Actor_SetFacingAnimationEntry(p, 1, 0, 1, 0, 0);

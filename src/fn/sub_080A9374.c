@@ -11,7 +11,7 @@ struct Group080A9374 {
     u8 pad874[0x8da - 0x874];
     s16 count;
 };
-void sub_082212DC(void *, void *, u32, u32);
+void Sprite_BlinkUntilExpired(void *, void *, u32, u32);
 
 static inline u8 TestMask(u8 *flags, u32 mask)
 {
@@ -27,6 +27,6 @@ void TentacleBody_UpdateSegmentMotion(u8 *p, void *arg)
     s32 i;
     for (i = 0; i < g->count; i++) {
         if (!TestMask(&e[i].flags, 1))
-            sub_082212DC(&e[i], arg, 10, 30);
+            Sprite_BlinkUntilExpired(&e[i], arg, 10, 30);
     }
 }

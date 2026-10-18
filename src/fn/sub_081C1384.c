@@ -9,13 +9,13 @@ struct S {
     u8 h[0x454 - 0x78];
     u32 a454;
 };
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 u32 PlayStats_Update(struct S *p)
 {
     if ((p->fl & 1) == 0)
         p->a6c++;
     if ((p->fl & 2) == 0)
         p->a74++;
-    sub_0824923C(p, p->a454);
+    Callback_InvokeActor(p, p->a454);
     return 0;
 }
