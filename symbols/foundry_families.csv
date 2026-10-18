@@ -441,3 +441,4 @@ addr,function,name,family,note
 0816EBE4,sub_0816EBE4,MenuTransition_FinishSelectionMessage,"MenuTransition","dismisses result message and resets selected widget state"
 0816EEC4,sub_0816EEC4,SceneMenuPanel_FinishResultMotion,"Scene menu panel","finishes motion and palette transition then branches on the result"
 0816F0E8,sub_0816F0E8,MenuTransition_UpdateWidgetFlicker,"MenuTransition","alternates target coordinates before restoring menu"
+0816F4C0,sub_0816F4C0,SceneHud_RefillActionStatB,"SceneHud","refills player stat B over about 120 updates and redraws its ratio"
