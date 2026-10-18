@@ -120,3 +120,4 @@ addr,function,name,family,note
 080EB450,sub_080EB450,SceneActorReaction_AwaitTargetControl,"SceneActorReaction","waits for a target then selects control or timeout fallback"
 080EB6E4,sub_080EB6E4,SceneActorReaction_RestoreAfterControl,"SceneActorReaction","queues alternate restoration after control finishes"
 080EBAE4,sub_080EBAE4,SceneActorReaction_ReturnToIdle,"SceneActorReaction","resets state and selects idle control after completion"
+080EBB84,sub_080EBB84,SceneActorReaction_BeginHiddenCollisionless,"SceneActorReaction","hides the actor, resets animation state, and disables terrain collision"
