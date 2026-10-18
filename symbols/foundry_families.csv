@@ -799,3 +799,4 @@ addr,function,name,family,note
 0816D114,sub_0816D114,SceneHud_ApplyTimedSceneMode,"SceneHud","set player scene mode and duration from the selected action"
 0816D240,sub_0816D240,SceneHud_IncreaseStatBonus,"SceneHud","increase a chosen or randomized stat bonus and refresh the HUD"
 0816D40C,sub_0816D40C,PlayerStatusPanel_RestoreStats,"Player status panel","restores saved player stats and updates depleted-state flags"
+0816D820,sub_0816D820,SceneInventory_GetItemConditionFrame,"Scene inventory item values","selects an item condition display frame from its condition ratio"
