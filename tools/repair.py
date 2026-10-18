@@ -92,6 +92,21 @@ def insns(code, addr):
     return out
 
 
+def scale(x):
+    x = x if x < 0x80000000 else (-x) & M32
+    return 0 if x < 0x100 else 1 if x < 0x10000 else 2
+
+
+def plausible(u, v):
+    """A value guessed from nearby code, not from the same instruction, has
+    to look like the one it replaces (same order of magnitude), or the search
+    accepts nonsense that happens to shorten the diff (0x144 -> 1)."""
+    return scale(u) == scale(v)
+
+
+MASKS = {0xFF, 0xFFFF, 0xFFFFFFFF, 0x7FFFFFFF}
+
+
 def lit(value, raw):
     """value written like the literal it replaces; hex once it is large"""
     return f"0x{value:X}" if raw.lower().startswith("0x") or value >= 0x100 else str(value)
@@ -160,7 +175,7 @@ class Repair:
                 near = {v for x in A[max(0, i1 - WINDOW):i2 + WINDOW] for v in x[2]}
                 for y in B[j1:j2]:
                     for u in y[2]:
-                        vals.update((u, v) for v in near if v != u)
+                        vals.update((u, v) for v in near if v != u and plausible(u, v))
                     for x in A[i1:i2]:
                         if x[3] and y[3] and x[3][0] == y[3][0]:
                             pair(x, y)
@@ -182,6 +197,8 @@ class Repair:
                 cv = (-val if neg else val) & M32
                 if cv not in (u, u & 0xFFFF, u & 0xFF) or val == 0 and u != 0:
                     continue
+                if cv in MASKS and v not in MASKS:
+                    continue  # a mask is a mask (the compiler often folds it away)
                 nv = v if cv == u else (v & 0xFFFF if cv == u & 0xFFFF else v & 0xFF)
                 if neg:
                     nv = (-nv) & M32
