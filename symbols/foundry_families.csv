@@ -1350,3 +1350,4 @@ addr,function,name,family,note
 08236428,sub_08236428,CallbackGroup_UpdateActive,"CallbackGroup","invokes active entry callbacks and clears an empty group's active flag"
 0823659C,sub_0823659C,PaletteTransition_UpdateFadeIn,"PaletteTransition","increments palette alpha and emits effects at its position for nineteen ticks"
 082365F4,sub_082365F4,PaletteTransition_UpdateFadeOut,"PaletteTransition","decrements palette alpha and marks the transition finished at zero"
+08236644,sub_08236644,PaletteTransition_UpdateOwnerFade,"PaletteTransition","selects fade-in for owner state nine and latches fade-out otherwise"
