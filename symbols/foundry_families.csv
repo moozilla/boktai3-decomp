@@ -1289,3 +1289,4 @@ addr,function,name,family,note
 08216520,sub_08216520,BgGfx_LoadTilemapAtPosition,"background graphics","converts pixel position to aligned tilemap coordinates"
 08217298,sub_08217298,ResourceSlots_Reset,"display resource slots","clears a two-slot resource cache and invalidates its IDs"
 08217EEC,sub_08217EEC,SpriteDrawable_SelectTileFrame,"sprite drawable","sets tile dimensions, OAM attributes and frame tile index"
+08218ED8,sub_08218ED8,BackgroundMap_ClearTextRect,"text background map","fills a rectangle on BG0 with tile 0xF001"
