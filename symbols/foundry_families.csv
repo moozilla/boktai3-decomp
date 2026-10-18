@@ -247,3 +247,4 @@ addr,function,name,family,note
 0811E534,sub_0811E534,ScriptRecord_FindAttributeModifier,"ScriptRecord","copies the four-attribute modifier with a signed identifier"
 0811E5D0,sub_0811E5D0,ScriptRecord_FindByteModifier,"ScriptRecord","copies the byte-valued modifier record with a signed identifier"
 0811E814,sub_0811E814,StatModifier_ScaleAtOwnerThreshold,"StatModifier","scales by tenths when the owner's current stat reaches its threshold"
+0811EE68,sub_0811EE68,CallbackList_SubtractClampedValue,"CallbackList","subtracts a supplied or callback-derived amount and clamps to zero"
