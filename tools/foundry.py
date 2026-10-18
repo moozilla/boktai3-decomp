@@ -670,10 +670,14 @@ def scale_report():
 
 def committable():
     """Matched functions not yet in src/: (func, source file)."""
+    import worklist
+    defined = worklist.done_names()  # matched elsewhere meanwhile (a unit run, another session)
     out = []
     seen = set()
     for rp in glob.glob(os.path.join(OUT, "sub_*", "result.txt")):
         func = os.path.basename(os.path.dirname(rp))
+        if func in defined:
+            continue
         sp = os.path.join(OUT, func, "stages.json")
         try:
             st = json.load(open(sp)) if os.path.exists(sp) else None
