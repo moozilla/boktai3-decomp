@@ -1387,3 +1387,4 @@ addr,function,name,family,note
 0823ABEC,sub_0823ABEC,Player_GetTetherMode,"Player","reads tether mode through action-state guards"
 0823AD64,sub_0823AD64,Player_InitializeInputHistory,"Player","selects slot input and resets direction history"
 0823B6E0,sub_0823B6E0,Player_CanUseAction,"Player","tests action availability for the current player mode"
+0823C02C,sub_0823C02C,Player_AccumulateActionCharge,"Player","adds action charge and triggers at one hundred"
