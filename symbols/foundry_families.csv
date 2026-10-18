@@ -1278,3 +1278,4 @@ addr,function,name,family,note
 08211A1C,sub_08211A1C,ForgingBook_SetAnimation,"Forging book","selects keyframes, applies duration scaling and steps animation"
 08211D3C,sub_08211D3C,SceneKeyframe_UpdateSelectionVisibility,"Scene selection keyframe owner (tentative)","loads selection keyframe and toggles a visibility flag from a comparison"
 08212324,sub_08212324,ForgingBook_RefreshCategory,"Forging book","refreshes category entries, labels, cursor and preview"
+082123E0,sub_082123E0,SceneGrid_IsCellBeforeLimit,"Scene selection grid","tests a six-column three-row cell against a selection-dependent table limit"
