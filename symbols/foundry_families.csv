@@ -491,3 +491,4 @@ addr,function,name,family,note
 08174F48,sub_08174F48,InventoryGrid_UpdateModifierPreview,"InventoryGrid","switches modifier-key and normal stat previews"
 08175348,sub_08175348,MenuSelection_ProcessConfirmation,"menu selection","process selection confirmation or cancellation"
 08175474,sub_08175474,SceneCatalog_GetLevelScaledValue,"SceneCatalog","returns ten times the level-indexed table value"
+0817559C,sub_0817559C,SceneCatalog_SetSelection,"SceneCatalog","sets the catalog selection and refreshes its animation"
