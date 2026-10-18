@@ -180,3 +180,4 @@ addr,function,name,family,note
 08109090,sub_08109090,LinkSession_ClearFirstPlayerKind,"LinkSession / AreaEffectLinkState","marks the first matching link-session player kind empty"
 08109134,sub_08109134,LinkSession_CountPlayerKind,"LinkSession","counts matching signed player-kind entries"
 081091E4,sub_081091E4,LinkSession_IncrementCounter,"LinkSession","increments indexed session counter"
+08109224,sub_08109224,LinkSession_IncrementAlternateCounter,"LinkSession","increments second indexed session counter"
