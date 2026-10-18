@@ -1265,3 +1265,4 @@ addr,function,name,family,note
 0820A2C8,sub_0820A2C8,FanCannonManager_Update,"FanCannon","updates occupied cannon slots and stops sound when none are active"
 0820A364,sub_0820A364,FanCannonManager_Destroy,"Fan cannon manager","stops cannon sound and removes all active cannons"
 0820C984,sub_0820C984,SceneDrawablePair_SetFlags,"Scene paired drawable owner (tentative)","sets bit two in paired halfword flags and bit zero in owner flags"
+0820D258,sub_0820D258,SceneOverlayEntry_Init,"Scene overlay entry (tentative)","initializes configuration animation and drawable for a pooled entry"
