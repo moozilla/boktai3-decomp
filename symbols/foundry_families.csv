@@ -805,3 +805,4 @@ addr,function,name,family,note
 0816DAF8,sub_0816DAF8,SceneHud_ReturnToActionGrid,"SceneHud","restores action-grid icons, cursor and input callback"
 081788E8,sub_081788E8,Hud_Destroy,"Field HUD","removes HUD animations and clears the global HUD pointer"
 08178920,sub_08178920,SceneHud_InitActionIcons,"SceneHud","initialize primary and secondary action icon widgets"
+081789C8,sub_081789C8,SceneHud_InitGameplayResources,"SceneHud","load gameplay HUD panel resources and initialize action icons"
