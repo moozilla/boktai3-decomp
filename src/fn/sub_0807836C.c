@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 #define SceneActorBehavior_TickDrawableBlink sub_0807836C
 extern const s16 gUnk_08605C20[3];
@@ -52,12 +51,10 @@ u8 SceneActorBehavior_TickDrawableBlink(struct SceneActorRegistryActor *inputAct
             }
         } else {
             u32 mask = 1;
-            asm("" : "+r"(mask));
             if (!kind)
                 ((struct SceneActorRegistrySequenceDrawable *)drawable)->flags |= mask;
             else {
-                register u8 *base asm("r1") = (u8 *)drawable + 0x20;
-                asm("" : "+r"(base));
+                u8 *base = (u8 *)drawable + 0x20;
                 *(u32 *)(base + 8) |= mask;
             }
         }
