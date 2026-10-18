@@ -35,3 +35,4 @@ addr,function,name,family,note
 0809EE2C,sub_0809EE2C,RouteActor_UpdatePeriodicAnimation,"RouteActor","selects an animation every ninety ticks and advances phase"
 0809EEBC,sub_0809EEBC,RouteActor_UpdateAnimationSequence,"RouteActor","advances animation sequence until phase five completes"
 080A20B4,sub_080A20B4,SceneActorContact_ApplyWithinBounds,"Scene actor contact","apply contact reaction within projected horizontal bounds"
+080A3C78,sub_080A3C78,SceneActor_IsWithinTetherRange,"Tether proximity checks (sibling of ProximityEmitter_IsTetherNearby sub_08051B70, but takes caller-supplied box bounds instead of fixed radius/127 thresholds, and operates on struct SceneActorRegistryResetView instead of ProximityEmitter)","returns 1 if |actor.position - TetherActor_GetPosition()| is within xRange on X and zRange on Z (box check, Y unused)"
