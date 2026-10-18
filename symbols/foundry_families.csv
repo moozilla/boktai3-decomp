@@ -1370,3 +1370,4 @@ addr,function,name,family,note
 082375FC,sub_082375FC,MovingSprite_Create,"moving sprite task (tentative)","allocates and initializes a timed moving sprite task"
 08237C9C,sub_08237C9C,TimedSprite_UpdateMotion,"timed sprite task (tentative)","integrates two coordinates until a timed phase expires"
 08237DD4,sub_08237DD4,SpriteBurst_InitParticles,"SpriteBurst","initialize four sprite burst particles"
+08237E40,sub_08237E40,SpriteBurst_Init,"SpriteBurst","initialize sprite burst parameters and callback"
