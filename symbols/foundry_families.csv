@@ -826,3 +826,4 @@ addr,function,name,family,note
 08179F1C,sub_08179F1C,ActorResource_ClampDecrease,"actor resource state","limits a decrease relative to the selected threshold"
 0817A0FC,sub_0817A0FC,ActorVariation_SelectRandomPair,"actor variation state","selects random variation indices and decodes the pair"
 0817A234,sub_0817A234,ActorProperty_GetConstant34,"actor property callback","returns the constant 0x34; property role tentative"
+0817A23C,sub_0817A23C,ActorMovement_CanReachTarget,"actor movement position search","checks target cell, facing, distance, and the connecting segment"
