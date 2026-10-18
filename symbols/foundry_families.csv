@@ -1103,3 +1103,4 @@ addr,function,name,family,note
 081C3A98,sub_081C3A98,SpriteController_AnimateShrinking,"SpriteController","shrinks sprite scale over eight ticks and stops its controller"
 081C43B0,sub_081C43B0,SceneTransition_BeginOffsetMove,"SceneTransition","starts a target move between screen offsets"
 081C43F8,sub_081C43F8,SceneTransition_BeginVectorTween,"SceneTransition","starts an offset vector tween"
+081C46D4,sub_081C46D4,SceneTransition_StartSunScript,"SceneTransition","selects a script context from sun state"
