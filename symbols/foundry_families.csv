@@ -404,3 +404,4 @@ addr,function,name,family,note
 08166CD0,sub_08166CD0,PlayerPanel_SnapshotValues,"PlayerPanel","copies three player values into panel storage"
 08166ED4,sub_08166ED4,InventoryPanel_UpdateSelectedUnlock,"InventoryPanel","queries or updates the selected unlock display"
 08166F84,sub_08166F84,InventoryPanel_UpdateSelectedEquipment,"InventoryPanel","queries or updates the selected equipment display"
+08167508,sub_08167508,MenuParticle_UpdateMotion,"MenuParticle","moves particle, accelerates every fourth tick and expires at twenty"
