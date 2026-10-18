@@ -223,3 +223,4 @@ addr,function,name,family,note
 0811AB78,sub_0811AB78,Glove_GetHorizontalBounds,"Glove / ScenePoolPlayer","returns pixel-aligned horizontal bounds spanning 240 pixels"
 0811AC6C,sub_0811AC6C,Terrain_GetCellHighByte,"TerrainColumn","reads terrain cell high byte at clamped x/z coordinates"
 0811AD8C,sub_0811AD8C,Terrain_GetCellClearance,"TerrainColumn","subtracts terrain cell height from z plus 96"
+0811ADF0,sub_0811ADF0,Terrain_GetHeightAtPosition,"Terrain","reads terrain height for fixed-point X/Z"
