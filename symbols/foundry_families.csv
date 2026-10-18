@@ -558,3 +558,4 @@ addr,function,name,family,note
 080FFDD4,sub_080FFDD4,WoodenCrate_CheckTrigger,"WoodenCrate","checks trigger flags and starts a timed sequence"
 0810056C,sub_0810056C,FloorSwitch_UpdateOccupancy,"FloorSwitch","scans eligible occupants and advances press or release timing"
 08102C0C,sub_08102C0C,NamedObject_UpdateTetherAttachment,"NamedObject","attach or detach the tether actor within object bounds"
+08102EE8,sub_08102EE8,NamedObject_MoveAttachedPlayer,"NamedObject","apply object motion to the attached player"
