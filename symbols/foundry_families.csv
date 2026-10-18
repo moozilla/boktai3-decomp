@@ -178,3 +178,4 @@ addr,function,name,family,note
 081088DC,sub_081088DC,AnimatedTile_TickFadeOut,"AnimatedTile","calls a script then fades and releases a tile"
 08108ADC,sub_08108ADC,SlotMonitor_CheckTimeout,"SlotMonitor","check active-slot and idle timeouts"
 08109090,sub_08109090,LinkSession_ClearFirstPlayerKind,"LinkSession / AreaEffectLinkState","marks the first matching link-session player kind empty"
+08109134,sub_08109134,LinkSession_CountPlayerKind,"LinkSession","counts matching signed player-kind entries"
