@@ -647,3 +647,4 @@ addr,function,name,family,note
 0811F6CC,sub_0811F6CC,ActorAbility_SpawnProjectile,"ActorAbility","spawns a projectile and consumes resource only on success"
 0811F75C,sub_0811F75C,ActorAbility_SpawnAlternateProjectile,"ActorAbility","spawns an alternate projectile and consumes resource on success"
 0811F918,sub_0811F918,ModifierAction_SpawnBurst,"ModifierAction","consumes action cost and spawns a timed effect"
+0811FA38,sub_0811FA38,ModifierAction_InitializeSecondary,"ModifierAction","loads secondary action configuration and selects its callback"
