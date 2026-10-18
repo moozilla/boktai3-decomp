@@ -660,3 +660,4 @@ addr,function,name,family,note
 08125EEC,sub_08125EEC,SpriteBurst_Create,"SpriteBurst","allocates and initializes a directional sprite burst"
 0812681C,sub_0812681C,SceneStatusIndicator_Create,"SceneStatusIndicator","creates a blinking status indicator thirty units above a position"
 081269E4,sub_081269E4,BouncingParticle_Update,"BouncingParticle","advances a delayed particle animation and halves horizontal velocities"
+08127F5C,sub_08127F5C,MovingSprite_Create,"MovingSprite","allocates a sprite with directional animation and trigonometric velocity"
