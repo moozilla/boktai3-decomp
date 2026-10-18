@@ -848,3 +848,4 @@ addr,function,name,family,note
 0817BAA0,sub_0817BAA0,ActorState_UpdateRestartableAnimation,"ActorState","initializes animation and restarts or queues a transition"
 0817BB54,sub_0817BB54,ActorDecision_UpdateTimedPhase,"ActorDecision (tentative)","updates a timed phase and selects transitions"
 0817BC64,sub_0817BC64,ActorDecision_UpdateDelayPhase,"ActorDecision (tentative)","sets timeout and requests transition after thirty ticks"
+0817BF10,sub_0817BF10,ActorDecision_UpdateFlagPhase,"ActorDecision (tentative)","sets a transition flag or exits after a timeout"
