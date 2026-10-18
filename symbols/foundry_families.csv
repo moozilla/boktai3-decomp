@@ -104,3 +104,4 @@ addr,function,name,family,note
 080DE550,sub_080DE550,SceneActor_RefreshLivingCountAndProfile,"SceneActorRegistryActor maintenance (struct SceneActorRegistryActor: category 0x98, livingCountByCategory 0x2c4, profileIndex 0x308)","recomputes living-count and profile index for an actor's category"
 080DE990,sub_080DE990,SceneActorCollision_InitGateColliders,"SceneActor collision","initializes body, attack, and external actor colliders"
 080DEE98,sub_080DEE98,SceneActorControl_CallContextScript,"SceneActor control script","calls the actor script with position and context parameters"
+080E17D8,sub_080E17D8,SceneActorAnimation_EmitDirectionalTrail,"SceneActorAnimation","emits a direction-offset effect every four frames and changes callback after frame 30"
