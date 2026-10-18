@@ -1002,3 +1002,4 @@ addr,function,name,family,note
 081A2BD4,sub_081A2BD4,ActorReaction_Tick,"ActorReaction (tentative)","runs the actor reaction update stages unless globally paused"
 081A32EC,sub_081A32EC,EffectVariant_SetProperties,"EffectVariant (tentative)","sets a variant byte and table-selected value and flag mode"
 081A376C,sub_081A376C,DirectionBurst_Emit,"DirectionBurst (tentative)","lazily initializes a shared emitter and forwards burst parameters"
+081A37E0,sub_081A37E0,EffectPool_FindIdleActiveEntry,"EffectPool (tentative)","find active pool entry with zero state"
