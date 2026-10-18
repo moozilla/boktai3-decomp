@@ -758,3 +758,4 @@ addr,function,name,family,note
 081681B8,sub_081681B8,SelectionPanel_ClearTileColumns,"SelectionPanel","fills three four-by-four tile regions with blank palette tiles"
 081685B4,sub_081685B4,SceneHud_RefreshWidgetVisibility,"SceneHud","refreshes visibility of HUD widget groups"
 081686FC,sub_081686FC,SceneHud_UpdateSecondaryWidgets,"SceneHud","loads icons and positions secondary HUD carousel widgets"
+081687D8,sub_081687D8,SceneHud_UpdateTertiaryWidgets,"SceneHud","loads selected tertiary icon and updates carousel positions"
