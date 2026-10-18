@@ -28,3 +28,4 @@ addr,function,name,family,note
 0809B00C,sub_0809B00C,ActorBehavior_TickParticipantProgress,"scene actor behavior","apply periodic participant effects and track counter progress"
 0809CBB8,sub_0809CBB8,ActorContact_InitializeBodyAndSecondary,"scene actor contact","initialize body and secondary collider with callbacks"
 0809D044,sub_0809D044,SceneActorControl_ResetCollisionFlags,"SceneActorControl (actor reset/collision-phase helpers)","clears motion/collider flags on an actor, sets flags2D0 bit 0x100000"
+0809D16C,sub_0809D16C,SceneActorControl_ResetTargetFlags,"SceneActorControl (actor reset helpers, same family as sub_0809D044)","clears flags2D4 bit 0x100, clears SceneActorTargetLink.flags bit 8, zeroes control+0x444"
