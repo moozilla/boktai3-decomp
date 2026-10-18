@@ -504,3 +504,4 @@ addr,function,name,family,note
 08175D78,sub_08175D78,PauseMenu_UpdateConfigChoice,"PauseMenu","updates configuration choice confirmation and cancellation"
 08175E24,sub_08175E24,SelectionPanel_WaitConfirmDelay,"SelectionPanel (tentative)","waits sixty ticks then restores confirmation callback"
 08175E64,sub_08175E64,PauseMenu_InitConfigChoice,"PauseMenu","initializes configuration choice animation and option flags"
+08176020,sub_08176020,PauseMenu_BeginSleepPrompt,"PauseMenu","opens sleep confirmation text after A input"
