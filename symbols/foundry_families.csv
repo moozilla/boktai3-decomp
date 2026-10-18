@@ -421,3 +421,4 @@ addr,function,name,family,note
 0816B7EC,sub_0816B7EC,Script_GetSelectedStateSlot,"Script state-slot access","reads a script-selected or default state-table slot"
 0816BA90,sub_0816BA90,MapMenu_InitializePageBounds,"MapMenu","resets scrolling and initializes page bounds in pixels"
 0816BB4C,sub_0816BB4C,MapMenu_ClampScrollAndUpdateArrows,"MapMenu","clamps map scrolling and updates boundary arrow flags"
+0816C50C,sub_0816C50C,MapMenu_PositionMarkers,"MapMenu","positions current and secondary map markers"
