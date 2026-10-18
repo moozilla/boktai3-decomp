@@ -633,3 +633,4 @@ addr,function,name,family,note
 0811D384,sub_0811D384,SceneActorStyle_InitializeFromGameState,"SceneActorStyle","initializes a style descriptor from saved game fields"
 0811EB44,sub_0811EB44,StatModifier_InitializeCallbacks,"StatModifier","clears twenty-four modifier slots and assigns callbacks for selected record kinds"
 0811ED0C,sub_0811ED0C,ActorDrain_Update,"ActorDrain","periodically drains actor health and advances its accumulator"
+0811EE0C,sub_0811EE0C,CallbackList_ResetDispatch,"CallbackList","stops an indexed slot and resets callback dispatch state"
