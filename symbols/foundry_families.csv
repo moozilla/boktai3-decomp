@@ -244,3 +244,4 @@ addr,function,name,family,note
 0811E224,sub_0811E224,ScriptRecord_ReadEntries,"ScriptRecord","reads up to six five-value script records and an option"
 0811E3F8,sub_0811E3F8,ScriptRecord_FindModifier,"ScriptRecord","copies the modifier record with a signed identifier and returns its index"
 0811E48C,sub_0811E48C,ScriptRecord_FindExtendedModifier,"ScriptRecord","copies an extended modifier by signed identifier and clears its transient field"
+0811E534,sub_0811E534,ScriptRecord_FindAttributeModifier,"ScriptRecord","copies the four-attribute modifier with a signed identifier"
