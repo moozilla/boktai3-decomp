@@ -26,19 +26,19 @@ struct PaletteSet {
 extern u8 gUnk_03005430[]; // game state bytes (14: current, 15: previous; guess)
 extern u32 gUnk_03004DA4, gUnk_030051CC, gUnk_030051C0;
 
-int sub_080036C0(void);
-int sub_080036DC(void);
+int Palette_GetTransitionLevel(void);
+int Palette_GetBrightness(void);
 void sub_08227950(u16 *from, u16 *to);
-void sub_08217344(u32 slot, void *colors);
+void Palette_CacheObjectBank(u32 slot, void *colors);
 void sub_08221110(void *dest, void *a, void *b, u32 amount, u32 count);
-int sub_08227938(u32 id);
+int PaletteSet_GetSlotForId(u32 id);
 void sub_08221208(void *dest, void *source, int a, int b, int c);
 
-void sub_0800E0CC(struct PaletteSet *set, struct PaletteSetEntry *entry);
-void sub_0800E10C(struct PaletteSet *set, struct PaletteSetEntry *entry);
+void PaletteSet_BlendSourceColors(struct PaletteSet *set, struct PaletteSetEntry *entry);
+void PaletteSet_BlendOverlayColors(struct PaletteSet *set, struct PaletteSetEntry *entry);
 int PaletteSet_Update(struct PaletteSet *p);
-u32 sub_0800E228(void);
+u32 PaletteSet_Destroy(void);
 int PaletteSet_Initialize(struct PaletteSet *p, u16 id);
-void *sub_0800E390(u32 arg);
+void *PaletteSet_Create(u32 arg);
 
 #endif

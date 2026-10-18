@@ -1,6 +1,6 @@
 #include "global.h"
 void SceneActorAnimation_SelectDirectionalEntry(u8 *, u32);
-void sub_080921D4(u8 *p)
+void Bee_ResetReactionAnimation(u8 *p)
 {
     if (p[0x2b2] != 0)
         p[0x2b2] = 0;

@@ -12,7 +12,7 @@ struct P {
     u32 b[2];
 };
 
-u32 sub_0803D210(struct P *p, s32 i, struct Q *q)
+u32 ScenePool_IsEntryInSpawnBand(struct P *p, s32 i, struct Q *q)
 {
     u32 v;
     switch (q->f38) {

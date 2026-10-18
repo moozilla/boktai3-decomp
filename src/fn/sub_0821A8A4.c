@@ -7,7 +7,7 @@ struct VM {
     u32 *sp;
 };
 extern struct VM gUnk_02000610;
-u32 *sub_0821A8A4(u32 a, u32 b)
+u32 *Script_PushArgumentFrame(u32 a, u32 b)
 {
     if (a == 0)
         return 0;

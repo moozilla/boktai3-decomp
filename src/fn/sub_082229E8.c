@@ -1,9 +1,9 @@
 #include "global.h"
 
-void sub_0822291C(void);
+void Serial_ResetMultiplayer(void);
 
-void sub_082229E8(void)
+void Serial_InitMultiplayer(void)
 {
     *(s32 *)0x03005324 = -1;
-    sub_0822291C();
+    Serial_ResetMultiplayer();
 }

@@ -26,7 +26,7 @@ zero:
     return 0;
 }
 
-void sub_080A5B8C(u8 *unused, u8 *obj, u8 *ctx)
+void TentacleBody_OnAttackCollision(u8 *unused, u8 *obj, u8 *ctx)
 {
     int mask;
     u32 *flags;

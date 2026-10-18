@@ -1,5 +1,5 @@
 #include "global.h"
-u8 *sub_0811B828(u8 *s)
+u8 *RegistryE7BC_FindFreeObject(u8 *s)
 {
     s32 i = 0;
     u8 *p = s + 0x18;

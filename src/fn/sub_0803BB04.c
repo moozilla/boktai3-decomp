@@ -19,7 +19,7 @@ struct Item {
 };
 extern struct Player *gUnk_020004F0;
 void sub_0811D4AC(void *, int, int, int, int, int, int);
-void sub_0803BB04(struct P *p, struct Item *item)
+void ScenePool_InitActorBounds(struct P *p, struct Item *item)
 {
     struct Player *player = gUnk_020004F0;
     int okay = 0;

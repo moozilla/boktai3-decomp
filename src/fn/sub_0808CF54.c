@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0808005C(void);
+void SceneActorReaction_PlayAnimationBUntilComplete(void);
 void Trigger_ConsumePending(u8 *, u32);
 struct S {
     u8 pad[0x9C];
@@ -43,12 +43,12 @@ inline static u8 TakeFlag(u8 *p)
     return 0;
 }
 
-void sub_0808CF54(struct S *s)
+void Ghoul_UpdateAnimationElevenControl(struct S *s)
 {
     void (*new_var)(void);
     s32 off;
     if (TakeFlag(&s->queued)) {
-        void (*fn)(void) = sub_0808005C;
+        void (*fn)(void) = SceneActorReaction_PlayAnimationBUntilComplete;
         u8 code = 0xA;
         u32 zero;
         u32 *flags;

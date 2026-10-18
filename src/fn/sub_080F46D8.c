@@ -3,7 +3,7 @@
 extern void (*gUnk_08606434[])(void);
 void sub_0824923C(u8 *, void *);
 
-void sub_080F46D8(u8 *p)
+void Ivy_DispatchState(u8 *p)
 {
     u32 m = 0x10;
     if ((p[0x8d] & m) == 0)

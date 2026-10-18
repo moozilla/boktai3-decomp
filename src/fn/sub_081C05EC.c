@@ -1,6 +1,6 @@
 #include "global.h"
-void sub_081C0538(void *);
-void sub_081C05EC(void *p)
+void ScenePaletteFade_SetBackgroundOffsets(void *);
+void ScenePaletteFade_UpdateHold(void *p)
 {
-    sub_081C0538(p);
+    ScenePaletteFade_SetBackgroundOffsets(p);
 }

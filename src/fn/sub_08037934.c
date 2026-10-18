@@ -7,7 +7,7 @@ struct PeerMenu {
     int window;
 };
 void TextWindow_Refresh(int, int);
-void sub_08037934(struct PeerMenu *p)
+void WirelessPeerMenu_UpdateStatusNotice(struct PeerMenu *p)
 {
     if (p->entered) {
         p->entered = 0;

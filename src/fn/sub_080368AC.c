@@ -16,22 +16,22 @@ struct P {
     u32 w388;
 };
 extern u32 gUnk_020000F0;
-s32 sub_08224D3C(void);
-void sub_080340AC(struct P *);
+s32 Wireless_InitRfuApi(void);
+void WirelessController_ResetSession(struct P *);
 u32 Script_GetKeywordValue(u32, u32);
 s32 Script_SeekToKeyword(s32);
-u32 sub_08227E90(void);
-s32 sub_080368AC(struct P *p)
+u32 Script_GetTextSourcePc(void);
+s32 Wireless_InitControllerFromScript(struct P *p)
 {
     u32 z;
     u8 *f = &p->b33;
     z = 0;
     *f = z;
     gUnk_020000F0 = z;
-    if (sub_08224D3C() < 0)
+    if (Wireless_InitRfuApi() < 0)
         goto fail;
     p->b1d = z;
-    sub_080340AC(p);
+    WirelessController_ResetSession(p);
     {
         u32 one = 1;
         p->b1c = z;
@@ -43,7 +43,7 @@ s32 sub_080368AC(struct P *p)
     if (!Script_SeekToKeyword(0x61))
         goto fail;
     {
-        u32 v = sub_08227E90();
+        u32 v = Script_GetTextSourcePc();
         p->w388 = v;
         if (v == 0) {
         fail:

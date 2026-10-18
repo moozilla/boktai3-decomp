@@ -1,14 +1,14 @@
 #include "global.h"
 
-void sub_0802D3FC(void *);
-void sub_0802D1E4(void *);
-void sub_0802D3F0(void *);
-void sub_0802D410(void *);
+void Actor_UpdateDrawableAndTarget(void *);
+void Actor_DispatchStateHandler(void *);
+void Actor_UpdateAction(void *);
+void Actor_UpdateControllerCollisionAndTimers(void *);
 
-void sub_0802D41C(void *p)
+void Actor_OnControllerUpdate(void *p)
 {
-    sub_0802D3FC(p);
-    sub_0802D1E4(p);
-    sub_0802D3F0(p);
-    sub_0802D410(p);
+    Actor_UpdateDrawableAndTarget(p);
+    Actor_DispatchStateHandler(p);
+    Actor_UpdateAction(p);
+    Actor_UpdateControllerCollisionAndTimers(p);
 }

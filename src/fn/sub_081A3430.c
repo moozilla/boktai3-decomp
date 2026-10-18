@@ -11,7 +11,7 @@ struct P {
     struct E e[32];
 };
 void sub_081A33B8(void *, void *, u32);
-s32 sub_081A3430(struct P *p)
+s32 Hresvelgr_UpdateShots(struct P *p)
 {
     struct E *e = p->e;
     s32 i = 0;

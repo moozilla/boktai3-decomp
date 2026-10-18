@@ -11,8 +11,8 @@ struct R {
 } __attribute__((packed));
 extern struct R gUnk_0203B400[];
 void sub_081263E0(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
-void sub_08204748(void *);
-s32 sub_08204EB8(u8 *p)
+void EnemyD459_RecordDefeat(void *);
+s32 EnemyD459_UpdateDeath(u8 *p)
 {
     if (!(*((s16 *)(p + 0x144)))) {
         if ((*((s32 *)(p + 0x18))) <= 11) {
@@ -26,7 +26,7 @@ s32 sub_08204EB8(u8 *p)
             sub_081263E0(&v, 128, 32, 12, 12, 24, r, 32, 32, 1, 1, 512);
         }
         if ((*((s32 *)(p + 0x18))) == 12) {
-            sub_08204748(p);
+            EnemyD459_RecordDefeat(p);
         }
     }
     return 0;

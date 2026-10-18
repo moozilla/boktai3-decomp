@@ -7,7 +7,7 @@ extern u16 gUnk_030051DC;
 extern u16 gUnk_03005210;
 extern u32 gUnk_030051D4;
 
-void sub_08163FA8(u32 a, u32 b)
+void Hud_InitSelectionBounds(u32 a, u32 b)
 {
     gUnk_03005214 = b;
     gUnk_030051C4 = 0xFFFF;

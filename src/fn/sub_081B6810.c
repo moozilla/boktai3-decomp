@@ -1,5 +1,5 @@
 #include "global.h"
-u8 *sub_081B6810(u8 *p, s32 *out)
+u8 *VanargandProjectilePool_FindFreeSlot(u8 *p, s32 *out)
 {
     s32 i = 0;
     u32 one = 1;

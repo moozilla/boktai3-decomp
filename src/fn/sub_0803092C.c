@@ -32,7 +32,7 @@ struct Actor {
 extern struct Actor *gUnk_020000DC;
 void AnimData_SelectPaletteBank(void *, int);
 int Anim_SetSequence(struct Frames *, void *, u16, int, int);
-int sub_0803092C(struct Actor *p)
+int MessageWindow_UpdateSpeakerPortrait(struct Actor *p)
 {
     struct State *state = &p->state;
     if (state->current == -1) {

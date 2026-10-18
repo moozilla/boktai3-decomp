@@ -13,7 +13,7 @@ struct P {
     u8 pad2[13];
     struct Entry entry;
 };
-void sub_08038094(struct P *p)
+void WirelessExchange_CaptureLocalResult(struct P *p)
 {
     struct Entry *e = &p->entry;
     u32 v = p->a;

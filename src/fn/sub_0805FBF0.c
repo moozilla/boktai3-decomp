@@ -19,22 +19,22 @@ void SceneInventory_ShowConsumableDescription(struct SceneInventoryPanel *panel)
         item = -1;
     if (item < 0) {
         panel->display.banner.flags |= 1;
-        sub_08030BF8();
-        sub_08033468();
+        MessageWindow_Clear();
+        ScrollingDialogue_ClearScript();
     } else {
         panel->display.banner.flags &= ~1;
         Anim_LoadKeyframe(&panel->display.banner, &panel->display.gridResource, 394, 1);
-        sub_08030C84(panel->consumableText);
-        sub_08030F20(2, 16, 28, 2);
-        sub_08033478(0, 999);
-        sub_08033478(1, 999);
-        sub_08030B78(1);
-        sub_08030DBC(item);
+        MessageWindow_SetMessageTable(panel->consumableText);
+        MessageWindow_SetBounds(2, 16, 28, 2);
+        ScrollingDialogue_SetNumberArgument(0, 999);
+        ScrollingDialogue_SetNumberArgument(1, 999);
+        MessageWindow_SetDisplayMode(1);
+        MessageWindow_ShowMessage(item);
         {
             s32 text = Script_ParseStringRef(panel->consumableText);
             text += 48;
             text += item;
-            sub_0803343C(Text_LookupString(text));
+            ScrollingDialogue_SetScript(Text_LookupString(text));
         }
     }
     SceneInputPanel_ShowItemComparison(panel->comparison[0], panel->comparison[1],

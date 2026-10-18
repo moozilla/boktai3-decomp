@@ -1,7 +1,7 @@
 #include "global.h"
 extern u32 gUnk_0200015C;
 void Sprite_Remove(u8 *);
-u32 sub_08126C84(u8 *p)
+u32 BurstSpark_DestroyPool(u8 *p)
 {
     u8 *q = p + 0x38;
     u8 *r = p + 0x77;

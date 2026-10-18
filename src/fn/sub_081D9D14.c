@@ -7,7 +7,7 @@ struct S {
     u16 d;
 };
 void sub_081D7934(struct S *);
-s32 sub_081D9D14(struct S *p)
+s32 Projectile_UpdateResetDelay(struct S *p)
 {
     u32 two = 2;
     p->b |= two;

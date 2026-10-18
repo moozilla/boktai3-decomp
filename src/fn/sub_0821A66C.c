@@ -1,5 +1,5 @@
 #include "global.h"
-u8 *sub_0821A66C(u8 *p, u32 *length)
+u8 *Script_DecodePacket(u8 *p, u32 *length)
 {
     s32 size = *p & 15;
     switch (size) {

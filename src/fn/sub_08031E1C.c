@@ -5,7 +5,7 @@ struct G {
     s16 a;
 };
 extern struct G *gUnk_02000710;
-s32 sub_08031E1C(void)
+s32 MessageWindow_GetSoundMode(void)
 {
     return gUnk_02000710->a;
 }

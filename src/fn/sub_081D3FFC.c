@@ -7,14 +7,14 @@ struct S {
     u32 f20;
     u8 b24;
 };
-u32 sub_081D3F24(struct S *);
-void sub_081D4DE4(struct S *, u32);
+u32 SceneDisplay_GetAlternateDescriptor(struct S *);
+void BestiaryDisplay_SetEntry(struct S *, u32);
 void sub_081D4A34(struct S *);
 
-void sub_081D3FFC(struct S *p)
+void SceneDisplay_SwitchToAlternateDescriptor(struct S *p)
 {
     u32 z;
-    sub_081D4DE4(p, sub_081D3F24(p));
+    BestiaryDisplay_SetEntry(p, SceneDisplay_GetAlternateDescriptor(p));
     z = 0;
     p->f18 = z;
     p->f20 = z;

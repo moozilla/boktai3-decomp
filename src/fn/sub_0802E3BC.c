@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine.h"
-/* Message packet, as sent by sub_08020DD0 (see sub_08029FB0). */
+/* Message packet, as sent by SceneMessages_Send (see GridAttackActor_NotifyLinkedActorLatePhase). */
 struct Packet {
     u16 id;
     u8 kind, zero;
@@ -17,7 +17,7 @@ struct PacketQueue {
     struct Packet packets[2][8];
 };
 extern struct PacketQueue *gUnk_02000480;
-void sub_08020DD0(struct Packet *);
+void SceneMessages_Send(struct Packet *);
 /* Script: fills the next packet of the current page (-n id, -k kind, -f, -a command,
    -p up to eight arguments), sends it and counts it. The bounds check indexes
    counts[] with the count itself, as the original does. */
@@ -41,7 +41,7 @@ s32 Packet_QueueFromScript(void)
                 break;
         }
     }
-    sub_08020DD0(packet);
+    SceneMessages_Send(packet);
     queue->counts[queue->page]++;
     return 0;
 }

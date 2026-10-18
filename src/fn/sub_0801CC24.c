@@ -2,15 +2,15 @@
 #include "global.h"
 extern int gUnk_0824DB94[];
 extern void *gUnknown_02000580;
-void sub_0801C17C(void *);
-void sub_0801C1C4(void *);
+void ResultGame_ShowTargetMarker(void *);
+void ResultGame_SetPressVisibility(void *);
 void sub_0815BE5C(void *, int);
 void ResultMenu_SendCommand(void *, int, int, void *);
 void Sound_PlaySong(int);
 void ResultGame_HandlePress(void *);
 void ResultGame_ScorePress(void *);
-void sub_0801C16C(void *);
-void sub_0801C190(void *);
+void ResultGame_HidePressMarker(void *);
+void ResultGame_HideTargetMarker(void *);
 void sub_0801C69C(void *, void *);
 void ResultGame_TrackTarget(void *);
 #define I(o) (*(int *)(p + (o)))
@@ -22,8 +22,8 @@ void ResultGame_TimedPress(u8 *p)
             I(0x8c) = 0;
             p[0xb3] = 0;
             I(0x9c) = 1536;
-            sub_0801C17C(p);
-            sub_0801C1C4(p);
+            ResultGame_ShowTargetMarker(p);
+            ResultGame_SetPressVisibility(p);
             {
                 u8 *state = p + 0xb0;
                 int minus;
@@ -84,7 +84,7 @@ void ResultGame_TimedPress(u8 *p)
                     int signedState = (s8)p[0xb0];
                     if (signedState == 0) {
                         ResultGame_ScorePress(p);
-                        sub_0801C16C(p);
+                        ResultGame_HidePressMarker(p);
                         ResultMenu_SendCommand(p, 0x34, 0, 0);
                         p[0xb1] = 1;
                     }
@@ -94,8 +94,8 @@ void ResultGame_TimedPress(u8 *p)
                 p[0xaf] = 3;
                 if (p[0xc4] == 1 || H(0xa8) > 899) {
                     sub_0801C69C(p, ResultGame_TrackTarget);
-                    sub_0801C190(p);
-                    sub_0801C16C(p);
+                    ResultGame_HideTargetMarker(p);
+                    ResultGame_HidePressMarker(p);
                     if (p[0xc4] == 1)
                         p[0xc4] = 2;
                     else {

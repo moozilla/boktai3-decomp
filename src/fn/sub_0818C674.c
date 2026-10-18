@@ -9,7 +9,7 @@ void Task_SetCallbacks(void *, void *, void *);
 void Task_Kill(void *);
 void sub_0818A820(void);
 void sub_0818ADB4(void);
-s32 sub_0818C0BC(void *, s32, s32);
+s32 Armor_InitFromScript(void *, s32, s32);
 void SceneMessages_RegisterReceiver(void *, s32, s32);
 struct P *Armor_Create(u16 a, u16 b)
 {
@@ -18,7 +18,7 @@ struct P *Armor_Create(u16 a, u16 b)
         u32 *q = &p->v;
         *q = a;
         Task_SetCallbacks(p, sub_0818A820, sub_0818ADB4);
-        if (sub_0818C0BC(p, a, b) < 0) {
+        if (Armor_InitFromScript(p, a, b) < 0) {
             Task_Kill(p);
             return 0;
         }

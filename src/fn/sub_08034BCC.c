@@ -40,13 +40,13 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-void sub_08223640(void *);
-int sub_08034BCC(struct Engine *p)
+void RfuManager_StartConfiguration(void *);
+int WirelessController_StartConfiguredLink(struct Engine *p)
 {
     if (p->pending)
         p->pending = 0;
     if (p->ticks > 59) {
-        sub_08223640((u8 *)p + 0x11C);
+        RfuManager_StartConfiguration((u8 *)p + 0x11C);
         gUnk_020000EC = 0;
         setOperation(p, 4, 0);
     }

@@ -7,8 +7,8 @@ struct Message {
 };
 u32 Script_GetValue(void);
 u8 *Script_GetPc(void);
-void sub_0821A340(struct Message *);
-s32 sub_082255BC(void)
+void MessageQueue_PostMessage(struct Message *);
+s32 Script_SendMessage(void)
 {
     s16 values[16];
     struct Message message;
@@ -23,6 +23,6 @@ s32 sub_082255BC(void)
         count = ((u32)count << 16) + 0x10000u >> 16;
     }
     message.count = count;
-    sub_0821A340(&message);
+    MessageQueue_PostMessage(&message);
     return 0;
 }

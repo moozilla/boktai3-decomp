@@ -22,7 +22,7 @@ struct Obj {
 };
 s32 Div(s32, s32);
 void sub_080F5620(struct Obj *);
-void sub_080F558C(struct Obj *p)
+void Sword_UpdateThrustRetraction(struct Obj *p)
 {
     p->x = p->startX + Div(p->dx * p->timer, 20);
     p->y = p->startY + Div(p->dy * p->timer, 20);

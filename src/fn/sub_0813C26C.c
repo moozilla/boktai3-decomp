@@ -28,8 +28,8 @@ typedef struct State {
 void AnimData_Load(void *, s32);
 void Sprite_Init(Sprite *, void *, s32);
 void AnimData_SelectPaletteBank(void *, s32);
-void sub_0813BFE0(void *);
-void sub_0813C26C(State *s)
+void Player_OnOrbitingEffectIdle(void *);
+void DirectionalSpriteEffect_InitSprite(State *s)
 {
     Sprite *sprite = &s->sprite;
     void *animation = s->animation;
@@ -44,6 +44,6 @@ void sub_0813C26C(State *s)
     sprite->yscale = 127;
     sprite->xscale = 127;
     sprite->pos = s->pos;
-    s->callback = sub_0813BFE0;
+    s->callback = Player_OnOrbitingEffectIdle;
     s->active = 0;
 }

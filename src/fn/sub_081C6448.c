@@ -11,12 +11,12 @@ struct S {
     u8 pad3[0x358 - 0xd8];
     u32 f358;
 };
-s32 sub_081C5EA8(u32);
+s32 ChallengeMenu_GetRankKeyframe(u32);
 void Anim_LoadKeyframe(u8 *, u8 *, u16, u32);
 
-void sub_081C6448(struct S *p)
+void TimeResult_InitCategoryDisplay(struct S *p)
 {
-    s32 r = sub_081C5EA8(p->f358);
+    s32 r = ChallengeMenu_GetRankKeyframe(p->f358);
     if (r >= 0) {
         Anim_LoadKeyframe(p->a58, p->a18, r, 0);
         p->f78 = 0x6f;

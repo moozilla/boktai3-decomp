@@ -19,13 +19,13 @@ struct P0813D34C {
     u8 fAC6[2];
     u8 fAC8;
 };
-void sub_0813D150(void);
+void Player_SelectSpriteResource(void);
 void sub_0813D178(void *);
 void sub_0813CB8C(void *, u32);
 
-void sub_0813D34C(struct P0813D34C *p)
+void Player_InitVisualState(struct P0813D34C *p)
 {
-    sub_0813D150();
+    Player_SelectSpriteResource();
     sub_0813D178(p);
     p->fAC4 = 0xFFFF;
     p->fAC8 = 0xFF;

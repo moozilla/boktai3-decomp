@@ -18,7 +18,7 @@ static inline u8 Take(u8 *s)
     }
     return 0;
 }
-void sub_080F6170(u8 *s)
+void Sword_UpdateThrustAttack(u8 *s)
 {
     if (Take(s)) {
         void (**p)(u8 *) = (void (**)(u8 *))(s + 0x178);

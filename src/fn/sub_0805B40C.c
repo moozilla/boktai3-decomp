@@ -56,7 +56,7 @@ void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *input)
             ScenePanel_SetState((void *)panel, ScenePanel_BeginLongSequence);
             Sound_PlaySong(294);
         }
-        sub_082260A4((70 - panel->frame) >> 1);
+        Camera_RequestShake((70 - panel->frame) >> 1);
     } else if (panel->variant == 0) {
         s32 i = 0;
         if (i < panel->subjectCount) {
@@ -73,7 +73,7 @@ void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *input)
         s32 anyActive;
         u32 count;
         PlayerCue_Stand(SCENE_PANEL_PLAYER, -1);
-        sub_0815C99C(SCENE_PANEL_PLAYER);
+        PlayerCue_ReleaseControl(SCENE_PANEL_PLAYER);
         anyActive = 0;
         count = panel->subjectCount;
         if (anyActive < (s32)count) {
@@ -92,7 +92,7 @@ void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *input)
             ScenePanel_SetEffectState((void *)panel, 3);
     } else {
         PlayerCue_Stand(SCENE_PANEL_PLAYER, -1);
-        sub_0815C99C(SCENE_PANEL_PLAYER);
+        PlayerCue_ReleaseControl(SCENE_PANEL_PLAYER);
         Sound_PlaySong(490);
         gUnk_02000488->state = 14;
         ScenePanelRig_SetState(&panel->rig, 1);

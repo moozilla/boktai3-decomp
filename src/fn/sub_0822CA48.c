@@ -1,11 +1,11 @@
 #include "global.h"
 
 extern u8 *gUnk_03002604;
-void sub_08243E8C(void);
+void Solar_StopMeasurement(void);
 
-u32 sub_0822CA48(void)
+u32 Solar_DestroyController(void)
 {
-    sub_08243E8C();
+    Solar_StopMeasurement();
     gUnk_03002604 = 0;
     return 0;
 }

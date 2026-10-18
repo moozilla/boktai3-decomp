@@ -13,7 +13,7 @@ struct TextState {
 extern u16 gUnk_03005428;
 extern const s16 gUnk_086055E0[];
 void Sound_PlaySong(int);
-void sub_08031EFC(struct TextState *p, int c)
+void TextState_PlayGlyphSound(struct TextState *p, int c)
 {
     if (p->skip)
         goto done;

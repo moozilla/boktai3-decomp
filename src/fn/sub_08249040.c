@@ -1,7 +1,7 @@
 #include "global.h"
 /* Reconstructed from B3 instructions; SIIRTC correspondence: docs/RTC.md. */
 // CFLAGS: -O0 -mthumb-interwork
-u32 sub_08249040(u8 value)
+u32 Rtc_WriteCommandByte(u8 value)
 {
     u8 i;
     u8 bit;

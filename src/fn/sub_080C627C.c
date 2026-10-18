@@ -22,7 +22,7 @@ static inline u8 tk(u8 *a)
     }
     return 0;
 }
-void sub_080C627C(struct S *p, s32 n)
+void Golem_UpdateDeath(struct S *p, s32 n)
 {
     if (tk(&p->b2)) {
         s32 m;

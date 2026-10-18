@@ -11,9 +11,9 @@ struct Queue08197470 {
 extern struct Globals08197470 {
     u8 pad[36], bank;
 } *gUnk_0200047C;
-void sub_08195A4C(void *, u32);
-void sub_08020D54(void *, void *);
-s32 sub_0819736C(void *);
+void Nidhoggr_SetBehavior(void *, u32);
+void SceneMessages_SetPendingTrigger(void *, void *);
+s32 Nidhoggr_Update(void *);
 
 static inline int count(struct Queue08197470 *q)
 {
@@ -21,7 +21,7 @@ static inline int count(struct Queue08197470 *q)
     return q->count[*bank];
 }
 
-s32 sub_08197470(u8 *t)
+s32 Nidhoggr_UpdateCutscene(u8 *t)
 {
     struct Queue08197470 *queue = (struct Queue08197470 *)(t + 0x18);
     int i;
@@ -30,22 +30,22 @@ s32 sub_08197470(u8 *t)
         struct Msg08197470 *cmd = queue->commands[g->bank][i];
         switch (cmd->type) {
             case 0:
-                sub_08195A4C(t, 0xd);
+                Nidhoggr_SetBehavior(t, 0xd);
                 break;
             case 33:
-                sub_08195A4C(t, 0xe);
+                Nidhoggr_SetBehavior(t, 0xe);
                 break;
             case 34:
-                sub_08195A4C(t, 0xf);
+                Nidhoggr_SetBehavior(t, 0xf);
                 break;
             case 35:
-                sub_08195A4C(t, 0x10);
+                Nidhoggr_SetBehavior(t, 0x10);
                 break;
             case 36:
-                sub_08195A4C(t, 0x12);
+                Nidhoggr_SetBehavior(t, 0x12);
                 break;
         }
-        sub_08020D54(queue, cmd);
+        SceneMessages_SetPendingTrigger(queue, cmd);
     }
-    return sub_0819736C(t);
+    return Nidhoggr_Update(t);
 }

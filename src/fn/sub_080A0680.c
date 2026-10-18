@@ -8,7 +8,7 @@ struct S {
     u8 rest[0x3D0 - 0x2D4];
     u32 q;
 };
-void sub_080A0680(struct S *s)
+void Crow_DisableAttackCollision(struct S *s)
 {
     struct Q *q = (struct Q *)s->q;
     u32 m = 0x100000;

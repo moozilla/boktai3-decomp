@@ -12,7 +12,7 @@ struct O {
     struct T *t;
 };
 
-s32 sub_081A6EBC(struct O *o, s32 m, s32 v)
+s32 Vanargand_OnPartTrigger(struct O *o, s32 m, s32 v)
 {
     struct T *t = o->t;
     if (m == 0) {

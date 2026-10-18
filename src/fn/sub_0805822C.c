@@ -1,4 +1,6 @@
 #include "scene_panel.h"
+/* ScenePanel_BeginReverseSequence: Sets presentation channel 2 to value 4 and installs the reverse sequence callback */
+#define ScenePanel_BeginReverseSequence sub_0805822C
 #define ScenePanel_BeginReverseSequence sub_0805822C
 void ScenePanel_BeginReverseSequence(struct ScenePanel *panel)
 {

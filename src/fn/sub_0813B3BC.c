@@ -5,7 +5,7 @@ struct S0813B3BC {
     u16 v;
 };
 
-u16 sub_0813B3BC(struct S0813B3BC *p, u16 m)
+u16 Player_GetEventFlags(struct S0813B3BC *p, u16 m)
 {
     return p->v & m;
 }

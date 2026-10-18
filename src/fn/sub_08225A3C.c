@@ -5,7 +5,7 @@ struct S {
     u32 f1c;
 };
 extern struct S *gUnk_030025F8;
-u32 sub_08225A3C(struct S *p)
+u32 SceneBody_InitRegistry(struct S *p)
 {
     gUnk_030025F8 = p;
     p->f18 = 0;

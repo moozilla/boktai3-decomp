@@ -10,7 +10,7 @@ struct S {
     u32 f8;
 };
 
-void sub_081C39F8(struct S *p)
+void RegistryF3E4_SetHidden(struct S *p)
 {
     void (*f)(void);
     p->f34 |= 1;

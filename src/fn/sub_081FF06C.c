@@ -8,7 +8,7 @@ struct A {
     u8 p1[0x1C - 0x1c];
     struct E e[24];
 };
-struct E *sub_081FF06C(struct A *a, s32 *out)
+struct E *SpriteParticle_FindFreeSlot(struct A *a, s32 *out)
 {
     struct E *e = a->e;
     s32 i = 0;

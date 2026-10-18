@@ -8,9 +8,9 @@ struct State08195810 {
     u8 pad725e[0x7278 - 0x725e];
     s16 hp[9];
 };
-s32 sub_081957E0(void *);
+s32 Nidhoggr_GetNextShuffledPart(void *);
 
-void sub_08195810(struct State08195810 *t)
+void Nidhoggr_ActivateRandomPart(struct State08195810 *t)
 {
     s32 tries;
     s32 i;
@@ -19,7 +19,7 @@ void sub_08195810(struct State08195810 *t)
     t->timer = 0;
     tries = 9;
     for (;;) {
-        i = sub_081957E0(t);
+        i = Nidhoggr_GetNextShuffledPart(t);
         if (t->hp[i] > 0) {
             if (i <= 3) {
                 if (!t->dead[i] && !t->dead[i + 4])

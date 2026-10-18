@@ -7,7 +7,7 @@ struct Entry {
 extern struct Entry gUnk_0203B000[];
 extern s32 gUnk_030052F0;
 void Heap_Free(void *);
-void sub_0821A218(u32 keep)
+void ResourceRegistry_ClearEntries(u32 keep)
 {
     s32 retained = 0;
     struct Entry *entry = gUnk_0203B000;

@@ -2,7 +2,7 @@
 
 extern u8 *gUnk_02000710;
 
-void sub_0813D8F4(u8 *p, s32 idx)
+void Player_ClearStateTimer(u8 *p, s32 idx)
 {
     s32 off = idx << 1;
     u8 *base = p + 0x530;

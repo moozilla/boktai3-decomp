@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_08225E20(void)
+void Camera_ClearInstance(void)
 {
     *(u32 *)0x03005420 = 0;
 }

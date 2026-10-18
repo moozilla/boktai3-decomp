@@ -19,12 +19,12 @@ struct S {
 };
 extern u8 gUnk_03005430[];
 void sub_081E42C4(void *);
-void sub_081E41B0(void *);
+void Actor_UpdateScaleGrowth(void *);
 static inline s32 absolute(s32 x)
 {
     return x < 0 ? -x : x;
 }
-void sub_081E41EC(struct S *p)
+void Actor_ArmRestIdleTransition(struct S *p)
 {
     if (p->x == 25 && p->z == 0 && absolute(p->y - 102) <= 9) {
         p->timer = 0;
@@ -34,7 +34,7 @@ void sub_081E41EC(struct S *p)
         else
             p->delay = 10800;
         if (p->enabled && p->scaleX != 127 && (p->flags & 16))
-            p->scaleFn = sub_081E41B0;
+            p->scaleFn = Actor_UpdateScaleGrowth;
     } else
         p->fn = 0;
 }

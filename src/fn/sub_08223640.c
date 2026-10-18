@@ -1,11 +1,11 @@
 #include "global.h"
 
-void sub_08223674(void);
+void RfuManager_ResetConnectionState(void);
 
-void sub_08223640(u8 *q)
+void RfuManager_StartConfiguration(u8 *q)
 {
     u8 *p;
-    sub_08223674();
+    RfuManager_ResetConnectionState();
     p = (u8 *)0x03005390;
     p[4] = 1;
     p[5] = 2;

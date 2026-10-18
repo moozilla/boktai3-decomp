@@ -1,7 +1,7 @@
 #include "global.h"
 void Anim_Remove(u8 *);
 void Sprite_Remove(u8 *);
-s32 sub_081BBDA8(u8 *p)
+s32 SolarBank_OnDestroy(u8 *p)
 {
     u8 *q = p + 0x58;
     s32 i = 0xf;

@@ -34,9 +34,9 @@ void Memory_Clear(void *, int);
 #define gRfuLinkStatus   gUnk_03006A80
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
-void sub_08034310(struct Engine *);
-void sub_08036BD4(int);
-int sub_0803441C(struct Engine *p)
+void WirelessController_BuildPeerRosterPacket(struct Engine *);
+void Wireless_SetStatus(int);
+int WirelessController_UpdatePeerRosterSend(struct Engine *p)
 {
     int result = 0;
     register int bits asm("r2") = p->mask;
@@ -71,7 +71,7 @@ run:
         p->pad1a = current;
     }
     if (p->mask & 4) {
-        sub_08034310(p);
+        WirelessController_BuildPeerRosterPacket(p);
         p->mask &= ~4;
         result = 1;
     }
@@ -91,7 +91,7 @@ run:
                 p->mode = slot;
                 p->mask = (p->mask & ~1) | 2;
             } else
-                sub_08036BD4(2);
+                Wireless_SetStatus(2);
         }
     }
     return result;

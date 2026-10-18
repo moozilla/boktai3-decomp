@@ -1,6 +1,6 @@
 #include "tether_actor.h"
 // MATCHING_CONCESSION: register-pinning
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline s32 cellIndex(s32 x, s32 z)
 {
     if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
@@ -9,7 +9,7 @@ static inline s32 cellIndex(s32 x, s32 z)
 }
 static inline u8 *cellProperties(s32 cell)
 {
-    u8 *properties = sub_0821D64C(cell, 1);
+    u8 *properties = TerrainModifiers_FindCellOverride(cell, 1);
     if (properties)
         properties += 4;
     else {

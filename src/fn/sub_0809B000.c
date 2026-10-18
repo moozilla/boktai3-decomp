@@ -2,7 +2,7 @@
 
 void SceneActorBehavior_ApplyContactReaction(void);
 
-void sub_0809B000(void)
+void Lun_OnBodyContact(void)
 {
     SceneActorBehavior_ApplyContactReaction();
 }

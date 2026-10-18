@@ -10,7 +10,7 @@ void SceneActorMovement_UpdateHeight(struct SceneActorRegistryActor *);
 struct SceneActorRegistryResetView;
 void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *, s32);
 void sub_08225B74(void *);
-void sub_0821FAD0(u16 *, u32);
+void NavMesh_UpdateProbe(u16 *, u32);
 void sub_0821DE30(struct SceneActorRegistryControlGroup *);
 static inline u32 ReadMotionFlags(struct SceneActorMotionView *actor, u32 mask)
 {
@@ -372,7 +372,7 @@ s32 SceneActorMotion_Update(struct SceneActorMotionView *argument)
                 }
                 {
                     u32 cell = *cellIndex;
-                    cellData = sub_0821D64C(cell, 1);
+                    cellData = TerrainModifiers_FindCellOverride(cell, 1);
                     if (cellData)
                         cellData += 4;
                     else {
@@ -547,7 +547,7 @@ s32 SceneActorMotion_Update(struct SceneActorMotionView *argument)
                                 x += 128;
                                 cache.center.x = x;
                                 {
-                                    u8 *record = sub_0821D64C(cell, 1);
+                                    u8 *record = TerrainModifiers_FindCellOverride(cell, 1);
                                     if (record)
                                         record += 4;
                                     else {
@@ -703,7 +703,7 @@ refresh: {
             cellFlags = *(u16 *)(SceneActorTerrain_GetCell(*field) + 2);
         }
         if ((cellFlags & 3) != 3 && !(cellFlags & 0x440))
-            sub_0821FAD0(contact, (u32)position);
+            NavMesh_UpdateProbe(contact, (u32)position);
     }
 }
     {

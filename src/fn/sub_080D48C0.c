@@ -1,17 +1,17 @@
 #include "global.h"
 
 void sub_080D7F50(void *);
-void sub_080D80E8(void *);
-void sub_080D9AEC(void *);
+void Mummy_UpdateMovementTimers(void *);
+void Mummy_UpdateMovementCooldown(void *);
 void sub_080D812C(void *);
-void sub_080DA7D8(void *);
+void Mummy_UpdateTemporaryFlagTimer(void *);
 
-s32 sub_080D48C0(void *p)
+s32 Mummy_UpdateBehavior(void *p)
 {
     sub_080D7F50(p);
-    sub_080D80E8(p);
-    sub_080D9AEC(p);
+    Mummy_UpdateMovementTimers(p);
+    Mummy_UpdateMovementCooldown(p);
     sub_080D812C(p);
-    sub_080DA7D8(p);
+    Mummy_UpdateTemporaryFlagTimer(p);
     return 1;
 }

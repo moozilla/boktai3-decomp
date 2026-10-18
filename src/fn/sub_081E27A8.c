@@ -4,8 +4,8 @@ void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
-void sub_081DC1B4(u32);
-s32 sub_081E27A8(u8 *s)
+void Menu_StartFadeIn(u32);
+s32 TimedPresentation_Initialize(u8 *s)
 {
     u32 zero, value;
     void *p, *q;
@@ -33,6 +33,6 @@ s32 sub_081E27A8(u8 *s)
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
     q = (u8 *)ScriptProc_Start(0x92B3, 0xD985) + 0x14;
     CpuSet(q, gUnk_03004FC0, 0x100);
-    sub_081DC1B4(*(u32 *)(s + 0x24));
+    Menu_StartFadeIn(*(u32 *)(s + 0x24));
     return 0;
 }

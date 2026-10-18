@@ -7,7 +7,7 @@ struct P {
     u32 w60;
 };
 
-void sub_08160640(struct P *p)
+void ActorDebris_Show(struct P *p)
 {
     if (p != 0) {
         u32 m = ~1;

@@ -4,10 +4,10 @@ s32 Script_GetValue(void);
 u8 *Script_GetPc(void);
 s32 Script_GetKeywordValue(s32, s32);
 u8 *Script_DecodeOperand(u8 *, s32 *, s32 *);
-u8 *sub_08228368(u32, void *, s32, s32);
+u8 *DelayedScript_Create(u32, void *, s32, s32);
 /* Script command: run a script later. Keywords: t delay, P urgent, e script
  * (by reference) or p script (by id, flag 1), a up to eight argument values. */
-u8 *sub_082283F4(u32 owner, u32 unused, s32 repeat)
+u8 *Script_CreateDeferredTaskFromScript(u32 owner, u32 unused, s32 repeat)
 {
     s32 delay = 0;
     s32 script = 0;
@@ -26,7 +26,7 @@ u8 *sub_082283F4(u32 owner, u32 unused, s32 repeat)
         flag = 1;
         script = Script_GetValue();
     }
-    t = sub_08228368(script, 0, delay, urgent);
+    t = DelayedScript_Create(script, 0, delay, urgent);
     if (t) {
         *(u32 *)(t + 0x18) = owner;
         *(u16 *)(t + 0x2e) = flag;

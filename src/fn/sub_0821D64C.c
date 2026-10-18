@@ -11,7 +11,7 @@ struct A {
     struct N *f18;
 };
 extern struct A *gUnk_030052F4;
-struct N *sub_0821D64C(u32 k, u32 m)
+struct N *TerrainModifiers_FindCellOverride(u32 k, u32 m)
 {
     struct N *best;
     struct N *n = gUnk_030052F4->f18;

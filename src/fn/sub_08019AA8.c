@@ -1,8 +1,8 @@
 #include "global.h"
 extern u8 *gUnk_020000B0;
 void AnimData_Load(u8 *, u32);
-void sub_082144E4(u8 *, u8 *, u32);
-u32 sub_08019AA8(u8 *p)
+void Sprite_InitUnlinked(u8 *, u8 *, u32);
+u32 SpritePool_Initialize(u8 *p)
 {
     u8 *e;
     u8 *q;
@@ -13,7 +13,7 @@ u32 sub_08019AA8(u8 *p)
     do {
         q = e + 0x38;
         AnimData_Load(q, 0xda6d);
-        sub_082144E4(e + 0xc, q, 0);
+        Sprite_InitUnlinked(e + 0xc, q, 0);
         i--;
         e += 0xb0;
     } while (i >= 0);

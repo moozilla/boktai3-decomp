@@ -1,20 +1,20 @@
 #include "global.h"
 s32 sub_08165A30(void *);
 void Sound_PlaySong(s32);
-void sub_0822E18C(s32);
-void sub_0817147C(void *);
-void sub_08171D08(u8 *p)
+void GameState_SortConsumableSlots(s32);
+void PauseInventory_ReturnToConsumableActions(void *);
+void PauseInventory_UpdateConsumableSortConfirmation(u8 *p)
 {
     s32 r = sub_08165A30(p);
     if (r == 0) {
         Sound_PlaySong(0xde);
-        sub_0817147C(p);
+        PauseInventory_ReturnToConsumableActions(p);
     } else if (r == 1) {
         Sound_PlaySong(0xdd);
-        sub_0822E18C(0);
+        GameState_SortConsumableSlots(0);
         p[0x4388] = 0;
         p[0x4389] = 0;
         p[0x438a] = 0;
-        sub_0817147C(p);
+        PauseInventory_ReturnToConsumableActions(p);
     }
 }

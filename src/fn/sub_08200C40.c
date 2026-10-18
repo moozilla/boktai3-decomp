@@ -14,8 +14,8 @@ struct B {
     u32 w33c;
     u8 r[0x1b8 - 0x1b8];
 };
-void sub_08013728(void *);
-void sub_08160624(u32);
+void ScaledShadow_Disable(void *);
+void ActorDebris_Hide(u32);
 struct H {
     u8 f[6];
     u16 h;
@@ -24,14 +24,14 @@ struct W {
     u8 f[8];
     u32 w;
 };
-void sub_08200C40(struct A *a, u8 *b, u32 n)
+void PlayerClone_ReleaseSlot(struct A *a, u8 *b, u32 n)
 {
     struct H *s;
     struct W *w;
     u32 m;
     a->cnt--;
-    sub_08013728(b + 0x298);
-    sub_08160624(*(u32 *)(b + 0x33c));
+    ScaledShadow_Disable(b + 0x298);
+    ActorDebris_Hide(*(u32 *)(b + 0x33c));
     s = (struct H *)(b + 0x80);
     s->h = 4 | s->h;
     w = (struct W *)(b + 0x1b8);

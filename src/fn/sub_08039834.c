@@ -3,18 +3,18 @@ struct Panel {
     u8 pad0[0x60];
     void *task;
 };
-void sub_0803A4D4(int, int);
-void *sub_0803AC5C(void);
-void sub_08037ECC(void);
-void sub_08037DEC(void);
-void sub_08037F30(void);
-void sub_08037F50(void);
-void sub_08036B2C(void *, void *, void *, void *);
+void WirelessGameItems_Create(int, int);
+void *WirelessGameDisplay_Create(void);
+void WirelessExchange_OnPacketSent(void);
+void WirelessExchange_OnPacketReceived(void);
+void WirelessExchange_OnSendFailure(void);
+void WirelessExchange_OnReceiveFailure(void);
+void Wireless_SetTransferCallbacks(void *, void *, void *, void *);
 void WirelessLinkIndicator_SetPosition(int, int);
-void sub_08039834(struct Panel *p)
+void WirelessGame_InitDisplayAndLinkCallbacks(struct Panel *p)
 {
-    sub_0803A4D4(0, 0);
-    p->task = sub_0803AC5C();
-    sub_08036B2C(sub_08037ECC, sub_08037DEC, sub_08037F30, sub_08037F50);
+    WirelessGameItems_Create(0, 0);
+    p->task = WirelessGameDisplay_Create();
+    Wireless_SetTransferCallbacks(WirelessExchange_OnPacketSent, WirelessExchange_OnPacketReceived, WirelessExchange_OnSendFailure, WirelessExchange_OnReceiveFailure);
     WirelessLinkIndicator_SetPosition(4, 24);
 }

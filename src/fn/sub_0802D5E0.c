@@ -5,7 +5,7 @@ struct Entry {
     void *data;
 };
 extern const struct Entry gUnk_086054D4[];
-const struct Entry *sub_0802D5E0(int type, int variant)
+const struct Entry *Actor_FindResourceEntry(int type, int variant)
 {
     int i = 0;
     const struct Entry *p = gUnk_086054D4;

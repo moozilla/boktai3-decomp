@@ -2,7 +2,7 @@
 extern void *gUnk_0200006C;
 void *AnimData_FindEntry(int);
 void *ScriptProc_Start(int, int);
-void sub_08217E60(void *, void *, int);
+void Effect_Initialize(void *, void *, int);
 void Anim_SetSequence(void *, void *, int, int, int);
 int FadingParticleManager_Initialize(u8 *m)
 {
@@ -22,7 +22,7 @@ int FadingParticleManager_Initialize(u8 *m)
         a = g + 56;
         s = g + 16;
         for (j = 7; j >= 0; a += 68, s += 68, j--) {
-            sub_08217E60(s, *(void **)(m + 28), 0);
+            Effect_Initialize(s, *(void **)(m + 28), 0);
             Anim_SetSequence(a, *(void **)(m + 32), 3, 0, clear);
         }
         i = next;

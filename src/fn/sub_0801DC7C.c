@@ -1,14 +1,14 @@
 #include "global.h"
 int ResultMenu_ConfigureLayers(int, int);
 void ResultMenu_InitializeLayer(void);
-void sub_08030C84(void *);
-void sub_08030F20(int, int, int, int);
-void sub_080311B0(int);
-void sub_08030B78(int);
+void MessageWindow_SetMessageTable(void *);
+void MessageWindow_SetBounds(int, int, int, int);
+void MessageWindow_SetPalette(int);
+void MessageWindow_SetDisplayMode(int);
 void sub_0801BD44(void *);
-void sub_08030DBC(int);
-void sub_082279A8(int, int, int, int, int, int, int);
-void sub_0801B534(void *, void *);
+void MessageWindow_ShowMessage(int);
+void ScreenTransition_SendCommand(int, int, int, int, int, int, int);
+void ResultMenu_SetPhase(void *, void *);
 void ResultTutorial_UpdateSequence(void *);
 typedef struct {
     u32 pad[2], flags;
@@ -19,13 +19,13 @@ void ResultTutorial_Open(u8 *p)
         case 0:
             p[0xb7] = ResultMenu_ConfigureLayers(14, 1);
             ResultMenu_InitializeLayer();
-            sub_08030C84(*(void **)(p + 0x74));
-            sub_08030F20(1, 1, 30, 6);
-            sub_080311B0(0x81b);
-            sub_08030B78(1);
+            MessageWindow_SetMessageTable(*(void **)(p + 0x74));
+            MessageWindow_SetBounds(1, 1, 30, 6);
+            MessageWindow_SetPalette(0x81b);
+            MessageWindow_SetDisplayMode(1);
             sub_0801BD44(p);
-            sub_08030DBC(p[0xb6]);
-            sub_082279A8(0, 5, 4, 4, 4, 0xffff, 0);
+            MessageWindow_ShowMessage(p[0xb6]);
+            ScreenTransition_SendCommand(0, 5, 4, 4, 4, 0xffff, 0);
             ++p[0xaf];
             *(u16 *)(p + 0xaa) = 0;
             break;
@@ -33,7 +33,7 @@ void ResultTutorial_Open(u8 *p)
             if (++*(s16 *)(p + 0xaa) > 31) {
                 ((Graphic *)(p + 0x684))->flags &= ~1;
                 p[0xb5] = 16;
-                sub_0801B534(p, ResultTutorial_UpdateSequence);
+                ResultMenu_SetPhase(p, ResultTutorial_UpdateSequence);
             }
             break;
     }

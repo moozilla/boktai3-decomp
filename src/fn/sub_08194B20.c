@@ -2,7 +2,7 @@
 extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 s32 sub_08190C98(void *, s32, s32);
-void sub_08194B20(u8 *p)
+void Nidhoggr_SelectRandomPart22Animation(u8 *p)
 {
     u8 *c;
     u16 t;

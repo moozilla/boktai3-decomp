@@ -4,7 +4,7 @@ extern s32 gUnk_03005308;
 extern u8 gUnk_0203B400[];
 s32 Mod(s32, s32);
 
-s32 sub_0813E504(void)
+s32 Player_OnWeaponHitRollEffect80000High(void)
 {
     s32 r;
 

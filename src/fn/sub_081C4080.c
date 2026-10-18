@@ -28,11 +28,11 @@ struct F3E4Actor {
     u32 fieldF8;
 };
 extern struct F3E4Actor *gUnk_02000268;
-void sub_081C3F7C(void *);
-void sub_081C3FA4(void *);
+void RegistryF3E4_OnTaskUpdate(void *);
+void RegistryF3E4_OnTaskDestroy(void *);
 void SceneMessages_RegisterReceiver(void *, s32, s32);
-void sub_081C39F8(struct F3E4Actor *);
-void sub_081C3AF8(void);
+void RegistryF3E4_SetHidden(struct F3E4Actor *);
+void RegistryF3E4_UpdateVisibleIdle(void);
 static inline void fill32(void *dst, u32 *tmp, u32 control)
 {
     *tmp = 0;
@@ -44,15 +44,15 @@ static inline void setUpdate(void (*fn)(void), void (**slot)(void))
 }
 /* Registry routine F3E4: creates its task (gUnk_02000268, sprite 0x3641) for
    the given name: -p x y z (default 0), -c palette bank (+0x4B), registers it
-   for scene messages, and -i nonzero starts it via sub_081C39F8, else idles
-   with update sub_081C3AF8 (tentative). */
+   for scene messages, and -i nonzero starts it via RegistryF3E4_SetHidden, else idles
+   with update RegistryF3E4_UpdateVisibleIdle (tentative). */
 struct F3E4Actor *RegistryF3E4_Create(u32 name)
 {
     struct F3E4Actor **current = &gUnk_02000268;
     struct F3E4Actor *p = Task_Create(8, 0xFC);
     u32 zero;
     if (p)
-        Task_SetCallbacks(p, sub_081C3F7C, sub_081C3FA4);
+        Task_SetCallbacks(p, RegistryF3E4_OnTaskUpdate, RegistryF3E4_OnTaskDestroy);
     *current = p;
     p->name = name;
     AnimData_Load(p->animData, 0x3641);
@@ -78,9 +78,9 @@ struct F3E4Actor *RegistryF3E4_Create(u32 name)
     }
     SceneMessages_RegisterReceiver(p->receiver, p->name, 10);
     if (Script_SeekToKeyword('i') && Script_GetValue())
-        sub_081C39F8(p);
+        RegistryF3E4_SetHidden(p);
     else {
-        setUpdate(sub_081C3AF8, &p->update);
+        setUpdate(RegistryF3E4_UpdateVisibleIdle, &p->update);
         p->fieldF8 = 0;
         p->fieldD8 = 0;
     }

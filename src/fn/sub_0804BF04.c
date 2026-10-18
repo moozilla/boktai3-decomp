@@ -8,7 +8,7 @@ s32 TetherActor_SetHeadingEntry(struct TetherActor *, u32);
 void TetherActor_UpdateShake(struct TetherActor *);
 u32 TetherActor_TestStepDelta(void *, void *, u32);
 u32 TetherActor_TestNearDelta(s32, s32);
-void sub_0821FAD0(void *, void *);
+void NavMesh_UpdateProbe(void *, void *);
 static inline s32 scale(s32 value)
 {
     if (value >= 0)
@@ -115,7 +115,7 @@ void TetherActor_UpdateRoamingState(struct TetherActor *actor)
         else
             TetherActor_SetEntry(actor, 0);
     }
-    sub_0821FAD0(&actor->interactionProbe, position);
+    NavMesh_UpdateProbe(&actor->interactionProbe, position);
 }
 
 #else

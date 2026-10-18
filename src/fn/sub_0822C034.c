@@ -6,7 +6,7 @@ struct RegionList {
     s32 regions[16];
 };
 extern struct RegionList *gUnk_03002600;
-u8 sub_0821E52C(u16 region, void *position); /* position inside region? */
+u8 Terrain_IsPositionInBox(u16 region, void *position); /* position inside region? */
 
 /* The first listed region containing position, or -1; callers keep it as
    the object's region. */
@@ -20,7 +20,7 @@ s32 Region_FindContaining(void *position)
     for (i = 0, region = list->regions; i < 16; region++, i++) {
         if (*region <= 0)
             return -1;
-        if (sub_0821E52C(*region, position))
+        if (Terrain_IsPositionInBox(*region, position))
             return *region;
     }
     return -1;

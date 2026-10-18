@@ -1,4 +1,6 @@
 #include "global.h"
+/* TentacleBody_UpdateSegmentPositions: Periodically shifts stored segment positions and inserts the supplied position at the front */
+#define TentacleBody_UpdateSegmentPositions sub_080A8CDC
 
 struct Entry080A8CDC {
     u8 pad0[0x1c];

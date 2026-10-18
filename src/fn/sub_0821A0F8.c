@@ -13,7 +13,7 @@ struct List {
 extern struct List gUnk_03005280[];
 s32 Task_Kill(struct Task *);
 
-void sub_0821A0F8(s32 prio)
+void TaskSystem_KillBelowPersistenceLevel(s32 prio)
 {
     struct List *l = gUnk_03005280;
     s32 i = 0;

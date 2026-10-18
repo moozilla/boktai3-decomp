@@ -5,7 +5,7 @@ struct Packed {
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
 void sub_0806A160(void *, int, void *, int, int, int, int, int);
-void sub_08028414(u8 *p)
+void SceneActors_SpawnDestructionParticles(u8 *p)
 {
     struct Packed size;
     int angle;

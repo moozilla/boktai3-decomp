@@ -9,7 +9,7 @@ struct S {
     u8 h[0x400 - 0x394 + 0x394 - 0x400];
 };
 void Anim_Remove(void *);
-void sub_081C0C24(u8 *p)
+void PlayStats_RemoveAnimations(u8 *p)
 {
     s32 i;
     u8 *e = p + 0x90;

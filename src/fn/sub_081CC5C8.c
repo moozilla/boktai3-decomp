@@ -5,7 +5,7 @@ static inline void orr(u16 *a, u32 m)
 }
 /* Blink forever: toggle the phase every 16 frames; odd phases set display
  * flag 0x100. */
-void sub_081CC5C8(u8 *a, u8 *b)
+void SceneCharacter_UpdateContinuousBlink(u8 *a, u8 *b)
 {
     u8 phase;
     u32 t;

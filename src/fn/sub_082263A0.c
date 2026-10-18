@@ -13,12 +13,12 @@ struct S {
     u16 f7c;
 };
 extern struct S *gUnk_03005420;
-s32 sub_08225984(u32);
-void sub_082263A0(u32 a, struct P *b)
+s32 SceneBody_GetById(u32);
+void Camera_TrackActor(u32 a, struct P *b)
 {
     if (gUnk_03005420) {
         gUnk_03005420->f7c = a;
-        if (sub_08225984(gUnk_03005420->f7c)) {
+        if (SceneBody_GetById(gUnk_03005420->f7c)) {
             struct S *p = gUnk_03005420;
             p->f1c = 1;
             p->f74 = *b;

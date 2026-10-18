@@ -18,15 +18,15 @@ static inline void orr(u32 *a, u32 m)
 {
     *a |= m;
 }
-void sub_0813D4E0(void *);
+void Player_EmitQueuedEffects(void *);
 void sub_0813AFEC(void *, u32, u32);
 
-void sub_08159BB8(struct P08159BB8 *p)
+void Player_InitState25(struct P08159BB8 *p)
 {
     orr(&p->f20, 0x1000);
     p->f464 = 0;
     p->f3A2 = 0;
-    sub_0813D4E0(p);
+    Player_EmitQueuedEffects(p);
     p->f236 |= 4;
     p->f270 = 0;
     p->f274 = 0;

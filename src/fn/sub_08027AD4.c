@@ -65,7 +65,7 @@ typedef struct {
     u32 a;
     u32 b;
 } Point;
-void sub_08027AD4(ActorAnimation *p, int time)
+void SceneActors_UpdateContractingShake(ActorAnimation *p, int time)
 {
     int tick = time;
     ActorAnimation *p2 = p;

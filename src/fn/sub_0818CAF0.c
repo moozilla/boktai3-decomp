@@ -29,7 +29,7 @@ struct A {
 extern u32 gUnk_03005308;
 extern u8 gUnk_0203B400[];
 void sub_0818CB30(void);
-void sub_0818CAF0(struct A *p)
+void Armor_InitPartOrbitTimer(struct A *p)
 {
     u32 v;
     gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;

@@ -10,7 +10,7 @@ struct S {
 void Sprite_Remove(u8 *);
 void Effect_Remove(struct E *);
 
-s32 sub_081D15C8(struct S *p)
+s32 SceneNpc_OnTransitionEffectDestroy(struct S *p)
 {
     struct E *e;
     s32 i;

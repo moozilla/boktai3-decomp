@@ -2,7 +2,7 @@
 
 extern u8 *gUnk_02000710;
 
-u32 sub_081D5274(s32 idx)
+u32 GameState_IsEventFlagSet(s32 idx)
 {
     u32 *p = (u32 *)(gUnk_02000710 + 0x6F0);
     s32 w;

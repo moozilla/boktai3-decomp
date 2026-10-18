@@ -1,6 +1,6 @@
 #include "global.h"
 
-u32 sub_081C3010(u8 *p)
+u32 RegistryF3E4_GetStateResult(u8 *p)
 {
     u32 r;
     if (p)

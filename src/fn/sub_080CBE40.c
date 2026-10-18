@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0808005C(void);
+void SceneActorReaction_PlayAnimationBUntilComplete(void);
 void sub_0807C72C(u8 *, u32, u32, u32);
 void SceneActorBehavior_CallActionScript(u8 *);
 void sub_080C4EF0(u8 *);
@@ -41,10 +41,10 @@ struct S {
     u16 at416;
     u16 at418;
 };
-void sub_080CBE40(struct S *obj)
+void Golem_UpdateScriptedAction(struct S *obj)
 {
     if (TakeFlag(((u8 *)obj) + 0x2B1)) {
-        void (*fn)(void) = sub_0808005C;
+        void (*fn)(void) = SceneActorReaction_PlayAnimationBUntilComplete;
         u8 code = 10;
         u32 zero;
         u32 *f;

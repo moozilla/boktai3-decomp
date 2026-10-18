@@ -13,7 +13,7 @@ struct G0813FADC {
 extern struct G0813FADC *gUnk_02000710;
 extern s16 gUnk_02000554;
 
-s32 sub_0813FADC(struct P0813FADC *p)
+s32 Player_GetSelectedAbility(struct P0813FADC *p)
 {
     if (p->f418 != 6)
         return *(s16 *)((u8 *)gUnk_02000710 + gUnk_02000710->idx * 2 + 0x88);

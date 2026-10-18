@@ -15,7 +15,7 @@ struct Obj {
     u32 f1C, f20;
 };
 
-void sub_0821452C(struct Obj *a, struct Obj *b, struct Blk *c, struct Blk *d)
+void Sprite_CopyRenderState(struct Obj *a, struct Obj *b, struct Blk *c, struct Blk *d)
 {
     u8 t;
     *c = *d;

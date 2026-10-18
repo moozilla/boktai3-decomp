@@ -1,5 +1,5 @@
 #include "global.h"
-u8 *sub_08126AA4(u8 *p)
+u8 *BurstSpark_AllocateSlot(u8 *p)
 {
     s32 i = 0;
     u32 one = 1;

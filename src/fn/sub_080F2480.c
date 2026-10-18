@@ -11,7 +11,7 @@ struct S {
     u32 cnt;
 };
 
-void sub_080F2480(struct S *s)
+void Ivy_UpdateBobbing(struct S *s)
 {
     u32 *c = &s->cnt;
     if ((*c & 3) == 0)

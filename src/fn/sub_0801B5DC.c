@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0801B5DC(u8 *p, u8 *q)
+void TransformMarker_CopyVector(u8 *p, u8 *q)
 {
     p[4] = q[0xc];
     p[5] = q[0xd];

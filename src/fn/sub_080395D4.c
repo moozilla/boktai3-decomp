@@ -3,13 +3,13 @@ struct Panel {
     u8 pad0[0x3c];
     u8 counts[4];
 };
-struct Panel *sub_08037DC0(void);
+struct Panel *WirelessExchange_Get(void);
 void sub_0803A514(void *, int, int);
-void sub_080397D4(int, int);
+void WirelessGame_AddWeightedScore(int, int);
 void Sound_PlaySong(int);
-void sub_080395D4(void *p, int index)
+void WirelessGame_AddItem(void *p, int index)
 {
-    struct Panel *q = sub_08037DC0();
+    struct Panel *q = WirelessExchange_Get();
     if (q) {
         u8 *counts = q->counts;
         if (counts[index] <= 4) {
@@ -20,7 +20,7 @@ void sub_080395D4(void *p, int index)
             if (total <= 9) {
                 sub_0803A514(p, index, 1);
                 counts[index]++;
-                sub_080397D4(2, 1);
+                WirelessGame_AddWeightedScore(2, 1);
                 Sound_PlaySong(885);
             }
         }

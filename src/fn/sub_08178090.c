@@ -2,7 +2,7 @@
 
 void Hud_RestoreMode(void);
 
-void sub_08178090(void)
+void Hud_RestoreModeFromScript(void)
 {
     Hud_RestoreMode();
 }

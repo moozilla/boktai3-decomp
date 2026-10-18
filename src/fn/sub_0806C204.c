@@ -3,7 +3,7 @@
 s32 Mod(s32, s32);
 void SceneSteeringActor_EmitRandomParticle(struct ContactPosition *);
 void SceneSteeringActor_RefreshCollider(struct SceneSteeringActor *);
-void sub_0801370C(void *);
+void ScaledShadow_Enable(void *);
 static inline s32 Truncate(s32 v)
 {
     if (v >= 0)
@@ -147,7 +147,7 @@ void SceneSteeringActor_BobInPlace(struct SceneSteeringActorPool *unused,
             frame = (void *)((u8 *)p + offset);
             zero = 0;
             *frame = 0;
-            sub_0801370C(p->shadow);
+            ScaledShadow_Enable(p->shadow);
             *enter = zero;
         }
     }

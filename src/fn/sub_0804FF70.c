@@ -1,5 +1,5 @@
 #include "repeated_effect.h"
-void sub_08225938(void *);
+void SceneBody_Unregister(void *);
 void Sprite_Remove(void *);
 void Collider_Remove(void *);
 s32 RepeatedEffect_DestroyManager(struct RepeatedEffectManager *manager)
@@ -12,7 +12,7 @@ s32 RepeatedEffect_DestroyManager(struct RepeatedEffectManager *manager)
         u8 *registered = &manager->entries[0].bodyRegistered;
         do {
             if (*registered)
-                sub_08225938(body);
+                SceneBody_Unregister(body);
             Sprite_Remove(sprite);
             Collider_Remove(collider);
             collider = (u8 *)collider + 0xFC;

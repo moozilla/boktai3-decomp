@@ -14,7 +14,7 @@ struct B {
     s16 y;
 };
 
-u32 sub_08100F28(struct A *a, struct B *b, u32 c, u32 d)
+u32 NamedObject_IsWithinSpriteBounds(struct A *a, struct B *b, u32 c, u32 d)
 {
     struct P *p = a->p;
     s32 px = p->x;

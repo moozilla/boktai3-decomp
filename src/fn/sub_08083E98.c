@@ -9,7 +9,7 @@ void SceneActorControl_StartPositionCurve(struct SceneActorRegistryResetView *ac
         struct ContactPosition delta;
     } temporary;
     u32 zeroValue;
-    sub_08083BFC(actor, target);
+    SceneActorControl_InitPositionCurveEndpoints(actor, target);
     sub_08083C38(actor);
     {
         register u32 one asm("r1") = 1;

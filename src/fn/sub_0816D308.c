@@ -13,7 +13,7 @@ struct SD308 {
     u8 x;
     u16 y;
 };
-void sub_0816D308(struct SD308 *s, u32 x, u32 y)
+void Inventory_BeginItemEffect(struct SD308 *s, u32 x, u32 y)
 {
     struct QD308 *q = s->q;
     if (q == 0)

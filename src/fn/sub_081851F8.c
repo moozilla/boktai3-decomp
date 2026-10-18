@@ -5,7 +5,7 @@ struct P {
     u8 b;
     u8 c;
 };
-s32 sub_081851F8(struct P *p, s32 x)
+s32 ActorController_SetBehavior(struct P *p, s32 x)
 {
     if (p->a == x && p->b != 0xff)
         return 0;

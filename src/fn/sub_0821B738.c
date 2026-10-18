@@ -1,6 +1,6 @@
 #include "global.h"
 u8 *Script_DecodeOperand(u8 *, s32 *, s32 *);
-u8 *sub_0821B738(u8 *p)
+u8 *Script_SelectConditionalBlock(u8 *p)
 {
     s32 type, condition, block;
 condition_next:

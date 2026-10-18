@@ -35,8 +35,8 @@ struct BgLayer {
 extern struct BgLayer gUnk_03004C30[];
 extern u16 gUnk_03004BD8;
 void sub_08215AC4(s32 bg, s32 mode);
-void sub_08215A48(s32 bg, u32 tiles, s32 offset, u16 size);
-void sub_08218CB0(void);
+void Bg_SetTileUpload(s32 bg, u32 tiles, s32 offset, u16 size);
+void Text_ClearGlyphCache(void);
 void *Video_GetBackgroundMap(u32);
 static inline void enableBg(s32 bits)
 {
@@ -44,7 +44,7 @@ static inline void enableBg(s32 bits)
 }
 /* Sets up the background layers of a map resource for one of eight layer
    modes: picks the BGs (sub_08215AC4) and DISPCNT bits, loads the tiles
-   (sub_08215A48) and fills each layer's gUnk_03004C30 entry from the map
+   (Bg_SetTileUpload) and fills each layer's gUnk_03004C30 entry from the map
    entries, picked through maps[] for the first count layers. */
 void Bg_SetupLayers(s32 mode, u16 resourceId, struct BgResource *res, u16 x, u16 y, s32 count,
                     s32 *maps)
@@ -138,13 +138,13 @@ void Bg_SetupLayers(s32 mode, u16 resourceId, struct BgResource *res, u16 x, u16
             break;
     }
     if (hdr.count && hdr.tiles != (u32)res)
-        sub_08215A48(bgs[0], hdr.tiles, offset, hdr.count);
+        Bg_SetTileUpload(bgs[0], hdr.tiles, offset, hdr.count);
     for (i = 0; i < n; i++) {
         s32 bg = bgs[i];
         struct BgLayer *layer = &gUnk_03004C30[bg];
         struct BgMapEntry *entries = (struct BgMapEntry *)hdr.maps;
         if (bg == 0)
-            sub_08218CB0();
+            Text_ClearGlyphCache();
         if (i < count && maps)
             entry = entries[maps[i]];
         else

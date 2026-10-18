@@ -9,7 +9,7 @@ struct A {
 };
 void Sprite_Remove(void *);
 
-void sub_081B748C(struct A *p)
+void VanargandAfterimagePool_Destroy(struct A *p)
 {
     s32 i;
     struct E *e = p->e;

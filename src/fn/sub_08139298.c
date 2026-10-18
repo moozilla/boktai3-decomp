@@ -10,7 +10,7 @@ typedef struct {
     Entry entries[4];
 } Obj;
 void sub_0824923C(void *, void *);
-s32 sub_08139298(Obj *p)
+s32 BallisticSpriteEffect_UpdateManager(Obj *p)
 {
     s32 i;
     for (i = 0; i < 4; i++) {

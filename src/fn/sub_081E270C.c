@@ -6,8 +6,8 @@ struct TimedSequence {
     void *handle;
 };
 extern u16 gUnk_03005260[];
-void sub_081DC1DC(s32);
-s32 sub_08228008(void);
+void Menu_StartFadeOut(s32);
+s32 Heap_IsEndGuardValid(void);
 void Script_Call(void *, void *);
 void Task_Kill(void *);
 // Wait for the sequence duration or an eligible skip, then finish its exit fade.
@@ -17,10 +17,10 @@ void TimedPresentation_Update(struct TimedSequence *p)
         case 0:
             if (p->timer > p->duration - (1 << p->fadeShift)) {
                 p->state = 1;
-                sub_081DC1DC(p->fadeShift);
-            } else if (p->timer > (1 << p->minShift) && sub_08228008() && (gUnk_03005260[1] & 1)) {
+                Menu_StartFadeOut(p->fadeShift);
+            } else if (p->timer > (1 << p->minShift) && Heap_IsEndGuardValid() && (gUnk_03005260[1] & 1)) {
                 p->state = 1;
-                sub_081DC1DC(p->fadeShift);
+                Menu_StartFadeOut(p->fadeShift);
             }
             break;
         case 1:

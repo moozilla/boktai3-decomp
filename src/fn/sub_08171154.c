@@ -1,12 +1,12 @@
 #include "global.h"
-s32 sub_0822E104(u32);
-u8 *sub_0822E288(s32);
-void sub_08171154(u32 a, u16 *t)
+s32 Inventory_GetConsumableId(u32);
+u8 *GameState_GetConsumableDescriptor(s32);
+void PauseInventory_AccumulateConsumableEffects(u32 a, u16 *t)
 {
     u8 *e;
     s32 i;
-    if (sub_0822E104(a) != -1) {
-        e = sub_0822E288(sub_0822E104(a));
+    if (Inventory_GetConsumableId(a) != -1) {
+        e = GameState_GetConsumableDescriptor(Inventory_GetConsumableId(a));
         i = 0;
         do {
             u32 k, v;

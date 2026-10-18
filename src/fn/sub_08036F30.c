@@ -6,7 +6,7 @@ struct S {
     u8 g[2];
     u32 b;
 };
-void sub_08036F30(struct S *p)
+void WirelessStatusMenu_UpdateIdleState(struct S *p)
 {
     if (p->a)
         p->a = 0;

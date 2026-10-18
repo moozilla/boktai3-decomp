@@ -42,10 +42,10 @@ static inline void setFacing(ActorAnimation *p, int angle)
     value = 7 & shifted;
     p->facing8 = value;
 }
-void sub_080297FC(void *, int, int, int);
-void sub_08029E1C(void *);
-int sub_08029E2C(void *);
-void sub_08029AA8(void *);
+void GridAttackActor_SetAnimation(void *, int, int, int);
+void GridAttackActor_ResetAttackAnimationHistory(void *);
+int GridAttackActor_SelectAttackAnimation(void *);
+void GridAttackActor_SpawnGridPattern(void *);
 void Sound_PlaySongChecked(int);
 struct Common {
     u8 pad0[0x90];
@@ -75,12 +75,12 @@ static inline void state(struct Common *p, void (*fn)(void *), int id)
     p->pending = zero;
 }
 void ContactSequencePool_BeginAllDeaths(void *);
-void sub_08029FF8(void *);
-void sub_0802A5A0(ActorAnimation *p)
+void GridAttackActor_UpdateIdle(void *);
+void GridAttack_UpdateStaggerState(ActorAnimation *p)
 {
     if (p->changed) {
         p->changed = 0;
-        sub_080297FC(p, 8, 1, 8);
+        GridAttackActor_SetAnimation(p, 8, 1, 8);
         ContactSequencePool_BeginAllDeaths(*(void **)((u8 *)p + 0x904));
         Sound_PlaySongChecked(1359);
     }
@@ -96,7 +96,7 @@ void sub_0802A5A0(ActorAnimation *p)
         p->flags |= mask;
     }
     if (p->padB2)
-        state((void *)p, sub_08029FF8, 1);
+        state((void *)p, GridAttackActor_UpdateIdle, 1);
     else
         p->flags |= 1;
 }

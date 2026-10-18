@@ -3,7 +3,7 @@ extern u8 *gUnk_02000710;
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
 void sub_08178238(u32, u32, u32);
-u32 sub_0804D6DC(u8 *p)
+u32 Countdown_InitializeFromScript(u8 *p)
 {
     s32 *q = (s32 *)(gUnk_02000710 + 0x618);
     s32 r;

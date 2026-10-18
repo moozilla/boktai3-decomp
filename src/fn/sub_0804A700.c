@@ -1,11 +1,11 @@
 #include "tether_actor.h"
-u8 *sub_0821D64C(s32, s32);
-u32 sub_08225AB4(void *, u32, const struct ContactPosition *, u32, u32, void *);
-u32 sub_08225B28(void *, void *);
-u32 sub_08225B30(void *, void *);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
+u32 SceneBody_Init(void *, u32, const struct ContactPosition *, u32, u32, void *);
+u32 SceneBody_SetSprite(void *, void *);
+u32 SceneBody_SetKeyframeDisplay(void *, void *);
 u32 SceneActorContacts_RegisterNode(void *, void *, u32);
 void sub_0821BC68(void *, void *);
-void sub_08003C00(void *);
+void TerrainOverlay_QueueAddActor(void *);
 void TetherActor_InitBodyFromScript(struct TetherActor *actor)
 {
     s32 found = Script_SeekToKeyword('p');
@@ -34,7 +34,7 @@ void TetherActor_InitBodyFromScript(struct TetherActor *actor)
         u32 row = gUnk_030052F4->rows[z];
         cell = row + x;
     }
-    properties = sub_0821D64C(cell, 1);
+    properties = TerrainModifiers_FindCellOverride(cell, 1);
     if (properties)
         properties += 4;
     else {
@@ -58,15 +58,15 @@ void TetherActor_InitBodyFromScript(struct TetherActor *actor)
     actor->origin = actor->savedPosition;
     actor->targetPosition = actor->savedPosition;
     initialConfig = &actor->bodyConfig;
-    sub_08225AB4(initialConfig, actor->entry, &actor->savedPosition, 0, 6, actor);
+    SceneBody_Init(initialConfig, actor->entry, &actor->savedPosition, 0, 6, actor);
     displayKind = actor->display.animation.kind;
     config = initialConfig;
     if (displayKind == 0)
         goto displayDone;
     if (displayKind == 1)
-        sub_08225B28(config, (u8 *)&actor->display.animation.resource + 0x1C);
+        SceneBody_SetSprite(config, (u8 *)&actor->display.animation.resource + 0x1C);
     else if (displayKind == 2)
-        sub_08225B30(config, (u8 *)&actor->display.animation.resource + 0x20);
+        SceneBody_SetKeyframeDisplay(config, (u8 *)&actor->display.animation.resource + 0x20);
 displayDone:
     actor->bodyConfig.angle = ((actor->heading + 5) & 7) << 5;
     actor->interactionProbe.bodyId = actor->bodyConfig.id;
@@ -81,5 +81,5 @@ displayDone:
         sub_0821BC68(&actor->movementProbeStorage, &actor->position);
         actor->movementProbe = &actor->movementProbeStorage;
     }
-    sub_08003C00(config);
+    TerrainOverlay_QueueAddActor(config);
 }

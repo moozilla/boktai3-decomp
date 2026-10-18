@@ -10,9 +10,9 @@ extern u32 gUnk_030053F4;
 void sub_08168534(u8 *);
 void sub_08177DAC(u8 *);
 void Bg_ClearTilemap(s32);
-void sub_08163F14(u8 *, void *, s32, s32, s32);
+void Hud_SetupBackgroundLayer(u8 *, void *, s32, s32, s32);
 void sub_081685B4(u8 *);
-void sub_080311B0(s32);
+void MessageWindow_SetPalette(s32);
 void sub_08169BE0(u8 *);
 /* The HUD block is large and mostly unmapped; offsets are read raw. */
 #define HUD_U8(o)  (*(u8 *)(hud + (o)))
@@ -22,7 +22,7 @@ void sub_08169BE0(u8 *);
 /* Records HUD mode (+0xA5E) and applies it unless the HUD is busy
    (+0xA5C). Modes 7, 8 and 3 and up set bit 0 in four element groups'
    flags; 8 also clears it in eight more elements; 9 uses row 2, 0-2 row 0
-   and 3 and up row mode - 2 with sound EFDA in sub_08163F14 (tentative). */
+   and 3 and up row mode - 2 with sound EFDA in Hud_SetupBackgroundLayer (tentative). */
 void Hud_SetMode(u32 mode)
 {
     u8 *hud = gUnk_02000214;
@@ -65,9 +65,9 @@ void Hud_SetMode(u32 mode)
                 e->flags &= mask;
         }
         Bg_ClearTilemap(0);
-        sub_08163F14(hud, HUD_PTR(0x28), 0, 0, HUD_U32(0x38));
+        Hud_SetupBackgroundLayer(hud, HUD_PTR(0x28), 0, 0, HUD_U32(0x38));
     } else if ((u8)mode == 9) {
-        sub_08163F14(hud, HUD_PTR(0x18), 0, 2, HUD_U32(0x2C));
+        Hud_SetupBackgroundLayer(hud, HUD_PTR(0x18), 0, 2, HUD_U32(0x2C));
     } else {
         s32 shown = 0;
         s32 row;
@@ -90,9 +90,9 @@ void Hud_SetMode(u32 mode)
             HUD_U8(0xA9B) = 0;
             sub_08177DAC(hud);
         }
-        sub_08163F14(hud, HUD_PTR(0x18), 0, row, HUD_U32(0x2C));
+        Hud_SetupBackgroundLayer(hud, HUD_PTR(0x18), 0, row, HUD_U32(0x2C));
         if (shown)
-            sub_080311B0(0xEFDA);
+            MessageWindow_SetPalette(0xEFDA);
         if (gUnk_030053F4 & 0x1000)
             sub_08169BE0(hud);
     }

@@ -80,28 +80,28 @@ extern u16 gUnk_02000534, gUnk_02000500;
 extern void *gUnk_08604A00[2][3];
 
 void sub_08009E30(void);
-struct CollisionSlot *sub_08009E3C(struct CollisionManager *);
+struct CollisionSlot *CollisionController_FindFreeSlot(struct CollisionManager *);
 s32 CollisionController_InitSlot(struct CollisionManager *, struct CollisionSlot *);
-u32 sub_08009F34(struct CollisionManager *, struct CollisionSlot *);
-void sub_08009E5C(struct SceneCollider *, struct CollisionOther *, struct CollisionSlot *);
-void sub_08009F54(u32, struct CollisionSlot *);
+u32 CollisionController_RemoveSlot(struct CollisionManager *, struct CollisionSlot *);
+void CollisionController_ReceiveHit(struct SceneCollider *, struct CollisionOther *, struct CollisionSlot *);
+void CollisionController_UpdateIdleAnimationPaused(u32, struct CollisionSlot *);
 void CollisionController_UpdateIdleAnimation(struct CollisionManager *, struct CollisionSlot *);
-void sub_0800A16C(u32, struct CollisionSlot *);
+void CollisionController_UpdateHitDelayAnimation(u32, struct CollisionSlot *);
 void CollisionController_UpdateHitAnimation(struct CollisionManager *, struct CollisionSlot *);
 s32 CollisionController_UpdateAll(struct CollisionManager *);
-s32 sub_0800A500(struct CollisionManager *);
+s32 CollisionController_DestroyManager(struct CollisionManager *);
 s32 CollisionController_InitManager(struct CollisionManager *, void *owner);
-struct CollisionManager *sub_0800A62C(void *owner, u32);
+struct CollisionManager *CollisionController_CreateManager(void *owner, u32);
 s32 CollisionController_ScriptCreate(void);
-s32 sub_0800A78C(void);
-void sub_0800A7D0(void);
+s32 CollisionController_ScriptGetActiveCount(void);
+void CollisionController_ScriptRemoveAll(void);
 
 /* Engine helpers. */
 void sub_08217DE0(void *, void *, u32);
 void sub_08217EEC(void *, void *, u32);
-void sub_08217EC4(void *, s32, s32);
-void sub_0821AAD8(void *);
-void sub_0821B4C8(void *, s32, s32);
+void Effect_SetOrigin(void *, s32, s32);
+void Script_ReadReference(void *);
+void Script_WriteReferenceValue(void *, s32, s32);
 void sub_0800AC44(u32, u32, u32, struct CollisionVec *, struct SceneExtent *, u32, u32);
 
 #endif

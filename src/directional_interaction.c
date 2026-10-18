@@ -2,14 +2,14 @@
 // MATCHING_CONCESSION: register-pinning
 
 /* Sets the controller's state and flags it as newly entered. */
-u32 sub_08009500(struct DirectionalController *p, u32 state)
+u32 DirectionalController_SetState(struct DirectionalController *p, u32 state)
 {
     p->state = state;
     p->entered = 1;
 }
 
 /* Returns 1 once after a state starts. */
-u32 sub_0800950C(struct DirectionalController *p)
+u32 DirectionalController_ConsumeEntered(struct DirectionalController *p)
 {
     u32 r;
     if (p->entered == 0) {
@@ -21,7 +21,7 @@ u32 sub_0800950C(struct DirectionalController *p)
     return r;
 }
 
-s32 sub_08009524(struct DirectionalManager *manager, struct DirectionalController *p, s32 index)
+s32 DirectionalController_InitSlot(struct DirectionalManager *manager, struct DirectionalController *p, s32 index)
 {
     void *animation = p->animation;
     s32 r;
@@ -37,7 +37,7 @@ s32 sub_08009524(struct DirectionalManager *manager, struct DirectionalControlle
 }
 
 /* Finds the enabled controller with the given script id; optionally returns its slot index. */
-struct DirectionalController *sub_08009568(struct DirectionalManager *manager, s32 id, s32 *index)
+struct DirectionalController *DirectionalController_FindByScriptId(struct DirectionalManager *manager, s32 id, s32 *index)
 {
     struct DirectionalController *e;
     s32 i;
@@ -55,7 +55,7 @@ struct DirectionalController *sub_08009568(struct DirectionalManager *manager, s
 }
 
 /* Picks the marker animation for a fade level. */
-u32 sub_080095B4(struct DirectionalController *p, u32 level)
+u32 DirectionalController_SetMarkerFadeLevel(struct DirectionalController *p, u32 level)
 {
     void *animation = p->animation;
     if (p->disabled == 0)
@@ -63,7 +63,7 @@ u32 sub_080095B4(struct DirectionalController *p, u32 level)
 }
 
 /* Places the controller and its marker around the given point. */
-u32 sub_080095D4(struct DirectionalManager *manager, struct DirectionalController *p,
+u32 DirectionalController_SetPosition(struct DirectionalManager *manager, struct DirectionalController *p,
                  struct DirectionalPackedVec *in)
 {
     struct DirectionalDrawable *q = &p->drawable;
@@ -91,23 +91,23 @@ void LevelController_Update(struct DirectionalManager *manager, struct Direction
         switch (p->state) {
             case 0:
                 if (p->level == 0)
-                    sub_080095B4(p, 2);
+                    DirectionalController_SetMarkerFadeLevel(p, 2);
                 else {
-                    sub_080095B4(p, 1);
+                    DirectionalController_SetMarkerFadeLevel(p, 1);
                     p->level--;
                 }
                 break;
             case 1:
                 if (p->level > 4)
-                    sub_080095B4(p, 0);
+                    DirectionalController_SetMarkerFadeLevel(p, 0);
                 else {
-                    sub_080095B4(p, 1);
+                    DirectionalController_SetMarkerFadeLevel(p, 1);
                     p->level++;
                 }
                 break;
             case 2:
                 p->level = 5;
-                sub_080095B4(p, 0);
+                DirectionalController_SetMarkerFadeLevel(p, 0);
                 break;
         }
     }
@@ -144,13 +144,13 @@ void LevelController_RunScript(struct DirectionalManager *unused, struct Directi
     }
 }
 
-u32 sub_0800971C(struct DirectionalManager *manager, s32 index)
+u32 DirectionalController_SelectTarget(struct DirectionalManager *manager, s32 index)
 {
     manager->selected = index;
     manager->pending = 0;
 }
 
-u32 sub_08009728(struct DirectionalManager *manager, s32 index)
+u32 DirectionalController_ReleaseTarget(struct DirectionalManager *manager, s32 index)
 {
     manager->selected = index;
     manager->pending = 1;
@@ -175,7 +175,7 @@ static inline s32 facingAllowedR2(u32 facing, s32 a, s32 b, s32 c)
 s32 DirectionalController_CheckApproach(struct DirectionalManager *manager,
                                         struct DirectionalController *p)
 {
-    sub_0800950C(p);
+    DirectionalController_ConsumeEntered(p);
     if (manager->actor) {
         u32 mask = 6;
         u32 flags;
@@ -203,7 +203,7 @@ s32 DirectionalController_CheckApproach(struct DirectionalManager *manager,
                 if (a == direction || b == direction || c == direction) {
                     u32 facing = manager->actor->facing;
                     if (facingAllowed(facing, a, b, c))
-                        sub_08009500(p, 1);
+                        DirectionalController_SetState(p, 1);
                 }
             }
         }
@@ -215,7 +215,7 @@ done:
 s32 DirectionalController_CheckInput(struct DirectionalManager *manager,
                                      struct DirectionalController *p, s32 index)
 {
-    sub_0800950C(p);
+    DirectionalController_ConsumeEntered(p);
     if (manager->actor) {
         u32 mask = 6;
         u32 flags;
@@ -245,9 +245,9 @@ s32 DirectionalController_CheckInput(struct DirectionalManager *manager,
                     if (facingAllowed(facing, a, b, c)) {
                         if ((gUnk_03005260[1] & 1) && Actor_CanInteractWithController(manager, p)) {
                             p->level = 5;
-                            sub_080095B4(p, 0);
-                            sub_08009500(p, 2);
-                            sub_0800971C(manager, index);
+                            DirectionalController_SetMarkerFadeLevel(p, 0);
+                            DirectionalController_SetState(p, 2);
+                            DirectionalController_SelectTarget(manager, index);
                         }
                         goto done;
                     }
@@ -256,7 +256,7 @@ s32 DirectionalController_CheckInput(struct DirectionalManager *manager,
         }
     }
 failed:
-    sub_08009500(p, 0);
+    DirectionalController_SetState(p, 0);
 done:
     return 0;
 }
@@ -264,7 +264,7 @@ done:
 s32 DirectionalController_CheckRemaining(struct DirectionalManager *manager,
                                          struct DirectionalController *p)
 {
-    sub_0800950C(p);
+    DirectionalController_ConsumeEntered(p);
     if (manager->actor) {
         u32 mask = 6;
         u32 flags;
@@ -306,7 +306,7 @@ s32 DirectionalController_CheckRemaining(struct DirectionalManager *manager,
         }
     }
 done:
-    sub_08009500(p, 0);
+    DirectionalController_SetState(p, 0);
     return 0;
 }
 
@@ -380,7 +380,7 @@ s32 DirectionalController_InitManager(struct DirectionalManager *manager, void *
     Memory_Clear(manager->slots, manager->count * sizeof(struct DirectionalController));
     p = manager->slots;
     for (i = 0; i < manager->count; i++, p++)
-        if (sub_08009524(manager, p, i) < 0)
+        if (DirectionalController_InitSlot(manager, p, i) < 0)
             goto fail;
     manager->actor = gUnk_02000580[0];
     if (manager->actor)
@@ -393,7 +393,7 @@ s32 DirectionalController_InitManager(struct DirectionalManager *manager, void *
     return 0;
 }
 
-void *sub_08009B30(void *a)
+void *DirectionalController_CreateManagerTask(void *a)
 {
     struct DirectionalManager *p;
     if (gUnk_02000038 != 0)
@@ -461,12 +461,12 @@ s32 DirectionalController_ScriptCreate(void)
                 position.y = 0;
                 position.z = 0;
             }
-            sub_080095D4(manager, p, &position);
+            DirectionalController_SetPosition(manager, p, &position);
             if (findRegion)
                 p->region = Region_FindContaining(&p->position);
             else
                 p->region = -1;
-            sub_080095B4(p, 2);
+            DirectionalController_SetMarkerFadeLevel(p, 2);
             if (p->disabled == 1)
                 *drawable |= 1;
             else
@@ -490,8 +490,8 @@ s32 DirectionalController_ScriptRelease(void)
     struct DirectionalManager *manager = gUnk_02000038;
     if (!manager || manager->selected < 0 || manager->selected >= manager->count)
         return -1;
-    sub_08009728(manager, manager->selected);
-    sub_08009500(&manager->slots[manager->selected], 0);
+    DirectionalController_ReleaseTarget(manager, manager->selected);
+    DirectionalController_SetState(&manager->slots[manager->selected], 0);
     return 0;
 }
 
@@ -502,7 +502,7 @@ s32 DirectionalController_ScriptMove(void)
     struct DirectionalController *p;
     if (!manager)
         goto fail;
-    p = sub_08009568(manager, Script_GetKeywordValue('n', 0), 0);
+    p = DirectionalController_FindByScriptId(manager, Script_GetKeywordValue('n', 0), 0);
     if (!p) {
     fail:
         return -1;
@@ -516,7 +516,7 @@ s32 DirectionalController_ScriptMove(void)
         position.y = 0;
         position.z = 0;
     }
-    sub_080095D4(manager, p, &position);
+    DirectionalController_SetPosition(manager, p, &position);
     if (p->region >= 0)
         p->region = Region_FindContaining(&p->position);
 }

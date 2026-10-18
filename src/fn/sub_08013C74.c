@@ -1,6 +1,6 @@
 #include "global.h"
 
-s32 sub_08013C74(u8 *head, u8 *n)
+s32 ShadowRegistry_UnlinkEntry(u8 *head, u8 *n)
 {
     u8 *prev = *(u8 **)(n + 0x4C);
     u8 *next = *(u8 **)(n + 0x50);

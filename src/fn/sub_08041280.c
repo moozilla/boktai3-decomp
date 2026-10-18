@@ -2,7 +2,7 @@
 #include "modifier_list.h"
 u32 Modifier_ReadPackedValue(u32, s32);
 void sub_080339B8(s32, s32, s32, s32, s32);
-s32 sub_080337FC(u32);
+s32 TextWindow_StartPlayback(u32);
 void ModifierMenu_DrawAvailableLabels(struct ModifierMenu *menu)
 {
     u32 available = 0;
@@ -57,7 +57,7 @@ void ModifierMenu_DrawAvailableLabels(struct ModifierMenu *menu)
             TextWindow_SetScript(*window, *sources);
             TextWindow_Refresh(*window, 4);
         }
-        sub_080337FC(*window++);
+        TextWindow_StartPlayback(*window++);
         item++;
         y += 2;
         row++;

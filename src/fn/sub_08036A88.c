@@ -5,7 +5,7 @@ struct S {
     u8 a;
 };
 extern struct S *gUnk_02000484;
-u8 *sub_08036A88(void)
+u8 *Wireless_GetPeerHandshakeData(void)
 {
     struct S *p = gUnk_02000484;
     if (!p)

@@ -65,7 +65,7 @@ extern u8 *gUnk_030042E4;
 typedef struct {
     u32 a, b;
 } Point;
-void sub_08025550(ActorAnimation *p, int tick)
+void SceneActorAnimation_UpdateHomingLunge(ActorAnimation *p, int tick)
 {
     ActorAnimation *p2 = p;
     u32 *savedFlags;

@@ -1,15 +1,15 @@
 #include "global.h"
 
 void sub_080DEA7C(void *);
-void sub_080DED24(void *);
-void sub_080DED54(void *);
-void sub_080DF6D4(void *);
+void Dog_UpdateActionTimers(void *);
+void Dog_UpdateActionCooldown(void *);
+void Dog_TickCooldown(void *);
 
-s32 sub_080E41D4(void *p)
+s32 Dog_FinishFrame(void *p)
 {
     sub_080DEA7C(p);
-    sub_080DED24(p);
-    sub_080DED54(p);
-    sub_080DF6D4(p);
+    Dog_UpdateActionTimers(p);
+    Dog_UpdateActionCooldown(p);
+    Dog_TickCooldown(p);
     return 1;
 }

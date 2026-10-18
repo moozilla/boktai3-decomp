@@ -20,7 +20,7 @@ struct SceneEventDispatchState {
     u8 phase;
 };
 extern struct SceneEventDispatchState *gUnk_0200047C;
-void sub_08020D54(struct SceneEventReceiver *, struct SceneEventCommand *);
+void SceneMessages_SetPendingTrigger(struct SceneEventReceiver *, struct SceneEventCommand *);
 void SceneAudioEvent_PlaySong(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
                               struct SceneEventCommand *);
 void SceneAudioEvent_StartSongDirect(struct SceneEventDispatchTask *, struct SceneEventReceiver *,

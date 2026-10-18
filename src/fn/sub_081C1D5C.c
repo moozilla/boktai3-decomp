@@ -4,13 +4,13 @@ struct S {
     u16 h;
 };
 void sub_081C1820(void *);
-void sub_081C1D2C(void *);
-void sub_081C17D4(void *, void (*)(void));
+void ControlPanel_ShowInteractionDisplay(void *);
+void ControlPanel_SetUpdate(void *, void (*)(void));
 void sub_081C1FC0(void);
-void sub_081C1D5C(struct S *p)
+void ControlPanel_OnStartPromptComplete(struct S *p)
 {
     sub_081C1820(p);
-    sub_081C1D2C(p);
+    ControlPanel_ShowInteractionDisplay(p);
     p->h = 0x20;
-    sub_081C17D4(p, sub_081C1FC0);
+    ControlPanel_SetUpdate(p, sub_081C1FC0);
 }

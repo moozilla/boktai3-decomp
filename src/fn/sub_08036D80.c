@@ -1,12 +1,12 @@
 #include "global.h"
-u16 *sub_08036CA4(void);
-u16 sub_08036CAC(u8);
-u8 sub_08036CC4(u16);
+u16 *WirelessText_GetCharacterTable(void);
+u16 WirelessText_GetCharacterTableByte(u8);
+u8 WirelessText_FindCharacterIndex(u16);
 int Script_SeekToKeyword(int);
 void *Script_GetPc(void);
 int Script_ParseStringRef(void *);
 const u8 *Text_LookupString(int);
-void sub_08036D80(void)
+void WirelessText_InitCharacterTableFromScript(void)
 {
     void *script;
     u16 *table;
@@ -20,7 +20,7 @@ void sub_08036D80(void)
     if (!script) {
         return;
     }
-    table = sub_08036CA4();
+    table = WirelessText_GetCharacterTable();
     alias[1] = 0;
     alias[0] = 0;
     capacity = 256;

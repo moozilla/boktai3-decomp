@@ -8,7 +8,7 @@ struct P08159DF8 {
 };
 s32 sub_0813AFEC(void *, u32, u32);
 
-s32 sub_08159DF8(struct P08159DF8 *p)
+s32 Player_EndState25(struct P08159DF8 *p)
 {
     if (p->f1c != 1 || p->f457 != 0x19)
         return -1;

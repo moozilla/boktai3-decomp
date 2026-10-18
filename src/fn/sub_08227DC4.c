@@ -1,11 +1,11 @@
 #include "global.h"
 extern u8 *gUnk_030053F8;
 extern u8 *gUnk_02000710;
-u8 sub_0822BBA8(void);
-void sub_08227DC4(void)
+u8 Save_ReadHeader(void);
+void Settings_LoadOrInitializeDefaults(void)
 {
     if (gUnk_030053F8) {
-        u8 r = sub_0822BBA8();
+        u8 r = Save_ReadHeader();
         if (r == 0) {
             u16 five = 5;
             s32 limit;

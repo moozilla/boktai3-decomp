@@ -1,6 +1,6 @@
 #include "global.h"
 
-u32 sub_0803EC88(u32 a, u8 *b, u8 *e)
+u32 ScenePool_StateBrake(u32 a, u8 *b, u8 *e)
 {
     u32 m;
     u32 *p;

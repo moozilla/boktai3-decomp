@@ -4,11 +4,11 @@ struct Q {
     u16 v;
     u8 g[0x1C - 0x12];
 };
-void sub_081DAD0C(void *, void *);
-void sub_081D929C(void);
-s32 sub_081D927C(struct Q *p)
+void Projectile_SetUpdateCallback(void *, void *);
+void Projectile_UpdateSecondaryExpiry(void);
+s32 Projectile_InitSecondaryExpiry(struct Q *p)
 {
-    sub_081DAD0C((u8 *)p + 0x18, sub_081D929C);
+    Projectile_SetUpdateCallback((u8 *)p + 0x18, Projectile_UpdateSecondaryExpiry);
     (p + 5)->v = 0x19;
     return 0;
 }

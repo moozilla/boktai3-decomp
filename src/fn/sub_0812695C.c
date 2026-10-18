@@ -7,7 +7,7 @@ struct S {
 };
 extern struct S *gUnk_02000158;
 u32 AnimData_FindEntry(u32);
-s32 sub_0812695C(struct S *s)
+s32 BlinkingEffect_InitPool(struct S *s)
 {
     s->p = AnimData_FindEntry(0x1c1a);
     s->c = 0;

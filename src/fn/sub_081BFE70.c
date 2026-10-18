@@ -1,7 +1,7 @@
 #include "global.h"
 void Script_Call(u32, u32);
 void Task_Kill(u8 *);
-void sub_081BFE70(u8 *p)
+void Storage_UpdateCloseDelay(u8 *p)
 {
     u16 *c = (u16 *)(p + 0x174e);
     (*c)++;

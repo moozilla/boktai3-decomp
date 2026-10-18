@@ -5,7 +5,7 @@ struct P {
     u16 a;
     u16 b;
 };
-void sub_081A492C(struct P *p, u32 v)
+void Hresvelgr_SetFallingAttackState(struct P *p, u32 v)
 {
     p->v = v;
     p->a = 0;

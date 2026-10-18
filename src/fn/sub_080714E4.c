@@ -19,7 +19,7 @@ void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *a
     category = actor->category;
     if (category - 18 > 1 && category != 9 && category != 22) {
         struct ContactPosition *earlyPosition = &actor->position;
-        sub_0821E7EC((u16 *)earlyPosition, route->parameterA, route->parameterC);
+        Path_GetPointPositionById((u16 *)earlyPosition, route->parameterA, route->parameterC);
         Route_Start(route, route->parameterA, route->parameterB, route->parameterC);
         sub_0821FD3C(actor->routeObject, earlyPosition);
         actor->currentRoute = route;
@@ -44,7 +44,7 @@ void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *a
         cell = *address;
     }
     position = cachedPosition;
-    data = sub_0821D64C(cell, 1);
+    data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         data += 4;
     else {

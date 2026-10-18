@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_080174B8(u8 *p, u32 v)
+void Weather_EnterPhase(u8 *p, u32 v)
 {
     u32 z = 0;
     p[0x1D] = v;

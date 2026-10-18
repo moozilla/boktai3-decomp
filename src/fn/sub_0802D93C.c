@@ -7,7 +7,7 @@ struct S {
     u8 b[1];
 };
 u32 DisplayAnimation_SelectPaletteBank(u8 *, u32);
-u32 sub_0802D93C(struct S *p, u32 v)
+u32 Actor_SetPaletteBank(struct S *p, u32 v)
 {
     u8 *q = p->b;
     p->a = v;

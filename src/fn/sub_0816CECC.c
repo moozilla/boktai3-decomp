@@ -1,6 +1,6 @@
 #include "global.h"
 s32 Div(s32, s32);
-void sub_0816446C(void *, s32, s32, s32);
+void Hud_DrawDefaultHealthMeter(void *, s32, s32, s32);
 struct QCECC {
     u8 f[0x424];
     u16 done;
@@ -12,7 +12,7 @@ struct SCECC {
     u8 f2[0x4866 - 0xa44];
     s16 value;
 };
-void sub_0816CECC(struct SCECC *s, s32 n)
+void Inventory_RestoreLifePercent(struct SCECC *s, s32 n)
 {
     struct QCECC *q = s->q;
     s32 v;
@@ -28,5 +28,5 @@ void sub_0816CECC(struct SCECC *s, s32 n)
     } else {
         q->done = sum;
     }
-    sub_0816446C(s, 1, 2, 12);
+    Hud_DrawDefaultHealthMeter(s, 1, 2, 12);
 }

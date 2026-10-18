@@ -1,6 +1,6 @@
 #include "global.h"
 /* Hide all nine animated display objects. */
-void sub_081EA9B4(u8 *p)
+void TimeDisplay_HideAnimatedObjects(u8 *p)
 {
     *(u32 *)(p + 0x20) |= 1;
     *(u32 *)(p + 0x350) |= 1;

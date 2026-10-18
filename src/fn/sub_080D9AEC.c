@@ -11,7 +11,7 @@ struct S {
     struct T *t;
 };
 
-void sub_080D9AEC(struct S *s)
+void Mummy_UpdateMovementCooldown(struct S *s)
 {
     struct T *t = s->t;
     u32 m = 0x40;

@@ -1,11 +1,11 @@
 #include "global.h"
 
-void sub_08121EE0(void);
+void SceneEffect863A_LoadResources(void);
 extern s32 gUnk_02000138;
 
-s32 sub_08121F0C(s32 value)
+s32 SceneSpriteBurst_InitManager(s32 value)
 {
-    sub_08121EE0();
+    SceneEffect863A_LoadResources();
     gUnk_02000138 = value;
     return 0;
 }

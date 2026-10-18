@@ -1,8 +1,8 @@
 #include "global.h"
 #include "libm_compat.h"
-double sub_08229E28(double);
-double sub_08229FEC(double);
-double sub_08229560(double);
+double Time_CalculateSolarLongitude(double);
+double Time_CalculateSolarLatitude(double);
+double Time_CalculateEclipticObliquity(double);
 s32 __ltdf2(double, double);
 double __muldf3(double, double);
 double __adddf3(double, double);
@@ -12,13 +12,13 @@ struct SA230 {
     double d[12];
     s32 n[4];
 };
-void sub_0822A230(struct SA230 *s, s32 mode, double arg, s32 day, double longitude, double latitude)
+void Time_CalculateSolarRiseTransitSet(struct SA230 *s, s32 mode, double arg, s32 day, double longitude, double latitude)
 {
     double l, b, e, decl, alpha, hour;
 
-    l = sub_08229E28(arg);
-    b = sub_08229FEC(arg);
-    e = sub_08229560(arg);
+    l = Time_CalculateSolarLongitude(arg);
+    b = Time_CalculateSolarLatitude(arg);
+    e = Time_CalculateEclipticObliquity(arg);
     b = b / 57.29577951308238;
     l = l / 57.29577951308238;
     e = e / 57.29577951308238;

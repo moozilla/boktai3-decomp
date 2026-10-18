@@ -12,8 +12,8 @@ void ScenePanel_InitParticles(struct ScenePanel *input)
     for (; i < 32; i++) {
         struct ScenePanelParticle *particle = &particles->entries[i];
         sub_08217DE0(particle, particles->resource, 1);
-        sub_08217EC4(particle, scale, scale);
-        sub_08217ECC(particle, 1);
+        Effect_SetOrigin(particle, scale, scale);
+        Effect_SetPalette(particle, 1);
         particle->active = 0;
     }
 }

@@ -11,7 +11,7 @@ struct P {
 
 void sub_0816044C(struct P *);
 
-s32 sub_081604C0(struct P *p)
+s32 ActorDebris_Update(struct P *p)
 {
     u32 m = 1;
     if (p->w60 & m) {

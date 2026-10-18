@@ -22,7 +22,7 @@ static inline u8 TakeFlag(struct S *p)
     return FALSE;
 }
 
-void sub_08023BA0(struct S *p)
+void SceneActorState_PlayAnimation15AndConsumeTrigger(struct S *p)
 {
     if (TakeFlag(p)) {
         u32 v = 0xf;

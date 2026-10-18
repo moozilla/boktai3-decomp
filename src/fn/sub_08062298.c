@@ -1,7 +1,7 @@
 #include "scene_inventory_tail.h"
 void sub_0822DA94(u32);
-void sub_0822D0F0(u32);
-void sub_0822E18C(u32);
+void Inventory_SortConsumables(u32);
+void GameState_SortConsumableSlots(u32);
 s32 SceneInventory_TickResetConfirmation(struct SceneInventoryTail *p)
 {
     s32 result;
@@ -15,10 +15,10 @@ s32 SceneInventory_TickResetConfirmation(struct SceneInventoryTail *p)
                 sub_0822DA94(0);
                 break;
             case 1:
-                sub_0822D0F0(0);
+                Inventory_SortConsumables(0);
                 break;
             case 2:
-                sub_0822E18C(0);
+                GameState_SortConsumableSlots(0);
                 break;
         }
         SceneInventory_BeginBrowse(p);

@@ -3,8 +3,8 @@ struct E {
     u32 k, v;
 };
 extern struct E gUnk_08614D6C[];
-u8 *sub_0821A490(u8 *, u32, u16, u16);
-u32 sub_0821A4E8(u32, struct E *, s32, s32);
+u8 *Script_LookupResource(u8 *, u32, u16, u16);
+u32 Script_LookupArchive(u32, struct E *, s32, s32);
 u8 *ScriptProc_Start(u16 key, u16 context)
 {
     u32 special = 0;
@@ -64,10 +64,10 @@ u8 *ScriptProc_Start(u16 key, u16 context)
             break;
     }
     combined = (key << 16) | context;
-    result = (u8 *)sub_0821A4E8(combined, gUnk_08614D6C, 0, 10);
+    result = (u8 *)Script_LookupArchive(combined, gUnk_08614D6C, 0, 10);
     if (special == 1) {
         u32 third = saved_context;
-        result = sub_0821A490(result, key, third, combined);
+        result = Script_LookupResource(result, key, third, combined);
     }
     return result;
 }

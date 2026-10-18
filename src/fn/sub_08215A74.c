@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_08215A74(s32 n, u32 v)
+void Bg_SetPriority(s32 n, u32 v)
 {
     vu16 *r;
     u16 t;

@@ -9,7 +9,7 @@ struct S {
     u16 cnt;
 };
 extern u16 gUnk_03004FE0[];
-void sub_0811D16C(u16 *p)
+void PaletteFade_CycleMenuColors(u16 *p)
 {
     if (p[0x10] <= 1) {
         p[0x10]++;

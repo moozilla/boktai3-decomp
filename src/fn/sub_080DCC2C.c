@@ -1,9 +1,9 @@
 #include "global.h"
 
-s32 sub_080D48C0(void *);
+s32 Mummy_UpdateBehavior(void *);
 void sub_0824923C(void *, u32);
-void sub_0807FC5C(void *);
-s32 sub_080D48E8(void *);
+void SceneActorControl_DispatchControl(void *);
+s32 Mummy_UpdateSpecialFlags(void *);
 
 struct S {
     u8 filler[0x27c];
@@ -16,15 +16,15 @@ struct S {
     u16 flags;
 };
 
-s32 sub_080DCC2C(struct S *s)
+s32 Mummy_OnUpdate(struct S *s)
 {
     u32 m;
-    sub_080D48C0(s);
+    Mummy_UpdateBehavior(s);
     m = 0x2000;
     if ((s->flags & m) || s->h2b8 == 0) {
         sub_0824923C(s, s->tbl[s->idx]);
-        sub_0807FC5C(s);
+        SceneActorControl_DispatchControl(s);
     }
-    sub_080D48E8(s);
+    Mummy_UpdateSpecialFlags(s);
     return 1;
 }

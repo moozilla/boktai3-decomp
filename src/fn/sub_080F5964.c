@@ -26,8 +26,8 @@ static inline s32 absolute(s32 x)
         x = -x;
     return x;
 }
-void sub_080F59E0(struct Obj *);
-void sub_080F5964(struct Obj *p)
+void Sword_UpdateSpinningLunge(struct Obj *);
+void Sword_UpdateLungeSpinup(struct Obj *p)
 {
     if ((*(u32 *)(p->parent + 0xd80) & 3) == 0) {
         p->byte1DD--;
@@ -39,6 +39,6 @@ void sub_080F5964(struct Obj *p)
     if (p->timer < 0) {
         p->timer = 0;
         if (absolute(p->byte1DD) == 15)
-            p->callback = sub_080F59E0;
+            p->callback = Sword_UpdateSpinningLunge;
     }
 }

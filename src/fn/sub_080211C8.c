@@ -5,8 +5,8 @@ struct P {
     s16 b;
     s16 c;
 };
-void sub_080037B0(s32, s32, s32);
-void sub_080211C8(u32 x, u32 y, struct P *p)
+void ColorFade_SetImmediate(s32, s32, s32);
+void SceneCommands_ConfigureBlendWindow(u32 x, u32 y, struct P *p)
 {
     s32 c;
     s32 m;
@@ -32,5 +32,5 @@ void sub_080211C8(u32 x, u32 y, struct P *p)
             m = 0xFFFF;
             break;
     }
-    sub_080037B0(p->a, m, c);
+    ColorFade_SetImmediate(p->a, m, c);
 }

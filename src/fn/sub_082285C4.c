@@ -14,7 +14,7 @@ static inline s32 yearDays(s32 year)
     c = Div(year, k);
     return 365 * year + a - b + c;
 }
-s32 sub_082285C4(s32 year, s32 month, s32 day, s32 otherYear, s32 otherMonth, s32 otherDay)
+s32 Clock_CalculateDateDifference(s32 year, s32 month, s32 day, s32 otherYear, s32 otherMonth, s32 otherDay)
 {
     s32 total = yearDays(year);
     s32 otherTotal;

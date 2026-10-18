@@ -21,9 +21,9 @@ s32 SceneInput_TickPairTransition(struct SceneInputPair *);
 s32 SceneItemValue_CalculateEquipment(u32);
 s32 SceneItemValue_CalculateItem(u32);
 s32 SceneItemValue_CalculateConsumable(u32);
-void sub_0822D918(u32);
-void sub_0822CE18(u32);
-void sub_0822E11C(u32);
+void Inventory_RemoveEquipmentEntry(u32);
+void Inventory_ClearItemSlot(u32);
+void GameState_ClearConsumableSlot(u32);
 s32 SceneInventory_TickSaleFeedback(struct SceneInventoryTail *);
 static inline void AddFunds(s32 value, struct GameState **location)
 {
@@ -52,7 +52,7 @@ s32 SceneInventory_TickSaleTransition(struct SceneInventoryTail *input)
                 value = SceneItemValue_CalculateEquipment(selection);
                 asm("" : "+r"(value));
                 AddFunds(value, &gUnk_02000710);
-                sub_0822D918(selection);
+                Inventory_RemoveEquipmentEntry(selection);
                 break;
             case 1: {
                 register s32 item asm("r0");
@@ -63,7 +63,7 @@ s32 SceneInventory_TickSaleTransition(struct SceneInventoryTail *input)
                 asm("" : "+r"(value));
                 location = &gUnk_02000710;
                 AddFunds(value, location);
-                item = sub_0822CDA8(selection);
+                item = Inventory_GetItemId(selection);
                 if (item <= 31) {
                     bits = (u32 *)*location;
                     offset = 0x750;
@@ -78,14 +78,14 @@ s32 SceneInventory_TickSaleTransition(struct SceneInventoryTail *input)
                 item = *bits;
                 item |= category;
                 *bits = item;
-                sub_0822CE18(selection);
+                Inventory_ClearItemSlot(selection);
                 break;
             }
             case 2:
                 value = SceneItemValue_CalculateConsumable(selection);
                 asm("" : "+r"(value));
                 AddFunds(value, &gUnk_02000710);
-                sub_0822E11C(selection);
+                GameState_ClearConsumableSlot(selection);
                 break;
         }
         ((struct SceneInventorySaleFlags *)p)->sold = 1;

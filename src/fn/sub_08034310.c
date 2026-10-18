@@ -35,7 +35,7 @@ void Memory_Clear(void *, int);
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 void sub_08221380(const void *, void *, int);
-int sub_08034310(struct Engine *p)
+int WirelessController_BuildPeerRosterPacket(struct Engine *p)
 {
     u8 *packet = p->scratch;
     u16 fill;

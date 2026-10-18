@@ -1,6 +1,6 @@
 #include "roaming_object.h"
-u8 *sub_0821D64C(s32, s32);
-void sub_08225AB4(void *, u16, struct ContactPackedVector *, u32, u32, struct RoamingObject *);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
+void SceneBody_Init(void *, u16, struct ContactPackedVector *, u32, u32, struct RoamingObject *);
 void RoamingObjectB_InitializePosition(struct RoamingObject *owner)
 {
     struct ContactPackedVector position;
@@ -26,7 +26,7 @@ void RoamingObjectB_InitializePosition(struct RoamingObject *owner)
         cell = 0;
     else
         cell = gUnk_030052F4->rows[z] + x;
-    definition = sub_0821D64C(cell, 1);
+    definition = TerrainModifiers_FindCellOverride(cell, 1);
     if (definition)
         definition += 4;
     else {
@@ -45,5 +45,5 @@ void RoamingObjectB_InitializePosition(struct RoamingObject *owner)
             break;
     }
     ((u16 *)&position)[1] = height;
-    sub_08225AB4((u8 *)owner + 0x1C, owner->id, &position, 0, 7, owner);
+    SceneBody_Init((u8 *)owner + 0x1C, owner->id, &position, 0, 7, owner);
 }

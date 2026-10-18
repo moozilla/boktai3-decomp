@@ -1,6 +1,6 @@
 #include "global.h"
 
-s32 sub_08141C18(s32 x)
+s32 Player_GetMovementRateScale(s32 x)
 {
     if (x == 12)
         return 0x40;

@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08210C5C(u8 *arg)
+void Collection_UpdateHighlightPulse(u8 *arg)
 {
     u8 *p = arg;
     s32 v = *((s16 *)(p + 0x364));

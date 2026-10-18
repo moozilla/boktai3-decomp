@@ -41,8 +41,8 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->pending = 1;
 }
 // MATCHING_CONCESSION: register-pinning
-void sub_08224E0C(void *, u8 *);
-void sub_0803559C(struct Engine *argument)
+void Wireless_EnqueuePacket(void *, u8 *);
+void Wireless_BuildParentUniPacket(struct Engine *argument)
 {
     struct {
         u32 fill;
@@ -85,7 +85,7 @@ void sub_0803559C(struct Engine *argument)
             register u16 *input asm("r3");
             u16 *output;
             stack.sequence = *packet;
-            sub_08224E0C(p->message, packet);
+            Wireless_EnqueuePacket(p->message, packet);
             waiting = &p->flag36;
             *waiting = zero;
             stack.fill = zero;

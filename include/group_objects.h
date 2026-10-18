@@ -92,27 +92,27 @@ extern struct GroupGlobals {
 extern void (*gUnk_08604B48[])(struct GroupObjects *, struct GroupPiece *, int);
 
 void sub_08221110(void *, void *, void *, int, int);
-void sub_08013684(void *);
+void Shadow_Destroy(void *);
 void Shadow_Initialize(void *, void *, int);
 void SceneMessages_RegisterReceiver(void *, int, int);
-void sub_08020D08(void *);
-void sub_08020D54(void *, void *);
-struct GroupActor *sub_08225984(int);
+void SceneMessages_UnregisterReceiver(void *);
+void SceneMessages_SetPendingTrigger(void *, void *);
+struct GroupActor *SceneBody_GetById(int);
 int Mod(int, int);
 
 int BoardPiece_Initialize(struct GroupObjects *, struct GroupPiece *, int);
-u32 sub_0800FA40(struct GroupObjects *, struct GroupPiece *, int);
+u32 BoardPiece_Destroy(struct GroupObjects *, struct GroupPiece *, int);
 void BoardPiece_UpdateAnimation(struct GroupPiece *);
 int BoardPieces_DispatchCommands(struct GroupObjects *);
 void BoardPiece_Launch(struct GroupObjects *, struct GroupPiece *, int);
-void sub_08010A34(struct GroupObjects *, struct GroupPiece *);
+void BoardPiece_Deactivate(struct GroupObjects *, struct GroupPiece *);
 int GroupObjects_Update(struct GroupObjects *);
 int GroupObjects_Destroy(struct GroupObjects *);
 int GroupObjects_Initialize(struct GroupObjects *, int);
-void *sub_080111A8(void *);
+void *GroupObjects_CreateTask(void *);
 
 void sub_082216F8(void *, void *, void *, int, int);
-void sub_0800FA5C(struct GroupObjects *, struct GroupPiece *, int);
+void BoardPiece_SetFacingAnim(struct GroupObjects *, struct GroupPiece *, int);
 int sub_0800FC28(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
 int sub_0800FE98(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
 int sub_0801010C(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);

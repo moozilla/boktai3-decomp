@@ -8,7 +8,7 @@ struct P {
 
 void AnimData_SelectPaletteBank(void *, s32);
 
-void sub_08162DAC(struct P *p)
+void PlayerBarrier_BeginRecovery(struct P *p)
 {
     if (p != 0) {
         p->st = 2;

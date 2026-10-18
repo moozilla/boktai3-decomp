@@ -27,7 +27,7 @@ struct A {
     u8 b1df;
 };
 void sub_0818CC48(void);
-void sub_0818CC10(struct A *p)
+void Armor_BeginPartSpinup(struct A *p)
 {
     p->b1dd = 0;
     p->fn = sub_0818CC48;

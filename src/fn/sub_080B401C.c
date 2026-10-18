@@ -6,7 +6,7 @@ void sub_080B162C(void *);
 void sub_080B0AE8(void *);
 void sub_080B2EEC(void *);
 
-s32 sub_080B401C(void *p)
+s32 Vorn_UpdateBehavior(void *p)
 {
     sub_080B3464(p);
     sub_080B1170(p);

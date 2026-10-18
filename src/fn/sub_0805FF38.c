@@ -39,7 +39,7 @@ void SceneInventory_PopulateItemGrid(struct SceneInventoryPanel *input)
             register s32 kind asm("r5");
             {
                 register s32 slot asm("r1") = rowSlot + column;
-                kind = sub_0822CDA8(slot);
+                kind = Inventory_GetItemId(slot);
             }
             if (kind >= 0) {
                 register u32 frame asm("r2");

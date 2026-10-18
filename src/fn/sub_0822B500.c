@@ -1,7 +1,7 @@
 #include "global.h"
 extern u16 gUnk_03005470[];
 void m4aSongNumStop(u16);
-void sub_0822B500(void)
+void Sound_SuspendPlayer29And30Songs(void)
 {
     u16 *p = gUnk_03005470;
     if (p[0x3a / 2] != 0)

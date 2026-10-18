@@ -4,11 +4,11 @@ struct S {
     u8 pad[0x18];
     u32 f18;
 };
-u32 sub_081C3010(u32);
+u32 RegistryF3E4_GetStateResult(u32);
 void sub_081C4D78(struct S *);
 
-void sub_081C4E48(struct S *p)
+void RegistryC281_UpdateRepositioning(struct S *p)
 {
-    if (sub_081C3010(p->f18))
+    if (RegistryF3E4_GetStateResult(p->f18))
         sub_081C4D78(p);
 }

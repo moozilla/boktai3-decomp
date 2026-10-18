@@ -44,9 +44,9 @@ struct S {
     void (*fn)(void *);
 };
 void Anim_SetSequence(void *, u32, u32, u32, u32);
-void sub_081E4188(void *);
+void Actor_RestoreSavedAnimationPlayback(void *);
 void ActorShadow_Disable(void *);
-void sub_081E41EC(void *);
+void Actor_ArmRestIdleTransition(void *);
 static inline u8 take(struct S *p)
 {
     s32 m = 1;
@@ -64,13 +64,13 @@ static inline u32 frame_factor(u16 v)
     u32 mask = 15;
     return mask & value;
 }
-void sub_081E4174(void *);
+void Actor_SetInteractionControlFlag(void *);
 void AnimData_SelectPaletteBank(void *, s32);
 void Sound_PlaySong(s32);
 void Script_Call(void *, s32);
 void ActorShadow_Enable(void *);
 void ActorPalette_BeginFade(void *);
-void sub_081E6604(struct S *p)
+void Actor_UpdateLargeRestAnimation(struct S *p)
 {
     struct Obj *o;
     struct Anim *a;
@@ -85,7 +85,7 @@ void sub_081E6604(struct S *p)
         p->obj.scaleY = 127;
         p->obj.scaleX = 127;
         ActorShadow_Disable(p->p2);
-        sub_081E4174(p);
+        Actor_SetInteractionControlFlag(p);
         AnimData_SelectPaletteBank(p->effect, 343);
         p->phase = 0;
         if (p->oldMode == 3 && p->mode == 3) {

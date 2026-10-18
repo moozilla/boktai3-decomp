@@ -14,7 +14,7 @@ extern struct TimeState *gUnk_030053F8;
 extern u8 gUnk_03005430[];
 s32 Script_GetValueSafe(void);
 u8 *Script_SetPc(u8 *pc);
-s32 sub_0821AA00(const void *);
+s32 Script_ReadValue(const void *);
 void Time_CalculateSunriseSunset(s32 latitude, s32 longitude, s32 timezone);
 /* Registry routine 7978: -d points at a region table (groups of entries:
    group id or -1 to end, count, then per entry a name string, longitude and
@@ -34,7 +34,7 @@ void Time_OnLoadSave(void)
         count = Script_GetValue();
         for (k = 0; k < count && (pc = Script_GetPc()); n++, k++) {
             entries[n].group = group;
-            entries[n].name = sub_0821AA00(pc);
+            entries[n].name = Script_ReadValue(pc);
             entries[n].longitude = Script_GetValue();
             entries[n].latitude = Script_GetValue();
         }

@@ -1,17 +1,17 @@
 #include "global.h"
 #include "engine.h"
-u8 *sub_08227878(void);
-const u8 *sub_0821AAB0(const u8 *pc);
-/* Registry routine 0272: clears the 16-byte name buffer from sub_08227878 and
+u8 *PlayerName_GetBuffer(void);
+const u8 *Script_ReadString(const u8 *pc);
+/* Registry routine 0272: clears the 16-byte name buffer from PlayerName_GetBuffer and
    copies the string -n into it (at most 16 bytes), or writes the default
    four-character name (tentative: the player's name). */
 void PlayerName_SetFromScript(void)
 {
-    u8 *name = sub_08227878();
+    u8 *name = PlayerName_GetBuffer();
     u32 zero = 0;
     CpuSet(&zero, name, 0x05000004);
     if (Script_SeekToKeyword('n')) {
-        const u8 *text = sub_0821AAB0(Script_GetPc());
+        const u8 *text = Script_ReadString(Script_GetPc());
         if (text) {
             s32 i = 0;
             if (*text) {

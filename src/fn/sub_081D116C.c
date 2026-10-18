@@ -2,9 +2,9 @@
 extern u8 *gUnk_02000274, *gUnk_02000480;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetKeywordValue(s32, s32);
-u8 *sub_0802D6D0(void *, s32);
-void sub_0802F0C0(void);
-void sub_081D116C(void)
+u8 *Actor_FindById(void *, s32);
+void Actor_OnConfiguredAnimationUpdate(void);
+void SceneNpc_SetBehaviorFourFromScript(void)
 {
     u8 *p;
     if (!gUnk_02000274)
@@ -13,7 +13,7 @@ void sub_081D116C(void)
         p = gUnk_02000480;
         if (!p)
             return;
-        p = sub_0802D6D0(p, Script_GetKeywordValue(0x6e, 0));
+        p = Actor_FindById(p, Script_GetKeywordValue(0x6e, 0));
         if (!p)
             return;
     } else
@@ -31,7 +31,7 @@ void sub_081D116C(void)
         }
         *(u32 *)(p + 0x14) = zero;
         p[8] = one;
-        f = sub_0802F0C0;
+        f = Actor_OnConfiguredAnimationUpdate;
         p[6] = 7;
         *(void (**)(void))(p + 0x2cc) = f;
         *(u32 *)(p + 0x10) = zero;

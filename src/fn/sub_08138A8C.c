@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_020004C0;
-void sub_08138A8C(u32 i)
+void TimedSpriteEffect_RequestStop(u32 i)
 {
     u8 *b = gUnk_020004C0;
     if (b != 0 && i <= 3) {

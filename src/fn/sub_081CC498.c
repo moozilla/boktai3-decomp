@@ -1,6 +1,6 @@
 #include "global.h"
 void Actor_PlayAnimationEntry(u8 *, u32, u32, u32, u32);
-void sub_081CC498(u8 *a, u8 *b)
+void SceneCharacter_StartAnimationThree(u8 *a, u8 *b)
 {
     if (b[9]) {
         u32 z = 0;

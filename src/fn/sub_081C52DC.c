@@ -5,7 +5,7 @@ struct S {
 };
 void sub_081C5264(void *);
 void sub_0824923C(void *, u32);
-void sub_081C52DC(struct S *p)
+void Registry1909_Update(struct S *p)
 {
     sub_081C5264(p);
     if (p->a != 0)

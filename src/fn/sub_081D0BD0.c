@@ -8,7 +8,7 @@ struct S {
     u8 gap2[0x2cc - 0x14];
     void (*fn)(void *, void *, u32);
 };
-u32 sub_081D0BD0(void *a, struct S *p)
+u32 SceneNpc_OnStateUpdate(void *a, struct S *p)
 {
     u32 n;
     void (*fn)(void *, void *, u32);

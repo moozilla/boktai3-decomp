@@ -10,7 +10,7 @@ struct G {
 };
 void Effect_Remove(void *);
 void Memory_Clear(void *, u32);
-void sub_08122F38(struct G *g, struct E *e)
+void SceneAnimatedEffect_ReleaseEntry(struct G *g, struct E *e)
 {
     u8 *p;
     s32 k;

@@ -7,7 +7,7 @@ struct S {
     u8 g[0x1c];
     s32 w;
 };
-void sub_0811D00C(struct S *s, s16 *o)
+void Character_GetHeightAdjustedPosition(struct S *s, s16 *o)
 {
     o[0] = s->x >> 12;
     o[1] = (s->y + s->w) >> 12;

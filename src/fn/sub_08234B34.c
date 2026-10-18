@@ -2,14 +2,14 @@
 extern u32 gUnk_0300523C, gUnk_030053F4;
 void sub_08234868(u8 *);
 void Sound_PlaySong(u32);
-void sub_0822B45C(void);
+void Sound_ResumePersistentSongs(void);
 void Task_Kill(u8 *);
 static inline void clear(u32 *dst, u32 mask)
 {
     *dst &= mask;
 }
 #define H(o) (*(u16 *)(p + (o)))
-void sub_08234B34(u8 *p)
+void HealthRestoreEffect_UpdateCompletion(u8 *p)
 {
     if (H(0x270) == 30) {
         sub_08234868(p);
@@ -20,7 +20,7 @@ void sub_08234B34(u8 *p)
     if (H(0x270) > 59) {
         u32 mask, value;
         u32 *flags;
-        sub_0822B45C();
+        Sound_ResumePersistentSongs();
         flags = &gUnk_0300523C;
         mask = ~4;
         clear(flags, mask);

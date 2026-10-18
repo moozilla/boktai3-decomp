@@ -30,7 +30,7 @@ struct Sequence {
 };
 void Anim_LoadKeyframe(void *, void *, s32, s32);
 void Anim_SetKeyframes(void *, void *, s32, s32, s32);
-void sub_081E28D4(void *);
+void Presentation_UpdateLayerAnimations(void *);
 void Presentation_ClearTilemap(void);
 // Configure the presentation layers for the selected scripted sequence layout.
 void Presentation_ConfigureLayout(struct Sequence *p)
@@ -84,7 +84,7 @@ void Presentation_ConfigureLayout(struct Sequence *p)
             p->flags4 &= ~1;
             Anim_SetKeyframes(p->layer4, p->resource, 3, 1, 0);
             p->flags3 |= 1;
-            p->callback = sub_081E28D4;
+            p->callback = Presentation_UpdateLayerAnimations;
             break;
         case 1:
             p->flags1 &= ~1;
@@ -95,7 +95,7 @@ void Presentation_ConfigureLayout(struct Sequence *p)
             Anim_SetKeyframes(p->layer4, p->resource, 3, 1, 0);
             p->flags3 &= ~1;
             Anim_LoadKeyframe(p->layer3, p->resource, 0, 1);
-            p->callback = sub_081E28D4;
+            p->callback = Presentation_UpdateLayerAnimations;
             break;
         case 4:
         case 12:
@@ -106,7 +106,7 @@ void Presentation_ConfigureLayout(struct Sequence *p)
             p->flags4 &= ~1;
             Anim_SetKeyframes(p->layer4, p->resource, 3, 1, 0);
             p->flags3 |= 1;
-            p->callback = sub_081E28D4;
+            p->callback = Presentation_UpdateLayerAnimations;
             break;
         case 2:
         case 9:
@@ -117,7 +117,7 @@ void Presentation_ConfigureLayout(struct Sequence *p)
             p->flags4 &= ~1;
             Anim_SetKeyframes(p->layer4, p->resource, 3, 1, 0);
             p->flags3 |= 1;
-            p->callback = sub_081E28D4;
+            p->callback = Presentation_UpdateLayerAnimations;
             break;
         case 3:
             p->flags1 &= ~1;

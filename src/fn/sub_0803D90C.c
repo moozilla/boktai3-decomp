@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
-void sub_0811EDE0(struct ScenePoolActor *);
+void Modifier_StartDrainIfAboveThreshold(struct ScenePoolActor *);
 static inline void ApplyMotionControls(struct ScenePoolEntry *entry, struct ScenePoolActor *actor)
 {
     u32 controls;
@@ -20,7 +20,7 @@ static inline void ApplyMotionControls(struct ScenePoolEntry *entry, struct Scen
         if (controls & 0x200) {
             actor->timerB = 500;
             actor->timerA = 500;
-            sub_0811EDE0(actor);
+            Modifier_StartDrainIfAboveThreshold(actor);
         }
         if (controls & 0x100)
             actor->forwardSpeed += entry->step;

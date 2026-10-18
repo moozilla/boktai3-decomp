@@ -4,18 +4,18 @@ struct PeerMenu {
     u8 state, entered, pad1b[5];
     u32 timer;
 };
-int sub_08036AA8(void);
-void sub_08036B14(void);
+int Wireless_IsSessionActive(void);
+void Wireless_RequestAdvanceConnection(void);
 extern u16 gUnk_03005260[];
-void sub_080376C4(struct PeerMenu *p)
+void WirelessPeerMenu_UpdateCancelInput(struct PeerMenu *p)
 {
     if (p->entered)
         p->entered = 0;
     if (p->timer > 15) {
-        int busy = sub_08036AA8();
+        int busy = Wireless_IsSessionActive();
         if (busy) {
             if (gUnk_03005260[1] & 2) {
-                sub_08036B14();
+                Wireless_RequestAdvanceConnection();
                 {
                     u32 state = 7;
                     u32 zero = 0;
@@ -26,7 +26,7 @@ void sub_080376C4(struct PeerMenu *p)
             }
         } else {
             if (gUnk_03005260[1] & 0x200) {
-                sub_08036B14();
+                Wireless_RequestAdvanceConnection();
                 p->state = 7;
                 p->entered = 1;
                 p->timer = busy;

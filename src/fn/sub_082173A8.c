@@ -7,7 +7,7 @@ extern u32 gUnk_030051E0;
 extern s16 gUnk_03004DB0;
 extern u16 gUnk_030051D0;
 
-void sub_082173A8(void)
+void Palette_UploadBuffers(void)
 {
     struct Dma *d = (struct Dma *)0x040000D4;
     d->src = gUnk_030051E0;

@@ -16,7 +16,7 @@ struct Owner080AA024 {
     s16 count;
 };
 
-void sub_080AA024(struct Owner080AA024 *p, struct Pair080AA024 *pos)
+void TentacleActor_ResetSegmentPositions(struct Owner080AA024 *p, struct Pair080AA024 *pos)
 {
     s32 i;
     for (i = 0; i < p->count; i++) {

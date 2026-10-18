@@ -9,7 +9,7 @@ struct S {
     u16 b;
     u16 c;
 };
-void sub_0801746C(struct S *s)
+void Weather_SetRandomDuration(struct S *s)
 {
     s->a = s->b;
     if (s->c != 0) {

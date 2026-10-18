@@ -4,7 +4,7 @@ static inline u32 tst(volatile u16 *a, u32 m)
 {
     return *a & m;
 }
-void sub_081A5394(u16 *p)
+void Debug_NudgeScreenPositionWithA(u16 *p)
 {
     if (gUnk_03005260 & 1) {
         if (gUnk_03005260 & 0x10)

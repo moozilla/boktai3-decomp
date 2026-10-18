@@ -15,9 +15,9 @@ struct O2 {
     u8 f0[0xf4];
     u16 hf4;
 };
-void sub_081B79F8(void);
+void GrowthHazard_UpdateCooldown(void);
 
-void sub_081B7920(struct O *p)
+void GrowthHazard_BeginCooldown(struct O *p)
 {
     u32 a = 2;
     u32 z = 0;
@@ -25,7 +25,7 @@ void sub_081B7920(struct O *p)
     void (*f)(void);
     p->h10 = a;
     p->hfc = p->hfe;
-    f = sub_081B79F8;
+    f = GrowthHazard_UpdateCooldown;
     p->cb = f;
     ((struct O2 *)p)->hf4 = z;
     p->b102 = b;

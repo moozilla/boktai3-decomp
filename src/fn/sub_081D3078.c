@@ -9,7 +9,7 @@ struct S {
 };
 void Sprite_Remove(struct E *);
 
-void sub_081D3078(struct S *p)
+void FrostEmitter_Destroy(struct S *p)
 {
     struct E *e = p->e;
     s32 i;

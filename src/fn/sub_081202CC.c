@@ -2,7 +2,7 @@
 extern u32 gUnk_030053F4;
 extern u32 gUnk_030053F0;
 void SceneMessages_RegisterReceiver(u8 *, u32, u32);
-void sub_081202CC(u8 *p)
+void RegistryA8CB_RegisterMessageReceiver(u8 *p)
 {
     u32 m = 0x800;
     if (((gUnk_030053F4 | gUnk_030053F0) & m) == 0)

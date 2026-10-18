@@ -4,7 +4,7 @@ u32 Script_GetPc(void);
 void Script_ParseStringRef(void);
 u8 *Text_LookupString(void);
 extern u16 gUnk_03005428;
-void sub_0822824C(void)
+void Text_SetSilentCharacterFromScript(void)
 {
     if (Script_SeekToKeyword(0x73)) {
         if (Script_GetPc()) {

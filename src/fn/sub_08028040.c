@@ -58,7 +58,7 @@ static inline int trunc12(int x)
 }
 void SceneActors_StartAnimation(void *, void *, void *, int, int, int);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
-void sub_08028040(ActorAnimation *p)
+void SceneActors_UpdateUnmirroredReaction(ActorAnimation *p)
 {
     ActorAnimation *p2 = p;
     if (p->changed) {

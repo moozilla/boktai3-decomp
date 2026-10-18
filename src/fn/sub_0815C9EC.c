@@ -3,7 +3,7 @@
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 
-s32 sub_0815C9EC(void)
+s32 ScriptActor_GetDirectionFromScript(void)
 {
     s32 r;
     if (Script_SeekToKeyword(0x64) == 0)

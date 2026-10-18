@@ -2,9 +2,9 @@
 #include "contact_sequence_actor.h"
 struct ContactSequenceActor *ContactSequencePool_FindInactiveActor(struct ContactSequenceOwner *);
 void ContactSequenceActor_SetState(struct ContactSequenceActor *, u32);
-void *sub_0821D64C(u32, u32);
-void sub_0821FF50(void *, u32, u32);
-void sub_0821FF7C(void *, u32, u32, u32);
+void *TerrainModifiers_FindCellOverride(u32, u32);
+void Collider_SetAttackPowerAndForce(void *, u32, u32);
+void Collider_SetBodyProperties(void *, u32, u32, u32);
 struct ContactSequenceFrame {
     u16 frame, unknown2;
 };
@@ -36,7 +36,7 @@ s32 ContactSequencePool_SpawnActor(struct ContactSequenceOwner *pool,
         cell = 0;
     else
         cell = gUnk_030052F4->rows[z] + x;
-    entry = sub_0821D64C(cell, 1);
+    entry = TerrainModifiers_FindCellOverride(cell, 1);
     if (entry)
         entry += 4;
     else {
@@ -60,8 +60,8 @@ s32 ContactSequencePool_SpawnActor(struct ContactSequenceOwner *pool,
     Collider_SetPosition(healthCollider, savedPosition, 0);
     resourceCollider = &actor->resourceCollider;
     Collider_SetPosition(resourceCollider, savedPosition, 0);
-    sub_0821FF50(resourceCollider, (u16)owner->resourceValue, 50);
-    sub_0821FF7C(healthCollider, owner->contactValue, 0, 0);
+    Collider_SetAttackPowerAndForce(resourceCollider, (u16)owner->resourceValue, 50);
+    Collider_SetBodyProperties(healthCollider, owner->contactValue, 0, 0);
     ContactSequenceActor_SetState(actor, 1);
     actor->stateFrame = 0;
     {

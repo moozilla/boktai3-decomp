@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0823A2BC(u8 *p)
+void LinkPlayer_AdvanceActionTick(u8 *p)
 {
     u8 *q = *(u8 **)(p + 0x348);
 

@@ -13,10 +13,10 @@ struct P {
     u32 a;
     u32 b;
 };
-void sub_081FE6E0(void);
-u32 sub_081FEC9C(void *);
+void SunOrb_GetOrCreateManager(void);
+u32 SunOrb_CreatePlayerTargeted(void *);
 void Sound_PlaySong(u32);
-void sub_081C847C(u32 a, struct S *p)
+void StateActor_SpawnRaisedEffect(u32 a, struct S *p)
 {
     u8 *e = (u8 *)p + 0x20;
     if (p->b9 != 0) {
@@ -24,12 +24,12 @@ void sub_081C847C(u32 a, struct S *p)
         u16 *h;
         p->b9 = 0;
         p->b7 = 0;
-        sub_081FE6E0();
+        SunOrb_GetOrCreateManager();
         d = (struct P *)((u8 *)p + 0x54);
         *d = *(struct P *)((u8 *)p + 0x68);
         h = (u16 *)((u8 *)p + 0x56);
         *h = (u16)(0x100 + *h);
-        *(u32 *)(e + 4) = sub_081FEC9C(d);
+        *(u32 *)(e + 4) = SunOrb_CreatePlayerTargeted(d);
         Sound_PlaySong(0x571);
     }
     p->b7 = 1;

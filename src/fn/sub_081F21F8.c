@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_081F21F8(u8 *p)
+void SingletonSlot7_OnEffectMotionComplete(u8 *p)
 {
     u8 one = 1;
     u32 z = 0;

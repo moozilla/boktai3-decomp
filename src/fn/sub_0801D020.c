@@ -6,8 +6,8 @@ Resource *ScriptProc_Start(int, int);
 void ResourceHeader_Relocate(void *, void *);
 int ResultMenu_ReadScript(void *);
 void ResultMenu_CreateGraphics(void *);
-void sub_0801B534(void *, void *);
-void sub_0801C5E4(void *);
+void ResultMenu_SetPhase(void *, void *);
+void ResultMenu_UpdateIntro(void *);
 int ResultMenu_Initialize(u8 *p, void *owner)
 {
     Resource *r;
@@ -25,6 +25,6 @@ int ResultMenu_Initialize(u8 *p, void *owner)
     if (ResultMenu_ReadScript(p) < 0)
         return -1;
     ResultMenu_CreateGraphics(p);
-    sub_0801B534(p, sub_0801C5E4);
+    ResultMenu_SetPhase(p, ResultMenu_UpdateIntro);
     return 0;
 }

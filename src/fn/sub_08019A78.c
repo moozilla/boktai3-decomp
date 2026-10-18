@@ -1,7 +1,7 @@
 #include "global.h"
 extern u32 gUnk_020000B0;
 void Sprite_Remove(u8 *);
-u32 sub_08019A78(u8 *p)
+u32 SpritePool_Destroy(u8 *p)
 {
     u8 *e = p + 0x18;
     s32 i = 0xf;

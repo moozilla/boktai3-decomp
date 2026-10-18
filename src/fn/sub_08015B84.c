@@ -3,7 +3,7 @@ struct A {
     u16 v[20];
 };
 void AnimatedParticles_Create(u32, u32, struct A *);
-void sub_08015B84(u32 a, u32 b, u32 c, u32 d, u32 e)
+void AnimatedParticles_EmitChargeSparkle(u32 a, u32 b, u32 c, u32 d, u32 e)
 {
     struct A s;
     s.v[0] = b;

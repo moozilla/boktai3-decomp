@@ -1,5 +1,5 @@
 #include "global.h"
 
-void sub_08029904(void)
+void GridAttackActor_OnBodyCollision(void)
 {
 }

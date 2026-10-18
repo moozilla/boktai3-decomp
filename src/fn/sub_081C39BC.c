@@ -11,7 +11,7 @@ struct S {
 };
 void sub_081C3A20(void);
 
-void sub_081C39BC(struct S *p)
+void RegistryF3E4_StartAppearing(struct S *p)
 {
     void (*f)(void);
     p->f34 &= ~1;

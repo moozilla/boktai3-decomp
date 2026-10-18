@@ -9,14 +9,14 @@ struct A {
     struct E e[10];
 };
 extern u32 gUnk_020005E8;
-void sub_081FCA0C(struct A *, struct E *, s32);
-u32 sub_081FCF38(struct A *a)
+void SceneProjectile_ReleaseSlot(struct A *, struct E *, s32);
+u32 SceneProjectile_OnPoolDestroy(struct A *a)
 {
     struct E *e = a->e;
     s32 i = 0;
     do {
         if (a->w18 & (1 << i))
-            sub_081FCA0C(a, e, i);
+            SceneProjectile_ReleaseSlot(a, e, i);
         i++;
         e++;
     } while (i <= 9);

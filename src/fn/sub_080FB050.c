@@ -9,7 +9,7 @@ struct S080FB050 {
     struct Q *q;
 };
 
-void sub_080FB050(struct S080FB050 *s)
+void Axe_TickCooldowns(struct S080FB050 *s)
 {
     u16 *p = s->q->v;
     s32 i = 3;

@@ -26,7 +26,7 @@ static inline void st(void (*v)(void), void (**a)(void))
 {
     *a = v;
 }
-void sub_081EF248(struct S *p)
+void SceneActors_EnterRandomizedActionState(struct S *p)
 {
     u8 *q;
     u32 r;

@@ -1,10 +1,10 @@
 #include "global.h"
 
-void sub_0819AB64(u8 *, u32);
+void SceneOrbitHazard_SetState(u8 *, u32);
 
-void sub_0819ADF4(u8 *p)
+void SceneOrbitHazard_Activate(u8 *p)
 {
     if (p != 0 && *(p + 0xE0) == 0) {
-        sub_0819AB64(p, 1);
+        SceneOrbitHazard_SetState(p, 1);
     }
 }

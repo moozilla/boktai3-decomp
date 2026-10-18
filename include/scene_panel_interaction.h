@@ -89,12 +89,12 @@ void PlayerCue_Motion7Front(struct ScenePanelInteractionPlayer *, u32, u32);
 void PlayerCue_Motion7End(struct ScenePanelInteractionPlayer *, u32);
 void PlayerCue_Kneel(struct ScenePanelInteractionPlayer *, s32, u32);
 void PlayerCue_StateMotion(struct ScenePanelInteractionPlayer *, u32);
-void sub_0815C99C(struct ScenePanelInteractionPlayer *);
+void PlayerCue_ReleaseControl(struct ScenePanelInteractionPlayer *);
 void TetherActor_SetInteractionTarget(const void *, u32);
 void TetherActor_BeginAuxiliaryState(struct TetherActor *);
 void TetherActor_BeginDirectedState(struct ContactPosition *);
-void sub_082260A4(s32);
+void Camera_RequestShake(s32);
 void sub_08226380(u32, const void *);
-void sub_08226508(u32);
-void sub_0822B058(u32);
+void Camera_FollowPlayerWithoutCompletion(u32);
+void Sound_FadeOutChannel10(u32);
 #endif

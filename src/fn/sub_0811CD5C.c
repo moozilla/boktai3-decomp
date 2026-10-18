@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0811CD5C(s32 p, u32 v)
+void CharacterModel_SetComponentRenderMode(s32 p, u32 v)
 {
     s32 q = p + 0x180;
     do {

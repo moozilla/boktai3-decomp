@@ -41,19 +41,19 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->pending = 1;
 }
 void sub_08223BC0(int);
-void sub_0803441C(struct Engine *);
-void sub_0803451C(struct Engine *);
+void WirelessController_UpdatePeerRosterSend(struct Engine *);
+void WirelessController_PollPeerRosterSend(struct Engine *);
 int sub_0824923C(void *, void *);
 extern void *gUnk_086056EC[];
-void sub_080341B8(struct Engine *);
-void sub_080341E0(struct Engine *);
-void sub_0803559C(struct Engine *);
-void sub_08223580(int);
+void WirelessController_RestoreLocalInput(struct Engine *);
+void WirelessController_PollInputExchange(struct Engine *);
+void Wireless_BuildParentUniPacket(struct Engine *);
+void RfuManager_SendData(int);
 extern u32 gUnk_03005250;
 extern u16 gUnk_03005274[];
-int sub_080362E0(struct Engine *);
-void sub_080363D0(struct Engine *);
-int sub_08036778(struct Engine *p)
+int Wireless_ExchangeChildNiPacket(struct Engine *);
+void Wireless_PollChildNiSend(struct Engine *);
+int Wireless_UpdateChildNiSession(struct Engine *p)
 {
     u8 *ready = &p->flag31;
     {
@@ -62,8 +62,8 @@ int sub_08036778(struct Engine *p)
         sub_08223BC0(zero);
     }
     rfu_getMasterSlave();
-    sub_080362E0(p);
-    sub_080363D0(p);
+    Wireless_ExchangeChildNiPacket(p);
+    Wireless_PollChildNiSend(p);
     {
         void **handlers = gUnk_086056EC;
         int op = p->operation;

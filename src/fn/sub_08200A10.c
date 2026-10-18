@@ -18,23 +18,23 @@ struct Vec00A {
     u32 z : 16;
 };
 
-void sub_08201274(u8 *);
+void PlayerClone_InitConfig(u8 *);
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(u8 *, void *);
 void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
-u32 sub_081605DC(u8 *, u8 *, u8 *);
-void sub_0816065C(u32, u32, u32);
-void sub_080139F4(u8 *, u8 *);
-void sub_08013728(u8 *);
+u32 ActorDebris_Create(u8 *, u8 *, u8 *);
+void PlayerEffect_SetPaletteSource(u32, u32, u32);
+void ScaledShadow_InitializeDefault(u8 *, u8 *);
+void ScaledShadow_Disable(u8 *);
 void Collider_Init(u8 *, u32, u32, u32, u32, struct Vec00A *, struct Vec00A *);
 void Collider_SetCallback(u8 *, void *, u8 *);
-void sub_0821FF7C(u8 *, s32, u32, u32);
+void Collider_SetBodyProperties(u8 *, s32, u32, u32);
 s32 Collider_Refresh(u8 *);
-void sub_0821FF58(u8 *, s32, s32, u32, u32, s32);
+void Collider_SetAttackProperties(u8 *, s32, s32, u32, u32, s32);
 void sub_08200324(void);
-void sub_082003B8(void);
+void PlayerClone_OnPassiveColliderContact(void);
 
-void sub_08200A10(u32 unused, u8 *s, u32 arg)
+void PlayerClone_InitSlot(u32 unused, u8 *s, u32 arg)
 {
     u8 *context = s + 0x198;
     u32 zero, fill;
@@ -42,7 +42,7 @@ void sub_08200A10(u32 unused, u8 *s, u32 arg)
     u32 value;
     struct Vec00A v, w;
 
-    sub_08201274(context);
+    PlayerClone_InitConfig(context);
     zero = 0;
     *(u32 *)s = zero;
     {
@@ -60,15 +60,15 @@ void sub_08200A10(u32 unused, u8 *s, u32 arg)
             u8 *p = s + 0x1b8;
             sub_0821983C(p, obj, 0, 0, 2, 1, zero, zero);
             *(u32 *)(s + 0x1c0) |= 1;
-            value = sub_081605DC(p, s + 0x320, s + 0x322);
+            value = ActorDebris_Create(p, s + 0x320, s + 0x322);
             *(u32 *)(s + 0x33c) = value;
-            sub_0816065C(value, 0xe001, 0);
+            PlayerEffect_SetPaletteSource(value, 0xe001, 0);
         }
     }
     {
         u8 *obj = s + 0x298;
-        sub_080139F4(obj, s + 0x1d8);
-        sub_08013728(obj);
+        ScaledShadow_InitializeDefault(obj, s + 0x1d8);
+        ScaledShadow_Disable(obj);
     }
     *(u32 *)(s + 0x328) = arg;
     p = s + 0x80;
@@ -80,7 +80,7 @@ void sub_08200A10(u32 unused, u8 *s, u32 arg)
     w.z = zero;
     Collider_Init(p, zero, 0x4001, zero, 16, &v, &w);
     Collider_SetCallback(p, sub_08200324, s);
-    sub_0821FF7C(p, *(s16 *)(context + 0x16), 0x402, 1);
+    Collider_SetBodyProperties(p, *(s16 *)(context + 0x16), 0x402, 1);
     Collider_Refresh(p);
     *(u16 *)(p + 6) = flag00A(*(u16 *)(p + 6));
     p -= 0x54;
@@ -91,8 +91,8 @@ void sub_08200A10(u32 unused, u8 *s, u32 arg)
     w.y = 128;
     w.z = zero;
     Collider_Init(p, zero, 0x2001, zero, 16, &v, &w);
-    Collider_SetCallback(p, sub_082003B8, s);
-    sub_0821FF58(p, *(s16 *)(context + 0x10), *(s16 *)(context + 0x12), 0, zero,
+    Collider_SetCallback(p, PlayerClone_OnPassiveColliderContact, s);
+    Collider_SetAttackProperties(p, *(s16 *)(context + 0x10), *(s16 *)(context + 0x12), 0, zero,
                  *(s16 *)(context + 0x14));
     p += 0xa8;
     v.x = 200;
@@ -102,8 +102,8 @@ void sub_08200A10(u32 unused, u8 *s, u32 arg)
     w.y = 128;
     w.z = zero;
     Collider_Init(p, zero, 0x2001, zero, 16, &v, &w);
-    Collider_SetCallback(p, sub_082003B8, s);
-    sub_0821FF58(p, *(s16 *)(context + 0x18), *(s16 *)(context + 0x1a), 0, zero,
+    Collider_SetCallback(p, PlayerClone_OnPassiveColliderContact, s);
+    Collider_SetAttackProperties(p, *(s16 *)(context + 0x18), *(s16 *)(context + 0x1a), 0, zero,
                  *(s16 *)(context + 0x1c));
     p = s + 0x128;
     v.x = 32;
@@ -113,5 +113,5 @@ void sub_08200A10(u32 unused, u8 *s, u32 arg)
     w.y = 128;
     w.z = zero;
     Collider_Init(p, zero, 0x2001, zero, 16, &v, &w);
-    Collider_SetCallback(p, sub_082003B8, s);
+    Collider_SetCallback(p, PlayerClone_OnPassiveColliderContact, s);
 }

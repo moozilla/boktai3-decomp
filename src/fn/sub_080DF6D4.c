@@ -5,7 +5,7 @@ struct S {
     u8 b;
 };
 
-void sub_080DF6D4(struct S *s)
+void Dog_TickCooldown(struct S *s)
 {
     u8 *p = &s->b;
     if (*p != 0)

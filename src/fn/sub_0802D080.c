@@ -13,11 +13,11 @@ struct Object {
     u8 pad182[2];
     u32 drawable;
 };
-void sub_0802CB94(struct Object *);
+void Actor_RefreshTarget(struct Object *);
 void DisplayAnimation_SetPosition(void *, void *);
 void DisplayAnimation_UpdatePlayback(void *);
 int DisplayAnimation_SetEntry(void *, int, int, int, int, int, int);
-int sub_0802D080(struct Object *p, int a, int b, int stride, int c, int d)
+int Actor_SetFacingAnimationEntry(struct Object *p, int a, int b, int stride, int c, int d)
 {
     int direction, flip;
     if (p->drawable == 1) {

@@ -1,5 +1,5 @@
 #include "global.h"
-u16 sub_08228508(u16 value)
+u16 Clock_DecodeBcd(u16 value)
 {
     u32 word = (u32)value << 16;
     u32 mask = 15;

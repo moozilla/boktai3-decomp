@@ -2,7 +2,7 @@
 #ifdef NONMATCHING
 // fuzzy: 60.0%
 // 17 differing instruction runs; size -4 bytes; first diff at +0xC (mov sb, r1 vs mov r8, r1)
-u16 sub_08248764(u16, const u16 *), sub_082488D8(u16, const u16 *);
+u16 Eeprom_WriteBlockWithFullDelay(u16, const u16 *), Eeprom_VerifyBlock(u16, const u16 *);
 s32 sub_0822EE68(u16 start, const u16 *data, s32 length)
 {
     s32 blocks = length >> 3, i, address;
@@ -11,12 +11,12 @@ s32 sub_0822EE68(u16 start, const u16 *data, s32 length)
     p = data;
     address = start;
     for (i = 0; i < blocks; i++, p += 4, address++)
-        if (sub_08248764(address, p))
+        if (Eeprom_WriteBlockWithFullDelay(address, p))
             goto fail;
     p = data;
     address = start;
     for (i = 0; i < blocks; i++, p += 4, address++)
-        if (sub_082488D8(address, p))
+        if (Eeprom_VerifyBlock(address, p))
             goto fail;
     header[0] = 0;
     header[1] = 0;
@@ -33,9 +33,9 @@ s32 sub_0822EE68(u16 start, const u16 *data, s32 length)
     }
     header[2] = length;
     header[3] = 65535;
-    if (sub_08248764((u16)address, header))
+    if (Eeprom_WriteBlockWithFullDelay((u16)address, header))
         goto fail;
-    if (sub_082488D8((u16)address, header))
+    if (Eeprom_VerifyBlock((u16)address, header))
         goto fail;
     return length + 8;
 fail:

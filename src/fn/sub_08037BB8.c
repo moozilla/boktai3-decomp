@@ -22,19 +22,19 @@ struct P {
 void *ScriptProc_Start(int, int);
 void ResourceHeader_Relocate(void *, void *);
 int Script_SeekToKeyword(int);
-void *sub_08227E90(void);
+void *Script_GetTextSourcePc(void);
 void *Script_GetKeywordValue(int, int);
-void sub_08037228(struct P *);
-int sub_08037290(struct P *, struct Panel *, int);
+void WirelessPeerMenu_InitBackground(struct P *);
+int WirelessPeerPanel_Init(struct P *, struct Panel *, int);
 int sub_08033690(int, int, int, int);
 void TextWindow_SetScript(int, void *);
-void sub_08033A38(int, int, void *);
+void TextWindow_SetString(int, int, void *);
 void TextWindow_Refresh(int, int);
-void sub_080337FC(int);
+void TextWindow_StartPlayback(int);
 void WirelessLinkIndicator_SetPosition(int, int);
-void sub_082279A8(int, int, int, int, int, int, int);
+void ScreenTransition_SendCommand(int, int, int, int, int, int, int);
 void sub_0821983C(void *, void *, int, int, int, int, int, int);
-int sub_08037BB8(struct P *p)
+int WirelessPeerPanel_Initialize(struct P *p)
 {
     struct Blob *b = ScriptProc_Start(0xcb05, 0x530d);
     struct Panel *q;
@@ -46,18 +46,18 @@ int sub_08037BB8(struct P *p)
     ResourceHeader_Relocate(&p->blob, b);
     if (!Script_SeekToKeyword(0x73))
         goto fail;
-    p->script = sub_08227E90();
+    p->script = Script_GetTextSourcePc();
     if (!p->script)
         goto fail;
     p->title = Script_GetKeywordValue(0x72, 0);
     p->state = 0;
     p->entered = 1;
     p->timer = 0;
-    sub_08037228(p);
+    WirelessPeerMenu_InitBackground(p);
     q = p->panels;
     i = 0;
     do {
-        if (sub_08037290(p, q, i) < 0)
+        if (WirelessPeerPanel_Init(p, q, i) < 0)
             goto fail;
         i++;
         q++;
@@ -67,26 +67,26 @@ int sub_08037BB8(struct P *p)
     if (*w < 0)
         goto fail;
     TextWindow_SetScript(*w, p->script);
-    sub_08033A38(*w, 0, (u8 *)p + 0x25c);
+    TextWindow_SetString(*w, 0, (u8 *)p + 0x25c);
     TextWindow_Refresh(*w, 3);
-    sub_080337FC(*w);
+    TextWindow_StartPlayback(*w);
     w = &p->windows[1];
     *w = sub_08033690(17, 10, 10, 2);
     if (*w < 0)
         goto fail;
     TextWindow_SetScript(*w, p->script);
-    sub_08033A38(*w, 1, (u8 *)p + 0x4b8);
+    TextWindow_SetString(*w, 1, (u8 *)p + 0x4b8);
     TextWindow_Refresh(*w, 4);
-    sub_080337FC(*w);
+    TextWindow_StartPlayback(*w);
     w = &p->windows[2];
     *w = sub_08033690(0, 14, 30, 6);
     if (*w < 0)
         goto fail;
     TextWindow_SetScript(*w, p->script);
     TextWindow_Refresh(*w, 7);
-    sub_080337FC(*w);
+    TextWindow_StartPlayback(*w);
     WirelessLinkIndicator_SetPosition(0, 24);
-    sub_082279A8(2, 4, 4, 4, 4, 65535, 0);
+    ScreenTransition_SendCommand(2, 4, 4, 4, 4, 65535, 0);
     b = ScriptProc_Start(0xcb05, 0x7c8b);
     if (!b)
         goto fail;
@@ -102,12 +102,12 @@ void Task_SetCallbacks(void *, void *, void *);
 void Task_Kill(void *);
 int sub_08037B20(struct P *);
 int sub_08037B6C(struct P *);
-struct P *sub_08037D80(void)
+struct P *WirelessPeerPanel_Create(void)
 {
     struct P *p = Task_Create(11, 0x694);
     if (p) {
         Task_SetCallbacks(p, sub_08037B20, sub_08037B6C);
-        if (sub_08037BB8(p) < 0) {
+        if (WirelessPeerPanel_Initialize(p) < 0) {
             Task_Kill(p);
             return 0;
         }
@@ -115,13 +115,13 @@ struct P *sub_08037D80(void)
     return p;
 }
 extern struct P *gUnk_020000FC;
-struct P *sub_08037DC0(void)
+struct P *WirelessExchange_Get(void)
 {
     return gUnk_020000FC;
 }
-void *sub_08037DCC(int i)
+void *WirelessExchange_GetPeerEntry(int i)
 {
-    struct P *p = sub_08037DC0();
+    struct P *p = WirelessExchange_Get();
     void *r;
     if (p)
         r = (u8 *)p + 0xf4 + i * 16;

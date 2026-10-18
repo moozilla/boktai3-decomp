@@ -1,5 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_manager.h"
+/* ActorAttachment_ReleaseAll: Releases occupied attachment slots and removes their sprites or parts without identity filtering */
+#define ActorAttachment_ReleaseAll sub_08066CB8
 #define ActorAttachment_ReleaseAll sub_08066CB8
 void Effect_Remove(void *);
 static inline u8 IsOccupied(u32 *mask, u32 bit)

@@ -5,7 +5,7 @@ struct S {
     u16 h26;
 };
 
-void sub_081D4DE0(struct S *p, u16 v)
+void BestiaryDisplay_SetPresentationMode(struct S *p, u16 v)
 {
     p->h26 = v;
 }

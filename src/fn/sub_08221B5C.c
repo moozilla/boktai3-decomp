@@ -1,4 +1,6 @@
 #include "scalar_approach.h"
+/* ScalarApproach_StepHalfArray: Updates signed halfword values toward corresponding targets using half steps */
+#define ScalarApproach_StepHalfArray sub_08221B5C
 #define ScalarApproach_HalfArray sub_08221B5C
 void ScalarApproach_HalfArray(s16 *values, const s16 *targets, s32 count)
 {

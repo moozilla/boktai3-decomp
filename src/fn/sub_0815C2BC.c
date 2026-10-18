@@ -15,7 +15,7 @@ struct P {
 
 void sub_0815AD78(struct P *);
 void sub_0813AFEC(struct P *, s32, s32);
-void sub_081561A8(void);
+void PlayerCue_UpdateStandDiagonalB(void);
 
 void PlayerCue_StandDiagonalB(struct P *p, s32 dir, u32 c)
 {
@@ -32,5 +32,5 @@ void PlayerCue_StandDiagonalB(struct P *p, s32 dir, u32 c)
     p->c = c;
     sub_0815AD78(p);
     sub_0813AFEC(p, 0, 0);
-    p->fn = sub_081561A8;
+    p->fn = PlayerCue_UpdateStandDiagonalB;
 }

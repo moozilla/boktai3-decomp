@@ -4,10 +4,10 @@
 #include "tether_actor.h"
 extern u16 gUnk_02000550, gUnk_0200052C, gUnk_0200053C;
 void sub_0821BC68(void *, void *);
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline u32 cellByte(s32 cell)
 {
-    u8 *properties = sub_0821D64C(cell, 1);
+    u8 *properties = TerrainModifiers_FindCellOverride(cell, 1);
     if (properties)
         properties += 4;
     else {

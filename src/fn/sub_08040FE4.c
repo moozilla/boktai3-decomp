@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_08040FE4(u8 *p)
+void ModifierMenu_HideDisplayObjects(u8 *p)
 {
     u32 m = 1;
     u32 *q = (u32 *)(p + 0x184);

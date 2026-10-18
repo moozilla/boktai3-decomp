@@ -7,7 +7,7 @@ struct S {
     u8 f;
 };
 
-void sub_080DFC10(struct S *s)
+void Dog_SelectAnimationZero(struct S *s)
 {
     if (s->f != 0)
         s->f = 0;

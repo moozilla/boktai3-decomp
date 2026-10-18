@@ -1,12 +1,12 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-u8 *sub_0821A2C4(int);
+u8 *ResourceRegistry_GetResource(int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
 void SceneObject_UpdateRaised(void);
 int SceneObjects_ScriptRaise(void)
 {
-    u8 *p = sub_0821A2C4(0x85e6);
+    u8 *p = ResourceRegistry_GetResource(0x85e6);
     register int found asm("r6");
     int i;
     int id;

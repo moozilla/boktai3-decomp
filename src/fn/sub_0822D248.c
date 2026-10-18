@@ -1,6 +1,6 @@
 #include "global.h"
-s32 sub_0822D210(void);
-s32 sub_0822D248(s32 kind)
+s32 Inventory_RollIcePopStick(void);
+s32 Inventory_GetAgedItemReplacement(s32 kind)
 {
     switch (kind) {
         case 1:
@@ -18,7 +18,7 @@ s32 sub_0822D248(s32 kind)
             return 14;
         case 10:
         case 11:
-            return sub_0822D210();
+            return Inventory_RollIcePopStick();
         default:
             return -1;
     }

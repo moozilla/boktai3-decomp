@@ -18,7 +18,7 @@ struct R {
     u32 flags;
 };
 
-s32 sub_080D9A94(struct R *s)
+s32 Mummy_GetAnimationStepOffset(struct R *s)
 {
     struct Q *q = (struct Q *)(s->p + 0x48);
     if (q->hE == 0) {

@@ -1,5 +1,5 @@
 #include "global.h"
-void *sub_08224EBC(int, int, int);
+void *SceneMessages_GetEventMessage(int, int, int);
 void SceneMessages_Enqueue(void *, void *);
 void Script_Call(int, int);
 void Trigger_ConsumePending(void *, int);
@@ -26,7 +26,7 @@ int SceneMessages_Update(u8 *p)
         if (p[0x1f]) {
             void *message;
             *((u16 *)(p + 0x1c)) = 0;
-            while (message = sub_08224EBC(*((s16 *)(p + 0x18)), *((s16 *)(p + 0x1a)),
+            while (message = SceneMessages_GetEventMessage(*((s16 *)(p + 0x18)), *((s16 *)(p + 0x1a)),
                                           *((u16 *)(p + 0x1c)))) {
                 SceneMessages_Enqueue(p, message);
                 (*((u16 *)(p + 0x1c)))++;

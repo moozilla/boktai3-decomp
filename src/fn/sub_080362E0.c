@@ -41,10 +41,10 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-void sub_08036BD4(int);
+void Wireless_SetStatus(int);
 void sub_0824923C(void *, void *);
 void sub_08249238(void *);
-int sub_080362E0(struct Engine *argument)
+int Wireless_ExchangeChildNiPacket(struct Engine *argument)
 {
     struct Engine *p = argument;
     int flags = p->mask;
@@ -107,7 +107,7 @@ int sub_080362E0(struct Engine *argument)
     p->mask = (p->mask & 0xFFFE) | 2;
     goto ready;
 sendError:
-    sub_08036BD4(2);
+    Wireless_SetStatus(2);
 failed:
     return 0;
 ready:

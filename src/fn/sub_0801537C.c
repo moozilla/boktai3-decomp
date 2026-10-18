@@ -1,7 +1,7 @@
 #include "global.h"
 extern u32 gUnk_02000068;
 void Sprite_Remove(u8 *);
-u32 sub_0801537C(u8 *s)
+u32 AnimatedParticleManager_Destroy(u8 *s)
 {
     u8 *a = s + 0x60;
     u8 *b = s + 0x24;

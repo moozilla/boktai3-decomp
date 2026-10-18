@@ -2,7 +2,7 @@
 
 extern u8 *gUnk_020001AC;
 
-u8 *sub_08101A74(void)
+u8 *NamedObject_GetFollowTarget(void)
 {
     u8 *g = gUnk_020001AC;
     s32 i = 0;

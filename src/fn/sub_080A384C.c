@@ -9,8 +9,8 @@ struct Z {
 void SceneActorCollision_InitBodyWithFlags(u8 *, struct Z *, struct Z *, void (*)(void), u8 *, u32);
 void SceneActorCollision_InitAttack(u8 *, struct Z *, struct Z *, void (*)(void), u32, u8 *);
 void sub_080A20B4(void);
-void sub_080A2048(void);
-void sub_080A384C(u8 *p)
+void Spider_OnAttackCollision(void);
+void Spider_InitColliders(u8 *p)
 {
     struct Z s1, s2, s3, s4;
     s1.a.lo = 0xa0;
@@ -24,5 +24,5 @@ void sub_080A384C(u8 *p)
     s3.b.lo = 0x40;
     *(u32 *)&s4.a = 0x800000;
     *(u32 *)&s4.b &= 0xFFFF0000;
-    SceneActorCollision_InitAttack(p, &s3, &s4, sub_080A2048, 0, p);
+    SceneActorCollision_InitAttack(p, &s3, &s4, Spider_OnAttackCollision, 0, p);
 }

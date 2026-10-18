@@ -7,7 +7,7 @@ struct VM {
     u32 *sp;
 };
 extern struct VM gUnk_02000610;
-void sub_0821A930(void)
+void Script_ResetKeywordStack(void)
 {
     gUnk_02000610.f8 = gUnk_02000610.stk;
 }

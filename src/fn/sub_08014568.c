@@ -1,8 +1,8 @@
 #include "global.h"
 extern void *gUnk_02000060;
 void *AnimData_FindEntry(int);
-void sub_08217E60(void *, void *, int);
-void sub_08217EC4(void *, int, int);
+void Effect_Initialize(void *, void *, int);
+void Effect_SetOrigin(void *, int, int);
 int ParticleManager_Initialize(u8 *m)
 {
     int i;
@@ -19,8 +19,8 @@ int ParticleManager_Initialize(u8 *m)
         next = i + 1;
         s = m + (offset + 56);
         for (j = 7; j >= 0; s += 56, j--) {
-            sub_08217E60(s, *(void **)(m + 28), 1);
-            sub_08217EC4(s, -4, -4);
+            Effect_Initialize(s, *(void **)(m + 28), 1);
+            Effect_SetOrigin(s, -4, -4);
         }
         i = next;
     }

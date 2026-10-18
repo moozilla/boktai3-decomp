@@ -7,7 +7,7 @@ struct S {
     u8 f;
 };
 
-void sub_080D0FC4(struct S *s)
+void Mummy_UpdateIdle(struct S *s)
 {
     if (s->f != 0)
         s->f = 0;

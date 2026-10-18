@@ -9,7 +9,7 @@ struct P {
     struct Q *q;
 };
 
-void sub_080B33D8(struct P *p)
+void Vorn_UpdateRecoveryCooldown(struct P *p)
 {
     u16 *v = &p->q->v;
     if (*v != 0)

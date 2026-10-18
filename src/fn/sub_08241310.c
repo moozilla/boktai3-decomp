@@ -9,7 +9,7 @@ struct P08241310 {
     u8 f5BB;
 };
 
-s32 sub_08241310(struct P08241310 *p)
+s32 Player_GetAdjustedMovementInterval(struct P08241310 *p)
 {
     s32 v = 12;
     if (p->f5B9 == 2 && p->f5BB != 0)

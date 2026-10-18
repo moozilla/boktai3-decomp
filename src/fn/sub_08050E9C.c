@@ -3,7 +3,7 @@ extern u16 gUnk_02000528;
 extern u16 gUnk_03004BD8;
 void *ScriptProc_Start(u16, u16);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, void *);
-void sub_08215A74(u32, u32);
+void Bg_SetPriority(u32, u32);
 void OrbitBackground_LoadResource(struct OrbitBackground *p)
 {
     u32 z[1];
@@ -11,7 +11,7 @@ void OrbitBackground_LoadResource(struct OrbitBackground *p)
     p->resource = ScriptProc_Start(0xC091, 0xB12);
     z[0] = 0;
     Bg_SetupLayers(3, 2, p->resource, 0, 0, 1, z);
-    sub_08215A74(1, 1);
+    Bg_SetPriority(1, 1);
     v = gUnk_02000528;
     f = 0;
     if (v == 1)

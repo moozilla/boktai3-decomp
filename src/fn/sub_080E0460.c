@@ -22,7 +22,7 @@ static inline u8 tk(u8 *a)
     }
     return 0;
 }
-void sub_080E0460(struct S *p, s32 n)
+void Dog_UpdateDefeatFinish(struct S *p, s32 n)
 {
     if (tk(&p->b2)) {
         s32 m;

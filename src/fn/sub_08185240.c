@@ -1,6 +1,6 @@
 #include "global.h"
 
-u32 sub_08185240(u8 *p, u32 v)
+u32 ActorController_SetBehaviorIfFinished(u8 *p, u32 v)
 {
     u8 *a = p + 0xB3C;
     if (*a != v) {

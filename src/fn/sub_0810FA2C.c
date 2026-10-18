@@ -3,7 +3,7 @@ struct S {
     u8 f[0x724];
     u16 a;
 };
-void sub_0810FA2C(struct S *s)
+void LinkScorePanel_InitGlyphFrames(struct S *s)
 {
     u16 v;
     s32 i;

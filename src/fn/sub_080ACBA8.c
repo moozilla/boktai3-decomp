@@ -6,7 +6,7 @@ void Heap_Free(void *);
 s32 sub_080ABDCC(void *);
 void sub_080ABD30(void *);
 
-void sub_080ACBA8(void)
+void TentacleEnemy_Create(void)
 {
     void *m = Heap_Alloc(0x934);
     if (m != 0) {

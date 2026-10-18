@@ -1,22 +1,22 @@
 #include "global.h"
-s32 sub_0815A400(void);
-s32 sub_0815CA08(void);
-s32 sub_0815C9EC(void);
+s32 Script_GetActorIndex(void);
+s32 ScriptActor_GetCueOptionFromScript(void);
+s32 ScriptActor_GetDirectionFromScript(void);
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-void sub_0814F828(s32);
+void ScriptActor_EnableCompletionScript(s32);
 extern s32 gUnk_02000580[];
 s32 PlayerCue_FormMotion(s32, s32);
-void sub_0814F838(s32);
-void sub_0815D358(void)
+void ScriptActor_CallCompletionScript(s32);
+void ScriptActor_StartFormMotionFromScript(void)
 {
-    s32 i = sub_0815A400();
+    s32 i = Script_GetActorIndex();
     s32 p = gUnk_02000580[i];
     s32 r;
     if (p != 0) {
-        r = PlayerCue_FormMotion(p, sub_0815CA08());
-        sub_0814F828(p);
+        r = PlayerCue_FormMotion(p, ScriptActor_GetCueOptionFromScript());
+        ScriptActor_EnableCompletionScript(p);
         if (r == 0)
-            sub_0814F838(p);
+            ScriptActor_CallCompletionScript(p);
     }
 }

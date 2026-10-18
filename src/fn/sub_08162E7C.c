@@ -10,7 +10,7 @@ struct P {
     u8 g[2];
     u16 d;
 };
-void sub_08162E7C(struct P *p)
+void GameOver_UpdateLetterRebound(struct P *p)
 {
     p->a++;
     p->b -= 3;

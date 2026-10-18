@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_08159574(u8 *p, s32 i, s32 d)
+void Player_SubtractResistance(u8 *p, s32 i, s32 d)
 {
     if (p != 0) {
         u8 *e;

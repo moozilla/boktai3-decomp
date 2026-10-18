@@ -1,7 +1,7 @@
 #include "global.h"
 extern u8 *gUnk_0200006C;
 void FadingParticleGroup_Update(u8 *);
-u32 sub_08016334(u8 *s)
+u32 FadingParticleManager_Update(u8 *s)
 {
     u8 **gp = &gUnk_0200006C;
     u32 off = 0x24;

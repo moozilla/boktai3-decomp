@@ -13,19 +13,19 @@ struct S {
     u16 f7c;
 };
 extern struct S *gUnk_03005420;
-s32 sub_08225984(u32);
-void sub_08226AAC(struct S *);
-void sub_082263FC(u32 a, s32 n, struct P *b)
+s32 SceneBody_GetById(u32);
+void Camera_NotifyMoveComplete(struct S *);
+void Camera_PanToActor(u32 a, s32 n, struct P *b)
 {
     if (gUnk_03005420) {
         gUnk_03005420->f7c = a;
-        if (sub_08225984(gUnk_03005420->f7c)) {
+        if (SceneBody_GetById(gUnk_03005420->f7c)) {
             struct S *p = gUnk_03005420;
             p->f1c = 1;
             p->f74 = *b;
             if (n <= 1) {
                 p->f68 = 3;
-                sub_08226AAC(p);
+                Camera_NotifyMoveComplete(p);
             } else {
                 p->f6a = n;
                 p->f68 = 4;

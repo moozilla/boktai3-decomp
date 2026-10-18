@@ -7,7 +7,7 @@ struct S {
     u8 f[0x100];
     struct E e[7];
 };
-void sub_081C1D0C(struct S *p)
+void ControlPanel_HideInputGauge(struct S *p)
 {
     s32 i;
     u32 m = 1;

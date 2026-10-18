@@ -6,21 +6,21 @@ struct Object {
     u8 drawable[1];
 };
 extern void *gUnk_02000480;
-void sub_0802D688(void *, struct Object *);
-void sub_0802D914(struct Object *);
-void sub_08225938(void *);
+void Actor_UnlinkFromManager(void *, struct Object *);
+void Actor_UnregisterMotion(struct Object *);
+void SceneBody_Unregister(void *);
 void DisplayAnimation_Destroy(void *);
-void sub_0802D85C(struct Object *);
+void Actor_DestroyShadow(struct Object *);
 void Heap_Free(void *);
-int sub_0802D96C(struct Object *p)
+int Actor_Destroy(struct Object *p)
 {
     int result;
     if (gUnk_02000480 && p->active) {
-        sub_0802D688(gUnk_02000480, p);
-        sub_0802D914(p);
-        sub_08225938(p->motion);
+        Actor_UnlinkFromManager(gUnk_02000480, p);
+        Actor_UnregisterMotion(p);
+        SceneBody_Unregister(p->motion);
         DisplayAnimation_Destroy(p->drawable);
-        sub_0802D85C(p);
+        Actor_DestroyShadow(p);
         p->active = 0;
         Heap_Free(p);
         result = 0;

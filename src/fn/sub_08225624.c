@@ -7,15 +7,15 @@ struct Trap {
     u32 b, command;
     void *region;
 };
-u32 sub_0821DDBC(void);
-s32 sub_0821AA00(const void *);
+u32 Trap_GetDispatchStarted(void);
+s32 Script_ReadValue(const void *);
 u8 *Script_DecodeOperand(u8 *p, s32 *type, s32 *value);
-void *sub_0821E104(u16 id, u16 *count);
-void sub_0821E190(struct Trap *trap, u8 *top);
+void *Terrain_FindBoxesById(u16 id, u16 *count);
+void Trap_Register(struct Trap *trap, u8 *top);
 /* Script command `trap`: id and a second value (both positional; '?' is a
    wildcard), -m event, -t, -w and -s
    name lists, -b, and -e block or -p procedure run when it fires; registered
-   with sub_0821E190 for the map regions named id. */
+   with Trap_Register for the map regions named id. */
 s32 Trap_CreateFromScript(u8 *top)
 {
     struct Trap trap;
@@ -24,7 +24,7 @@ s32 Trap_CreateFromScript(u8 *top)
     u8 *pc;
     u16 *list, *names, *count;
     s32 type, value;
-    sub_0821DDBC();
+    Trap_GetDispatchStarted();
     Memory_Clear(&trap, sizeof(trap));
     trap.id = Script_GetValue();
     trap.other = Script_GetValue();
@@ -53,7 +53,7 @@ s32 Trap_CreateFromScript(u8 *top)
     }
     if (Script_SeekToKeyword('w'))
         for (i = 0; i < 4 && (pc = Script_GetPc()); i++)
-            *list++ = sub_0821AA00(pc);
+            *list++ = Script_ReadValue(pc);
     {
         u16 *base = *&names; /* taking the address keeps names+3 from being hoisted */
         s32 zero = 0;
@@ -64,7 +64,7 @@ s32 Trap_CreateFromScript(u8 *top)
     }
     if (Script_SeekToKeyword('s'))
         for (i = 0, list = names; i < 4 && (pc = Script_GetPc()); i++)
-            *list++ = sub_0821AA00(pc);
+            *list++ = Script_ReadValue(pc);
     if (Script_SeekToKeyword('b')) {
         trap.flags |= 0x10;
         trap.b = Script_GetValue();
@@ -78,9 +78,9 @@ s32 Trap_CreateFromScript(u8 *top)
     }
     trap.flags |= 0; /* reproduces the original's reload and store */
     trap.count = 0;
-    trap.region = sub_0821E104(trap.id, count);
+    trap.region = Terrain_FindBoxesById(trap.id, count);
     if (trap.region) {
-        sub_0821E190(&trap, top);
+        Trap_Register(&trap, top);
         result = 0;
     } else
         result = -1;

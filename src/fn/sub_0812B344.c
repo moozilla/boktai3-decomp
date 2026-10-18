@@ -2,7 +2,7 @@
 
 extern u32 gUnk_02000180;
 
-void sub_0812B344(void)
+void FragmentProjectilePool_ResetSingleton(void)
 {
     gUnk_02000180 = 0;
 }

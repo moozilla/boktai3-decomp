@@ -20,7 +20,7 @@ s32 SceneInventory_ClassifyItemAction(struct SceneInventoryControlView *panel)
             goto done;
         goto invalid;
     } else {
-        register s32 item asm("r1") = sub_0822CDA8(panel->grid.selection);
+        register s32 item asm("r1") = Inventory_GetItemId(panel->grid.selection);
         asm("" : "+r"(item));
         result = -1;
         if (item < 0)

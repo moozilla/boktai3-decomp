@@ -3,7 +3,7 @@ extern u32 gUnk_02000560;
 extern const u32 gUnk_08611CB8[];
 s32 sub_0817B694(void *);
 void sub_0824923C(void *, u32);
-void sub_0817D54C(u8 *p)
+void BossSlot2_RunGuardedPhaseCallback(u8 *p)
 {
     u32 m = 4;
     if (!(gUnk_02000560 & m)) {

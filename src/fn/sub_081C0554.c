@@ -1,7 +1,7 @@
 #include "global.h"
-void sub_081C0470(void *, void (*)(void *));
-void sub_081C0588(void *);
-void sub_081C0554(void *p)
+void ScenePaletteFade_SetState(void *, void (*)(void *));
+void ScenePaletteFade_UpdateDelay(void *);
+void ScenePaletteFade_BeginDelay(void *p)
 {
-    sub_081C0470(p, sub_081C0588);
+    ScenePaletteFade_SetState(p, ScenePaletteFade_UpdateDelay);
 }

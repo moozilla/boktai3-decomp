@@ -8,7 +8,7 @@ struct S {
     u8 b1;
 };
 void Sprite_Remove(void *);
-void sub_08115DD0(struct S *s)
+void SpriteDrop_OnDeactivate(struct S *s)
 {
     if (s->b1 != 0) {
         if (s->on != 0)

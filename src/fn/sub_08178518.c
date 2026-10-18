@@ -2,7 +2,7 @@
 extern u8 *gUnk_02000214;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-void sub_08178518(void)
+void Hud_SetGaugeDisplayFlagFromScript(void)
 {
     u8 *p = gUnk_02000214;
     if (p) {

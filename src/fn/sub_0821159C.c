@@ -1,19 +1,19 @@
 #include "global.h"
-void sub_08210D60(void *);
+void Collection_LoadPageBackground(void *);
 void sub_08210F04(void *);
 s32 Script_SeekToKeyword(s32);
-void *sub_08227E90(void);
+void *Script_GetTextSourcePc(void);
 void *Script_GetKeywordValue(s32, s32);
 void sub_08210AD4(void *);
-void sub_08210B50(void *);
-void sub_08210BEC(void *);
+void Collection_UpdateCountDigits(void *);
+void Collection_UpdatePageIndicator(void *);
 void *sub_08033690(u32, u32, u32, u32);
-void sub_08033568(void);
-void sub_08033468(void);
-u32 sub_08210CB0(void *);
-void sub_082279A8(s32, s32, s32, s32, s32, s32, s32);
+void ScrollingDialogue_RequestShow(void);
+void ScrollingDialogue_ClearScript(void);
+u32 Collection_UpdateSelectedEntryText(void *);
+void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 void Sound_PlaySong(u32);
-s32 sub_0821159C(u8 *s)
+s32 CollectionMenu_Init(u8 *s)
 {
     u32 zero = 0, four;
     s16 *p;
@@ -26,32 +26,32 @@ s32 sub_0821159C(u8 *s)
     *p = four;
     *(u16 *)(s + 0xb8c) = zero;
     *(u16 *)(s + 0xb88) = zero;
-    sub_08210D60(s);
+    Collection_LoadPageBackground(s);
     sub_08210F04(s);
     if (!Script_SeekToKeyword(0x6d))
         goto fail;
-    if (!(*(void **)(s + 0xb9c) = sub_08227E90()))
+    if (!(*(void **)(s + 0xb9c) = Script_GetTextSourcePc()))
         goto fail;
     if (!Script_SeekToKeyword(0x6e))
         goto fail;
-    if (!(*(void **)(s + 0xb98) = sub_08227E90()))
+    if (!(*(void **)(s + 0xb98) = Script_GetTextSourcePc()))
         goto fail;
     if (!Script_SeekToKeyword(0x68))
         goto fail;
-    if ((*(void **)(s + 0xba0) = sub_08227E90()))
+    if ((*(void **)(s + 0xba0) = Script_GetTextSourcePc()))
         goto success;
 fail:
     return -1;
 success:
     *(void **)(s + 0xba4) = Script_GetKeywordValue(0x65, 0);
     sub_08210AD4(s);
-    sub_08210B50(s);
-    sub_08210BEC(s);
+    Collection_UpdateCountDigits(s);
+    Collection_UpdatePageIndicator(s);
     *(void **)(s + 0xb94) = sub_08033690(1, 0x10, 0x1d, 4);
-    sub_08033568();
-    sub_08033468();
-    sub_08210CB0(s);
-    sub_082279A8(0, *p, 4, 4, four, 0xffff, zero);
+    ScrollingDialogue_RequestShow();
+    ScrollingDialogue_ClearScript();
+    Collection_UpdateSelectedEntryText(s);
+    ScreenTransition_SendCommand(0, *p, 4, 4, four, 0xffff, zero);
     Sound_PlaySong(0x118);
     return 0;
 }

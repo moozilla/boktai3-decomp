@@ -9,8 +9,8 @@ struct P {
     u8 pad[0x3c];
     struct Entry entries[2];
 };
-void sub_080397D4(int, int);
-int sub_08038004(struct P *p)
+void WirelessGame_AddWeightedScore(int, int);
+int WirelessExchange_ResolveOutcome(struct P *p)
 {
     struct Entry *a = &p->entries[0], *b = &p->entries[1];
     if (a->kind == 0) {
@@ -31,7 +31,7 @@ int sub_08038004(struct P *p)
         if (b->kind != 2)
             goto zero;
     notify:
-        sub_080397D4(1, 1);
+        WirelessGame_AddWeightedScore(1, 1);
     zero:
         return 0;
     }
@@ -39,7 +39,7 @@ int sub_08038004(struct P *p)
         goto one;
     if (b->kind != 2)
         goto one;
-    sub_080397D4(1, 1);
+    WirelessGame_AddWeightedScore(1, 1);
     if (a->timer < b->timer)
         goto one;
     if (a->timer > b->timer)

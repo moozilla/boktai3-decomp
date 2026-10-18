@@ -10,7 +10,7 @@ struct S {
     u16 f70;
 };
 extern struct S *gUnk_03005420;
-void sub_08226AAC(struct S *);
+void Camera_NotifyMoveComplete(struct S *);
 void Camera_PanTo(s32 n, u16 *a)
 {
     struct S *p = gUnk_03005420;
@@ -21,7 +21,7 @@ void Camera_PanTo(s32 n, u16 *a)
         p->f1c = 1;
         if (n <= 1) {
             p->f68 = 1;
-            sub_08226AAC(p);
+            Camera_NotifyMoveComplete(p);
         } else {
             p->f6a = n;
             p->f68 = 2;

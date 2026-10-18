@@ -4,7 +4,7 @@
 // Only the speed-byte stack reload uses r0 instead of r2; the reviewed body is 428 bytes.
 #define ContactSwarm_SpawnPairedAdvanceCount sub_08044AD4
 void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
-void sub_0821FF58(void *, u32, u32, u32, u32, u32);
+void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 void sub_08221110(void *, void *, void *, s32, s32);
 s32 ContactSwarm_SpawnPairedAdvanceCount(struct ContactSwarm *pool,
                                          const struct ContactPosition *position, s32 direction,
@@ -106,7 +106,7 @@ s32 ContactSwarm_SpawnPairedAdvanceCount(struct ContactSwarm *pool,
                 }
                 collider = &slot->resourceCollider;
                 Collider_SetPosition(collider, destination, 0);
-                sub_0821FF58(collider, resourceId, cost, 0x8000, active, option);
+                Collider_SetAttackProperties(collider, resourceId, cost, 0x8000, active, option);
                 collider = &slot->display.healthCollider;
                 Collider_SetPosition(collider, destination, 0);
                 collider->flags |= 4;

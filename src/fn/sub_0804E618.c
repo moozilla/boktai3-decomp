@@ -1,6 +1,6 @@
 #include "area_effect.h"
 // MATCHING_CONCESSION: register-pinning
-void sub_081594F4(struct AreaEffectPlayer *, s32);
+void Player_AddEnergy(struct AreaEffectPlayer *, s32);
 static inline u32 test(u32 *value, u32 mask)
 {
     return *value & mask;
@@ -73,6 +73,6 @@ void AreaEffect_AccumulatePlayerResource(struct AreaEffectManager *manager, s32 
             object->resourceFraction = next;
         }
         if (amount > 0)
-            sub_081594F4(player, amount);
+            Player_AddEnergy(player, amount);
     }
 }

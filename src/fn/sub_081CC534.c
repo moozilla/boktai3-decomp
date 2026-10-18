@@ -2,7 +2,7 @@
 
 void sub_0802F298(void);
 
-void sub_081CC534(void)
+void SceneCharacter_FaceSceneTarget(void)
 {
     sub_0802F298();
 }

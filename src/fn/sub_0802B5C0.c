@@ -20,7 +20,7 @@ static inline u8 TakeFlag(struct S *p)
     return FALSE;
 }
 
-void sub_0802B5C0(struct S *p)
+void GridAttack_UpdateAnimationFive(struct S *p)
 {
     if (TakeFlag(p)) {
         u32 v = 5;

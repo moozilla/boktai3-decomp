@@ -6,7 +6,7 @@ void AnimData_Load(u8 *, u32);
 void Sprite_Init(u8 *, u8 *, u32);
 s32 sub_0821D6F4(struct Pair *, u32);
 void AnimData_SelectPaletteBank(u8 *, u32);
-void sub_082340D8(u8 *p)
+void SolarBomb_InitSprite(u8 *p)
 {
     u8 *resource = p + 0x48, *sprite;
     AnimData_Load(resource, 0xe74b);

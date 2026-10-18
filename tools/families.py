@@ -94,7 +94,7 @@ def main():
                 k += 1
             names.add(name)
             rows.append({"name": name, "start": f"{lo:08X}", "end": f"{hi:08X}",
-                         "name_files": "symbols/functions.csv",
+                         "name_files": "",
                          "evidence": f"tools/families.py: {hits} of {n} contiguous functions named {p}_*"})
         rows.sort(key=lambda r: int(r["start"], 16))
         with CSV.open("w", newline="") as fh:

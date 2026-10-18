@@ -1,4 +1,6 @@
 #include "global.h"
+/* SceneTilemap_FillRectangle: Fills rectangular rows with a tile value using wrapped row starts and consecutive halfword writes */
+#define SceneTilemap_FillRectangle sub_0806F1D0
 #define SceneTilemap_FillRectangle sub_0806F1D0
 u16 *sub_0806F1B0(s32, u32, u32);
 void SceneTilemap_FillRectangle(s32 column, s32 row, s32 width, s32 height, s32 tile, s32 layer)

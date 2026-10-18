@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_02000710;
-s32 sub_0816AB98(void)
+s32 Hud_GetScaledRetryCount(void)
 {
     s16 v = *(s16 *)(gUnk_02000710 + 0x876);
     s32 r;

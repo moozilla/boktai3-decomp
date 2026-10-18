@@ -6,15 +6,15 @@ struct S {
     void (*a77c)(void *);
 };
 extern struct S *gUnk_02000264;
-void sub_0822B180(u32);
-void sub_081C2BE8(void *);
-void sub_081C2F8C(void)
+void Sound_PauseChannel12(u32);
+void SparkleEmitter_UpdateDraining(void *);
+void SparkleEmitter_StopEmitting(void)
 {
     struct S *p = gUnk_02000264;
     if (p != 0) {
         void (*f)(void *);
-        sub_0822B180(8);
-        f = sub_081C2BE8;
+        Sound_PauseChannel12(8);
+        f = SparkleEmitter_UpdateDraining;
         p->a77c = f;
         p->a770 = 0;
     }

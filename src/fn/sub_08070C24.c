@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 #include "player.h"
-s32 sub_0821E7EC(u16 *, u32, u32);
+s32 Path_GetPointPositionById(u16 *, u32, u32);
 extern u16 gUnk_02000544;
 u32 SceneActorRegistry_TestNearestPlayerBounds(struct SceneActorRegistryActor *input,
                                                const struct ContactPosition *inputBounds)
@@ -37,7 +37,7 @@ u32 SceneActorRegistry_TestNearestPlayerBounds(struct SceneActorRegistryActor *i
         offset = 0x45a;
         asm("" : "+r"(offset));
         field = (u8 *)actor + offset;
-        sub_0821E7EC((u16 *)&origin, first, *field);
+        Path_GetPointPositionById((u16 *)&origin, first, *field);
     }
     {
         s32 index = 0;

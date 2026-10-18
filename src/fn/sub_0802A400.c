@@ -45,22 +45,22 @@ static inline void setFacing(ActorAnimation *p, int angle)
     value = 7 & shifted;
     p->facing8 = value;
 }
-void sub_080297FC(void *, int, int, int);
-void sub_08029E1C(void *);
-int sub_08029E2C(void *);
-void sub_08029AA8(void *);
+void GridAttackActor_SetAnimation(void *, int, int, int);
+void GridAttackActor_ResetAttackAnimationHistory(void *);
+int GridAttackActor_SelectAttackAnimation(void *);
+void GridAttackActor_SpawnGridPattern(void *);
 void Sound_PlaySongChecked(int);
 extern u32 gUnk_03005304;
 extern u16 gUnk_086141BC[];
 void sub_08029BF4(void *, void *, int);
-void sub_0802A400(ActorAnimation *p, int tick)
+void GridAttackActor_UpdateTargetedAttack(ActorAnimation *p, int tick)
 {
     ActorAnimation *base = p;
     if (p->changed) {
         p->changed = 0;
         setFacing(p, p->requestedAngle);
-        sub_08029E1C(p);
-        sub_080297FC(p, sub_08029E2C(p), 1, 8);
+        GridAttackActor_ResetAttackAnimationHistory(p);
+        GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
         gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
         {
             int random = gUnk_086141BC[gUnk_03005304];

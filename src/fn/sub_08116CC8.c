@@ -1,6 +1,6 @@
 #include "global.h"
 void Script_Call(u32, u32);
-void sub_08116CC8(u8 *s)
+void Glove_OnActionComplete(u8 *s)
 {
     u8 *p = s + 0x868;
     u16 *h;

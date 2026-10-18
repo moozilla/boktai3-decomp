@@ -6,7 +6,7 @@ struct E {
 };
 extern struct E gUnk_03004C30[];
 
-u16 *sub_08163F70(s32 i, u32 x, u32 y)
+u16 *Hud_GetTilemapCell(s32 i, u32 x, u32 y)
 {
     struct E *e;
     u16 *p;

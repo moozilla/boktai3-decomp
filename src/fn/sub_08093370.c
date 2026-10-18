@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08093100(u8 *, s16 *);
+void Bee_SetMovementEndpoints(u8 *, s16 *);
 void sub_08093138(u8 *);
 u32 Math_Atan2(s32, s32);
 void CpuSet(const void *, void *, u32);
@@ -9,13 +9,13 @@ static inline void Fill(void *dst, u32 *tmp, u32 v)
     CpuSet(tmp, dst, 0x05000002);
 }
 
-void sub_08093370(u8 *s, s16 *v)
+void Bee_BeginMoveToPosition(u8 *s, s16 *v)
 {
     u8 *p = *(u8 **)(s + 0x3d0);
     u32 stack[3];
     s16 *a;
     s16 *b;
-    sub_08093100(s, v);
+    Bee_SetMovementEndpoints(s, v);
     sub_08093138(s);
     {
         u32 one = 1;

@@ -8,7 +8,7 @@ struct S {
 u8 sub_0812266C(void);
 void Collider_SetPosition(void *, void *, u32);
 s32 Collider_Refresh(void *);
-void sub_08122824(u8 *s)
+void SceneScheduledEffect_UpdateEntry(u8 *s)
 {
     if (sub_0812266C() == 0) {
         if (*(s16 *)(s + 0x130) == 1) {

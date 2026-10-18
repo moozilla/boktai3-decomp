@@ -1,6 +1,6 @@
 #include "global.h"
-void sub_0816B654(void *, int, int);
-void sub_081708CC(u8 *p)
+void Hud_SetGridPosition(void *, int, int);
+void PauseMenu_ResetItemCursor(u8 *p)
 {
-    sub_0816B654(p + 0x4384, 0, 0);
+    Hud_SetGridPosition(p + 0x4384, 0, 0);
 }

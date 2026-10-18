@@ -22,9 +22,9 @@ struct Manager {
     struct Orb orbs[8];
 };
 extern const s16 gUnk_086149C4[];
-void sub_080187E4(void *, void *);
+void OrbitingParticles_SpawnOrb(void *, void *);
 void OrbitingParticles_Advance(void *, void *);
-int sub_080187BC(void *);
+int OrbitingParticles_HasActiveOrb(void *);
 void Task_Kill(void *);
 static inline int scale(int v)
 {
@@ -40,17 +40,17 @@ struct Map {
 };
 extern struct Map *gUnk_030052F4;
 extern u32 gUnk_030052F8, gUnk_030052FC;
-u8 *sub_0821D64C(int, int);
+u8 *TerrainModifiers_FindCellOverride(int, int);
 void *AnimData_FindEntry(int);
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
 void sub_08217DE0(void *, void *, int);
-void sub_08217EC4(void *, int, int);
+void Effect_SetOrigin(void *, int, int);
 void sub_08217EEC(void *, void *, int);
-void sub_08217ECC(void *, int);
+void Effect_SetPalette(void *, int);
 static inline u8 *cell(int i)
 {
-    u8 *p = sub_0821D64C(i, 1);
+    u8 *p = TerrainModifiers_FindCellOverride(i, 1);
     if (p)
         return p + 4;
     return gUnk_030052F4->cells + 12 + i * 4;
@@ -147,9 +147,9 @@ int OrbitingParticles_Initialize(struct Manager *m, struct Vec *source, int radi
         p->radius = radius;
         p->timer = i * 4;
         sub_08217DE0(s, m->resource, 1);
-        sub_08217EC4(s, -4, -4);
+        Effect_SetOrigin(s, -4, -4);
         sub_08217EEC(s, m->resource, m->frame);
-        sub_08217ECC(s, 1);
+        Effect_SetPalette(s, 1);
         angle = p->angle;
         r = p->radius;
         p->sprite.position.x = scale(gUnk_086149C4[(angle + 64) & 255] * r);

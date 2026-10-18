@@ -4,9 +4,9 @@ struct S {
     u32 a;
 };
 extern struct S *gUnk_020004B8;
-u8 sub_08110B7C(u32);
-void sub_0811117C(u32 x)
+u8 SceneTilemap_IsActive(u32);
+void SceneTilemap_SetScrollSource(u32 x)
 {
-    if (sub_08110B7C(x))
+    if (SceneTilemap_IsActive(x))
         gUnk_020004B8->a = x;
 }

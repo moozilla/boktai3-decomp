@@ -4,7 +4,7 @@ struct SD394 {
     u8 f[0x4861];
     u8 status;
 };
-void sub_0816D394(struct SD394 *s)
+void PauseMenu_ApplyCharacterSelection(struct SD394 *s)
 {
     u8 status = s->status;
     if (status == 0) {

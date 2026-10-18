@@ -18,7 +18,7 @@ struct S {
     u16 a34[4];
 };
 extern struct S gUnk_03005390;
-void sub_08223674(void)
+void RfuManager_ResetConnectionState(void)
 {
     u8 i;
     gUnk_03005390.f5 = 0;

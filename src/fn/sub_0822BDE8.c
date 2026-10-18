@@ -4,13 +4,13 @@ struct S {
     u8 b;
 };
 extern struct S *gUnk_030053F8;
-u8 sub_0822BC6C(u32);
-u8 sub_0822BD20(u32);
-u32 sub_0822BDE8(void)
+u8 Save_ReadMainState(u32);
+u8 Save_ReadContinuation(u32);
+u32 Save_LoadAlternateSlot(void)
 {
     u32 b = 1 - gUnk_030053F8->b;
-    if (sub_0822BC6C(b)) {
-        if (sub_0822BD20(b)) {
+    if (Save_ReadMainState(b)) {
+        if (Save_ReadContinuation(b)) {
             gUnk_030053F8->b = b;
             return 1;
         }

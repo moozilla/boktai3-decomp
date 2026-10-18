@@ -5,7 +5,7 @@ struct S {
     u8 q[0xca];
     u32 a;
 };
-void sub_082377A8(struct S *s, u32 v)
+void ActorGlyphTrail_SetState(struct S *s, u32 v)
 {
     s->a = v;
     s->h = 0;

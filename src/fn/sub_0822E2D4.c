@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_02000710;
-void sub_0822E2D4(s32 a)
+void GameState_UnequipConsumableSlot(s32 a)
 {
     s32 i = 0;
     do {

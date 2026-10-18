@@ -59,9 +59,9 @@ struct S {
     u32 variant;
 };
 void Anim_SetSequence(void *, u32, u32, u32, u32);
-void sub_081E4188(void *);
+void Actor_RestoreSavedAnimationPlayback(void *);
 void ActorShadow_Disable(void *);
-void sub_081E41EC(void *);
+void Actor_ArmRestIdleTransition(void *);
 static inline u8 take(struct S *p)
 {
     s32 m = 1;
@@ -91,9 +91,9 @@ struct Child {
     u8 flags;
     u8 rest[0xdc - 6];
 };
-void sub_081E5608(void *, void *);
+void Actor_OnInteractionChildUpdate(void *, void *);
 void ScriptUtility_ClearControlFlag(void);
-void sub_081E4174(void *);
+void Actor_SetInteractionControlFlag(void *);
 void AnimData_SelectPaletteBank(void *, s32);
 void Sound_PlaySong(s32);
 void Script_Call(void *, s32);
@@ -102,7 +102,7 @@ void ActorPalette_BeginFade(void *);
 extern u8 gUnk_03005430[];
 extern const s16 gUnk_086149C4[];
 u8 Math_Atan2(s32, s32);
-void sub_081E41B0(void *);
+void Actor_UpdateScaleGrowth(void *);
 static inline void set_direction(s16 angle, u8 *directionOut, u8 *flipOut)
 {
     register s32 direction asm("r2");
@@ -146,7 +146,7 @@ void Actor_MoveAlongCurveToRest(struct S *p)
         p->bend = (p->variant & 1) ? 1 : -1;
         ActorShadow_Disable(p->p2);
         if (*((u8 *)p + 0xf6f) && p->obj.scaleX != 127 && (p->obj.flags & 16))
-            p->scaleFn = sub_081E41B0;
+            p->scaleFn = Actor_UpdateScaleGrowth;
         if (!*((u8 *)p + 0xf77)) {
             p->targetX = 25;
             p->targetY = 102;

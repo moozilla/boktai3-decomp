@@ -10,7 +10,7 @@ struct S {
 void Sprite_Remove(u8 *);
 void Effect_Remove(struct E *);
 
-s32 sub_08237D7C(struct S *p)
+s32 ActorGlyphTrail_DestroyTask(struct S *p)
 {
     struct E *e;
     s32 i;

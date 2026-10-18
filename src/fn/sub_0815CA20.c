@@ -1,15 +1,15 @@
 #include "global.h"
 extern u8 *gUnk_02000580[];
-s32 sub_0815A400(void);
+s32 Script_GetActorIndex(void);
 void PlayerCue_Hide(u8 *);
-void sub_0814F828(u8 *);
-void sub_0815CA20(void)
+void ScriptActor_EnableCompletionScript(u8 *);
+void ScriptActor_HideFromScript(void)
 {
     u8 *p;
-    s32 i = sub_0815A400();
+    s32 i = Script_GetActorIndex();
     p = gUnk_02000580[i];
     if (p) {
         PlayerCue_Hide(p);
-        sub_0814F828(p);
+        ScriptActor_EnableCompletionScript(p);
     }
 }

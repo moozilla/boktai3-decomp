@@ -1,4 +1,6 @@
 #include "scene_actor_palette.h"
+/* SceneActorPalette_IsTransitionComplete: Reports completion when transitions are disabled or no relevant living actors remain; does not inspect frame counters */
+#define SceneActorPalette_IsTransitionComplete sub_08072124
 #define SceneActorPalette_IsTransitionComplete sub_08072124
 
 static inline u8 Test(u32 v, u32 mask)

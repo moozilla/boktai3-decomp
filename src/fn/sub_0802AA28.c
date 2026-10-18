@@ -42,23 +42,23 @@ static inline void setFacing(ActorAnimation *p, int angle)
     value = 7 & shifted;
     p->facing8 = value;
 }
-void sub_080297FC(void *, int, int, int);
-void sub_08029E1C(void *);
-int sub_08029E2C(void *);
-void sub_08029AA8(void *);
+void GridAttackActor_SetAnimation(void *, int, int, int);
+void GridAttackActor_ResetAttackAnimationHistory(void *);
+int GridAttackActor_SelectAttackAnimation(void *);
+void GridAttackActor_SpawnGridPattern(void *);
 void Sound_PlaySongChecked(int);
 typedef struct {
     u32 a, b;
 } Point;
 u8 sub_082212DC(int *, int, int, int);
-void sub_0802AA28(ActorAnimation *p, int tick)
+void GridAttack_UpdateTimedHideState(ActorAnimation *p, int tick)
 {
     ActorAnimation *base = p;
     u8 *position = (u8 *)p + 0x48;
     int done;
     if (p->changed) {
         p->changed = 0;
-        sub_080297FC(p, 11, 1, 8);
+        GridAttackActor_SetAnimation(p, 11, 1, 8);
         *(Point *)((u8 *)p + 0xd0) = *(Point *)(position + 12);
     }
     done = 0;

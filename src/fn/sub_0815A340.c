@@ -2,7 +2,7 @@
 
 extern u8 *gUnk_02000580;
 
-void sub_0815A340(void)
+void Player_SetFlag740(void)
 {
     u8 *g = gUnk_02000580;
 

@@ -1,5 +1,5 @@
 #include "global.h"
 
-void sub_081281CC(void)
+void FragmentBurst_OnContact(void)
 {
 }

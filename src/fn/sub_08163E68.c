@@ -2,7 +2,7 @@
 
 void Task_Kill(void *);
 
-void sub_08163E68(void *p)
+void ParticlePool_Destroy(void *p)
 {
     Task_Kill(p);
 }

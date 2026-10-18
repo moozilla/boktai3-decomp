@@ -59,10 +59,10 @@ struct SceneNpc {
 extern u8 *gUnk_0200047C;
 extern u8 *gUnk_030042E4;
 
-void sub_08020D54(void *, void *);
+void SceneMessages_SetPendingTrigger(void *, void *);
 s32 Math_Atan2(s32, s32);
 void sub_081CFFE8(struct SceneNpc *, s32);
-void sub_0802DE3C(struct SceneNpc *, s32, s32, s32);
+void Actor_SetAttachmentEffect(struct SceneNpc *, s32, s32, s32);
 void sub_081D010C(struct SceneNpc *, s16 *);
 void CpuSet(const void *, void *, u32);
 
@@ -110,7 +110,7 @@ void SceneNpc_DispatchCommands(struct SceneNpc *npc)
             s16 *m;
             u8 *controller = gUnk_0200047C;
             m = entry->messages[controller[0x24]][i];
-            sub_08020D54(entry, m);
+            SceneMessages_SetPendingTrigger(entry, m);
             switch (((u8 *)m)[6]) {
                 case 0:
                     if (sub->flag)
@@ -182,7 +182,7 @@ void SceneNpc_DispatchCommands(struct SceneNpc *npc)
                     if (sub->flag)
                         sub_081CFFE8(npc, m[4]);
                     else
-                        sub_0802DE3C(npc, m[4], 0xB4, 0xB4);
+                        Actor_SetAttachmentEffect(npc, m[4], 0xB4, 0xB4);
                     break;
                 case 11:
                     setState(npc, 0x14);

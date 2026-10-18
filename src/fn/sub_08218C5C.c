@@ -8,7 +8,7 @@ struct S {
 };
 extern struct S *gUnk_03001664;
 
-u16 sub_08218C5C(void)
+u16 Text_GetWideGlyphCount(void)
 {
     if (gUnk_03001664 == 0)
         return 0;

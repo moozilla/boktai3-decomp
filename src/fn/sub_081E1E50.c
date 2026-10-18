@@ -34,15 +34,15 @@ void Anim_LoadKeyframe(void *, void *, u16, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 extern const s16 gUnk_086136F0[], gUnk_086137AE[], gUnk_08613BC4[];
-u32 sub_0822B590(s32);
+u32 Sound_IsSongPlaying(s32);
 void Sound_StopSong(s32);
 void Sound_PlaySong(s32);
 void Anim_SetKeyframes(void *, void *, u16, s32, s32);
 // Stop the selected preview, or signal that all categories are already silent.
 s32 SoundTest_StopSelection(struct Viewer *p)
 {
-    if (!sub_0822B590(gUnk_086136F0[p->previousA]) && !sub_0822B590(gUnk_086137AE[p->previousB]) &&
-        !sub_0822B590(gUnk_08613BC4[p->previousC])) {
+    if (!Sound_IsSongPlaying(gUnk_086136F0[p->previousA]) && !Sound_IsSongPlaying(gUnk_086137AE[p->previousB]) &&
+        !Sound_IsSongPlaying(gUnk_08613BC4[p->previousC])) {
         p->labels[0].flags |= 1;
         p->labels[1].flags |= 1;
         p->labels[2].flags |= 1;

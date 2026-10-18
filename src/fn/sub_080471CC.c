@@ -1,6 +1,6 @@
 #include "damage_number_display.h"
-void sub_08217E60(void *, void *, u32);
-void sub_08217EC4(void *, s32, s32);
+void Effect_Initialize(void *, void *, u32);
+void Effect_SetOrigin(void *, s32, s32);
 void sub_08217EEC(void *, void *, u32);
 s32 DamageNumberDisplay_Initialize(struct DamageNumberDisplay *display)
 {
@@ -27,8 +27,8 @@ s32 DamageNumberDisplay_Initialize(struct DamageNumberDisplay *display)
         }
         remaining = 3;
         do {
-            sub_08217E60(digit, display->resource, 0x10010);
-            sub_08217EC4(digit, -4, -4);
+            Effect_Initialize(digit, display->resource, 0x10010);
+            Effect_SetOrigin(digit, -4, -4);
             sub_08217EEC(digit, display->resource, 0x20);
             digit->priority = 1;
             --remaining;

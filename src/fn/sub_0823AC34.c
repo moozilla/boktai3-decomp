@@ -3,9 +3,9 @@ struct FlagAC {
     s8 a;
     u8 b, c, d;
 };
-s32 sub_0823AAAC(s32);
-s32 sub_0823AB4C(u8 *, s32);
-void sub_0823AC34(u8 *p)
+s32 LinkPlayer_GetAbilityCostById(s32);
+s32 LinkPlayer_IsAbilityIdValid(u8 *, s32);
+void LinkPlayer_InitAbilityState(u8 *p)
 {
     struct FlagAC *f = (struct FlagAC *)(p + 0x33c);
     s8 value = (*(u8 **)(p + 0x344))[0x3e];
@@ -15,8 +15,8 @@ void sub_0823AC34(u8 *p)
         f->d = zero;
         f->b = zero;
     } else {
-        f->d = sub_0823AAAC(f->a);
-        f->b = sub_0823AB4C(p, f->a);
+        f->d = LinkPlayer_GetAbilityCostById(f->a);
+        f->b = LinkPlayer_IsAbilityIdValid(p, f->a);
     }
     f->c = zero;
 }

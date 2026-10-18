@@ -1,6 +1,6 @@
 #include "pooled_motion.h"
 void MotionPool_HideSlot(struct MotionPool *, struct MotionPoolSlot *, s32);
-void sub_0821A2AC(u32);
+void ResourceRegistry_UnregisterResource(u32);
 s32 MotionPool_Destroy(struct MotionPool *pool)
 {
     struct MotionPoolSlot *slot = pool->slots;
@@ -11,6 +11,6 @@ s32 MotionPool_Destroy(struct MotionPool *pool)
         index++;
         slot++;
     } while (index <= 15);
-    sub_0821A2AC(0x5B1B);
+    ResourceRegistry_UnregisterResource(0x5B1B);
     return 0;
 }

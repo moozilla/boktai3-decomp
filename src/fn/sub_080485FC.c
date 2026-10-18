@@ -7,7 +7,7 @@ void TetherActor_InitializeSegments(struct TetherActor *actor)
     do {
         void *resource = AnimData_FindEntry(0x1C1C);
         sub_08217DE0(segment, resource, 0);
-        sub_08217EC4(segment, offset, offset);
+        Effect_SetOrigin(segment, offset, offset);
         segment->priority = 255;
         segment->flags |= 1;
         --remaining;

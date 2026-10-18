@@ -9,7 +9,7 @@ struct P {
     u32 d[2];
 };
 
-void sub_08109BF8(struct P *p)
+void Registry1745_ResetTransferCounters(struct P *p)
 {
     u32 z = 0;
     u32 *d = p->d;

@@ -8,7 +8,7 @@ struct Actor {
 };
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, int, int, void *, int, int, int);
 void Sound_PlaySong(int);
-void sub_0802DE3C(struct Actor *p, unsigned kind, int timer, int duration)
+void Actor_SetAttachmentEffect(struct Actor *p, unsigned kind, int timer, int duration)
 {
     switch (kind) {
         case 0:

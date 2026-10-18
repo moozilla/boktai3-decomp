@@ -1,6 +1,6 @@
 #include "global.h"
 void Effect_Remove(void *);
-void sub_08236484(u8 *s)
+void RadialBurstEffect_RemoveParticles(u8 *s)
 {
     u8 *p = s + 0x140;
     s32 i = 11;

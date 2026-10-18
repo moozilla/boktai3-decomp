@@ -18,12 +18,12 @@ struct S {
     s16 c;
     s16 d;
 };
-struct R *sub_08225984(s32);
+struct R *SceneBody_GetById(s32);
 void OrbitingParticles_Create(struct BF *, s32, s32, s32, s32);
-void sub_08020FE4(u32 x, u32 y, struct S *s)
+void SceneCommands_CreateOrbitingParticles(u32 x, u32 y, struct S *s)
 {
     struct BF bf;
-    struct R *r = sub_08225984(s->id);
+    struct R *r = SceneBody_GetById(s->id);
     if (r != 0) {
         bf.a = r->a;
         bf.b = r->b;

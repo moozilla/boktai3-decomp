@@ -66,32 +66,32 @@ struct SceneNpc {
     void *callbacks[6];
 };
 extern void *gUnk_02000480;
-s32 sub_081CE060(s32);
-s32 sub_081CE08C(s32);
-s32 sub_081CE0B8(s32);
-struct SceneNpc *sub_0802D6F4(s32 name, s32 variant);
-s32 sub_0802D728(struct SceneNpc *, s32 name, struct PackedVec *, s32 angle);
-s32 sub_0802D760(struct SceneNpc *, s32 kind, s32 a, s32 b, s32 c);
-void sub_0802D950(struct SceneNpc *, s32);
-void sub_0802D7E0(struct SceneNpc *, u32, s32, s32, s32);
-void sub_081CD46C(struct SceneNpc *, s32);
-void sub_0802D614(void *, struct SceneNpc *, s32, s32);
-void sub_0802D654(void *, struct SceneNpc *);
-void sub_0802E698(void *, struct SceneNpc *);
+s32 SceneCharacter_GetModelId(s32);
+s32 SceneCharacter_GetPaletteIndex(s32);
+s32 SceneCharacter_GetResourceVariant(s32);
+struct SceneNpc *Actor_Allocate(s32 name, s32 variant);
+s32 Actor_InitMotion(struct SceneNpc *, s32 name, struct PackedVec *, s32 angle);
+s32 Actor_InitDrawable(struct SceneNpc *, s32 kind, s32 a, s32 b, s32 c);
+void Actor_SetDefaultPaletteBank(struct SceneNpc *, s32);
+void Actor_InitShadow(struct SceneNpc *, u32, s32, s32, s32);
+void SceneCharacter_RegisterMessageReceiver(struct SceneNpc *, s32);
+void Actor_InitResources(void *, struct SceneNpc *, s32, s32);
+void Actor_LinkToManager(void *, struct SceneNpc *);
+void Actor_InitBehaviorFromScript(void *, struct SceneNpc *);
 void DisplayAnimation_SetFlags(void *);
-void sub_0802D88C(struct SceneNpc *);
-u8 sub_0802FD14(struct SceneNpc *);
+void Actor_DisableShadow(struct SceneNpc *);
+u8 SceneCharacter_GetPathNodeState(struct SceneNpc *);
 u32 ParticlePool_Create(void);
 void sub_081CE0E4(struct SceneNpc *, s32);
-void sub_081CC610(void);
+void SceneCharacter_OnStateChange(void);
 void sub_081CDFFC(void);
-void sub_081CD460(void);
+void SceneCharacter_OnCommandUpdate(void);
 void sub_081CC64C(void);
-void sub_081CE014(void);
-void sub_081CE040(void);
-void sub_0802EA4C(void);
-void sub_0802EA08(void);
-void sub_0802F0C0(void);
+void SceneCharacter_UpdateDisplay(void);
+void SceneCharacter_OnDestroy(void);
+void Actor_OnIdleUpdate(void);
+void Actor_OnHiddenIdleUpdate(void);
+void Actor_OnConfiguredAnimationUpdate(void);
 void sub_081CC4CC(void);
 void sub_081CC1B4(void);
 void sub_081CC0C8(void);
@@ -143,9 +143,9 @@ void SceneCharacter_PlaceFromScript(void)
         colorA = Script_GetValue();
         sound = Script_GetValue();
     }
-    model = sub_081CE060(k);
-    palette = sub_081CE08C(k);
-    extra = sub_081CE0B8(k);
+    model = SceneCharacter_GetModelId(k);
+    palette = SceneCharacter_GetPaletteIndex(k);
+    extra = SceneCharacter_GetResourceVariant(k);
     if (kind == 0x2B) {
         flags = 1;
         key = 0x3D95;
@@ -153,12 +153,12 @@ void SceneCharacter_PlaceFromScript(void)
         flags = 2;
         key = 0;
     }
-    npc = sub_0802D6F4(name, kind);
+    npc = Actor_Allocate(name, kind);
     if (!npc)
         return;
-    if (sub_0802D728(npc, name, &position, angle) < 0)
+    if (Actor_InitMotion(npc, name, &position, angle) < 0)
         return;
-    if (sub_0802D760(npc, flags, model, key, 0) < 0)
+    if (Actor_InitDrawable(npc, flags, model, key, 0) < 0)
         return;
     if (palette >= 0) {
         if (k == 0x19) {
@@ -171,7 +171,7 @@ void SceneCharacter_PlaceFromScript(void)
             }
             *(u16 *)((u8 *)npc + 0x13A) = palette;
         } else
-            sub_0802D950(npc, palette);
+            Actor_SetDefaultPaletteBank(npc, palette);
     }
     if (k == 0x19) {
         struct CharacterExtra *x = &npc->extra;
@@ -192,8 +192,8 @@ void SceneCharacter_PlaceFromScript(void)
         x->field12 = 0;
         x->field10 = 0;
     }
-    sub_0802D7E0(npc, npc->field160, 1, 0, 0x40);
-    sub_081CD46C(npc, name);
+    Actor_InitShadow(npc, npc->field160, 1, 0, 0x40);
+    SceneCharacter_RegisterMessageReceiver(npc, name);
     npc->motion.angle = angle;
     {
         u16 a = angle;
@@ -215,15 +215,15 @@ void SceneCharacter_PlaceFromScript(void)
             npc->facing4 = m;
         }
     }
-    setHandler(sub_081CC610, &npc->callbacks[5]);
+    setHandler(SceneCharacter_OnStateChange, &npc->callbacks[5]);
     setHandler(sub_081CDFFC, &npc->callbacks[0]);
-    setHandler(sub_081CD460, &npc->callbacks[1]);
+    setHandler(SceneCharacter_OnCommandUpdate, &npc->callbacks[1]);
     setHandler(sub_081CC64C, &npc->callbacks[2]);
-    setHandler(sub_081CE014, &npc->callbacks[3]);
-    setHandler(sub_081CE040, &npc->callbacks[4]);
-    sub_0802D614(manager, npc, model, extra);
-    sub_0802D654(manager, npc);
-    sub_0802E698(manager, npc);
+    setHandler(SceneCharacter_UpdateDisplay, &npc->callbacks[3]);
+    setHandler(SceneCharacter_OnDestroy, &npc->callbacks[4]);
+    Actor_InitResources(manager, npc, model, extra);
+    Actor_LinkToManager(manager, npc);
+    Actor_InitBehaviorFromScript(manager, npc);
     behavior = Script_GetKeywordValue('i', 0);
 
     switch (behavior) {
@@ -234,7 +234,7 @@ void SceneCharacter_PlaceFromScript(void)
             npc->mode = one;
             npc->field14 = 0;
             npc->field8 = 1;
-            updates[1] = sub_0802EA4C;
+            updates[1] = Actor_OnIdleUpdate;
             npc->state = 2;
             npc->update = updates[1];
             npc->field10 = 0;
@@ -248,26 +248,26 @@ void SceneCharacter_PlaceFromScript(void)
             npc->mode = 0;
             npc->field14 = 0;
             npc->field8 = 1;
-            updates[1] = sub_0802EA08;
+            updates[1] = Actor_OnHiddenIdleUpdate;
             npc->state = 1;
             npc->update = updates[1];
             npc->field10 = 0;
             npc->field9 = 1;
             npc->field18 = 0;
             DisplayAnimation_SetFlags(&npc->animMode);
-            sub_0802D88C(npc);
+            Actor_DisableShadow(npc);
             break;
         case 2: {
             void (*fn)(void);
             npc->field21B = 1;
             if (npc->field1F3 >= 0) {
-                mode = sub_0802FD14(npc);
+                mode = SceneCharacter_GetPathNodeState(npc);
                 npc->field2 = 0;
                 npc->field3 = 0;
                 npc->mode = mode;
                 npc->field14 = 0;
                 npc->field8 = 1;
-                fn = sub_0802EA4C;
+                fn = Actor_OnIdleUpdate;
                 npc->state = 2;
                 npc->update = fn;
                 npc->field10 = 0;
@@ -280,7 +280,7 @@ void SceneCharacter_PlaceFromScript(void)
                 npc->mode = mode;
                 npc->field14 = 0;
                 npc->field8 = 1;
-                fn = sub_0802F0C0;
+                fn = Actor_OnConfiguredAnimationUpdate;
                 npc->state = 7;
                 npc->update = fn;
                 npc->field10 = 0;
@@ -296,7 +296,7 @@ void SceneCharacter_PlaceFromScript(void)
             npc->mode = mode;
             npc->field14 = 0;
             npc->field8 = 1;
-            updates[0] = sub_0802F0C0;
+            updates[0] = Actor_OnConfiguredAnimationUpdate;
             npc->state = 7;
             npc->update = updates[0];
             npc->field10 = 0;
@@ -333,7 +333,7 @@ void SceneCharacter_PlaceFromScript(void)
                 npc->mode = mode;
                 npc->field14 = 0;
                 npc->field8 = 1;
-                updates[0] = sub_0802F0C0;
+                updates[0] = Actor_OnConfiguredAnimationUpdate;
                 npc->state = 7;
                 npc->update = updates[0];
                 npc->field10 = 0;

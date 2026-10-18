@@ -9,7 +9,7 @@ struct N {
     struct N *next;
 };
 extern struct N *gUnk_030042D0[];
-void sub_082143F8(struct N *n, u32 i)
+void Effect_UnlinkFromList(struct N *n, u32 i)
 {
     struct N *p = n->prev;
     struct N *q = n->next;

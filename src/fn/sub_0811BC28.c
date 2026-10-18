@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_02000710;
-void sub_0811BC28(s32 x)
+void GameState_AddActionCount892(s32 x)
 {
     s32 t = *(s16 *)(gUnk_02000710 + 0x892) + x;
     if (t > 0x3E7)

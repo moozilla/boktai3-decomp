@@ -1,6 +1,6 @@
 #include "global.h"
 s32 Div(s32, s32);
-s32 sub_0811E6CC(u8 *s, s32 x)
+s32 Modifier_ScaleKindSevenStat(u8 *s, s32 x)
 {
     s32 r;
     if (*(u8 *)(s + 0xc) == 0)

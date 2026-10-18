@@ -4,7 +4,7 @@ void SceneInventory_ShowItemDescription(struct SceneInventoryPanel *panel)
     s32 item;
     s32 frame;
     if (panel->selection <= 15) {
-        item = sub_0822CDA8(panel->selection);
+        item = Inventory_GetItemId(panel->selection);
         frame = sub_0816D820(panel->selection);
     } else if (panel->selection <= 23) {
         {
@@ -29,26 +29,26 @@ void SceneInventory_ShowItemDescription(struct SceneInventoryPanel *panel)
     }
     if (item < 0) {
         panel->display.banner.flags |= 1;
-        sub_08030BF8();
-        sub_08033468();
+        MessageWindow_Clear();
+        ScrollingDialogue_ClearScript();
     } else {
         s32 text;
         panel->display.banner.flags &= ~1;
         Anim_LoadKeyframe(&panel->display.banner, &panel->display.gridResource, (u16)frame, 1);
-        sub_08030C84(panel->itemText);
-        sub_08030F20(2, 16, 28, 2);
-        sub_08030B78(1);
-        sub_08030DBC(item);
+        MessageWindow_SetMessageTable(panel->itemText);
+        MessageWindow_SetBounds(2, 16, 28, 2);
+        MessageWindow_SetDisplayMode(1);
+        MessageWindow_ShowMessage(item);
         text = Script_ParseStringRef(panel->itemText);
         if (gUnk_02000710->form == 6 && item == 13) {
-            sub_0803343C(Text_LookupString(text + 234));
+            ScrollingDialogue_SetScript(Text_LookupString(text + 234));
         } else {
             s32 context = gUnk_02000710->form;
             if (context == 0 || context == 6)
                 text += 55;
             else
                 text += 110;
-            sub_0803343C(Text_LookupString(text + item));
+            ScrollingDialogue_SetScript(Text_LookupString(text + item));
         }
     }
     SceneInputPanel_ShowItemComparison(panel->comparison[0], panel->comparison[1],

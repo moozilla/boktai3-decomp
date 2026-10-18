@@ -2,7 +2,7 @@
 
 extern u32 gUnk_0200016C;
 
-void sub_081281A8(void)
+void DirectionalProjectile_ResetPool(void)
 {
     gUnk_0200016C = 0;
 }

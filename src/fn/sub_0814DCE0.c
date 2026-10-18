@@ -1,6 +1,6 @@
 #include "global.h"
 
-s32 sub_0814DCE0(u32 x)
+s32 Player_GetAttackEffectType(u32 x)
 {
     s32 r;
     switch (x) {

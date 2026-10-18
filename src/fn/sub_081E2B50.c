@@ -30,16 +30,16 @@ struct Sequence {
 };
 void Anim_LoadKeyframe(void *, void *, s32, s32);
 void Anim_SetKeyframes(void *, void *, s32, s32, s32);
-void sub_081E28D4(void *);
+void Presentation_UpdateLayerAnimations(void *);
 void Presentation_ClearTilemap(void);
 extern u16 gUnk_03005260[];
 extern u16 gUnk_03004FC0;
 void Task_Kill(void *);
 void Script_Call(void *, void *);
 void Presentation_UpdateDropShakeBlink(void *);
-s32 sub_082279A8(s32, s32, s32, s32, s32, s32, s32);
-void sub_08030B78(s32);
-void sub_08030DBC(s32);
+s32 ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
+void MessageWindow_SetDisplayMode(s32);
+void MessageWindow_ShowMessage(s32);
 struct Message {
     u32 count : 16;
     u32 unused : 16;
@@ -64,11 +64,11 @@ s32 Presentation_Update(struct Sequence *p)
         }
     } else {
         if (p->frame == p->last && p->frameTimer == p->duration - 16) {
-            sub_082279A8(1, 4, 4, 4, 4, 0xffff, 0);
+            ScreenTransition_SendCommand(1, 4, 4, 4, 4, 0xffff, 0);
             p->result = 0;
             p->exitTimer = 1;
         } else if (p->timer > 16 && (gUnk_03005260[1] & 11)) {
-            sub_082279A8(1, 4, 4, 4, 4, 0xffff, 0);
+            ScreenTransition_SendCommand(1, 4, 4, 4, 4, 0xffff, 0);
             p->result = 1;
             p->exitTimer = 1;
         } else if (p->frameTimer >= p->duration && p->option) {
@@ -82,8 +82,8 @@ s32 Presentation_Update(struct Sequence *p)
                 p->state = 0;
             }
             p->frameTimer = 0;
-            sub_08030B78(1);
-            sub_08030DBC(p->frame);
+            MessageWindow_SetDisplayMode(1);
+            MessageWindow_ShowMessage(p->frame);
         }
         p->timer++;
         p->frameTimer++;

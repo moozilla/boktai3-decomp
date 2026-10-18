@@ -15,7 +15,7 @@ void ScenePanel_InitScheduledAction(struct ScenePanel *input)
             action = ScenePanel_TickHazardSpawner;
             goto shared;
         case 1:
-            panel->handle = sub_081A3710(panel->resourceId, 10, 30);
+            panel->handle = Hresvelgr_CreateShotPool(panel->resourceId, 10, 30);
             handleOffset = 0x1364;
             destination = &panel->action;
             action = ScenePanel_TickAngleBurst;
@@ -27,7 +27,7 @@ void ScenePanel_InitScheduledAction(struct ScenePanel *input)
             action = ScenePanel_TickHandleActionB;
             goto shared;
         case 3:
-            panel->handle = sub_08190704(panel->resourceId, panel->parameter);
+            panel->handle = ScenePanelEffect_Create(panel->resourceId, panel->parameter);
             panel->action = ScenePanel_TickHandlePosition;
             panel->interval = 360;
             break;

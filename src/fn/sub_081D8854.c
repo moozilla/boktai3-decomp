@@ -4,7 +4,7 @@ struct O {
     u8 pad[12];
     u16 frame;
 };
-s32 sub_081D8854(u8 *p)
+s32 Task4E01_OnType8DirectionalAnimation(u8 *p)
 {
     if (*(u32 *)p == 3) {
         s32 d = (((u16) * (s8 *)(p + 0x1e) + 0x70) >> 5);

@@ -8,7 +8,7 @@ static inline u8 Test(u8 *s)
         return 1;
     return 0;
 }
-u32 sub_0809D3A4(u8 *s)
+u32 Lun_OnTargetCheck(u8 *s)
 {
     u8 *p;
     s32 distance;

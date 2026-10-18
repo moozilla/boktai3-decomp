@@ -1,5 +1,5 @@
 #include "burst_emitter.h"
-void sub_0821FF58(void *, s32, s32, s32, s32, s32);
+void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 struct BurstEmitterSize {
     u32 x : 16, y : 16, z : 16;
 };
@@ -14,9 +14,9 @@ void BurstEmitter_InitCollider(struct BurstEmitter *emitter, s32 a, s32 b, s32 c
     ((u32 *)&offset)[1] &= 0xFFFF0000;
     Collider_Init(collider, 0, 0x2001, 0, (u16)config, &size, &offset);
     if (!emitter->context)
-        sub_0821FF58(collider, a, b, 512, 0x240004, c);
+        Collider_SetAttackProperties(collider, a, b, 512, 0x240004, c);
     else
-        sub_0821FF58(collider, a, b, 512, 0x40000, c);
+        Collider_SetAttackProperties(collider, a, b, 512, 0x40000, c);
     {
         u32 type = 0x3246;
         *(u16 *)((u8 *)collider + 4) = type;

@@ -1,4 +1,6 @@
 #include "global.h"
+/* Math_BlendAngleWithTableFactor: Wraps the angle near its target then blends using the indexed table factor */
+#define Math_BlendAngleWithTableFactor sub_0819B244
 
 extern const s16 gUnk_08611D24[];
 

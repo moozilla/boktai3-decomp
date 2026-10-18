@@ -9,7 +9,7 @@ struct B {
     u8 f[0x18];
 };
 
-void sub_080F3650(u8 *p, u32 b, s32 a)
+void Ivy_SetSegmentProperties(u8 *p, u32 b, s32 a)
 {
     struct B *y = (struct B *)(p + 0x164);
     struct A *x = (struct A *)(p + 0x15e);

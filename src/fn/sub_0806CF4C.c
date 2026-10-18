@@ -1,4 +1,6 @@
 #include "scene_steering_actor.h"
+/* SceneSteeringActor_CreateFixedOriginTravelActor: Creates a travel actor at fixed coordinates aimed toward the primary player */
+#define SceneSteeringActor_CreateFixedOriginTravelActor sub_0806CF4C
 struct SceneSteeringPlayerView {
     u8 unknown0[0x30];
     struct ContactPosition position;

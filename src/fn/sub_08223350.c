@@ -4,7 +4,7 @@ extern u32 gUnk_03001730, gUnk_0300172C, gUnk_03001734;
 extern u16 gUnk_0300172A, gUnk_03001728, gUnk_03005330, gUnk_03005380;
 extern s16 gUnk_03005370[], gUnk_03005340[];
 extern u16 gUnk_03005350[][4];
-void sub_08223350(void)
+void SerialLink_ResetMultiplayer(void)
 {
     s32 i, j;
     sub_082230AC();

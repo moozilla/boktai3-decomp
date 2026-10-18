@@ -9,7 +9,7 @@ struct S {
     u8 p1[4];
     struct E e[12];
 };
-void sub_081FDB9C(struct S *p)
+void OrbitEffect_HideTrailSprites(struct S *p)
 {
     s32 i;
     u32 m = 1;

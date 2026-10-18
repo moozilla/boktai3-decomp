@@ -3,13 +3,13 @@ void *Task_Create(u32, u32);
 void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
 s32 sub_081BABB0(void *, void *);
 void Task_Kill(void *);
-void sub_081BAB20(void);
-void sub_081BAB48(void);
-void *sub_081BAC74(void *a)
+void Registry3F74_OnUpdate(void);
+void Registry3F74_OnDestroy(void);
+void *Registry3F74_Create(void *a)
 {
     void *p = Task_Create(8, 0x268);
     if (p) {
-        Task_SetCallbacks(p, sub_081BAB20, sub_081BAB48);
+        Task_SetCallbacks(p, Registry3F74_OnUpdate, Registry3F74_OnDestroy);
         if (sub_081BABB0(p, a) < 0) {
             Task_Kill(p);
             return 0;

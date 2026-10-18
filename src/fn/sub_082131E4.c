@@ -3,7 +3,7 @@ s32 sub_08213010(void *, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 void Anim_LoadKeyframe(void *, void *, u32, u32);
-u32 sub_082131E4(u8 *p)
+u32 CollectionBook_UpdateTrackedEntryMarker(u8 *p)
 {
     s32 value = sub_08213010(p, *(s16 *)(p + 0x722));
     s32 page = *(s16 *)(p + 0x6f4);

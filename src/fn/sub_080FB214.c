@@ -10,7 +10,7 @@ struct S080FB214 {
     struct Q *q;
 };
 
-void sub_080FB214(struct S080FB214 *s, u32 x)
+void Axe_RecordRoutePoint(struct S080FB214 *s, u32 x)
 {
     struct Q *q = s->q;
     q->v[q->idx] = x;

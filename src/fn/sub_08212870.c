@@ -5,7 +5,7 @@ struct Entry {
 void Sprite_Remove(void *);
 void Task_Kill(void *);
 void Anim_Remove(void *);
-void sub_08212870(u8 *s)
+void ForgingBook_RemoveDisplayObjects(u8 *s)
 {
     struct Entry *p;
     void *a, *b;

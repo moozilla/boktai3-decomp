@@ -37,7 +37,7 @@ void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *argument)
         cell = *address;
     }
     position = &actor->position;
-    data = sub_0821D64C(cell, 1);
+    data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         data += 4;
     else

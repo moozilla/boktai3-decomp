@@ -61,24 +61,24 @@ struct SceneActor {
 extern struct SceneIndicators *gUnk_0200004C;
 extern struct SceneActor *gUnk_02000580;
 
-struct SceneIndicators *sub_08011884(void);
+struct SceneIndicators *SceneIndicators_GetInstance(void);
 void SceneIndicator_Initialize(struct SceneIndicators *m, struct SceneIndicator *p);
 void SceneIndicator_Update(struct SceneIndicators *owner, struct SceneIndicator *p);
-void sub_08011A18(struct SceneIndicators *owner, struct SceneIndicator *p);
+void SceneIndicator_Destroy(struct SceneIndicators *owner, struct SceneIndicator *p);
 int SceneIndicators_Update(struct SceneIndicators *m);
-u32 sub_08011AA4(struct SceneIndicators *m);
+u32 SceneIndicators_Destroy(struct SceneIndicators *m);
 int SceneIndicators_Initialize(struct SceneIndicators *m);
-struct SceneIndicators *sub_08011C00(void);
-struct SceneIndicator *sub_08011C4C(struct SceneIndicators *m);
-struct SceneIndicator *sub_08011C6C(struct SceneIndicators *m, u32 key);
+struct SceneIndicators *SceneIndicators_Create(void);
+struct SceneIndicator *SceneIndicators_FindFreeSlot(struct SceneIndicators *m);
+struct SceneIndicator *SceneIndicators_FindById(struct SceneIndicators *m, u32 key);
 int SceneIndicator_CreateFromScript(void);
 int SceneIndicator_Pause(void);
 int SceneIndicator_Resume(void);
 
-u8 *sub_0821D64C(int, int);
+u8 *TerrainModifiers_FindCellOverride(int, int);
 int sub_0821DA14(void *);
 void sub_08214588(void *, void *);
-void sub_0821FF50(void *, int, int);
-void sub_0821FF58(void *, int, int, int, int, int);
+void Collider_SetAttackPowerAndForce(void *, int, int);
+void Collider_SetAttackProperties(void *, int, int, int, int, int);
 
 #endif

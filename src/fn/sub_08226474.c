@@ -8,15 +8,15 @@ struct S {
     u16 f6a;
 };
 extern struct S *gUnk_03005420;
-void sub_08226AAC(struct S *);
-void sub_08226474(s32 n)
+void Camera_NotifyMoveComplete(struct S *);
+void Camera_ReturnToDefault(s32 n)
 {
     struct S *p = gUnk_03005420;
     if (p) {
         p->f1c = 1;
         if (n <= 1) {
             p->f68 = 0;
-            sub_08226AAC(p);
+            Camera_NotifyMoveComplete(p);
         } else {
             p->f6a = n;
             p->f68 = 5;

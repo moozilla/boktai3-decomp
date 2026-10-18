@@ -19,14 +19,14 @@ struct SceneInventoryPanel {
 };
 extern const struct SceneValueItemDefinition gUnk_08E61280[];
 extern const struct SceneValueConsumableDefinition gUnk_08E60F80[];
-s32 sub_08030BF8(void);
-u32 sub_08033468(void);
-s32 sub_08030C84(const void *);
-s32 sub_08030F20(s32, s32, s32, s32);
-s32 sub_08030B78(s32);
-s32 sub_08030DBC(s32);
-s32 sub_0803343C(const u8 *);
-s32 sub_08033478(s32, s32);
+s32 MessageWindow_Clear(void);
+u32 ScrollingDialogue_ClearScript(void);
+s32 MessageWindow_SetMessageTable(const void *);
+s32 MessageWindow_SetBounds(s32, s32, s32, s32);
+s32 MessageWindow_SetDisplayMode(s32);
+s32 MessageWindow_ShowMessage(s32);
+s32 ScrollingDialogue_SetScript(const u8 *);
+s32 ScrollingDialogue_SetNumberArgument(s32, s32);
 void SceneInputPanel_ShowItemComparison(struct SceneInputWidget *, struct SceneInputWidget *,
                                         struct SceneInputResource *, const void *, s32);
 void SceneInputPanel_ShowAttributeComparison(struct SceneInputWidget *, struct SceneInputWidget *,
@@ -40,9 +40,9 @@ struct SceneInventoryFlagsView {
     u8 unknown0[0xB0];
     struct SceneInventoryWidgetFlags widgets[54];
 };
-s32 sub_0822D6E0(u32);
-s32 sub_0822DFDC(u32);
+s32 Inventory_GetEquipmentId(u32);
+s32 Inventory_CanAssignEquipment(u32);
 u32 sub_0822D604(s32);
-s32 sub_0822E224(u32);
+s32 GameState_IsConsumableSlotEquipped(u32);
 void SceneHud_SetKeyframePaletteBank(struct SceneInputWidget *, u32);
 #endif

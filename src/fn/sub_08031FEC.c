@@ -1,6 +1,6 @@
 #include "global.h"
 
-u32 sub_08031FEC(s32 *p, s32 lim)
+u32 Text_ExtractDecimalDigit(s32 *p, s32 lim)
 {
     u32 n = 0;
     s32 v = *p;

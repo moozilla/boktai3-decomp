@@ -16,23 +16,23 @@ struct P08195F00 {
     u8 f4[0x72a8 - 0x728a];
     s32 a, b, c, d, e, f;
 };
-void sub_08193680(void *, u32);
-void sub_08194FA4(void *, s32, s32);
-void sub_08195078(void *, s32, s32);
+void Nidhoggr_SetBackgroundMode(void *, u32);
+void Nidhoggr_InitBobbingMotion(void *, s32, s32);
+void Nidhoggr_UpdateAnchoredSway(void *, s32, s32);
 void sub_081958A8(void *);
 void sub_081905F0(void *);
-void sub_0818F3D8(void *);
-void sub_08195A4C(void *, u32);
+void Nidhoggr_CreateUpperSweepBurst(void *);
+void Nidhoggr_SetBehavior(void *, u32);
 void Sound_PlaySongChecked(u32);
 
-void sub_08195F00(struct P08195F00 *t)
+void Nidhoggr_UpdateSecondPartPhase(struct P08195F00 *t)
 {
     s32 allDead, i;
     s16 *hp;
     switch (t->state) {
         case 0:
-            sub_08193680(t, 0);
-            sub_08194FA4(t, 0x200, 0x980);
+            Nidhoggr_SetBackgroundMode(t, 0);
+            Nidhoggr_InitBobbingMotion(t, 0x200, 0x980);
             if (t->a < -0x20000) {
                 t->state = 1;
                 Sound_PlaySongChecked(0x403);
@@ -50,7 +50,7 @@ void sub_08195F00(struct P08195F00 *t)
             t->d += 6;
             if (t->d > 0x800)
                 t->d = 0x800;
-            sub_08195078(t, 0x200, 0x980);
+            Nidhoggr_UpdateAnchoredSway(t, 0x200, 0x980);
             break;
         case 2:
             t->state++;
@@ -68,12 +68,12 @@ void sub_08195F00(struct P08195F00 *t)
             t->d += 6;
             if (t->d > 0x30)
                 t->d = 0x30;
-            sub_08195078(t, 0x200, 0x980);
+            Nidhoggr_UpdateAnchoredSway(t, 0x200, 0x980);
             if (t->x == 0x200) {
                 t->state = 4;
                 t->d = -0x600;
                 sub_081905F0(t);
-                sub_0818F3D8(&t->x);
+                Nidhoggr_CreateUpperSweepBurst(&t->x);
             }
             break;
         case 4:
@@ -88,7 +88,7 @@ void sub_08195F00(struct P08195F00 *t)
             t->d += 6;
             if (t->d > -0x30)
                 t->d = -0x30;
-            sub_08195078(t, 0x200, 0x980);
+            Nidhoggr_UpdateAnchoredSway(t, 0x200, 0x980);
             if (t->x < 0) {
                 t->state = 2;
                 t->d = 0x30;
@@ -103,5 +103,5 @@ void sub_08195F00(struct P08195F00 *t)
             allDead = 0;
     }
     if (allDead)
-        sub_08195A4C(t, 5);
+        Nidhoggr_SetBehavior(t, 5);
 }

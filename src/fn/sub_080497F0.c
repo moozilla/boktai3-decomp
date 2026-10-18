@@ -5,10 +5,10 @@ struct TetherStatusOwner {
     s16 status;
 };
 extern struct TetherStatusOwner *gUnk_02000710;
-s32 sub_0822CEE8(u32, u32);
+s32 Inventory_AddItem(u32, u32);
 void TetherActor_ClearExternalStatus(void)
 {
-    sub_0822CEE8(43, 0);
+    Inventory_AddItem(43, 0);
     {
         s16 *status = &gUnk_02000710->status;
         register s32 value asm("r2");

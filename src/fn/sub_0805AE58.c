@@ -46,7 +46,7 @@ void ScenePanelRig_InitPrimarySprites(struct ScenePanelRig *rig)
         }
         animated = sprite;
         graphics = sprite->graphics;
-        AnimData_Load(graphics, (u16)sub_08219BD8(gUnk_0824DEAC));
+        AnimData_Load(graphics, (u16)String_Hash(gUnk_0824DEAC));
         {
             register u32 parity asm("r0") = i;
             register u32 bit asm("r3");
@@ -83,7 +83,7 @@ void ScenePanelRig_InitPrimarySprites(struct ScenePanelRig *rig)
             (*randomIndex) = next & mask;
         }
         animated->randomPhase = *(u8 *)&table[(*randomIndex)];
-        animationKey = (u16)sub_08219BD8(gUnk_0824DEB0);
+        animationKey = (u16)String_Hash(gUnk_0824DEB0);
         resource = ScriptProc_Start(0x922E, animationKey);
         animated->animationResource = resource;
         {

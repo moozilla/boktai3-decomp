@@ -2,7 +2,7 @@
 
 void sub_081C5FC4(void);
 
-void sub_081C61A0(void)
+void TimeResult_UpdateInput(void)
 {
     sub_081C5FC4();
 }

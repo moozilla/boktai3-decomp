@@ -27,14 +27,14 @@ struct A {
     u8 b1df;
 };
 void Sound_PlaySongChecked(s32);
-void sub_0818CA04(void);
-void sub_0818C9C4(struct A *p)
+void Armor_UpdatePartStretch(void);
+void Armor_BeginPartStretch(struct A *p)
 {
     p->b6 = 0x80;
     p->b8 = 0x7f;
     p->b9 = 1;
     p->b1de = 0xf8;
     p->b1df = 0x10;
-    p->fn = sub_0818CA04;
+    p->fn = Armor_UpdatePartStretch;
     Sound_PlaySongChecked(0x16d);
 }

@@ -1,4 +1,6 @@
 #include "global.h"
+/* Ghost_SetAuxiliarySpriteFlags: Sets the leading flags word of all four context sprite records */
+#define Ghost_SetAuxiliarySpriteFlags sub_08098040
 
 struct Ent08098040 {
     u32 value;

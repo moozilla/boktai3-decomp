@@ -11,7 +11,7 @@ struct S {
     u32 p;
 };
 void sub_08217EEC(void *, u32, u32);
-void sub_08125BBC(struct S *s, struct E *e)
+void SceneMovingParticle_UpdateAnimation(struct S *s, struct E *e)
 {
     if (e->a != 0) {
         e->a--;

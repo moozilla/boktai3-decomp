@@ -26,7 +26,7 @@ struct A {
     u8 b1de;
     u8 b1df;
 };
-void sub_0818C974(struct A *p)
+void Armor_UpdatePartBobbing(struct A *p)
 {
     u16 *c = &p->w1d4;
     if ((*c & 3) == 0)

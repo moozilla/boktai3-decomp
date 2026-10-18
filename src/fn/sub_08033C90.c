@@ -7,7 +7,7 @@ struct S {
     u8 c[6];
     u32 d;
 };
-void sub_08033C90(struct S *p, u8 v)
+void DialogueTransition_SetState(struct S *p, u8 v)
 {
     p->a = v;
     p->b = 1;

@@ -19,7 +19,7 @@ struct S080FAE08 {
     u16 z;
 };
 
-void sub_080FAE08(struct S080FAE08 *s)
+void Axe_ClearForcedMovement(struct S080FAE08 *s)
 {
     u16 *hp = &s->h;
     u32 hm = 0xFFFFFEFF;

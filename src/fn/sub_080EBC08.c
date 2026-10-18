@@ -13,7 +13,7 @@ struct S {
     struct P p[3];
 };
 
-void sub_080EBC08(struct S *s)
+void Octopus_InitControlPresets(struct S *s)
 {
     s->p[0].a = gUnk_08606338;
     s->p[1].a = gUnk_08606320;

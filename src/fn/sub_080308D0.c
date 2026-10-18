@@ -44,12 +44,12 @@ struct Actor {
     void *callback;
 };
 extern struct Actor *gUnk_020000DC;
-int sub_0803092C(struct Actor *);
+int MessageWindow_UpdateSpeakerPortrait(struct Actor *);
 void sub_080316A4(void);
-void sub_080317D8(void);
-void sub_080317CC(void);
+void MessageWindow_UpdateImmediatePlayback(void);
+void MessageWindow_ClearTextCompletion(void);
 int TextWindow_BlankRect(int, int, int, int);
-void *sub_080313C8(struct Actor *, int);
+void *MessageWindow_GetStringAtOffset(struct Actor *, int);
 void TextState_Reset(struct State *);
 int TextState_SetBounds(struct State *, int, int, int, int);
 int Script_GetValue(void);
@@ -62,7 +62,7 @@ static inline void setCallbackB(struct Actor *p, void *fn)
     p->callback = fn;
 }
 void *ScriptProc_Start(int, u16);
-int sub_080308D0(struct Actor *p, int palette)
+int MessageWindow_LoadPalette(struct Actor *p, int palette)
 {
     void *data = ScriptProc_Start(0x92b3, (u16)palette);
     int result;

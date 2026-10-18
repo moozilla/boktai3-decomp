@@ -1,4 +1,6 @@
 #include "global.h"
+/* BgGfx_GetMapRow: tentatively returns an indexed row of 16-bit entries from resource map data */
+#define BgGfx_GetMapRow sub_0821607C
 
 struct Hdr0821607C {
     u32 w[16];

@@ -1,6 +1,6 @@
 #include "global.h"
 void Anim_Step(void *, void *);
-void sub_0816BC2C(u8 *s)
+void MapScreen_StepDirectionalIndicators(u8 *s)
 {
     u8 *p = s + 0x38E0;
     s32 i;

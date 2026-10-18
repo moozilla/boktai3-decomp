@@ -22,18 +22,18 @@ s32 ScriptUtility_CallRepeatedFromScript(void)
                         destination = values;
                         current = count;
                         do {
-                            *destination++ = sub_0821AA00(pc);
+                            *destination++ = Script_ReadValue(pc);
                             pc = Script_GetPc();
                         } while (--current != 0);
                     }
-                    sub_0821AFB4(script, &args);
+                    Script_RunBlock(script, &args);
                     current = next;
                 } while (current < repeats);
         } else {
             if (repeats > 0) {
                 s32 i = repeats;
                 do {
-                    sub_0821AFB4(script, &args);
+                    Script_RunBlock(script, &args);
                 } while (--i != 0);
             }
         }

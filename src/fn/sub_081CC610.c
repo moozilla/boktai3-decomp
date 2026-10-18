@@ -15,7 +15,7 @@ struct S {
     u32 f2cc;
 };
 
-s32 sub_081CC610(struct S *p)
+s32 SceneCharacter_OnStateChange(struct S *p)
 {
     s32 r;
     if ((u8)(p->b5 - 1) <= 0x5F) {

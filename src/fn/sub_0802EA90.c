@@ -44,7 +44,7 @@ struct Map {
 };
 extern struct Map *gUnk_030052F4;
 extern u32 gUnk_030052F8, gUnk_030052FC;
-u8 *sub_0821D64C(int, int);
+u8 *TerrainModifiers_FindCellOverride(int, int);
 extern const s16 gUnk_086149C4[];
 int Actor_PlayAnimationEntry(struct Actor *, int, int, int, int);
 void sub_0802DD6C(struct Actor *, int);
@@ -61,7 +61,7 @@ static inline int scale(int v)
 }
 static inline u8 *cell(int i)
 {
-    u8 *p = sub_0821D64C(i, 1);
+    u8 *p = TerrainModifiers_FindCellOverride(i, 1);
     if (p)
         return p + 4;
     return gUnk_030052F4->cells + 12 + i * 4;

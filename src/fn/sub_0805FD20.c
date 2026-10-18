@@ -51,7 +51,7 @@ void SceneInventory_PopulateEquipmentGrid(struct SceneInventoryPanel *input)
             register s32 kind asm("r5");
             slot = column;
             slot += rowSlot;
-            kind = sub_0822D6E0(slot);
+            kind = Inventory_GetEquipmentId(slot);
             if (kind != 255) {
                 entry->flags &= ~1;
                 {
@@ -64,7 +64,7 @@ void SceneInventory_PopulateEquipmentGrid(struct SceneInventoryPanel *input)
                 }
             } else
                 entry->flags |= 1;
-            if (sub_0822DFDC(slot))
+            if (Inventory_CanAssignEquipment(slot))
                 SceneHud_SetKeyframePaletteBank(widget, 0x373);
             else
                 SceneHud_SetKeyframePaletteBank(widget, 0x374);
@@ -125,7 +125,7 @@ void SceneInventory_PopulateEquipmentGrid(struct SceneInventoryPanel *input)
                 kind = *catalog;
             }
             if (kind >= 0) {
-                struct SceneValueEquipmentDefinition *definition = sub_08227F5C(kind);
+                struct SceneValueEquipmentDefinition *definition = Equipment_GetDefinition(kind);
                 entry->flags &= ~1;
                 {
                     u32 frame = kind;

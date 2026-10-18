@@ -18,7 +18,7 @@ struct P {
     s16 pad;
     s16 y;
 };
-s32 sub_0804DF4C(struct P *p)
+s32 AreaEffect_IsPositionCovered(struct P *p)
 {
     struct O *o = gUnk_0200010C;
     s32 i;

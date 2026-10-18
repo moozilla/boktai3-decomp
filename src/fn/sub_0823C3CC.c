@@ -4,7 +4,7 @@ s32 sub_0823C368(u8 *);
 void sub_08238238(u8 *);
 s32 sub_081419D4(u32, s32);
 void sub_08238280(u8 *, s32, s32);
-void sub_0823C3CC(u8 *p)
+void Player_EnterIdleAnimation(u8 *p)
 {
     s32 value;
     if (p[0x457]) {

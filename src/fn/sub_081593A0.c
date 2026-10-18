@@ -19,7 +19,7 @@ struct H081593A0 {
 };
 extern u8 *gUnk_02000710;
 
-void sub_081593A0(struct P081593A0 *p, struct H081593A0 *h)
+void Player_SetPositionAndSave(struct P081593A0 *p, struct H081593A0 *h)
 {
     struct V081593A0 *v = (struct V081593A0 *)h;
     struct V081593A0 t = *v;

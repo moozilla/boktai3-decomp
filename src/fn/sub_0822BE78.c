@@ -4,18 +4,18 @@ struct State {
     u8 slot;
 };
 extern struct State *gUnk_030053F8;
-void sub_0822BB60(void), sub_0821B148(void);
-u8 sub_0822BC6C(u32), sub_0822BBD8(u32), sub_0822BCE4(u32);
-u32 sub_0822BE78(void)
+void Save_SnapshotContinuation(void), GameState_BackupActiveRegions(void);
+u8 Save_ReadMainState(u32), Save_WriteMainState(u32), Save_WriteContinuation(u32);
+u32 Save_CopySelectedStateToAlternateSlot(void)
 {
     u32 slot = gUnk_030053F8->slot, other = 1 - slot;
-    sub_0822BB60();
-    if (!sub_0822BC6C(slot))
+    Save_SnapshotContinuation();
+    if (!Save_ReadMainState(slot))
         return 0;
-    sub_0821B148();
-    if (!sub_0822BBD8(other))
+    GameState_BackupActiveRegions();
+    if (!Save_WriteMainState(other))
         return 0;
-    if (!sub_0822BCE4(other))
+    if (!Save_WriteContinuation(other))
         return 0;
     return 1;
 }

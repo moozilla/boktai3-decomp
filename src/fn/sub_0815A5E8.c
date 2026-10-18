@@ -1,13 +1,13 @@
 #include "global.h"
 #include "engine.h"
 extern u8 *gUnk_02000580[];
-s32 sub_0815A400(void);
+s32 Script_GetActorIndex(void);
 /* Script: -l (default: actor +0x426) goes to +0x424 of the scripted actor
    chosen by -i and to game state +0x28 (tentative: level). */
 void ScriptActor_SetLevelFromScript(void)
 {
     u8 *actor;
-    s32 i = sub_0815A400();
+    s32 i = Script_GetActorIndex();
     actor = gUnk_02000580[i];
     if (actor) {
         s32 level = Script_GetKeywordValue('l', *(u16 *)(actor + 0x426));

@@ -1,5 +1,7 @@
 // COMPILER: old_agbcc
 #include "global.h"
+/* TetherActor_GetSavedKind: Returns the saved kind at GameState offset 0x5AA as a signed halfword */
+#define TetherActor_GetSavedKind sub_0804A400
 
 extern u8 *gUnk_02000710;
 

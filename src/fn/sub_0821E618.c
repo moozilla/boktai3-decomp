@@ -17,7 +17,7 @@ struct C {
     u8 *f8;
 };
 extern struct A *gUnk_030052F4;
-u32 sub_0821E618(struct C *c)
+u32 Route_AdvancePoint(struct C *c)
 {
     u8 *base;
     c->f2++;

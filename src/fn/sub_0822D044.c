@@ -1,13 +1,13 @@
 #include "global.h"
-s32 sub_0822CE44(void);
-s32 sub_0822D020(s32);
-s32 sub_0822CFFC(s32);
-s32 sub_0822D044(s32 a)
+s32 Inventory_IsKeyItemId(void);
+s32 Inventory_HasValuable(s32);
+s32 Inventory_HasConsumable(s32);
+s32 Inventory_HasItem(s32 a)
 {
     s32 r;
-    if (sub_0822CE44())
-        r = sub_0822D020(a);
+    if (Inventory_IsKeyItemId())
+        r = Inventory_HasValuable(a);
     else
-        r = sub_0822CFFC(a);
+        r = Inventory_HasConsumable(a);
     return r;
 }

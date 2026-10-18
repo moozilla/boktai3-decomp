@@ -6,9 +6,9 @@ void *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void ResourceHeader_Relocate(u8 *, void *);
 void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
-void sub_081DC1B4(u32);
+void Menu_StartFadeIn(u32);
 void sub_081E0818(u8 *);
-u32 sub_081E0B4C(u8 *s)
+u32 ScriptPrompt_Initialize(u8 *s)
 {
     u32 zero;
     u32 value;
@@ -56,7 +56,7 @@ u32 sub_081E0B4C(u8 *s)
     *ptr = (u32)dest;
     *(void **)(s + 0x174) = dest;
     *(u32 *)(s + 0x1C0) = zero;
-    sub_081DC1B4(0);
+    Menu_StartFadeIn(0);
     sub_081E0818(s);
     return 0;
 }

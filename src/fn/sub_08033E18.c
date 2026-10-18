@@ -13,22 +13,22 @@ struct Transition {
 extern struct Transition *gUnk_020000E8;
 extern u32 gUnk_03004DA0;
 extern u16 gUnk_03004BD8, gUnk_03004FC0, gUnk_03005214, gUnk_030051C4, gUnk_03005260[];
-void sub_08030F20(int, int, int, int);
-void sub_08030DBC(int);
-void sub_08030BF8(void);
-void sub_08030B78(int);
-void sub_08030C84(void *);
-void sub_080311B0(int);
+void MessageWindow_SetBounds(int, int, int, int);
+void MessageWindow_ShowMessage(int);
+void MessageWindow_Clear(void);
+void MessageWindow_SetDisplayMode(int);
+void MessageWindow_SetMessageTable(void *);
+void MessageWindow_SetPalette(int);
 void Script_Call(int, int);
 void Task_Kill(void *);
 void Bg_ClearTilemap(int);
 int Div(int, int);
-u8 sub_08033C9C(struct Transition *);
-void sub_08033C90(struct Transition *, int);
-void sub_08033C58(struct Transition *);
+u8 DialogueTransition_ConsumeStateEntry(struct Transition *);
+void DialogueTransition_SetState(struct Transition *, int);
+void DialogueTransition_ApplyEntryBounds(struct Transition *);
 extern void *gUnk_086056D8[];
 void sub_0824923C(struct Transition *, void *);
-int sub_08033E18(struct Transition *p)
+int DialogueTransition_OnTaskUpdate(struct Transition *p)
 {
     void *callback = gUnk_086056D8[p->state];
     if (callback)
@@ -39,7 +39,7 @@ int sub_08033E18(struct Transition *p)
         *reg = value;
     }
     if ((gUnk_03005260[1] & 9) && p->endProcedure && p->state <= 2)
-        sub_08033C90(p, 3);
+        DialogueTransition_SetState(p, 3);
     p->ticks++;
     return 0;
 }

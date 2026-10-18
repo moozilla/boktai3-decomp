@@ -26,7 +26,7 @@ struct S {
     u8 f7[0x12];
     u16 h2c8;
 };
-void sub_080BA9A0(struct S *p)
+void Skeleton_UpdateAlternateAttackRecovery(struct S *p)
 {
     if (tk(&p->b2b2))
         SceneActorAnimation_SelectDirectionalEntry(p, 0x16);

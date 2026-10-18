@@ -14,15 +14,15 @@ typedef struct State {
 } State;
 void *AnimData_FindEntry(s32);
 void sub_08217DE0(Sprite *, void *, s32);
-void sub_08217EC4(Sprite *, s32, s32);
+void Effect_SetOrigin(Sprite *, s32, s32);
 void sub_08217EEC(Sprite *, void *, s32);
-void sub_082387B0(State *s)
+void Player_InitPrimaryAuraEffect(State *s)
 {
     Sprite *sprite;
     s->graphics = AnimData_FindEntry(0x1c1c);
     sprite = &s->sprite;
     sub_08217DE0(sprite, s->graphics, 0);
-    sub_08217EC4(sprite, -4, -4);
+    Effect_SetOrigin(sprite, -4, -4);
     sub_08217EEC(sprite, s->graphics, 4);
     sprite->flags |= 1;
     sprite->mode = 1;

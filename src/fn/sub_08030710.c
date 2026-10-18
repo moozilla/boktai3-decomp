@@ -26,14 +26,14 @@ struct Manager {
 };
 extern struct Manager *gUnk_02000480;
 extern struct Player *gUnk_02000580[4];
-int sub_08018420(void);
+int Weather_GetType(void);
 int SunClock_GetBaseHour(void);
 int SunClock_GetBaseMinute(void);
-void sub_0802D9C0(void *, struct Actor *);
+void Actor_RunCallbacks(void *, struct Actor *);
 void sub_0802E188(struct Manager *);
 void sub_0802E04C(void *);
-int sub_0802D96C(struct Actor *);
-int sub_08030710(struct Manager *m)
+int Actor_Destroy(struct Actor *);
+int SceneActorManager_Update(struct Manager *m)
 {
     struct Player *player = gUnk_02000580[0];
     int zero;
@@ -44,7 +44,7 @@ int sub_08030710(struct Manager *m)
     } else {
         m->target = 0;
     }
-    m->event = sub_08018420();
+    m->event = Weather_GetType();
     m->phase = SunClock_GetBaseHour();
     {
         int frame = SunClock_GetBaseMinute();
@@ -78,7 +78,7 @@ int sub_08030710(struct Manager *m)
         struct Actor *p = m->head;
         while (p) {
             struct Actor *prev = p->prev;
-            sub_0802D9C0(m, p);
+            Actor_RunCallbacks(m, p);
             p = prev;
         }
     }

@@ -4,11 +4,11 @@ struct Q {
     u16 v;
     u8 g[0x1C - 0x12];
 };
-void sub_081DAD0C(void *, void *);
-void sub_081D85DC(void);
-s32 sub_081D85BC(struct Q *p)
+void Projectile_SetUpdateCallback(void *, void *);
+void Task4E01_OnAlternateTimedAnimation(void);
+s32 Task4E01_StartAlternateTimedAnimation(struct Q *p)
 {
-    sub_081DAD0C((u8 *)p + 0x18, sub_081D85DC);
+    Projectile_SetUpdateCallback((u8 *)p + 0x18, Task4E01_OnAlternateTimedAnimation);
     (p + 5)->v = 0x19;
     return 0;
 }

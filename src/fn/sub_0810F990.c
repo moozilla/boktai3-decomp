@@ -14,8 +14,8 @@ struct S {
 extern struct G *gUnk_020004B4;
 void TextWindow_SetScript(u32, u32);
 void TextWindow_Refresh(u32, u32);
-void sub_08033A38(u32, u32, void *);
-void sub_080337FC(u32);
+void TextWindow_SetString(u32, u32, void *);
+void TextWindow_StartPlayback(u32);
 static inline u8 ok(s32 v)
 {
     if (v < 0)
@@ -27,7 +27,7 @@ z:
 o:
     return 1;
 }
-void sub_0810F990(struct S *s)
+void LinkScorePanel_RefreshPlayerName(struct S *s)
 {
     s32 i = s->i;
     struct G *g = gUnk_020004B4;
@@ -36,8 +36,8 @@ void sub_0810F990(struct S *s)
         if (q != 0) {
             TextWindow_SetScript(s->h, s->e);
             TextWindow_Refresh(s->h, 0);
-            sub_08033A38(s->h, 1, q + 0x10);
-            sub_080337FC(s->h);
+            TextWindow_SetString(s->h, 1, q + 0x10);
+            TextWindow_StartPlayback(s->h);
         }
     }
 }

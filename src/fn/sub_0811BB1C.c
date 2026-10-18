@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_02000710;
-s16 sub_0811BB1C(void)
+s16 GameState_GetResultIndex(void)
 {
     s32 t = *(s16 *)(gUnk_02000710 + 0x890);
     if (t > 0xb)

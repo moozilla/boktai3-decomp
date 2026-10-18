@@ -42,17 +42,17 @@ static inline void setFacing(ActorAnimation *p, int angle)
     value = 7 & shifted;
     p->facing8 = value;
 }
-void sub_080297FC(void *, int, int, int);
-void sub_08029E1C(void *);
-int sub_08029E2C(void *);
-void sub_08029AA8(void *);
+void GridAttackActor_SetAnimation(void *, int, int, int);
+void GridAttackActor_ResetAttackAnimationHistory(void *);
+int GridAttackActor_SelectAttackAnimation(void *);
+void GridAttackActor_SpawnGridPattern(void *);
 void Sound_PlaySongChecked(int);
-void sub_0802A8CC(ActorAnimation *p, int tick)
+void GridAttack_UpdateRandomAnimationState(ActorAnimation *p, int tick)
 {
     if (p->changed) {
         p->changed = 0;
-        sub_08029E1C(p);
-        sub_080297FC(p, sub_08029E2C(p), 1, 8);
+        GridAttackActor_ResetAttackAnimationHistory(p);
+        GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
     }
     *(u32 *)((u8 *)p + 0x178) = 0;
     *((u8 *)p + 0x17c) = 0;
@@ -61,7 +61,7 @@ void sub_0802A8CC(ActorAnimation *p, int tick)
         p->flags |= mask;
     }
     if (!p->reset(p) && p->padB2) {
-        sub_080297FC(p, sub_08029E2C(p), 1, 8);
+        GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
         if (tick > 31)
             p->finished = 1;
     }

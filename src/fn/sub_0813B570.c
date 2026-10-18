@@ -13,7 +13,7 @@ struct G0813B570 {
 extern u32 gUnk_030053F4;
 extern struct G0813B570 *gUnk_02000710;
 
-s32 sub_0813B570(struct P0813B570 *p)
+s32 Player_GetMaxLife(struct P0813B570 *p)
 {
     s32 s;
     if (gUnk_030053F4 & 0x1000)

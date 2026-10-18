@@ -1,6 +1,6 @@
 #include "global.h"
-void sub_0822B45C(void);
-void sub_0822B4AC(void)
+void Sound_ResumePersistentSongs(void);
+void Sound_ResumePersistentSongsFromScript(void)
 {
-    sub_0822B45C();
+    Sound_ResumePersistentSongs();
 }

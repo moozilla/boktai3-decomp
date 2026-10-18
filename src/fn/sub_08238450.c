@@ -5,7 +5,7 @@ struct S08238450 {
     u16 v;
 };
 
-void sub_08238450(struct S08238450 *p, u32 m)
+void Player_SetSecondaryActionFlags(struct S08238450 *p, u32 m)
 {
     p->v |= m;
 }

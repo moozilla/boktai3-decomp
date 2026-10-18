@@ -1,6 +1,6 @@
 #include "global.h"
 extern const s16 gUnk_086149C4[];
-void sub_080AADE4(u8 *s)
+void TentacleActor_ApplyPendingRadialVelocity(u8 *s)
 {
     u32 *state = (u32 *)(s + 0x8EC);
     u32 stored = *state;

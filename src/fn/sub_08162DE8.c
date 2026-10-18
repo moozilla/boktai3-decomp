@@ -5,7 +5,7 @@ struct P {
     s32 st;
 };
 
-s32 sub_08162DE8(struct P *p)
+s32 PlayerBarrier_IsActive(struct P *p)
 {
     if (p != 0 && p->st != 0)
         return 1;

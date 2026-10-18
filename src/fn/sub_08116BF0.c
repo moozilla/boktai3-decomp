@@ -11,12 +11,12 @@ struct G {
 };
 extern struct Q *gUnk_020004F0;
 extern struct G *gUnk_02000710;
-void sub_0811C41C(void *, void *);
-void sub_08116BF0(void)
+void Character_SetLowResourceColorEffect(void *, void *);
+void Player_RestoreCurrentHealth(void)
 {
     struct Q *q = gUnk_020004F0;
     if (q != 0) {
         q->v = gUnk_02000710->h;
-        sub_0811C41C(q->a, q->b);
+        Character_SetLowResourceColorEffect(q->a, q->b);
     }
 }

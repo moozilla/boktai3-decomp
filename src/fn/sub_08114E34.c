@@ -5,7 +5,7 @@ struct E {
     u8 p[8];
     u32 v;
 };
-struct E *sub_08114E34(u8 *g)
+struct E *NativeParticle_AllocateEntry(u8 *g)
 {
     s32 i = 0;
     u32 one = 1;

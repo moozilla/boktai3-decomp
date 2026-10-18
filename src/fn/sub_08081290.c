@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 void sub_0807C72C(void *, u32, u32, u32);
-void sub_0807E7B0(void *, u32);
+void SceneActorEffects_AdvanceSteps(void *, u32);
 void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *);
 static inline u8 IsControlled(struct SceneActorRegistryResetView *a)
 {
@@ -117,7 +117,7 @@ void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *input,
             sub_0807C72C(actor, 0, 127, 0);
             sub_0807C72C(actor, 1, 127, 0);
             sub_0807C72C(actor, 3, 127, 0);
-            sub_0807E7B0(actor, 4);
+            SceneActorEffects_AdvanceSteps(actor, 4);
             {
                 void *control = SceneActorReaction_BeginHiddenDefeat;
                 u32 kind = 23;

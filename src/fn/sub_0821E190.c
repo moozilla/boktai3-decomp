@@ -14,7 +14,7 @@ struct Context {
 };
 extern struct Context *gUnk_030052F4;
 extern u32 gUnk_03005300;
-void sub_0821E190(struct Trap *trap, u8 *top)
+void Trap_Register(struct Trap *trap, u8 *top)
 {
     s32 i, found, j;
     if (gUnk_030052F4->count > 63)

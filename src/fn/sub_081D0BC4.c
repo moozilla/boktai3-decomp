@@ -1,9 +1,9 @@
 #include "global.h"
 
-void sub_081CEDC8(void *);
+void SceneNpc_UpdateMode(void *);
 
-s32 sub_081D0BC4(void *p)
+s32 SceneNpc_OnModeUpdate(void *p)
 {
-    sub_081CEDC8(p);
+    SceneNpc_UpdateMode(p);
     return 0;
 }

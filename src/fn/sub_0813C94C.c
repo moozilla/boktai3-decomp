@@ -11,7 +11,7 @@ struct P0813C94C {
 };
 extern u8 *gUnk_030042E4;
 
-void sub_0813C94C(struct P0813C94C *p)
+void Player_LoadVisualParameters(struct P0813C94C *p)
 {
     u16 *t;
     s32 i;

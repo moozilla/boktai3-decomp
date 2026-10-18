@@ -7,7 +7,7 @@ struct P {
     u8 f1[0x72A8 - 0x540A];
     s32 a, b, c, d, e, f;
 };
-void sub_08194FA4(struct P *p, s32 x, s32 y)
+void Nidhoggr_InitBobbingMotion(struct P *p, s32 x, s32 y)
 {
     p->a = (p->x - x) << 8;
     p->b = 0;

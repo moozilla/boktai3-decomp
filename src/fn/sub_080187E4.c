@@ -14,7 +14,7 @@ struct O {
     s32 lo;
     s32 hi;
 };
-void sub_080187E4(struct O *o, struct B *b)
+void OrbitingParticles_SpawnOrb(struct O *o, struct B *b)
 {
     if (b->t == 0) {
         if (o->hi < 0 || o->lo < o->hi) {

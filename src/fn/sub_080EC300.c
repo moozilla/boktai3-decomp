@@ -7,7 +7,7 @@ struct B {
     u32 a;
     u8 *p;
 };
-u32 sub_080EC300(struct B *b)
+u32 Octopus_GetAnimationStatus(struct B *b)
 {
     struct A *a = (struct A *)(b->p + 0x48);
     if (a->v == 3)

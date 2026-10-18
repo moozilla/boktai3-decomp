@@ -1,8 +1,8 @@
 #include "global.h"
 
-u8 *sub_0802140C(u32);
+u8 *SceneActors_GetBySlot(u32);
 
-u8 *sub_081F34C8(void)
+u8 *Ratatosk_GetPosition(void)
 {
-    return sub_0802140C(4) + 0x54;
+    return SceneActors_GetBySlot(4) + 0x54;
 }

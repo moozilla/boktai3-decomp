@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08110E58(s32 id, u32 a, u32 b, u32 c, u32 d, u32 e)
+void Bg_SetControlFields(s32 id, u32 a, u32 b, u32 c, u32 d, u32 e)
 {
     a <<= 14;
     b <<= 8;

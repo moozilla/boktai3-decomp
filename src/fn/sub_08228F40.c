@@ -1,9 +1,9 @@
 #include "global.h"
 s32 Script_GetValue(void);
-s32 sub_082285C4(s32, s32, s32, s32, s32, s32);
-void sub_0821AAD8(void *);
-void sub_0821B4C8(void *, u32, s32);
-void sub_08228F40(void)
+s32 Clock_CalculateDateDifference(s32, s32, s32, s32, s32, s32);
+void Script_ReadReference(void *);
+void Script_WriteReferenceValue(void *, u32, s32);
+void Clock_GetDateDifferenceFromScript(void)
 {
     s32 a, b, c, d, e, f, result;
     u32 context[2];
@@ -13,7 +13,7 @@ void sub_08228F40(void)
     d = Script_GetValue();
     e = Script_GetValue();
     f = Script_GetValue();
-    result = sub_082285C4(a, b, c, d, e, f);
-    sub_0821AAD8(context);
-    sub_0821B4C8(context, 0, result);
+    result = Clock_CalculateDateDifference(a, b, c, d, e, f);
+    Script_ReadReference(context);
+    Script_WriteReferenceValue(context, 0, result);
 }

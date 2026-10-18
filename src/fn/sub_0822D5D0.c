@@ -2,7 +2,7 @@
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
 u32 sub_0822D490(u32, u32);
-u32 sub_0822D5D0(void)
+u32 Inventory_CanReceiveItemFromScript(void)
 {
     u32 a, r;
     if (Script_SeekToKeyword(0x6b) == 0)

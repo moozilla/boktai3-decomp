@@ -4,8 +4,8 @@ struct E {
 };
 extern u8 *gUnk_02000600;
 extern u16 gUnk_02000558;
-void sub_082094D0(u8 *, struct E *, s32);
-u32 sub_0820A3AC(u8 *a)
+void FanCannonManager_InitSlot(u8 *, struct E *, s32);
+u32 FanCannonManager_Init(u8 *a)
 {
     struct E *e;
     s32 i;
@@ -14,7 +14,7 @@ u32 sub_0820A3AC(u8 *a)
     e = (struct E *)(a + 0x1c);
     i = 0;
     do {
-        sub_082094D0(a, e, i);
+        FanCannonManager_InitSlot(a, e, i);
         i++;
         e++;
     } while (i <= 7);

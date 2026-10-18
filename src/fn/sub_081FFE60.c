@@ -7,7 +7,7 @@ struct A {
     u32 w18;
     struct E e[3];
 };
-struct E *sub_081FFE60(struct A *a, s32 *out)
+struct E *HomingProjectile_FindFreeSlot(struct A *a, s32 *out)
 {
     struct E *e = a->e;
     s32 i = 0;

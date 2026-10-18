@@ -2,7 +2,7 @@
 
 void sub_081DAD28(s32);
 
-void sub_0814F310(u8 *p)
+void Player_ReleaseActionEffectOnExit(u8 *p)
 {
     s32 v = *(s32 *)(p + 0xC74);
 

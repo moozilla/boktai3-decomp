@@ -1,6 +1,6 @@
 #include "global.h"
 
-s32 sub_0823C520(s32 x)
+s32 Player_GetMovementAnimationRate(s32 x)
 {
     if (x == 12)
         return 0x40;

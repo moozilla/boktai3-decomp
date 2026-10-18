@@ -15,7 +15,7 @@ void ScenePanel_InitOverlay(struct ScenePanel *panel)
         u16 *shadow = &gUnk_03004BD8;
         *shadow = mask | *shadow;
     }
-    sub_08215A74(3, 1);
+    Bg_SetPriority(3, 1);
     panel->overlayPalette = (u8 *)ScriptProc_Start(0x92B3, 0xE2BA) + 0x114;
     {
         u32 level = 5;

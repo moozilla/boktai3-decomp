@@ -182,11 +182,11 @@ extern u16 gUnk_03004BD8;
 extern u16 gUnk_02000550, gUnk_0200053C;
 
 /* Engine functions used by this unit. */
-s32 sub_0821AA00(u8 *);
+s32 Script_ReadValue(u8 *);
 u8 *sub_08216E54(u16);
-struct ResourceRef *sub_0821A2C4(u16);
-void sub_08219574(u32, s32, s32);
-void sub_08215A74(u32, s32);
+struct ResourceRef *ResourceRegistry_GetResource(u16);
+void Blend_SetAlpha(u32, s32, s32);
+void Bg_SetPriority(u32, s32);
 void sub_082160B8(u32, u32, void *, s32, s32, s32, s32, void *);
 void Bg_SetupLayers(s32, s32, void *, s16, s16, s32, s32 *);
 void Bg_SetLayerMap(u32, void *, u16);
@@ -230,9 +230,9 @@ s32 Mod(s32, s32);
 /* Functions of this unit (ROM order). */
 s32 Background_ApplyQueuedCommands(struct Background *p);
 s32 Background_Update(struct Background *p);
-u32 sub_08001AD0(struct Background *p);
+u32 Background_Destroy(struct Background *p);
 s32 Background_Initialize(struct Background *p, u16 id, struct BackgroundConfig *c);
-void *sub_08001CB0(u16 id, struct BackgroundConfig *c);
+void *Background_Create(u16 id, struct BackgroundConfig *c);
 void *Background_CreateFromScript(u32 id);
 s32 Background_FindMapId(struct BackgroundResource *resource, u16 id);
 s32 Background_LoadMapsFromScript(void);
@@ -240,16 +240,16 @@ s32 Background_LoadMapFromScript(void);
 s32 sub_080020BC(s32 layer, u16 resourceId, s32 useIndex, u16 index);
 s32 Background_LoadTilesFromScript(void);
 void Background_QueueCommand(u32 layer, u32 type, s32 length, s32 *args);
-void sub_08002234(void);
+void Background_QueueCommandFromScript(void);
 void sub_08002284(void);
 s32 ScrollingBackground_ApplyCommands(struct ScrollingBackground *p);
 s32 ScrollingBackground_Update(struct ScrollingBackground *p);
-u32 sub_08002658(struct ScrollingBackground *p);
+u32 ScrollingBackground_Destroy(struct ScrollingBackground *p);
 s32 ScrollingBackground_Initialize(struct ScrollingBackground *p, u16 id,
                                    struct ScrollingBackgroundConfig *c);
-void *sub_08002840(u16 id, struct ScrollingBackgroundConfig *c);
+void *ScrollingBackground_Create(u16 id, struct ScrollingBackgroundConfig *c);
 void *ScrollingBackground_CreateFromScript(u32 id);
 void ScrollingBackground_QueueCommand(u32 layer, u32 type, s32 length, s32 *args);
-void sub_08002A58(void);
+void ScrollingBackground_QueueCommandFromScript(void);
 
 #endif

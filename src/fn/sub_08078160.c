@@ -1,9 +1,9 @@
 #include "scene_actor_behavior.h"
-u8 *sub_0821D64C(u32, u32);
+u8 *TerrainModifiers_FindCellOverride(u32, u32);
 #include "script_utility.h"
 static inline u8 *CellData(u32 cell)
 {
-    u8 *override = sub_0821D64C(cell, 1);
+    u8 *override = TerrainModifiers_FindCellOverride(cell, 1);
     if (override)
         return override + 4;
     return gUnk_030052F4->cells + (cell * 4 + 12);
@@ -35,7 +35,7 @@ void SceneActorBehavior_CallTerrainScript(struct SceneActorBehaviorView *actor)
         if (*ground - actor->position.y > 256)
             return;
     }
-    if (sub_0821D64C(actor->terrainCell, 1))
+    if (TerrainModifiers_FindCellOverride(actor->terrainCell, 1))
         return;
     script = *(u16 *)&actor->script1F4;
     if (!script)

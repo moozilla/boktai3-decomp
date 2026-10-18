@@ -23,7 +23,7 @@ struct Obj {
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);
 void sub_080F4FA8(struct Obj *);
-void sub_080F4E30(struct Obj *p)
+void Sword_UpdateHorizontalWaveFlight(struct Obj *p)
 {
     s32 wave, position;
     const s16 *table;

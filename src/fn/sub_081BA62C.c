@@ -6,7 +6,7 @@ struct Q {
     u32 b;
 };
 
-void sub_081BA62C(struct Q *p, u32 v)
+void Registry3F74_SetState(struct Q *p, u32 v)
 {
     p->a = v;
     p->b = 0;
