@@ -360,3 +360,4 @@ addr,function,name,family,note
 08142160,sub_08142160,Player_IsWithinCoordinateBand,"Player","tests the selected position component low byte against 31 through 225"
 08142C4C,sub_08142C4C,Player_SetActionOrigin,"Player","copies position and applies facing-dependent action offsets"
 08143938,sub_08143938,Player_CalculateMovementSpeed,"Player","calculates capped and modified movement speed"
+0814433C,sub_0814433C,Player_UpdateMovementFacing,"Player","updates facing and movement animation"
