@@ -213,6 +213,8 @@ def main():
     ap.add_argument("--depth", type=int, default=6, help="priority changes to combine")
     ap.add_argument("--beam", type=int, default=6)
     ap.add_argument("--seconds", type=int, default=600)
+    ap.add_argument("--max-compiles", type=int, default=0,
+                    help="stop the search after N compiles (deterministic, unlike --seconds)")
     ap.add_argument("--solutions", type=int, default=12, help="exact solutions to collect")
     ap.add_argument("--search-c", type=int, default=0, metavar="SECONDS",
                     help="then search C (permuter passes, focused on the variables) toward the solution")
@@ -294,7 +296,7 @@ def main():
         for state, score in frontier:
             used = {(kind, r) for kind, r, d in state}
             for kind, r, d, o in moves:
-                if (kind, r) in used or time.time() > deadline:
+                if (kind, r) in used or time.time() > deadline or (a.max_compiles and cc.compiles >= a.max_compiles):
                     continue
                 s2 = state + ((kind, r, d),)
                 if kind == "spill2":

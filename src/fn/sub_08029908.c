@@ -23,5 +23,6 @@ void GridAttackActor_InitBodyCollider(u8 *p)
     Collider_Init(collider, 0, 0x2401, 0, 16, &size, &offset);
     Collider_SetPosition(collider, p + 0x8a4, 0);
     Collider_SetCallback(collider, GridAttackActor_OnBodyCollision, p);
-    Collider_SetAttackProperties(collider, *(s16 *)(p + 0x1ac), *(s16 *)(p + 0x1ae), 0, 0, *(s16 *)(p + 0x1b0));
+    Collider_SetAttackProperties(collider, *(s16 *)(p + 0x1ac), *(s16 *)(p + 0x1ae), 0, 0,
+                                 *(s16 *)(p + 0x1b0));
 }

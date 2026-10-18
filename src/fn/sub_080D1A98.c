@@ -1,6 +1,5 @@
 #include "global.h"
 
-
 void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorAnimationView *, s32);
 
 static inline u8 TakeFlag(u8 *flag)

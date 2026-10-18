@@ -1,7 +1,6 @@
 #include "global.h"
 #include "player.h"
 
-
 void SceneActorRoute_CommitReachableDestination(void *s);
 
 static inline u8 Test(u32 value, u32 mask)

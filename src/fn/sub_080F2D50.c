@@ -1,4 +1,4 @@
-#define gPhaseDirectionSines         gUnk_086149C4
+#define gPhaseDirectionSines gUnk_086149C4
 #include "global.h"
 
 // Tentative family name: object with four phase entries and timed state callbacks.

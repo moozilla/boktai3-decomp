@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_control_helpers.h"
 
-
 struct SceneActorTargetLink {
     u8 *target;
     u8 unknownE0[0xB];

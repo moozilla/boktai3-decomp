@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_control_helpers.h"
 
-
 void SceneActorControl_ResetCollisionFlags(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *actor = input;

@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_control_helpers.h"
 
-
 u32 TerrainOverlay_QueueRemoveActor(u32 *p);
 void SceneBody_Unregister(void *);
 

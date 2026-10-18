@@ -6,7 +6,8 @@ struct SceneActorControlPositionView {
     u8 unknown0[0x3FC];
     struct ContactPosition position;
 };
-void SceneActorControl_InitPositionCurveEndpoints(struct SceneActorRegistryResetView *, const struct ContactPosition *);
+void SceneActorControl_InitPositionCurveEndpoints(struct SceneActorRegistryResetView *,
+                                                  const struct ContactPosition *);
 s32 sub_08083C38(struct SceneActorRegistryResetView *);
 void SceneActorControl_StartPositionCurve(struct SceneActorRegistryResetView *,
                                           const struct ContactPosition *);

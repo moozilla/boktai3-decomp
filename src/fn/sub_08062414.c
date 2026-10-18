@@ -19,7 +19,8 @@ struct SceneInventoryFunds {
     s16 funds;
 };
 s32 SceneInput_TickPairTransition(struct SceneInputPair *);
-void SceneInventory_PrepareEquipmentDescriptor(struct SceneInventoryTail *, struct SceneInventoryPurchaseDescriptor *);
+void SceneInventory_PrepareEquipmentDescriptor(struct SceneInventoryTail *,
+                                               struct SceneInventoryPurchaseDescriptor *);
 void Inventory_SetEquipmentEntry(u32, struct SceneInventoryPurchaseDescriptor *);
 void Inventory_SetItemId(u32, s32);
 void Inventory_SetConsumableEntry(u32, s32);

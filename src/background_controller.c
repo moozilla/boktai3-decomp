@@ -768,7 +768,6 @@ s32 ScrollingBackground_Update(struct ScrollingBackground *p)
     }
 }
 
-
 u32 ScrollingBackground_Destroy(struct ScrollingBackground *p)
 {
     /* The slot table is pointer-sized; a u32 view keeps the original access shape. */

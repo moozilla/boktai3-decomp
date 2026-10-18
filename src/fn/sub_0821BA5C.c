@@ -33,7 +33,8 @@ u32 Script_EvalExpression(u8 *p)
                 if (category == 0x90)
                     Script_SetStackArgument(type & 15, ((struct Slot *)((u32)slot + 8))->value);
                 else
-                    Script_AssignVariableOperand(reference, ((struct Slot *)((u32)slot + 8))->value);
+                    Script_AssignVariableOperand(reference,
+                                                 ((struct Slot *)((u32)slot + 8))->value);
                 saved->value = ((struct Slot *)((u32)slot + 8))->value;
             } else {
                 slot->value =

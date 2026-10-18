@@ -1,6 +1,7 @@
 #include "resource_station.h"
 // MATCHING_CONCESSION: register-pinning
-void Player_BeginResourceStationInteraction(struct ResourceStationPlayer *, struct ResourceStationPosition *, u32);
+void Player_BeginResourceStationInteraction(struct ResourceStationPlayer *,
+                                            struct ResourceStationPosition *, u32);
 void ResourceStation_CheckInteraction(struct ResourceStation *station)
 {
     struct ResourceStationPlayer *player = station->player;
@@ -73,7 +74,8 @@ void ResourceStation_CheckInteraction(struct ResourceStation *station)
                         register u32 triggerOffset asm("r5") = 0x254;
                         struct ResourceStationPosition *trigger =
                             (void *)((u8 *)station + triggerOffset);
-                        Player_BeginResourceStationInteraction(player, trigger, station->interactionVariant);
+                        Player_BeginResourceStationInteraction(player, trigger,
+                                                               station->interactionVariant);
                         triggerOffset += 0xE;
                         destination = (u8 *)station + triggerOffset;
                         value = 1;

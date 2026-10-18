@@ -1,4 +1,4 @@
-#define gPlayerSlots                          gUnk_02000580
+#define gPlayerSlots gUnk_02000580
 #include "global.h"
 #include "scene_actor_reset.h"
 struct ActorParticipantProgress {

@@ -14,8 +14,8 @@ void Memory_Copy(void *destination, const void *source, int size);
 void WirelessText_DecodeString(const u8 *source, u8 *destination, int count);
 void TextWindow_Refresh(int window, int style);
 
-int WirelessPeerPanel_SetNameFromPacket(void *ownerArg, struct PeerPanel *panel, int peerArg, int playerArg,
-                 const u8 *packetArg)
+int WirelessPeerPanel_SetNameFromPacket(void *ownerArg, struct PeerPanel *panel, int peerArg,
+                                        int playerArg, const u8 *packetArg)
 {
     u8 *owner = ownerArg;
     struct PeerPanel *p = panel;

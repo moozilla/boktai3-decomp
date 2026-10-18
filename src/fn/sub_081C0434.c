@@ -9,7 +9,8 @@ void *TetherActor_CreateRequestIndicator(void)
 {
     void *p = Task_Create(9, 0xac);
     if (p != 0) {
-        Task_SetCallbacks(p, TetherActor_UpdateRequestIndicator, TetherActor_DestroyRequestIndicator);
+        Task_SetCallbacks(p, TetherActor_UpdateRequestIndicator,
+                          TetherActor_DestroyRequestIndicator);
         if (sub_081C0390(p) < 0) {
             Task_Kill(p);
             return 0;

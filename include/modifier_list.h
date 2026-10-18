@@ -67,7 +67,10 @@ struct ModifierDisplayObject {
 struct CharacterPreviewModel {
     union {
         struct ModifierDisplayObject parts[5];
-        struct { u8 unknown0[0xD2]; u16 kind; } metadata;
+        struct {
+            u8 unknown0[0xD2];
+            u16 kind;
+        } metadata;
     } view;
     u8 unknown1E0[0x30];
     u16 activePalette[16], normalPalette[16];

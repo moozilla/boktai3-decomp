@@ -2,7 +2,6 @@
 #include "scene_actor_registry.h"
 #include "scene_actor_script.h"
 
-
 void SceneActorScript_ReadCallScriptConfig(struct SceneActorRegistryActor *actor)
 {
     struct SceneActorScriptPropertiesView *context = actor->context;
@@ -10,8 +9,7 @@ void SceneActorScript_ReadCallScriptConfig(struct SceneActorRegistryActor *actor
     s32 a;
     s32 b;
 
-    if (found)
-    {
+    if (found) {
         if (Script_GetPc())
             a = Script_GetValue();
         else
@@ -24,9 +22,7 @@ void SceneActorScript_ReadCallScriptConfig(struct SceneActorRegistryActor *actor
             b = 0;
         context->callLimit6CE = b;
         context->callCount6CF = 0;
-    }
-    else
-    {
+    } else {
         context->scriptId6CC = found;
         context->callLimit6CE = found;
         context->callCount6CF = 0;
