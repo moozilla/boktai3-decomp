@@ -424,3 +424,4 @@ addr,function,name,family,note
 0816C50C,sub_0816C50C,MapMenu_PositionMarkers,"MapMenu","positions current and secondary map markers"
 0816C78C,sub_0816C78C,MapMenu_ResetMarkers,"MapMenu","resets marker positions and hides the secondary marker"
 0816DBAC,sub_0816DBAC,SceneHud_BeginSelectedActionTransfer,"SceneHud","animates the selected action icon from the cursor to position 16,48"
+0816DC78,sub_0816DC78,SceneHud_BeginRandomActionReturn,"SceneHud","assigns a random special item and animates an icon back to the action cursor"
