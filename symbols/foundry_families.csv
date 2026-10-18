@@ -756,3 +756,4 @@ addr,function,name,family,note
 081678A0,sub_081678A0,SelectionPanel_UpdateBlink,"SelectionPanel","alternates panel tiles on a sixty-tick cycle"
 08167BDC,sub_08167BDC,Hud_RefreshActivePanel,"Hud","refreshes the active HUD panel for modes zero through two"
 081681B8,sub_081681B8,SelectionPanel_ClearTileColumns,"SelectionPanel","fills three four-by-four tile regions with blank palette tiles"
+081685B4,sub_081685B4,SceneHud_RefreshWidgetVisibility,"SceneHud","refreshes visibility of HUD widget groups"
