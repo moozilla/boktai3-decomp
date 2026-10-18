@@ -1,18 +1,19 @@
 #include "scene_panel_interaction.h"
-// MATCHING_CONCESSION: register-pinning
 
 void ScenePanel_AdvanceSubjectDeparture(struct ScenePanel *input)
 {
     struct ScenePanelInteractionView *panel = (void *)input;
     u32 frame;
-    asm("" : "+r"(panel));
+    do {
+    } while (0);
     frame = (u16)(++panel->frame);
     if (frame == 30) {
         s32 i = 0;
         for (; i < panel->subjectCount; i++) {
             struct ScenePanelInteractionSubject *subject = panel->subjects[i];
-            if (subject->state == 4)
+            if (subject->state == 4) {
                 ScenePanelSubject_SetState((void *)subject, 5);
+            }
         }
         ScenePanel_SetState((void *)panel, ScenePanel_BeginLongSequence);
         Sound_FadeOutChannel10(4);
