@@ -1220,3 +1220,4 @@ addr,function,name,family,note
 081FA070,sub_081FA070,Ratatosk_InitBodyCollider,"Ratatosk","initializes body collider dimensions and attack properties"
 081FA11C,sub_081FA11C,Ratatosk_InitHurtCollider,"Ratatosk","initializes and refreshes the damage-receiving collider"
 081FA1B0,sub_081FA1B0,Ratatosk_InitFrontCollider,"Ratatosk","initializes an attack collider offset in the facing direction"
+081FA2DC,sub_081FA2DC,Ratatosk_InitOuterCollider,"Ratatosk","initializes the larger outer attack collider"
