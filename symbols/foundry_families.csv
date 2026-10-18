@@ -230,3 +230,4 @@ addr,function,name,family,note
 0811B668,sub_0811B668,CategoryLists_Destroy,"CategoryLists","frees both linked lists in ten categories and clears manager pointer"
 0811B7A0,sub_0811B7A0,RegistryE7BC_QueueActiveObjects,"RegistryE7BC / CategoryLists","enqueues each active object among twelve registry entries"
 0811C2EC,sub_0811C2EC,ActorParticles_UpdateEmitter,"ActorParticles","updates a timed particle emitter with alternating scale"
+0811C99C,sub_0811C99C,PaletteFlash_SelectPalette,"PaletteFlash","copies normal or flash palette and sets the eight-frame flash timer"
