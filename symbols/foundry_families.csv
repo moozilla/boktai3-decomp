@@ -1070,3 +1070,4 @@ addr,function,name,family,note
 081BCCB0,sub_081BCCB0,StatGauge_GetSelectionGroup,"StatGaugePreview","maps four-entry selection groups to zero, one or two"
 081BD118,sub_081BD118,StatGauge_WaitAfterConfirm,"StatGaugePreview","waits 150 frames before selecting completion message or fade"
 081BD184,sub_081BD184,StatGauge_WaitBeforeFade,"StatGaugePreview","waits 150 frames before starting the fade"
+081BD1D0,sub_081BD1D0,StatGauge_CloseAfterDelay,"StatGaugePreview","closes after 32 frames and optionally calls the exit script"
