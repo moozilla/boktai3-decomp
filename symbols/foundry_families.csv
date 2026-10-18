@@ -644,3 +644,4 @@ addr,function,name,family,note
 0811F4DC,sub_0811F4DC,ModifierAction_ActivateCost,"ModifierAction","starts timed action after checking and consuming its cost"
 0811F538,sub_0811F538,ActorAbility_ActivatePaletteEffect,"ActorAbility","consumes a resource and starts an effect using the actor palette"
 0811F5C4,sub_0811F5C4,ActorAbility_UpdateRecovery,"ActorAbility","spends resource to increment a bounded stat and maintain recovery effects"
+0811F6CC,sub_0811F6CC,ActorAbility_SpawnProjectile,"ActorAbility","spawns a projectile and consumes resource only on success"
