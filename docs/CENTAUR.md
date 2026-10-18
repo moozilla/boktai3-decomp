@@ -70,6 +70,7 @@ screen in both.
 | `callproc(id, {args})` | run a script procedure (also on the Live page) |
 | `warp(scene[, entrance])`, `scene()` | go to a scene the way a door does, player placed (see below); current scene |
 | `peek*/poke*`, `watch(a)` | memory helpers |
+| `settext(id, hex)`, `setpool(pool, colors)` | live edits: point string `id` at new bytes, or rewrite sprite palette pool `pool` (16 BGR555 words), in the running game's cartridge ROM; the Studio sends them when a string is saved on the Text page or a color is clicked on Sprite palettes |
 
 ## The Live page (http://localhost:8642/live)
 
