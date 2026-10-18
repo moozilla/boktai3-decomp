@@ -1245,3 +1245,4 @@ addr,function,name,family,note
 081FEA80,sub_081FEA80,RisingActorManager_BeginRaise,"Rising actor manager (tentative)","selects raising callback for an active lowered actor slot"
 081FEB38,sub_081FEB38,SlotController_IsSlotIdle,"SlotController","tests whether an active slot has state zero"
 081FEB84,sub_081FEB84,SlotController_SetSlotFlag2,"SlotController","sets flag two on an active slot"
+081FEDA0,sub_081FEDA0,SpritePool_InitEntry,"SpritePool","initializes pooled control, animation and drawable records"
