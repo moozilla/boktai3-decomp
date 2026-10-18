@@ -44,3 +44,4 @@ addr,function,name,family,note
 080AA524,sub_080AA524,ActorTrail_RemoveLastSegment,"ActorTrail","remove the last eligible segment while keeping at least two"
 080AA5D8,sub_080AA5D8,ActorTrail_RemoveAllSegments,"ActorTrail","remove remaining segment colliders and emit position effects"
 080AB408,sub_080AB408,ActorTrail_UpdateTimedScale,"ActorTrail","update timer-dependent scale field and periodic stationary sound"
+080AB57C,sub_080AB57C,SceneActor_ResetQueuedState,"SceneActor","resets action queue and installs default callback"
