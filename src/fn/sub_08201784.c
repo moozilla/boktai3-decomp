@@ -33,7 +33,8 @@ void sub_08201784(u8 *p)
     b.b.lo = 0;
     Collider_Init(q, 0, 0x2001, 0, 0x10, &a, &b);
     Collider_SetCallback(q, ScriptCombatActor_OnPassiveColliderContact, p);
-    Collider_SetAttackProperties(q, *(s16 *)(p + 0x174), *(s16 *)(p + 0x176), 0, 0, *(s16 *)(p + 0x178));
+    Collider_SetAttackProperties(q, *(s16 *)(p + 0x174), *(s16 *)(p + 0x176), 0, 0,
+                                 *(s16 *)(p + 0x178));
     q += 0x54;
     v = (u16 *)&a;
     r = (u16 *)&b;

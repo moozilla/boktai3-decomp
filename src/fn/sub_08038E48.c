@@ -47,7 +47,8 @@ void WirelessTradeMenu_UpdateResultsPanel(struct P *p)
         right = (u8 *)(offset + (u32)p->right);
         side = Wireless_IsSessionActive();
         money = gUnk_030053F8->money;
-        sub_0803B700(side, p->mode, left, right, p->reward, money, WirelessGameMenu_OnResultPanelClosed);
+        sub_0803B700(side, p->mode, left, right, p->reward, money,
+                     WirelessGameMenu_OnResultPanelClosed);
     }
     if (p->done) {
         int *window = &p->window;

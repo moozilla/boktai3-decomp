@@ -16,6 +16,20 @@ struct StateActorPos {
     s16 x, y, z, pad;
 } __attribute__((aligned(4)));
 
+struct StateActorTag {
+    u8 unknown0[4];
+    u16 field4, field6;
+    union {
+        u32 word;
+        struct {
+            u16 unknown8, fieldA;
+        } halves;
+    } state; /* +8; upper half cleared by 081CF84C, whole word by 081D2544. */
+    u8 unknownC[0xC];
+    void *attachment;       /* +0x18 */
+    s32 paletteBlendFrames; /* +0x1C, decremented by 081D25AC. */
+};
+
 struct StateActor {
     u8 unk0;
     u8 kind; /* 0x01: selects animation variants (cases 4-29) */
@@ -27,17 +41,28 @@ struct StateActor {
     u8 enterCommand; /* 0x08: entry pending (command states) */
     u8 enter;        /* 0x09: entry pending (kind states) */
     u8 unkA[4];
-    u16 displayFlags; /* 0x0E */
-    u32 stateFrame;   /* 0x10 */
-    u32 timer;        /* 0x14 */
-    u8 phase;         /* 0x18 */
-    u8 unk19[0x54 - 0x19];
+    u16 displayFlags;                 /* 0x0E */
+    u32 stateFrame;                   /* 0x10 */
+    u32 timer;                        /* 0x14 */
+    u8 phase;                         /* 0x18 */
+    u8 facing4, facing8, targetAngle; /* 0x19-0x1B */
+    u8 unk1C[0x20 - 0x1C];
+    struct StateActorTag tag; /* 0x20 */
+    u8 unk40[0x54 - 0x40];
     struct StateActorPos target; /* 0x54: position the actor walks to */
-    u8 unk5C[0x68 - 0x5C];
+    u8 motion[0x65 - 0x5C];      /* Descriptor prefix, 081D2544. */
+    u8 angle;                    /* 0x65, initialized from targetAngle by 081D1A44. */
+    u8 unk66[2];
     struct StateActorPos position; /* 0x68 */
     u8 unk70[0x168 - 0x70];
     u8 receiver[0x2CC - 0x168];  /* 0x168: scene message receiver */
     void (*stateCallback)(void); /* 0x2CC */
+    u8 unk2D0[0x2E4 - 0x2D0];
+    s32 (*animationCallback)(struct StateActor *); /* 0x2E4 */
+    u8 unk2E8[0x300 - 0x2E8];
+    s32 counter300; /* Advanced by 081CFCA4; meaning tentative. */
+    u8 unk304[0x344 - 0x304];
+    u8 groundEffect[1]; /* 0x344: embedded projection object, full extent unknown. */
 };
 
 void Trigger_ConsumePending(void *receiver, s32 count);

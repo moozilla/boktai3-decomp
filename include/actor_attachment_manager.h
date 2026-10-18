@@ -18,7 +18,8 @@ struct ActorAttachmentFollowView {
     u8 unknown14[0x34 - 0x14];
     struct ContactPosition offset;
 };
-struct ActorAttachmentSlotView *ActorAttachment_AllocateSlotHeader(struct ActorAttachmentManagerView *);
+struct ActorAttachmentSlotView *
+ActorAttachment_AllocateSlotHeader(struct ActorAttachmentManagerView *);
 struct ActorAttachmentManagerView *ActorAttachment_CreateManager(void);
 struct ActorAttachmentSlotView *ActorAttachment_ReleaseResource(struct ActorAttachmentSlotView *,
                                                                 u32, void *);

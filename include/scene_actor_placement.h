@@ -2,6 +2,11 @@
 #define GUARD_SCENE_ACTOR_PLACEMENT_H
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
+/* Tile drawable flags relative to its embedded block at drawable +0x20. */
+struct SceneActorPlacementTileFlags {
+    u8 unknown0[8];
+    u32 flags;
+};
 /* Reset/placement phase; resetControl220 is observed separately from savedTarget22C. */
 struct SceneActorPlacementView {
     void *object, *drawable;
@@ -21,7 +26,9 @@ struct SceneActorPlacementView {
     u16 paletteOffset;
     u8 unknown1E8[0x34];
     const void *control, *resetControl220;
-    u8 unknown224[0x18];
+    u8 unknown224[0xC];
+    const void *savedControl230;
+    u8 unknown234[8];
     void *callback23C;
     u8 unknown240[0x68];
     u8 state2A8, phase2A9, behavior2AA, unknown2AB;
@@ -36,11 +43,17 @@ struct SceneActorPlacementView {
     u8 unknown2CA[2];
     u32 flags2CC, flags2D0;
     u16 flags2D4, flags2D6;
-    u8 unknown2D8[0xC];
+    u32 flags2D8;
+    u32 flags2DC;
+    u8 unknown2E0[4];
     u16 field2E4, flags2E6;
-    u8 unknown2E8[0xC];
+    u8 unknown2E8[4];
+    struct ContactPosition velocity;
     u16 terrainCell;
-    u8 unknown2F6[0xDE];
+    u8 unknown2F6[0x1A];
+    struct ContactPosition destination;
+    u8 unknown318[8];
+    u8 shadow320[0xB4];
     struct SceneActorRegistryControlGroup group;
     struct SceneActorRegistryRoute route;
 };

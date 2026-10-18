@@ -17,6 +17,8 @@ struct SunClock {
     u8 level;                  /* 0x0F */
     u8 spanBHour, spanBMinute; /* 0x10: B - base */
     u8 spanAHour, spanAMinute; /* 0x12: A - base */
+    u16 moonAgeTenths;         /* 0x14: tentative lunar age, in tenths of a day */
+    u8 moonPhase;              /* 0x16: eight ranges of moonAgeTenths */
 };
 extern struct SunClock gUnk_03005430;
 extern u8 *gUnk_030053F8;

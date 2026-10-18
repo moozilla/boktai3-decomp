@@ -41,7 +41,8 @@ void Anim_SetKeyframes(void *, void *, u16, s32, s32);
 // Stop the selected preview, or signal that all categories are already silent.
 s32 SoundTest_StopSelection(struct Viewer *p)
 {
-    if (!Sound_IsSongPlaying(gUnk_086136F0[p->previousA]) && !Sound_IsSongPlaying(gUnk_086137AE[p->previousB]) &&
+    if (!Sound_IsSongPlaying(gUnk_086136F0[p->previousA]) &&
+        !Sound_IsSongPlaying(gUnk_086137AE[p->previousB]) &&
         !Sound_IsSongPlaying(gUnk_08613BC4[p->previousC])) {
         p->labels[0].flags |= 1;
         p->labels[1].flags |= 1;

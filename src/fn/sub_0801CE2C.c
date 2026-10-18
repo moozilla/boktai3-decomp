@@ -1,6 +1,6 @@
 #include "global.h"
 int ResultMenu_IsPhaseStart(void *);
-void sub_0801C69C(void *, void *);
+void ResultGame_SetUpdateCallback(void *, void *);
 void ResultGame_TrackTarget(void *);
 void sub_0824923C(void *, void *);
 void Sound_StopSong(int);
@@ -9,7 +9,7 @@ void ResultGame_Finish(void *);
 void ResultGame_Update(u8 *p)
 {
     if (ResultMenu_IsPhaseStart(p)) {
-        sub_0801C69C(p, ResultGame_TrackTarget);
+        ResultGame_SetUpdateCallback(p, ResultGame_TrackTarget);
         *(int *)(p + 0x68) = 0;
         *(int *)(p + 0x60) = 0;
         *(int *)(p + 0x64) = 32;

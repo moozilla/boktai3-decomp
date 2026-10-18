@@ -8,7 +8,7 @@ void Sound_PlaySong(int);
 void Sound_StopSong(int);
 void ResultGame_UpdatePlayerMarker(void *);
 void ResultGame_ScoreAlignment(void *);
-void sub_0801C69C(void *, void *);
+void ResultGame_SetUpdateCallback(void *, void *);
 void ResultGame_TimedPress(void *);
 #define I(o) (*(int *)(p + (o)))
 #define H(o) (*(s16 *)(p + (o)))
@@ -104,7 +104,7 @@ void ResultGame_TrackTarget(u8 *p)
             *((int *)(p + 0x8c)) -= 176;
             if ((*((int *)(p + 0x8c))) <= 0) {
                 *((int *)(p + 0x8c)) = 0;
-                sub_0801C69C(p, ResultGame_TimedPress);
+                ResultGame_SetUpdateCallback(p, ResultGame_TimedPress);
                 if (p[0xc4] == 1) {
                     p[0xc4] = 2;
                 }

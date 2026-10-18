@@ -10,7 +10,7 @@ void ResultGame_HandlePress(void *);
 void ResultGame_ScorePress(void *);
 void ResultGame_HidePressMarker(void *);
 void ResultGame_HideTargetMarker(void *);
-void sub_0801C69C(void *, void *);
+void ResultGame_SetUpdateCallback(void *, void *);
 void ResultGame_TrackTarget(void *);
 #define I(o) (*(int *)(p + (o)))
 #define H(o) (*(s16 *)(p + (o)))
@@ -93,7 +93,7 @@ void ResultGame_TimedPress(u8 *p)
                 I(0x8c) = 0;
                 p[0xaf] = 3;
                 if (p[0xc4] == 1 || H(0xa8) > 899) {
-                    sub_0801C69C(p, ResultGame_TrackTarget);
+                    ResultGame_SetUpdateCallback(p, ResultGame_TrackTarget);
                     ResultGame_HideTargetMarker(p);
                     ResultGame_HidePressMarker(p);
                     if (p[0xc4] == 1) {

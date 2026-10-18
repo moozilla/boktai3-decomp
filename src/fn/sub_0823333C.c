@@ -7,8 +7,8 @@ static inline void init(u16 *dest, u32 zero, u32 value)
     *dest++ = value;
     *dest = zero;
 }
-s32 ExplosionEffect_Init(u8 *p, u8 *pos, u32 flag, s32 duration, s32 arg4, s32 arg5, s32 arg6, s32 frame,
-                 u32 arg8)
+s32 ExplosionEffect_Init(u8 *p, u8 *pos, u32 flag, s32 duration, s32 arg4, s32 arg5, s32 arg6,
+                         s32 frame, u32 arg8)
 {
     u8 *emitter;
     ExplosionEffect_InitSprite(p + 0x18, p + 0x44, pos, frame);

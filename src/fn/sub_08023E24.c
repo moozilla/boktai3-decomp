@@ -32,7 +32,7 @@ static inline u8 enter(State *p)
     return 0;
 }
 void sub_08022EA4(void *, void *);
-int sub_08022D68(void *);
+int SceneActorState_StepTableByKind(void *);
 void SceneActorState_WaitForDelayedAction(Actor *p)
 {
     State *s = &p->base;
@@ -45,7 +45,7 @@ void SceneActorState_WaitForDelayedAction(Actor *p)
             s->animation = k;
         }
     }
-    if (s->elapsed > p->delay && sub_08022D68(p)) {
+    if (s->elapsed > p->delay && SceneActorState_StepTableByKind(p)) {
         sub_08022EA4(p, (u8 *)p + 0x9c4);
         {
             u32 one = 1;

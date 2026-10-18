@@ -2,7 +2,7 @@
 #include "scalar_approach.h"
 /* ScalarApproach_StepEighthArray: Updates signed halfword values toward corresponding targets using eighth steps */
 #define ScalarApproach_StepEighthArray sub_08221BE8
-#define ScalarApproach_EighthArray sub_08221BE8
+#define ScalarApproach_EighthArray     sub_08221BE8
 void ScalarApproach_EighthArray(s16 *values, const s16 *targets, s32 count)
 {
     while ((count = (s32)((u32)count - 1u)) >= 0) {

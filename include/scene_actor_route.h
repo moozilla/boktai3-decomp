@@ -18,4 +18,18 @@ struct SceneActorRouteCursor {
 };
 u32 Route_AdvancePoint(void *);
 u32 sub_0821E8C8(struct SceneActorRouteCursor *, const struct ContactPosition *, u32, u32);
+/* Tentative destination object referenced by the actor's word at 0xDC. */
+struct SceneActorRouteDestination {
+    u8 unknown0[0xC];
+    struct ContactPosition position;
+};
+/* Route context referenced by actor offset 0x3D0. Consumers 080C4CFC and
+ * 080C4DBC copy destination words after terrain/path checks. The latter sets
+ * bit 19 of flags628; the flag's broader meaning remains unknown. */
+struct SceneActorRouteContext {
+    u8 unknown0[0x628];
+    u32 flags628;
+    u8 unknown62C[0x68];
+    struct ContactPosition destination;
+};
 #endif

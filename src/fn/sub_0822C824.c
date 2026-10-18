@@ -34,7 +34,8 @@ void Solar_UpdateMeasurement(struct Obj *obj)
             obj->a = Solar_GetIntensity();
             obj->b = Solar_GetLevelForIntensity(obj->a);
             (*(s16 *)(gUnk_02000710 + 0x874)) = Solar_ApplyIntensityModifiers(obj->a);
-            (*(s16 *)(gUnk_02000710 + 0x876)) = Solar_GetLevelForIntensity((*(s16 *)(gUnk_02000710 + 0x874)));
+            (*(s16 *)(gUnk_02000710 + 0x876)) =
+                Solar_GetLevelForIntensity((*(s16 *)(gUnk_02000710 + 0x874)));
             sub_0822C598(obj);
             gUnk_030054C0 = (*(s16 *)(gUnk_02000710 + 0x874));
             gUnk_030054C4 = (*(s16 *)(gUnk_02000710 + 0x876));

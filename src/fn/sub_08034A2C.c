@@ -48,7 +48,8 @@ int WirelessController_InitLinkCallbacks(struct Engine *p)
     if (p->pending)
         p->pending = 0;
     {
-        int status = (u8)RfuManager_Init(WirelessController_OnLinkEvent, WirelessController_OnReceiveRequest);
+        int status = (u8)RfuManager_Init(WirelessController_OnLinkEvent,
+                                         WirelessController_OnReceiveRequest);
         if (status)
             setOperation(p, 27, 0);
         else {

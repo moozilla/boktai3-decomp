@@ -632,7 +632,8 @@ void *FallingObjectManager_Create(void *a, u32 unused)
         return gUnk_0200046C;
     p = Task_Create(8, 0x20);
     if (p != 0) {
-        Task_SetCallbacks(p, (void *)FallingObjectManager_Update, (void *)FallingObjectManager_Destroy);
+        Task_SetCallbacks(p, (void *)FallingObjectManager_Update,
+                          (void *)FallingObjectManager_Destroy);
         if (FallingObjectManager_Initialize(p, a) < 0) {
             Task_Kill(p);
             return 0;
