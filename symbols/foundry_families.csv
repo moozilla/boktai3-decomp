@@ -947,3 +947,4 @@ addr,function,name,family,note
 08190498,sub_08190498,Nidhoggr_CreateDistanceLimitedEffect,"Nidhoggr collidable effects","creates a phased attack effect with randomized depth velocity"
 081905F0,sub_081905F0,BossAttack_ActivateCollider,"BossAttack","starts a timed attack collider and plays its sound"
 0819117C,sub_0819117C,SceneAnimation_UpdateSlotSequenceSevenEffect,"Scene animation (tentative)","updates slot sequence seven and triggers its delayed effect"
+08191508,sub_08191508,Nidhoggr_HidePartWithExplosion,"Nidhoggr part animation","hides a part, creates an offset explosion, and resets its state"
