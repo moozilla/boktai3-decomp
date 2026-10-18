@@ -302,3 +302,4 @@ addr,function,name,family,note
 08131CCC,sub_08131CCC,SceneActorBehavior_InstallCallbackTables,"SceneActorBehavior","installs ten actor callback tables"
 08132898,sub_08132898,SceneActorBehavior_DispatchFlaggedCategory,"SceneActorBehavior","dispatches enabled flagged actors by category"
 08135C08,sub_08135C08,SceneActorPlacement_BeginDestinationJump,"SceneActorPlacement","sets jump velocity toward a saved destination"
+081369C8,sub_081369C8,SceneActorPlacement_ResetStateThree,"SceneActorPlacement","restores saved control and initializes state three"
