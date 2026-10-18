@@ -57,3 +57,4 @@ addr,function,name,family,note
 080B0E5C,sub_080B0E5C,SceneActor_TryLaunchItem13,"SceneActor item-launch triggers","finds an item of kind 13 and launches it toward an actor"
 080B0F4C,sub_080B0F4C,SceneActor_TryLaunchSelectedItem,"SceneActor item-launch triggers","selects an item and launches it toward an actor"
 080B1038,sub_080B1038,SceneActor_UpdateForwardCollider,"SceneActor forward collision","positions collider 180 units ahead in behavior 0x22"
+080B1D8C,sub_080B1D8C,SceneActor_InitContextColliders,"SceneActor","initializes body and attack colliders including context collider"
