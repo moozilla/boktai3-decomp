@@ -518,3 +518,4 @@ addr,function,name,family,note
 08176590,sub_08176590,SceneDialog_ConfigureVariantSlot,"SceneDialog","runs variant callback and configures slot three"
 081765D4,sub_081765D4,PauseMenu_SaveDisplayState,"PauseMenu","backs up background and display state for menu entry"
 08176718,sub_08176718,PauseMenu_RestoreDisplayState,"PauseMenu","restores saved background state and resets menu transitions"
+08176838,sub_08176838,SceneDialog_FindNextEnabledEntry,"SceneDialog","finds the next enabled entry in a wrapping ten-entry list"
