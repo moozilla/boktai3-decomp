@@ -1137,3 +1137,4 @@ addr,function,name,family,note
 081D8FE8,sub_081D8FE8,TimedEffect_TestDuration,"TimedEffect","tests duration and marks alternating ticks"
 081D9024,sub_081D9024,TimedEffect_BeginPhase26,"TimedEffect","installs callback and begins phase 26 with minimum duration"
 081D92F0,sub_081D92F0,TimedEffect_UpdateDeceleration,"TimedEffect","subtracts acceleration and transitions on duration or position limit"
+081DA178,sub_081DA178,TimedEffect_RemoveFromManager,"TimedEffect","decrements kind counts, removes sprite and clears active slot"
