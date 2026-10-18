@@ -92,6 +92,21 @@ def insns(code, addr):
     return out
 
 
+def scale(x):
+    x = x if x < 0x80000000 else (-x) & M32
+    return 0 if x < 0x100 else 1 if x < 0x10000 else 2
+
+
+def plausible(u, v):
+    """A value guessed from nearby code, not from the same instruction, has
+    to look like the one it replaces (same order of magnitude), or the search
+    accepts nonsense that happens to shorten the diff (0x144 -> 1)."""
+    return scale(u) == scale(v)
+
+
+MASKS = {0xFF, 0xFFFF, 0xFFFFFFFF, 0x7FFFFFFF}
+
+
 def lit(value, raw):
     """value written like the literal it replaces; hex once it is large"""
     return f"0x{value:X}" if raw.lower().startswith("0x") or value >= 0x100 else str(value)
@@ -103,7 +118,8 @@ def shape(t):
 
 
 class Repair:
-    def __init__(self, path, func):
+    def __init__(self, path, func, force=False):
+        self.force = force
         self.path = os.path.abspath(path)
         self.func = func
         self.cc = rasolve.Compiler(self.path, func, lines=False)
@@ -133,6 +149,25 @@ class Repair:
         a = rasolve.off(self.cc.address)
         return self.cc.rom[a:a + n]
 
+    def measure(self, mine):
+        """(shape distance, aligned instructions whose values or symbols
+        differ): an edit has to improve these, not just the byte count,
+        or a coincidence in mismatched code passes for progress."""
+        orig = self.rom(self.cc.size or len(mine))
+        A, B = insns(orig, self.cc.address), insns(mine, self.cc.address)
+        sm = difflib.SequenceMatcher(None, [shape(x[1]) for x in A], [shape(x[1]) for x in B], autojunk=False)
+        sh, wrong = 0, 0
+        for tag, i1, i2, j1, j2 in sm.get_opcodes():
+            if tag == "equal":
+                wrong += sum(1 for x, y in zip(A[i1:i2], B[j1:j2]) if x[2] != y[2] or
+                             (x[3] and y[3] and self.by_addr.get(x[3][1]) != self.by_addr.get(y[3][1])))
+            else:
+                sh += max(i2 - i1, j2 - j1)
+        return sh, wrong
+
+    def better(self, old, new):
+        return new[0] <= old[0] and new[1] <= old[1] and new != old
+
     def pairs(self, mine):
         """Value and symbol substitutions (C side, ROM side) suggested by the
         aligned code, plus the unpaired ROM and C instructions."""
@@ -160,7 +195,7 @@ class Repair:
                 near = {v for x in A[max(0, i1 - WINDOW):i2 + WINDOW] for v in x[2]}
                 for y in B[j1:j2]:
                     for u in y[2]:
-                        vals.update((u, v) for v in near if v != u)
+                        vals.update((u, v) for v in near if v != u and plausible(u, v))
                     for x in A[i1:i2]:
                         if x[3] and y[3] and x[3][0] == y[3][0]:
                             pair(x, y)
@@ -182,6 +217,8 @@ class Repair:
                 cv = (-val if neg else val) & M32
                 if cv not in (u, u & 0xFFFF, u & 0xFF) or val == 0 and u != 0:
                     continue
+                if cv in MASKS and v not in MASKS:
+                    continue  # a mask is a mask (the compiler often folds it away)
                 nv = v if cv == u else (v & 0xFFFF if cv == u & 0xFFFF else v & 0xFF)
                 if neg:
                     nv = (-nv) & M32
@@ -232,13 +269,14 @@ class Repair:
         """The best improving edit (one, else a pair) as (distance, desc, text, bytes)."""
         vals, syms, _, _ = self.pairs(mine)
         cands = self.edits(text, vals, syms)
+        base = self.measure(mine)
         tried, found = [], None
         for desc, spans in cands:
             d, m = self.compile(self.apply(text, spans))
             if d is None:
                 continue
             tried.append((d, desc, spans))
-            if d < best and (found is None or d < found[0]):
+            if d < best and self.better(base, self.measure(m)) and (found is None or d < found[0]):
                 found = (d, desc, self.apply(text, spans), m)
         if found:
             return found
@@ -254,7 +292,8 @@ class Repair:
                     continue  # overlapping spans
                 cand = self.apply(text, s1 + s2)
                 d, m = self.compile(cand)
-                if d is not None and d < best and (found is None or d < found[0]):
+                if d is not None and d < best and self.better(base, self.measure(m)) and \
+                        (found is None or d < found[0]):
                     found = (d, f"{d1}, {d2}", cand, m)
         return found
 
@@ -264,6 +303,12 @@ class Repair:
         if best is None:
             sys.exit(f"{self.func}: does not compile")
         start, log = best, []
+        sh_, _ = self.measure(mine)
+        limit = max(8, len(mine) // 2 // 10)
+        if sh_ > limit and not self.force:
+            print(f"{self.func}: shape is {sh_} instructions off (limit {limit}); fix the structure first "
+                  "(values guessed across mismatched code are mostly wrong), or pass --force", flush=True)
+            rounds = 0
         for _ in range(rounds):
             if best == 0:
                 break
@@ -285,9 +330,10 @@ def main():
     ap.add_argument("func")
     ap.add_argument("--write", action="store_true", help="rewrite FILE.c")
     ap.add_argument("--rounds", type=int, default=20)
+    ap.add_argument("--force", action="store_true", help="run even when the shape is far off")
     ap.add_argument("--out-dir", help="write FUNC.c here (default build/repair)")
     a = ap.parse_args()
-    r = Repair(a.file, a.func)
+    r = Repair(a.file, a.func, a.force)
     start, best, text, log, er, ec = r.run(a.rounds)
     dst = a.file if a.write else os.path.join(a.out_dir or r.work, f"{a.func}.c")
     if log:
