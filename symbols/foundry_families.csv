@@ -616,3 +616,4 @@ addr,function,name,family,note
 0810FC90,sub_0810FC90,LinkMenu_LoadSelectionSprite,"LinkMenu","copies received selection attributes and loads the menu sprite"
 0810FF8C,sub_0810FF8C,LinkMenu_DrawRandomizedFourDigitNumber,"LinkMenu","draws a capped counter-derived number with random digit contributions"
 08110378,sub_08110378,LinkMenu_UpdateExitDelay,"LinkMenu","shows the exit message and requests session exit after a timed screen effect"
+08110FD4,sub_08110FD4,TilemapPanel_Initialize,"tilemap panel","initializes script map and tile resources on BG2"
