@@ -392,3 +392,4 @@ addr,function,name,family,note
 08162F5C,sub_08162F5C,TransitionPanel_UpdateOpening,"TransitionPanel","expands panel extents after timed sounds"
 081631F8,sub_081631F8,TransitionPanel_InitOverlay,"TransitionPanel","loads an overlay resource and copies its tiles"
 08163C00,sub_08163C00,CollisionVolume_InitCollider,"CollisionVolume","initializes large volume collider"
+08164158,sub_08164158,ResultPanel_DrawCappedCounters,"ResultPanel (tentative)","pass two counters capped at 9999 to the number renderer"
