@@ -1047,3 +1047,4 @@ addr,function,name,family,note
 081B6FA8,sub_081B6FA8,PooledController_UpdateAll,"PooledController","dispatches active controller slots by state"
 081B7304,sub_081B7304,PooledController_ActivateIdleSlots,"PooledController","moves enabled idle slots into state three"
 081B7340,sub_081B7340,EffectPool_FindFreeSlot,"EffectPool","finds a nonpositive active record in an eight-slot pool"
+081B7868,sub_081B7868,AnimatedMarker_BeginReveal,"AnimatedMarker","resets marker registration and installs reveal update"
