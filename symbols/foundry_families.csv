@@ -509,3 +509,4 @@ addr,function,name,family,note
 0817610C,sub_0817610C,SelectionPanel_WaitThenSleep,"SelectionPanel / sleep prompt (tentative)","waits 120 ticks and enters hardware sleep"
 08176174,sub_08176174,PauseMenu_InitSleepTab,"PauseMenu","initializes sleep tab resources and input callback"
 08176224,sub_08176224,SelectionPanel_ConfirmTransition,"SelectionPanel (tentative)","accepts A press and starts panel transition"
+0817627C,sub_0817627C,SelectionPanel_ProcessFlaggedChoice,"SelectionPanel (tentative)","routes accepted choice according to game-state flag 86E"
