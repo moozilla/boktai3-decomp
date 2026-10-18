@@ -929,3 +929,4 @@ addr,function,name,family,note
 08186B34,sub_08186B34,DirectionalActor_UpdateVisibilityDelay,"directional actor delayed display state","applies a delayed display flag change and consumes its trigger"
 0818ADB4,sub_0818ADB4,Armor6_Destroy,"Armor 6 (auto, tentative)","clears callbacks and unregisters actor components"
 0818B178,sub_0818B178,Armor_UpdateAccumulatedBehavior,"Armor actor","accumulates counters and triggers behavior transitions"
+0818BCB4,sub_0818BCB4,Armor_ReceiveTargetEvent,"Armor actor","applies damage and knockback target events"
