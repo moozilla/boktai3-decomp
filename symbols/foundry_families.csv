@@ -1005,3 +1005,4 @@ addr,function,name,family,note
 081A37E0,sub_081A37E0,EffectPool_FindIdleActiveEntry,"EffectPool (tentative)","find active pool entry with zero state"
 081A3D00,sub_081A3D00,EffectPool_UpdateActiveEntries,"EffectPool (tentative)","update active entries and increment their frame counters"
 081A3F04,sub_081A3F04,EffectPool_Initialize,"EffectPool (tentative)","load animation and start procedure before creating entries"
+081A3F84,sub_081A3F84,EffectPool_Create,"EffectPool (tentative)","create singleton task with entry update and destruction callbacks"
