@@ -1007,3 +1007,4 @@ addr,function,name,family,note
 081A3F04,sub_081A3F04,EffectPool_Initialize,"EffectPool (tentative)","load animation and start procedure before creating entries"
 081A3F84,sub_081A3F84,EffectPool_Create,"EffectPool (tentative)","create singleton task with entry update and destruction callbacks"
 081A3FDC,sub_081A3FDC,EffectPool_CreateEntry,"EffectPool (tentative)","ensure singleton pool and create entry with positive count"
+081A4718,sub_081A4718,EffectSpritePool_InitializeEntries,"EffectSpritePool (tentative child pool)","initialize thirty-two sprite entries and clear their state"
