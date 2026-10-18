@@ -52,7 +52,7 @@ const u8 *Text_LookupString(int);
 int SunClock_GetPhase(void);
 int SunClock_GetBaseHour(void);
 void WirelessText_EncodeString(const void *, void *, int);
-void sub_08224DAC(void *, int, int, int, int, const void *, const void *);
+void Wireless_InitSessionConfig(void *, int, int, int, int, const void *, const void *);
 extern u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
 struct Game {
@@ -137,7 +137,7 @@ int WirelessController_UpdateAdapterSetup(struct Engine *p)
                 int flags = 0;
                 if (mode)
                     flags = 3;
-                sub_08224DAC(config, mode, 43, flags, 0, gameName, userName);
+                Wireless_InitSessionConfig(config, mode, 43, flags, 0, gameName, userName);
             }
             break;
         }

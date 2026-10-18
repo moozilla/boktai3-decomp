@@ -18,7 +18,7 @@ void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *argument)
         void *object;
         object = *(void **)((u8 *)actor + offset);
         position = &actor->position;
-        sub_0821FD3C(object, position);
+        ProximityVolume_TranslateBounds(object, position);
     }
     actor->currentRoute = route;
     x = position->x >> 8;

@@ -92,12 +92,12 @@ void SceneNpc_OnDestroy(void);
 void Actor_OnIdleUpdate(void);
 void Actor_OnHiddenIdleUpdate(void);
 void sub_081CEFCC(void);
-void sub_081CF84C(void);
+void SceneNpc_PlayAnimation12(void);
 void Actor_OnConfiguredAnimationUpdate(void);
-void sub_081D2544(void);
+void SceneNpc_EnterRequestedState(void);
 void TaggedSceneNpc_OnFrameUpdate(void);
 void TaggedSceneNpc_OnBehaviorUpdate(void);
-void sub_081D25AC(void);
+void SceneNpc_TickStateAndPalette(void);
 void TaggedSceneNpc_OnVisibilityUpdate(void);
 void TaggedSceneNpc_DispatchReceiverCallback(void);
 void sub_081D1A44(void);
@@ -193,10 +193,10 @@ void TaggedSceneNpc_Create(u32 tag)
             npc->facing4 = m;
         }
     }
-    setHandler(sub_081D2544, &npc->callbacks[5]);
+    setHandler(SceneNpc_EnterRequestedState, &npc->callbacks[5]);
     setHandler(TaggedSceneNpc_OnFrameUpdate, &npc->callbacks[0]);
     setHandler(TaggedSceneNpc_OnBehaviorUpdate, &npc->callbacks[1]);
-    setHandler(sub_081D25AC, &npc->callbacks[2]);
+    setHandler(SceneNpc_TickStateAndPalette, &npc->callbacks[2]);
     setHandler(TaggedSceneNpc_OnVisibilityUpdate, &npc->callbacks[3]);
     setHandler(TaggedSceneNpc_DispatchReceiverCallback, &npc->callbacks[4]);
     npc->field1B = angle;

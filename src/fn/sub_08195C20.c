@@ -20,7 +20,7 @@ void Nidhoggr_SetBackgroundMode(void *, u32);
 void Nidhoggr_InitBobbingMotion(void *, s32, s32);
 void Nidhoggr_UpdateAnchoredSway(void *, s32, s32);
 void Nidhoggr_ActivateRandomPart(void *);
-void sub_081905F0(void *);
+void BossAttack_ActivateCollider(void *);
 void Nidhoggr_CreateLowerSweepBurst(void *);
 void Nidhoggr_SetBehavior(void *, u32);
 void Sound_PlaySongChecked(u32);
@@ -71,7 +71,7 @@ void Nidhoggr_UpdateFirstPartPhase(struct P08195C20 *t)
             if (t->x == 0x200) {
                 t->state = 4;
                 t->d = -0x600;
-                sub_081905F0(t);
+                BossAttack_ActivateCollider(t);
                 Nidhoggr_CreateLowerSweepBurst(&t->x);
             }
             break;

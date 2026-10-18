@@ -8,8 +8,8 @@ void LinkPlayer_InitOptionalPlayerState(u8 *);
 void LinkPlayer_LoadBaseStats(u8 *);
 void LinkPlayer_InitHealth(u8 *);
 void LinkPlayer_InitEnergy(u8 *);
-void sub_082383D4(u8 *, s32, s32);
-void sub_0823AD64(u8 *);
+void Player_SetTetherMode(u8 *, s32, s32);
+void Player_InitializeInputHistory(u8 *);
 s32 sub_0823ADB4(u8 *p)
 {
     u32 v = LinkPlayer_GetSessionPlayerData(p);
@@ -23,8 +23,8 @@ s32 sub_0823ADB4(u8 *p)
     LinkPlayer_LoadBaseStats(p);
     LinkPlayer_InitHealth(p);
     LinkPlayer_InitEnergy(p);
-    sub_082383D4(p, 0, 0);
-    sub_0823AD64(p);
+    Player_SetTetherMode(p, 0, 0);
+    Player_InitializeInputHistory(p);
     *(u16 *)(p + 0x534) = 0;
     *(u16 *)(p + 0x536) = 0;
     *(u16 *)(p + 0x538) = 0;

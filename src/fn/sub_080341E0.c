@@ -33,14 +33,14 @@ void Memory_Clear(void *, int);
 #define gRfuLinkStatus   gUnk_03006A80
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
-int sub_08224E54(void *, void *);
+int WirelessPacketQueue_Pop(void *, void *);
 int WirelessController_PollInputExchange(struct Engine *p)
 {
     u8 *changed;
     int result;
     void *key = &p->key;
     void *message = p->message;
-    if (sub_08224E54(message, key)) {
+    if (WirelessPacketQueue_Pop(message, key)) {
         u16 *src;
         u16 *diff;
         u16 *history;

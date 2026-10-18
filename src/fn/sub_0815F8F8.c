@@ -17,7 +17,7 @@ struct A {
     u32 w;
 };
 
-void sub_08217EEC(struct B *, u32, s32);
+void SpriteDrawable_SelectTileFrame(struct B *, u32, s32);
 
 void PlayerBurst_UpdateParticle(struct A *a, struct B *b)
 {
@@ -33,5 +33,5 @@ void PlayerBurst_UpdateParticle(struct A *a, struct B *b)
     }
     b->c2c++;
     if (b->c2c == 5)
-        sub_08217EEC(b, a->w, 5);
+        SpriteDrawable_SelectTileFrame(b, a->w, 5);
 }

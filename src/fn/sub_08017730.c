@@ -17,7 +17,7 @@ struct Weather {
     void *resource;
     struct Drop drops[32];
 };
-void sub_08217EEC(void *, void *, int);
+void SpriteDrawable_SelectTileFrame(void *, void *, int);
 void Effect_Remove(void *);
 int WeatherParticles_Update(struct Weather *p)
 {
@@ -32,7 +32,7 @@ int WeatherParticles_Update(struct Weather *p)
                 case 0:
                     if (d->timer > 2) {
                         d->state = 1;
-                        sub_08217EEC(s, p->resource, 31);
+                        SpriteDrawable_SelectTileFrame(s, p->resource, 31);
                         d->timer = 0;
                     }
                     break;

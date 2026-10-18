@@ -5,7 +5,7 @@
 #define ContactSwarm_SpawnPairedAdvance sub_08044934
 void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
-void sub_08221110(void *, void *, void *, s32, s32);
+void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
 s32 ContactSwarm_SpawnPairedAdvance(struct ContactSwarm *pool,
                                     const struct ContactPosition *position, s32 direction,
                                     u32 speed, u32 resourceId, u32 cost, volatile u32 option)
@@ -150,7 +150,7 @@ s32 ContactSwarm_SpawnPairedAdvance(struct ContactSwarm *pool,
         bank = gUnk_030042E4;
         first = bank + 0x5A60;
         second = bank + 0x5A60 + 0x80;
-        sub_08221110(pool->palette, first, second, *level, 5);
+        Palette_InterpolateBanks(pool->palette, first, second, *level, 5);
     }
     return 0;
 }

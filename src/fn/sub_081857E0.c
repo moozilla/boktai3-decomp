@@ -24,15 +24,15 @@ struct S {
     s16 z;
 };
 void ActorController_ForceAction(struct S *, s32);
-s32 sub_0818505C(struct S *, s32);
+s32 Armor_TryStartAction(struct S *, s32);
 s32 sub_08184FE8(struct S *, s32);
-void sub_0818573C(struct S *);
+void Armor_SpawnPairedProjectiles(struct S *);
 void Armor_UpdatePairedProjectileAttack(struct S *p)
 {
     u8 s = p->b3d;
     switch (s) {
         case 0:
-            if (sub_0818505C(p, 0xa)) {
+            if (Armor_TryStartAction(p, 0xa)) {
                 p->b3d = 1;
                 p->b3e = s;
             }
@@ -41,7 +41,7 @@ void Armor_UpdatePairedProjectileAttack(struct S *p)
             if (sub_08184FE8(p, 0xc)) {
                 p->b3d = 2;
                 p->b3e = 0;
-                sub_0818573C(p);
+                Armor_SpawnPairedProjectiles(p);
             }
             break;
         case 2:

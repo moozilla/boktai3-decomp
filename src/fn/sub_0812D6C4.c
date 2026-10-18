@@ -14,14 +14,15 @@ struct SceneParticlePool {
     struct SceneParticle particles[26];
     volatile u32 occupied;
 };
-void sub_08217EEC(void *, void *, u32);
+void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 s32 SceneParticle_UpdateAlternatingFrame(struct SceneParticlePool *pool,
                                          struct SceneParticle *particle)
 {
     if (particle->timer == 0) {
         particle->timer = particle->interval;
         particle->phase = (particle->phase + 1) & 1;
-        sub_08217EEC(particle, pool->resource, particle->baseFrame + particle->phase);
+        SpriteDrawable_SelectTileFrame(particle, pool->resource,
+                                       particle->baseFrame + particle->phase);
     } else
         particle->timer--;
     return 0;

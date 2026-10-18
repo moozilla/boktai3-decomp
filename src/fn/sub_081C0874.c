@@ -6,10 +6,10 @@ struct S {
     u32 n;
 };
 s32 RegistryF3E4_GetStateResult(void *);
-void sub_081C0894(void *);
+void ScreenTransition_BeginCornerMotion(void *);
 void SceneActorSequence_UpdateCenterMotion(struct S *p)
 {
     p->n = p->n + 1;
     if (RegistryF3E4_GetStateResult(p->a) != 0)
-        sub_081C0894(p);
+        ScreenTransition_BeginCornerMotion(p);
 }

@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_082230AC(void);
+void Serial_ResetMultiplayer_082230AC(void);
 extern u32 gUnk_03001730, gUnk_0300172C, gUnk_03001734;
 extern u16 gUnk_0300172A, gUnk_03001728, gUnk_03005330, gUnk_03005380;
 extern s16 gUnk_03005370[], gUnk_03005340[];
@@ -7,7 +7,7 @@ extern u16 gUnk_03005350[][4];
 void SerialLink_ResetMultiplayer(void)
 {
     s32 i, j;
-    sub_082230AC();
+    Serial_ResetMultiplayer_082230AC();
     gUnk_03001730 = 0;
     gUnk_0300172A = 0x4000;
     gUnk_03001728 = 0x4000;

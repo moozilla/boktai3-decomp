@@ -68,7 +68,7 @@ void LevelAdvanceDisplay_InitSprite(struct LevelAdvanceManager *);
 void LevelAdvanceDisplay_InitParticles(struct LevelAdvanceManager *);
 s32 LevelAdvanceDisplay_InitFromScript(struct LevelAdvanceManager *);
 void sub_08217DE0(struct LevelAdvanceParticle *, void *, u32);
-void sub_08217EEC(struct LevelAdvanceParticle *, void *, u32);
+void SpriteDrawable_SelectTileFrame(struct LevelAdvanceParticle *, void *, u32);
 void Effect_SetOrigin(struct LevelAdvanceParticle *, s32, s32);
 void Effect_SetPalette(struct LevelAdvanceParticle *, u32);
 s32 Script_GetValueSafe(void);

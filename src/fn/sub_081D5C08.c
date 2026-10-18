@@ -4,7 +4,7 @@ extern u8 gUnk_03004FC0[], gUnk_03004CC0[];
 void *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void Bg_SetPriority(u32, u32);
-void sub_08216520(u32, u32, u32);
+void BgGfx_LoadTilemapAtPosition(u32, u32, u32);
 void sub_08215EB4(u32, u32, u32, u32, u32, u32, u32, u32);
 u32 MonsterBook_SetupPageBackgrounds(u8 *s, u32 value)
 {
@@ -27,7 +27,7 @@ u32 MonsterBook_SetupPageBackgrounds(u8 *s, u32 value)
     *(void **)(s + 0x18) = p;
     Bg_SetupLayers(1, 0, p, 0, 0, 1, &value);
     Bg_SetPriority(2, 0);
-    sub_08216520(2, 0, 0);
+    BgGfx_LoadTilemapAtPosition(2, 0, 0);
     q = (u8 *)ScriptProc_Start(0x92B3, 0x204) + 0x14;
     *(void **)(s + 0x1C) = q;
     dst = (u16 *)gUnk_03004FC0;

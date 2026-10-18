@@ -14,7 +14,7 @@ struct State33A {
 u32 AnimData_FindEntry(u32);
 void sub_08217DE0(struct Entry33A *, u32, s32);
 void Effect_SetOrigin(struct Entry33A *, s32, s32);
-void sub_08217EEC(struct Entry33A *, u32, s32);
+void SpriteDrawable_SelectTileFrame(struct Entry33A *, u32, s32);
 void Effect_SetPalette(struct Entry33A *, s32);
 void ChargedBurst_InitParticles(struct State33A *p)
 {
@@ -24,7 +24,7 @@ void ChargedBurst_InitParticles(struct State33A *p)
         struct Entry33A *e = &p->entries[i];
         sub_08217DE0(e, p->handle, 1);
         Effect_SetOrigin(e, -4, -4);
-        sub_08217EEC(e, p->handle, 8);
+        SpriteDrawable_SelectTileFrame(e, p->handle, 8);
         Effect_SetPalette(e, 1);
         e->a = 2;
         e->b = 236;

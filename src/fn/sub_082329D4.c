@@ -7,7 +7,7 @@ struct S {
 };
 void sub_08217DE0(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
-void sub_08217EEC(void *, void *, u32);
+void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 void ScreenOrbitEffect_InitSlot(u8 *a, struct S *s)
 {
     u32 zero = 0;
@@ -22,7 +22,7 @@ void ScreenOrbitEffect_InitSlot(u8 *a, struct S *s)
     a += 0x100;
     sub_08217DE0(p, *(void **)a, 0x13);
     Effect_SetOrigin(p, -4, -4);
-    sub_08217EEC(p, *(void **)a, 0x33);
+    SpriteDrawable_SelectTileFrame(p, *(void **)a, 0x33);
     ((u8 *)s)[0x17] = one;
     s->h30 = zero;
     s->h32 = zero;

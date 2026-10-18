@@ -22,7 +22,7 @@ extern void *AnimData_FindEntry(u32);
 extern void sub_08217DE0(struct P *, void *, u32);
 extern void Effect_SetOrigin(struct P *, s32, s32);
 extern void Effect_SetPalette(struct P *, u32);
-extern void sub_08217EEC(struct P *, void *, u32);
+extern void SpriteDrawable_SelectTileFrame(struct P *, void *, u32);
 
 void OrbitEffect_InitTrailSprites(struct M *m)
 {
@@ -41,10 +41,10 @@ void OrbitEffect_InitTrailSprites(struct M *m)
         sub_08217DE0(p, *r, 1);
         Effect_SetOrigin(p, -4, -4);
         if (m->mode == 2) {
-            sub_08217EEC(p, *r, 1);
+            SpriteDrawable_SelectTileFrame(p, *r, 1);
             Effect_SetPalette(p, 1);
         } else {
-            sub_08217EEC(p, *r, 5);
+            SpriteDrawable_SelectTileFrame(p, *r, 5);
             Effect_SetPalette(p, 1);
         }
         p->f0f = 1;

@@ -28,11 +28,11 @@ extern u32 gUnk_03004DA4, gUnk_030051CC, gUnk_030051C0;
 
 int Palette_GetTransitionLevel(void);
 int Palette_GetBrightness(void);
-void sub_08227950(u16 *from, u16 *to);
+void Palette_GetStateBlendIndices(u16 *from, u16 *to);
 void Palette_CacheObjectBank(u32 slot, void *colors);
-void sub_08221110(void *dest, void *a, void *b, u32 amount, u32 count);
+void Palette_InterpolateBanks(void *dest, void *a, void *b, u32 amount, u32 count);
 int PaletteSet_GetSlotForId(u32 id);
-void sub_08221208(void *dest, void *source, int a, int b, int c);
+void Palette_BlendBank(void *dest, void *source, int a, int b, int c);
 
 void PaletteSet_BlendSourceColors(struct PaletteSet *set, struct PaletteSetEntry *entry);
 void PaletteSet_BlendOverlayColors(struct PaletteSet *set, struct PaletteSetEntry *entry);

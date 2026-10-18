@@ -9,7 +9,7 @@ void SceneInventory_PopulateItemGrid(struct SceneInventoryPanel *input)
     s32 column;
     register s32 rowSlot asm("r9");
     s32 row;
-    sub_08219728(&panel->display.heading, &panel->display.widgetResource, 0x63);
+    Anim_SelectWidgetGlyph(&panel->display.heading, &panel->display.widgetResource, 0x63);
     row = 0;
     flagsBase = ((struct SceneInventoryFlagsView *)(void *)panel)->widgets;
     {

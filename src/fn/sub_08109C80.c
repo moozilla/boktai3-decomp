@@ -29,7 +29,7 @@ void Hud_RefreshSpriteFromScript(void);
 s32 TextWindow_Create(s32, s32, s32, s32);
 void Hud_SetMode(s32);
 void TextWindow_StartPlayback(s32);
-void sub_08215490(s32);
+void SpriteOam_ResetQueue(s32);
 extern u32 gUnk_03005250, gUnk_0300523C, gUnk_03004DA0, gUnk_030051D4, gUnk_03005408;
 extern u16 gUnk_03004BD8;
 s32 ScriptPanel_OpenTextWindow(struct ScriptPanel *p)
@@ -69,7 +69,7 @@ s32 ScriptPanel_OpenTextWindow(struct ScriptPanel *p)
             u32 mask = ~0xE00;
             *flags = mask & *flags;
         }
-        sub_08215490(1);
+        SpriteOam_ResetQueue(1);
     }
     if (p->counter <= 29)
         gUnk_03005408 = 1;

@@ -1,12 +1,12 @@
 #include "global.h"
 
-void sub_081813F8(u32, u32);
+void ActorMarker_EmitIndexedEffect(u32, u32);
 
 void Armor_SpawnDirectionalParticleFan(u32 a)
 {
     s32 i = 0;
     do {
-        sub_081813F8(a, i);
+        ActorMarker_EmitIndexedEffect(a, i);
         i++;
     } while (i <= 8);
 }

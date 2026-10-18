@@ -5,7 +5,7 @@
 s32 Div(s32, s32);
 u16 *Hud_GetTilemapCell(s32, s32, s32);
 extern u16 gUnk_03005178;
-void sub_08243B54(s32 style, s32 x, s32 y, s32 current, s32 maximum, s32 attr)
+void StatGauge_Draw(s32 style, s32 x, s32 y, s32 current, s32 maximum, s32 attr)
 {
     s32 whole, partial;
     u32 filled, empty;
@@ -49,5 +49,5 @@ void sub_08243B54(s32 style, s32 x, s32 y, s32 current, s32 maximum, s32 attr)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08243B54);
+INCLUDE_ASM("asm/nonmatching", StatGauge_Draw);
 #endif

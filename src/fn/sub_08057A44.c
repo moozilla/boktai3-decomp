@@ -8,7 +8,7 @@ void ScenePanel_AddParticle(struct ScenePanel *input, union ScenePanelPosition *
     particle->flags &= ~1;
     particle->position = *position;
     particle->renderMode = renderMode;
-    sub_08217EEC(particle, particles->resource, 2);
+    SpriteDrawable_SelectTileFrame(particle, particles->resource, 2);
     particle->velocity = *velocity;
     particle->age = 0;
     particle->lifetime = lifetime;

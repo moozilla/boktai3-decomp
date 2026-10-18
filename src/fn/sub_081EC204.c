@@ -7,7 +7,7 @@ void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void ResourceHeader_Relocate(u8 *, void *);
 void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
 u32 Menu_StartFadeIn(u32);
-void sub_081E0818(u8 *);
+void ScriptPrompt_ResetDisplay(u8 *);
 u32 Results_Initialize(u8 *s)
 {
     u32 zero;

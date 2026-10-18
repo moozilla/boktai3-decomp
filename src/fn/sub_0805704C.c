@@ -40,9 +40,9 @@ void LevelAdvanceDisplay_UpdateParticle(struct LevelAdvanceParticle *input, void
             register u32 phase asm("r0") = (u16)frame >> 2;
             phase &= 1;
             if (phase)
-                sub_08217EEC(particle, resource, 3);
+                SpriteDrawable_SelectTileFrame(particle, resource, 3);
             else
-                sub_08217EEC(particle, resource, 2);
+                SpriteDrawable_SelectTileFrame(particle, resource, 2);
         }
     }
 }

@@ -7,7 +7,7 @@ void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void ResourceHeader_Relocate(u8 *, void *);
 void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
 void Menu_StartFadeIn(u32);
-void sub_081E0818(u8 *);
+void ScriptPrompt_ResetDisplay(u8 *);
 extern u32 gUnk_020002E8[];
 void MessageWindow_SetPalette(u32);
 void MessageWindow_SetMessageTable(u32);

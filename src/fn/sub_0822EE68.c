@@ -3,7 +3,7 @@
 // fuzzy: 60.0%
 // 17 differing instruction runs; size -4 bytes; first diff at +0xC (mov sb, r1 vs mov r8, r1)
 u16 Eeprom_WriteBlockWithFullDelay(u16, const u16 *), Eeprom_VerifyBlock(u16, const u16 *);
-s32 sub_0822EE68(u16 start, const u16 *data, s32 length)
+s32 Save_WriteBlock(u16 start, const u16 *data, s32 length)
 {
     s32 blocks = length >> 3, i, address;
     const u16 *p;
@@ -42,5 +42,5 @@ fail:
     return -1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0822EE68);
+INCLUDE_ASM("asm/nonmatching", Save_WriteBlock);
 #endif

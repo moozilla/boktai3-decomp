@@ -9,7 +9,7 @@ struct A {
     struct E e[32];
 };
 extern struct A *gUnk_02000604;
-void sub_0820D258(struct A *, struct E *, s32);
+void SceneOverlayEntry_Init(struct A *, struct E *, s32);
 u32 EnemyParticle_InitPool(struct A *a)
 {
     struct E *e;
@@ -19,7 +19,7 @@ u32 EnemyParticle_InitPool(struct A *a)
     e = a->e;
     i = 0;
     do {
-        sub_0820D258(a, e, i);
+        SceneOverlayEntry_Init(a, e, i);
         i++;
         e++;
     } while (i <= 0xF);

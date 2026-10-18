@@ -17,7 +17,7 @@ void InterruptsAndVideo_InitRuntime(void);
 void Terrain_Init(void);
 void AnimData_InitPalettePool(void);
 void *ScriptProc_Start(u32, u32);
-void sub_08215148(void *);
+void SpriteTiles_LoadResource(void *);
 void AnimData_SetResourceBank(void *);
 void Serial_InitMultiplayer(void);
 void Time_CalculateSunriseSunset(s32, s32, s32);
@@ -67,7 +67,7 @@ void AgbMain(void)
     InterruptsAndVideo_InitRuntime();
     Terrain_Init();
     AnimData_InitPalettePool();
-    sub_08215148(ScriptProc_Start(0xceaa, 0x3002));
+    SpriteTiles_LoadResource(ScriptProc_Start(0xceaa, 0x3002));
     AnimData_SetResourceBank(ScriptProc_Start(0x98f5, 0xff54));
     {
         vu16 *ime = (vu16 *)0x04000208;

@@ -5,7 +5,7 @@ struct P {
 };
 s32 Math_Atan2(s32, s32);
 void ActorController_StartTurn(void *);
-s32 sub_0818505C(void *, s32);
+s32 Armor_TryStartAction(void *, s32);
 void Armor_UpdateFacingAction9(u8 *p)
 {
     u8 *state = p + 0xb3d;
@@ -21,7 +21,7 @@ void Armor_UpdateFacingAction9(u8 *p)
             angle = (angle + 0x20) & 0xc0;
             if (p[0xb39] != angle)
                 ActorController_StartTurn(p);
-            else if (sub_0818505C(p, 9))
+            else if (Armor_TryStartAction(p, 9))
                 *state = 1;
             break;
         }

@@ -2,7 +2,7 @@
 #define GUARD_SCENE_PANEL_SUBJECT_TAIL_H
 #include "scene_panel_subject.h"
 
-void sub_08231568(void *);
+void EffectGroup_Reset(void *);
 void sub_082314C4(void *);
 u32 SceneActorEffects_DestroyGroup(void *);
 void Collider_SetBodyProperties(void *, u32, u32, u32);

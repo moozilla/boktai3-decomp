@@ -8,7 +8,7 @@ struct S {
 };
 void Registry6A37_UpdateBackgroundScroll(struct S *);
 void sub_081B95E4(u8 *);
-void sub_081C43B0(struct S *);
+void SceneTransition_BeginOffsetMove(struct S *);
 
 void Registry6A37_UpdateSecondScrollTransition(struct S *p)
 {
@@ -19,6 +19,6 @@ void Registry6A37_UpdateSecondScrollTransition(struct S *p)
     if (p->f4d == 2)
         r = 1;
     if (r)
-        sub_081C43B0(p);
+        SceneTransition_BeginOffsetMove(p);
     p->f68++;
 }

@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "player.h"
-void sub_08221110(void *, void *, void *, s32, s32);
+void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
 extern void (*const gUnk_08605920[])(struct ContactSwarm *, struct ContactSwarmSlot *, s32);
 static inline void updatePlayback(struct ContactSwarmAnimation *animation,
                                   struct ContactSwarmSprite *spriteInput)
@@ -130,7 +130,7 @@ u32 ContactSwarm_Update(struct ContactSwarm *poolInput)
                 u8 *reverse;
                 palette = pool->palette;
                 level = &pool->fadeLevel;
-                sub_08221110(palette, first, second, *level, 5);
+                Palette_InterpolateBanks(palette, first, second, *level, 5);
                 reverse = &pool->fadeReverse;
                 if (!*reverse) {
                     if (++*level > 30) {

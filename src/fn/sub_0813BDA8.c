@@ -17,7 +17,7 @@ typedef struct State {
 void *AnimData_FindEntry(s32);
 void sub_08217DE0(Sprite *, void *, s32);
 void Effect_SetOrigin(Sprite *, s32, s32);
-void sub_08217EEC(Sprite *, void *, s32);
+void SpriteDrawable_SelectTileFrame(Sprite *, void *, s32);
 void Player_InitDirectionalEffectPair(State *s)
 {
     Sprite *sprite;
@@ -27,7 +27,7 @@ void Player_InitDirectionalEffectPair(State *s)
     for (i = 1; i >= 0; sprite++, i--) {
         sub_08217DE0(sprite, s->resource, 17);
         Effect_SetOrigin(sprite, 4, 4);
-        sub_08217EEC(sprite, s->graphics, 74);
+        SpriteDrawable_SelectTileFrame(sprite, s->graphics, 74);
         sprite->mode = 1;
         sprite->size = 20;
     }

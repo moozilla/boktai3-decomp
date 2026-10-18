@@ -1,7 +1,7 @@
 #include "motion_0818.h"
 
 s32 Div(s32, s32);
-void sub_0818DB10(struct Motion0818Object *);
+void SpinningApproach_UpdateOwnerRelativeSegment(struct Motion0818Object *);
 void SpinningApproach_UpdateApproach(struct Motion0818Object *p)
 {
     u8 *owner = p->parent;
@@ -11,7 +11,7 @@ void SpinningApproach_UpdateApproach(struct Motion0818Object *p)
     p->z = p->startZ + Div(p->dz * p->timer, 100);
     p->timer++;
     if (p->timer > 100) {
-        p->callback = sub_0818DB10;
+        p->callback = SpinningApproach_UpdateOwnerRelativeSegment;
         p->timer = 0;
         p->a = *(u16 *)(owner + 0x5ac) - p->fx - p->startX;
         p->b = *(u16 *)(owner + 0x5ae) - p->fy - p->startY;

@@ -24,7 +24,7 @@ void Nidhoggr_SetBackgroundMode(void *, u32);
 void Nidhoggr_InitRelativeMotion(void *, s32, s32);
 void Nidhoggr_UpdateWideSway(void *);
 void Nidhoggr_TrackPlayerDepth(void *);
-void sub_08190498(void *, void *, const void *, void *);
+void Nidhoggr_CreateDistanceLimitedEffect(void *, void *, const void *, void *);
 void Nidhoggr_SetBehavior(void *, u32);
 void Sound_PlaySongChecked(u32);
 void Sound_StopSong(u32);
@@ -79,7 +79,7 @@ void Nidhoggr_UpdateEffectAttack(struct P08196718 *t)
             goto update;
         case 5:
             if (!(t->timer & 1))
-                sub_08190498(t->effects, &t->pos, gUnk_0824F5A0, t);
+                Nidhoggr_CreateDistanceLimitedEffect(t->effects, &t->pos, gUnk_0824F5A0, t);
             Nidhoggr_TrackPlayerDepth(t);
             Nidhoggr_UpdateWideSway(t);
             if (t->timer > 0x78) {

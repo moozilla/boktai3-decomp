@@ -5,7 +5,7 @@ struct SceneActorScriptPayloadView {
     u8 unknown9[3];
     u32 payload[2];
 };
-void sub_08232F68(u32, const void *);
+void EffectQuad_StartRemoteEntry(u32, const void *);
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)
@@ -34,5 +34,5 @@ void SceneActorScript_DispatchKindPayload(void *input)
         default:
             return;
     }
-    sub_08232F68(kind, descriptor->payload);
+    EffectQuad_StartRemoteEntry(kind, descriptor->payload);
 }

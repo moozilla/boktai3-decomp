@@ -1,7 +1,7 @@
 #include "damage_number_display.h"
 void Effect_Initialize(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
-void sub_08217EEC(void *, void *, u32);
+void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 s32 DamageNumberDisplay_Initialize(struct DamageNumberDisplay *display)
 {
     struct DamageNumberGroup *group;
@@ -29,7 +29,7 @@ s32 DamageNumberDisplay_Initialize(struct DamageNumberDisplay *display)
         do {
             Effect_Initialize(digit, display->resource, 0x10010);
             Effect_SetOrigin(digit, -4, -4);
-            sub_08217EEC(digit, display->resource, 0x20);
+            SpriteDrawable_SelectTileFrame(digit, display->resource, 0x20);
             digit->priority = 1;
             --remaining;
             ++digit;

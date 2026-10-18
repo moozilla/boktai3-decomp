@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0822B410(void);
+void MusicSlots_StopAllAndRetainResumable(void);
 
 void SceneLifecycle_PauseScene(void)
 {
@@ -8,7 +8,7 @@ void SceneLifecycle_PauseScene(void)
     if (((*(u32 *)0x030053F4 | *(u32 *)0x030053F0) & m) == 0) {
         u32 *p;
         u32 f;
-        sub_0822B410();
+        MusicSlots_StopAllAndRetainResumable();
         f = 2;
         p = (u32 *)0x0300523C;
         *p = *p | f;

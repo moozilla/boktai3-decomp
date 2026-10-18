@@ -1,5 +1,5 @@
 #include "global.h"
-s32 sub_0821172C(void *, s32);
+s32 ForgingBook_CountDiscoveredCategoryEntries(void *, s32);
 s32 ForgingBook_GetCategoryEntryCount(s32);
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
@@ -7,7 +7,7 @@ void Anim_LoadKeyframe(void *, void *, u32, u32);
 u32 ForgingBook_UpdateCategoryCountDigits(u8 *p)
 {
     s16 *idx = (s16 *)(p + 0xb60);
-    s32 a = sub_0821172C(p, *idx), b;
+    s32 a = ForgingBook_CountDiscoveredCategoryEntries(p, *idx), b;
     s32 ad, am, bd, bm;
     void *anchor;
     b = ForgingBook_GetCategoryEntryCount(*idx);

@@ -72,7 +72,7 @@ s32 ScenePanel_AdvancePaletteFrame(struct ScenePanelMainSprite *);
 void ScenePanel_InitTimePalette(struct ScenePanel *);
 void ScenePanel_UpdateTimePalette(struct ScenePanel *);
 void sub_08217DE0(struct ScenePanelParticle *, void *, u32);
-void sub_08217EEC(struct ScenePanelParticle *, void *, u32);
+void SpriteDrawable_SelectTileFrame(struct ScenePanelParticle *, void *, u32);
 void Effect_SetOrigin(struct ScenePanelParticle *, s32, s32);
 void Effect_SetPalette(struct ScenePanelParticle *, u32);
 u32 SunClock_GetPhase(void);
