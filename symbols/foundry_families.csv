@@ -452,3 +452,4 @@ addr,function,name,family,note
 0817026C,sub_0817026C,SceneHud_UpdateActionFeedback,"SceneHud","animates action feedback before restoring selection input"
 081704B4,sub_081704B4,SceneHud_UpdateActionSwap,"SceneHud","checks and applies an action-slot swap or cancels it"
 08170718,sub_08170718,SceneHud_LayoutActionGrid,"SceneHud","places sixteen action icons in a four by four grid"
+0817080C,sub_0817080C,SceneHud_InitializeActionInput,"SceneHud","initializes action input flags and cursor keyframes"
