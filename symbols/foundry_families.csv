@@ -296,3 +296,4 @@ addr,function,name,family,note
 0812F520,sub_0812F520,SceneActor_SetContactReactionDirection,"SceneActor","set contact reaction direction from source or displacement"
 0813067C,sub_0813067C,SceneActorControl_UpdateSavedControlPhase,"SceneActorControl","restore saved control or advance the phase timer"
 08130B24,sub_08130B24,SceneActor_RunControlAndFallback,"Scene actor control","invokes actor control callback then fallback while still attached"
+08130BA0,sub_08130BA0,SceneActor_DispatchActivePhase,"Scene actor control","dispatches indexed phase callback after actor gate succeeds"
