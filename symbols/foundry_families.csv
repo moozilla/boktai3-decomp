@@ -401,3 +401,4 @@ addr,function,name,family,note
 081663A0,sub_081663A0,MenuDisplay_SetPaletteOverrides,"MenuDisplay","selects shared palette overrides for four animation channels"
 081664A8,sub_081664A8,MenuDisplay_LoadAdjustedDigits,"MenuDisplay","loads three decimal digit frames with an adjustment-dependent bank"
 08166670,sub_08166670,MenuDisplay_FindEntryIndex,"MenuDisplay","finds a nonnegative entry in one of four menu lists"
+08166CD0,sub_08166CD0,PlayerPanel_SnapshotValues,"PlayerPanel","copies three player values into panel storage"
