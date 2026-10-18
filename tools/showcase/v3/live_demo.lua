@@ -4,8 +4,10 @@
 --
 -- Runs Centaur (linked to the studio, which forwards text saves and palette
 -- edits as settext/setpool) and records frames as PNGs in LIVE_OUT:
---   a_NNNNN.png  Django reads the hint panel (the original text)
---   c_NNNNN.png  after the studio's text edit arrives: he reads it again
+--   a_NNNNN.png  Django opens the hint panel (a title page, then line 1587 as the game has it)
+--                (then the panel is paged through and closed, off camera)
+--   c_NNNNN.png  after the studio's text edit arrives: he opens it again and
+--                the first line is the edited one (held open from then on)
 --   dK_NNNNN.png after palette edit K arrives: a second of the recolored Django
 -- The game waits (unrecorded) for each edit; the edit lines the pieces up
 -- with the studio's recording (tour.py). Stops after four palette edits or
@@ -22,7 +24,6 @@ emu:loadStateBuffer(data)
 emu:write16(emu:read32(0x02000710) + 0x12, 0)    -- the fastest message speed (GameState+0x12)
 
 local MAX_WAIT = 60 * 60 * 60 * 24   -- the game runs unthrottled while it waits
-local PAGE = 150                    -- frames between A presses while reading
 local phase, n, waited, pools = "a", 0, 0, 0
 local press_until = -1
 local function log(s) console:log("live_demo: " .. s) end
@@ -36,22 +37,23 @@ local orig_setpool = setpool
 setpool = function(p, c) orig_setpool(p, c); pool_seen = pool_seen + 1 end
 COMMANDS.setpool = function(c) setpool(c.pool, c.colors) end
 
-local function read_panel(prefix)
-  -- tap A at 10 and every PAGE frames, five times: the message's pages and its close
-  if n % PAGE == 10 and n < PAGE * 5 then press_until = n + 3 end
+local A_FRAMES, C_FRAMES = 640, 700    -- presses at least 60 frames apart: a press while a page types only completes it
+local function read_panel(prefix, presses, frames)
+  -- A at the given frames (open the panel; page through and close it)
+  for _, t in ipairs(presses) do if n == t then press_until = n + 3 end end
   emu:screenshot(string.format("%s/%s_%05d.png", OUT, prefix, n))
   n = n + 1
-  return n >= PAGE * 5 + 20
+  return n >= frames
 end
 
 callbacks:add("frame", function()
   if phase == "a" then
-    if read_panel("a") then phase, n = "wait_text", 0; log("read once; waiting for the text edit") end
+    if read_panel("a", { 10, 100, 480, 540, 600 }, A_FRAMES) then phase, n = "wait_text", 0; log("read once; waiting for the text edit") end
   elseif phase == "wait_text" then
     waited = waited + 1
     if LIVE_NEXT ~= text_seen then phase, n = "c", 0; log("text edit arrived") end
   elseif phase == "c" then
-    if read_panel("c") then phase, n = "wait_pool", 0; log("read again; waiting for palette edits") end
+    if read_panel("c", { 10, 100 }, C_FRAMES) then phase, n = "wait_pool", 0; log("read again; waiting for palette edits") end
   elseif phase == "wait_pool" then
     waited = waited + 1
     if pool_seen > pools then pools = pools + 1; phase, n = "d", 0; log("palette edit " .. pools) end

@@ -30,7 +30,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
 sys.path.insert(0, HERE)
-from gclasm import Arg, Call, Hash, Proc, Set, Text, chara, command, proc, r700, r708, switch  # noqa: E402,F401
+from gclasm import Arg, Block, Call, Cmd, Hash, Proc, Set, Text, chara, command, proc, r700, r708, switch  # noqa: E402,F401
 from rom import Rom, message  # noqa: E402
 import romx  # noqa: E402
 
@@ -38,6 +38,7 @@ import romx  # noqa: E402
 DIRECTOR, CAMERA, SCREEN, AUDIO = 0x4E69, 0xFF40, 0x730A, 0xD3A9
 COUNTER = r700(0x119)        # the dialogue counter every scene's cutscenes use
 STORY = r708(0x3C, 1)        # story progress
+TOO_LONG = []                # dialogue lines wider than the window (Show.text)
 
 OT = "<LABEL=OTENKO>Master Otenko</LABEL>:\n"
 DJ = "<LABEL=PLAYER>Django</LABEL>:\n"
@@ -72,6 +73,11 @@ class Show:
     def text(self, pages):
         """A message of one or more pages; returns the first string id."""
         first = None
+        for p in pages:   # the window is 28 characters wide (tags aside); the label line is extra
+            body = p.split(":\n", 1)[-1] if ":\n" in p else p
+            for ln in re.sub(r"<[^>]*>", "", body).split("\n"):
+                if len(ln) > 28:
+                    TOO_LONG.append(ln)
         for p in list(pages) + ["<PROC=0>\n<END>"]:
             sid = self.strings.pop(0)
             first = first if first is not None else sid
@@ -338,3 +344,15 @@ def stage_of(img, scene):
                 if c2 in (884, 885, 876):
                     stage = (c, tuple(int(x, 0) for x in a2[:3]))
     return stage, song
+
+
+TRACK_STEP = r700(0x33E, 1)      # past every r700 offset the game's scripts use (0x339)
+
+
+def track(name, steps, every=4, var=TRACK_STEP):
+    """A motion track independent of the cutscene director (which dialogue
+    blocks): the game's repeating timer (chara 430D) runs steps[k] (lists of
+    statements) every `every` frames, k counted in `var`, and stops after the
+    last. Returns the statements that start it."""
+    cases = [(k, list(s) + [Set(var, var, 1, "+"), Cmd("return", [every])]) for k, s in enumerate(steps)]
+    return [Set(var, 0), chara(0x430D, name, t=1, e=Block([switch(var, cases)]))]
