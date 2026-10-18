@@ -114,3 +114,54 @@ The bottleneck is a structural signal that survives allocation differences:
 
 Run the <50 bucket at scale now: 8 of 10 match at about 80k tokens each, and
 1,075 such functions remain.
+
+## Re-measure with the region score (2026-10-18)
+
+`tools/regions.py` gives the structural distance with allocation ignored:
+register copies, stack spills and the frame are dropped, registers are
+abstracted, and each basic-block region is reported as locked or not. Every
+`foundry.py check` prints it, and the brief tells workers to steer by it.
+The 16 functions of 150+ instructions that failed in the first sample were
+re-run from scratch (`FOUNDRY_RUN=foundry2`, same budgets and model).
+
+* **The match rate did not move: 0 of 16.**
+* **Structure did move.**
+  - sub_0818B2A0: 2 core instructions off of 494 (97.8%).
+  - sub_0823F148: 6 of 393 (96%).
+  - sub_0823B0D4: 2 of 132 (99.5%).
+  - sub_08142194 (1,001 instructions): 73% to 91%, 29 of 893 off.
+  - sub_0812FA0C (876 instructions): 429 to 145 core off.
+* **What is left is not structure.** Three kinds of residue remain:
+  - register choice;
+  - instruction order (one `movs` a few slots away);
+  - CSE and rematerialization: agbcc keeps a constant in a callee-saved
+    register where the ROM rebuilds it at each use.
+
+  At a 150-second budget the register solver closed none of these (0 of 4).
+  Some of the residue is instruction order, which allocation search cannot
+  change.
+
+## At scale (2026-10-18, running)
+
+Batches of 6–8 contiguous functions per worker (`foundry.py queue`,
+`foundry.py batch`), headless `claude -p` workers (`tools/foundry_run.py`),
+and a finisher loop for the machine stages. Each match is committed named
+(`#define Name sub_X`, family in `symbols/foundry_families.csv`) and placed in
+its unit when the unit holds its `INCLUDE_ASM` (`foundry.py integrate`).
+
+| bucket | finished | matched | tokens per match |
+|---|---|---|---|
+| <50 | 19 | 16 (84%) | ~45k (batched) |
+| 50–150 | 16 | 1 (6%) | — |
+
+The 50–150 functions so far are all from the early ROM (0800D–0802xxxx).
+Every failure has the residue above, and no compiler or flag variant explains
+it: -O1, old_agbcc, -fno-expensive-optimizations and -fno-builtin were each
+worse or equal on 18 drafts. Batching shares context: about 20–50k tokens per
+match on <50, against about 80k for one worker per function.
+
+Next: a last-mile search over C edits (statement order, temporaries, scope,
+types), scored by core distance and then bytes, run with long budgets on the
+drafts that are within 3 core instructions. The first measurement is running
+(`build/lastmile/`).
+
