@@ -233,3 +233,4 @@ addr,function,name,family,note
 0811C99C,sub_0811C99C,PaletteFlash_SelectPalette,"PaletteFlash","copies normal or flash palette and sets the eight-frame flash timer"
 0811CF68,sub_0811CF68,ScenePool_ClampForwardBias,"ScenePoolActor","clamps forward bias with a flag-controlled minimum"
 0811CFAC,sub_0811CFAC,ScenePool_ClampMotionSpeeds,"ScenePoolActor","clamps forward and lateral speed then forward bias"
+0811D080,sub_0811D080,SceneMotion_PlayKindSound,"SceneMotionSoundSource","plays one of three songs based on object kind"
