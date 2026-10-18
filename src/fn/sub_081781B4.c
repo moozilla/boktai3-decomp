@@ -1,0 +1,23 @@
+#include "global.h"
+#include "scene_hud_display.h"
+#define SceneHud_SetTimedState sub_081781B4
+#define gSceneHudState         gUnk_02000214
+extern struct SceneHudState *gUnk_02000214;
+void sub_081781B4(u32 unused, s32 start, u32 value, u32 kind, u32 phaseEnabled, u32 parameter)
+{
+    struct SceneHudState *p = gUnk_02000214;
+    if (p && !p->controlMode) {
+        if (start < 0)
+            p->timedStateStart = 0;
+        else
+            p->timedStateStart = start;
+        p->timedStateValue = value;
+        p->timedStateKind = kind;
+        p->timedStateTimer = 300;
+        p->timedStateParameter = parameter;
+        if (phaseEnabled)
+            p->timedStatePhase = 6;
+        else
+            p->timedStatePhase = 0;
+    }
+}
