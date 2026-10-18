@@ -1312,3 +1312,4 @@ addr,function,name,family,note
 08225E2C,sub_08225E2C,Camera_ClampCenteredPosition,"Camera bounds","clamps two position components after subtracting half the middle component"
 08225F1C,sub_08225F1C,Camera_ApplyPositionBounds,"Camera bounds","dispatches camera position clamping by bounds mode"
 0822744C,sub_0822744C,Camera_Destroy,"Camera task","unregisters the camera receiver and clears the active camera"
+0822776C,sub_0822776C,Camera_CalculateDistanceScale,"Camera distance scale","divides planar distance between two positions and clamps it to a configured range"
