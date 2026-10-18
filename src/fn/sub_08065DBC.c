@@ -18,8 +18,8 @@ ActorAttachment_CreateSpriteSlot(u32 frame, struct ContactPosition *anchor, void
                                  s32 z, u32 action, void *source,
                                  struct ActorAttachmentFollowView *follow)
 {
-    register void *savedUpdate asm("r8");
-    register s32 savedY asm("r9");
+    void *savedUpdate;
+    s32 savedY;
     struct ActorAttachmentManagerView *existing;
     struct ActorAttachmentManagerView *manager;
     struct ActorAttachmentSlotView *slot;
@@ -202,7 +202,7 @@ gotManager:
     }
     {
         u32 one = 1;
-        register u8 *lowActive asm("r1");
+        u8 *lowActive;
         lowActive = activePointer;
         *lowActive = one;
     }

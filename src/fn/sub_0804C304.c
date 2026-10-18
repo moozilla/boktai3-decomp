@@ -128,7 +128,7 @@ void TetherActor_UpdateRecoveryState(struct TetherActor *actor)
             amplitude = 2;
         table = (const u16 *)RANDOM_TABLE_ADDR;
         {
-            register u32 *slot asm("r1") = &gUnk_03005308;
+            u32 *slot = &gUnk_03005308;
             u32 index;
             u32 mask;
             randomIndex = slot;

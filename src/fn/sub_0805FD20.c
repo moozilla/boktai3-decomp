@@ -7,7 +7,7 @@ void SceneInventory_PopulateEquipmentGrid(struct SceneInventoryPanel *input)
     volatile s32 nextRow;
     struct SceneInventoryWidgetFlags *volatile flagsBase;
     volatile u32 rowBytes;
-    register s32 rowSlot asm("r10");
+    s32 rowSlot;
     s32 row;
     s32 slot;
     sub_08219728(&panel->display.heading, &panel->display.widgetResource, 0x65);
@@ -158,7 +158,7 @@ void SceneInventory_PopulateEquipmentGrid(struct SceneInventoryPanel *input)
         }
     } while (1);
     {
-        register struct GameState *state asm("r0") = gUnk_02000710;
+        struct GameState *state = gUnk_02000710;
         const s16 *materials;
         struct ContactPosition *position;
         struct SceneInventoryWidgetFlags *entry;

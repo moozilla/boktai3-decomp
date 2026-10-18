@@ -10,7 +10,7 @@ static inline s32 ReadTimer0(s16 *input, u32 offset)
 {
     s16 *timer = input;
     register u32 token asm("r1");
-    register u32 keep asm("r2") = offset;
+    u32 keep = offset;
     s32 result;
     result = *timer;
     asm volatile("" : : "r"(token), "r"(keep));
@@ -19,14 +19,14 @@ static inline s32 ReadTimer0(s16 *input, u32 offset)
 static inline s32 ReadTimer6(s16 *input, u32 offset)
 {
     register s16 *timer asm("r6") = input;
-    register u32 keep asm("r2") = offset;
+    u32 keep = offset;
     s32 result;
     result = *timer;
     return result;
 }
 static inline s32 ReadTimer1(s16 *input)
 {
-    register s16 *timer asm("r6") = input;
+    s16 *timer = input;
     s32 result;
     result = *timer;
     return result;
@@ -161,7 +161,7 @@ void SceneSteeringActor_AppearIdle(struct SceneSteeringActorPool *unused,
     if (*enter) {
         p->flags = (p->flags & ~1) | 2;
         {
-            register u32 timerOffset asm("r1") = 0x116;
+            u32 timerOffset = 0x116;
             s16 *timer;
             u32 zeroEnter;
             register u32 zeroFrame asm("r1");
@@ -214,7 +214,7 @@ void SceneSteeringActor_AppearIdle(struct SceneSteeringActorPool *unused,
                 *enter = 1;
             }
         } else {
-            register u32 frameOffset asm("r3") = 0x124;
+            u32 frameOffset = 0x124;
             register u16 *frame asm("r1");
             frame = (void *)((u8 *)p + frameOffset);
             (*frame)++;

@@ -103,7 +103,7 @@ void sub_0802533C(ActorAnimation *p, int tick)
         p->flags |= mask;
         if (!p->reset(p)) {
             if (tick <= 63) {
-                register int rate asm("r0") = ((int)mask - tick) >> 3;
+                int rate = ((int)mask - tick) >> 3;
                 s16 *velocity = (s16 *)(position + 20);
                 u32 angle = position[9];
                 int speed;

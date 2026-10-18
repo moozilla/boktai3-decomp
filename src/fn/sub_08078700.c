@@ -16,7 +16,7 @@ static inline u8 Nonzero(u32 value)
 static inline u32 ReadControl(u32 inputMask, u16 *input)
 {
     u32 mask = inputMask;
-    register u16 *field asm("r2") = input;
+    u16 *field = input;
     u32 value;
     value = *field;
     return value & mask;

@@ -205,15 +205,14 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                 target++;
                 {
                     u32 offset = target * sizeof(entry);
-                    register struct SceneOverlayMapEntry *destination asm("r1"),
-                        *mapEntries asm("r3");
+                    struct SceneOverlayMapEntry *destination, *mapEntries asm("r3");
                     destination = entryPointer;
                     mapEntries = entries;
                     offset += (u32)mapEntries;
                     *destination = *(struct SceneOverlayMapEntry *)offset;
                 }
                 {
-                    register void **mapSlot asm("r0");
+                    void **mapSlot;
                     struct ScenePanel *mapPanel = panel;
                     u32 mapOffset = 0x4DC;
                     struct SceneOverlayMapEntry *copied;

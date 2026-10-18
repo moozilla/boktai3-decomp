@@ -38,7 +38,7 @@ void sub_0803A844(struct Display *p)
         Anim_LoadKeyframe(q, resource, 11, 0);
         {
             u32 flags = q->flags;
-            register int value asm("r1") = ~1;
+            int value = ~1;
             mask = value;
             q->flags = flags & value;
         }

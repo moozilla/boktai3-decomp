@@ -217,11 +217,11 @@ void SceneInventory_PopulateConsumableGrid(struct SceneInventoryPanel *input)
             entry++;
             widget++;
             {
-                register u32 step asm("r0") = 1;
+                u32 step = 1;
                 column += step;
             }
             {
-                register s32 check asm("r1") = column;
+                s32 check = column;
                 if (check > 3)
                     break;
             }

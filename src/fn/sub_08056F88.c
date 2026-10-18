@@ -3,7 +3,7 @@
 void LevelAdvanceDisplay_StartParticle(struct LevelAdvanceParticle *particle)
 {
     const u16 *table;
-    register u32 *randomIndex asm("r12");
+    u32 *randomIndex;
     u32 mask;
     register u32 index asm("r2");
     s32 x, y, z;
@@ -25,7 +25,6 @@ void LevelAdvanceDisplay_StartParticle(struct LevelAdvanceParticle *particle)
         x = (value & rangeMask) - 63;
     }
     zero = 0;
-    asm("" : "+r"(zero));
     particle->offsetX = x;
     index = (index + 1) & mask;
     {
@@ -50,8 +49,8 @@ void LevelAdvanceDisplay_StartParticle(struct LevelAdvanceParticle *particle)
     index = (index + 1) & mask;
     *randomIndex = index;
     {
-        register u32 value asm("r1") = table[index];
-        register u32 lowMask asm("r2") = 7;
+        u32 value = table[index];
+        u32 lowMask = 7;
         particle->velocityY = (value & lowMask) + 12;
     }
     {

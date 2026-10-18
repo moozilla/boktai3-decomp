@@ -80,8 +80,8 @@ void RouteSpriteActor_Create(struct ContactPosition *anchor, void *unused, s32 i
         shadowResult = ScaledShadow_Initialize(actor->shadow, &actor->sprite.position, 64, 16, 96,
                                                100, 0xE00, one, 5, one, zero);
         {
-            register u32 offset asm("r3") = 0x15B;
-            register s8 *dst asm("r1");
+            u32 offset = 0x15B;
+            s8 *dst;
             dst = (void *)((u32)actor + offset);
             *dst = shadowResult;
         }

@@ -728,7 +728,7 @@ void EffectParticle_UpdateHoming(struct EffectManager *manager, struct Effect *e
         p->velocity.z = (gUnk_086149C4[p->angle] * p->speed) >> 12;
         {
             u32 mask;
-            register u32 m asm("r3") = 4;
+            u32 m = 4;
             mask = m;
             if (!(gUnk_02000560 & m) && !effect->timer && (dy < 0 ? -dy : dy) <= 129 &&
                 dx * dx + dz * dz < 400) {
@@ -754,14 +754,12 @@ void EffectParticle_UpdateHoming(struct EffectManager *manager, struct Effect *e
             sprite->position.y -= 16;
         else {
             register struct EffectContext *c asm("r3") = ctx;
-            asm("" : : "r"(c));
             sprite->position.y = c->world.y;
         }
     }
     {
         u16 velocity = p->velocity.z;
         u16 position = sprite->position.z;
-        asm("" : : "r"(velocity), "r"(position));
         sprite->position.z = velocity + position;
     }
     o = &p->sprite;

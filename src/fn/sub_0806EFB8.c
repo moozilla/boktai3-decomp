@@ -1,16 +1,15 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 #define SceneActorQuery_FindInRectangle sub_0806EFB8
 struct SceneActorRegistryActor *SceneActorRegistry_FindAvailableAfterId(u32);
 static inline u8 Inactive(struct SceneActorRegistryActor *a)
 {
     {
-        register u32 mask asm("r1") = 0x40;
+        u32 mask = 0x40;
         if (a->flags2D4 & mask)
             return 1;
     }
     {
-        register u32 mask asm("r1") = 0x20000;
+        u32 mask = 0x20000;
         if (a->flags2D0 & mask)
             return 1;
     }

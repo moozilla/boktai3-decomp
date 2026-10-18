@@ -148,14 +148,13 @@ void DisplayTrack_Update(struct DisplayTrack *track)
                 register u32 base asm("r1") = 600;
                 register u32 value asm("r0");
                 register u32 tag asm("r2");
-                register u16 *destination asm("r3");
+                u16 *destination;
                 asm("" : "+r"(base));
                 value = base;
                 asm("" : "+r"(value));
                 tag = track->tag;
                 value += tag;
                 destination = defaultPalette;
-                asm("" : : "r"(destination));
                 *destination = value;
             }
         }

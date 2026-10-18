@@ -109,7 +109,7 @@ s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p)
             if (delay) {
                 u32 value = delay - 1;
                 {
-                    register u8 *destination asm("r1") = repeat;
+                    u8 *destination = repeat;
                     *destination = value;
                 }
             }

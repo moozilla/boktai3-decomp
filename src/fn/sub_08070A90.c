@@ -4,7 +4,7 @@ struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 void SceneActorRegistry_SetMovementMode(struct SceneActorRegistryActor *, s32);
 static inline u32 ReadExclusionFlags(struct SceneActorRegistryActor *actor)
 {
-    register u32 mask asm("r1") = 0x20000;
+    u32 mask = 0x20000;
     u32 offset = 0x2d0;
     u32 *field;
     u32 value;

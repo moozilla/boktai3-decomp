@@ -64,9 +64,9 @@ u8 SceneActorContacts_TestPlayerCondition(struct SceneActorContactObjectView *ob
             goto fail;
         }
         if (condition == 1 && player) {
-            register u32 fieldOffset asm("r4") = 0x448;
+            u32 fieldOffset = 0x448;
             u32 mask;
-            register u32 *field asm("r0");
+            u32 *field;
             u32 value;
             field = (void *)((u32)player + fieldOffset);
             mask = 0x40;

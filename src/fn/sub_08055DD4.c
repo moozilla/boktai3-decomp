@@ -4,7 +4,7 @@
 void StageIconDisplay_InitAnimations(struct StageIconDisplay *argument, s32 variantArgument)
 {
     struct StageIconDisplay *display = argument;
-    register s32 variant asm("r4");
+    s32 variant;
     struct ProjectedDisplayResource *resource;
     variant = variantArgument;
     resource = ScriptProc_Start(0xCB05, 0x1289);

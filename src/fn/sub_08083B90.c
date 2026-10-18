@@ -15,7 +15,7 @@ static inline u32 ReadProfile(u32 index)
 u32 SceneActorControl_GetTravelProfile(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
-    register u32 offset asm("r4") = 0x3E0;
+    u32 offset = 0x3E0;
     s32 sample;
     s32 index;
     u32 result;

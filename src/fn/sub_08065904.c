@@ -31,12 +31,12 @@ void ActorAttachment_UpdateValueFrame(struct ActorAttachmentSlotView *input)
         } else {
             register s32 level asm("r3") = 4;
             s32 currentValue = *sample;
-            register s16 *threshold asm("r1");
+            s16 *threshold;
             s32 boundary;
             s16 *cutoff;
             u8 *status;
             s16 *timer;
-            register u8 *flags asm("r8");
+            u8 *flags;
             threshold = slot->thresholds;
             boundary = *threshold * 4;
             status = slot->status;
