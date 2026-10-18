@@ -917,3 +917,4 @@ addr,function,name,family,note
 081849DC,sub_081849DC,ActorController_UpdateRetreatMotion,"ActorController","plays directional animation and applies backward motion"
 08184B08,sub_08184B08,ActorController_UpdateTimedMotion,"ActorController","plays directional animation and moves until timer exceeds nine"
 08184C1C,sub_08184C1C,ActorController_CompleteMotionTransition,"ActorController","selects stopped animation and clears callbacks for selected modes"
+08185280,sub_08185280,ActorController_IsNearTarget,"Actor controller 2 (auto, tentative)","tests X/Z Manhattan distance to movement target below 192"
