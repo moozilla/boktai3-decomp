@@ -266,3 +266,4 @@ addr,function,name,family,note
 08126348,sub_08126348,SpriteParticle_CreateVariant4384,"SpriteParticle","creates a randomized sprite particle using resource 4384"
 08126398,sub_08126398,SpriteParticle_ForwardCreate,"SpriteParticle","forwards all eighteen particle creation arguments"
 081263E0,sub_081263E0,SpriteParticle_CreateDefaultVariant4384,"SpriteParticle","creates resource 4384 particles with the default extra parameter"
+081267D4,sub_081267D4,EffectPool_ReleaseSlot,"EffectPool","clears the active slot and removes its effect"
