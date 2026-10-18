@@ -964,3 +964,4 @@ addr,function,name,family,note
 0819A520,sub_0819A520,ScriptValues_LoadRotatedArray,"ScriptValues","copies seven script values at a rotating destination index"
 0819A564,sub_0819A564,ScriptValues_TickRotation,"ScriptValues","loads rotated values and decrements the index every four ticks"
 0819A698,sub_0819A698,LinkEffect_UpdateEndpoints,"LinkEffect","offsets target and player endpoints along their connecting angle"
+0819A7B8,sub_0819A7B8,SceneEffect_CreateLinkedEntry,"SceneEffectLink (tentative)","creates an entry linked to embedded effect data"
