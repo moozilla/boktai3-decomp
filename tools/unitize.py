@@ -21,6 +21,7 @@ import csv
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -128,6 +129,10 @@ def run_one(s, model, base, backend="codex", effort="medium"):
                        cwd=d, capture_output=True)
     dirty = subprocess.run(["git", "status", "--porcelain", "--", "src", "include", "symbols"], cwd=d,
                            capture_output=True, text=True).stdout.strip()
+    for sub in ("src", "asm", "check"):          # regenerable outputs (tools/clean.py's set): save disk
+        p = os.path.join(d, "build", sub)
+        if os.path.isdir(p) and not os.path.islink(p):
+            shutil.rmtree(p)
     st.update(state="verified" if good and not dirty else "failed",
               build_ok=ok, unit=unit, before=before, after=after, uncommitted=bool(dirty),
               branch="unit/unit-" + s["slug"], worktree=d)
