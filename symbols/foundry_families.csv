@@ -1288,3 +1288,4 @@ addr,function,name,family,note
 08215490,sub_08215490,SpriteOam_ResetQueue,"sprite OAM queue","clears sprite queue counters and optionally hides OAM entries"
 08216520,sub_08216520,BgGfx_LoadTilemapAtPosition,"background graphics","converts pixel position to aligned tilemap coordinates"
 08217298,sub_08217298,ResourceSlots_Reset,"display resource slots","clears a two-slot resource cache and invalidates its IDs"
+08217EEC,sub_08217EEC,SpriteDrawable_SelectTileFrame,"sprite drawable","sets tile dimensions, OAM attributes and frame tile index"
