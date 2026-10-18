@@ -502,3 +502,4 @@ addr,function,name,family,note
 08175BA8,sub_08175BA8,MenuSelection_RefreshAllOptionText,"menu selection","refresh text for all three option rows"
 08175D34,sub_08175D34,SelectionPanel_ConfirmSettings,"SelectionPanel (tentative)","accepts A press and advances panel callback"
 08175D78,sub_08175D78,PauseMenu_UpdateConfigChoice,"PauseMenu","updates configuration choice confirmation and cancellation"
+08175E24,sub_08175E24,SelectionPanel_WaitConfirmDelay,"SelectionPanel (tentative)","waits sixty ticks then restores confirmation callback"
