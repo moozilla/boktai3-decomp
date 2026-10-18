@@ -269,3 +269,4 @@ addr,function,name,family,note
 081267D4,sub_081267D4,EffectPool_ReleaseSlot,"EffectPool","clears the active slot and removes its effect"
 08126C3C,sub_08126C3C,EffectPool_UpdateActive,"EffectPool128","dispatches callbacks for 128 active effect slots"
 08126D3C,sub_08126D3C,SpritePool10_AllocateSlot,"SpritePool10","reserves the first free sprite slot"
+08127478,sub_08127478,PooledSprite_UpdateRemoval,"PooledSprite","retires a pooled sprite after its timed exit animation"
