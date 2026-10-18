@@ -122,3 +122,4 @@ addr,function,name,family,note
 080EBAE4,sub_080EBAE4,SceneActorReaction_ReturnToIdle,"SceneActorReaction","resets state and selects idle control after completion"
 080EBB84,sub_080EBB84,SceneActorReaction_BeginHiddenCollisionless,"SceneActorReaction","hides the actor, resets animation state, and disables terrain collision"
 080EBE5C,sub_080EBE5C,SceneActorCollision_InitCompactBody,"SceneActorCollision","initializes body bounds and an empty attack collider"
+080ED3FC,sub_080ED3FC,SceneActorReaction_PlayHiddenCue,"SceneActorReaction","hides the drawable and plays animation 15 with sound 475"
