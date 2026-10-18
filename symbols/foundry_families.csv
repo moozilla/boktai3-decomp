@@ -338,3 +338,4 @@ addr,function,name,family,note
 0813F784,sub_0813F784,ActorParameter_GetModeValue,"ActorParameter","looks up an actor parameter in one of two mode-dependent tables"
 08140550,sub_08140550,Player_BeginTerrainRecovery,"Player terrain movement","starts terrain recovery and faces away from its target"
 081408AC,sub_081408AC,Player_BeginTerrainRecovery,"Player","initialize recovery facing from terrain cell"
+081414E4,sub_081414E4,Player_ClampCameraOffsets,"Player","clamp camera offset sum and difference around half height"
