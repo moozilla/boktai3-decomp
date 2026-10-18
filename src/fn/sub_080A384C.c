@@ -18,7 +18,8 @@ void Spider_InitColliders(u8 *p)
     s1.b.lo = 0xa0;
     *(u32 *)&s2.a = 0x800000;
     *(u32 *)&s2.b &= 0xFFFF0000;
-    SceneActorCollision_InitBodyWithFlags(p, &s1, &s2, SceneActorContact_ApplyWithinBounds, p, 0x510B);
+    SceneActorCollision_InitBodyWithFlags(p, &s1, &s2, SceneActorContact_ApplyWithinBounds, p,
+                                          0x510B);
     s3.a.lo = 0x40;
     s3.a.hi = 0x64;
     s3.b.lo = 0x40;

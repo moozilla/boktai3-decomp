@@ -40,5 +40,6 @@ void SolarBank_ApplyInterestFromScript(void)
             rate = 13;
         STATE_S16(0x598) = rate + 0x41;
     } else
-        STATE_S16(0x598) = Mod(*(u32 *)((u8 *)gUnk_02000710 + 0x614) ^ SunClock_GetSecond(), 13) + 0x41;
+        STATE_S16(0x598) =
+            Mod(*(u32 *)((u8 *)gUnk_02000710 + 0x614) ^ SunClock_GetSecond(), 13) + 0x41;
 }

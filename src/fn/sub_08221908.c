@@ -1,7 +1,7 @@
 #include "scalar_approach.h"
 /* ScalarApproach_StepAngleHalf: Approaches the target along the wrapped angle difference by half and snaps within one unit */
 #define ScalarApproach_StepAngleHalf sub_08221908
-#define ScalarApproach_HalfAngle sub_08221908
+#define ScalarApproach_HalfAngle     sub_08221908
 s32 ScalarApproach_HalfAngle(s32 current, s32 target)
 {
     s16 angle = ((u32)current - (u32)target) & 255;

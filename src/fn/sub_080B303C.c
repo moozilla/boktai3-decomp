@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_registry.h"
 
-
 struct VornData {
     u8 unknown0[0x688];
     s32 field688;

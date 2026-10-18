@@ -103,8 +103,10 @@ s32 FallingObject_CreateFromScript(void);
 s32 FallingObject_SpawnFinishParticles(struct FallingObject *object);
 void FallingObject_ReceiveHit(struct FallingHit *hit, u32 unused, struct FallingObject *object);
 void FallingObject_ReceiveAttackHit(void);
-u32 FallingObjectManager_AddObject(struct FallingObjectManager *manager, struct FallingObject *object);
-u32 FallingObjectManager_RemoveObject(struct FallingObjectManager *manager, struct FallingObject *object);
+u32 FallingObjectManager_AddObject(struct FallingObjectManager *manager,
+                                   struct FallingObject *object);
+u32 FallingObjectManager_RemoveObject(struct FallingObjectManager *manager,
+                                      struct FallingObject *object);
 u32 FallingObjectManager_Destroy(struct FallingObjectManager *manager);
 s32 FallingObjectManager_Initialize(struct FallingObjectManager *manager, void *unused);
 void *FallingObjectManager_Create(void *a, u32 unused);

@@ -2,7 +2,6 @@
 #include "scene_actor_profile.h"
 #include "scene_actor_palette.h"
 
-
 void SceneActor_RefreshLivingCountAndProfile(struct SceneActorRegistryActor *actor)
 {
     u32 category = actor->category;

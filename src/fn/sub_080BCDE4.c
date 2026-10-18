@@ -9,8 +9,14 @@ struct SceneActorApproachContext {
 u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *);
 void sub_080B7C10(struct SceneActorRegistryResetView *);
 s32 sub_0824923C(void *, void *);
-static inline void ClearFlags(u32 *p, u32 mask) { *p &= mask; }
-static inline void ClearFlags16(u16 *p, u32 mask) { *p &= mask; }
+static inline void ClearFlags(u32 *p, u32 mask)
+{
+    *p &= mask;
+}
+static inline void ClearFlags16(u16 *p, u32 mask)
+{
+    *p &= mask;
+}
 static inline u8 TryMove(struct SceneActorRegistryResetView *actor, u8 *group)
 {
     void *route = *(void **)(group + 0x1FC);
@@ -38,7 +44,8 @@ void SceneActorApproach_UpdateRange(struct SceneActorRegistryResetView *actor)
     u8 *group = (void *)&actor->group;
     if (SceneActorReaction_TakePrepared(actor))
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-    else if (actor->distanceF0 > context->maximumDistance || actor->distanceF0 < context->minimumDistance) {
+    else if (actor->distanceF0 > context->maximumDistance ||
+             actor->distanceF0 < context->minimumDistance) {
         ClearFlags(&context->flags, ~0x100);
         sub_080B7C10(actor);
     } else if (SceneActorReaction_IsRangeReady(actor)) {

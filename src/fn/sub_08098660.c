@@ -1,4 +1,4 @@
-#define gEngineFlags                    gUnk_030053F4
+#define gEngineFlags gUnk_030053F4
 #include "global.h"
 #include "scene_actor_reset.h"
 extern u32 gUnk_030053F4;

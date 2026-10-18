@@ -1,5 +1,5 @@
 #define SceneActorContext_RunPendingScript Vorn_RunPendingScript
-#define gSceneActorFacingTarget               gUnk_02000580
+#define gSceneActorFacingTarget            gUnk_02000580
 #include "global.h"
 #include "scene_actor_reaction.h"
 struct SceneActorFacingTarget {

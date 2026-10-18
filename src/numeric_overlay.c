@@ -22,7 +22,8 @@ void NumericOverlay_RefreshDisplay(struct NumericOverlay *s)
 }
 
 // Returns the (unchanged) r0 of NumericOverlay_RefreshDisplay.
-extern u32 NumericOverlay_RefreshResult(struct NumericOverlay *) asm("NumericOverlay_RefreshDisplay");
+extern u32
+NumericOverlay_RefreshResult(struct NumericOverlay *) asm("NumericOverlay_RefreshDisplay");
 u32 NumericOverlay_Update(struct NumericOverlay *p)
 {
     return NumericOverlay_RefreshResult(p);
@@ -40,7 +41,8 @@ void *NumericOverlay_Create(u32 arg)
     void *obj;
     obj = Task_Create(9, 0x2C);
     if (obj != 0) {
-        Task_SetCallbacks(obj, (void (*)(void *))NumericOverlay_Update, (void (*)(void *))NumericOverlay_Destroy);
+        Task_SetCallbacks(obj, (void (*)(void *))NumericOverlay_Update,
+                          (void (*)(void *))NumericOverlay_Destroy);
         if (sub_0800F6F8(obj, arg) < 0) {
             Task_Kill(obj);
             return 0;

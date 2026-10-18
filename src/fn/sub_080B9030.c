@@ -2,7 +2,8 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_script.h"
-void SceneActorControl_BeginTimedBehavior56(struct SceneActorRegistryResetView *, struct SceneActorScriptPropertiesView *);
+void SceneActorControl_BeginTimedBehavior56(struct SceneActorRegistryResetView *,
+                                            struct SceneActorScriptPropertiesView *);
 u8 sub_080B5E54(struct SceneActorRegistryResetView *);
 static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input, u32 offset)
 {
@@ -35,7 +36,8 @@ static inline u32 WordFlag(u32 *p, u32 mask)
 {
     return *p & mask;
 }
-void SceneActorReaction_TryStartContact(u8 *source, u16 *contact, struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_TryStartContact(u8 *source, u16 *contact,
+                                        struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorScriptPropertiesView *state = actor->context;
     if (IsUnavailable(actor))

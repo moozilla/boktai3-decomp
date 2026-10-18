@@ -16,7 +16,8 @@ void SceneActor_InitializeReactionColliders(void *p)
     offset.packed.x = 0;
     offset.packed.y = 40;
     offset.packed.z = 0;
-    SceneActorCollision_InitAttack(p, &bounds.position, &offset.position, Mimic_OnAttackContact, 0, p);
+    SceneActorCollision_InitAttack(p, &bounds.position, &offset.position, Mimic_OnAttackContact, 0,
+                                   p);
     bounds.position.x = 80;
     bounds.position.y = 120;
     bounds.position.z = 80;

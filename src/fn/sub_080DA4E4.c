@@ -1,6 +1,6 @@
-#define gSceneGridMap                      gUnk_030052F4
-#define gSceneGridWidth                    gUnk_030052F8
-#define gSceneGridHeight                   gUnk_030052FC
+#define gSceneGridMap    gUnk_030052F4
+#define gSceneGridWidth  gUnk_030052F8
+#define gSceneGridHeight gUnk_030052FC
 #include "global.h"
 #include "scene_actor_terrain.h"
 

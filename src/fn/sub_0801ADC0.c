@@ -47,7 +47,8 @@ void SelectionMenu_Choose(u8 *p)
                     Presentation_UpdateActorGraphic(p, 0);
                 }
                 if (gUnk_03005260[1] & 1) {
-                    if (*Inventory_GetEquipmentEntry(p[0x1d]) != 255 && ((1 << p[0x1d]) & *(u32 *)(p + 0x34)))
+                    if (*Inventory_GetEquipmentEntry(p[0x1d]) != 255 &&
+                        ((1 << p[0x1d]) & *(u32 *)(p + 0x34)))
                         SelectionMenu_StartAnimateChoice(p);
                     else
                         Sound_PlaySong(0x192);

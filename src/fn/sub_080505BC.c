@@ -24,7 +24,8 @@ void CellGate_UpdateConditionalBarrier(struct CellGate *gate)
         } else {
             if (CellGate_TestTraversalMode(gate) && CellGate_TestPlayerEdge(gate, 64)) {
                 if (!gate->registered) {
-                    TerrainModifiers_RegisterCell(gate->registration, gate->cell, 0, gate->height, 255, 0x82A);
+                    TerrainModifiers_RegisterCell(gate->registration, gate->cell, 0, gate->height,
+                                                  255, 0x82A);
                     gate->registered = 1;
                 }
             } else if (gate->registered) {

@@ -12,8 +12,8 @@ void SceneActorCollision_InitBody(struct SceneActorRegistryActor *actor, void *i
     }
     Collider_Init(collider, (u16)actor->id, 0x5109, 0, 16, size, offset);
     Collider_SetBodyProperties(collider, SceneActorCollision_ReadBodyField3C(actor),
-                 SceneActorCollision_ReadBodyReactionFlags(actor),
-                 SceneActorCollision_ReadBodyField34(actor));
+                               SceneActorCollision_ReadBodyReactionFlags(actor),
+                               SceneActorCollision_ReadBodyField34(actor));
     Collider_SetPosition(collider, &actor->position, 0);
     Collider_SetCallback(collider, callback, owner);
     Collider_Refresh(collider);

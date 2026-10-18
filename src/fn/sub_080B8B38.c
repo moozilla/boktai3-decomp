@@ -2,7 +2,6 @@
 #include "scene_actor_registry.h"
 #include "scene_actor_script.h"
 
-
 void SceneActorScript_TriggerCallOnCount(struct SceneActorRegistryActor *actor)
 {
     s32 zero = 0;
@@ -11,13 +10,11 @@ void SceneActorScript_TriggerCallOnCount(struct SceneActorRegistryActor *actor)
     u8 *count;
     u8 *limit;
 
-    if (*script != 0)
-    {
+    if (*script != 0) {
         count = &context->callCount6CF;
         *count += 1;
         limit = &context->callLimit6CE;
-        if (*count >= *limit)
-        {
+        if (*count >= *limit) {
             u8 z;
             Script_Call(*script, zero);
             z = 0;
