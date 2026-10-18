@@ -552,3 +552,4 @@ addr,function,name,family,note
 080FAC30,sub_080FAC30,SceneActorControl_InitializeHoverState,"SceneActorControl","initializes hover counters vectors and directional animation"
 080FC8D4,sub_080FC8D4,ActorCollision_InitThreeAuxiliaryAttacks,"SceneActor auxiliary attack colliders","initializes three auxiliary colliders using attack slot three"
 080FD334,sub_080FD334,ActorGroup_BeginMotionPhase,"SceneActor group state callbacks","starts group control and transitions to phase two on completion"
+080FD840,sub_080FD840,SceneActorControl_EndExtendedPhase,"SceneActorControl","sets channel targets and returns to behavior 3"
