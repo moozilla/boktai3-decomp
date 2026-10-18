@@ -1041,3 +1041,4 @@ addr,function,name,family,note
 081B6604,sub_081B6604,ActorEffect_UpdateFadeFrame,"ActorEffect (tentative)","selects a sprite frame from elapsed fade time and mode"
 081B6844,sub_081B6844,ActorReaction_BeginOnContact,"ActorReaction (tentative)","copies direction and starts reaction state when flag one is set"
 081B6884,sub_081B6884,ActorReaction_Idle,"ActorReaction (tentative)","empty callback adjacent to actor reaction routines"
+081B69F4,sub_081B69F4,ActorEffect_RemoveSprites,"ActorEffect (tentative)","removes six sprites and clears the owner's active bit"
