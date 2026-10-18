@@ -838,3 +838,4 @@ addr,function,name,family,note
 0817ACD0,sub_0817ACD0,ActorEffect_SpawnAtAngle,"ActorEffect","offsets a packed position by an angle before spawning an effect"
 0817B058,sub_0817B058,SceneVolume_ConsumePendingEvent,"SceneVolume","clears pending byte equal to one and reports consumption"
 0817B078,sub_0817B078,SceneVolume_ResetPendingSequence,"SceneVolume","resets sequence state length and buffer pointer when requested"
+0817B3EC,sub_0817B3EC,ActorEffect_UpdateIdleScript,"ActorEffect","initializes idle animation and runs a queued actor script"
