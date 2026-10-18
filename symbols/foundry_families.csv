@@ -1124,3 +1124,4 @@ addr,function,name,family,note
 081D427C,sub_081D427C,PaletteTransition_BlendSelectedBanks,"PaletteTransition","blends three consecutive banks and an extra selected bank"
 081D437C,sub_081D437C,PaletteTransition_SetVariantParameters,"PaletteTransition","selects a parameter and enables variants 100 through 103"
 081D43C8,sub_081D43C8,PaletteTransition_SetAlternateVariantParameters,"PaletteTransition","selects alternate parameters for variants 62 63 and 100 through 103"
+081D4E80,sub_081D4E80,ThresholdTrack_SelectInterval,"ThresholdTrack","finds the position interval and stores its remainder"
