@@ -107,3 +107,4 @@ addr,function,name,family,note
 080E17D8,sub_080E17D8,SceneActorAnimation_EmitDirectionalTrail,"SceneActorAnimation","emits a direction-offset effect every four frames and changes callback after frame 30"
 080E18F4,sub_080E18F4,SceneActorAnimation_RefreshTimedAttackCollider,"SceneActorAnimation","starts entry 17 and refreshes a context collider during frames 13 through 23"
 080E1F50,sub_080E1F50,SceneActorMotion_TestTargetTransition,"SceneActorMotion","checks target movement and selects failure callback or phase 17"
+080E2064,sub_080E2064,SceneActorMotion_UpdateTargetTransition,"SceneActorMotion","selects phases 17 or 19 from movement flags and time limit"
