@@ -726,3 +726,4 @@ addr,function,name,family,note
 081598F8,sub_081598F8,PlayerAction_BeginMode24,"PlayerAction","clears player movement and reset state before mode twenty-four"
 08159C0C,sub_08159C0C,Player_BeginInterpolatedMovement,"Player","saves movement endpoints and duration and starts animation"
 08159E28,sub_08159E28,Player_ResetPositionState,"Player","sets position and clears position-reset counters and contact state"
+08159EC0,sub_08159EC0,Player_ResetModePosition,"Player","copies position and resets phase fields for kind one mode 0x1A"
