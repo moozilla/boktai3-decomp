@@ -568,3 +568,4 @@ addr,function,name,family,note
 08105704,sub_08105704,ProximityActor_CheckPlayerRange,"ProximityActor","activates state two inside the player distance threshold"
 081083F4,sub_081083F4,TilePool_Destroy,"Tile / Pool1B8","removes sprites and frees all occupied tile slots"
 08108B90,sub_08108B90,CallbackTask_Finish,"CallbackTask","dispatches a result callback and kills a completed task"
+08108C20,sub_08108C20,SlotMonitor_PollResult,"SlotMonitor","poll result and advance callback when ready"
