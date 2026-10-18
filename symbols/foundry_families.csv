@@ -817,3 +817,4 @@ addr,function,name,family,note
 08179A4C,sub_08179A4C,FieldHud_InitializeGauge,"Field HUD","initializes gauge palette resource and source"
 08179A74,sub_08179A74,MeterDisplay_UpdateOwnerMeters,"MeterDisplay","updates owner meter offsets and hides the unused second meter"
 08179B04,sub_08179B04,FieldHud_UpdateWidgets,"Field HUD","updates five embedded HUD widget components"
+08179B34,sub_08179B34,FieldHud_InitializeWidgets,"Field HUD","initializes number gauge and value source then enables widgets"
