@@ -199,6 +199,19 @@ def context(func):
     pack += ["```", ""]
     if use:
         pack += ["## How matched code calls this function", "", "```c"] + use + ["```", ""]
+    lo, hi, sname = subsystem_of(f["addr"])
+    if hi:
+        import collections
+        inc = collections.Counter()
+        for q in glob.glob(os.path.join(ROOT, "src", "fn", "sub_*.c")):
+            a = int(os.path.basename(q)[4:12], 16)
+            if lo <= a < hi:
+                inc.update(re.findall(r'#include "([^"]+\.h)"', open(q, errors="replace").read()))
+        inc.pop("global.h", None)
+        pack += [f"## Subsystem: {sname} ({lo:08X}-{hi:08X})", "",
+                 "Headers its matched functions include (shared types live here; extend them):", ""]
+        pack += [f"* include/{h} (used by {n} matched functions)" for h, n in inc.most_common(6)] or ["* (none yet)"]
+        pack.append("")
     pack += ["## Matched relatives (tools/relatives.py: matched functions sharing code with this one)", "",
              rel.strip() or "(none)", ""]
     path = os.path.join(fdir(func), "context.md")
@@ -382,14 +395,20 @@ def finish(func):
     else:
         sh([PY, "tools/repair.py", cand, func, "--write"], timeout=600)
         st["repair_dist"], st["repair_shape"] = distances(cand, func)
+        try:
+            import regions
+            st["core"] = regions.Report(cand, func).run()["core"]
+        except Exception:
+            st["core"] = None
         if st["repair_dist"] == 0:
             st["stage"] = "matched by repair"
-        elif st["repair_shape"] == 0 and st["repair_dist"]:
+        elif st["repair_dist"] and (st["repair_shape"] == 0 or (st["core"] is not None and st["core"] <= 4)):
             log = sh([PY, "tools/autosolve.py", os.path.relpath(cand, ROOT), func, "--out",
                       os.path.join(d, "autosolve"), "-j", "2", "--solve-seconds", "60",
                       "--translate-seconds", "150"], timeout=1800)
             m = "TRANSLATED" in log or "MATCHES" in log
-            st["stage"] = "matched by register solver" if m else "registers only (solver failed)"
+            st["stage"] = "matched by register solver" if m else (
+                "registers only (solver failed)" if st["core"] == 0 else f"core {st['core']} (solver failed)")
             if m:
                 hit = glob.glob(os.path.join(d, "autosolve", func, "match-*.c"))
                 if hit:
@@ -480,7 +499,8 @@ def make_queue(buckets, max_insns):
 
 
 BATCH_BRIEF = """You are a decompilation worker on the Boktai 3 (GBA) decomp in {root}.
-Work through these functions in order, one at a time:
+These functions are a contiguous run in the {subsystem} subsystem ({range}). Work through them
+in order, one at a time; neighbours share types and callees, so carry what you learn forward:
 
 {funcs}
 
@@ -488,29 +508,113 @@ For EACH function FUNC:
 1. Run: build/venv/bin/python tools/foundry.py brief FUNC
    It writes the context pack and prints the per-function instructions. Follow them exactly
    (its check budget applies to that function alone).
-2. When done with FUNC (MATCH, budget spent, or no progress), write its result line to
-   build/foundry/FUNC/result.txt, e.g. `RESULT FUNC MATCH checks=3` or
-   `RESULT FUNC fuzzy 91.2% checks=12`, plus one sentence on what was hard, and move on.
-Do not reread earlier functions' files; keep each function's work self-contained.
-Finish with one line per function: its RESULT line.
+2. Leave the match organized, not just matched:
+   * NAME it. At the top of wip/foundry/FUNC.c add `#define Subsystem_Verb FUNC` (the style of
+     symbols/functions.csv: e.g. ScenePanel_BeginFade) when you can say what it does; a
+     provisional name is fine. Name callees you understood the same way
+     (`#define Name sub_XXXXXXXX`), and globals with `#define gName gUnk_XXXXXXXX`. Keep the
+     sub_ name as the definition's name (the alias renames it later). Don't invent a name
+     you can't support.
+   * TYPES go in the shared header. If the object it works on has a struct in include/ (the
+     context pack lists the headers this subsystem's matched code uses), use it, and add the
+     fields you discovered there: only by replacing padding/unknown bytes, never moving an
+     existing offset. After editing a header run
+       build/venv/bin/python tools/foundry.py hdrcheck include/HEADER.h
+     which re-checks every matched file that includes it; undo the edit if anything breaks.
+     Don't edit include/global.h or headers outside this subsystem. If the object has no
+     header yet, define its struct locally, named after the object (not `struct S1`).
+3. Write build/foundry/FUNC/result.txt with these lines:
+     RESULT FUNC MATCH checks=K            (or: RESULT FUNC fuzzy N% checks=K)
+     NAME Subsystem_Verb low "what it does, in a few words"      (or: NAME none)
+     FAMILY <the subsystem or object family it belongs to>
+     NOTE <one sentence on what was hard or what is left>
+   If FUNC is not a real function (a split error: a lone epilogue tail or prologue head of a
+   neighbour), write `RESULT FUNC notafunction checks=0` and move on.
+Finish with the RESULT lines, one per function.
 """
 
 
+_subsys = None
+
+
+def subsystems():
+    global _subsys
+    if _subsys is None:
+        import csv
+        _subsys = [(int(r["start"], 16), int(r["end"], 16), r["name"])
+                   for r in csv.DictReader(open(os.path.join(ROOT, "symbols", "progress_subsystems.csv")))]
+    return _subsys
+
+
+def subsystem_of(addr):
+    return next(((s, e, n) for s, e, n in subsystems() if s <= addr < e), (0, 0, "unassigned"))
+
+
 def batch(n, bucket_filter=None):
-    """Claim the next n queued functions and print a batch brief."""
+    """Claim the next n queued functions of one subsystem not already being worked on, as a
+    contiguous run, and print a batch brief."""
     q = os.path.join(SCALE, "queue.tsv")
     claimed_p = os.path.join(SCALE, "claimed.txt")
+    active_p = os.path.join(SCALE, "active.txt")
     claimed = set(open(claimed_p).read().split()) if os.path.exists(claimed_p) else set()
+    active = set(open(active_p).read().split("\n")) if os.path.exists(active_p) else set()
     rows = [ln.rstrip("\n").split("\t") for ln in open(q)]
-    take = [r[0] for r in rows if r[0] not in claimed and (not bucket_filter or r[2] == bucket_filter)][:n]
+    names = {f["name"]: f["addr"] for f in __import__("worklist").functions()}
+    take, sub = [], None
+    for r in rows:
+        if r[0] in claimed or (bucket_filter and r[2] != bucket_filter):
+            continue
+        s = subsystem_of(names[r[0]])
+        if sub is None:
+            if s[2] in active and s[2] != "unassigned":
+                continue
+            sub = s
+        if s != sub:
+            if take:
+                break
+            continue
+        take.append(r[0])
+        if len(take) >= n:
+            break
     if not take:
         sys.exit("queue empty")
     with open(claimed_p, "a") as fh:
         fh.write("\n".join(take) + "\n")
+    with open(active_p, "a") as fh:
+        fh.write(sub[2] + "\n")
     k = len(glob.glob(os.path.join(SCALE, "batch-*.txt"))) + 1
     path = os.path.join(SCALE, f"batch-{k:03d}.txt")
-    open(path, "w").write(BATCH_BRIEF.format(root=ROOT, funcs="\n".join(take)))
+    rng = f"{sub[0]:08X}-{sub[1]:08X}" if sub[1] else "no recorded range"
+    open(path, "w").write(BATCH_BRIEF.format(root=ROOT, funcs="\n".join(take), subsystem=sub[2], range=rng))
+    open(path + ".subsystem", "w").write(sub[2])
     print(path)
+
+
+def release(path):
+    """A batch finished: its subsystem is free for another batch."""
+    sp = path + ".subsystem"
+    if not os.path.exists(sp):
+        return
+    name = open(sp).read()
+    active_p = os.path.join(SCALE, "active.txt")
+    lines = open(active_p).read().split("\n") if os.path.exists(active_p) else []
+    if name in lines:
+        lines.remove(name)
+    open(active_p, "w").write("\n".join(lines))
+
+
+def hdrcheck(header):
+    """Re-check every matched src/ file that includes header; exit 1 if any no longer matches."""
+    base = os.path.basename(header)
+    files = [p for p in glob.glob(os.path.join(ROOT, "src", "**", "*.c"), recursive=True)
+             if f'"{base}"' in open(p, errors="replace").read() and "INCLUDE_ASM" not in open(p).read()]
+    bad = []
+    for p in files:
+        r = subprocess.run([PY, "tools/check.py", p], cwd=ROOT, capture_output=True, text=True)
+        if r.returncode != 0 or "MATCH" not in r.stdout:
+            bad.append(os.path.relpath(p, ROOT))
+    print(f"{len(files)} files include {base}; " + ("all still match" if not bad else f"BROKEN: {' '.join(bad[:20])}"))
+    return 1 if bad else 0
 
 
 def batch_usage(k, tokens, seconds):
@@ -593,6 +697,7 @@ def main():
     bu.add_argument("seconds")
     sub.add_parser("scale-report")
     sub.add_parser("committable")
+    sub.add_parser("hdrcheck").add_argument("header")
     r = sub.add_parser("report")
     r.add_argument("--markdown", action="store_true")
     a = ap.parse_args()
@@ -616,6 +721,8 @@ def main():
         batch_usage(a.k, a.tokens, a.seconds)
     elif a.cmd == "scale-report":
         scale_report()
+    elif a.cmd == "hdrcheck":
+        sys.exit(hdrcheck(a.header))
     elif a.cmd == "committable":
         for row in committable():
             print(*row, sep="\t")
