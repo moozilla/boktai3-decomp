@@ -745,3 +745,4 @@ addr,function,name,family,note
 08165518,sub_08165518,SceneHud_DrawActiveStatValue,"Scene HUD","draws a player stat in the active three-digit region"
 08165870,sub_08165870,ResultPanel_DrawClockLabel,"ResultPanel (tentative)","write three clock-label glyphs at a tile-map position"
 081658C8,sub_081658C8,SceneHud_DrawSelectedClock,"Scene HUD","draws base time or one of the two sun-clock times"
+08165A30,sub_08165A30,SceneHud_UpdateBinaryChoice,"Scene HUD","processes left/right choice input and confirm or cancel"
