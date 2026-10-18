@@ -1159,3 +1159,4 @@ addr,function,name,family,note
 081E095C,sub_081E095C,AnimPanel_SelectActiveAnimation,"animation panel (tentative)","sets complementary flag bits on two animations according to selection"
 081E1278,sub_081E1278,SelectionPalette_UpdatePulse,"Two-choice screen selection palette","cycles the selected entry palette color while clearing the other"
 081EB81C,sub_081EB81C,ScreenText_ShowIndexedString,"screen script parameters","displays script text with a mode-dependent index adjustment"
+081EC1A8,sub_081EC1A8,ScreenScript_UpdateDelay,"screen script parameters","calls a script after an exponential frame delay and kills the task"
