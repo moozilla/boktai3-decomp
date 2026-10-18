@@ -24,3 +24,4 @@ addr,function,name,family,note
 08097B18,sub_08097B18,SceneActor_EndLinkedReaction,"SceneActor linked reactions (tentative Bee family)","clears context reaction flags and releases player counter contribution"
 08098064,sub_08098064,SceneActor_InitLinkedSprites,"SceneActor linked reactions","loads four linked sprite animations and starts their scripts"
 08098660,sub_08098660,ActorVisibility_TickRevealDelay,"scene actor visibility","keep drawable visible while reveal counter expires"
+080989FC,sub_080989FC,ActorContact_UpdateColliderPositions,"scene actor contact","update primary and conditional secondary collider positions"
