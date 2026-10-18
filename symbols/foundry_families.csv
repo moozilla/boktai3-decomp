@@ -2,3 +2,4 @@ addr,function,name,family,note
 0801C69C,sub_0801C69C,ResultGame_SetUpdateCallback,"Result game","stores the update callback and resets the game state fields"
 0801EF28,sub_0801EF28,SceneObjects_AddPrimaryId,"Scene object controller","appends the pending id to the primary id list if not already present"
 08022D24,sub_08022D24,SceneActorState_StepTableByte,"Scene actor states","steps a column through an 8-byte table row, keeping the previous value"
+08022D68,sub_08022D68,SceneActorState_StepTableByKind,"Scene actor states","picks a byte table by kind and steps it"
