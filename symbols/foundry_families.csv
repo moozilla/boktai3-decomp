@@ -467,3 +467,4 @@ addr,function,name,family,note
 08172BD0,sub_08172BD0,SceneHud_UpdateActionGridInput,"SceneHud","processes action-grid movement confirmation and cancellation"
 08172CE8,sub_08172CE8,SceneHud_UpdateActionChoice,"SceneHud","updates action cursor and accepts or cancels the choice"
 08172DB8,sub_08172DB8,SceneHud_LoadActionMotion,"SceneHud","loads action motion keyframe and source and target positions"
+08173058,sub_08173058,SceneHud_FinishActionTransfer,"SceneHud","animates action transfer then applies the selected exchange"
