@@ -705,3 +705,4 @@ addr,function,name,family,note
 08145130,sub_08145130,Player_UpdateCountdownAnimation,"Player","counts down before advancing and completing an animation"
 08146478,sub_08146478,Player_UpdateTimedCuePhase,"Player","advances a timed animation and sound cue phase"
 08146870,sub_08146870,Player_UpdateBriefAction,"Player","updates a fifteen-frame player action"
+0814A01C,sub_0814A01C,Player_UpdateStatBAction,"Player","consumes stat B and advances action or empty-stat recovery"
