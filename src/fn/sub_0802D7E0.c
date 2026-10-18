@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Object {
     u8 pad[0x218];
     u8 kind;
@@ -15,7 +14,7 @@ int Actor_InitShadow(struct Object *p, int resource, int kind, int param, int va
 {
     p->kind = kind;
     {
-        register unsigned shifted asm("r2") = (unsigned)kind << 24;
+        unsigned shifted = ((unsigned)(*(&kind))) << 24;
         kind = shifted >> 24;
     }
     if (kind == 1) {
