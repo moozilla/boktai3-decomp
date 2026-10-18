@@ -589,3 +589,4 @@ addr,function,name,family,note
 0810A8D8,sub_0810A8D8,LinkMenu_ExchangePayload,"AreaEffectLinkState / link menu","exchanges participant payloads with a completion timeout"
 0810ABC0,sub_0810ABC0,SessionMenu_CreateStageIconDisplay,"Session menu state callbacks","creates stage icon display on state entry"
 0810AC7C,sub_0810AC7C,LinkSelection_AdvanceBitExchange,"AreaEffectLinkState","advances the six-bit link selection exchange"
+0810B120,sub_0810B120,LinkSelection_WaitForReadyParticipants,"AreaEffectLinkState","counts ready participants and advances the link menu"
