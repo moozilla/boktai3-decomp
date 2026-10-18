@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_effects.h"
 void sub_08020D08(void *);
 void sub_08013684(void *);
@@ -22,7 +21,7 @@ static inline u8 TestValue(u32 value)
 void SceneActorEffects_ReleaseResources(struct SceneActorEffectsView *actor)
 {
     u8 *control = (u8 *)actor + 0x3D4;
-    register u8 *drawable asm("r4") = actor->drawable;
+    u8 *drawable = actor->drawable;
     u16 *flags;
     void *identity;
     if (actor->drawableKind == 0)
