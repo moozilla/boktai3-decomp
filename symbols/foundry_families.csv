@@ -1027,3 +1027,4 @@ addr,function,name,family,note
 081A8774,sub_081A8774,ScenePanel_ResetPairMode,"ScenePanel","clears pair mode before applying active pair transitions"
 081A87D0,sub_081A87D0,ActorSoundPhase_UpdateStop,"ActorSoundPhase","consume entry flag, stop song, and update active phase"
 081A8BA4,sub_081A8BA4,ActorSoundPhase_EnterPhase21,"ActorSoundPhase","enter phase 21 and notify attachment on entry"
+081A8CC0,sub_081A8CC0,ActorSoundPhase_StartFlaggedAnimation,"ActorSoundPhase","set flag 0x40 and start pending animation before callback"
