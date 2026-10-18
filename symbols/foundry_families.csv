@@ -171,3 +171,4 @@ addr,function,name,family,note
 08107320,sub_08107320,TileTrigger_TickIdle,"TileTrigger","enters state 2 when a nearby actor is found"
 0810764C,sub_0810764C,TileTrigger_TickDelay,"TileTrigger","starts an animation and sound after a delay"
 08108244,sub_08108244,Tile_SetEnabledFromScript,"Tile / Pool1B8","sets a named tile's enabled flag from script keywords"
+081082DC,sub_081082DC,TileTrigger_SetStateFromScript,"TileTrigger","sets a named tile state from script keywords"
