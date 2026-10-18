@@ -174,3 +174,4 @@ addr,function,name,family,note
 081082DC,sub_081082DC,TileTrigger_SetStateFromScript,"TileTrigger","sets a named tile state from script keywords"
 08108360,sub_08108360,TileTrigger_TickManager,"TileTrigger","dispatches active tile state callbacks"
 0810853C,sub_0810853C,Pool1BC_FindByName,"NamedEntry / Pool1BC","finds an occupied named entry in the three-slot pool"
+0810889C,sub_0810889C,Pool1BC_UpdateDelay,"NamedEntry / Pool1BC","advances the entry to state four after an eleven-frame delay"
