@@ -713,3 +713,4 @@ addr,function,name,family,note
 0814CFC0,sub_0814CFC0,Player_UpdateStatThreshold,"Player","returns a stat threshold and records whether the scene threshold is met"
 0814D02C,sub_0814D02C,Player_SelectActionVariant,"Player contact and action variants","selects variant from callback flags and available stat B"
 0814D724,sub_0814D724,Player_InitializeActionContact,"Player contact and action variants","initializes the action contact origin heading and parameters"
+0814F90C,sub_0814F90C,Player_UpdateTriggerAnimation,"Player","updates timed animation and dispatches pending trigger"
