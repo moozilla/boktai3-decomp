@@ -722,3 +722,4 @@ addr,function,name,family,note
 08158650,sub_08158650,Player_SynchronizeInteractionDisplay,"Player","synchronizes collider visibility shadow and positions"
 08158CD8,sub_08158CD8,Player_BeginTerrainInteraction,"Player","starts mode 0x1C and records terrain-relative height"
 08159030,sub_08159030,Player_EvaluateItemStatA,"Player","evaluates item stat A through temporary action modifiers"
+08159594,sub_08159594,PlayerAction_RefreshModifiers,"PlayerAction","refreshes mode-dependent response values and action modifiers"
