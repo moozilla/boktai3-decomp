@@ -794,3 +794,4 @@ addr,function,name,family,note
 0816C230,sub_0816C230,MapMenu_SelectDirection,"MapMenu","selects an adjacent map entry from directional input"
 0816C624,sub_0816C624,MapMenu_RefreshMarkers,"MapMenu","refreshes marker animation and screen positions"
 0816C838,sub_0816C838,MapMenu_InitializeDisplay,"MapMenu","initializes map layers, centered scrolling, markers and input callback"
+0816CFAC,sub_0816CFAC,SceneHud_ApplyStatBPercent,"SceneHud","apply a percentage of maximum stat B and refresh its display"
