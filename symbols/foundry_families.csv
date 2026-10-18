@@ -1189,3 +1189,4 @@ addr,function,name,family,note
 081F2CD4,sub_081F2CD4,ActorResource_GetFixedId,"ActorResource (tentative)","reads a variant and returns resource id 0x1F2"
 081F2DE8,sub_081F2DE8,ActorProximity_UpdateSquaredDistances,"ActorProximity (tentative)","updates nine squared horizontal distances"
 081F2E88,sub_081F2E88,SceneDistance_UpdateLinkedDistances,"SceneDistanceSet","updates four linked squared X/Z distances"
+081F2EE0,sub_081F2EE0,SceneDistance_UpdateLinkedTargetDistances,"SceneDistanceSet","updates linked distances from target position"
