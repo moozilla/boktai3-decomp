@@ -1335,3 +1335,4 @@ addr,function,name,family,note
 08231568,sub_08231568,EffectGroup_Reset,"EffectGroup","clear group counters and reset four effect entries"
 082323DC,sub_082323DC,ColliderSprite_Destroy,"ColliderSprite","remove a sprite and collider and free its allocations"
 08232988,sub_08232988,ColliderSpritePool_Create,"ColliderSprite","create the task that owns the collider-sprite list"
+08232E6C,sub_08232E6C,EffectQuad_UpdateEntries,"EffectQuad","dispatch state callbacks for four effect entries"
