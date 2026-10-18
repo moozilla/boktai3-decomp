@@ -619,3 +619,4 @@ addr,function,name,family,note
 08110FD4,sub_08110FD4,TilemapPanel_Initialize,"tilemap panel","initializes script map and tile resources on BG2"
 0811129C,sub_0811129C,ScanlineScroll_Update,"scanline scroll","updates scanline offsets and timed horizontal background scrolling"
 08112464,sub_08112464,MessagePanel_UpdateExitDelay,"MessagePanel","waits 32 frames before finishing panel exit"
+08112BA8,sub_08112BA8,SceneSlot_RegisterObject,"Scene slot registry","registers an object in the first free slot of an eight-entry task registry"
