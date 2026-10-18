@@ -141,3 +141,4 @@ addr,function,name,family,note
 080F56D8,sub_080F56D8,ActorPhase_DampMovement,"PhaseActor","applies velocity and halves horizontal movement until stopped"
 080F669C,sub_080F669C,Sword_UpdateTask,"Sword","update sword state and components then advance ticks"
 080F6718,sub_080F6718,Sword_DestroyTask,"Sword","remove sword sprites colliders animation and status"
+080F7714,sub_080F7714,SceneActor_AdvanceOffsetApproach,"SceneActor","approach an offset destination then enter control phase 43"
