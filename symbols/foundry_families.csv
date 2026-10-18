@@ -317,3 +317,4 @@ addr,function,name,family,note
 08139CC0,sub_08139CC0,CallbackPool_MarkNextOfKind,"CallbackPool","marks first active unvisited slot with matching kind"
 08139D04,sub_08139D04,SceneProcParticles_TestCapacity,"SceneProcParticles","test free slots and existing particle groups"
 08139F58,sub_08139F58,CallbackPool_RemoveEntry,"CallbackPool","clears entry state and removes its sprite"
+0813A1E0,sub_0813A1E0,PairCallbackPool_Update,"PairCallbackPool","invokes active callbacks in a two-entry pool"
