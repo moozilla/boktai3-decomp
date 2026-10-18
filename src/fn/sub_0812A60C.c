@@ -27,7 +27,8 @@ static inline void MarkCollider(struct LinkedEffectCollider *sprite)
 {
     sprite->flags |= 4;
 }
-void LinkedEffect_ApplyVariant(struct EffectVariantSource *source, void *unused, struct LinkedEffect *effect)
+void LinkedEffect_ApplyVariant(struct EffectVariantSource *source, void *unused,
+                               struct LinkedEffect *effect)
 {
     if (TestFlags(&source->flags, 0x20)) {
         u8 *sprite = (u8 *)effect + 0x1C;

@@ -1,8 +1,8 @@
 #include "global.h"
-#define gScreenMoteCallbacks     gUnk_086108EC
-#define gEffectPauseFlags        gUnk_030053F4
-#define gScenePauseFlags         gUnk_030053F0
-#define gFrameCounter            gUnk_0300523C
+#define gScreenMoteCallbacks gUnk_086108EC
+#define gEffectPauseFlags    gUnk_030053F4
+#define gScenePauseFlags     gUnk_030053F0
+#define gFrameCounter        gUnk_0300523C
 /* State options at 0x14 control updates while paused or throttled. */
 struct ScreenMoteState {
     u8 unknown0[0x14];

@@ -1,6 +1,6 @@
 #include "global.h"
 #define PanelText_GetGlyphCell Video_GetWrappedBackgroundMapEntry
-#define PanelText_Clear Video_DrawBackgroundRowMarkers
+#define PanelText_Clear        Video_DrawBackgroundRowMarkers
 struct LinkTimeRecord {
     u8 pad0[0x24];
     s32 times[1];

@@ -25,7 +25,8 @@ s32 BlinkingSprite_UpdateExpiry(struct BlinkingSpritePool *pool, struct Blinking
     u32 rate = 2;
     if (age <= 60) {
         rate = 0;
-        if (age > 40) rate = 1;
+        if (age > 40)
+            rate = 1;
     }
     if (Mod(sprite->blinkAge, gUnk_086107B0[rate]) == 0) {
         u32 flags = copy->flags;

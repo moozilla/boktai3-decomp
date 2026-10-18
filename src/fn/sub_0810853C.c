@@ -14,7 +14,8 @@ struct NamedEntryPool {
 extern struct NamedEntryPool *gUnk_020001BC;
 static inline u8 IsUsed(u32 mask, s32 index, s32 one)
 {
-    if (mask & (one << index)) return 1;
+    if (mask & (one << index))
+        return 1;
     return 0;
 }
 struct NamedEntry *Pool1BC_FindByName(u32 name)
@@ -24,7 +25,8 @@ struct NamedEntry *Pool1BC_FindByName(u32 name)
     s32 i;
     u32 used;
     s32 one;
-    if (pool) goto search;
+    if (pool)
+        goto search;
     goto fail;
 found:
     return entry;

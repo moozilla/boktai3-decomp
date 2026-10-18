@@ -19,7 +19,7 @@ void PlayerCue_BeginOddDirection(struct Player *p, s32 direction)
     }
     Player_EnterKindTwo(p);
     Anim_SetKeyframes(&p->animation, p->animationData,
-        (u16)(p->heading + ActorVariant_GetTableValue(p->actionMode, 0x2e)), 1, 2);
+                      (u16)(p->heading + ActorVariant_GetTableValue(p->actionMode, 0x2e)), 1, 2);
     Anim_Step(&p->animation, p->animationData);
     if (p->side)
         p->animation.flags |= 4;

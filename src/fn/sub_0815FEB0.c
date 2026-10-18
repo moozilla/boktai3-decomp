@@ -1,8 +1,8 @@
 #include "global.h"
 #include "player.h"
-#define PlayerTransition_SetPhase PlayerBurst_SetStateCallback
+#define PlayerTransition_SetPhase     PlayerBurst_SetStateCallback
 #define PlayerTransition_FinishReveal PlayerBurst_UpdateShutdown
-#define gPlayers gUnk_02000580
+#define gPlayers                      gUnk_02000580
 struct PlayerTransition {
     u8 unknown0[0x1c];
     u8 animationData[0x20];

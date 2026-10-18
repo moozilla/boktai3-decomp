@@ -17,7 +17,8 @@ s32 CallbackPool_Update(struct CallbackPool *p)
     for (i = 0; i < 6; i++) {
         if (p->entries[i].active) {
             void *callback = p->entries[i].callback;
-            if (callback) sub_08249240(&p->entries[i], i * 0xd8, callback);
+            if (callback)
+                sub_08249240(&p->entries[i], i * 0xd8, callback);
         }
     }
     p->frame++;

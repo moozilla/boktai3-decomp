@@ -15,8 +15,8 @@ struct PanelSequence {
     u8 pad140D;
     u16 timer;
 };
-void BgGfx_LoadTilemapSimple(u32,u32,u32,u32,u32);
-void Bg_SetLayerMap(u32,void *,u16);
+void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
+void Bg_SetLayerMap(u32, void *, u16);
 void LinkPanel_DrawPeerTimes(struct PanelSequence *);
 void CharacterModel_UpdatePairedAnimations(void *, int);
 void PaletteFade_CycleMenuColors(void *);
@@ -27,7 +27,7 @@ void PanelSequence_UpdateDelay(struct PanelSequence *s)
     u8 *panel;
     if (s->entering) {
         Bg_SetLayerMap(3, s->map, 2);
-        BgGfx_LoadTilemapSimple(3,0,0,0,0);
+        BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
         LinkPanel_DrawPeerTimes(s);
         s->timer = 0;
         s->entering = 0;

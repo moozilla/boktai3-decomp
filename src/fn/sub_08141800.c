@@ -5,11 +5,14 @@ u32 Player_IsActionAllowed(struct Player *p, u32 action)
     if (p->actionMode <= 1 || p->actionMode == 6) {
         if (action == 0 || action == 3 || action == 19 || action == 20 || action == 6)
             goto allowed;
-        if (action == 4 && p->actionFourEnabled) goto allowed;
+        if (action == 4 && p->actionFourEnabled)
+            goto allowed;
     } else if (p->actionMode == 5) {
-        if (action == 0) goto allowed;
+        if (action == 0)
+            goto allowed;
     } else {
-        if (action == 0 || action == 4) goto allowed;
+        if (action == 0 || action == 4)
+            goto allowed;
     }
     goto denied;
 allowed:

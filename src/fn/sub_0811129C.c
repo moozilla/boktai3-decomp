@@ -20,20 +20,21 @@ static inline u8 IsPlayerScrollBlocked(void)
 {
     if (gUnk_020004F0[0]) {
         u32 flags = gUnk_020004F0[0]->flags;
-        if (flags & 5) return 1;
+        if (flags & 5)
+            return 1;
     }
     return 0;
 }
 
 void ScanlineScroll_AdvancePhases(struct ScanlineScroll *);
-void ScanlineEffect_SetSource(s32,s32,void *);
+void ScanlineEffect_SetSource(s32, s32, void *);
 void ScanlineScroll_Update(struct ScanlineScroll *p)
 {
     if (p->lastMapX != gUnk_03004C30[3].x)
-        BgGfx_LoadTilemapSimple(3,gUnk_03004C30[3].x >> 3,0,0,0);
+        BgGfx_LoadTilemapSimple(3, gUnk_03004C30[3].x >> 3, 0, 0, 0);
     p->lastMapX = gUnk_03004C30[3].x;
     ScanlineScroll_AdvancePhases(p);
-    ScanlineEffect_SetSource(3,0,p->offsets);
+    ScanlineEffect_SetSource(3, 0, p->offsets);
     if (p->moving && !IsPlayerScrollBlocked()) {
         p->scroll += p->speed;
         if ((p->scroll >> 7) > 256)

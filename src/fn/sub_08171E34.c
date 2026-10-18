@@ -1,7 +1,10 @@
 #define MotionSequence_SetCallback Hud_SetInteractionCallback
 #include "global.h"
 /* Tentative semantic names; field offsets are established by static accesses. */
-struct MotionSequence { u8 unknown0[0x438A]; u8 selection; };
+struct MotionSequence {
+    u8 unknown0[0x438A];
+    u8 selection;
+};
 int SceneHud_UpdateBinaryChoice(void *);
 void Sound_PlaySong(u32);
 void PauseInventory_BeginConsumableDiscardSelection(void *, int);

@@ -10,7 +10,8 @@ static inline void Disable(struct PursuingActorCollider *c)
 {
     c->flags |= 4;
 }
-void PursuingActor_UpdateRetirement(struct PursuingActorManager *manager, struct PursuingActor *actor)
+void PursuingActor_UpdateRetirement(struct PursuingActorManager *manager,
+                                    struct PursuingActor *actor)
 {
     struct SceneVec *position, *velocity;
     if (actor->entered) {

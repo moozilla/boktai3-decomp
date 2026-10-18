@@ -8,9 +8,9 @@ static inline u32 requestBlocked(u32 *flags, u32 mask)
 {
     return *flags & mask;
 }
-s32 Player_BeginPositionRequest(struct Player *p, struct SceneVec *position, struct SceneVec *target,
-                 s32 animationOffset, s32 side, s32 parameter, s32 immediate, s32 request,
-                 u32 option)
+s32 Player_BeginPositionRequest(struct Player *p, struct SceneVec *position,
+                                struct SceneVec *target, s32 animationOffset, s32 side,
+                                s32 parameter, s32 immediate, s32 request, u32 option)
 {
     s32 result;
     if (p->kind != 1 || requestBlocked(&p->statusFlags, 0x40000))
@@ -26,7 +26,8 @@ s32 Player_BeginPositionRequest(struct Player *p, struct SceneVec *position, str
         p->animation.flags &= ~1;
         p->movementRequestAnimated = 1;
         p->side = side;
-        Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x14) + animationOffset, 0x40, 1);
+        Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x14) + animationOffset,
+                            0x40, 1);
     }
     if (parameter > 0) {
         p->movementRequestParameter = parameter;

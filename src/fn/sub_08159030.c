@@ -1,5 +1,5 @@
 #define Player_ComputeIndexedStatA Player_GetSpecialAttackPower
-#define gGameState                  gUnk_02000710
+#define gGameState                 gUnk_02000710
 #include "global.h"
 #include "player.h"
 #include "game_state.h"
@@ -13,7 +13,8 @@ s32 Player_CalculateActionStat(s32, struct PlayerStatModifierContext *, s32);
 s32 Player_GetSpecialAttackPower(s32, s32);
 void ActionRecord_CopyFromEntry(const void *, void *);
 void Player_BuildActionModifiers(struct Player *, struct PlayerStatModifierContext *, const void *);
-s32 Player_EvaluateItemStatA(struct PlayerActionEntry *item, struct PlayerEquipmentReference *reference)
+s32 Player_EvaluateItemStatA(struct PlayerActionEntry *item,
+                             struct PlayerEquipmentReference *reference)
 {
     s32 equipment[4];
     s16 stats[8];

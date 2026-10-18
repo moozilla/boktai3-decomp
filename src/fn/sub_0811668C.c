@@ -17,7 +17,8 @@ struct RecoilCollisionActor {
 };
 void sub_081162D8();
 void ActorRecoil_ApplyDirectionalImpulse();
-void SpatialIndex_InitEntry(void *, void *, void *, void *, s32, s32, s32, s32, s32, void (*)(), void *);
+void SpatialIndex_InitEntry(void *, void *, void *, void *, s32, s32, s32, s32, s32, void (*)(),
+                            void *);
 void SpatialIndex_InsertEntry(void *);
 void ActorRecoil_InitCollisionVolumes(struct RecoilCollisionActor *p)
 {
@@ -37,7 +38,8 @@ void ActorRecoil_InitCollisionVolumes(struct RecoilCollisionActor *p)
     offset.x = 0;
     offset.y = -size.y;
     offset.z = 2;
-    SpatialIndex_InitEntry(p->bodyVolume, &pos, &size, &offset, 20, group, 0, 0, 12, sub_081162D8, owner);
+    SpatialIndex_InitEntry(p->bodyVolume, &pos, &size, &offset, 20, group, 0, 0, 12, sub_081162D8,
+                           owner);
     ((s16 *)&pos)[0] = p->width;
     ((s16 *)&pos)[1] = p->height - 96;
     ((s16 *)&pos)[2] = p->height - 96;
@@ -47,6 +49,7 @@ void ActorRecoil_InitCollisionVolumes(struct RecoilCollisionActor *p)
     ((s16 *)&offset)[0] = 0;
     ((s16 *)&offset)[1] = -((s16 *)&size)[1];
     ((s16 *)&offset)[2] = 4;
-    SpatialIndex_InitEntry(p->hitVolume, &pos, &size, &offset, 44, group, 0, 15, 12, ActorRecoil_ApplyDirectionalImpulse, owner);
+    SpatialIndex_InitEntry(p->hitVolume, &pos, &size, &offset, 44, group, 0, 15, 12,
+                           ActorRecoil_ApplyDirectionalImpulse, owner);
     SpatialIndex_InsertEntry(p->bodyVolume);
 }

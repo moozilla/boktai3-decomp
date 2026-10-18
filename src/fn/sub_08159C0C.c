@@ -14,7 +14,7 @@ static inline void enableAnimation(struct PlayerAnimation *a)
     a->flags &= ~1;
 }
 s32 Player_BeginInterpolatedMovement(struct Player *p, struct SceneVec *destination, s32 duration,
-                 struct SceneVec *target, u32 unused, s32 request, u32 option)
+                                     struct SceneVec *target, u32 unused, s32 request, u32 option)
 {
     s32 result;
     if (p->kind != 1 || requestBlocked(&p->statusFlags, 0x40000))

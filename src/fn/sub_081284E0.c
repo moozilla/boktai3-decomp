@@ -15,7 +15,10 @@ struct SpriteGroup {
     u8 unknown15C[2];
     u8 pendingRelease;
 };
-struct SpriteGroupPool { u8 unknown00[0x38]; u32 used; };
+struct SpriteGroupPool {
+    u8 unknown00[0x38];
+    u32 used;
+};
 void Sprite_Remove(void *);
 void FragmentBurst_RunCompletionScript(struct SpriteGroup *);
 void SpriteGroup_Release(struct SpriteGroupPool *pool, struct SpriteGroup *group)
@@ -27,7 +30,8 @@ void SpriteGroup_Release(struct SpriteGroupPool *pool, struct SpriteGroup *group
         i = 0;
         do {
             struct GroupPartSprite *sprite = &group->sprites[i];
-            if (sprite->active) Sprite_Remove(sprite);
+            if (sprite->active)
+                Sprite_Remove(sprite);
             i++;
         } while (i < 4);
         group->slot = -1;

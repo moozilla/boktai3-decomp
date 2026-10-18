@@ -1,4 +1,4 @@
-#define gNamedObjectTetherBounds         gUnk_086064B4
+#define gNamedObjectTetherBounds gUnk_086064B4
 #include "global.h"
 struct NamedObjectVector {
     s16 x, y, z, pad;
@@ -31,7 +31,8 @@ static inline void subtractVector(struct NamedObjectVector *d, struct NamedObjec
     d->y = a->y - b->y;
     d->z = a->z - b->z;
 }
-void NamedObject_SnapTetherToPlatform(struct NamedObjectManager *manager, struct NamedObject *object)
+void NamedObject_SnapTetherToPlatform(struct NamedObjectManager *manager,
+                                      struct NamedObject *object)
 {
     struct NamedObjectVector target, delta;
     if (object->kind == 2) {

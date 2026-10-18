@@ -9,14 +9,14 @@ s32 SelectionPanel_GetSelection(struct SelectionPanel *p)
 {
     s32 index;
     switch (p->page) {
-    default:
-        return 0;
-    case 0:
-        index = 0;
-        break;
-    case 1:
-        index = 6;
-        break;
+        default:
+            return 0;
+        case 0:
+            index = 0;
+            break;
+        case 1:
+            index = 6;
+            break;
     }
     index += p->column;
     return index;

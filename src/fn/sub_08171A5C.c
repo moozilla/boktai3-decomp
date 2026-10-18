@@ -3,7 +3,8 @@
 s32 Inventory_GetConsumableId(u32);
 void SceneHud_GetActionIconPosition(void *, int);
 void PauseMenu_SetSpritePalette(void *, u16);
-void SceneHud_PrepareActionTransferToSlot(struct SceneHudState *p, s32 index, s32 action, s32 target)
+void SceneHud_PrepareActionTransferToSlot(struct SceneHudState *p, s32 index, s32 action,
+                                          s32 target)
 {
     struct SceneInputWidget *widget = &p->motionWidgets[index];
     void *resource;

@@ -8,8 +8,8 @@ static inline void Subtract(struct ContactPosition *out, const struct ContactPos
     out->y = a->y - b->y;
     out->z = a->z - b->z;
 }
-s32 SceneActorTarget_CanReplaceByDistance(struct SceneActorRegistryActor *actor, const struct ContactPosition *position,
-                 void *identity)
+s32 SceneActorTarget_CanReplaceByDistance(struct SceneActorRegistryActor *actor,
+                                          const struct ContactPosition *position, void *identity)
 {
     struct ContactPosition delta;
     s32 distance;

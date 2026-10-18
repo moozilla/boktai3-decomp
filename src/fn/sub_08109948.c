@@ -13,18 +13,19 @@ struct MessagePanel {
     u32 unk38;
     u32 unk3C;
 };
-void sub_08108FB4(s32,s32,s32,s32,u32);
+void sub_08108FB4(s32, s32, s32, s32, u32);
 void ResultMessage_RunOutcomeScript(void);
 void ResultMessage_ShowOutcome(void);
 void LinkConnection_SetCallbacks(void *, void (*)(void), void (*)(void));
 void MessagePanel_ResetDisplay(struct MessagePanel *p)
 {
     if (p->entering == 1) {
-        BgGfx_LoadTilemapSimple(3,0,0,0,0);
+        BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
         p->entering = 0;
-        sub_08108FB4(-1,1,0,0x36,p->unk3C);
-        LinkConnection_SetCallbacks(p,ResultMessage_RunOutcomeScript,ResultMessage_ShowOutcome);
+        sub_08108FB4(-1, 1, 0, 0x36, p->unk3C);
+        LinkConnection_SetCallbacks(p, ResultMessage_RunOutcomeScript, ResultMessage_ShowOutcome);
         p->timer = 0;
     }
-    if (p->timer < 30) p->timer++;
+    if (p->timer < 30)
+        p->timer++;
 }

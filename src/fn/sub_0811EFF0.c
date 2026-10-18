@@ -1,7 +1,13 @@
 #define ActorEmitter_CanEmit Modifier_IsFirstSourceReady
 #include "global.h"
-struct EmitterVector { s32 x, y, z; u32 :32; };
-struct EmitterActor { u8 pad0[0x38]; s32 height; };
+struct EmitterVector {
+    s32 x, y, z;
+    u32 : 32;
+};
+struct EmitterActor {
+    u8 pad0[0x38];
+    s32 height;
+};
 struct EmitterOwner {
     u8 pad0[0x28];
     struct EmitterVector position;
@@ -49,17 +55,20 @@ s32 ActorEmitter_UpdateAnimation(struct ActorEmitter *emitter)
     s32 cost;
     s16 position[3];
     s16 *pos;
-    if (!Modifier_IsFirstSourceReady(emitter)) goto fail;
+    if (!Modifier_IsFirstSourceReady(emitter))
+        goto fail;
     owner = emitter->owner;
     actor = (struct EmitterActor *)((u8 *)owner + 0x18);
     cost = CallbackList_RunMatchingState(actor, emitter->id, 9);
-    if (owner->energy >= cost) goto active;
+    if (owner->energy >= cost)
+        goto active;
 fail:
     return 0;
 active:
     if (emitter->entered) {
         Anim_SetKeyframes((u8 *)owner + 0x670, (u8 *)owner + 0x7F0, emitter->animation, 1, 0);
-        if (LinkParticipant_IsLocallySelected(owner)) Sound_PlaySong(0x93);
+        if (LinkParticipant_IsLocallySelected(owner))
+            Sound_PlaySong(0x93);
         emitter->entered = 0;
     }
     CallbackList_SubtractClampedValue(actor, emitter, cost);

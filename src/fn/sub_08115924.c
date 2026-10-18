@@ -1,4 +1,4 @@
-#define gActorParticlePool      gUnk_020001E4
+#define gActorParticlePool gUnk_020001E4
 // Tentative family and semantic names; layouts follow observed field offsets.
 #include "global.h"
 struct ActorParticleSlot {

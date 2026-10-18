@@ -1,5 +1,5 @@
 #include "global.h"
-#define gLinkPanel               gUnk_020001C4
+#define gLinkPanel gUnk_020001C4
 struct LinkPanel {
     u8 pad0[0x1C];
     void *resource;

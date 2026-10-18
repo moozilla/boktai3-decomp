@@ -19,7 +19,8 @@ s32 Mod(s32, s32);
 void Sprite_Remove(void *);
 void Shadow_Destroy(void *);
 
-void SpriteEffect_UpdateBlinkAndExpire(struct SpriteEffectOwner *owner, struct SpriteEffectBlink *effect)
+void SpriteEffect_UpdateBlinkAndExpire(struct SpriteEffectOwner *owner,
+                                       struct SpriteEffectBlink *effect)
 {
     struct SpriteEffectBlink *p = effect;
     s32 rate;

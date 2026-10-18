@@ -1,7 +1,7 @@
-#define LinkMenu_ConsumeStateEntry Registry1745_ConsumeStateEntry
-#define LinkMenu_SetState Registry1745_SetState
-#define LinkMenu_CheckSession Registry1745_CheckSessionReady
-#define LinkMenu_ResetSelection Registry1745_BeginShutdown
+#define LinkMenu_ConsumeStateEntry     Registry1745_ConsumeStateEntry
+#define LinkMenu_SetState              Registry1745_SetState
+#define LinkMenu_CheckSession          Registry1745_CheckSessionReady
+#define LinkMenu_ResetSelection        Registry1745_BeginShutdown
 #define LinkMenu_ClearExchangeCounters Registry1745_ClearParticipantCounters
 #define gLinkMenuState                 gUnk_020004B4
 #include "global.h"

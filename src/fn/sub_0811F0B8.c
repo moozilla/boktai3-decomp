@@ -1,7 +1,17 @@
 #define ActorEmitter_CanEmit Modifier_IsFirstSourceReady
 #include "global.h"
-struct EmitterVector { s32 x, y, z; u32 :32; };
-struct EmitterActor { u8 pad0[0x10]; struct EmitterVector position; u8 pad20[0x18]; s32 height; u8 pad3C[0x278]; u8 profile[0xC]; };
+struct EmitterVector {
+    s32 x, y, z;
+    u32 : 32;
+};
+struct EmitterActor {
+    u8 pad0[0x10];
+    struct EmitterVector position;
+    u8 pad20[0x18];
+    s32 height;
+    u8 pad3C[0x278];
+    u8 profile[0xC];
+};
 struct EmitterOwner {
     u8 pad0[0x28];
     struct EmitterVector position;
@@ -38,23 +48,27 @@ s32 ActorEmitter_TryEmitPair(struct ActorEmitter *emitter)
     struct EmitterActor *actor;
     s32 cost, height;
     struct EmitterVector velocity;
-    if (!Modifier_IsFirstSourceReady(emitter)) goto fail;
+    if (!Modifier_IsFirstSourceReady(emitter))
+        goto fail;
     owner = emitter->owner;
     actor = (struct EmitterActor *)((u8 *)owner + 0x18);
     cost = CallbackList_RunMatchingState(actor, emitter->id, 9);
-    if (owner->energy < cost) goto fail;
+    if (owner->energy < cost)
+        goto fail;
     velocity.x = owner->velocity;
     velocity.y = 0;
     velocity.z = 0;
-    if (emitter->kind == 4) height = actor->height - 0x8000;
-    else height = actor->height - 0x16000;
-    if (sub_08114928(&actor->position, height, &velocity,
-                       actor->profile, owner->kind + 1, 1, 2, 0) >= 0) goto success;
+    if (emitter->kind == 4)
+        height = actor->height - 0x8000;
+    else
+        height = actor->height - 0x16000;
+    if (sub_08114928(&actor->position, height, &velocity, actor->profile, owner->kind + 1, 1, 2,
+                     0) >= 0)
+        goto success;
 fail:
     return 0;
 success:
-    sub_08114928(&actor->position, height, &velocity,
-                       actor->profile, owner->kind + 1, 0, 1, 1);
+    sub_08114928(&actor->position, height, &velocity, actor->profile, owner->kind + 1, 0, 1, 1);
     CallbackList_SubtractClampedValue(actor, emitter, cost);
     emitter->timer = emitter->duration;
     return 1;

@@ -1,5 +1,5 @@
 #define SceneItem_SelectRandomSpecialItem Inventory_RollIcePopStick
-#define SceneItem_SetSlotItem Inventory_SetItemId
+#define SceneItem_SetSlotItem             Inventory_SetItemId
 #include "global.h"
 #include "scene_hud_display.h"
 void SceneHud_GetActionIconPosition(void *, s32);
@@ -31,7 +31,8 @@ void SceneHud_BeginRandomActionReturn(struct SceneHudState *s)
     SceneItem_SetSlotItem(*selection, SceneItem_SelectRandomSpecialItem());
     keyframe = sub_0822D604(item);
     later = *selection + 10;
-    SceneHud_BeginIconMotion(s, 0, keyframe, s->categoryWidgets[later].paletteBank, &from, &to, 24, 16);
+    SceneHud_BeginIconMotion(s, 0, keyframe, s->categoryWidgets[later].paletteBank, &from, &to, 24,
+                             16);
     Sound_PlaySong(0x38a);
     Hud_SetInteractionCallback(s, SceneHud_FinishRandomActionReturn, 1);
 }

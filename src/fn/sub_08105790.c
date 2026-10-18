@@ -1,4 +1,4 @@
-#define gPlayers                                 gUnk_02000580
+#define gPlayers gUnk_02000580
 #include "global.h"
 #include "proximity_actor.h"
 s32 ProximityActor_IsPlayerInsideOriginRange(struct ProximityActor *actor)

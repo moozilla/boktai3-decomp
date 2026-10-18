@@ -30,16 +30,33 @@ s32 NumericDisplay_InitializeWidgets(struct NumericDisplay *s, u32 parameter)
     i = 0;
     do {
         switch (i) {
-        case 0: x = 0x58; break;
-        case 1: x = 0x60; break;
-        case 2: x = 0x68; break;
-        case 3: x = 0x78; break;
-        case 4: x = 0x80; break;
-        case 5: x = 0x88; break;
-        default: x = 0; break;
+            case 0:
+                x = 0x58;
+                break;
+            case 1:
+                x = 0x60;
+                break;
+            case 2:
+                x = 0x68;
+                break;
+            case 3:
+                x = 0x78;
+                break;
+            case 4:
+                x = 0x80;
+                break;
+            case 5:
+                x = 0x88;
+                break;
+            default:
+                x = 0;
+                break;
         }
         result = sub_0821983C(&s->widgets[i], s->resource, 0x29, 0x10, 0, 0, 0, 0);
-        if (result != 0) { ret = -1; goto end; }
+        if (result != 0) {
+            ret = -1;
+            goto end;
+        }
         s->widgets[i].x = x;
         s->widgets[i].z = result;
         s->widgets[i].y = result;

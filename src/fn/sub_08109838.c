@@ -22,6 +22,8 @@ void MessagePanel_WaitForInput(struct MessagePanel *p)
         p->timer = 0;
         p->entering = 0;
     }
-    if (p->timer < 60) p->timer++;
-    else if (gUnk_03005260[1] & 0x30F) sub_08224FA4();
+    if (p->timer < 60)
+        p->timer++;
+    else if (gUnk_03005260[1] & 0x30F)
+        sub_08224FA4();
 }

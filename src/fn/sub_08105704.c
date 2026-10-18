@@ -1,6 +1,6 @@
 #define ProximityActor_TestFlags Pool184_TestStatusFlags
-#define ProximityActor_SetFlags Pool184_AddStatusFlags
-#define gPlayers                        gUnk_02000580
+#define ProximityActor_SetFlags  Pool184_AddStatusFlags
+#define gPlayers                 gUnk_02000580
 #include "global.h"
 #include "proximity_actor.h"
 u8 Pool184_TestStatusFlags(struct ProximityActor *, u32);

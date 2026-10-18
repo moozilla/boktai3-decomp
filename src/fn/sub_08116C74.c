@@ -1,6 +1,6 @@
 #include "global.h"
 #include "area_effect_link.h"
-#define gLinkSelection                    gUnk_020004B4
+#define gLinkSelection gUnk_020004B4
 struct LinkParticipant {
     u8 unknown0[0x8F8];
     s8 playerIndex;

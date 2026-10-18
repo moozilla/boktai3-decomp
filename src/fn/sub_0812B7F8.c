@@ -1,4 +1,4 @@
-#define gPlayerSlots                   gUnk_02000580
+#define gPlayerSlots gUnk_02000580
 #include "global.h"
 #include "player.h"
 #include "pursuing_actor.h"

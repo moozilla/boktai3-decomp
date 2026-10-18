@@ -1,7 +1,10 @@
 // Tentative StatusPanel family and semantic names; based on static consumers.
 #define gStatusPanel gUnk_02000214
 #include "global.h"
-struct PanelRefresh { u32 unknown[2]; u32 flags; };
+struct PanelRefresh {
+    u32 unknown[2];
+    u32 flags;
+};
 struct StatusPanel {
     u8 unknown[0xA9C];
     struct PanelRefresh refresh;

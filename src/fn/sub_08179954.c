@@ -37,7 +37,8 @@ void MeterDisplay_InitializeWidgets(struct MeterDisplay *s)
 
     do {
         result = sub_0821983C(widget, s->resource, i + 0x49, 0x10, zero, zero, zero, (void *)zero);
-        if (result) return;
+        if (result)
+            return;
         widget->x = result;
         widget->y = result;
         widget->z = result;

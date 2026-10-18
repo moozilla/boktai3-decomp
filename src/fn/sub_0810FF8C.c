@@ -1,6 +1,6 @@
 #define LinkMenu_DrawFourDigitNumber LinkScorePanel_SetNumber
-#define gRandomTableIndex                      gUnk_03005304
-#define gRandomValues                          gUnk_086141BC
+#define gRandomTableIndex            gUnk_03005304
+#define gRandomValues                gUnk_086141BC
 #include "global.h"
 struct LinkMenuCounter {
     u8 unknown0[0x1026];

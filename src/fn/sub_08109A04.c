@@ -1,4 +1,4 @@
-#define MessagePanel_SetupBackground LinkConnectionMenu_LoadBackground
+#define MessagePanel_SetupBackground  LinkConnectionMenu_LoadBackground
 #define MessagePanel_CreateTextWindow LinkConnectionMenu_CreateTextWindow
 #include "global.h"
 struct MessagePanel {

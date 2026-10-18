@@ -12,7 +12,7 @@ static inline s32 SceneTerrain_RoundDistance(s32 x)
     return -((-x) >> 8);
 }
 s32 SceneTerrain_IsPathBlocked(struct ContactPosition *a, struct ContactPosition *b, s32 direction,
-                 s32 targetCell)
+                               s32 targetCell)
 {
     s32 count;
     switch (direction) {

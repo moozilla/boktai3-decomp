@@ -13,16 +13,16 @@ void TextLabel_FormatSuffix(struct TextLabelStyle *style, u8 *text)
 {
     u32 length = 0;
     switch (style->suffixKind) {
-    case 1:
-        text[0] = 0x80;
-        text[1] = 0xCA;
-        length = 2;
-        break;
-    case 2:
-        text[0] = 0x80;
-        text[1] = 0xCB;
-        length = 2;
-        break;
+        case 1:
+            text[0] = 0x80;
+            text[1] = 0xCA;
+            length = 2;
+            break;
+        case 2:
+            text[0] = 0x80;
+            text[1] = 0xCB;
+            length = 2;
+            break;
     }
     if (style->specialC || style->special10) {
         text[length] = 'S';

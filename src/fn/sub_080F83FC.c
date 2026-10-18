@@ -48,7 +48,7 @@ static inline void clearFlags(u32 *p, u32 mask)
     *p &= ~mask;
 }
 
-#define gPhaseTarget                     gUnk_02000580
+#define gPhaseTarget gUnk_02000580
 extern u8 *gUnk_02000580;
 void ActorShadow_Disable(void *);
 void ActorPhase_SelectDistantWaypoint(struct PhaseActor *, void *, void *, s32);

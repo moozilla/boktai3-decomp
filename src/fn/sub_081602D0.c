@@ -1,5 +1,5 @@
 #define PlayerStatEffect_SetPhase PlayerBurst_SetStateCallback
-#define gEngineFlags gUnk_030053F4
+#define gEngineFlags              gUnk_030053F4
 #include "global.h"
 #include "player.h"
 struct PlayerStatEffect {

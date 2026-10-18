@@ -1,6 +1,6 @@
 #define NamedObject_SyncTetherStatus NamedObject_UpdateTetherFollowFlags
-#define gNamedObjectManager                gUnk_020001AC
-#define gNamedObjectTetherBounds           gUnk_086064B4
+#define gNamedObjectManager          gUnk_020001AC
+#define gNamedObjectTetherBounds     gUnk_086064B4
 #include "global.h"
 struct NamedObjectVector {
     s16 x, y, z, pad;

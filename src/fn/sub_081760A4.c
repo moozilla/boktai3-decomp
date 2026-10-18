@@ -1,7 +1,10 @@
 #define MenuPanel_SetCallback Hud_SetInteractionCallback
 // Provisional panel family; field meanings follow static consumers.
 #include "global.h"
-struct SelectionPanel { u8 unk0[0x48C8]; u32 window; };
+struct SelectionPanel {
+    u8 unk0[0x48C8];
+    u32 window;
+};
 int SceneHud_UpdateBinaryChoice(void *);
 void Sound_PlaySong(u32);
 void SceneCatalog_SelectDescription(u32);

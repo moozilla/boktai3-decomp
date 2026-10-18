@@ -1,5 +1,5 @@
 #include "global.h"
-#define SessionMenu_ConsumeEntryFlag Registry1745_ConsumeStateEntry
+#define SessionMenu_ConsumeEntryFlag  Registry1745_ConsumeStateEntry
 #define SessionMenu_ResetWithCallback Registry1745_BeginShutdown
 extern u32 gUnk_03005250;
 u8 Registry1745_ConsumeStateEntry(void *);

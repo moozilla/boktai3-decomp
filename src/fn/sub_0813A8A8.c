@@ -1,6 +1,6 @@
 #include "global.h"
 #define DisplaySlots_Create PositionLinkedSprite_EnsureManager
-#define gDisplaySlots        gUnk_020004D8
+#define gDisplaySlots       gUnk_020004D8
 /* Tentative family: two display slots owned by a task. */
 struct DisplaySlot {
     u32 flags;

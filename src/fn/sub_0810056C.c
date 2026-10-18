@@ -1,5 +1,5 @@
-#define gSceneContactFlags          gUnk_030053F4
-#define gSwitchPlayer               gUnk_02000580
+#define gSceneContactFlags gUnk_030053F4
+#define gSwitchPlayer      gUnk_02000580
 #include "global.h"
 struct FloorSwitch {
     u32 flags;

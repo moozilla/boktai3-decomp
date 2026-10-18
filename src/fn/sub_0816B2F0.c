@@ -2,10 +2,10 @@
 #include "global.h"
 struct SceneSequence {
     u8 unknown0[0xC4];
-    u8 animationData[0xA4C-0xC4];
+    u8 animationData[0xA4C - 0xC4];
     u16 phaseTimer;
-    u8 unknownA4E[0x3BE0-0xA4E];
-    u8 animation[0x48F0-0x3BE0];
+    u8 unknownA4E[0x3BE0 - 0xA4E];
+    u8 animation[0x48F0 - 0x3BE0];
     u32 completionScript;
 };
 s32 Anim_Step(void *, void *);

@@ -1,5 +1,5 @@
 #define Player_SetAttachmentPosition Player_SetPositionAndSave
-#define gNamedObjectManager                   gUnk_020001AC
+#define gNamedObjectManager          gUnk_020001AC
 #include "global.h"
 #include "player.h"
 struct NamedObject {
@@ -15,7 +15,8 @@ struct NamedObjectManager {
     u32 playerName;
 };
 extern struct NamedObjectManager *gUnk_020001AC;
-void NamedObject_ResolveAttachmentPosition(struct SceneVec *, struct SceneVec *, struct NamedObject *);
+void NamedObject_ResolveAttachmentPosition(struct SceneVec *, struct SceneVec *,
+                                           struct NamedObject *);
 void Player_SetPositionAndSave(struct Player *, struct SceneVec *);
 static inline u8 testFlag(u32 mask, u16 *flags)
 {

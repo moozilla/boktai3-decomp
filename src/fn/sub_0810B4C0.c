@@ -1,6 +1,6 @@
 #include "global.h"
-#define SessionMenu_SetState Registry1745_SetState
-#define SessionMenu_ConsumeEntryFlag Registry1745_ConsumeStateEntry
+#define SessionMenu_SetState          Registry1745_SetState
+#define SessionMenu_ConsumeEntryFlag  Registry1745_ConsumeStateEntry
 #define SessionMenu_ResetWithCallback Registry1745_BeginShutdown
 #include "area_effect_link.h"
 #include "engine.h"

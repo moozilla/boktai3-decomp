@@ -24,7 +24,8 @@ void PanelSequence_InitializeSprites(struct PanelSequence *group)
     zero = 0;
     sprite = (u8 *)group + 0x20;
     do {
-        sub_0821983C(sprite, group->resource, group->resourceIds[i], 0x10, zero, zero, zero, (void *)zero);
+        sub_0821983C(sprite, group->resource, group->resourceIds[i], 0x10, zero, zero, zero,
+                     (void *)zero);
         group->previousIds[i] = 0xFFFF;
         sprite += 0x60;
         i++;

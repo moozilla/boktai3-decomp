@@ -2,7 +2,7 @@
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
 s32 Div(s32, s32);
 void MenuDisplay_LoadAdjustedDigits(s32 value, s32 adjustment, void *data, void *hundredsAnim,
-                  void *tensAnim, void *onesAnim)
+                                    void *tensAnim, void *onesAnim)
 {
     s32 hundreds, tens, ones, bank;
     value += adjustment;

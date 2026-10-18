@@ -27,7 +27,8 @@ struct SceneStatusIndicator *SceneStatusIndicator_Allocate(struct SceneStatusInd
 void sub_08217DE0(struct SceneStatusIndicator *, void *, u32);
 void Effect_SetOrigin(struct SceneStatusIndicator *, s32, s32);
 void sub_08217EEC(struct SceneStatusIndicator *, void *, u32);
-struct SceneStatusIndicator *SceneStatusIndicator_Create(struct SceneStatusIndicatorPosition *position)
+struct SceneStatusIndicator *
+SceneStatusIndicator_Create(struct SceneStatusIndicatorPosition *position)
 {
     struct SceneStatusIndicatorManager *manager = gUnk_02000158;
     struct SceneStatusIndicator *entry;

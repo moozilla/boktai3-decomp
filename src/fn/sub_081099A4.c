@@ -18,14 +18,16 @@ extern u32 gUnk_0300546C;
 extern u32 gUnk_03005408;
 static inline u8 MessagePanel_IsBlocking(struct MessagePanel *p)
 {
-    if (p->flags & 1) return TRUE;
+    if (p->flags & 1)
+        return TRUE;
     return FALSE;
 }
 s32 MessagePanel_Update(struct MessagePanel *p)
 {
     Solar_PauseMeasurement();
     gUnk_0300546C = 1;
-    if (MessagePanel_IsBlocking(p)) gUnk_03005408 = 1;
-    Callback_InvokeActor(p,p->state);
+    if (MessagePanel_IsBlocking(p))
+        gUnk_03005408 = 1;
+    Callback_InvokeActor(p, p->state);
     return 1;
 }

@@ -1,6 +1,6 @@
-#define SelectionMenu_SetPhase Hud_SetUpdateCallback
+#define SelectionMenu_SetPhase          Hud_SetUpdateCallback
 #define SelectionMenu_SetWidgetPosition PauseMenu_SetSpritePosition
-#define gMenuKeys                        gUnk_03005260
+#define gMenuKeys                       gUnk_03005260
 #include "global.h"
 struct SelectionMenuOwner {
     u8 unknown0[0x418];

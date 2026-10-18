@@ -1,5 +1,5 @@
-#define gLinkMenuFlags                         gUnk_0300523C
-#define gLinkMenuActive                        gUnk_03005250
+#define gLinkMenuFlags  gUnk_0300523C
+#define gLinkMenuActive gUnk_03005250
 #include "global.h"
 #include "area_effect_link.h"
 #include "game_state.h"

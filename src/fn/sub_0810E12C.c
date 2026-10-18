@@ -19,9 +19,11 @@ void SelectionPanel_UpdateDescription(struct SelectionPanel *p)
     if (p->lastDescription != selection) {
         ScrollingDialogue_ClearScript();
         if (StateFlags_TestIndexedFlag(selection)) {
-            ScrollingDialogue_SetScript(Text_LookupString(Script_ParseStringRef(p->descriptionText) + selection));
+            ScrollingDialogue_SetScript(
+                Text_LookupString(Script_ParseStringRef(p->descriptionText) + selection));
         } else {
-            ScrollingDialogue_SetScript(Text_LookupString(Script_ParseStringRef(p->descriptionText) + 12));
+            ScrollingDialogue_SetScript(
+                Text_LookupString(Script_ParseStringRef(p->descriptionText) + 12));
         }
         p->lastDescription = selection;
     }

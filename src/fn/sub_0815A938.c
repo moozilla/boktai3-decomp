@@ -1,5 +1,5 @@
 #define Player_GetScriptSlot Script_GetActorIndex
-#define gPlayers gUnk_02000580
+#define gPlayers             gUnk_02000580
 #include "global.h"
 #include "player.h"
 s32 Script_GetActorIndex(void);
@@ -14,7 +14,7 @@ s32 Player_TestScriptStatus(void)
         goto fail;
     index = Script_GetValue();
     if (index > 1) {
-fail:
+    fail:
         return 0;
     }
     if (p->scriptStatus[index] == 0)

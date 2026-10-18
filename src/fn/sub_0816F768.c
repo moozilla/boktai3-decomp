@@ -1,5 +1,5 @@
 #define SceneMenuPanel_UpdateMotion PauseMenu_UpdateSpriteMotion
-#define SceneMenuPanel_SetCallback Hud_SetInteractionCallback
+#define SceneMenuPanel_SetCallback  Hud_SetInteractionCallback
 #include "global.h"
 struct SceneMenuPanel {
     u8 unknown0[0xA4E];

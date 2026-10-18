@@ -1,5 +1,5 @@
 #include "global.h"
-#define gCategoryLists        gUnk_02000200
+#define gCategoryLists gUnk_02000200
 struct CategoryListNode {
     u32 value;
     struct CategoryListNode *previous;

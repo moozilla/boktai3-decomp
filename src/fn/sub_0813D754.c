@@ -1,14 +1,14 @@
 #define SceneActor_GetEffectElapsedTicks Player_GetEffectTickDelta
-#define gSceneActorEffectThresholds gUnk_08610918
+#define gSceneActorEffectThresholds      gUnk_08610918
 #include "global.h"
 struct SceneActorEffectDisplay {
     u8 unknown0[0x1C];
     u32 flags;
-    u8 unknown20[0x4F4-0x20];
+    u8 unknown20[0x4F4 - 0x20];
     u8 tick, savedTick, overrideMode;
-    u8 unknown4F7[0x5B9-0x4F7];
+    u8 unknown4F7[0x5B9 - 0x4F7];
     u8 effectMode, unknown5BA, effectActive;
-    u8 unknown5BC[0xACA-0x5BC];
+    u8 unknown5BC[0xACA - 0x5BC];
     u16 savedMode;
     s16 flashTimer;
 };
@@ -26,15 +26,20 @@ s32 SceneActor_SelectEffectDisplayMode(struct SceneActorEffectDisplay *p, s32 mo
             }
         }
         if (p->effectActive) {
-            if (p->effectMode == 1) mode = 3;
-            else if (p->effectMode == 2) mode = 4;
-            else if (p->effectMode == 3) mode = 5;
+            if (p->effectMode == 1)
+                mode = 3;
+            else if (p->effectMode == 2)
+                mode = 4;
+            else if (p->effectMode == 3)
+                mode = 5;
         }
     }
-    if (p->overrideMode) mode = 7;
+    if (p->overrideMode)
+        mode = 7;
     if (mode == original) {
         if (p->flashTimer) {
-            if (((u16)p->flashTimer >> 2) & 1) mode = p->savedMode;
+            if (((u16)p->flashTimer >> 2) & 1)
+                mode = p->savedMode;
             p->flashTimer--;
         }
     } else {

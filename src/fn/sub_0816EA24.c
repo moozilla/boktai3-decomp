@@ -1,5 +1,5 @@
 #define SceneMenuPanel_SetCallback Hud_SetInteractionCallback
-#define gMenuKeys gUnk_03005260
+#define gMenuKeys                  gUnk_03005260
 #include "global.h"
 struct SceneMenuPanel {
     u8 unknown0[0x3C];

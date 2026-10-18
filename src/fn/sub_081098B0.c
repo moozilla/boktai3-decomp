@@ -10,12 +10,12 @@ struct MessagePanel {
     u8 entering;
     u16 timer;
 };
-void ScreenTransition_SendCommand(s32,s32,s32,s32,s32,s32,s32);
+void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 void LinkConnectionMenu_OnExitState(struct MessagePanel *);
 void MessagePanel_BeginDismiss(struct MessagePanel *p)
 {
     if (p->entering == 1) {
-        ScreenTransition_SendCommand(3,4,4,4,4,0xFFFF,0);
+        ScreenTransition_SendCommand(3, 4, 4, 4, 4, 0xFFFF, 0);
         p->timer = 0;
         p->entering = 0;
     }
@@ -25,5 +25,6 @@ void MessagePanel_BeginDismiss(struct MessagePanel *p)
         p->state = next;
         p->entering = 1;
         p->mode = mode;
-    } else p->timer++;
+    } else
+        p->timer++;
 }

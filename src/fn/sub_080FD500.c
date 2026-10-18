@@ -10,39 +10,45 @@ struct SceneActorControl35Context {
     u8 unknownEBC[6];
     u16 fieldEC2;
 };
-static inline void Or16(u32 m, u16 *p) { *p = m | *p; }
-static inline void Or32(u32 m, u32 *p) { *p |= m; }
+static inline void Or16(u32 m, u16 *p)
+{
+    *p = m | *p;
+}
+static inline void Or32(u32 m, u32 *p)
+{
+    *p |= m;
+}
 static inline void Restart(struct SceneActorRegistryResetView *actor)
 {
-        void *callback = (void *)ActorPhase_UpdateSpriteCollapse;
-        u32 kind = 0x23;
-        u8 zero8;
-        u8 one;
-        u32 zero;
-        u8 *taken = &actor->field2B2;
-        zero = 0;
-        one = 1;
-        *taken = one;
-        actor->field2B0 = zero;
-        actor->field2B5 = kind;
-        actor->target = callback;
-        zero8 = 0;
-        actor->field2C8 = zero;
-        {
-            u32 *flags = &actor->flags114;
-            u32 mask = ~1;
-            *flags &= mask;
-        }
-        actor->word104 = zero;
-        {
-            u32 phase = 2;
-            u32 behavior = 5;
-            actor->state2A8 = zero8;
-            actor->phase2A9 = phase;
-            actor->behavior2AA = behavior;
-            actor->counter2AC = zero;
-            actor->field2B1 = one;
-        }
+    void *callback = (void *)ActorPhase_UpdateSpriteCollapse;
+    u32 kind = 0x23;
+    u8 zero8;
+    u8 one;
+    u32 zero;
+    u8 *taken = &actor->field2B2;
+    zero = 0;
+    one = 1;
+    *taken = one;
+    actor->field2B0 = zero;
+    actor->field2B5 = kind;
+    actor->target = callback;
+    zero8 = 0;
+    actor->field2C8 = zero;
+    {
+        u32 *flags = &actor->flags114;
+        u32 mask = ~1;
+        *flags &= mask;
+    }
+    actor->word104 = zero;
+    {
+        u32 phase = 2;
+        u32 behavior = 5;
+        actor->state2A8 = zero8;
+        actor->phase2A9 = phase;
+        actor->behavior2AA = behavior;
+        actor->counter2AC = zero;
+        actor->field2B1 = one;
+    }
 }
 void SceneActorControl_UpdateControl35Phase(struct SceneActorRegistryResetView *actor)
 {

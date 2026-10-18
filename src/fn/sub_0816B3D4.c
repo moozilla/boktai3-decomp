@@ -1,6 +1,9 @@
 #define gSceneKeys gUnk_03005260
 #include "global.h"
-struct SceneInputRepeat { u8 unknown0[0xB]; u8 repeatTimer; };
+struct SceneInputRepeat {
+    u8 unknown0[0xB];
+    u8 repeatTimer;
+};
 extern volatile u16 gUnk_03005260[];
 u32 SceneInput_ReadRepeatingDirections(struct SceneInputRepeat *s)
 {

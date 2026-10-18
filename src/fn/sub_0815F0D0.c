@@ -1,6 +1,6 @@
 #define Player_RefreshCueCollider Player_UpdateColliderRefreshCountdown
-#define gPlayerCueTimer              gUnk_02000518
-#define gPlayerCueActive             gUnk_02000528
+#define gPlayerCueTimer           gUnk_02000518
+#define gPlayerCueActive          gUnk_02000528
 #include "global.h"
 #include "player.h"
 #include "game_state.h"

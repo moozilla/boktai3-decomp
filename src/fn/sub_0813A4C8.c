@@ -1,6 +1,6 @@
-#define SpritePairPool_Create FollowingSpriteEffect_EnsureManager
+#define SpritePairPool_Create       FollowingSpriteEffect_EnsureManager
 #define SpritePairEntry_SetCallback FollowingSpriteEffect_SetStateCallback
-#define gSpritePairPool                gUnk_020004D4
+#define gSpritePairPool             gUnk_020004D4
 #include "global.h"
 struct SpritePairEntry {
     u8 pad0[0x44];
@@ -48,7 +48,8 @@ static inline u32 SpritePairPool_MakeKey(u32 counter, u32 id)
     id |= counter;
     return id;
 }
-s32 SpritePairPool_StartEntry(void *position, u32 *height, u32 unused, struct SpritePairParams *params, u32 id)
+s32 SpritePairPool_StartEntry(void *position, u32 *height, u32 unused,
+                              struct SpritePairParams *params, u32 id)
 {
     struct SpritePairPool *pool;
     s32 i;
@@ -72,7 +73,9 @@ s32 SpritePairPool_StartEntry(void *position, u32 *height, u32 unused, struct Sp
             key = pool->counter;
             key = SpritePairPool_MakeKey(key, id);
             pool->entries[i].id = key;
-            SpritePairEntry_CreateEffect(&pool->entries[i], FollowingSpriteEffect_OnAnimationComplete, params->value, id + 1);
+            SpritePairEntry_CreateEffect(&pool->entries[i],
+                                         FollowingSpriteEffect_OnAnimationComplete, params->value,
+                                         id + 1);
             FollowingSpriteEffect_SetStateCallback(&pool->entries[i], sub_08139FE0);
             Sound_PlaySong(0x3e4);
             return i;

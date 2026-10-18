@@ -1,4 +1,4 @@
-#define gSceneInputKeys                gUnk_03005260
+#define gSceneInputKeys gUnk_03005260
 #include "global.h"
 #include "scene_hud_display.h"
 extern u16 gUnk_03005260[];

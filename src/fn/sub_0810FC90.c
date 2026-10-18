@@ -1,4 +1,4 @@
-#define gLinkSession                 gUnk_020004B4
+#define gLinkSession               gUnk_020004B4
 #define MenuSprite_LoadPalettePair CharacterModel_InitPalettes
 #include "global.h"
 #include "area_effect_link.h"

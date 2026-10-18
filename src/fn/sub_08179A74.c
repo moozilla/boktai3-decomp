@@ -18,13 +18,17 @@ struct MeterDisplay {
     void *script;
     s32 scale;
 };
-struct MeterOwnerSource { u8 unknown0[0x18]; s16 index; };
+struct MeterOwnerSource {
+    u8 unknown0[0x18];
+    s16 index;
+};
 extern struct MeterOwnerSource *gMeterOwnerSource;
 extern u32 gUnk_030053F4, gUnk_030053F0;
 s32 ViewportGauge_ComputeFill(struct MeterDisplay *, s32);
 static inline s32 OwnerIndex(void)
 {
-    if (!gMeterOwnerSource) return -1;
+    if (!gMeterOwnerSource)
+        return -1;
     return gMeterOwnerSource->index;
 }
 void MeterDisplay_UpdateOwnerMeters(struct MeterDisplay *s)

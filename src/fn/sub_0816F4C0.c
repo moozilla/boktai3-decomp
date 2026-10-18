@@ -27,7 +27,8 @@ void SceneHud_RefillActionStatB(struct SceneHudState *s)
         }
         s->actionOwner->currentStatB = value;
     }
-    Hud_DrawDefaultEnergyMeter(s, 1, 5, 4, s->actionOwner->currentStatB, s->actionOwner->maximumStatB);
+    Hud_DrawDefaultEnergyMeter(s, 1, 5, 4, s->actionOwner->currentStatB,
+                               s->actionOwner->maximumStatB);
     if (complete) {
         if (s->actionTransferDelay)
             Sound_StopSong(0x259);

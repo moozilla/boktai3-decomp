@@ -1,8 +1,12 @@
 #define Hud_RemovePrimaryAnimation PauseMenu_RemoveHeaderAnimation
-#define Hud_RemoveTimerAnimations PauseMenu_RemoveEquipmentSlotAnimations
-#define gFieldHud gUnk_02000214
+#define Hud_RemoveTimerAnimations  PauseMenu_RemoveEquipmentSlotAnimations
+#define gFieldHud                  gUnk_02000214
 #include "global.h"
-struct FieldHud { u8 unknown0[0xC88]; u8 animation0[0x1A0]; u8 animation1[1]; };
+struct FieldHud {
+    u8 unknown0[0xC88];
+    u8 animation0[0x1A0];
+    u8 animation1[1];
+};
 extern struct FieldHud *gUnk_02000214;
 void PauseMenu_RemoveHeaderAnimation(struct FieldHud *);
 void PauseMenu_RemoveEquipmentSlotAnimations(struct FieldHud *);

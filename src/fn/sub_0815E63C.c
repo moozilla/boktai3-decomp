@@ -1,17 +1,19 @@
-#define gGameState                    gUnk_02000710
+#define gGameState gUnk_02000710
 #include "global.h"
 #include "player.h"
 #include "contact_actor.h"
 #include "game_state.h"
 s32 Div(s32, s32);
-void PlayerContact_ApplyResponse(struct Player *, struct ContactCollider *, struct ContactCollider *);
+void PlayerContact_ApplyResponse(struct Player *, struct ContactCollider *,
+                                 struct ContactCollider *);
 void PlayerStats_AddHundredths(struct Player *, s32);
 void PlayerCue_InitCollider(struct Player *);
 static inline u32 masked(u32 *p, u32 mask)
 {
     return *p & mask;
 }
-void PlayerContact_ApplyStatReward(struct ContactCollider *a, struct ContactCollider *b, struct Player *p)
+void PlayerContact_ApplyStatReward(struct ContactCollider *a, struct ContactCollider *b,
+                                   struct Player *p)
 {
     s32 value, gain;
     u32 flags;

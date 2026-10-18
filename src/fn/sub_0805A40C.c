@@ -19,8 +19,8 @@ void ScenePanelRig_TickHideBurst(struct ScenePanelRig *rig)
                 SparkParticle_Spawn(&rig->position, 1, &extent, 0, 0, 0, 2, 2);
                 if (*counter <= 31) {
                     ScenePanel_SetPresentationMode(rig->parent);
-                    SparkParticle_Spawn(&rig->secondary[Mod(*counter, 5)].position, 1, &extent, 0, 0, 0, 2,
-                                 2);
+                    SparkParticle_Spawn(&rig->secondary[Mod(*counter, 5)].position, 1, &extent, 0,
+                                        0, 0, 2, 2);
                 }
             }
         }

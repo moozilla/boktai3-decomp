@@ -1,7 +1,10 @@
 #define gSceneGameState gUnk_02000710
 #include "global.h"
 #include "game_state.h"
-struct SceneSequenceEntry { u8 unknown0[15]; u8 message; };
+struct SceneSequenceEntry {
+    u8 unknown0[15];
+    u8 message;
+};
 struct SceneSequence {
     u8 unknown0[0x48F8];
     struct SceneSequenceEntry *entries;

@@ -1,7 +1,10 @@
 #define MotionSequence_SetCallback Hud_SetInteractionCallback
 #include "global.h"
 /* Tentative semantic names; field offsets are established by static accesses. */
-struct MotionSequence { u8 unknown0[0x5C]; void *panel; };
+struct MotionSequence {
+    u8 unknown0[0x5C];
+    void *panel;
+};
 void PauseMenu_AddSpriteFlags(void *, int, int);
 void PauseMenu_OpenPrompt(void *, s32, s32);
 void PauseMenu_SetConfirmationIndicator(void *, s32);

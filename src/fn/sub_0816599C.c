@@ -1,4 +1,4 @@
-#define gMenuKeys                     gUnk_03005260
+#define gMenuKeys gUnk_03005260
 #include "global.h"
 struct MenuInputController {
     u8 unknown[0x43e8];

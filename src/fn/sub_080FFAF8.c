@@ -1,5 +1,5 @@
 #define WoodenCrate_TestFlags WoodenCrate_HasFlags
-#define gWoodenCrateManager gUnk_020001A4
+#define gWoodenCrateManager   gUnk_020001A4
 #include "global.h"
 #include "engine.h"
 struct WoodenCrate {
@@ -37,10 +37,12 @@ void WoodenCrate_BeginToggleAnimation(struct WoodenCrate *crate)
         crate->animationFrame = crate->animationLength - crate->animationFrame;
     } else {
         if (WoodenCrate_HasFlags(crate, 1)) {
-            Anim_SetSequence(crate->animation, manager->animationData, 1, crate->animationRow, crate->sequenceFlags);
+            Anim_SetSequence(crate->animation, manager->animationData, 1, crate->animationRow,
+                             crate->sequenceFlags);
             WoodenCrate_ClearFlags(crate, 1);
         } else {
-            Anim_SetSequence(crate->animation, manager->animationData, 1, crate->animationRow, crate->sequenceFlags | 4);
+            Anim_SetSequence(crate->animation, manager->animationData, 1, crate->animationRow,
+                             crate->sequenceFlags | 4);
             WoodenCrate_ClearFlags(crate, 2);
         }
         crate->state = 2;

@@ -1,8 +1,18 @@
 #include "global.h"
 struct CollisionBody;
-struct CollisionBodyLink { struct CollisionBody *body; void *previous; struct CollisionBodyLink *next; };
-struct CollisionGroup { struct CollisionBodyLink *pending, *targets; s32 unknown, count; };
-struct CollisionManager { u8 pad0[0x18]; struct CollisionGroup groups[10]; };
+struct CollisionBodyLink {
+    struct CollisionBody *body;
+    void *previous;
+    struct CollisionBodyLink *next;
+};
+struct CollisionGroup {
+    struct CollisionBodyLink *pending, *targets;
+    s32 unknown, count;
+};
+struct CollisionManager {
+    u8 pad0[0x18];
+    struct CollisionGroup groups[10];
+};
 void sub_0811B094(struct CollisionManager *, struct CollisionGroup *, s32);
 void Collision_DispatchOverlaps(struct CollisionBody *, struct CollisionBodyLink *);
 void Heap_Free(void *);

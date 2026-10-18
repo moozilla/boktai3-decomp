@@ -1,4 +1,4 @@
-#define gHoverSineTable gUnk_086149C4
+#define gHoverSineTable   gUnk_086149C4
 #define gSceneHeightState gUnk_02000580
 #include "global.h"
 #include "scene_actor_reset.h"

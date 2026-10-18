@@ -2,8 +2,9 @@
 #include "player.h"
 void Sound_PlaySong(u32);
 s32 PlayerContact_ApplySyntheticContact(struct Player *, s32, u32, u32, u32, u32);
-s32 Player_ApplyInterpolatedMovement(struct Player *p, struct SceneVec *position, s32 frame, u32 direction,
-                 s32 resetValue, s32 parameter, s32 request, u32 option)
+s32 Player_ApplyInterpolatedMovement(struct Player *p, struct SceneVec *position, s32 frame,
+                                     u32 direction, s32 resetValue, s32 parameter, s32 request,
+                                     u32 option)
 {
     s32 result;
     if (p->kind != 1 || p->tetherMode != 0x19)

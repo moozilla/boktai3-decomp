@@ -2,7 +2,8 @@
 #include "scene_actor_placement.h"
 s32 Math_Atan2(s32, s32);
 void sub_0812E5A4(struct SceneActorPlacementView *);
-static inline void Difference(struct ContactPosition *out, const struct ContactPosition *b, const struct ContactPosition *a)
+static inline void Difference(struct ContactPosition *out, const struct ContactPosition *b,
+                              const struct ContactPosition *a)
 {
     out->x = a->x - b->x;
     out->y = a->y - b->y;
@@ -11,7 +12,8 @@ static inline void Difference(struct ContactPosition *out, const struct ContactP
 s32 SceneActorPlacement_BeginDestinationJump(struct SceneActorPlacementView *actor)
 {
     struct ContactPosition delta;
-    if (actor->category == 3 && SceneActorPlacement_ReadFlags16(actor, 0x100) && (actor->flags2D8 & 0x400)) {
+    if (actor->category == 3 && SceneActorPlacement_ReadFlags16(actor, 0x100) &&
+        (actor->flags2D8 & 0x400)) {
         Difference(&delta, &actor->position, &actor->destination);
         actor->velocity.x = Div(delta.x, 36);
         actor->velocity.y = 20;

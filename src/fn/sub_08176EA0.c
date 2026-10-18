@@ -1,5 +1,5 @@
 #include "global.h"
-#define Hud_SetPhase Hud_SetUpdateCallback
+#define Hud_SetPhase        Hud_SetUpdateCallback
 #define gDisplayUpdateFlags gUnk_0300523C
 struct HudManager {
     u8 pad0[0xA12];

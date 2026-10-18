@@ -1,5 +1,5 @@
 #define SceneHud_FindCategoryAction Inventory_GetQuantityByStorage
-#define SceneHud_SetIconPalette PauseMenu_SetSpritePalette
+#define SceneHud_SetIconPalette     PauseMenu_SetSpritePalette
 #include "global.h"
 #include "scene_hud_display.h"
 s32 SceneHud_FindCategoryAction(u32, u32);
@@ -12,7 +12,8 @@ void SceneHud_BeginActionIconMotion(struct SceneHudState *s, s32 index, s32 sour
     void *resource;
     w->flags &= ~1;
     resource = s->motionResource;
-    Anim_LoadKeyframe(w, resource, (u16)sub_0822D604(SceneHud_FindCategoryAction(s->actionCategory, source)), 1);
+    Anim_LoadKeyframe(w, resource,
+                      (u16)sub_0822D604(SceneHud_FindCategoryAction(s->actionCategory, source)), 1);
     SceneHud_GetActionIconPosition(&w->position, source);
     SceneHud_GetActionIconPosition(&s->actionTargets[index], target);
     source += 10;

@@ -1,5 +1,7 @@
 #include "global.h"
-struct TransitionVector { s32 x:16, y:16, z:16, pad:16; };
+struct TransitionVector {
+    s32 x : 16, y : 16, z : 16, pad : 16;
+};
 struct PlayerTransition {
     u8 unknown0[0x18];
     u8 *owner;

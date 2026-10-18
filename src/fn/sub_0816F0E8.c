@@ -1,4 +1,4 @@
-#define gMenuTransitionKeys                gUnk_03005260
+#define gMenuTransitionKeys        gUnk_03005260
 #define MenuTransition_SetCallback Hud_SetInteractionCallback
 #include "global.h"
 void SceneHud_RefreshActionIcons(void *);
@@ -49,7 +49,7 @@ void MenuTransition_UpdateWidgetFlicker(u8 *p)
     }
     Hud_DrawDefaultHealthMeter(p, 1, 5, 3);
     Hud_DrawDefaultEnergyMeter(p, 1, 5, 4, ((struct MenuFlickerView *)p)->target->y,
-                 ((struct MenuFlickerView *)p)->target->z);
+                               ((struct MenuFlickerView *)p)->target->z);
     {
         u32 next = ((struct MenuFlickerView *)p)->timer + 1;
         r = 0;

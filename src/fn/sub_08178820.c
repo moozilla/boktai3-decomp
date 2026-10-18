@@ -18,7 +18,8 @@ void SceneHud_RefreshGameplayDisplay(struct SceneHudState *hud)
     if (hud->controlMode > 2)
         return;
     Hud_DrawDefaultHealthMeter(hud, 0, 4, 1);
-    Hud_DrawDefaultEnergyMeter(hud, 0, 4, 2, hud->actionOwner->currentStatB, hud->actionOwner->maximumStatB);
+    Hud_DrawDefaultEnergyMeter(hud, 0, 4, 2, hud->actionOwner->currentStatB,
+                               hud->actionOwner->maximumStatB);
     SceneHud_DrawSlotMeter(hud, 0, 9, 0x12);
     sub_08165020(hud);
     sub_08164DC0(hud);

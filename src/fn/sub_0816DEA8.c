@@ -1,6 +1,6 @@
-#define InventoryGrid_SetPhaseCallback Hud_SetInteractionCallback
+#define InventoryGrid_SetPhaseCallback       Hud_SetInteractionCallback
 #define InventoryGrid_BeginPaletteTransition PauseMenu_StartPaletteTransition
-#define InventoryGrid_UpdateIconMotion PauseMenu_UpdateSpriteMotion
+#define InventoryGrid_UpdateIconMotion       PauseMenu_UpdateSpriteMotion
 #include "global.h"
 struct InventoryGrid {
     u8 unknown0000[0xA4E];

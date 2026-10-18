@@ -26,17 +26,21 @@ void MenuDisplay_SetPaletteOverrides(struct MenuDisplay *p, s32 a, s32 b, s32 c,
     if (a == 1) {
         p->channel0Palette = 0xB100;
         p->channel0PaletteData = p->overridePalette;
-    } else Anim_SelectPaletteBank((u8 *)p + 0x1600, 0x3AA);
+    } else
+        Anim_SelectPaletteBank((u8 *)p + 0x1600, 0x3AA);
     if (b == 1) {
         p->channel1Palette = 0xB100;
         p->channel1PaletteData = p->overridePalette;
-    } else Anim_SelectPaletteBank((u8 *)p + 0x15A0, 0x3AA);
+    } else
+        Anim_SelectPaletteBank((u8 *)p + 0x15A0, 0x3AA);
     if (c == 1) {
         p->channel2Palette = 0xB100;
         p->channel2PaletteData = p->overridePalette;
-    } else Anim_SelectPaletteBank((u8 *)p + 0x16C0, 0x3AA);
+    } else
+        Anim_SelectPaletteBank((u8 *)p + 0x16C0, 0x3AA);
     if (d == 1) {
         p->channel3Palette = 0xB100;
         p->channel3PaletteData = p->overridePalette;
-    } else Anim_SelectPaletteBank((u8 *)p + 0x3340, 0x3AA);
+    } else
+        Anim_SelectPaletteBank((u8 *)p + 0x3340, 0x3AA);
 }

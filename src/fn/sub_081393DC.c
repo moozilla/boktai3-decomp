@@ -15,7 +15,8 @@ u8 *BallisticSpriteEffect_EnsureManager(void)
         return gUnk_020004CC;
     p = Task_Create(0xa, 0x39c);
     if (p != 0) {
-        Task_SetCallbacks(p, BallisticSpriteEffect_UpdateManager, BallisticSpriteEffect_DestroyManager);
+        Task_SetCallbacks(p, BallisticSpriteEffect_UpdateManager,
+                          BallisticSpriteEffect_DestroyManager);
         if (SceneProcSprites_Initialize(p) < 0) {
             Task_Kill(p);
             return 0;

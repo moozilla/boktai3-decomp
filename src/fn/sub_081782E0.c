@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene_hud_display.h"
-#define gSceneHud                gUnk_02000214
+#define gSceneHud gUnk_02000214
 extern struct SceneHudState *gSceneHud;
 extern struct Player *gUnk_02000580[];
 extern u32 gUnk_030053F4;

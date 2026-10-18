@@ -1,6 +1,6 @@
-#define SceneInput_MoveUp Hud_MoveGridUp
-#define SceneInput_MoveDown Hud_MoveGridDown
-#define SceneInput_MoveLeft Hud_MoveGridLeft
+#define SceneInput_MoveUp    Hud_MoveGridUp
+#define SceneInput_MoveDown  Hud_MoveGridDown
+#define SceneInput_MoveLeft  Hud_MoveGridLeft
 #define SceneInput_MoveRight Hud_MoveGridRight
 #include "global.h"
 #include "scene_input_navigation.h"

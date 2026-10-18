@@ -13,8 +13,8 @@ struct SpritePairEffectEntry {
     u32 *height;
 };
 void Position_GetHeightAdjustedCoordinates(u32, u32, void *);
-void SpatialIndex_InitEntry(void *, void *, struct EffectOffset *, struct EffectOffset *, u32, u32, u32, u32,
-                  u32, u32, u32);
+void SpatialIndex_InitEntry(void *, void *, struct EffectOffset *, struct EffectOffset *, u32, u32,
+                            u32, u32, u32, u32, u32);
 void SpritePairEntry_CreateEffect(struct SpritePairEffectEntry *entry, u32 a, u32 b, u32 c)
 {
     u32 position[2];
@@ -27,5 +27,6 @@ void SpritePairEntry_CreateEffect(struct SpritePairEffectEntry *entry, u32 a, u3
     second.a.lo = 10;
     second.a.hi = first.a.hi;
     second.b.lo = -21;
-    SpatialIndex_InitEntry((u8 *)entry + 4, position, &first, &second, 12, c, 5, b, 20, a, (u32)entry);
+    SpatialIndex_InitEntry((u8 *)entry + 4, position, &first, &second, 12, c, 5, b, 20, a,
+                           (u32)entry);
 }

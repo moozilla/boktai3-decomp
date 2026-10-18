@@ -1,4 +1,4 @@
-#define Player_ResetDefaultAction PlayerCue_EnterStandUpdate
+#define Player_ResetDefaultAction          PlayerCue_EnterStandUpdate
 #define Player_ConsumePendingActionTrigger PlayerCue_CompleteAction
 #include "global.h"
 #include "player.h"

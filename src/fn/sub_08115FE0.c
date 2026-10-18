@@ -1,4 +1,4 @@
-#define gCompactParticlePool           gUnk_020001E8
+#define gCompactParticlePool gUnk_020001E8
 // Tentative family and semantic names; layouts follow observed field offsets.
 #include "global.h"
 struct CompactParticleSlot {

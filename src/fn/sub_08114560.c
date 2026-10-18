@@ -7,7 +7,8 @@ struct Z {
     struct H a, b;
 };
 void Position_GetHeightAdjustedCoordinates(void *, u32, void *);
-void SpatialIndex_InitEntry(void *, void *, struct Z *, struct Z *, u32, u32, u32, u32, u32, u32, u32);
+void SpatialIndex_InitEntry(void *, void *, struct Z *, struct Z *, u32, u32, u32, u32, u32, u32,
+                            u32);
 void NativeEffect_InitDefaultCollider(u8 *s, u32 y, u32 x)
 {
     u32 l[2];

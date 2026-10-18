@@ -19,7 +19,8 @@ u32 TerrainOverlay_QueueRemoveActor(u32 *);
 void SceneBody_Unregister(void *);
 static inline u8 TilePool_IsUsed(struct TileManager *pool, s32 i)
 {
-    if (pool->used & (1 << i)) return 1;
+    if (pool->used & (1 << i))
+        return 1;
     return 0;
 }
 u32 TilePool_Destroy(struct TileManager *pool)

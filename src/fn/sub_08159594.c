@@ -8,7 +8,8 @@ struct PlayerActionRecord {
 extern const struct PlayerActionRecord gUnk_08E6092C[];
 void Player_SetResistance(struct Player *, s32, u8);
 void ActionRecord_CopyFromEntry(struct PlayerActionEntry *, struct PlayerActionRecord *);
-void Player_BuildActionModifiers(struct Player *, struct PlayerStatModifierContext *, struct PlayerActionRecord *);
+void Player_BuildActionModifiers(struct Player *, struct PlayerStatModifierContext *,
+                                 struct PlayerActionRecord *);
 void PlayerAction_RefreshFlagState(struct Player *, void *, s32);
 void PlayerAction_RefreshModifiers(struct Player *p)
 {

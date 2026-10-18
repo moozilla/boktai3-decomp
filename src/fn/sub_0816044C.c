@@ -1,5 +1,7 @@
 #include "global.h"
-struct FrameDisplayPosition { u32 words[2]; };
+struct FrameDisplayPosition {
+    u32 words[2];
+};
 struct FrameDisplayAnimation {
     u8 unknown0[0x20];
     struct FrameDisplayPosition position;
@@ -38,8 +40,10 @@ void FrameDisplay_UpdateSprite(struct FrameDisplay *p)
             p->sprite.flags &= ~1;
             SetFrame(&p->sprite, frame);
         }
-        if (*p->flip) p->sprite.flags |= 4;
-        else p->sprite.flags &= ~4;
+        if (*p->flip)
+            p->sprite.flags |= 4;
+        else
+            p->sprite.flags &= ~4;
     }
     p->sprite.position = p->animation->position;
     p->sprite.dirty = 1;
