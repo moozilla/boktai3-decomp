@@ -128,3 +128,4 @@ addr,function,name,family,note
 080F0324,sub_080F0324,SceneActorControl_BeginSoundTransition,"SceneActorControl","plays a variant sound and starts or suppresses an animation transition"
 080F0738,sub_080F0738,SceneActor_InitCollision5005,"SceneActor collision initialization","initialize body and attack collision for flags 0x5005"
 080F07BC,sub_080F07BC,SceneActor_BeginReaction22,"SceneActor reaction state","reset phase and install reaction code 0x22"
+080F1E84,sub_080F1E84,ColorPulse_FadeRed,"ColorPulse","fade red and advance the color callback"
