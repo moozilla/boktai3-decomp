@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_registry.h"
 
-
 void SceneActorRegistry_SendToCategory(s32, s16 *);
 
 struct VornData {

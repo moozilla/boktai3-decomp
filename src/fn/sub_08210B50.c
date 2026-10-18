@@ -5,7 +5,8 @@ s32 Mod(s32, s32);
 void Anim_LoadKeyframe(void *, void *, u16, u32);
 s32 Collection_UpdateCountDigits(u8 *p)
 {
-    s32 v = Collection_CountUnlockedEntries(p), a = Div(v, 10), b = Mod(v, 10), c = Div(27, 10), d = Mod(27, 10);
+    s32 v = Collection_CountUnlockedEntries(p), a = Div(v, 10), b = Mod(v, 10), c = Div(27, 10),
+        d = Mod(27, 10);
     Anim_LoadKeyframe(p + 0x1c4, p + 0x24, a, 0);
     Anim_LoadKeyframe(p + 0x224, p + 0x24, b, 0);
     Anim_LoadKeyframe(p + 0x284, p + 0x24, c, 0);

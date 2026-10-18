@@ -89,11 +89,13 @@ void sub_08249244(struct DirectionalManager *, struct DirectionalController *, s
 
 u32 DirectionalController_SetState(struct DirectionalController *, u32);
 u32 DirectionalController_ConsumeEntered(struct DirectionalController *);
-s32 DirectionalController_InitSlot(struct DirectionalManager *, struct DirectionalController *, s32);
-struct DirectionalController *DirectionalController_FindByScriptId(struct DirectionalManager *, s32, s32 *);
+s32 DirectionalController_InitSlot(struct DirectionalManager *, struct DirectionalController *,
+                                   s32);
+struct DirectionalController *DirectionalController_FindByScriptId(struct DirectionalManager *, s32,
+                                                                   s32 *);
 u32 DirectionalController_SetMarkerFadeLevel(struct DirectionalController *, u32);
 u32 DirectionalController_SetPosition(struct DirectionalManager *, struct DirectionalController *,
-                 struct DirectionalPackedVec *);
+                                      struct DirectionalPackedVec *);
 void LevelController_Update(struct DirectionalManager *, struct DirectionalController *);
 s32 Actor_CanInteractWithController(struct DirectionalManager *, struct DirectionalController *);
 void LevelController_RunScript(struct DirectionalManager *, struct DirectionalController *, u32);

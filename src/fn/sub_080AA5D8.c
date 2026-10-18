@@ -17,13 +17,16 @@ struct ActorTrail {
     u8 activeCount;
 };
 void sub_080AB294(struct ContactPosition *);
-static inline u8 isRemoved(struct TrailSegment *segment) {
+static inline u8 isRemoved(struct TrailSegment *segment)
+{
     u32 mask = 1;
     u32 value = segment->flags;
-    if (mask & value) return 1;
+    if (mask & value)
+        return 1;
     return 0;
 }
-void ActorTrail_RemoveAllSegments(struct SceneActorRegistryResetView *actor) {
+void ActorTrail_RemoveAllSegments(struct SceneActorRegistryResetView *actor)
+{
     struct ActorTrail *trail = actor->context;
     struct TrailSegment *segments = trail->segments;
     s32 i;

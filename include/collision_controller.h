@@ -83,7 +83,8 @@ void sub_08009E30(void);
 struct CollisionSlot *CollisionController_FindFreeSlot(struct CollisionManager *);
 s32 CollisionController_InitSlot(struct CollisionManager *, struct CollisionSlot *);
 u32 CollisionController_RemoveSlot(struct CollisionManager *, struct CollisionSlot *);
-void CollisionController_ReceiveHit(struct SceneCollider *, struct CollisionOther *, struct CollisionSlot *);
+void CollisionController_ReceiveHit(struct SceneCollider *, struct CollisionOther *,
+                                    struct CollisionSlot *);
 void CollisionController_UpdateIdleAnimationPaused(u32, struct CollisionSlot *);
 void CollisionController_UpdateIdleAnimation(struct CollisionManager *, struct CollisionSlot *);
 void CollisionController_UpdateHitDelayAnimation(u32, struct CollisionSlot *);

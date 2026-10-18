@@ -40,7 +40,8 @@ void sub_0823E704(u8 *p)
             sub_0823AAF8(p);
         }
     }
-    Collider_SetAttackProperties(q + 0x48, resource, *(u16 *)(q + 0xb8), 4, flags, *(u16 *)(q + 0xba));
+    Collider_SetAttackProperties(q + 0x48, resource, *(u16 *)(q + 0xb8), 4, flags,
+                                 *(u16 *)(q + 0xba));
     q[0x8a] = q[0xc8];
     *(u16 *)(q + 0xc6) = 0;
 }

@@ -5,7 +5,8 @@ struct SceneActorBehaviorTimer {
     u16 timer;
 };
 void sub_080B9158(void);
-void SceneActorControl_BeginTimedBehavior56(struct SceneActorRegistryResetView *s, struct SceneActorBehaviorTimer *other)
+void SceneActorControl_BeginTimedBehavior56(struct SceneActorRegistryResetView *s,
+                                            struct SceneActorBehaviorTimer *other)
 {
     switch (s->category) {
         case 6:

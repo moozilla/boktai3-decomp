@@ -1,6 +1,5 @@
 #include "global.h"
 
-
 struct SkeletonLink {
     u8 filler[0x628];
     u32 h628;
