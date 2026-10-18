@@ -850,3 +850,4 @@ addr,function,name,family,note
 0817BC64,sub_0817BC64,ActorDecision_UpdateDelayPhase,"ActorDecision (tentative)","sets timeout and requests transition after thirty ticks"
 0817BF10,sub_0817BF10,ActorDecision_UpdateFlagPhase,"ActorDecision (tentative)","sets a transition flag or exits after a timeout"
 0817BFA4,sub_0817BFA4,SceneActorState_UpdateAnimationRequest,"SceneActorState","consume phase reset and queue animation request"
+0817C00C,sub_0817C00C,ActorDecision_UpdatePendingPhase,"ActorDecision (tentative)","processes a pending transition with a blocking flag"
