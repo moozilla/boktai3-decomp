@@ -8,7 +8,7 @@ struct P {
     s16 p;
     s16 y;
 };
-u32 sub_0821F18C(struct R *r, struct P *pt, u32 i)
+u32 NavMesh_IsPointInsideRegion(struct R *r, struct P *pt, u32 i)
 {
     struct R *e = r + i;
     s32 x = pt->x;

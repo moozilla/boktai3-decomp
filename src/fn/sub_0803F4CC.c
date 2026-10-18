@@ -1,5 +1,5 @@
 #include "scene_arc.h"
-struct SceneArcManager *sub_0821A2C4(u32);
+struct SceneArcManager *ResourceRegistry_GetResource(u32);
 struct SceneArcSlot *SceneArc_FindFreeSlot(struct SceneArcManager *, s32 *);
 struct SceneArcManager *SceneArc_CreateManager(void);
 void GroundEffect_EnableProjection(struct SceneGroundEffect *);
@@ -10,7 +10,7 @@ s32 SceneArc_Create(const struct ScenePoolVec32 *from, const struct ScenePoolVec
     const struct ScenePoolVec32 *targetArg = to;
     u32 duration = flightDuration;
     u32 end = endFrame;
-    struct SceneArcManager *manager = sub_0821A2C4(0xfe2c);
+    struct SceneArcManager *manager = ResourceRegistry_GetResource(0xfe2c);
     struct SceneArcSlot *slot;
     s32 index;
     u32 zero;

@@ -7,7 +7,7 @@ void SceneActorCollision_InitExternalAttack(struct SceneActorRegistryActor *acto
         u32 flags = 0x2001;
         Collider_Init(collider, (u16)actor->id, flags, 0, 16, size, offset);
     }
-    sub_0821FF58(collider, SceneActorCollision_ReadAttackField3C(actor, index),
+    Collider_SetAttackProperties(collider, SceneActorCollision_ReadAttackField3C(actor, index),
                  SceneActorCollision_ReadAttackField40(actor, index), 0,
                  SceneActorCollision_ReadAttackReactionFlags(actor, index),
                  SceneActorCollision_ReadAttackField44(actor, index));

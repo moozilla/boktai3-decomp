@@ -1,5 +1,7 @@
 // COMPILER: old_agbcc
 #include "global.h"
+/* Video_SaveWindowLayerMasks: Saves the WININ and WINOUT registers for later restoration */
+#define Video_SaveWindowLayerMasks sub_08216FFC
 
 extern u16 gUnk_03001556, gUnk_03001558;
 

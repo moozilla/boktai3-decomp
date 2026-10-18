@@ -4,7 +4,7 @@ void *Script_GetPc(void);
 s32 Script_GetValue(void);
 u32 Script_GetKeywordValue(u32, u32);
 void sub_0822B6C8(s16, s16, s16, s16, u8, u16);
-void sub_0822B968(void)
+void SceneStimulus_AddFromScript(void)
 {
     u16 a;
     u16 b;

@@ -15,11 +15,11 @@ struct Q {
 };
 void Collider_Init(u8 *, u16, u32, u32, u32, struct Z *, struct Z *);
 void Collider_SetCallback(u8 *, void (*)(void), u8 *);
-void sub_0821FF58(u8 *, s32, s32, u32, u32, s32);
+void Collider_SetAttackProperties(u8 *, s32, s32, u32, u32, s32);
 void Collider_SetPosition(u8 *, u8 *, u32);
-void sub_0821FF7C(void *, u32, u32, u32);
+void Collider_SetBodyProperties(void *, u32, u32, u32);
 s32 Collider_Refresh(u8 *);
-void sub_082015D0(void);
+void ScriptCombatActor_OnPassiveColliderContact(void);
 void sub_082015D4(void);
 void sub_08201784(u8 *p)
 {
@@ -32,8 +32,8 @@ void sub_08201784(u8 *p)
     *(u32 *)&b.a = 0x780000;
     b.b.lo = 0;
     Collider_Init(q, 0, 0x2001, 0, 0x10, &a, &b);
-    Collider_SetCallback(q, sub_082015D0, p);
-    sub_0821FF58(q, *(s16 *)(p + 0x174), *(s16 *)(p + 0x176), 0, 0, *(s16 *)(p + 0x178));
+    Collider_SetCallback(q, ScriptCombatActor_OnPassiveColliderContact, p);
+    Collider_SetAttackProperties(q, *(s16 *)(p + 0x174), *(s16 *)(p + 0x176), 0, 0, *(s16 *)(p + 0x178));
     q += 0x54;
     v = (u16 *)&a;
     r = (u16 *)&b;
@@ -46,7 +46,7 @@ void sub_08201784(u8 *p)
     Collider_Init(q, 0, 0x5009, 0, 0x10, &a, &b);
     Collider_SetPosition(q, p + 0x40, 0);
     Collider_SetCallback(q, sub_082015D4, p);
-    sub_0821FF7C(q, 0, *(u16 *)(p + 0x19a), *(u16 *)(p + 0x19c));
+    Collider_SetBodyProperties(q, 0, *(u16 *)(p + 0x19a), *(u16 *)(p + 0x19c));
     Collider_Refresh(q);
     ((struct Q *)q)->flags |= 4;
 }

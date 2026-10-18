@@ -1,5 +1,5 @@
 #include "global.h"
-u32 sub_08225A2C(void)
+u32 SceneBody_UpdateRegistryTask(void)
 {
     return 0;
 }

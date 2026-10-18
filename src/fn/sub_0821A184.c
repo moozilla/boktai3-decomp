@@ -6,7 +6,7 @@ struct Entry {
 };
 extern struct Entry gUnk_0203B000[];
 extern s32 gUnk_030052F0;
-struct Entry *sub_0821A184(void)
+struct Entry *ResourceRegistry_AllocateEntry(void)
 {
     s32 i;
     struct Entry *entry;

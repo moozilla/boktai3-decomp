@@ -1,6 +1,6 @@
 #include "global.h"
 void Effect_Remove(void *);
-void sub_08239130(u8 *s)
+void Player_DestroySixParticleEffects(u8 *s)
 {
     u8 *p = s + 0x870;
     s32 i = 5;

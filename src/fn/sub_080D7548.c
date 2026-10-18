@@ -7,7 +7,7 @@ struct S {
     u16 f;
 };
 
-void sub_080D7548(struct S *s)
+void Mummy_OnMovementUpdate(struct S *s)
 {
     u32 m = 0x100;
     if (!(s->f & m))

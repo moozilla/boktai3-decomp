@@ -12,7 +12,7 @@ struct P {
 };
 void sub_080F4CFC(void);
 
-void sub_080F4CC4(struct P *p)
+void Sword_InitWaveAttack(struct P *p)
 {
     p->z = 0;
     p->cb = sub_080F4CFC;

@@ -8,11 +8,11 @@ struct S {
     s16 f34;
 };
 void sub_081C35EC(u32, u32, u32);
-void sub_081C4E48(void);
+void RegistryC281_UpdateRepositioning(void);
 
-void sub_081C4D58(struct S *p)
+void SceneTransition_StartChildTransition(struct S *p)
 {
     sub_081C35EC(p->f18, 0, 0x5a);
-    p->f30 = sub_081C4E48;
+    p->f30 = RegistryC281_UpdateRepositioning;
     p->f34 = 0;
 }

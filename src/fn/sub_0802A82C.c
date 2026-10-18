@@ -1,11 +1,11 @@
 #include "global.h"
-void sub_080297FC(u8 *, u32, u32, u32);
+void GridAttackActor_SetAnimation(u8 *, u32, u32, u32);
 void sub_0824923C(u8 *, void (*)(u8 *));
-void sub_0802A82C(u8 *s)
+void GridAttack_UpdateAnimationElevenState(u8 *s)
 {
     if (s[0xB1]) {
         s[0xB1] = 0;
-        sub_080297FC(s, 11, 1, 8);
+        GridAttackActor_SetAnimation(s, 11, 1, 8);
     }
     {
         u32 zero;

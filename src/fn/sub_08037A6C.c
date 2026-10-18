@@ -7,10 +7,10 @@ struct P {
     u8 pad2[5];
     u32 d;
 };
-s32 sub_08036AE0(void);
-void sub_08037A6C(struct P *p)
+s32 Wireless_GetOperation(void);
+void WirelessPeerMenu_UpdateConnectionState(struct P *p)
 {
-    s32 r = sub_08036AE0();
+    s32 r = Wireless_GetOperation();
     u32 v;
     if (p->b != 7) {
         if (r != p->a) {

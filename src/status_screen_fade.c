@@ -1,4 +1,6 @@
 #include "status_screen.h"
+/* NumericOverlay_ClearActive: sets gUnk_02000048 (the live NumericOverlay pointer, per numeric_overlay.h) back to NULL; twin of NumericOverlay_Destroy in numeric_overlay.c */
+#define NumericOverlay_ClearActive sub_0800F4B8
 // MATCHING_CONCESSION: register-pinning
 
 void StatusScreen_FadeAndExit(struct StatusScreen *p)
@@ -161,7 +163,7 @@ int StatusScreen_Update(struct StatusScreen *p)
         zero = 0;
         p->active = next;
     }
-    sub_0800E77C(p);
+    StatusScreen_RefreshDirtyDisplays(p);
     return BgGfx_LoadTilemapResult(0, 0, 0, 0, zero);
 }
 
@@ -225,7 +227,7 @@ int StatusScreen_Initialize(struct StatusScreen *p, u16 id)
     if (!palette)
         return -1;
     if (map[0] == 'M' && map[1] == 'P')
-        sub_08215A74(p->bg, 0);
+        Bg_SetPriority(p->bg, 0);
     else {
         void *dst = Video_GetBackgroundMap(0);
         sub_082160B8(p->bg, 0, map, 0, 0, 0, 0, dst);
@@ -262,7 +264,7 @@ int StatusScreen_Initialize(struct StatusScreen *p, u16 id)
     return 0;
 }
 
-void *sub_0800F474(u32 arg)
+void *StatusScreen_Open(u32 arg)
 {
     void *obj;
     obj = Task_Create(9, 0x308);

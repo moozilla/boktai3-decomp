@@ -1,4 +1,6 @@
 #include "global.h"
+/* MessageWindow_SetTextStream: Replaces the primary text stream and clears message table ownership and entry state */
+#define MessageWindow_SetTextStream sub_08030EDC
 
 extern u8 *gUnk_020000DC;
 

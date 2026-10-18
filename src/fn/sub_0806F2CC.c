@@ -1,7 +1,7 @@
 #include "engine.h"
 void GameState_ClearSlots7A8FromScript(void);
-void sub_0811DB6C(void);
-void sub_0811D54C(void);
+void GameState_ClearChallengeCompletionFlags(void);
+void GameState_ResetChallengeRecords(void);
 static inline u16 *SceneState_HalfwordAt(u8 *base, s32 offset)
 {
     return (u16 *)(base + offset);
@@ -28,7 +28,7 @@ void SceneState_ResetRuntimeFields(void)
     *((u16 *)(((u8 *)gUnk_02000710) + 0x7F8)) = 1;
     *((u32 *)(((u8 *)gUnk_02000710) + 0x81C)) = 0;
     GameState_ClearSlots7A8FromScript();
-    sub_0811DB6C();
-    sub_0811D54C();
+    GameState_ClearChallengeCompletionFlags();
+    GameState_ResetChallengeRecords();
     *((u32 *)(((u8 *)gUnk_02000710) + 0x820)) = 0;
 }

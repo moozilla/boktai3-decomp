@@ -54,17 +54,17 @@ extern struct ChoiceKeys gUnk_03005260;
 
 void ChoiceMenu_DispatchSelection(struct ChoiceMenu *p, s32 selection);
 void ChoiceMenu_Select(struct ChoiceMenu *p, s32 selection);
-s32 sub_08006478(struct ChoiceMenu *p, s32 a, s32 d);
+s32 ChoiceMenu_FindSelectableRow(struct ChoiceMenu *p, s32 a, s32 d);
 s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p);
-u32 sub_080066C0(struct ChoiceMenu *p);
-u32 sub_08006710(struct ChoiceMenu *p);
-void sub_08006738(struct ChoiceMenu *p);
+u32 ChoiceMenu_Update(struct ChoiceMenu *p);
+u32 ChoiceMenu_Destroy(struct ChoiceMenu *p);
+void ChoiceMenu_PrintText(struct ChoiceMenu *p);
 u8 *ChoiceMenu_ParseTag(struct ChoiceMenu *p, u8 *text);
 void ChoiceMenu_LayoutText(struct ChoiceMenu *p, void *window);
 s32 ChoiceMenu_Initialize(struct ChoiceMenu *p, void *window, s32 stringBase, s32 *options);
 struct ChoiceMenu *sub_08006CD0(void *window, s32 stringBase, void *callback, s32 *options);
 struct ChoiceMenu *ChoiceMenu_CreateFromScript(void);
-void sub_08006E98(void);
+void ChoiceMenu_ReloadFromScript(void);
 
 /* Tag-parsing helpers; expand inside ChoiceMenu_ParseTag (use its p and cursor). */
 #define READ_NUMBER()                                                                              \
@@ -93,7 +93,7 @@ void sub_08006E98(void);
                 f;                                                                                 \
             }) &&                                                                                  \
             length)                                                                                \
-            value = sub_080321A0(p->scratch, length);                                              \
+            value = Text_ParseDecimal(p->scratch, length);                                              \
         else                                                                                       \
             value = 0;                                                                             \
         value;                                                                                     \
@@ -124,7 +124,7 @@ void sub_08006E98(void);
                 f;                                                                                 \
             }) &&                                                                                  \
             length) {                                                                              \
-            s32 value = sub_080321A0(p->scratch, length);                                          \
+            s32 value = Text_ParseDecimal(p->scratch, length);                                          \
             register u8 *out asm("r2") = &p->explicitWidth;                                        \
             asm("" : : "r"(out));                                                                  \
             *out = value;                                                                          \

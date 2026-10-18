@@ -2,7 +2,7 @@
 
 void sub_08159860(u32, u32, s32);
 
-void sub_0819074C(u32 a, u32 b, u8 *p)
+void ScenePanelEffect_OnContact(u32 a, u32 b, u8 *p)
 {
     u8 *q = *(u8 **)(p + 0x184);
     *(p + 0x180) = 0xff;

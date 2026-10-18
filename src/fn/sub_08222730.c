@@ -7,7 +7,7 @@ struct T {
 };
 void sub_082227D8(void);
 
-void sub_08222730(void)
+void Serial_EnableReceiveInterrupt(void)
 {
     u16 ie;
     struct T *t;

@@ -1,6 +1,6 @@
 #include "global.h"
-u32 sub_0821AA88(u8 *);
-u32 sub_0821AAB0(u8 *p)
+u32 Script_ReadValueSafe(u8 *);
+u32 Script_ReadString(u8 *p)
 {
-    return sub_0821AA88(p);
+    return Script_ReadValueSafe(p);
 }

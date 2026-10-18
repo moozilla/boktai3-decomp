@@ -3,7 +3,7 @@
 extern s32 gUnk_03005308;
 extern u8 gUnk_0203B400[];
 s32 Mod(s32, s32);
-u8 *sub_0821E76C(u8 *);
+u8 *Path_GetPointData(u8 *);
 
 struct E {
     u8 pad0[2];
@@ -17,7 +17,7 @@ struct S080FA7D0 {
     struct E e;
 };
 
-void sub_080FA7D0(struct S080FA7D0 *s)
+void Axe_SelectRandomRoutePoint(struct S080FA7D0 *s)
 {
     struct E *e = &s->e;
     u8 v;
@@ -28,5 +28,5 @@ void sub_080FA7D0(struct S080FA7D0 *s)
         v = Mod(v + 1, *e->p);
     e->a = v;
     e->b = 0;
-    e->q = sub_0821E76C(e->p) + (e->a << 3);
+    e->q = Path_GetPointData(e->p) + (e->a << 3);
 }

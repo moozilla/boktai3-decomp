@@ -4,9 +4,9 @@ struct Ref {
     u16 first, index;
 };
 u32 Script_GetValue(void);
-void sub_0821AAD8(struct Ref *);
-void sub_0821B4C8(struct Ref *, s32, s32);
-s32 sub_0821E7EC(s16 *, u32, u32);
+void Script_ReadReference(struct Ref *);
+void Script_WriteReferenceValue(struct Ref *, s32, s32);
+s32 Path_GetPointPositionById(s16 *, u32, u32);
 s32 Path_GetPointFromScript(void)
 {
     s16 vector[4];
@@ -15,13 +15,13 @@ s32 Path_GetPointFromScript(void)
     u32 first = Script_GetValue();
     u32 second = Script_GetValue();
     saved = vector;
-    if (sub_0821E7EC(vector, first, second) < 0)
+    if (Path_GetPointPositionById(vector, first, second) < 0)
         return -1;
-    sub_0821AAD8(&ref);
-    sub_0821B4C8(&ref, 0, vector[0]);
-    sub_0821AAD8(&ref);
-    sub_0821B4C8(&ref, 0, saved[1]);
-    sub_0821AAD8(&ref);
-    sub_0821B4C8(&ref, 0, saved[2]);
+    Script_ReadReference(&ref);
+    Script_WriteReferenceValue(&ref, 0, vector[0]);
+    Script_ReadReference(&ref);
+    Script_WriteReferenceValue(&ref, 0, saved[1]);
+    Script_ReadReference(&ref);
+    Script_WriteReferenceValue(&ref, 0, saved[2]);
     return 0;
 }

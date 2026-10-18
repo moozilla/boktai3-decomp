@@ -41,18 +41,18 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-void sub_0822C1C8(void);
+void Solar_PauseMeasurement(void);
 void *Heap_Alloc(int);
 void Memory_Clear(void *, int);
-int sub_08228DA0(void);
-int sub_080368AC(struct Engine *);
+int SunClock_GetSecond(void);
+int Wireless_InitControllerFromScript(struct Engine *);
 void Task_SetCallbacks(void *, int, int);
-void sub_08219F74(void *);
+void Task_LinkToPriorityList(void *);
 void Heap_Free(void *);
 extern u32 gUnk_03005308, gUnk_0300546C;
 extern const u16 gUnk_0203B400[];
 extern u8 gUnk_03003A50;
-struct Engine *sub_08036910(void)
+struct Engine *Wireless_CreateController(void)
 {
     struct Engine **singleton = &gUnk_02000484;
     struct Engine *existing = *singleton;
@@ -61,14 +61,14 @@ struct Engine *sub_08036910(void)
     int random;
     if (existing)
         return existing;
-    sub_0822C1C8();
+    Solar_PauseMeasurement();
     size = 0x38C;
     p = Heap_Alloc(size);
     if (!p)
         goto failed;
     asm("" : "+r"(p));
     Memory_Clear(p, size);
-    random = sub_08228DA0();
+    random = SunClock_GetSecond();
     {
         u32 *position = &gUnk_03005308;
         u32 index = *position + 1;
@@ -94,14 +94,14 @@ struct Engine *sub_08036910(void)
         destination = (u16 *)((u8 *)p + 0x6C);
         *destination = salt;
     }
-    if (sub_080368AC(p) >= 0) {
+    if (Wireless_InitControllerFromScript(p) >= 0) {
         int one;
         Task_SetCallbacks(p, 0, 0);
         one = 1;
         ((u8 *)p)[0x14] = one;
         ((u8 *)p)[0x16] = one;
         *(u16 *)((u8 *)p + 0x10) = (u32)existing;
-        sub_08219F74(p);
+        Task_LinkToPriorityList(p);
         gUnk_0300546C = one;
         *singleton = p;
         return p;

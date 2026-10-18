@@ -9,8 +9,8 @@ struct P {
     u8 pad1[0x144];
     u8 draw[1];
 };
-void sub_0803746C(struct P *, struct Panel *, int);
-void sub_08033778(u32);
+void WirelessPeerPanel_Destroy(struct P *, struct Panel *, int);
+void TextWindow_Destroy(u32);
 void Anim_Remove(void *);
 int sub_08037B6C(struct P *p)
 {
@@ -18,14 +18,14 @@ int sub_08037B6C(struct P *p)
     int i = 0;
     u32 *w;
     do {
-        sub_0803746C(p, q, i);
+        WirelessPeerPanel_Destroy(p, q, i);
         i++;
         q++;
     } while (i <= 1);
     w = p->windows;
     i = 2;
     do {
-        sub_08033778(*w++);
+        TextWindow_Destroy(*w++);
         i--;
     } while (i >= 0);
     Anim_Remove(p->draw);

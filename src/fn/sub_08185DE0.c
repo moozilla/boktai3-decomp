@@ -19,14 +19,14 @@ struct S {
     s16 y;
     s16 z;
 };
-void sub_081850B4(struct S *, s32);
+void ActorController_ForceAction(struct S *, s32);
 void sub_08185BF0(struct S *);
-void sub_08185DE0(struct S *p)
+void Armor_UpdateAlternateDeathSequence(struct S *p)
 {
     switch (p->b3d) {
         case 0:
             if (p->b3f != 0x2e)
-                sub_081850B4(p, 0x2e);
+                ActorController_ForceAction(p, 0x2e);
             p->b3d = 1;
             break;
         case 1:

@@ -41,39 +41,39 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->pending = 1;
 }
 extern u32 gUnk_020000F0, gUnk_0300546C, gUnk_03005408;
-void sub_0822C1C8(void);
-void sub_0822C1F0(void);
-void sub_08219F94(void *);
+void Solar_PauseMeasurement(void);
+void Solar_ResumeMeasurement(void);
+void Task_UnlinkFromPriorityList(void *);
 void Heap_Free(void *);
 int sub_082238F0(int);
-void sub_080364C0(struct Engine *);
-void sub_08036538(struct Engine *);
-void sub_08036568(struct Engine *);
-void sub_08036678(struct Engine *);
-void sub_0803670C(struct Engine *);
-void sub_08036778(struct Engine *);
-int sub_080367B4(struct Engine *p)
+void Wireless_UpdateConnectionSession(struct Engine *);
+void Wireless_UpdateInactiveConnectionSession(struct Engine *);
+void Wireless_UpdateParentUniSession(struct Engine *);
+void Wireless_UpdateChildUniSession(struct Engine *);
+void Wireless_UpdateParentNiSession(struct Engine *);
+void Wireless_UpdateChildNiSession(struct Engine *);
+int Wireless_UpdateControllerTask(struct Engine *p)
 {
-    sub_0822C1C8();
+    Solar_PauseMeasurement();
     gUnk_020000F0 = p->flag33;
     switch (p->phase) {
         case 0:
             if (p->active)
-                sub_080364C0(p);
+                Wireless_UpdateConnectionSession(p);
             else
-                sub_08036538(p);
+                Wireless_UpdateInactiveConnectionSession(p);
             break;
         case 1:
             if (p->active)
-                sub_08036568(p);
+                Wireless_UpdateParentUniSession(p);
             else
-                sub_08036678(p);
+                Wireless_UpdateChildUniSession(p);
             break;
         case 2:
             if (p->active)
-                sub_0803670C(p);
+                Wireless_UpdateParentNiSession(p);
             else
-                sub_08036778(p);
+                Wireless_UpdateChildNiSession(p);
             break;
     }
     if (p->flag3d) {
@@ -85,9 +85,9 @@ int sub_080367B4(struct Engine *p)
     if (p->pad1d) {
         gUnk_0300546C = 0;
         gUnk_02000484 = 0;
-        sub_08219F94(p);
+        Task_UnlinkFromPriorityList(p);
         Heap_Free(p);
-        sub_0822C1F0();
+        Solar_ResumeMeasurement();
     } else {
         if ((u16)(p->operation - 9) <= 17)
             gUnk_03005408 = 1;

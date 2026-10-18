@@ -5,7 +5,7 @@ struct S080FB938 {
     u8 *q;
 };
 
-void sub_080FB938(struct S080FB938 *s, u32 x)
+void Axe_SetAuxiliarySpriteResource(struct S080FB938 *s, u32 x)
 {
     u8 *q = s->q;
     s32 i = 3;

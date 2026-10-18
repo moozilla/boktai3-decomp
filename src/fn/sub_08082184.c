@@ -31,7 +31,7 @@ static inline void SetTerrainHeight(struct ContactPosition *position)
         cell = 0;
     else
         cell = gUnk_030052F4->rows[z] + x;
-    data = sub_0821D64C(cell, 1);
+    data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         data += 4;
     else {
@@ -135,7 +135,7 @@ void SceneActorReaction_TryResumeRoute(struct SceneActorRegistryResetView *input
                 accepted = resultFlag;
             }
             if (!accepted) {
-                void *control = sub_0807FC90;
+                void *control = SceneActorControl_OnIdle;
                 u32 zero = accepted;
                 u32 one;
                 u32 zeroByte;

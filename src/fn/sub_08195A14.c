@@ -5,7 +5,7 @@ struct P {
     u8 g[2];
     u16 x, y, z;
 };
-void sub_08195A14(struct P *p)
+void Nidhoggr_SetConfiguredTargetValues(struct P *p)
 {
     p->a = p->x;
     p->b = p->y;

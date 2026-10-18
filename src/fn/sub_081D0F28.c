@@ -31,7 +31,7 @@ struct Player {
 extern void *gUnk_02000480;
 extern struct SceneNpc *gUnk_02000274;
 extern struct Player *gUnk_02000580[];
-struct SceneNpc *sub_0802D6D0(void *manager, s32 name);
+struct SceneNpc *Actor_FindById(void *manager, s32 name);
 s32 Math_Atan2(s32 dx, s32 dz);
 void sub_081CEE50(void);
 /* Sets the motion angle and the derived 8- and 4-way facings. The facing math
@@ -75,7 +75,7 @@ void SceneNpc_CommandFromScript(void)
         void *manager = gUnk_02000480;
         if (!manager)
             return;
-        npc = sub_0802D6D0(manager, Script_GetKeywordValue('n', 0));
+        npc = Actor_FindById(manager, Script_GetKeywordValue('n', 0));
         if (!npc)
             return;
     } else

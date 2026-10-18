@@ -21,7 +21,7 @@ struct S {
     struct E e[20];
 };
 
-u32 sub_0812975C(struct S *b)
+u32 FeatherEffectPool_DestroyTask(struct S *b)
 {
     s32 i = 0;
     struct E *e = b->e;

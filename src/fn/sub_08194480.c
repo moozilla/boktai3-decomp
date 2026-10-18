@@ -5,7 +5,7 @@ struct A {
 void Anim_Remove(void *);
 void Collider_Remove(void *);
 void sub_0815F738(void *);
-void sub_08194480(u8 *p)
+void Nidhoggr_DestroyParts(u8 *p)
 {
     s32 i = 0;
     u8 *a = p + 0x6F60;

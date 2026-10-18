@@ -24,7 +24,7 @@ extern const u16 gUnk_0824DE7C[];
 extern const u8 gUnk_0824DE94[];
 void Sprite_Init(void *, void *, int);
 void sub_0821983C(void *, void *, int, int, int, int, int, const void *);
-void sub_0803A2A8(void *owner, struct Item *p, int index)
+void WirelessGameItems_InitItem(void *owner, struct Item *p, int index)
 {
     int state;
     int choice;

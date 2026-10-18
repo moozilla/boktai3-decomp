@@ -41,12 +41,12 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->pending = 1;
 }
 void sub_08223BC0(int);
-void sub_08223580(int);
-void sub_08035F5C(struct Engine *);
-void sub_08035FF4(struct Engine *);
+void RfuManager_SendData(int);
+void Wireless_TryStartParentNiSend(struct Engine *);
+void Wireless_PollParentNiSend(struct Engine *);
 int sub_0824923C(void *, void *);
 extern void *gUnk_086056EC[];
-void sub_0803670C(struct Engine *argument)
+void Wireless_UpdateParentNiSession(struct Engine *argument)
 {
     struct Engine *p = argument;
     volatile u8 *busy = &gUnk_020000EC;
@@ -64,10 +64,10 @@ void sub_0803670C(struct Engine *argument)
         int mode = gUnk_03006A80->parentChild;
         if (mode == 1) {
             gUnk_020000EC = mode;
-            sub_08223580(1);
+            RfuManager_SendData(1);
         }
     }
-    sub_08035F5C(p);
-    sub_08035FF4(p);
+    Wireless_TryStartParentNiSend(p);
+    Wireless_PollParentNiSend(p);
     sub_0824923C(p, gUnk_086056EC[p->operation]);
 }

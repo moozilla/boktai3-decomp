@@ -16,9 +16,9 @@ struct Actor {
 void sub_0821DE30(void *);
 int DisplayAnimation_SetFlags(void *, int);
 int DisplayAnimation_ClearFlags(void *, int);
-int sub_0802D88C(struct Actor *);
-int sub_0802D8BC(struct Actor *);
-int sub_0802DB1C(void *unused, struct Actor *p)
+int Actor_DisableShadow(struct Actor *);
+int Actor_EnableShadow(struct Actor *);
+int Actor_UpdateVisibilityAndShadow(void *unused, struct Actor *p)
 {
     int result;
     p->linkId = p->id;
@@ -28,15 +28,15 @@ int sub_0802DB1C(void *unused, struct Actor *p)
         u32 mask = 0x100;
         if (p->flags & mask) {
             DisplayAnimation_SetFlags(&p->drawable, 1);
-            result = sub_0802D88C(p);
+            result = Actor_DisableShadow(p);
         } else {
             DisplayAnimation_ClearFlags(&p->drawable, 1);
             {
                 u32 mask = 0x200;
                 if (p->flags & mask)
-                    result = sub_0802D88C(p);
+                    result = Actor_DisableShadow(p);
                 else
-                    result = sub_0802D8BC(p);
+                    result = Actor_EnableShadow(p);
             }
         }
     }

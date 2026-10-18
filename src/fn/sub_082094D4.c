@@ -8,7 +8,7 @@ struct A {
     u32 w18;
 };
 void Sprite_Remove(u32 *);
-u32 sub_082094D4(struct A *a, struct B *b, u32 n)
+u32 FanCannonManager_DestroySlot(struct A *a, struct B *b, u32 n)
 {
     b->w10 |= 1;
     Sprite_Remove(&b->w10);

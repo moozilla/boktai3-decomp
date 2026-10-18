@@ -6,7 +6,7 @@ s32 sub_08122D58(u8 *);
 void Task_Kill(u8 *);
 void sub_081228F0(void);
 void sub_0812286C(void);
-void sub_08122DA0(void)
+void SceneScheduledEffect_EnsureSingleton(void)
 {
     u8 *p;
     if (gUnk_02000140 == 0) {

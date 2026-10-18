@@ -8,7 +8,7 @@ struct S {
 extern struct S *gUnk_02000184;
 void AnimData_Load(u8 *, u32);
 
-s32 sub_0812C0A4(struct S *s)
+s32 SlashEffect_InitManager(struct S *s)
 {
     s->c = 0;
     AnimData_Load(s->a, 0x0000354D);

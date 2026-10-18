@@ -10,9 +10,9 @@ struct TextState {
     u8 pad30[0xD8];
     u8 depth, styles[7];
 };
-const u8 *sub_08032A44(struct TextState *, const u8 *);
-void sub_08031E84(struct TextState *);
-int sub_08032B24(struct TextState *p)
+const u8 *TextState_RenderNextGlyph(struct TextState *, const u8 *);
+void TextState_PopStream(struct TextState *);
+int TextState_StepPlayback(struct TextState *p)
 {
     const u8 *s;
     int result;
@@ -20,7 +20,7 @@ int sub_08032B24(struct TextState *p)
     p->padE = 0;
     switch (p->style) {
         case 0:
-            s = sub_08032A44(p, p->pc);
+            s = TextState_RenderNextGlyph(p, p->pc);
             p->pc = s;
             if (p->fresh)
                 goto yes;
@@ -29,32 +29,32 @@ int sub_08032B24(struct TextState *p)
             c = *s;
             goto endchar;
         case 1:
-            s = sub_08032A44(p, p->streams[0]);
+            s = TextState_RenderNextGlyph(p, p->streams[0]);
             p->streams[0] = s;
             if (p->style != 1)
                 goto no;
             goto stream;
         case 2:
-            s = sub_08032A44(p, p->streams[1]);
+            s = TextState_RenderNextGlyph(p, p->streams[1]);
             p->streams[1] = s;
             if (p->style != 2)
                 goto no;
             goto stream;
         case 3:
-            s = sub_08032A44(p, p->streams[2]);
+            s = TextState_RenderNextGlyph(p, p->streams[2]);
             p->streams[2] = s;
             if (p->style != 3)
                 goto no;
             goto stream;
         case 4:
-            s = sub_08032A44(p, p->streams[3]);
+            s = TextState_RenderNextGlyph(p, p->streams[3]);
             p->streams[3] = s;
             if (p->style != 4)
                 goto no;
         stream:
             if (*s)
                 goto no;
-            sub_08031E84(p);
+            TextState_PopStream(p);
             if (p->style)
                 goto no;
             if (p->fresh)

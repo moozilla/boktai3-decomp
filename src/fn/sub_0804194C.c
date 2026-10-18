@@ -3,11 +3,11 @@
 extern u32 gUnk_030053F0;
 extern struct ModifierMenuActor *gUnk_020004B4;
 void sub_0811C9F8(u8 *, u8 *, u32);
-void sub_08041908(struct ModifierMenu *);
+void ModifierMenu_RefreshPreviewModel(struct ModifierMenu *);
 void sub_0811CB68(u8 *, u8 *, struct ModifierPreviewOrigin *, u32);
-void sub_0811CD24(u8 *, s32);
-void sub_0811CD5C(u8 *, s32);
-void sub_0811C844(u8 *, s32);
+void CharacterModel_SetAnimationFlags(u8 *, s32);
+void CharacterModel_SetComponentRenderMode(u8 *, s32);
+void CharacterModel_InitPalettes(u8 *, s32);
 void ModifierMenu_InitializePreview(struct ModifierMenu *menu)
 {
     struct ModifierPreviewOrigin origin;
@@ -35,9 +35,9 @@ void ModifierMenu_InitializePreview(struct ModifierMenu *menu)
     resource = (u8 *)menu + 0x83C;
     model = (u8 *)menu + 0xE34;
     sub_0811C9F8(resource, model, 0x3D99);
-    sub_08041908(menu);
+    ModifierMenu_RefreshPreviewModel(menu);
     sub_0811CB68(resource, model, &origin, 0);
-    sub_0811CD24(model, 16);
-    sub_0811CD5C(model, 1);
-    sub_0811C844(model, gUnk_02000710->unk81A);
+    CharacterModel_SetAnimationFlags(model, 16);
+    CharacterModel_SetComponentRenderMode(model, 1);
+    CharacterModel_InitPalettes(model, gUnk_02000710->unk81A);
 }

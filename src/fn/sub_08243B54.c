@@ -3,7 +3,7 @@
 // fuzzy: 87.9%
 // 9 differing instruction runs; size -4 bytes; first diff at +0x54 (ldr r1, [pc, #0x5c] vs ldr r1, [pc, #0x58])
 s32 Div(s32, s32);
-u16 *sub_08163F70(s32, s32, s32);
+u16 *Hud_GetTilemapCell(s32, s32, s32);
 extern u16 gUnk_03005178;
 void sub_08243B54(s32 style, s32 x, s32 y, s32 current, s32 maximum, s32 attr)
 {
@@ -22,11 +22,11 @@ void sub_08243B54(s32 style, s32 x, s32 y, s32 current, s32 maximum, s32 attr)
     if (style == 0) {
         filled = 0x53;
         empty = 0x4B;
-        out = sub_08163F70(0, x, y);
+        out = Hud_GetTilemapCell(0, x, y);
     } else {
         filled = 0x73;
         empty = 0x6B;
-        out = sub_08163F70(0, x - 1, y);
+        out = Hud_GetTilemapCell(0, x - 1, y);
     }
     if (gUnk_03005178 != attr)
         gUnk_03005178 = attr;

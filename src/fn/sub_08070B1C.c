@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
-void sub_0807FC90(u8 *);
+void SceneActorControl_OnIdle(u8 *);
 static inline u8 IsUnavailable(struct SceneActorRegistryActor *input, u16 **saved,
                                u32 excludedInput)
 {
@@ -54,7 +54,7 @@ void SceneActorRegistry_ResetEligibleCategoryState(void)
             reject = initial;
         }
         {
-            register const void *initial asm("r2") = (const void *)sub_0807FC90;
+            register const void *initial asm("r2") = (const void *)SceneActorControl_OnIdle;
             asm("" : "+r"(initial));
             callback = initial;
         }

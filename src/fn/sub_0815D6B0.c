@@ -15,9 +15,9 @@ struct Vec {
 
 extern u8 *gUnk_0200047C;
 
-void sub_08020D54(void *, void *);
-void sub_0814F858(u8 *);
-void sub_0814F874(u8 *);
+void SceneMessages_SetPendingTrigger(void *, void *);
+void PlayerCue_BeginAcknowledgement(u8 *);
+void PlayerCue_AcknowledgePendingTrigger(u8 *);
 void PlayerCue_Hide(u8 *);
 void PlayerCue_SetPosition(u8 *, struct Vec *);
 void PlayerCue_Stand(u8 *, s32);
@@ -80,145 +80,145 @@ void PlayerCue_Dispatch(u8 *p)
             s16 *m;
             u8 *controller = gUnk_0200047C;
             m = entry->messages[controller[0x24]][i];
-            sub_08020D54(entry, m);
+            SceneMessages_SetPendingTrigger(entry, m);
             switch (((u8 *)m)[6]) {
                 case 0:
                     PlayerCue_Hide(p);
-                    sub_0814F858(p);
-                    sub_0814F874(p);
+                    PlayerCue_BeginAcknowledgement(p);
+                    PlayerCue_AcknowledgePendingTrigger(p);
                     break;
                 case 1:
                     v1.x = m[4];
                     v1.y = m[5];
                     v1.z = m[6];
                     PlayerCue_SetPosition(p, &v1);
-                    sub_0814F858(p);
-                    sub_0814F874(p);
+                    PlayerCue_BeginAcknowledgement(p);
+                    PlayerCue_AcknowledgePendingTrigger(p);
                     break;
                 case 2:
                     PlayerCue_Stand(p, m[4]);
-                    sub_0814F858(p);
-                    sub_0814F874(p);
+                    PlayerCue_BeginAcknowledgement(p);
+                    PlayerCue_AcknowledgePendingTrigger(p);
                     break;
                 case 3:
                     PlayerCue_Face(p, m[4], 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 4:
                     PlayerCue_Idle(p, m[4]);
-                    sub_0814F858(p);
-                    sub_0814F874(p);
+                    PlayerCue_BeginAcknowledgement(p);
+                    PlayerCue_AcknowledgePendingTrigger(p);
                     break;
                 case 5:
                     PlayerCue_StandVariant2(p, m[4], 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 6:
                     PlayerCue_StandVariant3(p, m[4], 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 7:
                     v7.x = m[4];
                     v7.y = m[5];
                     v7.z = m[6];
                     PlayerCue_WalkTo(p, &v7, 0, -1);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 8:
                     PlayerCue_Motion7Front(p, m[4], 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 9:
                     PlayerCue_Motion7(p, m[4], 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 10:
                     PlayerCue_Motion7End(p, 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 11:
                     PlayerCue_Kneel(p, m[4], 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 12:
                     PlayerCue_KneelDown(p, m[4]);
-                    sub_0814F858(p);
-                    sub_0814F874(p);
+                    PlayerCue_BeginAcknowledgement(p);
+                    PlayerCue_AcknowledgePendingTrigger(p);
                     break;
                 case 13:
                     PlayerCue_KneelGasp(p, m[4]);
-                    sub_0814F858(p);
-                    sub_0814F874(p);
+                    PlayerCue_BeginAcknowledgement(p);
+                    PlayerCue_AcknowledgePendingTrigger(p);
                     break;
                 case 14:
                     PlayerCue_GetUp(p, m[4], 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 15:
                     PlayerCue_MoveTo(p, 0, m[4], 0, 0);
-                    sub_0814F858(p);
-                    sub_0814F874(p);
+                    PlayerCue_BeginAcknowledgement(p);
+                    PlayerCue_AcknowledgePendingTrigger(p);
                     break;
                 case 16:
                     PlayerCue_Motion29(p, m[4], m[5], 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 17:
                     PlayerCue_Motion30(p, m[4], m[5], m[6], 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 18:
                     PlayerCue_Motion30End(p, 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 19:
                     PlayerCue_Motion29B(p, m[4], m[5], 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 20:
                     PlayerCue_Motion7Turn(p, m[4], 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 22:
                     PlayerCue_Motion7Variant3(p, m[4], 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 21:
                     PlayerCue_Motion7Variant7(p, m[4], 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 23:
                     PlayerCue_Aim(p, m[4], 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 24:
                     PlayerCue_Shoot(p, m[4], 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 25:
                     PlayerCue_AimHold(p, m[4], m[5], 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 26:
                     PlayerCue_AimEnd(p, 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 28:
                     PlayerCue_Motion11(p, 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 29: {
                     s32 r = PlayerCue_Motion10(p, 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     if (r == 0)
-                        sub_0814F874(p);
+                        PlayerCue_AcknowledgePendingTrigger(p);
                     break;
                 }
                 case 30: {
                     s32 r = PlayerCue_FormMotion(p, 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     if (r == 0)
-                        sub_0814F874(p);
+                        PlayerCue_AcknowledgePendingTrigger(p);
                     break;
                 }
                 case 51:
@@ -229,9 +229,9 @@ void PlayerCue_Dispatch(u8 *p)
                     break;
                 case 31: {
                     s32 r = PlayerCue_StateMotion(p, 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     if (r == 0)
-                        sub_0814F874(p);
+                        PlayerCue_AcknowledgePendingTrigger(p);
                     break;
                 }
                 case 33:
@@ -239,89 +239,89 @@ void PlayerCue_Dispatch(u8 *p)
                     v33.y = m[5];
                     v33.z = m[6];
                     PlayerCue_RunTo(p, &v33, -1, 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 34:
                     PlayerCue_Run(p, m[4]);
-                    sub_0814F858(p);
-                    sub_0814F874(p);
+                    PlayerCue_BeginAcknowledgement(p);
+                    PlayerCue_AcknowledgePendingTrigger(p);
                     break;
                 case 35:
                     PlayerCue_Windblown(p, m[4], 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 37:
                     PlayerCue_WindblownVariant3(p, m[4], 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 38:
                     PlayerCue_WindblownVariant4(p, m[4], 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 36:
                     PlayerCue_WindblownVariant2(p, m[4], 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 39:
                     PlayerCue_StandDiagonal(p, m[4], 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 40:
                     PlayerCue_StandDiagonalB(p, m[4], 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 27:
                     PlayerCue_FaceSide(p, m[4]);
-                    sub_0814F858(p);
-                    sub_0814F874(p);
+                    PlayerCue_BeginAcknowledgement(p);
+                    PlayerCue_AcknowledgePendingTrigger(p);
                     break;
                 case 41:
                     PlayerCue_Motion17(p, 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 42:
                     PlayerCue_Motion17Variant2(p, 0);
-                    sub_0814F858(p);
+                    PlayerCue_BeginAcknowledgement(p);
                     break;
                 case 43:
                     PlayerCue_ShakeEffect(p, 2);
-                    sub_0814F858(p);
-                    sub_0814F874(p);
+                    PlayerCue_BeginAcknowledgement(p);
+                    PlayerCue_AcknowledgePendingTrigger(p);
                     break;
                 case 44:
                     PlayerCue_Refresh(p);
-                    sub_0814F858(p);
-                    sub_0814F874(p);
+                    PlayerCue_BeginAcknowledgement(p);
+                    PlayerCue_AcknowledgePendingTrigger(p);
                     break;
                 case 48:
                     PlayerCue_OverlaySet(p, m[4] + 0x16E);
-                    sub_0814F858(p);
-                    sub_0814F874(p);
+                    PlayerCue_BeginAcknowledgement(p);
+                    PlayerCue_AcknowledgePendingTrigger(p);
                     break;
                 case 47:
                     PlayerCue_OverlayOn(p, m[4] + 0x16E);
-                    sub_0814F858(p);
-                    sub_0814F874(p);
+                    PlayerCue_BeginAcknowledgement(p);
+                    PlayerCue_AcknowledgePendingTrigger(p);
                     break;
                 case 49:
                     PlayerCue_OverlayOff(p);
-                    sub_0814F858(p);
-                    sub_0814F874(p);
+                    PlayerCue_BeginAcknowledgement(p);
+                    PlayerCue_AcknowledgePendingTrigger(p);
                     break;
                 case 50:
                     PlayerCue_OverlaySet(p, 0x17A);
-                    sub_0814F858(p);
-                    sub_0814F874(p);
+                    PlayerCue_BeginAcknowledgement(p);
+                    PlayerCue_AcknowledgePendingTrigger(p);
                     break;
                 case 45:
                     p[0x5A1] = 1;
-                    sub_0814F858(p);
-                    sub_0814F874(p);
+                    PlayerCue_BeginAcknowledgement(p);
+                    PlayerCue_AcknowledgePendingTrigger(p);
                     break;
                 case 46:
                     p[0x5A1] = 0;
-                    sub_0814F858(p);
-                    sub_0814F874(p);
+                    PlayerCue_BeginAcknowledgement(p);
+                    PlayerCue_AcknowledgePendingTrigger(p);
                     break;
                 case 32:
                     switch (m[4]) {
@@ -339,8 +339,8 @@ void PlayerCue_Dispatch(u8 *p)
                             sub_0815C73C(p, m[4], m[5], m[6]);
                             break;
                     }
-                    sub_0814F858(p);
-                    sub_0814F874(p);
+                    PlayerCue_BeginAcknowledgement(p);
+                    PlayerCue_AcknowledgePendingTrigger(p);
                     break;
             }
             i++;

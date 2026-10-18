@@ -3,7 +3,7 @@
 void TetherActor_CreateAuxiliarySprite(struct TetherActor *);
 void TetherActor_SetState(struct TetherActor *, u32);
 void TetherActor_UpdatePendingEffect(struct TetherActor *);
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void SceneActorContacts_RemoveNode(void *);
 void TetherActor_BeginAuxiliaryState(struct TetherActor *input)
 {
@@ -26,7 +26,7 @@ void TetherActor_BeginAuxiliaryState(struct TetherActor *input)
         u32 row = gUnk_030052F4->rows[z];
         cell = row + x;
     }
-    properties = sub_0821D64C(cell, 1);
+    properties = TerrainModifiers_FindCellOverride(cell, 1);
     if (properties)
         properties += 4;
     else {

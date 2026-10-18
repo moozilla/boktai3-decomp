@@ -39,7 +39,7 @@ struct Obj {
     s8 delta8;
     s8 delta9;
 };
-void sub_0818DF90(struct Obj *p)
+void Armor_CapturePartMotionEndpoint(struct Obj *p)
 {
     p->endX = p->x;
     p->endY = p->y;

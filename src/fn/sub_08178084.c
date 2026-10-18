@@ -2,7 +2,7 @@
 
 void Hud_SaveMode(void);
 
-void sub_08178084(void)
+void Hud_SaveModeFromScript(void)
 {
     Hud_SaveMode();
 }

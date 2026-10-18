@@ -2,7 +2,7 @@
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
-void sub_08237DA0(u8 *s)
+void ActorGlyphTrail_InitSprite(u8 *s)
 {
     u8 *p = s + 0x48;
     u8 *q;

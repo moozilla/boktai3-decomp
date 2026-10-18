@@ -24,8 +24,8 @@ struct ScenePanelCommandGlobals {
     u8 bank;
 };
 extern struct ScenePanelCommandGlobals *gUnk_0200047C;
-u32 sub_08020D54(void *, void *);
-void sub_08020D08(void *);
+u32 SceneMessages_SetPendingTrigger(void *, void *);
+void SceneMessages_UnregisterReceiver(void *);
 s32 SceneMessages_RegisterReceiver(void *, u32, u32);
 void sub_08225F88(const void *);
 

@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0814B1E0(u8 *p)
+void Player_OnTargetMotionExit(u8 *p)
 {
     u8 *q = p + 0xAC;
     u32 a = *(u32 *)(p + 0x30);

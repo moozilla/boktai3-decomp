@@ -6,10 +6,10 @@ struct P {
     u8 pad2[0xae];
     u32 title;
 };
-void sub_08036C38(void);
-void sub_08038138(struct P *);
+void Wireless_RequestResetConnection(void);
+void WirelessGameMenu_SignalStatusPanel(struct P *);
 void Script_Call(u32, int);
-void sub_08038DF8(struct P *p)
+void WirelessGameMenu_UpdateResultsDelay(struct P *p)
 {
     if (p->entered)
         p->entered = 0;
@@ -17,14 +17,14 @@ void sub_08038DF8(struct P *p)
         u32 eleven;
         u8 *state;
         u32 zero;
-        sub_08036C38();
+        Wireless_RequestResetConnection();
         eleven = 11;
         state = &p->state;
         zero = 0;
         *state = eleven;
         p->entered = 1;
         p->timer = zero;
-        sub_08038138(p);
+        WirelessGameMenu_SignalStatusPanel(p);
         if (p->title)
             Script_Call(p->title, 0);
     } else

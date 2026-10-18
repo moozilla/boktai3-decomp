@@ -9,7 +9,7 @@ struct Blk {
     struct Ent *ents;
 };
 extern struct Blk *gUnk_02000458;
-struct Ent *sub_0821AC30(u32 key)
+struct Ent *Script_FindCommand(u32 key)
 {
     struct Blk *b = gUnk_02000458;
     while (b) {

@@ -1,6 +1,6 @@
 #include "global.h"
 void DisplayAnimation_UpdatePlayback(u8 *);
-void sub_081D48B0(u8 *p)
+void BestiaryDisplay_UpdateAnimations(u8 *p)
 {
     u8 *q = p + 0x28;
     s32 i = 4;

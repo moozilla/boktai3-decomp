@@ -47,14 +47,14 @@ extern u16 gUnk_08604AB4[];
 
 void EffectEmitter_ReceiveHit(struct EmitterAttack *, void *, struct EffectEmitter *);
 s32 EffectEmitter_Update(struct EffectEmitter *);
-u32 sub_0800C630(struct EffectEmitter *);
+u32 EffectEmitter_Destroy(struct EffectEmitter *);
 s32 EffectEmitter_Initialize(struct EffectEmitter *, u32, u32);
-void *sub_0800C7AC(u32, u32);
+void *EffectEmitter_Create(u32, u32);
 
 /* Engine helpers. */
 s32 sub_0800AFE8(s32, u32, s32, struct EmitterVec *, void *, s32, s32);
 void *Region_FindContaining(void *);
-void sub_08013684(void *);
+void Shadow_Destroy(void *);
 void Shadow_Initialize(void *, void *, u32);
 
 #endif

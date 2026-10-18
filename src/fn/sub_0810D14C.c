@@ -1,8 +1,8 @@
 #include "global.h"
 
-void sub_0811CD24(u8 *, u32);
+void CharacterModel_SetAnimationFlags(u8 *, u32);
 
-void sub_0810D14C(u8 *p)
+void Registry30AC_HideDisplay(u8 *p)
 {
     u32 flag = 1;
     u8 *q = p + 0x28;
@@ -15,7 +15,7 @@ void sub_0810D14C(u8 *p)
     }
     r = p + 0x940;
     for (i = 1; i >= 0; i--) {
-        sub_0811CD24(r, 1);
+        CharacterModel_SetAnimationFlags(r, 1);
         r += 0x850;
     }
 }

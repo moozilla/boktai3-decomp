@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_02000710;
-void sub_0822E010(void)
+void Inventory_ResetEquipmentAssignments(void)
 {
     s32 i = 0;
     do {

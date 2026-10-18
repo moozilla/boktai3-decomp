@@ -12,7 +12,7 @@ struct E {
 };
 void Effect_Remove(void *);
 void Memory_Clear(void *, u32);
-void sub_08114E04(u8 *g, struct E *e)
+void NativeParticle_ReleaseEntry(u8 *g, struct E *e)
 {
     Effect_Remove(g + 0x20 + e->idx * 40);
     e->b = 0;

@@ -5,7 +5,7 @@ struct Motion {
 };
 extern u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
-void sub_08039920(struct Motion *arg, int baseArg, int mask)
+void WirelessGameItem_SetRandomArcVelocity(struct Motion *arg, int baseArg, int mask)
 {
     struct Motion *p = arg;
     int base = baseArg;

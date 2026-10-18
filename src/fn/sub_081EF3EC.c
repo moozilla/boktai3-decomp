@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_081EEAC4(void);
+void SceneActors_DestroyTask(void);
 struct S {
     u8 f0[0x90];
     u32 a90;
@@ -26,12 +26,12 @@ static inline void st(void (*v)(void), void (**a)(void))
 {
     *a = v;
 }
-void sub_081EF3EC(struct S *p)
+void SingletonSlot7_UpdateDestroyTransition(struct S *p)
 {
     u8 *q;
     u32 r;
     if (chk(p) == 1) {
-        st(sub_081EEAC4, &p->fn);
+        st(SceneActors_DestroyTask, &p->fn);
         p->a90 = 0;
         *((u8 *)p + 0xb1) = 1;
         *((u8 *)p + 0xa2) = 0;

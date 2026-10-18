@@ -1,5 +1,5 @@
 #include "global.h"
-u32 sub_0821F840(u16 *p)
+u32 NavMesh_ConsumeProbeEvent(u16 *p)
 {
     u32 r;
     if ((*p & 2) == 0)

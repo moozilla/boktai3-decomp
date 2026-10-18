@@ -11,7 +11,7 @@ struct P {
 extern struct P *gUnk_020001B4;
 u32 ScriptProc_Start(s32, s32);
 
-s32 sub_08106D20(struct P *p)
+s32 Pool128_InitManager(struct P *p)
 {
     p->a = ScriptProc_Start(0x922e, 0x1003);
     p->b = ScriptProc_Start(0x922e, 0x931e);

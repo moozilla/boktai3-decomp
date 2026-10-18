@@ -7,7 +7,7 @@ struct A {
 };
 void Sprite_Remove(void *);
 
-void sub_081AF628(struct A *p)
+void Vanargand_DestroyTransientEffect(struct A *p)
 {
     if (p->a != 0)
         Sprite_Remove(p->g);

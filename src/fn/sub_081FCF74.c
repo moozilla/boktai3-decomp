@@ -10,7 +10,7 @@ struct A {
 };
 extern struct A *gUnk_020005E8;
 void sub_081FC900(struct A *, struct E *, s32);
-u32 sub_081FCF74(struct A *a)
+u32 SceneProjectile_InitPool(struct A *a)
 {
     struct E *e;
     s32 i;

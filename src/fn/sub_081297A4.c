@@ -10,7 +10,7 @@ extern struct S *gUnk_02000174;
 void AnimData_Load(u8 *, u32);
 u32 ScriptProc_Start(u32, u32);
 
-s32 sub_081297A4(struct S *s)
+s32 FeatherEffectPool_Init(struct S *s)
 {
     AnimData_Load(s->a, 0x000084B4);
     s->b = ScriptProc_Start(0x0000922E, 0x00004EC0);

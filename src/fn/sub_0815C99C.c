@@ -14,7 +14,7 @@ struct P {
     u8 b9c;
 };
 
-void sub_0815C99C(struct P *p)
+void PlayerCue_ReleaseControl(struct P *p)
 {
     u32 z;
     if (p->c57 != 6)

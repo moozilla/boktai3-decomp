@@ -6,13 +6,13 @@ struct H {
 struct Z {
     struct H a, b;
 };
-void sub_0811D024(void *, u32, void *);
+void Position_GetHeightAdjustedCoordinates(void *, u32, void *);
 void sub_0811B278(void *, void *, struct Z *, struct Z *, u32, u32, u32, u32, u32, u32, u32);
-void sub_081145DC(u8 *s, u32 y, u32 x, u32 d)
+void NativeEffect_InitColliderWithDepth(u8 *s, u32 y, u32 x, u32 d)
 {
     u32 l[2];
     struct Z s1, s2;
-    sub_0811D024(s + 0xa0, *(u32 *)(s + 0xc0), l);
+    Position_GetHeightAdjustedCoordinates(s + 0xa0, *(u32 *)(s + 0xc0), l);
     s1.a.lo = 0xe;
     s1.a.hi = 0xe;
     s1.b.lo = d;

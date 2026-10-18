@@ -1,6 +1,6 @@
 #include "global.h"
 void Sprite_Remove(void *);
-void sub_0812B610(u8 *p)
+void SwooshProjectile_RemoveTrailSprites(u8 *p)
 {
     u8 *q = p + 0x3c;
     s32 i = 1;

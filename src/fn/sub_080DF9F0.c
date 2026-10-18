@@ -26,7 +26,7 @@ zero:
     return 0;
 }
 
-void sub_080DF9F0(u8 *unused, u8 *obj, u8 *ctx)
+void Dog_OnSensorContact(u8 *unused, u8 *obj, u8 *ctx)
 {
     int mask;
     u32 *flags;

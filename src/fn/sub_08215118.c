@@ -5,7 +5,7 @@ extern u16 *gUnk_030042E4;
 u16 *ScriptProc_Start(u32, u32);
 void sub_082171C0(u16 *, u32);
 
-void sub_08215118(void)
+void AnimData_InitPalettePool(void)
 {
     u16 *p = ScriptProc_Start(0x9B1B, 0xC5E9);
     gUnk_030042E0 = p[0];

@@ -1,8 +1,8 @@
 #include "global.h"
-u8 *sub_0821B2B0(u8 *, s32 *, s32 *);
-s32 sub_0821A8DC(s32);
-s32 sub_0821A908(s32);
-u8 *sub_0821A66C(u8 *, u32 *);
+u8 *Script_DecodeVariableValue(u8 *, s32 *, s32 *);
+s32 Script_GetCallArgument(s32);
+s32 Script_GetStackArgument(s32);
+u8 *Script_DecodePacket(u8 *, u32 *);
 s32 Script_EvalExpression(u8 *);
 u8 *Text_LookupString(u16);
 u8 *Script_DecodeOperand(u8 *p, s32 *type, s32 *value)
@@ -68,33 +68,33 @@ u8 *Script_DecodeOperand(u8 *p, s32 *type, s32 *value)
         switch (family) {
             case 0x10:
             case 0x20:
-                return sub_0821B2B0(p, type, value);
+                return Script_DecodeVariableValue(p, type, value);
             case 0x40:
                 if ((*cursor & 15) == 15) {
-                    *value = sub_0821A8DC(cursor[1] + 15);
+                    *value = Script_GetCallArgument(cursor[1] + 15);
                     cursor++;
                 } else
-                    *value = sub_0821A8DC(*cursor & 15);
+                    *value = Script_GetCallArgument(*cursor & 15);
                 *type = 9;
                 cursor++;
                 break;
             case 0x90:
-                *value = sub_0821A908(*cursor & 15);
+                *value = Script_GetStackArgument(*cursor & 15);
                 *type = 9;
                 cursor++;
                 break;
             case 0x80:
-                cursor = sub_0821A66C(cursor, &length);
+                cursor = Script_DecodePacket(cursor, &length);
                 *value = (s32)cursor;
                 cursor += length;
                 break;
             case 0x30:
-                cursor = sub_0821A66C(cursor, &length);
+                cursor = Script_DecodePacket(cursor, &length);
                 *value = Script_EvalExpression(cursor);
                 cursor += length;
                 break;
             case 0x50:
-                cursor = sub_0821A66C(cursor, &length);
+                cursor = Script_DecodePacket(cursor, &length);
                 *type |= *cursor << 16;
                 *value = (s32)(cursor + 1);
                 cursor += length;

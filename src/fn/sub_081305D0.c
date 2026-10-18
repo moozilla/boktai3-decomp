@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_081305D0(u8 *p)
+void SceneActorControl_AdvancePhase(u8 *p)
 {
     u8 *q = p + 0x2b1;
     if (*q != 0)

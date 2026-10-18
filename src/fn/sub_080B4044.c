@@ -1,10 +1,10 @@
 #include "global.h"
-void sub_080B33D8(u8 *);
-u32 sub_080B4044(u8 *p)
+void Vorn_UpdateRecoveryCooldown(u8 *);
+u32 Vorn_UpdateActionTimers(u8 *p)
 {
     u8 *q = p;
     u16 *r;
-    sub_080B33D8(p);
+    Vorn_UpdateRecoveryCooldown(p);
     switch (p[0x2B5]) {
         case 12:
         case 13:

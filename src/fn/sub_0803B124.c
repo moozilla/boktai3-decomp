@@ -13,7 +13,7 @@ int Mod(int, int);
 void Sound_PlaySong(int);
 void sub_082213B8(void *, void *, int, int, int, int, int, int, int);
 
-void sub_0803B124(struct P *p)
+void WirelessResultPanel_UpdatePointsReveal(struct P *p)
 {
     int value;
     u8 *drawing;

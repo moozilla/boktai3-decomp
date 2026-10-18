@@ -34,10 +34,10 @@ struct P081976E4 {
     struct Vec081976E4 v7298;
 };
 void sub_0818EBF4(void *);
-void sub_08193514(void *);
+void Nidhoggr_InitBackgrounds(void *);
 void sub_081940F8(void *);
-void sub_081944C4(void *);
-void sub_08195A4C(void *, u32);
+void Nidhoggr_InitSuspendedObject(void *);
+void Nidhoggr_SetBehavior(void *, u32);
 
 static inline void Fill32(void *dst, u32 *tmp, u32 size)
 {
@@ -45,7 +45,7 @@ static inline void Fill32(void *dst, u32 *tmp, u32 size)
     CpuSet(tmp, dst, 0x05000000 | size / 4);
 }
 
-s32 sub_081976E4(struct P081976E4 *t)
+s32 Nidhoggr_Init(struct P081976E4 *t)
 {
     s32 i;
     u8 *p;
@@ -62,10 +62,10 @@ s32 sub_081976E4(struct P081976E4 *t)
             *p = z;
     }
     sub_0818EBF4(t->effects);
-    sub_08193514(t);
+    Nidhoggr_InitBackgrounds(t);
     sub_081940F8(t);
-    sub_081944C4(t);
-    sub_08195A4C(t, 0);
+    Nidhoggr_InitSuspendedObject(t);
+    Nidhoggr_SetBehavior(t, 0);
     t->life = t->maxLife;
     *(s32 *)((u8 *)gUnk_02000710 + 0x61c) = (s16)t->maxLife;
     *(s32 *)((u8 *)gUnk_02000710 + 0x618) = t->life;

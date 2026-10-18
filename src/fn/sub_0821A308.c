@@ -6,11 +6,11 @@ struct Buf {
 };
 extern u32 gUnk_0300523C;
 extern u32 gUnk_03001680;
-struct Buf *sub_0821A2DC(void);
+struct Buf *MessageQueue_GetBuffers(void);
 
-void sub_0821A308(void)
+void MessageQueue_SwapBuffers(void)
 {
-    struct Buf *b = sub_0821A2DC();
+    struct Buf *b = MessageQueue_GetBuffers();
     if (gUnk_0300523C == 0) {
         struct Buf *e;
         gUnk_03001680 ^= 1;

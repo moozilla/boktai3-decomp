@@ -3,7 +3,7 @@ struct S {
     u8 f[0x3c4];
     u16 a[10];
 };
-void sub_0810EEA4(struct S *s)
+void LinkLobbyPanel_InitGlyphFrames(struct S *s)
 {
     s->a[0] = 0x2d;
     s->a[1] = 0x2e;

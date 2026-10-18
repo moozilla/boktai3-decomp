@@ -7,7 +7,7 @@ struct P {
     u16 c;
     u16 d;
 };
-void sub_08166094(struct P *p, u32 a, u32 b)
+void PauseMenu_SetPromptIconPositions(struct P *p, u32 a, u32 b)
 {
     p->a = a;
     p->b = b;

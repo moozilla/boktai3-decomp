@@ -44,7 +44,7 @@ void SceneInventory_ReadScriptCatalog(struct SceneInventoryScriptCatalog *p)
     if (!p->pageCount)
         p->pageCount = 1;
     if (Script_SeekToKeyword(0x69))
-        p->itemText = sub_08227E90();
+        p->itemText = Script_GetTextSourcePc();
     if (Script_SeekToKeyword(0x61))
-        p->consumableText = sub_08227E90();
+        p->consumableText = Script_GetTextSourcePc();
 }

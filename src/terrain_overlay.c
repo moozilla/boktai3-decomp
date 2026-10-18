@@ -1,9 +1,9 @@
 #include "global.h"
 #include "terrain_overlay.h"
 
-u32 sub_08225984(u16);
+u32 SceneBody_GetById(u16);
 
-void sub_08003B44(struct TerrainOverlay *s, u16 id)
+void TerrainOverlay_AddActor(struct TerrainOverlay *s, u16 id)
 {
     struct TerrainOverlayEntry *e = s->entries;
     s32 i = 0;
@@ -14,7 +14,7 @@ void sub_08003B44(struct TerrainOverlay *s, u16 id)
         i++;
     }
     if (i != s->actorCount) {
-        e->actor = (struct TerrainOverlayActor *)sub_08225984(id);
+        e->actor = (struct TerrainOverlayActor *)SceneBody_GetById(id);
         if (e->actor != 0) {
             e->used = 1;
             e->id = id;
@@ -22,7 +22,7 @@ void sub_08003B44(struct TerrainOverlay *s, u16 id)
     }
 }
 
-void sub_08003B84(struct TerrainOverlay *s, u16 id)
+void TerrainOverlay_RemoveActor(struct TerrainOverlay *s, u16 id)
 {
     struct TerrainOverlayEntry *e = s->entries;
     s32 i;
@@ -36,13 +36,13 @@ void sub_08003B84(struct TerrainOverlay *s, u16 id)
     }
 }
 
-struct TerrainOverlay *sub_0821A2C4(u16);
+struct TerrainOverlay *ResourceRegistry_GetResource(u16);
 
 // MATCHING_CONCESSION: register-pinning
 s32 TerrainOverlay_QueueCommand(u32 type, u32 id)
 {
     struct TerrainOverlay *p = ({
-        struct TerrainOverlay *value = sub_0821A2C4(0x7BE3);
+        struct TerrainOverlay *value = ResourceRegistry_GetResource(0x7BE3);
         asm("" : "+r"(value));
         value;
     });
@@ -55,25 +55,24 @@ s32 TerrainOverlay_QueueCommand(u32 type, u32 id)
     return -1;
 }
 
-u32 sub_08003C00(u32 *p)
+u32 TerrainOverlay_QueueAddActor(u32 *p)
 {
     return TerrainOverlay_QueueCommand(0, *p);
 }
 
-u32 sub_08003C10(u32 *p)
+u32 TerrainOverlay_QueueRemoveActor(u32 *p)
 {
     return TerrainOverlay_QueueCommand(1, *p);
 }
 
-/* Tentative: draws terrain-edge overlays around tracked actors. */
 
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
-void sub_08214374(struct TerrainOverlayDrawable *, s32);
+void Sprite_LinkToList(struct TerrainOverlayDrawable *, s32);
 
-void sub_08003B44(struct TerrainOverlay *, u16);
+void TerrainOverlay_AddActor(struct TerrainOverlay *, u16);
 
-void sub_08003B84(struct TerrainOverlay *, u16);
+void TerrainOverlay_RemoveActor(struct TerrainOverlay *, u16);
 
 static inline struct TerrainOverlayCell *baseCell(s32 index)
 {
@@ -102,16 +101,16 @@ s32 TerrainOverlay_Update(struct TerrainOverlay *p)
             struct TerrainOverlayDrawable *d =
                 (struct TerrainOverlayDrawable *)(sizeof(*base) * i + (u32)base);
             if (!d->active)
-                sub_08214374(d, 0);
+                Sprite_LinkToList(d, 0);
         }
     }
     for (i = 0; (u32)i < p->count; i++) {
         switch (p->commands[i][0]) {
             case 0:
-                sub_08003B44(p, p->commands[i][1]);
+                TerrainOverlay_AddActor(p, p->commands[i][1]);
                 break;
             case 1:
-                sub_08003B84(p, p->commands[i][1]);
+                TerrainOverlay_RemoveActor(p, p->commands[i][1]);
                 break;
         }
     }
@@ -181,7 +180,7 @@ s32 TerrainOverlay_Update(struct TerrainOverlay *p)
             u8 *dynamic;
             s32 index = rowOffset(zs[i]) + xs[i];
             indices[i] = index;
-            dynamic = sub_0821D64C(index, 1);
+            dynamic = TerrainModifiers_FindCellOverride(index, 1);
             if (dynamic)
                 cell = (struct TerrainOverlayCell *)(dynamic + 4);
             else
@@ -260,15 +259,15 @@ test:
 
 extern const u8 gUnk_0824DAFC[];
 
-s32 sub_08219BD8(const u8 *);
+s32 String_Hash(const u8 *);
 
-void sub_082144E4(struct TerrainOverlayDrawable *, void *, s32);
+void Sprite_InitUnlinked(struct TerrainOverlayDrawable *, void *, s32);
 
-void sub_08217060(s32, s32, s32);
+void Video_SetBlendControl(s32, s32, s32);
 
-void sub_08217074(s32, s32);
+void Video_SetBlendAlpha(s32, s32);
 
-void sub_0821A284(u16, void *, s32);
+void ResourceRegistry_RegisterResource(u16, void *, s32);
 
 // MATCHING_CONCESSION: register-pinning
 s32 TerrainOverlay_Initialize(struct TerrainOverlay *p, u32 id, u32 resource)
@@ -286,7 +285,7 @@ s32 TerrainOverlay_Initialize(struct TerrainOverlay *p, u32 id, u32 resource)
     } else {
         model = p->model;
         key = ({
-            register s32 value asm("r1") = sub_08219BD8(gUnk_0824DAFC);
+            register s32 value asm("r1") = String_Hash(gUnk_0824DAFC);
             asm("" : "+r"(value));
             (u16) value;
         });
@@ -304,18 +303,18 @@ s32 TerrainOverlay_Initialize(struct TerrainOverlay *p, u32 id, u32 resource)
             register u32 offset asm("r0") = sizeof(struct TerrainOverlayDrawable) * i;
             struct TerrainOverlayDrawable *d;
             d = (struct TerrainOverlayDrawable *)((u32)*drawables + offset);
-            sub_082144E4(d, loadedModel, 1);
+            Sprite_InitUnlinked(d, loadedModel, 1);
             d->drawFlags |= 0x400;
             i++;
         } while (i < p->drawableCount);
     }
-    sub_08217060(2, 12, 44);
-    sub_08217074(0, 16);
-    sub_0821A284(0x7BE3, p, 0);
+    Video_SetBlendControl(2, 12, 44);
+    Video_SetBlendAlpha(0, 16);
+    ResourceRegistry_RegisterResource(0x7BE3, p, 0);
     return 0;
 }
 
-void *sub_080040F8(u16 x, u16 y)
+void *TerrainOverlay_CreateFromScript(u16 x, u16 y)
 {
     struct TerrainOverlay *s;
     s32 n;

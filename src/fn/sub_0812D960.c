@@ -20,7 +20,7 @@ struct S {
     u32 mask;
 };
 
-u32 sub_0812D960(struct S *b)
+u32 ParticleEffectPool_DestroyTask(struct S *b)
 {
     s32 i = 0;
     u32 *m = &b->mask;

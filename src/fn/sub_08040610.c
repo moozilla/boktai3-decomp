@@ -5,7 +5,7 @@ s32 Modifier_ApplyKindTen(struct ModifierSelection *, struct ModifierSelection *
 u32 sub_0811DD94(s32, s32);
 void ModifierMenu_DrawStatComparison(s32, s32, s32, s32, u32);
 void ModifierMenu_DrawUnavailableStat(s32, s32, s32);
-void sub_08215DF0(u32, s32, s32, u32, u32, u32);
+void Bg_SetTilemapEntry(u32, s32, s32, u32, u32, u32);
 void ModifierMenu_DrawFourthSourceStats(struct ModifierMenu *menu)
 {
     struct ModifierSelection *pending = &menu->pending;
@@ -22,11 +22,11 @@ void ModifierMenu_DrawFourthSourceStats(struct ModifierMenu *menu)
             ModifierMenu_DrawStatComparison(first, first, 25, 4, 9);
             ModifierMenu_DrawStatComparison(second, second, 25, 5, 10);
             zero = 0;
-            sub_08215DF0(2, 24, 4, 0x1d, zero, zero);
+            Bg_SetTilemapEntry(2, 24, 4, 0x1d, zero, zero);
             one = 1;
-            sub_08215DF0(2, 28, 4, 0x1d, one, zero);
-            sub_08215DF0(2, 24, 5, 0x1d, zero, zero);
-            sub_08215DF0(2, 28, 5, 0x1d, one, zero);
+            Bg_SetTilemapEntry(2, 28, 4, 0x1d, one, zero);
+            Bg_SetTilemapEntry(2, 24, 5, 0x1d, zero, zero);
+            Bg_SetTilemapEntry(2, 28, 5, 0x1d, one, zero);
             break;
         }
         case 1: {
@@ -39,11 +39,11 @@ void ModifierMenu_DrawFourthSourceStats(struct ModifierMenu *menu)
                 ModifierMenu_DrawUnavailableStat(8, 14, 3);
             }
             zero = 0;
-            sub_08215DF0(2, 7, 13, 0x1d, zero, zero);
+            Bg_SetTilemapEntry(2, 7, 13, 0x1d, zero, zero);
             one = 1;
-            sub_08215DF0(2, 11, 13, 0x1d, one, zero);
-            sub_08215DF0(2, 7, 14, 0x1d, zero, zero);
-            sub_08215DF0(2, 11, 14, 0x1d, one, zero);
+            Bg_SetTilemapEntry(2, 11, 13, 0x1d, one, zero);
+            Bg_SetTilemapEntry(2, 7, 14, 0x1d, zero, zero);
+            Bg_SetTilemapEntry(2, 11, 14, 0x1d, one, zero);
             break;
         }
     }

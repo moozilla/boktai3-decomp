@@ -9,7 +9,7 @@ struct P {
     u8 pad[0x3c];
     struct Entry entries[1];
 };
-void sub_08038074(struct P *p, int index)
+void WirelessExchange_ClearPeerCounts(struct P *p, int index)
 {
     struct Entry *e = &p->entries[index];
     u8 *q;

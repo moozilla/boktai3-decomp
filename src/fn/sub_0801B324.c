@@ -7,17 +7,17 @@ Resource *ScriptProc_Start(int, int);
 void ResourceHeader_Relocate(void *, void *);
 int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
-u32 sub_08227E90(void);
+u32 Script_GetTextSourcePc(void);
 void sub_0801A218(void *);
 void sub_0801A418(void *);
 void sub_0801A6D0(void *);
 void sub_0801A3C0(void *);
-void sub_0801A470(void *);
-void sub_08030F20(int, int, int, int);
+void SelectionMenu_InitHighlight(void *);
+void MessageWindow_SetBounds(int, int, int, int);
 void SelectionMenu_OpenActorPage(void *);
-void sub_08019F18(void *, void (*)(void));
+void SelectionMenu_SetCallback(void *, void (*)(void));
 void SelectionMenu_Choose(void);
-void sub_08033568(void);
+void ScrollingDialogue_RequestShow(void);
 extern u32 gUnk_0300523C;
 int SelectionMenu_Initialize(u8 *p)
 {
@@ -37,28 +37,28 @@ int SelectionMenu_Initialize(u8 *p)
     *(u16 *)(p + 0x42) = Script_GetKeywordValue('e', 0);
     if (!Script_SeekToKeyword('w'))
         goto fail;
-    if (!(*(u32 *)(p + 0xda8) = sub_08227E90()))
+    if (!(*(u32 *)(p + 0xda8) = Script_GetTextSourcePc()))
         goto fail;
     if (!Script_SeekToKeyword('a'))
         goto fail;
-    if ((*(u32 *)(p + 0xdac) = sub_08227E90()))
+    if ((*(u32 *)(p + 0xdac) = Script_GetTextSourcePc()))
         goto configure;
 fail:
     return -1;
 configure:
     if (!Script_SeekToKeyword('k'))
         goto fail;
-    if (!(*(u32 *)(p + 0xdb0) = sub_08227E90()))
+    if (!(*(u32 *)(p + 0xdb0) = Script_GetTextSourcePc()))
         goto fail;
     sub_0801A218(p);
     sub_0801A418(p);
     sub_0801A6D0(p);
     sub_0801A3C0(p);
-    sub_0801A470(p);
-    sub_08030F20(0, 16, 30, 2);
+    SelectionMenu_InitHighlight(p);
+    MessageWindow_SetBounds(0, 16, 30, 2);
     SelectionMenu_OpenActorPage(p);
-    sub_08019F18(p, SelectionMenu_Choose);
-    sub_08033568();
+    SelectionMenu_SetCallback(p, SelectionMenu_Choose);
+    ScrollingDialogue_RequestShow();
     {
         int mask = 4;
         gUnk_0300523C |= mask;

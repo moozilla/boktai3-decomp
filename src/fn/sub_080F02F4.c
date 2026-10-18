@@ -13,7 +13,7 @@ struct S {
     struct P p[3];
 };
 
-void sub_080F02F4(struct S *s)
+void Ivy_InitControlPresets(struct S *s)
 {
     s->p[0].a = gUnk_086063E4;
     s->p[1].a = gUnk_086063D4;

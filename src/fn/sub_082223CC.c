@@ -3,7 +3,7 @@
 u32 Heap_Alloc(u32);
 void Memory_Clear(u32, u32);
 
-s32 sub_082223CC(u32 *p, u32 n, u32 c)
+s32 HashTable_Init(u32 *p, u32 n, u32 c)
 {
     u32 sz;
     s32 r;

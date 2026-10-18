@@ -10,8 +10,8 @@ struct S {
 };
 extern struct S *gUnk_02000098;
 void *AnimData_FindEntry(u32);
-void sub_082329D4(void *, void *);
-u32 sub_08232ED4(struct S *s)
+void ScreenOrbitEffect_InitSlot(void *, void *);
+u32 ScreenOrbitEffect_Init(struct S *s)
 {
     struct Slot *p;
     int i;
@@ -23,7 +23,7 @@ u32 sub_08232ED4(struct S *s)
     p = s->slots;
     i = 3;
     do {
-        sub_082329D4(s, p);
+        ScreenOrbitEffect_InitSlot(s, p);
         p++;
         i--;
     } while (i >= 0);

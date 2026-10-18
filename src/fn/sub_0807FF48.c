@@ -40,6 +40,6 @@ void SceneActorReaction_RestoreAlternateAfterDelay(struct SceneActorRegistryActo
         }
         owner->counter2AC = zero;
         owner->field2B1 = one;
-        sub_0812E084((u8 *)owner + 0x460, gUnk_0824E128, 0xA0);
+        SceneActorReaction_ResetResponseState((u8 *)owner + 0x460, gUnk_0824E128, 0xA0);
     }
 }

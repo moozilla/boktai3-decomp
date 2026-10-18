@@ -5,10 +5,10 @@ struct Object {
 struct Entry {
     u8 data[0x60];
 };
-void sub_08033590(void);
+void ScrollingDialogue_RequestHide(void);
 void Sprite_Remove(void *);
 void Anim_Remove(void *);
-void sub_08213810(u8 *s)
+void ForgingBook_ReleaseGraphics(u8 *s)
 {
     struct Object *obj = (struct Object *)(s + 0x500);
     struct Entry *p;
@@ -33,5 +33,5 @@ void sub_08213810(u8 *s)
     Anim_Remove(s + 0x124);
     Anim_Remove(a);
     Anim_Remove(b);
-    sub_08033590();
+    ScrollingDialogue_RequestHide();
 }

@@ -6,7 +6,7 @@ struct S {
 };
 extern struct S *gUnk_02000484;
 
-u8 sub_08036AC4(void)
+u8 Wireless_GetConnectedSlotMask(void)
 {
     if (gUnk_02000484 == 0)
         return 0;

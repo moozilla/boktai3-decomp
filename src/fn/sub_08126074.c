@@ -20,7 +20,7 @@ struct S {
     u32 mask;
 };
 
-u32 sub_08126074(struct S *b)
+u32 SceneMovingParticle_OnPoolDestroy(struct S *b)
 {
     s32 i = 0;
     u32 *m = &b->mask;

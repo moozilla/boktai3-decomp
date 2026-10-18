@@ -8,7 +8,7 @@ struct S {
 };
 void Anim_Remove(void *);
 void Bg_ClearTilemap(u32);
-void sub_081C59C4(struct S *p)
+void ChallengeMenu_Destroy(struct S *p)
 {
     s32 i;
     struct E *e = p->e;

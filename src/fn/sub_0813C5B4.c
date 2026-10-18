@@ -43,7 +43,7 @@ static inline s32 scale(s32 v)
         return v >> 12;
     return -((-v) >> 12);
 }
-void sub_0813C5B4(State *s, Point *pos)
+void ConvergingEffects_EmitFarParticle(State *s, Point *pos)
 {
     if ((++s->ticks & 3) == 0) {
         Effect *e = &s->effects[s->next];

@@ -1,9 +1,9 @@
 #include "global.h"
 
-void sub_081D18F0(u32, u32);
+void TaggedSceneNpc_UpdateBehavior(u32, u32);
 
-s32 sub_081D18FC(u32 a, u32 b)
+s32 TaggedSceneNpc_OnBehaviorUpdate(u32 a, u32 b)
 {
-    sub_081D18F0(a, b);
+    TaggedSceneNpc_UpdateBehavior(a, b);
     return 0;
 }

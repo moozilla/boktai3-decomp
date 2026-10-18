@@ -1,8 +1,8 @@
 #include "global.h"
 
-void sub_08248988(void);
+void Rtc_Protect(void);
 
-void sub_082284E8(void)
+void Clock_EndRtcAccess(void)
 {
-    sub_08248988();
+    Rtc_Protect();
 }

@@ -5,12 +5,12 @@ struct Packed {
 void Collider_Init(void *, int, int, int, int, void *, void *);
 void Collider_SetPosition(void *, void *, int);
 void Collider_SetCallback(void *, void *, void *);
-void sub_0821FF58(void *, int, int, int, int, int);
-void sub_0821FF7C(void *, int, int, int);
+void Collider_SetAttackProperties(void *, int, int, int, int, int);
+void Collider_SetBodyProperties(void *, int, int, int);
 s32 Collider_Refresh(void *);
-void sub_08029904(void);
+void GridAttackActor_OnBodyCollision(void);
 void sub_08029870(void *, void *, void *);
-void sub_080299B4(u8 *p, int mode)
+void GridAttackActor_InitDamageCollider(u8 *p, int mode)
 {
     u8 *collider = p + 0x818;
     struct Packed size, offset;
@@ -23,6 +23,6 @@ void sub_080299B4(u8 *p, int mode)
     Collider_Init(collider, 0, 0x5101, 0, 16, &size, &offset);
     Collider_SetPosition(collider, p + 0x8a4, 0);
     Collider_SetCallback(collider, sub_08029870, p);
-    sub_0821FF7C(collider, mode, 0x808, 4);
+    Collider_SetBodyProperties(collider, mode, 0x808, 4);
     Collider_Refresh(collider);
 }

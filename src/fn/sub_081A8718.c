@@ -8,7 +8,7 @@ struct S {
     u8 f2[0xC4 - 0xB1];
     u32 c4;
 };
-void sub_081A68CC(void *);
+void Vanargand_StopActionSequence(void *);
 void sub_081A7C94(void *);
 void sub_081A7D80(void *);
 static inline u8 chk(struct S *p)
@@ -21,12 +21,12 @@ static inline u8 chk(struct S *p)
     }
     return FALSE;
 }
-void sub_081A8718(struct S *p)
+void Vanargand_UpdateTimedMode13(struct S *p)
 {
     struct S *q = p;
     if (chk(p) == 1) {
         u32 v = 0xd;
-        sub_081A68CC((u8 *)p + 0x21C);
+        Vanargand_StopActionSequence((u8 *)p + 0x21C);
         p->st = v;
     }
     if (p->af != 0) {

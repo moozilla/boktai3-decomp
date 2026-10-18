@@ -48,15 +48,15 @@ struct Event {
     u16 code, value;
 };
 extern struct Event gUnk_03005390;
-void sub_08035320(struct Engine *);
-void sub_0803548C(struct Engine *);
-void sub_08035438(struct Engine *);
-void sub_08223580(int);
-void sub_080356AC(struct Engine *, u8);
-void sub_080340AC(struct Engine *);
+void Wireless_UpdateUniAcknowledgedSlots(struct Engine *);
+void Wireless_ReceiveParentUniPackets(struct Engine *);
+void Wireless_ProcessChildUniExchange(struct Engine *);
+void RfuManager_SendData(int);
+void Wireless_RemoveConnectedSlots(struct Engine *, u8);
+void WirelessController_ResetSession(struct Engine *);
 int sub_082238F0(int);
 // MATCHING_CONCESSION: register-pinning
-void sub_0803614C(u8 command)
+void Wireless_OnChildTransferEvent(u8 command)
 {
     register int key asm("r3") = command;
     int saved = key;
@@ -111,7 +111,7 @@ lastMore:
         goto error;
     goto done;
 receive:
-    sub_08223580(1);
+    RfuManager_SendData(1);
     goto done;
 added: {
     u8 *slots = &p->selected;
@@ -136,7 +136,7 @@ disconnected: {
 }
     goto done;
 reset:
-    sub_080340AC(p);
+    WirelessController_ResetSession(p);
     goto done;
 error:
     if (p->operation != 28)

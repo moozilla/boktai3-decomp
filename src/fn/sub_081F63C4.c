@@ -2,7 +2,7 @@
 
 void SceneActors_RunStateCallback(void);
 
-void sub_081F63C4(void)
+void Ratatosk_RunStateCallback(void)
 {
     SceneActors_RunStateCallback();
 }

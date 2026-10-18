@@ -3,7 +3,7 @@
 s32 Script_GetKeywordValue(s32, s32);
 u8 *sub_0810853C(void);
 
-void sub_08108AA4(void)
+void AnimatedTile_StartAlternateAnimationFromScript(void)
 {
     if (Script_GetKeywordValue(0x6e, 0) != 0) {
         u8 *p = sub_0810853C();

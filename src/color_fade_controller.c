@@ -1,7 +1,7 @@
 #include "global.h"
 #include "color_fade_controller.h"
 
-void sub_080036F8(struct ColorFadeChannel *p)
+void ColorFade_StepFadeOut(struct ColorFadeChannel *p)
 {
     p->level = 0x40 - ((p->time << 6) >> p->shift);
     if (p->time > (1 << p->shift)) {
@@ -14,7 +14,7 @@ void sub_080036F8(struct ColorFadeChannel *p)
     p->time++;
 }
 
-void sub_08003734(struct ColorFadeChannel *p)
+void ColorFade_StepFadeIn(struct ColorFadeChannel *p)
 {
     p->level = (p->time << 6) >> p->shift;
     if (p->time > (1 << p->shift)) {
@@ -24,7 +24,7 @@ void sub_08003734(struct ColorFadeChannel *p)
     p->time++;
 }
 
-void sub_08003760(struct ColorFadeChannel *p)
+void ColorFade_InitChannel(struct ColorFadeChannel *p)
 {
     p->mode = 0;
     p->color = 0x1084;
@@ -35,25 +35,25 @@ void sub_08003760(struct ColorFadeChannel *p)
     p->shift = 0;
 }
 
-void sub_0800377C(struct ColorFadeChannel *p)
+void ColorFade_ClearMode(struct ColorFadeChannel *p)
 {
     p->mode = 0;
 }
 
-void sub_08003734(struct ColorFadeChannel *);
+void ColorFade_StepFadeIn(struct ColorFadeChannel *);
 
-void sub_080036F8(struct ColorFadeChannel *);
+void ColorFade_StepFadeOut(struct ColorFadeChannel *);
 
-void sub_08003784(struct ColorFadeChannel *p)
+void ColorFade_UpdateChannel(struct ColorFadeChannel *p)
 {
     switch (p->mode) {
         case 1:
         case 3:
-            sub_08003734(p);
+            ColorFade_StepFadeIn(p);
             break;
         case 2:
         case 4:
-            sub_080036F8(p);
+            ColorFade_StepFadeOut(p);
             break;
     }
 }
@@ -72,9 +72,9 @@ extern u16 gUnk_030051DC;
 
 extern u32 gUnk_030051C8;
 
-void sub_0800377C(struct ColorFadeChannel *);
+void ColorFade_ClearMode(struct ColorFadeChannel *);
 
-void sub_080037B0(u32 a, u32 b, u32 c)
+void ColorFade_SetImmediate(u32 a, u32 b, u32 c)
 {
     struct ColorFadeController *s = gUnk_02000020;
     if (s != 0) {
@@ -84,14 +84,14 @@ void sub_080037B0(u32 a, u32 b, u32 c)
         gUnk_030051D4 = a;
         gUnk_030051DC = c;
         gUnk_030051C8 = 0;
-        sub_0800377C(&s->channels[0]);
-        sub_0800377C(&s->channels[1]);
+        ColorFade_ClearMode(&s->channels[0]);
+        ColorFade_ClearMode(&s->channels[1]);
     }
 }
 
 extern u16 gUnk_03005210;
 
-void sub_08003808(struct ColorFadeController *s)
+void ColorFade_PublishOutputs(struct ColorFadeController *s)
 {
     struct ColorFadeChannel *p = &s->channels[0];
     if (p->mode != 0) {
@@ -107,7 +107,7 @@ void sub_08003808(struct ColorFadeController *s)
     }
 }
 
-s32 sub_08003860(struct ColorFadeChannel *c, s32 x)
+s32 ColorFade_SetMode(struct ColorFadeChannel *c, s32 x)
 {
     u32 *p = &c->mode;
     switch (x) {
@@ -132,7 +132,7 @@ s32 sub_08003860(struct ColorFadeChannel *c, s32 x)
     return 0;
 }
 
-s32 sub_08003860(struct ColorFadeChannel *, s32);
+s32 ColorFade_SetMode(struct ColorFadeChannel *, s32);
 
 void ColorFade_ApplyCommand(struct ColorFadeController *p, s32 type, s32 *args)
 {
@@ -142,7 +142,7 @@ void ColorFade_ApplyCommand(struct ColorFadeController *p, s32 type, s32 *args)
     s32 start = args[5], target = args[6];
     if (flags & 1) {
         struct ColorFadeChannel *c = &p->channels[0];
-        if (sub_08003860(c, type) >= 0) {
+        if (ColorFade_SetMode(c, type) >= 0) {
             if (type == 5) {
                 c->time = 1;
                 c->shift = 0;
@@ -156,7 +156,7 @@ void ColorFade_ApplyCommand(struct ColorFadeController *p, s32 type, s32 *args)
     }
     if (flags & 2) {
         struct ColorFadeChannel *c = &p->channels[1];
-        if (sub_08003860(c, type) >= 0) {
+        if (ColorFade_SetMode(c, type) >= 0) {
             if (type == 5) {
                 c->time = 1;
                 c->shift = 0;
@@ -187,10 +187,10 @@ void ColorFade_ApplyCommands(struct ColorFadeController *p)
                 ColorFade_ApplyCommand(p, type, args);
                 break;
             case 6:
-                sub_0800377C(&p->channels[0]);
+                ColorFade_ClearMode(&p->channels[0]);
                 break;
             case 7:
-                sub_0800377C(&p->channels[1]);
+                ColorFade_ClearMode(&p->channels[1]);
                 break;
         }
     }
@@ -199,20 +199,20 @@ void ColorFade_ApplyCommands(struct ColorFadeController *p)
 
 void ColorFade_ApplyCommands(struct ColorFadeController *);
 
-void sub_08003784(struct ColorFadeChannel *);
+void ColorFade_UpdateChannel(struct ColorFadeChannel *);
 
-void sub_08003808(struct ColorFadeController *);
+void ColorFade_PublishOutputs(struct ColorFadeController *);
 
-u32 sub_080039BC(struct ColorFadeController *p)
+u32 ColorFade_OnUpdate(struct ColorFadeController *p)
 {
     ColorFade_ApplyCommands(p);
-    sub_08003784(&p->channels[0]);
-    sub_08003784(&p->channels[1]);
-    sub_08003808(p);
+    ColorFade_UpdateChannel(&p->channels[0]);
+    ColorFade_UpdateChannel(&p->channels[1]);
+    ColorFade_PublishOutputs(p);
     return 0;
 }
 
-void sub_080039E4(void)
+void ColorFade_OnDestroy(void)
 {
     gUnk_02000020 = 0;
 }
@@ -221,13 +221,13 @@ extern u32 gUnk_03004DA8;
 
 extern u32 gUnk_03004DAC;
 
-void sub_08003760(struct ColorFadeChannel *);
+void ColorFade_InitChannel(struct ColorFadeChannel *);
 
-s32 sub_080039F0(struct ColorFadeController *s)
+s32 ColorFade_Init(struct ColorFadeController *s)
 {
     gUnk_02000020 = s;
-    sub_08003760(&s->channels[0]);
-    sub_08003760(&s->channels[1]);
+    ColorFade_InitChannel(&s->channels[0]);
+    ColorFade_InitChannel(&s->channels[1]);
     gUnk_03004DA0 = 0x40;
     gUnk_03004DA8 = 0x40;
     gUnk_03005214 = 0x1084;
@@ -239,12 +239,12 @@ s32 sub_080039F0(struct ColorFadeController *s)
     return gUnk_030051C8 = 0;
 }
 
-void *sub_08003A68(void)
+void *ColorFade_Create(void)
 {
     void *p = Task_Create(0xb, 0x15c);
     if (p != 0) {
-        Task_SetCallbacks(p, sub_080039BC, sub_080039E4);
-        if (sub_080039F0(p) < 0) {
+        Task_SetCallbacks(p, ColorFade_OnUpdate, ColorFade_OnDestroy);
+        if (ColorFade_Init(p) < 0) {
             Task_Kill(p);
             return 0;
         }
@@ -252,7 +252,7 @@ void *sub_08003A68(void)
     return p;
 }
 
-s32 sub_08003AA8(u32 id, s32 cnt, u32 *src)
+s32 ColorFade_QueueCommand(u32 id, s32 cnt, u32 *src)
 {
     struct ColorFadeController *s = gUnk_02000020;
     s32 i;
@@ -265,7 +265,7 @@ s32 sub_08003AA8(u32 id, s32 cnt, u32 *src)
     return 0;
 }
 
-s32 sub_08003AA8(u32, s32, u32 *);
+s32 ColorFade_QueueCommand(u32, s32, u32 *);
 
 u32 ColorFade_FromScript(void)
 {
@@ -279,5 +279,5 @@ u32 ColorFade_FromScript(void)
             n++;
         }
     }
-    return sub_08003AA8(a, n, buf);
+    return ColorFade_QueueCommand(a, n, buf);
 }

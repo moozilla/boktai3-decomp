@@ -33,7 +33,7 @@ static inline u8 enter(State *p)
 }
 void sub_08022EA4(void *, void *);
 int sub_08022D68(void *);
-void sub_08023E24(Actor *p)
+void SceneActorState_WaitForDelayedAction(Actor *p)
 {
     State *s = &p->base;
     s->vulnerable = 1;

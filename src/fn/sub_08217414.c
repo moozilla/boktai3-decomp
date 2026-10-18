@@ -1,5 +1,7 @@
 // COMPILER: old_agbcc
 #include "global.h"
+/* Palette_LoadWorkingColors: Copies 48 colors into the shared working palette buffer using DMA */
+#define Palette_LoadWorkingColors sub_08217414
 
 void sub_08217414(const void *src)
 {

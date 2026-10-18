@@ -1,5 +1,5 @@
 #include "global.h"
-u32 sub_0816C620(void)
+u32 MapScreen_GetPositionMarkerKeyframe(void)
 {
     return 0;
 }

@@ -11,7 +11,7 @@ struct Obj {
 };
 
 void sub_08214588(struct Obj *);
-void sub_08214374(struct Obj *, u32);
+void Sprite_LinkToList(struct Obj *, u32);
 
 void Sprite_Init(struct Obj *o, u32 b, u32 c)
 {
@@ -28,7 +28,7 @@ void Sprite_Init(struct Obj *o, u32 b, u32 c)
             u32 t = (u32) - (c & 0x80) >> 31;
             o->f24 = 0;
             o->f28 = 0;
-            sub_08214374(o, t);
+            Sprite_LinkToList(o, t);
         }
     }
 }

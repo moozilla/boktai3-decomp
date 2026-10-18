@@ -9,7 +9,7 @@ struct P {
     u8 *q;
 };
 
-u16 sub_080F0B28(struct P *p)
+u16 Ivy_GetAnimationStatus(struct P *p)
 {
     struct R *r = (struct R *)(p->q + 0x48);
     if (r->v == 3)

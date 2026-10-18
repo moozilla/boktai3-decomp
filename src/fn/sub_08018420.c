@@ -2,7 +2,7 @@
 
 extern u32 gUnk_02000088;
 
-u32 sub_08018420(void)
+u32 Weather_GetType(void)
 {
     return gUnk_02000088;
 }

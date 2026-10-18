@@ -6,7 +6,7 @@ struct S {
     u32 w50;
     u32 w54;
 };
-void sub_08202F2C(struct S *p, u32 a, u32 b, u32 c)
+void ProjectileConfig_SetAnimation(struct S *p, u32 a, u32 b, u32 c)
 {
     p->w50 = a;
     p->w54 = b;

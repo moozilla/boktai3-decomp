@@ -3,7 +3,7 @@
 struct Obj {
     u32 a, b, flags;
 };
-void sub_081EAAAC(u8 *p)
+void Actor_HideAuxiliarySprites(u8 *p)
 {
     ((struct Obj *)(p + 0x238))->flags &= ~1;
     ((struct Obj *)(p + 0x2c0))->flags &= ~1;

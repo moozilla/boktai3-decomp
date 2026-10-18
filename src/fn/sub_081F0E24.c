@@ -3,8 +3,8 @@ void Bg_ClearTilemap(u32);
 void *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
-void sub_08215A74(u32, u32);
-void sub_081F0E24(u8 *s)
+void Bg_SetPriority(u32, u32);
+void SingletonSlot7_InitBackgroundAndMotion(u8 *s)
 {
     s32 kind = *(s16 *)(s + 0x5EE);
     struct Scratch {
@@ -27,7 +27,7 @@ void sub_081F0E24(u8 *s)
         *(void **)(s + 0x3A4) = (p = ScriptProc_Start(0xC091, 0x42FF));
         scratch.value = kind;
         Bg_SetupLayers(2, 0, p, 0, kind, 1, &scratch.value);
-        sub_08215A74(3, 2);
+        Bg_SetPriority(3, 2);
         BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0x60);
     }
     key = 0x92B3;

@@ -12,7 +12,7 @@ struct G {
     struct E e[32];
 };
 extern struct G *gUnk_02000240;
-struct E *sub_081A4020(void)
+struct E *Hresvelgr_FindInactiveEffect(void)
 {
     struct G *g = gUnk_02000240;
     struct E *e;

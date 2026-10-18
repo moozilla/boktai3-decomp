@@ -2,7 +2,7 @@
 
 void sub_0811D4AC(u8 *, s32, s32, s32, s32, s32, s32);
 
-u32 sub_0803EBF4(u32 a, u8 *b, u8 *e)
+u32 ScenePool_StateBrakeThenAccelerate(u32 a, u8 *b, u8 *e)
 {
     u32 f;
     u32 z;

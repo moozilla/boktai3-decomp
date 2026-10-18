@@ -8,7 +8,7 @@ void Task_Kill(u8 *);
 void sub_08115F74(void);
 void sub_08115FAC(void);
 
-u8 *sub_0811606C(void)
+u8 *SpriteDrop_CreateManager(void)
 {
     u8 *p;
     if (gUnk_020001E8 != 0)

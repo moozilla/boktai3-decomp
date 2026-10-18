@@ -23,7 +23,7 @@ struct Collider {
     u8 pad40[4];
     u16 reaction;
 };
-void sub_0802C96C(struct Object *p, struct Collider *self, struct Collider *other)
+void Actor_CapturePendingHit(struct Object *p, struct Collider *self, struct Collider *other)
 {
     if (!p->damage) {
         p->damage = other->damage;

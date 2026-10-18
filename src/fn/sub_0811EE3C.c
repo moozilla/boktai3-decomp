@@ -6,7 +6,7 @@ struct O {
     u8 c;
     u16 h;
 };
-s32 sub_0811EE3C(struct O *o)
+s32 Modifier_IsFirstSourceReady(struct O *o)
 {
     if (o->a != 0 && o->h == 0 && o->c != 1)
         return 1;

@@ -4,14 +4,14 @@ extern u8 *gUnk_02000710;
 extern const s16 gUnk_086149C4[];
 u32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
-void sub_0818D8E0(struct Motion0818Object *);
-void sub_0818D754(struct Motion0818Object *p)
+void SpinningApproach_UpdateSpinRamp(struct Motion0818Object *);
+void SpinningApproach_InitMotion(struct Motion0818Object *p)
 {
     u8 *owner = p->parent;
     p->angle =
         Math_Atan2(*(s16 *)(gUnk_02000710 + 0x30) - p->x, *(s16 *)(gUnk_02000710 + 0x34) - p->z);
     p->byte1DD = 0;
-    p->callback = sub_0818D8E0;
+    p->callback = SpinningApproach_UpdateSpinRamp;
     p->a = 0;
     p->b = 0;
     p->c = 0;

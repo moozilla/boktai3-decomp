@@ -22,7 +22,7 @@ static inline u8 tk(u8 *a)
     }
     return 0;
 }
-void sub_080BB5AC(struct S *p, s32 n)
+void Skeleton_UpdateRevivalState(struct S *p, s32 n)
 {
     if (tk(&p->b2)) {
         s32 m;

@@ -8,7 +8,7 @@ struct P {
     u8 f2[4];
     u16 d;
 };
-void sub_08162E40(struct P *p)
+void PlayerBurstEffect_UpdateExpansion(struct P *p)
 {
     p->a++;
     p->b += 0x1e;

@@ -8,7 +8,7 @@ struct P {
 };
 u32 SceneActorProfiles_FindOrAdd(s32, s32);
 
-void sub_080B1EEC(struct P *p)
+void Vorn_InitActorProfile(struct P *p)
 {
     p->a = 0;
     p->b = SceneActorProfiles_FindOrAdd(0x19, 0);

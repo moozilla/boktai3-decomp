@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_08159554(u8 *p, s32 i, s32 add)
+void Player_AddResistance(u8 *p, s32 i, s32 add)
 {
     u8 *q;
     s32 v;

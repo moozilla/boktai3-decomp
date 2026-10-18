@@ -3,7 +3,7 @@ struct S {
     u8 f[0x24];
     u16 n;
 };
-u32 sub_080187BC(struct S *s)
+u32 OrbitingParticles_HasActiveOrb(struct S *s)
 {
     s32 i = 0;
     u8 *e;

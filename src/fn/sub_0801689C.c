@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0801689C(u8 *p)
+void FloatingEffect_Init(u8 *p)
 {
     u32 z = 0;
     u32 one;

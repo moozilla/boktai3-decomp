@@ -8,12 +8,12 @@ struct E7BCObject {
     s32 field40, active;
 };
 extern void *gUnk_02000204;
-void *sub_0811B7E8(void);
-struct E7BCObject *sub_0811B828(void *);
+void *RegistryE7BC_CreateManager(void);
+struct E7BCObject *RegistryE7BC_FindFreeObject(void *);
 void sub_0811B278(struct E7BCObject *, struct PackedVec *, struct PackedVec *, struct PackedVec *,
                   s32, s32, s32, s32, s32, void (*)(void), struct E7BCObject *);
 void sub_0811B2FC(struct E7BCObject *);
-void sub_0811B784(void);
+void RegistryE7BC_OnObjectComplete(void);
 static inline s32 optionalValue(void)
 {
     s32 value;
@@ -34,11 +34,11 @@ void RegistryE7BC_CreateFromScript(void)
     struct PackedVec s;
     struct PackedVec o;
     if (!manager) {
-        manager = sub_0811B7E8();
+        manager = RegistryE7BC_CreateManager();
         if (!manager)
             return;
     }
-    e = sub_0811B828(manager);
+    e = RegistryE7BC_FindFreeObject(manager);
     if (!e)
         return;
     e->field40 = Script_GetKeywordValue('P', 0);
@@ -57,7 +57,7 @@ void RegistryE7BC_CreateFromScript(void)
     o.x = optionalValue();
     o.y = optionalValue();
     o.z = optionalValue();
-    sub_0811B278(e, &p, &s, &o, 12, 7, 0, 6, 12, sub_0811B784, e);
+    sub_0811B278(e, &p, &s, &o, 12, 7, 0, 6, 12, RegistryE7BC_OnObjectComplete, e);
     sub_0811B2FC(e);
     e->active = 1;
 }

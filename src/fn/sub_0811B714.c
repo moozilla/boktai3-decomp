@@ -1,11 +1,11 @@
 #include "global.h"
 
 extern u32 gUnk_02000200;
-void sub_0811B6C8(u32);
+void Collider_InitManagerBuckets(u32);
 
-s32 sub_0811B714(u32 a)
+s32 Collider_InitManager(u32 a)
 {
-    sub_0811B6C8(a);
+    Collider_InitManagerBuckets(a);
     gUnk_02000200 = a;
     return 0;
 }

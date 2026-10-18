@@ -2,7 +2,7 @@
 
 void SceneActorEffects_ReleaseResources(void);
 
-u32 sub_0808D1CC(void)
+u32 Ghoul_Destroy(void)
 {
     SceneActorEffects_ReleaseResources();
     return 0;

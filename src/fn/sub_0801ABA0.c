@@ -3,8 +3,8 @@ typedef struct {
     u8 pad[10], available, tail[5];
 } Item;
 extern Item gUnk_08E60F80[];
-int sub_0822E104(int);
-int sub_0822E224(int);
+int Inventory_GetConsumableId(int);
+int GameState_IsConsumableSlotEquipped(int);
 void SelectionMenu_ItemAvailability(u8 *arg)
 {
     u8 *p = arg;
@@ -17,11 +17,11 @@ void SelectionMenu_ItemAvailability(u8 *arg)
     mask = 1;
     /* do-while(0) only keeps agbcc's block layout */
     do {
-        index = sub_0822E104(i);
+        index = Inventory_GetConsumableId(i);
         if (index >= 0) {
             Item *table = gUnk_08E60F80;
             alias = table[index].available;
-            if (alias && (!sub_0822E224(i))) {
+            if (alias && (!GameState_IsConsumableSlotEquipped(i))) {
                 goto next;
             }
         }

@@ -7,7 +7,7 @@ struct A {
 void sub_081A7A0C(void *);
 void sub_081A7AD0(void *);
 
-void sub_081A7BE0(struct A *p)
+void Vanargand_UpdateModeEffect(struct A *p)
 {
     switch (p->m) {
         case 1:

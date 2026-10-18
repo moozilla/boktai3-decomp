@@ -14,7 +14,7 @@ s32 RouteSpritePool_Destroy(struct RouteSpritePool *pool)
             if (slot->sprite.unknown4[0])
                 Sprite_Remove(&slot->sprite);
             if (slot->shadowAbsent == 0)
-                sub_08013B74(slot->shadow);
+                ScaledShadow_Destroy(slot->shadow);
         }
         slot++;
         i++;

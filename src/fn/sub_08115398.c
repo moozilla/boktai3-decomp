@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08115398(u8 *p)
+void Collectible_OnDeactivate(u8 *p)
 {
     if (p[0xf1]) {
         p[0xf0] = 0;

@@ -9,7 +9,7 @@ struct Weather {
 extern u8 *gUnk_02000710;
 extern u16 gUnk_03004BD8;
 void Script_Call(void *, int);
-void sub_080174B8(void *, int);
+void Weather_EnterPhase(void *, int);
 int sub_080177AC(void *, int, int, int);
 static inline void setFlag(void)
 {
@@ -39,7 +39,7 @@ int Weather_StormOnset(struct Weather *p)
     }
     sub_080177AC(p, 3, 10, 10);
     if (p->timer > 44) {
-        sub_080174B8(p, 3);
+        Weather_EnterPhase(p, 3);
         return 1;
     } else {
         p->bank = 0;

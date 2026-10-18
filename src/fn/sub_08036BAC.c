@@ -1,4 +1,6 @@
 #include "global.h"
+/* Wireless_CopyReceivedNiPacket: Copies the twelve-byte NI receive buffer into the caller destination */
+#define Wireless_CopyReceivedNiPacket sub_08036BAC
 
 extern u8 *gUnk_02000484;
 

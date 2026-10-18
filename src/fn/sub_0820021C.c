@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0820021C(u8 *p, u16 a, u16 b, u16 c)
+void HomingProjectile_SetSecondaryColliderParams(u8 *p, u16 a, u16 b, u16 c)
 {
     *(u16 *)(p + 0x18) = a;
     *(u16 *)(p + 0x1A) = b;

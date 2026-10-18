@@ -20,12 +20,12 @@ extern const EEPROMConfig *gUnk_03006A9C;
 #define REG_DMA3CNT_H         (*(vu16 *)0x040000DE)
 #define REG_VCOUNT            (*(vu16 *)0x04000006)
 #define REG_EEPROM            (*(vu16 *)0x0d000000)
-void sub_08248634(const void *, void *, u16);
-u16 sub_082486B4(u16, u16 *);
-u16 sub_08248778(u16, const u16 *, u8);
-u16 sub_082488D8(u16, const u16 *);
+void Eeprom_TransferDma3(const void *, void *, u16);
+u16 Eeprom_ReadBlock(u16, u16 *);
+u16 Eeprom_WriteBlock(u16, const u16 *, u8);
+u16 Eeprom_VerifyBlock(u16, const u16 *);
 typedef unsigned long uintptr_t;
-u16 sub_08248778(u16 address, const u16 *data, u8 unk_3)
+u16 Eeprom_WriteBlock(u16 address, const u16 *data, u8 unk_3)
 {
     u16 buffer[0x52]; // this is one too large?
     vu16 timeout_flag;
@@ -63,7 +63,7 @@ u16 sub_08248778(u16 address, const u16 *data, u8 unk_3)
     }
     *ptr-- = 0;
     *ptr-- = 1;
-    sub_08248634(buffer, (u16 *)0xd000000, gEEPROMConfig->address_width + 0x43);
+    Eeprom_TransferDma3(buffer, (u16 *)0xd000000, gEEPROMConfig->address_width + 0x43);
     ret = 0;
     timeout_flag = 0;
     prev_vcount = REG_VCOUNT;

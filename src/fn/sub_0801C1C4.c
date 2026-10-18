@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0801C1C4(u8 *p)
+void ResultGame_SetPressVisibility(u8 *p)
 {
     u32 *field;
     field = (u32 *)(p + 0x324);

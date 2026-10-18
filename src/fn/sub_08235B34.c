@@ -7,7 +7,7 @@ struct Vec5B {
 };
 extern u8 *gUnk_02000710;
 void Collider_Init(u8 *, s32, s32, s32, s32, struct Vec5B *, struct Vec5B *);
-void sub_0821FF58(u8 *, s32, s32, s32, s32, s32);
+void Collider_SetAttackProperties(u8 *, s32, s32, s32, s32, s32);
 void Collider_SetCallback(u8 *, void *, u8 *);
 void Collider_SetPosition(u8 *, u8 *, s32);
 void sub_08235B34(u8 *p)
@@ -39,7 +39,7 @@ void sub_08235B34(u8 *p)
     }
     step = 0x1000;
     Collider_Init(e, 0, 0x3001, 0, (u16)flags, &scale, &position);
-    sub_0821FF58(e, amount, 10, 0, step, 30);
+    Collider_SetAttackProperties(e, amount, 10, 0, step, 30);
     Collider_SetCallback(e, 0, p);
     Collider_SetPosition(e, *(u8 **)(p + 0x18) + 0x30, 0);
 }

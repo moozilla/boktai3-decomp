@@ -6,7 +6,7 @@ struct S0813B154 {
 };
 void Sound_StopSong(u32);
 
-void sub_0813B154(struct S0813B154 *p)
+void Player_StopActionSounds(struct S0813B154 *p)
 {
     if (p->v != 6) {
         Sound_StopSong(0xd8);

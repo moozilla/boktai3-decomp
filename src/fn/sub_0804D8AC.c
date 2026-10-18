@@ -13,7 +13,7 @@ struct G {
     u8 idx;
 };
 extern struct G *gUnk_0200047C;
-void sub_08020D54(struct L *, struct E *);
+void SceneMessages_SetPendingTrigger(struct L *, struct E *);
 s32 StagedEffect_CheckScriptCompletion(u8 *p)
 {
     struct L *l = (struct L *)(p + 0x18);
@@ -22,7 +22,7 @@ s32 StagedEffect_CheckScriptCompletion(u8 *p)
         do {
             struct G *g = gUnk_0200047C;
             struct E *e = (struct E *)l->e[g->idx][i];
-            sub_08020D54(l, e);
+            SceneMessages_SetPendingTrigger(l, e);
             if (e->t == 3)
                 return 1;
             i++;

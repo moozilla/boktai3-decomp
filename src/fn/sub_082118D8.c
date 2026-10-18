@@ -8,7 +8,7 @@ struct G {
     u32 a730;
 };
 extern struct G *gUnk_02000710;
-u32 sub_082118D8(s32 n)
+u32 ForgingBook_IsItemDiscoveryRecorded(s32 n)
 {
     u32 *p;
     if (n > 0x1f) {

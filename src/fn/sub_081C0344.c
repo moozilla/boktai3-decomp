@@ -8,7 +8,7 @@ struct S {
 extern u32 gUnk_0300523C;
 u32 TetherActor_GetRequestMode(void);
 void sub_081C01D8(void *);
-void sub_081C0344(struct S *p)
+void TetherActor_UpdateRequestIndicator(struct S *p)
 {
     if (gUnk_0300523C != 0) {
         p->fl |= 1;

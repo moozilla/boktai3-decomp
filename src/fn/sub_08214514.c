@@ -7,10 +7,10 @@ struct Obj {
     u8 fA;
 };
 
-void sub_082143A0(struct Obj *, u32);
+void Sprite_UnlinkFromList(struct Obj *, u32);
 
 void Sprite_Remove(struct Obj *o)
 {
     if (o->f4 != 0)
-        sub_082143A0(o, o->fA);
+        Sprite_UnlinkFromList(o, o->fA);
 }

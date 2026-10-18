@@ -9,14 +9,14 @@ struct T {
     u8 p[8];
     u16 h;
 };
-void sub_08115A20(void *, void *);
-void sub_08115A98(struct S *s, struct T *t)
+void Collectible_ApplyPickupReward(void *, void *);
+void Collectible_OnContact(struct S *s, struct T *t)
 {
     u32 m = 0x20;
     if (t->fl & m) {
         s->b = 0;
     } else {
-        sub_08115A20(s, t);
+        Collectible_ApplyPickupReward(s, t);
         s->h = t->h;
     }
 }

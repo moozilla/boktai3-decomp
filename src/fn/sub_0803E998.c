@@ -3,7 +3,7 @@
 void ScenePool_UpdateSpeedPulse(struct ScenePoolActor *, struct ScenePoolEntry *,
                                 const struct ScenePoolSpeedBounds *);
 extern const struct ScenePoolSpeedBounds gUnk_086058B4[];
-s32 sub_08116C20(s32);
+s32 Player_GetHorizontalVelocity(s32);
 void sub_08114928(struct ScenePoolVec32 *, s32, struct ScenePoolVec32 *, void *, s32, s32, s32,
                   s32);
 static inline void Or(u32 mask, u32 *flags)
@@ -91,7 +91,7 @@ s32 ScenePool_StateEmitBursts(void *manager, struct ScenePoolActor *actor,
             case 2: {
                 register s32 level asm("r5");
                 u32 zero;
-                velocity.x = sub_08116C20(entry->motionPhase) + 1;
+                velocity.x = Player_GetHorizontalVelocity(entry->motionPhase) + 1;
                 zero = 0;
                 velocity.y = zero;
                 velocity.z = zero;
@@ -108,7 +108,7 @@ s32 ScenePool_StateEmitBursts(void *manager, struct ScenePoolActor *actor,
                 register struct ScenePoolVec32 *position asm("r9");
                 register void *profile asm("r10");
                 u32 zero;
-                velocity.x = sub_08116C20(entry->motionPhase) + 1;
+                velocity.x = Player_GetHorizontalVelocity(entry->motionPhase) + 1;
                 zero = 0;
                 velocity.y = zero;
                 velocity.z = zero;
@@ -119,7 +119,7 @@ s32 ScenePool_StateEmitBursts(void *manager, struct ScenePoolActor *actor,
                 position = &actor->position;
                 profile = actor->emissionProfile;
                 sub_08114928(position, level, &velocity, profile, 5, 1, 4, zero);
-                velocity.x = sub_08116C20(entry->motionPhase) + 1;
+                velocity.x = Player_GetHorizontalVelocity(entry->motionPhase) + 1;
                 velocity.y = zero;
                 velocity.z = zero;
                 sub_08114928(position, level, &velocity, profile, 5, zero, 4, 1);

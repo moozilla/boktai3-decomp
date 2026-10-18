@@ -74,8 +74,8 @@ static inline void effect(u8 *p, int id, int mode, int duration)
     }
 }
 void SceneActors_UpdateAnimation(void *, void *, void *);
-void sub_08022AF4(void *);
-void sub_0802667C(ActorAnimation *p, int tick)
+void SceneActors_StopBackgroundFlash(void *);
+void SceneActorAnimation_UpdateFlashPulse(ActorAnimation *p, int tick)
 {
     ActorAnimation *p2 = p;
     if (p->changed) {
@@ -89,7 +89,7 @@ void sub_0802667C(ActorAnimation *p, int tick)
         *(u16 *)((u8 *)p + 0x254) = 2;
         SceneActors_UpdateAnimation(p, draw, resource);
         effect((u8 *)p, 826, 2, 5);
-        sub_08022AF4(p2);
+        SceneActors_StopBackgroundFlash(p2);
     }
     if (!p->tryUpdate(p)) {
         u32 mask = 64;

@@ -1,6 +1,6 @@
 #include "global.h"
 void ResultGame_ScorePress(void *);
-void sub_0801C154(void *);
+void ResultGame_ShowPressMarker(void *);
 void ResultTutorial_Press(u8 *p, int pressed)
 {
     int state = (s8)p[0xb0];
@@ -12,6 +12,6 @@ void ResultTutorial_Press(u8 *p, int pressed)
             u32 v = *(u16 *)(p + 0x46);
             p[0xc0] = v;
         }
-        sub_0801C154(p);
+        ResultGame_ShowPressMarker(p);
     }
 }

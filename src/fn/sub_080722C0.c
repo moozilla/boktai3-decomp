@@ -13,7 +13,7 @@ static inline u32 CellAt(s32 x, s32 z)
 }
 static inline s32 GroundHeight(u32 cell, struct ContactPosition *position)
 {
-    u8 *override = sub_0821D64C(cell, 1);
+    u8 *override = TerrainModifiers_FindCellOverride(cell, 1);
     u8 *data;
     u32 type;
     s32 height;

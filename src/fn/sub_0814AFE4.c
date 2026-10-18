@@ -6,7 +6,7 @@ struct P0814AFE4 {
     u8 f3A3;
 };
 
-void sub_0814AFE4(struct P0814AFE4 *p, s32 v)
+void Player_SetFacingFromAngle(struct P0814AFE4 *p, s32 v)
 {
     s32 k = ((v + 0x60) & 0xff) >> 6;
     if (k > 1) {

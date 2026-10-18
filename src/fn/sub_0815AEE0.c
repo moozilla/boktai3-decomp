@@ -9,12 +9,12 @@ struct P {
 
 void sub_0815AD78(struct P *);
 void sub_0813AFEC(struct P *, s32, s32);
-void sub_0814F8C8(void);
+void PlayerCue_UpdateHidden(void);
 
 void PlayerCue_Hide(struct P *p)
 {
     sub_0815AD78(p);
     sub_0813AFEC(p, 0, 0);
     p->f |= 1;
-    p->fn = sub_0814F8C8;
+    p->fn = PlayerCue_UpdateHidden;
 }

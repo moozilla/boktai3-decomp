@@ -21,7 +21,7 @@ struct A {
 
 void sub_08217EEC(struct B *, u32, s32);
 
-void sub_08163990(struct A *a, struct B *b)
+void ParticlePool_UpdateLinearParticle(struct A *a, struct B *b)
 {
     {
         u16 x = b->h34;

@@ -10,7 +10,7 @@ struct TextState {
     u8 pad20[0xE8];
     u8 depth, styles[7];
 };
-int sub_08031ED8(struct TextState *p, int wide)
+int TextState_AdvanceCursor(struct TextState *p, int wide)
 {
     if (p->wrap != 2)
         p->wrap = 0;

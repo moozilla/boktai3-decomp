@@ -40,7 +40,7 @@ struct Obj {
     s8 delta9;
 };
 void sub_0818CA6C(struct Obj *);
-void sub_0818CA04(struct Obj *p)
+void Armor_UpdatePartStretch(struct Obj *p)
 {
     s32 a = p->byte8, b = p->byte9;
     if (a > 64) {

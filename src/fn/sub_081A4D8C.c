@@ -11,7 +11,7 @@ struct A {
 };
 void sub_0824923C(void *, u32);
 
-void sub_081A4D8C(struct A *p)
+void Hresvelgr_UpdateProjectilePool(struct A *p)
 {
     s32 i;
     struct E *e = p->e;

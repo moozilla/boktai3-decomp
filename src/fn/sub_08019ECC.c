@@ -1,11 +1,11 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 extern u8 gUnk_08E60F80[][16];
-int sub_0822E104(u32);
+int Inventory_GetConsumableId(u32);
 void Anim_LoadKeyframe(u8 *, u8 *, u32, u32);
 void Presentation_SetItemGraphic(u8 *p, u8 *q, u32 item)
 {
-    int index = sub_0822E104(item);
+    int index = Inventory_GetConsumableId(item);
     if (index >= 0) {
         int offset = index * 16;
         u8 *entry;

@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_08237BAC(u8 *p)
+void ActorGlyphTrail_HideParticles(u8 *p)
 {
     u8 z = 0;
     u32 one = 1;

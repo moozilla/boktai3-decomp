@@ -1,7 +1,7 @@
 #include "global.h"
-void sub_080AADE4(void);
-u32 sub_080ABABC(void)
+void TentacleActor_ApplyPendingRadialVelocity(void);
+u32 TentacleActor_UpdatePendingVelocity(void)
 {
-    sub_080AADE4();
+    TentacleActor_ApplyPendingRadialVelocity();
     return 1;
 }

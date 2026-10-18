@@ -5,7 +5,7 @@ struct S {
     s32 f6c;
 };
 
-s32 sub_081D16D8(struct S *p)
+s32 SceneNpc_IsTransitionEffectFinished(struct S *p)
 {
     s32 r = 0;
     if (p->f6c == 4)

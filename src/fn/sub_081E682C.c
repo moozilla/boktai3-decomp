@@ -44,9 +44,9 @@ struct S {
     void (*fn)(void *);
 };
 void Anim_SetSequence(void *, u32, u32, u32, u32);
-void sub_081E4188(void *);
+void Actor_RestoreSavedAnimationPlayback(void *);
 void ActorShadow_Disable(void *);
-void sub_081E41EC(void *);
+void Actor_ArmRestIdleTransition(void *);
 static inline u8 take(struct S *p)
 {
     s32 m = 1;
@@ -76,15 +76,15 @@ struct Child {
     u8 flags;
     u8 rest[0xdc - 6];
 };
-void sub_081E5608(void *, void *);
+void Actor_OnInteractionChildUpdate(void *, void *);
 void ScriptUtility_ClearControlFlag(void);
-void sub_081E4174(void *);
+void Actor_SetInteractionControlFlag(void *);
 void AnimData_SelectPaletteBank(void *, s32);
 void Sound_PlaySong(s32);
 void Script_Call(void *, s32);
 void ActorShadow_Enable(void *);
 void ActorPalette_BeginFade(void *);
-void sub_081E682C(struct S *p)
+void Actor_HideAndResetChildren(struct S *p)
 {
     struct Obj *o;
     struct Anim *a;
@@ -120,7 +120,7 @@ void sub_081E682C(struct S *p)
         }
         {
             u32 active = 4;
-            register void (*fn)(void *, void *) asm("r4") = sub_081E5608;
+            register void (*fn)(void *, void *) asm("r4") = Actor_OnInteractionChildUpdate;
             u32 reset = 1;
             struct Child *child = (struct Child *)((u8 *)p + 0xc8);
             s32 i = 15;

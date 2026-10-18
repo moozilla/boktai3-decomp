@@ -8,7 +8,7 @@ struct Actor {
     u32 drawable;
 };
 int DisplayAnimation_SetEntry(void *, int, int, int, int, int, int);
-int sub_0802DBD4(struct Actor *p, int a, int b, int c, int d, int e)
+int Actor_SetFourWayAnimation(struct Actor *p, int a, int b, int c, int d, int e)
 {
     void *draw = &p->drawable;
     u32 direction, flip;

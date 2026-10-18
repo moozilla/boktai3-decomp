@@ -15,20 +15,20 @@ struct Obj {
     u32 f20, f24;
 };
 extern u8 *gUnk_030042E4;
-void sub_08217EC4(struct Obj *, s32, s32);
+void Effect_SetOrigin(struct Obj *, s32, s32);
 void sub_08217EEC(struct Obj *, struct Pal *, u32);
-u32 sub_082172E0(u32, u8 *);
+u32 Palette_CacheReservedObjectBank(u32, u8 *);
 
-void sub_08217E60(struct Obj *o, struct Pal *p, u32 c)
+void Effect_Initialize(struct Obj *o, struct Pal *p, u32 c)
 {
     if (o->f4 == 0) {
         o->f0 = c;
         o->f14 = 0;
         o->fF = 1;
         o->f10 = 0;
-        sub_08217EC4(o, -8, -8);
+        Effect_SetOrigin(o, -8, -8);
         sub_08217EEC(o, p, 0);
-        o->fE = sub_082172E0(p->f6, gUnk_030042E4 + (p->f6 << 5));
+        o->fE = Palette_CacheReservedObjectBank(p->f6, gUnk_030042E4 + (p->f6 << 5));
         o->f20 = 0;
         o->f24 = 0;
     }

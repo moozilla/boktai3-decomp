@@ -20,20 +20,20 @@ struct PeerMenu {
 #define gRfuLinkStatus gUnk_03006A80
 #include "rfu_compat.h"
 extern u16 gUnk_03005260[];
-int sub_08036AC4(void);
-int sub_08036A88(void);
+int Wireless_GetConnectedSlotMask(void);
+int Wireless_GetPeerHandshakeData(void);
 void TextWindow_Refresh(int, int);
 void Memory_Clear(void *, int);
-void sub_08036CF0(const void *, void *, int);
+void WirelessText_DecodeString(const void *, void *, int);
 void sub_082213B8(void *, void *, int, int, int, int, int, int, int);
-void sub_08033A38(int, int, void *);
+void TextWindow_SetString(int, int, void *);
 void Sound_PlaySong(int);
-void sub_08036B14(void);
-void sub_08036AFC(void);
-void sub_08037788(struct PeerMenu *p)
+void Wireless_RequestAdvanceConnection(void);
+void Wireless_RequestDisconnectPeer(void);
+void WirelessPeerMenu_UpdatePeerConfirmation(struct PeerMenu *p)
 {
     u8 alias;
-    u8 connected = sub_08036AC4();
+    u8 connected = Wireless_GetConnectedSlotMask();
     struct Row *r;
     int i;
     if (p->entered) {
@@ -44,7 +44,7 @@ void sub_08037788(struct PeerMenu *p)
     if (connected != p->previous) {
         r = p->rows;
         if (connected && (connected == gUnk_03006A80->connSlotFlag)) {
-            if (sub_08036A88()) {
+            if (Wireless_GetPeerHandshakeData()) {
                 u8 *name;
                 void *draw;
                 int bit;
@@ -69,7 +69,7 @@ void sub_08037788(struct PeerMenu *p)
                 }
                 r = p->rows;
                 Memory_Clear(name, 24);
-                sub_08036CF0(gUnk_03006A80->partner[i].gname, name, 11);
+                WirelessText_DecodeString(gUnk_03006A80->partner[i].gname, name, 11);
                 {
                     u8 *packet = gUnk_03006A80->partner[i].gname;
                     int value = packet[11] | (packet[12] << 8);
@@ -85,7 +85,7 @@ void sub_08037788(struct PeerMenu *p)
                         cursor++;
                     } while ((--i) >= 0);
                 }
-                sub_08033A38(p->window, 2, ((u8 *)r) + 0x244);
+                TextWindow_SetString(p->window, 2, ((u8 *)r) + 0x244);
                 Sound_PlaySong(495);
             }
             TextWindow_Refresh(p->window, 8);
@@ -105,15 +105,15 @@ void sub_08037788(struct PeerMenu *p)
         p->previous = connected;
     }
     if ((gUnk_03005260[1] & 1) && connected) {
-        sub_08036B14();
+        Wireless_RequestAdvanceConnection();
     }
     if (!r) {
     }
     if (gUnk_03005260[1] & 2) {
         if (connected) {
-            sub_08036AFC();
+            Wireless_RequestDisconnectPeer();
         } else {
-            sub_08036B14();
+            Wireless_RequestAdvanceConnection();
             p->state = 7;
             p->entered = 1;
             p->timer = connected;

@@ -2,7 +2,7 @@
 
 void sub_0807E9D0(void);
 
-void sub_080D0E14(void)
+void Mummy_OnBodyCollision(void)
 {
     sub_0807E9D0();
 }

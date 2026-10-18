@@ -4,14 +4,14 @@ extern u32 gUnk_02000298;
 struct E {
     u8 pad[0x48];
 };
-void sub_08030BF8(u8 *);
+void MessageWindow_Clear(u8 *);
 void Effect_Remove(u8 *);
 
-u32 sub_081D3374(u8 *p)
+u32 PlayerParticleCloud_Destroy(u8 *p)
 {
     u8 *e;
     s32 i;
-    sub_08030BF8(p);
+    MessageWindow_Clear(p);
     e = p + 0x30;
     for (i = 39; i >= 0; i--, e += 0x48) {
         Effect_Remove(e + 0x20);

@@ -1,5 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_helpers.h"
+/* SceneActorControl_ReflectTerrainProbe: Reverses secondary horizontal motion and stops primary horizontal motion when projected terrain exceeds current ground height. */
+#define SceneActorControl_ReflectTerrainProbe sub_08083F5C
 #define SceneActorControl_ReflectTerrainProbe sub_08083F5C
 void SceneActorControl_ReflectTerrainProbe(struct SceneActorRegistryResetView *input)
 {
@@ -43,7 +45,7 @@ void SceneActorControl_ReflectTerrainProbe(struct SceneActorRegistryResetView *i
     else
         cell = gUnk_030052F4->rows[z] + x;
     terrainPosition = &next;
-    data = sub_0821D64C(cell, 1);
+    data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         data += 4;
     else {

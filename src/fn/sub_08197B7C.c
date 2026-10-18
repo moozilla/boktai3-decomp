@@ -12,7 +12,7 @@ struct Task08197B7C {
 };
 void sub_08221208(void *, void *, u32, u32, u32);
 
-void sub_08197B7C(struct Task08197B7C *t)
+void PaletteEffect_UpdateRedPulse(struct Task08197B7C *t)
 {
     u8 *src, *dst;
     s32 i;

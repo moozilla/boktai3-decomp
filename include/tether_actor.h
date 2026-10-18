@@ -128,6 +128,6 @@ extern struct TetherPlayer *gUnk_02000580[4];
 extern const s16 gUnk_086149C4[];
 extern u32 gUnk_03005308;
 void sub_08217DE0(void *, void *, u32);
-void sub_08217EC4(void *, s32, s32);
-void sub_08214584(void *, s32, s32);
+void Effect_SetOrigin(void *, s32, s32);
+void Sprite_SetOriginStub(void *, s32, s32);
 #endif

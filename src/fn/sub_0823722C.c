@@ -1,6 +1,6 @@
 #include "global.h"
 void sub_082371F0(void *);
-u32 sub_0823722C(u8 *s)
+u32 RisingPuffPool_UpdateTask(u8 *s)
 {
     u8 *p = s + 0x18;
     u8 *q = s + 0x44;

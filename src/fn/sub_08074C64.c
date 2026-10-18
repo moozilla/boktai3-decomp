@@ -12,7 +12,7 @@ void SceneActorCollision_InitBodyWithFlags(struct SceneActorRegistryActor *actor
         collider = (void *)((u8 *)actor + colliderOffset);
     }
     Collider_Init(collider, (u16)actor->id, (u16)flags, 0, 16, size, offset);
-    sub_0821FF7C(collider, SceneActorCollision_ReadBodyField3C(actor),
+    Collider_SetBodyProperties(collider, SceneActorCollision_ReadBodyField3C(actor),
                  SceneActorCollision_ReadBodyReactionFlags(actor),
                  SceneActorCollision_ReadBodyField34(actor));
     Collider_SetPosition(collider, &actor->position, 0);

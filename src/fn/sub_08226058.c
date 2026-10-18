@@ -9,7 +9,7 @@ struct S {
     u16 f64;
 };
 extern struct S *gUnk_03005420;
-void sub_08226058(s32 n, u16 *a)
+void Camera_SetOffset(s32 n, u16 *a)
 {
     struct S *p = gUnk_03005420;
     if (p) {

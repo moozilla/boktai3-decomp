@@ -22,7 +22,7 @@ static inline s32 clamp(s32 v)
     return v;
 }
 #define INC(n) H(gUnk_02000710, n) = clamp(H(gUnk_02000710, n) + 1)
-void sub_0820EBEC(u8 *p)
+void OrangeSpine_RecordDefeat(u8 *p)
 {
     struct Args a;
     struct Message m;

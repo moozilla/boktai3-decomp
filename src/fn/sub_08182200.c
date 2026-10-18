@@ -10,7 +10,7 @@ struct S {
     struct T t;
 };
 void sub_08182088(void);
-void sub_08182200(u8 *s)
+void Armor_StartAccentPaletteFade(u8 *s)
 {
     struct T *t = (struct T *)(s + 0x650);
     switch (*(u8 *)(s + 0xb38)) {

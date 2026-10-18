@@ -2,7 +2,7 @@
 struct Shorts {
     s16 elements[1];
 };
-void sub_0821B20C(u8 *p, s32 descriptor, s32 index, s32 *value)
+void Script_ReadTypedVariable(u8 *p, s32 descriptor, s32 index, s32 *value)
 {
     switch ((descriptor >> 24) & 15) {
         case 9:

@@ -1,4 +1,6 @@
 #include "global.h"
+/* Actor_IsWithinHorizontalRange: Tests horizontal axis distances against a range with a fixed vertical tolerance */
+#define Actor_IsWithinHorizontalRange sub_0802DDEC
 
 struct Vec0802DDEC {
     s16 x, y, z;

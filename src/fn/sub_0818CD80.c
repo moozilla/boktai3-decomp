@@ -24,7 +24,7 @@ struct Obj {
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);
 void sub_0818CF10(struct Obj *);
-void sub_0818CD80(struct Obj *p)
+void Armor_UpdatePartTravelXWave(struct Obj *p)
 {
     s32 wave;
     p->rotation += p->byte1DD;

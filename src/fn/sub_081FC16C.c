@@ -9,14 +9,14 @@ struct A {
     struct E e[24];
 };
 extern u32 gUnk_020005E4;
-void sub_081FBEF8(struct A *, struct E *, s32);
-u32 sub_081FC16C(struct A *a)
+void Ratatosk_ReleaseAnimatedParticle(struct A *, struct E *, s32);
+u32 Ratatosk_OnAnimatedParticlePoolDestroy(struct A *a)
 {
     struct E *e = a->e;
     s32 i = 0;
     do {
         if (a->w18 & (1 << i))
-            sub_081FBEF8(a, e, i);
+            Ratatosk_ReleaseAnimatedParticle(a, e, i);
         i++;
         e++;
     } while (i <= 0x1F);

@@ -18,7 +18,7 @@ static inline s32 scaleVelocity(s32 value)
 }
 s32 DirectionalParticle_Spawn(struct DirectionalParticleSource *source, u32 direction, u32 frame)
 {
-    struct DirectionalParticle *particle = sub_08019B7C();
+    struct DirectionalParticle *particle = SpritePool_Allocate();
     struct DirectionalParticleMotion *motion;
     struct ContactPosition position;
     struct ContactPosition *point;
@@ -44,9 +44,9 @@ s32 DirectionalParticle_Spawn(struct DirectionalParticleSource *source, u32 dire
     point->z = point->z - 64 + (((const u16 *)RANDOM_TABLE_ADDR)[randomIndex] & 127);
     particle->visible = 1;
     SpritePool_SetResource(particle, 0x4147);
-    sub_08019BCC(particle, frame);
+    SpritePool_SetFrame(particle, frame);
     SpritePool_SetPalette(particle, 0x164);
-    sub_08019C00(particle, point);
+    SpritePool_SetPosition(particle, point);
     SpritePool_Activate(particle, (void *)DirectionalParticle_Update, source);
     return 0;
 }

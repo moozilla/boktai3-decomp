@@ -7,15 +7,15 @@ struct S {
     u32 k;
 };
 extern u8 *gUnk_02000580;
-void sub_08159404(u8 *, u32, u32);
-void sub_08159424(u8 *, u32);
+void Player_AddAttachmentFlags(u8 *, u32, u32);
+void Player_ClearAttachmentFlags(u8 *, u32);
 
-void sub_08102978(struct S *s)
+void NamedObject_UpdatePlayerFollowFlags(struct S *s)
 {
     if ((u16)(s->h - 3) > 1) {
-        sub_08159404(gUnk_02000580, 5, s->k);
+        Player_AddAttachmentFlags(gUnk_02000580, 5, s->k);
     } else {
-        sub_08159404(gUnk_02000580, 1, s->k);
-        sub_08159424(gUnk_02000580, 4);
+        Player_AddAttachmentFlags(gUnk_02000580, 1, s->k);
+        Player_ClearAttachmentFlags(gUnk_02000580, 4);
     }
 }

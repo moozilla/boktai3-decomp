@@ -1,5 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_helpers.h"
+/* SceneActorControl_ClearCollisionLatch: Clears actor flag 0x100 and status bit 8; retains the existing provisional file-local name. */
+#define SceneActorControl_ClearCollisionLatch sub_08083F3C
 #define SceneActorControl_ClearCollisionLatch sub_08083F3C
 void SceneActorControl_ClearCollisionLatch(struct SceneActorRegistryResetView *actor)
 {

@@ -10,7 +10,7 @@ struct S {
     u8 f[0x1c];
     struct E e[8];
 };
-struct E *sub_08019818(struct S *p, u32 id)
+struct E *TileAnimation_FindChannel(struct S *p, u32 id)
 {
     struct E *e = p->e;
     s32 i = 0;

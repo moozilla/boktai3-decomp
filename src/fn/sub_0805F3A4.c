@@ -13,8 +13,8 @@ void SceneInputPanel_GetEquippedValues(s32 *primaryValue, s32 *secondaryValue,
         index = equipment->selected;
         entry = (void *)(index * 2 + (u32)equipment);
         if (entry->primary[0] >= 0) {
-            sub_0822D808(index, &temporary);
-            first = sub_081590E4(&temporary);
+            Inventory_GetEquippedDescriptor(index, &temporary);
+            first = Player_GetEquipmentValue(&temporary);
             firstIndex = index;
         }
     } else {
@@ -22,7 +22,7 @@ void SceneInputPanel_GetEquippedValues(s32 *primaryValue, s32 *secondaryValue,
         index = equipment->selected - 8;
         entry = (void *)(index * 2 + (u32)equipment);
         if (entry->secondary[0] >= 0) {
-            second = sub_081590FC(sub_0822E5F4(entry->secondary[0]));
+            second = Player_GetEquipmentLevelBonus(GameState_GetUnlockDescriptor(entry->secondary[0]));
             secondIndex = index;
         }
     }
@@ -31,11 +31,11 @@ void SceneInputPanel_GetEquippedValues(s32 *primaryValue, s32 *secondaryValue,
     if (secondaryValue)
         *secondaryValue = second;
     if (primaryDescriptor && firstIndex >= 0)
-        sub_0822D808(firstIndex, primaryDescriptor);
+        Inventory_GetEquippedDescriptor(firstIndex, primaryDescriptor);
     if (secondaryDescriptor && secondIndex >= 0) {
         struct SceneInputEquipmentView *entry;
         struct SceneInputEquipmentView *reloaded = (void *)gUnk_02000710;
         entry = (void *)(secondIndex * 2 + (u32)reloaded);
-        *secondaryDescriptor = *(u32 *)sub_0822E5F4(entry->secondary[0]);
+        *secondaryDescriptor = *(u32 *)GameState_GetUnlockDescriptor(entry->secondary[0]);
     }
 }

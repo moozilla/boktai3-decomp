@@ -1,9 +1,9 @@
 #include "global.h"
 
 extern const u8 gUnk_0824E224[];
-void sub_080B1938(u8 *, const u8 *, u32);
+void Vorn_SelectRecoveryAction(u8 *, const u8 *, u32);
 
-void sub_080B0994(u8 *p)
+void Vorn_UpdateActionCompletion(u8 *p)
 {
     if (p[0x2b1])
         p[0x2b1] = 0;
@@ -14,7 +14,7 @@ void sub_080B0994(u8 *p)
         } *sprite = (void *)(p + 0xdc);
         u8 m = 8;
         sprite->flags |= m;
-        sub_080B1938(p, gUnk_0824E224, 0x19b);
+        Vorn_SelectRecoveryAction(p, gUnk_0824E224, 0x19b);
     } else
         (*(u32 *)(p + 0x2ac))++;
 }

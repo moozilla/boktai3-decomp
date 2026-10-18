@@ -21,7 +21,7 @@ struct Obj {
 };
 s32 Div(s32, s32);
 void sub_0818D590(struct Obj *);
-void sub_0818D4F4(struct Obj *p)
+void Armor_UpdatePartRetraction(struct Obj *p)
 {
     p->x = p->startX + Div(p->dx * p->timer, 20);
     p->y = p->startY + Div(p->dy * p->timer, 20);

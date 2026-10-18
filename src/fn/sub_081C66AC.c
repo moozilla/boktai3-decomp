@@ -11,7 +11,7 @@ struct S {
     u8 h[0x168 - 0x18];
 };
 void Trigger_ConsumePending(void *, u32);
-void sub_081C66AC(u32 a, struct S *p)
+void Actor_UpdateStateFour(u32 a, struct S *p)
 {
     if (p->b8 != 0) {
         p->b8 = 0;

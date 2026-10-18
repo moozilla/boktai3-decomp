@@ -1,4 +1,6 @@
 #include "encoded_record.h"
+/* EncodedRecord_EncodeAlternateFields: Packs game state and name into the alternate record format then applies seeded masking and writes its checksum */
+#define EncodedRecord_EncodeAlternateFields sub_080451BC
 extern u32 gUnk_03005308;
 extern u8 *gUnk_030053F8;
 struct EncodedRecordSession {
@@ -6,7 +8,7 @@ struct EncodedRecordSession {
     u32 value;
 };
 s32 Div(s32, s32);
-u32 sub_08221594(const void *, u32, u32);
+u32 Crc_ComputeCcitt16(const void *, u32, u32);
 #define EncodedRecord_EncodeAlternateFields sub_080451BC
 void EncodedRecord_EncodeAlternateFields(u8 *record)
 {
@@ -63,7 +65,7 @@ padNames:
 namesDone:
     EncodedRecord_WriteBits(record, 0, &bit, 144 - bit, 6);
     EncodedRecord_XorRange(record, 4, 24, 0xB8E6E, skip, 63);
-    value = sub_08221594(record, 3, 24);
+    value = Crc_ComputeCcitt16(record, 3, 24);
     bit = 0;
     EncodedRecord_WriteBits(record, value, &bit, 16, 6);
 }

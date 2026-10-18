@@ -28,12 +28,12 @@ struct SceneValueConsumableDefinition {
     s16 baseValue;
     u8 unknownA[6];
 };
-struct SceneValueEquipment *sub_0822D6C8(u32);
-struct SceneValueEquipmentDefinition *sub_08227F5C(u32);
-struct SceneValueConsumableDefinition *sub_0822E288(u32);
+struct SceneValueEquipment *Inventory_GetEquipmentEntry(u32);
+struct SceneValueEquipmentDefinition *Equipment_GetDefinition(u32);
+struct SceneValueConsumableDefinition *GameState_GetConsumableDescriptor(u32);
 s32 sub_0816D820(u32);
-s32 sub_0822CDA8(u32);
-s32 sub_0822E104(u32);
+s32 Inventory_GetItemId(u32);
+s32 Inventory_GetConsumableId(u32);
 u32 SceneItemValue_GetItemBaseValue(s32);
 s32 SceneItemValue_GetConsumableBaseValue(u32);
 #endif

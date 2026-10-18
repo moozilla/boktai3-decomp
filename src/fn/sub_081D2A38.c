@@ -70,39 +70,39 @@ struct SceneNpc {
 };
 extern void *gUnk_02000480;
 extern struct SceneNpc *gUnk_02000274;
-struct SceneNpc *sub_0802D6F4(s32 name, s32 variant);
-s32 sub_0802D728(struct SceneNpc *, s32 name, struct PackedVec *, s32 angle);
-s32 sub_0802D760(struct SceneNpc *, s32 kind, s32 a, s32 b, s32 c);
-void sub_0802D7E0(struct SceneNpc *, u32, s32, s32, s32);
+struct SceneNpc *Actor_Allocate(s32 name, s32 variant);
+s32 Actor_InitMotion(struct SceneNpc *, s32 name, struct PackedVec *, s32 angle);
+s32 Actor_InitDrawable(struct SceneNpc *, s32 kind, s32 a, s32 b, s32 c);
+void Actor_InitShadow(struct SceneNpc *, u32, s32, s32, s32);
 void SceneMessages_RegisterReceiver(void *, s32, s32);
-void sub_0802D614(void *, struct SceneNpc *, s32, s32);
-void sub_0802D654(void *, struct SceneNpc *);
-void sub_0802E698(void *, struct SceneNpc *);
+void Actor_InitResources(void *, struct SceneNpc *, s32, s32);
+void Actor_LinkToManager(void *, struct SceneNpc *);
+void Actor_InitBehaviorFromScript(void *, struct SceneNpc *);
 void DisplayAnimation_SetFlags(void *);
-void sub_0802D88C(struct SceneNpc *);
-s32 sub_0802DB78(struct SceneNpc *, s32, s32, s32, s32, s32);
+void Actor_DisableShadow(struct SceneNpc *);
+s32 Actor_SetMirroredFourWayAnimation(struct SceneNpc *, s32, s32, s32, s32, s32);
 u32 ParticlePool_Create(void);
 void sub_081D07D8(void *, struct SceneNpc *);
-void sub_081CFFAC(void);
+void SceneNpc_OnStateChange(void);
 void sub_081D0864(void);
-void sub_081D0BC4(void);
-void sub_081D0BD0(void);
+void SceneNpc_OnModeUpdate(void);
+void SceneNpc_OnStateUpdate(void);
 void sub_081D0928(void);
-void sub_081D0B8C(void);
-void sub_0802EA4C(void);
-void sub_0802EA08(void);
+void SceneNpc_OnDestroy(void);
+void Actor_OnIdleUpdate(void);
+void Actor_OnHiddenIdleUpdate(void);
 void sub_081CEFCC(void);
 void sub_081CF84C(void);
-void sub_0802F0C0(void);
+void Actor_OnConfiguredAnimationUpdate(void);
 void sub_081D2544(void);
-void sub_081D29FC(void);
-void sub_081D18FC(void);
+void TaggedSceneNpc_OnFrameUpdate(void);
+void TaggedSceneNpc_OnBehaviorUpdate(void);
 void sub_081D25AC(void);
-void sub_081D2A1C(void);
-void sub_081D2A28(void);
+void TaggedSceneNpc_OnVisibilityUpdate(void);
+void TaggedSceneNpc_DispatchReceiverCallback(void);
 void sub_081D1A44(void);
 void sub_081D1DF8(void);
-u8 sub_0802FD14(struct SceneNpc *);
+u8 SceneCharacter_GetPathNodeState(struct SceneNpc *);
 static inline void setHandler(void *fn, void **slot)
 {
     *slot = fn;
@@ -149,12 +149,12 @@ void TaggedSceneNpc_Create(u32 tag)
     }
     angle = Script_GetKeywordValue('d', 0);
     zero = 0;
-    npc = sub_0802D6F4(name, variant);
+    npc = Actor_Allocate(name, variant);
     if (!npc)
         return;
-    if (sub_0802D728(npc, name, &position, angle) < 0)
+    if (Actor_InitMotion(npc, name, &position, angle) < 0)
         return;
-    if (sub_0802D760(npc, 2, model, 0, zero) < 0)
+    if (Actor_InitDrawable(npc, 2, model, 0, zero) < 0)
         return;
     {
         struct Tagged *t = &npc->tagged;
@@ -170,7 +170,7 @@ void TaggedSceneNpc_Create(u32 tag)
         motion->field36 = speed;
         motion->field38 = zero;
     }
-    sub_0802D7E0(npc, npc->field160, 1, 0, 0x40);
+    Actor_InitShadow(npc, npc->field160, 1, 0, 0x40);
     SceneMessages_RegisterReceiver(npc->block168, name, 5);
     npc->motion.angle = angle;
     {
@@ -194,15 +194,15 @@ void TaggedSceneNpc_Create(u32 tag)
         }
     }
     setHandler(sub_081D2544, &npc->callbacks[5]);
-    setHandler(sub_081D29FC, &npc->callbacks[0]);
-    setHandler(sub_081D18FC, &npc->callbacks[1]);
+    setHandler(TaggedSceneNpc_OnFrameUpdate, &npc->callbacks[0]);
+    setHandler(TaggedSceneNpc_OnBehaviorUpdate, &npc->callbacks[1]);
     setHandler(sub_081D25AC, &npc->callbacks[2]);
-    setHandler(sub_081D2A1C, &npc->callbacks[3]);
-    setHandler(sub_081D2A28, &npc->callbacks[4]);
+    setHandler(TaggedSceneNpc_OnVisibilityUpdate, &npc->callbacks[3]);
+    setHandler(TaggedSceneNpc_DispatchReceiverCallback, &npc->callbacks[4]);
     npc->field1B = angle;
-    sub_0802D614(manager, npc, model, 0);
-    sub_0802D654(manager, npc);
-    sub_0802E698(manager, npc);
+    Actor_InitResources(manager, npc, model, 0);
+    Actor_LinkToManager(manager, npc);
+    Actor_InitBehaviorFromScript(manager, npc);
     switch (Script_GetKeywordValue('i', 0)) {
         case 0: {
             u8 one = 1;
@@ -225,26 +225,26 @@ void TaggedSceneNpc_Create(u32 tag)
             npc->mode = 0;
             npc->field14 = 0;
             npc->field8 = 1;
-            updates[1] = sub_0802EA08;
+            updates[1] = Actor_OnHiddenIdleUpdate;
             npc->state = 1;
             npc->update = updates[1];
             npc->field10 = 0;
             npc->field9 = 1;
             npc->field18 = 0;
             DisplayAnimation_SetFlags(npc->blockD4);
-            sub_0802D88C(npc);
+            Actor_DisableShadow(npc);
             break;
         case 2: {
             void (*fn)(void);
             npc->field21B = 1;
             if ((s8)npc->block168[0x8B] >= 0) {
-                mode = sub_0802FD14(npc);
+                mode = SceneCharacter_GetPathNodeState(npc);
                 npc->field2 = 0;
                 npc->field3 = 0;
                 npc->mode = mode;
                 npc->field14 = 0;
                 npc->field8 = 1;
-                fn = sub_0802EA4C;
+                fn = Actor_OnIdleUpdate;
                 npc->state = 2;
                 npc->update = fn;
                 npc->field10 = 0;
@@ -257,7 +257,7 @@ void TaggedSceneNpc_Create(u32 tag)
                 npc->mode = mode;
                 npc->field14 = 0;
                 npc->field8 = 1;
-                fn = sub_0802F0C0;
+                fn = Actor_OnConfiguredAnimationUpdate;
                 npc->state = 7;
                 npc->update = fn;
                 npc->field10 = 0;
@@ -287,7 +287,7 @@ void TaggedSceneNpc_Create(u32 tag)
             npc->mode = mode;
             npc->field14 = 0;
             npc->field8 = 1;
-            updates[0] = sub_0802F0C0;
+            updates[0] = Actor_OnConfiguredAnimationUpdate;
             npc->state = 7;
             npc->update = updates[0];
             npc->field10 = 0;

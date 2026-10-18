@@ -13,30 +13,30 @@ struct P {
     u32 requested;
 };
 extern u16 gUnk_03005260[];
-void sub_08038170(struct P *);
-void sub_08038448(struct P *);
+void WirelessGameMenu_InitItemChoices(struct P *);
+void WirelessGameMenu_InitEquipmentChoices(struct P *);
 void sub_08169DCC(void);
 void sub_08169E94(void);
-void sub_08038128(struct P *, int);
-void sub_08038138(struct P *);
+void WirelessGameMenu_SetStatusPanelState(struct P *, int);
+void WirelessGameMenu_SignalStatusPanel(struct P *);
 void Sound_PlaySong(int);
 static inline u32 test(u16 *flags, u32 mask)
 {
     return *flags & mask;
 }
-void sub_08038764(struct P *p)
+void WirelessGameMenu_UpdateSelection(struct P *p)
 {
     if (p->entered) {
         u32 zero = 0;
         p->entered = zero;
-        sub_08038170(p);
-        sub_08038448(p);
+        WirelessGameMenu_InitItemChoices(p);
+        WirelessGameMenu_InitEquipmentChoices(p);
         p->requested = zero;
         sub_08169DCC();
         p->ready = 1;
         p->countdown = 8;
         p->wait = 6;
-        sub_08038128(p, 2);
+        WirelessGameMenu_SetStatusPanelState(p, 2);
     }
     if (gUnk_03005260[1] & 8) {
         p->requested = 1;
@@ -55,7 +55,7 @@ void sub_08038764(struct P *p)
             p->entered = 1;
             p->timer = countdown;
             sub_08169E94();
-            sub_08038138(p);
+            WirelessGameMenu_SignalStatusPanel(p);
             if (p->cancel && p->retries)
                 p->retries--;
             return;

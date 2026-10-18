@@ -1,6 +1,6 @@
 #include "global.h"
 void sub_08199F34(void *, void *, s32, s32);
-void sub_0819A07C(u8 *p, s32 a, s32 b)
+void CannonBattery_SpawnProjectile(u8 *p, s32 a, s32 b)
 {
     u8 *q = 0;
     s32 i = 0;

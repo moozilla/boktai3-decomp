@@ -1,18 +1,18 @@
 #include "global.h"
-void sub_0821ABCC(void);
-void sub_0821B0DC(void);
-void sub_0821ABDC(void);
-void sub_0821B90C(void);
+void Script_ResetStacks(void);
+void GameState_ClearActiveRegions(void);
+void Script_ClearCommandTables(void);
+void Script_RegisterBuiltinCommands(void);
 void ScriptProc_Start(u32, u32);
-void sub_0821AE04(void);
-void sub_0821B03C(u32);
-void sub_0821B048(void)
+void Script_LoadScript(void);
+void Script_SetEntryProcedure(u32);
+void Script_InitRuntime(void)
 {
-    sub_0821ABCC();
-    sub_0821B0DC();
-    sub_0821ABDC();
-    sub_0821B90C();
+    Script_ResetStacks();
+    GameState_ClearActiveRegions();
+    Script_ClearCommandTables();
+    Script_RegisterBuiltinCommands();
     ScriptProc_Start(0xA8D9, 0x49BC);
-    sub_0821AE04();
-    sub_0821B03C(0);
+    Script_LoadScript();
+    Script_SetEntryProcedure(0);
 }

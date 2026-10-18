@@ -8,7 +8,7 @@ struct P {
 extern const u32 gUnk_08611DAC[];
 void sub_0824923C(void *, u32);
 void sub_0819E408(void *);
-void sub_0819E5EC(struct P *p)
+void Hresvelgr_UpdatePrimaryBehavior(struct P *p)
 {
     p->b = 0;
     sub_0824923C(p, gUnk_08611DAC[p->i]);

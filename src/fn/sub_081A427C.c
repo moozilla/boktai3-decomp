@@ -9,7 +9,7 @@ struct P {
     u16 h;
 };
 extern struct G *gUnk_02000240;
-void sub_081A427C(struct P *p)
+void Hresvelgr_ReleaseEffect(struct P *p)
 {
     struct G *g = gUnk_02000240;
     if (p != 0) {

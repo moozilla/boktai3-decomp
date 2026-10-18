@@ -5,7 +5,7 @@ struct P {
     u8 g[0x724A - 0x540A];
     u8 s;
 };
-void sub_08196BA4(struct P *p)
+void Nidhoggr_InitOffscreenPose(struct P *p)
 {
     u8 *q = &p->s;
     u32 z = *q;

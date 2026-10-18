@@ -9,7 +9,7 @@ struct S {
     struct T t;
 };
 
-s32 sub_080EFC2C(struct S *s)
+s32 Ivy_SetAuxiliaryColliderFlag(struct S *s)
 {
     struct T *t = &s->t;
     u32 m = 4;

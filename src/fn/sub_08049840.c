@@ -4,7 +4,7 @@
 #include "tether_actor.h"
 extern u8 *gUnk_02000488;
 u32 TetherActor_TestMatchingStatus(u32, u32, u32, u32);
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline s32 cellIndex(s32 x, s32 z)
 {
     s32 index;
@@ -16,7 +16,7 @@ static inline s32 cellIndex(s32 x, s32 z)
 }
 static inline s32 terrainHeight(struct ContactPackedVector *position, s32 index)
 {
-    u8 *properties = sub_0821D64C(index, 1);
+    u8 *properties = TerrainModifiers_FindCellOverride(index, 1);
     u32 surface, height;
     if (properties)
         properties += 4;

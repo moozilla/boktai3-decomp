@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_02000710;
-void sub_0811BA94(s32 x)
+void GameState_SetActionCount892(s32 x)
 {
     s32 t;
     *(s16 *)(gUnk_02000710 + 0x892) = x;

@@ -9,7 +9,7 @@ void ScenePanelSubject_InitCollider(struct ScenePanelSubjectView *subject, u32 v
     *(u32 *)&offset = 0xC80000;
     ((u32 *)&offset)[1] &= 0xFFFF0000;
     Collider_Init(collider, 0, 0x4001, 0, 0x10, &size, &offset);
-    sub_0821FF7C(collider, value, 0, 0);
+    Collider_SetBodyProperties(collider, value, 0, 0);
     Collider_SetPosition(collider, &subject->home, 0);
     Collider_SetCallback(collider, ScenePanelSubject_ApplyContact, subject);
 }

@@ -24,7 +24,7 @@ struct SceneActorReactionTail {
     u8 unknown0[0x5D4];
     struct ContactPosition *destination;
 };
-void sub_0807FC90(void);
+void SceneActorControl_OnIdle(void);
 s32 sub_0821F204(void *, struct ContactPosition *, struct ContactPosition *);
 s32 sub_0821F7A8(void *, struct ContactPosition *, struct ContactPosition *);
 static inline u8 SceneActorReaction_TakePrepared(struct SceneActorRegistryResetView *actor)
@@ -78,7 +78,7 @@ static inline u32 SceneActorReaction_TerrainHeight(struct ContactPosition *posit
         cell = 0;
     else
         cell = gUnk_030052F4->rows[z] + x;
-    data = sub_0821D64C(cell, 1);
+    data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         data += 4;
     else

@@ -1,4 +1,6 @@
 #include "global.h"
+/* Actor_InitAnimationSequence: Initializes the actor drawable sequence and caches its tile index */
+#define Actor_InitAnimationSequence sub_0802CED0
 void DisplayAnimation_InitializeSequence(u8 *, s32, s32, s32, u8 *);
 u32 DisplayAnimation_GetTileIndex(u8 *);
 void sub_0802CED0(u8 *p, s32 a, s32 b, s32 c)

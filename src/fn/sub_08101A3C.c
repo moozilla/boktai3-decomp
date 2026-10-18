@@ -2,7 +2,7 @@
 
 extern u8 *gUnk_020001AC;
 
-u8 *sub_08101A3C(u32 key)
+u8 *NamedObject_FindByName(u32 key)
 {
     u8 *base = gUnk_020001AC;
     s32 i = 0;

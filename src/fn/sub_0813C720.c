@@ -2,7 +2,7 @@
 
 void Effect_Remove(u8 *);
 
-void sub_0813C720(u8 *p)
+void ConvergingEffects_RemoveSprites(u8 *p)
 {
     u8 *q = p + 0x9B0;
     s32 i;

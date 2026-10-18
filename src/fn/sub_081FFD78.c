@@ -10,15 +10,15 @@ struct A {
 };
 extern u32 gUnk_020005F4;
 void Collider_Remove(void *);
-void sub_081FFA74(struct A *, struct E *, s32);
-u32 sub_081FFD78(struct A *a)
+void HomingProjectile_ReleaseSlot(struct A *, struct E *, s32);
+u32 HomingProjectile_DestroyManager(struct A *a)
 {
     struct E *e = a->e;
     s32 i = 0;
     do {
         if (a->w18 & (1 << i)) {
             Collider_Remove((u8 *)e + 0x78);
-            sub_081FFA74(a, e, i);
+            HomingProjectile_ReleaseSlot(a, e, i);
         }
         i++;
         e++;

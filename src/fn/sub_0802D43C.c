@@ -5,7 +5,7 @@ struct S {
     u8 a;
 };
 void DisplayAnimation_Destroy(void *);
-void sub_0802D43C(struct S *p)
+void Actor_OnControllerDestroy(struct S *p)
 {
     DisplayAnimation_Destroy(&p->a);
 }

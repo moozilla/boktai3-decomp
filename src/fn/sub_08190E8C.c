@@ -13,7 +13,7 @@ struct Entries {
     u8 pad[0x5444];
     struct Entry items[52];
 };
-void sub_08190E8C(u8 *p, int i)
+void SceneAnimation_SetSlotFrameThirteen(u8 *p, int i)
 {
     u8 **flag_pointer;
     u8 *q;

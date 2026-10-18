@@ -8,7 +8,7 @@ struct A {
     u8 p1[0x38 - 0x1c];
     struct E e[24];
 };
-struct E *sub_081FBB78(struct A *a, s32 *out)
+struct E *Ratatosk_FindFreeParticle(struct A *a, s32 *out)
 {
     struct E *e = a->e;
     s32 i = 0;

@@ -27,7 +27,7 @@ static inline u8 chk(struct S *p)
     return 0;
 }
 
-void sub_08024AD4(struct S *p)
+void SceneActorState_UpdateShortRecovery(struct S *p)
 {
     struct S *p2 = p;
     if (chk(p)) {

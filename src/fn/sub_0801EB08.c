@@ -1,12 +1,12 @@
 #include "global.h"
-u8 *sub_0821A2C4(int);
+u8 *ResourceRegistry_GetResource(int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
-void sub_0821AAD8(void *);
-void sub_0821B4C8(void *, int, int);
+void Script_ReadReference(void *);
+void Script_WriteReferenceValue(void *, int, int);
 void SceneObjects_ScriptReadPosition(void)
 {
-    u8 *p = sub_0821A2C4(0x85e6);
+    u8 *p = ResourceRegistry_GetResource(0x85e6);
     int id, i, count, index;
     u32 output[2];
     if (!p)
@@ -30,10 +30,10 @@ void SceneObjects_ScriptReadPosition(void)
         return;
     if (!Script_SeekToKeyword(0x70))
         return;
-    sub_0821AAD8(output);
-    sub_0821B4C8(output, 0, *(s16 *)(*(u8 **)(p + 0x42c) + index * 140 + 0x1c));
-    sub_0821AAD8(output);
-    sub_0821B4C8(output, 0, *(s16 *)(*(u8 **)(p + 0x42c) + index * 140 + 0x1e));
-    sub_0821AAD8(output);
-    sub_0821B4C8(output, 0, *(s16 *)(*(u8 **)(p + 0x42c) + index * 140 + 0x20));
+    Script_ReadReference(output);
+    Script_WriteReferenceValue(output, 0, *(s16 *)(*(u8 **)(p + 0x42c) + index * 140 + 0x1c));
+    Script_ReadReference(output);
+    Script_WriteReferenceValue(output, 0, *(s16 *)(*(u8 **)(p + 0x42c) + index * 140 + 0x1e));
+    Script_ReadReference(output);
+    Script_WriteReferenceValue(output, 0, *(s16 *)(*(u8 **)(p + 0x42c) + index * 140 + 0x20));
 }

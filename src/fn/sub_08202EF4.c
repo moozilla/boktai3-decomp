@@ -8,7 +8,7 @@ struct S {
     u16 pad;
     u16 h22;
 };
-void sub_08202EF4(struct S *p, u32 a, u32 b, u32 c, u32 d, u32 e)
+void ProjectileConfig_SetCollision(struct S *p, u32 a, u32 b, u32 c, u32 d, u32 e)
 {
     p->w14 = a;
     p->w18 = b;

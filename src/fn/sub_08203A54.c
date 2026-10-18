@@ -11,12 +11,12 @@ void Collider_SetCallback(u8 *, void (*)(void), u8 *);
 void Collider_SetPosition(u8 *, u8 *, u32);
 s32 Collider_Refresh(u8 *);
 void sub_082038A8(void);
-void sub_0821FF7C(void *, u32, u32, u32);
+void Collider_SetBodyProperties(void *, u32, u32, u32);
 struct Q {
     u8 pad[6];
     u16 flags;
 };
-void sub_08203A54(u8 *p)
+void EnemyF426_InitCollider(u8 *p)
 {
     struct Z a, b;
     u8 *q = p + 0x6c;
@@ -28,7 +28,7 @@ void sub_08203A54(u8 *p)
     Collider_Init(q, 0, 0x5009, 0, 0x10, &a, &b);
     Collider_SetPosition(q, p + 0x40, 0);
     Collider_SetCallback(q, sub_082038A8, p);
-    sub_0821FF7C(q, 0, *(u16 *)(p + 0x13a), *(u16 *)(p + 0x13c));
+    Collider_SetBodyProperties(q, 0, *(u16 *)(p + 0x13a), *(u16 *)(p + 0x13c));
     Collider_Refresh(q);
     ((struct Q *)q)->flags |= 4;
 }

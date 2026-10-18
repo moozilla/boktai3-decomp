@@ -1,7 +1,7 @@
 #include "global.h"
-void sub_08003AA8(s32, s32, s32 *);
-/* sub_08003AA8(n, 7, {3, a..f}) with n = kind + 1 for kinds 1-4, else 1. */
-void sub_082279A8(u32 kind, s32 a, s32 b, s32 c, s32 d, s32 e, s32 f)
+void ColorFade_QueueCommand(s32, s32, s32 *);
+/* ColorFade_QueueCommand(n, 7, {3, a..f}) with n = kind + 1 for kinds 1-4, else 1. */
+void ScreenTransition_SendCommand(u32 kind, s32 a, s32 b, s32 c, s32 d, s32 e, s32 f)
 {
     s32 args[8];
     s32 n;
@@ -30,5 +30,5 @@ void sub_082279A8(u32 kind, s32 a, s32 b, s32 c, s32 d, s32 e, s32 f)
     args[4] = d;
     args[5] = e;
     args[6] = f;
-    sub_08003AA8(n, 7, args);
+    ColorFade_QueueCommand(n, 7, args);
 }

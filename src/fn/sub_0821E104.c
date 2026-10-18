@@ -13,7 +13,7 @@ struct A {
     struct T *fc;
 };
 extern struct A *gUnk_030052F4;
-struct E *sub_0821E104(u16 id, u16 *cnt)
+struct E *Terrain_FindBoxesById(u16 id, u16 *cnt)
 {
     struct E *first;
     s32 i;

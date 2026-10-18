@@ -1,7 +1,7 @@
 #include "global.h"
 extern u16 gUnk_03004BD8;
 u32 ScriptProc_Start(u32, u32);
-void sub_081BD300(u8 *p)
+void DarkLoan_StartDisplayScript(u8 *p)
 {
     u16 *r = &gUnk_03004BD8;
     u32 m = ~0x100;

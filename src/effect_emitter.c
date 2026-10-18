@@ -87,11 +87,11 @@ s32 EffectEmitter_Update(struct EffectEmitter *object)
     return 0;
 }
 
-u32 sub_0800C630(struct EffectEmitter *object)
+u32 EffectEmitter_Destroy(struct EffectEmitter *object)
 {
     Collider_Remove(&object->collider);
     Sprite_Remove(&object->sprite);
-    sub_08013684(object->shadow);
+    Shadow_Destroy(object->shadow);
     return 0;
 }
 
@@ -146,11 +146,11 @@ s32 EffectEmitter_Initialize(struct EffectEmitter *object, u32 id, u32 unused)
     return 0;
 }
 
-void *sub_0800C7AC(u32 a, u32 b)
+void *EffectEmitter_Create(u32 a, u32 b)
 {
     void *p = Task_Create(8, 0x118);
     if (p) {
-        Task_SetCallbacks(p, EffectEmitter_Update, sub_0800C630);
+        Task_SetCallbacks(p, EffectEmitter_Update, EffectEmitter_Destroy);
         if (EffectEmitter_Initialize(p, a, b) < 0) {
             Task_Kill(p);
             return 0;

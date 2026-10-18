@@ -1,5 +1,5 @@
 #include "global.h"
 
-void sub_08219054(void)
+void TextWindow_InitializeGraphics(void)
 {
 }

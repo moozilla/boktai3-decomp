@@ -23,7 +23,7 @@ static inline s32 absolute(s32 x)
 {
     return x < 0 ? -x : x;
 }
-void sub_081E41B0(struct S *p)
+void Actor_UpdateScaleGrowth(struct S *p)
 {
     s32 x = p->scaleX;
     s32 y = p->scaleY;

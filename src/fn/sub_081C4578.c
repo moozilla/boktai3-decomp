@@ -6,14 +6,14 @@ struct S {
     u8 pad2[0x68 - 0x4e];
     s32 f68;
 };
-void sub_081C439C(struct S *);
+void Registry6A37_UpdateBackgroundScroll(struct S *);
 void sub_081B95E4(u8 *);
 void sub_081C43B0(struct S *);
 
-void sub_081C4578(struct S *p)
+void Registry6A37_UpdateSecondScrollTransition(struct S *p)
 {
     s32 r;
-    sub_081C439C(p);
+    Registry6A37_UpdateBackgroundScroll(p);
     sub_081B95E4((u8 *)p + 0x24);
     r = 0;
     if (p->f4d == 2)

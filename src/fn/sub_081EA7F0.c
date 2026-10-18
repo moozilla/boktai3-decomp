@@ -5,8 +5,8 @@ void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
-void sub_08215A74(u32, u32);
-void sub_081EA7F0(u8 *p)
+void Bg_SetPriority(u32, u32);
+void TimeDisplay_InitBackgrounds(u8 *p)
 {
     void *resource;
     u32 layer;
@@ -18,10 +18,10 @@ void sub_081EA7F0(u8 *p)
     *(void **)(p + 0x720) = resource;
     layer = 0;
     Bg_SetupLayers(1, 16, resource, 0, 0, 1, &layer);
-    sub_08215A74(2, 2);
+    Bg_SetPriority(2, 2);
     layer = 1;
     Bg_SetupLayers(2, 0, resource, 0, 0, 1, &layer);
-    sub_08215A74(3, 3);
+    Bg_SetPriority(3, 3);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
     CpuSet((u8 *)ScriptProc_Start(0x92b3, 0x91d) + 20, gUnk_03004FC0, 256);
 }

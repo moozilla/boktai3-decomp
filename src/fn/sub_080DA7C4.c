@@ -5,7 +5,7 @@ struct S {
     u32 flags;
 };
 
-void sub_080DA7C4(struct S *s)
+void Mummy_OnClearActivityFlag(struct S *s)
 {
     u32 *p = &s->flags;
     u32 m = ~2;

@@ -20,13 +20,13 @@ struct Obj {
     u8 byte1DD;
 };
 s32 Div(s32, s32);
-void sub_0818D4F4(struct Obj *);
-void sub_0818D460(struct Obj *p)
+void Armor_UpdatePartRetraction(struct Obj *);
+void Armor_UpdatePartLunge(struct Obj *p)
 {
     p->x = p->startX + Div(p->dx * p->timer, 20);
     p->y = p->startY + Div(p->dy * p->timer, 20);
     p->z = p->startZ + Div(p->dz * p->timer, 20);
     p->timer++;
     if (p->timer > 20)
-        p->callback = sub_0818D4F4;
+        p->callback = Armor_UpdatePartRetraction;
 }

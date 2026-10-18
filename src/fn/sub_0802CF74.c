@@ -21,10 +21,10 @@ struct Manager {
     u8 pad[0x30];
     u32 slot;
 };
-struct Manager *sub_0802C678(void);
+struct Manager *ActorPool_GetManager(void);
 s32 Collider_Refresh(void *);
 void DisplayAnimation_SelectPaletteBank(void *, u32);
-void sub_0802C994(struct Object *);
+void Actor_ClearPendingHit(struct Object *);
 static inline void enable(struct Object *p)
 {
     struct Collision *c = &p->collider;
@@ -42,9 +42,9 @@ static inline void disable(struct Object *p)
     int mask = ~4;
     c->flags &= mask;
 }
-void sub_0802CF74(struct Object *p)
+void Actor_UpdateCollisionAndEffectTimers(struct Object *p)
 {
-    struct Manager *m = sub_0802C678();
+    struct Manager *m = ActorPool_GetManager();
     int selected = 0;
     if (m->slot == p->slot)
         selected = 1;
@@ -68,5 +68,5 @@ void sub_0802CF74(struct Object *p)
         if (!p->effectTimer)
             DisplayAnimation_SelectPaletteBank(&p->drawable, p->effect);
     }
-    sub_0802C994(p);
+    Actor_ClearPendingHit(p);
 }

@@ -1,3 +1,3 @@
-void sub_080AD10C(void)
+void Vorn_OnReactionNoOp(void)
 {
 }

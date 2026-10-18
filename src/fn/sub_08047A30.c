@@ -23,7 +23,7 @@ s32 BackgroundFlash_Initialize(struct BackgroundFlashController *controller, voi
     controller->page = 0;
     if (resource[0] == 'M' && resource[1] == 'P') {
         offset = 0;
-        sub_08215A74(1, 1);
+        Bg_SetPriority(1, 1);
         Bg_SetupLayers(3, 1, resource, 0, 0, 1, (s32 *)&offset);
     } else {
         sub_082160B8(1, 1, resource, 0, 0, 0, 1, map);

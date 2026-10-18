@@ -2,7 +2,7 @@
 
 void sub_0824923C(u8 *p, u32 f);
 
-u32 sub_08013558(u8 *p)
+u32 ShadowTask_Update(u8 *p)
 {
     u8 *n = *(u8 **)(p + 0x1C);
     if (n) {

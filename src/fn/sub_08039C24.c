@@ -12,7 +12,7 @@ struct Item {
 };
 extern const u16 gUnk_0824DE7C[];
 void Anim_LoadKeyframe(void *, void *, int, int);
-void sub_08039C24(void *p, struct Item *q, int index)
+void WirelessGameItems_UpdateBlinkingItem(void *p, struct Item *q, int index)
 {
     if (q->entered)
         q->entered = 0;

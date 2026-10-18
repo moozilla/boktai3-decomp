@@ -8,22 +8,22 @@ struct P {
     u8 pad1[0x12];
     struct Panel panels[2];
 };
-int sub_08036BEC(void);
-void sub_08037A6C(struct P *);
+int Wireless_GetStatus(void);
+void WirelessPeerMenu_UpdateConnectionState(struct P *);
 int sub_0824923C(void *, const void *);
-void sub_080375BC(struct P *, struct Panel *, int);
+void WirelessPeerPanel_Update(struct P *, struct Panel *, int);
 extern const void *gUnk_08605780[];
 int sub_08037B20(struct P *p)
 {
     struct Panel *q;
     int i;
-    if (!sub_08036BEC()) {
-        sub_08037A6C(p);
+    if (!Wireless_GetStatus()) {
+        WirelessPeerMenu_UpdateConnectionState(p);
         sub_0824923C(p, gUnk_08605780[p->state]);
         q = p->panels;
         i = 0;
         do {
-            sub_080375BC(p, q, i);
+            WirelessPeerPanel_Update(p, q, i);
             i++;
             q++;
         } while (i <= 1);

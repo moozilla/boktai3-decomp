@@ -7,7 +7,7 @@ struct Unk08065BEC {
 struct Unk08065BEC *ActorAttachment_AllocateSlot(void);
 
 // &p->unk0 == p, but agbcc keeps the null test for the address expression
-u32 *sub_08065C40(void)
+u32 *ActorAttachment_AllocateSlotHeader(void)
 {
     struct Unk08065BEC *p = ActorAttachment_AllocateSlot();
     if (!p)

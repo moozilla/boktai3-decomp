@@ -1,6 +1,6 @@
 #include "global.h"
 void Anim_Remove(void *);
-void sub_0811CD08(u8 *p)
+void CharacterModel_RemoveAnimations(u8 *p)
 {
     s32 i = 4;
     do {

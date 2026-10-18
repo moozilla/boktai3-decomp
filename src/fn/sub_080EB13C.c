@@ -9,7 +9,7 @@ struct S {
     struct T t;
 };
 
-s32 sub_080EB13C(struct S *s)
+s32 Octopus_SetAnimationRefreshFlag(struct S *s)
 {
     struct T *t = &s->t;
     u32 m = 4;

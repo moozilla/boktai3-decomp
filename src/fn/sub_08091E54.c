@@ -1,5 +1,5 @@
 #include "global.h"
 
-void sub_08091E54(void)
+void Bee_OnAttackCollision(void)
 {
 }

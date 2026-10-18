@@ -2,7 +2,7 @@
 
 extern u32 gUnk_020000D8;
 
-u32 sub_0802C678(void)
+u32 ActorPool_GetManager(void)
 {
     return gUnk_020000D8;
 }

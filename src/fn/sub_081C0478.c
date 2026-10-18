@@ -1,6 +1,6 @@
 #include "global.h"
 void sub_08221110(void *, void *, void *, int, int);
-void sub_081C0478(u8 *a, u8 *b, u8 *c, int d, int e, int n)
+void ScenePaletteFade_BlendPaletteBanks(u8 *a, u8 *b, u8 *c, int d, int e, int n)
 {
     if (n > 0) {
         u8 *z = c;

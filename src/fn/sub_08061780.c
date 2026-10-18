@@ -9,7 +9,7 @@ void SceneInventory_BeginSaleConfirmation(struct SceneInventoryControlView *pane
             break;
         case 1: {
             const void *message = panel->itemText;
-            s32 item = sub_0822CDA8(panel->grid.savedSelection);
+            s32 item = Inventory_GetItemId(panel->grid.savedSelection);
             SceneInputPanel_ShowDescription(panel, 1, message, item);
             break;
         }

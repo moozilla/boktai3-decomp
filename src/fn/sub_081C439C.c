@@ -7,7 +7,7 @@ struct S {
 };
 void sub_08216520(u32, s32, s32);
 
-void sub_081C439C(struct S *p)
+void Registry6A37_UpdateBackgroundScroll(struct S *p)
 {
     sub_08216520(3, p->x, p->y);
 }

@@ -7,14 +7,14 @@ struct S {
     u32 d;
 };
 extern u8 gUnk_03004FC0[];
-void sub_081C0478(void *, u32, u32, u32, u32, u32);
-void sub_081C0538(void *);
-void sub_081C0578(void *);
-void sub_081C05A8(struct S *p)
+void ScenePaletteFade_BlendPaletteBanks(void *, u32, u32, u32, u32, u32);
+void ScenePaletteFade_SetBackgroundOffsets(void *);
+void ScenePaletteFade_BeginHold(void *);
+void ScenePaletteFade_UpdateBlend(struct S *p)
 {
-    sub_081C0478(gUnk_03004FC0, p->a, p->b, p->c, p->d, 3);
+    ScenePaletteFade_BlendPaletteBanks(gUnk_03004FC0, p->a, p->b, p->c, p->d, 3);
     p->c = p->c + 1;
-    sub_081C0538(p);
+    ScenePaletteFade_SetBackgroundOffsets(p);
     if ((p->c >> p->d) != 0)
-        sub_081C0578(p);
+        ScenePaletteFade_BeginHold(p);
 }

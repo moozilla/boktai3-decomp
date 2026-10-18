@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_080937D0(u8 *p)
+void Bee_TickActionCooldown(u8 *p)
 {
     u8 *q = p + 0x42b;
     u8 v = *q;

@@ -19,24 +19,24 @@ int MessageMenu_CreateTextWindows(struct MessageMenu *m)
     if (*handle < 0)
         return -1;
     for (i = 0; i < 4; i++)
-        sub_08033A38(*handle, i, m->lines[i]);
+        TextWindow_SetString(*handle, i, m->lines[i]);
     TextWindow_SetScript(*handle, m->text);
     TextWindow_Refresh(*handle, 0);
-    sub_080337FC(*handle);
+    TextWindow_StartPlayback(*handle);
     handle = &m->footerText;
     *handle = sub_08033690(6, 17, 28, 2);
     if (*handle < 0)
         return -1;
     TextWindow_SetScript(*handle, m->text);
     TextWindow_Refresh(*handle, 1);
-    sub_080337FC(*handle);
+    TextWindow_StartPlayback(*handle);
     handle = &m->choiceText;
     *handle = sub_08033690(0, 11, 30, 4);
     if (*handle < 0)
         return -1;
     TextWindow_SetScript(*handle, m->text);
     TextWindow_Refresh(*handle, 2);
-    sub_080337FC(*handle);
+    TextWindow_StartPlayback(*handle);
     palette = ScriptProc_Start(0x92B3, 0x519C);
     if (!palette)
         return -1;
@@ -77,7 +77,7 @@ int MessageMenu_Destroy(struct MessageMenu *m)
     int *handles = &m->mainText;
     int i = 2;
     do {
-        sub_08033778(*handles++);
+        TextWindow_Destroy(*handles++);
     } while (--i >= 0);
     Anim_Remove(m->transition);
     return 0;
@@ -96,7 +96,7 @@ int MessageMenu_Initialize(struct MessageMenu *m)
     m->source = Text_LookupString(Script_ParseStringRef(Script_GetPc()));
     if (!Script_SeekToKeyword('d'))
         return -1;
-    m->text = sub_08227E90();
+    m->text = Script_GetTextSourcePc();
     if (!m->text)
         return -1;
     m->script = Script_GetKeywordValue('e', 0);

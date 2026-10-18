@@ -104,7 +104,7 @@ static inline int turn(int target, int current)
     }
     return angle + delta;
 }
-void sub_08025DEC(ActorAnimation *p, int tick)
+void SceneActorAnimation_UpdateChargeShotRelease(ActorAnimation *p, int tick)
 {
     ActorAnimation *p2 = p;
     u8 *position = (u8 *)p + 0x48;

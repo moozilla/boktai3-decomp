@@ -2,7 +2,7 @@
 
 void SceneActors_RunStateCallback(void);
 
-void sub_081EF140(void)
+void SceneActors_TickStateCallback(void)
 {
     SceneActors_RunStateCallback();
 }

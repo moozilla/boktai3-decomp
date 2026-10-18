@@ -33,9 +33,9 @@ struct S {
     void (*fn)(void *);
 };
 void Anim_SetSequence(void *, u32, u32, u32, u32);
-void sub_081E4188(void *);
+void Actor_RestoreSavedAnimationPlayback(void *);
 void ActorShadow_Disable(void *);
-void sub_081E41EC(void *);
+void Actor_ArmRestIdleTransition(void *);
 static inline u8 take(struct S *p)
 {
     s32 m = 1;
@@ -79,7 +79,7 @@ static inline void rotate(struct S *p)
         o->angle += o->delta;
     }
 }
-void sub_081E98E0(struct S *p)
+void Actor_UpdateRotatingShrink(struct S *p)
 {
     s32 x, y;
     if (take(p))

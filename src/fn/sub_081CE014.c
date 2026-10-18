@@ -1,10 +1,10 @@
 #include "global.h"
-void sub_0802DB1C(void);
+void Actor_UpdateVisibilityAndShadow(void);
 void sub_081CDE14(u8 *, u8 *);
 void sub_081CDEF8(u8 *, u8 *);
-s32 sub_081CE014(u8 *a, u8 *b)
+s32 SceneCharacter_UpdateDisplay(u8 *a, u8 *b)
 {
-    sub_0802DB1C();
+    Actor_UpdateVisibilityAndShadow();
     if (b[1] == 0x1d || b[1] == 9) {
         sub_081CDE14(a, b);
         sub_081CDEF8(a, b);

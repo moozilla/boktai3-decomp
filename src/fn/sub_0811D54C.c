@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_02000710;
-void sub_0811D54C(void)
+void GameState_ResetChallengeRecords(void)
 {
     s32 i = 0;
     do {

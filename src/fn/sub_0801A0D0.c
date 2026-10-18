@@ -1,4 +1,6 @@
 #include "global.h"
+/* Presentation_PlaySelectionSound: Independent switch-based sound picker living in the byte tail after SelectionMenu_ConfigureLayers; matches the existing low-confidence proposal in sym */
+#define Presentation_PlaySelectionSound sub_0801A0D0
 #define Presentation_PlaySelectionSound sub_0801A0D0
 void Sound_PlaySong(int);
 void Presentation_PlaySelectionSound(void *p, int selection)

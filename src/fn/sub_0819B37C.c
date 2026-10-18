@@ -1,4 +1,6 @@
 #include "global.h"
+/* Math_ApproachShortArrayBySixteenth: Updates each signed halfword toward its target by one sixteenth with a minimum unit step */
+#define Math_ApproachShortArrayBySixteenth sub_0819B37C
 
 static inline s32 Shift(s32 x)
 {

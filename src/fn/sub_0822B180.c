@@ -10,7 +10,7 @@ struct MP {
 extern struct MP gUnk_082643EC[];
 extern u16 gUnk_03005470[];
 void m4aMPlayFadeOutTemporarily(u32, u16);
-void sub_0822B180(u32 t)
+void Sound_PauseChannel12(u32 t)
 {
     u16 s = gUnk_03005470[0x18 / 2];
     if (s != 0) {

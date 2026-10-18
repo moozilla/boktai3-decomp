@@ -1,9 +1,9 @@
 #include "global.h"
-void sub_08215A74(u32, u32);
+void Bg_SetPriority(u32, u32);
 extern u16 gUnk_020005A4;
 extern u32 gUnk_02000580;
 extern u8 gUnk_08E60F0C[];
-void sub_0822D740(u8 *, u8 *);
+void Inventory_InitEquipmentEntryFromDescriptor(u8 *, u8 *);
 u32 Script_SeekToKeyword(u32);
 u32 Script_GetValue(void);
 void sub_08177C9C(u8 *);
@@ -14,10 +14,10 @@ void sub_08176F70(u8 *);
 u32 sub_08033690(u32, u32, u32, u32);
 void sub_08167FC0(u8 *);
 void sub_08179194(void);
-void sub_08163EA0(u8 *, void (*)(void));
+void Hud_SetUpdateCallback(u8 *, void (*)(void));
 void sub_0816778C(u8 *);
 extern u8 *gUnk_02000214;
-u32 sub_08178FC8(u8 *s)
+u32 Hud_InitAlternateLayout(u8 *s)
 {
     u32 zero, value;
     u16 one;
@@ -25,7 +25,7 @@ u32 sub_08178FC8(u8 *s)
     s32 negative;
     void (*callback)(void);
     s[0x4CD8] = (zero = 0);
-    sub_08215A74(0, 0);
+    Bg_SetPriority(0, 0);
     offset = 0xA5C;
     *(u16 *)(s + offset) = zero;
     value = gUnk_020005A4;
@@ -33,7 +33,7 @@ u32 sub_08178FC8(u8 *s)
     value = gUnk_02000580;
     *(u32 *)(s + 0xA40) = value;
     one = 1;
-    sub_0822D740(gUnk_08E60F0C, s + 0x4884);
+    Inventory_InitEquipmentEntryFromDescriptor(gUnk_08E60F0C, s + 0x4884);
     if (Script_SeekToKeyword(0x4E))
         s[0xA5E] = Script_GetValue();
     else
@@ -57,9 +57,9 @@ u32 sub_08178FC8(u8 *s)
     *(u32 *)(s + 0x48E0) = sub_08033690(13, 12, 12, 2);
     sub_08167FC0(s);
     callback = sub_08179194;
-    sub_08163EA0(s, callback);
+    Hud_SetUpdateCallback(s, callback);
     sub_0816778C(s);
-    sub_08163EA0(s, callback);
+    Hud_SetUpdateCallback(s, callback);
     s[0xB01] = 2;
     offset = 0xB02;
     s[offset] = 0xFF;

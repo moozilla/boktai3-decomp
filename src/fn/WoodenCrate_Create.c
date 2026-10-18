@@ -4,20 +4,20 @@ struct WoodenCrate {
     u8 pad0[0xA4];
     u16 timer;
 };
-struct WoodenCrate *sub_080FF820(s32 name);
-u8 sub_080FF7AC(struct WoodenCrate *, s32 flag);
+struct WoodenCrate *WoodenCrate_FindByName(s32 name);
+u8 WoodenCrate_HasFlags(struct WoodenCrate *, s32 flag);
 void sub_080FFAF8(struct WoodenCrate *);
-void sub_080FF78C(struct WoodenCrate *, s32);
+void WoodenCrate_SetFlags(struct WoodenCrate *, s32);
 static inline void trigger(struct WoodenCrate *crate, s32 flag)
 {
-    if (!sub_080FF7AC(crate, flag)) {
+    if (!WoodenCrate_HasFlags(crate, flag)) {
         crate->timer = 24;
         sub_080FFAF8(crate);
-        sub_080FF78C(crate, 0x10);
+        WoodenCrate_SetFlags(crate, 0x10);
     }
 }
 /* Registry routine 820B (Wooden Crate), given -n: for the crate named -n
-   (sub_080FF820), -c bit 1 or else bit 2 picks a flag; unless the crate already
+   (WoodenCrate_FindByName), -c bit 1 or else bit 2 picks a flag; unless the crate already
    has it, it starts the 24-frame sequence (sub_080FFAF8, state 0x10). */
 void WoodenCrate_Create(void)
 {
@@ -26,7 +26,7 @@ void WoodenCrate_Create(void)
     s32 name = Script_GetKeywordValue('n', 0);
     if (!name)
         return;
-    crate = sub_080FF820(name);
+    crate = WoodenCrate_FindByName(name);
     if (!crate)
         return;
     c = Script_GetKeywordValue('c', 0);

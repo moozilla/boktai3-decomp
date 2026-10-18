@@ -9,7 +9,7 @@ struct Context {
     struct Actor *actors;
 };
 extern struct Context *gUnk_030025F8;
-struct Actor *sub_082258DC(u16 id)
+struct Actor *SceneBody_FindById(u16 id)
 {
     struct Actor *actor;
     if (!gUnk_030025F8)

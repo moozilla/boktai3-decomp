@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "display_track.h"
-void sub_08220D20(void *, const void *, u32, u32, u32);
-void sub_08220D44(void *, u32);
+void Anim_RestartSequence(void *, const void *, u32, u32, u32);
+void Anim_SetDurationScale(void *, u32);
 void DisplayTrack_SetSequenceFromScript(void)
 {
     struct DisplayTrack *track = DisplayTrack_FindFromScript();
@@ -19,7 +19,7 @@ void DisplayTrack_SetSequenceFromScript(void)
                     variant = Script_GetValue();
                 if (variant) {
                     state = &track->sequenceState;
-                    sub_08220D20(state, track->sequenceResource, track->sequenceId,
+                    Anim_RestartSequence(state, track->sequenceResource, track->sequenceId,
                                  track->sequenceRow, track->mirror);
                 } else {
                     state = &track->sequenceState;
@@ -27,7 +27,7 @@ void DisplayTrack_SetSequenceFromScript(void)
                                      track->sequenceRow, track->mirror);
                 }
                 if (Script_SeekToKeyword('P'))
-                    sub_08220D44(state, (u16)Script_GetValue());
+                    Anim_SetDurationScale(state, (u16)Script_GetValue());
                 event = Script_SeekToKeyword('o');
                 if (event)
                     track->sequenceEvent = Script_GetValue();

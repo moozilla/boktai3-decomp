@@ -31,9 +31,9 @@ struct Packed {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
 void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
-void sub_0802A4F4(void *);
-void sub_0802A53C(void *);
-void sub_0802A63C(void *);
+void GridAttackActor_UpdateDamageHold(void *);
+void GridAttackActor_UpdateDamageRecovery(void *);
+void GridAttack_UpdateDeathState(void *);
 struct Actor {
     struct Common common;
     u8 pad104[0x74];
@@ -47,9 +47,9 @@ struct Actor {
 };
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
-void sub_0802A5A0(void *);
+void GridAttack_UpdateStaggerState(void *);
 void Sound_PlaySongChecked(int);
-int sub_0802AB4C(struct Actor *p)
+int GridAttack_ApplyPendingDamage(struct Actor *p)
 {
     struct Common *base = (void *)p;
     u8 *position = (u8 *)p + 0x48;
@@ -109,7 +109,7 @@ int sub_0802AB4C(struct Actor *p)
                 u32 mask = 2;
                 base->flags |= mask;
             }
-            state(base, sub_0802A63C, 8);
+            state(base, GridAttack_UpdateDeathState, 8);
             return 1;
         }
         if (special) {
@@ -121,7 +121,7 @@ int sub_0802AB4C(struct Actor *p)
                 u32 mask = 1;
                 base->flags |= mask;
             }
-            state(base, sub_0802A5A0, 7);
+            state(base, GridAttack_UpdateStaggerState, 7);
             return 1;
         }
         p->shake = 3;

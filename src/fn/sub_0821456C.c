@@ -8,7 +8,7 @@ struct Obj {
     u32 f18;
 };
 
-void sub_0821456C(struct Obj *o)
+void Sprite_ResetRenderDefaults(struct Obj *o)
 {
     o->f0 = 0;
     o->f5 = 1;

@@ -3,7 +3,7 @@
 extern const u32 gUnk_0860643C[];
 void sub_0824923C(u8 *, u32);
 
-void sub_080F63C4(u8 *s)
+void Sword_UpdateComponents(u8 *s)
 {
     s32 i;
     for (i = 0; i < s[0xd2c]; i++) {

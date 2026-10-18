@@ -6,8 +6,8 @@ struct S {
     u16 h2a;
 };
 void sub_081FD4C0(void *);
-void sub_081FC68C(void *);
-u32 sub_081FC7D4(struct S *p)
+void SceneProjectile_UpdateSpriteRotation(void *);
+u32 SceneProjectile_UpdateHomingRotation(struct S *p)
 {
     u32 r;
     if (p->w0 <= p->h2a) {
@@ -16,7 +16,7 @@ u32 sub_081FC7D4(struct S *p)
             u32 m = 2;
             p->w4 = m | p->w4;
         }
-        sub_081FC68C(p);
+        SceneProjectile_UpdateSpriteRotation(p);
         r = 0;
     } else
         r = 1;

@@ -9,7 +9,7 @@ struct P08148F80 {
     u8 f5BB;
 };
 
-s32 sub_08148F80(struct P08148F80 *p)
+s32 Player_GetWalkSpeed(struct P08148F80 *p)
 {
     s32 v = 12;
     if (p->f5B9 == 2 && p->f5BB != 0)

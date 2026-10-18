@@ -11,7 +11,7 @@ struct S {
     struct T *t;
 };
 
-void sub_080DED24(struct S *s)
+void Dog_UpdateActionTimers(struct S *s)
 {
     struct T *t = s->t;
     u16 *p = &t->h698;

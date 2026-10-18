@@ -38,7 +38,7 @@ static inline s32 scale(s32 v)
         return v >> 12;
     return -((-v) >> 12);
 }
-void sub_0817A43C(State *s)
+void SceneActors_UpdateConvergingParticles(State *s)
 {
     s32 count, i;
     if (!s->active)

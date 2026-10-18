@@ -15,7 +15,7 @@ extern struct G *gUnk_02000710;
 void AnimData_SelectPaletteBank(void *, s32);
 void Sound_PlaySong(s32);
 
-s32 sub_08162D58(struct P *p)
+s32 PlayerBarrier_TryActivate(struct P *p)
 {
     struct P *q = p;
     if (gUnk_02000710->w <= 0)

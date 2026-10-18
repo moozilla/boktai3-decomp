@@ -12,7 +12,7 @@ struct Q {
     u8 f[0xc];
     u16 a;
 };
-void sub_0803CC78(struct S *p, struct Q *q)
+void ScenePool_OnProximityContact(struct S *p, struct Q *q)
 {
     p->g->a = q->a;
 }

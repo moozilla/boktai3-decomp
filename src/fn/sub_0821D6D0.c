@@ -9,7 +9,7 @@ struct A {
     struct N *f18;
 };
 extern struct A *gUnk_030052F4;
-void sub_0821D6D0(struct N *n)
+void TerrainModifiers_UnregisterCell(struct N *n)
 {
     struct N *prev = n->f8;
     struct N *next = n->fc;

@@ -34,7 +34,7 @@ void Memory_Clear(void *, int);
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 int sub_08224E54(void *, void *);
-int sub_080341E0(struct Engine *p)
+int WirelessController_PollInputExchange(struct Engine *p)
 {
     u8 *changed;
     int result;

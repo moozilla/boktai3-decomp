@@ -13,9 +13,9 @@ struct A {
 };
 extern void *gUnk_02000244;
 void Anim_Remove(void *);
-void sub_08013B74(void *);
+void ScaledShadow_Destroy(void *);
 
-void sub_081A4DB4(struct A *p)
+void Hresvelgr_DestroyProjectilePool(struct A *p)
 {
     s32 i;
     struct E *e = p->e;
@@ -23,7 +23,7 @@ void sub_081A4DB4(struct A *p)
         if (e->a != 0)
             Anim_Remove(e);
         if (e->b != 0)
-            sub_08013B74(&e->b);
+            ScaledShadow_Destroy(&e->b);
         e++;
     }
     gUnk_02000244 = 0;

@@ -9,7 +9,7 @@ struct L {
 };
 extern u32 gUnk_02000474;
 void sub_082323DC(void *);
-u32 sub_0823293C(struct L *l)
+u32 ScriptSpriteManager_Destroy(struct L *l)
 {
     struct N *p = l->head;
     while (p) {

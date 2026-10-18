@@ -1,12 +1,12 @@
 #include "global.h"
 extern u8 *gUnk_02000580[];
 extern u8 *gUnk_02000710;
-s32 sub_0815A400(void);
+s32 Script_GetActorIndex(void);
 u32 Script_GetKeywordValue(u32, u32);
-void sub_0815A628(void)
+void ScriptActor_SetEnergyMaxFromScript(void)
 {
     u8 *p;
-    s32 i = sub_0815A400();
+    s32 i = Script_GetActorIndex();
     p = gUnk_02000580[i];
     if (p) {
         u32 r = Script_GetKeywordValue(0x65, *(u16 *)(p + 0x42a));

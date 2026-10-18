@@ -60,7 +60,7 @@ static inline int trunc12(int x)
     return x >= 0 ? x >> 12 : -(-x >> 12);
 }
 void SceneActors_StartAnimation(void *, void *, void *, int, int, int);
-void sub_08027DAC(ActorAnimation *p)
+void SceneActors_UpdateRestPose(ActorAnimation *p)
 {
     if (p->changed) {
         p->changed = 0;

@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 #include "player.h"
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 sub_0821F204(void *, const struct ContactPosition *, const struct ContactPosition *);
 s32 sub_0821F7A8(void *, const struct ContactPosition *, const struct ContactPosition *);
 u8 SceneActorAttachment_TestPositionWindow(struct SceneActorRegistryActor *,
@@ -92,7 +92,7 @@ modeZero: {
         index = 0;
     else
         index = gUnk_030052F4->rows[cellZ] + cellX;
-    cell = sub_0821D64C(index, 1);
+    cell = TerrainModifiers_FindCellOverride(index, 1);
     if (cell)
         cell += 4;
     else {

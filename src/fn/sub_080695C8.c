@@ -19,7 +19,7 @@ s32 BouncingObject_DestroyPool(struct BouncingPool *input)
             slotOffset += (u32) & ((struct BouncingPool *)0)->slots;
             slot = (void *)((u32)pool + slotOffset);
             Sprite_Remove(slot);
-            sub_08013684(slot->registration);
+            Shadow_Destroy(slot->registration);
         }
         i++;
     } while (i < 12);

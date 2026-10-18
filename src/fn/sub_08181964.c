@@ -2,7 +2,7 @@
 void sub_08181778(void);
 void sub_0818171C(void *);
 void sub_081816B0(void *);
-void sub_08181964(u8 *s)
+void Armor_InitPaletteController(u8 *s)
 {
     u32 *t;
     sub_08181778();

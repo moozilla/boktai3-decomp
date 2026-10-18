@@ -80,13 +80,13 @@ static inline void effect2(u8 *p, int mode, int id, int duration)
 }
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
-void sub_08022AF4(void *);
+void SceneActors_StopBackgroundFlash(void *);
 void BackgroundFlash_BeginAppearance(void *);
 #define U16(p, o) (*(u16 *)((u8 *)(p) + (o)))
 #define S16(p, o) (*(s16 *)((u8 *)(p) + (o)))
 #define U32(p, o) (*(u32 *)((u8 *)(p) + (o)))
 #define U8(p, o)  (*((u8 *)(p) + (o)))
-void sub_08026488(ActorAnimation *p, int tick)
+void SceneActorAnimation_UpdateFlashWindup(ActorAnimation *p, int tick)
 {
     ActorAnimation *p2 = p;
     if (p->changed) {
@@ -127,7 +127,7 @@ void sub_08026488(ActorAnimation *p, int tick)
         U16(p2, 0x24c) = 0;
     if (p->tryUpdate(p)) {
         effect2((u8 *)p2, 2, 826, 5);
-        sub_08022AF4(p2);
+        SceneActors_StopBackgroundFlash(p2);
     } else {
         u32 mask = 64;
         p->flags |= mask;

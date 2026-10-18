@@ -7,7 +7,7 @@ struct S {
     u8 b;
 };
 void DisplayAnimation_SelectPaletteBank(u8 *, u32);
-void sub_0802D040(u8 *p)
+void Actor_StartDamageFlash(u8 *p)
 {
     DisplayAnimation_SelectPaletteBank(p + 0x184, 0x192);
     *(u16 *)(p + 0x64) = 10;

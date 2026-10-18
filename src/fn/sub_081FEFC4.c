@@ -10,7 +10,7 @@ struct A {
 };
 extern u32 gUnk_020005F0;
 void sub_081FEDE8(struct A *, struct E *, s32);
-u32 sub_081FEFC4(struct A *a)
+u32 SpriteParticle_DestroyManager(struct A *a)
 {
     struct E *e = a->e;
     s32 i = 0;

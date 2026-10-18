@@ -6,7 +6,7 @@ struct E {
     u8 d;
     u16 e;
 };
-u32 sub_0821E7AC(struct E *t, u32 i)
+u32 Path_GetPointNodeId(struct E *t, u32 i)
 {
     return t[i].c;
 }

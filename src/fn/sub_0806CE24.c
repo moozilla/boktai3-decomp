@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_steering_actor.h"
-void sub_08013B74(void *);
+void ScaledShadow_Destroy(void *);
 static inline u8 Used(struct SceneSteeringActorPool *pool, u32 bit)
 {
     if (pool->used & bit)
@@ -20,7 +20,7 @@ s32 SceneSteeringActor_DestroyPool(struct SceneSteeringActorPool *input)
     do {
         if (Used(pool, 1U << i)) {
             if (!*status) {
-                sub_08013B74(shadow);
+                ScaledShadow_Destroy(shadow);
                 *status = 255;
             }
             {

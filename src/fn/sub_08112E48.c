@@ -11,7 +11,7 @@ struct S {
 };
 void Anim_Remove(void *);
 void Heap_Free(void *);
-void sub_08112E48(struct S *s)
+void SceneDebris_ReleaseAnimation(struct S *s)
 {
     struct A *a = s->a;
     if (a->on != 0) {

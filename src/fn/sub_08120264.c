@@ -8,7 +8,7 @@ struct S {
     u8 pad[0x18];
     struct E e[1];
 };
-struct E *sub_08120264(struct S *s)
+struct E *RegistryA8CB_FindAvailableEntry(struct S *s)
 {
     s32 i;
     for (i = 0; i < 1; i++) {

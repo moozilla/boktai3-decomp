@@ -1,8 +1,8 @@
 #include "global.h"
 
-void sub_082333A8(u32, u32, u32, u32, u32);
+void ExplosionEffect_Create(u32, u32, u32, u32, u32);
 
-void sub_08190778(u32 a, u8 *p)
+void ScenePanelEffect_CreatePositionEffect(u32 a, u8 *p)
 {
-    sub_082333A8(a, 0x10, *(u16 *)(p + 0x53C8), 0xa, 0);
+    ExplosionEffect_Create(a, 0x10, *(u16 *)(p + 0x53C8), 0xa, 0);
 }

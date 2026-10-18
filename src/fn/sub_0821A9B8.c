@@ -1,7 +1,7 @@
 #include "global.h"
 extern u8 *gUnk_02000610;
 u8 *Script_DecodeOperand(u8 *, u32 *, u32 *);
-s32 sub_0821A9B8(void)
+s32 Script_ReadNextKeyword(void)
 {
     u32 a, b;
     u8 *p = gUnk_02000610;

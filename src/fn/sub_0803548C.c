@@ -42,7 +42,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-void sub_0803548C(struct Engine *argument)
+void Wireless_ReceiveParentUniPackets(struct Engine *argument)
 {
     struct Engine *p = argument;
     u8 *scratch = p->scratch;

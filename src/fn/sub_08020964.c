@@ -11,7 +11,7 @@ struct S {
     u8 f[0x74];
     struct N *head;
 };
-struct N *sub_08020964(struct S *p, u32 id, u32 a)
+struct N *SceneMessages_FindReceiver(struct S *p, u32 id, u32 a)
 {
     struct N *n = p->head;
     while (n) {

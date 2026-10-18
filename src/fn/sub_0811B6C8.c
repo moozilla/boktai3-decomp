@@ -9,9 +9,9 @@ struct S {
     s32 m;
     s32 avg;
 };
-s32 sub_08111140(void);
+s32 SceneTilemap_GetLayoutLength(void);
 s32 Div(s32, s32);
-void sub_0811B6C8(struct S *s)
+void Collider_InitManagerBuckets(struct S *s)
 {
     s32 i;
     s32 v;
@@ -24,7 +24,7 @@ void sub_0811B6C8(struct S *s)
         s->e[i].d = 0;
         i++;
     } while (i <= 9);
-    v = sub_08111140() << 5;
+    v = SceneTilemap_GetLayoutLength() << 5;
     if (v <= 0)
         v = 0x7fffffff;
     s->avg = Div(v, 9);

@@ -1,11 +1,11 @@
 #include "global.h"
-u8 *sub_0821A2C4(int);
+u8 *ResourceRegistry_GetResource(int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
 void SceneObject_BeginRaising(void);
 int SceneObjects_ScriptActivate(void)
 {
-    u8 *p = sub_0821A2C4(0x85e6);
+    u8 *p = ResourceRegistry_GetResource(0x85e6);
     int found, id, i;
     if (!p)
         return -1;

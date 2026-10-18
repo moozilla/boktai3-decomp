@@ -41,11 +41,11 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->pending = 1;
 }
 void sub_08223BC0(int);
-void sub_0803441C(struct Engine *);
-void sub_0803451C(struct Engine *);
+void WirelessController_UpdatePeerRosterSend(struct Engine *);
+void WirelessController_PollPeerRosterSend(struct Engine *);
 int sub_0824923C(void *, void *);
 extern void *gUnk_086056EC[];
-int sub_08036538(struct Engine *p)
+int Wireless_UpdateInactiveConnectionSession(struct Engine *p)
 {
     if (p->pad18) {
         p->allowed = 0;

@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "transient_sprite_effects.h"
-void sub_082144E4(void *, void *, u32);
+void Sprite_InitUnlinked(void *, void *, u32);
 union TransientPackedPosition {
     struct ContactPackedVector bits;
     struct {
@@ -48,7 +48,7 @@ s32 TransientSpriteEffects_Initialize(struct TransientSpriteEffects *pool, void 
             register struct ContactSwarmGraphics *argument asm("r1") = graphics;
             register u32 mode asm("r2") = 0;
             savedIndex = index;
-            sub_082144E4(sprite, argument, mode);
+            Sprite_InitUnlinked(sprite, argument, mode);
         }
         slot->sprite.priority = 1;
         slot->sprite.position.bits = position.bits;

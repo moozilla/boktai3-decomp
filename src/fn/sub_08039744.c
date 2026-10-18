@@ -1,12 +1,12 @@
 #include "global.h"
-u8 *sub_08037DC0(void);
+u8 *WirelessExchange_Get(void);
 static inline u8 g(u8 *q)
 {
     return q[5];
 }
-u32 sub_08039744(void)
+u32 WirelessGame_GetRemoteOpponentHealthPercent(void)
 {
-    u8 *p = sub_08037DC0();
+    u8 *p = WirelessExchange_Get();
     u32 r;
     if (p)
         r = g(p + 0x48);

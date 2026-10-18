@@ -73,13 +73,13 @@ struct Actor {
     struct Vec destination;
 };
 extern void *gUnk_02000480;
-struct Actor *sub_0802D6D0(void *, int);
+struct Actor *Actor_FindById(void *, int);
 int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
-int sub_0802FD14(struct Actor *);
-void sub_08225B4C(void *, void *, int, int, int);
-void sub_0821E780(void *, void *, int);
+int SceneCharacter_GetPathNodeState(struct Actor *);
+void SceneBody_StartRoute(void *, void *, int, int, int);
+void Path_GetPointPosition(void *, void *, int);
 struct Context {
     u8 pad0[0x22];
     u8 phase, frame, event;
@@ -87,7 +87,7 @@ struct Context {
     struct Vec *target;
 };
 void Trigger_ConsumePending(void *, int);
-void sub_080305AC(struct Context *m, struct Actor *p)
+void SceneCharacter_UpdatePhaseWindowWaitState(struct Context *m, struct Actor *p)
 {
     if (p->entered) {
         int zero = 0;

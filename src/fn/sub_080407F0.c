@@ -3,7 +3,7 @@
 u8 *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, u8 *, u32, u32, u32, u32 *);
 
-u32 sub_080407F0(u8 *p)
+u32 ModifierMenu_StartBackgroundScript(u8 *p)
 {
     u32 v;
     v = 3;

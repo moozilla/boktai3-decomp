@@ -1,6 +1,5 @@
 #include "global.h"
 #include "engine.h"
-/* Script: sets the four halfwords at game state +0x7A8 to -1. */
 void GameState_ClearSlots7A8FromScript(void)
 {
     s32 i;

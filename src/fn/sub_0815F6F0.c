@@ -16,7 +16,7 @@ struct L {
 };
 extern struct L *volatile gUnk_02000598;
 
-s32 sub_0815F6F0(struct N *n, u32 v, u32 w)
+s32 TargetRegistry_RegisterSceneActor(struct N *n, u32 v, u32 w)
 {
     struct N *q;
     struct L *g = gUnk_02000598;

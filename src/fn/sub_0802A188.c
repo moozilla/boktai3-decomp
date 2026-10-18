@@ -45,24 +45,24 @@ static inline void setFacing(ActorAnimation *p, int angle)
     value = 7 & shifted;
     p->facing8 = value;
 }
-void sub_080297FC(void *, int, int, int);
-void sub_08029E1C(void *);
-int sub_08029E2C(void *);
-void sub_08029AA8(void *);
+void GridAttackActor_SetAnimation(void *, int, int, int);
+void GridAttackActor_ResetAttackAnimationHistory(void *);
+int GridAttackActor_SelectAttackAnimation(void *);
+void GridAttackActor_SpawnGridPattern(void *);
 void Sound_PlaySongChecked(int);
 void ProjectedDisplay_SetHeight(void *, int);
 void OrbitContactActor_BeginExpansion(void *);
-void sub_0802A188(ActorAnimation *p)
+void GridAttackActor_UpdateElevatedGridAttack(ActorAnimation *p)
 {
     ActorAnimation *base = p;
     if (p->changed) {
         int zero = 0;
         p->changed = zero;
         setFacing(p, p->requestedAngle);
-        sub_080297FC(p, 3, 1, 8);
+        GridAttackActor_SetAnimation(p, 3, 1, 8);
         p->stage = zero;
         p->counter = zero;
-        sub_08029E1C(p);
+        GridAttackActor_ResetAttackAnimationHistory(p);
         Sound_PlaySongChecked(955);
     }
     {
@@ -102,19 +102,19 @@ void sub_0802A188(ActorAnimation *p)
             if (p->counter > 129) {
                 p->stage++;
                 p->counter = 0;
-                sub_080297FC(p, 3, 1, 12);
+                GridAttackActor_SetAnimation(p, 3, 1, 12);
             }
             break;
         case 3:
             if (p->counter == 6)
-                sub_08029AA8(p);
+                GridAttackActor_SpawnGridPattern(p);
         case 4:
         case 5:
         case 6:
             if (p->counter > 5) {
                 p->stage++;
                 p->counter = 0;
-                sub_080297FC(p, sub_08029E2C(p), 1, 8);
+                GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
             }
             break;
         case 7:

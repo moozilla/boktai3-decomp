@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 extern u32 gUnk_03005308;
-void sub_080E1D48(struct SceneActorRegistryResetView *input, s32 inputFrame)
+void Dog_UpdateTurnSequence(struct SceneActorRegistryResetView *input, s32 inputFrame)
 {
     struct SceneActorRegistryResetView *actor;
     register s32 frame asm("r4");

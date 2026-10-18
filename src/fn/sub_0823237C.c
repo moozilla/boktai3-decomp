@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0823237C(u8 *a, u8 *b, u8 *c)
+void TimedHazard_OnDamageContact(u8 *a, u8 *b, u8 *c)
 {
     u32 d = *(u16 *)(b + 0x3e);
     u32 m = 8;

@@ -1,9 +1,9 @@
 #include "global.h"
 
 void sub_0824923C(void *, u32);
-void sub_0807FC5C(void *);
-void sub_080EB13C(void *);
-void sub_080EB150(void *);
+void SceneActorControl_DispatchControl(void *);
+void Octopus_SetAnimationRefreshFlag(void *);
+void Octopus_UpdateBodyColliderPosition(void *);
 
 struct S {
     u8 filler[0x27c];
@@ -12,11 +12,11 @@ struct S {
     u8 idx;
 };
 
-s32 sub_080EC320(struct S *s)
+s32 Octopus_Update(struct S *s)
 {
-    sub_080EB13C(s);
+    Octopus_SetAnimationRefreshFlag(s);
     sub_0824923C(s, s->tbl[s->idx]);
-    sub_0807FC5C(s);
-    sub_080EB150(s);
+    SceneActorControl_DispatchControl(s);
+    Octopus_UpdateBodyColliderPosition(s);
     return 1;
 }

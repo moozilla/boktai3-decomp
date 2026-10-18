@@ -5,7 +5,7 @@ struct S {
     u8 f;
 };
 
-void sub_080EB8B4(struct S *s)
+void Octopus_ClearStateChangedFlag(struct S *s)
 {
     if (s->f != 0)
         s->f = 0;

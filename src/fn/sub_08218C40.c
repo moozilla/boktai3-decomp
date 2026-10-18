@@ -1,4 +1,6 @@
 #include "global.h"
+/* Text_GetNarrowGlyphCount: Returns the first font header count provisionally interpreted as the narrow glyph count */
+#define Text_GetNarrowGlyphCount sub_08218C40
 
 extern u16 *gUnk_03001664;
 

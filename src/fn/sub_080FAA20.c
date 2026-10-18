@@ -10,7 +10,7 @@ struct S080FAA20 {
     u8 *q;
 };
 
-void sub_080FAA20(struct S080FAA20 *s, struct P *d)
+void Axe_SetMovementEndpoints(struct S080FAA20 *s, struct P *d)
 {
     u8 *q = s->q;
     *(struct P *)(q + 0xf04) = s->p;

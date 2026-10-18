@@ -5,7 +5,7 @@ void Task_Kill(void *);
 s32 sub_08213B64(void *, u32);
 void sub_08213888(void);
 void sub_08213B50(void);
-void *sub_08213CCC(u32 a)
+void *ForgingBook_CreateFromScript(u32 a)
 {
     void *p = Task_Create(8, 0x724);
     if (p) {

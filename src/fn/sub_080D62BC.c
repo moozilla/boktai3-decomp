@@ -7,7 +7,7 @@ struct S {
     const u8 *p;
 };
 
-void sub_080D62BC(struct S *s)
+void Mummy_SetControlPreset(struct S *s)
 {
     s->p = gUnk_0860616C;
 }

@@ -20,7 +20,7 @@ static inline int randomValue(u16 *table, int limit)
     return Mod(table[gUnk_03005308], limit);
 }
 
-void sub_0803ADB8(struct P *p)
+void WirelessResultPanel_UpdateRollingNumbers(struct P *p)
 {
     int a, b, c, d, e, f;
     u8 *base;

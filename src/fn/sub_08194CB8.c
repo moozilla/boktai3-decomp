@@ -14,7 +14,7 @@ static inline s32 Random2(void)
     return gUnk_086141BC[gUnk_03005304];
 }
 
-void sub_08194CB8(struct Vec08194CB8 *pos)
+void Nidhoggr_PlayNearbyRandomSound(struct Vec08194CB8 *pos)
 {
     struct Vec08194CB8 d;
     d.x = pos->x - gUnk_02000710->positionX;

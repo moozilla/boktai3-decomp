@@ -37,7 +37,7 @@ struct Manager {
     void *animations;
 };
 extern struct Manager *gUnk_0200006C;
-void sub_08220D44(void *, int);
+void Anim_SetDurationScale(void *, int);
 void Effect_Remove(void *);
 static inline int scale(int a, int b)
 {
@@ -73,7 +73,7 @@ int FadingParticleGroup_Update(struct Group *g)
                 p->sprite.position.z += scale(p->velocity.z, *speed);
                 asm("" : : : "memory");
                 p->velocity.y -= 2;
-                sub_08220D44(anim, 16);
+                Anim_SetDurationScale(anim, 16);
                 resource = gUnk_0200006C->resource;
                 a = anim;
                 entry = p->anim.data + p->anim.frame;

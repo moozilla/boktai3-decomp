@@ -9,7 +9,7 @@ void SceneInventory_BeginEquipmentRemoveMove(struct SceneInventoryActionView *pa
     struct SceneInputPosition *target;
     enabled[0] = 1;
     display->widgets[panel->savedSelection + 5].flags |= 1;
-    frames[0] = sub_0822D6E0(panel->savedSelection) + 0xF0;
+    frames[0] = Inventory_GetEquipmentId(panel->savedSelection) + 0xF0;
     {
         u32 attribute = 0x373;
         savedAttribute = attribute;

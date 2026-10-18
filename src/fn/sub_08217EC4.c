@@ -5,7 +5,7 @@ struct Obj {
     u8 fC, fD;
 };
 
-void sub_08217EC4(void *object, s32 a, s32 b)
+void Effect_SetOrigin(void *object, s32 a, s32 b)
 {
     struct Obj *o = object;
     o->fC = a;

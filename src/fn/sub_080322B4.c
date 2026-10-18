@@ -13,7 +13,7 @@ static inline u8 flag(u32 *ptr, u32 mask)
     return 0;
 }
 // MATCHING_CONCESSION: register-pinning
-int sub_080322B4(void)
+int TextState_GetPlayerSpeakerLabel(void)
 {
     int v;
     register u32 mask asm("r2") = 128;

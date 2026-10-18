@@ -11,20 +11,20 @@ struct TextState {
     u8 depth, styles[7];
 };
 // MATCHING_CONCESSION: register-pinning
-const u8 *sub_0803232C(struct TextState *, const u8 *);
-u16 sub_08032070(const u8 *);
-int sub_08031F58(struct TextState *, u32);
-int sub_08031FA0(struct TextState *, u32);
-int sub_08031ED8(struct TextState *, int);
-void sub_08031EAC(struct TextState *);
-u32 sub_08218C5C(void);
-const u8 *sub_08032A44(struct TextState *p, const u8 *s)
+const u8 *TextState_ProcessTag(struct TextState *, const u8 *);
+u16 Text_DecodeGlyphEscape(const u8 *);
+int TextState_DrawNarrowGlyph(struct TextState *, u32);
+int TextState_DrawWideGlyph(struct TextState *, u32);
+int TextState_AdvanceCursor(struct TextState *, int);
+void TextState_AdvanceLine(struct TextState *);
+u32 Text_GetWideGlyphCount(void);
+const u8 *TextState_RenderNextGlyph(struct TextState *p, const u8 *s)
 {
     u32 c;
     u16 glyph;
     goto test;
 tag:
-    s = sub_0803232C(p, s);
+    s = TextState_ProcessTag(p, s);
     if (p->padE)
         goto done;
     if (*s)
@@ -34,26 +34,26 @@ plain:
     asm("" ::: "memory");
     c = *s;
     if (c == 10) {
-        sub_08031EAC(p);
+        TextState_AdvanceLine(p);
         goto next;
     }
     if (c == 31) {
-        u32 code = (u16)sub_08032070(s);
+        u32 code = (u16)Text_DecodeGlyphEscape(s);
         if (code == 0xFFFF) {
             glyph = *s - 32;
-            sub_08031F58(p, glyph);
+            TextState_DrawNarrowGlyph(p, glyph);
         } else if (code & 0xFF00) {
             u32 mask = 0x7FFF;
             code &= mask;
-            sub_08031FA0(p, code);
+            TextState_DrawWideGlyph(p, code);
         } else
-            sub_08031F58(p, code);
+            TextState_DrawNarrowGlyph(p, code);
         s += 2;
         goto done;
     }
     asm("" ::: "memory");
     glyph = *s - 32;
-    sub_08031F58(p, glyph);
+    TextState_DrawNarrowGlyph(p, glyph);
     s++;
     goto done;
 wide: {
@@ -68,10 +68,10 @@ wide: {
     low = *s;
     glyph = (c << 8) | low;
 }
-    if (glyph >= sub_08218C5C())
-        sub_08031ED8(p, 1);
+    if (glyph >= Text_GetWideGlyphCount())
+        TextState_AdvanceCursor(p, 1);
     else
-        sub_08031FA0(p, glyph);
+        TextState_DrawWideGlyph(p, glyph);
     s++;
     goto done;
 next:

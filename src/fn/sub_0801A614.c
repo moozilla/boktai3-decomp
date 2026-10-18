@@ -1,4 +1,6 @@
 #include "global.h"
+/* SelectionMenu_HideMarkers: Independent eight-marker hide loop in the byte tail, matching the eight inventory/equipment markers positioned by SelectionMenu_PositionInventoryMarke */
+#define SelectionMenu_HideMarkers sub_0801A614
 #define SelectionMenu_HideMarkers sub_0801A614
 typedef struct {
     u32 flags;

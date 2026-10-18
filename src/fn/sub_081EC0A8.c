@@ -14,7 +14,6 @@ struct ScreenParams3F8Params {
     s32 M;
 };
 extern struct ScreenParams3F8Params gUnk_020003F8;
-/* Script: sets the parameter block (see the option letters). */
 void ScreenParams3F8_SetFromScript(void)
 {
     if (Script_SeekToKeyword('m'))

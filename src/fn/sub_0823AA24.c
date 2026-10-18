@@ -1,5 +1,5 @@
 #include "global.h"
-u32 sub_0823AA24(void)
+u32 LinkPlayer_GetInitialActionCount(void)
 {
     return 1;
 }

@@ -15,7 +15,7 @@ struct TradeSave {
     s16 leftRows[16], rightRows[16];
 };
 extern struct TradeSave *gUnk_02000710;
-void sub_08038634(struct TradeMenu *p)
+void WirelessGameMenu_ConsumeSelectedEquipment(struct TradeMenu *p)
 {
     struct TradeSave *save = gUnk_02000710;
     int row = save->rightSelected;
@@ -27,7 +27,7 @@ void sub_08038634(struct TradeMenu *p)
             p->rightMask = flags & ~6;
     }
 }
-void sub_08038674(struct TradeMenu *p)
+void WirelessGameMenu_UpdateIdle(struct TradeMenu *p)
 {
     if (p->entered)
         p->entered = 0;

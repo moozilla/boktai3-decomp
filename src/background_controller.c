@@ -1,5 +1,9 @@
 #include "global.h"
 #include "background_controller.h"
+/* Background_LoadLayerMap: Resolves a background resource via sub_08216E54, optionally finds the map id with Background_FindMapId, then calls Bg_SetLayerMap; matches docs' descr */
+#define Background_LoadLayerMap sub_080020BC
+/* ScrollingBackground_ClearSlots: Zeroes all four ScrollingBackground slots in gUnk_02000010, unlike the single-slot clear done by the destroy callback ScrollingBackground_Destroy */
+#define ScrollingBackground_ClearSlots sub_08002284
 
 /* Functions marked MATCHING_CONCESSION keep local register hints made with
  * empty asm constraints; these emit no handwritten instructions. */
@@ -29,7 +33,7 @@ s32 Background_ApplyQueuedCommands(struct Background *p)
                 p->blendY = a[1] << 8;
                 p->blendStepX = 0;
                 p->blendStepY = 0;
-                sub_08219574(p->layer, p->blendX >> 8, p->blendY >> 8);
+                Blend_SetAlpha(p->layer, p->blendX >> 8, p->blendY >> 8);
                 break;
             case 3:
                 p->fadeActive = 1;
@@ -40,7 +44,7 @@ s32 Background_ApplyQueuedCommands(struct Background *p)
                 p->blendTargetY = a[2] << 8;
                 p->blendStepX = Div(p->blendTargetX - p->blendStartX, p->fadeDuration);
                 p->blendStepY = Div(p->blendTargetY - p->blendStartY, p->fadeDuration);
-                sub_08219574(p->layer, p->blendX >> 8, p->blendY >> 8);
+                Blend_SetAlpha(p->layer, p->blendX >> 8, p->blendY >> 8);
                 break;
             case 6:
                 p->driftX = a[0];
@@ -191,7 +195,7 @@ s32 Background_Update(struct Background *p)
     if (p->fadeActive == 1) {
         p->blendX += p->blendStepX;
         p->blendY += p->blendStepY;
-        sub_08219574(p->layer, p->blendX >> 8, p->blendY >> 8);
+        Blend_SetAlpha(p->layer, p->blendX >> 8, p->blendY >> 8);
         if (--p->fadeDuration == 0)
             p->fadeActive = 0;
     }
@@ -208,7 +212,7 @@ s32 Background_Update(struct Background *p)
     return 0;
 }
 
-u32 sub_08001AD0(struct Background *p)
+u32 Background_Destroy(struct Background *p)
 {
     gUnk_02000000[p->layer] = 0;
     return 0;
@@ -235,7 +239,7 @@ s32 Background_Initialize(struct Background *p, u16 id, struct BackgroundConfig 
     p->resource = c->resource;
     resource = sub_08216E54(p->resource);
     if (p->flags & 1) {
-        struct BackgroundDimensions *dims = sub_0821A2C4(0x56C2)->data;
+        struct BackgroundDimensions *dims = ResourceRegistry_GetResource(0x56C2)->data;
         offsetX = dims->x;
         offsetY = dims->y;
     } else {
@@ -286,7 +290,7 @@ s32 Background_Initialize(struct Background *p, u16 id, struct BackgroundConfig 
     mode = modeFlag(p) != 0;
     if (resource[0] == 'M' && resource[1] == 'P') {
         layer->flags = mode;
-        sub_08215A74(p->layer, c->mode);
+        Bg_SetPriority(p->layer, c->mode);
     } else {
         void *map = Video_GetBackgroundMap(p->layer);
         u32 layerId = p->layer;
@@ -300,7 +304,7 @@ s32 Background_Initialize(struct Background *p, u16 id, struct BackgroundConfig 
     return 0;
 }
 
-void *sub_08001CB0(u16 id, struct BackgroundConfig *c)
+void *Background_Create(u16 id, struct BackgroundConfig *c)
 {
     struct Background *p;
     if (c->priority == 0)
@@ -308,7 +312,7 @@ void *sub_08001CB0(u16 id, struct BackgroundConfig *c)
     else
         p = Task_Create(0xb, 0x140);
     if (p != 0) {
-        Task_SetCallbacks(p, Background_Update, sub_08001AD0);
+        Task_SetCallbacks(p, Background_Update, Background_Destroy);
         if (Background_Initialize(p, id, c) < 0) {
             Task_Kill(p);
             return 0;
@@ -321,7 +325,7 @@ static inline s32 next(s32 fallback)
 {
     u8 *p = Script_GetPc();
     if (p)
-        return sub_0821AA00(p);
+        return Script_ReadValue(p);
     return fallback;
 }
 
@@ -329,7 +333,7 @@ static inline s32 nextZero(void)
 {
     s32 v = (s32)Script_GetPc();
     if (v)
-        v = sub_0821AA00((u8 *)v);
+        v = Script_ReadValue((u8 *)v);
     return v;
 }
 
@@ -398,9 +402,9 @@ void *Background_CreateFromScript(u32 id)
         s32 x = next(0), y = next(8);
         c.blendX = x;
         c.blendY = y;
-        sub_08219574(c.layer, x, y);
+        Blend_SetAlpha(c.layer, x, y);
     }
-    return sub_08001CB0(id, &c);
+    return Background_Create(id, &c);
 }
 
 // MATCHING_CONCESSION: register-pinning
@@ -420,7 +424,7 @@ s32 Background_FindMapId(struct BackgroundResource *resource, u16 id)
 static inline s32 nextShift(void)
 {
     u8 *p = Script_GetPc();
-    return p ? sub_0821AA00(p) << 7 : 0;
+    return p ? Script_ReadValue(p) << 7 : 0;
 }
 
 // MATCHING_CONCESSION: register-pinning
@@ -444,7 +448,7 @@ s32 Background_LoadMapsFromScript(void)
         });
         cursor = Script_GetPc();
         if (cursor)
-            y = sub_0821AA00(cursor) << 7;
+            y = Script_ReadValue(cursor) << 7;
         else
             y = 0;
     } else {
@@ -460,7 +464,7 @@ s32 Background_LoadMapsFromScript(void)
         explicitIndices = 1;
         for (i = 0; i < 4; i++) {
             if (p) {
-                indices[i] = sub_0821AA00(p);
+                indices[i] = Script_ReadValue(p);
                 p = Script_GetPc();
             } else
                 indices[i] = (s32)p;
@@ -479,7 +483,7 @@ s32 Background_LoadMapsFromScript(void)
         s32 *out = indices;
         for (i = 3; i >= 0; i--) {
             if (p) {
-                *out = Background_FindMapId(&resource, sub_0821AA00(p));
+                *out = Background_FindMapId(&resource, Script_ReadValue(p));
                 p = Script_GetPc();
             }
             out++;
@@ -506,7 +510,7 @@ s32 Background_LoadMapFromScript(void)
             u8 found = FALSE;
             u8 *arg;
             if (Script_SeekToKeyword('i') && (arg = Script_GetPc())) {
-                index = sub_0821AA00(arg);
+                index = Script_ReadValue(arg);
                 found = TRUE;
             } else
                 index = 0;
@@ -515,7 +519,7 @@ s32 Background_LoadMapFromScript(void)
         Script_SeekToKeyword('c')) {
         u8 *p = Script_GetPc();
         if (p)
-            index = (u16)Background_FindMapId(&resource, sub_0821AA00(p));
+            index = (u16)Background_FindMapId(&resource, Script_ReadValue(p));
     }
     Bg_SetLayerMap(layer, base, index);
     return index;
@@ -556,7 +560,7 @@ s32 Background_LoadTilesFromScript(void)
             p = Script_GetPc();
             if (!p)
                 goto done;
-            *out = sub_0821AA00(p);
+            *out = Script_ReadValue(p);
             count++;
             out++;
         }
@@ -605,7 +609,7 @@ void Background_QueueCommand(u32 layer, u32 type, s32 length, s32 *args)
     }
 }
 
-void sub_08002234(void)
+void Background_QueueCommandFromScript(void)
 {
     s32 buf[8];
     u32 a = Script_GetKeywordValue(0x74, 1);
@@ -663,7 +667,7 @@ s32 ScrollingBackground_ApplyCommands(struct ScrollingBackground *p)
                 p->moveDy = Div(p->moveTargetY - p->y, p->moveDuration);
                 break;
             case 2:
-                sub_08219574(p->layer, a[0], a[1]);
+                Blend_SetAlpha(p->layer, a[0], a[1]);
                 break;
             case 3:
                 p->fadeActive = 1;
@@ -674,7 +678,7 @@ s32 ScrollingBackground_ApplyCommands(struct ScrollingBackground *p)
                 p->blendTargetY = a[2] << 8;
                 p->blendStepX = Div(p->blendTargetX - p->blendStartX, p->fadeDuration);
                 p->blendStepY = Div(p->blendTargetY - p->blendStartY, p->fadeDuration);
-                sub_08219574(p->layer, p->blendX >> 8, p->blendY >> 8);
+                Blend_SetAlpha(p->layer, p->blendX >> 8, p->blendY >> 8);
                 break;
             case 4:
                 p->enabled = 0;
@@ -758,15 +762,14 @@ s32 ScrollingBackground_Update(struct ScrollingBackground *p)
     if (p->fadeActive == 1) {
         p->blendX += p->blendStepX;
         p->blendY += p->blendStepY;
-        sub_08219574(p->layer, p->blendX >> 8, p->blendY >> 8);
+        Blend_SetAlpha(p->layer, p->blendX >> 8, p->blendY >> 8);
         if (--p->fadeDuration == 0)
             p->fadeActive = 0;
     }
 }
 
-/* Destructor: clears the layer's slot. Returns u32 (no value) like the original. */
 
-u32 sub_08002658(struct ScrollingBackground *p)
+u32 ScrollingBackground_Destroy(struct ScrollingBackground *p)
 {
     /* The slot table is pointer-sized; a u32 view keeps the original access shape. */
     u32 *q = (u32 *)gUnk_02000010;
@@ -789,7 +792,7 @@ s32 ScrollingBackground_Initialize(struct ScrollingBackground *p, u16 id,
     p->resource = c->resource;
     resource = sub_08216E54(p->resource);
     if (p->flags & 1) {
-        struct BackgroundDimensions *dims = sub_0821A2C4(0x56C2)->data;
+        struct BackgroundDimensions *dims = ResourceRegistry_GetResource(0x56C2)->data;
         c->offsetX = dims->x;
         c->offsetY = dims->y;
     }
@@ -823,7 +826,7 @@ s32 ScrollingBackground_Initialize(struct ScrollingBackground *p, u16 id,
     map = Video_GetBackgroundMap(p->layer);
     if (resource[0] == 'M' && resource[1] == 'P') {
         layer->flags = 1;
-        sub_08215A74(p->layer, c->mode);
+        Bg_SetPriority(p->layer, c->mode);
     } else
         sub_082160B8(p->layer, 1, resource, 0, (s16)c->offsetX, (s16)c->offsetY, c->mode, map);
     p->speedScale = scale;
@@ -846,12 +849,12 @@ s32 ScrollingBackground_Initialize(struct ScrollingBackground *p, u16 id,
         p->blendStepX = p->blendX;
         p->blendStepY = p->blendY;
         if (c->fade)
-            sub_08219574(p->layer, blendX, blendY);
+            Blend_SetAlpha(p->layer, blendX, blendY);
     }
     return 0;
 }
 
-void *sub_08002840(u16 id, struct ScrollingBackgroundConfig *c)
+void *ScrollingBackground_Create(u16 id, struct ScrollingBackgroundConfig *c)
 {
     struct ScrollingBackground *p;
     if (c->priority == 0)
@@ -859,7 +862,7 @@ void *sub_08002840(u16 id, struct ScrollingBackgroundConfig *c)
     else
         p = Task_Create(0xb, 0xf8);
     if (p != 0) {
-        Task_SetCallbacks(p, ScrollingBackground_Update, sub_08002658);
+        Task_SetCallbacks(p, ScrollingBackground_Update, ScrollingBackground_Destroy);
         if (ScrollingBackground_Initialize(p, id, c) < 0) {
             Task_Kill(p);
             return 0;
@@ -872,7 +875,7 @@ static inline s32 nextOffset(void)
 {
     s32 v = (s32)Script_GetPc();
     if (v)
-        v = sub_0821AA00((u8 *)v) << 4;
+        v = Script_ReadValue((u8 *)v) << 4;
     return v;
 }
 
@@ -934,7 +937,7 @@ void *ScrollingBackground_CreateFromScript(u32 id)
             c.mode = Script_GetKeywordValue('p', 1);
             break;
     }
-    return sub_08002840(id, &c);
+    return ScrollingBackground_Create(id, &c);
 }
 
 void ScrollingBackground_QueueCommand(u32 layer, u32 type, s32 length, s32 *args)
@@ -949,7 +952,7 @@ void ScrollingBackground_QueueCommand(u32 layer, u32 type, s32 length, s32 *args
     }
 }
 
-void sub_08002A58(void)
+void ScrollingBackground_QueueCommandFromScript(void)
 {
     s32 buf[8];
     u32 a = Script_GetKeywordValue(0x74, 1);

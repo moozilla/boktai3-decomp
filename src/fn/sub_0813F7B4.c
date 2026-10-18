@@ -13,7 +13,7 @@ static inline u32 tst(u32 *a, u32 m)
 s32 Div(s32, s32);
 s32 sub_0813F784(s32);
 
-s32 sub_0813F7B4(struct P0813F7B4 *p)
+s32 Player_GetEnchantmentEnergyCost(struct P0813F7B4 *p)
 {
     s32 v;
     s32 pct;

@@ -4,10 +4,10 @@ struct S {
     u8 f[0x2e];
     u8 a;
 };
-struct S *sub_08037DC0(void);
-void sub_080396F0(void)
+struct S *WirelessExchange_Get(void);
+void WirelessGame_NotifyOpponentDefeated(void)
 {
-    struct S *p = sub_08037DC0();
+    struct S *p = WirelessExchange_Get();
     if (p)
         p->a = 1;
 }

@@ -1,10 +1,10 @@
 #include "global.h"
 u32 sub_08168E38(void *);
-void sub_08168C90(void *);
-u32 sub_08168EC8(void *p)
+void PauseMenu_BeginEquipmentSelection(void *);
+u32 PauseMenu_TryBeginEquipmentSelection(void *p)
 {
     if (sub_08168E38(p)) {
-        sub_08168C90(p);
+        PauseMenu_BeginEquipmentSelection(p);
         return 1;
     }
     return 0;

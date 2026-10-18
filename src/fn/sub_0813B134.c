@@ -5,7 +5,7 @@ struct S0813B134 {
     u16 v;
 };
 
-void sub_0813B134(struct S0813B134 *p, u32 m)
+void Player_AddControlFlags(struct S0813B134 *p, u32 m)
 {
     p->v |= m;
 }

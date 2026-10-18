@@ -5,7 +5,7 @@ void SelectionMenu_PopulateItems(u8 *);
 s32 Script_ParseStringRef(s32);
 s32 Text_LookupString(void);
 void Presentation_UpdateItemGraphic(u8 *, s32);
-void sub_0801AC84(u8 *p)
+void SelectionMenu_RefreshItemPage(u8 *p)
 {
     SelectionMenu_ItemAvailability(p);
     SelectionMenu_PositionEquipmentMarkers(p);

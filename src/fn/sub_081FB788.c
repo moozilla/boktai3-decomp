@@ -1,5 +1,5 @@
 #include "global.h"
-void *sub_0802140C(u32);
+void *SceneActors_GetBySlot(u32);
 void *Task_Create(u32, u32);
 void sub_081FAD14(void);
 void sub_081FAD74(void);
@@ -8,7 +8,7 @@ s32 sub_081FAE0C(void *, void *);
 void Task_Kill(void *);
 void *Ratatosk_Create(void *arg)
 {
-    void *p = sub_0802140C(4);
+    void *p = SceneActors_GetBySlot(4);
     if (p)
         return p;
     p = Task_Create(8, 0xf30);

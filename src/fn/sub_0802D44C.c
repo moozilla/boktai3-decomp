@@ -18,16 +18,16 @@ struct Object {
     u8 pad138[0x4c];
     u32 drawable;
 };
-void sub_0802CD04(struct Object *);
+void Actor_InitControllerFromScript(struct Object *);
 void DisplayAnimation_InitializeSequence(void *, int, int, int, struct Vec *);
-int sub_0802D080(struct Object *, int, int, int, int, int);
-void sub_0802C9A0(struct Object *, struct Vec *, struct Vec *, void *);
-void sub_0802CA1C(struct Object *, struct Vec *, struct Vec *, void *);
-void sub_0802D1C8(void);
-void sub_0802D1B0(void);
+int Actor_SetFacingAnimationEntry(struct Object *, int, int, int, int, int);
+void Actor_InitHitSensor(struct Object *, struct Vec *, struct Vec *, void *);
+void Actor_InitBodyCollider(struct Object *, struct Vec *, struct Vec *, void *);
+void Actor_OnColliderContact(void);
+void Actor_OnHitboxContact(void);
 void sub_0802D334(void);
-void sub_0802D380(void);
-void sub_0802D218(void);
+void Actor_OnDamage(void);
+void Actor_OnTrackingAction(void);
 static inline void selectCallback(struct Object *p, void *fn)
 {
     p->selectFn = fn;
@@ -51,24 +51,24 @@ static inline void action(struct Object *p, void *fn, int zero, int one)
 }
 static inline void collider(struct Object *p, struct Vec *size, void *fn, struct Vec *offset)
 {
-    sub_0802C9A0(p, size, offset, fn);
+    Actor_InitHitSensor(p, size, offset, fn);
 }
 static inline void hitbox(struct Object *p, struct Vec *size, void *fn, struct Vec *offset)
 {
-    sub_0802CA1C(p, size, offset, fn);
+    Actor_InitBodyCollider(p, size, offset, fn);
 }
 // Scene actor initializer. Matches without register hints: the draft's pins
 // and barriers were what made it differ.
-int sub_0802D44C(struct Object *p)
+int Actor_InitializeControllerFromScript(struct Object *p)
 {
     struct Vec size, offset, size2, offset2;
     int zero;
-    sub_0802CD04(p);
+    Actor_InitControllerFromScript(p);
     DisplayAnimation_InitializeSequence(&p->drawable, 0xd495, 0xaf44, 0, &p->pos);
     {
         int initialZero = 0;
         zero = initialZero;
-        sub_0802D080(p, 1, initialZero, 1, initialZero, initialZero);
+        Actor_SetFacingAnimationEntry(p, 1, initialZero, 1, initialZero, initialZero);
     }
     {
         u32 mask = 2;
@@ -80,19 +80,19 @@ int sub_0802D44C(struct Object *p)
     offset.x = 0;
     offset.y = 128;
     offset.z = 0;
-    collider(p, &size, sub_0802D1C8, &offset);
+    collider(p, &size, Actor_OnColliderContact, &offset);
     size2.x = 32;
     size2.y = 128;
     size2.z = 32;
     offset2.x = 0;
     offset2.y = 128;
     offset2.z = 0;
-    hitbox(p, &size2, sub_0802D1B0, &offset2);
+    hitbox(p, &size2, Actor_OnHitboxContact, &offset2);
     selectCallback(p, sub_0802D334);
-    damageCallback(p, sub_0802D380);
+    damageCallback(p, Actor_OnDamage);
     p->state = zero;
     p->stateChanged = 1;
     p->ticks = zero;
-    action(p, sub_0802D218, zero, 1);
+    action(p, Actor_OnTrackingAction, zero, 1);
     return 0;
 }

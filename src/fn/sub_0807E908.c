@@ -1,10 +1,10 @@
 #include "scene_actor_effects.h"
-void sub_08020D08(void *);
-void sub_08013684(void *);
-void sub_0823233C(void *);
-void sub_08003C10(void *);
+void SceneMessages_UnregisterReceiver(void *);
+void Shadow_Destroy(void *);
+void SceneActorEffects_DestroyGroup(void *);
+void TerrainOverlay_QueueRemoveActor(void *);
 void sub_0815F738(void *);
-void sub_08225938(void *);
+void SceneBody_Unregister(void *);
 void SceneActorRegistry_UnlinkActor(struct SceneActorRegistryActor *);
 static inline u8 TestFlag(u16 *flags, u32 mask)
 {
@@ -37,28 +37,28 @@ void SceneActorEffects_ReleaseResources(struct SceneActorEffectsView *actor)
         value = *pointer & mask;
         flags = pointer;
         if (TestValue(value))
-            sub_08020D08((u8 *)actor + 0xC);
+            SceneMessages_UnregisterReceiver((u8 *)actor + 0xC);
     }
     {
         u32 offset = 0x320;
         u8 *shadow;
         shadow = (u8 *)actor + offset;
         if (*shadow)
-            sub_08013684(shadow);
+            Shadow_Destroy(shadow);
     }
     if (*(u8 *)(control + 0xA8))
-        sub_0823233C(control + 0xA8);
+        SceneActorEffects_DestroyGroup(control + 0xA8);
     {
         u32 mask = 0x02000000;
         u32 flags;
         flags = actor->flags2D0 & mask;
         identity = (u8 *)actor + 0x50;
         if (!flags)
-            sub_08003C10(identity);
+            TerrainOverlay_QueueRemoveActor(identity);
     }
     if (TestFlag(flags, 0x200))
         sub_0815F738(control + 0x30);
-    sub_08225938(identity);
+    SceneBody_Unregister(identity);
     Collider_Remove((u8 *)actor + 0x134);
     SceneActorRegistry_UnlinkActor((void *)actor);
 }

@@ -3,7 +3,7 @@
 extern const u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
 extern const s16 gUnk_086149C4[];
-void sub_08125EC4(struct ContactPosition *, struct ContactPosition *, s32, s32);
+void SceneMovingParticle_Create(struct ContactPosition *, struct ContactPosition *, s32, s32);
 static inline s32 Truncate(s32 v)
 {
     if (v >= 0)
@@ -70,5 +70,5 @@ void SceneSteeringActor_EmitRandomParticle(struct ContactPosition *input)
             velocity.y = value;
         }
     }
-    sub_08125EC4(position, &velocity, 60, 3);
+    SceneMovingParticle_Create(position, &velocity, 60, 3);
 }

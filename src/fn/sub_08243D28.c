@@ -1,7 +1,7 @@
 #include "global.h"
 extern u32 gUnk_030035BC, gUnk_03006A4C, gUnk_03006A3C, gUnk_03006A38, gUnk_030035B8;
 extern s32 gUnk_030035B0, gUnk_030035B4, gUnk_03006A48;
-void sub_08243D28(void)
+void Solar_OnTimerInterrupt(void)
 {
     u32 pins = *(vu16 *)0x080000C4;
     u32 shadow = gUnk_030035BC;

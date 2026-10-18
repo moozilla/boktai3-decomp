@@ -37,6 +37,6 @@ extern u32 gUnk_03005308;
 s32 Mod(s32, s32);
 void BreakableProp_InitializeSprite(struct BreakableProp *, void *);
 void BreakableProp_InitializeCollider(struct BreakableProp *, u32, void *);
-u8 *sub_0821D64C(s32, s32);
-void sub_0821D698(void *, u32, u32, u32, u32, u32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
+void TerrainModifiers_RegisterCell(void *, u32, u32, u32, u32, u32);
 #endif

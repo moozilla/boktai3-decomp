@@ -12,7 +12,7 @@ struct Obj {
 
 void sub_08214588(struct Obj *);
 
-void sub_082144E4(struct Obj *o, u32 b, u32 c)
+void Sprite_InitUnlinked(struct Obj *o, u32 b, u32 c)
 {
     if (o->f4 == 0) {
         o->f0 = c;

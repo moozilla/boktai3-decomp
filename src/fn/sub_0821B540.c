@@ -4,8 +4,8 @@ struct Reference {
     u16 first, index;
 };
 extern u8 *gUnk_02000710, *gUnk_02000700, *gUnk_02000708;
-void sub_0821B20C(u8 *, u32, s32, s32 *);
-s32 sub_0821B540(struct Reference *ref, s32 index)
+void Script_ReadTypedVariable(u8 *, u32, s32, s32 *);
+s32 Script_ReadReferenceValue(struct Reference *ref, s32 index)
 {
     s32 value;
     u32 descriptor =
@@ -20,6 +20,6 @@ s32 sub_0821B540(struct Reference *ref, s32 index)
     base += descriptor & 0xFFFF;
     if (((descriptor >> 24) & 0xF0) == 0x20)
         index += ref->index;
-    sub_0821B20C(base, descriptor, index, &value);
+    Script_ReadTypedVariable(base, descriptor, index, &value);
     return value;
 }

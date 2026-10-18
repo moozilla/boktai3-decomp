@@ -4,13 +4,13 @@
 // fuzzy: 51.0%
 // Open: the original keeps two copies of the actor pointer (r4 and r5).
 extern u8 *gUnk_02000580[];
-s32 sub_0815A400(void);
+s32 Script_GetActorIndex(void);
 /* Script: tests flag -f (0-95) in the three flag words at +0x444 of the
    scripted actor chosen by -i; returns the masked word (nonzero if set). */
 u32 ScriptActor_TestFlagFromScript(void)
 {
     u8 *actor, *p;
-    s32 i = sub_0815A400();
+    s32 i = Script_GetActorIndex();
     p = actor = gUnk_02000580[i];
     if (actor && Script_SeekToKeyword('f')) {
         u32 flag = Script_GetValue();

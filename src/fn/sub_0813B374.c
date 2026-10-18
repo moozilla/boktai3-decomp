@@ -14,7 +14,7 @@ struct D {
 };
 void Script_Call(void *, void *);
 
-void sub_0813B374(struct S0813B374 *p, u32 a)
+void Player_CallEventScript(struct S0813B374 *p, u32 a)
 {
     struct D d;
     void *r = p->v;

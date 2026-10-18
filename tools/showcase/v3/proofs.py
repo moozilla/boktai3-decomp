@@ -283,5 +283,154 @@ def campan():
     print(run.shots(path, st, [20, 100, 190, 280], "campan", scale=1))
 
 
+
+def vcmds():
+    """Vanargand's scene-actor commands 51-62, one every 90 frames, camera looking up."""
+    from show import actor
+    show = Show(STRINGS, SLOTS)
+    cut = Cutscene(show)
+    cut.at(0, fade(0, 1, 0, 0, 0), cam(1200, 1200, 1, y=900))
+    order = [51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62]
+    for k, c in enumerate(order):
+        cut.at(20 + 90 * k, actor(0x7C56, 4, c), cam(1200, 1200, 1, y=900))
+    cut.hold(20 + 90 * len(order) + 60)
+    done = show.proc([Call(1669)])
+    dlg = cut.write(done)
+    arrive = show.proc([command(0x9769, p=[1440, 406, 1440]), command(0x061E, i=0, d=4)])
+    start = show.proc([Set(COUNTER, 0), Call(1667, 1, 1, 0, 0), Call(dlg)])
+    stage = dream_stage(show)
+    ents = show.proc([Call(916, 1440, 1440, 4, 0, 128, 0, 58, Proc(arrive), Proc(start))])
+    scene = show.proc([Call(861, 56), Call(864, 0), Call(553), Call(1265), Call(1), Call(stage), Call(ents), Call(905),
+                       Call(6557), Call(6558)])
+    path = os.path.join(OUT, "vcmds.gba")
+    show.save(path)
+    st = run.state(path, scene, 58, "vcmds", wait=40)
+    print(run.shots(path, st, [10 + 90 * k + d for k in range(12) for d in (45, 85)], "vcmds", scale=1))
+
+
+
+def vseq():
+    """Record Vanargand through a command sequence (VSEQ="cmd@frame,..."), D from VD (default 1)."""
+    from show import actor
+    import record
+    show = Show(STRINGS, SLOTS)
+    cut = Cutscene(show)
+    cut.at(0, fade(0, 1, 0, 0, 0), cam(1200, 1200, 1, y=int(os.environ.get("VY", "900"))))
+    seq = [tuple(int(v) for v in x.split("@")) for x in os.environ.get("VSEQ", "51@20,52@80").split(",")]
+    for c, t in seq:
+        cut.at(t, actor(0x7C56, 4, c))
+    markers = os.environ.get("VMARK")      # "y1,y2": stranger sprites at (1200, y, 1200) for the first second
+    if markers:
+        import art
+        pk, fr, _ = art.package(show, 0x6000, "stranger")
+        from show import kf_add, kf_hide
+        for k, y in enumerate(int(v) for v in markers.split(",")):
+            cut.at(1, kf_add(0x7300 + k, pk, 1200, 1200, y=y, prio=int(os.environ.get("VPRIO", "2"))))
+            if not os.environ.get("VKEEP"):
+                cut.at(60, kf_hide(0x7300 + k))
+    cut.hold(max(t for _, t in seq) + 200)
+    done = show.proc([Call(1669)])
+    dlg = cut.write(done)
+    arrive = show.proc([command(0x9769, p=[1440, 406, 1440]), command(0x061E, i=0, d=4)])
+    start = show.proc([Set(COUNTER, 0), Call(1667, 1, 1, 0, 0), Call(dlg)])
+    stage = dream_stage(show, 8)
+    ents = show.proc([Call(916, 1440, 1440, 4, 0, 128, 0, 58, Proc(arrive), Proc(start))])
+    from gclasm import chara as chara_
+    vd = int(os.environ.get("VD", "1"))
+    spawn = [chara_(0x7C56, 0x7C56, D=vd, m=0)] if vd != 1 else [Call(6557)]
+    scene = show.proc([Call(861, 56), Call(864, 0), Call(553), Call(1265), Call(1), Call(stage), Call(ents), Call(905)]
+                      + spawn + [Call(6558)])
+    path = os.path.join(OUT, "vseq.gba")
+    show.save(path)
+    st = run.state(path, scene, 58, "vseq", wait=40)
+    out = os.path.join(OUT, "vseq.mp4")
+    record.record(path, st, [], "vseq_rec", out, tail=int(os.environ.get("VLEN", max(t for _, t in seq) + 260)))
+
+
+
+def timer():
+    """A repeating timer (chara 430D) circles a sprite while a dialogue window blocks the cutscene."""
+    import math
+    import art
+    import record
+    from show import OT, kf_glide, track
+    show = Show(STRINGS, SLOTS)
+    pk, fr, _ = art.package(show, 0x6000, "stranger")
+    cut = Cutscene(show)
+    X, Z = 1152, 1152
+    cut.at(0, fade(0, 1, 0, 0, 0), cam(X, Z))
+    cut.at(1, kf_add(0x7300, pk, X + 300, Z))
+    steps = []
+    for k in range(120):
+        a = 2 * math.pi * k / 40
+        steps.append([kf_glide(0x7300, X + int(300 * math.cos(a)), Z + int(300 * math.sin(a)), 4)])
+    cut.at(2, *track(0x7301, steps, every=4))
+    cut.hold(30)
+    cut.say([OT + '"Is it still moving?"'])
+    cut.say([OT + '"It is!"'])
+    cut.hold(120)
+    scene = simple_scene(show, cut, 2718, X, Z + 300)
+    path = os.path.join(OUT, "timer.gba")
+    show.save(path)
+    st = run.state(path, scene, 58, "timer", wait=30)
+    record.record(path, st, cut.pages, "timer_rec", os.path.join(OUT, "timer.mp4"), shots=True)
+
+
+
+def facing():
+    """Each NPC package at 8 points around a center, facing it (part1.npc_facing)."""
+    import math
+    import part1
+    from figures import Sprite
+    show = Show(STRINGS, SLOTS)
+    cut = Cutscene(show)
+    CX, CZ = 1664, 1860
+    cut.at(0, fade(0, 1, 0, 0, 0), cam(CX, CZ, 1, y=406))
+    pkgs = [int(x, 16) for x in os.environ.get("PKGS", "DFFE").split(",")]
+    k = 0
+    for pkg in pkgs:
+        for j in range(8):
+            a = 2 * math.pi * j / 8
+            x, z = CX + int(380 * math.cos(a)), CZ + int(380 * math.sin(a))
+            f, m = part1.npc_facing(pkg, (x, z), (CX, CZ))
+            sp = Sprite(cut, 0x7200 + k, pkg, {}).add(2, x, z, frame=f)
+            sp.frame(3, f, mirror=m)
+            k += 1
+    import art
+    pk, fr, _ = art.package(show, 0x6000, "stranger")
+    Sprite(cut, 0x7300, pk, fr).add(2, CX, CZ, frame="stand_dr")
+    cut.hold(120)
+    scene = simple_scene(show, cut, 3878, 1664, 2944)
+    path = os.path.join(OUT, "facing.gba")
+    show.save(path)
+    st = run.state(path, scene, 58, "facing", wait=30)
+    print(run.shots(path, st, [200], "facing", scale=2))
+
+
+
+def fades():
+    """Which fade groups (bg, obj, other) tint which sprites: Claude and the
+    digits (new pools), a coffin (a game pool), Django."""
+    import part1
+    from figures import Sprite
+    show = Show(STRINGS, SLOTS)
+    cast = part1.Cast(show)
+    cut = Cutscene(show)
+    X, Z, Y = 2176, 2400, 512
+    cut.at(0, fade(0, 1, 0, 0, 0), cam(X, Z - 300, 1, y=Y + 150))
+    Sprite(cut, 0x7005, cast.claude, cast.cf, y=Y).add(2, X - 200, Z - 400, frame="stand_dr")
+    Sprite(cut, 0x7400, cast.coffins[0], {}, y=Y).add(2, X + 100, Z - 400, frame=0)
+    Sprite(cut, 0x7480, cast.digits, {}, y=Y).add(2, X, Z - 600, frame=0)
+    for k, (bg, obj, oth) in enumerate([(1, 0, 0), (0, 1, 0), (0, 0, 1)]):
+        cut.at(40 + 60 * k, fade(1, 1, 31, 0, 0, bg, obj, oth, 0))
+        cut.at(80 + 60 * k, fade(0, 1, 31, 0, 0, 1, 1, 1, 0))
+    cut.hold(260)
+    scene = simple_scene(show, cut, 2850, X, Z, flags=56)
+    path = os.path.join(OUT, "fades.gba")
+    show.save(path)
+    st = run.state(path, scene, 58, "fades", wait=30)
+    print(run.shots(path, st, list(range(60, 420, 30)), "fades", scale=1))
+
+
 if __name__ == "__main__":
     globals()[sys.argv[1]]()

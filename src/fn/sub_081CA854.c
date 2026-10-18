@@ -1,6 +1,6 @@
 #include "global.h"
 void Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
-void sub_081CA854(void *unused, u8 *p)
+void Actor_BeginKindFifteenEntryNine(void *unused, u8 *p)
 {
     if (p[9]) {
         s32 r;

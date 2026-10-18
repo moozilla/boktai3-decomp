@@ -10,7 +10,7 @@ struct MP {
 extern struct MP gUnk_082643EC[];
 extern u16 gUnk_03005470[];
 void m4aMPlayTempoControl(u32, u16);
-void sub_0822B248(u32 t)
+void Sound_SetChannel10Tempo(u32 t)
 {
     u16 s = gUnk_03005470[0x14 / 2];
     if (s != 0) {

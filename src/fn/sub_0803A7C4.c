@@ -13,7 +13,7 @@ struct Display {
     struct Drawing drawings[4];
 };
 void Anim_LoadKeyframe(void *, void *, int, int);
-void sub_0803A7C4(struct Display *p)
+void WirelessGameDisplay_UpdateAlternatingNotice(struct Display *p)
 {
     if (p->entered) {
         struct Drawing *q;

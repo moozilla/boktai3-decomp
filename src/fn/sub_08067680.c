@@ -5,8 +5,8 @@ struct SceneActorControlManager *SceneActorControl_EnsureSingleton(void);
 struct SceneActorControlSlot *SceneActorControl_AllocateSlot(struct SceneActorControlManager *);
 void SceneActorControl_DecodeDirection(const void *, u8 *, u8 *);
 s32 Region_FindContaining(const struct ContactPosition *);
-void sub_082144E4(void *, void *, u32);
-u32 sub_0804DFC0(s32);
+void Sprite_InitUnlinked(void *, void *, u32);
+u32 AreaEffect_HasEnabledTerrainValue(s32);
 void SceneActorControl_InitCollider(struct SceneActorControlSlot *, s32, s32);
 static inline u16 *Step(struct SceneActorControlSlot *slot,
                         struct SceneActorControlSprite *inputSprite, u16 *inputFlags)
@@ -191,7 +191,7 @@ s32 SceneActorControl_CreateFromPosition(const struct SceneActorControlInput *ar
     }
     sprite = (void *)slot;
     slot->position = *saved;
-    sub_082144E4(slot, (u8 *)p + 0x18, 0);
+    Sprite_InitUnlinked(slot, (u8 *)p + 0x18, 0);
     {
         void *resource;
         u8 *read;
@@ -210,7 +210,7 @@ s32 SceneActorControl_CreateFromPosition(const struct SceneActorControlInput *ar
             write->spriteFlags = flags;
             write->priority = 1;
         }
-        if (sub_0804DFC0(slot->scene)) {
+        if (AreaEffect_HasEnabledTerrainValue(slot->scene)) {
             u32 value = *lateFlags;
             u32 mask = 0x20;
             mask |= value;

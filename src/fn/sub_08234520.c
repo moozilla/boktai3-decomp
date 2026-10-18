@@ -1,6 +1,6 @@
 #include "global.h"
 void Effect_Remove(u8 *);
-u32 sub_08234520(u8 *p)
+u32 SpiralBurst_OnTaskDestroy(u8 *p)
 {
     s32 i;
     u8 *q = p + 0x78;

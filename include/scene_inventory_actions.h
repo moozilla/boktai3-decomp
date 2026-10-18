@@ -33,13 +33,13 @@ struct SceneInventoryActionDefinition {
     u8 unknown4[2];
     u16 baseValue;
 };
-s32 sub_0822D6E0(u32);
+s32 Inventory_GetEquipmentId(u32);
 s32 SceneItemValue_CalculateEquipment(u32);
-struct SceneInventoryActionDefinition *sub_08227F5C(u32);
-s32 sub_0822CDA8(u32);
+struct SceneInventoryActionDefinition *Equipment_GetDefinition(u32);
+s32 Inventory_GetItemId(u32);
 s32 SceneItemValue_CalculateItem(u32);
 u32 SceneItemValue_GetItemBaseValue(s32);
-s32 sub_0822E104(u32);
+s32 Inventory_GetConsumableId(u32);
 s32 SceneItemValue_CalculateConsumable(u32);
 s32 SceneItemValue_GetConsumableBaseValue(u32);
 void SceneHud_ShowFourDigits(struct SceneHudDigitView *, const struct ContactPosition *, s32, u32);

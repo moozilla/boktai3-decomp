@@ -1,6 +1,6 @@
 #include "global.h"
 
-s32 sub_08097758(void)
+s32 Ghost_GetBehaviorCode(void)
 {
     return 4;
 }

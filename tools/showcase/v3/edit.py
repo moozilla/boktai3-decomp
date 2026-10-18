@@ -34,20 +34,19 @@ BOLD = "/System/Library/Fonts/Supplemental/Arial Bold.ttf"
 # Part 1: (recording, chapter title or None, trims) in order. trims: list of
 # (start, end, speed) in recording seconds; None = from the scene's start to the end.
 PART1 = [
-    ("cold", "Cold open: one ghoul, twenty palettes", None),
-    ("title", None, None),
+    ("cold", "Cold open: something is wrong with that ghoul", None),
     ("doors", "The doors lie", "cuts"),
     ("night", "Night falls on cue", None),
     ("marionettes", "The marionettes", None),
-    ("fight", "The boss who forgets", None),
-    ("count", None, None),
+    ("count", "The Count loses control", None),
     ("ride", "Somebody rides Vanargand", None),
     ("reveal", "The overload: who the stranger was", None),
-    ("coffins", "Encore: a coffin for every boss", None),
-    ("vride", None, None),
-    ("sunback", "The sun, handed back", None),
-    ("credits", "Credits", [(0, 32, 2.0), (32, 58, 1.0), (58, 74, 2.0), (74, 82, 1.0)]),
-    ("finale", None, [(0, 5.2, 1.0)]),
+    ("coffins", "Encore: a purification of a different kind", None),
+    ("vride", "Claude rides Vanargand", None),
+    ("sunback", "Want to see?", None),
+    ("title", "Introducing... Boktai 3, decompiled", ("abs", [(0.7, 10.0, 1.0)])),
+    ("part2", None, None),
+    ("credits", "Credits", ("abs", [(0.9, 52.0, 1.0)])),
 ]
 
 
@@ -118,6 +117,8 @@ def game_clip(name, tmp, trims=None):
     recording's sound running at its own speed (music under a fast crawl)."""
     src = os.path.join(REC, f"{name}.mp4")
     s0 = scene_start(src)
+    if isinstance(trims, tuple) and trims[0] == "abs":    # times from the recording's start (the crawl scenes)
+        s0, trims = 0.0, trims[1]
     end = duration(src)
     cut_sound = trims == "cuts"
     parts = without_black(src, s0) if cut_sound else (trims or [(0, end - s0, 1.0)])
@@ -126,6 +127,8 @@ def game_clip(name, tmp, trims=None):
         a, b = s0 + a, min(end, s0 + b)
         o = os.path.join(tmp, f"{name}_{k}.mp4")
         vf = f"setpts=(PTS-STARTPTS)/{speed},{GAME}"
+        if name == "credits" and k == len(parts) - 1:     # the video's end: fade to black
+            vf += f",fade=out:st={(b - a) / speed - 2.5:.3f}:d=2.5"
         sh("ffmpeg", "-v", "error", "-y", "-ss", f"{a:.3f}", "-to", f"{b:.3f}", "-i", src, "-vf", vf,
            *(["-af", "aresample=48000,afade=t=in:d=0.03"] if cut_sound else ["-an"]),
            "-c:v", "libx264", "-crf", "16", "-preset", "fast", *(["-c:a", "aac", "-ac", "2"] if cut_sound else []), o)
@@ -136,11 +139,12 @@ def game_clip(name, tmp, trims=None):
         return o
     v = os.path.join(tmp, f"{name}_v.mp4")
     concat(outs, v, audio=False)
+    fo = 2.5 if name == "credits" else 0.25
     # sound: the recording's own, unsped, from the scene's start, as long as the picture
     dv = duration(v)
     o = os.path.join(tmp, f"{name}.mp4")
     sh("ffmpeg", "-v", "error", "-y", "-i", v, "-ss", f"{s0:.3f}", "-i", src, "-map", "0:v", "-map", "1:a",
-       "-af", f"aresample=48000,afade=t=in:d=0.08,afade=t=out:st={max(0, dv - 0.25):.3f}:d=0.25,apad",
+       "-af", f"aresample=48000,afade=t=in:d=0.08,afade=t=out:st={max(0, dv - fo):.3f}:d={fo},apad",
        "-t", f"{dv:.3f}", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-ac", "2", o)
     return o
 
@@ -238,8 +242,8 @@ def part2(tmp, chapters, t0):
        "-af", f"aresample=48000,volume=0.55,afade=t=in:d=2,afade=t=out:st={dv - 3:.3f}:d=3,apad", "-t", f"{dv:.3f}",
        "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-ac", "2", o)
     dp = duration(pages)
-    chapters += [(t0, "Part 2: how it was done (the Studio)"), (t0 + dp, "Live edit: the Studio changes the running game"),
-                 (t0 + dp + dl, "The tools, and thanks")]
+    chapters += [(t0, "How it was done: the Studio"), (t0 + dp, "Live edit: the Studio changes the running game"),
+                 (t0 + dp + dl, "The tools, and where to find them")]
     return o
 
 
@@ -255,16 +259,20 @@ def main():
     try:
         if a.part in ("1", "all"):
             for name, chapter, trims in PART1:
-                if name == "title":
-                    c = card(tmp, "title", "BOKTAI 3, DECOMPILED", secs=2.6, music=os.path.join(REC, "music.mp4"))
-                else:
-                    c = game_clip(name, tmp, trims)
+                if name == "part2":
+                    if a.part == "1":
+                        continue
+                    c = part2(tmp, chapters, t)
+                    clips.append(c)
+                    t += duration(c)
+                    continue
+                c = game_clip(name, tmp, trims)
                 if chapter:
                     chapters.append((t, chapter))
                 clips.append(c)
                 t += duration(c)
                 print(f"{name}: {duration(c):.1f} s (at {t:.1f})", flush=True)
-        if a.part in ("2", "all"):
+        if a.part == "2":
             c = part2(tmp, chapters, t)
             clips.append(c)
             t += duration(c)

@@ -1,6 +1,6 @@
 #include "global.h"
 
-u32 sub_08018DFC(void)
+u32 BlendTransition_Destroy(void)
 {
     return 0;
 }

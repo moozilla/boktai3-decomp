@@ -23,25 +23,25 @@ extern u32 gUnk_030053D8;
 extern u32 gUnk_030054B0;
 extern u8 *gUnk_02000710;
 extern struct Task gUnk_030025A0;
-void sub_0822580C(void);
-void sub_082250EC(void);
-void sub_082257E4(void);
-void sub_0821B90C(void);
-void sub_08227DC4(void);
+void Script_InitActorRegistry(void);
+void SceneLifecycle_ResetSceneRegistries(void);
+void Script_RegisterEngineCommands(void);
+void Script_RegisterBuiltinCommands(void);
+void Settings_LoadOrInitializeDefaults(void);
 void SceneLifecycle_ResetSubsystems(void);
-void sub_082210B8(void);
+void Random_InitValueTable(void);
 void sub_08177D54(void);
-s32 sub_082250FC(struct Task *);
-void sub_08225324(void);
+s32 SceneLifecycle_UpdateTask(struct Task *);
+void SceneLifecycle_DestroyTask(void);
 void Task_SetCallbacks(struct Task *, s32 (*)(struct Task *), void (*)(void));
-void sub_08219F74(struct Task *);
-void sub_08225328(void)
+void Task_LinkToPriorityList(struct Task *);
+void SceneLifecycle_InitManager(void)
 {
     struct Task *task;
-    sub_0822580C();
-    sub_082250EC();
-    sub_082257E4();
-    sub_0821B90C();
+    Script_InitActorRegistry();
+    SceneLifecycle_ResetSceneRegistries();
+    Script_RegisterEngineCommands();
+    Script_RegisterBuiltinCommands();
     gUnk_030053F4 = 0;
     gUnk_030053F0 = 0;
     gUnk_030053EC = 0;
@@ -59,20 +59,20 @@ void sub_08225328(void)
     *(u32 *)(gUnk_02000710 + 0x868) = 0;
     gUnk_030053E8 = 0;
     gUnk_030054B0 = 0;
-    sub_08227DC4();
+    Settings_LoadOrInitializeDefaults();
     SceneLifecycle_ResetSubsystems();
-    sub_082210B8();
+    Random_InitValueTable();
     sub_08177D54();
     {
         u32 value = 2;
         *(u16 *)(gUnk_02000710 + 0x12) = value;
     }
     task = &gUnk_030025A0;
-    Task_SetCallbacks(task, sub_082250FC, sub_08225324);
+    Task_SetCallbacks(task, SceneLifecycle_UpdateTask, SceneLifecycle_DestroyTask);
     task->f14 = 1;
     task->f16 = 1;
     task->f10 = 0;
-    sub_08219F74(task);
+    Task_LinkToPriorityList(task);
     task->state = 0;
     task->counter = 0;
 }

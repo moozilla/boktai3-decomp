@@ -64,7 +64,7 @@ extern u8 *gUnk_030042E4;
 typedef struct {
     u32 a, b;
 } Point;
-void sub_080257D0(ActorAnimation *p, int tick)
+void SceneActorAnimation_UpdateChargeSlide(ActorAnimation *p, int tick)
 {
     ActorAnimation *p2 = p;
     u8 *position = (u8 *)p + 0x48;

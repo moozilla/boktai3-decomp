@@ -8,7 +8,7 @@ struct B {
     struct A *args;
 };
 void Script_Call(u32, struct B *);
-void sub_0801A094(u8 *p)
+void SelectionMenu_CallConfirmScript(u8 *p)
 {
     struct A a;
     struct B b;

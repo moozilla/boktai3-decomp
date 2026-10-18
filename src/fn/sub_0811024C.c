@@ -16,32 +16,32 @@ struct S {
 };
 void TextWindow_SetScript(u32, u32);
 void TextWindow_Refresh(u32, u32);
-void sub_080337FC(u32);
-s32 sub_0822BE78(void);
-void sub_08109374(void);
-void sub_08110410(void);
-void sub_081102EC(void);
+void TextWindow_StartPlayback(u32);
+s32 Save_CopySelectedStateToAlternateSlot(void);
+void Registry1745_RequestHandshakeContinue(void);
+void SaveMenu_UpdateSaveFailure(void);
+void SaveMenu_WaitForSaveTransition(void);
 static inline void set(struct S *s, void *fp, u8 st)
 {
     s->fp = fp;
     s->c24 = 1;
     s->st = st;
 }
-void sub_0811024C(struct S *s)
+void SaveMenu_UpdateSaveDelay(struct S *s)
 {
     if (s->c24 != 0) {
         TextWindow_SetScript(s->h, s->c);
         TextWindow_Refresh(s->h, 4);
-        sub_080337FC(s->h);
+        TextWindow_StartPlayback(s->h);
         s->t = 0;
         s->c24 = 0;
     }
     if (s->t == 0x3c) {
-        if (!(u8)sub_0822BE78()) {
-            set(s, sub_08110410, 8);
+        if (!(u8)Save_CopySelectedStateToAlternateSlot()) {
+            set(s, SaveMenu_UpdateSaveFailure, 8);
         } else {
-            sub_08109374();
-            set(s, sub_081102EC, 5);
+            Registry1745_RequestHandshakeContinue();
+            set(s, SaveMenu_WaitForSaveTransition, 5);
         }
     } else {
         s->t++;

@@ -29,15 +29,15 @@ extern struct Actor *gUnk_02000580;
 extern u32 gUnk_03005308, gUnk_0300523C;
 extern u16 gUnk_0203B400[];
 void sub_081783C0(u16 *);
-void sub_08038128(struct P *, int);
-void sub_0822AE7C(int);
-void sub_08038148(struct P *);
-void sub_08038138(struct P *);
+void WirelessGameMenu_SetStatusPanelState(struct P *, int);
+void Sound_PlayTrackedSong(int);
+void WirelessGameMenu_UpdateHealthIndicators(struct P *);
+void WirelessGameMenu_SignalStatusPanel(struct P *);
 int Mod(int, int);
 int Div(int, int);
-struct Target *sub_0802140C(int);
-void sub_080397D4(int, int);
-int sub_08037FB4(struct P *, int, const u32 *, int);
+struct Target *SceneActors_GetBySlot(int);
+void WirelessGame_AddWeightedScore(int, int);
+int WirelessExchange_SendPacket(struct P *, int, const u32 *, int);
 void sub_08178404(void);
 void Sound_PlaySong(int);
 static inline u32 test(u32 *flags, u32 mask)
@@ -48,7 +48,7 @@ static inline void set(u32 mask)
 {
     gUnk_0300523C |= mask;
 }
-void sub_08038AD4(struct P *input)
+void WirelessGameMenu_UpdateActiveRound(struct P *input)
 {
     register struct P *p asm("r8") = input;
     u32 data;
@@ -62,23 +62,23 @@ void sub_08038AD4(struct P *input)
             view->remaining = value;
         }
         sub_081783C0(&p->remaining);
-        sub_08038128(p, 4);
-        sub_0822AE7C(22);
+        WirelessGameMenu_SetStatusPanelState(p, 4);
+        Sound_PlayTrackedSong(22);
         p->active = 1;
     }
-    sub_08038148(p);
+    WirelessGameMenu_UpdateHealthIndicators(p);
     if (({
             register struct P *view asm("r2") = p;
             view->timer;
         }) == 30)
-        sub_08038138(p);
+        WirelessGameMenu_SignalStatusPanel(p);
     if (Mod(({
                 register struct P *view asm("r3") = p;
                 view->timer;
             }),
             60) == 0) {
         struct Actor *actor = gUnk_02000580;
-        struct Target *target = sub_0802140C(0);
+        struct Target *target = SceneActors_GetBySlot(0);
         int a, b;
         struct Entry *e;
         u32 packed;
@@ -150,14 +150,14 @@ void sub_08038AD4(struct P *input)
                 int v = total;
                 v;
             }) > 0)
-            sub_080397D4(3, 1);
+            WirelessGame_AddWeightedScore(3, 1);
         {
             u32 v = packed;
             u32 shifted;
             shifted = v << 16;
             data |= shifted;
         }
-        sub_08037FB4(p, 0, &data, 1);
+        WirelessExchange_SendPacket(p, 0, &data, 1);
     }
     {
         register struct P *view asm("r3") = p;
