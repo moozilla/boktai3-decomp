@@ -904,3 +904,4 @@ addr,function,name,family,note
 08182624,sub_08182624,Armor_EnterFacingAnimation,"Armor animation controller","starts a facing animation and changes collision flags once"
 0818288C,sub_0818288C,,"scene actor state callbacks",""
 08182CDC,sub_08182CDC,Armor_UpdatePositiveTurn,"Armor 3 (tentative)","advances facing in positive quarter turns toward target"
+08182DF4,sub_08182DF4,Armor_UpdateNegativeTurn,"Armor 3 (tentative)","advances facing in negative quarter turns toward target"
