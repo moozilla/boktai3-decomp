@@ -7,7 +7,8 @@ struct SceneActorAnimationView {
     void *drawable;
     u8 drawableKind, unknown9[0x50];
     u8 direction;
-    u8 unknown5A[0x259];
+    u8 unknown5A[0x258];
+    u8 directionalEntryFlag;
     u8 restart;
     u8 unknown2B4[3];
     u8 selection;

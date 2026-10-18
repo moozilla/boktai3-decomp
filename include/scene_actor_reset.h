@@ -95,7 +95,8 @@ struct SceneActorRegistryResetView {
     u8 unknown2F6[0xE];
     u32 field304;
     u8 unknown308[0xC4];
-    u8 field3CC, unknown3CD[7];
+    u8 field3CC, unknown3CD[3];
+    void *context;
     struct SceneActorRegistryControlGroup group;
     struct SceneActorRegistryRoute route;
     u8 unknown45C[4];
