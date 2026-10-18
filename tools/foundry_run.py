@@ -32,6 +32,17 @@ TOOLS = ["Read", "Glob", "Grep", "Edit(wip/**)", "Write(wip/**)", "Edit(build/fo
          "Write(build/foundry/**)", "Edit(include/**)", "Bash(build/venv/bin/python tools/*)"]
 
 
+def quota_ok(floor):
+    """False when the Codex weekly quota is below floor percent (tools/codex_quota.py)."""
+    q = os.path.join(ROOT, "tools", "codex_quota.py")
+    if not os.path.exists(q):
+        return True
+    r = subprocess.run([sys.executable, q, "--floor", str(floor)], cwd=ROOT, capture_output=True, text=True)
+    if r.returncode != 0:
+        print(f"quota gate: {r.stdout.strip()} (floor {floor}%): no new batches", flush=True)
+    return r.returncode == 0
+
+
 def claim(n, bucket, rng=None):
     r = subprocess.run([foundry.PY, "tools/foundry.py", "batch", str(n)] + (["--bucket", bucket] if bucket else []) +
                        (["--range", *rng] if rng else []),
@@ -92,6 +103,8 @@ def main():
     ap.add_argument("--effort", default="medium", help="codex reasoning effort")
     ap.add_argument("--bucket")
     ap.add_argument("--range", nargs=2, help="START END (hex): only functions in this address range")
+    ap.add_argument("--quota-floor", type=int, default=15,
+                    help="codex: start no batch once the weekly quota is below this percent")
     ap.add_argument("--stop", default="STOP", help="stop file name under build/foundry/scale/")
     ap.add_argument("--max-batches", type=int, default=10 ** 9)
     a = ap.parse_args()
@@ -108,6 +121,9 @@ def main():
                 running.remove(item)
         if not os.path.exists(stop) and started < a.max_batches:
             while len(running) < a.workers:
+                if a.backend == "codex" and not quota_ok(a.quota_floor):
+                    started = a.max_batches  # stop for good; running batches finish
+                    break
                 path = claim(a.batch, a.bucket, a.range)
                 if not path:
                     break
