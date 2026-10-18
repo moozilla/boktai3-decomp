@@ -1346,3 +1346,4 @@ addr,function,name,family,note
 08234A4C,sub_08234A4C,FlickerParticle_UpdateStationary,"FlickerParticle","alternates particle frames until expiry after eight ticks"
 0823511C,sub_0823511C,FlickerParticle_UpdateSecondaryMotion,"FlickerParticle","alternates particle frames and integrates accelerated motion"
 08235294,sub_08235294,FlickerParticle_UpdatePool,"FlickerParticle","invokes callbacks for eight active particle slots"
+08235984,sub_08235984,SceneEffectGroup_Remove,"SceneEffectGroup","removes task animation, eight effects and optional sprite pair"
