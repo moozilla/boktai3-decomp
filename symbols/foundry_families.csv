@@ -1389,3 +1389,4 @@ addr,function,name,family,note
 0823B6E0,sub_0823B6E0,Player_CanUseAction,"Player","tests action availability for the current player mode"
 0823C02C,sub_0823C02C,Player_AccumulateActionCharge,"Player","adds action charge and triggers at one hundred"
 0823C054,sub_0823C054,Player_EmitPositionEffect,"Player","emits positional effect with optional player feedback and song"
+0823D00C,sub_0823D00C,Player_SetActionOrigin,"Player","copies position and applies facing-dependent action offsets"
