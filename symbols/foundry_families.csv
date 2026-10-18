@@ -481,3 +481,4 @@ addr,function,name,family,note
 08174480,sub_08174480,Presentation_ApplyGraphicData,"Presentation graphics","applies graphic data to the default target"
 08174494,sub_08174494,Presentation_ApplyIndexedGraphicData,"Presentation graphics","applies graphic data to an indexed target"
 08174578,sub_08174578,Presentation_ApplyPackedGraphicData,"Presentation graphics","converts packed data and applies graphic settings"
+08174594,sub_08174594,Presentation_SelectGraphicResource,"Presentation graphics","selects a graphic resource from kind and amount"
