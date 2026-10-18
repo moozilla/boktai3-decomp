@@ -597,3 +597,4 @@ addr,function,name,family,note
 0810B8A8,sub_0810B8A8,SessionMenu_Destroy,"Session menu state callbacks","restores callbacks and clears menu singleton"
 0810BEF8,sub_0810BEF8,SlotMenu_CreateTextWindows,"SlotMenu","creates three text windows and initializes the main window"
 0810C398,sub_0810C398,LinkPanel_GetConnectionStatus,"LinkPanel","maps link state and selected peer status to panel status"
+0810C724,sub_0810C724,SlotMenu_Destroy,"SlotMenu","clears backgrounds, calls the exit script, and kills the menu task"
