@@ -21,3 +21,4 @@ addr,function,name,family,note
 0809366C,sub_0809366C,SceneActorCollision_FireSecondaryAttack,"SceneActorCollision (attack-collider setup, shares sub_0821FF58 call convention with scene_actor_collision.h's ReadAttack* helpers)","arms the secondary collider (actor+0x188) with one of two attack-parameter slots picked by flags2D4&0x100, unless the actor is unavailable/dead"
 080972BC,sub_080972BC,SceneActor_BeginLinkedIdleReaction,"SceneActor linked reactions","starts behavior three when linked context flag is set"
 08097690,sub_08097690,SceneActor_InitLinkedReactionColliders,"SceneActor linked reactions","initializes body and linked reaction collider callbacks"
+08097B18,sub_08097B18,SceneActor_EndLinkedReaction,"SceneActor linked reactions (tentative Bee family)","clears context reaction flags and releases player counter contribution"
