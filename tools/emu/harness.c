@@ -14,6 +14,9 @@
 //   tap KEYS            hold for 2 frames, release for 8
 //   shot NAME           write OUTDIR/NAME.ppm
 //   save NAME / load NAME   savestate to/from OUTDIR/NAME.ss
+//   record PATH         start recording video and audio (mGBA's FFmpeg
+//                       encoder, H.264/AAC in MP4, 4x scaled; needs an mGBA
+//                       built with FFmpeg); "stoprecord" ends it (so does exit)
 //   loadstate PATH      load an mGBA savestate (raw or PNG, e.g. one Centaur
 //                       wrote); PATH relative to the script's directory
 //   dump NAME ADDR:LEN  raw memory dump (hex address and length)
@@ -41,6 +44,9 @@ typedef mColor color_t;
 #define desiredVideoDimensions baseVideoSize
 #endif
 
+#ifdef USE_FFMPEG
+#include "feature/ffmpeg/ffmpeg-encoder.h"
+#endif
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,6 +58,13 @@ typedef mColor color_t;
 #define ROM_SIZE 0x1000000
 
 static struct mCore* core;
+#ifdef USE_FFMPEG
+static struct FFmpegEncoder encoder;
+static int recording;
+static void stop_recording(void) {
+	if (recording) { core->setAVStream(core, NULL); FFmpegEncoderClose(&encoder); recording = 0; }
+}
+#endif
 static struct ARMCore* cpu;
 static struct ARMMemory orig;
 static color_t* fb;
@@ -393,6 +406,18 @@ int main(int argc, char** argv) {
 		else if (!strcmp(cmd, "save")) savestate(a1, 0);
 		else if (!strcmp(cmd, "load")) savestate(a1, 1);
 		else if (!strcmp(cmd, "loadstate")) loadstate(a1);
+#ifdef USE_FFMPEG
+		else if (!strcmp(cmd, "record")) {
+			FFmpegEncoderInit(&encoder);
+			if (!FFmpegEncoderSetAudio(&encoder, "aac", 192 * 1024) || !FFmpegEncoderSetVideo(&encoder, "libx264", -18, 0)
+			    || !FFmpegEncoderSetContainer(&encoder, "mp4")) { fprintf(stderr, "encoder setup failed\n"); exit(1); }
+			FFmpegEncoderSetDimensions(&encoder, W * 4, H * 4);
+			if (!FFmpegEncoderOpen(&encoder, a1)) { fprintf(stderr, "cannot record to %s\n", a1); exit(1); }
+			core->setAVStream(core, &encoder.d);
+			recording = 1;
+		}
+		else if (!strcmp(cmd, "stoprecord")) stop_recording();
+#endif
 		else if (!strcmp(cmd, "dump")) {
 			// dump NAME ADDR:LEN  (hex) -> OUTDIR/NAME.bin
 			unsigned addr = 0, len = 0;
@@ -440,6 +465,9 @@ int main(int argc, char** argv) {
 		fprintf(stderr, "[frame %u] %s %s %s\n", core->frameCounter(core), cmd, a1, a2);
 	}
 	end_segment();
+#ifdef USE_FFMPEG
+	stop_recording();
+#endif
 	if (probe_file && fclose(probe_file)) { perror("probes.tsv"); return 1; }
 	write_cov("total", rom_reader, rom_exec);
 	char path[1024];
