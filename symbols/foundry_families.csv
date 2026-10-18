@@ -907,3 +907,4 @@ addr,function,name,family,note
 08182DF4,sub_08182DF4,Armor_UpdateNegativeTurn,"Armor 3 (tentative)","advances facing in negative quarter turns toward target"
 08182F84,sub_08182F84,ActorController_UpdateResetMotionTransition,"Actor controller (auto, tentative)","updates reset-motion animation and optionally sets speed to 120"
 08183480,sub_08183480,ActorController_UpdateMovementVelocity,"ActorController","sets velocity for moving animation IDs"
+0818351C,sub_0818351C,ActorController_UpdateDecayingVelocity,"ActorController","scales velocity by a state-dependent right shift"
