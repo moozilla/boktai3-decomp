@@ -495,3 +495,4 @@ addr,function,name,family,note
 081755D4,sub_081755D4,SceneCatalog_ResetTextWindow,"SceneCatalog","loads the description script and refreshes text index zero"
 08175854,sub_08175854,SceneCatalog_SelectDescription,"SceneCatalog","selects a description or clears it for a negative index"
 08175874,sub_08175874,SceneCatalog_GetMappedState,"SceneCatalog","maps saved state one to two and two to one, otherwise zero"
+0817589C,sub_0817589C,SceneCatalog_MapSelectionMask,"SceneCatalog","maps selection zero to four, one to two, otherwise one"
