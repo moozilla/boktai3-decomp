@@ -1,4 +1,4 @@
-# Showcase v3: "The Prologue Breaks" (plan and script)
+# Showcase v3: "The Stranger" (plan and script)
 
 Tags: #showcase #scripts #tooling
 
@@ -7,11 +7,14 @@ The brief for the third showcase video. v1 and v2 are in
 and `showcase.py` (v2). This one aims as high as it can: a long cut
 (8–12 minutes) that we cut down later. Two parts:
 
-1. **The hack (6–8 min).** A cold open that hooks in seconds (the SUN
-   gauge overloads, Claude walks out of the light), then a journey through
-   the real game where Claude, having decompiled it, rewrites each place as
-   he passes through. Everything is played by the game's engine:
-   new scripts, cutscene tables, sprites, palettes, stage data.
+1. **The hack (6–8 min).** A cloaked stranger does impossible things to
+   the game (one ghoul fans out into twenty, doors lead everywhere, bosses
+   forget their fights) while Django and Otenko chase it across the world.
+   At the end Django's gun overheats, the SUN gauge explodes, and the
+   stranger is revealed as Claude, who decompiled the game. Then an encore
+   (a train of boss coffins) and the credits. Everything is played by the
+   game's engine: new scripts, cutscene tables, sprites, palettes, stage
+   data.
 2. **How it was done (4–6 min).** The Studio and the tooling, page by page,
    each with a caption panel saying what is interesting about it.
 
@@ -57,117 +60,148 @@ finished; the sprite package tile sheet must be 16 tiles wide.
 
 ## Part 1: the hack
 
-Rules from the user's review:
+Rules from the user's reviews:
 
-* **Hook in the first 5–10 seconds.** No slow prologue: the prologue gets
-  at most a few seconds as a quick reference.
-* **Not one stage.** The video travels through the real game. Fans
-  recognize places without setup.
-* **Glitch effects for their own sake are dull.** Every effect must be a
-  capability of the decompiled game being shown, not noise.
-* **No Clawd.** All art effort goes into a Claudesona that looks like it
-  belongs in Boktai (sprites and portraits).
-* Claude is confident, warm, a little mischievous, proud of the work; the
-  cast react in character (Otenko lectures, Django is blunt, Sabata is dry,
-  Trinity is sharp).
+* **Hook in the first 5–10 seconds** with something visual and impossible.
+  No slow prologue.
+* **Claude stays hidden until the end of Part 1.** Through most of the
+  video there is only a **stranger**: a cloaked figure at the edge of the
+  frame, face hidden, who does impossible things to the game and is gone
+  before anyone catches up. Django and Otenko chase it: "Who *is* that?"
+  Viewers who don't know or care about the Claudesona get a mystery, not a
+  mascot. The reveal comes from the sun gauge (below).
+* **Show, don't tell.** Every set piece is visual and ends on a punchline.
+  Editing dialogue is not a set piece: everyone knows text can be hacked.
+  A character talks only when they have just appeared somewhere impossible.
+* **Funny.** Django is deadpan and put upon; Otenko is scandalized; the
+  stranger never explains itself.
+* **Not beat for beat.** The list below is a menu, not a running order.
+  Prove the mechanisms, keep the best 6–8, and order them for escalation and
+  variety (big, small, big; fast cuts between places). Invent better ones
+  where the engine allows; the bar is "I didn't know the game could do that".
+* **No glitch noise and no Clawd.** Every effect is a capability of the
+  decompiled engine. The art effort goes into the stranger and the
+  Claudesona, both of which must look like original Boktai art.
+* **Travel.** Real places from across the game (save checkpoints from
+  `saves.py` give the right story state), with their own music.
 
 Dialogue pacing: faster than v2 (which pressed A every 105 frames). Use
-adaptive timing, `frames = 30 + 1.8 * characters on the page`, from the
-script; the recorder presses A per page on that schedule.
+adaptive timing, `frames = 30 + 1.8 * characters on the page`; the recorder
+presses A per page on that schedule. Most lines are one page.
 
-### Cold open: the overload (0:00–0:20)
+### Cold open (0:00–0:10)
 
-The Sealed Prison, under the skylight. Django raises the Gun Del Sol. The
-SUN gauge fills, and keeps filling past its end (the HUD's sun value and the
-harness's `lux`, pushed beyond what the game ever shows). The gauge cracks,
-the gun sparks (particles, quake, white flashes on a quickening beat), and
-the screen blows out to white. Out of the light walks a figure with a
-sunburst head: the Claudesona.
+Django walks up a corridor. A ghoul shambles toward him. Behind it, at the
+far end, the stranger raises a hand, and the ghoul **fans out** into twenty
+ghouls, each in another palette, sliding apart like a deck of cards, then
+snapping back into one. The ghoul looks at its own hands. Django: "..."
+Otenko: "Django. Who is that?" The stranger is gone.
 
-Claude: "Hi. I decompiled your game."
+Title: **BOKTAI 3, DECOMPILED**, two seconds, straight on.
 
-Title card: **BOKTAI 3, DECOMPILED** (two seconds, then straight on).
+(How: keyframe sprite packages made from the ghoul's own frames, each naming
+a different palette pool, gliding with `997B`; the real ghoul hidden while
+the copies are out.)
 
-### Act I: who is this? (0:20–1:30)
+### The chase: set pieces (0:10–5:30)
 
-Django and Otenko, in the prison room, after the flash. Otenko and Claude
-look at each other: two sunflower heads (Otenko: "A spirit of the sun...?
-No. You're something else."). Claude explains in three lines: he read every
-function, script and table of this world and wrote them back as source code,
-so now he can change the world from inside it. Django: "Prove it."
+Each is a short scene with the stranger somewhere in it, usually walking
+off-screen just as Django arrives. Candidates:
 
-A quick flash of the prologue here, as Claude's proof that he knows this
-world's history: the dream stage and Vanargand rising, five seconds, played
-from our own copy of cutscene 0 in fast motion, with Claude's voice over it.
+* **The doors lie.** Django runs after the stranger through a door, and
+  every door after that goes somewhere else: San Miguel, a desert, Dark
+  Castle, the Sealed Prison, a dungeon, back to San Miguel, faster and
+  faster (real warps between real scenes, the continuation carrying the
+  cutscene). He comes out in a closet. Otenko: "I don't think we're
+  following it. I think it's moving us."
+* **The light show.** A puzzle room. The stranger touches one floor switch
+  and every switch, gate and light in the room fires in a cascade, opening
+  and closing in time with the music (each switch rewired to our
+  procedure; a timed sequence). The way out is open. Django: "I was going
+  to solve that."
+* **The night falls on cue.** In a town, the stranger snaps its fingers and
+  the time of day sweeps from noon to night to dawn in seconds (palettes,
+  the solar sensor), shop shutters, townsfolk going in and out of doors in
+  sync like clockwork.
+* **The boss who forgets.** The Count's fight (Lifeless Town). Mid-fight
+  the stranger appears on a ledge; the Count's palette cycles, his HP bar
+  drains to one, his attack runs backwards, then he shrinks into a ghoul
+  (sprite swap) and walks away. Django lowers his gun.
+* **Riding Vanargand.** A silhouette crosses the sky of the Dark Castle on
+  Vanargand's back, Vanargand roaring through its rise (receiver commands
+  51/52/56/62), the camera chasing. Django: "Is that... riding Vanargand?"
+  Otenko: "Nobody rides Vanargand."
+* **The prison break.** The stranger presses a big switch and cages drop
+  from the ceiling, each holding someone from across the game: Sabata,
+  Trinity, the bosses, shopkeepers, Smith. The cages rise again, empty.
+  (Each cast member in their real sprite; see "The cast" in the art and
+  mechanism checks.) Or a summoning circle of particles, the cast rising
+  out of it in a ring. Pick whichever looks better.
+* **The cutting room floor.** The stranger walks through a wall into a room
+  Konami never shipped (a scene the scripts contain but no door reaches:
+  check `areas.py` for scenes with no incoming doors, area 2 "Unidentified
+  / unused room", debug scenes). Django follows. It is strange and unlit.
+  Otenko: "This place isn't in the world."
+* **The ROM as a stage.** The floor becomes the ROM itself: the Studio's
+  treemap drawn as an injected tileset and map, colored by kind; the
+  stranger walks across it. The most ambitious; prove it early, fall back
+  to a static backdrop on a BG layer.
 
-### Act II: a tour of a world rewritten (1:30–6:30)
+### The overload: the reveal (5:30–6:15)
 
-Claude, Django and Otenko travel through the game in story order. Each stop
-is a real scene (warps between real scenes; the cast respawned in each; the
-continue procedures carry the cutscene from scene to scene, as the prologue
-carries scene 6554 through its four entrances; save checkpoints from
-`saves.py` give the right story state for each place). Each stop shows one
-decoded system, with that place's own music and people:
+Django finally corners the stranger in a sunlit room (the Sealed Prison
+skylight). He raises the Gun Del Sol. The SUN gauge starts to rise on its
+own: full, then past full (the HUD's sun value and the harness's `lux`
+pushed beyond anything the game ever shows), still climbing.
 
-1. **Sealed Prison: the switches.** A puzzle room. Claude doesn't solve it:
-   he walks to the door and it opens because he rewired the room's floor
-   switch to his own script; then every switch in the room fires in sequence,
-   gates opening and closing like a light show. "Every switch in the game is
-   a script. So now are mine."
-2. **San Miguel: the people.** The townsfolk are mid-conversation with lines
-   Claude has edited (the text bank), and notice: Smith: "Why did I just say
-   that?" The shop's stock changes while Django is looking at it (item data).
-   Claude buys the Solar Gun back for Django for 0 Sols.
-3. **Lifeless Town: the Count.** The boss fight against the Count. Django is
-   losing; Claude rewrites the fight live: the Count's palette cycles, his HP
-   bar drops to one, his attack pattern runs backwards. The Count, in his own
-   portrait: "This... is not how this goes."
-4. **Pirate Island: one becomes many.** A single ghoul walks up, then splits:
-   copies slide out from it into a fan, each in another palette, then snap
-   back into one and it walks off confused. (Keyframe sprites made from the
-   ghoul's own frames, converted into sprite packages, each naming a
-   different palette pool, gliding with `997B`.) "The game only ever drew
-   one ghoul."
-5. **The cast, summoned.** Characters from across the game appear in a ring
-   around Django, each in their real sprite, each saying one line from the
-   game's own script in their own portrait, then gone.
-6. **Dark Castle: Vanargand.** Claude conducts Vanargand like an orchestra
-   (its receiver commands: rise, arms, roar), then jumps onto his back (a
-   keyframe sprite gliding onto the boss layer's position) and rides him as
-   the camera pulls back and the music swells.
-7. **The cutting room floor.** Claude opens a door to a room Konami never
-   shipped: scenes the scripts contain but no door reaches (the area
-   labels list candidates, e.g. area 2, "Unidentified / unused room"; check
-   `areas.py` for scenes with no incoming doors and debug scenes). "Nobody
-   has stood here since 2005."
-8. **The ROM as a stage.** The floor becomes the ROM itself: the Studio's
-   treemap rendered as a new tileset and map (an injected BG map and
-   tileset: the decomp's own understanding map, colored by kind), and
-   Claude walks across it pointing out regions ("This is the code. 31% of
-   it is ours now. This is every sprite."). The most ambitious beat; prove
-   it early, have a fallback (a static backdrop image on a BG layer).
-9. **The sun, finished.** Back to the opening's idea: Claude hands Django
-   the sun, the SUN gauge swings from empty to full, day to night to day
-   (time of day, the solar sensor value), the Gun Del Sol fires a beam
-   across the screen.
+Django: "What the... My gun is overheating!"
 
-Reactions between stops, short: Django ("This is cheating." / "Can you give
-me infinite energy?"), Otenko ("The order of this world, rewritten this
-easily..."), Trinity in San Miguel ("Who's the flower?").
+The gauge cracks. The gun shakes (quake, sparks, particles on a quickening
+beat, the music pitched up), then **explodes**: a burst of particles, white
+flash, sound cut. The smoke clears and where the stranger stood, its cloak
+burned away, is the Claudesona.
 
-### Act III: the credits (6:30–7:30)
+Claude: "Sorry. That was me." Then: "I decompiled your game."
 
-The game's own credits sequence (scene 6595 "Credits", from the save bank's
+### After the reveal: the encore (6:15–7:15)
+
+Short and funny, now with Claude in plain sight:
+
+* **The coffin train.** Django, in Boktai tradition, drags a coffin. Then
+  Claude walks past dragging a chain of coffins: one for every boss in the
+  game, a train that snakes across the screen and keeps coming, through
+  rooms, around corners (coffin packages following a path, each a few
+  frames behind the one before). Django: "You're not purifying all of
+  those." Claude: "Already did."
+* **Riding Vanargand, for real.** Claude jumps onto Vanargand's back (a
+  keyframe sprite gliding onto the boss layer's position) and waves.
+* **The sun, handed back.** Claude hands Django the sun: the gauge swings
+  empty to full, day to night to day, and the Gun Del Sol fires a beam
+  across the screen.
+
+### The credits (7:15–8:00)
+
+The game's own credits sequence (scene 6595 "Credits", the save bank's
 `0086 Credits` checkpoint), with the decomp's credits inserted between the
 real ones in the same style: the decomp contributors, the fan translation
-team, vgel and the Claudesona artists, pret's agbcc, decomp-permuter.
+team, vgel and the Claudesona artists, pret's agbcc, decomp-permuter. The
+coffin train can pass behind them.
 
-Then, in the last shot, Django: "How did you even do all this?" Claude:
-"Want to see?" Fade to white; the next shot is the Studio.
+Last shot, Django: "How did you even do all this?" Claude: "Want to see?"
+Fade to white; the next shot is the Studio.
 
 ## Art pipeline (Codex for references, then real pixel art)
 
-v2's sprites did not fit the game. Do this properly:
+v2's sprites did not fit the game. Do this properly. Two characters:
+
+* **The stranger**: a cloaked, hooded figure, face in shadow, maybe a faint
+  warm glow under the hood. It should read as a mysterious Boktai NPC, and
+  only in hindsight as Claude (the cloak's outline can hint at the mane).
+  Walk, idle, raise-a-hand, snap, vanish frames.
+* **The Claudesona**, revealed: walk cycle, idle, talk, cheer, the jump
+  (for Vanargand), dragging (for the coffin train), and the frames of the
+  cloak burning away for the reveal.
+
 
 1. **Gather references** under `build/showcase/refs/`:
    * the Claudesona: the CC0 sprites in github.com/N8python/claudesona
@@ -185,8 +219,8 @@ v2's sprites did not fit the game. Do this properly:
    sprites (palette size, outline weight, shading direction, 3/4 view,
    proportions), front/back/side/walk/attack/cheer poses at the sprite
    scale; 32×32 portraits in the style of the attached portraits (several
-   expressions: neutral, happy, smug, surprised); and the emerging-from-
-   the-light frames for the cold open. Check first
+   expressions: neutral, happy, smug, surprised); the stranger in the same
+   style; and the reveal frames (the cloak burning away). Check first
    that this Codex version can produce images (an image generation tool);
    if it cannot, have it produce the pixel art directly as indexed PNGs or
    as a palette plus an index grid, and iterate on its output. Keep the
@@ -195,8 +229,8 @@ v2's sprites did not fit the game. Do this properly:
    pool, clean by hand (in code, as v2 did) where needed, and check every
    sprite next to Django, Sabata and Otenko in a screenshot at 1x and 4x
    before using it. A Claude walk cycle (4 directions × 3–4 frames), idle,
-   talk, cheer, a jump (for Vanargand), a pointing pose, and the emerging
-   frames. The bar: a fan should not be able to tell it isn't original art.
+   talk, cheer, a jump (for Vanargand), dragging, and the reveal
+   frames; the stranger's frames. The bar: a fan should not be able to tell it isn't original art.
 4. **Portraits** at 32×32 in the style of the game's portraits (bust, the
    same lighting and outline), with expression variants if a speaker can
    carry more than one frame. v2's portrait was a placeholder.
@@ -257,10 +291,13 @@ Recorded with `studio_tour.py`, but reworked:
 ## Order of work
 
 Prove the risky mechanisms first, each in a throwaway scene with a
-screenshot, before writing the story around them: the SUN gauge pushed
-past full (and a way to draw it cracking); ghoul frames as a gliding
-package; a character summoned with a real sprite; a cross-scene transition
-that keeps the cutscene going; a floor switch firing our procedure;
-changing a boss's HP and palette during its fight; riding Vanargand; an
-unshipped room; the ROM drawn as a stage. Cut any that fail and say so. Then the art,
+screenshot, before writing the story around them: ghoul frames as a
+gliding package (the hook, first); the SUN gauge pushed past full, a way
+to draw it cracking, and the explosion (the reveal); a chain of coffin
+packages following a path; a run of chained warps that keeps the cutscene
+going; a floor switch firing our procedure and a timed cascade; the time
+of day swept in seconds; changing a boss's HP, palette and sprite during
+its fight; cast members in their real sprites (in cages or a circle);
+riding Vanargand; an unshipped room; the ROM drawn as a stage. Cut any that
+fail and say so; the menu has more set pieces than the video needs. Then the art,
 then the script, then the Studio part, then the edit.

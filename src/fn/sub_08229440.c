@@ -1,21 +1,18 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 70.6%
-// 6 differing instruction runs; first diff at +0x0 (push {r4, r5, lr} vs push {r4, lr})
 void sub_082284DC(void);
-u8 sub_082489A0(void);
+u32 sub_082489A0(void);
 void sub_082284E8(void);
-
 s32 sub_08229440(void)
 {
-    u8 status;
+    register u32 shifted asm("r5");
+    register u32 status asm("r4");
     sub_082284DC();
-    status = sub_082489A0();
+    shifted = sub_082489A0() << 24;
+    status = shifted >> 24;
     sub_082284E8();
-    if ((status & 15) == 1)
+    status &= 15;
+    if (status == 1)
         return 1;
     return -1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08229440);
-#endif
