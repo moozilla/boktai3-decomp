@@ -1118,3 +1118,4 @@ addr,function,name,family,note
 081CFCA4,sub_081CFCA4,SceneNpc_UpdateProjectedIdle,"StateActor","enables ground projection and advances idle counter"
 081D1720,sub_081D1720,SceneNpc_SetTargetToCurrentPosition,"StateActor","copies current position to walk target and selects state 14"
 081D2118,sub_081D2118,SceneNpc_OscillatePaletteBlend,"StateActor","oscillates palette blend over alternating 60-frame ramps"
+081D2544,sub_081D2544,SceneNpc_EnterRequestedState,"StateActor","selects requested state callback and resets attachment state"
