@@ -747,3 +747,4 @@ addr,function,name,family,note
 081658C8,sub_081658C8,SceneHud_DrawSelectedClock,"Scene HUD","draws base time or one of the two sun-clock times"
 08165A30,sub_08165A30,SceneHud_UpdateBinaryChoice,"Scene HUD","processes left/right choice input and confirm or cancel"
 08165BAC,sub_08165BAC,MenuTilemap_ClearRect,"MenuTilemap","fills a rectangle with blank tile F001"
+081660D0,sub_081660D0,SceneHud_SetPairedIcons,"Scene HUD","sets two icon keyframes or hides each when its selector is negative"
