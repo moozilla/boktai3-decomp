@@ -666,3 +666,4 @@ addr,function,name,family,note
 0812B68C,sub_0812B68C,PursuingActor_InitColliders,"actor collider pair","initializes two actor colliders and their callbacks"
 0812BCE0,sub_0812BCE0,PursuingActor_UpdateRetirement,"pursuing actor","moves fading actor and releases sprites and pool slot"
 0812D390,sub_0812D390,ScriptedColliderActor_Create,"scripted collider actor pool","allocates a scripted sprite actor and initializes its collider"
+0812DE38,sub_0812DE38,SceneTerrain_IsPathBlocked,"SceneTerrain","tests whether a directional terrain search reaches the target cell"
