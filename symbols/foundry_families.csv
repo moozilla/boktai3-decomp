@@ -1129,3 +1129,4 @@ addr,function,name,family,note
 081D5444,sub_081D5444,BackgroundPanel_ReleaseHandles,"BackgroundPanel","releases eight handles marks the panel and clears background zero"
 081D7240,sub_081D7240,ScreenTransition_WaitForCompletion,"ScreenTransition","waits until combined transition timing expires"
 081D72A4,sub_081D72A4,ScreenTransition_DispatchPhase,"ScreenTransition","dispatches current transition step phase"
+081D72FC,sub_081D72FC,ScreenTransition_ReturnZero,"ScreenTransition","returns zero without side effects"
