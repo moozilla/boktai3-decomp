@@ -11,3 +11,4 @@ addr,function,name,family,note
 0808B3A0,sub_0808B3A0,,"Bat","counts up and runs a delayed script call when the limit is reached"
 0808F490,sub_0808F490,Bat_UpdateActionScript,"Bat","runs the queued action script and updates the counter or flags"
 0808FF00,sub_0808FF00,Bat_ReadScriptValuePair,"Bat","reads an optional pair of script values into two fields"
+08093798,sub_08093798,Slime_SetStateFlag,"Slime","sets bit 3 in a state flag byte"
