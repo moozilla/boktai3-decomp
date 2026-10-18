@@ -783,3 +783,4 @@ addr,function,name,family,note
 0816AE38,sub_0816AE38,ScenePanel_BeginAccountExit,"ScenePanel","starts account panel exit animation and sound"
 0816AEE8,sub_0816AEE8,SceneSequence_BeginAnimation6,"SceneSequence","starts animation six and installs its next phase"
 0816AF5C,sub_0816AF5C,ScenePanel_UpdateAccountIntro,"ScenePanel","runs timed intro, slides main sprite and opens account selection"
+0816B040,sub_0816B040,SceneSequence_UpdateRamp64,"SceneSequence","ramps a parameter to 64 while advancing two animations"
