@@ -214,3 +214,4 @@ addr,function,name,family,note
 08115924,sub_08115924,ActorParticles_InitPool,"ActorParticles","initializes 48 animated particle slots"
 08115FAC,sub_08115FAC,CallbackPool_RemoveSmallSprites,"SmallCallbackPool","removes small-pool sprites and clears the global pool pointer"
 08115FE0,sub_08115FE0,ActorParticles_InitCompactPool,"ActorParticles","initializes 16 compact animated particle slots"
+0811628C,sub_0811628C,ScenePool_CanAcceptControl,"ScenePoolActor","tests actor and linked player restriction flags"
