@@ -12,7 +12,7 @@ void sub_082386DC(u8 *);
 void Player_UpdateOrbitingAuraEffect(u8 *);
 void sub_08238FE0(u8 *);
 void Player_UpdateConvergingParticles(u8 *);
-void sub_0824923C(u8 *, u32);
+void Callback_InvokeActor(u8 *, u32);
 void sub_0823A2E4(u8 *p)
 {
     sub_0823A060(p);
@@ -25,7 +25,7 @@ void sub_0823A2E4(u8 *p)
     {
         u32 *source = (u32 *)(p + 0x864);
         u8 *target = p + 0x7fc;
-        sub_0824923C(target, *source);
+        Callback_InvokeActor(target, *source);
     }
     {
         u32 v = *(u16 *)(p + 0x6f8);

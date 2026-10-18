@@ -20,7 +20,7 @@ void ScenePanel_TickRig(struct ScenePanel *input)
     struct ScenePanelRig *rig = &parent->rig;
     u32 palette;
     ScenePanelRig_CheckContactTransition(rig);
-    sub_0824923C(rig, gUnk_08605A94[parent->rig.state]);
+    Callback_InvokeActor(rig, gUnk_08605A94[parent->rig.state]);
     if (parent->rig.colliderHold) {
         register u32 flagOffset asm("r1") =
             (u32) & ((struct SceneRigDriverView *)0)->rig.collider.flags;

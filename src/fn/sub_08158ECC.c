@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0813AFEC(u8 *, s32, s32);
+void ActorSequence_Begin(u8 *, s32, s32);
 
 void Player_BeginResourceStationInteraction(u8 *p, s32 *a, s32 b)
 {
@@ -8,7 +8,7 @@ void Player_BeginResourceStationInteraction(u8 *p, s32 *a, s32 b)
     s32 x;
     s32 y;
 
-    sub_0813AFEC(p, 8, 0);
+    ActorSequence_Begin(p, 8, 0);
     *(u16 *)(p + 0x4E8) = 0;
     d = (s32 *)(p + 0x498);
     x = a[0];

@@ -7,11 +7,11 @@ struct S {
 };
 s32 Mod(s32, s32);
 void Sound_PlaySong(s32);
-void sub_0810FF8C(struct S *, s32);
+void LinkMenu_DrawRandomizedFourDigitNumber(struct S *, s32);
 void LinkScorePanel_UpdateRollingNumber(struct S *s)
 {
     if (Mod(s->h, 2) == 0)
         Sound_PlaySong(0x2A5);
     if (s->h2 != 0)
-        sub_0810FF8C(s, 0);
+        LinkMenu_DrawRandomizedFourDigitNumber(s, 0);
 }

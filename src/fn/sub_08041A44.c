@@ -7,9 +7,9 @@ struct ModifierCapacityInfo {
     u16 value;
 };
 s32 ModifierMenu_ClampSourceId(u32, s32);
-s32 sub_0811DD94(s32, s32);
+s32 StateFlags_GetCategoryBit(s32, s32);
 s32 GameFlag_FindFirstSetIndex(s32, s32);
-s32 sub_0811E5D0(struct ModifierCapacityInfo *, s32);
+s32 ScriptRecord_FindByteModifier(struct ModifierCapacityInfo *, s32);
 extern const u8 gUnk_086058E8[];
 void ModifierMenu_ValidateSavedSelection(struct ModifierMenu *menu)
 {
@@ -22,20 +22,20 @@ void ModifierMenu_ValidateSavedSelection(struct ModifierMenu *menu)
     gUnk_02000710->unk7A0[2] = ModifierMenu_ClampSourceId(1, (s16)gUnk_02000710->unk7A0[2]);
     gUnk_02000710->unk7A0[1] = ModifierMenu_ClampSourceId(2, (s16)gUnk_02000710->unk7A0[1]);
     gUnk_02000710->unk81A = ModifierMenu_ClampSourceId(5, gUnk_02000710->unk81A);
-    if (!sub_0811DD94(0, (s16)gUnk_02000710->unk7A0[0]))
+    if (!StateFlags_GetCategoryBit(0, (s16)gUnk_02000710->unk7A0[0]))
         gUnk_02000710->unk7A0[0] = GameFlag_FindFirstSetIndex(0, 6);
-    if (!sub_0811DD94(1, (s16)gUnk_02000710->unk7A0[2]))
+    if (!StateFlags_GetCategoryBit(1, (s16)gUnk_02000710->unk7A0[2]))
         gUnk_02000710->unk7A0[2] = GameFlag_FindFirstSetIndex(1, 6);
-    if (!sub_0811DD94(2, (s16)gUnk_02000710->unk7A0[1]))
+    if (!StateFlags_GetCategoryBit(2, (s16)gUnk_02000710->unk7A0[1]))
         gUnk_02000710->unk7A0[1] = GameFlag_FindFirstSetIndex(2, 6);
-    if (!sub_0811DD94(3, (s16)gUnk_02000710->unk7A0[3]))
+    if (!StateFlags_GetCategoryBit(3, (s16)gUnk_02000710->unk7A0[3]))
         gUnk_02000710->unk7A0[3] = -1;
-    sub_0811E5D0(&info, (s16)gUnk_02000710->unk7A0[2]);
+    ScriptRecord_FindByteModifier(&info, (s16)gUnk_02000710->unk7A0[2]);
     capacity = info.capacity;
     mask = 0;
     for (i = 0; i < 4; i++) {
         s32 id = ((s16 *)gUnk_02000710->modifierIdsBytes)[i];
-        if (id >= 0 && sub_0811DD94(4, id))
+        if (id >= 0 && StateFlags_GetCategoryBit(4, id))
             mask |= 1 << ((s16 *)gUnk_02000710->modifierIdsBytes)[i];
     }
     for (i = 0; i < 4; i++)
@@ -60,7 +60,7 @@ void ModifierMenu_ValidateSavedSelection(struct ModifierMenu *menu)
         }
     } while (1);
 secondary:
-    if (!sub_0811DD94(5, gUnk_02000710->unk81A))
+    if (!StateFlags_GetCategoryBit(5, gUnk_02000710->unk81A))
         gUnk_02000710->unk81A = GameFlag_FindFirstSetIndex(5, gUnk_086058E8[2] * 3 * 2);
 }
 

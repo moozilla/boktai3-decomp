@@ -1,7 +1,7 @@
 #include "global.h"
 
 void sub_0811C168(u8 *);
-void sub_0811EE0C(u8 *);
+void CallbackList_ResetDispatch(u8 *);
 void sub_0811C09C(u8 *);
 void Sound_PlaySong(u32);
 void ScenePool_ReleaseActorSlot(u32, u8 *, u8 *, u32);
@@ -16,7 +16,7 @@ u32 ScenePool_StatePlayRemovalEffects(u32 a, u8 *b, u8 *e, u32 d)
         z = 0;
         e[0x64] = z;
         sub_0811C168(b);
-        sub_0811EE0C(b);
+        CallbackList_ResetDispatch(b);
         *(u32 *)(b + 0x5ac) = z;
         *(u32 *)(b + 0x5b4) = z;
         *(u32 *)(b + 0xc0) = z;

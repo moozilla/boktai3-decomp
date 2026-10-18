@@ -10,7 +10,7 @@ s32 ResultMenu_IsPhaseStart(void);
 u8 ResultMenu_ConfigureLayers(u32, u32);
 void sub_0801BD44(struct P *);
 void ScreenTransition_SendCommand(u32, u32, u32, u32, u32, u32, u32);
-void sub_0815BE5C(u32, u32);
+void PlayerCue_BeginModeSeven(u32, u32);
 void ResultMenu_SetPhase(struct P *, void (*)(void));
 void ResultMenu_Countdown(void);
 void ResultMenu_UpdateIntro(struct P *p)
@@ -21,7 +21,7 @@ void ResultMenu_UpdateIntro(struct P *p)
         z = 0;
         sub_0801BD44(p);
         ScreenTransition_SendCommand(0, 5, 4, 4, 4, 0xFFFF, z);
-        sub_0815BE5C(gUnk_02000580, 0);
+        PlayerCue_BeginModeSeven(gUnk_02000580, 0);
     }
     if (p->w3c > 0x1f) {
         ResultMenu_SetPhase(p, ResultMenu_Countdown);

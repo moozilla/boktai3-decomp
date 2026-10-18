@@ -4,7 +4,7 @@
 #include "scene_actor_script.h"
 void SceneActorControl_BeginTimedBehavior56(struct SceneActorRegistryResetView *,
                                             struct SceneActorScriptPropertiesView *);
-u8 sub_080B5E54(struct SceneActorRegistryResetView *);
+u8 SceneActorControl_CanTurnTowardTarget(struct SceneActorRegistryResetView *);
 static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input, u32 offset)
 {
     u32 mask = input;
@@ -52,7 +52,7 @@ void SceneActorReaction_TryStartContact(u8 *source, u16 *contact,
         return;
     if (WordFlag((u32 *)(source + 0x34), 0x10))
         return;
-    if (!sub_080B5E54(actor))
+    if (!SceneActorControl_CanTurnTowardTarget(actor))
         return;
     SceneActorControl_BeginTimedBehavior56(actor, state);
     *((u8 *)state + 0x6D0) = 20;

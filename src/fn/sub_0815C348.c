@@ -1,6 +1,6 @@
 #include "global.h"
-void sub_0815AD78(u8 *);
-void sub_0813AFEC(u8 *, s32, s32);
+void Player_EnterKindTwo(u8 *);
+void ActorSequence_Begin(u8 *, s32, s32);
 void PlayerCue_UpdateFaceSide(void);
 /* Sets the actor's +0x3A4 mode to 5 (on) or 3 and +0x3A2/+0x3A3, then
    update PlayerCue_UpdateFaceSide. */
@@ -18,7 +18,7 @@ void PlayerCue_FaceSide(u8 *a, u32 on)
         a[0x3A2] = on;
         a[0x3A3] = on;
     }
-    sub_0815AD78(a);
-    sub_0813AFEC(a, 0, 0);
+    Player_EnterKindTwo(a);
+    ActorSequence_Begin(a, 0, 0);
     *(void **)(a + 0x58C) = PlayerCue_UpdateFaceSide;
 }

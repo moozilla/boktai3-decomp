@@ -1,7 +1,7 @@
 #include "global.h"
 
 void SceneActorReaction_TickHiddenResponse(void *);
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 void SceneActorControl_DispatchControl(void *);
 void Skeleton_UpdateActionFlags(void *);
 
@@ -22,7 +22,7 @@ s32 Skeleton_Update(struct S *s)
     SceneActorReaction_TickHiddenResponse(s);
     m = 0x2000;
     if ((s->flags & m) || s->h2b8 == 0) {
-        sub_0824923C(s, s->tbl[s->idx]);
+        Callback_InvokeActor(s, s->tbl[s->idx]);
         SceneActorControl_DispatchControl(s);
     }
     Skeleton_UpdateActionFlags(s);

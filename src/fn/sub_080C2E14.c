@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *);
-s32 sub_0824923C(void *, void *);
+s32 Callback_InvokeActor(void *, void *);
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
 static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
 {
@@ -33,7 +33,7 @@ void SceneActorControl_UpdateEntryPhase(struct SceneActorRegistryResetView *acto
         SetControl(actor, control, 2);
     }
     if (SceneActorReaction_IsRangeReady(actor)) {
-        if ((u8)sub_0824923C(actor, actor->update270))
+        if ((u8)Callback_InvokeActor(actor, actor->update270))
             return;
         if (sub_0812F3CC(actor))
             return;

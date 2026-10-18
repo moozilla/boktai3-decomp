@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 void SceneActorControl_DispatchControl(void *);
 void Octopus_SetAnimationRefreshFlag(void *);
 void Octopus_UpdateBodyColliderPosition(void *);
@@ -15,7 +15,7 @@ struct S {
 s32 Octopus_Update(struct S *s)
 {
     Octopus_SetAnimationRefreshFlag(s);
-    sub_0824923C(s, s->tbl[s->idx]);
+    Callback_InvokeActor(s, s->tbl[s->idx]);
     SceneActorControl_DispatchControl(s);
     Octopus_UpdateBodyColliderPosition(s);
     return 1;

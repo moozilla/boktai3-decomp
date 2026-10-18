@@ -136,7 +136,7 @@ s32 SceneActorBehavior_DispatchPendingFlags(struct SceneActorRegistryActor *acto
         else
             goto unavailable;
         if (callback)
-            sub_0824923C(base, callback);
+            Callback_InvokeActor(base, callback);
         mask = ~0x180;
     }
     mask &= *flags;

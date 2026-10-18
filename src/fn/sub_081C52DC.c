@@ -4,10 +4,10 @@ struct S {
     u32 a;
 };
 void sub_081C5264(void *);
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 void Registry1909_Update(struct S *p)
 {
     sub_081C5264(p);
     if (p->a != 0)
-        sub_0824923C(p, p->a);
+        Callback_InvokeActor(p, p->a);
 }

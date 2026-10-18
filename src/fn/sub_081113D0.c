@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 void PaletteFade_UpdateTransition(void *);
 struct S {
     u8 f[0x18];
@@ -8,7 +8,7 @@ struct S {
 u32 PaletteFade_OnTaskUpdate(struct S *p)
 {
     if (p->a)
-        sub_0824923C(p, p->a);
+        Callback_InvokeActor(p, p->a);
     PaletteFade_UpdateTransition(p);
     return 0;
 }

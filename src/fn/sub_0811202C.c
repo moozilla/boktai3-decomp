@@ -5,7 +5,7 @@ struct T {
     u32 lo2 : 16;
     u32 hi2 : 16;
 };
-void sub_0811D384(void *);
+void SceneActorStyle_InitializeFromGameState(void *);
 void sub_0811C9F8(void *, void *, u32);
 void sub_0811CB68(void *, void *, void *, s32);
 void CharacterModel_SetAnimationFlags(void *, s32);
@@ -16,7 +16,7 @@ void StageResults_InitPortraitDisplay(u8 *s)
     struct T t;
     u8 *a;
     u8 *b;
-    sub_0811D384(s + 0x9B0);
+    SceneActorStyle_InitializeFromGameState(s + 0x9B0);
     s[0x11B2] = 0;
     t.lo = 0x30;
     t.hi = 0x50;

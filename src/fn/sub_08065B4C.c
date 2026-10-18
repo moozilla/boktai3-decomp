@@ -40,5 +40,5 @@ void ActorAttachment_UpdateFollowingOffset(struct ActorAttachmentSlotView *slot)
             }
         }
     }
-    sub_0824923C(slot, gUnk_08605B18[slot->resourceKind]);
+    Callback_InvokeActor(slot, gUnk_08605B18[slot->resourceKind]);
 }

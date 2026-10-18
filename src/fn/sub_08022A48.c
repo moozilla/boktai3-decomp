@@ -5,7 +5,7 @@ struct Packed {
 };
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
-void sub_0806A160(void *, int, void *, int, int, int, int, int);
+void SparkParticle_Spawn(void *, int, void *, int, int, int, int, int);
 void SceneActors_SpawnAmbientParticlePair(u8 *p)
 {
     u8 *graphics = p + 0x240;
@@ -33,6 +33,6 @@ void SceneActors_SpawnAmbientParticlePair(u8 *p)
         index = (index + 1) & mask;
         *indexPtr = index;
         speed = (table[index] & smallMask) + 20;
-        sub_0806A160(graphics + 0x20, 3, &size, angle, count, speed, 2, 2);
+        SparkParticle_Spawn(graphics + 0x20, 3, &size, angle, count, speed, 2, 2);
     }
 }

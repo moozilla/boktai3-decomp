@@ -9,14 +9,14 @@ struct P {
     u32 v;
 };
 void Memory_Clear(void *, u32);
-s32 sub_0811E534(void *, s32);
-void sub_0811F4C4(void);
-void sub_0811F6CC(void);
-void sub_0811F538(void);
-void sub_0811F75C(void);
+s32 ScriptRecord_FindAttributeModifier(void *, s32);
+void CallbackStatus_ResetSelectorAndTest(void);
+void ActorAbility_SpawnProjectile(void);
+void ActorAbility_ActivatePaletteEffect(void);
+void ActorAbility_SpawnAlternateProjectile(void);
 void sub_0811F7EC(void);
-void sub_0811F4DC(void);
-void sub_0811F5C4(void);
+void ModifierAction_ActivateCost(void);
+void ActorAbility_UpdateRecovery(void);
 void Modifier_InitFourthSourceEffect(u8 *s, u32 v)
 {
     u8 *a = s + 0x48;
@@ -29,28 +29,28 @@ void Modifier_InitFourthSourceEffect(u8 *s, u32 v)
     p->v = v;
     q = s + 0x318;
     Memory_Clear(q, 0xc);
-    if (sub_0811E534(q, *(s8 *)(a + 0xe)) < 0) {
-        p->cb = sub_0811F4C4;
+    if (ScriptRecord_FindAttributeModifier(q, *(s8 *)(a + 0xe)) < 0) {
+        p->cb = CallbackStatus_ResetSelectorAndTest;
         p->fl = z;
     } else {
         switch (p->sel) {
             case 0:
-                f = sub_0811F6CC;
+                f = ActorAbility_SpawnProjectile;
                 goto set;
             case 1:
-                f = sub_0811F538;
+                f = ActorAbility_ActivatePaletteEffect;
                 goto set;
             case 2:
-                f = sub_0811F75C;
+                f = ActorAbility_SpawnAlternateProjectile;
                 goto set;
             case 3:
                 f = sub_0811F7EC;
                 goto set;
             case 4:
-                f = sub_0811F4DC;
+                f = ModifierAction_ActivateCost;
                 goto set;
             case 5:
-                f = sub_0811F5C4;
+                f = ActorAbility_UpdateRecovery;
             set:
                 p->cb = f;
                 p->fl = 1;

@@ -35,14 +35,14 @@ void Wireless_RequestDisconnectMode(void);
 void Sound_FadeOutChannel10(int);
 void WirelessStatusMenu_InitDisplay(struct LinkMenu *);
 void WirelessStatusMenu_LoadStatusBackground(struct LinkMenu *, int);
-int sub_08033690(int, int, int, int);
+int TextWindow_Create(int, int, int, int);
 void TextWindow_SetScript(int, void *);
 void TextWindow_Refresh(int, int);
 void TextWindow_StartPlayback(int);
 void TextWindow_Destroy(int);
 void Sound_PlaySong(int);
 int Wireless_GetStatus(void);
-int sub_0824923C(void *, void *);
+int Callback_InvokeActor(void *, void *);
 extern void *gUnk_08605770[];
 void Anim_Remove(void *);
 void WirelessStatusMenu_InitDisplay(struct LinkMenu *p)

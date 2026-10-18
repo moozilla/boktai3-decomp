@@ -7,7 +7,7 @@ void *Script_GetKeywordValue(s32, s32);
 void sub_08210AD4(void *);
 void Collection_UpdateCountDigits(void *);
 void Collection_UpdatePageIndicator(void *);
-void *sub_08033690(u32, u32, u32, u32);
+void *TextWindow_Create(u32, u32, u32, u32);
 void ScrollingDialogue_RequestShow(void);
 void ScrollingDialogue_ClearScript(void);
 u32 Collection_UpdateSelectedEntryText(void *);
@@ -47,7 +47,7 @@ success:
     sub_08210AD4(s);
     Collection_UpdateCountDigits(s);
     Collection_UpdatePageIndicator(s);
-    *(void **)(s + 0xb94) = sub_08033690(1, 0x10, 0x1d, 4);
+    *(void **)(s + 0xb94) = TextWindow_Create(1, 0x10, 0x1d, 4);
     ScrollingDialogue_RequestShow();
     ScrollingDialogue_ClearScript();
     Collection_UpdateSelectedEntryText(s);

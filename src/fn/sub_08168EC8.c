@@ -1,9 +1,9 @@
 #include "global.h"
-u32 sub_08168E38(void *);
+u32 SceneHud_CanOpenSecondarySelection(void *);
 void PauseMenu_BeginEquipmentSelection(void *);
 u32 PauseMenu_TryBeginEquipmentSelection(void *p)
 {
-    if (sub_08168E38(p)) {
+    if (SceneHud_CanOpenSecondarySelection(p)) {
         PauseMenu_BeginEquipmentSelection(p);
         return 1;
     }

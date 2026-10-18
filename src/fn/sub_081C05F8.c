@@ -3,8 +3,8 @@ struct S {
     u8 f[0x30];
     u32 a;
 };
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 void ScenePaletteFade_Update(struct S *p)
 {
-    sub_0824923C(p, p->a);
+    Callback_InvokeActor(p, p->a);
 }

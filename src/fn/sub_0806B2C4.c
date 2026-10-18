@@ -15,7 +15,7 @@ struct TileDrawable {
     u8 unknownC[0x1c];
     const u16 *graphics;
 };
-u32 sub_082212DC(void *, s32, s32, s32);
+u32 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 static inline void StepSprite(struct SpriteEffectController *input)
 {
     register struct SpriteEffectController *slot asm("r6") = input;
@@ -382,7 +382,7 @@ void SpriteEffectController_FadeAndDestroy(struct SpriteEffectControllerPool *un
     {
         void *drawable = slot->drawable;
         u16 *age = &slot->frame;
-        if ((u8)sub_082212DC(drawable, *age, 60, 40)) {
+        if ((u8)Sprite_BlinkUntilExpired(drawable, *age, 60, 40)) {
             struct SpriteEffectControllerPool *p = gUnk_02000178;
             register s8 *index asm("r3") = &slot->index;
             p->used &= ~(1U << *index);

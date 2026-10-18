@@ -1,11 +1,11 @@
 #include "area_effect.h"
 // MATCHING_CONCESSION: register-pinning
-u32 sub_08228DB8(void);
+u32 SunClock_GetPhase(void);
 void AnimData_SelectPaletteBank(void *, u32);
 void AreaEffect_UpdateGraphicsId(struct AreaEffectManager *manager)
 {
     u32 id;
-    switch (sub_08228DB8()) {
+    switch (SunClock_GetPhase()) {
         case 3:
         case 4:
             id = 0x1C8;

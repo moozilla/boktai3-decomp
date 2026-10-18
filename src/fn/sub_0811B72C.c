@@ -5,8 +5,8 @@ u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 Collider_InitManager(u8 *);
 void Task_Kill(u8 *);
-void sub_0811B5F0(void);
-void sub_0811B668(void);
+void Collision_ProcessGroups(void);
+void CategoryLists_Destroy(void);
 
 u8 *Collider_CreateManager(void)
 {
@@ -15,7 +15,7 @@ u8 *Collider_CreateManager(void)
         return gUnk_02000200;
     p = Task_Create(5, 0xc0);
     if (p != 0) {
-        Task_SetCallbacks(p, sub_0811B5F0, sub_0811B668);
+        Task_SetCallbacks(p, Collision_ProcessGroups, CategoryLists_Destroy);
         if (Collider_InitManager(p) < 0) {
             Task_Kill(p);
             return 0;

@@ -4,17 +4,17 @@ struct P081561A8 {
     u8 f0[0x458];
     u8 f458;
 };
-s32 sub_0813AE18(void *, u32, u32, u32);
-void sub_0813ADD0(void *);
+s32 Player_SetAnimation(void *, u32, u32, u32);
+void Player_UpdateFacingSide(void *);
 void PlayerCue_EnterStandUpdate(void *);
 void PlayerCue_CompleteAction(void *);
 
 void PlayerCue_UpdateStandDiagonalB(struct P081561A8 *p)
 {
-    if (sub_0813AE18(p, 0x1BB, 0x40, 1) != 0) {
+    if (Player_SetAnimation(p, 0x1BB, 0x40, 1) != 0) {
         p->f458++;
         if (p->f458 > 1) {
-            sub_0813ADD0(p);
+            Player_UpdateFacingSide(p);
             PlayerCue_EnterStandUpdate(p);
             PlayerCue_CompleteAction(p);
         }

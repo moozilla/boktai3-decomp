@@ -1,6 +1,6 @@
 #include "global.h"
-void sub_0811DC30(u32);
+void ClockDisplay_DrawBaseTime(u32);
 void ModifierMenu_DrawClockAndValue(void)
 {
-    sub_0811DC30(2);
+    ClockDisplay_DrawBaseTime(2);
 }

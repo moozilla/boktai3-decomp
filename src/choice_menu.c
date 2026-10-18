@@ -30,7 +30,7 @@ void ChoiceMenu_DispatchSelection(struct ChoiceMenu *p, s32 selection)
         if (script)
             Script_Call(script, &args);
     } else
-        sub_0824923C(selection, p->callback);
+        Callback_InvokeActor(selection, p->callback);
 }
 
 void ChoiceMenu_Select(struct ChoiceMenu *p, s32 selection)

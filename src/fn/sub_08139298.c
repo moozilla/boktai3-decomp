@@ -9,13 +9,13 @@ typedef struct {
     u8 pad[0x18];
     Entry entries[4];
 } Obj;
-void sub_0824923C(void *, void *);
+void Callback_InvokeActor(void *, void *);
 s32 BallisticSpriteEffect_UpdateManager(Obj *p)
 {
     s32 i;
     for (i = 0; i < 4; i++) {
         if (p->entries[i].active && p->entries[i].ptr)
-            sub_0824923C(&p->entries[i], p->entries[i].ptr);
+            Callback_InvokeActor(&p->entries[i], p->entries[i].ptr);
     }
     return 0;
 }

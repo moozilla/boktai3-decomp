@@ -8,7 +8,7 @@ struct SceneActorApproachContext {
 };
 u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *);
 void sub_080B7C10(struct SceneActorRegistryResetView *);
-s32 sub_0824923C(void *, void *);
+s32 Callback_InvokeActor(void *, void *);
 static inline void ClearFlags(u32 *p, u32 mask)
 {
     *p &= mask;
@@ -51,7 +51,7 @@ void SceneActorApproach_UpdateRange(struct SceneActorRegistryResetView *actor)
     } else if (SceneActorReaction_IsRangeReady(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         if (!TryMove(actor, group))
-            sub_0824923C(actor, *(void **)(group + 0x224));
+            Callback_InvokeActor(actor, *(void **)(group + 0x224));
         else {
             u32 next;
             ClearFlags(&context->flags, ~0x100);

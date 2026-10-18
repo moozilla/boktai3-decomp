@@ -5,15 +5,15 @@ struct S {
     s16 b;
 };
 extern struct S *gUnk_020004B4;
-void sub_0811D270(s32, s32, s32, s32, s32);
+void PanelText_DrawDigits(s32, s32, s32, s32, s32);
 void Registry33FF_DrawActorValues(void)
 {
     struct S *s = gUnk_020004B4;
     if (s == 0) {
-        sub_0811D270(0, 0x64, 0, 0x12, (s32)s);
-        sub_0811D270(0, 0x64, 0x12, 0x12, (s32)s);
+        PanelText_DrawDigits(0, 0x64, 0, 0x12, (s32)s);
+        PanelText_DrawDigits(0, 0x64, 0x12, 0x12, (s32)s);
     } else {
-        sub_0811D270(s->a, 0x64, 0, 0x12, 0);
-        sub_0811D270(s->b, 0x64, 0x12, 0x12, 0);
+        PanelText_DrawDigits(s->a, 0x64, 0, 0x12, 0);
+        PanelText_DrawDigits(s->b, 0x64, 0x12, 0x12, 0);
     }
 }

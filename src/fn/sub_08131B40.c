@@ -3,7 +3,7 @@
 // fuzzy: 66.2%
 // 7 differing instruction runs; first diff at +0x18 (movs r1, #4 vs ldr r0, [pc, #0x38])
 extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560;
-void sub_0824923C(u8 *, void *);
+void Callback_InvokeActor(u8 *, void *);
 static inline u32 test(u32 *p, u32 m)
 {
     return *p & m;
@@ -36,7 +36,7 @@ void sub_08131B40(u8 *s)
     } else {
         u32 i = s[0x2AA];
         struct S *obj = (struct S *)s;
-        sub_0824923C(s, obj->table[i]);
+        Callback_InvokeActor(s, obj->table[i]);
     }
 }
 #else

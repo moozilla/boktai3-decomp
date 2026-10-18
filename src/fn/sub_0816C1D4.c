@@ -14,7 +14,7 @@ struct S1D4 {
     u8 state;
 };
 void Bg_SetLayerMap(u32, u32, u32);
-void sub_0816BA90(struct S1D4 *);
+void MapMenu_InitializePageBounds(struct S1D4 *);
 void sub_0816BC54(struct S1D4 *);
 void MapScreen_HideDirectionalIndicators(struct S1D4 *);
 void MapScreen_ClearMapLayer(struct S1D4 *);
@@ -22,7 +22,7 @@ void MapScreen_RefreshAreaDisplay(struct S1D4 *s)
 {
     if (s->state == 1) {
         Bg_SetLayerMap(1, s->arg, s->entries[s->index].value);
-        sub_0816BA90(s);
+        MapMenu_InitializePageBounds(s);
         sub_0816BC54(s);
     } else {
         MapScreen_ClearMapLayer(s);

@@ -8,7 +8,7 @@ struct S {
     u8 c;
 };
 u8 Save_ToggleSelectedSlot(void);
-void sub_08110378(void);
+void LinkMenu_UpdateExitDelay(void);
 void SaveMenu_UpdateSaveFailure(void);
 static inline void set(struct S *s, void *fp, u8 st)
 {
@@ -19,7 +19,7 @@ static inline void set(struct S *s, void *fp, u8 st)
 void SaveMenu_UpdateSlotCommit(struct S *s)
 {
     if (Save_ToggleSelectedSlot())
-        set(s, sub_08110378, 7);
+        set(s, LinkMenu_UpdateExitDelay, 7);
     else
         set(s, SaveMenu_UpdateSaveFailure, 8);
 }

@@ -9,7 +9,7 @@ struct F {
     u32 b;
     u8 f[0x188 - 8];
 };
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 void Nidhoggr_ClearEffectPools(u8 *p)
 {
     struct E *e;
@@ -20,7 +20,7 @@ void Nidhoggr_ClearEffectPools(u8 *p)
     do {
         e->a = 0;
         if (e->b != 0) {
-            sub_0824923C(e, e->b);
+            Callback_InvokeActor(e, e->b);
             e->b = 0;
         }
         i--;
@@ -31,7 +31,7 @@ void Nidhoggr_ClearEffectPools(u8 *p)
     do {
         g->a = 0;
         if (g->b != 0) {
-            sub_0824923C(g, g->b);
+            Callback_InvokeActor(g, g->b);
             g->b = 0;
         }
         i--;

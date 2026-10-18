@@ -2,7 +2,7 @@
 extern u16 gUnk_03005260[];
 extern const u8 gUnk_086058E8[];
 void Sound_PlaySong(u32);
-u32 sub_0811DD94(s32, s32);
+u32 StateFlags_GetCategoryBit(s32, s32);
 s32 Input_UpdateKeyRepeat(u32, u8 *, u32, s32, s32);
 void ModifierMenu_SelectPendingSource(struct ModifierMenu *);
 s32 ModifierMenu_ApplyPendingSource(struct ModifierMenu *);
@@ -66,7 +66,7 @@ void ModifierMenu_HandleSelectionInput(struct ModifierMenu *menuArg)
             if (menu->state == 1 && menu->mode == 1) {
                 s32 category = menu->choice.cursor.category;
                 s32 index = menu->choice.cursor.index;
-                if (sub_0811DD94(4, category * 3 * 2 + index))
+                if (StateFlags_GetCategoryBit(4, category * 3 * 2 + index))
                     menu->errorFlash = 0x40;
             }
         }
