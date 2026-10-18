@@ -1074,3 +1074,4 @@ addr,function,name,family,note
 081BD334,sub_081BD334,ScriptPanel_InitializeProcedure,"ScriptPanel (tentative)","starts a procedure and snapshots global state"
 081BD914,sub_081BD914,ScriptPanel_IsCallbackActive,"ScriptPanel (tentative)","tests whether callback 081BCB14 is installed"
 081BDA44,sub_081BDA44,MenuPanel_IsEntryAvailable,"MenuPanel (tentative)","checks selected catalog entry availability by page type"
+081BDAA8,sub_081BDAA8,MenuPanel_IsEntryEmpty,"MenuPanel (tentative)","checks catalog entry emptiness by page type"
