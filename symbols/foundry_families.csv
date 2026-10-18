@@ -1222,3 +1222,4 @@ addr,function,name,family,note
 081FA1B0,sub_081FA1B0,Ratatosk_InitFrontCollider,"Ratatosk","initializes an attack collider offset in the facing direction"
 081FA2DC,sub_081FA2DC,Ratatosk_InitOuterCollider,"Ratatosk","initializes the larger outer attack collider"
 081FA388,sub_081FA388,Ratatosk_InitWideBodyCollider,"Ratatosk","initializes and refreshes the widest body collider"
+081FA5D0,sub_081FA5D0,SceneResource_InitializeHiddenSprite,"SceneResourceObject","loads resource CB05/FB81 and initializes sprite with flag one"
