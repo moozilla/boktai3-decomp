@@ -8,9 +8,9 @@ void SceneActorCollision_InitExternalAttack(struct SceneActorRegistryActor *acto
         Collider_Init(collider, (u16)actor->id, flags, 0, 16, size, offset);
     }
     Collider_SetAttackProperties(collider, SceneActorCollision_ReadAttackField3C(actor, index),
-                 SceneActorCollision_ReadAttackField40(actor, index), 0,
-                 SceneActorCollision_ReadAttackReactionFlags(actor, index),
-                 SceneActorCollision_ReadAttackField44(actor, index));
+                                 SceneActorCollision_ReadAttackField40(actor, index), 0,
+                                 SceneActorCollision_ReadAttackReactionFlags(actor, index),
+                                 SceneActorCollision_ReadAttackField44(actor, index));
     Collider_SetPosition(collider, &actor->position, 0);
     Collider_SetCallback(collider, callback, owner);
 }

@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_080B8D14(void *);
+void SceneActorReaction_TickHiddenResponse(void *);
 void sub_0824923C(void *, u32);
 void SceneActorControl_DispatchControl(void *);
 void Skeleton_UpdateActionFlags(void *);
@@ -19,7 +19,7 @@ struct S {
 s32 Skeleton_Update(struct S *s)
 {
     u32 m;
-    sub_080B8D14(s);
+    SceneActorReaction_TickHiddenResponse(s);
     m = 0x2000;
     if ((s->flags & m) || s->h2b8 == 0) {
         sub_0824923C(s, s->tbl[s->idx]);

@@ -7,7 +7,8 @@ struct Obj {
     u32 x, y, z;
 };
 s32 Div(s32, s32);
-void Palette_InitColorTransition(struct Obj *p, u32 x, u32 y, u32 z, u32 endX, u32 endY, u32 endZ, u32 duration)
+void Palette_InitColorTransition(struct Obj *p, u32 x, u32 y, u32 z, u32 endX, u32 endY, u32 endZ,
+                                 u32 duration)
 {
     p->from = x | (y << 5) | (z << 10);
     p->to = endX | (endY << 5) | (endZ << 10);

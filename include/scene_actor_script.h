@@ -47,7 +47,29 @@ struct SceneActorScriptPropertiesView {
     struct SceneActorScriptControlView control;
     u8 unknown45C[0x15A];
     u16 quarterHealth;
+    u8 unknown5B8[0x114];
+    u16 scriptId6CC;
+    u8 callLimit6CE;
+    u8 callCount6CF;
+    u8 active6D0, unknown6D1;
+    u16 parameter6D2, parameter6D4, parameter6D6;
+    u16 timer6D8;
+    u8 unknown6DA[2];
+    u32 flags6DC;
+    u32 distanceThreshold6E0, distanceThreshold6E4, distanceThreshold6E8;
+    u8 unknown6EC[4];
+    s16 timer6F0, timer6F2, timer6F4;
+    u8 unknown6F6[2];
+    u16 parameters6F8[4];
+    u8 unknown700[2];
+    u8 parameter702, unknown703[3];
+    u16 parameter706;
+};
+/* Tail beyond the script view's last established offset. */
+struct SceneActorReactionHealthTail {
+    u8 unknown0[0x718];
+    s32 healthThreshold;
 };
 struct SceneActorRegistryActor *SceneActorRegistry_FindById(u32);
-u8 *TerrainModifiers_FindCellOverride(u32, u32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 #endif

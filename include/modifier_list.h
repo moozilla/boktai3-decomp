@@ -8,6 +8,37 @@ struct ModifierRecord {
     u8 extra;
     u8 unknown5[3];
 };
+/* Source table view; successive records start eight bytes apart. */
+struct ModifierSourceList {
+    u8 unknown0[0x20];
+    u8 id, kind;
+    u16 amount;
+    u8 extra;
+    u8 unknown25[0xbb];
+    s32 count;
+};
+struct StatModifierOwnerStats {
+    u8 unknown0[0x5c];
+    s32 threshold;
+    u8 unknown60[4];
+    s32 current;
+};
+struct StatModifierOwner {
+    u8 unknown0[0x18];
+    struct StatModifierOwnerStats stats;
+    u8 unknown80[0x879];
+    u8 mode;
+};
+struct StatModifier {
+    s32 (*callback)(u8 *, s32);
+    u8 order, kind;
+    u16 amount;
+    u8 extra;
+    u8 unknown9[3];
+    u8 enabled;
+    u8 unknownD[3];
+    struct StatModifierOwner *owner;
+};
 struct ModifierSelection {
     s16 values0[5];
     s16 count, capacity;
@@ -31,6 +62,25 @@ struct ModifierDisplayObject {
     u8 unknown3C[0xc];
     u16 *palette; /* 32-byte graphic entry; palette interpretation is tentative. */
     u8 unknown4C[0x14];
+};
+/* Five display parts share storage with preview metadata at 0xD2. */
+struct CharacterPreviewModel {
+    union {
+        struct ModifierDisplayObject parts[5];
+        struct {
+            u8 unknown0[0xD2];
+            u16 kind;
+        } metadata;
+    } view;
+    u8 unknown1E0[0x30];
+    u16 activePalette[16], normalPalette[16];
+};
+struct CharacterPreviewPalette {
+    u8 unknown0[0xC];
+    const u8 *flashPalette, *normalPalette;
+    u8 framesRemaining, unknown15;
+    u16 paletteId;
+    struct CharacterPreviewModel *target;
 };
 struct ModifierCursor {
     s8 category, index;

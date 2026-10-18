@@ -37,7 +37,8 @@ struct SceneActorBehaviorView {
     u8 unknown220[0x90];
     u8 substate, resetRequested, prepared, unknown2B3, unknown2B4;
     u8 kind;
-    u8 unknown2B6[8];
+    u8 reactionDirection; /* 0812F520: source direction or contact-to-contact angle. */
+    u8 unknown2B7[7];
     u16 groundHeight;
     u16 flags2C0;
     u8 unknown2C2[6];
@@ -65,12 +66,17 @@ struct SceneActorBehaviorContactView {
     u16 flags;
     u8 unknown8[2];
     u16 kind;
-    u8 unknownC[0x28];
+    struct ContactPosition position;
+    u8 unknown14[8];
+    struct ContactPosition bounds;
+    u8 unknown24[0x10];
     u32 parameter34, reactionFlags;
     u16 unknown3C, remaining, power;
-    u8 unknown42, mode;
+    u8 direction, mode;
     u16 parameter44;
-    u8 unknown46[0xE];
+    u8 unknown46[6];
+    void *contactCallback;
+    s32 contactArgument;
 };
 struct SceneActorBehaviorDestination {
     u16 flags;

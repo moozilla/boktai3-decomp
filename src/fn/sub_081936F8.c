@@ -17,10 +17,12 @@ static inline u32 CellIndex(s32 x, s32 z)
 void Nidhoggr_RegisterTerrainCells(u8 *t)
 {
     if (!t[0x71bd]) {
-        TerrainModifiers_RegisterCell(t + 0x7100, CellIndex(gUnk_0824F478[0].x >> 8, gUnk_0824F478[0].z >> 8), 0,
-                     gUnk_0824F478[0].y >> 8, 0xff, 0x1000);
-        TerrainModifiers_RegisterCell(t + 0x7110, CellIndex(gUnk_0824F478[1].x >> 8, gUnk_0824F478[1].z >> 8), 0,
-                     gUnk_0824F478[1].y >> 8, 0xff, 0x1000);
+        TerrainModifiers_RegisterCell(t + 0x7100,
+                                      CellIndex(gUnk_0824F478[0].x >> 8, gUnk_0824F478[0].z >> 8),
+                                      0, gUnk_0824F478[0].y >> 8, 0xff, 0x1000);
+        TerrainModifiers_RegisterCell(t + 0x7110,
+                                      CellIndex(gUnk_0824F478[1].x >> 8, gUnk_0824F478[1].z >> 8),
+                                      0, gUnk_0824F478[1].y >> 8, 0xff, 0x1000);
         t[0x71bd] = 1;
     }
 }

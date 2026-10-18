@@ -1,5 +1,6 @@
 #include "global.h"
-u32 Save_GetContinuationSize(void), Save_AlignSizeToEightBytes(u32), Save_GetContinuationRegionBlock(u32);
+u32 Save_GetContinuationSize(void), Save_AlignSizeToEightBytes(u32),
+    Save_GetContinuationRegionBlock(u32);
 void *Save_GetContinuationSnapshot(void);
 s32 sub_0822F0A4(u32, void *, u32);
 u32 Save_WriteContinuation(u32 arg)

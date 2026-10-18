@@ -145,7 +145,8 @@ s32 TerrainModifiers_Activate(u32 id)
         n = e->next;
         if (e->id == k && e->active == 0) {
             e->active = 1;
-            TerrainModifiers_RegisterCell(e->registration, e->cell, e->tile, e->height, 0xff, e->flags);
+            TerrainModifiers_RegisterCell(e->registration, e->cell, e->tile, e->height, 0xff,
+                                          e->flags);
         }
         e = n;
     }

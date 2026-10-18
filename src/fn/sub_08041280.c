@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
 u32 Modifier_ReadPackedValue(u32, s32);
-void sub_080339B8(s32, s32, s32, s32, s32);
+void TextWindow_SetBounds(s32, s32, s32, s32, s32);
 s32 TextWindow_StartPlayback(u32);
 void ModifierMenu_DrawAvailableLabels(struct ModifierMenu *menu)
 {
@@ -49,7 +49,7 @@ void ModifierMenu_DrawAvailableLabels(struct ModifierMenu *menu)
     y = 5;
     do {
         u32 bit = row - 2;
-        sub_080339B8(*window, 13, y, 16, 2);
+        TextWindow_SetBounds(*window, 13, y, 16, 2);
         if (available & (1 << bit)) {
             TextWindow_SetScript(*window, *selectedSource);
             TextWindow_Refresh(*window, item);

@@ -40,7 +40,8 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-void Wireless_SetTransferCallbacks(void *sent, void *received, void *sendFailure, void *receiveFailure)
+void Wireless_SetTransferCallbacks(void *sent, void *received, void *sendFailure,
+                                   void *receiveFailure)
 {
     struct Engine *p = gUnk_02000484;
     if (p) {

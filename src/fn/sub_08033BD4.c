@@ -10,7 +10,8 @@ void *TextWindowManager_Create(void)
     if (!p) {
         p = Task_Create(12, 0x20);
         if (p) {
-            Task_SetCallbacks(p, (void (*)(void *))TextWindowManager_OnUpdate, (void (*)(void *))TextWindowManager_OnDestroy);
+            Task_SetCallbacks(p, (void (*)(void *))TextWindowManager_OnUpdate,
+                              (void (*)(void *))TextWindowManager_OnDestroy);
             if (TextWindowManager_Init(p) < 0) {
                 Task_Kill(p);
                 return 0;

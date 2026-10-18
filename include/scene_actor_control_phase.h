@@ -12,6 +12,8 @@ struct SceneActorControlState {
     u8 maxElapsed, savedDirection;
     u8 unknown3DE[8];
     u8 elapsed, startTick;
+    u8 unknown3E8[5];
+    u8 randomDelay3ED;
 };
 struct SceneActorControlPhaseView {
     u8 unknown0[0x3D0];

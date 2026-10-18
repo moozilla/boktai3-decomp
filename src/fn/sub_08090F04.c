@@ -3,7 +3,7 @@
 u32 Slime_ProcessPendingStateChange(u8 *);
 void sub_0824923C(u8 *, u32);
 void SceneActorControl_DispatchControl(u8 *);
-void sub_08090E60(u8 *);
+void SceneActorMotion_RefreshGroundHeight(u8 *);
 
 u32 Slime_Update(u8 *p)
 {
@@ -14,6 +14,6 @@ u32 Slime_Update(u8 *p)
     t = *(u32 **)(p + 0x27c);
     sub_0824923C(p, t[i]);
     SceneActorControl_DispatchControl(p);
-    sub_08090E60(p);
+    SceneActorMotion_RefreshGroundHeight(p);
     return 1;
 }

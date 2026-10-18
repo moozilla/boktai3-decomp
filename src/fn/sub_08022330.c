@@ -13,12 +13,12 @@ void SceneActorGraphics_UpdateVariant(u8 *p)
     if (p[0x3b6] != p[0x3b7]) {
         switch (p[0x3b6]) {
             case 0:
-                Collider_SetAttackProperties(drawable, *(s16 *)(p + 0x35c), *(s16 *)(p + 0x35e), 0, 0,
-                             *(s16 *)(p + 0x360));
+                Collider_SetAttackProperties(drawable, *(s16 *)(p + 0x35c), *(s16 *)(p + 0x35e), 0,
+                                             0, *(s16 *)(p + 0x360));
                 break;
             case 1:
-                Collider_SetAttackProperties(drawable, *(s16 *)(p + 0x362), *(s16 *)(p + 0x364), 0, 0x60000,
-                             *(s16 *)(p + 0x366));
+                Collider_SetAttackProperties(drawable, *(s16 *)(p + 0x362), *(s16 *)(p + 0x364), 0,
+                                             0x60000, *(s16 *)(p + 0x366));
                 break;
         }
         {
