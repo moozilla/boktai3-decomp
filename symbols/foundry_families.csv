@@ -814,3 +814,4 @@ addr,function,name,family,note
 081798FC,sub_081798FC,ViewportGauge_ComputeFill,"Field HUD / viewport gauge","scales player displacement from viewport origin"
 08179954,sub_08179954,MeterDisplay_InitializeWidgets,"MeterDisplay","initializes two meter widgets and computes the scale"
 081799F8,sub_081799F8,FieldHud_InitializeNumber,"Field HUD","initializes clamped number and display resources"
+08179A4C,sub_08179A4C,FieldHud_InitializeGauge,"Field HUD","initializes gauge palette resource and source"
