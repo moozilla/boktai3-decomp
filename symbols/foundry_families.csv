@@ -101,3 +101,4 @@ addr,function,name,family,note
 080DA3AC,sub_080DA3AC,SceneActor_TryTrackNearbyPlayer,"SceneActor behavior and tracking","check player identity and range then set tracking target heading and distance"
 080DA4E4,sub_080DA4E4,SceneGrid_SnapPositionToCellCenter,"SceneGrid terrain","snaps a position to its terrain cell center and height"
 080DA810,sub_080DA810,SceneEffect_EmitPositionPattern,"SceneEffectEmitter","emits one, two, or four particles around an actor position"
+080DE550,sub_080DE550,SceneActor_RefreshLivingCountAndProfile,"SceneActorRegistryActor maintenance (struct SceneActorRegistryActor: category 0x98, livingCountByCategory 0x2c4, profileIndex 0x308)","recomputes living-count and profile index for an actor's category"
