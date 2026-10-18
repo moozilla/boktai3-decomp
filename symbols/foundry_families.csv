@@ -1173,3 +1173,4 @@ addr,function,name,family,note
 081F00FC,sub_081F00FC,SceneActors_AdvanceToHorizontalTween,"SceneActors","switches to horizontal interpolation after the initial callback finishes"
 081F022C,sub_081F022C,ScreenPhase_DampenMotion,"screen motion phase","reduces a signed motion value and initializes timers with a random sound"
 081F029C,sub_081F029C,ActorReaction_MarkSequenceHit,"ActorReaction (tentative)","marks a hit and conditionally halves a signed field"
+081F0384,sub_081F0384,SingletonSlot7_InitCollider,"SingletonSlot7","initializes and enables the actor collider"
