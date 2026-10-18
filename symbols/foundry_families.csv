@@ -324,3 +324,4 @@ addr,function,name,family,note
 0813A5B4,sub_0813A5B4,SpritePair_ReleaseSlot,"SpritePair task","clears a slot and removes or disables its sprite"
 0813A7A8,sub_0813A7A8,CompactSpritePool_Initialize,"CompactSpritePool","initializes two compact animated sprite entries and registers their pool"
 0813A91C,sub_0813A91C,SpritePair_RemoveSlot,"CompactSpritePair task","removes a compact pair slot sprite and clears its state"
+0813A9D8,sub_0813A9D8,ScreenMote_ApproachTarget,"ScreenMote","interpolate a sprite toward an offset target over twelve frames"
