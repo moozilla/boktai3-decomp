@@ -1234,3 +1234,4 @@ addr,function,name,family,note
 081FC75C,sub_081FC75C,SceneProjectile_EmitPeriodicParticle,"Scene projectile (tentative)","emits a randomly scaled particle every eight ticks"
 081FC800,sub_081FC800,SceneProjectile_RespondToContact,"Scene projectile (tentative)","responds to contact with stun or projectile lifetime changes"
 081FC8BC,sub_081FC8BC,SlotActor_ResetOnFlags,"Slot actor state (tentative)","plays sound and resets actor action when signal flags are set"
+081FC900,sub_081FC900,SceneProjectile_InitSlot,"Scene projectile (tentative)","initializes projectile animation sprite and two colliders"
