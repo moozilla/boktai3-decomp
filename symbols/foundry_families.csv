@@ -1207,3 +1207,4 @@ addr,function,name,family,note
 081F5AE4,sub_081F5AE4,SceneActor_UpdateAnimation7Timer,"SceneActor animation states","starts directional animation 7, plays sound and completes after fifty-six ticks"
 081F5B74,sub_081F5B74,SceneActor_BeginConditionalAnimation8,"SceneActor animation states","initializes directional animation 8 and conditional timed mode"
 081F5CAC,sub_081F5CAC,SceneActor_UpdateAnimation15Cycle,"SceneActor animation states","cycles animations 15 and 16 with a timed sound"
+081F5D6C,sub_081F5D6C,SceneActor_UpdateAnimation0Timer,"SceneActor animation states","updates animation zero and waits for callback and timer completion"
