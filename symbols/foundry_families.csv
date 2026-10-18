@@ -622,3 +622,4 @@ addr,function,name,family,note
 08112BA8,sub_08112BA8,SceneSlot_RegisterObject,"Scene slot registry","registers an object in the first free slot of an eight-entry task registry"
 08114804,sub_08114804,EffectActor_BeginHorizontalMotion,"EffectActor","sets directional motion, animation and an effect callback"
 081167CC,sub_081167CC,ActorRecoil_UpdateMotion,"ActorRecoil","updates motion, damps velocity, and selects state sound"
+08116870,sub_08116870,MotionActor_UpdateMovementAudio,"MotionActor","updates movement damping and pending song"
