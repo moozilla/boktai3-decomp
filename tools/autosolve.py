@@ -21,6 +21,7 @@ import argparse
 import json
 import os
 import re
+import signal
 import subprocess
 import sys
 import time
@@ -32,18 +33,50 @@ from romlib import ROOT  # noqa: E402
 PY = sys.executable
 
 
-def run(cmd, timeout):
+def killpg(pid):
     try:
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, cwd=ROOT)
-        return r.stdout + r.stderr
-    except subprocess.TimeoutExpired as e:
-        return (e.stdout or b"").decode(errors="replace") if isinstance(e.stdout, bytes) else (e.stdout or "")
+        os.killpg(pid, signal.SIGKILL)
+    except OSError:  # nothing left (macOS says EPERM once only zombies remain)
+        pass
+
+
+def run(cmd, timeout):
+    # its own process group, so a timeout also stops the compiler servers it forked
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, cwd=ROOT,
+                         start_new_session=True)
+    try:
+        out, _ = p.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        killpg(p.pid)
+        out, _ = p.communicate()
+    killpg(p.pid)  # servers left behind by a normal exit
+    return out or ""
+
+
+def distance(path, func):
+    """Halfwords from the ROM after alignment, from one compile (None on failure)."""
+    try:
+        import rasolve
+        import permute
+        cc = rasolve.Compiler(os.path.abspath(path), func, lines=False)
+        cc.pre, _ = permute.prepare_source(os.path.relpath(path, ROOT), func)
+        b, _ = cc.run()
+        if cc.server:
+            cc.server.close()
+        return b
+    except BaseException:
+        return None
 
 
 def solve_one(func, path, out, a):
     rows = []
     variants = [("as is", path)]
     text = open(path).read()
+    if a.triage:
+        # one compile: a copy too far for the C search is not worth solving
+        b = distance(path, func)
+        if b is not None and b > a.max_bytes and unpin.strip_code(text) == text:
+            return [(func, "as is", b, "too far; skipped", "", 0, "")]
     stripped = unpin.strip_code(text)
     if stripped != text:
         up = os.path.join(out, func, "unpinned.c")
@@ -71,7 +104,8 @@ def solve_one(func, path, out, a):
         tj = os.path.join(out, func, f"targets-{name.replace(' ', '_')}.json")
         os.makedirs(os.path.dirname(tj), exist_ok=True)
         log = run([PY, "tools/rasolve.py", src, func, "--seconds", str(a.solve_seconds), "--depth", "3",
-                   "--json-out", tj], a.solve_seconds + 300)
+                   "--json-out", tj, "-j", str(a.j), "--max-compiles", str(a.solve_compiles)],
+                  a.solve_seconds + a.grace)
         m = re.search(rf"{re.escape(func)}: (\d+) differing bytes", log)
         base = int(m.group(1)) if m else None
         if "already matches" in log:
@@ -90,9 +124,10 @@ def solve_one(func, path, out, a):
         if base is None or reach > a.max_bytes:
             rows.append((func, name, base, kind + "; too far for C search", "", round(time.time() - t0), ""))
             continue
-        budget = a.translate_seconds if targets != "none" else a.translate_seconds // 2
+        budget = a.translate_seconds
         tlog = run([PY, "tools/translate.py", src, func, "--targets", targets, "--seconds",
-                    str(budget), "-j", str(a.j)], budget + 600)
+                    str(budget), "-j", str(a.j), "--steps", str(a.steps), "--beam", str(a.beam)],
+                   budget + a.grace)
         mm = re.search(r"\n(MATCH|(\d+) differing bytes) after (\d+) edit", tlog)
         best = os.path.join(ROOT, "build", "translate", func, "best.c")
         if mm and mm.group(1) == "MATCH":
@@ -115,7 +150,20 @@ def main():
                     help="worker processes (default: half the cores; all of them saturated a 16 GB machine)")
     ap.add_argument("--max-bytes", type=int, default=64, help="skip C search beyond this many differing bytes")
     ap.add_argument("--out", default=os.path.join(ROOT, "build", "autosolve"))
+    ap.add_argument("--solve-compiles", type=int, default=0, help="rasolve.py compile budget (0: time only)")
+    ap.add_argument("--beam", type=int, default=6, help="translate.py beam")
+    ap.add_argument("--steps", type=int, default=0, help="translate.py steps (0: until the time is up)")
+    ap.add_argument("--grace", type=int, default=600, help="seconds past a budget before a run is killed")
+    ap.add_argument("--triage", action="store_true",
+                    help="skip a function whose first compile is beyond --max-bytes without solving it")
+    ap.add_argument("--fast", action="store_true",
+                    help="farm settings: --triage, 5000 compiles in the compiler search, 2 C steps with beam 2, at least -j 2")
     a = ap.parse_args()
+    if a.fast:
+        # work budgets, not time, so the yield does not depend on the machine's load
+        a.triage, a.solve_seconds, a.solve_compiles = True, 300, 5000
+        a.translate_seconds, a.steps, a.beam, a.grace = 600, 2, 2, 60
+        a.j = max(a.j, 2)
     if a.items[0].endswith(".tsv"):
         work = [(ln.split("\t")[0], ln.split("\t")[1].strip()) for ln in open(a.items[0]) if ln.strip()]
     else:

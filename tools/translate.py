@@ -163,11 +163,72 @@ def neighbors(text, func, focus_lines, passes=PASSES, helpers=True):
     seen = set()
     for name in passes:
         for target in [func] + (inline_helpers(base_ast, func) if helpers else []):
-            yield from _neighbors_of(base_ast, target, focus_lines if target == func else [],
-                                     name, seen)
+            focus = focus_lines if target == func else []
+            outs = _neighbors_of(base_ast, target, focus, name, seen, shallow=True)
+            if outs is None:  # the pass changed something outside the function: copy it all
+                base_ast = ast_util.parse_c(text)
+                outs = _neighbors_of(base_ast, target, focus, name, seen, shallow=False)
+            yield from outs
 
 
-def _neighbors_of(base_ast, func, focus_lines, name, seen):
+def clone(n):
+    """Deep copy of a pycparser tree, several times faster than copy.deepcopy
+    (nodes are __slots__ objects; coordinates are shared, not copied)."""
+    if isinstance(n, list):
+        return [clone(x) for x in n]
+    if not isinstance(n, ast_util.ca.Node):
+        return n
+    cls = type(n)
+    new = cls.__new__(cls)
+    for slot in cls.__slots__:
+        if slot == "__weakref__" or not hasattr(n, slot):
+            continue
+        v = getattr(n, slot)
+        setattr(new, slot, v if slot == "coord" else clone(v))
+    return new
+
+
+def to_c_cached(ast, cache, base_ids):
+    """ast_util.to_c(ast), reusing the text of top-level items that are the
+    base's own objects (BASE_IDS; passes do not change them, which
+    _neighbors_of checks); CACHE: id -> (node, text). The generator's FileAST layout."""
+    parts = []
+    for ext in ast.ext:
+        hit = cache.get(id(ext))
+        if hit is None or hit[0] is not ext:
+            text = ast_util.PatchedCGenerator().visit(ext)
+            if not isinstance(ext, ast_util.ca.FuncDef):
+                text += "\n" if isinstance(ext, ast_util.ca.Pragma) else ";\n"
+            hit = (ext, text)
+            if id(ext) in base_ids:
+                cache[id(ext)] = hit
+        parts.append(hit[1])
+    return ast_util.process_pragmas("".join(parts))
+
+
+def _copy_for(base_ast, func, shallow):
+    """A copy of BASE_AST a pass can change. Shallow: only FUNC's definition is
+    copied (deep-copying the whole preprocessed file took 90% of the time);
+    the top-level list is new, so added declarations stay out of the base."""
+    if not shallow:
+        return copy.deepcopy(base_ast)
+    ast = copy.copy(base_ast)
+    ast.ext = [clone(n) if isinstance(n, ast_util.ca.FuncDef) and n.decl.name == func else n
+               for n in base_ast.ext]
+    return ast
+
+
+def _neighbors_of(base_ast, func, focus_lines, name, seen, shallow=False):
+    if shallow:
+        # extract_fn drops `static` from function declarations in place: settle
+        # that once, then any other change to the base means a pass wrote to it
+        ast_util.extract_fn(_copy_for(base_ast, func, True), func)
+        before = ast_util.to_c(base_ast)
+        cache = {}
+        # top-level items and the declarations extract_fn puts in place of definitions
+        base_ids = {id(n) for n in base_ast.ext}
+        base_ids |= {id(n.decl) for n in base_ast.ext if isinstance(n, ast_util.ca.FuncDef)}
+    found = []
     for name in [name]:
         fn_pass = getattr(randomizer, name, None) or getattr(agbcc_passes, name, None)
         if fn_pass is None:
@@ -175,7 +236,7 @@ def _neighbors_of(base_ast, func, focus_lines, name, seen):
         prefix, runs = [], 0
         while runs < CAP_RUNS:
             runs += 1
-            ast = copy.deepcopy(base_ast)
+            ast = _copy_for(base_ast, func, shallow)
             fn, _ = ast_util.extract_fn(ast, func)
             ast_util.normalize_ast(fn, ast)
             indices = ast_util.compute_node_indices(fn)
@@ -185,14 +246,13 @@ def _neighbors_of(base_ast, func, focus_lines, name, seen):
             try:
                 fn_pass(fn, ast, indices, region, rnd)
                 ast_util.compute_node_indices(fn)
-                out = ast_util.to_c(ast)
+                out = to_c_cached(ast, cache, base_ids) if shallow else ast_util.to_c(ast)
             except Exception:
                 ok = False
             if ok:
                 h = hashlib.sha1(out.encode()).digest()
                 if h not in seen:
-                    seen.add(h)
-                    yield name, out
+                    found.append((h, name, out))
             # next choice sequence (odometer over the recorded options)
             trace = rnd.trace
             j = len(trace) - 1
@@ -201,6 +261,14 @@ def _neighbors_of(base_ast, func, focus_lines, name, seen):
             if j < 0:
                 break
             prefix = [v for v, _ in trace[:j]] + [trace[j][0] + 1]
+    if shallow and ast_util.to_c(base_ast) != before:
+        return None
+    outs = []
+    for h, name, out in found:
+        if h not in seen:
+            seen.add(h)
+            outs.append((name, out))
+    return outs
 
 
 # --- scoring ---------------------------------------------------------------
@@ -385,6 +453,7 @@ def main():
     ap.add_argument("--targets", help="rasolve.py --json-out file (default: run rasolve); "
                     "'none': search the lines whose code differs, by bytes alone")
     ap.add_argument("--seconds", type=int, default=600)
+    ap.add_argument("--steps", type=int, default=0, help="stop after N steps (0: no limit)")
     ap.add_argument("--beam", type=int, default=6)
     ap.add_argument("-j", type=int, default=max(1, (os.cpu_count() or 2) // 2),
                     help="worker processes (default: half the cores; all of them saturated a 16 GB machine)")
@@ -442,7 +511,7 @@ def main():
         seen = {hashlib.sha1(base.encode()).digest()}
         seen_code = {base_feat.get("code")}
         step = 0
-        while time.time() - t0 < a.seconds and best[2] != 0:
+        while time.time() - t0 < a.seconds and best[2] != 0 and not (a.steps and step >= a.steps):
             step += 1
             gen_jobs, owners = [], []
             for st in states:
@@ -460,7 +529,14 @@ def main():
             if not jobs:
                 print("no new neighbors")
                 break
-            results = pool.map(evaluate, [c for c, _ in jobs], chunksize=4)
+            # in chunks, best states' candidates first: stop at a match or when the time is up
+            results, cands, chunk = [], [c for c, _ in jobs], max(16, 8 * a.j)
+            for i in range(0, len(cands), chunk):
+                part = list(pool.map(evaluate, cands[i:i + chunk], chunksize=2))
+                results += part
+                if any(r and r[0] == 0 for r in part) or time.time() - t0 >= a.seconds:
+                    break
+            jobs = jobs[:len(results)]
             scored = []
             for (cand, hist), res in zip(jobs, results):
                 if res is None:
