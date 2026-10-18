@@ -3,9 +3,9 @@
 // Allocation and projection/animation scheduling still differ; reviewed extent is 1112 bytes.
 #include "scene_arc.h"
 s32 __divsi3(s32, s32);
-s32 sub_0811AE68(struct ScenePoolVec32 *);
+s32 Terrain_GetHeightAtFixedPosition(struct ScenePoolVec32 *);
 s32 sub_0811ADF0(struct ScenePoolVec32 *);
-void sub_0811B230(void *, struct ScenePoolVec32 *, u32);
+void Collider_SetFixedPositionWithYOffset(void *, struct ScenePoolVec32 *, u32);
 void sub_0811B2FC(void *);
 void GroundEffect_DisableProjection(struct SceneGroundEffect *);
 void SceneArc_ReleaseSlot(struct SceneArcManager *, struct SceneArcSlot *, u32);
@@ -65,7 +65,7 @@ void SceneArc_UpdateSlot(struct SceneArcManager *manager, struct SceneArcSlot *s
             gUnk_086149C4[Div(slot->frame << 7, slot->flightDuration) & 255] * slot->height, 12);
         ProjectArc(slot, sprite, lift);
         position = &slot->position;
-        terrain = sub_0811AE68(position);
+        terrain = Terrain_GetHeightAtFixedPosition(position);
         if (terrain < sprite->screen.y) {
             sprite->screen.y = terrain;
             slot->grounded = 1;
@@ -105,7 +105,7 @@ void SceneArc_UpdateSlot(struct SceneArcManager *manager, struct SceneArcSlot *s
             lift = SignedShift(gUnk_086149C4[Div(remaining << 7, interval) & 255], 10);
         ProjectArc(slot, sprite, lift);
         position = &slot->position;
-        terrain = sub_0811AE68(position);
+        terrain = Terrain_GetHeightAtFixedPosition(position);
         if (terrain < sprite->screen.y) {
             sprite->screen.y = terrain;
             slot->grounded = 1;
@@ -114,7 +114,7 @@ void SceneArc_UpdateSlot(struct SceneArcManager *manager, struct SceneArcSlot *s
     paused = PlayerSuspendsArc();
     if (!paused) {
         if (slot->frame >= slot->endFrame) {
-            sub_0811B230(collider, position, 0);
+            Collider_SetFixedPositionWithYOffset(collider, position, 0);
             sub_0811B2FC(collider);
             if (slot->frame == slot->endFrame) {
                 Sound_PlaySongChecked(0x195);

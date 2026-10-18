@@ -1,7 +1,7 @@
 #include "global.h"
 extern void ActorShadow_Disable(void *);
 extern void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
-extern void sub_080AD270(void);
+extern void Vorn_RestoreSavedState(void);
 static inline u8 take6030(u8 *s)
 {
     if (s[0x2B2]) {
@@ -18,7 +18,7 @@ struct Part6030 {
     u8 pad[8];
     u32 flags;
 };
-void sub_080AD1C0(u8 *s, s32 arg, u32 unused)
+void Vorn_UpdateHiddenRecovery(u8 *s, s32 arg, u32 unused)
 {
     u32 queued = take6030(s);
     if (queued) {
@@ -40,7 +40,7 @@ void sub_080AD1C0(u8 *s, s32 arg, u32 unused)
         u32 *flags;
         u32 mask;
         SceneActorAnimation_SelectDirectionalEntry(s, 9);
-        fn = sub_080AD270;
+        fn = Vorn_RestoreSavedState;
         code = 0xD;
         s[0x2B2] = 1;
         s[0x2B0] = queued;

@@ -1,11 +1,11 @@
 #include "global.h"
-void sub_0809343C(u8 *);
+void Bee_TickBehaviorCooldown(u8 *);
 void sub_0809366C(u8 *);
-void sub_080937D0(u8 *);
-u32 sub_080937F4(u8 *p)
+void Bee_TickActionCooldown(u8 *);
+u32 Bee_UpdateTimersAndContacts(u8 *p)
 {
-    sub_0809343C(p);
+    Bee_TickBehaviorCooldown(p);
     sub_0809366C(p);
-    sub_080937D0(p);
+    Bee_TickActionCooldown(p);
     return 1;
 }

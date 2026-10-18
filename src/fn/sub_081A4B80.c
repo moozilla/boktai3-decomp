@@ -15,7 +15,7 @@ struct P *TetherActor_GetPosition(void);
 s32 Math_Atan2(s32, s32);
 void TetherActor_RequestKindNineAction(s32, s32);
 
-void sub_081A4B80(struct A *p)
+void Hresvelgr_RepelNearbyTetherActor(struct A *p)
 {
     struct P *q = TetherActor_GetPosition();
     s32 dx = q->x - p->x;

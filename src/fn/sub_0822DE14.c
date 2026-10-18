@@ -1,7 +1,7 @@
 #include "global.h"
 
 #include "engine.h"
-s32 sub_0822D6E0(s32);
+s32 Inventory_GetEquipmentId(s32);
 /* Script: 1 when item -w is among the first 16 entries (48 with -d set),
    else 0 (tentative). */
 u32 Inventory_ContainsFromScript(void)
@@ -18,7 +18,7 @@ u32 Inventory_ContainsFromScript(void)
     } else
         n = 0x10;
     for (i = 0; i < n; i++) {
-        if (sub_0822D6E0(i) == id)
+        if (Inventory_GetEquipmentId(i) == id)
             return 1;
     }
     return 0;

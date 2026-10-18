@@ -5,7 +5,7 @@ struct S {
     u8 b1c;
 };
 void Anim_Remove(void *);
-void sub_081C0378(struct S *p)
+void TetherActor_DestroyRequestIndicator(struct S *p)
 {
     if (p->b1c != 0)
         Anim_Remove(p->f + 0x18);

@@ -2,7 +2,7 @@
 
 void sub_0813B8A4(u8 *);
 
-void sub_081412A4(u8 *p)
+void Player_EmitPeriodicEffect(u8 *p)
 {
     u16 *q;
 

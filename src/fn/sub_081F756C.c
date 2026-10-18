@@ -24,7 +24,7 @@ static inline u8 TakeFlag(struct S *p)
     return FALSE;
 }
 
-void sub_081F756C(struct S *p)
+void SceneActor_UpdateState24AndConditionalReturnCommand(struct S *p)
 {
     u8 *q = (u8 *)p;
     if (TakeFlag(p)) {

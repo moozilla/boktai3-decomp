@@ -1,6 +1,6 @@
 #include "global.h"
 
-u32 sub_080937A4(u8 *p)
+u32 Bee_GetMovementVariant(u8 *p)
 {
     u32 r;
     switch (*(u16 *)(p + 0x1e6)) {

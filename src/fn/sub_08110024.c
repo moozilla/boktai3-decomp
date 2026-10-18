@@ -8,7 +8,7 @@ struct S {
 s32 Mod(s32, s32);
 void Sound_PlaySong(s32);
 void sub_0810FF8C(struct S *, s32);
-void sub_08110024(struct S *s)
+void LinkScorePanel_UpdateRollingNumber(struct S *s)
 {
     if (Mod(s->h, 2) == 0)
         Sound_PlaySong(0x2A5);

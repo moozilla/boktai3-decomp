@@ -1,5 +1,5 @@
 #include "global.h"
 
-void sub_080ED39C(void)
+void Ivy_OnSecondaryContact(void)
 {
 }

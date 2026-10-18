@@ -3,7 +3,7 @@ struct Vm {
     u8 pad[0x88];
     s32 numbers[16];
 };
-int sub_08032D10(struct Vm *p, int index)
+int TextState_GetNumberWidth(struct Vm *p, int index)
 {
     int value = p->numbers[index];
     u32 n = (u32)value >> 31;

@@ -3,7 +3,7 @@
 s32 Mod(s32, s32);
 void sub_08221110(void *dst, void *from, void *to, s32 t, s32 shift);
 /* Pulse the palette between the 0x680 and 0x2E80 banks: 64 frames each way. */
-void sub_081CBA04(u8 *a, u8 *b)
+void SceneCharacter_UpdatePalettePulse(u8 *a, u8 *b)
 {
     s32 t;
     if (b[9]) {

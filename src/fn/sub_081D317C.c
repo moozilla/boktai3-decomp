@@ -8,11 +8,11 @@ struct S {
     u32 f3a0;
     u32 f3a4;
 };
-struct S *sub_081D313C(void);
+struct S *FrostEmitter_CreateTask(void);
 
-struct S *sub_081D317C(void)
+struct S *FrostEmitter_Create(void)
 {
-    struct S *p = sub_081D313C();
+    struct S *p = FrostEmitter_CreateTask();
     u32 z = 0;
     p->f38 = z;
     p->f3c = z;

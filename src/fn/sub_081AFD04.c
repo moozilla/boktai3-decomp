@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_081AFD04(u8 *p)
+void Vanargand_ClearPartContact(u8 *p)
 {
     *(u32 *)(p + 0x160) = 0;
 }

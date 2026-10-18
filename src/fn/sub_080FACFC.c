@@ -13,7 +13,7 @@ struct S080FACFC {
     struct Q *q;
 };
 
-void sub_080FACFC(struct S080FACFC *s)
+void Axe_ResetMovementFlags(struct S080FACFC *s)
 {
     struct Q *q = s->q;
     u32 m = 0x100000;

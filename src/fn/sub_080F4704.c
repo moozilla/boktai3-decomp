@@ -1,5 +1,5 @@
 #include "global.h"
 
-void sub_080F4704(void)
+void Ivy_OnChildDestroy(void)
 {
 }

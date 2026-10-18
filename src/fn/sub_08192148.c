@@ -14,7 +14,7 @@ struct P {
 };
 void Anim_SetKeyframes(void *, void *, s32, s32, s32);
 void Anim_Step(void *, void *);
-void sub_08192148(struct P *p, s32 i)
+void Nidhoggr_UpdateLoopAnimation2A(struct P *p, s32 i)
 {
     u8 *s;
     u8 *t = (u8 *)p + 0x71DC;

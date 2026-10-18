@@ -31,7 +31,7 @@ struct Sequence {
 };
 void Anim_LoadKeyframe(void *, void *, s32, s32);
 void Anim_SetKeyframes(void *, void *, s32, s32, s32);
-void sub_081E28D4(void *);
+void Presentation_UpdateLayerAnimations(void *);
 void Presentation_ClearTilemap(void);
 extern u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;

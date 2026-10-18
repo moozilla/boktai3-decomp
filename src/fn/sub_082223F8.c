@@ -2,7 +2,7 @@
 
 void Heap_Free(u32);
 
-void sub_082223F8(u32 *p)
+void HashTable_Destroy(u32 *p)
 {
     if (p[1] != 0) {
         Heap_Free(p[1]);

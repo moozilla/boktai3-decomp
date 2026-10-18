@@ -7,13 +7,13 @@ struct Actor {
 };
 extern struct Actor *gUnk_02000580[];
 extern u8 *gUnk_02000710;
-s32 sub_0815A400(void);
+s32 Script_GetActorIndex(void);
 /* Script: life -l and energy -e (current and maximum) of the scripted actor
    picked by -i, mirrored into game state +0x28..+0x2E (tentative). Raw
    offset stores: the original reloads the game state pointer per store. */
 void ScriptActor_SetLifeEnergyFromScript(void)
 {
-    s32 i = sub_0815A400();
+    s32 i = Script_GetActorIndex();
     struct Actor *a = gUnk_02000580[i];
     if (a) {
         a->life = Script_GetKeywordValue('l', 0);

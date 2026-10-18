@@ -3,7 +3,7 @@
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 
-s32 sub_0815A418(s16 *p)
+s32 Script_ReadPositionOption(s16 *p)
 {
     s32 r;
     if (Script_SeekToKeyword(0x70) == 0) {

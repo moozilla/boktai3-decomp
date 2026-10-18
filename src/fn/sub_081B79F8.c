@@ -14,7 +14,7 @@ struct O {
 };
 void sub_081B7954(void *);
 
-void sub_081B79F8(struct O *p)
+void GrowthHazard_UpdateCooldown(struct O *p)
 {
     struct S *s = &p->s;
     s32 m = ~4;

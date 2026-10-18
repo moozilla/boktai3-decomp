@@ -7,7 +7,7 @@ struct S {
     const u8 *p;
 };
 
-void sub_080CFB98(struct S *s)
+void Golem_InitSpecialActionHandlers(struct S *s)
 {
     s->p = gUnk_0860613C;
 }

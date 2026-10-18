@@ -1,4 +1,4 @@
 #include "global.h"
-void sub_0801EF5C(void)
+void SceneObject_UpdateActiveIdle(void)
 {
 }

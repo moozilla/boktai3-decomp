@@ -40,21 +40,21 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-int sub_08034258(struct Engine *);
-void sub_080340AC(struct Engine *);
-void sub_08036BD4(int);
+int WirelessController_ConsumeAdvanceRequest(struct Engine *);
+void WirelessController_ResetSession(struct Engine *);
+void Wireless_SetStatus(int);
 int sub_082238F0(int);
-int sub_0803524C(struct Engine *p)
+int Wireless_ResetAfterError(struct Engine *p)
 {
     if (p->pending) {
         int zero = 0;
         p->pending = zero;
-        sub_08036BD4(1);
+        Wireless_SetStatus(1);
         sub_082238F0(1);
         p->entered = zero;
         p->flag = zero;
     }
-    if (sub_08034258(p))
-        sub_080340AC(p);
+    if (WirelessController_ConsumeAdvanceRequest(p))
+        WirelessController_ResetSession(p);
     return 0;
 }

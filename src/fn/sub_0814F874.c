@@ -2,7 +2,7 @@
 
 void Trigger_ConsumePending(u8 *, s32);
 
-void sub_0814F874(u8 *p)
+void PlayerCue_AcknowledgePendingTrigger(u8 *p)
 {
     u8 *flag = p + 0x59F;
 

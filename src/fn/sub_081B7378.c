@@ -12,7 +12,7 @@ struct B {
     u32 b;
 };
 
-void sub_081B7378(struct A *p, struct B *q)
+void VanargandAfterimagePool_ActivateSlot(struct A *p, struct B *q)
 {
     u32 x, y;
     p->a = 8;

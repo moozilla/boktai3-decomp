@@ -2,8 +2,8 @@
 s32 Script_GetKeywordValue(s32, s32);
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-void sub_0802C8AC(u8 *, s32, s32, void *);
-void sub_0802C91C(u8 *, s32, s32);
+void Actor_InitEntity(u8 *, s32, s32, void *);
+void Actor_SetHealthLimits(u8 *, s32, s32);
 struct Fields2CD {
     u8 pad[0x13c];
     u8 v13c;
@@ -16,7 +16,7 @@ struct Vec2CD {
     u32 y : 16;
     u32 z : 16;
 };
-void sub_0802CD04(u8 *p)
+void Actor_InitControllerFromScript(u8 *p)
 {
     struct Vec2CD v;
     s32 id = Script_GetKeywordValue(0x6e, 0);
@@ -30,7 +30,7 @@ void sub_0802CD04(u8 *p)
         v.y = 0;
         v.z = 0;
     }
-    sub_0802C8AC(p, id, Script_GetKeywordValue(0x64, 0), &v);
+    Actor_InitEntity(p, id, Script_GetKeywordValue(0x64, 0), &v);
     *(u32 *)(p + 0x50) = 0;
     *(u32 *)(p + 0x54) = 0;
     *(u32 *)(p + 0x58) = 0;
@@ -46,7 +46,7 @@ void sub_0802CD04(u8 *p)
     }
     p[0x146] = Script_GetKeywordValue(0x73, 1);
     n = Script_GetKeywordValue(0x6c, 0x64);
-    sub_0802C91C(p, n, n);
+    Actor_SetHealthLimits(p, n, n);
     if (Script_SeekToKeyword(0x53)) {
         *(u32 *)(p + 0x14c) = Script_GetValue();
         *(u32 *)(p + 0x150) = Script_GetValue();

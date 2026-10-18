@@ -3,7 +3,7 @@
 #include "breakable_barrier.h"
 
 // Short-lived debris pieces thrown out of a hit barrier. Particles come from the sprite pool
-// (sub_08019B7C), fall under gravity and blink out after 30 ticks (Debris_Update).
+// (SpritePool_Allocate), fall under gravity and blink out after 30 ticks (Debris_Update).
 
 struct DebrisParticle {
     u8 pad0[8];
@@ -14,10 +14,10 @@ struct DebrisParticle {
     struct SceneVec velocity;
 };
 
-struct DebrisParticle *sub_08019B7C(void);
+struct DebrisParticle *SpritePool_Allocate(void);
 void SpritePool_SetResource(void *, u32);
-void sub_08019C1C(void *, u32, u32, u32, u32);
-void sub_08019C00(void *, void *);
+void SpritePool_StartAnimation(void *, u32, u32, u32, u32);
+void SpritePool_SetPosition(void *, void *);
 u32 SpritePool_Activate(void *, void *, void *);
 void SpritePool_AdvanceAnimation(void *);
 int Debris_Update(void *unused, struct DebrisParticle *p);

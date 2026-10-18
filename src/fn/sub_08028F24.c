@@ -1,15 +1,15 @@
 #include "global.h"
 
 void sub_080287DC(void);
-void sub_08024CBC(void *);
-void sub_08028394(void *);
+void SceneActorState_UpdateActionController(void *);
+void SceneActors_RunUnpausedState(void *);
 void sub_080289FC(void *);
 
-s32 sub_08028F24(void *p)
+s32 Vampire_Init(void *p)
 {
     sub_080287DC();
-    sub_08024CBC(p);
-    sub_08028394(p);
+    SceneActorState_UpdateActionController(p);
+    SceneActors_RunUnpausedState(p);
     sub_080289FC(p);
     return 0;
 }

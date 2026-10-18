@@ -25,7 +25,7 @@ struct S {
 };
 s32 sub_0818505C(struct S *, s32);
 void sub_0818E9B8(void *, s32);
-void sub_0818591C(struct S *p)
+void Armor_UpdateDelayedAction12(struct S *p)
 {
     u8 s = p->b3d;
     switch (s) {

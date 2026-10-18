@@ -28,8 +28,8 @@ static inline void state(struct Common *p, void (*fn)(void *), int id)
     p->reset = zero;
     p->pending = zero;
 }
-int sub_0802AD0C(void *);
-void sub_0802A63C(void *);
+int GridAttack_SelectNextAction(void *);
+void GridAttack_UpdateDeathState(void *);
 static inline u8 chk(struct Common *p)
 {
     if (p->entered) {
@@ -55,7 +55,7 @@ void sub_0802B3E4(struct Common *p)
     if (chk(p) == 1)
         base->requested = 1;
     if (base->actionTimer > *(u16 *)((u8 *)p + 0x190)) {
-        if (sub_0802AD0C(p))
+        if (GridAttack_SelectNextAction(p))
             return;
     }
     base->actionTimer++;

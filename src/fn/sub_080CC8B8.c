@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_082260A4(u32);
+void Camera_RequestShake(u32);
 void sub_080C4E8C(void *);
 void sub_080C52BC(void *);
 void sub_080C53A8(void *);
@@ -17,14 +17,14 @@ struct S {
     struct T *t;
 };
 
-s32 sub_080CC8B8(struct S *s)
+s32 Golem_UpdateEffectsAndContacts(struct S *s)
 {
     struct T *t = s->t;
     u32 m = 0x40;
     if (!(s->flags & m)) {
         u16 *p = &t->h6ae;
         if (*p != 0) {
-            sub_082260A4(t->h6ac);
+            Camera_RequestShake(t->h6ac);
             *p = *p - 1;
         }
     }

@@ -1,5 +1,5 @@
 #include "global.h"
-u32 sub_0822BAD0(u32 a, u32 b)
+u32 Save_GetPrimaryRegionBlock(u32 a, u32 b)
 {
     if (b != 0)
         return a * 321 + 0x113;

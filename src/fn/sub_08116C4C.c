@@ -4,7 +4,7 @@ struct Q {
     u32 a, b, c;
 };
 extern struct Q *gUnk_020004F0[];
-void sub_08116C4C(s32 i, u32 *d)
+void Player_GetWorldPosition(s32 i, u32 *d)
 {
     struct Q *q;
     if (i <= 1) {

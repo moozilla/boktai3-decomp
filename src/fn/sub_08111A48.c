@@ -18,7 +18,7 @@ struct PaletteFade {
 };
 extern struct PaletteFade *gUnk_020001D8;
 extern u16 gUnk_03004FC0[];
-void sub_0811153C(struct PaletteFade *, s32 slot, s32 target, s32 rate, s32 frames);
+void PaletteFade_SetTransitionParameters(struct PaletteFade *, s32 slot, s32 target, s32 rate, s32 frames);
 void sub_08111410(struct PaletteFade *);
 void sub_08111578(struct PaletteFade *);
 /* Registry routine 734C: fades palette slot -t (default 3) of the palette
@@ -36,7 +36,7 @@ void PaletteFade_StartFromScript(void)
     rate = Script_GetKeywordValue('r', 8);
     frames = Script_GetKeywordValue('f', 60);
     p = gUnk_020001D8;
-    sub_0811153C(p, slot, target, rate, frames);
+    PaletteFade_SetTransitionParameters(p, slot, target, rate, frames);
     if (frames <= 0) {
         u16 *from = &gUnk_03004FC0[p->slot * 16];
         u16 *to = &p->targets[p->target * 16];

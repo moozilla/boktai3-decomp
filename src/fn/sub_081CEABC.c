@@ -3,7 +3,7 @@ struct P {
     u32 a, b;
 };
 void Trigger_ConsumePending(u8 *, u32);
-void sub_081CEABC(u8 *a, u8 *b)
+void SceneNpc_UpdateAnimation3AtCurrentPosition(u8 *a, u8 *b)
 {
     if (b[8]) {
         b[8] = 0;

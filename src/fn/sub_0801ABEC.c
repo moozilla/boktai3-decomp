@@ -5,10 +5,10 @@ void SelectionMenu_ConfigureLayers(int, int);
 void SelectionMenu_PositionCursors(void *);
 void SelectionMenu_PositionInventoryMarkers(void *);
 void SelectionMenu_PopulateActors(void *);
-void sub_08030C84(u32);
-void sub_08030F20(int, int, int, int);
-void sub_08030B78(int);
-void sub_080311B0(int);
+void MessageWindow_SetMessageTable(u32);
+void MessageWindow_SetBounds(int, int, int, int);
+void MessageWindow_SetDisplayMode(int);
+void MessageWindow_SetPalette(int);
 void SelectionMenu_OpenActorPage(u8 *p)
 {
     SelectionMenu_ActorAvailability(p);
@@ -19,8 +19,8 @@ void SelectionMenu_OpenActorPage(u8 *p)
     SelectionMenu_PositionCursors(p);
     SelectionMenu_PositionInventoryMarkers(p);
     SelectionMenu_PopulateActors(p);
-    sub_08030C84(*(u32 *)(p + 0xda8));
-    sub_08030F20(2, 16, 30, 2);
-    sub_08030B78(1);
-    sub_080311B0(0x81b);
+    MessageWindow_SetMessageTable(*(u32 *)(p + 0xda8));
+    MessageWindow_SetBounds(2, 16, 30, 2);
+    MessageWindow_SetDisplayMode(1);
+    MessageWindow_SetPalette(0x81b);
 }

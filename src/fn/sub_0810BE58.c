@@ -1,7 +1,7 @@
 #include "global.h"
 extern u8 *gUnk_020004B4;
-void sub_0821AAD8(void *);
-void sub_0821B4C8(void *, s32, s32);
+void Script_ReadReference(void *);
+void Script_WriteReferenceValue(void *, s32, s32);
 static inline u8 *getBlock(void)
 {
     u8 *p = gUnk_020004B4;
@@ -22,10 +22,10 @@ void Registry1022_GetValueFromScript(void)
     u32 result[2];
     u8 *block;
     s32 value;
-    sub_0821AAD8(result);
+    Script_ReadReference(result);
     block = getBlock();
     value = 0;
     if (block)
         value = block[0x7D];
-    sub_0821B4C8(result, 0, value);
+    Script_WriteReferenceValue(result, 0, value);
 }

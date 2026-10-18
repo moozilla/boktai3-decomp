@@ -65,9 +65,9 @@ struct T {
 extern u8 *gUnk_0200047C;
 extern u8 *gUnk_030042E4;
 
-void sub_08020D54(void *, void *);
+void SceneMessages_SetPendingTrigger(void *, void *);
 void Trigger_ConsumePending(void *, s32);
-void sub_08022AF4(void *);
+void SceneActors_StopBackgroundFlash(void *);
 void BackgroundFlash_BeginAlternating(void *);
 void BackgroundFlash_BeginAppearance(void *);
 s32 SceneActorGraphics_GetResourceId(void *);
@@ -108,7 +108,7 @@ void SceneActors_DispatchCommands(struct S *s)
             s16 *m;
             u8 *controller = gUnk_0200047C;
             m = entry->messages[controller[0x24]][i];
-            sub_08020D54(entry, m);
+            SceneMessages_SetPendingTrigger(entry, m);
             switch (((u8 *)m)[6]) {
                 case 0:
                     setState(s, 0);
@@ -184,7 +184,7 @@ void SceneActors_DispatchCommands(struct S *s)
                     break;
                 case 25:
                     if (m[4])
-                        sub_08022AF4(t);
+                        SceneActors_StopBackgroundFlash(t);
                     else if (m[5])
                         BackgroundFlash_BeginAlternating(t->flash);
                     else

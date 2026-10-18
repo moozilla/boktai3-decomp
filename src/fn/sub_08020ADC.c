@@ -5,7 +5,7 @@ struct S {
     u32 a;
 };
 void Trigger_ConsumePending(void *, u32);
-void sub_08020ADC(struct S *p, void *q)
+void SceneMessages_SetSignal(struct S *p, void *q)
 {
     p->a = 1;
     Trigger_ConsumePending(q, 1);

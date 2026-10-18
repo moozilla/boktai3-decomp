@@ -6,7 +6,7 @@ struct P {
 };
 void sub_0807E9D0(s32, s32);
 
-void sub_080ACD9C(s32 a, s32 b, struct P *p)
+void Vorn_OnCollisionResponse(s32 a, s32 b, struct P *p)
 {
     u32 f;
     sub_0807E9D0(a, b);

@@ -9,9 +9,9 @@ struct Object {
 void Shadow_Initialize(void *, int, int, int);
 void ActorShadow_Enable(void *);
 void ScaledShadow_Initialize(void *, int, int, int, int, int, int, int, int, int, int);
-void sub_08013B98(void *, int, int);
-void sub_0801370C(void *);
-int sub_0802D7E0(struct Object *p, int resource, int kind, int param, int value)
+void ScaledShadow_SetGraphic(void *, int, int);
+void ScaledShadow_Enable(void *);
+int Actor_InitShadow(struct Object *p, int resource, int kind, int param, int value)
 {
     p->kind = kind;
     {
@@ -25,8 +25,8 @@ int sub_0802D7E0(struct Object *p, int resource, int kind, int param, int value)
     } else if (kind == 2) {
         void *e = p->effect;
         ScaledShadow_Initialize(e, resource, value, value, value, value, 2000, 400, 2, 4, 1);
-        sub_08013B98(e, 0x1c1b, param);
-        sub_0801370C(e);
+        ScaledShadow_SetGraphic(e, 0x1c1b, param);
+        ScaledShadow_Enable(e);
     }
     return 0;
 }

@@ -1,6 +1,6 @@
 #include "stacked_actor.h"
 extern u8 *gUnk_0200047C;
-u32 sub_08020D54(void *, void *);
+u32 SceneMessages_SetPendingTrigger(void *, void *);
 void StackedActor_RaiseLift(struct StackedActor *);
 void StackedActor_LowerLift(struct StackedActor *);
 void StackedActor_ConsumeTriggers(struct StackedActor *actor)
@@ -26,7 +26,7 @@ void StackedActor_ConsumeTriggers(struct StackedActor *actor)
             base = receiver + 8;
             base += offset;
             message = *(u8 **)base;
-            sub_08020D54(receiver, message);
+            SceneMessages_SetPendingTrigger(receiver, message);
             switch (message[6]) {
                 case 5:
                     StackedActor_SetUpdate(actor, StackedActor_RaiseLift);

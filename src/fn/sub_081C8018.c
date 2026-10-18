@@ -11,7 +11,7 @@ struct S {
 };
 void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
 s32 DisplayAnimation_TestFinished(void *);
-void sub_081C8018(u32 a, struct S *p, s32 n)
+void StateActor_UpdateAnimation21State(u32 a, struct S *p, s32 n)
 {
     u32 r;
     if (p->b9 != 0) {

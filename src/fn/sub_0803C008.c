@@ -16,10 +16,10 @@ struct Item {
     u32 id;
 };
 int Mod(int, int);
-void sub_0811CD24(void *, int);
-void sub_08112C54(int);
+void CharacterModel_SetAnimationFlags(void *, int);
+void ActorMarkerPool_HideMarker(int);
 void sub_0811EE0C(void *);
-void sub_0803C008(struct P *input, struct Slot *slotInput, struct Item *item)
+void ScenePool_ReleaseActorSlot(struct P *input, struct Slot *slotInput, struct Item *item)
 {
     struct P *p = input;
     struct Slot *slot = slotInput;
@@ -32,8 +32,8 @@ void sub_0803C008(struct P *input, struct Slot *slotInput, struct Item *item)
     mask = (u32 *)((u8 *)mask + index);
     one = 1;
     *mask &= ~(one << shift);
-    sub_0811CD24((u8 *)slot + 0x600, 1);
-    sub_08112C54((s8)slot->selector);
+    CharacterModel_SetAnimationFlags((u8 *)slot + 0x600, 1);
+    ActorMarkerPool_HideMarker((s8)slot->selector);
     {
         u32 *flags = (u32 *)((u8 *)slot + 0x56c);
         *flags |= one;

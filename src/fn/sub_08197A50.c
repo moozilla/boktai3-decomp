@@ -27,7 +27,7 @@ struct Task08197A50 {
 };
 extern u8 *gUnk_030042E4;
 
-void sub_08197A50(void *task)
+void PaletteEffect_UpdateSharedOverride(void *task)
 {
     struct Task08197A50 *t = task;
     u32 target = t->target;

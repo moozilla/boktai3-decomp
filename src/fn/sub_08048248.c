@@ -1,6 +1,6 @@
 #include "contact_burst.h"
 void ContactBurst_OnContact(void *, void *, struct ContactBurst *);
-void sub_0821FF7C(void *, u32, u32, u32);
+void Collider_SetBodyProperties(void *, u32, u32, u32);
 s32 ContactBurst_Initialize(struct ContactBurst *effect, const struct ContactPosition *world)
 {
     struct ContactSwarmGraphics *graphics;
@@ -35,7 +35,7 @@ s32 ContactBurst_Initialize(struct ContactBurst *effect, const struct ContactPos
     collider = &effect->collider;
     Collider_Init(collider, 0, 0x4005, 0, 16, &bounds, &offset);
     Collider_SetCallback(collider, (void *)ContactBurst_OnContact, effect);
-    sub_0821FF7C(collider, 0, 0, 0);
+    Collider_SetBodyProperties(collider, 0, 0, 0);
     /* The ROM forwards Collider_Refresh's incidental nonnegative return word. */
     status = Collider_Refresh(collider);
 done:

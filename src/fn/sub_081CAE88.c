@@ -1,7 +1,7 @@
 #include "global.h"
 s32 DisplayAnimation_TestFinished(void *);
 void Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
-void sub_081CAE88(void *unused, u8 *p)
+void SceneCharacter_UpdateAnimationSevenSixFive(void *unused, u8 *p)
 {
     if (p[9]) {
         s32 r;

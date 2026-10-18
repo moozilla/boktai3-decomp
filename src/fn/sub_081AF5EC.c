@@ -9,7 +9,7 @@ struct A {
 };
 void Task_Kill(void *);
 
-void sub_081AF5EC(struct A *p)
+void Vanargand_UpdateTransientEffect(struct A *p)
 {
     u32 t = gUnk_0300523C & 7;
     if (t == 0) {

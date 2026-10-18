@@ -1,6 +1,6 @@
 #include "global.h"
 
-u8 *sub_0822590C(u8 *m)
+u8 *SceneBody_FindByPointer(u8 *m)
 {
     u8 *s = *(u8 **)0x030025F8;
     if (s == 0)

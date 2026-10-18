@@ -60,7 +60,7 @@ void SceneActors_StartAnimation(void *, void *, void *, int, int, int);
 typedef struct {
     u32 a, b;
 } Point;
-void sub_08027FA0(ActorAnimation *p)
+void SceneActors_UpdateAnchoredReaction(ActorAnimation *p)
 {
     ActorAnimation *p2 = p;
     u8 *position = (u8 *)p + 0x48;

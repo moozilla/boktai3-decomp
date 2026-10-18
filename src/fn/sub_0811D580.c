@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_02000710;
-s32 sub_0811D580(u32 i)
+s32 GameState_GetChallengeBestScore(u32 i)
 {
     s32 r;
     if (i <= 11)

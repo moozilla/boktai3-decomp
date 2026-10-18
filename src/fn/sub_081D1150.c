@@ -7,7 +7,7 @@ struct Y {
     u8 c;
 };
 extern u8 *gUnk_02000274;
-void sub_081D1150(void)
+void SceneNpc_RequestRigAction(void)
 {
     u8 *p = gUnk_02000274;
     struct Y *q;

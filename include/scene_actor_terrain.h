@@ -15,7 +15,7 @@ struct SceneActorTerrainView {
     u8 unknown210[0xE4];
     u16 terrainCell;
 };
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 static inline s32 SceneActorTerrain_Width(void)
@@ -24,7 +24,7 @@ static inline s32 SceneActorTerrain_Width(void)
 }
 static inline u8 *SceneActorTerrain_GetCell(s32 cell)
 {
-    u8 *override = sub_0821D64C(cell, 1);
+    u8 *override = TerrainModifiers_FindCellOverride(cell, 1);
     if (override)
         return override + 4;
     return gUnk_030052F4->cells + (cell * 4 + 12);

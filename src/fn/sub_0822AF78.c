@@ -8,7 +8,7 @@ void m4aMPlayImmInit(struct MusicPlayerInfo *);
 void m4aMPlayFadeIn(struct MusicPlayerInfo *, u16);
 void m4aMPlayFadeOut(struct MusicPlayerInfo *, u16);
 void m4aMPlayFadeOutTemporarily(struct MusicPlayerInfo *, u16);
-void sub_0822AF78(u32 speed)
+void Sound_FadeInChannel10(u32 speed)
 {
     if (gUnk_03005470[10]) {
         u32 song = gUnk_03005470[10];

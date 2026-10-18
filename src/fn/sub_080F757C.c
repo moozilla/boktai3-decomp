@@ -1,5 +1,5 @@
 #include "global.h"
 
-void sub_080F757C(void)
+void Axe_OnSecondaryColliderContact(void)
 {
 }

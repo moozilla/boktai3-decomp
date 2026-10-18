@@ -1,9 +1,11 @@
 #include "global.h"
+/* Skeleton_SelectRandomBehavior: Selects a different random eight-byte behavior entry and resets its cursor; behavior interpretation is tentative */
+#define Skeleton_SelectRandomBehavior sub_080B8A58
 
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
-u8 *sub_0821E76C(u8 *);
+u8 *Path_GetPointData(u8 *);
 
 static inline u32 Random(void)
 {
@@ -31,5 +33,5 @@ void sub_080B8A58(u8 *owner)
         n = Mod(n + 1, *p->data);
     p->index = n;
     p->unk3 = 0;
-    p->entry = sub_0821E76C(p->data) + p->index * 8;
+    p->entry = Path_GetPointData(p->data) + p->index * 8;
 }

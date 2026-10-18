@@ -2,7 +2,7 @@
 extern u8 *gUnk_02000214;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-void sub_081784C0(void)
+void Hud_SetPanelIndexFromScript(void)
 {
     u8 *p = gUnk_02000214;
     if (p) {

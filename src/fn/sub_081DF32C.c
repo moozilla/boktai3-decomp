@@ -1,7 +1,7 @@
 #include "global.h"
 void sub_081DF1D8(void *);
 void Sound_PlaySong(s32);
-void sub_081DF32C(u8 *p)
+void Password_MoveCursorUp(u8 *p)
 {
     switch (*(u32 *)(p + 0x34c)) {
         case 0:

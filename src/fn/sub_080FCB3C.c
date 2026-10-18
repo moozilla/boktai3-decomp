@@ -6,7 +6,7 @@ struct S080FCB3C {
 };
 void Collider_Remove(u8 *);
 
-void sub_080FCB3C(struct S080FCB3C *s)
+void Axe_RemoveSecondaryColliders(struct S080FCB3C *s)
 {
     u8 *p = s->q + 0xd94;
     s32 i = 1;

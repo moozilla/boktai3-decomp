@@ -8,7 +8,7 @@ struct S {
 };
 void Sound_PlaySong(u32);
 
-void sub_08100A64(struct S *s)
+void NamedActor_PlayMovementSound(struct S *s)
 {
     if (!(s->f & 4)) {
         switch (s->h) {

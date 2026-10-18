@@ -1,4 +1,4 @@
 #include "global.h"
-void sub_0820BF6C(void)
+void Screamer_OnColliderContact(void)
 {
 }

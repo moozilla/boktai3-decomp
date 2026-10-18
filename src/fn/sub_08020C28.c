@@ -5,9 +5,9 @@ struct S {
     u8 a;
 };
 extern u32 gUnk_0200047C;
-void sub_08020D08(void *);
-u32 sub_08020C28(struct S *p)
+void SceneMessages_UnregisterReceiver(void *);
+u32 SceneMessages_Destroy(struct S *p)
 {
-    sub_08020D08(&p->a);
+    SceneMessages_UnregisterReceiver(&p->a);
     return gUnk_0200047C = 0;
 }

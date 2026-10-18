@@ -1,5 +1,5 @@
 #include "global.h"
-s32 sub_0811E70C(u8 *s, s32 x)
+s32 Modifier_AddKindThreeStat(u8 *s, s32 x)
 {
     s32 r;
     if (*(u8 *)(s + 0xc) == 0)

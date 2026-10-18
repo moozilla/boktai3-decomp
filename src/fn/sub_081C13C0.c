@@ -1,7 +1,7 @@
 #include "global.h"
-void sub_081C0C24(void);
-u32 sub_081C13C0(void)
+void PlayStats_RemoveAnimations(void);
+u32 RecordDisplay_OnTaskDestroy(void)
 {
-    sub_081C0C24();
+    PlayStats_RemoveAnimations();
     return 0;
 }

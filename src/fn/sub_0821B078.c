@@ -1,6 +1,6 @@
 #include "global.h"
-void sub_0821B1F4(void);
-void sub_0821B078(void)
+void Script_ClearLocalVariables(void);
+void Script_ResetLocalVariables(void)
 {
-    sub_0821B1F4();
+    Script_ClearLocalVariables();
 }

@@ -16,8 +16,8 @@ extern struct Owner *gUnk_02000100;
 struct Resource *ScriptProc_Start(int, int);
 void ResourceHeader_Relocate(void *, void *);
 int AnimData_Load(void *, int);
-void sub_0803A2A8(void *, void *, int);
-int sub_0803A434(struct Owner *p)
+void WirelessGameItems_InitItem(void *, void *, int);
+int WirelessGameItems_Init(struct Owner *p)
 {
     struct Resource *resource;
     struct Item *item;
@@ -37,7 +37,7 @@ int sub_0803A434(struct Owner *p)
     current = p->current;
     pending = p->pending;
     do {
-        sub_0803A2A8(p, item, i);
+        WirelessGameItems_InitItem(p, item, i);
         i++;
         item++;
     } while (i <= 15);

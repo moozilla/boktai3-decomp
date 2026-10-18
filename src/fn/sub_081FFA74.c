@@ -10,7 +10,7 @@ struct H {
     u16 h;
 };
 void Sprite_Remove(void *);
-void sub_081FFA74(struct A *a, u8 *b, u32 n)
+void HomingProjectile_ReleaseSlot(struct A *a, u8 *b, u32 n)
 {
     u32 m, t;
     u32 *q;

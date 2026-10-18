@@ -5,7 +5,7 @@ struct S {
 };
 void sub_081C58BC(void *);
 void sub_0824923C(void *, u32);
-void sub_081C59A4(struct S *p)
+void ChallengeMenu_Update(struct S *p)
 {
     sub_081C58BC(p);
     if (p->a != 0)

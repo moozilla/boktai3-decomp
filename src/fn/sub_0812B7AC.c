@@ -18,7 +18,7 @@ static inline u8 Tst(u32 *m, s32 i)
     return FALSE;
 }
 
-struct E *sub_0812B7AC(struct S *b)
+struct E *SlashEffect_AllocateSlot(struct S *b)
 {
     s32 i;
     struct E *e;

@@ -10,7 +10,7 @@ struct O {
     s16 f6fa;
 };
 void Anim_LoadKeyframe(void *, void *, u32, u32);
-s32 sub_0821319C(struct O *o)
+s32 CollectionBook_UpdateSelectionCursor(struct O *o)
 {
     o->fe4 = o->f6f8 * 40;
     o->fe6 = o->f6fa * 40;

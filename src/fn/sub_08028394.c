@@ -7,7 +7,7 @@ struct A {
 };
 void SceneActors_RunStateCallback(void *);
 
-void sub_08028394(struct A *p)
+void SceneActors_RunUnpausedState(struct A *p)
 {
     u32 m;
     p->a = 0;

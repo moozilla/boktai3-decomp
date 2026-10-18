@@ -31,7 +31,7 @@ static inline u8 enter(State *p)
     }
     return 0;
 }
-void sub_08023F34(State *p)
+void SceneActorState_PlayAnimation5ThenAdvance(State *p)
 {
     p->vulnerable = 1;
     if (enter(p)) {

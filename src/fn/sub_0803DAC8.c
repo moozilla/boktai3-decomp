@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
 
-void sub_0803DA30(struct ScenePoolEntry *, s32, s32, s32);
+void ScenePool_SetSpeedControlSchedule(struct ScenePoolEntry *, s32, s32, s32);
 static inline u8 PlayerHasFlag(u32 mask)
 {
     if (gUnk_020004F0[0] && (gUnk_020004F0[0]->flags & mask))
@@ -45,9 +45,9 @@ void ScenePool_ScheduleSpeedControl(struct ScenePoolEntry *entry)
                 *index = next;
                 random = *(const u8 *)((next << 1) + (u32)gUnk_0203B400);
                 if (random <= 31)
-                    sub_0803DA30(base, 2, 2, 4);
+                    ScenePool_SetSpeedControlSchedule(base, 2, 2, 4);
                 else if (random <= 63)
-                    sub_0803DA30(base, 1, 2, 4);
+                    ScenePool_SetSpeedControlSchedule(base, 1, 2, 4);
                 goto done;
             }
         near:
@@ -77,9 +77,9 @@ medium:
     arg = base;
     kind = 2;
 schedule:
-    sub_0803DA30(arg, kind, 4, 8);
+    ScenePool_SetSpeedControlSchedule(arg, kind, 4, 8);
     goto done;
 slow:
-    sub_0803DA30(base, 1, 4, 8);
+    ScenePool_SetSpeedControlSchedule(base, 1, 4, 8);
 done:;
 }

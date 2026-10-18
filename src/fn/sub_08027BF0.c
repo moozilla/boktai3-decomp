@@ -59,7 +59,7 @@ static inline int trunc12(int x)
 typedef struct {
     u32 a, b;
 } Point;
-void sub_08027BF0(ActorAnimation *p, int time)
+void SceneActors_UpdateExpandingShake(ActorAnimation *p, int time)
 {
     int tick = time;
     ActorAnimation *p2 = p;

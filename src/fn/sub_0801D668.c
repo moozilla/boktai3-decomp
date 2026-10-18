@@ -1,12 +1,12 @@
 #include "global.h"
-void sub_0801C190(void *);
+void ResultGame_HideTargetMarker(void *);
 int ResultTutorial_SlideMarkerOut(u8 *p)
 {
     switch (p[0xaf]) {
         case 0:
             p[0xaf] = 1;
             *(u16 *)(p + 0xaa) = 0;
-            sub_0801C190(p);
+            ResultGame_HideTargetMarker(p);
             break;
         case 1:
             *(int *)(p + 0x8c) -= 176;

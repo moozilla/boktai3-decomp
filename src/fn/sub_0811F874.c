@@ -17,7 +17,7 @@ void sub_0811F75C(void);
 void sub_0811F7EC(void);
 void sub_0811F4DC(void);
 void sub_0811F5C4(void);
-void sub_0811F874(u8 *s, u32 v)
+void Modifier_InitFourthSourceEffect(u8 *s, u32 v)
 {
     u8 *a = s + 0x48;
     struct P *p = (struct P *)(s + 0x314);

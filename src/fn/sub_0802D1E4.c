@@ -6,11 +6,11 @@ struct Object {
     int ticks;
 };
 extern void (*gUnk_0860504C[])(struct Object *, int);
-void sub_0802CF40(struct Object *);
-void sub_0802D1E4(struct Object *p)
+void Actor_PrepareStateUpdate(struct Object *);
+void Actor_DispatchStateHandler(struct Object *p)
 {
     int tick;
-    sub_0802CF40(p);
+    Actor_PrepareStateUpdate(p);
     tick = p->ticks;
     p->ticks = tick + 1;
     gUnk_0860504C[p->state](p, tick);

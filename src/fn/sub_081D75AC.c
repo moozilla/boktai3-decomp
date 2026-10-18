@@ -7,7 +7,7 @@ void Task_Kill(u8 *);
 void sub_081D7434(void);
 void sub_081D7508(void);
 
-u8 *sub_081D75AC(void)
+u8 *ScreenParams2A0_CreateSelector(void)
 {
     u8 *p;
     p = Task_Create(11, 0x20);

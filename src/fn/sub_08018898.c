@@ -23,9 +23,9 @@ struct Manager {
     struct Orb orbs[8];
 };
 extern const s16 gUnk_086149C4[];
-void sub_080187E4(void *, void *);
+void OrbitingParticles_SpawnOrb(void *, void *);
 void OrbitingParticles_Advance(void *, void *);
-int sub_080187BC(void *);
+int OrbitingParticles_HasActiveOrb(void *);
 void Task_Kill(void *);
 static inline int scale(int v)
 {
@@ -48,7 +48,7 @@ int OrbitingParticles_Update(struct Manager *m)
             struct Orb *arg = cursor;
             asm("" : "+r"(arg));
             if (!p->state)
-                sub_080187E4(m, arg);
+                OrbitingParticles_SpawnOrb(m, arg);
             else
                 OrbitingParticles_Advance(m, arg);
             out = position;
@@ -83,7 +83,7 @@ int OrbitingParticles_Update(struct Manager *m)
         }
     }
     m->time++;
-    if (m->duration > 0 && m->time >= m->duration && !sub_080187BC(m))
+    if (m->duration > 0 && m->time >= m->duration && !OrbitingParticles_HasActiveOrb(m))
         Task_Kill(m);
     return 0;
 }

@@ -2,8 +2,8 @@
 #include "pooled_motion.h"
 void MotionPool_InitializeParams(struct MotionPoolParams *);
 void MotionPool_FinishOnResourceContact(void *, void *, struct MotionPoolSlot *);
-void sub_082144E4(void *, void *, u32);
-void sub_0821FF58(void *, u32, u32, u32, u32, u32);
+void Sprite_InitUnlinked(void *, void *, u32);
+void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 void MotionPool_InitializeSlot(struct MotionPool *pool, struct MotionPoolSlot *slot, s32 index)
 {
     struct MotionPoolParams *params = &slot->params;
@@ -22,10 +22,10 @@ void MotionPool_InitializeSlot(struct MotionPool *pool, struct MotionPoolSlot *s
     }
     graphics = &slot->graphics;
     AnimData_Load(graphics, params->graphicResource);
-    sub_082144E4(&slot->sprite, graphics, 1);
+    Sprite_InitUnlinked(&slot->sprite, graphics, 1);
     collider = &slot->collider;
     Collider_Init(collider, 0, 0x2001, 0, 0x10, &params->bounds, &params->offset);
     Collider_SetCallback(collider, MotionPool_FinishOnResourceContact, slot);
-    sub_0821FF58(collider, params->resourceId, params->cost, params->contactMode,
+    Collider_SetAttackProperties(collider, params->resourceId, params->cost, params->contactMode,
                  params->contactFlags, params->option);
 }

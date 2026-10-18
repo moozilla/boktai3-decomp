@@ -14,7 +14,7 @@ static inline u8 Tst(u32 *m, s32 i)
 }
 /* Takes the first free one of the pool's 32 slots: a cleared 0x128-byte block
    recorded at +0x20 with its index at +0x104; NULL when full. */
-u8 *sub_08105A44(struct Pool *pool)
+u8 *Pool128_Allocate(struct Pool *pool)
 {
     s32 i;
     for (i = 0; i < 32; i++) {

@@ -2,7 +2,7 @@
 extern void *gUnk_02000480;
 u32 Script_GetKeywordValue(u32, u32);
 void sub_081C6954(void *, u32);
-void sub_081C6B84(void)
+void StateActor_CreateFromScript(void)
 {
     void *p = gUnk_02000480;
     if (p != 0)

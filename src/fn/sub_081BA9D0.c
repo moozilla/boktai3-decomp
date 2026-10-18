@@ -3,7 +3,7 @@
 void sub_08216520(s32, s32, s32);
 void Hud_SetMode(s32);
 
-void sub_081BA9D0(void)
+void Registry3F74_ConfigureDisplay(void)
 {
     sub_08216520(3, 8, 0x20);
     sub_08216520(2, 0, 0);

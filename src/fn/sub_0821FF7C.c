@@ -5,7 +5,7 @@ struct O {
     u32 f38;
     u16 f3c;
 };
-void sub_0821FF7C(struct O *o, u16 a, u32 b, u32 c)
+void Collider_SetBodyProperties(struct O *o, u16 a, u32 b, u32 c)
 {
     o->f3c = a;
     o->f38 = b;

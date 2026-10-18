@@ -1,29 +1,29 @@
 #include "global.h"
 extern u8 *gUnk_02000710;
 extern u32 gUnk_0200060C, gUnk_03005404;
-void sub_0821B1B8(void *, u32);
-u32 sub_0822ED64(u32);
-u32 sub_0822BAD0(u32, u32);
-void *sub_0821B6BC(void), *sub_0821B6B0(void);
+void GameState_BackupRegionRange(void *, u32);
+u32 Save_AlignSizeToEightBytes(u32);
+u32 Save_GetPrimaryRegionBlock(u32, u32);
+void *GameState_GetBackupVariableBase(void), *GameState_GetBackupStateBase(void);
 s32 sub_0822F0A4(u32, void *, u32);
-u32 sub_0822BB38(void);
-u32 sub_0822BBD8(u32 arg)
+u32 Save_GetMainStateSize(void);
+u32 Save_WriteMainState(u32 arg)
 {
     u32 buffer, result, index;
     *(u32 *)gUnk_02000710 = gUnk_0200060C;
-    sub_0821B1B8(gUnk_02000710, 4);
-    buffer = sub_0822ED64(1024);
-    index = sub_0822BAD0(arg, 0);
+    GameState_BackupRegionRange(gUnk_02000710, 4);
+    buffer = Save_AlignSizeToEightBytes(1024);
+    index = Save_GetPrimaryRegionBlock(arg, 0);
     index <<= 16;
     index >>= 16;
-    result = sub_0822F0A4(index, sub_0821B6BC(), buffer);
+    result = sub_0822F0A4(index, GameState_GetBackupVariableBase(), buffer);
     if (result != buffer + 8)
         return 0;
-    buffer = sub_0822ED64(sub_0822BB38());
-    index = sub_0822BAD0(arg, 1);
+    buffer = Save_AlignSizeToEightBytes(Save_GetMainStateSize());
+    index = Save_GetPrimaryRegionBlock(arg, 1);
     index <<= 16;
     index >>= 16;
-    result = sub_0822F0A4(index, sub_0821B6B0(), buffer);
+    result = sub_0822F0A4(index, GameState_GetBackupStateBase(), buffer);
     if (result != buffer + 8)
         return 0;
     return gUnk_03005404 = 1;

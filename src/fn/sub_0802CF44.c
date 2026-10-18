@@ -13,10 +13,10 @@ struct Object {
     u8 pad182[2];
     u32 drawable;
 };
-void sub_0802CB94(struct Object *);
+void Actor_RefreshTarget(struct Object *);
 void DisplayAnimation_SetPosition(void *, void *);
 void DisplayAnimation_UpdatePlayback(void *);
-void sub_0802CF44(struct Object *p)
+void Actor_DispatchActionCallback(struct Object *p)
 {
     int tick;
     p->transient = 0;

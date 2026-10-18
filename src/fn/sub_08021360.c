@@ -6,14 +6,14 @@ struct S {
     u32 b;
 };
 void SceneCommands_Dispatch(struct S *);
-void sub_082260A4(u32);
-u32 sub_08021360(struct S *p)
+void Camera_RequestShake(u32);
+u32 SceneCommands_TaskUpdate(struct S *p)
 {
     SceneCommands_Dispatch(p);
     if (p->a != 0) {
         if (p->a > 0)
             p->a--;
-        sub_082260A4(p->b);
+        Camera_RequestShake(p->b);
     }
     return 0;
 }

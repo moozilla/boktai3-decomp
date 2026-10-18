@@ -7,7 +7,7 @@ struct P {
     u16 fl;
 };
 u32 sub_0824923C(void *, void *);
-u8 sub_080C5234(struct P *p)
+u8 Golem_InvokeEnabledBehavior(struct P *p)
 {
     u32 m = 0x100;
     u8 r;

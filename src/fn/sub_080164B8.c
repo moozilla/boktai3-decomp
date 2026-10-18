@@ -5,7 +5,7 @@ struct Controller {
     u16 timers[4], periods[4];
     s8 current[4], target[4];
 };
-void sub_082190E0(int, int, int);
+void Mosaic_SetParameters(int, int, int);
 void PaletteLevels_Increase(struct Controller *p)
 {
     u16 levels = 0;
@@ -23,7 +23,7 @@ void PaletteLevels_Increase(struct Controller *p)
             }
         }
     }
-    sub_082190E0(levels, p->first, p->count);
+    Mosaic_SetParameters(levels, p->first, p->count);
     if (!p->enabled)
         p->state = 0;
 }

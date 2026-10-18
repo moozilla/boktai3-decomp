@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_08223614(void)
+void RfuManager_ClearState(void)
 {
     u16 z;
     u8 *p;

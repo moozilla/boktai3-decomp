@@ -2,7 +2,7 @@
 void Sound_PlaySong(u32);
 s32 Collider_Refresh(u8 *);
 void Task_Kill(u8 *);
-s32 sub_082331E4(u8 *p)
+s32 ExplosionEffect_Update(u8 *p)
 {
     u16 *delay = (u16 *)(p + 0xb4);
     if (*delay)

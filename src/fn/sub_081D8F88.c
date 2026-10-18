@@ -1,6 +1,6 @@
 #include "global.h"
 
-u32 sub_081D8F88(void)
+u32 Task4E01_OnType4Animation(void)
 {
     return 2;
 }

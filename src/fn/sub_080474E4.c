@@ -1,6 +1,6 @@
 #include "transient_sprite_effects.h"
 struct TransientSpriteEffects *TransientSpriteEffects_Create(void *, u32);
-void sub_08214374(void *, u32);
+void Sprite_LinkToList(void *, u32);
 s32 TransientSpriteEffects_Spawn(u32 kind, u32 options, const struct ContactPosition *position,
                                  const struct ContactPosition *velocity, u32 dragDelay, u32 drag)
 {
@@ -42,7 +42,7 @@ s32 TransientSpriteEffects_Spawn(u32 kind, u32 options, const struct ContactPosi
                 sprite->flags |= 16;
             else
                 sprite->flags &= ~16;
-            sub_08214374(sprite, 0);
+            Sprite_LinkToList(sprite, 0);
             return 0;
         }
         ++index;

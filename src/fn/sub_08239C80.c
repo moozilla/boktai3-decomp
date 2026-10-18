@@ -8,7 +8,7 @@ struct State {
     u8 gap[0xa94];
     struct Entry entries[4];
 };
-void sub_08239C80(struct State *p)
+void LinkPlayer_InitAnimationSlots(struct State *p)
 {
     u32 v = p->value + 47;
     p->entries[0].a = v;

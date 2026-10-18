@@ -8,7 +8,7 @@ struct T {
     void (*f)(void);
 };
 
-void sub_08222554(void)
+void Serial_EnableTimer3Polling(void)
 {
     u16 ie;
     struct T *t;

@@ -10,7 +10,7 @@ struct S {
     u16 h;
 };
 void sub_08181A08(void);
-void sub_08181AE0(struct S *p)
+void Armor_StartFastWhiteFade(struct S *p)
 {
     struct Sub *s = &p->s;
     void (*f)(void) = sub_08181A08;

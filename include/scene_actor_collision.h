@@ -11,7 +11,7 @@ struct SceneActorCollisionParameters {
     u16 field3C[4], field40[4], field44[4];
     u32 reactionFlags[4];
 };
-void sub_0821FF7C(void *, u16, u32, u32);
+void Collider_SetBodyProperties(void *, u16, u32, u32);
 static inline u16 SceneActorCollision_ReadBodyField3C(struct SceneActorRegistryActor *actor)
 {
     const u8 *field = (u8 *)actor + 0x9e;
@@ -27,7 +27,7 @@ static inline u32 SceneActorCollision_ReadBodyField34(struct SceneActorRegistryA
     const u16 *field = (void *)((u8 *)actor + 0xa4);
     return *field;
 }
-void sub_0821FF58(void *, u16, u16, u32, u32, u16);
+void Collider_SetAttackProperties(void *, u16, u16, u32, u32, u16);
 /* GNU trailing-storage views avoid imposing a four-entry index bound. The
  * selected entries must lie in initialized storage in the actual actor object. */
 static inline u16 SceneActorCollision_ReadAttackField3C(struct SceneActorRegistryActor *actor,

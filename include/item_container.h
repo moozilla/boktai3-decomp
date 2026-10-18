@@ -116,9 +116,9 @@ struct TriggerScriptArgs {
 extern struct TriggerManager *gUnk_02000030;
 
 s32 Trigger_RunScript(struct Trigger *, u32 script, s32 event);
-u32 sub_08006FAC(struct Trigger *);
-u32 sub_08006FD8(struct Trigger *);
-u32 sub_0800700C(struct Trigger *);
+u32 TriggerManager_InsertTrigger(struct Trigger *);
+u32 TriggerManager_RemoveTrigger(struct Trigger *);
+u32 Trigger_Destroy(struct Trigger *);
 void Trigger_UpdateShake(struct Trigger *);
 void sub_080070D0(struct TriggerManager *, struct Trigger *);
 s32 Trigger_TryOpenNearby(struct TriggerOpener *);
@@ -126,17 +126,17 @@ void Trigger_UpdateFalling(struct TriggerManager *, struct Trigger *);
 void Trigger_UpdateLanding(struct TriggerManager *, struct Trigger *);
 void Trigger_UpdateBobbingAnimation(struct TriggerManager *, struct Trigger *);
 void Trigger_UpdateGrounded(struct TriggerManager *, struct Trigger *);
-void sub_080077C4(struct TriggerManager *, struct Trigger *);
+void Trigger_UpdateDropTimer(struct TriggerManager *, struct Trigger *);
 void Trigger_UpdateIdleAnimation(struct TriggerManager *, struct Trigger *);
 void Trigger_UpdateOpeningAnimation(struct TriggerManager *, struct Trigger *);
 void Trigger_UpdateActivation(struct TriggerManager *, struct Trigger *);
 void Trigger_UpdateLockedPause(struct TriggerManager *, struct Trigger *);
 void Trigger_UpdateLockedRecovery(struct TriggerManager *, struct Trigger *);
 s32 TriggerManager_Update(struct TriggerManager *);
-u32 sub_08008148(struct TriggerManager *);
+u32 TriggerManager_DestroyManager(struct TriggerManager *);
 s32 TriggerManager_Initialize(struct TriggerManager *, void *);
-void *sub_08008230(void *, void *);
-struct TriggerManager *sub_08008270(void);
+void *TriggerManager_InitManager(void *, void *);
+struct TriggerManager *TriggerManager_GetOrCreate(void);
 s32 Trigger_CreateDrop(struct SceneVec *position, s32 id, s32 kind, u32 script, u32 *arguments,
                        s32 sound, s32 persistent, s32 option);
 s32 Trigger_CreateDropFromScript(void);
@@ -144,9 +144,9 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
                             u32 startScript, u32 script, u32 *arguments, s32 sound, s32 hidden,
                             s32 condition);
 s32 Trigger_CreateContainerFromScript(void);
-s32 sub_08008950(u32 type);
-u32 sub_08008988(void);
+s32 TriggerManager_DestroyAllOfType(u32 type);
+u32 TriggerManager_DestroyAllOfTypeFromScript(void);
 s32 Trigger_MoveDropsByItem(struct SceneVec *position, s32 id, s32 kind);
-u32 sub_08008A00(void);
+u32 Trigger_MoveDropsByItemFromScript(void);
 
 #endif

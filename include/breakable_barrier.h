@@ -40,7 +40,7 @@ struct BreakableBarrierManager {
 
 extern u16 gUnk_03005214, gUnk_030051C4;
 
-void sub_0821FF7C(void *, s32, s32, s32);
+void Collider_SetBodyProperties(void *, s32, s32, s32);
 void sub_0806A160(void *, s32, void *, s32, s32, s32, s32, s32);
 
 /* Hit particles (debris_particles.c) */

@@ -54,7 +54,7 @@ ActorAttachment_CreateSpriteSlot(u32 frame, struct ContactPosition *anchor, void
 gotManager:
     if (!savedFollow)
         goto failed;
-    slot = sub_08065C40(manager);
+    slot = ActorAttachment_AllocateSlotHeader(manager);
     if (!slot)
         goto failed;
     slot->followActor = savedFollow;

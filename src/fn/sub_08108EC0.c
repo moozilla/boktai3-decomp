@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_08108EC0(u8 *p, u32 a)
+void LinkConnection_SetRetryOptions(u8 *p, u32 a)
 {
     u32 one;
 

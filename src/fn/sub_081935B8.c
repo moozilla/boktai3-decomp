@@ -29,7 +29,7 @@ static inline void Project(struct Vec081935B8 *out, struct Vec081935B8 *v)
     out->z = s + h;
 }
 
-void sub_081935B8(u8 *t)
+void Nidhoggr_UpdateBackgroundScroll(u8 *t)
 {
     struct Vec081935B8 d;
     Project(&d, (struct Vec081935B8 *)(t + 0x5404));

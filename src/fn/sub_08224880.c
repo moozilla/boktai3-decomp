@@ -13,8 +13,8 @@ struct S {
 extern struct S gUnk_03005390;
 extern u16 *gUnk_03006A70[];
 void rfu_clearSlot(u32, u32);
-void sub_08224980(u32, u32);
-void sub_08224880(void)
+void RfuManager_NotifyEvent(u32, u32);
+void RfuManager_FinishSlotReception(void)
 {
     struct S *s = &gUnk_03005390;
     if (s->f4 == 0xf) {
@@ -27,7 +27,7 @@ void sub_08224880(void)
             rfu_clearSlot(4, i);
             s->f24 &= ~(1 << s->f10);
             s->a28[s->f10] = z;
-            sub_08224980(0x24, 0);
+            RfuManager_NotifyEvent(0x24, 0);
         }
     }
 }

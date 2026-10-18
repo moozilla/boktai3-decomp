@@ -7,12 +7,12 @@ struct Owner {
     struct Item items[16];
 };
 extern void *gUnk_086057DC[];
-int sub_08036BEC(void);
+int Wireless_GetStatus(void);
 void sub_08249244(void *, void *, int, void *);
-void sub_0803A36C(void *);
-int sub_0803A3C8(struct Owner *p)
+void WirelessGameItems_PublishPendingEffects(void *);
+int WirelessGameItems_Update(struct Owner *p)
 {
-    if (!sub_08036BEC()) {
+    if (!Wireless_GetStatus()) {
         struct Item *q = p->items;
         int i = 0;
         do {
@@ -20,7 +20,7 @@ int sub_0803A3C8(struct Owner *p)
             i++;
             q++;
         } while (i <= 15);
-        sub_0803A36C(p);
+        WirelessGameItems_PublishPendingEffects(p);
     }
     return 0;
 }

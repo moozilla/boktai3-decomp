@@ -1,13 +1,13 @@
 #include "global.h"
-void sub_08213F80(void);
-void sub_08213F98(u16 n)
+void InterruptsAndVideo_WaitForVBlank(void);
+void InterruptsAndVideo_WaitFrames(u16 n)
 {
     u16 save = *(vu16 *)0x04000208;
     u16 i;
     *(vu16 *)0x04000208 = 1;
     i = n - 1;
     while (i != 0xFFFF) {
-        sub_08213F80();
+        InterruptsAndVideo_WaitForVBlank();
         i--;
     }
     *(vu16 *)0x04000208 = save;

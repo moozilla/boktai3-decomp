@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 struct SceneActorRegistryActor *SceneActorRegistry_FindById(u32);
-void sub_0807FC90(u8 *);
+void SceneActorControl_OnIdle(u8 *);
 static inline u8 HasMovementFlag(struct SceneActorRegistryActor *actor)
 {
     u32 mask = 0x100;
@@ -45,7 +45,7 @@ void SceneActorRegistry_RequestScriptState(void)
                 u32 one = 1;
                 *field = one;
                 if (!preserveControl) {
-                    const void *control = (const void *)sub_0807FC90;
+                    const void *control = (const void *)SceneActorControl_OnIdle;
                     u32 substate = 16;
                     phaseOffset += 1;
                     field = (u8 *)actor + phaseOffset;

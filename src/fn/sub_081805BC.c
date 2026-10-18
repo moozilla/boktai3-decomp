@@ -2,7 +2,7 @@
 
 u32 Sprite_Remove(u8 *);
 
-void sub_081805BC(u8 *p)
+void ArmorIndicator_DestroySprite(u8 *p)
 {
     Sprite_Remove(p + 0x8);
 }

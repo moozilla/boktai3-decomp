@@ -5,7 +5,7 @@ struct S {
     u8 a;
 };
 void Sprite_Remove(void *);
-void sub_080297E8(struct S *p)
+void GridAttackActor_RemoveSprite(struct S *p)
 {
     Sprite_Remove(&p->a);
 }

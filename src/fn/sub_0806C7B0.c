@@ -126,9 +126,9 @@ void SceneSteeringActor_InitializeCollider(struct SceneSteeringActor *, s32, s32
                                            s32, s32);
 u32 ScaledShadow_Initialize(void *, const struct ContactPosition *, s32, s32, s32, s32, s32, s32,
                             s32, s32, s32);
-void sub_08013B98(void *, s32, s32);
-void sub_08013BBC(void *, s32);
-void sub_08013728(void *);
+void ScaledShadow_SetGraphic(void *, s32, s32);
+void ScaledShadow_SetFlag(void *, s32);
+void ScaledShadow_Disable(void *);
 void SceneSteeringActor_CreateTravelActor(const struct ContactPosition *position,
                                           const struct ContactPosition *target, s32 velocityY,
                                           s32 direction, s32 steeringTimer, s32 turnStep,
@@ -252,8 +252,8 @@ void SceneSteeringActor_CreateTravelActor(const struct ContactPosition *position
         shadow = slot->shadow;
         slot->shadowStatus = ScaledShadow_Initialize(shadow, &slot->position, 64, 64, 64, 100,
                                                      tailZero, tailZero, 5, 1, tailZero);
-        sub_08013B98(shadow, 0x1C1B, 6);
-        sub_08013BBC(shadow, 0);
-        sub_08013728(shadow);
+        ScaledShadow_SetGraphic(shadow, 0x1C1B, 6);
+        ScaledShadow_SetFlag(shadow, 0);
+        ScaledShadow_Disable(shadow);
     }
 }

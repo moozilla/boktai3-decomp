@@ -1,5 +1,7 @@
 // COMPILER: old_agbcc
 #include "global.h"
+/* ChallengeMenu_ResetStoredRanks: Resets eight bytes of packed option values to the unset nibble value 15 */
+#define ChallengeMenu_ResetStoredRanks sub_081C5E84
 
 extern u8 *gUnk_02000710;
 

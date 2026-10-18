@@ -6,7 +6,7 @@ struct S {
 void sub_0824923C(void *, u32);
 void sub_081C18E8(void *);
 void sub_081C2240(void *);
-u32 sub_081C2294(struct S *p)
+u32 ControlPanel_OnTaskUpdate(struct S *p)
 {
     sub_0824923C(p, p->a);
     sub_081C18E8(p);

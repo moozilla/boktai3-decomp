@@ -17,7 +17,7 @@ s32 WirelessLinkIndicator_Update(struct WirelessLinkIndicator *);
 s32 WirelessLinkIndicator_Destroy(struct WirelessLinkIndicator *);
 struct WirelessLinkIndicator *WirelessLinkIndicator_Get(void);
 struct WirelessLinkIndicator *WirelessLinkIndicator_Create(void);
-u32 sub_08036BEC(void);
-s32 sub_08036A3C(void);
-s32 sub_08036A10(void);
+u32 Wireless_GetStatus(void);
+s32 Wireless_IsSessionConnected(void);
+s32 Wireless_GetConnectedParentSlot(void);
 #endif

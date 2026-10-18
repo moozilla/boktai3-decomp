@@ -8,9 +8,9 @@ struct PeerMenu {
 };
 void TextWindow_Refresh(int, int);
 void Sound_PlaySong(int);
-void sub_08036B14(void);
+void Wireless_RequestAdvanceConnection(void);
 extern u16 gUnk_03005260[];
-void sub_08037730(struct PeerMenu *p)
+void WirelessPeerMenu_UpdateDismissibleNotice(struct PeerMenu *p)
 {
     if (p->entered) {
         p->entered = 0;
@@ -19,7 +19,7 @@ void sub_08037730(struct PeerMenu *p)
     }
     if (p->timer > 35) {
         if (gUnk_03005260[1] & 3) {
-            sub_08036B14();
+            Wireless_RequestAdvanceConnection();
             {
                 u32 state = 7;
                 u32 zero = 0;

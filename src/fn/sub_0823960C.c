@@ -15,10 +15,10 @@ struct Q0823960C {
 };
 u32 AnimData_FindEntry(u32);
 void sub_08217DE0(void *, u32, u32);
-void sub_08217EC4(void *, s32, s32);
-void sub_08217ECC(void *, u32);
+void Effect_SetOrigin(void *, s32, s32);
+void Effect_SetPalette(void *, u32);
 
-void sub_0823960C(u8 *p)
+void Player_InitConvergingParticles(u8 *p)
 {
     struct Q0823960C *q = (struct Q0823960C *)(p + 0x9A8);
     s32 i;
@@ -26,8 +26,8 @@ void sub_0823960C(u8 *p)
     for (i = 0; i < 4; i++) {
         struct E0823960C *e = &q->e[i];
         sub_08217DE0(e, q->f0, 1);
-        sub_08217EC4(e, -4, -4);
-        sub_08217ECC(e, 1);
+        Effect_SetOrigin(e, -4, -4);
+        Effect_SetPalette(e, 1);
         e->fF = 2;
     }
     q->f5 = 0;

@@ -1,12 +1,12 @@
 #include "global.h"
-void sub_0801C17C(void *);
-void sub_0801C1C4(void *);
+void ResultGame_ShowTargetMarker(void *);
+void ResultGame_SetPressVisibility(void *);
 int ResultTutorial_InitializePressDemo(u8 *p)
 {
     switch (p[0xaf]) {
         case 0:
-            sub_0801C17C(p);
-            sub_0801C1C4(p);
+            ResultGame_ShowTargetMarker(p);
+            ResultGame_SetPressVisibility(p);
             p[0xb0] = 255;
             p[0xb1] = 0;
             *(int *)(p + 0x8c) = 0;

@@ -6,7 +6,7 @@ struct Reference {
     u16 count;
     u16 index;
 };
-u8 *sub_0821B478(u8 *p, struct Reference *ref)
+u8 *Script_DecodeVariableReference(u8 *p, struct Reference *ref)
 {
     s32 type, count, index;
     u8 *end;

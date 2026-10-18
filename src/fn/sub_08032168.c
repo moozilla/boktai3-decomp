@@ -1,5 +1,5 @@
 #include "global.h"
-int sub_08032168(const u8 *a, const u8 *b, int n)
+int Text_ComparePrefix(const u8 *a, const u8 *b, int n)
 {
     int i = 0;
     for (; i < n; i++) {

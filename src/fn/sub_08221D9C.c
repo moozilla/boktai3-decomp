@@ -1,4 +1,6 @@
 #include "scalar_approach.h"
+/* ScalarApproach_StepAngleHalfArray: Updates signed halfword angles toward corresponding targets using wrapped half steps */
+#define ScalarApproach_StepAngleHalfArray sub_08221D9C
 #define ScalarApproach_HalfAngleArray sub_08221D9C
 void ScalarApproach_HalfAngleArray(s16 *values, const s16 *targets, s32 count)
 {

@@ -10,7 +10,7 @@ struct Manager {
     u8 pad[0x1c];
     struct Object *head;
 };
-void sub_0802D654(struct Manager *m, struct Object *p)
+void Actor_LinkToManager(struct Manager *m, struct Object *p)
 {
     if (m->head)
         m->head->next = p;

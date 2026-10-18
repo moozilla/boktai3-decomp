@@ -7,7 +7,7 @@ struct S {
     struct E e[4];
 };
 void Effect_Remove(void *);
-void sub_0817A41C(struct S *p)
+void SceneActors_RemoveConvergingParticles(struct S *p)
 {
     s32 i;
     struct E *e = p->e;

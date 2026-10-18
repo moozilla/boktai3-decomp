@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08130490(u8 *p)
+void SceneActorControl_AdvancePhaseIfFlagged(u8 *p)
 {
     u8 *q = p + 0x2b1;
     u16 *h;

@@ -1,9 +1,9 @@
 #include "global.h"
 extern u8 gUnk_0824DB8A[], gUnk_0824DB7A[];
-void sub_0801C16C(void *);
-void sub_0801C17C(void *);
-void sub_0801C1A0(void *);
-void sub_0801C190(void *);
+void ResultGame_HidePressMarker(void *);
+void ResultGame_ShowTargetMarker(void *);
+void ResultGame_SetTrackingVisibility(void *);
+void ResultGame_HideTargetMarker(void *);
 void Sound_PlaySong(int);
 void Sound_StopSong(int);
 void ResultGame_UpdatePlayerMarker(void *);
@@ -37,9 +37,9 @@ void ResultGame_TrackTarget(u8 *p)
                 *((s16 *)(p + 0xa8)) = zero;
                 p[0xb3] = 32;
                 p[0xbf] = 255;
-                sub_0801C16C(p);
-                sub_0801C17C(p);
-                sub_0801C1A0(p);
+                ResultGame_HidePressMarker(p);
+                ResultGame_ShowTargetMarker(p);
+                ResultGame_SetTrackingVisibility(p);
                 Sound_PlaySong(0x4b1);
                 break;
             }
@@ -125,6 +125,6 @@ void ResultGame_TrackTarget(u8 *p)
         Sound_StopSong(0x3ee);
         p[0xaf] = 6;
         p[0xb3] = 0;
-        sub_0801C190(p);
+        ResultGame_HideTargetMarker(p);
     }
 }

@@ -10,7 +10,7 @@ struct A {
     u16 idx;
 };
 
-void sub_081A516C(struct A *p)
+void Hresvelgr_UpdateMovingProjectile(struct A *p)
 {
     struct T t = gUnk_0824F77C;
     sub_0824923C(p, t.a[p->idx]);

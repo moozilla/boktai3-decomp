@@ -10,7 +10,7 @@ struct T {
     u32 size;
 };
 u32 sub_08249240(struct T *, u32, u32);
-struct Nd *sub_082224C0(struct T *t, u32 key)
+struct Nd *HashTable_FindNode(struct T *t, u32 key)
 {
     struct Nd **b = t->buckets;
     struct Nd *n;

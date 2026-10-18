@@ -41,7 +41,7 @@ struct S {
     u16 at416;
     u16 at418;
 };
-void sub_080E3790(struct S *obj)
+void Dog_UpdateScriptedAction(struct S *obj)
 {
     if (TakeFlag(((u8 *)obj) + 0x2B1)) {
         void (*fn)(void) = sub_080E04D0;

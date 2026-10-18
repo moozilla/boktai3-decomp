@@ -9,7 +9,7 @@ struct S {
 };
 struct P *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
-void sub_08122D20(struct S *s)
+void SceneScheduledEffect_LoadResource(struct S *s)
 {
     s->q = ScriptProc_Start(0xcb05, 0x1bc7);
     s->p = *s->q;

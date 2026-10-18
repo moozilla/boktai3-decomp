@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0801EF5C(void);
+void SceneObject_UpdateActiveIdle(void);
 void SceneObjects_SetActive(u8 *p, u16 id)
 {
     int i = 0;
@@ -13,7 +13,7 @@ void SceneObjects_SetActive(u8 *p, u16 id)
             u8 *s = *base + 140 * i;
             if (*(u16 *)(s + 0x34) == id) {
                 s[0x37] = one;
-                *(void **)(s + 0x30) = sub_0801EF5C;
+                *(void **)(s + 0x30) = SceneObject_UpdateActiveIdle;
                 s[0x39] = zero;
                 s[0x3a] = zero;
             }

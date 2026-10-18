@@ -1,6 +1,8 @@
 #include "global.h"
+/* Actor_SetAnimationPhase: Requests and saves the supplied phase with special cases for playing sound and clearing control */
+#define Actor_SetAnimationPhase sub_081E4B0C
 extern u8 *gUnk_020003C8;
-u8 *sub_081EA730(s32, s32);
+u8 *Actor_EnsureController(s32, s32);
 struct G {
     u8 f0[0xE2C];
     u16 e2c;
@@ -24,7 +26,7 @@ void sub_081E4B0C(u32 phase)
     struct G *g = (struct G *)gUnk_020003C8;
     u32 three = 3;
     if (g == 0) {
-        g = (struct G *)sub_081EA730(0xBB34, 0);
+        g = (struct G *)Actor_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }

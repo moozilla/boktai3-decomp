@@ -5,7 +5,7 @@ struct P {
     u8 g[0xE];
     u16 b;
 };
-void sub_0819382C(struct P *p)
+void Nidhoggr_SetTerrainCellFlag40(struct P *p)
 {
     p->a |= 0x40;
     p->b = 0x40 | p->b;

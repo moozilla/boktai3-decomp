@@ -1,6 +1,6 @@
 #include "global.h"
-void sub_0811CD24(void *, s32);
-void sub_0810F1FC(u8 *s)
+void CharacterModel_SetAnimationFlags(void *, s32);
+void LinkLobbyPanel_HideSprites(u8 *s)
 {
     s32 i;
     u8 *p;
@@ -14,7 +14,7 @@ void sub_0810F1FC(u8 *s)
     p = s + 0xa30;
     i = 1;
     do {
-        sub_0811CD24(p, 1);
+        CharacterModel_SetAnimationFlags(p, 1);
         p += 0x850;
     } while (--i >= 0);
 }

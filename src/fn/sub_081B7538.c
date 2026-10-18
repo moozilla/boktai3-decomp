@@ -13,7 +13,7 @@ struct A {
     struct E e[1];
 };
 
-void sub_081B7538(u8 *p, s32 i)
+void GrowthHazard_ResetEntryCooldown(u8 *p, s32 i)
 {
     struct E *e = (struct E *)(p + 0x5c + i * 0x118);
     if (e->b == 2) {

@@ -5,7 +5,7 @@ struct S {
     u8 *a;
 };
 extern u8 gUnk_030051A0[];
-void sub_08030908(struct S *p)
+void MessageWindow_ApplyPalette(struct S *p)
 {
     CpuSet(p->a + 0x1f4, gUnk_030051A0, 0x04000008);
 }

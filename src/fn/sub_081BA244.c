@@ -10,7 +10,7 @@ struct Q {
 };
 void Script_Call(u32, s32);
 
-void sub_081BA244(struct Q *p)
+void Registry2388_UpdateScriptDelay(struct Q *p)
 {
     p->cnt++;
     if (p->cnt > 0x3c)

@@ -2,7 +2,7 @@
 
 void SceneActorEffects_ReleaseResources(void);
 
-s32 sub_080DCC8C(void)
+s32 Mummy_OnReleaseResources(void)
 {
     SceneActorEffects_ReleaseResources();
     return 0;

@@ -8,7 +8,7 @@ void ScenePanel_DispatchCommands(struct ScenePanel *owner)
         do {
             struct ScenePanelCommandGlobals *globals = gUnk_0200047C;
             struct ScenePanelCommand *command = receiver->commands[globals->bank][i];
-            sub_08020D54(receiver, command);
+            SceneMessages_SetPendingTrigger(receiver, command);
             switch (command->opcode) {
                 case 0:
                     panel->savedMode = command->mode;

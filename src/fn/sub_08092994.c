@@ -2,7 +2,7 @@
 
 extern u8 gUnk_08605D64[];
 
-void sub_08092994(u8 *p)
+void Bee_InitActionPreset(u8 *p)
 {
     *(u8 **)(p + 0x284) = gUnk_08605D64;
 }

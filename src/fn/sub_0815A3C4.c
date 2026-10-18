@@ -3,7 +3,7 @@
 extern u8 *gUnk_02000710;
 void sub_0813EDDC(u32, void *, s32);
 
-s32 sub_0815A3C4(s32 i, s32 d)
+s32 Player_GetCandidateAttribute(s32 i, s32 d)
 {
     u8 buf[16];
     s32 r;

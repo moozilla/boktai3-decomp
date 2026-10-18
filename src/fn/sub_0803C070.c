@@ -9,7 +9,7 @@ struct P {
     int countdown;
     struct Animation animation;
 };
-int sub_0803C070(struct P *p)
+int ScenePool_UpdateProximityCooldown(struct P *p)
 {
     int alias;
     struct Animation *animation = &p->animation;

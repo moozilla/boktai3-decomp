@@ -21,7 +21,7 @@ struct Collider {
     u8 pad40[4];
     u16 reaction;
 };
-void sub_0802C934(struct Object *p, int health)
+void Actor_SetHealth(struct Object *p, int health)
 {
     p->health = health;
     if (health < 0)

@@ -7,7 +7,7 @@ struct Unk08121848 {
 struct Unk08121848 *sub_08121848(void);
 
 // &p->unk0 == p, but agbcc keeps the null test for the address expression
-u32 *sub_08121890(void)
+u32 *SceneColliderEffect_AllocateSprite(void)
 {
     struct Unk08121848 *p = sub_08121848();
     if (!p)

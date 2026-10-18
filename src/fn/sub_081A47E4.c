@@ -3,17 +3,17 @@ extern void *gUnk_02000240;
 void *Task_Create(s32, s32);
 void Task_SetCallbacks(void *, void *, void *);
 void Task_Kill(void *);
-void sub_081A46B0(void);
-void sub_081A46EC(void);
+void Hresvelgr_UpdateEffects(void);
+void Hresvelgr_DestroyEffectPool(void);
 s32 sub_081A4760(void *);
-void *sub_081A47E4(void)
+void *Hresvelgr_CreateEffectPool(void)
 {
     void *p;
     if (gUnk_02000240 == 0) {
         gUnk_02000240 = Task_Create(8, 0xBDC);
         p = gUnk_02000240;
         if (p != 0) {
-            Task_SetCallbacks(p, sub_081A46B0, sub_081A46EC);
+            Task_SetCallbacks(p, Hresvelgr_UpdateEffects, Hresvelgr_DestroyEffectPool);
             if (sub_081A4760(p) < 0) {
                 Task_Kill(p);
                 return 0;

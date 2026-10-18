@@ -2,7 +2,7 @@
 extern void *gUnk_0200005C;
 u32 AnimData_FindEntry(u32);
 u32 ScriptProc_Start(u32, u32);
-u32 sub_082321E0(u32 *s)
+u32 SceneActorEffects_InitManager(u32 *s)
 {
     gUnk_0200005C = s;
     s[8] = 0;

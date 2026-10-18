@@ -10,7 +10,7 @@ struct P {
     u8 g[2];
     u16 d;
 };
-void sub_08162EB8(struct P *p)
+void GameOver_UpdateLetterSettle(struct P *p)
 {
     p->a += 2;
     p->b -= 3;

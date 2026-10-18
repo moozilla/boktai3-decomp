@@ -71,20 +71,20 @@ struct Actor {
     struct Vec destination;
 };
 extern void *gUnk_02000480;
-struct Actor *sub_0802D6D0(void *, int);
+struct Actor *Actor_FindById(void *, int);
 int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
-int sub_0802FD14(struct Actor *);
-void sub_08225B4C(void *, void *, int, int, int);
-void sub_0821E780(void *, void *, int);
-int sub_0802E468(void)
+int SceneCharacter_GetPathNodeState(struct Actor *);
+void SceneBody_StartRoute(void *, void *, int, int, int);
+void Path_GetPointPosition(void *, void *, int);
+int Actor_BeginScriptControl(void)
 {
     void *m = gUnk_02000480;
     struct Actor *p;
     if (!m)
         return -1;
-    p = sub_0802D6D0(m, Script_GetKeywordValue(0x6e, 0));
+    p = Actor_FindById(m, Script_GetKeywordValue(0x6e, 0));
     if (!p)
         return -1;
     if (Script_SeekToKeyword(0x64)) {
@@ -107,8 +107,8 @@ int sub_0802E468(void)
         p->pathId = Script_GetValue();
         p->pathParamA = Script_GetValue();
         p->pathParamB = Script_GetValue();
-        sub_08225B4C(&p->body, p->path, (u8)p->pathId, (u8)p->pathParamA, (u8)p->pathParamB);
-        sub_0821E780(&p->pos, p->map, p->pathParamB);
+        SceneBody_StartRoute(&p->body, p->path, (u8)p->pathId, (u8)p->pathParamA, (u8)p->pathParamB);
+        Path_GetPointPosition(&p->pos, p->map, p->pathParamB);
     }
     if (Script_SeekToKeyword(0x62)) {
         p->modeA = Script_GetValue();
@@ -128,7 +128,7 @@ int sub_0802E468(void)
         register int state asm("r0");
         int zero;
         if (p->pathId >= 0)
-            state = sub_0802FD14(p);
+            state = SceneCharacter_GetPathNodeState(p);
         else
             state = 6;
         zero = 0;

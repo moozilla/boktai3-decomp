@@ -1,6 +1,6 @@
 #include "global.h"
 
-s32 sub_08108B70(u8 *p)
+s32 LinkHandshake_AdvanceTimeout(u8 *p)
 {
     s32 lim = *(s32 *)(p + 0x18);
     s32 cnt;

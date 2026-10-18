@@ -9,7 +9,7 @@ struct A {
 };
 void sub_0824923C(void *, u32);
 
-void sub_081F0208(struct A *p)
+void SingletonSlot7_DispatchUpdateCallback(struct A *p)
 {
     p->a = 0;
     sub_0824923C(p, gUnk_08613E00[p->i]);

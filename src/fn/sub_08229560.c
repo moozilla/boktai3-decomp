@@ -1,7 +1,7 @@
 #include "global.h"
 #include "libm_compat.h"
 
-double sub_08229560(double arg)
+double Time_CalculateEclipticObliquity(double arg)
 {
     double base, result;
     base = (((arg - 51544.5) + 0.00074074) / 36525.0);

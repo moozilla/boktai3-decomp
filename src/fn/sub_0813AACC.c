@@ -1,5 +1,5 @@
 #include "global.h"
-u8 *sub_0813AACC(u8 *p)
+u8 *SpriteParticle_AllocateSlot(u8 *p)
 {
     s32 i = 0;
     u32 one = 1;

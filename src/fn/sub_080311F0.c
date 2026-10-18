@@ -25,11 +25,11 @@ struct Actor {
     void *script;
 };
 extern struct Actor *gUnk_020000DC;
-void *sub_08227E90(void);
-void sub_08030C84(void *);
-int sub_08030F20(int x, int y, int width, int height);
-int sub_080308D0(struct Actor *, int);
-void sub_08030908(struct Actor *);
+void *Script_GetTextSourcePc(void);
+void MessageWindow_SetMessageTable(void *);
+int MessageWindow_SetBounds(int x, int y, int width, int height);
+int MessageWindow_LoadPalette(struct Actor *, int);
+void MessageWindow_ApplyPalette(struct Actor *);
 int MessageWindow_OpenFromScript(void)
 {
     struct Actor *p = gUnk_020000DC;
@@ -38,25 +38,25 @@ int MessageWindow_OpenFromScript(void)
         return -1;
     state = &p->state;
     if (Script_SeekToKeyword('s')) {
-        void *script = sub_08227E90();
+        void *script = Script_GetTextSourcePc();
         p->script = script;
         if (!script)
             return -1;
-        sub_08030C84(script);
+        MessageWindow_SetMessageTable(script);
     }
     if (Script_SeekToKeyword('r')) {
         int x = Script_GetValue();
         int y = Script_GetValue();
         int width = Script_GetValue();
         int height = Script_GetValue();
-        sub_08030F20(x, y, width, height);
+        MessageWindow_SetBounds(x, y, width, height);
     }
     {
         s32 palette = Script_GetKeywordValue('c', p->palette);
-        if (sub_080308D0(p, palette) < 0)
+        if (MessageWindow_LoadPalette(p, palette) < 0)
             return -1;
     }
-    sub_08030908(p);
+    MessageWindow_ApplyPalette(p);
     p->scriptIndex = Script_GetKeywordValue('i', p->scriptIndex);
     state->spacing = Script_GetKeywordValue('m', state->spacing);
     state->lineWidth = Script_GetKeywordValue('w', (s16)gUnk_02000710->unk12);

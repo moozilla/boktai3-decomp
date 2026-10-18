@@ -5,7 +5,7 @@ static inline u8 gt(s32 x)
         return 1;
     return 0;
 }
-u32 sub_0822CE44(s32 x)
+u32 Inventory_IsKeyItemId(s32 x)
 {
     return gt(x);
 }

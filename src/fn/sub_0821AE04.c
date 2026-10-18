@@ -13,7 +13,7 @@ static inline u32 read_word(u8 *p)
 {
     return (p[3] << 24) | (p[2] << 16) | (p[1] << 8) | p[0];
 }
-s32 sub_0821AE04(u8 *p)
+s32 Script_LoadScript(u8 *p)
 {
     u32 count;
     struct ScriptContext *ctx = &gUnk_02000438;

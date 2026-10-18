@@ -6,7 +6,7 @@ struct S {
     s32 b;
 };
 extern struct S *gUnk_020004B8;
-s32 sub_0811115C(void)
+s32 SceneTilemap_GetScrollDelta(void)
 {
     struct S *s = gUnk_020004B8;
     if (!s)

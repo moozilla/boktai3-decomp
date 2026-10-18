@@ -1,5 +1,7 @@
 // COMPILER: old_agbcc
 #include "global.h"
+/* Player_GetBasePosition: Returns the position block at offset 0x24 for the indexed player */
+#define Player_GetBasePosition sub_0815F578
 
 extern u8 *gUnk_02000580[];
 

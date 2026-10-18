@@ -6,11 +6,11 @@ struct Panel {
     u8 pad33[9];
     u8 values[7];
 };
-struct Panel *sub_08037DC0(void);
+struct Panel *WirelessExchange_Get(void);
 void Sound_PlaySong(int);
-int sub_08039774(void)
+int WirelessGame_ToggleItemMode(void)
 {
-    struct Panel *p = sub_08037DC0();
+    struct Panel *p = WirelessExchange_Get();
     asm("" : "+r"(p));
     if (p && p->enabled) {
         u8 *v = p->values;

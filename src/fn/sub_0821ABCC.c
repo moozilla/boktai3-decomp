@@ -1,8 +1,8 @@
 #include "global.h"
-void sub_0821A894(void);
-void sub_0821A930(void);
-void sub_0821ABCC(void)
+void Script_ResetArgumentStack(void);
+void Script_ResetKeywordStack(void);
+void Script_ResetStacks(void)
 {
-    sub_0821A894();
-    sub_0821A930();
+    Script_ResetArgumentStack();
+    Script_ResetKeywordStack();
 }

@@ -5,15 +5,15 @@ void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 sub_08016F24(u8 *);
 void Task_Kill(u8 *);
 void FloatingEffectManager_Update(void);
-void sub_08016EFC(void);
-u8 *sub_08016FE0(void)
+void FloatingEffectManager_Destroy(void);
+u8 *FloatingEffectManager_Create(void)
 {
     u8 *r;
     if (gUnk_02000078 != 0)
         return gUnk_02000078;
     r = Task_Create(9, 0x45c);
     if (r) {
-        Task_SetCallbacks(r, FloatingEffectManager_Update, sub_08016EFC);
+        Task_SetCallbacks(r, FloatingEffectManager_Update, FloatingEffectManager_Destroy);
         if (sub_08016F24(r) < 0) {
             Task_Kill(r);
             return 0;

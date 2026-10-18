@@ -1,15 +1,15 @@
 #include "global.h"
 
 void sub_0810BB0C(void);
-void sub_080369BC(void);
+void Wireless_UpdateController(void);
 void sub_08219B24(void);
-void sub_0821A308(void);
+void MessageQueue_SwapBuffers(void);
 
-s32 sub_08219A94(void)
+s32 TaskSystem_UpdateRoot(void)
 {
     sub_0810BB0C();
-    sub_080369BC();
+    Wireless_UpdateController();
     sub_08219B24();
-    sub_0821A308();
+    MessageQueue_SwapBuffers();
     return 0;
 }

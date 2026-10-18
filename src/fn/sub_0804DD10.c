@@ -1,6 +1,6 @@
 #include "staged_effect.h"
 void Sprite_Remove(struct StagedEffectSprite *);
-void sub_08020D08(void *);
+void SceneMessages_UnregisterReceiver(void *);
 s32 StagedEffect_Destroy(struct StagedEffect *effect)
 {
     struct StagedEffectSprite *sprite = effect->sprites;
@@ -11,6 +11,6 @@ s32 StagedEffect_Destroy(struct StagedEffect *effect)
         i--;
     } while (i >= 0);
     if (effect->hasScript)
-        sub_08020D08((u8 *)effect + 0x18);
+        SceneMessages_UnregisterReceiver((u8 *)effect + 0x18);
     return 0;
 }

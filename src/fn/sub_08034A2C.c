@@ -40,15 +40,15 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-void sub_080345D8(u8);
-void sub_080349F0(void);
-int sub_082235C0(void *, void *);
-int sub_08034A2C(struct Engine *p)
+void WirelessController_OnLinkEvent(u8);
+void WirelessController_OnReceiveRequest(void);
+int RfuManager_Init(void *, void *);
+int WirelessController_InitLinkCallbacks(struct Engine *p)
 {
     if (p->pending)
         p->pending = 0;
     {
-        int status = (u8)sub_082235C0(sub_080345D8, sub_080349F0);
+        int status = (u8)RfuManager_Init(WirelessController_OnLinkEvent, WirelessController_OnReceiveRequest);
         if (status)
             setOperation(p, 27, 0);
         else {

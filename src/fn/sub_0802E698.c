@@ -70,18 +70,18 @@ struct Actor {
     struct Vec destination;
 };
 extern void *gUnk_02000480;
-struct Actor *sub_0802D6D0(void *, int);
+struct Actor *Actor_FindById(void *, int);
 int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
-int sub_0802FD14(struct Actor *);
-void sub_08225B4C(void *, void *, int, int, int);
-void sub_0821E780(void *, void *, int);
-void sub_0802D8EC(struct Actor *);
-int sub_0802E698(void *unused, struct Actor *p)
+int SceneCharacter_GetPathNodeState(struct Actor *);
+void SceneBody_StartRoute(void *, void *, int, int, int);
+void Path_GetPointPosition(void *, void *, int);
+void Actor_RegisterMotion(struct Actor *);
+int Actor_InitBehaviorFromScript(void *unused, struct Actor *p)
 {
     if (Script_GetKeywordValue(0x43, 1))
-        sub_0802D8EC(p);
+        Actor_RegisterMotion(p);
     {
         u8 angle = p->angle;
         p->savedAngle = angle;
@@ -91,8 +91,8 @@ int sub_0802E698(void *unused, struct Actor *p)
         p->pathId = Script_GetValue();
         p->pathParamA = Script_GetValue();
         p->pathParamB = Script_GetValue();
-        sub_08225B4C(&p->body, p->path, (u8)p->pathId, (u8)p->pathParamA, (u8)p->pathParamB);
-        sub_0821E780(&p->pos, p->map, p->pathParamB);
+        SceneBody_StartRoute(&p->body, p->path, (u8)p->pathId, (u8)p->pathParamA, (u8)p->pathParamB);
+        Path_GetPointPosition(&p->pos, p->map, p->pathParamB);
     } else
         p->pathId = -1;
     if (Script_SeekToKeyword(0x68)) {

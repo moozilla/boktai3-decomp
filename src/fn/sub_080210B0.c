@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-void sub_08003AA8(int, int, void *);
+void ColorFade_QueueCommand(int, int, void *);
 void SceneCommands_FadePalette(void *p, void *unused, u8 *message)
 {
     s16 *args = (s16 *)(message + 8);
@@ -42,5 +42,5 @@ void SceneCommands_FadePalette(void *p, void *unused, u8 *message)
         if (!enabled)
             mode = 1;
     }
-    sub_08003AA8(mode, 7, out);
+    ColorFade_QueueCommand(mode, 7, out);
 }

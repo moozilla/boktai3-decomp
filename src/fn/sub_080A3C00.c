@@ -27,7 +27,7 @@ zero:
 }
 
 extern u8 *gUnk_02000580;
-void sub_080A3C00(u8 *s)
+void Spider_ClearGroupFlag(u8 *s)
 {
     if (blocked2048(s) == 0 && *(s8 *)(gUnk_02000580 + 0x4F3) < 0) {
         u8 *q = *(u8 **)(s + 0x3D0);

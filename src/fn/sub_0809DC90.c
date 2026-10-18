@@ -1,19 +1,19 @@
 #include "global.h"
 
-u32 sub_0809D550(u8 *);
+u32 Lun_UpdateMovement(u8 *);
 void sub_0824923C(u8 *, u32);
-void sub_0807FC5C(u8 *);
-void sub_0809D568(u8 *);
+void SceneActorControl_DispatchControl(u8 *);
+void Lun_UpdateTerrainBounce(u8 *);
 
-u32 sub_0809DC90(u8 *p)
+u32 Lun_OnUpdate(u8 *p)
 {
     u32 i;
     u32 *t;
-    sub_0809D550(p);
+    Lun_UpdateMovement(p);
     i = p[0x2a8];
     t = *(u32 **)(p + 0x27c);
     sub_0824923C(p, t[i]);
-    sub_0807FC5C(p);
-    sub_0809D568(p);
+    SceneActorControl_DispatchControl(p);
+    Lun_UpdateTerrainBounce(p);
     return 1;
 }

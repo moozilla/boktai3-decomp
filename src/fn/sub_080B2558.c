@@ -7,7 +7,7 @@ struct P {
     u32 c;
 };
 
-void sub_080B2558(struct P *p)
+void Vorn_InitMotionLimits(struct P *p)
 {
     p->a = 0;
     p->b = 0x10000;

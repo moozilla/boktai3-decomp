@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
-s32 sub_0803D9D8(struct ScenePoolEntry *);
+s32 ScenePool_SelectStateAtPositionLimit(struct ScenePoolEntry *);
 s32 ScenePool_ResumeAfterIdle(void *, struct ScenePoolEntry *);
 void ScenePool_UpdateSpeedPulse(struct ScenePoolActor *, struct ScenePoolEntry *,
                                 const struct ScenePoolSpeedBounds *);
@@ -35,7 +35,7 @@ s32 ScenePool_StateTrackFast(void *manager, struct ScenePoolActor *actor,
         entry->speedControlActive = 0;
         entry->turnStep = 0x200;
     }
-    if (sub_0803D9D8(entry))
+    if (ScenePool_SelectStateAtPositionLimit(entry))
         goto done;
     if (ScenePool_ResumeAfterIdle(actor, entry))
         goto done;

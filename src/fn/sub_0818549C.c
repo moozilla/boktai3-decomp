@@ -1,6 +1,6 @@
 #include "global.h"
-void sub_081852F4(s32, s32, s32);
-void sub_0818549C(s32 a)
+void ActorController_UpdateTargetMovement(s32, s32, s32);
+void ActorController_UpdateModeZeroMovement(s32 a)
 {
-    sub_081852F4(a, 0, 0);
+    ActorController_UpdateTargetMovement(a, 0, 0);
 }

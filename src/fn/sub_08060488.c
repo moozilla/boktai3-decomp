@@ -4,7 +4,7 @@ void SceneInventory_RefreshConsumableValue(struct SceneInventoryActionView *pane
     struct SceneInputPosition position;
     s32 kind, value, label;
     if (panel->selection <= 15) {
-        kind = sub_0822E104(panel->selection);
+        kind = Inventory_GetConsumableId(panel->selection);
         if (kind < 0)
             goto hidden;
         value = SceneItemValue_CalculateConsumable(panel->selection);

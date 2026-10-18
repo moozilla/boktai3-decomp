@@ -1,5 +1,5 @@
 #include "global.h"
-s32 sub_0815F76C(void)
+s32 TargetRegistry_Update(void)
 {
     return 0;
 }

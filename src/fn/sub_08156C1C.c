@@ -8,7 +8,7 @@ struct P08156C1C {
 };
 s32 sub_08156BBC(void *);
 
-void sub_08156C1C(struct P08156C1C *p)
+void Player_UpdateDirectionHistory(struct P08156C1C *p)
 {
     s32 i;
     s32 r;

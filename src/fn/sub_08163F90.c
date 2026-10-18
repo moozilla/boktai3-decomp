@@ -1,6 +1,6 @@
 #include "global.h"
 
-s32 sub_08163F90(s32 a, s32 b)
+s32 Hud_GetStyleTileIndex(s32 a, s32 b)
 {
     s32 r = 0x11;
     if (b != 0) {

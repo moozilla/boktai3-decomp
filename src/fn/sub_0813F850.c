@@ -8,11 +8,11 @@ struct P0813F850 {
     u8 f33F[0xBF5 - 0x33F];
     u8 fBF5;
 };
-s32 sub_0813F808(void *);
+s32 Player_CanAffordEnchantment(void *);
 
-s32 sub_0813F850(struct P0813F850 *p)
+s32 Player_GetUsableEnchantment(struct P0813F850 *p)
 {
-    if (p->f33E != 0 && sub_0813F808(p) != 0 && (u8)(p->fBF5 - 3) > 1)
+    if (p->f33E != 0 && Player_CanAffordEnchantment(p) != 0 && (u8)(p->fBF5 - 3) > 1)
         return p->f33C;
     return -1;
 }

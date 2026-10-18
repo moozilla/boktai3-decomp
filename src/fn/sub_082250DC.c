@@ -1,10 +1,10 @@
 #include "global.h"
 
-void sub_0821A218(u32);
+void ResourceRegistry_ClearEntries(u32);
 void sub_08217298(void);
 
-void sub_082250DC(void)
+void SceneLifecycle_ReleaseSceneResources(void)
 {
-    sub_0821A218(0);
+    ResourceRegistry_ClearEntries(0);
     sub_08217298();
 }

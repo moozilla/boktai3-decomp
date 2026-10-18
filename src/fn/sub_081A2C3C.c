@@ -5,16 +5,16 @@ struct E {
 extern s32 gUnk_020005AC;
 void SceneActors_Destroy(void);
 void Anim_Remove(void *);
-void sub_08013B74(void *);
+void ScaledShadow_Destroy(void *);
 void Collider_Remove(void *);
-s32 sub_081A2C3C(u8 *p)
+s32 Hresvelgr_Destroy(u8 *p)
 {
     struct E *e;
     s32 i;
     s32 z;
     SceneActors_Destroy();
     Anim_Remove(p + 0x194);
-    sub_08013B74(p + 0x3b4);
+    ScaledShadow_Destroy(p + 0x3b4);
     e = (struct E *)(p + 0x248);
     i = 1;
     do {

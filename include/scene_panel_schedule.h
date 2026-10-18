@@ -18,12 +18,12 @@ struct ScenePanelScheduleView {
 };
 void *AnimatedHazard_Create(const void *, s32, s32);
 void sub_081A376C(const void *, u32, u32, u32);
-void *sub_081A3710(u16, u32, u32);
+void *Hresvelgr_CreateShotPool(u16, u32, u32);
 void *sub_0819AD94(u16, const void *);
-void *sub_08190704(u16, s32);
+void *ScenePanelEffect_Create(u16, s32);
 void *sub_0819AA8C(u16, const void *);
-void sub_0819AAD8(void *);
-void sub_0819ADF4(void *);
+void SceneBurstEmitter_RequestCleanup(void *);
+void SceneOrbitHazard_Activate(void *);
 void sub_08190B10(void *, const void *, const void *);
 extern const u8 gUnk_0824DEA4[];
 void ScenePanel_TickHazardSpawner(struct ScenePanel *);

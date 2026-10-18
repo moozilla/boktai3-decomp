@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08138184(u8 *p)
+void Registry1745_ClearParticipantCounters(u8 *p)
 {
     u16 *h;
     s32 n;

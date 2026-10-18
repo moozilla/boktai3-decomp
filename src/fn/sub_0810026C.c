@@ -1,17 +1,17 @@
 #include "global.h"
 
 s32 Script_GetKeywordValue(s32, s32);
-u8 *sub_080FF820(void);
-void sub_080FF78C(u8 *, s32);
-void sub_080FF79C(u8 *, s32);
+u8 *WoodenCrate_FindByName(void);
+void WoodenCrate_SetFlags(u8 *, s32);
+void WoodenCrate_ClearFlags(u8 *, s32);
 
-void sub_0810026C(void)
+void WoodenCrate_StartBreakFromScript(void)
 {
     if (Script_GetKeywordValue(0x6e, 0) != 0) {
-        u8 *p = sub_080FF820();
+        u8 *p = WoodenCrate_FindByName();
         if (p != 0) {
-            sub_080FF78C(p, 0x18);
-            sub_080FF79C(p, 4);
+            WoodenCrate_SetFlags(p, 0x18);
+            WoodenCrate_ClearFlags(p, 4);
         }
     }
 }

@@ -1,6 +1,6 @@
 #include "global.h"
 
-u32 sub_081D929C(u8 *p)
+u32 Projectile_UpdateSecondaryExpiry(u8 *p)
 {
     u32 two = 2;
     *(u32 *)(p + 4) |= two;

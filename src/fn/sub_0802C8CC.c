@@ -24,7 +24,7 @@ struct Collider {
     u8 pad40[4];
     u16 reaction;
 };
-void sub_0802C8CC(struct Object *p, int angle)
+void Actor_SetFacingAngle(struct Object *p, int angle)
 {
     p->angle = angle;
     {

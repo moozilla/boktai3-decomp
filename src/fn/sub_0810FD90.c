@@ -1,8 +1,8 @@
 #include "global.h"
 
-void sub_0811CD24(u8 *, u32);
+void CharacterModel_SetAnimationFlags(u8 *, u32);
 
-void sub_0810FD90(u8 *p)
+void LinkScorePanel_HideSprites(u8 *p)
 {
     u32 flag = 1;
     u8 *q = p + 0x2C;
@@ -12,5 +12,5 @@ void sub_0810FD90(u8 *p)
         *(u32 *)q |= flag;
         q += 0x60;
     }
-    sub_0811CD24(p + 0xD8C, 1);
+    CharacterModel_SetAnimationFlags(p + 0xD8C, 1);
 }

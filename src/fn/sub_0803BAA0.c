@@ -10,7 +10,7 @@ struct P {
     u8 pad2[0x40];
     u32 count;
 };
-struct Slot *sub_0803BAA0(struct P *p)
+struct Slot *ScenePool_FindFreeActorSlot(struct P *p)
 {
     struct Slot *slot = p->slots;
     u32 i = 0;
@@ -31,7 +31,7 @@ struct Slot *sub_0803BAA0(struct P *p)
     return 0;
 }
 void sub_0811BD30(void *, void *);
-void sub_0803BAE4(u8 *p)
+void ScenePool_UpdateActorDrawablePosition(u8 *p)
 {
     sub_0811BD30(p, p + 0x600);
 }
@@ -44,7 +44,7 @@ struct Tail {
     u8 pad[0x860];
     struct TailData data;
 };
-void sub_0803BAF4(struct Tail *p)
+void ScenePool_ResetProximityContact(struct Tail *p)
 {
     struct TailData *data = &p->data;
     data->flag = 0;

@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_081DC178(u8 *p, u8 *s)
+void Menu_SetTextRect(u8 *p, u8 *s)
 {
     *(u16 *)(p + 0x20) = *(u16 *)(s + 0);
     *(u16 *)(p + 0x22) = *(u16 *)(s + 2);

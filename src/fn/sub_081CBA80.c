@@ -3,7 +3,7 @@
 s32 Mod(s32, s32);
 void sub_08221110(void *dst, void *from, void *to, s32 t, s32 shift);
 /* Copy the 0x680 palette bank in, then pulse between it and the 0x2DE0 bank. */
-void sub_081CBA80(u8 *a, u8 *b)
+void SceneCharacter_UpdateAlternatePalettePulse(u8 *a, u8 *b)
 {
     s32 t;
     if (b[9]) {

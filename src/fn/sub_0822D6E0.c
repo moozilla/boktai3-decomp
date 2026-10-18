@@ -1,6 +1,6 @@
 #include "global.h"
-u8 *sub_0822D6C8(void);
-u8 sub_0822D6E0(void)
+u8 *Inventory_GetEquipmentEntry(void);
+u8 Inventory_GetEquipmentId(void)
 {
-    return *sub_0822D6C8();
+    return *Inventory_GetEquipmentEntry();
 }

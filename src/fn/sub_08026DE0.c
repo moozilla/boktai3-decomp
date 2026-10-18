@@ -68,7 +68,7 @@ static inline void decay(s16 *p)
     *dst = next;
 }
 void SceneActorGraphics_SelectResource(void *);
-void sub_08026DE0(ActorAnimation *p)
+void SceneActors_UpdateShrinkingReaction(ActorAnimation *p)
 {
     ActorAnimation *p2 = p;
     u32 zero;

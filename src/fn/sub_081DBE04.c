@@ -6,15 +6,15 @@ void *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void ResourceHeader_Relocate(u8 *, void *);
 void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
-void sub_081DC1B4(u32);
+void Menu_StartFadeIn(u32);
 void sub_081E0818(u8 *);
 extern u32 gUnk_020002E8[];
-void sub_080311B0(u32);
-void sub_08030C84(u32);
-void sub_08030DBC(u32);
-void sub_08030F20(u32, u32, u32, u32);
-void sub_08030B78(u32);
-u32 sub_081DBE04(u8 *s)
+void MessageWindow_SetPalette(u32);
+void MessageWindow_SetMessageTable(u32);
+void MessageWindow_ShowMessage(u32);
+void MessageWindow_SetBounds(u32, u32, u32, u32);
+void MessageWindow_SetDisplayMode(u32);
+u32 ScreenParams2E8_InitScreen(u8 *s)
 {
     u32 zero, one, value;
     void *a, *p, *resource;
@@ -46,18 +46,18 @@ u32 sub_081DBE04(u8 *s)
     sub_0821983C(s + 0x154, obj3, 0x2A, 0x10, zero, zero, zero, zero);
     *(u32 *)(s + 0xD4) &= ~1;
     *(u32 *)(s + 0x15C) |= one;
-    sub_080311B0(0xC486);
+    MessageWindow_SetPalette(0xC486);
     global = gUnk_020002E8;
-    sub_08030C84(global[0]);
-    sub_08030DBC(0);
-    sub_08030F20(2, 3, 0x20, 6);
-    sub_08030B78(1);
+    MessageWindow_SetMessageTable(global[0]);
+    MessageWindow_ShowMessage(0);
+    MessageWindow_SetBounds(2, 3, 0x20, 6);
+    MessageWindow_SetDisplayMode(1);
     *(u32 *)(s + 0x28) = one;
     *(u32 *)(s + 0x24) = one;
     if (global[3] == 1)
         *(u32 *)(s + 0x40) = 3;
     else
         *(u32 *)(s + 0x40) = zero;
-    sub_081DC1B4(*(u32 *)(s + 0x40));
+    Menu_StartFadeIn(*(u32 *)(s + 0x40));
     return *(u32 *)(s + 0x40) = 0;
 }

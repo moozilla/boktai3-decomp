@@ -1,4 +1,6 @@
 #include "global.h"
+/* Math_BlendWithTableFactor: Blends endpoints using a capped table index and returns the target for a zero table entry */
+#define Math_BlendWithTableFactor sub_0819B010
 
 extern const s16 gUnk_08611D24[];
 

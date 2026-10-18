@@ -1,5 +1,5 @@
 #include "global.h"
-u32 sub_0801B54C(u8 *p)
+u32 ResultMenu_IsPhaseStart(u8 *p)
 {
     u32 r;
     u8 *q = p + 0x38;

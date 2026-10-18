@@ -2,7 +2,7 @@
 #include "tether_actor.h"
 #include "game_state.h"
 u32 TetherActor_RequestKindNineAction(u32, u32);
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 static inline u8 flaggedCellHandlingEnabled(void)
@@ -26,7 +26,7 @@ void TetherActor_HandleFlaggedCell(struct TetherActor *actor)
     } else {
         cell = gUnk_030052F4->rows[z] + x;
     }
-    properties = sub_0821D64C(cell, 1);
+    properties = TerrainModifiers_FindCellOverride(cell, 1);
     if (properties) {
         properties += 4;
     } else {

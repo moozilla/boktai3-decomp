@@ -23,14 +23,14 @@ typedef struct State {
 extern const s16 gUnk_086149C4[];
 void sub_08238B48(u32, u32 *, u32 *);
 void Anim_SetSequence(void *, void *, s32, u8, u8);
-void sub_08238B88(State *);
+void Player_ShowDirectionalEffect(State *);
 static inline s32 scale(s32 v)
 {
     if (v >= 0)
         return v >> 12;
     return -((-v) >> 12);
 }
-void sub_08238BC8(State *s, u32 mode, Point *pos)
+void Player_StartDirectionalEffect(State *s, u32 mode, Point *pos)
 {
     Sprite *sprite = &s->sprite;
     s32 angle;
@@ -44,5 +44,5 @@ void sub_08238BC8(State *s, u32 mode, Point *pos)
     s->dy = scale(10 * gUnk_086149C4[angle & 255]);
     sub_08238B48(mode, &a, &b);
     Anim_SetSequence(s->animation, s->resource, 0, a, b);
-    sub_08238B88(s);
+    Player_ShowDirectionalEffect(s);
 }

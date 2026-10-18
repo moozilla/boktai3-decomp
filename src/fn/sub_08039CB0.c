@@ -39,10 +39,10 @@ struct Owner {
 };
 extern const u16 gUnk_0824DE7C[], gUnk_0824DE8C[];
 void Anim_LoadKeyframe(void *, void *, int, int);
-void sub_08039920(void *, int, int);
+void WirelessGameItem_SetRandomArcVelocity(void *, int, int);
 void sub_082216F8(void *, void *, void *, int, int);
-void sub_08039998(void *, int, int);
-void sub_08039CB0(struct Owner *owner, struct Item *p, int indexArg)
+void WirelessGameItems_ApplyMotionWave(void *, int, int);
+void WirelessGameItems_UpdateItemMerge(struct Owner *owner, struct Item *p, int indexArg)
 {
     int index = indexArg;
     struct Sprite *sprite = &p->sprite;
@@ -72,10 +72,10 @@ void sub_08039CB0(struct Owner *owner, struct Item *p, int indexArg)
             end->y = y;
             end->z = 0;
         }
-        sub_08039920(p, 32, 15);
+        WirelessGameItem_SetRandomArcVelocity(p, 32, 15);
     }
     sub_082216F8(&drawing->x, &p->start, &p->end, p->timer, 5);
-    sub_08039998(&drawing->x, p->timer, p->velocity);
+    WirelessGameItems_ApplyMotionWave(&drawing->x, p->timer, p->velocity);
     *(struct Pair *)&sprite->x = *(struct Pair *)&drawing->x;
     if (p->timer > 31) {
         int offset = (index & ~4) * 0xb0 + 0x5c;

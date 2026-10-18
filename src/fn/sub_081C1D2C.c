@@ -1,8 +1,8 @@
 #include "global.h"
-void sub_081C1A58(void *);
-void sub_081C1CEC(void *);
-void sub_081C1D2C(void *p)
+void ControlPanel_ShowValueDisplay(void *);
+void ControlPanel_ShowInputGauge(void *);
+void ControlPanel_ShowInteractionDisplay(void *p)
 {
-    sub_081C1A58(p);
-    sub_081C1CEC(p);
+    ControlPanel_ShowValueDisplay(p);
+    ControlPanel_ShowInputGauge(p);
 }

@@ -1,4 +1,6 @@
 #include "global.h"
+/* TentacleBody_UpdateAnimationEleven: Starts directional animation 11 on state entry and completes when the ready flag is set */
+#define TentacleBody_UpdateAnimationEleven sub_080A6294
 
 void SceneActorAnimation_SelectDirectionalEntry(u8 *, u32);
 

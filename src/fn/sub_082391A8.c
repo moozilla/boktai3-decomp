@@ -38,7 +38,7 @@ static inline s32 scale(s32 v)
         return v >> 12;
     return -((-v) >> 12);
 }
-void sub_082391A8(State *s)
+void Player_UpdateConvergingParticles(State *s)
 {
     s32 count, i;
     if (!s->active)

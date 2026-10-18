@@ -2,7 +2,7 @@
 
 extern u32 *gEventBytecodePtrs[];
 
-u32 sub_08224EBC(u32 a, u32 b, u32 c)
+u32 SceneMessages_GetEventMessage(u32 a, u32 b, u32 c)
 {
     u32 *t = gEventBytecodePtrs[a];
     if (t != 0) {

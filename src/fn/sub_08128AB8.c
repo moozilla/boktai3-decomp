@@ -10,7 +10,7 @@ extern struct S *gUnk_02000170;
 void AnimData_Load(u8 *, u32);
 u32 ScriptProc_Start(u32, u32);
 
-s32 sub_08128AB8(struct S *s)
+s32 FragmentBurst_InitPool(struct S *s)
 {
     AnimData_Load(s->a, 0x0000D45E);
     s->b = ScriptProc_Start(0x0000922E, 0x00001DC3);

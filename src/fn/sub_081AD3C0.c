@@ -7,7 +7,7 @@ struct A {
 };
 void SceneActors_RunStateCallback(void *);
 
-void sub_081AD3C0(struct A *p)
+void Vanargand_UpdateStateCallback(struct A *p)
 {
     u32 m;
     p->a = 0;

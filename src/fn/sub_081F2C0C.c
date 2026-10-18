@@ -10,7 +10,7 @@ static inline void setFields(u8 *p, u32 bit)
     p[7] = bit;
     *(u32 *)p |= bit;
 }
-void sub_081F2C0C(u8 *sprite, u8 *resource, struct Pair *pos, s32 frame)
+void SingletonSlot7_InitImpactSprite(u8 *sprite, u8 *resource, struct Pair *pos, s32 frame)
 {
     AnimData_Load(resource, 0x8639);
     Sprite_Init(sprite, resource, 0x210);

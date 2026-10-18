@@ -3,7 +3,7 @@
 void Bg_ClearTilemap(u32);
 void Script_Call(u32, u32);
 
-void sub_08109584(u8 *p)
+void LinkConnectionMenu_RunExitScript(u8 *p)
 {
     u32 v;
 

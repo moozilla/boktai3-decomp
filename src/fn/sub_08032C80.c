@@ -12,13 +12,13 @@ struct TextState {
 };
 void TextState_SetBounds(struct TextState *, int, int, int, int);
 void TextState_Reset(struct TextState *);
-void sub_08032C6C(struct TextState *);
-void sub_08032C80(struct TextState *p, int x, int y, int w, int h)
+void TextState_ResetPlaybackMode(struct TextState *);
+void TextState_Init(struct TextState *p, int x, int y, int w, int h)
 {
     int zero;
     TextState_SetBounds(p, x, y, w, h);
     TextState_Reset(p);
-    sub_08032C6C(p);
+    TextState_ResetPlaybackMode(p);
     zero = 0;
     p->skip = zero;
     p->busy = zero;

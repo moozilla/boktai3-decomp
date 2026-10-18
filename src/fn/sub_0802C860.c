@@ -18,20 +18,20 @@ struct Manager {
 };
 extern struct Manager *gUnk_020000D8;
 extern u8 *gUnk_02000580[4];
-int sub_0802C6C8(struct Manager *, struct Object *);
+int ActorPool_UnlinkObject(struct Manager *, struct Object *);
 void Heap_Free(void *);
-void sub_0802C710(struct Manager *);
-struct Manager *sub_0802C678(void);
-struct Manager *sub_0802C818(void);
+void ActorPool_RefreshTargets(struct Manager *);
+struct Manager *ActorPool_GetManager(void);
+struct Manager *ActorPool_CreateManager(void);
 void *Heap_Alloc(int);
 void Memory_Clear(void *, int);
-int sub_0802C684(struct Manager *, struct Object *);
-void *sub_0802C860(int size)
+int ActorPool_LinkObject(struct Manager *, struct Object *);
+void *ActorPool_AllocObject(int size)
 {
-    struct Manager *m = sub_0802C678();
+    struct Manager *m = ActorPool_GetManager();
     struct Object *p;
     if (!m) {
-        m = sub_0802C818();
+        m = ActorPool_CreateManager();
         if (!m)
             return 0;
     }
@@ -39,6 +39,6 @@ void *sub_0802C860(int size)
     if (!p)
         return 0;
     Memory_Clear(p, size);
-    sub_0802C684(m, p);
+    ActorPool_LinkObject(m, p);
     return p;
 }

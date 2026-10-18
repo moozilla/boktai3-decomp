@@ -6,7 +6,7 @@ struct A {
     u32 b;
 };
 
-void sub_081B984C(struct A *p, u32 v)
+void Registry2388_SetUpdate(struct A *p, u32 v)
 {
     p->a = v;
     p->b = 0;

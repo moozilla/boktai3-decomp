@@ -11,26 +11,26 @@ typedef struct {
     void *tiles;
 } Manager;
 
-Manager *sub_080195DC(void);
-Channel *sub_080197F8(Manager *);
-Channel *sub_08019818(Manager *, int);
+Manager *TileAnimation_GetTask(void);
+Channel *TileAnimation_FindFreeChannel(Manager *);
+Channel *TileAnimation_FindChannel(Manager *, int);
 int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetPc(void);
 int Script_GetValue(int);
 void TileAnimation_Configure(void)
 {
-    Manager *p = sub_080195DC();
+    Manager *p = TileAnimation_GetTask();
     Channel *q;
     int i, v;
     u16 *out;
     if (!p)
         return;
-    q = sub_080197F8(p);
+    q = TileAnimation_FindFreeChannel(p);
     if (!q)
         return;
     q->id = Script_GetKeywordValue('c', 0);
-    if (q->id && sub_08019818(p, q->id))
+    if (q->id && TileAnimation_FindChannel(p, q->id))
         return;
     q->count = Script_GetKeywordValue('s', 1);
     q->frame = Script_GetKeywordValue('S', 0);

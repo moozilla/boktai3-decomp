@@ -15,14 +15,14 @@ void ScenePanel_AdvanceSubjectDeparture(struct ScenePanel *input)
                 ScenePanelSubject_SetState((void *)subject, 5);
         }
         ScenePanel_SetState((void *)panel, ScenePanel_BeginLongSequence);
-        sub_0822B058(4);
+        Sound_FadeOutChannel10(4);
     } else if (frame == 90) {
-        sub_08226508(16);
+        Camera_FollowPlayerWithoutCompletion(16);
         PlayerCue_Motion7End(SCENE_PANEL_PLAYER, 0);
     } else if (frame > 105) {
         struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
         if (!player->tetherMode) {
-            sub_0815C99C(player);
+            PlayerCue_ReleaseControl(player);
             ScenePanel_SetEffectState((void *)panel, 3);
             panel->allSubjectsNotified = 0;
             ScenePanel_CallPendingScript((void *)panel, 2);

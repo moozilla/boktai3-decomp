@@ -1,6 +1,6 @@
 #include "global.h"
 extern s32 gUnk_02000484;
-s32 sub_08034090(void)
+s32 WirelessController_IsCreated(void)
 {
     if (gUnk_02000484)
         return 1;

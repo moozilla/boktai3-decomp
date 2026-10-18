@@ -28,7 +28,7 @@ static inline void action(struct S *p, int mode, int zero, int id)
     p->c4 = zero;
     p->b0 = 1;
 }
-void sub_0802B180(struct S *p)
+void GridAttack_UpdateAnimationFourteen(struct S *p)
 {
     if (chk(p)) {
         u32 k = 14;

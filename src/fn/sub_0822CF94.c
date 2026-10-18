@@ -1,13 +1,13 @@
 #include "global.h"
-s32 sub_0822CE44(void);
-s32 sub_0822CF6C(s32);
-s32 sub_0822CF44(s32);
-s32 sub_0822CF94(s32 a)
+s32 Inventory_IsKeyItemId(void);
+s32 Inventory_RemoveValuable(s32);
+s32 Inventory_RemoveConsumable(s32);
+s32 Inventory_RemoveItem(s32 a)
 {
     s32 r;
-    if (sub_0822CE44())
-        r = sub_0822CF6C(a);
+    if (Inventory_IsKeyItemId())
+        r = Inventory_RemoveValuable(a);
     else
-        r = sub_0822CF44(a);
+        r = Inventory_RemoveConsumable(a);
     return r;
 }

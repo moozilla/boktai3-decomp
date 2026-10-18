@@ -13,29 +13,29 @@ struct P {
 extern u32 gUnk_02000560;
 extern void *gUnk_02000580;
 void PaletteLevels_Reset(void);
-void sub_08038094(struct P *);
-int sub_08037FB4(struct P *, int, const u32 *, int);
-void sub_08038128(struct P *, int);
-void sub_0822B058(int);
+void WirelessExchange_CaptureLocalResult(struct P *);
+int WirelessExchange_SendPacket(struct P *, int, const u32 *, int);
+void WirelessGameMenu_SetStatusPanelState(struct P *, int);
+void Sound_FadeOutChannel10(int);
 void PlayerCue_Stand(void *, int);
 static inline u32 test(u32 *flags, u32 mask)
 {
     return *flags & mask;
 }
-void sub_08038CDC(struct P *p)
+void WirelessGameMenu_UpdateRoundResultExchange(struct P *p)
 {
     u32 data;
     if (p->entered) {
         p->entered = 0;
         PaletteLevels_Reset();
-        sub_08038094(p);
+        WirelessExchange_CaptureLocalResult(p);
         {
             struct Entry *e = &p->entry;
             data = e->timer | ((e->kind & 3) << 16);
         }
-        sub_08037FB4(p, 4, &data, 1);
-        sub_08038128(p, 5);
-        sub_0822B058(4);
+        WirelessExchange_SendPacket(p, 4, &data, 1);
+        WirelessGameMenu_SetStatusPanelState(p, 5);
+        Sound_FadeOutChannel10(4);
         {
             u32 mask = 4;
             if (!(gUnk_02000560 & mask))

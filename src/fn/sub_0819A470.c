@@ -18,7 +18,7 @@ struct Obj {
 };
 /* Resets the -b values (default 30, 10, 180) and clears sixteen 0xD4-byte and
    eight 0xB8-byte records. */
-u32 sub_0819A470(struct Obj *p)
+u32 CannonBattery_ReadOptions(struct Obj *p)
 {
     s32 i;
     struct A *a;

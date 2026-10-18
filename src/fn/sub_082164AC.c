@@ -30,7 +30,7 @@ struct BgLayer {
     void *map;
 };
 extern struct BgLayer gUnk_03004C30[];
-void sub_08218CB0(void);
+void Text_ClearGlyphCache(void);
 /* Points background layer bg at map entry index of a map resource (data,
    size, scale 1.0); see Bg_SetupLayers. */
 void Bg_SetLayerMap(s32 bg, struct BgResource *res, s32 index)
@@ -39,7 +39,7 @@ void Bg_SetLayerMap(s32 bg, struct BgResource *res, s32 index)
     struct BgMapEntry entry;
     struct BgLayer *layer;
     if (bg == 0)
-        sub_08218CB0();
+        Text_ClearGlyphCache();
     hdr = *res;
     hdr.maps += (u32)res;
     hdr.tiles += (u32)res;

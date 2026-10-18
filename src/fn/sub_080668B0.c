@@ -50,7 +50,7 @@ ActorAttachment_CreateAlternateSpriteSlot(struct ContactPosition *anchor, void *
 gotManager:
     if (!follow)
         goto failed;
-    slot = sub_08065C40(manager);
+    slot = ActorAttachment_AllocateSlotHeader(manager);
     if (!slot)
         goto failed;
     {

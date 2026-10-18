@@ -5,27 +5,27 @@ struct Context {
     s32 hour, minute, second;
 };
 extern struct Context *gUnk_02000710;
-u32 sub_08228D7C(void);
-s32 SunClock_GetBaseHour(void), SunClock_GetBaseMinute(void), sub_08228DA0(void);
-void sub_082286E0(s32 *, s32 *, s32 *, s32);
-u32 sub_082285C4(s32, s32, s32, s32, s32, s32);
-u32 sub_0822C404(void)
+u32 SunClock_GetPackedDate(void);
+s32 SunClock_GetBaseHour(void), SunClock_GetBaseMinute(void), SunClock_GetSecond(void);
+void Clock_UnpackDate(s32 *, s32 *, s32 *, s32);
+u32 Clock_CalculateDateDifference(s32, s32, s32, s32, s32, s32);
+u32 Solar_HasExposureCooldownElapsed(void)
 {
     s32 delta;
     s32 a, b, c, d, e, f;
     s32 hour, minute, second, time, old;
-    if (sub_08228D7C() == gUnk_02000710->date)
+    if (SunClock_GetPackedDate() == gUnk_02000710->date)
         delta = 0;
     else {
-        sub_082286E0(&a, &b, &c, sub_08228D7C());
-        sub_082286E0(&d, &e, &f, gUnk_02000710->date);
-        if (sub_082285C4(a, b, c, d, e, f) > 1)
+        Clock_UnpackDate(&a, &b, &c, SunClock_GetPackedDate());
+        Clock_UnpackDate(&d, &e, &f, gUnk_02000710->date);
+        if (Clock_CalculateDateDifference(a, b, c, d, e, f) > 1)
             goto yes;
         delta = 86400;
     }
     hour = SunClock_GetBaseHour();
     minute = SunClock_GetBaseMinute();
-    second = sub_08228DA0();
+    second = SunClock_GetSecond();
     time = (hour * 60 + minute) * 60 + second;
     old = (gUnk_02000710->hour * 60 + gUnk_02000710->minute) * 60 + gUnk_02000710->second;
     delta += time - old;

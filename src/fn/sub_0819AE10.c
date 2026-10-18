@@ -1,4 +1,6 @@
 #include "global.h"
+/* DamageNumberDisplay_ShowDefaultSize: Shows a damage number using a fixed size vector of 32 by zero by 32 */
+#define DamageNumberDisplay_ShowDefaultSize sub_0819AE10
 
 struct Vec0819AE10 {
     u16 x, y, z, w;

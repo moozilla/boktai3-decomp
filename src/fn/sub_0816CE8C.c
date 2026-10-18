@@ -1,4 +1,6 @@
 #include "global.h"
+/* Inventory_GetItemCategory: Extracts the low category nibble from an item definition; category meaning tentative */
+#define Inventory_GetItemCategory sub_0816CE8C
 
 extern const u16 gUnk_08E61280[];
 

@@ -1,6 +1,6 @@
 #include "global.h"
 
-u32 sub_081FBE2C(void)
+u32 Ratatosk_OnAnimatedParticleUpdate(void)
 {
     return 0;
 }

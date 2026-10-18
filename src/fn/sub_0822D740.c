@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0822D740(u8 *src, u8 *dst)
+void Inventory_InitEquipmentEntryFromDescriptor(u8 *src, u8 *dst)
 {
     u32 *from;
     u32 *to;

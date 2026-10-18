@@ -1,7 +1,7 @@
 #include "global.h"
-void sub_0808AEB8(void);
-u32 sub_0808CE44(void)
+void Ghoul_TickCooldown(void);
+u32 Ghoul_UpdateCooldown(void)
 {
-    sub_0808AEB8();
+    Ghoul_TickCooldown();
     return 1;
 }

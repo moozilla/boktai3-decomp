@@ -2,7 +2,7 @@
 
 void sub_08249240(u32, u32, u32);
 
-void sub_08224980(u8 a, u8 b)
+void RfuManager_NotifyEvent(u8 a, u8 b)
 {
     u8 *p = (u8 *)0x03005390;
     u32 f = *(u32 *)(p + 0x40);

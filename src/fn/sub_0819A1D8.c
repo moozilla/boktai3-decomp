@@ -1,6 +1,6 @@
 #include "global.h"
 void sub_0819A110(void *, void *, s32, s32);
-void sub_0819A1D8(u8 *p, s32 a, s32 b)
+void CannonBattery_SpawnMuzzleFlash(u8 *p, s32 a, s32 b)
 {
     u8 *q = 0;
     s32 i = 0;

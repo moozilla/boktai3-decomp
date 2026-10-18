@@ -2,7 +2,7 @@
 extern void *gUnk_02000480;
 void *Heap_Alloc(int);
 void Memory_Clear(void *, int);
-void *sub_0802D6F4(int unused, int variant)
+void *Actor_Allocate(int unused, int variant)
 {
     if (gUnk_02000480) {
         int size = 0x384;

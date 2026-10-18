@@ -1,7 +1,7 @@
 #include "global.h"
 extern u8 *gUnk_020005EC;
-void sub_081FE6E0(void);
-s32 sub_081FEBCC(s32 i)
+void SunOrb_GetOrCreateManager(void);
+s32 SunOrb_GetSlotState(s32 i)
 {
     u8 *g = gUnk_020005EC;
     s32 r;
@@ -12,7 +12,7 @@ s32 sub_081FEBCC(s32 i)
         q = g + 0x38;
         r = *(s32 *)(q + off);
     } else {
-        sub_081FE6E0();
+        SunOrb_GetOrCreateManager();
         r = -1;
     }
     return r;

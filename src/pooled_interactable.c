@@ -1,7 +1,9 @@
 #include "pooled_interactable.h"
+/* Breakable_NullCallback: Empty no-op function used as a placeholder/gap callback entry. */
+#define Breakable_NullCallback sub_08008C18
 // MATCHING_CONCESSION: register-pinning
 
-struct PooledInteractable *sub_08008A70(struct PooledInteractableManager *manager)
+struct PooledInteractable *Breakable_FindFreeSlot(struct PooledInteractableManager *manager)
 {
     struct PooledInteractable *slot = manager->slots;
     u32 i;
@@ -13,7 +15,7 @@ struct PooledInteractable *sub_08008A70(struct PooledInteractableManager *manage
 }
 
 /* Starts a new state. */
-void sub_08008A98(struct PooledInteractable *slot, u32 state)
+void Breakable_EnterState(struct PooledInteractable *slot, u32 state)
 {
     u32 z = 0;
     slot->state = state;
@@ -22,7 +24,7 @@ void sub_08008A98(struct PooledInteractable *slot, u32 state)
 }
 
 /* Returns 1 once after a state starts. */
-u32 sub_08008AA4(struct PooledInteractable *slot)
+u32 Breakable_ConsumeEnteredFlag(struct PooledInteractable *slot)
 {
     u32 r;
     if (slot->entered == 0) {
@@ -35,17 +37,17 @@ u32 sub_08008AA4(struct PooledInteractable *slot)
 }
 
 /* Collider callback: moves to state 3 or 4 when hit by the matching attack kind. */
-void sub_08008ABC(struct SceneCollider *other, u32 unused, struct PooledInteractable *slot)
+void Breakable_OnHit(struct SceneCollider *other, u32 unused, struct PooledInteractable *slot)
 {
     struct PooledInteractable *c = slot;
     if (slot->state == 1) {
         u32 m = 4;
         if (other->contactFlags2 & m)
-            sub_08008A98(slot, 3);
+            Breakable_EnterState(slot, 3);
     } else if (slot->state == 2) {
         u32 m = 8;
         if (other->contactFlags2 & m)
-            sub_08008A98(c, 4);
+            Breakable_EnterState(c, 4);
     }
 }
 
@@ -81,14 +83,14 @@ s32 Breakable_InitSlot(struct PooledInteractableManager *manager, struct PooledI
     offset.y = 128;
     offset.z = 0;
     Collider_Init(collider, slot->id, 0x4001, 0, 0, &scale, &offset);
-    Collider_SetCallback(collider, sub_08008ABC, slot);
+    Collider_SetCallback(collider, Breakable_OnHit, slot);
     Collider_SetPosition(collider, &slot->drawable.position, 0);
     Collider_Refresh(collider);
     return 0;
 }
 
 /* Runs the slot's script with (id, state-dependent flag, arg). */
-void sub_08008BD0(struct PooledInteractable *slot)
+void Breakable_RunScript(struct PooledInteractable *slot)
 {
     u32 a[3];
     struct PooledPackedArgs b;
@@ -110,9 +112,9 @@ void sub_08008C18(void)
 {
 }
 
-void sub_08008C1C(struct PooledInteractableManager *manager, struct PooledInteractable *slot)
+void Breakable_UpdateAnimation(struct PooledInteractableManager *manager, struct PooledInteractable *slot)
 {
-    if (sub_08008AA4(slot)) {
+    if (Breakable_ConsumeEnteredFlag(slot)) {
         void *q = &slot->drawable;
         Anim_SetKeyframes(q, slot->resource, gUnk_086049CE[slot->kind][0], 1, 0);
         if (slot->kind != 2)
@@ -124,27 +126,27 @@ void sub_08008C1C(struct PooledInteractableManager *manager, struct PooledIntera
 
 void Breakable_Idle(struct PooledInteractableManager *manager, struct PooledInteractable *slot)
 {
-    if (sub_08008AA4(slot)) {
+    if (Breakable_ConsumeEnteredFlag(slot)) {
         void *drawable = &slot->drawable;
         Anim_SetKeyframes(drawable, slot->resource, gUnk_086049CE[slot->kind][1], 1, 0);
         Anim_SelectPaletteBank(drawable, gUnk_086049DA[slot->kind]);
     }
     if (slot->timeout >= 0 && slot->counter >= slot->timeout)
-        sub_08008A98(slot, 4);
+        Breakable_EnterState(slot, 4);
 }
 
 void Breakable_React(struct PooledInteractableManager *manager, struct PooledInteractable *slot)
 {
-    if (sub_08008AA4(slot)) {
+    if (Breakable_ConsumeEnteredFlag(slot)) {
         void *drawable = &slot->drawable;
         Anim_SetKeyframes(drawable, slot->resource, gUnk_086049CE[slot->kind][1], 1, 0);
         Anim_SelectPaletteBank(drawable, gUnk_086049DA[slot->kind]);
         slot->flash = 10;
         Sound_PlaySong(331);
-        sub_08008BD0(slot);
+        Breakable_RunScript(slot);
     }
     if (slot->counter > 10)
-        sub_08008A98(slot, 2);
+        Breakable_EnterState(slot, 2);
 }
 
 /* Local adaptation: this function only matches when the position is read as packed bitfields. */
@@ -153,11 +155,11 @@ void Breakable_React(struct PooledInteractableManager *manager, struct PooledInt
 void Breakable_Activate(struct PooledInteractableManager *manager, struct PooledInteractable *slot)
 {
     struct SceneExtent effect;
-    if (sub_08008AA4(slot)) {
+    if (Breakable_ConsumeEnteredFlag(slot)) {
         void *drawable = &slot->drawable;
         Anim_SetKeyframes(drawable, slot->resource, gUnk_086049CE[slot->kind][0], 1, 0);
         slot->flash = 10;
-        sub_08008BD0(slot);
+        Breakable_RunScript(slot);
         if (slot->kind != 2) {
             Anim_SelectPaletteBank(drawable, gUnk_086049DA[slot->kind] + 1);
             effect = POSITION;
@@ -182,13 +184,13 @@ void Breakable_Activate(struct PooledInteractableManager *manager, struct Pooled
         }
     }
     if (slot->counter > 10)
-        sub_08008A98(slot, 1);
+        Breakable_EnterState(slot, 1);
 }
 
 #undef POSITION
 
 /* Motion 1: steps along the route and moves the position by the step. */
-void sub_08008F00(struct PooledInteractable *s)
+void Breakable_UpdateRouteMotion(struct PooledInteractable *s)
 {
     void *q = &s->route;
     if (s->delay != 0) {
@@ -202,8 +204,8 @@ void sub_08008F00(struct PooledInteractable *s)
         } m;
         op = &m.o;
         if ((u8)sub_0821E67C(q, r, op, &m.w, s->range, s->range, s->speed)) {
-            sub_0821E618(q);
-            s->delay = sub_0821E7E4(q);
+            Route_AdvancePoint(q);
+            s->delay = Route_GetCurrentPointNodeId(q);
         }
         r->x += op->x;
         s->drawable.position.z += op->z;
@@ -211,7 +213,7 @@ void sub_08008F00(struct PooledInteractable *s)
 }
 
 /* Motion 2: copies the follow target's position, plus the height offset. */
-void sub_08008F64(struct PooledInteractable *s)
+void Breakable_UpdateFollowMotion(struct PooledInteractable *s)
 {
     struct SceneVec *r = s->target;
     if (r != 0) {
@@ -235,9 +237,9 @@ s32 Breakable_UpdateAll(struct PooledInteractableManager *manager)
                 slot->collider.state &= ~4;
                 sub_08249240(manager, slot, gUnk_086049E0[slot->state]);
                 if (slot->motion == 1)
-                    sub_08008F00(slot);
+                    Breakable_UpdateRouteMotion(slot);
                 else if (slot->motion == 2)
-                    sub_08008F64(slot);
+                    Breakable_UpdateFollowMotion(slot);
                 Anim_Step(&slot->drawable, slot->resource);
                 Collider_SetPosition(&slot->collider, &slot->drawable.position, 0);
                 if (slot->flash) {
@@ -291,7 +293,7 @@ s32 Breakable_InitManager(struct PooledInteractableManager *manager)
         Breakable_InitSlot(manager, slot);
 }
 
-void *sub_08009180(void)
+void *Breakable_GetOrCreateManager(void)
 {
     void *p;
     if (gUnk_02000034 != 0)
@@ -318,7 +320,7 @@ static inline s32 cellIndex(struct SceneVec *pos)
 static inline s32 groundHeight(struct SceneVec *position)
 {
     s32 index = cellIndex(position), height;
-    u8 *cell = sub_0821D64C(index, 1);
+    u8 *cell = TerrainModifiers_FindCellOverride(index, 1);
     u32 kind;
     if (cell)
         cell += 4;
@@ -347,7 +349,7 @@ s32 Breakable_ScriptCreate(void)
     if (!manager)
         goto fail;
     asm("" : : "r"(manager));
-    slot = sub_08008A70(manager);
+    slot = Breakable_FindFreeSlot(manager);
     if (!slot)
         goto fail;
     slot->motion = 0;
@@ -357,16 +359,16 @@ s32 Breakable_ScriptCreate(void)
         if (!Route_Start(&slot->route, route, point, mode))
             goto fail;
         slot->motion = 1;
-        slot->delay = sub_0821E7E4(&slot->route);
+        slot->delay = Route_GetCurrentPointNodeId(&slot->route);
         slot->speed = Script_GetValue();
         slot->range = Script_GetValue();
-        sub_0821E780(&position, slot->route.current, 0);
+        Path_GetPointPosition(&position, slot->route.current, 0);
         placed = 1;
     }
     if (Script_SeekToKeyword('t')) {
         s32 target = Script_GetValue();
         slot->offset = Script_GetValue();
-        slot->target = sub_08103EF4(target);
+        slot->target = NamedObject_GetPositionByName(target);
         if (!slot->target)
             goto fail;
         slot->motion = 2;
@@ -383,7 +385,7 @@ s32 Breakable_ScriptCreate(void)
     fail:
         return -1;
     }
-    sub_08008A98(slot, Script_GetKeywordValue('m', 1));
+    Breakable_EnterState(slot, Script_GetKeywordValue('m', 1));
     slot->flags = Script_GetKeywordValue('f', 0);
     slot->timeout = Script_GetKeywordValue('d', 120);
     slot->id = Script_GetKeywordValue('n', 0);
@@ -420,7 +422,7 @@ s32 Breakable_ScriptCreate(void)
             }
             Anim_SelectPaletteBank(drawable, gUnk_086049DA[slot->kind]);
         }
-        sub_08214424(drawable, 0);
+        Anim_LinkToList(drawable, 0);
         slot->active = 1;
         return 0;
     }
@@ -439,7 +441,7 @@ void Breakable_ScriptSetTimeout(void)
     }
 }
 
-void sub_080094A0(void)
+void Breakable_ScriptSetState(void)
 {
     struct PooledInteractableManager *g = gUnk_02000034;
     if (g != 0) {
@@ -451,7 +453,7 @@ void sub_080094A0(void)
             u32 i = 0;
             for (; i < g->count; i++, e++) {
                 if (e->active == 1 && e->id == id)
-                    sub_08008A98(e, v);
+                    Breakable_EnterState(e, v);
             }
         }
     }

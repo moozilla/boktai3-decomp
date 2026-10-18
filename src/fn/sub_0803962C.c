@@ -5,13 +5,13 @@ struct Panel {
     u8 pad40[0xaa];
     u8 choice, counter;
 };
-struct Panel *sub_08037DC0(void);
+struct Panel *WirelessExchange_Get(void);
 void sub_0803A514(void *, int, int);
-void sub_080397D4(int, int);
+void WirelessGame_AddWeightedScore(int, int);
 void Sound_PlaySong(int);
-int sub_0803962C(void *owner)
+int WirelessGame_TryAddCyclingItem(void *owner)
 {
-    struct Panel *p = sub_08037DC0();
+    struct Panel *p = WirelessExchange_Get();
     int index;
     u8 *choice, *counts;
     if (!p)
@@ -53,7 +53,7 @@ int sub_0803962C(void *owner)
                 if (total <= 9) {
                     sub_0803A514(owner, index, 1);
                     counts[index]++;
-                    sub_080397D4(2, 1);
+                    WirelessGame_AddWeightedScore(2, 1);
                     Sound_PlaySong(885);
                     if (++*choice > 8)
                         *choice = 6;

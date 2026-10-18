@@ -2,11 +2,11 @@
 #include "global.h"
 extern u8 *gUnk_02000710;
 extern u16 gUnk_030054C0, gUnk_030054C4;
-void sub_0822C824(void);
-void sub_0822CA5C(u8 *p)
+void Solar_UpdateMeasurement(void);
+void Solar_InitControllerState(u8 *p)
 {
     p[0x18] = 1;
-    *(void (**)(void))(p + 0x2c) = sub_0822C824;
+    *(void (**)(void))(p + 0x2c) = Solar_UpdateMeasurement;
     {
         u32 zero = 0;
         p[0x19] = zero;

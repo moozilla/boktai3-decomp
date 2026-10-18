@@ -41,7 +41,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-void sub_080356AC(struct Engine *p, u8 slots)
+void Wireless_RemoveConnectedSlots(struct Engine *p, u8 slots)
 {
     u8 *scratch = p->scratch;
     int mask = (u8)(slots << 1);

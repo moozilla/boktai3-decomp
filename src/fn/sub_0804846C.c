@@ -3,12 +3,12 @@
 void WirelessLinkIndicator_UpdateLinkStatus(struct WirelessLinkIndicator *input)
 {
     register struct WirelessLinkIndicator *indicator asm("r4") = input;
-    if (!sub_08036BEC()) {
+    if (!Wireless_GetStatus()) {
         s32 strength = 255;
-        if (sub_08036A3C()) {
+        if (Wireless_IsSessionConnected()) {
             struct RfuLinkStatus *status = gRfuLinkStatus;
             if (!status->parentChild) {
-                s32 slot = sub_08036A10();
+                s32 slot = Wireless_GetConnectedParentSlot();
                 strength = gRfuLinkStatus->strength[slot];
                 WirelessLinkIndicator_SelectStrengthFrame(indicator, strength);
             } else {

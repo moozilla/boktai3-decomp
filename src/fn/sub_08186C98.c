@@ -9,7 +9,7 @@ struct P {
     u16 y;
     u16 z;
 };
-void sub_08186C98(struct P *p)
+void Armor_SaveCurrentPosition(struct P *p)
 {
     p->x = p->a;
     p->y = p->b;

@@ -1,10 +1,10 @@
 #include "global.h"
-s32 sub_082117C4(void);
-s32 sub_082117E4(void);
-u32 sub_08211804(void)
+s32 ForgingBook_HasDiscoveredAllWeapons(void);
+s32 ForgingBook_HasDiscoveredAllItems(void);
+u32 ForgingBook_IsComplete(void)
 {
-    if (sub_082117C4()) {
-        if (sub_082117E4())
+    if (ForgingBook_HasDiscoveredAllWeapons()) {
+        if (ForgingBook_HasDiscoveredAllItems())
             return 1;
     }
     return 0;

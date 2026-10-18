@@ -41,18 +41,18 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->pending = 1;
 }
 void Sound_PlaySong(int);
-void sub_08213F98(int);
-int sub_08035EB8(struct Engine *);
+void InterruptsAndVideo_WaitFrames(int);
+int Wireless_BeginParentNiSession(struct Engine *);
 int sub_082238F0(int);
-void sub_08034178(struct Engine *);
-int sub_08034F44(struct Engine *p)
+void WirelessController_ResetPeerExchange(struct Engine *);
+int Wireless_UpdateSearchRestartDelay(struct Engine *p)
 {
     if (p->pending) {
         p->pending = 0;
         Sound_PlaySong(222);
     }
     if (p->ticks > 89) {
-        sub_08034178(p);
+        WirelessController_ResetPeerExchange(p);
         {
             int active = p->active;
             if (active)

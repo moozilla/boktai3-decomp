@@ -18,7 +18,7 @@ static inline u32 Locked(void)
     u32 mask = 4;
     return gUnk_02000560 & mask;
 }
-u32 sub_081296D0(u8 *s)
+u32 FeatherEffectPool_UpdateTask(u8 *s)
 {
     u8 *first = s + 0x3C;
     if (*(u32 *)(s + 0x38) && !Paused() && !Locked()) {

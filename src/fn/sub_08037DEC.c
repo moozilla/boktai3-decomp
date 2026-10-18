@@ -21,14 +21,14 @@ struct P {
     struct Entry entries[2];
     struct Packet packet;
 };
-struct P *sub_08037DC0(void);
-void sub_08037F5C(struct P *);
-int sub_08036AA8(void);
-int sub_08036B64(struct Packet *);
-void sub_0803A618(int, int, int);
-void sub_08037DEC(struct Packet *p)
+struct P *WirelessExchange_Get(void);
+void WirelessExchange_ApplyReceivedCounts(struct P *);
+int Wireless_IsSessionActive(void);
+int Wireless_QueueNiPacket(struct Packet *);
+void WirelessGameItems_QueueIncomingItem(int, int, int);
+void WirelessExchange_OnPacketReceived(struct Packet *p)
 {
-    struct P *s = sub_08037DC0();
+    struct P *s = WirelessExchange_Get();
     struct Entry *e;
     int i;
     register int shift asm("r5");
@@ -49,7 +49,7 @@ void sub_08037DEC(struct Packet *p)
                 i++;
                 shift += 4;
             } while (i <= 3);
-            sub_08037F5C(s);
+            WirelessExchange_ApplyReceivedCounts(s);
             break;
         case 1:
             mask = 2;
@@ -88,7 +88,7 @@ void sub_08037DEC(struct Packet *p)
             mask = 128;
             goto flags;
         case 5:
-            if (!sub_08036AA8())
+            if (!Wireless_IsSessionActive())
                 s->mode = p->word & 3;
             mask = 512;
         flags:
@@ -96,9 +96,9 @@ void sub_08037DEC(struct Packet *p)
             break;
     }
 }
-void sub_08037ECC(struct Packet *p)
+void WirelessExchange_OnPacketSent(struct Packet *p)
 {
-    struct P *s = sub_08037DC0();
+    struct P *s = WirelessExchange_Get();
     u32 mask;
     if (s) {
         switch (p->type) {
@@ -126,17 +126,17 @@ void sub_08037ECC(struct Packet *p)
         s->sent = 1;
     }
 }
-void sub_08037F30(void)
+void WirelessExchange_OnSendFailure(void)
 {
-    struct P *s = sub_08037DC0();
+    struct P *s = WirelessExchange_Get();
     if (s && s->packet.type)
-        sub_08036B64(&s->packet);
+        Wireless_QueueNiPacket(&s->packet);
 }
-void sub_08037F50(void)
+void WirelessExchange_OnReceiveFailure(void)
 {
-    sub_08037DC0();
+    WirelessExchange_Get();
 }
-void sub_08037F5C(struct P *s)
+void WirelessExchange_ApplyReceivedCounts(struct P *s)
 {
     struct Entry *a = &s->entries[0];
     u8 *q = s->entries[1].bytes;
@@ -151,7 +151,7 @@ void sub_08037F5C(struct P *s)
         d = q - 16;
         do {
             *d += *t;
-            sub_0803A618(i, *t, 1);
+            WirelessGameItems_QueueIncomingItem(i, *t, 1);
             *t = z;
             t++;
             d++;
@@ -162,7 +162,7 @@ void sub_08037F5C(struct P *s)
         z = 0;
         do {
             u8 *p = q + i;
-            sub_0803A618(i, *p, 0);
+            WirelessGameItems_QueueIncomingItem(i, *p, 0);
             *p = z;
             i++;
         } while (i <= 3);

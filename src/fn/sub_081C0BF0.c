@@ -11,7 +11,7 @@ struct S {
     u32 a454;
 };
 extern const u32 gUnk_0861215C[];
-void sub_081C0BF0(struct S *p, u32 i)
+void PlayStats_SetState(struct S *p, u32 i)
 {
     u32 t;
     p->a68 = i;

@@ -5,12 +5,12 @@ typedef struct {
     s16 x, y;
     u8 tail[60];
 } Graphic;
-void sub_08019F18(void *, void (*)(void));
+void SelectionMenu_SetCallback(void *, void (*)(void));
 void SelectionMenu_Choose(void);
 void SelectionMenu_Close(void);
 void Sound_PlaySong(int);
 void Anim_LoadKeyframe(void *, void *, int, int);
-void sub_08030F20(int, int, int, int);
+void MessageWindow_SetBounds(int, int, int, int);
 void Presentation_UpdateActorGraphic(void *, int);
 void SelectionMenu_Back(u8 *p)
 {
@@ -25,11 +25,11 @@ void SelectionMenu_Back(u8 *p)
         else
             g->x = 64;
         g->y = 40;
-        sub_08030F20(2, 16, 30, 2);
+        MessageWindow_SetBounds(2, 16, 30, 2);
         Presentation_UpdateActorGraphic(p, 0);
-        sub_08019F18(p, SelectionMenu_Choose);
+        SelectionMenu_SetCallback(p, SelectionMenu_Choose);
     } else {
         Sound_PlaySong(0xde);
-        sub_08019F18(p, SelectionMenu_Close);
+        SelectionMenu_SetCallback(p, SelectionMenu_Close);
     }
 }

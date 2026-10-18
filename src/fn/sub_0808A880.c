@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0807FC90(void);
+void SceneActorControl_OnIdle(void);
 struct S {
     u8 pad[0x9C];
     s16 z;
@@ -26,9 +26,9 @@ struct S {
     struct S *other;
     u32 at3D4;
 };
-void sub_0808A880(struct S *s)
+void Ghoul_EnterIdleControl(struct S *s)
 {
-    void (*fn)(void) = sub_0807FC90;
+    void (*fn)(void) = SceneActorControl_OnIdle;
     u8 code = 0x10;
     u32 zero;
     u8 one;

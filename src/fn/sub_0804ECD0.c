@@ -1,6 +1,6 @@
 #include "area_effect_link.h"
 // MATCHING_CONCESSION: register-pinning
-void sub_081594F4(struct AreaEffectPlayer *, s32);
+void Player_AddEnergy(struct AreaEffectPlayer *, s32);
 static inline u32 playerMode(struct AreaEffectPlayer *player)
 {
     u32 mask = 32;
@@ -87,7 +87,7 @@ void AreaEffect_UpdateLinkPlayerResources(struct AreaEffectManager *manager)
                 } while ((u16)value > 119);
             }
             if (amount > 0)
-                sub_081594F4(player, amount);
+                Player_AddEnergy(player, amount);
         }
         }
         i = next;

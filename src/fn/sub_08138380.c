@@ -1,14 +1,14 @@
 #include "global.h"
-void sub_08138154(void *, u32, u32);
+void Registry1745_SetState(void *, u32, u32);
 void StageIconDisplay_RequestKill(void);
-void sub_08223270(void);
-void sub_08138380(u8 *p, u32 b)
+void Serial_StopCommunication(void);
+void Registry1745_BeginShutdown(u8 *p, u32 b)
 {
     u8 t;
     *(u16 *)(p + 0x1a) = 0;
     t = p[0x1c];
     p[0x20] = t;
-    sub_08138154(p, 0, b);
+    Registry1745_SetState(p, 0, b);
     StageIconDisplay_RequestKill();
-    sub_08223270();
+    Serial_StopCommunication();
 }

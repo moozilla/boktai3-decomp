@@ -119,7 +119,7 @@ int NameEntry_DecodeAndValidate(struct PasswordEntry *m)
     EncodedRecord_ReadBits(m, &pos, 2, 6);
     m->version = EncodedRecord_ReadBits(m, &pos, 3, 6);
     m->key = EncodedRecord_ReadBits(m, &pos, 3, 6);
-    if ((sub_08221594(m, 3, 24) & 65535) != m->checksum)
+    if ((Crc_ComputeCcitt16(m, 3, 24) & 65535) != m->checksum)
         return -1;
     EncodedRecord_DecodeAlternateFields(decoded, m, m->key);
     if (m->version != 1)
@@ -156,7 +156,7 @@ void Password_ApplyDecoded(struct PasswordEntry *m, u8 *output)
     *(u16 *)((u8 *)gUnk_02000710 + 14) = decoded[10];
 }
 
-s32 sub_08011794(u8 *src, s32 tableRef, s32 script, u8 *output)
+s32 Password_DecodeEntry(u8 *src, s32 tableRef, s32 script, u8 *output)
 {
     struct PasswordEntry *e = Heap_Alloc(0x90);
     s32 result;
@@ -182,7 +182,7 @@ s32 sub_08011794(u8 *src, s32 tableRef, s32 script, u8 *output)
     return result;
 }
 
-void sub_08011814(void)
+void Password_DecodeWordList(void)
 {
     u8 *a, *b, *c;
     s32 i;
@@ -202,7 +202,7 @@ void sub_08011814(void)
     i = 0;
     do {
         u8 *r = Text_LookupString(Script_ParseStringRef(c) + i);
-        sub_08011794(r, (s32)a, (s32)b, gUnk_02000710->playerName);
+        Password_DecodeEntry(r, (s32)a, (s32)b, gUnk_02000710->playerName);
         i++;
     } while (i <= 0x1e49);
 }

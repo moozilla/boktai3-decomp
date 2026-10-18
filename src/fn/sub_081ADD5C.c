@@ -8,7 +8,7 @@ struct A {
 void Anim_Remove(void *);
 void Sprite_Remove(void *);
 
-void sub_081ADD5C(struct A *p)
+void Vanargand_DestroyAnimatedPart(struct A *p)
 {
     Anim_Remove(p);
     if (p->a != 0)

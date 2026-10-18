@@ -1,14 +1,14 @@
 #include "global.h"
 #include "engine.h"
 extern u8 *gUnk_02000580[];
-s32 sub_0815A400(void);
+s32 Script_GetActorIndex(void);
 void sub_0815C73C(u8 *actor, s32 mode, s32 c, s32 a);
 /* Script: sub_0815C73C on the scripted actor chosen by -i with mode -m; modes
    4 and 5 also take -c and -A (default 120 each), others pass 0. */
 void ScriptActor_SetModeFromScript(void)
 {
     u8 *actor;
-    s32 i = sub_0815A400();
+    s32 i = Script_GetActorIndex();
     actor = gUnk_02000580[i];
     if (actor && Script_SeekToKeyword('m')) {
         s32 mode = Script_GetValue();

@@ -6,7 +6,7 @@ struct S {
 };
 extern struct S *gUnk_020004B4;
 void sub_0811D270(s32, s32, s32, s32, s32);
-void sub_0810ECEC(void)
+void Registry33FF_DrawActorValues(void)
 {
     struct S *s = gUnk_020004B4;
     if (s == 0) {

@@ -3,7 +3,7 @@ struct Motion {
     u16 x, y;
 };
 extern const s16 gUnk_086149C4[];
-void sub_08039998(struct Motion *arg, int angleArg, int scale)
+void WirelessGameItems_ApplyMotionWave(struct Motion *arg, int angleArg, int scale)
 {
     struct Motion *p = arg;
     const s16 *table;

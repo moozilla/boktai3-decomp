@@ -26,17 +26,17 @@ extern const u8 gUnk_086056D0[];
 void TextWindow_BlankRect(int, int, int, int);
 void sub_08218ED8(int, int, int, int);
 void TextState_SetBounds(struct TextState *, int, int, int, int);
-void sub_08032C80(struct TextState *, int, int, int, int);
+void TextState_Init(struct TextState *, int, int, int, int);
 void TextState_Reset(struct TextState *);
-const u8 *sub_08032BEC(struct TextState *);
-int sub_08032B24(struct TextState *);
-int sub_08031F58(struct TextState *, int);
-void sub_08032E8C(struct TextState *);
-void sub_08032E98(struct TextState *);
-void sub_08032F78(struct Window *);
-int sub_08033468(void);
-int sub_08032F14(struct Window *, int);
-int sub_08033248(struct Window *p)
+const u8 *TextState_GetActiveStream(struct TextState *);
+int TextState_StepPlayback(struct TextState *);
+int TextState_DrawNarrowGlyph(struct TextState *, int);
+void TextState_ClearSelectedChoices(struct TextState *);
+void TextState_RunSelectedProcedures(struct TextState *);
+void ScrollingDialogue_UpdatePlayback(struct Window *);
+int ScrollingDialogue_ClearScript(void);
+int ScrollingDialogue_ResetPlayback(struct Window *, int);
+int ScrollingDialogue_Show(struct Window *p)
 {
     u8 *active = &p->active;
     int result;
@@ -44,7 +44,7 @@ int sub_08033248(struct Window *p)
         goto fail;
     {
         p->ticks = 0;
-        sub_08032F14(p, 1);
+        ScrollingDialogue_ResetPlayback(p, 1);
         gUnk_03004280 = 1;
         *active = 1;
         result = 0;

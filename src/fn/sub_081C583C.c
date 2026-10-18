@@ -6,12 +6,12 @@ struct S {
     u32 pd;
     u32 st;
 };
-u8 sub_081C55B8(void *);
+u8 ChallengeMenu_ConsumeStateEntry(void *);
 void Script_Call(void *, u32);
 void Task_Kill(void *);
-void sub_081C583C(struct S *p)
+void ChallengeMenu_DispatchSelection(struct S *p)
 {
-    if (sub_081C55B8(p) != 0) {
+    if (ChallengeMenu_ConsumeStateEntry(p) != 0) {
         u32 s = p->st;
         if (s == 5) {
             Script_Call(p->a2f8, 0);

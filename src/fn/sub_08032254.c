@@ -4,7 +4,7 @@ struct Tag {
     int hasValue, length;
     u8 text[64];
 };
-const u8 *sub_08032254(struct Tag *p, const u8 *s)
+const u8 *TextState_ParseTagValue(struct Tag *p, const u8 *s)
 {
     int n;
     int first;

@@ -37,7 +37,7 @@ extern struct Manager *gUnk_02000068;
 extern u16 gUnk_08604C54[];
 void *ScriptProc_Start(int, int);
 int AnimData_Load(void *, int);
-void sub_082144E4(void *, void *, int);
+void Sprite_InitUnlinked(void *, void *, int);
 void Anim_SetSequence(void *, void *, int, int, int);
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
@@ -49,12 +49,12 @@ struct Config {
         verticalDecayRange, horizontalStart, horizontalStartRange, horizontalDecay,
         horizontalDecayRange;
 };
-struct Manager *sub_0801548C(int, int);
+struct Manager *AnimatedParticleManager_Create(int, int);
 int Mod(int, int);
 void AnimData_SelectPaletteBank(void *, int);
 int AnimatedParticle_PriorityFromFlags(int);
-void sub_08220D44(void *, int);
-void sub_08214374(void *, int);
+void Anim_SetDurationScale(void *, int);
+void Sprite_LinkToList(void *, int);
 static inline int rnd(void)
 {
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
@@ -84,7 +84,7 @@ int AnimatedParticles_Create(int count, struct Vec *pos, struct Config *c)
     u32 *index;
     if (gUnk_02000068)
         goto start;
-    if (sub_0801548C(0, 0))
+    if (AnimatedParticleManager_Create(0, 0))
         goto start;
     goto failure;
 success:
@@ -237,8 +237,8 @@ start:
                 done = 0;
             o->position = *pos;
             *((u8 *)o + 7) = AnimatedParticle_PriorityFromFlags(c->flags);
-            sub_08220D44(saved, c->speed);
-            sub_08214374(o, 0);
+            Anim_SetDurationScale(saved, c->speed);
+            Sprite_LinkToList(o, 0);
             if (emitted++ >= count)
                 goto success;
         }

@@ -1,7 +1,7 @@
 #include "script_selector.h"
 extern u16 gUnk_03005260[];
 void ScriptSelector_MoveSelection(struct ScriptSelector *, s32);
-u32 sub_08228008(void);
+u32 Heap_IsEndGuardValid(void);
 s32 ScriptSelector_UpdateTask(struct ScriptSelector *selector)
 {
     u16 *keys = gUnk_03005260;
@@ -38,6 +38,6 @@ s32 ScriptSelector_UpdateTask(struct ScriptSelector *selector)
         Script_Call(selector->selectedScript, 0);
         Task_Kill(selector);
     }
-    sub_08228008();
+    Heap_IsEndGuardValid();
     return 0;
 }

@@ -1,22 +1,22 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-void *sub_0803AD30(void);
+void *WirelessResultPanel_GetInstance(void);
 void *Task_Create(int, int);
 void Task_SetCallbacks(void *, void *, void *);
-int sub_0803B370(void *);
-int sub_0803B3B4(void *);
-int sub_0803B40C(void *);
+int WirelessResultPanel_Update(void *);
+int WirelessResultPanel_Destroy(void *);
+int WirelessResultPanel_Init(void *);
 void Task_Kill(void *);
-void *sub_0803B6B8(void)
+void *WirelessResultPanel_Create(void)
 {
-    void *result = sub_0803AD30();
+    void *result = WirelessResultPanel_GetInstance();
     register void *p asm("r4") = result;
     asm("" : : "r"(p));
     if (!p) {
         p = Task_Create(11, 0x930);
         if (p) {
-            Task_SetCallbacks(p, sub_0803B370, sub_0803B3B4);
-            if (sub_0803B40C(p) < 0) {
+            Task_SetCallbacks(p, WirelessResultPanel_Update, WirelessResultPanel_Destroy);
+            if (WirelessResultPanel_Init(p) < 0) {
                 Task_Kill(p);
                 return 0;
             }

@@ -10,7 +10,7 @@ struct S {
 };
 void sub_081D2FE8(void);
 
-void sub_081D319C(struct S *p, u32 v)
+void FrostEmitter_StartEmission(struct S *p, u32 v)
 {
     if (p) {
         void (*f)(void);

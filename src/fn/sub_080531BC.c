@@ -1,7 +1,7 @@
 #include "stacked_actor.h"
 void Sprite_Remove(void *);
 void Effect_Remove(struct StackedActorParticle *);
-void sub_08020D08(void *);
+void SceneMessages_UnregisterReceiver(void *);
 s32 StackedActor_Destroy(struct StackedActor *actor)
 {
     struct StackedActorSprite *segment;
@@ -25,7 +25,7 @@ s32 StackedActor_Destroy(struct StackedActor *actor)
         particle++;
         i--;
     } while (i >= 0);
-    sub_08020D08(trigger);
+    SceneMessages_UnregisterReceiver(trigger);
     if (gUnk_02000118)
         gUnk_02000118 = 0;
     return 0;

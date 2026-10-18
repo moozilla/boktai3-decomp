@@ -1,13 +1,13 @@
 #include "global.h"
 extern u8 *gUnk_030042E4;
-s32 sub_0811C77C(u8 *);
-void sub_0811C844(u8 *s, s32 n)
+s32 CharacterModel_GetPrimaryPaletteIndex(u8 *);
+void CharacterModel_InitPalettes(u8 *s, s32 n)
 {
     u8 *a, *b;
     u8 *d;
     s32 i;
     u32 c;
-    a = gUnk_030042E4 + (sub_0811C77C(s) << 5);
+    a = gUnk_030042E4 + (CharacterModel_GetPrimaryPaletteIndex(s) << 5);
     b = gUnk_030042E4 + ((n + 0x379) << 5);
     d = s + 0x210;
     CpuSet(a, d, 0x10);

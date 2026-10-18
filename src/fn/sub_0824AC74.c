@@ -50,7 +50,7 @@ typedef union {
 extern const UQItype __clz_tab[];
 extern DItype __fixunssfdi(SFtype a);
 extern DItype __fixunsdfdi(DFtype a);
-DItype sub_0824AC74(DItype u, DItype v)
+DItype Libgcc_MultiplyInt64(DItype u, DItype v)
 {
     DIunion w;
     DIunion uu, vv;

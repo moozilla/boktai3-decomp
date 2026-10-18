@@ -2,7 +2,7 @@
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 extern u8 *gUnk_02000710;
-void sub_0816B75C(void)
+void GameState_SetReturnAreaFromScript(void)
 {
     if (Script_SeekToKeyword(0x73))
         *(u16 *)(gUnk_02000710 + 0x5b0) = Script_GetValue();

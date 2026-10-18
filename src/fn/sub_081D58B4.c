@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_081D58B4(u8 *arg)
+void MonsterBook_UpdateHighlightPulse(u8 *arg)
 {
     u8 *p = arg;
     s32 v = *((s16 *)(p + 0xD4C));

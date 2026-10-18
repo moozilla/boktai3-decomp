@@ -6,15 +6,15 @@ void *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void ResourceHeader_Relocate(u8 *, void *);
 void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
-void sub_081DC1B4(u32);
+void Menu_StartFadeIn(u32);
 void sub_081E0818(u8 *);
 extern u32 gUnk_020002F8[];
 u32 sub_08033690(u32, u32, u32, u32);
 void TextWindow_SetScript(u32, u32);
 void TextWindow_Refresh(u32, u32);
-void sub_080337FC(u32);
-void sub_08217DCC(u32);
-u32 sub_081DC470(u8 *s)
+void TextWindow_StartPlayback(u32);
+void Palette_SetBackdropColor(u32);
+u32 ScreenMessage_Initialize(u8 *s)
 {
     u32 zero, one, value;
     void *a, *p, *resource;
@@ -68,10 +68,10 @@ u32 sub_081DC470(u8 *s)
     *sound = result;
     TextWindow_SetScript(result, global[0]);
     TextWindow_Refresh(*sound, global[1]);
-    sub_080337FC(*sound);
+    TextWindow_StartPlayback(*sound);
     *(u32 *)(s + 0x138) = zero;
-    sub_081DC1B4(0);
+    Menu_StartFadeIn(0);
     *(u32 *)(s + 0x13C) = one;
-    sub_08217DCC(0x73FF);
+    Palette_SetBackdropColor(0x73FF);
     return 0;
 }

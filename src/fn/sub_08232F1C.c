@@ -1,10 +1,12 @@
 #include "global.h"
+/* ScreenOrbitEffect_EnsureSingleton: Returns the existing effect manager or creates and initializes its task */
+#define ScreenOrbitEffect_EnsureSingleton sub_08232F1C
 extern u8 *gUnk_02000098;
 u8 *Task_Create(s32, u32);
 void Task_SetCallbacks(u8 *, void (*)(u8 *), void (*)(u8 *));
 void sub_08232E6C(u8 *);
-void sub_08232EA8(u8 *);
-s32 sub_08232ED4(u8 *);
+void ScreenOrbitEffect_Destroy(u8 *);
+s32 ScreenOrbitEffect_Init(u8 *);
 void Task_Kill(u8 *);
 
 u8 *sub_08232F1C(void)
@@ -14,8 +16,8 @@ u8 *sub_08232F1C(void)
         return gUnk_02000098;
     p = Task_Create(11, 0x104);
     if (p != NULL) {
-        Task_SetCallbacks(p, sub_08232E6C, sub_08232EA8);
-        if (sub_08232ED4(p) < 0) {
+        Task_SetCallbacks(p, sub_08232E6C, ScreenOrbitEffect_Destroy);
+        if (ScreenOrbitEffect_Init(p) < 0) {
             Task_Kill(p);
             return NULL;
         }

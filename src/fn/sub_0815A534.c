@@ -4,7 +4,7 @@ struct S {
     s32 a;
 };
 extern struct S *gUnk_02000580;
-u32 sub_0815A534(void)
+u32 PlayerCue_IsStateFour(void)
 {
     u32 r;
     if (!gUnk_02000580)

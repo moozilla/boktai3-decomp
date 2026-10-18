@@ -8,7 +8,7 @@ struct S {
     u8 q[4];
 };
 extern struct S *gUnk_02000070;
-u32 sub_08016634(struct S *s)
+u32 PaletteLevels_Initialize(struct S *s)
 {
     s32 i;
     gUnk_02000070 = s;

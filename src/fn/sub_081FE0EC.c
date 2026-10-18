@@ -4,7 +4,7 @@ struct S {
     s32 pos;
     s32 vel;
 };
-void sub_081FE0EC(struct S *p)
+void OrbitEffect_UpdateWideRadius(struct S *p)
 {
     p->pos += p->vel;
     if (p->pos > 0x60000) {

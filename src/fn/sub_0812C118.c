@@ -2,7 +2,7 @@
 
 extern u32 gUnk_02000184;
 
-void sub_0812C118(void)
+void SlashEffect_ResetManagerReference(void)
 {
     gUnk_02000184 = 0;
 }

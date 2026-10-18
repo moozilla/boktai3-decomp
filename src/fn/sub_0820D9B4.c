@@ -6,7 +6,7 @@ struct S {
     u32 w30;
     u32 w34;
 };
-void sub_0820D9B4(struct S *p, u32 a, u32 b, u8 c)
+void EnemyParticle_SetAnimationParameters(struct S *p, u32 a, u32 b, u8 c)
 {
     p->w30 = a;
     p->w34 = b;

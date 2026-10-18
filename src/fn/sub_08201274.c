@@ -16,12 +16,12 @@ struct S {
     u16 h1c;
 };
 void Memory_Clear(void *, u32);
-void sub_08201270(void *, void (*)(void));
+void PlayerClone_SetBehaviorCallback(void *, void (*)(void));
 void sub_082003BC(void);
-void sub_08201274(struct S *p)
+void PlayerClone_InitConfig(struct S *p)
 {
     Memory_Clear(p, 0x20);
-    sub_08201270(p, sub_082003BC);
+    PlayerClone_SetBehaviorCallback(p, sub_082003BC);
     p->h0 = 0;
     p->h2 = 0x3c;
     p->w8 = 0x10;

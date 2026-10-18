@@ -49,7 +49,7 @@ typedef union {
 } DIunion;
 extern DItype __fixunssfdi(SFtype a);
 extern DItype __fixunsdfdi(DFtype a);
-DItype sub_0824AC40(DItype u, word_type b)
+DItype Libgcc_ShiftRightLogical64(DItype u, word_type b)
 {
     DIunion w;
     word_type bm;

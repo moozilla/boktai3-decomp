@@ -20,23 +20,23 @@ struct P08196718 {
 };
 extern const struct Vec08196718 gUnk_0824F598, gUnk_0824F5A8, gUnk_0824F5B0, gUnk_0824F5B8;
 extern const u8 gUnk_0824F5A0[];
-void sub_08193680(void *, u32);
-void sub_08195014(void *, s32, s32);
-void sub_08195180(void *);
-void sub_08195254(void *);
+void Nidhoggr_SetBackgroundMode(void *, u32);
+void Nidhoggr_InitRelativeMotion(void *, s32, s32);
+void Nidhoggr_UpdateWideSway(void *);
+void Nidhoggr_TrackPlayerDepth(void *);
 void sub_08190498(void *, void *, const void *, void *);
-void sub_08195A4C(void *, u32);
+void Nidhoggr_SetBehavior(void *, u32);
 void Sound_PlaySongChecked(u32);
 void Sound_StopSong(u32);
 
-void sub_08196718(struct P08196718 *t)
+void Nidhoggr_UpdateEffectAttack(struct P08196718 *t)
 {
     switch (t->state) {
         case 0:
             t->base.x = -0xe80;
             t->base.y = t->pos.y;
             t->base.z = t->pos.z;
-            sub_08195014(t, t->base.x, t->base.z);
+            Nidhoggr_InitRelativeMotion(t, t->base.x, t->base.z);
             t->d = -0xe00;
             t->e = -0x88;
             t->state++;
@@ -50,13 +50,13 @@ void sub_08196718(struct P08196718 *t)
                 t->state++;
             goto update;
         case 2:
-            sub_08193680(t, 1);
+            Nidhoggr_SetBackgroundMode(t, 1);
             t->base = gUnk_0824F598;
             t->base.z += gUnk_02000710->positionZ;
             t->speed = 0;
             t->pos = t->base;
             t->pos.x += -0x800;
-            sub_08195014(t, t->base.x, t->base.z);
+            Nidhoggr_InitRelativeMotion(t, t->base.x, t->base.z);
             t->d = 0xe00;
             t->state++;
             Sound_PlaySongChecked(0x405);
@@ -80,8 +80,8 @@ void sub_08196718(struct P08196718 *t)
         case 5:
             if (!(t->timer & 1))
                 sub_08190498(t->effects, &t->pos, gUnk_0824F5A0, t);
-            sub_08195254(t);
-            sub_08195180(t);
+            Nidhoggr_TrackPlayerDepth(t);
+            Nidhoggr_UpdateWideSway(t);
             if (t->timer > 0x78) {
                 t->state++;
                 Sound_StopSong(0x1b8);
@@ -96,22 +96,22 @@ void sub_08196718(struct P08196718 *t)
             if (t->d < -0xe00)
                 t->d = -0xe00;
         update:
-            sub_08195180(t);
+            Nidhoggr_UpdateWideSway(t);
             break;
         case 7:
-            sub_08193680(t, 0);
+            Nidhoggr_SetBackgroundMode(t, 0);
             switch (t->mode) {
                 case 8:
                     t->pos = gUnk_0824F5A8;
-                    sub_08195A4C(t, 2);
+                    Nidhoggr_SetBehavior(t, 2);
                     break;
                 case 9:
                     t->pos = gUnk_0824F5B0;
-                    sub_08195A4C(t, 4);
+                    Nidhoggr_SetBehavior(t, 4);
                     break;
                 case 10:
                     t->pos = gUnk_0824F5B8;
-                    sub_08195A4C(t, 0xb);
+                    Nidhoggr_SetBehavior(t, 0xb);
                     break;
             }
             t->d = 0;

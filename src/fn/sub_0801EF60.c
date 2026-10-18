@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 void Sound_PlaySongChecked(int);
-void sub_0801EF58(void);
+void SceneObject_UpdateInactiveIdle(void);
 void SceneObject_AnimateInactive(u8 *s)
 {
     if ((*(u32 *)(s + 0x38) & 0xffff00) == 0x200)
@@ -30,7 +30,7 @@ void SceneObject_AnimateInactive(u8 *s)
             }
             asm("" ::: "memory");
             (*(u8 **)(s + 0x2c))[4] = ((*(u8 **)(s + 0x2c))[4] & 0xf0) | (s[0x3b] + 1);
-            *(void **)(s + 0x30) = sub_0801EF58;
+            *(void **)(s + 0x30) = SceneObject_UpdateInactiveIdle;
         }
     }
 }

@@ -1,7 +1,7 @@
 #include "global.h"
 void Sound_PlaySong(int);
-void sub_0801C17C(void *);
-void sub_0801C190(void *);
+void ResultGame_ShowTargetMarker(void *);
+void ResultGame_HideTargetMarker(void *);
 int ResultTutorial_BlinkTarget(u8 *p)
 {
     switch (p[0xaf]) {
@@ -21,9 +21,9 @@ int ResultTutorial_BlinkTarget(u8 *p)
                 visible = 0;
             if (visible)
             show:
-                sub_0801C17C(p);
+                ResultGame_ShowTargetMarker(p);
             else
-                sub_0801C190(p);
+                ResultGame_HideTargetMarker(p);
             if ((*(s16 *)(p + 0xaa) >> 5) > 2)
                 return 1;
             ++*(u16 *)(p + 0xaa);

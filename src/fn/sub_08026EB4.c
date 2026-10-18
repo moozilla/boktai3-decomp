@@ -66,7 +66,7 @@ static inline void decay(s16 *p)
     *dst = next;
 }
 void SceneActorGraphics_SelectResource(void *);
-void sub_08026EB4(ActorAnimation *base, int time)
+void SceneActors_UpdateKnockbackReaction(ActorAnimation *base, int time)
 {
     int tick = time;
     ActorAnimation *p = base;

@@ -79,10 +79,10 @@ extern u16 gUnk_03005260[];
 extern u32 gUnk_0300523C;
 u8 Math_Atan2(s32, s32);
 void Script_Call(void *, s32);
-void sub_081E574C(void *, void *);
-void sub_081E5648(void *, void *);
-void sub_081E4174(void *);
-void sub_081E44D4(void *);
+void Actor_OnInteractionChildRelease(void *, void *);
+void Actor_OnInteractionChildDelay(void *, void *);
+void Actor_SetInteractionControlFlag(void *);
+void Actor_BeginInteractionSoundSequence(void *);
 static inline u32 mode_bits(u8 *p, u32 mask)
 {
     register u32 v asm("r1") = *p;
@@ -180,13 +180,13 @@ void Actor_TryInteraction(struct G *p, struct Partner *q)
             register u32 flags asm("r2") = p->flags;
             p->flags = one | flags;
             {
-                register void (*fn)(void *, void *) asm("r2") = sub_081E574C;
+                register void (*fn)(void *, void *) asm("r2") = Actor_OnInteractionChildRelease;
                 q->fn = fn;
             }
             one |= q->flags;
             q->flags = one;
         }
-        sub_081E4174(p);
+        Actor_SetInteractionControlFlag(p);
     } else {
         p->oldMode = p->mode;
         {
@@ -210,12 +210,12 @@ void Actor_TryInteraction(struct G *p, struct Partner *q)
             register u32 flags asm("r2") = p->flags;
             p->flags = one | flags;
             {
-                register void (*fn)(void *, void *) asm("r2") = sub_081E5648;
+                register void (*fn)(void *, void *) asm("r2") = Actor_OnInteractionChildDelay;
                 q->fn = fn;
             }
             one |= q->flags;
             q->flags = one;
         }
-        sub_081E44D4(p);
+        Actor_BeginInteractionSoundSequence(p);
     }
 }

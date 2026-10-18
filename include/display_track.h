@@ -1,7 +1,6 @@
 #ifndef GUARD_DISPLAY_TRACK_H
 #define GUARD_DISPLAY_TRACK_H
 #include "contact_swarm.h"
-/* Provisional: script-controlled sprite movement, palette and display tracks. */
 struct DisplayTrackGraphics {
     u8 unknown0[6];
     u16 defaultPalette;

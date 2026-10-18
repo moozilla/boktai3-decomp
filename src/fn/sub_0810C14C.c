@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0810C14C(u8 *p)
+void RegistryF246_HideAnimations(u8 *p)
 {
     u32 flag = 1;
     u8 *q = p + 0x28;

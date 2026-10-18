@@ -1,11 +1,13 @@
 #include "animated_hazard.h"
+/* AnimatedHazard_Noop: Empty function with no callers or taken address; placeholder/no-op in the animated-hazard unit. */
+#define AnimatedHazard_Noop sub_08012134
 
-struct AnimatedHazardManager *sub_08012040(void)
+struct AnimatedHazardManager *AnimatedHazard_GetManager(void)
 {
     return gUnk_02000050;
 }
 
-void sub_0801204C(void *unused, struct AnimatedHazard *p, u32 v)
+void AnimatedHazard_SetState(void *unused, struct AnimatedHazard *p, u32 v)
 {
     u32 z = 0;
     p->state = v;
@@ -13,7 +15,7 @@ void sub_0801204C(void *unused, struct AnimatedHazard *p, u32 v)
     p->entered = 1;
 }
 
-s32 sub_08012058(void *unused, struct AnimatedHazard *p)
+s32 AnimatedHazard_ConsumeEntered(void *unused, struct AnimatedHazard *p)
 {
     s32 r;
     if (p->entered == 0) {
@@ -43,16 +45,16 @@ void AnimatedHazard_Initialize(struct AnimatedHazardManager *m, struct AnimatedH
     offset.z = 0;
     Collider_Init(effect, 0, 0x2001, 0, 16, &size, &offset);
     Collider_SetCallback(effect, 0, p);
-    sub_0821FF58(effect, 100, 50, 0, 0x60000, 30);
+    Collider_SetAttackProperties(effect, 100, 50, 0, 0x60000, 30);
     p->active = zero;
 }
 
-void sub_0801204C(void *, struct AnimatedHazard *, u32);
+void AnimatedHazard_SetState(void *, struct AnimatedHazard *, u32);
 
-void sub_08012114(void *a, struct AnimatedHazard *p)
+void AnimatedHazard_Deactivate(void *a, struct AnimatedHazard *p)
 {
     p->sprite.flags |= 1;
-    sub_0801204C(a, p, 0);
+    AnimatedHazard_SetState(a, p, 0);
     p->active = 0;
 }
 
@@ -67,21 +69,21 @@ void AnimatedHazard_WaitForPlayer(void *m, struct AnimatedHazard *p)
     else
         p->sprite.flags |= 1;
     if (++p->timer > p->duration)
-        sub_0801204C(m, p, 3);
+        AnimatedHazard_SetState(m, p, 3);
     else {
-        struct SceneVec *player = sub_0815F53C(0);
+        struct SceneVec *player = Player_GetEffectivePosition(0);
         struct SceneVec *pos = &p->sprite.position;
         int x = player->x - pos->x, z = player->z - pos->z;
         if (x * x + z * z < 14400)
-            sub_0801204C(m, p, 3);
+            AnimatedHazard_SetState(m, p, 3);
     }
 }
 
-s32 sub_08012058(void *, struct AnimatedHazard *);
+s32 AnimatedHazard_ConsumeEntered(void *, struct AnimatedHazard *);
 
 void AnimatedHazard_EmitWarning(void *m, struct AnimatedHazard *p)
 {
-    sub_08012058(m, p);
+    AnimatedHazard_ConsumeEntered(m, p);
     if (p->timer < 60) {
         switch (p->timer) {
             case 0:
@@ -92,7 +94,7 @@ void AnimatedHazard_EmitWarning(void *m, struct AnimatedHazard *p)
         }
     }
     if (++p->timer > 89)
-        sub_0801204C(m, p, 3);
+        AnimatedHazard_SetState(m, p, 3);
 }
 
 static inline u32 frame_factor(u16 v)
@@ -110,7 +112,7 @@ void AnimatedHazard_AnimateAttack(struct AnimatedHazardManager *m, struct Animat
     const u16 *entry;
     register u16 n asm("r0");
     int done;
-    if (sub_08012058(m, p)) {
+    if (AnimatedHazard_ConsumeEntered(m, p)) {
         p->sprite.flags &= ~1;
         Anim_SetSequence(&p->anim, m->script, 0, 0, 0);
         Sound_PlaySongChecked(0x34D);
@@ -172,7 +174,7 @@ void AnimatedHazard_AnimateAttack(struct AnimatedHazardManager *m, struct Animat
     } else
         done = 0;
     if (done)
-        sub_0801204C(m, p, 4);
+        AnimatedHazard_SetState(m, p, 4);
     Collider_Refresh(p->collider);
 }
 
@@ -184,7 +186,7 @@ void AnimatedHazard_AnimateHold(struct AnimatedHazardManager *m, struct Animated
     const u16 *entry;
     register u16 n asm("r0");
     int done;
-    if (sub_08012058(m, p)) {
+    if (AnimatedHazard_ConsumeEntered(m, p)) {
         Anim_SetSequence(&p->anim, m->script, 1, 0, 0);
     }
     o = &p->sprite;
@@ -244,11 +246,11 @@ void AnimatedHazard_AnimateHold(struct AnimatedHazardManager *m, struct Animated
     } else
         done = 0;
     if (p->timer >= p->hold)
-        sub_0801204C(m, p, 5);
+        AnimatedHazard_SetState(m, p, 5);
     Collider_Refresh(p->collider);
 }
 
-void sub_08012114(void *, struct AnimatedHazard *);
+void AnimatedHazard_Deactivate(void *, struct AnimatedHazard *);
 
 // MATCHING_CONCESSION: register-pinning
 void AnimatedHazard_AnimateRetraction(struct AnimatedHazardManager *m, struct AnimatedHazard *p)
@@ -258,7 +260,7 @@ void AnimatedHazard_AnimateRetraction(struct AnimatedHazardManager *m, struct An
     const u16 *entry;
     register u16 n asm("r0");
     int done;
-    if (sub_08012058(m, p)) {
+    if (AnimatedHazard_ConsumeEntered(m, p)) {
         Anim_SetSequence(&p->anim, m->script, 2, 0, 0);
     }
     o = &p->sprite;
@@ -318,50 +320,50 @@ void AnimatedHazard_AnimateRetraction(struct AnimatedHazardManager *m, struct An
     } else
         done = 0;
     if (done)
-        sub_08012114(m, p);
+        AnimatedHazard_Deactivate(m, p);
 }
 
 extern const u32 gUnk_08604B6C[];
 
-void sub_080125FC(void *a, struct AnimatedHazard *p)
+void AnimatedHazard_Update(void *a, struct AnimatedHazard *p)
 {
     sub_08249240(a, p, (void *)gUnk_08604B6C[p->state]);
     p->timer += 1;
 }
 
-void sub_08012620(void *unused, struct AnimatedHazard *p)
+void AnimatedHazard_RemoveSprite(void *unused, struct AnimatedHazard *p)
 {
     Sprite_Remove(&p->sprite);
 }
 
-void sub_080125FC(void *, struct AnimatedHazard *);
+void AnimatedHazard_Update(void *, struct AnimatedHazard *);
 
-s32 sub_08012630(struct AnimatedHazardManager *s)
+s32 AnimatedHazardManager_Update(struct AnimatedHazardManager *s)
 {
     struct AnimatedHazard *e = s->hazards;
     s32 i;
     for (i = 7; i >= 0; i--, e++) {
         if (e->active != 0)
-            sub_080125FC(s, e);
+            AnimatedHazard_Update(s, e);
     }
     return 0;
 }
 
-void sub_08012620(void *, struct AnimatedHazard *);
+void AnimatedHazard_RemoveSprite(void *, struct AnimatedHazard *);
 
-u32 sub_08012658(struct AnimatedHazardManager *s)
+u32 AnimatedHazardManager_Destroy(struct AnimatedHazardManager *s)
 {
     struct AnimatedHazard *e = s->hazards;
     s32 i;
     for (i = 7; i >= 0; i--, e++) {
-        sub_08012620(s, e);
+        AnimatedHazard_RemoveSprite(s, e);
     }
     return gUnk_02000050 = 0;
 }
 
 void AnimatedHazard_Initialize(struct AnimatedHazardManager *, struct AnimatedHazard *);
 
-s32 sub_08012684(struct AnimatedHazardManager *s)
+s32 AnimatedHazardManager_Initialize(struct AnimatedHazardManager *s)
 {
     struct AnimatedHazard *e;
     s32 i;
@@ -376,21 +378,21 @@ s32 sub_08012684(struct AnimatedHazardManager *s)
     return 0;
 }
 
-s32 sub_08012684(struct AnimatedHazardManager *);
+s32 AnimatedHazardManager_Initialize(struct AnimatedHazardManager *);
 
-s32 sub_08012630(struct AnimatedHazardManager *);
+s32 AnimatedHazardManager_Update(struct AnimatedHazardManager *);
 
-u32 sub_08012658(struct AnimatedHazardManager *);
+u32 AnimatedHazardManager_Destroy(struct AnimatedHazardManager *);
 
-void *sub_080126DC(void)
+void *AnimatedHazardManager_Create(void)
 {
     struct AnimatedHazardManager *p;
     if (gUnk_02000050 != 0)
         return gUnk_02000050;
     p = Task_Create(8, 0x538);
     if (p != 0) {
-        Task_SetCallbacks(p, (void (*)(void *))sub_08012630, (void (*)(void *))sub_08012658);
-        if (sub_08012684(p) < 0) {
+        Task_SetCallbacks(p, (void (*)(void *))AnimatedHazardManager_Update, (void (*)(void *))AnimatedHazardManager_Destroy);
+        if (AnimatedHazardManager_Initialize(p) < 0) {
             Task_Kill(p);
             return 0;
         }
@@ -398,7 +400,7 @@ void *sub_080126DC(void)
     return p;
 }
 
-struct AnimatedHazard *sub_08012728(struct AnimatedHazardManager *p)
+struct AnimatedHazard *AnimatedHazardManager_GetFreeSlot(struct AnimatedHazardManager *p)
 {
     struct AnimatedHazard *q = p->hazards;
     s32 i = 0;
@@ -412,15 +414,15 @@ struct AnimatedHazard *sub_08012728(struct AnimatedHazardManager *p)
     return 0;
 }
 
-struct AnimatedHazardManager *sub_08012040(void);
+struct AnimatedHazardManager *AnimatedHazard_GetManager(void);
 
-void *sub_080126DC(void);
+void *AnimatedHazardManager_Create(void);
 
-struct AnimatedHazard *sub_08012728(struct AnimatedHazardManager *);
+struct AnimatedHazard *AnimatedHazardManager_GetFreeSlot(struct AnimatedHazardManager *);
 
 static inline u8 *cell(int i)
 {
-    u8 *p = sub_0821D64C(i, 1);
+    u8 *p = TerrainModifiers_FindCellOverride(i, 1);
     if (p)
         return p + 4;
     return gUnk_030052F4->cells + 12 + i * 4;
@@ -428,7 +430,7 @@ static inline u8 *cell(int i)
 
 int AnimatedHazard_Create(struct SceneVec *source, int damage, int hold)
 {
-    struct AnimatedHazardManager *m = sub_08012040();
+    struct AnimatedHazardManager *m = AnimatedHazard_GetManager();
     struct AnimatedHazard *p;
     struct SceneVec *pos;
     void *effect;
@@ -436,11 +438,11 @@ int AnimatedHazard_Create(struct SceneVec *source, int damage, int hold)
     int height, slope;
     int zero;
     if (!m) {
-        m = sub_080126DC();
+        m = AnimatedHazardManager_Create();
         if (!m)
             return -1;
     }
-    p = sub_08012728(m);
+    p = AnimatedHazardManager_GetFreeSlot(m);
     if (!p)
         return -1;
     p->sprite.position = *source;
@@ -471,8 +473,8 @@ int AnimatedHazard_Create(struct SceneVec *source, int damage, int hold)
     }
     effect = p->collider;
     Collider_SetPosition(effect, pos, 0);
-    sub_0821FF50(effect, (u16)damage, 50);
-    sub_0801204C(m, p, 2);
+    Collider_SetAttackPowerAndForce(effect, (u16)damage, 50);
+    AnimatedHazard_SetState(m, p, 2);
     p->timer = zero;
     p->hold = hold;
     p->active = 1;
@@ -482,7 +484,7 @@ int AnimatedHazard_Create(struct SceneVec *source, int damage, int hold)
 // MATCHING_CONCESSION: register-pinning
 int AnimatedHazard_CreateProximity(struct SceneVec *source, int damage, int delay, int hold)
 {
-    struct AnimatedHazardManager *m = sub_08012040();
+    struct AnimatedHazardManager *m = AnimatedHazard_GetManager();
     struct AnimatedHazard *p;
     struct SceneVec *pos;
     void *effect;
@@ -490,11 +492,11 @@ int AnimatedHazard_CreateProximity(struct SceneVec *source, int damage, int dela
     int height, slope;
     int zero;
     if (!m) {
-        m = sub_080126DC();
+        m = AnimatedHazardManager_Create();
         if (!m)
             return -1;
     }
-    p = sub_08012728(m);
+    p = AnimatedHazardManager_GetFreeSlot(m);
     if (!p)
         return -1;
     p->sprite.position = *source;
@@ -527,9 +529,9 @@ int AnimatedHazard_CreateProximity(struct SceneVec *source, int damage, int dela
     Collider_SetPosition(effect, pos, 0);
     {
         register int d asm("r9") = damage;
-        sub_0821FF58(effect, d, 50, 0, 8, 30);
+        Collider_SetAttackProperties(effect, d, 50, 0, 8, 30);
     }
-    sub_0801204C(m, p, 1);
+    AnimatedHazard_SetState(m, p, 1);
     Anim_SetSequence(&p->anim, m->script, 0, 0, zero);
     {
         struct HazardSprite *o = &p->sprite;
@@ -602,20 +604,20 @@ int AnimatedHazard_CreateProximity(struct SceneVec *source, int damage, int dela
     return 0;
 }
 
-s32 sub_08012A88(void)
+s32 AnimatedHazardManager_RetractAll(void)
 {
-    struct AnimatedHazardManager *s = sub_08012040();
+    struct AnimatedHazardManager *s = AnimatedHazard_GetManager();
     struct AnimatedHazard *e;
     s32 i;
     if (s == 0) {
-        s = sub_080126DC();
+        s = AnimatedHazardManager_Create();
         if (s == 0)
             return -1;
     }
     e = s->hazards;
     for (i = 7; i >= 0; i--) {
         if (e->active != 0 && e->state <= 2)
-            sub_0801204C(s, e, 3);
+            AnimatedHazard_SetState(s, e, 3);
         e++;
     }
     return 0;

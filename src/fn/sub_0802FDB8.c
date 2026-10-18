@@ -1,6 +1,6 @@
 #include "global.h"
 void Trigger_ConsumePending(void *, s32);
-void sub_0802FDB8(void *unused, u8 *p)
+void SceneCharacter_UpdateOneShotActionState(void *unused, u8 *p)
 {
     u32 one;
     u32 zero;

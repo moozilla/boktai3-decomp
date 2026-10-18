@@ -2,7 +2,7 @@
 #include "game_state.h"
 extern u8 *gUnk_02000580[];
 void sub_0822E458(s32 slot, s32 id); /* sets slot */
-void sub_08178140(void);
+void Hud_RefreshEquipmentDisplay(void);
 void sub_0813F9EC(u8 *actor, s32 id);
 
 /* Marks id in the unlock mask, puts it in the first empty one of the four
@@ -17,7 +17,7 @@ void GameState_AddEquipment(s32 id)
         if (*(s16 *)(i * 2 + (u8 *)gUnk_02000710 + 0x88) == -1) {
             sub_0822E458(i, id);
             gUnk_02000710->selected = i;
-            sub_08178140();
+            Hud_RefreshEquipmentDisplay();
             if (i == gUnk_02000710->selected && gUnk_02000580[0])
                 sub_0813F9EC(gUnk_02000580[0], id);
             return;

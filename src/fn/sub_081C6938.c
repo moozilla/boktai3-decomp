@@ -1,9 +1,9 @@
 #include "global.h"
 
-void sub_0802DB1C(u32, u32);
+void Actor_UpdateVisibilityAndShadow(u32, u32);
 
-s32 sub_081C6938(u32 a, u32 b)
+s32 StateActor_OnRender(u32 a, u32 b)
 {
-    sub_0802DB1C(a, b);
+    Actor_UpdateVisibilityAndShadow(a, b);
     return 0;
 }

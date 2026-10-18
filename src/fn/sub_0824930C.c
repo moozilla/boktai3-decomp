@@ -49,7 +49,7 @@ typedef union {
 extern DItype __fixunssfdi(SFtype a);
 extern DItype __fixunsdfdi(DFtype a);
 
-USItype sub_0824930C(DFtype a)
+USItype Libgcc_ConvertDoubleToUint32(DFtype a)
 {
     if (a >= -(DFtype)(-2147483647L - 1))
         return (SItype)(a + (-2147483647L - 1)) - (-2147483647L - 1);

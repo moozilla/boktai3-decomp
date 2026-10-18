@@ -9,7 +9,7 @@ struct S {
 void Script_Call(u32, u32);
 void Task_Kill(struct S *);
 
-void sub_081C616C(struct S *p)
+void TimeResult_UpdateFadeOut(struct S *p)
 {
     p->f370++;
     if (p->f370 > 0x20) {

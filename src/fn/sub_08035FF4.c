@@ -43,7 +43,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
 }
 void sub_0824923C(void *, void *);
 void sub_08249238(void *);
-void sub_08035FF4(struct Engine *p)
+void Wireless_PollParentNiSend(struct Engine *p)
 {
     register int lost asm("r6") = 0;
     if (p->mask & 2) {

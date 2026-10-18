@@ -12,7 +12,7 @@ struct S {
     s8 b;
 };
 
-void sub_080F26B0(struct S *s)
+void Ivy_WaitForPrimaryActionCompletion(struct S *s)
 {
     u32 v = s->v;
     if (v != 0) {

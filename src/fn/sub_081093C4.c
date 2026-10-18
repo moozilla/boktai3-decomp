@@ -2,7 +2,7 @@
 
 extern u8 *gUnk_020004B4;
 
-void sub_081093C4(void)
+void Registry1745_NotifyMenuClosed(void)
 {
     u8 *p = gUnk_020004B4;
     if (p != 0)

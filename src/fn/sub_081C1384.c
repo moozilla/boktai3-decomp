@@ -10,7 +10,7 @@ struct S {
     u32 a454;
 };
 void sub_0824923C(void *, u32);
-u32 sub_081C1384(struct S *p)
+u32 PlayStats_Update(struct S *p)
 {
     if ((p->fl & 1) == 0)
         p->a6c++;

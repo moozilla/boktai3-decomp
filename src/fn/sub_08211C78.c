@@ -1,16 +1,16 @@
 #include "global.h"
 s32 sub_0821172C(void *, s32);
-s32 sub_082116EC(s32);
+s32 ForgingBook_GetCategoryEntryCount(s32);
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
 void Anim_LoadKeyframe(void *, void *, u32, u32);
-u32 sub_08211C78(u8 *p)
+u32 ForgingBook_UpdateCategoryCountDigits(u8 *p)
 {
     s16 *idx = (s16 *)(p + 0xb60);
     s32 a = sub_0821172C(p, *idx), b;
     s32 ad, am, bd, bm;
     void *anchor;
-    b = sub_082116EC(*idx);
+    b = ForgingBook_GetCategoryEntryCount(*idx);
     if (*idx > 5) {
         a--;
         b--;

@@ -12,7 +12,7 @@ static inline u8 test0894(u8 *p)
         return 1;
     return 0;
 }
-s32 sub_080A0894(u8 *s)
+s32 Crow_TryActivatePlayerProximityResponse(u8 *s)
 {
     s32 d;
     u8 *p;

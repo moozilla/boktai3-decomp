@@ -3,20 +3,20 @@ struct Bytes {
     u8 b0, b1, b2, b3, b4, b5, b6, b7;
 };
 extern struct Bytes gUnk_03005460;
-void sub_0822C1C8(void);
-void sub_0822C1F0(void);
-void sub_082284CC(s32);
-void sub_082284DC(void);
-void sub_082284E8(void);
-u32 sub_08248C70(void *);
-u32 sub_08229258(void)
+void Solar_PauseMeasurement(void);
+void Solar_ResumeMeasurement(void);
+void Clock_WaitCycles(s32);
+void Clock_BeginRtcAccess(void);
+void Clock_EndRtcAccess(void);
+u32 Rtc_ReadDateTime(void *);
+u32 Clock_ReadValidatedRtcDateTime(void)
 {
     u32 status = 0;
     s32 i;
 
     vu16 *ime, *ie;
     u32 zero;
-    sub_0822C1C8();
+    Solar_PauseMeasurement();
     i = 0;
     ime = (vu16 *)0x04000208;
     zero = 0;
@@ -26,17 +26,17 @@ u32 sub_08229258(void)
         *ime = zero;
         old = *ie;
         *ie = zero;
-        sub_082284DC();
-        status = (u8)sub_08248C70(&gUnk_03005460);
-        sub_082284E8();
+        Clock_BeginRtcAccess();
+        status = (u8)Rtc_ReadDateTime(&gUnk_03005460);
+        Clock_EndRtcAccess();
         *ie = old;
         *ime = 1;
         if (status == 1)
             break;
-        sub_082284CC(200);
+        Clock_WaitCycles(200);
         i++;
     }
-    sub_0822C1F0();
+    Solar_ResumeMeasurement();
     if (status == 1) {
 
         if ((gUnk_03005460.b0 & 0xf0) > 0x9f || (15 & gUnk_03005460.b0) > 9) {

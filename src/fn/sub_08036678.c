@@ -41,14 +41,14 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->pending = 1;
 }
 void sub_08223BC0(int);
-void sub_0803441C(struct Engine *);
-void sub_0803451C(struct Engine *);
+void WirelessController_UpdatePeerRosterSend(struct Engine *);
+void WirelessController_PollPeerRosterSend(struct Engine *);
 int sub_0824923C(void *, void *);
 extern void *gUnk_086056EC[];
-void sub_080341B8(struct Engine *);
-void sub_080341E0(struct Engine *);
-void sub_0803559C(struct Engine *);
-void sub_08223580(int);
+void WirelessController_RestoreLocalInput(struct Engine *);
+void WirelessController_PollInputExchange(struct Engine *);
+void Wireless_BuildParentUniPacket(struct Engine *);
+void RfuManager_SendData(int);
 extern u32 gUnk_03005250;
 extern u16 gUnk_03005274[];
 // MATCHING_CONCESSION: register-pinning
@@ -92,7 +92,7 @@ static inline void publishInputs(struct Engine *p)
     } else
         gUnk_03005250 = enabled;
 }
-int sub_08036678(struct Engine *p)
+int Wireless_UpdateChildUniSession(struct Engine *p)
 {
     u8 *ready = &p->flag31;
     {
@@ -101,8 +101,8 @@ int sub_08036678(struct Engine *p)
         sub_08223BC0(zero);
     }
     rfu_getMasterSlave();
-    sub_080341B8(p);
-    sub_080341E0(p);
+    WirelessController_RestoreLocalInput(p);
+    WirelessController_PollInputExchange(p);
     {
         void **handlers = gUnk_086056EC;
         int op = p->operation;

@@ -21,7 +21,7 @@ static inline s32 rnd(u16 *table)
     v = table[gUnk_03005308];
     return v >> 3;
 }
-void sub_08234A84(struct Elem *p)
+void HealthRestoreEffect_InitSparkle(struct Elem *p)
 {
     u16 *table;
     u32 zero;

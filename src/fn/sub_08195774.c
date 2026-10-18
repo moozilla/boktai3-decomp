@@ -2,7 +2,7 @@
 extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 s32 sub_08249350(s32, s32);
-void sub_08195774(u8 *p)
+void Nidhoggr_ShufflePartOrder(u8 *p)
 {
     const u16 *tbl;
     s32 i;

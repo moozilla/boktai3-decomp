@@ -1,7 +1,7 @@
 #include "global.h"
 void sub_0813A5B4(u32, u32);
 extern u32 gUnk_020004D4;
-u32 sub_0813A228(void)
+u32 FollowingSpriteEffect_DestroyManager(void)
 {
     s32 i = 0;
     do {

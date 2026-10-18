@@ -7,11 +7,11 @@ struct S {
 extern struct S *gUnk_020003C8;
 struct S *Task_Create(u32, u32);
 void Task_SetCallbacks(void *, void (*)(void *), void (*)(void *));
-void sub_081E9D84(void *);
-void sub_081E9DE4(void *);
+void Actor_UpdateController(void *);
+void Actor_DestroyController(void *);
 s32 sub_081EA4DC(void *);
 void Task_Kill(void *);
-struct S *sub_081EA730(u32 resource, u32 unused)
+struct S *Actor_EnsureController(u32 resource, u32 unused)
 {
     struct S *p;
     if (gUnk_020003C8)
@@ -19,7 +19,7 @@ struct S *sub_081EA730(u32 resource, u32 unused)
     p = Task_Create(11, 0xfa4);
     if (p) {
         p->resource = resource;
-        Task_SetCallbacks(p, sub_081E9D84, sub_081E9DE4);
+        Task_SetCallbacks(p, Actor_UpdateController, Actor_DestroyController);
         if (sub_081EA4DC(p) < 0) {
             Task_Kill(p);
             return 0;

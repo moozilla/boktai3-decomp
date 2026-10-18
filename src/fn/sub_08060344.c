@@ -7,7 +7,7 @@ void SceneInventory_RefreshEquipmentValue(struct SceneInventoryActionView *panel
         case 4:
         case 5:
             if (panel->selection <= 15) {
-                kind = sub_0822D6E0(panel->selection);
+                kind = Inventory_GetEquipmentId(panel->selection);
                 value = SceneItemValue_CalculateEquipment(panel->selection);
                 label = 1;
                 goto ready;
@@ -16,7 +16,7 @@ void SceneInventory_RefreshEquipmentValue(struct SceneInventoryActionView *panel
                 index += panel->selection;
                 kind = panel->catalog[index];
                 if (kind >= 0) {
-                    value = sub_08227F5C(kind)->baseValue;
+                    value = Equipment_GetDefinition(kind)->baseValue;
                     label = 0;
                     goto ready;
                 }

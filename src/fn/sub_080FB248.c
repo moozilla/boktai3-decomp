@@ -9,7 +9,7 @@ struct S080FB248 {
     struct Q *q;
 };
 
-u32 sub_080FB248(struct S080FB248 *s, s32 x)
+u32 Axe_IsRoutePointRecent(struct S080FB248 *s, s32 x)
 {
     struct Q *q = s->q;
     s32 i;

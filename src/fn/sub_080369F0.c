@@ -1,4 +1,6 @@
 #include "global.h"
+/* Wireless_GetLocalParticipantIndex: Returns the participant index assigned by matching the local RFU ID */
+#define Wireless_GetLocalParticipantIndex sub_080369F0
 
 extern u8 *gUnk_02000484;
 

@@ -14,7 +14,7 @@ struct R {
     u8 f3[0x2d0 - 0x2c4];
     u32 flags;
 };
-u32 sub_080AB010(struct R *s)
+u32 TentacleActor_OnResolveVariantValue(struct R *s)
 {
     struct Q *q = (struct Q *)(s->p + 0x48);
     if (q->hE == 0) {

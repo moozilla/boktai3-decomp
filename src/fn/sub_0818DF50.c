@@ -10,7 +10,7 @@ struct P {
     u32 z;
 };
 void AnimData_SelectPaletteBank(void *, u32);
-void sub_0818DF50(struct P *p)
+void Armor_UpdatePartPaletteRestore(struct P *p)
 {
     s32 v = --p->w128;
     if (v == 0) {

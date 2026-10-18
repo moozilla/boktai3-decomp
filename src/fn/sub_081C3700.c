@@ -8,7 +8,7 @@ struct S {
     u32 f8;
 };
 
-void sub_081C3700(struct S *p)
+void RegistryF3E4_ClearState(struct S *p)
 {
     if (p) {
         u32 z = 0;

@@ -3,7 +3,7 @@
 extern const s32 gUnk_0824FAB8[];
 void memcpy(void *, const void *, u32);
 
-s32 sub_081CE08C(u32 n)
+s32 SceneCharacter_GetPaletteIndex(u32 n)
 {
     s32 t[40];
     s32 r;

@@ -2,15 +2,15 @@
 
 /* Sun clock: time-of-day spans and the light phase (0x08228928-0x08228C10). */
 /* Recompute the spans and the phase, initializing the clock first if needed. */
-void sub_08228928(void)
+void SunClock_Refresh(void)
 {
     if (!gUnk_0300546C)
-        sub_08229380();
+        Clock_SyncFromRtc();
     SunClock_Update();
 }
 
 /* Set time A (hour, minute), one hour later in daylight-saving mode. */
-void sub_08228A10(s32 hour, s32 minute)
+void SunClock_SetSunrise(s32 hour, s32 minute)
 {
     struct SunClock *c = &gUnk_03005430;
     c->hourA = hour;
@@ -24,7 +24,7 @@ void sub_08228A10(s32 hour, s32 minute)
 }
 
 /* Set time B (hour, minute), one hour later in daylight-saving mode. */
-void sub_08228B10(s32 hour, s32 minute)
+void SunClock_SetSunset(s32 hour, s32 minute)
 {
     struct SunClock *c = &gUnk_03005430;
     c->hourB = hour;

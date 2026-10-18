@@ -8,8 +8,8 @@ struct ScriptUtilityArguments {
     s32 *values;
 };
 extern u16 gUnk_03005260[];
-s32 sub_0821AA00(const void *);
-u32 sub_0821AFB4(u32, struct ScriptUtilityArguments *);
+s32 Script_ReadValue(const void *);
+u32 Script_RunBlock(u32, struct ScriptUtilityArguments *);
 void ScriptUtility_SetControlFlag(s32);
 void ScriptUtility_ClearControlFlag(void);
 #endif

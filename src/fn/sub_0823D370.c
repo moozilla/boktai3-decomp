@@ -12,7 +12,7 @@ static inline u32 tst(u32 *a, u32 m)
     return *a & m;
 }
 
-s32 sub_0823D370(struct P0823D370 *p)
+s32 Player_IsUnflaggedBelowResourceLimit(struct P0823D370 *p)
 {
     if (tst(&p->f20, 0x10) == 0 && p->f428 < p->f42A)
         return 1;

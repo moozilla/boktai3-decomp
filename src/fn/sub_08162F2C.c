@@ -8,7 +8,7 @@ struct P {
     u8 f2[4];
     u16 d;
 };
-void sub_08162F2C(struct P *p)
+void GameOver_UpdateLetterHold(struct P *p)
 {
     p->d++;
     if (p->d > 0x13) {

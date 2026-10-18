@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
-void sub_0807FC90(u8 *);
+void SceneActorControl_OnIdle(u8 *);
 void SceneActorTerrain_DisableCollision(struct SceneActorRegistryActor *);
 void SceneActorRecord_RecordPair(u32, u32);
 extern u16 gUnk_030039F0;
@@ -68,7 +68,7 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
     if (actor) {
         u32 zero = 0;
         u32 one = 1;
-        const void *defaultControl = (const void *)sub_0807FC90;
+        const void *defaultControl = (const void *)SceneActorControl_OnIdle;
         do {
             u32 *flags;
             s16 *health;

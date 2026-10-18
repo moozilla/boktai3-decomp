@@ -5,7 +5,7 @@ struct S {
     u32 f8;
 };
 
-void sub_081C3AF8(struct S *p)
+void RegistryF3E4_UpdateVisibleIdle(struct S *p)
 {
     p->f8++;
 }

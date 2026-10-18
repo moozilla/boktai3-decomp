@@ -47,12 +47,12 @@ struct Actor {
     void *callback;
 };
 extern struct Actor *gUnk_020000DC;
-int sub_0803092C(struct Actor *);
+int MessageWindow_UpdateSpeakerPortrait(struct Actor *);
 void sub_080316A4(void);
-void sub_080317D8(void);
-void sub_080317CC(void);
+void MessageWindow_UpdateImmediatePlayback(void);
+void MessageWindow_ClearTextCompletion(void);
 int TextWindow_BlankRect(int, int, int, int);
-void *sub_080313C8(struct Actor *, int);
+void *MessageWindow_GetStringAtOffset(struct Actor *, int);
 void TextState_Reset(struct State *);
 int TextState_SetBounds(struct State *, int, int, int, int);
 int Script_GetValue(void);
@@ -80,20 +80,20 @@ struct Sun {
 };
 extern struct Sun *gUnk_02000710;
 int Script_SeekToKeyword(int);
-void *sub_08227E90(void);
+void *Script_GetTextSourcePc(void);
 void *Script_GetPc(void);
 int Script_GetKeywordValue(int, int);
-int sub_080308D0(struct Actor *, int);
-void sub_08030908(struct Actor *);
-int sub_08030C84(void *);
-int sub_08030F20(int, int, int, int);
-int sub_08032B24(struct State *);
-void sub_080317D4(void);
+int MessageWindow_LoadPalette(struct Actor *, int);
+void MessageWindow_ApplyPalette(struct Actor *);
+int MessageWindow_SetMessageTable(void *);
+int MessageWindow_SetBounds(int, int, int, int);
+int TextState_StepPlayback(struct State *);
+void MessageWindow_UpdateIdle(void);
 void sub_080313E4(void);
 extern u16 gUnk_03005260[];
 void Anim_Remove(void *);
 void Sprite_Remove(void *);
-int sub_08031964(struct Actor *p)
+int MessageWindow_OnDestroy(struct Actor *p)
 {
     Anim_Remove((u8 *)p + 0x210);
     Sprite_Remove(&p->render);

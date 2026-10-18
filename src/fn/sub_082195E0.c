@@ -6,10 +6,10 @@ struct Obj {
     u8 pad5[0x17];
     u8 f1C;
 };
-void sub_08214450(struct Obj *, u32);
+void Anim_UnlinkFromList(struct Obj *, u32);
 
 void Anim_Remove(struct Obj *o)
 {
     if (o->f4 != 0)
-        sub_08214450(o, o->f1C);
+        Anim_UnlinkFromList(o, o->f1C);
 }

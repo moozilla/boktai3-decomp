@@ -12,7 +12,7 @@ struct S080F5E74 {
 };
 void AnimData_SelectPaletteBank(u8 *, u32);
 
-void sub_080F5E74(struct S080F5E74 *s)
+void Sword_UpdateComponentPaletteRestore(struct S080F5E74 *s)
 {
     s16 v = --s->h;
     if (v == 0) {

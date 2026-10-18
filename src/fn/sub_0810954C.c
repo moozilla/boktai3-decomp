@@ -3,9 +3,9 @@
 u32 sub_08033690(u32, u32, u32, u32);
 void TextWindow_SetScript(u32, u32);
 void TextWindow_Refresh(u32, u32);
-void sub_080337FC(u32);
+void TextWindow_StartPlayback(u32);
 
-void sub_0810954C(u8 *p)
+void LinkConnectionMenu_CreateTextWindow(u8 *p)
 {
     u32 h;
 
@@ -13,5 +13,5 @@ void sub_0810954C(u8 *p)
     *(u32 *)(p + 0x30) = h;
     TextWindow_SetScript(h, *(u32 *)(p + 0x24));
     TextWindow_Refresh(*(u32 *)(p + 0x30), 0);
-    sub_080337FC(*(u32 *)(p + 0x30));
+    TextWindow_StartPlayback(*(u32 *)(p + 0x30));
 }

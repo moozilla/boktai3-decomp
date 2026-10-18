@@ -33,7 +33,7 @@ void Anim_LoadKeyframe(void *, void *, u16, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 extern const s16 gUnk_086136F0[], gUnk_086137AE[], gUnk_08613BC4[];
-u32 sub_0822B590(s32);
+u32 Sound_IsSongPlaying(s32);
 void Sound_StopSong(s32);
 void Sound_PlaySong(s32);
 void Anim_SetKeyframes(void *, void *, u16, s32, s32);

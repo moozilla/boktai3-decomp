@@ -2,7 +2,7 @@
 
 extern u8 *gUnk_02000710;
 
-void sub_081C5470(s32 a, s32 b, u32 c)
+void ChallengeMenu_SetStoredRank(s32 a, s32 b, u32 c)
 {
     s32 i = a * 3 + b;
     s32 h = i / 2;

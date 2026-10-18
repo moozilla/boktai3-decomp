@@ -4,7 +4,7 @@ struct Object {
     u8 pad[0x2cf];
     void (*callbacks[4])(void *, struct Object *);
 };
-int sub_0802D9C0(void *context, struct Object *p)
+int Actor_RunCallbacks(void *context, struct Object *p)
 {
     void (**alias)(void *, struct Object *);
     int i;

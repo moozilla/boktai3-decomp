@@ -63,11 +63,11 @@ struct BgMapInfo {
     u16 *map;
 };
 
-u16 *sub_0800E3E0(u32 bg, u32 x, s32 y); // address of a tile in the background's tilemap
+u16 *StatusScreen_GetTilePtr(u32 bg, u32 x, s32 y); // address of a tile in the background's tilemap
 void NumericDisplay_DrawPair(void *unused, int left, int right);
 void NumericDisplay_DrawStatusValues(struct StatusScreen *);
 void sub_0800E5B8(struct StatusScreen *);
-void sub_0800E77C(struct StatusScreen *);
+void StatusScreen_RefreshDirtyDisplays(struct StatusScreen *);
 int StatusScreen_CheckConfirm(struct StatusScreen *);
 void StatusScreen_Close(struct StatusScreen *);
 void StatusScreen_BeginClose(struct StatusScreen *);
@@ -85,9 +85,9 @@ void sub_0800EF90(struct StatusScreen *);
 s32 Div(s32, s32);
 s32 SunClock_GetBaseHour(void); // counter values
 s32 SunClock_GetBaseMinute(void);
-u32 sub_08228D7C(void);
-void sub_082286E0(s32 *, s32 *, s32 *, u32);
-void sub_082279A8(s32, s32, s32, s32, s32, s32, s32); // (guess) start a screen transition
+u32 SunClock_GetPackedDate(void);
+void Clock_UnpackDate(s32 *, s32 *, s32 *, u32);
+void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32); // (guess) start a screen transition
 
 int StatusScreen_Update(struct StatusScreen *);
 int StatusScreen_Destroy(struct StatusScreen *);
@@ -97,7 +97,7 @@ extern void *gUnk_03004278, *gUnk_03003A00; // HBlank DMA source and destination
 extern u16 gUnk_03004270, gUnk_03004274;
 extern u16 gUnk_03005160[];
 extern const u16 gUnk_08604B3C[]; // default phase durations
-void sub_08215A74(u32, s32);
+void Bg_SetPriority(u32, s32);
 void sub_082160B8(u32, u32, void *, s32, s32, s32, s32, void *);
 void *Video_GetBackgroundMap(u32);
 extern struct StatusScreen *gUnk_02000044; // the live status screen, or NULL

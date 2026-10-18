@@ -5,12 +5,12 @@ struct S {
     u8 a;
 };
 void Collider_Remove(u8 *);
-void sub_080297E8(struct S *);
+void GridAttackActor_RemoveSprite(struct S *);
 void SceneActors_Destroy(struct S *);
-u32 sub_0802BF88(struct S *p)
+u32 GridAttackActor_Destroy(struct S *p)
 {
     Collider_Remove(&p->a);
-    sub_080297E8(p);
+    GridAttackActor_RemoveSprite(p);
     SceneActors_Destroy(p);
     return 0;
 }

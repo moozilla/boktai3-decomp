@@ -10,7 +10,7 @@ struct Bg {
 };
 extern struct Bg gUnk_03004C30[];
 
-void sub_08215DF0(u32 n, s32 x, s32 y, u32 a, u32 b, u32 c)
+void Bg_SetTilemapEntry(u32 n, s32 x, s32 y, u32 a, u32 b, u32 c)
 {
     struct Bg *bg = &gUnk_03004C30[n];
     bg->map[(bg->f18 << 1) * y + x] = a | (b << 10) | (c << 12);

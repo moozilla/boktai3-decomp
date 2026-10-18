@@ -18,14 +18,14 @@ extern int gUnk_0200008C, gUnk_02000478, gUnk_030051E4;
 extern u8 gUnk_03005430[];
 extern u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
-void sub_08003448(int);
-int sub_08017468(int, int);
-void sub_0801746C(void *);
-void sub_080174B8(void *, int);
+void Palette_SetBrightnessMode(int);
+int Weather_TestFlags(int, int);
+void Weather_SetRandomDuration(void *);
+void Weather_EnterPhase(void *, int);
 int sub_080177AC(void *, int, int, int);
 int Mod(int, int);
 void Sound_PlaySong(int);
-void sub_082279A8(int, int, int, int, int, int, int);
+void ScreenTransition_SendCommand(int, int, int, int, int, int, int);
 static inline int randomValue(void)
 {
     u32 offset;
@@ -64,36 +64,36 @@ int Weather_ActiveStorm(struct Weather *p)
         }
         p->light = 0;
         flags();
-        sub_08003448(2);
+        Palette_SetBrightnessMode(2);
     }
-    if (!sub_08017468(p->flags, 8)) {
+    if (!Weather_TestFlags(p->flags, 8)) {
         if (!p->countdown) {
             if (!(gUnk_030053F4 & 1024) && gUnk_02000478 > 0) {
                 gUnk_030051E4 = 5;
                 Sound_PlaySong(103);
             }
-            sub_0801746C(p);
+            Weather_SetRandomDuration(p);
         } else {
             if (gUnk_03005430[14] > 2) {
                 if (p->countdown == 5)
-                    sub_082279A8(0, 2, 31, 31, 31, 8191, 0);
+                    ScreenTransition_SendCommand(0, 2, 31, 31, 31, 8191, 0);
                 else if (p->countdown == 3)
                     gUnk_02000478 = 6;
             }
             p->countdown--;
         }
     }
-    if (!sub_08017468(p->flags, 1) && p->timer > 29) {
+    if (!Weather_TestFlags(p->flags, 1) && p->timer > 29) {
         p->light = light(p);
         if (p->light > 59 || interrupted()) {
             gUnk_0200008C = 0;
-            sub_080174B8(p, 4);
+            Weather_EnterPhase(p, 4);
             return 1;
         }
     }
-    if (!sub_08017468(p->flags, 2)) {
+    if (!Weather_TestFlags(p->flags, 2)) {
         if (gUnk_0200008C <= 0) {
-            sub_080174B8(p, 4);
+            Weather_EnterPhase(p, 4);
             gUnk_0200008C = 0;
             return 1;
         } else

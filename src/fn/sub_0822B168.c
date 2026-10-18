@@ -1,9 +1,9 @@
 #include "global.h"
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-void sub_0822B114(s32);
-void sub_0822B168(void)
+void Sound_FadeInChannel12(s32);
+void Sound_FadeInChannel12FromScript(void)
 {
     if (Script_SeekToKeyword(0x66))
-        sub_0822B114(Script_GetValue());
+        Sound_FadeInChannel12(Script_GetValue());
 }

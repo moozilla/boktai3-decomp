@@ -2,7 +2,7 @@
 
 u32 rfu_REQBN_softReset_and_checkID(void);
 
-s32 sub_08224D78(void)
+s32 Wireless_CheckAdapterReady(void)
 {
     if (rfu_REQBN_softReset_and_checkID() == 0x8001)
         return 1;

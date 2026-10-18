@@ -35,7 +35,7 @@ void PlayerCue_Stand(struct P *, s32);
 void sub_081502AC(void);
 void sub_081507F4(void);
 void Sound_PlaySong(s32);
-void sub_0815196C(void);
+void PlayerCue_UpdateRunOverlay(void);
 
 void PlayerCue_Run(struct P *p, s32 v)
 {
@@ -45,5 +45,5 @@ void PlayerCue_Run(struct P *p, s32 v)
     sub_0813AE18(p, sub_081419D4(p->d18, 1), 0x20, 1);
     sub_0815AD78(p);
     sub_0813AFEC(p, 2, 0);
-    p->fn = sub_0815196C;
+    p->fn = PlayerCue_UpdateRunOverlay;
 }

@@ -8,7 +8,7 @@ struct S {
 };
 s32 sub_0811C67C(s32);
 
-s32 sub_0811C77C(struct S *s)
+s32 CharacterModel_GetPrimaryPaletteIndex(struct S *s)
 {
     s32 r;
     switch (s->h) {

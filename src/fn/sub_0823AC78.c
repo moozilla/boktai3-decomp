@@ -3,7 +3,7 @@
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 
-void sub_0823AC78(u8 *p)
+void LinkPlayer_ReadSlotFromScript(u8 *p)
 {
     s32 v;
 

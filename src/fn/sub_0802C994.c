@@ -6,7 +6,7 @@ struct S {
     u32 b;
     u32 c;
 };
-void sub_0802C994(struct S *p)
+void Actor_ClearPendingHit(struct S *p)
 {
     p->a = 0;
     p->b = 0;

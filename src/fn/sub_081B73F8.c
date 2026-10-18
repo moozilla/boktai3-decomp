@@ -9,7 +9,7 @@ struct A {
     s32 n;
 };
 
-void sub_081B73F8(struct A *p, struct E *e)
+void VanargandAfterimagePool_ReleaseSlot(struct A *p, struct E *e)
 {
     e->a = 0;
     e->b |= 1;

@@ -19,42 +19,42 @@ extern struct LinkMenu *gUnk_020000F8;
 extern u16 gUnk_03004BD8, gUnk_03005260[];
 extern u32 gUnk_0300523C;
 extern u16 gUnk_03004FC0[];
-void sub_08033C1C(void);
+void TextWindowManager_DestroyAllWindows(void);
 void PaletteLevels_Reset(void);
 void sub_08215490(int);
-void sub_08218B30(void);
-void sub_08215114(void);
+void Video_OnFrameNoOp(void);
+void Video_OnRenderNoOp(void);
 void sub_0821969C(void);
-void sub_0821447C(int, void *, void *, void *);
+void Video_SetRenderCallbacks(int, void *, void *, void *);
 void Hud_SetMode(int);
 void Bg_ClearTilemap(int);
 void *ScriptProc_Start(int, int);
 void Bg_SetupLayers(int, int, void *, int, int, int, void *);
 void BgGfx_LoadTilemapSimple(int, int, int, int, int);
-void sub_08036C0C(void);
-void sub_0822B058(int);
-void sub_08036E14(void);
-void sub_08036EC8(struct LinkMenu *, int);
+void Wireless_RequestDisconnectMode(void);
+void Sound_FadeOutChannel10(int);
+void WirelessStatusMenu_InitDisplay(void);
+void WirelessStatusMenu_LoadStatusBackground(struct LinkMenu *, int);
 int sub_08033690(int, int, int, int);
 void TextWindow_SetScript(int, void *);
 void TextWindow_Refresh(int, int);
-void sub_080337FC(int);
-void sub_08033778(int);
+void TextWindow_StartPlayback(int);
+void TextWindow_Destroy(int);
 void Sound_PlaySong(int);
-int sub_08036BEC(void);
+int Wireless_GetStatus(void);
 int sub_0824923C(void *, void *);
 extern void *gUnk_08605770[];
 void Anim_Remove(void *);
-int sub_080370D0(struct LinkMenu *);
-int sub_08037110(struct LinkMenu *);
-struct LinkMenu *sub_08036E08(void);
+int WirelessStatusMenu_Update(struct LinkMenu *);
+int WirelessStatusMenu_Destroy(struct LinkMenu *);
+struct LinkMenu *WirelessStatusMenu_Get(void);
 struct LinkMenu *Task_Create(int, int);
 void Task_SetCallbacks(void *, void *, void *);
-int sub_08037140(struct LinkMenu *);
+int WirelessStatusMenu_InitFromScript(struct LinkMenu *);
 void Task_Kill(void *);
-struct LinkMenu *sub_080371E0(void)
+struct LinkMenu *WirelessStatusMenu_Create(void)
 {
-    struct LinkMenu *p = sub_08036E08();
+    struct LinkMenu *p = WirelessStatusMenu_Get();
     struct LinkMenu *result;
     if (p) {
         result = p;
@@ -67,11 +67,11 @@ struct LinkMenu *sub_080371E0(void)
         p = allocated;
         if (!p)
             goto returnPointer;
-        update = sub_080370D0;
-        destroy = sub_08037110;
+        update = WirelessStatusMenu_Update;
+        destroy = WirelessStatusMenu_Destroy;
         Task_SetCallbacks(allocated, update, destroy);
     }
-    if (sub_08037140(p) >= 0)
+    if (WirelessStatusMenu_InitFromScript(p) >= 0)
         goto returnPointer;
     Task_Kill(p);
     result = 0;

@@ -21,7 +21,7 @@ static inline u8 Tst(u32 *m, s32 i)
     return FALSE;
 }
 
-struct E *sub_08104220(struct S *b)
+struct E *Pool184_Allocate(struct S *b)
 {
     s32 i;
     struct E *e;

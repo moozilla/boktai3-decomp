@@ -4,7 +4,7 @@ struct P {
     u32 a;
 };
 void sub_0824923C(void *, u32);
-s32 sub_081BD2C0(struct P *p)
+s32 DarkLoan_OnUpdate(struct P *p)
 {
     sub_0824923C(p, p->a);
     return 0;

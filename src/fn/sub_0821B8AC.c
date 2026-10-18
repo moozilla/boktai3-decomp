@@ -8,7 +8,7 @@ s32 Script_GetValue(void);
 u8 *Script_GetPc(void);
 u8 *Script_DecodeOperand(u8 *, s32 *, s32 *);
 s32 Script_Call(s32, struct Args *);
-s32 sub_0821B8AC(void)
+s32 Script_CallFromOperands(void)
 {
     s32 values[16], type, value;
     struct Args args;

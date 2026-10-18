@@ -20,7 +20,7 @@ struct S {
     u32 mask;
 };
 
-u32 sub_081230B8(struct S *b)
+u32 SceneAnimatedEffect_OnTaskDestroy(struct S *b)
 {
     s32 i = 0;
     u32 *m = &b->mask;

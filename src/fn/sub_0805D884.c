@@ -3,6 +3,6 @@ s32 ScenePanelSubject_Destroy(struct ScenePanelSubjectView *subject)
 {
     Sprite_Remove(&subject->drawable);
     Collider_Remove(&subject->collider);
-    sub_0823233C(subject->effects);
+    SceneActorEffects_DestroyGroup(subject->effects);
     return 0;
 }

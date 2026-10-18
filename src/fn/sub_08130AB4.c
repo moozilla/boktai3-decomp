@@ -6,7 +6,7 @@ struct S {
     u8 idx;
 };
 void sub_0824923C(void *, u32);
-void sub_08130AB4(struct S *p)
+void SceneActorState_DispatchTable294State(struct S *p)
 {
     u32 i = p->idx;
     sub_0824923C(p, p->tbl[i]);

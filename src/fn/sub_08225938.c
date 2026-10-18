@@ -10,11 +10,11 @@ struct H {
     struct N *last;
 };
 extern struct H *gUnk_030025F8;
-s32 sub_0822590C(struct N *);
-s32 sub_08225938(struct N *n)
+s32 SceneBody_FindByPointer(struct N *);
+s32 SceneBody_Unregister(struct N *n)
 {
     struct H *h = gUnk_030025F8;
-    if (h == 0 || n == 0 || sub_0822590C(n) == 0)
+    if (h == 0 || n == 0 || SceneBody_FindByPointer(n) == 0)
         return 0;
     {
         if (n->prev == 0)

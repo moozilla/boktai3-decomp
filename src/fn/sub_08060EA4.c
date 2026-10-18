@@ -10,7 +10,7 @@ void SceneInventory_BeginItemSpecialMove(struct SceneInventoryActionView *panel)
     struct SceneInputPosition *target;
     enabled[0] = 1;
     display->widgets[panel->savedSelection + 5].flags |= 1;
-    frames[0] = sub_0822D604(sub_0822CDA8(panel->savedSelection));
+    frames[0] = sub_0822D604(Inventory_GetItemId(panel->savedSelection));
     {
         u32 attribute = 0x373;
         savedAttribute = attribute;

@@ -19,7 +19,7 @@ static inline u8 chk(struct S *p)
     }
     return 0;
 }
-void sub_08023638(struct S *p)
+void SceneActorState_AdvanceToState01(struct S *p)
 {
     u8 r = chk(p);
     if (r == 1) {

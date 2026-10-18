@@ -1,4 +1,6 @@
 #include "actor_attachment.h"
+/* ActorAttachment_GetUnusedOffset: Unused geometry helper that writes facing-dependent offsets for kind 3 and preserves outputs otherwise */
+#define ActorAttachment_GetUnusedOffset sub_08064B20
 #define ActorAttachment_GetUnusedOffset sub_08064B20
 
 void ActorAttachment_GetUnusedOffset(s32 kind, s32 *x, s32 *y, s32 dir)

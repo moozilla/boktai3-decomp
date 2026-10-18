@@ -1,4 +1,6 @@
 #include "global.h"
+/* Math_ApproachAngleArrayBySixteenth: Approaches each target angle by one sixteenth of the shortest difference with a minimum unit step */
+#define Math_ApproachAngleArrayBySixteenth sub_0819B628
 
 static inline s32 AngleNear(s32 angle, s32 ref)
 {

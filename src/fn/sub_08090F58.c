@@ -2,10 +2,10 @@
 void Sprite_Remove(void *);
 void Anim_Remove(void *);
 void Heap_Free(void *);
-void sub_08020D08(void *);
-void sub_08013684(void *);
-void sub_08003C10(void *);
-void sub_08225938(void *);
+void SceneMessages_UnregisterReceiver(void *);
+void Shadow_Destroy(void *);
+void TerrainOverlay_QueueRemoveActor(void *);
+void SceneBody_Unregister(void *);
 void Collider_Remove(void *);
 void SceneActorRegistry_UnlinkActor(void *);
 
@@ -22,7 +22,7 @@ struct S {
     u8 f1[0x2b7];
     u16 h2c0;
 };
-u32 sub_08090F58(struct S *s)
+u32 Slime_Destroy(struct S *s)
 {
     u8 *p = s->p4;
     u8 *q;
@@ -35,19 +35,19 @@ u32 sub_08090F58(struct S *s)
     Heap_Free(p);
     m = 0x100;
     if (tst((u16 *)((u8 *)s + 0x2c0), m))
-        sub_08020D08((u8 *)s + 0xc);
+        SceneMessages_UnregisterReceiver((u8 *)s + 0xc);
     {
         u8 *r = (u8 *)s + 0x320;
         if (*r == 1)
-            sub_08013684(r);
+            Shadow_Destroy(r);
     }
     m = 0x2000000;
     v = *(u32 *)((u8 *)s + 0x2d0) & m;
     q = (u8 *)s + 0x50;
     if (v == 0)
-        sub_08003C10(q);
+        TerrainOverlay_QueueRemoveActor(q);
 
-    sub_08225938(q);
+    SceneBody_Unregister(q);
     Collider_Remove((u8 *)s + 0x134);
     SceneActorRegistry_UnlinkActor(s);
     return 0;

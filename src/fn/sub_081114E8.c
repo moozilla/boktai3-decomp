@@ -11,7 +11,7 @@ struct S {
 };
 void sub_08111410(void *);
 void sub_08111578(void *);
-void sub_081114E8(struct S *s)
+void PaletteFade_UpdateTransition(struct S *s)
 {
     if (s->flags & 1) {
         if (s->cnt <= 0) {

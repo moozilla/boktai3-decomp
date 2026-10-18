@@ -1,14 +1,14 @@
 #include "global.h"
-void sub_08030BF8(void);
-void sub_08033468(void);
-void sub_08033590(void);
+void MessageWindow_Clear(void);
+void ScrollingDialogue_ClearScript(void);
+void ScrollingDialogue_RequestHide(void);
 void sub_0816EA98(void);
-void sub_08163EB8(void *, void (*)(void), u32);
-void sub_0816E540(u8 *s, u32 value)
+void Hud_SetInteractionCallback(void *, void (*)(void), u32);
+void PauseMenu_BeginCharacterItemUse(u8 *s, u32 value)
 {
     s[0x4861] = value;
-    sub_08030BF8();
-    sub_08033468();
-    sub_08033590();
-    sub_08163EB8(s, sub_0816EA98, 1);
+    MessageWindow_Clear();
+    ScrollingDialogue_ClearScript();
+    ScrollingDialogue_RequestHide();
+    Hud_SetInteractionCallback(s, sub_0816EA98, 1);
 }

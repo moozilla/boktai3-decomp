@@ -40,9 +40,9 @@ int BoardPiece_Initialize(struct GroupObjects *owner, struct GroupPiece *p, int 
     ActorShadow_Disable(p->transform);
 }
 
-u32 sub_0800FA40(struct GroupObjects *m, struct GroupPiece *p, int index)
+u32 BoardPiece_Destroy(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
-    sub_08013684(p->transform);
+    Shadow_Destroy(p->transform);
     Sprite_Remove(&p->sprite);
 }
 
@@ -53,7 +53,7 @@ static inline u32 frame_factor(u16 v)
     return mask & value;
 }
 
-void sub_0800FA5C(struct GroupObjects *m, struct GroupPiece *p, int index)
+void BoardPiece_SetFacingAnim(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     u8 left;
     u8 right;
@@ -208,7 +208,7 @@ int sub_0800FC28(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
         p->speed = (randomValue() & 7) + 7;
         p->sprite.position = p->position;
         p->sprite.flags &= ~1;
-        sub_0800FA5C(m, r, 0);
+        BoardPiece_SetFacingAnim(m, r, 0);
         AnimData_SelectPaletteBank(&r->resource, 0x2D3);
         p->resource.palette = m->palette;
         ActorShadow_Enable(r->transform);
@@ -264,7 +264,7 @@ int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
         p->speed = (randomValue() & 7) + 7;
         p->sprite.position = p->position;
         p->sprite.flags &= ~1;
-        sub_0800FA5C(m, r, 0);
+        BoardPiece_SetFacingAnim(m, r, 0);
         AnimData_SelectPaletteBank(&r->resource, 0x2D3);
         p->resource.palette = m->palette;
         ActorShadow_Enable(r->transform);
@@ -292,7 +292,7 @@ int BoardPieces_DispatchCommands(struct GroupObjects *manager)
         struct GroupGlobals *g = gUnk_0200047C;
         {
             struct GroupCommand *cmd = queue->commands[g->bank][i];
-            sub_08020D54(queue, cmd);
+            SceneMessages_SetPendingTrigger(queue, cmd);
             switch (cmd->type) {
                 case 0:
                     sub_0800FC28(manager, queue, cmd);
@@ -351,7 +351,7 @@ void BoardPiece_Launch(struct GroupObjects *m, struct GroupPiece *p, int delay)
         p->active = 0;
     polar(&delta, p->direction, p->duration * 2);
     addPosition(&p->position, &delta);
-    sub_0800FA5C(m, p, 0);
+    BoardPiece_SetFacingAnim(m, p, 0);
     if (p->timer >= delay + 2) {
         p->state = 1;
         p->active = 1;
@@ -360,7 +360,7 @@ void BoardPiece_Launch(struct GroupObjects *m, struct GroupPiece *p, int delay)
     p->timer++;
 }
 
-void sub_08010514(struct GroupObjects *m, struct GroupPiece *p, int index)
+void BoardPiece_Wander(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
     struct GroupVec *moved;
@@ -395,7 +395,7 @@ void sub_08010514(struct GroupObjects *m, struct GroupPiece *p, int index)
         p->direction = Math_Atan2(origin->x - p->position.x, origin->z - moved->z);
         p->speed--;
     }
-    sub_0800FA5C(m, p, 0);
+    BoardPiece_SetFacingAnim(m, p, 0);
     if (p->timer > 0x5F) {
         u32 t = 1;
         p->state = t;
@@ -404,7 +404,7 @@ void sub_08010514(struct GroupObjects *m, struct GroupPiece *p, int index)
     }
     p->timer++;
 }
-void sub_0801068C(struct GroupObjects *m, struct GroupPiece *p, int index)
+void BoardPiece_ApproachTarget(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
     struct GroupVec *position;
@@ -446,11 +446,11 @@ void sub_0801068C(struct GroupObjects *m, struct GroupPiece *p, int index)
             struct GroupVec *origin = &m->origin;
             p->direction = Math_Atan2(origin->x - p->position.x, origin->z - moved->z);
         }
-        sub_0800FA5C(m, p, 0);
+        BoardPiece_SetFacingAnim(m, p, 0);
         p->timer++;
     }
 }
-void sub_08010860(struct GroupObjects *m, struct GroupPiece *p, int index)
+void BoardPiece_ConvergeOnTarget(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
     struct GroupVec *position;
@@ -492,12 +492,12 @@ void sub_08010860(struct GroupObjects *m, struct GroupPiece *p, int index)
             struct GroupVec *origin = &m->origin;
             p->direction = Math_Atan2(origin->x - p->position.x, origin->z - moved->z);
         }
-        sub_0800FA5C(m, p, 0);
+        BoardPiece_SetFacingAnim(m, p, 0);
         p->timer++;
     }
 }
 
-void sub_08010A34(struct GroupObjects *m, struct GroupPiece *p)
+void BoardPiece_Deactivate(struct GroupObjects *m, struct GroupPiece *p)
 {
     if (p->active != 0) {
         p->active = 0;
@@ -506,7 +506,7 @@ void sub_08010A34(struct GroupObjects *m, struct GroupPiece *p)
     }
 }
 
-void sub_08010A58(struct GroupObjects *m, struct GroupPiece *p, int index)
+void BoardPiece_ChasePlayer(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
     struct GroupVec *position;
@@ -549,7 +549,7 @@ void sub_08010A58(struct GroupObjects *m, struct GroupPiece *p, int index)
             position->y += src->y;
             position->z += src->z;
         }
-        sub_0800FA5C(m, p, 0);
+        BoardPiece_SetFacingAnim(m, p, 0);
         p->timer++;
     }
 }
@@ -591,20 +591,20 @@ void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
     }
     p->position.x = p->anchor.x + p->offset.x;
     p->position.z = p->anchor.z + p->offset.z;
-    sub_0800FA5C(m, p, 0);
+    BoardPiece_SetFacingAnim(m, p, 0);
     p->timer++;
 }
 #else
 INCLUDE_ASM("asm/nonmatching", sub_08010C10);
 #endif
-void sub_08010D84(struct GroupObjects *m, struct GroupPiece *p, int delay)
+void BoardPiece_AdvanceStraight(struct GroupObjects *m, struct GroupPiece *p, int delay)
 {
     struct GroupVec delta;
     if (p->active)
         p->active = 0;
     polar(&delta, p->direction, p->duration * 2);
     addPosition(&p->position, &delta);
-    sub_0800FA5C(m, p, 0);
+    BoardPiece_SetFacingAnim(m, p, 0);
     if (p->timer >= delay + 2) {
         p->state = 6;
         p->active = 1;
@@ -612,7 +612,7 @@ void sub_08010D84(struct GroupObjects *m, struct GroupPiece *p, int delay)
     }
     p->timer++;
 }
-void sub_08010E44(struct GroupObjects *m, struct GroupPiece *p, int index)
+void BoardPiece_HomeToTarget(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
     struct GroupVec *position;
@@ -645,7 +645,7 @@ void sub_08010E44(struct GroupObjects *m, struct GroupPiece *p, int index)
             p->speed--;
         polar(&delta, p->direction, p->duration);
         addPositionN(&p->position, &delta);
-        sub_0800FA5C(m, p, 0);
+        BoardPiece_SetFacingAnim(m, p, 0);
         p->timer++;
     }
 }
@@ -657,7 +657,7 @@ int GroupObjects_Update(struct GroupObjects *m)
     BoardPieces_DispatchCommands(m);
     if (m->active) {
         if (m->actorId)
-            m->actor = sub_08225984(m->actorId);
+            m->actor = SceneBody_GetById(m->actorId);
         if (m->paletteActive == 0) {
             if (++m->paletteMask >= 63) {
                 m->paletteMask = 63;
@@ -694,8 +694,8 @@ int GroupObjects_Destroy(struct GroupObjects *m)
     struct GroupPiece *p = m->pieces;
     int i;
     for (i = 0; i < 16; i++, p++)
-        sub_0800FA40(m, p, i);
-    sub_08020D08(&m->queue);
+        BoardPiece_Destroy(m, p, i);
+    SceneMessages_UnregisterReceiver(&m->queue);
     return 0;
 }
 
@@ -719,7 +719,7 @@ int GroupObjects_Initialize(struct GroupObjects *m, int id)
     return 0;
 }
 
-void *sub_080111A8(void *arg)
+void *GroupObjects_CreateTask(void *arg)
 {
     void *obj;
     obj = Task_Create(11, 0xD08);

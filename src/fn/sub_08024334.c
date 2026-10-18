@@ -27,7 +27,7 @@ static inline u8 chk(struct S *p, u32 z)
     return 0;
 }
 
-void sub_08024334(struct S *p)
+void SceneActorState_PlayAnimation8ThenRecover(struct S *p)
 {
     struct S *p2 = p;
     u32 z;

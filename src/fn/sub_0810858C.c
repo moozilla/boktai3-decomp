@@ -28,8 +28,8 @@ struct AnimatedTileManager {
     void *sequences;
 };
 extern struct AnimatedTileManager *gUnk_020001BC;
-struct AnimatedTileManager *sub_08108A4C(void);
-struct AnimatedTile *sub_081084E4(struct AnimatedTileManager *);
+struct AnimatedTileManager *AnimatedTile_CreateManager(void);
+struct AnimatedTile *AnimatedTile_Allocate(struct AnimatedTileManager *);
 /* Registry routine 8192: takes a slot of the animated tile manager
    (0x020001BC, created on demand) with sprite 0x3876: -p x y z, -R (2), -r
    sequence, -n, -C, -c palette bank (+0x304); then starts the sequence and
@@ -46,11 +46,11 @@ void AnimatedTile_CreateFromScript(void)
     const vu16 *frame;
     u32 one;
     if (!manager) {
-        manager = sub_08108A4C();
+        manager = AnimatedTile_CreateManager();
         if (!manager)
             return;
     }
-    slot = sub_081084E4(manager);
+    slot = AnimatedTile_Allocate(manager);
     if (!slot)
         return;
     e = slot;

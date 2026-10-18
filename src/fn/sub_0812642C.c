@@ -5,8 +5,8 @@
 extern u8 *gUnk_02000154;
 extern u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
-u8 *sub_08126604(void);
-u8 *sub_08126144(u8 *);
+u8 *ScriptedParticle_EnsurePool(void);
+u8 *ScriptedParticle_AllocateSlot(u8 *);
 void AnimData_Load(u8 *, u32);
 void *ScriptProc_Start(u32, u32);
 void Sprite_Init(u8 *, u8 *, u32);
@@ -27,11 +27,11 @@ void sub_0812642C(u32 *a, s32 b, s32 c, s32 d, s32 e, u32 f, s32 g, s32 h, u32 i
     u32 mask;
     s32 value;
     if (!context) {
-        context = sub_08126604();
+        context = ScriptedParticle_EnsurePool();
         if (!context)
             goto end;
     }
-    fields = s = sub_08126144(context);
+    fields = s = ScriptedParticle_AllocateSlot(context);
     if (!s)
         goto end;
     fields += 0x58;

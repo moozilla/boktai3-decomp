@@ -6,7 +6,7 @@ struct E {
 };
 extern u32 gUnk_020004CC;
 void Sprite_Remove(void *);
-s32 sub_081392DC(u8 *s)
+s32 BallisticSpriteEffect_DestroyManager(u8 *s)
 {
     s32 i;
     u32 z;

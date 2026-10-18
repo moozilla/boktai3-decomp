@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_08220D44(u8 *p, u16 v)
+void Anim_SetDurationScale(u8 *p, u16 v)
 {
     if (*(u16 *)(p + 0xc) != v) {
         p[7] = (p[6] * v) >> 6;

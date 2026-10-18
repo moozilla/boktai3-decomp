@@ -5,7 +5,7 @@ struct S {
 };
 void sub_081C4950(void *);
 void sub_0824923C(void *, u32);
-void sub_081C49C0(struct S *p)
+void ShipWheel_Update(struct S *p)
 {
     sub_081C4950(p);
     if (p->a != 0)

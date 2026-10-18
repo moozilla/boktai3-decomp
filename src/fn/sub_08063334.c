@@ -7,7 +7,7 @@ void SceneInventory_InitCatalogBackground(struct SceneInventoryLifecycleView *, 
 void SceneInventory_InitPanel(struct SceneInventoryLifecycleView *, u32);
 void SceneInventory_InitMessageBox(struct SceneInventoryLifecycleView *);
 void SceneInventory_ReadCompletionScript(struct SceneInventoryLifecycleView *);
-void sub_082279A8(u32, u32, u32, u32, u32, u32, u32);
+void ScreenTransition_SendCommand(u32, u32, u32, u32, u32, u32, u32);
 void SceneInventory_RefreshCatalogDisplay(struct SceneInventoryLifecycleView *);
 void Sound_PlaySong(u32);
 void SceneInputPanel_RequestAction(struct SceneInventoryLifecycleView *,
@@ -51,7 +51,7 @@ s32 SceneInventory_InitializeController(struct SceneInventoryLifecycleView *owne
     SceneInventory_InitPanel(owner, owner->presentation);
     SceneInventory_InitMessageBox(owner);
     SceneInventory_ReadCompletionScript(owner);
-    sub_082279A8(2, 5, 4, 4, 4, 0xffff, 0);
+    ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xffff, 0);
     SceneInventory_RefreshCatalogDisplay(owner);
     Sound_PlaySong(0x118);
     SceneInputPanel_RequestAction(owner, SceneInventory_WaitForController);

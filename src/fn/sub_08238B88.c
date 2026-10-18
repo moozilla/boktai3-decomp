@@ -15,7 +15,7 @@ struct S08238B88 {
     u8 f860;
 };
 
-void sub_08238B88(struct S08238B88 *p)
+void Player_ShowDirectionalEffect(struct S08238B88 *p)
 {
     p->f82E = p->fC6;
     p->f834 = p->fD4;

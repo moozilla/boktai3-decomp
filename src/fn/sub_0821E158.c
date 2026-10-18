@@ -13,7 +13,7 @@ struct A {
     struct E e[1];
 };
 extern struct A *gUnk_030052F4;
-struct E *sub_0821E158(u32 id)
+struct E *Trap_FindBySerial(u32 id)
 {
     s32 i = 0;
     struct A *a = gUnk_030052F4;

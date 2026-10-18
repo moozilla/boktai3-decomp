@@ -41,27 +41,27 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->pending = 1;
 }
 void Bg_ClearTilemap(int);
-void sub_08224DE8(void *);
-void sub_08035D58(u8);
-void sub_08035EAC(void);
-void sub_08224BB8(void (*)(u8));
-void sub_08224BA0(void (*)(void));
+void Wireless_InitPacketQueue(void *);
+void Wireless_OnParentNiSessionEvent(u8);
+void Wireless_OnParentNiSendComplete(void);
+void RfuManager_SetEventCallback(void (*)(u8));
+void RfuManager_SetMscCallback(void (*)(void));
 void Script_Call(void *, int);
-void sub_0822B058(int);
-void sub_08035EB8(struct Engine *p)
+void Sound_FadeOutChannel10(int);
+void Wireless_BeginParentNiSession(struct Engine *p)
 {
     u8 *scratch = p->scratch;
     int i;
     int bit;
     void *listener;
     Bg_ClearTilemap(0);
-    sub_08224DE8(p->message);
+    Wireless_InitPacketQueue(p->message);
     Memory_Clear(((u8 *)p) + 0xB8, 12);
     Memory_Clear(((u8 *)p) + 0xC4, 12);
     bit = 8;
     rfu_clearSlot(bit, p->mode);
-    sub_08224BB8(sub_08035D58);
-    sub_08224BA0(sub_08035EAC);
+    RfuManager_SetEventCallback(Wireless_OnParentNiSessionEvent);
+    RfuManager_SetMscCallback(Wireless_OnParentNiSendComplete);
     i = 0;
     /* do-while(0) only keeps agbcc's block layout */
     do {
@@ -84,5 +84,5 @@ void sub_08035EB8(struct Engine *p)
     if (listener) {
         Script_Call(listener, 0);
     }
-    sub_0822B058(4);
+    Sound_FadeOutChannel10(4);
 }

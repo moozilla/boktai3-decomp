@@ -1,4 +1,6 @@
 #include "global.h"
+/* SceneActorControl_UpdateDirectionalAnimation: Restarts directional animation 1 on preparation or heading changes and clears completion otherwise; duplicates UpdateFacingAnimation. */
+#define SceneActorControl_UpdateDirectionalAnimation sub_08082BF0
 
 void SceneActorAnimation_SelectDirectionalEntry(u8 *, u32);
 

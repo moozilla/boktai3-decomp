@@ -4,13 +4,13 @@ struct Object {
     u8 motion[0x196];
     u8 registered;
 };
-int sub_08003C00(void *);
-void sub_08003C10(void *);
-int sub_0802D914(struct Object *p)
+int TerrainOverlay_QueueAddActor(void *);
+void TerrainOverlay_QueueRemoveActor(void *);
+int Actor_UnregisterMotion(struct Object *p)
 {
     int result;
     if (p->registered) {
-        sub_08003C10(p->motion);
+        TerrainOverlay_QueueRemoveActor(p->motion);
         p->registered = 0;
         result = 0;
     } else

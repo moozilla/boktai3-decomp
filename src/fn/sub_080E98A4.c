@@ -2,7 +2,7 @@
 
 void SceneActorBehavior_ApplyContactReaction(void);
 
-void sub_080E98A4(void)
+void Octopus_OnBodyContact(void)
 {
     SceneActorBehavior_ApplyContactReaction();
 }

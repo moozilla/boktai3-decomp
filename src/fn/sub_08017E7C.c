@@ -11,9 +11,9 @@ extern u16 gUnk_03004BD8;
 extern int gUnk_02000080, gUnk_02000084;
 extern u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
-void sub_08003448(int);
+void Palette_SetBrightnessMode(int);
 void Script_Call(void *, int);
-void sub_080174B8(void *, int);
+void Weather_EnterPhase(void *, int);
 int sub_080177AC(void *, int, int, int);
 int Mod(int, int);
 static inline void clearFlag(void)
@@ -27,7 +27,7 @@ int Weather_StormEnd(struct Weather *p)
     int mask;
     if (p->entered) {
         p->entered = 0;
-        sub_08003448(3);
+        Palette_SetBrightnessMode(3);
         clearFlag();
         if (p->script)
             Script_Call(p->script, 0);
@@ -39,7 +39,7 @@ int Weather_StormEnd(struct Weather *p)
     if (p->timer <= 7)
         sub_080177AC(p, 3, 10, 10);
     if (p->timer > 29) {
-        sub_080174B8(p, 0);
+        Weather_EnterPhase(p, 0);
         {
             u16 *reg = &gUnk_03004BD8;
             u32 m;

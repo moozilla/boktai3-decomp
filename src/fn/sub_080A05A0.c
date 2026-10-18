@@ -10,7 +10,7 @@ void SceneActorCollision_InitBody(u8 *, struct Z *, struct Z *, void (*)(void), 
 void SceneActorCollision_InitAttack(u8 *, struct Z *, struct Z *, void (*)(void), u32, u8 *);
 void sub_0809ED70(void);
 void sub_0809ED00(void);
-void sub_080A05A0(u8 *p)
+void Crow_InitColliders(u8 *p)
 {
     struct Z s1, s2, s3, s4;
     s1.a.lo = 0x2a;

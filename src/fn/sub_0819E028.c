@@ -11,7 +11,7 @@ static inline u8 start(u8 *p)
     }
     return 0;
 }
-void sub_0819E028(u8 *p)
+void Hresvelgr_UpdateActionTwentySevenRequest(u8 *p)
 {
     u8 *q = p;
     if (start(q)) {

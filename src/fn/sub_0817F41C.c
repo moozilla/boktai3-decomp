@@ -7,7 +7,7 @@ struct A {
 };
 void SceneActors_RunStateCallback(void *);
 
-void sub_0817F41C(struct A *p)
+void BossSlot2_RunUnpausedStateCallback(struct A *p)
 {
     u32 m;
     p->a = 0;

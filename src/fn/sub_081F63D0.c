@@ -15,7 +15,7 @@ struct T {
     u8 p5[0x100 - 0xb2];
     u32 w100;
 };
-u32 sub_081F63D0(struct T *p)
+u32 Ratatosk_InitRequestedState(struct T *p)
 {
     if ((u8)(p->baa - 1) > 0x24)
         return 0;

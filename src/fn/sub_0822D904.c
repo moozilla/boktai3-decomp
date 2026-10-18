@@ -1,6 +1,6 @@
 #include "global.h"
 s32 sub_0822D87C(void);
-u32 sub_0822D904(void)
+u32 Inventory_TryAddEquipmentEntry(void)
 {
     s32 v = sub_0822D87C();
     u32 r = 0;

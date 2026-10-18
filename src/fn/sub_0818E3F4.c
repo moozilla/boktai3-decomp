@@ -98,8 +98,8 @@ static inline void setVector(struct Geometry *g)
     g->vec = gUnk_0824F150;
 }
 void ScaledShadow_Initialize(u8 *, u8 *, u32, u32, u32, u32, u32, u32, u32, u32, u32);
-void sub_0818DE44(struct Obj *);
-void sub_0818E3F4(struct Obj *p)
+void Armor_UpdatePartDescent(struct Obj *);
+void Armor_InitPartDescent(struct Obj *p)
 {
     if (activate(p)) {
         p->id10A = 1;
@@ -114,6 +114,6 @@ void sub_0818E3F4(struct Obj *p)
         p->vec64 = gUnk_0824F150;
         setVector(&p->geometry);
         ScaledShadow_Initialize((u8 *)p + 0x160, (u8 *)p + 0x1c, 32, 32, 32, 32, 0, 0, 0, 0, 0);
-        p->callback = sub_0818DE44;
+        p->callback = Armor_UpdatePartDescent;
     }
 }

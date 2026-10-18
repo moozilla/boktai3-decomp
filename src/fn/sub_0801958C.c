@@ -1,6 +1,6 @@
 #include "global.h"
 
-u32 sub_0801958C(void)
+u32 PaletteFrames_Destroy(void)
 {
     return 0;
 }

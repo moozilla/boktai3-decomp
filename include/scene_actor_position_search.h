@@ -12,7 +12,7 @@ struct SceneActorTaggedPosition {
     u8 unknown14[4];
     u32 tag;
 };
-u32 sub_0822B694(u16 *coordinates, u32 index);
+u32 SceneStimulus_GetTaggedPosition(u16 *coordinates, u32 index);
 void sub_0807CDC4(const struct SceneActorPositionSource *, void *, struct ContactPosition *,
                   const struct ContactPosition *);
 #endif

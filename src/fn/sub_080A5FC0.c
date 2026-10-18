@@ -1,4 +1,6 @@
 #include "global.h"
+/* TentacleBody_UpdateTimedAction: Starts animation 7 and advances action flags at frame 40 and after frame 120 */
+#define TentacleBody_UpdateTimedAction sub_080A5FC0
 
 struct Actor080A5FC0 {
     u8 pad0[0x2b0];

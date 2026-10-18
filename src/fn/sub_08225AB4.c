@@ -4,9 +4,9 @@ struct P {
     u32 a;
     u32 b;
 };
-void sub_082258AC(u8 *);
+void SceneBody_AppendToRegistry(u8 *);
 
-u32 sub_08225AB4(u8 *p, u32 a, u32 *q, u8 b, u8 c, u32 d)
+u32 SceneBody_Init(u8 *p, u32 a, u32 *q, u8 b, u8 c, u32 d)
 {
     u32 z;
     *(u32 *)p = a;
@@ -23,7 +23,7 @@ u32 sub_08225AB4(u8 *p, u32 a, u32 *q, u8 b, u8 c, u32 d)
     *(u32 *)(p + 0x24) = z;
     *(u32 *)(p + 0x2c) = z;
     *(u32 *)(p + 0x28) = z;
-    sub_082258AC(p);
+    SceneBody_AppendToRegistry(p);
     *(u32 *)(p + 0x3c) = d;
     return 1;
 }

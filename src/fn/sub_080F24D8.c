@@ -10,7 +10,7 @@ struct S {
     s32 n;
 };
 
-void sub_080F24D8(struct S *s)
+void Ivy_UpdateGroundHeight(struct S *s)
 {
     if (s->n > 7)
         s->v = (u16)sub_0821BD48(s->a);

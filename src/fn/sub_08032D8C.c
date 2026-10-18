@@ -5,14 +5,14 @@ struct Vm {
     u8 pad78[0x98];
     const u8 *strings[16];
 };
-int sub_08032168(const u8 *, const u8 *, int);
-int sub_080321A0(const u8 *, int);
-int sub_08032D10(struct Vm *, int);
-u16 sub_08032070(const u8 *);
+int Text_ComparePrefix(const u8 *, const u8 *, int);
+int Text_ParseDecimal(const u8 *, int);
+int TextState_GetNumberWidth(struct Vm *, int);
+u16 Text_DecodeGlyphEscape(const u8 *);
 const u8 *Text_FindChar(const u8 *, u8);
 extern const u8 gUnk_0824DDF4[];
 // MATCHING_CONCESSION: register-pinning
-int sub_08032D8C(struct Vm *arg, int index)
+int TextState_MeasureStringLine(struct Vm *arg, int index)
 {
     struct Vm *p = arg;
     const u8 *s = p->strings[index];
@@ -28,7 +28,7 @@ loop:
         if (!*s)
             goto done;
         q = s;
-        if (!sub_08032168(s, gUnk_0824DDF4, 3)) {
+        if (!Text_ComparePrefix(s, gUnk_0824DDF4, 3)) {
             int has = 0;
             int length = 0;
             u8 *text;
@@ -55,10 +55,10 @@ loop:
         parsed:
             text[length] = 0;
             if (has && length)
-                index = sub_080321A0(text, length);
+                index = Text_ParseDecimal(text, length);
             else
                 index = 0;
-            n += sub_08032D10(p, index);
+            n += TextState_GetNumberWidth(p, index);
             Text_FindChar(q, '>');
         } else
             Text_FindChar(s, '>');
@@ -67,7 +67,7 @@ loop:
         goto test;
     }
     if (c == 31) {
-        u32 code = (u16)sub_08032070(s);
+        u32 code = (u16)Text_DecodeGlyphEscape(s);
         if (code == 0xFFFF)
             goto wide;
         {

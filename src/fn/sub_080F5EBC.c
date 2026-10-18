@@ -39,7 +39,7 @@ struct Obj {
     s8 delta8;
     s8 delta9;
 };
-void sub_080F5EBC(struct Obj *p)
+void Sword_SetTrajectoryFromCurrentPosition(struct Obj *p)
 {
     p->endX = p->x;
     p->endY = p->y;

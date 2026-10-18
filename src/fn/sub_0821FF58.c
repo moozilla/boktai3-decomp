@@ -9,7 +9,7 @@ struct O {
     u16 pb;
     u16 f44;
 };
-void sub_0821FF58(struct O *o, u16 a, u16 b, u32 c, u32 d, u16 e)
+void Collider_SetAttackProperties(struct O *o, u16 a, u16 b, u32 c, u32 d, u16 e)
 {
     o->f3c = a;
     o->f40 = b;

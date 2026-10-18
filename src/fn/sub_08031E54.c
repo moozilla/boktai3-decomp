@@ -10,7 +10,7 @@ struct TextState {
     u8 pad20[0xE8];
     u8 depth, styles[7];
 };
-void sub_08031E54(struct TextState *p, int style)
+void TextState_PushStream(struct TextState *p, int style)
 {
     u8 *depth = &p->depth;
     if (*depth <= 6) {

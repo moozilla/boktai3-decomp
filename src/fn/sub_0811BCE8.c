@@ -10,7 +10,7 @@ struct S {
 };
 extern s8 gUnk_086106C0[];
 
-void sub_0811BCE8(struct S *p, s32 d)
+void Actor_SetSpriteDepthOffsets(struct S *p, s32 d)
 {
     s32 i;
     for (i = 0; i < 3; i++)

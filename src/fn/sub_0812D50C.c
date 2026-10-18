@@ -8,7 +8,7 @@ struct S {
 extern struct S *gUnk_02000190;
 void AnimData_Load(u8 *, u32);
 
-s32 sub_0812D50C(struct S *s)
+s32 FragmentSpritePool_Init(struct S *s)
 {
     s->c = 0;
     AnimData_Load(s->a, 0x0000F422);

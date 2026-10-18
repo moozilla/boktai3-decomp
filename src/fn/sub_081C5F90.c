@@ -8,10 +8,10 @@ struct S {
     u8 pad[0x120];
     struct E e[6];
 };
-void sub_081C5EF0(struct S *, void (*)(void));
+void ChallengeResult_SetState(struct S *, void (*)(void));
 void sub_081C6094(void);
 
-void sub_081C5F90(struct S *p)
+void TimeResult_BeginDigitReveal(struct S *p)
 {
     void (*f)(void) = sub_081C6094;
     s32 m = ~1;
@@ -21,5 +21,5 @@ void sub_081C5F90(struct S *p)
         e->flags &= m;
         e++;
     }
-    sub_081C5EF0(p, f);
+    ChallengeResult_SetState(p, f);
 }

@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_081945AC(u8 *p)
+void Nidhoggr_StartSuspendedObjectDescent(u8 *p)
 {
     u8 *q = p + 0x71BC;
     u8 v = *q;

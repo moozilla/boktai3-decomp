@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "hit_switch.h"
-void sub_08225AB4(struct SceneBody *, u32, struct SceneVec *, u32, u32, struct HitSwitchEntry *);
-void sub_08003C00(struct SceneBody *);
+void SceneBody_Init(struct SceneBody *, u32, struct SceneVec *, u32, u32, struct HitSwitchEntry *);
+void TerrainOverlay_QueueAddActor(struct SceneBody *);
 void HitSwitch_InitEntryFromScript(struct HitSwitchManager *input)
 {
     struct HitSwitchManager *manager = input;
@@ -67,8 +67,8 @@ void HitSwitch_InitEntryFromScript(struct HitSwitchManager *input)
         entry->bodyEnabled = Script_GetValue();
         if (entry->bodyEnabled) {
             struct SceneBody *body = &entry->body;
-            sub_08225AB4(body, entry->collisionId, &sprite->position, 0, 7, entry);
-            sub_08003C00(body);
+            SceneBody_Init(body, entry->collisionId, &sprite->position, 0, 7, entry);
+            TerrainOverlay_QueueAddActor(body);
         }
     } else
         entry->bodyEnabled = 0;

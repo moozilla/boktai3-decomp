@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08213294(u8 *arg)
+void ForgingBook_UpdateCursorPulse(u8 *arg)
 {
     u8 *p = arg;
     s32 v = *((s16 *)(p + 0x3e4));

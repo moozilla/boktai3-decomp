@@ -7,7 +7,7 @@ s32 ScenePanel_DestroyLifecycle(struct ScenePanelLifecycleView *parent)
     } else {
         ScenePanelRig_RemoveSprites(&parent->rig);
         Sprite_Remove(&parent->auxiliary);
-        sub_08215A74(1, 1);
+        Bg_SetPriority(1, 1);
     }
     ScenePanel_DestroyParticles((void *)parent);
     ScenePanel_UnregisterReceiver((void *)parent);

@@ -10,11 +10,11 @@ struct O {
     u16 b;
     u16 c;
 };
-struct E *sub_0821E104(u16, u16 *);
-void sub_0821E4D4(u16 id, struct O *o)
+struct E *Terrain_FindBoxesById(u16, u16 *);
+void Terrain_GetBoxMinPosition(u16 id, struct O *o)
 {
     u16 n;
-    struct E *e = sub_0821E104(id, &n);
+    struct E *e = Terrain_FindBoxesById(id, &n);
     if (e) {
         o->a = e->f0;
         o->b = e->f8 << 4;

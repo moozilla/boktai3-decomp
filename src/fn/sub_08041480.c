@@ -1,14 +1,14 @@
 #include "global.h"
 
-void sub_0803384C(s32);
+void TextWindow_StopPlayback(s32);
 
-void sub_08041480(u8 *p)
+void ModifierMenu_StopListTextPlayback(u8 *p)
 {
     s32 *e = (s32 *)(p + 0xf8);
     s32 i = 5;
     do {
         if (*e >= 0) {
-            sub_0803384C(*e);
+            TextWindow_StopPlayback(*e);
         }
         e++;
         i--;

@@ -9,7 +9,7 @@ struct S {
     struct T *t;
 };
 
-void sub_080DED54(struct S *s)
+void Dog_UpdateActionCooldown(struct S *s)
 {
     u16 *p = &s->t->h;
     if (*p != 0)

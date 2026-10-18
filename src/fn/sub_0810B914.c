@@ -46,12 +46,12 @@ struct Registry1745 {
 };
 extern struct Registry1745 *gUnk_020004B4;
 extern u32 gUnk_0300546C;
-void sub_08219F74(void *);
+void Task_LinkToPriorityList(void *);
 void sub_08223180(void);
-void sub_08109BF8(void *);
-void sub_08109BD0(void *);
-void sub_08138154(void *, s32, void (*)(void));
-u8 *sub_08227E90(void);
+void Registry1745_ResetTransferCounters(void *);
+void Registry1745_InitSessionSettings(void *);
+void Registry1745_SetState(void *, s32, void (*)(void));
+u8 *Script_GetTextSourcePc(void);
 void Hud_SetMode(s32);
 void sub_0810B8A8(void *);
 void sub_08109D94(void);
@@ -84,7 +84,7 @@ struct Registry1745 *Registry1745_Create(void)
         p->field16 = one;
         zero = 0;
         p->field10 = (u32)existing;
-        sub_08219F74(p);
+        Task_LinkToPriorityList(p);
         gUnk_0300546C = one;
         sub_08223180();
         p->field18 = 0xFFFF;
@@ -106,9 +106,9 @@ struct Registry1745 *Registry1745_Create(void)
             entry++;
         }
     }
-    sub_08109BF8(m);
-    sub_08109BD0(m);
-    sub_08138154(p, 1, sub_08109D94);
+    Registry1745_ResetTransferCounters(m);
+    Registry1745_InitSessionSettings(m);
+    Registry1745_SetState(p, 1, sub_08109D94);
     p->field20 = 3;
     p->fieldD4 = Script_GetKeywordValue('U', 0);
     p->fieldD0 = Script_GetKeywordValue('Y', 0);
@@ -120,15 +120,15 @@ struct Registry1745 *Registry1745_Create(void)
     settings->field164 = Script_GetKeywordValue('T', 0);
     p->fieldC4 = Script_GetKeywordValue('v', 0);
     p->fieldCC = Script_GetKeywordValue('E', 0);
-    if (!Script_SeekToKeyword('s') || !(p->fieldD8 = sub_08227E90()))
+    if (!Script_SeekToKeyword('s') || !(p->fieldD8 = Script_GetTextSourcePc()))
         goto fail;
-    if (!Script_SeekToKeyword('L') || !(settings->field174 = sub_08227E90()))
+    if (!Script_SeekToKeyword('L') || !(settings->field174 = Script_GetTextSourcePc()))
         goto fail;
     if (!Script_SeekToKeyword('c') || !(settings->field178 = Script_GetPc())) {
     fail:
         return 0;
     }
-    if (!Script_SeekToKeyword('e') || !(settings->field17C = sub_08227E90()))
+    if (!Script_SeekToKeyword('e') || !(settings->field17C = Script_GetTextSourcePc()))
         goto fail;
     Hud_SetMode(7);
     p->fieldB4 = sub_0810B724;

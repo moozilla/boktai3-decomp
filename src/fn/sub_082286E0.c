@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_082286E0(s32 *a, s32 *b, s32 *c, s32 value)
+void Clock_UnpackDate(s32 *a, s32 *b, s32 *c, s32 value)
 {
     s32 d0, d1, d2, d3, d4, d5, d6, d7, total, total2, total3;
     d0 = (u32)value >> 28;

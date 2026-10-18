@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0816B614(u8 *p)
+void Hud_SaveGridSelection(u8 *p)
 {
     p[4] = p[1];
     p[5] = p[2];

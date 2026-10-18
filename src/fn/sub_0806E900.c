@@ -1,9 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_grid.h"
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline u8 *Properties(s32 index)
 {
-    u8 *p = sub_0821D64C(index, 1);
+    u8 *p = TerrainModifiers_FindCellOverride(index, 1);
     if (p)
         return p + 4;
     else {
@@ -32,7 +32,7 @@ s32 SceneGrid_ScanTerrainDirection(s32 start, s32 angle)
     {
         u32 raw;
         register u32 mask asm("r1");
-        u8 *properties = sub_0821D64C(savedStart, 1);
+        u8 *properties = TerrainModifiers_FindCellOverride(savedStart, 1);
         if (properties)
             properties += 4;
         else {
@@ -65,7 +65,7 @@ s32 SceneGrid_ScanTerrainDirection(s32 start, s32 angle)
             for (;;) {
                 s32 next = cell + 1;
                 register s32 adjacentHeight asm("r5");
-                u8 *properties = sub_0821D64C(next, 1);
+                u8 *properties = TerrainModifiers_FindCellOverride(next, 1);
                 if (properties)
                     properties += 4;
                 else {
@@ -77,7 +77,7 @@ s32 SceneGrid_ScanTerrainDirection(s32 start, s32 angle)
                     adjacentHeight = 15;
                     adjacentHeight &= raw;
                 }
-                properties = sub_0821D64C(next, 1);
+                properties = TerrainModifiers_FindCellOverride(next, 1);
                 if (properties)
                     properties += 4;
                 else {
@@ -128,7 +128,7 @@ s32 SceneGrid_ScanTerrainDirection(s32 start, s32 angle)
             for (;;) {
                 s32 next = cell - 1;
                 register s32 adjacentHeight asm("r5");
-                u8 *properties = sub_0821D64C(next, 1);
+                u8 *properties = TerrainModifiers_FindCellOverride(next, 1);
                 if (properties)
                     properties += 4;
                 else {
@@ -140,7 +140,7 @@ s32 SceneGrid_ScanTerrainDirection(s32 start, s32 angle)
                     adjacentHeight = 15;
                     adjacentHeight &= raw;
                 }
-                properties = sub_0821D64C(next, 1);
+                properties = TerrainModifiers_FindCellOverride(next, 1);
                 if (properties)
                     properties += 4;
                 else {

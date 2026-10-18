@@ -11,7 +11,7 @@ struct S {
 };
 void Sprite_Remove(void *);
 void Heap_Free(void *);
-void sub_08112E20(struct S *s)
+void SceneDebris_ReleaseSprite(struct S *s)
 {
     struct A *a = s->a;
     if (a->on != 0) {

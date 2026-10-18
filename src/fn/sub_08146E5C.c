@@ -14,7 +14,7 @@ struct P08146E5C {
 };
 void sub_08159594(void *);
 
-void sub_08146E5C(struct P08146E5C *p)
+void Player_OnMotion11Exit(struct P08146E5C *p)
 {
     p->f1D0 |= 1;
     p->f4E6 = 0;
