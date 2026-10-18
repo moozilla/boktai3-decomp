@@ -477,3 +477,4 @@ addr,function,name,family,note
 081741A8,sub_081741A8,MotionSequence_ResolveAlternateSelection,"MotionSequence (tentative)","dispatch cancel or confirmation for the alternate selection path"
 08174270,sub_08174270,SceneHud_TickEquipmentFeedback,"SceneHud","animate equipment feedback then return to selection"
 081743F4,sub_081743F4,TextLabel_FormatSuffix,"TextLabel","format a two-byte suffix and optional SP text"
+08174440,sub_08174440,TextLabel_DisplaySuffix,"TextLabel","format the suffix and display it in a selected text backend"
