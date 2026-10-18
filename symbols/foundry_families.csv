@@ -1231,3 +1231,4 @@ addr,function,name,family,note
 081FBE30,sub_081FBE30,Ratatosk_UpdateParticleFallAndWander,"Ratatosk 4 (auto, tentative), animated particles","accelerates a falling particle and randomizes planar motion"
 081FBEB8,sub_081FBEB8,OverlaySlot_InitializeExtended,"Overlay slot manager (tentative)","initializes extended motion, position and drawable slot"
 081FC6BC,sub_081FC6BC,SceneProjectile_UpdatePulse,"Scene projectile (tentative)","updates lifetime-dependent pulse and phase"
+081FC75C,sub_081FC75C,SceneProjectile_EmitPeriodicParticle,"Scene projectile (tentative)","emits a randomly scaled particle every eight ticks"
