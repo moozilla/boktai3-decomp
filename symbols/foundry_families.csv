@@ -69,3 +69,4 @@ addr,function,name,family,note
 080B6430,sub_080B6430,SceneActor_UpdateProfileForCategory,"SceneActorRegistry / SceneActorProfile","recounts living actors of this category and refreshes its pooled profile index"
 080B70CC,sub_080B70CC,SceneActorReaction_SelectTileParameter,"SceneActorReaction","selects a tile parameter by category and reaction variant"
 080B7184,sub_080B7184,SceneActorReaction_ParseOptions,"SceneActorReaction","parses E and d options into the reaction context"
+080B7580,sub_080B7580,SceneActorReaction_SetProfileEntries,"SceneActorReaction","sets category-specific profile entries from reaction flags"
