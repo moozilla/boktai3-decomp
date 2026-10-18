@@ -351,3 +351,4 @@ addr,function,name,family,note
 08105998,sub_08105998,ProximityActor_InitializeCollider,"ProximityActor","initializes variant-dependent collider bounds and callback"
 08106BCC,sub_08106BCC,RegionActorPool_UpdateActors,"RegionActorPool","dispatches occupied actors and hides actors outside their region"
 08114370,sub_08114370,SceneCallbackPool_Update,"Scene callback pool","invokes callbacks for active entries in a sixteen-slot pool and increments its frame"
+081143D8,sub_081143D8,SceneCallbackPool_Initialize,"Scene callback pool","clears sixteen entry buffers and active flags, resets frame and publishes the pool"
