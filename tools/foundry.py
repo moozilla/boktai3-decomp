@@ -660,7 +660,7 @@ def scale_report():
     for b, x in by.items():
         print(f"{b:8s} finished {x['n']:4d}  matched {x['m']:4d} ({100 * x['m'] / max(x['n'], 1):.0f}%)  "
               f"named {x['named']}/{x['m']}  instructions matched {x['minsns']}/{x['insns']}")
-    print(f"batches {len(us)}  tokens {tokens} (incl. cache reads)  headless cost ${cost:.2f}  matches {m}  "
+    print(f"batches {len(us)}  tokens {tokens} (non-cached)  headless cost ${cost:.2f}  matches {m}  "
           f"tokens/match {tokens // max(m, 1)}  "
           f"wall {hours:.1f} h  matches/hour {m / hours if hours else 0:.1f}")
 
