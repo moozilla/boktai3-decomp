@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 #define SceneActorRegistry_FindAvailableFilteredAfterId sub_08070E44
 /* The observed category whitelist is preserved without guessing game roles. */
@@ -9,11 +8,10 @@ struct SceneActorRegistryActor *SceneActorRegistry_FindAvailableFilteredAfterId(
     struct SceneActorRegistryActor *actor = node->actor;
     if (actor) {
         u32 mask = 1;
-        register u32 offset asm("r5");
+        u32 offset;
         do {
-            register u32 *field asm("r0");
+            u32 *field;
             offset = 0x2cc;
-            asm("" : "+r"(offset));
             field = (void *)((u8 *)actor + offset);
             if (!(*field & mask) && !id) {
                 u32 category = actor->category;
