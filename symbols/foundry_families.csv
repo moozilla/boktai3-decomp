@@ -118,3 +118,4 @@ addr,function,name,family,note
 080E990C,sub_080E990C,SceneActor_BeginReactionAnimation,"SceneActor route collision","shows the actor, starts reaction animation and sound, then schedules control"
 080E9B8C,sub_080E9B8C,SceneActor_EndReactionAnimation,"SceneActor route collision","restores collider flags and hides the actor when animation ends"
 080EB450,sub_080EB450,SceneActorReaction_AwaitTargetControl,"SceneActorReaction","waits for a target then selects control or timeout fallback"
+080EB6E4,sub_080EB6E4,SceneActorReaction_RestoreAfterControl,"SceneActorReaction","queues alternate restoration after control finishes"
