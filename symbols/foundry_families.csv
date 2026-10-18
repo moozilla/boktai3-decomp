@@ -771,3 +771,4 @@ addr,function,name,family,note
 08169E94,sub_08169E94,StatusPanel_BeginRefresh,"StatusPanel","sets refresh flag, redraws sections, and installs callback"
 0816A4EC,sub_0816A4EC,ScenePanel_BeginSelection,"ScenePanel","resets sprite coordinates, starts keyframes and installs selection callback"
 0816A5A8,sub_0816A5A8,ScenePanel_BeginDetail,"ScenePanel","initializes detail sprites and installs detail callback"
+0816A700,sub_0816A700,StatusPanel_BeginAnimatedTransition,"StatusPanel","resets background, starts animation, plays sound, and switches callback"
