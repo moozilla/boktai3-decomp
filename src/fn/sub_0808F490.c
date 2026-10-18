@@ -1,5 +1,4 @@
 #include "global.h"
-#define Bat_UpdateActionScript sub_0808F490
 
 void SceneActorBehavior_CallActionScript(u8 *);
 
@@ -25,7 +24,7 @@ struct S {
     u8 *ctx;
 };
 
-void sub_0808F490(struct S *obj)
+void Bat_UpdateActionScript(struct S *obj)
 {
     u8 *ctx = obj->ctx;
 

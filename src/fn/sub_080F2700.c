@@ -1,5 +1,3 @@
-#define ColorPulse_PrepareTargetDash  sub_080F2700
-#define ColorPulse_AlignTargetHeading sub_080F2858
 #include "global.h"
 struct ColorPulseTarget {
     u8 pad0[0x30];
@@ -30,10 +28,10 @@ struct ColorPulse {
     u8 padD5C[0x24];
     u32 ticks;
 };
-void sub_080F2858(struct ColorPulse *);
+void ColorPulse_AlignTargetHeading(struct ColorPulse *);
 s32 Math_Atan2(s32, s32);
 void Sound_PlaySong(u32);
-void sub_080F2700(struct ColorPulse *p)
+void ColorPulse_PrepareTargetDash(struct ColorPulse *p)
 {
     p->rotationTimer += p->speed;
     if (p->rotationTimer > 255) {
@@ -57,6 +55,6 @@ void sub_080F2700(struct ColorPulse *p)
         p->deltaY = p->targetY - p->y;
         p->deltaZ = p->targetZ - p->z;
         p->timer = 0;
-        p->callback = sub_080F2858;
+        p->callback = ColorPulse_AlignTargetHeading;
     }
 }

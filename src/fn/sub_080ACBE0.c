@@ -1,4 +1,3 @@
-#define SceneActor_AimArcAtPlayer sub_080ACBE0
 #define gSineTable                gUnk_086149C4
 #include "global.h"
 #include "scene_actor_reset.h"
@@ -12,7 +11,7 @@ static inline s32 TruncateShift(s32 value, u32 shift)
         return value >> shift;
     return -(-value >> shift);
 }
-void sub_080ACBE0(struct SceneActorRegistryResetView *actor)
+void SceneActor_AimArcAtPlayer(struct SceneActorRegistryResetView *actor)
 {
     struct ContactPosition delta;
     struct SceneActorRegistrySequenceDrawable *drawable = actor->drawable;

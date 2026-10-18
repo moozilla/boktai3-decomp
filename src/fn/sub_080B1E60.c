@@ -1,4 +1,3 @@
-#define SceneActor_ResetContextAnimation sub_080B1E60
 // Tentative scene-actor family names; behavior inferred from static accesses.
 #include "global.h"
 #include "scene_actor_reset.h"
@@ -7,7 +6,7 @@ void SceneActorReaction_ResetResponseState(void *, const void *, u32);
 void SceneActorMovement_ResolveRoutePosition(void *);
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 s32 Anim_Step(void *, void *);
-void sub_080B1E60(struct SceneActorRegistryResetView *p)
+void SceneActor_ResetContextAnimation(struct SceneActorRegistryResetView *p)
 {
     struct SceneActorRegistryResetView *q = p->context;
     q->field6D6 = 0;

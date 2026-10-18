@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_registry.h"
 
-#define Vorn_SendMessage sub_080B4134
 
 void SceneActorRegistry_SendToCategory(s32, s16 *);
 

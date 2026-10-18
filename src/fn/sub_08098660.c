@@ -1,4 +1,3 @@
-#define ActorVisibility_TickRevealDelay sub_08098660
 #define gEngineFlags                    gUnk_030053F4
 #include "global.h"
 #include "scene_actor_reset.h"
@@ -31,7 +30,7 @@ static inline u8 Test(u32 v, u32 m)
         return 1;
     return 0;
 }
-void sub_08098660(struct SceneActorRegistryResetView *a)
+void ActorVisibility_TickRevealDelay(struct SceneActorRegistryResetView *a)
 {
     struct ActorRevealState *s = a->context;
     if (Unavailable(a))

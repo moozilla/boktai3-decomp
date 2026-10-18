@@ -1,8 +1,7 @@
 #include "global.h"
 
-#define Skeleton_StepPosition sub_080C4768
 
-void sub_080C4768(void *ptr, s32 n)
+void Skeleton_StepPosition(void *ptr, s32 n)
 {
     u16 *p = ptr;
     u32 val;

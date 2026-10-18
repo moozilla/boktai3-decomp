@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_registry.h"
 
-#define Vorn_ParseField688 sub_080B303C
 
 struct VornData {
     u8 unknown0[0x688];

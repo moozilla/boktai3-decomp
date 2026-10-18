@@ -1,4 +1,3 @@
-#define SceneActorReaction_ParseOptions sub_080B7184
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_script.h"
@@ -12,7 +11,7 @@ static inline void SetContextFlags(struct SceneActorScriptPropertiesView *p, u32
 {
     p->flags6DC |= mask;
 }
-void sub_080B7184(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_ParseOptions(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorScriptPropertiesView *context = actor->context;
     s32 mode;

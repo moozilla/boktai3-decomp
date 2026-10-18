@@ -1,9 +1,8 @@
 #include "global.h"
 #include "scene_actor_control_helpers.h"
 
-#define SceneActorControl_ResetCollisionFlags sub_0809D044
 
-void sub_0809D044(struct SceneActorRegistryResetView *input)
+void SceneActorControl_ResetCollisionFlags(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *actor = input;
     u32 *state = (void *)SceneActorControl_GetMotionState(actor);

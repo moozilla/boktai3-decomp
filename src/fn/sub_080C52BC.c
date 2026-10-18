@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define Skeleton_ClearPendingFlag sub_080C52BC
 
 struct SkeletonLink {
     u8 filler[0x628];
@@ -20,7 +19,7 @@ struct SkeletonActor {
     struct SkeletonLink *t;
 };
 
-void sub_080C52BC(struct SkeletonActor *s)
+void Skeleton_ClearPendingFlag(struct SkeletonActor *s)
 {
     u32 mask;
 

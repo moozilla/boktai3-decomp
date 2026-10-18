@@ -1,4 +1,3 @@
-#define SceneActor_TryTrackNearbyPlayer sub_080DA3AC
 #define gTrackedPlayerId                gUnk_02000508
 #define gPlayerSlots                    gUnk_02000580
 #include "global.h"
@@ -29,7 +28,7 @@ static inline void SubtractPosition(struct ContactPosition *out, struct ContactP
     out->y = a->y - b->y;
     out->z = a->z - b->z;
 }
-s32 sub_080DA3AC(struct SceneActorRegistryResetView *actor, struct ContactPosition *input,
+s32 SceneActor_TryTrackNearbyPlayer(struct SceneActorRegistryResetView *actor, struct ContactPosition *input,
                  u32 playerId)
 {
     u8 *group = (void *)&actor->group;

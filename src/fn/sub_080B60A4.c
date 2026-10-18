@@ -1,4 +1,3 @@
-#define SceneActorControl_InitBehaviorColliders sub_080B60A4
 #include "global.h"
 #include "scene_actor_registry.h"
 void SceneActorCollision_InitExternalBody(struct SceneActorRegistryActor *,
@@ -10,11 +9,11 @@ void SceneActorCollision_InitAttack(struct SceneActorRegistryActor *, void *, vo
 void SceneActorCollision_InitExternalAttack(struct SceneActorRegistryActor *,
                                             struct ContactCollider *, void *, void *, void *, u32,
                                             void *);
-void sub_080B9030(void);
+void SceneActorReaction_TryStartContact(void);
 void sub_080B8FB0(void);
 void sub_080B8DE0(void);
 void sub_080B8EDC(void);
-void sub_080B60A4(struct SceneActorRegistryActor *actor)
+void SceneActorControl_InitBehaviorColliders(struct SceneActorRegistryActor *actor)
 {
     u8 *context = actor->context;
     union SceneActorRegistryPackedPosition bodySize, bodyOffset;
@@ -29,7 +28,7 @@ void sub_080B60A4(struct SceneActorRegistryActor *actor)
     {
         u32 flags = 0x410B;
         SceneActorCollision_InitExternalBody(actor, (void *)(context + 0x624), &bodySize,
-                                             &bodyOffset, sub_080B9030, actor, flags);
+                                             &bodyOffset, SceneActorReaction_TryStartContact, actor, flags);
     }
     innerSize.packed.x = 0x80;
     innerSize.packed.y = 0x80;

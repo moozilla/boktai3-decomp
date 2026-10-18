@@ -1,4 +1,3 @@
-#define SceneActorReaction_IsRangeReady sub_080B7688
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_script.h"
@@ -8,7 +7,7 @@ static inline u8 ContextHasFlag(struct SceneActorScriptPropertiesView *p, u32 ma
         return 1;
     return 0;
 }
-u8 sub_080B7688(struct SceneActorRegistryResetView *actor)
+u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorScriptPropertiesView *context = actor->context;
     switch (actor->paletteOffset) {

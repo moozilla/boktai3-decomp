@@ -1,4 +1,3 @@
-#define SceneActorAnimation_RefreshTimedAttackCollider sub_080E18F4
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
@@ -15,7 +14,7 @@ static inline u8 TakePrepared(struct SceneActorRegistryResetView *a)
     }
     return 0;
 }
-void sub_080E18F4(struct SceneActorRegistryResetView *a, u32 frame)
+void SceneActorAnimation_RefreshTimedAttackCollider(struct SceneActorRegistryResetView *a, u32 frame)
 {
     struct SceneActorTimedAttackContext *context = a->context;
     if (TakePrepared(a)) {

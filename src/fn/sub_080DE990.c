@@ -1,4 +1,3 @@
-#define SceneActorCollision_InitGateColliders sub_080DE990
 #include "global.h"
 #include "scene_actor_collision.h"
 void Dog_OnBodyCollision(void);
@@ -10,7 +9,7 @@ void SceneActorCollision_InitAttack(struct SceneActorRegistryActor *, void *, vo
 void SceneActorCollision_InitExternalAttack(struct SceneActorRegistryActor *,
                                             struct ContactCollider *, void *, void *, void *, u32,
                                             void *);
-void sub_080DE990(struct SceneActorRegistryActor *actor)
+void SceneActorCollision_InitGateColliders(struct SceneActorRegistryActor *actor)
 {
     struct ContactPackedVector bodySize, bodyOffset, attackSize, attackOffset, externalSize,
         externalOffset;

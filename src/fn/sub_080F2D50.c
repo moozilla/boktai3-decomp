@@ -1,5 +1,3 @@
-#define PhaseObject_EndApproachPause sub_080F2E6C
-#define PhaseObject_ApproachTarget   sub_080F2D50
 #define gPhaseDirectionSines         gUnk_086149C4
 #include "global.h"
 
@@ -30,8 +28,8 @@ struct PhaseObject {
 };
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
-void sub_080F2E6C(struct PhaseObject *);
-void sub_080F2D50(struct PhaseObject *p)
+void PhaseObject_EndApproachPause(struct PhaseObject *);
+void PhaseObject_ApproachTarget(struct PhaseObject *p)
 {
     s32 vx, vz, stepX, stepZ;
     p->targetX = p->target->x;
@@ -57,6 +55,6 @@ void sub_080F2D50(struct PhaseObject *p)
     p->z += p->velocityZ;
     if (!(p->frame & 3)) {
         if (++p->timer == 0x50)
-            p->callback = sub_080F2E6C;
+            p->callback = PhaseObject_EndApproachPause;
     }
 }

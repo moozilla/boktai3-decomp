@@ -1,4 +1,3 @@
-#define ActorPhase_DampMovement sub_080F56D8
 #include "global.h"
 struct PhaseParent { u8 unknown0[0xD80]; u32 flags; };
 struct PhaseActor {
@@ -10,7 +9,7 @@ struct PhaseActor {
  u8 unknown164[0x14]; void (*update178)(void);
 };
 void Sword_UpdateThrustRetraction(void);
-void sub_080F56D8(struct PhaseActor *p) {
+void ActorPhase_DampMovement(struct PhaseActor *p) {
  struct PhaseParent *parent = p->parent;
  p->angle += 20;
  p->position[0] += p->velocity[0];

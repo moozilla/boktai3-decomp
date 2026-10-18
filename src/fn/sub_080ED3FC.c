@@ -1,4 +1,3 @@
-#define SceneActorReaction_PlayHiddenCue sub_080ED3FC
 /* Tentative name based on the observed state transition or initialization. */
 #include "global.h"
 #include "scene_actor_reset.h"
@@ -12,7 +11,7 @@ static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
     }
     return 0;
 }
-void sub_080ED3FC(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_PlayHiddenCue(struct SceneActorRegistryResetView *actor)
 {
     if (TakePrepared(actor)) {
         u8 *drawable = actor->drawable;

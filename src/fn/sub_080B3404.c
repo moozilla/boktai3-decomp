@@ -2,7 +2,6 @@
 #include "scene_actor_registry.h"
 #include "animated_hazard.h"
 
-#define Vorn_TickSound sub_080B3404
 
 void SceneStimulus_AddTagged(s16 a, s16 b, s16 c, s16 d, u8 e, u16 f);
 

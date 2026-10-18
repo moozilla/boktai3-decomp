@@ -1,11 +1,10 @@
-#define SceneActor_InitializeReactionColliders sub_080E7EC8
 #include "global.h"
 #include "contact_actor.h"
 void Mimic_OnAttackContact(void);
 void Mimic_OnBodyContact(void);
 void SceneActorCollision_InitAttack(void *, void *, void *, void (*)(void), u32, void *);
 void SceneActorCollision_InitBody(void *, void *, void *, void (*)(void), void *);
-void sub_080E7EC8(void *p)
+void SceneActor_InitializeReactionColliders(void *p)
 {
     union {
         struct ContactPackedVector packed;

@@ -1,5 +1,4 @@
 #include "global.h"
-#define TextWindow_SetBounds sub_080339B8
 
 struct Win {
     u8 pad[4];
@@ -10,7 +9,7 @@ s32 TextState_SetBounds(void *state, u32 left, u32 top, u32 width, u32 height);
 void TextWindow_BlankRect(s32 x, s32 y, s32 width, s32 height);
 void *TextWindow_Find(u32 id);
 
-s32 sub_080339B8(u32 id, u32 x, u32 y, u32 w, u32 h)
+s32 TextWindow_SetBounds(u32 id, u32 x, u32 y, u32 w, u32 h)
 {
     struct Win *win = TextWindow_Find(id);
     u8 *state;

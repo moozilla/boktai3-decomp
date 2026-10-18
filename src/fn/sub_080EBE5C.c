@@ -1,4 +1,3 @@
-#define SceneActorCollision_InitCompactBody sub_080EBE5C
 /* Tentative name based on the observed state transition or initialization. */
 #include "global.h"
 #include "scene_actor_reset.h"
@@ -10,7 +9,7 @@ void SceneActorCollision_InitBodyWithFlags(struct SceneActorRegistryResetView *,
 void SceneActorCollision_InitAttack(struct SceneActorRegistryResetView *, void *, void *, void (*)(void), u32, void *);
 void Octopus_OnBodyContact(void);
 void Octopus_OnAttackContact(void);
-void sub_080EBE5C(struct SceneActorRegistryResetView *actor)
+void SceneActorCollision_InitCompactBody(struct SceneActorRegistryResetView *actor)
 {
     union SceneActorCollisionVector bounds, offset, attackBounds, attackOffset;
     bounds.vector.x = 64;

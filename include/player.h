@@ -99,7 +99,7 @@ struct Player {
     s32 slot; /* 0x18: compared with local link player index */
     u32 kind; /* 0x1C: kind one accepts mode-0x1A position reset */
     u32 statusFlags; /* 0x186c: busy bits, 0x100000: cannot interact (guess) */
-    u16 positionalEffectGroup; /* 0x24: forwarded to sub_0822B7B4 (tentative) */
+    u16 positionalEffectGroup; /* 0x24: forwarded to SceneStimulus_AddTagged (tentative) */
     u8 unk26[6];
     u8 movementRequestBlocked; /* 0x2C: gates saved movement target; also indexes player slot on teardown */
     s8 unk2D; /* forwarded to indexed scene-entry update */
@@ -219,7 +219,7 @@ struct Player {
     u8 unk4BF[3];
     u16 contactActionTag; /* 0x4C2: terrain recovery sets 0x191 */
     u8 unk4C4[4];
-    u16 actionAccumulator; /* 0x4C8: wraps by 100 and triggers sub_081412A4 */
+    u16 actionAccumulator; /* 0x4C8: wraps by 100 and triggers Player_EmitPeriodicEffect */
     u16 particleIntervalCounter; /* 0x4CA: periodic particle emission */
     u8 unk4CC[4];
     u16 particleCadenceCounter; /* 0x4D0: emits a particle after fifteen ticks */

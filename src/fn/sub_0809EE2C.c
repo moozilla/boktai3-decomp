@@ -1,4 +1,3 @@
-#define RouteActor_UpdatePeriodicAnimation sub_0809EE2C
 #include "global.h"
 #include "scene_actor_registry.h"
 #include "scene_actor_animation.h"
@@ -23,7 +22,7 @@ static inline u8 TestFlag(struct RouteActorAnimationState *state, u32 mask)
         return 1;
     return 0;
 }
-void sub_0809EE2C(struct SceneActorRegistryActor *actor, s32 tick)
+void RouteActor_UpdatePeriodicAnimation(struct SceneActorRegistryActor *actor, s32 tick)
 {
     struct RouteActorAnimationState *state = actor->context;
     if (TakeFlag(&actor->field2B2)) {

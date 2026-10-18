@@ -1,6 +1,5 @@
 #include "global.h"
 /* Tentative family name: owner of the active child-record group. */
-#define ChildGroup_UpdateTimedOscillation    sub_080F3848
 #define ChildGroup_UpdateVerticalOscillation Ivy_UpdateBobbing
 struct ChildGroup {
     u8 pad0[0x8D];
@@ -43,7 +42,7 @@ static inline void SetState(struct ChildGroup *p, u8 one, u8 id)
     p->state93 = id;
     p->flags |= one;
 }
-void sub_080F3848(struct ChildGroup *p)
+void ChildGroup_UpdateTimedOscillation(struct ChildGroup *p)
 {
     if (EnterState(p)) {
         p->timer = 150;

@@ -1,4 +1,3 @@
-#define SceneActorControl_CallContextScript sub_080DEE98
 #include "global.h"
 #include "scene_actor_behavior.h"
 #include "scene_actor_registry.h"
@@ -7,7 +6,7 @@ struct SceneActorScriptContext {
     u8 unknown0[0x6A0];
     s16 mode, firstParameter, secondParameter;
 };
-void sub_080DEE98(struct SceneActorBehaviorView *actor)
+void SceneActorControl_CallContextScript(struct SceneActorBehaviorView *actor)
 {
     s32 values[12];
     struct ScriptUtilityArguments arguments;

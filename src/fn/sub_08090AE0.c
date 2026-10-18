@@ -1,8 +1,7 @@
 #include "global.h"
 #include "scene_actor_motion.h"
-#define SceneActorMotion_ArmPrimaryCollider sub_08090AE0
 
-void sub_08090AE0(struct SceneActorMotionView *actor)
+void SceneActorMotion_ArmPrimaryCollider(struct SceneActorMotionView *actor)
 {
     s32 health;
 

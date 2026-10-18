@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_actor_reset.h"
-#define ActorTrail_ResetAtSavedPosition sub_080AA10C
 #define ActorTrail_ResetPositions TentacleActor_ResetSegmentPositions
 #define ActorTrail_CopyTerrainSamples TentacleActor_ResetRouteHistory
 extern u32 gUnk_03005308;
@@ -23,7 +22,7 @@ struct ActorTrail {
 void TentacleActor_ResetRouteHistory(void *);
 void TentacleActor_ResetSegmentPositions(void *, struct ContactPosition *);
 void sub_080A8904(void *);
-void sub_080AA10C(struct SceneActorRegistryResetView *actor) {
+void ActorTrail_ResetAtSavedPosition(struct SceneActorRegistryResetView *actor) {
     struct ActorTrail *trail = actor->context;
     struct ContactPosition *saved;
     trail->flags8D0 &= 0xFFFD;

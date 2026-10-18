@@ -1,5 +1,4 @@
 #include "global.h"
-#define ActorTrail_ApplyAngularOffsets sub_080A9AA0
 #define gTrailSineTable gUnk_086149C4
 extern const s16 gUnk_086149C4[];
 struct TrailOscillator {
@@ -35,7 +34,7 @@ static inline s32 fixedMultiply(s32 a, s32 b) {
     if (product >= 0) return product >> 12;
     return -((-product) >> 12);
 }
-void sub_080A9AA0(struct TrailActor *actor, s32 magnitude, s32 angleStep, s32 mode) {
+void ActorTrail_ApplyAngularOffsets(struct TrailActor *actor, s32 magnitude, s32 angleStep, s32 mode) {
     struct ActorTrail *trail = actor->trail;
     s32 i;
     for (i = 0; i < trail->segmentCount; i++) {

@@ -1,8 +1,7 @@
-#define SceneActor_UpdateTargetedAttack sub_080ACDC4
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
-void sub_080B1038(struct SceneActorRegistryResetView *);
+void SceneActor_UpdateForwardCollider(struct SceneActorRegistryResetView *);
 struct TargetedAttackContext {
     u8 unknown0[0x628];
     struct ContactCollider collider;
@@ -25,7 +24,7 @@ static inline u8 TakeEntryFlag(struct SceneActorRegistryResetView *s)
     }
     return 0;
 }
-void sub_080ACDC4(struct SceneActorRegistryResetView *s)
+void SceneActor_UpdateTargetedAttack(struct SceneActorRegistryResetView *s)
 {
     struct TargetedAttackContext *context = s->context;
     struct TargetedAttackSequence *sequence = (void *)((u8 *)s->drawable + 0x20);
@@ -36,7 +35,7 @@ void sub_080ACDC4(struct SceneActorRegistryResetView *s)
         Sound_PlaySong(0x1D0);
     }
     if ((u16)(sequence->frame - 3) <= 1) {
-        sub_080B1038(s);
+        SceneActor_UpdateForwardCollider(s);
         Collider_Refresh(&context->collider);
     }
     if (s->field2B3)

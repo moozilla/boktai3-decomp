@@ -1,4 +1,3 @@
-#define SceneActor_EnterMotionPhase sub_080D7438
 #include "global.h"
 #include "scene_actor_reset.h"
 struct SceneActorMotionParent {
@@ -14,7 +13,7 @@ static inline u8 MotionStarted(struct SceneActorReactionMotion *motion)
         return 1;
     return 0;
 }
-void sub_080D7438(struct SceneActorRegistryResetView *actor)
+void SceneActor_EnterMotionPhase(struct SceneActorRegistryResetView *actor)
 {
     u32 *flags = &actor->flags2D0;
     s32 mask = -5;

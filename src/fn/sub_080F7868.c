@@ -1,6 +1,4 @@
 #include "global.h"
-#define ActorPhase_UpdateTimedFlicker sub_080F7868
-#define ActorPhase_UpdateFlicker      sub_080FC498
 #define ActorPhase_SetAnimation Axe_SetAuxiliarySpriteParameters
 struct PhaseActor {
     u8 pad0[0x104];
@@ -24,7 +22,7 @@ void sub_080FC4F4(struct PhaseActor *);
 void sub_080FC894(struct PhaseActor *, void *);
 void ActorShadow_Enable(void *);
 void Sound_PlaySong(u32);
-u8 sub_080FC498(u32 *, s32, s32, s32);
+u8 ActorPhase_UpdateFlicker(u32 *, s32, s32, s32);
 void Axe_SetAuxiliarySpriteParameters(struct PhaseActor *, void *, u32);
 void sub_080F79A8(void);
 static inline u8 consumeEntry(struct PhaseActor *s)
@@ -39,7 +37,7 @@ static inline void clearFlags(u32 *p, u32 mask)
 {
     *p &= ~mask;
 }
-void sub_080F7868(struct PhaseActor *s, s32 frame)
+void ActorPhase_UpdateTimedFlicker(struct PhaseActor *s, s32 frame)
 {
     u8 *data = s->data;
     u32 flags;
@@ -52,7 +50,7 @@ void sub_080F7868(struct PhaseActor *s, s32 frame)
         Axe_SetAuxiliarySpriteParameters(s, data + 0x888, 0x13c);
         Sound_PlaySong(0x16f);
     }
-    if (sub_080FC498(&flags, frame, 10, 30)) {
+    if (ActorPhase_UpdateFlicker(&flags, frame, 10, 30)) {
         void (*next)(void) = sub_080F79A8;
         u32 id = 0x2c;
         s->entered = 1;

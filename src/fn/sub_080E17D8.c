@@ -1,12 +1,9 @@
-#define SceneActorAnimation_EmitDirectionalTrail       sub_080E17D8
-#define SceneActorAnimation_RefreshTimedAttackCollider sub_080E18F4
-#define SceneActorAnimation_SpawnTrailAtPosition       sub_080DF908
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
 s32 Mod(s32, s32);
-void sub_080DF908(void *, u32);
-void sub_080E18F4(void);
+void SceneActorAnimation_SpawnTrailAtPosition(void *, u32);
+void SceneActorAnimation_RefreshTimedAttackCollider(void);
 static inline u8 TakePrepared(struct SceneActorRegistryResetView *a)
 {
     if (a->field2B2) {
@@ -15,7 +12,7 @@ static inline u8 TakePrepared(struct SceneActorRegistryResetView *a)
     }
     return 0;
 }
-void sub_080E17D8(struct SceneActorRegistryResetView *a, s32 frame)
+void SceneActorAnimation_EmitDirectionalTrail(struct SceneActorRegistryResetView *a, s32 frame)
 {
     union SceneActorRegistryPackedPosition p;
     if (TakePrepared(a))
@@ -43,10 +40,10 @@ void sub_080E17D8(struct SceneActorRegistryResetView *a, s32 frame)
                 p.packed.z -= 128;
                 break;
         }
-        sub_080DF908(&p, a->paletteOffset);
+        SceneActorAnimation_SpawnTrailAtPosition(&p, a->paletteOffset);
     }
     if (frame > 30) {
-        void *callback = sub_080E18F4;
+        void *callback = SceneActorAnimation_RefreshTimedAttackCollider;
         u8 kind = 38;
         u8 *prepared = &a->field2B2;
         u32 zero = 0;

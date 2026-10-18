@@ -1,4 +1,3 @@
-#define Sword_DestroyTask sub_080F6718
 #include "global.h"
 struct SwordSprite {
     u8 unknown0[0x2C];
@@ -18,7 +17,7 @@ void Sprite_Remove(void *);
 void Collider_Remove(void *);
 void ScaledShadow_Destroy(void *);
 void sub_0815F738(void *);
-s32 sub_080F6718(struct SwordTask *p)
+s32 Sword_DestroyTask(struct SwordTask *p)
 {
     struct SwordSprite *sprite;
     s32 i;

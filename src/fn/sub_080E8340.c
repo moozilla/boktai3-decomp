@@ -1,4 +1,3 @@
-#define SceneActor_PrepareStationaryReaction sub_080E8340
 #include "global.h"
 #include "scene_actor_reaction.h"
 void sub_080E8158(struct SceneActorRegistryResetView *);
@@ -37,7 +36,7 @@ static inline void prepareControl(struct SceneActorRegistryResetView *actor, voi
     clearFlag(&actor->flags114);
     actor->word104 = zero;
 }
-void sub_080E8340(struct SceneActorRegistryResetView *actor)
+void SceneActor_PrepareStationaryReaction(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorReactionMotion *motion;
     s32 offset;

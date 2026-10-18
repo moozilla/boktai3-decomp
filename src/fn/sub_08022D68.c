@@ -1,11 +1,9 @@
 #include "global.h"
-#define SceneActorState_StepTableByKind sub_08022D68
-#define SceneActorState_StepTableByte sub_08022D24
 
 extern const u8 gUnk_08604DC4[], gUnk_08604DE4[], gUnk_08604E04[], gUnk_08604E24[];
-void sub_08022D24(u8 *p, const u8 *tbl);
+void SceneActorState_StepTableByte(u8 *p, const u8 *tbl);
 
-int sub_08022D68(u8 *p)
+int SceneActorState_StepTableByKind(u8 *p)
 {
     const u8 *tbl;
     switch (*(s32 *)(p + 0x358)) {
@@ -24,7 +22,7 @@ int sub_08022D68(u8 *p)
     default:
         goto fail;
     }
-    sub_08022D24(p, tbl);
+    SceneActorState_StepTableByte(p, tbl);
     return 1;
 fail:
     return 0;

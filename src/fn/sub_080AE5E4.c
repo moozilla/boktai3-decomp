@@ -1,4 +1,3 @@
-#define SceneActorReaction_ResumeOrRunScript sub_080AE5E4
 #include "global.h"
 #include "scene_actor_reaction.h"
 extern const u8 gUnk_0824E20C[];
@@ -32,7 +31,7 @@ struct SceneActorResumeContext {
     u8 unknown0[0x6D4];
     u16 flags;
 };
-void sub_080AE5E4(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_ResumeOrRunScript(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group;
     if (SceneActorReaction_TakePrepared(actor))

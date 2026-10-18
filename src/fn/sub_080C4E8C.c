@@ -1,9 +1,8 @@
 #include "global.h"
 #include "player.h"
 
-#define Skeleton_TryTriggerAction sub_080C4E8C
 
-void sub_080C4CFC(void *s);
+void SceneActorRoute_CommitReachableDestination(void *s);
 
 static inline u8 Test(u32 value, u32 mask)
 {
@@ -26,7 +25,7 @@ struct SkeletonActor {
     struct SkeletonLink *t;
 };
 
-void sub_080C4E8C(struct SkeletonActor *s)
+void Skeleton_TryTriggerAction(struct SkeletonActor *s)
 {
     struct SkeletonLink *t = s->t;
     u32 mask;
@@ -49,5 +48,5 @@ void sub_080C4E8C(struct SkeletonActor *s)
     if (s->h0DC == 0)
         return;
 
-    sub_080C4CFC(s);
+    SceneActorRoute_CommitReachableDestination(s);
 }

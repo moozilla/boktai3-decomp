@@ -1,4 +1,3 @@
-#define SceneActor_UpdateDelayedAnimation sub_080ACEE8
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
@@ -15,7 +14,7 @@ static inline u8 TakeEntryFlag(struct SceneActorRegistryResetView *s)
     }
     return 0;
 }
-void sub_080ACEE8(struct SceneActorRegistryResetView *s)
+void SceneActor_UpdateDelayedAnimation(struct SceneActorRegistryResetView *s)
 {
     struct DelayedAnimationContext *context = s->context;
     if (TakeEntryFlag(s))

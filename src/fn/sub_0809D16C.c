@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_control_helpers.h"
 
-#define SceneActorControl_ResetTargetFlags sub_0809D16C
 
 struct SceneActorTargetLink {
     u8 *target;
@@ -9,7 +8,7 @@ struct SceneActorTargetLink {
     u8 flags;
 };
 
-void sub_0809D16C(struct SceneActorRegistryResetView *input)
+void SceneActorControl_ResetTargetFlags(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *s = input;
     struct SceneActorControlState *q = SceneActorControl_GetState(s);

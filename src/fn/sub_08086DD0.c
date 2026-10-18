@@ -1,5 +1,4 @@
 #include "global.h"
-#define Bat_UpdateAnimationRequest sub_08086DD0
 
 void SceneActorAnimation_SelectDirectionalEntry(void *, u32);
 
@@ -30,7 +29,7 @@ static inline void Clr(u8 *q)
     ((struct Seq *)q)->hE = 0;
 }
 
-void sub_08086DD0(u8 *p)
+void Bat_UpdateAnimationRequest(u8 *p)
 {
     struct Seq *s;
 

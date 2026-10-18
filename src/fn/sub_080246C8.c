@@ -1,6 +1,5 @@
 #include "global.h"
 #include "contact_actor.h"
-#define SceneActorState_StartContactPool sub_080246C8
 typedef struct State {
     u8 pad0[0x90];
     u32 tick;
@@ -37,7 +36,7 @@ static inline u8 enter(State *p)
     return 0;
 }
 
-void sub_080246C8(Actor *a)
+void SceneActorState_StartContactPool(Actor *a)
 {
     State *p = &a->base;
     struct ContactPosition pos;

@@ -1,4 +1,3 @@
-#define SceneActorReaction_TickHiddenTimeout sub_080BB7BC
 #define SceneActorReaction_RestoreControl SceneActorPlacement_ResetActorState
 /* Tentative reaction name, based on the observed fields and calls. */
 #include "global.h"
@@ -21,7 +20,7 @@ static inline void SetColliderFlag(struct ContactCollider *collider)
 {
     collider->flags |= 4;
 }
-void sub_080BB7BC(struct SceneActorRegistryResetView *p, s32 elapsed)
+void SceneActorReaction_TickHiddenTimeout(struct SceneActorRegistryResetView *p, s32 elapsed)
 {
     struct SceneActorScriptPropertiesView *state = p->context;
     u16 mode;

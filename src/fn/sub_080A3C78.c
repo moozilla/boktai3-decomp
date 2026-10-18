@@ -2,9 +2,8 @@
 #include "proximity_emitter.h"
 #include "scene_actor_reset.h"
 
-#define SceneActor_IsWithinTetherRange sub_080A3C78
 
-s32 sub_080A3C78(struct SceneActorRegistryResetView *actor, s32 xRange, s32 zRange)
+s32 SceneActor_IsWithinTetherRange(struct SceneActorRegistryResetView *actor, s32 xRange, s32 zRange)
 {
     struct ContactPosition *target = TetherActor_GetPosition();
     if (!target)

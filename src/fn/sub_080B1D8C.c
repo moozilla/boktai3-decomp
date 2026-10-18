@@ -1,4 +1,3 @@
-#define SceneActor_InitContextColliders sub_080B1D8C
 // Tentative scene-actor family names; behavior inferred from static accesses.
 #include "global.h"
 #include "scene_actor_reset.h"
@@ -9,7 +8,7 @@ void SceneActorCollision_InitExternalAttack(void *, void *, void *, void *, void
 void Vorn_OnCollisionResponse(void);
 void Vorn_OnContactEvent(void);
 void Vorn_OnScriptActionRequest(void);
-void sub_080B1D8C(struct SceneActorRegistryResetView *p)
+void SceneActor_InitContextColliders(struct SceneActorRegistryResetView *p)
 {
     struct ContactPackedVector size, offset;
     u8 *q = p->context;

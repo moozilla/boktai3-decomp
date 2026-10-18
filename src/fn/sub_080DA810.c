@@ -1,4 +1,3 @@
-#define SceneEffect_EmitPositionPattern sub_080DA810
 #define SceneEffect_CreateParticle ExplosionEffect_CreateDelayed
 #define gSceneEffectPatternArguments          gUnk_086061C0
 #define gSceneEffectFourOffsetsX        gUnk_086061C4
@@ -10,7 +9,7 @@
 extern const u16 gUnk_086061D4[], gUnk_086061D8[], gUnk_086061C4[], gUnk_086061CC[];
 extern const u8 gUnk_086061C0[];
 u8 *ExplosionEffect_CreateDelayed(void *, u32, s32, s32, s32, u32);
-void sub_080DA810(struct SceneActorRegistryActor *emitter)
+void SceneEffect_EmitPositionPattern(struct SceneActorRegistryActor *emitter)
 {
     struct ContactPackedVector position;
     s32 i;

@@ -1,4 +1,3 @@
-#define SceneActorControl_BeginTimedBehavior56 sub_080B5D84
 #include "global.h"
 #include "scene_actor_reset.h"
 struct SceneActorBehaviorTimer {
@@ -6,7 +5,7 @@ struct SceneActorBehaviorTimer {
     u16 timer;
 };
 void sub_080B9158(void);
-void sub_080B5D84(struct SceneActorRegistryResetView *s, struct SceneActorBehaviorTimer *other)
+void SceneActorControl_BeginTimedBehavior56(struct SceneActorRegistryResetView *s, struct SceneActorBehaviorTimer *other)
 {
     switch (s->category) {
         case 6:

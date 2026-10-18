@@ -1,4 +1,3 @@
-#define SceneActorControl_WaitForTarget sub_080EFC58
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
@@ -56,7 +55,7 @@ static inline void BeginTargetControl(struct SceneActorRegistryResetView *actor,
         actor->word104 = zero;
     }
 }
-void sub_080EFC58(struct SceneActorRegistryResetView *input)
+void SceneActorControl_WaitForTarget(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *actor = input;
     s32 zero;

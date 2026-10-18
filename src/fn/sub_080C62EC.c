@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_animation.h"
 
-#define Skeleton_ClearDirectionalEntryFlag sub_080C62EC
 
 struct Seq {
     u8 pad0[8];
@@ -19,7 +18,7 @@ static inline u8 TakeFlag(u8 *flag)
     return FALSE;
 }
 
-void sub_080C62EC(struct SceneActorAnimationView *s)
+void Skeleton_ClearDirectionalEntryFlag(struct SceneActorAnimationView *s)
 {
     struct Seq *seq = (struct Seq *)((u8 *)s->drawable + 0x48);
 

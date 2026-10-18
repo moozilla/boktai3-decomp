@@ -1,5 +1,4 @@
 #include "global.h"
-#define GridAttack_Update sub_0802BF30
 
 void sub_0802B7C8(u8 *p);
 void GridAttack_UpdateActionController(u8 *p);
@@ -8,7 +7,7 @@ void sub_0802BAFC(u8 *p);
 void GridAttackActor_RequestLinkedActorState(u8 *p);
 void GridAttackActor_NotifyLinkedActorLatePhase(u8 *p);
 
-int sub_0802BF30(u8 *p)
+int GridAttack_Update(u8 *p)
 {
     u16 *t;
     sub_0802B7C8(p);

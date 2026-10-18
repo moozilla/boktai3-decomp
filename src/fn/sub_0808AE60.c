@@ -1,5 +1,4 @@
 #include "global.h"
-#define Bat_LookupAnimationEntry sub_0808AE60
 
 extern u16 gUnk_08605CE8[];
 
@@ -17,7 +16,7 @@ struct Obj {
     u32 flags;
 };
 
-u32 sub_0808AE60(struct Obj *p)
+u32 Bat_LookupAnimationEntry(struct Obj *p)
 {
     struct Seq *s = (struct Seq *)(p->inner + 0x48);
     struct Seq *t = s;

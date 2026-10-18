@@ -1,4 +1,3 @@
-#define SceneActorReaction_AwaitTargetControl sub_080EB450
 #include "global.h"
 #include "scene_actor_reaction.h"
 void *sub_080EC024(struct SceneActorRegistryResetView *);
@@ -26,7 +25,7 @@ static inline void ResetState(struct SceneActorRegistryResetView *actor, u32 sta
         *((u8 *)actor + offset) = 1;
     }
 }
-void sub_080EB450(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_AwaitTargetControl(struct SceneActorRegistryResetView *actor)
 {
     void *target;
     TakeReset(actor);

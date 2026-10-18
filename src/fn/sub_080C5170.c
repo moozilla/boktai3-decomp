@@ -1,4 +1,3 @@
-#define SceneActor_AccelerateForTerrain sub_080C5170
 #include "global.h"
 #include "scene_actor_reset.h"
 #define gTerrainMap gUnk_030052F4
@@ -6,7 +5,7 @@
 struct ActorMotion { u8 pad0[0x682]; s16 speed; };
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
-void sub_080C5170(struct SceneActorRegistryResetView *actor)
+void SceneActor_AccelerateForTerrain(struct SceneActorRegistryResetView *actor)
 {
     struct ActorMotion *motion = actor->context;
     u16 type = actor->terrainCell;

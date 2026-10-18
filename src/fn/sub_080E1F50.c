@@ -1,4 +1,3 @@
-#define SceneActorMotion_TestTargetTransition sub_080E1F50
 #define SceneActorMotion_IsVariantTimerReady Dog_IsActionTimerExpired
 #include "global.h"
 #include "scene_actor_reset.h"
@@ -42,7 +41,7 @@ static inline u8 TestMovement(struct SceneActorRegistryResetView *a)
         }
     }
 }
-void sub_080E1F50(struct SceneActorRegistryResetView *a)
+void SceneActorMotion_TestTargetTransition(struct SceneActorRegistryResetView *a)
 {
     struct SceneActorTargetMotionContext *context = a->context;
     if (!TakePrepared(a)) {

@@ -1,5 +1,3 @@
-#define SceneActor_TryLaunchItem13 sub_080B0E5C
-#define ItemSlots_FindKind         sub_080B0E04
 #define gPlayers                   gUnk_02000580
 /* Descriptive aliases and object roles are tentative (confidence: low). */
 #include "global.h"
@@ -19,7 +17,7 @@ struct SceneActorItemLaunch {
     u16 flags;
 };
 extern struct ItemLaunchPlayer *gUnk_02000580[4];
-u8 sub_080B0E04(s16 *, s16 *, s16 *, s32);
+u8 SceneInventory_FindSlotByValue(s16 *, s16 *, s16 *, s32);
 s32 sub_08017044(s32, s32, s32, s32, void *, void *, s32, void *);
 void Inventory_ClearItemSlot(u32);
 void Sound_PlaySong(u32);
@@ -36,14 +34,14 @@ static inline u8 occupied(struct SceneActorItemLaunch *p)
         return 1;
     return 0;
 }
-s32 sub_080B0E5C(struct SceneActorItemLaunch *p)
+s32 SceneActor_TryLaunchItem13(struct SceneActorItemLaunch *p)
 {
     struct SceneActorItemLaunch *q = p;
     struct PackedItemPosition pos = gUnk_02000580[0]->position;
     pos.y += 200;
     if (occupied(p))
         return -1;
-    if (!sub_080B0E04(&p->slot, &p->kind, &p->parameter, 13))
+    if (!SceneInventory_FindSlotByValue(&p->slot, &p->kind, &p->parameter, 13))
         return -1;
     if (sub_08017044(0, p->kind, 3, 0, &pos, &q->position, 24, p) < 0) {
         p->slot = 0xffff;

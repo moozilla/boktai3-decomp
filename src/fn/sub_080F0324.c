@@ -1,9 +1,7 @@
-#define SceneActorControl_BeginSoundTransition      sub_080F0324
-#define SceneActorControl_UpdateAnimationTransition sub_080EE000
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #include "engine.h"
-void sub_080EE000(struct SceneActorRegistryResetView *, s32);
+void SceneActorControl_UpdateAnimationTransition(struct SceneActorRegistryResetView *, s32);
 static inline void BeginTransition(struct SceneActorRegistryResetView *actor, u16 zero, u32 offset)
 {
     u32 state = 3;
@@ -18,7 +16,7 @@ static inline void BeginTransition(struct SceneActorRegistryResetView *actor, u1
     offset += 8;
     *((u8 *)actor + offset) = 1;
     {
-        void *callback = sub_080EE000;
+        void *callback = SceneActorControl_UpdateAnimationTransition;
         u32 kind = 0x2B;
         offset++;
         *((u8 *)actor + offset) = 1;
@@ -37,7 +35,7 @@ static inline void BeginTransition(struct SceneActorRegistryResetView *actor, u1
         actor->word104 = zero;
     }
 }
-s32 sub_080F0324(struct SceneActorRegistryResetView *actor)
+s32 SceneActorControl_BeginSoundTransition(struct SceneActorRegistryResetView *actor)
 {
     u16 *flags;
     u16 suppressed;

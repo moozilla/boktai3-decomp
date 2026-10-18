@@ -1,4 +1,3 @@
-#define ActorContact_InitializeBodyAndSecondary sub_0809CBB8
 #include "global.h"
 #include "scene_actor_reset.h"
 void Lun_OnBodyContact(void);
@@ -8,7 +7,7 @@ void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_SetCallback(void *, void *, void *);
-void sub_0809CBB8(struct SceneActorRegistryResetView *a)
+void ActorContact_InitializeBodyAndSecondary(struct SceneActorRegistryResetView *a)
 {
     struct ContactPackedVector bodySize, bodyOffset, secondarySize, secondaryOffset;
     struct ContactCollider *collider;

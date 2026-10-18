@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define SpritePool_FlagEntries sub_080A95F8
 
 struct Entry080A9 {
     u32 field0;
@@ -22,7 +21,7 @@ static inline u8 TestMask(u8 flags, u32 mask)
     return FALSE;
 }
 
-void sub_080A95F8(struct Group080A9 *g)
+void SpritePool_FlagEntries(struct Group080A9 *g)
 {
     s32 i = 0;
     s16 *countPtr = &g->count;

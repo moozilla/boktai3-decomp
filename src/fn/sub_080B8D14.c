@@ -1,13 +1,11 @@
-#define SceneActorReaction_TickHiddenResponse sub_080B8D14
-#define SceneActorReaction_SetProfileEntries  sub_080B7580
 #include "global.h"
 #include "scene_actor_control_helpers.h"
 #include "scene_actor_script.h"
 #include "scene_actor_animation.h"
 void sub_080B5BEC(struct SceneActorRegistryResetView *);
-void sub_080B7580(struct SceneActorRegistryResetView *);
+void SceneActorReaction_SetProfileEntries(struct SceneActorRegistryResetView *);
 void sub_080B7768(struct SceneActorRegistryResetView *);
-s32 sub_080B8D14(struct SceneActorRegistryResetView *actor)
+s32 SceneActorReaction_TickHiddenResponse(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorRegistryResetView *saved = actor;
     u32 mask = 0x4000;
@@ -42,7 +40,7 @@ s32 sub_080B8D14(struct SceneActorRegistryResetView *actor)
     } else {
         struct SceneActorScriptPropertiesView *context = (void *)actor;
         u16 *timer;
-        sub_080B7580(actor);
+        SceneActorReaction_SetProfileEntries(actor);
         sub_080B7768(actor);
         timer = &context->timer6D8;
         if (*timer)
