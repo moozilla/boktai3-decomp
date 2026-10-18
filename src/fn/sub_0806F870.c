@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_range_watch.h"
 static inline s32 Read(s32 fallback)
 {
@@ -36,8 +35,7 @@ s32 SceneRangeWatch_Initialize(struct SceneRangeWatch *input)
         u32 zero;
         minimum = &watch->minimum;
         {
-            register u32 last asm("r1") = 0x2B;
-            asm("" : "+r"(last));
+            u32 last = 0x2B;
             last += (u32)watch;
             maximum = (u8 *)last;
         }
