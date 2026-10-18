@@ -631,3 +631,4 @@ addr,function,name,family,note
 0811CBB4,sub_0811CBB4,ScenePalette_RefreshOnFlags,"ScenePalette","refreshes selected colors under game-state or engine flags"
 0811D0C4,sub_0811D0C4,ActorStats_ApplyPendingDamage,"ActorStats","applies modified damage and sets the depleted flag"
 0811D384,sub_0811D384,SceneActorStyle_InitializeFromGameState,"SceneActorStyle","initializes a style descriptor from saved game fields"
+0811EB44,sub_0811EB44,StatModifier_InitializeCallbacks,"StatModifier","clears twenty-four modifier slots and assigns callbacks for selected record kinds"
