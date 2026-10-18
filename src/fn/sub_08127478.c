@@ -1,0 +1,41 @@
+#include "global.h"
+#define PooledSprite_UpdateRemoval sub_08127478
+#define gPooledSpriteManager       gUnk_02000164
+struct PooledSprite {
+    u8 unknown0[0xBC];
+    u16 timer, state;
+    u8 active;
+    s8 slot;
+    u8 unknownC2[6];
+    u8 reset, unknownC9;
+    u16 counter;
+};
+struct PooledSpriteManager {
+    u8 unknown0[0x860];
+    u32 allocated;
+};
+extern struct PooledSpriteManager *gUnk_02000164;
+u8 sub_082212DC(void *, u32, s32, s32);
+void Sprite_Remove(void *);
+static inline void release(struct PooledSpriteManager *manager, s32 slot)
+{
+    manager->allocated &= ~(1 << slot);
+}
+void sub_08127478(void *unused, struct PooledSprite *sprite)
+{
+    if (sprite->reset) {
+        sprite->reset = 0;
+        sprite->timer = 0;
+    }
+    if (sub_082212DC(sprite, sprite->timer, 60, 40)) {
+        struct PooledSpriteManager *manager = gUnk_02000164;
+        s32 slot = sprite->slot;
+        release(manager, slot);
+        sprite->active = 0;
+        Sprite_Remove(sprite);
+        sprite->slot = -1;
+        sprite->state = 0;
+        sprite->counter = 0;
+    } else
+        sprite->timer++;
+}
