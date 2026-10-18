@@ -182,3 +182,4 @@ addr,function,name,family,note
 081091E4,sub_081091E4,LinkSession_IncrementCounter,"LinkSession","increments indexed session counter"
 08109224,sub_08109224,LinkSession_IncrementAlternateCounter,"LinkSession","increments second indexed session counter"
 08109480,sub_08109480,LinkSession_GetSlotValues,"LinkSession","loads four default values and overrides selected slot"
+0810963C,sub_0810963C,ResultMessage_RunOutcomeScript,"ResultMessage","record outcome and invoke its script with one argument"
