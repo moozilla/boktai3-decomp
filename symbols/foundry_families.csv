@@ -112,3 +112,4 @@ addr,function,name,family,note
 080E74C4,sub_080E74C4,SceneActor_EnterShadowlessPhase,"SceneActorAnimation","selects phase entry and disables its shadow"
 080E7544,sub_080E7544,SceneActor_RestoreSavedTargetOnCompletion,"SceneActorAnimation","restores saved target and clears phase state on completion"
 080E766C,sub_080E766C,SceneActor_WaitForCategoryAttachment,"SceneActorAnimation","starts category attachment at frame 160 and waits for unavailability"
+080E7EC8,sub_080E7EC8,SceneActor_InitializeReactionColliders,"SceneActorCollision","initializes attack and body collider bounds and callbacks"
