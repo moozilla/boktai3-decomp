@@ -484,3 +484,4 @@ addr,function,name,family,note
 08174594,sub_08174594,Presentation_SelectGraphicResource,"Presentation graphics","selects a graphic resource from kind and amount"
 081748B8,sub_081748B8,InventoryGrid_GetSlotPosition,"InventoryGrid","maps inventory slots to screen coordinates"
 08174B8C,sub_08174B8C,Presentation_DrawEntryCount,"Presentation entry list","draws the list count and related panel content"
+08174E38,sub_08174E38,Presentation_UpdateListCursor,"Presentation entry list","places the cursor at the selected eight-pixel row"
