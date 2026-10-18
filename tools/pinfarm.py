@@ -8,8 +8,9 @@
 `// MATCHING_CONCESSION: register-pinning` (default: all of src/) whose body
 still holds a pin or an empty asm() barrier, isolates it (tools/isolate.py)
 and writes the copy with its hints removed (tools/unpin.py) to
-DIR/iso/FUNC.c. The rows `FUNC<TAB>DIR/iso/FUNC.c<TAB>UNIT.c` are input for
-tools/autosolve.py, which solves the unpinned copy as is.
+DIR/iso/NAME.c. The rows `SYMBOL<TAB>DIR/iso/NAME.c<TAB>UNIT.c<TAB>PINS<TAB>NAME`
+(SYMBOL differs from the C name when a `#define` renames the function) are
+input for tools/autosolve.py, which solves the unpinned copy as is.
 
 `apply` reads autosolve's results.tsv. For each MATCHES or TRANSLATED row it
 replaces the function's definition in its unit with the matching one,
@@ -19,6 +20,7 @@ the unit still matches. With --commit, each kept function is one commit.
 """
 
 import argparse
+import difflib
 import os
 import re
 import subprocess
@@ -80,7 +82,10 @@ def cmd_list(a):
                            cwd=ROOT, check=True)
             text = unpin.strip_code(open(dst).read())
             open(dst, "w").write(text)
-            rows.append((name, os.path.relpath(dst, ROOT), unit, str(len(unpin.PIN.findall(item)))))
+            # the solver needs the ROM symbol when a macro renames the function
+            alias = re.search(r"^#define\s+" + name + r"\s+(\w+)\s*$", text, re.M)
+            sym = alias.group(1) if alias else name
+            rows.append((sym, os.path.relpath(dst, ROOT), unit, str(len(unpin.PIN.findall(item))), name))
     with open(os.path.join(a.out, "list.tsv"), "w") as f:
         for r in rows:
             f.write("\t".join(r) + "\n")
@@ -93,11 +98,15 @@ def check(unit):
     return r.returncode == 0
 
 
-def splice(unit, func, src):
-    """Replace FUNC's definition in UNIT with the one in SRC; returns the old text or None."""
+def splice(unit, func, src, sym=None):
+    """Replace FUNC's definition in UNIT with the one in SRC (where it may be
+    called SYM: translate.py's output is preprocessed); returns the old text or None."""
     path = os.path.join(ROOT, unit)
     old = open(path).read()
-    new_def = dict(definitions(open(src).read())).get(func)
+    defs = dict(definitions(open(src).read()))
+    new_def = defs.get(func)
+    if new_def is None and sym in defs:
+        new_def = re.sub(r"\b" + sym + r"(\s*\()", func + r"\1", defs[sym], count=1)
     old_def = dict(definitions(old)).get(func)
     if not new_def or not old_def or old.count(old_def) != 1:
         return None
@@ -110,12 +119,33 @@ def splice(unit, func, src):
     return old
 
 
+def tidy(unit, name, orig):
+    """Undo each hunk of the translation that the match does not need: the
+    permuter re-spells lines (parentheses, braces) along with the real edit."""
+    path = os.path.join(ROOT, unit)
+    want = orig.split("\n")
+    while True:
+        text = open(path).read()
+        cur = dict(definitions(text))[name]
+        have = cur.split("\n")
+        ops = [o for o in difflib.SequenceMatcher(None, have, want, autojunk=False).get_opcodes()
+               if o[0] != "equal"]
+        for tag, i1, i2, j1, j2 in ops:
+            cand = "\n".join(have[:i1] + want[j1:j2] + have[i2:])
+            open(path, "w").write(text.replace(cur, cand))
+            if check(unit):
+                break
+        else:
+            open(path, "w").write(text)
+            return
+
+
 def cmd_apply(a):
     units = {}
     lst = os.path.join(os.path.dirname(a.results), "..", "list.tsv")
     for ln in open(a.list or lst):
         p = ln.rstrip("\n").split("\t")
-        units[p[0]] = p[2]
+        units[p[0]] = (p[2], p[4] if len(p) > 4 else p[0])
     seen = set()
     for ln in open(a.results):
         p = ln.rstrip("\n").split("\t")
@@ -123,22 +153,27 @@ def cmd_apply(a):
             continue
         func, src = p[0], p[6]
         seen.add(func)
-        unit = units.get(func)
-        if not unit:
+        if func not in units:
             print(f"{func}: not in the list")
             continue
-        old = splice(unit, func, src)
+        unit, name = units[func]
+        old = splice(unit, name, src, func)
         if old is None:
             print(f"{func}: could not splice into {unit}")
+            continue
+        if open(os.path.join(ROOT, unit)).read() == old:
+            print(f"{name}: already applied")
             continue
         if not check(unit):
             open(os.path.join(ROOT, unit), "w").write(old)
             print(f"{func}: {unit} no longer matches after splicing; reverted")
             continue
+        if p[3] == "TRANSLATED":
+            tidy(unit, name, unpin.strip_code(dict(definitions(old))[name]))
         how = "solver translation" if p[3] == "TRANSLATED" else "pins removed"
-        print(f"{func}: applied to {unit} ({how})")
+        print(f"{name}: applied to {unit} ({how})")
         if a.commit:
-            msg = f"{func}: drop register pins ({how})\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n"
+            msg = f"{name}: drop register pins ({how})\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n"
             subprocess.run(["git", "commit", "-q", "-m", msg, unit], cwd=ROOT, check=True)
 
 
