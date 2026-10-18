@@ -189,3 +189,4 @@ addr,function,name,family,note
 08109C24,sub_08109C24,ClockPanel_CaptureTime,"ClockPanel","clears paired values and captures encoded time and sun phase"
 0810AC10,sub_0810AC10,LinkSelection_RecordSlotState,"AreaEffectLinkState","records display slot value and selection bit"
 0810BD8C,sub_0810BD8C,SlotState_ResetInactiveMode,"SlotState","clears mode unless it is six through ten"
+0810BE0C,sub_0810BE0C,SlotText_CopySelectedString,"SlotText","copies the mode-selected script string into a cleared buffer"
