@@ -73,3 +73,4 @@ addr,function,name,family,note
 080B7688,sub_080B7688,SceneActorReaction_IsRangeReady,"SceneActorReaction","tests category-specific distance and health gates against timers"
 080B7BB4,sub_080B7BB4,SceneActorScript_ReadPParameters,"SceneActorScript / SceneActorRegistry","after seeking script keyword 'P', reads 4 u16 parameters plus one trailing value into the actor's script-context struct"
 080B8AB8,sub_080B8AB8,SceneActorScript_ReadCallScriptConfig,"SceneActorScript / SceneActorRegistry","after seeking script keyword 'x', reads a script id and call-limit from the script (or zeros them), then always resets the call counter"
+080B8B38,sub_080B8B38,SceneActorScript_TriggerCallOnCount,"SceneActorScript / SceneActorRegistry","increments the actor's script-call counter and, once it reaches the stored limit, calls the stored script id and resets id/limit/counter"
