@@ -1,14 +1,12 @@
-// MATCHING_CONCESSION: register-pinning
 #include "roaming_object_playback.h"
 void RoamingObject_UpdateAnimation(struct RoamingObject *owner)
 {
-    register s32 angle asm("r0") = (owner->angle + 32) & 255;
+    s32 angle = (owner->angle + 32) & 255;
     s32 mask;
     s32 row;
     u32 mirror;
     struct DisplaySequenceState *sequence;
-    asm("" : "+r"(angle));
-    angle >>= 6;
+    *(&angle) >>= 6;
     angle++;
     mask = 3;
     angle &= mask;

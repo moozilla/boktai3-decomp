@@ -192,6 +192,9 @@ def cmd_apply(a):
             continue
         if p[3] == "TRANSLATED":
             tidy(unit, name, unpin.strip_code(dict(definitions(old))[name]))
+        if subprocess.run(["git", "diff", "--quiet", "--", unit], cwd=ROOT).returncode == 0:
+            print(f"{name}: already applied")
+            continue
         how = "solver translation" if p[3] == "TRANSLATED" else "pins removed"
         print(f"{name}: applied to {unit} ({how})")
         if a.commit:

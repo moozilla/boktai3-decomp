@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_input.h"
 void SceneInput_InitGlyphPair(struct SceneInputPair *pair)
 {
@@ -9,7 +8,7 @@ void SceneInput_InitGlyphPair(struct SceneInputPair *pair)
     struct SceneInputWidget *widget;
     s32 remaining;
     u32 zero;
-    register struct SceneInputPosition *positionPointer asm("r4");
+    struct SceneInputPosition *positionPointer;
     pair->resource = *resource;
     ResourceHeader_Relocate(pair, resource);
     {
@@ -17,13 +16,17 @@ void SceneInput_InitGlyphPair(struct SceneInputPair *pair)
         position.first = 0;
         position.second &= mask;
     }
+    do {
+    } while (0);
     zero = 0;
     positionPointer = (void *)&position;
     widget = pair->widgets;
     remaining = 1;
     do {
+        do {
         sub_0821983C(widget, pair, 0x7F, 0x31, zero, zero, 60, positionPointer);
         positionPointer->y += 8;
+        } while (0);
         widget++;
         remaining--;
     } while (remaining >= 0);
