@@ -29,7 +29,7 @@ import unpin  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MARK = unpin.MARK
-DEF = re.compile(r"^(?:static\s+)?[A-Za-z_][\w \*]*?\b(\w+)\s*\([^;{]*\)\s*\{", re.S | re.M)
+DEF = re.compile(r"^(static\s+)?[A-Za-z_][\w \*]*?\b(\w+)\s*\([^;{]*\)\s*\{", re.S | re.M)
 HINTS = (unpin.PIN, unpin.BARRIER_INLINE)
 
 
@@ -51,7 +51,8 @@ def definitions(text):
             i += 1
             if depth == 0:
                 break
-        out.append((m.group(1), text[m.start():i]))
+        if not m.group(1):  # static helpers are not ROM functions
+            out.append((m.group(2), text[m.start():i]))
         pos = i
     return out
 
