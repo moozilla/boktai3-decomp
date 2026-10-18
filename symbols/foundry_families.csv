@@ -96,3 +96,4 @@ addr,function,name,family,note
 080D0E20,sub_080D0E20,SceneActor_UpdateAnimationCheckpoint,"scene actor animation","selects animation five and saves a timed checkpoint"
 080D0EBC,sub_080D0EBC,SceneActor_UpdateDirectionalAnimation,"scene actor animation","faces along motion and updates animation completion flags"
 080D1A98,sub_080D1A98,SceneActorAnimation_UpdateDirectionalEntry,"scene_actor_animation (SceneActorAnimationView)","test-and-clear the directional-entry/restart flags on a SceneActorAnimationView, re-triggering SelectDirectionalEntry when a distance arg exceeds 0x10"
+080D6114,sub_080D6114,SceneActor_WaitForControlCompletion,"SceneActor behavior and control","wait for entry control then select animation and install follow-up control"
