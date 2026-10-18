@@ -979,3 +979,4 @@ addr,function,name,family,note
 0819BF34,sub_0819BF34,Hresvelgr_SelectPlayerAnimation,"Hresvelgr","selects animation preset and palette from linked player mode"
 0819C024,sub_0819C024,Collider_IgnoreCallback,"Collider callback","empty callback registered by the neighboring collider initializer"
 0819C028,sub_0819C028,Hresvelgr_InitializeCollider,"Hresvelgr","initializes collider position and attack properties"
+0819C0D0,sub_0819C0D0,Hresvelgr_OnBodyContact,"Hresvelgr","records contact magnitude direction flags and response values"
