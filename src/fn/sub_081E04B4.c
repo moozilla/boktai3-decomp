@@ -1,0 +1,42 @@
+#include "global.h"
+// Names are tentative, based on the static state transitions and memory writes.
+#define StartPrompt_Update sub_081E04B4
+#define ScreenFade_BeginExit Menu_StartFadeOut
+#define gPromptKeys gUnk_03005260
+struct StartPrompt {
+    u8 unknown[0x98];
+    s16 state, frame;
+    void *resource;
+    s32 fadeTimer, fadeShift;
+};
+extern u16 gUnk_03005260[];
+extern u32 gUnk_02000378[];
+void Sound_PlaySong(u32);
+void Menu_StartFadeOut(s32);
+void Script_Call(u32, void *);
+void Task_Kill(void *);
+// The original callback leaves r0 unspecified; preserve its non-void return ABI.
+u32 sub_081E04B4(struct StartPrompt *p)
+{
+    switch (p->state) {
+    case 0:
+        if (p->frame <= 20 && !(p->frame & 1))
+            Sound_PlaySong(628);
+        if (p->frame > 59 && (gUnk_03005260[1] & 8)) {
+            Sound_PlaySong(221);
+            p->state = 1;
+            Menu_StartFadeOut(p->fadeShift);
+        }
+        break;
+    case 1:
+        if (p->fadeTimer > (1 << p->fadeShift) || p->fadeShift == 0) {
+            if (gUnk_02000378[2])
+                Script_Call(gUnk_02000378[2], 0);
+            Task_Kill(p);
+        } else {
+            p->fadeTimer++;
+        }
+        break;
+    }
+    p->frame++;
+}
