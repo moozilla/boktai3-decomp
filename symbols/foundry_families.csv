@@ -6,3 +6,4 @@ addr,function,name,family,note
 080246C8,sub_080246C8,SceneActorState_StartContactPool,"Scene actor states","on finish, starts a contact actor pool burst and advances the phase"
 0802BF30,sub_0802BF30,GridAttack_Update,"Grid attack actor","runs the grid attack update steps and cycles a frame timer"
 080339B8,sub_080339B8,TextWindow_SetBounds,"Text window manager","blanks a text window rect and sets new bounds"
+08086DD0,sub_08086DD0,Bat_UpdateAnimationRequest,"Bat","handles a queued animation entry request and advances a finished sequence"
