@@ -5,10 +5,10 @@ struct Display {
 };
 extern void *gUnk_086057FC[];
 int Wireless_GetStatus(void);
-void sub_0824923C(void *, void *);
+void Callback_InvokeActor(void *, void *);
 int WirelessGameDisplay_Update(struct Display *p)
 {
     if (!Wireless_GetStatus())
-        sub_0824923C(p, gUnk_086057FC[p->state]);
+        Callback_InvokeActor(p, gUnk_086057FC[p->state]);
     return 0;
 }

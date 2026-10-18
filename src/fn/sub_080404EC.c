@@ -1,7 +1,7 @@
 #include "modifier_list.h"
 s32 Modifier_ApplyKindTwelve(struct ModifierSelection *, struct ModifierSelection *, s32, u32);
 s32 Modifier_ApplyKindEight(struct ModifierSelection *, struct ModifierSelection *, s32, u32);
-u32 sub_0811DD94(s32, s32);
+u32 StateFlags_GetCategoryBit(s32, s32);
 void ModifierMenu_DrawStatComparison(s32, s32, s32, s32, u32);
 void ModifierMenu_DrawUnavailableStat(s32, s32, s32);
 void ModifierMenu_DrawThirdSourceStats(struct ModifierMenu *menu)
@@ -22,7 +22,8 @@ void ModifierMenu_DrawThirdSourceStats(struct ModifierMenu *menu)
             ModifierMenu_DrawStatComparison(third, third, 21, 12, 8);
             break;
         case 1:
-            if (sub_0811DD94(menu->choice.cursor.category, menu->choice.cursor.index)) {
+            if (StateFlags_GetCategoryBit(menu->choice.cursor.category,
+                                          menu->choice.cursor.index)) {
                 ModifierMenu_DrawStatComparison(first, nextFirst, 8, 13, 6);
                 ModifierMenu_DrawStatComparison(second, nextSecond, 8, 14, 7);
                 ModifierMenu_DrawStatComparison(third, nextThird, 8, 15, 8);

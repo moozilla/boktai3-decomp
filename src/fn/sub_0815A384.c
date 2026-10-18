@@ -1,7 +1,7 @@
 #include "global.h"
 
 extern u8 *gUnk_02000710;
-void sub_0813EDDC(u32, void *, s32);
+void PlayerAction_RefreshFlagState(u32, void *, s32);
 
 s32 Player_GetCurrentAttribute(s32 i)
 {
@@ -13,7 +13,7 @@ s32 Player_GetCurrentAttribute(s32 i)
     q = (u8 *)i;
     q += (s32)g;
     r = *(s16 *)(q + 0x18) + *(s16 *)(q + 0x20);
-    sub_0813EDDC(0, buf, -1);
+    PlayerAction_RefreshFlagState(0, buf, -1);
     {
         u8 *e = buf + 6;
         e += i;

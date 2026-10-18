@@ -49,6 +49,6 @@ void SparkParticle_CreateFromScript(void)
         speed = Script_GetKeywordValue('s', 0);
         kind = Script_GetKeywordValue('k', 1);
         priority = Script_GetKeywordValue('r', 2);
-        sub_0806A160(positionArg, count, spreadArg, angle, speed, 0, kind, priority);
+        SparkParticle_Spawn(positionArg, count, spreadArg, angle, speed, 0, kind, priority);
     }
 }

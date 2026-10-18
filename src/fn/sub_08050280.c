@@ -8,7 +8,7 @@ void CellGate_UpdatePassageBarrier(struct CellGate *p)
             if (p->registered != 0) {
                 TerrainModifiers_UnregisterCell(p->registration);
                 p->registered = r;
-                sub_08158CD8(gUnk_02000580);
+                Player_BeginTerrainInteraction(gUnk_02000580);
                 if (p->scriptId != 0)
                     Script_Call(p->scriptId, 0);
             }

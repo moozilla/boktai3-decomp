@@ -19,7 +19,7 @@ static inline void orr(u32 *a, u32 m)
     *a |= m;
 }
 void Player_EmitQueuedEffects(void *);
-void sub_0813AFEC(void *, u32, u32);
+void ActorSequence_Begin(void *, u32, u32);
 
 void Player_InitState25(struct P08159BB8 *p)
 {
@@ -30,5 +30,5 @@ void Player_InitState25(struct P08159BB8 *p)
     p->f236 |= 4;
     p->f270 = 0;
     p->f274 = 0;
-    sub_0813AFEC(p, 0x19, 0);
+    ActorSequence_Begin(p, 0x19, 0);
 }

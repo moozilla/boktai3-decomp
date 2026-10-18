@@ -95,7 +95,7 @@ void Memory_Copy(void *dst, const void *src, s32 bytes);
 
 /* libgcc _call_via_r1 / _call_via_r2 (bx r1 / bx r2), aliased in symbols/ram.ld.
  * Explicit calls are a matching workaround; prefer calling the function pointer. */
-s32 sub_0824923C(void *arg, void *function);
+s32 Callback_InvokeActor(void *arg, void *function);
 s32 sub_08249240(void *arg0, void *arg1, void *function);
 
 /* ---- Sound -------------------------------------------------------------- */

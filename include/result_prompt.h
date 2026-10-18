@@ -27,7 +27,7 @@ extern u16 gUnk_03005260[]; // [1] = newly pressed keys
 u8 Save_WriteAlternateSlotAndSelect(void);
 void Hud_SetMode(s32);
 void TextWindow_Destroy(s32);
-s32 sub_08033690(u32, u32, u32, u32);
+s32 TextWindow_Create(u32, u32, u32, u32);
 void TextWindow_StartPlayback(s32);
 u32 Script_GetTextSourcePc(void);
 

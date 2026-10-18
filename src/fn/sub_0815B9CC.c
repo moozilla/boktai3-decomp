@@ -13,9 +13,9 @@ struct P {
     u32 c;
 };
 
-void sub_0815AD78(struct P *);
-void sub_0813AFEC(struct P *, s32, s32);
-void sub_0813ADD0(struct P *);
+void Player_EnterKindTwo(struct P *);
+void ActorSequence_Begin(struct P *, s32, s32);
+void Player_UpdateFacingSide(struct P *);
 void sub_08152174(void);
 void sub_081543F0(void);
 void sub_08155008(void);
@@ -26,7 +26,7 @@ void PlayerCue_Motion7Variant3(struct P *p, s32 dir, u32 c)
     if (dir >= 0)
         p->dir = dir;
     p->c = c;
-    sub_0815AD78(p);
+    Player_EnterKindTwo(p);
     if (p->state == 3) {
         p->dir |= 1;
         if (p->dir > 4) {
@@ -36,18 +36,18 @@ void PlayerCue_Motion7Variant3(struct P *p, s32 dir, u32 c)
             p->b3A2 = p->dir >> 1;
             p->b3A3 = 0;
         }
-        sub_0813AFEC(p, 7, 3);
+        ActorSequence_Begin(p, 7, 3);
         p->fn = sub_08152174;
     } else {
-        sub_0813ADD0(p);
+        Player_UpdateFacingSide(p);
         if (p->state == 4) {
-            sub_0813AFEC(p, 7, 3);
+            ActorSequence_Begin(p, 7, 3);
             p->fn = sub_081543F0;
         } else if (p->state == 5) {
-            sub_0813AFEC(p, 7, 3);
+            ActorSequence_Begin(p, 7, 3);
             p->fn = sub_08155008;
         } else {
-            sub_0813AFEC(p, 7, 4);
+            ActorSequence_Begin(p, 7, 4);
             p->fn = sub_081503EC;
         }
     }

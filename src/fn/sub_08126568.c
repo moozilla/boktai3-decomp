@@ -1,6 +1,6 @@
 #include "global.h"
 extern const u32 gUnk_0861074C[];
-void sub_0824923C(u8 *, u32);
+void Callback_InvokeActor(u8 *, u32);
 u32 ScriptedParticle_UpdatePool(u8 *p)
 {
     const u32 *t = gUnk_0861074C;
@@ -9,7 +9,7 @@ u32 ScriptedParticle_UpdatePool(u8 *p)
     s32 n = 0x2f;
     do {
         if (*(s8 *)(r + 0x14) >= 0)
-            sub_0824923C(q, t[*r]);
+            Callback_InvokeActor(q, t[*r]);
         r += 0x70;
         q += 0x70;
         n--;

@@ -9,7 +9,7 @@ struct A {
     u8 f[0x64];
     struct E e[16];
 };
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 
 void Hresvelgr_UpdateProjectilePool(struct A *p)
 {
@@ -17,7 +17,7 @@ void Hresvelgr_UpdateProjectilePool(struct A *p)
     struct E *e = p->e;
     for (i = 15; i >= 0; i--) {
         if (e->v != 0)
-            sub_0824923C(e, e->v);
+            Callback_InvokeActor(e, e->v);
         e++;
     }
 }

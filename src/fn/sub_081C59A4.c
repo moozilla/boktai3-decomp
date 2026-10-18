@@ -4,10 +4,10 @@ struct S {
     u32 a;
 };
 void sub_081C58BC(void *);
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 void ChallengeMenu_Update(struct S *p)
 {
     sub_081C58BC(p);
     if (p->a != 0)
-        sub_0824923C(p, p->a);
+        Callback_InvokeActor(p, p->a);
 }

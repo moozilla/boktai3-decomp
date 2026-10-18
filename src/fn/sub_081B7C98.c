@@ -24,7 +24,7 @@ typedef struct {
 } Obj;
 
 extern void sub_081B7B1C(Obj *p);
-extern s32 sub_0824923C(void *arg, void *function);
+extern s32 Callback_InvokeActor(void *arg, void *function);
 extern void AnimData_SelectPaletteBank(void *a, s32 b);
 extern u32 gUnk_08612154[];
 
@@ -35,7 +35,7 @@ s32 GrowthHazard_UpdateManager(Obj *p)
     if (*(s16 *)(p->q + 0x94) > 0) {
         for (i = 0; i < p->n; i++) {
             Ent *e = &p->e[i];
-            sub_0824923C(e, e->arg);
+            Callback_InvokeActor(e, e->arg);
             if (e->cnt != 0) {
                 e->cnt--;
                 if (e->cnt != 0) {

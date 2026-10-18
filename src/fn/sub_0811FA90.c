@@ -9,12 +9,12 @@ struct T {
     u32 v;
 };
 void Memory_Clear(void *, u32);
-void sub_0811E5D0(void *, u32);
+void ScriptRecord_FindByteModifier(void *, u32);
 void Modifier_InitSourceInfo(u8 *s, u32 v)
 {
     u8 *a = s + 0x48;
     struct T *t = (struct T *)(s + 0x518);
     t->v = v;
     Memory_Clear(t, 8);
-    sub_0811E5D0(t, a[5]);
+    ScriptRecord_FindByteModifier(t, a[5]);
 }

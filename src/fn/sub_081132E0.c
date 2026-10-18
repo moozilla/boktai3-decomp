@@ -3,7 +3,7 @@ struct E {
     u8 f[0x19];
     u8 b;
 };
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 s32 SceneDebrisPool_Update(u8 *s)
 {
     s32 i;
@@ -16,7 +16,7 @@ s32 SceneDebrisPool_Update(u8 *s)
         if (p->b != 0) {
             q = s + 0x34;
             q = q + off;
-            sub_0824923C(p, *(u32 *)q);
+            Callback_InvokeActor(p, *(u32 *)q);
         }
         p = (struct E *)((u8 *)p + 0x20);
         i++;

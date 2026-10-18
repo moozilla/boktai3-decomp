@@ -50,7 +50,7 @@ void SceneActorMotion_TestTargetTransition(struct SceneActorRegistryResetView *a
             u8 *tail = (u8 *)a + 0x3D4;
             SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)a, 0);
             if (!TestMovement(a))
-                sub_0824923C(a, *(void **)(tail + 0x224));
+                Callback_InvokeActor(a, *(void **)(tail + 0x224));
             else {
                 u32 *flags = &context->flags;
                 s32 mask = -5;

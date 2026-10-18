@@ -3,16 +3,16 @@ extern u16 gUnk_03005260[];
 void sub_0816618C(void *, s32, s32);
 void Sound_PlaySong(s32);
 void Hud_SaveSecondaryGridSelection(void *);
-void sub_0816D920(void *, s32);
-void sub_081738D0(void *);
+void SceneHud_GetActionIconPosition(void *, s32);
+void MotionSequence_BeginResetPrompt(void *);
 void PauseInventory_BeginItemUseSelection(void *, s32);
 void PauseInventory_BeginItemSwapSelection(void *, s32);
 void PauseInventory_BeginItemDiscardSelection(void *, s32);
 void PauseMenu_ClearSpriteFlags(void *, s32, s32);
 void PauseMenu_ResetItemCursor(void *);
-s32 sub_0816B59C(void *, s32);
-void sub_08173470(void *);
-void sub_08166B7C(void *, s32);
+s32 SceneInput_NavigateGridKeys(void *, s32);
+void SceneHud_ShowEquipmentDetails(void *);
+void MenuDisplay_UpdateActionPrompt(void *, s32);
 void Hud_UpdateInventoryMenuInput(u8 *p)
 {
     sub_0816618C(p, 8, 32);
@@ -24,10 +24,10 @@ void Hud_UpdateInventoryMenuInput(u8 *p)
         {
             u8 *a = p + 0x15c0;
             q = p + 0x4387;
-            sub_0816D920(a, *q);
+            SceneHud_GetActionIconPosition(a, *q);
         }
         if (*q == 0x27) {
-            sub_081738D0(p);
+            MotionSequence_BeginResetPrompt(p);
             return;
         }
         if (*q == 0x20)
@@ -38,10 +38,10 @@ void Hud_UpdateInventoryMenuInput(u8 *p)
             PauseInventory_BeginItemDiscardSelection(p, 1);
         PauseMenu_ClearSpriteFlags(p, 5, 1);
         PauseMenu_ResetItemCursor(p);
-        sub_0816D920(p + 0x1620, p[0x4387]);
-    } else if (sub_0816B59C(p + 0x4384, 0xc0)) {
-        sub_0816D920(p + 0x15c0, p[0x4387]);
-        sub_08173470(p);
-        sub_08166B7C(p, 2);
+        SceneHud_GetActionIconPosition(p + 0x1620, p[0x4387]);
+    } else if (SceneInput_NavigateGridKeys(p + 0x4384, 0xc0)) {
+        SceneHud_GetActionIconPosition(p + 0x15c0, p[0x4387]);
+        SceneHud_ShowEquipmentDetails(p);
+        MenuDisplay_UpdateActionPrompt(p, 2);
     }
 }

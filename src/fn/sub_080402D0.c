@@ -3,7 +3,7 @@
 s32 Modifier_ApplyKindZero(struct ModifierSelection *, struct ModifierSelection *, s32, u32);
 s32 Modifier_ApplyKindSeven(struct ModifierSelection *, struct ModifierSelection *, s32, u32);
 s32 Modifier_ApplyKindSix(struct ModifierSelection *, struct ModifierSelection *, s32, u32);
-u32 sub_0811DD94(s32, s32);
+u32 StateFlags_GetCategoryBit(s32, s32);
 void ModifierMenu_DrawStatComparison(s32, s32, s32, s32, u32);
 void ModifierMenu_DrawUnavailableStat(s32, s32, s32);
 void ModifierMenu_DrawCapacity(s32, s32, s32, s32, s32);
@@ -41,12 +41,13 @@ void ModifierMenu_DrawSecondSourceStats(struct ModifierMenu *menu)
             break;
         case 1:
             if (menu->mode == 0) {
-                if (sub_0811DD94(menu->choice.cursor.category, menu->choice.cursor.index))
+                if (StateFlags_GetCategoryBit(menu->choice.cursor.category,
+                                              menu->choice.cursor.index))
                     goto validPreview;
                 goto invalidPreview;
             } else if (menu->mode == 1) {
-                if (!sub_0811DD94(4,
-                                  menu->choice.cursor.index + menu->choice.cursor.category * 3 * 2))
+                if (!StateFlags_GetCategoryBit(4, menu->choice.cursor.index +
+                                                      menu->choice.cursor.category * 3 * 2))
                     goto invalidPreview;
             validPreview:
                 ModifierMenu_DrawStatComparison(first, nextFirst, 8, 13, 2);

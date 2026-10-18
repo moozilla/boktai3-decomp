@@ -10,7 +10,7 @@ struct Obj {
     u32 f28;
 };
 
-void sub_08214588(struct Obj *);
+void Sprite_ApplyAnimation(struct Obj *);
 void Sprite_LinkToList(struct Obj *, u32);
 
 void Sprite_Init(struct Obj *o, u32 b, u32 c)
@@ -23,7 +23,7 @@ void Sprite_Init(struct Obj *o, u32 b, u32 c)
         o->f9 = 0x40;
         o->f6 = 0;
         o->f7 = 2;
-        sub_08214588(o);
+        Sprite_ApplyAnimation(o);
         {
             u32 t = (u32) - (c & 0x80) >> 31;
             o->f24 = 0;

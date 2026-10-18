@@ -11,7 +11,7 @@ static inline u32 tst(u32 *a, u32 m)
     return *a & m;
 }
 s32 Div(s32, s32);
-s32 sub_0813F784(s32);
+s32 ActorParameter_GetModeValue(s32);
 
 s32 Player_GetEnchantmentEnergyCost(struct P0813F7B4 *p)
 {
@@ -19,7 +19,7 @@ s32 Player_GetEnchantmentEnergyCost(struct P0813F7B4 *p)
     s32 pct;
     if (p->f33C < 0)
         return 0;
-    v = sub_0813F784(p->f33C);
+    v = ActorParameter_GetModeValue(p->f33C);
     pct = 100;
     if (p != 0 && tst(&p->f448, 0x1000))
         pct = 50;

@@ -11,7 +11,7 @@ void ScenePanelRig_TickSubjectAction(struct ScenePanelRig *rig)
     s8 *selected = &rig->selectedSubject;
     if (ScenePanelRig_IsSubjectState(rig, *selected, 4)) {
         if (((randomValue() >> 3) & 3) == 0)
-            sub_0806A160(&rig->position, 1, rig->payloadA, 0, 0, 0, 1, 2);
+            SparkParticle_Spawn(&rig->position, 1, rig->payloadA, 0, 0, 0, 1, 2);
         if (++rig->stateFrame > 89) {
             ScenePanelRig_SetSubjectState(rig, *selected, 5);
             ScenePanelRig_RandomizeMovement(rig);

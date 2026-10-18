@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
-s32 sub_0824923C(void *, void *);
+s32 Callback_InvokeActor(void *, void *);
 void sub_080D3D60(void);
 static inline u8 TakePrepared(u8 *field)
 {
@@ -34,7 +34,7 @@ void SceneActor_WaitForControlCompletion(struct SceneActorRegistryResetView *act
         void *control = actor->entryTarget224;
         SetControl(actor, control, 2);
     }
-    busy = sub_0824923C(actor, actor->update270);
+    busy = Callback_InvokeActor(actor, actor->update270);
     if (!busy) {
         if (actor->field2B0) {
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);

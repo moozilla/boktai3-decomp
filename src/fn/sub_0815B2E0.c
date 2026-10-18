@@ -19,22 +19,22 @@ struct P {
     u8 f59e[0x5A4 - 0x59E];
     u32 w5a4;
 };
-void sub_0815AD78(struct P *);
-void sub_0813ADD0(struct P *);
-void sub_0813AFEC(struct P *, s32, s32);
+void Player_EnterKindTwo(struct P *);
+void Player_UpdateFacingSide(struct P *);
+void ActorSequence_Begin(struct P *, s32, s32);
 void PlayerCue_Stand(struct P *, s32);
-void sub_081502AC(void);
+void Player_UpdateSongCueAnimation(void);
 void sub_081507F4(void);
 void Sound_PlaySong(s32);
 
 void PlayerCue_Kneel(struct P *p, s32 v, u32 w)
 {
-    sub_0815AD78(p);
+    Player_EnterKindTwo(p);
     if (v >= 0)
         p->a4 = v;
-    sub_0813ADD0(p);
+    Player_UpdateFacingSide(p);
     p->w5a4 = w;
-    sub_0815AD78(p);
-    sub_0813AFEC(p, 0x15, 0);
+    Player_EnterKindTwo(p);
+    ActorSequence_Begin(p, 0x15, 0);
     p->fn = sub_081507F4;
 }

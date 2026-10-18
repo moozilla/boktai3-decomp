@@ -17,14 +17,14 @@ static inline u16 color(struct Obj *p)
 {
     return ((u32)p->blue << 10) | ((u32)p->green << 5) | (u32)p->red;
 }
-void sub_080F1E00(struct Obj *);
+void SceneActor_LowerColorRedPeak(struct Obj *);
 void Ivy_WaitForColorRelease(struct Obj *);
 s32 Ivy_UpdateRedBrightening(struct Obj *p)
 {
     p->red = Div((u32)p->counter * 7, p->duration) + 24;
     if (p->counter++ == p->duration) {
         if (p->mode == 0)
-            p->callback = sub_080F1E00;
+            p->callback = SceneActor_LowerColorRedPeak;
         else
             p->callback = Ivy_WaitForColorRelease;
         p->counter = p->duration;

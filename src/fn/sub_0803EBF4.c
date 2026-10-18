@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0811D4AC(u8 *, s32, s32, s32, s32, s32, s32);
+void ActorStats_ConfigureScaledParameters(u8 *, s32, s32, s32, s32, s32, s32);
 
 u32 ScenePool_StateBrakeThenAccelerate(u32 a, u8 *b, u8 *e)
 {
@@ -10,7 +10,7 @@ u32 ScenePool_StateBrakeThenAccelerate(u32 a, u8 *b, u8 *e)
         z = 0;
         e[0x64] = z;
         *(u32 *)(e + 0x54) = 0x200;
-        sub_0811D4AC(b, 0x3000, 0x2000, -0x2000, 0x5000, z, 0x6000);
+        ActorStats_ConfigureScaledParameters(b, 0x3000, 0x2000, -0x2000, 0x5000, z, 0x6000);
     }
     f = *(u32 *)(e + 0x44);
     if (f <= 7) {

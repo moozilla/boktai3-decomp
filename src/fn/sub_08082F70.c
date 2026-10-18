@@ -5,7 +5,7 @@ void *sub_081D4F20(u32, u32);
 void GameState_SetEventFlag(void *);
 void SceneActorBehavior_CallTerrainScript(struct SceneActorBehaviorView *);
 void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *);
-u8 sub_082212DC(void *, s32, s32, s32);
+u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
                                 u8 behavior)
 {
@@ -30,7 +30,7 @@ void SceneActorControl_CompleteScriptedResponse(struct SceneActorRegistryResetVi
             collider->flags |= 4;
         }
     }
-    if (!sub_082212DC(actor->drawable, frame, 10, 30))
+    if (!Sprite_BlinkUntilExpired(actor->drawable, frame, 10, 30))
         return;
     actor->field2B0 = 1;
     script = *(u16 *)((u8 *)actor + 0x1F8);

@@ -1,9 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_behavior.h"
 void sub_0821FF8C(struct SceneActorBehaviorContactView *, struct SceneActorBehaviorContactView *);
-void sub_0812F520(struct SceneActorBehaviorView *, struct SceneActorBehaviorContactView *,
-                  struct SceneActorBehaviorContactView *);
-void sub_08159860(struct SceneActorBehaviorContactView *, void *, u32);
+void SceneActor_SetContactReactionDirection(struct SceneActorBehaviorView *,
+                                            struct SceneActorBehaviorContactView *,
+                                            struct SceneActorBehaviorContactView *);
+void PlayerStats_AddContactHundredths(struct SceneActorBehaviorContactView *, void *, u32);
 static inline u32 Unavailable(struct SceneActorBehaviorView *actor)
 {
     u32 result;
@@ -89,7 +90,7 @@ void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactVie
             power = 0;
         destination->power = power;
     }
-    sub_0812F520(actor, source, destination);
+    SceneActor_SetContactReactionDirection(actor, source, destination);
     actor->payload2E0 = source->kind;
     {
         u32 parameter = source->parameter34;
@@ -111,7 +112,7 @@ void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactVie
         }
     }
     actor->result2E4 = destination->remaining;
-    sub_08159860(source, destination, actor->reactionA0);
+    PlayerStats_AddContactHundredths(source, destination, actor->reactionA0);
     {
         u32 mask = 0x2000;
         u32 offset = 0x2CC;

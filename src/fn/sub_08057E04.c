@@ -14,7 +14,7 @@ void ScenePanel_UpdateTimePalette(struct ScenePanel *input)
     struct ScenePanelPaletteScratch cache;
     u32 phase;
     u8 *phaseField;
-    phase = sub_08228DB8();
+    phase = SunClock_GetPhase();
     phaseField = &panel->timePhase;
     if (*phaseField != phase) {
         *phaseField = phase;

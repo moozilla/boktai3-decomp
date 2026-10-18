@@ -11,7 +11,7 @@ s32 sub_0822D490(s32, s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void ScaledShadow_Disable(void *);
 void sub_08017044(s32, s32, s32, s32, struct SceneVec *, struct SceneVec *, s32, struct Trigger *);
-u8 sub_082212DC(void *, u32, s32, s32);
+u8 Sprite_BlinkUntilExpired(void *, u32, s32, s32);
 void sub_08217DE0(struct TriggerSprite *, struct TriggerGraphics *, u32);
 void Effect_SetOrigin(struct TriggerSprite *, s32, s32);
 s32 sub_0821D6F4(struct SceneVec *, s32);
@@ -453,7 +453,7 @@ void Trigger_UpdateGrounded(struct TriggerManager *manager, struct Trigger *p)
 
 void Trigger_UpdateDropTimer(struct TriggerManager *a, struct Trigger *b)
 {
-    if (sub_082212DC(b->sprite, b->timer, 0x2d, 0x5a))
+    if (Sprite_BlinkUntilExpired(b->sprite, b->timer, 0x2d, 0x5a))
         b->flags |= 1;
     else
         sub_080070D0(a, b);
@@ -673,7 +673,7 @@ void Trigger_UpdateActivation(struct TriggerManager *manager, struct Trigger *p)
         script = *(u16 *)&p->script;
         Trigger_RunScript(p, script, sub_0822D490(p->id, p->kind) == 1);
     } else if (p->timer > 8) {
-        if (sub_082212DC(p->object, p->timer, 30, 90))
+        if (Sprite_BlinkUntilExpired(p->object, p->timer, 30, 90))
             p->flags |= 1;
     }
     p->timer++;

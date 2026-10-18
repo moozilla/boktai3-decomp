@@ -2,6 +2,6 @@
 u32 CellGate_Tick(struct CellGate *p)
 {
     if (!(gUnk_02000580->flags & 4))
-        sub_0824923C(p, p->update);
+        Callback_InvokeActor(p, p->update);
     return 0;
 }

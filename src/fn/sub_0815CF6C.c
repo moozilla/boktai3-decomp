@@ -4,9 +4,9 @@ extern u8 *gUnk_02000580[];
 s32 Script_GetActorIndex(void);
 s32 ScriptActor_GetDirectionFromScript(void);
 s32 ScriptActor_GetCueOptionFromScript(void);
-void sub_0815B49C(u8 *actor, s32 direction, s32 h, s32 e);
+void PlayerCue_BeginMode28(u8 *actor, s32 direction, s32 h, s32 e);
 void ScriptActor_EnableCompletionScript(u8 *);
-/* Script: sub_0815B49C on the scripted actor chosen by -i with -d, -h
+/* Script: PlayerCue_BeginMode28 on the scripted actor chosen by -i with -d, -h
    (default 1500) and -e (tentative). */
 void ScriptActor_StartActionFromScript(void)
 {
@@ -21,7 +21,7 @@ void ScriptActor_StartActionFromScript(void)
             h = Script_GetValue();
         else
             h = 1500;
-        sub_0815B49C(actor, direction, h, e);
+        PlayerCue_BeginMode28(actor, direction, h, e);
         ScriptActor_EnableCompletionScript(actor);
     }
 }

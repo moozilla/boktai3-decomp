@@ -7,12 +7,12 @@ struct O {
     u8 pad3[0xbf - 0xb4];
     u8 b;
 };
-void sub_0811ED0C(void);
+void ActorDrain_Update(void);
 void Modifier_StartDrainIfAboveThreshold(struct O *o)
 {
     if (o->b == 0 && o->h > 200) {
         u8 *p = (u8 *)o + 0xb0;
-        *(u32 *)p = (u32)sub_0811ED0C;
+        *(u32 *)p = (u32)ActorDrain_Update;
         p[0xe] = 1;
     }
 }

@@ -1,6 +1,6 @@
 #include "global.h"
 
-u32 sub_0824923C(void *, u32);
+u32 Callback_InvokeActor(void *, u32);
 void ColorPulse_PrepareTargetDash(void);
 
 struct S {
@@ -16,7 +16,7 @@ void Ivy_WaitForPrimaryActionCompletion(struct S *s)
 {
     u32 v = s->v;
     if (v != 0) {
-        if ((u8)sub_0824923C(s, v) != 0)
+        if ((u8)Callback_InvokeActor(s, v) != 0)
             s->b++;
     }
     if (s->b > 1) {
