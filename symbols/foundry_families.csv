@@ -844,3 +844,4 @@ addr,function,name,family,note
 0817B6F8,sub_0817B6F8,ActorState_UpdateDepletedState,"ActorState","updates depleted state and queues a delayed variant request"
 0817B788,sub_0817B788,ActorState_UpdateRandomAnimation,"ActorState","selects random animation and queues timed state transition"
 0817B8BC,sub_0817B8BC,ActorState_UpdateSelectedAnimation,"ActorState","selects an animation pair and queues timed state transitions"
+0817B9EC,sub_0817B9EC,ActorState_BeginReverseAnimation,"ActorState","initializes animation opposite the stored direction and queues a transition"
