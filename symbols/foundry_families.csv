@@ -533,3 +533,4 @@ addr,function,name,family,note
 08177D7C,sub_08177D7C,Hud_GetManager,"HudManager","returns the current HUD manager"
 08177DAC,sub_08177DAC,Hud_HideAuxiliaryElements,"HudManager","sets hidden flag on two auxiliary element groups"
 081781B4,sub_081781B4,SceneHud_SetTimedState,"SceneHud","sets HUD parameters and starts a 300-frame timed state"
+08178238,sub_08178238,Hud_UpdateCountdownDisplay,"HudManager","updates countdown values with a three-hundred-frame display timer"
