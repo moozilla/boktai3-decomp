@@ -607,3 +607,4 @@ addr,function,name,family,note
 0810D9B0,sub_0810D9B0,RecordPanel_ShowName,"RecordPanel","shows a name from the selected record or game state"
 0810E12C,sub_0810E12C,SelectionPanel_UpdateDescription,"SelectionPanel","refreshes selection description with fallback string"
 0810E284,sub_0810E284,SelectionPanel_RunSelectionScript,"SelectionPanel","clears display and calls script with selected index"
+0810E30C,sub_0810E30C,SelectionPanel_RunCancelScript,"SelectionPanel","clears display and runs alternate script without selection arguments"
