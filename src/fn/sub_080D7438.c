@@ -6,7 +6,7 @@ struct SceneActorMotionParent {
     u16 flags;
 };
 void sub_080D64E0(void *);
-void sub_0807FC90(void);
+void SceneActorControl_OnIdle(void);
 static inline u8 MotionStarted(struct SceneActorReactionMotion *motion)
 {
     u32 mask = 8;
@@ -61,7 +61,7 @@ void sub_080D7438(struct SceneActorRegistryResetView *actor)
         actor->counter2AC = 0;
         actor->field2B1 = one;
         {
-            void *control = sub_0807FC90;
+            void *control = SceneActorControl_OnIdle;
             u32 kind = 0x10;
             actor->field2B2 = one;
             actor->field2B0 = 0;

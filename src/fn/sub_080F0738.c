@@ -2,7 +2,7 @@
 #include "global.h"
 #include "scene_actor_registry.h"
 void sub_080ED328(void);
-void sub_080ED39C(void);
+void Ivy_OnSecondaryContact(void);
 void SceneActorCollision_InitBodyWithFlags(struct SceneActorRegistryActor *, void *, void *,
                                            void (*)(void), struct SceneActorRegistryActor *, u32);
 void SceneActorCollision_InitAttack(struct SceneActorRegistryActor *, void *, void *,
@@ -21,5 +21,5 @@ void sub_080F0738(struct SceneActorRegistryActor *actor)
     *(u32 *)((u8 *)&attackSize + 4) &= 0xFFFF0000;
     *(u32 *)&attackOffset = 0;
     *(u32 *)((u8 *)&attackOffset + 4) &= 0xFFFF0000;
-    SceneActorCollision_InitAttack(actor, &attackSize, &attackOffset, sub_080ED39C, 1, actor);
+    SceneActorCollision_InitAttack(actor, &attackSize, &attackOffset, Ivy_OnSecondaryContact, 1, actor);
 }

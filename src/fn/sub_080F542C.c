@@ -6,7 +6,7 @@ struct PhaseActor {
  u8 unknown164[0x14]; void (*update178)(void); u8 unknown17C[8]; s32 timer;
  u8 targetAngle, unknown189; s8 direction, turnSteps;
 };
-void sub_080F54D4(void);
+void Sword_UpdateThrustDelay(void);
 void sub_080F542C(struct PhaseActor *p) {
  struct PhaseParent *parent = p->parent;
  s32 i;
@@ -14,7 +14,7 @@ void sub_080F542C(struct PhaseActor *p) {
   p->angle += (u8)p->direction;
   if (p->angle == p->targetAngle) {
    p->timer = 30;
-   p->update178 = sub_080F54D4;
+   p->update178 = Sword_UpdateThrustDelay;
    return;
   }
  }

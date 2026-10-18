@@ -9,7 +9,7 @@ struct PhaseActor {
  s16 delta[3]; u8 unknown14A[0x16]; struct PhaseParent *parent;
  u8 unknown164[0x14]; void (*update178)(void);
 };
-void sub_080F558C(void);
+void Sword_UpdateThrustRetraction(void);
 void sub_080F56D8(struct PhaseActor *p) {
  struct PhaseParent *parent = p->parent;
  p->angle += 20;
@@ -26,7 +26,7 @@ void sub_080F56D8(struct PhaseActor *p) {
    p->delta[0] = p->destination[0] - p->start[0];
    p->delta[1] = p->destination[1] - p->start[1];
    p->delta[2] = p->destination[2] - p->start[2];
-   p->update178 = sub_080F558C;
+   p->update178 = Sword_UpdateThrustRetraction;
   }
   value = p->velocity[0];
   if (value >= 0) half = value >> 1;

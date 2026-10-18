@@ -1,11 +1,11 @@
 #define SceneActorReaction_TickHiddenTimeout sub_080BB7BC
-#define SceneActorReaction_RestoreControl    sub_080772C0
+#define SceneActorReaction_RestoreControl SceneActorPlacement_ResetActorState
 /* Tentative reaction name, based on the observed fields and calls. */
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_script.h"
 u8 sub_080B8B84(struct SceneActorRegistryResetView *);
-void sub_080772C0(struct SceneActorRegistryResetView *, const u16 *);
+void SceneActorPlacement_ResetActorState(struct SceneActorRegistryResetView *, const u16 *);
 s32 Mod(s32, s32);
 static inline u8 Test(u32 value, u32 mask)
 {
@@ -44,6 +44,6 @@ void sub_080BB7BC(struct SceneActorRegistryResetView *p, s32 elapsed)
         if (state->parameter6D2 >= elapsed)
             return;
         mode = 1;
-        sub_080772C0(p, &mode);
+        SceneActorPlacement_ResetActorState(p, &mode);
     }
 }

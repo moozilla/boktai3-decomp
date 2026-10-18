@@ -2,7 +2,7 @@
 #include "global.h"
 #include "scene_actor_registry.h"
 #include "scene_actor_animation.h"
-void sub_080A0874(u8 *);
+void Crow_PlayAnimationCue(u8 *);
 struct RouteActorAnimationState {
     u8 unknown0[0x3D8];
     u8 sequencePhase;
@@ -23,7 +23,7 @@ void sub_0809EEBC(struct SceneActorRegistryActor *actor)
         state->sequencePhase = 0;
     }
     if (state->sequencePhase)
-        sub_080A0874((u8 *)actor);
+        Crow_PlayAnimationCue((u8 *)actor);
     if (actor->field2B3) {
         switch (state->sequencePhase) {
             case 0:

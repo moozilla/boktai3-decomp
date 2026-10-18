@@ -16,14 +16,14 @@ struct SwordTask {
 };
 void Sprite_Remove(void *);
 void Collider_Remove(void *);
-void sub_08013B74(void *);
+void ScaledShadow_Destroy(void *);
 void sub_0815F738(void *);
 s32 sub_080F6718(struct SwordTask *p)
 {
     struct SwordSprite *sprite;
     s32 i;
     Sprite_Remove(p->sprite);
-    sub_08013B74(p->animation);
+    ScaledShadow_Destroy(p->animation);
     sub_0815F738(p->status);
     Collider_Remove(p->collider);
     Collider_Remove(p->secondaryCollider);

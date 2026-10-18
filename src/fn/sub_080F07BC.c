@@ -1,7 +1,7 @@
 #define SceneActor_BeginReaction22 sub_080F07BC
 #include "global.h"
 #include "scene_actor_reset.h"
-void sub_080ED3A0(void);
+void Ivy_UpdateActiveState(void);
 void sub_080F07BC(struct SceneActorRegistryResetView *actor)
 {
     actor->state2A8 = 0;
@@ -10,7 +10,7 @@ void sub_080F07BC(struct SceneActorRegistryResetView *actor)
     actor->counter2AC = 0;
     actor->field2B1 = 1;
     {
-        void *callback = sub_080ED3A0;
+        void *callback = Ivy_UpdateActiveState;
         u8 reaction = 0x22;
         actor->field2B2 = 1;
         actor->field2B0 = 0;

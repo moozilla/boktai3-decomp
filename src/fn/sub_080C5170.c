@@ -4,13 +4,13 @@
 #define gTerrainMap gUnk_030052F4
 
 struct ActorMotion { u8 pad0[0x682]; s16 speed; };
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
 void sub_080C5170(struct SceneActorRegistryResetView *actor)
 {
     struct ActorMotion *motion = actor->context;
     u16 type = actor->terrainCell;
-    u8 *entry = sub_0821D64C(type, 1);
+    u8 *entry = TerrainModifiers_FindCellOverride(type, 1);
     s32 maximum, acceleration;
     if (entry) entry += 4;
     else entry = (type * 4 + 12) + gTerrainMap->cells;

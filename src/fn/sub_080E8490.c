@@ -39,7 +39,7 @@ void sub_080E8490(struct SceneActorRegistryResetView *actor)
     struct SceneActorRegistryControl *control;
     u16 *flags;
     resetState(actor, 0x11);
-    setControl(actor, sub_0807FC90, 0x10);
+    setControl(actor, SceneActorControl_OnIdle, 0x10);
     motion = (void *)&actor->fieldDC;
     motion->fieldDC = 0;
     actor->field2C2 = 0x40;

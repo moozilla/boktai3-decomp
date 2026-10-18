@@ -1,5 +1,5 @@
 #define PhaseObject_BeginEntryMotion sub_080F31AC
-#define PhaseObject_ResetMotion      sub_080F2450
+#define PhaseObject_ResetMotion Ivy_InitBobbing
 #include "global.h"
 
 // Tentative family name: object with four phase entries and timed state callbacks.
@@ -22,7 +22,7 @@ struct PhaseObject {
     s32 delay;
     s32 motionTimer;
 };
-void sub_080F2450(struct PhaseObject *);
+void Ivy_InitBobbing(struct PhaseObject *);
 void sub_080F3230(struct PhaseObject *);
 void Sound_PlaySong(u32);
 void sub_080F31AC(struct PhaseObject *p)
@@ -39,7 +39,7 @@ void sub_080F31AC(struct PhaseObject *p)
             entry++;
             height = (u16 *)((u8 *)height + 0x2c);
         } while ((s32)entry <= (s32)end);
-        sub_080F2450(p);
+        Ivy_InitBobbing(p);
         p->delay = 15;
         p->motionTimer = 20;
         p->callback = sub_080F3230;

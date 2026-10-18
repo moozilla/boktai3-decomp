@@ -1,6 +1,5 @@
 #define Sword_UpdateTask       sub_080F669C
-#define Sword_DispatchState    sub_080F46D8
-#define Sword_UpdateComponents sub_080F63C4
+#define Sword_DispatchState Ivy_DispatchState
 #include "global.h"
 struct SwordOwner {
     u8 unknown0[0x1C];
@@ -22,8 +21,8 @@ struct SwordTask {
     struct SwordStatus status;
 };
 void sub_080F645C(struct SwordTask *);
-void sub_080F46D8(void *);
-void sub_080F63C4(void *);
+void Ivy_DispatchState(void *);
+void Sword_UpdateComponents(void *);
 s32 sub_080F669C(struct SwordTask *p)
 {
     if (p->owner->flags & 4)
@@ -38,8 +37,8 @@ s32 sub_080F669C(struct SwordTask *p)
         u32 mask = ~1;
         status->flags &= mask;
     }
-    sub_080F46D8(p);
-    sub_080F63C4(p);
+    Ivy_DispatchState(p);
+    Sword_UpdateComponents(p);
     p->ticks++;
     return 0;
 }

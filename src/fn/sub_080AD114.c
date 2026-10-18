@@ -1,5 +1,5 @@
 #define SceneActorReaction_UpdateFacingAttack sub_080AD114
-#define SceneActorContext_RunPendingScript    sub_080B309C
+#define SceneActorContext_RunPendingScript Vorn_RunPendingScript
 #define gSceneActorFacingTarget               gUnk_02000580
 #include "global.h"
 #include "scene_actor_reaction.h"
@@ -13,7 +13,7 @@ extern struct SceneActorFacingTarget *gUnk_02000580;
 s32 Math_Atan2(s32, s32);
 void Sound_PlaySong(u32);
 void sub_080B23A0(void *, u32);
-void sub_080B309C(void *);
+void Vorn_RunPendingScript(void *);
 void sub_080AD114(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
@@ -30,7 +30,7 @@ void sub_080AD114(struct SceneActorRegistryResetView *actor, s32 frame)
     }
     if (frame == 14) {
         actor->field2EA = 140;
-        sub_080B309C(actor->context);
+        Vorn_RunPendingScript(actor->context);
     }
     if (frame > 60)
         sub_080B23A0(actor, 1);

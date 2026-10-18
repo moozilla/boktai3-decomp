@@ -1,6 +1,6 @@
 #define SceneActor_ResetQueuedState sub_080AB57C
 #include "global.h"
-void sub_0807FC90(void);
+void SceneActorControl_OnIdle(void);
 #include "scene_actor_reset.h"
 void sub_080AB57C(struct SceneActorRegistryResetView *s)
 {
@@ -20,7 +20,7 @@ void sub_080AB57C(struct SceneActorRegistryResetView *s)
     field = &s->field2B1;
     one = 1;
     *field = one;
-    fn = sub_0807FC90;
+    fn = SceneActorControl_OnIdle;
     code = 0x10;
     s->field2B2 = one;
     s->field2B0 = zero;

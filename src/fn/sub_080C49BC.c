@@ -2,7 +2,7 @@
 #include "scene_actor_reset.h"
 #define SceneActorControl_RefreshMotionRoute sub_080C49BC
 void sub_080C4EF0(void *);
-void sub_0807FC90(void);
+void SceneActorControl_OnIdle(void);
 static inline u32 TestFlags(u16 *flags, u32 mask)
 {
     return *flags & mask;
@@ -62,7 +62,7 @@ void sub_080C49BC(struct SceneActorRegistryResetView *actor)
         sub_080C4EF0(actor);
     } else {
         SetState(actor, active);
-        SetControl(actor, (void *)sub_0807FC90, 16, active);
+        SetControl(actor, (void *)SceneActorControl_OnIdle, 16, active);
     }
     {
         struct SceneActorReactionMotion *motion = (void *)&actor->fieldDC;

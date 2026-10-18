@@ -1,5 +1,5 @@
 #define ColorPulse_ApplyContact   sub_080F2320
-#define ColorPulse_UpdateHitFlash sub_080F6414
+#define ColorPulse_UpdateHitFlash Sword_UpdateBodyPaletteRestore
 #include "global.h"
 struct ColorPulseContact {
     u8 pad0[0xa];
@@ -43,7 +43,7 @@ struct ColorPulse {
     u16 damage, effect;
 };
 void sub_080F421C(void);
-void sub_080F6414(void);
+void Sword_UpdateBodyPaletteRestore(void);
 void sub_0821FF8C(void *, void *);
 void sub_08159860(void *, void *, s32);
 void AnimData_SelectPaletteBank(void *, u32);
@@ -69,7 +69,7 @@ void sub_080F2320(struct ColorPulseContact *a, struct ColorPulseContact *b, stru
                 p->hitFlags = flags;
                 p->hitKind = a->kind;
                 p->colliderState = 8;
-                p->hitCallback = sub_080F6414;
+                p->hitCallback = Sword_UpdateBodyPaletteRestore;
                 AnimData_SelectPaletteBank(p->animation, p->palette);
                 sub_08159860(a, b, p->hitValue);
             }

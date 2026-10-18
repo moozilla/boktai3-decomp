@@ -1,5 +1,5 @@
 #define SceneActor_AdvanceOffsetApproach  sub_080F7714
-#define SceneActor_ConfigureTrailSegments sub_080FB958
+#define SceneActor_ConfigureTrailSegments Axe_SetAuxiliarySpriteRenderState
 #include "global.h"
 #include "scene_actor_reaction.h"
 struct SceneActorApproachContext {
@@ -10,7 +10,7 @@ struct SceneActorApproachContext {
     u8 unknownC90[0x1B], flagsCAB, unknownCAC[0x195], duration;
     u8 unknownE42[0x6D], remaining, unknownEB0[0x22], stateED2;
 };
-void sub_080FB958(struct SceneActorRegistryResetView *, void *, u32);
+void Axe_SetAuxiliarySpriteRenderState(struct SceneActorRegistryResetView *, void *, u32);
 void sub_080FBC84(struct SceneActorRegistryResetView *, struct ContactPosition *, u32);
 void sub_080FC998(struct SceneActorRegistryResetView *);
 void sub_080F7868(struct SceneActorRegistryResetView *);
@@ -59,7 +59,7 @@ void sub_080F7714(struct SceneActorRegistryResetView *p)
         context->motionMode = 0;
         context->remaining = context->duration;
         context->flagsCAB = 0;
-        sub_080FB958(p, context->trail, 316);
+        Axe_SetAuxiliarySpriteRenderState(p, context->trail, 316);
     }
     current = &context->current;
     sub_080FBC84(p, current, context->motionMode);

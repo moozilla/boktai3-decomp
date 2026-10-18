@@ -20,7 +20,7 @@ struct SceneActorItemLaunch {
 extern struct ItemLaunchPlayer *gUnk_02000580[4];
 u8 sub_0812E3DC(s16 *, s16 *, s16 *);
 s32 sub_08017044(s32, s32, s32, s32, void *, void *, s32, void *);
-void sub_0822CE18(u32);
+void Inventory_ClearItemSlot(u32);
 void Sound_PlaySong(u32);
 static inline u8 busy(struct SceneActorItemLaunch *p)
 {
@@ -48,7 +48,7 @@ s32 sub_080B0F4C(struct SceneActorItemLaunch *p)
         p->slot = 0xffff;
         return -1;
     }
-    sub_0822CE18(p->slot);
+    Inventory_ClearItemSlot(p->slot);
     switch (p->kind) {
         case 2:
         case 5:

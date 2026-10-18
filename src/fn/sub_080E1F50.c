@@ -1,5 +1,5 @@
 #define SceneActorMotion_TestTargetTransition sub_080E1F50
-#define SceneActorMotion_IsVariantTimerReady  sub_080DF298
+#define SceneActorMotion_IsVariantTimerReady Dog_IsActionTimerExpired
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
@@ -7,7 +7,7 @@ struct SceneActorTargetMotionContext {
     u8 unknown0[0x678];
     u32 flags;
 };
-s32 sub_080DF298(struct SceneActorRegistryResetView *);
+s32 Dog_IsActionTimerExpired(struct SceneActorRegistryResetView *);
 s32 sub_0821F204(void *, struct ContactPosition *, struct ContactPosition *);
 s32 sub_0821F7A8(void *, struct ContactPosition *, struct ContactPosition *);
 static inline u8 TakePrepared(struct SceneActorRegistryResetView *a)
@@ -47,7 +47,7 @@ void sub_080E1F50(struct SceneActorRegistryResetView *a)
     struct SceneActorTargetMotionContext *context = a->context;
     if (!TakePrepared(a)) {
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)a, 11);
-        if ((u8)sub_080DF298(a)) {
+        if ((u8)Dog_IsActionTimerExpired(a)) {
             u8 *tail = (u8 *)a + 0x3D4;
             SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)a, 0);
             if (!TestMovement(a))

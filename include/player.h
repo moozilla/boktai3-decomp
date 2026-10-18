@@ -3,7 +3,6 @@
 
 #include "global.h"
 #include "scene_vec.h"
-#include "scene_actor_contacts.h"
 
 /*
  * The player actor. gUnk_02000580 holds four pointers (one per player slot; slot 0 is the local
@@ -146,7 +145,7 @@ struct Player {
     u8 positionTracker[4]; /* 0x294: refreshed after player update */
     struct SceneVec *trackedPosition; /* 0x298 */
     u8 unk29C[0x4C];
-    struct SceneActorContactNode contactListNode; /* 0x2E8 */
+    u8 contactListNode[0x10]; /* 0x2E8: a struct SceneActorContactNode (scene_actor_contacts.h; not included here, it pulls in engine.h) */
     u8 unk2F8[0x34];
     u8 actionFlagState[4]; /* 0x32C: refreshed after action modifiers */
     u16 movementLoadPercent; /* 0x330: reduces base movement speed (tentative) */
