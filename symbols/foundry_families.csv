@@ -239,3 +239,4 @@ addr,function,name,family,note
 0811DAD4,sub_0811DAD4,StateFlags_TestIndexedFlag,"StateFlags","tests indexed state bit with a global override"
 0811DB84,sub_0811DB84,MotionTween_Advance,"MotionTween","advance delayed value and coordinate interpolation"
 0811DC30,sub_0811DC30,ClockDisplay_DrawBaseTime,"ClockDisplay","draw base hour minute and state value"
+0811DCC4,sub_0811DCC4,StateFlags_SetCategoryBit,"StateFlags","sets a bit in one of six persistent flag categories"
