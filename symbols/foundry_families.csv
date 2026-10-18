@@ -960,3 +960,4 @@ addr,function,name,family,note
 08199CF4,sub_08199CF4,CannonBattery_InitCannon,"Cannon battery (tentative)","initializes cannon sprite, position and collider"
 08199DF8,sub_08199DF8,CannonBattery_CreateCannon,"Cannon battery (tentative)","allocates and initializes a cannon from a 16-slot pool"
 08199E68,sub_08199E68,CannonBattery_UpdateProjectile,"Cannon battery projectile (tentative)","moves a projectile and destroys it beyond its travel limit"
+0819A110,sub_0819A110,CannonBattery_InitMuzzleFlash,"Cannon battery firing effect (tentative)","initializes a directional firing animation at the cannon muzzle"
