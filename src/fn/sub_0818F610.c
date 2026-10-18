@@ -1,12 +1,13 @@
 #include "global.h"
-#define SceneEffectPool_AllocateSlot sub_0818F610
-struct SceneEffect { u8 unknown0[0x188]; };
+struct SceneEffect {
+    u8 unknown0[0x188];
+};
 struct SceneEffectPool {
     u8 unknown0[0xA24];
     struct SceneEffect slots[48];
     u32 occupied[2];
 };
-struct SceneEffect *sub_0818F610(struct SceneEffectPool *pool)
+struct SceneEffect *SceneEffectPool_AllocateSlot(struct SceneEffectPool *pool)
 {
     struct SceneEffect *slot = pool->slots;
     s32 index = 0;

@@ -15,7 +15,7 @@ void ScenePanel_TickAngleBurst(struct ScenePanel *input)
         if (panel->step == 0)
             Sound_PlaySong(994);
         if (panel->step <= 4) {
-            sub_081A376C(&panel->origin, panel->angle, 12, 100);
+            DirectionBurst_Emit(&panel->origin, panel->angle, 12, 100);
             panel->angle = (panel->angle + 16) & 255;
             panel->step++;
         } else

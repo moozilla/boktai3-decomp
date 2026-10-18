@@ -1,8 +1,6 @@
 #include "global.h"
 
 // Tentative interpretation: bit 0 hides the part visual; collider bit 2 disables it.
-#define Nidhoggr_HidePartWithExplosion    sub_08191508
-#define Nidhoggr_ChangeCompletedPartState sub_08190C98
 
 struct NidhoggrPosition {
     u16 x, y, z;
@@ -44,7 +42,7 @@ struct Nidhoggr {
 };
 
 void ExplosionEffect_Create(void *, u32, u32, u32, u32);
-s32 sub_08190C98(struct Nidhoggr *, s32, u32);
+s32 Nidhoggr_ChangeCompletedPartState(struct Nidhoggr *, s32, u32);
 
 static inline void AddPosition(struct NidhoggrPosition *offset, struct NidhoggrPosition *position)
 {
@@ -53,7 +51,7 @@ static inline void AddPosition(struct NidhoggrPosition *offset, struct NidhoggrP
     position->z = position->z + offset->z;
 }
 
-void sub_08191508(struct Nidhoggr *boss, s32 index)
+void Nidhoggr_HidePartWithExplosion(struct Nidhoggr *boss, s32 index)
 {
     struct NidhoggrEffectPosition effect;
     struct NidhoggrPosition *position;
@@ -71,6 +69,6 @@ void sub_08191508(struct Nidhoggr *boss, s32 index)
         AddPosition(offset, position);
         ExplosionEffect_Create(position, 0x10, 0, 0, phase);
         boss->partCompleted[index] = 1;
-        sub_08190C98(boss, index, 0);
+        Nidhoggr_ChangeCompletedPartState(boss, index, 0);
     }
 }

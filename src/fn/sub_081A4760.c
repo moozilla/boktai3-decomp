@@ -1,7 +1,5 @@
 #include "global.h"
 /* Effect pool family names and field interpretations are tentative. */
-#define EffectSpritePool_Initialize        sub_081A4760
-#define EffectSpritePool_InitializeEntries sub_081A4718
 struct EffectSpriteEntry {
     u32 flags;
     u8 unknown4[0x48];
@@ -23,8 +21,8 @@ struct EffectSpritePool {
 s32 AnimData_Load(void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void *ScriptProc_Start(u16, u16);
-s32 sub_081A4718(struct EffectSpritePool *);
-s32 sub_081A4760(struct EffectSpritePool *pool)
+s32 EffectSpritePool_InitializeEntries(struct EffectSpritePool *);
+s32 EffectSpritePool_Initialize(struct EffectSpritePool *pool)
 {
     pool->active = 0;
     pool->count = 0;

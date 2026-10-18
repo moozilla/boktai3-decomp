@@ -1,7 +1,4 @@
-#define SceneActors_UpdateOrbitingParticleAnimation sub_081F61A0
-#define SceneParticles_InitParameters               sub_081FBDE0
-#define SceneParticles_SpawnAtPosition              sub_081FBBA8
-#define gSceneAngleSineTable                        gUnk_086149C4
+#define gSceneAngleSineTable gUnk_086149C4
 #include "global.h"
 typedef struct SceneParticleActor {
     u8 pad0[0x90];
@@ -21,8 +18,8 @@ typedef struct ParticlePosition {
 extern s16 gUnk_086149C4[];
 s32 Mod(s32, s32);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
-void sub_081FBDE0(u8 *);
-int sub_081FBBA8(u8 *, void *);
+void SlotMotion_Initialize(u8 *);
+int SceneParticles_SpawnAtPosition(u8 *, void *);
 void Ratatosk_ConfigureParticle(u8 *, u16, u32, u8, u32, u32);
 static inline int trunc12(int n)
 {
@@ -34,7 +31,7 @@ static inline void add(ParticlePosition *a, ParticlePosition *b)
     b->y += a->y;
     b->z += a->z;
 }
-void sub_081F61A0(SceneParticleActor *p)
+void SceneActors_UpdateOrbitingParticleAnimation(SceneParticleActor *p)
 {
     u8 particle[0x18];
     ParticlePosition delta;
@@ -64,9 +61,9 @@ void sub_081F61A0(SceneParticleActor *p)
     }
     add(&delta, &pos);
     pos.y += 256;
-    sub_081FBDE0(particle);
+    SlotMotion_Initialize(particle);
     Ratatosk_ConfigureParticle(particle, 20, zero, zero, 2, zero);
-    sub_081FBBA8(particle, &pos);
+    SceneParticles_SpawnAtPosition(particle, &pos);
     if (p->tick > 60)
         p->finished = 1;
 }

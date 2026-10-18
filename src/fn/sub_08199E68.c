@@ -1,4 +1,3 @@
-#define CannonBattery_UpdateProjectile sub_08199E68
 #include "global.h"
 #include "engine.h"
 struct CannonBatteryProjectile {
@@ -10,7 +9,7 @@ struct CannonBatteryProjectile {
     u16 startCoordinate;
     u8 direction;
 };
-void sub_08199E68(struct CannonBatteryProjectile *p)
+void CannonBattery_UpdateProjectile(struct CannonBatteryProjectile *p)
 {
     s16 *position;
     switch (p->direction) {

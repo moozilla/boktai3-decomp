@@ -1,9 +1,5 @@
 #include "global.h"
-#define Nidhoggr_AllocateEffect              sub_0818F610
-#define Nidhoggr_ResetEffectState            sub_0818F588
-#define Nidhoggr_CreateDistanceLimitedEffect sub_08190498
-#define Nidhoggr_UpdateDistanceLimitedEffect sub_081903FC
-#define gEffectRandomTableIndex              gUnk_03005304
+#define gEffectRandomTableIndex gUnk_03005304
 struct NidhoggrEffectVector {
     u16 x, y, z, pad;
 };
@@ -34,9 +30,9 @@ struct NidhoggrDistanceEffect {
 extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 extern const struct NidhoggrEffectPair gUnk_0824F29C, gUnk_0824F2A4;
-struct NidhoggrDistanceEffect *sub_0818F610(void *);
-void sub_0818F588(void *);
-void sub_081903FC(void *);
+struct NidhoggrDistanceEffect *SceneEffectPool_AllocateSlot(void *);
+void SceneEffect_ResetState(void *);
+void Nidhoggr_UpdateDistanceLimitedEffect(void *);
 void Nidhoggr_DestroyCollidableEffect(void *);
 s32 AnimData_Load(void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
@@ -44,17 +40,17 @@ void Sprite_Init(void *, void *, u32);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Collider_SetCallback(void *, void *, void *);
 s32 Collider_Refresh(void *);
-void sub_08190498(void *owner, struct NidhoggrEffectVector *anchor,
-                  struct NidhoggrEffectVector *offset, u8 *boss)
+void Nidhoggr_CreateDistanceLimitedEffect(void *owner, struct NidhoggrEffectVector *anchor,
+                                          struct NidhoggrEffectVector *offset, u8 *boss)
 {
-    struct NidhoggrDistanceEffect *effect = Nidhoggr_AllocateEffect(owner);
+    struct NidhoggrDistanceEffect *effect = SceneEffectPool_AllocateSlot(owner);
     u8 *animation;
     struct NidhoggrEffectSprite *sprite;
     struct NidhoggrEffectVector *position;
     u8 *collider;
     if (!effect)
         return;
-    Nidhoggr_ResetEffectState(effect);
+    SceneEffect_ResetState(effect);
     {
         void (*update)(void *) = Nidhoggr_UpdateDistanceLimitedEffect;
         void (*destroy)(void *) = Nidhoggr_DestroyCollidableEffect;

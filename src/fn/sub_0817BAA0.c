@@ -1,6 +1,5 @@
 #include "global.h"
 #include "actor_state.h"
-#define ActorState_UpdateRestartableAnimation sub_0817BAA0
 void ActorVariation_SelectRandomPair(struct ActorState *, struct ActorAnimationPair *);
 s32 SceneVolume_ConsumePendingEvent(struct ActorState *);
 s32 SceneVolume_GetActivityState(struct ActorState *);
@@ -14,7 +13,7 @@ static inline u8 ConsumeTrigger(struct ActorState *p)
     }
     return 0;
 }
-void sub_0817BAA0(struct ActorStateOwner *owner)
+void ActorState_UpdateRestartableAnimation(struct ActorStateOwner *owner)
 {
     struct ActorState *p = &owner->actor;
     u32 nextState;

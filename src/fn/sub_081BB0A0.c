@@ -1,7 +1,10 @@
 #include "global.h"
-#define ResourceSprite_Initialize sub_081BB0A0
-struct ResourceSpriteEntry { s32 values[4]; };
-struct ResourceSpriteHeader { u32 words[8]; };
+struct ResourceSpriteEntry {
+    s32 values[4];
+};
+struct ResourceSpriteHeader {
+    u32 words[8];
+};
 struct ResourceSprite {
     u8 pad0[0x18];
     u8 sprite[0x60];
@@ -14,7 +17,7 @@ struct ResourceSprite {
 void *ScriptProc_Start(u16, u16);
 s32 ResourceHeader_Relocate(void *, void *);
 void sub_0821983C(void *, void *, int, int, int, int, int, void *);
-void sub_081BB0A0(struct ResourceSprite *object, u32 palette)
+void ResourceSprite_Initialize(struct ResourceSprite *object, u32 palette)
 {
     struct ResourceSpriteHeader *resource = ScriptProc_Start(0xCB05, 0xA2DB);
     if (resource) {

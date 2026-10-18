@@ -1,4 +1,3 @@
-#define Armor_InitPaletteBanks sub_08182394
 #include "global.h"
 struct ArmorPaletteState {
     u8 pad0[0x650];
@@ -13,10 +12,10 @@ struct ArmorPaletteState {
     u8 otherBank;
 };
 void sub_08181778(void *);
-void sub_08181CE8(void *);
-void sub_081816B0(void *);
+void ActorPalette_BlendSavedBanksSlow(void *);
+void ActorPalette_RestoreSelectedBanks(void *);
 void Palette_CopyBank(void *, u32);
-void sub_08182394(struct ArmorPaletteState *s)
+void Armor_InitPaletteBanks(struct ArmorPaletteState *s)
 {
     u32 controller = (u32)&s->update;
     u32 off;
@@ -24,8 +23,8 @@ void sub_08182394(struct ArmorPaletteState *s)
     void (*update)(void *);
     void (*finish)(void *);
     sub_08181778(s);
-    update = sub_08181CE8;
-    finish = sub_081816B0;
+    update = ActorPalette_BlendSavedBanksSlow;
+    finish = ActorPalette_RestoreSelectedBanks;
     *(u32 *)controller = (u32)update;
     *(u32 *)(controller + 4) = (u32)finish;
     off = s->bank * 32 + 0x208;

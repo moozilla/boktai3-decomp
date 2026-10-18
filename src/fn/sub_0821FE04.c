@@ -1,5 +1,4 @@
-#define Collider_InsertPriorityList sub_0821FE04
-#define gColliderManager            gUnk_03001688
+#define gColliderManager gUnk_03001688
 #include "global.h"
 #include "contact_actor.h"
 struct ColliderManager {
@@ -9,7 +8,7 @@ struct ColliderManager {
     u16 priorityCount;
 };
 extern struct ColliderManager *gUnk_03001688;
-void sub_0821FE04(struct ContactCollider *node)
+void Collider_InsertPriorityList(struct ContactCollider *node)
 {
     struct ContactCollider *entry;
     if (!gUnk_03001688)

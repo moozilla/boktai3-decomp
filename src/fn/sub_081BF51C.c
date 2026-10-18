@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_input.h"
-#define SceneInventory_InitWidgetPalette sub_081BF51C
 #define gScenePaletteBanks gUnk_030042E4
 #define Palette_CopyColors Palette_CopyBank
 struct SceneInventoryWidgetPalette {
@@ -15,7 +14,8 @@ struct SceneInventoryCategoryMenu {
     struct SceneInputWidget targetWidget;
 };
 void Palette_CopyBank(void *, const void *);
-void sub_081BF51C(struct SceneInventoryCategoryMenu *p, struct SceneInventoryWidgetPalette *palette)
+void SceneInventory_InitWidgetPalette(struct SceneInventoryCategoryMenu *p,
+                                      struct SceneInventoryWidgetPalette *palette)
 {
     Palette_CopyBank(palette, gUnk_030042E4 + 0x7540);
     palette->frame = 0;

@@ -1,5 +1,4 @@
 /* Tentative family and field names, based on static accesses. */
-#define ActorReaction_MarkSequenceHit sub_081F029C
 #include "global.h"
 void sub_081EE518(void);
 struct ActorReaction {
@@ -16,7 +15,7 @@ struct ActorReaction {
 struct ActorReactionEvent {
     u32 unknown0, sequence;
 };
-void sub_081F029C(struct ActorReaction *p, struct ActorReactionEvent *event)
+void ActorReaction_MarkSequenceHit(struct ActorReaction *p, struct ActorReactionEvent *event)
 {
     p->hit = 1;
     if (p->update == sub_081EE518 && event->sequence == p->sequence + 1) {

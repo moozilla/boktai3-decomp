@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneEffect_ResetState sub_0818F588
 struct SceneEffect {
     u8 unknown0[0x174];
     u32 unknown174;
@@ -14,7 +13,7 @@ static inline void clear(void *dst, u32 *zero)
     *zero = 0;
     CpuSet(zero, dst, 0x05000002);
 }
-void sub_0818F588(struct SceneEffect *effect)
+void SceneEffect_ResetState(struct SceneEffect *effect)
 {
     u32 zero;
     effect->unknown174 = 0;

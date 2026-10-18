@@ -56,7 +56,7 @@ s32 CollisionController_InitSlot(struct CollisionManager *manager, struct Collis
     Collider_Refresh(collider);
     sprite = &slot->sprite;
     sub_08217DE0(sprite, manager->graphics, 1);
-    sub_08217EEC(sprite, manager->graphics, 12);
+    SpriteDrawable_SelectTileFrame(sprite, manager->graphics, 12);
     Effect_SetOrigin(sprite, -8, -8);
     slot->active = 1;
 }
@@ -140,7 +140,7 @@ void CollisionController_UpdateIdleAnimation(struct CollisionManager *manager,
     if (p->entered) {
         p->entered = 0;
         Effect_SetOrigin(&p->sprite, -4, -4);
-        sub_08217EEC(&p->sprite, manager->animationGraphics, 0);
+        SpriteDrawable_SelectTileFrame(&p->sprite, manager->animationGraphics, 0);
         Anim_SetSequence(&p->anim, manager->idleResource, 8, 0, 0);
         p->sprite.flags &= ~1;
         p->delay = randomDelay(0);
@@ -155,7 +155,7 @@ void CollisionController_UpdateIdleAnimation(struct CollisionManager *manager,
                 p->timer = 0;
                 p->delay = randomDelay(1);
                 Effect_SetOrigin(&p->sprite, -4, -4);
-                sub_08217EEC(&p->sprite, manager->animationGraphics, 0);
+                SpriteDrawable_SelectTileFrame(&p->sprite, manager->animationGraphics, 0);
                 Anim_SetSequence(&p->anim, manager->idleResource, 8, 0, 0);
                 p->sprite.flags &= ~1;
             }
@@ -254,7 +254,7 @@ void CollisionController_UpdateHitAnimation(struct CollisionManager *manager,
         p->entered = 0;
         p->sprite.flags &= ~1;
         Effect_SetOrigin(&p->sprite, -8, -8);
-        sub_08217EEC(&p->sprite, manager->graphics, 0);
+        SpriteDrawable_SelectTileFrame(&p->sprite, manager->graphics, 0);
         Anim_SetSequence(&p->anim, manager->hitResource, 0, 0, 0);
         Sound_PlaySongChecked(290);
     }

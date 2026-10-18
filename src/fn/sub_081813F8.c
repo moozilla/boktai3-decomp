@@ -1,4 +1,3 @@
-#define ActorMarker_EmitIndexedEffect sub_081813F8
 #define gActorMarkerIndexedEffectOffsets gUnk_0824E778
 #include "global.h"
 struct ActorMarker {
@@ -7,12 +6,14 @@ struct ActorMarker {
     u8 padDA[0xb39 - 0xda];
     u8 direction;
 };
-struct ActorMarkerEffectPosition { u32 x : 16, y : 16, z : 16, pad : 16; };
+struct ActorMarkerEffectPosition {
+    u32 x : 16, y : 16, z : 16, pad : 16;
+};
 extern const u16 gUnk_0824E778[][10][4];
 extern u8 gUnk_0824E770[];
 s32 Math_Atan2(s32, s32);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
-void sub_081813F8(struct ActorMarker *p, s32 index)
+void ActorMarker_EmitIndexedEffect(struct ActorMarker *p, s32 index)
 {
     s32 row = 0;
     struct ActorMarkerEffectPosition position;
@@ -21,8 +22,14 @@ void sub_081813F8(struct ActorMarker *p, s32 index)
     const u16 *actorPosition;
     s32 direction;
     switch (((p->direction + 0x60) >> 6) & 3) {
-    case 1: case 3: row = 0; break;
-    case 0: case 2: row = 1; break;
+        case 1:
+        case 3:
+            row = 0;
+            break;
+        case 0:
+        case 2:
+            row = 1;
+            break;
     }
     actorPosition = p->position;
     {

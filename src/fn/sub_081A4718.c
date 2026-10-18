@@ -1,6 +1,5 @@
 #include "global.h"
 /* Effect pool family names and field interpretations are tentative. */
-#define EffectSpritePool_InitializeEntries sub_081A4718
 struct EffectSpriteEntry {
     u32 flags;
     u8 unknown4[0x48];
@@ -16,7 +15,7 @@ struct EffectSpritePool {
     struct EffectSpriteEntry entries[32];
 };
 void Sprite_Init(void *, void *, u32);
-s32 sub_081A4718(struct EffectSpritePool *pool)
+s32 EffectSpritePool_InitializeEntries(struct EffectSpritePool *pool)
 {
     struct EffectSpriteEntry *entry = pool->entries;
     u32 zero = 0;

@@ -1,5 +1,4 @@
 #include "global.h"
-#define SelectionPanel_Destroy sub_081BA2A4
 #define gSelectionPanel gUnk_0200025C
 struct SelectionPanelAnimation {
     u32 unknown0;
@@ -14,7 +13,7 @@ struct SelectionPanel {
 };
 extern struct SelectionPanel *gUnk_0200025C;
 void Anim_Remove(void *);
-void sub_081BA2A4(struct SelectionPanel *panel)
+void SelectionPanel_Destroy(struct SelectionPanel *panel)
 {
     struct SelectionPanelAnimation *animation = panel->animations;
     s32 i = 12;

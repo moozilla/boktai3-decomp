@@ -1,4 +1,3 @@
-#define Ratatosk_UpdateShrinkingAnimation sub_081F4B24
 #include "global.h"
 
 /* Ratatosk field and state interpretations are provisional (low confidence). */
@@ -44,8 +43,8 @@ void ScaledShadow_Disable(void *);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void Sound_PlaySong(u32);
 s32 Callback_InvokeActor(void *, void *);
-void sub_081FEB84(s32);
-void sub_081F4B24(struct RatatoskActor *p, s32 frame)
+void SlotController_SetSlotFlag2(s32);
+void Ratatosk_UpdateShrinkingAnimation(struct RatatoskActor *p, s32 frame)
 {
     if (p->changed) {
         p->changed = 0;
@@ -67,7 +66,7 @@ void sub_081F4B24(struct RatatoskActor *p, s32 frame)
         u32 mask = 0x8000c;
         p->flags = mask | p->flags;
     }
-    sub_081FEB84(Ratatosk_GetSelectedPointIndex());
+    SlotController_SetSlotFlag2(Ratatosk_GetSelectedPointIndex());
     if (frame > 299 || p->shrinkScale <= 1) {
         p->shrinkScale = 1;
         {

@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_082371F0(void *);
+void RisingSprite_Update(void *);
 u32 RisingPuffPool_UpdateTask(u8 *s)
 {
     u8 *p = s + 0x18;
@@ -7,7 +7,7 @@ u32 RisingPuffPool_UpdateTask(u8 *s)
     s32 i = 7;
     do {
         if (*q != 0)
-            sub_082371F0(p);
+            RisingSprite_Update(p);
         p += 0x30;
         q += 0x30;
         i--;

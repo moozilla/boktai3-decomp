@@ -2,7 +2,7 @@
 #include "engine.h"
 extern void *gUnk_020005AC; /* the Hresvelgr task */
 void *SceneActors_GetBySlot(u32);
-void sub_081A2BD4(void *);
+void ActorReaction_Tick(void *);
 void Hresvelgr_Destroy(void *);
 s32 sub_081A2C80(void *, void *);
 /* Registry routine C077: returns the singleton in slot -t (default 1), or
@@ -14,7 +14,7 @@ void *Hresvelgr_Create(void *arg)
         return p;
     p = Task_Create(9, 0x7E8);
     if (p) {
-        Task_SetCallbacks(p, sub_081A2BD4, Hresvelgr_Destroy);
+        Task_SetCallbacks(p, ActorReaction_Tick, Hresvelgr_Destroy);
         if (sub_081A2C80(p, arg) < 0) {
             Task_Kill(p);
             return 0;

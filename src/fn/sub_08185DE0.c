@@ -20,7 +20,7 @@ struct S {
     s16 z;
 };
 void ActorController_ForceAction(struct S *, s32);
-void sub_08185BF0(struct S *);
+void Armor_FinalizeDefeat(struct S *);
 void Armor_UpdateAlternateDeathSequence(struct S *p)
 {
     switch (p->b3d) {
@@ -32,7 +32,7 @@ void Armor_UpdateAlternateDeathSequence(struct S *p)
         case 1:
             if (p->b40 == 0xff) {
                 p->b3d = 0xff;
-                sub_08185BF0(p);
+                Armor_FinalizeDefeat(p);
             }
             break;
     }

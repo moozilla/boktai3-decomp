@@ -1,7 +1,6 @@
 #include "global.h"
 #include "player.h"
-#define SegmentDisplay_UpdatePlayerSegments sub_081C1C8C
-#define gPlayerSlots                        gUnk_02000580
+#define gPlayerSlots gUnk_02000580
 struct SegmentDisplayElement {
     u8 unknown0[0x10];
     u16 frame;
@@ -11,7 +10,7 @@ struct SegmentDisplay {
     u8 unknown0[0x100];
     struct SegmentDisplayElement segments[7];
 };
-void sub_081C1C8C(struct SegmentDisplay *p)
+void SegmentDisplay_UpdatePlayerSegments(struct SegmentDisplay *p)
 {
     s32 count = gPlayerSlots[0]->displaySegmentCount;
     s32 i;

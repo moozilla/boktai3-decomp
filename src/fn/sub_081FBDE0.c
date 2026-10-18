@@ -1,4 +1,3 @@
-#define SlotMotion_Initialize  sub_081FBDE0
 #define SlotMotion_SetCallback Ratatosk_SetParticleUpdateCallback
 #include "global.h"
 struct SlotMotion {
@@ -10,7 +9,7 @@ struct SlotMotion {
 extern const u8 gUnk_081FB808[];
 void Memory_Clear(void *, u32);
 void Ratatosk_SetParticleUpdateCallback(struct SlotMotion *, u32);
-void sub_081FBDE0(struct SlotMotion *motion)
+void SlotMotion_Initialize(struct SlotMotion *motion)
 {
     Memory_Clear(motion, 0x18);
     Ratatosk_SetParticleUpdateCallback(motion, (u32)(gUnk_081FB808 + 1));

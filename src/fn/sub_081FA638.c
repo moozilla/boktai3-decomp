@@ -1,8 +1,3 @@
-#define Ratatosk_UpdateAnimatedPosition        sub_081FA638
-#define Ratatosk_UpdatePointDistancesToSelf    sub_081F2DE8
-#define Ratatosk_UpdatePointDistancesToPlayer  sub_081F2E34
-#define Ratatosk_UpdateTargetDistancesToSelf   sub_081F2E88
-#define Ratatosk_UpdateTargetDistancesToPlayer sub_081F2EE0
 #include "global.h"
 struct RatatoskPosition {
     s16 x, y, z, pad;
@@ -36,13 +31,13 @@ s32 Mod(s32, s32);
 void Ratatosk_OscillateScale(struct Ratatosk *);
 s32 SceneActors_UpdateAnimation(void *, void *, s32);
 void sub_08225B74(void *);
-void sub_081F2DE8(struct Ratatosk *);
-void sub_081F2E34(struct Ratatosk *);
-void sub_081F2E88(struct Ratatosk *);
-void sub_081F2EE0(struct Ratatosk *);
+void ActorProximity_UpdateSquaredDistances(struct Ratatosk *);
+void Ratatosk_UpdatePointDistancesToPlayer(struct Ratatosk *);
+void SceneDistance_UpdateLinkedDistances(struct Ratatosk *);
+void SceneDistance_UpdateLinkedTargetDistances(struct Ratatosk *);
 void sub_081F6B90(struct Ratatosk *);
 void sub_081FA418(struct Ratatosk *);
-void sub_081FA638(struct Ratatosk *p)
+void Ratatosk_UpdateAnimatedPosition(struct Ratatosk *p)
 {
     struct Ratatosk *actor = p;
     struct RatatoskSprite *sprite = &p->sprite;
@@ -50,12 +45,12 @@ void sub_081FA638(struct Ratatosk *p)
     sub_081F6B90(p);
     sub_08225B74(sprite);
     if (Mod(p->timer, 30) == 0) {
-        sub_081F2DE8(p);
-        sub_081F2E88(p);
+        ActorProximity_UpdateSquaredDistances(p);
+        SceneDistance_UpdateLinkedDistances(p);
     }
     if (Mod(p->timer, 30) == 15) {
-        sub_081F2E34(p);
-        sub_081F2EE0(p);
+        Ratatosk_UpdatePointDistancesToPlayer(p);
+        SceneDistance_UpdateLinkedTargetDistances(p);
     }
     sub_081FA418(actor);
     SceneActors_UpdateAnimation(actor, actor->animation, (s32)&actor->animationDelta);

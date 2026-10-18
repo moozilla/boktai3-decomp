@@ -1,6 +1,5 @@
 #include "global.h"
 #include "terrain_overlay.h"
-#define SceneOverlayEntry_Init sub_0820D258
 #define SceneOverlayConfig_Init EnemyParticle_InitParameters
 struct SceneOverlayConfig {
     u8 unknown0[0x14];
@@ -23,7 +22,7 @@ static inline void ClearPosition(void *dest)
     u32 zero = 0;
     CpuSet(&zero, dest, 0x05000002);
 }
-void sub_0820D258(void *owner, struct SceneOverlayEntry *entry, s32 index)
+void SceneOverlayEntry_Init(void *owner, struct SceneOverlayEntry *entry, s32 index)
 {
     struct SceneOverlayConfig *config = &entry->config;
     void *animation;

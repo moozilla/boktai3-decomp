@@ -1,7 +1,6 @@
-#define Hresvelgr_HasAdjacentOverride sub_0819BA7C
-#define gTerrainMap                   gUnk_030052F4
-#define gTerrainMapWidth              gUnk_030052F8
-#define gTerrainMapHeight             gUnk_030052FC
+#define gTerrainMap       gUnk_030052F4
+#define gTerrainMapWidth  gUnk_030052F8
+#define gTerrainMapHeight gUnk_030052FC
 #include "global.h"
 #include "engine.h"
 #include "scene_vec.h"
@@ -19,7 +18,7 @@ static inline s32 cellIndex(struct SceneVec *pos)
         return 0;
     return gUnk_030052F4->rows[z] + x;
 }
-s32 sub_0819BA7C(struct Hresvelgr *actor)
+s32 Hresvelgr_HasAdjacentOverride(struct Hresvelgr *actor)
 {
     s32 cell = cellIndex(&actor->position);
     s32 i;

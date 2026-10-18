@@ -1,7 +1,6 @@
-#define Player_GetTetherMode sub_0823ABEC
 #include "global.h"
 #include "player.h"
-u32 sub_0823ABEC(struct Player *s)
+u32 Player_GetTetherMode(struct Player *s)
 {
     s8 *action = (s8 *)&s->thresholdMode;
     if (*action < 0)

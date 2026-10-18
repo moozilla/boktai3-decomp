@@ -22,7 +22,7 @@ typedef struct State {
     u8 active, ticks;
 } State;
 extern const s16 gUnk_086149C4[];
-void sub_08217EEC(Sprite *, void *, s32);
+void SpriteDrawable_SelectTileFrame(Sprite *, void *, s32);
 static inline s32 scale(s32 v)
 {
     if (v >= 0)
@@ -48,7 +48,7 @@ void Player_UpdateOrbitingAuraEffect(State *s)
         s->sprite.pos.x += 56;
         s->sprite.pos.z += 350;
         s->sprite.flags &= ~1;
-        sub_08217EEC(&s->sprite, s->graphics, 16);
+        SpriteDrawable_SelectTileFrame(&s->sprite, s->graphics, 16);
         s->ticks = 0;
         s->active = 1;
     }

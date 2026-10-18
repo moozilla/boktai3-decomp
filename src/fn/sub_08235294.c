@@ -1,4 +1,3 @@
-#define FlickerParticle_UpdatePool sub_08235294
 #include "global.h"
 struct FlickerParticle {
     u32 flags;
@@ -15,7 +14,7 @@ struct FlickerParticlePool {
     struct FlickerParticle particles[8];
 };
 s32 Callback_InvokeActor(void *, void *);
-void sub_08235294(struct FlickerParticlePool *s)
+void FlickerParticle_UpdatePool(struct FlickerParticlePool *s)
 {
     struct FlickerParticle *p = s->particles;
     u32 o = 0;

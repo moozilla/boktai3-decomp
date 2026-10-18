@@ -1,5 +1,4 @@
 #include "global.h"
-#define MovingSprite_UpdateMotion sub_08237450
 #define MovingSprite_SetPhase MovingGlyph_SetState
 struct MovingSpritePosition {
     u16 x, unknown2, y, unknown6;
@@ -15,7 +14,7 @@ struct MovingSprite {
 };
 void MovingGlyph_SetState(struct MovingSprite *, void (*)(void));
 void sub_082373D4(void);
-void sub_08237450(struct MovingSprite *p)
+void MovingSprite_UpdateMotion(struct MovingSprite *p)
 {
     p->position.x += p->velocityX;
     p->position.y += p->velocityY;

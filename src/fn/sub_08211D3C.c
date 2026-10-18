@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneKeyframe_UpdateSelectionVisibility sub_08211D3C
 struct SceneSelectionKeyframe {
     u8 unknown0[0x24];
     u8 data[0x108];
@@ -10,7 +9,7 @@ struct SceneSelectionKeyframe {
 };
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
 u32 ForgingBook_IsCategoryComplete(struct SceneSelectionKeyframe *, s32);
-s32 sub_08211D3C(struct SceneSelectionKeyframe *p)
+s32 SceneKeyframe_UpdateSelectionVisibility(struct SceneSelectionKeyframe *p)
 {
     Anim_LoadKeyframe(p->animation, p->data, (u16)(p->selection + 0x4C), 0);
     if (ForgingBook_IsCategoryComplete(p, p->selection))

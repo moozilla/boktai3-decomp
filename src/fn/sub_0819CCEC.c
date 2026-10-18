@@ -1,4 +1,3 @@
-#define OffsetActor_StepTowardTarget sub_0819CCEC
 #include "global.h"
 struct OffsetActorVector {
     s16 x, y, z, pad;
@@ -17,7 +16,7 @@ static inline void Difference(struct OffsetActorVector *out, struct OffsetActorV
     out->y = a->y - b->y;
     out->z = a->z - b->z;
 }
-void sub_0819CCEC(struct OffsetActor *p)
+void OffsetActor_StepTowardTarget(struct OffsetActor *p)
 {
     struct OffsetActorVector v;
     struct OffsetActorVector *current = &p->position, *target = &p->target;

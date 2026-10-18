@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0819A110(void *, void *, s32, s32);
+void CannonBattery_InitMuzzleFlash(void *, void *, s32, s32);
 void CannonBattery_SpawnMuzzleFlash(u8 *p, s32 a, s32 b)
 {
     u8 *q = 0;
@@ -14,5 +14,5 @@ void CannonBattery_SpawnMuzzleFlash(u8 *p, s32 a, s32 b)
         i++;
     }
     if (q)
-        sub_0819A110(p, q, a, b);
+        CannonBattery_InitMuzzleFlash(p, q, a, b);
 }

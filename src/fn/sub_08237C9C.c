@@ -1,5 +1,4 @@
 #include "global.h"
-#define TimedSprite_UpdateMotion sub_08237C9C
 #define TimedSprite_SetPhase ActorGlyphTrail_SetState
 struct TimedSprite {
     u8 unknown0[0x38];
@@ -11,7 +10,7 @@ struct TimedSprite {
 };
 void ActorGlyphTrail_SetState(struct TimedSprite *, void (*)(void));
 void sub_08237CDC(void);
-void sub_08237C9C(struct TimedSprite *p)
+void TimedSprite_UpdateMotion(struct TimedSprite *p)
 {
     p->x += p->velocityX;
     p->y += p->velocityY;

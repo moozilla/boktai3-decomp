@@ -6,7 +6,7 @@ struct Q {
     u8 g[0x28];
     u8 *p558;
 };
-void sub_081B9E58(void *);
+void SelectionPanel_ProcessConfirm(void *);
 
 void Registry2388_UpdateSelection(struct Q *p)
 {
@@ -16,5 +16,5 @@ void Registry2388_UpdateSelection(struct Q *p)
     else
         v = *(s16 *)(p->p558 + 0xa0);
     p->sel = v;
-    sub_081B9E58(p);
+    SelectionPanel_ProcessConfirm(p);
 }

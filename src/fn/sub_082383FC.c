@@ -1,8 +1,7 @@
-#define Player_ResetActionState sub_082383FC
 #include "global.h"
 #include "player.h"
 s32 AreaEffect_IsLinkPlayerCovered(struct Player *);
-void sub_082383FC(struct Player *p)
+void Player_ResetActionState(struct Player *p)
 {
     p->statusFlags = 1;
     if (AreaEffect_IsLinkPlayerCovered(p)) {

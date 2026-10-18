@@ -1,4 +1,3 @@
-#define TemporarySpritePool_Update sub_08233038
 #include "global.h"
 struct TemporarySpriteSlot {
     u8 active, unknown1;
@@ -10,7 +9,7 @@ struct TemporarySpritePool {
     struct TemporarySpriteSlot slots[16];
 };
 void Sprite_Remove(void *);
-s32 sub_08233038(struct TemporarySpritePool *pool)
+s32 TemporarySpritePool_Update(struct TemporarySpritePool *pool)
 {
     struct TemporarySpriteSlot *slot = pool->slots;
     s32 remaining = 15;

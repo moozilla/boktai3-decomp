@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneEventActor_UpdateTimedResponse sub_0817EB34
 struct SceneEventActor {
     u8 unknown0[0x51];
     u8 angle;
@@ -19,13 +18,17 @@ struct SceneEventActor {
 void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
 s32 Callback_InvokeActor(void *, void *);
 void ActorAttachment_PlayEffect(void *, s32);
-void sub_0817EB34(struct SceneEventActor *actor, s32 tick)
+void SceneEventActor_UpdateTimedResponse(struct SceneEventActor *actor, s32 tick)
 {
     if (actor->restart) {
         actor->restart = 0;
         ActorAttachment_PlayEffect(actor, 2);
-        SceneActors_StartEightDirectionAnimation(actor, (u8 *)actor + 0x2CC, (u8 *)actor + 0x2AC, 0xF4, 1, 1, 4);
-        { u32 mask = 0x400004; actor->flags |= mask; }
+        SceneActors_StartEightDirectionAnimation(actor, (u8 *)actor + 0x2CC, (u8 *)actor + 0x2AC,
+                                                 0xF4, 1, 1, 4);
+        {
+            u32 mask = 0x400004;
+            actor->flags |= mask;
+        }
     }
     if (tick > 30)
         actor->finished = 1;

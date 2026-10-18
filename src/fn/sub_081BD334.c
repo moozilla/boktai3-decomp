@@ -1,4 +1,3 @@
-#define ScriptPanel_InitializeProcedure sub_081BD334
 #define gScriptPanelSource gUnk_030042E4
 #include "global.h"
 
@@ -12,7 +11,7 @@ struct ScriptPanel {
 extern u8 *gUnk_030042E4;
 void *ScriptProc_Start(u16 key, u16 context);
 
-void sub_081BD334(struct ScriptPanel *panel)
+void ScriptPanel_InitializeProcedure(struct ScriptPanel *panel)
 {
     panel->procedureData = (u8 *)ScriptProc_Start(0x92B3, 0x2E9) + 0x1B4;
     CpuSet(gUnk_030042E4 + 0x7540, panel->snapshot, 0x04000008);

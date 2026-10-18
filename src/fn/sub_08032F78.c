@@ -24,7 +24,7 @@ extern u32 gUnk_03003A48, gUnk_03004280;
 extern u16 gUnk_03005260[];
 extern const u8 gUnk_086056D0[];
 void TextWindow_BlankRect(int, int, int, int);
-void sub_08218ED8(int, int, int, int);
+void BackgroundMap_ClearTextRect(int, int, int, int);
 void TextState_SetBounds(struct TextState *, int, int, int, int);
 void TextState_Init(struct TextState *, int, int, int, int);
 void TextState_Reset(struct TextState *);
@@ -80,7 +80,7 @@ void ScrollingDialogue_UpdatePlayback(struct Window *p)
     if (!advance)
         goto done;
     TextWindow_BlankRect(p->row, 18, 1, 2);
-    sub_08218ED8(p->row, 18, 1, 2);
+    BackgroundMap_ClearTextRect(p->row, 18, 1, 2);
     p->row++;
     s = TextState_GetActiveStream(t);
     if (!s)

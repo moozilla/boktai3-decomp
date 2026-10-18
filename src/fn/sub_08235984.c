@@ -1,4 +1,3 @@
-#define SceneEffectGroup_Remove sub_08235984
 #include "global.h"
 #include "engine.h"
 
@@ -14,7 +13,7 @@ struct SceneEffectGroup {
 };
 void Sprite_Remove(void *);
 
-s32 sub_08235984(struct SceneEffectGroup *group)
+s32 SceneEffectGroup_Remove(struct SceneEffectGroup *group)
 {
     u8 *effect;
     s32 i;

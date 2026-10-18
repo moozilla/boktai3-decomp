@@ -1,4 +1,3 @@
-#define CallbackGroup_UpdateActive sub_08236428
 #include "global.h"
 #include "engine.h"
 struct CallbackGroupEntry {
@@ -14,7 +13,7 @@ struct CallbackGroup {
     void *context;
     struct CallbackGroupEntry entries[12];
 };
-void sub_08236428(struct CallbackGroup *group)
+void CallbackGroup_UpdateActive(struct CallbackGroup *group)
 {
     s32 count;
     u8 *active;

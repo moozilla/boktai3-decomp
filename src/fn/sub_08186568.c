@@ -1,6 +1,5 @@
-#define Armor_UpdateRandomFlankAction42 sub_08186568
 #define gRandomTableIndex gUnk_03005308
-#define gRandomTable gUnk_0203B400
+#define gRandomTable      gUnk_0203B400
 #include "global.h"
 
 /* Tentative Armor-family behavior: aim a quarter turn to either side of the target. */
@@ -28,7 +27,7 @@ extern const u16 gUnk_0203B400[];
 s32 Math_Atan2(s32, s32);
 s32 sub_08184FE8(struct ArmorActor *, s32);
 
-void sub_08186568(struct ArmorActor *p)
+void Armor_UpdateRandomFlankAction42(struct ArmorActor *p)
 {
     u8 *q = &p->phase;
     u8 r;

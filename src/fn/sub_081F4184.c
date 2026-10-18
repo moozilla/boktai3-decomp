@@ -1,4 +1,3 @@
-#define Ratatosk_UpdateTimedAttack sub_081F4184
 #include "global.h"
 
 /* Ratatosk field and state interpretations are provisional (low confidence). */
@@ -41,7 +40,7 @@ static inline void facing(struct RatatoskActor *p, int angle)
     p->facing8 = v;
 }
 void Sound_PlaySong(u32);
-void sub_081F4184(struct RatatoskActor *p, s32 frame)
+void Ratatosk_UpdateTimedAttack(struct RatatoskActor *p, s32 frame)
 {
     facing(p, p->requestedAngle);
     if (p->changed) {

@@ -1,6 +1,3 @@
-#define Nidhoggr_CreateBurstEffects     sub_0818F444
-#define Nidhoggr_AllocateSpriteEffect   sub_0818F218
-#define Nidhoggr_StepMovingSpriteEffect sub_0818EF64
 /* The current build ELF still exports these two original address names. */
 #include "global.h"
 
@@ -37,8 +34,8 @@ struct NidhoggrPool {
     u32 activeEffects[2];
     void *sequenceResource;
 };
-struct NidhoggrAnimatedSlot *sub_0818F218(struct NidhoggrPool *);
-void sub_0818EF64(struct NidhoggrAnimatedSlot *);
+struct NidhoggrAnimatedSlot *EffectPool_AllocateSlot(struct NidhoggrPool *);
+void Nidhoggr_StepMovingSpriteEffect(struct NidhoggrAnimatedSlot *);
 void Nidhoggr_DestroySpriteEffect(struct NidhoggrAnimatedSlot *);
 s32 AnimData_Load(void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
@@ -48,11 +45,11 @@ void ExplosionEffect_Create(void *, u32, u32, u32, u32);
 extern const u8 gUnk_08611D1C[];
 extern const struct NidhoggrEffectMotion gUnk_0824F214[];
 
-void sub_0818F444(struct NidhoggrPool *pool, struct NidhoggrEffectMotion *position)
+void Nidhoggr_CreateBurstEffects(struct NidhoggrPool *pool, struct NidhoggrEffectMotion *position)
 {
     s32 i;
     for (i = 0; i <= 5; i++) {
-        struct NidhoggrAnimatedSlot *slot = sub_0818F218(pool);
+        struct NidhoggrAnimatedSlot *slot = EffectPool_AllocateSlot(pool);
         const struct NidhoggrEffectMotion *motion;
         struct NidhoggrEffectMotion *output;
         if (!slot)
@@ -68,7 +65,7 @@ void sub_0818F444(struct NidhoggrPool *pool, struct NidhoggrEffectMotion *positi
         output->z = position->z + motion->z;
         slot->motion = *motion;
         {
-            void (*update)(struct NidhoggrAnimatedSlot *) = sub_0818EF64;
+            void (*update)(struct NidhoggrAnimatedSlot *) = Nidhoggr_StepMovingSpriteEffect;
             void (*complete)(struct NidhoggrAnimatedSlot *) = Nidhoggr_DestroySpriteEffect;
             slot->update = update;
             slot->onComplete = complete;

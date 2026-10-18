@@ -1,5 +1,4 @@
 /* Tentative family and field names, based on static accesses. */
-#define SpriteGroup_RemoveSlot sub_081F23A0
 #include "global.h"
 void Sprite_Remove(void *);
 struct SpriteGroupSprite {
@@ -16,7 +15,7 @@ struct SpriteGroup {
     u8 unknown0[0x18];
     u32 activeSlots;
 };
-u32 sub_081F23A0(struct SpriteGroup *p, struct SpriteGroupSlot *slot, s32 index)
+u32 SpriteGroup_RemoveSlot(struct SpriteGroup *p, struct SpriteGroupSlot *slot, s32 index)
 {
     struct SpriteGroupSprite *sprite = slot->sprites;
     u32 *flags;

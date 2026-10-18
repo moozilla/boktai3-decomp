@@ -1,6 +1,5 @@
-#define FanCannon_IsPathToPlayerClear sub_082095B8
-#define gTerrainMap gUnk_030052F4
-#define gTerrainMapWidth gUnk_030052F8
+#define gTerrainMap       gUnk_030052F4
+#define gTerrainMapWidth  gUnk_030052F8
 #define gTerrainMapHeight gUnk_030052FC
 #include "global.h"
 #include "engine.h"
@@ -42,7 +41,7 @@ static inline s32 FanCannon_GetCellIndex(struct SceneVec *position)
     return gTerrainMap->rows[z] + x;
 }
 
-s32 sub_082095B8(struct FanCannon *cannon)
+s32 FanCannon_IsPathToPlayerClear(struct FanCannon *cannon)
 {
     struct SceneVec delta;
     union FanCannonSample sample;

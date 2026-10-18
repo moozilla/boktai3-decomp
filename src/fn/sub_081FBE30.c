@@ -1,8 +1,7 @@
 #include "global.h"
 
-#define Ratatosk_UpdateParticleFallAndWander sub_081FBE30
 #define gRandomTableIndex gUnk_03005304
-#define gRandomTable gUnk_086141BC
+#define gRandomTable      gUnk_086141BC
 
 struct RatatoskParticleParams {
     u8 unknown0[6];
@@ -28,7 +27,7 @@ extern const u16 gUnk_086141BC[];
 s32 Mod(s32, s32);
 
 /* Tentative: accelerates a falling particle and randomizes its planar motion. */
-s32 sub_081FBE30(struct RatatoskParticle *particle)
+s32 Ratatosk_UpdateParticleFallAndWander(struct RatatoskParticle *particle)
 {
     struct RatatoskParticleParams *params = &particle->params;
     particle->fallSpeed += particle->params.fallAcceleration;

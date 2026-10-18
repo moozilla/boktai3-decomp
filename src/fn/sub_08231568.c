@@ -1,4 +1,3 @@
-#define EffectGroup_Reset          sub_08231568
 #define EffectGroup_UpdateDisabled sub_08231444
 #include "global.h"
 struct EffectGroupEntry {
@@ -15,7 +14,7 @@ struct EffectGroup {
     void (*update)(struct EffectGroup *);
 };
 void sub_08231444(struct EffectGroup *);
-s32 sub_08231568(struct EffectGroup *group)
+s32 EffectGroup_Reset(struct EffectGroup *group)
 {
     struct EffectGroupEntry *entry;
     s32 i;

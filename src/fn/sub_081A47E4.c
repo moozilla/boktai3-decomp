@@ -5,7 +5,7 @@ void Task_SetCallbacks(void *, void *, void *);
 void Task_Kill(void *);
 void Hresvelgr_UpdateEffects(void);
 void Hresvelgr_DestroyEffectPool(void);
-s32 sub_081A4760(void *);
+s32 EffectSpritePool_Initialize(void *);
 void *Hresvelgr_CreateEffectPool(void)
 {
     void *p;
@@ -14,7 +14,7 @@ void *Hresvelgr_CreateEffectPool(void)
         p = gUnk_02000240;
         if (p != 0) {
             Task_SetCallbacks(p, Hresvelgr_UpdateEffects, Hresvelgr_DestroyEffectPool);
-            if (sub_081A4760(p) < 0) {
+            if (EffectSpritePool_Initialize(p) < 0) {
                 Task_Kill(p);
                 return 0;
             }

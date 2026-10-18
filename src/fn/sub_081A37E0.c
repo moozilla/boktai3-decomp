@@ -1,7 +1,6 @@
 #include "global.h"
 /* Effect pool family names and field interpretations are tentative. */
-#define EffectPool_FindIdleActiveEntry sub_081A37E0
-#define gEffectPool                    gUnk_0200023C
+#define gEffectPool gUnk_0200023C
 struct EffectPoolEntry {
     u32 flags;
     u8 unknown4[0x15a];
@@ -15,7 +14,7 @@ struct EffectPool {
     struct EffectPoolEntry entries[3];
 };
 extern struct EffectPool *gUnk_0200023C;
-struct EffectPoolEntry *sub_081A37E0(void)
+struct EffectPoolEntry *EffectPool_FindIdleActiveEntry(void)
 {
     struct EffectPoolEntry *entry = gEffectPool->entries;
     s32 i;

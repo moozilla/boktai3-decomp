@@ -1,5 +1,4 @@
 #include "global.h"
-#define DirectionGate_IsAngleInModeRange sub_0819C83C
 
 /* Tentative angle gate: the two modes select overlapping half-circle ranges. */
 struct DirectionGate {
@@ -8,7 +7,7 @@ struct DirectionGate {
     u8 unknownCD[0x25E];
     u8 mode;
 };
-u32 sub_0819C83C(struct DirectionGate *gate)
+u32 DirectionGate_IsAngleInModeRange(struct DirectionGate *gate)
 {
     u32 angle = gate->angle;
     switch (gate->mode) {

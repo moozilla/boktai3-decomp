@@ -1,6 +1,3 @@
-#define AnimatedMarker_BeginActive          sub_081B78CC
-#define AnimatedMarker_RegisterOccupiedCell sub_081B769C
-#define AnimatedMarker_TickActive           sub_081B79A4
 #include "global.h"
 /* Tentative proximity-marker family; collider extent interpretation is provisional. */
 struct AnimatedMarkerCollider {
@@ -28,8 +25,8 @@ struct AnimatedMarker {
     void (*update)(struct AnimatedMarker *);
 };
 void TerrainModifiers_UnregisterCell(void *);
-void sub_081B769C(struct AnimatedMarker *);
-void sub_081B79A4(struct AnimatedMarker *);
+void AnimatedMarker_RegisterOccupiedCell(struct AnimatedMarker *);
+void AnimatedMarker_TickActive(struct AnimatedMarker *);
 static inline void AnimatedMarker_SetUpdate(struct AnimatedMarker *marker,
                                             void (*update)(struct AnimatedMarker *), u8 state)
 {
@@ -37,14 +34,14 @@ static inline void AnimatedMarker_SetUpdate(struct AnimatedMarker *marker,
     marker->phaseTimer = 0;
     marker->state = state;
 }
-void sub_081B78CC(struct AnimatedMarker *marker)
+void AnimatedMarker_BeginActive(struct AnimatedMarker *marker)
 {
     struct AnimatedMarkerCollider *collider;
     marker->state = 1;
     TerrainModifiers_UnregisterCell(marker->cellRef);
-    sub_081B769C(marker);
+    AnimatedMarker_RegisterOccupiedCell(marker);
     collider = &marker->collider;
     collider->extent = 32;
     collider->flags |= 4;
-    AnimatedMarker_SetUpdate(marker, sub_081B79A4, 1);
+    AnimatedMarker_SetUpdate(marker, AnimatedMarker_TickActive, 1);
 }

@@ -1,4 +1,3 @@
-#define SlotActor_ResetOnFlags sub_081FC8BC
 #include "global.h"
 #include "engine.h"
 struct SlotActorSignal {
@@ -21,8 +20,8 @@ struct SlotActor {
     u8 padD4[0xa4];
     u16 timer;
 };
-void sub_081FC8BC(struct SlotActorSignal *signal, struct SlotActorState *state,
-                  struct SlotActor *actor)
+void SlotActor_ResetOnFlags(struct SlotActorSignal *signal, struct SlotActorState *state,
+                            struct SlotActor *actor)
 {
     if (signal->flags & 7) {
         Sound_PlaySong(0x170);

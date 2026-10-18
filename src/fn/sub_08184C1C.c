@@ -1,6 +1,4 @@
-#define ActorController_CompleteMotionTransition sub_08184C1C
-#define ActorController_ClearAnimationCallbacks  sub_08182440
-#define gActorStopAnimations                     gUnk_0824EEF0
+#define gActorStopAnimations gUnk_0824EEF0
 // Names describe observed behavior; the action interpretation is tentative.
 #include "global.h"
 
@@ -18,9 +16,9 @@ struct ActorMotionVector {
 };
 extern u32 gUnk_0824EEF0[];
 void Armor_SetAnimationFromStart(u32, u32);
-void sub_08182440(u8 *);
+void ActorPalette_DisableCallbacks(u8 *);
 
-void sub_08184C1C(u8 *p)
+void ActorController_CompleteMotionTransition(u8 *p)
 {
     u8 *state = p + 0xB40;
     if (*state == 0) {
@@ -46,7 +44,7 @@ void sub_08184C1C(u8 *p)
             case 9:
             case 13:
             case 15:
-                sub_08182440(p);
+                ActorPalette_DisableCallbacks(p);
                 break;
         }
     }

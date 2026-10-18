@@ -3,7 +3,7 @@ struct E {
     u8 p[0x3ac];
 };
 extern u8 *gUnk_020005EC;
-void sub_081FE16C(u8 *, struct E *, s32);
+void OrbitEffect_InitSlot(u8 *, struct E *, s32);
 void AnimData_Load(u8 *, u32);
 u32 SceneActors_GetBySlot(u32);
 u32 SunOrb_InitManager(u8 *a)
@@ -15,7 +15,7 @@ u32 SunOrb_InitManager(u8 *a)
     e = (struct E *)(a + 0x38);
     i = 0;
     do {
-        sub_081FE16C(a, e, i);
+        OrbitEffect_InitSlot(a, e, i);
         i++;
         e++;
     } while (i <= 3);

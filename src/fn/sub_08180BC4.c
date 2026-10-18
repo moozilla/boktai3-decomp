@@ -1,4 +1,3 @@
-#define ActorMarker_InitFacingSprite sub_08180BC4
 #define gActorMarkerFacingFrames gUnk_0824E6B4
 #include "global.h"
 
@@ -12,7 +11,10 @@ struct ActorMarker {
     u16 facingValue;
     u8 padD8[0x334 - 0xd8];
     u8 animation[0x3d0 - 0x334];
-    struct { void (*update)(void *); void (*draw)(void *); } callbacks;
+    struct {
+        void (*update)(void *);
+        void (*draw)(void *);
+    } callbacks;
     struct ActorMarkerSprite sprite;
     u8 pad3EC[0x40c - 0x3ec];
     u16 savedFacing;
@@ -21,11 +23,11 @@ struct ActorMarker {
     u8 kind, direction;
 };
 void Sprite_Init(void *, void *, u32);
-void sub_08180A88(void *);
-void sub_08180AFC(void *);
+void SceneParticle_UpdateBounce(void *);
+void BouncingEffect_RemoveSprite(void *);
 extern const u8 gUnk_0824E6B4[];
 
-void sub_08180BC4(struct ActorMarker *p)
+void ActorMarker_InitFacingSprite(struct ActorMarker *p)
 {
     struct ActorMarkerSprite *sprite = &p->sprite;
     s32 direction;
@@ -34,8 +36,8 @@ void sub_08180BC4(struct ActorMarker *p)
     sprite->flags = 0x202;
     {
         typeof(p->callbacks) *callbacks = &p->callbacks;
-        void (*update)(void *) = sub_08180A88;
-        void (*draw)(void *) = sub_08180AFC;
+        void (*update)(void *) = SceneParticle_UpdateBounce;
+        void (*draw)(void *) = BouncingEffect_RemoveSprite;
         callbacks->update = update;
         callbacks->draw = draw;
     }
@@ -44,9 +46,19 @@ void sub_08180BC4(struct ActorMarker *p)
     frame = gUnk_0824E6B4[p->kind];
     direction = ((p->direction + 0x60) >> 6) & 3;
     switch (direction) {
-    case 0: sprite->frame = frame; break;
-    case 1: sprite->frame = frame - 4; break;
-    case 2: sprite->frame = frame - 4; sprite->flags |= 4; break;
-    case 3: sprite->frame = frame; sprite->flags |= 4; break;
+        case 0:
+            sprite->frame = frame;
+            break;
+        case 1:
+            sprite->frame = frame - 4;
+            break;
+        case 2:
+            sprite->frame = frame - 4;
+            sprite->flags |= 4;
+            break;
+        case 3:
+            sprite->frame = frame;
+            sprite->flags |= 4;
+            break;
     }
 }

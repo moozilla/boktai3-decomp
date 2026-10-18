@@ -1,10 +1,9 @@
-#define Armor_AcceleratePartTurn sub_0818D384
 #include "global.h"
 #include "motion_0818.h"
 
 void Armor_UpdatePartLungeDelay(struct Motion0818Object *);
 
-void sub_0818D384(struct Motion0818Object *p)
+void Armor_AcceleratePartTurn(struct Motion0818Object *p)
 {
     u8 *parent = p->parent;
     s32 i;

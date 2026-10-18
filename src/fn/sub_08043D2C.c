@@ -3,7 +3,7 @@
 // Reviewed full extent; register lifetimes and instruction scheduling still differ.
 #include "contact_actor.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
-void sub_08221110(void *, void *, void *, s32, s32);
+void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
 struct ContactStartSprite {
     u8 prefix[0x1C];
     struct ContactPosition position;
@@ -37,7 +37,7 @@ s32 ContactActorPool_Start(struct ContactActorPool *pool, const struct ContactPo
         u8 *bank = gUnk_030042E4;
         void *first = bank + 0x5A60;
         void *second = bank + 0x5AA0;
-        sub_08221110((u8 *)pool + 0x1700, first, second, 63, 6);
+        Palette_InterpolateBanks((u8 *)pool + 0x1700, first, second, 63, 6);
     }
     pool->retreatCenter = *center;
     slot = &pool->slots[0];

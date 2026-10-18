@@ -1,6 +1,5 @@
-#define LinkEffect_UpdateEndpoints sub_0819A698
-#define gSineTable                 gUnk_086149C4
-#define gPlayerPositionOwner       gUnk_02000710
+#define gSineTable           gUnk_086149C4
+#define gPlayerPositionOwner gUnk_02000710
 #include "global.h"
 struct LinkVector {
     s16 x, y, z;
@@ -34,7 +33,7 @@ static inline void add(struct LinkVector *dst, struct LinkVector *a, struct Link
     dst->y = b->y + a->y;
     dst->z = b->z + a->z;
 }
-void sub_0819A698(struct LinkEffect *p)
+void LinkEffect_UpdateEndpoints(struct LinkEffect *p)
 {
     struct LinkVector offset;
     s32 angle = Math_Atan2(p->target->x - gPlayerPositionOwner->position.x,

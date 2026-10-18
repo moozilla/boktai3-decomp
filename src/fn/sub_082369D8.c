@@ -1,6 +1,5 @@
 #include "global.h"
 /* Tentative ParticleEffect/ParticleBurst family names (low confidence). */
-#define ParticleEffect_Update       sub_082369D8
 #define gParticleEffectPendingCount gUnk_02000590
 struct ParticleEffect {
     u8 pad0[0x19];
@@ -20,11 +19,11 @@ struct ParticleEffectOwner {
     u32 state;
 };
 extern u16 gUnk_02000590;
-void sub_08236644(struct ParticleEffect *);
-void sub_08236878(struct ParticleEffect *);
-void sub_08236428(struct ParticleEffect *);
+void PaletteTransition_UpdateOwnerFade(struct ParticleEffect *);
+void PlayerEffect_UpdatePhaseCallback(struct ParticleEffect *);
+void CallbackGroup_UpdateActive(struct ParticleEffect *);
 void Task_Kill(void *);
-u32 sub_082369D8(struct ParticleEffect *p)
+u32 ParticleEffect_Update(struct ParticleEffect *p)
 {
     if (p->owner->state == 4) {
         p->stopped = 1;
@@ -34,9 +33,9 @@ u32 sub_082369D8(struct ParticleEffect *p)
         gUnk_02000590--;
         p->pending = 0;
     }
-    sub_08236644(p);
-    sub_08236878(p);
-    sub_08236428(p);
+    PaletteTransition_UpdateOwnerFade(p);
+    PlayerEffect_UpdatePhaseCallback(p);
+    CallbackGroup_UpdateActive(p);
     if (!p->active12C && !p->activeB0 && !p->active13A)
         Task_Kill(p);
 }

@@ -18,7 +18,7 @@ void ScenePanel_UpdateParticles(struct ScenePanel *input)
                     particle->position.world.y += particle->velocity.world.y;
                     particle->position.world.z += particle->velocity.world.z;
                     if (particle->age == 6)
-                        sub_08217EEC(particle, particles->resource, 3);
+                        SpriteDrawable_SelectTileFrame(particle, particles->resource, 3);
                     particle->age++;
                 }
             }

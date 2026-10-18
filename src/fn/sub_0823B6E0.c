@@ -1,7 +1,6 @@
-#define Player_CanUseAction sub_0823B6E0
 #include "global.h"
 #include "player.h"
-u32 sub_0823B6E0(struct Player *s, s32 action)
+u32 Player_CanUseAction(struct Player *s, s32 action)
 {
     u32 result;
     if (s->actionMode <= 1 || s->actionMode == 6) {

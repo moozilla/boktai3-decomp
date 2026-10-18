@@ -1,4 +1,3 @@
-#define Combat_ApplyHitReaction sub_0820FEA8
 #include "global.h"
 /* Names and field interpretations are tentative. */
 
@@ -35,7 +34,8 @@ void Sound_PlaySong(u32);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
 void sub_0821FF8C(void *);
 
-void sub_0820FEA8(struct HitSource *source, struct HitResult *hit, struct HitRecipient *target)
+void Combat_ApplyHitReaction(struct HitSource *source, struct HitResult *hit,
+                             struct HitRecipient *target)
 {
     sub_0821FF8C(source);
     if (hit->blocked) {

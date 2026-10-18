@@ -1,5 +1,4 @@
 #include "global.h"
-#define EffectPool_AllocateSlot sub_0818F218
 
 struct EffectPoolSlot {
     u8 unknown[0x6C];
@@ -9,7 +8,7 @@ struct EffectPool {
     u32 occupied;
 };
 
-struct EffectPoolSlot *sub_0818F218(struct EffectPool *pool)
+struct EffectPoolSlot *EffectPool_AllocateSlot(struct EffectPool *pool)
 {
     struct EffectPoolSlot *slot = pool->slots;
     u32 bit = 1;

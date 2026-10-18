@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneParticle_UpdateBounce sub_08180A88
 #define Callback_Invoke Callback_InvokeActor
 struct ParticleVector {
     s32 x : 16, y : 16, z : 16;
@@ -17,7 +16,7 @@ struct BouncingSceneParticle {
     u8 bounced;
 };
 s32 Callback_InvokeActor(void *, void *);
-void sub_08180A88(struct BouncingSceneParticle *p)
+void SceneParticle_UpdateBounce(struct BouncingSceneParticle *p)
 {
     u32 zero;
     p->phase += 8;

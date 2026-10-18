@@ -1,5 +1,4 @@
 #include "global.h"
-#define ActorDecision_UpdateThresholdPhase sub_0817C08C
 #define ActorDecision_SetTransition SceneVolume_BeginPhase
 struct ActorDecisionPosition {
     u32 a, b;
@@ -33,7 +32,7 @@ static inline u8 consumeReset(struct ActorDecisionState *p)
     return 0;
 }
 void sub_0817A16C(struct ActorDecisionState *, struct ActorDecisionPosition *);
-void sub_0817C08C(struct ActorDecisionState *p)
+void ActorDecision_UpdateThresholdPhase(struct ActorDecisionState *p)
 {
     struct ActorDecisionState *s = p;
     if (consumeReset(p)) {

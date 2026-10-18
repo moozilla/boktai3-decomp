@@ -1,4 +1,3 @@
-#define ScreenTransition_DispatchPhase sub_081D72A4
 #include "global.h"
 struct ScreenTransitionStep {
     s16 delay;
@@ -18,7 +17,7 @@ struct ScreenTransitionCallbacks {
 };
 extern const struct ScreenTransitionCallbacks gUnk_0824FCA4;
 s32 sub_08249240(void *, void *, void *);
-s32 sub_081D72A4(struct ScreenTransition *p)
+s32 ScreenTransition_DispatchPhase(struct ScreenTransition *p)
 {
     struct ScreenTransitionCallbacks callbacks = gUnk_0824FCA4;
     if (p->state <= p->lastStep) {

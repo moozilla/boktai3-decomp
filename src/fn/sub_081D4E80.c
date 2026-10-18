@@ -1,6 +1,5 @@
 #include "global.h"
 // Family and descriptive names are tentative interpretations of static code.
-#define ThresholdTrack_SelectInterval sub_081D4E80
 #define ThresholdTrack_GetBoundary Bestiary_GetCategoryFirstEntry
 struct ThresholdTrack {
     u8 pad0[0x25];
@@ -10,7 +9,7 @@ struct ThresholdTrack {
     u8 remainder;
 };
 s32 Bestiary_GetCategoryFirstEntry(u32);
-void sub_081D4E80(struct ThresholdTrack *p)
+void ThresholdTrack_SelectInterval(struct ThresholdTrack *p)
 {
     s32 i;
     for (i = 0; i <= 13; i++) {

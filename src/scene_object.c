@@ -1162,7 +1162,7 @@ void sub_08225B74(void *);
 
 void sub_0821DE30(void *);
 
-void sub_08221110(void *, u32, u32, s32, s32);
+void Palette_InterpolateBanks(void *, u32, u32, s32, s32);
 
 static inline u8 ownerIsCurrent(u32 owner)
 {
@@ -1240,8 +1240,8 @@ s32 SceneObjects_Update(struct SceneObjectManager *manager)
             AnimData_SelectPaletteBank(&p->animationData, p->basePalette);
     }
     if (manager->fading) {
-        sub_08221110(manager->paletteA, manager->fromA, manager->toA, manager->fade, 5);
-        sub_08221110(manager->paletteB, manager->fromB, manager->toB, manager->fade, 5);
+        Palette_InterpolateBanks(manager->paletteA, manager->fromA, manager->toA, manager->fade, 5);
+        Palette_InterpolateBanks(manager->paletteB, manager->fromB, manager->toB, manager->fade, 5);
         if (!manager->descending) {
             if (++manager->fade > 31) {
                 manager->fade = 32;

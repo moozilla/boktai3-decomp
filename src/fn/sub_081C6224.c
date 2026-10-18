@@ -1,11 +1,13 @@
 #include "global.h"
-#define SceneObject_StartBackgroundScript sub_081C6224
 #define gDisplayControlShadow gUnk_03004BD8
 extern u16 gUnk_03004BD8;
-struct SceneBackgroundOwner { u8 unknown0[0x35c]; void *script; };
+struct SceneBackgroundOwner {
+    u8 unknown0[0x35c];
+    void *script;
+};
 void *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, void *);
-void sub_081C6224(struct SceneBackgroundOwner *p)
+void SceneObject_StartBackgroundScript(struct SceneBackgroundOwner *p)
 {
     u32 layers[1];
     void *script;

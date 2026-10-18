@@ -1,8 +1,13 @@
 #include "global.h"
-#define SceneEffect_InitializeEmitterOptions sub_08199374
 
-struct EmitterRingSlot { u32 update, destroy; u8 data[0x150]; };
-struct EmitterParticleSlot { u32 update, destroy; u8 data[0xb0]; };
+struct EmitterRingSlot {
+    u32 update, destroy;
+    u8 data[0x150];
+};
+struct EmitterParticleSlot {
+    u32 update, destroy;
+    u8 data[0xb0];
+};
 struct SceneEffectEmitter {
     u8 pad00[0x1c];
     u8 state, timer, ringCount, particleCount;
@@ -14,7 +19,7 @@ struct SceneEffectEmitter {
 s32 Script_GetValue(void);
 s32 Script_SeekToKeyword(u32);
 
-s32 sub_08199374(struct SceneEffectEmitter *emitter)
+s32 SceneEffect_InitializeEmitterOptions(struct SceneEffectEmitter *emitter)
 {
     struct EmitterRingSlot *ring;
     struct EmitterParticleSlot *particle;

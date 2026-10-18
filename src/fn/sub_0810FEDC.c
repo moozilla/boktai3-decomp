@@ -6,7 +6,7 @@ struct S {
     u8 f[0x24];
     struct E e[8];
 };
-void sub_08219728(void *, void *, u16);
+void Anim_SelectWidgetGlyph(void *, void *, u16);
 void LinkScorePanel_SetNumber(struct S *s, s32 k, s32 v)
 {
     s32 idx = k * 4 + 1;
@@ -15,23 +15,23 @@ void LinkScorePanel_SetNumber(struct S *s, s32 k, s32 v)
         d++;
         v -= 1000;
     }
-    sub_08219728(&s->e[idx], (u8 *)s + 0x704, d);
+    Anim_SelectWidgetGlyph(&s->e[idx], (u8 *)s + 0x704, d);
     d = 0x3e;
     while (v > 99) {
         d++;
         v -= 100;
     }
-    sub_08219728(&s->e[idx + 1], (u8 *)s + 0x704, d);
+    Anim_SelectWidgetGlyph(&s->e[idx + 1], (u8 *)s + 0x704, d);
     d = 0x3e;
     while (v > 9) {
         d++;
         v -= 10;
     }
-    sub_08219728(&s->e[idx + 2], (u8 *)s + 0x704, d);
+    Anim_SelectWidgetGlyph(&s->e[idx + 2], (u8 *)s + 0x704, d);
     d = 0x3e;
     while (v > 0) {
         d++;
         v -= 1;
     }
-    sub_08219728(&s->e[idx + 3], (u8 *)s + 0x704, d);
+    Anim_SelectWidgetGlyph(&s->e[idx + 3], (u8 *)s + 0x704, d);
 }

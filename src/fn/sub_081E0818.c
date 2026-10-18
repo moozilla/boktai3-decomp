@@ -1,6 +1,5 @@
 #include "global.h"
 // Names are tentative, based on the static state transitions and memory writes.
-#define ScriptPrompt_ResetDisplay sub_081E0818
 #define gScriptPromptSettings gUnk_02000388
 struct ScriptPromptSprite {
     u8 unknown[8];
@@ -15,14 +14,17 @@ struct ScriptPrompt {
     u32 state;
     u32 timer;
 };
-struct ScriptPromptSettings { const void *message, *title; s32 o, c, p; };
+struct ScriptPromptSettings {
+    const void *message, *title;
+    s32 o, c, p;
+};
 extern struct ScriptPromptSettings gUnk_02000388;
 void Menu_EraseRect(u32, u32, u32, u32);
 void Menu_DrawText(u32, u32, const u8 *);
 s32 Script_ParseStringRef(const void *);
 u8 *Text_LookupString(s32);
 u8 *PlayerName_GetBuffer(void);
-void sub_081E0818(struct ScriptPrompt *p)
+void ScriptPrompt_ResetDisplay(struct ScriptPrompt *p)
 {
     u8 text[32];
     u32 zero;

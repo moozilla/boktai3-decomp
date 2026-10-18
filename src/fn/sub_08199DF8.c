@@ -1,5 +1,3 @@
-#define CannonBattery_CreateCannon sub_08199DF8
-#define CannonBattery_InitCannon   sub_08199CF4
 #include "global.h"
 struct CannonBatteryPosition {
     s16 x, y, z, unk6;
@@ -32,9 +30,9 @@ struct CannonBatteryPool {
     u8 unk1E[0xA];
     struct CannonBatteryCannon cannons[16];
 };
-void sub_08199CF4(struct CannonBatteryCannon *, s32, s32, s32, s32);
-struct CannonBatteryCannon *sub_08199DF8(struct CannonBatteryPool *pool, s32 x, s32 y, s32 z,
-                                         s32 flip)
+void CannonBattery_InitCannon(struct CannonBatteryCannon *, s32, s32, s32, s32);
+struct CannonBatteryCannon *CannonBattery_CreateCannon(struct CannonBatteryPool *pool, s32 x, s32 y,
+                                                       s32 z, s32 flip)
 {
     struct CannonBatteryCannon *cannon = NULL;
     s32 i;
@@ -48,7 +46,7 @@ struct CannonBatteryCannon *sub_08199DF8(struct CannonBatteryPool *pool, s32 x, 
     }
     if (cannon) {
         cannon->owner = pool;
-        sub_08199CF4(cannon, x, y, z, flip);
+        CannonBattery_InitCannon(cannon, x, y, z, flip);
         result = cannon;
     } else {
         result = NULL;

@@ -1,4 +1,3 @@
-#define Armor_UpdatePositiveTurn     sub_08182CDC
 #define gArmorPositiveTurnAnimations gUnk_0824EBC4
 #include "global.h"
 
@@ -38,7 +37,7 @@ struct ArmorTurnController {
 extern const u32 gArmorPositiveTurnAnimations[];
 void Armor_SetAnimationFromStart(u32, u32);
 
-void sub_08182CDC(struct ArmorTurnController *p, s32 duration)
+void Armor_UpdatePositiveTurn(struct ArmorTurnController *p, s32 duration)
 {
     u8 *s = &p->turnState;
     u8 state = *s;

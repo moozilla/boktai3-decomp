@@ -1,5 +1,3 @@
-#define SceneEffect_CreateEntryTask     sub_0819AA8C
-#define SceneEffect_UpdateEntryState    sub_0819AA08
 #define SceneEffect_InitializeEntryTask SceneBurstEmitter_Init
 #include "global.h"
 struct SceneEffectLink {
@@ -12,14 +10,14 @@ struct SceneEffectLink {
 void *Task_Create(u32, u32);
 void Task_Kill(void *);
 void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
-void sub_0819AA08(void);
+void SceneEffect_UpdateEntryState(void);
 void SceneBurstEmitter_OnDestroy(void);
 s32 SceneBurstEmitter_Init(struct SceneEffectLink *);
-struct SceneEffectLink *sub_0819AA8C(u32 resourceId, const void *origin)
+struct SceneEffectLink *SceneEffect_CreateEntryTask(u32 resourceId, const void *origin)
 {
     struct SceneEffectLink *p = Task_Create(8, 0x40);
     if (p) {
-        Task_SetCallbacks(p, sub_0819AA08, SceneBurstEmitter_OnDestroy);
+        Task_SetCallbacks(p, SceneEffect_UpdateEntryState, SceneBurstEmitter_OnDestroy);
         p->resourceId = 30;
         p->origin = 0;
         if (SceneBurstEmitter_Init(p) < 0) {

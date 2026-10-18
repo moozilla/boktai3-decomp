@@ -1,4 +1,3 @@
-#define CannonBattery_InitMuzzleFlash sub_0819A110
 #include "global.h"
 #include "engine.h"
 struct CannonBatteryPosition {
@@ -15,8 +14,8 @@ u32 CannonBattery_LoadAnimation(void);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void CannonBattery_UpdateMuzzleFlash(void);
 void CannonBattery_DestroyMuzzleFlash(void);
-void sub_0819A110(void *pool, struct CannonBatteryMuzzleFlash *p,
-                  struct CannonBatteryPosition *origin, s32 horizontal)
+void CannonBattery_InitMuzzleFlash(void *pool, struct CannonBatteryMuzzleFlash *p,
+                                   struct CannonBatteryPosition *origin, s32 horizontal)
 {
     void *resource = (void *)CannonBattery_LoadAnimation();
     AnimData_Load(p->animation, 0x8D95);

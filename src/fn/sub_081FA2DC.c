@@ -1,4 +1,3 @@
-#define Ratatosk_InitOuterCollider sub_081FA2DC
 #include "global.h"
 struct ColliderVector {
     s32 x : 16, y : 16, z : 16, pad : 16;
@@ -15,7 +14,7 @@ void Collider_SetPosition(void *, void *, u32);
 void Collider_SetCallback(void *, void *, void *);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Ratatosk_OnOuterCollision(void);
-void sub_081FA2DC(struct Ratatosk *p)
+void Ratatosk_InitOuterCollider(struct Ratatosk *p)
 {
     void *collider = p->outerCollider;
     struct ColliderVector size, offset;

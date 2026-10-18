@@ -1,6 +1,4 @@
-#define PositionQueue_FlushPending sub_08220A58
-#define gEnginePauseFlags          gUnk_0300523C
-#define Collision_ProcessPairs     sub_08220938
+#define gEnginePauseFlags gUnk_0300523C
 #include "global.h"
 extern u32 gUnk_0300523C;
 struct PositionQueue {
@@ -13,8 +11,8 @@ struct PositionQueue {
     u16 count;
     u16 ready;
 };
-void sub_08220938(void *, void *);
-s32 sub_08220A58(struct PositionQueue *q)
+void Collision_ProcessPairs(void *, void *);
+s32 PositionQueue_FlushPending(struct PositionQueue *q)
 {
     if (q->ready) {
         if (gUnk_0300523C) {
@@ -26,7 +24,7 @@ s32 sub_08220A58(struct PositionQueue *q)
         } else {
             u32 *pending;
             if (q->count)
-                sub_08220938(q->pending, q->source);
+                Collision_ProcessPairs(q->pending, q->source);
             q->ready = 0;
             pending = q->pending;
             *pending = 0;

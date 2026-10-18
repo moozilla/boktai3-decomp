@@ -26,7 +26,7 @@ struct SceneStatusIndicatorManager *BlinkingEffect_EnsurePool(void);
 struct SceneStatusIndicator *SceneStatusIndicator_Allocate(struct SceneStatusIndicatorManager *);
 void sub_08217DE0(struct SceneStatusIndicator *, void *, u32);
 void Effect_SetOrigin(struct SceneStatusIndicator *, s32, s32);
-void sub_08217EEC(struct SceneStatusIndicator *, void *, u32);
+void SpriteDrawable_SelectTileFrame(struct SceneStatusIndicator *, void *, u32);
 struct SceneStatusIndicator *
 SceneStatusIndicator_Create(struct SceneStatusIndicatorPosition *position)
 {
@@ -50,7 +50,7 @@ SceneStatusIndicator_Create(struct SceneStatusIndicatorPosition *position)
     entry->position.vector.y += 30;
     sub_08217DE0(entry, manager->resource, 0);
     Effect_SetOrigin(entry, -8, -8);
-    sub_08217EEC(entry, manager->resource, 52);
+    SpriteDrawable_SelectTileFrame(entry, manager->resource, 52);
     entry->flags |= 1;
     entry->mode = one;
     return entry;

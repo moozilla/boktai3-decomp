@@ -1,6 +1,5 @@
-#define SceneProjectile_RespondToContact sub_081FC800
-#define gSceneProjectilePool             gUnk_020005E8
-#define gPlayer                          gUnk_02000580
+#define gSceneProjectilePool gUnk_020005E8
+#define gPlayer              gUnk_02000580
 #include "global.h"
 struct SceneProjectileState {
     u16 unknown;
@@ -28,7 +27,8 @@ extern struct ProjectilePoolState *gSceneProjectilePool;
 extern u8 *gPlayer;
 s32 Player_StartForcedStun(u8 *, s32);
 void Sound_PlaySong(u32);
-void sub_081FC800(void *unused, struct ProjectileContact *contact, struct SceneProjectile *p)
+void SceneProjectile_RespondToContact(void *unused, struct ProjectileContact *contact,
+                                      struct SceneProjectile *p)
 {
     struct SceneProjectileState *state = (void *)((u8 *)p + 0x28);
     if (p->state.mode == 1 && contact->kind == 1)

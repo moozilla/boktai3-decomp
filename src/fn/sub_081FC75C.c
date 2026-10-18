@@ -1,6 +1,5 @@
-#define SceneProjectile_EmitPeriodicParticle sub_081FC75C
-#define gRandomTableIndex                    gUnk_03005308
-#define gRandomTable                         gUnk_0203B400
+#define gRandomTableIndex gUnk_03005308
+#define gRandomTable      gUnk_0203B400
 #include "global.h"
 struct SceneProjectile {
     u32 age;
@@ -13,10 +12,10 @@ struct SceneProjectile {
 extern u32 gRandomTableIndex;
 extern const u16 gRandomTable[];
 s32 Mod(s32, s32);
-void sub_081FBDE0(u8 *);
-void sub_081FBBA8(u8 *, s32 *);
+void SlotMotion_Initialize(u8 *);
+void SceneParticles_SpawnAtPosition(u8 *, s32 *);
 void Ratatosk_ConfigureParticle(u8 *, u16, u32, u8, u32, u32);
-s32 sub_081FC75C(struct SceneProjectile *p)
+s32 SceneProjectile_EmitPeriodicParticle(struct SceneProjectile *p)
 {
     u8 particle[0x18];
     u32 scale;
@@ -33,9 +32,9 @@ s32 sub_081FC75C(struct SceneProjectile *p)
         scale = *(const u16 *)(offset + (u32)gRandomTable);
         scale &= 1;
         scale += 1;
-        sub_081FBDE0(particle);
+        SlotMotion_Initialize(particle);
         Ratatosk_ConfigureParticle(particle, 40, 0, 0, 1, scale << 9);
-        sub_081FBBA8(particle, p->position);
+        SceneParticles_SpawnAtPosition(particle, p->position);
     }
     return 0;
 }

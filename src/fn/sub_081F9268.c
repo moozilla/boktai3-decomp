@@ -1,4 +1,3 @@
-#define SceneEffect_EnterAndRestart sub_081F9268
 #include "global.h"
 struct SceneEffectState {
     u8 pad[0xAA];
@@ -22,7 +21,7 @@ static inline u8 TakeFlag(struct SceneEffectState *p)
     }
     return FALSE;
 }
-void sub_081F9268(struct SceneEffectState *p)
+void SceneEffect_EnterAndRestart(struct SceneEffectState *p)
 {
     u32 *c;
     u8 t, entry;

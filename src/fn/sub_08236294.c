@@ -12,7 +12,7 @@ struct P {
     u16 vx, vy, vz;
 };
 
-void sub_08217EEC(struct P *, void *, u32);
+void SpriteDrawable_SelectTileFrame(struct P *, void *, u32);
 
 void RadialBurstEffect_UpdateParticle(struct P *p)
 {
@@ -26,6 +26,6 @@ void RadialBurstEffect_UpdateParticle(struct P *p)
         p->y += p->vy;
         p->z += p->vz;
         if ((u16)n == 10)
-            sub_08217EEC(p, unused, p->a29 + 1);
+            SpriteDrawable_SelectTileFrame(p, unused, p->a29 + 1);
     }
 }

@@ -1,5 +1,4 @@
 #include "global.h"
-#define ScreenTransition_BeginDownwardMotion sub_081C0780
 /* Tentative: moves the child from (120,80,0) to (120,144,0). */
 struct ScreenTransition {
     u8 unknown0[0x30];
@@ -8,10 +7,12 @@ struct ScreenTransition {
     void (*update)(void);
     u32 timer;
 };
-struct ScreenPoint { s16 x, y, z; };
-void sub_081C32C8(void *, struct ScreenPoint *, struct ScreenPoint *, int, int, int, int);
+struct ScreenPoint {
+    s16 x, y, z;
+};
+void SceneTarget_BeginMove(void *, struct ScreenPoint *, struct ScreenPoint *, int, int, int, int);
 void sub_081C07C8(void);
-void sub_081C0780(struct ScreenTransition *p)
+void ScreenTransition_BeginDownwardMotion(struct ScreenTransition *p)
 {
     struct ScreenPoint start, end;
     s16 *q = (s16 *)&start;
@@ -26,7 +27,7 @@ void sub_081C0780(struct ScreenTransition *p)
         r[1] = y2;
         r[2] = zero;
     }
-    sub_081C32C8(p->child, &start, &end, 1, 64, 128, 60);
+    SceneTarget_BeginMove(p->child, &start, &end, 1, 64, 128, 60);
     p->update = sub_081C07C8;
     p->timer = zero;
 }

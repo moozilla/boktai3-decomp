@@ -1,5 +1,3 @@
-#define ProjectileEmitter_UpdateAttack          sub_08210180
-#define ProjectileEmitter_WaitForPlayerApproach sub_08210100
 #include "global.h"
 /* Names and field interpretations are tentative. */
 struct EmitterPosition {
@@ -23,10 +21,10 @@ struct ProximityProjectileEmitter {
 struct EmitterPosition *Player_GetEffectivePosition(s32);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);
-u32 sub_08210180(struct ProximityProjectileEmitter *);
+u32 ProjectileEmitter_UpdateAttack(struct ProximityProjectileEmitter *);
 void Anim_SetDurationScale(void *, u32);
-u32 sub_08210100(struct ProximityProjectileEmitter *);
-u32 sub_08210180(struct ProximityProjectileEmitter *p)
+u32 ProjectileEmitter_WaitForPlayerApproach(struct ProximityProjectileEmitter *);
+u32 ProjectileEmitter_UpdateAttack(struct ProximityProjectileEmitter *p)
 {
     struct EmitterPosition *pos = Player_GetEffectivePosition(0);
     struct EmitterPosition *origin = &p->position;
@@ -47,7 +45,7 @@ u32 sub_08210180(struct ProximityProjectileEmitter *p)
         Anim_SetDurationScale(p->animation, 0x40);
     if (distance > p->triggerDistanceSquared) {
         Anim_RestartSequence(p->animation, p->animationResource, 11, 0, 0);
-        p->update = sub_08210100;
+        p->update = ProjectileEmitter_WaitForPlayerApproach;
     }
     return 0;
 }

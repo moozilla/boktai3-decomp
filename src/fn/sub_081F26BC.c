@@ -1,5 +1,4 @@
 /* Tentative family and field names, based on static accesses. */
-#define SpriteGroup_UpdateSlots sub_081F26BC
 #include "global.h"
 struct SpriteGroupSlot {
     u8 resetRequested, state, unknown2[0x256];
@@ -13,7 +12,7 @@ struct SpriteGroup {
 extern void *gUnk_08613E08[];
 #define gSpriteGroupSlotCallbacks gUnk_08613E08
 void sub_08249244(void *, void *, s32, void *);
-u32 sub_081F26BC(struct SpriteGroup *p)
+u32 SpriteGroup_UpdateSlots(struct SpriteGroup *p)
 {
     struct SpriteGroupSlot *slot = p->slots;
     s32 i = 0;

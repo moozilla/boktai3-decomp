@@ -11,7 +11,7 @@ struct O {
     u16 hf8;
     u16 hfa;
 };
-void sub_081B78CC(void *);
+void AnimatedMarker_BeginActive(void *);
 
 void GrowthHazard_UpdateIdle(struct O *p)
 {
@@ -19,5 +19,5 @@ void GrowthHazard_UpdateIdle(struct O *p)
     s32 m = ~4;
     s->fl &= m;
     if (p->hf8 >= p->hfa)
-        sub_081B78CC(p);
+        AnimatedMarker_BeginActive(p);
 }

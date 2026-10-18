@@ -11,7 +11,7 @@ struct Fade08197E0C {
 };
 u32 SunClock_GetPhase(void);
 u8 TimePalette_GetSourceIndex(u32);
-void sub_08221110(void *, u32, u32, u32, u32);
+void Palette_InterpolateBanks(void *, u32, u32, u32, u32);
 
 void TimePalette_UpdateTransition(struct Fade08197E0C *f)
 {
@@ -27,7 +27,7 @@ void TimePalette_UpdateTransition(struct Fade08197E0C *f)
         f->timer++;
         a = f->colors[f->from];
         b = f->colors[f->to];
-        sub_08221110(f->out, a, b, f->timer, 6);
+        Palette_InterpolateBanks(f->out, a, b, f->timer, 6);
         if (f->timer > 0x3f)
             f->from = f->to;
     }

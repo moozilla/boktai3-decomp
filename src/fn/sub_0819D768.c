@@ -1,5 +1,4 @@
 #include "global.h"
-#define ActorAction_PlayDescentSequence sub_0819D768
 
 struct ActorActionSequence {
     u8 unknown0[0x56];
@@ -28,7 +27,7 @@ static inline u8 ConsumeEntry(struct ActorActionSequence *p)
     }
     return 0;
 }
-void sub_0819D768(struct ActorActionSequence *p)
+void ActorAction_PlayDescentSequence(struct ActorActionSequence *p)
 {
     struct ActorActionSequence *actor = p;
     u8 *action = p->action;
@@ -38,34 +37,41 @@ void sub_0819D768(struct ActorActionSequence *p)
         ActionState_SetState(action, 0);
     }
     switch (*action) {
-    case 0:
-        if (*(u32 *)(action + 4) == 0) {
-            u32 animation = 0x15;
-            actor->animation = animation;
+        case 0:
+            if (*(u32 *)(action + 4) == 0) {
+                u32 animation = 0x15;
+                actor->animation = animation;
+                (*(u32 *)(action + 4))++;
+            } else if (actor->animationDone)
+                ActionState_AdvanceState(action);
+            break;
+        case 1:
+            if (*(u32 *)(action + 4) == 0) {
+                u32 animation = 0x16;
+                actor->animation = animation;
+                (*(u32 *)(action + 4))++;
+            } else if (actor->animationDone)
+                ActionState_AdvanceState(action);
+            break;
+        case 2:
+            if (*(u32 *)(action + 4) == 0) {
+                u32 animation = 0x13;
+                actor->animation = animation;
+                (*(u32 *)(action + 4))++;
+            } else if (actor->animationDone)
+                ActionState_AdvanceState(action);
+            break;
+        case 3:
+            if (*(u32 *)(action + 4) == 0) {
+                u32 animation = 1;
+                actor->animation = animation;
+            }
             (*(u32 *)(action + 4))++;
-        } else if (actor->animationDone) ActionState_AdvanceState(action);
-        break;
-    case 1:
-        if (*(u32 *)(action + 4) == 0) {
-            u32 animation = 0x16;
-            actor->animation = animation;
-            (*(u32 *)(action + 4))++;
-        } else if (actor->animationDone) ActionState_AdvanceState(action);
-        break;
-    case 2:
-        if (*(u32 *)(action + 4) == 0) {
-            u32 animation = 0x13;
-            actor->animation = animation;
-            (*(u32 *)(action + 4))++;
-        } else if (actor->animationDone) ActionState_AdvanceState(action);
-        break;
-    case 3:
-        if (*(u32 *)(action + 4) == 0) { u32 animation = 1; actor->animation = animation; }
-        (*(u32 *)(action + 4))++;
-        if (actor->height <= 0x340) ActionState_SetState(action, 4);
-        break;
-    case 4:
-        p->done = 1;
-        break;
+            if (actor->height <= 0x340)
+                ActionState_SetState(action, 4);
+            break;
+        case 4:
+            p->done = 1;
+            break;
     }
 }

@@ -22,7 +22,7 @@ extern const s16 gUnk_086149C4[];
 void Player_EnterKindTwo(struct P *);
 void ActorSequence_Begin(struct P *, s32, s32);
 void Sound_PlaySong(s32);
-void sub_082375FC(struct Vec *, s32, s32, s32, s32, s32, s32);
+void MovingSprite_Create_082375FC(struct Vec *, s32, s32, s32, s32, s32, s32);
 void Player_UpdateSixPhaseAction(void);
 
 static inline int trunc12(int x)
@@ -48,7 +48,7 @@ void PlayerCue_Shoot(struct P *p, s32 a, u32 c)
         Sound_PlaySong(0xCD);
         id = 0x4B;
     }
-    sub_082375FC(&v, id, 0, p->dir, 0x20, 0, a);
+    MovingSprite_Create_082375FC(&v, id, 0, p->dir, 0x20, 0, a);
     p->c = c;
     Player_EnterKindTwo(p);
     ActorSequence_Begin(p, 3, 2);

@@ -1,6 +1,5 @@
-#define ActorController_UpdateTimedMotion sub_08184B08
-#define gActorTimedMotionAnimations       gUnk_0824EEE0
-#define gSineTable                        gUnk_086149C4
+#define gActorTimedMotionAnimations gUnk_0824EEE0
+#define gSineTable                  gUnk_086149C4
 // Names describe observed behavior; the action interpretation is tentative.
 #include "global.h"
 
@@ -35,7 +34,7 @@ static inline void SetMotion(struct ActorMotionVector *v, s32 angle, s32 speed)
     v->z = RoundMotion(gUnk_086149C4[angle] * speed);
 }
 
-void sub_08184B08(u8 *p)
+void ActorController_UpdateTimedMotion(u8 *p)
 {
     u8 *s = p + 0xB40;
     u8 st = *s;

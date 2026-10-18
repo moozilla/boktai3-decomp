@@ -1,4 +1,3 @@
-#define ScenePanel_UpdateActiveTransition sub_081A809C
 #define ScenePanel_StopSound Vanargand_StopActionSequence
 #include "global.h"
 /* Tentative ScenePanel family; names describe observed state and sprite operations. */
@@ -22,7 +21,7 @@ static inline u8 ScenePanel_ConsumePending(struct ScenePanelActiveTransition *pa
     }
     return FALSE;
 }
-void sub_081A809C(struct ScenePanelActiveTransition *panel)
+void ScenePanel_UpdateActiveTransition(struct ScenePanelActiveTransition *panel)
 {
     if (ScenePanel_ConsumePending(panel)) {
         u32 state = 14;

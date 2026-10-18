@@ -1,4 +1,3 @@
-#define SceneActor_UpdateAnimation0Timer sub_081F5D6C
 #define Callback_InvokeWithArgument Callback_InvokeActor
 #include "global.h"
 typedef struct TimedSceneActor {
@@ -43,7 +42,7 @@ static inline void setFacing(TimedSceneActor *p, int angle)
     p->facing8 = value;
 }
 s32 Callback_InvokeActor(void *, void *);
-void sub_081F5D6C(TimedSceneActor *p, s32 elapsed)
+void SceneActor_UpdateAnimation0Timer(TimedSceneActor *p, s32 elapsed)
 {
     TimedSceneActor *self = p;
     if (p->enter) {

@@ -1,6 +1,5 @@
-#define RisingActorManager_BeginRaise    sub_081FEA80
 #define RisingActorManager_EnsureCreated SunOrb_GetOrCreateManager
-#define RisingActor_SetCallback SunOrb_SetUpdateCallback
+#define RisingActor_SetCallback          SunOrb_SetUpdateCallback
 #define gRisingActorManager              gUnk_020005EC
 #include "global.h"
 struct RisingActor {
@@ -19,7 +18,7 @@ extern struct RisingActorManager *gUnk_020005EC;
 void SunOrb_GetOrCreateManager(void);
 void sub_081FDAF4(void);
 void SunOrb_SetUpdateCallback(void *, void (*)(void));
-s32 sub_081FEA80(s32 index)
+s32 RisingActorManager_BeginRaise(s32 index)
 {
     struct RisingActorManager *manager = gUnk_020005EC;
     if (!manager) {

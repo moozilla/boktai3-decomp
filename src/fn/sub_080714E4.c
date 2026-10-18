@@ -21,7 +21,7 @@ void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *a
         struct ContactPosition *earlyPosition = &actor->position;
         Path_GetPointPositionById((u16 *)earlyPosition, route->parameterA, route->parameterC);
         Route_Start(route, route->parameterA, route->parameterB, route->parameterC);
-        sub_0821FD3C(actor->routeObject, earlyPosition);
+        ProximityVolume_TranslateBounds(actor->routeObject, earlyPosition);
         actor->currentRoute = route;
     }
     {

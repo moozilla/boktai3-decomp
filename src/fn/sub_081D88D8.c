@@ -1,5 +1,4 @@
-#define SpriteSequence_BeginStageAnimation sub_081D88D8
-#define SpriteSequence_SetCallback Projectile_SetUpdateCallback
+#define SpriteSequence_SetCallback  Projectile_SetUpdateCallback
 #define SpriteGroup_SelectAnimation Task4E01_SetTrailSpriteResources
 #include "global.h"
 struct SpriteSequenceState {
@@ -24,7 +23,7 @@ void Projectile_SetUpdateCallback(void *, void *);
 void Task4E01_SetTrailSpriteResources(void *, u32);
 void sub_081D8934(void);
 extern const u32 gUnk_08613684[];
-s32 sub_081D88D8(struct SpriteSequence *p)
+s32 SpriteSequence_BeginStageAnimation(struct SpriteSequence *p)
 {
     struct SpriteSequenceState *state = &p->state;
     void *group = ResourceRegistry_GetResource(0x4E01);

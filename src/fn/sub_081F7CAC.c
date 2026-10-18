@@ -1,9 +1,8 @@
 #include "global.h"
 // Tentative family name: actor animation/state handlers; specific actor identity unknown.
-#define AnimationActor_UpdateProjectileSequence sub_081F7CAC
-#define gPreviewKeys                            gUnk_03005260
-#define gRandomIndex                            gUnk_03005308
-#define gRandomTable                            gUnk_0203B400
+#define gPreviewKeys gUnk_03005260
+#define gRandomIndex gUnk_03005308
+#define gRandomTable gUnk_0203B400
 struct AnimationPosition {
     u32 packedXY, packedZ;
 };
@@ -41,7 +40,7 @@ static inline u8 ConsumeActivation(struct AnimationActor *p)
     }
     return 0;
 }
-void sub_081F7CAC(struct AnimationActor *p)
+void AnimationActor_UpdateProjectileSequence(struct AnimationActor *p)
 {
     struct AnimationActor *q = p;
     if (ConsumeActivation(q)) {

@@ -1,5 +1,3 @@
-#define OffsetActor_UpdateFacingWait sub_0819D660
-#define OffsetActor_TestFacingSector sub_0819C83C
 #include "global.h"
 struct OffsetActorAction {
     u8 state, pad1[3];
@@ -19,7 +17,7 @@ struct OffsetActor {
 };
 void ActionState_Reset(void *);
 void ActionState_SetState(void *, u32);
-s32 OffsetActor_TestFacingSector(struct OffsetActor *);
+s32 DirectionGate_IsAngleInModeRange(struct OffsetActor *);
 static inline u8 Enter(struct OffsetActor *p)
 {
     if (p->entered) {
@@ -33,7 +31,7 @@ static inline void SetAnimation(struct OffsetActor *p, u32 id)
 {
     p->animation = id;
 }
-void sub_0819D660(struct OffsetActor *p)
+void OffsetActor_UpdateFacingWait(struct OffsetActor *p)
 {
     struct OffsetActor *obj = p;
     struct OffsetActorAction *s = &p->action;
@@ -44,7 +42,7 @@ void sub_0819D660(struct OffsetActor *p)
         case 0:
             if (!s->frame)
                 SetAnimation(obj, 1);
-            if (OffsetActor_TestFacingSector(obj)) {
+            if (DirectionGate_IsAngleInModeRange(obj)) {
                 s->state = 1;
                 SetAnimation(obj, 2);
             } else

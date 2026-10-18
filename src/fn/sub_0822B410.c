@@ -1,5 +1,4 @@
-#define MusicSlots_StopAllAndRetainResumable sub_0822B410
-#define gMusicSlotSongs gUnk_03005470
+#define gMusicSlotSongs       gUnk_03005470
 #define gMusicSlotPlayerTable gUnk_082643EC
 #include "global.h"
 #include "gba/m4a_internal.h"
@@ -9,7 +8,7 @@ extern const struct MusicPlayer gMusicSlotPlayerTable[];
 void m4aMPlayAllStop(void);
 
 /* Tentative: preserve songs in resumable slots while stopping every player. */
-void sub_0822B410(void)
+void MusicSlots_StopAllAndRetainResumable(void)
 {
     s32 i = 0;
     const struct MusicPlayer *players = gMusicSlotPlayerTable;

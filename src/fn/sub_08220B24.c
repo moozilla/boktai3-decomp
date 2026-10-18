@@ -1,4 +1,3 @@
-#define Collision_AccumulateNearbyResponse sub_08220B24
 #include "global.h"
 struct CollisionEntry {
     u8 unknown0[6];
@@ -9,7 +8,8 @@ struct CollisionEntry {
     u8 layer;
     u8 responseFlags;
 };
-void sub_08220B24(struct CollisionEntry *a, struct CollisionEntry *b, s32 amount)
+void Collision_AccumulateNearbyResponse(struct CollisionEntry *a, struct CollisionEntry *b,
+                                        s32 amount)
 {
     if ((b->flags & 0x100) && (a->flags & 0x100)) {
         s32 delta = b->layer - a->layer;

@@ -1,4 +1,3 @@
-#define CollectionBook_RefreshCollectedEntryVisibility sub_0821304C
 #include "global.h"
 
 /* Tentative: bit 0 suppresses display of an uncollected entry. */
@@ -17,7 +16,7 @@ struct CollectionBook {
 
 s32 CollectionBook_IsEntryCollected(s32 n);
 
-s32 sub_0821304C(struct CollectionBook *book)
+s32 CollectionBook_RefreshCollectedEntryVisibility(struct CollectionBook *book)
 {
     s32 i;
     u32 hidden = 1;

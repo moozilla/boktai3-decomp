@@ -1,4 +1,3 @@
-#define SpriteComponent_SetFramePosition sub_081805F0
 #include "global.h"
 
 struct SpriteComponent {
@@ -12,7 +11,8 @@ struct SpriteComponent {
 void Sound_PlaySong(u32);
 s32 Callback_InvokeActor(void *, void *);
 
-s32 sub_081805F0(struct SpriteComponent *component, s32 frame, const u32 *position)
+s32 SpriteComponent_SetFramePosition(struct SpriteComponent *component, s32 frame,
+                                     const u32 *position)
 {
     u32 x, y;
     if (component->frame > (frame & 0xFF))

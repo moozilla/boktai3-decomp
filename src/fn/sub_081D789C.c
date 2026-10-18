@@ -1,4 +1,3 @@
-#define SpriteGroup_InitFourSprites sub_081D789C
 #define Sprite_SetOffsets Effect_SetOrigin
 #include "global.h"
 struct SpriteGroupEntry {
@@ -15,9 +14,9 @@ struct SpriteGroup {
 void *AnimData_FindEntry(s32);
 void sub_08217DE0(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
-void sub_08217EEC(void *, void *, u32);
+void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 void Effect_SetPalette(void *, u32);
-void sub_081D789C(struct SpriteGroup *p, u32 animation)
+void SpriteGroup_InitFourSprites(struct SpriteGroup *p, u32 animation)
 {
     u8 *active;
     struct SpriteGroupEntry *entry;
@@ -32,7 +31,7 @@ void sub_081D789C(struct SpriteGroup *p, u32 animation)
     do {
         sub_08217DE0(entry, p->resource, 1);
         Effect_SetOrigin(entry, offset, offset);
-        sub_08217EEC(entry, p->resource, animation);
+        SpriteDrawable_SelectTileFrame(entry, p->resource, animation);
         Effect_SetPalette(entry, 1);
         *active = 0;
         active += 0x30;

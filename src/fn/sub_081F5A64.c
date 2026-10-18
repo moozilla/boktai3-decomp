@@ -1,4 +1,3 @@
-#define SceneActor_UpdateAnimation33Timer sub_081F5A64
 #include "global.h"
 typedef struct TimedSceneActor {
     u8 pad0[0x51];
@@ -31,7 +30,7 @@ static inline void setFacing(TimedSceneActor *p, int angle)
     value &= shifted;
     p->facing8 = value;
 }
-void sub_081F5A64(TimedSceneActor *p, s32 elapsed)
+void SceneActor_UpdateAnimation33Timer(TimedSceneActor *p, s32 elapsed)
 {
     if (p->enter) {
         p->enter = 0;

@@ -16,7 +16,7 @@ struct Obj {
 };
 extern u8 *gUnk_030042E4;
 void Effect_SetOrigin(struct Obj *, s32, s32);
-void sub_08217EEC(struct Obj *, struct Pal *, u32);
+void SpriteDrawable_SelectTileFrame(struct Obj *, struct Pal *, u32);
 u32 Palette_CacheReservedObjectBank(u32, u8 *);
 
 void Effect_Initialize(struct Obj *o, struct Pal *p, u32 c)
@@ -27,7 +27,7 @@ void Effect_Initialize(struct Obj *o, struct Pal *p, u32 c)
         o->fF = 1;
         o->f10 = 0;
         Effect_SetOrigin(o, -8, -8);
-        sub_08217EEC(o, p, 0);
+        SpriteDrawable_SelectTileFrame(o, p, 0);
         o->fE = Palette_CacheReservedObjectBank(p->f6, gUnk_030042E4 + (p->f6 << 5));
         o->f20 = 0;
         o->f24 = 0;

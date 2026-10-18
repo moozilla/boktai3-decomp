@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define ScenePanelEffect_InitPool      sub_0818EBF4
 #define gScenePanelEffectColliderShape gUnk_0824F184
 
 struct ScenePanelEffectSlot {
@@ -27,7 +26,7 @@ extern u8 gScenePanelEffectColliderShape[];
 void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
 void *ScriptProc_Start(u16, u16);
 
-void sub_0818EBF4(struct ScenePanelEffectPool *pool)
+void ScenePanelEffect_InitPool(struct ScenePanelEffectPool *pool)
 {
     s32 i;
     u32 *word;

@@ -1,5 +1,4 @@
 #include "global.h"
-#define ColliderActor_UpdateCameraOffset sub_0819C51C
 struct ColliderActorVector {
     s16 x, y, z, pad;
 };
@@ -18,7 +17,7 @@ struct ColliderActor {
     struct ColliderActorVector *cameraAnchor;
 };
 void Camera_SetOffset(s32, void *);
-void sub_0819C51C(struct ColliderActor *actor)
+void ColliderActor_UpdateCameraOffset(struct ColliderActor *actor)
 {
     struct ColliderActorCamera *camera = &actor->camera;
     s32 shift = camera->shift;

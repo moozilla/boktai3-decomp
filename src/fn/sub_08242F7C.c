@@ -1,4 +1,3 @@
-#define Player_FindMaskedSlot sub_08242F7C
 #define gPlayerSlots gUnk_02000580
 #include "global.h"
 #include "player.h"
@@ -8,7 +7,7 @@ struct PlayerSelection {
     u16 playerMask;
 };
 
-struct Player *sub_08242F7C(const struct PlayerSelection *selection)
+struct Player *Player_FindMaskedSlot(const struct PlayerSelection *selection)
 {
     s32 i = 0;
     struct Player **base = gUnk_02000580;

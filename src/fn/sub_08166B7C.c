@@ -21,7 +21,7 @@ void Hud_SaveSecondaryGridSelection(void *);
 s32 Inventory_GetQuantityByStorage(u32, u32);
 s32 MenuEntries_CountAvailable(void *, s32);
 s32 sub_0816D4E4(s32);
-s32 sub_0822DCB4(u32);
+s32 ItemRecord_MeetsLevelRequirement(u32);
 s32 MenuDisplay_UpdateActionPrompt(struct MenuDisplay *p, s32 group)
 {
     struct MenuSelection *selection = &p->selection;
@@ -43,7 +43,7 @@ s32 MenuDisplay_UpdateActionPrompt(struct MenuDisplay *p, s32 group)
                 if (MenuEntries_CountAvailable(p, group) > 1 || group == 3)
                     action = 4;
             } else {
-                if (group != 2 || sub_0822DCB4(selection->current)) {
+                if (group != 2 || ItemRecord_MeetsLevelRequirement(selection->current)) {
                     if (MenuEntries_CountAvailable(p, group) <= 7)
                         action = 1;
                 }

@@ -1,4 +1,3 @@
-#define EffectGroup_Unlink sub_08231480
 #include "global.h"
 
 struct EffectGroup {
@@ -11,7 +10,7 @@ struct EffectGroupPool {
     u8 pad00[0x20];
     struct EffectGroup *head;
 };
-s32 sub_08231480(struct EffectGroupPool *pool, struct EffectGroup *group)
+s32 EffectGroup_Unlink(struct EffectGroupPool *pool, struct EffectGroup *group)
 {
     struct EffectGroup *previous = group->previous;
     struct EffectGroup *next = group->next;

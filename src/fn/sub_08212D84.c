@@ -1,9 +1,6 @@
 #include "global.h"
-#define ForgingBook_InitializeFromScript sub_08212D84
-#define ForgingBook_InitSprites sub_082124D8
-#define ForgingBook_RefreshCategory sub_08212324
 #define gForgingBookWeaponEntries gUnk_08613FE8
-#define gForgingBookItemEntries gUnk_08614019
+#define gForgingBookItemEntries   gUnk_08614019
 
 struct ForgingBook {
     u8 unknown[0x20];
@@ -29,18 +26,18 @@ struct ForgingBook {
 };
 extern const u8 gUnk_08613FE8[], gUnk_08614019[];
 void ForgingBook_InitBackgrounds(struct ForgingBook *);
-void sub_082124D8(struct ForgingBook *);
-s32 sub_08212324(struct ForgingBook *);
+void ForgingBook_InitSprites(struct ForgingBook *);
+s32 ForgingBook_RefreshCategory(struct ForgingBook *);
 s32 Script_SeekToKeyword(u32);
 u32 Script_GetTextSourcePc(void);
 s32 Script_GetKeywordValue(u32, s32);
 int TextWindow_Create(int, int, int, int);
 void ScrollingDialogue_RequestShow(void);
 u32 ScrollingDialogue_ClearScript(void);
-void ScreenTransition_SendCommand(s32,s32,s32,s32,s32,s32,s32);
+void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 void Sound_PlaySong(u32);
 
-s32 sub_08212D84(struct ForgingBook *book)
+s32 ForgingBook_InitializeFromScript(struct ForgingBook *book)
 {
     s32 i, j;
     book->state = 0;
@@ -56,7 +53,7 @@ s32 sub_08212D84(struct ForgingBook *book)
     for (j = 0, i = 0x31; i <= 0x60; i++, j++)
         book->entries[i] = gUnk_08614019[j];
     ForgingBook_InitBackgrounds(book);
-    sub_082124D8(book);
+    ForgingBook_InitSprites(book);
     if (!Script_SeekToKeyword('n'))
         goto fail;
     book->nameText = Script_GetTextSourcePc();
@@ -79,7 +76,7 @@ ready:
     book->textWindow = TextWindow_Create(1, 16, 29, 4);
     ScrollingDialogue_RequestShow();
     ScrollingDialogue_ClearScript();
-    sub_08212324(book);
+    ForgingBook_RefreshCategory(book);
     ScreenTransition_SendCommand(0, book->transition, 4, 4, 4, 0xFFFF, 0);
     Sound_PlaySong(280);
     return 0;

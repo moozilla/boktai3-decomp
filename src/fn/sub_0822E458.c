@@ -1,6 +1,5 @@
-#define Equipment_AssignUniqueSlot sub_0822E458
 #include "game_state.h"
-void sub_0822E458(s32 index, s32 id)
+void Equipment_AssignUniqueSlot(s32 index, s32 id)
 {
     s32 i;
     for (i = 0; i <= 3; i++) {

@@ -1,6 +1,7 @@
 #include "global.h"
-#define SceneEntryPool_CreateEntry sub_08199034
-struct SceneEntry { u8 unknown0[0xB8]; };
+struct SceneEntry {
+    u8 unknown0[0xB8];
+};
 struct SceneEntryPool {
     u8 unknown0[0x1D];
     u8 occupied;
@@ -8,7 +9,7 @@ struct SceneEntryPool {
     struct SceneEntry entries[4];
 };
 void sub_08198F3C(struct SceneEntryPool *, struct SceneEntry *, void *, void *);
-void sub_08199034(struct SceneEntryPool *pool, void *arg1, void *arg2)
+void SceneEntryPool_CreateEntry(struct SceneEntryPool *pool, void *arg1, void *arg2)
 {
     struct SceneEntry *entry = 0;
     s32 index;

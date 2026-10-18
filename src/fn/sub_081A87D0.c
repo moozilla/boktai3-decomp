@@ -1,4 +1,3 @@
-#define ActorSoundPhase_UpdateStop sub_081A87D0
 #define ActorSoundPhase_StopSong Vanargand_StopActionSequence
 #include "global.h"
 struct ActorSoundPhase {
@@ -11,8 +10,8 @@ struct ActorSoundPhase {
     u32 c4;
 };
 void Vanargand_StopActionSequence(void *);
-void sub_081A7C94(void *);
-void sub_081A7D80(void *);
+void ScenePanel_UpdatePairConditions(void *);
+void ScenePanel_ApplyPairTransition(void *);
 static inline u8 chk(struct ActorSoundPhase *p)
 {
     u8 *q = &p->b0;
@@ -23,7 +22,7 @@ static inline u8 chk(struct ActorSoundPhase *p)
     }
     return FALSE;
 }
-void sub_081A87D0(struct ActorSoundPhase *p)
+void ActorSoundPhase_UpdateStop(struct ActorSoundPhase *p)
 {
     struct ActorSoundPhase *q = p;
     if (chk(p)) {
@@ -32,7 +31,7 @@ void sub_081A87D0(struct ActorSoundPhase *p)
         p->st = v;
     }
     if (p->af != 0) {
-        sub_081A7C94(q);
-        sub_081A7D80(q);
+        ScenePanel_UpdatePairConditions(q);
+        ScenePanel_ApplyPairTransition(q);
     }
 }

@@ -1,6 +1,5 @@
-#define Inventory_AssignUniqueSecondarySlot sub_0822E6A4
 #include "game_state.h"
-void sub_0822E6A4(s32 id, s32 index)
+void Inventory_AssignUniqueSecondarySlot(s32 id, s32 index)
 {
     s32 i;
     for (i = 0; i <= 7; i++) {

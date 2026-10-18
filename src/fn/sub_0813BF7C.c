@@ -15,7 +15,7 @@ typedef struct State {
 void *AnimData_FindEntry(s32);
 void sub_08217DE0(Sprite *, void *, s32);
 void Effect_SetOrigin(Sprite *, s32, s32);
-void sub_08217EEC(Sprite *, void *, s32);
+void SpriteDrawable_SelectTileFrame(Sprite *, void *, s32);
 void Player_InitOrbitingEffect(State *s)
 {
     Sprite *sprite;
@@ -23,7 +23,7 @@ void Player_InitOrbitingEffect(State *s)
     sprite = &s->sprite;
     sub_08217DE0(sprite, s->graphics, 0);
     Effect_SetOrigin(sprite, -4, -4);
-    sub_08217EEC(sprite, s->graphics, 16);
+    SpriteDrawable_SelectTileFrame(sprite, s->graphics, 16);
     sprite->flags |= 1;
     sprite->mode = 1;
     sprite->size = 20;

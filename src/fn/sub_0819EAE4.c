@@ -1,6 +1,4 @@
 #include "global.h"
-#define ActorAction_UpdateDirectionalAnimation sub_0819EAE4
-#define ActorAction_StartAnimation sub_0819B96C
 #define Callback_InvokeActor _call_via_r1
 struct ActorActionSequence {
     u8 unknown0[0x51];
@@ -24,20 +22,34 @@ struct ActorActionSequence {
     u8 animationResource[0x20];
     u8 animation[1];
 };
-void sub_0819B96C(void *, void *, void *, s32, s32, s32);
+void Hresvelgr_SetAnimation(void *, void *, void *, s32, s32, s32);
 void Sound_PlaySong(u32);
 s32 Callback_InvokeActor(void *, void *);
-void sub_0819EAE4(struct ActorActionSequence *p)
+void ActorAction_UpdateDirectionalAnimation(struct ActorActionSequence *p)
 {
     p->angle = p->requestedAngle;
-    { s32 angle = (p->angle + 0x60) >> 6; u32 direction = 3; direction &= angle; p->direction4 = direction; }
-    { s32 angle = (p->angle + 0x70) >> 5; u32 direction = 7; direction &= angle; p->direction8 = direction; }
-    { u32 mask = 0x200040; p->flags |= mask; }
+    {
+        s32 angle = (p->angle + 0x60) >> 6;
+        u32 direction = 3;
+        direction &= angle;
+        p->direction4 = direction;
+    }
+    {
+        s32 angle = (p->angle + 0x70) >> 5;
+        u32 direction = 7;
+        direction &= angle;
+        p->direction8 = direction;
+    }
+    {
+        u32 mask = 0x200040;
+        p->flags |= mask;
+    }
     if (p->pending) {
         p->pending = 0;
-        sub_0819B96C(p, p->animation, p->animationResource, 0x10, 1, 4);
+        Hresvelgr_SetAnimation(p, p->animation, p->animationResource, 0x10, 1, 4);
         Sound_PlaySong(0x4D0);
     }
-    if (p->repeat && p->animationCompleted > 5) p->done = 1;
+    if (p->repeat && p->animationCompleted > 5)
+        p->done = 1;
     Callback_InvokeActor(p, p->callback);
 }

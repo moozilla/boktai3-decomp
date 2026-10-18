@@ -1,5 +1,3 @@
-#define EnemyD459_UpdateAttackTiming     sub_08204D84
-#define EnemyD459_UpdateProjectileAttack sub_08204E5C
 #include "global.h"
 
 struct EnemyD459Vector {
@@ -31,9 +29,9 @@ struct EnemyD459 {
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Anim_SetDurationScale(void *, u32);
 s32 Mod(s32, s32);
-u32 sub_08204E5C(struct EnemyD459 *);
+u32 SceneSequence_UpdateCountdown(struct EnemyD459 *);
 
-u32 sub_08204D84(struct EnemyD459 *enemy)
+u32 EnemyD459_UpdateAttackTiming(struct EnemyD459 *enemy)
 {
     if (enemy->useAttackSchedule) {
         s16 *index = &enemy->attackIndex;
@@ -46,7 +44,7 @@ u32 sub_08204D84(struct EnemyD459 *enemy)
             u32 zero = 0;
             Anim_RestartSequence(anim, resource, 3, facing, zero);
             Anim_SetDurationScale(anim, 64);
-            enemy->callback = sub_08204E5C;
+            enemy->callback = SceneSequence_UpdateCountdown;
             enemy->attackDuration = 80;
             enemy->timer = zero;
             (*index)++;
@@ -58,7 +56,7 @@ u32 sub_08204D84(struct EnemyD459 *enemy)
         if (!value) {
             Anim_RestartSequence(enemy->animation, enemy->animationResource, 3, enemy->facing,
                                  value);
-            enemy->callback = sub_08204E5C;
+            enemy->callback = SceneSequence_UpdateCountdown;
         }
     }
     return 0;

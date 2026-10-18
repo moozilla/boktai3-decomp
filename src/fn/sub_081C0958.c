@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_081C32C8(void *, int, s16 *, int, int, int, int);
+void SceneTarget_BeginMove(void *, int, s16 *, int, int, int, int);
 void SceneActorSequence_UpdateFinalWaypointMotion(void);
 void SceneActorSequence_BeginFinalWaypointMotion(u8 *p)
 {
@@ -11,7 +11,7 @@ void SceneActorSequence_BeginFinalWaypointMotion(u8 *p)
     v.x = a;
     q[1] = b;
     q[2] = z;
-    sub_081C32C8(*(void **)(p + 0x30), 0, (s16 *)&v, -1, 0x1, *(s16 *)(p + 0x5C), 0x3C);
+    SceneTarget_BeginMove(*(void **)(p + 0x30), 0, (s16 *)&v, -1, 0x1, *(s16 *)(p + 0x5C), 0x3C);
     *(void (**)(void))(p + 0x50) = SceneActorSequence_UpdateFinalWaypointMotion;
     *(u32 *)(p + 0x54) = z;
 }

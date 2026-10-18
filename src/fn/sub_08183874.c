@@ -1,7 +1,6 @@
 // Callee aliases below resolve against the checker ELF predating symbol promotion.
-#define gActorFadeFollowupAnimations                  gUnk_0824ED68
-#define gActorFadeStartAnimations                     gUnk_0824ED58
-#define ActorController_UpdateFadeAnimationTransition sub_08183874
+#define gActorFadeFollowupAnimations gUnk_0824ED68
+#define gActorFadeStartAnimations    gUnk_0824ED58
 #include "global.h"
 
 struct ActorAnimationLayer {
@@ -19,7 +18,7 @@ void Sound_PlaySongChecked(u32 a);
 
 void Armor_StartFastWhiteFade(void *);
 
-void sub_08183874(u8 *p)
+void ActorController_UpdateFadeAnimationTransition(u8 *p)
 {
     u8 *s = p + 0xB40;
     u8 st = *s;

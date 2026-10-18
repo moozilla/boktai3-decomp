@@ -1,5 +1,3 @@
-#define SceneEffect_CreateMovingTask     sub_0819AD94
-#define SceneEffect_UpdateMovingState    sub_0819AD18
 #define SceneEffect_InitializeMovingTask SceneOrbitHazard_Init
 #include "global.h"
 struct SceneEffectMoving {
@@ -16,14 +14,14 @@ struct SceneEffectMoving {
 void *Task_Create(u32, u32);
 void Task_Kill(void *);
 void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
-void sub_0819AD18(void);
+void SceneEffect_UpdateMovingState(void);
 void SceneOrbitHazard_OnDestroy(void);
 s32 SceneOrbitHazard_Init(struct SceneEffectMoving *);
-struct SceneEffectMoving *sub_0819AD94(u32 resourceId, const void *origin)
+struct SceneEffectMoving *SceneEffect_CreateMovingTask(u32 resourceId, const void *origin)
 {
     struct SceneEffectMoving *p = Task_Create(8, 0xE4);
     if (p) {
-        Task_SetCallbacks(p, sub_0819AD18, SceneOrbitHazard_OnDestroy);
+        Task_SetCallbacks(p, SceneEffect_UpdateMovingState, SceneOrbitHazard_OnDestroy);
         p->resourceId = 30;
         p->origin = 0;
         if (SceneOrbitHazard_Init(p) < 0) {

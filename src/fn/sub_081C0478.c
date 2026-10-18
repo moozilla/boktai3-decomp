@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08221110(void *, void *, void *, int, int);
+void Palette_InterpolateBanks(void *, void *, void *, int, int);
 void ScenePaletteFade_BlendPaletteBanks(u8 *a, u8 *b, u8 *c, int d, int e, int n)
 {
     if (n > 0) {
@@ -9,7 +9,7 @@ void ScenePaletteFade_BlendPaletteBanks(u8 *a, u8 *b, u8 *c, int d, int e, int n
         int count = n;
         /* do-while(0) only keeps agbcc's block layout */
         do {
-            sub_08221110(x, y, z, d, e);
+            Palette_InterpolateBanks(x, y, z, d, e);
             z += 0x20;
             y += 0x20;
             /* do-while(0) only keeps agbcc's block layout */

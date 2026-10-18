@@ -1,5 +1,4 @@
 #include "global.h"
-#define ActorState_UpdateConditionalTrigger sub_0817C29C
 
 struct TriggerActor {
     u8 pad0[0xAA];
@@ -29,7 +28,7 @@ static inline u8 ConsumeTrigger(struct TriggerActor *p)
     }
     return 0;
 }
-void sub_0817C29C(struct TriggerActor *p)
+void ActorState_UpdateConditionalTrigger(struct TriggerActor *p)
 {
     if (ConsumeTrigger(p)) {
         u32 state = 10;

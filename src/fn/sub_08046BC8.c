@@ -1,5 +1,5 @@
 #include "damage_number_display.h"
-void sub_08217EEC(void *, void *, u32);
+void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 void sub_08217E40(void *, u32);
 extern const u32 gUnk_086059C0[];
 #ifdef NONMATCHING
@@ -33,7 +33,7 @@ u32 DamageNumberDisplay_RenderDigits(struct DamageNumberDisplay *display,
         ++count;
         amount -= 1000;
     }
-    sub_08217EEC(&group->digits[3], display->resource, glyphBase + count);
+    SpriteDrawable_SelectTileFrame(&group->digits[3], display->resource, glyphBase + count);
     if (count > 0)
         group->digitCount = 4;
     count = 0;
@@ -41,7 +41,7 @@ u32 DamageNumberDisplay_RenderDigits(struct DamageNumberDisplay *display,
         ++count;
         amount -= 100;
     }
-    sub_08217EEC(&group->digits[2], display->resource, glyphBase + count);
+    SpriteDrawable_SelectTileFrame(&group->digits[2], display->resource, glyphBase + count);
     if (!group->digitCount && count > 0)
         group->digitCount = 3;
     count = 0;
@@ -49,7 +49,7 @@ u32 DamageNumberDisplay_RenderDigits(struct DamageNumberDisplay *display,
         ++count;
         amount -= 10;
     }
-    sub_08217EEC(&group->digits[1], display->resource, glyphBase + count);
+    SpriteDrawable_SelectTileFrame(&group->digits[1], display->resource, glyphBase + count);
     if (!group->digitCount && count > 0)
         group->digitCount = 2;
     count = 0;
@@ -57,7 +57,7 @@ u32 DamageNumberDisplay_RenderDigits(struct DamageNumberDisplay *display,
         ++count;
         --amount;
     }
-    sub_08217EEC(&group->digits[0], display->resource, glyphBase + count);
+    SpriteDrawable_SelectTileFrame(&group->digits[0], display->resource, glyphBase + count);
     if (!group->digitCount)
         group->digitCount = 1;
     digit = group->digits;

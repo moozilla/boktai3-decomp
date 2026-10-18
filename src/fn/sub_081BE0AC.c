@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_input.h"
-#define SceneInventory_SetCategoryPalette sub_081BE0AC
 #define gScenePaletteBanks gUnk_030042E4
 /* Tentative role names; the offsets are established by palette consumers. */
 struct SceneInventoryCategoryMenu {
@@ -8,7 +7,7 @@ struct SceneInventoryCategoryMenu {
     struct SceneInputWidget categoryWidget;
     struct SceneInputWidget targetWidget;
 };
-void sub_081BE0AC(struct SceneInventoryCategoryMenu *p, u16 *colors)
+void SceneInventory_SetCategoryPalette(struct SceneInventoryCategoryMenu *p, u16 *colors)
 {
     u16 *palette = (u16 *)(gUnk_030042E4 + 0x7540);
     p->categoryWidget.palette = palette;

@@ -1,4 +1,3 @@
-#define TimedDisplay_AdvanceIntro sub_08233714
 #define TimedDisplay_SetState ChargedBurst_SetState
 #include "global.h"
 struct TimedDisplay {
@@ -13,7 +12,7 @@ void sub_082335F0(struct TimedDisplay *);
 void ChargedBurst_SetState(struct TimedDisplay *, void (*)(void));
 void sub_08233760(void);
 void Sound_PlaySong(u32);
-void sub_08233714(struct TimedDisplay *s)
+void TimedDisplay_AdvanceIntro(struct TimedDisplay *s)
 {
     sub_0823350C(s);
     sub_082335F0(s);

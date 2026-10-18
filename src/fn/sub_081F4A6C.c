@@ -1,4 +1,3 @@
-#define Ratatosk_UpdatePointEffectAnimation sub_081F4A6C
 #include "global.h"
 
 /* Ratatosk field and state interpretations are provisional (low confidence). */
@@ -32,16 +31,16 @@ void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int)
 void Sound_PlaySong(u32);
 void Sound_StopSong(u32);
 s32 Callback_InvokeActor(void *, void *);
-void sub_081FEA80(s32);
+void RisingActorManager_BeginRaise(s32);
 void sub_081FEADC(s32);
-void sub_081FEB84(s32);
-void sub_081F4A6C(struct RatatoskActor *p, s32 frame)
+void SlotController_SetSlotFlag2(s32);
+void Ratatosk_UpdatePointEffectAnimation(struct RatatoskActor *p, s32 frame)
 {
     if (p->changed) {
         p->changed = 0;
         SceneActors_StartUnmirroredAnimation(p, p->animationData, p->animation, 16, 1, 4);
         p->effectCounter = 0;
-        sub_081FEA80(Ratatosk_GetSelectedPointIndex());
+        RisingActorManager_BeginRaise(Ratatosk_GetSelectedPointIndex());
         Sound_PlaySong(0x570);
     }
     if (Mod(frame, 300) == 180)
@@ -51,7 +50,7 @@ void sub_081F4A6C(struct RatatoskActor *p, s32 frame)
         p->flags = mask | p->flags;
     }
     if (frame <= 179)
-        sub_081FEB84(Ratatosk_GetSelectedPointIndex());
+        SlotController_SetSlotFlag2(Ratatosk_GetSelectedPointIndex());
     if (p->effectProgress > 240) {
         p->effectCounter = 0;
         p->finished = 1;

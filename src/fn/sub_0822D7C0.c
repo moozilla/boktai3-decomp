@@ -1,4 +1,3 @@
-#define ItemDescriptor_Reset sub_0822D7C0
 #include "scene_input_compare.h"
 struct ItemDescriptorValue {
     u8 bytes[4];
@@ -11,7 +10,7 @@ struct ItemDescriptorPackedView {
     u8 fields18[7];
     u8 field1F;
 };
-void sub_0822D7C0(struct SceneInputItemDescriptor *descriptor)
+void ItemDescriptor_Reset(struct SceneInputItemDescriptor *descriptor)
 {
     struct ItemDescriptorPackedView *record = (void *)descriptor;
     struct ItemDescriptorValue *value;

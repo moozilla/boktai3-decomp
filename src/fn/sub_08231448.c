@@ -1,4 +1,3 @@
-#define ActiveList_PrependNode sub_08231448
 #include "global.h"
 struct ActiveListNode {
     u8 active;
@@ -10,7 +9,7 @@ struct ActiveList {
     u8 unknown00[0x20];
     struct ActiveListNode *head;
 };
-s32 sub_08231448(struct ActiveList *list, struct ActiveListNode *node)
+s32 ActiveList_PrependNode(struct ActiveList *list, struct ActiveListNode *node)
 {
     if (node->active)
         return -1;

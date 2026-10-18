@@ -1,12 +1,11 @@
 #include "global.h"
-#define SegmentDisplay_Destroy sub_081C22BC
-#define gSegmentDisplay        gUnk_02000260
+#define gSegmentDisplay gUnk_02000260
 struct SegmentDisplay;
 extern struct SegmentDisplay *gSegmentDisplay;
 void Sprite_Remove(void *);
 void Anim_Remove(void *);
 void Sound_StopSong(u32);
-s32 sub_081C22BC(struct SegmentDisplay *p)
+s32 SegmentDisplay_Destroy(struct SegmentDisplay *p)
 {
     s32 i;
     u8 *anim;

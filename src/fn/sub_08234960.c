@@ -1,4 +1,3 @@
-#define FlickerParticle_UpdateVerticalMotion sub_08234960
 #include "global.h"
 struct FlickerParticle {
     u32 flags;
@@ -9,14 +8,14 @@ struct FlickerParticle {
     u8 pad30[4];
     void *resource;
 };
-void sub_08217EEC(void *, void *, u32);
-void sub_08234960(struct FlickerParticle *s)
+void SpriteDrawable_SelectTileFrame(void *, void *, u32);
+void FlickerParticle_UpdateVerticalMotion(struct FlickerParticle *s)
 {
     if (++s->age > 15) {
         s->flags |= 1;
         s->active = 0;
     } else {
-        sub_08217EEC(s, s->resource, 2 + ((s->age >> 2) & 1));
+        SpriteDrawable_SelectTileFrame(s, s->resource, 2 + ((s->age >> 2) & 1));
         s->y += s->velocityY;
     }
 }

@@ -114,13 +114,13 @@ void Palette_ScaleRange(u16 *dest, const u16 *source, u32 brightness, s32 first,
     }
 }
 
-void sub_08227950(u16 *, u16 *);
+void Palette_GetStateBlendIndices(u16 *, u16 *);
 
 void Palette_PickTransitionColors(struct PaletteController *p, struct PaletteTransition *t)
 {
     u16 x[2];
     u16 *y = &x[1];
-    sub_08227950(x, y);
+    Palette_GetStateBlendIndices(x, y);
     t->from = p->colorSets[PALETTE_SET_VARIANT][x[0]];
     t->to = p->colorSets[PALETTE_SET_VARIANT][*y];
 }
@@ -589,7 +589,7 @@ void Palette_ReplaceResource(u32 bank, u32 index, u32 resource, u32 flags)
         if (flags & 1) {
             if (p->flags & 1) {
                 u16 first, second;
-                sub_08227950(&first, &second);
+                Palette_GetStateBlendIndices(&first, &second);
                 if (first == 2)
                     Palette_BuildOverlayColors(p, &p->transition);
                 Palette_ResetTransition(p);

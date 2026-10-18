@@ -1,4 +1,3 @@
-#define ActorReaction_BeginOnContact sub_081B6844
 #include "global.h"
 struct ContactActor {
     u8 pad0[0x34];
@@ -17,7 +16,8 @@ struct ContactReaction {
 void Sound_PlaySong(u32);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
 void sub_0821FF8C(void *);
-void sub_081B6844(struct ContactActor *actor, void *context, struct ContactReaction *reaction)
+void ActorReaction_BeginOnContact(struct ContactActor *actor, void *context,
+                                  struct ContactReaction *reaction)
 {
     reaction->direction = actor->direction;
     sub_0821FF8C(actor);

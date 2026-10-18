@@ -1,4 +1,3 @@
-#define ScriptPanel_IsCallbackActive sub_081BD914
 #include "global.h"
 
 struct ScriptPanel {
@@ -7,7 +6,7 @@ struct ScriptPanel {
 };
 void sub_081BCB14(void);
 
-s32 sub_081BD914(struct ScriptPanel *panel)
+s32 ScriptPanel_IsCallbackActive(struct ScriptPanel *panel)
 {
     if (panel->callback == sub_081BCB14)
         return 1;

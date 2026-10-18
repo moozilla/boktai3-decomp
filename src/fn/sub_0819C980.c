@@ -1,5 +1,4 @@
 #include "global.h"
-#define ColliderActor_SetTargetPosition sub_0819C980
 struct ColliderActorVector {
     s16 x, y, z, pad;
 };
@@ -25,7 +24,7 @@ static inline void SetTravelTime(struct ColliderActor *actor, u32 time)
     if ((u16)time <= 1)
         actor->travelTime = 2;
 }
-s32 sub_0819C980(struct ColliderActor *actor, struct ColliderActorVector *target)
+s32 ColliderActor_SetTargetPosition(struct ColliderActor *actor, struct ColliderActorVector *target)
 {
     struct ColliderActorVector delta;
     struct ColliderActorVector *out;

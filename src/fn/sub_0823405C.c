@@ -1,4 +1,3 @@
-#define MovingEffect_AdvanceLifetime sub_0823405C
 #include "global.h"
 struct MovingEffectOwner {
     u8 pad0[0x4ef];
@@ -20,7 +19,7 @@ struct MovingEffect {
     u16 age;
 };
 void Task_Kill(void *);
-void sub_0823405C(struct MovingEffect *s)
+void MovingEffect_AdvanceLifetime(struct MovingEffect *s)
 {
     s->sourcePosition.x -= 20;
     s->position = s->sourcePosition;

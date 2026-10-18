@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine.h"
 s32 Mod(s32, s32);
-void sub_08221110(void *dst, void *from, void *to, s32 t, s32 shift);
+void Palette_InterpolateBanks(void *dst, void *from, void *to, s32 t, s32 shift);
 /* Copy the 0x680 palette bank in, then pulse between it and the 0x2DE0 bank. */
 void SceneCharacter_UpdateAlternatePalettePulse(u8 *a, u8 *b)
 {
@@ -19,10 +19,10 @@ void SceneCharacter_UpdateAlternatePalettePulse(u8 *a, u8 *b)
     if (t <= 64) {
         u8 *bank = gUnk_030042E4;
         u8 *from = bank + 0x680, *to = bank + 0x2de0;
-        sub_08221110(b + 0x1cc, from, to, t, 6);
+        Palette_InterpolateBanks(b + 0x1cc, from, to, t, 6);
     } else {
         u8 *bank = gUnk_030042E4;
         u8 *from = bank + 0x2de0, *to = bank + 0x680;
-        sub_08221110(b + 0x1cc, from, to, t - 64, 6);
+        Palette_InterpolateBanks(b + 0x1cc, from, to, t - 64, 6);
     }
 }

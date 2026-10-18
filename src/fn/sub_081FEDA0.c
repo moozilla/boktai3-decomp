@@ -1,6 +1,5 @@
 #include "global.h"
 #include "terrain_overlay.h"
-#define SpritePool_InitEntry   sub_081FEDA0
 #define SpritePoolControl_Init SpriteParticle_InitParams
 struct SpritePoolControl {
     u8 unknown0[0x20];
@@ -23,7 +22,7 @@ static inline void ClearEntryFields(void *dest)
     u32 zero = 0;
     CpuSet(&zero, dest, 0x05000002);
 }
-void sub_081FEDA0(void *pool, struct SpritePoolEntry *entry, s32 index)
+void SpritePool_InitEntry(void *pool, struct SpritePoolEntry *entry, s32 index)
 {
     struct SpritePoolControl *control = &entry->control;
     SpriteParticle_InitParams(control);

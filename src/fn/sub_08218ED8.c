@@ -1,6 +1,5 @@
 #include "background_controller.h"
-#define BackgroundMap_ClearTextRect sub_08218ED8
-void sub_08218ED8(u32 x, u32 y, u32 width, u32 height)
+void BackgroundMap_ClearTextRect(u32 x, u32 y, u32 width, u32 height)
 {
     u16 *map = Video_GetBackgroundMap(0);
     u32 start = x;

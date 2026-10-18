@@ -32,7 +32,7 @@ struct G {
 extern struct G *gUnk_02000710;
 s32 Math_Atan2(s32, s32);
 void ActorController_StartTurn(struct S *, s32);
-s32 sub_0818505C(struct S *, s32);
+s32 Armor_TryStartAction(struct S *, s32);
 void Armor_UpdateFacingAction6(struct S *p)
 {
     u8 *q = &p->b3d;
@@ -44,7 +44,7 @@ void Armor_UpdateFacingAction6(struct S *p)
             a = (a + 0x20) & 0xc0;
             if (p->b39 != a)
                 ActorController_StartTurn(p, a);
-            else if (sub_0818505C(p, 6)) {
+            else if (Armor_TryStartAction(p, 6)) {
                 r = 1;
                 goto st;
             }

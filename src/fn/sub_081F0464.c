@@ -1,6 +1,5 @@
-#define SingletonSlot7_InitSecondaryCollider sub_081F0464
 #define ActorCollider_Initialize SpatialIndex_InitEntry
-#define ActorCollider_Activate SpatialIndex_InsertEntry
+#define ActorCollider_Activate   SpatialIndex_InsertEntry
 #include "global.h"
 struct Slot7PackedVector {
     u32 x : 16, y : 16, z : 16, pad : 16;
@@ -16,11 +15,12 @@ struct Slot7Actor {
     u8 pad26c[0x358];
     s16 parameter5c4, parameter5c6;
 };
-void sub_081F022C(void);
+void ScreenPhase_DampenMotion(void);
 void SpatialIndex_InitEntry(void *, struct Slot7PackedVector *, struct Slot7PackedVector *,
-                  struct Slot7PackedVector *, s32, s32, s32, s32, s32, void (*)(void), void *);
+                            struct Slot7PackedVector *, s32, s32, s32, s32, s32, void (*)(void),
+                            void *);
 void SpatialIndex_InsertEntry(void *);
-void sub_081F0464(struct Slot7Actor *actor)
+void SingletonSlot7_InitSecondaryCollider(struct Slot7Actor *actor)
 {
     void *collider = &actor->secondaryColliderFlags;
     struct Slot7PackedVector position, size, offset;
@@ -38,6 +38,6 @@ void sub_081F0464(struct Slot7Actor *actor)
     offset.y = 60;
     offset.z = 0;
     SpatialIndex_InitEntry(collider, &position, &size, &offset, 20, 5, 1, actor->parameter5c4,
-                 actor->parameter5c6, sub_081F022C, actor);
+                           actor->parameter5c6, ScreenPhase_DampenMotion, actor);
     SpatialIndex_InsertEntry(collider);
 }

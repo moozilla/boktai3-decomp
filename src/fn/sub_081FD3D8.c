@@ -1,6 +1,3 @@
-#define Projectile_InitParameters sub_081FD3D8
-#define Projectile_SetCollisionOffset sub_081FD49C
-#define Projectile_SetBehaviorCallback sub_081FD4AC
 
 #include "global.h"
 
@@ -20,21 +17,21 @@ void Memory_Clear(void *, u32);
 void Projectile_SetLaunchParameters(struct ProjectileParameters *, u16, u16, u8, u32);
 void Projectile_SetCollisionParameters(struct ProjectileParameters *, u32, u32, u32, u32, u32);
 void Projectile_SetCollisionExtents(struct ProjectileParameters *, u16, u16, u16);
-void Projectile_SetCollisionOffset(struct ProjectileParameters *, u16, u16, u16);
+void Projectile_SetCollisionOffset_081FD49C(struct ProjectileParameters *, u16, u16, u16);
 void Projectile_SetSpriteParameters(struct ProjectileParameters *, u32, u32, u32);
 void Projectile_SetBehaviorCallback(struct ProjectileParameters *, u32 (*)(void *));
-u32 sub_081FC6BC(void *);
+u32 SceneProjectile_UpdatePulse(void *);
 
 /* Default configuration for the tentative scene projectile family. */
-void sub_081FD3D8(struct ProjectileParameters *p)
+void Projectile_InitParameters(struct ProjectileParameters *p)
 {
     Memory_Clear(p, 0x58);
     Projectile_SetLaunchParameters(p, 0, 0x3C, 0, 0);
     Projectile_SetCollisionParameters(p, 0, 0, 0xA, 0x14, 0x14);
     Projectile_SetCollisionExtents(p, 0x10, 0x80, 0x10);
-    Projectile_SetCollisionOffset(p, 0, 0, 0);
+    Projectile_SetCollisionOffset_081FD49C(p, 0, 0, 0);
     Projectile_SetSpriteParameters(p, 0x848F, 0, -1);
-    Projectile_SetBehaviorCallback(p, sub_081FC6BC);
+    Projectile_SetBehaviorCallback(p, SceneProjectile_UpdatePulse);
     p->unk48 = 0;
     p->unk4C = 0;
     p->unk38 = 0;

@@ -1,4 +1,3 @@
-#define Camera_CalculateDistanceScale sub_0822776C
 #include "global.h"
 struct CameraPosition {
     s16 x, y, z;
@@ -10,7 +9,7 @@ struct CameraDistanceScale {
 };
 u16 Sqrt(u32);
 s32 Div(s32, s32);
-s32 sub_0822776C(struct CameraDistanceScale *scale)
+s32 Camera_CalculateDistanceScale(struct CameraDistanceScale *scale)
 {
     struct CameraPosition *first = scale->first;
     struct CameraPosition *second = scale->second;

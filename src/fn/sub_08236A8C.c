@@ -1,5 +1,4 @@
 #include "global.h"
-#define ParticleEffect_Initialize sub_08236A8C
 /* Tentative family name; owner and variant are retained by the task. */
 struct ParticleEffect {
     u8 pad[0x18];
@@ -13,7 +12,8 @@ void sub_082368DC(struct ParticleEffect *, u32);
 void sub_082366A8(struct ParticleEffect *, u32);
 void sub_082364A4(struct ParticleEffect *);
 void Sound_PlaySong(u32);
-s32 sub_08236A8C(struct ParticleEffect *p, void *owner, u32 a, u32 b, u32 variant, u32 flags)
+s32 ParticleEffect_Initialize(struct ParticleEffect *p, void *owner, u32 a, u32 b, u32 variant,
+                              u32 flags)
 {
     p->variant = variant;
     p->owner = owner;

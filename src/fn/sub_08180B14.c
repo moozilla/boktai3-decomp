@@ -1,8 +1,5 @@
 #include "global.h"
-#define SceneCombatActor_InitBouncingParticle sub_08180B14
-#define SceneParticle_UpdateBounce            sub_08180A88
-#define SceneParticle_HideSprite              sub_08180AFC
-#define gSceneCombatParticleFrameBases        gUnk_0824E6A4
+#define gSceneCombatParticleFrameBases gUnk_0824E6A4
 struct ParticleVector {
     s32 x : 16, y : 16, z : 16;
     u32 : 16;
@@ -34,8 +31,8 @@ struct SceneCombatActor {
     u8 kind, heading;
 };
 void Sprite_Init(void *, void *, u32);
-void sub_08180A88(void *);
-void sub_08180AFC(void *);
+void SceneParticle_UpdateBounce(void *);
+void BouncingEffect_RemoveSprite(void *);
 extern const u8 gUnk_0824E6A4[];
 static inline void SetParticleCallbacks(struct BouncingSceneParticle *p, void (*update)(void *),
                                         void (*destroy)(void *))
@@ -43,14 +40,14 @@ static inline void SetParticleCallbacks(struct BouncingSceneParticle *p, void (*
     p->update = update;
     p->destroy = destroy;
 }
-void sub_08180B14(struct SceneCombatActor *p)
+void SceneCombatActor_InitBouncingParticle(struct SceneCombatActor *p)
 {
     struct BouncingParticleSprite *sprite = &p->particle.sprite;
     s32 frame, direction;
     struct BouncingSceneParticle *particle;
     Sprite_Init(sprite, p->particleAnimation, 0);
     sprite->flags = 0x202;
-    SetParticleCallbacks(&p->particle, sub_08180A88, sub_08180AFC);
+    SetParticleCallbacks(&p->particle, SceneParticle_UpdateBounce, BouncingEffect_RemoveSprite);
     p->particle.bounced = 0;
     p->particle.floor = p->floor;
     frame = gUnk_0824E6A4[p->kind];

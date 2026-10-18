@@ -1,4 +1,3 @@
-#define PlayerEffect_UpdatePhaseCallback sub_08236878
 #include "global.h"
 #include "engine.h"
 #include "player.h"
@@ -10,7 +9,7 @@ struct PlayerPhaseEffect {
     u8 unknownB1[7];
     void *callback;
 };
-void sub_08236878(struct PlayerPhaseEffect *effect)
+void PlayerEffect_UpdatePhaseCallback(struct PlayerPhaseEffect *effect)
 {
     if (!effect->active) {
         if (effect->owner->tetherMode == 9 && effect->owner->tetherPhase == 2)

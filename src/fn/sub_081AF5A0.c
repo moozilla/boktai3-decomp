@@ -1,4 +1,3 @@
-#define SceneAnimation_SelectSequence sub_081AF5A0
 #include "global.h"
 struct SceneAnimation {
     u8 unknown0[0x10];
@@ -11,7 +10,7 @@ struct SceneAnimation {
     u16 active;
 };
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
-void sub_081AF5A0(struct SceneAnimation *p, u32 sequence, u32 flags, u32 parameter)
+void SceneAnimation_SelectSequence(struct SceneAnimation *p, u32 sequence, u32 flags, u32 parameter)
 {
     if (sequence == 3) {
         u16 state = 7;

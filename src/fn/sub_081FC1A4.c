@@ -3,7 +3,7 @@ struct E {
     u8 p[0x78];
 };
 extern u8 *gUnk_020005E4;
-void sub_081FBEB8(u8 *, struct E *, s32);
+void OverlaySlot_InitializeExtended(u8 *, struct E *, s32);
 void AnimData_Load(u8 *, u32);
 u32 ScriptProc_Start(u32, u32);
 u32 Ratatosk_InitAnimatedParticlePool(u8 *a)
@@ -15,7 +15,7 @@ u32 Ratatosk_InitAnimatedParticlePool(u8 *a)
     e = (struct E *)(a + 0x38);
     i = 0;
     do {
-        sub_081FBEB8(a, e, i);
+        OverlaySlot_InitializeExtended(a, e, i);
         i++;
         e++;
     } while (i <= 0x1f);

@@ -1,5 +1,4 @@
-#define ActorEffect_UpdateFadeFrame sub_081B6604
-#define gActorEffectFadeFrames      gUnk_0824F798
+#define gActorEffectFadeFrames gUnk_0824F798
 #include "global.h"
 struct ActorEffectSprite {
     u8 pad0[0x10];
@@ -16,7 +15,7 @@ struct FadeFrames {
     s32 frames[3];
 };
 extern const struct FadeFrames gUnk_0824F798;
-void sub_081B6604(struct ActorEffect *effect)
+void ActorEffect_UpdateFadeFrame(struct ActorEffect *effect)
 {
     struct ActorEffectSprite *sprite = &effect->sprite;
     s32 mode = effect->mode;

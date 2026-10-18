@@ -1,5 +1,4 @@
 #include "global.h"
-#define PairedFlags_SelectActive sub_081DC208
 struct PairedFlags {
     u8 pad0[0x24];
     u32 firstFlags;
@@ -8,7 +7,7 @@ struct PairedFlags {
     u8 padB0[0x8c];
     u32 selection;
 };
-void sub_081DC208(struct PairedFlags *p)
+void PairedFlags_SelectActive(struct PairedFlags *p)
 {
     if (p->selection == 0) {
         p->firstFlags &= ~1;

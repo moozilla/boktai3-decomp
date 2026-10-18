@@ -1,6 +1,5 @@
 #include "global.h"
 #include "directional_interaction.h"
-#define SceneScriptObject_RunPendingScript sub_081B817C
 /* Tentative scene script object; coordinates and five script arguments are observed here. */
 struct SceneScriptObject {
     u8 unknown0[0x34];
@@ -11,7 +10,7 @@ struct SceneScriptObject {
     u8 unknownEE[0xA];
     u32 pendingScript;
 };
-void sub_081B817C(struct SceneScriptObject *object)
+void SceneScriptObject_RunPendingScript(struct SceneScriptObject *object)
 {
     s32 values[5];
     struct DirectionalScriptArgs args;

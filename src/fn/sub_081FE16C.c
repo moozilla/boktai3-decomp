@@ -1,7 +1,4 @@
 #include "global.h"
-#define OrbitEffect_InitSlot    sub_081FE16C
-#define SunOrb_InitMotionParams sub_081FE92C
-
 struct OrbitEffectSlot {
     u32 state;
     u8 unknown04[8];
@@ -26,7 +23,7 @@ struct OrbitColliderVector {
     s32 y : 16;
     s32 z : 16;
 };
-void sub_081FE92C(void *);
+void RisingActorConfig_Initialize(void *);
 void Sprite_InitUnlinked(void *, void *, s32);
 void AnimData_SelectPaletteBank(void *, u32);
 void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
@@ -34,7 +31,7 @@ void Collider_SetPosition(void *, void *, u32);
 void Collider_SetCallback(void *, void *, void *);
 void Collider_SetBodyProperties(void *, s32, s32, s32);
 s32 Collider_Refresh(void *);
-void sub_081FD704(void);
+void OrbitEffect_FireProjectileOnContact(void);
 
 static inline void ClearOrbitPosition(void *destination)
 {
@@ -42,11 +39,12 @@ static inline void ClearOrbitPosition(void *destination)
     CpuSet(&zero, destination, 0x05000002);
 }
 
-void sub_081FE16C(struct OrbitEffectManager *manager, struct OrbitEffectSlot *slot, s32 index)
+void OrbitEffect_InitSlot(struct OrbitEffectManager *manager, struct OrbitEffectSlot *slot,
+                          s32 index)
 {
     struct OrbitColliderVector size, offset;
     void *collider;
-    sub_081FE92C(slot->motionParams);
+    RisingActorConfig_Initialize(slot->motionParams);
     slot->state = 0;
     ClearOrbitPosition(slot->position);
     Sprite_InitUnlinked(slot->sprite, manager->animation, 3);
@@ -62,7 +60,7 @@ void sub_081FE16C(struct OrbitEffectManager *manager, struct OrbitEffectSlot *sl
     offset.z = 0;
     Collider_Init(collider, 0, 0x4004, 0, 0x20, &size, &offset);
     Collider_SetPosition(collider, slot->spritePosition, 0);
-    Collider_SetCallback(collider, sub_081FD704, slot);
+    Collider_SetCallback(collider, OrbitEffect_FireProjectileOnContact, slot);
     Collider_SetBodyProperties(collider, 0, 0, 0);
     Collider_Refresh(collider);
 }

@@ -1,5 +1,4 @@
 #include "global.h"
-#define ParticleEffect_Destroy       sub_08236A40
 #define ParticleEffect_RemoveSprites ActorBurst_RemovePrimarySprites
 #define ParticleEffect_RemoveEffects RadialBurstEffect_RemoveParticles
 #define gParticleEffectPendingCount  gUnk_02000590
@@ -17,7 +16,7 @@ void sub_08235DB0(struct ParticleEffect *);
 void ActorBurst_RemovePrimarySprites(struct ParticleEffect *);
 void ActorBurst_RemoveGlowSprite(struct ParticleEffect *);
 void RadialBurstEffect_RemoveParticles(struct ParticleEffect *);
-u32 sub_08236A40(struct ParticleEffect *p)
+u32 ParticleEffect_Destroy(struct ParticleEffect *p)
 {
     if (p->active && !p->suppressCleanup && !p->stopFlags)
         sub_08235DB0(p);

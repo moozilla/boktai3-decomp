@@ -1,5 +1,5 @@
-#define ShadowActor_UpdateTransition sub_0819804C
-#define ScaledShadow_Enable          ScaledShadow_Enable /* Existing name; stale baseline ELF uses address name. */
+#define ScaledShadow_Enable                                                                        \
+    ScaledShadow_Enable /* Existing name; stale baseline ELF uses address name. */
 #include "global.h"
 
 /* Tentative family: an animated actor with an embedded scaled shadow. */
@@ -16,7 +16,7 @@ struct ShadowActor {
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 void ScaledShadow_Enable(void *);
 
-void sub_0819804C(struct ShadowActor *actor)
+void ShadowActor_UpdateTransition(struct ShadowActor *actor)
 {
     if (!actor->entered) {
         Anim_SetKeyframes(actor->animation, actor->animationData, 5, 2, 0);

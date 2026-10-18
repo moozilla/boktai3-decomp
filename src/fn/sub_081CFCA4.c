@@ -1,11 +1,10 @@
-#define SceneNpc_UpdateProjectedIdle sub_081CFCA4
 #include "global.h"
 #include "state_actor.h"
 
 void GroundEffect_EnableProjection(void *);
 s32 Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
 s32 Player_GetHorizontalVelocity(s32);
-void sub_081CFCA4(void *unused, struct StateActor *p)
+void SceneNpc_UpdateProjectedIdle(void *unused, struct StateActor *p)
 {
     if (p->enter) {
         p->enter = 0;

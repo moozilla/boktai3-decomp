@@ -7,9 +7,9 @@ struct S {
     s16 a28;
     s16 a2a;
 };
-void sub_08216520(u32, s32, s32);
+void BgGfx_LoadTilemapAtPosition(u32, s32, s32);
 void SceneActorSequence_UpdateBackgroundScroll(struct S *p)
 {
-    sub_08216520(1, p->a28, p->a2a);
-    sub_08216520(3, p->a20, p->a22);
+    BgGfx_LoadTilemapAtPosition(1, p->a28, p->a2a);
+    BgGfx_LoadTilemapAtPosition(3, p->a20, p->a22);
 }

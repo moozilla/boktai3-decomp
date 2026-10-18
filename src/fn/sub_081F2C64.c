@@ -1,5 +1,4 @@
 /* Tentative family and field names, based on static accesses. */
-#define TimedSprite_Init         sub_081F2C64
 #define TimedSprite_InitDrawable SingletonSlot7_InitImpactSprite
 #include "global.h"
 struct Pair {
@@ -14,7 +13,7 @@ struct TimedSprite {
     s32 duration;
 };
 void SingletonSlot7_InitImpactSprite(void *, void *, struct Pair *, s32);
-u32 sub_081F2C64(struct TimedSprite *p, struct Pair *pos, s32 frame, s32 duration)
+u32 TimedSprite_Init(struct TimedSprite *p, struct Pair *pos, s32 frame, s32 duration)
 {
     SingletonSlot7_InitImpactSprite(p->sprite, p->resource, pos, frame);
     {

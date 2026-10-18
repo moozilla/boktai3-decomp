@@ -1,4 +1,3 @@
-#define ForgingBook_InitializeFromScript sub_08213B64
 #include "global.h"
 
 struct ForgingBook {
@@ -29,7 +28,7 @@ s32 Script_SeekToKeyword(u32);
 u32 Script_GetTextSourcePc(void);
 s32 Script_GetValue(void);
 s32 Script_GetKeywordValue(u32, s32);
-void sub_0821304C(struct ForgingBook *);
+void CollectionBook_RefreshCollectedEntryVisibility(struct ForgingBook *);
 void CollectionBook_RefreshCompletionDigits(struct ForgingBook *);
 void CollectionBook_RefreshPageHeading(struct ForgingBook *);
 void CollectionBook_UpdateTrackedEntryMarker(struct ForgingBook *);
@@ -40,7 +39,7 @@ u32 ForgingBook_RefreshEntryDescription(struct ForgingBook *);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 void Sound_PlaySong(u32);
 
-s32 sub_08213B64(struct ForgingBook *book, u32 arg)
+s32 ForgingBook_InitializeFromScript_08213B64(struct ForgingBook *book, u32 arg)
 {
     book->state = 0;
     book->page = 0;
@@ -74,7 +73,7 @@ s32 sub_08213B64(struct ForgingBook *book, u32 arg)
     else
         book->optionC = 0;
     book->optionE = Script_GetKeywordValue('e', 0);
-    sub_0821304C(book);
+    CollectionBook_RefreshCollectedEntryVisibility(book);
     CollectionBook_RefreshCompletionDigits(book);
     CollectionBook_RefreshPageHeading(book);
     CollectionBook_UpdateTrackedEntryMarker(book);

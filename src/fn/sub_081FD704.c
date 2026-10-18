@@ -1,8 +1,4 @@
 #include "global.h"
-#define OrbitEffect_FireProjectileOnContact sub_081FD704
-#define Projectile_InitializeParams         sub_081DAC34
-#define Projectile_Spawn                    sub_081DAB00
-#define Task4E01_ReleaseEntry               sub_081DAD28
 struct OrbitEffectWords {
     u32 a, b;
 };
@@ -24,12 +20,12 @@ struct OrbitEffectContact {
 s32 Math_Atan2(s32, s32);
 struct OrbitEffectPosition *Player_GetEffectivePosition(s32);
 struct OrbitEffectPosition *Task4E01_GetEntryPosition(s32);
-void sub_081DAD28(s32);
-void sub_081DAC34(u8 *);
+void Task4E01_RemoveEntry(s32);
+void Projectile_InitializeParams(u8 *);
 void Projectile_SetFlightParams(u8 *, u16, u16, u8, u32);
 void Projectile_SetTypeAndElement(u8 *, u32, u32);
-s32 sub_081DAB00(u8 *, struct OrbitEffectPosition *);
-void sub_081FD704(struct OrbitEffectContact *p)
+s32 Projectile_Spawn(u8 *, struct OrbitEffectPosition *);
+void OrbitEffect_FireProjectileOnContact(struct OrbitEffectContact *p)
 {
     u8 params[0x58];
     struct OrbitEffectPosition origin, target;
@@ -41,15 +37,15 @@ void sub_081FD704(struct OrbitEffectContact *p)
         source = Task4E01_GetEntryPosition(*entry);
         originPtr = &origin;
         *(struct OrbitEffectWords *)originPtr = *(struct OrbitEffectWords *)source;
-        sub_081DAD28(*entry);
+        Task4E01_RemoveEntry(*entry);
         source = Player_GetEffectivePosition(0);
         targetPtr = &target;
         *(struct OrbitEffectWords *)targetPtr = *(struct OrbitEffectWords *)source;
         targetPtr->y += 0x80;
         direction = (u8)Math_Atan2(targetPtr->x - originPtr->x, targetPtr->z - originPtr->z);
-        sub_081DAC34(params);
+        Projectile_InitializeParams(params);
         Projectile_SetFlightParams(params, 0x8000, 0x5a, direction, 0x18);
         Projectile_SetTypeAndElement(params, 1, 6);
-        sub_081DAB00(params, originPtr);
+        Projectile_Spawn(params, originPtr);
     }
 }

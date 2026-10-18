@@ -1,4 +1,3 @@
-#define PlayerClone_OnBodyColliderContact sub_08200324
 #include "global.h"
 
 struct CloneContact {
@@ -23,7 +22,8 @@ struct PlayerClone {
 };
 void Sound_PlaySong(u32);
 
-void sub_08200324(struct CloneContact *contact, struct CloneContact *other, struct PlayerClone *s)
+void PlayerClone_OnBodyColliderContact(struct CloneContact *contact, struct CloneContact *other,
+                                       struct PlayerClone *s)
 {
     u16 zero = other->duration;
     if (zero == 0) {

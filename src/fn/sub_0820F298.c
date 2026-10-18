@@ -1,6 +1,6 @@
 #include "global.h"
 void Anim_SetSequence(void *, u32, u32, u32, u32);
-void sub_0820F1A0(void);
+void OrangeSpine_TryFireAtPlayer(void);
 u32 OrangeSpine_UpdateRecoveryDelay(u8 *p)
 {
     u16 n = *(u16 *)(p + 0x12c);
@@ -9,6 +9,6 @@ u32 OrangeSpine_UpdateRecoveryDelay(u8 *p)
         *(u16 *)(p + 0x12c) = n - 1;
     } else {
         Anim_SetSequence(p + 0x10c, *(u32 *)(p + 0x170), 14, p[0x132], z);
-        *(void (**)(void))(p + 0x108) = sub_0820F1A0;
+        *(void (**)(void))(p + 0x108) = OrangeSpine_TryFireAtPlayer;
     }
 }

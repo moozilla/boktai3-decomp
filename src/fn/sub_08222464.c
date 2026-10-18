@@ -1,4 +1,3 @@
-#define HashTable_RemoveKey sub_08222464
 #include "global.h"
 struct HashEntry {
     u32 key;
@@ -19,7 +18,7 @@ static inline u8 HashEntry_HasKey(struct HashEntry *entry, u32 key)
         result = 1;
     return result;
 }
-s32 sub_08222464(struct HashTable *table, u32 key)
+s32 HashTable_RemoveKey(struct HashTable *table, u32 key)
 {
     struct HashEntry **buckets = table->buckets;
     struct HashEntry *previous;

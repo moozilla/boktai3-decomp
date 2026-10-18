@@ -1,4 +1,3 @@
-#define PooledController_ActivateIdleSlots sub_081B7304
 #include "global.h"
 struct PooledController {
     u8 active, state;
@@ -12,7 +11,7 @@ struct PooledControllerManager {
     u8 pad1c[8];
     struct PooledController slots[8];
 };
-s32 sub_081B7304(struct PooledControllerManager *manager)
+s32 PooledController_ActivateIdleSlots(struct PooledControllerManager *manager)
 {
     struct PooledController *slot = manager->slots;
     s32 i;

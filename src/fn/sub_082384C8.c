@@ -1,16 +1,19 @@
-#define Player_StopLocalActionSounds sub_082384C8
 #define gPlayerLinkSelection gUnk_020004B4
 #include "global.h"
 #include "player.h"
-struct PlayerLinkSelection { u8 unknown0[0x18]; s16 localPlayer; };
+struct PlayerLinkSelection {
+    u8 unknown0[0x18];
+    s16 localPlayer;
+};
 extern struct PlayerLinkSelection *gUnk_020004B4;
 void Sound_StopSong(u32);
 static inline s32 LocalPlayerSlot(void)
 {
-    if (!gUnk_020004B4) return -1;
+    if (!gUnk_020004B4)
+        return -1;
     return gUnk_020004B4->localPlayer;
 }
-void sub_082384C8(struct Player *p)
+void Player_StopLocalActionSounds(struct Player *p)
 {
     if (p->slot == LocalPlayerSlot()) {
         if (p->actionMode != 6) {

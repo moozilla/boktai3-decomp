@@ -1,8 +1,7 @@
 #include "global.h"
-#define SelectionPanel_ProcessConfirm sub_081B9E58
-#define gInputState gUnk_03005260
+#define gInputState                   gUnk_03005260
 #define SelectionPanel_BeginSelection Registry2388_BeginFadeOut
-#define SelectionList_Confirm MenuCursor_SetSelectionFlag
+#define SelectionList_Confirm         MenuCursor_SetSelectionFlag
 struct SelectionList {
     u8 unknown0[0x1A4];
     u32 flags;
@@ -19,13 +18,14 @@ extern u16 gUnk_03005260[];
 void Sound_PlaySong(u32);
 void Registry2388_BeginFadeOut(void *);
 void MenuCursor_SetSelectionFlag(void *);
-void sub_081B9E58(struct SelectionPanel *panel)
+void SelectionPanel_ProcessConfirm(struct SelectionPanel *panel)
 {
     if (gInputState[1] & 1) {
         struct SelectionList *list = panel->list;
         u32 mask = 4;
         u32 flags = list->flags;
-        if (flags & mask) Sound_PlaySong(0x192);
+        if (flags & mask)
+            Sound_PlaySong(0x192);
         else if ((flags & 2) && panel->selected >= 0) {
             if (panel->entries[panel->selected])
                 SelectionPanel_BeginSelection(panel);

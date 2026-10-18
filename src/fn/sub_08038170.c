@@ -21,7 +21,7 @@ extern u16 gUnk_0203B400[];
 int Mod(int, int);
 void Inventory_GetEquippedDescriptor(int, struct ItemInfo *);
 int GameState_GetUnlockEntry(int);
-void sub_0822EA8C(int, int);
+void GameState_MoveSlotEntry(int, int);
 void SolarFruit_ClearEquippedSlot(int);
 void WirelessGameMenu_InitItemChoices(struct P *input)
 {
@@ -344,7 +344,7 @@ void WirelessGameMenu_InitItemChoices(struct P *input)
         }
     }
     asm("" ::: "r1");
-    sub_0822EA8C(0, 0);
+    GameState_MoveSlotEntry(0, 0);
     i = 1;
     do {
         SolarFruit_ClearEquippedSlot(i);

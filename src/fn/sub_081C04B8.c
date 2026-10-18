@@ -1,5 +1,4 @@
 #include "global.h"
-#define PaletteScreen_LoadResources sub_081C04B8
 #define gPaletteShadow gUnk_03004FC0
 /* Tentative screen family: keeps two palettes and copies the first to shadow RAM. */
 struct PaletteScreen {
@@ -13,7 +12,7 @@ void Bg_SetupLayers(int, int, void *, int, int, int, void *);
 void *ScriptProc_Start(u16, u16);
 void Bg_SetPriority(u32, s32);
 u8 *sub_08216E54(u16);
-void sub_081C04B8(struct PaletteScreen *p)
+void PaletteScreen_LoadResources(struct PaletteScreen *p)
 {
     u8 *resource;
     u8 *palette;

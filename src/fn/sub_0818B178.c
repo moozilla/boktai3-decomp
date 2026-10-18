@@ -1,4 +1,3 @@
-#define Armor_UpdateAccumulatedBehavior sub_0818B178
 #include "global.h"
 
 struct ArmorPart {
@@ -33,7 +32,7 @@ static inline void setPartFlags(struct ArmorPart *p, u32 flags)
     p->flags |= flags;
 }
 
-void sub_0818B178(struct ArmorActor *p, s32 amount, u32 flags)
+void Armor_UpdateAccumulatedBehavior(struct ArmorActor *p, s32 amount, u32 flags)
 {
     p->accumulated += amount;
     if (flags & 8)

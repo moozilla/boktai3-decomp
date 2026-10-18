@@ -1,6 +1,7 @@
-#define DirectionalEffect_PlaceSprite sub_08238EBC
 #include "global.h"
-struct DirectionalEffectPosition { u16 x, z, y, unknown6; };
+struct DirectionalEffectPosition {
+    u16 x, z, y, unknown6;
+};
 struct DirectionalEffect {
     u8 unknown0[0x7fc];
     u32 flags;
@@ -12,7 +13,8 @@ struct DirectionalEffect {
     u8 unknown861[0x3a9];
     u16 paletteValue;
 };
-void sub_08238EBC(struct DirectionalEffect *p, s32 unused, struct DirectionalEffectPosition *position)
+void DirectionalEffect_PlaceSprite(struct DirectionalEffect *p, s32 unused,
+                                   struct DirectionalEffectPosition *position)
 {
     p->flags &= ~1;
     p->position = *position;

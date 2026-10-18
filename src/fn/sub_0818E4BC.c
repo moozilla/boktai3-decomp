@@ -1,4 +1,3 @@
-#define Armor_UpdatePartColliders sub_0818E4BC
 #include "global.h"
 
 struct ArmorVector {
@@ -23,7 +22,7 @@ extern struct ArmorScene *gUnk_02000710;
 void Collider_SetPosition(void *, void *, u32);
 s32 Collider_Refresh(void *);
 
-void sub_0818E4BC(struct ArmorPart *p)
+void Armor_UpdatePartColliders(struct ArmorPart *p)
 {
     struct ArmorVector position;
     struct ArmorVector delta;

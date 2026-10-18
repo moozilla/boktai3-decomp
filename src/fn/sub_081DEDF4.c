@@ -1,4 +1,3 @@
-#define AnimPanel_RemoveAnimations sub_081DEDF4
 #include "global.h"
 void Anim_Remove(void *);
 /* Tentative panel family: four main animations and twelve small entries. */
@@ -7,7 +6,7 @@ struct AnimPanel {
     u8 mainAnimations[4][0x88];
     u8 entryAnimations[12][0x60];
 };
-void sub_081DEDF4(struct AnimPanel *p)
+void AnimPanel_RemoveAnimations(struct AnimPanel *p)
 {
     u8 *entry = p->entryAnimations[0];
     s32 i = 11;

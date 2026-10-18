@@ -1,4 +1,3 @@
-#define SpriteOam_ResetQueue  sub_08215490
 #define gSpriteOamQueueCount  gUnk_03004798
 #define gSpriteOamCount       gUnk_0300479C
 #define gSpriteOamAffineCount gUnk_03004BA0
@@ -12,7 +11,7 @@ struct SpriteOamEntry {
 extern u32 gUnk_03004798, gUnk_0300479C, gUnk_03004BA0;
 extern u16 gUnk_03004790[4];
 extern struct SpriteOamEntry gUnk_03004390[128];
-void sub_08215490(s32 clear)
+void SpriteOam_ResetQueue(s32 clear)
 {
     u16 *p, *base;
     u32 *count, *affine;

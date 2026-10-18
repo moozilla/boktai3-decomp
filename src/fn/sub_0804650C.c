@@ -1,6 +1,6 @@
 #include "contact_sequence_actor.h"
 void ContactSequenceActor_Update(struct ContactSequenceOwner *, struct ContactSequenceActor *);
-void sub_08221110(void *, void *, void *, u32, u32);
+void Palette_InterpolateBanks(void *, void *, void *, u32, u32);
 s32 ContactSequencePool_Update(struct ContactSequenceOwner *owner)
 {
     struct ContactSequenceActor *actor;
@@ -36,7 +36,7 @@ s32 ContactSequencePool_Update(struct ContactSequenceOwner *owner)
             u8 *first, *second;
             first = bank + 0x2C00;
             second = bank + 0x2CA0;
-            sub_08221110(owner->palette, first, second, owner->fadeLevel, 5);
+            Palette_InterpolateBanks(owner->palette, first, second, owner->fadeLevel, 5);
         }
     }
     return 0;

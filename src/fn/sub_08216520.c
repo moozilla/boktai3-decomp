@@ -1,4 +1,3 @@
-#define BgGfx_LoadTilemapAtPosition sub_08216520
 #include "global.h"
 void BgGfx_LoadTilemap(u32, u32, u32, u32, u32, u32);
 static inline s32 truncateTile(s32 value)
@@ -10,7 +9,7 @@ static inline s32 truncateTile(s32 value)
         result = -((-value) >> 3);
     return result;
 }
-void sub_08216520(u32 layer, s32 x, s32 y)
+void BgGfx_LoadTilemapAtPosition(u32 layer, s32 x, s32 y)
 {
     s32 bottom = y + 80;
     s32 tileX = truncateTile(x - 8);

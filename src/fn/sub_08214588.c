@@ -1,10 +1,9 @@
-#define DisplaySequenceSprite_SetResource sub_08214588
-#define gSpriteWidths                     gUnk_03004D90
-#define gSpriteHeights                    gUnk_03004D20
+#define gSpriteWidths  gUnk_03004D90
+#define gSpriteHeights gUnk_03004D20
 #include "global.h"
 #include "display_animation.h"
 extern const u8 gUnk_03004D90[], gUnk_03004D20[];
-void sub_08214588(struct DisplaySequenceSprite *s, const u8 *resource)
+void Sprite_ApplyAnimation(struct DisplaySequenceSprite *s, const u8 *resource)
 {
     if (resource) {
         s->frame = 0;

@@ -8,7 +8,7 @@ struct O {
     u8 g[0x38];
     struct V v;
 };
-struct O *sub_0818F218(void *);
+struct O *EffectPool_AllocateSlot(void *);
 void AnimData_Load(void *, s32);
 void AnimData_SelectPaletteBank(void *, s32);
 void Sprite_Init(void *, void *, s32);
@@ -17,7 +17,7 @@ void sub_0818EE38(void);
 void Nidhoggr_DestroySpriteEffect(void);
 void Nidhoggr_CreatePalette426Effect(u8 *p, struct V *q)
 {
-    struct O *o = sub_0818F218(p);
+    struct O *o = EffectPool_AllocateSlot(p);
     if (o != 0) {
         u8 *r = (u8 *)o + 8;
         void (*a)(void);

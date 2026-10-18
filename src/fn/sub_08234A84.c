@@ -11,8 +11,8 @@ struct Elem {
 };
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
-void sub_08217EEC(struct Elem *, void *, u32);
-void sub_08234A4C(struct Elem *);
+void SpriteDrawable_SelectTileFrame(struct Elem *, void *, u32);
+void FlickerParticle_UpdateStationary(struct Elem *);
 s32 Mod(s32, s32);
 static inline s32 rnd(u16 *table)
 {
@@ -26,7 +26,7 @@ void HealthRestoreEffect_InitSparkle(struct Elem *p)
     u16 *table;
     u32 zero;
     p->flags &= ~1;
-    sub_08217EEC(p, p->data, 2);
+    SpriteDrawable_SelectTileFrame(p, p->data, 2);
     table = gUnk_0203B400;
     p->x = Mod(rnd(table), 80) + 24;
     zero = 0;
@@ -34,5 +34,5 @@ void HealthRestoreEffect_InitSparkle(struct Elem *p)
     p->z = zero;
     p->active = 1;
     p->age = zero;
-    p->update = sub_08234A4C;
+    p->update = FlickerParticle_UpdateStationary;
 }

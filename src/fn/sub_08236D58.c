@@ -1,6 +1,5 @@
 #include "global.h"
 /* Tentative ParticleEffect/ParticleBurst family names (low confidence). */
-#define ParticleBurst_UpdateSlots sub_08236D58
 struct ParticleBurstSlot {
     u8 pad[0x28];
     u8 active;
@@ -15,7 +14,7 @@ struct ParticleBurst {
     struct ParticleBurstSlot slots[8];
 };
 s32 sub_08249240(void *, void *, void *);
-void sub_08236D58(struct ParticleBurst *p)
+void ParticleBurst_UpdateSlots(struct ParticleBurst *p)
 {
     if (p->active) {
         s32 count = 0;

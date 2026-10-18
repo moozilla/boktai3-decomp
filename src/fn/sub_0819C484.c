@@ -1,6 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#define ColliderActor_InitLowerBodyCollider sub_0819C484
 struct ColliderActorExtent {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
@@ -16,9 +15,9 @@ struct ColliderActor {
     struct ColliderActorExtent offset;
     struct ColliderActorRotation rotation;
 };
-void sub_0819C1B8(void);
+void Hresvelgr_OnSecondaryContact(void);
 void Collider_SetBodyProperties(void *, s32, s32, s32);
-void sub_0819C484(struct ColliderActor *actor, s32 mode)
+void ColliderActor_InitLowerBodyCollider(struct ColliderActor *actor, s32 mode)
 {
     void *collider = actor->lowerCollider;
     struct ColliderActorExtent size, offset;
@@ -30,7 +29,7 @@ void sub_0819C484(struct ColliderActor *actor, s32 mode)
     offset.z = 0;
     Collider_Init(collider, 0, 0x5101, 0, 16, &size, &offset);
     Collider_SetPosition(collider, actor->position, 0);
-    Collider_SetCallback(collider, sub_0819C1B8, actor);
+    Collider_SetCallback(collider, Hresvelgr_OnSecondaryContact, actor);
     Collider_SetBodyProperties(collider, mode, 0x810, 32);
     Collider_Refresh(collider);
 }

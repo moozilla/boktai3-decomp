@@ -1,7 +1,4 @@
 #include "global.h"
-#define Nidhoggr_AllocateEffect             sub_0818F610
-#define Nidhoggr_ResetEffectState           sub_0818F588
-#define Nidhoggr_CreateAttachedAttackEffect sub_0818FD9C
 struct NidhoggrEffectVector {
     u16 x, y, z, pad;
 };
@@ -30,8 +27,8 @@ struct NidhoggrAttachedEffect {
 };
 extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560;
 extern const struct NidhoggrEffectPair gUnk_0824F264, gUnk_0824F26C;
-struct NidhoggrAttachedEffect *sub_0818F610(void *);
-void sub_0818F588(void *);
+struct NidhoggrAttachedEffect *SceneEffectPool_AllocateSlot(void *);
+void SceneEffect_ResetState(void *);
 void sub_0818FC00(void *);
 void Nidhoggr_DestroyCollidableEffect(void *);
 s32 AnimData_Load(void *, u32);
@@ -42,7 +39,8 @@ void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Collider_SetCallback(void *, void *, void *);
 s32 Collider_Refresh(void *);
 void Sound_PlaySongChecked(u32);
-void sub_0818FD9C(u8 *owner, struct NidhoggrEffectVector *anchor, void *offsetArg, u8 *boss)
+void Nidhoggr_CreateAttachedAttackEffect(u8 *owner, struct NidhoggrEffectVector *anchor,
+                                         void *offsetArg, u8 *boss)
 {
     struct NidhoggrEffectVector *offset = offsetArg;
     struct NidhoggrAttachedEffect *effect;
@@ -56,10 +54,10 @@ void sub_0818FD9C(u8 *owner, struct NidhoggrEffectVector *anchor, void *offsetAr
         if (gUnk_02000560 & mask)
             return;
     }
-    effect = Nidhoggr_AllocateEffect(owner);
+    effect = SceneEffectPool_AllocateSlot(owner);
     if (!effect)
         return;
-    Nidhoggr_ResetEffectState(effect);
+    SceneEffect_ResetState(effect);
     {
         void (*update)(void *) = sub_0818FC00;
         void (*destroy)(void *) = Nidhoggr_DestroyCollidableEffect;

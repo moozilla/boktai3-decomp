@@ -1,5 +1,3 @@
-#define Hresvelgr_InitializeCollider sub_0819C028
-#define Hresvelgr_ColliderNoOp       sub_0819C024
 #include "global.h"
 #include "engine.h"
 #include "scene_vec.h"
@@ -14,9 +12,9 @@ struct Hresvelgr {
 typedef struct {
     s16 x, y, z;
 } HresvelgrColliderVector;
-void sub_0819C024(void);
+void Collider_IgnoreCallback(void);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
-void sub_0819C028(struct Hresvelgr *actor, u16 id)
+void Hresvelgr_InitializeCollider(struct Hresvelgr *actor, u16 id)
 {
     HresvelgrColliderVector scale, rotation;
     void *collider = actor->collider;
@@ -28,7 +26,7 @@ void sub_0819C028(struct Hresvelgr *actor, u16 id)
     rotation.z = 0;
     Collider_Init(collider, id, 0x2001, 0, 16, &scale, &rotation);
     Collider_SetPosition(collider, &actor->colliderPosition, 0);
-    Collider_SetCallback(collider, sub_0819C024, actor);
+    Collider_SetCallback(collider, Collider_IgnoreCallback, actor);
     Collider_SetAttackProperties(collider, actor->attackPower, actor->attackForce, 0, 0,
                                  actor->attackParameter);
 }

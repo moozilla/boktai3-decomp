@@ -24,7 +24,7 @@ extern u32 gUnk_03003A48, gUnk_03004280;
 extern u16 gUnk_03005260[];
 extern const u8 gUnk_086056D0[];
 void TextWindow_BlankRect(int, int, int, int);
-void sub_08218ED8(int, int, int, int);
+void BackgroundMap_ClearTextRect(int, int, int, int);
 void TextState_SetBounds(struct TextState *, int, int, int, int);
 void TextState_Init(struct TextState *, int, int, int, int);
 void TextState_Reset(struct TextState *);
@@ -39,6 +39,6 @@ void ScrollingDialogue_ClearTextArea(struct Window *p)
 {
     struct TextState *t = &p->text;
     TextWindow_BlankRect(0, 18, 32, 2);
-    sub_08218ED8(0, 18, 32, 2);
+    BackgroundMap_ClearTextRect(0, 18, 32, 2);
     TextState_SetBounds(t, 0, 18, 32, 2);
 }

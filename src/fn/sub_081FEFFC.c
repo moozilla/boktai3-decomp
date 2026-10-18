@@ -9,7 +9,7 @@ struct A {
     struct E e[32];
 };
 extern struct A *gUnk_020005F0;
-void sub_081FEDA0(struct A *, struct E *, s32);
+void SpritePool_InitEntry(struct A *, struct E *, s32);
 u32 sub_081FEFFC(struct A *a)
 {
     struct E *e;
@@ -19,7 +19,7 @@ u32 sub_081FEFFC(struct A *a)
     e = a->e;
     i = 0;
     do {
-        sub_081FEDA0(a, e, i);
+        SpritePool_InitEntry(a, e, i);
         i++;
         e++;
     } while (i <= 0x1f);

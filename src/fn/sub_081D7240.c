@@ -1,4 +1,3 @@
-#define ScreenTransition_WaitForCompletion sub_081D7240
 #define ScreenTransition_SetPhase TextSequence_SetState
 #include "global.h"
 struct ScreenTransition {
@@ -15,7 +14,8 @@ struct ScreenTransitionStep {
 };
 void BestiaryDisplay_Hide(void *);
 void TextSequence_SetState(struct ScreenTransition *, u8);
-void sub_081D7240(struct ScreenTransition *p, struct ScreenTransitionStep *step)
+void ScreenTransition_WaitForCompletion(struct ScreenTransition *p,
+                                        struct ScreenTransitionStep *step)
 {
     BestiaryDisplay_Hide(p->effect);
     if (++p->timer > step->duration + step->hold + step->delay) {

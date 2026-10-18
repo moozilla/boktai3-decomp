@@ -1,4 +1,3 @@
-#define SceneMover_IsNearTarget sub_0819C7E4
 #include "global.h"
 struct SceneMoverPosition {
     s16 x, y, z;
@@ -17,7 +16,7 @@ static inline void SceneMover_SubtractVector(struct SceneMoverPosition *out,
     out->y = (u16)a->y - (u16)b->y;
     out->z = (u16)a->z - (u16)b->z;
 }
-s32 sub_0819C7E4(struct SceneMover *p, s32 threshold)
+s32 SceneMover_IsNearTarget(struct SceneMover *p, s32 threshold)
 {
     struct SceneMoverPosition difference;
     s32 x, z, xSquare, zSquare, distance;

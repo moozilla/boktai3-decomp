@@ -1,8 +1,11 @@
-#define ActorMotion_AdvanceTowardScreenTarget sub_081ECC70
 #define gActorDisplayCamera gUnk_020004B8
 #include "global.h"
-struct WorldPosition { s32 x, y, z; };
-struct ScreenPosition { s16 x, y, z, unused; };
+struct WorldPosition {
+    s32 x, y, z;
+};
+struct ScreenPosition {
+    s16 x, y, z, unused;
+};
 struct ScreenMovingActor {
     u8 pad0[0x268];
     struct WorldPosition position;
@@ -15,10 +18,13 @@ struct ScreenMovingActor {
     u8 pad2B0[0x3A0 - 0x2B0];
     s32 playerIndex;
 };
-struct DisplayCamera { u8 pad[0x44]; s32 x; };
+struct DisplayCamera {
+    u8 pad[0x44];
+    s32 x;
+};
 extern struct DisplayCamera *gUnk_020004B8;
 s32 Player_GetHorizontalVelocity(s32);
-s32 sub_081ECC70(struct ScreenMovingActor *actor, s32 target)
+s32 ActorMotion_AdvanceTowardScreenTarget(struct ScreenMovingActor *actor, s32 target)
 {
     s32 *speed;
     struct WorldPosition *position;

@@ -1,10 +1,9 @@
-#define SunClock_SetMoonAge sub_08229078
 #define gSunClock gUnk_03005430
 #include "global.h"
 #include "sun_clock.h"
 
 /* Tentative: the date-dependent lunar age is rounded to tenths by the caller. */
-void sub_08229078(s32 whole, s32 tenth)
+void SunClock_SetMoonAge(s32 whole, s32 tenth)
 {
     u32 age;
     age = gSunClock.moonAgeTenths = whole * 10 + tenth;

@@ -1,9 +1,8 @@
-#define Player_SetActionOrigin sub_0823D00C
 #include "global.h"
 #include "player.h"
 
 /* Tentative: position offset used as the player's action origin. */
-void sub_0823D00C(struct Player *p)
+void Player_SetActionOrigin_0823D00C(struct Player *p)
 {
     p->actionOrigin = p->position;
     if (p->facing == 4) {

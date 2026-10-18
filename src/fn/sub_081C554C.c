@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneTextSelector_UpdatePanel sub_081C554C
 struct SceneTextSelector {
     u8 unknown0[0x2e3];
     u8 enabledChoices;
@@ -14,12 +13,14 @@ u32 ScrollingDialogue_ClearScript(void);
 s32 ScrollingDialogue_SetScript(const u8 *);
 void ScrollingDialogue_RequestShow(void);
 void ScrollingDialogue_HideImmediately(void);
-void sub_081C554C(struct SceneTextSelector *p)
+void SceneTextSelector_UpdatePanel(struct SceneTextSelector *p)
 {
-    if (p->choice == 0) goto close;
-    if (p->choice > 3) return;
+    if (p->choice == 0)
+        goto close;
+    if (p->choice > 3)
+        return;
     if (!((p->enabledChoices >> (p->choice - 1)) & 1)) {
-close:
+    close:
         ScrollingDialogue_ClearScript();
         ScrollingDialogue_HideImmediately();
     } else {

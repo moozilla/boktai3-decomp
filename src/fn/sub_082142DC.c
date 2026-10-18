@@ -11,7 +11,7 @@ extern u32 gUnk_030042C0[];
 extern u32 gUnk_030042C8[];
 extern u32 gUnk_030042D0[];
 void ObjGfx_ResetAllocationCounters(void);
-void sub_08215490(u32);
+void SpriteOam_ResetQueue(u32);
 void Sprite_InitSystem(void)
 {
     s32 i;
@@ -33,5 +33,5 @@ void Sprite_InitSystem(void)
         *c++ = z;
     }
     ObjGfx_ResetAllocationCounters();
-    sub_08215490(1);
+    SpriteOam_ResetQueue(1);
 }

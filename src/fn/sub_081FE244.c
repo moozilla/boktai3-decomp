@@ -1,5 +1,4 @@
 #include "global.h"
-#define OrbitEffect_RemoveSlot sub_081FE244
 
 struct OrbitSlotSprite {
     u32 flags;
@@ -29,15 +28,16 @@ struct OrbitEffectManager {
     u32 activeCount;
 };
 void Sound_StopSong(u32);
-void sub_081F33F0(s32);
+void SceneDistance_ClearLinkedEntry(s32);
 void OrbitEffect_RemoveTrailSprites(struct OrbitEffectSlot *);
 void Sprite_Remove(void *);
 
-void sub_081FE244(struct OrbitEffectManager *manager, struct OrbitEffectSlot *slot, s32 index)
+void OrbitEffect_RemoveSlot(struct OrbitEffectManager *manager, struct OrbitEffectSlot *slot,
+                            s32 index)
 {
     manager->activeCount--;
     Sound_StopSong(0x564);
-    sub_081F33F0(index);
+    SceneDistance_ClearLinkedEntry(index);
     OrbitEffect_RemoveTrailSprites(slot);
     slot->motionMode = 0;
     {

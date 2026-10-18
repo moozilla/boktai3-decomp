@@ -1,5 +1,4 @@
 #include "global.h"
-#define RisingSprite_Spawn      sub_08237368
 #define RisingSprite_CreatePool RisingPuffPool_GetOrCreate
 #define gRisingSpritePool       gUnk_020004A0
 struct RisingSpritePosition {
@@ -21,7 +20,7 @@ struct RisingSpritePool {
 };
 extern struct RisingSpritePool *gUnk_020004A0;
 void *RisingPuffPool_GetOrCreate(void);
-void sub_08237368(struct RisingSpritePosition *position)
+void RisingSprite_Spawn(struct RisingSpritePosition *position)
 {
     struct RisingSprite *p;
     if (!gUnk_020004A0)

@@ -1,4 +1,3 @@
-#define Ratatosk_GetPlayerOffsetNearestSelf sub_081F31FC
 #define gRatatoskPlayerOffsets gUnk_0824FDD0
 // Checker ELF predates promotion of these two names.
 #include "global.h"
@@ -11,14 +10,15 @@ extern const struct RatatoskPlayerOffsets gUnk_0824FDD0;
 struct SceneVec *Player_GetEffectivePosition(s32);
 struct SceneVec *Ratatosk_GetPosition(void);
 
-static inline void AddPosition(struct SceneVec *out, const struct SceneVec *a, const struct SceneVec *b)
+static inline void AddPosition(struct SceneVec *out, const struct SceneVec *a,
+                               const struct SceneVec *b)
 {
     out->x = b->x + a->x;
     out->y = b->y + a->y;
     out->z = b->z + a->z;
 }
 
-void sub_081F31FC(void *unused, struct SceneVec *out)
+void Ratatosk_GetPlayerOffsetNearestSelf(void *unused, struct SceneVec *out)
 {
     s32 selected = -1;
     struct RatatoskPlayerOffsets offsets = gRatatoskPlayerOffsets;

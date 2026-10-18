@@ -1,4 +1,3 @@
-#define RisingActor_LowerHeight sub_081FDB40
 #define RisingActor_SetCallback SunOrb_SetUpdateCallback
 #include "global.h"
 struct RisingDrawable {
@@ -22,7 +21,7 @@ static inline void showDrawable(struct RisingDrawable *drawable)
     drawable->flags |= 4;
 }
 s32 Mod(s32, s32);
-s32 sub_081FDB40(struct RisingActor *actor)
+s32 RisingActor_LowerHeight(struct RisingActor *actor)
 {
     if (Mod(actor->tick, 4) == 0)
         actor->height += -0x2000;

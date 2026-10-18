@@ -1,12 +1,12 @@
 #include "global.h"
 #include "engine.h"
 void SolarFruit_SetInventorySlot(s32 slot, s32 value);
-void sub_0822EA8C(s32 value, s32 slot);
+void GameState_MoveSlotEntry(s32 value, s32 slot);
 /* game state fields, addressed index-first as the original does */
 #define FRUIT_SLOT(i) (*(s16 *)((u8 *)gUnk_02000710 + (i) * 2 + 0x90))
 /* Registry routine FE88 (Solar Fruit): clears the eight entries set by
    SolarFruit_SetInventorySlot, the eight slots at +0x90 and +0x54, then -n count, -w count
-   values for SolarFruit_SetInventorySlot and -q eight values for sub_0822EA8C. */
+   values for SolarFruit_SetInventorySlot and -q eight values for GameState_MoveSlotEntry. */
 void SolarFruit_Command(void)
 {
     s32 i, count;
@@ -25,6 +25,6 @@ void SolarFruit_Command(void)
                 SolarFruit_SetInventorySlot(i, Script_GetValue());
         if (Script_SeekToKeyword('q'))
             for (i = 0; i <= 7; i++)
-                sub_0822EA8C(Script_GetValue(), i);
+                GameState_MoveSlotEntry(Script_GetValue(), i);
     }
 }

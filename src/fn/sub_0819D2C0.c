@@ -1,5 +1,3 @@
-#define OffsetActor_UpdateAnimationSequence sub_0819D2C0
-#define OffsetActor_TestNearbyCells         sub_0819BA7C
 #include "global.h"
 struct OffsetActorAction {
     u8 state, pad1[3];
@@ -19,7 +17,7 @@ struct OffsetActor {
 };
 void ActionState_Reset(void *);
 void ActionState_SetState(void *, u32);
-s32 OffsetActor_TestNearbyCells(struct OffsetActor *);
+s32 Hresvelgr_HasAdjacentOverride(struct OffsetActor *);
 static inline u8 Enter(struct OffsetActor *p)
 {
     if (p->entered) {
@@ -33,7 +31,7 @@ static inline void SetAnimation(struct OffsetActor *p, u32 id)
 {
     p->animation = id;
 }
-void sub_0819D2C0(struct OffsetActor *p)
+void OffsetActor_UpdateAnimationSequence(struct OffsetActor *p)
 {
     struct OffsetActor *obj = p;
     struct OffsetActorAction *s = &p->action;
@@ -46,7 +44,7 @@ void sub_0819D2C0(struct OffsetActor *p)
                 SetAnimation(obj, 24);
                 s->frame++;
             } else if (obj->finished) {
-                if (OffsetActor_TestNearbyCells(obj))
+                if (Hresvelgr_HasAdjacentOverride(obj))
                     ActionState_SetState(s, 1);
                 else
                     ActionState_SetState(s, 2);
