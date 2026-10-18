@@ -344,3 +344,4 @@ addr,function,name,family,note
 081419D4,sub_081419D4,ActorVariant_GetTableValue,"ActorVariant","looks up a halfword in a variant-specific table"
 08141AE4,sub_08141AE4,Player_GetMovementSpeed,"Player","calculate movement speed with load and status reductions"
 080B5E54,sub_080B5E54,SceneActorControl_CanTurnTowardTarget,"SceneActorControl","tests stationary motion, range, facing difference and turn cooldown"
+080F1C48,sub_080F1C48,SceneActor_RampColorRed,"SceneActor color cycle","ramp red channel to sixteen and advance color phase"
