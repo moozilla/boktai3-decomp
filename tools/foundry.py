@@ -169,6 +169,9 @@ def context(func):
             break
         keep.append(ln)
     asm = "\n".join(keep)
+    names = real_names()
+    asm = re.sub(r"\bsub_([0-9A-F]{8})\b", lambda m: names.get(m.group(1), m.group(0))
+                 if m.group(0) != func else m.group(0), asm)
     refs = sorted(set(re.findall(r"\b(?:bl|=)\s*([A-Za-z_]\w+)", asm)) - {func})
     decls = declarations()
     known, unknown = [], []
@@ -211,7 +214,8 @@ Read docs/WORKER.md sections "agbcc matching tips" and the "Wrong values in the 
 bullet for compiler idioms.
 
 Write your C to wip/foundry/{func}.c: `#include "global.h"`, local declarations, then the one
-function {func} (keep the sub_ name). No data definitions, no string literals, no register
+function {func} (keep the sub_ name). Use the names the context pack shows: the linker
+does not resolve sub_XXXXXXXX for a function that has a real name, or D_XXXXXXXX labels. No data definitions, no string literals, no register
 pins (`register ... asm("rN")`), no asm() statements.
 
 Check ONLY with:  build/venv/bin/python tools/foundry.py check wip/foundry/{func}.c
@@ -247,6 +251,33 @@ def brief(func, checks=None):
 
 # ---------------------------------------------------------------- check and stages
 
+_names = None
+
+
+def real_names():
+    """address -> the name the linker knows, for functions renamed in symbols/functions.csv"""
+    global _names
+    if _names is None:
+        import csv
+        _names = {r["addr"].upper(): r["name"] for r in csv.DictReader(open(os.path.join(ROOT, "symbols", "functions.csv")))}
+    return _names
+
+
+def link_names(path):
+    """Address-style names (sub_X, D_X) that check.py resolves but the ROM link does not."""
+    text = open(path).read()
+    out = []
+    for m in sorted(set(re.findall(r"\b(sub|D|gUnk|dword|byte)_([0-9A-Fa-f]{8})\b", text))):
+        kind, a = m
+        real = real_names().get(a.upper())
+        name = f"{kind}_{a}"
+        if kind == "sub" and real and real != name:
+            out.append(f"{name} -> {real}")
+        elif kind in ("D", "dword", "byte"):
+            out.append(f"{name} -> gUnk_{a.upper()}")
+    return out
+
+
 def fuzzy_of(text):
     if re.search(r": MATCH \(", text):
         return 100.0
@@ -266,6 +297,10 @@ def check(path, func=None):
     with open(os.path.join(d, "checks.tsv"), "a") as fh:
         fh.write(f"{n + 1}\t{time.time():.0f}\t{fz if fz is not None else 'error'}\t{round(time.time() - t0, 2)}\n")
     print(text, end="")
+    bad = link_names(path)
+    if bad:
+        print("LINK NAMES: the ROM build will not link these; rename them: " + ", ".join(bad))
+        return r.returncode or 3
     return r.returncode
 
 
