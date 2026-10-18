@@ -8,7 +8,8 @@ Keeps WORKERS batches in flight. Each batch claims a contiguous run of queued
 functions in one subsystem (tools/foundry.py batch: one active batch per
 subsystem, so header edits don't collide), runs a worker on it, records its
 tokens and cost (build/foundry/scale/usage.tsv), and frees the subsystem. The
-machine stages run separately (build/foundry/scale/finisher.sh). Stop with
+machine stages run separately (build/foundry/scale/finisher.sh). Several runners
+can share the queue (e.g. one per bucket or range). Stop with
 `touch build/foundry/scale/STOP`; running batches finish first.
 
 Workers may read anything, write only under wip/, build/foundry/ and include/,
@@ -29,8 +30,9 @@ TOOLS = ["Read", "Glob", "Grep", "Edit(wip/**)", "Write(wip/**)", "Edit(build/fo
          "Write(build/foundry/**)", "Edit(include/**)", "Bash(build/venv/bin/python tools/*)"]
 
 
-def claim(n, bucket):
-    r = subprocess.run([foundry.PY, "tools/foundry.py", "batch", str(n)] + (["--bucket", bucket] if bucket else []),
+def claim(n, bucket, rng=None):
+    r = subprocess.run([foundry.PY, "tools/foundry.py", "batch", str(n)] + (["--bucket", bucket] if bucket else []) +
+                       (["--range", *rng] if rng else []),
                        cwd=ROOT, capture_output=True, text=True)
     path = r.stdout.strip()
     return path if r.returncode == 0 and path.endswith(".txt") else None
@@ -69,6 +71,7 @@ def main():
     ap.add_argument("--batch", type=int, default=8)
     ap.add_argument("--model", default="sonnet")
     ap.add_argument("--bucket")
+    ap.add_argument("--range", nargs=2, help="START END (hex): only functions in this address range")
     ap.add_argument("--max-batches", type=int, default=10 ** 9)
     a = ap.parse_args()
     stop = os.path.join(foundry.SCALE, "STOP")
@@ -81,7 +84,7 @@ def main():
                 running.remove(item)
         if not os.path.exists(stop) and started < a.max_batches:
             while len(running) < a.workers:
-                path = claim(a.batch, a.bucket)
+                path = claim(a.batch, a.bucket, a.range)
                 if not path:
                     break
                 p, log, t0 = launch(path, a.model)

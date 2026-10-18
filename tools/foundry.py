@@ -550,7 +550,7 @@ def subsystem_of(addr):
     return next(((s, e, n) for s, e, n in subsystems() if s <= addr < e), (0, 0, "unassigned"))
 
 
-def batch(n, bucket_filter=None):
+def batch(n, bucket_filter=None, lo=0, hi=1 << 32):
     """Claim the next n queued functions of one subsystem not already being worked on, as a
     contiguous run, and print a batch brief."""
     q = os.path.join(SCALE, "queue.tsv")
@@ -562,7 +562,7 @@ def batch(n, bucket_filter=None):
     names = {f["name"]: f["addr"] for f in __import__("worklist").functions()}
     take, sub = [], None
     for r in rows:
-        if r[0] in claimed or (bucket_filter and r[2] != bucket_filter):
+        if r[0] in claimed or (bucket_filter and r[2] != bucket_filter) or not lo <= names[r[0]] < hi:
             continue
         s = subsystem_of(names[r[0]])
         if sub is None:
@@ -777,6 +777,7 @@ def main():
     bp = sub.add_parser("batch")
     bp.add_argument("n", type=int)
     bp.add_argument("--bucket")
+    bp.add_argument("--range", nargs=2, help="START END (hex)")
     bu = sub.add_parser("batch-usage")
     bu.add_argument("k")
     bu.add_argument("tokens")
@@ -803,7 +804,7 @@ def main():
     elif a.cmd == "queue":
         make_queue(a.buckets.split(","), a.max_insns)
     elif a.cmd == "batch":
-        batch(a.n, a.bucket)
+        batch(a.n, a.bucket, *([int(x, 16) for x in a.range] if a.range else []))
     elif a.cmd == "batch-usage":
         batch_usage(a.k, a.tokens, a.seconds)
     elif a.cmd == "scale-report":
