@@ -640,3 +640,4 @@ addr,function,name,family,note
 0811F0B8,sub_0811F0B8,ActorEmitter_TryEmitPair,"ActorEmitter","emits a pair with a kind-dependent height offset"
 0811F1A8,sub_0811F1A8,ActorEmitter_TryEmitAnimatedPair,"ActorEmitter","emits a pair and starts its keyframe animation"
 0811F29C,sub_0811F29C,ActorEffect_EmitOffsetPair,"ActorEffect","emits an effect using paired extents and negative offsets"
+0811F4C4,sub_0811F4C4,CallbackStatus_ResetSelectorAndTest,"CallbackStatus","clears the selector and tests active status with a zero count"
