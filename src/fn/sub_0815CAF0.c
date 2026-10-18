@@ -5,7 +5,7 @@ s32 sub_0815A400(void);
 s32 sub_0815C9EC(void);
 s32 sub_0815CA08(void);
 void sub_0814F828(u8 *);
-void sub_0815AF14(u8 *, s32);
+void PlayerCue_Stand(u8 *, s32);
 
 void sub_0815CAF0(void)
 {
@@ -13,7 +13,7 @@ void sub_0815CAF0(void)
     s32 i = sub_0815A400();
     p = gUnk_02000580[i];
     if (p != 0) {
-        sub_0815AF14(p, sub_0815C9EC());
+        PlayerCue_Stand(p, sub_0815C9EC());
         sub_0814F828(p);
     }
 }

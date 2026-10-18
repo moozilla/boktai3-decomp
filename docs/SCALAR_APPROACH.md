@@ -131,3 +131,40 @@ E70112(run-5kon9g7a),EE0116(run-6u9iddsj),B5C64(run-2gx83cy8). Depinning
 reduces each angle array from20 to9 hints and the half array from9 to5. Every
 hard-register value is initialized from an actual load or arithmetic result;
 there are no handwritten instruction bodies or explicit r7 bindings.
+
+## Addendum from codex/contiguous-section-sol-resume (2026-10-15, commit d48fe39e)
+
+### Final verification addendum, October 15
+
+A bounded follow-up recovered five more functions from the same reviewed
+family. This supersedes the earlier 20-function snapshot and the earlier ASM
+status of the five entries listed in this addendum. The final new-helper total is **25 functions /2,016
+bytes**, comprising **780 ordinary C bytes and 1,236 concession bytes**.
+The additional 504 bytes contribute 0.0209 percentage points against the
+2,415,354-byte code denominator, before any independent QC corrections.
+The six remaining ASM entries total 468 bytes: `082218A8`, `08221AB8`,
+`08221CC8`, `08221D04`, `08221F54` and `08221FEC`.
+
+| Address | Bytes | Commit | Full-span proof artifact |
+| 08221D9C | 100 | 0c1f187c | build/check/run-2v0zpew_ |
+| 08221E00 | 112 | d3e0b742 | build/check/run-fybloa42 |
+| 08221E70 | 112 | e582f9fe | build/check/run-5kon9g7a |
+| 08221EE0 | 116 | 8d070381 | build/check/run-6u9iddsj |
+| 08221B5C | 64 | 8fa779e2 | build/check/run-2gx83cy8 |
+
+The four contiguous angle arrays retain nine hints each after reduction from
+20; the half-step array retains five after reduction from nine. These are
+all concession-category functions. Their shared helper header is unchanged.
+The angle arrays preserve a masked unsigned intermediate, signed halfword
+representative, wrapping subtraction, signed rounding and narrowing stores.
+Every operand supplied to an empty asm is initialized; register constraints
+reuse a register only after the preceding value's last use. No explicit r7
+binding or instruction body is introduced.
+
+The decisive allocation change was to retain the masked intermediate in a
+low register while letting the target load use another register, then give
+the signed step its own short lifetime. This fixed the signed-load scratch
+rotation and all subsequent operand roles without changing the arithmetic.
+The half-step array similarly needed the target and result lifetimes kept
+separate. All five proofs were repeated after formatting and minimization.
+Combined ROM validation remains the integrator's responsibility.

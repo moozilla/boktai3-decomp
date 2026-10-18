@@ -5,7 +5,7 @@
   gclfiles.py FILE [--inline] print one file in the readable view
 
 Procedure ids are table slots assigned in source order, and a scene's private
-procedures sit right before and after its entry procedure (232 of 354 scenes
+procedures sit right before and after its entry procedure (287 of 492 scene files
 in one contiguous run). So a file is:
 
 * a scene file: a scene entry procedure and every procedure only it reaches,

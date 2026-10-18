@@ -9,7 +9,7 @@ struct S {
 };
 extern struct S *gUnk_03005420;
 void sub_08226AAC(struct S *);
-void sub_082264D0(s32 n)
+void Camera_FollowPlayer(s32 n)
 {
     struct S *p = gUnk_03005420;
     if (p) {

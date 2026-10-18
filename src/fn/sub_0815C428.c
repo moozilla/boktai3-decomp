@@ -30,15 +30,15 @@ s32 sub_081419D4(s32, s32);
 void sub_0815AD78(struct P *);
 void sub_0813ADD0(struct P *);
 void sub_0813AFEC(struct P *, s32, s32);
-void sub_0815B858(struct P *, s32);
-void sub_0815AF14(struct P *, s32);
+void PlayerCue_Motion7Turn(struct P *, s32);
+void PlayerCue_Stand(struct P *, s32);
 void sub_081502AC(void);
 void sub_081507F4(void);
 void Sound_PlaySong(s32);
 void sub_08153224(void);
 void sub_08146EAC(void);
 
-s32 sub_0815C428(struct P *p, u32 w)
+s32 PlayerCue_FormMotion(struct P *p, u32 w)
 {
     s32 r;
     p->w5a4 = w;

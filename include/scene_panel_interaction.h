@@ -79,15 +79,16 @@ void ScenePanel_BeginLongSequence(struct ScenePanel *);
 void ScenePanel_BeginPulseSequence(struct ScenePanel *);
 void ScenePanel_RunScheduledAction(struct ScenePanel *);
 void ScenePanelRig_SetState(struct ScenePanelRig *, u32);
-void sub_0815B15C(struct ScenePanelInteractionPlayer *, const struct ContactPosition *, s32, u32,
-                  u32);
-void sub_0815AF14(struct ScenePanelInteractionPlayer *, s32);
-void sub_0815AF50(struct ScenePanelInteractionPlayer *, s32, u32);
-void sub_0815B0A8(struct ScenePanelInteractionPlayer *, const struct ContactPosition *, u32, u32);
-void sub_0815B1D0(struct ScenePanelInteractionPlayer *, u32, u32);
-void sub_0815B28C(struct ScenePanelInteractionPlayer *, u32);
-void sub_0815B2E0(struct ScenePanelInteractionPlayer *, s32, u32);
-void sub_0815C4FC(struct ScenePanelInteractionPlayer *, u32);
+void PlayerCue_MoveTo(struct ScenePanelInteractionPlayer *, const struct ContactPosition *, s32,
+                      u32, u32);
+void PlayerCue_Stand(struct ScenePanelInteractionPlayer *, s32);
+void PlayerCue_Face(struct ScenePanelInteractionPlayer *, s32, u32);
+void PlayerCue_WalkTo(struct ScenePanelInteractionPlayer *, const struct ContactPosition *, u32,
+                      u32);
+void PlayerCue_Motion7Front(struct ScenePanelInteractionPlayer *, u32, u32);
+void PlayerCue_Motion7End(struct ScenePanelInteractionPlayer *, u32);
+void PlayerCue_Kneel(struct ScenePanelInteractionPlayer *, s32, u32);
+void PlayerCue_StateMotion(struct ScenePanelInteractionPlayer *, u32);
 void sub_0815C99C(struct ScenePanelInteractionPlayer *);
 void TetherActor_SetInteractionTarget(const void *, u32);
 void TetherActor_BeginAuxiliaryState(struct TetherActor *);

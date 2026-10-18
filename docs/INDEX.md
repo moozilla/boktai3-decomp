@@ -33,9 +33,13 @@ big one) · [GAME_LAYOUT](GAME_LAYOUT.md) (ROM to gameplay) · [ROM_MAP](ROM_MAP
 
 **Scripts (GCL).** [gcl/README](../gcl/README.md) (names, views, Konami's
 naming) · [gcl/examples/scale_quiz](../gcl/examples/scale_quiz.md) (a puzzle read
-end to end) · [MGS_GCL_MATCHING](MGS_GCL_MATCHING.md) (the matched VM) ·
+end to end) · [gcl/examples/prologue](../gcl/examples/prologue.md) (New Game to the
+Sealed Prison) · [gcl/examples/sealed_prison](../gcl/examples/sealed_prison.md) (the
+first dungeon, room by room; story progress) · [CUTSCENES](CUTSCENES.md) (the event tables SceneMessages plays,
+receivers and commands) · [MGS_GCL_MATCHING](MGS_GCL_MATCHING.md) (the matched VM) ·
 [PROCESS_REVIEW](PROCESS_REVIEW.md) · [tasks/script_targets](tasks/script_targets.md)
-(native routines scripts call, unmatched first).
+(native routines scripts call, unmatched first) · [tasks/relatives](tasks/relatives.md)
+(unmatched functions a matched relative mostly explains; `tools/relatives.py`).
 
 **Subsystems** (one doc per matched family; the title carries the address
 range). Scene actors: `SCENE_ACTOR_*`, [ACTOR_ATTACHMENT](ACTOR_ATTACHMENT.md),
@@ -85,24 +89,25 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/ACTOR_ATTACHMENT.md](../docs/ACTOR_ATTACHMENT.md) | Actor attachment state and offsets | *#actors* | 9 |
 | [docs/ACTOR_ATTACHMENT_MANAGER.md](../docs/ACTOR_ATTACHMENT_MANAGER.md) | Attachment manager lifecycle and scene actor pool prefix | *#actors #scene #assets* | 8 |
 | [docs/ANIMATION_081E.md](../docs/ANIMATION_081E.md) | Animation controller matching batch | *#scripts #animation #assets #matching* | 5 |
-| [docs/ASM_OUTPUT_QC.md](../docs/ASM_OUTPUT_QC.md) | Empty-asm outputs and return-value QC |  | 5 |
-| [docs/ASSETS.md](../docs/ASSETS.md) | Resources and asset formats | *#scripts #assets #text #tooling* | 32 |
+| [docs/ASM_OUTPUT_QC.md](../docs/ASM_OUTPUT_QC.md) | Empty-asm outputs and return-value QC |  | 9 |
+| [docs/ASSETS.md](../docs/ASSETS.md) | Resources and asset formats | *#scripts #assets #text #tooling* | 33 |
 | [docs/BACKGROUND_CONTROLLERS.md](../docs/BACKGROUND_CONTROLLERS.md) | Background controllers and scheduler report groups | *#assets #progress* | 3 |
-| [docs/BACKLOG.md](../docs/BACKLOG.md) | Research and development backlog |  | 15 |
+| [docs/BACKLOG.md](../docs/BACKLOG.md) | Research and development backlog |  | 16 |
 | [docs/BOUNCING_OBJECTS.md](../docs/BOUNCING_OBJECTS.md) | Twelve-slot bouncing objects (080688D0–08069964) | *#particles* | 4 |
 | [docs/BURST_EMITTER.md](../docs/BURST_EMITTER.md) | Five-slot burst emitter (tentative identity) | *#particles* | 2 |
 | [docs/CANDIDATES.md](../docs/CANDIDATES.md) | Compact checking and candidate checkpoints | *#tooling* | 3 |
 | [docs/CENTAUR.md](../docs/CENTAUR.md) | Centaur: playing with the decomp | *#scene #tooling* | 19 |
 | [docs/COMPILER_REFERENCES.md](../docs/COMPILER_REFERENCES.md) | Community references and checked agbcc patterns | *#assets #matching* | 4 |
+| [docs/CUTSCENES.md](../docs/CUTSCENES.md) | Cutscenes: the SceneMessages event tables | #scripts #scene #actors | 6 |
 | [docs/DATA.md](../docs/DATA.md) | Decoded data |  | 7 |
 | [docs/DEVLOG_2026-10-08.md](../docs/DEVLOG_2026-10-08.md) | Boktai 3 devlog for October 8 2026 | *#process* | 21 |
 | [docs/DRAFT_INVENTORY_2026-10-09.md](../docs/DRAFT_INVENTORY_2026-10-09.md) | Existing-draft inventory (October 9, 2026) | *#inventory #matching* | 12 |
 | [docs/EEPROM.md](../docs/EEPROM.md) | EEPROM SDK source matches | *#hardware #library* | 2 |
-| [docs/ENGINE.md](../docs/ENGINE.md) | How the Boktai 3 engine works |  | 45 |
+| [docs/ENGINE.md](../docs/ENGINE.md) | How the Boktai 3 engine works |  | 46 |
 | [docs/ENTRY_AND_MENUS.md](../docs/ENTRY_AND_MENUS.md) | Entry point and contiguous subsystem batch |  | 5 |
 | [docs/FINDINGS.md](../docs/FINDINGS.md) | Engine findings |  | 5 |
 | [docs/GAME_LAYOUT.md](../docs/GAME_LAYOUT.md) | Boktai 3 game layout: from ROM to gameplay | *#assets* | 33 |
-| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 10 |
+| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 12 |
 | [docs/HIT_SWITCH.md](../docs/HIT_SWITCH.md) | Hit-counted switch pool (tentative identity) |  | 5 |
 | [docs/KNIDL_PROCESS_REVIEW_2026-10-09.md](../docs/KNIDL_PROCESS_REVIEW_2026-10-09.md) | KNIDL workflow review and implications for Boktai 3 | *#process* | 13 |
 | [docs/LEVEL_ADVANCE_DISPLAY.md](../docs/LEVEL_ADVANCE_DISPLAY.md) | Level advancement display (tentative presentation identity) |  | 4 |
@@ -122,14 +127,14 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/RESEARCH_2026-10-12.md](../docs/RESEARCH_2026-10-12.md) | RESEARCH_2026-10-12.md |  | 28 |
 | [docs/RETROSPECTIVE_2026-10-08.md](../docs/RETROSPECTIVE_2026-10-08.md) | Boktai 3 matching run retrospective | *#matching #process* | 26 |
 | [docs/RFU.md](../docs/RFU.md) | RFU wireless SDK source matches | *#wireless #library* | 6 |
-| [docs/ROM_MAP.md](../docs/ROM_MAP.md) | ROM map — Boktai 3 (U33J) | *#assets #text* | 4 |
+| [docs/ROM_MAP.md](../docs/ROM_MAP.md) | ROM map — Boktai 3 (U33J) | *#assets #text* | 5 |
 | [docs/ROUTE_SPRITE_ACTOR.md](../docs/ROUTE_SPRITE_ACTOR.md) | Route sprite actor pool (tentative) | *#actors #assets* | 9 |
 | [docs/RTC.md](../docs/RTC.md) | Cartridge RTC matching evidence | *#hardware #matching* | 4 |
 | [docs/RUNTIME_CONTEXT.md](../docs/RUNTIME_CONTEXT.md) | Runtime function context | *#scripts #tooling* | 4 |
-| [docs/SCALAR_APPROACH.md](../docs/SCALAR_APPROACH.md) | Scalar approach and period-256 angle helpers | *#inventory* | 7 |
+| [docs/SCALAR_APPROACH.md](../docs/SCALAR_APPROACH.md) | Scalar approach and period-256 angle helpers | *#inventory* | 9 |
 | [docs/SCENE_ACTOR_ANIMATION.md](../docs/SCENE_ACTOR_ANIMATION.md) | Scene actor profile animation selection | *#actors #scene #animation* | 4 |
 | [docs/SCENE_ACTOR_ATTACHMENT_RESPONSES.md](../docs/SCENE_ACTOR_ATTACHMENT_RESPONSES.md) | Actor attachment selection and responses | *#actors #animation* | 15 |
-| [docs/SCENE_ACTOR_BEHAVIOR.md](../docs/SCENE_ACTOR_BEHAVIOR.md) | Actor behavior and collision setup (0807462C–08076034) | *#actors #animation* | 11 |
+| [docs/SCENE_ACTOR_BEHAVIOR.md](../docs/SCENE_ACTOR_BEHAVIOR.md) | Actor behavior and collision setup (0807462C–08076034) | *#actors #animation* | 18 |
 | [docs/SCENE_ACTOR_BEHAVIOR_FRONTIER.md](../docs/SCENE_ACTOR_BEHAVIOR_FRONTIER.md) | Scene actor behavior frontier | *#actors #scene #inventory #animation* | 13 |
 | [docs/SCENE_ACTOR_CONTACTS.md](../docs/SCENE_ACTOR_CONTACTS.md) | Scene actor contacts and profiles (tentative) | *#actors #scene #assets* | 5 |
 | [docs/SCENE_ACTOR_CONTROL_HELPERS.md](../docs/SCENE_ACTOR_CONTROL_HELPERS.md) | Scene actor control helpers, 08083AEC–08084280 | *#actors #scene* | 5 |
@@ -185,9 +190,10 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/STACKED_ACTOR.md](../docs/STACKED_ACTOR.md) | Stacked display actor (tentative identity) | *#actors #particles #assets* | 5 |
 | [docs/TERRAIN_EDGE_MARKER.md](../docs/TERRAIN_EDGE_MARKER.md) | Terrain edge marker manager (tentative identity) | *#scripts* | 4 |
 | [docs/UNIT_WORKER.md](../docs/UNIT_WORKER.md) | Subsystem unit worker | *#text* | 4 |
-| [docs/WORKER.md](../docs/WORKER.md) | Worker brief: family-oriented matching | *#matching #process* | 15 |
+| [docs/WORKER.md](../docs/WORKER.md) | Worker brief: family-oriented matching | *#matching #process* | 16 |
 | [docs/WORKER_ROUND.md](../docs/WORKER_ROUND.md) | Standard round brief (only when workers are authorized) |  | 3 |
 | [docs/tasks/m4a.md](../docs/tasks/m4a.md) | Task: lift the MP2K (m4a) sound library from pokeemerald | *#sound #library* | 3 |
+| [docs/tasks/relatives.md](../docs/tasks/relatives.md) | Unmatched functions with matched relatives | *#tooling* | 35 |
 | [docs/tasks/script_targets.md](../docs/tasks/script_targets.md) | Decomp targets: the code the scripts call | *#scripts #assets #tooling* | 2 |
 | [docs/history/2026-10-12.md](../docs/history/2026-10-12.md) | Handoff history: 2026-10-12 | #actors #animation #assets #hardware #inventory #library #menu #panel #particles #scene #scripts #sound #text #tooling #wireless | 49 |
 | [docs/history/2026-10-13.md](../docs/history/2026-10-13.md) | Handoff history: 2026-10-13 | #actors #assets #inventory #menu #particles #scene #scripts #text #tooling #wireless | 13 |
@@ -197,8 +203,10 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-17.md](../docs/history/2026-10-17.md) | Handoff history: 2026-10-17 | #actors #scripts | 0 |
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 16 |
-| [gcl/README.md](../gcl/README.md) | GCL: the game's scripts | *#scripts #scene #assets #tooling* | 14 |
+| [gcl/README.md](../gcl/README.md) | GCL: the game's scripts | *#scripts #scene #assets #tooling* | 15 |
+| [gcl/examples/prologue.md](../gcl/examples/prologue.md) | Worked example: the prologue, from New Game to the Sealed Prison | *#scripts #assets #tooling* | 8 |
 | [gcl/examples/scale_quiz.md](../gcl/examples/scale_quiz.md) | Worked example: the Blackbeard Brothers' scale quiz | *#scripts #assets #tooling* | 10 |
+| [gcl/examples/sealed_prison.md](../gcl/examples/sealed_prison.md) | Worked example: the Sealed Prison, the first dungeon | *#scripts #assets #tooling* | 6 |
 | [notes/animation-contact-burst_2026-10-14.md](../notes/animation-contact-burst_2026-10-14.md) | Temporary animations and contact-burst effect, October 14 | *#particles #animation* | 7 |
 | [notes/area-effect-link_2026-10-14.md](../notes/area-effect-link_2026-10-14.md) | Link variant of area effects (Sol, 2026-10-14) |  | 2 |
 | [notes/area-effect_2026-10-14.md](../notes/area-effect_2026-10-14.md) | Rectangular area effect manager (Sol, 2026-10-14) | *#tooling* | 4 |
