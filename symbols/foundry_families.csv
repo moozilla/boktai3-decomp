@@ -1183,3 +1183,4 @@ addr,function,name,family,note
 081F2534,sub_081F2534,SpriteTrail_BeginImpact,"SpriteTrail","enters impact transition and spawns an impact sprite"
 081F2678,sub_081F2678,SpriteGroup_UpdateExpiringSlot,"SpriteGroup (tentative)","updates a slot and removes it after its counter becomes positive"
 081F26BC,sub_081F26BC,SpriteGroup_UpdateSlots,"SpriteGroup (tentative)","dispatches state callbacks for four active slots"
+081F27A4,sub_081F27A4,SpriteTrail_InitCollider,"SpriteTrail","initializes the trail motion collider with four-unit extents"
