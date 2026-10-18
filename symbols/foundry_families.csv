@@ -471,3 +471,4 @@ addr,function,name,family,note
 08173190,sub_08173190,MotionSequence_ConfirmReset,"MotionSequence (tentative)","clear selection state when reset is confirmed"
 08173470,sub_08173470,SceneHud_ShowEquipmentDetails,"SceneHud","shows selected equipment animation and detail text"
 08173650,sub_08173650,SceneHud_LayoutEquipmentGrid,"SceneHud","positions sixteen equipment entries and sets optional control palettes"
+081738D0,sub_081738D0,MotionSequence_BeginResetPrompt,"MotionSequence (tentative)","configure a prompt and install its reset-confirmation callback"
