@@ -740,3 +740,4 @@ addr,function,name,family,note
 08163310,sub_08163310,TransitionPanel_TryBeginClose,"TransitionPanel","hides panel sprites and starts or defers closing"
 08163398,sub_08163398,SceneTransition_FinishDelay,"SceneTransition (tentative)","after 32 ticks disable eight entries and switch callbacks"
 081633F8,sub_081633F8,TransitionPanel_UpdateCostPrompt,"TransitionPanel","shows a value prompt after the opening animation"
+08163B70,sub_08163B70,SpriteParticles_UpdateEntries,"SpriteParticles (tentative)","expire and update sixteen timed sprite entries"
