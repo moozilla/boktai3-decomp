@@ -720,3 +720,4 @@ addr,function,name,family,note
 08151988,sub_08151988,Player_UpdateThreePhaseBaseAnimationAction,"Player","steps a three phase action using animation zero"
 08158234,sub_08158234,Player_ClampInteractionVelocity,"Player","clamps projected movement around interaction target"
 08158650,sub_08158650,Player_SynchronizeInteractionDisplay,"Player","synchronizes collider visibility shadow and positions"
+08158CD8,sub_08158CD8,Player_BeginTerrainInteraction,"Player","starts mode 0x1C and records terrain-relative height"
