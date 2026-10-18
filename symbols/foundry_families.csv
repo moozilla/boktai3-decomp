@@ -534,3 +534,4 @@ addr,function,name,family,note
 08177DAC,sub_08177DAC,Hud_HideAuxiliaryElements,"HudManager","sets hidden flag on two auxiliary element groups"
 081781B4,sub_081781B4,SceneHud_SetTimedState,"SceneHud","sets HUD parameters and starts a 300-frame timed state"
 08178238,sub_08178238,Hud_UpdateCountdownDisplay,"HudManager","updates countdown values with a three-hundred-frame display timer"
+081782E0,sub_081782E0,SceneHud_RefreshControls,"SceneHud","refresh player-backed HUD controls according to mode"
