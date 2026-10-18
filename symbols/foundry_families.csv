@@ -881,3 +881,4 @@ addr,function,name,family,note
 0818088C,sub_0818088C,ProximityVolume_SetParameter,"ProximityVolume","sets the volume halfword parameter at offset 0x3A when nonnull"
 081808B4,sub_081808B4,SceneCombatActor_ResetAttackMode,"SceneCombatActor","restores saved parameters and resets collider categories for attack mode"
 081809A8,sub_081809A8,SceneCombatActor_ResetDefenseMode,"SceneCombatActor","restores saved parameters and resets collider categories for defense mode"
+08180A88,sub_08180A88,SceneParticle_UpdateBounce,"BouncingSceneParticle","integrates particle velocity, bounces once, then invokes its cleanup callback"
