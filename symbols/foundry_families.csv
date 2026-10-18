@@ -953,3 +953,4 @@ addr,function,name,family,note
 081981C8,sub_081981C8,ShadowActor_UpdateThreeStageAction,"ShadowActor (tentative animated actor with scaled shadow)","loads three directional vectors and repeats the action before changing state"
 08198D58,sub_08198D58,SceneEffect_AllocateActor,"Scene effect actor pool (tentative)","claims the pool's actor slot and initializes its mode"
 08199034,sub_08199034,SceneEntryPool_CreateEntry,"SceneEntryPool","claims one of four pooled entries and initializes it"
+08199374,sub_08199374,SceneEffect_InitializeEmitterOptions,"SceneEffect emitter","reads emitter script options and clears effect callbacks"
