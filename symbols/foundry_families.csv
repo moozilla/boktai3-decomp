@@ -1303,3 +1303,4 @@ addr,function,name,family,note
 08222464,sub_08222464,HashTable_RemoveKey,"HashTable","unlinks a matching key from its hash bucket"
 08222974,sub_08222974,Serial_ProbeConnection,"Serial","checks serial readiness and busy state then records connection role"
 08222CB0,sub_08222CB0,Serial_EnableInterrupt,"serial communication","installs serial interrupt callback and enables serial IRQ"
+082230AC,sub_082230AC,Serial_ResetMultiplayer,"serial communication","resets serial state and configures multiplayer mode"
