@@ -564,3 +564,4 @@ addr,function,name,family,note
 08103C54,sub_08103C54,ActorGroup_RemoveFromScript,"ActorGroup","removes the member named by script keyword n"
 08104B64,sub_08104B64,ActorGroup_UpdateMemberFall,"ActorGroup","accelerates a falling member and emits eight landing effects"
 08104C9C,sub_08104C9C,ActorGroup_UpdateMemberRemoval,"ActorGroup","runs removal sounds and script then removes sprite and collider"
+08104DE8,sub_08104DE8,CallbackPool_DestroyEntries,"CallbackPool","remove active sprites, colliders and optional effects"
