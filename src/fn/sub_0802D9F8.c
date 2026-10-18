@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -41,6 +40,7 @@ static inline u8 *cell(int i)
 }
 int Actor_UpdateMovementAnimationAndEffects(void *unused, struct Actor *p)
 {
+    s16 k2 = 0;
     struct Body *body = &p->body;
     void *drawable = &p->drawable;
     sub_08225B74(body);
@@ -50,10 +50,12 @@ int Actor_UpdateMovementAnimationAndEffects(void *unused, struct Actor *p)
             struct Vec *pos = &body->pos;
             int x = pos->x >> 8, z = pos->z >> 8, index, height, slope;
             u8 *c;
-            if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+            if ((((x < 0) || (z < 0)) || (((u32)x) >= gUnk_030052F8)) ||
+                (((u32)z) >= gUnk_030052FC)) {
                 index = 0;
-            else
+            } else {
                 index = gUnk_030052F4->rows[z] + x;
+            }
             c = cell(index);
             slope = *c >> 4;
             height = (*c & 15) << 8;
@@ -73,13 +75,12 @@ int Actor_UpdateMovementAnimationAndEffects(void *unused, struct Actor *p)
     if (p->timer > 0) {
         p->timer--;
         if (p->timer <= 3) {
-            if (p->flashing && !(gUnk_030053F4 & 0x200))
+            if (p->flashing && (!(gUnk_030053F4 & 0x200))) {
                 p->timer = p->duration;
-            else {
+            } else {
                 s16 *timer = &p->timer;
                 int zero;
-                zero = 0;
-                asm("" : "+r"(zero));
+                zero = k2;
                 *timer = 0;
                 Actor_SetAttachmentEffect(p, 8, 180, 180);
                 p->flashing = zero;
