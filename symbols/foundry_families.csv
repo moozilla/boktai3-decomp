@@ -819,3 +819,4 @@ addr,function,name,family,note
 08179B04,sub_08179B04,FieldHud_UpdateWidgets,"Field HUD","updates five embedded HUD widget components"
 08179B34,sub_08179B34,FieldHud_InitializeWidgets,"Field HUD","initializes number gauge and value source then enables widgets"
 08179B9C,sub_08179B9C,CollisionReaction_RecordImpact,"CollisionReaction","records contact direction, frontal proximity and reward flags"
+08179CFC,sub_08179CFC,,"Field HUD",""
