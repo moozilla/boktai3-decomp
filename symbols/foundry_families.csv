@@ -830,3 +830,4 @@ addr,function,name,family,note
 0817A324,sub_0817A324,ActorPosition_SaveSelectedPoint,"actor position state","copies the selected eight-byte point after a successful query"
 0817A6E4,sub_0817A6E4,ActorPosition_SetOffsetPoint,"actor position state","copies position and adds coordinate offsets minus20 plus330 plus60"
 0817A8C8,sub_0817A8C8,ActorPosition_TestPath,"actor position state","requires both position-pair tests to succeed; path role tentative"
+0817A900,sub_0817A900,SceneVolume_TestPlayerPosition,"SceneVolume","tests a volume against player position"
