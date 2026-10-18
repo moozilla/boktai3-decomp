@@ -591,3 +591,4 @@ addr,function,name,family,note
 0810AC7C,sub_0810AC7C,LinkSelection_AdvanceBitExchange,"AreaEffectLinkState","advances the six-bit link selection exchange"
 0810B120,sub_0810B120,LinkSelection_WaitForReadyParticipants,"AreaEffectLinkState","counts ready participants and advances the link menu"
 0810B324,sub_0810B324,SceneMenu_BeginTimedMessage,"SceneMenu","opens a message window and schedules its next state"
+0810B4C0,sub_0810B4C0,SessionMenu_ShowTimedMessage,"Session menu state callbacks","opens message window and advances after 120 frames"
