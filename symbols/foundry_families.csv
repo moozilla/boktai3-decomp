@@ -1161,3 +1161,4 @@ addr,function,name,family,note
 081EB81C,sub_081EB81C,ScreenText_ShowIndexedString,"screen script parameters","displays script text with a mode-dependent index adjustment"
 081EC1A8,sub_081EC1A8,ScreenScript_UpdateDelay,"screen script parameters","calls a script after an exponential frame delay and kills the task"
 081ECADC,sub_081ECADC,ActorDisplay_RefreshScreenLayer,"actor display","updates the selected display layer then calls two actor display helpers"
+081ECB60,sub_081ECB60,ScreenLayers_SelectRandomVariant,"screen background layers","selects a random value masked to the configured bit width"
