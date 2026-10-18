@@ -1,0 +1,50 @@
+#define SceneActorReaction_RestoreAfterControl sub_080EB6E4
+#include "global.h"
+#include "scene_actor_reaction.h"
+#include "scene_actor_control_phase.h"
+void sub_080E9B8C(void *);
+void SceneActorReaction_RestoreAlternateAfterDelay(struct SceneActorRegistryResetView *);
+static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
+{
+    actor->field2B2 = 1;
+    actor->field2B0 = 0;
+    actor->field2B5 = kind;
+    actor->target = control;
+    actor->field2C8 = 0;
+    {
+        u32 *flags = &actor->flags114;
+        u32 mask = ~1;
+        *flags &= mask;
+    }
+    actor->word104 = 0;
+}
+void sub_080EB6E4(struct SceneActorRegistryResetView *actor)
+{
+    if (SceneActorControl_TakeFlag(&actor->field2B1)) {
+        SetControl(actor, sub_080E9B8C, 35);
+        actor->field2B0 = 0;
+    }
+    if (actor->field2B0) {
+        struct SceneActorReactionCommand *command = (void *)&actor->word460;
+        void *callback = sub_0807FC90;
+        u32 one = 1;
+        u32 zero;
+        u32 state;
+        command->duration = 30;
+        command->payload = callback;
+        zero = 0;
+        command->first = zero;
+        command->second = zero;
+        command->kind = one;
+        state = 3;
+        actor->state2A8 = state;
+        actor->phase2A9 = zero;
+        actor->behavior2AA = zero;
+        actor->counter2AC = zero;
+        {
+            u16 offset = 0x2B1;
+            *((u8 *)actor + offset) = one;
+        }
+        SetControl(actor, SceneActorReaction_RestoreAlternateAfterDelay, 14);
+    }
+}
