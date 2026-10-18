@@ -289,3 +289,4 @@ addr,function,name,family,note
 0812D34C,sub_0812D34C,SceneSlot_Remove,"SceneSlotPool","removes sprite and releases its pool occupancy bit"
 0812D6C4,sub_0812D6C4,SceneParticle_UpdateAlternatingFrame,"SceneParticlePool","alternates two frames on a countdown interval"
 0812D704,sub_0812D704,SceneParticle_UpdateMotion,"SceneParticlePool","moves particle, animates frames, and expires its lifetime"
+0812D758,sub_0812D758,SceneParticle_Remove,"SceneParticlePool","releases occupancy bit and removes particle effect"
