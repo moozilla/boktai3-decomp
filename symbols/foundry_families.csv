@@ -1045,3 +1045,4 @@ addr,function,name,family,note
 081B6BC4,sub_081B6BC4,HomingEffect_TurnTowardTarget,"HomingEffect (tentative)","turns a fixed-point heading toward its target with a bounded angular step"
 081B6F68,sub_081B6F68,ActorEffect_UpdateExpiry,"ActorEffect (tentative)","disables collision on entry and removes the effect after thirty timer steps"
 081B6FA8,sub_081B6FA8,PooledController_UpdateAll,"PooledController","dispatches active controller slots by state"
+081B7304,sub_081B7304,PooledController_ActivateIdleSlots,"PooledController","moves enabled idle slots into state three"
