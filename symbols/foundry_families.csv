@@ -655,3 +655,4 @@ addr,function,name,family,note
 0812224C,sub_0812224C,SpriteEffect_UpdateBlinkAndExpire,"SpriteEffect","blinks then removes sprite and shadow and releases the effect slot"
 0812247C,sub_0812247C,SpriteEffect_SpawnWithMotion,"SpriteEffect","allocates a moving sprite effect with shadow palette and collider"
 081225A4,sub_081225A4,SpriteEffectPool_RemoveSlots,"SpriteEffectPool","removes active sprites and their auxiliary effects"
+081229E4,sub_081229E4,StateSprite_InitCollider,"StateSpritePool","initializes oriented collider dimensions and callback"
