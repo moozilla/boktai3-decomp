@@ -1218,3 +1218,4 @@ addr,function,name,family,note
 081F8C6C,sub_081F8C6C,SceneSong_EnterAndWait,"SceneSongState","plays song on entry and marks completion when done"
 081F9268,sub_081F9268,SceneEffect_EnterAndRestart,"SceneEffectState","configures effect on entry and restarts when done"
 081FA070,sub_081FA070,Ratatosk_InitBodyCollider,"Ratatosk","initializes body collider dimensions and attack properties"
+081FA11C,sub_081FA11C,Ratatosk_InitHurtCollider,"Ratatosk","initializes and refreshes the damage-receiving collider"
