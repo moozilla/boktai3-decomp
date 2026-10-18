@@ -111,3 +111,4 @@ addr,function,name,family,note
 080E696C,sub_080E696C,SceneActor_UpdateAlternateEntryPhase,"SceneActor movement phases","restore alternate target and advance to behavior fifteen"
 080E74C4,sub_080E74C4,SceneActor_EnterShadowlessPhase,"SceneActorAnimation","selects phase entry and disables its shadow"
 080E7544,sub_080E7544,SceneActor_RestoreSavedTargetOnCompletion,"SceneActorAnimation","restores saved target and clears phase state on completion"
+080E766C,sub_080E766C,SceneActor_WaitForCategoryAttachment,"SceneActorAnimation","starts category attachment at frame 160 and waits for unavailability"
