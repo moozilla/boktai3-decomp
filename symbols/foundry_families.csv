@@ -943,3 +943,4 @@ addr,function,name,family,note
 0818F50C,sub_0818F50C,EffectPool_CreateTimedEffect,"EffectPool","creates an animated effect with a lifetime of 100"
 0818F588,sub_0818F588,SceneEffect_ResetState,"SceneEffect","clears effect state fields at offsets 0x174 through 0x184"
 0818F610,sub_0818F610,SceneEffectPool_AllocateSlot,"SceneEffectPool","claims the first free slot in a 48-entry scene effect pool"
+0818FD9C,sub_0818FD9C,Nidhoggr_CreateAttachedAttackEffect,"Nidhoggr collidable effects","creates an anchored sprite effect with attack collision"
