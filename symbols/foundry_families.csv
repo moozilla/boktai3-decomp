@@ -211,3 +211,4 @@ addr,function,name,family,note
 08114C50,sub_08114C50,SlotRegistry_RemoveSprite,"SlotRegistry","removes an active slot sprite and clears its registration"
 08115104,sub_08115104,EffectPool_UpdateEntries,"EffectPool","dispatches active pool entries subject to global pause flags"
 08115268,sub_08115268,ActorParticles_SpawnAlternatingBurst,"ActorParticles","spawns four particles with alternating settings"
+08115924,sub_08115924,ActorParticles_InitPool,"ActorParticles","initializes 48 animated particle slots"
