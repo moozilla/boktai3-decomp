@@ -1108,3 +1108,4 @@ addr,function,name,family,note
 081C4CF0,sub_081C4CF0,SceneFade_BeginTargetMove,"SceneFade","starts a target move and fade vector"
 081C4D78,sub_081C4D78,SceneFade_BeginSecondMove,"SceneFade","starts the second target movement phase"
 081C4DC4,sub_081C4DC4,SceneFade_BeginFinalMove,"SceneFade","starts the final target movement phase"
+081C542C,sub_081C542C,GameState_GetPackedTripletValue,"game-state packed triplet values","reads a nibble indexed by three times row plus column"
