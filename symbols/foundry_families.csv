@@ -1120,3 +1120,4 @@ addr,function,name,family,note
 081D2118,sub_081D2118,SceneNpc_OscillatePaletteBlend,"StateActor","oscillates palette blend over alternating 60-frame ramps"
 081D2544,sub_081D2544,SceneNpc_EnterRequestedState,"StateActor","selects requested state callback and resets attachment state"
 081D25AC,sub_081D25AC,SceneNpc_TickStateAndPalette,"StateActor","runs animation and state callbacks then decrements palette blend"
+081D418C,sub_081D418C,PaletteTransition_ResetBuffers,"PaletteTransition","resets palette buffers with white and black banks"
