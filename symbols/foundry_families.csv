@@ -567,3 +567,4 @@ addr,function,name,family,note
 08104DE8,sub_08104DE8,CallbackPool_DestroyEntries,"CallbackPool","remove active sprites, colliders and optional effects"
 08105704,sub_08105704,ProximityActor_CheckPlayerRange,"ProximityActor","activates state two inside the player distance threshold"
 081083F4,sub_081083F4,TilePool_Destroy,"Tile / Pool1B8","removes sprites and frees all occupied tile slots"
+08108B90,sub_08108B90,CallbackTask_Finish,"CallbackTask","dispatches a result callback and kills a completed task"
