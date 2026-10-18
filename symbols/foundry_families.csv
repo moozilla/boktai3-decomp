@@ -455,3 +455,4 @@ addr,function,name,family,note
 0817080C,sub_0817080C,SceneHud_InitializeActionInput,"SceneHud","initializes action input flags and cursor keyframes"
 08170B48,sub_08170B48,SceneInput_BuildActionGrid,"SceneInput","builds action-grid navigation cells and optional entries"
 08170C90,sub_08170C90,SceneHud_LayoutAlternateActionGrid,"SceneHud","lays out alternate action grid and sets control palettes"
+081712D4,sub_081712D4,SceneHud_OpenStatComparison,"SceneHud stat comparison and action transfer","open stat comparison and compute three stat differences"
