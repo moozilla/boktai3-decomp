@@ -525,3 +525,4 @@ addr,function,name,family,note
 08176974,sub_08176974,SceneHud_UpdatePageInput,"SceneHud","updates page selection from shoulder buttons"
 08176B00,sub_08176B00,SceneHud_FadeOutPage,"SceneHud","fades out the page and switches menu handlers"
 08176EA0,sub_08176EA0,Hud_BeginSavedBlend,"HudManager","saves display blend state and starts a transition phase"
+08176F20,sub_08176F20,Hud_RemoveMenuGraphics,"HudManager","removes animation array and four additional graphics objects"
