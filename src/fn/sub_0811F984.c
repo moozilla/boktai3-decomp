@@ -1,0 +1,34 @@
+#include "global.h"
+#define ActorAction_TickRecovery sub_0811F984
+struct ActorRecovery {
+    u8 unknown0[0x68];
+    u32 pendingDamage;
+    u8 unknown6C[0x12];
+    u16 recoveryValue;
+    u8 unknown80[0x299];
+    u8 actionKind;
+    u8 unknown31A[0xA];
+    u16 unknown324, recoveryTimer, cooldown;
+    u8 unknown32A[0x250];
+    u8 damageTimer;
+    u8 unknown57B[0x73];
+    s8 damageFlags;
+};
+void sub_0811D6C8(struct ActorRecovery *, void *, u32, s32, s32, s32, s32, s32);
+static inline void ClearDamageFlag(s8 *flags, s32 mask)
+{
+    *flags &= mask;
+}
+s32 sub_0811F984(struct ActorRecovery *actor, void *context)
+{
+    if (actor->actionKind == 1 && actor->recoveryTimer) {
+        actor->recoveryTimer--;
+        ClearDamageFlag(&actor->damageFlags, ~1);
+        actor->damageTimer = 0;
+        actor->pendingDamage = 0;
+        if (!actor->recoveryTimer)
+            sub_0811D6C8(actor, context, actor->recoveryValue, 0, 0, 16, 1, 1);
+    }
+    if (actor->cooldown)
+        actor->cooldown--;
+}

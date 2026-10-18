@@ -250,3 +250,4 @@ addr,function,name,family,note
 0811EE68,sub_0811EE68,CallbackList_SubtractClampedValue,"CallbackList","subtracts a supplied or callback-derived amount and clamps to zero"
 0811F338,sub_0811F338,ActorAction_InitializeMode,"ActorAction","selects action callback, animation and duration from mode"
 0811F490,sub_0811F490,CallbackList_SubtractStateTenValue,"CallbackList","subtracts a supplied or state-ten callback-derived amount and clamps to zero"
+0811F984,sub_0811F984,ActorAction_TickRecovery,"ActorAction","ticks recovery and cooldown timers and clears pending damage"
