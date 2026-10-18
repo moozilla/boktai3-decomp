@@ -1333,3 +1333,4 @@ addr,function,name,family,note
 08231448,sub_08231448,ActiveList_PrependNode,"Active list; precise subsystem unknown","prepends an inactive node to a doubly linked active list"
 08231480,sub_08231480,EffectGroup_Unlink,"EffectGroup","unlink an active effect group from its pool"
 08231568,sub_08231568,EffectGroup_Reset,"EffectGroup","clear group counters and reset four effect entries"
+082323DC,sub_082323DC,ColliderSprite_Destroy,"ColliderSprite","remove a sprite and collider and free its allocations"
