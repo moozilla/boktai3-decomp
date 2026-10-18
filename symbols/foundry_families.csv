@@ -425,3 +425,4 @@ addr,function,name,family,note
 0816C78C,sub_0816C78C,MapMenu_ResetMarkers,"MapMenu","resets marker positions and hides the secondary marker"
 0816DBAC,sub_0816DBAC,SceneHud_BeginSelectedActionTransfer,"SceneHud","animates the selected action icon from the cursor to position 16,48"
 0816DC78,sub_0816DC78,SceneHud_BeginRandomActionReturn,"SceneHud","assigns a random special item and animates an icon back to the action cursor"
+0816DD70,sub_0816DD70,SceneHud_FinishRandomActionReturn,"SceneHud","waits for icon motion, plays the special-item cue and restores action input"
