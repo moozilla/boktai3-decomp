@@ -632,12 +632,14 @@ def scale_report():
         if not os.path.exists(sp):
             continue
         st = json.load(open(sp))
-        x = by.setdefault(b, {"n": 0, "m": 0, "insns": 0, "minsns": 0})
+        x = by.setdefault(b, {"n": 0, "m": 0, "insns": 0, "minsns": 0, "named": 0})
         x["n"] += 1
         x["insns"] += int(insns)
         if st["stage"].startswith("matched") and "disagrees" not in st["stage"]:
             x["m"] += 1
             x["minsns"] += int(insns)
+            nm = parse_result(func).get("NAME", "none")
+            x["named"] += not nm.startswith("none") and bool(nm)
     up = os.path.join(SCALE, "usage.tsv")
     us = [ln.split("\t") for ln in open(up)] if os.path.exists(up) else []
     tokens = sum(int(u[1]) for u in us)
@@ -646,7 +648,7 @@ def scale_report():
     m = sum(x["m"] for x in by.values())
     for b, x in by.items():
         print(f"{b:8s} finished {x['n']:4d}  matched {x['m']:4d} ({100 * x['m'] / max(x['n'], 1):.0f}%)  "
-              f"instructions matched {x['minsns']}/{x['insns']}")
+              f"named {x['named']}/{x['m']}  instructions matched {x['minsns']}/{x['insns']}")
     print(f"batches {len(us)}  tokens {tokens}  matches {m}  tokens/match {tokens // max(m, 1)}  "
           f"wall {hours:.1f} h  matches/hour {m / hours if hours else 0:.1f}")
 
@@ -664,6 +666,83 @@ def committable():
         src = os.path.join(WIP, func + ".c") if st["stage"] == "matched by worker" else os.path.join(OUT, func, "candidate.c")
         out.append((func, src, st["stage"], st.get("checks")))
     return sorted(out)
+
+
+def parse_result(func):
+    p = os.path.join(OUT, func, "result.txt")
+    out = {}
+    if os.path.exists(p):
+        for ln in open(p):
+            k, _, v = ln.strip().partition(" ")
+            if k in ("NAME", "FAMILY", "NOTE"):
+                out[k] = v.strip()
+    return out
+
+
+def unit_with_placeholder(func):
+    for p in glob.glob(os.path.join(ROOT, "src", "*.c")):
+        if re.search(rf'INCLUDE_ASM\("asm/nonmatching", {func}\);', open(p).read()):
+            return p
+    return None
+
+
+def integrate(dry=False):
+    """Commit each new match, organized: named, placed, family recorded. One commit per function."""
+    fam_p = os.path.join(ROOT, "symbols", "foundry_families.csv")
+    if not os.path.exists(fam_p):
+        open(fam_p, "w").write("addr,function,name,family,note\n")
+    done = 0
+    for func, src, stage, checks in committable():
+        if not os.path.exists(src):
+            continue
+        text = open(src).read()
+        r = parse_result(func)
+        name = None
+        m = re.match(r"(\w+)\s+(\w+)\s*(.*)", r.get("NAME", ""))
+        if m and m.group(1) != "none":
+            name = m.group(1)
+        if name and not re.search(rf"^#define\s+\w+\s+{func}\b", text, re.M):
+            text = re.sub(r'((?:#include[^\n]*\n)+)', rf"\1#define {name} {func}\n", text, count=1)
+        alias = re.search(rf"^#define\s+(\w+)\s+{func}\b", text, re.M)
+        name = alias.group(1) if alias else None
+        placed = None
+        unit = unit_with_placeholder(func)
+        if unit and not dry:
+            old = open(unit).read()
+            body = "\n".join(ln for ln in text.split("\n") if not ln.startswith("#include"))
+            open(unit, "w").write(old.replace(f'INCLUDE_ASM("asm/nonmatching", {func});', body.strip()))
+            ok = subprocess.run([PY, "tools/check.py", unit], cwd=ROOT, capture_output=True, text=True)
+            if ok.returncode == 0:
+                placed = unit
+            else:
+                open(unit, "w").write(old)
+        if not placed:
+            placed = os.path.join(ROOT, "src", "fn", func + ".c")
+            if not dry:
+                open(placed, "w").write(text)
+                ok = subprocess.run([PY, "tools/check.py", placed], cwd=ROOT, capture_output=True, text=True)
+                if ok.returncode != 0 or "MATCH" not in ok.stdout:
+                    os.remove(placed)
+                    print(f"{func}: no longer matches as src/fn ({ok.stdout.strip()[-80:]}); skipped")
+                    continue
+        addr = func[4:]
+        fam = r.get("FAMILY", "")
+        note = (r.get("NAME", "").split(None, 2)[2:] or [""])[0].strip('"')
+        if not dry:
+            with open(fam_p, "a") as fh:
+                fh.write(f'{addr},{func},{name or ""},"{fam}","{note}"\n')
+        how = {"matched by worker": "a foundry worker", "matched by repair": "a foundry worker plus tools/repair.py",
+               "matched by register solver": "a foundry worker plus tools/autosolve.py"}.get(stage, stage)
+        msg = f"Match {func}" + (f" ({name})" if name else "")
+        body = f"From the foundry: {how}, {checks} checks." + (f" Family: {fam}." if fam else "") + \
+            (f" {note}." if note else "") + (f" Placed in {os.path.relpath(placed, ROOT)}." if unit and placed == unit else "")
+        print(f"{msg} -> {os.path.relpath(placed, ROOT)}")
+        if not dry:
+            subprocess.run(["git", "add", placed, fam_p], cwd=ROOT, check=True)
+            subprocess.run(["git", "commit", "-q", "-m", msg, "-m", body, "-m",
+                            "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"], cwd=ROOT, check=True)
+        done += 1
+    print(f"{done} integrated")
 
 
 def main():
@@ -697,6 +776,7 @@ def main():
     bu.add_argument("seconds")
     sub.add_parser("scale-report")
     sub.add_parser("committable")
+    sub.add_parser("integrate").add_argument("--dry", action="store_true")
     sub.add_parser("hdrcheck").add_argument("header")
     r = sub.add_parser("report")
     r.add_argument("--markdown", action="store_true")
@@ -723,6 +803,8 @@ def main():
         scale_report()
     elif a.cmd == "hdrcheck":
         sys.exit(hdrcheck(a.header))
+    elif a.cmd == "integrate":
+        integrate(a.dry)
     elif a.cmd == "committable":
         for row in committable():
             print(*row, sep="\t")
