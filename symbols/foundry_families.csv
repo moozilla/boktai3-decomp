@@ -287,3 +287,4 @@ addr,function,name,family,note
 0812CF50,sub_0812CF50,SceneSlot_Allocate,"SceneSlotPool","allocates a free slot and records its index"
 0812D180,sub_0812D180,SceneSlot_UpdateTimedPulse,"SceneSlotPool","emits every six ticks then advances state after duration"
 0812D34C,sub_0812D34C,SceneSlot_Remove,"SceneSlotPool","removes sprite and releases its pool occupancy bit"
+0812D6C4,sub_0812D6C4,SceneParticle_UpdateAlternatingFrame,"SceneParticlePool","alternates two frames on a countdown interval"
