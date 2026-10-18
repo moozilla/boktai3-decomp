@@ -849,3 +849,4 @@ addr,function,name,family,note
 0817BB54,sub_0817BB54,ActorDecision_UpdateTimedPhase,"ActorDecision (tentative)","updates a timed phase and selects transitions"
 0817BC64,sub_0817BC64,ActorDecision_UpdateDelayPhase,"ActorDecision (tentative)","sets timeout and requests transition after thirty ticks"
 0817BF10,sub_0817BF10,ActorDecision_UpdateFlagPhase,"ActorDecision (tentative)","sets a transition flag or exits after a timeout"
+0817BFA4,sub_0817BFA4,SceneActorState_UpdateAnimationRequest,"SceneActorState","consume phase reset and queue animation request"
