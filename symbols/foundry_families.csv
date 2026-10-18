@@ -1106,3 +1106,4 @@ addr,function,name,family,note
 081C46D4,sub_081C46D4,SceneTransition_StartSunScript,"SceneTransition","selects a script context from sun state"
 081C4C94,sub_081C4C94,SceneFade_BeginSoundFade,"SceneFade","starts a fade and plays a sound"
 081C4CF0,sub_081C4CF0,SceneFade_BeginTargetMove,"SceneFade","starts a target move and fade vector"
+081C4D78,sub_081C4D78,SceneFade_BeginSecondMove,"SceneFade","starts the second target movement phase"
