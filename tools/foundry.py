@@ -42,8 +42,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from romlib import ROOT  # noqa: E402
 
 PY = os.path.join(ROOT, "build", "venv", "bin", "python")
-OUT = os.path.join(ROOT, "build", "foundry")
-WIP = os.path.join(ROOT, "wip", "foundry")
+RUN = os.environ.get("FOUNDRY_RUN", "foundry")  # a separate run keeps its own state and drafts
+OUT = os.path.join(ROOT, "build", RUN)
+WIP = os.path.join(ROOT, "wip", RUN)
 BUCKETS = [(0, 50, "<50"), (50, 150, "50-150"), (150, 400, "150-400"), (400, 10 ** 9, "400+")]
 
 
@@ -213,17 +214,17 @@ matched relatives (start from a relative's C when one covers most of the functio
 Read docs/WORKER.md sections "agbcc matching tips" and the "Wrong values in the right shape"
 bullet for compiler idioms.
 
-Write your C to wip/foundry/{func}.c: `#include "global.h"`, local declarations, then the one
+Write your C to wip/{run}/{func}.c: `#include "global.h"`, local declarations, then the one
 function {func} (keep the sub_ name). Use the names the context pack shows: the linker
 does not resolve sub_XXXXXXXX for a function that has a real name, or D_XXXXXXXX labels. No data definitions, no string literals, no register
 pins (`register ... asm("rN")`), no asm() statements.
 
-Check ONLY with:  build/venv/bin/python tools/foundry.py check wip/foundry/{func}.c
+Check ONLY with:  {env}build/venv/bin/python tools/foundry.py check wip/{run}/{func}.c
 It prints the aligned original/candidate listing (`!` marks differences) and MATCH or a fuzzy %.
 When the shape is right but values differ, run:
-  build/venv/bin/python tools/repair.py wip/foundry/{func}.c {func} --write
+  build/venv/bin/python tools/repair.py wip/{run}/{func}.c {func} --write
 (it takes constants, offsets and callees from the ROM; its "ROM only"/"C only" lines name what
-is structurally missing). Also useful: build/venv/bin/python tools/explain.py wip/foundry/{func}.c {func}
+is structurally missing). Also useful: build/venv/bin/python tools/explain.py wip/{run}/{func}.c {func}
 
 Register copies are reachable in plain C: do not conclude that a pin is needed. When the ROM
 copies a constant or value between registers (`movs r3, #1; adds r1, r3, #0`) or keeps a mask
@@ -234,9 +235,16 @@ early `return` or `goto` that changes block layout; the order of declarations an
 statements that compute the same value. A value computed separately in each branch usually
 means the C repeats the expression in each branch.
 
+Each check also prints a CORE line: the distance with register allocation ignored (copies,
+spills and the frame dropped, registers abstracted), and which regions of the function are
+LOCKED. On anything over ~60 instructions, steer by CORE, not by the fuzzy %: allocation noise
+makes the fuzzy % jump around, while CORE only moves when the C does different work. Lock regions
+one at a time. Once CORE is 0, work on registers (the levers above); the machine stages after
+you also try register allocation.
+
 Budget: {checks} checks. Get the structure right first (calls, branches, loops), then the values,
 then registers. Stop early when you match, or when several checks bring no improvement.
-Do not edit anything outside wip/foundry/. Do not commit.
+Do not edit anything outside wip/{run}/. Do not commit.
 Finish with one line: RESULT {func} MATCH|fuzzy N% checks=K  and a two-sentence note on what
 was left or what made it hard.
 """
@@ -246,7 +254,8 @@ def brief(func, checks=None):
     path, f = context(func)
     if checks is None:
         checks = 12 if f["insns"] < 150 else 20
-    return BRIEF.format(root=ROOT, func=func, context=os.path.relpath(path, ROOT), checks=checks)
+    env = f"FOUNDRY_RUN={RUN} " if RUN != "foundry" else ""
+    return BRIEF.format(root=ROOT, func=func, context=os.path.relpath(path, ROOT), checks=checks, run=RUN, env=env)
 
 
 # ---------------------------------------------------------------- check and stages
@@ -297,6 +306,12 @@ def check(path, func=None):
     with open(os.path.join(d, "checks.tsv"), "a") as fh:
         fh.write(f"{n + 1}\t{time.time():.0f}\t{fz if fz is not None else 'error'}\t{round(time.time() - t0, 2)}\n")
     print(text, end="")
+    if fz != 100.0 and fz is not None:
+        try:
+            import regions
+            print(regions.render(regions.Report(path, func).run(), limit=6))
+        except Exception as e:  # the report is advice; never fail the check over it
+            print(f"(regions report failed: {e!r})")
     bad = link_names(path)
     if bad:
         print("LINK NAMES: the ROM build will not link these; rename them: " + ", ".join(bad))
@@ -371,7 +386,8 @@ def finish(func):
             st["stage"] = "matched by repair"
         elif st["repair_shape"] == 0 and st["repair_dist"]:
             log = sh([PY, "tools/autosolve.py", os.path.relpath(cand, ROOT), func, "--out",
-                      os.path.join(d, "autosolve"), "-j", "2"], timeout=3600)
+                      os.path.join(d, "autosolve"), "-j", "2", "--solve-seconds", "60",
+                      "--translate-seconds", "150"], timeout=1800)
             m = "TRANSLATED" in log or "MATCHES" in log
             st["stage"] = "matched by register solver" if m else "registers only (solver failed)"
             if m:
@@ -442,6 +458,110 @@ def report(markdown):
                          f" shape {st.get('repair_shape', st.get('worker_shape'))}" if st else ""))
 
 
+# ---------------------------------------------------------------- at scale
+
+SCALE = os.path.join(OUT, "scale")
+
+
+def make_queue(buckets, max_insns):
+    """Every never-drafted, unmatched function in the buckets, in ROM order."""
+    import worklist
+    done = worklist.done_names()
+    skip = drafted() | {r[0] for r in sample_rows()}
+    want = set(buckets)
+    fs = [f for f in worklist.functions() if f["name"] not in done and f["name"] not in skip
+          and not worklist.in_library(f["addr"]) and f["addr"] >= 0x0800145C and f["insns"] <= max_insns
+          and bucket(f["insns"]) in want]
+    os.makedirs(SCALE, exist_ok=True)
+    with open(os.path.join(SCALE, "queue.tsv"), "w") as fh:
+        for f in fs:
+            fh.write(f"{f['name']}\t{f['insns']}\t{bucket(f['insns'])}\n")
+    print(f"{len(fs)} functions queued")
+
+
+BATCH_BRIEF = """You are a decompilation worker on the Boktai 3 (GBA) decomp in {root}.
+Work through these functions in order, one at a time:
+
+{funcs}
+
+For EACH function FUNC:
+1. Run: build/venv/bin/python tools/foundry.py brief FUNC
+   It writes the context pack and prints the per-function instructions. Follow them exactly
+   (its check budget applies to that function alone).
+2. When done with FUNC (MATCH, budget spent, or no progress), write its result line to
+   build/foundry/FUNC/result.txt, e.g. `RESULT FUNC MATCH checks=3` or
+   `RESULT FUNC fuzzy 91.2% checks=12`, plus one sentence on what was hard, and move on.
+Do not reread earlier functions' files; keep each function's work self-contained.
+Finish with one line per function: its RESULT line.
+"""
+
+
+def batch(n, bucket_filter=None):
+    """Claim the next n queued functions and print a batch brief."""
+    q = os.path.join(SCALE, "queue.tsv")
+    claimed_p = os.path.join(SCALE, "claimed.txt")
+    claimed = set(open(claimed_p).read().split()) if os.path.exists(claimed_p) else set()
+    rows = [ln.rstrip("\n").split("\t") for ln in open(q)]
+    take = [r[0] for r in rows if r[0] not in claimed and (not bucket_filter or r[2] == bucket_filter)][:n]
+    if not take:
+        sys.exit("queue empty")
+    with open(claimed_p, "a") as fh:
+        fh.write("\n".join(take) + "\n")
+    k = len(glob.glob(os.path.join(SCALE, "batch-*.txt"))) + 1
+    path = os.path.join(SCALE, f"batch-{k:03d}.txt")
+    open(path, "w").write(BATCH_BRIEF.format(root=ROOT, funcs="\n".join(take)))
+    print(path)
+
+
+def batch_usage(k, tokens, seconds):
+    with open(os.path.join(SCALE, "usage.tsv"), "a") as fh:
+        fh.write(f"{k}\t{tokens}\t{seconds}\t{time.time():.0f}\n")
+
+
+def scale_report():
+    """Funnel over the at-scale run: per bucket, and matches per hour / tokens per match."""
+    q = os.path.join(SCALE, "queue.tsv")
+    rows = [ln.rstrip("\n").split("\t") for ln in open(q)] if os.path.exists(q) else []
+    by = {}
+    for func, insns, b in rows:
+        sp = os.path.join(OUT, func, "stages.json")
+        if not os.path.exists(sp):
+            continue
+        st = json.load(open(sp))
+        x = by.setdefault(b, {"n": 0, "m": 0, "insns": 0, "minsns": 0})
+        x["n"] += 1
+        x["insns"] += int(insns)
+        if st["stage"].startswith("matched") and "disagrees" not in st["stage"]:
+            x["m"] += 1
+            x["minsns"] += int(insns)
+    up = os.path.join(SCALE, "usage.tsv")
+    us = [ln.split("\t") for ln in open(up)] if os.path.exists(up) else []
+    tokens = sum(int(u[1]) for u in us)
+    times = [float(u[3]) - float(u[2]) for u in us] + [float(u[3]) for u in us]
+    hours = (max(times) - min(times)) / 3600 if us else 0
+    m = sum(x["m"] for x in by.values())
+    for b, x in by.items():
+        print(f"{b:8s} finished {x['n']:4d}  matched {x['m']:4d} ({100 * x['m'] / max(x['n'], 1):.0f}%)  "
+              f"instructions matched {x['minsns']}/{x['insns']}")
+    print(f"batches {len(us)}  tokens {tokens}  matches {m}  tokens/match {tokens // max(m, 1)}  "
+          f"wall {hours:.1f} h  matches/hour {m / hours if hours else 0:.1f}")
+
+
+def committable():
+    """Matched functions not yet in src/: (func, source file)."""
+    out = []
+    for sp in glob.glob(os.path.join(OUT, "sub_*", "stages.json")):
+        func = os.path.basename(os.path.dirname(sp))
+        st = json.load(open(sp))
+        if not st["stage"].startswith("matched") or "disagrees" in st["stage"]:
+            continue
+        if os.path.exists(os.path.join(ROOT, "src", "fn", func + ".c")):
+            continue
+        src = os.path.join(WIP, func + ".c") if st["stage"] == "matched by worker" else os.path.join(OUT, func, "candidate.c")
+        out.append((func, src, st["stage"], st.get("checks")))
+    return sorted(out)
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -461,6 +581,18 @@ def main():
     u.add_argument("func")
     u.add_argument("tokens")
     u.add_argument("seconds")
+    qp = sub.add_parser("queue")
+    qp.add_argument("--buckets", default="<50,50-150")
+    qp.add_argument("--max-insns", type=int, default=150)
+    bp = sub.add_parser("batch")
+    bp.add_argument("n", type=int)
+    bp.add_argument("--bucket")
+    bu = sub.add_parser("batch-usage")
+    bu.add_argument("k")
+    bu.add_argument("tokens")
+    bu.add_argument("seconds")
+    sub.add_parser("scale-report")
+    sub.add_parser("committable")
     r = sub.add_parser("report")
     r.add_argument("--markdown", action="store_true")
     a = ap.parse_args()
@@ -476,6 +608,17 @@ def main():
         print(json.dumps(finish(a.func), indent=1))
     elif a.cmd == "usage":
         usage(a.func, a.tokens, a.seconds)
+    elif a.cmd == "queue":
+        make_queue(a.buckets.split(","), a.max_insns)
+    elif a.cmd == "batch":
+        batch(a.n, a.bucket)
+    elif a.cmd == "batch-usage":
+        batch_usage(a.k, a.tokens, a.seconds)
+    elif a.cmd == "scale-report":
+        scale_report()
+    elif a.cmd == "committable":
+        for row in committable():
+            print(*row, sep="\t")
     else:
         report(a.markdown)
 
