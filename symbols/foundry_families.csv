@@ -1058,3 +1058,4 @@ addr,function,name,family,note
 081BAF10,sub_081BAF10,SelectionList_TickCursorShake,"SelectionList","offsets the cursor horizontally for three frames then resumes selection updates"
 081BB060,sub_081BB060,ResourceSprite_CopyEntries,"ResourceSprite","Copies up to sixteen fixed-size entries into the sprite resource object."
 081BB0A0,sub_081BB0A0,ResourceSprite_Initialize,"ResourceSprite","Loads and relocates the resource and initializes its sprite."
+081BB4E8,sub_081BB4E8,SpriteMenu_HideAll,"SpriteMenu","Sets the hidden flag on sixteen sprite records and two marker records."
