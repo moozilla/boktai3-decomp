@@ -934,3 +934,4 @@ addr,function,name,family,note
 0818D590,sub_0818D590,Armor_AcceleratePartReturnTurn,"Armor articulated-part motion","accelerates rotation toward the part's return heading"
 0818D640,sub_0818D640,Armor_DampPartMovement,"Armor articulated-part motion","dampens part movement before starting retraction"
 0818DB10,sub_0818DB10,SpinningApproach_UpdateOwnerRelativeSegment,"Spinning approach motion (tentative), Motion0818Object","advances owner-relative final segment and marks completion"
+0818DEBC,sub_0818DEBC,Armor_UpdatePartRebound,"Armor 9 (auto, tentative), armor parts","applies vertical rebound and spin, then retires the part"
