@@ -690,3 +690,4 @@ addr,function,name,family,note
 0813F9EC,sub_0813F9EC,Player_SetActionRequest,"Player action requests","sets action request and resets its latch and timers"
 081401A0,sub_081401A0,Player_RefreshActionEquipment,"Player action equipment","applies saved equipment and auxiliary action selection"
 08140410,sub_08140410,Player_ClampPositionToStoredTerrainCell,"Player terrain movement","clamps position inside the stored terrain cell"
+08140620,sub_08140620,Player_ClampAlternateTerrainPosition,"Player terrain movement","clamps position for the alternate terrain-recovery gate"
