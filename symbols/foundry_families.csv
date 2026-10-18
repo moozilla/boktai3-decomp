@@ -144,3 +144,4 @@ addr,function,name,family,note
 080F7714,sub_080F7714,SceneActor_AdvanceOffsetApproach,"SceneActor","approach an offset destination then enter control phase 43"
 080F7868,sub_080F7868,ActorPhase_UpdateTimedFlicker,"ActorPhase","updates a timed flicker and enters phase 44"
 080B0C80,sub_080B0C80,SceneActor_RunPositionScript,"SceneActor position-script triggers","runs script with actor coordinates and resets trigger fields"
+080F82E8,sub_080F82E8,ActorPhase_UpdateSpriteCollapse,"ActorPhase","reduces sprite X scale and increases Y scale before phase 36"
