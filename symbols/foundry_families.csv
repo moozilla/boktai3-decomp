@@ -1380,3 +1380,4 @@ addr,function,name,family,note
 08238B48,sub_08238B48,DirectionalEffect_DecodeAnimationMode,"DirectionalEffect","maps an effect mode to animation variant and group"
 08238EBC,sub_08238EBC,DirectionalEffect_PlaceSprite,"DirectionalEffect","places and activates an effect sprite with a vertical offset"
 082397B0,sub_082397B0,ActorEffect_SelectModeFlag,"ActorEffect","selects effect flag four or eight using actor and global state"
+0823A550,sub_0823A550,ActorEffect_TestStatusFlags,"ActorEffect","returns ten when any status flag from bit seven through eleven is set"
