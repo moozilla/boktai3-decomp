@@ -711,3 +711,4 @@ addr,function,name,family,note
 0814A6B8,sub_0814A6B8,Player_CalculatePreviewActionStat,"Player action stats","calculates a preview stat while temporarily substituting action fields"
 0814A884,sub_0814A884,Player_AccumulateContactCost,"Player contact and action variants","reduces contact cost and adds callback contributions"
 0814CFC0,sub_0814CFC0,Player_UpdateStatThreshold,"Player","returns a stat threshold and records whether the scene threshold is met"
+0814D02C,sub_0814D02C,Player_SelectActionVariant,"Player contact and action variants","selects variant from callback flags and available stat B"
