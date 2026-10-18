@@ -24,8 +24,13 @@
 //   poke ADDR[:SIZE] V  write V (hex) to memory once (SIZE 1/2/4, default 4)
 //   freeze ADDR[:SIZE] V  same, rewritten before every frame; "unfreeze" clears
 //   lux N               solar sensor reading (0-255, game treats lower as brighter)
+//   rtc SECONDS         set the cartridge clock (unix seconds, UTC)
 //   trace on|off        enable coverage recording (default on)
 //   probe NAME ADDR     log registers before executing ADDR (hex) to probes.tsv
+//   watchpc ADDR LO HI  arm a latch: set when ADDR (hex) executes with r0 in
+//                       [LO, HI] (decimal), e.g. Text_LookupString of a string
+//   waitpc MAX          run until the armed latch is set (at most MAX frames;
+//                       the rest of that frame runs too), then disarm it
 //   unprobe             remove all probes; probes also work with trace off
 //   (env BOKTAI3_SAV=file.sav loads a battery save first)
 //   mark NAME           start a new coverage segment: subsequent coverage is
@@ -245,10 +250,15 @@ static void poke(uint32_t addr, uint32_t size, uint32_t val) {
 	else core->busWrite32(core, addr, val);
 }
 
+// waitpc: the PC and r0 range to stop at; hit is set when it executes
+static uint32_t until_pc;
+static int32_t until_lo, until_hi;
+static int until_hit;
+
 static void run_frames(int n) {
 	for (int f = 0; f < n; ++f) {
 		for (int i = 0; i < nfreeze; ++i) poke(freezes[i].addr, freezes[i].size, freezes[i].val);
-		if (!tracing && !nprobes) { core->runFrame(core); continue; }
+		if (!tracing && !nprobes && !until_pc) { core->runFrame(core); continue; }
 		uint32_t frame = core->frameCounter(core);
 		while (core->frameCounter(core) == frame) {
 			// ARMRun processes events before executing an instruction. Drain
@@ -260,6 +270,8 @@ static void run_frames(int n) {
 			uint32_t pc = cpu->gprs[15] - (cpu->executionMode == MODE_THUMB ? 2 : 4);
 			if (tracing) note_exec(pc);
 			if (nprobes) note_probes(pc);
+			if (until_pc && pc == until_pc && (int32_t)cpu->gprs[0] >= until_lo && (int32_t)cpu->gprs[0] <= until_hi)
+				until_hit = 1;
 			core->step(core);
 		}
 	}
@@ -451,8 +463,20 @@ int main(int argc, char** argv) {
 		}
 		else if (!strcmp(cmd, "unfreeze")) nfreeze = 0;
 		else if (!strcmp(cmd, "lux")) lux = atoi(a1);
+		else if (!strcmp(cmd, "rtc")) core->rtc.value = (int64_t) strtoll(a1, NULL, 10) * 1000;
 		else if (!strcmp(cmd, "trace")) tracing = !strcmp(a1, "on");
 		else if (!strcmp(cmd, "probe")) add_probe(a1, a2);
+		else if (!strcmp(cmd, "watchpc")) {
+			unsigned addr = 0; int lo = 0, hi = 0;
+			if (sscanf(line, "%*s %x %d %d", &addr, &lo, &hi) != 3) { fprintf(stderr, "watchpc ADDR LO HI\n"); return 1; }
+			until_pc = addr; until_lo = lo; until_hi = hi; until_hit = 0;
+		}
+		else if (!strcmp(cmd, "waitpc")) {
+			int f = 0, max = atoi(a1);
+			while (until_pc && !until_hit && f < max) { run_frames(1); ++f; }
+			if (!until_hit) fprintf(stderr, "waitpc %X: not reached in %d frames\n", until_pc, max);
+			until_pc = 0;
+		}
 		else if (!strcmp(cmd, "unprobe")) { nprobes = 0; probe_lo = UINT32_MAX; probe_hi = 0; }
 		else if (!strcmp(cmd, "mark")) {
 			end_segment();

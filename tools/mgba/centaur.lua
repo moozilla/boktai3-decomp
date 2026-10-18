@@ -855,8 +855,56 @@ function ovdump()
   LOG(string.format("overlay dumped: canvas %dx%d screen %dx%d at %d,%d", o.w, o.h, o.sw, o.sh, o.x0, o.y0))
 end
 
+-- live edits from the studio: write into the cartridge ROM in memory (the
+-- cart0 domain goes through GBAPatch, copy-on-write), so the game sees the
+-- change the next time it reads the data. Edited strings go in the free
+-- space at the end of the ROM and the string table entry is pointed at them.
+local LIVE_TEXT = 0x00FE0000                       -- cart0 offset: free in every build
+local STRING_TABLE, STRING_BANK = 0x08D6B1F8, 0x08D74DDC
+LIVE_NEXT = LIVE_TEXT
+function settext(id, hex)
+  local bytes = (hex:gsub("..", function(x) return string.char(tonumber(x, 16)) end)) .. "\0"
+  local off = LIVE_NEXT
+  LIVE_NEXT = (LIVE_NEXT + #bytes + 3) & ~3
+  for i = 1, #bytes do emu.memory.cart0:write8(off + i - 1, bytes:byte(i)) end
+  emu.memory.cart0:write32(STRING_TABLE - 0x08000000 + 4 * id, 0x80000000 | (0x08000000 + off - STRING_BANK))
+  LOG(string.format("text %d: %d bytes at %08X", id, #bytes, 0x08000000 + off))
+  toast("text " .. id .. " updated")
+  send({ t = "settext", id = id })
+end
+-- a sprite palette pool entry (16 BGR555 colors) in the pool table the game loaded (*0x030042E4)
+-- Objects keep their own copies of their palettes (the player's, for its
+-- damage tints), refreshed only when they are set up, so every 16-color copy
+-- of the entry's old colors in work RAM gets the new colors too.
+function setpool(pool, colors)
+  local base = emu:read32(0x030042E4) - 0x08000000 + 32 * pool
+  local old = emu.memory.cart0:readRange(base, 32)
+  local new = {}
+  for i = 1, 16 do new[i] = string.pack("<I2", colors[i] or 0) end
+  new = table.concat(new)
+  for i = 1, 16 do emu.memory.cart0:write16(base + 2 * (i - 1), colors[i] or 0) end
+  for _, name in ipairs({ "wram", "iwram" }) do
+    local m = emu.memory[name]
+    local data = m:readRange(0, m:size())
+    local at = 1
+    while true do
+      local s = data:find(old, at, true)
+      if not s then break end
+      if (s - 1) % 2 == 0 then
+        for k = 1, 32 do m:write8(s - 2 + k, new:byte(k)) end
+      end
+      at = s + 1
+    end
+  end
+  LOG(string.format("pool %d updated", pool))
+  toast("palette " .. pool .. " updated")
+  send({ t = "setpool", pool = pool })
+end
+
 -- commands the studio can send
 COMMANDS = {
+  settext = function(c) settext(c.id, c.hex) end,
+  setpool = function(c) setpool(c.pool, c.colors) end,
   capture = function(c) capture(c.name) end,
   bookmark = function(c) bm(c.name) end,
   load = function(c) go(c.name) end,
