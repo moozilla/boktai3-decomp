@@ -963,3 +963,4 @@ addr,function,name,family,note
 0819A110,sub_0819A110,CannonBattery_InitMuzzleFlash,"Cannon battery firing effect (tentative)","initializes a directional firing animation at the cannon muzzle"
 0819A520,sub_0819A520,ScriptValues_LoadRotatedArray,"ScriptValues","copies seven script values at a rotating destination index"
 0819A564,sub_0819A564,ScriptValues_TickRotation,"ScriptValues","loads rotated values and decrements the index every four ticks"
+0819A698,sub_0819A698,LinkEffect_UpdateEndpoints,"LinkEffect","offsets target and player endpoints along their connecting angle"
