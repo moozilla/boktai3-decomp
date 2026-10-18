@@ -583,3 +583,4 @@ addr,function,name,family,note
 0810A3E0,sub_0810A3E0,SessionMenu_WaitForSelection,"Session menu state callbacks","advances timed menu transition according to selected player"
 0810A448,sub_0810A448,LinkMenu_UpdateSelection,"AreaEffectLinkState / link menu","routes selection modes and queued menu events"
 0810A5C0,sub_0810A5C0,LinkMenu_ExchangeChoices,"AreaEffectLinkState / link menu","sends and receives four choice bytes"
+0810A698,sub_0810A698,LinkMenu_ShowChoiceMessage,"AreaEffectLinkState / link menu","displays choices and waits for participant acknowledgement"
