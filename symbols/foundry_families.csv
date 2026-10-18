@@ -399,3 +399,4 @@ addr,function,name,family,note
 0816599C,sub_0816599C,MenuInput_ReadDirectionRepeat,"MenuInput","reads pressed directions with ten-call held repeat"
 08165C4C,sub_08165C4C,PlayerPanel_GetStatusValue,"PlayerPanel","selects a player status value using script status and timed counter"
 081663A0,sub_081663A0,MenuDisplay_SetPaletteOverrides,"MenuDisplay","selects shared palette overrides for four animation channels"
+081664A8,sub_081664A8,MenuDisplay_LoadAdjustedDigits,"MenuDisplay","loads three decimal digit frames with an adjustment-dependent bank"
