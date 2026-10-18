@@ -1116,3 +1116,4 @@ addr,function,name,family,note
 081CEA10,sub_081CEA10,SceneNpc_EnterTriggeredMode,"scene NPC","consumes entry trigger and switches to mode ten when pending"
 081CF84C,sub_081CF84C,SceneNpc_PlayAnimation12,"StateActor","plays animation 12 until callback completes"
 081CFCA4,sub_081CFCA4,SceneNpc_UpdateProjectedIdle,"StateActor","enables ground projection and advances idle counter"
+081D1720,sub_081D1720,SceneNpc_SetTargetToCurrentPosition,"StateActor","copies current position to walk target and selects state 14"
