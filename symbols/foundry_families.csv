@@ -1077,3 +1077,4 @@ addr,function,name,family,note
 081BDAA8,sub_081BDAA8,MenuPanel_IsEntryEmpty,"MenuPanel (tentative)","checks catalog entry emptiness by page type"
 081BDC34,sub_081BDC34,MenuPanel_ShowDescription,"MenuPanel (tentative)","opens panel description text in the selected mode"
 081BDDCC,sub_081BDDCC,MenuPanel_FindEmptyOppositeHalf,"MenuPanel (tentative)","finds an empty catalog slot in the opposite 16-entry half"
+081BDE30,sub_081BDE30,MenuPanel_SwapConsumableSlots,"MenuPanel / GameState inventory (tentative)","swaps consumable slots and repairs four equipped-slot references"
