@@ -753,3 +753,4 @@ addr,function,name,family,note
 08166D74,sub_08166D74,InventoryPanel_CreateEntry,"InventoryPanel","creates a panel entry from an inventory slot or item index"
 0816778C,sub_0816778C,InventoryPanel_InitCallbackGroups,"InventoryPanel","initializes two groups of eight particle callback entries"
 08167864,sub_08167864,PlayerPanel_ClearNoticeTiles,"PlayerPanel","clears nine top-left tiles and resets the visibility flag"
+081678A0,sub_081678A0,SelectionPanel_UpdateBlink,"SelectionPanel","alternates panel tiles on a sixty-tick cycle"
