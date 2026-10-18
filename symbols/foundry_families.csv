@@ -937,3 +937,4 @@ addr,function,name,family,note
 0818DEBC,sub_0818DEBC,Armor_UpdatePartRebound,"Armor 9 (auto, tentative), armor parts","applies vertical rebound and spin, then retires the part"
 0818E4BC,sub_0818E4BC,Armor_UpdatePartColliders,"Armor 9 (auto, tentative), armor parts","positions both part colliders and refreshes the enabled collider"
 0818E910,sub_0818E910,SceneEffectPool_Update,"SceneEffectPool","copies owner position and updates effect callbacks"
+0818EBF4,sub_0818EBF4,ScenePanelEffect_InitPool,"ScenePanelEffect","starts script and initializes effect slots and colliders"
