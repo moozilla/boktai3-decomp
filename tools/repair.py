@@ -92,6 +92,11 @@ def insns(code, addr):
     return out
 
 
+def lit(value, raw):
+    """value written like the literal it replaces; hex once it is large"""
+    return f"0x{value:X}" if raw.lower().startswith("0x") or value >= 0x100 else str(value)
+
+
 def shape(t):
     t = REG.sub("R", t)
     return IMM.sub("#K", t).split(";")[0]
@@ -184,7 +189,7 @@ class Repair:
                         nv = (-nv) & M32
                         s = len(pre) - 1
                         neg = False
-                new = f"0x{nv:X}" if raw.lower().startswith("0x") else str(nv)
+                new = lit(nv, raw)
                 spans.append((s, e, new))
                 out.append((f"{'-' if neg else ''}{raw} -> {new}", [spans[-1]]))
             if len(spans) > 1:
@@ -207,7 +212,7 @@ class Repair:
             us = [u for _, u in group.values()]
             lo, hi = min(us), max(us)
             if hi > lo:
-                inside = [(a, b, (f"0x{val + delta:X}" if raw.lower().startswith("0x") else str(val + delta)))
+                inside = [(a, b, lit(val + delta, raw))
                           for a, b, val, raw in lits if lo <= val <= hi]
                 if len(inside) > len(group):
                     out.append((f"every literal in {lo:#x}..{hi:#x} moved by {delta:+#x}", inside))
