@@ -614,3 +614,4 @@ addr,function,name,family,note
 0810F2DC,sub_0810F2DC,SceneTask_UpdateTextDelay,"Scene text tasks","refreshes a text window after ten ticks and retires the task on scene states 21 or 23"
 0810F544,sub_0810F544,RecordMenu_UpdateRecords,"RecordMenu","redraws records and returns to selection after delayed input"
 0810FC90,sub_0810FC90,LinkMenu_LoadSelectionSprite,"LinkMenu","copies received selection attributes and loads the menu sprite"
+0810FF8C,sub_0810FF8C,LinkMenu_DrawRandomizedFourDigitNumber,"LinkMenu","draws a capped counter-derived number with random digit contributions"
