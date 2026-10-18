@@ -536,3 +536,4 @@ addr,function,name,family,note
 08178238,sub_08178238,Hud_UpdateCountdownDisplay,"HudManager","updates countdown values with a three-hundred-frame display timer"
 081782E0,sub_081782E0,SceneHud_RefreshControls,"SceneHud","refresh player-backed HUD controls according to mode"
 08178370,sub_08178370,Hud_BeginModeSixCue,"Field HUD","starts HUD cue state six and plays a song"
+081783C0,sub_081783C0,Hud_RegisterTimer,"Field HUD","registers the countdown value pointer with HUD"
