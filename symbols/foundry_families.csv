@@ -1269,3 +1269,4 @@ addr,function,name,family,note
 0820F1A0,sub_0820F1A0,OrangeSpine_TryFireAtPlayer,"Orange spine (tentative)","fires when the player is ahead and within a narrow lateral band"
 0820F2EC,sub_0820F2EC,OrangeSpine_UpdateDefeatEffect,"Orange spine (tentative)","emits randomized effects during defeat and records defeat at state one"
 0820FEA8,sub_0820FEA8,Combat_ApplyHitReaction,"combat hit processing","copies hit damage and selects a reaction, optionally showing a damage number"
+0820FFE4,sub_0820FFE4,Combat_SpawnDirectionalProjectile,"combat projectile emitter","spawns a configured projectile offset in an eight-way direction"
