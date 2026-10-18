@@ -126,3 +126,4 @@ addr,function,name,family,note
 080EFC58,sub_080EFC58,SceneActorControl_WaitForTarget,"SceneActorControl","waits for a target before entering control mode three"
 080F0164,sub_080F0164,SceneActorControl_HideAndDisableCollision,"SceneActorControl","hides the drawable and disables actor collision on phase entry"
 080F0324,sub_080F0324,SceneActorControl_BeginSoundTransition,"SceneActorControl","plays a variant sound and starts or suppresses an animation transition"
+080F0738,sub_080F0738,SceneActor_InitCollision5005,"SceneActor collision initialization","initialize body and attack collision for flags 0x5005"
