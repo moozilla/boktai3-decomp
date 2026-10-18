@@ -148,6 +148,25 @@ class Repair:
         a = rasolve.off(self.cc.address)
         return self.cc.rom[a:a + n]
 
+    def measure(self, mine):
+        """(shape distance, aligned instructions whose values or symbols
+        differ): an edit has to improve these, not just the byte count,
+        or a coincidence in mismatched code passes for progress."""
+        orig = self.rom(self.cc.size or len(mine))
+        A, B = insns(orig, self.cc.address), insns(mine, self.cc.address)
+        sm = difflib.SequenceMatcher(None, [shape(x[1]) for x in A], [shape(x[1]) for x in B], autojunk=False)
+        sh, wrong = 0, 0
+        for tag, i1, i2, j1, j2 in sm.get_opcodes():
+            if tag == "equal":
+                wrong += sum(1 for x, y in zip(A[i1:i2], B[j1:j2]) if x[2] != y[2] or
+                             (x[3] and y[3] and self.by_addr.get(x[3][1]) != self.by_addr.get(y[3][1])))
+            else:
+                sh += max(i2 - i1, j2 - j1)
+        return sh, wrong
+
+    def better(self, old, new):
+        return new[0] <= old[0] and new[1] <= old[1] and new != old
+
     def pairs(self, mine):
         """Value and symbol substitutions (C side, ROM side) suggested by the
         aligned code, plus the unpaired ROM and C instructions."""
@@ -249,13 +268,14 @@ class Repair:
         """The best improving edit (one, else a pair) as (distance, desc, text, bytes)."""
         vals, syms, _, _ = self.pairs(mine)
         cands = self.edits(text, vals, syms)
+        base = self.measure(mine)
         tried, found = [], None
         for desc, spans in cands:
             d, m = self.compile(self.apply(text, spans))
             if d is None:
                 continue
             tried.append((d, desc, spans))
-            if d < best and (found is None or d < found[0]):
+            if d < best and self.better(base, self.measure(m)) and (found is None or d < found[0]):
                 found = (d, desc, self.apply(text, spans), m)
         if found:
             return found
@@ -271,7 +291,8 @@ class Repair:
                     continue  # overlapping spans
                 cand = self.apply(text, s1 + s2)
                 d, m = self.compile(cand)
-                if d is not None and d < best and (found is None or d < found[0]):
+                if d is not None and d < best and self.better(base, self.measure(m)) and \
+                        (found is None or d < found[0]):
                     found = (d, f"{d1}, {d2}", cand, m)
         return found
 
