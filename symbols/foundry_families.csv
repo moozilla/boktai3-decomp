@@ -67,3 +67,4 @@ addr,function,name,family,note
 080B60A4,sub_080B60A4,SceneActorControl_InitBehaviorColliders,"SceneActorControl","initializes two body and two attack collision regions"
 080B61C4,sub_080B61C4,Vorn_SpawnHazard,"Vorn (actor context script-field parsers/tickers, called from Vorn_Init)","reads actor's parallel arrays arrB4/arrBC/arrC4 (u16) and arrCC (u32) at [index] and calls sub_0821FF58(ctx+0x678, arrB4[i], arrBC[i], 0, arrCC[i], arrC4[i])"
 080B6430,sub_080B6430,SceneActor_UpdateProfileForCategory,"SceneActorRegistry / SceneActorProfile","recounts living actors of this category and refreshes its pooled profile index"
+080B70CC,sub_080B70CC,SceneActorReaction_SelectTileParameter,"SceneActorReaction","selects a tile parameter by category and reaction variant"
