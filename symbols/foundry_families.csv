@@ -790,3 +790,4 @@ addr,function,name,family,note
 0816B250,sub_0816B250,SelectionMenu_ApplyConfirmedReward,"SelectionMenu","applies confirmed count reward and advances menu"
 0816B2F0,sub_0816B2F0,SceneSequence_CallCompletionScript,"SceneSequence","calls an optional completion script after 150 animation ticks"
 0816B59C,sub_0816B59C,SceneInput_NavigateGridKeys,"SceneInput","moves grid cursor using allowed directional keys"
+0816B66C,sub_0816B66C,SceneSequence_SelectEntryMessage,"SceneSequence","selects a message from state or the current sixteen-byte entry"
