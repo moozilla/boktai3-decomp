@@ -627,3 +627,4 @@ addr,function,name,family,note
 0811A62C,sub_0811A62C,MotionActor_Destroy,"MotionActor","removes animations and resources and clears actor slot"
 0811B278,sub_0811B278,SpatialIndex_InitEntry,"SpatialIndex","initializes position bounds offset and callback"
 0811C5F8,sub_0811C5F8,ActorStats_ApplyPendingIncrement,"ActorStats","applies a pending increment and clamps to a limit"
+0811C67C,sub_0811C67C,ActorResource_SelectElementResource,"ActorResource","selects a resource from link element or equipped categories"
