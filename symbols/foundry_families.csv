@@ -874,3 +874,4 @@ addr,function,name,family,note
 081806C4,sub_081806C4,SceneMotion_InitState,"SceneMotion (tentative; distinct from preceding sprite component)","clear position, create task and reset active state"
 081806F0,sub_081806F0,ProximityVolume_ContainsPlayer,"ProximityVolume","tests the player position against two volume predicates"
 08180810,sub_08180810,ProximityVolume_IdleCallback,"ProximityVolume","empty second callback installed by the volume initializer"
+08180814,sub_08180814,ProximityVolume_InitializeCallbacks,"ProximityVolume","clears callbacks, initializes volume, installs callback pair"
