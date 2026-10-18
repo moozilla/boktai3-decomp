@@ -1140,3 +1140,4 @@ addr,function,name,family,note
 081DA178,sub_081DA178,TimedEffect_RemoveFromManager,"TimedEffect","decrements kind counts, removes sprite and clears active slot"
 081DA61C,sub_081DA61C,TimedEffect_DestroyManager,"TimedEffect","removes pooled effects and active entries, frees entry array"
 081DA770,sub_081DA770,TimedEffect_GetOrCreateManager,"TimedEffect","gets resource 4E01 or creates manager with capacity clamped to 12 through 32"
+081DA7D0,sub_081DA7D0,TimedEffect_FindFreeEntry,"TimedEffect","returns first inactive entry and writes its slot index"
