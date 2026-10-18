@@ -1,8 +1,8 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 #define ActorTrail_ResetAtSavedPosition sub_080AA10C
-#define ActorTrail_ResetPositions sub_080AA024
-#define ActorTrail_CopyTerrainSamples sub_080AB4E0
+#define ActorTrail_ResetPositions TentacleActor_ResetSegmentPositions
+#define ActorTrail_CopyTerrainSamples TentacleActor_ResetRouteHistory
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 struct ActorTrail {
@@ -20,8 +20,8 @@ struct ActorTrail {
     u8 unknown8F6[0x36];
     struct ContactPosition savedPosition;
 };
-void sub_080AB4E0(void *);
-void sub_080AA024(void *, struct ContactPosition *);
+void TentacleActor_ResetRouteHistory(void *);
+void TentacleActor_ResetSegmentPositions(void *, struct ContactPosition *);
 void sub_080A8904(void *);
 void sub_080AA10C(struct SceneActorRegistryResetView *actor) {
     struct ActorTrail *trail = actor->context;
@@ -46,8 +46,8 @@ void sub_080AA10C(struct SceneActorRegistryResetView *actor) {
     else
         *(struct ContactPosition *)((u8 *)actor->drawable + 0x40) = *saved;
     actor->position = trail->savedPosition;
-    sub_080AB4E0(actor);
-    sub_080AA024(trail, &actor->position);
+    TentacleActor_ResetRouteHistory(actor);
+    TentacleActor_ResetSegmentPositions(trail, &actor->position);
     sub_080A8904(actor);
     { u32 state = 2;
     actor->state2A8 = 0;

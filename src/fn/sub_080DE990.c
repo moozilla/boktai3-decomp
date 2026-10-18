@@ -1,8 +1,8 @@
 #define SceneActorCollision_InitGateColliders sub_080DE990
 #include "global.h"
 #include "scene_actor_collision.h"
-void sub_080DFBCC(void);
-void sub_080DF9F0(void);
+void Dog_OnBodyCollision(void);
+void Dog_OnSensorContact(void);
 void sub_080DFA5C(void);
 void SceneActorCollision_InitBody(struct SceneActorRegistryActor *, void *, void *, void *, void *);
 void SceneActorCollision_InitAttack(struct SceneActorRegistryActor *, void *, void *, void *, u32,
@@ -21,14 +21,14 @@ void sub_080DE990(struct SceneActorRegistryActor *actor)
     bodyOffset.x = 0;
     bodyOffset.y = 0x80;
     bodyOffset.z = 0;
-    SceneActorCollision_InitBody(actor, &bodySize, &bodyOffset, sub_080DFBCC, actor);
+    SceneActorCollision_InitBody(actor, &bodySize, &bodyOffset, Dog_OnBodyCollision, actor);
     attackSize.x = 0x40;
     attackSize.y = 0x78;
     attackSize.z = 0x40;
     attackOffset.x = 0;
     attackOffset.y = 0x80;
     attackOffset.z = 0;
-    SceneActorCollision_InitAttack(actor, &attackSize, &attackOffset, sub_080DF9F0, 0, actor);
+    SceneActorCollision_InitAttack(actor, &attackSize, &attackOffset, Dog_OnSensorContact, 0, actor);
     externalSize.x = 0;
     externalSize.y = 0x78;
     externalSize.z = 0;

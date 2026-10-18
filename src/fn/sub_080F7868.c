@@ -1,7 +1,7 @@
 #include "global.h"
 #define ActorPhase_UpdateTimedFlicker sub_080F7868
 #define ActorPhase_UpdateFlicker      sub_080FC498
-#define ActorPhase_SetAnimation       sub_080FC8B0
+#define ActorPhase_SetAnimation Axe_SetAuxiliarySpriteParameters
 struct PhaseActor {
     u8 pad0[0x104];
     u32 f104;
@@ -25,7 +25,7 @@ void sub_080FC894(struct PhaseActor *, void *);
 void ActorShadow_Enable(void *);
 void Sound_PlaySong(u32);
 u8 sub_080FC498(u32 *, s32, s32, s32);
-void sub_080FC8B0(struct PhaseActor *, void *, u32);
+void Axe_SetAuxiliarySpriteParameters(struct PhaseActor *, void *, u32);
 void sub_080F79A8(void);
 static inline u8 consumeEntry(struct PhaseActor *s)
 {
@@ -49,7 +49,7 @@ void sub_080F7868(struct PhaseActor *s, s32 frame)
         *(u16 *)(data + 0x90a) = 0;
         *(u32 *)(data + 0xa38) &= ~1;
         ActorShadow_Enable(data + 0xcac);
-        sub_080FC8B0(s, data + 0x888, 0x13c);
+        Axe_SetAuxiliarySpriteParameters(s, data + 0x888, 0x13c);
         Sound_PlaySong(0x16f);
     }
     if (sub_080FC498(&flags, frame, 10, 30)) {
@@ -62,11 +62,11 @@ void sub_080F7868(struct PhaseActor *s, s32 frame)
         s->timer = 0;
         clearFlags(&s->flags114, 1);
         s->f104 = 0;
-        sub_080FC8B0(s, data + 0x908, 0x13f);
+        Axe_SetAuxiliarySpriteParameters(s, data + 0x908, 0x13f);
         Sound_PlaySong(0x16d);
     } else if (flags & 1) {
-        sub_080FC8B0(s, data + 0x888, 0x13c);
+        Axe_SetAuxiliarySpriteParameters(s, data + 0x888, 0x13c);
     } else {
-        sub_080FC8B0(s, data + 0x908, 0x13f);
+        Axe_SetAuxiliarySpriteParameters(s, data + 0x908, 0x13f);
     }
 }

@@ -1,5 +1,5 @@
 #define SceneEffect_EmitPositionPattern sub_080DA810
-#define SceneEffect_CreateParticle      sub_08233418
+#define SceneEffect_CreateParticle ExplosionEffect_CreateDelayed
 #define gSceneEffectPatternArguments          gUnk_086061C0
 #define gSceneEffectFourOffsetsX        gUnk_086061C4
 #define gSceneEffectFourOffsetsZ        gUnk_086061CC
@@ -9,7 +9,7 @@
 #include "scene_actor_registry.h"
 extern const u16 gUnk_086061D4[], gUnk_086061D8[], gUnk_086061C4[], gUnk_086061CC[];
 extern const u8 gUnk_086061C0[];
-u8 *sub_08233418(void *, u32, s32, s32, s32, u32);
+u8 *ExplosionEffect_CreateDelayed(void *, u32, s32, s32, s32, u32);
 void sub_080DA810(struct SceneActorRegistryActor *emitter)
 {
     struct ContactPackedVector position;
@@ -18,7 +18,7 @@ void sub_080DA810(struct SceneActorRegistryActor *emitter)
     position.y += 0x40;
     switch (emitter->paletteOffset) {
         case 0:
-            sub_08233418(&position, 0, emitter->effectDurationB8, emitter->effectParameterC0, 0, 0);
+            ExplosionEffect_CreateDelayed(&position, 0, emitter->effectDurationB8, emitter->effectParameterC0, 0, 0);
             break;
         case 1:
             for (i = 0; i < 2; i++) {
@@ -27,7 +27,7 @@ void sub_080DA810(struct SceneActorRegistryActor *emitter)
                 p->y += 0x40;
                 p->x += gUnk_086061D4[i];
                 p->z += gUnk_086061D8[i];
-                sub_08233418(&position, 0, emitter->effectDurationB8, emitter->effectParameterC0, 0,
+                ExplosionEffect_CreateDelayed(&position, 0, emitter->effectDurationB8, emitter->effectParameterC0, 0,
                              gUnk_086061C0[i]);
             }
             break;
@@ -38,7 +38,7 @@ void sub_080DA810(struct SceneActorRegistryActor *emitter)
                 p->y += 0x40;
                 p->x += gUnk_086061C4[i];
                 p->z += gUnk_086061CC[i];
-                sub_08233418(&position, 0, emitter->effectDurationB8, emitter->effectParameterC0, 0,
+                ExplosionEffect_CreateDelayed(&position, 0, emitter->effectDurationB8, emitter->effectParameterC0, 0,
                              gUnk_086061C0[i]);
             }
             break;

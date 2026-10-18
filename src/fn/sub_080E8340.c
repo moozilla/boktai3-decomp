@@ -52,7 +52,7 @@ void sub_080E8340(struct SceneActorRegistryResetView *actor)
     if (motionSquared(&actor->secondaryMotion) || (offset = *(s16 *)&actor->field2EA)) {
         sub_080E8158(actor);
     } else {
-        prepareControl(actor, sub_0807FC90, 0x10, offset);
+        prepareControl(actor, SceneActorControl_OnIdle, 0x10, offset);
         actor->state2A8 = 0;
         actor->phase2A9 = 1;
         actor->behavior2AA = 0;

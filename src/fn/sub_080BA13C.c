@@ -3,7 +3,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 void sub_080BA268(void);
-void sub_080BA578(void);
+void Skeleton_UpdateAttackRecovery(void);
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)
@@ -54,7 +54,7 @@ void sub_080BA13C(struct SceneActorRegistryResetView *p)
             p->word104 = z;
         }
     } else if (p->field2B3) {
-        void (*f)(void) = sub_080BA578;
+        void (*f)(void) = Skeleton_UpdateAttackRecovery;
         u32 k = 0x24;
         u32 z;
         u8 *a = &p->field2B2;

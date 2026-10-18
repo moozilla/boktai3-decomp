@@ -26,7 +26,7 @@ void sub_080EB6E4(struct SceneActorRegistryResetView *actor)
     }
     if (actor->field2B0) {
         struct SceneActorReactionCommand *command = (void *)&actor->word460;
-        void *callback = sub_0807FC90;
+        void *callback = SceneActorControl_OnIdle;
         u32 one = 1;
         u32 zero;
         u32 state;

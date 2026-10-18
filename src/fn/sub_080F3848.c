@@ -1,7 +1,7 @@
 #include "global.h"
 /* Tentative family name: owner of the active child-record group. */
 #define ChildGroup_UpdateTimedOscillation    sub_080F3848
-#define ChildGroup_UpdateVerticalOscillation sub_080F2480
+#define ChildGroup_UpdateVerticalOscillation Ivy_UpdateBobbing
 struct ChildGroup {
     u8 pad0[0x8D];
     u8 flags;
@@ -18,9 +18,9 @@ struct ChildGroup {
     u32 timer;
 };
 void sub_080F1FE8(struct ChildGroup *);
-void sub_080F2480(struct ChildGroup *);
+void Ivy_UpdateBobbing(struct ChildGroup *);
 void sub_080F3F48(struct ChildGroup *);
-void sub_080F26B0(struct ChildGroup *);
+void Ivy_WaitForPrimaryActionCompletion(struct ChildGroup *);
 static inline u8 EnterState(struct ChildGroup *p)
 {
     u32 mask = 1;
@@ -49,10 +49,10 @@ void sub_080F3848(struct ChildGroup *p)
         p->timer = 150;
         p->callbackCF0 = sub_080F1FE8;
     }
-    sub_080F2480(p);
+    Ivy_UpdateBobbing(p);
     if (--p->timer == 0) {
         SetState(p, 1, 4);
         p->callbackCC8 = sub_080F3F48;
-        p->callbackCD8 = sub_080F26B0;
+        p->callbackCD8 = Ivy_WaitForPrimaryActionCompletion;
     }
 }

@@ -6,9 +6,9 @@
 void SceneActorCollision_InitBody(void *, void *, void *, void *, void *);
 void SceneActorCollision_InitAttack(void *, void *, void *, void *, u32, void *);
 void SceneActorCollision_InitExternalAttack(void *, void *, void *, void *, void *, u32, void *);
-void sub_080ACD9C(void);
-void sub_080ACCF0(void);
-void sub_080ACD5C(void);
+void Vorn_OnCollisionResponse(void);
+void Vorn_OnContactEvent(void);
+void Vorn_OnScriptActionRequest(void);
 void sub_080B1D8C(struct SceneActorRegistryResetView *p)
 {
     struct ContactPackedVector size, offset;
@@ -18,19 +18,19 @@ void sub_080B1D8C(struct SceneActorRegistryResetView *p)
     size.z = 0x40;
     *(u32 *)&offset = 0x800000;
     *((u32 *)&offset + 1) &= 0xFFFF0000;
-    SceneActorCollision_InitBody(p, &size, &offset, sub_080ACD9C, p);
+    SceneActorCollision_InitBody(p, &size, &offset, Vorn_OnCollisionResponse, p);
     ((struct ContactPosition *)&size)->x = 0x40;
     ((struct ContactPosition *)&size)->y = 0x64;
     ((struct ContactPosition *)&size)->z = 0x40;
     ((struct ContactPosition *)&offset)->x = 0;
     ((struct ContactPosition *)&offset)->y = 0x80;
     ((struct ContactPosition *)&offset)->z = 0;
-    SceneActorCollision_InitAttack(p, &size, &offset, sub_080ACCF0, 0, p);
+    SceneActorCollision_InitAttack(p, &size, &offset, Vorn_OnContactEvent, 0, p);
     ((struct ContactPosition *)&size)->x = 0x40;
     ((struct ContactPosition *)&size)->y = 0x64;
     ((struct ContactPosition *)&size)->z = 0x40;
     ((struct ContactPosition *)&offset)->x = 0;
     ((struct ContactPosition *)&offset)->y = 0x80;
     ((struct ContactPosition *)&offset)->z = 0;
-    SceneActorCollision_InitExternalAttack(p, q + 0x628, &size, &offset, sub_080ACD5C, 1, p);
+    SceneActorCollision_InitExternalAttack(p, q + 0x628, &size, &offset, Vorn_OnScriptActionRequest, 1, p);
 }

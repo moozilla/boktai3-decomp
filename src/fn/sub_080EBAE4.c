@@ -45,6 +45,6 @@ void sub_080EBAE4(struct SceneActorRegistryResetView *actor)
     TakeReset(actor);
     if (actor->field2B0) {
         ResetState(actor);
-        SetControl(actor, sub_0807FC90, 16);
+        SetControl(actor, SceneActorControl_OnIdle, 16);
     }
 }

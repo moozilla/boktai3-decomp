@@ -25,5 +25,5 @@ void Vorn_SpawnHazard(struct SceneActorRegistryActor *actor, s32 index)
     u32 cc = extra->arrCC[index];
     u16 c4 = extra->arrC4[index];
 
-    sub_0821FF58((u8 *)ctx + 0x678, b4, bc, 0, cc, c4);
+    Collider_SetAttackProperties((u8 *)ctx + 0x678, b4, bc, 0, cc, c4);
 }

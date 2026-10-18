@@ -68,7 +68,7 @@ void sub_080EB450(struct SceneActorRegistryResetView *actor)
             void *callback;
             u32 kind;
             ResetState(actor, 0, 0, 1);
-            callback = sub_0807FC90;
+            callback = SceneActorControl_OnIdle;
             kind = 16;
             actor->field2B2 = one;
             actor->field2B0 = zero;

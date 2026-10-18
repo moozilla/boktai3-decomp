@@ -2,7 +2,7 @@
 #include "scene_actor_collision.h"
 #define SceneActorCollision_FireSecondaryAttack sub_0809366C
 
-void sub_0821FF58(void *, u16, u16, u32, u32, u16);
+void Collider_SetAttackProperties(void *, u16, u16, u32, u32, u16);
 
 static inline u32 ActorFlag(struct SceneActorRegistryActor *actor, u32 input, u32 offset)
 {
@@ -31,7 +31,7 @@ void sub_0809366C(struct SceneActorRegistryActor *actor)
             u16 field40 = *(u16 *)((u8 *)actor + 0xBE);
             u32 reactionFlags = *(u32 *)((u8 *)actor + 0xD0);
             u16 field44 = *(u16 *)((u8 *)actor + 0xC6);
-            sub_0821FF58(collider, field3C, field40, 0, reactionFlags, field44);
+            Collider_SetAttackProperties(collider, field3C, field40, 0, reactionFlags, field44);
             return;
         }
     }
@@ -41,6 +41,6 @@ void sub_0809366C(struct SceneActorRegistryActor *actor)
         u16 field40 = *(u16 *)((u8 *)actor + 0xBC);
         u32 reactionFlags = *(u32 *)((u8 *)actor + 0xCC);
         u16 field44 = *(u16 *)((u8 *)actor + 0xC4);
-        sub_0821FF58(collider, field3C, field40, 0, reactionFlags, field44);
+        Collider_SetAttackProperties(collider, field3C, field40, 0, reactionFlags, field44);
     }
 }

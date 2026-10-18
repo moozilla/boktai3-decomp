@@ -11,7 +11,7 @@ s32 sub_08090E60(u8 *argument)
 
     if ((s32)*(u16 *)(argument + 0x2BE) - *(u16 *)(argument + 0x3D8) > 0x1FF) {
         s32 cell = SceneActorTerrain_GetCellIndex((struct ContactPosition *)(argument + 0x5C));
-        if (sub_0821D64C(cell, 1)) {
+        if (TerrainModifiers_FindCellOverride(cell, 1)) {
             sub_08090AE0(actor);
             actor->groundHeight = *(u16 *)(argument + 0x3D8);
         }

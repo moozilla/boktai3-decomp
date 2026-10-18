@@ -3,8 +3,8 @@
 
 #define SpritePool_ConsumeStateFlag sub_080A975C
 
-u32 sub_08003C10(u32 *p);
-void sub_08225938(void *);
+u32 TerrainOverlay_QueueRemoveActor(u32 *p);
+void SceneBody_Unregister(void *);
 
 struct State080A9 {
     u8 pad0[0x888];
@@ -30,8 +30,8 @@ void sub_080A975C(struct SceneActorRegistryResetView *input)
         *flagsPtr &= clearMask;
         {
             void *obj = state->obj;
-            sub_08003C10(obj);
-            sub_08225938(obj);
+            TerrainOverlay_QueueRemoveActor(obj);
+            SceneBody_Unregister(obj);
         }
     }
 }

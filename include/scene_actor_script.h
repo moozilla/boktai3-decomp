@@ -71,5 +71,5 @@ struct SceneActorReactionHealthTail {
     s32 healthThreshold;
 };
 struct SceneActorRegistryActor *SceneActorRegistry_FindById(u32);
-u8 *TerrainModifiers_FindCellOverride(u32, u32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 #endif

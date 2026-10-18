@@ -1,10 +1,10 @@
 #define RouteActor_UpdatePlayerDestinationPhase sub_0809D948
-#define RouteActor_SetDestination               sub_0809D0C8
+#define RouteActor_SetDestination Lun_BeginMoveToPosition
 #define gPlayerSlots                            gUnk_02000580
 #include "global.h"
 #include "scene_actor_reset.h"
 void sub_0809B6AC(void);
-void sub_0809D0C8(void *, void *);
+void Lun_BeginMoveToPosition(void *, void *);
 extern u8 *gUnk_02000580[4];
 struct RouteActorDestinationState {
     u8 unknown0[0x442];
@@ -44,7 +44,7 @@ void sub_0809D948(struct SceneActorRegistryResetView *actor)
         state->delay = state->delayDuration;
     }
     if (actor->field2B0)
-        sub_0809D0C8(actor, gUnk_02000580[0] + 0x30);
+        Lun_BeginMoveToPosition(actor, gUnk_02000580[0] + 0x30);
     else
         actor->counter2AC++;
 }

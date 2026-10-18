@@ -2,7 +2,7 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 extern u8 *gUnk_02000580;
-void sub_0807FC90(void);
+void SceneActorControl_OnIdle(void);
 void Sound_PlaySong(u32);
 struct LinkedReactionContext {
     u8 unknown0[0x558];
@@ -61,7 +61,7 @@ void sub_080972BC(struct SceneActorRegistryResetView *s)
             one = 1;
             *queued = one;
         }
-        fn = sub_0807FC90;
+        fn = SceneActorControl_OnIdle;
         code = 0x10;
         s->field2B2 = one;
         s->field2B0 = zero;
