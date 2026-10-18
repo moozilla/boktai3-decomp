@@ -1195,3 +1195,4 @@ addr,function,name,family,note
 081F31FC,sub_081F31FC,Ratatosk_GetPlayerOffsetNearestSelf,"Ratatosk","writes the nearest of four player-relative positions to Ratatosk"
 081F33F0,sub_081F33F0,SceneDistance_ClearLinkedEntry,"SceneDistanceSet","clears the first word of a linked entry"
 081F3508,sub_081F3508,Ratatosk_UpdateDirectionalAnimation,"Ratatosk","starts directional animation and updates completion flags"
+081F3618,sub_081F3618,Ratatosk_UpdateEightDirectionAnimation,"Ratatosk","starts eight-direction animation and sets motion parameters"
