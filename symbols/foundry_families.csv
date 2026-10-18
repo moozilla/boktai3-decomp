@@ -580,3 +580,4 @@ addr,function,name,family,note
 08109A04,sub_08109A04,MessagePanel_InitFromScript,"MessagePanel","initializes message panel from script keywords"
 08109C80,sub_08109C80,ScriptPanel_OpenTextWindow,"ScriptPanel","waits for HUD setup and opens script text window"
 08109E98,sub_08109E98,ScriptPanel_WaitForSelectionData,"ScriptPanel","waits for selected data or restarts polling after timeout"
+0810A3E0,sub_0810A3E0,SessionMenu_WaitForSelection,"Session menu state callbacks","advances timed menu transition according to selected player"
