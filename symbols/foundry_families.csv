@@ -458,3 +458,4 @@ addr,function,name,family,note
 081712D4,sub_081712D4,SceneHud_OpenStatComparison,"SceneHud stat comparison and action transfer","open stat comparison and compute three stat differences"
 0817160C,sub_0817160C,SceneHud_PrepareActionTransfer,"SceneHud stat comparison and action transfer","prepare action icon transfer to a stat column"
 08171888,sub_08171888,SceneHud_TickStatTransfer,"SceneHud stat comparison and action transfer","animate and apply stat transfer then refresh comparison"
+08171A5C,sub_08171A5C,SceneHud_PrepareActionTransferToSlot,"SceneHud stat comparison and action transfer","prepare action icon transfer between slots"
