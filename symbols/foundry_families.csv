@@ -50,3 +50,4 @@ addr,function,name,family,note
 080ACEE8,sub_080ACEE8,SceneActor_UpdateDelayedAnimation,"SceneActor","waits for countdown then selects animation fourteen and completes on restart"
 080AD114,sub_080AD114,SceneActorReaction_UpdateFacingAttack,"SceneActorReaction","faces target and advances a timed attack reaction"
 080AD40C,sub_080AD40C,SceneActorReaction_ResumeSavedTarget,"SceneActorReaction","restores position and saved target after an animation delay"
+080AE120,sub_080AE120,SceneActorReaction_BeginSideStep,"SceneActorReaction","sets a lateral destination and waits for the configured duration"
