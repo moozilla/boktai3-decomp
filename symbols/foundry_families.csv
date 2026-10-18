@@ -1100,3 +1100,4 @@ addr,function,name,family,note
 081C2240,sub_081C2240,SegmentDisplay_UpdateScreenBrightness,"SegmentDisplay","sets blend mode and brightness from the player segment count"
 081C22BC,sub_081C22BC,SegmentDisplay_Destroy,"SegmentDisplay","removes display sprites and animations and stops its sound"
 081C3A1C,sub_081C3A1C,SpriteController_UpdateStopped,"SpriteController","empty update callback installed when the sprite is stopped"
+081C3A98,sub_081C3A98,SpriteController_AnimateShrinking,"SpriteController","shrinks sprite scale over eight ticks and stops its controller"
