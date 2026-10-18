@@ -9,7 +9,8 @@ u8 *RoamingObjectB_Create(u32 a, u32 b)
 {
     u8 *r = Task_Create(8, 0x144);
     if (r) {
-        Task_SetCallbacks(r, (void (*)(void))RoamingObjectB_Tick, (void (*)(void))RoamingObjectB_Destroy);
+        Task_SetCallbacks(r, (void (*)(void))RoamingObjectB_Tick,
+                          (void (*)(void))RoamingObjectB_Destroy);
         if (RoamingObjectB_Initialize(r, a, b) < 0) {
             Task_Kill(r);
             return 0;

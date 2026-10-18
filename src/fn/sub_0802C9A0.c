@@ -11,7 +11,7 @@ void Actor_InitHitSensor(u8 *p, void *a, void *b, void *fn)
     Collider_SetPosition(q, p + 0xc, 0);
     Collider_SetCallback(q, fn, p);
     Collider_SetAttackProperties(q, *(u32 *)(p + 0x150), *(u32 *)(p + 0x154), *(u32 *)(p + 0x15c),
-                 *(u32 *)(p + 0x160), *(u32 *)(p + 0x158));
+                                 *(u32 *)(p + 0x160), *(u32 *)(p + 0x158));
     {
         u32 mask = 4;
         *(u32 *)(p + 0x50) |= mask;

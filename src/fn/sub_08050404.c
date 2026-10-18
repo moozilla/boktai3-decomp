@@ -47,7 +47,8 @@ void CellGate_UpdateForcedDirection(struct CellGate *gate)
             }
             if (!CellGate_TestForcedPassage(gate)) {
                 if (!gate->registered) {
-                    TerrainModifiers_RegisterCell(gate->registration, gate->cell, 0, gate->height, 255, 0x80B);
+                    TerrainModifiers_RegisterCell(gate->registration, gate->cell, 0, gate->height,
+                                                  255, 0x80B);
                     gate->registered = 1;
                 }
             } else

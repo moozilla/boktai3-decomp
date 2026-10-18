@@ -13,7 +13,8 @@ void RegistryA8CB_ResetFromScript(void)
 {
     void *manager = gUnk_0200020C;
     u8 *e;
-    if (manager && (e = RegistryA8CB_FindEntryByName(manager, Script_GetKeywordValue('n', 0))) != 0) {
+    if (manager &&
+        (e = RegistryA8CB_FindEntryByName(manager, Script_GetKeywordValue('n', 0))) != 0) {
         u8 *p = e;
         u8 *s = e + 0x5F8;
         s32 i;

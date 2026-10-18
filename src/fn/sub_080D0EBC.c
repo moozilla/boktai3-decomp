@@ -1,11 +1,26 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
-struct SceneActorDirectionalSequence { u8 unknown0[8]; u16 frame; u8 unknownA[4]; u16 timer; };
+struct SceneActorDirectionalSequence {
+    u8 unknown0[8];
+    u16 frame;
+    u8 unknownA[4];
+    u16 timer;
+};
 void sub_080DDD28(struct SceneActorRegistryResetView *);
 s32 Math_Atan2(s32, s32);
-static inline u8 TakeFlag(u8 *flag) { if (*flag) { *flag = 0; return 1; } return 0; }
-static inline u32 ReadFlags(struct SceneActorRegistryResetView *actor, u32 mask) { return actor->flags2D0 & mask; }
+static inline u8 TakeFlag(u8 *flag)
+{
+    if (*flag) {
+        *flag = 0;
+        return 1;
+    }
+    return 0;
+}
+static inline u32 ReadFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+{
+    return actor->flags2D0 & mask;
+}
 void SceneActor_UpdateDirectionalAnimation(struct SceneActorRegistryResetView *actor)
 {
     u8 *direction = (u8 *)actor + 0x50;
@@ -19,7 +34,8 @@ void SceneActor_UpdateDirectionalAnimation(struct SceneActorRegistryResetView *a
         actor->flags2D4 |= mask;
     }
     if (sequence->frame > 2) {
-        if (sequence->frame == 4 && sequence->timer == 0) Sound_PlaySong(0x101);
+        if (sequence->frame == 4 && sequence->timer == 0)
+            Sound_PlaySong(0x101);
     }
     if (ReadFlags(actor, 0x10)) {
         u16 *flags = &actor->flags2D4;

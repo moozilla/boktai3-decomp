@@ -5,10 +5,10 @@ void BouncingObject_TickRemoval(struct BouncingPool *unused, struct BouncingObje
 {
     s8 *index;
     if (object->enter) {
-        ExplosionEffect_Create(&object->sprite.position, 32, object->spawnParameterA, object->spawnParameterB,
-                     0);
+        ExplosionEffect_Create(&object->sprite.position, 32, object->spawnParameterA,
+                               object->spawnParameterB, 0);
         SceneStimulus_AddTagged(object->sprite.position.x, object->sprite.position.z, 1024, 0, 1,
-                     (u16)object->colliderConfig);
+                                (u16)object->colliderConfig);
         object->enter = 0;
     }
     {

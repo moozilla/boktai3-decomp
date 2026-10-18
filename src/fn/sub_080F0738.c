@@ -20,5 +20,6 @@ void SceneActor_InitCollision5005(struct SceneActorRegistryActor *actor)
     *(u32 *)((u8 *)&attackSize + 4) &= 0xFFFF0000;
     *(u32 *)&attackOffset = 0;
     *(u32 *)((u8 *)&attackOffset + 4) &= 0xFFFF0000;
-    SceneActorCollision_InitAttack(actor, &attackSize, &attackOffset, Ivy_OnSecondaryContact, 1, actor);
+    SceneActorCollision_InitAttack(actor, &attackSize, &attackOffset, Ivy_OnSecondaryContact, 1,
+                                   actor);
 }

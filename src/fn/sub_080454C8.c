@@ -27,5 +27,5 @@ void MotionPool_InitializeSlot(struct MotionPool *pool, struct MotionPoolSlot *s
     Collider_Init(collider, 0, 0x2001, 0, 0x10, &params->bounds, &params->offset);
     Collider_SetCallback(collider, MotionPool_FinishOnResourceContact, slot);
     Collider_SetAttackProperties(collider, params->resourceId, params->cost, params->contactMode,
-                 params->contactFlags, params->option);
+                                 params->contactFlags, params->option);
 }

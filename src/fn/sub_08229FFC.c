@@ -29,7 +29,8 @@ double Time_CalculateMoonAge(s32 a, u32 year, s32 month, s32 day)
         } else
             current += period;
         for (i = 1; i <= 4; i++) {
-            difference = Time_CalculateLunarLongitude(current) - Time_CalculateSolarLongitude(current);
+            difference =
+                Time_CalculateLunarLongitude(current) - Time_CalculateSolarLongitude(current);
             if (difference >= 0.0 && difference <= 0.1)
                 break;
             if (difference < 0.0 && difference >= -0.1)

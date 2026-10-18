@@ -1,6 +1,5 @@
 #include "global.h"
 
-
 s32 Inventory_GetItemPackedState(s32 i);
 s32 Inventory_GetItemId(u32);
 

@@ -1,7 +1,7 @@
 #include "scalar_approach.h"
 /* ScalarApproach_StepAngleQuarter: Approaches the target along the wrapped angle difference by one quarter with a minimum unit step */
 #define ScalarApproach_StepAngleQuarter sub_0822194C
-#define ScalarApproach_QuarterAngle sub_0822194C
+#define ScalarApproach_QuarterAngle     sub_0822194C
 s32 ScalarApproach_QuarterAngle(s32 current, s32 target)
 {
     s16 angle = ((u32)current - (u32)target) & 255;

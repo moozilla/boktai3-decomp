@@ -39,7 +39,7 @@ s32 MotionPool_Spawn(const struct MotionPoolParams *params, const struct Contact
     velocity->z = scaleMotion(gUnk_086149C4[direction & 255] * speed);
     collider = &slot->collider;
     Collider_SetAttackProperties(collider, params->resourceId, params->cost, params->contactMode,
-                 params->contactFlags, params->option);
+                                 params->contactFlags, params->option);
     collider->bounds = params->bounds;
     collider->offset = params->offset;
     Collider_SetPosition(collider, position, 0);

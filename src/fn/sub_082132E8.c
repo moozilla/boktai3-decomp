@@ -17,7 +17,8 @@ u32 ForgingBook_RefreshEntryDescription(u8 *s)
         TextWindow_StartPlayback(*handle);
         ScrollingDialogue_ClearScript();
         ref = Script_ParseStringRef(*(u32 *)(s + 0x710));
-        ScrollingDialogue_SetScript(Text_LookupString(ref + *(s16 *)((u8 *)entries + (*index << 1))));
+        ScrollingDialogue_SetScript(
+            Text_LookupString(ref + *(s16 *)((u8 *)entries + (*index << 1))));
     } else {
         handle = (u32 *)(s + 0x708);
         TextWindow_SetScript(*handle, *(u32 *)(s + 0x70C));

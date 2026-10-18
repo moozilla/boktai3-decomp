@@ -91,7 +91,8 @@ int Actor_InitBehaviorFromScript(void *unused, struct Actor *p)
         p->pathId = Script_GetValue();
         p->pathParamA = Script_GetValue();
         p->pathParamB = Script_GetValue();
-        SceneBody_StartRoute(&p->body, p->path, (u8)p->pathId, (u8)p->pathParamA, (u8)p->pathParamB);
+        SceneBody_StartRoute(&p->body, p->path, (u8)p->pathId, (u8)p->pathParamA,
+                             (u8)p->pathParamB);
         Path_GetPointPosition(&p->pos, p->map, p->pathParamB);
     } else
         p->pathId = -1;

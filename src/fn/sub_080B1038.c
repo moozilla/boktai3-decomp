@@ -1,4 +1,4 @@
-#define gSineTable                       gUnk_086149C4
+#define gSineTable gUnk_086149C4
 /* Descriptive aliases and object roles are tentative (confidence: low). */
 #include "global.h"
 #include "scene_actor_reset.h"

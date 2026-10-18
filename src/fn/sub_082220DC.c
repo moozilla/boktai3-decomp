@@ -1,7 +1,7 @@
 #include "scalar_approach.h"
 /* ScalarApproach_StepEighthArrayWithSnap: Steps signed halfword elements one eighth toward targets and snaps when the step magnitude is below the threshold */
 #define ScalarApproach_StepEighthArrayWithSnap sub_082220DC
-#define ScalarApproach_Snap8Array sub_082220DC
+#define ScalarApproach_Snap8Array              sub_082220DC
 void ScalarApproach_Snap8Array(s16 *values, const s16 *targets, s32 threshold, s32 count)
 {
     s32 initialLimit = threshold;
