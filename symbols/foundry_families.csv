@@ -1085,3 +1085,4 @@ addr,function,name,family,note
 081BEEC0,sub_081BEEC0,SceneInventory_UpdateBrowseIntro,"SceneInventoryCategoryMenu","animates introductory vertical bounce before category browse"
 081BEFEC,sub_081BEFEC,SceneInventory_UpdateCategoryConfirmation,"SceneInventoryCategoryMenu","accepts category confirmation or returns to browse on cancel"
 081BF3D0,sub_081BF3D0,SceneInventory_UpdateSortConfirmation,"SceneInventoryCategoryMenu","sorts on confirmation and restores the saved menu state"
+081BF51C,sub_081BF51C,SceneInventory_InitWidgetPalette,"SceneInventoryCategoryMenu","copies the default palette and binds three menu widgets"
