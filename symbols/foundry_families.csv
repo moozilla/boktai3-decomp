@@ -1368,3 +1368,4 @@ addr,function,name,family,note
 08237450,sub_08237450,MovingSprite_UpdateMotion,"moving sprite task (tentative)","integrates two coordinates and ends a timed phase"
 082374A0,sub_082374A0,MovingSprite_UpdateDelay,"moving sprite task (tentative)","waits before revealing the sprite and starting motion"
 082375FC,sub_082375FC,MovingSprite_Create,"moving sprite task (tentative)","allocates and initializes a timed moving sprite task"
+08237C9C,sub_08237C9C,TimedSprite_UpdateMotion,"timed sprite task (tentative)","integrates two coordinates until a timed phase expires"
