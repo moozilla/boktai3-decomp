@@ -1067,3 +1067,4 @@ addr,function,name,family,note
 081BC5F0,sub_081BC5F0,StatGauge_DrawPreview,"StatGaugePreview","draws stat B with the pending bonus"
 081BCB14,sub_081BCB14,,"menu callbacks (tentative)",""
 081BCB58,sub_081BCB58,StatGauge_ConfirmPreview,"StatGaugePreview","confirms a nonzero stat preview or starts a fade"
+081BCCB0,sub_081BCCB0,StatGauge_GetSelectionGroup,"StatGaugePreview","maps four-entry selection groups to zero, one or two"
