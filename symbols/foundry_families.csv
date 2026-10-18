@@ -179,3 +179,4 @@ addr,function,name,family,note
 08108ADC,sub_08108ADC,SlotMonitor_CheckTimeout,"SlotMonitor","check active-slot and idle timeouts"
 08109090,sub_08109090,LinkSession_ClearFirstPlayerKind,"LinkSession / AreaEffectLinkState","marks the first matching link-session player kind empty"
 08109134,sub_08109134,LinkSession_CountPlayerKind,"LinkSession","counts matching signed player-kind entries"
+081091E4,sub_081091E4,LinkSession_IncrementCounter,"LinkSession","increments indexed session counter"
