@@ -130,9 +130,16 @@ def tidy(unit, name, orig):
         have = cur.split("\n")
         ops = [o for o in difflib.SequenceMatcher(None, have, want, autojunk=False).get_opcodes()
                if o[0] != "equal"]
+        cands = []
         for tag, i1, i2, j1, j2 in ops:
-            cand = "\n".join(have[:i1] + want[j1:j2] + have[i2:])
-            open(path, "w").write(text.replace(cur, cand))
+            cands.append(have[:i1] + want[j1:j2] + have[i2:])
+            # a line re-spelled inside a larger hunk (one that also added braces)
+            for i in range(i1, i2):
+                near = difflib.get_close_matches(have[i], want[j1:j2], 1, 0.8)
+                if near and near[0] != have[i]:
+                    cands.append(have[:i] + near + have[i + 1:])
+        for cand in cands:
+            open(path, "w").write(text.replace(cur, "\n".join(cand)))
             if check(unit):
                 break
         else:
