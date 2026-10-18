@@ -1384,3 +1384,4 @@ addr,function,name,family,note
 0823A590,sub_0823A590,Player_NotifyFirstSelectedSlot,"Player","notifies the first selected player slot when event flags qualify"
 0823AA28,sub_0823AA28,Player_InitializeActionState,"Player","initializes action state and selects its callback"
 0823AAF8,sub_0823AAF8,Player_ConsumeActionResource,"Player","subtracts capped stat-B cost and accumulates consumption"
+0823ABEC,sub_0823ABEC,Player_GetTetherMode,"Player","reads tether mode through action-state guards"
