@@ -1354,3 +1354,4 @@ addr,function,name,family,note
 0823674C,sub_0823674C,TimedSprite_UpdateFrames,"TimedSprite","advances frames every four ticks and finishes after twenty-four ticks"
 08236878,sub_08236878,PlayerEffect_UpdatePhaseCallback,"PlayerEffect","latches an effect callback when player mode nine reaches phase two"
 082369D8,sub_082369D8,ParticleEffect_Update,"ParticleEffect","updates effect components and retires inactive tasks"
+08236A40,sub_08236A40,ParticleEffect_Destroy,"ParticleEffect","removes task sprites and effects and releases pending count"
