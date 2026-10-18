@@ -190,3 +190,4 @@ addr,function,name,family,note
 0810AC10,sub_0810AC10,LinkSelection_RecordSlotState,"AreaEffectLinkState","records display slot value and selection bit"
 0810BD8C,sub_0810BD8C,SlotState_ResetInactiveMode,"SlotState","clears mode unless it is six through ten"
 0810BE0C,sub_0810BE0C,SlotText_CopySelectedString,"SlotText","copies the mode-selected script string into a cleared buffer"
+0810BF94,sub_0810BF94,SlotMenu_InitializeEntryValues,"SlotMenu","initializes seven entry values at offset 0x300"
