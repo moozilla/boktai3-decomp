@@ -984,3 +984,4 @@ addr,function,name,family,note
 0819C3D0,sub_0819C3D0,ColliderActor_InitBodyCollider,"ColliderActor (tentative)","initialize body collider and offset"
 0819C484,sub_0819C484,ColliderActor_InitLowerBodyCollider,"ColliderActor (tentative)","initialize body collider with negative vertical offset"
 0819C51C,sub_0819C51C,ColliderActor_UpdateCameraOffset,"ColliderActor (tentative)","interpolate camera offset toward actor position"
+0819C794,sub_0819C794,SceneMover_SetSideTarget,"SceneMover (tentative)","sets a target vector using the side flag and anchor position"
