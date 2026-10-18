@@ -1352,3 +1352,4 @@ addr,function,name,family,note
 082365F4,sub_082365F4,PaletteTransition_UpdateFadeOut,"PaletteTransition","decrements palette alpha and marks the transition finished at zero"
 08236644,sub_08236644,PaletteTransition_UpdateOwnerFade,"PaletteTransition","selects fade-in for owner state nine and latches fade-out otherwise"
 0823674C,sub_0823674C,TimedSprite_UpdateFrames,"TimedSprite","advances frames every four ticks and finishes after twenty-four ticks"
+08236878,sub_08236878,PlayerEffect_UpdatePhaseCallback,"PlayerEffect","latches an effect callback when player mode nine reaches phase two"
