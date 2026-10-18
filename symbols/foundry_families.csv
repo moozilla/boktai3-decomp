@@ -271,3 +271,4 @@ addr,function,name,family,note
 08126D3C,sub_08126D3C,SpritePool10_AllocateSlot,"SpritePool10","reserves the first free sprite slot"
 08127478,sub_08127478,PooledSprite_UpdateRemoval,"PooledSprite","retires a pooled sprite after its timed exit animation"
 08127848,sub_08127848,StateSlotPool_Update,"StateSlotPool","dispatches occupied slots through their state callbacks"
+08127994,sub_08127994,,"EmptyCallback",""
