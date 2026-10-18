@@ -464,3 +464,4 @@ addr,function,name,family,note
 081724D4,sub_081724D4,SceneHud_RefreshEquippedActionIcons,"SceneHud","refreshes equipped action and unlock icons with palette"
 08172850,sub_08172850,SceneHud_ConfigureActionGrid,"SceneHud","builds selectable action grid for mode and flags"
 08172950,sub_08172950,SceneHud_LayoutActionGrid,"SceneHud","places action and unlock icons in two grid layouts"
+08172BD0,sub_08172BD0,SceneHud_UpdateActionGridInput,"SceneHud","processes action-grid movement confirmation and cancellation"
