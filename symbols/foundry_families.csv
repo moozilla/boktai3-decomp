@@ -437,3 +437,4 @@ addr,function,name,family,note
 0816E440,sub_0816E440,MenuTransition_UpdateTimedMessage,"MenuTransition","dismisses a timed message and restores menu transition"
 0816EA24,sub_0816EA24,SceneMenuPanel_ShowTimedResult,"Scene menu panel","shows indexed result text then advances on timeout or A press"
 0816EA98,sub_0816EA98,MenuTransition_UpdateSelectionMessage,"MenuTransition","dismisses selection message and activates selected widget"
+0816EB30,sub_0816EB30,MenuTransition_UpdateSelectionFade,"MenuTransition","plays selection sound and advances color fade"
