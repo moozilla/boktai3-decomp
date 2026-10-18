@@ -792,3 +792,4 @@ addr,function,name,family,note
 0816B59C,sub_0816B59C,SceneInput_NavigateGridKeys,"SceneInput","moves grid cursor using allowed directional keys"
 0816B66C,sub_0816B66C,SceneSequence_SelectEntryMessage,"SceneSequence","selects a message from state or the current sixteen-byte entry"
 0816C230,sub_0816C230,MapMenu_SelectDirection,"MapMenu","selects an adjacent map entry from directional input"
+0816C624,sub_0816C624,MapMenu_RefreshMarkers,"MapMenu","refreshes marker animation and screen positions"
