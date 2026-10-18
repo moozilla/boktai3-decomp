@@ -316,3 +316,4 @@ addr,function,name,family,note
 08139BC0,sub_08139BC0,SceneProcParticles_Initialize,"SceneProcParticles","initialize six script-backed particle entries"
 08139CC0,sub_08139CC0,CallbackPool_MarkNextOfKind,"CallbackPool","marks first active unvisited slot with matching kind"
 08139D04,sub_08139D04,SceneProcParticles_TestCapacity,"SceneProcParticles","test free slots and existing particle groups"
+08139F58,sub_08139F58,CallbackPool_RemoveEntry,"CallbackPool","clears entry state and removes its sprite"
