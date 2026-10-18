@@ -383,3 +383,4 @@ addr,function,name,family,note
 0815DD3C,sub_0815DD3C,Player_ScaleLevelValue,"Player/GameState","scales a level-derived value with a state adjustment"
 0815E63C,sub_0815E63C,PlayerContact_ApplyStatReward,"Player contact response","Applies gated contact response and proportional stat gain."
 0815EC14,sub_0815EC14,Player_SaveStateSnapshot,"Player saved state","Copies player position, stats and mode into saved state and script globals."
+0815EF6C,sub_0815EF6C,Player_RecordInputTicks,"Player input statistics","Increments saturating mode and indexed counters while input is held."
