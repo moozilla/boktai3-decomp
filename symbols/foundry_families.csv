@@ -782,3 +782,4 @@ addr,function,name,family,note
 0816AD34,sub_0816AD34,ScenePanel_BeginAccountMenu,"ScenePanel","initializes account menu and conditionally enables its secondary sprite"
 0816AE38,sub_0816AE38,ScenePanel_BeginAccountExit,"ScenePanel","starts account panel exit animation and sound"
 0816AEE8,sub_0816AEE8,SceneSequence_BeginAnimation6,"SceneSequence","starts animation six and installs its next phase"
+0816AF5C,sub_0816AF5C,ScenePanel_UpdateAccountIntro,"ScenePanel","runs timed intro, slides main sprite and opens account selection"
