@@ -1014,3 +1014,4 @@ addr,function,name,family,note
 081A48E0,sub_081A48E0,MotionEntry_CreateWithDelta,"MotionEntry","creates entry with a supplied motion delta"
 081A5100,sub_081A5100,TimedEffect_UpdateShutdown,"TimedEffect","initializes shutdown state then kills effect after timer expires"
 081A5360,sub_081A5360,DamageNumberDisplay_ShowWithDefaultScale,"DamageNumberDisplay","shows damage number using vector 32,0,32"
+081A6104,sub_081A6104,,"PaletteTransition",""
