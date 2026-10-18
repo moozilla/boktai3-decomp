@@ -10,7 +10,7 @@ static inline u8 Occupied(const u32 *mask, u32 bit)
 }
 s32 SceneParticlePool_Update(struct SceneParticlePool *input)
 {
-    register struct SceneParticlePool *pool asm("r6") = input;
+    struct SceneParticlePool *pool = input;
     struct SceneParticleSlot *slot;
     s32 i;
     register u32 maskOffset asm("r1") = (u32) & ((struct SceneParticlePool *)0)->used;
@@ -25,7 +25,6 @@ s32 SceneParticlePool_Update(struct SceneParticlePool *input)
             u32 offset = (u32) & ((struct SceneParticlePool *)0)->used;
             used = (void *)((u32)pool + offset);
         }
-        asm("" : "+r"(used));
         {
             register u32 offset asm("r1") = (u32) & ((struct SceneParticlePool *)0)->slots;
             asm("" : "+r"(offset));

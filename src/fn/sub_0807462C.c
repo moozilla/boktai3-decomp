@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 s32 SceneMessages_RegisterReceiver(u8 *, s32, s32);
 static inline u8 IsScenePaused(void)
@@ -17,9 +16,9 @@ void SceneActorRegistry_RegisterCategoryReceiver(struct SceneActorRegistryActor 
         SceneMessages_RegisterReceiver((u8 *)actor + 0xc, actor->id, 3);
         {
             u32 mask = 0x100;
-            register u32 offset asm("r1") = 0x2c0;
+            u32 offset = 0x2c0;
             u16 *field;
-            register u32 value asm("r1");
+            u32 value;
             field = (void *)((u8 *)actor + offset);
             value = *field;
             mask |= value;

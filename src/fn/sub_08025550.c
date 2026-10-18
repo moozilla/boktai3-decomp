@@ -130,13 +130,13 @@ void sub_08025550(ActorAnimation *p, int tick)
         }
     }
     {
-        register s16 *velocity asm("r3") = (s16 *)(position + 20);
+        s16 *velocity = (s16 *)(position + 20);
         u32 angle = position[9];
         int speed;
         speed = 40;
         {
             int x = trunc12(gUnk_086149C4[(angle + 64) & 255] * speed);
-            register int zero asm("r0") = 0;
+            int zero = 0;
             velocity[0] = x;
             velocity[1] = zero;
         }

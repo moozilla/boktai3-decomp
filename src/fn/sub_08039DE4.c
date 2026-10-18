@@ -89,7 +89,7 @@ void sub_08039DE4(struct Owner *owner, struct Item *p, int index)
     p->sprite.flags &= ~1;
     {
         void *draw = &p->drawing;
-        register void *resource asm("r6") = owner->resource;
+        void *resource = owner->resource;
         if (index > 7)
             choice = (index & 3) + 4;
         else
@@ -104,7 +104,7 @@ void sub_08039DE4(struct Owner *owner, struct Item *p, int index)
     }
     {
         register struct Drawing *source asm("r2") = drawing;
-        register u32 x asm("r0") = source->x;
+        u32 x = source->x;
         u32 y = source->y;
         register struct Sprite *dest asm("r6") = sprite;
         dest->x = x;

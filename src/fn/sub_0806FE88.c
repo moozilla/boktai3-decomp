@@ -6,9 +6,7 @@ static inline u8 Inactive(struct SceneActorRegistryActor *actor)
 {
     {
         u32 flags = actor->flags2D4;
-        asm("" : "+r"(flags));
         flags &= 0x40;
-        asm("" : "+r"(flags));
         if (flags)
             return 1;
     }
@@ -33,14 +31,12 @@ void SceneActorRegistry_ScheduleAvailableActors(void)
         } else if (count <= 9) {
             {
                 s32 value = 2;
-                asm("" : "+r"(value));
                 quota = value;
             }
             delay = Div(count + 1, 2) - 1;
         } else {
             {
                 s32 value = 4;
-                asm("" : "+r"(value));
                 quota = value;
             }
             delay = Div(count + 3, 4) - 1;
@@ -63,7 +59,6 @@ void SceneActorRegistry_ScheduleAvailableActors(void)
             }
             {
                 u32 low = 0x4000;
-                asm("" : "+r"(low));
                 request = low;
             }
             do {

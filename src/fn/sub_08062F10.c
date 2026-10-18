@@ -10,12 +10,12 @@ void SceneInventory_BuildUnlockedItemCatalog(struct SceneInventoryScriptCatalog 
     struct SceneInventoryScriptCatalog *p = input;
     s32 page;
     s32 next;
-    register s32 count asm("r5");
-    register s8 *destination asm("r4");
-    register const s8 *source asm("r6");
+    s32 count;
+    s8 *destination;
+    const s8 *source;
     struct GameState **location;
     register u32 one asm("r8");
-    register u8 *pageCount asm("r10");
+    u8 *pageCount;
     s8 *volatile base;
     u8 *initialCount;
     p->page = 0;
@@ -27,7 +27,7 @@ void SceneInventory_BuildUnlockedItemCatalog(struct SceneInventoryScriptCatalog 
     base = p->catalog;
     pageCount = initialCount;
     do {
-        register s32 offset asm("r0") = page * 8;
+        s32 offset = page * 8;
         next = page + 1;
         {
             register s8 *baseLoad asm("r1") = base;
@@ -48,9 +48,9 @@ void SceneInventory_BuildUnlockedItemCatalog(struct SceneInventoryScriptCatalog 
                     offset = one << kind;
                     enabled = *flags & offset;
                 } else {
-                    register struct GameState **copy asm("r1") = location;
+                    struct GameState **copy = location;
                     u32 *flags;
-                    register u32 offset asm("r1");
+                    u32 offset;
                     flags = (u32 *)*copy;
                     offset = 0x754;
                     flags = (u32 *)((u8 *)flags + offset);
@@ -67,10 +67,10 @@ void SceneInventory_BuildUnlockedItemCatalog(struct SceneInventoryScriptCatalog 
         page = next;
     } while (page < *pageCount);
     if (page <= 6) {
-        register u32 mask asm("r3") = 0xFF;
+        u32 mask = 0xFF;
         s8 *fillBase = p->catalog;
         do {
-            register s32 offset asm("r0") = page * 8;
+            s32 offset = page * 8;
             s8 *cursor;
             next = page + 1;
             cursor = (s8 *)((u32)offset + (u32)fillBase);

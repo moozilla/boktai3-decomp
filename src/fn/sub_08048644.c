@@ -2,7 +2,6 @@
 #ifdef NONMATCHING
 // fuzzy: 77.3%
 // Packed endpoint caching and register allocation differ; no exact credit.
-// MATCHING_CONCESSION: register-pinning
 static inline s32 scaleOffset(s32 value)
 {
     if (value >= 0)
@@ -11,22 +10,22 @@ static inline s32 scaleOffset(s32 value)
 }
 void TetherActor_UpdateSegments(struct TetherActor *input)
 {
-    register struct TetherActor *actor asm("r6") = input;
+    struct TetherActor *actor = input;
     struct TetherPlayer **globals = gUnk_02000580;
     struct TetherPlayer *player = globals[0];
-    register u32 mode asm("r1") = player->tetherMode;
-    register struct TetherPlayer **slots asm("r8") = globals;
-    register struct TetherSegment *segment asm("r4");
+    u32 mode = player->tetherMode;
+    struct TetherPlayer **slots = globals;
+    struct TetherSegment *segment;
     struct ContactPackedVector start, end;
     s32 x;
-    register s32 z asm("r2");
+    s32 z;
     s32 offsetX, offsetZ;
     u32 angle;
-    register s32 priority asm("r9");
-    register s32 index asm("r1");
+    s32 priority;
+    s32 index;
     s32 accumulatedX, accumulatedY;
     if (mode != 6) {
-        register u32 hidden asm("r2") = 1;
+        u32 hidden = 1;
         segment = actor->segments;
         index = 6;
         do {
@@ -60,14 +59,14 @@ void TetherActor_UpdateSegments(struct TetherActor *input)
     segment = actor->segments;
     index = 0;
     {
-        register s32 startX asm("r10") = start.x;
-        register s32 startY asm("r8") = start.y;
-        register s32 endX asm("r12") = end.x;
-        register s32 nextX asm("r6") = endX;
+        s32 startX = start.x;
+        s32 startY = start.y;
+        s32 endX = end.x;
+        s32 nextX = endX;
         s32 endY = end.y;
-        register s32 nextY asm("r5") = endY;
+        s32 nextY = endY;
         do {
-            register s32 count asm("r3") = index + 1;
+            s32 count = index + 1;
             s32 remaining = 7 - index;
             segment->position.x = (nextX + startX * remaining) >> 3;
             segment->position.y = (nextY + startY * remaining) >> 3;

@@ -22,14 +22,14 @@ void SceneActorControl_UpdateShadowReturnPhase(struct SceneActorRegistryResetVie
         actor->field2C8 = 0;
         {
             u32 *flags = &actor->flags114;
-            register u32 mask asm("r1") = ~1;
+            u32 mask = ~1;
             *flags &= mask;
         }
         actor->word104 = 0;
 
         {
             u32 *flags = &actor->flags2D0;
-            register u32 mask asm("r1") = ~0x100000;
+            u32 mask = ~0x100000;
             *flags &= mask;
         }
         {

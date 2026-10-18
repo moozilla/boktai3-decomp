@@ -150,7 +150,7 @@ u32 ContactSwarm_Update(struct ContactSwarm *poolInput)
             }
         }
         {
-            register const struct ContactSwarm *current asm("r1") = pool;
+            const struct ContactSwarm *current = pool;
             pool->resourceParity = current->frame & 1;
         }
         {
@@ -163,7 +163,6 @@ u32 ContactSwarm_Update(struct ContactSwarm *poolInput)
             s32 test;
             asm("" : "+r"(slotOffset));
             initialSlot = (void *)(slotOffset + (u32)pool);
-            asm("" : "+r"(initialSlot));
             slot = initialSlot;
             initialIndex = 0;
             index = initialIndex;
@@ -187,7 +186,7 @@ u32 ContactSwarm_Update(struct ContactSwarm *poolInput)
                     updatePlayback(sequence, &slot->display.animation.draw.sprite);
                 }
                 {
-                    register u32 one asm("r1") = 1;
+                    u32 one = 1;
                     register u32 stride asm("r2");
                     index += one;
                     stride = sizeof(*slot);
@@ -198,7 +197,7 @@ u32 ContactSwarm_Update(struct ContactSwarm *poolInput)
             } while (test <= 15);
         }
         {
-            register struct ContactSwarm *current asm("r1") = pool;
+            struct ContactSwarm *current = pool;
             current->frame++;
         }
     }

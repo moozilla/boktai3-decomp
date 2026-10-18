@@ -1,5 +1,4 @@
 #include "scene_panel_interaction.h"
-// MATCHING_CONCESSION: register-pinning
 
 void ScenePanel_UpdateActiveSubjects(struct ScenePanel *input)
 {
@@ -9,7 +8,7 @@ void ScenePanel_UpdateActiveSubjects(struct ScenePanel *input)
     for (; i < panel->subjectCount; i++) {
         struct ScenePanelInteractionSubject **subject;
         u32 offset;
-        register struct ScenePanelInteractionSubject **base asm("r1");
+        struct ScenePanelInteractionSubject **base;
         offset = i * 4;
         base = panel->subjects;
         subject = (void *)((u8 *)base + offset);

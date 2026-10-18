@@ -55,7 +55,7 @@ void ScenePanelRig_TickResourceDrain(struct ScenePanelRig *rig)
             rig->resourceAccumulator -= drain * 40;
         }
         {
-            register struct GameState *game asm("r0") = gUnk_02000710;
+            struct GameState *game = gUnk_02000710;
             s32 *remaining;
             register s32 value asm("r0");
             remaining = &game->unk618;
@@ -68,7 +68,7 @@ void ScenePanelRig_TickResourceDrain(struct ScenePanelRig *rig)
         }
         {
             struct SceneRigParentView **global = (void *)&gUnk_020004A4;
-            register struct SceneRigParentView *current asm("r0") = *global;
+            struct SceneRigParentView *current = *global;
             u32 offset = 0x1343;
             u8 *warning = (void *)(offset + (u32)current);
             u32 stage = *warning;

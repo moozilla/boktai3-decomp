@@ -35,7 +35,7 @@ s32 ContactBurst_Update(struct ContactBurst *effect)
         projectPosition(screen, effect->world);
         {
             struct ContactBurst *addressBase = effect;
-            register s16 *height asm("r1");
+            s16 *height;
             height = &addressBase->sprite.position.vector.z;
             *height += 50;
         }

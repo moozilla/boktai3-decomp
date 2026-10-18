@@ -142,7 +142,7 @@ int sub_0802E468(void)
             p->entered = one;
         }
         {
-            register u8 *controlled asm("r1") = &p->controlled;
+            u8 *controlled = &p->controlled;
             *controlled = 1;
         }
     }

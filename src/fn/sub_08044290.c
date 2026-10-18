@@ -19,10 +19,9 @@ void ContactSwarm_UpdateTracking(struct ContactSwarm *pool, struct ContactSwarmS
     {
         u32 phase = slot->stateFrame & 15;
         index &= 15;
-        asm("" : "+r"(phase), "+r"(index));
         position = &slot->display.animation.draw.sprite.position;
         if (phase == index) {
-            register struct ContactSwarmSprite *current asm("r5");
+            struct ContactSwarmSprite *current;
             const struct ContactPosition *target = &pool->target;
             s32 dx = target->x;
             s32 dz;
@@ -40,7 +39,7 @@ void ContactSwarm_UpdateTracking(struct ContactSwarm *pool, struct ContactSwarmS
         register u32 limit asm("r5");
         limit = slot->trackingFrames;
         if (frame >= limit) {
-            register u32 offset asm("r0") = (u8 *)&pool->target - (u8 *)pool;
+            u32 offset = (u8 *)&pool->target - (u8 *)pool;
             const struct ContactPosition *target;
             struct ContactSwarmSprite *current;
             s32 dx;
@@ -68,7 +67,7 @@ void ContactSwarm_UpdateTracking(struct ContactSwarm *pool, struct ContactSwarmS
             mask = 15;
             jitter &= mask;
             {
-                register u32 zero asm("r1");
+                u32 zero;
                 u32 newDirection = direction + jitter - 8;
                 zero = 0;
                 slot->direction = newDirection;

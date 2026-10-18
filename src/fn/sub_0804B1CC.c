@@ -36,7 +36,7 @@ u32 TetherActor_TestTerrainTransition(struct TetherActor *actor)
     if (actor->statusFlags)
         goto no;
     {
-        register struct ContactPosition *first asm("r0") = &actor->position;
+        struct ContactPosition *first = &actor->position;
         s32 x = first->x >> 8;
         s32 z = first->z >> 8;
         s32 cell;

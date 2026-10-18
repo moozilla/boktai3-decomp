@@ -42,7 +42,7 @@ void ContactActor_UpdateBurst(struct ContactActorPool *pool, struct ContactActor
         frame = 32 - slot->stateFrame;
     {
         u32 speed = frame * 16;
-        register struct ContactPosition *write asm("r4") = &delta;
+        struct ContactPosition *write = &delta;
         register u32 direction asm("r5") = slot->direction;
         write->x = truncateShift12(gUnk_086149C4[(direction + 64) & 255] * speed);
         write->y = 0;
@@ -91,7 +91,7 @@ void ContactActor_UpdateBurst(struct ContactActorPool *pool, struct ContactActor
         if (slot->retargetTimer && !--slot->retargetTimer) {
             register u32 mode asm("r0") = pool->mode;
             if (mode == 2) {
-                register s32 slotIndex asm("r4") = index;
+                s32 slotIndex = index;
                 if (slotIndex > 7)
                     goto zeroMode2;
                 mode = 1;

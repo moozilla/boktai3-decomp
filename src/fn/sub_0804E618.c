@@ -23,7 +23,7 @@ void AreaEffect_AccumulatePlayerResource(struct AreaEffectManager *manager, s32 
     if ((gUnk_030053F4 & 0x300) == 0x200 || any(4))
         return;
     {
-        register struct AreaEffectPlayer *candidate asm("r0") = object->player;
+        struct AreaEffectPlayer *candidate = object->player;
         u32 kind = candidate->actionMode;
         player = candidate;
         if (kind == 6) {
@@ -33,7 +33,7 @@ void AreaEffect_AccumulatePlayerResource(struct AreaEffectManager *manager, s32 
                 object->resourceFraction += 5;
         } else {
             if (activeMode == 2) {
-                register s32 value asm("r0") = gUnk_02000710->unk876;
+                s32 value = gUnk_02000710->unk876;
                 value <<= 3;
                 {
                     u32 fraction = object->resourceFraction;

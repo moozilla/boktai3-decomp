@@ -146,7 +146,7 @@ void CollisionController_UpdateIdleAnimation(struct CollisionManager *manager,
     {
         u32 flags = p->sprite.flags;
         register u32 low asm("r2") = 1;
-        register u32 firstMask asm("ip");
+        u32 firstMask;
         firstMask = low;
         if (flags & low) {
             if (p->timer++ > p->delay) {

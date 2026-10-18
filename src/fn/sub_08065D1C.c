@@ -8,7 +8,7 @@ ActorAttachment_ReleasePartsResource(struct ActorAttachmentSlotView *incoming, u
     register struct ActorAttachmentSlotView *slot asm("r6") = incoming;
     struct ActorAttachmentManagerView *manager;
     void *matchUpdate;
-    register struct ActorAttachmentPartSprite *parts asm("ip");
+    struct ActorAttachmentPartSprite *parts;
     s8 *slotId;
     u32 matchKind = resourceKind;
     asm("" : "+r"(matchKind), "+r"(update));

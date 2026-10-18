@@ -87,7 +87,7 @@ s32 ScenePool_StateLaunchArc(void *manager, struct ScenePoolActor *actor,
         s32 random;
         register s32 kind asm("r1");
         u32 *arg;
-        register u32 *index asm("r0") = &gUnk_03005308;
+        u32 *index = &gUnk_03005308;
         u32 next = (*index + 1) & 0x3ff;
         *index = next;
         {

@@ -1,7 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
 // fuzzy: 98.9%
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 s32 sub_0806A160(const struct ContactPosition *, u8, const struct ContactPosition *, s32, s32, s32,
@@ -16,14 +15,13 @@ static inline u32 NextRandom(const u16 *table)
 {
     u32 *index = &gUnk_03005308;
     u32 next;
-    asm("" : "+r"(index));
     next = (*index + 1) & 1023;
     *index = next;
     return table[next];
 }
 static inline u32 FirstRandom(const u16 *table)
 {
-    register u32 *index asm("r3") = &gUnk_03005308;
+    u32 *index = &gUnk_03005308;
     u32 next;
     next = (*index + 1) & 1023;
     *index = next;
@@ -55,16 +53,13 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor)
 {
     void *callback = (void *)sub_0807FC90;
     u8 kind = 16;
-    register u32 zero asm("r3");
+    u32 zero;
     {
-        register u32 preparedOffset asm("r4") = 0x2B2;
+        u32 preparedOffset = 0x2B2;
         u8 *field;
-        register u8 one asm("r4");
-        asm("" : "+r"(preparedOffset));
+        u8 one;
         field = (u8 *)actor + preparedOffset;
-        asm("" : "+r"(field));
         zero = 0;
-        asm("" : "+r"(zero));
         one = 1;
         *field = one;
     }
@@ -112,17 +107,16 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
         {
             struct ContactCollider *collider;
             u32 colliderOffset = 0x134;
-            register u32 old asm("r2");
+            u32 old;
             u32 bit;
             collider = (void *)((u8 *)actor + colliderOffset);
             old = collider->flags;
             bit = 4;
             collider->flags = bit | old;
             {
-                register u32 parameterOffset asm("r2") = 0x178;
-                asm("" : "+r"(parameterOffset));
+                u32 parameterOffset = 0x178;
                 {
-                    register u16 *field asm("r0") = (void *)((u8 *)actor + parameterOffset);
+                    u16 *field = (void *)((u8 *)actor + parameterOffset);
                     *field = zero;
                 }
             }
@@ -163,16 +157,14 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
     range.y = 60;
     range.z = 60;
     {
-        register struct ContactPosition *rangePointer asm("r6") = &range;
+        struct ContactPosition *rangePointer = &range;
         u32 life;
         u32 mode;
-        register u32 flag asm("r8");
+        u32 flag;
         {
-            register const u16 *raw asm("r4") = gUnk_0203B400;
-            asm("" : : "r"(raw));
+            const u16 *raw = gUnk_0203B400;
             table = raw;
         }
-        asm("" : "+r"(table));
         sub_0806A160(&actor->position, (FirstRandom(table) & 3) + 1, rangePointer, 32, 4,
                      (life = 20), (mode = 2), (flag = 1));
         sub_0806A160(&actor->position, (NextRandom(table) & 3) + 1, rangePointer, 64, 4, life, mode,
@@ -211,30 +203,27 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
         GameState_SetEventFlag(sub_081D4F20(actor->category, actor->paletteOffset));
     SetControl(actor);
     {
-        register u8 behavior asm("r1") = 2;
-        register u32 offset asm("r2") = 0x2A8;
-        asm("" : "+r"(behavior));
+        u8 behavior = 2;
+        u32 offset = 0x2A8;
         {
             u8 *field = (u8 *)actor + offset;
-            register u8 one asm("r4");
-            asm("" : "+r"(field));
+            u8 one;
             one = 1;
             *field = one;
         }
         offset += 1;
         *((u8 *)actor + offset) = 0;
         {
-            register u32 behaviorOffset asm("r4") = 0x2AA;
+            u32 behaviorOffset = 0x2AA;
             *((u8 *)actor + behaviorOffset) = behavior;
             actor->counter2AC = 0;
             offset += 8;
             {
-                register u8 *field asm("r0") = (u8 *)actor + offset;
-                register u8 one asm("r3");
+                u8 *field = (u8 *)actor + offset;
+                u8 one;
                 one = 1;
                 *field = one;
             }
-            asm("" : : "r"(behaviorOffset), "r"(behavior));
         }
     }
     if (!Test(gUnk_030053F4, 0x4800) && !Flag(actor, 0x800, 0x2D0))

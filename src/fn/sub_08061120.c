@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_control.h"
 s32 SceneInventory_ClassifyEquipmentAction(struct SceneInventoryControlView *panel)
 {
@@ -8,7 +7,7 @@ s32 SceneInventory_ClassifyEquipmentAction(struct SceneInventoryControlView *pan
         result = 1;
         {
             s32 pageIndex = (panel->page << 3) - 16;
-            register u8 raw asm("r1");
+            u8 raw;
             raw = ((struct SceneInventoryCatalogView *)panel)
                       ->entries[pageIndex + panel->grid.selection];
             entry = (s8)raw;

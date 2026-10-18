@@ -1,10 +1,9 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 void SceneActorRegistry_SetObjectContext(struct SceneActorRegistryActor *actor, void *context,
                                          u32 kind, void *object)
 {
-    register u32 offset asm("r5") = 0x3d0;
-    register void **field asm("r4");
+    u32 offset = 0x3d0;
+    void **field;
     field = (void *)((u8 *)actor + offset);
     *field = context;
     actor->object = object;

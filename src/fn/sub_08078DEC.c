@@ -26,7 +26,7 @@ static inline u8 Test(u32 value, u32 mask)
 void SceneActorBehavior_ActivatePendingControl(struct SceneActorBehaviorView *actor)
 {
     u32 *flags;
-    register u32 clear asm("r4");
+    u32 clear;
     register u32 zero asm("r6");
     const void *control;
     u32 kind;

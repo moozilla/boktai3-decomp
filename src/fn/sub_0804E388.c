@@ -89,7 +89,7 @@ void AreaEffect_AddSpriteFromScript(void)
                     if (!manager->visible) {
                         u32 offset = *entryCount * sizeof(struct AreaEffectEntry);
                         u8 *base = (u8 *)manager + 0x34;
-                        register u32 *flags asm("r1");
+                        u32 *flags;
                         flags = (u32 *)(base + offset);
                         *flags |= one;
                     }

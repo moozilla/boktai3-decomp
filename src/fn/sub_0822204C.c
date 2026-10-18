@@ -1,12 +1,11 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scalar_approach.h"
 #define ScalarApproach_Snap2Array sub_0822204C
 void ScalarApproach_Snap2Array(s16 *values, const s16 *targets, s32 threshold, s32 count)
 {
     s32 initialLimit = threshold;
     s32 limit;
-    register s16 *cursor asm("r2");
-    register const s16 *targetCursor asm("r5");
+    s16 *cursor;
+    const s16 *targetCursor;
     limit = initialLimit;
     cursor = values;
     targetCursor = targets;

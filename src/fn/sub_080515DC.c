@@ -14,7 +14,7 @@ void BreakableProp_EmitBreakParticles(struct BreakableProp *prop)
     s32 i;
     u32 mask;
     s32 range;
-    register u32 *indexAddress asm("r5");
+    u32 *indexAddress;
     register const u16 *random asm("r4");
     local.config.type = 2;
     local.config.flags = 0;

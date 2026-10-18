@@ -81,7 +81,7 @@ void sub_0803559C(struct Engine *argument)
             u16 *backup;
             u16 *flags;
             u8 *seen;
-            register int bit asm("r9");
+            int bit;
             register u16 *input asm("r3");
             u16 *output;
             stack.sequence = *packet;
@@ -95,7 +95,7 @@ void sub_0803559C(struct Engine *argument)
             stack.waiting = waiting;
             backup = (u16 *)((u8 *)p + 0xEA);
             {
-                register int offset asm("r1") = 0xEC;
+                int offset = 0xEC;
                 flags = (u16 *)(offset + (u32)p);
             }
             {
@@ -110,7 +110,7 @@ void sub_0803559C(struct Engine *argument)
             output = (u16 *)(waiting + 0x40);
             do {
                 int mask = bit;
-                register u8 *read asm("r5");
+                u8 *read;
                 mask <<= i;
                 read = scratch;
                 if (read[2] & mask)
@@ -121,14 +121,14 @@ void sub_0803559C(struct Engine *argument)
             *(u16 *)(packet + 4) = *backup;
             {
                 u16 *read = flags;
-                register int value asm("r0");
+                int value;
                 value = *read;
                 *backup = value;
                 value = 65535;
                 *read = value;
             }
             {
-                register u8 *read asm("r2") = scratch;
+                u8 *read = scratch;
                 packet[2] = read[2];
             }
             packet[1] = 1;
@@ -137,7 +137,7 @@ void sub_0803559C(struct Engine *argument)
                 register int sequence asm("r3") = stack.sequence + 1;
                 register int bit asm("r5") = 2;
                 do {
-                    register u8 *read asm("r0") = scratch;
+                    u8 *read = scratch;
                     int active;
                     int mask;
                     active = read[2];
@@ -158,7 +158,7 @@ void sub_0803559C(struct Engine *argument)
                     *write = one;
                 }
                 {
-                    register u8 *read asm("r2") = scratch;
+                    u8 *read = scratch;
                     if (read[3] > 1) {
                         register u8 *write asm("r5") = stack.waiting;
                         *write = one;

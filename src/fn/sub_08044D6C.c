@@ -15,7 +15,7 @@ void EncodedRecord_XorRange(u8 *buffer, s32 start, s32 end, u32 seed, volatile s
     index = start;
     asm("" : "+r"(index) : : "r0", "r1", "r2", "r3");
     if (index < end) {
-        register u8 *base asm("r0") = buffer;
+        u8 *base = buffer;
         register u8 *current asm("r5");
         s32 remaining;
         current = (void *)(index + (u32)base);

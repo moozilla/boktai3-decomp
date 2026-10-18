@@ -6,7 +6,7 @@ void ProximityEmitter_TickRise(struct ProximityEmitter *input)
     emitter->primary.sprite.flags &= ~1;
     {
         u16 *frameAddress = &emitter->stateFrame;
-        register u32 previous asm("r0") = *frameAddress;
+        u32 previous = *frameAddress;
         u32 frame;
         frame = previous + 1;
         *frameAddress = frame;

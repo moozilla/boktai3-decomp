@@ -1,28 +1,26 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scalar_approach.h"
 #define ScalarApproach_QuarterAngleArray sub_08221E00
 void ScalarApproach_QuarterAngleArray(s16 *values, const s16 *targets, s32 count)
 {
     s32 remaining = count;
-    register s16 *cursor asm("r5");
-    register const s16 *targetCursor asm("r6");
+    s16 *cursor;
+    const s16 *targetCursor;
     cursor = values;
     targetCursor = targets;
     while ((remaining = (s32)((u32)remaining - 1u)) >= 0) {
-        register s32 current asm("r0");
+        s32 current;
         s32 target;
-        register s32 result asm("r0");
+        s32 result;
 
-        register u32 masked asm("r3");
+        u32 masked;
         s16 angle;
-        register s32 converted asm("r0");
+        s32 converted;
         s32 near;
-        register s32 delta asm("r3");
-        register s32 step asm("r0");
+        s32 delta;
+        s32 step;
         current = *cursor;
         target = *targetCursor;
         masked = ((u32)current - (u32)target) & 255;
-        asm("" : : "r"(masked));
         angle = masked;
         if (angle > 128)
             angle = angle - 256;

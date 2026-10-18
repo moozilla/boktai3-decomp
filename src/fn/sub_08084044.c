@@ -15,7 +15,7 @@ void SceneActorControl_RestartPositionCurve(struct SceneActorRegistryResetView *
         *field = zero;
     }
     {
-        register u32 offset asm("r0") = 0x2EC;
+        u32 offset = 0x2EC;
         void *destination;
         destination = (u8 *)actor + offset;
         fill = zero;
@@ -28,7 +28,7 @@ void SceneActorControl_RestartPositionCurve(struct SceneActorRegistryResetView *
         }
     }
     {
-        register u32 offset asm("r1") = 0x3D4;
+        u32 offset = 0x3D4;
         u32 mask;
         state = (void *)((u8 *)state + offset);
         mask = ~7;
@@ -50,7 +50,7 @@ void SceneActorControl_RestartPositionCurve(struct SceneActorRegistryResetView *
     {
         u32 mask = 0x100;
         u32 offset = 0x2D4;
-        register u16 *flags asm("r2");
+        u16 *flags;
         u32 old;
         u32 zeroByte;
         flags = (void *)((u8 *)actor + offset);
@@ -68,7 +68,7 @@ void SceneActorControl_RestartPositionCurve(struct SceneActorRegistryResetView *
             field = (u8 *)actor + offset;
             *field = phase;
             {
-                register u32 offset asm("r1") = 0x2AA;
+                u32 offset = 0x2AA;
                 field = (u8 *)actor + offset;
                 *field = zeroByte;
             }

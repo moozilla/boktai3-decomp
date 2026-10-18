@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 #include "scene_actor_control.h"
 #include "actor_attachment_manager.h"
@@ -27,7 +26,6 @@ void SceneActorRegistry_EnsureActorSubsystems(struct SceneActorRegistryManager *
             {
                 u32 mask = 8;
                 u32 flags;
-                asm("" : "+r"(mask));
                 flags = manager->flags;
                 flags |= mask;
                 manager->flags = flags;
@@ -42,7 +40,6 @@ void SceneActorRegistry_EnsureActorSubsystems(struct SceneActorRegistryManager *
             {
                 u32 mask = 0x10;
                 u32 flags;
-                asm("" : "+r"(mask));
                 flags = manager->flags;
                 flags |= mask;
                 manager->flags = flags;
@@ -57,7 +54,6 @@ void SceneActorRegistry_EnsureActorSubsystems(struct SceneActorRegistryManager *
         {
             u32 mask = 0x20;
             u32 flags;
-            asm("" : "+r"(mask));
             flags = manager->flags;
             flags |= mask;
             manager->flags = flags;
@@ -74,7 +70,6 @@ void SceneActorRegistry_EnsureActorSubsystems(struct SceneActorRegistryManager *
         {
             u32 mask = 0x1000;
             u32 flags;
-            asm("" : "+r"(mask));
             flags = manager->flags;
             flags |= mask;
             manager->flags = flags;

@@ -7,10 +7,10 @@ static inline void *resourceAt(void **resource)
 }
 void ProximityEmitter_InitializeParticles(struct ProximityEmitter *input)
 {
-    register struct ProximityEmitter *emitter asm("r6") = input;
+    struct ProximityEmitter *emitter = input;
     void **resource;
-    register s32 scale asm("r10");
-    register u32 one asm("r9");
+    s32 scale;
+    u32 one;
     s32 i;
     {
         void *found = AnimData_FindEntry(0x1C1E);
@@ -30,8 +30,8 @@ void ProximityEmitter_InitializeParticles(struct ProximityEmitter *input)
     do {
         u32 offset = i * sizeof(struct ProximityEmitterParticle);
         u32 particleOffset = offset + 0xC0;
-        register struct ProximityEmitterParticle *particle asm("r4");
-        register u16 *active asm("r5");
+        struct ProximityEmitterParticle *particle;
+        u16 *active;
         particle = (void *)((u8 *)emitter + particleOffset);
         sub_08217DE0(particle, resourceAt(resource), 0);
         sub_08217EC4(particle, scale, scale);
@@ -55,7 +55,7 @@ void ProximityEmitter_InitializeParticles(struct ProximityEmitter *input)
         u32 zero = 0;
         *address = zero;
         {
-            register u16 *frameAddress asm("r0") = (u16 *)(address + 1);
+            u16 *frameAddress = (u16 *)(address + 1);
             *frameAddress = zero;
         }
     }

@@ -17,7 +17,7 @@ void LevelAdvanceDisplay_UpdateParticle(struct LevelAdvanceParticle *input, void
         u32 y;
         struct LevelAdvancePlayer *player;
         {
-            register u32 velocity asm("r1") = (u16)particle->velocityY;
+            u32 velocity = (u16)particle->velocityY;
             u32 offset = (u16)particle->offsetY;
             y = velocity + offset;
         }

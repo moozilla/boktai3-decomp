@@ -11,7 +11,6 @@ static inline u32 Enabled(void)
             asm("" : "+r"(result));
         } else {
             result = 0;
-            asm("" : "+r"(result));
         }
         return result;
     }

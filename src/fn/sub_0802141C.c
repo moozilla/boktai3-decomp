@@ -5,7 +5,7 @@ u8 *SceneActors_FindAvailable(void)
 {
     u8 *found = 0;
     u8 **cursor;
-    register int i asm("r4") = 0;
+    int i = 0;
     cursor = gUnk_020000B8;
     do {
         u8 *p;

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_actor.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 static inline s32 truncateShift12(s32 value)
@@ -14,13 +13,12 @@ void ContactActor_UpdateAdvance(struct ContactActorPool *pool, struct ContactAct
     s32 index = indexInput;
     struct ContactPosition delta;
     struct ContactPosition *write;
-    register u32 rawSpeed asm("r0");
+    u32 rawSpeed;
     u32 direction;
     s32 speed;
     if (slot->enter)
         slot->enter = 0;
     rawSpeed = slot->speed;
-    asm("" : "+r"(rawSpeed));
     write = &delta;
     direction = slot->direction;
     speed = rawSpeed * 2;

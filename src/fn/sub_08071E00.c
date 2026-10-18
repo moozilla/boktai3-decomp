@@ -40,7 +40,7 @@ category10:
 selected:
     SceneActorRegistry_FindLiving(category);
     {
-        register u8 **bankPointer asm("r0") = &gUnk_030042E4;
+        u8 **bankPointer = &gUnk_030042E4;
         destinationOffset = destinationBank * 32;
         palettes = *bankPointer;
         sourceOffset = sourceBank * 32;
@@ -140,7 +140,7 @@ nextColor: {
         i += step;
     }
     {
-        register s32 test asm("r3") = i;
+        s32 test = i;
         if (test <= 15)
             goto nextColor;
     }

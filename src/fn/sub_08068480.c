@@ -8,7 +8,7 @@ static inline u8 IsUsed(u32 *used, u32 index, u32 one)
 }
 struct SceneParticleSlot *SceneParticle_AllocateSlot(struct SceneParticlePool *input)
 {
-    register struct SceneParticlePool *p asm("r2") = input;
+    struct SceneParticlePool *p = input;
     s32 i = 0;
     u32 *used = &p->used;
     u32 one = 1;

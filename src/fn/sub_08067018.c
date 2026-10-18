@@ -18,7 +18,7 @@ void SceneActorControl_TickJitter(void *unused, struct SceneActorControlSlot *sl
     } else {
         if (remaining > 10) {
             const u16 *table = gUnk_0203B400;
-            register u32 mask asm("r8");
+            u32 mask;
             s32 jitter;
             u32 index;
             register u32 lowMask asm("r1");

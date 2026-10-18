@@ -8,7 +8,7 @@ void BouncingObject_HandleTimerContact(struct BouncingContact *contact, void *un
                                        struct BouncingObject *input)
 {
     register struct BouncingObject *early asm("r3") = input;
-    register struct BouncingObject *object asm("ip") = early;
+    struct BouncingObject *object = early;
     {
         u16 *timer;
         u32 value;

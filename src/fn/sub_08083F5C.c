@@ -14,14 +14,13 @@ void SceneActorControl_ReflectTerrainProbe(struct SceneActorRegistryResetView *i
     struct ContactPosition *terrainPosition;
     u8 *data;
     position = &actor->position;
-    asm("" : "+r"(position));
     motion = &actor->secondaryMotion;
     {
         u32 first = (u16)position->x, second = (u16)motion->x;
         next.x = first + second;
     }
     {
-        register u32 first asm("r0") = (u16)position->y;
+        u32 first = (u16)position->y;
         u32 second;
         second = (u16)motion->y;
         sum->y = first + second;
@@ -70,8 +69,8 @@ void SceneActorControl_ReflectTerrainProbe(struct SceneActorRegistryResetView *i
         height -= (s32)adjustment;
     }
 compare_ground: {
-    register u32 offset asm("r2") = 0x2BE;
-    register u16 *groundField asm("r0");
+    u32 offset = 0x2BE;
+    u16 *groundField;
     u32 ground;
     groundField = (void *)((u8 *)actor + offset);
     ground = *groundField;

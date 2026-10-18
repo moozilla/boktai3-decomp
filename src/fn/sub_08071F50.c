@@ -127,7 +127,7 @@ selected:
         channels.actorFlags = (void *)((u32)actor + offset);
     }
     if (!alreadyAdvanced) {
-        register s8 *deltaBlue asm("r10");
+        s8 *deltaBlue;
         register u16 *colorCursor asm("r6");
         i = 0;
         {
@@ -135,7 +135,6 @@ selected:
             s8 *deltaRed;
             register s16 *green asm("r0");
             channels.red = red;
-            asm("" : "+m"(channels.red), "+r"(red));
             deltaRed = transition->deltaRed;
             channels.deltaRed = deltaRed;
             green = transition->green;

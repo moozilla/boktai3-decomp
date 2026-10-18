@@ -59,7 +59,7 @@ void SceneActorAnimation_TransitionVariant(ActorAnimation *p, int tick)
             p->scaleStep = 32;
             sequence = choose(p->mode, 45, 7);
             {
-                register int offset asm("r2") = 0x240;
+                int offset = 0x240;
                 SceneActors_StartDirectionalAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220,
                                                       sequence, 2, 1, 4);
             }
@@ -69,7 +69,7 @@ void SceneActorAnimation_TransitionVariant(ActorAnimation *p, int tick)
             p->scaleStep = -32;
             sequence = choose(p->mode, 47, 9);
             {
-                register int offset asm("r2") = 0x240;
+                int offset = 0x240;
                 SceneActors_StartDirectionalAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220,
                                                       sequence, 2, 1, 4);
             }
@@ -116,7 +116,7 @@ void SceneActorAnimation_TransitionVariant(ActorAnimation *p, int tick)
     eightSelection:
         sequence = chooseMasked(eightMode, variant, 38, 0);
         {
-            register int offset asm("r2") = 0x240;
+            int offset = 0x240;
             SceneActors_StartEightDirectionAnimation(p, (u8 *)p2 + offset, (u8 *)p2 + 0x220,
                                                      sequence, 2, variant, 4);
         }
