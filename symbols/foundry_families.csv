@@ -763,3 +763,4 @@ addr,function,name,family,note
 08168FC4,sub_08168FC4,SelectionPanel_RefreshVisibleEntries,"SelectionPanel","refreshes three wrapped entries and a selection marker"
 081691C0,sub_081691C0,SelectionPanel_RefreshSecondaryEntries,"SelectionPanel","refreshes three wrapped secondary entries and their marker"
 081697B8,sub_081697B8,SelectionPanel_RefreshAttachedPanel,"SelectionPanel","runs panel refresh helpers when an owner is attached"
+08169838,sub_08169838,SelectionPanel_ResetSecondarySelection,"SelectionPanel","zeros the secondary selection and refreshes dependent panel elements"
