@@ -1091,3 +1091,4 @@ addr,function,name,family,note
 081BF9C4,sub_081BF9C4,Storage_InitTextOptions,"Storage","captures four script options and configures text window"
 081BFFC8,sub_081BFFC8,DirectionMarker_GetAnimation,"DirectionMarker (tentative)","maps quadrant and variant to sprite animation"
 081C04B8,sub_081C04B8,PaletteScreen_LoadResources,"PaletteScreen (tentative)","loads background and two palette resources"
+081C0780,sub_081C0780,ScreenTransition_BeginDownwardMotion,"ScreenTransition (tentative)","starts child motion from y80 to y144"
