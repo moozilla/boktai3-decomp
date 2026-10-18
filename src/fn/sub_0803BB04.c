@@ -22,7 +22,7 @@ void sub_0811D4AC(void *, int, int, int, int, int, int);
 void sub_0803BB04(struct P *p, struct Item *item)
 {
     struct Player *player = gUnk_020004F0;
-    register int okay asm("r4") = 0;
+    int okay = 0;
     int x = 0;
     int z = 0;
     if (player) {

@@ -68,7 +68,7 @@ static inline void decay(s16 *p)
 void SceneActorGraphics_SelectResource(void *);
 void sub_08026EB4(ActorAnimation *base, int time)
 {
-    register int tick asm("r8") = time;
+    int tick = time;
     ActorAnimation *p = base;
     u8 *position = (u8 *)p + 0x48;
     u32 zero;

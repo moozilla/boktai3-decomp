@@ -46,8 +46,8 @@ static inline u8 IsScenePaused(void)
 static inline u32 ReadSuppressionFlag(struct SceneActorRegistryActor *actor)
 {
     u32 mask = 0x800;
-    register u32 offset asm("r2") = 0x2d0;
-    register u32 *field asm("r0");
+    u32 offset = 0x2d0;
+    u32 *field;
     u32 value;
     field = (void *)((u8 *)actor + offset);
     value = *field;
@@ -148,7 +148,7 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
                         *flags114 = value;
                     }
                     {
-                        register u32 fieldOffset asm("r1") = 0x104;
+                        u32 fieldOffset = 0x104;
                         field = (u8 *)actor + fieldOffset;
                         *(u32 *)field = zero;
                     }

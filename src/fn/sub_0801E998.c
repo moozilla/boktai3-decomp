@@ -6,10 +6,10 @@ int Script_GetValue(void);
 void SceneObject_UpdateLowered(void);
 int SceneObjects_ScriptLower(void)
 {
-    register u8 *p asm("r5") = sub_0821A2C4(0x85e6);
+    u8 *p = sub_0821A2C4(0x85e6);
     int found;
     int i;
-    register int id asm("r8");
+    int id;
     if (!p)
         return -1;
     found = 0;
@@ -21,7 +21,6 @@ int SceneObjects_ScriptLower(void)
         u8 **base = (u8 **)(p + 0x42c);
         int zero;
         int one;
-        asm("" : "+r"(found));
         zero = 0;
         one = 1;
         do {

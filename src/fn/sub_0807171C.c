@@ -14,7 +14,7 @@ void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *argument)
     route->fieldC = route->parameterC;
     Route_Start(route, route->parameterA, route->parameterB, route->parameterC);
     {
-        register u32 offset asm("r2") = 0x5D0;
+        u32 offset = 0x5D0;
         void *object;
         object = *(void **)((u8 *)actor + offset);
         position = &actor->position;

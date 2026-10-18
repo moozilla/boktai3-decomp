@@ -10,7 +10,7 @@ void SceneInventory_BuildConsumableCatalog(struct SceneInventoryScriptCatalog *i
     const s8 *table;
     register u8 *pageCount asm("r1");
     s8 *base;
-    register u32 pageOffset asm("r2");
+    u32 pageOffset;
     const s8 *tableSource;
     p->page = 0;
     pageOffset = 0x1AB1;

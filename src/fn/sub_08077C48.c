@@ -11,7 +11,7 @@ s32 sub_080148CC(s32, s32, const struct ContactPosition *, u32, s32, s32, s32, s
 void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *actor)
 {
     struct SceneActorEmissionPhase *phase = (void *)actor;
-    register u32 angle asm("r10");
+    u32 angle;
     struct ContactPosition offset;
     u32 category;
     if (!phase->timer)

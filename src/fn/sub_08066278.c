@@ -14,7 +14,7 @@ ActorAttachment_CreateSinglePartSlot(u32 incomingFrame, struct ContactPosition *
     struct ActorAttachmentSlotView *slot;
     struct ActorAttachmentPartSprite *part;
     register struct ActorAttachmentPartSprite *workingPart asm("r10");
-    register struct ActorAttachmentPartSprite *renderPart asm("r6");
+    struct ActorAttachmentPartSprite *renderPart;
     u8 *frameLow;
     u8 *actionLow;
     register u8 *kindLow asm("r1");

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 struct Motion {
@@ -44,10 +43,9 @@ static inline void setAngle(struct SceneNpc *npc, s32 angle)
     npc->motion.angle = angle;
     a = angle;
     {
-        register s32 t asm("r2");
-        register u32 m asm("r1");
+        s32 t;
+        u32 m;
         t = a + 0x70;
-        asm("" : "+r"(t));
         t >>= 5;
         m = 7;
         m &= t;

@@ -18,7 +18,7 @@ s32 DamageNumberDisplay_UpdateLeaving(struct DamageNumberDisplay *display,
     group = slot;
     groupIndex = slotIndex;
     {
-        register struct ContactPosition *projected asm("r5") = &screen;
+        struct ContactPosition *projected = &screen;
         struct ContactPosition *world = &group->position;
         struct DamageNumberGroup *lowGroup;
         s32 x;

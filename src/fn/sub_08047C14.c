@@ -14,7 +14,7 @@ static inline s32 initializeAnimation(struct ProjectedDisplayEntry *animation,
 s32 TemporaryAnimationPool_Initialize(struct TemporaryAnimationPool *pool)
 {
     const struct ProjectedDisplayResource *resource;
-    register struct TemporaryAnimationSlot *slot asm("r5");
+    struct TemporaryAnimationSlot *slot;
     struct ProjectedDisplayResource *relocated;
     struct {
         u32 zero;

@@ -71,7 +71,6 @@ static inline void vector(s16 *dst, int direction, int length)
         angle = converted >> 24;
     }
     speed = length;
-    asm("" ::"r"(velocity), "r"(angle));
     {
         int x = trunc12(gUnk_086149C4[(angle + 64) & 255] * speed);
         int zero = 0;

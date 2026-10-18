@@ -708,7 +708,7 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
 {
     struct SceneObject *actor = input;
     register s32 index asm("r4") = idx;
-    register s32 direction asm("r8") = dir;
+    s32 direction = dir;
     struct SceneCell *reference = &actor->cellRef.cell;
     s32 savedIndex;
     s32 delta = 0, dx = 0, dz = 0, speed, step;

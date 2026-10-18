@@ -6,9 +6,9 @@ int Script_GetValue(void);
 void SceneObject_UpdateRaised(void);
 int SceneObjects_ScriptRaise(void)
 {
-    register u8 *p asm("r5") = sub_0821A2C4(0x85e6);
+    u8 *p = sub_0821A2C4(0x85e6);
     register int found asm("r6");
-    register int i asm("r4");
+    int i;
     int id;
     if (!p)
         return -1;
