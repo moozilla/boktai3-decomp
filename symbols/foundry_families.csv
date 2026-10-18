@@ -581,3 +581,4 @@ addr,function,name,family,note
 08109C80,sub_08109C80,ScriptPanel_OpenTextWindow,"ScriptPanel","waits for HUD setup and opens script text window"
 08109E98,sub_08109E98,ScriptPanel_WaitForSelectionData,"ScriptPanel","waits for selected data or restarts polling after timeout"
 0810A3E0,sub_0810A3E0,SessionMenu_WaitForSelection,"Session menu state callbacks","advances timed menu transition according to selected player"
+0810A448,sub_0810A448,LinkMenu_UpdateSelection,"AreaEffectLinkState / link menu","routes selection modes and queued menu events"
