@@ -743,3 +743,4 @@ addr,function,name,family,note
 08163B70,sub_08163B70,SpriteParticles_UpdateEntries,"SpriteParticles (tentative)","expire and update sixteen timed sprite entries"
 08164B84,sub_08164B84,StatDisplay_DrawTwoDigitCounter,"StatDisplay","draws labeled counter capped at ninety-nine"
 08165518,sub_08165518,SceneHud_DrawActiveStatValue,"Scene HUD","draws a player stat in the active three-digit region"
+08165870,sub_08165870,ResultPanel_DrawClockLabel,"ResultPanel (tentative)","write three clock-label glyphs at a tile-map position"
