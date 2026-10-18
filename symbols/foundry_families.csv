@@ -1331,3 +1331,4 @@ addr,function,name,family,note
 0822F0A4,sub_0822F0A4,Save_WriteBlockWithRetries,"Save transfer","validates a save block and retries its transfer up to eight times"
 0822F10C,sub_0822F10C,Save_ReadBlockWithRetries,"Save transfer","validates a save block and retries its transfer up to eight times"
 08231448,sub_08231448,ActiveList_PrependNode,"Active list; precise subsystem unknown","prepends an inactive node to a doubly linked active list"
+08231480,sub_08231480,EffectGroup_Unlink,"EffectGroup","unlink an active effect group from its pool"
