@@ -661,3 +661,4 @@ addr,function,name,family,note
 0812681C,sub_0812681C,SceneStatusIndicator_Create,"SceneStatusIndicator","creates a blinking status indicator thirty units above a position"
 081269E4,sub_081269E4,BouncingParticle_Update,"BouncingParticle","advances a delayed particle animation and halves horizontal velocities"
 08127F5C,sub_08127F5C,MovingSprite_Create,"MovingSprite","allocates a sprite with directional animation and trigonometric velocity"
+081284E0,sub_081284E0,SpriteGroup_Release,"SpriteGroup","releases four sprites and calls the group's completion script"
