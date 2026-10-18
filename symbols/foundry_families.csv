@@ -1042,3 +1042,4 @@ addr,function,name,family,note
 081B6844,sub_081B6844,ActorReaction_BeginOnContact,"ActorReaction (tentative)","copies direction and starts reaction state when flag one is set"
 081B6884,sub_081B6884,ActorReaction_Idle,"ActorReaction (tentative)","empty callback adjacent to actor reaction routines"
 081B69F4,sub_081B69F4,ActorEffect_RemoveSprites,"ActorEffect (tentative)","removes six sprites and clears the owner's active bit"
+081B6BC4,sub_081B6BC4,HomingEffect_TurnTowardTarget,"HomingEffect (tentative)","turns a fixed-point heading toward its target with a bounded angular step"
