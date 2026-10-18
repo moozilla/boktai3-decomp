@@ -915,3 +915,4 @@ addr,function,name,family,note
 08183C3C,sub_08183C3C,DirectionalActor_UpdateSequence,"directional actor state callbacks","starts a direction-selected sequence and waits for completion"
 08184930,sub_08184930,ActorController_FinishDelayedTransition,"ActorController","selects directional animation and completes transition with delay 0x5B"
 081849DC,sub_081849DC,ActorController_UpdateRetreatMotion,"ActorController","plays directional animation and applies backward motion"
+08184B08,sub_08184B08,ActorController_UpdateTimedMotion,"ActorController","plays directional animation and moves until timer exceeds nine"
