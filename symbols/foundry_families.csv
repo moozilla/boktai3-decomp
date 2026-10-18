@@ -1204,3 +1204,4 @@ addr,function,name,family,note
 081F57DC,sub_081F57DC,Ratatosk_UpdateTimedPoseVariant,"Ratatosk","plays the alternate pose mode and completes after sixty ticks"
 081F5870,sub_081F5870,SceneActor_BeginTimedAnimation,"SceneActor animation states","starts animation 32 and finishes after a delay"
 081F5A64,sub_081F5A64,SceneActor_UpdateAnimation33Timer,"SceneActor animation states","starts animation 33 and completes after sixteen ticks"
+081F5AE4,sub_081F5AE4,SceneActor_UpdateAnimation7Timer,"SceneActor animation states","starts directional animation 7, plays sound and completes after fifty-six ticks"
