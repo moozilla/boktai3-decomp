@@ -951,3 +951,4 @@ addr,function,name,family,note
 0819804C,sub_0819804C,ShadowActor_UpdateTransition,"ShadowActor (tentative animated actor with scaled shadow)","plays a transition animation and advances actor state"
 08198158,sub_08198158,SceneActor_SetSavedPositionOffset,"OffsetSceneActor","sets target coordinates to the saved position plus a diagonal offset"
 081981C8,sub_081981C8,ShadowActor_UpdateThreeStageAction,"ShadowActor (tentative animated actor with scaled shadow)","loads three directional vectors and repeats the action before changing state"
+08198D58,sub_08198D58,SceneEffect_AllocateActor,"Scene effect actor pool (tentative)","claims the pool's actor slot and initializes its mode"
