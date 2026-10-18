@@ -326,3 +326,4 @@ addr,function,name,family,note
 0813A91C,sub_0813A91C,SpritePair_RemoveSlot,"CompactSpritePair task","removes a compact pair slot sprite and clears its state"
 0813A9D8,sub_0813A9D8,ScreenMote_ApproachTarget,"ScreenMote","interpolate a sprite toward an offset target over twelve frames"
 0813AC78,sub_0813AC78,ScreenMote_UpdateManager,"ScreenMote","dispatch active particle phases subject to pause flags"
+0813AF18,sub_0813AF18,Player_SetDirectionalVelocity,"Player","sets direction-based velocity with axis scaling"
