@@ -254,3 +254,4 @@ addr,function,name,family,note
 0811FDB4,sub_0811FDB4,ActorCollision_InitBounds,"ActorCollision","initializes body and contact collision bounds and callbacks"
 08121458,sub_08121458,SceneEffect_UpdateBlink,"SceneEffect","toggles visibility with an age-dependent period and expires an effect slot"
 081218A0,sub_081218A0,Direction_IsMiddleQuadrants,"Direction","tests rounded direction quadrant for one or two"
+08121A78,sub_08121A78,ActionGroup_RunSelectedCallbacks,"ActionGroup","dispatches kind callbacks for four mask-selected entries"
