@@ -575,3 +575,4 @@ addr,function,name,family,note
 08109738,sub_08109738,TimedMessage_ShowFollowup,"TimedMessage","shows follow-up text and branches at frame 120"
 081097A8,sub_081097A8,TimedMessage_SelectNextState,"TimedMessage","selects callback state from byte status"
 081098B0,sub_081098B0,MessagePanel_BeginDismiss,"MessagePanel","starts a panel transition and waits sixty ticks"
+08109948,sub_08109948,MessagePanel_ResetDisplay,"MessagePanel","clears the background and installs panel callbacks"
