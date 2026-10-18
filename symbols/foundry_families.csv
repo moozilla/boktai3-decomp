@@ -55,3 +55,4 @@ addr,function,name,family,note
 080B0728,sub_080B0728,SceneActorPhase_UpdateConditionalMotion,"Scene actor phase control","runs optional control updates then advances the phase"
 080B0E04,sub_080B0E04,SceneInventory_FindSlotByValue,"scene_inventory_actions (sub_0822CDA8 is declared in include/scene_inventory_actions.h)","scans slot indices 0..15 via sub_0822CDA8(i), writing each result to *p1; on the first non-negative result equal to p3, records the index in *p0, calls sub_0822CCC8(*p0) into *p2 and returns 1; returns 0 if no slot matches"
 080B0E5C,sub_080B0E5C,SceneActor_TryLaunchItem13,"SceneActor item-launch triggers","finds an item of kind 13 and launches it toward an actor"
+080B0F4C,sub_080B0F4C,SceneActor_TryLaunchSelectedItem,"SceneActor item-launch triggers","selects an item and launches it toward an actor"
