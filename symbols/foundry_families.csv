@@ -388,3 +388,4 @@ addr,function,name,family,note
 08160060,sub_08160060,PlayerTransition_InitCollider,"PlayerTransition","initializes transition collider from owner attributes"
 08160380,sub_08160380,FrameDisplay_GetCompactFrameIndex,"FrameDisplay","maps animation frame IDs to a compact display index"
 0816044C,sub_0816044C,FrameDisplay_UpdateSprite,"FrameDisplay","synchronizes sprite frame visibility flip and position"
+08160550,sub_08160550,VariantSprite_SelectAnimation,"VariantSprite","loads one of five animations and applies it to a sprite"
