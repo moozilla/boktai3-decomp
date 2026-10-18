@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Engine {
     u8 pad0[0x18];
@@ -59,11 +58,11 @@ void Wireless_BeginChildTransfer(struct Engine *p)
     Bg_ClearTilemap(0);
     index = 0;
     {
-        register int offset asm("r0") = 0x16A;
+        int offset = 0x16A;
         u16 *first;
         struct RfuLinkStatus **initial;
         u16 *mine;
-        first = (u16 *)((u8 *)p + offset);
+        first = (u16 *)(((u8 *)p) + (*(&offset)));
         initial = &gUnk_03006A80;
         mine = &(*initial)->my.id;
         if (*first != *mine) {
@@ -74,8 +73,9 @@ void Wireless_BeginChildTransfer(struct Engine *p)
             do {
                 next++;
                 index++;
-                if (index > 3)
+                if (index > 3) {
                     break;
+                }
             } while (*next != (*(struct RfuLinkStatus *volatile *)cursor)->my.id);
         }
     }
@@ -91,6 +91,7 @@ void Wireless_BeginChildTransfer(struct Engine *p)
     p->phase = 2;
     setOperation(p, 24, zero);
     listener = *(void **)((u8 *)p + 0x4C);
-    if (listener)
+    if (listener) {
         Script_Call(listener, 0);
+    }
 }
