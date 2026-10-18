@@ -1053,3 +1053,4 @@ addr,function,name,family,note
 081B8518,sub_081B8518,SceneScriptTask_Update,"SceneScriptTask","dispatches one of two task state callbacks"
 081B9334,sub_081B9334,MotionTrack_Initialize,"MotionTrack","initializes a data track with two optional vectors and a mode"
 081B9E58,sub_081B9E58,SelectionPanel_ProcessConfirm,"SelectionPanel","processes confirm input according to selection-list flags"
+081BA2A4,sub_081BA2A4,SelectionPanel_Destroy,"SelectionPanel","removes panel animations and clears list and global panel pointers"
