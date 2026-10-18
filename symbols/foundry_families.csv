@@ -497,3 +497,4 @@ addr,function,name,family,note
 08175874,sub_08175874,SceneCatalog_GetMappedState,"SceneCatalog","maps saved state one to two and two to one, otherwise zero"
 0817589C,sub_0817589C,SceneCatalog_MapSelectionMask,"SceneCatalog","maps selection zero to four, one to two, otherwise one"
 081758B4,sub_081758B4,SceneCatalog_SaveOptions,"SceneCatalog","saves three menu options and conditionally updates the player"
+08175934,sub_08175934,SelectionPanel_CaptureSettings,"SelectionPanel (tentative)","captures game settings and current selection"
