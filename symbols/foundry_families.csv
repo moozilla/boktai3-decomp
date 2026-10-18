@@ -1216,3 +1216,4 @@ addr,function,name,family,note
 081F7CAC,sub_081F7CAC,AnimationActor_UpdateProjectileSequence,"AnimationActor","advances animation sequence until homing projectiles finish"
 081F88A0,sub_081F88A0,AnimationActor_UpdateRepeatedAttack,"AnimationActor","repeats attack animation three times then signals completion"
 081F8C6C,sub_081F8C6C,SceneSong_EnterAndWait,"SceneSongState","plays song on entry and marks completion when done"
+081F9268,sub_081F9268,SceneEffect_EnterAndRestart,"SceneEffectState","configures effect on entry and restarts when done"
