@@ -306,3 +306,4 @@ addr,function,name,family,note
 08136C80,sub_08136C80,SceneActorPlacement_HideActor,"SceneActorPlacement","sets hidden drawable flags and disables the shadow"
 08136DFC,sub_08136DFC,SceneActorPlacement_ShowActor,"SceneActorPlacement","clears hidden flags and enables the shadow"
 08136EB0,sub_08136EB0,SceneActorControl_RestoreInactiveDefaults,"SceneActorControl","restores defaults when actor flag 2 is set without flag 1"
+0813760C,sub_0813760C,SceneActorTarget_CanReplaceByDistance,"SceneActorTarget","accepts candidate identity when unlocked and no farther than current target"
