@@ -639,3 +639,4 @@ addr,function,name,family,note
 0811EFF0,sub_0811EFF0,ActorEmitter_UpdateAnimation,"ActorEmitter","steps an emission animation and updates its collision position"
 0811F0B8,sub_0811F0B8,ActorEmitter_TryEmitPair,"ActorEmitter","emits a pair with a kind-dependent height offset"
 0811F1A8,sub_0811F1A8,ActorEmitter_TryEmitAnimatedPair,"ActorEmitter","emits a pair and starts its keyframe animation"
+0811F29C,sub_0811F29C,ActorEffect_EmitOffsetPair,"ActorEffect","emits an effect using paired extents and negative offsets"
