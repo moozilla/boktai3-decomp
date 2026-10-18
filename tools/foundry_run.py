@@ -52,8 +52,8 @@ def record(path, log, t0):
     try:
         d = json.loads(open(log).read().strip().split("\n")[-1])
         u = d.get("usage", {})
-        tokens = u.get("input_tokens", 0) + u.get("output_tokens", 0) + u.get("cache_read_input_tokens", 0) + \
-            u.get("cache_creation_input_tokens", 0)
+        # non-cached tokens: cache reads are ~99% of the raw total and cost a tenth as much
+        tokens = u.get("input_tokens", 0) + u.get("output_tokens", 0) + u.get("cache_creation_input_tokens", 0)
         cost = d.get("total_cost_usd", 0)
         err = d.get("is_error")
     except Exception as e:

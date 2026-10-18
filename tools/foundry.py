@@ -514,7 +514,8 @@ For EACH function FUNC:
      provisional name is fine. Name callees you understood the same way
      (`#define Name sub_XXXXXXXX`), and globals with `#define gName gUnk_XXXXXXXX`. Keep the
      sub_ name as the definition's name (the alias renames it later). Don't invent a name
-     you can't support.
+     you can't support, and never use placeholder words (Something, Stuff, Thing, Do, Handle
+     alone): if you can't say what it does, write NAME none.
    * TYPES go in the shared header. If the object it works on has a struct in include/ (the
      context pack lists the headers this subsystem's matched code uses), use it, and add the
      fields you discovered there: only by replacing padding/unknown bytes, never moving an
@@ -643,13 +644,15 @@ def scale_report():
     up = os.path.join(SCALE, "usage.tsv")
     us = [ln.split("\t") for ln in open(up)] if os.path.exists(up) else []
     tokens = sum(int(u[1]) for u in us)
+    cost = sum(float(u[4]) for u in us if len(u) > 4 and u[4].strip())
     times = [float(u[3]) - float(u[2]) for u in us] + [float(u[3]) for u in us]
     hours = (max(times) - min(times)) / 3600 if us else 0
     m = sum(x["m"] for x in by.values())
     for b, x in by.items():
         print(f"{b:8s} finished {x['n']:4d}  matched {x['m']:4d} ({100 * x['m'] / max(x['n'], 1):.0f}%)  "
               f"named {x['named']}/{x['m']}  instructions matched {x['minsns']}/{x['insns']}")
-    print(f"batches {len(us)}  tokens {tokens}  matches {m}  tokens/match {tokens // max(m, 1)}  "
+    print(f"batches {len(us)}  tokens {tokens} (incl. cache reads)  headless cost ${cost:.2f}  matches {m}  "
+          f"tokens/match {tokens // max(m, 1)}  "
           f"wall {hours:.1f} h  matches/hour {m / hours if hours else 0:.1f}")
 
 
