@@ -1082,3 +1082,4 @@ addr,function,name,family,note
 081BE0F0,sub_081BE0F0,SceneInventory_ResetCategoryPalette,"SceneInventoryCategoryMenu","restores both category widgets to the default palette"
 081BED9C,sub_081BED9C,SceneInventory_SortSelectedCategory,"SceneInventoryCategoryMenu","dispatches selected inventory category to its sorter"
 081BEE48,sub_081BEE48,SceneInventory_BeginCategoryBrowse,"SceneInventoryCategoryMenu","enables widgets and installs the category browse state"
+081BEEC0,sub_081BEEC0,SceneInventory_UpdateBrowseIntro,"SceneInventoryCategoryMenu","animates introductory vertical bounce before category browse"
