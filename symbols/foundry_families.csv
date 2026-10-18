@@ -788,3 +788,4 @@ addr,function,name,family,note
 0816B1AC,sub_0816B1AC,SceneSequence_SlideAnimationLeft,"SceneSequence","slides the animation left and changes phase after 150 ticks"
 0816B200,sub_0816B200,SceneSequence_UpdateRampDown64,"SceneSequence","ramps a parameter down from 64 then invokes the next setup"
 0816B250,sub_0816B250,SelectionMenu_ApplyConfirmedReward,"SelectionMenu","applies confirmed count reward and advances menu"
+0816B2F0,sub_0816B2F0,SceneSequence_CallCompletionScript,"SceneSequence","calls an optional completion script after 150 animation ticks"
