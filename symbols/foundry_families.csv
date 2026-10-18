@@ -601,3 +601,4 @@ addr,function,name,family,note
 0810C798,sub_0810C798,SlotMenu_UpdateExitTransition,"SlotMenu","starts the exit transition and destroys the menu at frame ten"
 0810CA34,sub_0810CA34,LinkPanel_InitFromScript,"LinkPanel","reads script options and initializes panel resources and callback"
 0810CC28,sub_0810CC28,LinkPanel_DrawTime,"LinkPanel","draws a capped time value as whole and fractional digits"
+0810CD4C,sub_0810CD4C,LinkPanel_CreateTextWindows,"LinkPanel","creates three text windows and refreshes the selected title"
