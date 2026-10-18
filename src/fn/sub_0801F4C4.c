@@ -50,11 +50,11 @@ void SceneObject_UpdateLowering(u8 *s)
     }
     do {
         {
-        u16 *offset = (u16 *)(s + 0x80);
-        int base;
-        base = *(u16 *)(s + 0x7a);
-        base += *offset;
-        *(u16 *)(s + 0x72) = base;
+            u16 *offset = (u16 *)(s + 0x80);
+            int base;
+            base = *(u16 *)(s + 0x7a);
+            base += *offset;
+            *(u16 *)(s + 0x72) = base;
         }
     } while (0);
 }

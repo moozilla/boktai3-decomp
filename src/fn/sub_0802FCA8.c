@@ -91,19 +91,19 @@ int Actor_SelectPathNodeAction(struct Actor *p, struct Node *node)
     u32 value = node->flags;
     int kind;
     do {
-    kind = value >> 4;
-    p->nodeId = Path_GetPointNodeId(node, 0);
-    switch (kind) {
-        case 1: {
-            int angle = (u16)Path_GetPointFacing(node, 0);
-            int facing = (angle + 112) >> 5;
-            int mask;
-            mask = 7;
-            p->nodeFacing = facing & mask;
+        kind = value >> 4;
+        p->nodeId = Path_GetPointNodeId(node, 0);
+        switch (kind) {
+            case 1: {
+                int angle = (u16)Path_GetPointFacing(node, 0);
+                int facing = (angle + 112) >> 5;
+                int mask;
+                mask = 7;
+                p->nodeFacing = facing & mask;
                 if ((((p->angle + 112) >> 5) & mask) != p->nodeFacing) {
-                return 8;
+                    return 8;
                 }
-            break;
+                break;
             }
             case 2:
                 return 9;
