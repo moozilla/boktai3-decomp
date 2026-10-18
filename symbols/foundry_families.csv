@@ -897,3 +897,4 @@ addr,function,name,family,note
 08182064,sub_08182064,ActorPalette_BeginTransition,"ActorPalette","installs palette update and restore callbacks and clears timer"
 081822C0,sub_081822C0,Armor_StartFullPaletteRestoreDelay,"Armor palette controller (Armor 2, tentative)","copies the scene palette into four banks and schedules delayed restoration"
 08182394,sub_08182394,Armor_InitPaletteBanks,"Armor palette controller","initializes callbacks and saves four armor palette banks"
+0818243C,sub_0818243C,ActorPalette_ReturnImmediately,"ActorPalette","returns immediately without side effects"
