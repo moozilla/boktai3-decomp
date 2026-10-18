@@ -684,3 +684,4 @@ addr,function,name,family,note
 0813AB04,sub_0813AB04,ScreenMote_SpawnBatch,"ScreenMote","allocate and initialize sprites with randomized starting positions"
 0813B67C,sub_0813B67C,Player_InitializeStatsFromScript,"Player","restores saved current stats with script-controlled refill options"
 0813D754,sub_0813D754,SceneActor_SelectEffectDisplayMode,"SceneActor effect","selects an effect display mode with timed alternation"
+0813DDAC,sub_0813DDAC,SceneActor_UpdateVisualEffects,"SceneActor effect","updates visual effects, delayed attachment and effect position"
