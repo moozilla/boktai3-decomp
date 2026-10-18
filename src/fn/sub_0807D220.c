@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_actor.h"
 #include "player.h"
 #include "scene_actor_contact_list.h"
@@ -30,7 +29,11 @@ void SceneActorAttachment_RetargetNearestPlayer(struct RetargetActorView *input,
             struct Player *player = *slot;
             if (player) {
                 const struct SceneVec *position = &player->position;
-                s32 x, z, xSquare, zSquare, distance;
+                s32 x;
+                s32 z;
+                s32 xSquare;
+                s32 zSquare;
+                s32 distance;
                 delta->x = (u16)player->position.x - (u16)origin->x;
                 delta->y = (u16)position->y - (u16)origin->y;
                 delta->z = (u16)position->z - (u16)origin->z;
@@ -60,7 +63,7 @@ void SceneActorAttachment_RetargetNearestPlayer(struct RetargetActorView *input,
             SceneActorContacts_ReleaseNode(*owned);
             {
                 u32 updated = *flags & ~mask;
-                register u32 zero asm("r1") = 0;
+                u32 zero = 0;
                 *flags = updated;
                 *owned = (void *)zero;
             }
