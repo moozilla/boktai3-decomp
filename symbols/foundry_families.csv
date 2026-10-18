@@ -606,3 +606,4 @@ addr,function,name,family,note
 0810D290,sub_0810D290,PanelSequence_UpdateDelay,"PanelSequence","updates two panels and advances after a 240 tick delay"
 0810D9B0,sub_0810D9B0,RecordPanel_ShowName,"RecordPanel","shows a name from the selected record or game state"
 0810E12C,sub_0810E12C,SelectionPanel_UpdateDescription,"SelectionPanel","refreshes selection description with fallback string"
+0810E284,sub_0810E284,SelectionPanel_RunSelectionScript,"SelectionPanel","clears display and calls script with selected index"
