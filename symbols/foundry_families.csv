@@ -859,3 +859,4 @@ addr,function,name,family,note
 0817E5B0,sub_0817E5B0,SceneEventActor_UpdateRemovalSequence,"SceneEventActor","runs animation and event scripts while requesting steering actor removal"
 0817EA70,sub_0817EA70,SceneEventActor_UpdateTimedAnimation,"SceneEventActor","sets facing and animation, triggers a response, and finishes after thirty ticks"
 0817EB34,sub_0817EB34,SceneEventActor_UpdateTimedResponse,"SceneEventActor","starts response mode two and animation, then finishes after thirty ticks"
+0817EF6C,sub_0817EF6C,SceneEventActor_UpdateDelayedFinish,"SceneEventActor","advances two animations and a 120-tick delay before marking the actor finished"
