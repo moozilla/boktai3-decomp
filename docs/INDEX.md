@@ -18,6 +18,7 @@ and [AGENTS.md](../AGENTS.md) (rules) · [HANDOFF](HANDOFF.md) (current state) �
 
 **Matching craft.** [WORKER](WORKER.md) (agbcc tricks) · [REGALLOC](REGALLOC.md) ·
 [PERMUTER](PERMUTER.md) (permuter fork, regsolve, litsweep, chunks) ·
+[MODEL_BENCHMARK](MODEL_BENCHMARK.md) (explain.py/idioms.py vs check.py with Haiku/Sonnet) ·
 [COMPILER_REFERENCES](COMPILER_REFERENCES.md) · [SCALAR_APPROACH](SCALAR_APPROACH.md)
 (angle/scalar helpers) · [ASM_OUTPUT_QC](ASM_OUTPUT_QC.md) (ABI and credit audits) ·
 [CANDIDATES](CANDIDATES.md) · [PERMUTER_HANDOFF](PERMUTER_HANDOFF_2026-10-15.md) ·
@@ -115,7 +116,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/LIBM.md](../docs/LIBM.md) | Math-library source matches | *#library #text* | 5 |
 | [docs/MENU_CONTEXT.md](../docs/MENU_CONTEXT.md) | Pause-menu config, sleep, and save context | *#menu* | 3 |
 | [docs/MGS_GCL_MATCHING.md](../docs/MGS_GCL_MATCHING.md) | Boktai 3 / MGS GCL matching evidence | *#scripts #matching* | 66 |
-| [docs/MODEL_BENCHMARK.md](../docs/MODEL_BENCHMARK.md) | Matching model pilot | *#matching* | 18 |
+| [docs/MODEL_BENCHMARK.md](../docs/MODEL_BENCHMARK.md) | Small-model matching benchmark: explain.py vs check.py | #matching #tooling | 7 |
 | [docs/MOTION_0818.md](../docs/MOTION_0818.md) | Motion callback family at 0818D754 | *#tooling* | 7 |
 | [docs/PERMUTER.md](../docs/PERMUTER.md) | Solving register allocation in the compiler, then in C | #matching #tooling | 15 |
 | [docs/PERMUTER_HANDOFF_2026-10-15.md](../docs/PERMUTER_HANDOFF_2026-10-15.md) | October 15 matching residue and frozen searches | *#matching* | 5 |
@@ -190,7 +191,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/STACKED_ACTOR.md](../docs/STACKED_ACTOR.md) | Stacked display actor (tentative identity) | *#actors #particles #assets* | 5 |
 | [docs/TERRAIN_EDGE_MARKER.md](../docs/TERRAIN_EDGE_MARKER.md) | Terrain edge marker manager (tentative identity) | *#scripts* | 4 |
 | [docs/UNIT_WORKER.md](../docs/UNIT_WORKER.md) | Subsystem unit worker | *#text* | 4 |
-| [docs/WORKER.md](../docs/WORKER.md) | Worker brief: family-oriented matching | *#matching #process* | 16 |
+| [docs/WORKER.md](../docs/WORKER.md) | Worker brief: family-oriented matching | *#matching #process* | 19 |
 | [docs/WORKER_ROUND.md](../docs/WORKER_ROUND.md) | Standard round brief (only when workers are authorized) |  | 3 |
 | [docs/tasks/m4a.md](../docs/tasks/m4a.md) | Task: lift the MP2K (m4a) sound library from pokeemerald | *#sound #library* | 3 |
 | [docs/tasks/relatives.md](../docs/tasks/relatives.md) | Unmatched functions with matched relatives | *#tooling* | 35 |

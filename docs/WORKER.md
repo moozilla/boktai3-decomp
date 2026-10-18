@@ -54,10 +54,49 @@ everything from the worktree root.
    * Keep the `sub_XXXXXXXX` name. If you're confident what a function does,
      add a line to `symbols/proposed/<your-worker-name>.csv`:
      `addr,name,confidence,evidence` (e.g. `08033568,Foo_SetFlag,medium,"sets flag 0x17D on gUnk_020000E0 object"`).
-5. Inner loop: `build/venv/bin/python tools/check.py sub_XXXXXXXX` compiles just your file,
-   links it at its real address and prints original vs. yours as compact aligned mismatch hunks,
-   with `!` on differing lines (`--full` expands the listing) (~0.5 s; exit 0 = MATCH). Literal pools show up
-   as junk instructions; that's fine. When it says MATCH, commit the function on the working branch. The integrator
+5. Inner loop (default): `build/venv/bin/python tools/explain.py wip/sub_XXXXXXXX.c`
+   compiles your function (agbcc fork server, with `-g`), aligns it with the ROM
+   and prints each mismatching region under the C line(s) that produced it
+   (~1 s, a few hundred bytes to 2 KB; exit 0 = MATCH):
+   ```
+   L15: *(u16 *)(p + 0xc6) = *a;
+   L16: value = p + 0x360;
+     selection: different instructions for this code
+     ROM: adds r1, #0xc6; [strh r0, [r1]; adds r0, r4, #0; adds r0, #0xd4; ... (+9)]; adds r0, r4, #0
+     you: adds r1, #0xc6; [ldrh r0, [r3]; strh r0, [r1]; movs r0, #0xd8; ... (+9)]; adds r0, r4, #0
+     idioms for the ROM shape:
+       ~0.97 p->fD4 = (u32)p + 0x360; | p->f178->f6 = p->fAC2; | ...   [src/fn/sub_0813D34C.c:33]
+   ```
+   (sub_08239CDC: that idiom's struct layout matched the function in two checks.)
+   * Read it top to bottom and fix **structural** regions (selection, control,
+     order, extra, missing) first; `frame` (saved registers, stack size) and
+     register-only regions usually move with them. Each class has a one-line
+     hint (ldrsh vs ldrh+lsl+asr means a signed vs unsigned field; branch sense
+     means negate the condition and swap the bodies; ...).
+   * **Idioms** are matched C from `src/` whose code has the ROM's shape at that
+     spot ('=N' same shape, seen N times; '~0.8' nearest). Open the file:line to
+     see the declarations (types decide ldrsh/ldrh, struct vs pointer decides
+     addressing). `tools/idioms.py --shape "lsls R,R,#0x10; asrs R,R,#0x10"`
+     looks up any instruction sequence, and `tools/idioms.py ADDR` shows the
+     nearest matched C for every basic block of a function you have not drafted
+     yet. The corpus is `build/idioms/corpus.pkl`: build it once with
+     `python3 tools/idioms.py --build` (about a minute) and rebuild after large
+     batches of matches.
+   * When only registers remain, go to tools/regdiag.py / tools/rasolve.py
+     (below). `tools/check.py sub_XXXXXXXX` remains the byte-exact acceptance
+     check (raw aligned listing, `--full`); run it once before committing.
+   * When the only structural region left is one register copy (`adds rX,
+     rY, #0` on one side), explain's hint is generic: also read
+     `tools/check.py --full`, and try a second variable holding the same value,
+     an early return or `goto` that changes block layout, or a scoped constant
+     local. In the October benchmark ([MODEL_BENCHMARK.md](MODEL_BENCHMARK.md))
+     Haiku and Sonnet workers matched 5–11 of 15 near misses within 10 checks
+     (about 5 checks per match). explain.py did not beat check.py there
+     (Haiku 6 vs 5, Sonnet 8 vs 11). It won where an idiom pointed at a struct
+     type and lost on lone register copies. Stop after about ten checks without
+     progress and keep the draft (step 6).
+
+   When it says MATCH, commit the function on the working branch. The integrator
    runs one combined full-ROM build before merging the batch.
 6. Matched: `git add src/fn/sub_XXXXXXXX.c symbols/proposed && git commit -m "match sub_XXXXXXXX"`.
    If attempts stop yielding useful hypotheses, retain the candidate under `wip/`, add a line to
