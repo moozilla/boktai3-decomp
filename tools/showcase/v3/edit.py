@@ -18,9 +18,7 @@ import argparse
 import json
 import os
 import re
-import shutil
 import subprocess
-import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
@@ -31,23 +29,33 @@ FPS = 30
 FONT = "/System/Library/Fonts/Supplemental/Arial.ttf"
 BOLD = "/System/Library/Fonts/Supplemental/Arial Bold.ttf"
 
-# Part 1: (recording, chapter title or None, trims) in order. trims: list of
-# (start, end, speed) in recording seconds; None = from the scene's start to the end.
+# Part 1: (recording, chapter title or None, trims, options) in order. trims:
+# None = from the scene's start to the end of its closing fade; "cuts" = skip
+# the dark stretches (the chase's warps); ("abs", [(start, end, speed)]) in
+# recording seconds; ("pages", [i, j]) = the crawl's pages i..j (text on
+# black, found by brightness). options: bed = a song recorded on its own
+# (part1.py musicN) laid under the clip, continuing where its last use
+# stopped (bed_end: the stretch that ends with the song); only_bed = the bed
+# replaces the clip's sound (otherwise mixed in).
 PART1 = [
-    ("cold", "Cold open: something is wrong with that ghoul", None),
-    ("doors", "The doors lie", "cuts"),
-    ("night", "Night falls on cue", None),
-    ("marionettes", "The marionettes", None),
-    ("count", "The Count loses control", None),
-    ("ride", "Somebody rides Vanargand", None),
-    ("reveal", "The overload: who the stranger was", None),
-    ("coffins", "Encore: a purification of a different kind", None),
-    ("vride", "Claude rides Vanargand", None),
-    ("sunback", "Want to see?", None),
-    ("title", "Introducing... Boktai 3, decompiled", ("abs", [(0.7, 10.0, 1.0)])),
-    ("part2", None, None),
-    ("credits", "Credits", ("abs", [(0.9, 52.0, 1.0)])),
+    ("cold", "Cold open: something is wrong with that ghoul", None, {}),
+    ("doors", "The doors lie", "cuts", {"bed": 13}),
+    ("night", "Night falls on cue", None, {}),
+    ("marionettes", "The marionettes", None, {}),
+    ("count", "The Count loses control", None, {}),
+    ("ride", "Somebody rides Vanargand", None, {}),
+    ("reveal", "The overload: who the stranger was", None, {}),
+    ("title", "Introducing... Boktai 3, decompiled", ("pages", [0, 1]), {"bed": 92, "only_bed": True}),
+    ("title", None, ("pages", [2]), {"bed": 92, "only_bed": True}),
+    ("coffins", "Encore: a purification at the Pile Driver", None, {}),
+    ("title", None, ("pages", [3]), {"bed": 92, "only_bed": True}),
+    ("vride", "Claude rides Vanargand", None, {"bed": 92}),
+    ("title", None, ("pages", [4]), {"bed": 92, "only_bed": True}),
+    ("sunback", "The sun is in your hands", None, {}),
+    ("part2", None, None, {}),
+    ("credits", "Credits", ("abs", [(0.9, 58.0, 1.0)]), {"bed": 92, "only_bed": True, "bed_end": True}),
 ]
+TMP = os.path.join(V3, "edit_tmp")      # reused: every run overwrites it (moving it to the Trash filled the disk)
 
 
 def sh(*cmd, capture=False):
@@ -68,6 +76,9 @@ def scene_start(path, default=2.3):
 
 
 GAME = (f"scale=1440:960:flags=neighbor,pad=1920:1080:240:60:color={BG},fps={FPS},format=yuv420p")
+# the crawl's cards: text centered (the crawl prints near the top) on black (it draws on dark gray)
+CARD = ("crop=960:512:0:0,pad=960:640:0:128:color=0x212121,colorlevels=rimin=0.15:gimin=0.15:bimin=0.15,"
+        f"scale=1440:960:flags=neighbor,pad=1920:1080:240:60:color=black,fps={FPS},format=yuv420p")
 
 
 def black_runs(path, th=0.10, min_len=0.05):
@@ -94,6 +105,36 @@ def dark_runs(path, below=58, fps=30, min_len=0.1):
     return runs
 
 
+def luma(path, key="YAVG", fps=30):
+    """Per-frame luma statistic (signalstats) sampled at fps."""
+    out = subprocess.run(["ffmpeg", "-v", "error", "-i", path, "-vf",
+                          f"fps={fps},signalstats,metadata=print:key=lavfi.signalstats.{key}:file=-", "-f", "null", "-"],
+                         capture_output=True, text=True).stdout
+    return [float(v) for v in re.findall(key + r"=([0-9.]+)", out)]
+
+
+def content_end(path, fps=30, keep=0.4):
+    """Seconds into the recording where the closing fade (to black or white)
+    is complete, plus `keep`: the recording runs on in black after it."""
+    ys = luma(path, fps=fps)
+    live = [i for i, y in enumerate(ys) if 24 < y < 228]
+    return (live[-1] + 1) / fps + keep if live else len(ys) / fps
+
+
+def pages(path, fps=30, th=60):
+    """(start, end) seconds of each crawl page: runs of frames with bright text."""
+    ys = luma(path, "YMAX", fps)
+    runs, a = [], None
+    for i, y in enumerate(ys + [0]):
+        if y > th and a is None:
+            a = i
+        elif y <= th and a is not None:
+            if i - a > fps:          # not the warp's last frames before the crawl
+                runs.append((a / fps, i / fps))
+            a = None
+    return runs
+
+
 def without_black(src, s0, keep=0.1):
     """Trims that skip every dark stretch after s0 (the warps between scenes),
     keeping `keep` seconds of each side of it."""
@@ -110,23 +151,30 @@ def without_black(src, s0, keep=0.1):
     return parts
 
 
-def game_clip(name, tmp, trims=None):
+def game_clip(name, tmp, trims=None, tag=None):
     """A Part 1 recording, cut and scaled; returns the clip's path. trims:
-    [(start, end, speed)] from the scene's start ("cuts": skip the dark
-    stretches, the sound cut with the picture); sped-up parts keep the
-    recording's sound running at its own speed (music under a fast crawl)."""
+    see PART1 ("cuts": the sound is cut with the picture); sped-up parts
+    keep the recording's sound running at its own speed."""
+    tag = tag or name
     src = os.path.join(REC, f"{name}.mp4")
     s0 = scene_start(src)
     if isinstance(trims, tuple) and trims[0] == "abs":    # times from the recording's start (the crawl scenes)
         s0, trims = 0.0, trims[1]
+    is_card = isinstance(trims, tuple) and trims[0] == "pages"
+    if is_card:
+        runs = pages(src)
+        i, j = trims[1][0], trims[1][-1]
+        s0, trims = 0.0, [(max(0.0, runs[i][0] - 0.3), runs[j][1] + 0.3, 1.0)]
     end = duration(src)
+    if trims is None:
+        end = min(end, content_end(src))
     cut_sound = trims == "cuts"
     parts = without_black(src, s0) if cut_sound else (trims or [(0, end - s0, 1.0)])
     outs = []
     for k, (a, b, speed) in enumerate(parts):
         a, b = s0 + a, min(end, s0 + b)
-        o = os.path.join(tmp, f"{name}_{k}.mp4")
-        vf = f"setpts=(PTS-STARTPTS)/{speed},{GAME}"
+        o = os.path.join(tmp, f"{tag}_{k}.mp4")
+        vf = f"setpts=(PTS-STARTPTS)/{speed},{CARD if is_card else GAME}"
         if name == "credits" and k == len(parts) - 1:     # the video's end: fade to black
             vf += f",fade=out:st={(b - a) / speed - 2.5:.3f}:d=2.5"
         sh("ffmpeg", "-v", "error", "-y", "-ss", f"{a:.3f}", "-to", f"{b:.3f}", "-i", src, "-vf", vf,
@@ -134,19 +182,52 @@ def game_clip(name, tmp, trims=None):
            "-c:v", "libx264", "-crf", "16", "-preset", "fast", *(["-c:a", "aac", "-ac", "2"] if cut_sound else []), o)
         outs.append(o)
     if cut_sound:
-        o = os.path.join(tmp, f"{name}.mp4")
+        o = os.path.join(tmp, f"{tag}.mp4")
         concat(outs, o)
         return o
-    v = os.path.join(tmp, f"{name}_v.mp4")
+    v = os.path.join(tmp, f"{tag}_v.mp4")
     concat(outs, v, audio=False)
     fo = 2.5 if name == "credits" else 0.25
-    # sound: the recording's own, unsped, from the scene's start, as long as the picture
+    # sound: the recording's own, unsped, from the clip's start, as long as the picture
     dv = duration(v)
-    o = os.path.join(tmp, f"{name}.mp4")
-    sh("ffmpeg", "-v", "error", "-y", "-i", v, "-ss", f"{s0:.3f}", "-i", src, "-map", "0:v", "-map", "1:a",
+    o = os.path.join(tmp, f"{tag}.mp4")
+    sh("ffmpeg", "-v", "error", "-y", "-i", v, "-ss", f"{s0 + parts[0][0]:.3f}", "-i", src, "-map", "0:v", "-map", "1:a",
        "-af", f"aresample=48000,afade=t=in:d=0.08,afade=t=out:st={max(0, dv - fo):.3f}:d={fo},apad",
        "-t", f"{dv:.3f}", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-ac", "2", o)
     return o
+
+
+def song_length(song):
+    """Seconds of song `song` in rec/musicN.mp4 from the bed's start until it
+    falls silent (the end roll's song ends; it doesn't loop)."""
+    music = os.path.join(REC, f"music{song}.mp4")
+    out = subprocess.run(["ffmpeg", "-i", music, "-af", "silencedetect=n=-55dB:d=2", "-f", "null", "-"],
+                         capture_output=True, text=True).stderr
+    ms = scene_start(music) + 0.5
+    starts = [float(v) for v in re.findall(r"silence_start: ([0-9.]+)", out) if float(v) > ms + 5]
+    return (starts[0] if starts else duration(music)) - ms
+
+
+def with_bed(clip, song, at, tmp, tag, only=False, fade_in=0.3, fade_out=0.5):
+    """`clip` with song `song` (rec/musicN.mp4) from `at` seconds into it laid
+    under (or, only=True, in place of) its sound (at < 0: so that the song
+    ends with the clip). Returns (path, seconds used)."""
+    music = os.path.join(REC, f"music{song}.mp4")
+    ms = scene_start(music) + 0.5
+    d = duration(clip)
+    if at < 0:
+        at = max(0.0, song_length(song) - d)
+    o = os.path.join(tmp, f"{tag}_bed.mp4")
+    fade = (f"afade=t=in:d={fade_in}," if fade_in else "") + (
+        f"afade=t=out:st={max(0, d - fade_out):.3f}:d={fade_out}" if fade_out else "anull")
+    if only:
+        af = ["-map", "0:v", "-map", "1:a", "-af", f"aresample=48000,{fade},apad"]
+    else:
+        af = ["-filter_complex", f"[1:a]aresample=48000,{fade},apad[b];[0:a]aresample=48000[g];"
+                                 f"[g][b]amix=inputs=2:normalize=0:duration=first[a]", "-map", "0:v", "-map", "[a]"]
+    sh("ffmpeg", "-v", "error", "-y", "-i", clip, "-ss", f"{ms + at:.3f}", "-i", music, *af, "-t", f"{d:.3f}",
+       "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-ac", "2", o)
+    return o, d
 
 
 def card(tmp, name, big, small="", secs=2.5, white=False, music=None):
@@ -254,48 +335,57 @@ def main():
     a = ap.parse_args()
     import sys
     sys.path.insert(0, HERE)
-    tmp = tempfile.mkdtemp(prefix="v3edit-")
+    tmp = TMP
+    os.makedirs(tmp, exist_ok=True)
     clips, chapters, t = [], [], 0.0
-    try:
-        if a.part in ("1", "all"):
-            for name, chapter, trims in PART1:
-                if name == "part2":
-                    if a.part == "1":
-                        continue
-                    c = part2(tmp, chapters, t)
-                    clips.append(c)
-                    t += duration(c)
+    beds = {}                  # song -> seconds of it used so far
+    if a.part in ("1", "all"):
+        for k, (name, chapter, trims, opt) in enumerate(PART1):
+            if name == "part2":
+                if a.part == "1":
                     continue
-                c = game_clip(name, tmp, trims)
-                if chapter:
-                    chapters.append((t, chapter))
+                c = part2(tmp, chapters, t)
                 clips.append(c)
                 t += duration(c)
-                print(f"{name}: {duration(c):.1f} s (at {t:.1f})", flush=True)
-        if a.part == "2":
-            c = part2(tmp, chapters, t)
+                continue
+            tag = f"{k:02d}_{name}"
+            c = game_clip(name, tmp, trims, tag)
+            if opt.get("bed"):
+                song = opt["bed"]
+                prev, nxt = (PART1[k - 1][3] if k else {}), (PART1[k + 1][3] if k + 1 < len(PART1) else {})
+                joined_in, joined_out = prev.get("bed") == song, nxt.get("bed") == song     # one stretch of the song
+                at = -1 if opt.get("bed_end") else beds.get(song, 0.0)
+                c, used = with_bed(c, song, at, tmp, tag, only=opt.get("only_bed", False),
+                                   fade_in=0 if joined_in else 0.3,
+                                   fade_out=2.5 if name == "credits" else (0 if joined_out else 0.5))
+                beds[song] = beds.get(song, 0.0) + used
+            if chapter:
+                chapters.append((t, chapter))
             clips.append(c)
             t += duration(c)
-        out = a.out
-        os.makedirs(os.path.dirname(out), exist_ok=True)
-        body = os.path.join(tmp, "body.mp4")
-        concat(clips, body)
-        meta = os.path.join(tmp, "chapters.txt")
-        with open(meta, "w") as f:
-            f.write(";FFMETADATA1\ntitle=Boktai 3, decompiled: The Stranger\n")
-            for k, (s, title) in enumerate(chapters):
-                e = chapters[k + 1][0] if k + 1 < len(chapters) else t
-                f.write(f"[CHAPTER]\nTIMEBASE=1/1000\nSTART={int(s * 1000)}\nEND={int(e * 1000)}\ntitle={title}\n")
-        # loudness to -16 LUFS (the game's mix is quiet), chapters from the metadata file
-        sh("ffmpeg", "-v", "error", "-y", "-i", body, "-i", meta, "-map", "0:v", "-map", "0:a", "-map_metadata", "1",
-           "-map_chapters", "1", "-c:v", "copy", "-af", "loudnorm=I=-16:TP=-1.5:LRA=11", "-ar", "48000", "-c:a", "aac",
-           "-b:a", "192k", "-movflags", "+faststart", out)
-        with open(out.replace(".mp4", ".chapters.txt"), "w") as f:
-            for s, title in chapters:
-                f.write(f"{int(s // 60)}:{int(s % 60):02d} {title}\n")
-        print(f"{out}: {duration(out):.1f} s")
-    finally:
-        shutil.move(tmp, os.path.expanduser(f"~/.Trash/{os.path.basename(tmp)}"))
+            print(f"{tag}: {duration(c):.1f} s (at {t:.1f})", flush=True)
+    if a.part == "2":
+        c = part2(tmp, chapters, t)
+        clips.append(c)
+        t += duration(c)
+    out = a.out
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    body = os.path.join(tmp, "body.mp4")
+    concat(clips, body)
+    meta = os.path.join(tmp, "chapters.txt")
+    with open(meta, "w") as f:
+        f.write(";FFMETADATA1\ntitle=Boktai 3, decompiled: The Stranger\n")
+        for k, (s_, title) in enumerate(chapters):
+            e = chapters[k + 1][0] if k + 1 < len(chapters) else t
+            f.write(f"[CHAPTER]\nTIMEBASE=1/1000\nSTART={int(s_ * 1000)}\nEND={int(e * 1000)}\ntitle={title}\n")
+    # loudness to -16 LUFS (the game's mix is quiet), chapters from the metadata file
+    sh("ffmpeg", "-v", "error", "-y", "-i", body, "-i", meta, "-map", "0:v", "-map", "0:a", "-map_metadata", "1",
+       "-map_chapters", "1", "-c:v", "copy", "-af", "loudnorm=I=-16:TP=-1.5:LRA=11", "-ar", "48000", "-c:a", "aac",
+       "-b:a", "192k", "-movflags", "+faststart", out)
+    with open(out.replace(".mp4", ".chapters.txt"), "w") as f:
+        for s_, title in chapters:
+            f.write(f"{int(s_ // 60)}:{int(s_ % 60):02d} {title}\n")
+    print(f"{out}: {duration(out):.1f} s")
 
 
 if __name__ == "__main__":

@@ -74,7 +74,8 @@ class Scene:
         if hud_mode is not None:
             self.cut.at(1, hud(hud_mode))
         self.player = Player(self.cut)
-        self.otenko = Otenko(self.cut)
+        self.player.pos = (x, z)
+        self.otenko = Otenko(self.cut, y=y)
         self.spawns = []
         self.then = None
         self.events = []          # harness lines timed against the cutscene (record.py)
@@ -139,8 +140,58 @@ class Cast:
         # Otenko as a keyframe sprite, for stages that never load his NPC sprite
         frames, origin, pool = romx.big_frames(show.r.rom, 0x97D3)
         self.otenko = show.package(0x6070, romx.package(frames, pool, origin))
+        # the Pile Driver's arena in Claude's colors (its three time-of-day palettes)
+        self.arena_pals = [show.resource(romx.STAGE_PAL_TYPE, 0x6090 + k,
+                                         romx.recolor_stage_palette(romx.resource(show.r.rom, romx.STAGE_PAL_TYPE, h),
+                                                                    claude_colors, range(12)))
+                           for k, h in enumerate(ARENA_PALS)]
+        # a link of the chain coffins are dragged on (the common sprite sheet's 1C1C)
+        self.bead = show.package(0x6080, chain_bead_package(show))
         portrait(show, "claude_neutral", 0x593B, 14, 506)
         portrait(show, "claude_smug", 0x593B, 8, 504)
+
+
+ARENA = 6201                               # the Pile Driver's arena (Lifeless Town's purification)
+ARENA_PALS = (0x8B1D, 0x46B8, 0x8504)      # its stage palettes: day, dusk, night
+COMMON_SHEET = (0xCEAA, 0x3002)            # the common sprite sheet AgbMain loads to OBJ VRAM (tiles at +0x24)
+CHAIN_TILE = 236                           # its entry 1C1C, frame 0: a chain link (TetherActor_InitializeSegments)
+
+
+def claude_colors(rgb, bank):
+    """The arena recolored: the ground warm cream, the stones and the
+    circle's glow terracotta (banks 0-1 ground, 2-11 the circle)."""
+    import colorsys
+    h, l_, s_ = colorsys.rgb_to_hls(*(v / 255 for v in rgb))
+    if bank <= 1:
+        h, s_, l_ = 40 / 360, s_ * 0.45, min(0.96, l_ * 1.04)
+    else:
+        h, s_ = 15 / 360, min(0.8, s_ * 1.2 + 0.15)
+    return tuple(int(round(v * 255)) for v in colorsys.hls_to_rgb(h, l_, s_))
+
+
+def arena_stage(show, cast):
+    """The arena's stage procedure (proc_6200) with our palettes in place of its own."""
+    import gcx
+    import struct
+    o = show.r.img.proc_address(6200 - 1)
+    st, n = gcx.length(bytes(show.r.rom), o)
+    code = bytearray(show.r.rom[o:st + n])
+    for old, new in zip(ARENA_PALS, cast.arena_pals):
+        k = code.find(struct.pack("<H", old))
+        assert k > 0 and code.find(struct.pack("<H", old), k + 1) < 0
+        struct.pack_into("<H", code, k, new)
+    pid = show.r.new_proc_id()
+    show.r.set_proc(pid, bytes(code))
+    return pid
+
+
+def chain_bead_package(show):
+    import struct
+    a = romx.resource(show.r.rom, *COMMON_SHEET)
+    o = 0x24 + 32 * CHAIN_TILE
+    img = [[(a[o + y * 4 + x // 2] >> (4 * (x & 1))) & 15 for x in range(8)] for y in range(8)]
+    pool = show.pool([0, 0x282830, 0, 0x8890A0, 0xD8E0E8] + [0] * 11)
+    return romx.package([img], pool, (4, 6))
 
 
 DIGIT_STRIPS = ["101", "010", "110", "011", "100", "001"]
@@ -227,6 +278,21 @@ def stranger_toward(frm, to):
     return 1 if screen(*to)[0] < screen(*frm)[0] else 0
 
 
+SNAP = (201, 202)          # two short noise clicks together: the nearest thing the game has to a finger snap
+OMEN = (1246, 1425)        # a slow swell over a low rumble: the stranger arrives (sound test audition, proofs.sfx)
+
+
+def snap(cut, st, t, frame="snap"):
+    """The stranger (or Claude) snaps its fingers at t, with the sound."""
+    if st is not None:
+        st.frame(t, frame)
+    cut.at(t, *[sound(n) for n in SNAP])
+
+
+def omen(cut, t):
+    cut.at(t, *[sound(n) for n in OMEN])
+
+
 def vanish(cut, st, t, x, z, y=256):
     """The stranger turns and dissolves into motes of light."""
     st.frame(t, "turn")
@@ -243,13 +309,14 @@ def vanish(cut, st, t, x, z, y=256):
 def cold(show, cast):
     """Cold open: Django and Otenko find a ghoul that isn't right; it wobbles,
     a cloaked figure floats in from the side, snaps, and the ghoul fans out
-    into twenty in ten palettes, then snaps back."""
+    into twenty in ten palettes; another snap and the copies burst into
+    motes of light, leaving the ghoul to look itself over."""
     X, GZ, DZ = 1408, 2060, 2480           # the corridor's line, the ghoul, where Django stops
     SX, SZ = 1880, 1740                    # where the stranger lands, to the ghoul's right
     sc = Scene(show, 2803, X, 3150, facing=1, song=None, camera=(X, 2750), fade_speed=4)
     cut, dj, ot = sc.cut, sc.player, sc.otenko
     cut.at(0, bgm(18))
-    ot.place(2, X + 230, 3250, d=1)
+    ot.place(0, X + 230, 3250, d=1)
     dj.walk(30, X, DZ)
     ot.walk(40, X + 200, DZ + 130)
     cut.at(20, cam(1560, 2260, 140))
@@ -270,25 +337,25 @@ def cold(show, cast):
             f.show(3 * i)
             f.hide(3 * i + 3)
     ghoul.glide(48, X, GZ, 3)
-    cut.at(0, sound(1407), quake(10, 48))
+    cut.at(0, quake(10, 48))
     # the stranger floats in from the right, facing them
     st = Sprite(cut, 0x7001, cast.stranger, cast.sf).add(40, SX + 760, SZ - 520, y=256 + 300, frame="stand_dr",
                                                         hidden=True)
     m = stranger_toward((SX, SZ), (X, DZ))
     st.frame(40, "stand_dr", mirror=m)
     st.show(44)
+    omen(cut, 40)
     st.glide(44, SX, SZ, 70, y=256 + 70)
     cut.at(44, particles(SX + 380, SZ - 260, 40, y=256 + 200, kind=GOLD))
     for i in range(4):
         st.glide(114 + 12 * i, SX, SZ, 12, y=256 + (40 if i % 2 == 0 else 70))
     st.glide(162, SX, SZ, 16, y=256)
     st.frame(190, "raise")
-    st.frame(222, "snap")
-    cut.at(222, sound(1407))
+    snap(cut, st, 222)
     # the fan: copies slide out of the ghoul one after another, ten hues twice
     t0 = 226
     n = 20
-    copies = []
+    copies, spots = [], []
     for k in range(n):
         s_ = Sprite(cut, 0x7030 + k, cast.fan[k % 10], {}).add(t0, X, GZ, frame=0)
         s_.mirror(t0)
@@ -296,54 +363,69 @@ def cold(show, cast):
     for k, s_ in enumerate(copies):
         a = math.radians(-78 + 156 * k / (n - 1))
         dx, dz, dy = screen_to_world(86 * math.sin(a), 48 * math.cos(a))
+        spots.append((X + dx, GZ + dz, 256 + dy))
         s_.glide(t0 + 2 + k, X + dx, GZ + dz, 20, y=256 + dy)
     cut.at(t0 + 2, sound(1425), quake(20, 10))
     for k, s_ in enumerate(copies):
-        s_.cycle(t0 + 24 + k % 4, [0, 1, 2, 3], 80, step=10)
+        s_.cycle(t0 + 24 + k % 4, [0, 1, 2, 3], 130, step=10)
     st.frame(t0 + 40, "stand_dr")
-    tb = t0 + 120
-    st.frame(tb - 6, "snap")
-    for s_ in copies:
-        s_.glide(tb, X, GZ, 8, y=256)
-        s_.frame(tb, 0)
-    cut.at(tb, sound(1407))
-    for s_ in copies:
-        s_.hide(tb + 9)
+    # a second snap: the copies burst into motes, from the ends of the fan in
+    tb = t0 + 150
+    st.frame(tb - 30, "raise")
+    snap(cut, st, tb - 6)
+    order = sorted(range(n), key=lambda k: -abs(k - (n - 1) / 2))
+    kinds = [GOLD, RED, FLAME, ICE, PURPLE, GREEN]
+    for i, k in enumerate(order):
+        t = tb + 3 * i
+        x, z, y = spots[k]
+        copies[k].hide(t)
+        cut.at(t, particles(x, z, 30, y=y + 48, kind=kinds[k % len(kinds)]))
+        if i % 4 == 0:
+            cut.at(t, sound(1407))
     st.frame(tb + 14, "stand_dr")
     # the ghoul looks itself over
-    ghoul.frame(tb + 30, 8)
-    ghoul.frame(tb + 60, 9, mirror=0)
-    ghoul.frame(tb + 92, 8, mirror=1)
-    cut.hold(tb + 120)
+    tl = tb + 3 * n + 20
+    ghoul.frame(tl, 8)
+    ghoul.frame(tl + 30, 9, mirror=0)
+    ghoul.frame(tl + 62, 8, mirror=1)
+    cut.hold(tl + 100)
     cut.say([DJ + '"..."'])
     cut.say([OT + '"Django... Who is that?"'])
     vanish(cut, st, 0, SX, SZ)
-    cut.hold(90)
+    end(cut, 70)
     return sc
 
 
-# the door chase: (place, entrance x, z, y, facing, exit x, z, song, line)
-CHASE = [(2961, 2176, 3200, 512, 1, 2176, 600, 20, DJ + '"There! It went\nthrough that door!"'),
-         (3880, 1664, 2944, 256, 1, 1664, 340, 26, OT + '"The White Forest?!\nThat door led to the town!"'),
-         (4359, 1152, 4224, 256, 1, 1152, 860, 29, DJ + '"An island?\nWhat is going on?!"'),
-         (5111, 2176, 4480, 512, 1, 2176, 1360, 33, OT + '"It\'s leading us around\nby the nose!"')]
-RUN = 18      # world units a frame, running (measured from the recordings)
+def end(cut, t, speed=4):
+    """Close a piece: fade the picture and the music out from t."""
+    cut.at(t, fade(1, speed, 0, 0, 0), bgm_out(speed))
+    cut.hold(t + 60)
+
+
+# the door chase: (place, start x, z, y, facing, exit x, z, line). They walk
+# in from part way along the room (each room's walk is a few seconds).
+CHASE = [(2961, 2176, 2300, 512, 1, 2176, 600, DJ + '"There! It went\nthrough that door!"'),
+         (3880, 1664, 2250, 256, 1, 1664, 340, OT + '"The White Forest?!\nThat door led to the town!"'),
+         (4359, 1152, 2900, 256, 1, 1152, 860, DJ + '"An island?\nWhat is going on?!"'),
+         (5111, 2176, 3300, 512, 1, 2176, 1360, OT + '"It\'s leading us around\nby the nose!"')]
+CHASE_SONG = 13       # one song under the whole chase, laid in by the edit (the rooms play none)
 
 
 @piece
 def doors(show, cast):
-    """The doors lie: Django and Otenko run after the stranger through door
+    """The doors lie: Django and Otenko go after the stranger through door
     after door, and each one comes out somewhere else; then a closet."""
-    scenes = [Scene(show, p, x, z, facing=f, y=y, song=song, fade_speed=2) for p, x, z, y, f, ex, ez, song, line in CHASE]
-    closet = Scene(show, 2391, 1408, 640, facing=7, y=256, song=18, fade_speed=2)
-    for k, (sc, (p, x, z, y, f, ex, ez, song, line)) in enumerate(zip(scenes, CHASE)):
+    scenes = [Scene(show, p, x, z, facing=f, y=y, song=0, fade_speed=2) for p, x, z, y, f, ex, ez, line in CHASE]
+    closet = Scene(show, 2391, 1408, 640, facing=7, y=256, song=0, fade_speed=2)
+    for k, (sc, (p, x, z, y, f, ex, ez, line)) in enumerate(zip(scenes, CHASE)):
         cut = sc.cut
         dist = math.hypot(ex - x, ez - z)
-        dur = int(dist / RUN)
         ux, uz = (ex - x) / dist, (ez - z) / dist
         sc.otenko.place(1, x - int(140 * uz), z + int(140 * ux), d=f)
-        sc.player.run(6, ex, ez, y=y)
-        sc.otenko.run(10, ex - int(140 * uz) - int(160 * ux), ez + int(140 * ux) - int(160 * uz), y=y)
+        arrive = sc.player.walk(6, ex, ez, y=y)
+        dur = arrive - 6
+        sc.otenko.walk(10, ex - int(140 * uz) - int(160 * ux), ez + int(140 * ux) - int(160 * uz), y=y, face=None)
+        cut.at(0, bgm_out(1))
         cut.at(6, cam_follow(20))
         # the stranger at the far door, slipping out as they come
         st = Sprite(cut, 0x7001, cast.stranger, cast.sf, y=y).add(1, ex + int(60 * ux), ez + int(60 * uz),
@@ -356,15 +438,16 @@ def doors(show, cast):
         sc.then = ((scenes[k + 1].pid if k + 1 < len(scenes) else closet.pid), ENTRANCE)
     # the closet: a storeroom with someone already in it
     cut = closet.cut
+    cut.at(0, bgm_out(1))
     closet.otenko.place(1, 1408, 900, d=7)
-    closet.player.run(4, 1152, 640)
+    closet.player.walk(4, 1152, 640)
     Sprite(cut, 0x7003, 0xE04E, {}).add(1, 896, 640, frame=4)
     cut.at(2, cam(1152, 700, 1))
     cut.hold(50)
     cut.say([OT + '"Django... I don\'t think\nwe\'re following it.', 'I think it\'s moving us."'])
     cut.say([DJ + '"This is a closet."'])
     cut.say(["<LABEL=PEOPLE2>Storeroom Man</LABEL>:\n\"...Can I help you?\""])
-    cut.hold(40)
+    end(cut, 30)
     closet.build()
     for sc in scenes[1:]:
         sc.build()
@@ -400,9 +483,13 @@ def night(show, cast):
         s_ = Sprite(cut, 0x7100 + k, pkg, {}, y=Y).add(1, *street, frame=f)
         s_.frame(1, f, mirror=m)
         people.append((s_, pkg, street, home))
-    st = Sprite(cut, 0x7001, cast.stranger, cast.sf, y=Y).add(1, SX, SZ, frame="stand_dr")
+    st = Sprite(cut, 0x7001, cast.stranger, cast.sf, y=Y + 400).add(1, SX, SZ, frame="stand_dr", hidden=True)
     st.frame(1, "stand_dr", mirror=stranger_toward((SX, SZ), (X, Z)))
-    cut.hold(100)
+    st.show(60)
+    omen(cut, 56)
+    st.glide(60, SX, SZ, 50, y=Y)
+    cut.at(60, particles(SX, SZ, 40, y=Y + 200, kind=PURPLE))
+    cut.hold(130)
 
     def go(t, where, dur):
         """Everyone hurries home (facing away) or out (facing the square)."""
@@ -418,14 +505,12 @@ def night(show, cast):
     cut.say([TOWN + '"Lovely afternoon,\nisn\'t it?"'])
     afternoon = [(-1, 0, PHASE.format(AFTERNOON))]
     st.frame(10, "raise")
-    st.frame(34, "snap")
-    cut.at(34, sound(1407))
+    snap(cut, st, 34)
     ev = afternoon + [(0, 40, PHASE.format(EVENING)), (0, 70, PHASE.format(NIGHT))]
     go(80, "home", 36)
     cut.hold(130)
     cut.say([TOWN + '"Goodness, dark already!\nGood night!"'])
-    st.frame(6, "snap")
-    cut.at(6, sound(1407))
+    snap(cut, st, 6)
     ev += [(1, 14, PHASE.format(DAWN)), (1, 40, PHASE.format(DAY))]
     go(44, "street", 30)
     cut.hold(90)
@@ -434,8 +519,7 @@ def night(show, cast):
     beat = 28
     for i in range(8):
         t = 8 + beat * i
-        st.frame(t, "snap" if i % 2 == 0 else "raise")
-        cut.at(t, sound(1407))
+        snap(cut, st, t, "snap" if i % 2 == 0 else "raise")
         ev.append((2, t + 4, PHASE.format(NIGHT if i % 2 == 0 else DAY)))
         go(t + 4, "home" if i % 2 == 0 else "street", beat - 6)
     st.frame(8 + beat * 8, "stand_dr")
@@ -444,7 +528,7 @@ def night(show, cast):
     cut.say([DJ + '"Did the sun just set?"'])
     cut.say([OT + '"And rise. Five times."', '"The sun does not\nwork like that!"'])
     vanish(cut, st, 0, SX, SZ, Y)
-    cut.hold(80)
+    end(cut, 60)
     ev.append((6, 60, "unfreeze"))
     sc.events = ev
     return sc
@@ -466,6 +550,7 @@ def marionettes(show, cast):
     st = Sprite(cut, 0x7001, cast.stranger, cast.sf, y=Y + 700).add(40, CX, CZ, frame="stand_dr", hidden=True)
     st.frame(40, "stand_dr", mirror=stranger_toward((CX, CZ), (DX, DZ)))
     st.show(60)
+    omen(cut, 56)
     st.glide(60, CX, CZ, 60, y=Y + 90)
     cut.at(60, particles(CX, CZ, 40, y=Y + 300, kind=PURPLE))
     cut.hold(130)
@@ -512,8 +597,7 @@ def marionettes(show, cast):
     cut.say(["<LABEL=RITA>Lita</LABEL>:\n\"Django? Why can't I move?\""])
     cut.say(["<LABEL=SMITH>Smith</LABEL>:\n\"I was halfway through\na sword!\""])
     cut.say([OT + '"Release them at once!"'])
-    st.frame(0, "snap")
-    cut.at(0, sound(1407))
+    snap(cut, st, 0)
     for k, m in enumerate(members):
         m.hide(8 + 4 * k)
         if k % 2 == 0:
@@ -521,21 +605,28 @@ def marionettes(show, cast):
     cut.hold(70)
     cut.say([DJ + '"We need to find\nthat thing."'])
     vanish(cut, st, 0, CX, CZ, Y + 90)
-    cut.hold(70)
+    end(cut, 60)
     return sc
+
+
+COUNT_SONG = 22      # the Count's battle theme (scene 3247 and his rematch, 6401)
 
 
 @piece
 def count(show, cast):
-    """The Count's fight unravels: his lunge plays backwards, he flashes
-    through every color, and a coffin slams shut on him. Only the viewer
-    sees who is doing it."""
+    """The Count has Django beaten: the Sol shots miss (he goes to bats), a
+    claw knocks Django to his knees, and the Count gloats and lunges for
+    the end. The stranger appears, snaps, and the lunge freezes and plays
+    backwards; the Count flashes through every color, and a coffin slams
+    shut on him. Only the viewer sees who is doing it."""
     X, Z, Y = 1664, 2050, 512
-    CX, CZ = 2050, 1560
-    SX, SZ = 1450, 1730
+    CX, CZ = 2050, 1560            # where the Count starts
+    PX, PZ = 1724, 1690            # where he strikes from, up and right of Django
+    LX, LZ = 1700, 1830            # the end of his last lunge (it never gets there)
+    SX, SZ = 1300, 2050             # the stranger, off to the left where they can't see it
     sc = Scene(show, 3243, X, Z, facing=1, y=Y, song=None, camera=(1850, 1800))
     cut, dj = sc.cut, sc.player
-    cut.at(0, bgm(45))
+    cut.at(0, bgm(COUNT_SONG))
     otenko_kf(cut, cast, 1, X - 260, Z + 120, Y)
     counts = [Sprite(cut, 0x7300 + k, pkg, {}, y=Y).add(1, CX, CZ, frame=60, hidden=k > 0)
               for k, pkg in enumerate(cast.count)]
@@ -543,29 +634,56 @@ def count(show, cast):
     dj.aim(20, 1)
     cut.hold(50)
     cut.say([COUNT + '"Foolish Solar Boy!\nYour light cannot touch me!"'])
-    # the lunge
-    for i, f in enumerate([20, 21, 22, 23]):
-        count0.frame(4 + 6 * i, f)
-    count0.glide(10, CX - 240, CZ + 240, 22)
-    # the stranger, on a ledge in the corner: the viewer sees it, they don't
-    st = Sprite(cut, 0x7001, cast.stranger, cast.sf, y=Y).add(2, SX, SZ, frame="raise", hidden=True)
+    # the fight: three shots; he goes to bats, and they reform beside Django
+    for i in range(3):
+        dj.shoot(4 + 14 * i, 1)
+    for i, f in enumerate([62, 63, 64, 65, 66]):
+        count0.frame(8 + 3 * i, f)
+    cut.at(10, sound(1243))
+    count0.cycle(23, [67, 68, 69, 70, 71, 72, 73, 74, 75], 44, step=4)
+    count0.glide(23, PX, PZ, 44)
+    for i, f in enumerate([66, 65, 64, 63, 62, 60]):
+        count0.frame(67 + 3 * i, f)
+    # the claw: Django is hit and goes down on one knee
+    count0.frame(92, 50, mirror=1)     # his strikes face right; Django is to his left
+    count0.frame(100, 49)
+    count0.frame(104, 48)
+    # knocked back and flat (motion 30). Not 43 (a freeze: it leaves him blue) or 11-14 (Sabata's)
+    dj.aim_end(102, 1)
+    dj.raw(104, 17, 1, 0, 0)
+    cut.at(104, quake(60, 16), sound(1244))
+    count0.frame(124, 60, mirror=0)
+    dj.aim(186, 1)                  # he gets up by himself (about 70 frames on the floor) and aims again
+    cut.hold(200)
+    cut.say([DJ + '"Ugh... my sunlight\nisn\'t working!"'])
+    cut.say([COUNT + '"Ha ha ha!\nI have you now, Solar Boy!"'])
+    # the last lunge, and someone in the corner
+    st = Sprite(cut, 0x7001, cast.stranger, cast.sf, y=Y + 300).add(2, SX, SZ, frame="raise", hidden=True)
     st.frame(2, "raise", mirror=0)
-    st.show(14)
-    cut.at(14, particles(SX, SZ, 30, y=Y + 64, kind=GOLD))
+    count0.frame(6, 50, mirror=1)
+    st.show(8)
+    omen(cut, 6)
+    st.glide(8, SX, SZ, 16, y=Y)
+    cut.at(8, particles(SX, SZ, 30, y=Y + 120, kind=PURPLE))
+    for i, f in enumerate([20, 21, 22, 23]):
+        count0.frame(22 + 5 * i, f)
+    count0.glide(26, LX, LZ, 24)
     # frozen mid-lunge, then the lunge plays backwards
-    count0.glide(26, CX - 230, CZ + 230, 2)
-    cut.at(26, sound(1407))
+    snap(cut, st, 34)
+    count0.glide(35, PX + (LX - PX) * 9 // 24, PZ + (LZ - PZ) * 9 // 24, 1)
     for i, f in enumerate([23, 22, 21, 20]):
-        count0.frame(50 + 10 * i, f)
-    count0.glide(50, CX, CZ, 40)
-    count0.frame(92, 60)
-    cut.hold(110)
+        count0.frame(70 + 10 * i, f)
+    count0.glide(70, PX, PZ, 40)
+    count0.frame(112, 60, mirror=0)
+    st.frame(60, "raise")
+    cut.hold(130)
     cut.say([COUNT + '"What?! My body...\nit moves on its own!"'])
     cut.say([COUNT + '"Something is... controlling\nme!', 'I am the Count!\nNo one controls ME!"'])
-    st.frame(0, "snap")
-    cut.at(0, sound(1407))
+    snap(cut, st, 0)
     # every color, faster and faster
     t, k, step = 6, 0, 8
+    for c in counts[1:]:
+        c.jump(1, PX, PZ)
     while t < 110:
         nxt = (k + 1) % len(counts)
         counts[nxt].frame(t, 60)
@@ -578,19 +696,19 @@ def count(show, cast):
             c.hide(t)
     count0.show(t)
     # a coffin drops on him and slams shut
-    coffin = Sprite(cut, 0x7310, cast.coffins[4], {}, y=Y + 520).add(t, CX, CZ, frame=6, hidden=True)
+    coffin = Sprite(cut, 0x7310, cast.coffins[4], {}, y=Y + 520).add(t, PX, PZ, frame=6, hidden=True)
     coffin.show(t + 2)
-    coffin.glide(t + 2, CX, CZ, 10, y=Y)
+    coffin.glide(t + 2, PX, PZ, 10, y=Y)
     count0.hide(t + 12)
-    cut.at(t + 12, quake(90, 14), sound(641), particles(CX, CZ, 40, y=Y + 64, kind=PURPLE))
+    cut.at(t + 12, quake(90, 14), sound(641), particles(PX, PZ, 40, y=Y + 64, kind=PURPLE))
     coffin.frame(t + 20, 5)
     coffin.frame(t + 28, 0)
     vanish(cut, st, t + 40, SX, SZ, Y)
-    dj.aim_end(t + 50, 1)
-    cut.hold(t + 110)
+    dj.aim_end(t + 14, 1)
+    cut.hold(t + 120)
     cut.say([OT + '"Django, did you\ndo that?"'])
     cut.say([DJ + '"No. Who IS that guy?"'])
-    cut.hold(40)
+    end(cut, 30)
     return sc
 
 
@@ -629,18 +747,35 @@ def otenko_kf(cut, cast, t, x, z, y, frame=0):
     return o
 
 
-# Vanargand's head, measured from recordings with a fixed camera
-# (proofs.vseq): after 57 it is down by ~205 frames; after 56 it rises from
-# ~125 frames on, by these world units (6 frames apart), to stay up.
-HEAD_RISE = [0, 171, 299, 437, 544, 661, 789, 885, 917, 949, 1109, 1120]
+MEASURE = bool(os.environ.get("MEASURE"))   # part1.py measure PIECE: film Vanargand's head (no rider, fixed camera)
+MEASURE_CAM_Y = int(os.environ.get("MEASURE_CAM_Y", "1500"))
+T56_RIDE, T56_VRIDE = 330, 760                # when each piece raises the head (command 56)
+
+
+# Vanargand's head as it rises after command 56: the top of its crest on
+# screen (pixels, every 2 frames), filmed with a fixed camera in each piece
+# (part1.py measure ride|vride). It starts a different time after the
+# command in each (whatever Vanargand was doing then): HEAD_DELAY.
+HEAD_PX = [113, 110, 106, 102, 98, 94, 90, 85, 82, 77, 73, 68, 65, 61, 56, 53, 48, 44, 41, 36, 32, 27, 24, 20, 15,
+           13, 11, 10, 8, 7, 6, 5]
+HEAD_DELAY = {"ride": 26, "vride": 4}
 RIDER_LOW = 1060    # a rider's feet on the lowered head (x = z = 1200)
 
 
-def ride_on_head(rider, t_raise, frames=None):
-    """Keep `rider` on the head as it rises: t_raise is when 56 was sent."""
-    t0 = t_raise + 125
-    for i, d in enumerate(HEAD_RISE):
-        rider.glide(t0 + 6 * i, 1200, 1200, 6, y=RIDER_LOW + d)
+def ride_on_head(cut, rider, behind, t_raise, piece):
+    """Keep `rider` on the head as it rises (t_raise: when 56 was sent). Once
+    the head is up, `behind` (the same sprite at priority 3, under
+    Vanargand's layer) takes over, so the crest is drawn in front of the
+    rider's legs. Returns the frame the swap happens."""
+    t0 = t_raise + HEAD_DELAY[piece]
+    for i, px in enumerate(HEAD_PX):
+        y = RIDER_LOW + int((HEAD_PX[0] - px) * 32 / 3)
+        rider.glide(t0 + 2 * i, 1200, 1200, 2, y=y)
+        behind.glide(t0 + 2 * i, 1200, 1200, 2, y=y)
+    t_up = t0 + 2 * len(HEAD_PX) + 4
+    behind.show(t_up)
+    rider.hide(t_up)
+    return t_up
 
 
 @piece
@@ -654,22 +789,32 @@ def ride(show, cast):
     otenko_kf(cut, cast, 1, X + 200, Z + 120, 256)
     cut.at(0, bgm(78))
     cut.at(20, vanargand(51), quake(90, 10), message_audio(106), sound(1425))
+    if MEASURE:
+        cut.at(30, cam(1200, 1200, 1, y=MEASURE_CAM_Y))
+        cut.at(100, vanargand(57))
+        cut.at(T56_RIDE, vanargand(56))
+        cut.hold(T56_RIDE + 400)
+        return sc
     cut.at(30, cam(1200, 1200, 70, y=900))
     cut.at(100, vanargand(57))
     st = Sprite(cut, 0x7001, cast.stranger, cast.sf, y=2600).add(240, 1200, 1200, frame="stand_dr", hidden=True)
+    back = Sprite(cut, 0x7007, cast.stranger, cast.sf, y=2600).add(240, 1200, 1200, frame="stand_dr", hidden=True,
+                                                                     prio=3)
     st.show(250)
+    omen(cut, 246)
     st.glide(250, 1200, 1200, 50, y=RIDER_LOW)
+    back.glide(250, 1200, 1200, 50, y=RIDER_LOW)
     cut.at(300, particles(1200, 1200, 30, y=RIDER_LOW + 60, kind=GOLD))
-    cut.at(330, vanargand(56))
-    ride_on_head(st, 330)
-    st.frame(470, "raise")
-    cut.at(450, cam(1200, 1200, 80, y=2000))
+    cut.at(T56_RIDE, vanargand(56))
+    t_up = ride_on_head(cut, st, back, T56_RIDE, "ride")
+    st = back
+    st.frame(t_up + 20, "raise")
+    cut.at(T56_RIDE + HEAD_DELAY["ride"], cam(1200, 1200, 70, y=2000))     # up with the head, keeping the rider in view
     cut.hold(560)
     cut.say([DJ + '"Is that... riding\nVanargand?"'])
     cut.say([OT + '"Nobody rides Vanargand."'])
     st.frame(0, "point")
-    cut.at(40, fade(1, 3, 0, 0, 0))
-    cut.hold(100)
+    end(cut, 40, speed=3)
     return sc
 
 
@@ -743,6 +888,7 @@ def reveal(show, cast):
                                                                     frame="raise", hidden=True)
     st.frame(t_end - 80, "raise", mirror=0)
     st.show(t_end - 70)
+    omen(cut, t_end - 74)
     st.glide(t_end - 70, SX, SZ, 50, y=Y)
     cut.hold(t_end + 40)
     cut.say([DJ + '"My gun...\nit\'s overheating!"'])
@@ -770,7 +916,9 @@ def reveal(show, cast):
              'So now I can change it\nfrom the inside."'])
     cut.say([DJ + '"The doors. The ghouls.\nVanargand."'])
     cut.say([CL2 + '"Sorry about the doors."'])
-    cut.hold(60)
+    r_.frame(0, "wave")
+    cut.say([CL + '"Let me make it up to you."'])
+    end(cut, 40)
     return sc
 
 
@@ -784,27 +932,38 @@ def coffin_frame(dx, dy):
     return 1 if dx * dy < 0 else 3
 
 
+PURIFY_SONG, PURIFY_CLIMAX = 3, 4      # the purification's music, and its last-quarter version (proc_6197)
+
+
 @piece
 def coffins(show, cast):
-    """Encore: Claude drags in a coffin for every boss, sets them in a ring,
-    and purifies them her own way: the lids open and the bosses come out as
-    ones and zeros."""
-    X, Z, Y = 2176, 2400, 512
-    CX, CZ = X + 120, Z - 620                # the ring's middle
-    sc = Scene(show, 2961, X, Z, facing=1, y=Y, song=20, camera=(X + 60, Z - 360))
+    """Encore, at the Pile Driver (in Claude's colors): Claude drags in a
+    coffin for every boss on one chain, sets them in a ring, and purifies
+    them her own way: the lids open and the bosses come out as ones and
+    zeros. Then she's off to the next thing."""
+    CX, CZ, Y = 1920, 1920, 512               # the ring's middle: the circle's
+    X, Z = CX - 150, CZ + 700                 # where Django stops, off the ring's lower left
+    sc = Scene(show, ARENA, X, Z + 450, facing=1, y=Y, song=PURIFY_SONG, stage=arena_stage(show, cast),
+               camera=(CX + 20, CZ + 120), capacity=64)
     cut, dj = sc.cut, sc.player
-    sc.otenko.place(1, X + 200, Z + 120, d=1)
-    dj.face(10, 7)
+    sc.otenko.place(1, X + 200, Z + 560, d=1)
+    dj.walk(10, X, Z)
+    sc.otenko.walk(16, X + 160, Z + 140)
+    cut.hold(80)
+    cut.say([OT + '"The Pile Driver!', 'But... why is it orange?"'])
+    cut.say([CL + '"I redecorated!"'])
     n = 9
-    R = 330
+    SPACING = 330                             # coffin to coffin along the chain (a coffin is ~220 long)
+    R = int(SPACING * n / (2 * math.pi))      # the ring they end up in
+    B = 4                                     # chain links between each pair
     # the path: in from the left edge, then once round the ring
     path = [(CX - 1300, CZ + 200), (CX - 700, CZ + 300)]
     for i in range(n + 1):
-        a = math.pi * 0.85 + 2 * math.pi * i / n
-        path.append((CX + int(R * math.cos(a)), CZ + int(R * math.sin(a))))
+        a_ = math.pi * 0.85 + 2 * math.pi * i / n
+        path.append((CX + int(R * math.cos(a_)), CZ + int(R * math.sin(a_))))
     seg = [math.dist(path[i], path[i + 1]) for i in range(len(path) - 1)]
     total = sum(seg)
-    spacing, speed, step = 2 * math.pi * R / n, 9, 8
+    spacing, speed, step = 2 * math.pi * R / n, 11, 8
 
     def at_(d):
         d = max(0.0, min(total, d))
@@ -814,24 +973,35 @@ def coffins(show, cast):
                 return int(x0 + (x1 - x0) * d / L), int(z0 + (z1 - z0) * d / L), (x1 - x0, z1 - z0)
             d -= L
         return path[-1] + ((1, 0),)
-    cl = Sprite(cut, 0x7005, cast.claude, cast.cf, y=Y).add(20, *path[0], frame="drag1")
-    train = [Sprite(cut, 0x7400 + k, cast.coffins[k % len(cast.coffins)], {}, y=Y).add(20, *path[0], frame=2)
+    cl = Sprite(cut, 0x7005, cast.claude, cast.cf, y=Y).add(2, *path[0], frame="drag1")
+    train = [Sprite(cut, 0x7400 + k, cast.coffins[k % len(cast.coffins)], {}, y=Y).add(2, *path[0], frame=2)
              for k in range(n)]
+    links = [Sprite(cut, 0x7440 + k, cast.bead, {}, y=Y + 8).add(2, *path[0], frame=0) for k in range(n * B)]
     frames = int(total / speed)
     for f in range(0, frames + step, step):
         d = min(frames, f) * speed
         x, z, (vx, vz) = at_(d)
-        cl.glide(30 + f, x, z, step)
+        cl.glide(10 + f, x, z, step)
+        # her drag frames hold the chain behind her to the left: mirror them when she heads left
+        cl.frame(10 + f, "drag1" if (f // 16) % 2 == 0 else "drag2", mirror=1 if screen(vx, vz, 0)[0] < 0 else 0)
         for k, c in enumerate(train):
             xk, zk, (vxk, vzk) = at_(d - spacing * (k + 1))
-            c.glide(30 + f, xk, zk, step)
+            c.glide(10 + f, xk, zk, step)
             sx, sy = screen(vxk, vzk, 0)
-            c.frame(30 + f, coffin_frame(sx, sy))
-    cl.cycle(30, ["drag1", "drag2"], frames, step=10)
-    t_in = 30 + frames + step
-    # Claude steps into the middle; the coffins stand up in the ring
+            c.frame(10 + f, coffin_frame(sx, sy))
+        for k, ln in enumerate(links):
+            g, j = divmod(k, B)
+            # from the back of the item in front (Claude's hand, a coffin's end) to the next coffin's front
+            front, back = d - spacing * g - (60 if g == 0 else 110), d - spacing * (g + 1) + 110
+            xl, zl, _ = at_(front + (back - front) * (j + 1) / (B + 1))
+            ln.glide(10 + f, xl, zl, step)
+    t_in = 10 + frames + step
+    # Claude lets go of the chain and steps into the middle; the coffins stand up in the ring
+    for ln in links:
+        ln.hide(t_in)
+    cut.at(t_in, sound(1243))
     cl.glide(t_in, CX, CZ, 30)
-    cl.frame(t_in + 30, "stand_dl")
+    cl.frame(t_in + 30, "stand_dl", mirror=0)
     for k, c in enumerate(train):
         c.frame(t_in + 30, 0)
     cut.hold(t_in + 50)
@@ -839,6 +1009,7 @@ def coffins(show, cast):
     cl.frame(0, "talk")
     cut.say([CL2 + '"Watch me."'])
     cl.frame(0, "cheer")
+    cut.at(0, bgm(PURIFY_CLIMAX))
     # (no tint here: the BG fade group also catches sprites in new pools, Claude and the digits)
     cut.at(10, particles(CX, CZ, 60, y=Y + 120, kind=GOLD), sound(1425), quake(30, 30))
     cut.at(50, particles(CX, CZ, 60, y=Y + 160, kind=GREEN), quake(20, 140))
@@ -873,7 +1044,12 @@ def coffins(show, cast):
     cut.say([OT + '"That is NOT how\npurification works!"'])
     cl.frame(0, "shrug")
     cut.say([CL2 + '"It is now."'])
-    cut.hold(50)
+    cl.frame(0, "cheer")
+    cut.say([CL + '"C\'mon! There\'s more!"'])
+    # off she goes, out the right side
+    cl.frame(0, "walk_dr1", mirror=0)
+    cl.walk(2, CX + 700, CZ - 700, 60, ["walk_dr1", "walk_dr2", "walk_dr3", "walk_dr4"], step=6)
+    end(cut, 46)
     return sc
 
 
@@ -886,13 +1062,21 @@ def vride(show, cast):
     sc.spawns = [Call(6557), Call(6558)]
     cut = sc.cut
     otenko_kf(cut, cast, 1, X + 200, Z + 120, 256)
-    cut.at(0, bgm(57))
-    cut.at(4, cam(1200, 1200, 40, y=900))
+    cut.at(0, bgm_out(1))            # the edit lays the encore's song under it
+    cut.at(4, cam(1200, 1200, 40, y=MEASURE_CAM_Y if MEASURE else 900))
     cut.at(20, vanargand(51), quake(60, 10), sound(1425))
     cut.at(80, vanargand(52))
     cut.at(250, vanargand(59))
-    T57, T56 = 480, 760
+    T57, T56 = 480, T56_VRIDE
     cut.at(T57, vanargand(57))
+    if MEASURE:
+        cut.at(T56, vanargand(56))
+        if os.environ.get("MEASURE_PRIO"):       # a rider behind layer 2, stepping up after the rise
+            m = Sprite(cut, 0x7005, cast.claude, cast.cf, y=256).add(T56 + 100, 1200, 1200, frame="ride", prio=3)
+            for k in range(8):
+                m.jump(T56 + 100 + 30 * k, 1200, 1200, y=RIDER_LOW + 1150 + 40 * k)
+        cut.hold(T56 + 400)
+        return sc
     cl = Sprite(cut, 0x7005, cast.claude, cast.cf, y=256).add(T57 + 120, X - 260, Z - 260, frame="stand_dr")
     # she jumps from beside Django up onto the lowered head
     tj = T57 + 215
@@ -901,9 +1085,12 @@ def vride(show, cast):
     cl.glide(tj + 16, 1200, 1200, 16, y=RIDER_LOW)
     cut.at(tj, sound(1407))
     cl.frame(tj + 32, "ride")
+    back = Sprite(cut, 0x7007, cast.claude, cast.cf, y=RIDER_LOW).add(tj + 34, 1200, 1200, frame="ride", hidden=True,
+                                                                     prio=3)
     cut.at(T56, vanargand(56))
-    ride_on_head(cl, T56)
-    cut.at(T56 + 110, cam(1200, 1200, 80, y=2000))
+    ride_on_head(cut, cl, back, T56, "vride")
+    cl = back
+    cut.at(T56 + HEAD_DELAY["vride"], cam(1200, 1200, 70, y=2000))
     for i in range(8):
         cl.frame(T56 + 200 + 16 * i, "wave" if i % 2 == 0 else "ride")
     cut.hold(T56 + 330)
@@ -917,44 +1104,63 @@ def vride(show, cast):
 
 @piece
 def sunback(show, cast):
-    """Claude hands Django the sun: he steps into the light and charges,
-    and the screen goes white."""
+    """Claude hands Django his sun back; while he charges in the light she
+    turns to the camera: the sun (the decomp, the tools) is in the viewer's
+    hands now. The screen goes white."""
     X, Z, Y = 1792, 1792, 256
+    CLX, CLZ = X - 300, Z - 120
     sc = Scene(show, 2712, X, Z + 420, facing=1, y=Y, song=18, flags=1, camera=(X - 60, Z + 120), hud_mode=1)
     cut, dj = sc.cut, sc.player
     light_pool(cut, cast, X, Z, colors=False)
     sc.otenko.place(1, X + 260, Z + 560, d=1)
-    cl = Sprite(cut, 0x7005, cast.claude, cast.cf).add(1, X - 300, Z - 120, frame="stand_dr")
+    cl = Sprite(cut, 0x7005, cast.claude, cast.cf).add(1, CLX, CLZ, frame="stand_dr")
     cut.hold(50)
     cut.say([DJ + '"How did you even\ndo all this?"'])
     cl.frame(0, "talk")
     cut.say([CL + '"Want to see?"'])
     cl.frame(0, "point")
     cut.say([CL2 + '"First, this is yours."'])
+    # the sun comes back: Django steps into the light and charges
     cut.at(0, hud(1), top_messages(), particles(X, Z, 60, y=Y + 96, kind=GOLD), sound(1425))
     cl.frame(10, "stand_dr")
-    cut.hold(30)
-    cut.say(["The sun is now\nin your hands."])
-    dj.walk(4, X, Z)
-    dj.aim(40, 1)
-    for i in range(5):
-        cut.at(60 + 30 * i, particles(X, Z, 30, y=Y + 96, kind=GOLD))
-    cut.at(160, fade(1, 3, 31, 31, 31), bgm_out(4))
-    cut.hold(260)
-    ev = [(3, 0, "poke 030025C4 E8")]
+    dj.walk(20, X, Z)
+    dj.aim(60, 1)
+    for i in range(4):
+        cut.at(80 + 30 * i, particles(X, Z, 30, y=Y + 96, kind=GOLD))
+    # then Claude turns to the camera
+    cl.walk(150, CLX + 60, CLZ + 60, 24, ["walk_dr1", "walk_dr2", "walk_dr3", "walk_dr4"], step=6, end="stand_dr")
+    cut.at(150, cam(CLX + 60, CLZ + 60, 40), Set(STORY, 194))     # on her, and messages back at the bottom
+    cut.hold(200)
+    cl.frame(0, "wave")
+    cut.say([CL + '"And you, watching this..."'])
+    cl.frame(0, "point")
+    cut.say([CL2 + '"The sun is in\nYOUR hands now."'])
+    for i in range(3):
+        cut.at(10 + 30 * i, particles(X, Z, 30, y=Y + 96, kind=GOLD))
+    cut.at(70, fade(1, 3, 31, 31, 31), bgm_out(4))
+    cut.hold(170)
+    ev = [(2, 0, "poke 030025C4 E8")]
     for k, lux in enumerate(range(235, 50, -12)):
-        ev.append((3, 20 + 8 * k, f"lux {lux}"))
+        ev.append((2, 30 + 8 * k, f"lux {lux}"))
     sc.events = ev
     return sc
 
 
-@piece
-def music(show, cast):
-    """Five minutes of song 57 (the bed under part 2)."""
-    sc = Scene(show, 2712, 1920, 3200, facing=1, song=57)
-    sc.cut.hold(60)
-    sc.tail = 60 * 300
-    return sc
+def music_piece(song, secs):
+    """`secs` seconds of a song on a quiet stage: a bed the edit lays under
+    pieces that play none (part 2: 57; the chase: 13; the encore: 92)."""
+    def fn(show, cast):
+        sc = Scene(show, 2712, 1920, 3200, facing=1, song=song)
+        sc.cut.hold(60)
+        sc.tail = 60 * secs
+        return sc
+    fn.__name__ = "music" if song == 57 else f"music{song}"
+    return fn
+
+
+ENCORE_SONG = 92     # the true ending's end roll: under the title, the cards, Claude's ride and the credits
+for _song, _secs in ((57, 300), (CHASE_SONG, 120), (ENCORE_SONG, 200)):
+    piece(music_piece(_song, _secs))
 
 
 # ---- the game's text crawl: the title and the credits ---------------------
@@ -970,28 +1176,41 @@ def crawl_strings(show, pages):
     return block[0]
 
 
-TITLE = ["        Introducing...", "           BOKTAI 3\n          DECOMPILED"]   # 30 columns; centered by hand
+def centered(text, width=30):
+    """The crawl doesn't center lines: pad each with spaces (leading blank lines break it)."""
+    return "\n".join(" " * max(0, (width - len(ln)) // 2) + ln for ln in text.split("\n"))
+
+
+# The title right after the reveal, then a card between each encore scene:
+# what the decomp makes possible. One crawl plays them all; the edit cuts
+# each page out (they are text on black) and puts it in its place.
+TITLE = [("Introducing...", 150), ("BOKTAI 3\nDECOMPILED", 230),
+         ("New scenes, written in\nthe game's own scripts", 150),
+         ("Custom ROM hacks", 130),
+         ("Bringing the 2007 fan\ntranslation back to life", 170)]
 
 
 def title(show):
-    """The title card, played by the crawl object (chara 3DF7) as the
-    prologue plays its title, in the game's own text font."""
+    """The title card and the encore's cards, played by the crawl object
+    (chara 3DF7) as the prologue plays its title, in the game's own text
+    font, with our timing."""
     from gclasm import Cmd, Hash, Text
-    first = crawl_strings(show, TITLE)
+    first = crawl_strings(show, [centered(t) for t, _ in TITLE])
+    timing = crawl_timing(show, len(TITLE), [h for _, h in TITLE])
     pid = show.proc([Call(861, 56), Call(864, 0), Call(553), Call(1265), Call(1), Call(6560),
-                     Cmd("chara", [Hash(0x3DF7), Hash(0xB45C)], [("p", [0]), ("s", [Text(first)]), ("t", [Text(9966)]),
+                     Cmd("chara", [Hash(0x3DF7), Hash(0xB45C)], [("p", [0]), ("s", [Text(first)]), ("t", [Text(timing)]),
                                                                  ("f", [1])])])
     return pid
 
 
-CREDITS = [
+CREDITS = [            # at most four lines of 26 characters: the parade walks below them
     "BOKTAI 3\nDECOMPILED",
-    "<WEIGHT>Direction</WEIGHT>\nmoozilla\n(a.k.a. Spikeman)",
+    "<WEIGHT>Direction</WEIGHT>\nmoozilla (a.k.a. Spikeman)",
     "<WEIGHT>Decompilation, tools</WEIGHT>\n<WEIGHT>and this video</WEIGHT>\nClaude Opus 5.5",
-    "<WEIGHT>With help from</WEIGHT>\nClaude Sonnet, Claude Haiku\nGPT-6 Astra, GPT-6.1 Sol",
+    "<WEIGHT>With help from</WEIGHT>\nClaude Sonnet\nClaude Haiku\nGPT-6 Astra, GPT-6.1 Sol",
     "<WEIGHT>Claudesona sprites</WEIGHT>\ndrawn for this video,\ninspired by vgel, thebes,\nN8python and Eidoverse",
     "<WEIGHT>Built with</WEIGHT>\npret's agbcc\ndecomp-permuter\nmGBA",
-    "<WEIGHT>Special thanks</WEIGHT>\nThe Boktai 3 fan translation\nDarth Nemesis\nLordHuffnPuff",
+    "<WEIGHT>Special thanks</WEIGHT>\nDarth Nemesis, Spikeman,\nLordHuffnPuff and the\nfan translation team",
     "<WEIGHT>Boktai 3</WEIGHT>\nShin Bokura no Taiyou:\nGyakushuu no Sabata\n(c) 2005 Konami",
     "github.com/moozilla/\nboktai3-decomp\n\n<WEIGHT>Contributions welcome!</WEIGHT>",
 ]
@@ -1007,7 +1226,8 @@ def crawl_timing(show, pages, hold):
 
     def v(x):
         return bytes([0xC0 | (x + 1)]) if -1 <= x <= 62 else bytes([2, x])
-    body = b"".join(v(hold) + b"".join(v(x) for x in (2, 4, 30, 8, 60, 32)) for _ in range(pages))
+    holds = hold if isinstance(hold, (list, tuple)) else [hold] * pages
+    body = b"".join(v(h) + b"".join(v(x) for x in (2, 4, 30, 8, 60, 32)) for h in holds)
     body += v(-1) + v(0) * 6 + b"\0"
     sid = show.strings.pop()
     a = show.r.alloc(body, 1)
@@ -1032,34 +1252,35 @@ def parade(show, cast):
         s_ = sy * 32 / 3 + (CX + CZ - CY) + y
         return int((s_ + d) / 2), int((s_ - d) / 2)
     cut.at(0, cam(CX, CZ, 1, y=CY))
+    ROW = 68                  # feet this far below the screen's middle: under four lines of text
     walk = ["walk_dr1", "walk_dr2", "walk_dr3", "walk_dr4"]
-    lead = Sprite(cut, 0x7001, cast.claude, cast.cf).add(2, *at(140, 56), frame="walk_dr1")
+    lead = Sprite(cut, 0x7001, cast.claude, cast.cf).add(2, *at(140, ROW), frame="walk_dr1")
     lead.mirror(2, 1)
     # 1: one Claude walks in from the right, stops, waves at the camera
-    lead.walk(10, *at(60, 56), 150, walk, step=9)
+    lead.walk(10, *at(60, ROW), 150, walk, step=9)
     lead.frame(160, "stand_dl", mirror=0)
     lead.frame(200, "wave")
     lead.frame(232, "stand_dl")
     lead.frame(250, "wave")
     lead.frame(282, "stand_dl")
     # 2: a second Claude drags three coffins past behind her
-    dragger = Sprite(cut, 0x7002, cast.claude, cast.cf).add(300, *at(150, 40), frame="drag1")
+    dragger = Sprite(cut, 0x7002, cast.claude, cast.cf).add(300, *at(150, ROW - 4), frame="drag1")
     dragger.mirror(300, 1)
-    coffins = [Sprite(cut, 0x7010 + k, cast.coffins[k * 3], {}).add(300, *at(150 + 34 * (k + 1), 40), frame=2)
+    coffins = [Sprite(cut, 0x7010 + k, cast.coffins[k * 3], {}).add(300, *at(150 + 34 * (k + 1), ROW - 4), frame=2)
                for k in range(3)]
     t0, dur = 302, 560
-    dragger.walk(t0, *at(-280, 40), dur, ["drag1", "drag2"], step=12)
+    dragger.walk(t0, *at(-280, ROW - 4), dur, ["drag1", "drag2"], step=12)
     for k, c in enumerate(coffins):
-        c.glide(t0, *at(-280 + 34 * (k + 1), 40), dur)
+        c.glide(t0, *at(-280 + 34 * (k + 1), ROW - 4), dur)
     lead.frame(330, "point", mirror=1)
     lead.frame(480, "shrug", mirror=0)
     lead.frame(560, "stand_dl")
     # 3: a third Claude rides by on a coffin, waving
-    rider = Sprite(cut, 0x7003, cast.claude, cast.cf).add(898, *at(150, 64), y=286, frame="ride")
+    rider = Sprite(cut, 0x7003, cast.claude, cast.cf).add(898, *at(150, ROW + 6), y=286, frame="ride")
     rider.mirror(898, 1)
-    mount = Sprite(cut, 0x7014, cast.coffins[5], {}).add(898, *at(150, 64), frame=2)
-    rider.glide(900, *at(-150, 64), 420, y=286)
-    mount.glide(900, *at(-150, 64), 420)
+    mount = Sprite(cut, 0x7014, cast.coffins[5], {}).add(898, *at(150, ROW + 6), frame=2)
+    rider.glide(900, *at(-150, ROW + 6), 420, y=286)
+    mount.glide(900, *at(-150, ROW + 6), 420)
     for i in range(12):
         rider.frame(910 + 32 * i, "wave" if i % 2 == 0 else "ride")
     lead.frame(960, "cheer")
@@ -1067,7 +1288,7 @@ def parade(show, cast):
     # 4: the lead jumps for joy, twice
     for k in range(2):
         t = 1480 + 70 * k
-        x, z = at(60, 56)
+        x, z = at(60, ROW)
         lead.frame(t, "jump")
         lead.glide(t, x, z, 14, y=340)
         lead.glide(t + 14, x, z, 14, y=256)
@@ -1077,7 +1298,7 @@ def parade(show, cast):
         c.hide(1700)
     for k, (sp, sx) in enumerate(((dragger, -30), (rider, 20), (lead, 70))):
         sp.frame(1700, "walk_dr1", mirror=0 if sx < 0 else 1)
-        sp.glide(1700, *at(sx, 50), 90, y=256)
+        sp.glide(1700, *at(sx, ROW), 90, y=256)
         sp.cycle(1700, walk, 90, step=9)
         sp.frame(1800, "stand_dl", mirror=0)
     for i in range(14):
@@ -1140,6 +1361,8 @@ def main():
             print(f"{k}: scene {pid}, {len(pages)} pages")
         return
     name = sys.argv[2]
+    if cmd == "measure":
+        return measure_head(name, scenes[name][0])
     os.makedirs(REC, exist_ok=True)
     out = os.path.join(REC, f"{name}.mp4")
     if name in CRAWL_ENTRANCE:
@@ -1150,6 +1373,22 @@ def main():
         st = run.state(ROM, pid, ENTRANCE, f"p1_{name}", wait=30)
         record.record(ROM, st, pages, f"p1_{name}_rec", out, shots=True, events=events, tail=tail)
     sheet(out, os.path.join(run.OUT, f"p1_{name}.png"), float(sys.argv[3]) if len(sys.argv) > 3 else 1.0)
+
+
+def measure_head(name, pid):
+    """Screenshots of Vanargand's head every 2 frames around command 56 in
+    piece `name` (built with MEASURE=1: fixed camera, no rider), timed from
+    the cutscene's start; prints the head's top edge per frame."""
+    t56 = {"ride": T56_RIDE, "vride": T56_VRIDE}[name]
+    st = run.state(ROM, pid, ENTRANCE, f"p1_{name}_m", wait=30)
+    times = list(range(t56 - 20, t56 + 360, 2))
+    lines = [f"loadstate {st}", f"watchpc {record.SCRIPT_START:08X} -2147483648 2147483647", "waitpc 20000"]
+    now = 0
+    for t in times:
+        lines += [f"wait {t - now}", f"shot h{t:05d}"]
+        now = t
+    d = run.harness(ROM, lines, f"p1_{name}_m")
+    print(d)
 
 
 def sheet(video, out, every=1.0, cols=6):
