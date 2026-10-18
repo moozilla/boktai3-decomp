@@ -406,3 +406,4 @@ addr,function,name,family,note
 08166F84,sub_08166F84,InventoryPanel_UpdateSelectedEquipment,"InventoryPanel","queries or updates the selected equipment display"
 08167508,sub_08167508,MenuParticle_UpdateMotion,"MenuParticle","moves particle, accelerates every fourth tick and expires at twenty"
 0816755C,sub_0816755C,InventoryPanel_UpdateCallbackGroups,"InventoryPanel","updates two groups of eight active callbacks"
+08167E64,sub_08167E64,Hud_InitializePanelTransition,"Hud","initializes a panel transition selected by display flags"
