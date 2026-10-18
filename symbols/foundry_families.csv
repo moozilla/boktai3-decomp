@@ -1359,3 +1359,4 @@ addr,function,name,family,note
 08236D58,sub_08236D58,ParticleBurst_UpdateSlots,"ParticleBurst","updates eight callback-driven slots and clears inactive group"
 08236EBC,sub_08236EBC,ParticleBurst_AdvanceFrame,"ParticleBurst","toggles sprite flag and advances sixteen-frame animation"
 08236EF8,sub_08236EF8,ParticleBurst_RewindFrame,"ParticleBurst","rewinds sprite animation and deactivates at frame zero"
+082370AC,sub_082370AC,ParticleBurst_Update,"ParticleBurst","updates sprite and optional slots then retires inactive task"
