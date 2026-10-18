@@ -1296,3 +1296,4 @@ addr,function,name,family,note
 0821FE04,sub_0821FE04,Collider_InsertPriorityList,"collider manager","insert a collider once into the bit-0x2000 list"
 08220780,sub_08220780,Collider_TestSegmentBounds,"collider geometry","test a segment against collider bounds on three axes"
 082208D4,sub_082208D4,PositionList_UpdateTranslatedCoordinates,"PositionList","adds base and offset coordinates across two lists"
+08220A58,sub_08220A58,PositionQueue_FlushPending,"PositionQueue","processes and clears a pending position queue unless paused"
