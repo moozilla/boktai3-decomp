@@ -200,3 +200,4 @@ addr,function,name,family,note
 0810E1A0,sub_0810E1A0,SelectionPanel_GetSelection,"SelectionPanel","combines column and six-entry page into selection index"
 08110AD4,sub_08110AD4,SceneEffect_ExecuteCommandList,"SceneEffect","dispatches packed x/y/type commands to two effect spawners"
 08111410,sub_08111410,PaletteFade_AdvanceColors,"palette fade","advances fixed-point RGB channels and writes sixteen palette colors"
+08111DE0,sub_08111DE0,MessagePanel_InitSprites,"MessagePanel","initializes 23 sprites and resets selection entries"
