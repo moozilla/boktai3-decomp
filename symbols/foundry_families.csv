@@ -779,3 +779,4 @@ addr,function,name,family,note
 0816AAB0,sub_0816AAB0,MenuPrompt_WaitForChildPhase,"MenuPrompt (tentative)","waits for the child callback phase before restoring display and menu"
 0816AB30,sub_0816AB30,MenuPrompt_PulseDisplay,"MenuPrompt (tentative)","ramps display levels up, holds them, then ramps down over 150 frames"
 0816ABC8,sub_0816ABC8,MenuPrompt_ResumeChild,"MenuPrompt (tentative)","resets display state and resumes the child before waiting for its phase"
+0816AD34,sub_0816AD34,ScenePanel_BeginAccountMenu,"ScenePanel","initializes account menu and conditionally enables its secondary sprite"
