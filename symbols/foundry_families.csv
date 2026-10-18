@@ -1177,3 +1177,4 @@ addr,function,name,family,note
 081F0464,sub_081F0464,SingletonSlot7_InitSecondaryCollider,"SingletonSlot7","initializes the actor's secondary collider"
 081F053C,sub_081F053C,SingletonSlot7_InitContactCollider,"SingletonSlot7","initializes contact collider and its scaled-cooldown callback"
 081F0678,sub_081F0678,,"unassigned callback stub",""
+081F067C,sub_081F067C,SingletonSlot7_SetMotionMode,"Singleton slot7 3 (auto, tentative)","changes motion mode and resets actor state"
