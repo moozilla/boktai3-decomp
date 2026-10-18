@@ -624,3 +624,4 @@ addr,function,name,family,note
 081167CC,sub_081167CC,ActorRecoil_UpdateMotion,"ActorRecoil","updates motion, damps velocity, and selects state sound"
 08116870,sub_08116870,MotionActor_UpdateMovementAudio,"MotionActor","updates movement damping and pending song"
 08119F9C,sub_08119F9C,Glove_StopWithMessage,"Glove","sends stop message and restores the glove update callback"
+0811A62C,sub_0811A62C,MotionActor_Destroy,"MotionActor","removes animations and resources and clears actor slot"
