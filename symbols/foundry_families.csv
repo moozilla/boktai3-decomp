@@ -1156,3 +1156,4 @@ addr,function,name,family,note
 081DFC1C,sub_081DFC1C,AnimPanel_AppendSelection,"animation panel (tentative)","stores selected value and advances the entry cursor unless full"
 081E04B4,sub_081E04B4,StartPrompt_Update,"StartPrompt screen task","waits for Start then fades and runs a completion script"
 081E0818,sub_081E0818,ScriptPrompt_ResetDisplay,"ScriptPrompt screen task","redraws prompt text and resets sprite positions and state"
+081E095C,sub_081E095C,AnimPanel_SelectActiveAnimation,"animation panel (tentative)","sets complementary flag bits on two animations according to selection"
