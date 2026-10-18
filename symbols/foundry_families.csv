@@ -545,3 +545,4 @@ addr,function,name,family,note
 081788A8,sub_081788A8,Hud_RefreshPlayerBinding,"Field HUD","binds HUD to its selected player and refreshes it"
 080B6538,sub_080B6538,SceneActorControl_TryBeginNearbyBehavior16,"SceneActorControl","conditionally begins behavior 16 using target angle and near range"
 080F1CC4,sub_080F1CC4,SceneActor_RampColorRedHigh,"SceneActor color cycle","ramp red channel from sixteen to twenty-four"
+080F1E00,sub_080F1E00,SceneActor_LowerColorRedPeak,"SceneActor color cycle","lower red channel from thirty-one to twenty-four"
