@@ -1,7 +1,7 @@
-#define MessagePanel_UpdateBlink StageResults_UpdateRecordBlink
-#define MessagePanel_FinishExit StageResults_FinishDisplay
+#define MessagePanel_UpdateBlink         StageResults_UpdateRecordBlink
+#define MessagePanel_FinishExit          StageResults_FinishDisplay
 #define MessagePanel_StepPairedAnimation CharacterModel_UpdatePairedAnimations
-#define MessagePanel_RotatePalette PaletteFade_CycleMenuColors
+#define MessagePanel_RotatePalette       PaletteFade_CycleMenuColors
 #include "global.h"
 struct MessagePanel {
     u8 pad0[0x11B8];

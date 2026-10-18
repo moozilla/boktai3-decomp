@@ -1,5 +1,5 @@
 #define SceneProcSprites_GetOrCreate BallisticSpriteEffect_EnsureManager
-#define gSceneProcSprites             gUnk_020004CC
+#define gSceneProcSprites            gUnk_020004CC
 #include "global.h"
 struct SpriteVector {
     u32 x, y, z, w;
@@ -53,7 +53,8 @@ s32 SceneProcSprites_CreateEntry(struct SpriteVector *position, s32 a, s32 b, u3
             p->entries[i].targetX = a;
             p->entries[i].targetY = p->entries[i].vx;
             p->entries[i].kind = kind;
-            SceneProcSprites_SubmitBounds(&p->entries[i], BallisticSpriteEffect_OnAnimationComplete, params[3], kind + 1);
+            SceneProcSprites_SubmitBounds(&p->entries[i], BallisticSpriteEffect_OnAnimationComplete,
+                                          params[3], kind + 1);
             ((struct SceneProcSprites *)((u8 *)p + i * 0xe0))->entries[0].callback = sub_08139028;
             p->entries[i].flags = 1;
             return i;

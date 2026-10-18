@@ -1,13 +1,13 @@
 #define MotionSequence_UpdateInterpolation PauseMenu_UpdateSpriteMotion
-#define MotionSequence_SetCallback Hud_SetInteractionCallback
+#define MotionSequence_SetCallback         Hud_SetInteractionCallback
 #include "global.h"
 /* Tentative semantic names; field offsets are established by static accesses. */
 struct MotionSequence {
     u8 unknown0[0xA4E];
     u16 delay;
-    u8 unknownA50[0x2AA8-0xA50];
+    u8 unknownA50[0x2AA8 - 0xA50];
     u32 flags;
-    u8 unknown2AAC[0x438A-0x2AAC];
+    u8 unknown2AAC[0x438A - 0x2AAC];
     u8 selection;
 };
 u32 PauseMenu_UpdateSpriteMotion(struct MotionSequence *, u32);

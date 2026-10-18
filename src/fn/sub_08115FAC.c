@@ -1,5 +1,5 @@
 #include "global.h"
-#define gSmallCallbackPool              gUnk_020001E8
+#define gSmallCallbackPool gUnk_020001E8
 struct SmallCallbackEntry {
     u8 pad0[0x1C];
     u8 sprite[4];

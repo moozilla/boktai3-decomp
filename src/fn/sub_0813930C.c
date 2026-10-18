@@ -1,4 +1,4 @@
-#define gSceneProcSprites           gUnk_020004CC
+#define gSceneProcSprites gUnk_020004CC
 #include "global.h"
 struct SceneProcSprite {
     u8 data[0x1c];

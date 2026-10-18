@@ -1,4 +1,4 @@
-#define gSceneProcParticles           gUnk_020004D0
+#define gSceneProcParticles gUnk_020004D0
 #include "global.h"
 struct SceneProcParticle {
     u8 pad00[0x44];

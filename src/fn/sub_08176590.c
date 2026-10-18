@@ -1,5 +1,5 @@
-#define SceneDialog_ClearSlotFlags PauseMenu_ClearSpriteFlags
-#define gSceneDialogVariantCallbacks     gUnk_08611C34
+#define SceneDialog_ClearSlotFlags   PauseMenu_ClearSpriteFlags
+#define gSceneDialogVariantCallbacks gUnk_08611C34
 #include "global.h"
 struct SceneDialogVariant {
     u8 pad0[0x1414];

@@ -16,7 +16,10 @@ struct ClockPanel {
     u16 first[2];
     u16 second[2];
 };
-struct ClockState { u8 unk0[0x18]; s16 mode; };
+struct ClockState {
+    u8 unk0[0x18];
+    s16 mode;
+};
 extern struct ClockState *gUnk_020004B4;
 u8 SunClock_GetPhase(void);
 void ClockPanel_CaptureTime(struct ClockPanel *p)
@@ -31,6 +34,7 @@ void ClockPanel_CaptureTime(struct ClockPanel *p)
     }
     if (*state && (*state)->mode == 0)
         snapshot->time = gUnk_03005430.extra6 * 15 + gUnk_03005430.extra7;
-    else snapshot->time = 0;
+    else
+        snapshot->time = 0;
     snapshot->sun = SunClock_GetPhase();
 }

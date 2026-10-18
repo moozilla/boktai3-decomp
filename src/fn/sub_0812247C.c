@@ -1,9 +1,11 @@
-#define SpriteEffect_GetOrCreatePool SceneActor14_EnsureSingleton
+#define SpriteEffect_GetOrCreatePool  SceneActor14_EnsureSingleton
 #define SpriteEffect_GetFacingVariant SceneActor14_GetFacingAndFlip
-#define gSpriteEffectPool gUnk_0200013C
+#define gSpriteEffectPool             gUnk_0200013C
 #include "global.h"
 
-struct EffectMotion { u32 xy, z; };
+struct EffectMotion {
+    u32 xy, z;
+};
 struct EffectSourceObject {
     u8 unk00[9];
     u8 facing;
@@ -44,7 +46,9 @@ void Sprite_Init(void *, void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void SpriteEffect_InitCollider(struct SpriteEffect *, u32, u32, u32, u32);
 
-s32 SpriteEffect_SpawnWithMotion(struct EffectSourceObject *source, struct EffectSourceObject *target, struct EffectMotion *motion, u32 a, u32 b, u32 c, u32 d)
+s32 SpriteEffect_SpawnWithMotion(struct EffectSourceObject *source,
+                                 struct EffectSourceObject *target, struct EffectMotion *motion,
+                                 u32 a, u32 b, u32 c, u32 d)
 {
     struct SpriteEffectPool *pool;
     struct SpriteEffect *effect;

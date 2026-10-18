@@ -20,7 +20,10 @@ struct EffectScriptActor {
     u8 unknown4EB[0x775];
     u32 scripts[1];
 };
-struct EffectScriptArgs { u32 count; s32 *values; };
+struct EffectScriptArgs {
+    u32 count;
+    s32 *values;
+};
 extern u32 gUnk_02000560;
 s32 Player_IsSlotInActionTwelveOrThirtyEight(s32);
 void Script_Call(u32, struct EffectScriptArgs *);

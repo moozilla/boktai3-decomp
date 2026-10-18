@@ -6,9 +6,11 @@ struct CompactSpriteSlot {
     u8 active;
     u8 pad05[0x3f];
     u32 state;
-    
 };
-struct CompactSpritePair { u8 pad00[0x18]; struct CompactSpriteSlot slots[2]; };
+struct CompactSpritePair {
+    u8 pad00[0x18];
+    struct CompactSpriteSlot slots[2];
+};
 extern struct CompactSpritePair *gUnk_020004D8;
 void Sprite_Remove(void *);
 void SpritePair_RemoveSlot(u32 index)

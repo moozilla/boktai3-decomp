@@ -1,4 +1,4 @@
-#define gScriptRecordTable        gUnk_02000208
+#define gScriptRecordTable gUnk_02000208
 #include "global.h"
 struct ScriptModifier {
     s8 id;

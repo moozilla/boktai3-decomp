@@ -1,5 +1,7 @@
 #include "global.h"
-struct SceneMenuDisplayElement { u8 bytes[0x60]; };
+struct SceneMenuDisplayElement {
+    u8 bytes[0x60];
+};
 struct SceneMenuDisplay {
     u8 pad0[0x20];
     struct SceneMenuDisplayElement elements[7];
@@ -34,10 +36,11 @@ void SceneMenu_InitializeDisplay(struct SceneMenuDisplay *p)
         i++;
     } while (i <= 5);
     {
-    u8 clear = 0;
-    p->elements[2].bytes[0x1A] = clear;
-    p->elements[3].bytes[0x1A] = clear;
-    sub_0821983C(&p->elements[6], p->auxiliaryResource, p->animations[6], 0x10, clear, clear, clear, (void *)clear);
-    p->auxiliarySelection |= -1;
+        u8 clear = 0;
+        p->elements[2].bytes[0x1A] = clear;
+        p->elements[3].bytes[0x1A] = clear;
+        sub_0821983C(&p->elements[6], p->auxiliaryResource, p->animations[6], 0x10, clear, clear,
+                     clear, (void *)clear);
+        p->auxiliarySelection |= -1;
     }
 }

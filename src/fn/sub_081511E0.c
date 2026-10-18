@@ -1,5 +1,5 @@
-#define Player_LaunchDirectionalEffect DirectionalSpriteEffect_LaunchFromFacing
-#define Player_ResetDefaultAction PlayerCue_EnterStandUpdate
+#define Player_LaunchDirectionalEffect     DirectionalSpriteEffect_LaunchFromFacing
+#define Player_ResetDefaultAction          PlayerCue_EnterStandUpdate
 #define Player_ConsumePendingActionTrigger PlayerCue_CompleteAction
 #include "global.h"
 #include "player.h"
@@ -36,7 +36,8 @@ void Player_UpdateFourPhaseAction(struct Player *p)
                     Sound_PlaySong(0x38B);
                 p->tetherFrame++;
             }
-            result = Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x17), speed, 1);
+            result =
+                Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x17), speed, 1);
             if (p->actionMode == 1 && p->actionCueFlags == 2 && !p->actionCueCounter)
                 DirectionalSpriteEffect_LaunchFromFacing(p, p->facing, &p->position);
             if (result)

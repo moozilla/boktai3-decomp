@@ -9,7 +9,10 @@ struct SceneActorExtendedControlContext {
     u8 fieldED1;
 };
 void Axe_SetAuxiliarySpriteRenderState(struct SceneActorRegistryResetView *, void *, u32);
-static inline u16 Mask16(u16 *p, u32 m) { return *p & m; }
+static inline u16 Mask16(u16 *p, u32 m)
+{
+    return *p & m;
+}
 void SceneActorControl_EndExtendedPhase(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorExtendedControlContext *context = actor->context;

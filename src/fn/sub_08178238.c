@@ -1,5 +1,5 @@
 #include "global.h"
-#define gHudManager                gUnk_02000214
+#define gHudManager gUnk_02000214
 struct HudManager {
     u8 pad0[0xA5E];
     u8 mode;

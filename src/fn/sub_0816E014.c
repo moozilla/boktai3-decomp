@@ -15,7 +15,8 @@ struct InventoryGrid {
 };
 s32 Div(s32, s32);
 void sub_08217EEC(void *, void *, u32);
-void InventoryGrid_ShowNumber(struct InventoryGrid *s, s32 value, struct InventoryNumberPosition *origin)
+void InventoryGrid_ShowNumber(struct InventoryGrid *s, s32 value,
+                              struct InventoryNumberPosition *origin)
 {
     s32 digits[4];
     s32 first, i, remainder;

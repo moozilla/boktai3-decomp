@@ -1,4 +1,4 @@
-#define gPanelSpritePool     gUnk_020004BC
+#define gPanelSpritePool gUnk_020004BC
 #include "global.h"
 struct PanelSprite {
     u8 data[0x1C];

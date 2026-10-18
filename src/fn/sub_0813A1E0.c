@@ -17,7 +17,8 @@ s32 PairCallbackPool_Update(struct PairCallbackPool *p)
     for (i = 0; i < 2; i++) {
         if (p->entries[i].active) {
             void *callback = p->entries[i].callback;
-            if (callback) sub_08249240(&p->entries[i], i * 0xdc, callback);
+            if (callback)
+                sub_08249240(&p->entries[i], i * 0xdc, callback);
         }
     }
     p->frame++;

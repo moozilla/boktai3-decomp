@@ -1,5 +1,5 @@
-#define Player_SetActionEntry Player_SetWeaponInstance
-#define gPlayerActionDescriptors     gUnk_08E6092C
+#define Player_SetActionEntry    Player_SetWeaponInstance
+#define gPlayerActionDescriptors gUnk_08E6092C
 #include "global.h"
 #include "player.h"
 #include "scene_input_compare.h"
@@ -41,6 +41,6 @@ void Player_BeginDescriptorAction(struct Player *p, u32 entry)
     if (p->tetherMode == 3)
         ActorSequence_Begin(p, 0, 0);
     if (p->statModifierContext.actionKind != 0x30)
-        VariantSprite_SelectAnimation(p->actionDisplay,
-                     gUnk_08E6092C[p->statModifierContext.actionKind].displaySelection);
+        VariantSprite_SelectAnimation(
+            p->actionDisplay, gUnk_08E6092C[p->statModifierContext.actionKind].displaySelection);
 }

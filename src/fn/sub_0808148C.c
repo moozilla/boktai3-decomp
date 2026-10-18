@@ -102,8 +102,8 @@ void SceneActorReaction_PlayStaggerBurst(struct SceneActorRegistryResetView *inp
             index *= 2;
             mode = *(const u16 *)((u32)gUnk_0203B400 + index) & randomMask;
             mode += 1;
-            SparkParticle_Spawn(&actor->position, mode, &range.position, actor->direction + 128, 10, 6, 2,
-                         2);
+            SparkParticle_Spawn(&actor->position, mode, &range.position, actor->direction + 128, 10,
+                                6, 2, 2);
         }
     }
     if (!actor->drawableKind) {

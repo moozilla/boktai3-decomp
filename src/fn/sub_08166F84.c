@@ -24,7 +24,8 @@ static inline void HideSelected(struct InventoryPanel *p, s32 x, s32 y)
     } while (--i >= 0);
     SceneHud_FillDigitCells(3, x, y, 0);
 }
-s32 InventoryPanel_UpdateSelectedEquipment(struct InventoryPanel *p, s32 x, s32 y, s32 query, s32 position)
+s32 InventoryPanel_UpdateSelectedEquipment(struct InventoryPanel *p, s32 x, s32 y, s32 query,
+                                           s32 position)
 {
     s32 value;
     s32 kind = InventoryPanel_CreateEntry(&value, position, (s16)gUnk_02000710->unk50, 1, 0);

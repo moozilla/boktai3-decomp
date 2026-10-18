@@ -1,5 +1,5 @@
 #define PauseMenu_SetCallback Hud_SetInteractionCallback
-#define gPauseMenuKeys gUnk_03005260
+#define gPauseMenuKeys        gUnk_03005260
 #include "global.h"
 struct PauseMenuConfig {
     u8 unknown0[0x64];
@@ -36,7 +36,8 @@ void PauseMenu_UpdateConfigChoice(struct PauseMenuConfig *s)
         MenuSelection_RefreshAllOptionText(s);
         Hud_SetInteractionCallback(s, SelectionPanel_ConfirmSettings, 0);
     } else {
-        if (sub_08175C40(s)) sub_0817597C(s, 1);
+        if (sub_08175C40(s))
+            sub_0817597C(s, 1);
         Anim_Step(s->animation, s->animationData);
     }
 }

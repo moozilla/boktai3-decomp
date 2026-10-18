@@ -1,6 +1,6 @@
-#define SceneHud_SetWidgetFlags PauseMenu_AddSpriteFlags
+#define SceneHud_SetWidgetFlags    PauseMenu_AddSpriteFlags
 #define SceneHud_SetWidgetKeyframe PauseMenu_LoadSpriteKeyframe
-#define gSceneInputKeyState         gUnk_03005260
+#define gSceneInputKeyState        gUnk_03005260
 #include "global.h"
 #include "scene_hud_display.h"
 void PauseMenu_AddSpriteFlags(void *, s32, s32);

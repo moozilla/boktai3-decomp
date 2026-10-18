@@ -1,4 +1,4 @@
-#define InventoryGrid_GetItemId Inventory_GetQuantityByStorage
+#define InventoryGrid_GetItemId        Inventory_GetQuantityByStorage
 #define InventoryGrid_SetPhaseCallback Hud_SetInteractionCallback
 #include "global.h"
 struct InventoryGridElement {
@@ -43,8 +43,8 @@ void InventoryGrid_BeginIconTransfer(u8 *s)
     to.z = 0;
     result = sub_0822D604(Inventory_GetQuantityByStorage(s[0x4860], *kind));
     later = *kind + 10;
-    SceneHud_BeginIconMotion(s, 0, result, ((struct InventoryGrid *)s)->elements[later].value32, &from, &to, 24,
-                 16);
+    SceneHud_BeginIconMotion(s, 0, result, ((struct InventoryGrid *)s)->elements[later].value32,
+                             &from, &to, 24, 16);
     Sound_PlaySong(0x38A);
     Hud_SetInteractionCallback(s, InventoryGrid_BeginNumberPhaseAlternate, 1);
 }

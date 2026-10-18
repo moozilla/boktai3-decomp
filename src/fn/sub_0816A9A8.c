@@ -1,5 +1,5 @@
 #include "global.h"
-#define MenuPrompt_SetPhase Hud_SetUpdateCallback
+#define MenuPrompt_SetPhase         Hud_SetUpdateCallback
 #define MenuPrompt_SetDisplayLevels Hud_InitSelectionBounds
 struct MenuPrompt {
     u8 unk0[0xC4];

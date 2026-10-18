@@ -14,7 +14,10 @@ static inline u8 TestFlag(u32 mask, u32 *flags)
         return 1;
     return 0;
 }
-static inline u32 MaskFlags(u16 *p, u32 mask) { return *p & mask; }
+static inline u32 MaskFlags(u16 *p, u32 mask)
+{
+    return *p & mask;
+}
 s32 SceneActorControl_AdvanceReactionCount(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorReactionCountContext *context = actor->context;

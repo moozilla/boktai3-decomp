@@ -1,5 +1,5 @@
-#define SceneHud_BeginControlPhase Hud_SetUpdateCallback
-#define SceneHud_SetPulseHighlight Hud_DrawHealthMeter
+#define SceneHud_BeginControlPhase       Hud_SetUpdateCallback
+#define SceneHud_SetPulseHighlight       Hud_DrawHealthMeter
 #define ScenePanel_ToggleAuxiliaryOption WirelessGame_ToggleItemMode
 #include "global.h"
 #include "scene_hud_display.h"

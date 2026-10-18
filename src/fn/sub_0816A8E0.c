@@ -1,4 +1,4 @@
-#define gPanelKeys                gUnk_03005260
+#define gPanelKeys gUnk_03005260
 #include "global.h"
 #include "game_state.h"
 struct PanelAccount {

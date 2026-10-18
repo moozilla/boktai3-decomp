@@ -8,7 +8,10 @@ struct FadingSprite {
     u16 blinkAge;
     u8 resetBlink;
 };
-struct FadingSpritePool { u8 unknown00[0x38]; u32 used; };
+struct FadingSpritePool {
+    u8 unknown00[0x38];
+    u32 used;
+};
 extern struct FadingSpritePool *gUnk_02000174;
 u8 Sprite_BlinkUntilExpired(void *, u32, s32, s32);
 void Sprite_Remove(void *);

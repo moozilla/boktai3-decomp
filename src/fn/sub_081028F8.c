@@ -1,4 +1,4 @@
-#define gNamedObjectManager             gUnk_020001AC
+#define gNamedObjectManager gUnk_020001AC
 #include "global.h"
 struct NamedObject {
     u8 pad0[0xB8];

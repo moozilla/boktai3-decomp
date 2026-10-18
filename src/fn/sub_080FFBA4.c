@@ -30,12 +30,12 @@ void WoodenCrate_UpdatePaletteTimers(struct WoodenCrate *crate)
         --bytes[0xCD];
     } else {
         switch (*(s16 *)(bytes + 0xCA)) {
-        case 1:
-            AnimData_SelectPaletteBank(crate->drawable, 0x1A0);
-            break;
-        case 0:
-            AnimData_SelectPaletteBank(crate->drawable, 0x1A1);
-            break;
+            case 1:
+                AnimData_SelectPaletteBank(crate->drawable, 0x1A0);
+                break;
+            case 0:
+                AnimData_SelectPaletteBank(crate->drawable, 0x1A1);
+                break;
         }
     }
 }

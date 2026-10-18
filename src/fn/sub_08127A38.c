@@ -21,13 +21,16 @@ void TimedSprite_BlinkAndRemove(struct TimedSpritePool *pool, struct TimedSprite
         rate = 2;
         if (copy->age <= 50) {
             rate = 0;
-            if (copy->age > 30) rate = 1;
+            if (copy->age > 30)
+                rate = 1;
         }
         if (Mod(copy->age, gUnk_08610780[rate]) == 0) {
             u32 flags = sprite->flags;
             u32 bit = 1;
-            if (flags & bit) flags &= ~1;
-            else flags |= bit;
+            if (flags & bit)
+                flags &= ~1;
+            else
+                flags |= bit;
             sprite->flags = flags;
         }
         if (copy->age > 70) {

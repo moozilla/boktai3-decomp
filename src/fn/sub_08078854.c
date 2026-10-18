@@ -1,8 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_behavior.h"
 void sub_0821FF8C(struct SceneActorBehaviorContactView *, struct SceneActorBehaviorContactView *);
-void SceneActor_SetContactReactionDirection(struct SceneActorBehaviorView *, struct SceneActorBehaviorContactView *,
-                  struct SceneActorBehaviorContactView *);
+void SceneActor_SetContactReactionDirection(struct SceneActorBehaviorView *,
+                                            struct SceneActorBehaviorContactView *,
+                                            struct SceneActorBehaviorContactView *);
 void PlayerStats_AddContactHundredths(struct SceneActorBehaviorContactView *, void *, u32);
 static inline u32 Unavailable(struct SceneActorBehaviorView *actor)
 {

@@ -25,7 +25,8 @@ void SceneHud_BeginSelectedActionTransfer(struct SceneHudState *s)
     to.z = 0;
     keyframe = sub_0822D604(SceneHud_FindCategoryAction(s->actionCategory, *selection));
     later = *selection + 10;
-    SceneHud_BeginIconMotion(s, 0, keyframe, s->categoryWidgets[later].paletteBank, &from, &to, 24, 16);
+    SceneHud_BeginIconMotion(s, 0, keyframe, s->categoryWidgets[later].paletteBank, &from, &to, 24,
+                             16);
     Sound_PlaySong(0x38a);
     Hud_SetInteractionCallback(s, InventoryGrid_BeginNumberPhase, 1);
 }

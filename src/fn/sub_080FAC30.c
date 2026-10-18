@@ -1,4 +1,4 @@
-#define gSceneHeightState gUnk_02000580
+#define gSceneHeightState   gUnk_02000580
 #define gHoverAnimationData gUnk_0824E318
 #include "global.h"
 #include "scene_actor_reset.h"

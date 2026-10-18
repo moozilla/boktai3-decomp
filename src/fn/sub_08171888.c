@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_hud_display.h"
 #include "game_state.h"
-#define gStatTransferProfiles       gUnk_08E60F80
+#define gStatTransferProfiles gUnk_08E60F80
 struct StatTransferProfile {
     u8 data[16];
 };
@@ -27,14 +27,14 @@ void SceneHud_TickStatTransfer(struct SceneHudState *p)
         Sound_PlaySong(0x38A);
     if (++p->actionTransferDelay < 12) {
         PauseMenu_SmoothPoint(&p->motionWidgets[0].position, &p->actionTargets[0],
-                     12 - p->actionTransferDelay);
+                              12 - p->actionTransferDelay);
     } else {
         s32 zero;
         p->motionWidgets[0].flags |= 1;
         Sound_PlaySong(0x10C);
         GameState_EquipConsumableSlot(p->actionSelection);
-        Player_RefreshEquipmentWithOptions(p->actionOwner, &gUnk_08E60F80[p->comparisonProfiles[gUnk_02000710->party[0]]],
-                     -1);
+        Player_RefreshEquipmentWithOptions(
+            p->actionOwner, &gUnk_08E60F80[p->comparisonProfiles[gUnk_02000710->party[0]]], -1);
         Hud_SetInteractionCallback(p, sub_081716B4, 1);
         sub_08171258(p);
         sub_08170D78(p);

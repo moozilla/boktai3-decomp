@@ -10,8 +10,9 @@ struct E7BCObject {
 extern void *gUnk_02000204;
 void *RegistryE7BC_CreateManager(void);
 struct E7BCObject *RegistryE7BC_FindFreeObject(void *);
-void SpatialIndex_InitEntry(struct E7BCObject *, struct PackedVec *, struct PackedVec *, struct PackedVec *,
-                  s32, s32, s32, s32, s32, void (*)(void), struct E7BCObject *);
+void SpatialIndex_InitEntry(struct E7BCObject *, struct PackedVec *, struct PackedVec *,
+                            struct PackedVec *, s32, s32, s32, s32, s32, void (*)(void),
+                            struct E7BCObject *);
 void SpatialIndex_InsertEntry(struct E7BCObject *);
 void RegistryE7BC_OnObjectComplete(void);
 static inline s32 optionalValue(void)

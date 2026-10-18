@@ -1,6 +1,6 @@
 #include "global.h"
-#define gRandomIndex                    gUnk_03005308
-#define gRandomTable                    gUnk_0203B400
+#define gRandomIndex gUnk_03005308
+#define gRandomTable gUnk_0203B400
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);

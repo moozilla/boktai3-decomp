@@ -1,5 +1,5 @@
 #include "global.h"
-#define gActorManager        gUnk_0200020C
+#define gActorManager gUnk_0200020C
 struct ManagedActor {
     u8 unknown0[0x56C];
     u8 contact[0x8C];

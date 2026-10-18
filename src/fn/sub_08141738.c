@@ -1,4 +1,4 @@
-#define gDirectionSineTable                 gUnk_086149C4
+#define gDirectionSineTable gUnk_086149C4
 #include "global.h"
 #include "player.h"
 extern const s16 gUnk_086149C4[];

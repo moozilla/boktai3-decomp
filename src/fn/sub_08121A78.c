@@ -24,7 +24,8 @@ s32 ActionGroup_RunSelectedCallbacks(struct ActionGroup *group)
     s32 i;
     for (i = 0; i < 4; i++) {
         if (ActionGroup_IsSelected(group, i)) {
-            struct ActionGroupEntry *entry = (struct ActionGroupEntry *)(i * sizeof(*entries) + (u32)entries);
+            struct ActionGroupEntry *entry =
+                (struct ActionGroupEntry *)(i * sizeof(*entries) + (u32)entries);
             sub_08249240(group, entry, gUnk_086106C8[entry->kind]);
         }
     }

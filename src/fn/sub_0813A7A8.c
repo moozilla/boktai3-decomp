@@ -1,4 +1,4 @@
-#define gCompactSpritePool           gUnk_020004D8
+#define gCompactSpritePool gUnk_020004D8
 #include "global.h"
 struct CompactSpriteEntry {
     u8 animData[0x1c];

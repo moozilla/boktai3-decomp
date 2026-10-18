@@ -49,6 +49,7 @@ void MenuTransition_BeginSelectedWidget(u8 *s)
     SceneHud_GetActionIconPosition(v, *kind);
     result = sub_0822D604(Inventory_GetQuantityByStorage(s[0x4860], *kind));
     later = (*kind) + 10;
-    SceneHud_BeginIconMotion(s, 0, result, ((struct MenuTransitionView *)s)->elems[later].v, v, &w, 0x18, 0x10);
+    SceneHud_BeginIconMotion(s, 0, result, ((struct MenuTransitionView *)s)->elems[later].v, v, &w,
+                             0x18, 0x10);
     Hud_SetInteractionCallback(s, SceneMenuPanel_FinishMotionDelay, 1);
 }

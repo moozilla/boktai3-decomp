@@ -1,4 +1,4 @@
-#define SceneItem_GetSlotItem Inventory_GetItemId
+#define SceneItem_GetSlotItem   Inventory_GetItemId
 #define SceneHud_TickIconMotion PauseMenu_UpdateSpriteMotion
 #include "global.h"
 #include "scene_hud_display.h"

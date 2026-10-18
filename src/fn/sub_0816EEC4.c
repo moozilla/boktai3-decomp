@@ -1,6 +1,6 @@
-#define SceneMenuPanel_UpdateMotion PauseMenu_UpdateSpriteMotion
+#define SceneMenuPanel_UpdateMotion           PauseMenu_UpdateSpriteMotion
 #define SceneMenuPanel_StartPaletteTransition PauseMenu_StartPaletteTransition
-#define SceneMenuPanel_SetCallback Hud_SetInteractionCallback
+#define SceneMenuPanel_SetCallback            Hud_SetInteractionCallback
 #include "global.h"
 struct SceneMenuPanel {
     u8 unknown0[0xA4E];
@@ -24,7 +24,8 @@ void SceneMenuPanel_FinishResultMotion(struct SceneMenuPanel *panel)
             u16 palette;
             panel->widgetFlags |= 1;
             palette = 366;
-            SceneMenuPanel_StartPaletteTransition(panel, palette, PlayerPanel_GetStatusValue(panel), 16);
+            SceneMenuPanel_StartPaletteTransition(panel, palette, PlayerPanel_GetStatusValue(panel),
+                                                  16);
             Sound_PlaySong(269);
             if (panel->result == 0)
                 SceneMenuPanel_SetCallback(panel, MenuTransition_UpdateWidgetFlicker, 1);

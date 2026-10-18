@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_pool.h"
-#define Packet_Send SceneMessages_Send
-#define gMessagePacket        gUnk_020001F0
+#define Packet_Send    SceneMessages_Send
+#define gMessagePacket gUnk_020001F0
 struct Packet {
     u16 id;
     u8 kind, zero;

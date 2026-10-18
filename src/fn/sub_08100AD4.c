@@ -1,4 +1,4 @@
-#define gNamedObjectManager gUnk_020001AC
+#define gNamedObjectManager       gUnk_020001AC
 #define gNamedObjectContactBounds gUnk_086064B4
 #include "global.h"
 #include "contact_actor.h"
@@ -16,10 +16,12 @@ extern struct NamedObjectContactPool *gUnk_020001AC;
 extern const struct ContactPosition gUnk_086064B4;
 static inline u8 IsActive(u32 *mask, s32 i)
 {
-    if (*mask & (1 << i)) return TRUE;
+    if (*mask & (1 << i))
+        return TRUE;
     return FALSE;
 }
-static inline void Difference(struct ContactPosition *d, const struct ContactPosition *a, const struct ContactPosition *b)
+static inline void Difference(struct ContactPosition *d, const struct ContactPosition *a,
+                              const struct ContactPosition *b)
 {
     d->x = a->x - b->x;
     d->y = a->y - b->y;
@@ -30,22 +32,23 @@ struct NamedObjectContactSlot *NamedObject_FindNearPosition(const struct Contact
     struct NamedObjectContactPool *pool = gUnk_020001AC;
     struct ContactPosition delta;
     s32 i;
-    if (!pool) return NULL;
-    if (!pool->activeMask) return NULL;
+    if (!pool)
+        return NULL;
+    if (!pool->activeMask)
+        return NULL;
     goto search;
 found:
     return &pool->slots[i];
-search:
-    {
-        for (i = 0; i < 12; i++) {
-            if (IsActive(&pool->activeMask, i)) {
-                Difference(&delta, position, &pool->slots[i].position);
-                if (delta.x <= gUnk_086064B4.x && delta.x >= -gUnk_086064B4.x
-                    && delta.y <= gUnk_086064B4.y && delta.y >= -gUnk_086064B4.y
-                    && delta.z <= gUnk_086064B4.z && delta.z >= -gUnk_086064B4.z)
-                    goto found;
-            }
+search: {
+    for (i = 0; i < 12; i++) {
+        if (IsActive(&pool->activeMask, i)) {
+            Difference(&delta, position, &pool->slots[i].position);
+            if (delta.x <= gUnk_086064B4.x && delta.x >= -gUnk_086064B4.x &&
+                delta.y <= gUnk_086064B4.y && delta.y >= -gUnk_086064B4.y &&
+                delta.z <= gUnk_086064B4.z && delta.z >= -gUnk_086064B4.z)
+                goto found;
         }
     }
+}
     return NULL;
 }

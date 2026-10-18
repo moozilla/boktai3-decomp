@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene_vec.h"
-#define gTileTriggerManager   gUnk_020001B8
+#define gTileTriggerManager gUnk_020001B8
 struct TileTrigger {
     u32 flags;
     u8 unknown4[0x70];

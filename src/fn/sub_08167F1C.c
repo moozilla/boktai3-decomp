@@ -1,4 +1,4 @@
-#define gSpriteTileBase          gUnk_030042E4
+#define gSpriteTileBase gUnk_030042E4
 #include "global.h"
 
 /* HUD interpretation and descriptive names are tentative. */

@@ -6,18 +6,18 @@ struct SceneActorVisualEffects {
     u32 mode;
     u8 unknown20[0x10];
     u16 position[3];
-    u8 unknown36[0x10C-0x36];
+    u8 unknown36[0x10C - 0x36];
     u16 alternatePosition[3];
-    u8 unknown112[0x457-0x112];
+    u8 unknown112[0x457 - 0x112];
     u8 state;
-    u8 unknown458[0x6F0-0x458];
+    u8 unknown458[0x6F0 - 0x458];
     u16 effectPosition[3];
     u8 unknown6F6[2];
     u16 effectOffset[3];
-    u8 unknown6FE[0x7FC-0x6FE];
-    u8 callbackContext[0x864-0x7FC];
+    u8 unknown6FE[0x7FC - 0x6FE];
+    u8 callbackContext[0x864 - 0x7FC];
     void *callback;
-    u8 unknown868[0xB04-0x868];
+    u8 unknown868[0xB04 - 0x868];
     void *attachment;
     u8 attachmentKind;
     u8 unknownB09;
@@ -58,8 +58,8 @@ void SceneActor_UpdateVisualEffects(struct SceneActorVisualEffects *p)
     }
     if (p->attachmentDelay) {
         if (--p->attachmentDelay == 0)
-            p->attachment = ActorAttachment_UpdateFromDescriptor(p->attachment, (u8 *)p + 0x24,
-                                       p->attachmentKind, 127, 0, 0, 0, 80);
+            p->attachment = ActorAttachment_UpdateFromDescriptor(
+                p->attachment, (u8 *)p + 0x24, p->attachmentKind, 127, 0, 0, 0, 80);
     }
     if (p->state == 38 || p->state == 12) {
         p->effectPosition[0] = p->alternatePosition[0] + p->effectOffset[0];

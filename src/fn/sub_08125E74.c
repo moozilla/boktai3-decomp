@@ -17,7 +17,8 @@ extern struct EffectSlotPool *gUnk_02000150;
 void Effect_Remove(void *);
 void EffectSlot_Release(void *unused, struct EffectSlot *slot)
 {
-    if (slot->entered) slot->entered = 0;
+    if (slot->entered)
+        slot->entered = 0;
     {
         struct EffectSlotPool *pool = gUnk_02000150;
         s32 index = slot->index;

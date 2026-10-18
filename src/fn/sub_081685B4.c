@@ -1,5 +1,5 @@
 #define SceneHud_IsSecondaryEntryEnabled PauseMenu_GetSelectedListEntryType
-#define SceneHud_TestOwnerModeGate PauseMenu_IsEquipmentSelectionEnabled
+#define SceneHud_TestOwnerModeGate       PauseMenu_IsEquipmentSelectionEnabled
 #include "global.h"
 #include "scene_hud_display.h"
 s32 PauseMenu_IsEquipmentSelectionEnabled(struct SceneHudState *);

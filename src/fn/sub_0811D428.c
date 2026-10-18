@@ -6,8 +6,8 @@ struct SceneActorStyle {
     s16 initialHalfword, currentHalfword;
     u32 initialWord, currentWord;
 };
-void SceneActorStyle_Initialize(struct SceneActorStyle *s, s32 a, s32 b, s32 c, s32 e, s32 d, s32 f, s32 halfword,
-                  u32 word)
+void SceneActorStyle_Initialize(struct SceneActorStyle *s, s32 a, s32 b, s32 c, s32 e, s32 d, s32 f,
+                                s32 halfword, u32 word)
 {
     s32 i;
     u8 *entry;

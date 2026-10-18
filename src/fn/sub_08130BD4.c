@@ -29,6 +29,7 @@ void SceneActorRoute_UpdateTimedPhase(struct SceneActorRegistryResetView *actor)
     }
     if (*(s16 *)(block + 0x1F2) > 0)
         --*(u16 *)(block + 0x1F2);
-    if (!(u8)Callback_InvokeActor(actor, actor->update26C) && actor->field2B0 && TestFlags(actor, 0x400000))
+    if (!(u8)Callback_InvokeActor(actor, actor->update26C) && actor->field2B0 &&
+        TestFlags(actor, 0x400000))
         SceneActorRoute_AdvanceActorPoint(actor, route);
 }

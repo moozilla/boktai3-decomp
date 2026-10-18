@@ -20,8 +20,8 @@ s32 InventoryPanel_CreateEntry(void **out, s32 position, s32 index, s32 slotMode
                       1;
         } else {
             kind = 0;
-            equipment =
-                Inventory_GetEquipmentEntry(((struct GameState *)((u8 *)gUnk_02000710 + index * 2))->inventory[0]);
+            equipment = Inventory_GetEquipmentEntry(
+                ((struct GameState *)((u8 *)gUnk_02000710 + index * 2))->inventory[0]);
             ActionRecord_CopyFromEntry(equipment, data);
         }
     } else if (kind == 4) {

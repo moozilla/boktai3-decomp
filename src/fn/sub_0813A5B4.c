@@ -11,7 +11,10 @@ struct SpritePairSlot {
     u16 timer;
     u8 padD2[0xa];
 };
-struct SpritePair { u8 pad00[0x18]; struct SpritePairSlot slots[2]; };
+struct SpritePair {
+    u8 pad00[0x18];
+    struct SpritePairSlot slots[2];
+};
 extern struct SpritePair *gUnk_020004D4;
 void Sprite_Remove(void *);
 void SpritePair_ReleaseSlot(u32 index, u32 remove)

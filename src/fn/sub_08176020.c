@@ -1,5 +1,5 @@
 #define PauseMenu_SetCallback Hud_SetInteractionCallback
-#define gPauseMenuKeys gUnk_03005260
+#define gPauseMenuKeys        gUnk_03005260
 #include "global.h"
 struct PauseMenuSleep {
     u8 unknown0[0x5C];

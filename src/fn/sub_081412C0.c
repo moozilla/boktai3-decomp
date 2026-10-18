@@ -6,13 +6,16 @@ static inline u8 Player_IsInModeSeven(struct Player *p)
 {
     u32 active = p->active;
     u32 result = 0;
-    if (active && p->sceneMode == 7) result = 1;
+    if (active && p->sceneMode == 7)
+        result = 1;
     return result;
 }
 void Player_AccumulateAction(struct Player *p, s32 amount)
 {
-    if (p->actionAccumulatorBlocked) return;
-    if (p && Player_IsInModeSeven(p)) return;
+    if (p->actionAccumulatorBlocked)
+        return;
+    if (p && Player_IsInModeSeven(p))
+        return;
     p->actionAccumulator += amount + 2;
     if (p->actionAccumulator > 99) {
         Player_EmitPeriodicEffect(p);

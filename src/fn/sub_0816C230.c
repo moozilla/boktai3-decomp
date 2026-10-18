@@ -1,5 +1,5 @@
 /* Provisional names and object interpretation; offsets follow static accesses. */
-#define MapMenu_IsAreaUnlocked GameState_GetMapRevealFlag
+#define MapMenu_IsAreaUnlocked   GameState_GetMapRevealFlag
 #define MapMenu_RefreshSelection MapScreen_RefreshAreaDisplay
 #define gMenuInput               gUnk_03005260
 #include "global.h"

@@ -1,8 +1,8 @@
-#define SpatialIndex_SetCallback Collider_SetContactCallback
-#define SpatialIndex_SetBounds Collider_SetExtents
-#define SpatialIndex_SetOffset Collider_SetOffset
-#define SpatialIndex_SetMask Collider_SetCategory
-#define SpatialIndex_SetKind Collider_SetContactParameter
+#define SpatialIndex_SetCallback     Collider_SetContactCallback
+#define SpatialIndex_SetBounds       Collider_SetExtents
+#define SpatialIndex_SetOffset       Collider_SetOffset
+#define SpatialIndex_SetMask         Collider_SetCategory
+#define SpatialIndex_SetKind         Collider_SetContactParameter
 #define SpatialIndex_DefaultCallback Collider_OnContactDefault
 /* Provisional family and semantic names; inferred from static accesses and callers. */
 #include "global.h"
@@ -24,8 +24,9 @@ void SpatialIndex_SetOffset(struct SpatialEntry *, struct SpatialVector *);
 void SpatialIndex_SetMask(struct SpatialEntry *, u32);
 void SpatialIndex_SetKind(struct SpatialEntry *, u32);
 void SpatialIndex_InitEntry(struct SpatialEntry *entry, struct SpatialVector *position,
-                  struct SpatialVector *bounds, struct SpatialVector *offset, u32 flags, u32 mask,
-                  u32 category, u32 kind, u32 parameter, void (*callback)(void), void *owner)
+                            struct SpatialVector *bounds, struct SpatialVector *offset, u32 flags,
+                            u32 mask, u32 category, u32 kind, u32 parameter, void (*callback)(void),
+                            void *owner)
 {
     entry->bucket = -1;
     if (!callback)

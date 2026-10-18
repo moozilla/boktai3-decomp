@@ -1,5 +1,5 @@
 #define Player_RecalculateStats Player_RefreshStatsAndVitals
-#define gGameState gUnk_02000710
+#define gGameState              gUnk_02000710
 #include "global.h"
 #include "player.h"
 #include "game_state.h"

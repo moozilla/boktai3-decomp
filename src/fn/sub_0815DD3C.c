@@ -4,8 +4,10 @@
 s32 Div(s32, s32);
 static inline s32 ScaleSigned(s32 x)
 {
-    if (x >= 0) x >>= 6;
-    else x = -(-x >> 6);
+    if (x >= 0)
+        x >>= 6;
+    else
+        x = -(-x >> 6);
     return x;
 }
 s32 Player_ScaleLevelValue(u32 flags, s32 scale)

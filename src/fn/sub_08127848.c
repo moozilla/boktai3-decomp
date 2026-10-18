@@ -15,7 +15,8 @@ extern void *gUnk_08610770[];
 s32 sub_08249240(void *, void *, void *);
 static inline u8 Occupied(const u32 *mask, u32 bit)
 {
-    if (*mask & bit) return TRUE;
+    if (*mask & bit)
+        return TRUE;
     return FALSE;
 }
 s32 StateSlotPool_Update(struct StateSlotPool *input)
@@ -33,7 +34,7 @@ s32 StateSlotPool_Update(struct StateSlotPool *input)
                 void **table;
                 i = 0;
                 {
-                    u16 usedOffset = (u32)&((struct StateSlotPool *)0)->used;
+                    u16 usedOffset = (u32) & ((struct StateSlotPool *)0)->used;
                     used = (void *)((u32)slots + usedOffset - 0x18);
                 }
                 table = gUnk_08610770;

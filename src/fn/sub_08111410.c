@@ -16,9 +16,8 @@ void PaletteFade_AdvanceColors(struct PaletteFade *p)
         p->red[p->slot][i] += p->deltaR[p->slot][i];
         p->green[p->slot][i] += p->deltaG[p->slot][i];
         p->blue[p->slot][i] += p->deltaB[p->slot][i];
-        gUnk_03004FC0[p->slot][i] =
-            (p->red[p->slot][i] >> 24) |
-            ((p->green[p->slot][i] >> 24) << 5) |
-            ((p->blue[p->slot][i] >> 24) << 10);
+        gUnk_03004FC0[p->slot][i] = (p->red[p->slot][i] >> 24) |
+                                    ((p->green[p->slot][i] >> 24) << 5) |
+                                    ((p->blue[p->slot][i] >> 24) << 10);
     }
 }

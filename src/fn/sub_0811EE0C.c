@@ -6,7 +6,10 @@ struct CallbackDispatch {
     u8 valueBase;
     u8 dispatchState;
 };
-struct CallbackList { u8 pad0[0xb0]; struct CallbackDispatch control; };
+struct CallbackList {
+    u8 pad0[0xb0];
+    struct CallbackDispatch control;
+};
 void TimedSpriteEffect_RequestStop(u32);
 void Modifier_UpdateIdleDrain(void);
 void CallbackList_ResetDispatch(struct CallbackList *list)

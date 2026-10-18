@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene_hud_display.h"
-#define gSceneInputKeys             gUnk_03005260
+#define gSceneInputKeys gUnk_03005260
 void Hud_InitSelectionBounds(u32, u32);
 void SceneHud_DrawSelectedClock(void *);
 void PauseMenu_UpdateHighlightPalette(void *);

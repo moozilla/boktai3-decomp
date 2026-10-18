@@ -8,9 +8,18 @@ struct SceneActorControl2AContext {
     u8 unknownEC0[6];
     u16 fieldEC6;
 };
-static inline void Or16(u32 m, u16 *p) { *p = m | *p; }
-static inline void Or32(u32 m, u32 *p) { *p |= m; }
-static inline u16 Mask16(u16 *p, u32 m) { return *p & m; }
+static inline void Or16(u32 m, u16 *p)
+{
+    *p = m | *p;
+}
+static inline void Or32(u32 m, u32 *p)
+{
+    *p |= m;
+}
+static inline u16 Mask16(u16 *p, u32 m)
+{
+    return *p & m;
+}
 static inline void Restart(struct SceneActorRegistryResetView *actor)
 {
     u8 zero8;

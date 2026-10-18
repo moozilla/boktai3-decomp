@@ -1,4 +1,4 @@
-#define gGameState               gUnk_02000710
+#define gGameState gUnk_02000710
 #include "global.h"
 #include "player.h"
 /* Byte view preserves the original global-pointer reloads between stores. */

@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene_hud_display.h"
-#define gMenuMode            gUnk_030051D8
+#define gMenuMode gUnk_030051D8
 extern u32 gUnk_030051D8;
 void Hud_InitSelectionBounds(u32, u32);
 s32 MessageWindow_Clear(void);

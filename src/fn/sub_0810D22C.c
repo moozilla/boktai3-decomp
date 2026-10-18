@@ -7,11 +7,11 @@ struct PanelTransition {
 };
 void Task_Kill(void *);
 void Registry1745_SetMenuRequest(u32);
-void ScreenTransition_SendCommand(s32,s32,s32,s32,s32,s32,s32);
+void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 void PanelTransition_UpdateExit(struct PanelTransition *p)
 {
     if (p->entered) {
-        ScreenTransition_SendCommand(3,4,4,4,4,0xFFFF,0);
+        ScreenTransition_SendCommand(3, 4, 4, 4, 4, 0xFFFF, 0);
         p->frame = 0;
         p->entered = 0;
     }

@@ -1,6 +1,6 @@
 #include "global.h"
 #define Link_GetState Registry1745_GetSessionState
-#define gLinkSession                  gUnk_020004B4
+#define gLinkSession  gUnk_020004B4
 struct LinkPanel {
     u8 pad0[0xF50];
     s32 peerIndex;

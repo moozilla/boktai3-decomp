@@ -2,8 +2,8 @@
 #include "scene_actor_behavior.h"
 s32 Math_Atan2(s32, s32);
 void SceneActor_SetContactReactionDirection(struct SceneActorBehaviorView *actor,
-                  struct SceneActorBehaviorContactView *source,
-                  struct SceneActorBehaviorContactView *destination)
+                                            struct SceneActorBehaviorContactView *source,
+                                            struct SceneActorBehaviorContactView *destination)
 {
     struct ContactPosition difference;
     if (source->flags & 0x100) {

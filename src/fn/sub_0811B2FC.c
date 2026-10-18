@@ -1,4 +1,4 @@
-#define gSpatialIndex            gUnk_02000200
+#define gSpatialIndex gUnk_02000200
 /* Provisional family and semantic names; inferred from static accesses and callers. */
 #include "global.h"
 struct SpatialEntry {

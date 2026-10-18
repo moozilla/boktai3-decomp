@@ -1,5 +1,5 @@
 #define SpriteSlots_Create PositionEffectDisplay_Create
-#define gSpriteSlots gUnk_020004C0
+#define gSpriteSlots       gUnk_020004C0
 #include "global.h"
 struct SpriteSlot {
     u32 flags;
@@ -22,7 +22,8 @@ s32 SpriteSlots_AttachSource(void *source)
     s32 i;
     if (!initial) {
         p = PositionEffectDisplay_Create();
-        if (!p) return -1;
+        if (!p)
+            return -1;
     } else {
         p = initial;
     }

@@ -1,5 +1,5 @@
 #define SceneHud_ClearWidgetFlags PauseMenu_ClearSpriteFlags
-#define SceneHud_SetWidgetFlags PauseMenu_AddSpriteFlags
+#define SceneHud_SetWidgetFlags   PauseMenu_AddSpriteFlags
 #include "global.h"
 #include "scene_hud_display.h"
 void SceneHud_RefreshActionIcons(void *);

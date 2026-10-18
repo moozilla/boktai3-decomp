@@ -1,7 +1,8 @@
 #include "scene_arc.h"
 void SceneArc_HandleCollision(void);
 s32 GroundEffect_Initialize(struct SceneGroundEffect *, const struct ScenePoolVec32 *, u32);
-void SpatialIndex_InitEntry(void *, void *, void *, void *, u32, u32, u32, u32, u32, void (*)(void), void *);
+void SpatialIndex_InitEntry(void *, void *, void *, void *, u32, u32, u32, u32, u32, void (*)(void),
+                            void *);
 struct ArcCollisionVector {
     s32 x : 16;
     s32 y : 16;
@@ -27,5 +28,5 @@ void SceneArc_InitializeSlot(struct SceneArcManager *manager, struct SceneArcSlo
     offset.z = 0;
     GroundEffect_Initialize(&slot->ground, &slot->position, 1);
     SpatialIndex_InitEntry(slot->collider, &origin, &extent, &offset, 12, 5, 5, 30, 12,
-                 SceneArc_HandleCollision, slot);
+                           SceneArc_HandleCollision, slot);
 }

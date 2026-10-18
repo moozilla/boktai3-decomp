@@ -7,8 +7,8 @@ struct SpriteBounds {
     struct BoundsHalf a, b;
 };
 void Position_GetHeightAdjustedCoordinates(void *, u32, void *);
-void SpatialIndex_InitEntry(void *, void *, struct SpriteBounds *, struct SpriteBounds *, u32, u32, u32, u32,
-                  u32, u32, u32);
+void SpatialIndex_InitEntry(void *, void *, struct SpriteBounds *, struct SpriteBounds *, u32, u32,
+                            u32, u32, u32, u32, u32);
 void SceneProcParticles_SubmitBounds(u8 *p, u32 y, u32 x, u32 mode)
 {
     u32 pos[2];

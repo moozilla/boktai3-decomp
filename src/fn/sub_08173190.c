@@ -1,6 +1,9 @@
 #include "global.h"
 /* Tentative semantic names; field offsets are established by static accesses. */
-struct MotionSequence { u8 unknown0[0x4388]; u8 selectionA, selectionB, selection; };
+struct MotionSequence {
+    u8 unknown0[0x4388];
+    u8 selectionA, selectionB, selection;
+};
 int SceneHud_UpdateBinaryChoice(void *);
 void Sound_PlaySong(u32);
 void PauseInventory_ReturnToEquipmentSelection(void *);

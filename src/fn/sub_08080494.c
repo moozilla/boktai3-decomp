@@ -3,8 +3,8 @@
 // fuzzy: 98.9%
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
-s32 SparkParticle_Spawn(const struct ContactPosition *, u8, const struct ContactPosition *, s32, s32, s32,
-                 s32, u32);
+s32 SparkParticle_Spawn(const struct ContactPosition *, u8, const struct ContactPosition *, s32,
+                        s32, s32, s32, u32);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
 void sub_0812E714(void *);
 void *sub_081D4F20(u32, u32);
@@ -166,17 +166,17 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
             table = raw;
         }
         SparkParticle_Spawn(&actor->position, (FirstRandom(table) & 3) + 1, rangePointer, 32, 4,
-                     (life = 20), (mode = 2), (flag = 1));
-        SparkParticle_Spawn(&actor->position, (NextRandom(table) & 3) + 1, rangePointer, 64, 4, life, mode,
-                     flag);
-        SparkParticle_Spawn(&actor->position, (NextRandom(table) & 3) + 1, rangePointer, 94, 4, life, mode,
-                     flag);
-        SparkParticle_Spawn(&actor->position, (NextRandom(table) & 3) + 1, rangePointer, 128, 4, life,
-                     mode, flag);
-        SparkParticle_Spawn(&actor->position, (NextRandom(table) & 3) + 1, rangePointer, 196, 4, life,
-                     mode, flag);
-        SparkParticle_Spawn(&actor->position, (NextRandom(table) & 3) + 1, rangePointer, 240, 4, life,
-                     mode, flag);
+                            (life = 20), (mode = 2), (flag = 1));
+        SparkParticle_Spawn(&actor->position, (NextRandom(table) & 3) + 1, rangePointer, 64, 4,
+                            life, mode, flag);
+        SparkParticle_Spawn(&actor->position, (NextRandom(table) & 3) + 1, rangePointer, 94, 4,
+                            life, mode, flag);
+        SparkParticle_Spawn(&actor->position, (NextRandom(table) & 3) + 1, rangePointer, 128, 4,
+                            life, mode, flag);
+        SparkParticle_Spawn(&actor->position, (NextRandom(table) & 3) + 1, rangePointer, 196, 4,
+                            life, mode, flag);
+        SparkParticle_Spawn(&actor->position, (NextRandom(table) & 3) + 1, rangePointer, 240, 4,
+                            life, mode, flag);
     }
     if (actor->category == 4 || actor->category == 1 || actor->category == 5 ||
         actor->category == 7 || actor->category == 6 || actor->category == 24 ||

@@ -1,5 +1,5 @@
 #define SceneActorStyle_CountEntries ModifierMenu_CountAppearanceModifiers
-#define gGameState                              gUnk_02000710
+#define gGameState                   gUnk_02000710
 #include "global.h"
 #include "game_state.h"
 #include "scene_actor_style.h"

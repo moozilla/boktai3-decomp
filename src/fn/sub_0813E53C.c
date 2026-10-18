@@ -1,6 +1,6 @@
-#define Player_AddStatA Player_IncreaseLifeTowardLimit
+#define Player_AddStatA      Player_IncreaseLifeTowardLimit
 #define Player_SubtractStatA Player_SubtractLifeNonlethal
-#define Player_AddStatB Player_AddEnergy
+#define Player_AddStatB      Player_AddEnergy
 #define Player_SubtractStatB Player_SubtractEnergy
 #include "global.h"
 #include "player.h"

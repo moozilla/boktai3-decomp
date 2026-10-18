@@ -1,5 +1,5 @@
 #define SceneSlot_GetOrCreateRegistry ActorMarkerPool_EnsureSingleton
-#define gSceneSlotRegistry gUnk_020004BC
+#define gSceneSlotRegistry            gUnk_020004BC
 #include "global.h"
 struct SceneSlot {
     u32 flags;

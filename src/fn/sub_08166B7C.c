@@ -1,4 +1,4 @@
-#define MenuSelection_SaveCurrent Hud_SaveSecondaryGridSelection
+#define MenuSelection_SaveCurrent      Hud_SaveSecondaryGridSelection
 #define MenuDisplay_IsEntryUnavailable PauseMenu_IsCategoryEntryEmpty
 #include "global.h"
 struct MenuSelection {
@@ -30,57 +30,58 @@ s32 MenuDisplay_UpdateActionPrompt(struct MenuDisplay *p, s32 group)
     if ((u8)(selection->current - 0x20) <= 8) {
         Hud_SaveSecondaryGridSelection(selection);
         special = 1;
-    } else special = 0;
+    } else
+        special = 0;
     switch (selection->saved) {
-    case 0x20:
-        if (special == 1 || PauseMenu_IsCategoryEntryEmpty(p, selection->current, group)) {
-            action = 0;
-        } else if (group == 4) {
-            if (sub_0816D4E4(Inventory_GetQuantityByStorage(p->page, selection->current)))
-                action = 1;
-        } else if (PauseMenu_GetCategoryEntryValue(selection->current, group)) {
-            if (MenuEntries_CountAvailable(p, group) > 1 || group == 3)
-                action = 4;
-        } else {
-            if (group != 2 || sub_0822DCB4(selection->current)) {
-                if (MenuEntries_CountAvailable(p, group) <= 7)
+        case 0x20:
+            if (special == 1 || PauseMenu_IsCategoryEntryEmpty(p, selection->current, group)) {
+                action = 0;
+            } else if (group == 4) {
+                if (sub_0816D4E4(Inventory_GetQuantityByStorage(p->page, selection->current)))
                     action = 1;
+            } else if (PauseMenu_GetCategoryEntryValue(selection->current, group)) {
+                if (MenuEntries_CountAvailable(p, group) > 1 || group == 3)
+                    action = 4;
+            } else {
+                if (group != 2 || sub_0822DCB4(selection->current)) {
+                    if (MenuEntries_CountAvailable(p, group) <= 7)
+                        action = 1;
+                }
             }
-        }
-        break;
-    case 0x26:
-        if (!special)
-            action = 3;
-        break;
-    case 0x28:
-        action = 2;
-        break;
-    case 0x27:
-        action = 5;
-        break;
+            break;
+        case 0x26:
+            if (!special)
+                action = 3;
+            break;
+        case 0x28:
+            action = 2;
+            break;
+        case 0x27:
+            action = 5;
+            break;
     }
     switch (action) {
-    case 1:
-        if (group == 4)
-            result = SceneHud_SetPairedIcons(p, 1, 2);
-        else
-            result = SceneHud_SetPairedIcons(p, 1, 6);
-        break;
-    case 4:
-        result = SceneHud_SetPairedIcons(p, 1, 3);
-        break;
-    case 3:
-        result = SceneHud_SetPairedIcons(p, 1, 4);
-        break;
-    case 0:
-    case 2:
-        result = SceneHud_SetPairedIcons(p, 1, -1);
-        break;
-    case 5:
-        result = SceneHud_SetPairedIcons(p, 1, 5);
-        break;
-    default:
-        result = SceneHud_SetPairedIcons(p, -1, -1);
+        case 1:
+            if (group == 4)
+                result = SceneHud_SetPairedIcons(p, 1, 2);
+            else
+                result = SceneHud_SetPairedIcons(p, 1, 6);
+            break;
+        case 4:
+            result = SceneHud_SetPairedIcons(p, 1, 3);
+            break;
+        case 3:
+            result = SceneHud_SetPairedIcons(p, 1, 4);
+            break;
+        case 0:
+        case 2:
+            result = SceneHud_SetPairedIcons(p, 1, -1);
+            break;
+        case 5:
+            result = SceneHud_SetPairedIcons(p, 1, 5);
+            break;
+        default:
+            result = SceneHud_SetPairedIcons(p, -1, -1);
     }
     return result;
 }

@@ -1,5 +1,7 @@
 #include "global.h"
-struct TransitionResourceHeader { u32 words[8]; };
+struct TransitionResourceHeader {
+    u32 words[8];
+};
 struct PlayerTransition {
     u8 unknown0[0x18];
     u8 *owner;

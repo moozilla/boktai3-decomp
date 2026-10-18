@@ -1,9 +1,12 @@
 #include "global.h"
 #define SceneMenu_SetState Registry1745_SetState
 struct SceneMenu {
-    u8 pad0[0x1A]; volatile u16 count;
-    u8 pad1C[0x14]; u32 timer;
-    u8 pad34[0xA]; u16 flags;
+    u8 pad0[0x1A];
+    volatile u16 count;
+    u8 pad1C[0x14];
+    u32 timer;
+    u8 pad34[0xA];
+    u16 flags;
     u16 *input;
     u32 field44;
     u32 state;
@@ -15,12 +18,14 @@ void ScriptPanel_OpenTextWindow(void);
 void Registry1745_WaitForCompletionFlag(void);
 static inline u16 ReadInput(struct SceneMenu *p, s32 i)
 {
-    if (i < 0) return 0xFFFF;
+    if (i < 0)
+        return 0xFFFF;
     return p->input[i];
 }
 static inline u8 IsAcknowledgement(u32 v, u32 mask)
 {
-    if ((v & mask) == 0x1000) return 1;
+    if ((v & mask) == 0x1000)
+        return 1;
     return 0;
 }
 s32 SceneMenu_WaitForConfirmation(struct SceneMenu *p)

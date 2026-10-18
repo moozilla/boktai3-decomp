@@ -2,16 +2,18 @@
  * and a script callback. Unknown bytes retain their observed offsets. */
 struct CallbackPoolEntry {
     u8 unknown0[0x1c];
-    struct CallbackPoolPosition { s16 x, y, z, unknown6; } position;
-    u8 unknown24[0x44-0x24];
+    struct CallbackPoolPosition {
+        s16 x, y, z, unknown6;
+    } position;
+    u8 unknown24[0x44 - 0x24];
     u16 sprite44;
-    u8 unknown46[0x96-0x46];
+    u8 unknown46[0x96 - 0x46];
     u16 damage;
     u8 unknown98[4];
     u16 hitFlags;
-    u8 unknown9e[0x118-0x9e];
+    u8 unknown9e[0x118 - 0x9e];
     struct CallbackPoolPosition savedPosition;
-    u8 unknown120[0x13c-0x120];
+    u8 unknown120[0x13c - 0x120];
     u32 spawnScript;
     void *healthDisplay;
     u8 unknown144[2];

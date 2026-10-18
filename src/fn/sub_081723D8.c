@@ -1,5 +1,5 @@
 #define GameState_GetActionDescriptionIndex SolarFruit_GetInventorySlot
-#define SceneHud_ClearWidgetFlags PauseMenu_ClearSpriteFlags
+#define SceneHud_ClearWidgetFlags           PauseMenu_ClearSpriteFlags
 #include "global.h"
 #include "scene_hud_display.h"
 #include "scene_inventory_panel.h"

@@ -4,8 +4,9 @@
 void Inventory_GetEquipmentDescriptor(s32, void *);
 s32 Player_CalculateActionStat(struct Player *, struct PlayerStatModifierContext *, s32);
 s32 Player_GetSpecialAttackPower(struct Player *, s32);
-s32 Player_CalculatePreviewActionStat(struct Player *p, s32 bonus, struct PlayerActionConfig *config,
-                 struct PlayerActionEntry *entry, s32 mode)
+s32 Player_CalculatePreviewActionStat(struct Player *p, s32 bonus,
+                                      struct PlayerActionConfig *config,
+                                      struct PlayerActionEntry *entry, s32 mode)
 {
     u8 buffer[32];
     u8 *q = (u8 *)p + 0x32C;

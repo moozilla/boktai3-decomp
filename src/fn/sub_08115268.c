@@ -1,5 +1,5 @@
-#define gParticleRandomIndex                 gUnk_03005304
-#define gParticleRandomValues                gUnk_086141BC
+#define gParticleRandomIndex  gUnk_03005304
+#define gParticleRandomValues gUnk_086141BC
 // Tentative family and semantic names; layouts follow observed field offsets.
 #include "global.h"
 struct ParticleOffset {

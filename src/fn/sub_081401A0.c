@@ -22,9 +22,10 @@ void Player_RefreshActionEquipment(struct Player *p)
         if (*entry >= 0) {
             Player_BeginIndexedAction(p, GameState_GetUnlockEntry(*entry));
             Player_SetWeaponMode(p,
-                         SolarFruit_GetInventorySlot(((struct GameState *)((u8 *)gUnk_02000710 +
-                                                            gUnk_02000710->actionAuxiliarySlot * 2))
-                                          ->slots88[4]));
+                                 SolarFruit_GetInventorySlot(
+                                     ((struct GameState *)((u8 *)gUnk_02000710 +
+                                                           gUnk_02000710->actionAuxiliarySlot * 2))
+                                         ->slots88[4]));
         } else
             Player_BeginDescriptorAction(p, 0);
     }

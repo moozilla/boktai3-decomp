@@ -1,5 +1,5 @@
-#define gSceneInputKeys                gUnk_03005260
-#define gGameState                     gUnk_02000710
+#define gSceneInputKeys gUnk_03005260
+#define gGameState      gUnk_02000710
 #include "global.h"
 s32 MessageWindow_Clear(void);
 s32 MessageWindow_SetBounds(s32, s32, s32, s32);

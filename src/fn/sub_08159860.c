@@ -1,9 +1,10 @@
-#define gPlayerSlots                     gUnk_02000580
+#define gPlayerSlots gUnk_02000580
 #include "global.h"
 #include "player.h"
 #include "contact_actor.h"
 void PlayerStats_AddHundredths(struct Player *, s32);
-void PlayerStats_AddContactHundredths(struct ContactCollider *source, struct ContactCollider *other, s32 amount)
+void PlayerStats_AddContactHundredths(struct ContactCollider *source, struct ContactCollider *other,
+                                      s32 amount)
 {
     struct Player *player = gPlayerSlots[0];
     s32 gain, product;

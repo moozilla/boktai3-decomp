@@ -1,6 +1,6 @@
 #define SceneHud_TestOwnerModeGate PauseMenu_IsEquipmentSelectionEnabled
-#define SceneHud_LoadTertiaryIcon PauseMenu_LoadStatusIconFrame
-#define SceneHud_GetCarouselY PauseMenu_GetEquipmentRowY
+#define SceneHud_LoadTertiaryIcon  PauseMenu_LoadStatusIconFrame
+#define SceneHud_GetCarouselY      PauseMenu_GetEquipmentRowY
 #include "global.h"
 #include "scene_hud_display.h"
 s32 PauseMenu_IsEquipmentSelectionEnabled(struct SceneHudState *);

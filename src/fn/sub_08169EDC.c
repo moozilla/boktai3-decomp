@@ -1,6 +1,10 @@
 // Tentative StatusPanel family and semantic names; based on static consumers.
 #include "global.h"
-struct PanelSelectionAnim { u32 unknown[2]; u32 flags; u8 rest[0x54]; };
+struct PanelSelectionAnim {
+    u32 unknown[2];
+    u32 flags;
+    u8 rest[0x54];
+};
 struct StatusPanel {
     u8 unknown0[0xC4];
     u8 animationData[0x3D60 - 0xC4];

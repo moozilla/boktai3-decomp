@@ -1,8 +1,17 @@
 #include "global.h"
 #include "scene_actor_placement.h"
-static inline void ClearWord(u32 *p, u32 mask) { *p &= mask; }
-static inline void ClearTile(struct SceneActorPlacementTileFlags *p, u32 mask) { p->flags &= mask; }
-static inline void ClearCollider(struct ContactCollider *p) { p->flags = 0xFFFB & p->flags; }
+static inline void ClearWord(u32 *p, u32 mask)
+{
+    *p &= mask;
+}
+static inline void ClearTile(struct SceneActorPlacementTileFlags *p, u32 mask)
+{
+    p->flags &= mask;
+}
+static inline void ClearCollider(struct ContactCollider *p)
+{
+    p->flags = 0xFFFB & p->flags;
+}
 void ActorShadow_Enable(void *);
 void SceneActorPlacement_ShowActor(struct SceneActorPlacementView *s)
 {
@@ -13,7 +22,8 @@ void SceneActorPlacement_ShowActor(struct SceneActorPlacementView *s)
         zero &= flags;
         if (!zero && (flags & 2)) {
             *field = flags & ~2;
-            if (s->shadow320[0]) ActorShadow_Enable(s->shadow320);
+            if (s->shadow320[0])
+                ActorShadow_Enable(s->shadow320);
             ClearCollider(&((struct SceneActorRegistryResetView *)s)->colliderA);
             s->field178 = zero;
             if (s->drawableKind == 0) {

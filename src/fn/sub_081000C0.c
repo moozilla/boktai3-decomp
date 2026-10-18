@@ -1,5 +1,5 @@
-#define gCrateRandomValues      gUnk_0203B400
-#define gCrateRandomIndex       gUnk_03005308
+#define gCrateRandomValues gUnk_0203B400
+#define gCrateRandomIndex  gUnk_03005308
 #include "global.h"
 struct CratePosition {
     u16 x, xHigh, y, yHigh;

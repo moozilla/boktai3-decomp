@@ -1,5 +1,5 @@
 #include "global.h"
-#define gPooledSpriteManager       gUnk_02000164
+#define gPooledSpriteManager gUnk_02000164
 struct PooledSprite {
     u8 unknown0[0xBC];
     u16 timer, state;

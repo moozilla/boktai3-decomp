@@ -1,7 +1,12 @@
 #define gPlayerSlots gUnk_02000580
 #include "global.h"
 #include "player.h"
-struct FieldHud { u8 unknown0[0xA40]; struct Player *player; u8 unknownA44[12]; void *updateCallback; };
+struct FieldHud {
+    u8 unknown0[0xA40];
+    struct Player *player;
+    u8 unknownA44[12];
+    void *updateCallback;
+};
 s32 Callback_InvokeActor(void *, void *);
 void InventoryPanel_UpdateCallbackGroups(struct FieldHud *);
 s32 Hud_UpdateWithCallback(struct FieldHud *hud)

@@ -12,7 +12,8 @@ static inline u16 GetWord(struct AreaEffectLinkState *session, s32 player)
         return 0xFFFF;
     return session->selection[player];
 }
-s32 LinkSession_ReceiveSelectionByte(struct AreaEffectLinkState *session, u8 *destination, s32 player, s32 length)
+s32 LinkSession_ReceiveSelectionByte(struct AreaEffectLinkState *session, u8 *destination,
+                                     s32 player, s32 length)
 {
     u32 word;
     u16 *cursor;

@@ -19,7 +19,8 @@ static inline void ClearPosition(void *src, void *dst)
 {
     CpuSet(src, dst, 0x05000002);
 }
-s32 PanelKeyframeSprite_Create(struct PanelKeyframeOwner *owner, u32 key, u32 index, u32 flags, u32 mode)
+s32 PanelKeyframeSprite_Create(struct PanelKeyframeOwner *owner, u32 key, u32 index, u32 flags,
+                               u32 mode)
 {
     struct PanelKeyframeSprite *p;
     struct {

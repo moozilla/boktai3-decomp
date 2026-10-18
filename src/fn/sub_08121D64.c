@@ -1,8 +1,10 @@
 #define SpriteParticle_GetOrCreatePool SceneSpriteBurst_EnsureSingleton
-#define gSpriteParticlePool gUnk_02000138
+#define gSpriteParticlePool            gUnk_02000138
 #include "global.h"
 
-struct SpriteParticlePosition { u32 xy, z; };
+struct SpriteParticlePosition {
+    u32 xy, z;
+};
 struct SpriteParticleSlot {
     struct SpriteParticlePosition position;
     u8 unk08[2];
@@ -33,7 +35,8 @@ void Sprite_Init(void *, void *, u32);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 
-s32 SpriteParticle_SpawnBatch(struct SpriteParticlePosition *position, s32 count, s32 layer, s32 sequence, u32 palette)
+s32 SpriteParticle_SpawnBatch(struct SpriteParticlePosition *position, s32 count, s32 layer,
+                              s32 sequence, u32 palette)
 {
     struct SpriteParticlePool *pool;
     struct SpriteParticleSlot *slot;

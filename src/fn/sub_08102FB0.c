@@ -1,4 +1,4 @@
-#define gNamedObjectManager            gUnk_020001AC
+#define gNamedObjectManager gUnk_020001AC
 #include "global.h"
 struct NamedObjectVector {
     s16 x, y, z, pad;

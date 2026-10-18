@@ -10,7 +10,8 @@ struct R {
     u8 b;
 } __attribute__((packed));
 extern struct R gUnk_0203B400[];
-void SpriteParticle_CreateDefaultVariant4384(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+void SpriteParticle_CreateDefaultVariant4384(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
+                                             s32, s32);
 void EnemyD459_RecordDefeat(void *);
 s32 EnemyD459_UpdateDeath(u8 *p)
 {

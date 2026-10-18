@@ -1,4 +1,4 @@
-#define gSceneHudActionDefinitions      gUnk_08E61280
+#define gSceneHudActionDefinitions gUnk_08E61280
 #include "global.h"
 #include "scene_hud_display.h"
 #include "scene_item_values.h"

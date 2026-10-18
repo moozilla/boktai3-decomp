@@ -2,7 +2,7 @@
 /* Tentative family name; visual identity is not yet established. */
 #include "contact_actor.h"
 #define ActorEffect_CreateManager FragmentProjectilePool_GetOrCreate
-#define ActorEffect_Allocate FragmentProjectilePool_AllocSprite
+#define ActorEffect_Allocate      FragmentProjectilePool_AllocSprite
 #define gActorEffectManager       gUnk_02000180
 struct ActorEffect {
     u32 flags;
@@ -31,7 +31,7 @@ struct ActorEffectManager *FragmentProjectilePool_GetOrCreate(void);
 struct ActorEffect *FragmentProjectilePool_AllocSprite(void *);
 void ActorEffect_InitColliders(struct ActorEffect *, s32, s32, s32, s32);
 void ActorEffect_Spawn(struct ContactPosition *position, u32 value, s32 a, s32 b, s32 c, s32 d,
-                  s32 parameter188, s32 parameter186, s32 parameter180, s32 variant)
+                       s32 parameter188, s32 parameter186, s32 parameter180, s32 variant)
 {
     struct ActorEffectManager *manager = gUnk_02000180;
     struct ActorEffect *effect;

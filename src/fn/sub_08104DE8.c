@@ -7,7 +7,8 @@ void Collider_Remove(void *);
 void ScaledShadow_Destroy(void *);
 static inline u8 CallbackPool_IsActive(u32 *mask, s32 i)
 {
-    if (*mask & (1 << i)) return TRUE;
+    if (*mask & (1 << i))
+        return TRUE;
     return FALSE;
 }
 s32 CallbackPool_DestroyEntries(struct CallbackPool *pool)

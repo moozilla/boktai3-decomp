@@ -1,5 +1,5 @@
 #define Equipment_HasCategory GameState_HasEquippedConsumable
-#define gAreaEffectLinkState                gUnk_020004B4
+#define gAreaEffectLinkState  gUnk_020004B4
 #include "global.h"
 #include "area_effect_link.h"
 extern u32 gUnk_030053F4, gUnk_030053F0;

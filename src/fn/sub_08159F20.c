@@ -6,8 +6,8 @@ static inline void lockPositionRequests(u32 *flags, u32 mask)
 {
     *flags |= mask;
 }
-s32 Player_ApplyForcedFacing(struct Player *p, s32 frame, u32 direction, s32 resetValue, s32 request,
-                 u32 option)
+s32 Player_ApplyForcedFacing(struct Player *p, s32 frame, u32 direction, s32 resetValue,
+                             s32 request, u32 option)
 {
     if (p->tetherMode == 0x1A)
         goto noRequest;

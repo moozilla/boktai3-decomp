@@ -1,7 +1,7 @@
 #define Player_ComputeInverseSpeedScale Player_GetMovementRateScale
-#define Player_AddStatA Player_IncreaseLifeTowardLimit
-#define Player_AddStatB Player_AddEnergy
-#define Player_SubtractStatB Player_SubtractEnergy
+#define Player_AddStatA                 Player_IncreaseLifeTowardLimit
+#define Player_AddStatB                 Player_AddEnergy
+#define Player_SubtractStatB            Player_SubtractEnergy
 #include "global.h"
 #include "player.h"
 s32 Player_GetSmoothedDirection(struct Player *);

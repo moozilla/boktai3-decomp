@@ -1,6 +1,6 @@
 #include "global.h"
 #define SceneMenu_SetState Registry1745_SetState
-#define gSceneMenuPeer gUnk_020004B4
+#define gSceneMenuPeer     gUnk_020004B4
 struct SceneMenu {
     u8 pad0[0x30];
     u32 timer;

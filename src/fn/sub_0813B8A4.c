@@ -4,9 +4,9 @@
 struct SceneActorParticleView {
     u8 unknown0[0x30];
     struct SceneVec position;
-    u8 unknown38[0x168-0x38];
+    u8 unknown38[0x168 - 0x38];
     struct SceneVec effectPosition;
-    u8 unknown170[0x418-0x170];
+    u8 unknown170[0x418 - 0x170];
     u8 mode;
 };
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);

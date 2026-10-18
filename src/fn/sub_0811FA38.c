@@ -29,13 +29,13 @@ void ModifierAction_InitializeSecondary(struct ModifierSecondaryActor *actor, u3
     Memory_Clear(config, 12);
     ScriptRecord_FindModifier(config, selection[15]);
     switch (action->kind) {
-    case 1:
-        action->callback = Modifier_EvaluateThirdSourceModeOne;
-        action->enabled = 1;
-        break;
-    case 2:
-        action->callback = Modifier_EvaluateThirdSourceModeTwo;
-        action->enabled = 1;
-        break;
+        case 1:
+            action->callback = Modifier_EvaluateThirdSourceModeOne;
+            action->enabled = 1;
+            break;
+        case 2:
+            action->callback = Modifier_EvaluateThirdSourceModeTwo;
+            action->enabled = 1;
+            break;
     }
 }

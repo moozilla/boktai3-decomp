@@ -17,8 +17,8 @@ void ScenePool_InitActorAppearance(u8 *p, struct Item *item, u32 a, u32 b)
 {
     const struct Style *style = &gUnk_0860582C[item->kind];
     void *drawable;
-    SceneActorStyle_Initialize(p + 0x48, style->args[0], style->args[1], style->args[2], style->args[3],
-                 style->args[4], style->args[5], a, b);
+    SceneActorStyle_Initialize(p + 0x48, style->args[0], style->args[1], style->args[2],
+                               style->args[3], style->args[4], style->args[5], a, b);
     ActorAction_InitializeMode(p, p, 0);
     ScriptRecord_FindAttributeModifier(p + 0x318, (s8)p[0x56]);
     p[0x324] = 1;

@@ -16,7 +16,8 @@ struct SceneVolume {
 void Collider_SetPosition(void *, void *, u32);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 s32 Collider_Refresh(void *);
-void SceneVolume_ConfigureAttackCollider(struct SceneVolume *volume, s32 radius, s32 attack, s32 height)
+void SceneVolume_ConfigureAttackCollider(struct SceneVolume *volume, s32 radius, s32 attack,
+                                         s32 height)
 {
     struct SceneAttackCollider *collider = &volume->collider;
     u32 mask = 0x100;

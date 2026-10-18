@@ -1,4 +1,4 @@
-#define gMenuTransitionKeys                   gUnk_03005260
+#define gMenuTransitionKeys        gUnk_03005260
 #define MenuTransition_SetCallback Hud_SetInteractionCallback
 #include "global.h"
 void Hud_SetInteractionCallback(void *, void (*)(void), int);

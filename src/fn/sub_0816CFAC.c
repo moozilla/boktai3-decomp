@@ -22,7 +22,8 @@ void SceneHud_ApplyStatBPercent(struct SceneHudState *s, s32 percent, s32 durati
         }
         if (s->appliedStatB < 0)
             s->appliedStatB = 0;
-        Hud_DrawDefaultEnergyMeter(s, 1, 2, 14, s->actionOwner->currentStatB, s->actionOwner->maximumStatB);
+        Hud_DrawDefaultEnergyMeter(s, 1, 2, 14, s->actionOwner->currentStatB,
+                                   s->actionOwner->maximumStatB);
         if (duration > 0) {
             if (Inventory_GetQuantityByStorage(s->actionCategory, s->actionSelection) == 14)
                 sub_0813D834(p, 1, duration * 60);

@@ -24,7 +24,8 @@ void PlayerCue_BeginModeSeven(struct Player *p, s32 mode)
         Player_UpdateFacingSide(p);
         p->heading--;
         p->tetherPhase = 0;
-    } else return;
+    } else
+        return;
     Player_EnterKindTwo(p);
     ActorSequence_Begin(p, 7, p->tetherPhase);
     p->triggerAnimationCallback = sub_08151A14;

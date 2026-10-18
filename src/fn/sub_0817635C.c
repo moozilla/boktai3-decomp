@@ -1,5 +1,5 @@
 #define SceneDialog_SetPhase Hud_SetInteractionCallback
-#define gSceneDialogActive            gUnk_03005408
+#define gSceneDialogActive   gUnk_03005408
 #include "global.h"
 struct SceneDialog {
     u8 pad0[0x5c];

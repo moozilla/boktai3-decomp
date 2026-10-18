@@ -1,5 +1,5 @@
 #define MenuPanel_SetCallback Hud_SetInteractionCallback
-#define gPanelInputState gUnk_03005260
+#define gPanelInputState      gUnk_03005260
 // Provisional panel family; field meanings follow static consumers.
 #include "global.h"
 extern u16 gUnk_03005260[];

@@ -14,6 +14,8 @@ u8 HeightProbe_IsBelowLimit(struct HeightProbe *p)
     s32 offset = p->heightOffset;
     s32 y = position->y;
     s32 limit = position->z + (y + offset);
-    if (height < (limit >> 12) + 0x70) return 1;
-    else return 0;
+    if (height < (limit >> 12) + 0x70)
+        return 1;
+    else
+        return 0;
 }

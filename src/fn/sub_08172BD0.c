@@ -25,7 +25,8 @@ void SceneHud_UpdateActionGridInput(struct SceneHudState *p)
     grid = p->actionInput;
     moved = SceneInput_NavigateGridKeys(grid, 0xF0);
     if (moved) {
-        SceneHud_SetActionCursorPosition(&p->categoryWidgets[5].position, *(cursor = &p->actionCursor));
+        SceneHud_SetActionCursorPosition(&p->categoryWidgets[5].position,
+                                         *(cursor = &p->actionCursor));
         SceneHud_ShowSelectionDescription(p);
         Hud_SaveGridSelection(grid);
         {

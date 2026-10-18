@@ -1,5 +1,5 @@
 #define MenuPanel_SetCallback Hud_SetInteractionCallback
-#define gPanelGameState gUnk_02000710
+#define gPanelGameState       gUnk_02000710
 // Provisional panel family; field meanings follow static consumers.
 #include "global.h"
 #include "game_state.h"

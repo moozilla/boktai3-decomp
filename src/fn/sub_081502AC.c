@@ -1,6 +1,6 @@
 #include "global.h"
 #include "player.h"
-#define Player_ResetTriggerAnimation PlayerCue_EnterStandUpdate
+#define Player_ResetTriggerAnimation  PlayerCue_EnterStandUpdate
 #define Player_DispatchPendingTrigger PlayerCue_CompleteAction
 void Sound_PlaySong(u32);
 s32 Player_SetAnimation(struct Player *, s32, s32, s32);

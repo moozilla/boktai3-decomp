@@ -1,5 +1,5 @@
 #include "global.h"
-#define gLinkSession            gUnk_020004B4
+#define gLinkSession gUnk_020004B4
 struct LinkPanel {
     u8 pad0[0x13FD];
     u8 selection;

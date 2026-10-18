@@ -1,6 +1,6 @@
 #include "global.h"
 #include "player.h"
-#define gPlayerActionCueTable   gUnk_08E5FA6C
+#define gPlayerActionCueTable gUnk_08E5FA6C
 struct PlayerActionCueInfo {
     u8 unknown0[0x15];
     u8 cueIndex;

@@ -18,8 +18,8 @@ struct ActorActionHost {
 };
 void Memory_Clear(void *, u32);
 void ScriptRecord_FindExtendedModifier(void *, s32);
-void ActorEmitter_TryEmit(void), ActorEmitter_TryEmitPair(void), ActorEmitter_TryEmitLow(void), ActorEmitter_TryEmitAnimatedPair(void),
-    ActorEmitter_UpdateAnimation(void);
+void ActorEmitter_TryEmit(void), ActorEmitter_TryEmitPair(void), ActorEmitter_TryEmitLow(void),
+    ActorEmitter_TryEmitAnimatedPair(void), ActorEmitter_UpdateAnimation(void);
 void ActorAction_InitializeMode(struct ActorActionHost *host, void *owner)
 {
     u8 *source = (u8 *)host + 0x48;

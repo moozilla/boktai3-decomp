@@ -41,12 +41,13 @@ void ModifierMenu_DrawSecondSourceStats(struct ModifierMenu *menu)
             break;
         case 1:
             if (menu->mode == 0) {
-                if (StateFlags_GetCategoryBit(menu->choice.cursor.category, menu->choice.cursor.index))
+                if (StateFlags_GetCategoryBit(menu->choice.cursor.category,
+                                              menu->choice.cursor.index))
                     goto validPreview;
                 goto invalidPreview;
             } else if (menu->mode == 1) {
-                if (!StateFlags_GetCategoryBit(4,
-                                  menu->choice.cursor.index + menu->choice.cursor.category * 3 * 2))
+                if (!StateFlags_GetCategoryBit(4, menu->choice.cursor.index +
+                                                      menu->choice.cursor.category * 3 * 2))
                     goto invalidPreview;
             validPreview:
                 ModifierMenu_DrawStatComparison(first, nextFirst, 8, 13, 2);

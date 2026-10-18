@@ -1,5 +1,5 @@
 #define SceneDialog_SetPhase Hud_SetInteractionCallback
-#define gSceneDialogActive            gUnk_03005408
+#define gSceneDialogActive   gUnk_03005408
 #include "global.h"
 #include "game_state.h"
 extern s32 gUnk_03005408;

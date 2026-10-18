@@ -1,5 +1,8 @@
 #include "global.h"
-struct SceneSequence { u8 unknown0[0xA4C]; u16 phaseTimer; };
+struct SceneSequence {
+    u8 unknown0[0xA4C];
+    u16 phaseTimer;
+};
 void Hud_InitSelectionBounds(u32, u32);
 void MenuPrompt_ResumeChild(void *);
 void SceneSequence_UpdateRampDown64(struct SceneSequence *s)

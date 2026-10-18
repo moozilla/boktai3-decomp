@@ -1,4 +1,4 @@
-#define SelectionPanel_LoadSecondaryEntry PauseMenu_LoadStatusIconFrame
+#define SelectionPanel_LoadSecondaryEntry  PauseMenu_LoadStatusIconFrame
 #define SelectionPanel_LoadSelectionMarker PauseMenu_LoadIndexedIconKeyframe
 #include "global.h"
 struct PanelEntry {

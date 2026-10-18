@@ -11,7 +11,8 @@ static inline u8 IsFlag512Set(struct SceneActorTimedBehaviorContext *context)
     return 0;
 }
 u32 SceneActorControl_TryBeginNearbyBehavior16(struct SceneActorRegistryResetView *s,
-                 struct SceneActorTimedBehaviorContext *context, s32 angle)
+                                               struct SceneActorTimedBehaviorContext *context,
+                                               s32 angle)
 {
     if (!SceneActorReaction_IsRangeReady(s)) {
         if (IsFlag512Set(context))

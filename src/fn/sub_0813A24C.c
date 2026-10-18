@@ -1,4 +1,4 @@
-#define gSpritePairPool           gUnk_020004D4
+#define gSpritePairPool gUnk_020004D4
 #include "global.h"
 struct SpritePairEntry {
     u8 pad0[0x44];

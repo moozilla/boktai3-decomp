@@ -9,8 +9,8 @@ void Collider_SetFixedPositionWithYOffset(void *, struct ScenePoolVec32 *, u32);
 void SpatialIndex_InsertEntry(void *);
 void GroundEffect_DisableProjection(struct SceneGroundEffect *);
 void SceneArc_ReleaseSlot(struct SceneArcManager *, struct SceneArcSlot *, u32);
-void SpriteEffect_CreateAtPosition(struct ScenePoolVec32 *, void *, void *, u32, u32, u32, u32, u32, u32, u32, u32,
-                  u32, u32, u32, u32);
+void SpriteEffect_CreateAtPosition(struct ScenePoolVec32 *, void *, void *, u32, u32, u32, u32, u32,
+                                   u32, u32, u32, u32, u32, u32, u32);
 struct ArcDirection {
     s32 x : 16;
     s32 y : 16;
@@ -119,8 +119,8 @@ void SceneArc_UpdateSlot(struct SceneArcManager *manager, struct SceneArcSlot *s
             if (slot->frame == slot->endFrame) {
                 Sound_PlaySongChecked(0x195);
                 slot->position.y = -(Terrain_GetHeightAtPosition(position) << 12);
-                SpriteEffect_CreateAtPosition(position, 0, 0, 0x8639, 0x75f6, paused, paused, paused, paused, 0x153,
-                             30, paused, paused, 1, paused);
+                SpriteEffect_CreateAtPosition(position, 0, 0, 0x8639, 0x75f6, paused, paused,
+                                              paused, paused, 0x153, 30, paused, paused, 1, paused);
                 sprite->flags |= 1;
                 GroundEffect_DisableProjection(&slot->ground);
             }

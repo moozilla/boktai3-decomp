@@ -1,5 +1,5 @@
-#define gGameState                   gUnk_02000710
-#define gRegionActorUpdateCallbacks  gUnk_086064FC
+#define gGameState                  gUnk_02000710
+#define gRegionActorUpdateCallbacks gUnk_086064FC
 #include "global.h"
 #include "game_state.h"
 #include "region_actor.h"

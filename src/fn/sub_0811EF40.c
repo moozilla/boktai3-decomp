@@ -1,7 +1,13 @@
 #define ActorEmitter_CanEmit Modifier_IsFirstSourceReady
 #include "global.h"
-struct EmitterVector { s32 x, y, z; u32 :32; };
-struct EmitterActor { u8 pad0[0x38]; s32 height; };
+struct EmitterVector {
+    s32 x, y, z;
+    u32 : 32;
+};
+struct EmitterActor {
+    u8 pad0[0x38];
+    s32 height;
+};
 struct EmitterOwner {
     u8 pad0[0x28];
     struct EmitterVector position;
@@ -38,17 +44,20 @@ s32 ActorEmitter_TryEmitLow(struct ActorEmitter *emitter)
     s32 cost;
     struct EmitterVector velocity;
     s32 height;
-    if (!Modifier_IsFirstSourceReady(emitter)) goto fail;
+    if (!Modifier_IsFirstSourceReady(emitter))
+        goto fail;
     owner = emitter->owner;
     actor = (struct EmitterActor *)((u8 *)owner + 0x18);
     cost = CallbackList_RunMatchingState(actor, emitter->id, 9);
-    if (owner->energy < cost) goto fail;
+    if (owner->energy < cost)
+        goto fail;
     velocity.x = owner->velocity;
     velocity.y = 0;
     velocity.z = 0;
     height = actor->height - 0x12000;
-    if (sub_08114928(&owner->position, height, &velocity,
-                       owner->profile, owner->kind + 1, 0, 1, 0) >= 0) goto success;
+    if (sub_08114928(&owner->position, height, &velocity, owner->profile, owner->kind + 1, 0, 1,
+                     0) >= 0)
+        goto success;
 fail:
     return 0;
 success:

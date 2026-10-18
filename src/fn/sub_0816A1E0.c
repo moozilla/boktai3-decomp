@@ -1,6 +1,10 @@
 // Tentative StatusPanel family and semantic names; based on static consumers.
 #include "global.h"
-struct PanelGaugeValues { u8 unknown[0x428]; u16 current; u16 maximum; };
+struct PanelGaugeValues {
+    u8 unknown[0x428];
+    u16 current;
+    u16 maximum;
+};
 struct StatusPanel {
     u8 unknown0[0xA40];
     struct PanelGaugeValues *values;

@@ -34,7 +34,8 @@ s32 MotionTween_Advance(struct MotionTweenObject *object, struct MotionTween *tw
     if (tween->coordinateDelay) {
         tween->coordinateDelay--;
     } else if (tween->coordinateFrames) {
-        object->velocity += Div(tween->targetCoordinate - (object->coordinate >> 12), tween->coordinateFrames) << 8;
+        object->velocity +=
+            Div(tween->targetCoordinate - (object->coordinate >> 12), tween->coordinateFrames) << 8;
         if (--tween->coordinateFrames == 0)
             object->position += (tween->targetCoordinate - (object->coordinate >> 12)) << 8;
         changed = 1;

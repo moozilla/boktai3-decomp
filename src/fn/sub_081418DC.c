@@ -1,5 +1,5 @@
 #define Camera_SnapToIfActive Camera_SnapToWithoutCompletion
-#define gCameraPosition          gUnk_030042A0
+#define gCameraPosition       gUnk_030042A0
 #include "global.h"
 #include "player.h"
 extern struct SceneVec gUnk_030042A0;

@@ -27,7 +27,8 @@ s32 Countdown_Tick(struct CountdownTask *task)
             if (++task->frame >= task->interval) {
                 task->frame = 0;
                 --*remaining;
-                Hud_UpdateCountdownDisplay(*(s32 *)(gUnk_02000710 + 0x618), *(s32 *)(gUnk_02000710 + 0x61C), 1);
+                Hud_UpdateCountdownDisplay(*(s32 *)(gUnk_02000710 + 0x618),
+                                           *(s32 *)(gUnk_02000710 + 0x61C), 1);
                 if (*(s32 *)(gUnk_02000710 + 0x618) <= 0)
                     done = 1;
             }

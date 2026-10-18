@@ -1,7 +1,7 @@
 #include "global.h"
 // Tentative SceneVolume family: ownership and field semantics remain provisional.
 #define PositionSearch_GetCoordinates SceneStimulus_GetTaggedPosition
-#define PositionSearch_FindNearby SceneStimulus_FindOverlap
+#define PositionSearch_FindNearby     SceneStimulus_FindOverlap
 struct SceneVolume {
     u8 pad0[0x48];
     u32 searchFlags;

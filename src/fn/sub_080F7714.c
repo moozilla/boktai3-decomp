@@ -10,7 +10,8 @@ struct SceneActorApproachContext {
     u8 unknownE42[0x6D], remaining, unknownEB0[0x22], stateED2;
 };
 void Axe_SetAuxiliarySpriteRenderState(struct SceneActorRegistryResetView *, void *, u32);
-void ActorPhase_EmitTrailSprite(struct SceneActorRegistryResetView *, struct ContactPosition *, u32);
+void ActorPhase_EmitTrailSprite(struct SceneActorRegistryResetView *, struct ContactPosition *,
+                                u32);
 void sub_080FC998(struct SceneActorRegistryResetView *);
 void ActorPhase_UpdateTimedFlicker(struct SceneActorRegistryResetView *);
 s32 Div(s32, s32);

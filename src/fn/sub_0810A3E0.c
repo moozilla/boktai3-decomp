@@ -1,5 +1,5 @@
 #include "global.h"
-#define SessionMenu_SetState Registry1745_SetState
+#define SessionMenu_SetState          Registry1745_SetState
 #define SessionMenu_ResetWithCallback Registry1745_BeginShutdown
 #define gSessionMenu                  gUnk_020004B4
 #include "area_effect_link.h"

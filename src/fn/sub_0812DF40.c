@@ -9,11 +9,13 @@ s16 Math_GetVectorLength(s16 x, s16 y)
     s32 result;
     if (angle == 64 || angle == 192) {
         s32 vertical = y;
-        if (vertical < 0) vertical = -vertical;
+        if (vertical < 0)
+            vertical = -vertical;
         return vertical;
     } else {
         result = Div(x << 12, gUnk_086149C4[(angle + 64) & 255]);
-        if (result < 0) result = -result;
+        if (result < 0)
+            result = -result;
     }
     return result;
 }

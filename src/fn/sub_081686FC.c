@@ -1,6 +1,6 @@
 #define SceneHud_LoadInactiveIcon PauseMenu_LoadCategoryIconFrame
-#define SceneHud_LoadActiveIcon PauseMenu_LoadEquipmentIconFrame
-#define SceneHud_GetCarouselY PauseMenu_GetEquipmentRowY
+#define SceneHud_LoadActiveIcon   PauseMenu_LoadEquipmentIconFrame
+#define SceneHud_GetCarouselY     PauseMenu_GetEquipmentRowY
 #include "global.h"
 #include "scene_hud_display.h"
 void PauseMenu_LoadCategoryIconFrame(struct SceneHudState *, struct SceneInputWidget *, s32);

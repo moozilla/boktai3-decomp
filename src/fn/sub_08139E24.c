@@ -1,4 +1,4 @@
-#define SpritePool_Create ParticleBurstEffect_EnsureManager
+#define SpritePool_Create           ParticleBurstEffect_EnsureManager
 #define SpritePoolEntry_SetCallback ParticleBurstEffect_SetStateCallback
 #define gSpritePool                 gUnk_020004D0
 #include "global.h"
@@ -49,7 +49,7 @@ static inline u32 SpritePool_MakeKey(u32 counter, u32 id)
     return id;
 }
 s32 SpritePool_StartEntry(struct SpritePoolVector *position, void *owner, u32 unused,
-                 struct SpritePoolParams *params, u32 id)
+                          struct SpritePoolParams *params, u32 id)
 {
     struct SpritePool *pool;
     s32 i;
@@ -76,7 +76,8 @@ s32 SpritePool_StartEntry(struct SpritePoolVector *position, void *owner, u32 un
             key = SpritePool_MakeKey(key, id);
             pool->entries[i].id = key;
             Anim_SetSequence(pool->entries[i].anim, pool->entries[i].data, 7, 0, 0);
-            SceneProcParticles_SubmitBounds(&pool->entries[i], ParticleBurstEffect_OnAnimationComplete, params->value, id + 1);
+            SceneProcParticles_SubmitBounds(
+                &pool->entries[i], ParticleBurstEffect_OnAnimationComplete, params->value, id + 1);
             ParticleBurstEffect_SetStateCallback(&pool->entries[i], sub_08139994);
             Sound_PlaySong(0x3e5);
             return i;

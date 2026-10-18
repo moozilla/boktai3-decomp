@@ -1,5 +1,5 @@
 #include "global.h"
-#define gSlotRegistry             gUnk_020004C8
+#define gSlotRegistry gUnk_020004C8
 struct RegistrySpriteSlot {
     u32 owner;
     u8 pad4[0x5C];

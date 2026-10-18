@@ -1,7 +1,19 @@
 #include "global.h"
-struct SpriteEffectSlot { u8 unknown[0xd7]; s8 index; };
-struct SpriteEffectPool { u8 unknown[0x34]; u32 used; struct SpriteEffectSlot slots[8]; };
-static inline u8 IsUsed(struct SpriteEffectPool *p, u32 index) { if (p->used & (1U << index)) return 1; return 0; }
+struct SpriteEffectSlot {
+    u8 unknown[0xd7];
+    s8 index;
+};
+struct SpriteEffectPool {
+    u8 unknown[0x34];
+    u32 used;
+    struct SpriteEffectSlot slots[8];
+};
+static inline u8 IsUsed(struct SpriteEffectPool *p, u32 index)
+{
+    if (p->used & (1U << index))
+        return 1;
+    return 0;
+}
 struct SpriteEffectSlot *SpriteEffectPool_AllocateSlot(struct SpriteEffectPool *p)
 {
     s32 i;

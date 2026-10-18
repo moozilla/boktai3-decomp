@@ -25,7 +25,8 @@ void ActorGroup_CallMemberScript(struct ActorGroupMember *);
 void Sound_PlaySong(u32);
 void Sprite_Remove(void *);
 void Collider_Remove(void *);
-void ActorGroup_UpdateMemberRemoval(struct ActorGroupRemovalPool *group, struct ActorGroupMember *member)
+void ActorGroup_UpdateMemberRemoval(struct ActorGroupRemovalPool *group,
+                                    struct ActorGroupMember *member)
 {
     if (member->started) {
         sub_0810523C(member);

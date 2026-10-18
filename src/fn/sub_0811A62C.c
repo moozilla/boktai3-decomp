@@ -1,5 +1,5 @@
 #include "global.h"
-#define gMotionActorSlots   gUnk_020004F0
+#define gMotionActorSlots gUnk_020004F0
 struct MotionActorAnimation {
     u8 unknown0[0x60];
 };

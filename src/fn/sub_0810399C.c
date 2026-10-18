@@ -1,4 +1,4 @@
-#define gActorGroup              gUnk_020001AC
+#define gActorGroup gUnk_020001AC
 /* Provisional ActorGroup names: static behavior established; semantic ownership tentative. */
 #include "global.h"
 struct ActorGroupMember {

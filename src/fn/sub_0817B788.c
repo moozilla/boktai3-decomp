@@ -1,7 +1,7 @@
 #include "global.h"
 #include "actor_state.h"
-#define gActorAnimationRandomIndex       gUnk_03005308
-#define gActorAnimationRandomValues      gUnk_0203B400
+#define gActorAnimationRandomIndex  gUnk_03005308
+#define gActorAnimationRandomValues gUnk_0203B400
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
 s32 ActorMovement_CanReachTarget(struct ActorState *);

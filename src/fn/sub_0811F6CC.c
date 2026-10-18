@@ -43,7 +43,8 @@ s32 ActorAbility_SpawnProjectile(struct ActorAbility *ability)
     args.c = 0;
     height = *(s32 *)(stats + 0x38) - 0x12000;
     if (SceneProcSprites_CreateEntry(owner + 0x28, height, *(u32 *)(owner + offset),
-                     (s8) * (u8 *)(owner + (offset + 0x10)), (u8 *)ability + 4) < 0) {
+                                     (s8) * (u8 *)(owner + (offset + 0x10)),
+                                     (u8 *)ability + 4) < 0) {
     fail:
         return 0;
     }

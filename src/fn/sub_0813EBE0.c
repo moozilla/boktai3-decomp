@@ -1,4 +1,4 @@
-#define gPlayerIndexedActions     gUnk_08E60F4C
+#define gPlayerIndexedActions gUnk_08E60F4C
 #include "global.h"
 #include "player.h"
 extern const struct PlayerIndexedAction gUnk_08E60F4C[];

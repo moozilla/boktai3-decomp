@@ -43,7 +43,7 @@ s32 ActorAbility_SpawnAlternateProjectile(struct ActorAbility *ability)
     args.c = 0;
     height = *(s32 *)(stats + 0x38) - 0x1a000;
     if (SpritePool_StartEntry(owner + 0x28, height, 0, (u8 *)ability + 4,
-                     (s8) * (u8 *)(owner + (offset + 0x10))) < 0) {
+                              (s8) * (u8 *)(owner + (offset + 0x10))) < 0) {
     fail:
         return 0;
     }

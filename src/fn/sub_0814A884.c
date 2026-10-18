@@ -19,7 +19,8 @@ static inline u32 Test32(u32 *p, u32 mask)
 {
     return *p & mask;
 }
-void Player_AccumulateContactCost(struct PlayerContactSource *source, struct ContactCollider *contact)
+void Player_AccumulateContactCost(struct PlayerContactSource *source,
+                                  struct ContactCollider *contact)
 {
     struct Player *p;
     s32 i;
