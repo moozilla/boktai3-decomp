@@ -562,3 +562,4 @@ addr,function,name,family,note
 08103850,sub_08103850,NamedObject_UpdatePool,"NamedObject","run active object callbacks and synchronize sprite positions"
 0810399C,sub_0810399C,ActorGroup_Destroy,"ActorGroup","stops group sounds and releases active members"
 08103C54,sub_08103C54,ActorGroup_RemoveFromScript,"ActorGroup","removes the member named by script keyword n"
+08104B64,sub_08104B64,ActorGroup_UpdateMemberFall,"ActorGroup","accelerates a falling member and emits eight landing effects"
