@@ -1322,3 +1322,4 @@ addr,function,name,family,note
 0822D764,sub_0822D764,ItemRecord_ExpandDescriptor,"ItemDescriptor","copy descriptor defaults and overlay three instance values"
 0822D7C0,sub_0822D7C0,ItemDescriptor_Reset,"ItemDescriptor","reset descriptor fields and mark its type invalid"
 0822DCB4,sub_0822DCB4,ItemRecord_MeetsLevelRequirement,"ItemDescriptor","test descriptor level requirement with selection 0x29 override"
+0822E138,sub_0822E138,Inventory_SwapSlots,"Inventory","swap inventory entries and remap four party references"
