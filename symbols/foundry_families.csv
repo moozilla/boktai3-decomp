@@ -766,3 +766,4 @@ addr,function,name,family,note
 08169838,sub_08169838,SelectionPanel_ResetSecondarySelection,"SelectionPanel","zeros the secondary selection and refreshes dependent panel elements"
 0816997C,sub_0816997C,SelectionPanel_RefreshPrimaryIfReady,"SelectionPanel","runs primary refresh helpers when global and panel state permit"
 081699BC,sub_081699BC,SceneHud_UpdateOptionControls,"SceneHud","updates option input, highlight pulse and auxiliary toggle animation"
+08169B38,sub_08169B38,StatusPanel_DrawFirstValue,"StatusPanel","draws a three-tile label and first status value"
