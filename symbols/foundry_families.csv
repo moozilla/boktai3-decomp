@@ -970,3 +970,4 @@ addr,function,name,family,note
 0819AA08,sub_0819AA08,SceneEffect_UpdateEntryState,"SceneEffectLink (tentative)","dispatches linked entry states and advances frame counter"
 0819AA8C,sub_0819AA8C,SceneEffect_CreateEntryTask,"SceneEffectLink (tentative)","allocates and initializes an effect task with resource and origin"
 0819AAF4,sub_0819AAF4,DirectionalActor_GetForwardPosition,"DirectionalActor","computes a position 170 units forward and 80 units above the actor"
+0819AB90,sub_0819AB90,SceneOrbitHazard_UpdateOrbit,"Scene orbit hazard (tentative)","initializes and advances the hazard orbit"
