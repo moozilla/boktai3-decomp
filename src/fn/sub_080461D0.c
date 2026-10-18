@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_sequence_actor.h"
 u32 ContactSequenceActor_TakeEntryFlag(struct ContactSequenceActor *);
 void ContactSequenceActor_SetFlags(struct ContactSequenceActor *, u32);
@@ -27,29 +26,26 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
     struct ContactSequenceScriptArgs args;
     const u16 *table;
     u32 randomMask;
-    register u32 xzMask asm("r10");
+    u32 xzMask;
     if (ContactSequenceActor_TakeEntryFlag(actor)) {
         table = (const u16 *)RANDOM_TABLE_ADDR;
         {
-            register u32 randomIndex asm("r1");
+            u32 randomIndex;
             u32 sample;
-            register u32 smallMask asm("r3");
-            register u32 lowMask asm("r2");
+            u32 smallMask;
+            u32 lowMask;
             u32 sampleY;
             u32 yMask;
-            register u32 *counter asm("r2");
+            u32 *counter;
             u32 sampleZ;
-            register u32 zMask asm("r3");
+            u32 zMask;
             randomIndex = gUnk_03005308 + 1;
             randomMask = 1023;
-            asm("" : "+r"(randomMask));
             randomIndex &= randomMask;
             sample = table[randomIndex];
             smallMask = 63;
-            asm("" : : "r"(smallMask));
             xzMask = smallMask;
             lowMask = xzMask;
-            asm("" : : "r"(lowMask));
             scatter.bits.x = sample & lowMask;
             randomIndex = (randomIndex + 1) & randomMask;
             sampleY = table[randomIndex];
@@ -58,29 +54,25 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
             scatter.bits.y = sampleY;
             randomIndex = (randomIndex + 1) & randomMask;
             counter = &gUnk_03005308;
-            asm("" : "+r"(counter));
             *counter = randomIndex;
             sampleZ = table[randomIndex];
             zMask = xzMask;
-            asm("" : : "r"(zMask));
             scatter.bits.z = sampleZ & zMask;
         }
         scatterPosition = &scatter.position;
-        asm("" : "+r"(scatterPosition));
         {
             u32 x = (u16)actor->position.x;
-            register u32 dx asm("r3") = (u16)scatterPosition->x;
+            u32 dx = (u16)scatterPosition->x;
             u32 y;
-            register u32 sourceY asm("r2");
-            register struct ContactPosition *lowPosition asm("r1");
+            u32 sourceY;
+            struct ContactPosition *lowPosition;
             u32 positionOffset;
-            register u32 sourceZ asm("r0");
-            register u32 dz asm("r3");
+            u32 sourceZ;
+            u32 dz;
             x += dx;
             scatterPosition->x = x;
             y = (u16)scatterPosition->y;
             positionOffset = 0x10;
-            asm("" : "+r"(positionOffset));
             lowPosition = (struct ContactPosition *)(positionOffset + (u32)actor);
             position = lowPosition;
             sourceY = (u16)actor->position.y;
@@ -93,18 +85,18 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
         }
         TransientSpriteEffects_Spawn(0, 0x1004, scatterPosition, 0, 256, 256);
         {
-            register u32 randomIndex asm("r0");
+            u32 randomIndex;
             u32 sampleX;
-            register u32 lowMask asm("r2");
+            u32 lowMask;
             u32 sampleY;
             u32 yMask;
-            register u32 *counter asm("r1");
+            u32 *counter;
             u32 sampleZ;
             u32 sourceX;
-            register struct ContactPosition *lowPosition asm("r3");
+            struct ContactPosition *lowPosition;
             u32 sourceY;
             u32 zMask;
-            register u32 sourceZ asm("r2");
+            u32 sourceZ;
             randomIndex = (gUnk_03005308 + 1) & randomMask;
             sampleX = table[randomIndex];
             lowMask = xzMask;
@@ -117,7 +109,6 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
             scatterPosition->y = sampleY;
             randomIndex = (randomIndex + 1) & randomMask;
             counter = &gUnk_03005308;
-            asm("" : "+r"(counter));
             *counter = randomIndex;
             sampleZ = table[randomIndex];
             sourceX = (u16)actor->position.x;
@@ -128,10 +119,8 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
             sampleY += sourceY;
             scatterPosition->y = sampleY;
             zMask = xzMask;
-            asm("" : : "r"(zMask));
             sampleZ &= zMask;
             sourceZ = (u16)lowPosition->z;
-            asm("" : "+r"(sourceZ));
             sampleZ += sourceZ;
             scatterPosition->z = sampleZ;
         }

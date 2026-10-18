@@ -19,7 +19,7 @@ void HitSwitch_UpdateSharedFlash(struct HitSwitchManager *manager)
             s32 flash = manager->flash;
             u16 *from;
             u16 *to;
-            register s32 i asm("r9");
+            s32 i;
             register u32 mask asm("r12");
             u8 *bank;
             inverse = 16 - flash;
@@ -44,7 +44,7 @@ void HitSwitch_UpdateSharedFlash(struct HitSwitchManager *manager)
                 mask = value;
             }
             do {
-                register u16 *read asm("r1") = from;
+                u16 *read = from;
                 register u32 a asm("r3");
                 s32 ar;
                 s32 ag;
@@ -86,7 +86,7 @@ void HitSwitch_UpdateSharedFlash(struct HitSwitchManager *manager)
                     i += one;
                 }
                 {
-                    register s32 count asm("r2") = i;
+                    s32 count = i;
                     if (count > 15)
                         break;
                 }

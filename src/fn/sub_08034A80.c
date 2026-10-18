@@ -84,7 +84,7 @@ int sub_08034A80(struct Engine *p)
             *timer = 60;
             break;
         case 1: {
-            register int three asm("r8") = 3;
+            int three = 3;
             int base;
             u32 position;
             u16 *table;

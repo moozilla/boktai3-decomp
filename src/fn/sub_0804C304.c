@@ -9,7 +9,7 @@ s32 Mod(s32, s32);
 void TetherActor_UpdateRecoveryState(struct TetherActor *actor)
 {
     u32 frozen;
-    register u32 rawTimer asm("r0");
+    u32 rawTimer;
     u32 highTimer;
     register u16 *timer asm("r8");
     register u32 counterOffset asm("r6");
@@ -65,9 +65,9 @@ void TetherActor_UpdateRecoveryState(struct TetherActor *actor)
         {
             const u16 *table;
             register const u16 *rawTable asm("r0");
-            register u32 *randomIndex asm("r5");
+            u32 *randomIndex;
             register u32 index asm("r1");
-            register u32 mask asm("r3");
+            u32 mask;
             register u32 amplitudeMask asm("r4");
             register u32 shakeOffset asm("r6");
             rawTable = (const u16 *)RANDOM_TABLE_ADDR;
@@ -128,11 +128,10 @@ void TetherActor_UpdateRecoveryState(struct TetherActor *actor)
             amplitude = 2;
         table = (const u16 *)RANDOM_TABLE_ADDR;
         {
-            register u32 *slot asm("r1") = &gUnk_03005308;
+            u32 *slot = &gUnk_03005308;
             u32 index;
             u32 mask;
             randomIndex = slot;
-            asm("" : : "r"(randomIndex));
             index = *slot + 1;
             mask = 1023;
             randomMask = mask;

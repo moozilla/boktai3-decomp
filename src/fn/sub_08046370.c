@@ -27,7 +27,7 @@ void ContactSequenceActor_Update(struct ContactSequenceOwner *parent,
     if (ContactSequenceActor_GetFlags(actor, 1)) {
         struct ContactCollider *collider = &actor->healthCollider;
         u32 result;
-        register u32 flags asm("r1");
+        u32 flags;
         flags = collider->flags;
         result = 4;
         result |= flags;
@@ -59,7 +59,6 @@ void ContactSequenceActor_Update(struct ContactSequenceOwner *parent,
             asm("" : "+r"(flash));
             offset = &jitter;
             direction = *sample;
-            asm("" : "+r"(direction));
             amplitude = flash * 4;
             sine = gUnk_086149C4;
             value = sine[(direction + 64) & angleMask] * amplitude;
@@ -71,8 +70,7 @@ void ContactSequenceActor_Update(struct ContactSequenceOwner *parent,
                 x = -value;
             }
             {
-                register u32 zero asm("r0") = 0;
-                asm("" : "+r"(zero));
+                u32 zero = 0;
                 offset->x = x;
                 offset->y = zero;
             }

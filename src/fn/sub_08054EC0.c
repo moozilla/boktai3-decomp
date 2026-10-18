@@ -44,7 +44,7 @@ void DisplayTrack_Update(struct DisplayTrack *track)
             out = initial;
             i = 15;
             do {
-                register const u16 *read asm("r2") = start;
+                const u16 *read = start;
                 u32 startColor;
                 u32 redStart;
                 u32 greenStart, blueStart;
@@ -121,15 +121,15 @@ void DisplayTrack_Update(struct DisplayTrack *track)
                     }
                 }
                 {
-                    register const u16 *next asm("r3") = start + 1;
+                    const u16 *next = start + 1;
                     start = next;
                 }
                 {
-                    register const u16 *next asm("r0") = end + 1;
+                    const u16 *next = end + 1;
                     end = next;
                 }
                 {
-                    register u32 step asm("r1") = 2;
+                    u32 step = 2;
                     out = (u16 *)((u8 *)out + step);
                 }
                 {
@@ -148,14 +148,13 @@ void DisplayTrack_Update(struct DisplayTrack *track)
                 register u32 base asm("r1") = 600;
                 register u32 value asm("r0");
                 register u32 tag asm("r2");
-                register u16 *destination asm("r3");
+                u16 *destination;
                 asm("" : "+r"(base));
                 value = base;
                 asm("" : "+r"(value));
                 tag = track->tag;
                 value += tag;
                 destination = defaultPalette;
-                asm("" : : "r"(destination));
                 *destination = value;
             }
         }
@@ -163,7 +162,6 @@ void DisplayTrack_Update(struct DisplayTrack *track)
     if (track->flags & 4) {
         /* Keep startColor scratch value live across the comparison to steer its reload. */
         register u32 comparisonScratch asm("r2");
-        asm("" : "=r"(comparisonScratch));
         if (++track->scaleFrame >= track->scaleDuration) {
             {
                 u32 end = track->scaleEnd;

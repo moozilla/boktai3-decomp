@@ -3,8 +3,8 @@
 extern void *gUnk_08605B34[];
 s32 ActorAttachment_TickManager(struct ActorAttachmentManagerView *incoming)
 {
-    register struct ActorAttachmentManagerView *manager asm("r1") = incoming;
-    register struct ActorAttachmentSlotView *base asm("r2") = manager->slots;
+    struct ActorAttachmentManagerView *manager = incoming;
+    struct ActorAttachmentSlotView *base = manager->slots;
     if (manager->occupiedMask) {
         void **dispatch = gUnk_08605B34;
         u8 *active = &manager->slots[0].flags31;

@@ -50,7 +50,7 @@ void AreaEffect_UpdateGraphicsId(struct AreaEffectManager *manager)
                     }
                     i = next;
                     {
-                        register u8 *readCount asm("r0") = count;
+                        u8 *readCount = count;
                         n = *readCount;
                     }
                 } while (i < n);

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_behavior.h"
 u8 *sub_0821D64C(u32, u32);
 #include "script_utility.h"
@@ -25,8 +24,8 @@ void SceneActorBehavior_CallTerrainScript(struct SceneActorBehaviorView *actor)
     {
         u32 offset = 0x2F4;
         u32 cell = *(u16 *)((u32)actor + offset);
-        register u32 flags asm("r0") = *(u16 *)(CellData(cell) + 2);
-        register u32 mask asm("r1") = 0x43;
+        u32 flags = *(u16 *)(CellData(cell) + 2);
+        u32 mask = 0x43;
         if (flags & mask)
             return;
     }

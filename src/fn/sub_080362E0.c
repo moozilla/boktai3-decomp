@@ -49,7 +49,7 @@ int sub_080362E0(struct Engine *argument)
     struct Engine *p = argument;
     int flags = p->mask;
     struct RfuLinkStatus **links;
-    register int one asm("r6");
+    int one;
     u8 *slot;
     int index;
     {
@@ -86,7 +86,6 @@ int sub_080362E0(struct Engine *argument)
         int check = one;
         asm("" : "+r"(check));
         check &= flags;
-        asm("" : "+r"(check));
         if (!check)
             goto ready;
     }

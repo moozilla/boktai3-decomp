@@ -175,7 +175,7 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
         }
         {
             s32 i = 0;
-            register s32 count asm("r1");
+            s32 count;
             register u32 one asm("r5");
             struct StackedActorSprite *savedShadow;
             u8 *segmentGraphics;
@@ -233,13 +233,13 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
                     *flags |= 0x201;
                 }
                 {
-                    register u8 *relative asm("r1") = (u8 *)actor + offset;
+                    u8 *relative = (u8 *)actor + offset;
                     u8 *destination = relative + 0xEF;
                     register u32 renderMode asm("r2") = 1;
                     *destination = renderMode;
                     {
-                        register u32 offset asm("r3") = 0x104;
-                        register struct StackedActorPosition *destination asm("r2");
+                        u32 offset = 0x104;
+                        struct StackedActorPosition *destination;
                         register struct StackedActorPosition *source asm("r3");
                         destination = (void *)(relative + offset);
                         source = cache.world;
@@ -341,14 +341,14 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
                             *destination = active;
                         }
                         {
-                            register u32 offset asm("r2") = 0x36A;
-                            register u16 *destination asm("r1");
+                            u32 offset = 0x36A;
+                            u16 *destination;
                             destination = (void *)((u8 *)actor + offset);
                             *destination = active;
                         }
                         {
-                            register u32 offset asm("r3") = 0x368;
-                            register u8 *destination asm("r1");
+                            u32 offset = 0x368;
+                            u8 *destination;
                             destination = (void *)((u8 *)actor + offset);
                             *destination = zeroByte;
                         }

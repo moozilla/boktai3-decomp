@@ -31,7 +31,7 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
             target = (struct TetherActor *)gUnk_02000488;
             angle = (angle + 7) & 7;
             {
-                register u32 offset asm("r3") = 0x46C;
+                u32 offset = 0x46C;
                 *(u16 *)((u8 *)target + offset) = angle;
             }
         } else {

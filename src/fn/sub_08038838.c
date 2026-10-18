@@ -38,7 +38,7 @@ void sub_08038838(struct P *p)
         int total;
         register int i asm("r12");
         int shift;
-        register u8 *q asm("r5");
+        u8 *q;
         p->entered = 0;
         data = 0;
         e = &p->entry;
@@ -49,7 +49,7 @@ void sub_08038838(struct P *p)
         q = e->bytes;
         do {
             int value;
-            register u32 flag asm("r4") = e->flag;
+            u32 flag = e->flag;
             if (flag) {
                 value = *q;
             } else {

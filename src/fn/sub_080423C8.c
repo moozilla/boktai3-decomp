@@ -12,7 +12,6 @@ s32 DisplayAnimation_UpdatePlayback(struct DisplayAnimation *display)
         u32 ended;
         u32 duration;
         u32 flags;
-        asm("" : "+r"(kind));
         if (!display->resource.sequence)
             goto done;
         sprite = (struct DisplaySequenceSprite *)((u8 *)display + 0x28);

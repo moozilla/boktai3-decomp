@@ -1,13 +1,13 @@
-// MATCHING_CONCESSION: register-pinning
 #include "script_keyframe_pool.h"
 struct ScriptKeyframeEntry *ScriptKeyframe_FindFromScript(void)
 {
     struct ScriptKeyframeManager **manager = &gUnk_02000498;
     struct ScriptKeyframeManager *current, *loaded;
-    register s32 length asm("r1");
-    u32 tag, offset;
+    s32 length;
+    u32 tag;
+    u32 offset;
     s32 i;
-    register s32 count asm("r4");
+    s32 count;
     u16 *scan;
     if (!*manager)
         goto missing;

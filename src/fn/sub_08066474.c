@@ -7,7 +7,7 @@ struct ActorAttachmentSlotView *ActorAttachment_CreateMeterPartsSlot(
     s32 total, u32 partCount, struct ActorAttachmentFollowView *follow, u32 sourceWord)
 {
     struct ActorAttachmentManagerView *manager;
-    register s32 savedZ asm("r8");
+    s32 savedZ;
     void *savedUpdate = update;
     struct ActorAttachmentManagerView *existing;
     u32 frame;
@@ -41,7 +41,6 @@ gotManager:
         goto failed;
     step = Div(total, 3);
     slot = sub_08065C40(manager);
-    asm("" : "+r"(slot));
     {
         struct ActorAttachmentPartSprite *low = slot->parts;
         asm("" : "+r"(low));
@@ -114,7 +113,7 @@ gotManager:
     }
     {
         u8 *status = slot->status;
-        register u8 *phase asm("r4");
+        u8 *phase;
         s16 *threshold;
         s32 *counter;
         register u32 zero asm("r2") = 0;
@@ -232,13 +231,13 @@ partLoop: {
         xOffset = zero;
     }
     {
-        register s32 index asm("r1") = partIndex;
+        s32 index = partIndex;
         register u32 offset asm("r0");
         offset = (scale + index) * 8 + 0x8C;
         part = (void *)((u32)slot + offset);
     }
     {
-        register u8 *low asm("r2") = kindPointer;
+        u8 *low = kindPointer;
         kind = *low;
     }
     scaledIndex = scale;
@@ -252,7 +251,6 @@ partLoop: {
         }
         case 3: {
             struct ActorAttachmentManagerView *low = manager;
-            asm("" : "+r"(low));
             resource = low->partResource;
             break;
         }
@@ -262,9 +260,9 @@ partLoop: {
     }
     sub_08217DE0(part, resource, 0);
     {
-        register u8 *lowResource asm("r1") = resourcePointer;
+        u8 *lowResource = resourcePointer;
         u32 resource;
-        register u8 *lowAction asm("r2");
+        u8 *lowAction;
         u32 action;
         register u32 offset asm("r3");
         resource = *lowResource;
@@ -279,7 +277,7 @@ partLoop: {
     }
     sub_08217EC4(part, xOffset, zOffset);
     {
-        register u8 *low asm("r1") = actionPointer;
+        u8 *low = actionPointer;
         if (*low == 255)
             slot->offset = (*followPointer)->offset;
         else {
@@ -296,7 +294,7 @@ partLoop: {
     part->unknownC[4] = 127;
     part->unknownC[3] = 1;
     {
-        register s32 indexOffset asm("r2") = sequenceOffset;
+        s32 indexOffset = sequenceOffset;
         register u8 *base asm("r0");
         register u32 offset asm("r3");
         register u16 *dst asm("r1");
@@ -346,7 +344,7 @@ partLoop: {
         Anim_SetSequence(state, sequence, *lowFrame, 0, 0);
     }
     {
-        register struct ActorAttachmentPartSprite *dst asm("r2") =
+        struct ActorAttachmentPartSprite *dst =
             (void *)((scaledIndex + partIndex) * 8 + (u32)parts);
         register struct ContactPosition *low asm("r3") = anchor;
         struct ContactPosition p;

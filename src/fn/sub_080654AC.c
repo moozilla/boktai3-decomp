@@ -81,7 +81,7 @@ void ActorAttachment_TickDescendingSprite(struct ActorAttachmentSlotView *slot)
                     sprite->position.y = y;
                 }
                 {
-                    register u32 z asm("r0") = (u16)slot->offset.z;
+                    u32 z = (u16)slot->offset.z;
                     u32 spriteZ = (u16)sprite->position.z;
                     sprite->position.z = z + spriteZ;
                 }

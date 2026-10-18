@@ -32,10 +32,10 @@ void sub_0803A9CC(struct Display *arg)
     if (p->timer <= 7) {
         u16 *table;
         u32 *state;
-        register u32 limit asm("r4");
+        u32 limit;
         register u32 index asm("r0");
         int value;
-        register int mask asm("r3");
+        int mask;
         q = p->drawings;
         table = gUnk_0203B400;
         state = &gUnk_03005308;

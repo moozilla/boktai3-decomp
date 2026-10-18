@@ -21,7 +21,7 @@ extern void *gUnk_020000B0;
 int SpritePool_AdvanceAnimation(Slot *arg)
 {
     register Slot *p asm("ip") = arg;
-    register Sprite *sprite asm("r6");
+    Sprite *sprite;
     Anim *a;
     u16 *frame;
     int done;
@@ -32,7 +32,6 @@ int SpritePool_AdvanceAnimation(Slot *arg)
     {
         int offset = a->frame * 2;
         register Slot *base asm("r2");
-        asm("" : "+r"(offset));
         base = p;
         frame = (u16 *)((u32)base->anim.data + offset);
     }

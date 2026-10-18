@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "tether_actor.h"
 u8 *sub_0821D64C(s32, s32);
 u32 sub_08225AB4(void *, u32, const struct ContactPosition *, u32, u32, void *);
@@ -14,7 +13,7 @@ void TetherActor_InitBodyFromScript(struct TetherActor *actor)
     s32 x, z, cell;
     u8 *properties;
     u32 surface, height;
-    register struct TetherBodyConfig *initialConfig asm("r4");
+    struct TetherBodyConfig *initialConfig;
     struct TetherBodyConfig *config;
     u32 displayKind;
     if (found) {

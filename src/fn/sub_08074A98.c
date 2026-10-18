@@ -82,7 +82,7 @@ void SceneActorMovement_UpdateHeight(struct SceneActorRegistryActor *actor)
             u16 height = *(u16 *)((u8 *)actor + 0x2be);
             actor->position.y = height;
             {
-                register u32 offset asm("r3") = 0x2ea;
+                u32 offset = 0x2ea;
                 {
                     u16 *field = (void *)((u8 *)actor + offset);
                     actor->position.y = height + *field;

@@ -10,9 +10,9 @@ void SparkParticle_CreateFromScript(void)
     u32 zero;
     union SparkParticleVector position, spread;
     union SparkParticleVector *positionVector;
-    register const struct ContactPosition *positionArg asm("r9");
+    const struct ContactPosition *positionArg;
     u32 hasSpread;
-    register const struct ContactPosition *spreadArg asm("r8");
+    const struct ContactPosition *spreadArg;
     s32 angle, speed, kind, priority;
     u8 count;
     asm("" : "=m"(zero));

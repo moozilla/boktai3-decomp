@@ -8,7 +8,7 @@ void ContactActor_SetDirectionalSequence(struct ContactActorPool *pool, struct C
     register struct ContactActor *actor asm("r5") = slot;
     u32 direction = ((actor->direction + 96) >> 6) & 3;
     register u8 *first asm("r1") = &flip[0];
-    register u8 *second asm("r4") = &flip[1];
+    u8 *second = &flip[1];
     u8 *saved;
     u32 check;
     check = (u8)(direction - 1);

@@ -40,7 +40,7 @@ void SceneActorReaction_BeginFadedState(struct SceneActorRegistryResetView *acto
             u32 mask = ~1;
             *sequence &= mask;
         } else {
-            register u8 *tile asm("r0") = (u8 *)actor->drawable + 0x20;
+            u8 *tile = (u8 *)actor->drawable + 0x20;
             u32 mask = ~1;
             *(u32 *)(tile + 8) &= mask;
         }

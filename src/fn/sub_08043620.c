@@ -15,14 +15,14 @@ void ContactActor_UpdateReaction(struct ContactActorPool *pool, struct ContactAc
                                  s32 index)
 {
     struct ContactPosition delta;
-    register struct ContactPosition *write asm("r3");
+    struct ContactPosition *write;
     u32 direction;
     u32 speed;
     u32 rawSpeed;
     if (slot->enter) {
         slot->enter = 0;
         {
-            register struct ContactCollider *collider asm("r2") = &slot->healthCollider;
+            struct ContactCollider *collider = &slot->healthCollider;
             collider->flags |= 4;
         }
         AnimData_SelectPaletteBank(slot->graphics, 0x192);

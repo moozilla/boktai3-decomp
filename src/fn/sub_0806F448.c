@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_effect_schedule.h"
 s32 Div(s32, s32);
 static inline s32 Scale(s32 input)
@@ -19,13 +18,11 @@ s32 SceneEffectSchedule_Tick(struct SceneEffectSchedule *manager)
         return 0;
     {
         u32 mask = 0x400;
-        asm("" : "+r"(mask));
         if ((gUnk_030053F4 | gUnk_030053F0) & mask)
             return 0;
     }
     {
         u32 mask = 4;
-        asm("" : "+r"(mask));
         if (gUnk_02000560 & mask)
             return 0;
     }

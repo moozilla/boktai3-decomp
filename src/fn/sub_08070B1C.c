@@ -7,10 +7,10 @@ static inline u8 IsUnavailable(struct SceneActorRegistryActor *input, u16 **save
 {
     register struct SceneActorRegistryActor *actor asm("r3") = input;
     register u32 excluded asm("r10") = excludedInput;
-    register u32 offset asm("r2") = 0x2d4;
+    u32 offset = 0x2d4;
     u16 *field;
     register u32 value asm("r0");
-    register u32 mask asm("r2");
+    u32 mask;
     field = (void *)((u8 *)actor + offset);
     value = *field;
     mask = 0x40;
@@ -50,8 +50,7 @@ void SceneActorRegistry_ResetEligibleCategoryState(void)
         u32 one;
         u32 zero;
         {
-            register u32 initial asm("r1") = 0xa007;
-            asm("" : "+r"(initial));
+            u32 initial = 0xa007;
             reject = initial;
         }
         {
@@ -87,7 +86,7 @@ void SceneActorRegistry_ResetEligibleCategoryState(void)
                             offset += 3;
                             field = (u8 *)actor + offset;
                             {
-                                register u32 code asm("r2") = substate;
+                                u32 code = substate;
                                 *field = code;
                             }
                             offset -= 0x99;
@@ -102,7 +101,7 @@ void SceneActorRegistry_ResetEligibleCategoryState(void)
                             {
                                 u32 flagOffset = 0x114;
                                 u32 *flags;
-                                register u32 mask asm("r1");
+                                u32 mask;
                                 u32 value;
                                 flags = (void *)((u8 *)actor + flagOffset);
                                 mask = ~1;
@@ -111,7 +110,7 @@ void SceneActorRegistry_ResetEligibleCategoryState(void)
                                 *flags = value;
                             }
                             {
-                                register u32 clearOffset asm("r1") = 0x104;
+                                u32 clearOffset = 0x104;
                                 field = (u8 *)actor + clearOffset;
                                 *(u32 *)field = selected;
                             }

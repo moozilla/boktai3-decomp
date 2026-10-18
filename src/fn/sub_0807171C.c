@@ -14,10 +14,9 @@ void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *argument)
     route->fieldC = route->parameterC;
     Route_Start(route, route->parameterA, route->parameterB, route->parameterC);
     {
-        register u32 offset asm("r2") = 0x5D0;
+        u32 offset = 0x5D0;
         void *object;
         object = *(void **)((u8 *)actor + offset);
-        asm("" : "+r"(object) : "r"(offset));
         position = &actor->position;
         sub_0821FD3C(object, position);
     }
@@ -31,8 +30,8 @@ void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *argument)
         computedCell = row + x;
     }
     {
-        register u32 offset asm("r2") = 0x2F4;
-        register u16 *address asm("r0");
+        u32 offset = 0x2F4;
+        u16 *address;
         address = (u16 *)((u8 *)actor + offset);
         *address = computedCell;
         cell = *address;
@@ -64,7 +63,7 @@ void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *argument)
         zero = 0;
         *address = zero;
         {
-            register u32 offset asm("r2") = 0x2EC;
+            u32 offset = 0x2EC;
             Memory_Clear((u8 *)actor + offset, 8);
         }
         Memory_Clear(&actor->motion, 8);
@@ -81,8 +80,8 @@ void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *argument)
                 u32 clearMask = ~0x1000000;
                 u32 value;
                 u16 *shortFlags;
-                register u32 offset asm("r0");
-                register u32 mask0 asm("r0");
+                u32 offset;
+                u32 mask0;
                 value = *renderFlags;
                 value &= clearMask;
                 *renderFlags = value;

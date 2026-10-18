@@ -6,26 +6,26 @@ extern const s16 gUnk_08614A84[];
 s32 DamageNumberDisplay_UpdateLeaving(struct DamageNumberDisplay *display,
                                       struct DamageNumberGroup *slot, s32 slotIndex)
 {
-    register s32 groupIndex asm("r8");
+    s32 groupIndex;
     register struct DamageNumberGroup *group asm("r12");
     struct ContactPosition screen;
     struct DamageNumberGlyph *digit;
     s32 index;
-    register s32 value asm("r0");
+    s32 value;
     s32 scaledSin;
     u32 x;
     s32 count;
     group = slot;
     groupIndex = slotIndex;
     {
-        register struct ContactPosition *projected asm("r5") = &screen;
-        register struct ContactPosition *world asm("r6") = &group->position;
+        struct ContactPosition *projected = &screen;
+        struct ContactPosition *world = &group->position;
         struct DamageNumberGroup *lowGroup;
         s32 x;
         s32 z;
         s32 scaledSum;
         s32 sum, vertical, y, depth;
-        register s32 pair asm("r1");
+        s32 pair;
         lowGroup = group;
         x = lowGroup->position.x;
         z = world->z;

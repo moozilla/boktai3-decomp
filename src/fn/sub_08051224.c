@@ -49,7 +49,7 @@ s32 DirectionalForce_Tick(struct DirectionalForce *force)
             {
                 register const u16 *random asm("r3") = (const u16 *)RANDOM_TABLE_ADDR;
                 u32 *indexAddress = &gUnk_03005308;
-                register u32 oldIndex asm("r0") = *indexAddress;
+                u32 oldIndex = *indexAddress;
                 u32 index;
                 u32 mask;
                 index = oldIndex + 1;

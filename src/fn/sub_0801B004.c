@@ -33,7 +33,7 @@ void SelectionMenu_ReviewChoice(u8 *p)
         Anim_LoadKeyframe(p + 0x194, p + 0x4c, 0x4d, 0);
         sub_08033468();
         {
-            register u8 *result asm("r2") = p + 0xd94;
+            u8 *result = p + 0xd94;
             sub_08019E70(p, g, result);
         }
         g->flags &= ~1;

@@ -71,7 +71,7 @@ s32 ScenePool_StateScheduleMotion(void *manager, struct ScenePoolActor *actor,
     else
         history[0] = 0;
     if (history[0] > 9) {
-        register s32 loaded asm("r0") = entry->direction;
+        s32 loaded = entry->direction;
         u32 lower = 0xfffebfff;
         u32 window = (u32)loaded + lower;
         u32 upper = 0x81ffe;

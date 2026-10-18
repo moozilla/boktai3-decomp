@@ -54,7 +54,7 @@ void sub_08038F08(struct Menu *p)
         if (p->result == 1 || ++p->retries > 2) {
             {
                 int state = 14;
-                register u8 *dest asm("r0") = &p->state;
+                u8 *dest = &p->state;
                 int zero = 0;
                 *dest = state;
                 p->entered = 1;

@@ -4,7 +4,7 @@ s32 SceneInventory_HandlePageKeys(struct SceneInventoryControlView *panel)
 {
     if (panel->interactionFlags & 1) {
         register u32 keys asm("r1") = gUnk_03005260[1];
-        register u32 bits asm("r0") = keys & 0x200;
+        u32 bits = keys & 0x200;
         u32 left;
         left = (u16)bits;
         if (left) {

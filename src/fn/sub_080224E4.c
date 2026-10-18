@@ -40,7 +40,7 @@ void sub_080224E4(u32 *position)
     ActorAnimation *p = sub_0802140C(0);
     if (p) {
         int sequence;
-        register u32 one asm("r3");
+        u32 one;
         u32 zero = 0, phase = 13;
         p->mode = zero;
         p->state = zero;

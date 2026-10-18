@@ -23,7 +23,7 @@ s32 ModifierMenu_InitializeGraphics(struct ModifierMenu *menu)
     originPointer = &origin;
     zero = 0;
     {
-        register u32 *source asm("r0") = &zero;
+        u32 *source = &zero;
         void *destination = originPointer;
         asm("" : "+r"(source), "+r"(destination));
         CpuSet(source, destination, 0x05000002);

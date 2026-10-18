@@ -2,12 +2,11 @@
 #ifdef NONMATCHING
 // fuzzy: 97.9%
 // Five FF constant birth orders differ (480/480 bytes).
-// MATCHING_CONCESSION: register-pinning
 void SceneInput_RebuildGrid(struct SceneInputGrid *grid)
 {
     s32 column, row;
     {
-        register u32 fill asm("r4");
+        u32 fill;
         for (column = 0, fill = 0xFF; column <= 3; column++)
             for (row = 0; row <= 3; row++)
                 grid->cells[(row) + 4][column] |= fill;
@@ -16,7 +15,6 @@ void SceneInput_RebuildGrid(struct SceneInputGrid *grid)
         for (column = 0; column <= 3; column++) {
             u32 offset = column * 4;
             s32 value;
-            asm("" : "+r"(offset) : : "r2");
             row = 3;
             value = offset + 3;
             for (; row >= 0; row--)
@@ -24,7 +22,7 @@ void SceneInput_RebuildGrid(struct SceneInputGrid *grid)
         }
     }
     {
-        register u32 fill asm("r6");
+        u32 fill;
         for (column = 0, fill = 0xFF; column <= 3; column++)
             for (row = 0; row <= 3; row++)
                 grid->cells[row][column] |= fill;
@@ -40,7 +38,6 @@ void SceneInput_RebuildGrid(struct SceneInputGrid *grid)
                     s32 next = column + 1;
                     u32 offset = column * 4;
                     s32 value;
-                    asm("" : "+r"(offset) : "r"(next) : "r2");
                     row = 3;
                     value = offset + 19;
                     for (; row >= 0; row--)
@@ -53,7 +50,6 @@ void SceneInput_RebuildGrid(struct SceneInputGrid *grid)
                 s32 next = column + 1;
                 u32 offset = column * 4;
                 s32 value;
-                asm("" : "+r"(offset) : "r"(next) : "r2");
                 row = 3;
                 value = offset + 19;
                 for (; row >= 0; row--)
@@ -72,13 +68,13 @@ void SceneInput_RebuildGrid(struct SceneInputGrid *grid)
     if (SceneInput_TestGridFlags(grid, 0x10)) {
         if (SceneInput_TestGridFlags(grid, 8)) {
             {
-                register u32 fill asm("r4");
+                u32 fill;
                 for (column = 0, fill = 0xFF; column <= 3; column++)
                     grid->cells[8][column] |= fill;
             }
         } else {
             {
-                register u32 fill asm("r4");
+                u32 fill;
                 for (column = 0, fill = 0xFF; column <= 3; column++)
                     grid->cells[8][column] |= fill;
             }
@@ -86,7 +82,7 @@ void SceneInput_RebuildGrid(struct SceneInputGrid *grid)
         }
     } else if (grid->kind == 1) {
         {
-            register u32 fill asm("r4");
+            u32 fill;
             for (column = 0, fill = 0xFF; column <= 3; column++)
                 grid->cells[8][column] |= fill;
         }

@@ -1,12 +1,11 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 struct SceneActorRegistryActor *SceneActorRegistry_FindById(u32);
 void SceneActorRegistry_SetMovementMode(struct SceneActorRegistryActor *, s32);
 static inline u8 HasMovementFlag(struct SceneActorRegistryActor *actor)
 {
-    register u32 mask asm("r1") = 0x100;
-    register u32 offset asm("r3") = 0x2c0;
-    register u16 *field asm("r0");
+    u32 mask = 0x100;
+    u32 offset = 0x2c0;
+    u16 *field;
     field = (void *)((u8 *)actor + offset);
     if (*field & mask)
         return 1;

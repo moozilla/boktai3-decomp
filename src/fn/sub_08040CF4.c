@@ -1,7 +1,6 @@
 #ifdef NONMATCHING
 // fuzzy: 84.2%
 // Remaining differences are low-register allocation; reviewed full extent is 716 bytes.
-// MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
 void ModifierMenu_DrawFirstSourceStats(struct ModifierMenu *);
 void ModifierMenu_DrawSecondSourceStats(struct ModifierMenu *);
@@ -15,8 +14,8 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
     struct ModifierSelection *current = &menu->current;
     struct ModifierDisplayObject *object;
     u32 one, mask;
-    register s32 remaining asm("r4");
-    register s32 mode asm("r2");
+    s32 remaining;
+    s32 mode;
     menu->previewFlags |= 1;
     one = 1;
     object = &menu->displays[8];
@@ -33,8 +32,8 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
     object = &menu->displays[7];
     object->flags = mask & object->flags;
     {
-        register u32 bit asm("r2") = 1;
-        register u32 *column asm("r1") = &menu->displays[9].flags;
+        u32 bit = 1;
+        u32 *column = &menu->displays[9].flags;
         remaining = 3;
         do {
             *column |= bit;
@@ -42,8 +41,8 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
         } while (--remaining >= 0);
     }
     {
-        register u32 bit asm("r2") = 1;
-        register u32 *column asm("r1") = &menu->displays[14].flags;
+        u32 bit = 1;
+        u32 *column = &menu->displays[14].flags;
         remaining = 3;
         do {
             *column |= bit;
@@ -55,7 +54,6 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
         case 0: {
             s32 selectedCategory = menu->choice.cursor.category;
             s8 *category;
-            asm("" : "+r"(selectedCategory));
             category = &menu->choice.cursor.category;
             if (selectedCategory == 0) {
                 object = &menu->displays[9];

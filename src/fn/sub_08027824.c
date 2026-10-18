@@ -81,14 +81,14 @@ void sub_08027824(ActorAnimation *p)
         p->changed = 0;
         sequence = choose(p->mode, 43, 5);
         {
-            register int offset asm("r2") = 0x240;
+            int offset = 0x240;
             SceneActors_StartDirectionalAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence, 1,
                                                   1, 4);
         }
     } else {
         register int sequence asm("r6") = choose(p->mode, 43, 5);
         {
-            register int offset asm("r2") = 0x240;
+            int offset = 0x240;
             SceneActors_StartDirectionalAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence, 1,
                                                   1, 1);
         }

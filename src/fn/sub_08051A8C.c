@@ -2,9 +2,9 @@
 #include "proximity_emitter.h"
 void ProximityEmitter_EmitParticle(struct ProximityEmitter *emitter, void *resource)
 {
-    register u8 *next asm("r10") = &emitter->nextParticle;
+    u8 *next = &emitter->nextParticle;
     struct ProximityEmitterParticle *particle = &emitter->particles[*next];
-    register const u16 *random asm("r5");
+    const u16 *random;
     register u32 *indexAddress asm("r9");
     register u32 index asm("r1"), mask asm("r3");
     register u32 xzMask asm("r8");
@@ -21,7 +21,7 @@ void ProximityEmitter_EmitParticle(struct ProximityEmitter *emitter, void *resou
     {
         s32 sample = random[index];
         u16 *address = (u16 *)&emitter->position.x;
-        register u32 applied asm("r6");
+        u32 applied;
         sample >>= 4;
         applied = 255;
         xzMask = applied;
@@ -54,7 +54,7 @@ void ProximityEmitter_EmitParticle(struct ProximityEmitter *emitter, void *resou
     {
         s32 sample = random[index];
         u16 *address = (u16 *)&emitter->position.z;
-        register u32 applied asm("r6");
+        u32 applied;
         sample >>= 4;
         applied = xzMask;
         sample &= applied;
