@@ -1093,3 +1093,4 @@ addr,function,name,family,note
 081C04B8,sub_081C04B8,PaletteScreen_LoadResources,"PaletteScreen (tentative)","loads background and two palette resources"
 081C0780,sub_081C0780,ScreenTransition_BeginDownwardMotion,"ScreenTransition (tentative)","starts child motion from y80 to y144"
 081C0894,sub_081C0894,ScreenTransition_BeginCornerMotion,"ScreenTransition (tentative)","starts child motion toward coordinates 48 48"
+081C0AA0,sub_081C0AA0,PaletteScreen_InitDisplayResources,"PaletteScreen (tentative)","sets display layers and loads background palette"
