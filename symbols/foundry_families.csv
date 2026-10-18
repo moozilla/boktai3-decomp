@@ -683,3 +683,4 @@ addr,function,name,family,note
 0813A8A8,sub_0813A8A8,DisplaySlots_Reserve,"DisplaySlots","reserve one of two task-owned display slots"
 0813AB04,sub_0813AB04,ScreenMote_SpawnBatch,"ScreenMote","allocate and initialize sprites with randomized starting positions"
 0813B67C,sub_0813B67C,Player_InitializeStatsFromScript,"Player","restores saved current stats with script-controlled refill options"
+0813D754,sub_0813D754,SceneActor_SelectEffectDisplayMode,"SceneActor effect","selects an effect display mode with timed alternation"
