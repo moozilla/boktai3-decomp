@@ -82,6 +82,8 @@ function still matching, `tools/build.py` printing `build/boktai3.gba: OK`. Name
 functions you understand with a file-local `#define NewName sub_XXXXXXXX` alias
 (integration promotes them). Do not run git commit (the driver commits after its own
 verification; your sandbox cannot write git metadata); leave the finished work in the tree.
+Don't edit shared docs (docs/HANDOFF.md, INDEX.md, history/, ENGINE.md, GAME_LAYOUT.md):
+every unit worker would collide there. Put findings in notes/{slug}.md instead.
 Finish with the brief's short report.
 """
 
@@ -133,7 +135,8 @@ def verify(s, st, d, before):
     unit = os.path.exists(os.path.join(d, "src", s["slug"] + ".c"))
     good = ok and unit and after is not None and before is not None and after >= before
     if good:                      # the worker leaves its changes; commit them here, one per subsystem
-        subprocess.run(["git", "add", "-A", "src", "include", "symbols", "docs", "notes"], cwd=d, check=True)
+        subprocess.run(["git", "add", "-A", "src", "include", "symbols", "notes"], cwd=d, check=True)
+        subprocess.run(["git", "checkout", "--", "docs"], cwd=d, capture_output=True)   # shared docs collide
         subprocess.run(["git", "commit", "-q", "-m", f"Unit {s['slug']}: merge {s['fn']} files into src/{s['slug']}.c\n\n"
                         f"{s['name']} ({s['start']}-{s['end']}); tools/unitize.py, build OK, "
                         f"matched bytes {before} -> {after}.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"],
