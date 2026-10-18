@@ -664,3 +664,4 @@ addr,function,name,family,note
 081284E0,sub_081284E0,SpriteGroup_Release,"SpriteGroup","releases four sprites and calls the group's completion script"
 0812B0F8,sub_0812B0F8,ActorEffect_Spawn,"ActorEffect pooled animated effects (tentative)","allocates and initializes an animated effect with two colliders"
 0812B68C,sub_0812B68C,PursuingActor_InitColliders,"actor collider pair","initializes two actor colliders and their callbacks"
+0812BCE0,sub_0812BCE0,PursuingActor_UpdateRetirement,"pursuing actor","moves fading actor and releases sprites and pool slot"
