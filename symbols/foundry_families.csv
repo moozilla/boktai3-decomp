@@ -1036,3 +1036,4 @@ addr,function,name,family,note
 081AF5A0,sub_081AF5A0,SceneAnimation_SelectSequence,"SceneAnimation (tentative)","selects an animation or enters inactive state"
 081AFABC,sub_081AFABC,,"unassigned callback",""
 081B4784,sub_081B4784,SceneParticleEmitter_EmitPeriodically,"SceneParticleEmitter (tentative)","emits variant particles every 32 ticks"
+081B6310,sub_081B6310,PairedSceneActor_SetResetValues,"PairedSceneActor (tentative)","sets two reset values and refreshes positive counters"
