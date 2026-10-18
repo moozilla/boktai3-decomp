@@ -164,3 +164,4 @@ addr,function,name,family,note
 081028F8,sub_081028F8,NamedObject_ClearAttachmentFlag,"NamedObject","clear player or tether attachment flag by object name"
 08102FB0,sub_08102FB0,NamedObject_MoveAttachedTether,"NamedObject","apply object motion to the attached tether actor"
 08103060,sub_08103060,NamedObject_SnapTetherToPlatform,"NamedObject","snap a nearby tether actor onto a kind-two object"
+08103B14,sub_08103B14,ActorGroup_GetSelectedMemberId,"ActorGroup","returns the identifier of the active member with flag 0x10"
