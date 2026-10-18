@@ -1,5 +1,3 @@
-#define MessagePanel_InitFromScript   sub_08109A04
-#define MessagePanel_ResetDisplay     sub_08109948
 #define MessagePanel_SetupBackground LinkConnectionMenu_LoadBackground
 #define MessagePanel_CreateTextWindow LinkConnectionMenu_CreateTextWindow
 #include "global.h"
@@ -24,9 +22,9 @@ s32 Script_GetKeywordValue(u32, s32);
 u32 Script_GetTextSourcePc(void);
 void LinkConnectionMenu_LoadBackground(struct MessagePanel *);
 void LinkConnectionMenu_CreateTextWindow(struct MessagePanel *);
-void sub_08109948(struct MessagePanel *);
+void MessagePanel_ResetDisplay(struct MessagePanel *);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
-s32 sub_08109A04(struct MessagePanel *p)
+s32 MessagePanel_InitFromScript(struct MessagePanel *p)
 {
     if (Script_SeekToKeyword('r')) {
         p->script = Script_GetTextSourcePc();
@@ -44,7 +42,7 @@ s32 sub_08109A04(struct MessagePanel *p)
     LinkConnectionMenu_LoadBackground(p);
     LinkConnectionMenu_CreateTextWindow(p);
     {
-        void (*state)(struct MessagePanel *) = sub_08109948;
+        void (*state)(struct MessagePanel *) = MessagePanel_ResetDisplay;
         u32 zero = 0;
         p->state = state;
         p->entering = 1;

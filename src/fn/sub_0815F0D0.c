@@ -1,4 +1,3 @@
-#define Player_Update                sub_0815F0D0
 #define Player_RefreshCueCollider Player_UpdateColliderRefreshCountdown
 #define gPlayerCueTimer              gUnk_02000518
 #define gPlayerCueActive             gUnk_02000528
@@ -7,29 +6,29 @@
 #include "game_state.h"
 extern u16 gUnk_02000518, gUnk_02000528;
 void PlayerCue_Dispatch(void *);
-void sub_0813B080(void *);
-void sub_0815EF6C(void *);
-void sub_0813ED20(void *);
+void Player_ResetStatus(void *);
+void Player_RecordInputTicks(void *);
+void Player_ConsumeActionCharge(void *);
 void Player_UpdateColliderRefreshCountdown(void *);
 s32 sub_0815E8A4(void *);
-void sub_0815E790(void *);
+void Player_EnterKindFour(void *);
 void sub_0815EBB8(void *);
 void sub_0815EFF8(void *);
 void Player_ClearDirectionHistory(void *);
 void sub_0815ED78(void *);
 void Sound_PlaySong(u32);
-s32 sub_0824923C(void *, void *);
-void sub_0813DDAC(void *);
+s32 Callback_InvokeActor(void *, void *);
+void SceneActor_UpdateVisualEffects(void *);
 void Player_RefreshVitalsAndCollision(void *);
-void sub_0815EC14(void *);
+void Player_SaveStateSnapshot(void *);
 void sub_0821DE30(void *);
-s32 sub_0815F0D0(struct Player *p)
+s32 Player_Update(struct Player *p)
 {
     PlayerCue_Dispatch(p);
-    sub_0813B080(p);
+    Player_ResetStatus(p);
     if (p->kind == 1) {
-        sub_0815EF6C(p);
-        sub_0813ED20(p);
+        Player_RecordInputTicks(p);
+        Player_ConsumeActionCharge(p);
         Player_UpdateColliderRefreshCountdown(p);
         if (gUnk_02000710->form != 2) {
             gUnk_02000518 = 0;
@@ -42,7 +41,7 @@ s32 sub_0815F0D0(struct Player *p)
                 gUnk_02000528 = 0;
         }
         if (sub_0815E8A4(p))
-            sub_0815E790(p);
+            Player_EnterKindFour(p);
         else if (p->tetherMode != 0x26) {
             sub_0815EBB8(p);
             sub_0815EFF8(p);
@@ -64,12 +63,12 @@ s32 sub_0815F0D0(struct Player *p)
         Sound_PlaySong(0x393);
         p->actionRequestState = 0;
     }
-    sub_0824923C(p, p->updateCallback);
-    sub_0813DDAC(p);
+    Callback_InvokeActor(p, p->updateCallback);
+    SceneActor_UpdateVisualEffects(p);
     Player_RefreshVitalsAndCollision(p);
     p->positionResetRequested = 0;
     if (!p->movementRequestBlocked)
-        sub_0815EC14(p);
+        Player_SaveStateSnapshot(p);
     if (p->kind != 4) {
         p->trackedPosition = &p->position;
         sub_0821DE30(p->positionTracker);

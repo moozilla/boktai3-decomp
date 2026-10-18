@@ -1,9 +1,7 @@
-#define Player_SetActionRequest         sub_0813F9EC
-#define Player_GetActionRequestDuration sub_0813F784
 #define Player_IsActionRequestEnabled Player_IsEnchantmentAvailable
 #include "global.h"
 #include "player.h"
-s32 sub_0813F784(s32);
+s32 ActorParameter_GetModeValue(s32);
 s32 Player_IsEnchantmentAvailable(struct Player *, s32);
 void PlayerBarrier_Hide(void *);
 s32 PlayerBarrier_IsActive(void *);
@@ -23,7 +21,7 @@ static inline void SetModeFlag(struct Player *p)
         *flags |= mask;
     }
 }
-void sub_0813F9EC(struct Player *p, s32 kind)
+void Player_SetActionRequest(struct Player *p, s32 kind)
 {
     struct PlayerActionRequest *request = (struct PlayerActionRequest *)&p->thresholdMode;
     if (request->kind != kind) {
@@ -46,7 +44,7 @@ void sub_0813F9EC(struct Player *p, s32 kind)
                 p->actionRequestTimer = 0;
         } else {
             request->enabled = Player_IsEnchantmentAvailable(p, request->kind);
-            request->duration = sub_0813F784(request->kind);
+            request->duration = ActorParameter_GetModeValue(request->kind);
             if (!request->enabled)
                 return;
             request->latched = 0;

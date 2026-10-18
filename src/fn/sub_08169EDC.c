@@ -1,5 +1,4 @@
 // Tentative StatusPanel family and semantic names; based on static consumers.
-#define StatusPanel_ResetSelectionAnimations sub_08169EDC
 #include "global.h"
 struct PanelSelectionAnim { u32 unknown[2]; u32 flags; u8 rest[0x54]; };
 struct StatusPanel {
@@ -10,7 +9,7 @@ struct StatusPanel {
     u8 selectionIndex;
 };
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
-void sub_08169EDC(struct StatusPanel *p)
+void StatusPanel_ResetSelectionAnimations(struct StatusPanel *p)
 {
     u32 mask = ~1;
     u32 *flags = &p->selection[0].flags;

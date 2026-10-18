@@ -1,5 +1,3 @@
-#define SelectionPanel_RunSelectionScript sub_0810E284
-#define SelectionPanel_GetSelection sub_0810E1A0
 #include "global.h"
 #include "directional_interaction.h"
 struct SelectionPanel {
@@ -16,9 +14,9 @@ void Bg_ClearTilemap(s32);
 u32 ScrollingDialogue_ClearScript(void);
 void ScrollingDialogue_HideImmediately(void);
 void Registry3C9F_HideDisplayObjects(struct SelectionPanel *);
-s32 sub_0810E1A0(struct SelectionPanel *);
+s32 SelectionPanel_GetSelection(struct SelectionPanel *);
 void Registry3C9F_OnTransitionIdle(void);
-void sub_0810E284(struct SelectionPanel *p)
+void SelectionPanel_RunSelectionScript(struct SelectionPanel *p)
 {
     s32 value;
     struct DirectionalScriptArgs args;
@@ -30,7 +28,7 @@ void sub_0810E284(struct SelectionPanel *p)
     Bg_ClearTilemap(3);
     Registry3C9F_HideDisplayObjects(p);
     if (p->selectionScript) {
-        value = sub_0810E1A0(p);
+        value = SelectionPanel_GetSelection(p);
         args.count = 1;
         args.values = &value;
         Script_Call(p->selectionScript, &args);

@@ -1,6 +1,5 @@
 #include "global.h"
 #include "player.h"
-#define PlayerTransition_StepReveal sub_0815FEB0
 #define PlayerTransition_SetPhase PlayerBurst_SetStateCallback
 #define PlayerTransition_FinishReveal PlayerBurst_UpdateShutdown
 #define gPlayers gUnk_02000580
@@ -15,7 +14,7 @@ void ActorShadow_Enable(void *);
 s32 Anim_Step(void *, void *);
 void PlayerBurst_UpdateShutdown(void *);
 void PlayerBurst_SetStateCallback(void *, void (*)(void *));
-void sub_0815FEB0(struct PlayerTransition *p)
+void PlayerTransition_StepReveal(struct PlayerTransition *p)
 {
     u16 *ticks = &p->phaseTicks;
     if (*ticks == 0) {

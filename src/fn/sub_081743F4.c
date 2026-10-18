@@ -1,4 +1,3 @@
-#define TextLabel_FormatSuffix sub_081743F4
 #include "global.h"
 /* Tentative semantic names; field offsets are established by static accesses. */
 struct TextLabelStyle {
@@ -10,7 +9,7 @@ struct TextLabelStyle {
     u8 unknown11[3];
     u8 suffixKind;
 };
-void sub_081743F4(struct TextLabelStyle *style, u8 *text)
+void TextLabel_FormatSuffix(struct TextLabelStyle *style, u8 *text)
 {
     u32 length = 0;
     switch (style->suffixKind) {

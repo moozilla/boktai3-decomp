@@ -1,6 +1,4 @@
-#define SelectionMenu_ApplyConfirmedReward sub_0816B250
 #define SelectionMenu_SetPhase Hud_SetUpdateCallback
-#define SelectionMenu_ReadConfirmation     sub_08165A30
 #define gGameState                         gUnk_02000710
 #include "global.h"
 #include "game_state.h"
@@ -16,19 +14,19 @@ struct SelectionMenu {
 s32 Anim_Step(void *, void *);
 void Sound_PlaySong(u32);
 s32 MessageWindow_ShowMessage(s32);
-s32 sub_08165A30(struct SelectionMenu *);
+s32 SceneHud_UpdateBinaryChoice(struct SelectionMenu *);
 void Hud_SetUpdateCallback(struct SelectionMenu *, void (*)(struct SelectionMenu *));
-void sub_0816B0AC(struct SelectionMenu *);
-void sub_0816AE38(struct SelectionMenu *);
-void sub_0816B250(struct SelectionMenu *p)
+void SelectionMenu_UpdateConfirmInput(struct SelectionMenu *);
+void ScenePanel_BeginAccountExit(struct SelectionMenu *);
+void SelectionMenu_ApplyConfirmedReward(struct SelectionMenu *p)
 {
     s32 result;
     Anim_Step(p->primaryAnimation, p->animationData);
-    result = sub_08165A30(p);
+    result = SceneHud_UpdateBinaryChoice(p);
     if (result == 0) {
         Sound_PlaySong(0xDE);
         MessageWindow_ShowMessage(7);
-        Hud_SetUpdateCallback(p, sub_0816B0AC);
+        Hud_SetUpdateCallback(p, SelectionMenu_UpdateConfirmInput);
     } else if (result == 1) {
         Sound_PlaySong(0xDD);
         ((struct GameState *)(u8 *)gUnk_02000710)->menuRewardBalance += (p->count - 1) * 50;
@@ -36,6 +34,6 @@ void sub_0816B250(struct SelectionMenu *p)
             (*(struct GameState *volatile *)&gUnk_02000710)->menuRewardBalance = 9999;
         p->confirmed = result;
         p->resultMode = 2;
-        sub_0816AE38(p);
+        ScenePanel_BeginAccountExit(p);
     }
 }

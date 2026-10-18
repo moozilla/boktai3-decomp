@@ -1,6 +1,5 @@
 #include "global.h"
 /* Provisional names and field interpretations; confidence low. */
-#define TilePool_Destroy sub_081083F4
 #define gTilePool gUnk_020001B8
 struct Tile {
     u8 pad0[0x2C];
@@ -23,7 +22,7 @@ static inline u8 TilePool_IsUsed(struct TileManager *pool, s32 i)
     if (pool->used & (1 << i)) return 1;
     return 0;
 }
-u32 sub_081083F4(struct TileManager *pool)
+u32 TilePool_Destroy(struct TileManager *pool)
 {
     s32 i;
     struct Tile *tile;

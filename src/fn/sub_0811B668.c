@@ -1,5 +1,4 @@
 #include "global.h"
-#define CategoryLists_Destroy sub_0811B668
 #define gCategoryLists        gUnk_02000200
 struct CategoryListNode {
     u32 value;
@@ -16,7 +15,7 @@ struct CategoryLists {
 };
 extern struct CategoryLists *gUnk_02000200;
 void Heap_Free(void *);
-s32 sub_0811B668(struct CategoryLists *manager)
+s32 CategoryLists_Destroy(struct CategoryLists *manager)
 {
     s32 i = 0;
     do {

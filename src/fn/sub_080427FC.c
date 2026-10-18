@@ -6,11 +6,11 @@ struct ContactModeActor {
     u32 mode;
 };
 void sub_0821FF8C(void *, void *);
-void sub_08159860(void *, void *, u32);
+void PlayerStats_AddContactHundredths(void *, void *, u32);
 struct ContactModeActor *SceneActors_GetBySlot(s32);
 void DamageNumberDisplay_Show(void *, u32, s32, void *, const struct ContactPackedVector *, u32);
 void SceneActors_AddHealthCost(u32);
-void sub_0806A160(void *, u32, const void *, u32, u32, u32, u32, u32);
+void SparkParticle_Spawn(void *, u32, const void *, u32, u32, u32, u32, u32);
 extern const u8 gUnk_0824DE9C[];
 void ContactActor_ApplyHealthContact(struct ContactCollider *sourceInput,
                                      struct ContactCollider *otherInput,
@@ -37,7 +37,7 @@ void ContactActor_ApplyHealthContact(struct ContactCollider *sourceInput,
         owner->targetIndex = mode;
     }
     sub_0821FF8C(source, other);
-    sub_08159860(source, other, 2);
+    PlayerStats_AddContactHundredths(source, other, 2);
     actor = SceneActors_GetBySlot(0);
     if (actor) {
         u32 playerMode = gUnk_02000580[0]->actionMode;
@@ -70,7 +70,7 @@ void ContactActor_ApplyHealthContact(struct ContactCollider *sourceInput,
             u32 angle;
             gUnk_03005308 = index;
             angle = ((const u8 *)RANDOM_TABLE_ADDR)[index * 2];
-            sub_0806A160(position, 1, gUnk_0824DE9C, angle, 3, 8, 2, 2);
+            SparkParticle_Spawn(position, 1, gUnk_0824DE9C, angle, 3, 8, 2, 2);
         }
     }
 }

@@ -1,4 +1,3 @@
-#define Player_ResetStatus sub_0813B080
 #include "global.h"
 #include "player.h"
 #include "game_state.h"
@@ -6,7 +5,7 @@ s32 AreaEffect_TestPlayerCoverage(u8 *a);
 static inline u32 masked(u32 *p, u32 mask) { return *p & mask; }
 static inline void set(u32 *p, u32 mask) { *p |= mask; }
 static inline u32 counter(u32 slot, struct GameState *state) { return (slot << 2) + (u32)state; }
-void sub_0813B080(struct Player *p)
+void Player_ResetStatus(struct Player *p)
 {
     p->statusFlags = 1;
     if (*(s32 *)(counter(p->timedEventSlot, gUnk_02000710) + 0x628) < 0)

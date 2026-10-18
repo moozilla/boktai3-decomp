@@ -1,13 +1,11 @@
 #include "global.h"
-#define SelectionPanel_UpdateCancelTransition sub_0810E450
-#define SelectionPanel_CompleteCancel         sub_0810E30C
 void GameState_SetResultIndex(s32);
 void CharacterModel_UpdatePairedAnimations(u8 *, s32);
 void PaletteFade_CycleMenuColors(u16 *);
 void Palette_UpdateHighlightPulse(u16 *, u8 *);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
-void sub_0810E30C(u8 *);
-void sub_0810E450(u8 *p)
+void SelectionPanel_RunCancelScript(u8 *);
+void SelectionPanel_UpdateCancelTransition(u8 *p)
 {
     u8 *flag = p + 0xd2c;
     if (*flag) {
@@ -21,5 +19,5 @@ void sub_0810E450(u8 *p)
     if (*(u16 *)(p + 0xd2e) <= 31)
         ++*(u16 *)(p + 0xd2e);
     else
-        sub_0810E30C(p);
+        SelectionPanel_RunCancelScript(p);
 }

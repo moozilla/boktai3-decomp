@@ -1,11 +1,10 @@
-#define RegionActorPool_UpdateActors sub_08106BCC
 #define gGameState                   gUnk_02000710
 #define gRegionActorUpdateCallbacks  gUnk_086064FC
 #include "global.h"
 #include "game_state.h"
 #include "region_actor.h"
 extern void *gUnk_086064FC[];
-s32 sub_0824923C(void *, void *);
+s32 Callback_InvokeActor(void *, void *);
 static inline u8 IsUsed(u32 *used, u32 mask)
 {
     if (*used & mask)
@@ -26,7 +25,7 @@ static inline u8 IsCurrentRegion(struct RegionActor *actor)
         return 1;
     return 0;
 }
-s32 sub_08106BCC(struct RegionActorPool *pool)
+s32 RegionActorPool_UpdateActors(struct RegionActorPool *pool)
 {
     struct RegionActor **actors = pool->actors;
     s32 i;
@@ -43,7 +42,7 @@ s32 sub_08106BCC(struct RegionActorPool *pool)
                 if (TestFlags(actors[i]) && !IsCurrentRegion(actors[i]))
                     actors[i]->flags |= 1;
                 else
-                    sub_0824923C(actors[i], callbacks[actors[i]->kind]);
+                    Callback_InvokeActor(actors[i], callbacks[actors[i]->kind]);
             }
             i++;
         } while (i < 32);

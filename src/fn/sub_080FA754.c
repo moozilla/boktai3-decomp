@@ -1,4 +1,3 @@
-#define SceneActorControl_UpdateHoverHeight sub_080FA754
 #define gHoverSineTable gUnk_086149C4
 #define gSceneHeightState gUnk_02000580
 #include "global.h"
@@ -9,7 +8,7 @@ static inline s32 Scale(s32 value)
 {
     return value >= 0 ? value >> 12 : -(-value >> 12);
 }
-void sub_080FA754(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateHoverHeight(struct SceneActorRegistryResetView *actor)
 {
     u8 *context = actor->context;
     u32 mask = 0x8000;

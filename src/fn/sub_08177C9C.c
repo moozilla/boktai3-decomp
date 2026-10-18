@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_hud_display.h"
-#define SceneHud_ReadPageVisibility sub_08177C9C
-void sub_08177C9C(struct SceneHudState *p)
+void SceneHud_ReadPageVisibility(struct SceneHudState *p)
 {
     s32 i;
     if (Script_SeekToKeyword('o')) {

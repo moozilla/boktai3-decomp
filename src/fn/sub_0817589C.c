@@ -1,6 +1,5 @@
-#define SceneCatalog_MapSelectionMask sub_0817589C
 #include "global.h"
-s32 sub_0817589C(s32 selection)
+s32 SceneCatalog_MapSelectionMask(s32 selection)
 {
     if (selection == 0)
         return 4;

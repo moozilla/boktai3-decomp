@@ -1,10 +1,9 @@
 #include "global.h"
 #include "scene_hud_display.h"
-#define SceneHud_ReadScriptOptions sub_08177C00
 #define Script_GetArgumentPc Script_GetTextSourcePc
 u32 Script_GetTextSourcePc(void);
 s32 Script_GetValueSafe(void);
-void sub_08177C00(struct SceneHudState *p)
+void SceneHud_ReadScriptOptions(struct SceneHudState *p)
 {
     if (Script_SeekToKeyword('i'))
         p->actionTextScript = (void *)Script_GetTextSourcePc();

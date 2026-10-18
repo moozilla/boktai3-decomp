@@ -1,7 +1,6 @@
 // Tentative StatusPanel family and semantic names; based on static consumers.
-#define StatusPanel_GetDirectionAxis sub_0816A25C
 #include "global.h"
-s32 sub_0816A25C(s32 direction)
+s32 StatusPanel_GetDirectionAxis(s32 direction)
 {
     s32 result;
     switch (direction >> 2) {

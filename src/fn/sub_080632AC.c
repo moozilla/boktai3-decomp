@@ -6,7 +6,7 @@ s32 SceneInventory_TickController(struct SceneInventoryLifecycleView *owner)
     u8 *mode = &owner->clockMode;
     SceneHud_DrawNumericStatus(*mode);
     SceneHud_DrawClock(*mode);
-    sub_0824923C(owner, owner->action);
+    Callback_InvokeActor(owner, owner->action);
     owner->frame++;
     return 0;
 }

@@ -1,4 +1,3 @@
-#define SpritePairPool_Initialize sub_0813A24C
 #define gSpritePairPool           gUnk_020004D4
 #include "global.h"
 struct SpritePairEntry {
@@ -28,7 +27,7 @@ void *ScriptProc_Start(u16, u16);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void Memory_Clear(void *, u32);
-s32 sub_0813A24C(struct SpritePairPool *pool)
+s32 SpritePairPool_Initialize(struct SpritePairPool *pool)
 {
     s32 i;
     for (i = 0; i < 2; i++) {

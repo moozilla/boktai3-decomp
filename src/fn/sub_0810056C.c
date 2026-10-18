@@ -1,6 +1,3 @@
-#define FloorSwitch_UpdateOccupancy sub_0810056C
-#define FloorSwitch_SetOccupant     sub_0810048C
-#define FloorSwitch_Release         sub_081004F8
 #define gSceneContactFlags          gUnk_030053F4
 #define gSwitchPlayer               gUnk_02000580
 #include "global.h"
@@ -45,12 +42,12 @@ struct FloorSwitchPlayer {
 extern u32 gUnk_030053F4;
 extern struct FloorSwitchPlayer *gUnk_02000580;
 struct FloorSwitchObjectList *SceneBody_GetRegistry(void);
-void sub_0810048C(struct FloorSwitch *, u32);
-void sub_081004F8(struct FloorSwitch *);
+void FloorSwitch_SetOccupant(struct FloorSwitch *, u32);
+void FloorSwitch_Release(struct FloorSwitch *);
 struct FloorSwitchDelta {
     s16 x, y, z;
 };
-void sub_0810056C(struct FloorSwitch *p)
+void FloorSwitch_UpdateOccupancy(struct FloorSwitch *p)
 {
     struct FloorSwitchObjectList *list = SceneBody_GetRegistry();
     struct FloorSwitchObject *o;
@@ -76,7 +73,7 @@ void sub_0810056C(struct FloorSwitch *p)
             d->y = src->y - base->y;
             d->z = src->z - base->z;
             if ((u16)d->x <= 256 && d->y <= 32 && d->y >= 0 && d->z <= 256 && d->z >= 0) {
-                sub_0810048C(p, o->id);
+                FloorSwitch_SetOccupant(p, o->id);
                 if (p->field8C < p->field8E - 1)
                     p->field8C++;
                 return;
@@ -85,7 +82,7 @@ void sub_0810056C(struct FloorSwitch *p)
     }
     if (!found) {
         if (p->field8C >= p->field8E)
-            sub_081004F8(p);
+            FloorSwitch_Release(p);
         else
             p->field8C++;
     }

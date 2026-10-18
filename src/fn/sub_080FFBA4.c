@@ -1,4 +1,3 @@
-#define WoodenCrate_UpdatePaletteTimers sub_080FFBA4
 #include "global.h"
 #include "directional_interaction.h"
 struct WoodenCrate {
@@ -22,7 +21,7 @@ static inline void UpdateTimedFlags(struct WoodenCrate *crate)
         crate->displayFlags &= ~4;
     }
 }
-void sub_080FFBA4(struct WoodenCrate *crate)
+void WoodenCrate_UpdatePaletteTimers(struct WoodenCrate *crate)
 {
     u8 *bytes = (u8 *)crate;
     UpdateTimedFlags(crate);

@@ -1,7 +1,4 @@
-#define SpritePairPool_StartEntry      sub_0813A4C8
 #define SpritePairPool_Create FollowingSpriteEffect_EnsureManager
-#define SpritePairPool_TestUnavailable sub_0813A390
-#define SpritePairEntry_CreateEffect   sub_0813A41C
 #define SpritePairEntry_SetCallback FollowingSpriteEffect_SetStateCallback
 #define gSpritePairPool                gUnk_020004D4
 #include "global.h"
@@ -36,8 +33,8 @@ struct SpritePairParams {
 };
 extern struct SpritePairPool *gUnk_020004D4;
 struct SpritePairPool *FollowingSpriteEffect_EnsureManager(void);
-u8 sub_0813A390(struct SpritePairPool *, u32, s32);
-void sub_0813A41C(struct SpritePairEntry *, void (*)(void), u32, u32);
+u8 SpritePairPool_TestUnavailable(struct SpritePairPool *, u32, s32);
+void SpritePairEntry_CreateEffect(struct SpritePairEntry *, void (*)(void), u32, u32);
 void FollowingSpriteEffect_SetStateCallback(struct SpritePairEntry *, void (*)(void));
 void FollowingSpriteEffect_OnAnimationComplete(void);
 void sub_08139FE0(void);
@@ -51,7 +48,7 @@ static inline u32 SpritePairPool_MakeKey(u32 counter, u32 id)
     id |= counter;
     return id;
 }
-s32 sub_0813A4C8(void *position, u32 *height, u32 unused, struct SpritePairParams *params, u32 id)
+s32 SpritePairPool_StartEntry(void *position, u32 *height, u32 unused, struct SpritePairParams *params, u32 id)
 {
     struct SpritePairPool *pool;
     s32 i;
@@ -64,7 +61,7 @@ s32 sub_0813A4C8(void *position, u32 *height, u32 unused, struct SpritePairParam
         pool = gUnk_020004D4;
     key = pool->counter;
     key = SpritePairPool_MakeKey(key, id);
-    if (sub_0813A390(pool, key, 1))
+    if (SpritePairPool_TestUnavailable(pool, key, 1))
         return -1;
     for (i = 0; i < 2; i++) {
         if (!pool->entries[i].active) {
@@ -75,7 +72,7 @@ s32 sub_0813A4C8(void *position, u32 *height, u32 unused, struct SpritePairParam
             key = pool->counter;
             key = SpritePairPool_MakeKey(key, id);
             pool->entries[i].id = key;
-            sub_0813A41C(&pool->entries[i], FollowingSpriteEffect_OnAnimationComplete, params->value, id + 1);
+            SpritePairEntry_CreateEffect(&pool->entries[i], FollowingSpriteEffect_OnAnimationComplete, params->value, id + 1);
             FollowingSpriteEffect_SetStateCallback(&pool->entries[i], sub_08139FE0);
             Sound_PlaySong(0x3e4);
             return i;

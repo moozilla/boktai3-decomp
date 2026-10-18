@@ -1,14 +1,14 @@
 #include "global.h"
 
 void sub_08168850(void *);
-void sub_081686FC(void *);
-void sub_081685B4(void *);
-void sub_08168D20(void *);
+void SceneHud_UpdateSecondaryWidgets(void *);
+void SceneHud_RefreshWidgetVisibility(void *);
+void SceneHud_ApplySecondarySelection(void *);
 
 void PauseMenu_RefreshEquipmentPanel(void *p)
 {
     sub_08168850(p);
-    sub_081686FC(p);
-    sub_081685B4(p);
-    sub_08168D20(p);
+    SceneHud_UpdateSecondaryWidgets(p);
+    SceneHud_RefreshWidgetVisibility(p);
+    SceneHud_ApplySecondarySelection(p);
 }

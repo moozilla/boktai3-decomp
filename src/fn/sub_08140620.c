@@ -1,4 +1,3 @@
-#define Player_ClampAlternateTerrainPosition       sub_08140620
 #define Player_TestAlternateTerrainRecoveryEnabled Player_IsStatusBit13ActionActive
 #include "global.h"
 #include "player.h"
@@ -7,7 +6,7 @@ u8 *TerrainModifiers_FindCellOverride(s32, s32);
 u32 Player_IsStatusBit13ActionActive(u32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
-void sub_08140620(struct Player *p)
+void Player_ClampAlternateTerrainPosition(struct Player *p)
 {
     s32 x = p->position.x >> 8;
     s32 z = p->position.z >> 8;

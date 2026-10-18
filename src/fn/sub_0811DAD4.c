@@ -1,9 +1,8 @@
 #include "global.h"
 #include "game_state.h"
-#define StateFlags_TestIndexedFlag sub_0811DAD4
 extern u32 gUnk_030053F4;
 extern u32 gUnk_030053F0;
-s32 sub_0811DAD4(s32 index)
+s32 StateFlags_TestIndexedFlag(s32 index)
 {
     if ((u32)index <= 11) {
         u32 mask = 0x800;

@@ -25,7 +25,7 @@ void SceneActorPhase_UpdateConditionalMotion(struct SceneActorRegistryResetView 
         SelectControl(p, control, kind);
     }
     if (sub_080B335C(p)) {
-        if ((u8)sub_0824923C(p, p->update270))
+        if ((u8)Callback_InvokeActor(p, p->update270))
             return;
         if (sub_0812F3CC(p))
             return;

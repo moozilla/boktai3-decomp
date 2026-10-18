@@ -1,7 +1,5 @@
 #include "global.h"
-#define SpriteNotice_Create sub_08122FC4
 #define SpriteNotice_GetManager SceneTrailEffect_EnsurePool
-#define SpriteNotice_AllocateSlot sub_08122F78
 #define gSpriteNoticeManager gUnk_02000144
 struct SpriteNoticePosition { s16 x,y,z; };
 struct SpriteNotice { u32 flags; u8 unk4[11]; u8 mode; u8 unk10[8]; struct SpriteNoticePosition position; u8 unk20[8]; u8 animation[0x1A]; u8 activeX, unk43, activeY; };
@@ -12,7 +10,7 @@ struct SpriteNotice *SpriteNotice_AllocateSlot(struct SpriteNoticeManager *);
 void sub_08217DE0(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
 u32 Anim_SetSequence(void *,void *,u32,u32,u32);
-s32 sub_08122FC4(struct SpriteNoticePosition *position, u32 mode)
+s32 SpriteNotice_Create(struct SpriteNoticePosition *position, u32 mode)
 {
     struct SpriteNoticeManager *manager;
     struct SpriteNotice *slot;

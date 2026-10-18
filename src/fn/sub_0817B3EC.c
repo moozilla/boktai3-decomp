@@ -1,5 +1,4 @@
 #include "global.h"
-#define ActorEffect_UpdateIdleScript sub_0817B3EC
 #define gSceneScriptFlags gUnk_02000560
 struct EffectScriptActor {
     u8 unknown0[0x51];
@@ -34,7 +33,7 @@ static inline u8 enter_idle(struct EffectScriptActor *actor)
     }
     return 0;
 }
-void sub_0817B3EC(struct EffectScriptActor *actor)
+void ActorEffect_UpdateIdleScript(struct EffectScriptActor *actor)
 {
     /* The ROM writes values but passes an uninitialized descriptor, as in
      * DamageController_Update. Retain the observed original behavior. */

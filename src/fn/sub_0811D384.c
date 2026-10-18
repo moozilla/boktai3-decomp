@@ -1,11 +1,10 @@
-#define SceneActorStyle_InitializeFromGameState sub_0811D384
 #define SceneActorStyle_CountEntries ModifierMenu_CountAppearanceModifiers
 #define gGameState                              gUnk_02000710
 #include "global.h"
 #include "game_state.h"
 #include "scene_actor_style.h"
 s32 ModifierMenu_CountAppearanceModifiers(struct SceneActorStyle *);
-void sub_0811D384(struct SceneActorStyle *style)
+void SceneActorStyle_InitializeFromGameState(struct SceneActorStyle *style)
 {
     s32 i;
     u32 zero;

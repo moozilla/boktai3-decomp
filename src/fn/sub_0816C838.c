@@ -1,8 +1,4 @@
 /* Provisional names and object interpretation; offsets follow static accesses. */
-#define MapMenu_InitializeDisplay sub_0816C838
-#define MapMenu_PositionMarkers   sub_0816C50C
-#define MapMenu_RefreshMarkers    sub_0816C624
-#define MapMenu_ResetMarkers      sub_0816C78C
 #define MapMenu_IsAreaUnlocked GameState_GetMapRevealFlag
 #include "global.h"
 struct MapMenuEntry {
@@ -24,28 +20,28 @@ struct MapMenu {
     u16 originX, originY;
     u16 map, x, y;
 };
-void sub_0816C50C(struct MapMenu *);
+void MapMenu_PositionMarkers(struct MapMenu *);
 u32 GameState_GetMapRevealFlag(u32);
 void Bg_SetupLayers(int, int, void *, int, int, int, void *);
-void sub_0816BA90(struct MapMenu *);
-void sub_0816BB4C(struct MapMenu *);
-void sub_0816C624(struct MapMenu *);
+void MapMenu_InitializePageBounds(struct MapMenu *);
+void MapMenu_ClampScrollAndUpdateArrows(struct MapMenu *);
+void MapMenu_RefreshMarkers(struct MapMenu *);
 void Bg_SetLayerMap(u32, void *, u16);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void sub_0816B958(struct MapMenu *, s32, s32);
 void MapScreen_ClearMapLayer(struct MapMenu *);
-void sub_0816C78C(struct MapMenu *);
+void MapMenu_ResetMarkers(struct MapMenu *);
 s32 MessageWindow_SetMessageTable(const void *);
 void MessageWindow_SetPalette(int);
 s32 MessageWindow_SetDisplayMode(s32);
-void sub_0816B66C(struct MapMenu *);
+void SceneSequence_SelectEntryMessage(struct MapMenu *);
 void sub_0816C2FC(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
-void sub_0816C838(struct MapMenu *s)
+void MapMenu_InitializeDisplay(struct MapMenu *s)
 {
     u32 zero;
     s->layer = s->layerSource;
-    sub_0816C50C(s);
+    MapMenu_PositionMarkers(s);
     s->index = s->map;
     if (s->entries && GameState_GetMapRevealFlag(s->entries[s->index].area))
         s->unlocked = 1;
@@ -55,11 +51,11 @@ void sub_0816C838(struct MapMenu *s)
     Bg_SetupLayers(6, 2, s->layer, 0, 0, 1, &zero);
     if (s->unlocked) {
         s32 dx, dy, tx, ty;
-        sub_0816BA90(s);
+        MapMenu_InitializePageBounds(s);
         s->scrollX = s->x + s->originX - 120;
         s->scrollY = s->y + s->originY - 80;
-        sub_0816BB4C(s);
-        sub_0816C624(s);
+        MapMenu_ClampScrollAndUpdateArrows(s);
+        MapMenu_RefreshMarkers(s);
         Bg_SetLayerMap(1, s->layer, s->entries[s->index].map);
         dx = (s16)s->scrollX - (s16)s->originX;
         dy = (s16)s->scrollY - (s16)s->originY;
@@ -69,11 +65,11 @@ void sub_0816C838(struct MapMenu *s)
         sub_0816B958(s, tx, ty);
     } else {
         MapScreen_ClearMapLayer(s);
-        sub_0816C78C(s);
+        MapMenu_ResetMarkers(s);
     }
     MessageWindow_SetMessageTable(s->panel);
     MessageWindow_SetPalette(0xefda);
     MessageWindow_SetDisplayMode(1);
-    sub_0816B66C(s);
+    SceneSequence_SelectEntryMessage(s);
     Hud_SetInteractionCallback(s, sub_0816C2FC, 0);
 }

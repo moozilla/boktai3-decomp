@@ -1,5 +1,3 @@
-#define SceneHud_UpdateTimedMessage    sub_0816F9C4
-#define SceneHud_UpdateActionSelection sub_0816FF4C
 #define gSceneInputKeys                gUnk_03005260
 #define gGameState                     gUnk_02000710
 #include "global.h"
@@ -15,19 +13,19 @@ void TextWindow_SetBounds(s32, s32, s32, s32, s32);
 void TextWindow_StartPlayback(s32);
 void TextWindow_Clear(s32);
 void Inventory_GetEquipmentDescriptor(s32, void *);
-void sub_08174494(s32, void *, void *);
-void sub_0816D98C(void *);
-void sub_0816FF4C(void);
+void Presentation_ApplyIndexedGraphicData(s32, void *, void *);
+void SceneHud_RefreshActionIcons(void *);
+void SceneHud_UpdateActionSelection(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void sub_0816CDB8(void *, int, int);
-void sub_0816D920(void *, int);
-void sub_0816D868(void *);
+void SceneHud_GetActionIconPosition(void *, int);
+void SceneHud_ShowActionPreview(void *);
 void Hud_SaveGridSelection(void *);
 void sub_081672FC(void *);
-void sub_08166B7C(void *, int);
+void MenuDisplay_UpdateActionPrompt(void *, int);
 void sub_0816701C(void *, int, int, int, int, int);
-void sub_081663A0(void *, int, int, int, int);
-void sub_0816F9C4(struct SceneHudState *p)
+void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
+void SceneHud_UpdateTimedMessage(struct SceneHudState *p)
 {
     u8 text[32];
     u8 *q;
@@ -39,7 +37,7 @@ void sub_0816F9C4(struct SceneHudState *p)
             *(s16 *)((u8 *)gUnk_02000710 + 0x68 + 2 * *(s16 *)((u8 *)gUnk_02000710 + 0x50)), text);
         TextWindow_SetBounds(p->timedMessageWindow, 0, 16, 30, 2);
         TextWindow_SetScript(p->timedMessageWindow, p->timedMessageScript);
-        sub_08174494(p->timedMessageWindow, text, p->unknownA44);
+        Presentation_ApplyIndexedGraphicData(p->timedMessageWindow, text, p->unknownA44);
         TextWindow_StartPlayback(p->timedMessageWindow);
     }
     if (p->actionTransferDelay == 8) {
@@ -52,16 +50,16 @@ void sub_0816F9C4(struct SceneHudState *p)
     if (p->actionTransferDelay > 89 || (p->actionTransferDelay > 15 && (gUnk_03005260[1] & 1))) {
         TextWindow_Clear(p->timedMessageWindow);
         MessageWindow_SetBounds(0, 16, 30, 2);
-        sub_0816D98C(p);
-        Hud_SetInteractionCallback(p, sub_0816FF4C, 1);
+        SceneHud_RefreshActionIcons(p);
+        Hud_SetInteractionCallback(p, SceneHud_UpdateActionSelection, 1);
         q = (u8 *)p + 0x4384;
         sub_0816CDB8(q, 1, 0);
-        sub_0816D920((u8 *)p + 0x1620, ((u8 *)p)[0x4387]);
-        sub_0816D868(p);
+        SceneHud_GetActionIconPosition((u8 *)p + 0x1620, ((u8 *)p)[0x4387]);
+        SceneHud_ShowActionPreview(p);
         Hud_SaveGridSelection(q);
         sub_081672FC(p);
-        sub_08166B7C(p, 4);
+        MenuDisplay_UpdateActionPrompt(p, 4);
         sub_0816701C(p, 0, 0, 0, 1, z);
-        sub_081663A0(p, 1, 0, 0, z);
+        MenuDisplay_SetPaletteOverrides(p, 1, 0, 0, z);
     }
 }

@@ -1,11 +1,10 @@
-#define SceneEffect_ExecuteCommandList sub_08110AD4
 #include "global.h"
 struct SceneEffectCommand {
     s16 x, y, kind;
 };
 void sub_08115AC8(s32, s32, s32, s32);
 void sub_081160CC(s32, s32, s32);
-void sub_08110AD4(const s16 *commands, s32 length)
+void SceneEffect_ExecuteCommandList(const s16 *commands, s32 length)
 {
     s32 i;
     for (i = 0; i < length; i += 3) {

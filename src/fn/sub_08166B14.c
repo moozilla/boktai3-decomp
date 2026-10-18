@@ -1,8 +1,7 @@
-#define MenuEntries_CountAvailable sub_08166B14
 #define MenuEntries_IsAvailable PauseMenu_GetCategoryEntryValue
 #include "global.h"
 s32 MenuEntries_IsAvailable(u32, s32);
-s32 sub_08166B14(void *unused, s32 category)
+s32 MenuEntries_CountAvailable(void *unused, s32 category)
 {
     s32 count = 0;
     s32 i;

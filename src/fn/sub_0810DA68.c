@@ -1,5 +1,4 @@
 #include "global.h"
-#define SelectionPanel_InitEntryIds sub_0810DA68
 
 struct SelectionPanel {
     u8 unk0[0x420];
@@ -8,7 +7,7 @@ struct SelectionPanel {
 extern u32 gUnk_030053F4;
 extern u32 gUnk_030053F0;
 
-void sub_0810DA68(struct SelectionPanel *p)
+void SelectionPanel_InitEntryIds(struct SelectionPanel *p)
 {
     p->entryIds[0] = 0x1e;
     p->entryIds[2] = 0x2f;

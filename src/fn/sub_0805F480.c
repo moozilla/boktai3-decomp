@@ -27,7 +27,7 @@ void SceneInputPanel_ShowItemComparison(struct SceneInputWidget *primary,
     SceneInputPanel_GetEquippedValues(&primaryValue, &secondaryValue, &equipped, 0);
     if (candidate) {
         Inventory_InitEquipmentEntryFromDescriptor(candidate, converted);
-        value = sub_08159030(converted, reference);
+        value = Player_EvaluateItemStatA(converted, reference);
         comparison = 0;
         if (value > primaryValue)
             comparison = 1;
@@ -37,7 +37,7 @@ void SceneInputPanel_ShowItemComparison(struct SceneInputWidget *primary,
     } else {
         if (primaryValue > 0) {
             Inventory_InitEquipmentEntryFromDescriptor(&equipped, converted);
-            value = sub_08159030(converted, reference);
+            value = Player_EvaluateItemStatA(converted, reference);
         } else
             value = 0;
         comparison = 0;

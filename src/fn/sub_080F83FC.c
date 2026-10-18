@@ -48,14 +48,12 @@ static inline void clearFlags(u32 *p, u32 mask)
     *p &= ~mask;
 }
 
-#define ActorPhase_WaitBeforeRelocation  sub_080F83FC
-#define ActorPhase_SelectDistantWaypoint sub_080FBF4C
 #define gPhaseTarget                     gUnk_02000580
 extern u8 *gUnk_02000580;
 void ActorShadow_Disable(void *);
-void sub_080FBF4C(struct PhaseActor *, void *, void *, s32);
-void sub_080F84D4(void);
-void sub_080F83FC(struct PhaseActor *s, s32 frame)
+void ActorPhase_SelectDistantWaypoint(struct PhaseActor *, void *, void *, s32);
+void ActorPhase_UpdateSpriteRestore(void);
+void ActorPhase_WaitBeforeRelocation(struct PhaseActor *s, s32 frame)
 {
     u8 *data = s->data;
     if (consumeEntry(s)) {
@@ -72,9 +70,9 @@ void sub_080F83FC(struct PhaseActor *s, s32 frame)
     s->sprite->flags |= 1;
     ActorShadow_Disable((u8 *)s + 0x320);
     if (frame > data[0xe40]) {
-        sub_080FBF4C(s, (u8 *)s + 0x5c, gUnk_02000580 + 0x30, 0x40000);
+        ActorPhase_SelectDistantWaypoint(s, (u8 *)s + 0x5c, gUnk_02000580 + 0x30, 0x40000);
         {
-            void (*next)(void) = sub_080F84D4;
+            void (*next)(void) = ActorPhase_UpdateSpriteRestore;
             u32 id = 0x25;
             s->entered = 1;
             s->phaseState = 0;

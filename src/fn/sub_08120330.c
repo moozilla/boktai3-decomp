@@ -1,4 +1,3 @@
-#define ActorMotion_UpdateDampedFall sub_08120330
 #define ActorSound_UpdateSong Character_UpdateLoopingSound
 #include "global.h"
 struct DampedMotionActor {
@@ -14,13 +13,13 @@ struct DampedMotionActor {
     u8 action[0x12];
     u16 remaining;
 };
-s32 sub_0811DB84(struct DampedMotionActor *, void *);
+s32 MotionTween_Advance(struct DampedMotionActor *, void *);
 void Character_UpdateLoopingSound(struct DampedMotionActor *);
 s32 Div(s32, s32);
-s32 sub_08120330(struct DampedMotionActor *actor)
+s32 ActorMotion_UpdateDampedFall(struct DampedMotionActor *actor)
 {
     struct DampedMotionActor *motion = actor;
-    s32 result = sub_0811DB84(actor, actor->action);
+    s32 result = MotionTween_Advance(actor, actor->action);
     if (!actor->grounded && !result) {
         actor->verticalVelocity -= 32;
         actor->song = 0x87;

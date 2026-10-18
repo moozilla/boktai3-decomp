@@ -1,6 +1,4 @@
-#define ActorAbility_ActivatePaletteEffect sub_0811F538
 #define ActorAbility_IsReady Modifier_IsFourthSourceReady
-#define ActorAbility_ConsumeResource       sub_0811F490
 // Tentative descriptive names; inferred from static field accesses and callees.
 #include "global.h"
 struct ActorAbility {
@@ -15,12 +13,12 @@ struct ActorAbility {
     u8 *owner;
 };
 u8 Modifier_IsFourthSourceReady(struct ActorAbility *);
-s32 sub_0811EAF8(void *, u32, s32);
-void sub_0811F490(void *, struct ActorAbility *, s32);
+s32 CallbackList_RunMatchingState(void *, u32, s32);
+void CallbackList_SubtractStateTenValue(void *, struct ActorAbility *, s32);
 s32 CharacterModel_GetPrimaryPaletteIndex(u8 *);
 void sub_0811D6C8(void *, u32, u32, s32, u32, u32, u32, u32);
 void Sound_PlaySong(u32);
-s32 sub_0811F538(struct ActorAbility *ability)
+s32 ActorAbility_ActivatePaletteEffect(struct ActorAbility *ability)
 {
     u8 *owner, *stats;
     u32 zero;
@@ -31,11 +29,11 @@ s32 sub_0811F538(struct ActorAbility *ability)
         stats = owner + 0x18;
         zero = ability->cooldown;
         if (zero == 0) {
-            cost = sub_0811EAF8(stats, ability->cost, 10);
+            cost = CallbackList_RunMatchingState(stats, ability->cost, 10);
             if (*(s16 *)(owner + 0x70) >= cost) {
                 s32 palette;
                 ability->cooldown = ability->interval;
-                sub_0811F490(stats, ability, cost);
+                CallbackList_SubtractStateTenValue(stats, ability, cost);
                 palette = CharacterModel_GetPrimaryPaletteIndex(owner + 0x610);
                 sub_0811D6C8(stats, 0x385, 0x385, palette, *(u16 *)(owner + 0x96), 16, 4, zero);
                 ability->remaining = ability->duration;

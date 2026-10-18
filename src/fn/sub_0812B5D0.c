@@ -1,5 +1,4 @@
 #include "global.h"
-#define TimedEffect_UpdateVisibility sub_0812B5D0
 struct TimedEffectEntry {
     u32 flags;
     u8 unknown[0x54];
@@ -10,7 +9,7 @@ struct TimedEffect {
     u8 unknown[0x3C];
     struct TimedEffectEntry entries[2];
 };
-void sub_0812B5D0(struct TimedEffect *effect)
+void TimedEffect_UpdateVisibility(struct TimedEffect *effect)
 {
     s32 i = 0;
     do {

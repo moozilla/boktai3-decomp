@@ -1,7 +1,7 @@
 #include "global.h"
-void sub_0812F270(void);
+void SceneActor_UpdateBehaviorCallbacks(void);
 u32 Spider_OnSecondaryUpdate(void)
 {
-    sub_0812F270();
+    SceneActor_UpdateBehaviorCallbacks();
     return 0;
 }

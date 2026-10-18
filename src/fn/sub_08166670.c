@@ -1,4 +1,3 @@
-#define MenuDisplay_FindEntryIndex sub_08166670
 #include "global.h"
 struct MenuDisplay {
     u8 unknown0[0x4D80];
@@ -7,7 +6,7 @@ struct MenuDisplay {
     s8 entries2[8];
     s8 entries3[4];
 };
-s32 sub_08166670(struct MenuDisplay *p, s32 entry, s32 group)
+s32 MenuDisplay_FindEntryIndex(struct MenuDisplay *p, s32 entry, s32 group)
 {
     s32 i;
     switch (group) {

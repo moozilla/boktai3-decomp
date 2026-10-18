@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneParticle_Remove sub_0812D758
 #define gSceneParticlePool gUnk_02000194
 struct SceneParticle {
     u32 flags; u8 unknown4[0x14];
@@ -11,7 +10,7 @@ struct SceneParticle {
 struct SceneParticlePool { u8 unknown[0x1c]; struct SceneParticle particles[26]; u32 occupied; };
 extern struct SceneParticlePool *gUnk_02000194;
 void Effect_Remove(void *);
-void sub_0812D758(void *unused, struct SceneParticle *particle)
+void SceneParticle_Remove(void *unused, struct SceneParticle *particle)
 {
     if (particle->reset) particle->reset = 0;
     {

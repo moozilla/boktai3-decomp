@@ -1,4 +1,3 @@
-#define PlayerStatEffect_Initialize sub_081602D0
 #define PlayerStatEffect_SetPhase PlayerBurst_SetStateCallback
 #define gEngineFlags gUnk_030053F4
 #include "global.h"
@@ -10,20 +9,20 @@ struct PlayerStatEffect {
     u16 step;
     u16 targetStat;
 };
-void sub_0815FFDC(struct PlayerStatEffect *);
-void sub_08160060(struct PlayerStatEffect *);
+void PlayerTransition_LoadAnimation(struct PlayerStatEffect *);
+void PlayerTransition_InitCollider(struct PlayerStatEffect *);
 void sub_08160108(struct PlayerStatEffect *);
-void sub_0815FAF4(struct PlayerStatEffect *);
+void PlayerOrbitEffect_UpdateIntro(struct PlayerStatEffect *);
 void PlayerBurst_SetStateCallback(struct PlayerStatEffect *, void (*)(struct PlayerStatEffect *));
 extern u32 gUnk_030053F4;
 s32 Div(s32, s32);
-s32 sub_081602D0(struct PlayerStatEffect *p, struct Player *player)
+s32 PlayerStatEffect_Initialize(struct PlayerStatEffect *p, struct Player *player)
 {
     p->player = player;
-    sub_0815FFDC(p);
-    sub_08160060(p);
+    PlayerTransition_LoadAnimation(p);
+    PlayerTransition_InitCollider(p);
     sub_08160108(p);
-    PlayerBurst_SetStateCallback(p, sub_0815FAF4);
+    PlayerBurst_SetStateCallback(p, PlayerOrbitEffect_UpdateIntro);
     gUnk_030053F4 |= 1;
     p->targetStat = p->player->currentStatA >> 1;
     if (p->targetStat == 0)

@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0813B8A4(u8 *);
+void SceneActor_SpawnModeParticles(u8 *);
 
 void PlayerCue_UpdatePeriodicParticles(u8 *p)
 {
@@ -12,7 +12,7 @@ void PlayerCue_UpdatePeriodicParticles(u8 *p)
         v = *c + 1;
         *c = v;
         if ((u8)v > 7) {
-            sub_0813B8A4(p);
+            SceneActor_SpawnModeParticles(p);
             *c = 0;
         }
     }

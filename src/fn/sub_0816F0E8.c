@@ -1,18 +1,17 @@
-#define MenuTransition_UpdateWidgetFlicker sub_0816F0E8
 #define gMenuTransitionKeys                gUnk_03005260
 #define MenuTransition_SetCallback Hud_SetInteractionCallback
 #include "global.h"
-void sub_0816D98C(void *);
-void sub_0816FF4C(void);
+void SceneHud_RefreshActionIcons(void *);
+void SceneHud_UpdateActionSelection(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void sub_0816CDB8(void *, int, int);
-void sub_0816D920(void *, int);
-void sub_0816D868(void *);
+void SceneHud_GetActionIconPosition(void *, int);
+void SceneHud_ShowActionPreview(void *);
 void Hud_SaveGridSelection(void *);
 void sub_081672FC(void *);
-void sub_08166B7C(void *, int);
+void MenuDisplay_UpdateActionPrompt(void *, int);
 void sub_0816701C(void *, int, int, int, int, int);
-void sub_081663A0(void *, int, int, int, int);
+void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
 extern u16 gUnk_03005260[];
 struct MenuMessageView {
     u8 pad[0x3c];
@@ -34,7 +33,7 @@ s32 sub_08165D10(void *);
 void sub_0816D634(void *, u32);
 void Hud_DrawDefaultHealthMeter(void *, u32, u32, u32);
 void Hud_DrawDefaultEnergyMeter(void *, s32, s32, s32, s32, s32);
-void sub_0816F0E8(u8 *p)
+void MenuTransition_UpdateWidgetFlicker(u8 *p)
 {
     u32 r;
     u8 *q, *a;
@@ -58,17 +57,17 @@ void sub_0816F0E8(u8 *p)
     }
     if (((struct MenuFlickerView *)p)->timer > 55) {
         sub_0816D634(p, p[0x438a]);
-        sub_0816D98C(p);
-        Hud_SetInteractionCallback(p, sub_0816FF4C, 1);
+        SceneHud_RefreshActionIcons(p);
+        Hud_SetInteractionCallback(p, SceneHud_UpdateActionSelection, 1);
         q = p + 0x4384;
         sub_0816CDB8(q, 1, 0);
         a = p + 0x1620;
-        sub_0816D920(a, p[0x4387]);
-        sub_0816D868(p);
+        SceneHud_GetActionIconPosition(a, p[0x4387]);
+        SceneHud_ShowActionPreview(p);
         Hud_SaveGridSelection(q);
         sub_081672FC(p);
-        sub_08166B7C(p, 4);
+        MenuDisplay_UpdateActionPrompt(p, 4);
         sub_0816701C(p, 0, 0, 0, 1, r);
-        sub_081663A0(p, 1, 0, 0, r);
+        MenuDisplay_SetPaletteOverrides(p, 1, 0, 0, r);
     }
 }

@@ -1,6 +1,4 @@
-#define SpatialIndex_InitEntry       sub_0811B278
 #define SpatialIndex_SetCallback Collider_SetContactCallback
-#define SpatialIndex_SetPosition     sub_0811B164
 #define SpatialIndex_SetBounds Collider_SetExtents
 #define SpatialIndex_SetOffset Collider_SetOffset
 #define SpatialIndex_SetMask Collider_SetCategory
@@ -25,7 +23,7 @@ void SpatialIndex_SetBounds(struct SpatialEntry *, s32, s32, s32);
 void SpatialIndex_SetOffset(struct SpatialEntry *, struct SpatialVector *);
 void SpatialIndex_SetMask(struct SpatialEntry *, u32);
 void SpatialIndex_SetKind(struct SpatialEntry *, u32);
-void sub_0811B278(struct SpatialEntry *entry, struct SpatialVector *position,
+void SpatialIndex_InitEntry(struct SpatialEntry *entry, struct SpatialVector *position,
                   struct SpatialVector *bounds, struct SpatialVector *offset, u32 flags, u32 mask,
                   u32 category, u32 kind, u32 parameter, void (*callback)(void), void *owner)
 {

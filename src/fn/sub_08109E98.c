@@ -1,5 +1,3 @@
-#define ScriptPanel_WaitForSelectionData sub_08109E98
-#define ScriptPanel_PollSelection        sub_08109DF8
 #include "global.h"
 struct ScriptPanel {
     u8 unk0[0x2E];
@@ -13,9 +11,9 @@ u8 Registry1745_ConsumeStateEntry(struct ScriptPanel *);
 void Registry1745_SetState(struct ScriptPanel *, u32, void *);
 s32 sub_082234C4(u16 *);
 void sub_08109F1C(void);
-void sub_08109DF8(void);
+void ScriptPanel_PollSelection(void);
 void Serial_StopCommunication(void);
-s32 sub_08109E98(struct ScriptPanel *p)
+s32 ScriptPanel_WaitForSelectionData(struct ScriptPanel *p)
 {
     u16 selections[4];
     s32 result;
@@ -29,7 +27,7 @@ s32 sub_08109E98(struct ScriptPanel *p)
         if (p->retryTimer > 29) {
             u8 *base, *button;
             u32 zero;
-            Registry1745_SetState(p, 2, sub_08109DF8);
+            Registry1745_SetState(p, 2, ScriptPanel_PollSelection);
             Serial_StopCommunication();
             base = p->buttons;
             zero = 0;

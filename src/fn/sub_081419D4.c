@@ -1,7 +1,6 @@
-#define ActorVariant_GetTableValue sub_081419D4
 #include "global.h"
 extern const u16 gUnk_08610980[], gUnk_086109F4[], gUnk_08610A68[], gUnk_08610ADC[];
-s32 sub_081419D4(s32 kind, s32 index)
+s32 ActorVariant_GetTableValue(s32 kind, s32 index)
 {
     s32 result;
     const u16 *table;

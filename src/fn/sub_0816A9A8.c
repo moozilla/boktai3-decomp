@@ -1,5 +1,4 @@
 #include "global.h"
-#define MenuPrompt_FinishDelayedChoice sub_0816A9A8
 #define MenuPrompt_SetPhase Hud_SetUpdateCallback
 #define MenuPrompt_SetDisplayLevels Hud_InitSelectionBounds
 struct MenuPrompt {
@@ -17,9 +16,9 @@ s32 MessageWindow_ShowMessage(s32);
 int MessageWindow_SetNumberArgument(int, int);
 void Script_Call(u32, void *);
 void Hud_UpdateFirstPostScriptWait(struct MenuPrompt *);
-void sub_08176B00(struct MenuPrompt *);
+void SceneHud_FadeOutPage(struct MenuPrompt *);
 void Hud_SetUpdateCallback(struct MenuPrompt *, void (*)(struct MenuPrompt *));
-void sub_0816A9A8(struct MenuPrompt *p)
+void MenuPrompt_FinishDelayedChoice(struct MenuPrompt *p)
 {
     Anim_Step(p->anim, p->animData);
     if (++p->timer > 150) {
@@ -31,7 +30,7 @@ void sub_0816A9A8(struct MenuPrompt *p)
                 MessageWindow_SetNumberArgument(0, 3);
             Hud_SetUpdateCallback(p, Hud_UpdateFirstPostScriptWait);
         } else {
-            Hud_SetUpdateCallback(p, sub_08176B00);
+            Hud_SetUpdateCallback(p, SceneHud_FadeOutPage);
         }
     }
 }

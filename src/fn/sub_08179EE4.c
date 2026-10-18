@@ -1,12 +1,11 @@
 #include "global.h"
-#define ActorResource_IsBelowSelectedLimit sub_08179EE4
 struct ActorResourceState {
     u8 unknown0[0x274];
     u16 limits[2];
     u8 unknown278[0x272];
     u8 selection;
 };
-s32 sub_08179EE4(struct ActorResourceState *p, s32 value)
+s32 ActorResource_IsBelowSelectedLimit(struct ActorResourceState *p, s32 value)
 {
     if (p->selection == 0) {
         if (value < p->limits[0])

@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_hud_display.h"
 #include "player.h"
-#define SceneHud_DrawSlotMeter  sub_0817871C
 #define SceneHud_GetTilemapCell Hud_GetTilemapCell
 #define gSceneHudMeterPulse     gUnk_03005174
 struct SceneHudSlotCounts {
@@ -21,7 +20,7 @@ static inline u8 slotCount(s32 slot)
         return 0;
     return gUnk_020004B4->counts[slot];
 }
-void sub_0817871C(struct SceneHudState *hud, s32 mode, u32 x, u32 y)
+void SceneHud_DrawSlotMeter(struct SceneHudState *hud, s32 mode, u32 x, u32 y)
 {
     u16 *tiles = SceneHud_GetTilemapCell(0, x, y);
     u32 pulse;

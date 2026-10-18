@@ -1,4 +1,3 @@
-#define Player_ScaleLevelValue sub_0815DD3C
 #define gGameState gUnk_02000710
 #include "global.h"
 #include "game_state.h"
@@ -9,7 +8,7 @@ static inline s32 ScaleSigned(s32 x)
     else x = -(-x >> 6);
     return x;
 }
-s32 sub_0815DD3C(u32 flags, s32 scale)
+s32 Player_ScaleLevelValue(u32 flags, s32 scale)
 {
     s32 value = gUnk_02000710->level + 50;
     s32 adjustment;

@@ -1,4 +1,3 @@
-#define ActorResource_SelectElementResource sub_0811C67C
 #define Equipment_HasCategory GameState_HasEquippedConsumable
 #define gAreaEffectLinkState                gUnk_020004B4
 #include "global.h"
@@ -16,7 +15,7 @@ invalid:
 valid:
     return 1;
 }
-s32 sub_0811C67C(s32 index)
+s32 ActorResource_SelectElementResource(s32 index)
 {
     u32 kind;
     s32 count, selected;

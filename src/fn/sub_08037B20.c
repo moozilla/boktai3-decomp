@@ -10,7 +10,7 @@ struct P {
 };
 int Wireless_GetStatus(void);
 void WirelessPeerMenu_UpdateConnectionState(struct P *);
-int sub_0824923C(void *, const void *);
+int Callback_InvokeActor(void *, const void *);
 void WirelessPeerPanel_Update(struct P *, struct Panel *, int);
 extern const void *gUnk_08605780[];
 int sub_08037B20(struct P *p)
@@ -19,7 +19,7 @@ int sub_08037B20(struct P *p)
     int i;
     if (!Wireless_GetStatus()) {
         WirelessPeerMenu_UpdateConnectionState(p);
-        sub_0824923C(p, gUnk_08605780[p->state]);
+        Callback_InvokeActor(p, gUnk_08605780[p->state]);
         q = p->panels;
         i = 0;
         do {

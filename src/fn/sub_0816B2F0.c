@@ -1,4 +1,3 @@
-#define SceneSequence_CallCompletionScript sub_0816B2F0
 #define SceneSequence_SetPhase Hud_SetUpdateCallback
 #include "global.h"
 struct SceneSequence {
@@ -15,7 +14,7 @@ void Script_Call(u32, void *);
 int MessageWindow_SetNumberArgument(int, int);
 void Hud_SetUpdateCallback(void *, void (*)(void));
 void Hud_UpdateSecondPostScriptWait(void);
-void sub_0816B2F0(struct SceneSequence *s)
+void SceneSequence_CallCompletionScript(struct SceneSequence *s)
 {
     Anim_Step(s->animation, s->animationData);
     if (++s->phaseTimer > 149) {

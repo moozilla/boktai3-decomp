@@ -1,4 +1,3 @@
-#define Player_AccumulateAction sub_081412C0
 #define Player_TriggerAccumulatorEvent Player_EmitPeriodicEffect
 #include "global.h"
 #include "player.h"
@@ -10,7 +9,7 @@ static inline u8 Player_IsInModeSeven(struct Player *p)
     if (active && p->sceneMode == 7) result = 1;
     return result;
 }
-void sub_081412C0(struct Player *p, s32 amount)
+void Player_AccumulateAction(struct Player *p, s32 amount)
 {
     if (p->actionAccumulatorBlocked) return;
     if (p && Player_IsInModeSeven(p)) return;

@@ -1,7 +1,6 @@
 #include "global.h"
 #include "player.h"
 #include "contact_actor.h"
-#define Player_AccumulateContactCost sub_0814A884
 #define Player_CheckContactReduction Player_IsActionBlocked
 struct PlayerContactSource {
     u8 unknown0[0x50];
@@ -20,7 +19,7 @@ static inline u32 Test32(u32 *p, u32 mask)
 {
     return *p & mask;
 }
-void sub_0814A884(struct PlayerContactSource *source, struct ContactCollider *contact)
+void Player_AccumulateContactCost(struct PlayerContactSource *source, struct ContactCollider *contact)
 {
     struct Player *p;
     s32 i;

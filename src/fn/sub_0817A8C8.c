@@ -1,5 +1,4 @@
 #include "global.h"
-#define ActorPosition_TestPath sub_0817A8C8
 struct ActorPathPosition {
     s16 x, y, z, pad;
 };
@@ -11,7 +10,7 @@ struct ActorPathState {
 };
 s32 sub_0821F204(void *, struct ActorPathPosition *, struct ActorPathPosition *);
 u32 sub_0821F2EC(void *, void *, void *);
-s32 sub_0817A8C8(struct ActorPathState *p, struct ActorPathPosition *destination)
+s32 ActorPosition_TestPath(struct ActorPathState *p, struct ActorPathPosition *destination)
 {
     if (sub_0821F204(p->pathContext, &p->position, destination) &&
         sub_0821F2EC(p->pathContext, &p->position, destination))

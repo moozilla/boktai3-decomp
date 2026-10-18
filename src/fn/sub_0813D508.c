@@ -1,7 +1,7 @@
 #include "global.h"
 
 void sub_08231568(u8 *);
-void sub_0813D3B0(u8 *);
+void SceneActor_StartRandomizedEffect(u8 *);
 
 void Player_FlushQueuedEffects(u8 *p)
 {
@@ -14,7 +14,7 @@ void Player_FlushQueuedEffects(u8 *p)
         if (t != 0) {
             n = t;
             do {
-                sub_0813D3B0(p);
+                SceneActor_StartRandomizedEffect(p);
                 n--;
             } while (n != 0);
         }

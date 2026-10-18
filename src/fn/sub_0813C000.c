@@ -1,6 +1,5 @@
-#define DirectionalEffect_GetAnimationParams sub_0813C000
 #include "global.h"
-void sub_0813C000(u32 mode, u32 *variant, u32 *kind)
+void DirectionalEffect_GetAnimationParams(u32 mode, u32 *variant, u32 *kind)
 {
     switch ((s32)(mode & 3)) {
     case 0: *variant = 0; break;

@@ -1,4 +1,3 @@
-#define PanelKeyframeSprite_Create sub_08112D6C
 #include "global.h"
 struct PanelKeyframeSprite {
     u8 resources[0x20];
@@ -20,7 +19,7 @@ static inline void ClearPosition(void *src, void *dst)
 {
     CpuSet(src, dst, 0x05000002);
 }
-s32 sub_08112D6C(struct PanelKeyframeOwner *owner, u32 key, u32 index, u32 flags, u32 mode)
+s32 PanelKeyframeSprite_Create(struct PanelKeyframeOwner *owner, u32 key, u32 index, u32 flags, u32 mode)
 {
     struct PanelKeyframeSprite *p;
     struct {

@@ -1,4 +1,3 @@
-#define MenuDisplay_SetPaletteOverrides sub_081663A0
 #include "global.h"
 
 struct MenuDisplay {
@@ -22,7 +21,7 @@ struct MenuDisplay {
     u8 overridePalette[1];
 };
 void Anim_SelectPaletteBank(void *, u32);
-void sub_081663A0(struct MenuDisplay *p, s32 a, s32 b, s32 c, s32 d)
+void MenuDisplay_SetPaletteOverrides(struct MenuDisplay *p, s32 a, s32 b, s32 c, s32 d)
 {
     if (a == 1) {
         p->channel0Palette = 0xB100;

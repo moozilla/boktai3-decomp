@@ -1,4 +1,3 @@
-#define SceneActorBehavior_InstallCallbackTables sub_08131CCC
 #include "global.h"
 #include "scene_actor_reset.h"
 #define gSceneActorCallbacks27C gUnk_0861081C
@@ -21,7 +20,7 @@ extern void *gSceneActorCallbacks298[];
 extern void *gSceneActorCallbacks29C[];
 #define gSceneActorCallbacks2A0 gUnk_086108A8
 extern void *gSceneActorCallbacks2A0[];
-void sub_08131CCC(struct SceneActorRegistryResetView *actor)
+void SceneActorBehavior_InstallCallbackTables(struct SceneActorRegistryResetView *actor)
 {
     actor->callbacks27C = gSceneActorCallbacks27C;
     actor->callbacks280 = gSceneActorCallbacks280;

@@ -11,7 +11,7 @@ s32 ActorAttachment_TickManager(struct ActorAttachmentManagerView *incoming)
         struct ActorAttachmentSlotView *slot = base;
         s32 i = 7;
         do {
-            sub_0824923C(slot, dispatch[*active]);
+            Callback_InvokeActor(slot, dispatch[*active]);
             /* Integer address advances preserve the two parallel field walks. */
             {
                 register u32 stride asm("r0") = sizeof(*slot);

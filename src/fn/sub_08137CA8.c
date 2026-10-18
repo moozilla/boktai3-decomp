@@ -1,4 +1,3 @@
-#define SceneActorTarget_FindNearestEligiblePlayer sub_08137CA8
 #define gLinkSession                               gUnk_020004B4
 #define gPlayerSlots                               gUnk_02000580
 #define gPlayerSlotFlags                           gUnk_02000560
@@ -18,7 +17,7 @@ static inline u32 Test(u32 value, u32 mask)
 {
     return value & mask;
 }
-s32 sub_08137CA8(const struct ContactPosition *position)
+s32 SceneActorTarget_FindNearestEligiblePlayer(const struct ContactPosition *position)
 {
     struct ContactPosition delta;
     s32 bestDistance = 0x7FFFFFFF;

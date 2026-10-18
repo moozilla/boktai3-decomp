@@ -1,4 +1,3 @@
-#define SceneProcParticles_TestCapacity sub_08139D04
 #include "global.h"
 struct SceneProcParticle {
     u8 pad[0xca];
@@ -12,8 +11,8 @@ struct SceneProcParticles {
     struct SceneProcParticle entries[6];
 };
 void Memory_Clear(void *, u32);
-void sub_08139CC0(struct SceneProcParticles *, s32, u32, u8 *);
-s32 sub_08139D04(struct SceneProcParticles *p, u32 kind, s32 requested)
+void CallbackPool_MarkNextOfKind(struct SceneProcParticles *, s32, u32, u8 *);
+s32 SceneProcParticles_TestCapacity(struct SceneProcParticles *p, u32 kind, s32 requested)
 {
     u32 key;
     s32 groups = 0, freeCount = 0;
@@ -27,7 +26,7 @@ s32 sub_08139D04(struct SceneProcParticles *p, u32 kind, s32 requested)
         else if ((u8)p->entries[i].group == key) {
             if (!visited[i]) {
                 visited[i] = 1;
-                sub_08139CC0(p, i + 1, p->entries[i].group, visited);
+                CallbackPool_MarkNextOfKind(p, i + 1, p->entries[i].group, visited);
                 groups++;
             }
         }

@@ -1,4 +1,3 @@
-#define SceneHud_ApplyStatBPercent sub_0816CFAC
 #include "global.h"
 #include "player.h"
 #include "scene_hud_display.h"
@@ -6,7 +5,7 @@ s32 Div(s32, s32);
 void Hud_DrawDefaultEnergyMeter(struct SceneHudState *, s32, s32, s32, s32, s32);
 s32 Inventory_GetQuantityByStorage(u32, u32);
 void sub_0813D834(struct Player *, s32, s32);
-void sub_0816CFAC(struct SceneHudState *s, s32 percent, s32 duration)
+void SceneHud_ApplyStatBPercent(struct SceneHudState *s, s32 percent, s32 duration)
 {
     struct Player *p = s->actionOwner;
     s32 value;

@@ -136,5 +136,5 @@ struct ModifierItemInfo {
     u8 id, kind;
     u16 value2, value4, value6, value8;
 };
-s32 sub_0811E37C(struct ModifierRecord *, s32);
+s32 ScriptRecord_FindModifierRecord(struct ModifierRecord *, s32);
 #endif

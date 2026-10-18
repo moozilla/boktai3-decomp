@@ -1,12 +1,10 @@
-#define Player_CalculatePreviewActionStat   sub_0814A6B8
-#define Player_CalculateActionStat          sub_0814A530
 #define Player_CalculateAlternateActionStat Player_GetSpecialAttackPower
 #include "global.h"
 #include "player.h"
 void Inventory_GetEquipmentDescriptor(s32, void *);
-s32 sub_0814A530(struct Player *, struct PlayerStatModifierContext *, s32);
+s32 Player_CalculateActionStat(struct Player *, struct PlayerStatModifierContext *, s32);
 s32 Player_GetSpecialAttackPower(struct Player *, s32);
-s32 sub_0814A6B8(struct Player *p, s32 bonus, struct PlayerActionConfig *config,
+s32 Player_CalculatePreviewActionStat(struct Player *p, s32 bonus, struct PlayerActionConfig *config,
                  struct PlayerActionEntry *entry, s32 mode)
 {
     u8 buffer[32];
@@ -27,7 +25,7 @@ s32 sub_0814A6B8(struct Player *p, s32 bonus, struct PlayerActionConfig *config,
             p->statModifierContext.actionDuration = config->duration;
             p->statModifierContext.statBOverrideEnabled = mode;
             p->statModifierContext.actionEntry = entry;
-            result = sub_0814A530(p, &p->statModifierContext, sum);
+            result = Player_CalculateActionStat(p, &p->statModifierContext, sum);
             p->statModifierContext.actionDuration = savedDuration;
             p->statModifierContext.statBOverrideEnabled = savedMode;
             p->statModifierContext.actionEntry = savedEntry;

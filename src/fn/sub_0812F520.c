@@ -1,8 +1,7 @@
-#define SceneActor_SetContactReactionDirection sub_0812F520
 #include "global.h"
 #include "scene_actor_behavior.h"
 s32 Math_Atan2(s32, s32);
-void sub_0812F520(struct SceneActorBehaviorView *actor,
+void SceneActor_SetContactReactionDirection(struct SceneActorBehaviorView *actor,
                   struct SceneActorBehaviorContactView *source,
                   struct SceneActorBehaviorContactView *destination)
 {

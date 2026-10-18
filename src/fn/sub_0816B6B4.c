@@ -1,4 +1,3 @@
-#define SceneSequence_GetSelectedMessage sub_0816B6B4
 #define gSceneGameState gUnk_02000710
 #define gSceneSequenceEntries gUnk_08611BA8
 #define gSceneSequenceSelections gUnk_08611BC0
@@ -8,7 +7,7 @@ struct SceneSequenceEntry { u8 unknown0[15]; u8 message; };
 struct SceneSequenceSelection { u8 entry; u8 unknown1[3]; };
 extern const struct SceneSequenceEntry *const gUnk_08611BA8[];
 extern const struct SceneSequenceSelection *const gUnk_08611BC0[];
-s32 sub_0816B6B4(void)
+s32 SceneSequence_GetSelectedMessage(void)
 {
     struct GameState *state = gUnk_02000710;
     s32 result;

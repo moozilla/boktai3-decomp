@@ -1,6 +1,4 @@
-#define TimedMessage_ShowNotice sub_081096CC
 #define TimedMessage_SelectTextIndex LinkConnectionMenu_GetErrorMessageIndex
-#define TimedMessage_ShowFollowup sub_08109738
 #include "global.h"
 struct TimedMessage {
     u8 unknown0[0x20];
@@ -19,8 +17,8 @@ s32 LinkConnectionMenu_GetErrorMessageIndex(void *);
 s32 TextWindow_Refresh(s32, s32);
 void TextWindow_StartPlayback(s32);
 void Sound_PlaySong(u32);
-void sub_08109738(struct TimedMessage *);
-void sub_081096CC(struct TimedMessage *p)
+void TimedMessage_ShowFollowup(struct TimedMessage *);
+void TimedMessage_ShowNotice(struct TimedMessage *p)
 {
     if (p->entering == 1) {
         TextWindow_Clear(p->window);
@@ -32,7 +30,7 @@ void sub_081096CC(struct TimedMessage *p)
         p->entering = 0;
     }
     if (p->timer > 120) {
-        void (*update)(struct TimedMessage *) = sub_08109738;
+        void (*update)(struct TimedMessage *) = TimedMessage_ShowFollowup;
         u32 state = 6;
         p->update = update;
         p->entering = 1;

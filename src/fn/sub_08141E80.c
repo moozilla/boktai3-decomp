@@ -1,24 +1,17 @@
-#define Player_UpdateMovement           sub_08141E80
-#define Player_GetSmoothedDirection     sub_08141BAC
-#define Player_GetMovementSpeed         sub_08141AE4
 #define Player_ComputeInverseSpeedScale Player_GetMovementRateScale
-#define Player_SetDirectionalVelocity   sub_0813AF18
-#define Player_UpdateFacingSide         sub_0813ADD0
-#define Player_SelectMovementAnimation  sub_081419D4
-#define Player_SetAnimation             sub_0813AE18
 #define Player_AddStatA Player_IncreaseLifeTowardLimit
 #define Player_AddStatB Player_AddEnergy
 #define Player_SubtractStatB Player_SubtractEnergy
 #include "global.h"
 #include "player.h"
-s32 sub_08141BAC(struct Player *);
-s32 sub_08141AE4(struct Player *);
+s32 Player_GetSmoothedDirection(struct Player *);
+s32 Player_GetMovementSpeed(struct Player *);
 s32 Player_GetMovementRateScale(s32);
-void sub_0813AF18(struct Player *, s32);
+void Player_SetDirectionalVelocity(struct Player *, s32);
 void sub_08141C40(struct Player *, s32);
-void sub_0813ADD0(struct Player *);
-s32 sub_081419D4(u32, s32);
-s32 sub_0813AE18(struct Player *, s32, s32, s32);
+void Player_UpdateFacingSide(struct Player *);
+s32 ActorVariant_GetTableValue(u32, s32);
+s32 Player_SetAnimation(struct Player *, s32, s32, s32);
 void Player_IncreaseLifeTowardLimit(struct Player *, u32);
 void Player_AddEnergy(struct Player *, s32);
 void Player_SubtractEnergy(struct Player *, s32);
@@ -52,20 +45,20 @@ static inline u8 IsModeFive(struct Player *p)
         result = 1;
     return result;
 }
-void sub_08141E80(struct Player *p)
+void Player_UpdateMovement(struct Player *p)
 {
     p->statusFlags &= ~1;
-    p->facing = sub_08141BAC(p);
+    p->facing = Player_GetSmoothedDirection(p);
     if (!p->movementVelocityLocked) {
-        s32 speed = sub_08141AE4(p);
+        s32 speed = Player_GetMovementSpeed(p);
         Player_GetMovementRateScale(speed);
         if (p && IsModeFive(p))
             speed = (p->movementSpeedScale * speed) >> 6;
-        sub_0813AF18(p, speed);
+        Player_SetDirectionalVelocity(p, speed);
     }
     sub_08141C40(p, 0);
-    sub_0813ADD0(p);
-    sub_0813AE18(p, sub_081419D4(p->actionMode, 1), 64, 1);
+    Player_UpdateFacingSide(p);
+    Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 1), 64, 1);
     if (++p->movementStatTimer > 60) {
         p->movementStatTimer = 0;
         if (HasFlag0(p))

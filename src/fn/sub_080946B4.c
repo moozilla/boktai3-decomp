@@ -1,11 +1,11 @@
 #include "global.h"
 
 extern u8 *gUnk_02000580;
-void sub_0812F12C(u8 *);
+void SceneActor_UpdateActiveCallbacks(u8 *);
 
 u32 Bee_OnPlayerInteraction(u8 *p)
 {
     *(u8 **)(p + 0xdc) = gUnk_02000580 + 0x24;
-    sub_0812F12C(p);
+    SceneActor_UpdateActiveCallbacks(p);
     return 0;
 }

@@ -1,4 +1,3 @@
-#define PauseMenu_SaveDisplayState sub_081765D4
 #define gDisplayControlShadow gUnk_03004BD8
 #include "global.h"
 #include "background_controller.h"
@@ -24,8 +23,8 @@ extern u16 gUnk_0300521C, gUnk_03005234;
 extern u8 gUnk_03005230, gUnk_03005218;
 void sub_08215AC4(u32, u32);
 void Mosaic_ResetParameters(void);
-void sub_08176590(struct PauseMenuDisplay *);
-void sub_081765D4(struct PauseMenuDisplay *s)
+void SceneDialog_ConfigureVariantSlot(struct PauseMenuDisplay *);
+void PauseMenu_SaveDisplayState(struct PauseMenuDisplay *s)
 {
     u32 flags;
     u32 bgEnable;
@@ -54,6 +53,6 @@ void sub_081765D4(struct PauseMenuDisplay *s)
     Mosaic_ResetParameters();
     gUnk_03004BD8 |= bgEnable;
     s->state = 0;
-    sub_08176590(s);
+    SceneDialog_ConfigureVariantSlot(s);
     s->selection = 0xFF;
 }

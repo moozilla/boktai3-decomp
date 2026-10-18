@@ -1,4 +1,3 @@
-#define SceneHud_ConfigureActionGrid sub_08172850
 #include "global.h"
 #include "scene_hud_display.h"
 static inline u8 GridOption(u32 flags, u32 mask, u32 value)
@@ -7,7 +6,7 @@ static inline u8 GridOption(u32 flags, u32 mask, u32 value)
         return value;
     return 0xFF;
 }
-void sub_08172850(struct SceneHudActionGrid *p, u32 flags, u32 mode)
+void SceneHud_ConfigureActionGrid(struct SceneHudActionGrid *p, u32 flags, u32 mode)
 {
     s32 column, row, next;
     p->flags = flags;

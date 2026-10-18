@@ -1,5 +1,4 @@
 #include "global.h"
-#define ScreenMote_UpdateManager sub_0813AC78
 #define gScreenMoteCallbacks     gUnk_086108EC
 #define gEffectPauseFlags        gUnk_030053F4
 #define gScenePauseFlags         gUnk_030053F0
@@ -20,7 +19,7 @@ struct ScreenMoteManager {
 extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_0300523C;
 extern void *gUnk_086108EC[];
 s32 sub_08249240(void *, void *, void *);
-s32 sub_0813AC78(struct ScreenMoteManager *m)
+s32 ScreenMote_UpdateManager(struct ScreenMoteManager *m)
 {
     s32 i;
     u32 pauseMask = 0x200;

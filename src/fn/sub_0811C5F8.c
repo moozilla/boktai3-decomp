@@ -1,8 +1,7 @@
-#define ActorStats_ApplyPendingIncrement sub_0811C5F8
 #include "global.h"
 #include "actor_stats.h"
 void Character_SetLowResourceColorEffect(void *, void *);
-void sub_0811C5F8(struct ActorStats *p)
+void ActorStats_ApplyPendingIncrement(struct ActorStats *p)
 {
     if (p->pending) {
         if (p->mode == 3) {

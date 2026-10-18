@@ -1,4 +1,3 @@
-#define NamedObject_ApplyVerticalImpulseAndJitter sub_08101810
 #define gNamedObjectRandomValues gUnk_0203B400
 #define gNamedObjectRandomIndex gUnk_03005308
 #include "global.h"
@@ -25,7 +24,7 @@ static inline u16 RandomValue(void)
     return gUnk_0203B400[gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF];
 }
 static inline void ClearFlag(s32 mask, s16 *flags) { *flags &= ~mask; }
-void sub_08101810(struct NamedObjectJitterState *object)
+void NamedObject_ApplyVerticalImpulseAndJitter(struct NamedObjectJitterState *object)
 {
     if (object->verticalImpulse < 0) {
         object->position.y += object->verticalImpulse;

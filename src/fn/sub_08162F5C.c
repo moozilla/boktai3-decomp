@@ -1,5 +1,4 @@
 #include "global.h"
-#define TransitionPanel_UpdateOpening sub_08162F5C
 struct TransitionPanelSprite {
     u32 flags;
     u8 unknown4[0x4C];
@@ -14,7 +13,7 @@ struct TransitionPanel {
     u16 timer;
 };
 void Sound_PlaySong(u32);
-void sub_08162F5C(struct TransitionPanel *p)
+void TransitionPanel_UpdateOpening(struct TransitionPanel *p)
 {
     u32 timer = p->timer + 1;
     p->timer = timer;

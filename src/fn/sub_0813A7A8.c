@@ -1,4 +1,3 @@
-#define CompactSpritePool_Initialize sub_0813A7A8
 #define gCompactSpritePool           gUnk_020004D8
 #include "global.h"
 struct CompactSpriteEntry {
@@ -24,7 +23,7 @@ void *ScriptProc_Start(u16, u16);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void Memory_Clear(void *, u32);
-s32 sub_0813A7A8(struct CompactSpritePool *pool)
+s32 CompactSpritePool_Initialize(struct CompactSpritePool *pool)
 {
     s32 i;
     for (i = 0; i < 2; i++) {

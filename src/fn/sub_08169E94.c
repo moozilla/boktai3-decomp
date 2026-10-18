@@ -1,5 +1,4 @@
 // Tentative StatusPanel family and semantic names; based on static consumers.
-#define StatusPanel_BeginRefresh sub_08169E94
 #define gStatusPanel gUnk_02000214
 #include "global.h"
 struct PanelRefresh { u32 unknown[2]; u32 flags; };
@@ -8,23 +7,23 @@ struct StatusPanel {
     struct PanelRefresh refresh;
 };
 extern struct StatusPanel *gUnk_02000214;
-void sub_081681B8(void);
-void sub_08168D20(struct StatusPanel *);
+void SelectionPanel_ClearTileColumns(void);
+void SceneHud_ApplySecondarySelection(struct StatusPanel *);
 void PauseMenu_ApplySelectedEquipment(struct StatusPanel *);
-void sub_081685B4(struct StatusPanel *);
+void SceneHud_RefreshWidgetVisibility(struct StatusPanel *);
 void Hud_OnUnpausedRefresh(void);
 void Hud_SetUpdateCallback(struct StatusPanel *, void (*)(void));
-void sub_08169E94(void)
+void StatusPanel_BeginRefresh(void)
 {
     struct StatusPanel *p = gUnk_02000214;
     if (p) {
         struct PanelRefresh *refresh;
-        sub_081681B8();
+        SelectionPanel_ClearTileColumns();
         refresh = (struct PanelRefresh *)((u8 *)p + 0xA9C);
         refresh->flags |= 1;
-        sub_08168D20(p);
+        SceneHud_ApplySecondarySelection(p);
         PauseMenu_ApplySelectedEquipment(p);
-        sub_081685B4(p);
+        SceneHud_RefreshWidgetVisibility(p);
         Hud_SetUpdateCallback(p, Hud_OnUnpausedRefresh);
     }
 }

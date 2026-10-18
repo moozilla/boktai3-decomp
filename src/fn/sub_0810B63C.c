@@ -1,6 +1,5 @@
 #include "global.h"
 #define SceneMenu_SetState Registry1745_SetState
-#define SceneMenu_WaitForConfirmation sub_0810B63C
 struct SceneMenu {
     u8 pad0[0x1A]; volatile u16 count;
     u8 pad1C[0x14]; u32 timer;
@@ -12,7 +11,7 @@ struct SceneMenu {
 u8 Registry1745_ConsumeStateEntry(struct SceneMenu *);
 void Registry1745_BeginShutdown(struct SceneMenu *, void (*)(void));
 void Registry1745_SetState(struct SceneMenu *, u32, void (*)(void));
-void sub_08109C80(void);
+void ScriptPanel_OpenTextWindow(void);
 void Registry1745_WaitForCompletionFlag(void);
 static inline u16 ReadInput(struct SceneMenu *p, s32 i)
 {
@@ -24,7 +23,7 @@ static inline u8 IsAcknowledgement(u32 v, u32 mask)
     if ((v & mask) == 0x1000) return 1;
     return 0;
 }
-s32 sub_0810B63C(struct SceneMenu *p)
+s32 SceneMenu_WaitForConfirmation(struct SceneMenu *p)
 {
     s32 completed, i;
     u32 mask;
@@ -43,7 +42,7 @@ s32 sub_0810B63C(struct SceneMenu *p)
     if (completed == p->count)
         Registry1745_SetState(p, 0x1B, Registry1745_WaitForCompletionFlag);
     else if (p->state + 2 <= 1 || p->timer > 179) {
-        Registry1745_BeginShutdown(p, sub_08109C80);
+        Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
     p->flags = 0x1002;

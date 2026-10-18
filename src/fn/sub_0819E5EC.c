@@ -6,11 +6,11 @@ struct P {
     u8 b;
 };
 extern const u32 gUnk_08611DAC[];
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 void sub_0819E408(void *);
 void Hresvelgr_UpdatePrimaryBehavior(struct P *p)
 {
     p->b = 0;
-    sub_0824923C(p, gUnk_08611DAC[p->i]);
+    Callback_InvokeActor(p, gUnk_08611DAC[p->i]);
     sub_0819E408(p);
 }

@@ -1,5 +1,4 @@
 #include "global.h"
-#define SpritePair_ReleaseSlot sub_0813A5B4
 #define gSpritePair gUnk_020004D4
 struct SpritePairSlot {
     u32 callback;
@@ -15,7 +14,7 @@ struct SpritePairSlot {
 struct SpritePair { u8 pad00[0x18]; struct SpritePairSlot slots[2]; };
 extern struct SpritePair *gUnk_020004D4;
 void Sprite_Remove(void *);
-void sub_0813A5B4(u32 index, u32 remove)
+void SpritePair_ReleaseSlot(u32 index, u32 remove)
 {
     struct SpritePair *pair = gUnk_020004D4;
     if (pair && index <= 1 && pair->slots[index].active) {

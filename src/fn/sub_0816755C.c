@@ -1,7 +1,6 @@
 #include "global.h"
 #include "level_advance_display.h"
 /* Tentative inventory display family, inferred from slot and item consumers. */
-#define InventoryPanel_UpdateCallbackGroups sub_0816755C
 struct InventoryPanelCallbackMetadata {
     u8 active;
     u8 unknown1[3];
@@ -22,7 +21,7 @@ struct InventoryPanel {
     u8 unknown0[0x4450];
     struct InventoryPanelCallbackGroup groups[2];
 };
-void sub_0816755C(struct InventoryPanel *panel)
+void InventoryPanel_UpdateCallbackGroups(struct InventoryPanel *panel)
 {
     s32 i = 0;
     do {

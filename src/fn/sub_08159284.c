@@ -1,4 +1,3 @@
-#define PlayerContact_GetOffsetPosition sub_08159284
 #define gPlayerSlots                    gUnk_02000580
 #define gDirectionSineTable             gUnk_086149C4
 #include "global.h"
@@ -18,7 +17,7 @@ static inline s32 Scale(s32 value)
         return value >> 12;
     return -((-value) >> 12);
 }
-void sub_08159284(s32 slot, struct SceneVec *out)
+void PlayerContact_GetOffsetPosition(s32 slot, struct SceneVec *out)
 {
     struct SceneVec pos;
     struct Player *p = gPlayerSlots[slot];

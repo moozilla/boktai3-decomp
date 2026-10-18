@@ -31,8 +31,8 @@ struct A8CBObject *RegistryA8CB_FindAvailableEntry(void *manager);
 void sub_081200C8(struct A8CBObject *);
 void sub_0811C9F8(struct A8CBObject *, void *, s32);
 void sub_0811C89C(void *, void *, u8);
-void sub_08112BA8(void *);
-void sub_0811FDB4(struct A8CBObject *);
+void SceneSlot_RegisterObject(void *);
+void ActorCollision_InitBounds(struct A8CBObject *);
 void RegistryA8CB_RegisterMessageReceiver(struct A8CBObject *);
 void Modifier_InitDrainState(void *, void *, s32, s32);
 void sub_08120B44(void);
@@ -59,8 +59,8 @@ void RegistryA8CB_CreateFromScript(void)
     anim = e->anim;
     sub_0811C9F8(e, anim, 0x3D99);
     sub_0811C89C(e->block68, anim, e->field4B);
-    sub_08112BA8(e->block10);
-    sub_0811FDB4(e);
+    SceneSlot_RegisterObject(e->block10);
+    ActorCollision_InitBounds(e);
     {
         void (*update)(void) = sub_08120B44;
         u8 *active = &e->active;

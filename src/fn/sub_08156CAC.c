@@ -1,12 +1,10 @@
-#define Player_EmitPeriodicParticles sub_08156CAC
-#define SparkParticle_SpawnBurst     sub_0806A160
 #define gGameState                   gUnk_02000710
 #include "global.h"
 #include "player.h"
 #include "game_state.h"
 #include "contact_actor.h"
-void sub_0806A160(void *, s32, void *, s32, s32, s32, s32, s32);
-void sub_08156CAC(struct Player *p)
+void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
+void Player_EmitPeriodicParticles(struct Player *p)
 {
     struct ContactPackedVector spread, position;
     if (gUnk_02000710->playerParticleRate) {
@@ -27,7 +25,7 @@ void sub_08156CAC(struct Player *p)
                 spread.y = 32;
                 spread.z = 32;
             }
-            sub_0806A160(&position, 1, &spread, 0, 0, 6, 3, 2);
+            SparkParticle_Spawn(&position, 1, &spread, 0, 0, 6, 3, 2);
             p->particleCadenceCounter = 0;
         }
     }

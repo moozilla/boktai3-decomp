@@ -1,5 +1,4 @@
 #include "global.h"
-#define ByteSequence_AdvanceEncodedValue sub_081382BC
 
 struct ByteSequence {
     u8 unknown0[0x3E];
@@ -9,7 +8,7 @@ struct ByteSequence {
     u8 unknown48[0x32];
     u16 index;
 };
-s32 sub_081382BC(struct ByteSequence *sequence, const u8 *bytes, s32 count)
+s32 ByteSequence_AdvanceEncodedValue(struct ByteSequence *sequence, const u8 *bytes, s32 count)
 {
     if (sequence->index < count) {
         if (sequence->status < 0)

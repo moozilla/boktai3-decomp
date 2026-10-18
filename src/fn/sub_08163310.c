@@ -1,6 +1,5 @@
 #include "global.h"
 #include "player.h"
-#define TransitionPanel_TryBeginClose sub_08163310
 #define TransitionPanel_HideSprites GameOver_ShowGraphics
 struct TransitionPanel {
     u8 unknown0[0x340];
@@ -12,7 +11,7 @@ extern u32 gUnk_030053F4, gUnk_030053F0;
 void GameOver_ShowGraphics(struct TransitionPanel *);
 void Hud_SetMode(s32);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
-void sub_08163310(struct TransitionPanel *p)
+void TransitionPanel_TryBeginClose(struct TransitionPanel *p)
 {
     u32 mask = 0x400;
     if ((gUnk_030053F4 | gUnk_030053F0) & mask) {

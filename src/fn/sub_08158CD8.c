@@ -1,5 +1,3 @@
-#define Player_BeginTerrainInteraction sub_08158CD8
-#define Player_SetActionModePhase      sub_0813AFEC
 #define gTerrainMap                    gUnk_030052F4
 #define gTerrainWidth                  gUnk_030052F8
 #define gTerrainHeight                 gUnk_030052FC
@@ -7,7 +5,7 @@
 #include "player.h"
 #include "engine.h"
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
-void sub_0813AFEC(struct Player *, s32, s32);
+void ActorSequence_Begin(struct Player *, s32, s32);
 static inline s32 cellIndex(s32 x, s32 z)
 {
     if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
@@ -26,7 +24,7 @@ static inline u8 *cellProperties(s32 cell)
     }
     return properties;
 }
-void sub_08158CD8(struct Player *p)
+void Player_BeginTerrainInteraction(struct Player *p)
 {
     struct SceneVec *position;
     u8 *properties;
@@ -36,7 +34,7 @@ void sub_08158CD8(struct Player *p)
         p->actionLatch464 = 1;
         p->actionLatch465 = 1;
     }
-    sub_0813AFEC(p, 0x1C, 0);
+    ActorSequence_Begin(p, 0x1C, 0);
     p->terrainRecoveryCounter = 0;
     position = &p->position;
     properties = cellProperties(cellIndex(position->x >> 8, position->z >> 8));

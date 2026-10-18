@@ -9,7 +9,7 @@ void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
 void Menu_StartFadeIn(u32);
 void sub_081E0818(u8 *);
 extern u32 gUnk_020002F8[];
-u32 sub_08033690(u32, u32, u32, u32);
+u32 TextWindow_Create(u32, u32, u32, u32);
 void TextWindow_SetScript(u32, u32);
 void TextWindow_Refresh(u32, u32);
 void TextWindow_StartPlayback(u32);
@@ -63,7 +63,7 @@ u32 ScreenMessage_Initialize(u8 *s)
         *(void **)(s + 0x64) = dest;
         *(void **)(s + 0xEC) = dest;
     }
-    result = sub_08033690(1, 6, 28, 6);
+    result = TextWindow_Create(1, 6, 28, 6);
     sound = (u32 *)(s + 0x140);
     *sound = result;
     TextWindow_SetScript(result, global[0]);

@@ -1,4 +1,3 @@
-#define ActorDrain_Update sub_0811ED0C
 #include "global.h"
 struct ActorDrainState {
     void *callback;
@@ -21,18 +20,18 @@ struct DrainActor {
 s32 Mod(s32, s32);
 void Sound_PlaySong(u32);
 void TimedSpriteEffect_RequestStop(u32);
-s8 sub_08138A2C(void *);
-u8 sub_08116C74(void *);
+s8 SpriteSlots_AttachSource(void *);
+u8 LinkParticipant_IsLocallySelected(void *);
 s32 sub_0811ECCC(struct DrainActor *);
 void Modifier_UpdateIdleDrain(void);
-s32 sub_0811ED0C(struct DrainActor *actor)
+s32 ActorDrain_Update(struct DrainActor *actor)
 {
     struct ActorDrainState *state = &actor->drain;
     state->active = 1;
     if (state->entered) {
-        if (state->resource) state->effect = sub_08138A2C(state->resource);
+        if (state->resource) state->effect = SpriteSlots_AttachSource(state->resource);
         state->timer = state->duration;
-        if (sub_08116C74(actor->owner)) Sound_PlaySong(0x8C);
+        if (LinkParticipant_IsLocallySelected(actor->owner)) Sound_PlaySong(0x8C);
         state->entered = 0;
     }
     state->timer--;

@@ -1,4 +1,3 @@
-#define SpritePool12_UpdateActive sub_0812808C
 #define gSpritePool12Callbacks gUnk_08610784
 #include "global.h"
 struct PoolSprite {
@@ -19,7 +18,7 @@ static inline u8 IsActive(u32 *mask, s32 slot)
         return TRUE;
     return FALSE;
 }
-s32 sub_0812808C(struct SpritePool *pool)
+s32 SpritePool12_UpdateActive(struct SpritePool *pool)
 {
     s32 i = 0;
     void **callbacks = gUnk_08610784;

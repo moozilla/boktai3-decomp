@@ -1,11 +1,9 @@
-#define PlayerStats_AddContactHundredths sub_08159860
-#define PlayerStats_AddHundredths        sub_0815977C
 #define gPlayerSlots                     gUnk_02000580
 #include "global.h"
 #include "player.h"
 #include "contact_actor.h"
-void sub_0815977C(struct Player *, s32);
-void sub_08159860(struct ContactCollider *source, struct ContactCollider *other, s32 amount)
+void PlayerStats_AddHundredths(struct Player *, s32);
+void PlayerStats_AddContactHundredths(struct ContactCollider *source, struct ContactCollider *other, s32 amount)
 {
     struct Player *player = gPlayerSlots[0];
     s32 gain, product;
@@ -33,7 +31,7 @@ void sub_08159860(struct ContactCollider *source, struct ContactCollider *other,
             gain = product >> 6;
         else
             gain = -((-product) >> 6);
-        sub_0815977C(player, gain);
+        PlayerStats_AddHundredths(player, gain);
         source->cost += amount;
     }
 }

@@ -1,4 +1,3 @@
-#define Player_EnterKindTwo         sub_0815AD78
 #define gPendingPlayerNotification  gUnk_0200054C
 #define gPlayerNotificationPending  gUnk_02000594
 #define Player_StopActionModeSounds Player_StopActionSounds
@@ -16,7 +15,7 @@ void sub_08249244(void *, s32, s32, void *);
 void Player_StopActionSounds(struct Player *);
 void Player_RestoreCameraFollow(struct Player *);
 void Player_AddControlFlags(struct Player *, s32);
-void sub_0815AD78(struct Player *p)
+void Player_EnterKindTwo(struct Player *p)
 {
     if (p->kind != 2) {
         p->kindTwoAttachmentCounter = 0;

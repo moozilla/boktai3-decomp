@@ -406,7 +406,7 @@ void Palette_ApplyFrame(struct PaletteController *p)
     } else
         Palette_ClearPendingFlags(p, 2);
     if (Weather_IsActive() || (p->flags & 16)) {
-        sub_0824923C(t, gUnk_0860499C[t->mode]);
+        Callback_InvokeActor(t, gUnk_0860499C[t->mode]);
         if (t->brightness != t->previousBrightness)
             Palette_SetPendingFlags(p, 4);
     } else

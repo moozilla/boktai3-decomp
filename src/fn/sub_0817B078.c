@@ -1,6 +1,5 @@
 #include "global.h"
 // Tentative SceneVolume family: ownership and field semantics remain provisional.
-#define SceneVolume_ResetPendingSequence sub_0817B078
 struct SceneVolume {
     u8 pad0[0x314];
     void *sequence;
@@ -13,7 +12,7 @@ struct SceneVolume {
     u8 pad50C[0xF4];
     u8 sequenceBuffer[1];
 };
-void sub_0817B078(struct SceneVolume *volume)
+void SceneVolume_ResetPendingSequence(struct SceneVolume *volume)
 {
     if (volume->pendingReset) {
         volume->sequenceState = 0;

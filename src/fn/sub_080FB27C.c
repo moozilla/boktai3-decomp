@@ -1,4 +1,3 @@
-#define SceneActorControl_CanAdvanceHover sub_080FB27C
 #define gSceneHeightState gUnk_02000580
 #include "global.h"
 #include "scene_actor_reset.h"
@@ -30,7 +29,7 @@ zero:
 }
 
 extern u8 *gUnk_02000580;
-s32 sub_080FB27C(struct SceneActorRegistryResetView *actor)
+s32 SceneActorControl_CanAdvanceHover(struct SceneActorRegistryResetView *actor)
 {
     if (!Actor_IsInactive((void *)actor)) {
         u8 *context = actor->context;

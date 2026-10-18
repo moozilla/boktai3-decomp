@@ -4,10 +4,10 @@ struct S {
     u32 a;
 };
 void sub_081C4950(void *);
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 void ShipWheel_Update(struct S *p)
 {
     sub_081C4950(p);
     if (p->a != 0)
-        sub_0824923C(&p->a, p->a);
+        Callback_InvokeActor(&p->a, p->a);
 }

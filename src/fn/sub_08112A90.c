@@ -1,4 +1,3 @@
-#define PanelSpritePool_Init sub_08112A90
 #define gPanelSpritePool     gUnk_020004BC
 #include "global.h"
 struct PanelSprite {
@@ -23,7 +22,7 @@ void Sprite_Init(void *, void *, u32);
 void *ScriptProc_Start(u16, u16);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
 void Memory_Clear(void *, u32);
-s32 sub_08112A90(struct PanelSpritePool *p)
+s32 PanelSpritePool_Init(struct PanelSpritePool *p)
 {
     s32 result;
     s32 i = 0;

@@ -1,7 +1,6 @@
 #include "global.h"
 #include "game_state.h"
-#define StateFlags_GetCategoryBit sub_0811DD94
-u32 sub_0811DD94(u32 category, u32 bit)
+u32 StateFlags_GetCategoryBit(u32 category, u32 bit)
 {
     u32 mask = 1 << bit;
     switch (category) {

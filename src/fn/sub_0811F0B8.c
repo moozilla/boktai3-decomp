@@ -1,4 +1,3 @@
-#define ActorEmitter_TryEmitPair sub_0811F0B8
 #define ActorEmitter_CanEmit Modifier_IsFirstSourceReady
 #include "global.h"
 struct EmitterVector { s32 x, y, z; u32 :32; };
@@ -30,10 +29,10 @@ struct ActorEmitter {
     struct EmitterOwner *owner;
 };
 u8 Modifier_IsFirstSourceReady(struct ActorEmitter *);
-s32 sub_0811EAF8(void *, u32, s32);
+s32 CallbackList_RunMatchingState(void *, u32, s32);
 s32 sub_08114928(struct EmitterVector *, s32, struct EmitterVector *, void *, s32, s32, s32, s32);
-void sub_0811EE68(void *, struct ActorEmitter *, s32);
-s32 sub_0811F0B8(struct ActorEmitter *emitter)
+void CallbackList_SubtractClampedValue(void *, struct ActorEmitter *, s32);
+s32 ActorEmitter_TryEmitPair(struct ActorEmitter *emitter)
 {
     struct EmitterOwner *owner;
     struct EmitterActor *actor;
@@ -42,7 +41,7 @@ s32 sub_0811F0B8(struct ActorEmitter *emitter)
     if (!Modifier_IsFirstSourceReady(emitter)) goto fail;
     owner = emitter->owner;
     actor = (struct EmitterActor *)((u8 *)owner + 0x18);
-    cost = sub_0811EAF8(actor, emitter->id, 9);
+    cost = CallbackList_RunMatchingState(actor, emitter->id, 9);
     if (owner->energy < cost) goto fail;
     velocity.x = owner->velocity;
     velocity.y = 0;
@@ -56,7 +55,7 @@ fail:
 success:
     sub_08114928(&actor->position, height, &velocity,
                        actor->profile, owner->kind + 1, 0, 1, 1);
-    sub_0811EE68(actor, emitter, cost);
+    CallbackList_SubtractClampedValue(actor, emitter, cost);
     emitter->timer = emitter->duration;
     return 1;
 }

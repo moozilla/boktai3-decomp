@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_vec.h"
 #include "proximity_emitter.h"
-#define TileTrigger_IsTetherNearby sub_08107298
 extern u32 gUnk_030053F4;
 u32 TetherActor_IsState(u32);
 struct TileTrigger {
@@ -16,7 +15,7 @@ struct TileTrigger {
     u16 triggerFlags;
     u8 forced, frame;
 };
-u8 sub_08107298(struct TileTrigger *p)
+u8 TileTrigger_IsTetherNearby(struct TileTrigger *p)
 {
     struct ContactPosition difference;
     struct ContactPosition *delta;

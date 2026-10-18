@@ -1,5 +1,4 @@
 #include "global.h"
-#define LinkedEffect_UpdateColliders sub_0812A760
 struct LinkedEffectCollider {
     u8 unknown[6];
     u16 flags;
@@ -17,7 +16,7 @@ static inline void ClearFlags(struct LinkedEffectCollider *p, u32 mask)
 {
     p->flags &= ~mask;
 }
-void sub_0812A760(struct LinkedEffect *effect)
+void LinkedEffect_UpdateColliders(struct LinkedEffect *effect)
 {
     struct LinkedEffectCollider *first = &effect->colliders[0];
     s32 *position = effect->position;

@@ -1,14 +1,14 @@
 #include "global.h"
-void sub_0811DEEC(void *);
-void sub_0811DF78(void *);
-void sub_0811E038(void *);
-void sub_0811E134(void *);
-void sub_0811E224(void *);
+void ScriptOptions_LoadEntries(void *);
+void ScriptOptions_LoadTargets(void *);
+void ScriptOptions_LoadWideRecords(void *);
+void ScriptOptions_LoadShortRecords(void *);
+void ScriptRecord_ReadEntries(void *);
 void Modifier_LoadTablesFromScript(void *p)
 {
-    sub_0811DEEC(p);
-    sub_0811DF78(p);
-    sub_0811E038(p);
-    sub_0811E134(p);
-    sub_0811E224(p);
+    ScriptOptions_LoadEntries(p);
+    ScriptOptions_LoadTargets(p);
+    ScriptOptions_LoadWideRecords(p);
+    ScriptOptions_LoadShortRecords(p);
+    ScriptRecord_ReadEntries(p);
 }

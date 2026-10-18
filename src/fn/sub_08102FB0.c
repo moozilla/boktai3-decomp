@@ -1,4 +1,3 @@
-#define NamedObject_MoveAttachedTether sub_08102FB0
 #define gNamedObjectManager            gUnk_020001AC
 #include "global.h"
 struct NamedObjectVector {
@@ -34,7 +33,7 @@ static inline u8 testFlag(u32 mask, u16 *flags)
         return 1;
     return 0;
 }
-void sub_08102FB0(struct NamedObject *object)
+void NamedObject_MoveAttachedTether(struct NamedObject *object)
 {
     struct NamedObjectVector target, delta;
     struct NamedObjectManager *manager = gUnk_020001AC;

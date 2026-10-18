@@ -1,4 +1,3 @@
-#define MessagePanel_WaitForInput sub_08109838
 #define gMessagePanelInput gUnk_03005260
 #include "global.h"
 #include "engine.h"
@@ -14,7 +13,7 @@ struct MessagePanel {
 };
 extern u16 gUnk_03005260[];
 void sub_08224FA4(void);
-void sub_08109838(struct MessagePanel *p)
+void MessagePanel_WaitForInput(struct MessagePanel *p)
 {
     if (p->entering) {
         TextWindow_SetScript(p->window, p->script);

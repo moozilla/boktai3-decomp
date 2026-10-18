@@ -1,4 +1,3 @@
-#define SelectionPanel_RefreshAttachedPanel  sub_081697B8
 #define SelectionPanel_RefreshPrimaryEntries PauseMenu_RefreshEquipmentSlotIcons
 #include "global.h"
 struct SelectionPanel {
@@ -9,25 +8,25 @@ extern u32 gUnk_030053F4;
 void sub_08169504(struct SelectionPanel *);
 void sub_08168850(struct SelectionPanel *);
 void sub_08168A0C(struct SelectionPanel *);
-void sub_08168BEC(struct SelectionPanel *);
-void sub_081686FC(struct SelectionPanel *);
+void SceneHud_RebuildTertiaryOptions(struct SelectionPanel *);
+void SceneHud_UpdateSecondaryWidgets(struct SelectionPanel *);
 void PauseMenu_RefreshEquipmentSlotIcons(struct SelectionPanel *);
-void sub_081687D8(struct SelectionPanel *);
-void sub_08168534(struct SelectionPanel *);
-void sub_081685B4(struct SelectionPanel *);
-void sub_081697B8(struct SelectionPanel *p)
+void SceneHud_UpdateTertiaryWidgets(struct SelectionPanel *);
+void Hud_SetElementGroupFlags(struct SelectionPanel *);
+void SceneHud_RefreshWidgetVisibility(struct SelectionPanel *);
+void SelectionPanel_RefreshAttachedPanel(struct SelectionPanel *p)
 {
     sub_08169504(p);
     if (p->owner) {
         sub_08168850(p);
         sub_08168A0C(p);
-        sub_08168BEC(p);
-        sub_081686FC(p);
+        SceneHud_RebuildTertiaryOptions(p);
+        SceneHud_UpdateSecondaryWidgets(p);
         PauseMenu_RefreshEquipmentSlotIcons(p);
-        sub_081687D8(p);
+        SceneHud_UpdateTertiaryWidgets(p);
         if (gUnk_030053F4 & 0x1000)
-            sub_08168534(p);
+            Hud_SetElementGroupFlags(p);
         else
-            sub_081685B4(p);
+            SceneHud_RefreshWidgetVisibility(p);
     }
 }

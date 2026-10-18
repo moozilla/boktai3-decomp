@@ -1,5 +1,4 @@
 #include "global.h"
-#define PairSlotPool_Allocate sub_081258DC
 struct PairSlot {
     u8 unknown[0xDE];
     u8 index;
@@ -15,7 +14,7 @@ static inline u8 PairSlotPool_IsAllocated(struct PairSlotPool *pool, s32 index)
     if (pool->allocated & (1 << index)) return TRUE;
     return FALSE;
 }
-struct PairSlot *sub_081258DC(struct PairSlotPool *pool)
+struct PairSlot *PairSlotPool_Allocate(struct PairSlotPool *pool)
 {
     s32 index;
     for (index = 0; index < 2; index++) {

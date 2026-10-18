@@ -1,4 +1,3 @@
-#define ActorFacing_TurnTowardPoint sub_0812E058
 #include "global.h"
 
 struct FacingActor {
@@ -16,7 +15,7 @@ static inline s32 FacingDelta(s16 target, u16 current)
     return target - current;
 }
 
-void sub_0812E058(struct FacingActor *actor, s32 x, s32 y)
+void SceneActor_SetPositionXZ(struct FacingActor *actor, s32 x, s32 y)
 {
     s32 dx = FacingDelta(x, actor->x);
     s32 dy = FacingDelta(y, actor->y);

@@ -1,4 +1,3 @@
-#define SceneActorControl_AdvanceReactionCount sub_080FE544
 #include "global.h"
 #include "scene_actor_reset.h"
 struct SceneActorReactionCountContext {
@@ -16,7 +15,7 @@ static inline u8 TestFlag(u32 mask, u32 *flags)
     return 0;
 }
 static inline u32 MaskFlags(u16 *p, u32 mask) { return *p & mask; }
-s32 sub_080FE544(struct SceneActorRegistryResetView *actor)
+s32 SceneActorControl_AdvanceReactionCount(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorReactionCountContext *context = actor->context;
     u16 *flags;

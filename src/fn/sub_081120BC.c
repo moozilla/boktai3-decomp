@@ -1,4 +1,3 @@
-#define SceneGauge_SelectThresholdFrame sub_081120BC
 #include "global.h"
 s32 sub_08219728(void *, void *, u32);
 extern const u8 gUnk_086106B0[];
@@ -8,7 +7,7 @@ struct SceneGauge {
     u8 animation[0x8EE - 0x8C4];
     u16 frame;
 };
-s32 sub_081120BC(struct SceneGauge *s, s32 value)
+s32 SceneGauge_SelectThresholdFrame(struct SceneGauge *s, s32 value)
 {
     s32 level = -1;
     s32 i;

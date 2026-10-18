@@ -1,7 +1,6 @@
-#define Player_SetActionOrigin sub_08142C4C
 #include "global.h"
 #include "player.h"
-void sub_08142C4C(struct Player *p)
+void Player_SetActionOrigin(struct Player *p)
 {
     p->actionOrigin = p->position;
     if (p->facing == 4) {

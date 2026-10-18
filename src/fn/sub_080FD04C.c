@@ -1,4 +1,3 @@
-#define ActorGroup_ReadScriptOptions sub_080FD04C
 #include "global.h"
 #include "scene_actor_registry.h"
 struct ActorGroupOptions {
@@ -14,7 +13,7 @@ static inline s32 ReadOption(s32 defaultValue)
         value = defaultValue;
     return value;
 }
-void sub_080FD04C(struct SceneActorRegistryActor *actor)
+void ActorGroup_ReadScriptOptions(struct SceneActorRegistryActor *actor)
 {
     struct ActorGroupOptions *group = actor->context;
     if (Script_SeekToKeyword('O')) {

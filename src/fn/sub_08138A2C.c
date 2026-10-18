@@ -1,4 +1,3 @@
-#define SpriteSlots_AttachSource sub_08138A2C
 #define SpriteSlots_Create PositionEffectDisplay_Create
 #define gSpriteSlots gUnk_020004C0
 #include "global.h"
@@ -16,7 +15,7 @@ struct SpriteSlots {
 };
 extern struct SpriteSlots *gUnk_020004C0;
 struct SpriteSlots *PositionEffectDisplay_Create(void);
-s32 sub_08138A2C(void *source)
+s32 SpriteSlots_AttachSource(void *source)
 {
     struct SpriteSlots *initial = gUnk_020004C0;
     struct SpriteSlots *p;

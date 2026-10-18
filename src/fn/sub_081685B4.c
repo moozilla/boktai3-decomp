@@ -1,11 +1,10 @@
 #define SceneHud_IsSecondaryEntryEnabled PauseMenu_GetSelectedListEntryType
 #define SceneHud_TestOwnerModeGate PauseMenu_IsEquipmentSelectionEnabled
-#define SceneHud_RefreshWidgetVisibility sub_081685B4
 #include "global.h"
 #include "scene_hud_display.h"
 s32 PauseMenu_IsEquipmentSelectionEnabled(struct SceneHudState *);
 u32 PauseMenu_GetSelectedListEntryType(struct SceneHudState *);
-void sub_081685B4(struct SceneHudState *p)
+void SceneHud_RefreshWidgetVisibility(struct SceneHudState *p)
 {
     s32 blocked = 0;
     s32 i;

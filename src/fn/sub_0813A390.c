@@ -1,5 +1,3 @@
-#define SpritePairPool_TestUnavailable sub_0813A390
-#define SpritePairPool_MarkDuplicate   sub_0813A34C
 #include "global.h"
 struct SpritePairEntry {
     u8 pad0[0x44];
@@ -24,8 +22,8 @@ struct SpritePairPool {
     u32 counter;
 };
 void Memory_Clear(void *, u32);
-u32 sub_0813A34C(struct SpritePairPool *, s32, u32, u8 *);
-u32 sub_0813A390(struct SpritePairPool *pool, u32 id, s32 required)
+u32 PairCallbackPool_MarkNextOfKind(struct SpritePairPool *, s32, u32, u8 *);
+u32 SpritePairPool_TestUnavailable(struct SpritePairPool *pool, u32 id, s32 required)
 {
     s32 matches = 0;
     s32 available = 0;
@@ -39,7 +37,7 @@ u32 sub_0813A390(struct SpritePairPool *pool, u32 id, s32 required)
             available++;
         else if ((pool->entries[i].id & 0xff) == key && !seen[i]) {
             seen[i] = 1;
-            sub_0813A34C(pool, i + 1, pool->entries[i].id, seen);
+            PairCallbackPool_MarkNextOfKind(pool, i + 1, pool->entries[i].id, seen);
             matches++;
         }
     }

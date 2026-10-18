@@ -1,7 +1,6 @@
-#define Player_IsActionAllowed sub_08141800
 #include "global.h"
 #include "player.h"
-u32 sub_08141800(struct Player *p, u32 action)
+u32 Player_IsActionAllowed(struct Player *p, u32 action)
 {
     if (p->actionMode <= 1 || p->actionMode == 6) {
         if (action == 0 || action == 3 || action == 19 || action == 20 || action == 6)

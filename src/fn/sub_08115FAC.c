@@ -1,5 +1,4 @@
 #include "global.h"
-#define CallbackPool_RemoveSmallSprites sub_08115FAC
 #define gSmallCallbackPool              gUnk_020001E8
 struct SmallCallbackEntry {
     u8 pad0[0x1C];
@@ -16,7 +15,7 @@ struct SmallCallbackPool {
 };
 extern struct SmallCallbackPool *gUnk_020001E8;
 void Sprite_Remove(void *);
-s32 sub_08115FAC(struct SmallCallbackPool *pool)
+s32 CallbackPool_RemoveSmallSprites(struct SmallCallbackPool *pool)
 {
     s32 i;
     for (i = 0; i <= 15; i++) {

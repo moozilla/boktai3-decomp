@@ -1,10 +1,10 @@
 #include "staged_effect.h"
 extern void (*const gUnk_08605A58[])(struct StagedEffect *);
-void sub_0824923C(void *, void *);
+void Callback_InvokeActor(void *, void *);
 s32 StagedEffect_Tick(struct StagedEffect *effect)
 {
     s32 i;
-    sub_0824923C(effect, gUnk_08605A58[effect->state]);
+    Callback_InvokeActor(effect, gUnk_08605A58[effect->state]);
     if (effect->state != 0) {
         i = 0;
         do {

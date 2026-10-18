@@ -1,4 +1,3 @@
-#define PanelTransition_UpdateExit sub_0810D22C
 #include "global.h"
 struct PanelTransition {
     u8 unknown0[0x140C];
@@ -9,7 +8,7 @@ struct PanelTransition {
 void Task_Kill(void *);
 void Registry1745_SetMenuRequest(u32);
 void ScreenTransition_SendCommand(s32,s32,s32,s32,s32,s32,s32);
-void sub_0810D22C(struct PanelTransition *p)
+void PanelTransition_UpdateExit(struct PanelTransition *p)
 {
     if (p->entered) {
         ScreenTransition_SendCommand(3,4,4,4,4,0xFFFF,0);

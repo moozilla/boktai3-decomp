@@ -1,4 +1,3 @@
-#define Player_InitializeStatsFromScript sub_0813B67C
 #define Player_CalculateMaximumStatA Player_GetMaxLife
 #define Player_CalculateMaximumStatB Player_GetMaxEnergy
 #include "global.h"
@@ -7,7 +6,7 @@
 s32 Script_GetKeywordValue(u32, s32);
 s32 Player_GetMaxLife(struct Player *);
 s32 Player_GetMaxEnergy(struct Player *);
-void sub_0813B67C(struct Player *p)
+void Player_InitializeStatsFromScript(struct Player *p)
 {
     p->maximumStatA = Player_GetMaxLife(p);
     if (Script_GetKeywordValue('l', 0)) p->currentStatA = p->maximumStatA;

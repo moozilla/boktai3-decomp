@@ -9,7 +9,7 @@ struct P {
 };
 void Anim_SetKeyframes(void *, void *, s32, s32, s32);
 void ScaledShadow_Disable(void *);
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 void SceneEffect_UpdateFinishAnimation(struct P *p)
 {
     u8 *q = &p->a;
@@ -22,7 +22,7 @@ void SceneEffect_UpdateFinishAnimation(struct P *p)
         u32 z = 0;
         p->w0 = z;
         if (p->w4 != 0) {
-            sub_0824923C(p, p->w4);
+            Callback_InvokeActor(p, p->w4);
             p->w4 = z;
         }
     }

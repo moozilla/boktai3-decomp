@@ -1,4 +1,3 @@
-#define SceneTask_UpdateTextDelay sub_0810F2DC
 #include "global.h"
 void Task_Kill(void *);
 s32 TextWindow_Refresh(s32, s32);
@@ -13,7 +12,7 @@ struct SceneTextTask {
     u8 unknown14FD;
     u16 timer;
 };
-void sub_0810F2DC(struct SceneTextTask *s)
+void SceneTask_UpdateTextDelay(struct SceneTextTask *s)
 {
     u32 state;
     if (s->reset) {

@@ -1,5 +1,4 @@
 #include "global.h"
-#define Hud_HideAuxiliaryElements sub_08177DAC
 struct HudElement {
     u8 pad0[8];
     u32 flags;
@@ -11,7 +10,7 @@ struct HudManager {
     u8 pad4A48[0x28];
     struct HudElement group[6];
 };
-void sub_08177DAC(struct HudManager *p)
+void Hud_HideAuxiliaryElements(struct HudManager *p)
 {
     struct HudElement *e;
     s32 i;

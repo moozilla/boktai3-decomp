@@ -1,5 +1,4 @@
 #include "global.h"
-#define ActorResource_ClampDecrease sub_08179F1C
 struct ActorResourceState {
     u8 unknown0[0x94];
     s16 current;
@@ -8,7 +7,7 @@ struct ActorResourceState {
     u8 unknown278[0x272];
     u8 selection;
 };
-s32 sub_08179F1C(struct ActorResourceState *p, s32 decrease)
+s32 ActorResource_ClampDecrease(struct ActorResourceState *p, s32 decrease)
 {
     s32 result;
     s32 current = p->current;

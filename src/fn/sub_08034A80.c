@@ -49,7 +49,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
 int Wireless_CheckAdapterReady(void);
 int Script_ParseStringRef(const void *);
 const u8 *Text_LookupString(int);
-int sub_08228DB8(void);
+int SunClock_GetPhase(void);
 int SunClock_GetBaseHour(void);
 void WirelessText_EncodeString(const void *, void *, int);
 void sub_08224DAC(void *, int, int, int, int, const void *, const void *);
@@ -108,7 +108,7 @@ int WirelessController_UpdateAdapterSetup(struct Engine *p)
             *randomIndex = position;
             chance = ((u8 *)table)[position * 2];
             if (chance <= 63) {
-                u32 form = sub_08228DB8();
+                u32 form = SunClock_GetPhase();
                 int stage = SunClock_GetBaseHour();
                 if (form - 1 <= 2) {
                     offset = 1;

@@ -1,4 +1,3 @@
-#define PanelSprite_Create sub_08112CC8
 #include "global.h"
 struct PanelSpriteInstance {
     u8 data[0x1C];
@@ -22,7 +21,7 @@ s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void *ScriptProc_Start(u16, u16);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
-s32 sub_08112CC8(struct PanelSpriteOwner *owner, u32 data, u32 key, u32 seq, u32 row, u32 flags,
+s32 PanelSprite_Create(struct PanelSpriteOwner *owner, u32 data, u32 key, u32 seq, u32 row, u32 flags,
                  u32 spriteFlags, u32 mode)
 {
     struct PanelSpriteInstance *p;

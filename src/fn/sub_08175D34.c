@@ -1,4 +1,3 @@
-#define SelectionPanel_ConfirmSettings sub_08175D34
 #define MenuPanel_SetCallback Hud_SetInteractionCallback
 #define gPanelInputState gUnk_03005260
 // Provisional panel family; field meanings follow static consumers.
@@ -6,17 +5,17 @@
 extern u16 gUnk_03005260[];
 void Sound_PlaySong(u32);
 void sub_0817597C(void *, int);
-void sub_08175854(u32);
+void SceneCatalog_SelectDescription(u32);
 void PauseMenu_HidePromptIcons(void *);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
-void sub_08175D78(void);
-void sub_08175D34(void *p)
+void PauseMenu_UpdateConfigChoice(void);
+void SelectionPanel_ConfirmSettings(void *p)
 {
     if (gUnk_03005260[1] & 1) {
         Sound_PlaySong(0xDD);
         sub_0817597C(p, 1);
-        sub_08175854(6);
+        SceneCatalog_SelectDescription(6);
         PauseMenu_HidePromptIcons(p);
-        Hud_SetInteractionCallback(p, sub_08175D78, 1);
+        Hud_SetInteractionCallback(p, PauseMenu_UpdateConfigChoice, 1);
     }
 }

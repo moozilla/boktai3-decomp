@@ -1,5 +1,3 @@
-#define NamedObject_UpdateTetherAttachment sub_08102C0C
-#define NamedObject_ClearAttachmentFlag    sub_081028F8
 #define NamedObject_SyncTetherStatus NamedObject_UpdateTetherFollowFlags
 #define gNamedObjectManager                gUnk_020001AC
 #define gNamedObjectTetherBounds           gUnk_086064B4
@@ -25,7 +23,7 @@ extern struct NamedObjectManager *gUnk_020001AC;
 extern const struct NamedObjectVector gUnk_086064B4;
 u32 TetherActor_CopyPosition(struct NamedObjectVector *);
 void TetherActor_RemoveStatusFlags(u32);
-void sub_081028F8(u32, s32);
+void NamedObject_ClearAttachmentFlag(u32, s32);
 void NamedObject_UpdateTetherFollowFlags(struct NamedObject *);
 static inline void addVector(struct NamedObjectVector *d, struct NamedObjectVector *a,
                              struct NamedObjectVector *b)
@@ -49,7 +47,7 @@ static inline void clearFlag(s16 *flags, s32 mask)
 {
     *flags &= mask;
 }
-void sub_08102C0C(struct NamedObject *object)
+void NamedObject_UpdateTetherAttachment(struct NamedObject *object)
 {
     struct NamedObjectVector target, delta;
     struct NamedObjectManager *manager;
@@ -61,7 +59,7 @@ void sub_08102C0C(struct NamedObject *object)
     manager = gUnk_020001AC;
     if (delta.x <= gUnk_086064B4.x && delta.x >= -gUnk_086064B4.x && delta.y <= gUnk_086064B4.y &&
         delta.y >= -gUnk_086064B4.y && delta.z <= gUnk_086064B4.z && delta.z >= -gUnk_086064B4.z) {
-        sub_081028F8(manager->tetherName, 1);
+        NamedObject_ClearAttachmentFlag(manager->tetherName, 1);
         manager->tetherName = object->name;
         NamedObject_UpdateTetherFollowFlags(object);
         {

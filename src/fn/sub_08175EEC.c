@@ -8,19 +8,19 @@ void MessageWindow_SetBounds(u32, u32, u32, u32);
 void Hud_SetupBackgroundLayer(u8 *, u32, u32, u32, u32);
 void PauseMenu_HideAllSprites(u8 *);
 void PauseMenu_LoadSpriteKeyframe(u8 *, u32, u32);
-void sub_08175E64(u8 *);
+void PauseMenu_InitConfigChoice(u8 *);
 void TextWindow_SetScript(u32, u32);
 void TextWindow_Refresh(u32, u32);
 void TextWindow_SetBounds(u32, u32, u32, u32, u32);
 void TextWindow_StartPlayback(u32);
-void sub_08175BA8(u8 *);
+void MenuSelection_RefreshAllOptionText(u8 *);
 void MessageWindow_SetMessageTable(u32);
 void MessageWindow_SetPalette(u32);
-void sub_08175854(u32);
+void SceneCatalog_SelectDescription(u32);
 void PauseMenu_SetPromptIconPositions(u8 *, u32, s32);
-void sub_081660D0(u8 *, u32, s32);
+void SceneHud_SetPairedIcons(u8 *, u32, s32);
 void Hud_SetInteractionCallback(u8 *, void (*)(void), u32);
-void sub_08175D34(void);
+void SelectionPanel_ConfirmSettings(void);
 void Hud_InitConfigMenu(u8 *s)
 {
     u32 two;
@@ -38,7 +38,7 @@ void Hud_InitConfigMenu(u8 *s)
     Hud_SetupBackgroundLayer(s, *(u32 *)(s + 0x18), 0, 10, *(u32 *)(s + 0x2C));
     PauseMenu_HideAllSprites(s);
     PauseMenu_LoadSpriteKeyframe(s, 0, 0x58);
-    sub_08175E64(s);
+    PauseMenu_InitConfigChoice(s);
     p = (u32 *)(s + 0x48CC);
     TextWindow_SetScript(*p, *(u32 *)(s + 0x5C));
     TextWindow_Refresh(*p, 0x19);
@@ -56,11 +56,11 @@ void Hud_InitConfigMenu(u8 *s)
     TextWindow_Refresh(*r, 0x1B);
     TextWindow_SetBounds(*r, 2, 7, 11, two);
     TextWindow_StartPlayback(*r);
-    sub_08175BA8(s);
+    MenuSelection_RefreshAllOptionText(s);
     MessageWindow_SetMessageTable(*(u32 *)(s + 0x5C));
     MessageWindow_SetPalette(0xEFDA);
-    sub_08175854(5);
+    SceneCatalog_SelectDescription(5);
     PauseMenu_SetPromptIconPositions(s, 0, -12);
-    sub_081660D0(s, 1, -1);
-    Hud_SetInteractionCallback(s, sub_08175D34, 0);
+    SceneHud_SetPairedIcons(s, 1, -1);
+    Hud_SetInteractionCallback(s, SelectionPanel_ConfirmSettings, 0);
 }

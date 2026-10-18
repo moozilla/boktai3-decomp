@@ -1,5 +1,4 @@
 #include "global.h"
-#define MenuPrompt_UpdateSelectionSprites sub_0816AC08
 struct MenuPrompt {
     u8 unk0[0xC4];
     u8 animData[0x3C40 - 0xC4];
@@ -11,7 +10,7 @@ struct MenuPrompt {
     u8 selection;
 };
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
-void sub_0816AC08(struct MenuPrompt *p)
+void MenuPrompt_UpdateSelectionSprites(struct MenuPrompt *p)
 {
     Anim_LoadKeyframe(p->firstSprite, p->animData, p->selection + 25, 1);
     Anim_LoadKeyframe(p->secondSprite, p->animData, (u16)(28 - p->selection), 1);

@@ -28,7 +28,7 @@ int Wireless_IsSessionActive(void);
 void WirelessGameMenu_OnResultPanelClosed(void);
 void sub_0803B700(int, int, void *, void *, u32, u32, void *);
 void WirelessGameMenu_LoadBackground(struct P *, int);
-int sub_08033690(int, int, int, int);
+int TextWindow_Create(int, int, int, int);
 void TextWindow_SetScript(int, void *);
 void TextWindow_Refresh(int, int);
 void TextWindow_StartPlayback(int);
@@ -60,7 +60,7 @@ void WirelessTradeMenu_UpdateResultsPanel(struct P *p)
         p->timer = zero;
         p->flag = zero;
         WirelessGameMenu_LoadBackground(p, 3);
-        w = sub_08033690(1, 6, 28, 6);
+        w = TextWindow_Create(1, 6, 28, 6);
         *window = w;
         if (w >= 0) {
             TextWindow_SetScript(w, p->script);

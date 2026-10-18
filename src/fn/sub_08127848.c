@@ -1,4 +1,3 @@
-#define StateSlotPool_Update sub_08127848
 #include "global.h"
 
 struct StateSlot {
@@ -19,7 +18,7 @@ static inline u8 Occupied(const u32 *mask, u32 bit)
     if (*mask & bit) return TRUE;
     return FALSE;
 }
-s32 sub_08127848(struct StateSlotPool *input)
+s32 StateSlotPool_Update(struct StateSlotPool *input)
 {
     struct StateSlotPool *pool = input;
     struct StateSlot *slots = pool->slots;

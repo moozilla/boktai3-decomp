@@ -1,5 +1,4 @@
 #define gSpriteTileBase          gUnk_030042E4
-#define Hud_InitializeThreeIcons sub_08167F1C
 #include "global.h"
 
 /* HUD interpretation and descriptive names are tentative. */
@@ -23,7 +22,7 @@ struct HudIconOffset {
 };
 extern u8 *gUnk_030042E4;
 void sub_0821983C(void *, void *, int, int, int, int, int, void *);
-void sub_08167F1C(struct Hud *hud)
+void Hud_InitializeThreeIcons(struct Hud *hud)
 {
     struct HudIconOffset offset;
     s32 i;

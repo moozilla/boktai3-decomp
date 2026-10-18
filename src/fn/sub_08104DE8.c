@@ -1,4 +1,3 @@
-#define CallbackPool_DestroyEntries sub_08104DE8
 #define gCallbackPool gUnk_020001B0
 #include "global.h"
 #include "callback_pool.h"
@@ -11,7 +10,7 @@ static inline u8 CallbackPool_IsActive(u32 *mask, s32 i)
     if (*mask & (1 << i)) return TRUE;
     return FALSE;
 }
-s32 sub_08104DE8(struct CallbackPool *pool)
+s32 CallbackPool_DestroyEntries(struct CallbackPool *pool)
 {
     s32 i;
     for (i = 0; i < 4; i++) {

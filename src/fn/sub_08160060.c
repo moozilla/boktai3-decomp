@@ -1,5 +1,4 @@
 #include "global.h"
-#define PlayerTransition_InitCollider sub_08160060
 struct TransitionVector { s32 x:16, y:16, z:16, pad:16; };
 struct PlayerTransition {
     u8 unknown0[0x18];
@@ -11,7 +10,7 @@ void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
 void Collider_SetCallback(void *, void *, void *);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
-void sub_08160060(struct PlayerTransition *p)
+void PlayerTransition_InitCollider(struct PlayerTransition *p)
 {
     struct TransitionVector size, offset;
     void *collider = p->collider;

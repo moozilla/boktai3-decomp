@@ -48,19 +48,17 @@ static inline void clearFlags(u32 *p, u32 mask)
     *p &= ~mask;
 }
 
-#define ActorPhase_UpdateAcceleratingTrail sub_080F8010
-#define ActorPhase_EmitTrailSprite         sub_080FBC84
 struct PhaseVector {
     s32 x, y;
 };
 void ActorShadow_Disable(void *);
 void Sound_PlaySong(u32);
-void sub_080FBC84(struct PhaseActor *, void *, u32);
+void ActorPhase_EmitTrailSprite(struct PhaseActor *, void *, u32);
 void sub_080FC998(struct PhaseActor *);
 void Axe_UpdateAttackColliderPositions(struct PhaseActor *);
 void Axe_ReleaseAuxiliarySprite(struct PhaseActor *);
-void sub_080F92AC(void);
-void sub_080F8010(struct PhaseActor *s, s32 frame)
+void SceneActorControl_ResetRotation(void);
+void ActorPhase_UpdateAcceleratingTrail(struct PhaseActor *s, s32 frame)
 {
     u8 *data = s->data;
     if (consumeEntry(s)) {
@@ -85,13 +83,13 @@ void sub_080F8010(struct PhaseActor *s, s32 frame)
     }
     if ((1 & frame) && data[0xa36] <= 19)
         data[0xa36]++;
-    sub_080FBC84(s, data + 0xa24, data[0xa34]);
+    ActorPhase_EmitTrailSprite(s, data + 0xa24, data[0xa34]);
     sub_080FC998(s);
     Axe_UpdateAttackColliderPositions(s);
     if ((*(u32 *)(data + 0xa38) & 1) && frame > 30) {
         Axe_ReleaseAuxiliarySprite(s);
         {
-            void (*next)(void) = sub_080F92AC;
+            void (*next)(void) = SceneActorControl_ResetRotation;
             u32 id = 0x34;
             s->entered = 1;
             s->phaseState = 0;

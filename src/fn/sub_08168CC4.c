@@ -3,7 +3,7 @@ struct P {
     u8 f0[0xA40];
     u8 *o;
 };
-void sub_0813F9EC(u8 *, s32);
+void Player_SetActionRequest(u8 *, s32);
 void PauseMenu_ApplySelectedEquipment(struct P *p)
 {
     s8 *q = (s8 *)p + 0xC72;
@@ -14,8 +14,8 @@ void PauseMenu_ApplySelectedEquipment(struct P *p)
         r = (s8 *)p;
         r += *q * 4;
         r += 0xC79;
-        sub_0813F9EC(o, *r);
+        Player_SetActionRequest(o, *r);
     } else {
-        sub_0813F9EC(p->o, -1);
+        Player_SetActionRequest(p->o, -1);
     }
 }

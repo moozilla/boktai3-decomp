@@ -1,11 +1,10 @@
 #include "global.h"
-#define SlotMonitor_CheckTimeout sub_08108ADC
 struct SlotMonitor {
     u8 unk0[0x24]; s32 expected; u8 unk28[0x1c]; s32 state44; s32 current;
     u8 unk4c[0xc]; s32 mode; u16 idleTimer; u16 activeTimer; u16 unk60;
     u16 slots[4]; u8 unk6a[6]; u32 flags;
 };
-s32 sub_08108ADC(struct SlotMonitor *obj)
+s32 SlotMonitor_CheckTimeout(struct SlotMonitor *obj)
 {
     s32 count, i;
     u16 *slot;

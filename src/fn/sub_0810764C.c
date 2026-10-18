@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_vec.h"
-#define TileTrigger_TickDelay sub_0810764C
 #define gTileTriggerManager   gUnk_020001B8
 struct TileTrigger {
     u32 flags;
@@ -26,7 +25,7 @@ extern u32 gUnk_030053F4;
 void sub_08107398(struct TileTrigger *);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);
-void sub_0810764C(struct TileTrigger *p)
+void TileTrigger_TickDelay(struct TileTrigger *p)
 {
     struct TileTriggerManager *manager = gUnk_020001B8;
     if (p->frame >= p->delay) {

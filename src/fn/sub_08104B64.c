@@ -1,4 +1,3 @@
-#define ActorGroup_UpdateMemberFall sub_08104B64
 /* Provisional ActorGroup names: static behavior established; semantic ownership tentative. */
 #include "global.h"
 #include "engine.h"
@@ -17,7 +16,7 @@ struct ActorGroupMember {
     u8 started;
 };
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
-void sub_081263E0(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
+void SpriteParticle_CreateDefaultVariant4384(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
 static inline s32 cellIndex(struct SceneVec *pos)
 {
     s32 x = pos->x >> 8, z = pos->z >> 8;
@@ -58,7 +57,7 @@ static inline void ClearMotion(void *dest)
     u32 zero = 0;
     CpuSet(&zero, dest, 0x05000002);
 }
-void sub_08104B64(void *unused, struct ActorGroupMember *member)
+void ActorGroup_UpdateMemberFall(void *unused, struct ActorGroupMember *member)
 {
     s32 i;
     if (member->started) {
@@ -73,7 +72,7 @@ void sub_08104B64(void *unused, struct ActorGroupMember *member)
             member->state = 4;
             member->started = 1;
             for (i = 0; i < 8; i++)
-                sub_081263E0(&member->position, 8, 16, 4, 12, 18, i << 5, 8, 64, 1, 1, 0);
+                SpriteParticle_CreateDefaultVariant4384(&member->position, 8, 16, 4, 12, 18, i << 5, 8, 64, 1, 1, 0);
         }
     }
 }

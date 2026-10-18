@@ -1,4 +1,3 @@
-#define Player_BlendCameraTarget sub_081418DC
 #define Camera_SnapToIfActive Camera_SnapToWithoutCompletion
 #define gCameraPosition          gUnk_030042A0
 #include "global.h"
@@ -6,7 +5,7 @@
 extern struct SceneVec gUnk_030042A0;
 s32 Div(s32, s32);
 void Camera_SnapToWithoutCompletion(struct SceneVec *);
-void sub_081418DC(struct Player *p)
+void Player_BlendCameraTarget(struct Player *p)
 {
     s32 y, sum;
     p->cameraTarget.x = Div(p->position.x + p->cameraOffsetX + (gUnk_030042A0.x << 2), 5);

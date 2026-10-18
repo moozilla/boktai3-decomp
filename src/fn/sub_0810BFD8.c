@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneMenu_InitializeDisplay sub_0810BFD8
 struct SceneMenuDisplayElement { u8 bytes[0x60]; };
 struct SceneMenuDisplay {
     u8 pad0[0x20];
@@ -14,7 +13,7 @@ struct SceneMenuDisplay {
 void *ScriptProc_Start(u16, u16);
 s32 ResourceHeader_Relocate(void *, void *);
 void sub_0821983C(void *, void *, s32, s32, s32, s32, s32, void *);
-void sub_0810BFD8(struct SceneMenuDisplay *p)
+void SceneMenu_InitializeDisplay(struct SceneMenuDisplay *p)
 {
     s32 i;
     struct SceneMenuDisplayElement *element;

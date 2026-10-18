@@ -2,13 +2,13 @@
 void MessageWindow_Clear(void);
 void ScrollingDialogue_ClearScript(void);
 void ScrollingDialogue_RequestHide(void);
-void sub_0816D920(void *, u32);
+void SceneHud_GetActionIconPosition(void *, u32);
 s32 Inventory_GetQuantityByStorage(u32, u32);
 s32 sub_0822D604(s32);
-void sub_08165E78(u8 *, u32, s32, u32, void *, void *, u32, u32);
+void SceneHud_BeginIconMotion(u8 *, u32, s32, u32, void *, void *, u32, u32);
 void Sound_PlaySong(u32);
 void Hud_SetInteractionCallback(u8 *, void (*)(void), u32);
-void sub_0816F768(void);
+void SceneMenuPanel_AdvanceAfterMotion(void);
 struct E {
     u32 flags;
     u8 pad[0x2E];
@@ -41,11 +41,11 @@ void PauseMenu_BeginTypeThirteenItemUse(u8 *s)
         flags = (u32 *)(base + off);
     }
     *flags |= 1;
-    sub_0816D920(v, *kind);
-    sub_0816D920(w, s[0x4387]);
+    SceneHud_GetActionIconPosition(v, *kind);
+    SceneHud_GetActionIconPosition(w, s[0x4387]);
     result = sub_0822D604(Inventory_GetQuantityByStorage(s[0x4860], *kind));
     later = (*kind) + 10;
-    sub_08165E78(s, 0, result, ((struct S *)s)->elems[later].v, v, w, 0x18, 0x10);
+    SceneHud_BeginIconMotion(s, 0, result, ((struct S *)s)->elems[later].v, v, w, 0x18, 0x10);
     Sound_PlaySong(0x38A);
-    Hud_SetInteractionCallback(s, sub_0816F768, 1);
+    Hud_SetInteractionCallback(s, SceneMenuPanel_AdvanceAfterMotion, 1);
 }

@@ -1,5 +1,4 @@
 #define gGameState               gUnk_02000710
-#define Player_SaveStateSnapshot sub_0815EC14
 #include "global.h"
 #include "player.h"
 /* Byte view preserves the original global-pointer reloads between stores. */
@@ -7,7 +6,7 @@ extern u8 *gUnk_02000710;
 extern u16 gUnk_02000500, gUnk_02000520, gUnk_02000534, gUnk_02000554;
 extern u16 gUnk_02000548[];
 extern u32 gUnk_02000560[];
-void sub_0815EC14(struct Player *p)
+void Player_SaveStateSnapshot(struct Player *p)
 {
     s32 i;
     *(u16 *)(gUnk_02000710 + 0x30) = p->position.x;

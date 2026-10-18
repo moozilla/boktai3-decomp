@@ -1,4 +1,3 @@
-#define TimedSprite_BlinkAndRemove sub_08127A38
 #include "global.h"
 struct TimedSprite {
     u32 flags;
@@ -14,7 +13,7 @@ struct TimedSpritePool {
 extern const u8 gUnk_08610780[];
 s32 Mod(s32, s32);
 void Sprite_Remove(void *);
-void sub_08127A38(struct TimedSpritePool *pool, struct TimedSprite *sprite)
+void TimedSprite_BlinkAndRemove(struct TimedSpritePool *pool, struct TimedSprite *sprite)
 {
     struct TimedSprite *copy = sprite;
     u32 rate;

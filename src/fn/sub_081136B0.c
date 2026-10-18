@@ -1,5 +1,3 @@
-#define SpriteEffect_RemoveWithBurst sub_081136B0
-#define SpriteEffect_CreateAtPosition sub_081135B8
 #include "global.h"
 struct SpriteEffectActor {
     u32 flags;
@@ -15,8 +13,8 @@ struct SpriteEffectActor {
 struct SpriteEffectOffset { u32 x:16, y:16, z:16, pad:16; };
 void Sprite_Remove(void *);
 void Sound_PlaySong(u32);
-void sub_081135B8(void *, struct SpriteEffectOffset *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
-void sub_081136B0(struct SpriteEffectActor *actor)
+void SpriteEffect_CreateAtPosition(void *, struct SpriteEffectOffset *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
+void SpriteEffect_RemoveWithBurst(struct SpriteEffectActor *actor)
 {
     struct SpriteEffectOffset offset;
     if (actor->active) {
@@ -28,7 +26,7 @@ void sub_081136B0(struct SpriteEffectActor *actor)
         offset.x = 0;
         offset.y = actor->height >> 12;
         offset.z = 0;
-        sub_081135B8(actor->position, &offset, 0, 0x8639, 0x75f6, 0, 0, 0, 0, 0x153, 30, 0, 0, 1, 0);
+        SpriteEffect_CreateAtPosition(actor->position, &offset, 0, 0x8639, 0x75f6, 0, 0, 0, 0, 0x153, 30, 0, 0, 1, 0);
         Sound_PlaySong(0x16e);
     }
 }

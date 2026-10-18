@@ -2,7 +2,7 @@
 int ResultMenu_IsPhaseStart(void *);
 void ResultGame_SetUpdateCallback(void *, void *);
 void ResultGame_TrackTarget(void *);
-void sub_0824923C(void *, void *);
+void Callback_InvokeActor(void *, void *);
 void Sound_StopSong(int);
 void ResultMenu_SetPhase(void *, void *);
 void ResultGame_Finish(void *);
@@ -29,7 +29,7 @@ void ResultGame_Update(u8 *p)
         p[0xc4] = 0;
     }
     p[0xbe] = 0;
-    sub_0824923C(p, *(void **)(p + 0x7a8));
+    Callback_InvokeActor(p, *(void **)(p + 0x7a8));
     if (p[0xc4] == 2) {
         Sound_StopSong(0x3ed);
         Sound_StopSong(0x3ee);

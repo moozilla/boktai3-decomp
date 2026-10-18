@@ -1,4 +1,3 @@
-#define NumericDisplay_InitializeWidgets sub_08179550
 #define gDisplayPalette gUnk_030042E4
 #include "global.h"
 #include "engine.h"
@@ -19,7 +18,7 @@ struct NumericDisplay {
     u32 parameter;
 };
 s32 sub_0821983C(void *, void *, u32, u32, u32, u32, u32, void *);
-s32 sub_08179550(struct NumericDisplay *s, u32 parameter)
+s32 NumericDisplay_InitializeWidgets(struct NumericDisplay *s, u32 parameter)
 {
     s32 i;
     s32 x;

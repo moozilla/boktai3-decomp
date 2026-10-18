@@ -27,12 +27,12 @@ u8 DialogueTransition_ConsumeStateEntry(struct Transition *);
 void DialogueTransition_SetState(struct Transition *, int);
 void DialogueTransition_ApplyEntryBounds(struct Transition *);
 extern void *gUnk_086056D8[];
-void sub_0824923C(struct Transition *, void *);
+void Callback_InvokeActor(struct Transition *, void *);
 int DialogueTransition_OnTaskUpdate(struct Transition *p)
 {
     void *callback = gUnk_086056D8[p->state];
     if (callback)
-        sub_0824923C(p, callback);
+        Callback_InvokeActor(p, callback);
     {
         u16 *reg = &gUnk_03004FC0;
         int value = 0x1084;

@@ -1,5 +1,4 @@
 #include "global.h"
-#define ScreenMote_ApproachTarget sub_0813A9D8
 /* Tentative screen-space particle family; coordinates are packed signed halves. */
 union ScreenMotePosition {
     struct {
@@ -29,7 +28,7 @@ struct ScreenMoteManager {
 };
 s32 Div(s32, s32);
 void sub_08217EEC(struct ScreenMoteSprite *, void *, u32);
-void sub_0813A9D8(struct ScreenMoteManager *m, struct ScreenMoteState *s)
+void ScreenMote_ApproachTarget(struct ScreenMoteManager *m, struct ScreenMoteState *s)
 {
     struct ScreenMoteSprite *sprite = &m->sprites[s->spriteIndex];
     union ScreenMotePosition target;

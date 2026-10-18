@@ -48,7 +48,6 @@ static inline void clearFlags(u32 *p, u32 mask)
     *p &= ~mask;
 }
 
-#define ActorPhase_UpdateSpriteRestore sub_080F84D4
 void Sound_PlaySong(u32);
 void ActorShadow_Enable(void *);
 static inline void clearCollision(struct PhaseCollision *p, u32 mask)
@@ -59,7 +58,7 @@ static inline void clearFlags16(u16 *p, u32 mask)
 {
     *p &= ~mask;
 }
-void sub_080F84D4(struct PhaseActor *s)
+void ActorPhase_UpdateSpriteRestore(struct PhaseActor *s)
 {
     u8 *data = s->data;
     if (consumeEntry(s)) {

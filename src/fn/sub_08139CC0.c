@@ -1,4 +1,3 @@
-#define CallbackPool_MarkNextOfKind sub_08139CC0
 #include "global.h"
 struct CallbackPoolEntry {
     void *callback;
@@ -13,7 +12,7 @@ struct CallbackPool {
     struct CallbackPoolEntry entries[6];
     u32 frame;
 };
-s32 sub_08139CC0(struct CallbackPool *p, s32 first, s32 kind, u8 *visited)
+s32 CallbackPool_MarkNextOfKind(struct CallbackPool *p, s32 first, s32 kind, u8 *visited)
 {
     s32 i;
     for (i = first; i < 6; i++) {

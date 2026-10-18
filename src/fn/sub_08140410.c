@@ -1,14 +1,13 @@
-#define Player_ClampPositionToStoredTerrainCell sub_08140410
 #define Player_TestTerrainRecoveryEnabled Player_IsStatusBit4ActionActive
 #include "global.h"
 #include "player.h"
 #include "engine.h"
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 u32 Player_IsStatusBit4ActionActive(u32);
-u32 sub_08100AD4(struct SceneVec *);
+u32 NamedObject_FindNearPosition(struct SceneVec *);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
-void sub_08140410(struct Player *p)
+void Player_ClampPositionToStoredTerrainCell(struct Player *p)
 {
     s32 x = p->position.x >> 8;
     s32 z = p->position.z >> 8;
@@ -30,7 +29,7 @@ void sub_08140410(struct Player *p)
         return;
     if (p->terrainClampBlocked)
         return;
-    if (sub_08100AD4(&p->position))
+    if (NamedObject_FindNearPosition(&p->position))
         return;
     cellX = Mod(p->storedTerrainCell, *(s16 *)(gUnk_030052F4->cells + 4));
     cellZ = Div(p->storedTerrainCell, *(s16 *)(gUnk_030052F4->cells + 4));

@@ -1,5 +1,4 @@
 #include "global.h"
-#define FrameDisplay_GetCompactFrameIndex sub_08160380
 struct FrameDisplayEntry { u16 frame, unknown2; };
 struct FrameDisplayAnimation {
     u8 unknown0[0x14];
@@ -11,7 +10,7 @@ struct FrameDisplay {
     u8 unknown0[0x74];
     struct FrameDisplayAnimation *animation;
 };
-s32 sub_08160380(struct FrameDisplay *p)
+s32 FrameDisplay_GetCompactFrameIndex(struct FrameDisplay *p)
 {
     s32 frame = p->animation->frames[p->animation->frameIndex].frame;
     if ((u32)(frame - 0xeb) <= 0x3a) {

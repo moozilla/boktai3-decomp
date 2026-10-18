@@ -3,7 +3,7 @@ void Sound_PlaySong(u32);
 void PauseMenu_SmoothPoint(u8 *, u8 *, u32);
 void PauseMenu_AddSpriteFlags(u8 *, u32, u32);
 void Hud_SetInteractionCallback(u8 *, void (*)(void), u32);
-void sub_0817026C(void);
+void SceneHud_UpdateActionFeedback(void);
 void PauseMenu_OnItemSelectionTransitionUpdate(u8 *p)
 {
     u16 *c = (u16 *)(p + 0xA4E);
@@ -14,6 +14,6 @@ void PauseMenu_OnItemSelectionTransitionUpdate(u8 *p)
         PauseMenu_SmoothPoint(p + 0x2AC0, p + 0x442C, 0xc - *c);
     } else {
         PauseMenu_AddSpriteFlags(p, 0x3c, 1);
-        Hud_SetInteractionCallback(p, sub_0817026C, 1);
+        Hud_SetInteractionCallback(p, SceneHud_UpdateActionFeedback, 1);
     }
 }

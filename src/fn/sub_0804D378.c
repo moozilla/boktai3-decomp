@@ -2,7 +2,7 @@
 extern u32 gUnk_02000560;
 extern void (*const gUnk_08605A10[])(struct TetherActor *);
 void TetherActor_UpdateSegments(struct TetherActor *);
-void sub_0815E790(struct TetherPlayer *);
+void Player_EnterKindFour(struct TetherPlayer *);
 u32 TetherActor_SelectNextState(struct TetherActor *);
 void TetherActor_AdjustSlopeMovement(struct TetherActor *);
 void TetherActor_UpdateWorldPosition(struct TetherActor *);
@@ -30,7 +30,7 @@ s32 TetherActor_Tick(struct TetherActor *actor)
     if (actor->kind == 9 && actor->requestMode == 0 && actor->onActionScriptId == 0 &&
         gUnk_02000580[0] && gUnk_02000580[0]->unknown1C == 1 &&
         gUnk_02000580[0]->tetherMode != 24) {
-        sub_0815E790(gUnk_02000580[0]);
+        Player_EnterKindFour(gUnk_02000580[0]);
         gUnk_02000580[0]->tetherMode = 36;
         gUnk_02000580[0]->unknown458 = 0;
         gUnk_02000580[0]->unknown45A = 0;
@@ -40,7 +40,7 @@ s32 TetherActor_Tick(struct TetherActor *actor)
     actor->moving = 0;
     {
         u32 state = TetherActor_SelectNextState(actor);
-        sub_0824923C(actor, gUnk_08605A10[state]);
+        Callback_InvokeActor(actor, gUnk_08605A10[state]);
     }
     TetherActor_AdjustSlopeMovement(actor);
     TetherActor_UpdateWorldPosition(actor);

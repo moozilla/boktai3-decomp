@@ -1,5 +1,4 @@
 #include "global.h"
-#define Terrain_GetCellClearance sub_0811AD8C
 #define gTerrainColumns          gUnk_020001FC
 #define gTerrainColumnIndices    gUnk_020001F8
 struct TerrainColumn {
@@ -7,7 +6,7 @@ struct TerrainColumn {
 };
 extern struct TerrainColumn *gUnk_020001FC;
 extern u8 *gUnk_020001F8;
-s32 sub_0811AD8C(s16 *position)
+s32 Terrain_GetCellClearance(s16 *position)
 {
     s32 clampedX = position[0] < 0 ? 0 : position[0];
     s32 clampedZ = position[2] < 0 ? 0 : position[2];

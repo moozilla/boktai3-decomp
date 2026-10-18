@@ -1,8 +1,7 @@
-#define Player_RequestTimedReset sub_08159FF4
 #include "global.h"
 #include "player.h"
 
-s32 sub_08159FF4(struct Player *p, u32 timer)
+s32 Player_RequestTimedReset(struct Player *p, u32 timer)
 {
     if (p->kind != 1)
         return 0;

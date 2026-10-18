@@ -1,6 +1,4 @@
 #define SceneActor_AdvanceEffectTick Player_AdvanceEffectTick
-#define SceneActor_UpdateVisualEffects sub_0813DDAC
-#define SceneActor_SelectEffectDisplayMode sub_0813D754
 #include "global.h"
 #include "engine.h"
 struct SceneActorVisualEffects {
@@ -28,7 +26,7 @@ struct SceneActorVisualEffects {
 void sub_0813DB98(void *);
 void Player_AdvanceEffectTick(void *);
 s32 sub_0813D924(void *, s32);
-s32 sub_0813D754(void *, s32);
+s32 SceneActor_SelectEffectDisplayMode(void *, s32);
 s32 sub_0813DB60(void *, s32);
 void sub_0813CE20(void *, s32);
 void sub_0813CB8C(void *, u32);
@@ -37,13 +35,13 @@ void Player_UpdateOrbitingEffect(void *);
 void sub_0813BAD8(void *);
 void ConvergingEffects_UpdateParticles(void *);
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, int, int, void *, int, int, int);
-void sub_0813DDAC(struct SceneActorVisualEffects *p)
+void SceneActor_UpdateVisualEffects(struct SceneActorVisualEffects *p)
 {
     s32 mode;
     sub_0813DB98(p);
     Player_AdvanceEffectTick(p);
     mode = sub_0813D924(p, 0);
-    mode = sub_0813D754(p, mode);
+    mode = SceneActor_SelectEffectDisplayMode(p, mode);
     mode = sub_0813DB60(p, mode);
     if (p->mode == 2 && p->state != 10 && p->state != 11)
         sub_0813CE20(p, mode);
@@ -56,7 +54,7 @@ void sub_0813DDAC(struct SceneActorVisualEffects *p)
     {
         void **callback = &p->callback;
         void *context = p->callbackContext;
-        sub_0824923C(context, *callback);
+        Callback_InvokeActor(context, *callback);
     }
     if (p->attachmentDelay) {
         if (--p->attachmentDelay == 0)

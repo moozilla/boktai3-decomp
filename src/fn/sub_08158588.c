@@ -1,18 +1,16 @@
-#define Player_SelectAlternateInteractionMode sub_08158588
-#define Player_SetActionModePhase             sub_0813AFEC
 #include "global.h"
 #include "player.h"
 struct TriggerOpener;
 s32 Trigger_TryOpenNearby(struct TriggerOpener *);
-void sub_0813AFEC(struct Player *, s32, s32);
-s32 sub_08158588(struct Player *p)
+void ActorSequence_Begin(struct Player *, s32, s32);
+s32 Player_SelectAlternateInteractionMode(struct Player *p)
 {
     s32 mode;
     if (p->tetherMode != 0x17 && (s8)p->movementAnimationState >= 0) {
         p->interactionResetCounter = 0;
         p->directionFrame = 0;
         p->terrainRecoveryCounter = 0;
-        sub_0813AFEC(p, 0x17, 0);
+        ActorSequence_Begin(p, 0x17, 0);
     }
     mode = p->tetherMode;
     if (p->directionFrame != 0)

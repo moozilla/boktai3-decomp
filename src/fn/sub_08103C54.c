@@ -1,6 +1,4 @@
-#define ActorGroup_RemoveFromScript sub_08103C54
 #define ActorGroup_FindMemberByName NamedObject_FindByName
-#define ActorGroup_ReleaseMember    sub_08101AB4
 #define gActorGroup                 gUnk_020001AC
 /* Provisional ActorGroup names: static behavior established; semantic ownership tentative. */
 #include "global.h"
@@ -24,7 +22,7 @@ extern struct ActorGroup *gUnk_020001AC;
 s32 Script_GetKeywordValue(u32, s32);
 struct ActorGroupMember *NamedObject_FindByName(s32);
 void TerrainModifiers_UnregisterCell(void *);
-void sub_08101AB4(void *);
+void ActorGroup_ReleaseMember(void *);
 void SceneBody_Unregister(void *);
 void Sprite_Remove(void *);
 static inline u8 HasBit(u32 value, u32 mask)
@@ -43,7 +41,7 @@ static inline void ClearFlags(struct ActorGroupMember *m, u32 mask)
 {
     m->flags &= ~mask;
 }
-void sub_08103C54(void)
+void ActorGroup_RemoveFromScript(void)
 {
     s32 name = Script_GetKeywordValue('n', 0);
     struct ActorGroupMember *member;
@@ -55,7 +53,7 @@ void sub_08103C54(void)
             TerrainModifiers_UnregisterCell(member->effect);
             ClearFlags(member, 1);
         }
-        sub_08101AB4(member);
+        ActorGroup_ReleaseMember(member);
         SceneBody_Unregister(member->resource);
         member->id = 0;
         member->state = 6;

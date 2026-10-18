@@ -1,10 +1,9 @@
-#define SceneActorControl_ResetRotation        sub_080F92AC
 #define SceneActorControl_SetFourEntryPayloads Axe_SetAuxiliarySpriteRenderState
 #include "global.h"
 #include "rotation_phase.h"
 s32 Div(s32, s32);
 void Axe_SetAuxiliarySpriteRenderState(struct SceneActorRegistryResetView *, void *, u32);
-void sub_080F92AC(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_ResetRotation(struct SceneActorRegistryResetView *actor)
 {
     u8 *state = actor->context;
     struct RotatingDrawable *drawable = actor->drawable;

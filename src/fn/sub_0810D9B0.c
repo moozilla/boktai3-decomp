@@ -1,6 +1,5 @@
 #include "global.h"
 #include "game_state.h"
-#define RecordPanel_ShowName sub_0810D9B0
 #define TextWindow_Show TextWindow_StartPlayback
 struct RecordPanel {
     u8 pad0[0xCF4];
@@ -28,7 +27,7 @@ static inline struct PanelNameRecord *GetNameRecord(void)
     if (p->type != 1) return 0;
     return &p->record;
 }
-void sub_0810D9B0(struct RecordPanel *p)
+void RecordPanel_ShowName(struct RecordPanel *p)
 {
     u8 *name;
     u32 mask = 0x800;

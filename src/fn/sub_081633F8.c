@@ -1,7 +1,6 @@
 #include "global.h"
 #include "engine.h"
 #include "game_state.h"
-#define TransitionPanel_UpdateCostPrompt sub_081633F8
 #define TransitionPanel_UpdateAnimation GameOver_UpdateLetterAnimation
 struct TransitionPanelOverlay {
     u8 unknown0[8];
@@ -26,7 +25,7 @@ s32 MessageWindow_SetDisplayMode(s32);
 s32 MessageWindow_SetMessageTable(const void *);
 s32 MessageWindow_SetNumberArgument(s32, s32);
 s32 MessageWindow_ShowMessage(s32);
-void sub_081633F8(struct TransitionPanel *p)
+void TransitionPanel_UpdateCostPrompt(struct TransitionPanel *p)
 {
     GameOver_UpdateLetterAnimation(p);
     if (p->state == 6) {

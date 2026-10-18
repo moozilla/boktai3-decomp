@@ -1,6 +1,5 @@
 #include "global.h"
 #include "player.h"
-#define Player_IsActionCueReady sub_0814D92C
 #define gPlayerActionCueTable   gUnk_08E5FA6C
 struct PlayerActionCueInfo {
     u8 unknown0[0x15];
@@ -8,13 +7,13 @@ struct PlayerActionCueInfo {
     u8 unknown16[0xA];
 };
 extern const u8 gUnk_08E5FA6C[];
-void sub_0822D764(void *, void *);
-s32 sub_0814D92C(struct Player *p)
+void ActionRecord_CopyFromEntry(void *, void *);
+s32 Player_IsActionCueReady(struct Player *p)
 {
     struct PlayerActionCueInfo info;
     u32 entry, offset;
     const u8 *record;
-    sub_0822D764(p->statModifierContext.actionEntry, &info);
+    ActionRecord_CopyFromEntry(p->statModifierContext.actionEntry, &info);
     record = gUnk_08E5FA6C + info.cueIndex * 64;
     offset = p->actionResetCounter * 12 + 4;
     record = (const u8 *)((u32)record + offset);

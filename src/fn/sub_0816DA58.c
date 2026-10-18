@@ -1,14 +1,12 @@
-#define SceneHud_BeginActionIconMotion sub_0816DA58
 #define SceneHud_FindCategoryAction Inventory_GetQuantityByStorage
 #define SceneHud_SetIconPalette PauseMenu_SetSpritePalette
-#define SceneHud_GetActionIconPosition sub_0816D920
 #include "global.h"
 #include "scene_hud_display.h"
 s32 SceneHud_FindCategoryAction(u32, u32);
 u32 sub_0822D604(s32);
 void SceneHud_GetActionIconPosition(void *, s32);
 void SceneHud_SetIconPalette(struct SceneInputWidget *, u16);
-void sub_0816DA58(struct SceneHudState *s, s32 index, s32 source, s32 target)
+void SceneHud_BeginActionIconMotion(struct SceneHudState *s, s32 index, s32 source, s32 target)
 {
     struct SceneInputWidget *w = &s->motionWidgets[index];
     void *resource;

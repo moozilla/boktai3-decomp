@@ -1,5 +1,4 @@
 #include "global.h"
-#define MenuPrompt_PulseDisplay     sub_0816AB30
 #define MenuPrompt_SetPhase Hud_SetUpdateCallback
 #define MenuPrompt_SetDisplayLevels Hud_InitSelectionBounds
 struct MenuPrompt {
@@ -11,9 +10,9 @@ struct MenuPrompt {
 };
 void Hud_InitSelectionBounds(u32, u32);
 s32 Anim_Step(void *, void *);
-void sub_0816AD34(struct MenuPrompt *);
+void ScenePanel_BeginAccountMenu(struct MenuPrompt *);
 void Hud_SetUpdateCallback(struct MenuPrompt *, void (*)(struct MenuPrompt *));
-void sub_0816AB30(struct MenuPrompt *p)
+void MenuPrompt_PulseDisplay(struct MenuPrompt *p)
 {
     Anim_Step(p->anim, p->animData);
     if (p->timer <= 15)
@@ -23,5 +22,5 @@ void sub_0816AB30(struct MenuPrompt *p)
     else
         Hud_InitSelectionBounds((150 - p->timer) * 4, 0);
     if (p->timer++ > 149)
-        sub_0816AD34(p);
+        ScenePanel_BeginAccountMenu(p);
 }

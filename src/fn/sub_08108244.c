@@ -1,6 +1,5 @@
 #include "global.h"
 /* Provisional names and field interpretations; confidence low. */
-#define Tile_SetEnabledFromScript sub_08108244
 struct Tile {
     u32 flags;
     u8 pad4[0xBE - 4];
@@ -9,7 +8,7 @@ struct Tile {
 };
 struct Tile *Pool1B8_FindByName(u32);
 s32 Script_GetKeywordValue(u32, s32);
-void sub_08108244(void)
+void Tile_SetEnabledFromScript(void)
 {
     s32 name = Script_GetKeywordValue(0x69, -1);
     s32 enabled;

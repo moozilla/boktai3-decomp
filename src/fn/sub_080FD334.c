@@ -1,4 +1,3 @@
-#define ActorGroup_BeginMotionPhase   sub_080FD334
 #define SpriteGroup_SetSharedPosition Axe_SetAuxiliarySpriteRenderState
 #include "global.h"
 #include "scene_actor_reset.h"
@@ -13,7 +12,7 @@ struct ActorGroupMotionState {
     u16 duration;
 };
 void sub_080F8B38(void);
-void sub_080F82E8(void);
+void ActorPhase_UpdateSpriteCollapse(void);
 void SpriteGroup_SetSharedPosition(struct SceneActorRegistryResetView *, void *, u32);
 static inline u8 TakePending(struct SceneActorRegistryResetView *actor)
 {
@@ -48,7 +47,7 @@ static inline void SetPhase(struct SceneActorRegistryResetView *actor, u32 state
     actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
-void sub_080FD334(struct SceneActorRegistryResetView *actor)
+void ActorGroup_BeginMotionPhase(struct SceneActorRegistryResetView *actor)
 {
     struct ActorGroupMotionState *group = actor->context;
     if (TakePending(actor)) {
@@ -66,7 +65,7 @@ void sub_080FD334(struct SceneActorRegistryResetView *actor)
         group->timer = group->duration;
     }
     if (actor->field2B0) {
-        BeginControl(actor, sub_080F82E8, 0x23);
+        BeginControl(actor, ActorPhase_UpdateSpriteCollapse, 0x23);
         SetPhase(actor, 0, 2, 3);
     } else {
         actor->counter2AC++;

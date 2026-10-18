@@ -1,5 +1,3 @@
-#define ActorGroup_Destroy       sub_0810399C
-#define ActorGroup_ReleaseMember sub_08101AB4
 #define gActorGroup              gUnk_020001AC
 /* Provisional ActorGroup names: static behavior established; semantic ownership tentative. */
 #include "global.h"
@@ -20,14 +18,14 @@ void Sound_StopSong(u32);
 void TerrainModifiers_UnregisterCell(void *);
 void SceneBody_Unregister(void *);
 void Sprite_Remove(void *);
-void sub_08101AB4(void *);
+void ActorGroup_ReleaseMember(void *);
 static inline u8 HasBit(u32 value, u32 mask)
 {
     if (value & mask)
         return 1;
     return 0;
 }
-u32 sub_0810399C(struct ActorGroup *group)
+u32 ActorGroup_Destroy(struct ActorGroup *group)
 {
     s32 i;
     u32 *active;
@@ -43,7 +41,7 @@ u32 sub_0810399C(struct ActorGroup *group)
             struct ActorGroupMember *member = &group->members[i];
             if (HasBit(member->flags, 1))
                 TerrainModifiers_UnregisterCell(member->effect);
-            sub_08101AB4(member);
+            ActorGroup_ReleaseMember(member);
             SceneBody_Unregister(member->resource);
             Sprite_Remove(member);
         }

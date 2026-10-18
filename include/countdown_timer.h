@@ -7,8 +7,8 @@ struct CountdownTimer {
     u32 completionScriptId;
 };
 extern struct CountdownTimer *gUnk_0200049C;
-void sub_081783C0(u16 *);
-void sub_08178404(void);
+void Hud_RegisterTimer(u16 *);
+void Hud_ClearTimer(void);
 void CountdownTimer_Stop(void);
 s32 CountdownTimer_Update(struct CountdownTimer *);
 void CountdownTimer_Destroy(void);

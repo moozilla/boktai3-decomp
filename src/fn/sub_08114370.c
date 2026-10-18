@@ -1,8 +1,7 @@
-#define SceneCallbackPool_Update sub_08114370
 #include "global.h"
 #include "scene_callback_pool.h"
 s32 sub_08249240(void *, u32, void *);
-s32 sub_08114370(struct SceneCallbackPool *pool)
+s32 SceneCallbackPool_Update(struct SceneCallbackPool *pool)
 {
     s32 i;
     for (i = 0; i < 16; i++) {

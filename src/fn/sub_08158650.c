@@ -1,4 +1,3 @@
-#define Player_SynchronizeInteractionDisplay sub_08158650
 #define Player_TestResetFlags Player_GetControlFlags
 #include "global.h"
 #include "player.h"
@@ -8,7 +7,7 @@ u32 Player_GetControlFlags(struct Player *, u16);
 void Collider_SetPosition(void *, void *, u32);
 void ActorShadow_Disable(void *);
 void ActorShadow_Enable(void *);
-void sub_08158650(struct Player *p)
+void Player_SynchronizeInteractionDisplay(struct Player *p)
 {
     sub_08225B74(&p->positionalEffectGroup);
     sub_0802E04C(&p->positionalEffectGroup);

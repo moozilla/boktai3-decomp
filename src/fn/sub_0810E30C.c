@@ -1,5 +1,3 @@
-#define SelectionPanel_RunCancelScript sub_0810E30C
-#define SelectionPanel_GetSelection sub_0810E1A0
 #include "global.h"
 #include "directional_interaction.h"
 struct SelectionPanel {
@@ -16,9 +14,9 @@ void Bg_ClearTilemap(s32);
 u32 ScrollingDialogue_ClearScript(void);
 void ScrollingDialogue_HideImmediately(void);
 void Registry3C9F_HideDisplayObjects(struct SelectionPanel *);
-s32 sub_0810E1A0(struct SelectionPanel *);
+s32 SelectionPanel_GetSelection(struct SelectionPanel *);
 void Registry3C9F_OnTransitionIdle(void);
-void sub_0810E30C(struct SelectionPanel *p)
+void SelectionPanel_RunCancelScript(struct SelectionPanel *p)
 {
     ScrollingDialogue_ClearScript();
     ScrollingDialogue_HideImmediately();

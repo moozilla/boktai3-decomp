@@ -1,9 +1,8 @@
-#define SceneActorPlacement_ResetStateThree sub_081369C8
 #include "global.h"
 #include "scene_actor_placement.h"
 static inline void SetFlags(struct SceneActorPlacementView *s, u16 mask) { s->flags2D4 = mask | s->flags2D4; }
 static inline void ClearFlags32(u32 *p, u32 mask) { *p &= mask; }
-s32 sub_081369C8(struct SceneActorPlacementView *s)
+s32 SceneActorPlacement_ResetStateThree(struct SceneActorPlacementView *s)
 {
     if (s->flags2DC & 0x40000) {
         SetFlags(s, 0x20);

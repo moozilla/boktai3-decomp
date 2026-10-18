@@ -1,6 +1,4 @@
-#define ScriptedColliderActor_Create         sub_0812D390
 #define ScriptedColliderActors_EnsureManager FragmentSpritePool_GetOrCreate
-#define ScriptedColliderActors_AllocateSlot  sub_0812CF50
 #define ScriptedColliderActor_InitCollider LargeFragmentEffect_InitCollider
 #define gScriptedColliderManager             gUnk_02000190
 #include "global.h"
@@ -28,9 +26,9 @@ struct ScriptedColliderManager {
 };
 extern struct ScriptedColliderManager *gUnk_02000190;
 struct ScriptedColliderManager *FragmentSpritePool_GetOrCreate(void);
-struct ScriptedColliderActor *sub_0812CF50(struct ScriptedColliderManager *);
+struct ScriptedColliderActor *SceneSlot_Allocate(struct ScriptedColliderManager *);
 void LargeFragmentEffect_InitCollider(void *, u32, u32, u32, u32, u32, u32, u32);
-void sub_0812D390(struct SceneVec *position, u32 variant, u32 a, u32 b, u32 c, u32 d)
+void ScriptedColliderActor_Create(struct SceneVec *position, u32 variant, u32 a, u32 b, u32 c, u32 d)
 {
     struct ScriptedColliderManager *manager = gUnk_02000190;
     struct ScriptedColliderActor *actor;
@@ -39,7 +37,7 @@ void sub_0812D390(struct SceneVec *position, u32 variant, u32 a, u32 b, u32 c, u
         if (!manager)
             return;
     }
-    actor = sub_0812CF50(manager);
+    actor = SceneSlot_Allocate(manager);
     if (!actor)
         return;
     actor->variant = variant;

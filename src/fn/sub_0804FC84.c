@@ -1,12 +1,12 @@
 #include "repeated_effect.h"
-void sub_0824923C(struct RepeatedEffect *, void (*)(struct RepeatedEffect *));
+void Callback_InvokeActor(struct RepeatedEffect *, void (*)(struct RepeatedEffect *));
 void RepeatedEffect_TickEntry(struct RepeatedEffect *effect)
 {
     if (effect->constrainCell) {
         if (effect->cell == *(u32 *)((u8 *)gUnk_02000710 + 0x5A0)) {
             if (!effect->constrained)
                 effect->collider.flags &= 0xFFFB;
-            sub_0824923C(effect, effect->update);
+            Callback_InvokeActor(effect, effect->update);
         } else {
             u8 constrainedValue = effect->constrained;
             u8 *constrained = &effect->constrained;
@@ -31,7 +31,7 @@ void RepeatedEffect_TickEntry(struct RepeatedEffect *effect)
             }
         }
     } else
-        sub_0824923C(effect, effect->update);
+        Callback_InvokeActor(effect, effect->update);
     if (effect->collider.cooldown)
         effect->collider.cooldown--;
 }

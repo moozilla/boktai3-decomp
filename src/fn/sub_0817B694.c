@@ -1,7 +1,6 @@
 #include "global.h"
-#define ActorState_BeginDepletedState sub_0817B694
 #include "actor_state.h"
-s32 sub_0817B694(struct ActorState *p)
+s32 ActorState_BeginDepletedState(struct ActorState *p)
 {
     s32 result;
     p->checking = 1;

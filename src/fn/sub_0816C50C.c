@@ -1,5 +1,4 @@
 /* Provisional names and object interpretation; offsets follow static accesses. */
-#define MapMenu_PositionMarkers sub_0816C50C
 #include "global.h"
 #include "game_state.h"
 struct MapMarkerLocation {
@@ -11,7 +10,7 @@ struct MapMenu {
     u8 pad4900[0x1c];
     u16 map, x, y, otherMap, otherX, otherY;
 };
-void sub_0816C50C(struct MapMenu *s)
+void MapMenu_PositionMarkers(struct MapMenu *s)
 {
     struct GameState *g = gUnk_02000710;
     s->map = s->locations[(s16)g->savedY].map;

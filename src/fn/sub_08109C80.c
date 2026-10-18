@@ -1,4 +1,3 @@
-#define ScriptPanel_OpenTextWindow sub_08109C80
 #include "global.h"
 #include "engine.h"
 struct ScriptPanel {
@@ -25,15 +24,15 @@ void Sprite_OnRenderPhase(void);
 void Video_SetRenderCallbacks(s32, void *, void *, void *);
 void Sound_StopTrackedSong(u32);
 void Sound_StopAllTrackedSongs(void);
-s32 sub_08177D7C(void);
+s32 Hud_GetManager(void);
 void Hud_RefreshSpriteFromScript(void);
-s32 sub_08033690(s32, s32, s32, s32);
+s32 TextWindow_Create(s32, s32, s32, s32);
 void Hud_SetMode(s32);
 void TextWindow_StartPlayback(s32);
 void sub_08215490(s32);
 extern u32 gUnk_03005250, gUnk_0300523C, gUnk_03004DA0, gUnk_030051D4, gUnk_03005408;
 extern u16 gUnk_03004BD8;
-s32 sub_08109C80(struct ScriptPanel *p)
+s32 ScriptPanel_OpenTextWindow(struct ScriptPanel *p)
 {
     if (Registry1745_ConsumeStateEntry(p)) {
         gUnk_03005250 = 0;
@@ -54,12 +53,12 @@ s32 sub_08109C80(struct ScriptPanel *p)
     gUnk_03004DA0 = 0x40;
     gUnk_030051D4 = 0x40;
     if (!p->hudReady) {
-        if (sub_08177D7C()) {
+        if (Hud_GetManager()) {
             Hud_RefreshSpriteFromScript();
             p->hudReady = 1;
         }
     } else if (!p->windowReady && MessageWindow_IsCreated()) {
-        p->window = sub_08033690(1, 6, 28, 6);
+        p->window = TextWindow_Create(1, 6, 28, 6);
         p->windowReady = 1;
         Hud_SetMode(5);
         TextWindow_SetScript(p->window, p->script);

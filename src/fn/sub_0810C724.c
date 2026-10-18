@@ -1,4 +1,3 @@
-#define SlotMenu_Destroy sub_0810C724
 #include "global.h"
 struct SlotMenu {
     u8 unknown0[0xF74];
@@ -11,7 +10,7 @@ void RegistryF246_HideAnimations(struct SlotMenu *);
 void Registry1745_NotifyMenuClosed(void);
 void Script_Call(u32, void *);
 void Task_Kill(void *);
-void sub_0810C724(struct SlotMenu *p)
+void SlotMenu_Destroy(struct SlotMenu *p)
 {
     ScrollingDialogue_ClearScript();
     ScrollingDialogue_HideImmediately();

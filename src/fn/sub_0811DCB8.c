@@ -1,8 +1,8 @@
 #include "global.h"
 
-void sub_0811DC30(void);
+void ClockDisplay_DrawBaseTime(void);
 
 void Video_DrawClockAndValueOnBackground(void)
 {
-    sub_0811DC30();
+    ClockDisplay_DrawBaseTime();
 }

@@ -1,9 +1,8 @@
-#define ProximityActor_InitializeCollider sub_08105998
 #include "global.h"
 #include "proximity_actor.h"
 #include "engine.h"
 void sub_08105808(void);
-void sub_08105998(struct ProximityActor *actor)
+void ProximityActor_InitializeCollider(struct ProximityActor *actor)
 {
     struct ColliderVector {
         s16 x, y, z;

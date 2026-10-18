@@ -1,4 +1,3 @@
-#define LinkMenu_DrawRandomizedFourDigitNumber sub_0810FF8C
 #define LinkMenu_DrawFourDigitNumber LinkScorePanel_SetNumber
 #define gRandomTableIndex                      gUnk_03005304
 #define gRandomValues                          gUnk_086141BC
@@ -17,7 +16,7 @@ static inline u32 nextRandom(void)
     value = gUnk_086141BC[gUnk_03005304];
     return value;
 }
-void sub_0810FF8C(struct LinkMenuCounter *menu, s32 row)
+void LinkMenu_DrawRandomizedFourDigitNumber(struct LinkMenuCounter *menu, s32 row)
 {
     s32 number = (menu->counter * menu->counter) >> 2;
     {

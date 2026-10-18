@@ -1,5 +1,3 @@
-#define SpriteParticle_SpawnBatch sub_08121D64
-#define SpriteParticle_AllocateSlot sub_08121D14
 #define SpriteParticle_GetOrCreatePool SceneSpriteBurst_EnsureSingleton
 #define gSpriteParticlePool gUnk_02000138
 #include "global.h"
@@ -30,12 +28,12 @@ struct SpriteParticlePool {
 };
 extern struct SpriteParticlePool *gUnk_02000138;
 struct SpriteParticlePool *SceneSpriteBurst_EnsureSingleton(void);
-struct SpriteParticleSlot *sub_08121D14(struct SpriteParticlePool *);
+struct SpriteParticleSlot *SpriteParticle_AllocateSlot_08121D14(struct SpriteParticlePool *);
 void Sprite_Init(void *, void *, u32);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 
-s32 sub_08121D64(struct SpriteParticlePosition *position, s32 count, s32 layer, s32 sequence, u32 palette)
+s32 SpriteParticle_SpawnBatch(struct SpriteParticlePosition *position, s32 count, s32 layer, s32 sequence, u32 palette)
 {
     struct SpriteParticlePool *pool;
     struct SpriteParticleSlot *slot;
@@ -51,7 +49,7 @@ s32 sub_08121D64(struct SpriteParticlePosition *position, s32 count, s32 layer, 
         pool = gUnk_02000138;
     }
     for (i = 0; i < count; i++) {
-        slot = sub_08121D14(pool);
+        slot = SpriteParticle_AllocateSlot_08121D14(pool);
         if (!slot)
             return -1;
         sprite = &pool->sprites[slot->index];

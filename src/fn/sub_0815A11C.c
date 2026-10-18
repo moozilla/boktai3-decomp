@@ -1,9 +1,8 @@
-#define Player_AdvanceTetherPhase sub_0815A11C
 #define Player_SetTetherPhase Player_SetActionPhase
 #include "global.h"
 #include "player.h"
 void Player_SetActionPhase(struct Player *, u8);
-void sub_0815A11C(struct Player *p)
+void Player_AdvanceTetherPhase(struct Player *p)
 {
     if (p->tetherMode == 0x1F) {
         if (p->tetherPhase == 3)

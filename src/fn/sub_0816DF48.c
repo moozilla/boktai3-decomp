@@ -1,5 +1,3 @@
-#define InventoryGrid_BeginIconTransfer sub_0816DF48
-#define InventoryGrid_GetSlotPosition   sub_0816D920
 #define InventoryGrid_GetItemId Inventory_GetQuantityByStorage
 #define InventoryGrid_SetPhaseCallback Hud_SetInteractionCallback
 #include "global.h"
@@ -16,14 +14,14 @@ struct InventoryGrid {
 struct InventoryGridVector {
     s16 x, y, z, pad;
 };
-void sub_0816D920(void *, int);
+void SceneHud_GetActionIconPosition(void *, int);
 s32 Inventory_GetQuantityByStorage(u32, u32);
 u32 sub_0822D604(s32);
-void sub_08165E78(void *, u32, s32, u32, void *, void *, u32, u32);
+void SceneHud_BeginIconMotion(void *, u32, s32, u32, void *, void *, u32, u32);
 void Sound_PlaySong(u32);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
-void sub_0816E140(void);
-void sub_0816DF48(u8 *s)
+void InventoryGrid_BeginNumberPhaseAlternate(void);
+void InventoryGrid_BeginIconTransfer(u8 *s)
 {
     struct InventoryGridVector from, to;
     u8 *kind;
@@ -39,14 +37,14 @@ void sub_0816DF48(u8 *s)
         flags = (u32 *)(base + off);
     }
     *flags |= 1;
-    sub_0816D920(&from, s[0x4387]);
+    SceneHud_GetActionIconPosition(&from, s[0x4387]);
     to.x = 16;
     to.y = 48;
     to.z = 0;
     result = sub_0822D604(Inventory_GetQuantityByStorage(s[0x4860], *kind));
     later = *kind + 10;
-    sub_08165E78(s, 0, result, ((struct InventoryGrid *)s)->elements[later].value32, &from, &to, 24,
+    SceneHud_BeginIconMotion(s, 0, result, ((struct InventoryGrid *)s)->elements[later].value32, &from, &to, 24,
                  16);
     Sound_PlaySong(0x38A);
-    Hud_SetInteractionCallback(s, sub_0816E140, 1);
+    Hud_SetInteractionCallback(s, InventoryGrid_BeginNumberPhaseAlternate, 1);
 }

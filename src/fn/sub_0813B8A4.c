@@ -1,4 +1,3 @@
-#define SceneActor_SpawnModeParticles sub_0813B8A4
 #include "global.h"
 #include "scene_vec.h"
 #include "scene_object.h"
@@ -10,8 +9,8 @@ struct SceneActorParticleView {
     u8 unknown170[0x418-0x170];
     u8 mode;
 };
-void sub_0806A160(void *, s32, void *, s32, s32, s32, s32, s32);
-void sub_0813B8A4(struct SceneActorParticleView *p)
+void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
+void SceneActor_SpawnModeParticles(struct SceneActorParticleView *p)
 {
     struct SceneExtent extent;
     struct SceneVec position;
@@ -27,5 +26,5 @@ void sub_0813B8A4(struct SceneActorParticleView *p)
         extent.y = 60;
         extent.z = 64;
     }
-    sub_0806A160(&position, 1, &extent, 0, 0, 12, 2, 2);
+    SparkParticle_Spawn(&position, 1, &extent, 0, 0, 12, 2, 2);
 }

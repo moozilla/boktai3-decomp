@@ -1,12 +1,11 @@
 #include "global.h"
-#define StateSprite_InitAnimation sub_08122B00
 struct StateSprite { u8 unk0[8]; u32 flags; u8 unkC[0xC8]; s16 position[4]; u8 unkDC[0x54]; u16 variant, animationIndex, active; };
 extern u8 *gUnk_02000140;
 extern const u8 gUnk_086106F0[];
 void sub_0821983C(void *, void *, int, int, int, int, int, void *);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 s32 Anim_Step(void *, void *);
-void sub_08122B00(struct StateSprite *sprite, s32 type, s32 direction, s32 variant)
+void StateSprite_InitAnimation(struct StateSprite *sprite, s32 type, s32 direction, s32 variant)
 {
     u8 *data=gUnk_02000140;
     s32 index=direction*3+type*9;

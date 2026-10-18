@@ -28,7 +28,7 @@ struct Target {
 extern struct Actor *gUnk_02000580;
 extern u32 gUnk_03005308, gUnk_0300523C;
 extern u16 gUnk_0203B400[];
-void sub_081783C0(u16 *);
+void Hud_RegisterTimer(u16 *);
 void WirelessGameMenu_SetStatusPanelState(struct P *, int);
 void Sound_PlayTrackedSong(int);
 void WirelessGameMenu_UpdateHealthIndicators(struct P *);
@@ -38,7 +38,7 @@ int Div(int, int);
 struct Target *SceneActors_GetBySlot(int);
 void WirelessGame_AddWeightedScore(int, int);
 int WirelessExchange_SendPacket(struct P *, int, const u32 *, int);
-void sub_08178404(void);
+void Hud_ClearTimer(void);
 void Sound_PlaySong(int);
 static inline u32 test(u32 *flags, u32 mask)
 {
@@ -61,7 +61,7 @@ void WirelessGameMenu_UpdateActiveRound(struct P *input)
             view = p;
             view->remaining = value;
         }
-        sub_081783C0(&p->remaining);
+        Hud_RegisterTimer(&p->remaining);
         WirelessGameMenu_SetStatusPanelState(p, 4);
         Sound_PlayTrackedSong(22);
         p->active = 1;
@@ -165,7 +165,7 @@ void WirelessGameMenu_UpdateActiveRound(struct P *input)
             u32 eight;
             u8 *state;
             u32 zero;
-            sub_08178404();
+            Hud_ClearTimer();
             eight = 8;
             state = &p->state;
             zero = 0;
@@ -182,7 +182,7 @@ void WirelessGameMenu_UpdateActiveRound(struct P *input)
         if (!remaining) {
             u32 two;
             u8 *state;
-            sub_08178404();
+            Hud_ClearTimer();
             Sound_PlaySong(0x372);
             two = 2;
             state = &p->state;

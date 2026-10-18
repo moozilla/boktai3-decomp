@@ -1,4 +1,3 @@
-#define SpriteGroupPool_Destroy sub_08128A5C
 #define gSpriteGroupPool gUnk_02000170
 #include "global.h"
 struct GroupSprite {
@@ -23,7 +22,7 @@ static inline u8 IsActive(u32 *mask, s32 slot)
         return TRUE;
     return FALSE;
 }
-struct SpriteGroupPool *sub_08128A5C(struct SpriteGroupPool *pool)
+struct SpriteGroupPool *SpriteGroupPool_Destroy(struct SpriteGroupPool *pool)
 {
     s32 i = 0;
     for (; i < 4; i++) {

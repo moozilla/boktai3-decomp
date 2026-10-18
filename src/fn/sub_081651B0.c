@@ -1,9 +1,8 @@
-#define SceneHud_PlayActionChangeCue sub_081651B0
 #include "global.h"
 #include "scene_hud_display.h"
 extern u32 gUnk_030053F4;
 void Sound_PlaySong(u32);
-void sub_081651B0(struct SceneHudState *p, u32 group, u32 mode, u32 selection)
+void SceneHud_PlayActionChangeCue(struct SceneHudState *p, u32 group, u32 mode, u32 selection)
 {
     if (gUnk_030053F4 & 0x1000) {
         if (group == 0 && mode == 0 && selection - 1 <= 2 && selection != p->previousCueSelection)

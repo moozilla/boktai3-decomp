@@ -1,5 +1,4 @@
 #include "global.h"
-#define PanelSequence_InitializeSprites sub_0810CF08
 struct PanelSequence {
     u8 pad0[0x20];
     u8 sprites[7][0x60];
@@ -12,7 +11,7 @@ struct PanelSequence {
 void *ScriptProc_Start(u16, u16);
 void ResourceHeader_Relocate(void *, void *);
 void sub_0821983C(void *, void *, int, int, int, int, int, void *);
-void sub_0810CF08(struct PanelSequence *group)
+void PanelSequence_InitializeSprites(struct PanelSequence *group)
 {
     u8 *sprite;
     int i;

@@ -1,4 +1,3 @@
-#define SpriteEffectPool_RemoveSlots sub_081225A4
 #define gSpriteEffectPool gUnk_0200013C
 #include "global.h"
 struct SpriteEffectSlot { u8 sprite[0x90]; u8 auxiliary[0x46]; u8 state; s8 index; };
@@ -7,7 +6,7 @@ extern struct SpriteEffectPool *gUnk_0200013C;
 void Sprite_Remove(void *);
 void Shadow_Destroy(void *);
 static inline u8 IsUsed(struct SpriteEffectPool *p, u32 index) { if (p->used & (1U << index)) return 1; return 0; }
-s32 sub_081225A4(struct SpriteEffectPool *p)
+s32 SpriteEffectPool_RemoveSlots(struct SpriteEffectPool *p)
 {
     s32 i = 0;
     for (; i < 8; i++) {

@@ -53,7 +53,7 @@ void Registry1745_InitSessionSettings(void *);
 void Registry1745_SetState(void *, s32, void (*)(void));
 u8 *Script_GetTextSourcePc(void);
 void Hud_SetMode(s32);
-void sub_0810B8A8(void *);
+void SessionMenu_Destroy(void *);
 void sub_08109D94(void);
 void sub_0810B724(void);
 /* Registry routine 1745: creates the singleton at gUnk_020004B4 (0x268
@@ -76,7 +76,7 @@ struct Registry1745 *Registry1745_Create(void)
     p = m;
     settings = &p->settings;
     gUnk_020004B4 = p;
-    Task_SetCallbacks(p, 0, sub_0810B8A8);
+    Task_SetCallbacks(p, 0, SessionMenu_Destroy);
     {
         s32 one = 1;
         u32 zero;

@@ -1,10 +1,9 @@
-#define Bounds_TestOverlap sub_0811B498
 #include "global.h"
 
 struct BoundsPosition { s32 x, y, z; };
 struct BoundsExtent { s16 x, y, z; };
 
-s32 sub_0811B498(struct BoundsPosition *a, struct BoundsExtent *ae,
+s32 Bounds_TestOverlap(struct BoundsPosition *a, struct BoundsExtent *ae,
                  struct BoundsPosition *b, struct BoundsExtent *be)
 {
     s32 extent = ae->x + be->x;

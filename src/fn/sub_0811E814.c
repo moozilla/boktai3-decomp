@@ -1,8 +1,7 @@
 #include "global.h"
 #include "modifier_list.h"
-#define StatModifier_ScaleAtOwnerThreshold sub_0811E814
 s32 Div(s32, s32);
-s32 sub_0811E814(struct StatModifier *modifier, s32 value)
+s32 StatModifier_ScaleAtOwnerThreshold(struct StatModifier *modifier, s32 value)
 {
     s32 result;
     struct StatModifierOwnerStats *stats;

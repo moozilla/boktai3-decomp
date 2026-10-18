@@ -1,8 +1,4 @@
-#define PlayerAction_RefreshModifiers sub_08159594
 #define PlayerAction_SetResponseValue Player_SetResistance
-#define ActionRecord_CopyFromEntry    sub_0822D764
-#define PlayerAction_ApplyModifiers   sub_0813E608
-#define PlayerAction_RefreshFlagState sub_0813EDDC
 #define gActionRecords                gUnk_08E6092C
 #include "global.h"
 #include "player.h"
@@ -11,10 +7,10 @@ struct PlayerActionRecord {
 };
 extern const struct PlayerActionRecord gUnk_08E6092C[];
 void Player_SetResistance(struct Player *, s32, u8);
-void sub_0822D764(struct PlayerActionEntry *, struct PlayerActionRecord *);
-void sub_0813E608(struct Player *, struct PlayerStatModifierContext *, struct PlayerActionRecord *);
-void sub_0813EDDC(struct Player *, void *, s32);
-void sub_08159594(struct Player *p)
+void ActionRecord_CopyFromEntry(struct PlayerActionEntry *, struct PlayerActionRecord *);
+void Player_BuildActionModifiers(struct Player *, struct PlayerStatModifierContext *, struct PlayerActionRecord *);
+void PlayerAction_RefreshFlagState(struct Player *, void *, s32);
+void PlayerAction_RefreshModifiers(struct Player *p)
 {
     struct PlayerActionRecord record;
     switch (p->actionMode) {
@@ -61,9 +57,9 @@ void sub_08159594(struct Player *p)
             break;
     }
     if (p->actionMode != 6)
-        sub_0822D764(p->statModifierContext.actionEntry, &record);
+        ActionRecord_CopyFromEntry(p->statModifierContext.actionEntry, &record);
     else
         record = gActionRecords[47];
-    sub_0813E608(p, &p->statModifierContext, &record);
-    sub_0813EDDC(p, p->actionFlagState, -1);
+    Player_BuildActionModifiers(p, &p->statModifierContext, &record);
+    PlayerAction_RefreshFlagState(p, p->actionFlagState, -1);
 }

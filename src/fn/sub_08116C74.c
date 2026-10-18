@@ -1,6 +1,5 @@
 #include "global.h"
 #include "area_effect_link.h"
-#define LinkParticipant_IsLocallySelected sub_08116C74
 #define gLinkSelection                    gUnk_020004B4
 struct LinkParticipant {
     u8 unknown0[0x8F8];
@@ -14,7 +13,7 @@ static inline s32 LinkSelection_GetLocalPlayer(void)
         return -1;
     return selection->localPlayer;
 }
-u8 sub_08116C74(struct LinkParticipant *participant)
+u8 LinkParticipant_IsLocallySelected(struct LinkParticipant *participant)
 {
     u32 mask = 0x800;
     if ((gUnk_030053F4 | gUnk_030053F0) & mask) {

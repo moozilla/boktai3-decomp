@@ -1,18 +1,16 @@
-#define PursuingActor_UpdateRetirement sub_0812BCE0
-#define PursuingActor_UpdateSprite     sub_0812B5D0
 #define PursuingActor_RemoveTrailSprites SwooshProjectile_RemoveTrailSprites
 #include "global.h"
 #include "engine.h"
 #include "pursuing_actor.h"
-void sub_0812B5D0(struct PursuingActor *);
+void TimedEffect_UpdateVisibility(struct PursuingActor *);
 void SwooshProjectile_RemoveTrailSprites(void *);
-u8 sub_082212DC(void *, u32, s32, s32);
+u8 Sprite_BlinkUntilExpired(void *, u32, s32, s32);
 void Sprite_Remove(void *);
 static inline void Disable(struct PursuingActorCollider *c)
 {
     c->flags |= 4;
 }
-void sub_0812BCE0(struct PursuingActorManager *manager, struct PursuingActor *actor)
+void PursuingActor_UpdateRetirement(struct PursuingActorManager *manager, struct PursuingActor *actor)
 {
     struct SceneVec *position, *velocity;
     if (actor->entered) {
@@ -26,9 +24,9 @@ void sub_0812BCE0(struct PursuingActorManager *manager, struct PursuingActor *ac
     actor->position.x = velocity->x + actor->position.x;
     position->y = velocity->y + position->y;
     position->z = velocity->z + position->z;
-    sub_0812B5D0(actor);
+    TimedEffect_UpdateVisibility(actor);
     actor->phase += 8;
-    if (sub_082212DC(actor, actor->timer, 10, 30)) {
+    if (Sprite_BlinkUntilExpired(actor, actor->timer, 10, 30)) {
         Collider_Remove(&actor->secondary);
         SwooshProjectile_RemoveTrailSprites(actor);
         Sprite_Remove(actor);

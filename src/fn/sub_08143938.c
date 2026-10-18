@@ -1,4 +1,3 @@
-#define Player_CalculateMovementSpeed sub_08143938
 #include "global.h"
 #include "player.h"
 struct MovementSpeedContext {
@@ -15,7 +14,7 @@ static inline u8 IsFixedSpeed(struct Player *p)
         fixed = 1;
     return fixed;
 }
-s32 sub_08143938(struct Player *p)
+s32 Player_CalculateMovementSpeed(struct Player *p)
 {
     s32 speed;
     if (p && IsFixedSpeed(p))

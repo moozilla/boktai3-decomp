@@ -1,4 +1,3 @@
-#define ScriptRecord_ReadEntries sub_0811E224
 #include "global.h"
 struct ScriptRecordEntry {
     u8 kind, a, b, c;
@@ -17,7 +16,7 @@ s32 Script_GetValue(void);
 s32 Script_GetValueSafe(void);
 s32 Script_SeekToKeyword(u32);
 void Script_SetPc(u8 *);
-void sub_0811E224(struct ScriptRecord *p)
+void ScriptRecord_ReadEntries(struct ScriptRecord *p)
 {
     s32 kind;
     if (Script_SeekToKeyword('b')) {

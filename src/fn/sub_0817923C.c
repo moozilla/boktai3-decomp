@@ -5,8 +5,8 @@ u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 Hud_InitAlternateLayout(u8 *, u32);
 void Task_Kill(u8 *);
-void sub_08178B98(void);
-void sub_08178BCC(void);
+void Hud_UpdateWithCallback(void);
+void SceneHud_DestroyOwner(void);
 
 u8 *Hud_CreateAlternateLayout(u32 a)
 {
@@ -15,7 +15,7 @@ u8 *Hud_CreateAlternateLayout(u32 a)
         return gUnk_02000214;
     p = Task_Create(0xc, 0x4DA0);
     if (p != 0) {
-        Task_SetCallbacks(p, sub_08178B98, sub_08178BCC);
+        Task_SetCallbacks(p, Hud_UpdateWithCallback, SceneHud_DestroyOwner);
         *(u16 *)(p + 0xA5A) = a;
         if (Hud_InitAlternateLayout(p, a) < 0) {
             Task_Kill(p);

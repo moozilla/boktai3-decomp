@@ -1,5 +1,4 @@
 #include "global.h"
-#define ActorVariation_SelectRandomPair sub_0817A0FC
 #define gRandomIndex                    gUnk_03005308
 #define gRandomTable                    gUnk_0203B400
 extern u32 gUnk_03005308;
@@ -10,7 +9,7 @@ struct ActorVariationState {
     u8 unknown0[0x4E3];
     u8 variant, detail;
 };
-void sub_0817A0FC(struct ActorVariationState *p, u16 *out)
+void ActorVariation_SelectRandomPair(struct ActorVariationState *p, u16 *out)
 {
     u32 table = (u32)gRandomTable;
     u32 index = (gRandomIndex + 1) & 1023;

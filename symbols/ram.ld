@@ -21,7 +21,7 @@ gXcmdTable = gUnk_08250284;
 gMPlayTable = gUnk_082643EC;
 
 /* libgcc/AGB SDK helpers emitted by the compiler */
-_call_via_r1 = sub_0824923C;
+_call_via_r1 = Callback_InvokeActor;
 _call_via_r2 = sub_08249240;
 /* agbcc libgcc/lib1thumb.asm call_via r4: bx r4; nop (ROM 08249248). */
 _call_via_r4 = sub_08249248;

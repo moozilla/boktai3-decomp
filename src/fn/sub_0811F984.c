@@ -1,5 +1,4 @@
 #include "global.h"
-#define ActorAction_TickRecovery sub_0811F984
 struct ActorRecovery {
     u8 unknown0[0x68];
     u32 pendingDamage;
@@ -19,7 +18,7 @@ static inline void ClearDamageFlag(s8 *flags, s32 mask)
 {
     *flags &= mask;
 }
-s32 sub_0811F984(struct ActorRecovery *actor, void *context)
+s32 ActorAction_TickRecovery(struct ActorRecovery *actor, void *context)
 {
     if (actor->actionKind == 1 && actor->recoveryTimer) {
         actor->recoveryTimer--;

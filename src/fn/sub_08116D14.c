@@ -1,5 +1,4 @@
 #include "global.h"
-#define MotionActor_RunPendingScript sub_08116D14
 struct MotionActorState {
     u8 unknown0[0x68];
     u32 pending;
@@ -29,7 +28,7 @@ static inline void AddFlags(u32 mask, u16 *p)
 {
     *p = mask | *p;
 }
-void sub_08116D14(struct MotionActor *actor)
+void MotionActor_RunPendingScript(struct MotionActor *actor)
 {
     struct MotionActorState *state = &actor->state;
     if (actor->scriptRequested) {

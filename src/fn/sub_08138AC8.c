@@ -1,4 +1,3 @@
-#define HeightProbe_IsBelowLimit sub_08138AC8
 #include "global.h"
 #include "scene_pool.h"
 struct HeightProbe {
@@ -8,7 +7,7 @@ struct HeightProbe {
     s32 heightOffset;
 };
 s32 Terrain_GetHeightAtFixedPosition(struct ScenePoolVec32 *);
-u8 sub_08138AC8(struct HeightProbe *p)
+u8 HeightProbe_IsBelowLimit(struct HeightProbe *p)
 {
     struct ScenePoolVec32 *position = &p->position;
     s32 height = Terrain_GetHeightAtFixedPosition(position);

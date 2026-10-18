@@ -1,4 +1,3 @@
-#define Player_Destroy       sub_0815F224
 #define Player_RemoveEffects Player_DestroyEffects
 #define gPlayerCount         gUnk_02000544
 #define gPlayerCueTimer      gUnk_02000518
@@ -15,7 +14,7 @@ void Player_UnregisterSceneMessageReceiver(void *);
 void Player_StopActionSounds(void *);
 extern u32 gUnk_0200054C;
 extern u16 gUnk_02000594, gUnk_02000544, gUnk_02000590, gUnk_02000570, gUnk_02000528, gUnk_02000518;
-s32 sub_0815F224(struct Player *p)
+s32 Player_Destroy(struct Player *p)
 {
     SceneActorContacts_RemoveNode(&p->contactListNode);
     Anim_Remove(&p->animation);

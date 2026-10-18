@@ -1,5 +1,3 @@
-#define StatModifier_InitializeCallbacks sub_0811EB44
-#define ScriptRecord_FindModifierRecord  sub_0811E37C
 #include "global.h"
 #include "modifier_list.h"
 struct ModifierSourceIds {
@@ -21,9 +19,9 @@ s32 Modifier_ScaleKindFourStat(u8 *, s32);
 s32 sub_0811E7C8(u8 *, s32);
 s32 Modifier_AddKindSixStat(u8 *, s32);
 s32 Modifier_ScaleKindEightToTenStat(u8 *, s32);
-s32 sub_0811E814(u8 *, s32);
+s32 StatModifier_ScaleAtOwnerThreshold(u8 *, s32);
 s32 Modifier_ScaleDefaultStat(u8 *, s32);
-void sub_0811EB44(struct ModifierActor *p, struct StatModifierOwner *owner)
+void StatModifier_InitializeCallbacks(struct ModifierActor *p, struct StatModifierOwner *owner)
 {
     struct ModifierSourceIds *sources = &p->sources;
     s32 i;
@@ -43,7 +41,7 @@ void sub_0811EB44(struct ModifierActor *p, struct StatModifierOwner *owner)
         } while (--remaining >= 0);
     }
     for (i = 0; i < sources->count; i++) {
-        sub_0811E37C((struct ModifierRecord *)&slots[i].order, sources->ids[i]);
+        ScriptRecord_FindModifierRecord((struct ModifierRecord *)&slots[i].order, sources->ids[i]);
         switch (slots[i].kind) {
             case 1:
                 slots[i].callback = sub_0811E728;
@@ -80,11 +78,11 @@ void sub_0811EB44(struct ModifierActor *p, struct StatModifierOwner *owner)
                 slots[i].enabled = 1;
                 break;
             case 13:
-                slots[i].callback = sub_0811E814;
+                slots[i].callback = StatModifier_ScaleAtOwnerThreshold;
                 slots[i].enabled = 1;
                 break;
             case 14:
-                slots[i].callback = sub_0811E814;
+                slots[i].callback = StatModifier_ScaleAtOwnerThreshold;
                 slots[i].enabled = 1;
                 break;
             case 0:

@@ -1,5 +1,3 @@
-#define MessagePanel_BeginDismiss sub_081098B0
-#define MessagePanel_WaitForDismiss sub_081097E0
 #include "global.h"
 #include "engine.h"
 struct MessagePanel {
@@ -12,8 +10,8 @@ struct MessagePanel {
     u8 entering;
     u16 timer;
 };
-void sub_081098B0(struct MessagePanel *);
-void sub_081097E0(struct MessagePanel *p)
+void MessagePanel_BeginDismiss(struct MessagePanel *);
+void MessagePanel_WaitForDismiss(struct MessagePanel *p)
 {
     if (p->entering) {
         TextWindow_SetScript(p->window, p->script);
@@ -23,7 +21,7 @@ void sub_081097E0(struct MessagePanel *p)
         p->entering = 0;
     }
     if (p->timer == 120) {
-        void (*next)(struct MessagePanel *) = sub_081098B0;
+        void (*next)(struct MessagePanel *) = MessagePanel_BeginDismiss;
         u32 mode = 3;
         p->state = next;
         p->entering = 1;

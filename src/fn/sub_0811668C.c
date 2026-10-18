@@ -1,7 +1,3 @@
-#define ActorRecoil_InitCollisionVolumes    sub_0811668C
-#define CollisionVolume_Init                sub_0811B278
-#define CollisionVolume_Activate            sub_0811B2FC
-#define ActorRecoil_ApplyDirectionalImpulse sub_08116538
 // Tentative family and semantic names; layouts follow observed field offsets.
 #include "global.h"
 struct CollisionPoint {
@@ -20,10 +16,10 @@ struct RecoilCollisionActor {
     s8 group;
 };
 void sub_081162D8();
-void sub_08116538();
-void sub_0811B278(void *, void *, void *, void *, s32, s32, s32, s32, s32, void (*)(), void *);
-void sub_0811B2FC(void *);
-void sub_0811668C(struct RecoilCollisionActor *p)
+void ActorRecoil_ApplyDirectionalImpulse();
+void SpatialIndex_InitEntry(void *, void *, void *, void *, s32, s32, s32, s32, s32, void (*)(), void *);
+void SpatialIndex_InsertEntry(void *);
+void ActorRecoil_InitCollisionVolumes(struct RecoilCollisionActor *p)
 {
     struct CollisionPoint pos, size, offset;
     void *owner = p->owner;
@@ -41,7 +37,7 @@ void sub_0811668C(struct RecoilCollisionActor *p)
     offset.x = 0;
     offset.y = -size.y;
     offset.z = 2;
-    sub_0811B278(p->bodyVolume, &pos, &size, &offset, 20, group, 0, 0, 12, sub_081162D8, owner);
+    SpatialIndex_InitEntry(p->bodyVolume, &pos, &size, &offset, 20, group, 0, 0, 12, sub_081162D8, owner);
     ((s16 *)&pos)[0] = p->width;
     ((s16 *)&pos)[1] = p->height - 96;
     ((s16 *)&pos)[2] = p->height - 96;
@@ -51,6 +47,6 @@ void sub_0811668C(struct RecoilCollisionActor *p)
     ((s16 *)&offset)[0] = 0;
     ((s16 *)&offset)[1] = -((s16 *)&size)[1];
     ((s16 *)&offset)[2] = 4;
-    sub_0811B278(p->hitVolume, &pos, &size, &offset, 44, group, 0, 15, 12, sub_08116538, owner);
-    sub_0811B2FC(p->bodyVolume);
+    SpatialIndex_InitEntry(p->hitVolume, &pos, &size, &offset, 44, group, 0, 15, 12, ActorRecoil_ApplyDirectionalImpulse, owner);
+    SpatialIndex_InsertEntry(p->bodyVolume);
 }

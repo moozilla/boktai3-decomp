@@ -1,13 +1,12 @@
 #define gLinkMenuFlags                         gUnk_0300523C
 #define gLinkMenuActive                        gUnk_03005250
-#define LinkSelection_WaitForReadyParticipants sub_0810B120
 #include "global.h"
 #include "area_effect_link.h"
 #include "game_state.h"
 u8 Registry1745_ConsumeStateEntry(struct AreaEffectLinkState *);
 s32 Registry1745_CheckSessionReady(struct AreaEffectLinkState *);
 void Registry1745_BeginShutdown(struct AreaEffectLinkState *, void (*)(void));
-void sub_08109C80(void);
+void ScriptPanel_OpenTextWindow(void);
 void Registry1745_SetState(struct AreaEffectLinkState *, u32, void (*)(void));
 void sub_0810B238(void);
 void sub_0810BBD4(struct AreaEffectLinkState *);
@@ -27,7 +26,7 @@ static inline u8 IsReadySlot(u32 value, u32 mask)
     return 0;
 }
 /* The waiting path preserves r0 from the validity check; no explicit return in the original. */
-s32 sub_0810B120(struct AreaEffectLinkState *p)
+s32 LinkSelection_WaitForReadyParticipants(struct AreaEffectLinkState *p)
 {
     struct AreaEffectLinkState *session = p;
     s32 count, i, length, result;
@@ -53,7 +52,7 @@ s32 sub_0810B120(struct AreaEffectLinkState *p)
     }
     result = Registry1745_CheckSessionReady(p);
     if (result < 0) {
-        Registry1745_BeginShutdown(p, sub_08109C80);
+        Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
     count = 0;

@@ -1,5 +1,3 @@
-#define InventoryGrid_GetSlotPosition   sub_0816D920
-#define InventoryGrid_FinishNumberPhase sub_0816E1E0
 #define InventoryGrid_SetPhaseCallback Hud_SetInteractionCallback
 #include "global.h"
 
@@ -23,18 +21,18 @@ struct InventoryGrid {
     struct InventoryNumberDigit attachments[4];
 };
 s32 sub_08165D10(void *);
-void sub_0816FF4C(void);
-void sub_081663A0(void *, int, int, int, int);
-void sub_08166B7C(void *, int);
+void SceneHud_UpdateActionSelection(void);
+void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
+void MenuDisplay_UpdateActionPrompt(void *, int);
 void sub_0816701C(void *, int, int, int, int, int);
 void sub_081672FC(void *);
 void Hud_SaveGridSelection(void *);
 void sub_0816CDB8(void *, int, int);
-void sub_0816D868(void *);
-void sub_0816D920(void *, int);
-void sub_0816D98C(void *);
+void SceneHud_ShowActionPreview(void *);
+void SceneHud_GetActionIconPosition(void *, int);
+void SceneHud_RefreshActionIcons(void *);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
-void sub_0816E1E0(struct InventoryGrid *s)
+void InventoryGrid_FinishNumberPhase(struct InventoryGrid *s)
 {
     if (s->phaseCounter <= 31) {
         if (++s->phaseCounter == 32) {
@@ -55,16 +53,16 @@ void sub_0816E1E0(struct InventoryGrid *s)
         }
     } else if (sub_08165D10(s)) {
         void *selection;
-        sub_0816D98C(s);
-        Hud_SetInteractionCallback(s, sub_0816FF4C, 1);
+        SceneHud_RefreshActionIcons(s);
+        Hud_SetInteractionCallback(s, SceneHud_UpdateActionSelection, 1);
         selection = s->selectionState;
         sub_0816CDB8(selection, 1, 0);
-        sub_0816D920(s->slotPosition, s->selectedSlot);
-        sub_0816D868(s);
+        SceneHud_GetActionIconPosition(s->slotPosition, s->selectedSlot);
+        SceneHud_ShowActionPreview(s);
         Hud_SaveGridSelection(selection);
         sub_081672FC(s);
-        sub_08166B7C(s, 4);
+        MenuDisplay_UpdateActionPrompt(s, 4);
         sub_0816701C(s, 0, 0, 0, 1, 0);
-        sub_081663A0(s, 1, 0, 0, 0);
+        MenuDisplay_SetPaletteOverrides(s, 1, 0, 0, 0);
     }
 }

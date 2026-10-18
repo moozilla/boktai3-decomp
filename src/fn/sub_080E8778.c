@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0824923C(void *, u32);
+void Callback_InvokeActor(void *, u32);
 void SceneActorControl_DispatchControl(void *);
 void Mimic_UpdateReactionState(void *);
 
@@ -13,7 +13,7 @@ struct S {
 
 s32 Mimic_UpdateBehavior(struct S *s)
 {
-    sub_0824923C(s, s->tbl[s->idx]);
+    Callback_InvokeActor(s, s->tbl[s->idx]);
     SceneActorControl_DispatchControl(s);
     Mimic_UpdateReactionState(s);
     return 1;

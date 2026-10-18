@@ -1,8 +1,7 @@
-#define MenuDisplay_LoadAdjustedDigits sub_081664A8
 #include "global.h"
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
 s32 Div(s32, s32);
-void sub_081664A8(s32 value, s32 adjustment, void *data, void *hundredsAnim,
+void MenuDisplay_LoadAdjustedDigits(s32 value, s32 adjustment, void *data, void *hundredsAnim,
                   void *tensAnim, void *onesAnim)
 {
     s32 hundreds, tens, ones, bank;

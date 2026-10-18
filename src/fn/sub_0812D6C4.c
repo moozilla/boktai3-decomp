@@ -1,9 +1,8 @@
 #include "global.h"
-#define SceneParticle_UpdateAlternatingFrame sub_0812D6C4
 struct SceneParticle { u8 unknown[0x32]; u8 state; s8 index; u8 reset, unknown35, timer, phase; u8 unknown38[4]; u8 baseFrame, unknown3d; u16 interval; };
 struct SceneParticlePool { u8 unknown[0x18]; void *resource; struct SceneParticle particles[26]; volatile u32 occupied; };
 void sub_08217EEC(void *, void *, u32);
-s32 sub_0812D6C4(struct SceneParticlePool *pool, struct SceneParticle *particle)
+s32 SceneParticle_UpdateAlternatingFrame(struct SceneParticlePool *pool, struct SceneParticle *particle)
 {
     if (particle->timer == 0) {
         particle->timer = particle->interval;

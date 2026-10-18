@@ -1,6 +1,5 @@
 #include "global.h"
 /* Provisional names and field interpretations; confidence low. */
-#define CallbackTask_Finish sub_08108B90
 struct CallbackTask {
     u8 pad0[0x20];
     s32 arg2;
@@ -18,7 +17,7 @@ struct CallbackTask {
 };
 void Serial_StopCommunication(void);
 void Task_Kill(void *);
-u8 sub_08108B90(struct CallbackTask *task)
+u8 CallbackTask_Finish(struct CallbackTask *task)
 {
     if (task->pending) {
         Serial_StopCommunication();

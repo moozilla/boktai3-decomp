@@ -6,7 +6,7 @@ void TextWindow_Refresh(void *, u32);
 void TextWindow_SetString(void *, u32, void *);
 void TextWindow_StartPlayback(void *);
 void ScrollingDialogue_ClearScript(void);
-void sub_08174578(void *, void *);
+void Presentation_ApplyPackedGraphicData(void *, void *);
 void ForgingBook_SetItemNameText(void *, void *);
 extern u8 gUnk_08E6092C[], gUnk_08E60F80[];
 u32 ForgingBook_RefreshSelectedEntryText(u8 *p)
@@ -29,7 +29,7 @@ u32 ForgingBook_RefreshSelectedEntryText(u8 *p)
             TextWindow_SetString(*obj, 0, flag);
             TextWindow_StartPlayback(*obj);
             ScrollingDialogue_ClearScript();
-            sub_08174578(gUnk_08E6092C + tbl[*idx] * 32, *arg);
+            Presentation_ApplyPackedGraphicData(gUnk_08E6092C + tbl[*idx] * 32, *arg);
         } else {
             u8 *flag;
             void **obj = (void **)(p + 0xb74);

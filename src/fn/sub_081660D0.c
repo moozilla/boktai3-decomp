@@ -1,4 +1,3 @@
-#define SceneHud_SetPairedIcons   sub_081660D0
 #define SceneHud_SetWidgetFlags PauseMenu_AddSpriteFlags
 #define SceneHud_ClearWidgetFlags PauseMenu_ClearSpriteFlags
 #define SceneHud_MapIconKeyframe PauseMenu_GetPromptIconKeyframe
@@ -7,7 +6,7 @@
 void PauseMenu_AddSpriteFlags(void *, s32, s32);
 void PauseMenu_ClearSpriteFlags(void *, s32, u32);
 s32 PauseMenu_GetPromptIconKeyframe(s32);
-void sub_081660D0(struct SceneHudState *hud, s32 left, s32 right)
+void SceneHud_SetPairedIcons(struct SceneHudState *hud, s32 left, s32 right)
 {
     if (left < 0) {
         PauseMenu_AddSpriteFlags(hud, 75, 1);

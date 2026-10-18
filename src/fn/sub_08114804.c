@@ -1,4 +1,3 @@
-#define EffectActor_BeginHorizontalMotion sub_08114804
 #define EffectActor_SetUpdate NativeEffect_SetState
 #include "global.h"
 struct EffectMotionActor {
@@ -12,7 +11,7 @@ void NativeEffect_SetState(void *, void (*)(void));
 void NativeEffect_InitColliderWithDepth(void *, void (*)(void), u32, u32);
 void NativeEffect_OnColliderImpact(void);
 void sub_08113920(void);
-void sub_08114804(struct EffectMotionActor *actor, struct EffectMotionConfig *config, s32 reverse)
+void EffectActor_BeginHorizontalMotion(struct EffectMotionActor *actor, struct EffectMotionConfig *config, s32 reverse)
 {
     actor->velocity += 0x2000;
     actor->targetVelocity = actor->velocity;

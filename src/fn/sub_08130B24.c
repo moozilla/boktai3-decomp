@@ -1,5 +1,3 @@
-#define SceneActor_RunControlAndFallback sub_08130B24
-#define Callback_InvokeActor             sub_0824923C
 #include "global.h"
 #include "scene_actor_reset.h"
 void sub_0812F3CC(struct SceneActorRegistryResetView *);
@@ -9,7 +7,7 @@ static inline u8 SceneActor_IsDetached(struct SceneActorRegistryResetView *actor
         return 1;
     return 0;
 }
-void sub_08130B24(struct SceneActorRegistryResetView *actor)
+void SceneActor_RunControlAndFallback(struct SceneActorRegistryResetView *actor)
 {
     if (!(u8)Callback_InvokeActor(actor, actor->update270)) {
         if (!SceneActor_IsDetached(actor))

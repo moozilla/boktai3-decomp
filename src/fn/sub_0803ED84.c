@@ -1,5 +1,5 @@
 #include "scene_pool.h"
-void sub_0811D4AC(struct ScenePoolActor *, s32, s32, s32, s32, s32, s32);
+void ActorStats_ConfigureScaledParameters(struct ScenePoolActor *, s32, s32, s32, s32, s32, s32);
 static inline void Or(u32 mask, u32 *flags)
 {
     *flags |= mask;
@@ -12,7 +12,7 @@ s32 ScenePool_StateDepartForward(void *manager, struct ScenePoolActor *actor,
         entry->stateEntered = zero;
         entry->turnStep = 0x200;
         actor->savedPosition = actor->position;
-        sub_0811D4AC(actor, 0x3000, 0x2000, -0x2000, 0x5000, zero, 0x6000);
+        ActorStats_ConfigureScaledParameters(actor, 0x3000, 0x2000, -0x2000, 0x5000, zero, 0x6000);
     }
     {
         u8 *flags = &actor->flags5ee;

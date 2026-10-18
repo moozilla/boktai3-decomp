@@ -1,8 +1,7 @@
 #define SceneInput_SetWidgetPalette PauseMenu_SetSpritePalette
-#define SceneHud_LayoutEquipmentGrid sub_08173650
 #include "global.h"
 #include "scene_hud_display.h"
-void sub_0817373C(void *, int);
+void SceneHud_RefreshEquipmentIcons(void *, int);
 void PauseMenu_SetSpritePalette(void *, u16);
 static inline void InitPosition(struct ContactPosition *v, s16 x, s16 y, s16 z, s16 pad)
 {
@@ -11,7 +10,7 @@ static inline void InitPosition(struct ContactPosition *v, s16 x, s16 y, s16 z, 
     v->z = z;
     v->pad = pad;
 }
-void sub_08173650(struct SceneHudState *p)
+void SceneHud_LayoutEquipmentGrid(struct SceneHudState *p)
 {
     struct ContactPosition position[1];
     s32 i;
@@ -32,7 +31,7 @@ void sub_08173650(struct SceneHudState *p)
             offset += 0x60;
         }
     }
-    sub_0817373C(p, 0);
+    SceneHud_RefreshEquipmentIcons(p, 0);
     {
         struct SceneInputWidget *a = (void *)((u8 *)p + 0x2560);
         a->flags &= ~1;

@@ -1,4 +1,3 @@
-#define ScriptRecord_FindModifier sub_0811E3F8
 #define gScriptRecordTable        gUnk_02000208
 #include "global.h"
 struct ScriptModifier {
@@ -19,7 +18,7 @@ struct ModifierResult {
     u16 a, b, c;
     u32 value;
 };
-s32 sub_0811E3F8(struct ModifierResult *out, s32 id)
+s32 ScriptRecord_FindModifier(struct ModifierResult *out, s32 id)
 {
     struct ScriptRecordTable *p;
     struct ScriptRecordTable *table = gUnk_02000208;

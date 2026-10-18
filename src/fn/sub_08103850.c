@@ -1,4 +1,3 @@
-#define NamedObject_UpdatePool        sub_08103850
 #define NamedObject_UpdateAttachments NamedObject_UpdateFollowers
 #define gNamedObjectStateCallbacks    gUnk_086064CC
 #include "global.h"
@@ -28,7 +27,7 @@ extern void *gUnk_086064CC[];
 void sub_08101B1C(struct NamedObject *);
 void NamedObject_UpdateFollowers(struct NamedObject *);
 void sub_0810103C(struct NamedObject *);
-void sub_08101810(struct NamedObject *);
+void NamedObject_ApplyVerticalImpulseAndJitter(struct NamedObject *);
 void sub_08101340(struct NamedObjectManager *);
 static inline u8 isActive(u32 mask, u32 bit)
 {
@@ -41,7 +40,7 @@ static inline u32 testMask(void)
     s16 mask = 4;
     return gUnk_02000560 & mask;
 }
-u32 sub_08103850(struct NamedObjectManager *manager)
+u32 NamedObject_UpdatePool(struct NamedObjectManager *manager)
 {
     struct NamedObject *objects = manager->objects;
     s32 i;
@@ -65,16 +64,16 @@ u32 sub_08103850(struct NamedObjectManager *manager)
             if (isActive(*active, 1 << i)) {
                 struct NamedObject *object = (struct NamedObject *)(i * 0x19C + (u32)objects);
                 if (object->state != 6) {
-                    sub_0824923C(object, object->callbackE4);
-                    sub_0824923C(object, gUnk_086064CC[object->state]);
-                    sub_0824923C(object, object->callbackE8);
-                    sub_0824923C(object, object->callbackEC);
+                    Callback_InvokeActor(object, object->callbackE4);
+                    Callback_InvokeActor(object, gUnk_086064CC[object->state]);
+                    Callback_InvokeActor(object, object->callbackE8);
+                    Callback_InvokeActor(object, object->callbackEC);
                     sub_08101B1C(object);
                     NamedObject_UpdateFollowers(object);
                     sub_0810103C(object);
                     object->spritePosition = object->position;
                     *(u16 *)&object->spritePosition -= 0x100;
-                    sub_08101810(object);
+                    NamedObject_ApplyVerticalImpulseAndJitter(object);
                 }
             }
         }

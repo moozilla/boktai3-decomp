@@ -1,5 +1,4 @@
 #include "global.h"
-#define ActorAttachment_PlayEffect sub_0817AB2C
 
 struct AttachmentEffectActor {
     u8 unk0[0x48];
@@ -9,7 +8,7 @@ struct AttachmentEffectActor {
 };
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, int, int, void *, int, int, int);
 void Sound_PlaySong(u32);
-void sub_0817AB2C(struct AttachmentEffectActor *actor, s32 effect)
+void ActorAttachment_PlayEffect(struct AttachmentEffectActor *actor, s32 effect)
 {
     switch (effect) {
     case 1:

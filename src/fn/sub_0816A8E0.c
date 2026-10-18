@@ -1,5 +1,3 @@
-#define ScenePanel_UpdateDetail   sub_0816A8E0
-#define ScenePanel_BeginSelection sub_0816A4EC
 #define gPanelKeys                gUnk_03005260
 #include "global.h"
 #include "game_state.h"
@@ -42,10 +40,10 @@ struct ScenePanel {
 extern u16 gUnk_03005260[];
 s32 Anim_Step(void *, void *);
 void Sound_PlaySong(u32);
-void sub_0816A700(void *);
-void sub_0816A4EC(void *);
+void StatusPanel_BeginAnimatedTransition(void *);
+void ScenePanel_BeginSelection(void *);
 void sub_0816A280(void *);
-void sub_0816A8E0(struct ScenePanel *p)
+void ScenePanel_UpdateDetail(struct ScenePanel *p)
 {
     Anim_Step(&p->mainSprite, p->keyframes);
     if (gPanelKeys[1] & 1) {
@@ -63,10 +61,10 @@ void sub_0816A8E0(struct ScenePanel *p)
             *total = value;
             Sound_PlaySong(0xDD);
         }
-        sub_0816A700(p);
+        StatusPanel_BeginAnimatedTransition(p);
     } else if (gPanelKeys[1] & 2) {
         Sound_PlaySong(0xDE);
-        sub_0816A4EC(p);
+        ScenePanel_BeginSelection(p);
     } else
         sub_0816A280(p);
 }

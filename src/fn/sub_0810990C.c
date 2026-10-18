@@ -1,5 +1,3 @@
-#define MessagePanel_BeginDismiss sub_081098B0
-#define MessagePanel_DelayDismiss sub_0810990C
 #include "global.h"
 #include "engine.h"
 struct MessagePanel {
@@ -12,15 +10,15 @@ struct MessagePanel {
     u8 entering;
     u16 timer;
 };
-void sub_081098B0(struct MessagePanel *);
-void sub_0810990C(struct MessagePanel *p)
+void MessagePanel_BeginDismiss(struct MessagePanel *);
+void MessagePanel_DelayDismiss(struct MessagePanel *p)
 {
     if (p->entering == 1) {
         p->timer = 0;
         p->entering = 0;
     }
     if (p->timer == 120) {
-        void (*next)(struct MessagePanel *) = sub_081098B0;
+        void (*next)(struct MessagePanel *) = MessagePanel_BeginDismiss;
         u32 mode = 3;
         p->state = next;
         p->entering = 1;

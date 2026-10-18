@@ -1,4 +1,3 @@
-#define SceneActor_RunPositionScript sub_080B0C80
 /* Descriptive aliases and object roles are tentative (confidence: low). */
 #include "global.h"
 #include "directional_interaction.h"
@@ -14,7 +13,7 @@ struct SceneActorPositionScript {
     u16 flags;
 };
 void Sound_PlaySong(u32);
-void sub_080B0C80(struct SceneActorPositionScript *p)
+void SceneActor_RunPositionScript(struct SceneActorPositionScript *p)
 {
     s32 values[4];
     struct DirectionalScriptArgs args;

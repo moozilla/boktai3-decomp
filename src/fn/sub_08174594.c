@@ -1,11 +1,10 @@
-#define Presentation_SelectGraphicResource sub_08174594
 #include "global.h"
 struct PresentationGraphicData {
     u8 kind;
     u8 unknown1;
     u16 amount;
 };
-u32 sub_08174594(struct PresentationGraphicData *data)
+u32 Presentation_SelectGraphicResource(struct PresentationGraphicData *data)
 {
     if (data->amount == 0 || data->kind == 0x30 || data->kind == 0x2f)
         return 394;

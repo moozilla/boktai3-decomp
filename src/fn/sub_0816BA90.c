@@ -1,4 +1,3 @@
-#define MapMenu_InitializePageBounds sub_0816BA90
 #include "global.h"
 struct MapMenuPage {
     u8 unknown0[2];
@@ -14,7 +13,7 @@ struct MapMenu {
     s16 minScrollX, minScrollY;
     s16 maxScrollX, maxScrollY, focusX, focusY;
 };
-void sub_0816BA90(struct MapMenu *menu)
+void MapMenu_InitializePageBounds(struct MapMenu *menu)
 {
     menu->minScrollX = 0;
     menu->minScrollY = 0;

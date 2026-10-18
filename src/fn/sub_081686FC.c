@@ -1,4 +1,3 @@
-#define SceneHud_UpdateSecondaryWidgets sub_081686FC
 #define SceneHud_LoadInactiveIcon PauseMenu_LoadCategoryIconFrame
 #define SceneHud_LoadActiveIcon PauseMenu_LoadEquipmentIconFrame
 #define SceneHud_GetCarouselY PauseMenu_GetEquipmentRowY
@@ -7,7 +6,7 @@
 void PauseMenu_LoadCategoryIconFrame(struct SceneHudState *, struct SceneInputWidget *, s32);
 void PauseMenu_LoadEquipmentIconFrame(struct SceneHudState *, struct SceneInputWidget *, s32);
 s32 PauseMenu_GetEquipmentRowY(struct SceneHudState *, s32, s32, s32, s32);
-void sub_081686FC(struct SceneHudState *p)
+void SceneHud_UpdateSecondaryWidgets(struct SceneHudState *p)
 {
     s32 i = 0;
     struct SceneInputWidget *w = (struct SceneInputWidget *)((u8 *)p + 0xE28);

@@ -1,4 +1,3 @@
-#define LinkSession_ReceiveSelectionByte sub_08138300
 #include "global.h"
 #include "area_effect_link.h"
 static inline u8 IsByte(u16 word)
@@ -13,7 +12,7 @@ static inline u16 GetWord(struct AreaEffectLinkState *session, s32 player)
         return 0xFFFF;
     return session->selection[player];
 }
-s32 sub_08138300(struct AreaEffectLinkState *session, u8 *destination, s32 player, s32 length)
+s32 LinkSession_ReceiveSelectionByte(struct AreaEffectLinkState *session, u8 *destination, s32 player, s32 length)
 {
     u32 word;
     u16 *cursor;

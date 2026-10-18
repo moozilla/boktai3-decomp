@@ -1,4 +1,3 @@
-#define SpriteActor_AdvanceContactState sub_08129834
 #include "global.h"
 struct SpriteActor {
     u8 unknown[0x8C];
@@ -8,7 +7,7 @@ struct SpriteActor {
     u8 unknown92[0x60];
     u8 contactState;
 };
-void sub_08129834(void *collision, void *other, struct SpriteActor *actor)
+void SpriteActor_AdvanceContactState(void *collision, void *other, struct SpriteActor *actor)
 {
     if (actor->contactState == 1) {
         actor->field8C = 0;

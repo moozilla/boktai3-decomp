@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "burst_emitter.h"
 void sub_08126AD4(const struct ContactPosition *, s32, s32, s32, s32, s32, u32);
-void sub_08126348(const struct ContactPosition *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32,
+void SpriteParticle_CreateVariant4384(const struct ContactPosition *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                   s32, s32);
 void BurstEmitter_EmitFrame(struct BurstEmitter *emitter)
 {
@@ -94,7 +94,7 @@ void BurstEmitter_EmitFrame(struct BurstEmitter *emitter)
             if (!emitter->context) {
                 u32 kind = 2;
                 for (index = 0; index <= 7; index++)
-                    sub_08126348(&emitter->position, 8, 16, 4, 12, 18, index << 5, 8, 64, 1, kind,
+                    SpriteParticle_CreateVariant4384(&emitter->position, 8, 16, 4, 12, 18, index << 5, 8, 64, 1, kind,
                                  512, 8);
             }
             break;

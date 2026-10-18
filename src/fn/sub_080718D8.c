@@ -508,7 +508,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
         address = (void **)((u8 *)actor + offset);
         callback = *address;
         if (callback)
-            sub_0824923C(actor, callback);
+            Callback_InvokeActor(actor, callback);
     }
     SceneActorPalette_ClearCompletedTransitions();
 }

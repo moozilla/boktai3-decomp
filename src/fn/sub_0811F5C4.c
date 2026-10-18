@@ -1,6 +1,4 @@
-#define ActorAbility_UpdateRecovery  sub_0811F5C4
 #define ActorAbility_IsReady Modifier_IsFourthSourceReady
-#define ActorAbility_ConsumeResource sub_0811F490
 // Tentative descriptive names; inferred from static field accesses and callees.
 #include "global.h"
 #include "actor_stats.h"
@@ -16,13 +14,13 @@ struct ActorAbility {
     u8 *owner;
 };
 u8 Modifier_IsFourthSourceReady(struct ActorAbility *);
-s32 sub_0811EAF8(void *, u32, s32);
-void sub_0811F490(void *, struct ActorAbility *, s32);
+s32 CallbackList_RunMatchingState(void *, u32, s32);
+void CallbackList_SubtractStateTenValue(void *, struct ActorAbility *, s32);
 s32 CharacterModel_GetPrimaryPaletteIndex(u8 *);
 void sub_0811D6C8(void *, u32, u32, s32, u32, u32, u32, u32);
 void Sound_PlaySong(u32);
 void Character_SetLowResourceColorEffect(void *, void *);
-s32 sub_0811F5C4(struct ActorAbility *ability)
+s32 ActorAbility_UpdateRecovery(struct ActorAbility *ability)
 {
     u8 *owner;
     struct ActorStats *stats;
@@ -37,10 +35,10 @@ s32 sub_0811F5C4(struct ActorAbility *ability)
         return 0;
     if (!ability->started && *(s16 *)(owner + 0x70) <= 15)
         return 0;
-    cost = sub_0811EAF8(stats, ability->cost, 10);
+    cost = CallbackList_RunMatchingState(stats, ability->cost, 10);
     if (stats->value < cost)
         return 0;
-    sub_0811F490(stats, ability, cost);
+    CallbackList_SubtractStateTenValue(stats, ability, cost);
     stats->amount++;
     if (stats->amount > stats->amountLimit)
         stats->amount = stats->amountLimit;

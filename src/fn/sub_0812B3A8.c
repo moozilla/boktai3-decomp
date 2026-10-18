@@ -1,6 +1,5 @@
 #include "global.h"
 /* Tentative family name; visual identity is not yet established. */
-#define TwinSpriteEffect_InitGraphics sub_0812B3A8
 struct TwinSpriteEffectSlot {
     u32 flags;
     u8 unknown4[0x2c - 4];
@@ -18,7 +17,7 @@ struct TwinSpriteEffect {
 s32 AnimData_Load(void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void Sprite_Init(void *, void *, u32);
-void sub_0812B3A8(struct TwinSpriteEffect *effect)
+void TwinSpriteEffect_InitGraphics(struct TwinSpriteEffect *effect)
 {
     s32 i = 0;
     do {

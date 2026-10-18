@@ -1,4 +1,3 @@
-#define Player_ApplyPeriodicStatChanges sub_0813E53C
 #define Player_AddStatA Player_IncreaseLifeTowardLimit
 #define Player_SubtractStatA Player_SubtractLifeNonlethal
 #define Player_AddStatB Player_AddEnergy
@@ -23,7 +22,7 @@ static inline s32 HasFlag(struct Player *p, u32 mask)
         return TRUE;
     return FALSE;
 }
-void sub_0813E53C(struct Player *p)
+void Player_ApplyPeriodicStatChanges(struct Player *p)
 {
     s32 amount;
     if (p->kind == 1) {

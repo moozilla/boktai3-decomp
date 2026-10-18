@@ -1,7 +1,7 @@
 #include "global.h"
 
 u32 Slime_ProcessPendingStateChange(u8 *);
-void sub_0824923C(u8 *, u32);
+void Callback_InvokeActor(u8 *, u32);
 void SceneActorControl_DispatchControl(u8 *);
 void SceneActorMotion_RefreshGroundHeight(u8 *);
 
@@ -12,7 +12,7 @@ u32 Slime_Update(u8 *p)
     Slime_ProcessPendingStateChange(p);
     i = p[0x2a8];
     t = *(u32 **)(p + 0x27c);
-    sub_0824923C(p, t[i]);
+    Callback_InvokeActor(p, t[i]);
     SceneActorControl_DispatchControl(p);
     SceneActorMotion_RefreshGroundHeight(p);
     return 1;

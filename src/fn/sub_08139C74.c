@@ -3,9 +3,9 @@
 extern u8 *gUnk_020004D0;
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
-s32 sub_08139BC0(u8 *);
+s32 SceneProcParticles_Initialize(u8 *);
 void Task_Kill(u8 *);
-void sub_08139B58(void);
+void CallbackPool_Update(void);
 void ParticleBurstEffect_DestroyManager(void);
 
 u8 *ParticleBurstEffect_EnsureManager(void)
@@ -15,8 +15,8 @@ u8 *ParticleBurstEffect_EnsureManager(void)
         return gUnk_020004D0;
     p = Task_Create(0xa, 0x52c);
     if (p != 0) {
-        Task_SetCallbacks(p, sub_08139B58, ParticleBurstEffect_DestroyManager);
-        if (sub_08139BC0(p) < 0) {
+        Task_SetCallbacks(p, CallbackPool_Update, ParticleBurstEffect_DestroyManager);
+        if (SceneProcParticles_Initialize(p) < 0) {
             Task_Kill(p);
             return 0;
         }

@@ -733,6 +733,7 @@ def renamed_refs(text, func):
 
 def drop_conflicting_decls(path):
     """Compile path; remove local prototypes that conflict with a header's; True when it matches."""
+    retried = False
     for _ in range(8):
         r = subprocess.run([PY, "tools/check.py", path], cwd=ROOT, capture_output=True, text=True)
         t = r.stdout + r.stderr
@@ -740,6 +741,11 @@ def drop_conflicting_decls(path):
             return True
         bad = set(re.findall(r"conflicting types for `(\w+)'", t))
         if not bad:
+            if not retried:  # a check can fail transiently under load; try once more
+                retried = True
+                time.sleep(5)
+                continue
+            print(f"  {os.path.basename(path)}: {t.strip().splitlines()[-1][:160] if t.strip() else 'no output'}")
             return False
         s = open(path).read()
         n = s

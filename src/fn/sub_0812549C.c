@@ -1,10 +1,8 @@
 #include "global.h"
 #include "scene_vec.h"
-#define SpriteNotice_CreateBetweenPositions sub_0812549C
-#define SpriteNotice_Create sub_08122FC4
 s32 Div(s32,s32);
 s32 SpriteNotice_Create(struct SceneVec *,u32,u32);
-s32 sub_0812549C(struct SceneVec *start,struct SceneVec *end,u32 arg)
+s32 SpriteNotice_CreateBetweenPositions(struct SceneVec *start,struct SceneVec *end,u32 arg)
 {
     struct SceneVec values;
     struct SceneVec *delta=&values;

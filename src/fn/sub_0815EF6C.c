@@ -1,9 +1,8 @@
 #define gGameState              gUnk_02000710
-#define Player_RecordInputTicks sub_0815EF6C
 #include "global.h"
 #include "player.h"
 #include "game_state.h"
-void sub_0815EF6C(struct Player *p)
+void Player_RecordInputTicks(struct Player *p)
 {
     if (*p->inputKeys) {
         if (p->actionMode == 2) {

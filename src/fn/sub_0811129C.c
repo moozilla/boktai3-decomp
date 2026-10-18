@@ -1,8 +1,6 @@
 #include "global.h"
 #include "scene_pool.h"
 #include "background_controller.h"
-#define ScanlineScroll_Update sub_0811129C
-#define ScanlineScroll_AdvancePhases sub_081111E8
 struct ScanlineScroll {
     u8 unknown0[0x1848];
     u16 scroll;
@@ -27,14 +25,14 @@ static inline u8 IsPlayerScrollBlocked(void)
     return 0;
 }
 
-void sub_081111E8(struct ScanlineScroll *);
+void ScanlineScroll_AdvancePhases(struct ScanlineScroll *);
 void ScanlineEffect_SetSource(s32,s32,void *);
-void sub_0811129C(struct ScanlineScroll *p)
+void ScanlineScroll_Update(struct ScanlineScroll *p)
 {
     if (p->lastMapX != gUnk_03004C30[3].x)
         BgGfx_LoadTilemapSimple(3,gUnk_03004C30[3].x >> 3,0,0,0);
     p->lastMapX = gUnk_03004C30[3].x;
-    sub_081111E8(p);
+    ScanlineScroll_AdvancePhases(p);
     ScanlineEffect_SetSource(3,0,p->offsets);
     if (p->moving && !IsPlayerScrollBlocked()) {
         p->scroll += p->speed;

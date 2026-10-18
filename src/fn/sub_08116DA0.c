@@ -1,5 +1,4 @@
 #include "global.h"
-#define MotionActor_RunDelayedScript sub_08116DA0
 struct MotionActorState {
     u8 unknown0[0x68];
     u32 pending;
@@ -22,7 +21,7 @@ struct MotionActor {
 extern u32 gUnk_030053F0, gUnk_030053F4;
 void Hud_SetMode(s32);
 void Script_Call(u32, void *);
-void sub_08116DA0(struct MotionActor *actor)
+void MotionActor_RunDelayedScript(struct MotionActor *actor)
 {
     struct MotionActorState *state = &actor->state;
     if (actor->scriptRequested)
