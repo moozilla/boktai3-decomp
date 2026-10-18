@@ -273,3 +273,4 @@ addr,function,name,family,note
 08127848,sub_08127848,StateSlotPool_Update,"StateSlotPool","dispatches occupied slots through their state callbacks"
 08127994,sub_08127994,,"EmptyCallback",""
 08127A38,sub_08127A38,TimedSprite_BlinkAndRemove,"TimedSprite","blinks an aging sprite and releases its slot after seventy frames"
+0812808C,sub_0812808C,SpritePool12_UpdateActive,"SpritePool12","dispatches state callbacks for twelve sprite slots"
