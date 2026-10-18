@@ -795,3 +795,4 @@ addr,function,name,family,note
 0816C624,sub_0816C624,MapMenu_RefreshMarkers,"MapMenu","refreshes marker animation and screen positions"
 0816C838,sub_0816C838,MapMenu_InitializeDisplay,"MapMenu","initializes map layers, centered scrolling, markers and input callback"
 0816CFAC,sub_0816CFAC,SceneHud_ApplyStatBPercent,"SceneHud","apply a percentage of maximum stat B and refresh its display"
+0816D0AC,sub_0816D0AC,PlayerStatusPanel_ResetScriptCounters,"Player status panel","clears selected player script statuses and an optional timed counter"
