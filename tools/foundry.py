@@ -632,7 +632,10 @@ def scale_report():
         sp = os.path.join(OUT, func, "stages.json")
         if not os.path.exists(sp):
             continue
-        st = json.load(open(sp))
+        try:
+            st = json.load(open(sp))
+        except ValueError:
+            continue
         x = by.setdefault(b, {"n": 0, "m": 0, "insns": 0, "minsns": 0, "named": 0})
         x["n"] += 1
         x["insns"] += int(insns)
@@ -668,9 +671,21 @@ def scale_report():
 def committable():
     """Matched functions not yet in src/: (func, source file)."""
     out = []
-    for sp in glob.glob(os.path.join(OUT, "sub_*", "stages.json")):
-        func = os.path.basename(os.path.dirname(sp))
-        st = json.load(open(sp))
+    seen = set()
+    for rp in glob.glob(os.path.join(OUT, "sub_*", "result.txt")):
+        func = os.path.basename(os.path.dirname(rp))
+        sp = os.path.join(OUT, func, "stages.json")
+        try:
+            st = json.load(open(sp)) if os.path.exists(sp) else None
+        except ValueError:
+            st = None
+        if st is None:
+            # the worker's own MATCH; integrate re-checks the file before committing it
+            first = open(rp).readline()
+            if not re.match(rf"RESULT {func} MATCH\b", first):
+                continue
+            st = {"stage": "matched by worker", "checks": len(open(os.path.join(OUT, func, "checks.tsv")).readlines())
+                  if os.path.exists(os.path.join(OUT, func, "checks.tsv")) else None}
         if not st["stage"].startswith("matched") or "disagrees" in st["stage"]:
             continue
         if os.path.exists(os.path.join(ROOT, "src", "fn", func + ".c")):
