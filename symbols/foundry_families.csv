@@ -237,3 +237,4 @@ addr,function,name,family,note
 0811D428,sub_0811D428,SceneActorStyle_Initialize,"SceneActorStyle","initializes embedded style parameters and clears its four entries"
 0811D4AC,sub_0811D4AC,ActorStats_ConfigureScaledParameters,"ActorStats","initializes scaled limits and six supplied parameters"
 0811DAD4,sub_0811DAD4,StateFlags_TestIndexedFlag,"StateFlags","tests indexed state bit with a global override"
+0811DB84,sub_0811DB84,MotionTween_Advance,"MotionTween","advance delayed value and coordinate interpolation"
