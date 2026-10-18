@@ -414,3 +414,4 @@ addr,function,name,family,note
 08169EDC,sub_08169EDC,StatusPanel_ResetSelectionAnimations,"StatusPanel","clears three animation flags and loads selection keyframes"
 0816A1E0,sub_0816A1E0,StatusPanel_UpdateGaugePosition,"StatusPanel","maps current plus increment onto a 79-pixel gauge"
 0816A25C,sub_0816A25C,StatusPanel_GetDirectionAxis,"StatusPanel","classifies shifted direction into zero, one, or two"
+0816A8E0,sub_0816A8E0,ScenePanel_UpdateDetail,"ScenePanel","confirms an amount into account and totals or cancels detail selection"
