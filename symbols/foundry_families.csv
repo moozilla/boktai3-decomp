@@ -434,3 +434,4 @@ addr,function,name,family,note
 0816E1E0,sub_0816E1E0,InventoryGrid_FinishNumberPhase,"InventoryGrid","hides number digits and returns to inventory selection"
 0816E2C8,sub_0816E2C8,MenuTransition_BeginSelectedWidget,"MenuTransition","starts selected widget transition from fixed coordinates"
 0816E390,sub_0816E390,SceneMenuPanel_FinishMotionDelay,"Scene menu panel","waits eight ticks after motion then transitions palette and callback"
+0816E440,sub_0816E440,MenuTransition_UpdateTimedMessage,"MenuTransition","dismisses a timed message and restores menu transition"
