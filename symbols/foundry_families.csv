@@ -225,3 +225,4 @@ addr,function,name,family,note
 0811AD8C,sub_0811AD8C,Terrain_GetCellClearance,"TerrainColumn","subtracts terrain cell height from z plus 96"
 0811ADF0,sub_0811ADF0,Terrain_GetHeightAtPosition,"Terrain","reads terrain height for fixed-point X/Z"
 0811B2FC,sub_0811B2FC,SpatialIndex_InsertEntry,"SpatialIndex","prepends entry to one of two horizontal bucket lists"
+0811B498,sub_0811B498,Bounds_TestOverlap,"Bounds","tests overlap of three-dimensional axis-aligned bounds"
