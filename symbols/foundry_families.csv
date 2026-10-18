@@ -264,3 +264,4 @@ addr,function,name,family,note
 081258DC,sub_081258DC,PairSlotPool_Allocate,"PairSlotPool","allocates one of two bitmap-tracked slots"
 08125E74,sub_08125E74,EffectSlot_Release,"EffectSlotPool","clears the slot bitmap and removes its effect"
 08126348,sub_08126348,SpriteParticle_CreateVariant4384,"SpriteParticle","creates a randomized sprite particle using resource 4384"
+08126398,sub_08126398,SpriteParticle_ForwardCreate,"SpriteParticle","forwards all eighteen particle creation arguments"
