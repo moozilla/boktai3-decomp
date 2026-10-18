@@ -629,3 +629,4 @@ addr,function,name,family,note
 0811C5F8,sub_0811C5F8,ActorStats_ApplyPendingIncrement,"ActorStats","applies a pending increment and clamps to a limit"
 0811C67C,sub_0811C67C,ActorResource_SelectElementResource,"ActorResource","selects a resource from link element or equipped categories"
 0811CBB4,sub_0811CBB4,ScenePalette_RefreshOnFlags,"ScenePalette","refreshes selected colors under game-state or engine flags"
+0811D0C4,sub_0811D0C4,ActorStats_ApplyPendingDamage,"ActorStats","applies modified damage and sets the depleted flag"
