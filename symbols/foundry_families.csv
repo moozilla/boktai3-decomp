@@ -546,3 +546,4 @@ addr,function,name,family,note
 080B6538,sub_080B6538,SceneActorControl_TryBeginNearbyBehavior16,"SceneActorControl","conditionally begins behavior 16 using target angle and near range"
 080F1CC4,sub_080F1CC4,SceneActor_RampColorRedHigh,"SceneActor color cycle","ramp red channel from sixteen to twenty-four"
 080F1E00,sub_080F1E00,SceneActor_LowerColorRedPeak,"SceneActor color cycle","lower red channel from thirty-one to twenty-four"
+080F8010,sub_080F8010,ActorPhase_UpdateAcceleratingTrail,"ActorPhase","decrements an angle with increasing speed then enters phase 52"
