@@ -872,3 +872,4 @@ addr,function,name,family,note
 081806A0,sub_081806A0,SpriteComponent_ConfigureCollider,"SpriteComponent","configure embedded collider with two zero parameters"
 081806BC,sub_081806BC,SpriteComponent_GetCollisionStatus,"SpriteComponent","read signed collision status set by embedded collider callback"
 081806C4,sub_081806C4,SceneMotion_InitState,"SceneMotion (tentative; distinct from preceding sprite component)","clear position, create task and reset active state"
+081806F0,sub_081806F0,ProximityVolume_ContainsPlayer,"ProximityVolume","tests the player position against two volume predicates"
