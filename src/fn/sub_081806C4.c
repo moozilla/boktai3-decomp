@@ -1,4 +1,3 @@
-#define SceneMotion_InitState sub_081806C4
 #define SceneMotion_CreateTask FrostEmitter_Create
 #include "global.h"
 struct SceneMotion {
@@ -14,7 +13,7 @@ static inline void ClearPosition(void *destination, u32 *source)
     *source = 0;
     CpuSet(source, destination, 0x05000002);
 }
-void *sub_081806C4(struct SceneMotion *motion)
+void *SceneMotion_InitState(struct SceneMotion *motion)
 {
     u32 *position = motion->position;
     u32 zero;

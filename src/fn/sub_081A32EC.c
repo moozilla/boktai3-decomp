@@ -1,7 +1,6 @@
 #include "global.h"
-#define EffectVariant_SetProperties sub_081A32EC
-#define gEffectVariantValues        gUnk_08611EB8
-#define gEffectVariantFlagModes     gUnk_08611EF8
+#define gEffectVariantValues    gUnk_08611EB8
+#define gEffectVariantFlagModes gUnk_08611EF8
 extern const u32 gUnk_08611EB8[];
 extern const s32 gUnk_08611EF8[];
 struct EffectVariant {
@@ -11,7 +10,7 @@ struct EffectVariant {
     u8 unknown7[9];
     u16 value;
 };
-void sub_081A32EC(struct EffectVariant *effect, s32 variant)
+void EffectVariant_SetProperties(struct EffectVariant *effect, s32 variant)
 {
     s32 index = (variant & 0xFF) >> 4;
     effect->variant = variant;

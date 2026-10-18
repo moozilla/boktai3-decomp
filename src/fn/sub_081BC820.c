@@ -8,7 +8,7 @@ void DarkLoan_HideSprites(u8 *);
 void Anim_SetKeyframes(u8 *, u8 *, u32, u32, u32);
 void Anim_LoadKeyframe(u8 *, u8 *, u32, u32);
 void sub_081BC3B4(u8 *);
-void sub_081BC5F0(u8 *);
+void StatGauge_DrawPreview(u8 *);
 void sub_081BC468(u8 *);
 void AnimData_SelectPaletteBank(u8 *, u32);
 void MessageWindow_ShowMessage(u32);
@@ -42,7 +42,7 @@ void sub_081BC820(u8 *s)
         initial = (u32 *)((u8 *)initial + 0x60);
     } while (--i >= 0);
     sub_081BC3B4(s);
-    sub_081BC5F0(s);
+    StatGauge_DrawPreview(s);
     *(u32 *)(s + 0x5A0) &= (mask2 = ~1);
     q = (u32 *)(resource + 0x5A0);
     p = (u32 *)(resource + 0x3C0);

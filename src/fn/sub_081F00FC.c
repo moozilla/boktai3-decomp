@@ -1,6 +1,4 @@
 #include "global.h"
-#define SceneActors_AdvanceToHorizontalTween sub_081F00FC
-#define SceneMover_InterpolateScreenX sub_081EEE34
 struct SceneActorTween {
     u8 pad0[0x90];
     u32 frame;
@@ -17,7 +15,7 @@ struct SceneActorTween {
     u8 pad104[0x4B8];
     u32 completed;
 };
-void sub_081EEE34(void);
+void SceneMover_InterpolateScreenX(void);
 void sub_081EEECC(void);
 u32 Trigger_ConsumePending(void *, u32);
 static inline u8 ConsumeEntry(struct SceneActorTween *p)
@@ -30,8 +28,11 @@ static inline u8 ConsumeEntry(struct SceneActorTween *p)
     }
     return FALSE;
 }
-static inline void SetCallback(void (*v)(void), void (**a)(void)) { *a = v; }
-void sub_081F00FC(struct SceneActorTween *p)
+static inline void SetCallback(void (*v)(void), void (**a)(void))
+{
+    *a = v;
+}
+void SceneActors_AdvanceToHorizontalTween(struct SceneActorTween *p)
 {
     if (ConsumeEntry(p) == 1) {
         SetCallback(sub_081EEECC, &p->callback);

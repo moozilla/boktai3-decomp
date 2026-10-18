@@ -1,6 +1,4 @@
 #include "global.h"
-#define Ooze_UpdateAttackDelay sub_08205AD0
-#define Ooze_BeginAttack       sub_08205B70
 struct Ooze {
     u8 pad0[0x104];
     void (*state)(void);
@@ -12,8 +10,8 @@ struct Ooze {
     u32 useDelayTable;
 };
 s32 Mod(s32, s32);
-void sub_08205B70(void);
-s32 sub_08205AD0(struct Ooze *p)
+void Ooze_BeginAttack(void);
+s32 Ooze_UpdateAttackDelay(struct Ooze *p)
 {
     if (p->useDelayTable) {
         if (p->timer > p->delays[p->delayIndex]) {

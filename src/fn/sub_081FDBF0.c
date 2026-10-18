@@ -1,6 +1,5 @@
 #include "global.h"
-#define OrbitEffect_UpdateTrailSprite sub_081FDBF0
-#define gOrbitEffectSineTable         gUnk_086149C4
+#define gOrbitEffectSineTable gUnk_086149C4
 struct OrbitEffectPosition {
     s16 x, y, z, pad;
 };
@@ -14,7 +13,7 @@ struct OrbitTrailSprite {
     s16 angle, radius;
 };
 extern const s16 gUnk_086149C4[];
-void sub_081FDBF0(struct OrbitTrailSprite *p)
+void OrbitEffect_UpdateTrailSprite(struct OrbitTrailSprite *p)
 {
     s32 radius;
     u32 age = p->age + 1;

@@ -85,7 +85,7 @@ void SceneNpc_OnDestroy(void);
 void Actor_OnIdleUpdate(void);
 void Actor_OnHiddenIdleUpdate(void);
 void sub_081CEFCC(void);
-void sub_081CF84C(void);
+void SceneNpc_PlayAnimation12(void);
 void Actor_OnConfiguredAnimationUpdate(void);
 static inline void setHandler(void *fn, void **slot)
 {
@@ -248,7 +248,7 @@ void SceneNpc_CreateFromScript(void)
             npc->mode = mode;
             npc->field14 = 0;
             npc->field8 = 1;
-            updateC = sub_081CF84C;
+            updateC = SceneNpc_PlayAnimation12;
             npc->state = 0x16;
             npc->update = updateC;
             npc->field10 = 0;

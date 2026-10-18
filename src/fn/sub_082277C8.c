@@ -1,6 +1,3 @@
-#define CameraTracking_Update                 sub_082277C8
-#define CameraTracking_CalculateDistanceScale sub_0822776C
-#define CameraTracking_UpdatePosition         sub_08227624
 #define Camera_SetFollowMode Camera_ResetOffset
 #include "global.h"
 struct CameraPosition {
@@ -13,22 +10,22 @@ struct CameraTracking {
     s32 active, blend;
     s32 followMode;
 };
-s32 sub_0822776C(struct CameraTracking *);
-void sub_08227624(struct CameraTracking *);
+s32 Camera_CalculateDistanceScale(struct CameraTracking *);
+void CameraTracking_UpdatePosition(struct CameraTracking *);
 void Camera_ResetOffset(s32);
 static inline u32 testRequest(u32 *requests, u32 mask)
 {
     return *requests & mask;
 }
-void sub_082277C8(struct CameraTracking *tracking)
+void CameraTracking_Update(struct CameraTracking *tracking)
 {
     if (testRequest(&tracking->requests, 1)) {
         if (!tracking->active) {
             tracking->active = 1;
-            tracking->scale = sub_0822776C(tracking);
+            tracking->scale = Camera_CalculateDistanceScale(tracking);
             tracking->blend = 0;
         }
-        sub_08227624(tracking);
+        CameraTracking_UpdatePosition(tracking);
         if (tracking->blend < 128)
             tracking->blend++;
     } else {

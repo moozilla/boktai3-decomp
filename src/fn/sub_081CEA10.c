@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneNpc_EnterTriggeredMode sub_081CEA10
 struct SceneNpc {
     u8 unknown0[4];
     u8 mode, commandPhase, unknown6, pending, entered;
@@ -10,7 +9,7 @@ struct SceneNpc {
     u8 previousMode;
 };
 u32 Trigger_ConsumePending(void *, u32);
-void sub_081CEA10(void *context, struct SceneNpc *p)
+void SceneNpc_EnterTriggeredMode(void *context, struct SceneNpc *p)
 {
     if (p->entered) {
         p->entered = 0;

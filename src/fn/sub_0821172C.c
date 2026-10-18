@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define ForgingBook_CountDiscoveredCategoryEntries sub_0821172C
-
 struct ForgingBook {
     u8 unknown[0xB84];
     u8 entries[1];
@@ -11,7 +9,7 @@ s32 ForgingBook_GetCategoryEntryOffset(s32);
 u32 ForgingBook_IsItemDiscovered(s32);
 u32 ForgingBook_IsWeaponDiscovered(s32);
 
-s32 sub_0821172C(struct ForgingBook *book, s32 category)
+s32 ForgingBook_CountDiscoveredCategoryEntries(struct ForgingBook *book, s32 category)
 {
     s32 count = ForgingBook_GetCategoryEntryCount(category);
     s32 offset = ForgingBook_GetCategoryEntryOffset(category);

@@ -1,6 +1,5 @@
 #include "global.h"
 #include "display_animation.h"
-#define SceneSequence_UpdateCountdown sub_08204E5C
 struct SceneCountdownSequence {
     u8 unknown0[0x108];
     s32 (*update)(struct SceneCountdownSequence *);
@@ -12,19 +11,19 @@ struct SceneCountdownSequence {
     u8 unknown133[0x25];
     void *resource;
 };
-void sub_08204C3C(struct SceneCountdownSequence *);
-s32 sub_08204D84(struct SceneCountdownSequence *);
+void EnemyD459_FireProjectile(struct SceneCountdownSequence *);
+s32 EnemyD459_UpdateAttackTiming(struct SceneCountdownSequence *);
 void Anim_RestartSequence(struct DisplaySequenceState *, void *, u32, u32, u32);
-s32 sub_08204E5C(struct SceneCountdownSequence *p)
+s32 SceneSequence_UpdateCountdown(struct SceneCountdownSequence *p)
 {
     s16 *count = &p->countdown;
     if (*count > 0) {
         if (*count == 40)
-            sub_08204C3C(p);
+            EnemyD459_FireProjectile(p);
         --*count;
     } else {
         Anim_RestartSequence(&p->sequence, p->resource, 2, p->variant, 0);
-        p->update = sub_08204D84;
+        p->update = EnemyD459_UpdateAttackTiming;
     }
     return 0;
 }

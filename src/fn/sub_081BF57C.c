@@ -1,5 +1,4 @@
 #include "global.h"
-#define Storage_InitEntries sub_081BF57C
 /* Storage menu; initializes six identity-mapped entries and option e. */
 struct Storage {
     u8 pad0[0x1754];
@@ -12,7 +11,7 @@ struct Storage {
 };
 s32 Script_GetValue(void);
 s32 Script_SeekToKeyword(u32);
-void sub_081BF57C(struct Storage *p)
+void Storage_InitEntries(struct Storage *p)
 {
     s32 i;
     s32 value;
@@ -24,6 +23,8 @@ void sub_081BF57C(struct Storage *p)
         i++;
     } while (i < p->entryCount);
     value = Script_SeekToKeyword(0x65);
-    if (value) p->optionE = Script_GetValue();
-    else p->optionE = value;
+    if (value)
+        p->optionE = Script_GetValue();
+    else
+        p->optionE = value;
 }

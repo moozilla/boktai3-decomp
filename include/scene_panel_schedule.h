@@ -17,11 +17,11 @@ struct ScenePanelScheduleView {
     s16 parameter;
 };
 void *AnimatedHazard_Create(const void *, s32, s32);
-void sub_081A376C(const void *, u32, u32, u32);
+void DirectionBurst_Emit(const void *, u32, u32, u32);
 void *Hresvelgr_CreateShotPool(u16, u32, u32);
-void *sub_0819AD94(u16, const void *);
+void *SceneEffect_CreateMovingTask(u16, const void *);
 void *ScenePanelEffect_Create(u16, s32);
-void *sub_0819AA8C(u16, const void *);
+void *SceneEffect_CreateEntryTask(u16, const void *);
 void SceneBurstEmitter_RequestCleanup(void *);
 void SceneOrbitHazard_Activate(void *);
 void sub_08190B10(void *, const void *, const void *);

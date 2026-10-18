@@ -1,7 +1,10 @@
 #include "global.h"
-#define ResourceSprite_CopyEntries sub_081BB060
-struct ResourceSpriteEntry { s32 values[4]; };
-struct ResourceSpriteHeader { u32 words[8]; };
+struct ResourceSpriteEntry {
+    s32 values[4];
+};
+struct ResourceSpriteHeader {
+    u32 words[8];
+};
 struct ResourceSprite {
     u8 pad0[0x18];
     u8 sprite[0x60];
@@ -11,7 +14,8 @@ struct ResourceSprite {
     s16 entryCount;
     struct ResourceSpriteEntry entries[16];
 };
-void sub_081BB060(struct ResourceSprite *track, u32 count, struct ResourceSpriteEntry *keys)
+void ResourceSprite_CopyEntries(struct ResourceSprite *track, u32 count,
+                                struct ResourceSpriteEntry *keys)
 {
     s32 i;
     struct ResourceSpriteEntry *dest;

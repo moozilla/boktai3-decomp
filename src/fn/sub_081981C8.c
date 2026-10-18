@@ -1,6 +1,5 @@
-#define ShadowActor_UpdateThreeStageAction sub_081981C8
-#define gShadowActorActionVectors          gUnk_0824F60C
-#define gShadowActorMirroredActionVectors  gUnk_0824F624
+#define gShadowActorActionVectors         gUnk_0824F60C
+#define gShadowActorMirroredActionVectors gUnk_0824F624
 #include "global.h"
 
 struct ShadowActionVector {
@@ -14,7 +13,7 @@ struct ShadowActionRegion {
     struct ShadowActionVector vector;
     u8 unknown1C[0x44];
 };
-/* Same tentative actor layout as sub_0819804C. */
+/* Same tentative actor layout as ShadowActor_UpdateTransition. */
 struct ShadowActor {
     u8 unknown0[8];
     u8 animationData[0x20];
@@ -43,7 +42,7 @@ static inline void ChangeState(struct ShadowActor *actor, u32 state)
     actor->phase = 0;
 }
 
-void sub_081981C8(struct ShadowActor *actor)
+void ShadowActor_UpdateThreeStageAction(struct ShadowActor *actor)
 {
     struct ShadowActionRegion *region;
     const struct ShadowActionVector *vector;

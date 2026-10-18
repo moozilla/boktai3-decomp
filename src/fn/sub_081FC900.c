@@ -1,4 +1,3 @@
-#define SceneProjectile_InitSlot sub_081FC900
 #include "global.h"
 struct ProjectileVector {
     s32 x : 16, y : 16, z : 16, pad : 16;
@@ -26,7 +25,7 @@ struct SceneProjectile {
     struct ProjectileCollider attack;
     struct ProjectileCollider body;
 };
-void sub_081FD3D8(struct SceneProjectileConfig *);
+void Projectile_InitParameters(struct SceneProjectileConfig *);
 s32 AnimData_Load(void *, u32);
 void Sprite_InitUnlinked(void *, void *, s32);
 void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
@@ -34,26 +33,26 @@ void Collider_SetCallback(void *, void *, void *);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Collider_SetBodyProperties(void *, s32, s32, s32);
 s32 Collider_Refresh(void *);
-void sub_081FC800(void);
-void sub_081FC8BC(void);
+void SceneProjectile_RespondToContact(void);
+void SlotActor_ResetOnFlags(void);
 static inline void ClearProjectileScratch(void *dest)
 {
     u32 zero = 0;
     CpuSet(&zero, dest, 0x05000002);
 }
-void sub_081FC900(void *pool, struct SceneProjectile *p, s32 index)
+void SceneProjectile_InitSlot(void *pool, struct SceneProjectile *p, s32 index)
 {
     struct ProjectileVector size, offset;
     struct SceneProjectileConfig *config = (void *)((u8 *)p + 0x28);
     struct ProjectileCollider *collider;
-    sub_081FD3D8(config);
+    Projectile_InitParameters(config);
     p->age = 0;
     ClearProjectileScratch(p->scratch);
     AnimData_Load(p->animation, config->animation);
     Sprite_InitUnlinked(p->sprite, p->animation, 1);
     collider = &p->attack;
     Collider_Init(collider, 0, 0x2001, 0, 16, (u8 *)p + 0x50, (u8 *)p + 0x58);
-    Collider_SetCallback(collider, sub_081FC800, p);
+    Collider_SetCallback(collider, SceneProjectile_RespondToContact, p);
     Collider_SetAttackProperties(collider, config->attack1C, config->attack20, config->attack14,
                                  config->attack18, config->attack24);
     collider = &p->body;
@@ -64,7 +63,7 @@ void sub_081FC900(void *pool, struct SceneProjectile *p, s32 index)
     offset.y = 0;
     offset.z = 0;
     Collider_Init(collider, 0, 0x4001, 0, 16, &size, &offset);
-    Collider_SetCallback(collider, sub_081FC8BC, p);
+    Collider_SetCallback(collider, SlotActor_ResetOnFlags, p);
     Collider_SetBodyProperties(collider, 0, 0, 0);
     Collider_Refresh(collider);
     collider->flags |= 4;

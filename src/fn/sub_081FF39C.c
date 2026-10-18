@@ -1,4 +1,3 @@
-#define HomingProjectile_BeginImpact sub_081FF39C
 #include "global.h"
 
 /* Tentative projectile layout, observed by its primary collision callback. */
@@ -26,7 +25,7 @@ struct HomingProjectile {
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);
 
-void sub_081FF39C(void *a, void *b, struct HomingProjectile *p)
+void HomingProjectile_BeginImpact(void *a, void *b, struct HomingProjectile *p)
 {
     u8 *params = (u8 *)p + 0xec;
     s32 sequence;

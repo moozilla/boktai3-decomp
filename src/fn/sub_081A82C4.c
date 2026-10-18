@@ -9,8 +9,8 @@ struct S {
     u32 c4;
 };
 void Vanargand_StopActionSequence(void *);
-void sub_081A7C94(void *);
-void sub_081A7D80(void *);
+void ScenePanel_UpdatePairConditions(void *);
+void ScenePanel_ApplyPairTransition(void *);
 static inline u8 chk(struct S *p)
 {
     u8 *q = &p->b0;
@@ -30,8 +30,8 @@ void Vanargand_UpdateTimedMode10(struct S *p)
         p->st = v;
     }
     if (p->af != 0) {
-        sub_081A7C94(q);
-        sub_081A7D80(q);
+        ScenePanel_UpdatePairConditions(q);
+        ScenePanel_ApplyPairTransition(q);
     }
     p->c4++;
 }

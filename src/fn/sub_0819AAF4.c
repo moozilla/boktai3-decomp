@@ -1,5 +1,4 @@
-#define DirectionalActor_GetForwardPosition sub_0819AAF4
-#define gSineTable                          gUnk_086149C4
+#define gSineTable gUnk_086149C4
 #include "global.h"
 struct DirectionalActor {
     u8 pad0[0xCC];
@@ -15,7 +14,7 @@ static inline s32 scale(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
-void sub_0819AAF4(struct DirectionalActor *p, struct ForwardPosition *out)
+void DirectionalActor_GetForwardPosition(struct DirectionalActor *p, struct ForwardPosition *out)
 {
     const s16 *table = gSineTable;
     u32 angle = p->angle;

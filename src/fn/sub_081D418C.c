@@ -1,6 +1,5 @@
 #include "global.h"
 // Family and descriptive names are tentative interpretations of static code.
-#define PaletteTransition_ResetBuffers sub_081D418C
 struct PaletteTransition {
     u8 pad0[0x1c];
     u32 parameter;
@@ -14,7 +13,7 @@ struct PaletteTransition {
 };
 void sub_081D48D8(struct PaletteTransition *, u32);
 void sub_081D409C(struct PaletteTransition *, u32);
-void sub_081D418C(struct PaletteTransition *p)
+void PaletteTransition_ResetBuffers(struct PaletteTransition *p)
 {
     u16 *source;
     s32 i;
@@ -25,8 +24,10 @@ void sub_081D418C(struct PaletteTransition *p)
         sub_081D409C(p, p->parameter);
         CpuSet(source, p->destination, 0x04000080);
         value = 0x7fff;
-        for (i = 15; i >= 0; i--) p->white[i] = value;
+        for (i = 15; i >= 0; i--)
+            p->white[i] = value;
         value = 0;
-        for (i = 15; i >= 0; i--) ((u16 *)((u8 *)source + 0x420))[i] = value;
+        for (i = 15; i >= 0; i--)
+            ((u16 *)((u8 *)source + 0x420))[i] = value;
     }
 }

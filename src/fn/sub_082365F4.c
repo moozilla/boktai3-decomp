@@ -1,4 +1,3 @@
-#define PaletteTransition_UpdateFadeOut sub_082365F4
 #define PaletteTransition_BlendFromGray RadialBurstEffect_BlendSpritePalette
 #include "global.h"
 struct PaletteTransition {
@@ -14,7 +13,7 @@ struct PaletteTransition {
     void *owner;
 };
 void RadialBurstEffect_BlendSpritePalette(struct PaletteTransition *);
-void sub_082365F4(struct PaletteTransition *transition)
+void PaletteTransition_UpdateFadeOut(struct PaletteTransition *transition)
 {
     if (transition->alpha <= 5)
         transition->flags |= 0x400;

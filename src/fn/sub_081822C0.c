@@ -1,5 +1,3 @@
-#define Armor_StartFullPaletteRestoreDelay sub_081822C0
-#define Armor_RestoreBasePalettes sub_081816B0
 #include "global.h"
 
 struct ArmorPaletteController {
@@ -16,19 +14,19 @@ struct ArmorPaletteOwner {
     struct ArmorPaletteController palette;
 };
 
-void sub_081816B0(struct ArmorPaletteController *);
+void ActorPalette_RestoreSelectedBanks(struct ArmorPaletteController *);
 void Armor_UpdatePaletteRestoreDelay(struct ArmorPaletteController *);
 void Armor_CopyScenePalette(u32);
 
 /* Tentative: apply the scene palette to all four banks, then delay restoration. */
-void sub_081822C0(struct ArmorPaletteOwner *owner)
+void Armor_StartFullPaletteRestoreDelay(struct ArmorPaletteOwner *owner)
 {
     struct ArmorPaletteController *palette = &owner->palette;
     u32 offset;
     void (*update)(struct ArmorPaletteController *);
     void (*completion)(struct ArmorPaletteController *);
 
-    Armor_RestoreBasePalettes(palette);
+    ActorPalette_RestoreSelectedBanks(palette);
     offset = (palette->primaryBank << 5) + 0x208;
     Armor_CopyScenePalette((u32)palette + offset);
     offset = (palette->primaryBank << 5) + 0x228;
@@ -38,7 +36,7 @@ void sub_081822C0(struct ArmorPaletteOwner *owner)
     offset = (palette->secondaryBank << 5) + 0x208;
     Armor_CopyScenePalette((u32)palette + offset);
     update = Armor_UpdatePaletteRestoreDelay;
-    completion = Armor_RestoreBasePalettes;
+    completion = ActorPalette_RestoreSelectedBanks;
     palette->update = update;
     palette->completion = completion;
     palette->restoreTimer = 0;

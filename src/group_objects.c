@@ -187,7 +187,7 @@ int sub_0800FC28(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
     {
         void *first = gUnk_030042E4 + 0x5A60;
         void *second = gUnk_030042E4 + 0x5AA0;
-        sub_08221110(m->palette, first, second, 63, 6);
+        Palette_InterpolateBanks(m->palette, first, second, 63, 6);
     }
     p = m->pieces;
     r = p;
@@ -243,7 +243,7 @@ int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
     {
         void *first = gUnk_030042E4 + 0x5A60;
         void *second = gUnk_030042E4 + 0x5AA0;
-        sub_08221110(m->palette, first, second, 63, 6);
+        Palette_InterpolateBanks(m->palette, first, second, 63, 6);
     }
     p = m->pieces;
     r = p;
@@ -677,7 +677,7 @@ int GroupObjects_Update(struct GroupObjects *m)
         if (m->paletteActive >= 0) {
             void *first = gUnk_030042E4 + 0x5A60;
             void *second = gUnk_030042E4 + 0x5AA0;
-            sub_08221110(m->palette, first, second, m->paletteMask, 6);
+            Palette_InterpolateBanks(m->palette, first, second, m->paletteMask, 6);
         }
         p = m->pieces;
         for (i = 0; i < 16; i++, p++) {
@@ -710,7 +710,7 @@ int GroupObjects_Initialize(struct GroupObjects *m, int id)
     {
         void *first = gUnk_030042E4 + 0x5A60;
         void *second = gUnk_030042E4 + 0x5AA0;
-        sub_08221110(m->palette, first, second, 64, 6);
+        Palette_InterpolateBanks(m->palette, first, second, 64, 6);
     }
     p = m->pieces;
     for (i = 0; i < 16; i++, p++)

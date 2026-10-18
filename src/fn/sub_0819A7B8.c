@@ -1,4 +1,3 @@
-#define SceneEffect_CreateLinkedEntry sub_0819A7B8
 #include "global.h"
 struct SceneEffectLink {
     u8 unknown[0x24];
@@ -16,24 +15,24 @@ struct EffectEntryConfig {
     u32 unknown8;
     u8 rest[0x14];
 };
-void sub_0819A698(struct SceneEffectLink *);
-void sub_081FE92C(struct EffectEntryConfig *);
-s32 sub_081FE760(struct EffectEntryConfig *, void *);
-void sub_081FEA80(s32);
-void sub_0819A7B8(struct SceneEffectLink *p)
+void LinkEffect_UpdateEndpoints(struct SceneEffectLink *);
+void RisingActorConfig_Initialize(struct EffectEntryConfig *);
+s32 SunOrb_CreateAtPosition(struct EffectEntryConfig *, void *);
+void RisingActorManager_BeginRaise(s32);
+void SceneEffect_CreateLinkedEntry(struct SceneEffectLink *p)
 {
     struct EffectEntryConfig config;
     s32 entry;
     p->entry = 0xFF;
     p->secondary = -1;
-    sub_0819A698(p);
-    sub_081FE92C(&config);
+    LinkEffect_UpdateEndpoints(p);
+    RisingActorConfig_Initialize(&config);
     config.flags = 0;
     config.kind = 1;
     config.unknown8 = 0;
-    entry = sub_081FE760(&config, p->entryData);
+    entry = SunOrb_CreateAtPosition(&config, p->entryData);
     if (entry >= 0) {
-        sub_081FEA80(entry);
+        RisingActorManager_BeginRaise(entry);
         p->entry = entry;
     }
     p->flags |= -1;

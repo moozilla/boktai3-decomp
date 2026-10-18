@@ -1,5 +1,4 @@
 #include "global.h"
-#define MenuSprites_SetFlagBits sub_081DE5E4
 struct MenuSpriteFlags {
     u32 flags;
     u8 pad4[0x5c];
@@ -16,7 +15,7 @@ struct MenuSprites {
     u8 pad1BC[0x84];
     struct MenuSpriteFlags entries[12];
 };
-void sub_081DE5E4(struct MenuSprites *p)
+void MenuSprites_SetFlagBits(struct MenuSprites *p)
 {
     u32 one = 1;
     struct MenuSpriteFlags *entry = p->entries;

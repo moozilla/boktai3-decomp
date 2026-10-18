@@ -1,5 +1,3 @@
-#define OverlaySlot_Initialize sub_081FB82C
-#define SlotMotion_Initialize  sub_081FBDE0
 #include "global.h"
 #include "terrain_overlay.h"
 struct OverlaySlot {
@@ -16,17 +14,17 @@ struct OverlayManager {
     u8 task[0x1c];
     u8 animation[0x1c];
 };
-void sub_081FBDE0(void *);
+void SlotMotion_Initialize(void *);
 void Sprite_InitUnlinked(struct TerrainOverlayDrawable *, void *, s32);
 static inline void clearPosition(void *target, u32 *source, u32 flags)
 {
     *source = 0;
     CpuSet(source, target, flags);
 }
-void sub_081FB82C(struct OverlayManager *manager, struct OverlaySlot *slot)
+void OverlaySlot_Initialize(struct OverlayManager *manager, struct OverlaySlot *slot)
 {
     u32 zero;
-    sub_081FBDE0(slot->animation);
+    SlotMotion_Initialize(slot->animation);
     slot->flags = 0;
     slot->field5C = 0;
     slot->field60 = 0;

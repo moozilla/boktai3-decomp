@@ -2,7 +2,7 @@
 #include "contact_actor.h"
 #include "player.h"
 void ContactActor_InitializeSlot(struct ContactActorPool *, struct ContactActor *, s32);
-void sub_08221110(void *, void *, void *, s32, s32);
+void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
 s32 ContactActorPool_Initialize(struct ContactActorPool *pool, u32 mode, u32 resourceId,
                                 u32 healthId)
 {
@@ -22,7 +22,7 @@ s32 ContactActorPool_Initialize(struct ContactActorPool *pool, u32 mode, u32 res
         u8 *bank = gUnk_030042E4;
         void *first = bank + 0x5A60;
         void *second = bank + 0x5AA0;
-        sub_08221110((u8 *)pool + 0x1700, first, second, 64, 6);
+        Palette_InterpolateBanks((u8 *)pool + 0x1700, first, second, 64, 6);
     }
     slot = &pool->slots[0];
     index = 0;

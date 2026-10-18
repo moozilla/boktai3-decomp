@@ -1,4 +1,3 @@
-#define Armor_UpdateFacingActionSequence sub_08186618
 #include "global.h"
 
 /* Tentative Armor-family sequence: face target, action 25, delay, action 43. */
@@ -28,7 +27,7 @@ s32 Math_Atan2(s32, s32);
 u32 ActorController_StartAlternateTurn(struct ArmorActor *, u32);
 s32 sub_08184FE8(struct ArmorActor *, s32);
 
-void sub_08186618(struct ArmorActor *p)
+void Armor_UpdateFacingActionSequence(struct ArmorActor *p)
 {
     u8 *q = &p->phase;
     u8 r;

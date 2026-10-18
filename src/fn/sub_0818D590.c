@@ -1,4 +1,3 @@
-#define Armor_AcceleratePartReturnTurn sub_0818D590
 #include "global.h"
 #include "motion_0818.h"
 
@@ -9,7 +8,7 @@ static inline void finish(struct Motion0818Object *p, u32 one)
     p->flags119 |= one;
 }
 
-void sub_0818D590(struct Motion0818Object *p)
+void Armor_AcceleratePartReturnTurn(struct Motion0818Object *p)
 {
     u8 *parent = p->parent;
     s32 i;

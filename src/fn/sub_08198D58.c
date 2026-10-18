@@ -1,5 +1,3 @@
-#define SceneEffect_AllocateActor sub_08198D58
-#define SceneEffect_InitActor sub_08198B70
 #include "global.h"
 
 struct SceneEffectPool;
@@ -20,7 +18,7 @@ struct SceneEffectPool {
 void SceneEffect_InitActor(struct SceneEffectActor *, s32, s32);
 
 /* Tentative: claims the pool's single actor slot and initializes its mode. */
-struct SceneEffectActor *sub_08198D58(struct SceneEffectPool *pool, s32 mode, s32 flag)
+struct SceneEffectActor *SceneEffect_AllocateActor(struct SceneEffectPool *pool, s32 mode, s32 flag)
 {
     struct SceneEffectActor *actor = NULL;
     struct SceneEffectActor *result;

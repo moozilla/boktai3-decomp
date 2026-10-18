@@ -1,5 +1,4 @@
 #include "global.h"
-#define TimedEffect_UpdateShutdown sub_081A5100
 struct TimedEffect {
     u8 unknown0[0x18];
     u32 flags;
@@ -25,7 +24,7 @@ static inline void ClearWords(void *dest)
     u32 zero = 0;
     CpuSet(&zero, dest, 0x05000002);
 }
-void sub_081A5100(struct TimedEffect *p)
+void TimedEffect_UpdateShutdown(struct TimedEffect *p)
 {
     if (p->timer == 0) {
         p->state = 6;

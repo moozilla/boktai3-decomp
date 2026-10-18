@@ -14,7 +14,7 @@ struct InventoryGrid {
     struct InventoryNumberDigit digits[4];
 };
 s32 Div(s32, s32);
-void sub_08217EEC(void *, void *, u32);
+void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 void InventoryGrid_ShowNumber(struct InventoryGrid *s, s32 value,
                               struct InventoryNumberPosition *origin)
 {
@@ -52,7 +52,7 @@ void InventoryGrid_ShowNumber(struct InventoryGrid *s, s32 value,
                 digit->flags |= 1;
             else {
                 digit->flags &= ~1;
-                sub_08217EEC(&s->digits[i], s->digitResource, *number + 42);
+                SpriteDrawable_SelectTileFrame(&s->digits[i], s->digitResource, *number + 42);
                 digit->position = position;
                 position.x += 5;
             }

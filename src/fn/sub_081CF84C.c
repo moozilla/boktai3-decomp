@@ -1,9 +1,8 @@
-#define SceneNpc_PlayAnimation12 sub_081CF84C
 #include "global.h"
 #include "state_actor.h"
 
 s32 Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
-void sub_081CF84C(void *unused, struct StateActor *p)
+void SceneNpc_PlayAnimation12(void *unused, struct StateActor *p)
 {
     struct StateActorTag *tag = &p->tag;
     if (p->enter) {

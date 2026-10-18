@@ -1,6 +1,5 @@
 #include "global.h"
 #include "actor_state.h"
-#define ActorState_UpdateSelectedAnimation sub_0817B8BC
 #define ActorState_SelectAnimationPair ActorPosition_TestPath
 s32 ActorMovement_CanReachTarget(struct ActorState *);
 s32 SceneVolume_GetActivityState(struct ActorState *);
@@ -17,7 +16,7 @@ static inline u8 ConsumeTrigger(struct ActorState *p)
     }
     return 0;
 }
-void sub_0817B8BC(struct ActorStateOwner *owner)
+void ActorState_UpdateSelectedAnimation(struct ActorStateOwner *owner)
 {
     struct ActorState *p = &owner->actor;
     s32 result;

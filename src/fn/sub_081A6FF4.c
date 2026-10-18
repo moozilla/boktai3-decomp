@@ -1,4 +1,3 @@
-#define ScenePanel_InitAuxiliarySprite sub_081A6FF4
 #include "global.h"
 /* Tentative ScenePanel family; names describe observed state and sprite operations. */
 
@@ -22,7 +21,7 @@ struct ScenePanelAuxiliarySprite {
 s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 
-void sub_081A6FF4(u8 *panel, struct ScenePanelAuxiliarySprite *sprite)
+void ScenePanel_InitAuxiliarySprite_081A6FF4(u8 *panel, struct ScenePanelAuxiliarySprite *sprite)
 {
     struct ScenePanelAnimation *animation = &sprite->animation;
     u16 *scale;

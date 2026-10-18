@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08221110(void *, void *, void *, int, int);
+void Palette_InterpolateBanks(void *, void *, void *, int, int);
 void Registry2388_BlendPaletteBanks(u8 *a, u8 *b, u8 *c, int d, int e, int n)
 {
     u8 *alias;
@@ -11,7 +11,7 @@ void Registry2388_BlendPaletteBanks(u8 *a, u8 *b, u8 *c, int d, int e, int n)
         /* do-while(0) only keeps agbcc's block layout */
         do {
             alias = z;
-            sub_08221110(x, y, alias, d, e);
+            Palette_InterpolateBanks(x, y, alias, d, e);
             z += 0x20;
             y += 0x20;
             /* do-while(0) only keeps agbcc's block layout */

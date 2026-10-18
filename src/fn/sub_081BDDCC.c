@@ -1,9 +1,7 @@
-#define MenuPanel_FindEmptyOppositeHalf sub_081BDDCC
-#define MenuPanel_IsEntryEmpty sub_081BDAA8
 #include "global.h"
 struct MenuPanel;
-s32 sub_081BDAA8(struct MenuPanel *, s32);
-s32 sub_081BDDCC(struct MenuPanel *panel, u32 index)
+s32 MenuPanel_IsEntryEmpty(struct MenuPanel *, s32);
+s32 MenuPanel_FindEmptyOppositeHalf(struct MenuPanel *panel, u32 index)
 {
     s32 start, end, i;
     if (index <= 15) {
@@ -21,7 +19,7 @@ lower:
     end = 16;
 scan:
     for (i = start; i < end; i++) {
-        if (sub_081BDAA8(panel, i))
+        if (MenuPanel_IsEntryEmpty(panel, i))
             goto found;
     }
 none:

@@ -35,7 +35,7 @@ void ProximityEmitter_InitializeParticles(struct ProximityEmitter *input)
         particle = (void *)((u8 *)emitter + particleOffset);
         sub_08217DE0(particle, resourceAt(resource), 0);
         Effect_SetOrigin(particle, scale, scale);
-        sub_08217EEC(particle, resourceAt(resource), 2);
+        SpriteDrawable_SelectTileFrame(particle, resourceAt(resource), 2);
         Effect_SetPalette(particle, 1);
         {
             register u32 value asm("r1") = one;

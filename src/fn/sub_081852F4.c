@@ -11,7 +11,7 @@ u32 ActorController_StartModeThreeTurn(u8 *p, u32 v);
 u32 ActorController_StartModeOneTurn(u8 *p, u32 v);
 s32 sub_0821F7A8(void *, void *, struct CP *);
 u32 NavMesh_ConsumeProbeEvent(u16 *p);
-s32 sub_08185280(u8 *);
+s32 ActorController_IsNearTarget(u8 *);
 u32 sub_0821FB8C(void *, void *, u32, u32);
 
 void ActorController_UpdateTargetMovement(u8 *p, s32 a, s32 b)
@@ -27,7 +27,7 @@ void ActorController_UpdateTargetMovement(u8 *p, s32 a, s32 b)
         r = sub_0821F7A8(p + 0x18, p + 0x48, &pos);
         if (r == 1) {
             p[0xB3D] = r;
-        } else if (sub_08185280(p) == 0) {
+        } else if (ActorController_IsNearTarget(p) == 0) {
             p[0xB3D] = 1;
         }
     }
@@ -36,7 +36,7 @@ void ActorController_UpdateTargetMovement(u8 *p, s32 a, s32 b)
         sub_08184FE8(p, 0);
     } else if (*q == 1) {
         u32 t = sub_0821FB8C(p + 0x18, p + 0x48, p[0xB39], 0x40);
-        if (sub_08185280(p) != 0) {
+        if (ActorController_IsNearTarget(p) != 0) {
             *q = 0;
             sub_08184FE8(p, 0);
         } else if (p[0xB41] != 0) {

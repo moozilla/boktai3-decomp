@@ -7,7 +7,7 @@ u32 ScaledShadow_InitializeDefaultLarge(void *a, void *b);
 s32 TargetRegistry_RegisterActor(void *n, void *v, void *w);
 void Armor_InitPaletteController(void *s);
 void sub_0821983C(void *, void *, int, int, int, int, int, void *);
-void sub_0821FD3C(void *, void *);
+void ProximityVolume_TranslateBounds(void *, void *);
 void SceneBody_Init(void *, u32, void *, s32, s32, void *);
 void SceneBody_SetKeyframeDisplay(void *, void *);
 void sub_0818BE30(void *, u32);
@@ -17,7 +17,7 @@ void *ScriptProc_Start(u32, u32);
 u32 Script_GetKeywordValue(u32, u32);
 void Anim_SetKeyframes(void *, void *, int, int, int);
 void sub_0818E5E4(void *, u32, u32);
-void sub_0818BCB4(void);
+void Armor_ReceiveTargetEvent(void);
 
 struct T {
     u32 a : 16;
@@ -191,11 +191,11 @@ s32 Armor_InitFromScript(struct S *p, u32 arg)
     SceneBody_SetKeyframeDisplay(x, w);
     *y = t;
     n = p->f180;
-    TargetRegistry_RegisterActor(n, x, sub_0818BCB4);
+    TargetRegistry_RegisterActor(n, x, Armor_ReceiveTargetEvent);
     one = 1;
     n[1] |= one;
     ScaledShadow_InitializeDefaultLarge(p->f114, y);
-    sub_0821FD3C(a, &t);
+    ProximityVolume_TranslateBounds(a, &t);
     sub_0818BE30(p, arg);
     p->hB2E = 0;
     r = 0;

@@ -1,6 +1,5 @@
 #include "global.h"
 // Names are tentative, based on the static state transitions and memory writes.
-#define SelectionPalette_UpdatePulse sub_081E1278
 #define gPaletteShadow gUnk_03004FC0
 struct SelectionPalette {
     u8 unknown[0x4cc];
@@ -9,15 +8,20 @@ struct SelectionPalette {
     s32 pulseTimer;
 };
 extern u16 gUnk_03004FC0[];
-void sub_081E1278(struct SelectionPalette *p)
+void SelectionPalette_UpdatePulse(struct SelectionPalette *p)
 {
     u16 first = 0, second = 0;
     u16 *color;
     s32 base = 10;
     switch (p->selection) {
-    case 0: color = &first; break;
-    case 1: color = &second; break;
-    default: return;
+        case 0:
+            color = &first;
+            break;
+        case 1:
+            color = &second;
+            break;
+        default:
+            return;
     }
     if (p->pulseTimer < base)
         *color = 31;

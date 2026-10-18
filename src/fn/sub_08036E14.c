@@ -21,7 +21,7 @@ extern u32 gUnk_0300523C;
 extern u16 gUnk_03004FC0[];
 void TextWindowManager_DestroyAllWindows(void);
 void PaletteLevels_Reset(void);
-void sub_08215490(int);
+void SpriteOam_ResetQueue(int);
 void Video_OnFrameNoOp(void);
 void Video_OnRenderNoOp(void);
 void sub_0821969C(void);
@@ -56,7 +56,7 @@ void WirelessStatusMenu_InitDisplay(struct LinkMenu *p)
         mask &= *shadow;
         *shadow = mask;
     }
-    sub_08215490(1);
+    SpriteOam_ResetQueue(1);
     Video_SetRenderCallbacks(0, Video_OnFrameNoOp, Video_OnRenderNoOp, sub_0821969C);
     Hud_SetMode(7);
     Bg_ClearTilemap(0);

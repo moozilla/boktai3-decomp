@@ -1,4 +1,3 @@
-#define Armor_ReceiveTargetEvent sub_0818BCB4
 #include "global.h"
 struct ArmorActor {
     u8 pad0[0x238];
@@ -24,7 +23,7 @@ void Armor_SetPlanarVelocity(struct ArmorActor *, s32, s32);
 void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
 void SceneHud_SetTimedState(u32, s32, s32, s32, s32, s32);
 
-s32 sub_0818BCB4(struct ArmorTarget *target, s32 event, s32 amount)
+s32 Armor_ReceiveTargetEvent(struct ArmorTarget *target, s32 event, s32 amount)
 {
     struct ArmorActor *p = target->actor;
     s32 damage;
@@ -41,7 +40,8 @@ s32 sub_0818BCB4(struct ArmorTarget *target, s32 event, s32 amount)
         }
         SceneHud_SetTimedState(p->actorId, p->health, p->maxHealth, 5, 0, -1);
         if (damage > 0)
-            DamageNumberDisplay_Show(p->damageDisplay, damage, 0, &p->damagePosition[0], &p->damagePosition[2], 1);
+            DamageNumberDisplay_Show(p->damageDisplay, damage, 0, &p->damagePosition[0],
+                                     &p->damagePosition[2], 1);
     } else if (event == 1) {
         Armor_SetPlanarVelocity(p, (p->direction + 0xa0) & 0xc0, 30);
         if (!(p->flags & 0x80)) {

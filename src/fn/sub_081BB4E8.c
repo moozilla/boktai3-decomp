@@ -1,9 +1,17 @@
 #include "global.h"
-#define SpriteMenu_HideAll sub_081BB4E8
-struct SpriteMenuItem { u32 flags; u8 pad4[0x5C]; };
-struct SpriteMenuMarker { u32 flags; u8 pad4[0x28]; };
-struct SpriteMenu { u8 pad0[0x60]; struct SpriteMenuItem items[16]; };
-void sub_081BB4E8(struct SpriteMenu *menu)
+struct SpriteMenuItem {
+    u32 flags;
+    u8 pad4[0x5C];
+};
+struct SpriteMenuMarker {
+    u32 flags;
+    u8 pad4[0x28];
+};
+struct SpriteMenu {
+    u8 pad0[0x60];
+    struct SpriteMenuItem items[16];
+};
+void SpriteMenu_HideAll(struct SpriteMenu *menu)
 {
     s32 i;
     struct SpriteMenuItem *item;

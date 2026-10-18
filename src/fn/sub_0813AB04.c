@@ -41,7 +41,7 @@ s32 Mod(s32, s32);
 void sub_08217DE0(struct ScreenMoteSprite *, void *, u32);
 void Effect_SetOrigin(struct ScreenMoteSprite *, s32, s32);
 void Effect_SetPalette(struct ScreenMoteSprite *, u32);
-void sub_08217EEC(struct ScreenMoteSprite *, void *, u32);
+void SpriteDrawable_SelectTileFrame(struct ScreenMoteSprite *, void *, u32);
 static inline u32 NextRandom(void)
 {
     gUnk_03005304 = (gUnk_03005304 + 1) & 0x3ff;
@@ -78,7 +78,7 @@ s32 ScreenMote_SpawnBatch(union ScreenMotePosition *origin, union ScreenMotePosi
         }
         sub_08217DE0(sprite, m->resource, 0);
         Effect_SetOrigin(sprite, -4, -4);
-        sub_08217EEC(sprite, m->resource, 2);
+        SpriteDrawable_SelectTileFrame(sprite, m->resource, 2);
         sprite->flags |= 0x11 | flags;
         sprite->mode = mode;
         Effect_SetPalette(sprite, 1);

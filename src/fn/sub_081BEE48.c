@@ -1,9 +1,5 @@
 #include "global.h"
 #include "scene_input.h"
-#define SceneInventory_BeginCategoryBrowse sub_081BEE48
-#define SceneInventory_SetCategoryPalette sub_081BE0AC
-#define SceneInventory_SetState sub_081BDB34
-#define SceneInventory_UpdateCategoryBrowse sub_081BF1AC
 struct SceneInventoryCategoryMenu {
     u8 unknown0[0x258];
     struct SceneInputWidget primaryWidget;
@@ -14,19 +10,20 @@ struct SceneInventoryCategoryMenu {
 };
 void sub_081BFAE0(struct SceneInventoryCategoryMenu *);
 void Storage_RefreshSelectedItemDetails(struct SceneInventoryCategoryMenu *);
-void sub_081BE0AC(struct SceneInventoryCategoryMenu *, u16 *);
-void sub_081BF1AC(struct SceneInventoryCategoryMenu *);
-void sub_081BDB34(struct SceneInventoryCategoryMenu *, void (*)(struct SceneInventoryCategoryMenu *), u32);
+void SceneInventory_SetCategoryPalette(struct SceneInventoryCategoryMenu *, u16 *);
+void SceneInventory_UpdateCategoryBrowse(struct SceneInventoryCategoryMenu *);
+void SceneInventory_SetState(struct SceneInventoryCategoryMenu *,
+                             void (*)(struct SceneInventoryCategoryMenu *), u32);
 static inline void EnableWidget(struct SceneInputWidget *widget)
 {
     widget->flags |= 1;
 }
-void sub_081BEE48(struct SceneInventoryCategoryMenu *p)
+void SceneInventory_BeginCategoryBrowse(struct SceneInventoryCategoryMenu *p)
 {
     EnableWidget(&p->categoryWidget);
     EnableWidget(&p->primaryWidget);
     sub_081BFAE0(p);
     Storage_RefreshSelectedItemDetails(p);
-    sub_081BE0AC(p, p->paletteTarget);
-    sub_081BDB34(p, sub_081BF1AC, 0);
+    SceneInventory_SetCategoryPalette(p, p->paletteTarget);
+    SceneInventory_SetState(p, SceneInventory_UpdateCategoryBrowse, 0);
 }

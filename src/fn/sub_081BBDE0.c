@@ -1,9 +1,11 @@
 #include "global.h"
-#define SpriteMenu_InitBackground sub_081BBDE0
-struct SpriteMenuBackground { u8 pad0[0x6E8]; void *backgroundResource; };
+struct SpriteMenuBackground {
+    u8 pad0[0x6E8];
+    void *backgroundResource;
+};
 void *ScriptProc_Start(u16, u16);
 void Bg_SetupLayers(int, int, void *, int, int, int, void *);
-void sub_081BBDE0(struct SpriteMenuBackground *menu)
+void SpriteMenu_InitBackground(struct SpriteMenuBackground *menu)
 {
     s32 zero;
     menu->backgroundResource = ScriptProc_Start(0xC091, 0x8544);

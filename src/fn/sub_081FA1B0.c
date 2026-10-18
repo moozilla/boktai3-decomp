@@ -1,5 +1,4 @@
-#define Ratatosk_InitFrontCollider sub_081FA1B0
-#define gSineTable                 gUnk_086149C4
+#define gSineTable gUnk_086149C4
 #include "global.h"
 struct ColliderVector {
     s32 x : 16, y : 16, z : 16, pad : 16;
@@ -36,7 +35,7 @@ static inline void polar(struct RatatoskPosition *v, s32 angle, s32 radius)
     v->y = 0;
     v->z = scale(gSineTable[angle & 255] * radius);
 }
-void sub_081FA1B0(struct Ratatosk *p)
+void Ratatosk_InitFrontCollider(struct Ratatosk *p)
 {
     struct RatatoskFacing *facing = &p->facing;
     void *collider = p->frontCollider;

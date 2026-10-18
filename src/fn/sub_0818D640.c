@@ -1,10 +1,9 @@
-#define Armor_DampPartMovement sub_0818D640
 #include "global.h"
 #include "motion_0818.h"
 
 void Armor_UpdatePartRetraction(struct Motion0818Object *);
 
-void sub_0818D640(struct Motion0818Object *p)
+void Armor_DampPartMovement(struct Motion0818Object *p)
 {
     u8 *parent = p->parent;
     p->rotation += 20;
@@ -24,12 +23,16 @@ void sub_0818D640(struct Motion0818Object *p)
             p->callback = Armor_UpdatePartRetraction;
         }
         value = p->velocityX;
-        if (value >= 0) half = value >> 1;
-        else half = -(-value >> 1);
+        if (value >= 0)
+            half = value >> 1;
+        else
+            half = -(-value >> 1);
         p->velocityX = half;
         value = p->velocityZ;
-        if (value >= 0) half = value >> 1;
-        else half = -(-value >> 1);
+        if (value >= 0)
+            half = value >> 1;
+        else
+            half = -(-value >> 1);
         p->velocityZ = half;
     }
 }

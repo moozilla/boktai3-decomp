@@ -1,4 +1,3 @@
-#define SceneSong_EnterAndWait sub_081F8C6C
 #include "global.h"
 struct SceneSongState {
     u8 pad0[0xAA];
@@ -18,7 +17,7 @@ static inline u8 TakeEntry(struct SceneSongState *p)
     }
     return FALSE;
 }
-void sub_081F8C6C(struct SceneSongState *p)
+void SceneSong_EnterAndWait(struct SceneSongState *p)
 {
     struct SceneSongState *state = p;
     if (TakeEntry(p)) {

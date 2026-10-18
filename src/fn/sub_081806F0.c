@@ -1,5 +1,4 @@
-#define ProximityVolume_ContainsPlayer sub_081806F0
-#define gProximityPlayer               gUnk_02000580
+#define gProximityPlayer gUnk_02000580
 #include "global.h"
 #include "contact_actor.h"
 struct ProximityVolume {
@@ -15,7 +14,7 @@ struct ProximityPlayer {
 extern struct ProximityPlayer *gUnk_02000580;
 s32 sub_0821F204(void *, void *, void *);
 u32 sub_0821F2EC(void *, void *, void *);
-u32 sub_081806F0(struct ProximityVolume *volume)
+u32 ProximityVolume_ContainsPlayer(struct ProximityVolume *volume)
 {
     struct ContactPosition *player = &gUnk_02000580->position;
     void *bounds = volume->bounds;

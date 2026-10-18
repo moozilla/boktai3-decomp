@@ -1,4 +1,3 @@
-#define ActorController_IsNearTarget sub_08185280
 #include "global.h"
 
 // Tentative: checks the X/Z Manhattan distance to the movement target.
@@ -15,14 +14,15 @@ struct ActorController2 {
 };
 
 static inline void ActorController_SubtractPositions(struct ActorController2Vector *out,
-    struct ActorController2Vector *a, struct ActorController2Vector *b)
+                                                     struct ActorController2Vector *a,
+                                                     struct ActorController2Vector *b)
 {
     out->x = a->x - b->x;
     out->y = a->y - b->y;
     out->z = a->z - b->z;
 }
 
-u32 sub_08185280(struct ActorController2 *actor)
+u32 ActorController_IsNearTarget(struct ActorController2 *actor)
 {
     struct ActorController2Vector delta;
     ActorController_SubtractPositions(&delta, &actor->position, &actor->referencePosition);

@@ -1,7 +1,5 @@
 #include "global.h"
-#define VulcanCannon_FireProjectile sub_082069A8
-#define Projectile_CreateFromConfig sub_08202B30
-#define gSineTable                  gUnk_086149C4
+#define gSineTable gUnk_086149C4
 struct CannonVector {
     s16 x, y, z, pad;
 };
@@ -20,7 +18,7 @@ void ProjectileConfig_SetAppearance(void *, u32, u32, s32);
 void ProjectileConfig_SetCollision(void *, u32, u32, u32, u32, u32);
 void ProjectileConfig_SetMovement(void *, u32, u32, u32, u32);
 void ProjectileConfig_SetAnimation(void *, u32, u32, u32);
-void sub_08202B30(void *, void *);
+void Projectile_SpawnFromConfig(void *, void *);
 extern const s16 gUnk_086149C4[];
 static inline s32 scale(s32 n)
 {
@@ -46,7 +44,7 @@ static inline void raise(struct CannonVector *v)
 {
     v->y += 128;
 }
-void sub_082069A8(struct VulcanCannon *p)
+void VulcanCannon_FireProjectile(struct VulcanCannon *p)
 {
     u8 config[0x5c];
     struct CannonVector position, offset;
@@ -63,5 +61,5 @@ void sub_082069A8(struct VulcanCannon *p)
     ProjectileConfig_SetCollision(config, 0, 0, p->attack, p->element, p->power);
     ProjectileConfig_SetMovement(config, 0, 120, angle, p->speed);
     ProjectileConfig_SetAnimation(config, 0xa6cf, 7, 0);
-    Projectile_CreateFromConfig(config, &position);
+    Projectile_SpawnFromConfig(config, &position);
 }

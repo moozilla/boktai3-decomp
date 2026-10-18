@@ -1,10 +1,9 @@
-#define SpinningApproach_UpdateOwnerRelativeSegment sub_0818DB10
 #include "global.h"
 #include "motion_0818.h"
 
 s32 Div(s32, s32);
 
-void sub_0818DB10(struct Motion0818Object *p)
+void SpinningApproach_UpdateOwnerRelativeSegment(struct Motion0818Object *p)
 {
     struct Motion0818Displacement displacement;
     u8 *owner = p->parent;

@@ -1,5 +1,4 @@
 #include "global.h"
-#define ActorDecision_UpdateDelayPhase sub_0817BC64
 struct ActorDecisionPosition {
     u32 a, b;
 };
@@ -26,7 +25,7 @@ static inline u8 consumeReset(struct ActorDecisionState *p)
     }
     return 0;
 }
-void sub_0817BC64(struct ActorDecisionState *p)
+void ActorDecision_UpdateDelayPhase(struct ActorDecisionState *p)
 {
     struct ActorDecisionState *s = p;
     if (consumeReset(p)) {

@@ -1,11 +1,11 @@
 #include "global.h"
-s32 sub_08213010(void *, s32);
+s32 Lookup_FindValueIndex(void *, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 void Anim_LoadKeyframe(void *, void *, u32, u32);
 u32 CollectionBook_UpdateTrackedEntryMarker(u8 *p)
 {
-    s32 value = sub_08213010(p, *(s16 *)(p + 0x722));
+    s32 value = Lookup_FindValueIndex(p, *(s16 *)(p + 0x722));
     s32 page = *(s16 *)(p + 0x6f4);
     if (value >= page * 10 && value < (page + 1) * 10) {
         s32 digit = Mod(value, 10), a, b, x, y;

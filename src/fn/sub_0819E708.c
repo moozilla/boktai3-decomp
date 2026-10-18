@@ -1,5 +1,4 @@
 #include "global.h"
-#define ActorAnimation_ResetSequence  sub_0819E708
 #define gActorAnimationSequenceValues gUnk_08611D44
 extern const u32 gUnk_08611D44[];
 struct ActorAnimationSequence {
@@ -12,7 +11,7 @@ struct ActorAnimationSequence {
     u8 unknown330[0x58];
     u8 state;
 };
-void sub_0819E708(struct ActorAnimationSequence *actor)
+void ActorAnimation_ResetSequence(struct ActorAnimationSequence *actor)
 {
     u32 value;
     actor->sequence = 0;

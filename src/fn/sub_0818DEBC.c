@@ -1,4 +1,3 @@
-#define Armor_UpdatePartRebound sub_0818DEBC
 #include "global.h"
 
 struct ArmorParent {
@@ -25,7 +24,7 @@ struct ArmorPart {
     u8 pad1D4[2];
     s16 timer;
 };
-void sub_0818DEBC(struct ArmorPart *p)
+void Armor_UpdatePartRebound(struct ArmorPart *p)
 {
     p->y += p->velocity;
     p->velocity -= 2;

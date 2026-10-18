@@ -5,9 +5,9 @@ struct S {
     s16 x;
     s16 y;
 };
-void sub_08216520(u32, s32, s32);
+void BgGfx_LoadTilemapAtPosition(u32, s32, s32);
 
 void Registry6A37_UpdateBackgroundScroll(struct S *p)
 {
-    sub_08216520(3, p->x, p->y);
+    BgGfx_LoadTilemapAtPosition(3, p->x, p->y);
 }

@@ -1,12 +1,11 @@
-#define Terrain_ResetMap   sub_0821BB34
-#define Terrain_ClearTrap Trap_Init
+#define Terrain_ClearTrap  Trap_Init
 #define gTerrainMap        gUnk_030052F4
 #define gTerrainTrapSerial gUnk_03005300
 #include "global.h"
 #include "engine.h"
 extern u32 gUnk_03005300;
 void Trap_Init(void *);
-s32 sub_0821BB34(void)
+s32 Terrain_ResetMap(void)
 {
     s32 i;
     struct EngineMap *map = gUnk_030052F4;

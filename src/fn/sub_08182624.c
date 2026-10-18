@@ -1,8 +1,13 @@
-#define Armor_EnterFacingAnimation sub_08182624
 #define gArmorFacingAnimations gUnk_0824EB84
 #include "global.h"
-struct ArmorCollider { u16 unknown0[3]; u16 flags; };
-struct ArmorCollisionGate { u32 unknown0; u32 flags; };
+struct ArmorCollider {
+    u16 unknown0[3];
+    u16 flags;
+};
+struct ArmorCollisionGate {
+    u32 unknown0;
+    u32 flags;
+};
 /* Observed component offsets; collision interpretations are tentative. */
 struct ArmorActor {
     u8 unknown0[0x180];
@@ -25,7 +30,7 @@ struct ArmorActor {
 };
 extern const u32 gUnk_0824EB84[];
 void Armor_SetAnimationFromStart(u32, u32);
-void sub_08182624(struct ArmorActor *actor)
+void Armor_EnterFacingAnimation(struct ArmorActor *actor)
 {
     u8 *p = (u8 *)actor;
     u8 *state = p + 0xb40;

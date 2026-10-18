@@ -1,5 +1,3 @@
-#define Armor6_Destroy sub_0818ADB4
-#define Armor6_DestroySpriteColliders sub_0818E98C
 #include "global.h"
 
 struct Armor6CallbackSlot {
@@ -30,7 +28,7 @@ struct Armor6 {
 };
 
 s32 Callback_InvokeActor(void *, void *);
-void sub_0818E98C(void *);
+void Armor6_DestroySpriteColliders(void *);
 void ScaledShadow_Destroy(void *);
 void Collider_Remove(void *);
 void sub_0815F738(void *);
@@ -47,7 +45,7 @@ static inline void Armor6_ClearCallback(struct Armor6CallbackSlot *slot)
     }
 }
 
-s32 sub_0818ADB4(struct Armor6 *actor)
+s32 Armor6_Destroy(struct Armor6 *actor)
 {
     s32 i;
     Armor6_ClearCallback(&actor->slot650);
@@ -57,7 +55,7 @@ s32 sub_0818ADB4(struct Armor6 *actor)
     for (i = 0; i < 9; i++) {
         Armor6_ClearCallback(&actor->slots410[i]);
     }
-    sub_0818E98C(actor->componentB58);
+    Armor6_DestroySpriteColliders(actor->componentB58);
     ScaledShadow_Destroy(actor->shadow);
     Collider_Remove(actor->collider1E4);
     Collider_Remove(actor->collider238);

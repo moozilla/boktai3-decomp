@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneActorState_UpdateAnimationRequest sub_0817BFA4
 struct SceneActorAnimationRequest {
     u8 pad0[0xaa];
     u8 state;
@@ -24,7 +23,7 @@ static inline u8 consume(struct SceneActorAnimationRequest *p)
     }
     return 0;
 }
-void sub_0817BFA4(struct SceneActorAnimationRequest *p)
+void SceneActorState_UpdateAnimationRequest(struct SceneActorAnimationRequest *p)
 {
     if (consume(p)) {
         u32 state = 7;

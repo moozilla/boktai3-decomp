@@ -1,4 +1,3 @@
-#define RisingActorConfig_Initialize  sub_081FE92C
 #define RisingActorConfig_SetCallback SunOrb_SetUpdateCallback
 #include "global.h"
 struct RisingActorConfig {
@@ -14,7 +13,7 @@ struct RisingActorConfig {
 void Memory_Clear(void *, u32);
 void sub_081FD7EC(void);
 void SunOrb_SetUpdateCallback(struct RisingActorConfig *, void (*)(void));
-void sub_081FE92C(struct RisingActorConfig *config)
+void RisingActorConfig_Initialize(struct RisingActorConfig *config)
 {
     Memory_Clear(config, 0x20);
     SunOrb_SetUpdateCallback(config, sub_081FD7EC);

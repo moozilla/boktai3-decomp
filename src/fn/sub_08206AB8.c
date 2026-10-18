@@ -1,9 +1,8 @@
 #include "global.h"
 #include "animated_hazard.h"
-#define VulcanCannon_HasClearShot sub_08206AB8
-#define gTerrainMap               gUnk_030052F4
-#define gTerrainWidth             gUnk_030052F8
-#define gTerrainHeight            gUnk_030052FC
+#define gTerrainMap    gUnk_030052F4
+#define gTerrainWidth  gUnk_030052F8
+#define gTerrainHeight gUnk_030052FC
 struct VulcanCannon {
     u8 pad0[0x88];
     struct SceneVec position;
@@ -34,7 +33,7 @@ static inline u8 *cellData(s32 index)
         return override + 4;
     return index * 4 + 12 + gTerrainMap->cells;
 }
-s32 sub_08206AB8(struct VulcanCannon *p)
+s32 VulcanCannon_HasClearShot(struct VulcanCannon *p)
 {
     struct SceneVec delta;
     struct CannonSample sample;

@@ -8,7 +8,7 @@ void ProximityEmitter_EmitParticle(struct ProximityEmitter *emitter, void *resou
     register u32 *indexAddress asm("r9");
     register u32 index asm("r1"), mask asm("r3");
     register u32 xzMask asm("r8");
-    sub_08217EEC(particle, resource, 2);
+    SpriteDrawable_SelectTileFrame(particle, resource, 2);
     particle->flags &= ~1;
     random = (const u16 *)RANDOM_TABLE_ADDR;
     {

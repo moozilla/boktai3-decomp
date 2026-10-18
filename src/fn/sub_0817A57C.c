@@ -25,7 +25,7 @@ typedef struct State {
 extern const s16 gUnk_086149C4[];
 extern u8 gUnk_0203B400[];
 extern u32 gUnk_03005308;
-void sub_08217EEC(Effect *, void *, s32);
+void SpriteDrawable_SelectTileFrame(Effect *, void *, s32);
 static inline s32 random_value(void)
 {
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
@@ -52,7 +52,7 @@ void SceneActors_SpawnConvergingParticle(State *s, Point *pos)
         s32 radius;
         draw->flags &= ~1;
         e->kind = 4;
-        sub_08217EEC(draw, s->graphics, 4);
+        SpriteDrawable_SelectTileFrame(draw, s->graphics, 4);
         angle = random_first() & 255;
         radius = (random_first() & 127) + 256;
         e->dx = scale(radius * gUnk_086149C4[(angle + 64) & 255]);

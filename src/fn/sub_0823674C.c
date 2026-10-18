@@ -1,4 +1,3 @@
-#define TimedSprite_UpdateFrames sub_0823674C
 #include "global.h"
 #include "display_animation.h"
 struct TimedSprite {
@@ -9,7 +8,7 @@ struct TimedSprite {
     u8 unknown91[5];
     s16 ticks;
 };
-void sub_0823674C(struct TimedSprite *effect)
+void TimedSprite_UpdateFrames(struct TimedSprite *effect)
 {
     s16 ticks = effect->ticks;
     u32 frame;

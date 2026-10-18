@@ -13,6 +13,6 @@ void ProximityEmitter_TickParticle(struct ProximityEmitterParticle *particle, vo
         particle->position.x += particle->velocityX;
         particle->position.y += particle->velocityY;
         particle->position.z += particle->velocityZ;
-        sub_08217EEC(particle, resource, (((u16)frame >> 2) & 1) + 2);
+        SpriteDrawable_SelectTileFrame(particle, resource, (((u16)frame >> 2) & 1) + 2);
     }
 }

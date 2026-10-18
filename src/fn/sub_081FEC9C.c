@@ -4,16 +4,16 @@ struct S {
     u16 h14;
     u8 q[10];
 };
-void sub_081FE92C(struct S *);
+void RisingActorConfig_Initialize(struct S *);
 void SunOrb_SetMotionParams(struct S *, u32, u32, u32, u32);
 void SunOrb_SetTargetSource(struct S *, u32);
-u32 sub_081FE760(struct S *, void *);
+u32 SunOrb_CreateAtPosition(struct S *, void *);
 u32 SunOrb_CreatePlayerTargeted(void *a)
 {
     struct S s;
-    sub_081FE92C(&s);
+    RisingActorConfig_Initialize(&s);
     SunOrb_SetMotionParams(&s, 0, 0, 0, 0);
     SunOrb_SetTargetSource(&s, 2);
     s.h14 = 1;
-    return sub_081FE760(&s, a);
+    return SunOrb_CreateAtPosition(&s, a);
 }

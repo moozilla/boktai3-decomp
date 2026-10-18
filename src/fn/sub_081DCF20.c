@@ -1,7 +1,6 @@
 #include "global.h"
 #include "game_state.h"
-#define TextEntry_CopyInitialName sub_081DCF20
-#define gGameState                gUnk_02000710
+#define gGameState gUnk_02000710
 struct TextEntry {
     u8 pad0[0x370];
     u32 useSavedName;
@@ -9,7 +8,7 @@ struct TextEntry {
     const u8 *initialName;
 };
 u8 *PlayerName_GetBuffer(void);
-void sub_081DCF20(struct TextEntry *p, u8 *out)
+void TextEntry_CopyInitialName(struct TextEntry *p, u8 *out)
 {
     const u8 *src;
     s32 i;

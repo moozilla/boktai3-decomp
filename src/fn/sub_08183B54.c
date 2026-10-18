@@ -1,7 +1,6 @@
 // Callee aliases below resolve against the checker ELF predating symbol promotion.
-#define gActorLayeredFollowupAnimations                  gUnk_0824EDB8
-#define gActorLayeredStartAnimations                     gUnk_0824EDA8
-#define ActorController_UpdateLayeredAnimationTransition sub_08183B54
+#define gActorLayeredFollowupAnimations gUnk_0824EDB8
+#define gActorLayeredStartAnimations    gUnk_0824EDA8
 #include "global.h"
 struct ActorAnimationLayer {
     u16 unknown[3];
@@ -14,7 +13,7 @@ extern const u32 gActorLayeredStartAnimations[];
 extern const u32 gActorLayeredFollowupAnimations[];
 void Sound_PlaySongChecked(u32);
 void Armor_SetAnimationFromStart(u32, u32);
-void sub_08183B54(u8 *p)
+void ActorController_UpdateLayeredAnimationTransition(u8 *p)
 {
     u8 *s = p + 0xb40;
     u8 st = *s;

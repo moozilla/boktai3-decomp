@@ -1,7 +1,3 @@
-#define LinkEffect_UpdateSecondOrb sub_0819A954
-#define LinkEffect_UpdateEndpoints sub_0819A698
-#define SunOrb_InitParameters      sub_081FE92C
-#define SunOrb_CreateAtPosition    sub_081FE760
 #include "global.h"
 struct LinkVector {
     s16 x, y, z;
@@ -25,20 +21,20 @@ struct SunOrbParameters {
     u8 padC[20];
 };
 void LinkEffect_UpdateEndpoints(struct LinkEffect *);
-void SunOrb_InitParameters(struct SunOrbParameters *);
+void RisingActorConfig_Initialize(struct SunOrbParameters *);
 s32 SunOrb_CreateAtPosition(struct SunOrbParameters *, struct LinkVector *);
-void sub_081FEA80(s32);
+void RisingActorManager_BeginRaise(s32);
 u32 SunOrb_FadeOutAll(void *);
 void SunOrb_SetEffectTimings(void *, s32, u32, u32);
 void SunOrb_SetMotionParams(struct SunOrbParameters *, u32, u32, u32, u32);
-void sub_0819A954(struct LinkEffect *p)
+void LinkEffect_UpdateSecondOrb(struct LinkEffect *p)
 {
     struct SunOrbParameters params;
     switch (p->state) {
         case 0: {
             s32 index;
             LinkEffect_UpdateEndpoints(p);
-            SunOrb_InitParameters(&params);
+            RisingActorConfig_Initialize(&params);
             params.type = 1;
             params.mode = 2;
             params.flags = 0;
@@ -46,7 +42,7 @@ void sub_0819A954(struct LinkEffect *p)
             SunOrb_SetEffectTimings(&params, p->collision, 15, 30);
             index = SunOrb_CreateAtPosition(&params, &p->end);
             if (index >= 0) {
-                sub_081FEA80(index);
+                RisingActorManager_BeginRaise(index);
                 p->otherOrb = index;
             }
             p->state++;

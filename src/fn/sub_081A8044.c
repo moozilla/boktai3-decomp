@@ -1,6 +1,3 @@
-#define ScenePanel_UpdatePairConditions sub_081A7C94
-#define ScenePanel_ApplyPairTransition sub_081A7D80
-#define ScenePanel_UpdateDelayedPairState sub_081A8044
 #define ScenePanel_StopSound Vanargand_StopActionSequence
 #include "global.h"
 /* Tentative ScenePanel family; names describe observed state and sprite operations. */
@@ -13,8 +10,8 @@ struct ScenePanelTimedExit {
     u32 counter;
 };
 void Vanargand_StopActionSequence(void *);
-void sub_081A7C94(void *);
-void sub_081A7D80(void *);
+void ScenePanel_UpdatePairConditions(void *);
+void ScenePanel_ApplyPairTransition(void *);
 static inline u8 ScenePanel_ConsumePending(struct ScenePanelTimedExit *panel)
 {
     if (panel->pending) {
@@ -24,7 +21,7 @@ static inline u8 ScenePanel_ConsumePending(struct ScenePanelTimedExit *panel)
     }
     return FALSE;
 }
-void sub_081A8044(void *object)
+void ScenePanel_UpdateDelayedPairState(void *object)
 {
     struct ScenePanelTimedExit *panel = object;
     if (ScenePanel_ConsumePending(panel)) {
@@ -33,8 +30,8 @@ void sub_081A8044(void *object)
         panel->state = state;
     }
     if (panel->counter > 128) {
-        sub_081A7C94(object);
-        sub_081A7D80(object);
+        ScenePanel_UpdatePairConditions(object);
+        ScenePanel_ApplyPairTransition(object);
     }
     panel->counter++;
 }

@@ -27,7 +27,7 @@ struct ScreenMoteManager {
     struct ScreenMoteSprite sprites[1];
 };
 s32 Div(s32, s32);
-void sub_08217EEC(struct ScreenMoteSprite *, void *, u32);
+void SpriteDrawable_SelectTileFrame(struct ScreenMoteSprite *, void *, u32);
 void ScreenMote_ApproachTarget(struct ScreenMoteManager *m, struct ScreenMoteState *s)
 {
     struct ScreenMoteSprite *sprite = &m->sprites[s->spriteIndex];
@@ -46,7 +46,7 @@ void ScreenMote_ApproachTarget(struct ScreenMoteManager *m, struct ScreenMoteSta
     s->remaining--;
     sprite->position = s->position;
     if (++s->delay > 3)
-        sub_08217EEC(sprite, m->resource, 3);
+        SpriteDrawable_SelectTileFrame(sprite, m->resource, 3);
     if (s->remaining == 0)
         s->phase = 2;
     s->age++;

@@ -1,11 +1,10 @@
 #include "global.h"
 #include "game_state.h"
-#define GameStats_SelectLeadingCounter sub_08228090
 #define gGameState gUnk_02000710
 
 s32 Div(s32, s32);
 
-s32 sub_08228090(void)
+s32 GameStats_SelectLeadingCounter(void)
 {
     s32 values[5];
     s32 i;

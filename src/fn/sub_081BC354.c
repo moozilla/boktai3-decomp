@@ -1,4 +1,3 @@
-#define StatGauge_ResetBackground sub_081BC354
 #define gBackgroundPalette gUnk_03005160
 #include "global.h"
 extern u16 gUnk_03005160[];
@@ -10,7 +9,7 @@ struct StatGaugePreview {
     void *map;
     void *palette;
 };
-void sub_081BC354(struct StatGaugePreview *p)
+void StatGauge_ResetBackground(struct StatGaugePreview *p)
 {
     u32 zero = 0;
     Bg_SetupLayers(0, 0, p->map, 0, 0, 1, &zero);

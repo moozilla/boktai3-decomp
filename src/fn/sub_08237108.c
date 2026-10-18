@@ -1,7 +1,5 @@
 #include "global.h"
 
-#define ActorAttachment_Initialize sub_08237108
-
 struct AttachmentVector {
     s16 x, y, z, pad;
 };
@@ -24,8 +22,8 @@ struct ActorAttachment {
 void sub_08236FF4(struct ActorAttachment *, struct AttachmentVector *);
 void sub_08236DC4(struct ActorAttachment *);
 
-s32 sub_08237108(struct ActorAttachment *p, struct AttachmentParent *parent, u32 kind,
-                 struct AttachmentVector *offset, u32 a, u32 b, u32 mode)
+s32 ActorAttachment_Initialize(struct ActorAttachment *p, struct AttachmentParent *parent, u32 kind,
+                               struct AttachmentVector *offset, u32 a, u32 b, u32 mode)
 {
     p->kind = kind;
     p->parent = parent;

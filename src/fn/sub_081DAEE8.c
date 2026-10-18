@@ -1,10 +1,9 @@
 #include "global.h"
 #include "task4e01.h"
-#define Task4E01_SetEntryPair sub_081DAEE8
 struct Task4E01Pair {
     u32 first, second;
 };
-s32 sub_081DAEE8(s32 i, struct Task4E01Pair *pair)
+s32 SceneEntry_SetPosition(s32 i, struct Task4E01Pair *pair)
 {
     struct Task4E01 *p = ResourceRegistry_GetResource(0x4e01);
     if (!p || i < 0 || i >= p->count)

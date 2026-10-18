@@ -1,4 +1,3 @@
-#define ActorEffect_RemoveSprites sub_081B69F4
 #include "global.h"
 struct EffectOwner {
     u8 pad0[0x18];
@@ -22,7 +21,7 @@ static inline void EffectCollision_Disable(struct EffectCollision *collision)
 {
     collision->flags |= 4;
 }
-u32 sub_081B69F4(struct EffectOwner *owner, struct ActorEffect *effect, u32 index)
+u32 ActorEffect_RemoveSprites(struct EffectOwner *owner, struct ActorEffect *effect, u32 index)
 {
     struct EffectSprite *sprite = effect->sprites;
     s32 count = 5;

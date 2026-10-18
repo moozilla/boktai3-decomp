@@ -8,13 +8,13 @@ struct L {
     struct N *head;
 };
 extern u32 gUnk_02000474;
-void sub_082323DC(void *);
+void ColliderSprite_Destroy(void *);
 u32 ScriptSpriteManager_Destroy(struct L *l)
 {
     struct N *p = l->head;
     while (p) {
         struct N *n = p->next;
-        sub_082323DC(p);
+        ColliderSprite_Destroy(p);
         p = n;
     }
     return gUnk_02000474 = 0;

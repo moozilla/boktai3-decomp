@@ -1,6 +1,5 @@
 #include "global.h"
-#define SlotController_SetSlotFlag2 sub_081FEB84
-#define gSlotController             gUnk_020005EC
+#define gSlotController gUnk_020005EC
 struct ControllerSlot {
     u8 unknown0[0xC4];
     u32 flags;
@@ -16,7 +15,7 @@ struct SlotController {
 };
 extern struct SlotController *gUnk_020005EC;
 void SunOrb_GetOrCreateManager(void);
-s32 sub_081FEB84(s32 index)
+s32 SlotController_SetSlotFlag2(s32 index)
 {
     struct SlotController *controller = gUnk_020005EC;
     s32 result;

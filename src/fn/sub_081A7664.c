@@ -1,4 +1,3 @@
-#define ScenePanel_RunSelectionScript sub_081A7664
 #include "global.h"
 /* Tentative ScenePanel family; names describe observed state and sprite operations. */
 
@@ -24,7 +23,7 @@ static inline u8 ScenePanel_ConsumePending(struct ScenePanelInput *panel)
     }
     return FALSE;
 }
-void sub_081A7664(struct ScenePanelSelection *panel)
+void ScenePanel_RunSelectionScript(struct ScenePanelSelection *panel)
 {
     struct ScenePanelInput *input = (struct ScenePanelInput *)panel;
     if (ScenePanel_ConsumePending(input)) {

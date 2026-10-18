@@ -1,4 +1,3 @@
-#define SceneDistance_UpdateLinkedDistances sub_081F2E88
 #include "global.h"
 #include "scene_vec.h"
 struct SceneDistanceEntry {
@@ -16,7 +15,7 @@ struct SceneDistanceSet {
     u8 *source;
 };
 u8 *SunOrb_GetPositionFromManager(u8 *, s32);
-void sub_081F2E88(struct SceneDistanceSet *set)
+void SceneDistance_UpdateLinkedDistances(struct SceneDistanceSet *set)
 {
     s32 i = 0;
     struct SceneVec *position = &set->position;

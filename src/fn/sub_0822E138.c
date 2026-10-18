@@ -1,6 +1,5 @@
-#define Inventory_SwapSlots sub_0822E138
 #include "game_state.h"
-void sub_0822E138(s32 first, s32 second)
+void Inventory_SwapSlots(s32 first, s32 second)
 {
     struct GameState *state = gUnk_02000710;
     s16 *a = &((struct GameState *)(first * 2 + (u32)state))->table160[0];

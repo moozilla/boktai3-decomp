@@ -1,5 +1,4 @@
-#define ActorController_UpdateDecayingVelocity sub_0818351C
-#define gSineTable                             gUnk_086149C4
+#define gSineTable gUnk_086149C4
 #include "global.h"
 typedef struct ActorControllerMotion {
     u8 pad0[0x50];
@@ -19,7 +18,7 @@ static inline int trunc12(int x)
 {
     return x >= 0 ? x >> 12 : -(-x >> 12);
 }
-void sub_0818351C(ActorControllerMotion *p)
+void ActorController_UpdateDecayingVelocity(ActorControllerMotion *p)
 {
     sub_0818323C(p);
     {

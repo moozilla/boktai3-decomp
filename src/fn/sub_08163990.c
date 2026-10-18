@@ -19,7 +19,7 @@ struct A {
     u32 w;
 };
 
-void sub_08217EEC(struct B *, u32, s32);
+void SpriteDrawable_SelectTileFrame(struct B *, u32, s32);
 
 void ParticlePool_UpdateLinearParticle(struct A *a, struct B *b)
 {
@@ -37,10 +37,10 @@ void ParticlePool_UpdateLinearParticle(struct A *a, struct B *b)
     if (b->c2c == 5) {
         switch (b->c32) {
             case 0:
-                sub_08217EEC(b, a->w, 3);
+                SpriteDrawable_SelectTileFrame(b, a->w, 3);
                 break;
             case 1:
-                sub_08217EEC(b, a->w, 5);
+                SpriteDrawable_SelectTileFrame(b, a->w, 5);
                 break;
         }
     }

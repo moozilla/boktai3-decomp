@@ -7,7 +7,7 @@ struct MenuPrompt {
 s32 MessageWindow_Clear(void);
 u32 ScrollingDialogue_ClearScript(void);
 void ScrollingDialogue_RequestHide(void);
-s32 sub_081BD914(void *);
+s32 ScriptPanel_IsCallbackActive(void *);
 void PauseMenu_HideAllSprites(void *);
 void DarkLoan_OpenDisplay(void *);
 void MenuPrompt_WaitForChildPhase(struct MenuPrompt *);
@@ -17,7 +17,7 @@ void MenuPrompt_ResumeChild(struct MenuPrompt *p)
     MessageWindow_Clear();
     ScrollingDialogue_ClearScript();
     ScrollingDialogue_RequestHide();
-    if (sub_081BD914(p->child)) {
+    if (ScriptPanel_IsCallbackActive(p->child)) {
         PauseMenu_HideAllSprites(p);
         DarkLoan_OpenDisplay(p->child);
         Hud_SetUpdateCallback(p, MenuPrompt_WaitForChildPhase);

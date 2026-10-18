@@ -1,5 +1,4 @@
 #include "global.h"
-#define SpriteController_AnimateShrinking sub_081C3A98
 #define SpriteController_Stop RegistryF3E4_SetHidden
 struct SpriteController {
     u8 unknown0[0x3c];
@@ -9,7 +8,7 @@ struct SpriteController {
 };
 void SpriteController_Stop(struct SpriteController *);
 s32 __divsi3(s32, s32);
-void sub_081C3A98(struct SpriteController *p)
+void SpriteController_AnimateShrinking(struct SpriteController *p)
 {
     s32 scale;
     s32 duration = 8;

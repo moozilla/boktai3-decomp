@@ -1,9 +1,5 @@
 #include "global.h"
 
-#define Armor_StartPaletteTransition sub_08181DD8
-#define Armor_UpdatePaletteTransition sub_08181BF8
-#define Armor_RestorePaletteBanks sub_081816B0
-
 /* Tentative armor palette view; unknown fields retain their observed offsets.
  * Callback arguments point to the embedded controller at offset 0x650.
  * Check 4 matched all 160 bytes using the old ELF name Palette_CopyBank for
@@ -23,15 +19,15 @@ struct ArmorPaletteState {
     u8 secondaryIndex;
 };
 
-void Armor_UpdatePaletteTransition(void *);
-void Armor_RestorePaletteBanks(void *);
+void ActorPalette_BlendSavedBanks(void *);
+void ActorPalette_RestoreSelectedBanks(void *);
 void Palette_CopyBank(void *, const void *);
 
-void sub_08181DD8(struct ArmorPaletteState *group)
+void Armor_StartPaletteTransition(struct ArmorPaletteState *group)
 {
     struct ArmorPaletteCallbacks *callbacks = &group->callbacks;
-    void (*update)(void *) = Armor_UpdatePaletteTransition;
-    void (*complete)(void *) = Armor_RestorePaletteBanks;
+    void (*update)(void *) = ActorPalette_BlendSavedBanks;
+    void (*complete)(void *) = ActorPalette_RestoreSelectedBanks;
     u32 offset;
     u8 *source;
     callbacks->update = update;

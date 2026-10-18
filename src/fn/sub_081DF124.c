@@ -1,4 +1,3 @@
-#define AnimPanel_LoadSelections sub_081DF124
 #define gAnimPanelSavedSelections gUnk_020005C0
 #include "global.h"
 extern u8 gUnk_020005C0[];
@@ -6,10 +5,10 @@ struct AnimPanel {
     u8 unk0[0x34c];
     u32 selectionSecondary;
     u32 selectionPrimary;
-    u8 unk354[0x770-0x354];
+    u8 unk354[0x770 - 0x354];
     u32 selections[24];
 };
-void sub_081DF124(struct AnimPanel *p)
+void AnimPanel_LoadSelections(struct AnimPanel *p)
 {
     s32 i = 0;
     u8 *saved = gUnk_020005C0;

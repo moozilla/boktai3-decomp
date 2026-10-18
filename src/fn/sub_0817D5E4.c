@@ -1,5 +1,4 @@
 #include "global.h"
-#define ActorAnimation_UpdateDirectional sub_0817D5E4
 
 struct DirectionalActor {
     u8 pad0[0x9C];
@@ -17,7 +16,7 @@ struct DirectionalActor {
 void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
 s32 Callback_InvokeActor(void *, void *);
 
-void sub_0817D5E4(struct DirectionalActor *p)
+void ActorAnimation_UpdateDirectional(struct DirectionalActor *p)
 {
     if (p->restart) {
         p->restart = 0;

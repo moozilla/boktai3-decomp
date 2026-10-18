@@ -1,17 +1,17 @@
-#define Serial_ReadLatestPacket sub_082234C4
 #define Interrupts_DisableMaster Serial_DisableGlobalInterrupts
-#define Interrupts_EnableMaster Serial_EnableGlobalInterrupts
-#define gSerialTransferStatus gUnk_03005324
-#define gSerialConnectionRole gUnk_0300531C
+#define Interrupts_EnableMaster  Serial_EnableGlobalInterrupts
+#define gSerialTransferStatus    gUnk_03005324
+#define gSerialConnectionRole    gUnk_0300531C
 #define gSerialLatestPacketIndex gUnk_03001734
-#define gSerialLatestPackets gUnk_03005340
+#define gSerialLatestPackets     gUnk_03005340
 #include "global.h"
 extern s32 gUnk_03005324, gUnk_0300531C;
 extern u32 gUnk_03001734;
 extern u16 gUnk_03005340[];
 void Serial_DisableGlobalInterrupts(void);
 void Serial_EnableGlobalInterrupts(void);
-s32 sub_082234C4(u16 *out) {
+s32 Serial_ReadLatestPacket(u16 *out)
+{
     s32 status = gUnk_03005324;
     if (status < 0 && status > -3) {
         out[0] = 0xFFFF;

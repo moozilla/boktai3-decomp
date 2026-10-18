@@ -21,7 +21,7 @@ void ScenePanel_InitScheduledAction(struct ScenePanel *input)
             action = ScenePanel_TickAngleBurst;
             goto shared;
         case 2:
-            panel->handle = sub_0819AD94(panel->resourceId, &panel->origin);
+            panel->handle = SceneEffect_CreateMovingTask(panel->resourceId, &panel->origin);
             handleOffset = 0x1364;
             destination = &panel->action;
             action = ScenePanel_TickHandleActionB;
@@ -32,7 +32,7 @@ void ScenePanel_InitScheduledAction(struct ScenePanel *input)
             panel->interval = 360;
             break;
         case 4:
-            panel->handle = sub_0819AA8C(panel->resourceId, &panel->origin);
+            panel->handle = SceneEffect_CreateEntryTask(panel->resourceId, &panel->origin);
             handleOffset = 0x1364;
             destination = &panel->action;
             action = ScenePanel_TickHandleActionA;

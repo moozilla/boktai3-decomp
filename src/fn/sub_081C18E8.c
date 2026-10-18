@@ -1,5 +1,4 @@
 #include "global.h"
-#define AnimatedObject_AdvanceThreeFrameCycle sub_081C18E8
 /* Tentative: selects one of three frames from a wrapping fixed-point phase. */
 struct AnimatedObject {
     u8 pad0[0x6c];
@@ -11,7 +10,7 @@ struct AnimatedObject {
     u16 phase;
     u16 phaseStep;
 };
-void sub_081C18E8(struct AnimatedObject *p)
+void AnimatedObject_AdvanceThreeFrameCycle(struct AnimatedObject *p)
 {
     struct AnimatedObjectSprite {
         u8 pad0[0x10];

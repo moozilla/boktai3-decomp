@@ -1,4 +1,3 @@
-#define Ratatosk_UpdateFadeIn sub_081F4C08
 #include "global.h"
 struct RatatoskAnimation {
     u32 unknown[2];
@@ -32,9 +31,9 @@ void ScaledShadow_Disable(void *);
 void ScaledShadow_Enable(void *);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void Sound_PlaySong(u32);
-void sub_081FEB84(s32);
+void SlotController_SetSlotFlag2(s32);
 s32 Callback_InvokeActor(void *, void *);
-void sub_081F4C08(struct Ratatosk *p, s32 timer)
+void Ratatosk_UpdateFadeIn(struct Ratatosk *p, s32 timer)
 {
     if (p->entering) {
         struct RatatoskAnimation *a;
@@ -55,7 +54,7 @@ void sub_081F4C08(struct Ratatosk *p, s32 timer)
         u32 mask = 0x8000c;
         p->flags |= mask;
     }
-    sub_081FEB84(Ratatosk_GetSelectedPointIndex());
+    SlotController_SetSlotFlag2(Ratatosk_GetSelectedPointIndex());
     if (timer > 299 || p->fade > 63) {
         p->fade = 64;
         {

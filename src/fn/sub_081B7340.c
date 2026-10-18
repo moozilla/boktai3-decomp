@@ -1,4 +1,3 @@
-#define EffectPool_FindFreeSlot sub_081B7340
 #include "global.h"
 struct EffectPoolSlot {
     s32 active;
@@ -9,7 +8,7 @@ struct EffectPool {
     s32 count;
     struct EffectPoolSlot slots[8];
 };
-struct EffectPoolSlot *sub_081B7340(struct EffectPool *pool)
+struct EffectPoolSlot *EffectPool_FindFreeSlot(struct EffectPool *pool)
 {
     s32 *slot;
     s32 offset;

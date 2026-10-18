@@ -1,13 +1,12 @@
 #include "global.h"
 #include "directional_interaction.h"
-#define SegmentDisplay_CallSelectionScript sub_081C1D88
 struct SegmentDisplay {
     u8 unknown0[0x57e];
     u16 selection;
     u8 unknown580[0x2c];
     u32 selectionScript;
 };
-void sub_081C1D88(struct SegmentDisplay *p)
+void SegmentDisplay_CallSelectionScript(struct SegmentDisplay *p)
 {
     if (p->selectionScript) {
         s32 value;

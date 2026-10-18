@@ -1,7 +1,6 @@
 #include "global.h"
-#define PaletteScreen_InitDisplayResources sub_081C0AA0
 #define gDisplayControlShadow gUnk_03004BD8
-#define gPaletteShadow gUnk_03004FC0
+#define gPaletteShadow        gUnk_03004FC0
 struct PaletteScreen {
     u8 task[0x18];
     u8 *background;
@@ -13,7 +12,7 @@ void Bg_SetupLayers(int, int, void *, int, int, int, void *);
 void *ScriptProc_Start(u16, u16);
 void Bg_SetPriority(u32, s32);
 u8 *sub_08216E54(u16);
-void sub_081C0AA0(struct PaletteScreen *p)
+void PaletteScreen_InitDisplayResources(struct PaletteScreen *p)
 {
     u8 *resource;
     u8 *palette;

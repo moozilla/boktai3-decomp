@@ -5,7 +5,7 @@ void ScenePanelSubject_UpdateTimedEffect(struct ScenePanelSubjectView *subject)
         subject->byteTimer--;
     if (subject->countdown == 0) {
         if (subject->stateFrame == 0)
-            sub_08231568(subject->effects);
+            EffectGroup_Reset(subject->effects);
         subject->stateFrame++;
         if (subject->stateFrame > 15) {
             subject->drawable.position = subject->home;

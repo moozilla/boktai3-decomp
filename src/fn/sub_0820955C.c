@@ -4,12 +4,12 @@ struct S {
     void (*cb)(void);
 };
 void FanCannon_UpdateInactive(void);
-void sub_08209704(void);
+void FanCannon_UpdateActive(void);
 void Sound_PlaySong(u32);
 u32 FanCannon_ToggleActiveState(struct S *p)
 {
     if (p->cb == FanCannon_UpdateInactive) {
-        p->cb = sub_08209704;
+        p->cb = FanCannon_UpdateActive;
         Sound_PlaySong(0x519);
     } else
         p->cb = FanCannon_UpdateInactive;

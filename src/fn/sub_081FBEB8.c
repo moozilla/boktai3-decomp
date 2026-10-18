@@ -1,4 +1,3 @@
-#define OverlaySlot_InitializeExtended sub_081FBEB8
 #define SlotMotion_InitializeExtended Ratatosk_InitAnimatedParticleParams
 #include "global.h"
 #include "terrain_overlay.h"
@@ -22,7 +21,8 @@ static inline void clearPosition(void *target, u32 *source, u32 flags)
     *source = 0;
     CpuSet(source, target, flags);
 }
-void sub_081FBEB8(struct OverlayManager *manager, struct ExtendedOverlaySlot *slot)
+void OverlaySlot_InitializeExtended(struct OverlayManager *manager,
+                                    struct ExtendedOverlaySlot *slot)
 {
     u32 zero;
     Ratatosk_InitAnimatedParticleParams(slot->motion);

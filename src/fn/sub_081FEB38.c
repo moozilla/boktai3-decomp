@@ -1,6 +1,5 @@
 #include "global.h"
-#define SlotController_IsSlotIdle sub_081FEB38
-#define gSlotController           gUnk_020005EC
+#define gSlotController gUnk_020005EC
 struct ControllerSlot {
     u8 callback[0xE0];
     s16 state;
@@ -14,7 +13,7 @@ struct SlotController {
 };
 extern struct SlotController *gUnk_020005EC;
 void SunOrb_GetOrCreateManager(void);
-s32 sub_081FEB38(s32 index)
+s32 SlotController_IsSlotIdle(s32 index)
 {
     struct SlotController *controller = gUnk_020005EC;
     if (!controller) {

@@ -9,11 +9,11 @@ struct S {
     u8 g[0xAD8 - 0x658];
     u16 h;
 };
-void sub_08181B00(void);
+void ActorPalette_FadeWhite(void);
 void Armor_StartSlowWhiteFade(struct S *p)
 {
     struct Sub *s = &p->s;
-    void (*f)(void) = sub_08181B00;
+    void (*f)(void) = ActorPalette_FadeWhite;
     u32 z = 0;
     s->fn = f;
     s->z = z;

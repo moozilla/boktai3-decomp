@@ -1,6 +1,4 @@
-#define Combat_SpawnDirectionalProjectile sub_0820FFE4
-#define Combat_CreateProjectile           sub_08202B30
-#define gCombatSineTable                  gUnk_086149C4
+#define gCombatSineTable gUnk_086149C4
 #include "global.h"
 /* Names and field interpretations are tentative. */
 struct ProjectilePosition {
@@ -20,7 +18,7 @@ void ProjectileConfig_SetAppearance(void *, u32, u32, s32);
 void ProjectileConfig_SetCollision(void *, u32, u32, u32, u32, u32);
 void ProjectileConfig_SetMovement(void *, u32, u32, u32, u32);
 void ProjectileConfig_SetAnimation(void *, u32, u32, u32);
-void sub_08202B30(void *, void *);
+void Projectile_SpawnFromConfig(void *, void *);
 static inline s32 scale(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
@@ -46,7 +44,7 @@ static inline void raisePosition(struct ProjectilePosition *p)
 {
     p->y += 0x80;
 }
-void sub_0820FFE4(struct ProjectileEmitter *emitter, u8 direction)
+void Combat_SpawnDirectionalProjectile(struct ProjectileEmitter *emitter, u8 direction)
 {
     u8 config[0x5C];
     struct ProjectilePosition position;
@@ -63,5 +61,5 @@ void sub_0820FFE4(struct ProjectileEmitter *emitter, u8 direction)
     ProjectileConfig_SetMovement(config, 0, 0x78, (u8)(((direction + 5) & 7) << 5),
                                  emitter->movement);
     ProjectileConfig_SetAnimation(config, 0xA6CF, 3, 8);
-    sub_08202B30(config, &position);
+    Projectile_SpawnFromConfig(config, &position);
 }

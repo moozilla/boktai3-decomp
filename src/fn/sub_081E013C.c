@@ -4,7 +4,7 @@
 // 21 differing instruction runs; size -4 bytes; first diff at +0x18 (movs r1, #0xd2 vs movs r2, #0xd2)
 extern u32 gUnk_02000358[];
 extern u8 gUnk_03004FC0[];
-void sub_081DF124(u8 *);
+void AnimPanel_LoadSelections(u8 *);
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void *ScriptProc_Start(u32, u32);
@@ -46,7 +46,7 @@ u32 sub_081E013C(u8 *s)
     *initial = (one = 1);
     *oneptr = one;
     *(u16 *)(s + 0x364) = zero;
-    sub_081DF124(s);
+    AnimPanel_LoadSelections(s);
     if (gUnk_02000358[6])
         *flags = 0x41;
     Bg_ClearTilemap(0);

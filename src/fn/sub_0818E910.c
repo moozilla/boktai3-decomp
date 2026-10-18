@@ -1,7 +1,6 @@
 #include "global.h"
 
-#define SceneEffectPool_Update    sub_0818E910
-#define Callback_Invoke Callback_InvokeActor
+#define Callback_Invoke           Callback_InvokeActor
 #define gSceneEffectPoolCallbacks gUnk_08611D14
 
 struct SceneEffectPosition {
@@ -22,7 +21,7 @@ struct SceneEffectPool {
 extern void *gSceneEffectPoolCallbacks[];
 s32 Callback_Invoke(void *, void *);
 
-void sub_0818E910(struct SceneEffectPool *pool, struct SceneEffectPosition *position)
+void SceneEffectPool_Update(struct SceneEffectPool *pool, struct SceneEffectPosition *position)
 {
     s32 i;
     if (position)

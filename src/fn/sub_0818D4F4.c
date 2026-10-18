@@ -20,7 +20,7 @@ struct Obj {
     u8 byte1DD;
 };
 s32 Div(s32, s32);
-void sub_0818D590(struct Obj *);
+void Armor_AcceleratePartReturnTurn(struct Obj *);
 void Armor_UpdatePartRetraction(struct Obj *p)
 {
     p->x = p->startX + Div(p->dx * p->timer, 20);
@@ -29,6 +29,6 @@ void Armor_UpdatePartRetraction(struct Obj *p)
     p->timer--;
     if (p->timer == 0) {
         p->done = 1;
-        p->callback = sub_0818D590;
+        p->callback = Armor_AcceleratePartReturnTurn;
     }
 }

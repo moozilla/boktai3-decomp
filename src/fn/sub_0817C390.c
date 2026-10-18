@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneActorState_WaitForFlagClear sub_0817C390
 struct SceneActorFlagWait {
     u8 pad0[0x9c];
     u32 flags;
@@ -23,7 +22,7 @@ static inline u8 consume(struct SceneActorFlagWait *p)
     }
     return 0;
 }
-void sub_0817C390(struct SceneActorFlagWait *p)
+void SceneActorState_WaitForFlagClear(struct SceneActorFlagWait *p)
 {
     if (consume(p)) {
         u32 state = 12;
@@ -31,13 +30,13 @@ void sub_0817C390(struct SceneActorFlagWait *p)
     } else {
         u32 one = 1;
         if (!(p->flags & one)) {
-        u32 zero = 0;
-        p->phase0 = zero;
-        p->phase1 = zero;
-        p->phase2 = zero;
-        p->timer = zero;
-        p->pending = one;
-        p->state = one;
+            u32 zero = 0;
+            p->phase0 = zero;
+            p->phase1 = zero;
+            p->phase2 = zero;
+            p->timer = zero;
+            p->pending = one;
+            p->state = one;
         }
     }
     p->timer++;

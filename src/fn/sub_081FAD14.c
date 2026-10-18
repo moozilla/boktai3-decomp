@@ -1,8 +1,7 @@
-#define SceneDistance_UpdateActor          sub_081FAD14
 #define SceneDistance_SelectRandomPosition Ratatosk_GetRandomMovementPoint
-#define SceneDistance_ApplyRequestedState Ratatosk_InitRequestedState
-#define SceneDistance_RunStateCallback Ratatosk_RunStateCallback
-#define SceneDistance_DispatchState Ratatosk_UpdateBehavior
+#define SceneDistance_ApplyRequestedState  Ratatosk_InitRequestedState
+#define SceneDistance_RunStateCallback     Ratatosk_RunStateCallback
+#define SceneDistance_DispatchState        Ratatosk_UpdateBehavior
 #include "global.h"
 #include "scene_vec.h"
 struct SceneDistanceActor {
@@ -16,12 +15,12 @@ struct SceneDistanceActor {
 void SceneActors_UpdateTargetMetrics(void *);
 void SceneActors_UpdateEffects(void *);
 struct SceneVec *Ratatosk_GetRandomMovementPoint(void *);
-void sub_081FA638(void *);
+void Ratatosk_UpdateAnimatedPosition(void *);
 void Ratatosk_UpdateBehavior(void *);
 u32 Ratatosk_InitRequestedState(void *);
 void Ratatosk_RunStateCallback(void *);
 void sub_081FA718(void *);
-s32 sub_081FAD14(struct SceneDistanceActor *p)
+s32 SceneDistance_UpdateActor(struct SceneDistanceActor *p)
 {
     u8 previous = p->nearTarget;
     SceneActors_UpdateTargetMetrics(p);
@@ -29,7 +28,7 @@ s32 sub_081FAD14(struct SceneDistanceActor *p)
         p->selectedPosition = *Ratatosk_GetRandomMovementPoint(p);
         p->phase = 2;
     }
-    sub_081FA638(p);
+    Ratatosk_UpdateAnimatedPosition(p);
     Ratatosk_UpdateBehavior(p);
     Ratatosk_InitRequestedState(p);
     Ratatosk_RunStateCallback(p);

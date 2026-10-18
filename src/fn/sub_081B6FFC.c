@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_081B69F4(u8 *, u8 *, s32);
+void ActorEffect_RemoveSprites(u8 *, u8 *, s32);
 void Collider_Remove(u8 *);
 
 u32 VanargandProjectilePool_Destroy(u8 *p)
@@ -9,7 +9,7 @@ u32 VanargandProjectilePool_Destroy(u8 *p)
     s32 i = 0;
     do {
         if (*(u32 *)(p + 0x18) & (1 << i)) {
-            sub_081B69F4(p, q, i);
+            ActorEffect_RemoveSprites(p, q, i);
         }
         Collider_Remove(q + 0xBC);
         i++;

@@ -1,8 +1,7 @@
-#define SceneComposite_Destroy sub_081ADD9C
 #define SceneComposite_RemoveAnimatedSprite Vanargand_DestroyAnimatedPart
-#define SceneComposite_RemoveSpriteArray Vanargand_DestroyPartSprites
-#define SpritePair_Remove Vanargand_RemovePartSprites
-#define gSceneComposite gUnk_02000250
+#define SceneComposite_RemoveSpriteArray    Vanargand_DestroyPartSprites
+#define SpritePair_Remove                   Vanargand_RemovePartSprites
+#define gSceneComposite                     gUnk_02000250
 #include "global.h"
 struct SceneComposite {
     u8 actor[0x18c];
@@ -17,16 +16,16 @@ void SceneActors_Destroy(void *);
 void Vanargand_DestroyAnimatedPart(void *);
 void Vanargand_DestroyPartSprites(void *);
 void Vanargand_RemovePartSprites(void *);
-void sub_081B7304(void *);
+void PooledController_ActivateIdleSlots(void *);
 void Task_Kill(void *);
 extern void *gUnk_02000250;
-void sub_081ADD9C(struct SceneComposite *p)
+void SceneComposite_Destroy(struct SceneComposite *p)
 {
     SceneActors_Destroy(p);
     Vanargand_DestroyAnimatedPart(p->animatedSprite);
     Vanargand_DestroyPartSprites(p->sprites);
     Vanargand_RemovePartSprites(p->spritePair);
-    sub_081B7304(p->resource);
+    PooledController_ActivateIdleSlots(p->resource);
     Task_Kill(p->task);
     gUnk_02000250 = 0;
 }

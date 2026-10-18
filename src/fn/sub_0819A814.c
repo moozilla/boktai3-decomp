@@ -1,5 +1,4 @@
-#define LinkEffect_UpdateProjectileBurst sub_0819A814
-#define gRandomIndex                     gUnk_03005308
+#define gRandomIndex gUnk_03005308
 #include "global.h"
 struct LinkVector {
     s16 x, y, z;
@@ -18,10 +17,10 @@ extern u32 gRandomIndex;
 s32 Mod(s32, s32);
 void Sound_PlaySongChecked(u32);
 u8 *SunOrb_GetPositionFromManager(u8 *, s32);
-void sub_081FEA80(s32);
+void RisingActorManager_BeginRaise(s32);
 void sub_081FEADC(s32);
-void sub_081FEB84(s32);
-void sub_081FD3D8(u8 *);
+void SlotController_SetSlotFlag2(s32);
+void Projectile_InitParameters(u8 *);
 void sub_081FD01C(u8 *, struct LinkVector *);
 void Projectile_SetBehaviorMode(u8 *, u16);
 void Projectile_SetCollisionParameters(u8 *, u32, u32, u32, u32, u32);
@@ -29,7 +28,7 @@ void Projectile_SetHomingParameters(u8 *, u16, u32, u8);
 void Projectile_SetLaunchParameters(u8 *, u16, u16, u8, u32);
 void Projectile_SetScriptProcedure(u8 *, u32, u16);
 void Projectile_SetSpriteParameters(u8 *, u32, u32, u32);
-void sub_0819A814(struct LinkEffect *p)
+void LinkEffect_UpdateProjectileBurst(struct LinkEffect *p)
 {
     u8 projectile[0x58];
     struct LinkVector position;
@@ -37,13 +36,13 @@ void sub_0819A814(struct LinkEffect *p)
         case 0:
             p->state = 1;
             p->emitted = 0;
-            sub_081FEA80(p->orb);
+            RisingActorManager_BeginRaise(p->orb);
             Sound_PlaySongChecked(0x55B);
             break;
         case 1:
             if (p->emitted <= 5 && Mod(p->timer, 15) == 0) {
                 u32 random;
-                sub_081FD3D8(projectile);
+                Projectile_InitParameters(projectile);
                 gRandomIndex = (gRandomIndex + 1) & 1023;
                 random = *(u8 *)(RANDOM_TABLE_ADDR + gRandomIndex * 2);
                 Projectile_SetLaunchParameters(projectile, 0, 180, random, 8);
@@ -64,7 +63,7 @@ void sub_0819A814(struct LinkEffect *p)
             if (Mod(p->timer, 300) == 180)
                 sub_081FEADC(p->orb);
             if (p->timer <= 179)
-                sub_081FEB84(p->orb);
+                SlotController_SetSlotFlag2(p->orb);
             if (p->timer > 240)
                 p->state = 255;
             break;

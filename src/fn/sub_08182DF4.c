@@ -1,4 +1,3 @@
-#define Armor_UpdateNegativeTurn     sub_08182DF4
 #define gArmorNegativeTurnAnimations gUnk_0824EBD4
 #include "global.h"
 
@@ -38,7 +37,7 @@ struct ArmorTurnController {
 extern const u32 gArmorNegativeTurnAnimations[];
 void Armor_SetAnimationFromStart(u32, u32);
 
-void sub_08182DF4(struct ArmorTurnController *p, s32 duration)
+void Armor_UpdateNegativeTurn(struct ArmorTurnController *p, s32 duration)
 {
     u8 *s = &p->turnState;
     u8 state = *s;

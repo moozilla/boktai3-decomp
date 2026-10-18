@@ -1,5 +1,4 @@
 #include "global.h"
-#define ActorState_UpdateTrigger sub_0817C21C
 
 struct TriggerActor {
     u8 pad0[0xAA];
@@ -28,7 +27,7 @@ static inline u8 ConsumeTrigger(struct TriggerActor *p)
     }
     return 0;
 }
-void sub_0817C21C(struct TriggerActor *p)
+void ActorState_UpdateTrigger(struct TriggerActor *p)
 {
     struct TriggerActor *actor = p;
     if (ConsumeTrigger(p)) {

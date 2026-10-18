@@ -1,4 +1,3 @@
-#define SceneActors_UpdateTimedDirectionalAnimation sub_081F5FEC
 #include "global.h"
 typedef struct TimedSceneActor {
     u8 pad0[0x51];
@@ -13,7 +12,7 @@ typedef struct TimedSceneActor {
     u8 requestedAngle;
 } TimedSceneActor;
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
-void sub_081F5FEC(TimedSceneActor *p, int tick)
+void SceneActors_UpdateTimedDirectionalAnimation(TimedSceneActor *p, int tick)
 {
     if (p->changed) {
         p->changed = 0;

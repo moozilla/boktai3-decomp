@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneKeyframe_SetGridPosition sub_08210C14
 struct SceneGridKeyframe {
     u8 unknown0[0x24];
     u8 data[0x80];
@@ -9,7 +8,7 @@ struct SceneGridKeyframe {
     s16 column, row;
 };
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
-s32 sub_08210C14(struct SceneGridKeyframe *p)
+s32 SceneKeyframe_SetGridPosition(struct SceneGridKeyframe *p)
 {
     p->x = p->column * 40;
     p->y = p->row * 40;

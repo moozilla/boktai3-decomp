@@ -1,6 +1,4 @@
-#define PaletteTransition_UpdateFadeIn  sub_0823659C
 #define PaletteTransition_BlendFromGray RadialBurstEffect_BlendSpritePalette
-#define CallbackGroup_EmitAtPosition    sub_08235EE0
 #include "global.h"
 struct PaletteTransition {
     u32 flags;
@@ -15,8 +13,8 @@ struct PaletteTransition {
     void *owner;
 };
 void RadialBurstEffect_BlendSpritePalette(struct PaletteTransition *);
-void sub_08235EE0(void *, void *);
-void sub_0823659C(struct PaletteTransition *transition)
+void CallbackGroup_EmitAtPosition(void *, void *);
+void PaletteTransition_UpdateFadeIn(struct PaletteTransition *transition)
 {
     if (transition->alpha <= 5)
         transition->flags |= 0x400;
@@ -27,5 +25,5 @@ void sub_0823659C(struct PaletteTransition *transition)
         RadialBurstEffect_BlendSpritePalette(transition);
     }
     if (++transition->ticks <= 19)
-        sub_08235EE0(transition->owner, transition->position);
+        CallbackGroup_EmitAtPosition(transition->owner, transition->position);
 }

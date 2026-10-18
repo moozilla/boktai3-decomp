@@ -1,5 +1,4 @@
-#define SingletonSlot7_SetMotionModeFromScript sub_081F2088
-#define gSceneTilemapController                gUnk_020004B8
+#define gSceneTilemapController gUnk_020004B8
 #include "global.h"
 
 /* Tentative actor and motion-field interpretations, based on static accesses. */
@@ -32,7 +31,7 @@ extern struct SingletonSlot7Origin *gSceneTilemapController;
 void *SceneActors_GetBySlot(u32) __asm__("SceneActors_GetBySlot");
 s32 Script_GetKeywordValue(u32, s32);
 
-void sub_081F2088(void)
+void SingletonSlot7_SetMotionModeFromScript(void)
 {
     struct SingletonSlot7Actor *p = SceneActors_GetBySlot(7);
     if (p) {

@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08219728(void *, void *, int);
+void Anim_SelectWidgetGlyph(void *, void *, int);
 struct Flags {
     u8 pad[0x71dc];
     u8 flags[52];

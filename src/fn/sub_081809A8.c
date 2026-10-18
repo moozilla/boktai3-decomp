@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneCombatActor_ResetDefenseMode sub_081809A8
 struct SceneCombatCollider {
     u8 unknown0[0x34];
     u32 categories, flags;
@@ -29,7 +28,7 @@ static inline void SetDefenseCategories(struct SceneCombatCollider *c)
     c->flags = flags | 4;
     c->categories = categories | 8;
 }
-void sub_081809A8(struct SceneCombatActor *p)
+void SceneCombatActor_ResetDefenseMode(struct SceneCombatActor *p)
 {
     struct SceneCombatState saved = p->state;
     struct SceneCombatCollider *a, *b, *c;

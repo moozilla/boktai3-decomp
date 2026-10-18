@@ -1,5 +1,5 @@
 #include "global.h"
-s32 sub_08219728(void *, void *, u32);
+s32 Anim_SelectWidgetGlyph(void *, void *, u32);
 extern const u8 gUnk_086106B0[];
 struct SceneGauge {
     u8 unknown0[0x204];
@@ -20,6 +20,6 @@ s32 SceneGauge_SelectThresholdFrame(struct SceneGauge *s, s32 value)
     if (level < 0)
         level = 4;
     s->frame = level + 0x22;
-    sub_08219728(s->sprite, s->animation, s->frame);
+    Anim_SelectWidgetGlyph(s->sprite, s->animation, s->frame);
     return level;
 }

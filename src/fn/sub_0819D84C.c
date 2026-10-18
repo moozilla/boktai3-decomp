@@ -1,5 +1,4 @@
 #include "global.h"
-#define ActorAction_PlayTetherSequence sub_0819D84C
 
 struct ActorActionSequence {
     u8 unknown0[0x56];
@@ -29,7 +28,7 @@ static inline u8 ConsumeEntry(struct ActorActionSequence *p)
     }
     return 0;
 }
-void sub_0819D84C(struct ActorActionSequence *p)
+void ActorAction_PlayTetherSequence(struct ActorActionSequence *p)
 {
     struct ActorActionSequence *actor = p;
     u8 *action = p->action;
@@ -39,36 +38,40 @@ void sub_0819D84C(struct ActorActionSequence *p)
         ActionState_SetState(action, 0);
     }
     switch (*action) {
-    case 0:
-        if (*(u32 *)(action + 4) == 0) {
-            u32 animation = 0xE;
-            actor->animation = animation;
-            (*(u32 *)(action + 4))++;
-        } else if (actor->animationDone) ActionState_AdvanceState(action);
-        break;
-    case 1:
-        if (*(u32 *)(action + 4) == 0) {
-            u32 animation = 3;
-            actor->animation = animation;
-            (*(u32 *)(action + 4))++;
-        } else if (actor->animationDone) ActionState_AdvanceState(action);
-        break;
-    case 2:
-        if (*(u32 *)(action + 4) == 0) {
-            u32 animation = 0xD;
-            actor->animation = animation;
-            (*(u32 *)(action + 4))++;
-        } else if (actor->animationDone || TetherActor_GetRequestStatus()) ActionState_SetState(action, 4);
-        break;
-    case 3:
-        if (*(u32 *)(action + 4) == 0) {
-            u32 animation = 0x18;
-            actor->animation = animation;
-            (*(u32 *)(action + 4))++;
-        } else if (actor->animationDone) ActionState_AdvanceState(action);
-        break;
-    case 4:
-        p->done = 1;
-        break;
+        case 0:
+            if (*(u32 *)(action + 4) == 0) {
+                u32 animation = 0xE;
+                actor->animation = animation;
+                (*(u32 *)(action + 4))++;
+            } else if (actor->animationDone)
+                ActionState_AdvanceState(action);
+            break;
+        case 1:
+            if (*(u32 *)(action + 4) == 0) {
+                u32 animation = 3;
+                actor->animation = animation;
+                (*(u32 *)(action + 4))++;
+            } else if (actor->animationDone)
+                ActionState_AdvanceState(action);
+            break;
+        case 2:
+            if (*(u32 *)(action + 4) == 0) {
+                u32 animation = 0xD;
+                actor->animation = animation;
+                (*(u32 *)(action + 4))++;
+            } else if (actor->animationDone || TetherActor_GetRequestStatus())
+                ActionState_SetState(action, 4);
+            break;
+        case 3:
+            if (*(u32 *)(action + 4) == 0) {
+                u32 animation = 0x18;
+                actor->animation = animation;
+                (*(u32 *)(action + 4))++;
+            } else if (actor->animationDone)
+                ActionState_AdvanceState(action);
+            break;
+        case 4:
+            p->done = 1;
+            break;
     }
 }

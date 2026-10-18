@@ -1,5 +1,4 @@
 #include "global.h"
-#define ActorAction_WaitThenChangeBehavior sub_0819E170
 struct ActorActionSequence {
     u8 unknown0[0x90];
     u32 timer90;
@@ -24,7 +23,7 @@ static inline u8 ConsumeEntry(struct ActorActionSequence *p)
     }
     return 0;
 }
-void sub_0819E170(struct ActorActionSequence *p)
+void ActorAction_WaitThenChangeBehavior(struct ActorActionSequence *p)
 {
     u32 *timer;
     if (ConsumeEntry(p)) {

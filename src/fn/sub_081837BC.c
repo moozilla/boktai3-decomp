@@ -1,6 +1,5 @@
 // Callee aliases below resolve against the checker ELF predating symbol promotion.
-#define gActorFixedTransitionAnimation                 gUnk_0824ED54
-#define ActorController_UpdateFixedAnimationTransition sub_081837BC
+#define gActorFixedTransitionAnimation gUnk_0824ED54
 #include "global.h"
 struct ActorAnimationLayer {
     u16 unknown[3];
@@ -11,7 +10,7 @@ struct ActorRenderFlags {
 };
 extern const u32 gActorFixedTransitionAnimation[];
 void Armor_SetAnimationFromStart(u32, u32);
-void sub_081837BC(u8 *p)
+void ActorController_UpdateFixedAnimationTransition(u8 *p)
 {
     u8 *s = p + 0xb40;
     u8 st = *s;

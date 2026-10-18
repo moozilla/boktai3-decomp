@@ -10,7 +10,7 @@ struct Task08197C98 {
     u8 *tiles;
     u8 buf[1];
 };
-void sub_08221208(void *, void *, u32, u32, u32);
+void Palette_BlendBank(void *, void *, u32, u32, u32);
 
 void PaletteEffect_UpdateWhiteFlash(void *task)
 {
@@ -21,7 +21,7 @@ void PaletteEffect_UpdateWhiteFlash(void *task)
     switch (t->state) {
         case 0:
             for (i = 0; i < t->count; i++) {
-                sub_08221208(dst, src, 0x7fff, t->phase, 3);
+                Palette_BlendBank(dst, src, 0x7fff, t->phase, 3);
                 src += 0x20;
                 dst += 0x20;
             }
@@ -33,7 +33,7 @@ void PaletteEffect_UpdateWhiteFlash(void *task)
         case 1: {
             u32 level = 16 - t->phase;
             for (i = 0; i < t->count; i++) {
-                sub_08221208(dst, src, 0x7fff, level, 4);
+                Palette_BlendBank(dst, src, 0x7fff, level, 4);
                 src += 0x20;
                 dst += 0x20;
             }

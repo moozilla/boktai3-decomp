@@ -1,4 +1,3 @@
-#define PositionList_UpdateTranslatedCoordinates sub_082208D4
 #include "global.h"
 struct PositionNode {
     struct PositionNode *next;
@@ -10,7 +9,8 @@ struct PositionNode {
     u8 pad1A[10];
     u16 translated[3];
 };
-void sub_082208D4(struct PositionNode **first, struct PositionNode **second)
+void PositionList_UpdateTranslatedCoordinates(struct PositionNode **first,
+                                              struct PositionNode **second)
 {
     struct PositionNode *next;
     struct PositionNode **saved;

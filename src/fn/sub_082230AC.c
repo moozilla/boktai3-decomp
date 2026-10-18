@@ -1,11 +1,11 @@
-#define Serial_ResetMultiplayer sub_082230AC
 #define gSerialTransferStatus gUnk_03005324
 #define gSerialConnectionRole gUnk_0300531C
 #include "global.h"
 extern u32 gUnk_03005324;
 extern s32 gUnk_0300531C;
 void InterruptsAndVideo_WaitForVBlank(void);
-void sub_082230AC(void) {
+void Serial_ResetMultiplayer_082230AC(void)
+{
     gUnk_03005324 = 0;
     gUnk_0300531C = -1;
     *(vu16 *)0x04000208 = 0;

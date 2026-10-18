@@ -1,4 +1,3 @@
-#define ProximitySequence_TestPlayerDistance sub_08202FBC
 #include "global.h"
 #include "scene_vec.h"
 #include "display_animation.h"
@@ -19,7 +18,7 @@ struct SceneVec *Player_GetEffectivePosition(s32);
 void Anim_RestartSequence(struct DisplaySequenceState *, void *, u32, u32, u32);
 void sub_0820302C(struct ProximitySequence *);
 
-s32 sub_08202FBC(struct ProximitySequence *s)
+s32 ProximitySequence_TestPlayerDistance(struct ProximitySequence *s)
 {
     struct SceneVec *player = Player_GetEffectivePosition(0);
     struct SceneVec *position = &s->position;

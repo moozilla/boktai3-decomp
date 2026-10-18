@@ -1,6 +1,5 @@
-#define AnimatedMarker_BeginReveal       sub_081B7868
 #define AnimatedMarker_RegisterEmptyCell GrowthHazard_RegisterCellEffect
-#define AnimatedMarker_TickReveal GrowthHazard_UpdateIdle
+#define AnimatedMarker_TickReveal        GrowthHazard_UpdateIdle
 #include "global.h"
 /* Tentative proximity-marker family; collider extent interpretation is provisional. */
 struct AnimatedMarkerCollider {
@@ -35,7 +34,7 @@ static inline void AnimatedMarker_SetUpdate(struct AnimatedMarker *marker,
     marker->phaseTimer = 0;
     marker->state = 0;
 }
-void sub_081B7868(struct AnimatedMarker *marker)
+void AnimatedMarker_BeginReveal(struct AnimatedMarker *marker)
 {
     struct AnimatedMarkerCollider *collider;
     marker->flags &= ~0x200;

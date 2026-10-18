@@ -91,7 +91,7 @@ extern struct GroupGlobals {
 
 extern void (*gUnk_08604B48[])(struct GroupObjects *, struct GroupPiece *, int);
 
-void sub_08221110(void *, void *, void *, int, int);
+void Palette_InterpolateBanks(void *, void *, void *, int, int);
 void Shadow_Destroy(void *);
 void Shadow_Initialize(void *, void *, int);
 void SceneMessages_RegisterReceiver(void *, int, int);

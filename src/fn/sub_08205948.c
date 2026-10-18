@@ -1,5 +1,4 @@
 #include "global.h"
-#define Ooze_InitAttackCollider sub_08205948
 struct Ooze {
     u8 pad0[0x68];
     u8 collider[0xb0];
@@ -16,7 +15,7 @@ void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
 void Collider_SetCallback(void *, void *, void *);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Ooze_OnCollision(void);
-void sub_08205948(struct Ooze *p)
+void Ooze_InitAttackCollider(struct Ooze *p)
 {
     struct OozeColliderVector size, offset;
     void *collider = p->collider;

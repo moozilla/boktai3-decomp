@@ -1,8 +1,12 @@
-#define ActorEffect_SpawnOffsetEffect sub_081ECBC0
 #define gEffectSourceActors gUnk_020004F0
 #include "global.h"
-struct EffectPosition { s32 x, y, z, unused; };
-struct EffectSourceActor { u8 pad[0x28]; struct EffectPosition position; };
+struct EffectPosition {
+    s32 x, y, z, unused;
+};
+struct EffectSourceActor {
+    u8 pad[0x28];
+    struct EffectPosition position;
+};
 struct OffsetEffectActor {
     u8 pad0[0x268];
     s32 x, y;
@@ -39,7 +43,7 @@ static inline void GetSourcePosition(s32 index, s32 *sourcePosition)
         }
     }
 }
-u32 sub_081ECBC0(struct OffsetEffectActor *actor)
+u32 ActorEffect_SpawnOffsetEffect(struct OffsetEffectActor *actor)
 {
     struct EffectPosition position;
     s32 source[4];
@@ -47,7 +51,8 @@ u32 sub_081ECBC0(struct OffsetEffectActor *actor)
     position.y = actor->y - 0x40000;
     position.z = 0x1C000;
     GetSourcePosition(actor->sourceIndex, source);
-    sub_081F2A08(actor->effectId, &position, source, actor->style, actor->parameterA, actor->parameterB);
+    sub_081F2A08(actor->effectId, &position, source, actor->style, actor->parameterA,
+                 actor->parameterB);
     Sound_PlaySong(0x58F);
     /* The original epilogue preserves r0; no explicit result is established. */
 }

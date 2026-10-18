@@ -1,6 +1,5 @@
 #include "global.h"
 // Tentative family name: actor animation/state handlers; specific actor identity unknown.
-#define AnimationActor_UpdateRepeatedAttack sub_081F88A0
 struct AnimationPosition {
     u32 packedXY, packedZ;
 };
@@ -18,7 +17,7 @@ struct AnimationActor {
     u8 padE64[0xede - 0xe64];
     s16 repeatCount;
 };
-void sub_081F3130(struct AnimationActor *, struct AnimationPosition *);
+void Ratatosk_GetPlayerOffsetFarthestFromSelf(struct AnimationActor *, struct AnimationPosition *);
 void Sound_PlaySong(u32);
 static inline u8 ConsumeActivation(struct AnimationActor *p)
 {
@@ -29,11 +28,11 @@ static inline u8 ConsumeActivation(struct AnimationActor *p)
     }
     return 0;
 }
-void sub_081F88A0(struct AnimationActor *p)
+void AnimationActor_UpdateRepeatedAttack(struct AnimationActor *p)
 {
     struct AnimationActor *q = p;
     if (ConsumeActivation(p)) {
-        sub_081F3130(p, &p->target);
+        Ratatosk_GetPlayerOffsetFarthestFromSelf(p, &p->target);
         {
             u32 animation = 4;
             q->animation = animation;

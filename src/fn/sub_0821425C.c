@@ -10,7 +10,7 @@ void sub_08217BBC(void);
 void Palette_RefreshObjectBanks(void);
 void sub_08217960(void);
 void sub_08217430(void);
-void sub_08215490(u32);
+void SpriteOam_ResetQueue(u32);
 u32 InterruptsAndVideo_OnGraphicsUpdateTask(void)
 {
     Palette_ResetObjectAllocation();
@@ -30,7 +30,7 @@ u32 InterruptsAndVideo_OnGraphicsUpdateTask(void)
         sub_08217960();
         sub_08217430();
     }
-    sub_08215490(0);
+    SpriteOam_ResetQueue(0);
     gUnk_03003A50++;
     return 0;
 }

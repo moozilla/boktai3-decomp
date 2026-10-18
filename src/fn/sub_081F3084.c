@@ -1,4 +1,3 @@
-#define Ratatosk_FindPointFarthestFromPosition sub_081F3084
 #include "global.h"
 
 struct RatatoskPoint {
@@ -9,7 +8,8 @@ struct Ratatosk {
     struct RatatoskPoint movementPoints[9];
 };
 
-struct RatatoskPoint *sub_081F3084(struct Ratatosk *self, struct RatatoskPoint *position)
+struct RatatoskPoint *Ratatosk_FindPointFarthestFromPosition(struct Ratatosk *self,
+                                                             struct RatatoskPoint *position)
 {
     u32 maximum = 0;
     s32 selected = -1;

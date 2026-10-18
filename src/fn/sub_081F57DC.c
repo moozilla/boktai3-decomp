@@ -1,4 +1,3 @@
-#define Ratatosk_UpdateTimedPoseVariant sub_081F57DC
 #include "global.h"
 struct Ratatosk {
     u8 pad0[0x51];
@@ -44,7 +43,7 @@ static inline void Ratatosk_SetFacing(struct Ratatosk *p, int angle)
     p->facing8 = value;
 }
 void SceneActors_StartAnimation(void *, void *, void *, int, int, int);
-void sub_081F57DC(struct Ratatosk *p, s32 timer)
+void Ratatosk_UpdateTimedPoseVariant(struct Ratatosk *p, s32 timer)
 {
     struct Ratatosk *p2 = p;
     if (p->entering) {

@@ -1,6 +1,4 @@
 #include "global.h"
-#define EffectPool_CreateTimedEffect sub_0818F50C
-#define EffectPool_AllocateSlot sub_0818F218
 struct EffectPosition {
     u32 a, b;
 };
@@ -12,16 +10,16 @@ struct EffectPoolSlot {
     u8 unknown48[0x20];
     u8 lifetime;
 };
-struct EffectPoolSlot *sub_0818F218(void *);
+struct EffectPoolSlot *EffectPool_AllocateSlot(void *);
 void AnimData_Load(void *, s32);
 void AnimData_SelectPaletteBank(void *, s32);
 void Sprite_Init(void *, void *, s32);
 void Anim_RestartSequence(void *, s32, s32, s32, s32);
 void sub_0818F0FC(void);
 void Nidhoggr_DestroySpriteEffect(void);
-void sub_0818F50C(u8 *p, struct EffectPosition *q)
+void EffectPool_CreateTimedEffect(u8 *p, struct EffectPosition *q)
 {
-    struct EffectPoolSlot *o = sub_0818F218(p);
+    struct EffectPoolSlot *o = EffectPool_AllocateSlot(p);
     if (o != 0) {
         u8 *r = (u8 *)o + 8;
         void (*a)(void);

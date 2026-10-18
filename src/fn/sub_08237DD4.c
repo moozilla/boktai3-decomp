@@ -1,15 +1,23 @@
-#define SpriteBurst_InitParticles sub_08237DD4
 #define Effect_SetSpriteOffset Effect_SetOrigin
-#define Effect_SetPaletteSlot Effect_SetPalette
+#define Effect_SetPaletteSlot  Effect_SetPalette
 #include "global.h"
-struct SpriteBurstParticle { u8 effect[0x28]; u8 active; u8 unknown29[7]; };
-struct SpriteBurst { u8 unknown0[0x77]; u8 state; void *resource; struct SpriteBurstParticle particles[4]; };
+struct SpriteBurstParticle {
+    u8 effect[0x28];
+    u8 active;
+    u8 unknown29[7];
+};
+struct SpriteBurst {
+    u8 unknown0[0x77];
+    u8 state;
+    void *resource;
+    struct SpriteBurstParticle particles[4];
+};
 void *AnimData_FindEntry(s32);
 void sub_08217DE0(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
-void sub_08217EEC(void *, void *, u32);
+void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 void Effect_SetPalette(void *, u32);
-void sub_08237DD4(struct SpriteBurst *p)
+void SpriteBurst_InitParticles(struct SpriteBurst *p)
 {
     s32 i;
     struct SpriteBurstParticle *particle;
@@ -23,7 +31,7 @@ void sub_08237DD4(struct SpriteBurst *p)
     for (i = 3; i >= 0; i--) {
         sub_08217DE0(particle, p->resource, 1);
         Effect_SetOrigin(particle, offset, offset);
-        sub_08217EEC(particle, p->resource, 0x11);
+        SpriteDrawable_SelectTileFrame(particle, p->resource, 0x11);
         Effect_SetPalette(particle, 1);
         *active = 0;
         active += 0x30;

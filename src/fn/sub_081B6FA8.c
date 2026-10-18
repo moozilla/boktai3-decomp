@@ -1,6 +1,5 @@
-#define PooledController_UpdateAll sub_081B6FA8
-#define gEnginePauseFlags          gUnk_0300523C
-#define gPooledControllerUpdates   gUnk_08612144
+#define gEnginePauseFlags        gUnk_0300523C
+#define gPooledControllerUpdates gUnk_08612144
 #include "global.h"
 struct PooledController {
     u8 unknown0;
@@ -16,7 +15,7 @@ struct PooledControllerManager {
 extern u32 gUnk_0300523C;
 extern void *gUnk_08612144[];
 void sub_08249244(void *, void *, s32, void *);
-s32 sub_081B6FA8(struct PooledControllerManager *manager)
+s32 PooledController_UpdateAll(struct PooledControllerManager *manager)
 {
     struct PooledController *slot;
     s32 i;

@@ -1,4 +1,3 @@
-#define HomingEffect_TurnTowardTarget sub_081B6BC4
 #include "global.h"
 struct EffectTargetPosition {
     s16 x;
@@ -19,7 +18,7 @@ struct HomingEffect {
     struct EffectTargetPosition *target;
 };
 s32 Math_Atan2(s32, s32);
-void sub_081B6BC4(struct HomingEffect *effect)
+void HomingEffect_TurnTowardTarget(struct HomingEffect *effect)
 {
     u16 delta;
     s16 limit;

@@ -1,12 +1,16 @@
 #include "global.h"
-#define SpriteMenu_UpdateTimedFade sub_081BBD00
 #define SpriteMenu_SetState SolarBank_SetState
-struct SpriteMenuState { u8 pad0[0x18]; u8 data[0x40]; u8 animation[0x6B4]; u16 timer; };
+struct SpriteMenuState {
+    u8 pad0[0x18];
+    u8 data[0x40];
+    u8 animation[0x6B4];
+    u16 timer;
+};
 s32 Anim_Step(void *, void *);
 void SolarBank_SetState(void *, void (*)(void));
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 void SolarBank_UpdateExitDelay(void);
-void sub_081BBD00(struct SpriteMenuState *menu)
+void SpriteMenu_UpdateTimedFade(struct SpriteMenuState *menu)
 {
     Anim_Step(menu->animation, menu->data);
     if (++menu->timer > 149) {

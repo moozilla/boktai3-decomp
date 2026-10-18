@@ -1,7 +1,6 @@
 #include "global.h"
-#define SceneGrid_IsCellBeforeLimit sub_082123E0
 s32 ForgingBook_GetCategoryEntryCount(u32);
-s32 sub_082123E0(s32 column, s32 row, s32 selection)
+s32 SceneGrid_IsCellBeforeLimit(s32 column, s32 row, s32 selection)
 {
     s32 cell, limit;
     if ((u32)column > 5 || row < 0 || row > 2)

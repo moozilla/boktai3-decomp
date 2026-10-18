@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneTask_DispatchUnlessPaused sub_08206030
 struct SceneDispatchTask {
     u8 unknown0[0x20];
     u32 flags;
@@ -10,9 +9,15 @@ struct SceneDispatchTask {
 };
 extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560;
 s32 Callback_InvokeActor(void *, void *);
-static inline u32 TestPair(u32 mask, u32 *a, u32 *b) { return (*a | *b) & mask; }
-static inline u32 TestFlag(u32 mask, u32 *p) { return *p & mask; }
-s32 sub_08206030(struct SceneDispatchTask *p)
+static inline u32 TestPair(u32 mask, u32 *a, u32 *b)
+{
+    return (*a | *b) & mask;
+}
+static inline u32 TestFlag(u32 mask, u32 *p)
+{
+    return *p & mask;
+}
+s32 SceneTask_DispatchUnlessPaused(struct SceneDispatchTask *p)
 {
     s32 result;
     p->flags |= 1;

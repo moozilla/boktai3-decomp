@@ -1,10 +1,9 @@
-#define SceneNpc_EnterRequestedState sub_081D2544
-#define gSceneNpcStateCallbacks      gUnk_0861265C
+#define gSceneNpcStateCallbacks gUnk_0861265C
 #include "global.h"
 #include "state_actor.h"
 extern void (*const gUnk_0861265C[])(void);
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, int, int, void *, int, int, int);
-s32 sub_081D2544(struct StateActor *p)
+s32 SceneNpc_EnterRequestedState(struct StateActor *p)
 {
     struct StateActorTag *tag = &p->tag;
     s32 result;

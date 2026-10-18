@@ -1,7 +1,5 @@
 // Callee aliases below resolve against the checker ELF predating symbol promotion.
-#define ActorController_ResetPaletteTransition           sub_08181DD8
-#define gActorPaletteTransitionAnimations                gUnk_0824ED98
-#define ActorController_UpdatePaletteAnimationTransition sub_08183A88
+#define gActorPaletteTransitionAnimations gUnk_0824ED98
 #include "global.h"
 
 struct ActorAnimationLayer {
@@ -13,10 +11,10 @@ struct ActorRenderFlags {
 };
 
 extern u32 gActorPaletteTransitionAnimations[];
-void ActorController_ResetPaletteTransition(void *);
+void Armor_StartPaletteTransition(void *);
 void Armor_SetAnimationFromStart(u32 a, u32 b);
 
-void sub_08183A88(u8 *p)
+void ActorController_UpdatePaletteAnimationTransition(u8 *p)
 {
     u8 *s = p + 0xB40;
     u8 st = *s;
@@ -37,7 +35,7 @@ void sub_08183A88(u8 *p)
                 ((struct ActorRenderFlags *)(p + 0x180))->flags &= ~one;
             }
             *(u16 *)(p + 0xB32) &= ~0x20;
-            ActorController_ResetPaletteTransition(p);
+            Armor_StartPaletteTransition(p);
             break;
         }
         case 1:

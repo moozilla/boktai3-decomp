@@ -1,13 +1,18 @@
 #include "global.h"
-#define FanCannonManager_Destroy sub_0820A364
 #define FanCannonManager_RemoveCannon FanCannonManager_DestroySlot
-#define gFanCannonManager gUnk_02000600
-struct FanCannon { u8 unknown0[0x180]; };
-struct FanCannonManager { u8 unknown0[0x18]; u32 active; struct FanCannon cannons[8]; };
+#define gFanCannonManager             gUnk_02000600
+struct FanCannon {
+    u8 unknown0[0x180];
+};
+struct FanCannonManager {
+    u8 unknown0[0x18];
+    u32 active;
+    struct FanCannon cannons[8];
+};
 void Sound_StopSong(u32);
 void FanCannonManager_DestroySlot(struct FanCannonManager *, struct FanCannon *, u32);
 extern u32 gUnk_02000600;
-u32 sub_0820A364(struct FanCannonManager *p)
+u32 FanCannonManager_Destroy(struct FanCannonManager *p)
 {
     struct FanCannon *cannon;
     s32 i;

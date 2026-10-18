@@ -1,6 +1,4 @@
 #include "global.h"
-#define MotionEntry_SetEnabled     sub_081A4834
-#define MotionEntry_UpdatePosition sub_081A4064
 struct MotionPosition {
     s16 x, y, z, pad;
 };
@@ -12,7 +10,7 @@ struct MotionEntry {
     u8 unknown4C[0xD];
     u8 enabled;
 };
-void sub_081A4064(struct MotionEntry *);
+void MotionEntry_UpdatePosition(struct MotionEntry *);
 static inline void Difference(struct MotionPosition *out, struct MotionPosition *a,
                               struct MotionPosition *b)
 {
@@ -20,7 +18,7 @@ static inline void Difference(struct MotionPosition *out, struct MotionPosition 
     out->y = a->y - b->y;
     out->z = a->z - b->z;
 }
-void sub_081A4834(u8 *raw, u32 enabled)
+void MotionEntry_SetEnabled(u8 *raw, u32 enabled)
 {
     struct MotionPosition previous;
     if (raw) {
@@ -29,7 +27,7 @@ void sub_081A4834(u8 *raw, u32 enabled)
             struct MotionPosition *old = &previous;
             struct MotionPosition *pos = &p->position;
             *old = *pos;
-            sub_081A4064(p);
+            MotionEntry_UpdatePosition(p);
             Difference(&p->delta, pos, old);
         }
         p->enabled = enabled;

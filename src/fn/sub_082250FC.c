@@ -9,7 +9,7 @@ extern u32 gUnk_030053F4, gUnk_03005404, gUnk_030053E4, gUnk_030053D8;
 extern u16 gUnk_03005260, gUnk_030039F0, gUnk_03004BD8;
 extern u8 *gUnk_02000710;
 extern u32 *gUnk_030053F8;
-void sub_08224FA4(void);
+void System_ShutdownAndSoftReset(void);
 void SceneLifecycle_InitSceneState(void);
 void Script_ResetLocalVariables(void);
 u32 Script_Call(u32, u32);
@@ -31,7 +31,7 @@ s32 SceneLifecycle_UpdateTask(struct Task *task)
             goto update;
         if ((12 & gUnk_03005260) != 12)
             goto update;
-        sub_08224FA4();
+        System_ShutdownAndSoftReset();
         return 0;
     } else
         gUnk_03005408 = 0;

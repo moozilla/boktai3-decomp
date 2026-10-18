@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_081B6604(u8 *);
+void ActorEffect_UpdateFadeFrame(u8 *);
 void VanargandEffect_UpdateLifetime(u8 *);
 void VanargandEffect_Update(u8 *p)
 {
@@ -9,7 +9,7 @@ void VanargandEffect_Update(u8 *p)
         if (*c == 0)
             *(u32 *)(p + 0x18) &= ~1;
     } else {
-        sub_081B6604(p);
+        ActorEffect_UpdateFadeFrame(p);
         VanargandEffect_UpdateLifetime(p);
     }
 }

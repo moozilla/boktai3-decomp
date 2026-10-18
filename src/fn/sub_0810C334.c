@@ -9,7 +9,7 @@ struct SlotMenu {
     u8 unknown31C[0x624];
     u8 mode;
 };
-s32 sub_08219728(void *, void *, u32);
+s32 Anim_SelectWidgetGlyph(void *, void *, u32);
 void SlotMenu_UpdateLastEntry(struct SlotMenu *p)
 {
     if (p->mode == 3)
@@ -17,7 +17,7 @@ void SlotMenu_UpdateLastEntry(struct SlotMenu *p)
     else
         p->entryValues[6] = 0x7F;
     if (p->entryValues[6] != p->cachedLastValue) {
-        sub_08219728(p->lastEntry, p->lastEntryResource, p->entryValues[6]);
+        Anim_SelectWidgetGlyph(p->lastEntry, p->lastEntryResource, p->entryValues[6]);
         p->cachedLastValue = p->entryValues[6];
     }
 }

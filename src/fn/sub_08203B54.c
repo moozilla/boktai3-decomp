@@ -1,5 +1,3 @@
-#define EnemyF426_SpawnProjectile sub_08203B54
-#define Projectile_SpawnFromConfig sub_08202B30
 #define gSineTable gUnk_086149C4
 #include "global.h"
 
@@ -33,7 +31,7 @@ void ProjectileConfig_SetCollisionExtents(void *, u32, u32, u32);
 void ProjectileConfig_SetCollisionOffset(void *, s32, s32, s32);
 void ProjectileConfig_SetMovement(void *, u32, u32, u32, s32);
 void ProjectileConfig_SetAnimation(void *, u32, u32, u32);
-s32 sub_08202B30(void *, struct EnemyF426Position *);
+s32 Projectile_SpawnFromConfig(void *, struct EnemyF426Position *);
 void Sound_PlaySong(u32);
 
 static inline s32 truncate12(s32 n)
@@ -48,7 +46,7 @@ static inline void polar(struct EnemyF426Position *v, u8 angle, s32 radius)
     v->z = truncate12(gSineTable[angle] * radius);
 }
 
-void sub_08203B54(struct EnemyF426 *actor)
+void EnemyF426_SpawnProjectile(struct EnemyF426 *actor)
 {
     u8 config[0x5c];
     struct EnemyF426Position delta;
@@ -69,12 +67,12 @@ void sub_08203B54(struct EnemyF426 *actor)
     }
     ProjectileConfig_Init(config);
     ProjectileConfig_SetAppearance(config, 0x7e7c, 0, 0x229);
-    ProjectileConfig_SetCollision(config, 0, 0x200000, actor->collisionArg0,
-                                  actor->collisionArg1, actor->collisionArg2);
+    ProjectileConfig_SetCollision(config, 0, 0x200000, actor->collisionArg0, actor->collisionArg1,
+                                  actor->collisionArg2);
     ProjectileConfig_SetCollisionExtents(config, 64, 96, 64);
     ProjectileConfig_SetCollisionOffset(config, 0, -172, 0);
     ProjectileConfig_SetMovement(config, 0, 120, (u8)((actor->direction << 6) + 192),
-                                actor->movementArg);
+                                 actor->movementArg);
     ProjectileConfig_SetAnimation(config, 0xa6cf, 5, 4);
     Projectile_SpawnFromConfig(config, &position);
     Sound_PlaySong(0x515);

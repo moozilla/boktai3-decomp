@@ -1,10 +1,9 @@
-#define GameState_InsertUniqueListEntry sub_0822EA14
 #define GameState_SetListEntry SolarFruit_SetInventorySlot
-#define gGameState gUnk_02000710
+#define gGameState             gUnk_02000710
 #include "global.h"
 #include "game_state.h"
 void SolarFruit_SetInventorySlot(s32, s32);
-s32 sub_0822EA14(s32 value)
+s32 GameState_InsertUniqueListEntry(s32 value)
 {
     s32 i;
     for (i = 0; i < 8; i++) {

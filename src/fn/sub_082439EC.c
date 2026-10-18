@@ -5,7 +5,7 @@ void Sprite_Remove(void *);
 void Collider_Remove(void *);
 void SceneBody_Unregister(void *);
 void LinkPlayer_RemoveAuxiliaryResources(void *);
-void sub_082384C8(void *);
+void Player_StopLocalActionSounds(void *);
 extern u32 gUnk_02000580[];
 extern u16 gUnk_02000544;
 s32 Player_OnDestroy(u8 *p)
@@ -16,7 +16,7 @@ s32 Player_OnDestroy(u8 *p)
     Collider_Remove(p + 0x230);
     SceneBody_Unregister(p + 0x24);
     LinkPlayer_RemoveAuxiliaryResources(p);
-    sub_082384C8(p);
+    Player_StopLocalActionSounds(p);
     gUnk_02000580[*(u32 *)(p + 0x18)] = 0;
     gUnk_02000544--;
     return 0;

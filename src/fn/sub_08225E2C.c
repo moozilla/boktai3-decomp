@@ -1,10 +1,9 @@
-#define Camera_ClampCenteredPosition sub_08225E2C
 #include "global.h"
 struct Camera {
     u8 unknown[0x8e];
     s16 minX, minZ, maxX, maxZ;
 };
-void sub_08225E2C(struct Camera *bounds, s16 *position)
+void Camera_ClampCenteredPosition(struct Camera *bounds, s16 *position)
 {
     s32 half = position[1] >> 1;
     s32 x = position[0] - half;

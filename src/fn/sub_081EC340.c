@@ -2,7 +2,7 @@
 void *Task_Create(s32, s32);
 void Task_SetCallbacks(void *, void *, void *);
 void Task_Kill(void *);
-void sub_081EC1A8(void);
+void ScreenScript_UpdateDelay(void);
 void Results_Destroy(void);
 s32 Results_Initialize(void *);
 
@@ -10,7 +10,7 @@ void *Results_Create(void)
 {
     void *r = Task_Create(0xb, 0x138);
     if (r != 0) {
-        Task_SetCallbacks(r, sub_081EC1A8, Results_Destroy);
+        Task_SetCallbacks(r, ScreenScript_UpdateDelay, Results_Destroy);
         if (Results_Initialize(r) < 0) {
             Task_Kill(r);
             return 0;

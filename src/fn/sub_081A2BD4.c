@@ -1,7 +1,5 @@
 #include "global.h"
-#define ActorReaction_Tick                  sub_081A2BD4
-#define ActorReaction_UpdateCallbackGate    sub_081A1E5C
-#define ActorReaction_CommitRequestedState Hresvelgr_ApplyRequestedAction
+#define ActorReaction_CommitRequestedState  Hresvelgr_ApplyRequestedAction
 #define ActorReaction_ResetFlagsAndDispatch Hresvelgr_UpdateBehaviorMode
 #define gActorUpdatePaused                  gUnk_0300523C
 #define gActorUpdateLatch                   gUnk_02000550
@@ -18,10 +16,10 @@ extern u16 gUnk_02000550;
 void sub_081A26D8(struct ActorReaction *);
 void Hresvelgr_UpdateBehaviorMode(struct ActorReaction *);
 u32 Hresvelgr_ApplyRequestedAction(struct ActorReaction *);
-void sub_081A1E5C(struct ActorReaction *);
+void ActorReaction_UpdateCallbackGate(struct ActorReaction *);
 void sub_081A2858(struct ActorReaction *);
 void Hresvelgr_CopyUpdateTable(struct ActorReaction *);
-u32 sub_081A2BD4(struct ActorReaction *actor)
+u32 ActorReaction_Tick(struct ActorReaction *actor)
 {
     if (gActorUpdatePaused) {
         gActorUpdateLatch = 0;

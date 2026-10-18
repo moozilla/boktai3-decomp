@@ -1,5 +1,4 @@
 #include "global.h"
-#define PositionedEffect_UpdateVectors sub_081A6604
 struct EffectVector {
     s16 x, y, z, pad;
 };
@@ -37,7 +36,7 @@ static inline void UpdateAnimation(struct EffectAnimation *a, struct PositionedE
     struct EffectVector *offset = a->offset;
     AddVector(out, offset, &p->base);
 }
-void sub_081A6604(struct PositionedEffect *p)
+void PositionedEffect_UpdateVectors(struct PositionedEffect *p)
 {
     p->position = p->source;
     SetVector(&p->shifted, p->source.x - 160, p->source.y, p->source.z - 160);

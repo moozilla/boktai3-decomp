@@ -1,4 +1,3 @@
-#define Hresvelgr_OnSecondaryContact sub_0819C1B8
 #include "global.h"
 #include "contact_actor.h"
 struct Hresvelgr {
@@ -30,7 +29,8 @@ static inline u32 testReaction(u32 *flags, u32 mask)
 {
     return *flags & mask;
 }
-void sub_0819C1B8(struct ContactCollider *a, struct ContactCollider *b, struct Hresvelgr *actor)
+void Hresvelgr_OnSecondaryContact(struct ContactCollider *a, struct ContactCollider *b,
+                                  struct Hresvelgr *actor)
 {
     struct Hresvelgr *saved = actor;
     if (actor->contactBlocked == 0) {

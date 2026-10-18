@@ -1,7 +1,5 @@
 #include "global.h"
 /* Tentative ParticleEffect/ParticleBurst family names (low confidence). */
-#define ParticleBurst_Update      sub_082370AC
-#define ParticleBurst_UpdateSlots sub_08236D58
 struct ParticleBurst {
     u8 pad[0x98];
     u8 spriteActive;
@@ -11,13 +9,13 @@ struct ParticleBurst {
     u8 mode;
 };
 void sub_08236F48(struct ParticleBurst *);
-void sub_08236D58(struct ParticleBurst *);
+void ParticleBurst_UpdateSlots(struct ParticleBurst *);
 void Task_Kill(void *);
-u32 sub_082370AC(struct ParticleBurst *p)
+u32 ParticleBurst_Update(struct ParticleBurst *p)
 {
     sub_08236F48(p);
     if (p->mode == 1)
-        sub_08236D58(p);
+        ParticleBurst_UpdateSlots(p);
     if (!p->spriteActive && !p->slotsActive)
         Task_Kill(p);
 }

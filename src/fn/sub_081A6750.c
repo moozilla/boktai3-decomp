@@ -1,5 +1,4 @@
 #include "global.h"
-#define PositionedEffect_SetHalfScaleCoordinates sub_081A6750
 struct EffectVector {
     s16 x, y, z, pad;
 };
@@ -13,7 +12,8 @@ static inline s32 HalfTowardZero(s32 value)
         return value >> 1;
     return -((-value) >> 1);
 }
-void sub_081A6750(struct EffectCoordinates *out, struct EffectVector *source)
+void PositionedEffect_SetHalfScaleCoordinates(struct EffectCoordinates *out,
+                                              struct EffectVector *source)
 {
     out->position.x = HalfTowardZero(source->x - 640) + 512;
     out->position.z = HalfTowardZero(source->z - 640) + 512;

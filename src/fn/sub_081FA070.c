@@ -1,4 +1,3 @@
-#define Ratatosk_InitBodyCollider sub_081FA070
 #include "global.h"
 struct ColliderVector {
     s32 x : 16, y : 16, z : 16, pad : 16;
@@ -15,7 +14,7 @@ void Collider_SetPosition(void *, void *, u32);
 void Collider_SetCallback(void *, void *, void *);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Ratatosk_OnBodyCollision(void);
-void sub_081FA070(struct Ratatosk *p)
+void Ratatosk_InitBodyCollider(struct Ratatosk *p)
 {
     void *collider = p->bodyCollider;
     struct ColliderVector size, offset;

@@ -1,4 +1,3 @@
-#define CannonBattery_InitCannon sub_08199CF4
 #include "global.h"
 #include "engine.h"
 struct CannonBatteryPosition {
@@ -27,11 +26,11 @@ struct CannonBatteryCannon {
 };
 u32 CannonBattery_LoadAnimation(void);
 void Collider_SetBodyProperties(void *, s32, s32, s32);
-void sub_08199C74(void);
+void CallbackSlot_StartWhenTimerReady(void);
 void CannonBattery_UpdateCannon(void *);
 void CannonBattery_DestroyCannon(void *);
 extern u8 gUnk_0824F6D8[], gUnk_0824F6E0[];
-void sub_08199CF4(struct CannonBatteryCannon *p, s32 x, s32 y, s32 z, s32 flip)
+void CannonBattery_InitCannon(struct CannonBatteryCannon *p, s32 x, s32 y, s32 z, s32 flip)
 {
     struct CannonBatterySprite *sprite;
     CannonBattery_LoadAnimation();
@@ -55,7 +54,7 @@ void sub_08199CF4(struct CannonBatteryCannon *p, s32 x, s32 y, s32 z, s32 flip)
     Collider_Init(p->collider, 0, 0x4101, 0, 0x10, gUnk_0824F6D8, gUnk_0824F6E0);
     Collider_SetPosition(p->collider, &p->position, 0);
     Collider_SetBodyProperties(p->collider, 0, 0x100, 0);
-    Collider_SetCallback(p->collider, sub_08199C74, p);
+    Collider_SetCallback(p->collider, CallbackSlot_StartWhenTimerReady, p);
     Collider_Refresh(p->collider);
     {
         u32 update = (u32)CannonBattery_UpdateCannon;

@@ -1,4 +1,3 @@
-#define Ratatosk_Destroy sub_081FAD74
 #include "global.h"
 
 /* Observed component starts; component extents remain unknown. */
@@ -17,7 +16,7 @@ void Collider_Remove(void *);
 u32 Ratatosk_RemoveAnimation(u8 *);
 void SceneActors_Destroy(u8 *);
 
-u32 sub_081FAD74(struct Ratatosk *actor)
+u32 Ratatosk_Destroy(struct Ratatosk *actor)
 {
     if (actor->childTasks[0])
         Task_Kill(actor->childTasks[0]);

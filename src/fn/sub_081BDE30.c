@@ -1,7 +1,6 @@
-#define MenuPanel_SwapConsumableSlots sub_081BDE30
 #include "global.h"
 #include "game_state.h"
-void sub_081BDE30(u32 source, u32 destination)
+void MenuPanel_SwapConsumableSlots(u32 source, u32 destination)
 {
     struct GameState *game = gUnk_02000710;
     struct GameState *a = (struct GameState *)((source << 1) + (u32)game);

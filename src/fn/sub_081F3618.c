@@ -1,4 +1,3 @@
-#define Ratatosk_UpdateEightDirectionAnimation sub_081F3618
 #include "global.h"
 
 /* Ratatosk field and state interpretations are provisional (low confidence). */
@@ -38,7 +37,7 @@ static inline void facing(struct RatatoskActor *p, int angle)
     v &= shifted;
     p->facing8 = v;
 }
-void sub_081F3618(struct RatatoskActor *p, s32 frame)
+void Ratatosk_UpdateEightDirectionAnimation(struct RatatoskActor *p, s32 frame)
 {
     struct RatatoskActor *q = p;
     if (p->changed) {

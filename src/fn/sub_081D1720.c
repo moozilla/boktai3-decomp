@@ -1,7 +1,6 @@
-#define SceneNpc_SetTargetToCurrentPosition sub_081D1720
 #include "global.h"
 #include "state_actor.h"
-void sub_081D1720(void *ctx, struct StateActor *p)
+void SceneNpc_SetTargetToCurrentPosition(void *ctx, struct StateActor *p)
 {
     if (p->enterCommand) {
         p->enterCommand = 0;

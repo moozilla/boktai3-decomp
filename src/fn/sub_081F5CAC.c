@@ -1,4 +1,3 @@
-#define SceneActor_UpdateAnimation15Cycle sub_081F5CAC
 #include "global.h"
 typedef struct TimedSceneActor {
     u8 pad0[0xaf];
@@ -9,7 +8,7 @@ typedef struct TimedSceneActor {
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void Sound_PlaySong(u32);
 void Sound_StopSong(u32);
-void sub_081F5CAC(TimedSceneActor *p, s32 elapsed)
+void SceneActor_UpdateAnimation15Cycle(TimedSceneActor *p, s32 elapsed)
 {
     if (p->enter) {
         p->enter = 0;

@@ -1,4 +1,3 @@
-#define MenuPanel_ShowDescription sub_081BDC34
 #include "global.h"
 #include "scene_inventory_panel.h"
 struct MenuPanel {
@@ -7,7 +6,7 @@ struct MenuPanel {
     u8 pad10A4[0x1740 - 0x10A4];
     const void *text;
 };
-void sub_081BDC34(struct MenuPanel *panel, s32 mode)
+void MenuPanel_ShowDescription(struct MenuPanel *panel, s32 mode)
 {
     ScrollingDialogue_ClearScript();
     panel->bannerFlags |= 1;

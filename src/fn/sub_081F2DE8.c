@@ -1,5 +1,4 @@
 /* Tentative family and field names, based on static accesses. */
-#define ActorProximity_UpdateSquaredDistances sub_081F2DE8
 #include "global.h"
 struct ProximityPosition {
     s16 x, y, z, unknown6;
@@ -15,7 +14,7 @@ struct ActorProximity {
     u8 unknown374[0x9A8];
     struct ProximityEntry entries[9];
 };
-void sub_081F2DE8(struct ActorProximity *p)
+void ActorProximity_UpdateSquaredDistances(struct ActorProximity *p)
 {
     struct ProximityPosition *position = &p->position;
     s32 *distance = &p->entries[0].squaredDistance;

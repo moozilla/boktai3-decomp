@@ -10,5 +10,5 @@ void LevelAdvanceDisplay_StartLevelAnimation(struct LevelAdvanceManager *manager
     manager->active = 1;
     manager->kind = 1;
     for (i = 0; i < 8; i++)
-        sub_08217EEC(&manager->particles[i], manager->particleResource, 0);
+        SpriteDrawable_SelectTileFrame(&manager->particles[i], manager->particleResource, 0);
 }

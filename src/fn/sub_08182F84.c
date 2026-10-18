@@ -1,5 +1,4 @@
-#define ActorController_UpdateResetMotionTransition sub_08182F84
-#define gActorControllerResetMotionAnimations       gUnk_0824EBE4
+#define gActorControllerResetMotionAnimations gUnk_0824EBE4
 
 #include "global.h"
 
@@ -27,10 +26,10 @@ struct ActorController {
 
 extern const u32 gActorControllerResetMotionAnimations[];
 void Armor_SetAnimationFromStart(u32 actor, u32 animation);
-void sub_081822C0(struct ActorController *actor);
+void Armor_StartFullPaletteRestoreDelay(struct ActorController *actor);
 
 /* Tentative reset-motion transition; the optional argument sets speed to 120. */
-void sub_08182F84(struct ActorController *p, s32 setSpeed)
+void ActorController_UpdateResetMotionTransition(struct ActorController *p, s32 setSpeed)
 {
     u8 *s = &p->transitionState;
     u8 st = *s;
@@ -43,7 +42,7 @@ void sub_08182F84(struct ActorController *p, s32 setSpeed)
                 (u32)&gActorControllerResetMotionAnimations[((p->direction + 0x60) >> 6) & 3]);
             (*s)++;
             p->transitionComplete = st;
-            sub_081822C0(p);
+            Armor_StartFullPaletteRestoreDelay(p);
             if (setSpeed != 0)
                 p->speed = 120;
             ((struct ActorControllerPart *)((u8 *)p + 0x238))->flags &= ~four;

@@ -1,5 +1,4 @@
 #include "global.h"
-#define DirectionalSpritePool_Init  sub_0820107C
 #define DirectionalSprite_InitEntry PlayerClone_InitSlot
 #define gDirectionalSpritePool      gUnk_020005F8
 struct DirectionalSprite {
@@ -20,7 +19,7 @@ struct DirectionalSpritePool {
 extern struct DirectionalSpritePool *gUnk_020005F8;
 extern u8 *gUnk_030042E4;
 void PlayerClone_InitSlot(void *, struct DirectionalSprite *, s32);
-s32 sub_0820107C(struct DirectionalSpritePool *pool)
+s32 DirectionalSpritePool_Init(struct DirectionalSpritePool *pool)
 {
     struct DirectionalSprite *entry;
     s32 i;

@@ -1,6 +1,5 @@
 #include "global.h"
 #include "actor_state.h"
-#define ActorState_BeginReverseAnimation sub_0817B9EC
 void sub_0817A034(struct ActorState *, struct ActorAnimationPair *, s32);
 s32 SceneVolume_ConsumePendingEvent(struct ActorState *);
 static inline u8 ConsumeTrigger(struct ActorState *p)
@@ -12,7 +11,7 @@ static inline u8 ConsumeTrigger(struct ActorState *p)
     }
     return 0;
 }
-void sub_0817B9EC(struct ActorStateOwner *owner)
+void ActorState_BeginReverseAnimation(struct ActorStateOwner *owner)
 {
     struct ActorState *p = &owner->actor;
     if (ConsumeTrigger(&owner->actor)) {

@@ -1,4 +1,3 @@
-#define SceneMover_SetSideTarget sub_0819C794
 #include "global.h"
 struct SceneMoverPosition {
     s16 x, y, z;
@@ -17,7 +16,7 @@ static inline void SceneMover_SetVector(struct SceneMoverPosition *v, s32 x, s32
     v->y = y;
     v->z = z;
 }
-void sub_0819C794(struct SceneMover *p)
+void SceneMover_SetSideTarget(struct SceneMover *p)
 {
     struct SceneMoverPosition *anchor = p->anchor;
     struct SceneMoverPosition *other = anchor;

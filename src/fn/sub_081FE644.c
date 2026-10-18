@@ -9,7 +9,7 @@ struct A {
     struct E e[4];
 };
 extern u32 gUnk_020005EC;
-void sub_081FE244(struct A *, struct E *, s32);
+void OrbitEffect_RemoveSlot(struct A *, struct E *, s32);
 void Sound_StopSong(u32);
 u32 OrbitEffect_DestroyManager(struct A *a)
 {
@@ -17,7 +17,7 @@ u32 OrbitEffect_DestroyManager(struct A *a)
     s32 i = 0;
     do {
         if (a->w18 & (1 << i))
-            sub_081FE244(a, e, i);
+            OrbitEffect_RemoveSlot(a, e, i);
         i++;
         e++;
     } while (i <= 3);

@@ -1,4 +1,3 @@
-#define SceneActor_BeginConditionalAnimation8 sub_081F5B74
 #include "global.h"
 typedef struct TimedSceneActor {
     u8 pad0[0x51];
@@ -50,7 +49,7 @@ static inline void setTimedMode(TimedSceneActor *p, s32 duration, u8 mode, u8 va
     } else if (p->mode4AE == 1)
         p->value4AC = 0;
 }
-void sub_081F5B74(TimedSceneActor *p)
+void SceneActor_BeginConditionalAnimation8(TimedSceneActor *p)
 {
     if (p->enter) {
         p->enter = 0;

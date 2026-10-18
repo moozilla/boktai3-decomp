@@ -1,5 +1,4 @@
-#define ItemRecord_ExpandDescriptor sub_0822D764
-#define gItemDescriptorDefaults     gUnk_08E6092C
+#define gItemDescriptorDefaults gUnk_08E6092C
 #include "global.h"
 struct ItemDescriptorView {
     u8 type;
@@ -13,7 +12,7 @@ struct ItemRecord {
     u32 values[3];
 };
 extern const struct ItemDescriptorView gUnk_08E6092C[];
-void sub_0822D764(struct ItemRecord *record, struct ItemDescriptorView *data)
+void ActionRecord_CopyFromEntry(struct ItemRecord *record, struct ItemDescriptorView *data)
 {
     if (record->type == 255)
         data->type = 255;

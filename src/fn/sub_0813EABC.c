@@ -5,7 +5,7 @@
 #include "scene_input_compare.h"
 extern const struct PlayerActionDescriptor gUnk_08E6092C[];
 void Player_SetWeaponInstance(struct Player *, u32);
-void sub_0822D7C0(void *);
+void ItemDescriptor_Reset(void *);
 void ActionRecord_CopyFromEntry(void *, void *);
 void Player_BuildActionModifiers(struct Player *, struct PlayerStatModifierContext *, const void *);
 void sub_0813E90C(struct Player *);
@@ -19,7 +19,7 @@ void Player_BeginDescriptorAction(struct Player *p, u32 entry)
     if (p->actionMode != 6) {
         Player_SetWeaponInstance(p, entry);
         if (p->statModifierContext.actionEntry == NULL)
-            sub_0822D7C0(&descriptor);
+            ItemDescriptor_Reset(&descriptor);
         else
             ActionRecord_CopyFromEntry(p->statModifierContext.actionEntry, &descriptor);
     } else {

@@ -1,4 +1,3 @@
-#define EffectQuad_UpdateEntries  sub_08232E6C
 #define gEffectQuadStateCallbacks gUnk_08602CA0
 #include "global.h"
 struct EffectQuadEntry {
@@ -14,7 +13,7 @@ struct EffectQuadCallbacks {
 };
 extern const struct EffectQuadCallbacks gUnk_08602CA0;
 s32 sub_08249240(void *, void *, void *);
-s32 sub_08232E6C(struct EffectQuad *quad)
+s32 EffectQuad_UpdateEntries(struct EffectQuad *quad)
 {
     struct EffectQuadCallbacks callbacks = gUnk_08602CA0;
     struct EffectQuadEntry *entry = quad->entries;

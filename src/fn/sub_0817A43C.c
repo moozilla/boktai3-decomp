@@ -25,7 +25,7 @@ typedef struct State {
 } State;
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
-void sub_08217EEC(Effect *, void *, s32);
+void SpriteDrawable_SelectTileFrame(Effect *, void *, s32);
 static inline s32 magnitude(s32 v)
 {
     if (v < 0)
@@ -58,7 +58,7 @@ void SceneActors_UpdateConvergingParticles(State *s)
                 draw->x = s->x + (u16)e->dx;
                 draw->y = s->y + (u16)e->dy;
                 if (++e->ticks == 4)
-                    sub_08217EEC(draw, s->graphics, e->kind + 1);
+                    SpriteDrawable_SelectTileFrame(draw, s->graphics, e->kind + 1);
                 count++;
             }
         }

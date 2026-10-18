@@ -13,7 +13,7 @@ void SceneInventory_PopulateConsumableGrid(struct SceneInventoryPanel *input)
     register s32 column asm("r10");
     s32 slot;
     register u32 previous asm("r1");
-    sub_08219728(&panel->display.heading, &panel->display.widgetResource, 0x66);
+    Anim_SelectWidgetGlyph(&panel->display.heading, &panel->display.widgetResource, 0x66);
     {
         u32 zero = 0;
         row = zero;

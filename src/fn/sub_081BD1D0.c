@@ -1,6 +1,5 @@
-#define StatGauge_CloseAfterDelay sub_081BD1D0
 #define StatGauge_SetIdleCallback DarkLoan_HideDisplay
-#define gScreenFlags gUnk_03004BD8
+#define gScreenFlags              gUnk_03004BD8
 #include "global.h"
 struct DirectionalScriptArgs;
 void Script_Call(u32, struct DirectionalScriptArgs *);
@@ -14,7 +13,7 @@ struct StatGaugePreview {
     u8 unknown8f8[0xc];
     u16 timer;
 };
-void sub_081BD1D0(struct StatGaugePreview *p)
+void StatGauge_CloseAfterDelay(struct StatGaugePreview *p)
 {
     if (++p->timer > 31) {
         if (p->exitScript == 0) {

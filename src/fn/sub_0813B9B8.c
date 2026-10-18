@@ -14,7 +14,7 @@ struct HiddenEffectOwner {
     struct HiddenEffectSprite sprite;
     u8 active, ticks, animation;
 };
-void sub_08217EEC(struct HiddenEffectSprite *, void *, u32);
+void SpriteDrawable_SelectTileFrame(struct HiddenEffectSprite *, void *, u32);
 void HiddenEffect_StartAtPosition(struct HiddenEffectOwner *s,
                                   struct HiddenEffectPosition *position, s32 alternate)
 {
@@ -23,7 +23,7 @@ void HiddenEffect_StartAtPosition(struct HiddenEffectOwner *s,
         s->animation = 0x48;
     else
         s->animation = 4;
-    sub_08217EEC(sprite, s->graphics, s->animation);
+    SpriteDrawable_SelectTileFrame(sprite, s->graphics, s->animation);
     sprite->position = *position;
     sprite->flags &= ~1;
     s->active = 1;

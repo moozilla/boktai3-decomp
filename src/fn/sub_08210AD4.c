@@ -1,4 +1,3 @@
-#define Collection_UpdateEntryVisibility sub_08210AD4
 #include "global.h"
 
 u32 Collection_IsEntryUnlocked(u32 i);
@@ -16,7 +15,7 @@ struct CollectionMenu {
 };
 
 /* Tentative: bit 0 hides an entry display outside the unlocked current page. */
-s32 sub_08210AD4(struct CollectionMenu *menu)
+s32 Collection_UpdateEntryVisibility(struct CollectionMenu *menu)
 {
     u32 hidden = 1;
     struct CollectionEntryDisplay *entry = menu->entries;

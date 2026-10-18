@@ -2,13 +2,13 @@
 
 void PaletteSet_BlendSourceColors(struct PaletteSet *a, struct PaletteSetEntry *b)
 {
-    sub_08221110(b->blend, b->source[a->from], b->source[a->to], a->blend, 6);
+    Palette_InterpolateBanks(b->blend, b->source[a->from], b->source[a->to], a->blend, 6);
     CpuSet(b->blend, b->colors, 0x10);
 }
 
 void PaletteSet_BlendOverlayColors(struct PaletteSet *a, struct PaletteSetEntry *b)
 {
-    sub_08221110(b->colors, b->blend, b->overlay, a->overlay, 6);
+    Palette_InterpolateBanks(b->colors, b->blend, b->overlay, a->overlay, 6);
 }
 
 int PaletteSet_Update(struct PaletteSet *p)
@@ -16,7 +16,7 @@ int PaletteSet_Update(struct PaletteSet *p)
     int amount = Palette_GetTransitionLevel(), changed = 0, i;
     struct PaletteSetEntry *palette;
     if (p->current != gUnk_03005430[14]) {
-        sub_08227950(&p->from, &p->to);
+        Palette_GetStateBlendIndices(&p->from, &p->to);
         goto refresh;
     }
     if (p->blend != amount)
@@ -75,11 +75,11 @@ int PaletteSet_Initialize(struct PaletteSet *p, u16 id)
             entry->source[1] = (u8 *)entry->source[0] + 32;
             entry->source[2] = (u8 *)entry->source[1] + 32;
             entry->slot = PaletteSet_GetSlotForId(entry->id);
-            sub_08221208(overlay, entry->source[2], 0, 14, 6);
+            Palette_BlendBank(overlay, entry->source[2], 0, 14, 6);
             p->count++;
         }
     }
-    sub_08227950(&p->from, &p->to);
+    Palette_GetStateBlendIndices(&p->from, &p->to);
     p->blend = 64;
     p->previous = gUnk_03005430[15];
     p->current = gUnk_03005430[14];

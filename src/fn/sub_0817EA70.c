@@ -1,5 +1,4 @@
 #include "global.h"
-#define SceneEventActor_UpdateTimedAnimation sub_0817EA70
 struct SceneEventActor {
     u8 unknown0[0x51];
     u8 angle;
@@ -19,13 +18,14 @@ struct SceneEventActor {
 void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
 s32 Callback_InvokeActor(void *, void *);
 void ActorAttachment_PlayEffect(void *, s32);
-void sub_0817EA70(struct SceneEventActor *actor, s32 tick)
+void SceneEventActor_UpdateTimedAnimation(struct SceneEventActor *actor, s32 tick)
 {
     if (actor->restart) {
         actor->restart = 0;
         actor->angle = actor->requestedAngle;
         {
-            int shifted; u32 value;
+            int shifted;
+            u32 value;
             shifted = (actor->angle + 0x60) >> 6;
             value = 3;
             value &= shifted;
@@ -35,9 +35,13 @@ void sub_0817EA70(struct SceneEventActor *actor, s32 tick)
             value &= shifted;
             actor->facing8 = value;
         }
-        { u32 mask = 0x400004; actor->flags |= mask; }
+        {
+            u32 mask = 0x400004;
+            actor->flags |= mask;
+        }
     }
-    SceneActors_StartEightDirectionAnimation(actor, (u8 *)actor + 0x2CC, (u8 *)actor + 0x2AC, 0xF4, 1, 1, 4);
+    SceneActors_StartEightDirectionAnimation(actor, (u8 *)actor + 0x2CC, (u8 *)actor + 0x2AC, 0xF4,
+                                             1, 1, 4);
     if (tick == 1) {
         if (actor->mode == 6)
             ActorAttachment_PlayEffect(actor, 3);

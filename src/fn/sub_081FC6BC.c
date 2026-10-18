@@ -1,4 +1,3 @@
-#define SceneProjectile_UpdatePulse sub_081FC6BC
 #include "global.h"
 struct SceneProjectile {
     u32 age;
@@ -11,7 +10,7 @@ struct SceneProjectile {
 };
 s32 Mod(s32, s32);
 void sub_081FD4C0(void *);
-s32 sub_081FC6BC(struct SceneProjectile *p)
+s32 SceneProjectile_UpdatePulse(struct SceneProjectile *p)
 {
     if (p->age > p->lifetime)
         return 1;

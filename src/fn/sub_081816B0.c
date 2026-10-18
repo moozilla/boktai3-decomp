@@ -1,4 +1,3 @@
-#define ActorPalette_RestoreSelectedBanks sub_081816B0
 #include "global.h"
 struct ActorPaletteBanks {
     u32 callbacks[2];
@@ -8,7 +7,7 @@ struct ActorPaletteBanks {
     u8 selected, alternate;
 };
 void Palette_CopyBank(void *, const void *);
-void sub_081816B0(struct ActorPaletteBanks *p)
+void ActorPalette_RestoreSelectedBanks(struct ActorPaletteBanks *p)
 {
     Palette_CopyBank(p->working[p->selected], p->original[p->selected]);
     Palette_CopyBank(p->working[p->selected + 1], p->original[p->selected + 1]);

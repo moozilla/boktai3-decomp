@@ -1,4 +1,3 @@
-#define FlickerParticle_UpdateStationary sub_08234A4C
 #include "global.h"
 struct FlickerParticle {
     u32 flags;
@@ -9,13 +8,13 @@ struct FlickerParticle {
     u8 pad30[4];
     void *resource;
 };
-void sub_08217EEC(void *, void *, u32);
-void sub_08234A4C(struct FlickerParticle *s)
+void SpriteDrawable_SelectTileFrame(void *, void *, u32);
+void FlickerParticle_UpdateStationary(struct FlickerParticle *s)
 {
     if (++s->age > 7) {
         s->flags |= 1;
         s->active = 0;
     } else {
-        sub_08217EEC(s, s->resource, 2 + ((s->age >> 2) & 1));
+        SpriteDrawable_SelectTileFrame(s, s->resource, 2 + ((s->age >> 2) & 1));
     }
 }

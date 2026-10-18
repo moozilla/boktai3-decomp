@@ -1,9 +1,8 @@
-#define ResourceLookup_FindValue sub_08227900
 #include "global.h"
 struct ResourceLookupEntry {
     u16 key, value;
 };
-u32 sub_08227900(u32 key, struct ResourceLookupEntry *entries, s32 low, s32 high)
+u32 ResourceLookup_FindValue(u32 key, struct ResourceLookupEntry *entries, s32 low, s32 high)
 {
     while (low < high) {
         s32 middle = (low + high) >> 1;

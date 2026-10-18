@@ -1,4 +1,3 @@
-#define SpriteEffect_StartBriefAnimation sub_08238744
 #include "global.h"
 #include "level_advance_display.h"
 struct BriefSpriteEffect {
@@ -10,12 +9,15 @@ struct BriefSpriteEffect {
     u8 unknown768[8];
     u8 active, tick, firstFrame;
 };
-void sub_08238744(struct BriefSpriteEffect *p, union LevelAdvancePosition *position, s32 alternate)
+void SpriteEffect_StartBriefAnimation(struct BriefSpriteEffect *p,
+                                      union LevelAdvancePosition *position, s32 alternate)
 {
     struct LevelAdvanceParticle *sprite = (struct LevelAdvanceParticle *)&p->flags;
-    if (alternate) p->firstFrame = 0x48;
-    else p->firstFrame = 4;
-    sub_08217EEC(sprite, p->resource, p->firstFrame);
+    if (alternate)
+        p->firstFrame = 0x48;
+    else
+        p->firstFrame = 4;
+    SpriteDrawable_SelectTileFrame(sprite, p->resource, p->firstFrame);
     sprite->position = *position;
     sprite->flags &= ~1;
     p->active = 1;

@@ -1,5 +1,4 @@
 #define gActorControllerDelayedTransitionAnimations gUnk_0824EEC0
-#define ActorController_FinishDelayedTransition     sub_08184930
 #define Armor_SetAnimationFromStart                 Armor_SetAnimationFromStart /* Legacy name in the local ELF. */
 #include "global.h"
 
@@ -26,7 +25,7 @@ extern u32 gActorControllerDelayedTransitionAnimations[];
 
 void Armor_SetAnimationFromStart(u32 a, u32 b);
 
-void sub_08184930(u8 *p)
+void ActorController_FinishDelayedTransition(u8 *p)
 {
     u8 *state = p + 0xB40;
     if (*state == 0) {

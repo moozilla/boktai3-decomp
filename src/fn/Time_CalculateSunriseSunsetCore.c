@@ -9,7 +9,7 @@ double Time_CalculateMoonAge(s32, u32, s32, s32);
 void Time_CalculateSolarRiseTransitSet(struct SunContext *, s32, double, s32, double, double);
 void SunClock_SetSunrise(s32, s32);
 void SunClock_SetSunset(s32, s32);
-void sub_08229078(s32, s32);
+void SunClock_SetMoonAge(s32, s32);
 s32 __gtdf2(double, double);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
@@ -156,7 +156,7 @@ u32 Time_CalculateSunriseSunsetCore(u32 year, s32 month, s32 day, double latitud
             part = 0;
         } else
             whole = Div(value, 100);
-        sub_08229078(whole, part);
+        SunClock_SetMoonAge(whole, part);
     }
     return 0;
 }

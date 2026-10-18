@@ -1,6 +1,4 @@
-#define EnemyD459_FireProjectile   sub_08204C3C
-#define Projectile_SpawnFromConfig sub_08202B30
-#define gSineTable                 gUnk_086149C4
+#define gSineTable gUnk_086149C4
 #include "global.h"
 
 struct EnemyD459Vector {
@@ -24,7 +22,7 @@ void ProjectileConfig_SetCollisionExtents(void *, u16, u16, u16);
 void ProjectileConfig_SetCollisionOffset(void *, u32, u32, u32);
 void ProjectileConfig_SetMovement(void *, u32, u32, u32, u32);
 void ProjectileConfig_SetAnimation(void *, u32, u32, u32);
-s32 sub_08202B30(void *, struct EnemyD459Vector *);
+s32 Projectile_SpawnFromConfig(void *, struct EnemyD459Vector *);
 void Sound_PlaySong(u32);
 static inline s32 scale(s32 value)
 {
@@ -43,7 +41,7 @@ static inline void addVector(struct EnemyD459Vector *out, struct EnemyD459Vector
     out->y = a->y + b->y;
     out->z = a->z + b->z;
 }
-void sub_08204C3C(struct EnemyD459 *enemy)
+void EnemyD459_FireProjectile(struct EnemyD459 *enemy)
 {
     u8 config[0x5c];
     struct EnemyD459Vector offset;
@@ -61,6 +59,6 @@ void sub_08204C3C(struct EnemyD459 *enemy)
     ProjectileConfig_SetCollisionOffset(config, 0, -72, 0);
     ProjectileConfig_SetMovement(config, 0, 120, (u8)(enemy->facing * 64 + 192), enemy->movement);
     ProjectileConfig_SetAnimation(config, 0xa6cf, 6, 4);
-    sub_08202B30(config, &position);
+    Projectile_SpawnFromConfig(config, &position);
     Sound_PlaySong(0x516);
 }

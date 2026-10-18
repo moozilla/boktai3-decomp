@@ -1,11 +1,10 @@
-#define SpriteComponent_Destroy sub_08180638
 #include "global.h"
 struct SpriteComponent {
     void (*update)(struct SpriteComponent *);
     void (*destroy)(struct SpriteComponent *);
 };
 s32 Callback_InvokeActor(void *, void *);
-u32 sub_08180638(struct SpriteComponent *component)
+u32 SpriteComponent_Destroy(struct SpriteComponent *component)
 {
     u32 result;
     void (*destroy)(struct SpriteComponent *);

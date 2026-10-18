@@ -1,4 +1,3 @@
-#define SceneActor_UpdateDirectionalTrigger sub_081F72E8
 #include "global.h"
 
 u32 Trigger_ConsumePending(void *latch, u32 expected);
@@ -40,7 +39,7 @@ static inline u8 SelectState(s32 value)
     return value;
 }
 
-void sub_081F72E8(struct SceneDirectionalActor *p)
+void SceneActor_UpdateDirectionalTrigger(struct SceneDirectionalActor *p)
 {
     u8 *q = (u8 *)p;
     p->direction = p->requestedDirection;

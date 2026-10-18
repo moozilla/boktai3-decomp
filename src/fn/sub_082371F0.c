@@ -1,5 +1,4 @@
 #include "global.h"
-#define RisingSprite_Update sub_082371F0
 struct RisingSprite {
     u32 flags;
     u8 unknown4[0x16];
@@ -9,10 +8,10 @@ struct RisingSprite {
     u8 active, unknown2D;
     u16 frame;
 };
-void sub_08217EEC(void *, void *, u32);
-void sub_082371F0(struct RisingSprite *p)
+void SpriteDrawable_SelectTileFrame(void *, void *, u32);
+void RisingSprite_Update(struct RisingSprite *p)
 {
-    sub_08217EEC(p, p->resource, (p->frame >> 1) + 12);
+    SpriteDrawable_SelectTileFrame(p, p->resource, (p->frame >> 1) + 12);
     p->height += 10;
     p->frame++;
     if (p->frame == 16) {
