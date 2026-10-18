@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Remove register pins from matched code with the register solver.
 
-  pinfarm.py list [UNIT.c ...] [--out DIR]     write DIR/list.tsv (default wip/farm)
+  pinfarm.py list [UNIT.c ...] [--out DIR] [--shards N]   write DIR/list.tsv (default wip/farm)
   pinfarm.py apply RESULTS.tsv [--commit]      splice matches into src/
 
 `list` finds every function in a unit marked
@@ -89,6 +89,10 @@ def cmd_list(a):
     with open(os.path.join(a.out, "list.tsv"), "w") as f:
         for r in rows:
             f.write("\t".join(r) + "\n")
+    for k in range(a.shards if a.shards > 1 else 0):
+        with open(os.path.join(a.out, f"list-{k}.tsv"), "w") as f:
+            for r in rows[k::a.shards]:
+                f.write("\t".join(r) + "\n")
     print(f"{len(rows)} hinted functions in {len(set(r[2] for r in rows))} units -> {a.out}/list.tsv")
 
 
@@ -190,6 +194,7 @@ def main():
     li = sub.add_parser("list")
     li.add_argument("units", nargs="*")
     li.add_argument("--out", default=os.path.join(ROOT, "wip", "farm"))
+    li.add_argument("--shards", type=int, default=1, help="also write list-K.tsv for N parallel workers")
     ap_ = sub.add_parser("apply")
     ap_.add_argument("results")
     ap_.add_argument("--list", help="list.tsv written by `list` (default: next to the results' parent)")
