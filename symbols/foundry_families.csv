@@ -1071,3 +1071,4 @@ addr,function,name,family,note
 081BD118,sub_081BD118,StatGauge_WaitAfterConfirm,"StatGaugePreview","waits 150 frames before selecting completion message or fade"
 081BD184,sub_081BD184,StatGauge_WaitBeforeFade,"StatGaugePreview","waits 150 frames before starting the fade"
 081BD1D0,sub_081BD1D0,StatGauge_CloseAfterDelay,"StatGaugePreview","closes after 32 frames and optionally calls the exit script"
+081BD334,sub_081BD334,ScriptPanel_InitializeProcedure,"ScriptPanel (tentative)","starts a procedure and snapshots global state"
