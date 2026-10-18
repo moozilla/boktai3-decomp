@@ -1064,3 +1064,4 @@ addr,function,name,family,note
 081BBE20,sub_081BBE20,SpriteMenu_LoadPalette,"SpriteMenu","Loads a palette resource and saves a palette bank."
 081BC1E4,sub_081BC1E4,SpriteMenu_InitText,"SpriteMenu","Reads the optional r argument and configures the menu text."
 081BC354,sub_081BC354,StatGauge_ResetBackground,"StatGaugePreview","resets layer zero and copies its palette"
+081BC5F0,sub_081BC5F0,StatGauge_DrawPreview,"StatGaugePreview","draws stat B with the pending bonus"
