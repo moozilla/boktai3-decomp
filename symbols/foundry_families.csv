@@ -1361,3 +1361,4 @@ addr,function,name,family,note
 08236EF8,sub_08236EF8,ParticleBurst_RewindFrame,"ParticleBurst","rewinds sprite animation and deactivates at frame zero"
 082370AC,sub_082370AC,ParticleBurst_Update,"ParticleBurst","updates sprite and optional slots then retires inactive task"
 082370E8,sub_082370E8,ParticleBurst_Destroy,"ParticleBurst","removes sprite and optional eight-slot effect group"
+08237108,sub_08237108,ActorAttachment_Initialize,"parent-linked actor attachment (tentative)","initializes parent-linked object and offset"
