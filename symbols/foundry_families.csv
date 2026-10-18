@@ -403,3 +403,4 @@ addr,function,name,family,note
 08166670,sub_08166670,MenuDisplay_FindEntryIndex,"MenuDisplay","finds a nonnegative entry in one of four menu lists"
 08166CD0,sub_08166CD0,PlayerPanel_SnapshotValues,"PlayerPanel","copies three player values into panel storage"
 08166ED4,sub_08166ED4,InventoryPanel_UpdateSelectedUnlock,"InventoryPanel","queries or updates the selected unlock display"
+08166F84,sub_08166F84,InventoryPanel_UpdateSelectedEquipment,"InventoryPanel","queries or updates the selected equipment display"
