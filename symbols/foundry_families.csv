@@ -1294,3 +1294,4 @@ addr,function,name,family,note
 0821BB34,sub_0821BB34,Terrain_ResetMap,"terrain map","clear map resources and reset trap storage"
 0821BBBC,sub_0821BBBC,Terrain_BuildRowOffsets,"terrain map","build cell-index offsets for each terrain row"
 0821FE04,sub_0821FE04,Collider_InsertPriorityList,"collider manager","insert a collider once into the bit-0x2000 list"
+08220780,sub_08220780,Collider_TestSegmentBounds,"collider geometry","test a segment against collider bounds on three axes"
