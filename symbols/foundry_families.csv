@@ -362,3 +362,4 @@ addr,function,name,family,note
 08143938,sub_08143938,Player_CalculateMovementSpeed,"Player","calculates capped and modified movement speed"
 0814433C,sub_0814433C,Player_UpdateMovementFacing,"Player","updates facing and movement animation"
 0814D7F8,sub_0814D7F8,Player_SelectActionCue,"Player contact and action variants","selects a cue from the action resource and phase"
+0814D92C,sub_0814D92C,Player_IsActionCueReady,"Player contact and action variants","tests cue-specific animation flags and frame thresholds"
