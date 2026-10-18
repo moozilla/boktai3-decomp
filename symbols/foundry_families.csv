@@ -823,3 +823,4 @@ addr,function,name,family,note
 08179E24,sub_08179E24,ActorImpact_InitCollider,"actor contact response","initializes the actor contact collider and callback"
 08179EB8,sub_08179EB8,ActorExtension_ResetState,"actor extension state","clears a halfword, word and byte in the actor extension; field roles tentative"
 08179EE4,sub_08179EE4,ActorResource_IsBelowSelectedLimit,"actor resource state","compares a signed value against the selected unsigned limit"
+08179F1C,sub_08179F1C,ActorResource_ClampDecrease,"actor resource state","limits a decrease relative to the selected threshold"
