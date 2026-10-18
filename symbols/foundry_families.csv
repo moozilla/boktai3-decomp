@@ -1166,3 +1166,4 @@ addr,function,name,family,note
 081ECC70,sub_081ECC70,ActorMotion_AdvanceTowardScreenTarget,"actor display and motion","adjusts bounded horizontal speed and projects movement to screen coordinates"
 081ECD44,sub_081ECD44,SceneMover_ApproachScreenX,"SceneMover","accelerates toward a screen X target and updates projected position"
 081EEE30,sub_081EEE30,,"unassigned empty callback",""
+081EEE34,sub_081EEE34,SceneMover_InterpolateScreenX,"SceneMover","interpolates screen X from its captured start and flags the final frame"
