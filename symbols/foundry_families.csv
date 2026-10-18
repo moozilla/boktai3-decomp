@@ -733,3 +733,4 @@ addr,function,name,family,note
 0815E710,sub_0815E710,PlayerContact_ApplySyntheticContact,"Player contact response","Builds a temporary collider and applies a synthetic contact."
 0815E790,sub_0815E790,Player_EnterKindFour,"Player state transition","Resets action and script state before entering kind four."
 0815F0D0,sub_0815F0D0,Player_Update,"Player","updates player cues, state, callbacks and position tracking"
+0815F224,sub_0815F224,Player_Destroy,"Player","removes player components and clears player globals"
