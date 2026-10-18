@@ -223,7 +223,7 @@ def original_strings():
 def write_string(sid, text):
     if "\n" in text or "\t" in text:
         raise ValueError("use \\n and \\t escapes, not literal newlines or tabs")
-    text_bank.encode_string(text, {c: g for g, c in text_bank.charmap().items()})
+    raw = text_bank.encode_string(text, {c: g for g, c in text_bank.charmap().items()})
     with open(BANK, encoding="utf-8") as f:
         lines = f.read().split("\n")
     prefix = f"{sid}\tT\t"
@@ -237,6 +237,7 @@ def write_string(sid, text):
     with open(tmp, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
     os.replace(tmp, BANK)
+    return raw
 
 
 class Handler(http.server.BaseHTTPRequestHandler):
@@ -428,10 +429,12 @@ class Handler(http.server.BaseHTTPRequestHandler):
             return self.send(400, {"error": "bad json"})
         if self.path == "/api/string":
             try:
-                write_string(int(req["id"]), req["text"])
+                raw = write_string(int(req["id"]), req["text"])
             except (ValueError, KeyError) as e:
                 return self.send(400, {"error": str(e)})
-            self.send(200, {"ok": True})
+            # a game running with Centaur gets the edit at once (centaur.lua settext)
+            live_sent = self.server.live.command({"c": "settext", "id": int(req["id"]), "hex": raw.hex()})
+            self.send(200, {"ok": True, "live": live_sent})
         elif self.path == "/api/live/cmd":
             self.send(200, {"ok": self.server.live.command(req)})
         elif self.path == "/api/tags":

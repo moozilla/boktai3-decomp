@@ -22,7 +22,7 @@ void SceneActorRegistry_RequestScriptState(void)
             u32 state = 2;
             register u32 offset asm("r4") = 0x2a8;
             register u8 *field asm("r0");
-            register u32 zero asm("r1");
+            u32 zero;
             u32 phaseOffset;
             field = (u8 *)actor + offset;
             zero = 0;
@@ -71,7 +71,7 @@ void SceneActorRegistry_RequestScriptState(void)
                     {
                         u32 flagOffset = 0x114;
                         u32 *flags;
-                        register u32 mask asm("r1");
+                        u32 mask;
                         u32 value;
                         flags = (void *)((u8 *)actor + flagOffset);
                         mask = ~1;
@@ -88,9 +88,9 @@ void SceneActorRegistry_RequestScriptState(void)
                 }
             }
             {
-                register u32 mask asm("r0") = 0x4000;
-                register u32 flagOffset asm("r1") = 0x2d4;
-                register u16 *flags asm("r2");
+                u32 mask = 0x4000;
+                u32 flagOffset = 0x2d4;
+                u16 *flags;
                 u32 value;
                 flags = (void *)((u8 *)actor + flagOffset);
                 value = *flags;
@@ -99,8 +99,8 @@ void SceneActorRegistry_RequestScriptState(void)
             }
             {
                 u32 mask = 8;
-                register u32 flagOffset asm("r4") = 0x2d0;
-                register u32 *flags asm("r1");
+                u32 flagOffset = 0x2d0;
+                u32 *flags;
                 u32 value;
                 flags = (void *)((u8 *)actor + flagOffset);
                 value = *flags;

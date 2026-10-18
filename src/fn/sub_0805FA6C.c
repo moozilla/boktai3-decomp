@@ -1,17 +1,17 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_panel.h"
 void SceneInventory_ShowItemDescription(struct SceneInventoryPanel *panel)
 {
-    s32 item, frame;
+    s32 item;
+    s32 frame;
     if (panel->selection <= 15) {
         item = sub_0822CDA8(panel->selection);
         frame = sub_0816D820(panel->selection);
     } else if (panel->selection <= 23) {
         {
-            register s32 offset asm("r0") = panel->page * 8;
+            s32 offset = panel->page * 8;
             offset -= 16;
             {
-                register u32 selected asm("r4") = panel->selection;
+                u32 selected = panel->selection;
                 offset += selected;
             }
             item = panel->catalog[offset];

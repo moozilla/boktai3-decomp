@@ -8,13 +8,12 @@ void SceneActorEffects_EmitRandomOffsets(struct SceneActorRegistryActor *actor, 
     struct SceneActorRegistryActor *owner = actor;
     u32 kind = mode;
     s32 incomingSpan = inputSpan;
-    asm("" : "+r"(owner), "+r"(kind), "+r"(incomingSpan));
     spanX = incomingSpan;
     offset.z = 0;
     offset.padding = 0;
     if (count > 0) {
         register u32 *index asm("r6") = &gUnk_03005308;
-        register u32 mask asm("r8") = 0x3FF;
+        u32 mask = 0x3FF;
         register s32 left asm("r5") = count;
         do {
             register const u16 *table asm("r4") = gUnk_0203B400;

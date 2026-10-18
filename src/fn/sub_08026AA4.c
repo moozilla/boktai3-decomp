@@ -80,7 +80,7 @@ void sub_08026AA4(ActorAnimation *p, int tick)
         setFacing(p, p->requestedAngle);
         sequence = choose(p->mode, 64, 26);
         {
-            register int offset asm("r2") = 0x240;
+            int offset = 0x240;
             SceneActors_StartAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence, 2, 4);
         }
         Sound_PlaySongChecked(890);
@@ -96,7 +96,7 @@ void sub_08026AA4(ActorAnimation *p, int tick)
                 u32 zeroCall;
                 {
                     int x = trunc12(gUnk_086149C4[(angle + 64) & 255] * 128);
-                    register int zero asm("r0") = 0;
+                    int zero = 0;
                     velocity[0] = x;
                     velocity[1] = zero;
                 }

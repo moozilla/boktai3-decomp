@@ -14,15 +14,13 @@ static inline u32 ReadProfile(u32 index)
 }
 u32 SceneActorControl_GetTravelProfile(struct SceneActorRegistryResetView *actor)
 {
-    register struct SceneActorControlMotionState *state asm("r3") =
-        SceneActorControl_GetMotionState(actor);
-    register u32 offset asm("r4") = 0x3E0;
+    struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
+    u32 offset = 0x3E0;
     s32 sample;
     s32 index;
     u32 result;
-    asm("" : "+r"(offset));
     {
-        register u16 *field asm("r0") = (void *)((u8 *)state + offset);
+        u16 *field = (void *)((u8 *)state + offset);
         sample = Divide128(*field);
     }
     if (sample < 0)
@@ -33,7 +31,7 @@ u32 SceneActorControl_GetTravelProfile(struct SceneActorRegistryResetView *actor
     {
         u32 mask = 8;
         u32 flags;
-        register u32 *field asm("r0");
+        u32 *field;
         offset = 0x3D4;
         field = (void *)((u8 *)state + offset);
         flags = *field;

@@ -74,8 +74,8 @@ modeZero: {
     }
     targetPointer = &target;
     {
-        register u32 offset asm("r1") = 0x448;
-        register u8 *base asm("r0");
+        u32 offset = 0x448;
+        u8 *base;
         register u32 sample asm("r1");
         base = (u8 *)actor + offset;
         route = *(u16 **)(base + 8);
@@ -163,7 +163,7 @@ slopeDone:;
     }
     if (!SceneActorAttachment_TestPositionWindow(actor, &target, 32, 32)) {
         {
-            register u32 mask asm("r1") = ~0xc0;
+            u32 mask = ~0xc0;
             register u32 *flags asm("r2") = cachedFlags;
             u32 value;
             value = *flags;
@@ -251,7 +251,7 @@ slopeDone:;
         u8 *field = (u8 *)actor + controlOffset;
         *(const void **)field = control;
         {
-            register u32 offset asm("r1") = 0x2c8;
+            u32 offset = 0x2c8;
             field = (u8 *)actor + offset;
             *(u16 *)field = wordZero;
         }
@@ -268,7 +268,7 @@ slopeDone:;
             *flags = value;
         }
         {
-            register u32 offset asm("r1") = 0x104;
+            u32 offset = 0x104;
             field = (u8 *)actor + offset;
             *(u32 *)field = wordZero;
         }
@@ -309,7 +309,7 @@ modeOne: {
         *savedFlags = mask;
     }
     {
-        register u32 readOffset asm("r1") = 0x416;
+        u32 readOffset = 0x416;
         u16 *field;
         register u32 value asm("r1");
         register u32 writeOffset asm("r2");

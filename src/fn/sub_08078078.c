@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_contact_list.h"
 #include "player.h"
 extern u16 gUnk_02000544;
@@ -12,7 +11,7 @@ u8 SceneActorBehavior_IsNearParticipant(struct SceneActorRegistryActor *actor)
     s32 index = 0;
     s32 last;
     s32 limit = gUnk_02000544;
-    register struct Player **cursor asm("r12");
+    struct Player **cursor;
     struct Player *player;
     struct SceneActorContactNode *node;
     s32 distance;

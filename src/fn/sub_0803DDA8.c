@@ -29,7 +29,7 @@ s32 ScenePool_StateCruise(void *manager, struct ScenePoolActor *actor, struct Sc
         entry->turnStep = 0x200;
         {
             u32 *flags = &actor->motionFlags;
-            register u32 mask asm("r1");
+            u32 mask;
             mask = ~1;
             *flags &= mask;
         }
@@ -40,7 +40,7 @@ s32 ScenePool_StateCruise(void *manager, struct ScenePoolActor *actor, struct Sc
         if (metric > hi)
             goto outside;
         {
-            register s32 inside asm("r2") = 1;
+            s32 inside = 1;
             if (metric < -0x28000)
                 inside = 0;
             if (!inside)

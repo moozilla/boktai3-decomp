@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_actions.h"
 void SceneInventory_BeginEquipmentCatalogMove(struct SceneInventoryActionView *panel)
 {
@@ -8,14 +7,13 @@ void SceneInventory_BeginEquipmentCatalogMove(struct SceneInventoryActionView *p
     u32 savedAttribute;
     u8 *saved;
     s32 index;
-    register s8 *entry asm("r1");
+    s8 *entry;
     struct SceneInputPosition *target;
     enabled[0] = 1;
     saved = &panel->savedSelection;
     index = panel->page * 8 - 16;
-    asm("" : "+r"(index));
     {
-        register u32 selected asm("r3") = *saved;
+        u32 selected = *saved;
         index += selected;
     }
     entry = panel->catalog;

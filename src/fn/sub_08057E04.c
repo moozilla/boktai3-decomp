@@ -213,7 +213,7 @@ void ScenePanel_UpdateTimePalette(struct ScenePanel *input)
                             cache.previous = next;
                         }
                         {
-                            register u32 step asm("r0") = 2;
+                            u32 step = 2;
                             target = (u16 *)((u8 *)target + step);
                         }
                         destination++;

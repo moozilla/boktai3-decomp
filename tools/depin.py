@@ -5,8 +5,8 @@
 
 For each file, tries deleting each hint on its own (``register T x asm("rN")``
 becomes ``T x``; ``asm("" ...);`` is dropped) and keeps the deletion whenever
-tools/check.py still reports an exact match. Greedy, one hint at a time, so the
-result is a locally minimal set of hints, not a global minimum. Candidates are
+tools/check.py still reports an exact match. Greedy, one hint at a time,
+repeated until a pass removes nothing, so the result is a locally minimal set of hints, not a global minimum. Candidates are
 checked from wip/depin/; with --write, an improved file replaces the original
 (and loses its MATCHING_CONCESSION marker when no hints remain).
 """
@@ -48,16 +48,20 @@ def minimize(src):
     before = len(HINT.findall(text))
     if not matches(trial, text):
         return src, before, None, text
-    i = 0
-    while True:
-        hints = list(HINT.finditer(text))
-        if i >= len(hints):
-            break
-        cand = drop(text, hints[i])
-        if matches(trial, cand):
-            text = cand
-        else:
-            i += 1
+    # repeat until a whole pass removes nothing: dropping one hint can make
+    # an earlier, kept hint unnecessary
+    changed = True
+    while changed:
+        changed, i = False, 0
+        while True:
+            hints = list(HINT.finditer(text))
+            if i >= len(hints):
+                break
+            cand = drop(text, hints[i])
+            if matches(trial, cand):
+                text, changed = cand, True
+            else:
+                i += 1
     if not HINT.search(text):
         text = text.replace(MARK, "")
     return src, before, len(HINT.findall(text)), text

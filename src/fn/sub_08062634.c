@@ -40,7 +40,7 @@ static inline void AddFunds(s32 value, struct GameState **location)
 s32 SceneInventory_TickSaleTransition(struct SceneInventoryTail *input)
 {
     struct SceneInventoryTail *p = input;
-    register u32 selection asm("r6");
+    u32 selection;
     s32 category;
     register s32 value asm("r5");
     SceneInputPanel_ResetHighlights(&p->display, &p->highlight);

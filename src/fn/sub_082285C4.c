@@ -1,7 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 97.6%
-// 4 differing instruction runs; first diff at +0x2C (movs r1, #0xc8 vs adds r0, r7, #0)
 s32 Div(s32, s32);
 s32 Clock_DaysInMonth(s32, s32);
 static inline s32 divideYear(s32 divisor, s32 value)
@@ -11,13 +9,16 @@ static inline s32 divideYear(s32 divisor, s32 value)
 static inline s32 yearDays(s32 year)
 {
     s32 a = Div(year, 4), b = Div(year, 100);
-    s32 c = divideYear(400, year);
+    s32 c;
+    register s32 k asm("r1") = 400;
+    c = Div(year, k);
     return 365 * year + a - b + c;
 }
 s32 sub_082285C4(s32 year, s32 month, s32 day, s32 otherYear, s32 otherMonth, s32 otherDay)
 {
     s32 total = yearDays(year);
-    s32 otherTotal, i;
+    s32 otherTotal;
+    s32 i;
     i = 1;
     while (i < month) {
         total += Clock_DaysInMonth(year, i);
@@ -33,6 +34,3 @@ s32 sub_082285C4(s32 year, s32 month, s32 day, s32 otherYear, s32 otherMonth, s3
     otherTotal += otherDay;
     return total - otherTotal;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_082285C4);
-#endif

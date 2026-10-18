@@ -9,7 +9,6 @@ static inline s32 truncateScale(s32 value)
         scaled >>= 5;
     else
         scaled = -((-scaled) >> 5);
-    asm("" : "+r"(scaled));
     return scaled;
 }
 struct ResourceStationDigitsState {

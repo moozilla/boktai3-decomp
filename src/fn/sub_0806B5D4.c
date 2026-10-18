@@ -263,14 +263,12 @@ struct SpriteEffectController *SpriteEffectController_Create(
                 register u32 full asm("r1") = sequence;
                 u32 narrowSequence;
                 u32 row;
-                register u32 flagsByte asm("r0");
+                u32 flagsByte;
                 narrowSequence = (u16)full;
                 asm("" : "+r"(narrowSequence) : "r"(full));
                 {
                     u32 source = variant;
-                    asm("" : "+r"(source));
                     row = (u8)source;
-                    asm("" : "+r"(row) : "r"(source));
                 }
                 full = animationFlags;
                 flagsByte = (u8)full;
@@ -318,19 +316,17 @@ struct SpriteEffectController *SpriteEffectController_Create(
             sub_08217DE0(sprite, ((struct TileDrawable *)slot->drawable)->graphics, 0);
             sub_08217EC4(sprite, 0U - (u32)biasX, 0U - (u32)biasY);
             {
-                register u32 full asm("r3") = sequence;
+                u32 full = sequence;
                 u32 narrowSequence;
                 u32 row;
-                register u32 flagsByte asm("r0");
+                u32 flagsByte;
                 narrowSequence = (u16)full;
                 {
                     u32 source = variant;
-                    asm("" : "+r"(source));
                     row = (u8)source;
-                    asm("" : "+r"(row) : "r"(source));
                 }
                 {
-                    register u32 source asm("r1") = animationFlags;
+                    u32 source = animationFlags;
                     flagsByte = (u8)source;
                 }
                 Anim_SetSequence(&slot->sequence, resource, narrowSequence, row, flagsByte);
@@ -339,7 +335,7 @@ struct SpriteEffectController *SpriteEffectController_Create(
             {
                 u32 value = sprite->flags;
                 u32 lowOne;
-                register u32 extra asm("r3");
+                u32 extra;
                 lowOne = one;
                 value |= lowOne;
                 extra = drawableFlags;

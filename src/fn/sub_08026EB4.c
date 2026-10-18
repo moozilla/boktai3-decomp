@@ -59,7 +59,7 @@ static inline int trunc12(int x)
 }
 static inline void decay(s16 *p)
 {
-    register s16 *dst asm("r1") = p;
+    s16 *dst = p;
     u32 old = (u16)*dst;
     register int next asm("r0");
     next = *dst > 23 ? old - 24 : 0;
@@ -68,7 +68,7 @@ static inline void decay(s16 *p)
 void SceneActorGraphics_SelectResource(void *);
 void sub_08026EB4(ActorAnimation *base, int time)
 {
-    register int tick asm("r8") = time;
+    int tick = time;
     ActorAnimation *p = base;
     u8 *position = (u8 *)p + 0x48;
     u32 zero;
@@ -77,7 +77,7 @@ void sub_08026EB4(ActorAnimation *base, int time)
         p->changed = 0;
         sequence = choose(p->mode, 49, 11);
         {
-            register int offset asm("r0") = 0x240;
+            int offset = 0x240;
             SceneActors_StartDirectionalAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence, 2,
                                                   1, 4);
         }
@@ -102,16 +102,15 @@ void sub_08026EB4(ActorAnimation *base, int time)
             u8 *anglePtr = (u8 *)p + 0x342;
             s16 *velocity = (s16 *)(position + 20);
             u32 angle;
-            register int speed asm("r7");
+            int speed;
             {
-                register u32 value asm("r5") = *anglePtr;
-                asm("" : "+r"(value));
+                u32 value = *anglePtr;
                 angle = value;
             }
             speed = 24;
             {
                 int x = trunc12(gUnk_086149C4[(angle + 64) & 255] * speed);
-                register int z asm("r0") = 0;
+                int z = 0;
                 velocity[0] = x;
                 velocity[1] = z;
             }

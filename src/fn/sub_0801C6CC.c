@@ -31,7 +31,7 @@ void ResultGame_UpdatePlayerMarker(u8 *p)
         } else {
             u32 index;
             u8 *counter = p + 0xb2;
-            register u8 *table asm("r0") = gUnk_0824DB64;
+            u8 *table = gUnk_0824DB64;
             asm("" : : "r"(counter), "r"(table));
             {
                 u32 n;

@@ -97,7 +97,7 @@ s32 TerrainEdgeMarker_FindTerrainDirection(struct TerrainMarkerRegion *input)
         u32 left, right;
         switch (fromKind) {
             case 0: {
-                register u32 rawOther asm("r1") = outsideCell->height;
+                u32 rawOther = outsideCell->height;
                 u32 otherKind = (rawOther >> 4) & mask;
                 u32 other = rawOther;
                 if (otherKind == 0) {
@@ -170,11 +170,11 @@ s32 TerrainEdgeMarker_FindTerrainDirection(struct TerrainMarkerRegion *input)
     {
         register u32 raw asm("r0") = insideCell->height;
         register u32 mask asm("r3") = 15;
-        register u32 fromKind asm("r2") = raw >> 4;
+        u32 fromKind = raw >> 4;
         u32 sourceHeight = raw;
         switch (fromKind) {
             case 0: {
-                register u32 rawOther asm("r1") = outsideCell->height;
+                u32 rawOther = outsideCell->height;
                 u32 otherKind = (rawOther >> 4) & mask;
                 u32 other = rawOther;
                 if (otherKind == 0) {
@@ -192,7 +192,7 @@ s32 TerrainEdgeMarker_FindTerrainDirection(struct TerrainMarkerRegion *input)
                 {
                     register u32 slopeKind asm("r4") = other >> 4;
                     if (slopeKind == 1) {
-                        register u32 heightMask asm("r0") = 15;
+                        u32 heightMask = 15;
                         u32 left = heightMask;
                         left &= sourceHeight;
                         heightMask &= other;
@@ -214,7 +214,7 @@ s32 TerrainEdgeMarker_FindTerrainDirection(struct TerrainMarkerRegion *input)
                         break;
                 }
                 {
-                    register u32 heightMask asm("r0") = 15;
+                    u32 heightMask = 15;
                     u32 left = heightMask;
                     left &= sourceHeight;
                     heightMask &= other;
@@ -264,7 +264,7 @@ s32 TerrainEdgeMarker_FindTerrainDirection(struct TerrainMarkerRegion *input)
         u32 left, right;
         switch (fromKind) {
             case 0: {
-                register u32 rawOther asm("r1") = outsideCell->height;
+                u32 rawOther = outsideCell->height;
                 u32 otherKind = (rawOther >> 4) & mask;
                 u32 other = rawOther;
                 if (otherKind == 0) {
@@ -356,11 +356,11 @@ s32 TerrainEdgeMarker_FindTerrainDirection(struct TerrainMarkerRegion *input)
         u32 left, right;
         switch (fromKind) {
             case 0: {
-                register u32 rawOther asm("r1") = outsideCell->height;
+                u32 rawOther = outsideCell->height;
                 u32 otherKind = (rawOther >> 4) & mask;
                 u32 other = rawOther;
                 if (otherKind == 0) {
-                    register u32 heightMask asm("r0") = 15;
+                    u32 heightMask = 15;
                     u32 flatLeft = heightMask;
                     flatLeft &= raw;
                     heightMask &= other;

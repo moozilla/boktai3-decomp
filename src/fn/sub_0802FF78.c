@@ -89,7 +89,7 @@ struct Context {
 };
 static inline int near(struct Actor *p, struct Vec *b)
 {
-    register struct Vec *a asm("r3") = &p->pos;
+    struct Vec *a = &p->pos;
     int limit;
     int x;
     int result;

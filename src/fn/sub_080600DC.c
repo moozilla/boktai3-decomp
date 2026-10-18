@@ -95,12 +95,12 @@ void SceneInventory_PopulateConsumableGrid(struct SceneInventoryPanel *input)
             }
             widget++;
             {
-                register u32 step asm("r3") = 2;
+                u32 step = 2;
                 cursor += step;
             }
             entry++;
             {
-                register u32 step asm("r0") = 1;
+                u32 step = 1;
                 column += step;
             }
             {
@@ -184,7 +184,7 @@ void SceneInventory_PopulateConsumableGrid(struct SceneInventoryPanel *input)
                 const struct SceneValueConsumableDefinition *definition;
                 {
                     u32 flags = entry->flags;
-                    register u32 mask asm("r1") = ~1;
+                    u32 mask = ~1;
                     u32 frame;
                     flags &= mask;
                     entry->flags = flags;
@@ -196,7 +196,7 @@ void SceneInventory_PopulateConsumableGrid(struct SceneInventoryPanel *input)
                 }
                 {
                     struct GameState *state = gUnk_02000710;
-                    register u32 offset asm("r0") = (u32) & ((struct GameState *)0)->unk7B0;
+                    u32 offset = (u32) & ((struct GameState *)0)->unk7B0;
                     s16 *currency;
                     const struct SceneValueConsumableDefinition *record;
                     s32 money, value;
@@ -217,13 +217,11 @@ void SceneInventory_PopulateConsumableGrid(struct SceneInventoryPanel *input)
             entry++;
             widget++;
             {
-                register u32 step asm("r0") = 1;
-                asm("" ::"r"(step));
+                u32 step = 1;
                 column += step;
             }
             {
-                register s32 check asm("r1") = column;
-                asm("" ::"r"(check));
+                s32 check = column;
                 if (check > 3)
                     break;
             }
@@ -243,7 +241,7 @@ void SceneInventory_PopulateConsumableGrid(struct SceneInventoryPanel *input)
         position = &panel->display.digits[0].position;
         {
             struct SceneInventoryWidgetFlags *base = flagsBase;
-            register u32 offset asm("r2") = 41 * 0x60;
+            u32 offset = 41 * 0x60;
             entry = (void *)((u32)base + offset);
         }
         party = state->party;
@@ -270,7 +268,7 @@ void SceneInventory_PopulateConsumableGrid(struct SceneInventoryPanel *input)
             u32 mask = 1;
             register struct SceneInventoryWidgetFlags *hidden asm("r1");
             register struct SceneInventoryWidgetFlags *base asm("r3");
-            register u32 offset asm("r0");
+            u32 offset;
             base = flagsBase;
             offset = 45 * 0x60;
             hidden = (void *)((u32)base + offset);

@@ -7,7 +7,7 @@ void RouteSpriteActor_FinishAnimation(struct RouteSpritePool *pool, struct Route
         actor->entered = 0;
     }
     if (RouteSpriteActor_StepPlayback(actor)) {
-        register u32 offset asm("r0") = 0x153;
+        u32 offset = 0x153;
         s8 *indexPointer;
         asm("" : "+r"(offset));
         indexPointer = (s8 *)((u32)actor + offset);

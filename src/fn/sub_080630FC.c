@@ -4,17 +4,16 @@ extern const s8 gUnk_0824DF7C[];
 void SceneInventory_BuildConsumableCatalog(struct SceneInventoryScriptCatalog *input)
 {
     register struct SceneInventoryScriptCatalog *p asm("r6") = input;
-    register s32 page asm("r2"), next asm("r5"), count asm("r4");
+    s32 page, next asm("r5"), count asm("r4");
     s8 *destination;
     const s8 *source;
     const s8 *table;
     register u8 *pageCount asm("r1");
     s8 *base;
-    register u32 pageOffset asm("r2");
-    register const s8 *tableSource asm("r4");
+    u32 pageOffset;
+    const s8 *tableSource;
     p->page = 0;
     pageOffset = 0x1AB1;
-    asm("" : "+r"(pageOffset));
     pageCount = (u8 *)p + pageOffset;
     *pageCount = 2;
     page = 0;
@@ -38,13 +37,13 @@ void SceneInventory_BuildConsumableCatalog(struct SceneInventoryScriptCatalog *i
         page = next;
     } while (page < *pageCount);
     if (page <= 6) {
-        register u32 mask asm("r3") = 0xFF;
-        register s32 baseOffset asm("r4");
+        u32 mask = 0xFF;
+        s32 baseOffset;
         s8 *fillBase;
         baseOffset = 0x1AB3;
         fillBase = (s8 *)((u8 *)p + baseOffset);
         do {
-            register s32 offset asm("r0") = page * 8;
+            s32 offset = page * 8;
             s8 *cursor;
             next = page + 1;
             cursor = (s8 *)((u32)offset + (u32)fillBase);
@@ -59,7 +58,7 @@ void SceneInventory_BuildConsumableCatalog(struct SceneInventoryScriptCatalog *i
     }
     if (Script_SeekToKeyword(0x61)) {
         u32 value = sub_08227E90();
-        register u32 textOffset asm("r2") = 0x1A98;
+        u32 textOffset = 0x1A98;
         register u32 *text asm("r1");
         text = (u32 *)((u8 *)p + textOffset);
         *text = value;

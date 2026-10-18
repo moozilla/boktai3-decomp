@@ -9,13 +9,13 @@ void TetherActor_EmitPointEffect(const struct ContactPackedVector *source, const
 {
     union TetherPointPacket position;
     const u16 *table;
-    register u32 *state asm("r1");
-    register u32 *savedState asm("r12");
+    u32 *state;
+    u32 *savedState;
     register u32 index asm("r3");
     u32 indexMask;
     s32 sampleX;
     s32 sampleZ;
-    register s32 sampleY asm("r3");
+    s32 sampleY;
     register u32 jitterMask asm("r9");
     register u32 upperMask asm("r10");
     register u32 xy asm("r5");

@@ -81,7 +81,7 @@ void LevelAdvanceDisplay_UpdateAnimation(struct LevelAdvanceManager *manager)
         }
     } else if (kindValue == 2) {
         register u16 *frame asm("r2") = &manager->frame;
-        register u32 zero asm("r6");
+        u32 zero;
         {
             u32 next = *frame + 1;
             zero = 0;

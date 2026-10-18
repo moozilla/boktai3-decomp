@@ -22,9 +22,9 @@ s32 TransientSpriteEffects_Initialize(struct TransientSpriteEffects *pool, void 
     }
     index = 0;
     do {
-        register struct TransientSpriteEffect *slot asm("r4");
-        register u32 offset asm("r0") = index * sizeof(*slot) + 0x18;
-        register struct TransientSpriteEffects *base asm("r1");
+        struct TransientSpriteEffect *slot;
+        u32 offset = index * sizeof(*slot) + 0x18;
+        struct TransientSpriteEffects *base;
         struct ContactSwarmGraphics *graphics;
         u32 loaded;
         base = pool;

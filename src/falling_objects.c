@@ -525,9 +525,9 @@ s32 FallingObjectManager_Update(struct FallingObjectManager *manager)
     const u16 *entry;
     register u16 n asm("r0");
     u8 done;
-    register u32 one asm("r9");
+    u32 one;
     if (p) {
-        register u32 initial asm("r0") = 1;
+        u32 initial = 1;
         one = initial;
     }
     for (; p; p = next) {

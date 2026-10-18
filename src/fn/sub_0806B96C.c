@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "sprite_effect_controller.h"
 struct DrawablePrefix {
     u32 flags;
@@ -7,7 +6,7 @@ struct DrawablePrefix {
 static inline u8 IsUsed(struct SpriteEffectControllerPool *p, u32 index)
 {
     u32 mask = 1U << index;
-    register struct SpriteEffectControllerPool *q asm("r2");
+    struct SpriteEffectControllerPool *q;
     q = p;
     if (q->used & mask)
         return 1;
@@ -19,7 +18,7 @@ s32 SpriteEffectController_DestroyPool(struct SpriteEffectControllerPool *input)
     s32 i;
     void **sprite;
     u16 *flags;
-    register void **effect asm("r5");
+    void **effect;
     i = 0;
     sprite = &p->slots[0].drawable;
     flags = &p->slots[0].flags;
@@ -45,7 +44,7 @@ s32 SpriteEffectController_DestroyPool(struct SpriteEffectControllerPool *input)
         effect = (void **)((u8 *)effect + 0x7c);
     }
     {
-        register u32 zero asm("r1") = 0;
+        u32 zero = 0;
         gUnk_02000178 = (void *)zero;
     }
     return 0;

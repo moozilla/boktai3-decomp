@@ -166,7 +166,7 @@ void RouteSpriteActor_TickPausing(struct RouteSpritePool *pool, struct RouteSpri
                 u32 offset = 0x14A;
                 u16 *savedY;
                 u32 value;
-                register struct RouteSpriteActor *low asm("r1");
+                struct RouteSpriteActor *low;
                 savedY = (void *)((u32)actor + offset);
                 value = *savedY;
                 value -= amount;
@@ -181,7 +181,7 @@ void RouteSpriteActor_TickPausing(struct RouteSpritePool *pool, struct RouteSpri
         }
     }
     {
-        register u32 offset asm("r0") = 0x154;
+        u32 offset = 0x154;
         u16 *frames;
         u32 count;
         asm("" : "+r"(offset));
@@ -191,13 +191,13 @@ void RouteSpriteActor_TickPausing(struct RouteSpritePool *pool, struct RouteSpri
             *frames = count + 1;
         else if (ended) {
             {
-                register u32 offset asm("r2") = 0x152;
+                u32 offset = 0x152;
                 register u8 *state asm("r1");
                 state = (void *)((u32)actor + offset);
                 *state = 4;
             }
             {
-                register u32 offset asm("r0") = 0x156;
+                u32 offset = 0x156;
                 register u8 *entered asm("r1");
                 entered = (void *)((u32)actor + offset);
                 *entered = 1;

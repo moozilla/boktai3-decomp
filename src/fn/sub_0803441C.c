@@ -62,7 +62,7 @@ run:
             {
                 int flags = p->mask;
                 int mask = 4;
-                register int unusedZero asm("r2") = 0;
+                int unusedZero = 0;
                 p->mask = flags | mask;
             }
             if (gUnk_03006A80->connSlotFlag)

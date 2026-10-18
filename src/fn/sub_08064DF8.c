@@ -86,7 +86,7 @@ void ActorAttachment_TickDetachedParts(struct ActorAttachmentSlotView *slot)
                             break;
                         }
                         default: {
-                            register u32 zero asm("r0") = 0;
+                            u32 zero = 0;
                             resource = (void *)zero;
                             break;
                         }
@@ -159,14 +159,14 @@ void ActorAttachment_TickDetachedParts(struct ActorAttachmentSlotView *slot)
                     u8 *phasePointer;
                     switch (slot->kind) {
                         case 2: {
-                            register struct ActorAttachmentManagerView *owner asm("r1") = manager;
+                            struct ActorAttachmentManagerView *owner = manager;
                             const struct ActorAttachmentPartResource *loaded;
                             loaded = owner->partResource;
                             resource = loaded;
                             break;
                         }
                         case 3: {
-                            register struct ActorAttachmentManagerView *owner asm("r2") = manager;
+                            struct ActorAttachmentManagerView *owner = manager;
                             const struct ActorAttachmentPartResource *loaded;
                             loaded = owner->partResource;
                             resource = loaded;

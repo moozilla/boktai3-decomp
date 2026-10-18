@@ -4,7 +4,6 @@ static inline u32 cellAtPosition(struct ContactPosition *position)
 {
     s16 *xAddress = (s16 *)position;
     s32 x, z;
-    asm("" : "+r"(xAddress));
     x = *xAddress >> 8;
     z = position->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
@@ -30,7 +29,7 @@ s32 BreakableProp_InitializeFromScript(struct BreakableProp *input, u32 id, u32 
     register struct ContactPosition *position asm("r6");
     u32 cell, height, surface;
     u8 *properties;
-    register u32 script asm("r1");
+    u32 script;
     asm("" : "+r"(prop));
     if (Script_SeekToKeyword('p')) {
         packet.x = ((Script_GetValue() >> 8) << 8) + 128;

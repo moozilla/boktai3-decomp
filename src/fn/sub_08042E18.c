@@ -44,8 +44,8 @@ void ContactActor_UpdateTracking(struct ContactActorPool *poolInput, struct Cont
         u32 frame = slot->stateFrame;
         u32 phase;
         register s32 secondIndex asm("r2");
-        register s32 savedIndex asm("r12");
-        register const struct ContactPosition **targets asm("r6");
+        s32 savedIndex;
+        const struct ContactPosition **targets;
         phase = 7;
         phase &= frame;
         secondIndex = slot->targetIndex;
@@ -55,7 +55,7 @@ void ContactActor_UpdateTracking(struct ContactActorPool *poolInput, struct Cont
             register s32 distanceX asm("r2");
             s32 distanceZ;
             {
-                register const struct ContactPosition **address asm("r0") = &targets[secondIndex];
+                const struct ContactPosition **address = &targets[secondIndex];
                 target = *address;
                 distanceX = target->x;
                 asm("" : "+r"(address), "+r"(distanceX));
@@ -71,7 +71,7 @@ void ContactActor_UpdateTracking(struct ContactActorPool *poolInput, struct Cont
             }
         }
         {
-            register const struct ContactPosition **address asm("r0") = &targets[savedIndex];
+            const struct ContactPosition **address = &targets[savedIndex];
             const struct ContactPosition *secondTarget;
             secondTarget = *address;
             dx = secondTarget->x - slot->position.x;
@@ -106,7 +106,7 @@ void ContactActor_UpdateTracking(struct ContactActorPool *poolInput, struct Cont
                 }
                 if (mode == 2) {
                     {
-                        register s32 slotIndex asm("r0") = index;
+                        s32 slotIndex = index;
                         if (slotIndex > 7)
                             goto zeroTarget;
                     }

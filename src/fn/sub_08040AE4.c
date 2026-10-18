@@ -1,16 +1,15 @@
-// MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
 s32 ModifierMenu_GetHeaderFrame(struct ModifierMenu *);
 void ModifierMenu_UpdateHeaderObjects(struct ModifierMenu *menuArg)
 {
     struct ModifierMenu *menu = menuArg;
-    register s32 state asm("r5") = menu->state;
+    s32 state = menu->state;
     struct ModifierDisplayObject *object;
     switch (state) {
         case 0:
         case 2: {
             struct ModifierGraphicsResource *graphics;
-            register u32 mask asm("r8");
+            u32 mask;
             object = &menu->displays[2];
             graphics = &menu->graphicsB;
             Anim_LoadKeyframe(object, graphics, (u16)(menu->mode + 13), 0);
@@ -31,8 +30,8 @@ void ModifierMenu_UpdateHeaderObjects(struct ModifierMenu *menuArg)
             break;
         }
         case 1: {
-            register struct ModifierGraphicsResource *graphics asm("r8");
-            register u32 mask asm("r9");
+            struct ModifierGraphicsResource *graphics;
+            u32 mask;
             object = &menu->displays[2];
             graphics = &menu->graphicsB;
             Anim_LoadKeyframe(object, graphics, (u16)(menu->mode + 13), 0);

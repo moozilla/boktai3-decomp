@@ -66,7 +66,7 @@ int sub_08037290(struct Owner *owner, struct PeerPanel *panel, int kind)
     {
         const struct PeerStyle *table = gUnk_0824DE64;
         {
-            register int index asm("r1") = type;
+            int index = type;
             {
                 u32 offset = index << 1;
                 offset += type;
@@ -78,7 +78,7 @@ int sub_08037290(struct Owner *owner, struct PeerPanel *panel, int kind)
     AnimData_Load(glyph, style->resource);
     {
         int tile = style->tile;
-        register int base asm("r2") = 503;
+        int base = 503;
         AnimData_SelectPaletteBank(glyph, tile + base);
     }
     initialSprite = &p->sprite;
@@ -234,7 +234,7 @@ int sub_08037290(struct Owner *owner, struct PeerPanel *panel, int kind)
     {
         int zero = 0;
         u8 *drawing;
-        register int count asm("r5");
+        int count;
         drawing = p->drawings[0];
         count = 4;
         do {

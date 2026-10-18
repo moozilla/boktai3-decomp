@@ -15,7 +15,7 @@ s32 ScenePool_SelectInitialDirection(void *owner, struct ScenePoolEntry *entry)
         goto wait;
     if (entry->direction > 0) {
     forward: {
-        register s32 one asm("r0") = 1;
+        s32 one = 1;
         s32 zero;
         entry->state = one;
         zero = 0;

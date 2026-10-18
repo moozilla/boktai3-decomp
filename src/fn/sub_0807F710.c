@@ -20,7 +20,7 @@ s32 SceneActorTarget_ResolvePendingObject(struct SceneActorRegistryResetView *ac
     struct SceneActorRegistryResetView *owner = actor;
     s32 *pendingId = (void *)((u8 *)owner + 0x304);
     if (*pendingId > 0) {
-        register struct SceneActorTargetLink *state asm("r4") = (void *)((u8 *)owner + 0xDC);
+        struct SceneActorTargetLink *state = (void *)((u8 *)owner + 0xDC);
         struct Delta {
             s16 x, y, z, pad;
         } delta;
@@ -30,13 +30,13 @@ s32 SceneActorTarget_ResolvePendingObject(struct SceneActorRegistryResetView *ac
         SceneActorTarget_ResetContactResponse((void *)owner);
         {
             u16 *flags = &owner->group.flags414;
-            register u32 mask asm("r0");
+            u32 mask;
             mask = ~2;
             mask &= *flags;
             *flags = mask;
         }
         {
-            register u32 mask asm("r0") = 0x80;
+            u32 mask = 0x80;
             u16 *flags;
             flags = &owner->flags2D6;
             mask |= *flags;
@@ -60,11 +60,11 @@ s32 SceneActorTarget_ResolvePendingObject(struct SceneActorRegistryResetView *ac
             cell = gUnk_030052F4->rows[z] + x;
         *(u16 *)((u8 *)owner + 0x2F8) = cell;
         {
-            register struct Delta *out asm("r3") = &delta;
+            struct Delta *out = &delta;
             struct ContactPosition *source = &owner->position;
             target = (void *)(state->target + 0xC);
             {
-                register u32 xDelta asm("r0") = (u16)target->x;
+                u32 xDelta = (u16)target->x;
                 struct Delta *first;
                 xDelta -= (u16)source->x;
                 first = &delta;

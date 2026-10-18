@@ -10,7 +10,7 @@ s32 SceneActorRegistry_CountLivingByCategoryAndField(s32 inputCategory, s32 inpu
     register s32 category asm("r5") = inputCategory;
     register s32 field asm("r4") = inputField;
     register struct SceneActorRegistryNode *node asm("r2");
-    register struct SceneActorRegistryActor *actor asm("r1");
+    struct SceneActorRegistryActor *actor;
     register s32 count asm("r3");
     SceneActorRegistry_GetManager();
     node = gUnk_020004AC;
@@ -26,7 +26,7 @@ s32 SceneActorRegistry_CountLivingByCategoryAndField(s32 inputCategory, s32 inpu
                 if (!(*flags & mask) && actor->category == category) {
                     offset -= 0xea;
                     {
-                        register u16 *criterion asm("r0") = (void *)((u8 *)actor + offset);
+                        u16 *criterion = (void *)((u8 *)actor + offset);
                         if (*criterion == field)
                             count++;
                     }

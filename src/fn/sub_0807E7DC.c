@@ -9,7 +9,6 @@ u32 sub_0821F7A8(void *, const struct ContactPosition *, struct SceneActorRouteT
 static inline s32 GetCell(struct SceneActorRouteTargetPosition *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
-    asm("" : "+r"(x)::"r4");
     if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
         return 0;
     return gUnk_030052F4->rows[z] + x;
@@ -33,9 +32,9 @@ void SceneActorMovement_ResolveRoutePosition(struct SceneActorRegistryActor *act
 {
     /* This local vector has halfword alignment; aggregate copies are not used. */
     struct SceneActorRouteTargetPosition target;
-    register struct SceneActorRegistryActor *owner asm("r6") = actor;
+    struct SceneActorRegistryActor *owner = actor;
     struct SceneActorRegistryActor *base = owner;
-    register u8 *control asm("r8") = (u8 *)owner + 0x3D4;
+    u8 *control = (u8 *)owner + 0x3D4;
     void *context;
     {
         struct SceneActorRouteTargetPosition *p = &target;
@@ -62,7 +61,7 @@ void SceneActorMovement_ResolveRoutePosition(struct SceneActorRegistryActor *act
     }
     goto done;
 failed: {
-    register u16 *flags asm("r0") = &owner->flags2D4;
+    u16 *flags = &owner->flags2D4;
     u32 mask = ~0x200;
     mask &= *flags;
     *flags = mask;

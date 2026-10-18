@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "terrain_edge_marker.h"
 struct TerrainMarkerRegion *sub_0821E104(u16, u16 *);
 u8 *sub_0821D64C(u32, u32);
@@ -15,11 +14,14 @@ void TerrainEdgeMarker_AddRegionFromScript(void)
     region = sub_0821E104((u16)tag, &count);
     if (region) {
         s32 x;
-        s32 z, index;
-        register union TerrainMarkerPosition *sample asm("r6");
+        s32 z;
+        s32 index;
+        union TerrainMarkerPosition *sample;
         union TerrainMarkerPosition *world;
         u8 *cell;
-        s32 type, height, direction;
+        s32 type;
+        s32 height;
+        s32 direction;
         {
             u32 mask;
             u32 value = (u16)((region->minX + region->maxX) >> 1);
@@ -27,7 +29,7 @@ void TerrainEdgeMarker_AddRegionFromScript(void)
             center.words[0] = (center.words[0] & mask) | value;
             {
                 u32 value = (u16)((region->minZ + region->maxZ) >> 1);
-                register union TerrainMarkerPosition *builder asm("r2") = &center;
+                union TerrainMarkerPosition *builder = &center;
                 {
                     u32 word = builder->words[1];
                     word &= mask;

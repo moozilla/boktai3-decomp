@@ -14,13 +14,13 @@ static inline s32 initializeAnimation(struct ProjectedDisplayEntry *animation,
 s32 TemporaryAnimationPool_Initialize(struct TemporaryAnimationPool *pool)
 {
     const struct ProjectedDisplayResource *resource;
-    register struct TemporaryAnimationSlot *slot asm("r5");
+    struct TemporaryAnimationSlot *slot;
     struct ProjectedDisplayResource *relocated;
     struct {
         u32 zero;
         struct ContactPosition position;
     } scratch;
-    register s32 index asm("r6");
+    s32 index;
     s32 result;
     u32 fillZero;
     struct ContactPosition *point;

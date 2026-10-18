@@ -34,8 +34,8 @@ void SceneActorReaction_ResumeAfterAnimation(struct SceneActorRegistryResetView 
         }
     }
     {
-        register u32 completedOffset asm("r1") = 0x2B3;
-        register u8 *completed asm("r0");
+        u32 completedOffset = 0x2B3;
+        u8 *completed;
         completed = (u8 *)actor + completedOffset;
         if (*completed) {
             u32 zeroWord;
@@ -55,7 +55,7 @@ void SceneActorReaction_ResumeAfterAnimation(struct SceneActorRegistryResetView 
                 *field = one;
             }
             {
-                register u32 mask asm("r2") = 0x10;
+                u32 mask = 0x10;
                 register u32 offset asm("r3") = 0x2CC;
                 register u32 *flags asm("r1");
                 asm("" : : "r"(offset));
@@ -75,7 +75,7 @@ void SceneActorReaction_ResumeAfterAnimation(struct SceneActorRegistryResetView 
                 }
                 *field = one;
                 {
-                    register u32 offset asm("r1") = 0x2AA;
+                    u32 offset = 0x2AA;
                     field = (u8 *)actor + offset;
                 }
                 *field = zeroByte;
@@ -128,8 +128,8 @@ void SceneActorReaction_ResumeAfterAnimation(struct SceneActorRegistryResetView 
                     *flags &= mask;
                 }
                 {
-                    register u32 offset asm("r1") = 0x104;
-                    register u32 *field asm("r0");
+                    u32 offset = 0x104;
+                    u32 *field;
                     field = (u32 *)((u8 *)actor + offset);
                     *field = zeroWord;
                 }

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "pooled_motion.h"
 void MotionPool_AdjustHeading(struct MotionPoolSlot *slot)
 {
@@ -8,13 +7,12 @@ void MotionPool_AdjustHeading(struct MotionPoolSlot *slot)
         if (target) {
             struct ContactPosition *position = &slot->sprite.position;
             u32 byte = (u8)Math_Atan2(target->x - position->x, target->z - position->z);
-            register u32 desired asm("r6");
+            u32 desired;
             u32 current;
             s32 delta;
             u32 step;
             s32 limit;
             u32 flags;
-            asm("" : "+r"(byte));
             desired = byte;
             current = (u8)params->direction;
             delta = (s8)desired;

@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 93.1%
-// Open: the original copies the allocated pointer again before Memory_Clear.
 void *Heap_Alloc(s32 size);
 void Memory_Clear(void *dst, s32 bytes);
 s32 Heap_Free(void *block); /* void in engine.h; the caller returns its r0 */
@@ -13,18 +10,15 @@ s32 sub_0822BF60(void *);
 s32 Registry3C8D_RunFromScript(void)
 {
     void *p = Heap_Alloc(0x1804);
-    if (p) {
-        Memory_Clear(p, 0x1804);
-        if (sub_0822BEE4(p) >= 0) {
-            sub_0821B104();
-            if (sub_0822BF60(p) >= 0)
-                goto done;
-        }
-    }
-    return -1;
-done:
+    if (p == NULL)
+        return -1;
+    Memory_Clear(p, 0x1804);
+    if (sub_0822BEE4(p) < 0)
+        return -1;
+    sub_0821B104();
+    if (sub_0822BF60(p) < 0)
+        goto fail;
     return Heap_Free(p);
+fail:
+    return -1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Registry3C8D_RunFromScript);
-#endif

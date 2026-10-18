@@ -1,0 +1,8 @@
+cloak
+cracks
+burn1
+burn2
+hood
+burst
+sooty
+wave

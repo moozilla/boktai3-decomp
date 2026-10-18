@@ -101,8 +101,8 @@ void TetherActor_UpdateBounceReturn(struct TetherActor *actor)
                 void **handle;
                 TetherActor_SetState(actor, 0);
                 {
-                    register u32 readyOffset asm("r2") = 0x384;
-                    register u16 *ready asm("r1");
+                    u32 readyOffset = 0x384;
+                    u16 *ready;
                     ready = (u16 *)((u8 *)actor + readyOffset);
                     *ready = 1;
                 }

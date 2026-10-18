@@ -60,7 +60,7 @@ void AreaEffect_UpdateActionParticles(struct AreaEffectManager *manager)
                         {
                             u32 y = (s32)xy >> 16;
                             register u32 step asm("r0") = 256;
-                            register u32 lowMask asm("r4");
+                            u32 lowMask;
                             y += step;
                             y <<= 16;
                             lowMask = 0xFFFF;

@@ -35,7 +35,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor)
     actor->target = callback;
     {
         /* Preserve the short-lived halfword-clear address. */
-        register u32 off asm("r2") = 0x2C8;
+        u32 off = 0x2C8;
         {
             u16 *field = (void *)((u8 *)actor + off);
             *field = 0;

@@ -41,7 +41,7 @@ void SceneActorRegistry_ResetCategoryControl(void)
         u32 five = 5;
         u32 zero = 0;
         u32 one = 1;
-        register u32 three asm("r12");
+        u32 three;
         u32 status;
         {
             u32 initialThree = 3;
@@ -61,15 +61,15 @@ void SceneActorRegistry_ResetCategoryControl(void)
                     actor->field2C8 = zero;
                     {
                         u32 *flags = &actor->flags114;
-                        register u32 mask asm("r1") = ~1;
+                        u32 mask = ~1;
                         u32 value;
                         value = *flags;
                         value &= mask;
                         *flags = value;
                     }
                     {
-                        register u32 offset asm("r1") = 0x104;
-                        register u32 *field asm("r0");
+                        u32 offset = 0x104;
+                        u32 *field;
                         field = (void *)((u8 *)actor + offset);
                         *field = zero;
                     }
@@ -79,7 +79,7 @@ void SceneActorRegistry_ResetCategoryControl(void)
                         field = (u8 *)actor + offset;
                         *field = zero;
                         {
-                            register u32 phaseOffset asm("r1") = 0x2a9;
+                            u32 phaseOffset = 0x2a9;
                             field = (u8 *)actor + phaseOffset;
                             *field = zero;
                         }
