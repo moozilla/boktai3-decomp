@@ -667,3 +667,4 @@ addr,function,name,family,note
 0812BCE0,sub_0812BCE0,PursuingActor_UpdateRetirement,"pursuing actor","moves fading actor and releases sprites and pool slot"
 0812D390,sub_0812D390,ScriptedColliderActor_Create,"scripted collider actor pool","allocates a scripted sprite actor and initializes its collider"
 0812DE38,sub_0812DE38,SceneTerrain_IsPathBlocked,"SceneTerrain","tests whether a directional terrain search reaches the target cell"
+0812F12C,sub_0812F12C,SceneActor_UpdateActiveCallbacks,"SceneActor","dispatch active actor and control callbacks"
