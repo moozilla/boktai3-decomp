@@ -879,3 +879,4 @@ addr,function,name,family,note
 08180858,sub_08180858,ProximityVolume_ClearLatch,"ProximityVolume","clears the halfword at offset 0x38"
 08180860,sub_08180860,ProximityVolume_SetPosition,"ProximityVolume","copies position, enables latch and updates bounds and position reference"
 0818088C,sub_0818088C,ProximityVolume_SetParameter,"ProximityVolume","sets the volume halfword parameter at offset 0x3A when nonnull"
+081808B4,sub_081808B4,SceneCombatActor_ResetAttackMode,"SceneCombatActor","restores saved parameters and resets collider categories for attack mode"
