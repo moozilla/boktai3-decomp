@@ -500,3 +500,4 @@ addr,function,name,family,note
 08175934,sub_08175934,SelectionPanel_CaptureSettings,"SelectionPanel (tentative)","captures game settings and current selection"
 08175AF8,sub_08175AF8,MenuSelection_RefreshOptionText,"menu selection","refresh text for the selected option row"
 08175BA8,sub_08175BA8,MenuSelection_RefreshAllOptionText,"menu selection","refresh text for all three option rows"
+08175D34,sub_08175D34,SelectionPanel_ConfirmSettings,"SelectionPanel (tentative)","accepts A press and advances panel callback"
