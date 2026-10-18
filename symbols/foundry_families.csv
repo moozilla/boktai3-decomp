@@ -1209,3 +1209,4 @@ addr,function,name,family,note
 081F5CAC,sub_081F5CAC,SceneActor_UpdateAnimation15Cycle,"SceneActor animation states","cycles animations 15 and 16 with a timed sound"
 081F5D6C,sub_081F5D6C,SceneActor_UpdateAnimation0Timer,"SceneActor animation states","updates animation zero and waits for callback and timer completion"
 081F5FEC,sub_081F5FEC,SceneActors_UpdateTimedDirectionalAnimation,"SceneActors","plays directional animation and finishes after twenty ticks"
+081F6078,sub_081F6078,SceneActors_UpdateTimedAnimationReset,"SceneActors","resets motion fields and completes animation at tick thirty-five"
