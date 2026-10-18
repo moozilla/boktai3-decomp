@@ -1110,3 +1110,4 @@ addr,function,name,family,note
 081C4DC4,sub_081C4DC4,SceneFade_BeginFinalMove,"SceneFade","starts the final target movement phase"
 081C542C,sub_081C542C,GameState_GetPackedTripletValue,"game-state packed triplet values","reads a nibble indexed by three times row plus column"
 081C554C,sub_081C554C,SceneTextSelector_UpdatePanel,"scene text selector","updates panel text from the enabled triplet choice"
+081C6224,sub_081C6224,SceneObject_StartBackgroundScript,"scene background script owner","starts script C091 and configures background layer twelve"
