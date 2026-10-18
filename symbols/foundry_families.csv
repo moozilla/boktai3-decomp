@@ -673,3 +673,4 @@ addr,function,name,family,note
 08130E60,sub_08130E60,SceneActorRoute_UpdateWaitPhase,"SceneActorRoute","waits on route timer or switches actor behavior"
 08137CA8,sub_08137CA8,SceneActorTarget_FindNearestEligiblePlayer,"SceneActorTarget","finds nearest player without excluded slot status or terrain flags"
 08138A2C,sub_08138A2C,SpriteSlots_AttachSource,"SpriteSlots","attaches a source pointer to the first inactive sprite slot"
+08138AC8,sub_08138AC8,HeightProbe_IsBelowLimit,"HeightProbe","compares sampled height with a position-derived limit"
