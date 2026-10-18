@@ -14,38 +14,38 @@ s32 sub_0812DC28(u16 *a, s32 dir, s32 n)
     base = (*SceneActorTerrain_GetCell(t) & 15) << 8;
     c = t;
     switch (dir) {
-    case 0:
-        for (i = 0; i < n; i++) {
-            if (base - ((*SceneActorTerrain_GetCell(c) & 15) << 8) < 0)
-                return c - 1;
-            c++;
-        }
-        c -= 1;
-        return c;
-    case 1:
-        for (i = 0; i < n; i++) {
-            if (base - ((*SceneActorTerrain_GetCell(c) & 15) << 8) < 0)
-                return c - SceneActorTerrain_Width();
-            c += SceneActorTerrain_Width();
-        }
-        c -= SceneActorTerrain_Width();
-        return c;
-    case 2:
-        for (i = 0; i < n; i++) {
-            if (base - ((*SceneActorTerrain_GetCell(c) & 15) << 8) < 0)
-                return c + 1;
-            c--;
-        }
-        c += 1;
-        return c;
-    case 3:
-        for (i = 0; i < n; i++) {
-            if (base - ((*SceneActorTerrain_GetCell(c) & 15) << 8) < 0)
-                return c + SceneActorTerrain_Width();
+        case 0:
+            for (i = 0; i < n; i++) {
+                if (base - ((*SceneActorTerrain_GetCell(c) & 15) << 8) < 0)
+                    return c - 1;
+                c++;
+            }
+            c -= 1;
+            return c;
+        case 1:
+            for (i = 0; i < n; i++) {
+                if (base - ((*SceneActorTerrain_GetCell(c) & 15) << 8) < 0)
+                    return c - SceneActorTerrain_Width();
+                c += SceneActorTerrain_Width();
+            }
             c -= SceneActorTerrain_Width();
-        }
-        c += SceneActorTerrain_Width();
-        return c;
+            return c;
+        case 2:
+            for (i = 0; i < n; i++) {
+                if (base - ((*SceneActorTerrain_GetCell(c) & 15) << 8) < 0)
+                    return c + 1;
+                c--;
+            }
+            c += 1;
+            return c;
+        case 3:
+            for (i = 0; i < n; i++) {
+                if (base - ((*SceneActorTerrain_GetCell(c) & 15) << 8) < 0)
+                    return c + SceneActorTerrain_Width();
+                c -= SceneActorTerrain_Width();
+            }
+            c += SceneActorTerrain_Width();
+            return c;
     }
     return t;
 }

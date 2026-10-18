@@ -1,7 +1,13 @@
 #include "global.h"
 
-struct E { u8 pad[0x24]; s16 v; u8 pad2[0x3A]; };
-struct S { struct E e[5]; };
+struct E {
+    u8 pad[0x24];
+    s16 v;
+    u8 pad2[0x3A];
+};
+struct S {
+    struct E e[5];
+};
 extern s8 gUnk_086106C0[];
 
 void sub_0811BCE8(struct S *p, s32 d)

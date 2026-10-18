@@ -3,7 +3,8 @@
 extern void sub_082195E0(void *);
 extern void sub_08214514(void *);
 
-void sub_081E154C(u8 *p) {
+void sub_081E154C(u8 *p)
+{
     s32 i;
     u8 *q;
     u8 *a, *b;

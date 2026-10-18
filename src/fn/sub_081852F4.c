@@ -1,6 +1,8 @@
 #include "global.h"
 
-struct CP { s16 x, y, z, pad; };
+struct CP {
+    s16 x, y, z, pad;
+};
 extern u8 *gUnk_02000710;
 void sub_08184FE8(u8 *, s32);
 void sub_081850F4(u8 *, u32);
@@ -40,23 +42,43 @@ void sub_081852F4(u8 *p, s32 a, s32 b)
         } else if (p[0xB41] != 0) {
             if (sub_0821F840((u16 *)(p + 0x18)) != 0) {
                 switch (a) {
-                case 0: sub_081850F4(p, t); break;
-                case 1: sub_08185190(p, t); break;
-                case 2: sub_08185128(p, t); break;
-                case 3: sub_0818515C(p, t); break;
+                    case 0:
+                        sub_081850F4(p, t);
+                        break;
+                    case 1:
+                        sub_08185190(p, t);
+                        break;
+                    case 2:
+                        sub_08185128(p, t);
+                        break;
+                    case 3:
+                        sub_0818515C(p, t);
+                        break;
                 }
             } else {
                 switch (b) {
-                case 1: sub_08184FE8(p, 0x1f); break;
-                case 2: sub_08184FE8(p, 0x2c); break;
-                case 0:
-                    switch (a) {
-                    case 0: sub_08184FE8(p, 1); break;
-                    case 1: sub_08184FE8(p, 0x13); break;
-                    case 2: sub_08184FE8(p, 0x16); break;
-                    case 3: sub_08184FE8(p, 0x26); break;
-                    }
-                    break;
+                    case 1:
+                        sub_08184FE8(p, 0x1f);
+                        break;
+                    case 2:
+                        sub_08184FE8(p, 0x2c);
+                        break;
+                    case 0:
+                        switch (a) {
+                            case 0:
+                                sub_08184FE8(p, 1);
+                                break;
+                            case 1:
+                                sub_08184FE8(p, 0x13);
+                                break;
+                            case 2:
+                                sub_08184FE8(p, 0x16);
+                                break;
+                            case 3:
+                                sub_08184FE8(p, 0x26);
+                                break;
+                        }
+                        break;
                 }
             }
         }
