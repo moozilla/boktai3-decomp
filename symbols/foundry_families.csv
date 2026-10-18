@@ -432,3 +432,4 @@ addr,function,name,family,note
 0816E014,sub_0816E014,InventoryGrid_ShowNumber,"InventoryGrid","renders a positive four-digit value with leading zeroes hidden"
 0816E140,sub_0816E140,InventoryGrid_BeginNumberPhaseAlternate,"InventoryGrid","shows the numeric value and enters the alternate delayed phase"
 0816E1E0,sub_0816E1E0,InventoryGrid_FinishNumberPhase,"InventoryGrid","hides number digits and returns to inventory selection"
+0816E2C8,sub_0816E2C8,MenuTransition_BeginSelectedWidget,"MenuTransition","starts selected widget transition from fixed coordinates"
