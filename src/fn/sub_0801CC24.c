@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 extern int gUnk_0824DB94[];
 extern void *gUnknown_02000580;
@@ -17,6 +16,7 @@ void ResultGame_TrackTarget(void *);
 #define H(o) (*(s16 *)(p + (o)))
 void ResultGame_TimedPress(u8 *p)
 {
+    s16 k2 = 0;
     switch (p[0xaf]) {
         case 0:
             I(0x8c) = 0;
@@ -46,10 +46,9 @@ void ResultGame_TimedPress(u8 *p)
             int next = p[0xaf] + 1;
             s16 *timer;
             zero = 0;
-            asm("" : "+r"(zero));
             p[0xaf] = next;
             timer = (s16 *)(p + 0xaa);
-            zeroByte = 0;
+            zeroByte = k2;
             *timer = 60;
             H(0xa8) = zero;
             p[0xb0] = 255;
@@ -57,8 +56,9 @@ void ResultGame_TimedPress(u8 *p)
             break;
         }
         case 2:
-            if (H(0xaa) <= 0)
+            if ((*((s16 *)(p + 0xaa))) <= 0) {
                 ++p[0xaf];
+            }
             break;
         case 3:
             I(0x8c) += 1024;
@@ -96,9 +96,9 @@ void ResultGame_TimedPress(u8 *p)
                     ResultGame_SetUpdateCallback(p, ResultGame_TrackTarget);
                     ResultGame_HideTargetMarker(p);
                     ResultGame_HidePressMarker(p);
-                    if (p[0xc4] == 1)
+                    if (p[0xc4] == 1) {
                         p[0xc4] = 2;
-                    else {
+                    } else {
                         ResultMenu_SendCommand(p, 0x36, 0, 0);
                         PlayerCue_BeginModeSeven(gUnknown_02000580, 0);
                     }

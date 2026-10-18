@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 void Sound_PlaySong(int);
 void Sound_StopSong(int);
@@ -6,6 +5,7 @@ void SceneObject_UpdateLowered(void);
 void SceneParticleBurst_CreateWhilePaused(void *, int, void *, int, int, int);
 void SceneObject_UpdateLowering(u8 *s)
 {
+    s16 k2;
     struct {
         s16 x, y, z;
     } v;
@@ -13,8 +13,8 @@ void SceneObject_UpdateLowering(u8 *s)
     int one;
     {
         int next = *(u16 *)(s + 0x80) - 15;
-        clear = 0;
-        asm("" : "+r"(clear) : "r"(next));
+        k2 = 0;
+        clear = k2;
         *(u16 *)(s + 0x80) = next;
     }
     if (*(s16 *)(s + 0x80) < 0) {
@@ -48,11 +48,13 @@ void SceneObject_UpdateLowering(u8 *s)
             SceneParticleBurst_CreateWhilePaused(s + 0x70, 0, &v, 5, 2, one);
         }
     }
-    {
+    do {
+        {
         u16 *offset = (u16 *)(s + 0x80);
-        register int base asm("r1");
+        int base;
         base = *(u16 *)(s + 0x7a);
         base += *offset;
         *(u16 *)(s + 0x72) = base;
-    }
+        }
+    } while (0);
 }

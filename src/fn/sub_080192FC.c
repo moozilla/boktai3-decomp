@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Clock {
     u8 pad[24];
     s16 hour, minute, second, tick;
@@ -35,12 +34,13 @@ int ClockEvents_Update(struct Clock *p)
 {
     int zero;
     int tick = (u16)p->tick + 1;
+    do {
     zero = 0;
-    asm("" : "+r"(zero));
+    } while (0);
     p->tick = tick;
-    if (p->tick > 59)
+    if (p->tick > 59) {
         p->tick = zero;
-    else {
+    } else {
         p->hour = SunClock_GetBaseHour();
         p->minute = SunClock_GetBaseMinute();
         p->second = SunClock_GetSecond();
@@ -50,8 +50,9 @@ int ClockEvents_Update(struct Clock *p)
                 p->armed[0] = zero;
                 ClockEvents_RunScript(p, 0);
             }
-        } else
+        } else {
             p->armed[0] = 1;
+        }
         {
             int when = scheduled(10), limit = p->window;
             if (distance(p->seconds, when) <= limit) {
@@ -59,8 +60,9 @@ int ClockEvents_Update(struct Clock *p)
                     p->armed[1] = 0;
                     ClockEvents_RunScript(p, 1);
                 }
-            } else
+            } else {
                 p->armed[1] = 1;
+            }
         }
         {
             int when = scheduled(12), limit = p->window;
@@ -69,8 +71,9 @@ int ClockEvents_Update(struct Clock *p)
                     p->armed[2] = 0;
                     ClockEvents_RunScript(p, 2);
                 }
-            } else
+            } else {
                 p->armed[2] = 1;
+            }
         }
     }
     return 0;
