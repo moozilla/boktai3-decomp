@@ -298,3 +298,4 @@ addr,function,name,family,note
 08130B24,sub_08130B24,SceneActor_RunControlAndFallback,"Scene actor control","invokes actor control callback then fallback while still attached"
 08130BA0,sub_08130BA0,SceneActor_DispatchActivePhase,"Scene actor control","dispatches indexed phase callback after actor gate succeeds"
 08131BC4,sub_08131BC4,SceneActorBehavior_DispatchOrEnterState2,"SceneActorBehavior","dispatches behavior or enters state two on global flags"
+08131C48,sub_08131C48,SceneActorBehavior_DispatchAlternateOrEnterState2,"SceneActorBehavior","dispatches alternate behavior table or enters state two"
