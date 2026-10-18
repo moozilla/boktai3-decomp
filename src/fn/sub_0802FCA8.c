@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -89,8 +88,9 @@ int Path_GetPointFacing(struct Node *, int);
 int Actor_SelectPathNodeAction(struct Actor *, struct Node *);
 int Actor_SelectPathNodeAction(struct Actor *p, struct Node *node)
 {
-    register u32 value asm("r0") = node->flags;
+    u32 value = node->flags;
     int kind;
+    do {
     kind = value >> 4;
     p->nodeId = Path_GetPointNodeId(node, 0);
     switch (kind) {
@@ -100,15 +100,17 @@ int Actor_SelectPathNodeAction(struct Actor *p, struct Node *node)
             int mask;
             mask = 7;
             p->nodeFacing = facing & mask;
-            if ((((p->angle + 112) >> 5) & mask) != p->nodeFacing)
+                if ((((p->angle + 112) >> 5) & mask) != p->nodeFacing) {
                 return 8;
+                }
             break;
+            }
+            case 2:
+                return 9;
+            case 0:
+            default:
+                break;
         }
-        case 2:
-            return 9;
-        case 0:
-        default:
-            break;
-    }
+    } while (0);
     return 7;
 }
