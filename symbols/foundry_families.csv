@@ -1157,3 +1157,4 @@ addr,function,name,family,note
 081E04B4,sub_081E04B4,StartPrompt_Update,"StartPrompt screen task","waits for Start then fades and runs a completion script"
 081E0818,sub_081E0818,ScriptPrompt_ResetDisplay,"ScriptPrompt screen task","redraws prompt text and resets sprite positions and state"
 081E095C,sub_081E095C,AnimPanel_SelectActiveAnimation,"animation panel (tentative)","sets complementary flag bits on two animations according to selection"
+081E1278,sub_081E1278,SelectionPalette_UpdatePulse,"Two-choice screen selection palette","cycles the selected entry palette color while clearing the other"
