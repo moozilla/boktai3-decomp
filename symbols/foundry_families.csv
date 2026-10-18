@@ -863,3 +863,4 @@ addr,function,name,family,note
 0817FD50,sub_0817FD50,SceneActor_UpdateUnlessPaused,"SceneActorState","run actor update stages subject to engine pause flags"
 0817FDA0,sub_0817FDA0,SceneActor_DestroyComponents,"SceneActorState","remove actor components and destroy actor"
 08180488,sub_08180488,SceneActorAttachment_MarkContact,"SceneActorAttachment","set attachment contact flag from collider callback"
+08180490,sub_08180490,SceneSpriteCollider_Init,"SceneSpriteCollider","initializes sprite animation and a cubic collider"
