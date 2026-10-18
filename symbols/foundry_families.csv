@@ -543,3 +543,4 @@ addr,function,name,family,note
 0817871C,sub_0817871C,SceneHud_DrawSlotMeter,"SceneHud","draw ten-cell player-slot meter and update pulse value"
 08178820,sub_08178820,SceneHud_RefreshGameplayDisplay,"SceneHud","refresh player meters and action displays in gameplay modes"
 081788A8,sub_081788A8,Hud_RefreshPlayerBinding,"Field HUD","binds HUD to its selected player and refreshes it"
+080B6538,sub_080B6538,SceneActorControl_TryBeginNearbyBehavior16,"SceneActorControl","conditionally begins behavior 16 using target angle and near range"
