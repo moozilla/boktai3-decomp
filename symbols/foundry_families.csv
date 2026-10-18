@@ -729,3 +729,4 @@ addr,function,name,family,note
 08159EC0,sub_08159EC0,Player_ResetModePosition,"Player","copies position and resets phase fields for kind one mode 0x1A"
 0815A11C,sub_0815A11C,Player_AdvanceTetherPhase,"Player","advances selected tether mode phases"
 0815A938,sub_0815A938,Player_TestScriptStatus,"Player","tests the selected player's script-selected status"
+0815AD78,sub_0815AD78,Player_EnterKindTwo,"Player","enters player kind two and resets movement state"
