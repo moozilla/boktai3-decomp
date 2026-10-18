@@ -670,3 +670,4 @@ addr,function,name,family,note
 0812F12C,sub_0812F12C,SceneActor_UpdateActiveCallbacks,"SceneActor","dispatch active actor and control callbacks"
 0812F270,sub_0812F270,SceneActor_UpdateBehaviorCallbacks,"SceneActor","dispatch behavior callbacks and update actor motion"
 08130BD4,sub_08130BD4,SceneActorRoute_UpdateTimedPhase,"SceneActorRoute","initializes and ticks a timed route phase"
+08130E60,sub_08130E60,SceneActorRoute_UpdateWaitPhase,"SceneActorRoute","waits on route timer or switches actor behavior"
