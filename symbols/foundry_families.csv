@@ -1301,3 +1301,4 @@ addr,function,name,family,note
 082212DC,sub_082212DC,Display_BlinkUntilTimeout,"Display","toggles visibility at table periods then sets it after sixty ticks"
 08221380,sub_08221380,String_CopyPadded,"String","copies up to length bytes and zero-fills through length plus one"
 08222464,sub_08222464,HashTable_RemoveKey,"HashTable","unlinks a matching key from its hash bucket"
+08222974,sub_08222974,Serial_ProbeConnection,"Serial","checks serial readiness and busy state then records connection role"
