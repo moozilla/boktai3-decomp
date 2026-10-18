@@ -968,3 +968,4 @@ addr,function,name,family,note
 0819A814,sub_0819A814,LinkEffect_UpdateProjectileBurst,"LinkEffect / SunOrb","emits six projectiles homing toward a SunOrb"
 0819A954,sub_0819A954,LinkEffect_UpdateSecondOrb,"LinkEffect / SunOrb","creates the second endpoint orb and later fades all orbs"
 0819AA08,sub_0819AA08,SceneEffect_UpdateEntryState,"SceneEffectLink (tentative)","dispatches linked entry states and advances frame counter"
+0819AA8C,sub_0819AA8C,SceneEffect_CreateEntryTask,"SceneEffectLink (tentative)","allocates and initializes an effect task with resource and origin"
