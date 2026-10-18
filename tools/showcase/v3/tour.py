@@ -42,32 +42,90 @@ html, body { margin:0; width:1920px; height:1080px; overflow:hidden; background:
 #frame { position:absolute; left:40px; top:140px; width:1280px; height:800px; border:1px solid var(--line);
   border-radius:10px; overflow:hidden; box-shadow:0 18px 60px rgba(0,0,0,.45); background:var(--bg); }
 #frame iframe { width:1280px; height:800px; border:0; display:block; }
-#cap { position:absolute; left:1370px; top:140px; width:500px; height:800px; display:flex; flex-direction:column; }
-#kicker { color:var(--muted); font-size:17px; letter-spacing:.08em; text-transform:uppercase; margin-bottom:14px; }
-#title { font-size:40px; line-height:1.15; font-weight:650; color:var(--ink); margin-bottom:26px; }
-#title b { color:var(--accent); font-weight:650; }
-#body p { font-size:24px; line-height:1.5; margin:0 0 18px; color:var(--ink); }
-#body p.m { color:var(--muted); font-size:20px; }
-#body code { font-size:20px; color:var(--accent); }
+#cap { position:absolute; left:1370px; top:140px; width:510px; height:800px; display:flex; flex-direction:column; }
+#kicker { margin-bottom:22px; }
+#title { margin-bottom:30px; }
+#body .gf { margin-bottom:22px; }
 #foot { margin-top:auto; color:var(--muted); font-size:16px; display:flex; gap:8px; align-items:center; }
 #dots i { display:inline-block; width:8px; height:8px; border-radius:4px; background:var(--line); margin-right:5px; }
 #dots i.on { background:var(--accent); }
-#head { position:absolute; left:40px; top:56px; font-size:22px; color:var(--muted); letter-spacing:.02em; }
-#head b { color:var(--ink); }
+#head { position:absolute; left:40px; top:60px; }
 #card { position:absolute; inset:0; display:none; background:var(--bg); }
-#card.on { display:flex; flex-direction:column; justify-content:center; padding:0 160px; }
-#card h1 { font-size:64px; margin:0 0 30px; font-weight:650; }
-#card h1 b { color:var(--accent); font-weight:650; }
-#card .grid { display:grid; grid-template-columns:1fr 1fr; gap:26px 60px; }
-#card .grid div { font-size:24px; line-height:1.45; color:var(--muted); }
-#card .grid div b { display:block; color:var(--ink); font-size:30px; margin-bottom:4px; }
-#card p { font-size:28px; color:var(--muted); max-width:1300px; line-height:1.5; }
+#card.on { display:flex; flex-direction:column; justify-content:center; padding:0 150px; }
+#card .grid { display:grid; grid-template-columns:1fr 1fr; gap:34px 70px; }
+#card .gap { height:40px; }
+canvas.gfc { image-rendering: pixelated; display:block; }
 </style></head><body>
-<div id="head"><b>Boktai 3 Studio</b> &nbsp;·&nbsp; the decompilation's workbench</div>
+<div id="head" class="gf" data-scale="2" data-text="<m>BOKTAI 3 STUDIO  -  the decompilation's workbench</m>"></div>
 <div id="frame"><iframe id="f" src="about:blank"></iframe></div>
-<div id="cap"><div id="kicker"></div><div id="title"></div><div id="body"></div>
+<div id="cap"><div id="kicker" class="gf" data-scale="2"></div><div id="title" class="gf" data-scale="3"></div>
+<div id="body"></div><div id="gamebox"></div>
 <div id="foot"><span id="dots"></span><span id="where"></span></div></div>
 <div id="card"></div>
+<script>
+// Text in the game's own 8x16 font (the Studio's /api/font: glyph c at
+// 0xC + (c - 0x20) * 64, two 4bpp tiles; 1 is the face, 2 and 3 its edge).
+// Markup: <b>accent</b>, <m>muted</m>; \\n breaks a line; words wrap.
+let FONT = null;
+const INKS = { n: ['#ece6dc', '#a89f92', '#5c554c'], b: ['#e0745a', '#a8553f', '#5a3024'], m: ['#9a9083', '#6b6359', '#3e3933'] };
+async function font() { return FONT ??= new Uint8Array(await (await fetch('/api/font')).arrayBuffer()); }
+function runs(text) {
+  const out = []; let style = 'n';
+  for (const part of text.split(/(<\\/?[bm]>)/)) {
+    if (/^<[bm]>$/.test(part)) style = part[1]; else if (/^<\\/[bm]>$/.test(part)) style = 'n';
+    else for (const ch of part) out.push([ch, style]);
+  }
+  return out;
+}
+function wrap(chars, cols) {
+  const lines = [[]]; let word = [];
+  const flush = () => { const l = lines[lines.length - 1];
+    if (l.length && l.length + word.length > cols) { while (l.length && l[l.length - 1][0] === ' ') l.pop(); lines.push([]); }
+    lines[lines.length - 1].push(...word); word = []; };
+  for (const c of chars) {
+    if (c[0] === '\\n') { flush(); lines.push([]); continue; }
+    word.push(c);
+    if (c[0] === ' ') flush();
+  }
+  flush();
+  return lines.map(l => { while (l.length && l[0][0] === ' ' && l !== lines[0]) l.shift(); return l; });
+}
+async function draw(el) {
+  const f = await font(), scale = +(el.dataset.scale || 2), text = el.dataset.text || '';
+  const width = el.clientWidth || 500, cols = Math.max(4, Math.floor(width / (8 * scale)));
+  const lines = wrap(runs(text), cols), lh = 18;
+  const cv = document.createElement('canvas'); cv.className = 'gfc';
+  cv.width = Math.max(8, cols * 8); cv.height = lines.length * lh;
+  cv.style.width = cv.width * scale + 'px'; cv.style.height = cv.height * scale + 'px';
+  const ctx = cv.getContext('2d');
+  lines.forEach((l, y) => l.forEach(([ch, st], x) => {
+    const code = ch.charCodeAt(0); if (code < 0x20 || code > 0x7e) return;
+    const o = 0xC + (code - 0x20) * 64;
+    for (let t = 0; t < 2; t++) for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+      const v = (f[o + t * 32 + r * 4 + (c >> 1)] >> (4 * (c & 1))) & 15;
+      if (v >= 1 && v <= 3) { ctx.fillStyle = INKS[st][v - 1]; ctx.fillRect(x * 8 + c, y * lh + t * 8 + r, 1, 1); }
+    }
+  }));
+  el.replaceChildren(cv);
+}
+async function drawAll(root) { for (const el of (root || document).querySelectorAll('.gf')) await draw(el); return 1; }
+async function setCaption(kicker, title, body, dots, where) {
+  document.getElementById('card').className = '';
+  document.getElementById('kicker').dataset.text = '<m>' + kicker + '</m>';
+  document.getElementById('title').dataset.text = title;
+  document.getElementById('body').innerHTML = body.map(p => '<div class="gf" data-scale="2"></div>').join('');
+  [...document.getElementById('body').children].forEach((d, i) => d.dataset.text = body[i]);
+  document.getElementById('dots').innerHTML = dots;
+  document.getElementById('where').textContent = where;
+  await drawAll(document.getElementById('cap'));
+  return 1;
+}
+async function setCard(html) {
+  const c = document.getElementById('card'); c.innerHTML = html; c.className = 'on';
+  await drawAll(c); return 1;
+}
+drawAll(document.getElementById('head'));
+</script>
 </body></html>"""
 
 
@@ -96,7 +154,7 @@ class Tour:
         self.ws.call("Page.navigate", url=url + "/tour-frame")
         time.sleep(0.8)
         self.top("document.open(); document.write(%s); document.close(); 1" % json.dumps(TEMPLATE))
-        time.sleep(0.3)
+        time.sleep(0.8)
         self.frames = []    # (jpeg bytes, seconds)
         self.meta = {}      # times (seconds into the recording) other tracks line up with
 
@@ -132,14 +190,13 @@ class Tour:
         time.sleep(settle)
 
     def caption(self, kicker, title, body, k, n, where=""):
+        """The caption panel, drawn in the game's font (<b>accent</b>, <m>muted</m>)."""
         dots = "".join(f"<i class='{'on' if i == k else ''}'></i>" for i in range(n))
-        self.top("document.getElementById('kicker').textContent = %s; document.getElementById('title').innerHTML = %s;"
-                 "document.getElementById('body').innerHTML = %s; document.getElementById('dots').innerHTML = %s;"
-                 "document.getElementById('where').textContent = %s; document.getElementById('card').className = ''"
-                 % tuple(json.dumps(x) for x in (kicker, title, "".join(f"<p>{p}</p>" for p in body), dots, where)))
+        self.top("setCaption(%s, %s, %s, %s, %s)" % tuple(json.dumps(x) for x in (kicker, title, body, dots, where)))
 
     def card(self, html):
-        self.top("var c = document.getElementById('card'); c.innerHTML = %s; c.className = 'on'" % json.dumps(html))
+        """A full-frame card: elements with class gf and data-text are drawn in the game's font."""
+        self.top("setCard(%s)" % json.dumps(html))
 
     # ---- capture ----
     def shot(self, secs):

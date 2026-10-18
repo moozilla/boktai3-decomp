@@ -1,0 +1,116 @@
+# The foundry: asm to a committed match, measured as a funnel
+
+Tags: #matching #tooling
+
+One pipeline from an unmatched function to a committed match, with every stage
+logged so we know where functions die and what each match costs. The driver is
+`tools/foundry.py` (see its docstring); state for each function lives in ignored
+`build/foundry/FUNC/` (context pack, every check attempt, stages, usage).
+
+## Stages
+
+1. **Context pack** (`foundry.py context FUNC`). The ROM's code, declarations
+   for everything it calls or loads (from `include/` and matched `src/`),
+   how matched code calls it, and the C of matched relatives that explain at
+   least 40% of it (`tools/relatives.py`; weaker ones are only a shared
+   prologue and were noise).
+2. **Draft and converge** (a model worker). The worker gets `foundry.py brief
+   FUNC`, writes `wip/foundry/FUNC.c`, and checks only through `foundry.py
+   check`, which logs each attempt's fuzzy score and keeps a copy. The budget
+   is 12 checks under 150 instructions and 20 above. The brief lists the plain-C
+   levers for register copies; workers otherwise conclude that a pin is
+   needed and stop.
+3. **Machine stages** (`foundry.py finish FUNC`) on the worker's best attempt:
+   - `tools/repair.py` puts the ROM's constants and symbols into the C;
+   - when only registers differ, `tools/autosolve.py` runs the compiler-space
+     solve and the C search.
+4. **Commit**. Each MATCH goes to `src/fn/FUNC.c`, one commit per function,
+   through the batch PR flow.
+
+Workers here were Sonnet subagents of the orchestrating session. The headless
+`claude -p` CLI would make this unattended, but its login had expired on this
+machine.
+
+## First sample (2026-10-17)
+
+The sample was 40 never-drafted functions, 10 per size bucket (`foundry.py
+sample`, seed `foundry-2026-10-17`, functions up to 1,500 instructions). It took
+about 25 minutes of wall time with 8 workers at once and 3.4M worker tokens in
+total.
+
+| bucket | n | first draft fuzzy (median) | worker best (median) | matched | shape off 1–3 | shape off 16+ | checks (mean) | tokens (mean) | tokens per match |
+|---|---|---|---|---|---|---|---|---|---|
+| <50 | 10 | 85.7 | 100.0 | **8** (8 worker) | 1 | 1 | 5.1 | 63k | 79k |
+| 50–150 | 10 | 75.0 | 98.4 | **5** (4 worker, 1 register solver) | 2 | 3 | 7.9 | 70k | 141k |
+| 150–400 | 10 | 74.8 | 96.6 | **3** (3 worker) | 2 | 5 | 12.9 | 85k | 284k |
+| 400+ | 10 | 62.4 | 74.6 | **1** (1 worker) | 0 | 9 | 17.8 | 122k | 1.1M |
+
+"Shape off" is the aligned instruction distance with registers and immediates
+abstracted, after repair: what a C change still has to fix. The 50–150
+"shape off 1–3" row counts two register-only residues the solver did not
+close (sub_081AA330 at 98.4%, sub_08130F60 at 95.5%).
+
+By instructions, the matched share is 78% for <50, 43% for 50–150, 29% for
+150–400 and 9% for 400+. All 17 matches are committed, including
+sub_0818C0BC (546 instructions, a jump table, 17 checks) and sub_0812DC28
+(235 instructions, 6 checks).
+
+## Where the funnel loses functions
+
+* **Drafting is not the bottleneck.** The first compiled draft is at 62–86%
+  fuzzy in every bucket, and no worker failed to compile a draft. Workers
+  converge on small functions within about 5 checks.
+* **Convergence on large functions is.** In 400+ the median worker ends at
+  75% after 18 checks. Every non-matching worker reported the same thing:
+  "the structure is right, the register allocation and stack layout are
+  not". The shape distance agrees only partly. Once allocation is wrong, the
+  extra copies and spills are themselves instructions, so the score has no
+  slope: a correct structural fix in one region can lower the fuzzy % because
+  registers shift everywhere else. Workers cannot tell a good edit from a bad
+  one.
+* **One 876-instruction function** got no further than a partial draft. A
+  single context is not enough for it; it needs to be worked region by region.
+* **repair.py did not help fresh drafts, and hurt five of them.** Its byte
+  distance accepted nonsense edits in code whose registers differ (0x144 to 1,
+  a 0xFFFF mask to 5). Fixes:
+  - an edit must now improve both the shape distance and the count of aligned
+    instructions whose values differ;
+  - values guessed from nearby code must have the same magnitude;
+  - masks are left alone;
+  - drafts whose shape is far off are refused (`--force` overrides).
+
+  Its value is in ports from relatives (the 15 matches in #231), not in fresh
+  drafts.
+* **The register solver** converted 1 of 3 register-only residues.
+
+**Link names.** check.py resolves `sub_XXXXXXXX` and `D_XXXXXXXX` from the
+address, but the ROM link does not when a function has a real name. Seven
+matches failed the combined build that way. The context pack now shows real
+names, and `foundry.py check` fails with a `LINK NAMES` line until they are
+fixed.
+
+## Next: a score with a slope for large functions
+
+The bottleneck is a structural signal that survives allocation differences:
+
+1. **Allocation-free score.** The instrumented compiler can force each pseudo
+   to the register the ROM uses (`AGBCC_FORCE`, as tools/rasolve.py does). The
+   distance that remains under the best forced allocation is the structural
+   distance, and it moves monotonically as the structure improves.
+   `foundry.py check --alloc` will report it per region of basic blocks, so a
+   worker sees "regions 1–4 locked, region 5 differs here" instead of a fuzzy %
+   that jumps around.
+2. **Region-wise work.** With per-region locking, a 400–1000 instruction
+   function becomes a sequence of 30–80 instruction tasks, which is the size
+   where workers already succeed (78%). Several workers can take separate
+   regions of one function.
+3. **Allocation last, by machine.** Once the allocation-free score is 0, the
+   remaining work is the class the compiler-space solver handles. It matched 6
+   of 40 pinned functions in #230 and 1 of 3 here, and it gets more budget for
+   large functions.
+4. **Types.** sub_0818C0BC went from 64% to 88% when the worker introduced a
+   struct. Sharing recovered struct layouts across a family (callers and
+   callees of the same object) in the context pack should move first drafts up.
+
+Run the <50 bucket at scale now: 8 of 10 match at about 80k tokens each, and
+1,075 such functions remain.

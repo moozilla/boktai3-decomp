@@ -427,7 +427,8 @@ def main():
     ap.add_argument("--search", type=int, default=0)
     ap.add_argument("--inplace", action="store_true",
                     help="mutate only the region, inside the whole function (no extraction)")
-    ap.add_argument("-j", type=int, default=os.cpu_count() or 4)
+    ap.add_argument("-j", type=int, default=max(1, (os.cpu_count() or 2) // 2),
+                    help="worker processes (default: half the cores; all of them saturated a 16 GB machine)")
     ap.add_argument("--out")
     a = ap.parse_args()
     src = os.path.abspath(a.src)

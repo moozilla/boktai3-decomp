@@ -113,3 +113,45 @@ sub_0815A838 (ScriptActor_GetField534FromScript), sub_08229440 (pinned),
 sub_082285C4 (pinned), sub_08234770, sub_0823652C, sub_0822B968 and
 sub_08239CDC. Each takes the cleanest matching run, preferring plain C, with
 pins reduced by `tools/depin.py`.
+
+## Sonnet 5.5 on repair.py near misses (2026-10-18)
+
+Input: the 14 batch results from `tools/relatives.py --port --min 0.6` plus
+`tools/repair.py` whose log ended in 1–10 halfwords off. A Sonnet 5.5 worker
+had one session, at most about 10 `tools/check.py` runs per function, no
+register pins added and no handwritten asm.
+
+**Result: 13 of 14 matched** (93%), each committed as `src/fn/FUNC.c`.
+
+| Function | Checks | The fix |
+| --- | --- | --- |
+| sub_081274F4, sub_08127998, sub_08129854 | 3, 2, 3 | bitfield constants (`hi`, `lo`) read from `lsls` immediates in the asm |
+| sub_0812CF9C | 2 | `value -= 48` became `value += 30` |
+| sub_081A6108 | 2 | struct padding that put a field 4 bytes late |
+| sub_08173D2C | 2 | a call moved inside the guarding `if` |
+| sub_0820901C | 2 | four struct offsets, from the `movs`/`adds` chain |
+| sub_082086B8 | 2 | reuse the loaded zero as a stack argument |
+| sub_0822E86C | 3 | callee name, `== 0` for `< 0`, loop bound 12 for 16 |
+| sub_080F4A4C | 2 | struct field offsets |
+| sub_08121848, sub_0812BFBC | 2, 2 | local structs with the ROM's slot size and counts |
+| sub_08091E58 | 2 | `~8` became `~4` |
+| sub_0809F368 | 10, not matched | needs `ldrh r1; movs r0,#4; orrs r0,r1` (operand order of `\|= 4` on a halfword at `+0x13A`) |
+
+Median 2 checks, mean 2.2 for the matches. Most of these were not structural:
+`repair.py` had already fixed the shape and the remaining diff was a constant
+or an offset that the batch left alone, found by reading `check.py`'s
+differing halfword and then `tools/asmat.py`. The one failure is a
+register-order problem (r0/r1 swapped), which repair.py's hints do not cover.
+
+Notes for the next run:
+
+- `repair.py` logs for the batch often showed a 1-halfword count with no
+  hint (e.g. `sub_08091E58`, `sub_080F4A4C`); the hint text was only useful
+  where it printed a substitution. A printed `ROM only` / `C only` line for
+  immediates that differ in a literal pool or a `movs` would have saved the
+  asm reading.
+- A fresh worktree needs `gen/` copied (not symlinked) and
+  `build/agbcc-instr` before `repair.py` runs; the first `make` took about
+  25 minutes with other sessions running.
+- Several ported sources carry inherited `register ... asm("rN")` pins and
+  `MATCHING_CONCESSION: register-pinning`. None was added here.
