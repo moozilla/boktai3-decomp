@@ -1202,3 +1202,4 @@ addr,function,name,family,note
 081F4C08,sub_081F4C08,Ratatosk_UpdateFadeIn,"Ratatosk","increases sprite fade scale and restores shadow at completion"
 081F5748,sub_081F5748,Ratatosk_UpdateTimedPose,"Ratatosk","plays pose animation and signals completion after sixty ticks"
 081F57DC,sub_081F57DC,Ratatosk_UpdateTimedPoseVariant,"Ratatosk","plays the alternate pose mode and completes after sixty ticks"
+081F5870,sub_081F5870,SceneActor_BeginTimedAnimation,"SceneActor animation states","starts animation 32 and finishes after a delay"
