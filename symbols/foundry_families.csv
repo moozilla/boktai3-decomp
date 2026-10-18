@@ -988,3 +988,4 @@ addr,function,name,family,note
 0819C7E4,sub_0819C7E4,SceneMover_IsNearTarget,"SceneMover (tentative)","tests squared horizontal target distance against a scaled threshold"
 0819C83C,sub_0819C83C,DirectionGate_IsAngleInModeRange,"DirectionGate (tentative)","tests an angle against the mode-selected half-circle range"
 0819C980,sub_0819C980,ColliderActor_SetTargetPosition,"ColliderActor (tentative)","set target and facing and compute minimum travel time"
+0819CCEC,sub_0819CCEC,OffsetActor_StepTowardTarget,"OffsetActor (tentative)","computes motion toward the saved target with a twelve-unit step"
