@@ -59,3 +59,4 @@ addr,function,name,family,note
 080B1038,sub_080B1038,SceneActor_UpdateForwardCollider,"SceneActor forward collision","positions collider 180 units ahead in behavior 0x22"
 080B1D8C,sub_080B1D8C,SceneActor_InitContextColliders,"SceneActor","initializes body and attack colliders including context collider"
 080B1E60,sub_080B1E60,SceneActor_ResetContextAnimation,"SceneActor","clears context state and initializes directional animation"
+080B22D4,sub_080B22D4,Vorn_ParseField624,"Vorn (actor context script-field parsers, called from Vorn_Init)","parses an optional script value pair (keyword 0x78) into Vorn's context fields 0x624/0x626/0x627, zeroing them if absent"
