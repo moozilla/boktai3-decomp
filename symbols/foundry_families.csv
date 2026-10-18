@@ -1149,3 +1149,4 @@ addr,function,name,family,note
 081DCF84,sub_081DCF84,TextEntry_DrawName,"Text entry screen","draw five character slots with empty-slot placeholders"
 081DE5E4,sub_081DE5E4,MenuSprites_SetFlagBits,"Menu sprite flags","set bit zero in sixteen menu sprite flag words"
 081DEDF4,sub_081DEDF4,AnimPanel_RemoveAnimations,"animation panel (tentative)","removes four main animations and twelve entry animations"
+081DF0EC,sub_081DF0EC,AnimPanel_SaveSelections,"animation panel (tentative)","packs 24 entry values and two selections into saved bytes"
