@@ -1132,3 +1132,4 @@ addr,function,name,family,note
 081D72FC,sub_081D72FC,ScreenTransition_ReturnZero,"ScreenTransition","returns zero without side effects"
 081D7508,sub_081D7508,,"Unassigned callback",""
 081D750C,sub_081D750C,,"Unassigned callback",""
+081D789C,sub_081D789C,SpriteGroup_InitFourSprites,"SpriteGroup","initializes four sprites from resource 0x1C1E"
