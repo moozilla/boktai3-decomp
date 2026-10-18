@@ -832,3 +832,4 @@ addr,function,name,family,note
 0817A8C8,sub_0817A8C8,ActorPosition_TestPath,"actor position state","requires both position-pair tests to succeed; path role tentative"
 0817A900,sub_0817A900,SceneVolume_TestPlayerPosition,"SceneVolume","tests a volume against player position"
 0817AA14,sub_0817AA14,SceneVolume_FindNearbyPosition,"SceneVolume","finds and stores nearby coordinates"
+0817AA7C,sub_0817AA7C,SceneVolume_GetActivityState,"SceneVolume","classifies timer and activity flags"
