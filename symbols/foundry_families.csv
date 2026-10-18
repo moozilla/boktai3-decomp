@@ -260,3 +260,4 @@ addr,function,name,family,note
 0812254C,sub_0812254C,SpriteEffectPool_Update,"SpriteEffectPool","dispatches active effect slots by state"
 081228F0,sub_081228F0,StateSpritePool_Tick,"StateSpritePool","dispatches occupied sprite slots by signed state"
 08122B00,sub_08122B00,StateSprite_InitAnimation,"StateSpritePool","initializes animation and variant metadata"
+0812549C,sub_0812549C,SpriteNotice_CreateBetweenPositions,"SpriteNotice","creates a midpoint sprite when horizontal separation exceeds 32 units"
