@@ -479,3 +479,4 @@ addr,function,name,family,note
 081743F4,sub_081743F4,TextLabel_FormatSuffix,"TextLabel","format a two-byte suffix and optional SP text"
 08174440,sub_08174440,TextLabel_DisplaySuffix,"TextLabel","format the suffix and display it in a selected text backend"
 08174480,sub_08174480,Presentation_ApplyGraphicData,"Presentation graphics","applies graphic data to the default target"
+08174494,sub_08174494,Presentation_ApplyIndexedGraphicData,"Presentation graphics","applies graphic data to an indexed target"
