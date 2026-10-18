@@ -870,3 +870,4 @@ addr,function,name,family,note
 08180654,sub_08180654,SpriteComponent_Suspend,"SpriteComponent","set sprite flag bit zero and stop song 0x202 once"
 08180678,sub_08180678,SpriteComponent_Resume,"SpriteComponent","clear sprite flag bit zero and restart song 0x202 once"
 081806A0,sub_081806A0,SpriteComponent_ConfigureCollider,"SpriteComponent","configure embedded collider with two zero parameters"
+081806BC,sub_081806BC,SpriteComponent_GetCollisionStatus,"SpriteComponent","read signed collision status set by embedded collider callback"
