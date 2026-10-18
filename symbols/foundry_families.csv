@@ -1342,3 +1342,4 @@ addr,function,name,family,note
 08233714,sub_08233714,TimedDisplay_AdvanceIntro,"TimedDisplay","advances display updates and changes state after thirty-two ticks"
 0823405C,sub_0823405C,MovingEffect_AdvanceLifetime,"MovingEffect","moves a position component and expires after three ticks"
 08234810,sub_08234810,FlickerParticle_UpdateMotion,"FlickerParticle","alternates particle frames and integrates velocity until expiry"
+08234960,sub_08234960,FlickerParticle_UpdateVerticalMotion,"FlickerParticle","alternates particle frames and moves vertically until expiry"
