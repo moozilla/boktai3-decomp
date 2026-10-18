@@ -935,3 +935,4 @@ addr,function,name,family,note
 0818D640,sub_0818D640,Armor_DampPartMovement,"Armor articulated-part motion","dampens part movement before starting retraction"
 0818DB10,sub_0818DB10,SpinningApproach_UpdateOwnerRelativeSegment,"Spinning approach motion (tentative), Motion0818Object","advances owner-relative final segment and marks completion"
 0818DEBC,sub_0818DEBC,Armor_UpdatePartRebound,"Armor 9 (auto, tentative), armor parts","applies vertical rebound and spin, then retires the part"
+0818E4BC,sub_0818E4BC,Armor_UpdatePartColliders,"Armor 9 (auto, tentative), armor parts","positions both part colliders and refreshes the enabled collider"
