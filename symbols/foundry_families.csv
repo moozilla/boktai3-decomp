@@ -15,3 +15,4 @@ addr,function,name,family,note
 080975C4,sub_080975C4,Bee_UpdateSway,"Bee","clamps and oscillates a sway offset with direction steps"
 08097C64,sub_08097C64,Bee_ClearActionFlags,"Bee","clears several action flag bits and a script field"
 080986DC,sub_080986DC,Bee_ConsumeFlag80,"Bee","if flag 0x80 is set, subtracts 3 from a counter and clears the flag"
+080C4768,sub_080C4768,Skeleton_StepPosition,"Skeleton","steps x or y subpixel offset by direction, snaps fraction to 0x80"
