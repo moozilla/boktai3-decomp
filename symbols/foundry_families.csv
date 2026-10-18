@@ -977,3 +977,4 @@ addr,function,name,family,note
 0819B9E4,sub_0819B9E4,Hresvelgr_HasCellOverride,"Hresvelgr","tests current and side-selected neighboring terrain overrides"
 0819BA7C,sub_0819BA7C,Hresvelgr_HasAdjacentOverride,"Hresvelgr","tests cell and three direction-relative neighboring overrides"
 0819BF34,sub_0819BF34,Hresvelgr_SelectPlayerAnimation,"Hresvelgr","selects animation preset and palette from linked player mode"
+0819C024,sub_0819C024,Collider_IgnoreCallback,"Collider callback","empty callback registered by the neighboring collider initializer"
