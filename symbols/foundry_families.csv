@@ -1320,3 +1320,4 @@ addr,function,name,family,note
 08229078,sub_08229078,SunClock_SetMoonAge,"Clock and sun schedule (tentative)","stores lunar age in tenths and selects one of eight moon phases"
 0822B410,sub_0822B410,MusicSlots_StopAllAndRetainResumable,"Music player slots (tentative)","stops all players while retaining resumable song slots"
 0822D764,sub_0822D764,ItemRecord_ExpandDescriptor,"ItemDescriptor","copy descriptor defaults and overlay three instance values"
+0822D7C0,sub_0822D7C0,ItemDescriptor_Reset,"ItemDescriptor","reset descriptor fields and mark its type invalid"
