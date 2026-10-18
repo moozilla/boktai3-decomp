@@ -198,3 +198,4 @@ addr,function,name,family,note
 0810CF08,sub_0810CF08,PanelSequence_InitializeSprites,"PanelSequence","starts a script and initializes seven sprite records"
 0810DA68,sub_0810DA68,SelectionPanel_InitEntryIds,"SelectionPanel","initializes ten entry identifiers with a flag-dependent variant"
 0810E1A0,sub_0810E1A0,SelectionPanel_GetSelection,"SelectionPanel","combines column and six-entry page into selection index"
+08110AD4,sub_08110AD4,SceneEffect_ExecuteCommandList,"SceneEffect","dispatches packed x/y/type commands to two effect spawners"
