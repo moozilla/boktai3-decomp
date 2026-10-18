@@ -350,3 +350,4 @@ addr,function,name,family,note
 08105790,sub_08105790,ProximityActor_IsPlayerInsideOriginRange,"ProximityActor","updates cached distance from origin and tests player range"
 08105998,sub_08105998,ProximityActor_InitializeCollider,"ProximityActor","initializes variant-dependent collider bounds and callback"
 08106BCC,sub_08106BCC,RegionActorPool_UpdateActors,"RegionActorPool","dispatches occupied actors and hides actors outside their region"
+08114370,sub_08114370,SceneCallbackPool_Update,"Scene callback pool","invokes callbacks for active entries in a sixteen-slot pool and increments its frame"
