@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Blob {
     u32 words[8];
@@ -54,7 +53,7 @@ void sub_0803B1E4(struct ResultMenu *p)
     if (p->remaining < 0)
         p->remaining = 0;
     {
-        register struct Drawing *draw asm("r3") = &p->draws[14];
+        struct Drawing *draw = &p->draws[14];
         int value;
         value = clamp(p->remaining);
         desc = &p->primary;
