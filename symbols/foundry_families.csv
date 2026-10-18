@@ -1259,3 +1259,4 @@ addr,function,name,family,note
 08205AD0,sub_08205AD0,Ooze_UpdateAttackDelay,"Ooze","schedules attack state from table or periodic delay"
 08206030,sub_08206030,SceneTask_DispatchUnlessPaused,"Scene task callback dispatcher","dispatches callback and increments ticks unless global pause flags are set"
 082069A8,sub_082069A8,VulcanCannon_FireProjectile,"VulcanCannon","creates a projectile ahead of the cannon"
+08206AB8,sub_08206AB8,VulcanCannon_HasClearShot,"VulcanCannon","checks terrain clearance along the path to the player"
