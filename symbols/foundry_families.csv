@@ -731,3 +731,4 @@ addr,function,name,family,note
 0815A938,sub_0815A938,Player_TestScriptStatus,"Player","tests the selected player's script-selected status"
 0815AD78,sub_0815AD78,Player_EnterKindTwo,"Player","enters player kind two and resets movement state"
 0815E710,sub_0815E710,PlayerContact_ApplySyntheticContact,"Player contact response","Builds a temporary collider and applies a synthetic contact."
+0815E790,sub_0815E790,Player_EnterKindFour,"Player state transition","Resets action and script state before entering kind four."
