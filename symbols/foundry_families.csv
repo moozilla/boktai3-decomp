@@ -781,3 +781,4 @@ addr,function,name,family,note
 0816ABC8,sub_0816ABC8,MenuPrompt_ResumeChild,"MenuPrompt (tentative)","resets display state and resumes the child before waiting for its phase"
 0816AD34,sub_0816AD34,ScenePanel_BeginAccountMenu,"ScenePanel","initializes account menu and conditionally enables its secondary sprite"
 0816AE38,sub_0816AE38,ScenePanel_BeginAccountExit,"ScenePanel","starts account panel exit animation and sound"
+0816AEE8,sub_0816AEE8,SceneSequence_BeginAnimation6,"SceneSequence","starts animation six and installs its next phase"
