@@ -653,3 +653,4 @@ addr,function,name,family,note
 081213B4,sub_081213B4,ActorCollider_Init,"ActorCollider","initializes collider extents and binds owner position and callback"
 08121D64,sub_08121D64,SpriteParticle_SpawnBatch,"SpriteParticlePool","allocates sprite effect slots and initializes position animation palette and layer"
 0812224C,sub_0812224C,SpriteEffect_UpdateBlinkAndExpire,"SpriteEffect","blinks then removes sprite and shadow and releases the effect slot"
+0812247C,sub_0812247C,SpriteEffect_SpawnWithMotion,"SpriteEffect","allocates a moving sprite effect with shadow palette and collider"
