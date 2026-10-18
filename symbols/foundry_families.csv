@@ -827,3 +827,4 @@ addr,function,name,family,note
 0817A0FC,sub_0817A0FC,ActorVariation_SelectRandomPair,"actor variation state","selects random variation indices and decodes the pair"
 0817A234,sub_0817A234,ActorProperty_GetConstant34,"actor property callback","returns the constant 0x34; property role tentative"
 0817A23C,sub_0817A23C,ActorMovement_CanReachTarget,"actor movement position search","checks target cell, facing, distance, and the connecting segment"
+0817A324,sub_0817A324,ActorPosition_SaveSelectedPoint,"actor position state","copies the selected eight-byte point after a successful query"
