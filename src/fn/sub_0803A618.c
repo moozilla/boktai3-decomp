@@ -41,11 +41,11 @@ struct Owner {
 };
 extern const u16 gUnk_0824DE7C[], gUnk_0824DE8C[];
 void Anim_LoadKeyframe(void *, void *, int, int);
-void sub_08039968(void *, int, int);
+void WirelessGameItem_SetRandomNegativeArcVelocity(void *, int, int);
 void sub_082216F8(void *, void *, void *, int, int);
-void sub_08039998(void *, int, int);
+void WirelessGameItems_ApplyMotionWave(void *, int, int);
 extern struct Owner *gUnk_02000100;
-int sub_0803A618(int indexArg, int amountArg, int pendingArg)
+int WirelessGameItems_QueueIncomingItem(int indexArg, int amountArg, int pendingArg)
 {
     int index = indexArg;
     int amount = amountArg;

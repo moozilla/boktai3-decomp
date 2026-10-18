@@ -1,13 +1,13 @@
 #include "global.h"
 
-void sub_0811CD08(u8 *);
+void CharacterModel_RemoveAnimations(u8 *);
 void sub_0811B394(u8 *);
-void sub_08112C08(s32);
+void ActorMarkerPool_RemoveMarker(s32);
 
-void sub_0803D1AC(u32 a, u8 *p)
+void ScenePool_DestroyActorSlot(u32 a, u8 *p)
 {
-    sub_0811CD08(p + 0x600);
+    CharacterModel_RemoveAnimations(p + 0x600);
     *(s32 *)(p + 0x854) = -1;
     sub_0811B394(p + 0x860);
-    sub_08112C08(*(s8 *)(p + 0x850));
+    ActorMarkerPool_RemoveMarker(*(s8 *)(p + 0x850));
 }

@@ -9,13 +9,13 @@ struct PeerPanel {
     u8 name[16];
 };
 
-void *sub_08037DCC(int peer);
+void *WirelessExchange_GetPeerEntry(int peer);
 void Memory_Copy(void *destination, const void *source, int size);
 void TextWindow_Refresh(int window, int style);
 
-int sub_08037540(void *owner, struct PeerPanel *p, int peer)
+int WirelessPeerPanel_ClearName(void *owner, struct PeerPanel *p, int peer)
 {
-    void *name = sub_08037DCC(peer);
+    void *name = WirelessExchange_GetPeerEntry(peer);
     u8 *destination;
     int i;
     int offset;

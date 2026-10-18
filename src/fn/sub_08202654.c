@@ -6,7 +6,7 @@ struct S {
     u16 h2a;
 };
 void sub_08202F48(void *);
-u32 sub_08202654(struct S *p)
+u32 TimedSpriteEffect_UpdateDefault(struct S *p)
 {
 
     {

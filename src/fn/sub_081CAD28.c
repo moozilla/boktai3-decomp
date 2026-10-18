@@ -1,6 +1,6 @@
 #include "global.h"
 void Actor_PlayAnimationEntry(void *, int, int, int, int);
-void sub_081CAD28(void *unused, u8 *p)
+void SceneCharacter_StartSlowAnimationSeven(void *unused, u8 *p)
 {
     if (p[9]) {
         int r;

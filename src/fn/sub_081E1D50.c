@@ -34,7 +34,7 @@ void Anim_LoadKeyframe(void *, void *, u16, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 extern const s16 gUnk_086136F0[], gUnk_086137AE[], gUnk_08613BC4[];
-u32 sub_0822B590(s32);
+u32 Sound_IsSongPlaying(s32);
 void Sound_StopSong(s32);
 void Sound_PlaySong(s32);
 void Anim_SetKeyframes(void *, void *, u16, s32, s32);
@@ -43,19 +43,19 @@ void SoundTest_PlaySelection(struct Viewer *p)
 {
     switch (p->selection) {
         case 0:
-            if (sub_0822B590(gUnk_086136F0[p->previousA]))
+            if (Sound_IsSongPlaying(gUnk_086136F0[p->previousA]))
                 Sound_StopSong(gUnk_086136F0[p->previousA]);
             Sound_PlaySong(gUnk_086136F0[p->textIndex]);
             p->previousA = p->textIndex;
             break;
         case 1:
-            if (sub_0822B590(gUnk_086137AE[p->previousB]))
+            if (Sound_IsSongPlaying(gUnk_086137AE[p->previousB]))
                 Sound_StopSong(gUnk_086137AE[p->previousB]);
             Sound_PlaySong(gUnk_086137AE[p->valueA]);
             p->previousB = p->valueA;
             break;
         case 2:
-            if (sub_0822B590(gUnk_08613BC4[p->previousC]))
+            if (Sound_IsSongPlaying(gUnk_08613BC4[p->previousC]))
                 Sound_StopSong(gUnk_08613BC4[p->previousC]);
             Sound_PlaySong(gUnk_08613BC4[p->valueB]);
             p->previousC = p->valueB;

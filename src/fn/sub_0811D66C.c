@@ -1,7 +1,7 @@
 #include "global.h"
 u32 Script_GetKeywordValue(u32, s32);
 void sub_0811D5A8(u32);
-void sub_0811D66C(void)
+void GameState_RecordChallengeScoreFromScript(void)
 {
     s32 m = -1;
     u32 a = Script_GetKeywordValue(0x63, m);

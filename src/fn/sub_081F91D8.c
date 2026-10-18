@@ -24,7 +24,7 @@ static inline u8 TakeFlag(struct S *p)
     }
     return FALSE;
 }
-void sub_081F91D8(struct S *p)
+void Ratatosk_UpdateFlagWaitState18(struct S *p)
 {
     u32 m;
     u32 t;

@@ -8,9 +8,9 @@ struct Q {
     u8 g2[4];
     s32 cnt;
 };
-void sub_081BA0FC(void *);
+void Registry2388_BeginSelection(void *);
 
-void sub_081BA204(struct Q *p)
+void Registry2388_UpdateOpeningDelay(struct Q *p)
 {
     s32 v;
     if (p->p558 == 0)
@@ -20,5 +20,5 @@ void sub_081BA204(struct Q *p)
     p->sel = v;
     p->cnt++;
     if (p->cnt > 0x3c)
-        sub_081BA0FC(p);
+        Registry2388_BeginSelection(p);
 }

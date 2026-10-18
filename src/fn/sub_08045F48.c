@@ -3,7 +3,7 @@
 u32 ContactSequenceActor_TakeEntryFlag(struct ContactSequenceActor *);
 void ContactSequenceActor_SetFlags(struct ContactSequenceActor *, u32);
 void ContactSequenceActor_SetState(struct ContactSequenceActor *, u32);
-void sub_08220D20(void *, const void *, u32, u32, u32);
+void Anim_RestartSequence(void *, const void *, u32, u32, u32);
 struct ContactSequenceFrame {
     u16 frame, unknown2;
 };
@@ -17,7 +17,7 @@ void ContactSequenceActor_UpdateAppearing(struct ContactSequenceOwner *parent,
     u32 ended, duration, flags, bit;
     if (ContactSequenceActor_TakeEntryFlag(owner)) {
         owner->sprite.flags &= ~1;
-        sub_08220D20(&owner->sequence, parent->sequenceResource,
+        Anim_RestartSequence(&owner->sequence, parent->sequenceResource,
                      gUnk_08605974[owner->variant & 1].frame, 0, 8);
     }
     if (owner->sequence.index == 3 && owner->sequence.elapsed == 0)

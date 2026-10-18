@@ -27,7 +27,7 @@ struct Task08197A0C {
 };
 extern u8 *gUnk_030042E4;
 
-void sub_08197A0C(struct Task08197A0C *t)
+void PaletteEffect_Destroy(struct Task08197A0C *t)
 {
     u32 target = t->target;
     struct Anim08197A0C *anim = (target & 1) ? NULL : (struct Anim08197A0C *)target;

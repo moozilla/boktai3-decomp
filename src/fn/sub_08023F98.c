@@ -43,7 +43,7 @@ static inline u8 enter(State *p)
     }
     return 0;
 }
-void sub_08023F98(State *p)
+void SceneActorState_EnterPhase6AndResetAnimation(State *p)
 {
     int bit;
     {

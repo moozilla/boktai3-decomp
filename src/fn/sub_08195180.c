@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_08195180(u8 *t)
+void Nidhoggr_UpdateWideSway(u8 *t)
 {
     s32 x, z;
     {

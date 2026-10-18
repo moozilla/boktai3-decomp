@@ -10,7 +10,7 @@ struct Node {
 
 extern struct Node *gUnk_030042C8[];
 
-void sub_08214450(struct Node *n, u32 i)
+void Anim_UnlinkFromList(struct Node *n, u32 i)
 {
     struct Node *prev = n->prev;
     struct Node *next = n->next;

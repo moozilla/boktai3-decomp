@@ -29,9 +29,9 @@ void PlayerCue_Stand(struct P *, s32);
 void sub_081502AC(void);
 void sub_081507F4(void);
 void Sound_PlaySong(s32);
-void sub_08151308(void);
+void PlayerCue_UpdateAimHoldA(void);
 
-void sub_0815BB9C(struct P *p, s32 v, u32 w)
+void PlayerCue_AimSteadyVariant2(struct P *p, s32 v, u32 w)
 {
     if (v >= 0)
         p->a4 = v;
@@ -39,5 +39,5 @@ void sub_0815BB9C(struct P *p, s32 v, u32 w)
     p->w5a4 = w;
     sub_0815AD78(p);
     sub_0813AFEC(p, 3, 2);
-    p->fn = sub_08151308;
+    p->fn = PlayerCue_UpdateAimHoldA;
 }

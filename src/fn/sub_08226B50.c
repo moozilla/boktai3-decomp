@@ -5,7 +5,7 @@ struct V {
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void Camera_SetCenteredBounds(void *, void *);
-void sub_08226B50(void)
+void Camera_SetCenteredBoundsFromScript(void)
 {
     struct V a, b;
     if (Script_SeekToKeyword(0x49)) {

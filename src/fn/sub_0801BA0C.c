@@ -7,12 +7,12 @@ typedef struct {
     Vec position;
 } Actor;
 extern Actor *gUnk_02000580;
-int sub_0801B54C(void *);
+int ResultMenu_IsPhaseStart(void *);
 void ResultMenu_SendCommand(void *, int, int, void *);
 void sub_0815BE5C(void *, int);
 void Sound_PlaySong(int);
-void sub_08015B84(int, int, int, int, void *);
-void sub_0801B534(void *, void (*)(void));
+void AnimatedParticles_EmitChargeSparkle(int, int, int, int, void *);
+void ResultMenu_SetPhase(void *, void (*)(void));
 void Transformation_Reveal(void);
 void Transformation_Charge(u8 *p)
 {
@@ -20,7 +20,7 @@ void Transformation_Charge(u8 *p)
     Actor *positionActor = actor;
     u16 param;
     Vec pos;
-    if (sub_0801B54C(p)) {
+    if (ResultMenu_IsPhaseStart(p)) {
         param = 2;
         ResultMenu_SendCommand(p, 1, 1, &param);
         sub_0815BE5C(actor, 3);
@@ -31,12 +31,12 @@ void Transformation_Charge(u8 *p)
             Vec *out = &pos;
             pos = positionActor->position;
             out->x += 200;
-            sub_08015B84(2, 0, 0x2000, 64, out);
+            AnimatedParticles_EmitChargeSparkle(2, 0, 0x2000, 64, out);
         }
         Sound_PlaySong(0x1c5);
     }
     if (*(u32 *)(p + 0x3c) > 99)
-        sub_0801B534(p, Transformation_Reveal);
+        ResultMenu_SetPhase(p, Transformation_Reveal);
     else
         (*(u32 *)(p + 0x3c))++;
 }

@@ -2,7 +2,7 @@
 #include "modifier_list.h"
 #include "scene_vec.h"
 void sub_0821983C(void *, void *, u32, u32, u32, u32, u32, void *);
-void sub_08217DB4(void *, void *);
+void Palette_CopyBank(void *, void *);
 s32 ModifierMenu_InitializeGraphics(struct ModifierMenu *menu)
 {
     struct ModifierGraphicsResource *resource;
@@ -61,7 +61,7 @@ s32 ModifierMenu_InitializeGraphics(struct ModifierMenu *menu)
         remaining--;
         object++;
     } while (remaining >= 0);
-    sub_08217DB4(menu->palette, gUnk_030042E4 + 0x64e0);
+    Palette_CopyBank(menu->palette, gUnk_030042E4 + 0x64e0);
     object = &menu->displays[1];
     object->tile = 0x9010;
     object->palette = menu->palette;

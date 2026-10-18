@@ -9,7 +9,7 @@ struct S {
     s32 v;
 };
 
-void sub_080E7D80(struct S *s)
+void Mimic_InitProfile(struct S *s)
 {
     s->v = SceneActorProfiles_FindOrAdd(s->b, 0);
 }

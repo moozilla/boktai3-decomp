@@ -13,7 +13,7 @@ struct S {
     u8 c;
 };
 extern struct E gUnk_03004C30[];
-void sub_08111398(struct S *s)
+void BackgroundScroll_UpdateHorizontal(struct S *s)
 {
     s->b += s->a;
     gUnk_03004C30[s->c].h = s->b >> 7;

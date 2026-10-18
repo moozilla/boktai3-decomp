@@ -20,7 +20,7 @@ static inline u8 Tst(u32 *m, s32 i)
     return FALSE;
 }
 
-struct E *sub_0812876C(struct S *b)
+struct E *FragmentBurst_AllocateSlot(struct S *b)
 {
     s32 i;
     struct E *e;

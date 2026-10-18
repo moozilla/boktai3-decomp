@@ -2,7 +2,7 @@
 
 s32 Sprite_Remove(u8 *);
 
-s32 sub_082079F4(u8 *p)
+s32 VulcanCannon_Destroy(u8 *p)
 {
     return Sprite_Remove(p + 0x6C);
 }

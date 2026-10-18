@@ -5,7 +5,7 @@ struct S {
     u8 b;
 };
 void sub_0824923C(void *, u32);
-void sub_081F9B90(struct S *p)
+void Ratatosk_UpdateInactiveMode(struct S *p)
 {
     sub_0824923C(p, gUnk_08613F4C[p->b]);
 }

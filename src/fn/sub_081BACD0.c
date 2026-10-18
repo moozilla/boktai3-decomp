@@ -16,7 +16,7 @@ struct Q {
     struct El e[1];
 };
 
-void sub_081BACD0(struct Q *p)
+void MenuCursor_SetPositionFromSelection(struct Q *p)
 {
     if (p->idx >= 0) {
         p->x = p->e[p->idx].a;

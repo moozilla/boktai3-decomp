@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_080A37C8(u8 *p)
+void Spider_TickActionUntilComplete(u8 *p)
 {
     if (p[0x2b1])
         p[0x2b1] = 0;

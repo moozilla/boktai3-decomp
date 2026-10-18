@@ -1,5 +1,5 @@
 #include "global.h"
-u32 sub_0822C07C(void)
+u32 Region_OnListUpdate(void)
 {
     return 0;
 }

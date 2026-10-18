@@ -49,7 +49,7 @@ static inline s32 scale(s32 v)
         return v >> 12;
     return -((-v) >> 12);
 }
-void sub_0813C42C(State *s, Point *pos)
+void ConvergingEffects_EmitNearParticle(State *s, Point *pos)
 {
     s32 step = *(s16 *)(gUnk_02000710 + 0x876);
     s->ticks = step + 2 + s->ticks;

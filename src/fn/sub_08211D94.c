@@ -10,7 +10,7 @@ struct O {
     s16 b66;
 };
 void Anim_LoadKeyframe(void *, void *, u32, u32);
-s32 sub_08211D94(struct O *o)
+s32 ForgingBook_UpdateSelectionCursor(struct O *o)
 {
     o->fe4 = o->b64 * 24 + 0x58;
     o->fe6 = o->b66 * 24 + 0x18;

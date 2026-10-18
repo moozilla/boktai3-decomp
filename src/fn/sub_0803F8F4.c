@@ -1,4 +1,6 @@
 #include "global.h"
+/* Modifier_EnumerateSelection: Fills an output array with selected bit indices in ascending order and returns the count */
+#define Modifier_EnumerateSelection sub_0803F8F4
 #define Modifier_EnumerateSelection sub_0803F8F4
 
 s32 Modifier_TestSelection(void *, s32);

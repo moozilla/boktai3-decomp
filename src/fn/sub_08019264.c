@@ -7,7 +7,7 @@ s32 CircleWindow_Initialize(void *, u32);
 void Task_Kill(void *);
 void CircleWindow_Update(void);
 void CircleWindow_Destroy(void);
-void *sub_08019264(u32 a)
+void *CircleWindow_Create(u32 a)
 {
     void *p;
     u32 r = Script_GetKeywordValue(0x61, 0);

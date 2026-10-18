@@ -73,29 +73,29 @@ struct Actor {
     struct Vec destination;
 };
 extern void *gUnk_02000480;
-struct Actor *sub_0802D6D0(void *, int);
+struct Actor *Actor_FindById(void *, int);
 int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
-int sub_0802FD14(struct Actor *);
-void sub_08225B4C(void *, void *, int, int, int);
-void sub_0821E780(void *, void *, int);
+int SceneCharacter_GetPathNodeState(struct Actor *);
+void SceneBody_StartRoute(void *, void *, int, int, int);
+void Path_GetPointPosition(void *, void *, int);
 struct Node {
     u16 x, z;
     u8 pad4[2], flags;
 };
-int sub_0821E7AC(struct Node *, int);
-int sub_0821E7A0(struct Node *, int);
-int sub_0802FCA8(struct Actor *, struct Node *);
-int sub_0802FCA8(struct Actor *p, struct Node *node)
+int Path_GetPointNodeId(struct Node *, int);
+int Path_GetPointFacing(struct Node *, int);
+int Actor_SelectPathNodeAction(struct Actor *, struct Node *);
+int Actor_SelectPathNodeAction(struct Actor *p, struct Node *node)
 {
     register u32 value asm("r0") = node->flags;
     int kind;
     kind = value >> 4;
-    p->nodeId = sub_0821E7AC(node, 0);
+    p->nodeId = Path_GetPointNodeId(node, 0);
     switch (kind) {
         case 1: {
-            int angle = (u16)sub_0821E7A0(node, 0);
+            int angle = (u16)Path_GetPointFacing(node, 0);
             int facing = (angle + 112) >> 5;
             int mask;
             mask = 7;

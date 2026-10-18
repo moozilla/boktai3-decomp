@@ -2,7 +2,7 @@
 
 s32 sub_08228DB8(void);
 
-s32 sub_081EA78C(void)
+s32 TimeDisplay_GetLightPhaseGroup(void)
 {
     s32 r;
     switch (sub_08228DB8()) {

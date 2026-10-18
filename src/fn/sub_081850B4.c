@@ -10,7 +10,7 @@ struct P {
     u8 f3;
     u8 c;
 };
-s32 sub_081850B4(struct P *p, u8 x)
+s32 ActorController_ForceAction(struct P *p, u8 x)
 {
     p->a = x;
     p->b = 0;

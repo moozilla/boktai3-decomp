@@ -3,7 +3,7 @@
 extern u16 gUnk_03005470[];
 extern const struct MusicPlayer gUnk_082643EC[];
 void m4aMPlayImmInit(struct MusicPlayerInfo *);
-void sub_0822B1D8(u32 speed)
+void Sound_FadeOutChannel12(u32 speed)
 {
     u16 *active = gUnk_03005470;
     u32 song = active[12];

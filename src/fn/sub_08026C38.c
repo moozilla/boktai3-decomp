@@ -71,7 +71,7 @@ static inline void add(Vec *a, Vec *b)
     a->y += b->y;
     a->z += b->z;
 }
-void sub_08026C38(ActorAnimation *p, int tick)
+void SceneActors_UpdateTravelProjectileAttack(ActorAnimation *p, int tick)
 {
     ActorAnimation *p2 = p;
     Vec spawn;

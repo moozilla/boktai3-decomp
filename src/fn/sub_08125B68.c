@@ -8,7 +8,7 @@ static inline u8 test(volatile u32 *p, s32 one, s32 i)
         return 1;
     return 0;
 }
-u8 *sub_08125B68(u8 *s)
+u8 *SceneMovingParticle_AllocateEntry(u8 *s)
 {
     s32 i = 0;
     volatile u32 *flags = (volatile u32 *)(s + 0x69C);

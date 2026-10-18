@@ -1,6 +1,6 @@
 #include "global.h"
 
-s32 sub_0819AFF0(s32 cur, s32 target, s32 step)
+s32 Math_StepTowardTarget(s32 cur, s32 target, s32 step)
 {
     s32 next, r;
     if (cur < target) {

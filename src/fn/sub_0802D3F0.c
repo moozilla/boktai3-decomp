@@ -1,8 +1,8 @@
 #include "global.h"
 
-void sub_0802CF44(void);
+void Actor_DispatchActionCallback(void);
 
-void sub_0802D3F0(void)
+void Actor_UpdateAction(void)
 {
-    sub_0802CF44();
+    Actor_DispatchActionCallback();
 }

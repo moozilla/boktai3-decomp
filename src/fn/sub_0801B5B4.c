@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0801B5B4(u8 *p, u8 *q, u32 i)
+void TransformMarker_SetTypeFromTable(u8 *p, u8 *q, u32 i)
 {
     u32 z = 0;
     p[0xc] = i;

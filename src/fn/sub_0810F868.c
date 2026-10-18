@@ -7,7 +7,7 @@ struct S {
 };
 u32 ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, u32, u32, u32, u32, void *);
-void sub_0810F868(struct S *s)
+void LinkScorePanel_LoadBackground(struct S *s)
 {
     u32 x;
     u32 r;

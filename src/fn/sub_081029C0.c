@@ -9,7 +9,7 @@ struct S {
 void TetherActor_AddStatusFlags(u32, u32);
 void TetherActor_RemoveStatusFlags(u32);
 
-void sub_081029C0(struct S *s)
+void NamedObject_UpdateTetherFollowFlags(struct S *s)
 {
     if ((u16)(s->h - 3) > 1) {
         TetherActor_AddStatusFlags(7, s->k);

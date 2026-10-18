@@ -14,8 +14,8 @@ struct SceneInventoryCleanupView {
 };
 void SceneInput_DestroyMarkerPair(struct SceneInputPair *);
 void SceneInput_DestroyGlyphPair(struct SceneInputPair *);
-void sub_08030BF8(void);
-void sub_08033468(void);
+void MessageWindow_Clear(void);
+void ScrollingDialogue_ClearScript(void);
 s32 SceneInventory_DestroyController(struct SceneInventoryCleanupView *owner)
 {
     struct SceneInputWidget *widget;
@@ -30,7 +30,7 @@ s32 SceneInventory_DestroyController(struct SceneInventoryCleanupView *owner)
     } while (i >= 0);
     SceneInput_DestroyMarkerPair(&owner->transition);
     SceneInput_DestroyGlyphPair(&owner->prompt);
-    sub_08030BF8();
-    sub_08033468();
+    MessageWindow_Clear();
+    ScrollingDialogue_ClearScript();
     return 0;
 }

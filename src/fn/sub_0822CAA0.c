@@ -4,13 +4,13 @@
 // 4 differing instruction runs; size +4 bytes; first diff at +0x2 (bl #0x8228d7c vs movs r6, #0)
 extern u8 *gUnk_02000710;
 extern u8 gUnk_03005430[];
-u32 sub_08228D7C(void);
+u32 SunClock_GetPackedDate(void);
 s32 SunClock_GetBaseHour(void), SunClock_GetBaseMinute(void);
 void sub_0822CAA0(void)
 {
     s32 minute, hour;
     u32 flag = 0;
-    *(u32 *)(gUnk_02000710 + 0x4e0) = sub_08228D7C();
+    *(u32 *)(gUnk_02000710 + 0x4e0) = SunClock_GetPackedDate();
     *(s32 *)(gUnk_02000710 + 0x4e4) = SunClock_GetBaseHour();
     minute = SunClock_GetBaseMinute();
     *(s32 *)(gUnk_02000710 + 0x4e8) = minute;

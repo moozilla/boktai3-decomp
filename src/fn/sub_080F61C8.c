@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_080F57E8(u8 *);
+void Sword_InitSpinningLunge(u8 *);
 void sub_0824923C(u8 *, void (*)(u8 *));
 static inline u8 Take(u8 *s)
 {
@@ -18,11 +18,11 @@ static inline u8 Take(u8 *s)
     }
     return 0;
 }
-void sub_080F61C8(u8 *s)
+void Sword_UpdateSpinningLungeAttack(u8 *s)
 {
     if (Take(s)) {
         void (**p)(u8 *) = (void (**)(u8 *))(s + 0x17c);
-        void (*fn)(u8 *) = sub_080F57E8;
+        void (*fn)(u8 *) = Sword_InitSpinningLunge;
         *p = fn;
     }
     {

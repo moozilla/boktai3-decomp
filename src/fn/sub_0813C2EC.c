@@ -38,7 +38,7 @@ static inline s32 scale(s32 v)
         return v >> 12;
     return -((-v) >> 12);
 }
-void sub_0813C2EC(State *s)
+void ConvergingEffects_UpdateParticles(State *s)
 {
     s32 count, i;
     if (!s->active)

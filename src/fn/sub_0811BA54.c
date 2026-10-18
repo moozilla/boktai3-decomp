@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_02000710;
-void sub_0811BA54(s32 x)
+void GameState_SetResultTimer(s32 x)
 {
     s32 t;
     *(s32 *)(gUnk_02000710 + 0x88c) = x;

@@ -5,7 +5,7 @@ struct P {
     u16 x, y, z;
 };
 s32 sub_081A3554(struct P *);
-s32 sub_081A3600(struct P *p, u16 x, u16 y, u16 z)
+s32 Hresvelgr_InitShotPool(struct P *p, u16 x, u16 y, u16 z)
 {
     p->b = 0;
     p->a = 0;

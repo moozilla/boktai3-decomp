@@ -14,7 +14,7 @@ struct Obj {
     struct Parent *parent;
 };
 s32 Div(s32, s32);
-void sub_080B7280(struct Obj *p)
+void Skeleton_InitVariantMotion(struct Obj *p)
 {
     struct Parent *owner = p->parent;
     switch (p->state) {

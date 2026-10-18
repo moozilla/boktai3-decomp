@@ -6,16 +6,16 @@ void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 sub_0813A24C(u8 *);
 void Task_Kill(u8 *);
 void sub_0813A1E0(void);
-void sub_0813A228(void);
+void FollowingSpriteEffect_DestroyManager(void);
 
-u8 *sub_0813A300(void)
+u8 *FollowingSpriteEffect_EnsureManager(void)
 {
     u8 *p;
     if (gUnk_020004D4 != 0)
         return gUnk_020004D4;
     p = Task_Create(0xa, 0x1d4);
     if (p != 0) {
-        Task_SetCallbacks(p, sub_0813A1E0, sub_0813A228);
+        Task_SetCallbacks(p, sub_0813A1E0, FollowingSpriteEffect_DestroyManager);
         if (sub_0813A24C(p) < 0) {
             Task_Kill(p);
             return 0;

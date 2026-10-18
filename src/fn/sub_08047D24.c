@@ -3,7 +3,7 @@
 struct TemporaryAnimationPool *TemporaryAnimationPool_Create(void);
 struct TemporaryAnimationSlot *TemporaryAnimationPool_FindInactive(struct TemporaryAnimationPool *);
 void sub_082199C8(void *, u32, u32);
-void sub_08214424(void *, u32);
+void Anim_LinkToList(void *, u32);
 struct TemporaryAnimationSlot *TemporaryAnimationPool_CreateEntry(u32 sequence, u32 lifetime,
                                                                   u32 flags, s32 paletteIndex,
                                                                   const void *paletteData)
@@ -31,9 +31,9 @@ struct TemporaryAnimationSlot *TemporaryAnimationPool_CreateEntry(u32 sequence, 
         animation->paletteData = palette;
     }
     if (animation->flags & 128)
-        sub_08214424(animation, 1);
+        Anim_LinkToList(animation, 1);
     else
-        sub_08214424(animation, 0);
+        Anim_LinkToList(animation, 0);
     {
         register u32 frames asm("r1") = lifetime;
         slot->lifetime = frames;

@@ -19,18 +19,18 @@ struct S {
     s16 y;
     s16 z;
 };
-void sub_081850B4(struct S *, s32);
-void sub_081851F8(struct S *, s32);
-void sub_08185AE4(struct S *p)
+void ActorController_ForceAction(struct S *, s32);
+void ActorController_SetBehavior(struct S *, s32);
+void Armor_UpdateAction16Transition(struct S *p)
 {
     switch (p->b3d) {
         case 0:
-            sub_081850B4(p, 0x10);
+            ActorController_ForceAction(p, 0x10);
             p->b3d = 1;
             break;
         case 1:
             if (p->b40 == 0xff)
-                sub_081851F8(p, 0xb);
+                ActorController_SetBehavior(p, 0xb);
             break;
     }
 }

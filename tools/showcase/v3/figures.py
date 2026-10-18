@@ -24,6 +24,7 @@ class Sprite:
         self.x = self.z = 0
         self.y = y
         self.added = False
+        self.mirrored = 0
 
     def fr(self, f):
         return self.frames[f] if isinstance(f, str) else f
@@ -33,14 +34,19 @@ class Sprite:
         if y is not None:
             self.y = y
         items = [kf_add(self.tag, self.pkg, x, z, y=self.y, frame=self.fr(frame), prio=prio)]
+        if self.mirrored:
+            items.append(kf_mirror(self.tag, 1))
         if hidden:
             items.append(kf_hide(self.tag))
         self.cut.at(t, *items)
         self.added = True
         return self
 
-    def frame(self, t, f):
-        self.cut.at(t, kf_frame(self.tag, self.fr(f)))
+    def frame(self, t, f, mirror=None):
+        """Show frame f (re-applying the mirror, which a new frame resets)."""
+        if mirror is not None:
+            self.mirrored = mirror
+        self.cut.at(t, kf_frame(self.tag, self.fr(f)), kf_mirror(self.tag, self.mirrored))
 
     def glide(self, t, x, z, frames, y=None):
         self.x, self.z = x, z
@@ -59,6 +65,7 @@ class Sprite:
         self.cut.at(t, kf_show(self.tag))
 
     def mirror(self, t, on=1):
+        self.mirrored = on
         self.cut.at(t, kf_mirror(self.tag, on))
 
     def cycle(self, t, frames, dur, step=8):

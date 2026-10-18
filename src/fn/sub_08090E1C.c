@@ -14,7 +14,7 @@ static inline u8 Tst(u16 *m, u32 b)
     return FALSE;
 }
 
-u32 sub_08090E1C(u8 *p)
+u32 Slime_ProcessPendingStateChange(u8 *p)
 {
     u32 m = 0x100;
     if (Tst((u16 *)(p + 0x2D6), m)) {

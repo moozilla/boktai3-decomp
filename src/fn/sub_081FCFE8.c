@@ -8,7 +8,7 @@ struct A {
     u8 p1[0x20 - 0x1c];
     struct E e[10];
 };
-struct E *sub_081FCFE8(struct A *a, s32 *out)
+struct E *Projectile_FindFreeSlot(struct A *a, s32 *out)
 {
     struct E *e = a->e;
     s32 i = 0;

@@ -2,7 +2,7 @@
 
 extern u32 gUnk_08605EA8[];
 
-u32 sub_080A0634(u8 *p)
+u32 Crow_GetTimedAction(u8 *p)
 {
     s32 v = *(s32 *)(p + 0x2ac);
     s32 i = 0;

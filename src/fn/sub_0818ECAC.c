@@ -10,7 +10,7 @@ struct F {
     u8 f[0x188 - 8];
 };
 void sub_0824923C(void *, u32);
-void sub_0818ECAC(u8 *p)
+void Nidhoggr_ClearEffectPools(u8 *p)
 {
     struct E *e;
     struct F *g;

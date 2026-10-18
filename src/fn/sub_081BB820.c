@@ -2,7 +2,7 @@
 void Sound_PlaySong(u32);
 void Anim_Step(u8 *, u8 *);
 void sub_081BB5CC(u8 *);
-void sub_081BB820(u8 *p)
+void SolarBank_UpdateOpening(u8 *p)
 {
     u16 *c = (u16 *)(p + 0x70c);
     if (*c == 0x20)

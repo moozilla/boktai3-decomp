@@ -1,4 +1,6 @@
 #include "collision_controller.h"
+/* CollisionController_ClearGlobal: Zeroes gUnk_0200003C; matches the ClearGlobal pattern already used by EffectManager_ClearGlobal and is hinted by the file's own #define. */
+#define CollisionController_ClearGlobal sub_08009E30
 // MATCHING_CONCESSION: register-pinning
 
 #define CollisionController_ClearGlobal sub_08009E30
@@ -7,7 +9,7 @@ void CollisionController_ClearGlobal(void)
     gUnk_0200003C = 0;
 }
 
-struct CollisionSlot *sub_08009E3C(struct CollisionManager *manager)
+struct CollisionSlot *CollisionController_FindFreeSlot(struct CollisionManager *manager)
 {
     s32 i = 0;
     struct CollisionSlot *slot = manager->slots;
@@ -21,7 +23,7 @@ struct CollisionSlot *sub_08009E3C(struct CollisionManager *manager)
     return 0;
 }
 
-void sub_08009E5C(struct SceneCollider *collider, struct CollisionOther *other,
+void CollisionController_ReceiveHit(struct SceneCollider *collider, struct CollisionOther *other,
                   struct CollisionSlot *slot)
 {
     u32 m = 0x4000;
@@ -50,23 +52,23 @@ s32 CollisionController_InitSlot(struct CollisionManager *manager, struct Collis
     offset.z = 0;
     collider = &slot->collider;
     Collider_Init(collider, 0, 0x4020, 0, 16, &scale, &offset);
-    Collider_SetCallback(collider, sub_08009E5C, slot);
+    Collider_SetCallback(collider, CollisionController_ReceiveHit, slot);
     Collider_Refresh(collider);
     sprite = &slot->sprite;
     sub_08217DE0(sprite, manager->graphics, 1);
     sub_08217EEC(sprite, manager->graphics, 12);
-    sub_08217EC4(sprite, -8, -8);
+    Effect_SetOrigin(sprite, -8, -8);
     slot->active = 1;
 }
 
-u32 sub_08009F34(struct CollisionManager *manager, struct CollisionSlot *slot)
+u32 CollisionController_RemoveSlot(struct CollisionManager *manager, struct CollisionSlot *slot)
 {
     Effect_Remove(&slot->sprite);
     Collider_Remove(&slot->collider);
     return slot->active = 0;
 }
 
-void sub_08009F54(u32 x, struct CollisionSlot *slot)
+void CollisionController_UpdateIdleAnimationPaused(u32 x, struct CollisionSlot *slot)
 {
     if (slot->entered != 0) {
         slot->entered = 0;
@@ -137,7 +139,7 @@ void CollisionController_UpdateIdleAnimation(struct CollisionManager *manager,
     u8 done;
     if (p->entered) {
         p->entered = 0;
-        sub_08217EC4(&p->sprite, -4, -4);
+        Effect_SetOrigin(&p->sprite, -4, -4);
         sub_08217EEC(&p->sprite, manager->animationGraphics, 0);
         Anim_SetSequence(&p->anim, manager->idleResource, 8, 0, 0);
         p->sprite.flags &= ~1;
@@ -152,7 +154,7 @@ void CollisionController_UpdateIdleAnimation(struct CollisionManager *manager,
             if (p->timer++ > p->delay) {
                 p->timer = 0;
                 p->delay = randomDelay(1);
-                sub_08217EC4(&p->sprite, -4, -4);
+                Effect_SetOrigin(&p->sprite, -4, -4);
                 sub_08217EEC(&p->sprite, manager->animationGraphics, 0);
                 Anim_SetSequence(&p->anim, manager->idleResource, 8, 0, 0);
                 p->sprite.flags &= ~1;
@@ -225,7 +227,7 @@ void CollisionController_UpdateIdleAnimation(struct CollisionManager *manager,
     }
 }
 
-void sub_0800A16C(u32 x, struct CollisionSlot *slot)
+void CollisionController_UpdateHitDelayAnimation(u32 x, struct CollisionSlot *slot)
 {
     u16 n;
     if (slot->entered != 0)
@@ -251,7 +253,7 @@ void CollisionController_UpdateHitAnimation(struct CollisionManager *manager,
     if (p->entered) {
         p->entered = 0;
         p->sprite.flags &= ~1;
-        sub_08217EC4(&p->sprite, -8, -8);
+        Effect_SetOrigin(&p->sprite, -8, -8);
         sub_08217EEC(&p->sprite, manager->graphics, 0);
         Anim_SetSequence(&p->anim, manager->hitResource, 0, 0, 0);
         Sound_PlaySongChecked(290);
@@ -381,7 +383,7 @@ s32 CollisionController_UpdateAll(struct CollisionManager *input)
         for (i = 15; i >= 0; control += 160, p++, i--)
             if (control[3]) {
                 if (control[4])
-                    sub_08009F34(manager, p);
+                    CollisionController_RemoveSlot(manager, p);
                 else {
                     control[6] = 0;
                     sub_08249240(manager, p, *(void **)(control[0] * 4 + row + (u32)table));
@@ -391,13 +393,13 @@ s32 CollisionController_UpdateAll(struct CollisionManager *input)
     return 0;
 }
 
-s32 sub_0800A500(struct CollisionManager *manager)
+s32 CollisionController_DestroyManager(struct CollisionManager *manager)
 {
     struct CollisionSlot *slot = manager->slots;
     s32 i;
     for (i = 15; i >= 0; i--) {
         if (slot->active != 0)
-            sub_08009F34(manager, slot);
+            CollisionController_RemoveSlot(manager, slot);
         slot++;
     }
     {
@@ -443,11 +445,11 @@ s32 CollisionController_InitManager(struct CollisionManager *manager, void *owne
     return 0;
 }
 
-struct CollisionManager *sub_0800A62C(void *owner, u32 unused)
+struct CollisionManager *CollisionController_CreateManager(void *owner, u32 unused)
 {
     struct CollisionManager *p = Task_Create(10, 0xA2C);
     if (p != 0) {
-        Task_SetCallbacks(p, CollisionController_UpdateAll, sub_0800A500);
+        Task_SetCallbacks(p, CollisionController_UpdateAll, CollisionController_DestroyManager);
         if (CollisionController_InitManager(p, owner) < 0) {
             Task_Kill(p);
             return 0;
@@ -462,11 +464,11 @@ s32 CollisionController_ScriptCreate(void)
     struct CollisionManager *manager = gUnk_0200003C;
     struct CollisionSlot *p;
     if (!manager) {
-        manager = sub_0800A62C(0, 0);
+        manager = CollisionController_CreateManager(0, 0);
         if (!manager)
             goto fail;
     }
-    p = sub_08009E3C(manager);
+    p = CollisionController_FindFreeSlot(manager);
     if (!p) {
     fail:
         return -1;
@@ -506,7 +508,7 @@ s32 CollisionController_ScriptCreate(void)
     return 0;
 }
 
-s32 sub_0800A78C(void)
+s32 CollisionController_ScriptGetActiveCount(void)
 {
     s32 count;
     struct CollisionManager *manager;
@@ -524,13 +526,13 @@ s32 sub_0800A78C(void)
     }
     {
         u8 temp[8];
-        sub_0821AAD8(temp);
-        sub_0821B4C8(temp, 0, count);
+        Script_ReadReference(temp);
+        Script_WriteReferenceValue(temp, 0, count);
     }
     return count;
 }
 
-void sub_0800A7D0(void)
+void CollisionController_ScriptRemoveAll(void)
 {
     struct CollisionManager *manager = gUnk_0200003C;
     s32 i;
@@ -540,7 +542,7 @@ void sub_0800A7D0(void)
     slot = manager->slots;
     for (i = 0xF; i >= 0; i--) {
         if (slot->active != 0)
-            sub_08009F34(manager, slot);
+            CollisionController_RemoveSlot(manager, slot);
         slot++;
     }
 }

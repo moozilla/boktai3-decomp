@@ -7,7 +7,7 @@ struct E {
 };
 void Sprite_Remove(void *);
 
-void sub_081ADD7C(struct E *e)
+void Vanargand_DestroyPartSprites(struct E *e)
 {
     s32 i;
     for (i = 5; i >= 0; i--) {

@@ -1,4 +1,6 @@
 #include "global.h"
+/* Actor_SetActionParameters: Tentatively stores an action selector and copies its parameter words into the actor */
+#define Actor_SetActionParameters sub_0802CCE0
 
 void sub_0802CCE0(u8 *p, u32 value, s32 count, u32 *src)
 {

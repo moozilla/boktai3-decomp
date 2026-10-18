@@ -1,6 +1,6 @@
 #include "global.h"
 
-u32 sub_081F32C8(u8 *p)
+u32 Ratatosk_IsPositionOutsideArena(u8 *p)
 {
     u32 r = 0;
     s32 v = *(s16 *)(p + 0);

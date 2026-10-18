@@ -3,7 +3,7 @@
 u8 *Heap_Alloc(u32);
 void Memory_Clear(u8 *, u32);
 s32 Mummy_Init(u8 *);
-void sub_080DCC8C(u8 *);
+void Mummy_OnReleaseResources(u8 *);
 void Heap_Free(u8 *);
 
 void Mummy_Create(void)
@@ -12,7 +12,7 @@ void Mummy_Create(void)
     if (p != 0) {
         Memory_Clear(p, 0x720);
         if (Mummy_Init(p) < 0) {
-            sub_080DCC8C(p);
+            Mummy_OnReleaseResources(p);
             Heap_Free(p);
         }
     }

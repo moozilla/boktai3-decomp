@@ -23,10 +23,10 @@ s32 Password_EncodeSymbols(struct PasswordEntry *e);
 int sub_080115DC(struct PasswordEntry *e);
 int NameEntry_DecodeAndValidate(struct PasswordEntry *e);
 void Password_ApplyDecoded(struct PasswordEntry *e, u8 *output);
-s32 sub_08011794(u8 *src, s32 tableRef, s32 script, u8 *output);
+s32 Password_DecodeEntry(u8 *src, s32 tableRef, s32 script, u8 *output);
 
 int EncodedRecord_ReadBits(void *, int *, int, int);
-int sub_08221594(void *, int, int);
+int Crc_ComputeCcitt16(void *, int, int);
 void EncodedRecord_DecodeAlternateFields(void *, void *, int);
 
 #endif

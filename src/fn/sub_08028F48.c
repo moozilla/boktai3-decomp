@@ -7,19 +7,19 @@ struct Actor {
     u8 pad3c0[0x61c];
     void *handle;
 };
-struct Actor *sub_0802140C(int);
+struct Actor *SceneActors_GetBySlot(int);
 int Script_GetKeywordValue(int, int);
-void sub_08022AF4(void *);
+void SceneActors_StopBackgroundFlash(void *);
 void BackgroundFlash_BeginAlternating(void *);
 void BackgroundFlash_BeginAppearance(void *);
 extern u32 gUnk_0300523C;
-void sub_08013B74(void *);
+void ScaledShadow_Destroy(void *);
 void Collider_Remove(void *);
 void Anim_Remove(void *);
 void SceneActors_Destroy(void *);
-int sub_08028F48(u8 *p)
+int Vampire_Destroy(u8 *p)
 {
-    sub_08013B74(p + 0x2a0);
+    ScaledShadow_Destroy(p + 0x2a0);
     Collider_Remove(p + 0x1cc);
     Anim_Remove(p + 0x240);
     SceneActors_Destroy(p);

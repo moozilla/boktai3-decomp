@@ -12,7 +12,7 @@ static inline void orr(struct W *a, u32 m)
     a->v |= m;
 }
 s32 sub_08190C98(void *, s32, s32);
-void sub_08194A40(u8 *p)
+void Nidhoggr_StartFirstPartAction(u8 *p)
 {
     if (p[0x724B] != 0)
         sub_08190C98(p, 0, 0x38);

@@ -7,7 +7,7 @@ struct Vec081CBE30 {
 };
 void Actor_PlayAnimationEntry(u8 *, u32, u32, u32, u32);
 s32 DisplayAnimation_TestFinished(void *);
-void sub_082381C8(struct Vec081CBE30 *, s32, s32, s32, s32, s32, s32, s32, s32);
+void TimedSpriteEffect_Create(struct Vec081CBE30 *, s32, s32, s32, s32, s32, s32, s32, s32);
 /* Three-phase attack: play the wind-up, spawn an effect above the actor on
  * frame 15, then the follow-through after 0x56 frames. */
 void sub_081CBE30(u8 *a, u8 *b, s32 frame)
@@ -71,7 +71,7 @@ void sub_081CBE30(u8 *a, u8 *b, s32 frame)
                 v[0] = x - 0x20;
                 v[1] = y + 0x180;
                 v[2] = z + 0x20;
-                sub_082381C8((struct Vec081CBE30 *)v, 0xa0, 0x20, 1, 1, 0, 0, 0, 0);
+                TimedSpriteEffect_Create((struct Vec081CBE30 *)v, 0xa0, 0x20, 1, 1, 0, 0, 0, 0);
             }
             if (DisplayAnimation_TestFinished(b + 0xd4))
                 b[0x18] = 1;

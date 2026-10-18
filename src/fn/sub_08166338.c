@@ -1,6 +1,6 @@
 #include "global.h"
 void Anim_LoadKeyframe(s32, u8 *, u32, s32);
-void sub_08166338(u8 *p, s32 x, s32 c)
+void PauseMenu_LoadStatusIconFrame(u8 *p, s32 x, s32 c)
 {
     Anim_LoadKeyframe(x, p + 0xa4, (u16)(c + 0xe7), 0);
 }

@@ -1,11 +1,11 @@
 #include "scene_actor_registry.h"
-s32 sub_0821A3E8(u32, struct SceneActorRegistryMessage **);
+s32 MessageQueue_GetMessagesById(u32, struct SceneActorRegistryMessage **);
 void SceneActorRegistry_SendBroadcast(u8, void *);
 void SceneActorRegistry_SendToCategory(u8, void *);
 void SceneActorRegistry_SendToActorId(u8, void *, u16);
 void SceneActorRegistry_DispatchMessages(struct SceneActorRegistryManager *p)
 {
-    s32 n = sub_0821A3E8(p->resourceId, &p->messages);
+    s32 n = MessageQueue_GetMessagesById(p->resourceId, &p->messages);
     if (n > 0) {
         struct SceneActorRegistryMessage *q = p->messages;
         n--;

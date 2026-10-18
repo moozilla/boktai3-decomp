@@ -1,15 +1,15 @@
 #include "global.h"
-s32 sub_0815A400(void);
-s32 sub_0815CA08(void);
-s32 sub_0815C9EC(void);
+s32 Script_GetActorIndex(void);
+s32 ScriptActor_GetCueOptionFromScript(void);
+s32 ScriptActor_GetDirectionFromScript(void);
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-void sub_0814F828(s32);
+void ScriptActor_EnableCompletionScript(s32);
 extern s32 gUnk_02000580[];
 void PlayerCue_Motion29(s32, s32, s32, s32);
-void sub_0815CFBC(void)
+void ScriptActor_PlayMotion29FromScript(void)
 {
-    s32 i = sub_0815A400();
+    s32 i = Script_GetActorIndex();
     s32 p = gUnk_02000580[i];
     s32 a, b;
     if (p != 0) {
@@ -17,8 +17,8 @@ void sub_0815CFBC(void)
             b = Script_GetValue();
         else
             b = 0x1e;
-        a = sub_0815C9EC();
-        PlayerCue_Motion29(p, a, b, sub_0815CA08());
-        sub_0814F828(p);
+        a = ScriptActor_GetDirectionFromScript();
+        PlayerCue_Motion29(p, a, b, ScriptActor_GetCueOptionFromScript());
+        ScriptActor_EnableCompletionScript(p);
     }
 }

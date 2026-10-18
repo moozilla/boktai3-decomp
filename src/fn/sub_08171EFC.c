@@ -3,7 +3,7 @@
 // fuzzy: 65.5%
 // 6 differing instruction runs; size -16 bytes; first diff at +0x4 (ldr r0, [pc, #0x30] vs ldr r0, [pc, #0x3c])
 void Sound_PlaySong(u32);
-void sub_08171410(u8 *, u32);
+void PauseInventory_BeginConsumableDiscardSelection(u8 *, u32);
 void sub_08171EFC(u8 *s)
 {
     u16 *timer = (u16 *)(s + 0xA4E);
@@ -22,7 +22,7 @@ void sub_08171EFC(u8 *s)
     } else if ((u16)value <= 15) {
         *(u16 *)(s + 0x26A2) = 104;
     } else
-        sub_08171410(s, 0);
+        PauseInventory_BeginConsumableDiscardSelection(s, 0);
 }
 #else
 INCLUDE_ASM("asm/nonmatching", sub_08171EFC);

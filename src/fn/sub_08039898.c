@@ -4,10 +4,10 @@ struct Panel {
     u32 timer;
     u8 state, entered;
 };
-struct Panel *sub_08037DC0(void);
-void sub_08039898(void)
+struct Panel *WirelessExchange_Get(void);
+void WirelessGame_BeginResults(void)
 {
-    struct Panel *p = sub_08037DC0();
+    struct Panel *p = WirelessExchange_Get();
     if (p) {
         int state = 12;
         u8 *dest = &p->state;

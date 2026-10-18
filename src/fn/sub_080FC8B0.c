@@ -5,7 +5,7 @@ struct S080FC8B0 {
     u8 *q;
 };
 
-void sub_080FC8B0(struct S080FC8B0 *s, u32 a, u32 b)
+void Axe_SetAuxiliarySpriteParameters(struct S080FC8B0 *s, u32 a, u32 b)
 {
     u8 *q = s->q;
     *(u16 *)(q + 0xa6a) = b;

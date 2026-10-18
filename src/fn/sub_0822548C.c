@@ -7,7 +7,7 @@ struct S {
     u16 f16;
 };
 extern struct S *gUnk_030053F8;
-void sub_0822548C(void)
+void GameState_ResetSessionCounters(void)
 {
     struct S *p = gUnk_030053F8;
     if (p) {

@@ -1,4 +1,6 @@
 #include "global.h"
+/* Actor_SetAnimationEntry: Sets a drawable entry with zero direction and flip parameters */
+#define Actor_SetAnimationEntry sub_0802D05C
 
 s32 DisplayAnimation_SetEntry(void *, u32, u32, u32, u32, u32, u32);
 

@@ -2,7 +2,7 @@
 
 extern u32 gUnk_030053F4;
 
-s32 sub_0813B5B8(u8 *p)
+s32 Player_GetMaxEnergy(u8 *p)
 {
     u8 *q = p + 0x32C;
     s32 s;

@@ -1,8 +1,8 @@
 #include "global.h"
 #include "engine.h"
-u8 *sub_0821D64C(s32, s32);
-void sub_0821AAD8(void *);
-void sub_0821B4C8(void *, u32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
+void Script_ReadReference(void *);
+void Script_WriteReferenceValue(void *, u32, s32);
 struct FloorPoint {
     s16 x, y, z, pad;
 };
@@ -24,7 +24,7 @@ static inline s32 cellIndex(struct FloorPoint *pos)
 static inline s32 groundHeight(struct FloorPoint *position)
 {
     s32 index = cellIndex(position), height;
-    u8 *cell = sub_0821D64C(index, 1);
+    u8 *cell = TerrainModifiers_FindCellOverride(index, 1);
     u32 kind;
     if (cell)
         cell += 4;
@@ -53,7 +53,7 @@ s32 Terrain_GetFloorHeightFromScript(void)
     pos.words.y = 0;
     pos.words.z = Script_GetValue();
     height = groundHeight(&pos.point);
-    sub_0821AAD8(result);
-    sub_0821B4C8(result, 0, height);
+    Script_ReadReference(result);
+    Script_WriteReferenceValue(result, 0, height);
     return height;
 }

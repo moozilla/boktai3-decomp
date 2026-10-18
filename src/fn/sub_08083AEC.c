@@ -13,7 +13,7 @@ void SceneActorControl_ApplyContactPowerFloor(struct SceneActorBehaviorContactVi
                                               struct SceneActorRegistryResetView *);
 void sub_08082648(struct SceneActorBehaviorContactView *, struct SceneActorBehaviorContactView *,
                   struct SceneActorRegistryResetView *);
-void sub_08083AEC(u8 *p)
+void SceneActorControl_InitContactColliders(u8 *p)
 {
     struct Z s1, s2, s3, s4;
     s1.bits.x = 0x20;

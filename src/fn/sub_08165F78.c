@@ -27,7 +27,7 @@ static inline s32 scale(s32 v)
         return v >> 12;
     return -((-v) >> 12);
 }
-u32 sub_08165F78(u8 *p, u32 i)
+u32 PauseMenu_UpdateSpriteMotion(u8 *p, u32 i)
 {
     struct Elem *e = (struct Elem *)(p + 0x2aa0) + i;
     struct State *s = (struct State *)(p + 0x43ec) + i;

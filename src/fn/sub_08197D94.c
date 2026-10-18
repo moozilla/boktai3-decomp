@@ -1,16 +1,18 @@
 #include "global.h"
 #include "engine.h"
+/* PaletteEffect_StartSpriteWhiteFlash: Buffers selected sprite palette banks and installs the white flash callback */
+#define PaletteEffect_StartSpriteWhiteFlash sub_08197D94
 
-void *sub_0819792C(void *, void *, u32, s32, s32);
-void sub_081979B4(void *, s32);
-void sub_08197C98(void *);
-void sub_08197A0C(void *);
+void *PaletteEffect_Create(void *, void *, u32, s32, s32);
+void PaletteEffect_ApplyBufferedPalette(void *, s32);
+void PaletteEffect_UpdateWhiteFlash(void *);
+void PaletteEffect_Destroy(void *);
 
 void sub_08197D94(void *sprite, s32 count, s32 start)
 {
-    void *task = sub_0819792C(NULL, sprite, 0, count, start);
+    void *task = PaletteEffect_Create(NULL, sprite, 0, count, start);
     if (task) {
-        sub_081979B4(task, start);
-        Task_SetCallbacks(task, sub_08197C98, sub_08197A0C);
+        PaletteEffect_ApplyBufferedPalette(task, start);
+        Task_SetCallbacks(task, PaletteEffect_UpdateWhiteFlash, PaletteEffect_Destroy);
     }
 }

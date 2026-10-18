@@ -16,7 +16,7 @@ void SceneSteeringActor_InitializeCollider(struct SceneSteeringActor *p, u32 a, 
     offset.packed.z = 0;
     collider = &p->collider;
     Collider_Init(collider, 0, 0x2403, 0, 16, &size.position, &offset.position);
-    sub_0821FF58(collider, a, b, 0, c, d);
+    Collider_SetAttackProperties(collider, a, b, 0, c, d);
     Collider_SetCallback(collider, SceneSteeringActor_RequestDeparture, p);
     Collider_SetPosition(collider, &p->position, 0);
 }

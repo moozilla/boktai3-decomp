@@ -8,7 +8,7 @@ static inline u8 Eq(u32 a, u32 b)
     return FALSE;
 }
 
-u32 sub_0810038C(u32 *p)
+u32 FloorSwitch_UpdateRegionVisibility(u32 *p)
 {
     u32 v = p[0x54 / 4];
     if (Eq(*(u32 *)(gUnk_02000710 + 0x5A0), v)) {

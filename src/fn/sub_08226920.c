@@ -2,7 +2,7 @@
 
 void Trigger_ConsumePending(u8 *, u32);
 
-void sub_08226920(u8 *p)
+void Camera_ConsumePendingMessage(u8 *p)
 {
     Trigger_ConsumePending(p + 0x20, 1);
 }

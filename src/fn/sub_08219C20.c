@@ -5,7 +5,7 @@ struct Heap {
 };
 extern struct Heap gUnk_02000714;
 
-void sub_08219C20(void)
+void Heap_Initialize(void)
 {
     gUnk_02000714.a = 0;
     gUnk_02000714.b = 0;

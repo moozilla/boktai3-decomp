@@ -2,7 +2,7 @@
 
 extern const u16 gUnk_08606004[];
 
-u16 sub_080B1F10(u8 *p)
+u16 Vorn_GetAnimationEvent(u8 *p)
 {
     u8 *anim = *(u8 **)(p + 4) + 0x20;
     u16 r;

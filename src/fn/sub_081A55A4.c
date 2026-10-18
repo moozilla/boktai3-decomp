@@ -7,7 +7,7 @@ struct A {
     u16 h;
 };
 
-void sub_081A55A4(struct A *p)
+void Vanargand_ResetPaletteTransition(struct A *p)
 {
     if (p->h != 0) {
         p->a = 0;

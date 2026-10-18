@@ -79,36 +79,36 @@ struct PooledPackedArgs {
 /* Engine helpers. */
 void sub_08219918(void *, void *, s32, s32, s32, s32, s32, void *);
 void Anim_SelectPaletteBank(void *, u32);
-void sub_08214424(void *, u32);
+void Anim_LinkToList(void *, u32);
 u32 sub_0821E67C(void *, void *, void *, void *, u32, u32, u32);
-void sub_0821E618(void *);
-u16 sub_0821E7E4(void *);
+void Route_AdvancePoint(void *);
+u16 Route_GetCurrentPointNodeId(void *);
 u8 Route_Start(struct PooledRoute *, s32, s32, s32);
-void sub_0821E780(struct SceneVec *, void *, u32);
-struct SceneVec *sub_08103EF4(s32);
+void Path_GetPointPosition(struct SceneVec *, void *, u32);
+struct SceneVec *NamedObject_GetPositionByName(s32);
 s32 Region_FindContaining(struct SceneVec *);
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
 /* Slot helpers and state handlers. */
-struct PooledInteractable *sub_08008A70(struct PooledInteractableManager *);
-void sub_08008A98(struct PooledInteractable *, u32);
-u32 sub_08008AA4(struct PooledInteractable *);
-void sub_08008ABC(struct SceneCollider *, u32, struct PooledInteractable *);
+struct PooledInteractable *Breakable_FindFreeSlot(struct PooledInteractableManager *);
+void Breakable_EnterState(struct PooledInteractable *, u32);
+u32 Breakable_ConsumeEnteredFlag(struct PooledInteractable *);
+void Breakable_OnHit(struct SceneCollider *, u32, struct PooledInteractable *);
 s32 Breakable_InitSlot(struct PooledInteractableManager *, struct PooledInteractable *);
-void sub_08008BD0(struct PooledInteractable *);
+void Breakable_RunScript(struct PooledInteractable *);
 void sub_08008C18(void);
-void sub_08008C1C(struct PooledInteractableManager *, struct PooledInteractable *);
+void Breakable_UpdateAnimation(struct PooledInteractableManager *, struct PooledInteractable *);
 void Breakable_Idle(struct PooledInteractableManager *, struct PooledInteractable *);
 void Breakable_React(struct PooledInteractableManager *, struct PooledInteractable *);
 void Breakable_Activate(struct PooledInteractableManager *, struct PooledInteractable *);
-void sub_08008F00(struct PooledInteractable *);
-void sub_08008F64(struct PooledInteractable *);
+void Breakable_UpdateRouteMotion(struct PooledInteractable *);
+void Breakable_UpdateFollowMotion(struct PooledInteractable *);
 s32 Breakable_UpdateAll(struct PooledInteractableManager *);
 s32 Breakable_DestroyManager(struct PooledInteractableManager *);
 s32 Breakable_InitManager(struct PooledInteractableManager *);
-void *sub_08009180(void);
+void *Breakable_GetOrCreateManager(void);
 s32 Breakable_ScriptCreate(void);
 void Breakable_ScriptSetTimeout(void);
-void sub_080094A0(void);
+void Breakable_ScriptSetState(void);
 
 #endif

@@ -67,7 +67,7 @@ static inline void effect(u8 *p, int id, int mode, int duration)
     } else if (p[0x38e] == 1)
         p[0x38c] = 0;
 }
-void sub_08026248(ActorAnimation *p, int tick)
+void SceneActorAnimation_UpdateImpactFinish(ActorAnimation *p, int tick)
 {
     ActorAnimation *p2 = p;
     if (p2->changed) {

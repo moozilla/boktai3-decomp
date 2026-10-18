@@ -14,7 +14,7 @@ static inline u8 global_mode(void)
         return 1;
     return 0;
 }
-s32 sub_0813C8F0(State *s)
+s32 Player_GetVisualEffectFlags(State *s)
 {
     s32 result = 0;
     if (s->mode == 2)

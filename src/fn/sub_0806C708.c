@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_steering_actor.h"
 s32 BurstEmitter_Create(const struct ContactPosition *, u32, u32, s32, s32, s32, s32);
-void sub_08013B74(void *);
+void ScaledShadow_Destroy(void *);
 static inline s32 Dimension(u16 *field)
 {
     u32 value = *field;
@@ -36,7 +36,7 @@ void SceneSteeringActor_DestroySlot(struct SceneSteeringActorPool *p,
                 asm("" : "+r"(offset));
                 status = (void *)((u8 *)actor + offset);
                 if (!*status) {
-                    sub_08013B74(actor->shadow);
+                    ScaledShadow_Destroy(actor->shadow);
                     *status = 255;
                 }
             }

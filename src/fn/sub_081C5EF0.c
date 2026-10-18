@@ -6,7 +6,7 @@ struct S {
     u32 f370;
 };
 
-void sub_081C5EF0(struct S *p, u32 v)
+void ChallengeResult_SetState(struct S *p, u32 v)
 {
     p->f36c = v;
     p->f370 = 0;

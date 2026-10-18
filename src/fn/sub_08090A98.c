@@ -14,7 +14,7 @@ static inline u8 Tst(u16 *m, u32 b)
     return FALSE;
 }
 
-void sub_08090A98(u8 *p)
+void Slime_PlayPendingSound(u8 *p)
 {
     u8 *q = *(u8 **)(p + 0x3D0);
     u32 m = 0x10;

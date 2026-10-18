@@ -1,10 +1,10 @@
 #include "global.h"
 
-u32 *sub_08218CC4(void);
+u32 *Text_GetGlyphCache(void);
 
-s32 sub_08218E0C(u32 idx)
+s32 Text_ReleaseCachedGlyph(u32 idx)
 {
-    u32 *tbl = sub_08218CC4();
+    u32 *tbl = Text_GetGlyphCache();
     idx -= 0x100;
     if (idx <= 0xFF) {
         u32 *e = (u32 *)((idx << 2) + (u32)tbl);

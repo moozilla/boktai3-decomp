@@ -1,15 +1,15 @@
 #include "global.h"
 
-void sub_0814F838(u8 *);
-void sub_0814F874(u8 *);
+void ScriptActor_CallCompletionScript(u8 *);
+void PlayerCue_AcknowledgePendingTrigger(u8 *);
 
-void sub_0814F89C(u8 *p)
+void PlayerCue_CompleteAction(u8 *p)
 {
     u8 v = p[0x59E];
 
     if (v == 1) {
-        sub_0814F838(p);
+        ScriptActor_CallCompletionScript(p);
     } else if (v == 2) {
-        sub_0814F874(p);
+        PlayerCue_AcknowledgePendingTrigger(p);
     }
 }

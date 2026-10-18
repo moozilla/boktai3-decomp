@@ -17,7 +17,7 @@ static inline u8 TakeFlag(u8 *flag)
     return FALSE;
 }
 
-void sub_080E7620(u8 *p)
+void Mimic_OnAnimationStateChanged(u8 *p)
 {
     if (TakeFlag(p + 0x2B2)) {
         u32 r = sub_080E81CC(*(u8 *)(p + 0x59));

@@ -4,7 +4,7 @@ struct G {
     u32 v;
 };
 extern struct G *gUnk_02000710;
-u32 sub_0811DB24(u32 i)
+u32 GameState_SetChallengeCompletionFlag(u32 i)
 {
     u32 r;
     if (i <= 11) {

@@ -2,7 +2,7 @@
 
 extern u8 *gUnk_020000E0;
 
-s32 sub_08033568(void)
+s32 ScrollingDialogue_RequestShow(void)
 {
     s32 ret;
 

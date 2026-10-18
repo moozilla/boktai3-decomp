@@ -86,10 +86,10 @@ extern u16 gUnk_03005260[];
 extern u32 gUnk_0300523C;
 u8 Math_Atan2(s32, s32);
 void Script_Call(void *, s32);
-void sub_081E574C(void *, void *);
-void sub_081E5648(void *, void *);
-void sub_081E4174(void *);
-void sub_081E44D4(void *);
+void Actor_OnInteractionChildRelease(void *, void *);
+void Actor_OnInteractionChildDelay(void *, void *);
+void Actor_SetInteractionControlFlag(void *);
+void Actor_BeginInteractionSoundSequence(void *);
 void AnimData_SelectPaletteBank(void *, s32);
 // Select the closest eligible interaction target and animate its selection marker.
 void Actor_SelectNearestInteraction(struct G *p)

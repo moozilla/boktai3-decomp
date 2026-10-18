@@ -6,7 +6,7 @@ struct P08159424 {
     u16 f476;
 };
 
-void sub_08159424(struct P08159424 *p, u32 a)
+void Player_ClearAttachmentFlags(struct P08159424 *p, u32 a)
 {
     p->f474 &= ~a;
     p->f476 = 0;

@@ -6,7 +6,7 @@ void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void Bg_SetLayerMap(u32, void *, u32);
-void sub_081E2DA0(void)
+void Presentation_InitializeBackground(void)
 {
     u32 id = 0xA597, pal = 0x81B;
     u32 zero, one, value;

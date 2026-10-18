@@ -16,7 +16,7 @@ static inline u8 chk(struct P *p)
     }
     return FALSE;
 }
-void sub_0819E0F4(struct P *p)
+void Hresvelgr_UpdateActionThirtyRequest(struct P *p)
 {
     if (chk(p)) {
         u8 k = 0x1e;

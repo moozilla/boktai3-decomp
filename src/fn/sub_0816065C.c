@@ -12,7 +12,7 @@ struct G {
 };
 extern struct G *gUnk_030042E4;
 
-void sub_0816065C(struct P *p, u32 h, u32 w)
+void PlayerEffect_SetPaletteSource(struct P *p, u32 h, u32 w)
 {
     if (p != 0) {
         p->h1e = h;

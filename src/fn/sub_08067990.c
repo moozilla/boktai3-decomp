@@ -1,12 +1,14 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control.h"
+/* SceneActorControl_CreateFromScript: Creates an actor slot using script position and flip parameters and initializes its sprite and collider */
+#define SceneActorControl_CreateFromScript sub_08067990
 #define SceneActorControl_CreateFromScript sub_08067990
 extern struct SceneActorControlManager *gUnk_02000128;
 struct SceneActorControlManager *SceneActorControl_EnsureSingleton(void);
 struct SceneActorControlSlot *SceneActorControl_AllocateSlot(struct SceneActorControlManager *);
 s32 Region_FindContaining(const struct ContactPosition *);
-void sub_082144E4(void *, void *, u32);
-u32 sub_0804DFC0(s32);
+void Sprite_InitUnlinked(void *, void *, u32);
+u32 AreaEffect_HasEnabledTerrainValue(s32);
 void SceneActorControl_InitCollider(struct SceneActorControlSlot *, s32, s32);
 static inline u16 *Step(struct SceneActorControlSlot *slot,
                         struct SceneActorControlSprite *inputSprite, u16 *inputFlags)
@@ -177,7 +179,7 @@ void SceneActorControl_CreateFromScript(void)
     }
     sprite = (void *)slot;
     slot->position = slot->savedPosition;
-    sub_082144E4(slot, p->graphics, 0);
+    Sprite_InitUnlinked(slot, p->graphics, 0);
     Anim_SetSequence(&slot->sequence, (void *)p->sequenceResource, 1, 0, flip);
     {
         register u16 *lateFlags asm("r6");
@@ -195,7 +197,7 @@ void SceneActorControl_CreateFromScript(void)
                 write->priority = 1;
             }
         }
-        if (sub_0804DFC0(slot->scene)) {
+        if (AreaEffect_HasEnabledTerrainValue(slot->scene)) {
             u32 value = *lateFlags;
             u32 mask = 0x20;
             mask |= value;

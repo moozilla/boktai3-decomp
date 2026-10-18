@@ -7,7 +7,7 @@ struct S {
     u8 ba03;
 };
 
-void sub_081D4DE4(struct S *p, u32 v)
+void BestiaryDisplay_SetEntry(struct S *p, u32 v)
 {
     p->f1c = v;
     p->ba03 = 1;

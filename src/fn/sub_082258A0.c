@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_082258A0(void)
+void SceneActorRegistry_ClearObjectContext(void)
 {
     *(u32 *)0x030025F8 = 0;
 }

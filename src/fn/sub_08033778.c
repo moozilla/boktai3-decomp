@@ -36,19 +36,19 @@ void *Heap_Alloc(int);
 void Memory_Clear(void *, int);
 void Heap_Free(void *);
 void TextWindow_BlankRect(int, int, int, int);
-void sub_08032C80(struct TextState *, int, int, int, int);
+void TextState_Init(struct TextState *, int, int, int, int);
 void TextState_SetBounds(struct TextState *, int, int, int, int);
 void TextState_Reset(struct TextState *);
 int Script_ParseStringRef(const void *);
 const u8 *Text_LookupString(int);
-void sub_08033AF0(struct WindowManager *, struct TextWindow *);
-void sub_08033AF8(struct WindowManager *, struct TextWindow *);
-struct TextWindow *sub_0803360C(struct WindowManager *, int);
+void TextWindow_OnIdle(struct WindowManager *, struct TextWindow *);
+void TextWindow_OnPlayback(struct WindowManager *, struct TextWindow *);
+struct TextWindow *TextWindowManager_FindWindow(struct WindowManager *, int);
 struct TextWindow *TextWindow_Find(int);
-int sub_08033654(struct WindowManager *);
-const u8 *sub_080335F4(struct TextWindow *, int);
+int TextWindowManager_AllocateWindowId(struct WindowManager *);
+const u8 *TextWindow_ResolveString(struct TextWindow *, int);
 // MATCHING_CONCESSION: register-pinning
-int sub_08033778(int id)
+int TextWindow_Destroy(int id)
 {
     struct WindowManager *p = gUnk_020000E4;
     struct TextWindow *w;
@@ -58,7 +58,7 @@ int sub_08033778(int id)
     int result;
     if (!p)
         goto fail;
-    w = sub_0803360C(p, id);
+    w = TextWindowManager_FindWindow(p, id);
     if (w)
         goto found;
 fail:
@@ -66,7 +66,7 @@ fail:
     goto done;
 found:
     TextWindow_BlankRect(w->x, w->y, w->width, w->height);
-    w->callback = sub_08033AF0;
+    w->callback = TextWindow_OnIdle;
     {
         struct TextWindow **initial = &w->next;
         next = *initial;

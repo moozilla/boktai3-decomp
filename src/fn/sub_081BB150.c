@@ -1,8 +1,8 @@
 #include "global.h"
-void sub_081BAF9C(void);
-void sub_081BACB8(void *, void (*)(void));
-void sub_081BB150(void *p)
+void MenuCursor_UpdateInput(void);
+void SelectionCursor_SetState(void *, void (*)(void));
+void MenuCursor_EnableInput(void *p)
 {
     if (p != 0)
-        sub_081BACB8(p, sub_081BAF9C);
+        SelectionCursor_SetState(p, MenuCursor_UpdateInput);
 }

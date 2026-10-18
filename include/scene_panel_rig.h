@@ -75,5 +75,5 @@ void ScenePanelRig_InitMovement(struct ScenePanelRig *);
 u32 ScenePanelRig_GetActiveCount(struct ScenePanelRig *);
 void ScenePanelSubject_SetState(struct SceneRigSubject *, u32);
 extern const s16 gUnk_086149C4[];
-void sub_082279A8(s32, s32, s32, s32, s32, s32, s32);
+void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 #endif

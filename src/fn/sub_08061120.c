@@ -16,7 +16,7 @@ s32 SceneInventory_ClassifyEquipmentAction(struct SceneInventoryControlView *pan
             goto invalid;
         {
             s32 funds = gUnk_02000710->unk7B0;
-            if (funds < sub_08227F5C(entry)->baseValue)
+            if (funds < Equipment_GetDefinition(entry)->baseValue)
                 goto invalid;
         }
         if (panel->destination >= 0)
@@ -24,9 +24,9 @@ s32 SceneInventory_ClassifyEquipmentAction(struct SceneInventoryControlView *pan
         goto invalid;
     } else {
         s32 selected = panel->grid.selection;
-        sub_0822D6E0(selected);
+        Inventory_GetEquipmentId(selected);
         {
-            s32 equipped = sub_0822DFDC(selected);
+            s32 equipped = Inventory_CanAssignEquipment(selected);
             result = -1;
             if (!equipped)
                 goto invalid;

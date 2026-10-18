@@ -1,5 +1,5 @@
 #include "global.h"
-u32 sub_080364A8(u8 *p)
+u32 Wireless_ClearChildTransferWaitEntryFlag(u8 *p)
 {
     u8 *q = p + 0x32;
     if (*q)

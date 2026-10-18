@@ -18,10 +18,10 @@ struct DirectionalParticleSource {
     const struct ContactPosition *position;
 };
 extern const s16 gUnk_086149C4[];
-struct DirectionalParticle *sub_08019B7C(void);
+struct DirectionalParticle *SpritePool_Allocate(void);
 void SpritePool_SetResource(void *, u32);
-void sub_08019BCC(void *, u32);
+void SpritePool_SetFrame(void *, u32);
 void SpritePool_SetPalette(void *, u32);
-void sub_08019C00(void *, const struct ContactPosition *);
+void SpritePool_SetPosition(void *, const struct ContactPosition *);
 u32 SpritePool_Activate(void *, void *, void *);
 #endif

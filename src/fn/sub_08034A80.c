@@ -46,12 +46,12 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->pending = 1;
 }
 // MATCHING_CONCESSION: register-pinning
-int sub_08224D78(void);
+int Wireless_CheckAdapterReady(void);
 int Script_ParseStringRef(const void *);
 const u8 *Text_LookupString(int);
 int sub_08228DB8(void);
 int SunClock_GetBaseHour(void);
-void sub_08036D2C(const void *, void *, int);
+void WirelessText_EncodeString(const void *, void *, int);
 void sub_08224DAC(void *, int, int, int, int, const void *, const void *);
 extern u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
@@ -60,7 +60,7 @@ struct Game {
     u8 playerName[8];
 };
 extern struct Game *gUnk_02000710;
-int sub_08034A80(struct Engine *p)
+int WirelessController_UpdateAdapterSetup(struct Engine *p)
 {
     u8 *pending = &p->pending;
     u8 *timer;
@@ -76,7 +76,7 @@ int sub_08034A80(struct Engine *p)
         *timer = read;
         goto done;
     }
-    switch (sub_08224D78()) {
+    switch (Wireless_CheckAdapterReady()) {
         case -1:
             setOperation(p, 27, zero);
             break;
@@ -125,10 +125,10 @@ int sub_08034A80(struct Engine *p)
                 offset = (table[next] & three) + 4;
             }
             name = Text_LookupString(base + offset);
-            sub_08036D2C(gUnk_02000710->playerName, p->userName, 8);
+            WirelessText_EncodeString(gUnk_02000710->playerName, p->userName, 8);
             userName = p->userName;
             gameName = p->gameName;
-            sub_08036D2C(name, gameName, 11);
+            WirelessText_EncodeString(name, gameName, 11);
             p->gameIdLow = p->gameId;
             p->gameIdHigh = p->gameId >> 8;
             {

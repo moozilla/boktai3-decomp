@@ -10,7 +10,7 @@ struct G {
 extern struct G *gUnk_02000710;
 s32 Script_SeekToKeyword(s32);
 u32 Script_GetValue(void);
-void sub_082119AC(void)
+void ForgingBook_RecordItemDiscoveryFromScript(void)
 {
     u32 n;
     u32 *p;

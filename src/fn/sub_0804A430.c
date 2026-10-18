@@ -6,7 +6,7 @@ struct TetherExternalStatus {
 };
 
 extern const u16 gUnk_086059F0[];
-s32 sub_0804A418(void);
+s32 TetherActor_GetConfiguredKind(void);
 void TetherActor_SetState(struct TetherActor *, u32);
 void TetherActor_InitKindFromScript(struct TetherActor *actor, u32 entry)
 {
@@ -16,7 +16,7 @@ void TetherActor_InitKindFromScript(struct TetherActor *actor, u32 entry)
     if (Script_SeekToKeyword('k'))
         kind = Script_GetValue();
     else
-        kind = sub_0804A418();
+        kind = TetherActor_GetConfiguredKind();
     ((struct TetherExternalStatus *)gUnk_02000710)->value = kind;
     asm("" ::: "memory");
     actor->kind = ((struct TetherExternalStatus *)gUnk_02000710)->value;

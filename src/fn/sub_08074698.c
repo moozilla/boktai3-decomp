@@ -20,7 +20,7 @@ void SceneActorRoute_AdvanceActorPoint(struct SceneActorRegistryActor *actor,
         args.values = values;
         Script_Call(script, &args);
     }
-    sub_0821E618(cursor);
+    Route_AdvancePoint(cursor);
     mode = cursor->point->attributes >> 4;
     near = (u8)sub_0821E8C8(cursor, &actor->position, 32, 32);
     if (near) {

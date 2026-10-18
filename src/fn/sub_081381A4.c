@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_081381A4(u8 *p)
+void Registry1745_ToggleConnectionRole(u8 *p)
 {
     u8 *q = p + 0x4c;
     u8 v = *q;

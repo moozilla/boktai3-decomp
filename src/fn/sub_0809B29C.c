@@ -13,7 +13,7 @@ static inline u8 TakeFlag(u8 *flag)
     return FALSE;
 }
 
-void sub_0809B29C(u8 *p)
+void Lun_OnSpecialAnimation(u8 *p)
 {
     if (TakeFlag(p + 0x2B2))
         SceneActorAnimation_SelectProfileEntry(p, 15);

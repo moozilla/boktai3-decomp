@@ -43,7 +43,7 @@ inline static u8 TakeFlag(u8 *p)
     return 0;
 }
 
-void sub_0808CE50(struct S *s)
+void Ghoul_UpdateSpecialActionControl(struct S *s)
 {
     void (*new_var)(void);
     s32 off;

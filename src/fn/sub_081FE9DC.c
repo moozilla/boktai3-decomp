@@ -4,15 +4,15 @@ struct G {
     s32 w;
 };
 extern struct G *gUnk_020005EC;
-void sub_081FE6E0(void);
-s32 sub_081FE9DC(void)
+void SunOrb_GetOrCreateManager(void);
+s32 SunOrb_GetManagerStatus(void)
 {
     struct G *g = gUnk_020005EC;
     s32 r;
     if (g != 0)
         r = g->w;
     else {
-        sub_081FE6E0();
+        SunOrb_GetOrCreateManager();
         r = -1;
     }
     return r;

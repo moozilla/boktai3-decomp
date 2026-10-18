@@ -1,5 +1,7 @@
 // CFLAGS: -O1 -mthumb-interwork
 #include "global.h"
+/* Eeprom_WriteBlockVerified: Retries block writing and readback verification up to three times */
+#define Eeprom_WriteBlockVerified sub_08248930
 /* Adapted from: laqieer/libgbabackup at 9597360b36d22df1ead5dd59566a3c8618cff6c0, src/eeprom.c (tmc lineage). */
 typedef struct EEPROMConfig {
     u32 unk_00;
@@ -19,11 +21,11 @@ extern const EEPROMConfig *gUnk_03006A9C;
 #define REG_DMA3CNT_H         (*(vu16 *)0x040000DE)
 #define REG_VCOUNT            (*(vu16 *)0x04000006)
 #define REG_EEPROM            (*(u16 *)0x0d000000)
-void sub_08248634(const void *, void *, u16);
-u16 sub_082486B4(u16, u16 *);
-u16 sub_08248778(u16, const u16 *, u8);
-u16 sub_082488D8(u16, const u16 *);
-u16 sub_082488D8(u16 address, const u16 *data)
+void Eeprom_TransferDma3(const void *, void *, u16);
+u16 Eeprom_ReadBlock(u16, u16 *);
+u16 Eeprom_WriteBlock(u16, const u16 *, u8);
+u16 Eeprom_VerifyBlock(u16, const u16 *);
+u16 Eeprom_VerifyBlock(u16 address, const u16 *data)
 {
     u16 ret;
 
@@ -36,7 +38,7 @@ u16 sub_082488D8(u16 address, const u16 *data)
     if (address >= gEEPROMConfig->size) {
         return EEPROM_OUT_OF_RANGE;
     }
-    sub_082486B4(address, buffer);
+    Eeprom_ReadBlock(address, buffer);
     ptr = buffer;
     for (i = 0; i < ARRAY_COUNT(buffer); i++) {
         if (*data++ != *ptr++) {
@@ -47,16 +49,16 @@ u16 sub_082488D8(u16 address, const u16 *data)
     return ret;
 }
 
-u16 sub_08248764(u16, const u16 *);
+u16 Eeprom_WriteBlockWithFullDelay(u16, const u16 *);
 
 u16 sub_08248930(u16 address, const u16 *data)
 {
     u8 i;
     u16 result;
     for (i = 0; i < 3; i++) {
-        result = sub_08248764(address, data);
+        result = Eeprom_WriteBlockWithFullDelay(address, data);
         if (result == 0) {
-            result = sub_082488D8(address, data);
+            result = Eeprom_VerifyBlock(address, data);
             if (result == 0)
                 break;
         }

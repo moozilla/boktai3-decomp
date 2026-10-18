@@ -3,10 +3,10 @@ struct S {
     u8 f[0x30];
     void *a;
 };
-s32 sub_081C3010(void *);
-void sub_081C09BC(void *);
-void sub_081C09A0(struct S *p)
+s32 RegistryF3E4_GetStateResult(void *);
+void SceneActorSequence_BeginFadeOut(void *);
+void SceneActorSequence_UpdateFinalWaypointMotion(struct S *p)
 {
-    if (sub_081C3010(p->a) != 0)
-        sub_081C09BC(p);
+    if (RegistryF3E4_GetStateResult(p->a) != 0)
+        SceneActorSequence_BeginFadeOut(p);
 }

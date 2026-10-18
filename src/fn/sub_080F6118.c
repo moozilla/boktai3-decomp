@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_080F4CC4(u8 *);
+void Sword_InitWaveAttack(u8 *);
 void sub_0824923C(u8 *, void (*)(u8 *));
 static inline u8 Take(u8 *s)
 {
@@ -18,11 +18,11 @@ static inline u8 Take(u8 *s)
     }
     return 0;
 }
-void sub_080F6118(u8 *s)
+void Sword_UpdateWaveAttack(u8 *s)
 {
     if (Take(s)) {
         void (**p)(u8 *) = (void (**)(u8 *))(s + 0x174);
-        void (*fn)(u8 *) = sub_080F4CC4;
+        void (*fn)(u8 *) = Sword_InitWaveAttack;
         *p = fn;
     }
     {

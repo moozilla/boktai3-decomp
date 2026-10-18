@@ -18,10 +18,10 @@ struct Manager {
 };
 extern struct Manager *gUnk_020000D8;
 extern u8 *gUnk_02000580[4];
-int sub_0802C6C8(struct Manager *, struct Object *);
+int ActorPool_UnlinkObject(struct Manager *, struct Object *);
 void Heap_Free(void *);
-void sub_0802C710(struct Manager *);
-int sub_0802C684(struct Manager *m, struct Object *p)
+void ActorPool_RefreshTargets(struct Manager *);
+int ActorPool_LinkObject(struct Manager *m, struct Object *p)
 {
     if (m->head)
         m->head->next = p;

@@ -17,7 +17,7 @@ extern u32 gUnk_030053F4;
 s32 Collider_Refresh(void *);
 void Task_Kill(void *);
 
-void sub_0815FF40(struct P *p)
+void PlayerBurst_UpdateShutdown(struct P *p)
 {
     u16 *c;
     p->w44 |= 1;

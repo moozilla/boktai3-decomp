@@ -9,7 +9,7 @@ struct S {
     s32 v;
 };
 
-void sub_080F05CC(struct S *s)
+void Ivy_InitProfileId(struct S *s)
 {
     s->v = SceneActorProfiles_FindOrAdd(s->b, 0);
 }

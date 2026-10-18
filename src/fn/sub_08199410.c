@@ -10,7 +10,7 @@ void Task_Kill(void *);
 void sub_08199094(void);
 void sub_08199314(void);
 s32 sub_08199374(void *);
-struct P *sub_08199410(u16 a)
+struct P *SceneEffectQueue_Create(u16 a)
 {
     struct P *p;
     if (gUnk_02000218 != 0)

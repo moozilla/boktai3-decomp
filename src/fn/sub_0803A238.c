@@ -12,7 +12,7 @@ struct Item {
 };
 extern const u16 gUnk_0824DE7C[];
 void Anim_LoadKeyframe(void *, void *, int, int);
-void sub_0803A238(void *p, struct Item *q, int index)
+void WirelessGameItems_UpdateTemporaryItem(void *p, struct Item *q, int index)
 {
     void *alias;
     /* do-while(0) only keeps agbcc's block layout */

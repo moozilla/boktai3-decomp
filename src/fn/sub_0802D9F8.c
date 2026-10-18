@@ -27,19 +27,19 @@ struct Map {
 };
 extern struct Map *gUnk_030052F4;
 extern u32 gUnk_030052F8, gUnk_030052FC, gUnk_030053F4;
-u8 *sub_0821D64C(int, int);
+u8 *TerrainModifiers_FindCellOverride(int, int);
 void sub_08225B74(void *);
 int DisplayAnimation_SetPosition(void *, void *);
 int DisplayAnimation_UpdatePlayback(void *);
-void sub_0802DE3C(struct Actor *, unsigned, int, int);
+void Actor_SetAttachmentEffect(struct Actor *, unsigned, int, int);
 static inline u8 *cell(int i)
 {
-    u8 *p = sub_0821D64C(i, 1);
+    u8 *p = TerrainModifiers_FindCellOverride(i, 1);
     if (p)
         return p + 4;
     return gUnk_030052F4->cells + 12 + i * 4;
 }
-int sub_0802D9F8(void *unused, struct Actor *p)
+int Actor_UpdateMovementAnimationAndEffects(void *unused, struct Actor *p)
 {
     struct Body *body = &p->body;
     void *drawable = &p->drawable;
@@ -81,7 +81,7 @@ int sub_0802D9F8(void *unused, struct Actor *p)
                 zero = 0;
                 asm("" : "+r"(zero));
                 *timer = 0;
-                sub_0802DE3C(p, 8, 180, 180);
+                Actor_SetAttachmentEffect(p, 8, 180, 180);
                 p->flashing = zero;
             }
         }

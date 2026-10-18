@@ -6,7 +6,7 @@ struct E {
     u8 b;
 };
 s32 sub_08184FE8(struct E *, s32);
-void sub_081859E8(struct E *p)
+void Armor_StartAction14(struct E *p)
 {
     if (p->a == 0) {
         if (sub_08184FE8(p, 0xe) != 0)

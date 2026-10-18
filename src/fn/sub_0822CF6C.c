@@ -1,12 +1,12 @@
 #include "global.h"
-u32 sub_0822CDD0(u32);
-void sub_0822CE34(u32);
-u32 sub_0822CF6C(u32 a)
+u32 Inventory_GetKeyItemId(u32);
+void Inventory_ClearKeyItemSlot(u32);
+u32 Inventory_RemoveValuable(u32 a)
 {
     s32 i;
     for (i = 0; i <= 0xf; i++) {
-        if (sub_0822CDD0(i) == a) {
-            sub_0822CE34(i);
+        if (Inventory_GetKeyItemId(i) == a) {
+            Inventory_ClearKeyItemSlot(i);
             return 1;
         }
     }

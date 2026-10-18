@@ -19,11 +19,11 @@ extern struct Save *gUnk_02000710;
 extern u32 gUnk_03003A50, gUnk_03005308;
 extern u16 gUnk_0203B400[];
 int Mod(int, int);
-void sub_0822D808(int, struct ItemInfo *);
+void Inventory_GetEquippedDescriptor(int, struct ItemInfo *);
 int GameState_GetUnlockEntry(int);
 void sub_0822EA8C(int, int);
-void sub_0822EACC(int);
-void sub_08038170(struct P *input)
+void SolarFruit_ClearEquippedSlot(int);
+void WirelessGameMenu_InitItemChoices(struct P *input)
 {
     struct ItemInfo info;
     int missing, usable;
@@ -113,7 +113,7 @@ void sub_08038170(struct P *input)
             int t = 1;
             missing = t;
         } else {
-            sub_0822D808(i, &info);
+            Inventory_GetEquippedDescriptor(i, &info);
             if (!info.enabled) {
                 int t = 1;
                 usable = t;
@@ -347,7 +347,7 @@ void sub_08038170(struct P *input)
     sub_0822EA8C(0, 0);
     i = 1;
     do {
-        sub_0822EACC(i);
+        SolarFruit_ClearEquippedSlot(i);
         i++;
     } while (i <= 7);
     gUnk_02000710->extraSelected = 0;

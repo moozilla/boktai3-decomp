@@ -1,7 +1,7 @@
 #include "status_screen.h"
 // MATCHING_CONCESSION: register-pinning
 
-u16 *sub_0800E3E0(u32 bg, u32 x, s32 y)
+u16 *StatusScreen_GetTilePtr(u32 bg, u32 x, s32 y)
 {
     struct BgMapInfo *t = &gUnk_03004C30[bg];
     u16 *p = t->map;
@@ -17,7 +17,7 @@ void NumericDisplay_DrawPair(void *unused, int left, int right)
     register int *values asm("r12");
     digits[0] = left > 9;
     digits[1] = left - digits[0] * 10;
-    dst = (s16 *)sub_0800E3E0(0, 6, 11);
+    dst = (s16 *)StatusScreen_GetTilePtr(0, 6, 11);
     row = 0;
     values = digits;
     for (; row < 2; row++) {
@@ -33,7 +33,7 @@ void NumericDisplay_DrawPair(void *unused, int left, int right)
 
     digits[0] = Div(right, 10);
     digits[1] = right - digits[0] * 10;
-    dst = (s16 *)sub_0800E3E0(0, 10, 11);
+    dst = (s16 *)StatusScreen_GetTilePtr(0, 10, 11);
     row = 0;
     values = digits;
     for (; row < 2;) {
@@ -61,7 +61,7 @@ void NumericDisplay_DrawStatusValues(struct StatusScreen *unused)
     int left = SunClock_GetBaseHour(), right = SunClock_GetBaseMinute();
     digits[0] = Div(left, 10);
     digits[1] = left - digits[0] * 10;
-    dst = (s16 *)sub_0800E3E0(0, 16, 11);
+    dst = (s16 *)StatusScreen_GetTilePtr(0, 16, 11);
     row = 0;
     values = digits;
     for (; row < 2; row++) {
@@ -77,7 +77,7 @@ void NumericDisplay_DrawStatusValues(struct StatusScreen *unused)
 
     digits[0] = Div(right, 10);
     digits[1] = right - digits[0] * 10;
-    dst = (s16 *)sub_0800E3E0(0, 20, 11);
+    dst = (s16 *)StatusScreen_GetTilePtr(0, 20, 11);
     row = 0;
     values = digits;
     for (; row < 2;) {
@@ -98,10 +98,10 @@ void NumericDisplay_DrawStatusValues(struct StatusScreen *unused)
 
 INCLUDE_ASM("asm/nonmatching", sub_0800E5B8);
 
-void sub_0800E77C(struct StatusScreen *s)
+void StatusScreen_RefreshDirtyDisplays(struct StatusScreen *s)
 {
     s32 a, b, c;
-    sub_082286E0(&a, &b, &c, sub_08228D7C());
+    Clock_UnpackDate(&a, &b, &c, SunClock_GetPackedDate());
     if (s->dirty & 1)
         NumericDisplay_DrawPair(s, b, c);
     if (s->dirty & 2)
@@ -114,7 +114,7 @@ void sub_0800E77C(struct StatusScreen *s)
 int StatusScreen_CheckConfirm(struct StatusScreen *p)
 {
     if ((gUnk_03005260[1] & 8) || (gUnk_03005260[1] & 1)) {
-        sub_082279A8(3, 4, 4, 4, 4, 65535, 0);
+        ScreenTransition_SendCommand(3, 4, 4, 4, 4, 65535, 0);
         {
             register void (*state)(struct StatusScreen *) asm("r1") = StatusScreen_FadeAndExit;
             p->state = state;

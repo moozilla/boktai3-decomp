@@ -1,7 +1,6 @@
 #ifndef GUARD_PROXIMITY_EMITTER_H
 #define GUARD_PROXIMITY_EMITTER_H
 #include "contact_swarm.h"
-/* Provisional: paired sprites and eight rising particles near the tether actor. */
 struct ProximityEmitterParticle {
     u32 flags;
     u8 unknown4[0x14];
@@ -30,12 +29,12 @@ extern struct ProximityEmitterPlayer *gUnk_02000488;
 struct ContactPosition *TetherActor_GetPosition(void);
 void TetherActor_RequestPaletteBlend(u32);
 void sub_08217EEC(void *, void *, u32);
-void sub_08217EC4(void *, s32, s32);
-void sub_08217ECC(void *, u32);
+void Effect_SetOrigin(void *, s32, s32);
+void Effect_SetPalette(void *, u32);
 void sub_08217DE0(void *, void *, u32);
 void ProximityEmitter_InitializeParticles(struct ProximityEmitter *);
 void ProximityEmitter_TickGrow(struct ProximityEmitter *);
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void ProximityEmitter_EmitParticle(struct ProximityEmitter *, void *);
 u32 ProximityEmitter_IsTetherNearby(struct ProximityEmitter *);
 void ProximityEmitter_TickActive(struct ProximityEmitter *);

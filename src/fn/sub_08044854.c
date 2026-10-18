@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
-void sub_0821FF58(void *, u32, u32, u32, u32, u32);
+void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 s32 ContactSwarm_SpawnCharge(struct ContactSwarm *poolInput,
                              const struct ContactPosition *positionInput, u32 directionInput,
                              u32 speedInput, u32 resourceId, u32 cost, volatile u32 option)
@@ -50,7 +50,7 @@ s32 ContactSwarm_SpawnCharge(struct ContactSwarm *poolInput,
             {
                 struct ContactCollider *resource = &slot->resourceCollider;
                 Collider_SetPosition(resource, destination, 0);
-                sub_0821FF58(resource, resourceId, cost, 0x8000, active, option);
+                Collider_SetAttackProperties(resource, resourceId, cost, 0x8000, active, option);
             }
             Collider_SetPosition(health, destination, 0);
             health->flags |= 4;

@@ -1,7 +1,7 @@
 #include "global.h"
 #include "libm_compat.h"
 
-double sub_08229E28(double arg)
+double Time_CalculateSolarLongitude(double arg)
 {
     double base, result, t;
     base = (((arg - 51544.5) + 0.00074074) / 365.25);

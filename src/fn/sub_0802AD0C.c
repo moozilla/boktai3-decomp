@@ -36,7 +36,7 @@ static inline void setAction(struct Common *p, int id, int zero)
     p->actionTimer = zero;
     p->entered = 1;
 }
-int sub_0802AD0C(struct Common *p)
+int GridAttack_SelectNextAction(struct Common *p)
 {
     struct Common *base = p;
     int trigger = *((u8 *)p + 0x1a2);

@@ -1,16 +1,16 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-void sub_082284DC(void);
-u32 sub_082489A0(void);
-void sub_082284E8(void);
-s32 sub_08229440(void)
+void Clock_BeginRtcAccess(void);
+u32 Rtc_CheckAndReset(void);
+void Clock_EndRtcAccess(void);
+s32 Clock_CheckRtcStatus(void)
 {
     register u32 shifted asm("r5");
     register u32 status asm("r4");
-    sub_082284DC();
-    shifted = sub_082489A0() << 24;
+    Clock_BeginRtcAccess();
+    shifted = Rtc_CheckAndReset() << 24;
     status = shifted >> 24;
-    sub_082284E8();
+    Clock_EndRtcAccess();
     status &= 15;
     if (status == 1)
         return 1;

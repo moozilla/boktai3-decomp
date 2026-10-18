@@ -4,7 +4,7 @@ struct Dma {
 };
 extern const u32 gUnk_08614114[];
 extern u32 gUnk_03005280;
-u32 sub_08219F50(void)
+u32 TaskSystem_InitLists(void)
 {
     struct Dma *d = (struct Dma *)0x040000D4;
     d->src = (u32)gUnk_08614114;

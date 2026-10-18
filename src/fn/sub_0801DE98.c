@@ -6,7 +6,7 @@ struct S {
 };
 void sub_0824923C(struct S *, u32);
 void sub_0801C24C(struct S *);
-u32 sub_0801DE98(struct S *p)
+u32 ResultTutorial_Finish(struct S *p)
 {
     sub_0824923C(p, p->a);
     sub_0801C24C(p);

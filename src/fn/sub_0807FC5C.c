@@ -2,7 +2,7 @@
 
 void sub_08249240(u8 *, u32, u32);
 
-void sub_0807FC5C(u8 *p)
+void SceneActorControl_DispatchControl(u8 *p)
 {
     u16 *q;
     u32 v, f;

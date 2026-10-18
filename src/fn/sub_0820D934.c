@@ -1,18 +1,18 @@
 #include "global.h"
 void Memory_Clear(void *, u32);
-void sub_0820D990(void *, u32, u32, u32, u32);
-void sub_0820D9A4(void *, u32, u32, s32);
-void sub_0820D9B4(void *, u32, u32, u32);
-void sub_0820D9BC(void *, void *);
-void sub_0820D9AC(void *, u32, u32);
-void sub_0820D23C(void);
-void sub_0820D934(u8 *p)
+void EnemyParticle_SetMotionParameters(void *, u32, u32, u32, u32);
+void EnemyParticle_SetGraphicsParameters(void *, u32, u32, s32);
+void EnemyParticle_SetAnimationParameters(void *, u32, u32, u32);
+void EnemyParticle_SetUpdateCallback(void *, void *);
+void EnemyParticle_SetVerticalMotion(void *, u32, u32);
+void EnemyParticle_UpdateLifetime(void);
+void EnemyParticle_InitParameters(u8 *p)
 {
     Memory_Clear(p, 0x38);
-    sub_0820D990(p, 0, 0x3c, 0, 0);
-    sub_0820D9A4(p, 0x848f, 0, -1);
-    sub_0820D9B4(p, 0, 0, 0);
-    sub_0820D9BC(p, sub_0820D23C);
-    sub_0820D9AC(p, 0, 0);
+    EnemyParticle_SetMotionParameters(p, 0, 0x3c, 0, 0);
+    EnemyParticle_SetGraphicsParameters(p, 0x848f, 0, -1);
+    EnemyParticle_SetAnimationParameters(p, 0, 0, 0);
+    EnemyParticle_SetUpdateCallback(p, EnemyParticle_UpdateLifetime);
+    EnemyParticle_SetVerticalMotion(p, 0, 0);
     *(u32 *)(p + 0xc) = 0;
 }

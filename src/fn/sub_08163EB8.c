@@ -8,18 +8,18 @@ struct P {
     u8 c58;
 };
 
-void sub_08165B28(struct P *, s32, s32);
+void PauseMenu_LoadSpriteKeyframe(struct P *, s32, s32);
 
-void sub_08163EB8(struct P *p, u32 w, u32 c)
+void Hud_SetInteractionCallback(struct P *p, u32 w, u32 c)
 {
     p->w54 = w;
     p->h4e = 0;
     p->c58 = c;
     if ((c << 24) != 0) {
-        sub_08165B28(p, 1, 0x43);
-        sub_08165B28(p, 2, 0x44);
+        PauseMenu_LoadSpriteKeyframe(p, 1, 0x43);
+        PauseMenu_LoadSpriteKeyframe(p, 2, 0x44);
     } else {
-        sub_08165B28(p, 1, 0x41);
-        sub_08165B28(p, 2, 0x42);
+        PauseMenu_LoadSpriteKeyframe(p, 1, 0x41);
+        PauseMenu_LoadSpriteKeyframe(p, 2, 0x42);
     }
 }

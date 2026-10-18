@@ -23,7 +23,7 @@ static inline u8 chk(struct S *p)
     return 0;
 }
 
-void sub_08023CA0(struct S *p)
+void SceneActorState_PlayAnimation37ThenResume(struct S *p)
 {
     if (chk(p)) {
         u32 k = 0x25;

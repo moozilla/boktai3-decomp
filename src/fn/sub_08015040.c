@@ -10,7 +10,7 @@ struct S {
     struct E e[4];
 };
 void FragmentGroup_Update(void *, void *);
-u32 sub_08015040(struct S *s)
+u32 FragmentManager_Update(struct S *s)
 {
     struct E *e = s->e;
     s32 i = 3;

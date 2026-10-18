@@ -7,7 +7,7 @@ struct S {
     u16 h;
     u16 g;
 };
-void sub_08232740(struct S *s)
+void TimedHazard_UpdateActivationDelay(struct S *s)
 {
     if (s->h++ > s->g) {
         u32 o = 1;

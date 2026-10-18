@@ -16,10 +16,10 @@ struct Save {
     int score;
 };
 extern struct Save *gUnk_030053F8;
-int sub_0822BB7C(void);
+int Save_WriteHeader(void);
 void TextWindow_Refresh(int, int);
 void Sound_PlaySong(int);
-void sub_08038F08(struct Menu *p)
+void WirelessTradeMenu_UpdateSaveResult(struct Menu *p)
 {
     int *window = &p->window;
     if (p->entered) {
@@ -41,7 +41,7 @@ void sub_08038F08(struct Menu *p)
         }
     }
     if (p->timer == 60) {
-        p->result = sub_0822BB7C();
+        p->result = Save_WriteHeader();
         if (p->result == 1) {
             TextWindow_Refresh(*window, 14);
             Sound_PlaySong(686);

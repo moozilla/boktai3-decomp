@@ -5,12 +5,12 @@ struct S {
     void (*f64)(void);
     s32 f68;
 };
-void sub_082279A8(u32, u32, u32, u32, u32, u32, u32);
-void sub_081C4668(void);
+void ScreenTransition_SendCommand(u32, u32, u32, u32, u32, u32, u32);
+void Registry6A37_UpdateFadeOut(void);
 
-void sub_081C4524(struct S *p)
+void Registry6A37_StartFadeOut(struct S *p)
 {
-    sub_082279A8(1, 6, 4, 4, 4, 0xFFFF, 0);
-    p->f64 = sub_081C4668;
+    ScreenTransition_SendCommand(1, 6, 4, 4, 4, 0xFFFF, 0);
+    p->f64 = Registry6A37_UpdateFadeOut;
     p->f68 = 0;
 }

@@ -1,5 +1,7 @@
 // COMPILER: old_agbcc
 #include "global.h"
+/* TentacleEnemy_SetSegmentPosition: Copies a position into an indexed segment entry used by the position trail */
+#define TentacleEnemy_SetSegmentPosition sub_080ACCD4
 
 struct Pos080ACCD4 {
     u32 a, b;

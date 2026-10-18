@@ -2,15 +2,15 @@
 int sub_08165A30(void *);
 void Sound_PlaySong(int);
 void sub_0816DAF8(void *);
-void sub_0822D0F0(int);
-void sub_0822D188(int);
+void Inventory_SortConsumables(int);
+void Inventory_SortValuables(int);
 struct S {
     u8 pad[0x4388];
     u8 a, b, c;
     u8 pad2[0x4860 - 0x438b];
     u8 d;
 };
-void sub_08170040(struct S *p)
+void PauseMenu_OnSortConfirmationUpdate(struct S *p)
 {
     int r = sub_08165A30(p);
     if (r == 0) {
@@ -19,9 +19,9 @@ void sub_08170040(struct S *p)
     } else if (r == 1) {
         Sound_PlaySong(0xdd);
         if (!p->d)
-            sub_0822D0F0(0);
+            Inventory_SortConsumables(0);
         else
-            sub_0822D188(0);
+            Inventory_SortValuables(0);
         p->a = 0;
         p->b = 0;
         p->c = 0;

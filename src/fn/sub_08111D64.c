@@ -3,7 +3,7 @@ struct S {
     u8 f[0x8E4];
     u16 a[24];
 };
-void sub_08111D64(struct S *s)
+void StageResults_InitAnimationIds(struct S *s)
 {
     s32 i;
     u16 *p;

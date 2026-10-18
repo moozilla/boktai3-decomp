@@ -3,12 +3,12 @@ struct VecB278 {
     u32 x : 16, y : 16, z : 16;
 };
 void Collider_Init(u8 *, s32, s32, s32, s32, struct VecB278 *, struct VecB278 *);
-void sub_0821FF58(u8 *, s32, s32, s32, s32, s32);
+void Collider_SetAttackProperties(u8 *, s32, s32, s32, s32, s32);
 void Collider_SetCallback(u8 *, void *, u8 *);
 void Collider_SetPosition(u8 *, u8 *, s32);
 void sub_082433C8(void);
 s32 Collider_Refresh(u8 *);
-void sub_0823B278(u8 *p)
+void Player_InitBodyCollider(u8 *p)
 {
     struct VecB278 scale;
     struct VecB278 position;

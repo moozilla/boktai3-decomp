@@ -8,7 +8,7 @@ static inline u8 Test(u8 *s)
         return 1;
     return 0;
 }
-u32 sub_08093718(u8 *s)
+u32 Bee_OnDetectionCheck(u8 *s)
 {
     u8 *p;
     s32 distance;

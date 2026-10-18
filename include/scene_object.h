@@ -28,7 +28,7 @@ struct SceneCell {
     u16 flags; /* bit 0 occupied by an object, bit 3 blocks entry, 0x20 (guess) */
 };
 
-/* Position and velocity block, shared with the generic entity code (sub_08225AB4 etc.). */
+/* Position and velocity block, shared with the generic entity code (SceneBody_Init etc.). */
 struct SceneBody {
     u32 id; /* script id (the 'n' parameter) */
     u32 flags;
@@ -68,7 +68,7 @@ struct SceneLink {
     u8 tail[40];
 };
 
-/* Reference to the terrain cell the object occupies, filled in by sub_0821D698. */
+/* Reference to the terrain cell the object occupies, filled in by TerrainModifiers_RegisterCell. */
 struct SceneCellRef {
     u16 unknown0;
     u16 index;             /* index into the terrain cell array */
@@ -137,37 +137,37 @@ void Scene_UpdateObjectStep(struct SceneObject *);
 void Scene_UpdateFallingObject(struct SceneObject *);
 void Scene_UpdateObjectDisappearance(struct SceneObject *);
 void Scene_UpdateObjectFlash(struct SceneObject *);
-void sub_080050AC(struct SceneObject *); /* idle state */
+void Scene_UpdateObjectIdle(struct SceneObject *); /* idle state */
 void Scene_ApplyTerrainInteraction(struct SceneCollider *, void *, struct SceneObject *);
-void sub_080046EC(void);
+void SceneObjects_NoOpUpdate(void);
 
 void Scene_SpawnEdgeParticles(struct SceneVec *position, s32 offset);
 u8 Scene_CanEnterNeighborCell(struct SceneObject *, s32 index, s32 direction);
-void sub_0800435C(u32 type);
+void Scene_PlayNeighborStepSound(u32 type);
 u8 Scene_CheckNeighborHeight(struct SceneObject *, s32 index, s32 direction);
-u8 sub_0800441C(struct SceneObject *);
+u8 Scene_IsObjectSurrounded(struct SceneObject *);
 void Scene_PlayMovementEffect(struct SceneObject *);
 void Scene_PlayNeighborMovementEffect(struct SceneObject *);
-void sub_080045B0(s32 type);
+void SceneObjects_PlayPushSound(s32 type);
 void Scene_DropObjectsAbove(struct SceneObject *);
-u32 sub_080047AC(struct SceneObject *);
-s32 sub_080047EC(void);
+u32 SceneObjects_DestroyObject(struct SceneObject *);
+s32 SceneObjects_DestroyAllObjects(void);
 s32 Scene_ActivateTypeOneObjects(void);
 s32 Scene_StopSelectedObject(void);
-s32 sub_080048F4(void);
+s32 SceneObjects_DestroyObjectsByScriptId(void);
 void Scene_PlayObjectBreakEffect(struct SceneObject *);
-void sub_08004A34(struct SceneObject *);
-void sub_08004AE8(struct SceneObject *);
+void Scene_PlayObjectSplashEffect(struct SceneObject *);
+void Scene_PlayObjectImpactEffect(struct SceneObject *);
 void Scene_SpawnDirectionalDust(struct SceneObject *);
 s32 Scene_TryStepDown(struct SceneObject *, s32 index, s32 direction);
 s32 SceneObjects_TryPushNeighbor(struct SceneVec *position, s32 direction);
-s32 sub_08005098(struct SceneVec *position, u32 index);
+s32 SceneObjects_TryPushNeighborByIndex(struct SceneVec *position, u32 index);
 s32 SceneObjects_Update(struct SceneObjectManager *);
-u32 sub_080056D0(struct SceneObjectManager *);
-s32 sub_080056F0(struct SceneObjectManager *, void *);
-struct SceneObjectManager *sub_08005778(void *);
-struct SceneObject *sub_080057D0(struct SceneObjectManager *);
-struct SceneObject *sub_080057FC(struct SceneObjectManager *, u32 id);
+u32 SceneObjects_DestroyTask(struct SceneObjectManager *);
+s32 SceneObjects_InitPool(struct SceneObjectManager *, void *);
+struct SceneObjectManager *SceneObjects_CreateTask(void *);
+struct SceneObject *SceneObjects_FindFreeSlot(struct SceneObjectManager *);
+struct SceneObject *SceneObjects_FindByScriptId(struct SceneObjectManager *, u32 id);
 s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *position,
                               u32 animationResource, s32 drawMode, s32 health, s32 basePalette,
                               s32 animation, u32 script);

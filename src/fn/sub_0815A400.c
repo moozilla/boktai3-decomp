@@ -3,7 +3,7 @@
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 
-s32 sub_0815A400(void)
+s32 Script_GetActorIndex(void)
 {
     s32 r;
     if (Script_SeekToKeyword(0x69) == 0)

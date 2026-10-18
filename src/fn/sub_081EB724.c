@@ -8,7 +8,6 @@ struct Params3D0 {
     s32 M;
 };
 extern struct Params3D0 gUnk_020003D0;
-/* Script: -M (default 0), -g, -o, -l, -s, -d, -c, -t, -b and -f (two values). */
 void Params3D0_SetFromScript(void)
 {
     struct Params3D0 *p = &gUnk_020003D0;

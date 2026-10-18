@@ -9,7 +9,7 @@ struct T {
     u32 a;
     u8 g[0xe];
 };
-void sub_081C17D4(u8 *p, u32 v)
+void ControlPanel_SetUpdate(u8 *p, u32 v)
 {
     *(u32 *)(p + 0x5b8) = v;
     *(u16 *)(p + 0x5b6) = 0;

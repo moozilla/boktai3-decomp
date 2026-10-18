@@ -16,7 +16,7 @@ struct S {
     u8 p6[0xee8 - 0x184];
     u32 e8, ec, f0, f4;
 };
-void sub_081F7998(struct S *p)
+void Ratatosk_BeginInterruptState(struct S *p)
 {
     u32 v, z;
     p->e8 = p->w17c;

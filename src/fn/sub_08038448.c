@@ -21,7 +21,7 @@ extern u16 gUnk_0203B400[];
 void GameState_AddEquipment(int);
 int Mod(int, int);
 
-void sub_08038448(struct P *p)
+void WirelessGameMenu_InitEquipmentChoices(struct P *p)
 {
     u32 mask = 0;
     register int start asm("r4");

@@ -13,7 +13,7 @@ void BouncingObject_InitializeColliders(struct BouncingObject *object, s16 categ
     offset.packed.z = 0;
     Collider_Init(&object->bodyCollider, (u16)object->colliderConfig, 0x2003, 0, 16, &size.position,
                   &offset.position);
-    sub_0821FF58(&object->bodyCollider, category, value, 0, 0, 0);
+    Collider_SetAttackProperties(&object->bodyCollider, category, value, 0, 0, 0);
     Collider_SetPosition(&object->bodyCollider, &object->sprite.position, 0);
     Collider_SetCallback(&object->bodyCollider, BouncingObject_ApplyContactImpulse, object);
     size.position.x = 64;

@@ -1,7 +1,7 @@
 #include "global.h"
 u8 *Script_GetPc(void);
-u32 sub_0821B63C(u8 *);
-u32 sub_08225438(void)
+u32 Script_ReadBackupVariableOperand(u8 *);
+u32 Script_GetSavedVariable(void)
 {
-    return sub_0821B63C(Script_GetPc());
+    return Script_ReadBackupVariableOperand(Script_GetPc());
 }

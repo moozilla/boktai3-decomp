@@ -1,10 +1,10 @@
 #include "global.h"
 
-void sub_0803381C(u32);
+void TextWindow_Clear(u32);
 
-void sub_0810EE70(u8 *p)
+void LinkLobbyPanel_ClearTextWindows(u8 *p)
 {
-    sub_0803381C(*(u32 *)(p + 0x14F8));
-    sub_0803381C(*(u32 *)(p + 0x14F0));
-    sub_0803381C(*(u32 *)(p + 0x14F4));
+    TextWindow_Clear(*(u32 *)(p + 0x14F8));
+    TextWindow_Clear(*(u32 *)(p + 0x14F0));
+    TextWindow_Clear(*(u32 *)(p + 0x14F4));
 }

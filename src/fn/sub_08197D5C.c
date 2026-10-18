@@ -1,16 +1,18 @@
 #include "global.h"
 #include "engine.h"
+/* PaletteEffect_StartAnimationWhiteFlash: Buffers an animation palette and installs the white flash callback */
+#define PaletteEffect_StartAnimationWhiteFlash sub_08197D5C
 
-void *sub_0819792C(void *, void *, u32, s32, s32);
-void sub_081979B4(void *, s32);
-void sub_08197C98(void *);
-void sub_08197A0C(void *);
+void *PaletteEffect_Create(void *, void *, u32, s32, s32);
+void PaletteEffect_ApplyBufferedPalette(void *, s32);
+void PaletteEffect_UpdateWhiteFlash(void *);
+void PaletteEffect_Destroy(void *);
 
 void sub_08197D5C(void *anim, s32 count)
 {
-    void *task = sub_0819792C(anim, NULL, 0, count, 0);
+    void *task = PaletteEffect_Create(anim, NULL, 0, count, 0);
     if (task) {
-        sub_081979B4(task, 0);
-        Task_SetCallbacks(task, sub_08197C98, sub_08197A0C);
+        PaletteEffect_ApplyBufferedPalette(task, 0);
+        Task_SetCallbacks(task, PaletteEffect_UpdateWhiteFlash, PaletteEffect_Destroy);
     }
 }

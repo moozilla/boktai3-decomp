@@ -1,13 +1,13 @@
 #include "global.h"
 extern u32 gUnk_030053F4, gUnk_030053F0;
-void sub_08116C4C(u32, s32 *);
+void Player_GetWorldPosition(u32, s32 *);
 static inline s32 absolute(s32 x)
 {
     if (x < 0)
         x = -x;
     return x;
 }
-u32 sub_08115D58(u8 *s)
+u32 SpriteDrop_IsNearPlayer(u8 *s)
 {
     s32 v[4];
     s32 i;
@@ -16,7 +16,7 @@ u32 sub_08115D58(u8 *s)
         i = 0;
         s += 0x9C;
         do {
-            sub_08116C4C(i, v);
+            Player_GetWorldPosition(i, v);
             if (absolute((v[0] >> 12) - *(s16 *)s) <= 160)
                 return 1;
             ++i;
@@ -24,7 +24,7 @@ u32 sub_08115D58(u8 *s)
     fail:
         return 0;
     } else {
-        sub_08116C4C(0, v);
+        Player_GetWorldPosition(0, v);
         if (absolute((v[0] >> 12) - *(s16 *)(s + 0x9C)) > 160)
             goto fail;
     }

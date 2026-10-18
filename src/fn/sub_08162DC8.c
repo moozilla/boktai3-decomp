@@ -7,7 +7,7 @@ struct P {
     u32 fl;
 };
 
-void sub_08162DC8(struct P *p)
+void PlayerBarrier_Hide(struct P *p)
 {
     if (p != 0) {
         p->st = 0;

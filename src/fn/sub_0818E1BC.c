@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0818CC10(void);
+void Armor_BeginPartSpinup(void);
 static inline u8 reset(u8 *p)
 {
     s32 one = 1;
@@ -19,8 +19,8 @@ static inline u8 reset(u8 *p)
     }
     return 0;
 }
-void sub_0818E1BC(u8 *p)
+void Armor_StartPartSpinMotion(u8 *p)
 {
     if (reset(p))
-        *(void (**)(void))(p + 0x1d0) = sub_0818CC10;
+        *(void (**)(void))(p + 0x1d0) = Armor_BeginPartSpinup;
 }

@@ -1,8 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
+/* ContactSwarm_SpawnPairedAdvance: Fills free slots in the advance state with alternating paired headings and randomized timing then starts palette fading. */
+#define ContactSwarm_SpawnPairedAdvance sub_08044934
 #define ContactSwarm_SpawnPairedAdvance sub_08044934
 void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
-void sub_0821FF58(void *, u32, u32, u32, u32, u32);
+void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 void sub_08221110(void *, void *, void *, s32, s32);
 s32 ContactSwarm_SpawnPairedAdvance(struct ContactSwarm *pool,
                                     const struct ContactPosition *position, s32 direction,
@@ -109,7 +111,7 @@ s32 ContactSwarm_SpawnPairedAdvance(struct ContactSwarm *pool,
             }
             collider = &slot->resourceCollider;
             Collider_SetPosition(collider, destination, 0);
-            sub_0821FF58(collider, resourceId, cost, 0x8000, active, option);
+            Collider_SetAttackProperties(collider, resourceId, cost, 0x8000, active, option);
             collider = &slot->display.healthCollider;
             Collider_SetPosition(collider, destination, 0);
             collider->flags |= 4;

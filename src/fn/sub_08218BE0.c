@@ -8,7 +8,7 @@ struct S *Heap_Alloc(u32);
 void Memory_Clear(struct S *, u32);
 struct S *ScriptProc_Start(u32, u32);
 
-s32 sub_08218BE0(void)
+s32 Text_LoadFontResource(void)
 {
     if (gUnk_03001664 != 0)
         return 0;

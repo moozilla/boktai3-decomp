@@ -6,7 +6,7 @@ struct S {
 };
 void Sound_StopSong(u32);
 void Sound_PlaySong(u32);
-void sub_0811D03C(struct S *s)
+void Character_UpdateLoopingSound(struct S *s)
 {
     u16 *a = &s->a;
     u16 *b = &s->b;

@@ -13,7 +13,7 @@ s32 SceneAudioEvent_DispatchPending(struct SceneEventDispatchTask *owner)
         struct SceneEventDispatchState *state = gUnk_0200047C;
         struct SceneEventCommand *command;
         command = receiver->pending[state->phase][i];
-        sub_08020D54(receiver, command);
+        SceneMessages_SetPendingTrigger(receiver, command);
         switch ((u32)command->kind) {
             case 0:
                 SceneAudioEvent_PlaySong(owner, receiver, command);

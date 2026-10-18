@@ -6,15 +6,15 @@ struct S {
     s16 f34;
     s16 f36;
 };
-void sub_081C4C18(struct S *);
-void sub_081C4EA0(void);
+void SceneTransition_Finish(struct S *);
+void RegistryC281_UpdateClosingDelay(void);
 
-void sub_081C4C70(struct S *p)
+void SceneTransition_StartCompletionDelay(struct S *p)
 {
     if (p->f36 < 0) {
-        sub_081C4C18(p);
+        SceneTransition_Finish(p);
     } else {
-        p->f30 = sub_081C4EA0;
+        p->f30 = RegistryC281_UpdateClosingDelay;
         p->f34 = 0;
     }
 }

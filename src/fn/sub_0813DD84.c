@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0813DD84(u8 *p)
+void Player_AdvanceEffectTick(u8 *p)
 {
     u8 *q = *(u8 **)(p + 0x348);
 

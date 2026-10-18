@@ -1,9 +1,9 @@
 #include "global.h"
 
-void sub_081BA62C(void *, void (*)(void));
-void sub_081BA9FC(void);
+void Registry3F74_SetState(void *, void (*)(void));
+void Registry3F74_UpdateSelection(void);
 
-void sub_081BAAA0(void *p)
+void Registry3F74_StartSelection(void *p)
 {
-    sub_081BA62C(p, sub_081BA9FC);
+    Registry3F74_SetState(p, Registry3F74_UpdateSelection);
 }

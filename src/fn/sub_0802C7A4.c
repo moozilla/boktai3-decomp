@@ -18,16 +18,16 @@ struct Manager {
 };
 extern struct Manager *gUnk_020000D8;
 extern u8 *gUnk_02000580[4];
-int sub_0802C6C8(struct Manager *, struct Object *);
+int ActorPool_UnlinkObject(struct Manager *, struct Object *);
 void Heap_Free(void *);
-void sub_0802C710(struct Manager *);
-int sub_0802C7A4(struct Manager *m)
+void ActorPool_RefreshTargets(struct Manager *);
+int ActorPool_DestroyCallback(struct Manager *m)
 {
     struct Object *p = m->head;
     while (p) {
         struct Object *next = p->prev;
         p->destroy(p);
-        sub_0802C6C8(m, p);
+        ActorPool_UnlinkObject(m, p);
         Heap_Free(p);
         p = next;
     }

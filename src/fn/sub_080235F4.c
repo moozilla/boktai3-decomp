@@ -22,7 +22,7 @@ static inline u8 TakeFlag(struct S *p)
     return FALSE;
 }
 
-void sub_080235F4(struct S *p)
+void SceneActorState_AdvanceToState1A(struct S *p)
 {
     if (TakeFlag(p)) {
         u32 v = 0x1a;

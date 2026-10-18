@@ -1,5 +1,5 @@
 #include "global.h"
-u8 *sub_081FEA3C(u8 *p, s32 i)
+u8 *SunOrb_GetPositionFromManager(u8 *p, s32 i)
 {
     u8 *r;
     if (p != 0)

@@ -81,7 +81,7 @@ void ScenePanelRig_TickResourceDrain(struct ScenePanelRig *rig)
                     if (sound)
                         Sound_PlaySong(sound);
                 }
-                sub_082279A8(0, 4, 31, 31, 31, 8191, stage);
+                ScreenTransition_SendCommand(0, 4, 31, 31, 31, 8191, stage);
                 ScenePanel_CallPendingScript((void *)*global, 4);
             }
         }

@@ -6,7 +6,7 @@ struct S {
     u16 h;
 };
 extern struct S *gUnk_02000580;
-void sub_081C17EC(void)
+void ControlPanel_ClearPlayerInputHistory(void)
 {
     s32 i;
     for (i = 0; i <= 0x1f; i++)

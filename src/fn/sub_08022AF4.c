@@ -7,7 +7,7 @@ struct S {
     u32 a;
 };
 void BackgroundFlash_BeginDisappearance(u32);
-void sub_08022AF4(struct S *p)
+void SceneActors_StopBackgroundFlash(struct S *p)
 {
     BackgroundFlash_BeginDisappearance(p->a);
     p->b = 0;

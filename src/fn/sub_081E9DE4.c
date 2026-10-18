@@ -52,10 +52,10 @@ struct S {
     u32 ticks;
 };
 void Anim_SetSequence(void *, u32, u32, u32, u32);
-void sub_081E4188(void *);
+void Actor_RestoreSavedAnimationPlayback(void *);
 void ActorShadow_Disable(void *);
-void sub_081E41EC(void *);
-void sub_081E4174(void *);
+void Actor_ArmRestIdleTransition(void *);
+void Actor_SetInteractionControlFlag(void *);
 void AnimData_SelectPaletteBank(void *, s32);
 void Sound_PlaySong(s32);
 void Script_Call(void *, s32);
@@ -63,7 +63,7 @@ void ActorShadow_Enable(void *);
 void ActorPalette_BeginFade(void *);
 extern s32 gUnk_03005260;
 extern u8 gUnk_03005430[];
-void sub_081E43E8(void *);
+void Actor_UpdateIdlePhaseRestoration(void *);
 struct Child {
     u32 flags;
     u8 p0[0x2c - 4];
@@ -76,24 +76,24 @@ struct Child {
     u8 rest[10];
 };
 void Actor_TryInteraction(void *, void *);
-void sub_081E5608(void *, void *);
+void Actor_OnInteractionChildUpdate(void *, void *);
 void Sprite_Remove(void *);
-void sub_08013684(void *);
-s32 sub_08225984(u16);
-void sub_08225938(void *);
+void Shadow_Destroy(void *);
+s32 SceneBody_GetById(u16);
+void SceneBody_Unregister(void *);
 extern void *gUnk_020003C8;
-s32 sub_081E9DE4(struct S *p)
+s32 Actor_DestroyController(struct S *p)
 {
     s32 i;
     u8 *c;
     Sprite_Remove(&p->obj);
-    sub_08013684(p->p2);
+    Shadow_Destroy(p->p2);
     c = (u8 *)p + 0x1c;
     for (i = 15; i >= 0; i--) {
         Sprite_Remove(c);
         c += 0xdc;
     }
-    if (sub_08225984(*(u16 *)((u8 *)p + 0xf8a)))
-        sub_08225938((u8 *)p + 0xe80);
+    if (SceneBody_GetById(*(u16 *)((u8 *)p + 0xf8a)))
+        SceneBody_Unregister((u8 *)p + 0xe80);
     gUnk_020003C8 = 0;
 }

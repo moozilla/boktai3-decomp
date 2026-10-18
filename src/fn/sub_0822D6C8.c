@@ -7,7 +7,7 @@ struct G {
     struct E e[1];
 };
 extern struct G *gUnk_02000710;
-struct E *sub_0822D6C8(u32 i)
+struct E *Inventory_GetEquipmentEntry(u32 i)
 {
     return &gUnk_02000710->e[i];
 }

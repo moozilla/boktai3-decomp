@@ -41,7 +41,7 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
     AnimData_SelectPaletteBank(graphics, gUnk_0824DF14[mode]);
     drawable = &panel->drawable;
     Sprite_Init(drawable, graphics, 0x30);
-    sub_08220D20(&sequence, sequenceResource, gUnk_0824DF1E[mode], 0, 0);
+    Anim_RestartSequence(&sequence, sequenceResource, gUnk_0824DF1E[mode], 0, 0);
     active = drawable;
     state = &sequence;
     {

@@ -7,7 +7,7 @@ struct E {
 };
 extern u32 gUnk_020001DC;
 void Effect_Remove(void *);
-s32 sub_08115190(u8 *g)
+s32 NativeParticle_DestroyManager(u8 *g)
 {
     struct E *e = (struct E *)(g + 0x720);
     s32 i = 0x1f;

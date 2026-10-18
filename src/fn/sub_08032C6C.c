@@ -10,7 +10,7 @@ struct S {
     u8 a;
     u8 b;
 };
-void sub_08032C6C(struct S *p)
+void TextState_ResetPlaybackMode(struct S *p)
 {
     s32 v;
     p->a = 0;

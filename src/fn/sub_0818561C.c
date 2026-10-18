@@ -4,9 +4,9 @@ struct P {
     u32 x : 16, y : 16, z : 16, w : 16;
 };
 s32 Math_Atan2(s32, s32);
-void sub_081850F4(void *);
+void ActorController_StartTurn(void *);
 s32 sub_0818505C(void *, s32);
-void sub_0818561C(u8 *p)
+void Armor_UpdateFacingAction29(u8 *p)
 {
     u8 *state = p + 0xb3d;
     switch (*state) {
@@ -20,7 +20,7 @@ void sub_0818561C(u8 *p)
             angle = Math_Atan2((s16)v.x - *(s16 *)(p + 0x48), (s16)v.z - *(s16 *)(p + 0x4c));
             angle = (angle + 0x20) & 0xc0;
             if (p[0xb39] != angle)
-                sub_081850F4(p);
+                ActorController_StartTurn(p);
             else if (sub_0818505C(p, 29))
                 *state = 1;
             break;

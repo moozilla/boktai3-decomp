@@ -1,6 +1,6 @@
 #include "global.h"
 void Trigger_ConsumePending(u8 *, u32);
-void sub_081CEA54(u8 *a, u8 *b)
+void SceneNpc_UpdateAnimation17(u8 *a, u8 *b)
 {
     if (b[8]) {
         b[8] = 0;

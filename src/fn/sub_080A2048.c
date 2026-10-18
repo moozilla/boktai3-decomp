@@ -26,7 +26,7 @@ zero:
     return 0;
 }
 
-void sub_080A2048(u8 *unused, u8 *obj, u8 *ctx)
+void Spider_OnAttackCollision(u8 *unused, u8 *obj, u8 *ctx)
 {
     int mask;
     u32 *flags;

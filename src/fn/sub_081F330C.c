@@ -1,6 +1,6 @@
 #include "global.h"
 
-s32 sub_081F330C(u8 *p)
+s32 Ratatosk_FindActiveTargetNearestPlayer(u8 *p)
 {
     s32 idx = -1;
     u32 best = 0xFFFFFFFF;

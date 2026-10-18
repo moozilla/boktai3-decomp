@@ -2,7 +2,7 @@
 
 extern u32 gUnk_02000194;
 
-void sub_0812DA20(void)
+void ParticleEffectPool_ResetSingleton(void)
 {
     gUnk_02000194 = 0;
 }

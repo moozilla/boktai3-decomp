@@ -2,7 +2,7 @@
 
 void SceneActorEffects_ReleaseResources(void);
 
-s32 sub_080E87B8(void)
+s32 Mimic_ReleaseResources(void)
 {
     SceneActorEffects_ReleaseResources();
     return 0;

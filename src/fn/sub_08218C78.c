@@ -8,7 +8,7 @@ struct S {
 };
 extern struct S *gUnk_03001664;
 
-u32 sub_08218C78(void)
+u32 Text_GetNarrowGlyphData(void)
 {
     if (gUnk_03001664 == 0)
         return 0;

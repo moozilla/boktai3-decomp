@@ -5,7 +5,7 @@ struct Q {
     u32 a;
 };
 
-void sub_081BAF8C(struct Q *p)
+void MenuCursor_OnHidden(struct Q *p)
 {
     u32 m = 1;
     p->a |= m;

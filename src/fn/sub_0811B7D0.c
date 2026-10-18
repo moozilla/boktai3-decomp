@@ -2,7 +2,7 @@
 
 extern u32 gUnk_02000204;
 
-void sub_0811B7D0(void)
+void RegistryE7BC_OnManagerDestroy(void)
 {
     gUnk_02000204 = 0;
 }

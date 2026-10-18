@@ -9,7 +9,7 @@ struct S {
 void Script_Call(u32, u32);
 void Task_Kill(u32);
 
-void sub_081C4C18(struct S *p)
+void SceneTransition_Finish(struct S *p)
 {
     if (p->f2c)
         Script_Call(p->f2c, 0);

@@ -1,6 +1,6 @@
 #include "global.h"
 s32 Mod(s32, s32);
-void sub_0811235C(u8 *s)
+void StageResults_UpdateRecordBlink(u8 *s)
 {
     u32 c = s[0x1208];
     if (c == 1) {

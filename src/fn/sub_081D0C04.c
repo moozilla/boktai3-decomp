@@ -63,30 +63,30 @@ struct SceneNpc {
 };
 extern void *gUnk_02000480;
 extern struct SceneNpc *gUnk_02000274;
-struct SceneNpc *sub_0802D6F4(s32 name, s32 variant);
-s32 sub_0802D728(struct SceneNpc *, s32 name, struct PackedVec *, s32 angle);
-s32 sub_0802D760(struct SceneNpc *, s32 kind, s32 a, s32 b, s32 c);
-void sub_0802D7E0(struct SceneNpc *, u32, s32, s32, s32);
+struct SceneNpc *Actor_Allocate(s32 name, s32 variant);
+s32 Actor_InitMotion(struct SceneNpc *, s32 name, struct PackedVec *, s32 angle);
+s32 Actor_InitDrawable(struct SceneNpc *, s32 kind, s32 a, s32 b, s32 c);
+void Actor_InitShadow(struct SceneNpc *, u32, s32, s32, s32);
 void SceneMessages_RegisterReceiver(void *, s32, s32);
-void sub_0802D614(void *, struct SceneNpc *, s32, s32);
-void sub_0802D654(void *, struct SceneNpc *);
-void sub_0802E698(void *, struct SceneNpc *);
+void Actor_InitResources(void *, struct SceneNpc *, s32, s32);
+void Actor_LinkToManager(void *, struct SceneNpc *);
+void Actor_InitBehaviorFromScript(void *, struct SceneNpc *);
 void DisplayAnimation_SetFlags(void *);
-void sub_0802D88C(struct SceneNpc *);
-s32 sub_0802DB78(struct SceneNpc *, s32, s32, s32, s32, s32);
+void Actor_DisableShadow(struct SceneNpc *);
+s32 Actor_SetMirroredFourWayAnimation(struct SceneNpc *, s32, s32, s32, s32, s32);
 u32 ParticlePool_Create(void);
 void sub_081D07D8(void *, struct SceneNpc *);
-void sub_081CFFAC(void);
+void SceneNpc_OnStateChange(void);
 void sub_081D0864(void);
-void sub_081D0BC4(void);
-void sub_081D0BD0(void);
+void SceneNpc_OnModeUpdate(void);
+void SceneNpc_OnStateUpdate(void);
 void sub_081D0928(void);
-void sub_081D0B8C(void);
-void sub_0802EA4C(void);
-void sub_0802EA08(void);
+void SceneNpc_OnDestroy(void);
+void Actor_OnIdleUpdate(void);
+void Actor_OnHiddenIdleUpdate(void);
 void sub_081CEFCC(void);
 void sub_081CF84C(void);
-void sub_0802F0C0(void);
+void Actor_OnConfiguredAnimationUpdate(void);
 static inline void setHandler(void *fn, void **slot)
 {
     *slot = fn;
@@ -101,7 +101,7 @@ static inline void setBox(struct SceneNpc *npc, s32 width, s32 height)
 }
 
 /* Registry routine BB34: creates a scene NPC (0x384-byte object from
-   sub_0802D6F4) named -n, variant -k (default 1), at -p x y z facing -d, with
+   Actor_Allocate) named -n, variant -k (default 1), at -p x y z facing -d, with
    behavior -i (0-4: update callback, mode and state), records it in
    gUnk_02000274 and registers it with the scene actor manager; -K also runs
    sub_081D07D8 on it. The facing computation needs register pins and an empty
@@ -139,16 +139,16 @@ void SceneNpc_CreateFromScript(void)
     }
     angle = Script_GetKeywordValue('d', 0);
     extra = Script_GetKeywordValue('K', 0);
-    npc = sub_0802D6F4(name, variant);
+    npc = Actor_Allocate(name, variant);
     if (!npc) {
         return;
     }
     gUnk_02000274 = npc;
-    if (sub_0802D728(npc, name, &position, angle) < 0) {
+    if (Actor_InitMotion(npc, name, &position, angle) < 0) {
         return;
     }
     model = 0x97D3;
-    if (sub_0802D760(npc, 1, model, 0xC6A0, zero = 0) < 0) {
+    if (Actor_InitDrawable(npc, 1, model, 0xC6A0, zero = 0) < 0) {
         return;
     }
     motion = &npc->motion;
@@ -158,7 +158,7 @@ void SceneNpc_CreateFromScript(void)
         motion->field36 = speed;
         motion->field38 = zero;
     }
-    sub_0802D7E0(npc, npc->field160, 1, 0, 0x40);
+    Actor_InitShadow(npc, npc->field160, 1, 0, 0x40);
     SceneMessages_RegisterReceiver(npc->block168, name, 5);
     npc->motion.angle = angle;
     {
@@ -180,15 +180,15 @@ void SceneNpc_CreateFromScript(void)
             npc->facing4 = m;
         }
     }
-    setHandler(sub_081CFFAC, &npc->callbacks[5]);
+    setHandler(SceneNpc_OnStateChange, &npc->callbacks[5]);
     setHandler(sub_081D0864, &npc->callbacks[0]);
-    setHandler(sub_081D0BC4, &npc->callbacks[1]);
-    setHandler(sub_081D0BD0, &npc->callbacks[2]);
+    setHandler(SceneNpc_OnModeUpdate, &npc->callbacks[1]);
+    setHandler(SceneNpc_OnStateUpdate, &npc->callbacks[2]);
     setHandler(sub_081D0928, &npc->callbacks[3]);
-    setHandler(sub_081D0B8C, &npc->callbacks[4]);
-    sub_0802D614(manager, npc, model, 0);
-    sub_0802D654(manager, npc);
-    sub_0802E698(manager, npc);
+    setHandler(SceneNpc_OnDestroy, &npc->callbacks[4]);
+    Actor_InitResources(manager, npc, model, 0);
+    Actor_LinkToManager(manager, npc);
+    Actor_InitBehaviorFromScript(manager, npc);
     rig = &npc->rig;
     npc->fieldC = zero;
     rig->fieldC = 0;
@@ -200,7 +200,7 @@ void SceneNpc_CreateFromScript(void)
             npc->mode = one;
             npc->field14 = 0;
             npc->field8 = 1;
-            update = sub_0802EA4C;
+            update = Actor_OnIdleUpdate;
             npc->state = 2;
             npc->update = update;
             npc->field10 = 0;
@@ -215,14 +215,14 @@ void SceneNpc_CreateFromScript(void)
             npc->mode = 0;
             npc->field14 = 0;
             npc->field8 = 1;
-            update = sub_0802EA08;
+            update = Actor_OnHiddenIdleUpdate;
             npc->state = 1;
             npc->update = update;
             npc->field10 = 0;
             npc->field9 = 1;
             npc->field18 = 0;
             DisplayAnimation_SetFlags(npc->blockD4);
-            sub_0802D88C(npc);
+            Actor_DisableShadow(npc);
             break;
 
         case 2:
@@ -263,7 +263,7 @@ void SceneNpc_CreateFromScript(void)
             npc->mode = mode;
             npc->field14 = 0;
             npc->field8 = 1;
-            updateB = sub_0802F0C0;
+            updateB = Actor_OnConfiguredAnimationUpdate;
             npc->state = 7;
             npc->update = updateB;
             npc->field10 = 0;
@@ -272,7 +272,7 @@ void SceneNpc_CreateFromScript(void)
             break;
     }
 
-    sub_0802DB78(npc, 0, 0, 0, 0, 0);
+    Actor_SetMirroredFourWayAnimation(npc, 0, 0, 0, 0, 0);
     setBox(npc, 16, 20);
     npc->field200 = 0x100;
     npc->field204 = 0x190;

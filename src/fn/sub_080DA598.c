@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0807E7B0(void *, s32);
+void SceneActorEffects_AdvanceSteps(void *, s32);
 void Memory_Clear(void *, s32);
 
 struct S {
@@ -16,9 +16,9 @@ struct S2 {
     u16 h5c2;
 };
 
-void sub_080DA598(struct S2 *s)
+void Mummy_ResetMotionState(struct S2 *s)
 {
-    sub_0807E7B0(s, 4);
+    SceneActorEffects_AdvanceSteps(s, 4);
     Memory_Clear((u8 *)s + 0x5b8, 8);
     s->h5c2 = 0;
     s->h5c0 = 0;

@@ -72,21 +72,21 @@ struct Actor {
     struct Vec destination;
 };
 extern void *gUnk_02000480;
-struct Actor *sub_0802D6D0(void *, int);
+struct Actor *Actor_FindById(void *, int);
 int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
-int sub_0802FD14(struct Actor *);
-void sub_08225B4C(void *, void *, int, int, int);
-void sub_0821E780(void *, void *, int);
+int SceneCharacter_GetPathNodeState(struct Actor *);
+void SceneBody_StartRoute(void *, void *, int, int, int);
+void Path_GetPointPosition(void *, void *, int);
 struct Node {
     u16 x, z;
     u8 pad4[2], flags;
 };
-int sub_0821E7AC(struct Node *, int);
-int sub_0821E7A0(struct Node *, int);
-int sub_0802FCA8(struct Actor *, struct Node *);
-int sub_0802FD14(struct Actor *p)
+int Path_GetPointNodeId(struct Node *, int);
+int Path_GetPointFacing(struct Node *, int);
+int Actor_SelectPathNodeAction(struct Actor *, struct Node *);
+int SceneCharacter_GetPathNodeState(struct Actor *p)
 {
     struct Path {
         u8 pad[8];
@@ -104,7 +104,7 @@ int sub_0802FD14(struct Actor *p)
         if (dz < 0)
             dz = -dz;
         if (dz <= 40)
-            result = sub_0802FCA8(p, node);
+            result = Actor_SelectPathNodeAction(p, node);
         else
             result = 9;
     } else

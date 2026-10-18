@@ -1,11 +1,11 @@
 #include "terrain_edge_marker.h"
 void sub_08217DE0(struct TerrainMarkerSprite *, void *, u32);
 void sub_08217EEC(struct TerrainMarkerSprite *, void *, u32);
-void sub_08217EC4(struct TerrainMarkerSprite *, s32, s32);
+void Effect_SetOrigin(struct TerrainMarkerSprite *, s32, s32);
 void TerrainEdgeMarker_Add(union TerrainMarkerPosition *position, s32 direction, s32 kind,
                            s32 preserveHeight)
 {
-    struct TerrainMarkerManager *manager = sub_0821A2C4(0xFD22);
+    struct TerrainMarkerManager *manager = ResourceRegistry_GetResource(0xFD22);
     if (manager) {
         void *resource = AnimData_FindEntry(0x1C1A);
         struct TerrainMarkerSprite *marker = &manager->markers[manager->count];
@@ -14,7 +14,7 @@ void TerrainEdgeMarker_Add(union TerrainMarkerPosition *position, s32 direction,
             sub_08217EEC(marker, resource, 0x33);
         else
             sub_08217EEC(marker, resource, kind + 0x34);
-        sub_08217EC4(marker, -8, -8);
+        Effect_SetOrigin(marker, -8, -8);
         marker->position = *position;
         if (!preserveHeight) {
             s32 x = position->world.x >> 8;

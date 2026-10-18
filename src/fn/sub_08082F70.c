@@ -59,7 +59,7 @@ void SceneActorControl_CompleteScriptedResponse(struct SceneActorRegistryResetVi
     }
     actor->fieldAA = 0;
     {
-        void *callback = (void *)sub_0807FC90;
+        void *callback = (void *)SceneActorControl_OnIdle;
         u32 kind;
         kind = 16;
         actor->field2B2 = 1;

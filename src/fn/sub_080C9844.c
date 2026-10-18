@@ -1,5 +1,5 @@
 #include "global.h"
 
-void sub_080C9844(void)
+void Golem_OnUnusedState(void)
 {
 }

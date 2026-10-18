@@ -1,6 +1,6 @@
 #include "global.h"
 s32 Div(s32, s32);
-s32 sub_0811E6A8(u8 *s, s32 x)
+s32 Modifier_ScaleKindFourStat(u8 *s, s32 x)
 {
     s32 r;
     if (*(u8 *)(s + 0xc) == 0)

@@ -44,7 +44,7 @@ void sub_0800E974(struct StatusScreen *p)
         p->noise = sub_0800EF90;
     }
     if (p->timer == 48) {
-        u16 *tiles = sub_0800E3E0(0, 0, 0);
+        u16 *tiles = StatusScreen_GetTilePtr(0, 0, 0);
         int row = 0;
         for (; row < 15;) {
             int col = 0;

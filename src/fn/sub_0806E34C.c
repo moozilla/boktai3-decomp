@@ -1,13 +1,15 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_grid.h"
 #include "contact_actor.h"
+/* SceneGrid_TryRandomNearbyPosition: Samples one nearby grid position and writes its cell center only if the board entry matches the source terrain height */
+#define SceneGrid_TryRandomNearbyPosition sub_0806E34C
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 extern const s8 gUnk_08605BC8[];
 static inline u8 *Properties(s32 index)
 {
-    u8 *p = sub_0821D64C(index, 1);
+    u8 *p = TerrainModifiers_FindCellOverride(index, 1);
     if (p)
         return p + 4;
     else {

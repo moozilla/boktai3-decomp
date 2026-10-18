@@ -19,7 +19,7 @@ struct S {
     s16 y;
     s16 z;
 };
-s32 sub_08186C50(struct S *p)
+s32 Armor_IsNearSavedPosition(struct S *p)
 {
     s32 dx = p->x - p->a48;
     s32 dy = p->z - p->a4c;

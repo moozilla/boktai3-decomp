@@ -21,40 +21,40 @@ struct G {
     u8 b;
 };
 extern struct G *gUnk_020004B4;
-void sub_0810FD90(struct S *);
+void LinkScorePanel_HideSprites(struct S *);
 void Bg_ClearTilemap(s32);
 void Bg_SetLayerMap(s32, u32, s32);
 void BgGfx_LoadTilemapSimple(s32, s32, s32, s32, s32);
-void sub_0803381C(u32);
+void TextWindow_Clear(u32);
 void sub_080339B8(u32, s32, s32, s32, s32);
 void TextWindow_SetScript(u32, u32);
 void TextWindow_Refresh(u32, u32);
-void sub_080337FC(u32);
-void sub_08109358(void);
-void sub_0811024C(void);
+void TextWindow_StartPlayback(u32);
+void Registry1745_RequestHandshakeStart(void);
+void SaveMenu_UpdateSaveDelay(void);
 static inline void set(struct S *s, void *fp, u8 st)
 {
     s->fp = fp;
     s->c24 = 1;
     s->st = st;
 }
-void sub_08110188(struct S *s)
+void LinkScorePanel_OnWaitSessionReady(struct S *s)
 {
     struct G *g;
     s32 v;
     if (s->c24 != 0) {
         u8 z;
-        sub_0810FD90(s);
+        LinkScorePanel_HideSprites(s);
         Bg_ClearTilemap(0);
         Bg_ClearTilemap(3);
         Bg_SetLayerMap(0, s->g, 3);
         BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
-        sub_0803381C(s->h);
+        TextWindow_Clear(s->h);
         sub_080339B8(s->h, 1, 6, 0x1c, 6);
         TextWindow_SetScript(s->h, s->a);
         TextWindow_Refresh(s->h, 8);
-        sub_080337FC(s->h);
-        sub_08109358();
+        TextWindow_StartPlayback(s->h);
+        Registry1745_RequestHandshakeStart();
         s->c24 = 0;
     }
     g = gUnk_020004B4;
@@ -62,5 +62,5 @@ void sub_08110188(struct S *s)
     if (g != 0)
         v = g->b;
     if (v == 0x19)
-        set(s, sub_0811024C, 4);
+        set(s, SaveMenu_UpdateSaveDelay, 4);
 }

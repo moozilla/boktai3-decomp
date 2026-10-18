@@ -19,13 +19,13 @@ struct S {
     s16 y;
     s16 z;
 };
-void sub_081850F4(struct S *, s32);
+void ActorController_StartTurn(struct S *, s32);
 void Trigger_ConsumePending(void *, s32);
-void sub_08186AE4(struct S *p)
+void Armor_UpdateTurnTriggerCompletion(struct S *p)
 {
     switch (p->b3d) {
         case 0:
-            sub_081850F4(p, p->b3a);
+            ActorController_StartTurn(p, p->b3a);
             p->b3d++;
             break;
         case 1:

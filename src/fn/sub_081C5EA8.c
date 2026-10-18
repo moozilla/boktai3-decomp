@@ -1,6 +1,6 @@
 #include "global.h"
 
-s32 sub_081C5EA8(s32 n)
+s32 ChallengeMenu_GetRankKeyframe(s32 n)
 {
     s32 r;
     switch (n) {

@@ -3,7 +3,7 @@ struct S {
     u8 f[0xe];
     u16 h;
 };
-u32 sub_081CEDD4(struct S *p, s32 b, s32 c)
+u32 SceneNpc_ApplyDeceleratingBlink(struct S *p, s32 b, s32 c)
 {
     s32 n;
     if (b > (c * (c + 1)) >> 1)

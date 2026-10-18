@@ -1,5 +1,5 @@
 #include "global.h"
-u8 *sub_08019B30(u8 *p)
+u8 *SpritePool_FindFreeSlot(u8 *p)
 {
     u8 *e = p + 0x18;
     s32 i = 0;

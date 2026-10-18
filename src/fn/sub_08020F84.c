@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08018D84(void *);
+void OrbitingParticles_Stop(void *);
 void *OrbitingParticles_Create(void *, int, int, int, int);
 void SceneCommands_CreateEffect(u8 *p, void *unused, s16 *message)
 {
@@ -15,7 +15,7 @@ void SceneCommands_CreateEffect(u8 *p, void *unused, s16 *message)
     c = message[9];
     d = message[10];
     if (*(void **)(p + 0x58)) {
-        sub_08018D84(*(void **)(p + 0x58));
+        OrbitingParticles_Stop(*(void **)(p + 0x58));
         *(void **)(p + 0x58) = 0;
     }
     *(void **)(p + 0x58) = OrbitingParticles_Create(&v, a, b, c, d);

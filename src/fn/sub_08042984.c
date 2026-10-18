@@ -6,8 +6,8 @@ void Shadow_Initialize(void *, void *, s32);
 void ContactActor_ApplyHealthContact(struct ContactCollider *, struct ContactCollider *,
                                      struct ContactActor *);
 void ContactActor_ApplyResourceContact(void *, struct ContactCollider *, struct ContactActor *);
-void sub_0821FF7C(void *, u32, u32, u32);
-void sub_0821FF58(void *, u32, u32, u32, u32, u32);
+void Collider_SetBodyProperties(void *, u32, u32, u32);
+void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 void ContactActor_InitializeSlot(struct ContactActorPool *pool, struct ContactActor *slot)
 {
     u32 zero;
@@ -44,7 +44,7 @@ void ContactActor_InitializeSlot(struct ContactActorPool *pool, struct ContactAc
     position = &slot->position;
     Collider_SetPosition(collider, (void *)position, 0);
     Collider_SetCallback(collider, ContactActor_ApplyHealthContact, slot);
-    sub_0821FF7C(collider, pool->healthColliderId, 0x82, 1);
+    Collider_SetBodyProperties(collider, pool->healthColliderId, 0x82, 1);
     Collider_Refresh(collider);
     collider = &slot->resourceCollider;
     ((struct ContactPosition *)&bounds)->x = 32;
@@ -56,7 +56,7 @@ void ContactActor_InitializeSlot(struct ContactActorPool *pool, struct ContactAc
     Collider_Init(collider, 0, 0x2001, 0, 16, &bounds, &offset);
     Collider_SetPosition(collider, (void *)position, 0);
     Collider_SetCallback(collider, ContactActor_ApplyResourceContact, slot);
-    sub_0821FF58(collider, pool->resourceColliderId, 30, 0x02080000, 0x20000, 30);
+    Collider_SetAttackProperties(collider, pool->resourceColliderId, 30, 0x02080000, 0x20000, 30);
 }
 
 #else

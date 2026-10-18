@@ -4,7 +4,7 @@ struct Q {
     u32 b;
     u32 fl;
 };
-void sub_08165ACC(u8 *p)
+void PauseMenu_HideAllSprites(u8 *p)
 {
     u32 one = 1;
     s32 i;

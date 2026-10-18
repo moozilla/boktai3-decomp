@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0814F828(u8 *p)
+void ScriptActor_EnableCompletionScript(u8 *p)
 {
     p[0x59e] = 1;
 }

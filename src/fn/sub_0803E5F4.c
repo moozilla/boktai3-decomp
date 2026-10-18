@@ -3,9 +3,9 @@
 void ScenePool_UpdateSpeedPulse(struct ScenePoolActor *, struct ScenePoolEntry *,
                                 const struct ScenePoolSpeedBounds *);
 extern const struct ScenePoolSpeedBounds gUnk_0860588C[];
-void sub_08116C4C(s32, struct ScenePoolVec32 *);
-s32 sub_08116C20(s32);
-s32 sub_0811AE68(struct ScenePoolVec32 *);
+void Player_GetWorldPosition(s32, struct ScenePoolVec32 *);
+s32 Player_GetHorizontalVelocity(s32);
+s32 Terrain_GetHeightAtFixedPosition(struct ScenePoolVec32 *);
 s32 SceneArc_Create(struct ScenePoolVec32 *, struct ScenePoolVec32 *, s32, s32, s32);
 static inline u32 *Prepare(struct ScenePoolEntry *entry, u32 state)
 {
@@ -71,15 +71,15 @@ s32 ScenePool_StateLaunchArc(void *manager, struct ScenePoolActor *actor,
     if (fire) {
         s32 speed;
     launch:
-        sub_08116C4C(entry->motionPhase, &path);
+        Player_GetWorldPosition(entry->motionPhase, &path);
         from = entry->position;
         from.y += actor->restrictionMetric;
         to = entry->position;
-        speed = sub_08116C20(entry->motionPhase);
+        speed = Player_GetHorizontalVelocity(entry->motionPhase);
         if (speed <= 0xfff)
             speed = 0x1000;
         to.x = path.x + speed * 90;
-        to.y = sub_0811AE68(&to);
+        to.y = Terrain_GetHeightAtFixedPosition(&to);
         to.z = path.z;
         SceneArc_Create(&from, &to, 0x40, 90, 0x40);
     }

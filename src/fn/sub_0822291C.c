@@ -1,6 +1,6 @@
 #include "global.h"
 extern s32 gUnk_03005324, gUnk_0300531C;
-void sub_0822291C(void)
+void Serial_ResetMultiplayer(void)
 {
     gUnk_03005324 = 0;
     gUnk_0300531C = -1;

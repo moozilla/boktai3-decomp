@@ -1,18 +1,18 @@
 #include "global.h"
 
-void sub_0801A8CC(u32);
-void sub_0801A67C(u32);
-void sub_0801A69C(u32);
-void sub_0801A6BC(u32);
-void sub_0801A658(u32);
-void sub_08033590(void);
-u32 sub_0801B2F8(u32 p)
+void SelectionMenu_RemoveIconGrid(u32);
+void SelectionMenu_RemoveCursors(u32);
+void SelectionMenu_RemoveMarkerAnim(u32);
+void SelectionMenu_RemoveHighlight(u32);
+void SelectionMenu_RemovePanel(u32);
+void ScrollingDialogue_RequestHide(void);
+u32 SelectionMenu_Destroy(u32 p)
 {
-    sub_0801A8CC(p);
-    sub_0801A67C(p);
-    sub_0801A69C(p);
-    sub_0801A6BC(p);
-    sub_0801A658(p);
-    sub_08033590();
+    SelectionMenu_RemoveIconGrid(p);
+    SelectionMenu_RemoveCursors(p);
+    SelectionMenu_RemoveMarkerAnim(p);
+    SelectionMenu_RemoveHighlight(p);
+    SelectionMenu_RemovePanel(p);
+    ScrollingDialogue_RequestHide();
     return 0;
 }

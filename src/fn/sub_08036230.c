@@ -42,13 +42,13 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->pending = 1;
 }
 void Bg_ClearTilemap(int);
-void sub_08224DE8(void *);
-void sub_0803614C(u8);
-void sub_08036218(void);
-void sub_08224BB8(void (*)(u8));
-void sub_08224BA0(void (*)(void));
+void Wireless_InitPacketQueue(void *);
+void Wireless_OnChildTransferEvent(u8);
+void Wireless_OnChildTransferReceiveRequest(void);
+void RfuManager_SetEventCallback(void (*)(u8));
+void RfuManager_SetMscCallback(void (*)(void));
 void Script_Call(void *, int);
-void sub_08036230(struct Engine *p)
+void Wireless_BeginChildTransfer(struct Engine *p)
 {
     int index;
     u16 *ids;
@@ -81,12 +81,12 @@ void sub_08036230(struct Engine *p)
     }
     zero = 0;
     p->flag1f = index;
-    sub_08224DE8(p->message);
+    Wireless_InitPacketQueue(p->message);
     Memory_Clear((u8 *)p + 0xB8, 12);
     buffer = (u8 *)p + 0xC4;
     Memory_Clear(buffer, 12);
-    sub_08224BB8(sub_0803614C);
-    sub_08224BA0(sub_08036218);
+    RfuManager_SetEventCallback(Wireless_OnChildTransferEvent);
+    RfuManager_SetMscCallback(Wireless_OnChildTransferReceiveRequest);
     rfu_setRecvBuffer(32, p->index, buffer, 12);
     p->phase = 2;
     setOperation(p, 24, zero);

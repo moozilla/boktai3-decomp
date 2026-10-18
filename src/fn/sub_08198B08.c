@@ -5,7 +5,7 @@ void sub_0824923C(u8 *, u32);
 s32 Collider_Refresh(u8 *);
 void Collider_SetPosition(u8 *, u8 *, u32);
 
-void sub_08198B08(u8 *p)
+void SceneEffect_UpdateActor(u8 *p)
 {
     const u32 *tbl = (const u32 *)gUnk_0824F67C;
     sub_0824923C(p, tbl[*(p + 0x157)]);

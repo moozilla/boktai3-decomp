@@ -1,4 +1,6 @@
 #include "scene_actor_restoration.h"
+/* SceneActorReaction_RestoreAndClearRestart: Clears the tentative restart flag and restores saved actor state and control once the delay threshold is reached */
+#define SceneActorReaction_RestoreAndClearRestart sub_0807FE80
 #define SceneActorReaction_RestoreAndClearRestart sub_0807FE80
 void SceneActorReaction_RestoreAndClearRestart(struct SceneActorRegistryActor *actor, s32 frame)
 {
@@ -46,6 +48,6 @@ void SceneActorReaction_RestoreAndClearRestart(struct SceneActorRegistryActor *a
         }
         owner->counter2AC = zero;
         owner->field2B1 = one;
-        sub_0812E084((u8 *)owner + 0x460, gUnk_0824E128, 0x8B);
+        SceneActorReaction_ResetResponseState((u8 *)owner + 0x460, gUnk_0824E128, 0x8B);
     }
 }

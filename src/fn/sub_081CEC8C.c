@@ -12,7 +12,7 @@ struct S {
     u8 d[1];
 };
 void Trigger_ConsumePending(void *, s32);
-void sub_081CEC8C(u32 a, struct S *p)
+void SceneNpc_UpdateAnimation27(u32 a, struct S *p)
 {
     if (p->b8 != 0) {
         p->b8 = 0;

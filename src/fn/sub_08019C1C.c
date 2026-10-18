@@ -2,7 +2,7 @@
 extern u32 gUnk_020000B0;
 u32 ScriptProc_Start(u32, u32);
 void Anim_SetSequence(u8 *, u32, u32, u32, u32);
-void sub_08019C1C(u8 *p, u32 a, u32 b, u32 c, u32 d)
+void SpritePool_StartAnimation(u8 *p, u32 a, u32 b, u32 c, u32 d)
 {
     if (gUnk_020000B0 != 0) {
         u32 r = ScriptProc_Start(0x922e, (u16)a);

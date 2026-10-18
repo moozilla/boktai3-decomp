@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0811BCBC(u8 *s)
+void Actor_ClampMovementSpeed(u8 *s)
 {
     s32 *p = (s32 *)(s + 0x5dc);
     if (*p > 0xc8000)

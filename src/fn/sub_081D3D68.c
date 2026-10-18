@@ -4,7 +4,7 @@ struct S {
     u32 a;
 };
 void sub_081D48D8(void *, u32);
-void sub_081D3D68(struct S *p)
+void SceneDisplay_InitCurrentAnimation(struct S *p)
 {
     sub_081D48D8(p, p->a);
 }

@@ -10,7 +10,7 @@ struct P {
     u16 v;
 };
 void sub_080F1C48(void);
-s32 sub_080F1C08(struct P *p)
+s32 Ivy_InitColorTransition(struct P *p)
 {
     u16 *s = &p->v;
     p->a = (*s >> 5) & 0x1f;

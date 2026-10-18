@@ -6,13 +6,13 @@ struct Controller {
     s8 current[4], target[4];
 };
 extern struct Controller *gUnk_02000070;
-void sub_0821910C(void);
+void Mosaic_ResetParameters(void);
 void PaletteLevels_Reset(void)
 {
     struct Controller *p = gUnk_02000070;
     int i;
     if (p) {
-        sub_0821910C();
+        Mosaic_ResetParameters();
         p->state = 0;
         p->first = 0;
         p->count = 0;

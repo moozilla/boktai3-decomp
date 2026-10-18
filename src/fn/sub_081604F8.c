@@ -11,7 +11,7 @@ struct Q {
 void AnimData_Load(void *, s32);
 void Sprite_Init(void *, void *, s32);
 
-s32 sub_081604F8(u8 *p, struct Q *q, u32 a, u32 b)
+s32 ActorDebris_Init(u8 *p, struct Q *q, u32 a, u32 b)
 {
     u8 *s18 = p + 0x18;
     u8 *s34 = p + 0x34;

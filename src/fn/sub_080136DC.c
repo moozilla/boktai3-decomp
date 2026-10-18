@@ -1,6 +1,6 @@
 #include "global.h"
 
-s32 sub_080136DC(u8 *head, u8 *n)
+s32 ScaledShadowManager_RemoveShadow(u8 *head, u8 *n)
 {
     u8 *prev = *(u8 **)(n + 0x64);
     u8 *next = *(u8 **)(n + 0x68);

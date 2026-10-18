@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_081A53E8(s16 *);
+void Debug_NudgeScreenPositionWithB(s16 *);
 s32 __divsi3(s32, s32);
 static inline s32 shift(s32 x, s32 n)
 {
@@ -10,7 +10,7 @@ static inline s32 shift(s32 x, s32 n)
         r = -((-x) >> n);
     return r;
 }
-void sub_081A54F0(s16 *p)
+void Debug_NudgeWorldPositionWithB(s16 *p)
 {
     // one variable per value, not a and b reused for both passes
     // (found by tools/autosolve.py: perm_split_var)
@@ -28,7 +28,7 @@ void sub_081A54F0(s16 *p)
     q[1] = a - b1;
     q[2] = a + b1;
     q2 = v;
-    sub_081A53E8(v);
+    Debug_NudgeScreenPositionWithB(v);
     a2 = v[0];
     b = q2[1];
     c = __divsi3((a2 + b) << 5, 3) + y;

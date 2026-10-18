@@ -30,7 +30,7 @@ static inline int clamp(int value)
         value = 0;
     return value;
 }
-void sub_0803B1E4(struct ResultMenu *p)
+void WirelessResultPanel_UpdatePointsTransfer(struct ResultMenu *p)
 {
     struct Blob *desc;
     if (p->entered) {

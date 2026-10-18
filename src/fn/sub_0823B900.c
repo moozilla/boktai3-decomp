@@ -6,7 +6,7 @@ static inline u8 chk(u32 m)
         return 1;
     return 0;
 }
-u32 sub_0823B900(u32 x)
+u32 Player_IsFlaggedWithGlobalModifier08(u32 x)
 {
     if (x & 0x80) {
         if (chk(8))

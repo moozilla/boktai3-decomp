@@ -13,7 +13,7 @@ struct S {
     struct T *t;
 };
 
-void sub_080D80E8(struct S *s)
+void Mummy_UpdateMovementTimers(struct S *s)
 {
     struct T *t = s->t;
     u32 m = 0x40;

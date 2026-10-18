@@ -107,7 +107,7 @@ static inline int turn(int target, int current)
     }
     return angle + delta;
 }
-void sub_080280CC(ActorAnimation *p, int tick)
+void SceneActors_UpdateSwarmAttack(ActorAnimation *p, int tick)
 {
     ActorAnimation *p2 = p;
     u8 *position = (u8 *)p + 0x48;

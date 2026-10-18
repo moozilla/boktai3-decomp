@@ -1,4 +1,6 @@
 #include "global.h"
+/* Math_ApproachShortArrayByQuarter: Updates each signed halfword toward its target by one quarter with a minimum unit step */
+#define Math_ApproachShortArrayByQuarter sub_0819B2E4
 
 static inline s32 Shift(s32 x)
 {

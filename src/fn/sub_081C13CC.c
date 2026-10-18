@@ -5,7 +5,7 @@ struct S {
 };
 void *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, void *);
-void sub_081C13CC(struct S *p)
+void RecordDisplay_LoadBackground(struct S *p)
 {
     u32 v[1];
     void *r;

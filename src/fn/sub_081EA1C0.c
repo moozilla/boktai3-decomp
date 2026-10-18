@@ -1,7 +1,7 @@
 #include "global.h"
 // Provisional name: Actor_ConfigureFromScript
 extern u8 *gUnk_020003C8;
-u8 *sub_081EA730(s32, s32);
+u8 *Actor_EnsureController(s32, s32);
 struct Obj {
     u32 flags;
     u8 pad[3];
@@ -91,7 +91,7 @@ void Actor_ConfigureFromScript(void)
     struct G *g = (struct G *)gUnk_020003C8;
     struct Obj *obj;
     if (!g)
-        g = (struct G *)sub_081EA730(0xbb34, 0);
+        g = (struct G *)Actor_EnsureController(0xbb34, 0);
     obj = (struct Obj *)((u8 *)g + 0xddc);
     AnimData_SelectPaletteBank((u8 *)g + 0xe08, 343);
     g->obj.priority = 0;

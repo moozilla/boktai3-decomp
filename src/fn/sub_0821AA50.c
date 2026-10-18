@@ -1,7 +1,7 @@
 #include "global.h"
 extern u8 *gUnk_02000610;
 u8 *Script_DecodeOperand(u8 *, s32 *, s32 *);
-s32 sub_0821AA50(u8 *p, s16 *destination)
+s32 Script_ReadVector16(u8 *p, s16 *destination)
 {
     s32 type, value;
     s16 *vector;

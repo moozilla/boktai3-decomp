@@ -2,7 +2,7 @@
 
 void sub_0813B8A4(u8 *);
 
-void sub_0814F8D4(u8 *p)
+void PlayerCue_UpdatePeriodicParticles(u8 *p)
 {
     u8 *c;
     s32 v;

@@ -1,9 +1,9 @@
 #include "global.h"
 #include "engine.h"
 #include "game_state.h"
-void *sub_0817923C(u32, u32);
-void *sub_081791E0(u32, u32);
-void *sub_08178B3C(u32, u32);
+void *Hud_CreateAlternateLayout(u32, u32);
+void *Hud_CreateStandardLayout(u32, u32);
+void *Hud_CreateEngineFlagVariant(u32, u32);
 static inline u8 testFlag(u32 mask, u32 *flags)
 {
     if (*flags & mask)
@@ -17,10 +17,10 @@ void *Hud_Create(u32 a, u32 b)
 {
     void *p;
     if (testFlag(0x80, (u32 *)((u8 *)gUnk_02000710 + 0x868)))
-        p = sub_0817923C(a, b);
+        p = Hud_CreateAlternateLayout(a, b);
     else if (!(gUnk_030053F4 & 0x800))
-        p = sub_081791E0(a, b);
+        p = Hud_CreateStandardLayout(a, b);
     else
-        p = sub_08178B3C(a, b);
+        p = Hud_CreateEngineFlagVariant(a, b);
     return p;
 }

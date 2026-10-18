@@ -9,7 +9,7 @@ struct S2B94 {
     u8 f2[0xD53 - 0xCF4];
     s8 b;
 };
-void sub_080F2B94(struct S2B94 *s)
+void Ivy_WaitForSecondaryActionCompletion(struct S2B94 *s)
 {
     u32 v = s->v;
     if (v != 0) {

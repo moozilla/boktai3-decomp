@@ -1,5 +1,5 @@
 #include "global.h"
-u32 sub_08034258(u8 *p)
+u32 WirelessController_ConsumeAdvanceRequest(u8 *p)
 {
     u32 r;
     if (p[0x1c] == 0) {

@@ -10,7 +10,7 @@ struct S {
 extern struct S *gUnk_020001D8;
 s32 Script_GetKeywordValue(s32, s32);
 s32 Div(s32, s32);
-void sub_08111BC4(void)
+void PaletteFade_StartScrollFromScript(void)
 {
     struct S *g = gUnk_020001D8;
     if (g != 0) {

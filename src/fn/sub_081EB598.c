@@ -1,8 +1,8 @@
 #include "global.h"
-void sub_081EAA20(void);
+void TimeDisplay_RemoveAnimatedObjects(void);
 void Bg_ClearTilemap(s32);
-void sub_081EB598(void)
+void Params3D0_DestroyDisplay(void)
 {
-    sub_081EAA20();
+    TimeDisplay_RemoveAnimatedObjects();
     Bg_ClearTilemap(2);
 }

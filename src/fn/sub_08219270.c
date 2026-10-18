@@ -1,6 +1,6 @@
 #include "global.h"
 
-u8 *sub_08219270(void)
+u8 *ScanlineEffect_GetBuffer(void)
 {
     return (u8 *)0x02036C00;
 }

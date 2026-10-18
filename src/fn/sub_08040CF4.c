@@ -7,7 +7,7 @@ void ModifierMenu_DrawSecondSourceStats(struct ModifierMenu *);
 void ModifierMenu_DrawThirdSourceStats(struct ModifierMenu *);
 void ModifierMenu_DrawFourthSourceStats(struct ModifierMenu *);
 u32 Modifier_TestSelection(struct ModifierSelection *, s32);
-void sub_08040A68(struct ModifierDisplayObject *, u32);
+void ModifierMenu_PositionSelectionMarker(struct ModifierDisplayObject *, u32);
 s32 Mod(s32, s32);
 void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
 {
@@ -87,11 +87,11 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
                     object->flags |= 1;
                 else {
                     object->flags &= ~1;
-                    sub_08040A68(object, current->sourceIds[*category]);
+                    ModifierMenu_PositionSelectionMarker(object, current->sourceIds[*category]);
                 }
             } else {
                 object->flags &= ~1;
-                sub_08040A68(object, current->sourceIds[*category]);
+                ModifierMenu_PositionSelectionMarker(object, current->sourceIds[*category]);
             }
             break;
         }
@@ -108,7 +108,7 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
             for (id = start; id < end; id++) {
                 if (Modifier_TestSelection(current, id)) {
                     object->flags &= ~1;
-                    sub_08040A68(object, Mod(id, 6));
+                    ModifierMenu_PositionSelectionMarker(object, Mod(id, 6));
                     object++;
                 }
             }
@@ -126,7 +126,7 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
             end = start + 6;
             if (current->secondaryId >= start && current->secondaryId < end) {
                 object->flags &= ~1;
-                sub_08040A68(object, Mod(current->secondaryId, 6));
+                ModifierMenu_PositionSelectionMarker(object, Mod(current->secondaryId, 6));
             }
             break;
         }

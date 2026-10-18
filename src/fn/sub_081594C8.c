@@ -7,7 +7,7 @@ struct P081594C8 {
     u16 f424;
 };
 
-void sub_081594C8(struct P081594C8 *p, s32 d)
+void Player_SubtractLifeNonlethal(struct P081594C8 *p, s32 d)
 {
     if (p->f1c == 1) {
         if (p->f424 < d + 1)

@@ -6,7 +6,7 @@ struct S {
     u8 a, b, c, d;
 };
 
-void sub_08223580(u8 a)
+void RfuManager_SendData(u8 a)
 {
     if (**(u8 **)0x03006A80 == 0) {
         u8 t = ((struct S *)0x03005390)->c;

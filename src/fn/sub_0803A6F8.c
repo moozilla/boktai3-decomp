@@ -12,7 +12,7 @@ struct Owner {
     struct Item items[16];
 };
 extern struct Owner *gUnk_02000100;
-void sub_0803A6F8(void)
+void WirelessGameItems_StartOutgoingItems(void)
 {
     struct Owner *p = gUnk_02000100;
     if (p) {

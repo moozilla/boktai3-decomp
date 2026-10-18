@@ -13,7 +13,7 @@ struct Vanargand {
     u16 field526;
 };
 extern struct Vanargand *gUnk_02000250;
-void sub_081A68CC(void *);
+void Vanargand_StopActionSequence(void *);
 /* Registry routine 4D12: resets state fields of the Vanargand task
    (tentative; no options). */
 /* Shared state change of the boss tasks (also used by 081803D8). */
@@ -34,6 +34,6 @@ void Vanargand_ResetFromScript(void)
     p->field526 = 0;
     setState(p, 14);
     mode = 16;
-    sub_081A68CC(p->block21C);
+    Vanargand_StopActionSequence(p->block21C);
     p->fieldAA = mode;
 }

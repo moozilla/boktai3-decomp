@@ -1,9 +1,9 @@
 #include "global.h"
-void sub_08112E70(u8 *);
-void sub_08112E8C(u8 *p)
+void SceneDebris_ReleaseVisual(u8 *);
+void SceneDebris_OnMotionEnd(u8 *p)
 {
     if (p[0x1a]) {
-        sub_08112E70(p);
+        SceneDebris_ReleaseVisual(p);
         p[0x19] = 0;
         p[0x1a] = 0;
     }

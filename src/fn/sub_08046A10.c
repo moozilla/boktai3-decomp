@@ -1,5 +1,5 @@
 #include "orbit_contact_actor.h"
-void sub_0821FF58(void *, u32, u32, u32, u32, u32);
+void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 s32 OrbitContactActor_Initialize(struct OrbitContactActor *actor,
                                  const struct ContactPosition *center, u32 resourceValue)
 {
@@ -24,7 +24,7 @@ s32 OrbitContactActor_Initialize(struct OrbitContactActor *actor,
         collider = &actor->collider;
         Collider_Init(collider, 0, 0x2001, 0, 16, &bounds, &offset);
         Collider_SetCallback(collider, NULL, actor);
-        sub_0821FF58(collider, resourceValue, 50, 0, 0x60000, 30);
+        Collider_SetAttackProperties(collider, resourceValue, 50, 0, 0x60000, 30);
         result = 0;
     } else {
         result = -1;

@@ -40,7 +40,7 @@ struct ModeState {
     u8 mode;
 };
 extern struct ModeState *gUnk_03006A80;
-void sub_080340AC(struct Engine *p)
+void WirelessController_ResetSession(struct Engine *p)
 {
     int zero = 0;
     int i;

@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_081E4188(u8 *p)
+void Actor_RestoreSavedAnimationPlayback(u8 *p)
 {
     u32 a = *(u8 *)(p + 0xF86);
     u32 b;

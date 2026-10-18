@@ -5,14 +5,14 @@ struct S {
     u8 f1[2];
     u8 b40;
 };
-void sub_081850B4(struct S *, s32);
+void ActorController_ForceAction(struct S *, s32);
 s32 sub_08184FE8(struct S *, s32);
 void sub_08185BF0(struct S *);
-void sub_08185D7C(struct S *p)
+void Armor_UpdateDeathSequence(struct S *p)
 {
     switch (p->b3d) {
         case 0:
-            sub_081850B4(p, 4);
+            ActorController_ForceAction(p, 4);
             p->b3d = 1;
             break;
         case 1:

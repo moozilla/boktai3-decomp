@@ -2,7 +2,7 @@
 
 u32 Sprite_Remove(u8 *);
 
-void sub_0818EF58(u8 *p)
+void Nidhoggr_DestroySpriteEffect(u8 *p)
 {
     Sprite_Remove(p + 0x24);
 }

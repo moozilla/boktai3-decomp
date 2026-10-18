@@ -2,7 +2,7 @@
 
 extern u32 gUnk_02000140;
 
-void sub_08122DE4(void)
+void SceneScheduledEffect_ResetSingleton(void)
 {
     gUnk_02000140 = 0;
 }

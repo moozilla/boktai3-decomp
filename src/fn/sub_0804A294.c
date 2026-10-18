@@ -1,6 +1,6 @@
 #include "tether_actor.h"
 extern struct TetherActor *gUnk_02000488;
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void TetherActor_SetTransformFromScript(void)
 {
     struct TetherActor *actor = gUnk_02000488;
@@ -22,7 +22,7 @@ void TetherActor_SetTransformFromScript(void)
                 u32 row = gUnk_030052F4->rows[z];
                 cell = row + x;
             }
-            properties = sub_0821D64C(cell, 1);
+            properties = TerrainModifiers_FindCellOverride(cell, 1);
             if (properties)
                 properties += 4;
             else {

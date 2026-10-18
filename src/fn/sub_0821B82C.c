@@ -9,7 +9,7 @@ struct VM {
 extern struct VM gUnk_02000610;
 u8 *Script_GetPc(void);
 u32 Script_GetValue(void);
-s32 sub_0821B82C(void)
+s32 Script_ExecuteReturn(void)
 {
     u8 *p = Script_GetPc();
     if (p)

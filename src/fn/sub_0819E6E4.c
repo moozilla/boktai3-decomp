@@ -9,7 +9,7 @@ struct A {
 };
 void sub_0824923C(void *, u32);
 
-void sub_0819E6E4(struct A *p)
+void Hresvelgr_UpdateBehaviorMode(struct A *p)
 {
     p->a = 0;
     sub_0824923C(p, gUnk_08611E10[p->i]);

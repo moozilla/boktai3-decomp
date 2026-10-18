@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_02000580;
-void sub_0807FC90(void);
+void SceneActorControl_OnIdle(void);
 struct S {
     u8 pad[0x9C];
     s16 z;
@@ -37,7 +37,7 @@ static inline u8 TestExtra(struct S *s, u8 **out)
         return 1;
     return 0;
 }
-void sub_080A090C(struct S *s)
+void Crow_BeginReaction(struct S *s)
 {
     u32 mask = 0x100;
     u8 *extra;
@@ -46,7 +46,7 @@ void sub_080A090C(struct S *s)
         return;
     zero = TestExtra(s, &extra);
     if (zero == 0) {
-        void (*fn)(void) = sub_0807FC90;
+        void (*fn)(void) = SceneActorControl_OnIdle;
         u8 code = 0x10;
         u8 one;
         u8 zero8;

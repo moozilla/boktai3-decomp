@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_0200070C;
-u8 *sub_0821B6B0(void)
+u8 *GameState_GetBackupStateBase(void)
 {
     return gUnk_0200070C;
 }

@@ -8,7 +8,7 @@ struct A {
     u8 p1[0x1c - 0x1c];
     struct E e[3];
 };
-struct E *sub_0820112C(struct A *a, s32 *out)
+struct E *PlayerClone_FindFreeSlot(struct A *a, s32 *out)
 {
     struct E *e = a->e;
     s32 i = 0;

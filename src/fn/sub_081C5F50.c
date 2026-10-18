@@ -1,15 +1,15 @@
 #include "global.h"
 
-void sub_082279A8(u32, u32, u32, u32, u32, u32, u32);
-void sub_081C5EF0(u8 *, void (*)(void));
-void sub_08033468(void);
-void sub_080335B4(void);
-void sub_081C616C(void);
+void ScreenTransition_SendCommand(u32, u32, u32, u32, u32, u32, u32);
+void ChallengeResult_SetState(u8 *, void (*)(void));
+void ScrollingDialogue_ClearScript(void);
+void ScrollingDialogue_HideImmediately(void);
+void TimeResult_UpdateFadeOut(void);
 
-void sub_081C5F50(u8 *p)
+void TimeResult_BeginFadeOut(u8 *p)
 {
-    sub_08033468();
-    sub_080335B4();
-    sub_082279A8(1, 5, 4, 4, 4, 0xFFFF, 0);
-    sub_081C5EF0(p, sub_081C616C);
+    ScrollingDialogue_ClearScript();
+    ScrollingDialogue_HideImmediately();
+    ScreenTransition_SendCommand(1, 5, 4, 4, 4, 0xFFFF, 0);
+    ChallengeResult_SetState(p, TimeResult_UpdateFadeOut);
 }

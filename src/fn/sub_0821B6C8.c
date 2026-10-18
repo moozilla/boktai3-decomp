@@ -1,6 +1,6 @@
 #include "global.h"
 s32 Div(s32, s32);
-void sub_0821B6C8(u8 *output, u8 *input)
+void Script_ConvertTextToShiftJis(u8 *output, u8 *input)
 {
     u8 *src = input;
     u8 *dest = output;

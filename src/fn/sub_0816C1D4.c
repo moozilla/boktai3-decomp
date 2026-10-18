@@ -16,17 +16,17 @@ struct S1D4 {
 void Bg_SetLayerMap(u32, u32, u32);
 void sub_0816BA90(struct S1D4 *);
 void sub_0816BC54(struct S1D4 *);
-void sub_0816BB10(struct S1D4 *);
-void sub_0816C1A4(struct S1D4 *);
-void sub_0816C1D4(struct S1D4 *s)
+void MapScreen_HideDirectionalIndicators(struct S1D4 *);
+void MapScreen_ClearMapLayer(struct S1D4 *);
+void MapScreen_RefreshAreaDisplay(struct S1D4 *s)
 {
     if (s->state == 1) {
         Bg_SetLayerMap(1, s->arg, s->entries[s->index].value);
         sub_0816BA90(s);
         sub_0816BC54(s);
     } else {
-        sub_0816C1A4(s);
-        sub_0816BB10(s);
+        MapScreen_ClearMapLayer(s);
+        MapScreen_HideDirectionalIndicators(s);
         sub_0816BC54(s);
     }
 }

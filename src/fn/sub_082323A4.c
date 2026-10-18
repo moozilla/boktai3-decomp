@@ -8,7 +8,7 @@ struct L {
     u8 p[0x1c];
     struct N *head;
 };
-u32 sub_082323A4(struct L *l, struct N *n)
+u32 TimedHazard_LinkInstance(struct L *l, struct N *n)
 {
     struct N *h;
     n->prev = 0;

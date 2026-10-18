@@ -14,7 +14,7 @@ struct P {
 
 void sub_08217EEC(struct P *, void *, u32);
 
-void sub_08236294(struct P *p)
+void RadialBurstEffect_UpdateParticle(struct P *p)
 {
     void *unused;
     u32 n = p->frame + 1;

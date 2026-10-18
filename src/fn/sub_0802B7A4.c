@@ -9,7 +9,7 @@ struct A {
 };
 void sub_0824923C(void *, u32);
 
-void sub_0802B7A4(struct A *p)
+void GridAttack_UpdateActionController(struct A *p)
 {
     p->a = 0;
     sub_0824923C(p, gUnk_08605040[p->i]);

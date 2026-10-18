@@ -5,7 +5,7 @@ struct S {
     u8 a[0x22];
     u16 h2a;
 };
-u32 sub_0820D23C(struct S *p)
+u32 EnemyParticle_UpdateLifetime(struct S *p)
 {
     u32 m = 2;
     p->w4 |= m;

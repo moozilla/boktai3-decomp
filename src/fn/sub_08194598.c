@@ -2,7 +2,7 @@
 
 u32 Sprite_Remove(u8 *);
 
-void sub_08194598(u8 *p)
+void Nidhoggr_DestroySuspendedObjectSprite(u8 *p)
 {
     Sprite_Remove(p + 0x713C);
 }

@@ -9,8 +9,8 @@ struct S {
 };
 extern u32 gUnk_02000264;
 void Sprite_Remove(void *);
-void sub_08020D08(void *);
-void sub_081C2D34(struct S *p)
+void SceneMessages_UnregisterReceiver(void *);
+void SparkleEmitter_OnTaskDestroy(struct S *p)
 {
     s32 i;
     struct E *e = p->e;
@@ -20,6 +20,6 @@ void sub_081C2D34(struct S *p)
         e++;
     }
     z = 0;
-    sub_08020D08((u8 *)p + 0x734);
+    SceneMessages_UnregisterReceiver((u8 *)p + 0x734);
     gUnk_02000264 = z;
 }

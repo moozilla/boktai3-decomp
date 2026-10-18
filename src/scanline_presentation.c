@@ -4,7 +4,7 @@ INCLUDE_ASM("asm/nonmatching", sub_0800D874);
 
 s32 Div(s32, s32);
 
-void sub_0800D9A0(struct ScanlinePresentation *s)
+void ScanlinePresentation_UpdateFadeIn(struct ScanlinePresentation *s)
 {
     if (s->mode == 0)
         gUnk_03004DA0 = Div(s->phase << 6, s->duration);
@@ -15,7 +15,7 @@ void sub_0800D9A0(struct ScanlinePresentation *s)
     }
 }
 
-void sub_0800D9FC(struct ScanlinePresentation *s)
+void ScanlinePresentation_UpdateFadeOut(struct ScanlinePresentation *s)
 {
     u32 k;
     if (s->mode == 0)
@@ -31,7 +31,7 @@ void sub_0800D9FC(struct ScanlinePresentation *s)
     }
 }
 
-void sub_08219254(int, int, void *);
+void ScanlineEffect_SetSource(int, int, void *);
 
 static inline void hide(struct ScanlineLayer *p)
 {
@@ -59,7 +59,7 @@ int ScanlinePresentation_Update(struct ScanlinePresentation *p)
             p->fade(p);
         if (p->noise) {
             p->noise(p);
-            sub_08219254(0, 2, p->rows[p->active]);
+            ScanlineEffect_SetSource(0, 2, p->rows[p->active]);
             p->active = 1 - p->active;
         }
         switch (p->state) {
@@ -68,7 +68,7 @@ int ScanlinePresentation_Update(struct ScanlinePresentation *p)
                 if (p->timer > p->delay) {
                     p->state = 1;
                     p->timer = 0;
-                    p->fade = sub_0800D9A0;
+                    p->fade = ScanlinePresentation_UpdateFadeIn;
                     if (p->start != p->end)
                         Sound_PlaySong(225);
                     p->amplitude = 128;
@@ -85,7 +85,7 @@ int ScanlinePresentation_Update(struct ScanlinePresentation *p)
                 if (p->timer > p->hold) {
                     p->state = 3;
                     p->timer = 0;
-                    p->fade = sub_0800D9FC;
+                    p->fade = ScanlinePresentation_UpdateFadeOut;
                     if (p->start != p->end)
                         Sound_PlaySong(227);
                     p->amplitude = 0;
@@ -101,14 +101,14 @@ int ScanlinePresentation_Update(struct ScanlinePresentation *p)
 
 void sub_082194D4(void *);
 
-void sub_0821910C(void);
+void Mosaic_ResetParameters(void);
 
 int ScanlinePresentation_Destroy(struct ScanlinePresentation *p)
 {
     int i;
     struct ScanlineLayer *layer;
     sub_082194D4(p);
-    sub_0821910C();
+    Mosaic_ResetParameters();
     Anim_Remove(&p->layers[0]);
     Anim_Remove(&p->layers[1]);
     Anim_Remove(&p->layers[2]);
@@ -123,7 +123,7 @@ int ScanlinePresentation_Destroy(struct ScanlinePresentation *p)
 
 INCLUDE_ASM("asm/nonmatching", sub_0800DC90);
 
-void *sub_0800E08C(void)
+void *ScanlinePresentation_Create(void)
 {
     struct ScanlinePresentation *p = Task_Create(8, 0x52C);
     if (p) {

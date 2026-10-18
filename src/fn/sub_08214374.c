@@ -9,7 +9,7 @@ struct N {
     struct N *next;
 };
 extern struct N *gUnk_030042C0[];
-s32 sub_08214374(struct N *n, u32 i)
+s32 Sprite_LinkToList(struct N *n, u32 i)
 {
     struct N *h;
     n->idx = i;

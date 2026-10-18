@@ -5,7 +5,7 @@ struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 struct SceneActorRegistryActor *SceneActorRegistry_FindById(u32);
 u8 SceneActorRecord_CanRecordPair(u32, u32);
 void SceneActorRegistry_MarkCategoryOne(u8);
-void sub_08003C00(u32 *);
+void TerrainOverlay_QueueAddActor(u32 *);
 void SceneActorRegistry_EnsureActorSubsystems(struct SceneActorRegistryManager *,
                                               struct SceneActorRegistryActor *);
 static inline u8 TrackPairs(void)
@@ -35,7 +35,7 @@ u8 SceneActorRegistry_LinkActor(struct SceneActorRegistryActor *actor)
     {
         u32 mask = 0x02000000;
         if (!(actor->flags2D0 & mask))
-            sub_08003C00(&actor->id);
+            TerrainOverlay_QueueAddActor(&actor->id);
     }
     SceneActorRegistry_EnsureActorSubsystems(manager, actor);
     manager->field32++;

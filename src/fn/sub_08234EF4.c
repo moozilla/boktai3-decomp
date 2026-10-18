@@ -10,7 +10,7 @@ struct S {
 void Anim_Remove(u8 *);
 void Effect_Remove(struct E *);
 
-s32 sub_08234EF4(struct S *p)
+s32 HealthRestoreEffect_OnDestroy(struct S *p)
 {
     struct E *e;
     s32 i;

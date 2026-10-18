@@ -28,7 +28,7 @@ extern s32 sub_0824923C(void *arg, void *function);
 extern void AnimData_SelectPaletteBank(void *a, s32 b);
 extern u32 gUnk_08612154[];
 
-s32 sub_081B7C98(Obj *p)
+s32 GrowthHazard_UpdateManager(Obj *p)
 {
     s32 i;
     sub_081B7B1C(p);

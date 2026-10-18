@@ -1,4 +1,6 @@
 #include "global.h"
+/* Solar_ResetState: Clears the solar task pointer and current and cached intensity levels */
+#define Solar_ResetState sub_0822C110
 extern u8 *gUnk_03002604;
 extern u8 *gUnk_02000710;
 extern u16 gUnk_030054C0, gUnk_030054C4, gUnk_030054BC;

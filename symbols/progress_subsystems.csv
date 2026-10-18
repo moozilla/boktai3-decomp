@@ -173,26 +173,405 @@ Scene actor target and contact control,0807E9D0,0808005C,,docs/SCENE_ACTOR_TARGE
 Scene actor reaction callbacks,0808005C,08082648,,docs/SCENE_ACTOR_REACTION_STATES.md; docs/SCENE_ACTOR_REACTION_TRANSITIONS.md; prepared state and drawable reaction paths
 Scene actor control phases,08082648,08084280,symbols/proposed/report-subsystems.csv,docs/SCENE_ACTOR_CONTROL_PHASE.md; docs/SCENE_ACTOR_CONTROL_MOTION.md; docs/SCENE_ACTOR_CONTROL_HELPERS.md; shared control context and interpolation helpers
 Scene actor visibility and stored motion,08084280,08084F44,,docs/SCENE_ACTOR_VISIBILITY.md; reviewed control-context visibility oscillation stored-position and entry callbacks
+"Ghoul (auto, tentative)",08085D58,08086C1C,,tools/families.py: 7 of 9 contiguous functions named Ghoul_*
+"Ghoul 2 (auto, tentative)",0808A224,0808AED8,,tools/families.py: 8 of 17 contiguous functions named Ghoul_*
+"Ghoul 3 (auto, tentative)",0808CE44,0808E208,,tools/families.py: 9 of 10 contiguous functions named Ghoul_*
+"Slime (auto, tentative)",0808F500,0808FA04,,tools/families.py: 4 of 9 contiguous functions named Slime_*
+"Slime 2 (auto, tentative)",08090118,08091E54,,tools/families.py: 8 of 14 contiguous functions named Slime_*
+"Bee (auto, tentative)",08091E54,08092240,,tools/families.py: 4 of 6 contiguous functions named Bee_*
+"Bee 2 (auto, tentative)",08092994,08093810,,tools/families.py: 13 of 22 contiguous functions named Bee_*
+"Bee 3 (auto, tentative)",0809465C,08095574,,tools/families.py: 7 of 7 contiguous functions named Bee_*
+"Ghost (auto, tentative)",08097758,08098040,,tools/families.py: 7 of 13 contiguous functions named Ghost_*
+"Ghost 2 (auto, tentative)",08099580,0809AE0C,,tools/families.py: 7 of 11 contiguous functions named Ghost_*
+"Lun (auto, tentative)",0809C824,0809ED00,,tools/families.py: 16 of 34 contiguous functions named Lun_*
+"Crow (auto, tentative)",080A0044,080A2048,,tools/families.py: 18 of 25 contiguous functions named Crow_*
+"Spider (auto, tentative)",080A2048,080A28A8,,tools/families.py: 5 of 9 contiguous functions named Spider_*
+"Spider 2 (auto, tentative)",080A37C8,080A3C78,,tools/families.py: 5 of 8 contiguous functions named Spider_*
+"Spider 3 (auto, tentative)",080A48E0,080A5B8C,,tools/families.py: 7 of 8 contiguous functions named Spider_*
+"Tentacle body (auto, tentative)",080A5B8C,080A60E0,,tools/families.py: 3 of 8 contiguous functions named TentacleBody_*
+"Tentacle actor (auto, tentative)",080A9688,080A9988,,tools/families.py: 5 of 7 contiguous functions named TentacleActor_*
+"Tentacle actor 2 (auto, tentative)",080AA024,080AB57C,,tools/families.py: 11 of 22 contiguous functions named TentacleActor_*
+"Tentacle actor 3 (auto, tentative)",080ABAAC,080ABD14,,tools/families.py: 4 of 5 contiguous functions named TentacleActor_*
+"Vorn (auto, tentative)",080ACCF0,080AD40C,,tools/families.py: 8 of 14 contiguous functions named Vorn_*
+"Vorn 2 (auto, tentative)",080B0994,080B0C80,,tools/families.py: 4 of 6 contiguous functions named Vorn_*
+"Vorn 3 (auto, tentative)",080B1158,080B197C,,tools/families.py: 5 of 9 contiguous functions named Vorn_*
+"Vorn 4 (auto, tentative)",080B1EE8,080B1F48,,tools/families.py: 3 of 3 contiguous functions named Vorn_*
+"Vorn 5 (auto, tentative)",080B309C,080B3404,,tools/families.py: 3 of 6 contiguous functions named Vorn_*
+"Vorn 6 (auto, tentative)",080B401C,080B54DC,,tools/families.py: 8 of 13 contiguous functions named Vorn_*
+"Skeleton (auto, tentative)",080B9104,080B9158,,tools/families.py: 3 of 3 contiguous functions named Skeleton_*
+"Skeleton 2 (auto, tentative)",080BA578,080BB61C,,tools/families.py: 6 of 12 contiguous functions named Skeleton_*
+"Skeleton 3 (auto, tentative)",080C3068,080C44E4,,tools/families.py: 5 of 6 contiguous functions named Skeleton_*
+"Golem (auto, tentative)",080C4F80,080C62EC,,tools/families.py: 10 of 18 contiguous functions named Golem_*
+"Golem 2 (auto, tentative)",080C9844,080CC910,,tools/families.py: 4 of 10 contiguous functions named Golem_*
+"Golem 3 (auto, tentative)",080CFB98,080D0C30,,tools/families.py: 6 of 6 contiguous functions named Golem_*
+"Mummy (auto, tentative)",080D0E14,080D0FE8,,tools/families.py: 4 of 6 contiguous functions named Mummy_*
+"Mummy 2 (auto, tentative)",080D48C0,080D5370,,tools/families.py: 3 of 6 contiguous functions named Mummy_*
+"Mummy 3 (auto, tentative)",080D7408,080D812C,,tools/families.py: 5 of 8 contiguous functions named Mummy_*
+"Mummy 4 (auto, tentative)",080DA598,080DDD28,,tools/families.py: 10 of 15 contiguous functions named Mummy_*
+"Dog (auto, tentative)",080DED24,080E04D0,,tools/families.py: 11 of 19 contiguous functions named Dog_*
+"Dog 2 (auto, tentative)",080E1CB8,080E1F50,,tools/families.py: 4 of 4 contiguous functions named Dog_*
+"Dog 3 (auto, tentative)",080E3790,080E4468,,tools/families.py: 5 of 9 contiguous functions named Dog_*
+"Dog 4 (auto, tentative)",080E56D8,080E6848,,tools/families.py: 5 of 6 contiguous functions named Dog_*
+"Mimic (auto, tentative)",080E7D08,080E7D9C,,tools/families.py: 3 of 3 contiguous functions named Mimic_*
+"Mimic 2 (auto, tentative)",080E848C,080E98A4,,tools/families.py: 7 of 10 contiguous functions named Mimic_*
+"Octopus (auto, tentative)",080EB8B4,080EBD0C,,tools/families.py: 4 of 11 contiguous functions named Octopus_*
+"Octopus 2 (auto, tentative)",080EC300,080ED328,,tools/families.py: 6 of 6 contiguous functions named Octopus_*
+"Ivy (auto, tentative)",080EFC2C,080EFF6C,,tools/families.py: 3 of 6 contiguous functions named Ivy_*
+"Ivy 2 (auto, tentative)",080F0B28,080F2BE4,,tools/families.py: 16 of 31 contiguous functions named Ivy_*
+"Ivy 3 (auto, tentative)",080F46A0,080F4B94,,tools/families.py: 6 of 9 contiguous functions named Ivy_*
+"Sword (auto, tentative)",080F4CC4,080F4FA8,,tools/families.py: 3 of 4 contiguous functions named Sword_*
+"Sword 2 (auto, tentative)",080F54D4,080F645C,,tools/families.py: 13 of 22 contiguous functions named Sword_*
+"Axe (auto, tentative)",080FA744,080FB984,,tools/families.py: 16 of 27 contiguous functions named Axe_*
+"Axe 2 (auto, tentative)",080FBF20,080FD158,,tools/families.py: 8 of 19 contiguous functions named Axe_*
+"Axe 3 (auto, tentative)",080FE2DC,080FF78C,,tools/families.py: 7 of 10 contiguous functions named Axe_*
+"Wooden crate (auto, tentative)",080FF78C,080FF87C,,tools/families.py: 5 of 5 contiguous functions named WoodenCrate_*
+"Wooden crate 2 (auto, tentative)",080FFFE4,0810033C,,tools/families.py: 8 of 11 contiguous functions named WoodenCrate_*
+"Floor switch (auto, tentative)",0810067C,08100A64,,tools/families.py: 5 of 6 contiguous functions named FloorSwitch_*
+"Named object (auto, tentative)",08101A3C,08101E6C,,tools/families.py: 3 of 6 contiguous functions named NamedObject_*
+"Named object 2 (auto, tentative)",08102978,08103AD0,,tools/families.py: 6 of 14 contiguous functions named NamedObject_*
+"Named actor (auto, tentative)",08103ADC,08103EF4,,tools/families.py: 7 of 11 contiguous functions named NamedActor_*
+"Pool184 (auto, tentative)",081041DC,081042DC,,tools/families.py: 3 of 4 contiguous functions named Pool184_*
+"Pool184 2 (auto, tentative)",08104E80,08104F08,,tools/families.py: 3 of 3 contiguous functions named Pool184_*
+"Pool1 B 8 (auto, tentative)",08107D48,081084E4,,tools/families.py: 7 of 13 contiguous functions named Pool1B8_*
+"Animated tile (auto, tentative)",081089D8,08108AD0,,tools/families.py: 5 of 5 contiguous functions named AnimatedTile_*
+"Link handshake (auto, tentative)",08108AD0,08108EC0,,tools/families.py: 4 of 9 contiguous functions named LinkHandshake_*
+"Registry1745 (auto, tentative)",081092F0,08109480,,tools/families.py: 8 of 9 contiguous functions named Registry1745_*
+"Link connection menu (auto, tentative)",081094EC,081096CC,,tools/families.py: 5 of 7 contiguous functions named LinkConnectionMenu_*
+"Registry1745 2 (auto, tentative)",0810B614,0810BB0C,,tools/families.py: 4 of 7 contiguous functions named Registry1745_*
+"Registry F 246 (auto, tentative)",0810C14C,0810C398,,tools/families.py: 5 of 8 contiguous functions named RegistryF246_*
+"Registry F 246 2 (auto, tentative)",0810C9E4,0810CBC8,,tools/families.py: 4 of 6 contiguous functions named RegistryF246_*
+"Registry30 AC (auto, tentative)",0810D14C,0810D548,,tools/families.py: 5 of 8 contiguous functions named Registry30AC_*
+"Registry3 C 9 F (auto, tentative)",0810DE3C,0810E91C,,tools/families.py: 8 of 19 contiguous functions named Registry3C9F_*
+"Registry33 FF (auto, tentative)",0810E964,0810EDC0,,tools/families.py: 3 of 5 contiguous functions named Registry33FF_*
+"Link lobby panel (auto, tentative)",0810EDC0,0810F820,,tools/families.py: 8 of 15 contiguous functions named LinkLobbyPanel_*
+"Link score panel (auto, tentative)",0810F868,0811024C,,tools/families.py: 10 of 16 contiguous functions named LinkScorePanel_*
+"Save menu (auto, tentative)",0811024C,08110A8C,,tools/families.py: 7 of 11 contiguous functions named SaveMenu_*
+"Scene tilemap (auto, tentative)",08110E14,081111E8,,tools/families.py: 8 of 11 contiguous functions named SceneTilemap_*
+"Palette fade (auto, tentative)",081113D0,08111C44,,tools/families.py: 10 of 13 contiguous functions named PaletteFade_*
+"Stage results (auto, tentative)",08111C44,0811244C,,tools/families.py: 11 of 15 contiguous functions named StageResults_*
+"Script display (auto, tentative)",0811244C,081128F8,,tools/families.py: 4 of 7 contiguous functions named ScriptDisplay_*
+"Actor marker pool (auto, tentative)",08112A70,08112CC8,,tools/families.py: 6 of 8 contiguous functions named ActorMarkerPool_*
+"Scene debris (auto, tentative)",08112E20,08112EA8,,tools/families.py: 4 of 4 contiguous functions named SceneDebris_*
+"Scene debris pool (auto, tentative)",081132E0,08113398,,tools/families.py: 4 of 4 contiguous functions named SceneDebrisPool_*
+"Native effect (auto, tentative)",081143B8,08114928,,tools/families.py: 11 of 16 contiguous functions named NativeEffect_*
+"Native particle (auto, tentative)",08114E04,081151F8,,tools/families.py: 5 of 7 contiguous functions named NativeParticle_*
+"Collectible (auto, tentative)",08115398,08115AC8,,tools/families.py: 7 of 11 contiguous functions named Collectible_*
+"Player (auto, tentative)",08116BCC,08116C74,,tools/families.py: 4 of 4 contiguous functions named Player_*
+"Glove (auto, tentative)",08119EF0,0811AB78,,tools/families.py: 5 of 10 contiguous functions named Glove_*
+"Terrain (auto, tentative)",0811ABC0,0811AE9C,,tools/families.py: 3 of 6 contiguous functions named Terrain_*
+"Collider (auto, tentative)",0811B150,0811B278,,tools/families.py: 7 of 8 contiguous functions named Collider_*
+"Collider 2 (auto, tentative)",0811B6C8,0811B774,,tools/families.py: 3 of 3 contiguous functions named Collider_*
+"Registry E 7 BC (auto, tentative)",0811B784,0811BA1C,,tools/families.py: 7 of 8 contiguous functions named RegistryE7BC_*
+"Game state (auto, tentative)",0811BA1C,0811BCBC,,tools/families.py: 10 of 10 contiguous functions named GameState_*
+"Character model (auto, tentative)",0811C77C,0811C89C,,tools/families.py: 4 of 4 contiguous functions named CharacterModel_*
+"Character model 2 (auto, tentative)",0811CC24,0811CF68,,tools/families.py: 9 of 10 contiguous functions named CharacterModel_*
+"Character (auto, tentative)",0811D00C,0811D14C,,tools/families.py: 3 of 6 contiguous functions named Character_*
+"Game state 2 (auto, tentative)",0811D358,0811DB84,,tools/families.py: 10 of 18 contiguous functions named GameState_*
+"Game flag (auto, tentative)",0811DD64,0811DEC8,,tools/families.py: 3 of 4 contiguous functions named GameFlag_*
+"Modifier (auto, tentative)",0811DEC8,0811DEEC,,tools/families.py: 3 of 3 contiguous functions named Modifier_*
+"Modifier 2 (auto, tentative)",0811E2F0,0811E37C,,tools/families.py: 3 of 3 contiguous functions named Modifier_*
+"Modifier 3 (auto, tentative)",0811E660,0811E728,,tools/families.py: 6 of 6 contiguous functions named Modifier_*
+"Modifier 4 (auto, tentative)",0811ECF0,0811EE68,,tools/families.py: 4 of 6 contiguous functions named Modifier_*
+"Modifier 5 (auto, tentative)",0811F874,0811FAB8,,tools/families.py: 4 of 7 contiguous functions named Modifier_*
+"Registry A 8 CB (auto, tentative)",08120264,08120330,,tools/families.py: 4 of 4 contiguous functions named RegistryA8CB_*
+"Registry A 8 CB 2 (auto, tentative)",081210C4,081213B0,,tools/families.py: 6 of 9 contiguous functions named RegistryA8CB_*
+"Scene collider effect (auto, tentative)",081213B0,08121B98,,tools/families.py: 7 of 16 contiguous functions named SceneColliderEffect_*
+"Scene actor14 (auto, tentative)",081225F0,08122668,,tools/families.py: 3 of 3 contiguous functions named SceneActor14_*
+"Scene scheduled effect (auto, tentative)",081229E0,08122DF0,,tools/families.py: 4 of 8 contiguous functions named SceneScheduledEffect_*
+"Scene animated effect (auto, tentative)",08122F38,08123124,,tools/families.py: 3 of 6 contiguous functions named SceneAnimatedEffect_*
+"Scene trail effect (auto, tentative)",08123124,08123194,,tools/families.py: 3 of 3 contiguous functions named SceneTrailEffect_*
+"Scene terrain probe (auto, tentative)",08125898,08125B64,,tools/families.py: 5 of 7 contiguous functions named SceneTerrainProbe_*
+"Scene moving particle (auto, tentative)",08125B68,08126140,,tools/families.py: 8 of 12 contiguous functions named SceneMovingParticle_*
+"Scripted particle (auto, tentative)",08126568,08126650,,tools/families.py: 4 of 4 contiguous functions named ScriptedParticle_*
+"Blinking effect (auto, tentative)",08126918,081269E0,,tools/families.py: 4 of 4 contiguous functions named BlinkingEffect_*
+"Burst spark (auto, tentative)",08126A7C,08126D38,,tools/families.py: 6 of 8 contiguous functions named BurstSpark_*
+"Sprite projectile (auto, tentative)",081274F0,08127994,,tools/families.py: 5 of 8 contiguous functions named SpriteProjectile_*
+"Directional projectile (auto, tentative)",08127EFC,081281B4,,tools/families.py: 6 of 8 contiguous functions named DirectionalProjectile_*
+"Fragment burst (auto, tentative)",0812876C,08128B48,,tools/families.py: 5 of 8 contiguous functions named FragmentBurst_*
+"Feather effect pool (auto, tentative)",081296D0,08129834,,tools/families.py: 5 of 5 contiguous functions named FeatherEffectPool_*
+"Sun disc pool (auto, tentative)",0812A2AC,0812A558,,tools/families.py: 5 of 7 contiguous functions named SunDiscPool_*
+"Fragment projectile pool (auto, tentative)",0812B0E8,0812B3A8,,tools/families.py: 4 of 7 contiguous functions named FragmentProjectilePool_*
+"Slash effect (auto, tentative)",0812B65C,0812B7F8,,tools/families.py: 3 of 4 contiguous functions named SlashEffect_*
+"Slash effect 2 (auto, tentative)",0812C0A4,0812C310,,tools/families.py: 3 of 3 contiguous functions named SlashEffect_*
+"Fragment effect (auto, tentative)",0812C310,0812C4E4,,tools/families.py: 4 of 5 contiguous functions named FragmentEffect_*
+"Fragment effect 2 (auto, tentative)",0812CD10,0812CE94,,tools/families.py: 5 of 5 contiguous functions named FragmentEffect_*
+"Fragment sprite pool (auto, tentative)",0812D46C,0812D670,,tools/families.py: 5 of 5 contiguous functions named FragmentSpritePool_*
+"Particle effect pool (auto, tentative)",0812D960,0812DA2C,,tools/families.py: 4 of 4 contiguous functions named ParticleEffectPool_*
+"Scene actor state (auto, tentative)",08130AB4,08130BA0,,tools/families.py: 5 of 7 contiguous functions named SceneActorState_*
+"Registry1745 3 (auto, tentative)",08138154,08138630,,tools/families.py: 8 of 11 contiguous functions named Registry1745_*
+"Ballistic sprite effect (auto, tentative)",08139298,0813942C,,tools/families.py: 4 of 5 contiguous functions named BallisticSpriteEffect_*
+"Particle burst effect (auto, tentative)",08139BA0,08139D9C,,tools/families.py: 3 of 6 contiguous functions named ParticleBurstEffect_*
+"Following sprite effect (auto, tentative)",08139FAC,0813A41C,,tools/families.py: 5 of 10 contiguous functions named FollowingSpriteEffect_*
+"Sprite particle (auto, tentative)",0813AA9C,0813ADC4,,tools/families.py: 6 of 9 contiguous functions named SpriteParticle_*
+"Player 2 (auto, tentative)",0813B01C,0813C000,,tools/families.py: 22 of 37 contiguous functions named Player_*
 Directional sprite effect (tentative),0813C040,0813C26C,,docs/REPORT_SUBSYSTEMS.md; shared sprite7FC and sequence840 orbit/directional effect consumers
 Four-effect center controller (tentative),0813C2EC,0813C798,,docs/REPORT_SUBSYSTEMS.md; shared four-effect array9A8 and center coordinatesA80/A84
+"Player 3 (auto, tentative)",0813C8F0,0813FC38,,tools/families.py: 44 of 71 contiguous functions named Player_*
+"Player 4 (auto, tentative)",08140328,08140410,,tools/families.py: 4 of 4 contiguous functions named Player_*
+"Player 5 (auto, tentative)",08144A98,08145400,,tools/families.py: 4 of 9 contiguous functions named Player_*
+"Player 6 (auto, tentative)",0814A4B0,0814C3A4,,tools/families.py: 7 of 16 contiguous functions named Player_*
+"Player 7 (auto, tentative)",0814D8D8,0814DE0C,,tools/families.py: 5 of 7 contiguous functions named Player_*
+"Player 8 (auto, tentative)",0814E978,0814F328,,tools/families.py: 3 of 5 contiguous functions named Player_*
+"Player cue (auto, tentative)",0814F804,0814FC80,,tools/families.py: 8 of 13 contiguous functions named PlayerCue_*
+"Player cue 2 (auto, tentative)",08151308,08151988,,tools/families.py: 3 of 6 contiguous functions named PlayerCue_*
+"Player 9 (auto, tentative)",08156C1C,08156FE0,,tools/families.py: 3 of 6 contiguous functions named Player_*
+"Player 10 (auto, tentative)",08158ECC,08159860,,tools/families.py: 28 of 36 contiguous functions named Player_*
+"Player 11 (auto, tentative)",0815A110,0815A400,,tools/families.py: 6 of 7 contiguous functions named Player_*
+"Script actor (auto, tentative)",0815A578,0815AD24,,tools/families.py: 12 of 20 contiguous functions named ScriptActor_*
+"Player cue 3 (auto, tentative)",0815AE94,0815C9EC,,tools/families.py: 55 of 60 contiguous functions named PlayerCue_*
+"Script actor 2 (auto, tentative)",0815C9EC,0815D688,,tools/families.py: 40 of 41 contiguous functions named ScriptActor_*
+"Player 12 (auto, tentative)",0815D688,0815DEEC,,tools/families.py: 4 of 8 contiguous functions named Player_*
+"Target registry (auto, tentative)",0815F6A8,0815F7E0,,tools/families.py: 6 of 7 contiguous functions named TargetRegistry_*
+"Player burst (auto, tentative)",0815FF40,0815FFDC,,tools/families.py: 3 of 3 contiguous functions named PlayerBurst_*
+"Actor debris (auto, tentative)",081604C0,0816065C,,tools/families.py: 6 of 7 contiguous functions named ActorDebris_*
+"Player attack effect (auto, tentative)",08160684,08162780,,tools/families.py: 9 of 15 contiguous functions named PlayerAttackEffect_*
+"Player barrier (auto, tentative)",08162780,08162E00,,tools/families.py: 8 of 11 contiguous functions named PlayerBarrier_*
+"Game over (auto, tentative)",08162E7C,08163310,,tools/families.py: 9 of 13 contiguous functions named GameOver_*
+"Game over 2 (auto, tentative)",08163654,0816381C,,tools/families.py: 4 of 5 contiguous functions named GameOver_*
+"Particle pool (auto, tentative)",08163990,08163EA0,,tools/families.py: 7 of 11 contiguous functions named ParticlePool_*
+"Hud (auto, tentative)",08163EA0,08163FFC,,tools/families.py: 7 of 7 contiguous functions named Hud_*
+"Hud 2 (auto, tentative)",08164438,081647A4,,tools/families.py: 6 of 7 contiguous functions named Hud_*
+"Hud 3 (auto, tentative)",08165594,0816599C,,tools/families.py: 7 of 11 contiguous functions named Hud_*
+"Pause menu (auto, tentative)",081659F4,08166B14,,tools/families.py: 27 of 39 contiguous functions named PauseMenu_*
+"Pause menu 2 (auto, tentative)",08167E50,081681B8,,tools/families.py: 4 of 8 contiguous functions named PauseMenu_*
+"Pause menu 3 (auto, tentative)",08168C90,08168EE8,,tools/families.py: 5 of 7 contiguous functions named PauseMenu_*
+"Hud 4 (auto, tentative)",0816AAF4,0816AD34,,tools/families.py: 3 of 6 contiguous functions named Hud_*
+"Hud 5 (auto, tentative)",0816B354,0816B66C,,tools/families.py: 12 of 14 contiguous functions named Hud_*
+"Game state 3 (auto, tentative)",0816B70C,0816B92C,,tools/families.py: 9 of 10 contiguous functions named GameState_*
+"Map screen (auto, tentative)",0816B92C,0816C624,,tools/families.py: 8 of 15 contiguous functions named MapScreen_*
+"Inventory (auto, tentative)",0816CD6C,0816CF2C,,tools/families.py: 5 of 7 contiguous functions named Inventory_*
+"Pause menu 4 (auto, tentative)",0816D36C,0816D920,,tools/families.py: 8 of 14 contiguous functions named PauseMenu_*
+"Pause menu 5 (auto, tentative)",0816E408,0816EA24,,tools/families.py: 3 of 6 contiguous functions named PauseMenu_*
+"Pause menu 6 (auto, tentative)",08170040,081704B4,,tools/families.py: 5 of 7 contiguous functions named PauseMenu_*
+"Pause inventory (auto, tentative)",081708E4,0817160C,,tools/families.py: 10 of 19 contiguous functions named PauseInventory_*
+"Pause inventory 2 (auto, tentative)",08171C44,08171EFC,,tools/families.py: 3 of 5 contiguous functions named PauseInventory_*
+"Pause inventory 3 (auto, tentative)",08173390,08173A7C,,tools/families.py: 6 of 12 contiguous functions named PauseInventory_*
+"Hud 6 (auto, tentative)",08173FB4,081743F4,,tools/families.py: 4 of 7 contiguous functions named Hud_*
+"Hud 7 (auto, tentative)",08175A8C,08175AF8,,tools/families.py: 3 of 3 contiguous functions named Hud_*
+"Hud 8 (auto, tentative)",08177DEC,081781B4,,tools/families.py: 11 of 12 contiguous functions named Hud_*
+"Hud 9 (auto, tentative)",081784C0,081785F4,,tools/families.py: 5 of 6 contiguous functions named Hud_*
+"Hud 10 (auto, tentative)",08178B3C,081792F8,,tools/families.py: 5 of 9 contiguous functions named Hud_*
+"Scene actors (auto, tentative)",0817A3C4,0817A7C8,,tools/families.py: 5 of 6 contiguous functions named SceneActors_*
+"Scene actors 2 (auto, tentative)",0817B4B4,0817B5C0,,tools/families.py: 4 of 4 contiguous functions named SceneActors_*
+"Boss slot2 (auto, tentative)",0817D530,0817D5E4,,tools/families.py: 5 of 5 contiguous functions named BossSlot2_*
+"Armor (auto, tentative)",08181964,08181BF8,,tools/families.py: 3 of 7 contiguous functions named Armor_*
+"Armor 2 (auto, tentative)",08182200,08182394,,tools/families.py: 4 of 5 contiguous functions named Armor_*
+"Armor 3 (auto, tentative)",0818287C,08182F60,,tools/families.py: 19 of 24 contiguous functions named Armor_*
+"Actor controller (auto, tentative)",08182F60,08183078,,tools/families.py: 5 of 6 contiguous functions named ActorController_*
+"Actor controller 2 (auto, tentative)",081850B4,081854DC,,tools/families.py: 14 of 15 contiguous functions named ActorController_*
+"Armor 4 (auto, tentative)",081854DC,081864C4,,tools/families.py: 28 of 34 contiguous functions named Armor_*
+"Armor 5 (auto, tentative)",081869D8,08186CC8,,tools/families.py: 8 of 10 contiguous functions named Armor_*
+"Armor 6 (auto, tentative)",08189C54,0818AFEC,,tools/families.py: 8 of 13 contiguous functions named Armor_*
+"Armor 7 (auto, tentative)",0818C0BC,0818CF10,,tools/families.py: 10 of 14 contiguous functions named Armor_*
+"Armor 8 (auto, tentative)",0818D430,0818D590,,tools/families.py: 3 of 3 contiguous functions named Armor_*
 Spinning approach motion (tentative),0818D754,0818DC50,symbols/proposed/subsystems.csv,docs/MOTION_0818.md contiguous four-callback movement chain
+"Armor 9 (auto, tentative)",0818DE44,0818E5E4,,tools/families.py: 8 of 13 contiguous functions named Armor_*
+"Nidhoggr (auto, tentative)",0818ECAC,0818F678,,tools/families.py: 11 of 20 contiguous functions named Nidhoggr_*
+"Scene panel effect (auto, tentative)",081906E4,08190798,,tools/families.py: 5 of 5 contiguous functions named ScenePanelEffect_*
+"Scene animation (auto, tentative)",08190CE4,08191508,,tools/families.py: 12 of 13 contiguous functions named SceneAnimation_*
 Large scene animation controller (tentative),081915E0,0819792C,,docs/REPORT_SUBSYSTEMS.md; reviewed controller portion with sixteen keyframes543C; task creators19783C and197890 allocate72FC bytes
 Buffered animation task (tentative),0819792C,08197DD0,,docs/REPORT_SUBSYSTEMS.md; independent graphics-buffer owner allocated count*32+0x28 with sprite and animation initialization
 Time palette transitions (tentative),08197DD0,08197EC4,symbols/proposed/report-subsystems.csv,docs/REPORT_SUBSYSTEMS.md; three phase-selected palette sources and64-tick transition through08221110
 Scripted key trigger,08197EC4,0819804C,,src/fn/sub_08197EC4.c; KeyTrigger_Update Init Create and task key-mask/message consumers
+"Scene effect (auto, tentative)",08198B08,08198F3C,,tools/families.py: 4 of 7 contiguous functions named SceneEffect_*
+"Scene effect queue (auto, tentative)",08199410,08199AEC,,tools/families.py: 3 of 4 contiguous functions named SceneEffectQueue_*
+"Cannon battery (auto, tentative)",08199CAC,0819A520,,tools/families.py: 10 of 17 contiguous functions named CannonBattery_*
+"Scene burst emitter (auto, tentative)",0819A9DC,0819AAF4,,tools/families.py: 5 of 7 contiguous functions named SceneBurstEmitter_*
+"Scene orbit hazard (auto, tentative)",0819AB64,0819AE10,,tools/families.py: 5 of 9 contiguous functions named SceneOrbitHazard_*
+"Action state (auto, tentative)",0819AE44,0819AE78,,tools/families.py: 3 of 3 contiguous functions named ActionState_*
+"Hresvelgr (auto, tentative)",0819E028,0819E170,,tools/families.py: 5 of 5 contiguous functions named Hresvelgr_*
+"Hresvelgr 2 (auto, tentative)",0819E5EC,0819E708,,tools/families.py: 7 of 7 contiguous functions named Hresvelgr_*
+"Hresvelgr 3 (auto, tentative)",081A2BBC,081A37E0,,tools/families.py: 13 of 21 contiguous functions named Hresvelgr_*
+"Hresvelgr 4 (auto, tentative)",081A4020,081A5360,,tools/families.py: 17 of 35 contiguous functions named Hresvelgr_*
+"Debug (auto, tentative)",081A5394,081A55A4,,tools/families.py: 4 of 4 contiguous functions named Debug_*
+"Vanargand (auto, tentative)",081A68CC,081A6920,,tools/families.py: 4 of 4 contiguous functions named Vanargand_*
+"Vanargand 2 (auto, tentative)",081A6E9C,081A7664,,tools/families.py: 10 of 16 contiguous functions named Vanargand_*
+"Vanargand 3 (auto, tentative)",081A8100,081A8320,,tools/families.py: 4 of 5 contiguous functions named Vanargand_*
+"Vanargand 4 (auto, tentative)",081A8C00,081A8CC0,,tools/families.py: 6 of 6 contiguous functions named Vanargand_*
+"Vanargand 5 (auto, tentative)",081AD3C0,081ADD9C,,tools/families.py: 4 of 7 contiguous functions named Vanargand_*
+"Vanargand 6 (auto, tentative)",081AE008,081AFA28,,tools/families.py: 7 of 15 contiguous functions named Vanargand_*
+"Vanargand 7 (auto, tentative)",081B63F4,081B646C,,tools/families.py: 4 of 4 contiguous functions named Vanargand_*
+"Vanargand effect (auto, tentative)",081B6668,081B6810,,tools/families.py: 4 of 5 contiguous functions named VanargandEffect_*
+"Vanargand projectile pool (auto, tentative)",081B6FFC,081B70A8,,tools/families.py: 3 of 3 contiguous functions named VanargandProjectilePool_*
+"Vanargand afterimage pool (auto, tentative)",081B7378,081B7538,,tools/families.py: 8 of 9 contiguous functions named VanargandAfterimagePool_*
+"Growth hazard (auto, tentative)",081B7920,081B817C,,tools/families.py: 7 of 14 contiguous functions named GrowthHazard_*
+"Registry2388 (auto, tentative)",081BA064,081BA62C,,tools/families.py: 13 of 16 contiguous functions named Registry2388_*
+"Registry3 F 74 (auto, tentative)",081BA9D0,081BACB8,,tools/families.py: 11 of 12 contiguous functions named Registry3F74_*
+"Menu cursor (auto, tentative)",081BAF7C,081BB178,,tools/families.py: 7 of 10 contiguous functions named MenuCursor_*
+"Solar bank (auto, tentative)",081BB294,081BBDE0,,tools/families.py: 8 of 17 contiguous functions named SolarBank_*
+"Dark loan (auto, tentative)",081BC664,081BCB58,,tools/families.py: 5 of 11 contiguous functions named DarkLoan_*
+"Dark loan 2 (auto, tentative)",081BD2C0,081BD914,,tools/families.py: 6 of 10 contiguous functions named DarkLoan_*
+"Storage (auto, tentative)",081BDA10,081BDE30,,tools/families.py: 8 of 14 contiguous functions named Storage_*
+"Storage 2 (auto, tentative)",081BECA4,081BEEC0,,tools/families.py: 3 of 6 contiguous functions named Storage_*
+"Storage 3 (auto, tentative)",081BFCD4,081BFFC8,,tools/families.py: 6 of 7 contiguous functions named Storage_*
+"Tether actor (auto, tentative)",081C0344,081C0470,,tools/families.py: 3 of 4 contiguous functions named TetherActor_*
+"Scene palette fade (auto, tentative)",081C0470,081C069C,,tools/families.py: 13 of 14 contiguous functions named ScenePaletteFade_*
+"Scene actor sequence (auto, tentative)",081C069C,081C0BD4,,tools/families.py: 15 of 20 contiguous functions named SceneActorSequence_*
+"Play stats (auto, tentative)",081C0BF0,081C13C0,,tools/families.py: 5 of 6 contiguous functions named PlayStats_*
+"Record display (auto, tentative)",081C13C0,081C17C8,,tools/families.py: 5 of 7 contiguous functions named RecordDisplay_*
+"Control panel (auto, tentative)",081C1A58,081C22BC,,tools/families.py: 13 of 22 contiguous functions named ControlPanel_*
+"Sparkle emitter (auto, tentative)",081C2BB8,081C3010,,tools/families.py: 7 of 10 contiguous functions named SparkleEmitter_*
+"Registry F 3 E 4 (auto, tentative)",081C3010,081C3B04,,tools/families.py: 6 of 13 contiguous functions named RegistryF3E4_*
+"Registry F 3 E 4 2 (auto, tentative)",081C3F7C,081C4194,,tools/families.py: 5 of 6 contiguous functions named RegistryF3E4_*
+"Registry6 A 37 (auto, tentative)",081C439C,081C482C,,tools/families.py: 12 of 19 contiguous functions named Registry6A37_*
+"Ship wheel (auto, tentative)",081C49C0,081C4C18,,tools/families.py: 4 of 5 contiguous functions named ShipWheel_*
+"Scene transition (auto, tentative)",081C4C18,081C4D78,,tools/families.py: 4 of 6 contiguous functions named SceneTransition_*
+"Registry C 281 (auto, tentative)",081C4E10,081C503C,,tools/families.py: 10 of 11 contiguous functions named RegistryC281_*
+"Registry1909 (auto, tentative)",081C503C,081C5308,,tools/families.py: 10 of 12 contiguous functions named Registry1909_*
+"Challenge menu (auto, tentative)",081C5470,081C5EF0,,tools/families.py: 16 of 25 contiguous functions named ChallengeMenu_*
+"Time result (auto, tentative)",081C5F1C,081C6654,,tools/families.py: 14 of 20 contiguous functions named TimeResult_*
+"Actor (auto, tentative)",081C6654,081C66F8,,tools/families.py: 4 of 4 contiguous functions named Actor_*
 State actor kind 086121C4 (tentative),081C66F8,081CC690,symbols/proposed/state-actors.csv,96-state table gUnk_086121C4 (first 16 shared with 0x0802FD60-0x08030658); helpers 081C66F8-081C6B84 precede the handlers; include/state_actor.h
 Scripted message actor 08612344 (tentative),081CC690,081CD484,symbols/proposed/state-actors.csv,state table gUnk_08612344 and dispatcher 081CD43C; command states wait on scene messages; src/message_actor_08612344.c
+"Scene character (auto, tentative)",081CE014,081CE9A8,,tools/families.py: 7 of 8 contiguous functions named SceneCharacter_*
+"Scene npc (auto, tentative)",081CE9A8,081CEE50,,tools/families.py: 24 of 25 contiguous functions named SceneNpc_*
+"Scene npc 2 (auto, tentative)",081CFFAC,081D16EC,,tools/families.py: 15 of 24 contiguous functions named SceneNpc_*
+"Tagged scene npc (auto, tentative)",081D16EC,081D1A44,,tools/families.py: 14 of 16 contiguous functions named TaggedSceneNpc_*
+"Tagged scene npc 2 (auto, tentative)",081D1D44,081D1DF8,,tools/families.py: 3 of 3 contiguous functions named TaggedSceneNpc_*
+"Tagged scene npc 3 (auto, tentative)",081D29FC,081D2D34,,tools/families.py: 6 of 6 contiguous functions named TaggedSceneNpc_*
+"Frost emitter (auto, tentative)",081D305C,081D31D8,,tools/families.py: 6 of 7 contiguous functions named FrostEmitter_*
+"Player particle cloud (auto, tentative)",081D3374,081D374C,,tools/families.py: 3 of 5 contiguous functions named PlayerParticleCloud_*
+"Scene display (auto, tentative)",081D3D68,081D4024,,tools/families.py: 3 of 4 contiguous functions named SceneDisplay_*
+"Bestiary display (auto, tentative)",081D4CA4,081D4E2C,,tools/families.py: 7 of 8 contiguous functions named BestiaryDisplay_*
+"Bestiary (auto, tentative)",081D4E2C,081D4E80,,tools/families.py: 4 of 4 contiguous functions named Bestiary_*
+"Game state 4 (auto, tentative)",081D5188,081D53A0,,tools/families.py: 6 of 9 contiguous functions named GameState_*
+"Monster book (auto, tentative)",081D58B4,081D70C4,,tools/families.py: 5 of 10 contiguous functions named MonsterBook_*
+"Text sequence (auto, tentative)",081D70C4,081D7434,,tools/families.py: 4 of 10 contiguous functions named TextSequence_*
+"Task4 E 01 (auto, tentative)",081D84FC,081D8FAC,,tools/families.py: 9 of 16 contiguous functions named Task4E01_*
+"Projectile (auto, tentative)",081D8FAC,081D92F0,,tools/families.py: 5 of 8 contiguous functions named Projectile_*
+"Projectile 2 (auto, tentative)",081D9CB8,081D9D3C,,tools/families.py: 3 of 3 contiguous functions named Projectile_*
+"Projectile 3 (auto, tentative)",081DAC1C,081DAD28,,tools/families.py: 10 of 13 contiguous functions named Projectile_*
+"Explosion (auto, tentative)",081DAF50,081DB474,,tools/families.py: 7 of 12 contiguous functions named Explosion_*
+"Screen params2 E 8 (auto, tentative)",081DBDC8,081DC02C,,tools/families.py: 4 of 4 contiguous functions named ScreenParams2E8_*
+"Menu (auto, tentative)",081DC02C,081DC208,,tools/families.py: 7 of 7 contiguous functions named Menu_*
+"Screen message (auto, tentative)",081DC448,081DC6D0,,tools/families.py: 3 of 4 contiguous functions named ScreenMessage_*
+"Time (auto, tentative)",081DC6D0,081DCF20,,tools/families.py: 7 of 8 contiguous functions named Time_*
+"Name entry (auto, tentative)",081DDAF0,081DE5E4,,tools/families.py: 3 of 7 contiguous functions named NameEntry_*
+"Script message (auto, tentative)",081E0560,081E0818,,tools/families.py: 3 of 4 contiguous functions named ScriptMessage_*
+"Script prompt (auto, tentative)",081E092C,081E0D58,,tools/families.py: 5 of 7 contiguous functions named ScriptPrompt_*
+"Game start (auto, tentative)",081E0D58,081E1AF4,,tools/families.py: 4 of 9 contiguous functions named GameStart_*
 Sound-test menu,081E1AF4,081E270C,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md and allocator 081E26CC callback chain
 Timed presentation,081E270C,081E2898,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md timed update cleanup and initialization
 Scripted presentation,081E2898,081E34D0,symbols/proposed/entry-animation.csv,docs/ENTRY_AND_MENUS.md allocation through global callback cleanup
 Actor animation controller (tentative),081E34D0,081EAB64,symbols/proposed/entry-animation.csv,docs/ANIMATION_081E.md and docs/ENTRY_AND_MENUS.md shared actor layout and command/callback chain
+"Params3 D 0 (auto, tentative)",081EB598,081EB81C,,tools/families.py: 3 of 4 contiguous functions named Params3D0_*
+"Screen params3 F 8 (auto, tentative)",081EB864,081EC1A8,,tools/families.py: 4 of 6 contiguous functions named ScreenParams3F8_*
+"Results (auto, tentative)",081EC1F8,081EC380,,tools/families.py: 4 of 4 contiguous functions named Results_*
+"Scene actors 3 (auto, tentative)",081EF140,081EF344,,tools/families.py: 7 of 7 contiguous functions named SceneActors_*
+"Singleton slot7 (auto, tentative)",081EF344,081EF750,,tools/families.py: 4 of 6 contiguous functions named SingletonSlot7_*
+"Singleton slot7 2 (auto, tentative)",081EF8F0,081F022C,,tools/families.py: 6 of 9 contiguous functions named SingletonSlot7_*
+"Singleton slot7 3 (auto, tentative)",081F065C,081F2190,,tools/families.py: 7 of 16 contiguous functions named SingletonSlot7_*
+"Singleton slot7 4 (auto, tentative)",081F2700,081F27A4,,tools/families.py: 3 of 3 contiguous functions named SingletonSlot7_*
+"Singleton slot7 5 (auto, tentative)",081F2BFC,081F2CD4,,tools/families.py: 3 of 4 contiguous functions named SingletonSlot7_*
+"Ratatosk (auto, tentative)",081F2F38,081F3508,,tools/families.py: 9 of 13 contiguous functions named Ratatosk_*
+"Scene actor (auto, tentative)",081F71D8,081F78F4,,tools/families.py: 20 of 21 contiguous functions named SceneActor_*
+"Ratatosk 2 (auto, tentative)",081F78F4,081F79F8,,tools/families.py: 4 of 4 contiguous functions named Ratatosk_*
+"Ratatosk 3 (auto, tentative)",081F9144,081F9E20,,tools/families.py: 12 of 15 contiguous functions named Ratatosk_*
+"Ratatosk particle (auto, tentative)",081FB86C,081FBB38,,tools/families.py: 3 of 4 contiguous functions named RatatoskParticle_*
+"Ratatosk 4 (auto, tentative)",081FBB38,081FC66C,,tools/families.py: 13 of 19 contiguous functions named Ratatosk_*
+"Scene projectile (auto, tentative)",081FC66C,081FCFE8,,tools/families.py: 7 of 13 contiguous functions named SceneProjectile_*
+"Projectile 4 (auto, tentative)",081FCFE8,081FD664,,tools/families.py: 9 of 15 contiguous functions named Projectile_*
+"Orbit effect (auto, tentative)",081FD7B0,081FDBF0,,tools/families.py: 3 of 6 contiguous functions named OrbitEffect_*
+"Orbit effect 2 (auto, tentative)",081FE02C,081FE68C,,tools/families.py: 5 of 8 contiguous functions named OrbitEffect_*
+"Sun orb (auto, tentative)",081FE68C,081FEA80,,tools/families.py: 10 of 12 contiguous functions named SunOrb_*
+"Sun orb 2 (auto, tentative)",081FEBCC,081FED40,,tools/families.py: 5 of 6 contiguous functions named SunOrb_*
+"Sprite particle 2 (auto, tentative)",081FED9C,081FF388,,tools/families.py: 10 of 15 contiguous functions named SpriteParticle_*
+"Homing projectile (auto, tentative)",081FF388,08200224,,tools/families.py: 13 of 18 contiguous functions named HomingProjectile_*
+"Player clone (auto, tentative)",082003B8,082012D4,,tools/families.py: 10 of 14 contiguous functions named PlayerClone_*
+"Script combat actor (auto, tentative)",08201CAC,0820264C,,tools/families.py: 3 of 5 contiguous functions named ScriptCombatActor_*
+"Timed sprite effect (auto, tentative)",0820264C,0820270C,,tools/families.py: 3 of 3 contiguous functions named TimedSpriteEffect_*
+"Projectile pool (auto, tentative)",0820270C,08202B30,,tools/families.py: 5 of 6 contiguous functions named ProjectilePool_*
+"Projectile config (auto, tentative)",08202E4C,08202F38,,tools/families.py: 9 of 10 contiguous functions named ProjectileConfig_*
+"Enemy F 426 (auto, tentative)",08203660,08204748,,tools/families.py: 6 of 11 contiguous functions named EnemyF426_*
+"Enemy D 459 (auto, tentative)",08204748,08205944,,tools/families.py: 6 of 12 contiguous functions named EnemyD459_*
+"Vulcan cannon (auto, tentative)",082064B4,082069A8,,tools/families.py: 3 of 4 contiguous functions named VulcanCannon_*
+"Fan cannon (auto, tentative)",082094F8,08209704,,tools/families.py: 4 of 5 contiguous functions named FanCannon_*
+"Fan cannon manager (auto, tentative)",0820A3AC,0820A5CC,,tools/families.py: 4 of 7 contiguous functions named FanCannonManager_*
+"Dragon puppy (auto, tentative)",0820AB3C,0820BD24,,tools/families.py: 7 of 12 contiguous functions named DragonPuppy_*
+"Enemy particle (auto, tentative)",0820D23C,0820D9D0,,tools/families.py: 14 of 17 contiguous functions named EnemyParticle_*
+"Poison hand (auto, tentative)",0820D9D0,0820EBEC,,tools/families.py: 5 of 10 contiguous functions named PoisonHand_*
+"Orange spine (auto, tentative)",0820EBEC,0820FD54,,tools/families.py: 5 of 11 contiguous functions named OrangeSpine_*
+"Collection (auto, tentative)",08210A1C,08210ED0,,tools/families.py: 12 of 15 contiguous functions named Collection_*
+"Collection menu (auto, tentative)",08210ED0,082116EC,,tools/families.py: 6 of 8 contiguous functions named CollectionMenu_*
+"Forging book (auto, tentative)",082116EC,08212F24,,tools/families.py: 23 of 34 contiguous functions named ForgingBook_*
+"Collection book (auto, tentative)",08212F24,08213294,,tools/families.py: 10 of 13 contiguous functions named CollectionBook_*
+"Forging book 2 (auto, tentative)",08213294,08213D10,,tools/families.py: 8 of 13 contiguous functions named ForgingBook_*
+"Interrupts and video (auto, tentative)",08213D10,08213FD8,,tools/families.py: 4 of 4 contiguous functions named InterruptsAndVideo_*
+"Interrupts and video 2 (auto, tentative)",082141BC,082142DC,,tools/families.py: 3 of 3 contiguous functions named InterruptsAndVideo_*
+"Sprite (auto, tentative)",082142DC,082143CC,,tools/families.py: 3 of 6 contiguous functions named Sprite_*
+"Sprite 2 (auto, tentative)",082144A4,08214588,,tools/families.py: 6 of 6 contiguous functions named Sprite_*
+"Anim data (auto, tentative)",08215118,082152AC,,tools/families.py: 5 of 6 contiguous functions named AnimData_*
+"Bg (auto, tentative)",082156A4,08215AC4,,tools/families.py: 5 of 8 contiguous functions named Bg_*
+"Bg 2 (auto, tentative)",082161B4,08216520,,tools/families.py: 3 of 3 contiguous functions named Bg_*
+"Video (auto, tentative)",08217060,08217120,,tools/families.py: 3 of 3 contiguous functions named Video_*
+"Palette (auto, tentative)",082171B8,08217414,,tools/families.py: 5 of 7 contiguous functions named Palette_*
+"Palette 2 (auto, tentative)",08217D50,08217DE0,,tools/families.py: 3 of 3 contiguous functions named Palette_*
+"Effect (auto, tentative)",08217E60,08217EEC,,tools/families.py: 4 of 4 contiguous functions named Effect_*
+"Text (auto, tentative)",08218B34,08218E5C,,tools/families.py: 12 of 14 contiguous functions named Text_*
+"Text window (auto, tentative)",08218E5C,0821907C,,tools/families.py: 3 of 6 contiguous functions named TextWindow_*
+"Mosaic (auto, tentative)",082190BC,08219134,,tools/families.py: 3 of 3 contiguous functions named Mosaic_*
+"Scanline effect (auto, tentative)",08219234,082192F0,,tools/families.py: 5 of 5 contiguous functions named ScanlineEffect_*
 Runtime input and utilities,08219A94,08219C20,symbols/proposed/subsystems.csv,Initializer 08219AAC; button polling 08219B24 and string hash 08219BD8
 Heap and memory operations,08219C20,08219F50,symbols/proposed/subsystems.csv,Allocator/free and memory clearing/copying implementations in src/fn/sub_08219*.c
 Task scheduler,08219F50,0821A184,symbols/proposed/subsystems.csv,Fourteen priority lists; allocation registration update destruction and ID lookup in src/fn/sub_08219F*.c and sub_0821A*.c
 Resource registry,0821A184,0821A2DC,,Registration and lookup implementations in src/fn/sub_0821A184.c through sub_0821A2C4.c
 Message queue,0821A2DC,0821A454,,docs/MGS_GCL_MATCHING.md double-buffered message posting and receiving
 Script virtual machine,0821A454,0821BAFC,,docs/MGS_GCL_MATCHING.md resource lookup and bytecode decoding through expression evaluator; following allocator starts map/collision resource
+"Terrain 2 (auto, tentative)",0821BAFC,0821BC68,,tools/families.py: 5 of 7 contiguous functions named Terrain_*
+"Terrain modifiers (auto, tentative)",0821D630,0821D6F4,,tools/families.py: 4 of 4 contiguous functions named TerrainModifiers_*
+"Trap (auto, tentative)",0821DDBC,0821E3C0,,tools/families.py: 5 of 11 contiguous functions named Trap_*
+"Terrain 3 (auto, tentative)",0821E3C0,0821E5C4,,tools/families.py: 5 of 6 contiguous functions named Terrain_*
+"Path (auto, tentative)",0821E748,0821E7B4,,tools/families.py: 5 of 5 contiguous functions named Path_*
+"Collider 3 (auto, tentative)",0821FDC8,0821FF8C,,tools/families.py: 10 of 11 contiguous functions named Collider_*
+"Collider 4 (auto, tentative)",08220AA0,08220B24,,tools/families.py: 3 of 4 contiguous functions named Collider_*
+"Anim (auto, tentative)",08220C8C,082210B8,,tools/families.py: 5 of 7 contiguous functions named Anim_*
 Scalar and vector interpolation,08221774,0822223C,symbols/proposed/report-subsystems.csv,docs/REPORT_SUBSYSTEMS.md; scalar approach wrapped angle clamp and vector helpers; 31 raw-tail entries independently reviewed and remain unmatched until exact C verification
+"Hash table (auto, tentative)",082223CC,08222554,,tools/families.py: 4 of 6 contiguous functions named HashTable_*
+"Serial (auto, tentative)",08222554,08222D60,,tools/families.py: 11 of 17 contiguous functions named Serial_*
+"Serial link (auto, tentative)",082232A0,082234C4,,tools/families.py: 4 of 5 contiguous functions named SerialLink_*
+"Rfu manager (auto, tentative)",08223534,082236C8,,tools/families.py: 7 of 7 contiguous functions named RfuManager_*
+"Rfu manager 2 (auto, tentative)",08224880,08224D3C,,tools/families.py: 8 of 11 contiguous functions named RfuManager_*
+"Wireless (auto, tentative)",08224D3C,08224E54,,tools/families.py: 4 of 5 contiguous functions named Wireless_*
+"Scene lifecycle (auto, tentative)",08224EEC,08225410,,tools/families.py: 12 of 17 contiguous functions named SceneLifecycle_*
+"Game state 5 (auto, tentative)",08225448,08225508,,tools/families.py: 3 of 3 contiguous functions named GameState_*
+"Script (auto, tentative)",08225560,082258A0,,tools/families.py: 9 of 13 contiguous functions named Script_*
+"Scene body (auto, tentative)",082258AC,08225B74,,tools/families.py: 19 of 19 contiguous functions named SceneBody_*
+"Terrain 4 (auto, tentative)",08225C48,08225E1C,,tools/families.py: 3 of 3 contiguous functions named Terrain_*
+"Camera (auto, tentative)",08225E20,08226CF8,,tools/families.py: 34 of 42 contiguous functions named Camera_*
+"Script 2 (auto, tentative)",082283F4,082284CC,,tools/families.py: 3 of 3 contiguous functions named Script_*
+"Clock (auto, tentative)",082284CC,082284F4,,tools/families.py: 3 of 3 contiguous functions named Clock_*
 Clock and sun schedule (tentative),082284F4,0822AE7C,,RTC date helpers Clock_DaysInMonth; sun clock src/sun_clock.c and sub_08228C40; Time_CalculateSunriseSunset ends the block
 Music player slots (tentative),0822AE7C,0822B5D0,,Sound_PlaySong/StopSong wrappers over m4aSongNum* on 0x03005470; fade helpers 0822AF78-B058; song table 0x082643EC readers end at 0822B590
+"Scene stimulus (auto, tentative)",0822B5D0,0822BAD0,,tools/families.py: 16 of 20 contiguous functions named SceneStimulus_*
+"Save (auto, tentative)",0822BAD0,0822BEE0,,tools/families.py: 19 of 20 contiguous functions named Save_*
+"Registry3 C 8 D (auto, tentative)",0822BEE4,0822C010,,tools/families.py: 3 of 3 contiguous functions named Registry3C8D_*
+"Region (auto, tentative)",0822C010,0822C110,,tools/families.py: 6 of 6 contiguous functions named Region_*
+"Solar (auto, tentative)",0822C198,0822CCC8,,tools/families.py: 17 of 22 contiguous functions named Solar_*
+"Inventory 2 (auto, tentative)",0822CCC8,0822DC78,,tools/families.py: 48 of 60 contiguous functions named Inventory_*
+"Inventory 3 (auto, tentative)",0822DE14,0822E11C,,tools/families.py: 8 of 10 contiguous functions named Inventory_*
+"Game state 6 (auto, tentative)",0822E11C,0822E6A4,,tools/families.py: 19 of 22 contiguous functions named GameState_*
+"Game state 7 (auto, tentative)",0822E904,0822E9FC,,tools/families.py: 3 of 3 contiguous functions named GameState_*
+"Solar fruit (auto, tentative)",0822E9FC,0822ED64,,tools/families.py: 7 of 10 contiguous functions named SolarFruit_*
+"Save 2 (auto, tentative)",0822ED64,0822EE68,,tools/families.py: 3 of 3 contiguous functions named Save_*
+"Scene actor effects (auto, tentative)",082321A4,08232370,,tools/families.py: 5 of 6 contiguous functions named SceneActorEffects_*
+"Timed hazard (auto, tentative)",0823237C,08232764,,tools/families.py: 5 of 7 contiguous functions named TimedHazard_*
+"Screen orbit effect (auto, tentative)",082329D4,08232F1C,,tools/families.py: 5 of 8 contiguous functions named ScreenOrbitEffect_*
+"Transient sprite pool (auto, tentative)",0823306C,08233140,,tools/families.py: 3 of 4 contiguous functions named TransientSpritePool_*
+"Explosion effect (auto, tentative)",082331E4,082334F4,,tools/families.py: 8 of 8 contiguous functions named ExplosionEffect_*
+"Charged burst (auto, tentative)",082338EC,08233B60,,tools/families.py: 7 of 7 contiguous functions named ChargedBurst_*
+"Solar bomb (auto, tentative)",08233B60,082343A0,,tools/families.py: 6 of 10 contiguous functions named SolarBomb_*
+"Spiral burst (auto, tentative)",082343A0,08234810,,tools/families.py: 6 of 8 contiguous functions named SpiralBurst_*
+"Health restore effect (auto, tentative)",082349A0,0823511C,,tools/families.py: 11 of 14 contiguous functions named HealthRestoreEffect_*
+"Health burst effect (auto, tentative)",082352C8,08235DB0,,tools/families.py: 6 of 15 contiguous functions named HealthBurstEffect_*
+"Radial burst effect (auto, tentative)",08236294,0823659C,,tools/families.py: 3 of 6 contiguous functions named RadialBurstEffect_*
+"Rising puff pool (auto, tentative)",0823722C,08237368,,tools/families.py: 4 of 5 contiguous functions named RisingPuffPool_*
+"Moving glyph (auto, tentative)",082373C8,082374F4,,tools/families.py: 3 of 6 contiguous functions named MovingGlyph_*
+"Actor glyph trail (auto, tentative)",082377A8,08237EC8,,tools/families.py: 6 of 14 contiguous functions named ActorGlyphTrail_*
+"Player 13 (auto, tentative)",08238450,082384C8,,tools/families.py: 4 of 4 contiguous functions named Player_*
+"Player 14 (auto, tentative)",082387B0,08239664,,tools/families.py: 13 of 22 contiguous functions named Player_*
+"Link player (auto, tentative)",082397FC,08239EB4,,tools/families.py: 5 of 8 contiguous functions named LinkPlayer_*
+"Link player 2 (auto, tentative)",0823AA24,0823AD64,,tools/families.py: 13 of 17 contiguous functions named LinkPlayer_*
+"Player 15 (auto, tentative)",0823B264,0823B308,,tools/families.py: 3 of 3 contiguous functions named Player_*
+"Player 16 (auto, tentative)",0823B6A4,0823B938,,tools/families.py: 4 of 7 contiguous functions named Player_*
+"Player 17 (auto, tentative)",0823CFDC,0823D7E0,,tools/families.py: 4 of 9 contiguous functions named Player_*
 Cartridge solar sensor,08243C10,08243EFC,symbols/proposed/solar.csv,docs/SOLAR_SENSOR.md complete eight-function GPIO and timer block

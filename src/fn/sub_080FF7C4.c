@@ -21,7 +21,7 @@ static inline u8 Tst(u32 *m, s32 i)
     return FALSE;
 }
 
-struct E *sub_080FF7C4(struct S *b)
+struct E *WoodenCrate_AllocateSlot(struct S *b)
 {
     s32 i;
     struct E *e;

@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_08195078(u8 *t, s32 cx, s32 cz)
+void Nidhoggr_UpdateAnchoredSway(u8 *t, s32 cx, s32 cz)
 {
     s32 x, z;
     {

@@ -127,7 +127,7 @@ static inline u32 CellIndex(const struct ContactPosition *position)
 }
 static inline u32 GroundHeight(u32 cell, const struct ContactPosition *position)
 {
-    u8 *data = sub_0821D64C(cell, 1);
+    u8 *data = TerrainModifiers_FindCellOverride(cell, 1);
     u32 flags;
     u32 shape, height;
     if (data)

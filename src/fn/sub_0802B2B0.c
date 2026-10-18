@@ -23,7 +23,7 @@ static inline u8 chk(struct S *p)
     return 0;
 }
 
-void sub_0802B2B0(struct S *p)
+void GridAttack_UpdateAnimationSeventeen(struct S *p)
 {
     if (chk(p)) {
         u32 k = 0x11;

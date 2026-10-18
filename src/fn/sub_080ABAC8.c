@@ -9,7 +9,7 @@ void sub_080AAA90(u8 *);
 void sub_080AA8C4(u8 *);
 void sub_080AB04C(u8 *);
 
-s32 sub_080ABAC8(u8 *p)
+s32 TentacleActor_UpdateComponents(u8 *p)
 {
     s16 *timer;
     sub_080AB7BC(p);

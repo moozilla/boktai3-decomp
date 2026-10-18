@@ -1,9 +1,9 @@
 #include "global.h"
 
-void sub_080DA948(void);
+void Mummy_ClearInactiveActionFlags(void);
 
-s32 sub_080D48E8(void)
+s32 Mummy_UpdateSpecialFlags(void)
 {
-    sub_080DA948();
+    Mummy_ClearInactiveActionFlags();
     return 1;
 }

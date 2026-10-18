@@ -4,7 +4,7 @@ struct S {
     u32 fl;
 };
 extern struct S *gUnk_0200026C;
-void sub_081C4BA8(void)
+void ShipWheel_RequestStop(void)
 {
     struct S *p = gUnk_0200026C;
     if (p != 0)

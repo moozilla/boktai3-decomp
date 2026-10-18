@@ -10,7 +10,7 @@ struct G {
 };
 extern struct G *gUnk_02000710;
 
-void sub_0815DD14(u32 a, u32 b, struct P *p)
+void Player_OnStateOneEvent(u32 a, u32 b, struct P *p)
 {
     if (p->d18 == 1)
         gUnk_02000710->w600 += 4;

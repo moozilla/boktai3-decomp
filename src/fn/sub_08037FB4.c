@@ -10,8 +10,8 @@ struct P {
     u8 pad1[0x29];
     struct Packet packet;
 };
-int sub_08036B64(struct Packet *);
-int sub_08037FB4(struct P *p, int type, const u32 *src, int count)
+int Wireless_QueueNiPacket(struct Packet *);
+int WirelessExchange_SendPacket(struct P *p, int type, const u32 *src, int count)
 {
     struct Packet *q = &p->packet;
     u32 *dst;
@@ -26,7 +26,7 @@ int sub_08037FB4(struct P *p, int type, const u32 *src, int count)
             count--;
         } while (count);
     }
-    r = sub_08036B64(q);
+    r = Wireless_QueueNiPacket(q);
     if (r < 0 && q->type)
         p->busy = 1;
     return r;

@@ -33,7 +33,7 @@ static inline u16 mask8(s32 x)
 {
     return x & 255;
 }
-s32 sub_08161AF4(u8 *p)
+s32 PlayerAttackEffect_EmitPaletteThreeTrail(u8 *p)
 {
     struct Vec a, b, c;
     u32 state = W(0x59C);

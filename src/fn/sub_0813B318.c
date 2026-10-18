@@ -17,7 +17,7 @@ static inline u32 tst(u32 *a, u32 m)
 }
 s32 sub_08228DB8(void);
 
-s32 sub_0813B318(struct P0813B318 *p)
+s32 Player_IsActionBlocked(struct P0813B318 *p)
 {
     s32 v;
     if (*(s32 *)((u8 *)gUnk_02000710 + p->idx * 4 + 0x628) > 0 ||

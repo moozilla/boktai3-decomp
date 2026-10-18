@@ -10,11 +10,11 @@ struct Object {
     u8 pad50[8];
     int damage;
 };
-void sub_0802D020(struct Object *, int, int, struct Vec *);
-void sub_0802C954(struct Object *, int);
-void sub_0802D040(struct Object *);
+void Actor_ShowDamageNumber(struct Object *, int, int, struct Vec *);
+void Actor_SubtractHealth(struct Object *, int);
+void Actor_StartDamageFlash(struct Object *);
 void TransientSpriteEffects_Spawn(int, int, struct Vec *, int, int, int);
-int sub_0802D380(struct Object *p)
+int Actor_OnDamage(struct Object *p)
 {
     int damage = p->damage;
     if (damage > 0) {
@@ -22,13 +22,13 @@ int sub_0802D380(struct Object *p)
         size.x = 16;
         size.y = 0;
         size.z = 16;
-        sub_0802D020(p, damage, 0, &size);
-        sub_0802C954(p, damage);
+        Actor_ShowDamageNumber(p, damage, 0, &size);
+        Actor_SubtractHealth(p, damage);
         if (p->health <= 0) {
             TransientSpriteEffects_Spawn(0, 0, &p->pos, 0, 256, 256);
             return 1;
         }
-        sub_0802D040(p);
+        Actor_StartDamageFlash(p);
     }
     return 0;
 }

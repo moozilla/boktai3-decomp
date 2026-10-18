@@ -8,24 +8,24 @@ struct Actor {
     u8 pad[0x2b8];
     struct Entry *entries;
 };
-int sub_0802DBD4(struct Actor *, int, int, int, int, int);
-int sub_0802DB78(struct Actor *, int, int, int, int, int);
-int sub_0802DC7C(struct Actor *, int, int, int, int, int);
-int sub_0802DC18(struct Actor *, int, int, int, int, int);
-int sub_0802DCB8(struct Actor *, int, int, int, int, int);
+int Actor_SetFourWayAnimation(struct Actor *, int, int, int, int, int);
+int Actor_SetMirroredFourWayAnimation(struct Actor *, int, int, int, int, int);
+int Actor_SetFrontBackAnimation(struct Actor *, int, int, int, int, int);
+int Actor_SetMirroredEightWayAnimation(struct Actor *, int, int, int, int, int);
+int Actor_SetUndirectedAnimation(struct Actor *, int, int, int, int, int);
 int Actor_PlayAnimationEntry(struct Actor *p, int id, int a, int b, int c)
 {
     struct Entry *entry = &p->entries[id];
     int result;
     if (entry->kind == 1)
-        result = sub_0802DBD4(p, entry->animation, a, entry->stride, b, c);
+        result = Actor_SetFourWayAnimation(p, entry->animation, a, entry->stride, b, c);
     else if (entry->kind == 3)
-        result = sub_0802DB78(p, entry->animation, a, entry->stride, b, c);
+        result = Actor_SetMirroredFourWayAnimation(p, entry->animation, a, entry->stride, b, c);
     else if (entry->kind == 2)
-        result = sub_0802DC7C(p, entry->animation, a, entry->stride, b, c);
+        result = Actor_SetFrontBackAnimation(p, entry->animation, a, entry->stride, b, c);
     else if (entry->kind == 4)
-        result = sub_0802DC18(p, entry->animation, a, entry->stride, b, c);
+        result = Actor_SetMirroredEightWayAnimation(p, entry->animation, a, entry->stride, b, c);
     else
-        result = sub_0802DCB8(p, entry->animation, a, entry->stride, b, c);
+        result = Actor_SetUndirectedAnimation(p, entry->animation, a, entry->stride, b, c);
     return result;
 }

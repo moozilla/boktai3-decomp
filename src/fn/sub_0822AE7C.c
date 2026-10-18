@@ -8,7 +8,7 @@ void m4aMPlayImmInit(struct MusicPlayerInfo *);
 void m4aMPlayFadeIn(struct MusicPlayerInfo *, u16);
 void m4aMPlayFadeOut(struct MusicPlayerInfo *, u16);
 void m4aMPlayFadeOutTemporarily(struct MusicPlayerInfo *, u16);
-void sub_0822AE7C(u32 song)
+void Sound_PlayTrackedSong(u32 song)
 {
     u32 index;
     if (gSongTable[song].ms == 10)

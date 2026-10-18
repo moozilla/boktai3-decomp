@@ -6,7 +6,7 @@ struct S {
     u16 c;
     u16 d;
 };
-void sub_0823AD18(struct S *s)
+void LinkPlayer_InitHealth(struct S *s)
 {
     u32 v = s->a * 10;
     s->d = v;

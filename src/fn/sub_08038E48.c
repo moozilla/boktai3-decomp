@@ -24,15 +24,15 @@ struct Global {
     u32 money;
 };
 extern struct Global *gUnk_030053F8;
-int sub_08036AA8(void);
-void sub_08038158(void);
+int Wireless_IsSessionActive(void);
+void WirelessGameMenu_OnResultPanelClosed(void);
 void sub_0803B700(int, int, void *, void *, u32, u32, void *);
-void sub_080380C4(struct P *, int);
+void WirelessGameMenu_LoadBackground(struct P *, int);
 int sub_08033690(int, int, int, int);
 void TextWindow_SetScript(int, void *);
 void TextWindow_Refresh(int, int);
-void sub_080337FC(int);
-void sub_08038E48(struct P *p)
+void TextWindow_StartPlayback(int);
+void WirelessTradeMenu_UpdateResultsPanel(struct P *p)
 {
     if (p->entered) {
         int offset;
@@ -45,9 +45,9 @@ void sub_08038E48(struct P *p)
         offset = (p->round - 1) * 720;
         left = (u8 *)(offset + (u32)p->left);
         right = (u8 *)(offset + (u32)p->right);
-        side = sub_08036AA8();
+        side = Wireless_IsSessionActive();
         money = gUnk_030053F8->money;
-        sub_0803B700(side, p->mode, left, right, p->reward, money, sub_08038158);
+        sub_0803B700(side, p->mode, left, right, p->reward, money, WirelessGameMenu_OnResultPanelClosed);
     }
     if (p->done) {
         int *window = &p->window;
@@ -59,13 +59,13 @@ void sub_08038E48(struct P *p)
         p->entered = 1;
         p->timer = zero;
         p->flag = zero;
-        sub_080380C4(p, 3);
+        WirelessGameMenu_LoadBackground(p, 3);
         w = sub_08033690(1, 6, 28, 6);
         *window = w;
         if (w >= 0) {
             TextWindow_SetScript(w, p->script);
             TextWindow_Refresh(*window, 11);
-            sub_080337FC(*window);
+            TextWindow_StartPlayback(*window);
         }
     }
 }

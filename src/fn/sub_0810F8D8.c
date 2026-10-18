@@ -1,6 +1,6 @@
 #include "global.h"
 u32 sub_08033690(u32, u32, u32, u32);
-void sub_0810F8D8(u8 *s)
+void LinkScorePanel_CreateTextWindows(u8 *s)
 {
     u32 v;
     *(u32 *)(s + 0x1004) = sub_08033690(1, 3, 10, 2);

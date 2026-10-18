@@ -1,10 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
-void sub_0803DA30(struct ScenePoolEntry *, s32, s32, s32);
-void sub_0803DA7C(struct ScenePoolEntry *, s32, s32, s32);
-s32 sub_0803D9D8(struct ScenePoolEntry *);
-void sub_0803DBB4(struct ScenePoolActor *, struct ScenePoolEntry *);
-void sub_0803DC1C(struct ScenePoolActor *, struct ScenePoolEntry *);
+void ScenePool_SetSpeedControlSchedule(struct ScenePoolEntry *, s32, s32, s32);
+void ScenePool_SetLateralControlSchedule(struct ScenePoolEntry *, s32, s32, s32);
+s32 ScenePool_SelectStateAtPositionLimit(struct ScenePoolEntry *);
+void ScenePool_ApplyScheduledSpeedControl(struct ScenePoolActor *, struct ScenePoolEntry *);
+void ScenePool_UpdateLateralControlPulse(struct ScenePoolActor *, struct ScenePoolEntry *);
 void ScenePool_ScheduleSpeedControl(struct ScenePoolEntry *);
 static inline void Or(u32 mask, u32 *flags)
 {
@@ -18,11 +18,11 @@ s32 ScenePool_StateScheduleMotion(void *manager, struct ScenePoolActor *actor,
     if (entry->stateEntered) {
         u32 initialZero = 0;
         entry->stateEntered = initialZero;
-        sub_0803DA30(entry, 0, 30, 40);
+        ScenePool_SetSpeedControlSchedule(entry, 0, 30, 40);
         entry->turnStep = 0x200;
         history[0] = initialZero;
     }
-    if (sub_0803D9D8(entry))
+    if (ScenePool_SelectStateAtPositionLimit(entry))
         goto done;
     Or(0x10, &actor->stateFlags);
     if (!entry->delayA) {
@@ -46,9 +46,9 @@ s32 ScenePool_StateScheduleMotion(void *manager, struct ScenePoolActor *actor,
             if (random <= 31) {
                 s32 z = actor->position.z >> 12;
                 if (z <= 18)
-                    sub_0803DA7C(entry, 1, 3, 6);
+                    ScenePool_SetLateralControlSchedule(entry, 1, 3, 6);
                 else if (z > 47)
-                    sub_0803DA7C(entry, -1, 3, 6);
+                    ScenePool_SetLateralControlSchedule(entry, -1, 3, 6);
                 else {
                     u32 value;
                     u32 second = (next + 1) & indexMask;
@@ -56,16 +56,16 @@ s32 ScenePool_StateScheduleMotion(void *manager, struct ScenePoolActor *actor,
                     value = table[second];
                     random = value & byteMask;
                     if (random <= 127)
-                        sub_0803DA7C(entry, 1, 3, 6);
+                        ScenePool_SetLateralControlSchedule(entry, 1, 3, 6);
                     else
-                        sub_0803DA7C(entry, -1, 3, 6);
+                        ScenePool_SetLateralControlSchedule(entry, -1, 3, 6);
                 }
             }
         }
     } else
         entry->delayA--;
-    sub_0803DBB4(actor, entry);
-    sub_0803DC1C(actor, entry);
+    ScenePool_ApplyScheduledSpeedControl(actor, entry);
+    ScenePool_UpdateLateralControlPulse(actor, entry);
     if ((u32)entry->direction + 0x4ffff <= 0x9fffe)
         history[0]++;
     else

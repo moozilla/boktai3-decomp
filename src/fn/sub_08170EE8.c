@@ -7,7 +7,7 @@ static inline void put(s16 *p, s32 x, s32 y)
     p[2] = zero;
     p[3] = zero;
 }
-void sub_08170EE8(s16 *out, u8 *in)
+void PauseInventory_GetConsumableCursorPosition(s16 *out, u8 *in)
 {
     u32 type = in[3];
     if (type <= 15) {

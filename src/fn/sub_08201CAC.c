@@ -15,8 +15,8 @@ struct S {
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
 void sub_081263E0(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
-void sub_08201388(void *);
-u32 sub_08201CAC(struct S *p)
+void ScriptCombatActor_RecordDefeat(void *);
+u32 ScriptCombatActor_UpdateDefeatEffect(struct S *p)
 {
     if (p->h1a8 == 0) {
         if (p->w18 <= 0x23) {
@@ -31,7 +31,7 @@ u32 sub_08201CAC(struct S *p)
             sub_081263E0(&v, 0x80, 0x20, 0xc, 0xc, 0x18, t, 0x20, 0x20, 1, 2, 0x200);
         }
         if (p->w18 == 1)
-            sub_08201388(p);
+            ScriptCombatActor_RecordDefeat(p);
     }
     return 0;
 }

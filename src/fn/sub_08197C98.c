@@ -12,7 +12,7 @@ struct Task08197C98 {
 };
 void sub_08221208(void *, void *, u32, u32, u32);
 
-void sub_08197C98(void *task)
+void PaletteEffect_UpdateWhiteFlash(void *task)
 {
     struct Task08197C98 *t = task;
     u8 *src = t->tiles;

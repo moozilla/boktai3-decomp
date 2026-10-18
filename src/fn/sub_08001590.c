@@ -1,4 +1,6 @@
 #include "global.h"
+/* Boot_ClearReservedWords: Clears four reserved EWRAM boot words right after AgbMain; standalone 28-byte function with its own push/pop-bx, matching the documented reserved-word */
+#define Boot_ClearReservedWords sub_08001590
 #define Boot_ClearReservedWords sub_08001590
 // Provisional name: Boot_ClearReservedWords
 /* Clear the four boot-state words at the start of external RAM. */

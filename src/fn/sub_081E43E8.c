@@ -53,9 +53,9 @@ struct S {
     s32 idleTimer;
 };
 void Anim_SetSequence(void *, u32, u32, u32, u32);
-void sub_081E4188(void *);
+void Actor_RestoreSavedAnimationPlayback(void *);
 void ActorShadow_Disable(void *);
-void sub_081E41EC(void *);
+void Actor_ArmRestIdleTransition(void *);
 static inline u8 take(struct S *p)
 {
     s32 m = 1;
@@ -79,7 +79,7 @@ static inline u32 frame_factor(u16 v)
     u32 mask = 15;
     return mask & value;
 }
-void sub_081E4174(void *);
+void Actor_SetInteractionControlFlag(void *);
 void AnimData_SelectPaletteBank(void *, s32);
 void Sound_PlaySong(s32);
 void Script_Call(void *, s32);
@@ -88,7 +88,7 @@ void ActorPalette_BeginFade(void *);
 extern s32 gUnk_03005260;
 extern u8 gUnk_03005430[];
 void sub_081E42C4(void *);
-void sub_081E43E8(struct S *p)
+void Actor_UpdateIdlePhaseRestoration(struct S *p)
 {
     if (gUnk_03005260) {
         p->interrupted = 1;

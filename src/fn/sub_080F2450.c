@@ -13,7 +13,7 @@ struct S {
     u32 cnt;
 };
 
-void sub_080F2450(struct S *s)
+void Ivy_InitBobbing(struct S *s)
 {
     s->h64 = 0;
     s->h66 = 0;

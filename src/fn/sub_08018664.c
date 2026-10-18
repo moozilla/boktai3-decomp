@@ -12,7 +12,7 @@ struct PaletteBlender {
     struct PaletteBlendEntry entries[16];
 };
 extern u16 gUnk_03004FC0[16][16];
-struct PaletteBlender *sub_08018618(void);
+struct PaletteBlender *PaletteCycle_Create(void);
 /* Registry routine 3A89: adds a palette blend entry to the palette blend task
    (0x02000094, created on demand; up to 16): -s and -d palette, color and
    bank (1 = the task's own colors, else the palette buffer), -b palette and
@@ -20,7 +20,7 @@ struct PaletteBlender *sub_08018618(void);
    Returns -1 when full (tentative). */
 s32 PaletteBlend_AddFromScript(void)
 {
-    struct PaletteBlender *p = sub_08018618();
+    struct PaletteBlender *p = PaletteCycle_Create();
     struct PaletteBlendEntry *e;
     s32 sp, sc, sb, dp, dc, db, bp, bc;
     if (!p)

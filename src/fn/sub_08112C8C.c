@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_020004BC;
-void sub_08112C8C(s32 i)
+void ActorMarkerPool_ShowMarker(s32 i)
 {
     if (i >= 0) {
         u8 *g = gUnk_020004BC;

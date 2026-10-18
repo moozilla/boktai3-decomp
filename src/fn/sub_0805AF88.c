@@ -23,7 +23,7 @@ void ScenePanelRig_InitSecondarySprites(struct ScenePanelRig *rig)
         }
         animated = sprite;
         graphics = sprite->graphics;
-        AnimData_Load(graphics, (u16)sub_08219BD8(gUnk_0824DEAC));
+        AnimData_Load(graphics, (u16)String_Hash(gUnk_0824DEAC));
         {
             u32 parity = i;
             asm("" : "+r"(parity));
@@ -60,7 +60,7 @@ void ScenePanelRig_InitSecondarySprites(struct ScenePanelRig *rig)
             offset += (u32)table;
             animated->randomPhase = *(u8 *)offset;
         }
-        resource = ScriptProc_Start(0x922E, (u16)sub_08219BD8(gUnk_0824DEB0));
+        resource = ScriptProc_Start(0x922E, (u16)String_Hash(gUnk_0824DEB0));
         animated->animationResource = resource;
         Anim_SetSequence(&animated->sequence, resource, (u16)({
             next = i + 1;

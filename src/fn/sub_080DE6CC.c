@@ -5,7 +5,7 @@ struct S {
     u32 flags;
 };
 
-void sub_080DE6CC(struct S *s)
+void Dog_OnClearActivityFlag(struct S *s)
 {
     u32 *p = &s->flags;
     u32 m = ~2;

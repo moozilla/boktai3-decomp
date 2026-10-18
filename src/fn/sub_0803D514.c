@@ -4,12 +4,12 @@ u32 Script_GetKeywordValue(u32, u32);
 u8 *Heap_Alloc(u32);
 void Memory_Clear(u8 *, u32);
 void sub_0803CEE8(u8 *, u8 *);
-void sub_082223CC(u8 *, u32, void *);
-void sub_0803C90C();
+void HashTable_Init(u8 *, u32, void *);
+void ScenePool_GetRegistryBucketIndex();
 
 extern u32 gUnk_02000108;
 
-s32 sub_0803D514(u8 *p)
+s32 ScenePool_InitializeManager(u8 *p)
 {
     u32 n;
     u8 *m;
@@ -32,6 +32,6 @@ s32 sub_0803D514(u8 *p)
         e += 0x8b0;
         i--;
     } while (i >= 0);
-    sub_082223CC(p + 0x2354, 0x10, sub_0803C90C);
+    HashTable_Init(p + 0x2354, 0x10, ScenePool_GetRegistryBucketIndex);
     return 0;
 }

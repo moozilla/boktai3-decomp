@@ -1,6 +1,6 @@
 #include "global.h"
 void Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
-void sub_081CA900(void *unused, u8 *p, s32 n)
+void Actor_UpdateKindFifteenEntryTenTimed(void *unused, u8 *p, s32 n)
 {
     if (p[9]) {
         s32 r;

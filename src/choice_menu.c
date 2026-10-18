@@ -1,4 +1,6 @@
 #include "choice_menu.h"
+/* ChoiceMenu_Create: non-script constructor (already aliased via #define in choice_menu.c) that creates the task, installs ChoiceMenu_Update/ChoiceMenu_Destroy as callback */
+#define ChoiceMenu_Create sub_08006CD0
 
 struct Args {
     u32 count : 16;
@@ -58,7 +60,7 @@ void ChoiceMenu_Select(struct ChoiceMenu *p, s32 selection)
     p->selected = selection;
 }
 
-s32 sub_08006478(struct ChoiceMenu *p, s32 a, s32 d)
+s32 ChoiceMenu_FindSelectableRow(struct ChoiceMenu *p, s32 a, s32 d)
 {
     s32 x = a;
     s32 i;
@@ -74,7 +76,7 @@ s32 sub_08006478(struct ChoiceMenu *p, s32 a, s32 d)
     return a;
 }
 
-void sub_08030BF8(void);
+void MessageWindow_Clear(void);
 
 // MATCHING_CONCESSION: register-pinning
 s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p)
@@ -122,7 +124,7 @@ s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p)
         if (pressed & 2) {
             if (p->allowCancel) {
                 Sound_PlaySong(222);
-                sub_08030BF8();
+                MessageWindow_Clear();
                 ChoiceMenu_DispatchSelection(p, -1);
                 p->leftCursor.flags |= 1;
                 p->rightCursor.flags |= 1;
@@ -138,7 +140,7 @@ s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p)
                     bits;
                 })) {
                 Sound_PlaySong(221);
-                sub_08030BF8();
+                MessageWindow_Clear();
                 ChoiceMenu_DispatchSelection(p, p->selected);
                 p->leftCursor.flags |= one;
                 p->rightCursor.flags |= one;
@@ -171,7 +173,7 @@ s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p)
                                  u32 value = p->rowStart[choice->row];
                                  value;
                              });
-                s32 row = sub_08006478(p, choice->row, -1);
+                s32 row = ChoiceMenu_FindSelectableRow(p, choice->row, -1);
                 if (choice->row == row)
                     selection = p->selected;
                 else
@@ -192,7 +194,7 @@ s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p)
                                                         p->rowStart[choice->row];
                                                     value;
                                                 });
-                s32 row = sub_08006478(p, choice->row, 1);
+                s32 row = ChoiceMenu_FindSelectableRow(p, choice->row, 1);
                 if (choice->row == row)
                     selection = p->selected;
                 else
@@ -219,57 +221,57 @@ s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p)
     return 0;
 }
 
-s32 sub_08031E34(void *);
+s32 MessageWindow_GetTextCompletionState(void *);
 
-u32 sub_082282A4(u32);
+u32 ChoiceMenu_GetHighlightColor(u32);
 
-u32 sub_080066C0(struct ChoiceMenu *p)
+u32 ChoiceMenu_Update(struct ChoiceMenu *p)
 {
-    if (p->window != 0 && sub_08031E34(p->window) != 0) {
+    if (p->window != 0 && MessageWindow_GetTextCompletionState(p->window) != 0) {
         if (p->delay == 0) {
             if (ChoiceMenu_HandleInput(p) == 1)
                 return 0;
         } else {
             p->delay--;
         }
-        p->palette[12] = sub_082282A4(p->colorIndex);
+        p->palette[12] = ChoiceMenu_GetHighlightColor(p->colorIndex);
         p->colorIndex = (p->colorIndex + 1) & 0x3f;
     }
     return 0;
 }
 
-u32 sub_08006710(struct ChoiceMenu *p)
+u32 ChoiceMenu_Destroy(struct ChoiceMenu *p)
 {
     Anim_Remove(&p->leftCursor);
     Anim_Remove(&p->rightCursor);
     return gUnk_0200002C = 0;
 }
 
-void sub_08030F20(u32, u32, u32, u32);
+void MessageWindow_SetBounds(u32, u32, u32, u32);
 
-void sub_08030B78(u32);
+void MessageWindow_SetDisplayMode(u32);
 
-void sub_08030C84(u32);
+void MessageWindow_SetMessageTable(u32);
 
-void sub_08030DBC(u32);
+void MessageWindow_ShowMessage(u32);
 
-void sub_08006738(struct ChoiceMenu *s)
+void ChoiceMenu_PrintText(struct ChoiceMenu *s)
 {
-    sub_08030F20(s->left, s->top, s->maxWidth, s->maxRows);
-    sub_08030B78(1);
-    sub_08030C84((u32)s->window);
-    sub_08030DBC(s->stringBase);
+    MessageWindow_SetBounds(s->left, s->top, s->maxWidth, s->maxRows);
+    MessageWindow_SetDisplayMode(1);
+    MessageWindow_SetMessageTable((u32)s->window);
+    MessageWindow_ShowMessage(s->stringBase);
 }
 
 extern const u8 gUnk_0824DB0C[], gUnk_0824DB14[], gUnk_0824DB1C[], gUnk_0824DB20[];
 
-s32 sub_08032168(const u8 *, const u8 *, s32);
+s32 Text_ComparePrefix(const u8 *, const u8 *, s32);
 
-s32 sub_080321A0(const u8 *, s32);
+s32 Text_ParseDecimal(const u8 *, s32);
 
-s32 sub_08031DDC(s32);
+s32 MessageWindow_GetStringWidth(s32);
 
-s32 sub_08031DBC(s32);
+s32 MessageWindow_GetNumberWidth(s32);
 
 u8 *Text_FindChar(u8 *, s32);
 
@@ -278,7 +280,7 @@ u8 *ChoiceMenu_ParseTag(struct ChoiceMenu *p, u8 *text)
 {
     u8 *cursor = text;
     if (*text != '/') {
-        if (!sub_08032168(text, gUnk_0824DB0C, 5)) {
+        if (!Text_ComparePrefix(text, gUnk_0824DB0C, 5)) {
             READ_WIDTH();
             cursor = Text_FindChar(cursor, '>');
             p->choices[p->count].x = (p->left + ({
@@ -290,19 +292,19 @@ u8 *ChoiceMenu_ParseTag(struct ChoiceMenu *p, u8 *text)
             p->choices[p->count].y = (p->top << 3) + (p->rows << 4);
             p->choices[p->count].row = p->rows;
             p->width = 0;
-        } else if (!sub_08032168(text, gUnk_0824DB14, 6)) {
-            register s32 width asm("r1") = sub_08031DDC(READ_NUMBER());
+        } else if (!Text_ComparePrefix(text, gUnk_0824DB14, 6)) {
+            register s32 width asm("r1") = MessageWindow_GetStringWidth(READ_NUMBER());
             p->width += width;
             p->textX += width;
             cursor = Text_FindChar(cursor, '>');
-        } else if (!sub_08032168(text, gUnk_0824DB1C, 3)) {
-            register s32 width asm("r1") = sub_08031DBC(READ_NUMBER());
+        } else if (!Text_ComparePrefix(text, gUnk_0824DB1C, 3)) {
+            register s32 width asm("r1") = MessageWindow_GetNumberWidth(READ_NUMBER());
             p->width += width;
             p->textX += width;
             cursor = Text_FindChar(cursor, '>');
         } else
             goto unknown;
-    } else if (!sub_08032168(text, gUnk_0824DB20, 6)) {
+    } else if (!Text_ComparePrefix(text, gUnk_0824DB20, 6)) {
         cursor = Text_FindChar(text, '>');
         if (p->explicitWidth)
             p->choices[p->count].width = p->explicitWidth;
@@ -326,7 +328,7 @@ returnText:
     return text;
 }
 
-u16 sub_08032070(u8 *);
+u16 Text_DecodeGlyphEscape(u8 *);
 
 // MATCHING_CONCESSION: register-pinning
 void ChoiceMenu_LayoutText(struct ChoiceMenu *p, void *window)
@@ -372,7 +374,7 @@ void ChoiceMenu_LayoutText(struct ChoiceMenu *p, void *window)
             text++;
         } else {
             if (*text == 31) {
-                u16 value = sub_08032070(text);
+                u16 value = Text_DecodeGlyphEscape(text);
                 if (value != 65535) {
                     if (({
                             u32 mask = 255;
@@ -410,7 +412,7 @@ struct Dimensions {
 
 void sub_0821983C(void *, struct ChoiceResource *, s32, s32, s32, s32, s32, struct Dimensions *);
 
-s32 sub_08031E1C(void);
+s32 MessageWindow_GetSoundMode(void);
 
 s32 ChoiceMenu_Initialize(struct ChoiceMenu *p, void *window, s32 stringBase, s32 *options)
 {
@@ -457,9 +459,9 @@ s32 ChoiceMenu_Initialize(struct ChoiceMenu *p, void *window, s32 stringBase, s3
     if (p->window) {
         ChoiceMenu_LayoutText(p, p->window);
         ChoiceMenu_Select(p, p->selected);
-        sub_08006738(p);
+        ChoiceMenu_PrintText(p);
     }
-    if (!sub_08031E1C())
+    if (!MessageWindow_GetSoundMode())
         Sound_PlaySong(263);
     return 0;
 }
@@ -473,7 +475,7 @@ struct ChoiceMenu *ChoiceMenu_Create(void *window, s32 stringBase, void *callbac
         return 0;
     p = Task_Create(11, 0x1E8);
     if (p) {
-        Task_SetCallbacks(p, sub_080066C0, sub_08006710);
+        Task_SetCallbacks(p, ChoiceMenu_Update, ChoiceMenu_Destroy);
         p->useScript = 0;
         p->callback = callback;
         if (ChoiceMenu_Initialize(p, window, stringBase, options) < 0) {
@@ -484,9 +486,9 @@ struct ChoiceMenu *ChoiceMenu_Create(void *window, s32 stringBase, void *callbac
     return p;
 }
 
-void *sub_08227E90(void);
+void *Script_GetTextSourcePc(void);
 
-s32 sub_08031D90(s32 *);
+s32 MessageWindow_GetTextBounds(s32 *);
 
 // MATCHING_CONCESSION: register-pinning
 struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
@@ -500,7 +502,7 @@ struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
     if (gUnk_0200002C)
         return 0;
     if (Script_SeekToKeyword('r'))
-        window = sub_08227E90();
+        window = Script_GetTextSourcePc();
     else
         window = 0;
     stringBase = Script_GetKeywordValue('i', 0);
@@ -515,7 +517,7 @@ struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
         options[4] = Script_GetValue();
         options[5] = Script_GetValue();
         options[6] = Script_GetValue();
-    } else if (!sub_08031D90(defaults)) {
+    } else if (!MessageWindow_GetTextBounds(defaults)) {
         options[3] = defaults[0];
         options[4] = defaults[1];
         options[5] = defaults[2];
@@ -556,7 +558,7 @@ struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
     }
     p = Task_Create(11, 0x1E8);
     if (p) {
-        Task_SetCallbacks(p, sub_080066C0, sub_08006710);
+        Task_SetCallbacks(p, ChoiceMenu_Update, ChoiceMenu_Destroy);
         p->useScript = 1;
         p->script = script;
         {
@@ -573,18 +575,18 @@ struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
     return p;
 }
 
-void sub_08006E98(void)
+void ChoiceMenu_ReloadFromScript(void)
 {
     struct ChoiceMenu *p = gUnk_0200002C;
     if (p != 0 && Script_SeekToKeyword(0x72)) {
-        p->window = sub_08227E90();
+        p->window = Script_GetTextSourcePc();
         p->stringBase = Script_GetKeywordValue(0x69, 0);
         if (Script_SeekToKeyword(0x77))
             p->selected = Script_GetValue();
         if (p->window != 0) {
             ChoiceMenu_LayoutText(p, p->window);
             ChoiceMenu_Select(p, p->selected);
-            sub_08006738(p);
+            ChoiceMenu_PrintText(p);
         }
     }
 }

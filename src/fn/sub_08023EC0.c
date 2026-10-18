@@ -31,14 +31,14 @@ static inline u8 enter(State *p)
     }
     return 0;
 }
-void sub_080224A4(void *, int);
+void SceneActorState_SetValueClampedWhenInactive(void *, int);
 void sub_08022DBC(void *);
-void sub_08023EC0(Actor *p)
+void SceneActorState_UpdateVariantActionPlayback(Actor *p)
 {
     State *s = &p->base;
     s->vulnerable = 1;
     if (enter(s))
-        sub_080224A4(p, 4);
+        SceneActorState_SetValueClampedWhenInactive(p, 4);
     if (s->finished) {
         if (p->base.state != 3) {
             sub_08022DBC(p);

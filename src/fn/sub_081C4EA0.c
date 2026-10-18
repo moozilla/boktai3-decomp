@@ -5,11 +5,11 @@ struct S {
     u16 f34;
     s16 f36;
 };
-void sub_081C4C3C(struct S *);
+void SceneTransition_StartFadeOut(struct S *);
 
-void sub_081C4EA0(struct S *p)
+void RegistryC281_UpdateClosingDelay(struct S *p)
 {
     p->f34++;
     if (p->f34 > p->f36)
-        sub_081C4C3C(p);
+        SceneTransition_StartFadeOut(p);
 }

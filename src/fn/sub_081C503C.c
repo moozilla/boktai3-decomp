@@ -5,7 +5,7 @@ struct S {
     u32 f8;
 };
 
-s32 sub_081C503C(struct S *p, s32 a, s32 b)
+s32 Registry1909_UpdateVisibilityFlicker(struct S *p, s32 a, s32 b)
 {
     s32 i;
     u32 fl;

@@ -4,11 +4,11 @@ struct Display {
     u8 state;
 };
 extern void *gUnk_086057FC[];
-int sub_08036BEC(void);
+int Wireless_GetStatus(void);
 void sub_0824923C(void *, void *);
-int sub_0803AAC8(struct Display *p)
+int WirelessGameDisplay_Update(struct Display *p)
 {
-    if (!sub_08036BEC())
+    if (!Wireless_GetStatus())
         sub_0824923C(p, gUnk_086057FC[p->state]);
     return 0;
 }

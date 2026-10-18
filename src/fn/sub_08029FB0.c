@@ -6,8 +6,8 @@ typedef struct {
     u8 command, count;
     u16 args[1];
 } Packet;
-void sub_08020DD0(void *);
-void sub_08029FB0(u8 *p)
+void SceneMessages_Send(void *);
+void GridAttackActor_NotifyLinkedActorLatePhase(u8 *p)
 {
     Packet *packet = (void *)(p + 0x914);
     if (*(int *)(p + 0x910) && p[0x1a8] != 1) {
@@ -19,6 +19,6 @@ void sub_08029FB0(u8 *p)
         packet->reserved = zero;
         packet->command = 92;
         packet->count = 0;
-        sub_08020DD0(packet);
+        SceneMessages_Send(packet);
     }
 }

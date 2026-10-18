@@ -8,11 +8,11 @@ struct P {
     u8 f2[4];
     u16 d;
 };
-void sub_0822B3E8(void);
+void Sound_StopAllTrackedSongs(void);
 void Sound_PlaySong(s32);
-void sub_08162E00(struct P *p)
+void PlayerBurstEffect_InitExpansion(struct P *p)
 {
-    sub_0822B3E8();
+    Sound_StopAllTrackedSongs();
     Sound_PlaySong(2);
     Sound_PlaySong(0x12c);
     p->a = 10;

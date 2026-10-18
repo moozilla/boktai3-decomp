@@ -2,13 +2,13 @@
 #include "scene_item_values.h"
 s32 SceneItemValue_CalculateEquipment(u32 slot)
 {
-    struct SceneValueEquipment *equipment = sub_0822D6C8(slot);
+    struct SceneValueEquipment *equipment = Inventory_GetEquipmentEntry(slot);
     s32 base;
     s32 percent;
     s32 result;
     register s32 comparison asm("r3");
     if (*(volatile u8 *)&equipment->kind == 0xFF ||
-        !(base = sub_08227F5C(equipment->kind)->baseValue))
+        !(base = Equipment_GetDefinition(equipment->kind)->baseValue))
         return 0;
     percent = 80;
     if (!equipment->condition)

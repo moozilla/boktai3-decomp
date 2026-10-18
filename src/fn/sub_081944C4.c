@@ -6,9 +6,9 @@ struct Pos081944C4 {
 };
 extern const struct Pos081944C4 gUnk_0824F4E4;
 extern const u8 gUnk_0824F4EC[], gUnk_0824F4F4[];
-void sub_0821FF58(void *, s32, s32, u32, u32, s32);
+void Collider_SetAttackProperties(void *, s32, s32, u32, u32, s32);
 
-void sub_081944C4(u8 *t)
+void Nidhoggr_InitSuspendedObject(u8 *t)
 {
     u8 *anim = t + 0x7120;
     u8 *sprite;
@@ -32,6 +32,6 @@ void sub_081944C4(u8 *t)
     collider = t + 0x7168;
     Collider_Init(collider, *(u32 *)(t + 0x4c), 0x2001, 0, 16, (void *)gUnk_0824F4EC,
                   (void *)gUnk_0824F4F4);
-    sub_0821FF58(collider, h, 10, 0, 0x40000, 30);
+    Collider_SetAttackProperties(collider, h, 10, 0, 0x40000, 30);
     Collider_SetCallback(collider, NULL, NULL);
 }

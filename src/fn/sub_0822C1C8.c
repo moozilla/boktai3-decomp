@@ -5,12 +5,12 @@ struct S {
 };
 extern struct S *gUnk_03002604;
 extern u16 gUnk_030054BC;
-void sub_08243E8C(void);
-void sub_0822C1C8(void)
+void Solar_StopMeasurement(void);
+void Solar_PauseMeasurement(void)
 {
     if (gUnk_03002604) {
         if (gUnk_03002604->b)
-            sub_08243E8C();
+            Solar_StopMeasurement();
         gUnk_030054BC = 1;
     }
 }

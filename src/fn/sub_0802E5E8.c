@@ -70,14 +70,14 @@ struct Actor {
     struct Vec destination;
 };
 extern void *gUnk_02000480;
-struct Actor *sub_0802D6D0(void *, int);
+struct Actor *Actor_FindById(void *, int);
 int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
-int sub_0802FD14(struct Actor *);
-void sub_08225B4C(void *, void *, int, int, int);
-void sub_0821E780(void *, void *, int);
-int sub_0802E5E8(void)
+int SceneCharacter_GetPathNodeState(struct Actor *);
+void SceneBody_StartRoute(void *, void *, int, int, int);
+void Path_GetPointPosition(void *, void *, int);
+int Actor_EndScriptControl(void)
 {
     void *m = gUnk_02000480;
     struct Actor *p;
@@ -86,7 +86,7 @@ int sub_0802E5E8(void)
     if (!m) {
         return -1;
     }
-    p = sub_0802D6D0(m, Script_GetKeywordValue(0x6e, 0));
+    p = Actor_FindById(m, Script_GetKeywordValue(0x6e, 0));
     if (!p) {
         return -1;
     }

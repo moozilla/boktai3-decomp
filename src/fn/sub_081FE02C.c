@@ -7,7 +7,7 @@ struct S {
     struct E e[12];
 };
 void Effect_Remove(void *);
-void sub_081FE02C(struct S *p)
+void OrbitEffect_RemoveTrailSprites(struct S *p)
 {
     s32 i;
     struct E *e = p->e;

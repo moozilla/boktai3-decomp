@@ -9,7 +9,7 @@ struct N {
     struct N *next;
 };
 extern struct N *gUnk_030042C0[];
-void sub_082143A0(struct N *n, u32 i)
+void Sprite_UnlinkFromList(struct N *n, u32 i)
 {
     struct N *p = n->prev;
     struct N *q = n->next;

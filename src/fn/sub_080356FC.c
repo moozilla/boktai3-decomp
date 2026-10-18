@@ -45,14 +45,14 @@ struct Event {
     u16 code, value;
 };
 extern struct Event gUnk_03005390;
-void sub_08035320(struct Engine *);
-void sub_0803548C(struct Engine *);
-void sub_08035438(struct Engine *);
-void sub_080356AC(struct Engine *, u8);
-void sub_080340AC(struct Engine *);
+void Wireless_UpdateUniAcknowledgedSlots(struct Engine *);
+void Wireless_ReceiveParentUniPackets(struct Engine *);
+void Wireless_ProcessChildUniExchange(struct Engine *);
+void Wireless_RemoveConnectedSlots(struct Engine *, u8);
+void WirelessController_ResetSession(struct Engine *);
 int sub_082238F0(int);
 // MATCHING_CONCESSION: register-pinning
-void sub_080356FC(u8 command)
+void Wireless_OnParentUniSessionEvent(u8 command)
 {
     register int key asm("r3") = command;
     int saved = key;
@@ -115,8 +115,8 @@ lastMore:
         goto error;
     goto done;
 receive:
-    sub_08035320(p);
-    sub_0803548C(p);
+    Wireless_UpdateUniAcknowledgedSlots(p);
+    Wireless_ReceiveParentUniPackets(p);
     gUnk_020000EC = 0;
     goto done;
 added: {
@@ -141,7 +141,7 @@ disconnected: {
     zero = 0;
     *slots = selected;
     ((u8 *)p)[0xE9] = 1;
-    sub_080356AC(p, (u8)event->code);
+    Wireless_RemoveConnectedSlots(p, (u8)event->code);
     remaining = p->scratch[3];
     if (remaining != 1)
         goto done;
@@ -157,7 +157,7 @@ disconnected: {
     goto done;
 lost: {
     int remaining;
-    sub_080356AC(p, (u8)gUnk_03005390.code);
+    Wireless_RemoveConnectedSlots(p, (u8)gUnk_03005390.code);
     remaining = p->scratch[3];
     if (remaining != 1)
         goto done;
@@ -167,7 +167,7 @@ lost: {
 }
     goto done;
 reset:
-    sub_080340AC(p);
+    WirelessController_ResetSession(p);
     goto done;
 stop:
     setOperation(p, 30, 0);

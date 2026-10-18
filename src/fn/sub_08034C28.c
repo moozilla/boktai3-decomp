@@ -43,7 +43,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
 }
 int sub_082236C8(int, int, int, const u8 *);
 extern const u8 gUnk_0824DE60[];
-int sub_08034C28(struct Engine *p)
+int Wireless_StartChildSearch(struct Engine *p)
 {
     int raw;
     int status;

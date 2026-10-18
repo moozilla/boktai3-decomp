@@ -15,10 +15,10 @@ struct Owner {
 };
 u32 AnimData_FindEntry(u32);
 void sub_08217DE0(struct Elem *, u32, s32);
-void sub_08217EC4(struct Elem *, s32, s32);
+void Effect_SetOrigin(struct Elem *, s32, s32);
 void sub_08217EEC(struct Elem *, u32, s32);
-void sub_08217ECC(struct Elem *, s32);
-void sub_08234F88(struct Owner *p)
+void Effect_SetPalette(struct Elem *, s32);
+void HealthRestoreEffect_InitParticlePool(struct Owner *p)
 {
     u32 resource = AnimData_FindEntry(0x1c1e);
     u32 zero = 0;
@@ -27,9 +27,9 @@ void sub_08234F88(struct Owner *p)
     for (i = 0; i < 8; e++, i++) {
         p->elems[i].data = resource;
         sub_08217DE0(e, resource, 17);
-        sub_08217EC4(e, -4, -4);
+        Effect_SetOrigin(e, -4, -4);
         sub_08217EEC(e, p->elems[i].data, 2);
-        sub_08217ECC(e, 1);
+        Effect_SetPalette(e, 1);
         e->attr = zero;
         e->age = zero;
         e->active = zero;

@@ -14,26 +14,26 @@ struct Transition {
 extern struct Transition *gUnk_020000E8;
 extern u32 gUnk_03004DA0;
 extern u16 gUnk_03004BD8, gUnk_03004FC0, gUnk_03005214, gUnk_030051C4, gUnk_03005260[];
-void sub_08030F20(int, int, int, int);
-void sub_08030DBC(int);
-void sub_08030BF8(void);
-void sub_08030B78(int);
-void sub_08030C84(void *);
-void sub_080311B0(int);
+void MessageWindow_SetBounds(int, int, int, int);
+void MessageWindow_ShowMessage(int);
+void MessageWindow_Clear(void);
+void MessageWindow_SetDisplayMode(int);
+void MessageWindow_SetMessageTable(void *);
+void MessageWindow_SetPalette(int);
 void Script_Call(int, int);
 void Task_Kill(void *);
 void Bg_ClearTilemap(int);
 int Div(int, int);
-u8 sub_08033C9C(struct Transition *);
-void sub_08033C90(struct Transition *, int);
-void sub_08033C58(struct Transition *);
+u8 DialogueTransition_ConsumeStateEntry(struct Transition *);
+void DialogueTransition_SetState(struct Transition *, int);
+void DialogueTransition_ApplyEntryBounds(struct Transition *);
 int Script_SeekToKeyword(int);
-void *sub_08227E90(void);
+void *Script_GetTextSourcePc(void);
 void *sub_08227E9C(void);
 void Script_SetPc(void *);
 int Script_GetValue(void);
 int Script_GetKeywordValue(int, int);
-int sub_08033EA4(struct Transition *p)
+int DialogueTransition_LoadFromScript(struct Transition *p)
 {
     int zero = 0;
     p->state = zero;
@@ -43,7 +43,7 @@ int sub_08033EA4(struct Transition *p)
     p->parameter = zero;
     if (!Script_SeekToKeyword(115))
         goto fail;
-    p->script = sub_08227E90();
+    p->script = Script_GetTextSourcePc();
     if (p->script)
         goto parameters;
 fail:
@@ -86,14 +86,14 @@ ready: {
     p->startProcedure = procedure;
 }
     p->endProcedure = Script_GetKeywordValue(99, 0);
-    sub_08030C84(p->script);
-    sub_08030B78(1);
-    sub_080311B0(0x539C);
-    sub_08030DBC(p->index);
-    sub_08033C58(p);
+    MessageWindow_SetMessageTable(p->script);
+    MessageWindow_SetDisplayMode(1);
+    MessageWindow_SetPalette(0x539C);
+    MessageWindow_ShowMessage(p->index);
+    DialogueTransition_ApplyEntryBounds(p);
     gUnk_03005214 = 0x1084;
     gUnk_030051C4 = 0x8000;
     gUnk_03004DA0 = zero;
-    sub_08033C90(p, 0);
+    DialogueTransition_SetState(p, 0);
     return 0;
 }

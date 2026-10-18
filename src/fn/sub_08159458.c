@@ -8,7 +8,7 @@ struct P08159458 {
     u8 f458;
 };
 
-s32 sub_08159458(struct P08159458 *p)
+s32 Player_IsActiveInLocomotionState(struct P08159458 *p)
 {
     u8 k;
     if (!(p->f1c & 1))

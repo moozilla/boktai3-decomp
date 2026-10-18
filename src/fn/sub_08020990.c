@@ -9,7 +9,7 @@ struct S {
     u8 f[0x74];
     struct N *head;
 };
-u32 sub_08020990(struct S *p, struct N *n)
+u32 SceneMessages_LinkReceiver(struct S *p, struct N *n)
 {
     if (p->head)
         p->head->prev = n;

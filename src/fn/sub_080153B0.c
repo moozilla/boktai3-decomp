@@ -36,7 +36,7 @@ extern struct Manager *gUnk_02000068;
 extern u16 gUnk_08604C54[];
 void *ScriptProc_Start(int, int);
 int AnimData_Load(void *, int);
-void sub_082144E4(void *, void *, int);
+void Sprite_InitUnlinked(void *, void *, int);
 void Anim_SetSequence(void *, void *, int, int, int);
 int AnimatedParticleManager_Initialize(struct Manager *m)
 {
@@ -67,7 +67,7 @@ int AnimatedParticleManager_Initialize(struct Manager *m)
         p->direction.z = clear;
         if (!AnimData_Load(r, 0x4384))
             return -1;
-        sub_082144E4(o, r, 0);
+        Sprite_InitUnlinked(o, r, 0);
         Anim_SetSequence(a, m->resources[0], 0, 0, clear);
         *((u8 *)o + 7) = 2;
         *(struct Vec *)((u8 *)p + 88) = zero;

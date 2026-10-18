@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_030025FC;
-void sub_0822BAA0(void)
+void SceneStimulus_ClearExclusionRegions(void)
 {
     u8 *p = gUnk_030025FC;
     if (p != 0) {

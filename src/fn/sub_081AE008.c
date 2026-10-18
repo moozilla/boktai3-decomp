@@ -7,7 +7,7 @@ void sub_081ADEAC(u8 *, u8 *, u8 *);
 void sub_081ADDF0(u8 *, u8 *, u8 *);
 void sub_081ADBF8(void);
 void SceneActors_SetDamageCallback(u8 *, u8 *, void (*)(void), u32);
-void sub_081AE008(u8 *s, u8 *t)
+void Vanargand_InitAnimatedAttachment(u8 *s, u8 *t)
 {
     u8 *coords = t + 0x80;
     u32 width = 0x280, height = 0x300;

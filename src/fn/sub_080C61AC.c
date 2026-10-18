@@ -2,7 +2,7 @@
 s32 Mod(s32, s32);
 void SceneActorAnimation_SelectDirectionalEntry(u8 *, s32);
 void sub_0807C72C(u8 *, s32, s32, u32);
-void sub_080C627C(void);
+void Golem_UpdateDeath(void);
 inline static u8 TakeFlag(u8 *flag)
 {
     if (*flag) {
@@ -12,7 +12,7 @@ inline static u8 TakeFlag(u8 *flag)
     return 0;
 }
 
-void sub_080C61AC(u8 *s, s32 arg)
+void Golem_UpdateDying(u8 *s, s32 arg)
 {
     u8 *part = s + 0x3D4;
     s32 zero;
@@ -44,7 +44,7 @@ void sub_080C61AC(u8 *s, s32 arg)
         off += 0xDE;
         zero = (*((u32 *)(s - (-off)))) & mask;
         if (zero == 0) {
-            void (*fn)(void) = sub_080C627C;
+            void (*fn)(void) = Golem_UpdateDeath;
             u32 code = 6;
             u32 *flags;
             u32 clear;

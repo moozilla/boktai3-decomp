@@ -8,7 +8,7 @@ void Task_Kill(void *);
 void sub_08227378(void);
 void sub_0822744C(void);
 
-void *sub_082275D8(void *a)
+void *Camera_Create(void *a)
 {
     void *p;
     if (gUnk_03005420 != 0)

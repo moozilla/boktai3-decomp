@@ -12,7 +12,7 @@ static inline s32 rnd(u16 *table)
     v = table[gUnk_03005308];
     return v >> 3;
 }
-void sub_08234D0C(u8 *p)
+void HealthRestoreEffect_UpdateShake(u8 *p)
 {
     H(0x270)++;
     if (H(0x270) < 8) {

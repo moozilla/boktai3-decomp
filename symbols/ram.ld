@@ -26,9 +26,9 @@ _call_via_r2 = sub_08249240;
 /* agbcc libgcc/lib1thumb.asm call_via r4: bx r4; nop (ROM 08249248). */
 _call_via_r4 = sub_08249248;
 /* Exact linked matches to pinned agbcc libgcc2 objects; see docs/LIBGCC.md. */
-__lshrdi3 = sub_0824AC40;
-__muldi3 = sub_0824AC74;
-__negdi2 = sub_0824ACE4;
+__lshrdi3 = Libgcc_ShiftRightLogical64;
+__muldi3 = Libgcc_MultiplyInt64;
+__negdi2 = Libgcc_NegateInt64;
 
 /* m4a_1.s routine whose label is only a data label in the generated asm */
 MPlayMain = gUnk_0822F820 + 1;
@@ -44,7 +44,7 @@ SoundMainRAM = gUnk_0822F249;       /* ARM routine in ROM, copied to IWRAM (bit 
 /* Fully linked newlib math calls verify these libgcc helper aliases; docs/LIBM.md. */
 /* Exact libgcc source unit identifies comparison helper; docs/LIBGCC.md. */
 /* Exact old_agbcc libgcc2 source and lib1thumb division identify these helpers. */
-__fixunsdfsi = sub_0824930C;
+__fixunsdfsi = Libgcc_ConvertDoubleToUint32;
 __udivsi3 = sub_08249420;
 
 /* agbcc indirect-call helper: original 08249244 is bx r3; nop. */

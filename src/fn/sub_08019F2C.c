@@ -1,5 +1,5 @@
 #include "global.h"
-u32 sub_08019F2C(u8 *p)
+u32 SelectionMenu_ConsumeCallbackFlag(u8 *p)
 {
     u32 r;
     if (p[0x1c] == 0) {

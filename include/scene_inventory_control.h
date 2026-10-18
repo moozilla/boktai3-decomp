@@ -45,12 +45,12 @@ struct SceneInventoryControlConsumable {
     u8 unknown0[8];
     s16 baseValue;
 };
-s32 sub_0822CDA8(u32);
-s32 sub_0822D6E0(u32);
-s32 sub_0822DFDC(u32);
-s32 sub_0822E224(u32);
-struct SceneInventoryControlDefinition *sub_08227F5C(u32);
-struct SceneInventoryControlConsumable *sub_0822E288(u32);
+s32 Inventory_GetItemId(u32);
+s32 Inventory_GetEquipmentId(u32);
+s32 Inventory_CanAssignEquipment(u32);
+s32 GameState_IsConsumableSlotEquipped(u32);
+struct SceneInventoryControlDefinition *Equipment_GetDefinition(u32);
+struct SceneInventoryControlConsumable *GameState_GetConsumableDescriptor(u32);
 u32 SceneItemValue_GetItemBaseValue(s32);
 s32 SceneItemValue_GetConsumableBaseValue(u32);
 s32 SceneInventory_ClassifyEquipmentAction(struct SceneInventoryControlView *);

@@ -1,6 +1,6 @@
 #include "global.h"
 
-s32 sub_0815924C(u8 *p)
+s32 Player_IsInActionTwelveOrThirtyEight(u8 *p)
 {
     u8 v = p[0x457];
 

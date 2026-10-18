@@ -1,6 +1,6 @@
 #include "global.h"
-void sub_0802C96C(void *, void *, void *);
-void sub_0802D1B0(void *a, void *b, void *p)
+void Actor_CapturePendingHit(void *, void *, void *);
+void Actor_OnHitboxContact(void *a, void *b, void *p)
 {
-    sub_0802C96C(p, a, b);
+    Actor_CapturePendingHit(p, a, b);
 }

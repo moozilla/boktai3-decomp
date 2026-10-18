@@ -7,7 +7,7 @@ struct Z {
     struct H a, b;
 };
 u32 sub_0811AD8C(struct Z *);
-u32 sub_0811AE68(u32 *p)
+u32 Terrain_GetHeightAtFixedPosition(u32 *p)
 {
     struct Z z;
     z.a.lo = (p[0] << 4) >> 16;

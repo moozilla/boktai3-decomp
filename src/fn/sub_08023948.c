@@ -22,7 +22,7 @@ static inline u8 chk(struct S *p)
     return 0;
 }
 
-void sub_08023948(struct S *arg)
+void SceneActorState_AdvanceToState06(struct S *arg)
 {
     struct S *p = arg;
     struct S *base = p;

@@ -2,8 +2,8 @@
 
 void sub_080CC830(void *);
 void sub_0824923C(void *, u32);
-void sub_0807FC5C(void *);
-void sub_080CC8B8(void *);
+void SceneActorControl_DispatchControl(void *);
+void Golem_UpdateEffectsAndContacts(void *);
 
 struct S {
     u8 filler[0x27c];
@@ -16,15 +16,15 @@ struct S {
     u16 flags;
 };
 
-s32 sub_080CFBA8(struct S *s)
+s32 Golem_OnUpdate(struct S *s)
 {
     u32 m;
     sub_080CC830(s);
     m = 0x2000;
     if ((s->flags & m) || s->h2b8 == 0) {
         sub_0824923C(s, s->tbl[s->idx]);
-        sub_0807FC5C(s);
+        SceneActorControl_DispatchControl(s);
     }
-    sub_080CC8B8(s);
+    Golem_UpdateEffectsAndContacts(s);
     return 1;
 }

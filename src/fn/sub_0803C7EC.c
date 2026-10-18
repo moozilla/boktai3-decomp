@@ -14,7 +14,7 @@ struct Item {
     u8 pad3[12];
     u32 threshold;
 };
-int sub_0803C7EC(struct P *p,void *unused,struct Item *item)
+int ScenePool_IsEntryOutsidePlayerBounds(struct P *p,void *unused,struct Item *item)
 {
     int bits=0;
     int i=0;

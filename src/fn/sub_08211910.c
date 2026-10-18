@@ -8,7 +8,7 @@ struct G {
     u32 a730;
 };
 extern struct G *gUnk_02000710;
-u32 sub_08211910(s32 n)
+u32 ForgingBook_IsItemDiscovered(s32 n)
 {
     u32 a = gUnk_02000710->a720 | 0x04000400;
     u32 b = gUnk_02000710->a724 | 0x8020;

@@ -1,5 +1,5 @@
 #include "global.h"
-u32 sub_0812EED4(void)
+u32 SceneActorReaction_OnEnemyDefault(void)
 {
     return 0;
 }

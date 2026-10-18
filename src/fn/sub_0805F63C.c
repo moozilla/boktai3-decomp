@@ -12,12 +12,12 @@ void SceneInputPanel_ShowAttributeComparison(struct SceneInputWidget *first,
     s32 comparison;
     s32 i;
     register struct SceneInputWidget *widget asm("r5");
-    current0 = sub_0815A384(0);
-    current1 = sub_0815A384(1);
-    current2 = sub_0815A384(2);
-    target0 = sub_0815A3C4(0, candidate);
-    target1 = sub_0815A3C4(1, candidate);
-    target2 = sub_0815A3C4(2, candidate);
+    current0 = Player_GetCurrentAttribute(0);
+    current1 = Player_GetCurrentAttribute(1);
+    current2 = Player_GetCurrentAttribute(2);
+    target0 = Player_GetCandidateAttribute(0, candidate);
+    target1 = Player_GetCandidateAttribute(1, candidate);
+    target2 = Player_GetCandidateAttribute(2, candidate);
     comparison = 1;
     if (current0 >= target0) {
         comparison = 0;

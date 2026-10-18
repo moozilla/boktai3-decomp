@@ -1,7 +1,7 @@
 #include "global.h"
 extern u8 *gUnk_020005F4;
 void sub_081FF948(u8 *, u8 *, s32);
-u32 sub_081FFDBC(u8 *a)
+u32 HomingProjectile_InitManager(u8 *a)
 {
     u8 *e;
     s32 i;

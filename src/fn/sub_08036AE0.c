@@ -8,7 +8,7 @@ struct S {
 };
 extern struct S *gUnk_02000484;
 
-u16 sub_08036AE0(void)
+u16 Wireless_GetOperation(void)
 {
     if (gUnk_02000484 == 0)
         return 0;

@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_02000710;
-u32 sub_0822E040(s32 i)
+u32 Inventory_GetConsumableObtainedFlag(s32 i)
 {
     u32 *p;
     if (i <= 0x1f)

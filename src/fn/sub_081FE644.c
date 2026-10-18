@@ -11,7 +11,7 @@ struct A {
 extern u32 gUnk_020005EC;
 void sub_081FE244(struct A *, struct E *, s32);
 void Sound_StopSong(u32);
-u32 sub_081FE644(struct A *a)
+u32 OrbitEffect_DestroyManager(struct A *a)
 {
     struct E *e = a->e;
     s32 i = 0;

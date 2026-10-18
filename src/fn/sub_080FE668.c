@@ -1,15 +1,15 @@
 #include "global.h"
 
-void sub_080FCB3C(void);
-void sub_080FBF20(void *);
-void sub_080FC844(void *);
+void Axe_RemoveSecondaryColliders(void);
+void Axe_RemoveAuxiliarySprites(void *);
+void Axe_ReleaseAuxiliarySprite(void *);
 void SceneActorEffects_ReleaseResources(void *);
 
-s32 sub_080FE668(void *p)
+s32 Axe_ReleaseResources(void *p)
 {
-    sub_080FCB3C();
-    sub_080FBF20(p);
-    sub_080FC844(p);
+    Axe_RemoveSecondaryColliders();
+    Axe_RemoveAuxiliarySprites(p);
+    Axe_ReleaseAuxiliarySprite(p);
     SceneActorEffects_ReleaseResources(p);
     return 0;
 }

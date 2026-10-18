@@ -2,7 +2,7 @@
 
 void Rtc_Initialize(void);
 
-void sub_082284DC(void)
+void Clock_BeginRtcAccess(void)
 {
     Rtc_Initialize();
 }

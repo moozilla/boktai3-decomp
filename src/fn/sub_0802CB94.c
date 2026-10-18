@@ -17,15 +17,15 @@ struct Object {
     s8 target;
     u8 count, slot;
 };
-void *sub_0802C678(void);
-struct Object *sub_0802CA8C(int);
+void *ActorPool_GetManager(void);
+struct Object *Actor_GetPartyTarget(int);
 int Math_Atan2(int, int);
-void sub_0802CB94(struct Object *p)
+void Actor_RefreshTarget(struct Object *p)
 {
     struct Object *t;
     if (p->target < 0)
         return;
-    t = sub_0802CA8C(p->target);
+    t = Actor_GetPartyTarget(p->target);
     if (t) {
         struct Vec *src = &p->pos;
         struct Vec *dst = &t->pos;

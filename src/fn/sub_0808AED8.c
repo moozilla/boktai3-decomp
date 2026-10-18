@@ -1,9 +1,11 @@
 #include "global.h"
+/* Ghoul_SelectRandomBehaviorEntry: Chooses a random entry different from the current index and resets its progress byte */
+#define Ghoul_SelectRandomBehaviorEntry sub_0808AED8
 
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
-u8 *sub_0821E76C(u8 *);
+u8 *Path_GetPointData(u8 *);
 
 static inline u32 Random(void)
 {
@@ -31,5 +33,5 @@ void sub_0808AED8(u8 *owner)
         n = Mod(n + 1, *p->data);
     q->index = n;
     q->unk3 = 0;
-    q->entry = sub_0821E76C(q->data) + q->index * 8;
+    q->entry = Path_GetPointData(q->data) + q->index * 8;
 }

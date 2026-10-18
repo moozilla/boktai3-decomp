@@ -7,7 +7,7 @@ struct S {
     s32 v;
 };
 
-void sub_080D7F34(struct S *s)
+void Mummy_InitProfile(struct S *s)
 {
     s->v = SceneActorProfiles_FindOrAdd(1, 0);
 }

@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_082258AC(u8 *n)
+void SceneBody_AppendToRegistry(u8 *n)
 {
     u8 *s = *(u8 **)0x030025F8;
     if (s != 0) {

@@ -87,18 +87,18 @@ void Task_Kill(void *);
 void Script_Call(u32, struct DirectionalScriptArgs *);
 void sub_08249244(struct DirectionalManager *, struct DirectionalController *, s32, void *);
 
-u32 sub_08009500(struct DirectionalController *, u32);
-u32 sub_0800950C(struct DirectionalController *);
-s32 sub_08009524(struct DirectionalManager *, struct DirectionalController *, s32);
-struct DirectionalController *sub_08009568(struct DirectionalManager *, s32, s32 *);
-u32 sub_080095B4(struct DirectionalController *, u32);
-u32 sub_080095D4(struct DirectionalManager *, struct DirectionalController *,
+u32 DirectionalController_SetState(struct DirectionalController *, u32);
+u32 DirectionalController_ConsumeEntered(struct DirectionalController *);
+s32 DirectionalController_InitSlot(struct DirectionalManager *, struct DirectionalController *, s32);
+struct DirectionalController *DirectionalController_FindByScriptId(struct DirectionalManager *, s32, s32 *);
+u32 DirectionalController_SetMarkerFadeLevel(struct DirectionalController *, u32);
+u32 DirectionalController_SetPosition(struct DirectionalManager *, struct DirectionalController *,
                  struct DirectionalPackedVec *);
 void LevelController_Update(struct DirectionalManager *, struct DirectionalController *);
 s32 Actor_CanInteractWithController(struct DirectionalManager *, struct DirectionalController *);
 void LevelController_RunScript(struct DirectionalManager *, struct DirectionalController *, u32);
-u32 sub_0800971C(struct DirectionalManager *, s32);
-u32 sub_08009728(struct DirectionalManager *, s32);
+u32 DirectionalController_SelectTarget(struct DirectionalManager *, s32);
+u32 DirectionalController_ReleaseTarget(struct DirectionalManager *, s32);
 s32 DirectionalController_CheckApproach(struct DirectionalManager *,
                                         struct DirectionalController *);
 s32 DirectionalController_CheckInput(struct DirectionalManager *, struct DirectionalController *,
@@ -108,7 +108,7 @@ s32 DirectionalController_CheckRemaining(struct DirectionalManager *,
 s32 DirectionalController_UpdateAll(struct DirectionalManager *);
 s32 DirectionalController_DestroyManager(struct DirectionalManager *);
 s32 DirectionalController_InitManager(struct DirectionalManager *, void *);
-void *sub_08009B30(void *);
+void *DirectionalController_CreateManagerTask(void *);
 s32 DirectionalController_ScriptCreate(void);
 s32 DirectionalController_ScriptRelease(void);
 s32 DirectionalController_ScriptMove(void);

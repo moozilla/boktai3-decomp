@@ -4,7 +4,7 @@ struct State {
     s32 value, limit;
 };
 s32 Div(s32, s32);
-void sub_0811C41C(u8 *p, struct State *s)
+void Character_SetLowResourceColorEffect(u8 *p, struct State *s)
 {
     s32 six = Div(s->limit * 6, 10);
     s32 four = Div(s->limit * 4, 10);

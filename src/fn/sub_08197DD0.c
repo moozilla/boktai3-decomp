@@ -1,5 +1,5 @@
 #include "global.h"
-s32 sub_08197DD0(u32 a)
+s32 TimePalette_GetSourceIndex(u32 a)
 {
     s32 r;
     switch (a) {

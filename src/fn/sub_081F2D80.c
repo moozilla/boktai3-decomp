@@ -3,7 +3,7 @@ typedef struct {
     u8 pad[0xE50];
     s16 scale, min, max, step;
 } Actor;
-void sub_081F2D80(Actor *p)
+void Ratatosk_OscillateScale(Actor *p)
 {
     p->scale += p->step;
     if (p->step > 0) {

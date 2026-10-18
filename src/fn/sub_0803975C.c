@@ -4,10 +4,10 @@ struct S {
     u8 f[0x32];
     u8 a;
 };
-struct S *sub_08037DC0(void);
-u32 sub_0803975C(void)
+struct S *WirelessExchange_Get(void);
+u32 WirelessGame_IsItemToggleEnabled(void)
 {
-    struct S *p = sub_08037DC0();
+    struct S *p = WirelessExchange_Get();
     if (!p)
         return 0;
     return p->a;

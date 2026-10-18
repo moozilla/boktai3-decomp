@@ -7,10 +7,10 @@ struct S {
     void (*f64)(void);
     s32 f68;
 };
-void sub_082279A8(u32, u32, u32, u32, u32, u32, u32);
-void sub_081C46A0(void);
+void ScreenTransition_SendCommand(u32, u32, u32, u32, u32, u32, u32);
+void Registry6A37_UpdateFadeIn(void);
 
-void sub_081C44E0(struct S *p)
+void Registry6A37_StartFadeIn(struct S *p)
 {
     s16 *v = p->v;
     s16 a = 0x15e, b = 0xc4;
@@ -18,7 +18,7 @@ void sub_081C44E0(struct S *p)
     p->v[0] = a;
     v[1] = b;
     v[2] = z;
-    sub_082279A8(0, 6, 4, 4, 4, 0xFFFF, z);
-    p->f64 = sub_081C46A0;
+    ScreenTransition_SendCommand(0, 6, 4, 4, 4, 0xFFFF, z);
+    p->f64 = Registry6A37_UpdateFadeIn;
     p->f68 = z;
 }

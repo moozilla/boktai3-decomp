@@ -7,7 +7,7 @@ struct S {
     u8 f[0x3a0];
     struct E e[5];
 };
-void sub_081C1A78(struct S *p)
+void ControlPanel_HideValueDisplay(struct S *p)
 {
     s32 i;
     u32 m = 1;

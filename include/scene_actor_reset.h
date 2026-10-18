@@ -193,8 +193,8 @@ struct SceneActorRegistryResetView {
     struct ContactPosition vector6E0;
     u16 field6E8;
 };
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void Route_Start(struct SceneActorRegistryRoute *, u32, u32, u32);
-s32 sub_0821E7EC(u16 *, u32, u32);
+s32 Path_GetPointPositionById(u16 *, u32, u32);
 void sub_0821FD3C(void *, struct ContactPosition *);
 #endif

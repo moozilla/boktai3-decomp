@@ -10,7 +10,7 @@ struct A {
 };
 extern struct A *gUnk_02000604;
 void sub_0820D258(struct A *, struct E *, s32);
-u32 sub_0820D5E4(struct A *a)
+u32 EnemyParticle_InitPool(struct A *a)
 {
     struct E *e;
     s32 i;

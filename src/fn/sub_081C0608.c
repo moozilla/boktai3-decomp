@@ -9,8 +9,8 @@ extern u16 gUnk_03004BD8;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void sub_081C04B8(void *);
-void sub_081C0554(void *);
-u32 sub_081C0608(struct S *p)
+void ScenePaletteFade_BeginDelay(void *);
+u32 ScenePaletteFade_InitFromScript(struct S *p)
 {
     s32 v;
     {
@@ -29,6 +29,6 @@ u32 sub_081C0608(struct S *p)
         v = Script_GetValue();
     p->a2c = v;
     p->a24 = 0;
-    sub_081C0554(p);
+    ScenePaletteFade_BeginDelay(p);
     return 0;
 }

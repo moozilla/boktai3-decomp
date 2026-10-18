@@ -5,7 +5,7 @@ struct P08159844 {
     u16 f430;
 };
 
-void sub_08159844(struct P08159844 *p, s32 d)
+void Player_SubtractGauge430(struct P08159844 *p, s32 d)
 {
     if (p->f430 <= d)
         p->f430 = 0;

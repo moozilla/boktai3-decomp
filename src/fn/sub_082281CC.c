@@ -4,7 +4,7 @@ struct G {
     u32 w10;
 };
 extern struct G *gUnk_030053F8;
-u32 sub_082281CC(void)
+u32 SaveData_IsHeaderValid(void)
 {
     if (gUnk_030053F8->w10 == 0x369F)
         return 1;
