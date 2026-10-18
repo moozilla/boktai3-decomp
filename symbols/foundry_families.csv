@@ -529,3 +529,4 @@ addr,function,name,family,note
 08177C00,sub_08177C00,SceneHud_ReadScriptOptions,"SceneHud","stores HUD script pointers and a numeric option"
 08177C9C,sub_08177C9C,SceneHud_ReadPageVisibility,"SceneHud","reads page visibility and selects an enabled page"
 08177D24,sub_08177D24,Hud_ReadScriptQOption,"HudManager","reads script q option with default one"
+08177D54,sub_08177D54,Hud_ResetGlobals,"HudManager","clears manager pointer and resets three HUD settings"
