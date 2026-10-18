@@ -699,3 +699,4 @@ addr,function,name,family,note
 081418DC,sub_081418DC,Player_BlendCameraTarget,"Player","blend player camera target with the current camera position"
 0814198C,sub_0814198C,Player_PlayPositionEffect,"Player","plays a positional effect with an optional hidden sprite and song"
 08141A80,sub_08141A80,Player_BeginVariantAction,"Player","updates facing and starts a variant-specific action"
+08141E80,sub_08141E80,Player_UpdateMovement,"Player","update movement direction velocity animation and periodic stat changes"
