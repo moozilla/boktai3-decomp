@@ -1021,3 +1021,4 @@ addr,function,name,family,note
 081A7664,sub_081A7664,ScenePanel_RunSelectionScript,"ScenePanel","runs the indexed script while panel input is active"
 081A770C,sub_081A770C,ScenePanel_UpdateTimedExit,"ScenePanel","stops panel sound on entry and signals exit after 200 ticks"
 081A7A0C,sub_081A7A0C,ScenePanel_AdvancePairState,"ScenePanel","updates state from two signed positive counters"
+081A8044,sub_081A8044,ScenePanel_UpdateDelayedPairState,"ScenePanel","updates pair conditions and transitions after 129 ticks"
