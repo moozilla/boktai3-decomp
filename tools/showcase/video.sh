@@ -28,7 +28,7 @@ STATE=build/centaur/scenarios/start/start.ss
   echo "loadstate $REPO/$STATE"
   echo "record $OUT"
   i=0
-  while [ $i -lt 40 ]; do echo "wait $TAP"; echo "tap A"; i=$((i + 1)); done
+  while [ $i -lt 70 ]; do echo "wait $TAP"; echo "tap A"; i=$((i + 1)); done
   echo "stoprecord"
 } > build/showcase/record.txt
 mkdir -p build/showcase/run
