@@ -235,3 +235,4 @@ addr,function,name,family,note
 0811CFAC,sub_0811CFAC,ScenePool_ClampMotionSpeeds,"ScenePoolActor","clamps forward and lateral speed then forward bias"
 0811D080,sub_0811D080,SceneMotion_PlayKindSound,"SceneMotionSoundSource","plays one of three songs based on object kind"
 0811D428,sub_0811D428,SceneActorStyle_Initialize,"SceneActorStyle","initializes embedded style parameters and clears its four entries"
+0811D4AC,sub_0811D4AC,ActorStats_ConfigureScaledParameters,"ActorStats","initializes scaled limits and six supplied parameters"
