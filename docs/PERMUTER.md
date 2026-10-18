@@ -13,6 +13,9 @@ FILE.c holds one ROM function (`tools/isolate.py UNIT.c FUNC OUT.c
 --nonmatching`). Use the venv Python (`build/venv/bin/python`, for capstone).
 `tools/agbcc-instr.sh` builds the instrumented compiler once (20 seconds).
 
+0. `tools/repair.py FILE.c FUNC` first: most near-misses are wrong values,
+   not wrong allocation (see Findings). It substitutes the ROM's constants and
+   symbols into the C in seconds and lists the shape differences left.
 1. `tools/autosolve.py LIST.tsv` runs everything below over many functions
    (rows `FUNC<TAB>FILE.c`), on the draft and on a copy without register
    pins, and writes `build/autosolve/results.tsv` with any matching source.
@@ -277,3 +280,18 @@ meaning-preserving passes by default.
   value's priority without changing the program (`sub_08010514`).
 * Extracting regions as separate functions loses the context that decides
   their code; restrict changes in place instead.
+
+### What the near-misses actually are (2026-10-17)
+
+Of 118 near-miss drafts and ports, compared with registers abstracted and then
+also immediates abstracted, 10% differ only in registers, 6% only in
+registers and constants, 18% in one to three instructions of shape and 66% in
+more. The allocation solver above addresses the first group only, which is
+why it matched 7 of about 145 functions. On the 21 relatives.py ports at 90%
+or more, every one was "not allocation": wrong constants, callees or a
+missing call or guard copied from the relative. Hand fixes matched 10 and
+`tools/repair.py` matched the next 3 on its own in under 6 seconds each,
+where autosolve had spent several minutes each and found nothing. Allocation
+search is the right tool for register-pinned code (structurally right by
+construction), not for drafts.
+

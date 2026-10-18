@@ -135,6 +135,13 @@ still differs. Only commit drafts that compile and are worth resuming.
   later) and keeps the MATCHes; the rest stay in `wip/relatives/` with their
   fuzzy score as starting drafts. `docs/tasks/relatives.md` ranks the
   unmatched functions by how much a matched relative explains.
+* **Wrong values in the right shape**: `build/venv/bin/python tools/repair.py
+  wip/sub_X.c sub_X` takes the ROM's constants and symbols (field offsets,
+  ids, arguments, callees, pool callbacks, a block of fields moved by one
+  delta) and puts them in place of the C's, keeping each edit that brings the
+  code closer. Run it first on any port or draft that is close in shape; it
+  takes seconds. What it can't fix it lists as `ROM only` / `C only`
+  instructions: a call, guard or store the C is missing, which is your job.
 * **Returns a value it never sets**: a non-void function that falls off the
   end (`u32 f(...) { ...; s->v = 0; }`) gives `pop {r1}; bx r1` with a stale r0.
 * **Work in progress** goes in an untracked `wip/` directory
