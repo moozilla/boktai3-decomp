@@ -53,3 +53,4 @@ addr,function,name,family,note
 080AE120,sub_080AE120,SceneActorReaction_BeginSideStep,"SceneActorReaction","sets a lateral destination and waits for the configured duration"
 080AE5E4,sub_080AE5E4,SceneActorReaction_ResumeOrRunScript,"SceneActorReaction","selects a scripted action or restores animation and control"
 080B0728,sub_080B0728,SceneActorPhase_UpdateConditionalMotion,"Scene actor phase control","runs optional control updates then advances the phase"
+080B0E04,sub_080B0E04,SceneInventory_FindSlotByValue,"scene_inventory_actions (sub_0822CDA8 is declared in include/scene_inventory_actions.h)","scans slot indices 0..15 via sub_0822CDA8(i), writing each result to *p1; on the first non-negative result equal to p3, records the index in *p0, calls sub_0822CCC8(*p0) into *p2 and returns 1; returns 0 if no slot matches"
