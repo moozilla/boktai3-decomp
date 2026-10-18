@@ -17,7 +17,13 @@ struct SceneActorRegistryActor {
     u8 unknown9E[0xA];
     s16 fieldA8;
     u16 fieldAA;
-    u8 unknownAC[0x58];
+    u8 unknownAC[0xC];
+    u16 effectDurationB8; /* Tentative: particle lifetime argument, 080DA810. */
+    u8 unknownBA[6];
+    u16 effectParameterC0; /* Particle constructor fourth argument. */
+    u8 unknownC2[0x1A];
+    struct SceneActorPositionSource *distanceTarget; /* +0xDC, 0813760C. */
+    u8 unknownE0[0x24];
     u32 field104;
     u8 unknown108[0xC];
     u32 flags114;
@@ -36,7 +42,11 @@ struct SceneActorRegistryActor {
     u8 unknown250[8];
     s32 (*update)(void *);
     s32 (*destroy)(void *);
-    u8 unknown260[0x48];
+    u8 unknown260[4];
+    void *activeCallback264; /* 0812F12C: dispatched with actor. */
+    u8 unknown268[0xC];
+    void *contextCallback274; /* 0812F12C: dispatched with context. */
+    u8 unknown278[0x30];
     u8 state2A8, phase2A9, behavior2AA, unknown2AB;
     u32 counter2AC;
     u8 field2B0, field2B1, field2B2, field2B3;
@@ -58,7 +68,13 @@ struct SceneActorRegistryActor {
     void *context;
     u8 unknown3D4[0x40];
     u16 flags414, field416, field418;
-    u8 unknown41A[0x36];
+    u8 unknown41A[0x1A];
+    u16 distanceTargetLock; /* +0x434, 0813760C. */
+    u8 unknown436[2];
+    void *distanceTargetIdentity; /* +0x438, 0813760C. */
+    u8 unknown43C[8];
+    void *fallbackCallback444;
+    u8 unknown448[8];
     const struct ContactPosition *field450;
     u8 unknown454[0x28];
     u32 effectConfig[2];
@@ -70,6 +86,16 @@ struct SceneActorRegistryActor {
     u8 unknown5E0[0x14];
     const void *control5F4;
 };
+/* Identity lookup view begins at actor +0x3D4 (0813760C). */
+struct SceneActorTargetIdentityView {
+    u8 unknown0[0x64];
+    void *identity;
+};
+/* Embedded control block beginning at actor +0x3D4. */
+struct SceneActorRegistryCallbackBlock {
+    u8 unknown0[0x70];
+    void *fallback;
+};
 struct SceneActorRegistrySequenceDrawable {
     u32 flags;
     u8 unknown4[0x18];
@@ -80,7 +106,10 @@ struct SceneActorRegistrySequenceDrawable {
 struct SceneActorRegistryTileDrawable {
     u8 unknown0[0x28];
     u32 flags;
-    u8 unknown2C[0x14];
+    u16 state2C;
+    u8 unknown2E[6];
+    u16 parameter34;
+    u8 unknown36[0xA];
     struct ContactPosition position;
     u8 unknown48[0x12];
     u16 paletteBank;

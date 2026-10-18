@@ -17,9 +17,13 @@ struct LevelAdvanceSprite {
 };
 struct LevelAdvanceParticle {
     u32 flags;
-    u8 unknown4[20];
+    u8 queued, scaleX, scaleY, rotation;
+    u8 unknown8[4];
+    u8 spriteOffsetX, spriteOffsetY, paletteSlot, mode, status, listIndex;
+    u8 unknown12[2];
+    u32 frameState;
     union LevelAdvancePosition position;
-    u8 unknown20[8];
+    struct LevelAdvanceParticle *previous, *next;
     s16 offsetX, offsetY, offsetZ, unknown2E;
     s16 velocityX, velocityY, velocityZ, unknown36;
     u16 active, frame;

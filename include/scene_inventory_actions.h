@@ -27,7 +27,10 @@ struct SceneInventoryActionFlagsView {
     struct SceneInventoryActionFlags widgets[54];
 };
 struct SceneInventoryActionDefinition {
-    u8 unknown0[6];
+    u8 kind; /* 0x0: 0x2F uses level-derived stat value (tentative) */
+    u8 unknown1[2];
+    u8 statValue; /* 0x3: base action stat, tentative */
+    u8 unknown4[2];
     u16 baseValue;
 };
 s32 sub_0822D6E0(u32);
