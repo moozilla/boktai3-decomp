@@ -167,3 +167,4 @@ addr,function,name,family,note
 08103B14,sub_08103B14,ActorGroup_GetSelectedMemberId,"ActorGroup","returns the identifier of the active member with flag 0x10"
 081042DC,sub_081042DC,ActorGroup_CallMemberScript,"ActorGroup","calls the member script with position and three parameters"
 08106DAC,sub_08106DAC,ScriptTriggerActor_DispatchPendingScripts,"ScriptTriggerActor","dispatches and clears pending three-argument and eight-argument script requests"
+08107298,sub_08107298,TileTrigger_IsTetherNearby,"TileTrigger","tests tether actor state and horizontal range"
