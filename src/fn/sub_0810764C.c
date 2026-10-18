@@ -1,0 +1,48 @@
+#include "global.h"
+#include "scene_vec.h"
+#define TileTrigger_TickDelay sub_0810764C
+#define gTileTriggerManager   gUnk_020001B8
+struct TileTrigger {
+    u32 flags;
+    u8 unknown4[0x70];
+    u8 animation[0x10];
+    struct SceneVec position;
+    u32 key;
+    u8 unknown90[0x28];
+    u16 sequence, delay, unknownBC;
+    s16 state;
+    u16 triggerFlags;
+    u8 forced, frame;
+};
+struct TileTriggerManager {
+    u8 unknown0[0x18];
+    void *animationData;
+    u8 unknown1C[0x1C];
+    struct TileTrigger *tiles[12];
+    u32 used;
+};
+extern struct TileTriggerManager *gUnk_020001B8;
+extern u32 gUnk_030053F4;
+void sub_08107398(struct TileTrigger *);
+u32 Anim_SetSequence(void *, void *, u32, u32, u32);
+void Sound_PlaySong(u32);
+void sub_0810764C(struct TileTrigger *p)
+{
+    struct TileTriggerManager *manager = gUnk_020001B8;
+    if (p->frame >= p->delay) {
+        sub_08107398(p);
+        Anim_SetSequence(p->animation, manager->animationData, 0, (u8)p->sequence, 0);
+        p->state = 4;
+        p->frame = 0;
+        switch (p->sequence) {
+            case 0:
+            case 1:
+                if (gUnk_030053F4 & 0x800)
+                    Sound_PlaySong(0x26D);
+                else
+                    Sound_PlaySong(0x1AB);
+                break;
+        }
+    } else
+        p->frame++;
+}
