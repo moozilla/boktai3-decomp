@@ -945,3 +945,4 @@ addr,function,name,family,note
 0818F610,sub_0818F610,SceneEffectPool_AllocateSlot,"SceneEffectPool","claims the first free slot in a 48-entry scene effect pool"
 0818FD9C,sub_0818FD9C,Nidhoggr_CreateAttachedAttackEffect,"Nidhoggr collidable effects","creates an anchored sprite effect with attack collision"
 08190498,sub_08190498,Nidhoggr_CreateDistanceLimitedEffect,"Nidhoggr collidable effects","creates a phased attack effect with randomized depth velocity"
+081905F0,sub_081905F0,BossAttack_ActivateCollider,"BossAttack","starts a timed attack collider and plays its sound"
