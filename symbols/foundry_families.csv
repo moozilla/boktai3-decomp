@@ -770,3 +770,4 @@ addr,function,name,family,note
 08169B74,sub_08169B74,StatusPanel_DrawSecondValue,"StatusPanel","draws a label and second decimal status value"
 08169E94,sub_08169E94,StatusPanel_BeginRefresh,"StatusPanel","sets refresh flag, redraws sections, and installs callback"
 0816A4EC,sub_0816A4EC,ScenePanel_BeginSelection,"ScenePanel","resets sprite coordinates, starts keyframes and installs selection callback"
+0816A5A8,sub_0816A5A8,ScenePanel_BeginDetail,"ScenePanel","initializes detail sprites and installs detail callback"
