@@ -5,7 +5,7 @@ struct S {
     u32 a;
     u32 b;
 };
-void sub_08021ADC(struct S *p, u32 a, u32 b)
+void SceneActors_SetEventScripts(struct S *p, u32 a, u32 b)
 {
     p->a = a;
     p->b = b;

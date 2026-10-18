@@ -11,7 +11,7 @@ struct StatusMenu {
     u8 pad20[0x20];
     struct Draw draws[4];
 };
-int sub_0803AC9C(struct StatusMenu *p, int state)
+int WirelessGameDisplay_SetState(struct StatusMenu *p, int state)
 {
     struct Draw *d;
     int i;

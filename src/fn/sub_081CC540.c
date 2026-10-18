@@ -5,7 +5,7 @@ static inline void orr(u16 *a, u32 m)
 }
 /* Blink for 15 frames: bit 0 of the phase sets display flag 0x100, and each
  * phase lasts one frame longer than the last. */
-void sub_081CC540(u8 *a, u8 *b)
+void SceneCharacter_UpdateSlowingBlink(u8 *a, u8 *b)
 {
     u32 t;
     u8 phase;

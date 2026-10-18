@@ -1,7 +1,7 @@
 #include "tether_actor.h"
 extern struct TetherActor *gUnk_02000488;
 void SceneActorContacts_RemoveNode(void *);
-void sub_08225938(void *);
+void SceneBody_Unregister(void *);
 void DisplayAnimation_Destroy(void *);
 
 void TetherActor_RemoveSegments(struct TetherActor *);
@@ -10,7 +10,7 @@ struct TetherActor *TetherActor_Destroy(struct TetherActor *p)
 {
     if (p->auxiliaryRegistered != 0)
         SceneActorContacts_RemoveNode(p->auxiliaryRegistration);
-    sub_08225938(&p->bodyConfig);
+    SceneBody_Unregister(&p->bodyConfig);
     DisplayAnimation_Destroy(&p->display.animation);
     Collider_Remove(&p->chargeCollider);
     TetherActor_RemoveSegments(p);

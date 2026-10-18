@@ -1,6 +1,6 @@
 #include "global.h"
 void Anim_Remove(u8 *);
-void sub_0801A8CC(u8 *p)
+void SelectionMenu_RemoveIconGrid(u8 *p)
 {
     u8 *e = p + 0x674;
     s32 i = 0x12;

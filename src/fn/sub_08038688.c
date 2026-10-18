@@ -5,8 +5,8 @@ struct TradeMenu {
     u8 state, entered;
 };
 extern void *gUnk_02000580;
-void sub_0815C99C(void *);
-void sub_08038688(struct TradeMenu *p)
+void PlayerCue_ReleaseControl(void *);
+void WirelessGameMenu_UpdateStartupDelay(struct TradeMenu *p)
 {
     if (p->entered)
         p->entered = 0;
@@ -17,7 +17,7 @@ void sub_08038688(struct TradeMenu *p)
         *state = two;
         p->entered = 1;
         p->timer = zero;
-        sub_0815C99C(gUnk_02000580);
+        PlayerCue_ReleaseControl(gUnk_02000580);
     }
     p->timer++;
 }

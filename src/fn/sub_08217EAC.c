@@ -6,10 +6,10 @@ struct Obj {
     u8 pad5[0xC];
     u8 f11;
 };
-void sub_082143F8(struct Obj *, u32);
+void Effect_UnlinkFromList(struct Obj *, u32);
 
 void Effect_Remove(struct Obj *o)
 {
     if (o->f4 != 0)
-        sub_082143F8(o, o->f11);
+        Effect_UnlinkFromList(o, o->f11);
 }

@@ -7,10 +7,10 @@ struct Q {
     struct P *p;
 };
 extern struct Q *gUnk_020004B8;
-u8 sub_08110B7C(void);
-void sub_0811119C(struct P *dst)
+u8 SceneTilemap_IsActive(void);
+void SceneTilemap_CopyScrollSourceState(struct P *dst)
 {
-    if (sub_08110B7C()) {
+    if (SceneTilemap_IsActive()) {
         *dst = *gUnk_020004B8->p;
     }
 }

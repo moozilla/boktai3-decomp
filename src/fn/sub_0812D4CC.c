@@ -19,7 +19,7 @@ struct S {
     struct E e[8];
 };
 
-u32 sub_0812D4CC(struct S *b)
+u32 FragmentSpritePool_DestroyTask(struct S *b)
 {
     s32 i = 0;
     struct E *e = b->e;

@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0811CD24(u8 *p, u32 m)
+void CharacterModel_SetAnimationFlags(u8 *p, u32 m)
 {
     u32 *q = (u32 *)(p + 8);
     s32 i = 4;

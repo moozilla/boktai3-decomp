@@ -9,7 +9,7 @@ struct Display {
     struct Drawing extra[2];
 };
 void Anim_Remove(void *);
-int sub_0803AAF0(struct Display *p)
+int WirelessGameDisplay_Destroy(struct Display *p)
 {
     struct Drawing *q = p->drawings;
     int i = 3;

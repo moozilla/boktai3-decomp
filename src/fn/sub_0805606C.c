@@ -2,7 +2,7 @@
 void TerrainEdgeMarker_SetModeFromScript(void)
 {
     if (Script_SeekToKeyword('m')) {
-        struct TerrainMarkerManager *manager = sub_0821A2C4(0xFD22);
+        struct TerrainMarkerManager *manager = ResourceRegistry_GetResource(0xFD22);
         if (manager) {
             manager->mode = Script_GetValue();
             if (manager->mode == 1) {

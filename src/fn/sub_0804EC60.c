@@ -26,7 +26,7 @@ static inline u8 gb(u8 *p, s32 i)
         return *(u8 *)((u32)q + i);
     }
 }
-s32 sub_0804EC60(u8 *a)
+s32 AreaEffect_IsLinkPlayerCovered(u8 *a)
 {
     s32 i = *(s32 *)(a + 0x18);
     if (gb(gUnk_020004B4, i) == 0)

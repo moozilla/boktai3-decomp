@@ -1,4 +1,6 @@
 #include "global.h"
+/* Math_ApproachAngleByFrameCount: Divides the shortest angular difference by the frame count with minimum movement and a snap threshold */
+#define Math_ApproachAngleByFrameCount sub_0819B190
 
 s32 Div(s32, s32);
 

@@ -1,6 +1,6 @@
 #include "global.h"
 extern u32 gUnk_030053F4;
-void sub_080224C4(void *, u32);
+void SceneActorState_SetValueClampedWhenActive(void *, u32);
 struct S {
     u8 f0[0x9a];
     u8 a9a;
@@ -28,7 +28,7 @@ static inline u8 chk(struct S *p, u32 z)
     return 0;
 }
 
-void sub_08024570(struct S *p)
+void SceneActorState_PlayVariantAnimation12ThenRecover(struct S *p)
 {
     struct S *p2 = p;
     u32 z;
@@ -36,7 +36,7 @@ void sub_08024570(struct S *p)
     z = 0;
     *a = 1;
     if (chk(p, z))
-        sub_080224C4(p2, 0xc);
+        SceneActorState_SetValueClampedWhenActive(p2, 0xc);
     if (p->af) {
         if (p2->ab == 3) {
             u32 k = 0xc;

@@ -2,7 +2,7 @@
 void sub_08121458(void);
 void Collider_SetPosition(void *, void *, u32);
 s32 Collider_Refresh(void *);
-void sub_081214E0(u32 a, u8 *s)
+void SceneColliderEffect_UpdateCollider(u32 a, u8 *s)
 {
     u8 *p, *q;
     sub_08121458();

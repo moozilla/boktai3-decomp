@@ -3,7 +3,7 @@ extern u16 gUnk_03005470[];
 void m4aSongNumStartOrContinue(u16);
 void m4aSongNumStartOrChange(u16);
 /* Restart the remembered songs of slots 10, 12, 29 and 30. */
-void sub_0822B45C(void)
+void Sound_ResumePersistentSongs(void)
 {
     s32 i;
     for (i = 0; i <= 31; i++) {

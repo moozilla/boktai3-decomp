@@ -4,11 +4,11 @@ struct Panel {
     u32 timer;
     u8 state, entered;
 };
-struct Panel *sub_08037DC0(void);
-void sub_08039834(void *);
-void sub_08039870(void)
+struct Panel *WirelessExchange_Get(void);
+void WirelessGame_InitDisplayAndLinkCallbacks(void *);
+void WirelessGame_RestartSession(void)
 {
-    struct Panel *p = sub_08037DC0();
+    struct Panel *p = WirelessExchange_Get();
     u8 *alias2;
     struct Panel *alias;
     if (p) {
@@ -20,6 +20,6 @@ void sub_08039870(void)
         *state = one;
         p->timer = zero;
         alias = p;
-        sub_08039834(alias);
+        WirelessGame_InitDisplayAndLinkCallbacks(alias);
     }
 }

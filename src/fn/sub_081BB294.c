@@ -2,7 +2,7 @@
 #include "engine.h"
 #include "game_state.h"
 #define STATE_S16(offset) (*(s16 *)((u8 *)gUnk_02000710 + (offset)))
-u32 sub_08228DA0(void);
+u32 SunClock_GetSecond(void);
 s32 Mod(s32, s32);
 /* Script (registry 61A0): over -d days (at most 10), grows the balance at game
    state +0x7B0 by the rate at +0x598 (value * rate / 64 + 1 per day, capped at
@@ -40,5 +40,5 @@ void SolarBank_ApplyInterestFromScript(void)
             rate = 13;
         STATE_S16(0x598) = rate + 0x41;
     } else
-        STATE_S16(0x598) = Mod(*(u32 *)((u8 *)gUnk_02000710 + 0x614) ^ sub_08228DA0(), 13) + 0x41;
+        STATE_S16(0x598) = Mod(*(u32 *)((u8 *)gUnk_02000710 + 0x614) ^ SunClock_GetSecond(), 13) + 0x41;
 }

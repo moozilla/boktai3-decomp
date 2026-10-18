@@ -9,8 +9,8 @@ struct A {
     struct E e[16];
 };
 extern struct A *gUnk_020005FC;
-void sub_0820267C(struct A *, struct E *, s32);
-u32 sub_08202A88(struct A *a)
+void TimedSpriteEffect_InitSlot(struct A *, struct E *, s32);
+u32 ProjectilePool_Init(struct A *a)
 {
     struct E *e;
     s32 i;
@@ -19,7 +19,7 @@ u32 sub_08202A88(struct A *a)
     e = a->e;
     i = 0;
     do {
-        sub_0820267C(a, e, i);
+        TimedSpriteEffect_InitSlot(a, e, i);
         i++;
         e++;
     } while (i <= 0xf);

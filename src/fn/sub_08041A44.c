@@ -6,9 +6,9 @@ struct ModifierCapacityInfo {
     u8 id, kind, unknown2, capacity;
     u16 value;
 };
-s32 sub_08041A20(u32, s32);
+s32 ModifierMenu_ClampSourceId(u32, s32);
 s32 sub_0811DD94(s32, s32);
-s32 sub_0811DE3C(s32, s32);
+s32 GameFlag_FindFirstSetIndex(s32, s32);
 s32 sub_0811E5D0(struct ModifierCapacityInfo *, s32);
 extern const u8 gUnk_086058E8[];
 void ModifierMenu_ValidateSavedSelection(struct ModifierMenu *menu)
@@ -18,16 +18,16 @@ void ModifierMenu_ValidateSavedSelection(struct ModifierMenu *menu)
     s32 i;
     s32 count;
     s32 capacity;
-    gUnk_02000710->unk7A0[0] = sub_08041A20(0, (s16)gUnk_02000710->unk7A0[0]);
-    gUnk_02000710->unk7A0[2] = sub_08041A20(1, (s16)gUnk_02000710->unk7A0[2]);
-    gUnk_02000710->unk7A0[1] = sub_08041A20(2, (s16)gUnk_02000710->unk7A0[1]);
-    gUnk_02000710->unk81A = sub_08041A20(5, gUnk_02000710->unk81A);
+    gUnk_02000710->unk7A0[0] = ModifierMenu_ClampSourceId(0, (s16)gUnk_02000710->unk7A0[0]);
+    gUnk_02000710->unk7A0[2] = ModifierMenu_ClampSourceId(1, (s16)gUnk_02000710->unk7A0[2]);
+    gUnk_02000710->unk7A0[1] = ModifierMenu_ClampSourceId(2, (s16)gUnk_02000710->unk7A0[1]);
+    gUnk_02000710->unk81A = ModifierMenu_ClampSourceId(5, gUnk_02000710->unk81A);
     if (!sub_0811DD94(0, (s16)gUnk_02000710->unk7A0[0]))
-        gUnk_02000710->unk7A0[0] = sub_0811DE3C(0, 6);
+        gUnk_02000710->unk7A0[0] = GameFlag_FindFirstSetIndex(0, 6);
     if (!sub_0811DD94(1, (s16)gUnk_02000710->unk7A0[2]))
-        gUnk_02000710->unk7A0[2] = sub_0811DE3C(1, 6);
+        gUnk_02000710->unk7A0[2] = GameFlag_FindFirstSetIndex(1, 6);
     if (!sub_0811DD94(2, (s16)gUnk_02000710->unk7A0[1]))
-        gUnk_02000710->unk7A0[1] = sub_0811DE3C(2, 6);
+        gUnk_02000710->unk7A0[1] = GameFlag_FindFirstSetIndex(2, 6);
     if (!sub_0811DD94(3, (s16)gUnk_02000710->unk7A0[3]))
         gUnk_02000710->unk7A0[3] = -1;
     sub_0811E5D0(&info, (s16)gUnk_02000710->unk7A0[2]);
@@ -61,7 +61,7 @@ void ModifierMenu_ValidateSavedSelection(struct ModifierMenu *menu)
     } while (1);
 secondary:
     if (!sub_0811DD94(5, gUnk_02000710->unk81A))
-        gUnk_02000710->unk81A = sub_0811DE3C(5, gUnk_086058E8[2] * 3 * 2);
+        gUnk_02000710->unk81A = GameFlag_FindFirstSetIndex(5, gUnk_086058E8[2] * 3 * 2);
 }
 
 #else

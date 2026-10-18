@@ -14,7 +14,7 @@ static inline u8 t(struct S *s)
     }
     return 0;
 }
-void sub_08232A44(u32 a, struct S *s)
+void ScreenOrbitEffect_UpdateIdleSlot(u32 a, struct S *s)
 {
     if (t(s))
         s->d |= 1;

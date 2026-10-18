@@ -1,7 +1,7 @@
 #include "global.h"
 extern u32 gUnk_02000060;
 void Effect_Remove(u8 *);
-u32 sub_0801450C(u8 *p)
+u32 ParticleManager_Kill(u8 *p)
 {
     s32 i = 0;
     do {

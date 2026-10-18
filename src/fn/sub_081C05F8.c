@@ -4,7 +4,7 @@ struct S {
     u32 a;
 };
 void sub_0824923C(void *, u32);
-void sub_081C05F8(struct S *p)
+void ScenePaletteFade_Update(struct S *p)
 {
     sub_0824923C(p, p->a);
 }

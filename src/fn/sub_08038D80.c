@@ -7,8 +7,8 @@ struct P {
     u8 mode;
 };
 extern u32 gUnk_0300523C;
-int sub_08038004(struct P *);
-int sub_08037FB4(struct P *, int, const u32 *, int);
+int WirelessExchange_ResolveOutcome(struct P *);
+int WirelessExchange_SendPacket(struct P *, int, const u32 *, int);
 static inline void set(u32 mask)
 {
     gUnk_0300523C |= mask;
@@ -17,14 +17,14 @@ static inline u32 test(u32 *flags, u32 mask)
 {
     return *flags & mask;
 }
-void sub_08038D80(struct P *p)
+void WirelessGameMenu_UpdateOutcomeExchange(struct P *p)
 {
     u32 data;
     if (p->entered) {
         p->entered = 0;
-        p->mode = sub_08038004(p);
+        p->mode = WirelessExchange_ResolveOutcome(p);
         data = p->mode;
-        sub_08037FB4(p, 5, &data, 1);
+        WirelessExchange_SendPacket(p, 5, &data, 1);
         set(4);
     }
     if (test(&p->flags, 0x300) == 0x300) {

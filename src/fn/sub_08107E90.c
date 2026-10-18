@@ -9,7 +9,7 @@ struct P {
     u32 d;
 };
 
-void sub_08107E90(s32 unused, struct P *p)
+void Pool1B8_EnterStateThree(s32 unused, struct P *p)
 {
     p->fl |= 1;
     p->a = 3;

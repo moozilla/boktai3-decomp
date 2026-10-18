@@ -1,6 +1,6 @@
 #include "global.h"
 void sub_0824923C(void *, u32);
-void sub_08234B04(u8 *s)
+void HealthRestoreEffect_UpdateParticles(u8 *s)
 {
     u8 *p = s + 0x8c;
     u32 o = 0;

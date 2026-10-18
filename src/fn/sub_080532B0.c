@@ -11,7 +11,7 @@ extern u32 gUnk_030052F8, gUnk_030052FC;
 extern u8 *gUnk_02000580;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-u8 *sub_0821D64C(u32, u32);
+u8 *TerrainModifiers_FindCellOverride(u32, u32);
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
@@ -19,7 +19,7 @@ void StackedActor_InitParticles(struct StackedActor *);
 s32 SceneMessages_RegisterReceiver(void *, s32, s32);
 void Sound_PlaySong(u32);
 void ScriptUtility_SetControlFlag(u32);
-void sub_081593A0(u8 *, struct StackedActorPosition *);
+void Player_SetPositionAndSave(u8 *, struct StackedActorPosition *);
 void PlayerCue_Hide(u8 *);
 void StackedActor_TickDisabled(struct StackedActor *);
 void StackedActor_Appear(struct StackedActor *);
@@ -66,7 +66,7 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
             u32 row = gUnk_030052F4->rowOffsets[z];
             index = row + x;
         }
-        cell = sub_0821D64C(index, 1);
+        cell = TerrainModifiers_FindCellOverride(index, 1);
         if (cell)
             cell += 4;
         else {
@@ -277,7 +277,7 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
                     Sound_PlaySong(0x160);
                     actor->unknown380 = one;
                     ScriptUtility_SetControlFlag(0);
-                    sub_081593A0(gUnk_02000580, cache.world);
+                    Player_SetPositionAndSave(gUnk_02000580, cache.world);
                     PlayerCue_Hide(gUnk_02000580);
                     actor->sprite.flags &= ~1;
                     {

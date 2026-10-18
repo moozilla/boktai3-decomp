@@ -20,7 +20,7 @@ static inline s32 scale(s32 v)
         return v >> 12;
     return -((-v) >> 12);
 }
-void sub_0813C198(State *s, s32 angle, Point *pos)
+void DirectionalSpriteEffect_PlaceOppositeAngle(State *s, s32 angle, Point *pos)
 {
     s->flags &= ~1;
     angle = (angle + 128) & 255;

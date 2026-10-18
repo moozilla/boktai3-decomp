@@ -7,13 +7,13 @@ struct Owner {
     struct Item items[16];
 };
 extern struct Owner *gUnk_02000100;
-void sub_0803A350(void *, void *, int);
-int sub_0803A408(struct Owner *p)
+void WirelessGameItems_DestroyItem(void *, void *, int);
+int WirelessGameItems_Destroy(struct Owner *p)
 {
     struct Item *q = p->items;
     int i = 0;
     do {
-        sub_0803A350(p, q, i);
+        WirelessGameItems_DestroyItem(p, q, i);
         i++;
         q++;
     } while (i <= 15);

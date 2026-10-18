@@ -20,10 +20,10 @@ struct P {
 extern u8 *gUnk_030053F8;
 extern u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
-void sub_0822AE7C(int);
+void Sound_PlayTrackedSong(int);
 void Anim_LoadKeyframe(void *, void *, int, int);
 
-void sub_0803B01C(struct P *p)
+void WirelessResultPanel_UpdateOutcomeReveal(struct P *p)
 {
     if (p->entered) {
         int icon;
@@ -59,7 +59,7 @@ void sub_0803B01C(struct P *p)
         {
             int resultValue = *result;
             if (resultValue == 0) {
-                sub_0822AE7C(0xB0);
+                Sound_PlayTrackedSong(0xB0);
                 {
                     int old = *(u16 *)(*save + 0x16);
                     count = old + 1;
@@ -74,9 +74,9 @@ void sub_0803B01C(struct P *p)
                     *(u16 *)(*address + 0x16) = count;
                 }
             } else if (resultValue == 1) {
-                sub_0822AE7C(0xB1);
+                Sound_PlayTrackedSong(0xB1);
             } else {
-                sub_0822AE7C(0xB1);
+                Sound_PlayTrackedSong(0xB1);
             }
         }
         drawing = &p->drawing;

@@ -6,9 +6,9 @@ struct E {
 };
 extern s32 gUnk_0200023C;
 void Sprite_Remove(void *);
-void sub_08013B74(void *);
+void ScaledShadow_Destroy(void *);
 void Collider_Remove(void *);
-void sub_081A3D50(struct E *e)
+void Hresvelgr_DestroyHomingShotPool(struct E *e)
 {
     s32 i;
     e = (struct E *)((u8 *)e + 0x48);
@@ -16,7 +16,7 @@ void sub_081A3D50(struct E *e)
     do {
         if (e->a != 0) {
             Sprite_Remove(e);
-            sub_08013B74((u8 *)e + 0xec);
+            ScaledShadow_Destroy((u8 *)e + 0xec);
             Collider_Remove((u8 *)e + 0x3c);
         }
         e++;

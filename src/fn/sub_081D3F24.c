@@ -5,7 +5,7 @@ struct S {
     s32 f1c;
 };
 
-s32 sub_081D3F24(struct S *p)
+s32 SceneDisplay_GetAlternateDescriptor(struct S *p)
 {
     s32 r;
     switch (p->f1c) {

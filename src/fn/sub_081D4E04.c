@@ -7,7 +7,7 @@ struct S {
     u16 h9f0;
 };
 
-void sub_081D4E04(struct S *p, u16 a, u16 b)
+void BestiaryDisplay_SetPosition(struct S *p, u16 a, u16 b)
 {
     p->h9ec = a;
     p->h9ee = b;

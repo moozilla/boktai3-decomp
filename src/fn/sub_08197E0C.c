@@ -10,15 +10,15 @@ struct Fade08197E0C {
     u8 out[4];
 };
 u32 sub_08228DB8(void);
-u8 sub_08197DD0(u32);
+u8 TimePalette_GetSourceIndex(u32);
 void sub_08221110(void *, u32, u32, u32, u32);
 
-void sub_08197E0C(struct Fade08197E0C *f)
+void TimePalette_UpdateTransition(struct Fade08197E0C *f)
 {
     u32 state = sub_08228DB8();
     if (state != f->state) {
-        f->from = sub_08197DD0(f->state);
-        f->to = sub_08197DD0(state);
+        f->from = TimePalette_GetSourceIndex(f->state);
+        f->to = TimePalette_GetSourceIndex(state);
         f->state = state;
         f->timer = 0;
     }

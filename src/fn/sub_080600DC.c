@@ -88,7 +88,7 @@ void SceneInventory_PopulateConsumableGrid(struct SceneInventoryPanel *input)
                 u32 base = (u32)gUnk_08E60F80;
                 const struct SceneValueConsumableDefinition *definition;
                 definition = (void *)(((u32)kind << 4) + base);
-                if (!definition->baseValue || sub_0822E224(slot))
+                if (!definition->baseValue || GameState_IsConsumableSlotEquipped(slot))
                     SceneHud_SetKeyframePaletteBank(widget, 0x374);
                 else
                     SceneHud_SetKeyframePaletteBank(widget, 0x373);

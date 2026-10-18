@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_081BDBE0(u8 *p, s32 b)
+void Storage_InitSlotMapping(u8 *p, s32 b)
 {
     s32 i = 0xf;
     u8 *q = p + 0x179f;

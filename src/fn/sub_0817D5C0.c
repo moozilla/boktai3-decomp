@@ -9,7 +9,7 @@ struct A {
 };
 void sub_0824923C(void *, u32);
 
-void sub_0817D5C0(struct A *p)
+void BossSlot2_ResetAndRunPhaseCallback(struct A *p)
 {
     p->a = 0;
     sub_0824923C(p, gUnk_08611CC4[p->i]);

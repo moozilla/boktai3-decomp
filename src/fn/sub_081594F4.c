@@ -8,7 +8,7 @@ struct P081594F4 {
     u16 f42A;
 };
 
-void sub_081594F4(struct P081594F4 *p, u32 d)
+void Player_AddEnergy(struct P081594F4 *p, u32 d)
 {
     if (p->f1c == 1) {
         p->f428 += d;

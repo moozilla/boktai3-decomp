@@ -29,7 +29,7 @@ struct Pair {
 };
 extern const struct Pair gUnk_0824F34C;
 void sub_0818FD9C(void *, void *, void *, void *);
-void sub_08190EEC(u8 *p, int i)
+void SceneAnimation_UpdateSlotSequenceFiveEffect(u8 *p, int i)
 {
     u8 *base = p + 0x71dc;
     u8 **base_pointer = &base;

@@ -10,9 +10,9 @@ extern u32 gUnk_03004290;
 extern u32 gUnk_030042C0[];
 extern u32 gUnk_030042C8[];
 extern u32 gUnk_030042D0[];
-void sub_082152AC(void);
+void ObjGfx_ResetAllocationCounters(void);
 void sub_08215490(u32);
-void sub_082142DC(void)
+void Sprite_InitSystem(void)
 {
     s32 i;
     u32 z;
@@ -32,6 +32,6 @@ void sub_082142DC(void)
         *b++ = z;
         *c++ = z;
     }
-    sub_082152AC();
+    ObjGfx_ResetAllocationCounters();
     sub_08215490(1);
 }

@@ -1,5 +1,5 @@
 #include "display_track.h"
-void sub_08013684(void);
+void Shadow_Destroy(void);
 s32 DisplayTrack_DestroyManager(struct DisplayTrackManager *manager)
 {
     s32 i;
@@ -12,7 +12,7 @@ s32 DisplayTrack_DestroyManager(struct DisplayTrackManager *manager)
         base = (u8 *)manager + 0xD0;
         resource = (void **)(base + offset);
         if (*resource) {
-            sub_08013684();
+            Shadow_Destroy();
             Heap_Free(*resource);
         }
     }

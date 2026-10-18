@@ -2,14 +2,14 @@
 
 s32 Script_GetValue(void);
 s32 Script_SeekToKeyword(u32);
-u32 sub_08003C00(void *p);
-u32 sub_08013A6C(void *a, void *b);
-s32 sub_0815F6A8(void *n, void *v, void *w);
-void sub_08181964(void *s);
+u32 TerrainOverlay_QueueAddActor(void *p);
+u32 ScaledShadow_InitializeDefaultLarge(void *a, void *b);
+s32 TargetRegistry_RegisterActor(void *n, void *v, void *w);
+void Armor_InitPaletteController(void *s);
 void sub_0821983C(void *, void *, int, int, int, int, int, void *);
 void sub_0821FD3C(void *, void *);
-void sub_08225AB4(void *, u32, void *, s32, s32, void *);
-void sub_08225B30(void *, void *);
+void SceneBody_Init(void *, u32, void *, s32, s32, void *);
+void SceneBody_SetKeyframeDisplay(void *, void *);
 void sub_0818BE30(void *, u32);
 void AnimData_Load(void *, u32);
 void ResourceHeader_Relocate(void *, void *);
@@ -104,7 +104,7 @@ struct S {
     u16 h1130;
 };
 
-s32 sub_0818C0BC(struct S *p, u32 arg)
+s32 Armor_InitFromScript(struct S *p, u32 arg)
 {
     struct T t;
     void *q;
@@ -185,16 +185,16 @@ s32 sub_0818C0BC(struct S *p, u32 arg)
     AnimData_Load(p->f2fc, 0x24B9);
     AnimData_Load(p->f318, 0x24B9);
     AnimData_Load(p->f334, 0x24B9);
-    sub_08181964(p);
-    sub_08225AB4(x, p->fB18, &t, 0, 4, p);
-    sub_08003C00(x);
-    sub_08225B30(x, w);
+    Armor_InitPaletteController(p);
+    SceneBody_Init(x, p->fB18, &t, 0, 4, p);
+    TerrainOverlay_QueueAddActor(x);
+    SceneBody_SetKeyframeDisplay(x, w);
     *y = t;
     n = p->f180;
-    sub_0815F6A8(n, x, sub_0818BCB4);
+    TargetRegistry_RegisterActor(n, x, sub_0818BCB4);
     one = 1;
     n[1] |= one;
-    sub_08013A6C(p->f114, y);
+    ScaledShadow_InitializeDefaultLarge(p->f114, y);
     sub_0821FD3C(a, &t);
     sub_0818BE30(p, arg);
     p->hB2E = 0;

@@ -33,17 +33,17 @@ struct ResultMenu {
 };
 extern struct ResultMenu *gUnk_02000104;
 int Script_SeekToKeyword(int);
-void *sub_08227E90(void);
+void *Script_GetTextSourcePc(void);
 void *ScriptProc_Start(int, int);
 void ResourceHeader_Relocate(void *, void *);
 void sub_0821983C(void *, void *, int, int, int, int, int, void *);
 void AnimData_Load(void *, int);
 void AnimData_SelectPaletteBank(void *, int);
 void Sprite_Init(void *, void *, int);
-void sub_08220D20(void *, void *, int, int, int);
-void *sub_08037DCC(int);
+void Anim_RestartSequence(void *, void *, int, int, int);
+void *WirelessExchange_GetPeerEntry(int);
 void Memory_Copy(void *, void *, int);
-int sub_0803B40C(struct ResultMenu *arg)
+int WirelessResultPanel_Init(struct ResultMenu *arg)
 {
     struct ResultMenu *p = arg;
     struct Blob *res;
@@ -65,7 +65,7 @@ int sub_0803B40C(struct ResultMenu *arg)
     int flags;
     gUnk_02000104 = p;
     if (Script_SeekToKeyword(115)) {
-        void *value = sub_08227E90();
+        void *value = Script_GetTextSourcePc();
         void **slot = &p->resource;
         *slot = value;
         if (value)
@@ -117,7 +117,7 @@ initialize:
     AnimData_Load(glyph, 0x593A);
     AnimData_SelectPaletteBank(glyph, 503);
     Sprite_Init(savedSprite, glyph, 0x2011);
-    sub_08220D20(&saved.animation, resource, 0, 0, 0);
+    Anim_RestartSequence(&saved.animation, resource, 0, 0, 0);
     sprite = savedSprite;
     a = &saved.animation;
     {
@@ -251,8 +251,8 @@ initialize:
             u8 *visible = saved.visible;
             *visible = zero;
         }
-        Memory_Copy(p->left, sub_08037DCC(0), 16);
-        Memory_Copy(p->right, sub_08037DCC(1), 16);
+        Memory_Copy(p->left, WirelessExchange_GetPeerEntry(0), 16);
+        Memory_Copy(p->right, WirelessExchange_GetPeerEntry(1), 16);
         {
             struct ResultMenu *write = p;
             int one;

@@ -6,16 +6,16 @@ void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 sub_0810E6E4(u8 *);
 void Task_Kill(u8 *);
 void sub_0810E660(void);
-void sub_0810E6B4(void);
+void Registry3C9F_OnDestroy(void);
 
-u8 *sub_0810E8D0(void)
+u8 *Registry3C9F_Create(void)
 {
     u8 *p;
     if (gUnk_020001CC != 0)
         return gUnk_020001CC;
     p = Task_Create(0xb, 0xd38);
     if (p != 0) {
-        Task_SetCallbacks(p, sub_0810E660, sub_0810E6B4);
+        Task_SetCallbacks(p, sub_0810E660, Registry3C9F_OnDestroy);
         if (sub_0810E6E4(p) < 0) {
             Task_Kill(p);
             return 0;

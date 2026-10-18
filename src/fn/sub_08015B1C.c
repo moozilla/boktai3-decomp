@@ -1,4 +1,6 @@
 #include "global.h"
+/* AnimatedParticles_EmitFan: Builds a particle Config and emits a fan-shaped spread using a yaw/yawRange/count/decay parameter set (matches existing src alias) */
+#define AnimatedParticles_EmitFan sub_08015B1C
 struct Config {
     u16 v[20];
 };

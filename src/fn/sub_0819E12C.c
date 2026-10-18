@@ -20,7 +20,7 @@ static inline u8 chk(struct S *p)
     return 0;
 }
 
-void sub_0819E12C(struct S *p)
+void Hresvelgr_UpdateActionThirtyOneRequest(struct S *p)
 {
     if (chk(p)) {
         u32 k = 0x1f;

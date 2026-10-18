@@ -1,6 +1,6 @@
 #include "global.h"
 void Anim_Remove(u8 *);
-void sub_08167EFC(u8 *p)
+void PauseMenu_RemoveEquipmentSlotAnimations(u8 *p)
 {
     u8 *q = p + 0xB08;
     s32 i = 2;

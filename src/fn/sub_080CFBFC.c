@@ -2,7 +2,7 @@
 
 void sub_0812F270(void);
 
-s32 sub_080CFBFC(void)
+s32 Golem_OnSharedActorUpdate(void)
 {
     sub_0812F270();
     return 0;

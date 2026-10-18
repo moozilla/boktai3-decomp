@@ -5,7 +5,7 @@ struct S {
     u32 a;
     u32 b;
 };
-void sub_0811B784(struct S *p)
+void RegistryE7BC_OnObjectComplete(struct S *p)
 {
     if (p) {
         Script_Call(p->a, 0);

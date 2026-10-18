@@ -11,7 +11,7 @@ struct List {
 };
 extern struct List gUnk_03005280[];
 
-void sub_08219F94(struct Task *t)
+void Task_UnlinkFromPriorityList(struct Task *t)
 {
     struct List *l = &gUnk_03005280[t->f14];
     struct Task *prev = t->prev;

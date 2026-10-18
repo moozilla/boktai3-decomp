@@ -1,6 +1,6 @@
 #include "global.h"
 void Anim_Step(void *, void *);
-void sub_0811CCE0(u8 *s)
+void CharacterModel_UpdatePairedAnimations(u8 *s)
 {
     u8 *p;
     Anim_Step(s + 0x120, p = s + 0x1e0);

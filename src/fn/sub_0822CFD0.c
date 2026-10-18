@@ -1,8 +1,8 @@
 #include "global.h"
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
-void sub_0822CF94(u32);
-u32 sub_0822CFD0(void)
+void Inventory_RemoveItem(u32);
+u32 Inventory_RemoveAllItemsOfKindFromScript(void)
 {
     u32 a;
     s32 i;
@@ -11,7 +11,7 @@ u32 sub_0822CFD0(void)
     a = Script_GetValue();
     i = 0xf;
     do {
-        sub_0822CF94(a);
+        Inventory_RemoveItem(a);
         i--;
     } while (i >= 0);
 }

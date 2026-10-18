@@ -2,10 +2,10 @@
 #include "scene_actor_reset.h"
 #define ACTOR_OFFSET(member) ((u32) & ((struct SceneActorRegistryResetView *)0)->member)
 /* Offset temporaries preserve pointer lifetimes required by the original allocator. */
-void sub_0807FC90(u8 *);
+void SceneActorControl_OnIdle(u8 *);
 void SceneActorPalette_ClearCompletedTransitions(void);
 /* The latter two arguments are observed but unused by this initializer. */
-void sub_0812E084(void *, const void *, u32);
+void SceneActorReaction_ResetResponseState(void *, const void *, u32);
 void *ActorAttachment_ReleaseResource(void *, u32, u32);
 void *ActorAttachment_ReleasePartsResource(void *, u32, u32);
 extern const u8 gUnk_0824E0D8[];
@@ -47,7 +47,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
         byteAddress = (u8 *)actor + offset2;
         state = 1;
         actor->field2B1 = state;
-        callback = sub_0807FC90;
+        callback = SceneActorControl_OnIdle;
         offset2 = 16;
         offset6 += 8;
         *((u8 *)actor + offset6) = state;
@@ -421,7 +421,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
                 destination = sequence;
                 asm("" : "+r"(destination));
                 offset2 -= 0x85;
-                sub_0812E084(destination, resource, offset2);
+                SceneActorReaction_ResetResponseState(destination, resource, offset2);
             }
             offset3 = ACTOR_OFFSET(field5D8);
             asm("" : "+r"(offset3));

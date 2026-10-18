@@ -6,7 +6,7 @@ int ResultPrompt_Update(struct ResultPrompt *p)
         gUnk_03005408 = 1;
     if (p->result < 0) {
         if (p->timer == 60) {
-            p->result = sub_0822BE20();
+            p->result = Save_WriteAlternateSlotAndSelect();
             if (p->result == 1) {
                 TextWindow_Refresh(p->window, 14);
                 Sound_PlaySong(686);
@@ -32,13 +32,13 @@ int ResultPrompt_Update(struct ResultPrompt *p)
     return 0;
 }
 
-u32 sub_0800F914(struct ResultPrompt *p)
+u32 ResultPrompt_Destroy(struct ResultPrompt *p)
 {
-    sub_08033778(p->window);
+    TextWindow_Destroy(p->window);
     return 0;
 }
 
-s32 sub_0800F924(struct ResultPrompt *p)
+s32 ResultPrompt_Init(struct ResultPrompt *p)
 {
     s32 r;
     Hud_SetMode(3);
@@ -47,13 +47,13 @@ s32 sub_0800F924(struct ResultPrompt *p)
     r = -1;
     p->result = r;
     if (Script_SeekToKeyword(0x73)) {
-        p->message = (const u8 *)sub_08227E90();
+        p->message = (const u8 *)Script_GetTextSourcePc();
         if (p->message != 0) {
             p->window = sub_08033690(1, 0xd, 0x1c, 6);
             if (p->window >= 0) {
                 TextWindow_SetScript(p->window, p->message);
                 TextWindow_Refresh(p->window, 0xb);
-                sub_080337FC(p->window);
+                TextWindow_StartPlayback(p->window);
                 return 0;
             }
         }
@@ -61,13 +61,13 @@ s32 sub_0800F924(struct ResultPrompt *p)
     return r;
 }
 
-u8 *sub_0800F988(void)
+u8 *ResultPrompt_Create(void)
 {
     u8 *p;
     p = Task_Create(11, 0x2c);
     if (p != 0) {
-        Task_SetCallbacks(p, (void (*)(void *))ResultPrompt_Update, (void (*)(void *))sub_0800F914);
-        if (sub_0800F924((struct ResultPrompt *)p) < 0) {
+        Task_SetCallbacks(p, (void (*)(void *))ResultPrompt_Update, (void (*)(void *))ResultPrompt_Destroy);
+        if (ResultPrompt_Init((struct ResultPrompt *)p) < 0) {
             Task_Kill(p);
             return 0;
         }

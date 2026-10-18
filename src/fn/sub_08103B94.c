@@ -12,18 +12,18 @@ struct NamedActor {
     u32 flagsE0;
 };
 extern void *gUnk_020001AC;
-struct NamedActor *sub_08101A3C(s32 name);
-void sub_08100A64(struct NamedActor *);
+struct NamedActor *NamedObject_FindByName(s32 name);
+void NamedActor_PlayMovementSound(struct NamedActor *);
 /* Script: for actor -n with flag 2 at +0xE0: +0xB6 = 2, then by -m (default
    1): 4 sets flag 4 and clears 2 at +0xB8; otherwise flag 4 is cleared, flag 2
-   set for 2 or cleared, and sub_08100A64 runs (tentative). */
+   set for 2 or cleared, and NamedActor_PlayMovementSound runs (tentative). */
 void NamedActor_SetMoveModeFromScript(void)
 {
     s32 mode = Script_GetKeywordValue('m', 1);
     s32 name = Script_GetKeywordValue('n', 0);
     struct NamedActor *actor;
     if (gUnk_020001AC && name) {
-        actor = sub_08101A3C(name);
+        actor = NamedObject_FindByName(name);
         if (actor && (actor->flagsE0 & 2)) {
             s32 two = 2;
             actor->fieldB6 = 2;
@@ -35,7 +35,7 @@ void NamedActor_SetMoveModeFromScript(void)
                     actor->flagsB8 |= mode;
                 else
                     actor->flagsB8 &= ~two;
-                sub_08100A64(actor);
+                NamedActor_PlayMovementSound(actor);
             }
         }
     }

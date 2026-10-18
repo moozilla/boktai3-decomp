@@ -26,19 +26,19 @@ struct Manager {
 };
 extern struct Manager *gUnk_02000480;
 extern struct Player *gUnk_02000580[4];
-int sub_08018420(void);
+int Weather_GetType(void);
 int SunClock_GetBaseHour(void);
 int SunClock_GetBaseMinute(void);
-void sub_0802D9C0(void *, struct Actor *);
+void Actor_RunCallbacks(void *, struct Actor *);
 void sub_0802E188(struct Manager *);
 void sub_0802E04C(void *);
-int sub_0802D96C(struct Actor *);
+int Actor_Destroy(struct Actor *);
 void *Task_Create(int, int);
 void Task_SetCallbacks(void *, void *, void *);
-int sub_08030818(struct Manager *);
+int SceneActorManager_Init(struct Manager *);
 void Task_Kill(void *);
-void sub_08030710(void);
-void sub_080307D8(void);
+void SceneActorManager_Update(void);
+void SceneActorManager_Destroy(void);
 /* Registry routine 286F: returns the scene actor manager (gUnk_02000480,
    which also holds the message packet queue), creating its task on first use. */
 struct Manager *SceneActorManager_Create(void)
@@ -48,8 +48,8 @@ struct Manager *SceneActorManager_Create(void)
         return gUnk_02000480;
     p = Task_Create(9, 0x43c);
     if (p) {
-        Task_SetCallbacks(p, sub_08030710, sub_080307D8);
-        if (sub_08030818(p) < 0) {
+        Task_SetCallbacks(p, SceneActorManager_Update, SceneActorManager_Destroy);
+        if (SceneActorManager_Init(p) < 0) {
             Task_Kill(p);
             return 0;
         }

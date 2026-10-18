@@ -1,4 +1,6 @@
 #include "scalar_approach.h"
+/* ScalarApproach_StepAngleEighthArray: Updates signed halfword angles toward corresponding targets using wrapped eighth steps */
+#define ScalarApproach_StepAngleEighthArray sub_08221E70
 #define ScalarApproach_EighthAngleArray sub_08221E70
 void ScalarApproach_EighthAngleArray(s16 *values, const s16 *targets, s32 count)
 {

@@ -1,7 +1,7 @@
 #include "global.h"
-u8 *sub_0822BB04(void);
+u8 *Save_GetContinuationData(void);
 extern u8 *gUnk_02000710;
-s32 sub_0822BB38(void)
+s32 Save_GetMainStateSize(void)
 {
-    return sub_0822BB04() - gUnk_02000710;
+    return Save_GetContinuationData() - gUnk_02000710;
 }

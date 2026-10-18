@@ -7,7 +7,7 @@ struct A {
 };
 void Sound_StopSong(s32);
 
-void sub_081A68CC(struct A *p)
+void Vanargand_StopActionSequence(struct A *p)
 {
     p->b = 0;
     p->a = 0;

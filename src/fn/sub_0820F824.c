@@ -2,7 +2,7 @@
 
 s32 Sprite_Remove(u8 *);
 
-s32 sub_0820F824(u8 *p)
+s32 OrangeSpine_OnTaskDestroy(u8 *p)
 {
     return Sprite_Remove(p + 0x24);
 }

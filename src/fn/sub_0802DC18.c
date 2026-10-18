@@ -8,7 +8,7 @@ struct Actor {
     u32 drawable;
 };
 int DisplayAnimation_SetEntry(void *, int, int, int, int, int, int);
-int sub_0802DC18(struct Actor *p, int a, int b, int stride, int c, int d)
+int Actor_SetMirroredEightWayAnimation(struct Actor *p, int a, int b, int stride, int c, int d)
 {
     int direction, flip;
     if (p->drawable == 1) {

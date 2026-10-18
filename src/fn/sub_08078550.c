@@ -1,4 +1,6 @@
 #include "scene_actor_behavior.h"
+/* SceneActorBehavior_AddDescriptorAcceleration: Steers toward the descriptor destination by adding speed-scaled acceleration and actor biases to velocity */
+#define SceneActorBehavior_AddDescriptorAcceleration sub_08078550
 #define SceneActorBehavior_AddDescriptorAcceleration sub_08078550
 static inline s32 Magnitude(s32 value)
 {

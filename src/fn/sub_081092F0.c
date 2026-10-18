@@ -7,7 +7,7 @@ struct P {
     u8 b;
 };
 extern struct P *gUnk_020004B4;
-void sub_0822B058(s32);
+void Sound_FadeOutChannel10(s32);
 
 static inline u8 chk(struct P *p)
 {
@@ -16,13 +16,13 @@ static inline u8 chk(struct P *p)
     return FALSE;
 }
 
-void sub_081092F0(u32 v)
+void Registry1745_SetSelectionResponse(u32 v)
 {
     if (gUnk_020004B4 != 0) {
         struct P *p = gUnk_020004B4;
         if (!chk(p)) {
             p->b = v;
-            sub_0822B058(1);
+            Sound_FadeOutChannel10(1);
         }
     }
 }

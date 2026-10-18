@@ -41,11 +41,11 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->pending = 1;
 }
 void sub_08223BC0(int);
-void sub_0803441C(struct Engine *);
-void sub_0803451C(struct Engine *);
+void WirelessController_UpdatePeerRosterSend(struct Engine *);
+void WirelessController_PollPeerRosterSend(struct Engine *);
 int sub_0824923C(void *, void *);
 extern void *gUnk_086056EC[];
-int sub_080364C0(struct Engine *argument)
+int Wireless_UpdateConnectionSession(struct Engine *argument)
 {
     struct Engine *p = argument;
     if (p->pad18) {
@@ -70,7 +70,7 @@ int sub_080364C0(struct Engine *argument)
             }
         }
     }
-    sub_0803441C(p);
-    sub_0803451C(p);
+    WirelessController_UpdatePeerRosterSend(p);
+    WirelessController_PollPeerRosterSend(p);
     sub_0824923C(p, gUnk_086056EC[p->operation]);
 }

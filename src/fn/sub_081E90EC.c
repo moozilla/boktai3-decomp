@@ -33,9 +33,9 @@ struct S {
     void (*fn)(void *);
 };
 void Anim_SetSequence(void *, u32, u32, u32, u32);
-void sub_081E4188(void *);
+void Actor_RestoreSavedAnimationPlayback(void *);
 void ActorShadow_Disable(void *);
-void sub_081E41EC(void *);
+void Actor_ArmRestIdleTransition(void *);
 static inline u8 take(struct S *p)
 {
     s32 m = 1;
@@ -85,7 +85,7 @@ static inline u32 frame_factor(u16 v)
     u32 mask = 15;
     return mask & value;
 }
-void sub_081E90EC(struct S *p)
+void Actor_UpdateRotatingAnimation8(struct S *p)
 {
     struct Obj *o;
     struct Anim *a;
@@ -96,9 +96,9 @@ void sub_081E90EC(struct S *p)
     if (take(p)) {
         p->state = 8;
         Anim_SetSequence(&p->anim, p->arg, 8, 0, p->last);
-        sub_081E4188(p);
+        Actor_RestoreSavedAnimationPlayback(p);
         ActorShadow_Disable(p->p2);
-        sub_081E41EC(p);
+        Actor_ArmRestIdleTransition(p);
     }
     if (p->fn)
         p->fn(p);

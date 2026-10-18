@@ -6,7 +6,7 @@ static inline void frame(u8 *p)
 {
     *(u16 *)(p + 0x28) = *(u16 *)(p + 0xb6) >> 2;
 }
-s32 sub_081DAF50(u8 *p)
+s32 Explosion_Update(u8 *p)
 {
     u16 *delay = (u16 *)(p + 0xb4);
     if (*delay)

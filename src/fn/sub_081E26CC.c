@@ -7,7 +7,7 @@ void Task_Kill(void *);
 void SoundTest_Update(void);
 void SoundTest_Destroy(void);
 
-void *sub_081E26CC(void)
+void *SoundTest_Create(void)
 {
     void *r = Task_Create(0xb, 1572);
     if (r != 0) {

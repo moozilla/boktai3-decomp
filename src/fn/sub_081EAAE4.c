@@ -3,7 +3,7 @@
 extern u8 gUnk_0824FDC8[];
 void memcpy(void *, const void *, u32);
 void Anim_LoadKeyframe(void *, void *, u16, u32);
-void sub_081EAAE4(u8 *p)
+void Actor_UpdatePairedSpriteAnimation(u8 *p)
 {
     u8 frames[4][2];
     if (Mod(++*(s32 *)(p + 0x744), 10) == 0) {

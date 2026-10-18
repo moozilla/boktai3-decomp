@@ -1,12 +1,12 @@
 #include "global.h"
 
-void sub_081C1A78(void *);
-void sub_081C1C6C(void *);
-void sub_081C1D0C(void *);
+void ControlPanel_HideValueDisplay(void *);
+void ControlPanel_HideMultiplierSprites(void *);
+void ControlPanel_HideInputGauge(void *);
 
-void sub_081C1D40(void *p)
+void ControlPanel_HideInteractionDisplay(void *p)
 {
-    sub_081C1A78(p);
-    sub_081C1C6C(p);
-    sub_081C1D0C(p);
+    ControlPanel_HideValueDisplay(p);
+    ControlPanel_HideMultiplierSprites(p);
+    ControlPanel_HideInputGauge(p);
 }

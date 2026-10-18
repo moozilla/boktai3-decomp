@@ -7,7 +7,7 @@ struct S {
     const u8 *p;
 };
 
-void sub_080D5360(struct S *s)
+void Mummy_InitActionHandlers(struct S *s)
 {
     s->p = gUnk_08606164;
 }

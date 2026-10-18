@@ -1,5 +1,7 @@
 // COMPILER: old_agbcc
 #include "global.h"
+/* ActionState_ResetSubstate: Clears substate bytes and two scratch words while preserving the main state and first counter */
+#define ActionState_ResetSubstate sub_0819AE78
 
 void sub_0819AE78(u8 *p)
 {

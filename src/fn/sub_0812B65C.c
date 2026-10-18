@@ -3,7 +3,7 @@ struct W {
     u8 f[6];
     u16 v;
 };
-void sub_0812B65C(u32 a, u32 b, u8 *p)
+void SlashEffect_OnSecondaryColliderContact(u32 a, u32 b, u8 *p)
 {
     u8 *q = p;
     struct W *w;

@@ -8,7 +8,7 @@ struct P {
     u8 st;
 };
 void ResultTutorial_MovePlayer(struct P *, s32);
-u32 sub_0801D3CC(struct P *p)
+u32 ResultTutorial_DemonstrateMovement(struct P *p)
 {
     switch (p->st) {
         case 0:

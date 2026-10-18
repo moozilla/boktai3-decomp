@@ -41,15 +41,15 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-void sub_08034270(struct Engine *);
+void WirelessController_RebuildAvailablePeerList(struct Engine *);
 int sub_082237A0(int, int);
 extern u16 gUnk_03005260[];
-int sub_08034E18(struct Engine *p)
+int Wireless_SelectParentFromInput(struct Engine *p)
 {
     u8 *count;
     if (p->pending)
         p->pending = 0;
-    sub_08034270(p);
+    WirelessController_RebuildAvailablePeerList(p);
     {
         u8 *initial = &p->count;
         int available = *initial;

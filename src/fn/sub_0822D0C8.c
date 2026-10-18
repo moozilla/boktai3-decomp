@@ -1,9 +1,9 @@
 #include "global.h"
-u32 sub_0822CDD0(u32);
-void sub_0822CE00(u32, u32);
-void sub_0822D0C8(u32 a, u32 b)
+u32 Inventory_GetKeyItemId(u32);
+void Inventory_SetKeyItemId(u32, u32);
+void Inventory_SwapValuableSlots(u32 a, u32 b)
 {
-    u32 x = sub_0822CDD0(a);
-    sub_0822CE00(a, sub_0822CDD0(b));
-    sub_0822CE00(b, x);
+    u32 x = Inventory_GetKeyItemId(a);
+    Inventory_SetKeyItemId(a, Inventory_GetKeyItemId(b));
+    Inventory_SetKeyItemId(b, x);
 }

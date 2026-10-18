@@ -4,7 +4,7 @@ s32 Script_GetValue(void);
 extern void *gUnk_03005420;
 void Camera_ReadMoveRate(void *);
 void Camera_FollowPlayer(s32);
-void sub_08226894(void)
+void Camera_FollowPlayerFromScript(void)
 {
     if (Script_SeekToKeyword(0x66)) {
         s32 v = Script_GetValue();

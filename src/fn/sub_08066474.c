@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_manager.h"
 void sub_08217DE0(void *, const void *, s32);
-void sub_08217EC4(void *, s32, s32);
+void Effect_SetOrigin(void *, s32, s32);
 struct ActorAttachmentSlotView *ActorAttachment_CreateMeterPartsSlot(
     u32 incomingFrame, struct ContactPosition *anchor, void *update, s32 z, u32 action, s16 *value,
     s32 total, u32 partCount, struct ActorAttachmentFollowView *follow, u32 sourceWord)
@@ -40,7 +40,7 @@ gotManager:
     if (!follow)
         goto failed;
     step = Div(total, 3);
-    slot = sub_08065C40(manager);
+    slot = ActorAttachment_AllocateSlotHeader(manager);
     {
         struct ActorAttachmentPartSprite *low = slot->parts;
         asm("" : "+r"(low));
@@ -275,7 +275,7 @@ partLoop: {
         ActorAttachment_GetActionOffset(resource, action, (*followPointer)->direction, &xOffset,
                                         &zOffset, slot->source);
     }
-    sub_08217EC4(part, xOffset, zOffset);
+    Effect_SetOrigin(part, xOffset, zOffset);
     {
         u8 *low = actionPointer;
         if (*low == 255)

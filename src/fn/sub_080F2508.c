@@ -8,7 +8,7 @@ struct P {
 };
 void sub_080F2538(void);
 
-void sub_080F2508(struct P *p)
+void Ivy_WaitForRetarget(struct P *p)
 {
     if (--p->n == 0) {
         p->n = 300;

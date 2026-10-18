@@ -19,7 +19,7 @@ struct A {
 
 void sub_08217EEC(struct B *, u32, s32);
 
-void sub_0815F8F8(struct A *a, struct B *b)
+void PlayerBurst_UpdateParticle(struct A *a, struct B *b)
 {
     {
         u16 x = b->h34;

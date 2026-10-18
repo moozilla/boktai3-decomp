@@ -7,7 +7,7 @@ struct S {
     struct E e[8];
 };
 void sub_08219728(void *, void *, u16);
-void sub_0810FEDC(struct S *s, s32 k, s32 v)
+void LinkScorePanel_SetNumber(struct S *s, s32 k, s32 v)
 {
     s32 idx = k * 4 + 1;
     u32 d = 0x3e;

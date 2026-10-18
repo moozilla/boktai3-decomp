@@ -9,7 +9,7 @@ struct P {
 
 void SceneMessages_RegisterReceiver(u8 *, u32, s32);
 
-void sub_0815D688(struct P *p)
+void Player_RegisterSceneMessageReceiver(struct P *p)
 {
     SceneMessages_RegisterReceiver(p->sub, p->w24, 2);
 }

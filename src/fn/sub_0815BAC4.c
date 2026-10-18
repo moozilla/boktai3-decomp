@@ -31,7 +31,7 @@ void sub_081507F4(void);
 void Sound_PlaySong(s32);
 void sub_081511E0(void);
 
-void sub_0815BAC4(struct P *p, s32 v, u32 w)
+void PlayerCue_AimDraw(struct P *p, s32 v, u32 w)
 {
     if (v >= 0)
         p->a4 = v;

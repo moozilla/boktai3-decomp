@@ -26,7 +26,7 @@ struct Obj {
     u16 y;
 };
 
-void sub_08140834(struct Obj *o)
+void Player_RequestNearbyEffectTarget(struct Obj *o)
 {
     if (RepeatedEffect_RequestNearby((u8 *)o + 0x30) != 0 && o->busy == 0) {
         s32 m = Mod(o->idx, gUnk_030052F4->in->w);

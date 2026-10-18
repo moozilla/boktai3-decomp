@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "display_track.h"
-void sub_08220D44(void *, u32);
+void Anim_SetDurationScale(void *, u32);
 void DisplayTrack_AddFromScript(void)
 {
     struct DisplayTrackManager *manager = gUnk_02000494;
@@ -88,7 +88,7 @@ void DisplayTrack_AddFromScript(void)
             Anim_SetSequence(state, (void *)track->sequenceResource, track->sequenceId,
                              track->sequenceRow, track->mirror);
             if (Script_SeekToKeyword('P'))
-                sub_08220D44(state, (u16)Script_GetValue());
+                Anim_SetDurationScale(state, (u16)Script_GetValue());
             sprite = savedSprite;
             command = &state->commands[state->index];
             sprite->frame = *command >> 6;

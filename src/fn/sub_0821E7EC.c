@@ -1,15 +1,15 @@
 #include "global.h"
-void sub_0821E748(u32);
-s32 sub_0821E76C(void);
-void sub_0821E780(u16 *, s32, u32);
-s32 sub_0821E7EC(u16 *a, u32 b, u32 c)
+void Path_GetDefinition(u32);
+s32 Path_GetPointData(void);
+void Path_GetPointPosition(u16 *, s32, u32);
+s32 Path_GetPointPositionById(u16 *a, u32 b, u32 c)
 {
     s32 r;
     s32 x;
-    sub_0821E748(b);
-    x = sub_0821E76C();
+    Path_GetDefinition(b);
+    x = Path_GetPointData();
     if (x != 0) {
-        sub_0821E780(a, x, c);
+        Path_GetPointPosition(a, x, c);
         r = 0;
     } else {
         a[0] = x;

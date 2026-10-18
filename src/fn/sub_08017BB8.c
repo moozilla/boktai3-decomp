@@ -4,16 +4,16 @@ struct Weather {
     u32 timer;
     u8 entered;
 };
-void sub_08003448(int);
-void sub_080174B8(void *, int);
+void Palette_SetBrightnessMode(int);
+void Weather_EnterPhase(void *, int);
 int Weather_WaitForStorm(struct Weather *p)
 {
     if (p->entered) {
         p->entered = 0;
-        sub_08003448(1);
+        Palette_SetBrightnessMode(1);
     }
     if (p->timer > 99) {
-        sub_080174B8(p, 2);
+        Weather_EnterPhase(p, 2);
         return 1;
     } else {
         p->timer++;

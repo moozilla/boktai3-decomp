@@ -22,7 +22,7 @@ void CellGate_UpdateForcedDirection(struct CellGate *gate)
                 gate->playerInside = 1;
             }
             if (gate->registered) {
-                sub_0821D6D0(gate->registration);
+                TerrainModifiers_UnregisterCell(gate->registration);
                 gate->registered = 0;
             }
             CellGate_ClampPlayerEdge(gate, 40);
@@ -47,7 +47,7 @@ void CellGate_UpdateForcedDirection(struct CellGate *gate)
             }
             if (!CellGate_TestForcedPassage(gate)) {
                 if (!gate->registered) {
-                    sub_0821D698(gate->registration, gate->cell, 0, gate->height, 255, 0x80B);
+                    TerrainModifiers_RegisterCell(gate->registration, gate->cell, 0, gate->height, 255, 0x80B);
                     gate->registered = 1;
                 }
             } else
@@ -60,7 +60,7 @@ void CellGate_UpdateForcedDirection(struct CellGate *gate)
         }
     remove:
         if (gate->registered) {
-            sub_0821D6D0(gate->registration);
+            TerrainModifiers_UnregisterCell(gate->registration);
             gate->registered = result;
         }
     }

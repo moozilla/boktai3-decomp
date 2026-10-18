@@ -12,7 +12,7 @@ static inline u32 tst(u32 *a, u32 m)
     return *a & m;
 }
 
-s32 sub_0823CFDC(struct P0823CFDC *p)
+s32 Player_IsFlaggedBelowResourceLimit(struct P0823CFDC *p)
 {
     if (tst(&p->f20, 0x10) != 0 && p->f428 < p->f42A)
         return 1;

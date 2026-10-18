@@ -6,7 +6,7 @@ struct Packed {
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
 void sub_0806A160(void *, int, void *, int, int, int, int, int);
-void sub_08022A48(u8 *p)
+void SceneActors_SpawnAmbientParticlePair(u8 *p)
 {
     u8 *graphics = p + 0x240;
     struct Packed size;

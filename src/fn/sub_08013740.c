@@ -26,7 +26,7 @@ struct Map {
 };
 extern struct Map *gUnk_030052F4;
 extern u32 gUnk_030052F8, gUnk_030052FC;
-u8 *sub_0821D64C(int, int);
+u8 *TerrainModifiers_FindCellOverride(int, int);
 static inline int cellIndex(struct Vec *p)
 {
     int x = p->x >> 8, z = p->z >> 8;
@@ -36,7 +36,7 @@ static inline int cellIndex(struct Vec *p)
 }
 static inline struct Cell *cell(int i)
 {
-    u8 *p = sub_0821D64C(i, 1);
+    u8 *p = TerrainModifiers_FindCellOverride(i, 1);
     if (p)
         return (void *)(p + 4);
     return (void *)(gUnk_030052F4->cells + 12 + i * 4);

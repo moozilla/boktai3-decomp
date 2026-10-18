@@ -10,7 +10,7 @@ struct Hdr {
     struct Ent *ents;
 };
 
-struct Ent *sub_08215C8C(struct Hdr *h, u16 id)
+struct Ent *BgGfx_FindEntryById(struct Hdr *h, u16 id)
 {
     struct Ent *e = h->ents;
     s32 i = 0;

@@ -2,7 +2,7 @@
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 void sub_0807C72C(void *, u32, u32, u32);
-void sub_0807E7B0(void *, u32);
+void SceneActorEffects_AdvanceSteps(void *, u32);
 void *sub_081D4F20(u32, u32);
 void GameState_SetEventFlag(void *);
 void SceneActorRecord_RecordPair(u16, u16);
@@ -27,7 +27,7 @@ static inline u32 Flag(struct SceneActorRegistryResetView *actor, u32 maskInput,
 }
 static inline void SetControl(struct SceneActorRegistryResetView *actor)
 {
-    void *callback = (void *)sub_0807FC90;
+    void *callback = (void *)SceneActorControl_OnIdle;
     u8 kind = 16;
     actor->field2B2 = 1;
     actor->field2B0 = 0;
@@ -83,7 +83,7 @@ void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *ac
         sub_0807C72C(actor, 0, 127, 0);
         sub_0807C72C(actor, 1, 127, 0);
         sub_0807C72C(actor, 3, 127, 0);
-        sub_0807E7B0(actor, 4);
+        SceneActorEffects_AdvanceSteps(actor, 4);
     }
     {
         u32 showFlag = 1;

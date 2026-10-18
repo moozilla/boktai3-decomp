@@ -2,7 +2,7 @@
 extern u8 *gUnk_02000710;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-void sub_0816C9AC(void)
+void GameState_SetWorldMapFlagFromScript(void)
 {
     s32 n;
     u32 *p;

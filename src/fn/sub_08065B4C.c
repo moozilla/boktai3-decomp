@@ -6,7 +6,7 @@ struct ActorAttachmentFollowView {
     struct ContactPosition offset;
 };
 extern void *const gUnk_08605B18[];
-void sub_08217EC4(struct ActorAttachmentPartSprite *, s32, s32);
+void Effect_SetOrigin(struct ActorAttachmentPartSprite *, s32, s32);
 void ActorAttachment_UpdateFollowingOffset(struct ActorAttachmentSlotView *slot)
 {
     struct ActorAttachmentFollowView *follow = slot->followActor;
@@ -28,7 +28,7 @@ void ActorAttachment_UpdateFollowingOffset(struct ActorAttachmentSlotView *slot)
                 part = (void *)kind;
                 for (; index <= 2; index++) {
                     if ((*mask >> index) & 1)
-                        sub_08217EC4(part, x, z);
+                        Effect_SetOrigin(part, x, z);
                     part++;
                 }
             } else {

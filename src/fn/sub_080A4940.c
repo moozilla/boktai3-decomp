@@ -14,7 +14,7 @@ struct R {
     u8 f3[0x2d0 - 0x2c4];
     u32 flags;
 };
-s32 sub_080A4940(struct R *s)
+s32 Spider_GetAnimationEvent(struct R *s)
 {
     struct Q *q = (struct Q *)(s->p + 0x48);
     if (q->hE == 0) {

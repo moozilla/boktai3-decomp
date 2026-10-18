@@ -15,11 +15,11 @@ struct BgOffset {
 extern struct BgOffset gUnk_030042A0;
 void Terrain_LoadHP(s32 hp);
 void Terrain_LoadGridResource(u16);
-void sub_0821DDC8(u16);
-void sub_0821E594(u16);
+void Terrain_LoadBoxesResource(u16);
+void Terrain_LoadPathsResource(u16);
 void sub_0821F15C(u16);
-struct TerrainTask *sub_0821A2C4(u32);
-void sub_0821447C(s32, void *, void *, void *);
+struct TerrainTask *ResourceRegistry_GetResource(u32);
+void Video_SetRenderCallbacks(s32, void *, void *, void *);
 void sub_08217F4C(void);
 void sub_08214B44(void);
 void sub_08219624(void);
@@ -46,21 +46,21 @@ void Terrain_LoadFromScript(void)
         if (grid)
             Terrain_LoadGridResource(grid);
         if (t)
-            sub_0821DDC8(t);
+            Terrain_LoadBoxesResource(t);
         if (r)
-            sub_0821E594(r);
+            Terrain_LoadPathsResource(r);
         if (z)
             sub_0821F15C(z);
     }
-    g = sub_0821A2C4(0x56C2)->grid;
+    g = ResourceRegistry_GetResource(0x56C2)->grid;
     if (Script_SeekToKeyword('v')) {
         s32 mode = Script_GetValue();
         if (mode == 0) {
-            sub_0821447C(0, sub_08217F4C, sub_08214B44, sub_08219624);
+            Video_SetRenderCallbacks(0, sub_08217F4C, sub_08214B44, sub_08219624);
             gUnk_030042A0.x = g->originX >> 4;
             gUnk_030042A0.y = g->originY >> 4;
         } else {
-            sub_0821447C(mode, sub_08218254, sub_08214D20, sub_0821964C);
+            Video_SetRenderCallbacks(mode, sub_08218254, sub_08214D20, sub_0821964C);
             gUnk_030042A0.x = 0;
             gUnk_030042A0.y = 0;
         }

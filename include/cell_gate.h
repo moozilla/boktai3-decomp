@@ -35,8 +35,8 @@ s32 CellGate_TestPlayerEdge(struct CellGate *, s32);
 s32 CellGate_TestForcedPassage(struct CellGate *);
 s32 CellGate_TestTraversalMode(struct CellGate *);
 void CellGate_ClampPlayerEdge(struct CellGate *, s32);
-void sub_0821D6D0(void *);
-void sub_0821D698(void *, u32, u32, u32, u32, u32);
+void TerrainModifiers_UnregisterCell(void *);
+void TerrainModifiers_RegisterCell(void *, u32, u32, u32, u32, u32);
 void sub_08158CD8(struct CellGatePlayer *);
 void sub_08158DF0(struct CellGatePlayer *, u32);
 #endif

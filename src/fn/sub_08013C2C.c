@@ -1,6 +1,6 @@
 #include "global.h"
 
-u8 *sub_08013C2C(u8 *p, u32 key)
+u8 *ShadowRegistry_FindEntry(u8 *p, u32 key)
 {
     u8 *q = *(u8 **)(p + 0x18);
     while (q) {

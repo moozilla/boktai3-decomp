@@ -9,10 +9,10 @@ struct Frame {
 };
 extern u32 gUnk_02000610[];
 u8 *Script_DecodeOperand(u8 *, s32 *, s32 *);
-void sub_0821A91C(s32, u32);
-u8 *sub_0821B3E4(u8 *, s32);
+void Script_SetStackArgument(s32, u32);
+u8 *Script_AssignVariableOperand(u8 *, s32);
 s32 Script_ApplyOperator(s32, s32, s32);
-u32 sub_0821AF2C(u8 *, u32, u32);
+u32 Script_ExecuteBlock(u8 *, u32, u32);
 u32 Script_EvalExpression(u8 *p)
 {
     struct Frame frame;
@@ -31,9 +31,9 @@ u32 Script_EvalExpression(u8 *p)
                 u32 category = type & 0xF0;
                 saved = slot;
                 if (category == 0x90)
-                    sub_0821A91C(type & 15, ((struct Slot *)((u32)slot + 8))->value);
+                    Script_SetStackArgument(type & 15, ((struct Slot *)((u32)slot + 8))->value);
                 else
-                    sub_0821B3E4(reference, ((struct Slot *)((u32)slot + 8))->value);
+                    Script_AssignVariableOperand(reference, ((struct Slot *)((u32)slot + 8))->value);
                 saved->value = ((struct Slot *)((u32)slot + 8))->value;
             } else {
                 slot->value =
@@ -45,7 +45,7 @@ u32 Script_EvalExpression(u8 *p)
             ((struct Slot *)((u32)slot + 8))->reference = p;
             p = Script_DecodeOperand(p, &frame.type, &frame.value);
             if (frame.type == 0x80) {
-                sub_0821AF2C((u8 *)frame.value, 0, 0);
+                Script_ExecuteBlock((u8 *)frame.value, 0, 0);
                 ((struct Slot *)((u32)slot + 8))->value = gUnk_02000610[1];
             } else
                 ((struct Slot *)((u32)slot + 8))->value = frame.value;

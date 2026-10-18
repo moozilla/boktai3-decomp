@@ -1,6 +1,6 @@
 #include "global.h"
 
-u32 sub_08013CA4(void)
+u32 ShadowRegistry_OnUpdate(void)
 {
     return 0;
 }

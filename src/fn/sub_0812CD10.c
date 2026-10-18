@@ -7,7 +7,7 @@ static inline u8 test(u32 *p, u32 mask)
         return 1;
     return 0;
 }
-u32 sub_0812CD10(u8 *s)
+u32 FragmentEffect_UpdateManager(u8 *s)
 {
     u8 *first = s + 0x3C;
     if (*(u32 *)(s + 0x38)) {

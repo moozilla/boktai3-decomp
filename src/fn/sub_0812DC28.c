@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_terrain.h"
 
-s32 sub_0812DC28(u16 *a, s32 dir, s32 n)
+s32 SceneActorTerrain_FindReachableCell(u16 *a, s32 dir, s32 n)
 {
     s32 x = (s16)a[0] >> 8;
     s32 y = (s16)a[2] >> 8;

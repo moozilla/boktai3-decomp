@@ -1,5 +1,5 @@
 #include "global.h"
 
-void sub_08121F80(void)
+void SceneActor14_OnColliderContact(void)
 {
 }

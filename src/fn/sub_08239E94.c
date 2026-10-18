@@ -1,6 +1,6 @@
 #include "global.h"
 
-s32 sub_08239E94(u8 *p)
+s32 LinkPlayer_GetElapsedActionTicks(u8 *p)
 {
     s32 r = p[0x4F4];
     r -= p[0x4F5];

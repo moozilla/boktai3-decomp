@@ -7,7 +7,7 @@ struct VM {
     u32 *sp;
 };
 extern struct VM gUnk_02000610;
-u32 sub_0821A908(s32 n)
+u32 Script_GetStackArgument(s32 n)
 {
     return *(u32 *)((u8 *)gUnk_02000610.sp - (n * 4 + 4));
 }

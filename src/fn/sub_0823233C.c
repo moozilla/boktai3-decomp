@@ -2,7 +2,7 @@
 extern void *gUnk_0200005C;
 void Effect_Remove(void *);
 void sub_08231480(void *, void *);
-u32 sub_0823233C(u8 *s)
+u32 SceneActorEffects_DestroyGroup(u8 *s)
 {
     u8 *p = s + 0x1c;
     s32 i = 3;

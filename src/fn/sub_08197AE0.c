@@ -1,5 +1,7 @@
 #include "global.h"
 #include "engine.h"
+/* PaletteEffect_StartAnimationOverride: Creates a timed shared palette override for an animation */
+#define PaletteEffect_StartAnimationOverride sub_08197AE0
 
 struct AnimData08197AE0 {
     u8 pad0[6];
@@ -12,15 +14,15 @@ struct Anim08197AE0 {
     struct AnimData08197AE0 *data;
 };
 extern u8 *gUnk_030042E4;
-void *sub_0819792C(void *, void *, u32, s32, s32);
-void sub_08197A50(void *);
-void sub_08197A0C(void *);
+void *PaletteEffect_Create(void *, void *, u32, s32, s32);
+void PaletteEffect_UpdateSharedOverride(void *);
+void PaletteEffect_Destroy(void *);
 
 void sub_08197AE0(struct Anim08197AE0 *anim, u32 hold)
 {
-    void *task = sub_0819792C(anim, NULL, hold, 0, 0);
+    void *task = PaletteEffect_Create(anim, NULL, hold, 0, 0);
     if (task) {
-        Task_SetCallbacks(task, sub_08197A50, sub_08197A0C);
+        Task_SetCallbacks(task, PaletteEffect_UpdateSharedOverride, PaletteEffect_Destroy);
         {
             u16 id = 0x192;
             u8 *tiles = gUnk_030042E4 + 0x3240;

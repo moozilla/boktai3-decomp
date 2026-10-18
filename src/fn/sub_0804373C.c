@@ -3,7 +3,7 @@
 // Reviewed full extent; register lifetimes and instruction scheduling still differ.
 #include "contact_actor.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline s32 truncateShift12(s32 value)
 {
     if (value >= 0)
@@ -19,7 +19,7 @@ static inline s32 cellIndex(struct ContactPosition *position)
 }
 static inline u8 *cell(s32 index)
 {
-    u8 *dynamic = sub_0821D64C(index, 1);
+    u8 *dynamic = TerrainModifiers_FindCellOverride(index, 1);
     if (dynamic)
         return dynamic + 4;
     return gUnk_030052F4->cells + 12 + index * 4;

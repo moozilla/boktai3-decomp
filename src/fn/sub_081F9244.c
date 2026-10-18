@@ -20,7 +20,7 @@ static inline u8 TakeFlag(struct S *p)
     }
     return FALSE;
 }
-void sub_081F9244(struct S *p)
+void Ratatosk_UpdateWaitTimer(struct S *p)
 {
     TakeFlag(p);
     p->cnt++;

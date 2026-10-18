@@ -3,18 +3,18 @@
 extern u8 *gUnk_02000580;
 void sub_081029F8(u8 *);
 void sub_08102C0C(u8 *);
-s32 sub_081593D8(u8 *, u32);
+s32 Player_TestAttachmentFlags(u8 *, u32);
 void sub_08102EE8(u8 *);
 s32 TetherActor_TestStatusFlags(u32);
 void sub_08102FB0(u8 *);
 void Memory_Clear(u8 *, u32);
 
-void sub_08102E98(u8 *s)
+void NamedObject_UpdateFollowers(u8 *s)
 {
     if (gUnk_02000580 != 0) {
         sub_081029F8(s);
         sub_08102C0C(s);
-        if (sub_081593D8(gUnk_02000580, 1))
+        if (Player_TestAttachmentFlags(gUnk_02000580, 1))
             sub_08102EE8(s);
         if (TetherActor_TestStatusFlags(1))
             sub_08102FB0(s);

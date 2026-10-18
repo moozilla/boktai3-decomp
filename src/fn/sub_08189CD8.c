@@ -7,7 +7,7 @@ void sub_081885BC(void *);
 void sub_0818911C(void *);
 void sub_08188B7C(void *);
 void sub_081896D0(void *);
-void sub_08189CD8(struct S *p)
+void Armor_UpdateSecondaryBehaviorByInverseFlag(struct S *p)
 {
     if ((p->fl & 0x200) == 0)
         sub_081896D0(p);

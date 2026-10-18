@@ -11,38 +11,38 @@ struct PeerMenu {
     u8 pad4f8[0xfc];
     u8 draw[8];
 };
-int sub_08036A88(void);
-int sub_08036C88(void);
-int sub_08036AC4(void);
+int Wireless_GetPeerHandshakeData(void);
+int Wireless_GetLocalSessionId(void);
+int Wireless_GetConnectedSlotMask(void);
 void sub_082213B8(void *, void *, int, int, int, int, int, int, int);
-void sub_08037490(void *, void *);
-void sub_0803749C(void *, void *);
-void *sub_08037594(int);
-void *sub_08037DCC(int);
+void WirelessPeerPanel_SetAvailable(void *, void *);
+void WirelessPeerPanel_SetUnavailable(void *, void *);
+void *WirelessPeerMenu_GetFirstConnectedPlayer(int);
+void *WirelessExchange_GetPeerEntry(int);
 void Memory_Copy(void *, const void *, int);
 void TextWindow_Refresh(int, int);
-void sub_080374A8(void *, void *, int, void *, int);
-void sub_08037540(void *, void *, int);
+void WirelessPeerPanel_SetNameFromPacket(void *, void *, int, void *, int);
+void WirelessPeerPanel_ClearName(void *, void *, int);
 extern u8 *gUnk_02000710;
-void sub_080375BC(struct PeerMenu *p, struct PeerPanel *panel, int index)
+void WirelessPeerPanel_Update(struct PeerMenu *p, struct PeerPanel *panel, int index)
 {
-    int status = sub_08036A88();
+    int status = Wireless_GetPeerHandshakeData();
     void *peer;
     if (!index) {
-        int value = sub_08036C88();
+        int value = Wireless_GetLocalSessionId();
         sub_082213B8((u8 *)panel + 0x50, p->draw, value, 5, 0, 24, 70, 8, 0);
         goto available;
     }
-    if (sub_08036AC4()) {
+    if (Wireless_GetConnectedSlotMask()) {
     available:
-        sub_08037490(p, panel);
+        WirelessPeerPanel_SetAvailable(p, panel);
     } else
-        sub_0803749C(p, panel);
+        WirelessPeerPanel_SetUnavailable(p, panel);
     if (status) {
-        peer = sub_08037594(status);
+        peer = WirelessPeerMenu_GetFirstConnectedPlayer(status);
         if (!index) {
             if (!panel->active) {
-                void *name = sub_08037DCC(0);
+                void *name = WirelessExchange_GetPeerEntry(0);
                 u32 zero = 0;
                 CpuSet(&zero, &p->clear, 0x05000001);
                 Memory_Copy(name, gUnk_02000710 + 0x780, 16);
@@ -52,11 +52,11 @@ void sub_080375BC(struct PeerMenu *p, struct PeerPanel *panel, int index)
             }
         } else if (peer) {
             if (!panel->active) {
-                sub_080374A8(p, panel, index, peer, status);
+                WirelessPeerPanel_SetNameFromPacket(p, panel, index, peer, status);
                 panel->active = 1;
             }
         } else if (panel->active) {
-            sub_08037540(p, panel, index);
+            WirelessPeerPanel_ClearName(p, panel, index);
             panel->active = 0;
         }
     }

@@ -9,7 +9,7 @@ struct A {
 };
 void Sound_PlaySong(s32);
 void sub_080F4A4C(void);
-void sub_080F4A0C(struct A *p)
+void Ivy_BeginChildPulse(struct A *p)
 {
     p->b6 = 0x80;
     p->b8 = 0x7f;

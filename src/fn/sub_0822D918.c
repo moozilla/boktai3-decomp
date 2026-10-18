@@ -1,10 +1,10 @@
 #include "global.h"
 extern u8 *gUnk_02000710;
-void sub_0822D858(u32);
-void sub_0822D918(s32 a)
+void Inventory_ClearEquipmentEntry(u32);
+void Inventory_RemoveEquipmentEntry(s32 a)
 {
     s32 i;
-    sub_0822D858(a);
+    Inventory_ClearEquipmentEntry(a);
     i = 0;
     do {
         u8 *g = gUnk_02000710;

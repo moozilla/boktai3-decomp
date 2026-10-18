@@ -1,5 +1,5 @@
 #include "global.h"
-s32 sub_081660C0(s32 a)
+s32 PauseMenu_GetPromptIconKeyframe(s32 a)
 {
     if (a <= 1)
         return a + 0x7e;

@@ -41,7 +41,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->pending = 1;
 }
 extern u8 gUnk_03005390[];
-void sub_08035320(struct Engine *p)
+void Wireless_UpdateUniAcknowledgedSlots(struct Engine *p)
 {
     u8 *seen = (u8 *)p + 0xE7;
     int bits = (gUnk_03005390[3] << 1) | *seen;

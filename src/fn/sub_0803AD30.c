@@ -2,7 +2,7 @@
 
 extern u32 gUnk_02000104;
 
-u32 sub_0803AD30(void)
+u32 WirelessResultPanel_GetInstance(void)
 {
     return gUnk_02000104;
 }

@@ -6,7 +6,7 @@ struct S {
     u8 b6c;
     u8 alpha;
 };
-void sub_0823652C(struct S *s)
+void RadialBurstEffect_BlendSpritePalette(struct S *s)
 {
     u16 *p = s->src;
     int bias = (16 - s->alpha) * 15;

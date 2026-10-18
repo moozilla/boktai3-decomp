@@ -6,14 +6,14 @@ struct Controller {
     s8 current[4], target[4];
 };
 extern struct Controller *gUnk_02000070;
-struct Controller *sub_08016674(int, int);
+struct Controller *PaletteLevels_Create(int, int);
 int PaletteLevels_Configure(int mode, int first, int count, u8 *initial, u8 *target, u16 *periods)
 {
     struct Controller *initialManager = gUnk_02000070;
     struct Controller *p;
     int i;
     if (!initialManager) {
-        p = sub_08016674(0, 0);
+        p = PaletteLevels_Create(0, 0);
         if (!p)
             return -1;
     } else

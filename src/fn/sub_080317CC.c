@@ -8,7 +8,7 @@ struct S {
     u8 f[0x18];
     struct In in;
 };
-void sub_080317CC(struct S *p)
+void MessageWindow_ClearTextCompletion(struct S *p)
 {
     struct In *q = &p->in;
     q->a = 0;

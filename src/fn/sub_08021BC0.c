@@ -1,4 +1,6 @@
 #include "global.h"
+/* SceneActors_CopyAvailablePosition: Copies the available actor's two position coordinates to the output and reports failure if absent */
+#define SceneActors_CopyAvailablePosition sub_08021BC0
 #define SceneActors_CopyAvailablePosition sub_08021BC0
 typedef struct {
     int a, b;

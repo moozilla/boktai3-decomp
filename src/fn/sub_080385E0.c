@@ -17,7 +17,7 @@ struct TradeSave {
 extern struct TradeSave *gUnk_02000710;
 extern u32 gUnk_03003A50;
 extern u16 gUnk_03005260[];
-void sub_080385E0(struct TradeMenu *p)
+void WirelessGameMenu_ConsumeSelectedItem(struct TradeMenu *p)
 {
     struct TradeSave *save = gUnk_02000710;
     s16 *selected = &save->leftSelected;

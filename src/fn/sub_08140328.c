@@ -6,7 +6,7 @@ static inline u8 chk(u32 m)
         return 1;
     return 0;
 }
-u32 sub_08140328(u32 x)
+u32 Player_IsNormalActionAllowed(u32 x)
 {
     if (x & 0x80) {
         if (chk(0x2018))

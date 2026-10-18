@@ -52,10 +52,10 @@ struct S {
     u32 ticks;
 };
 void Anim_SetSequence(void *, u32, u32, u32, u32);
-void sub_081E4188(void *);
+void Actor_RestoreSavedAnimationPlayback(void *);
 void ActorShadow_Disable(void *);
-void sub_081E41EC(void *);
-void sub_081E4174(void *);
+void Actor_ArmRestIdleTransition(void *);
+void Actor_SetInteractionControlFlag(void *);
 void AnimData_SelectPaletteBank(void *, s32);
 void Sound_PlaySong(s32);
 void Script_Call(void *, s32);
@@ -63,7 +63,7 @@ void ActorShadow_Enable(void *);
 void ActorPalette_BeginFade(void *);
 extern s32 gUnk_03005260;
 extern u8 gUnk_03005430[];
-void sub_081E43E8(void *);
+void Actor_UpdateIdlePhaseRestoration(void *);
 struct Child {
     u32 flags;
     u8 p0[0x2c - 4];
@@ -76,10 +76,10 @@ struct Child {
     u8 rest[10];
 };
 void Actor_TryInteraction(void *, void *);
-void sub_081E5608(void *, void *);
+void Actor_OnInteractionChildUpdate(void *, void *);
 void Actor_SelectNearestInteraction(void *);
 extern void (*const gUnk_08613D70[])(void *);
-void sub_081E9D10(struct S *p)
+void Actor_UpdateInteractionMode(struct S *p)
 {
     Actor_SelectNearestInteraction(p);
     gUnk_08613D70[p->mode](p);

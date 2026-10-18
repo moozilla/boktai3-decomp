@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0803DC1C(u8 *a, u8 *e)
+void ScenePool_UpdateLateralControlPulse(u8 *a, u8 *e)
 {
     s32 *c = (s32 *)(e + 0x178);
     if (*c > 0) {

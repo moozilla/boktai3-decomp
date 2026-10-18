@@ -1,6 +1,6 @@
 #include "global.h"
 void Anim_LoadKeyframe(u8 *, u8 *, u32, s32);
-void sub_08165B28(u8 *p, s32 i, u32 c)
+void PauseMenu_LoadSpriteKeyframe(u8 *p, s32 i, u32 c)
 {
     u8 *e = (u8 *)(i * 0x60 + (u32)p + 0x1420);
     *(u32 *)(e + 8) &= ~1;

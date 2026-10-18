@@ -2,7 +2,7 @@
 extern s32 gUnk_030051CC;
 extern u16 gUnk_030051F0[];
 extern u8 gUnk_03004DC0[];
-u32 sub_082172E0(u32 key, void *src)
+u32 Palette_CacheReservedObjectBank(u32 key, void *src)
 {
     s32 i = 0;
     u32 result;

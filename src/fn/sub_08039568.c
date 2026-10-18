@@ -5,14 +5,14 @@ struct Task {
     u16 state;
 };
 void *Script_GetKeywordValue(int, int);
-void sub_0821447C(int, void *, void *, void *);
-void sub_08218B30(void);
-void sub_08215114(void);
-void sub_082199C4(void);
-int sub_08039568(struct Task *p)
+void Video_SetRenderCallbacks(int, void *, void *, void *);
+void Video_OnFrameNoOp(void);
+void Video_OnRenderNoOp(void);
+void Sprite_OnRenderPhase(void);
+int WirelessExit_Init(struct Task *p)
 {
     p->listener = Script_GetKeywordValue(101, 0);
     p->state = 0;
-    sub_0821447C(0, sub_08218B30, sub_08215114, sub_082199C4);
+    Video_SetRenderCallbacks(0, Video_OnFrameNoOp, Video_OnRenderNoOp, Sprite_OnRenderPhase);
     return 0;
 }

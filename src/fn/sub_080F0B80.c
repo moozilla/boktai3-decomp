@@ -2,7 +2,7 @@
 
 void sub_0812F12C(void);
 
-s32 sub_080F0B80(void)
+s32 Ivy_UpdateInteraction(void)
 {
     sub_0812F12C();
     return 0;

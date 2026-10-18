@@ -11,7 +11,7 @@ struct Context {
     struct Slot slots[8];
 };
 extern struct Context *gUnk_030025FC;
-u8 sub_0822B5D0(s32, s32, s32, s32, s32, s32);
+u8 SceneStimulus_TestSquareOverlap(s32, s32, s32, s32, s32, s32);
 s8 sub_0822B7E4(s32 a, s32 b, s32 c, u8 mask, u16 value, s32 index)
 {
     struct Context *ctx = gUnk_030025FC;
@@ -24,7 +24,7 @@ s8 sub_0822B7E4(s32 a, s32 b, s32 c, u8 mask, u16 value, s32 index)
                 if (slot->flags & 0x80)
                     return index;
                 if (slot->d >= 0 && (slot->flags & mask) &&
-                    sub_0822B5D0(slot->a, slot->c, slot->d, a, b, c))
+                    SceneStimulus_TestSquareOverlap(slot->a, slot->c, slot->d, a, b, c))
                     return index;
             }
             slot++;

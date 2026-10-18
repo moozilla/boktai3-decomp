@@ -4,7 +4,7 @@ struct E {
     u8 b;
 };
 void sub_0824923C(void *, u32);
-s32 sub_081132E0(u8 *s)
+s32 SceneDebrisPool_Update(u8 *s)
 {
     s32 i;
     struct E *p;

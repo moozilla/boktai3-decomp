@@ -15,7 +15,7 @@ struct S0813C040 {
     u8 f860;
 };
 
-void sub_0813C040(struct S0813C040 *p)
+void DirectionalSpriteEffect_Activate(struct S0813C040 *p)
 {
     p->f82E = p->fC6;
     p->f834 = p->fD4;

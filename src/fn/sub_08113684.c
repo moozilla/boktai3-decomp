@@ -1,6 +1,6 @@
 #include "global.h"
 void Sprite_Remove(void *);
-void sub_08113684(u8 *s)
+void NativeEffect_DestroyEntry(u8 *s)
 {
     u8 *p = s + 0xce;
     if (*p != 0) {

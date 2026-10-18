@@ -8,7 +8,7 @@ void TetherActor_CreateAuxiliarySprite(struct TetherActor *actor)
         AnimData_Load(graphics, 0x1C1B);
         sprite = &actor->auxiliarySprite;
         Sprite_Init(sprite, graphics, 512);
-        sub_08214584(sprite, -8, -8);
+        Sprite_SetOriginStub(sprite, -8, -8);
         sprite->frame = 6;
         *active = 1;
     }

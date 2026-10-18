@@ -42,12 +42,12 @@ static inline void setFacing(ActorAnimation *p, int angle)
     value = 7 & shifted;
     p->facing8 = value;
 }
-void sub_080297FC(void *, int, int, int);
-void sub_08029E1C(void *);
-int sub_08029E2C(void *);
-void sub_08029AA8(void *);
+void GridAttackActor_SetAnimation(void *, int, int, int);
+void GridAttackActor_ResetAttackAnimationHistory(void *);
+int GridAttackActor_SelectAttackAnimation(void *);
+void GridAttackActor_SpawnGridPattern(void *);
 void Sound_PlaySongChecked(int);
-void sub_08029FF8(ActorAnimation *p)
+void GridAttackActor_UpdateIdle(ActorAnimation *p)
 {
     if (!p->locked)
         setFacing(p, p->requestedAngle);
@@ -55,7 +55,7 @@ void sub_08029FF8(ActorAnimation *p)
         p->changed = 0;
         if (p->locked)
             setFacing(p, p->savedAngle);
-        sub_080297FC(p, 2, 1, 0);
+        GridAttackActor_SetAnimation(p, 2, 1, 0);
     }
     if (!p->tryUpdate(p)) {
         u32 mask = 64;

@@ -9,7 +9,7 @@ struct A {
 };
 void sub_0824923C(void *, u32);
 
-void sub_08024CBC(struct A *p)
+void SceneActorState_UpdateActionController(struct A *p)
 {
     p->a = 0;
     sub_0824923C(p, gUnk_08604EFC[p->i]);

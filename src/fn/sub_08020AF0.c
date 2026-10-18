@@ -1,9 +1,9 @@
 #include "global.h"
 extern u8 *gUnk_0200047C;
-void sub_08020D54(void *, void *);
+void SceneMessages_SetPendingTrigger(void *, void *);
 void SceneMessages_RunScript(void *, void *, void *);
-void sub_08020AC0(void *, void *, void *);
-void sub_08020ADC(void *, void *, void *);
+void SceneMessages_SetDelay(void *, void *, void *);
+void SceneMessages_SetSignal(void *, void *, void *);
 typedef struct {
     u16 id;
     u8 unk[4];
@@ -22,16 +22,16 @@ int SceneMessages_Dispatch(u8 *p)
             u8 *message;
             u8 *controller = gUnk_0200047C;
             message = entry->messages[controller[0x24]][i];
-            sub_08020D54(entry, message);
+            SceneMessages_SetPendingTrigger(entry, message);
             switch (message[6]) {
                 case 0:
                     SceneMessages_RunScript(p, entry, message);
                     break;
                 case 1:
-                    sub_08020AC0(p, entry, message);
+                    SceneMessages_SetDelay(p, entry, message);
                     break;
                 case 2:
-                    sub_08020ADC(p, entry, message);
+                    SceneMessages_SetSignal(p, entry, message);
                     break;
             }
             i++;

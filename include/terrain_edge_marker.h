@@ -1,7 +1,6 @@
 #ifndef GUARD_TERRAIN_EDGE_MARKER_H
 #define GUARD_TERRAIN_EDGE_MARKER_H
 #include "scene_object.h"
-/* Tentative: directional marker selected from a region's terrain edges. */
 union TerrainMarkerPosition {
     struct SceneVec world;
     u32 words[2];
@@ -27,7 +26,7 @@ struct TerrainMarkerRegion {
     s16 minX, minZ, maxX, maxZ;
     u16 unknown8, tag;
 };
-struct TerrainMarkerManager *sub_0821A2C4(u16);
+struct TerrainMarkerManager *ResourceRegistry_GetResource(u16);
 void TerrainEdgeMarker_Add(union TerrainMarkerPosition *, s32, s32, s32);
 s32 TerrainEdgeMarker_FindTerrainDirection(struct TerrainMarkerRegion *);
 s32 TerrainEdgeMarker_UpdateVisibility(struct TerrainMarkerManager *);

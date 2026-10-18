@@ -3,26 +3,26 @@
 // fuzzy: 67.5%
 // 9 differing instruction runs; first diff at +0x14 (ldr r2, [pc, #0x7c] vs ldr r1, [pc, #0x78])
 extern u8 *gUnk_02000710;
-u32 sub_0823AC94(u8 *);
-void sub_0823ACCC(u8 *);
-void sub_0823ACD0(u8 *);
-void sub_0823AD18(u8 *);
-void sub_0823AD40(u8 *);
+u32 LinkPlayer_GetSessionPlayerData(u8 *);
+void LinkPlayer_InitOptionalPlayerState(u8 *);
+void LinkPlayer_LoadBaseStats(u8 *);
+void LinkPlayer_InitHealth(u8 *);
+void LinkPlayer_InitEnergy(u8 *);
 void sub_082383D4(u8 *, s32, s32);
 void sub_0823AD64(u8 *);
 s32 sub_0823ADB4(u8 *p)
 {
-    u32 v = sub_0823AC94(p);
+    u32 v = LinkPlayer_GetSessionPlayerData(p);
     *(u32 *)(p + 0x344) = v;
     *(u32 *)(p + 0x1c) = 1;
     *(u32 *)(gUnk_02000710 + 0x628) = 0;
     *(u32 *)(gUnk_02000710 + 0x62c) = 0;
     *(u16 *)(gUnk_02000710 + 0x610) = 0;
     *(u16 *)(gUnk_02000710 + 0x612) = 0;
-    sub_0823ACCC(p);
-    sub_0823ACD0(p);
-    sub_0823AD18(p);
-    sub_0823AD40(p);
+    LinkPlayer_InitOptionalPlayerState(p);
+    LinkPlayer_LoadBaseStats(p);
+    LinkPlayer_InitHealth(p);
+    LinkPlayer_InitEnergy(p);
     sub_082383D4(p, 0, 0);
     sub_0823AD64(p);
     *(u16 *)(p + 0x534) = 0;

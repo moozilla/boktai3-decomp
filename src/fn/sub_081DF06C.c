@@ -5,7 +5,7 @@ struct G {
 extern struct G gUnk_02000340;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-void sub_081DF06C(void)
+void Time_SetDateMenuFromScript(void)
 {
     if (Script_SeekToKeyword(0x6f))
         gUnk_02000340.c = Script_GetValue();

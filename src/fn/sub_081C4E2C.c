@@ -4,11 +4,11 @@ struct S {
     u8 pad[0x18];
     u32 f18;
 };
-u32 sub_081C3010(u32);
-void sub_081C4D58(struct S *);
+u32 RegistryF3E4_GetStateResult(u32);
+void SceneTransition_StartChildTransition(struct S *);
 
-void sub_081C4E2C(struct S *p)
+void RegistryC281_UpdateFirstMovement(struct S *p)
 {
-    if (sub_081C3010(p->f18))
-        sub_081C4D58(p);
+    if (RegistryF3E4_GetStateResult(p->f18))
+        SceneTransition_StartChildTransition(p);
 }

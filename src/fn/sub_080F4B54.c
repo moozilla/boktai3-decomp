@@ -10,7 +10,7 @@ struct P {
 };
 void sub_080F4B94(void);
 
-void sub_080F4B54(struct P *p)
+void Ivy_BeginChildRandomDelay(struct P *p)
 {
     u32 v;
     gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;

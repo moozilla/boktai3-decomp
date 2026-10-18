@@ -15,7 +15,7 @@ struct Owner {
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
-void sub_08235A5C(struct Owner *p)
+void HealthBurstEffect_InitSprites(struct Owner *p)
 {
     s32 i;
     AnimData_Load(p->resource, 0x24ba);

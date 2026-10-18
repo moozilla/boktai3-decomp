@@ -1,5 +1,7 @@
 #include "global.h"
 #include "engine.h"
+/* WirelessStatusMenu_LoadPrimaryBackground: Loads the BG0 tilemap resource and its palette into the menu. */
+#define WirelessStatusMenu_LoadPrimaryBackground sub_08036E60
 
 extern u16 gUnk_03004FC0[];
 void Bg_SetupLayers(int, int, void *, int, int, int, void *);

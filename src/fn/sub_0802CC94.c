@@ -16,11 +16,11 @@ struct Object {
     s8 target;
     u8 count, slot;
 };
-void *sub_0802C678(void);
-struct Object *sub_0802CA8C(int);
+void *ActorPool_GetManager(void);
+struct Object *Actor_GetPartyTarget(int);
 int Math_Atan2(int, int);
-void sub_0802C8CC(struct Object *, int);
-void sub_0802CC94(struct Object *p)
+void Actor_SetFacingAngle(struct Object *, int);
+void Actor_StepFacingAngle(struct Object *p)
 {
     if (p->target >= 0) {
         s8 *deltaPtr = (s8 *)(&p->delta);
@@ -34,6 +34,6 @@ void sub_0802CC94(struct Object *p)
         } else {
             angle = (*deltaPtr) + p->angle;
         }
-        sub_0802C8CC(p, angle);
+        Actor_SetFacingAngle(p, angle);
     }
 }

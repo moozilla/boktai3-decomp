@@ -9,7 +9,7 @@ struct P {
     u8 e;
 };
 extern u16 *gUnk_030042E4;
-void sub_08165CA8(struct P *p, u16 a, u16 b, s32 d)
+void PauseMenu_StartPaletteTransition(struct P *p, u16 a, u16 b, s32 d)
 {
     u16 *src;
     u16 *dst;

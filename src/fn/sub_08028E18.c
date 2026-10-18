@@ -7,20 +7,20 @@ struct Actor {
     u8 pad3c0[0x61c];
     void *handle;
 };
-struct Actor *sub_0802140C(int);
+struct Actor *SceneActors_GetBySlot(int);
 int Script_GetKeywordValue(int, int);
-void sub_08022AF4(void *);
+void SceneActors_StopBackgroundFlash(void *);
 void BackgroundFlash_BeginAlternating(void *);
 void BackgroundFlash_BeginAppearance(void *);
 extern u32 gUnk_0300523C;
-void sub_08028E18(void)
+void Vampire_TriggerBackgroundFlash(void)
 {
-    struct Actor *p = sub_0802140C(0);
+    struct Actor *p = SceneActors_GetBySlot(0);
     if (p && p->handle) {
         int a = Script_GetKeywordValue(115, 0);
         int b = Script_GetKeywordValue(104, 0);
         if (a)
-            sub_08022AF4(p);
+            SceneActors_StopBackgroundFlash(p);
         else if (b)
             BackgroundFlash_BeginAlternating(p->handle);
         else

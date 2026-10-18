@@ -2,7 +2,7 @@
 
 void sub_08106DAC(void);
 
-void sub_08107D48(void)
+void Pool1B8_RunPendingScripts(void)
 {
     sub_08106DAC();
 }

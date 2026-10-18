@@ -16,7 +16,7 @@ static inline void Clr(u16 *q, u32 m)
     *q = m & *q;
 }
 
-void sub_080ED3A0(u8 *p)
+void Ivy_UpdateActiveState(u8 *p)
 {
     if (TakeFlag(p + 0x2B2)) {
         u16 *q;

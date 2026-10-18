@@ -15,22 +15,22 @@ struct ResultMenu {
 extern struct ResultMenu *gUnk_02000104;
 extern void *gUnk_08605814[];
 extern u16 gUnk_03005260[], gUnk_03004BD8;
-void sub_0822AFE8(int);
+void Sound_PauseChannel10(int);
 void Sound_PlaySong(int);
 void sub_08249238(void *);
 void Task_Kill(void *);
-int sub_08036BEC(void);
-void sub_08033778(int);
+int Wireless_GetStatus(void);
+void TextWindow_Destroy(int);
 void sub_0824923C(void *, void *);
 void Anim_Remove(void *);
 void Sprite_Remove(void *);
-int sub_0803B370(struct ResultMenu *p)
+int WirelessResultPanel_Update(struct ResultMenu *p)
 {
-    if (sub_08036BEC()) {
+    if (Wireless_GetStatus()) {
         int *w = p->windows;
         int i = 3;
         do {
-            sub_08033778(*w++);
+            TextWindow_Destroy(*w++);
         } while (--i >= 0);
         Task_Kill(p);
     } else

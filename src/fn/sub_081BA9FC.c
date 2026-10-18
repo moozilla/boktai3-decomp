@@ -7,7 +7,7 @@ struct Q {
 };
 void sub_081BA79C(void *);
 
-void sub_081BA9FC(struct Q *p)
+void Registry3F74_UpdateSelection(struct Q *p)
 {
     s32 v;
     if (p->p == 0)

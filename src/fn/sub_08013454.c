@@ -1,5 +1,5 @@
 #include "global.h"
 
-void sub_08013454(void)
+void ActorShadow_UpdateNone(void)
 {
 }

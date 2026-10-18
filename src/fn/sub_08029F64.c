@@ -6,8 +6,8 @@ typedef struct {
     u8 command, count;
     u16 args[1];
 } Packet;
-void sub_08020DD0(void *);
-void sub_08029F64(u8 *p)
+void SceneMessages_Send(void *);
+void GridAttackActor_RequestLinkedActorState(u8 *p)
 {
     Packet *packet = (void *)(p + 0x914);
     if (*(int *)(p + 0x910) && p[0x1a8] != 0) {
@@ -20,6 +20,6 @@ void sub_08029F64(u8 *p)
         packet->command = 1;
         packet->count = 1;
         packet->args[0] = 3;
-        sub_08020DD0(packet);
+        SceneMessages_Send(packet);
     }
 }

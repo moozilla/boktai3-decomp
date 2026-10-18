@@ -1,5 +1,7 @@
 #include "global.h"
 #include "engine.h"
+/* TextWindow_LoadFramePalette: Selects one of two resources and copies 32 palette colors into RAM; tentative frame palette role */
+#define TextWindow_LoadFramePalette sub_0821907C
 
 extern u32 gUnk_03005180[];
 

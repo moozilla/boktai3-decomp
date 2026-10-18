@@ -5,7 +5,7 @@ s32 Presentation_Initialize(void *);
 void Task_Kill(void *);
 void Presentation_Update(void);
 void Presentation_Destroy(void);
-void *sub_081E3484(void)
+void *Presentation_Create(void)
 {
     void *p = Task_Create(8, 0x238);
     if (p) {

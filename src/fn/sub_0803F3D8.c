@@ -1,6 +1,6 @@
 #include "scene_arc.h"
 void SceneArc_DestroySlot(struct SceneArcManager *, struct SceneArcSlot *, s32);
-void sub_0821A2AC(u32);
+void ResourceRegistry_UnregisterResource(u32);
 u32 SceneArc_DestroyManager(struct SceneArcManager *manager)
 {
     struct SceneArcSlot *slot = manager->slots;
@@ -10,6 +10,6 @@ u32 SceneArc_DestroyManager(struct SceneArcManager *manager)
         index++;
         slot++;
     } while (index <= 7);
-    sub_0821A2AC(0xfe2c);
+    ResourceRegistry_UnregisterResource(0xfe2c);
     return 0;
 }

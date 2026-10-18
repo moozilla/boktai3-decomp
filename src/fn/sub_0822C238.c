@@ -1,5 +1,5 @@
 #include "global.h"
-s32 sub_0822C238(s32 v)
+s32 Solar_GetLevelForIntensity(s32 v)
 {
     if (v == 0)
         return 0;

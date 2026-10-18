@@ -1,6 +1,6 @@
 #include "global.h"
 
-s32 sub_08013C4C(u8 *head, u8 *n)
+s32 ShadowRegistry_LinkEntry(u8 *head, u8 *n)
 {
     u32 z = n[2];
     u8 *t;

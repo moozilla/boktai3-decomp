@@ -9,7 +9,7 @@ struct S {
     u8 f2[0xb];
     u32 c14;
 };
-void sub_0802FD60(u32 a, struct S *p)
+void SceneCharacter_UpdateIdleState(u32 a, struct S *p)
 {
     if (p->b8) {
         p->b8 = 0;

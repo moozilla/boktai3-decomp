@@ -12,13 +12,13 @@ struct Pos {
     u16 x, y, z, pad;
 };
 extern u8 *gUnk_020005F8;
-u8 *sub_0820112C(void *, s32 *);
+u8 *PlayerClone_FindFreeSlot(void *, s32 *);
 void Memory_Copy(void *, void *, u32);
 void Anim_LoadKeyframe(void *, void *, u32, u32);
-u8 *sub_0815F53C(u32);
-void sub_08201270(void *, void *);
+u8 *Player_GetEffectivePosition(u32);
+void PlayerClone_SetBehaviorCallback(void *, void *);
 void sub_082003BC(void);
-void sub_082010EC(void);
+void PlayerClone_CreatePool(void);
 s32 sub_08201160(u8 *resource, struct Pos *pos)
 {
     struct {
@@ -27,7 +27,7 @@ s32 sub_08201160(u8 *resource, struct Pos *pos)
     } scratch;
     u8 *pool = gUnk_020005F8;
     if (pool) {
-        u8 *obj = sub_0820112C(((struct Pool *)pool)->data, &scratch.index);
+        u8 *obj = PlayerClone_FindFreeSlot(((struct Pool *)pool)->data, &scratch.index);
         if (obj) {
             void *handler = obj + 0x198;
             void *display;
@@ -48,7 +48,7 @@ s32 sub_08201160(u8 *resource, struct Pos *pos)
             *(u16 *)(obj + 0x14) = pos->x;
             *(u16 *)(obj + 0x16) = pos->y + 0x80;
             *(u16 *)(obj + 0x18) = pos->z;
-            tmp = sub_0815F53C(0);
+            tmp = Player_GetEffectivePosition(0);
             *(struct Pair *)(obj + 0x24) = *(struct Pair *)tmp;
             {
                 void *target = obj + 0xc;
@@ -56,13 +56,13 @@ s32 sub_08201160(u8 *resource, struct Pos *pos)
                 CpuSet(&scratch.fill, target, 0x05000002);
             }
             *(u32 *)((u8 *)display + 8) |= 1;
-            sub_08201270(handler, sub_082003BC);
+            PlayerClone_SetBehaviorCallback(handler, sub_082003BC);
             *(u32 *)(pool + 0x18) |= 1 << scratch.index;
             (*(u32 *)(pool + 0x9e8))++;
             return scratch.index;
         }
     } else
-        sub_082010EC();
+        PlayerClone_CreatePool();
     return -1;
 }
 #else

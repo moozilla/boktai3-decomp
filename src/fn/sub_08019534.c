@@ -5,13 +5,13 @@ typedef struct {
     u16 colors[256];
 } PaletteFrames;
 extern u16 gUnk_03004FC0[];
-int sub_08003460(void);
-void sub_08019518(PaletteFrames *);
+int Palette_IsDirty(void);
+void PaletteFrames_CaptureColors(PaletteFrames *);
 int PaletteFrames_Update(PaletteFrames *p)
 {
     int i;
-    if (sub_08003460())
-        sub_08019518(p);
+    if (Palette_IsDirty())
+        PaletteFrames_CaptureColors(p);
     if (++p->time > 3) {
         p->time = 0;
         if (++p->frame > 6)

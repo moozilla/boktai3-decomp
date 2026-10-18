@@ -33,20 +33,20 @@ void Anim_LoadKeyframe(void *, void *, u16, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 extern const s16 gUnk_086136F0[], gUnk_086137AE[], gUnk_08613BC4[];
-u32 sub_0822B590(s32);
+u32 Sound_IsSongPlaying(s32);
 void Sound_StopSong(s32);
 void Sound_PlaySong(s32);
 void Anim_SetKeyframes(void *, void *, u16, s32, s32);
 extern u16 gUnk_03005260[];
 extern void *gUnk_020003C0[];
-void sub_081DC1DC(s32);
+void Menu_StartFadeOut(s32);
 s32 SoundTest_StopSelection(void *);
 void SoundTest_UpdatePlaybackIndicators(void *);
 void SoundTest_PlaySelection(void *);
 void SoundTest_MoveCategoryCursor(void *);
 void SoundTest_SelectPrevious(void *);
 void SoundTest_SelectNext(void *);
-void sub_0816381C(void *, void *);
+void Palette_UpdateHighlightPulse(void *, void *);
 void Script_Call(void *, void *);
 void Task_Kill(void *);
 // Handle sound-test controls, accelerating held left/right, and the exit fade.
@@ -56,7 +56,7 @@ void SoundTest_Update(struct Viewer *p)
     switch (p->state) {
         case 0:
             if ((gUnk_03005260[1] & 2) && SoundTest_StopSelection(p)) {
-                sub_081DC1DC(p->fadeShift);
+                Menu_StartFadeOut(p->fadeShift);
                 p->state = 1;
                 p->exitFlag = 0;
                 Sound_PlaySong(222);
@@ -99,7 +99,7 @@ void SoundTest_Update(struct Viewer *p)
                 SoundTest_SelectPrevious(p);
             else if (direction == 2)
                 SoundTest_SelectNext(p);
-            sub_0816381C((u8 *)p + 0x618, (u8 *)p + 0x620);
+            Palette_UpdateHighlightPulse((u8 *)p + 0x618, (u8 *)p + 0x620);
             break;
         case 1:
             if (p->exitTimer > (1 << p->fadeShift)) {

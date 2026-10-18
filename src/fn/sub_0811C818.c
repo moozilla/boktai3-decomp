@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_030042E4;
-void sub_0811C818(u8 *a, s32 b)
+void CharacterModel_LoadSecondaryPalette(u8 *a, s32 b)
 {
     u8 **gp;
     u32 k = b + 0x379;

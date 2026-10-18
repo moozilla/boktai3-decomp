@@ -1,5 +1,5 @@
 #include "global.h"
-s32 sub_0819AF14(s32 a, s32 b)
+s32 Math_ApproachEighth(s32 a, s32 b)
 {
     s32 d = b - a;
     s32 r;

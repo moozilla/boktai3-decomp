@@ -1,4 +1,6 @@
 #include "global.h"
+/* SceneTilemap_GetWrappedCell: Returns a layer tilemap cell pointer with column and row wrapped to the 32 by 32 map */
+#define SceneTilemap_GetWrappedCell sub_0806F1B0
 #define SceneTilemap_GetWrappedCell sub_0806F1B0
 struct SceneTilemapLayer {
     u8 unknown0[0x2c];

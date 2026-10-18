@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08139FB8(u8 *p)
+void FollowingSpriteEffect_OnStop(u8 *p)
 {
     u8 *q = p + 0xcf;
     if (*q != 0) {

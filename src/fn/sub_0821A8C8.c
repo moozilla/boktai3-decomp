@@ -7,7 +7,7 @@ struct VM {
     u32 *sp;
 };
 extern struct VM gUnk_02000610;
-void sub_0821A8C8(u32 *p)
+void Script_RestoreArgumentStack(u32 *p)
 {
     if (p)
         gUnk_02000610.sp = p;

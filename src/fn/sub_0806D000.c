@@ -16,7 +16,7 @@ void RouteSpriteActor_FinishAnimation(struct RouteSpritePool *pool, struct Route
         if (actor->sprite.unknown4[0])
             Sprite_Remove(&actor->sprite);
         if (actor->shadowAbsent == 0)
-            sub_08013B74(actor->shadow);
+            ScaledShadow_Destroy(actor->shadow);
         *(u8 *)indexPointer = 0xFF;
         actor->flags150 = 0;
     }

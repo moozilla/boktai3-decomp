@@ -11,7 +11,7 @@ struct S080B0C38 {
     s32 value;
 };
 
-void sub_080B0C38(struct S080B0C38 *p)
+void Vorn_InitScriptCallback(struct S080B0C38 *p)
 {
     p->a = 0xffff;
     p->b = -1;

@@ -4,11 +4,11 @@ struct G {
     s16 v;
 };
 extern struct G *gUnk_02000710;
-u16 *sub_08163F70(s32, s32, s32);
+u16 *Hud_GetTilemapCell(s32, s32, s32);
 void sub_08165488(s32, s32, s32, s32, s32);
-void sub_081655D8(s32 a, s32 b)
+void Hud_DrawCounter7B0(s32 a, s32 b)
 {
-    u16 *p = sub_08163F70(0, a - 1, b);
+    u16 *p = Hud_GetTilemapCell(0, a - 1, b);
     *p = 0xF001;
     if (gUnk_02000710->v > 9999)
         gUnk_02000710->v = 9999;

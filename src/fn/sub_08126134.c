@@ -2,7 +2,7 @@
 
 extern u32 gUnk_02000150;
 
-void sub_08126134(void)
+void SceneMovingParticle_ResetPool(void)
 {
     gUnk_02000150 = 0;
 }

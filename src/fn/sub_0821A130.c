@@ -12,7 +12,7 @@ struct List {
 };
 extern struct List gUnk_03005280[];
 
-struct Task *sub_0821A130(u16 id)
+struct Task *Task_FindById(u16 id)
 {
     struct List *l = gUnk_03005280;
     s32 i = 0;

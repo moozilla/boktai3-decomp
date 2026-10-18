@@ -1,11 +1,11 @@
 #include "global.h"
 #include "engine.h"
 extern u8 *gUnk_0200025C;
-void sub_081BB150(void *);
-void sub_081BB13C(void *);
+void MenuCursor_EnableInput(void *);
+void MenuCursor_Hide(void *);
 /* Script: for the registry 2388 task (gUnk_0200025C) with a child at +0x558:
-   -v nonzero clears +0x52A and calls sub_081BB150, else sets it and calls
-   sub_081BB13C (tentative). */
+   -v nonzero clears +0x52A and calls MenuCursor_EnableInput, else sets it and calls
+   MenuCursor_Hide (tentative). */
 void Registry2388_SetVisibleFromScript(void)
 {
     u8 *p = gUnk_0200025C;
@@ -17,9 +17,9 @@ void Registry2388_SetVisibleFromScript(void)
         return;
     if (Script_GetKeywordValue('v', 0)) {
         *(u16 *)(p + 0x52A) = 0;
-        sub_081BB150(*child);
+        MenuCursor_EnableInput(*child);
     } else {
         *(u16 *)(p + 0x52A) = 1;
-        sub_081BB13C(*child);
+        MenuCursor_Hide(*child);
     }
 }

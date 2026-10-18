@@ -1,4 +1,4 @@
 #include "global.h"
-void sub_081C4EEC(void)
+void RegistryC281_Destroy(void)
 {
 }

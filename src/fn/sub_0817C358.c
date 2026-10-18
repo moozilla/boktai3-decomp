@@ -20,7 +20,7 @@ static inline u8 TakeFlag(struct S *p)
     return FALSE;
 }
 
-void sub_0817C358(struct S *p)
+void BossSlot2_UpdateFlaggedRecovery(struct S *p)
 {
     if (TakeFlag(p)) {
         u32 v = 0xb;

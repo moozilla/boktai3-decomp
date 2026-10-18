@@ -2,7 +2,7 @@
 
 void SceneActorRegistry_SendToCategory(s32, u16 *);
 
-void sub_0814196C(void)
+void Player_NotifyActionCategories(void)
 {
     u16 buf;
 

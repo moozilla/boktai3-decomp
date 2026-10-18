@@ -1,6 +1,6 @@
 #include "global.h"
 void Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
-void sub_081CBCBC(void *unused, u8 *p)
+void SceneCharacter_StartAnimationEleven(void *unused, u8 *p)
 {
     if (p[9]) {
         s32 r;

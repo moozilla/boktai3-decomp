@@ -10,7 +10,7 @@ struct T {
 };
 void Memory_Clear(void *, u32);
 void sub_0811E5D0(void *, u32);
-void sub_0811FA90(u8 *s, u32 v)
+void Modifier_InitSourceInfo(u8 *s, u32 v)
 {
     u8 *a = s + 0x48;
     struct T *t = (struct T *)(s + 0x518);

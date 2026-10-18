@@ -5,7 +5,7 @@ struct P {
     u8 g[0x730 - 0x70E];
     u32 a;
 };
-void sub_081BB520(struct P *p, u32 v)
+void SolarBank_SetState(struct P *p, u32 v)
 {
     p->a = v;
     p->b = 0;

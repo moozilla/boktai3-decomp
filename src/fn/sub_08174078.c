@@ -3,7 +3,7 @@ s32 sub_08165A30(void *);
 void Sound_PlaySong(s32);
 void sub_0822DA94(s32);
 void sub_08173A7C(void *);
-void sub_08174078(u8 *p)
+void Hud_UpdateInventorySortConfirmation(u8 *p)
 {
     s32 r = sub_08165A30(p);
     if (r == 0) {

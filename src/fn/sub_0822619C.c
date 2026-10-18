@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_0822619C(u32 *q)
+void Camera_SetTargetOffset(u32 *q)
 {
     u8 *p = *(u8 **)0x03005420;
     if (p != 0) {

@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08030498(u8 *a, u8 *p)
+void SceneCharacter_UpdateTetherReactionState(u8 *a, u8 *p)
 {
     if (p[8] != 0) {
         p[8] = 0;

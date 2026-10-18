@@ -2,7 +2,7 @@
 
 extern u32 gUnk_02000158;
 
-void sub_081269D4(void)
+void BlinkingEffect_ResetSingleton(void)
 {
     gUnk_02000158 = 0;
 }

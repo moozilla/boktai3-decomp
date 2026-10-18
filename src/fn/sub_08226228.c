@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_08226178(void);
+void Camera_ClearTargetOffset(void);
 
 void Camera_Reset(void)
 {
@@ -9,6 +9,6 @@ void Camera_Reset(void)
         u32 z = 0;
         *(u16 *)(s + 0x1c) = 1;
         *(u16 *)(s + 0x68) = z;
-        sub_08226178();
+        Camera_ClearTargetOffset();
     }
 }

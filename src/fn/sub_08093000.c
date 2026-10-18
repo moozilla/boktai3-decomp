@@ -9,8 +9,8 @@ struct Z {
 void SceneActorCollision_InitBody(u8 *, struct Z *, struct Z *, void (*)(void), u8 *);
 void SceneActorCollision_InitAttack(u8 *, struct Z *, struct Z *, void (*)(void), u32, u8 *);
 void sub_08091E58(void);
-void sub_08091E54(void);
-void sub_08093000(u8 *p)
+void Bee_OnAttackCollision(void);
+void Bee_InitColliders(u8 *p)
 {
     struct Z s1, s2, s3, s4;
     s1.a.lo = 0x10;
@@ -24,5 +24,5 @@ void sub_08093000(u8 *p)
     s3.b.lo = 0x20;
     *(u32 *)&s4.a = 0;
     *(u32 *)&s4.b &= 0xFFFF0000;
-    SceneActorCollision_InitAttack(p, &s3, &s4, sub_08091E54, 0, p);
+    SceneActorCollision_InitAttack(p, &s3, &s4, Bee_OnAttackCollision, 0, p);
 }

@@ -9,7 +9,7 @@ struct S {
     u32 e;
     u32 f2;
 };
-void sub_0811153C(struct S *s, u32 a, u32 b, u32 c, u32 d)
+void PaletteFade_SetTransitionParameters(struct S *s, u32 a, u32 b, u32 c, u32 d)
 {
     s->c = a;
     s->d = b;

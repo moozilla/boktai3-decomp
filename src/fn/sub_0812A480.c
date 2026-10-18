@@ -19,7 +19,7 @@ struct S {
     struct E e[12];
 };
 
-u32 sub_0812A480(struct S *b)
+u32 SunDiscPool_DestroyTask(struct S *b)
 {
     s32 i = 0;
     struct E *e = b->e;

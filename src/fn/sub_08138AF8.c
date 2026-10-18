@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_08138AF8(u8 *p)
+void ParticleEmitter_OnStop(u8 *p)
 {
     u8 *q = p + 0xd4;
     if (*q != 0) {

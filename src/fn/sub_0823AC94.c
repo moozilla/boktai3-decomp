@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_020004B4;
-u8 *sub_0823AC94(u8 *s)
+u8 *LinkPlayer_GetSessionPlayerData(u8 *s)
 {
     s32 i = *(s32 *)(s + 0x18);
     u8 *g = gUnk_020004B4;

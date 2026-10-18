@@ -1,7 +1,7 @@
 #include "global.h"
 #include "libm_compat.h"
 
-double sub_08229618(double arg)
+double Time_CalculateLunarLongitude(double arg)
 {
     double t, base, result;
     t = (((arg - 51544.5) + 0.00074074) / 36525.0);

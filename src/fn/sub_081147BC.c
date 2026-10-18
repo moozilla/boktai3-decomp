@@ -3,7 +3,7 @@ s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 u32 ScriptProc_Start(u32, u32);
 void AnimData_SelectPaletteBank(void *, u32);
-void sub_081147BC(u8 *s)
+void NativeEffect_InitUnsequencedSprite(u8 *s)
 {
     u8 *p = s + 0x44;
     if (AnimData_Load(p, 0x409c) != 0) {

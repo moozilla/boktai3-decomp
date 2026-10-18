@@ -1,6 +1,6 @@
 #include "global.h"
 extern u32 gUnk_02000598;
-void sub_0815F770(void)
+void TargetRegistry_Destroy(void)
 {
     gUnk_02000598 = 0;
 }

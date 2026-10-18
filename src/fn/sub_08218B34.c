@@ -6,7 +6,7 @@ struct Dma {
 extern u32 gUnk_03001660;
 extern u8 gUnk_03001560[];
 
-void sub_08218B34(void)
+void Text_FlushTileUploads(void)
 {
     u32 i;
     u32 src = 0x02034C00;

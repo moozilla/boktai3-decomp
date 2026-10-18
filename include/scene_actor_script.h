@@ -49,5 +49,5 @@ struct SceneActorScriptPropertiesView {
     u16 quarterHealth;
 };
 struct SceneActorRegistryActor *SceneActorRegistry_FindById(u32);
-u8 *sub_0821D64C(u32, u32);
+u8 *TerrainModifiers_FindCellOverride(u32, u32);
 #endif

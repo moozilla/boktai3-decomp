@@ -39,7 +39,7 @@ struct Record {
     u8 pad0, mode, pad2[6], count, pad9[13], status, pad17[9];
 };
 extern struct Record *gUnk_03006A80;
-void sub_08034270(struct Engine *p)
+void WirelessController_RebuildAvailablePeerList(struct Engine *p)
 {
     int i;
     int left, right, limit;

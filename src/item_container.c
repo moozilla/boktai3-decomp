@@ -6,14 +6,14 @@ extern u32 gUnk_02000560[];
 extern s32 gUnk_02000478;
 extern u16 gUnk_02000534, gUnk_02000500;
 
-void sub_08013B74(void *);
+void ScaledShadow_Destroy(void *);
 s32 sub_0822D490(s32, s32);
-u8 *sub_0821D64C(s32, s32);
-void sub_08013728(void *);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
+void ScaledShadow_Disable(void *);
 void sub_08017044(s32, s32, s32, s32, struct SceneVec *, struct SceneVec *, s32, struct Trigger *);
 u8 sub_082212DC(void *, u32, s32, s32);
 void sub_08217DE0(struct TriggerSprite *, struct TriggerGraphics *, u32);
-void sub_08217EC4(struct TriggerSprite *, s32, s32);
+void Effect_SetOrigin(struct TriggerSprite *, s32, s32);
 s32 sub_0821D6F4(struct SceneVec *, s32);
 s32 Region_FindContaining();
 void ScaledShadow_Initialize(void *, struct SceneVec *, s32, s32, s32, s32, s32, s32, s32, s32,
@@ -52,7 +52,7 @@ static inline s32 cellIndex(struct SceneVec *pos)
 static inline s32 groundHeight(struct SceneVec *position)
 {
     s32 index = cellIndex(position), height;
-    u8 *cell = sub_0821D64C(index, 1);
+    u8 *cell = TerrainModifiers_FindCellOverride(index, 1);
     u32 kind;
     if (cell)
         cell += 4;
@@ -199,7 +199,7 @@ active:
     return Script_Call(script, argsPtr);
 }
 
-u32 sub_08006FAC(struct Trigger *p)
+u32 TriggerManager_InsertTrigger(struct Trigger *p)
 {
     struct Trigger *t;
     p->previous = 0;
@@ -211,7 +211,7 @@ u32 sub_08006FAC(struct Trigger *p)
     gUnk_02000030->head = p;
     return 0;
 }
-u32 sub_08006FD8(struct Trigger *p)
+u32 TriggerManager_RemoveTrigger(struct Trigger *p)
 {
     struct Trigger *a = p->previous;
     struct Trigger *b = p->next;
@@ -225,10 +225,10 @@ u32 sub_08006FD8(struct Trigger *p)
     }
     return 0;
 }
-u32 sub_0800700C(struct Trigger *s)
+u32 Trigger_Destroy(struct Trigger *s)
 {
-    sub_08006FD8(s);
-    sub_08013B74(s->effect);
+    TriggerManager_RemoveTrigger(s);
+    ScaledShadow_Destroy(s->effect);
     if (s->other != 0)
         Heap_Free(s->other);
     if (s->animation != 0)
@@ -356,7 +356,7 @@ void Trigger_UpdateLanding(struct TriggerManager *manager, struct Trigger *p)
         p->update = Trigger_UpdateGrounded;
         p->timer = 0;
         p->position->y = height + 1;
-        sub_08013728(p->effect);
+        ScaledShadow_Disable(p->effect);
         return;
     }
     Trigger_UpdateShake(p);
@@ -438,11 +438,11 @@ void Trigger_UpdateBobbingAnimation(struct TriggerManager *manager, struct Trigg
 void Trigger_UpdateGrounded(struct TriggerManager *manager, struct Trigger *p)
 {
     if (!p->persistent && p->timer > 899) {
-        p->update = sub_080077C4;
+        p->update = Trigger_UpdateDropTimer;
         p->timer = 0;
     } else {
         if ((p->timer & 15) == 15) {
-            if (sub_0821D64C(cellIndex(p->position), 1))
+            if (TerrainModifiers_FindCellOverride(cellIndex(p->position), 1))
                 p->timer = 900;
         }
         Trigger_UpdateShake(p);
@@ -451,7 +451,7 @@ void Trigger_UpdateGrounded(struct TriggerManager *manager, struct Trigger *p)
     }
 }
 
-void sub_080077C4(struct TriggerManager *a, struct Trigger *b)
+void Trigger_UpdateDropTimer(struct TriggerManager *a, struct Trigger *b)
 {
     if (sub_082212DC(b->sprite, b->timer, 0x2d, 0x5a))
         b->flags |= 1;
@@ -880,7 +880,7 @@ s32 TriggerManager_Update(struct TriggerManager *input)
     for (; trigger; trigger = next) {
         next = trigger->next;
         if (trigger->flags & 1)
-            sub_0800700C(trigger);
+            Trigger_Destroy(trigger);
         else {
             if (!trigger->sound || sameRegion(trigger)) {
                 if (trigger->sprite)
@@ -985,12 +985,12 @@ s32 TriggerManager_Update(struct TriggerManager *input)
     return 0;
 }
 
-u32 sub_08008148(struct TriggerManager *s)
+u32 TriggerManager_DestroyManager(struct TriggerManager *s)
 {
     struct Trigger *n = s->head;
     while (n != 0) {
         struct Trigger *next = n->next;
-        sub_0800700C(n);
+        Trigger_Destroy(n);
         n = next;
     }
     gUnk_02000030 = 0;
@@ -1039,11 +1039,11 @@ s32 TriggerManager_Initialize(struct TriggerManager *p, void *unused)
     return 0;
 }
 
-void *sub_08008230(void *a, void *b)
+void *TriggerManager_InitManager(void *a, void *b)
 {
     void *p = Task_Create(9, 0x5c);
     if (p != 0) {
-        Task_SetCallbacks(p, TriggerManager_Update, sub_08008148);
+        Task_SetCallbacks(p, TriggerManager_Update, TriggerManager_DestroyManager);
         if (TriggerManager_Initialize(p, a) < 0) {
             Task_Kill(p);
             return 0;
@@ -1052,10 +1052,10 @@ void *sub_08008230(void *a, void *b)
     return p;
 }
 
-struct TriggerManager *sub_08008270(void)
+struct TriggerManager *TriggerManager_GetOrCreate(void)
 {
     if (gUnk_02000030 == 0) {
-        return sub_08008230(0, 0);
+        return TriggerManager_InitManager(0, 0);
     }
     return gUnk_02000030;
 }
@@ -1063,7 +1063,7 @@ struct TriggerManager *sub_08008270(void)
 s32 Trigger_CreateDrop(struct SceneVec *position, s32 id, s32 kind, u32 script, u32 *arguments,
                        s32 sound, s32 persistent, s32 option)
 {
-    struct TriggerManager *manager = sub_08008270();
+    struct TriggerManager *manager = TriggerManager_GetOrCreate();
     struct Trigger *p;
     s32 i;
     u32 *in, *out;
@@ -1101,7 +1101,7 @@ s32 Trigger_CreateDrop(struct SceneVec *position, s32 id, s32 kind, u32 script, 
     }
     Memory_Clear(p->sprite, 40);
     sub_08217DE0(p->sprite, manager->graphics, 0);
-    sub_08217EC4(p->sprite, -8, -10);
+    Effect_SetOrigin(p->sprite, -8, -10);
     if (sub_0821D6F4(position, 128)) {
         {
             struct TriggerSprite *sprite = p->sprite;
@@ -1126,7 +1126,7 @@ s32 Trigger_CreateDrop(struct SceneVec *position, s32 id, s32 kind, u32 script, 
         p->sound = sound;
     p->persistent = persistent;
     ScaledShadow_Initialize(p->effect, &p->sprite->position, 64, 24, 40, 32, 512, 1, 5, 1, 0);
-    sub_08006FAC(p);
+    TriggerManager_InsertTrigger(p);
     return 0;
 }
 
@@ -1178,7 +1178,7 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
                             u32 startScript, u32 script, u32 *arguments, s32 sound, s32 hidden,
                             s32 condition)
 {
-    struct TriggerManager *manager = sub_08008270();
+    struct TriggerManager *manager = TriggerManager_GetOrCreate();
     struct Trigger *p;
     s32 i;
     u32 *in, *out;
@@ -1315,8 +1315,8 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
                                 register s32 zero asm("r0") = 0;
                                 zero;
                             }));
-    sub_08013728(p->effect);
-    sub_08006FAC(p);
+    ScaledShadow_Disable(p->effect);
+    TriggerManager_InsertTrigger(p);
     return 0;
 }
 
@@ -1368,9 +1368,9 @@ s32 Trigger_CreateContainerFromScript(void)
                                    sound, hidden, condition);
 }
 
-s32 sub_08008950(u32 type)
+s32 TriggerManager_DestroyAllOfType(u32 type)
 {
-    struct TriggerManager *s = sub_08008270();
+    struct TriggerManager *s = TriggerManager_GetOrCreate();
     struct Trigger *n;
     if (s == 0)
         return -1;
@@ -1378,30 +1378,30 @@ s32 sub_08008950(u32 type)
     while (n != 0) {
         struct Trigger *next = n->next;
         if (n->type == type)
-            sub_0800700C(n);
+            Trigger_Destroy(n);
         n = next;
     }
 }
-u32 sub_08008988(void)
+u32 TriggerManager_DestroyAllOfTypeFromScript(void)
 {
-    return sub_08008950(Script_GetKeywordValue('t', 0));
+    return TriggerManager_DestroyAllOfType(Script_GetKeywordValue('t', 0));
 }
 
 s32 Trigger_MoveDropsByItem(struct SceneVec *position, s32 id, s32 kind)
 {
-    struct TriggerManager *manager = sub_08008270();
+    struct TriggerManager *manager = TriggerManager_GetOrCreate();
     struct Trigger *p, *next;
     if (!manager)
         return -1;
     for (p = manager->head; p; p = next) {
         next = p->next;
         if (p->type == 0 && p->option && p->id == id && p->kind == kind &&
-            p->update != sub_080077C4)
+            p->update != Trigger_UpdateDropTimer)
             *p->position = *position;
     }
 }
 
-u32 sub_08008A00(void)
+u32 Trigger_MoveDropsByItemFromScript(void)
 {
     struct {
         u32 a : 16;

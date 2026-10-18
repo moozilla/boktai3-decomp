@@ -8,7 +8,7 @@ static inline u8 Tst(u16 *m, s32 one)
     return FALSE;
 }
 
-u32 sub_08101E20(u32 x)
+u32 NamedObject_IsMapCellOccupied(u32 x)
 {
     u8 *b = (u8 *)gUnk_020001AC;
     s32 i = 0;

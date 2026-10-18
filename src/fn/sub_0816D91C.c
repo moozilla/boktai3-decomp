@@ -1,5 +1,5 @@
 #include "global.h"
-u32 sub_0816D91C(void)
+u32 PauseMenu_CanUseSelectedItem(void)
 {
     return 1;
 }

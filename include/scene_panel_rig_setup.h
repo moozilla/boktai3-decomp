@@ -17,8 +17,8 @@ struct SceneRigSetupParentView {
 };
 
 extern const char gUnk_0824DEAC[], gUnk_0824DEB0[];
-u32 sub_08219BD8(const char *);
-void sub_0821FF7C(void *, u32, u32, u32);
+u32 String_Hash(const char *);
+void Collider_SetBodyProperties(void *, u32, u32, u32);
 void ScenePanelRig_ApplyContact(struct SceneRigContact *, struct SceneRigContact *,
                                 struct ScenePanelRig *);
 void ScenePanelRig_SetState(struct ScenePanelRig *, u32);

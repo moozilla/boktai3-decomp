@@ -6,7 +6,7 @@ struct E {
 };
 extern u32 gUnk_020004C0;
 void Sprite_Remove(void *);
-s32 sub_081388F4(u8 *s)
+s32 PositionEffectDisplay_Destroy(u8 *s)
 {
     s32 i;
     u32 z;

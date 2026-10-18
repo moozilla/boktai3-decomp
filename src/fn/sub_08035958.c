@@ -40,7 +40,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-void sub_08035958(void)
+void Wireless_OnParentUniSendComplete(void)
 {
     struct Engine *p = gUnk_02000484;
     u8 slots;

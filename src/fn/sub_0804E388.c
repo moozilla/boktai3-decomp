@@ -1,7 +1,7 @@
 #include "area_effect.h"
 #include "engine.h"
 // MATCHING_CONCESSION: register-pinning
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void AreaEffect_InitializeEntry(struct AreaEffectEntry *, s32, struct AreaEffectPosition *, s32,
                                 u32);
 struct PackedPosition {
@@ -49,7 +49,7 @@ void AreaEffect_AddSpriteFromScript(void)
                 asm("" : "+r"(first));
                 cell = cellIndex(first->x >> 8, point->z >> 8);
             }
-            properties = sub_0821D64C(cell, 1);
+            properties = TerrainModifiers_FindCellOverride(cell, 1);
             if (properties)
                 properties += 4;
             else {

@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_020003C8;
-u8 *sub_081EA730(s32, s32);
+u8 *Actor_EnsureController(s32, s32);
 struct G {
     u8 f0[0xE2C];
     u16 e2c;
@@ -17,12 +17,12 @@ struct G {
     u8 d;
     u8 e;
 };
-void sub_081E54C0(void)
+void Actor_BeginRadialBurst(void)
 {
     struct G *g = (struct G *)gUnk_020003C8;
     u32 three = 2;
     if (g == 0) {
-        g = (struct G *)sub_081EA730(0xBB34, 0);
+        g = (struct G *)Actor_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }

@@ -1,19 +1,19 @@
 #include "global.h"
 
-void sub_08210D60(void *);
+void Collection_LoadPageBackground(void *);
 void sub_08210AD4(void *);
 void sub_08210C14(void *);
-void sub_08210B50(void *);
-void sub_08210BEC(void *);
-void sub_08210CB0(void *);
+void Collection_UpdateCountDigits(void *);
+void Collection_UpdatePageIndicator(void *);
+void Collection_UpdateSelectedEntryText(void *);
 
-s32 sub_08210E84(void *s)
+s32 Collection_RefreshPage(void *s)
 {
-    sub_08210D60(s);
+    Collection_LoadPageBackground(s);
     sub_08210AD4(s);
     sub_08210C14(s);
-    sub_08210B50(s);
-    sub_08210BEC(s);
-    sub_08210CB0(s);
+    Collection_UpdateCountDigits(s);
+    Collection_UpdatePageIndicator(s);
+    Collection_UpdateSelectedEntryText(s);
     return 0;
 }

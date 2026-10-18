@@ -46,10 +46,10 @@ struct AnimatedHazardManager {
 
 extern struct AnimatedHazardManager *gUnk_02000050;
 
-struct SceneVec *sub_0815F53C(s32);
-void sub_0821FF50(void *, s32, s32);
-void sub_0821FF58(void *, s32, s32, s32, s32, s32);
-u8 *sub_0821D64C(s32, s32);
+struct SceneVec *Player_GetEffectivePosition(s32);
+void Collider_SetAttackPowerAndForce(void *, s32, s32);
+void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void AnimatedParticles_EmitOffset(void *, s32, s32, s32, s32, s32, s32, s32);
 
 #endif

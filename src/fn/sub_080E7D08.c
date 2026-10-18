@@ -26,7 +26,7 @@ zero:
     return 0;
 }
 
-void sub_080E7D08(u8 *unused, u8 *obj, u8 *ctx)
+void Mimic_OnAttackContact(u8 *unused, u8 *obj, u8 *ctx)
 {
     int mask;
     u32 *flags;

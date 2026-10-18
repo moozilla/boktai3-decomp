@@ -2,7 +2,7 @@
 
 void sub_0813AFEC(u8 *, s32, s32);
 
-void sub_08158ECC(u8 *p, s32 *a, s32 b)
+void Player_BeginResourceStationInteraction(u8 *p, s32 *a, s32 b)
 {
     s32 *d;
     s32 x;

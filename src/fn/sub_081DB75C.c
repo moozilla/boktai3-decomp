@@ -1,6 +1,6 @@
 #include "global.h"
 void Anim_Remove(u8 *);
-void sub_081DB75C(u8 *p)
+void Options_Destroy(u8 *p)
 {
     Anim_Remove(p + 0x244);
     Anim_Remove(p + 0x1bc);

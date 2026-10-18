@@ -33,7 +33,7 @@ struct SceneInputPair {
 extern u16 gUnk_03005260[];
 s32 sub_08219728(void *, void *, u32);
 void sub_0821983C(void *, void *, u32, u32, u32, u32, u32, void *);
-void sub_0816381C(u16 *, u8 *);
+void Palette_UpdateHighlightPulse(u16 *, u8 *);
 void SceneInput_BeginChoice(struct SceneInputWidget *, void *, u8 *, u32, u8 *);
 s32 SceneInput_TickChoice(struct SceneInputWidget *, void *, u8 *, u8 *);
 void SceneInput_InitGlyphPair(struct SceneInputPair *);

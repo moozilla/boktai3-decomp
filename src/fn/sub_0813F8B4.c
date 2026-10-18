@@ -10,7 +10,7 @@ struct G0813F8B4 {
 };
 extern struct G0813F8B4 *gUnk_02000710;
 
-s32 sub_0813F8B4(struct P0813F8B4 *p, s32 v)
+s32 Player_CanSpendSharedResource(struct P0813F8B4 *p, s32 v)
 {
     if (*(s32 *)((u8 *)gUnk_02000710 + p->idx * 4 + 0x628) <= 0 && gUnk_02000710->f876 >= v)
         return 1;

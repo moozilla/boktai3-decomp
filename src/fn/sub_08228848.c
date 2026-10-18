@@ -1,11 +1,11 @@
 #include "global.h"
 extern u8 gUnk_03005430[];
 extern u32 gUnk_03005404;
-void sub_082286E0(s32 *, s32 *, s32 *, u32);
-u32 sub_0822874C(s32, s32, s32);
+void Clock_UnpackDate(s32 *, s32 *, s32 *, u32);
+u32 Clock_PackDate(s32, s32, s32);
 s32 Clock_DaysInMonth(s32, s32);
-s32 sub_0822867C(s32, s32, s32);
-void sub_08228848(void)
+s32 Clock_CalculateWeekday(s32, s32, s32);
+void SunClock_TickFrame(void)
 {
     if (++gUnk_03005430[7] > 59) {
         u8 *p;
@@ -18,7 +18,7 @@ void sub_08228848(void)
                 if (++p[4] > 23) {
                     s32 year, month, day;
                     p[4] = 0;
-                    sub_082286E0(&year, &month, &day, *(u32 *)p);
+                    Clock_UnpackDate(&year, &month, &day, *(u32 *)p);
                     day++;
                     if (day >= Clock_DaysInMonth(year, month)) {
                         day = 1;
@@ -30,8 +30,8 @@ void sub_08228848(void)
                                 year = 2099;
                         }
                     }
-                    *(u32 *)p = sub_0822874C(year, month, day);
-                    p[8] = sub_0822867C(year, month, day);
+                    *(u32 *)p = Clock_PackDate(year, month, day);
+                    p[8] = Clock_CalculateWeekday(year, month, day);
                 }
             }
             gUnk_03005404 = 1;

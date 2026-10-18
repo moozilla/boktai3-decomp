@@ -5,10 +5,10 @@
 struct PairE7 {
     u32 a, b;
 };
-u32 sub_0823D7D4(u8 *);
+u32 Player_GetConfiguredActionPower(u8 *);
 u32 sub_0823D7E0(u8 *);
 void sub_0823AAF8(u8 *);
-void sub_0821FF58(u8 *, u32, u32, u32, u32, u32);
+void Collider_SetAttackProperties(u8 *, u32, u32, u32, u32, u32);
 void sub_0823E704(u8 *p)
 {
     u8 *q = p + 0xb44;
@@ -19,7 +19,7 @@ void sub_0823E704(u8 *p)
         u32 v = ((p[0x3a4] + 5) & 7) << 5;
         p[0xbfc] = v;
     }
-    resource = sub_0823D7D4(p);
+    resource = Player_GetConfiguredActionPower(p);
     flags = sub_0823D7E0(p);
     if (p[0x418] == 1) {
         *(u16 *)(p + 0xc00) = 29;
@@ -40,7 +40,7 @@ void sub_0823E704(u8 *p)
             sub_0823AAF8(p);
         }
     }
-    sub_0821FF58(q + 0x48, resource, *(u16 *)(q + 0xb8), 4, flags, *(u16 *)(q + 0xba));
+    Collider_SetAttackProperties(q + 0x48, resource, *(u16 *)(q + 0xb8), 4, flags, *(u16 *)(q + 0xba));
     q[0x8a] = q[0xc8];
     *(u16 *)(q + 0xc6) = 0;
 }

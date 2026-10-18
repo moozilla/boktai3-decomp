@@ -4,8 +4,8 @@ struct Vec50 {
 };
 extern u16 gUnk_03005418[];
 extern u32 gUnk_030053F4;
-void sub_08234F18(u8 *);
-void sub_08234F88(u8 *);
+void HealthRestoreEffect_InitAnimation(u8 *);
+void HealthRestoreEffect_InitParticlePool(u8 *);
 void sub_08234DC8(u8 *);
 static inline s32 scale50(s32 v)
 {
@@ -15,7 +15,7 @@ static inline s32 scale50(s32 v)
         v = -((-v) >> 5);
     return v;
 }
-s32 sub_08235000(u8 *p, u8 *owner)
+s32 HealthRestoreEffect_Init(u8 *p, u8 *owner)
 {
     struct Vec50 v;
     u16 *dest;
@@ -38,8 +38,8 @@ s32 sub_08235000(u8 *p, u8 *owner)
     dest[0] = dest[0] - gUnk_03005418[0] + 120;
     dest[1] = y - gUnk_03005418[1] + 80;
     dest[2] = depth - gUnk_03005418[2];
-    sub_08234F18(p);
-    sub_08234F88(p);
+    HealthRestoreEffect_InitAnimation(p);
+    HealthRestoreEffect_InitParticlePool(p);
     *(void (**)(u8 *))(p + 0x274) = sub_08234DC8;
     *(u16 *)(p + 0x270) = zero;
     gUnk_030053F4 |= 1;

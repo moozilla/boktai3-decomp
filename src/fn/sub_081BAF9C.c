@@ -16,7 +16,7 @@ struct Q {
 s16 sub_081BAD98(void *);
 s32 sub_081BADFC(void *);
 
-void sub_081BAF9C(struct Q *p)
+void MenuCursor_UpdateInput(struct Q *p)
 {
     u32 m;
     p->ha0 = sub_081BAD98(p);

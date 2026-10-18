@@ -1,7 +1,7 @@
 #include "global.h"
 extern u16 gUnk_03004BD8;
 void Anim_Remove(void *);
-void sub_081E00E8(u8 *p)
+void Password_DestroyEntryMenu(u8 *p)
 {
     u16 *q = &gUnk_03004BD8;
     u32 m = ~3;

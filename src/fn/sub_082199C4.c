@@ -1,5 +1,5 @@
 #include "global.h"
 
-void sub_082199C4(void)
+void Sprite_OnRenderPhase(void)
 {
 }

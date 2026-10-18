@@ -1,7 +1,7 @@
 #include "global.h"
 
 void Sprite_Remove(void *);
-void sub_08013B74(void *);
+void ScaledShadow_Destroy(void *);
 void Collider_Remove(void *);
 struct A {
     u8 f0[0x18];
@@ -10,9 +10,9 @@ struct A {
     u8 fcc[1];
 };
 
-void sub_081A5198(struct A *p)
+void Hresvelgr_DestroyMovingProjectile(struct A *p)
 {
     Sprite_Remove(p->f18);
-    sub_08013B74(p->fcc);
+    ScaledShadow_Destroy(p->fcc);
     Collider_Remove(p->f60);
 }

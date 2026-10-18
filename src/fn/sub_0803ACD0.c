@@ -1,11 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-int sub_0803972C(void);
-int sub_08039744(void);
+int WirelessGame_GetRemotePlayerHealthPercent(void);
+int WirelessGame_GetRemoteOpponentHealthPercent(void);
 void Anim_LoadKeyframe(void *, void *, int, int);
-void sub_0803ACD0(u8 *p)
+void WirelessGameDisplay_UpdateStatusIcons(u8 *p)
 {
-    int value = sub_0803972C();
+    int value = WirelessGame_GetRemotePlayerHealthPercent();
     int category = 0;
     if (value <= 60) {
         category = 2;
@@ -23,7 +23,7 @@ void sub_0803ACD0(u8 *p)
     }
     {
         int category;
-        value = sub_08039744();
+        value = WirelessGame_GetRemoteOpponentHealthPercent();
         category = 0;
         if (value <= 60) {
             category = 2;

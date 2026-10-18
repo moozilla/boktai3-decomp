@@ -5,11 +5,11 @@ struct Buf {
     u8 pad[0x180];
 };
 extern u32 gUnk_03001680;
-struct Buf *sub_0821A2DC(void);
+struct Buf *MessageQueue_GetBuffers(void);
 
-void sub_0821A2E4(void)
+void MessageQueue_InitBuffers(void)
 {
-    struct Buf *b = sub_0821A2DC();
+    struct Buf *b = MessageQueue_GetBuffers();
     gUnk_03001680 = 0;
     b[0].a = 0;
     b[0].b = 0;

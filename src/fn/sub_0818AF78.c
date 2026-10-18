@@ -32,7 +32,7 @@ struct T {
     u16 fl;
 };
 extern const s16 gUnk_086149C4[];
-void sub_0818AF78(struct T *p, s32 ang, s32 m)
+void Armor_SetPlanarVelocity(struct T *p, s32 ang, s32 m)
 {
     s32 v, w, r1, r2;
     p->fl |= 0x40;

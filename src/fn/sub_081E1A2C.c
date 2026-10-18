@@ -11,7 +11,6 @@ struct ScreenParams3A0Params {
     s32 b;
 };
 extern struct ScreenParams3A0Params gUnk_020003A0;
-/* Script: sets the parameter block (see the option letters). */
 void ScreenParams3A0_SetFromScript(void)
 {
     if (Script_SeekToKeyword('m'))

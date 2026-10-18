@@ -9,7 +9,7 @@ struct P {
     u16 h;
 };
 extern struct G *gUnk_02000238;
-void sub_081A3380(struct P *p)
+void Hresvelgr_ReleaseShot(struct P *p)
 {
     struct G *g = gUnk_02000238;
     if (p != 0) {

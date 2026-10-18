@@ -11,12 +11,12 @@ struct Q2 {
     u8 sh;
 };
 void sub_081B9D54(void *);
-void sub_081B984C(void *, void *);
+void Registry2388_SetUpdate(void *, void *);
 
-void sub_081BA19C(struct Q *p)
+void Registry2388_UpdateTimedEffect(struct Q *p)
 {
     sub_081B9D54(p);
     p->h520++;
     if (p->h520 > (1 << ((struct Q2 *)p)->sh))
-        sub_081B984C(p, 0);
+        Registry2388_SetUpdate(p, 0);
 }

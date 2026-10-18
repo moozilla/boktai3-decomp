@@ -1,5 +1,5 @@
 #include "global.h"
-u32 sub_080351BC(u8 *p)
+u32 Wireless_ClearFirstHandshakeWaitEntry(u8 *p)
 {
     u32 v = (u32)p;
     u8 *q = (u8 *)v + 0x32;

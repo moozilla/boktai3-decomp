@@ -12,7 +12,7 @@ void Script_SetPc(void);
 s32 Script_GetValue(void);
 void Memory_Clear(void *, s32);
 void Heap_Free(void *);
-void sub_08110EDC(struct S *s)
+void SceneTilemap_LoadLayoutFromScript(struct S *s)
 {
     u8 *buf;
     s32 n, i, c, r, m;

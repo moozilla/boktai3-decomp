@@ -4,7 +4,7 @@ struct S {
     u32 a[2];
 };
 u32 ScriptProc_Start(u32, u16);
-void sub_08111748(struct S *s, u32 a, u32 b)
+void PaletteFade_LoadPaletteResources(struct S *s, u32 a, u32 b)
 {
     s32 i;
     for (i = 0; i <= 1; i++) {

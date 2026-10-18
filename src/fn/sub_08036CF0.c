@@ -1,12 +1,12 @@
 #include "global.h"
-u16 *sub_08036CA4(void);
-u16 sub_08036CAC(u8);
-u8 sub_08036CC4(u16);
-void sub_08036CF0(const u8 *source, u8 *destination, int count)
+u16 *WirelessText_GetCharacterTable(void);
+u16 WirelessText_GetCharacterTableByte(u8);
+u8 WirelessText_FindCharacterIndex(u16);
+void WirelessText_DecodeString(const u8 *source, u8 *destination, int count)
 {
     int i = 0;
     while (i < count) {
-        u16 code = sub_08036CAC(source[i]);
+        u16 code = WirelessText_GetCharacterTableByte(source[i]);
         if (code <= 127) {
             *destination++ = code;
         } else {

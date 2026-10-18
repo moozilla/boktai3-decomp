@@ -7,7 +7,7 @@ struct S {
     u16 b;
     u16 c;
 };
-u32 sub_081C1AD0(struct S *p)
+u32 ControlPanel_GetInputMultiplier(struct S *p)
 {
     if (p->v > p->c)
         return 10;

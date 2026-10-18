@@ -2,7 +2,7 @@
 
 extern u32 gUnk_02000058;
 
-void sub_080138D4(void)
+void ScaledShadowManager_OnTaskDestroy(void)
 {
     gUnk_02000058 = 0;
 }

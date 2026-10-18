@@ -1,6 +1,6 @@
 #include "global.h"
 void sub_08215EB4(s32, s32, s32, s32, s32, s32, s32, s32);
-void sub_08215DF0(s32, s32, s32, s32, s32, s32);
+void Bg_SetTilemapEntry(s32, s32, s32, s32, s32, s32);
 void ModifierMenu_DrawCapacity(s32 a, s32 b, s32 count, s32 y, s32 width)
 {
     s32 diff;
@@ -23,7 +23,7 @@ void ModifierMenu_DrawCapacity(s32 a, s32 b, s32 count, s32 y, s32 width)
                 goto no_increment;
             c++;
         no_increment:
-            sub_08215DF0(2, y + i, width, c, 0, 0);
+            Bg_SetTilemapEntry(2, y + i, width, c, 0, 0);
             i++;
         } while (i < count);
     }

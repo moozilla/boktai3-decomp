@@ -4,7 +4,7 @@ struct S {
     u8 *head;
 };
 void sub_08249240(void *, void *, u32);
-u32 sub_082321A4(struct S *s)
+u32 SceneActorEffects_UpdateManager(struct S *s)
 {
     u8 *q = s->head;
     while (q) {

@@ -41,12 +41,12 @@ s32 SceneInventory_ClassifyConsumableAction(struct SceneInventoryControlView *pa
             struct GameState *slot = (void *)(selected * 2 + (u32)state);
             item = slot->table160[0];
         }
-        if (sub_0822E224(selected))
+        if (GameState_IsConsumableSlotEquipped(selected))
             goto invalid;
         if (item < 0)
             goto invalid;
         {
-            struct SceneInventoryControlConsumable *definition = sub_0822E288(item);
+            struct SceneInventoryControlConsumable *definition = GameState_GetConsumableDescriptor(item);
             s32 value = definition->baseValue;
             result = -1;
             if (!value)

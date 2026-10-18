@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
 
-void sub_0803DA7C(struct ScenePoolEntry *, s32, s32, s32);
-s32 sub_0803D9D8(struct ScenePoolEntry *);
+void ScenePool_SetLateralControlSchedule(struct ScenePoolEntry *, s32, s32, s32);
+s32 ScenePool_SelectStateAtPositionLimit(struct ScenePoolEntry *);
 s32 ScenePool_ResumeAfterIdle(struct ScenePoolActor *, struct ScenePoolEntry *);
 s32 ScenePool_SelectInitialDirection(struct ScenePoolActor *, struct ScenePoolEntry *);
 s32 ScenePool_SelectRepeatOrExit(struct ScenePoolActor *, struct ScenePoolEntry *);
@@ -84,9 +84,9 @@ s32 ScenePool_StateCruise(void *manager, struct ScenePoolActor *actor, struct Sc
         if (random <= 31) {
             s32 z = actor->position.z >> 12;
             if (z <= 18)
-                sub_0803DA7C(entry, 1, 3, 6);
+                ScenePool_SetLateralControlSchedule(entry, 1, 3, 6);
             else if (z > 47)
-                sub_0803DA7C(entry, -1, 3, 6);
+                ScenePool_SetLateralControlSchedule(entry, -1, 3, 6);
             else {
                 u32 value;
                 u32 second = (next + 1) & indexMask;
@@ -94,13 +94,13 @@ s32 ScenePool_StateCruise(void *manager, struct ScenePoolActor *actor, struct Sc
                 value = table[second];
                 random = value & byteMask;
                 if (random <= 127)
-                    sub_0803DA7C(entry, 1, 3, 6);
+                    ScenePool_SetLateralControlSchedule(entry, 1, 3, 6);
                 else
-                    sub_0803DA7C(entry, -1, 3, 6);
+                    ScenePool_SetLateralControlSchedule(entry, -1, 3, 6);
             }
         }
     }
-    if (sub_0803D9D8(entry))
+    if (ScenePool_SelectStateAtPositionLimit(entry))
         goto done;
     if (ScenePool_ResumeAfterIdle(actor, entry))
         goto done;

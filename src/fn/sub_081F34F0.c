@@ -1,8 +1,8 @@
 #include "global.h"
 
-u8 *sub_0802140C(u32);
+u8 *SceneActors_GetBySlot(u32);
 
-s32 sub_081F34F0(void)
+s32 Ratatosk_GetSelectedTargetIndex(void)
 {
-    return *(s16 *)(sub_0802140C(4) + 0xE4E);
+    return *(s16 *)(SceneActors_GetBySlot(4) + 0xE4E);
 }

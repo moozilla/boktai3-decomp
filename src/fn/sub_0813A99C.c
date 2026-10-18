@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_020004D8;
-void sub_0813A99C(s32 i0)
+void ActorMarker_ShowSlot(s32 i0)
 {
     s32 i = i0;
     u8 *b;

@@ -43,12 +43,12 @@ struct Actor {
     void *callback;
 };
 extern struct Actor *gUnk_020000DC;
-int sub_0803092C(struct Actor *);
+int MessageWindow_UpdateSpeakerPortrait(struct Actor *);
 void sub_080316A4(void);
-void sub_080317D8(void);
-void sub_080317CC(void);
+void MessageWindow_UpdateImmediatePlayback(void);
+void MessageWindow_ClearTextCompletion(void);
 int TextWindow_BlankRect(int, int, int, int);
-void *sub_080313C8(struct Actor *, int);
+void *MessageWindow_GetStringAtOffset(struct Actor *, int);
 void TextState_Reset(struct State *);
 int TextState_SetBounds(struct State *, int, int, int, int);
 int Script_GetValue(void);
@@ -64,7 +64,7 @@ static inline u8 getMode(struct Actor *p, u32 offset)
 {
     return *((u8 *)p + offset);
 }
-int sub_08030DBC(int index)
+int MessageWindow_ShowMessage(int index)
 {
     struct Actor *p = gUnk_020000DC;
     if (p) {
@@ -76,7 +76,7 @@ int sub_08030DBC(int index)
             TextState_SetBounds(state, p->x, p->y, p->width, p->height);
             p->scriptIndex = index;
             {
-                void *pc = sub_080313C8(p, p->scriptIndex);
+                void *pc = MessageWindow_GetStringAtOffset(p, p->scriptIndex);
                 struct State *dst = state;
                 dst->pc = pc;
             }
@@ -113,7 +113,7 @@ int sub_08030DBC(int index)
                         }
                     }
                     {
-                        register void *fn asm("r1") = sub_080317D8;
+                        register void *fn asm("r1") = MessageWindow_UpdateImmediatePlayback;
                         u32 offset;
                         register void **dst asm("r0");
                         offset = 0x2cc;

@@ -3,7 +3,7 @@
 extern void Anim_Remove(void *);
 extern void Sprite_Remove(void *);
 
-void sub_081E154C(u8 *p)
+void GameStart_Destroy(u8 *p)
 {
     s32 i;
     u8 *q;

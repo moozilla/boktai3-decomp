@@ -90,7 +90,7 @@ static inline u8 peek_flag(Obj *s)
     return s->unk2B3;
 }
 
-void sub_080D1EA0(Obj *s)
+void Mummy_UpdateRevival(Obj *s)
 {
     s32 n;
     if (take_flag(s)) {

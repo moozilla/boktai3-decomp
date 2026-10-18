@@ -5,7 +5,7 @@ struct S {
     u32 b;
 };
 extern struct S *gUnk_02000598;
-s32 sub_0815F77C(struct S *s)
+s32 TargetRegistry_Init(struct S *s)
 {
     s->a = 0;
     s->b = 0;

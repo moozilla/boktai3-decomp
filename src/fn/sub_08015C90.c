@@ -1,4 +1,6 @@
 #include "global.h"
+/* AnimatedParticles_EmitAngledBurst: Builds a particle Config and emits a single burst with vertical/horizontal/pitch angle ranges (matches existing src alias) */
+#define AnimatedParticles_EmitAngledBurst sub_08015C90
 struct Config {
     u16 v[20];
 };

@@ -7,7 +7,7 @@ struct P {
 };
 extern const u32 gUnk_08611DDC[];
 void sub_0824923C(void *, u32);
-void sub_0819E620(struct P *p)
+void Hresvelgr_UpdateSecondaryBehavior(struct P *p)
 {
     p->b = 0;
     sub_0824923C(p, gUnk_08611DDC[p->i]);

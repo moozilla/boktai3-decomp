@@ -10,18 +10,18 @@ struct TextState {
     u8 pad20[0xE8];
     u8 depth, styles[7];
 };
-void sub_08031EFC(struct TextState *, int);
-void sub_08031EAC(struct TextState *);
-int sub_08031ED8(struct TextState *, int);
+void TextState_PlayGlyphSound(struct TextState *, int);
+void TextState_AdvanceLine(struct TextState *);
+int TextState_AdvanceCursor(struct TextState *, int);
 void sub_08218FB4(int, int, int, int);
-int sub_08031FA0(struct TextState *p, u16 c)
+int TextState_DrawWideGlyph(struct TextState *p, u16 c)
 {
-    sub_08031EFC(p, c);
+    TextState_PlayGlyphSound(p, c);
     if (p->wrap != 2 && p->x >= p->left + p->width - 1) {
-        sub_08031EAC(p);
+        TextState_AdvanceLine(p);
         p->wrap = 1;
     }
     sub_08218FB4(c, p->x, p->y, p->palette);
-    sub_08031ED8(p, 1);
+    TextState_AdvanceCursor(p, 1);
     p->lastWidth = 1;
 }

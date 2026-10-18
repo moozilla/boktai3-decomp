@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_081BC664(u8 *p)
+void DarkLoan_HideSprites(u8 *p)
 {
     u32 one = 1;
     u8 *q = p + 0x60;

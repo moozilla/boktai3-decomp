@@ -7,7 +7,7 @@ struct S {
     struct E e[6];
 };
 void Anim_Remove(void *);
-void sub_081C61F4(struct S *p)
+void TimeResult_Destroy(struct S *p)
 {
     s32 i;
     struct E *e = p->e;

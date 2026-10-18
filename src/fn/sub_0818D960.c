@@ -2,7 +2,7 @@
 
 s32 Div(s32, s32);
 void sub_0818DB10(struct Motion0818Object *);
-void sub_0818D960(struct Motion0818Object *p)
+void SpinningApproach_UpdateApproach(struct Motion0818Object *p)
 {
     u8 *owner = p->parent;
     p->rotation += p->byte1DD;

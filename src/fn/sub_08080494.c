@@ -51,7 +51,7 @@ static inline u32 Flag(struct SceneActorRegistryResetView *actor, u32 maskInput,
 }
 static inline void SetControl(struct SceneActorRegistryResetView *actor)
 {
-    void *callback = (void *)sub_0807FC90;
+    void *callback = (void *)SceneActorControl_OnIdle;
     u8 kind = 16;
     u32 zero;
     {

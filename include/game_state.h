@@ -16,7 +16,7 @@ struct GameState {
     u16 unk12;
     s16 unk14;
     u8 unk16[0x12];
-    s16 life;    /* (guess) current; (lifeMax - life) / lifeMax is a ratio in sub_0813E208 */
+    s16 life;    /* (guess) current; (lifeMax - life) / lifeMax is a ratio in Player_ModifyValueByRemainingLife */
     s16 lifeMax; /* (guess) */
     u16 unk2c;
     u8 unk2E[0x2];
@@ -30,7 +30,7 @@ struct GameState {
     u16 unk50;      /* set to 8 on reset */
     s16 selected;   /* (guess) index into the slot tables */
     u8 unk54[0x4];
-    s16 party[4]; /* (guess) ids, searched by sub_0822E254 */
+    s16 party[4]; /* (guess) ids, searched by GameState_HasEquippedConsumable */
     u8 unk60[0x8];
     s16 inventory[16]; /* (guess) -1 is empty */
     s16 slots88[12];   /* (guess) indexed by `selected` */
@@ -42,7 +42,7 @@ struct GameState {
     s32 unk4E4;
     s32 unk4E8;
     u32 unk4EC;
-    u32 date; /* (guess) day number from the RTC (sub_08228D7C) */
+    u32 date; /* (guess) day number from the RTC (SunClock_GetPackedDate) */
     s32 hour; /* (guess) RTC time at the last check */
     s32 minute;
     s32 second;
@@ -68,9 +68,9 @@ struct GameState {
     u8 unk598[0x8];
     s32 region; /* current region/scene id (guess); compared by interactable controllers */
     u32 unk5A4;
-    s16 form; /* (guess) selects behavior in sub_08032300 */
+    s16 form; /* (guess) selects behavior in TextState_GetPairSpeakerLabel */
     s16 unk5AA;
-    u16 savedX; /* (guess) position copied by sub_0818D754 */
+    u16 savedX; /* (guess) position copied by SpinningApproach_InitMotion */
     u16 savedY;
     u16 savedZ;
     u16 unk5B2; /* set from a script value */
@@ -125,7 +125,7 @@ struct GameState {
     s16 unk85E;
     u8 unk860[0x8];
     u32 flags868; /* (guess) bit 1: feature enabled */
-    u16 unk86C;   /* also read as a u32 by sub_0811A604 */
+    u16 unk86C;   /* also read as a u32 by Glove_UpdateTask */
     u16 flag86E;
     u8 unk870[0x4];
     s16 unk874;

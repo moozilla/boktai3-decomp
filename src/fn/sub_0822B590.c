@@ -13,7 +13,7 @@ struct T {
     s32 a;
     s32 b;
 };
-u32 sub_0822B590(u32 n)
+u32 Sound_IsSongPlaying(u32 n)
 {
     u32 m = gSongTable[n].ms;
     if (((struct T *)gUnk_082643EC[m].a)->b >= 0 && gUnk_03005470[m] == n)

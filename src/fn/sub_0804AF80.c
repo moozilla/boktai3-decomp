@@ -2,7 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 void TetherActor_HandleFlaggedCell(struct TetherActor *);
 void TetherActor_UpdateSampledPosition(struct TetherActor *);
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void sub_0821BC68(void *, void *);
 void sub_08225B74(void *);
 static inline s32 cellIndex(s32 x, s32 z)
@@ -13,7 +13,7 @@ static inline s32 cellIndex(s32 x, s32 z)
 }
 static inline u8 *cellProperties(s32 cell)
 {
-    u8 *properties = sub_0821D64C(cell, 1);
+    u8 *properties = TerrainModifiers_FindCellOverride(cell, 1);
     if (properties)
         properties += 4;
     else {
@@ -103,7 +103,7 @@ void TetherActor_UpdateWorldPosition(struct TetherActor *actor)
             currentCell = *field;
         }
         {
-            u8 *raw = sub_0821D64C(currentCell, 1);
+            u8 *raw = TerrainModifiers_FindCellOverride(currentCell, 1);
             if (raw)
                 properties = raw + 4;
             else {

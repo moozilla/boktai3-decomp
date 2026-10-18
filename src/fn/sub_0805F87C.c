@@ -11,7 +11,7 @@ s32 SceneItemValue_CalculateItem(u32 slot)
         if (percent <= 19)
             percent = 20;
     }
-    result = Div(SceneItemValue_GetItemBaseValue(sub_0822CDA8(slot)) * percent, 100);
+    result = Div(SceneItemValue_GetItemBaseValue(Inventory_GetItemId(slot)) * percent, 100);
     if (result <= 0)
         result = 1;
     if (result > 9999)

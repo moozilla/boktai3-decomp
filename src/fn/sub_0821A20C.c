@@ -2,7 +2,7 @@
 
 extern s32 gUnk_030052F0;
 
-void sub_0821A20C(void)
+void ResourceRegistry_Initialize(void)
 {
     gUnk_030052F0 = 0;
 }

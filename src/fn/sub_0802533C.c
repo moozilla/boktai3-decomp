@@ -67,7 +67,7 @@ static inline void decay(s16 *p)
     next = *dst > 23 ? old - 24 : 0;
     *dst = next;
 }
-void sub_0802533C(ActorAnimation *p, int tick)
+void SceneActorAnimation_UpdateLungeAttack(ActorAnimation *p, int tick)
 {
     ActorAnimation *p2 = p;
     u8 *position = (u8 *)p + 0x48;

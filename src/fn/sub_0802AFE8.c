@@ -22,7 +22,7 @@ static inline u8 TakeFlag(struct S *p)
     return FALSE;
 }
 
-void sub_0802AFE8(struct S *p)
+void GridAttack_UpdateStateNineAction(struct S *p)
 {
     if (TakeFlag(p)) {
         u32 v = 9;

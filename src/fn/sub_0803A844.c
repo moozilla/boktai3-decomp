@@ -18,10 +18,10 @@ void Anim_LoadKeyframe(void *, void *, int, int);
 void Sound_PlaySong(int);
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
-int sub_080397AC(void);
+int WirelessGame_GetRoundCount(void);
 int Div(int, int);
 int Mod(int, int);
-void sub_0803A844(struct Display *p)
+void WirelessGameDisplay_UpdateRoundAnnouncement(struct Display *p)
 {
     struct Drawing *q;
     void *volatile resource;
@@ -30,7 +30,7 @@ void sub_0803A844(struct Display *p)
     if (p->entered) {
         register int count asm("r4");
         p->entered = 0;
-        count = sub_080397AC();
+        count = WirelessGame_GetRoundCount();
         if (count == 1)
             Sound_PlaySong(706);
         q = p->drawings;

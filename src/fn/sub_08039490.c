@@ -5,16 +5,16 @@ struct Task {
 };
 void *Task_Create(int, int);
 void Task_SetCallbacks(void *, void *, void *);
-int sub_08039058(void *);
-int sub_080390A0(void *);
-int sub_080390C4(void *);
+int WirelessTradeMenu_Update(void *);
+int WirelessTradeMenu_Destroy(void *);
+int WirelessTradeMenu_InitFromScript(void *);
 void Task_Kill(void *);
-struct Task *sub_08039490(void)
+struct Task *WirelessTradeMenu_Create(void)
 {
     struct Task *p = Task_Create(2, 276);
     if (p) {
-        Task_SetCallbacks(p, sub_08039058, sub_080390A0);
-        if (sub_080390C4(p) < 0) {
+        Task_SetCallbacks(p, WirelessTradeMenu_Update, WirelessTradeMenu_Destroy);
+        if (WirelessTradeMenu_InitFromScript(p) < 0) {
             Task_Kill(p);
             return 0;
         }

@@ -15,15 +15,15 @@ struct S {
     u16 t;
 };
 extern u16 gUnk_03005260[];
-void sub_08223270(void);
+void Serial_StopCommunication(void);
 void TextWindow_SetScript(u32, u32);
 void TextWindow_Refresh(u32, u32);
 void Sound_PlaySong(s32);
 void sub_08224FA4(void);
-void sub_08110410(struct S *s)
+void SaveMenu_UpdateSaveFailure(struct S *s)
 {
     if (s->c24 != 0) {
-        sub_08223270();
+        Serial_StopCommunication();
         TextWindow_SetScript(s->h, s->c);
         TextWindow_Refresh(s->h, 3);
         Sound_PlaySong(0x192);

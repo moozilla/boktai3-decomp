@@ -2,9 +2,9 @@
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
 void sub_0821983C(u8 *, void *, u32, u32, u32, u32, u32, u32);
-void sub_081C6448(u8 *);
+void TimeResult_InitCategoryDisplay(u8 *);
 void sub_081C62B4(u8 *);
-void sub_081C6498(u8 *s)
+void TimeResult_InitAnimations(u8 *s)
 {
     struct Blob {
         u32 words[8];
@@ -29,7 +29,7 @@ void sub_081C6498(u8 *s)
             obj += 0x60;
         }
     }
-    sub_081C6448(s);
+    TimeResult_InitCategoryDisplay(s);
     sub_081C62B4(s);
     *(u32 *)(s + 0x60) |= 1;
 }

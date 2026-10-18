@@ -8,7 +8,7 @@ struct V {
 extern const struct T gUnk_0824F1DC[];
 void sub_08121D64(struct V *, s32, s32, s32, s32);
 void Sound_PlaySongChecked(s32);
-void sub_0818F3D8(struct V *p)
+void Nidhoggr_CreateUpperSweepBurst(struct V *p)
 {
     s32 i = 0;
     struct V v;

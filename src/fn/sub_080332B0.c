@@ -26,38 +26,38 @@ extern const u8 gUnk_086056D0[];
 void TextWindow_BlankRect(int, int, int, int);
 void sub_08218ED8(int, int, int, int);
 void TextState_SetBounds(struct TextState *, int, int, int, int);
-void sub_08032C80(struct TextState *, int, int, int, int);
+void TextState_Init(struct TextState *, int, int, int, int);
 void TextState_Reset(struct TextState *);
-const u8 *sub_08032BEC(struct TextState *);
-int sub_08032B24(struct TextState *);
-int sub_08031F58(struct TextState *, int);
-void sub_08032E8C(struct TextState *);
-void sub_08032E98(struct TextState *);
-void sub_08032F78(struct Window *);
-int sub_08033468(void);
-int sub_08033248(struct Window *);
-int sub_08033284(struct Window *);
-int sub_080332B0(struct Window *p)
+const u8 *TextState_GetActiveStream(struct TextState *);
+int TextState_StepPlayback(struct TextState *);
+int TextState_DrawNarrowGlyph(struct TextState *, int);
+void TextState_ClearSelectedChoices(struct TextState *);
+void TextState_RunSelectedProcedures(struct TextState *);
+void ScrollingDialogue_UpdatePlayback(struct Window *);
+int ScrollingDialogue_ClearScript(void);
+int ScrollingDialogue_Show(struct Window *);
+int ScrollingDialogue_Hide(struct Window *);
+int ScrollingDialogue_OnTaskUpdate(struct Window *p)
 {
     struct TextState *t;
     if (p->showRequest) {
-        sub_08033248(p);
+        ScrollingDialogue_Show(p);
         p->showRequest = 0;
     }
     if (p->hideRequest) {
-        sub_08033284(p);
+        ScrollingDialogue_Hide(p);
         p->hideRequest = 0;
     }
     if (p->active) {
         t = &p->text;
-        sub_08032E8C(t);
-        sub_08032F78(p);
+        TextState_ClearSelectedChoices(t);
+        ScrollingDialogue_UpdatePlayback(p);
         if (p->scrolling)
             gUnk_03003A48 = p->ticks;
         else
             gUnk_03003A48 = 0;
         p->frames++;
-        sub_08032E98(t);
+        TextState_RunSelectedProcedures(t);
     }
     return 0;
 }

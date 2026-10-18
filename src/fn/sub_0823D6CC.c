@@ -11,7 +11,7 @@ struct P0814A4B0 {
 u8 sub_0823C4B4(void *);
 void sub_08238238(void *);
 
-s32 sub_0823D6CC(struct P0814A4B0 *p)
+s32 Player_UpdateFacingFromInputHistory(struct P0814A4B0 *p)
 {
     s32 r = 0;
     if (p->f34C != -1 && p->f4B6 == 0) {

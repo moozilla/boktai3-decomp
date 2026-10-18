@@ -1,6 +1,6 @@
 #include "scene_indicator.h"
 
-struct SceneIndicators *sub_08011884(void)
+struct SceneIndicators *SceneIndicators_GetInstance(void)
 {
     return gUnk_0200004C;
 }
@@ -27,7 +27,7 @@ void SceneIndicator_Initialize(struct SceneIndicators *m, struct SceneIndicator 
     offset.z = 0;
     Collider_Init(effect, 0, 0x2001, 0, 16, &size, &offset);
     Collider_SetCallback(effect, 0, p);
-    sub_0821FF58(effect, 10, 1, 0x400000, 0x60000, 30);
+    Collider_SetAttackProperties(effect, 10, 1, 0x400000, 0x60000, 30);
     p->active = zero;
 }
 
@@ -87,7 +87,7 @@ void SceneIndicator_Update(struct SceneIndicators *owner, struct SceneIndicator 
     p->timer++;
 }
 
-void sub_08011A18(struct SceneIndicators *owner, struct SceneIndicator *p)
+void SceneIndicator_Destroy(struct SceneIndicators *owner, struct SceneIndicator *p)
 {
     Sprite_Remove(&p->sprite);
 }
@@ -110,12 +110,12 @@ int SceneIndicators_Update(struct SceneIndicators *m)
     return 0;
 }
 
-u32 sub_08011AA4(struct SceneIndicators *s)
+u32 SceneIndicators_Destroy(struct SceneIndicators *s)
 {
     struct SceneIndicator *e = s->indicators;
     s32 i;
     for (i = 15; i >= 0; i--, e++) {
-        sub_08011A18(s, e);
+        SceneIndicator_Destroy(s, e);
     }
     return (u32)(gUnk_0200004C = 0);
 }
@@ -177,14 +177,14 @@ int SceneIndicators_Initialize(struct SceneIndicators *m)
     return 0;
 }
 
-struct SceneIndicators *sub_08011C00(void)
+struct SceneIndicators *SceneIndicators_Create(void)
 {
     struct SceneIndicators *p;
     if (gUnk_0200004C != 0)
         return gUnk_0200004C;
     p = Task_Create(0x8, 0xbd0);
     if (p != 0) {
-        Task_SetCallbacks(p, SceneIndicators_Update, sub_08011AA4);
+        Task_SetCallbacks(p, SceneIndicators_Update, SceneIndicators_Destroy);
         if (SceneIndicators_Initialize(p) < 0) {
             Task_Kill(p);
             return 0;
@@ -193,7 +193,7 @@ struct SceneIndicators *sub_08011C00(void)
     return p;
 }
 
-struct SceneIndicator *sub_08011C4C(struct SceneIndicators *p)
+struct SceneIndicator *SceneIndicators_FindFreeSlot(struct SceneIndicators *p)
 {
     struct SceneIndicator *q = p->indicators;
     s32 i = 0;
@@ -207,7 +207,7 @@ struct SceneIndicator *sub_08011C4C(struct SceneIndicators *p)
     return 0;
 }
 
-struct SceneIndicator *sub_08011C6C(struct SceneIndicators *p, u32 key)
+struct SceneIndicator *SceneIndicators_FindById(struct SceneIndicators *p, u32 key)
 {
     struct SceneIndicator *q = p->indicators;
     s32 i = 0;
@@ -232,7 +232,7 @@ static inline int cellIndex(struct Vec *p)
 
 static inline u8 *cell(int i)
 {
-    u8 *p = sub_0821D64C(i, 1);
+    u8 *p = TerrainModifiers_FindCellOverride(i, 1);
     if (p)
         return p + 4;
     return gUnk_030052F4->cells + 12 + i * 4;
@@ -241,14 +241,14 @@ static inline u8 *cell(int i)
 // MATCHING_CONCESSION: register-pinning
 int SceneIndicator_CreateFromScript(void)
 {
-    struct SceneIndicators *m = sub_08011884();
+    struct SceneIndicators *m = SceneIndicators_GetInstance();
     struct SceneIndicator *p;
     struct Vec *position;
     struct IndicatorSprite *sprite;
     void *effect;
     if (!m)
         return -1;
-    p = sub_08011C4C(m);
+    p = SceneIndicators_FindFreeSlot(m);
     if (!p)
         return -1;
     p->id = Script_GetKeywordValue('n', 0);
@@ -351,7 +351,7 @@ int SceneIndicator_CreateFromScript(void)
         sprite->flags &= ~1;
     else
         sprite->flags |= 1;
-    sub_0821FF50(effect, (u16)Script_GetKeywordValue('d', 10), 1);
+    Collider_SetAttackPowerAndForce(effect, (u16)Script_GetKeywordValue('d', 10), 1);
     {
         register u32 raw asm("r0") = (u16)position->x;
         register int x asm("r2");
@@ -369,7 +369,7 @@ int SceneIndicator_CreateFromScript(void)
 
 int SceneIndicator_Pause(void)
 {
-    struct SceneIndicators *m = sub_08011884();
+    struct SceneIndicators *m = SceneIndicators_GetInstance();
     int id;
     struct SceneIndicator *p;
     if (!m)
@@ -377,7 +377,7 @@ int SceneIndicator_Pause(void)
     id = Script_GetKeywordValue('n', 0);
     if (!id)
         return -1;
-    p = sub_08011C6C(m, id);
+    p = SceneIndicators_FindById(m, id);
     if (!p)
         return -1;
     p->disabled = 1;
@@ -388,7 +388,7 @@ int SceneIndicator_Pause(void)
 
 int SceneIndicator_Resume(void)
 {
-    struct SceneIndicators *m = sub_08011884();
+    struct SceneIndicators *m = SceneIndicators_GetInstance();
     int id;
     struct SceneIndicator *p;
     if (!m)
@@ -396,7 +396,7 @@ int SceneIndicator_Resume(void)
     id = Script_GetKeywordValue('n', 0);
     if (!id)
         return -1;
-    p = sub_08011C6C(m, id);
+    p = SceneIndicators_FindById(m, id);
     if (!p || !p->disabled)
         return -1;
     p->disabled = 0;

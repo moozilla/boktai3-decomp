@@ -1,6 +1,6 @@
 #include "global.h"
 
-void sub_081D7874(u8 *p)
+void Task4E01_ClearTrailSprites(u8 *p)
 {
     u8 z = 0;
     u32 one = 1;

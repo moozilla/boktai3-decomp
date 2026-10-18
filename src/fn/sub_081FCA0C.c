@@ -10,7 +10,7 @@ struct B {
     u16 h122;
 };
 void Sprite_Remove(void *);
-void sub_081FCA0C(struct A *a, struct B *b, u32 n)
+void SceneProjectile_ReleaseSlot(struct A *a, struct B *b, u32 n)
 {
     u32 m;
     b->h122 |= 4;

@@ -10,7 +10,7 @@ struct Display {
     u8 pad1f[0x21];
     struct Drawing drawings[4];
 };
-void sub_0803A744(struct Display *p)
+void WirelessGameDisplay_UpdateHidden(struct Display *p)
 {
     if (p->entered) {
         struct Drawing *q;

@@ -5,7 +5,7 @@ struct P0813FBE4 {
     u16 a[10];
 };
 
-void sub_0813FBE4(struct P0813FBE4 *p)
+void Player_ClearDirectionHistory(struct P0813FBE4 *p)
 {
     s32 i;
     for (i = 0; i < 10; i++)

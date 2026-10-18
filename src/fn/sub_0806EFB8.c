@@ -1,4 +1,6 @@
 #include "scene_actor_registry.h"
+/* SceneActorQuery_FindInRectangle: Advances the actor ID cursor through up to twenty candidates and returns an eligible living actor within inclusive X/Z bounds */
+#define SceneActorQuery_FindInRectangle sub_0806EFB8
 #define SceneActorQuery_FindInRectangle sub_0806EFB8
 struct SceneActorRegistryActor *SceneActorRegistry_FindAvailableAfterId(u32);
 static inline u8 Inactive(struct SceneActorRegistryActor *a)

@@ -14,25 +14,25 @@ struct Save {
 };
 extern struct Save *gUnk_02000710;
 extern u32 gUnk_0300523C;
-void sub_08038128(struct P *, int);
-void sub_08038138(struct P *);
-void sub_08158FE8(void);
-void sub_08158FC0(void);
-void sub_080398BC(int);
-void sub_08159010(void);
+void WirelessGameMenu_SetStatusPanelState(struct P *, int);
+void WirelessGameMenu_SignalStatusPanel(struct P *);
+void Player_EnterStateTen(void);
+void Player_EnterStateEleven(void);
+void WirelessGame_GetSelectedEquipmentEffect(int);
+void Player_SetTransitionMode(void);
 static inline int item(void)
 {
     struct Save *s = gUnk_02000710;
     return *(s16 *)((u8 *)s + s->selected * 2 + 0x88);
 }
-void sub_080389AC(struct P *p)
+void WirelessGameMenu_UpdateRoundPreparation(struct P *p)
 {
     if (p->entered) {
         p->entered = 0;
         p->rounds++;
         if (p->rounds > 98)
             p->rounds = 99;
-        sub_08038128(p, 3);
+        WirelessGameMenu_SetStatusPanelState(p, 3);
     }
     if (p->timer > 89) {
         u32 seven = 7;
@@ -51,7 +51,7 @@ void sub_080389AC(struct P *p)
             u32 mask = ~4;
             *global &= mask;
         }
-        sub_08038138(p);
+        WirelessGameMenu_SignalStatusPanel(p);
         mode = &p->mode;
         switch (*mode) {
             case 0: {
@@ -66,26 +66,26 @@ void sub_080389AC(struct P *p)
                 if (item() == 2) {
                 mode1:
                     *mode = one;
-                    sub_08158FE8();
+                    Player_EnterStateTen();
                 } else {
                     *mode = zero;
-                    sub_08158FC0();
+                    Player_EnterStateEleven();
                 }
                 break;
             case 1:
                 if (item() == 1) {
                 mode2:
                     *mode = 2;
-                    sub_08158FC0();
+                    Player_EnterStateEleven();
                 } else {
                     *mode = zero;
-                    sub_08158FE8();
+                    Player_EnterStateTen();
                 }
                 break;
         }
     done:
-        sub_080398BC(item());
-        sub_08159010();
+        WirelessGame_GetSelectedEquipmentEffect(item());
+        Player_SetTransitionMode();
     } else
         p->timer++;
 }

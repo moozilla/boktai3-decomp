@@ -1,6 +1,6 @@
 #include "global.h"
 void Effect_Remove(void *);
-u32 sub_08233900(u8 *s)
+u32 ChargedBurst_OnTaskDestroy(u8 *s)
 {
     u8 *p;
     s32 i;

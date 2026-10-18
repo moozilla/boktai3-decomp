@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_02000710;
-s32 sub_08210A8C(void)
+s32 Collection_CountUnlockedEntries(void)
 {
     s32 n = 0;
     s32 i = 0;

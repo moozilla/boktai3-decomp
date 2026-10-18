@@ -10,7 +10,7 @@ struct A {
 };
 void sub_081B7394(void *, void *, s32);
 
-s32 sub_081B74A8(struct A *p)
+s32 VanargandAfterimagePool_Init(struct A *p)
 {
     s32 i;
     struct E *e;

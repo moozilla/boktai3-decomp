@@ -5,8 +5,8 @@
 struct SceneActorControlManager *SceneActorControl_EnsureSingleton(void);
 struct ActorAttachmentManagerView *ActorAttachment_CreateManager(void);
 struct SceneParticleBurstPool *SceneParticleBurst_EnsureSingleton(u32, u32);
-struct Task *sub_08121B40(void);
-struct Task *sub_08122610(void);
+struct Task *SceneColliderEffect_EnsurePool(void);
+struct Task *SceneActor14_EnsureSingleton(void);
 static inline u8 HasFlag(struct SceneActorRegistryManager *manager, u32 mask)
 {
     if (manager->flags & mask)
@@ -33,7 +33,7 @@ void SceneActorRegistry_EnsureActorSubsystems(struct SceneActorRegistryManager *
             manager->controlTaskId = task->id;
         }
         if (actor->paletteOffset == 1 && !HasFlag(manager, 0x10)) {
-            struct Task *task = sub_08121B40();
+            struct Task *task = SceneColliderEffect_EnsurePool();
             manager->variantTask = task;
             if (!task)
                 return;
@@ -63,7 +63,7 @@ void SceneActorRegistry_EnsureActorSubsystems(struct SceneActorRegistryManager *
     if (category == 3)
         SceneParticleBurst_EnsureSingleton(0, 0);
     if (category == 14 && !HasFlag(manager, 0x1000)) {
-        struct Task *task = sub_08122610();
+        struct Task *task = SceneActor14_EnsureSingleton();
         manager->category14Task = task;
         if (!task)
             return;

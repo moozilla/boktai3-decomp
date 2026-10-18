@@ -2,7 +2,7 @@
 
 void Camera_SnapTo(u32);
 
-void sub_0822630C(u32 a)
+void Camera_SnapToWithoutCompletion(u32 a)
 {
     u8 *s = *(u8 **)0x03005420;
     if (s != 0) {

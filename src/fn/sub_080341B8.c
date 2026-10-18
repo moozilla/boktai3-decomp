@@ -37,7 +37,7 @@ struct ModeState {
     u8 mode;
 };
 extern struct ModeState *gUnk_03006A80;
-int sub_080341B8(struct Engine *p)
+int WirelessController_RestoreLocalInput(struct Engine *p)
 {
     int result;
     if (!(p->flags & 0x4000)) {

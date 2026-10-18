@@ -5,7 +5,7 @@ struct S {
     u8 b25;
 };
 
-void sub_081D4DFC(struct S *p)
+void BestiaryDisplay_Show(struct S *p)
 {
     p->b25 = 0;
 }

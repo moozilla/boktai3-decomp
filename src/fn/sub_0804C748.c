@@ -6,7 +6,7 @@ void TetherActor_RemoveAuxiliarySprite(struct TetherActor *);
 void TetherActor_EmitPointEffect(struct ContactPosition *, void *);
 void DisplayAnimation_SetFlags(struct DisplayAnimation *, u32);
 void DisplayAnimation_ClearFlags(struct DisplayAnimation *, u32);
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 extern struct TetherActor *gUnk_02000488;
 static inline u8 *propertiesAt(s32 x, s32 z)
 {
@@ -16,7 +16,7 @@ static inline u8 *propertiesAt(s32 x, s32 z)
         cell = 0;
     else
         cell = gUnk_030052F4->rows[z] + x;
-    properties = sub_0821D64C(cell, 1);
+    properties = TerrainModifiers_FindCellOverride(cell, 1);
     if (properties)
         properties += 4;
     else {

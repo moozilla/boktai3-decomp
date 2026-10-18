@@ -5,7 +5,7 @@ struct S {
     u8 a;
 };
 extern struct S *gUnk_0200047C;
-s32 sub_08020D28(void)
+s32 SceneMessages_RequestAdvance(void)
 {
     struct S *s = gUnk_0200047C;
     if (s == 0)

@@ -23,11 +23,11 @@ struct S {
     s16 y;
     s16 z;
 };
-void sub_081850B4(struct S *, s32);
+void ActorController_ForceAction(struct S *, s32);
 s32 sub_0818505C(struct S *, s32);
 s32 sub_08184FE8(struct S *, s32);
 void sub_0818573C(struct S *);
-void sub_081857E0(struct S *p)
+void Armor_UpdatePairedProjectileAttack(struct S *p)
 {
     u8 s = p->b3d;
     switch (s) {

@@ -26,7 +26,7 @@ static inline void st(void (*v)(void), void (**a)(void))
 {
     *a = v;
 }
-void sub_081EF398(struct S *p)
+void SingletonSlot7_UpdateAlternateStateTransition(struct S *p)
 {
     u8 *q;
     u32 r;

@@ -1,10 +1,10 @@
 #include "global.h"
 
-void sub_082258A0(void);
-void sub_08225E20(void);
+void SceneActorRegistry_ClearObjectContext(void);
+void Camera_ClearInstance(void);
 
-void sub_082250EC(void)
+void SceneLifecycle_ResetSceneRegistries(void)
 {
-    sub_082258A0();
-    sub_08225E20();
+    SceneActorRegistry_ClearObjectContext();
+    Camera_ClearInstance();
 }

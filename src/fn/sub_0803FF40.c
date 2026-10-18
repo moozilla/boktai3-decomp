@@ -1,6 +1,6 @@
 #include "modifier_list.h"
 extern u32 gUnk_030053F0;
-void sub_081093AC(u32);
+void Registry1745_SetMenuRequest(u32);
 static inline u32 TestFlags(u32 mask)
 {
     return (gUnk_030053F4 | gUnk_030053F0) & mask;
@@ -13,5 +13,5 @@ void ModifierMenu_CloseScript(struct ModifierMenu *menu)
         *script = 0;
     }
     if (TestFlags(0x800))
-        sub_081093AC(1);
+        Registry1745_SetMenuRequest(1);
 }

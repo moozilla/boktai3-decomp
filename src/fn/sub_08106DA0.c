@@ -2,7 +2,7 @@
 
 extern u32 gUnk_020001B4;
 
-void sub_08106DA0(void)
+void Pool1B4_ResetInstance(void)
 {
     gUnk_020001B4 = 0;
 }

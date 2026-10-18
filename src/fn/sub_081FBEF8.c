@@ -10,7 +10,7 @@ struct B {
     u32 w30;
 };
 void Sprite_Remove(void *);
-void sub_081FBEF8(struct A *a, struct B *b, u32 n)
+void Ratatosk_ReleaseAnimatedParticle(struct A *a, struct B *b, u32 n)
 {
     a->cnt--;
     b->w30 |= 1;

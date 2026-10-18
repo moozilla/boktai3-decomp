@@ -3,7 +3,7 @@
 extern u8 *gUnk_02000710;
 s32 Div(s32, s32);
 
-s32 sub_0813E208(void *unused, s32 n)
+s32 Player_ModifyValueByRemainingLife(void *unused, s32 n)
 {
     s32 a = Div(n, 10);
     s32 b = Div(n, 2);

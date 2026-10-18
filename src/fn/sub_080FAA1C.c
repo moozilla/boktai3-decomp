@@ -1,6 +1,6 @@
 #include "global.h"
 
-s32 sub_080FAA1C(void)
+s32 Axe_GetActorCategory(void)
 {
     return 4;
 }

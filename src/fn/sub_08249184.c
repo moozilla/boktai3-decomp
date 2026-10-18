@@ -1,7 +1,7 @@
 #include "global.h"
 /* Reconstructed from B3 instructions; SIIRTC correspondence: docs/RTC.md. */
 // CFLAGS: -O0 -mthumb-interwork
-u8 sub_08249184(void)
+u8 Rtc_ReadDataByte(void)
 {
     u8 i;
     u8 bit;

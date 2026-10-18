@@ -9,7 +9,7 @@ struct S {
     u8 b;
 };
 
-s32 sub_080F1FBC(struct S *s)
+s32 Ivy_WaitForColorRelease(struct S *s)
 {
     s32 r;
     if (s->b != 0)

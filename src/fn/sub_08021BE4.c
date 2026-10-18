@@ -5,7 +5,7 @@ struct S {
     u8 a;
 };
 struct S *SceneActors_FindAvailable(void);
-u8 *sub_08021BE4(void)
+u8 *SceneActors_GetAvailablePosition(void)
 {
     struct S *p = SceneActors_FindAvailable();
     if (!p)

@@ -12,7 +12,7 @@ static inline u8 TakeFlag(u8 *flag)
     return FALSE;
 }
 
-void sub_080D0F88(u8 *p)
+void Mummy_UpdateWalking(u8 *p)
 {
     if (TakeFlag(p + 0x2B2))
         sub_0807C72C(p, 0, 0x7F, 0);

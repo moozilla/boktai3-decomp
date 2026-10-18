@@ -11,10 +11,10 @@ typedef struct {
     void *tiles;
 } Manager;
 
-Manager *sub_080195DC(void);
+Manager *TileAnimation_GetTask(void);
 void TileAnimation_Upload(void)
 {
-    Manager *p = sub_080195DC();
+    Manager *p = TileAnimation_GetTask();
     Channel *q;
     int i;
     if (p) {

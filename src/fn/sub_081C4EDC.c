@@ -4,7 +4,7 @@ struct S {
     u32 a;
 };
 void sub_0824923C(void *, u32);
-void sub_081C4EDC(struct S *p)
+void RegistryC281_Update(struct S *p)
 {
     if (p->a != 0)
         sub_0824923C(p, p->a);

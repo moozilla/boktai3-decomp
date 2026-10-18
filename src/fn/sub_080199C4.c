@@ -11,18 +11,18 @@ typedef struct {
     void *tiles;
 } Manager;
 
-Manager *sub_080195DC(void);
-Channel *sub_08019818(Manager *, int);
+Manager *TileAnimation_GetTask(void);
+Channel *TileAnimation_FindChannel(Manager *, int);
 int Script_GetKeywordValue(int, int);
 void TileAnimation_Stop(void)
 {
-    Manager *p = sub_080195DC();
+    Manager *p = TileAnimation_GetTask();
     Channel *q;
     int id, frame;
     if (p) {
         id = Script_GetKeywordValue('c', 0);
         if (id) {
-            q = sub_08019818(p, id);
+            q = TileAnimation_FindChannel(p, id);
             if (q) {
                 q->remove = 1;
                 frame = Script_GetKeywordValue('i', -1);

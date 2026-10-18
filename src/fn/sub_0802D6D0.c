@@ -10,7 +10,7 @@ struct Manager {
     u8 pad[0x1c];
     struct Object *head;
 };
-struct Object *sub_0802D6D0(struct Manager *m, int id)
+struct Object *Actor_FindById(struct Manager *m, int id)
 {
     struct Object *p = m->head;
     while (p) {

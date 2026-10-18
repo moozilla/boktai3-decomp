@@ -6,7 +6,6 @@ struct ScreenParams {
     s32 N, s, y, n, c;
 };
 extern struct ScreenParams gUnk_020002F8;
-/* Script: sets the screen parameters: -m block, -N, -s, -y, -n, -c. */
 void ScreenParams_SetFromScript(void)
 {
     if (Script_SeekToKeyword('m'))

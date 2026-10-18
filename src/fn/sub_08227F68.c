@@ -6,7 +6,7 @@ void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, s32 *);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 extern u16 gUnk_03005160[];
 /* Script command: load map `b` with value `i`, and palette `p` if given. */
-void sub_08227F68(void)
+void Bg_LoadMapFromScript(void)
 {
     s32 map, value, pal;
     map = Script_GetKeywordValue('b', 0);

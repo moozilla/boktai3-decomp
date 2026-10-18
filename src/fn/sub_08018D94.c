@@ -8,19 +8,19 @@ struct Blend {
     u32 time, duration;
 };
 int Div(int, int);
-void sub_08217060(int, int, int);
-void sub_08217074(int, int);
-void sub_08217084(int);
+void Video_SetBlendControl(int, int, int);
+void Video_SetBlendAlpha(int, int);
+void Video_SetBlendBrightness(int);
 void Task_Kill(void *);
 int BlendTransition_Update(struct Blend *p)
 {
     int first;
-    sub_08217060(p->mode, p->source, p->dest);
+    Video_SetBlendControl(p->mode, p->source, p->dest);
     first = p->initial[0] + Div(p->delta[0] * p->time, p->duration);
     if (p->mode == 1)
-        sub_08217074(first, p->initial[1] + Div(p->delta[1] * p->time, p->duration));
+        Video_SetBlendAlpha(first, p->initial[1] + Div(p->delta[1] * p->time, p->duration));
     else
-        sub_08217084(first);
+        Video_SetBlendBrightness(first);
     if (p->time >= p->duration)
         Task_Kill(p);
     p->time++;

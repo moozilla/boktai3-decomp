@@ -26,7 +26,7 @@ zero:
     return 0;
 }
 
-void sub_08085D58(u8 *unused, u8 *obj, u8 *ctx)
+void Ghoul_OnAttackCollision(u8 *unused, u8 *obj, u8 *ctx)
 {
     int mask;
     u32 *flags;

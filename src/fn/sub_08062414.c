@@ -19,10 +19,10 @@ struct SceneInventoryFunds {
     s16 funds;
 };
 s32 SceneInput_TickPairTransition(struct SceneInputPair *);
-void sub_0805F900(struct SceneInventoryTail *, struct SceneInventoryPurchaseDescriptor *);
-void sub_0822D83C(u32, struct SceneInventoryPurchaseDescriptor *);
-void sub_0822CDEC(u32, s32);
-void sub_0822E0DC(u32, s32);
+void SceneInventory_PrepareEquipmentDescriptor(struct SceneInventoryTail *, struct SceneInventoryPurchaseDescriptor *);
+void Inventory_SetEquipmentEntry(u32, struct SceneInventoryPurchaseDescriptor *);
+void Inventory_SetItemId(u32, s32);
+void Inventory_SetConsumableEntry(u32, s32);
 s32 SceneInventory_TickPurchaseTransition(struct SceneInventoryTail *p)
 {
     struct SceneInventoryPurchaseDescriptor descriptor;
@@ -43,15 +43,15 @@ s32 SceneInventory_TickPurchaseTransition(struct SceneInventoryTail *p)
                     offset = (s32)catalog->catalog;
                     offset += index;
                     offset = *(s8 *)offset;
-                    definition = sub_08227F5C(offset);
+                    definition = Equipment_GetDefinition(offset);
                 }
                 descriptor = *(struct SceneInventoryPurchaseDescriptor *)definition;
                 descriptor.modifierA = category;
                 descriptor.modifierB = category;
                 descriptor.modifierC = category;
-                sub_0805F900(p, &descriptor);
-                sub_0822D83C(destination, &descriptor);
-                sub_0822D6C8(destination)->condition = 500;
+                SceneInventory_PrepareEquipmentDescriptor(p, &descriptor);
+                Inventory_SetEquipmentEntry(destination, &descriptor);
+                Inventory_GetEquipmentEntry(destination)->condition = 500;
                 ((struct SceneInventoryFunds *)gUnk_02000710)->funds -= definition->baseValue;
                 break;
             }
@@ -68,7 +68,7 @@ s32 SceneInventory_TickPurchaseTransition(struct SceneInventoryTail *p)
                 ((struct SceneInventoryFunds *)gUnk_02000710)->funds -= value;
                 index += *page * 8;
                 entries += index;
-                sub_0822CDEC(destination, *entries);
+                Inventory_SetItemId(destination, *entries);
                 break;
             }
             case 2: {
@@ -80,10 +80,10 @@ s32 SceneInventory_TickPurchaseTransition(struct SceneInventoryTail *p)
                 s32 value;
                 offset = index + offset;
                 entries = catalog->catalog;
-                sub_0822E288(entries[offset]);
+                GameState_GetConsumableDescriptor(entries[offset]);
                 offset = *page * 8;
                 offset = index + offset;
-                sub_0822E0DC(destination, entries[offset]);
+                Inventory_SetConsumableEntry(destination, entries[offset]);
                 index += *page * 8;
                 entries += index;
                 value = SceneItemValue_GetConsumableBaseValue(*entries);

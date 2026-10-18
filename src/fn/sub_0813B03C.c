@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0813B03C(u8 *p, u8 v)
+void Player_SetActionPhase(u8 *p, u8 v)
 {
     u8 *a = p + 0x458;
     u16 z = 0;

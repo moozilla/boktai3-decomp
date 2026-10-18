@@ -36,16 +36,16 @@ void *Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 void *Script_GetPc(void);
 int Script_GetValue(void);
-u8 *sub_08227F5C(int);
-void sub_0822D83C(int, void *);
-void sub_0822E650(int, int);
-void sub_0822E9FC(int, int);
-void sub_0822E0DC(int, int);
-void sub_0822CE18(int);
-void sub_0822CE34(int);
-void sub_08038074(struct Menu *, int);
-void *sub_08227E90(void);
-int sub_080390C4(struct Menu *arg)
+u8 *Equipment_GetDefinition(int);
+void Inventory_SetEquipmentEntry(int, void *);
+void GameState_SetUnlockSlot(int, int);
+void SolarFruit_SetInventorySlot(int, int);
+void Inventory_SetConsumableEntry(int, int);
+void Inventory_ClearItemSlot(int);
+void Inventory_ClearKeyItemSlot(int);
+void WirelessExchange_ClearPeerCounts(struct Menu *, int);
+void *Script_GetTextSourcePc(void);
+int WirelessTradeMenu_InitFromScript(struct Menu *arg)
 {
     register struct Menu *p asm("r6") = arg;
     u16 *leftBase;
@@ -154,7 +154,7 @@ int sub_080390C4(struct Menu *arg)
                 do {
                     int index;
                     register u32 mask asm("r1");
-                    item = sub_08227F5C(leftBase[j]);
+                    item = Equipment_GetDefinition(leftBase[j]);
                     if (!*item) {
                         index = 0;
                         mask = p->leftMask;
@@ -191,7 +191,7 @@ int sub_080390C4(struct Menu *arg)
                         }
                     }
                     p->leftMask = (1 << index) | mask;
-                    sub_0822D83C(index, item);
+                    Inventory_SetEquipmentEntry(index, item);
                     {
                         register u32 *read asm("r1") = &gUnk_03005308;
                         register u32 *write asm("r3");
@@ -208,8 +208,8 @@ int sub_080390C4(struct Menu *arg)
                 } while ((u32)j < p->count);
         }
     }
-    item = sub_08227F5C(0);
-    sub_0822D83C(0, item);
+    item = Equipment_GetDefinition(0);
+    Inventory_SetEquipmentEntry(0, item);
     p->rightCount = 0;
     p->extraMask = 0;
     if (Script_SeekToKeyword(103)) {
@@ -290,7 +290,7 @@ int sub_080390C4(struct Menu *arg)
                     }
                     p->extraMask = (1 << index) | mask;
                     asm("" : "+r"(q));
-                    sub_0822E650(index, *q);
+                    GameState_SetUnlockSlot(index, *q);
                     {
                         register u32 *read asm("r1") = random;
                         register u32 *write asm("r3");
@@ -311,10 +311,10 @@ int sub_080390C4(struct Menu *arg)
             }
         }
     }
-    sub_0822E650(0, 1);
-    sub_0822E9FC(0, 0);
+    GameState_SetUnlockSlot(0, 1);
+    SolarFruit_SetInventorySlot(0, 0);
     for (i = 1; i <= 7; i++)
-        sub_0822E9FC(i, -1);
+        SolarFruit_SetInventorySlot(i, -1);
     {
         struct Save **slot;
         register int minus asm("r0");
@@ -333,11 +333,11 @@ int sub_080390C4(struct Menu *arg)
         } while (i <= 3);
     }
     for (i = 0; i <= 15; i++)
-        sub_0822E0DC(i, -1);
+        Inventory_SetConsumableEntry(i, -1);
     for (i = 0; i <= 15; i++)
-        sub_0822CE18(i);
+        Inventory_ClearItemSlot(i);
     for (i = 0; i <= 15; i++)
-        sub_0822CE34(i);
+        Inventory_ClearKeyItemSlot(i);
     p->rightMask = 0xFCF;
     {
         register int zero asm("r2") = 0;
@@ -426,10 +426,10 @@ int sub_080390C4(struct Menu *arg)
             c--;
         } while ((s32)c >= (s32)base);
     }
-    sub_08038074(p, 0);
-    sub_08038074(p, 1);
+    WirelessExchange_ClearPeerCounts(p, 0);
+    WirelessExchange_ClearPeerCounts(p, 1);
     if (Script_SeekToKeyword(115)) {
-        void *resource = sub_08227E90();
+        void *resource = Script_GetTextSourcePc();
         p->resource = resource;
         if (resource) {
             asm("" : "+r"(p));

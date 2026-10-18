@@ -2,7 +2,7 @@
 
 extern u32 gUnk_030025FC;
 
-void sub_0822BAC4(void)
+void SceneStimulus_Reset(void)
 {
     gUnk_030025FC = 0;
 }

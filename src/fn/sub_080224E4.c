@@ -34,10 +34,10 @@ static inline void setFacing(ActorAnimation *p, int angle)
 }
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 void Sound_PlaySongChecked(int);
-ActorAnimation *sub_0802140C(int);
-void sub_080224E4(u32 *position)
+ActorAnimation *SceneActors_GetBySlot(int);
+void SceneActors_StartDisappearEffect(u32 *position)
 {
-    ActorAnimation *p = sub_0802140C(0);
+    ActorAnimation *p = SceneActors_GetBySlot(0);
     if (p) {
         int sequence;
         u32 one;

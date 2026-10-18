@@ -13,13 +13,13 @@ struct Object {
     u8 pad182[2];
     u32 drawable;
 };
-void sub_0802CB94(struct Object *);
+void Actor_RefreshTarget(struct Object *);
 void DisplayAnimation_SetPosition(void *, void *);
 void DisplayAnimation_UpdatePlayback(void *);
-void sub_0802CF10(struct Object *p)
+void Actor_UpdateDrawable(struct Object *p)
 {
     void *d;
-    sub_0802CB94(p);
+    Actor_RefreshTarget(p);
     d = &p->drawable;
     DisplayAnimation_SetPosition(d, p->pos);
     {

@@ -1,7 +1,7 @@
 #include "global.h"
 extern u8 *gUnk_020004BC;
 void Sprite_Remove(void *);
-void sub_08112C08(u32 i)
+void ActorMarkerPool_RemoveMarker(u32 i)
 {
     u8 *g = gUnk_020004BC;
     if (g != 0 && i <= 7) {

@@ -15,7 +15,7 @@ struct T {
     u8 p5[0x100 - 0xb2];
     u32 w100;
 };
-u32 sub_0817F444(struct T *p)
+u32 BossSlot2_InitStateDispatch(struct T *p)
 {
     if ((u8)(p->baa - 1) > 0x10)
         return 0;

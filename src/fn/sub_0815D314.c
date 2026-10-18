@@ -1,15 +1,15 @@
 #include "global.h"
-s32 sub_0815A400(void);
-s32 sub_0815CA08(void);
-s32 sub_0815C9EC(void);
+s32 Script_GetActorIndex(void);
+s32 ScriptActor_GetCueOptionFromScript(void);
+s32 ScriptActor_GetDirectionFromScript(void);
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-void sub_0814F828(s32);
+void ScriptActor_EnableCompletionScript(s32);
 extern s32 gUnk_02000580[];
 void PlayerCue_Shoot(s32, s32, s32);
-void sub_0815D314(void)
+void ScriptActor_ShootFromScript(void)
 {
-    s32 i = sub_0815A400();
+    s32 i = Script_GetActorIndex();
     s32 p = gUnk_02000580[i];
     s32 a;
     if (p != 0) {
@@ -17,7 +17,7 @@ void sub_0815D314(void)
             a = Script_GetValue();
         else
             a = 0x20;
-        PlayerCue_Shoot(p, a, sub_0815CA08());
-        sub_0814F828(p);
+        PlayerCue_Shoot(p, a, ScriptActor_GetCueOptionFromScript());
+        ScriptActor_EnableCompletionScript(p);
     }
 }

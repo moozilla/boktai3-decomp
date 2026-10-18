@@ -7,7 +7,7 @@ struct P08159524 {
     u16 f428;
 };
 
-void sub_08159524(struct P08159524 *p, s32 d)
+void Player_SubtractEnergy(struct P08159524 *p, s32 d)
 {
     if (p->f1c == 1) {
         if (p->f428 < d)

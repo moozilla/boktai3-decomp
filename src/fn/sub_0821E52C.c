@@ -10,13 +10,13 @@ struct Ref {
 };
 u8 *Script_GetPc(void);
 u32 Script_GetValue(void);
-struct Rect *sub_0821E104(u16, u16 *);
-void sub_0821AAD8(struct Ref *);
-void sub_0821B4C8(struct Ref *, s32, s32);
-s32 sub_0821E52C(u16 id, s16 *p)
+struct Rect *Terrain_FindBoxesById(u16, u16 *);
+void Script_ReadReference(struct Ref *);
+void Script_WriteReferenceValue(struct Ref *, s32, s32);
+s32 Terrain_IsPositionInBox(u16 id, s16 *p)
 {
     u16 count, i;
-    struct Rect *r = sub_0821E104(id, &count);
+    struct Rect *r = Terrain_FindBoxesById(id, &count);
     if (!r)
         return 0;
     for (i = 0; i < count; r++, i++) {

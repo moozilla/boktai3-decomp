@@ -6,7 +6,7 @@ struct G {
     u16 t[1];
 };
 extern struct G *gUnk_02000710;
-u32 sub_080398BC(void)
+u32 WirelessGame_GetSelectedEquipmentEffect(void)
 {
     struct G *g = gUnk_02000710;
     u32 r;

@@ -1,13 +1,13 @@
 #include "bouncing_object.h"
-void sub_082333A8(struct ContactPosition *, s32, u32, u32, u32);
-void sub_0822B7B4(s32, s32, s32, s32, s32, u32);
+void ExplosionEffect_Create(struct ContactPosition *, s32, u32, u32, u32);
+void SceneStimulus_AddTagged(s32, s32, s32, s32, s32, u32);
 void BouncingObject_TickRemoval(struct BouncingPool *unused, struct BouncingObject *object)
 {
     s8 *index;
     if (object->enter) {
-        sub_082333A8(&object->sprite.position, 32, object->spawnParameterA, object->spawnParameterB,
+        ExplosionEffect_Create(&object->sprite.position, 32, object->spawnParameterA, object->spawnParameterB,
                      0);
-        sub_0822B7B4(object->sprite.position.x, object->sprite.position.z, 1024, 0, 1,
+        SceneStimulus_AddTagged(object->sprite.position.x, object->sprite.position.z, 1024, 0, 1,
                      (u16)object->colliderConfig);
         object->enter = 0;
     }
@@ -22,7 +22,7 @@ void BouncingObject_TickRemoval(struct BouncingPool *unused, struct BouncingObje
     }
     object->state = 0;
     Sprite_Remove(object);
-    sub_08013684(object->registration);
+    Shadow_Destroy(object->registration);
     Collider_Remove(&object->removalCollider);
     *(u8 *)index = 255;
     object->flags = 0;

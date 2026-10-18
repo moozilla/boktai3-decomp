@@ -6,7 +6,7 @@ struct S080FBF20 {
 };
 void Sprite_Remove(u8 *);
 
-void sub_080FBF20(struct S080FBF20 *s)
+void Axe_RemoveAuxiliarySprites(struct S080FBF20 *s)
 {
     u8 *p = s->q + 0x708;
     s32 i = 3;

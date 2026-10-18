@@ -8,7 +8,7 @@ void m4aMPlayImmInit(struct MusicPlayerInfo *);
 void m4aMPlayFadeIn(struct MusicPlayerInfo *, u16);
 void m4aMPlayFadeOut(struct MusicPlayerInfo *, u16);
 void m4aMPlayFadeOutTemporarily(struct MusicPlayerInfo *, u16);
-void sub_0822B0C8(u32 song)
+void Sound_PlayChannel12Song(u32 song)
 {
     const struct Song *songs = gSongTable;
     const struct Song *entry = &songs[song];

@@ -11,11 +11,11 @@ struct SceneActorControlGameView {
     s16 parameter;
 };
 extern struct SceneActorControlPlayerView *gUnk_02000580[4];
-void sub_08214374(void *, u32);
-void sub_082143A0(void *, u32);
+void Sprite_LinkToList(void *, u32);
+void Sprite_UnlinkFromList(void *, u32);
 void SceneActorControl_TickJitter(struct SceneActorControlManager *,
                                   struct SceneActorControlSlot *);
-void sub_08158EC8(struct ContactPosition *);
+void SceneActorControl_OnJitterPosition(struct ContactPosition *);
 u32 SceneActorControl_IsEnabledForScene(struct SceneActorControlSlot *);
 void SceneActorControl_TryActivateNearby(struct SceneActorControlSlot *);
 static inline u8 PlayerHasControlFlag(void)
@@ -72,11 +72,11 @@ void SceneActorControl_TickActive(struct SceneActorControlManager *p,
                 *flags = mask;
             }
             if (!sprite->active)
-                sub_08214374(sprite, 0);
+                Sprite_LinkToList(sprite, 0);
             if (*flags & 4) {
                 slot->timer = 60;
                 SceneActorControl_TickJitter(p, slot);
-                sub_08158EC8(&slot->position);
+                SceneActorControl_OnJitterPosition(&slot->position);
                 {
                     u16 *target = previous;
                     *target = delta;
@@ -94,7 +94,7 @@ void SceneActorControl_TickActive(struct SceneActorControlManager *p,
         }
     } else if (initialFlags & 0x40) {
         if (!slot->active)
-            sub_08214374(slot, 0);
+            Sprite_LinkToList(slot, 0);
         if (*flags & 4) {
             SceneActorControl_TickJitter(p, slot);
             ClearFlags(flags, 4);
@@ -114,14 +114,14 @@ void SceneActorControl_TickActive(struct SceneActorControlManager *p,
              ((struct SceneActorControlGameView *)gUnk_02000710)->parameter > 0) ||
             (u8)SceneActorControl_IsEnabledForScene(slot)) {
             if (!sprite->active)
-                sub_08214374(sprite, 0);
+                Sprite_LinkToList(sprite, 0);
         } else {
             if (sprite->active)
-                sub_082143A0(sprite, 0);
+                Sprite_UnlinkFromList(sprite, 0);
         }
         if (*flags & 2) {
             if (!sprite->active)
-                sub_08214374(sprite, 0);
+                Sprite_LinkToList(sprite, 0);
             slot->stateFrame = 0;
             slot->kind = 2;
             clearValue = *flags;

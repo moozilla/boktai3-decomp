@@ -4,8 +4,8 @@
 
 void sub_08231568(void *);
 void sub_082314C4(void *);
-u32 sub_0823233C(void *);
-void sub_0821FF7C(void *, u32, u32, u32);
+u32 SceneActorEffects_DestroyGroup(void *);
+void Collider_SetBodyProperties(void *, u32, u32, u32);
 void ScenePanelSubject_UpdateTimedEffect(struct ScenePanelSubjectView *);
 void ScenePanelSubject_UpdatePaletteBank(struct ScenePanelSubjectView *);
 s32 ScenePanelSubject_Update(struct ScenePanelSubjectView *);

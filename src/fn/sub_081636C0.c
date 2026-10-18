@@ -6,7 +6,7 @@ struct P {
 extern u32 gUnk_02000210;
 void Sprite_Remove(u8 *);
 void Anim_Remove(u8 *);
-u32 sub_081636C0(u8 *p)
+u32 GameOver_OnDestroy(u8 *p)
 {
     u8 *q;
     s32 i;

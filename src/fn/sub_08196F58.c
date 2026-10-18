@@ -19,27 +19,27 @@ struct P08196F58 {
     s32 a, b, c, d, e, f;
     void *script;
 };
-void sub_08193680(void *, u32);
-void sub_08195014(void *, s32, s32);
-void sub_08195254(void *);
+void Nidhoggr_SetBackgroundMode(void *, u32);
+void Nidhoggr_InitRelativeMotion(void *, s32, s32);
+void Nidhoggr_TrackPlayerDepth(void *);
 void Hud_SetMode(u32);
-void sub_082279A8(u32, u32, u32, u32, u32, u32, u32);
+void ScreenTransition_SendCommand(u32, u32, u32, u32, u32, u32, u32);
 void sub_08159164(u32);
 void GameState_SetEventFlag(u32);
 void Sound_PlaySongChecked(u32);
 
-void sub_08196F58(struct P08196F58 *t)
+void Nidhoggr_UpdateDepartureTransition(struct P08196F58 *t)
 {
     switch (t->state) {
         case 0:
-            sub_08193680(t, 1);
+            Nidhoggr_SetBackgroundMode(t, 1);
             t->pos.x = -0xd80;
             t->pos.y = 0;
             t->pos.z = 0x80;
             t->pos.z = gUnk_02000710->positionZ + 0x80;
             t->base = t->pos;
             t->base.x = -0x680;
-            sub_08195014(t, t->base.x, t->base.z);
+            Nidhoggr_InitRelativeMotion(t, t->base.x, t->base.z);
             t->base.x += t->b >> 8;
             t->base.z += t->c >> 8;
             t->b = 0;
@@ -53,13 +53,13 @@ void sub_08196F58(struct P08196F58 *t)
             t->a += 0x3000;
             x = t->a + t->b;
             z = t->c;
-            sub_08195254(t);
+            Nidhoggr_TrackPlayerDepth(t);
             t->pos.x = (x >> 8) + t->base.x;
             t->pos.z = (z >> 8) + t->base.z;
             if (t->a >= 0) {
                 t->state++;
                 Hud_SetMode(7);
-                sub_082279A8(3, 4, 0x1f, 0x1f, 0x1f, 0xffff, 0);
+                ScreenTransition_SendCommand(3, 4, 0x1f, 0x1f, 0x1f, 0xffff, 0);
             }
             break;
         }
@@ -68,7 +68,7 @@ void sub_08196F58(struct P08196F58 *t)
             t->a += 0x3000;
             x = t->a + t->b;
             z = t->c;
-            sub_08195254(t);
+            Nidhoggr_TrackPlayerDepth(t);
             t->pos.x = (x >> 8) + t->base.x;
             t->pos.z = (z >> 8) + t->base.z;
             if (t->a > 0x2ffff)

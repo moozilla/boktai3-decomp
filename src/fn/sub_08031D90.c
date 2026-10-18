@@ -4,7 +4,7 @@ struct Actor {
     u8 rect[4];
 };
 extern struct Actor *gUnk_020000DC;
-int sub_08031D90(int *out)
+int MessageWindow_GetTextBounds(int *out)
 {
     struct Actor *p = gUnk_020000DC;
     int result;

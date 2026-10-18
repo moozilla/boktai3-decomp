@@ -8,7 +8,7 @@ void Task_Kill(u8 *);
 void sub_081788A8(void);
 void sub_081788E8(void);
 
-u8 *sub_08178B3C(u32 a)
+u8 *Hud_CreateEngineFlagVariant(u32 a)
 {
     u8 *p;
     if (gUnk_02000214 != 0)

@@ -8,7 +8,7 @@ struct P {
     u16 *src;
 };
 
-void sub_080F360C(struct P *p)
+void Ivy_InitPaletteBuffers(struct P *p)
 {
     u16 **sp = &p->src;
     u32 z = 0;

@@ -1,5 +1,7 @@
 // COMPILER: old_agbcc
 #include "global.h"
+/* CollectionBook_SetEntryCollected: Sets the indexed bit in the persistent ten-entry collection mask */
+#define CollectionBook_SetEntryCollected sub_08212F34
 
 extern u8 *gUnk_02000710;
 

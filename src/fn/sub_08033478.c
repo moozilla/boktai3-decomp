@@ -26,23 +26,23 @@ extern const u8 gUnk_086056D0[];
 void TextWindow_BlankRect(int, int, int, int);
 void sub_08218ED8(int, int, int, int);
 void TextState_SetBounds(struct TextState *, int, int, int, int);
-void sub_08032C80(struct TextState *, int, int, int, int);
+void TextState_Init(struct TextState *, int, int, int, int);
 void TextState_Reset(struct TextState *);
-const u8 *sub_08032BEC(struct TextState *);
-int sub_08032B24(struct TextState *);
-int sub_08031F58(struct TextState *, int);
-void sub_08032E8C(struct TextState *);
-void sub_08032E98(struct TextState *);
-void sub_08032F78(struct Window *);
-int sub_08033468(void);
-void sub_08032CC8(struct TextState *, int, int);
-int sub_08033478(int index, int value)
+const u8 *TextState_GetActiveStream(struct TextState *);
+int TextState_StepPlayback(struct TextState *);
+int TextState_DrawNarrowGlyph(struct TextState *, int);
+void TextState_ClearSelectedChoices(struct TextState *);
+void TextState_RunSelectedProcedures(struct TextState *);
+void ScrollingDialogue_UpdatePlayback(struct Window *);
+int ScrollingDialogue_ClearScript(void);
+void TextState_SetNumber(struct TextState *, int, int);
+int ScrollingDialogue_SetNumberArgument(int index, int value)
 {
     struct Window *p = gUnk_020000E0;
     int result;
     if (!p)
         goto fail;
-    sub_08032CC8(&p->text, index, value);
+    TextState_SetNumber(&p->text, index, value);
     result = 0;
     goto done;
 fail:

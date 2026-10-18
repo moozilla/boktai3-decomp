@@ -3,7 +3,7 @@
 void Anim_Remove(u8 *);
 void Effect_Remove(u8 *);
 
-s32 sub_0815FFB8(u8 *p)
+s32 PlayerBurst_Destroy(u8 *p)
 {
     u8 *q;
     s32 i;

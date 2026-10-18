@@ -10,10 +10,10 @@ struct Buffer {
     s16 values[64];
 };
 extern s32 gUnk_03001680;
-struct Buffer *sub_0821A2DC(void);
-void sub_0821A340(struct Message *message)
+struct Buffer *MessageQueue_GetBuffers(void);
+void MessageQueue_PostMessage(struct Message *message)
 {
-    struct Buffer *buffer = sub_0821A2DC() + gUnk_03001680;
+    struct Buffer *buffer = MessageQueue_GetBuffers() + gUnk_03001680;
     struct Message *p = buffer->entries;
     s32 insert = buffer->count;
     s32 i;

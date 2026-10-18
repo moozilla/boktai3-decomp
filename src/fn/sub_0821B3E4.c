@@ -3,8 +3,8 @@ extern u8 *gUnk_02000710;
 extern u8 *gUnk_02000700;
 extern u8 *gUnk_02000708;
 u8 *Script_DecodeOperand(u8 *, s32 *, s32 *);
-void sub_0821B34C(u8 *, u32, s32, s32);
-u8 *sub_0821B3E4(u8 *p, s32 value)
+void Script_WriteTypedVariable(u8 *, u32, s32, s32);
+u8 *Script_AssignVariableOperand(u8 *p, s32 value)
 {
     s32 ignored, first, index;
     u32 descriptor = (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
@@ -23,6 +23,6 @@ u8 *sub_0821B3E4(u8 *p, s32 value)
         index = 0;
         end = p + 4;
     }
-    sub_0821B34C(base, descriptor, index, value);
+    Script_WriteTypedVariable(base, descriptor, index, value);
     return end;
 }

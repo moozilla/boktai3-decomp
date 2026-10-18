@@ -4,7 +4,7 @@ void SceneInventory_RefreshItemValue(struct SceneInventoryActionView *panel)
     struct SceneInputPosition position;
     s32 kind, value, label;
     if (panel->selection <= 15) {
-        kind = sub_0822CDA8(panel->selection);
+        kind = Inventory_GetItemId(panel->selection);
         if (kind < 0)
             goto hidden;
         value = SceneItemValue_CalculateItem(panel->selection);

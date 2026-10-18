@@ -1,9 +1,9 @@
 #include "global.h"
-void sub_081BC664(void);
-void sub_081BC694(void *, void (*)(void));
+void DarkLoan_HideSprites(void);
+void DarkLoan_SetState(void *, void (*)(void));
 void sub_081BCB14(void);
-void sub_081BCAF8(void *p)
+void DarkLoan_HideDisplay(void *p)
 {
-    sub_081BC664();
-    sub_081BC694(p, sub_081BCB14);
+    DarkLoan_HideSprites();
+    DarkLoan_SetState(p, sub_081BCB14);
 }

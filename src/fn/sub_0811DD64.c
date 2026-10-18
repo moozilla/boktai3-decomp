@@ -1,7 +1,7 @@
 #include "global.h"
 s32 Script_GetKeywordValue(u32, s32);
 void sub_0811DCC4(s32, s32);
-void sub_0811DD64(void)
+void GameFlag_SetFromScript(void)
 {
     s32 m = -1;
     s32 a = Script_GetKeywordValue(0x6b, m);

@@ -4,7 +4,7 @@ struct S {
     u16 x;
 };
 extern struct S *gUnk_02000580;
-void sub_0815A6F4(void)
+void Player_InitField42C(void)
 {
     struct S *s = gUnk_02000580;
     if (s)

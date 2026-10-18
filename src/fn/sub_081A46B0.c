@@ -8,7 +8,7 @@ struct E {
 };
 extern const u32 gUnk_08611F40[];
 void sub_0824923C(void *, u32);
-void sub_081A46B0(u8 *p)
+void Hresvelgr_UpdateEffects(u8 *p)
 {
     void *q = p + 0x5c;
     const u32 *t = gUnk_08611F40;

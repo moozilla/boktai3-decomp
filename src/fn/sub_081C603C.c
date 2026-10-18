@@ -16,15 +16,15 @@ struct T {
 };
 extern u16 gUnk_03005260[];
 void Sound_PlaySong(u32);
-void sub_081C5EF0(void *, void (*)(void *));
-void sub_081C61A0(void *);
-void sub_081C603C(struct T *p)
+void ChallengeResult_SetState(void *, void (*)(void *));
+void TimeResult_UpdateInput(void *);
+void TimeResult_UpdateResultHold(struct T *p)
 {
     p->cnt++;
     if (p->cnt > 0x3c || (gUnk_03005260[1] & 1) != 0) {
         Sound_PlaySong(0x167);
         if ((u32)(p->st - 1) <= 4)
             p->fl &= ~1;
-        sub_081C5EF0(p, sub_081C61A0);
+        ChallengeResult_SetState(p, TimeResult_UpdateInput);
     }
 }

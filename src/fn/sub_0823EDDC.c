@@ -5,9 +5,9 @@
 struct PairED {
     u32 a, b;
 };
-u32 sub_0823D7D4(u8 *);
+u32 Player_GetConfiguredActionPower(u8 *);
 void AnimData_SelectPaletteBank(u8 *, u32);
-void sub_0821FF58(u8 *, u32, u32, u32, u32, u32);
+void Collider_SetAttackProperties(u8 *, u32, u32, u32, u32, u32);
 void sub_0823EDDC(u8 *p)
 {
     u32 resource, zero;
@@ -23,9 +23,9 @@ void sub_0823EDDC(u8 *p)
         angle = p + 0xbfc;
         *angle = direction;
     }
-    resource = sub_0823D7D4(p);
+    resource = Player_GetConfiguredActionPower(p);
     AnimData_SelectPaletteBank(p + 0xb70, 76);
-    sub_0821FF58(p + 0xb8c, resource, *(u16 *)(p + 0xbfc), 0x2000, zero, *(u16 *)(p + 0xbfe));
+    Collider_SetAttackProperties(p + 0xb8c, resource, *(u16 *)(p + 0xbfc), 0x2000, zero, *(u16 *)(p + 0xbfe));
     p[0xbce] = *angle;
     *(u16 *)(p + 0xc0a) = zero;
 }

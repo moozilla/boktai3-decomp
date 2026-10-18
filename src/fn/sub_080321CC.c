@@ -4,8 +4,8 @@ struct Vm {
     u8 pad[0x1C];
     const u8 *pc;
 };
-u16 sub_08032070(const u8 *);
-int sub_080321CC(struct Vm *p)
+u16 Text_DecodeGlyphEscape(const u8 *);
+int TextState_MeasureTextColumns(struct Vm *p)
 {
     const u8 *s = p->pc;
     int n = 0;
@@ -24,7 +24,7 @@ loop:
         goto next;
     }
     if (c == 0x1F) {
-        u32 code = (u16)sub_08032070(s);
+        u32 code = (u16)Text_DecodeGlyphEscape(s);
         if (code != 0xFFFF) {
             {
                 u32 mask = 0xFF;

@@ -1,4 +1,6 @@
 #include "global.h"
+/* Ivy_EnterDisabledState: Consumes the entry flag and switches drawable and collision flags to directional animation 20; disabled role tentative */
+#define Ivy_EnterDisabledState sub_080ED484
 
 void SceneActorAnimation_SelectDirectionalFlags(u8 *, u32);
 

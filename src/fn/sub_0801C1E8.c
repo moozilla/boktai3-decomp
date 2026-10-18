@@ -6,7 +6,7 @@ typedef struct {
     u8 command, count;
     u16 args[1];
 } Packet;
-void sub_08020DD0(void *);
+void SceneMessages_Send(void *);
 int ResultMenu_SendCommand(u8 *p, int command, int count, u16 *args)
 {
     Packet *packet = (Packet *)(p + 0x7b0);
@@ -26,6 +26,6 @@ int ResultMenu_SendCommand(u8 *p, int command, int count, u16 *args)
             *out++ = *src++;
         } while (--n);
     }
-    sub_08020DD0(packet);
+    SceneMessages_Send(packet);
     return 0;
 }

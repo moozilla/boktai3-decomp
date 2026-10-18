@@ -4,7 +4,7 @@ struct G {
     u32 w1c;
 };
 extern struct G *gUnk_020005E8;
-u32 sub_081FC66C(void)
+u32 SceneProjectile_ConsumeHitEvent(void)
 {
     struct G *g = gUnk_020005E8;
     u32 r;

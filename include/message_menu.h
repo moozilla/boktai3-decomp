@@ -24,14 +24,14 @@ struct MessageMenu {
 };
 
 int sub_08033690(int, int, int, int);
-void sub_08033A38(int, int, void *);
-void sub_080337FC(int);
-void sub_08033778(int);
+void TextWindow_SetString(int, int, void *);
+void TextWindow_StartPlayback(int);
+void TextWindow_Destroy(int);
 void Bg_SetupLayers(int, int, void *, int, int, int, void *);
 void sub_0821983C(void *, void *, int, int, int, int, int, void *);
 void EncodedRecord_EncodeFields(void *);
 void EncodedRecord_FormatRows(void *, void *, void *, int);
-void *sub_08227E90(void);
+void *Script_GetTextSourcePc(void);
 extern u16 gUnk_03004FC0[];
 extern u16 gUnk_030051A0[];
 extern u16 gUnk_03005260[];

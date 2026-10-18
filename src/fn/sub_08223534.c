@@ -13,8 +13,8 @@ struct S {
 };
 extern struct S gUnk_03005390;
 u32 rfu_REQBN_softReset_and_checkID(void);
-void sub_08224C84(void);
-u32 sub_08223534(void)
+void RfuManager_CompletePendingMscCycle(void);
+u32 RfuManager_ResetAndCheckAdapter(void)
 {
     u32 r = rfu_REQBN_softReset_and_checkID();
     struct S *s;
@@ -32,6 +32,6 @@ u32 sub_08223534(void)
     s->f1 = 0;
     s->f0 = 0;
     s->f6 = 0xff;
-    sub_08224C84();
+    RfuManager_CompletePendingMscCycle();
     return r;
 }

@@ -9,7 +9,7 @@ struct S {
 };
 void Script_Call(void *, u32);
 void Task_Kill(void *);
-void sub_081C09F8(struct S *p)
+void SceneActorSequence_UpdateCompletionDelay(struct S *p)
 {
     p->n = p->n + 1;
     if (p->n > 0x3f && p->b != 0) {

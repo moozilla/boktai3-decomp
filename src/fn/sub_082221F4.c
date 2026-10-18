@@ -12,7 +12,7 @@ struct Q {
 };
 u8 Math_Atan2(s32, s32);
 u32 Sqrt(u32);
-void sub_082221F4(struct Q *q, struct P *pt, u8 *a, u16 *b)
+void Math_GetTargetAngleAndDistance(struct Q *q, struct P *pt, u8 *a, u16 *b)
 {
     s32 dx = pt->x - q->x;
     s32 dy = pt->y - q->y;

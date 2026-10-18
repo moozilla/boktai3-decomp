@@ -7,7 +7,7 @@ struct VM {
     u32 *sp;
 };
 extern struct VM gUnk_02000610;
-u32 sub_0821A8DC(s32 n)
+u32 Script_GetCallArgument(s32 n)
 {
     if (!n)
         return gUnk_02000610.f4;

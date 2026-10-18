@@ -6,20 +6,20 @@ extern u32 gUnk_03003A04, gUnk_03003A08, gUnk_03004260;
 extern u16 gUnk_03004BD8;
 extern u8 gUnk_03004390[];
 void Bg_UpdateScrollShadow(void);
-void sub_08213F80(void);
+void InterruptsAndVideo_WaitForVBlank(void);
 void sub_082192F0(void);
-void sub_082173A8(void);
+void Palette_UploadBuffers(void);
 void sub_0821537C(void);
-void sub_08218B34(void);
+void Text_FlushTileUploads(void);
 void sub_08215964(void);
 void TileAnimation_Upload(void);
 void sub_08219134(void);
-u32 sub_082141C0(void)
+u32 InterruptsAndVideo_OnVideoUploadTask(void)
 {
     u32 *flags;
     vu16 *disp;
     Bg_UpdateScrollShadow();
-    sub_08213F80();
+    InterruptsAndVideo_WaitForVBlank();
     sub_082192F0();
     flags = &gUnk_03003A04;
     if (*flags & 1) {
@@ -30,9 +30,9 @@ u32 sub_082141C0(void)
         (void)dma->control;
         *flags &= ~1;
     }
-    sub_082173A8();
+    Palette_UploadBuffers();
     sub_0821537C();
-    sub_08218B34();
+    Text_FlushTileUploads();
     sub_08215964();
     TileAnimation_Upload();
     disp = (vu16 *)0x04000000;

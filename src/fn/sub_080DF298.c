@@ -12,7 +12,7 @@ struct S {
     struct T *t;
 };
 
-s32 sub_080DF298(struct S *s)
+s32 Dog_IsActionTimerExpired(struct S *s)
 {
     struct T *t = s->t;
     u16 v;

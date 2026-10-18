@@ -5,7 +5,7 @@ struct P {
     u8 g[8];
     s32 b;
 };
-void sub_08195140(struct P *p)
+void Nidhoggr_UpdateHorizontalSway(struct P *p)
 {
     s32 *a = &p->a;
     s32 *b = &p->b;

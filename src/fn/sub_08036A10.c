@@ -40,7 +40,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-int sub_08036A10(void)
+int Wireless_GetConnectedParentSlot(void)
 {
     struct Engine *p = gUnk_02000484;
     if (!p)

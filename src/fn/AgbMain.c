@@ -9,20 +9,20 @@ void Clock_ClearState(void);
 void Clock_CheckRtcDate(void);
 void m4aSoundInit(void);
 void InterruptsAndVideo_Initialize(void);
-void sub_082485EC(u32);
-void sub_08224EEC(void);
+void Eeprom_SetCapacity(u32);
+void SceneLifecycle_InitFrameCounterPointer(void);
 void GameState_SelectRamBase(void);
 void TaskSystem_Initialize(void);
-void sub_08213DCC(void);
-void sub_0821BAFC(void);
-void sub_08215118(void);
+void InterruptsAndVideo_InitRuntime(void);
+void Terrain_Init(void);
+void AnimData_InitPalettePool(void);
 void *ScriptProc_Start(u32, u32);
 void sub_08215148(void *);
-void sub_082151C0(void *);
-void sub_082229E8(void);
+void AnimData_SetResourceBank(void *);
+void Serial_InitMultiplayer(void);
 void Time_CalculateSunriseSunset(s32, s32, s32);
-void sub_0821B048(void);
-void sub_08225328(void);
+void Script_InitRuntime(void);
+void SceneLifecycle_InitManager(void);
 void TaskSystem_RunFrame(void);
 extern u8 _08000350[], AgbMain__addr[], gUnk_03000000[];
 void AgbMain(void)
@@ -60,15 +60,15 @@ void AgbMain(void)
     InterruptsAndVideo_Initialize();
     CpuSet(_08000350, gUnk_03000000,
            (((s32)(AgbMain__addr - _08000350) / 4) & 0x1fffff) | 0x04000000);
-    sub_082485EC(64);
-    sub_08224EEC();
+    Eeprom_SetCapacity(64);
+    SceneLifecycle_InitFrameCounterPointer();
     GameState_SelectRamBase();
     TaskSystem_Initialize();
-    sub_08213DCC();
-    sub_0821BAFC();
-    sub_08215118();
+    InterruptsAndVideo_InitRuntime();
+    Terrain_Init();
+    AnimData_InitPalettePool();
     sub_08215148(ScriptProc_Start(0xceaa, 0x3002));
-    sub_082151C0(ScriptProc_Start(0x98f5, 0xff54));
+    AnimData_SetResourceBank(ScriptProc_Start(0x98f5, 0xff54));
     {
         vu16 *ime = (vu16 *)0x04000208;
         vu16 *ie;
@@ -80,10 +80,10 @@ void AgbMain(void)
         *ie = 4 | flags;
         *ime = 1;
     }
-    sub_082229E8();
+    Serial_InitMultiplayer();
     Time_CalculateSunriseSunset(0x23a666, 0x8bc000, 0);
-    sub_0821B048();
-    sub_08225328();
+    Script_InitRuntime();
+    SceneLifecycle_InitManager();
     for (;;)
         TaskSystem_RunFrame();
 }

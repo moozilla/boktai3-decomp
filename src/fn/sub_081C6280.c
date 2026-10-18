@@ -2,7 +2,7 @@
 
 u32 ScriptProc_Start(u32, u32);
 
-void sub_081C6280(u8 *p)
+void TimeResult_LoadPalette(u8 *p)
 {
     u32 r = ScriptProc_Start(0x92B3, 0x204);
     p += 0x360;

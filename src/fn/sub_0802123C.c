@@ -12,17 +12,17 @@ typedef struct {
 extern u8 *gUnk_0200047C;
 extern u32 gUnk_030051C8;
 
-void sub_08020D54(void *, void *);
+void SceneMessages_SetPendingTrigger(void *, void *);
 void Trigger_ConsumePending(void *, s32);
 void SceneCommands_CreateEffect(void *, void *, void *);
-void sub_08020F6C(void *, void *, void *);
-void sub_08020FE4(void *, void *, void *);
+void SceneCommands_ClearEffect(void *, void *, void *);
+void SceneCommands_CreateOrbitingParticles(void *, void *, void *);
 void SceneCommands_Fade(void *, void *, void *);
 void SceneCommands_FadePalette(void *, void *, void *);
 void SceneCommands_BlendPalette(void *, void *, void *);
-void sub_080211B0(void *, void *, void *);
-void sub_080211C0(void *, void *, void *);
-void sub_080211C8(void *, void *, void *);
+void SceneCommands_SetPosition(void *, void *, void *);
+void SceneCommands_ClearPosition(void *, void *, void *);
+void SceneCommands_ConfigureBlendWindow(void *, void *, void *);
 
 s32 SceneCommands_Dispatch(u8 *p)
 {
@@ -35,18 +35,18 @@ s32 SceneCommands_Dispatch(u8 *p)
             u8 *message;
             u8 *controller = gUnk_0200047C;
             message = entry->messages[controller[0x24]][i];
-            sub_08020D54(entry, message);
+            SceneMessages_SetPendingTrigger(entry, message);
             switch (message[6]) {
                 case 0:
                     SceneCommands_CreateEffect(p, entry, message);
                     Trigger_ConsumePending(entry, 1);
                     break;
                 case 1:
-                    sub_08020F6C(p, entry, message);
+                    SceneCommands_ClearEffect(p, entry, message);
                     Trigger_ConsumePending(entry, 1);
                     break;
                 case 2:
-                    sub_08020FE4(p, entry, message);
+                    SceneCommands_CreateOrbitingParticles(p, entry, message);
                     Trigger_ConsumePending(entry, 1);
                     break;
                 case 3:
@@ -62,15 +62,15 @@ s32 SceneCommands_Dispatch(u8 *p)
                     Trigger_ConsumePending(entry, 1);
                     break;
                 case 6:
-                    sub_080211B0(p, entry, message);
+                    SceneCommands_SetPosition(p, entry, message);
                     Trigger_ConsumePending(entry, 1);
                     break;
                 case 7:
-                    sub_080211C0(p, entry, message);
+                    SceneCommands_ClearPosition(p, entry, message);
                     Trigger_ConsumePending(entry, 1);
                     break;
                 case 8:
-                    sub_080211C8(p, entry, message);
+                    SceneCommands_ConfigureBlendWindow(p, entry, message);
                     Trigger_ConsumePending(entry, 1);
                     break;
                 case 9:

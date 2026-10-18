@@ -39,11 +39,11 @@ struct Owner {
 };
 extern const u16 gUnk_0824DE7C[], gUnk_0824DE8C[];
 void Anim_LoadKeyframe(void *, void *, int, int);
-void sub_08039920(void *, int, int);
+void WirelessGameItem_SetRandomArcVelocity(void *, int, int);
 void sub_082216F8(void *, void *, void *, int, int);
-void sub_08039998(void *, int, int);
-void sub_08039968(void *, int, int);
-void sub_08039DE4(struct Owner *owner, struct Item *p, int index)
+void WirelessGameItems_ApplyMotionWave(void *, int, int);
+void WirelessGameItem_SetRandomNegativeArcVelocity(void *, int, int);
+void WirelessGameItems_UpdateOutgoingItem(struct Owner *owner, struct Item *p, int index)
 {
     struct Sprite *sprite = &p->sprite;
     struct Drawing *drawing;
@@ -83,7 +83,7 @@ void sub_08039DE4(struct Owner *owner, struct Item *p, int index)
         }
         vector->y = 32;
         vector->z = zero;
-        sub_08039968(p, 32, 15);
+        WirelessGameItem_SetRandomNegativeArcVelocity(p, 32, 15);
     }
     p->sprite.value = p->count;
     p->sprite.flags &= ~1;
@@ -100,7 +100,7 @@ void sub_08039DE4(struct Owner *owner, struct Item *p, int index)
     {
         void *position = &drawing->x;
         sub_082216F8(position, &p->start, &p->end, p->timer, 5);
-        sub_08039998(position, p->timer, p->velocity);
+        WirelessGameItems_ApplyMotionWave(position, p->timer, p->velocity);
     }
     {
         register struct Drawing *source asm("r2") = drawing;

@@ -66,9 +66,8 @@ void Scene_SpawnEdgeParticles(struct SceneVec *position, s32 offset)
     }
 }
 
-/* Tentative: test whether a neighboring terrain cell accepts an object. */
 
-u8 *sub_0821D64C(s32, s32);
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
 u8 Scene_CanEnterNeighborCell(struct SceneObject *object, s32 index, s32 direction)
 {
@@ -91,7 +90,7 @@ u8 Scene_CanEnterNeighborCell(struct SceneObject *object, s32 index, s32 directi
             break;
     }
     neighbor = index + delta;
-    dynamic = sub_0821D64C(neighbor, 1);
+    dynamic = TerrainModifiers_FindCellOverride(neighbor, 1);
     if (dynamic)
         cell = (struct SceneCell *)(dynamic + 4);
     else
@@ -112,7 +111,7 @@ success:
     return 1;
 }
 
-void sub_0800435C(u32 type)
+void Scene_PlayNeighborStepSound(u32 type)
 {
     if (type == 5) {
         Sound_PlaySong(0x151);
@@ -121,7 +120,6 @@ void sub_0800435C(u32 type)
     }
 }
 
-/* Tentative: test whether a neighboring terrain cell is at least as tall as the object. */
 
 u8 Scene_CheckNeighborHeight(struct SceneObject *object, s32 index, s32 direction)
 {
@@ -144,7 +142,7 @@ u8 Scene_CheckNeighborHeight(struct SceneObject *object, s32 index, s32 directio
             break;
     }
     neighbor = index + delta;
-    dynamic = sub_0821D64C(neighbor, 1);
+    dynamic = TerrainModifiers_FindCellOverride(neighbor, 1);
     if (dynamic)
         cell = (struct SceneCell *)(dynamic + 4);
     else
@@ -153,14 +151,14 @@ u8 Scene_CheckNeighborHeight(struct SceneObject *object, s32 index, s32 directio
         if ((u32)(cell->height & 15) >= (u32)(*reference & 15))
             return 1;
         if (object->type == 5)
-            sub_0800435C(object->type);
+            Scene_PlayNeighborStepSound(object->type);
     }
     return 0;
 }
 
 /* Count how many of the four neighbors accept the object; more than two means it is boxed in. */
 
-u8 sub_0800441C(struct SceneObject *object)
+u8 Scene_IsObjectSurrounded(struct SceneObject *object)
 {
     s32 c = 0;
     s32 i = 0;
@@ -194,7 +192,7 @@ void Scene_PlayMovementEffect(struct SceneObject *object)
             Sound_PlaySong(0x143);
             break;
     }
-    if (sub_0800441C(object))
+    if (Scene_IsObjectSurrounded(object))
         AnimatedParticles_EmitDirectional(4, 1, 1, 0x40, 0, 255, 2, 4, 6, 6, &object->center);
     else
         Scene_SpawnEdgeParticles(&object->body.position, 0x90);
@@ -226,13 +224,13 @@ void Scene_PlayNeighborMovementEffect(struct SceneObject *object)
                 break;
         }
         AnimatedParticles_EmitDirectional(2, 1, 1, 0x40, angle, 31, 2, 4, 6, 6, &position);
-        sub_0800435C(object->type);
+        Scene_PlayNeighborStepSound(object->type);
     }
 }
 
 /* Play the sound for pushing an object of this type. */
 
-void sub_080045B0(s32 type)
+void SceneObjects_PlayPushSound(s32 type)
 {
     switch (type) {
         case 0:
@@ -251,7 +249,6 @@ void sub_080045B0(s32 type)
     }
 }
 
-/* Tentative: apply a terrain-triggered resource cost and feedback. */
 
 void AnimatedParticles_EmitBurst(struct SceneVec *, s32, s32, s32, s32, s32, s32, s32);
 
@@ -326,7 +323,7 @@ void Scene_ApplyTerrainInteraction(struct SceneCollider *contact, void *unused,
     }
 }
 
-void sub_080046EC(void)
+void SceneObjects_NoOpUpdate(void)
 {
 }
 
@@ -374,28 +371,28 @@ void Scene_DropObjectsAbove(struct SceneObject *object)
     }
 }
 
-void sub_0821D6D0(void *);
+void TerrainModifiers_UnregisterCell(void *);
 
-void sub_08003C10(void *);
+void TerrainOverlay_QueueRemoveActor(void *);
 
-void sub_08225938(void *);
+void SceneBody_Unregister(void *);
 
 /* Release everything an object holds (draw, cell reference, collider, body) and free its slot. */
 
-u32 sub_080047AC(struct SceneObject *object)
+u32 SceneObjects_DestroyObject(struct SceneObject *object)
 {
     Sprite_Remove(&object->draw);
-    sub_0821D6D0(&object->cellRef);
+    TerrainModifiers_UnregisterCell(&object->cellRef);
     Collider_Remove(&object->collider);
     if ((object->flags & 2) == 0)
-        sub_08003C10(&object->body);
-    sub_08225938(&object->body);
+        TerrainOverlay_QueueRemoveActor(&object->body);
+    SceneBody_Unregister(&object->body);
     return object->active = 0;
 }
 
 /* Free every active object. */
 
-s32 sub_080047EC(void)
+s32 SceneObjects_DestroyAllObjects(void)
 {
     struct SceneObjectManager *manager = gUnk_02000024;
     struct SceneObject *object;
@@ -405,7 +402,7 @@ s32 sub_080047EC(void)
     object = manager->objects;
     for (i = 0; i < manager->count; i++) {
         if (object->active != 0)
-            sub_080047AC(object);
+            SceneObjects_DestroyObject(object);
         object = object + 1;
     }
     return 0;
@@ -469,7 +466,7 @@ s32 Scene_StopSelectedObject(void)
 
 /* Free every active object whose script id matches the selected one. */
 
-s32 sub_080048F4(void)
+s32 SceneObjects_DestroyObjectsByScriptId(void)
 {
     struct SceneObjectManager *manager = gUnk_02000024;
     u32 id;
@@ -481,7 +478,7 @@ s32 sub_080048F4(void)
     object = manager->objects;
     for (i = 0; i < manager->count; object++, i++) {
         if (object->active != 0 && object->body.id == id)
-            sub_080047AC(object);
+            SceneObjects_DestroyObject(object);
     }
     return 0;
 }
@@ -515,7 +512,7 @@ void Scene_PlayObjectBreakEffect(struct SceneObject *p)
     sub_08014634(8, 3, &a, &b, &c, 0x3c, 0x3c);
 }
 
-void sub_08004A34(struct SceneObject *p)
+void Scene_PlayObjectSplashEffect(struct SceneObject *p)
 {
     struct SceneExtent a;
     struct SceneExtent b;
@@ -538,7 +535,7 @@ void sub_08004A34(struct SceneObject *p)
     sub_08014634(8, 2, &a, &b, &c, 0x3c, 0x3c);
 }
 
-void sub_08004AE8(struct SceneObject *object)
+void Scene_PlayObjectImpactEffect(struct SceneObject *object)
 {
     struct SceneVec *p;
     Sound_PlaySong(0x150);
@@ -746,7 +743,7 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
             break;
     }
     index += delta;
-    dynamic = sub_0821D64C(index, 1);
+    dynamic = TerrainModifiers_FindCellOverride(index, 1);
     savedIndex = index;
     if (dynamic)
         cell = (struct SceneCell *)(dynamic + 4);
@@ -859,7 +856,7 @@ static inline s32 cellIndex(struct SceneVec *pos)
 
 static inline struct SceneCell *getCell(s32 index)
 {
-    u8 *dynamic = sub_0821D64C(index, 1);
+    u8 *dynamic = TerrainModifiers_FindCellOverride(index, 1);
     struct SceneCell *cell;
     if (dynamic)
         cell = (struct SceneCell *)(dynamic + 4);
@@ -914,7 +911,7 @@ s32 SceneObjects_TryPushNeighbor(struct SceneVec *position, s32 direction)
             break;
         result = Scene_TryStepDown(p, p->cellRef.index, direction);
         if (result > 0) {
-            sub_080045B0(p->type);
+            SceneObjects_PlayPushSound(p->type);
             if (p->type == 1)
                 result = -1;
             if (p->pushesLeft)
@@ -929,14 +926,14 @@ extern const u8 gUnk_086049AC[];
 
 /* Try pushing the neighbor in the direction named by table entry `index`. */
 
-s32 sub_08005098(struct SceneVec *position, u32 index)
+s32 SceneObjects_TryPushNeighborByIndex(struct SceneVec *position, u32 index)
 {
     return SceneObjects_TryPushNeighbor(position, gUnk_086049AC[index]);
 }
 
 /* Idle state: wait until health runs out, then disappear (type 1) or get removed. */
 
-void sub_080050AC(struct SceneObject *p)
+void Scene_UpdateObjectIdle(struct SceneObject *p)
 {
     u8 t = p->type;
     if (t == 1) {
@@ -995,7 +992,7 @@ void Scene_UpdateObjectStep(struct SceneObject *p)
             } else if (!Scene_TryStepDown(p, p->cellRef.index, p->direction)) {
                 Scene_PlayNeighborMovementEffect(p);
                 {
-                    register void (*callback)(struct SceneObject *) asm("r1") = sub_080050AC;
+                    register void (*callback)(struct SceneObject *) asm("r1") = Scene_UpdateObjectIdle;
                     p->update = callback;
                 }
                 p->timer = 0;
@@ -1019,7 +1016,7 @@ void Scene_UpdateObjectStep(struct SceneObject *p)
             } else {
                 Scene_PlayNeighborMovementEffect(p);
                 {
-                    register void (*callback)(struct SceneObject *) asm("r1") = sub_080050AC;
+                    register void (*callback)(struct SceneObject *) asm("r1") = Scene_UpdateObjectIdle;
                     p->update = callback;
                 }
                 p->timer = 0;
@@ -1069,7 +1066,7 @@ void Scene_UpdateFallingObject(struct SceneObject *p)
             Scene_PlayMovementEffect(p);
         }
         {
-            register void (*callback)(struct SceneObject *) asm("r1") = sub_080050AC;
+            register void (*callback)(struct SceneObject *) asm("r1") = Scene_UpdateObjectIdle;
             p->update = callback;
         }
         p->timer = 0;
@@ -1152,7 +1149,7 @@ void Scene_UpdateObjectFlash(struct SceneObject *p)
             setMode(&p->draw, p->phase);
         }
     } else {
-        register void (*callback)(struct SceneObject *) asm("r0") = sub_080050AC;
+        register void (*callback)(struct SceneObject *) asm("r0") = Scene_UpdateObjectIdle;
         p->update = callback;
         p->timer = 0;
         p->entered = 1;
@@ -1209,7 +1206,7 @@ s32 SceneObjects_Update(struct SceneObjectManager *manager)
                 p->script = 0;
             }
             Scene_DropObjectsAbove(p);
-            sub_080047AC(p);
+            SceneObjects_DestroyObject(p);
             continue;
         }
         sub_08225B74(&p->body);
@@ -1264,16 +1261,16 @@ s32 SceneObjects_Update(struct SceneObjectManager *manager)
 
 /* Task teardown: free all objects, release the pool and clear the global manager. */
 
-u32 sub_080056D0(struct SceneObjectManager *manager)
+u32 SceneObjects_DestroyTask(struct SceneObjectManager *manager)
 {
-    sub_080047EC();
+    SceneObjects_DestroyAllObjects();
     Heap_Free((u32)manager->objects);
     return (u32)(gUnk_02000024 = 0);
 }
 
 /* Allocate the object pool (default 8 objects) and initialize the palette-fade state. */
 
-s32 sub_080056F0(struct SceneObjectManager *p, void *unused)
+s32 SceneObjects_InitPool(struct SceneObjectManager *p, void *unused)
 {
     void *m;
     u8 *b;
@@ -1301,16 +1298,16 @@ s32 sub_080056F0(struct SceneObjectManager *p, void *unused)
 
 /* Create the scene-object task (or return the existing one). */
 
-struct SceneObjectManager *sub_08005778(void *a)
+struct SceneObjectManager *SceneObjects_CreateTask(void *a)
 {
     struct SceneObjectManager *p;
     if (gUnk_02000024 != 0)
         return gUnk_02000024;
     p = Task_Create(8, 0x74);
     if (p != 0) {
-        Task_SetCallbacks(p, (void (*)(void))SceneObjects_Update, (void (*)(void))sub_080056D0);
+        Task_SetCallbacks(p, (void (*)(void))SceneObjects_Update, (void (*)(void))SceneObjects_DestroyTask);
         p->count = Script_GetKeywordValue(0x6d, 8);
-        if (sub_080056F0(p, a) < 0) {
+        if (SceneObjects_InitPool(p, a) < 0) {
             Task_Kill(p);
             return 0;
         }
@@ -1320,7 +1317,7 @@ struct SceneObjectManager *sub_08005778(void *a)
 
 /* Find a free object slot, or NULL. */
 
-struct SceneObject *sub_080057D0(struct SceneObjectManager *manager)
+struct SceneObject *SceneObjects_FindFreeSlot(struct SceneObjectManager *manager)
 {
     struct SceneObject *e = manager->objects;
     s32 i;
@@ -1333,7 +1330,7 @@ struct SceneObject *sub_080057D0(struct SceneObjectManager *manager)
 
 /* Find the active object with the given script id, or NULL. */
 
-struct SceneObject *sub_080057FC(struct SceneObjectManager *manager, u32 id)
+struct SceneObject *SceneObjects_FindByScriptId(struct SceneObjectManager *manager, u32 id)
 {
     struct SceneObject *e = manager->objects;
     s32 i;
@@ -1344,21 +1341,21 @@ struct SceneObject *sub_080057FC(struct SceneObjectManager *manager, u32 id)
     return 0;
 }
 
-void sub_08225AB4(struct SceneBody *, u32, struct SceneVec *, s32, s32, struct SceneObject *);
+void SceneBody_Init(struct SceneBody *, u32, struct SceneVec *, s32, s32, struct SceneObject *);
 
-void sub_08225B28(struct SceneBody *, struct SceneDraw *);
+void SceneBody_SetSprite(struct SceneBody *, struct SceneDraw *);
 
 u32 Region_FindContaining(struct SceneVec *);
 
-u32 sub_0821D698(void *, u32, u32, u32, u32, u32);
+u32 TerrainModifiers_RegisterCell(void *, u32, u32, u32, u32, u32);
 
-void sub_0821FF50(struct SceneCollider *, s32, s32);
+void Collider_SetAttackPowerAndForce(struct SceneCollider *, s32, s32);
 
-s32 sub_08003C00(struct SceneBody *);
+s32 TerrainOverlay_QueueAddActor(struct SceneBody *);
 
 static inline void initializeCell(void *cell, s32 index, s32 height)
 {
-    sub_0821D698(cell, index, 0, height, 255, ({
+    TerrainModifiers_RegisterCell(cell, index, 0, height, 255, ({
                      register s32 zero asm("r2") = 0;
                      zero;
                  }));
@@ -1389,7 +1386,7 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     u32 clear;
     u8 *dynamic;
     struct SceneCell *cell;
-    if (!manager || !(p = sub_080057D0(manager)))
+    if (!manager || !(p = SceneObjects_FindFreeSlot(manager)))
         return -1;
     Memory_Clear(p, 0x1A8);
     p->active = 1;
@@ -1407,8 +1404,8 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     p->center.x = (position->x & ~255) + 128;
     p->center.y = position->y & ~255;
     p->center.z = (position->z & ~255) + 128;
-    sub_08225AB4(&p->body, id, position, 0, 7, p);
-    sub_08225B28(&p->body, draw);
+    SceneBody_Init(&p->body, id, position, 0, 7, p);
+    SceneBody_SetSprite(&p->body, draw);
     p->body.position = p->center;
     if (flags16(p, 16)) {
         p->owner = Region_FindContaining(&p->body.position);
@@ -1429,7 +1426,7 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
         p->timer = 0;
     } else {
         {
-            register void (*callback)(struct SceneObject *) asm("r0") = sub_080050AC;
+            register void (*callback)(struct SceneObject *) asm("r0") = Scene_UpdateObjectIdle;
             asm("" : "+r"(callback));
             p->update = callback;
         }
@@ -1447,7 +1444,7 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
         index = 0;
     else
         index = gUnk_030052F4->rows[z] + x;
-    dynamic = sub_0821D64C(index, 1);
+    dynamic = TerrainModifiers_FindCellOverride(index, 1);
     if (dynamic)
         cell = (struct SceneCell *)(dynamic + 4);
     else
@@ -1481,8 +1478,8 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     ((u16 *)&size)[2] = 128;
     Collider_Init(&p->stepCollider, p->body.id, 0x2801, 0, 1, &size, &offset);
     Collider_SetPosition(&p->stepCollider, pos, 0);
-    Collider_SetCallback(&p->stepCollider, sub_080046EC, p);
-    sub_0821FF50(&p->stepCollider, 1500, 50);
+    Collider_SetCallback(&p->stepCollider, SceneObjects_NoOpUpdate, p);
+    Collider_SetAttackPowerAndForce(&p->stepCollider, 1500, 50);
     setStepFlags(&p->stepCollider);
     p->health = health;
     p->damageTimer = clear;
@@ -1514,7 +1511,7 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     p->link.id = p->body.id;
     p->link.position = pos;
     p->script = script;
-    if (!(p->flags & 2) && sub_08003C00(&p->body) < 0)
+    if (!(p->flags & 2) && TerrainOverlay_QueueAddActor(&p->body) < 0)
         p->flags |= 2;
     if (p->type == 5) {
         p->pushLimited = 1;
@@ -1599,7 +1596,6 @@ s32 SceneObjects_CreateFromScript(void)
     return 0;
 }
 
-/* Tentative: trigger the type-six object's palette-switch animation. */
 
 s32 SceneObjects_SwitchPaletteFromScript(void)
 {
@@ -1607,7 +1603,7 @@ s32 SceneObjects_SwitchPaletteFromScript(void)
     struct SceneObject *p;
     struct SceneDraw *draw;
     s32 id, mode, sound;
-    if (!manager || !(id = Script_GetKeywordValue('n', 0)) || !(p = sub_080057FC(manager, id)) ||
+    if (!manager || !(id = Script_GetKeywordValue('n', 0)) || !(p = SceneObjects_FindByScriptId(manager, id)) ||
         p->type != 6)
         return -1;
     draw = &p->draw;

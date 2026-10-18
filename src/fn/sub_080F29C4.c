@@ -19,7 +19,7 @@ struct Obj {
 };
 s32 Div(s32, s32);
 void sub_080F2AAC(struct Obj *);
-void sub_080F29C4(struct Obj *p)
+void Ivy_UpdatePositionTransition(struct Obj *p)
 {
     u32 age;
     p->x = p->startX + Div(p->dx * p->timer, 16);

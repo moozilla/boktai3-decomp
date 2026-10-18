@@ -5,11 +5,11 @@ struct Counters {
 };
 extern struct Counters *gUnk_030053F8;
 extern u8 *gUnk_02000710;
-u8 sub_0822BBA8(void);
+u8 Save_ReadHeader(void);
 void Memory_Clear(void *, s32);
-s32 sub_08225448(void)
+s32 GameState_LoadSessionOrInitDefaults(void)
 {
-    u8 result = sub_0822BBA8();
+    u8 result = Save_ReadHeader();
     if (!result) {
         if (gUnk_030053F8)
             Memory_Clear(gUnk_030053F8, 40);

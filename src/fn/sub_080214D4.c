@@ -41,8 +41,8 @@ static inline void setFacing(ActorAnimation *p, int angle)
     p->facing8 = value;
 }
 
-void sub_08225AB4(void *, int, int, int, int, void *);
-void sub_08225B38(void *, void *);
+void SceneBody_Init(void *, int, int, int, int, void *);
+void SceneBody_SetPositionOffset(void *, void *);
 void SceneMessages_RegisterReceiver(void *, int, int);
 int SceneActors_Initialize(u8 *p, int id, int type, int arg, int facingArg)
 {
@@ -55,11 +55,11 @@ int SceneActors_Initialize(u8 *p, int id, int type, int arg, int facingArg)
     int zero = 0;
     asm("" : : "r"(dst), "r"(zero), "r"(facing), "r"(firstId));
     *dst = type;
-    sub_08225AB4(p + 0x48, firstId, arg, (u8)facing, 5, p);
+    SceneBody_Init(p + 0x48, firstId, arg, (u8)facing, 5, p);
     v.x = 0;
     v.y = 256;
     v.z = 0;
-    sub_08225B38(p + 0x48, &v);
+    SceneBody_SetPositionOffset(p + 0x48, &v);
     setFacing((ActorAnimation *)p, facing);
     p[0x114] = facing;
     *(int *)(p + 0x16c) = zero;

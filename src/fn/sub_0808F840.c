@@ -13,7 +13,7 @@ void SceneActorCollision_InitBody(u8 *, struct Z *, struct Z *, void (*)(void), 
 void SceneActorCollision_InitAttack(u8 *, struct Z *, struct Z *, void (*)(void), u32, u8 *);
 void sub_0808E2CC(void);
 void sub_0808E208(void);
-void sub_0808F840(u8 *p)
+void Slime_InitColliders(u8 *p)
 {
     struct Z s1, s2;
     s1.a.lo = 0x40;

@@ -1,9 +1,9 @@
 #include "global.h"
 void Bg_ClearTilemap(s32);
-void sub_08112118(void *);
-u32 sub_0811BB1C(void);
+void StageResults_HideSprites(void *);
+u32 GameState_GetResultIndex(void);
 void Script_Call(u32, void *);
-void sub_081123F0(u8 *s)
+void StageResults_FinishDisplay(u8 *s)
 {
     u32 loc[3];
     u32 *p;
@@ -13,10 +13,10 @@ void sub_081123F0(u8 *s)
     Bg_ClearTilemap(1);
     Bg_ClearTilemap(2);
     Bg_ClearTilemap(3);
-    sub_08112118(s);
+    StageResults_HideSprites(s);
     p = (u32 *)(s + 0x1210);
     if (*p != 0) {
-        loc[0] = sub_0811BB1C();
+        loc[0] = GameState_GetResultIndex();
         m = 0xFFFF0000;
         loc[1] = (loc[1] & m) | 1;
         q = &loc[1];

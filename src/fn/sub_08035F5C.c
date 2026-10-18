@@ -41,8 +41,8 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-void sub_08036BD4(int);
-int sub_08035F5C(struct Engine *p)
+void Wireless_SetStatus(int);
+int Wireless_TryStartParentNiSend(struct Engine *p)
 {
     int flags = p->mask;
     struct RfuLinkStatus **links;
@@ -80,7 +80,7 @@ int sub_08035F5C(struct Engine *p)
     p->mask = (p->mask & 0xFFFE) | 2;
     goto ready;
 sendError:
-    sub_08036BD4(2);
+    Wireless_SetStatus(2);
 failed:
     return 0;
 ready:

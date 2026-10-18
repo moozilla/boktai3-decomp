@@ -49,7 +49,7 @@ typedef union {
 } DIunion;
 extern DItype __fixunssfdi(SFtype a);
 extern DItype __fixunsdfdi(DFtype a);
-DItype sub_0824ACE4(DItype u)
+DItype Libgcc_NegateInt64(DItype u)
 {
     DIunion w;
     DIunion uu;

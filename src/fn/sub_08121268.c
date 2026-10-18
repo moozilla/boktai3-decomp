@@ -26,15 +26,15 @@ struct A8CBObject {
     u32 field8B4;
 };
 extern void *gUnk_0200020C;
-void *sub_08121210(void);
-struct A8CBObject *sub_08120264(void *manager);
+void *RegistryA8CB_EnsureManager(void);
+struct A8CBObject *RegistryA8CB_FindAvailableEntry(void *manager);
 void sub_081200C8(struct A8CBObject *);
 void sub_0811C9F8(struct A8CBObject *, void *, s32);
 void sub_0811C89C(void *, void *, u8);
 void sub_08112BA8(void *);
 void sub_0811FDB4(struct A8CBObject *);
-void sub_081202CC(struct A8CBObject *);
-void sub_0811EDC0(void *, void *, s32, s32);
+void RegistryA8CB_RegisterMessageReceiver(struct A8CBObject *);
+void Modifier_InitDrainState(void *, void *, s32, s32);
 void sub_08120B44(void);
 /* Registry routine A8CB: takes an object from the manager at 0x0200020C
    (created on demand), reads its options (sub_081200C8: -n, -p, -s, -P),
@@ -46,11 +46,11 @@ void RegistryA8CB_CreateFromScript(void)
     void *anim;
     u16 one;
     if (!manager) {
-        manager = sub_08121210();
+        manager = RegistryA8CB_EnsureManager();
         if (!manager)
             return;
     }
-    e = sub_08120264(manager);
+    e = RegistryA8CB_FindAvailableEntry(manager);
     if (!e)
         return;
     Memory_Clear(e->block5BC, 16);
@@ -70,11 +70,11 @@ void RegistryA8CB_CreateFromScript(void)
         e->update = update;
         e->field84C = zero;
     }
-    sub_081202CC(e);
+    RegistryA8CB_RegisterMessageReceiver(e);
     {
         struct DrawFlags *draw = &e->draw;
         draw->flags = one | draw->flags;
     }
-    sub_0811EDC0(e->blockB0, e->block618, 0, 0);
+    Modifier_InitDrainState(e->blockB0, e->block618, 0, 0);
     e->field8B4 = one;
 }

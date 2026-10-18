@@ -16,25 +16,25 @@ struct Object {
     s8 target;
     u8 count, slot;
 };
-void *sub_0802C678(void);
-struct Object *sub_0802CA8C(int);
+void *ActorPool_GetManager(void);
+struct Object *Actor_GetPartyTarget(int);
 int Math_Atan2(int, int);
 struct Manager {
     u8 pad[0x30];
     u32 slot;
 };
-int sub_0802CAAC(struct Object *);
-void sub_0802CB94(struct Object *);
-void sub_0802CC4C(struct Object *p)
+int Actor_FindTargetInFacingArc(struct Object *);
+void Actor_RefreshTarget(struct Object *);
+void Actor_UpdateSelectedTarget(struct Object *p)
 {
-    struct Manager *m = sub_0802C678();
+    struct Manager *m = ActorPool_GetManager();
     int selected = 0;
     if (m->slot == p->slot)
         selected = 1;
     if (selected) {
         if (p->target >= 0)
-            sub_0802CB94(p);
+            Actor_RefreshTarget(p);
         else
-            p->target = sub_0802CAAC(p);
+            p->target = Actor_FindTargetInFacingArc(p);
     }
 }

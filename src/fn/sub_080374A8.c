@@ -9,12 +9,12 @@ struct PeerPanel {
     u8 name[16];
 };
 
-void *sub_08037DCC(int peer);
+void *WirelessExchange_GetPeerEntry(int peer);
 void Memory_Copy(void *destination, const void *source, int size);
-void sub_08036CF0(const u8 *source, u8 *destination, int count);
+void WirelessText_DecodeString(const u8 *source, u8 *destination, int count);
 void TextWindow_Refresh(int window, int style);
 
-int sub_080374A8(void *ownerArg, struct PeerPanel *panel, int peerArg, int playerArg,
+int WirelessPeerPanel_SetNameFromPacket(void *ownerArg, struct PeerPanel *panel, int peerArg, int playerArg,
                  const u8 *packetArg)
 {
     u8 *owner = ownerArg;
@@ -27,7 +27,7 @@ int sub_080374A8(void *ownerArg, struct PeerPanel *panel, int peerArg, int playe
     u8 *scratch;
     u8 *destination;
 
-    name = sub_08037DCC(peer);
+    name = WirelessExchange_GetPeerEntry(peer);
     p->flags = 0;
     zero = 0;
     scratch = owner + 0x4F4;
@@ -35,7 +35,7 @@ int sub_080374A8(void *ownerArg, struct PeerPanel *panel, int peerArg, int playe
     packet += 4 + player * 10;
     Memory_Copy(scratch, packet, 16);
     destination = p->name;
-    sub_08036CF0(scratch, destination, 8);
+    WirelessText_DecodeString(scratch, destination, 8);
     Memory_Copy(name, destination, 16);
     {
         int index = peer << 2;

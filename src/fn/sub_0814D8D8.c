@@ -14,7 +14,7 @@ struct B0814D8D8 {
 extern u8 gUnk_08E5FA6C[];
 void sub_0822D764(u32, void *);
 
-s32 sub_0814D8D8(struct P0814D8D8 *p)
+s32 Player_HasWeaponComboEntry(struct P0814D8D8 *p)
 {
     struct B0814D8D8 buf;
     u16 *ip = &p->fAAE;

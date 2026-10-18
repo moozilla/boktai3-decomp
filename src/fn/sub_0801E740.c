@@ -1,5 +1,5 @@
 #include "global.h"
-void sub_0801EF58(void);
+void SceneObject_UpdateInactiveIdle(void);
 void SceneObjects_Unlock(u8 *p, u16 id)
 {
     int i;

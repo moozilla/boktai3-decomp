@@ -1,6 +1,6 @@
 #include "global.h"
 
-vu16 *sub_08219278(s32 n)
+vu16 *ScanlineEffect_GetHorizontalScrollRegister(s32 n)
 {
     switch (n) {
         case 0:

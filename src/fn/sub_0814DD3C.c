@@ -2,7 +2,7 @@
 
 extern u32 gUnk_030053F4;
 
-u32 sub_0814DD3C(u32 x)
+u32 Player_GetAttackAttributeFlags(u32 x)
 {
     u32 r;
     if (gUnk_030053F4 & 0x1000) {

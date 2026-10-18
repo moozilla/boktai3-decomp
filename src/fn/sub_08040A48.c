@@ -2,7 +2,7 @@
 
 void Anim_Remove(u8 *);
 
-u32 sub_08040A48(u8 *p)
+u32 ModifierMenu_DestroyDisplayObjects(u8 *p)
 {
     u8 *e = p + 0x17C;
     s32 i = 0x11;

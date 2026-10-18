@@ -1,4 +1,6 @@
 #include "global.h"
+/* Script_SaveContext: Copies the loaded script context and section pointers into caller storage */
+#define Script_SaveContext sub_0821AEDC
 
 struct Block0821AEDC {
     u32 w[4];

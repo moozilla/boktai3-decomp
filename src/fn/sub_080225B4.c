@@ -1,11 +1,11 @@
 #include "global.h"
-u8 *sub_0802140C(int);
-void sub_08022590(void);
+u8 *SceneActors_GetBySlot(int);
+void SceneActors_RequestContactPoolClear(void);
 void SceneActors_AddHealthCost(int amount)
 {
     u8 *p;
     if (amount > 0) {
-        p = sub_0802140C(0);
+        p = SceneActors_GetBySlot(0);
         if (p) {
             int remaining, diff;
             *(int *)(p + 0x3a0) += amount;
@@ -18,7 +18,7 @@ void SceneActors_AddHealthCost(int amount)
                     diff = -diff;
                 if (diff > 49) {
                 stop:
-                    sub_08022590();
+                    SceneActors_RequestContactPoolClear();
                 }
             }
         }
