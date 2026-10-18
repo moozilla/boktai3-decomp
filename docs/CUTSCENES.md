@@ -68,13 +68,17 @@ The director's own commands (kind 1, `SceneMessages_Dispatch`):
 ### Dialogue
 
 The first script is usually the starter's own procedure, written as a
-`match` on a counter (`r700[0x119]`). Starting the cutscene runs case 0; each
-"run" of it from the table runs the next case, which either shows a line
-(`sub_08030D9C(text=...)`, command 1C64, then `message_then`) or closes the
-window (`close_message_window`) and sends the signal. The table pairs each
-"run the dialogue script" with "wait for the signal", so a line stays until
-the player presses A. `cutscenes.py` replays the counter to put each line in
-its step.
+`match` on a counter (`r700[0x119]`). Starting the cutscene runs case 0. Each
+"run" of it from the table runs an odd case: show a message
+(`sub_08030D9C(text=...)`, command 1C64) and `message_then` itself
+(`proc_1022`), so when the player dismisses the window the script runs again,
+into the even case: `close_message_window`, then the signal. The step pairs
+the run with "wait for the signal", so it lasts until the player presses A.
+One run is one message (a message is one or more pages, up to a string with
+`<END>`). `cutscenes.py` replays the counter, two cases per run, to put each
+message in its step. (Until 2026-10-17 it counted one case per run and
+labeled every other message "close window"; the showcase scene, built from
+this description, is what showed it was wrong.)
 
 ## Receiver kinds and their commands
 
@@ -153,6 +157,26 @@ branches and the NPC facing math still allocate registers differently. Open:
 Vanargand (`7C56`) is sent scene-actor commands 51–62, which this dispatcher
 ignores, so another receiver must handle them; the only other kind-4
 registration is in `sub_08197890`.
+
+## Writing new ones
+
+`tools/showcase/` builds a ROM with a scene and cutscene that are not in the
+game: `gclasm.py` assembles script procedures (byte-identical to the
+compiler's output for the forms it covers: commands with options, calls,
+`switch`, `if`/`else`, assignments), `rom.py` puts procedures in unused
+slots, strings on borrowed ids, a cutscene table in an event slot and extra
+patrol paths in a stage's terrain, and `showcase.py` is the scene itself:
+Otenko explains the decompilation while the camera, screen, sound, Django,
+Vanargand and a line of ghouls (one sprite, five palettes) follow the table.
+`tools/showcase/video.sh` records it with sound (mGBA's FFmpeg encoder in
+`tools/emu/harness`, `record`/`stoprecord`). Things learned building it:
+
+* A spawned enemy stands at the first point of its patrol path (`r=` option,
+  the stage's HP paths); `n=(0, 0)` stops it moving.
+* In the prologue's dream stage the floor layer is shown once Vanargand
+  (`proc_6557`) is spawned: the boss is a background layer and its object
+  sets the layers up.
+* The player instance in a scene started with `scene_start(56)` is `2B06`.
 
 ## Tools
 

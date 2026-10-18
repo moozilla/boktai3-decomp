@@ -6,7 +6,7 @@ MGBA_SRC ?= $(HOME)/git/mgba
 ifneq ($(wildcard $(MGBA_SRC)/build/libmgba.*),)
 # the library's own compile definitions: its struct layouts depend on them
 # (ENABLE_DIRECTORIES is not in the generated flags.h)
-CPPFLAGS += -I$(MGBA_SRC)/include -I$(MGBA_SRC)/build/include \
+CPPFLAGS += -I$(MGBA_SRC)/include -I$(MGBA_SRC)/build/include -I$(MGBA_SRC)/src $(shell pkg-config --cflags libavformat 2>/dev/null) \
 	$(filter-out -Dmgba_EXPORTS -DLUA_VERSION_ONLY%,$(shell sed -n 's/^C_DEFINES = //p' $(MGBA_SRC)/build/CMakeFiles/mgba.dir/flags.make))
 LDFLAGS += -L$(MGBA_SRC)/build -Wl,-rpath,$(MGBA_SRC)/build
 else ifeq ($(shell uname -s),Darwin)

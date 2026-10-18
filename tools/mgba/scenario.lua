@@ -19,6 +19,12 @@
 --   pos X Y Z             move the player (world units, 256 per cell)
 --   keys KEYS N           hold keys for N frames (A+UP, START, ...), then release
 --   shot NAME             screenshot -> NAME.png
+--   state NAME            write an mGBA savestate -> NAME.ss (for tools/emu/harness
+--                         `loadstate`, e.g. to record video with audio)
+--   record N PREFIX [TAP] a screenshot every frame for N frames ->
+--                         PREFIX_00000.png ... (for a video: ffmpeg -framerate
+--                         59.7275 -i PREFIX_%05d.png); with TAP, press A for 2
+--                         frames every TAP frames (to advance dialogue)
 --   capture NAME          a full Centaur capture (palettes, VRAM, OAM, screen)
 --   log TEXT              write TEXT to the log
 --   quit                  stop (also at the end of the file)
@@ -85,7 +91,7 @@ local function keymask(s)
   return m
 end
 
-local i, wait_until, busy = 0, 0, false
+local i, wait_until, busy, rec = 0, 0, false, nil
 local function done() say("done"); if logf then logf:close() end; os.exit(0) end
 local function next_step()
   i = i + 1
@@ -116,6 +122,11 @@ local function next_step()
   elseif op == "keys" then
     emu:setKeys(keymask(a[1])); wait_until = emu:currentFrame() + (num(a[2]) or 2); s.release = true
   elseif op == "shot" then pcall(function() emu:screenshot(OUTDIR .. "/" .. a[1] .. ".png") end)
+  elseif op == "state" then
+    local ok, err = pcall(function() return emu:saveStateFile(OUTDIR .. "/" .. a[1] .. ".ss", 0xFF) end)
+    if not ok then say("state failed: " .. tostring(err)) end
+  elseif op == "record" then
+    rec = { n = num(a[1]), prefix = a[2], tap = num(a[3]), k = 0 }
   elseif op == "capture" then capture(name .. "_" .. a[1])
   elseif op == "log" then say(table.concat(a, " "))
   elseif op == "quit" then return done()
@@ -128,6 +139,13 @@ local function start()
   started = true
   callbacks:add("frame", function()
     local s = steps[i]
+    if rec then
+      pcall(function() emu:screenshot(string.format("%s/%s_%05d.png", OUTDIR, rec.prefix, rec.k)) end)
+      if rec.tap then emu:setKeys((rec.k % rec.tap) < 2 and 1 or 0) end
+      rec.k = rec.k + 1
+      if rec.k >= rec.n then emu:setKeys(0); rec = nil end
+      return
+    end
     if busy or emu:currentFrame() < wait_until then return end
     if s and s.release then emu:setKeys(0); s.release = nil end
     next_step()
