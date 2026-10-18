@@ -377,3 +377,4 @@ addr,function,name,family,note
 08159FF4,sub_08159FF4,Player_RequestTimedReset,"Player","requests a timed player reset unless already completing"
 0815B404,sub_0815B404,PlayerCue_BeginMode27,"Player","starts cue mode 27 with action-mode-specific callback"
 0815B49C,sub_0815B49C,PlayerCue_BeginMode28,"Player","starts cue mode 28 with a counter and action-mode-specific callback"
+0815B774,sub_0815B774,PlayerCue_BeginOddDirection,"PlayerCue","starts cue 0x1D with an odd facing direction"
