@@ -903,3 +903,4 @@ addr,function,name,family,note
 081825D0,sub_081825D0,SceneActor_SpawnSpriteEffect,"scene actor effects","creates a sprite effect at the actor position"
 08182624,sub_08182624,Armor_EnterFacingAnimation,"Armor animation controller","starts a facing animation and changes collision flags once"
 0818288C,sub_0818288C,,"scene actor state callbacks",""
+08182CDC,sub_08182CDC,Armor_UpdatePositiveTurn,"Armor 3 (tentative)","advances facing in positive quarter turns toward target"
