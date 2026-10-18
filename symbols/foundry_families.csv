@@ -1250,3 +1250,4 @@ addr,function,name,family,note
 08200244,sub_08200244,DirectionalSprite_FoldFacing,"DirectionalSprite","folds eight-way facing into an index and mirror flag"
 08200324,sub_08200324,PlayerClone_OnBodyColliderContact,"PlayerClone","queues a body-hit reaction and plays its sound"
 0820107C,sub_0820107C,DirectionalSpritePool_Init,"DirectionalSprite","initializes three directional sprites and their palette buffers"
+08202FBC,sub_08202FBC,ProximitySequence_TestPlayerDistance,"ProximitySequence","starts sequence 7 when the player enters the trigger radius"
