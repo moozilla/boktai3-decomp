@@ -713,13 +713,53 @@ def unit_with_placeholder(func):
     return None
 
 
-def integrate(dry=False):
+def renamed_refs(text, func):
+    """Callees renamed in symbols/functions.csv since the worker wrote this: use the names, and
+    drop aliases that the rename made redundant (the linker needs the real names)."""
+    names = real_names()
+    out = []
+    for ln in text.split("\n"):
+        m = re.match(r"#define\s+(\w+)\s+sub_([0-9A-F]{8})\s*$", ln)
+        if m and f"sub_{m.group(2)}" != func and names.get(m.group(2), "").startswith(("sub_", "")) and \
+                names.get(m.group(2)) and names[m.group(2)] != f"sub_{m.group(2)}":
+            if names[m.group(2)] == m.group(1):
+                continue
+            ln = f"#define {m.group(1)} {names[m.group(2)]}"
+        out.append(ln)
+    text = "\n".join(out)
+    return re.sub(r"\bsub_([0-9A-F]{8})\b",
+                  lambda m: m.group(0) if m.group(0) == func else names.get(m.group(1), m.group(0)), text)
+
+
+def drop_conflicting_decls(path):
+    """Compile path; remove local prototypes that conflict with a header's; True when it matches."""
+    for _ in range(8):
+        r = subprocess.run([PY, "tools/check.py", path], cwd=ROOT, capture_output=True, text=True)
+        t = r.stdout + r.stderr
+        if r.returncode == 0 and "MATCH" in t:
+            return True
+        bad = set(re.findall(r"conflicting types for `(\w+)'", t))
+        if not bad:
+            return False
+        s = open(path).read()
+        n = s
+        for b in bad:
+            n = re.sub(rf"^[^\n;{{}}#]*\b{b}\s*\([^;{{]*\)\s*;[ \t]*\n", "", n, count=1, flags=re.M)
+        if n == s:
+            return False
+        open(path, "w").write(n)
+    return False
+
+
+def integrate(dry=False, limit=10 ** 9):
     """Commit each new match, organized: named, placed, family recorded. One commit per function."""
     fam_p = os.path.join(ROOT, "symbols", "foundry_families.csv")
     if not os.path.exists(fam_p):
         open(fam_p, "w").write("addr,function,name,family,note\n")
     done = 0
     for func, src, stage, checks in committable():
+        if done >= limit:
+            break
         clean = os.path.join(OUT, func, "clean.c")
         if stage != "matched by worker" and os.path.exists(clean):
             src = clean
@@ -737,6 +777,7 @@ def integrate(dry=False):
             name = m.group(1)
         if name and not re.search(rf"^#define\s+\w+\s+{func}\b", text, re.M):
             text = re.sub(r'((?:#include[^\n]*\n)+)', rf"\1#define {name} {func}\n", text, count=1)
+        text = renamed_refs(text, func)
         alias = re.search(rf"^#define\s+(\w+)\s+{func}\b", text, re.M)
         name = alias.group(1) if alias else None
         placed = None
@@ -754,10 +795,9 @@ def integrate(dry=False):
             placed = os.path.join(ROOT, "src", "fn", func + ".c")
             if not dry:
                 open(placed, "w").write(text)
-                ok = subprocess.run([PY, "tools/check.py", placed], cwd=ROOT, capture_output=True, text=True)
-                if ok.returncode != 0 or "MATCH" not in ok.stdout:
+                if not drop_conflicting_decls(placed):
                     os.remove(placed)
-                    print(f"{func}: no longer matches as src/fn ({ok.stdout.strip()[-80:]}); skipped")
+                    print(f"{func}: no longer matches as src/fn; skipped")
                     continue
         addr = func[4:]
         fam = r.get("FAMILY", "")
@@ -811,7 +851,9 @@ def main():
     bu.add_argument("seconds")
     sub.add_parser("scale-report")
     sub.add_parser("committable")
-    sub.add_parser("integrate").add_argument("--dry", action="store_true")
+    ip = sub.add_parser("integrate")
+    ip.add_argument("--dry", action="store_true")
+    ip.add_argument("--limit", type=int, default=10 ** 9)
     sub.add_parser("hdrcheck").add_argument("header")
     r = sub.add_parser("report")
     r.add_argument("--markdown", action="store_true")
@@ -839,7 +881,7 @@ def main():
     elif a.cmd == "hdrcheck":
         sys.exit(hdrcheck(a.header))
     elif a.cmd == "integrate":
-        integrate(a.dry)
+        integrate(a.dry, a.limit)
     elif a.cmd == "committable":
         for row in committable():
             print(*row, sep="\t")
