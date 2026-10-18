@@ -548,3 +548,4 @@ addr,function,name,family,note
 080F1E00,sub_080F1E00,SceneActor_LowerColorRedPeak,"SceneActor color cycle","lower red channel from thirty-one to twenty-four"
 080F8010,sub_080F8010,ActorPhase_UpdateAcceleratingTrail,"ActorPhase","decrements an angle with increasing speed then enters phase 52"
 080F815C,sub_080F815C,ActorPhase_UpdateReverseFlicker,"ActorPhase","flickers between animation entries and enters phase 48"
+080F92AC,sub_080F92AC,SceneActorControl_ResetRotation,"SceneActor control phases","eases drawable angle back over a thirty-frame countdown"
