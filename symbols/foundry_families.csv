@@ -1010,3 +1010,4 @@ addr,function,name,family,note
 081A4718,sub_081A4718,EffectSpritePool_InitializeEntries,"EffectSpritePool (tentative child pool)","initialize thirty-two sprite entries and clear their state"
 081A4760,sub_081A4760,EffectSpritePool_Initialize,"EffectSpritePool (tentative child pool)","load two animations and initialize the sprite entry pool"
 081A4834,sub_081A4834,MotionEntry_SetEnabled,"MotionEntry","enables motion entry and records initial position delta"
+081A488C,sub_081A488C,MotionEntry_CreateConfigured,"MotionEntry","creates entry and sets three configuration halfwords"
