@@ -70,3 +70,4 @@ addr,function,name,family,note
 080B70CC,sub_080B70CC,SceneActorReaction_SelectTileParameter,"SceneActorReaction","selects a tile parameter by category and reaction variant"
 080B7184,sub_080B7184,SceneActorReaction_ParseOptions,"SceneActorReaction","parses E and d options into the reaction context"
 080B7580,sub_080B7580,SceneActorReaction_SetProfileEntries,"SceneActorReaction","sets category-specific profile entries from reaction flags"
+080B7688,sub_080B7688,SceneActorReaction_IsRangeReady,"SceneActorReaction","tests category-specific distance and health gates against timers"
