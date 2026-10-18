@@ -1385,3 +1385,4 @@ addr,function,name,family,note
 0823AA28,sub_0823AA28,Player_InitializeActionState,"Player","initializes action state and selects its callback"
 0823AAF8,sub_0823AAF8,Player_ConsumeActionResource,"Player","subtracts capped stat-B cost and accumulates consumption"
 0823ABEC,sub_0823ABEC,Player_GetTetherMode,"Player","reads tether mode through action-state guards"
+0823AD64,sub_0823AD64,Player_InitializeInputHistory,"Player","selects slot input and resets direction history"
