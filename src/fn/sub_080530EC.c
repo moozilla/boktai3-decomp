@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "stacked_actor.h"
 extern u8 *gUnk_0200047C;
 u32 sub_08020D54(void *, void *);
@@ -7,21 +6,22 @@ void StackedActor_LowerLift(struct StackedActor *);
 void StackedActor_ConsumeTriggers(struct StackedActor *actor)
 {
     u8 *receiver = actor->trigger;
-    register s32 i asm("r5") = 0;
+    s32 i = 0;
     u8 **manager = &gUnk_0200047C;
     u8 *counts = (u8 *)actor + 0x1E;
-    if (i >= counts[(*manager)[0x24]])
+    if (i >= counts[(*manager)[0x24]]) {
         goto done;
+    }
     {
         u8 **cache = manager;
         s32 count;
         do {
+            u8 **cache = manager;
             u8 **slot = cache;
             u8 *current = *slot;
             s32 offset = i * 4;
             u8 *base;
             u8 *message;
-            asm("" : "+r"(receiver));
             offset += current[0x24] * 16;
             base = receiver + 8;
             base += offset;
