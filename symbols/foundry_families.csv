@@ -79,3 +79,4 @@ addr,function,name,family,note
 080BA010,sub_080BA010,SceneActorReaction_TickContactAnimation,"SceneActorReaction","selects animation five, refreshes collider, and advances completed reactions"
 080BA0EC,sub_080BA0EC,SceneActorReaction_ApplyThreshold,"SceneActorScript / SceneActorRegistry / SceneActorControl","consumes the pending-reaction flag to trigger an animation, then sets field2B0 when the given value exceeds the actor's stored script threshold (parameter706)"
 080BA13C,sub_080BA13C,SceneActorReaction_TickQueuedContact,"SceneActorReaction","consumes a queued context flag to select the next contact reaction"
+080BAA28,sub_080BAA28,SceneActorReaction_TickMultiHitAnimation,"SceneActorReaction","refreshes the collider across two animation frame ranges"
