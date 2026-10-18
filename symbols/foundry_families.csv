@@ -27,3 +27,4 @@ addr,function,name,family,note
 080989FC,sub_080989FC,ActorContact_UpdateColliderPositions,"scene actor contact","update primary and conditional secondary collider positions"
 0809B00C,sub_0809B00C,ActorBehavior_TickParticipantProgress,"scene actor behavior","apply periodic participant effects and track counter progress"
 0809CBB8,sub_0809CBB8,ActorContact_InitializeBodyAndSecondary,"scene actor contact","initialize body and secondary collider with callbacks"
+0809D044,sub_0809D044,SceneActorControl_ResetCollisionFlags,"SceneActorControl (actor reset/collision-phase helpers)","clears motion/collider flags on an actor, sets flags2D0 bit 0x100000"
