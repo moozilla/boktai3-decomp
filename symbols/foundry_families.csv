@@ -1270,3 +1270,4 @@ addr,function,name,family,note
 0820F2EC,sub_0820F2EC,OrangeSpine_UpdateDefeatEffect,"Orange spine (tentative)","emits randomized effects during defeat and records defeat at state one"
 0820FEA8,sub_0820FEA8,Combat_ApplyHitReaction,"combat hit processing","copies hit damage and selects a reaction, optionally showing a damage number"
 0820FFE4,sub_0820FFE4,Combat_SpawnDirectionalProjectile,"combat projectile emitter","spawns a configured projectile offset in an eight-way direction"
+08210100,sub_08210100,ProjectileEmitter_WaitForPlayerApproach,"proximity projectile emitter","starts attack animation and a timer when the player enters range"
