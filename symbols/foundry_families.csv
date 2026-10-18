@@ -604,3 +604,4 @@ addr,function,name,family,note
 0810CD4C,sub_0810CD4C,LinkPanel_CreateTextWindows,"LinkPanel","creates three text windows and refreshes the selected title"
 0810D22C,sub_0810D22C,PanelTransition_UpdateExit,"PanelTransition","starts transition and kills task after sixteen frames"
 0810D290,sub_0810D290,PanelSequence_UpdateDelay,"PanelSequence","updates two panels and advances after a 240 tick delay"
+0810D9B0,sub_0810D9B0,RecordPanel_ShowName,"RecordPanel","shows a name from the selected record or game state"
