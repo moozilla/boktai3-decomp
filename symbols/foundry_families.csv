@@ -256,3 +256,4 @@ addr,function,name,family,note
 081218A0,sub_081218A0,Direction_IsMiddleQuadrants,"Direction","tests rounded direction quadrant for one or two"
 08121A78,sub_08121A78,ActionGroup_RunSelectedCallbacks,"ActionGroup","dispatches kind callbacks for four mask-selected entries"
 08121CD4,sub_08121CD4,SpriteGroup_RemoveEntry,"SpriteGroup","removes a sprite and clears its group entry"
+08122020,sub_08122020,SpriteEffectPool_AllocateSlot,"SpriteEffectPool","allocates one of eight large effect slots"
