@@ -876,3 +876,4 @@ addr,function,name,family,note
 08180810,sub_08180810,ProximityVolume_IdleCallback,"ProximityVolume","empty second callback installed by the volume initializer"
 08180814,sub_08180814,ProximityVolume_InitializeCallbacks,"ProximityVolume","clears callbacks, initializes volume, installs callback pair"
 0818083C,sub_0818083C,ProximityVolume_DispatchUpdate,"ProximityVolume","invokes the first callback if installed and returns zero"
+08180858,sub_08180858,ProximityVolume_ClearLatch,"ProximityVolume","clears the halfword at offset 0x38"
