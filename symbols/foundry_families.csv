@@ -1061,3 +1061,4 @@ addr,function,name,family,note
 081BB4E8,sub_081BB4E8,SpriteMenu_HideAll,"SpriteMenu","Sets the hidden flag on sixteen sprite records and two marker records."
 081BBD00,sub_081BBD00,SpriteMenu_UpdateTimedFade,"SpriteMenu","Steps animation and starts a fade after the timer reaches 150."
 081BBDE0,sub_081BBDE0,SpriteMenu_InitBackground,"SpriteMenu","Loads the background resource and configures its layers."
+081BBE20,sub_081BBE20,SpriteMenu_LoadPalette,"SpriteMenu","Loads a palette resource and saves a palette bank."
