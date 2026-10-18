@@ -1,5 +1,4 @@
 #include "tether_actor.h"
-// MATCHING_CONCESSION: register-pinning
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline s32 cellIndex(s32 x, s32 z)
 {
@@ -42,16 +41,16 @@ void TetherActor_BlockPlayerAcrossTerrain(struct TetherActor *actor)
     struct ContactPosition *position;
     s32 playerCell;
     s32 actorCell;
-    register s32 rowStride asm("r1");
+    s32 rowStride;
     attributes &= 1;
     position = &actor->position;
     if (attributes == 0) {
         s32 playerHeight = surfaceHeight(&gUnk_02000580[0]->position);
         s32 height, difference;
-        asm("" : "+r"(actor));
         {
-            struct ContactPosition *heightPosition = &actor->position;
-            s32 x = heightPosition->x >> 8, z = heightPosition->z >> 8;
+            struct ContactPosition *heightPosition = &(*(&actor))->position;
+            s32 x = heightPosition->x >> 8;
+            s32 z = heightPosition->z >> 8;
             u8 *properties;
             u32 surface;
             position = heightPosition;
@@ -68,10 +67,12 @@ void TetherActor_BlockPlayerAcrossTerrain(struct TetherActor *actor)
             }
         }
         difference = playerHeight - height;
-        if (difference < 0)
+        if (difference < 0) {
             difference = -difference;
-        if (difference <= 255)
+        }
+        if (difference <= 255) {
             return;
+        }
     }
     {
         s32 x;
@@ -97,12 +98,11 @@ void TetherActor_BlockPlayerAcrossTerrain(struct TetherActor *actor)
         return;
     }
     rowStride = *(s16 *)(gUnk_030052F4->cells + 4);
-    if (actorCell == playerCell + rowStride)
+    if (actorCell == (playerCell + rowStride)) {
         gUnk_02000580[0]->position.z = ((actor->position.z >> 8) << 8) + 2;
-    else if (actorCell == playerCell - rowStride)
+    } else if (actorCell == (playerCell - rowStride)) {
         gUnk_02000580[0]->position.z = (((actor->position.z >> 8) + 1) << 8) - 2;
-    else {
-        asm("" : : "r"(rowStride), "r"(playerCell));
+    } else {
         gUnk_02000580[0]->position.x = position->x;
         gUnk_02000580[0]->position.z = actor->position.z;
     }
