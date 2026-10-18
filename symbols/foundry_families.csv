@@ -1306,3 +1306,4 @@ addr,function,name,family,note
 082230AC,sub_082230AC,Serial_ResetMultiplayer,"serial communication","resets serial state and configures multiplayer mode"
 08223424,sub_08223424,Serial_ReceivePacket,"serial communication","copies pending four-word packet and returns connection role"
 082234C4,sub_082234C4,Serial_ReadLatestPacket,"serial communication","reads four-word packet or fills error sentinel values"
+08224DAC,sub_08224DAC,Wireless_InitSessionConfig,"wireless session configuration","initializes wireless session configuration and name pointers"
