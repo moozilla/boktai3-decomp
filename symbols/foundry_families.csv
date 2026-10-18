@@ -86,3 +86,4 @@ addr,function,name,family,note
 080C2F3C,sub_080C2F3C,SceneActorControl_UpdateEntryRecoveryPhase,"SceneActorControl","initializes entry control then enters recovery phase"
 080C4660,sub_080C4660,SceneActorTerrain_CompareNeighborHeight,"SceneActorTerrain","classifies adjacent cell elevation with slope exceptions"
 080C49BC,sub_080C49BC,SceneActorControl_RefreshMotionRoute,"SceneActorControl","refreshes route flags or initializes motion control"
+080C4CFC,sub_080C4CFC,SceneActorRoute_CommitReachableDestination,"SceneActorRoute","copies a reachable route destination into actor context"
