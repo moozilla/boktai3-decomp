@@ -25,3 +25,4 @@ addr,function,name,family,note
 08098064,sub_08098064,SceneActor_InitLinkedSprites,"SceneActor linked reactions","loads four linked sprite animations and starts their scripts"
 08098660,sub_08098660,ActorVisibility_TickRevealDelay,"scene actor visibility","keep drawable visible while reveal counter expires"
 080989FC,sub_080989FC,ActorContact_UpdateColliderPositions,"scene actor contact","update primary and conditional secondary collider positions"
+0809B00C,sub_0809B00C,ActorBehavior_TickParticipantProgress,"scene actor behavior","apply periodic participant effects and track counter progress"
