@@ -1240,3 +1240,4 @@ addr,function,name,family,note
 081FDB40,sub_081FDB40,RisingActor_LowerHeight,"Rising actor controller (tentative)","lowers height every fourth tick and changes callback at threshold"
 081FDBF0,sub_081FDBF0,OrbitEffect_UpdateTrailSprite,"OrbitEffect","contracts orbit trail toward target then hides it"
 081FE16C,sub_081FE16C,OrbitEffect_InitSlot,"Orbit effect 2 (tentative)","initializes motion parameters, sprites and collider for an orbit slot"
+081FE244,sub_081FE244,OrbitEffect_RemoveSlot,"Orbit effect 2 (tentative)","removes slot sprites, disables its collider and clears its active bit"
