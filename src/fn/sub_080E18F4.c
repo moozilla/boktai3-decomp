@@ -14,7 +14,8 @@ static inline u8 TakePrepared(struct SceneActorRegistryResetView *a)
     }
     return 0;
 }
-void SceneActorAnimation_RefreshTimedAttackCollider(struct SceneActorRegistryResetView *a, u32 frame)
+void SceneActorAnimation_RefreshTimedAttackCollider(struct SceneActorRegistryResetView *a,
+                                                    u32 frame)
 {
     struct SceneActorTimedAttackContext *context = a->context;
     if (TakePrepared(a)) {

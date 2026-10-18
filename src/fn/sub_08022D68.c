@@ -7,20 +7,20 @@ int SceneActorState_StepTableByKind(u8 *p)
 {
     const u8 *tbl;
     switch (*(s32 *)(p + 0x358)) {
-    case 0:
-        tbl = gUnk_08604DC4;
-        break;
-    case 1:
-        tbl = gUnk_08604DE4;
-        break;
-    case 2:
-        tbl = gUnk_08604E04;
-        break;
-    case 3:
-        tbl = gUnk_08604E24;
-        break;
-    default:
-        goto fail;
+        case 0:
+            tbl = gUnk_08604DC4;
+            break;
+        case 1:
+            tbl = gUnk_08604DE4;
+            break;
+        case 2:
+            tbl = gUnk_08604E04;
+            break;
+        case 3:
+            tbl = gUnk_08604E24;
+            break;
+        default:
+            goto fail;
     }
     SceneActorState_StepTableByte(p, tbl);
     return 1;

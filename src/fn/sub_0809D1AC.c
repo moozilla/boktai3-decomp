@@ -1,5 +1,5 @@
 #define RouteCursor_SelectRandomPoint Lun_SelectRandomRouteEntry
-#define RouteActor_SetDestination Lun_BeginMoveToPosition
+#define RouteActor_SetDestination     Lun_BeginMoveToPosition
 #include "global.h"
 #include "scene_actor_route.h"
 #include "scene_actor_terrain.h"

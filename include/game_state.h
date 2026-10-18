@@ -20,7 +20,7 @@ struct GameState {
     u8 unk1E[2];
     u16 statBonuses[3]; /* 0x20: added to normal and alternate-mode stats */
     u8 unk26[2];
-    s16 life;    /* (guess) current; (lifeMax - life) / lifeMax is a ratio in Player_ModifyValueByRemainingLife */
+    s16 life; /* (guess) current; (lifeMax - life) / lifeMax is a ratio in Player_ModifyValueByRemainingLife */
     s16 lifeMax; /* (guess) */
     u16 unk2c;
     u8 unk2E[0x2];
@@ -31,10 +31,10 @@ struct GameState {
     u8 unk3C[4];
     s16 level; /* (guess) compared against actor levels */
     u8 unk42[6];
-    s32 rewardTotal; /* 0x48: capped at 999999; tentative reward accumulator */
-    u32 unlockMask; /* (guess) bit set per index */
-    u16 unk50;      /* set to 8 on reset */
-    s16 selected;   /* (guess) index into the slot tables */
+    s32 rewardTotal;         /* 0x48: capped at 999999; tentative reward accumulator */
+    u32 unlockMask;          /* (guess) bit set per index */
+    u16 unk50;               /* set to 8 on reset */
+    s16 selected;            /* (guess) index into the slot tables */
     s16 actionAuxiliarySlot; /* 0x54: selects the auxiliary action descriptor (tentative) */
     u8 unk56[2];
     s16 party[4]; /* (guess) ids, searched by GameState_HasEquippedConsumable */
@@ -91,7 +91,7 @@ struct GameState {
     u8 unk5C0[0x40]; /* Map-marker flag words, indexed by signed savedX (tentative). */
     u32 unk600;
     s32 contactThreshold; /* 0x604: randomized 200..299 after player threshold event (tentative) */
-    u32 statHundredths; /* 0x608: restored by player initialization */
+    u32 statHundredths;   /* 0x608: restored by player initialization */
     u8 unk60C[4];
     u16 unk610;
     s16 unk612;

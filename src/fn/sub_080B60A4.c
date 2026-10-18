@@ -28,7 +28,8 @@ void SceneActorControl_InitBehaviorColliders(struct SceneActorRegistryActor *act
     {
         u32 flags = 0x410B;
         SceneActorCollision_InitExternalBody(actor, (void *)(context + 0x624), &bodySize,
-                                             &bodyOffset, SceneActorReaction_TryStartContact, actor, flags);
+                                             &bodyOffset, SceneActorReaction_TryStartContact, actor,
+                                             flags);
     }
     innerSize.packed.x = 0x80;
     innerSize.packed.y = 0x80;

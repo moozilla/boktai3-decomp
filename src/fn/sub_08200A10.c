@@ -93,7 +93,7 @@ void PlayerClone_InitSlot(u32 unused, u8 *s, u32 arg)
     Collider_Init(p, zero, 0x2001, zero, 16, &v, &w);
     Collider_SetCallback(p, PlayerClone_OnPassiveColliderContact, s);
     Collider_SetAttackProperties(p, *(s16 *)(context + 0x10), *(s16 *)(context + 0x12), 0, zero,
-                 *(s16 *)(context + 0x14));
+                                 *(s16 *)(context + 0x14));
     p += 0xa8;
     v.x = 200;
     v.y = 128;
@@ -104,7 +104,7 @@ void PlayerClone_InitSlot(u32 unused, u8 *s, u32 arg)
     Collider_Init(p, zero, 0x2001, zero, 16, &v, &w);
     Collider_SetCallback(p, PlayerClone_OnPassiveColliderContact, s);
     Collider_SetAttackProperties(p, *(s16 *)(context + 0x18), *(s16 *)(context + 0x1a), 0, zero,
-                 *(s16 *)(context + 0x1c));
+                                 *(s16 *)(context + 0x1c));
     p = s + 0x128;
     v.x = 32;
     v.y = 32;

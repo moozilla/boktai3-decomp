@@ -27,7 +27,7 @@ struct Task0819792C {
 };
 
 struct Task0819792C *PaletteEffect_Create(struct Anim0819792C *anim, struct Sprite0819792C *sprite,
-                                  u32 hold, s32 count, s32 start)
+                                          u32 hold, s32 count, s32 start)
 {
     struct Task0819792C *t = Task_Create(10, count * 32 + 0x28);
     if (!t)

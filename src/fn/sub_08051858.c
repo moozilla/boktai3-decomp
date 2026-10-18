@@ -71,7 +71,8 @@ s32 BreakableProp_InitializeFromScript(struct BreakableProp *input, u32 id, u32 
         struct ContactPosition *point = (void *)&packet;
         prop->height = (point->y >> 8) + 1;
     }
-    TerrainModifiers_RegisterCell(prop->terrainRegistration, prop->cell, 0, prop->height, 255, 0x103);
+    TerrainModifiers_RegisterCell(prop->terrainRegistration, prop->cell, 0, prop->height, 255,
+                                  0x103);
     BreakableProp_InitializeSprite(prop, &packet);
     BreakableProp_InitializeCollider(prop, id, &packet);
     script = Script_SeekToKeyword('R');

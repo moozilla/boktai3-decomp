@@ -391,7 +391,8 @@ void *AnimatedHazardManager_Create(void)
         return gUnk_02000050;
     p = Task_Create(8, 0x538);
     if (p != 0) {
-        Task_SetCallbacks(p, (void (*)(void *))AnimatedHazardManager_Update, (void (*)(void *))AnimatedHazardManager_Destroy);
+        Task_SetCallbacks(p, (void (*)(void *))AnimatedHazardManager_Update,
+                          (void (*)(void *))AnimatedHazardManager_Destroy);
         if (AnimatedHazardManager_Initialize(p) < 0) {
             Task_Kill(p);
             return 0;

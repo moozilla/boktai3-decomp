@@ -19,7 +19,8 @@ struct O {
     u32 w34;
 };
 
-void PositionMotion_InitTimedInterpolation(struct O *o, struct P *d, struct P *a, struct P *b, u16 h)
+void PositionMotion_InitTimedInterpolation(struct O *o, struct P *d, struct P *a, struct P *b,
+                                           u16 h)
 {
     o->w0 = (u32)d;
     o->p4 = *a;

@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_control_helpers.h"
 
-
 extern u8 *gUnk_02000580;
 
 static inline u8 Test(u32 value, u32 mask)

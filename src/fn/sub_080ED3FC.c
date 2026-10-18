@@ -30,5 +30,6 @@ void SceneActorReaction_PlayHiddenCue(struct SceneActorRegistryResetView *actor)
         SceneActorAnimation_SelectDirectionalFlags(actor, 15);
         Sound_PlaySong(475);
     }
-    if (actor->field2B3) actor->field2B0 = 1;
+    if (actor->field2B3)
+        actor->field2B0 = 1;
 }

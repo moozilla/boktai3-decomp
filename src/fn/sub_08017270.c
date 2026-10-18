@@ -19,8 +19,9 @@ void ScanlineEffect_SetSource(int, int, void *);
 int ScanlineWave_Update(struct Wave *p)
 {
     if (p->enabled) {
-        ScanlineEffect_SetSource(p->target, p->mode,
-                     &p->samples[p->bank][(gUnk_03004C30[gUnk_03005220].y + p->phase) & 127]);
+        ScanlineEffect_SetSource(
+            p->target, p->mode,
+            &p->samples[p->bank][(gUnk_03004C30[gUnk_03005220].y + p->phase) & 127]);
         if (++p->timer >= p->period) {
             p->timer = 0;
             p->phase += p->step;

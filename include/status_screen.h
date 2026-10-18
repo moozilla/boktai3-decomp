@@ -87,7 +87,8 @@ s32 SunClock_GetBaseHour(void); // counter values
 s32 SunClock_GetBaseMinute(void);
 u32 SunClock_GetPackedDate(void);
 void Clock_UnpackDate(s32 *, s32 *, s32 *, u32);
-void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32); // (guess) start a screen transition
+void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32,
+                                  s32); // (guess) start a screen transition
 
 int StatusScreen_Update(struct StatusScreen *);
 int StatusScreen_Destroy(struct StatusScreen *);

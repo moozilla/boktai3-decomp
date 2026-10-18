@@ -23,8 +23,8 @@ static inline u32 TestFlag(struct SceneActorBehaviorContactView *s, u32 mask)
     return s->flags & mask;
 }
 void SceneActorContact_ApplyWithinBounds(struct SceneActorBehaviorContactView *source,
-                  struct SceneActorBehaviorContactView *destination,
-                  struct SceneActorBehaviorView *actor)
+                                         struct SceneActorBehaviorContactView *destination,
+                                         struct SceneActorBehaviorView *actor)
 {
     struct ContactPosition point;
     s32 difference;

@@ -9,7 +9,8 @@ void *RecordDisplay_Create(void)
 {
     void *p = Task_Create(0xb, 0x464);
     if (p != 0) {
-        Task_SetCallbacks(p, (void (*)(void *))PlayStats_Update, (void (*)(void *))RecordDisplay_OnTaskDestroy);
+        Task_SetCallbacks(p, (void (*)(void *))PlayStats_Update,
+                          (void (*)(void *))RecordDisplay_OnTaskDestroy);
         if (sub_081C1578(p) < 0) {
             Task_Kill(p);
             return 0;

@@ -12,7 +12,8 @@ struct SA230 {
     double d[12];
     s32 n[4];
 };
-void Time_CalculateSolarRiseTransitSet(struct SA230 *s, s32 mode, double arg, s32 day, double longitude, double latitude)
+void Time_CalculateSolarRiseTransitSet(struct SA230 *s, s32 mode, double arg, s32 day,
+                                       double longitude, double latitude)
 {
     double l, b, e, decl, alpha, hour;
 

@@ -17,31 +17,38 @@ struct ActorTrail {
     u8 activeCount;
 };
 void sub_080AB294(struct ContactPosition *);
-static inline u8 isUnavailable(struct TrailSegment *segment) {
+static inline u8 isUnavailable(struct TrailSegment *segment)
+{
     u32 mask = 5;
     u32 value = segment->flags;
-    if (mask & value) return 1;
+    if (mask & value)
+        return 1;
     return 0;
 }
-static inline void setFlag(struct TrailSegment *segment, u8 mask) { segment->flags |= mask; }
-s32 ActorTrail_RemoveLastSegment(struct SceneActorRegistryResetView *actor) {
+static inline void setFlag(struct TrailSegment *segment, u8 mask)
+{
+    segment->flags |= mask;
+}
+s32 ActorTrail_RemoveLastSegment(struct SceneActorRegistryResetView *actor)
+{
     struct ActorTrail *trail = actor->context;
     struct TrailSegment *segments = trail->segments;
     s32 i;
-    if (trail->activeCount > 2) goto scan;
+    if (trail->activeCount > 2)
+        goto scan;
     goto failure;
-removeSegment:
-    {
-        struct TrailSegment *segment = &segments[i];
-        Collider_Remove(segment->collider);
-        setFlag(segment, 1);
-        trail->activeCount--;
-        sub_080AB294(&segment->position);
-        return 1;
-    }
+removeSegment: {
+    struct TrailSegment *segment = &segments[i];
+    Collider_Remove(segment->collider);
+    setFlag(segment, 1);
+    trail->activeCount--;
+    sub_080AB294(&segment->position);
+    return 1;
+}
 scan:
     for (i = trail->segmentCount - 1; i >= 0; i--) {
-        if (!isUnavailable(&segments[i])) goto removeSegment;
+        if (!isUnavailable(&segments[i]))
+            goto removeSegment;
     }
 failure:
     return 0;

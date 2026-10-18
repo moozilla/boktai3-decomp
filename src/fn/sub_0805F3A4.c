@@ -22,7 +22,8 @@ void SceneInputPanel_GetEquippedValues(s32 *primaryValue, s32 *secondaryValue,
         index = equipment->selected - 8;
         entry = (void *)(index * 2 + (u32)equipment);
         if (entry->secondary[0] >= 0) {
-            second = Player_GetEquipmentLevelBonus(GameState_GetUnlockDescriptor(entry->secondary[0]));
+            second =
+                Player_GetEquipmentLevelBonus(GameState_GetUnlockDescriptor(entry->secondary[0]));
             secondIndex = index;
         }
     }

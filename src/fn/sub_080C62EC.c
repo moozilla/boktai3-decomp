@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_animation.h"
 
-
 struct Seq {
     u8 pad0[8];
     u16 h8;

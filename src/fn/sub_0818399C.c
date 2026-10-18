@@ -37,7 +37,8 @@ void ActorController_UpdateSoundedAnimationTransition(u8 *p)
         }
         case 1:
             if (p[0xB43] != 0) {
-                Armor_SetAnimationFromStart((u32)p, (u32)&gUnk_0824ED88[((p[0xB39] + 0x60) >> 6) & 3]);
+                Armor_SetAnimationFromStart((u32)p,
+                                            (u32)&gUnk_0824ED88[((p[0xB39] + 0x60) >> 6) & 3]);
                 *s = 0xFF;
                 p[0xB41] = st;
             }

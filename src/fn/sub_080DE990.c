@@ -27,7 +27,8 @@ void SceneActorCollision_InitGateColliders(struct SceneActorRegistryActor *actor
     attackOffset.x = 0;
     attackOffset.y = 0x80;
     attackOffset.z = 0;
-    SceneActorCollision_InitAttack(actor, &attackSize, &attackOffset, Dog_OnSensorContact, 0, actor);
+    SceneActorCollision_InitAttack(actor, &attackSize, &attackOffset, Dog_OnSensorContact, 0,
+                                   actor);
     externalSize.x = 0;
     externalSize.y = 0x78;
     externalSize.z = 0;

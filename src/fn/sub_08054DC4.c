@@ -20,7 +20,7 @@ void DisplayTrack_SetSequenceFromScript(void)
                 if (variant) {
                     state = &track->sequenceState;
                     Anim_RestartSequence(state, track->sequenceResource, track->sequenceId,
-                                 track->sequenceRow, track->mirror);
+                                         track->sequenceRow, track->mirror);
                 } else {
                     state = &track->sequenceState;
                     Anim_SetSequence(state, (void *)track->sequenceResource, track->sequenceId,

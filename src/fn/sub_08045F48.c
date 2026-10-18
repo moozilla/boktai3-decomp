@@ -18,7 +18,7 @@ void ContactSequenceActor_UpdateAppearing(struct ContactSequenceOwner *parent,
     if (ContactSequenceActor_TakeEntryFlag(owner)) {
         owner->sprite.flags &= ~1;
         Anim_RestartSequence(&owner->sequence, parent->sequenceResource,
-                     gUnk_08605974[owner->variant & 1].frame, 0, 8);
+                             gUnk_08605974[owner->variant & 1].frame, 0, 8);
     }
     if (owner->sequence.index == 3 && owner->sequence.elapsed == 0)
         Sound_PlaySongChecked(0x3B8);
