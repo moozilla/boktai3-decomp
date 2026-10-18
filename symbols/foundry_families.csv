@@ -453,3 +453,4 @@ addr,function,name,family,note
 081704B4,sub_081704B4,SceneHud_UpdateActionSwap,"SceneHud","checks and applies an action-slot swap or cancels it"
 08170718,sub_08170718,SceneHud_LayoutActionGrid,"SceneHud","places sixteen action icons in a four by four grid"
 0817080C,sub_0817080C,SceneHud_InitializeActionInput,"SceneHud","initializes action input flags and cursor keyframes"
+08170B48,sub_08170B48,SceneInput_BuildActionGrid,"SceneInput","builds action-grid navigation cells and optional entries"
