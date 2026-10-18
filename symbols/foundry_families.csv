@@ -635,3 +635,4 @@ addr,function,name,family,note
 0811ED0C,sub_0811ED0C,ActorDrain_Update,"ActorDrain","periodically drains actor health and advances its accumulator"
 0811EE0C,sub_0811EE0C,CallbackList_ResetDispatch,"CallbackList","stops an indexed slot and resets callback dispatch state"
 0811EE9C,sub_0811EE9C,ActorEmitter_TryEmit,"ActorEmitter","checks energy, emits an object, and starts a cooldown"
+0811EF40,sub_0811EF40,ActorEmitter_TryEmitLow,"ActorEmitter","emits at a lower height offset and clears the emission timer"
