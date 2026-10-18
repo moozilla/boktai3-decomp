@@ -1079,3 +1079,4 @@ addr,function,name,family,note
 081BDDCC,sub_081BDDCC,MenuPanel_FindEmptyOppositeHalf,"MenuPanel (tentative)","finds an empty catalog slot in the opposite 16-entry half"
 081BDE30,sub_081BDE30,MenuPanel_SwapConsumableSlots,"MenuPanel / GameState inventory (tentative)","swaps consumable slots and repairs four equipped-slot references"
 081BE0AC,sub_081BE0AC,SceneInventory_SetCategoryPalette,"SceneInventoryCategoryMenu","sets the category source palette and target widget colors"
+081BE0F0,sub_081BE0F0,SceneInventory_ResetCategoryPalette,"SceneInventoryCategoryMenu","restores both category widgets to the default palette"
