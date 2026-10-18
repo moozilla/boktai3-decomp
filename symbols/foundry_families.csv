@@ -293,3 +293,4 @@ addr,function,name,family,note
 0812DF40,sub_0812DF40,Math_GetVectorLength,"VectorMath","estimates vector length from angle and sine table"
 0812E058,sub_0812E058,ActorFacing_TurnTowardPoint,"Actor facing","sets facing angle toward target coordinates"
 0812E6F0,sub_0812E6F0,ActorMode_SelectOddStateVariant,"Actor state variant","returns variant three for values one three and five otherwise four"
+0812F520,sub_0812F520,SceneActor_SetContactReactionDirection,"SceneActor","set contact reaction direction from source or displacement"
