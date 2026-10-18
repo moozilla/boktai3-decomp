@@ -378,3 +378,4 @@ addr,function,name,family,note
 0815B404,sub_0815B404,PlayerCue_BeginMode27,"Player","starts cue mode 27 with action-mode-specific callback"
 0815B49C,sub_0815B49C,PlayerCue_BeginMode28,"Player","starts cue mode 28 with a counter and action-mode-specific callback"
 0815B774,sub_0815B774,PlayerCue_BeginOddDirection,"PlayerCue","starts cue 0x1D with an odd facing direction"
+0815BE5C,sub_0815BE5C,PlayerCue_BeginModeSeven,"PlayerCue","starts cue seven with a selected phase and facing"
