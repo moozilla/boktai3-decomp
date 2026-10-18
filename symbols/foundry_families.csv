@@ -1038,3 +1038,4 @@ addr,function,name,family,note
 081B4784,sub_081B4784,SceneParticleEmitter_EmitPeriodically,"SceneParticleEmitter (tentative)","emits variant particles every 32 ticks"
 081B6310,sub_081B6310,PairedSceneActor_SetResetValues,"PairedSceneActor (tentative)","sets two reset values and refreshes positive counters"
 081B646C,sub_081B646C,PairedSceneActor_ApplyToActiveHalf,"PairedSceneActor (tentative)","selects an active half, randomly choosing when both are active"
+081B6604,sub_081B6604,ActorEffect_UpdateFadeFrame,"ActorEffect (tentative)","selects a sprite frame from elapsed fade time and mode"
