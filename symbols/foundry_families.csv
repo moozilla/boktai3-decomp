@@ -1024,3 +1024,4 @@ addr,function,name,family,note
 081A8044,sub_081A8044,ScenePanel_UpdateDelayedPairState,"ScenePanel","updates pair conditions and transitions after 129 ticks"
 081A809C,sub_081A809C,ScenePanel_UpdateActiveTransition,"ScenePanel","queues state three when panel activity is observed"
 081A8320,sub_081A8320,ScenePanel_UpdateActivePairState,"ScenePanel","updates pair conditions and transitions while input is active"
+081A8774,sub_081A8774,ScenePanel_ResetPairMode,"ScenePanel","clears pair mode before applying active pair transitions"
