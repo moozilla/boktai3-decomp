@@ -372,3 +372,4 @@ addr,function,name,family,note
 08159860,sub_08159860,PlayerStats_AddContactHundredths,"PlayerStats","awards scaled stat hundredths from collider flags"
 08159978,sub_08159978,Player_BeginPositionRequest,"Player","copies position and starts an optional movement request"
 08159A90,sub_08159A90,Player_ApplyPositionRequest,"Player","applies position and facing while clearing recovery state"
+08159D00,sub_08159D00,Player_ApplyInterpolatedMovement,"Player","applies position and facing in movement mode twenty-five"
