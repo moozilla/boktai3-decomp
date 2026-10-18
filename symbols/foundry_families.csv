@@ -1283,3 +1283,4 @@ addr,function,name,family,note
 08213010,sub_08213010,Lookup_FindValueIndex,"lookup tables","finds a value in a ten-entry lookup table"
 0821304C,sub_0821304C,CollectionBook_RefreshCollectedEntryVisibility,"Collection book (tentative)","refreshes display flags for collected entries"
 08213B64,sub_08213B64,ForgingBook_InitializeFromScript,"Forging book 2 (auto, tentative)","initializes the forging book screen from script options"
+08214588,sub_08214588,DisplaySequenceSprite_SetResource,"display sequence sprites","resets sprite playback and sets resource attributes"
