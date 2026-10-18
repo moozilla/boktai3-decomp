@@ -1200,3 +1200,4 @@ addr,function,name,family,note
 081F4A6C,sub_081F4A6C,Ratatosk_UpdatePointEffectAnimation,"Ratatosk","runs selected-point effects during animation sixteen"
 081F4B24,sub_081F4B24,Ratatosk_UpdateShrinkingAnimation,"Ratatosk","disables shadow and shrinks rotating animation until complete"
 081F4C08,sub_081F4C08,Ratatosk_UpdateFadeIn,"Ratatosk","increases sprite fade scale and restores shadow at completion"
+081F5748,sub_081F5748,Ratatosk_UpdateTimedPose,"Ratatosk","plays pose animation and signals completion after sixty ticks"
