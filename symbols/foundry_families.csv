@@ -85,3 +85,4 @@ addr,function,name,family,note
 080C2E14,sub_080C2E14,SceneActorControl_UpdateEntryPhase,"SceneActorControl","initializes entry control and restores saved control on completion"
 080C2F3C,sub_080C2F3C,SceneActorControl_UpdateEntryRecoveryPhase,"SceneActorControl","initializes entry control then enters recovery phase"
 080C4660,sub_080C4660,SceneActorTerrain_CompareNeighborHeight,"SceneActorTerrain","classifies adjacent cell elevation with slope exceptions"
+080C49BC,sub_080C49BC,SceneActorControl_RefreshMotionRoute,"SceneActorControl","refreshes route flags or initializes motion control"
