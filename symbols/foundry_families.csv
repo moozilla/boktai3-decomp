@@ -657,3 +657,4 @@ addr,function,name,family,note
 081225A4,sub_081225A4,SpriteEffectPool_RemoveSlots,"SpriteEffectPool","removes active sprites and their auxiliary effects"
 081229E4,sub_081229E4,StateSprite_InitCollider,"StateSpritePool","initializes oriented collider dimensions and callback"
 08122FC4,sub_08122FC4,SpriteNotice_Create,"SpriteNotice","allocates and initializes a positioned animated sprite"
+08125EEC,sub_08125EEC,SpriteBurst_Create,"SpriteBurst","allocates and initializes a directional sprite burst"
