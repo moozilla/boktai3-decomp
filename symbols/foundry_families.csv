@@ -1158,3 +1158,4 @@ addr,function,name,family,note
 081E0818,sub_081E0818,ScriptPrompt_ResetDisplay,"ScriptPrompt screen task","redraws prompt text and resets sprite positions and state"
 081E095C,sub_081E095C,AnimPanel_SelectActiveAnimation,"animation panel (tentative)","sets complementary flag bits on two animations according to selection"
 081E1278,sub_081E1278,SelectionPalette_UpdatePulse,"Two-choice screen selection palette","cycles the selected entry palette color while clearing the other"
+081EB81C,sub_081EB81C,ScreenText_ShowIndexedString,"screen script parameters","displays script text with a mode-dependent index adjustment"
