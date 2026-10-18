@@ -12,7 +12,7 @@ u32 SceneInput_GetNavigationKeys(struct SceneInputGridView *grid)
         return keys[1];
     } else {
         do {
-        mask &= keys[0];
+            mask &= keys[0];
         } while (0);
         if (mask) {
             grid->repeat++;

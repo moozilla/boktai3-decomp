@@ -48,7 +48,7 @@ void TetherActor_UpdateWanderingState(struct TetherActor *actor)
             angle = value << 5;
         }
         do {
-        table = gUnk_086149C4;
+            table = gUnk_086149C4;
         } while (0);
         delta.x = scale(table[(angle + 64) & 255] * 3);
         delta.y = 0;
