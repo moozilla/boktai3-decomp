@@ -803,3 +803,4 @@ addr,function,name,family,note
 0816D868,sub_0816D868,SceneHud_ShowActionPreview,"SceneHud","display the highlighted action animation and description"
 0816DA58,sub_0816DA58,SceneHud_BeginActionIconMotion,"SceneHud","initializes an action icon at its source position and records its target"
 0816DAF8,sub_0816DAF8,SceneHud_ReturnToActionGrid,"SceneHud","restores action-grid icons, cursor and input callback"
+081788E8,sub_081788E8,Hud_Destroy,"Field HUD","removes HUD animations and clears the global HUD pointer"
