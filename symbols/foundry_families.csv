@@ -716,3 +716,4 @@ addr,function,name,family,note
 0814F90C,sub_0814F90C,Player_UpdateTriggerAnimation,"Player","updates timed animation and dispatches pending trigger"
 081502AC,sub_081502AC,Player_UpdateSongCueAnimation,"Player","updates branched animation with song cue and facing reset"
 081511E0,sub_081511E0,Player_UpdateFourPhaseAction,"Player","steps a four phase action with a directional effect"
+08151310,sub_08151310,Player_UpdateSixPhaseAction,"Player","steps a six phase action with a timed hold"
