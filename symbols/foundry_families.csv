@@ -886,3 +886,4 @@ addr,function,name,family,note
 08180B14,sub_08180B14,SceneCombatActor_InitBouncingParticle,"SceneCombatActor / BouncingSceneParticle","initializes an embedded bouncing sprite and selects its directional frame"
 08180BC4,sub_08180BC4,ActorMarker_InitFacingSprite,"ActorMarker","initializes an embedded marker sprite from kind and direction"
 08180C74,sub_08180C74,ActorOverlay_InitSprite,"ActorOverlay (tentative)","initializes the actor attached sprite and callbacks"
+081811F0,sub_081811F0,ActorMarker_InitMovingSprite,"ActorMarker","initializes a raised sprite with facing-dependent velocity"
