@@ -569,3 +569,4 @@ addr,function,name,family,note
 081083F4,sub_081083F4,TilePool_Destroy,"Tile / Pool1B8","removes sprites and frees all occupied tile slots"
 08108B90,sub_08108B90,CallbackTask_Finish,"CallbackTask","dispatches a result callback and kills a completed task"
 08108C20,sub_08108C20,SlotMonitor_PollResult,"SlotMonitor","poll result and advance callback when ready"
+08108EF0,sub_08108EF0,SlotMonitor_Initialize,"SlotMonitor","initialize timeout, slots and polling callback"
