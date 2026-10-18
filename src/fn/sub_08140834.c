@@ -4,8 +4,14 @@ s32 Div(s32, s32);
 s32 Mod(s32, s32);
 s32 sub_0804F6D0(void *);
 
-struct Inner { u8 pad[4]; s16 w; };
-struct Outer { u8 pad[4]; struct Inner *in; };
+struct Inner {
+    u8 pad[4];
+    s16 w;
+};
+struct Outer {
+    u8 pad[4];
+    struct Inner *in;
+};
 extern struct Outer *gUnk_030052F4;
 
 struct Obj {
