@@ -845,3 +845,4 @@ addr,function,name,family,note
 0817B788,sub_0817B788,ActorState_UpdateRandomAnimation,"ActorState","selects random animation and queues timed state transition"
 0817B8BC,sub_0817B8BC,ActorState_UpdateSelectedAnimation,"ActorState","selects an animation pair and queues timed state transitions"
 0817B9EC,sub_0817B9EC,ActorState_BeginReverseAnimation,"ActorState","initializes animation opposite the stored direction and queues a transition"
+0817BAA0,sub_0817BAA0,ActorState_UpdateRestartableAnimation,"ActorState","initializes animation and restarts or queues a transition"
