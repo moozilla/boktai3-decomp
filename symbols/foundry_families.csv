@@ -1187,3 +1187,4 @@ addr,function,name,family,note
 081F2838,sub_081F2838,SpriteTrail_InitRenderCollider,"SpriteTrail","initializes and activates the trail render collider"
 081F2C64,sub_081F2C64,TimedSprite_Init,"TimedSprite (tentative)","initializes a sprite and resets its age and duration"
 081F2CD4,sub_081F2CD4,ActorResource_GetFixedId,"ActorResource (tentative)","reads a variant and returns resource id 0x1F2"
+081F2DE8,sub_081F2DE8,ActorProximity_UpdateSquaredDistances,"ActorProximity (tentative)","updates nine squared horizontal distances"
