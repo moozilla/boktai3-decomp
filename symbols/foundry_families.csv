@@ -1155,3 +1155,4 @@ addr,function,name,family,note
 081DF1A0,sub_081DF1A0,AnimPanel_JoinTextRows,"animation panel text (tentative)","concatenates four bounded 256-byte text rows"
 081DFC1C,sub_081DFC1C,AnimPanel_AppendSelection,"animation panel (tentative)","stores selected value and advances the entry cursor unless full"
 081E04B4,sub_081E04B4,StartPrompt_Update,"StartPrompt screen task","waits for Start then fades and runs a completion script"
+081E0818,sub_081E0818,ScriptPrompt_ResetDisplay,"ScriptPrompt screen task","redraws prompt text and resets sprite positions and state"
