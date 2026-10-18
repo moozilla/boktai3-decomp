@@ -1267,3 +1267,4 @@ addr,function,name,family,note
 0820C984,sub_0820C984,SceneDrawablePair_SetFlags,"Scene paired drawable owner (tentative)","sets bit two in paired halfword flags and bit zero in owner flags"
 0820D258,sub_0820D258,SceneOverlayEntry_Init,"Scene overlay entry (tentative)","initializes configuration animation and drawable for a pooled entry"
 0820F1A0,sub_0820F1A0,OrangeSpine_TryFireAtPlayer,"Orange spine (tentative)","fires when the player is ahead and within a narrow lateral band"
+0820F2EC,sub_0820F2EC,OrangeSpine_UpdateDefeatEffect,"Orange spine (tentative)","emits randomized effects during defeat and records defeat at state one"
