@@ -1,0 +1,36 @@
+#define ActorContact_InitializeBodyAndSecondary sub_0809CBB8
+#include "global.h"
+#include "scene_actor_reset.h"
+void sub_0809B000(void);
+void sub_0809AE0C(void);
+void SceneActorCollision_InitBody(void *, void *, void *, void *, void *);
+void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
+void sub_0821FF58(void *, s32, s32, s32, s32, s32);
+void Collider_SetPosition(void *, void *, u32);
+void Collider_SetCallback(void *, void *, void *);
+void sub_0809CBB8(struct SceneActorRegistryResetView *a)
+{
+    struct ContactPackedVector bodySize, bodyOffset, secondarySize, secondaryOffset;
+    struct ContactCollider *collider;
+    bodySize.x = 0x10;
+    bodySize.y = 0x80;
+    bodySize.z = 0x10;
+    bodyOffset.x = 0;
+    bodyOffset.y = 0;
+    bodyOffset.z = 0;
+    SceneActorCollision_InitBody(a, &bodySize, &bodyOffset, sub_0809B000, a);
+    secondarySize.x = 0x10;
+    secondarySize.y = 0x54;
+    secondarySize.z = 0x10;
+    secondaryOffset.x = 0;
+    secondaryOffset.y = 0;
+    secondaryOffset.z = 0;
+    {
+        u32 flags = 0x2003;
+        collider = &a->colliderB;
+        Collider_Init(collider, a->id, flags, 0, 0x10, &secondarySize, &secondaryOffset);
+    }
+    sub_0821FF58(collider, 0, 0, 0, 0, 0);
+    Collider_SetPosition(collider, &a->position, 0);
+    Collider_SetCallback(collider, sub_0809AE0C, a);
+}
