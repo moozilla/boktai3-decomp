@@ -21,7 +21,8 @@ u32 DirectionalController_ConsumeEntered(struct DirectionalController *p)
     return r;
 }
 
-s32 DirectionalController_InitSlot(struct DirectionalManager *manager, struct DirectionalController *p, s32 index)
+s32 DirectionalController_InitSlot(struct DirectionalManager *manager,
+                                   struct DirectionalController *p, s32 index)
 {
     void *animation = p->animation;
     s32 r;
@@ -37,7 +38,8 @@ s32 DirectionalController_InitSlot(struct DirectionalManager *manager, struct Di
 }
 
 /* Finds the enabled controller with the given script id; optionally returns its slot index. */
-struct DirectionalController *DirectionalController_FindByScriptId(struct DirectionalManager *manager, s32 id, s32 *index)
+struct DirectionalController *
+DirectionalController_FindByScriptId(struct DirectionalManager *manager, s32 id, s32 *index)
 {
     struct DirectionalController *e;
     s32 i;
@@ -63,8 +65,9 @@ u32 DirectionalController_SetMarkerFadeLevel(struct DirectionalController *p, u3
 }
 
 /* Places the controller and its marker around the given point. */
-u32 DirectionalController_SetPosition(struct DirectionalManager *manager, struct DirectionalController *p,
-                 struct DirectionalPackedVec *in)
+u32 DirectionalController_SetPosition(struct DirectionalManager *manager,
+                                      struct DirectionalController *p,
+                                      struct DirectionalPackedVec *in)
 {
     struct DirectionalDrawable *q = &p->drawable;
     p->position.x = in->x;
@@ -416,9 +419,11 @@ s32 DirectionalController_ScriptCreate(void)
     s32 findRegion;
     struct DirectionalManager *manager = gUnk_02000038;
     struct DirectionalController *p;
-    s32 i, id;
-    if (!manager)
+    s32 i;
+    s32 id;
+    if (!manager) {
         goto fail;
+    }
     id = Script_GetKeywordValue('n', 0);
     p = manager->slots;
     for (i = 0; i < manager->count; i++, p++) {
@@ -436,12 +441,13 @@ s32 DirectionalController_ScriptCreate(void)
                 p->distance = distance * distance;
             }
             if (Script_SeekToKeyword('a')) {
-                register s16 *base asm("r6") = p->arguments;
-                s16 *out = base;
+                s16 *base = p->arguments;
+                s16 *out = *(&base);
                 do {
                     s32 value = Script_GetPc();
-                    if (value)
-                        value = Script_GetValue();
+                    if (value) {
+                        *(&value) = Script_GetValue();
+                    }
                     *out++ = value;
                 } while ((s32)out <= (s32)(base + 3));
             } else {
@@ -462,25 +468,30 @@ s32 DirectionalController_ScriptCreate(void)
                 position.z = 0;
             }
             DirectionalController_SetPosition(manager, p, &position);
-            if (findRegion)
+            if (findRegion) {
                 p->region = Region_FindContaining(&p->position);
-            else
+            } else {
                 p->region = -1;
+            }
             DirectionalController_SetMarkerFadeLevel(p, 2);
-            if (p->disabled == 1)
+            if (p->disabled == 1) {
                 *drawable |= 1;
-            else
+            } else {
                 *drawable &= ~1;
-            if (p->orientation == 0)
+            }
+            if (p->orientation == 0) {
                 *drawable &= ~4;
-            else
+            } else {
                 *drawable |= 4;
+            }
             manager->enabled |= 1 << i;
             break;
         }
     }
-    if (i != manager->count)
+
+    if (i != manager->count) {
         return 0;
+    }
 fail:
     return -1;
 }
