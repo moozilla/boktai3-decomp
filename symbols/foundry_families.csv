@@ -1051,3 +1051,4 @@ addr,function,name,family,note
 081B78CC,sub_081B78CC,AnimatedMarker_BeginActive,"AnimatedMarker","registers occupied terrain cell and installs active update"
 081B817C,sub_081B817C,SceneScriptObject_RunPendingScript,"SceneScriptObject","calls the pending script with five object arguments and clears it"
 081B8518,sub_081B8518,SceneScriptTask_Update,"SceneScriptTask","dispatches one of two task state callbacks"
+081B9334,sub_081B9334,MotionTrack_Initialize,"MotionTrack","initializes a data track with two optional vectors and a mode"
