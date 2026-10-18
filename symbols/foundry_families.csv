@@ -202,3 +202,4 @@ addr,function,name,family,note
 08111410,sub_08111410,PaletteFade_AdvanceColors,"palette fade","advances fixed-point RGB channels and writes sixteen palette colors"
 08111DE0,sub_08111DE0,MessagePanel_InitSprites,"MessagePanel","initializes 23 sprites and resets selection entries"
 081120BC,sub_081120BC,SceneGauge_SelectThresholdFrame,"Scene gauge animation","selects one of five animation frames using four descending byte thresholds"
+08112A90,sub_08112A90,PanelSpritePool_Init,"PanelSpritePool","initializes eight animation and sprite slots"
